@@ -1,9 +1,11 @@
 import Lake
 open Lake DSL
 
-package "foreduction" where
+package "descriptive-complexity" where
   version := v!"0.1.0"
-  keywords := #["math"]
+  description := "Descriptive complexity in Lean 4: machine-model-free NP-completeness via first-order reductions, and the polynomial hierarchy via second-order alternation"
+  keywords := #["complexity", "descriptive complexity", "model theory",
+    "NP-completeness", "reductions"]
   leanOptions := #[
     ⟨`pp.unicode.fun, true⟩, -- pretty-prints `fun a ↦ b`
     ⟨`relaxedAutoImplicit, false⟩,
@@ -14,5 +16,5 @@ package "foreduction" where
 require "leanprover-community" / "mathlib" @ git "v4.33.0-rc1"
 
 @[default_target]
-lean_lib «FOReduction» where
+lean_lib «DescriptiveComplexity» where
   -- add any library configuration options here

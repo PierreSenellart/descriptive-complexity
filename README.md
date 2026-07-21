@@ -1,8 +1,10 @@
-# First-order reductions in Lean 4
+# DescriptiveComplexity
 
-Machine-model-free hardness reductions on top of Mathlib's `ModelTheory`
-library, in the style of descriptive complexity (Immerman, *Descriptive
-Complexity*, ch. 3).
+A Lean 4 library for descriptive complexity on top of Mathlib's
+`ModelTheory` library: machine-model-free hardness reductions in the style
+of Immerman (*Descriptive Complexity*, ch. 3). All declarations live in the
+`DescriptiveComplexity` namespace; the top-level module is
+`DescriptiveComplexity`.
 
 Complexity theory is essentially absent from Lean/Mathlib because formalizing
 a model of computation with resource bounds is hard. But many classical
@@ -25,71 +27,71 @@ the input structure to thread each clause's OR-gadget chain). SAT and
 
 ## Contents
 
-* `FOReduction/Interpretation.lean` — the framework:
-  - `FirstOrder.DecisionProblem L`: a decision problem as an
+* `DescriptiveComplexity/Interpretation.lean` — the framework:
+  - `DescriptiveComplexity.DecisionProblem L`: a decision problem as an
     isomorphism-invariant property of `L`-structures (invariance is part of
     the notion, as in descriptive complexity);
-  - `FirstOrder.FOInterpretation L L' Tag dim`: tagged `dim`-dimensional
+  - `DescriptiveComplexity.FOInterpretation L L' Tag dim`: tagged `dim`-dimensional
     first-order interpretations of a relational language `L'` in `L`, sending
     an `L`-structure `A` to an `L'`-structure `I.Map A` on `Tag × A^dim`
     (tags replace the linear order used by textbook FO reductions to encode
     constantly many sorts of elements);
-  - `FirstOrder.FOInterpretation.IsQuantifierFree`: quantifier-free
+  - `DescriptiveComplexity.FOInterpretation.IsQuantifierFree`: quantifier-free
     interpretations;
-  - `FirstOrder.FOReduction P Q`, with notation `P ≤ᶠᵒ Q`: FO reductions
+  - `DescriptiveComplexity.FOReduction P Q`, with notation `P ≤ᶠᵒ Q`: FO reductions
     between problems, i.e. interpretations mapping yes-instances exactly to
     yes-instances;
-  - `FirstOrder.FOInterpretation.map_finite`: finite structures map to finite
+  - `DescriptiveComplexity.FOInterpretation.map_finite`: finite structures map to finite
     structures.
-* `FOReduction/Problems/` — the problem catalog, one file (or directory) per
+* `DescriptiveComplexity/Problems/` — the problem catalog, one file (or directory) per
   problem, each holding vocabulary, semantic definition, the bundled
   `DecisionProblem`, its FO reductions and its completeness theorems
-  (`FOReduction/Problems.lean` is the umbrella):
+  (`DescriptiveComplexity/Problems.lean` is the umbrella):
   - `Problems/Sat.lean`: the language `FirstOrder.Language.sat` of CNF
     instances (`isClause`, `posIn`, `negIn`), satisfiability
-    `FirstOrder.Satisfiable`, the problem `FirstOrder.SAT`, and the
-    Cook–Levin axiom `FirstOrder.SAT_NP_complete` with its corollaries
+    `DescriptiveComplexity.Satisfiable`, the problem `DescriptiveComplexity.SAT`, and the
+    Cook–Levin axiom `DescriptiveComplexity.SAT_NP_complete` with its corollaries
     (`sat_mem_NP`, `sat_NP_hard`, `sat_compl_mem_coNP`);
   - `Problems/ThreeColorability/Defs.lean`: 3-colorability
-    `FirstOrder.ThreeColorable` over Mathlib's `FirstOrder.Language.graph`
-    and the problem `FirstOrder.ThreeCol`, shown to agree with Mathlib's
+    `DescriptiveComplexity.ThreeColorable` over Mathlib's `FirstOrder.Language.graph`
+    and the problem `DescriptiveComplexity.ThreeCol`, shown to agree with Mathlib's
     `SimpleGraph.Colorable 3` on simple graphs.
-* `FOReduction/Composition.lean` — transitivity:
-  - `FirstOrder.FOInterpretation.pull`: pullback of a formula through an
+* `DescriptiveComplexity/Composition.lean` — transitivity:
+  - `DescriptiveComplexity.FOInterpretation.pull`: pullback of a formula through an
     interpretation (quantifiers over the interpreted universe become finite
     conjunctions over tags of blocks of quantifiers);
-  - `FirstOrder.FOInterpretation.comp`: composition of FO interpretations,
+  - `DescriptiveComplexity.FOInterpretation.comp`: composition of FO interpretations,
     with `compLEquiv` identifying the composite universe with the
     twice-interpreted one;
-  - `FirstOrder.FOReduction.refl` and `FirstOrder.FOReduction.trans`:
+  - `DescriptiveComplexity.FOReduction.refl` and `DescriptiveComplexity.FOReduction.trans`:
     FO reducibility is reflexive (identity interpretation) and transitive,
     with a `Trans` instance for `calc` chains and a `Preorder` instance on
     `DecisionProblem L` (for relational `L`) where `P ≤ Q` is the
     propositional truncation `Nonempty (P ≤ᶠᵒ Q)`.
-* `FOReduction/Ordered.lean` — ordered machinery:
+* `DescriptiveComplexity/Ordered.lean` — ordered machinery:
   - an `(L.sum Language.order).Structure` instance on linearly ordered
-    `L`-structures, and `FirstOrder.OrderedFOReduction P Q`, with notation
+    `L`-structures, and `DescriptiveComplexity.OrderedFOReduction P Q`, with notation
     `P ≤ᶠᵒ[≤] Q`: FO reductions over the ordered expansion of the source
     language, correct for every finite linearly ordered input structure
     (i.e. order-invariant FO(≤) reductions, the standard notion of
     descriptive complexity).
-* `FOReduction/Problems/ThreeColorability/ToSat.lean` — the reduction
+* `DescriptiveComplexity/Problems/ThreeColorability/ToSat.lean` — the reduction
   3COL ⟶ SAT:
-  - `FirstOrder.threeColToSat`: the classical CNF encoding of 3-colorability
+  - `DescriptiveComplexity.threeColToSat`: the classical CNF encoding of 3-colorability
     (variables `xᵤᵢ` "vertex `u` gets color `i`"; per-vertex clauses
     `xᵤ₀ ∨ xᵤ₁ ∨ xᵤ₂`; per-edge, per-color clauses `¬xᵤᵢ ∨ ¬xᵥᵢ`) as a
     2-dimensional interpretation with 7 tags;
-  - `FirstOrder.threeColorable_iff_satisfiable`: correctness, for
+  - `DescriptiveComplexity.threeColorable_iff_satisfiable`: correctness, for
     arbitrary (not necessarily finite, simple or undirected) graph
     structures;
-  - `FirstOrder.threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT` — the
+  - `DescriptiveComplexity.threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT` — the
     `fo_reduction` theorem;
-  - `FirstOrder.threeColToSat_isQuantifierFree`: the reduction is even
+  - `DescriptiveComplexity.threeColToSat_isQuantifierFree`: the reduction is even
     quantifier-free;
-  - `FirstOrder.SimpleGraph.colorable_iff_satisfiable`: the corollary for
+  - `DescriptiveComplexity.SimpleGraph.colorable_iff_satisfiable`: the corollary for
     Mathlib simple graphs.
-* `FOReduction/Complexity.lean` — abstract complexity:
-  - `FirstOrder.ComplexityClass`: abstract complexity classes (membership
+* `DescriptiveComplexity/Complexity.lean` — abstract complexity:
+  - `DescriptiveComplexity.ComplexityClass`: abstract complexity classes (membership
     `P ∈ 𝒞`, hardness `𝒞.Hard P`, completeness `𝒞.Complete P`, inclusion
     `𝒞 ⊆ 𝒟`), closed by definition under (ordered) FO reductions — closure
     is part of the structure since an axiom over all classes would be
@@ -103,13 +105,13 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     axioms hold in the trivial model, so they are jointly consistent; `PH`
     is defined from the levels;
   - the Cook–Levin axiom and per-problem completeness theorems live with
-    their problems under `FOReduction/Problems/`; in particular
-    **`FirstOrder.threeCol_NP_complete : NP.Complete ThreeCol`**
+    their problems under `DescriptiveComplexity/Problems/`; in particular
+    **`DescriptiveComplexity.threeCol_NP_complete : NP.Complete ThreeCol`**
     (`Problems/ThreeColorability.lean`) — NP-completeness of 3-colorability
     from the two FO reductions, with no machine model.
-* `FOReduction/OccurrenceOrder.lean`,
-  `FOReduction/Problems/ThreeColorability/SatGadget.lean`,
-  `FOReduction/Problems/ThreeColorability/FromSat.lean` — the reverse
+* `DescriptiveComplexity/OccurrenceOrder.lean`,
+  `DescriptiveComplexity/Problems/ThreeColorability/SatGadget.lean`,
+  `DescriptiveComplexity/Problems/ThreeColorability/FromSat.lean` — the reverse
   reduction SAT ⟶ 3COL:
   - literal occurrences of a clause and their traversal along the order
     (first/last occurrence, immediate predecessor), with existence lemmas on
@@ -120,7 +122,7 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     `SatToCol.satisfiable_iff_gadColoring` that it is 3-colorable iff the
     CNF is satisfiable;
   - FO(≤) formulas defining the gadget graph, their realization lemmas, and
-    `FirstOrder.sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol` —
+    `DescriptiveComplexity.sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol` —
     the reverse `fo_reduction` theorem.
 
 ## Notes

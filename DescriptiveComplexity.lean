@@ -1,0 +1,15 @@
+-- This module serves as the root of the `DescriptiveComplexity` library.
+import DescriptiveComplexity.Interpretation
+import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Composition
+import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.Complexity
+import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.SecondOrderLift
+import DescriptiveComplexity.SecondOrderPull
+import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.OccurrenceOrder
+import DescriptiveComplexity.OccurrenceFormulas
+import DescriptiveComplexity.Numbers
+import DescriptiveComplexity.Problems
