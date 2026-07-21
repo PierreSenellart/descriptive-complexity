@@ -57,10 +57,36 @@ open Language Structure
 
 variable (L L' : Language.{0, 0})
 
-/-- A property of `L`-structures: a "problem" in the sense of descriptive
-complexity, whose yes-instances are the `L`-structures satisfying it. -/
-def DecisionProblem : Type 1 :=
-  ∀ (A : Type) [L.Structure A], Prop
+/-- A decision problem in the sense of descriptive complexity: an
+isomorphism-closed property of `L`-structures, whose yes-instances are the
+`L`-structures satisfying it. Isomorphism-invariance is part of the notion —
+a decision problem cannot distinguish isomorphic presentations of the same
+structure. -/
+structure DecisionProblem where
+  /-- The predicate: `P A` (through the function coercion) states that the
+  structure `A` is a yes-instance. -/
+  Holds : ∀ (A : Type) [L.Structure A], Prop
+  /-- Decision problems do not distinguish isomorphic structures. -/
+  iso_invariant : ∀ {A B : Type} [L.Structure A] [L.Structure B],
+    (A ≃[L] B) → (Holds A ↔ Holds B)
+
+namespace DecisionProblem
+
+variable {L}
+
+instance : CoeFun (DecisionProblem L) fun _ => ∀ (A : Type) [L.Structure A], Prop :=
+  ⟨Holds⟩
+
+@[ext]
+theorem ext {P Q : DecisionProblem L} (h : ∀ (A : Type) [L.Structure A], P A ↔ Q A) :
+    P = Q := by
+  obtain ⟨p, hp⟩ := P
+  obtain ⟨q, hq⟩ := Q
+  have : p = q := funext fun A => funext fun inst => propext (h A)
+  subst this
+  rfl
+
+end DecisionProblem
 
 /-- A *tagged `dim`-dimensional first-order interpretation* of the relational
 language `L'` in the language `L`. It maps an `L`-structure `A` to the

@@ -26,8 +26,9 @@ the input structure to thread each clause's OR-gadget chain). SAT and
 ## Contents
 
 * `FOReduction/Interpretation.lean` — the framework:
-  - `FirstOrder.DecisionProblem L`: a decision problem as a property of
-    `L`-structures;
+  - `FirstOrder.DecisionProblem L`: a decision problem as an
+    isomorphism-invariant property of `L`-structures (invariance is part of
+    the notion, as in descriptive complexity);
   - `FirstOrder.FOInterpretation L L' Tag dim`: tagged `dim`-dimensional
     first-order interpretations of a relational language `L'` in `L`, sending
     an `L`-structure `A` to an `L'`-structure `I.Map A` on `Tag × A^dim`
@@ -46,6 +47,18 @@ the input structure to thread each clause's OR-gadget chain). SAT and
   - 3-colorability `FirstOrder.ThreeColorable` over Mathlib's
     `FirstOrder.Language.graph`, shown to agree with Mathlib's
     `SimpleGraph.Colorable 3` on simple graphs.
+* `FOReduction/Composition.lean` — transitivity:
+  - `FirstOrder.FOInterpretation.pull`: pullback of a formula through an
+    interpretation (quantifiers over the interpreted universe become finite
+    conjunctions over tags of blocks of quantifiers);
+  - `FirstOrder.FOInterpretation.comp`: composition of FO interpretations,
+    with `compLEquiv` identifying the composite universe with the
+    twice-interpreted one;
+  - `FirstOrder.FOReduction.refl` and `FirstOrder.FOReduction.trans`:
+    FO reducibility is reflexive (identity interpretation) and transitive,
+    with a `Trans` instance for `calc` chains and a `Preorder` instance on
+    `DecisionProblem L` (for relational `L`) where `P ≤ Q` is the
+    propositional truncation `Nonempty (P ≤ᶠᵒ Q)`.
 * `FOReduction/Ordered.lean` — ordered machinery:
   - an `(L.sum Language.order).Structure` instance on linearly ordered
     `L`-structures, and `FirstOrder.OrderedFOReduction P Q`, with notation
@@ -72,7 +85,10 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     `P ∈ 𝒞`, hardness `𝒞.Hard P`, completeness `𝒞.Complete P`, inclusion
     `𝒞 ⊆ 𝒟`), closed by definition under (ordered) FO reductions — closure
     is part of the structure since an axiom over all classes would be
-    inconsistent;
+    inconsistent; membership and hardness moreover only depend on the
+    *finite* instances of a problem (`mem_congr_finite`/`hard_congr_finite`),
+    making explicit that complexity statements say nothing about infinite
+    structures;
   - the polynomial hierarchy, axiomatized: `SigmaP k`/`PiP k` with
     `PTIME := SigmaP 0`, `NP := SigmaP 1`, `coNP := PiP 1`, the level
     inclusions, `Π₀ᵖ = Σ₀ᵖ`, and `Πₖᵖ` = complements (`Pᶜ`) of `Σₖᵖ`; all
@@ -102,10 +118,11 @@ the input structure to thread each clause's OR-gadget chain). SAT and
   direction SAT → 3COL is *not* FO-expressible without a linear order on the
   input structure (clauses of unbounded width require an ordered traversal),
   so it is formalized as an ordered (order-invariant) FO reduction, correct
-  for every finite linearly ordered input. Natural next steps: composition of
-  FO reductions, `BIT`/arithmetic on ordered structures (under which SAT is
-  complete for NP under FO reductions, Immerman), and further reductions
-  (e.g. 3COL → k-COL, CLIQUE ↔ INDEPENDENT-SET).
+  for every finite linearly ordered input. Natural next steps: a catalog of
+  classical NP-complete problems with their FO reductions (3SAT, Vertex
+  Cover, Clique, Independent Set, …), composition involving ordered
+  reductions, and `BIT`/arithmetic on ordered structures (under which SAT is
+  complete for NP under FO reductions, Immerman).
 * Junk elements of the interpreted universe (tags with non-diagonal or
   non-edge tuples) are excluded from all relations by the defining formulas,
   so no domain formula is needed.

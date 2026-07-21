@@ -71,8 +71,49 @@ def Satisfiable : Prop :=
 
 end Sat
 
+section Iso
+
+private theorem comp_vec₁ {A B : Type} (f : A → B) (a : A) : f ∘ ![a] = ![f a] := by
+  funext j
+  fin_cases j
+  simp
+
+private theorem comp_vec₂ {A B : Type} (f : A → B) (a b : A) : f ∘ ![a, b] = ![f a, f b] := by
+  funext j
+  fin_cases j <;> simp
+
+private theorem satisfiable_of_iso {A B : Type} [Language.sat.Structure A]
+    [Language.sat.Structure B] (e : A ≃[Language.sat] B) (h : Satisfiable A) :
+    Satisfiable B := by
+  obtain ⟨ν, hν⟩ := h
+  refine ⟨fun b => ν (e.symm b), fun c hc => ?_⟩
+  have hc' : RelMap satIsClause ![e.symm c] := by
+    have h' := StrongHomClass.map_rel e.symm satIsClause ![c]
+    rw [comp_vec₁] at h'
+    exact h'.mpr hc
+  obtain ⟨x, hx⟩ := hν (e.symm c) hc'
+  refine ⟨e x, ?_⟩
+  rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+  · refine Or.inl ⟨?_, by simpa using hT⟩
+    have h' := (StrongHomClass.map_rel e satPosIn ![e.symm c, x]).mpr hp
+    rw [comp_vec₂] at h'
+    simpa using h'
+  · refine Or.inr ⟨?_, by simpa using hT⟩
+    have h' := (StrongHomClass.map_rel e satNegIn ![e.symm c, x]).mpr hn
+    rw [comp_vec₂] at h'
+    simpa using h'
+
+/-- Satisfiability is isomorphism-invariant. -/
+theorem satisfiable_iso {A B : Type} [Language.sat.Structure A] [Language.sat.Structure B]
+    (e : A ≃[Language.sat] B) : Satisfiable A ↔ Satisfiable B :=
+  ⟨satisfiable_of_iso e, satisfiable_of_iso e.symm⟩
+
+end Iso
+
 /-- SAT, as a problem on `Language.sat`-structures. -/
-def SAT : DecisionProblem Language.sat := fun A inst => @Satisfiable A inst
+def SAT : DecisionProblem Language.sat where
+  Holds := fun A inst => @Satisfiable A inst
+  iso_invariant := fun e => satisfiable_iso e
 
 section Graph
 
@@ -86,8 +127,26 @@ def ThreeColorable : Prop :=
 
 end Graph
 
+private theorem threeColorable_of_iso {A B : Type} [Language.graph.Structure A]
+    [Language.graph.Structure B] (e : A ≃[Language.graph] B) (h : ThreeColorable A) :
+    ThreeColorable B := by
+  obtain ⟨c, hc⟩ := h
+  refine ⟨fun b => c (e.symm b), fun x y hxy => ?_⟩
+  refine hc (e.symm x) (e.symm y) ?_
+  have h' := StrongHomClass.map_rel e.symm adj ![x, y]
+  rw [comp_vec₂] at h'
+  exact h'.mpr hxy
+
+/-- 3-colorability is isomorphism-invariant. -/
+theorem threeColorable_iso {A B : Type} [Language.graph.Structure A]
+    [Language.graph.Structure B] (e : A ≃[Language.graph] B) :
+    ThreeColorable A ↔ ThreeColorable B :=
+  ⟨threeColorable_of_iso e, threeColorable_of_iso e.symm⟩
+
 /-- 3-colorability, as a problem on `Language.graph`-structures. -/
-def ThreeCol : DecisionProblem Language.graph := fun V inst => @ThreeColorable V inst
+def ThreeCol : DecisionProblem Language.graph where
+  Holds := fun V inst => @ThreeColorable V inst
+  iso_invariant := fun e => threeColorable_iso e
 
 /-- On the first-order structure associated to a simple graph,
 `ThreeColorable` coincides with Mathlib's `SimpleGraph.Colorable 3`. -/

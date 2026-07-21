@@ -6,4 +6,5 @@ import FOReduction.Ordered
 import FOReduction.OccurrenceOrder
 import FOReduction.SatGadget
 import FOReduction.SatToThreeCol
+import FOReduction.Composition
 import FOReduction.Complexity

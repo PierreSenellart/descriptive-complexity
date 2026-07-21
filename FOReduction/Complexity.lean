@@ -72,6 +72,13 @@ structure ComplexityClass where
   /-- Hardness travels forward along ordered FO reductions. -/
   hard_of_orderedReduction : ∀ {L L' : Language.{0, 0}} [L'.IsRelational]
     {P : DecisionProblem L} {Q : DecisionProblem L'}, (P ≤ᶠᵒ[≤] Q) → Hard P → Hard Q
+  /-- Complexity classes speak about *finite* instances only: membership does
+  not depend on the behavior of a problem on infinite structures. -/
+  mem_congr_finite : ∀ {L : Language.{0, 0}} {P Q : DecisionProblem L},
+    (∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) → (Mem P ↔ Mem Q)
+  /-- Hardness, too, only depends on the finite instances of a problem. -/
+  hard_congr_finite : ∀ {L : Language.{0, 0}} {P Q : DecisionProblem L},
+    (∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) → (Hard P ↔ Hard Q)
 
 /-- `P ∈ 𝒞`: the problem `P` belongs to the complexity class `𝒞`. (This
 overloads the `∈` notation; the `Membership` class cannot be used here since
@@ -100,8 +107,9 @@ end ComplexityClass
 /-- The complement of a decision problem: its yes-instances are the
 no-instances of `P`. -/
 protected def DecisionProblem.compl {L : Language.{0, 0}} (P : DecisionProblem L) :
-    DecisionProblem L :=
-  fun A inst => ¬@P A inst
+    DecisionProblem L where
+  Holds := fun A inst => ¬@DecisionProblem.Holds L P A inst
+  iso_invariant := fun e => not_congr (P.iso_invariant e)
 
 instance {L : Language.{0, 0}} : Compl (DecisionProblem L) :=
   ⟨DecisionProblem.compl⟩
@@ -109,7 +117,7 @@ instance {L : Language.{0, 0}} : Compl (DecisionProblem L) :=
 @[simp]
 theorem DecisionProblem.compl_compl {L : Language.{0, 0}} (P : DecisionProblem L) :
     Pᶜᶜ = P :=
-  funext fun _ => funext fun _ => propext not_not
+  DecisionProblem.ext fun _ _ => not_not
 
 /-! ### The polynomial hierarchy, axiomatized -/
 
@@ -157,6 +165,8 @@ noncomputable def PH : ComplexityClass where
   hard_of_foReduction h hP k := (SigmaP k).hard_of_foReduction h (hP k)
   mem_of_orderedReduction h := fun ⟨k, hk⟩ => ⟨k, (SigmaP k).mem_of_orderedReduction h hk⟩
   hard_of_orderedReduction h hP k := (SigmaP k).hard_of_orderedReduction h (hP k)
+  mem_congr_finite h := exists_congr fun k => (SigmaP k).mem_congr_finite h
+  hard_congr_finite h := forall_congr' fun k => (SigmaP k).hard_congr_finite h
 
 theorem sigmaP_subset_PH (k : ℕ) : SigmaP k ⊆ PH :=
   fun _ _ hP => ⟨k, hP⟩
@@ -181,7 +191,12 @@ theorem compl_mem_coNP_iff {L : Language.{0, 0}} (P : DecisionProblem L) :
 
 /-- The Cook–Levin theorem, as an axiom: SAT is the archetypical NP-complete
 problem. Its NP-hardness holds even under (ordered) first-order reductions
-(Immerman), consistently with the abstract closure properties. -/
+(Immerman), consistently with the abstract closure properties.
+
+Like every statement about complexity classes, this is a statement about the
+*finite* CNF structures only: by `ComplexityClass.mem_congr_finite` and
+`ComplexityClass.hard_congr_finite`, membership and hardness are unaffected
+by the behavior of `SAT` on infinite structures. -/
 axiom SAT_NP_complete : NP.Complete SAT
 
 /-- SAT is in NP. -/
@@ -208,7 +223,8 @@ theorem threeCol_NP_hard : NP.Hard ThreeCol :=
 
 /-- **3-colorability is NP-complete**, derived from the two first-order
 reductions of this library and the Cook–Levin axiom — with no machine model
-anywhere. -/
+anywhere. As with any complexity-theoretic statement, this is about finite
+graphs only (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`). -/
 theorem threeCol_NP_complete : NP.Complete ThreeCol :=
   ⟨threeCol_mem_NP, threeCol_NP_hard⟩
 
