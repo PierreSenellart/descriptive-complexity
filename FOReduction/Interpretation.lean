@@ -161,4 +161,28 @@ structure FOReduction [L'.IsRelational] (P : DecisionProblem L) (Q : DecisionPro
 @[inherit_doc]
 scoped notation:50 P:51 " ≤ᶠᵒ " Q:51 => FOReduction P Q
 
+/-- For a one-dimensional interpretation with a single tag, the interpreted
+universe is equivalent, as a plain type, to the original universe. -/
+def FOInterpretation.mapEquivSelf (I : FOInterpretation L L' Unit 1) (A : Type) :
+    I.Map A ≃ A where
+  toFun x := x.2 0
+  invFun a := ((), fun _ => a)
+  left_inv x :=
+    Prod.ext_iff.mpr ⟨rfl, funext fun j => congrArg x.2 (Subsingleton.elim 0 j)⟩
+  right_inv _ := rfl
+
+/-- Interpretations are functorial on isomorphisms: an `L`-isomorphism of the
+base structures induces an `L'`-isomorphism of the interpreted structures. -/
+def FOInterpretation.mapLEquiv [L'.IsRelational] {Tag : Type} {dim : ℕ}
+    (I : FOInterpretation L L' Tag dim) {M N : Type} [L.Structure M] [L.Structure N]
+    (e : M ≃[L] N) : I.Map M ≃[L'] I.Map N where
+  toFun p := (p.1, fun j => e (p.2 j))
+  invFun p := (p.1, fun j => e.symm (p.2 j))
+  left_inv p := Prod.ext_iff.mpr ⟨rfl, funext fun j => e.symm_apply_apply (p.2 j)⟩
+  right_inv p := Prod.ext_iff.mpr ⟨rfl, funext fun j => e.apply_symm_apply (p.2 j)⟩
+  map_fun' f := isEmptyElim f
+  map_rel' R x := by
+    rw [FOInterpretation.relMap_map, FOInterpretation.relMap_map]
+    exact StrongHomClass.realize_formula e _
+
 end FirstOrder
