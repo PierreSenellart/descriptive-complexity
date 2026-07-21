@@ -3,8 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import FOReduction.ThreeColToSat
-import FOReduction.SatToThreeCol
+import FOReduction.Ordered
 
 /-!
 # Abstract complexity classes, the polynomial hierarchy, and NP-completeness
@@ -29,21 +28,17 @@ contains every problem, so they are jointly consistent):
 * `FirstOrder.piP_zero_eq`: `Π₀ᵖ = Σ₀ᵖ` (both are PTIME);
 * the four level inclusions `Σₖᵖ ∪ Πₖᵖ ⊆ Σₖ₊₁ᵖ ∩ Πₖ₊₁ᵖ`;
 * `FirstOrder.mem_piP_iff`: `Πₖᵖ` consists of the complements of `Σₖᵖ`
-  problems (`DecisionProblem.compl`, notation `Pᶜ`);
-* `FirstOrder.SAT_NP_complete`: the Cook–Levin theorem — SAT is the
-  archetypical NP-complete problem (its NP-hardness holds under ordered FO
-  reductions, Immerman, "Descriptive Complexity", ch. 3).
+  problems (`DecisionProblem.compl`, notation `Pᶜ`).
 
 `FirstOrder.PH` is *defined* from the levels, and closure under FO reductions
 is proved for it. If NP is one day defined (e.g. via Fagin's theorem,
 `NP = ESO`), the axioms above become proof obligations.
 
-From the two reductions of this library we then *derive*, with no machine
-model anywhere:
-
-* `FirstOrder.threeCol_mem_NP : ThreeCol ∈ NP` (via `ThreeCol ≤ᶠᵒ SAT`);
-* `FirstOrder.threeCol_NP_hard : NP.Hard ThreeCol` (via `SAT ≤ᶠᵒ[≤] ThreeCol`);
-* `FirstOrder.threeCol_NP_complete : NP.Complete ThreeCol`.
+This file is problem-agnostic: the Cook–Levin axiom
+(`FirstOrder.SAT_NP_complete`) lives with the problem SAT in
+`FOReduction.Problems.Sat`, and completeness theorems for other problems live
+in their files under `FOReduction/Problems/` (e.g.
+`FirstOrder.threeCol_NP_complete` in `FOReduction.Problems.ThreeColorability`).
 -/
 
 namespace FirstOrder
@@ -186,46 +181,5 @@ theorem PTIME_subset_coNP : PTIME ⊆ coNP :=
 theorem compl_mem_coNP_iff {L : Language.{0, 0}} (P : DecisionProblem L) :
     Pᶜ ∈ coNP ↔ P ∈ NP := by
   rw [mem_piP_iff, DecisionProblem.compl_compl]
-
-/-! ### SAT is NP-complete (Cook–Levin, axiomatized) and consequences -/
-
-/-- The Cook–Levin theorem, as an axiom: SAT is the archetypical NP-complete
-problem. Its NP-hardness holds even under (ordered) first-order reductions
-(Immerman), consistently with the abstract closure properties.
-
-Like every statement about complexity classes, this is a statement about the
-*finite* CNF structures only: by `ComplexityClass.mem_congr_finite` and
-`ComplexityClass.hard_congr_finite`, membership and hardness are unaffected
-by the behavior of `SAT` on infinite structures. -/
-axiom SAT_NP_complete : NP.Complete SAT
-
-/-- SAT is in NP. -/
-theorem sat_mem_NP : SAT ∈ NP :=
-  SAT_NP_complete.mem
-
-/-- SAT is NP-hard. -/
-theorem sat_NP_hard : NP.Hard SAT :=
-  SAT_NP_complete.hard
-
-/-- The complement of SAT (essentially, propositional entailment of `⊥`) is
-in coNP. -/
-theorem sat_compl_mem_coNP : SATᶜ ∈ coNP :=
-  (compl_mem_coNP_iff SAT).mpr sat_mem_NP
-
-/-- 3-colorability is in NP: it FO-reduces to SAT, which is in NP. -/
-theorem threeCol_mem_NP : ThreeCol ∈ NP :=
-  NP.mem_of_foReduction threeCol_fo_reduction_sat sat_mem_NP
-
-/-- 3-colorability is NP-hard: SAT, which is NP-hard, reduces to it by an
-ordered FO reduction. -/
-theorem threeCol_NP_hard : NP.Hard ThreeCol :=
-  NP.hard_of_orderedReduction sat_ordered_fo_reduction_threeCol sat_NP_hard
-
-/-- **3-colorability is NP-complete**, derived from the two first-order
-reductions of this library and the Cook–Levin axiom — with no machine model
-anywhere. As with any complexity-theoretic statement, this is about finite
-graphs only (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`). -/
-theorem threeCol_NP_complete : NP.Complete ThreeCol :=
-  ⟨threeCol_mem_NP, threeCol_NP_hard⟩
 
 end FirstOrder

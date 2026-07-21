@@ -41,11 +41,18 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     yes-instances;
   - `FirstOrder.FOInterpretation.map_finite`: finite structures map to finite
     structures.
-* `FOReduction/Problems.lean` — the problems:
-  - the language `FirstOrder.Language.sat` of CNF instances (`isClause`,
-    `posIn`, `negIn`) and satisfiability `FirstOrder.Satisfiable`;
-  - 3-colorability `FirstOrder.ThreeColorable` over Mathlib's
-    `FirstOrder.Language.graph`, shown to agree with Mathlib's
+* `FOReduction/Problems/` — the problem catalog, one file (or directory) per
+  problem, each holding vocabulary, semantic definition, the bundled
+  `DecisionProblem`, its FO reductions and its completeness theorems
+  (`FOReduction/Problems.lean` is the umbrella):
+  - `Problems/Sat.lean`: the language `FirstOrder.Language.sat` of CNF
+    instances (`isClause`, `posIn`, `negIn`), satisfiability
+    `FirstOrder.Satisfiable`, the problem `FirstOrder.SAT`, and the
+    Cook–Levin axiom `FirstOrder.SAT_NP_complete` with its corollaries
+    (`sat_mem_NP`, `sat_NP_hard`, `sat_compl_mem_coNP`);
+  - `Problems/ThreeColorability/Defs.lean`: 3-colorability
+    `FirstOrder.ThreeColorable` over Mathlib's `FirstOrder.Language.graph`
+    and the problem `FirstOrder.ThreeCol`, shown to agree with Mathlib's
     `SimpleGraph.Colorable 3` on simple graphs.
 * `FOReduction/Composition.lean` — transitivity:
   - `FirstOrder.FOInterpretation.pull`: pullback of a formula through an
@@ -66,7 +73,8 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     language, correct for every finite linearly ordered input structure
     (i.e. order-invariant FO(≤) reductions, the standard notion of
     descriptive complexity).
-* `FOReduction/ThreeColToSat.lean` — the reduction 3COL ⟶ SAT:
+* `FOReduction/Problems/ThreeColorability/ToSat.lean` — the reduction
+  3COL ⟶ SAT:
   - `FirstOrder.threeColToSat`: the classical CNF encoding of 3-colorability
     (variables `xᵤᵢ` "vertex `u` gets color `i`"; per-vertex clauses
     `xᵤ₀ ∨ xᵤ₁ ∨ xᵤ₂`; per-edge, per-color clauses `¬xᵤᵢ ∨ ¬xᵥᵢ`) as a
@@ -94,12 +102,15 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     inclusions, `Π₀ᵖ = Σ₀ᵖ`, and `Πₖᵖ` = complements (`Pᶜ`) of `Σₖᵖ`; all
     axioms hold in the trivial model, so they are jointly consistent; `PH`
     is defined from the levels;
-  - `FirstOrder.SAT_NP_complete` (Cook–Levin, axiom), and the derived
-    theorems `threeCol_mem_NP`, `threeCol_NP_hard`, and
-    **`threeCol_NP_complete : NP.Complete ThreeCol`** — NP-completeness of
-    3-colorability from the two FO reductions, with no machine model.
-* `FOReduction/OccurrenceOrder.lean`, `FOReduction/SatGadget.lean`,
-  `FOReduction/SatToThreeCol.lean` — the reverse reduction SAT ⟶ 3COL:
+  - the Cook–Levin axiom and per-problem completeness theorems live with
+    their problems under `FOReduction/Problems/`; in particular
+    **`FirstOrder.threeCol_NP_complete : NP.Complete ThreeCol`**
+    (`Problems/ThreeColorability.lean`) — NP-completeness of 3-colorability
+    from the two FO reductions, with no machine model.
+* `FOReduction/OccurrenceOrder.lean`,
+  `FOReduction/Problems/ThreeColorability/SatGadget.lean`,
+  `FOReduction/Problems/ThreeColorability/FromSat.lean` — the reverse
+  reduction SAT ⟶ 3COL:
   - literal occurrences of a clause and their traversal along the order
     (first/last occurrence, immediate predecessor), with existence lemmas on
     finite universes;
