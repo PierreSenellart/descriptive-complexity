@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import Mathlib.Tactic.FinCases
 import FOReduction.Complexity
+import FOReduction.SecondOrder
 
 /-!
 # SAT: propositional satisfiability
@@ -138,5 +139,102 @@ theorem sat_NP_hard : NP.Hard SAT :=
 in coNP. -/
 theorem sat_compl_mem_coNP : SATᶜ ∈ coNP :=
   (compl_mem_coNP_iff SAT).mpr sat_mem_NP
+
+/-! ### SAT is existential second-order definable
+
+The membership half of Fagin's characterization of SAT's NP-membership: SAT
+is `Σ₁`-definable in the sense of `FOReduction.SecondOrder` — "there exists a
+truth assignment (a unary relation) making every clause true", the inner part
+being first-order. This is a first consistency check of the second-order
+definability layer against a concrete problem. -/
+
+section SigmaOne
+
+open SOBlock
+
+/-- The single existential block of the `Σ₁` definition of SAT: one unary
+relation variable, the truth assignment. -/
+def satAssignBlock : SOBlock where
+  num := 1
+  arity := fun _ => 1
+
+/-- The symbol of the truth-assignment relation variable. -/
+def satNuSym : satAssignBlock.lang.Relations 1 := ⟨⟨0, Nat.one_pos⟩, rfl⟩
+
+/-- The vocabulary of the kernel: CNF instances together with the
+truth-assignment relation variable. -/
+abbrev satSOLang : Language := Language.sat.sum satAssignBlock.lang
+
+/-- The symbol for "is a clause" in the kernel's vocabulary. -/
+abbrev kIsClSym : satSOLang.Relations 1 := Sum.inl satIsClause
+
+/-- The symbol for "occurs positively in" in the kernel's vocabulary. -/
+abbrev kPosSym : satSOLang.Relations 2 := Sum.inl satPosIn
+
+/-- The symbol for "occurs negatively in" in the kernel's vocabulary. -/
+abbrev kNegSym : satSOLang.Relations 2 := Sum.inl satNegIn
+
+/-- The truth-assignment symbol in the kernel's vocabulary. -/
+abbrev kNuSym : satSOLang.Relations 1 := Sum.inr satNuSym
+
+/-- The first-order kernel of the `Σ₁` definition of SAT: every clause
+contains a true literal. The universally quantified variable is the clause,
+the existentially quantified one the literal's variable. -/
+noncomputable def satKernel : satSOLang.Sentence :=
+  ((Relations.formula₁ kIsClSym (Term.var (Sum.inr 0))).imp
+    (((Relations.formula₂ kPosSym (Term.var (Sum.inl (Sum.inr 0)))
+          (Term.var (Sum.inr ())) ⊓
+        Relations.formula₁ kNuSym (Term.var (Sum.inr ()))) ⊔
+      (Relations.formula₂ kNegSym (Term.var (Sum.inl (Sum.inr 0)))
+          (Term.var (Sum.inr ())) ⊓
+        ∼(Relations.formula₁ kNuSym (Term.var (Sum.inr ()))))).iExs
+      Unit)).iAlls (Fin 1)
+
+/-- Realization of the kernel under an assignment of the truth-assignment
+variable: every clause contains a true literal. -/
+private theorem realize_satKernel {A : Type} [Language.sat.Structure A]
+    (ρ : satAssignBlock.Assignment A) :
+    (@Sentence.Realize satSOLang A
+        (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) satKernel) ↔
+      ∀ c : A, RelMap satIsClause ![c] → ∃ x : A,
+        (RelMap satPosIn ![c, x] ∧ ρ satNuSym.1 fun _ => x) ∨
+          (RelMap satNegIn ![c, x] ∧ ¬ρ satNuSym.1 fun _ => x) := by
+  letI := satAssignBlock.structure ρ
+  have hsub : ∀ (w : Fin 1 → A),
+      RelMap (L := satSOLang) (M := A) kNuSym w ↔ ρ satNuSym.1 fun _ => w 0 := by
+    intro w
+    change ρ satNuSym.1 _ ↔ ρ satNuSym.1 _
+    exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
+  rw [satKernel]
+  simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
+    Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
+    Language.relMap_sumInl, hsub]
+  constructor
+  · intro h c hc
+    obtain ⟨x, hx⟩ := h (fun _ => c) hc
+    rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact ⟨x (), Or.inl ⟨hp, hT⟩⟩
+    · exact ⟨x (), Or.inr ⟨hn, hT⟩⟩
+  · intro h i hc
+    obtain ⟨x, hx⟩ := h (i 0) hc
+    rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact ⟨fun _ => x, Or.inl ⟨hp, hT⟩⟩
+    · exact ⟨fun _ => x, Or.inr ⟨hn, hT⟩⟩
+
+/-- **SAT is `Σ₁`-definable**: satisfiability of a CNF structure is expressed
+by existentially quantifying a truth assignment and checking, in first-order
+logic, that every clause contains a true literal. -/
+theorem sat_sigmaSODefinable : SigmaSODefinable 1 SAT := by
+  refine ⟨[satAssignBlock], rfl, satKernel, ?_⟩
+  intro A _ _
+  constructor
+  · rintro ⟨ν, hν⟩
+    exact ⟨fun _ x => ν (x ⟨0, Nat.one_pos⟩),
+      (realize_satKernel _).mpr fun c hc => hν c hc⟩
+  · rintro ⟨ρ, hρ⟩
+    exact ⟨fun a => ρ satNuSym.1 fun _ => a, fun c hc => (realize_satKernel ρ).mp hρ c hc⟩
+
+end SigmaOne
 
 end FirstOrder
