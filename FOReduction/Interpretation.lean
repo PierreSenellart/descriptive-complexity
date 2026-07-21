@@ -21,7 +21,7 @@ formalize on top of Mathlib's `ModelTheory` library.
 
 This file defines:
 
-* `FirstOrder.StructureProp L`: a "problem" over the vocabulary `L`, i.e. a
+* `FirstOrder.DecisionProblem L`: a "problem" over the vocabulary `L`, i.e. a
   property of `L`-structures;
 * `FirstOrder.FOInterpretation L L' Tag dim`: a tagged, `dim`-dimensional
   first-order interpretation of a relational language `L'` in a language `L`,
@@ -59,7 +59,7 @@ variable (L L' : Language.{0, 0})
 
 /-- A property of `L`-structures: a "problem" in the sense of descriptive
 complexity, whose yes-instances are the `L`-structures satisfying it. -/
-def StructureProp : Type 1 :=
+def DecisionProblem : Type 1 :=
   ∀ (A : Type) [L.Structure A], Prop
 
 /-- A *tagged `dim`-dimensional first-order interpretation* of the relational
@@ -120,7 +120,7 @@ Since FO interpretations are computable in AC⁰ ⊆ PTIME on (encodings of)
 finite structures, an `FOReduction P Q` is in particular a Karp reduction from
 `P` to `Q`: any NP-hardness argument for `P` transfers to `Q`, without any
 formalized machine model. -/
-structure FOReduction [L'.IsRelational] (P : StructureProp L) (Q : StructureProp L') where
+structure FOReduction [L'.IsRelational] (P : DecisionProblem L) (Q : DecisionProblem L') where
   /-- The tags (copies of `A^dim`) used by the underlying interpretation. -/
   Tag : Type
   /-- Tags are finite, so that finite structures map to finite structures. -/
@@ -131,5 +131,8 @@ structure FOReduction [L'.IsRelational] (P : StructureProp L) (Q : StructureProp
   toInterpretation : FOInterpretation L L' Tag dim
   /-- Yes-instances map exactly to yes-instances. -/
   correct : ∀ (A : Type) [L.Structure A], P A ↔ Q (toInterpretation.Map A)
+
+@[inherit_doc]
+scoped notation:50 P:51 " ≤ᶠᵒ " Q:51 => FOReduction P Q
 
 end FirstOrder

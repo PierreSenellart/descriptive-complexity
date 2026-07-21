@@ -2,3 +2,8 @@
 import FOReduction.Interpretation
 import FOReduction.Problems
 import FOReduction.ThreeColToSat
+import FOReduction.Ordered
+import FOReduction.OccurrenceOrder
+import FOReduction.SatGadget
+import FOReduction.SatToThreeCol
+import FOReduction.Complexity

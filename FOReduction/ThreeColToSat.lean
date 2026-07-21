@@ -21,9 +21,9 @@ solvers:
   by `(edgClause i, ![u, v])`.
 
 The resulting CNF is satisfiable iff the graph is 3-colorable
-(`FirstOrder.threeColorableStructure_iff_satSatisfiable`); note that the usual
+(`FirstOrder.threeColorable_iff_satisfiable`); note that the usual
 "at most one color per vertex" clauses are not needed for the equivalence. All
-defining formulas are quantifier-free (`FirstOrder.colToSat_isQuantifierFree`),
+defining formulas are quantifier-free (`FirstOrder.threeColToSat_isQuantifierFree`),
 so this is even a quantifier-free reduction, the weakest reduction notion in
 common use in descriptive complexity.
 
@@ -80,7 +80,7 @@ def negInFormula : ColTag → ColTag → Language.graph.Formula (Fin 2 × Fin 2)
 
 /-- The first-order interpretation producing, from a graph, the CNF instance
 expressing its 3-colorability. -/
-def colToSat : FOInterpretation Language.graph Language.sat ColTag 2 where
+def threeColToSat : FOInterpretation Language.graph Language.sat ColTag 2 where
   relFormula {n} R :=
     match n, R with
     | _, .isClause => fun t => isClauseFormula (t 0)
@@ -93,49 +93,49 @@ variable {V : Type} [Language.graph.Structure V]
 
 @[simp]
 theorem isClause_varC (i : Fin 3) (w : Fin 2 → V) :
-    ¬RelMap (M := colToSat.Map V) satIsClause ![(ColTag.varC i, w)] := by
+    ¬RelMap (M := threeColToSat.Map V) satIsClause ![(ColTag.varC i, w)] := by
   rw [FOInterpretation.relMap_map]
-  simp [colToSat, isClauseFormula]
+  simp [threeColToSat, isClauseFormula]
 
 @[simp]
 theorem isClause_vtxClause (w : Fin 2 → V) :
-    RelMap (M := colToSat.Map V) satIsClause ![(ColTag.vtxClause, w)] ↔ w 0 = w 1 := by
+    RelMap (M := threeColToSat.Map V) satIsClause ![(ColTag.vtxClause, w)] ↔ w 0 = w 1 := by
   rw [FOInterpretation.relMap_map]
-  simp [colToSat, isClauseFormula]
+  simp [threeColToSat, isClauseFormula]
 
 @[simp]
 theorem isClause_edgClause (i : Fin 3) (w : Fin 2 → V) :
-    RelMap (M := colToSat.Map V) satIsClause ![(ColTag.edgClause i, w)] ↔
+    RelMap (M := threeColToSat.Map V) satIsClause ![(ColTag.edgClause i, w)] ↔
       RelMap adj ![w 0, w 1] := by
   rw [FOInterpretation.relMap_map]
-  simp [colToSat, isClauseFormula]
+  simp [threeColToSat, isClauseFormula]
 
 @[simp]
 theorem posIn_iff (tc tx : ColTag) (wc wx : Fin 2 → V) :
-    RelMap (M := colToSat.Map V) satPosIn ![(tc, wc), (tx, wx)] ↔
+    RelMap (M := threeColToSat.Map V) satPosIn ![(tc, wc), (tx, wx)] ↔
       (∃ i, tc = ColTag.vtxClause ∧ tx = ColTag.varC i) ∧
         (wc 0 = wc 1 ∧ wx 0 = wx 1) ∧ wc 0 = wx 0 := by
   rw [FOInterpretation.relMap_map]
-  cases tc <;> cases tx <;> simp [colToSat, posInFormula]
+  cases tc <;> cases tx <;> simp [threeColToSat, posInFormula]
 
 @[simp]
 theorem negIn_iff (tc tx : ColTag) (wc wx : Fin 2 → V) :
-    RelMap (M := colToSat.Map V) satNegIn ![(tc, wc), (tx, wx)] ↔
+    RelMap (M := threeColToSat.Map V) satNegIn ![(tc, wc), (tx, wx)] ↔
       (∃ i, tc = ColTag.edgClause i ∧ tx = ColTag.varC i) ∧
         (RelMap adj ![wc 0, wc 1] ∧ wx 0 = wx 1) ∧
         (wx 0 = wc 0 ∨ wx 0 = wc 1) := by
   rw [FOInterpretation.relMap_map]
   cases tc with
-  | varC i => cases tx <;> simp [colToSat, negInFormula]
-  | vtxClause => cases tx <;> simp [colToSat, negInFormula]
+  | varC i => cases tx <;> simp [threeColToSat, negInFormula]
+  | vtxClause => cases tx <;> simp [threeColToSat, negInFormula]
   | edgClause i =>
     cases tx with
     | varC j =>
       rcases eq_or_ne i j with rfl | hij
-      · simp [colToSat, negInFormula]
-      · simp [colToSat, negInFormula, hij, Ne.symm hij]
-    | vtxClause => simp [colToSat, negInFormula]
-    | edgClause j => simp [colToSat, negInFormula]
+      · simp [threeColToSat, negInFormula]
+      · simp [threeColToSat, negInFormula, hij, Ne.symm hij]
+    | vtxClause => simp [threeColToSat, negInFormula]
+    | edgClause j => simp [threeColToSat, negInFormula]
 
 end Characterizations
 
@@ -153,9 +153,9 @@ theorem colAssignment_varC {V : Type} (col : V → Fin 3) (i : Fin 3) (w : Fin 2
 
 /-- Correctness of the reduction: a graph is 3-colorable iff the interpreted
 CNF instance is satisfiable. -/
-theorem threeColorableStructure_iff_satSatisfiable (V : Type) [Language.graph.Structure V] :
-    ThreeColorableStructure V ↔ SatSatisfiable (colToSat.Map V) := by
-  unfold ThreeColorableStructure SatSatisfiable
+theorem threeColorable_iff_satisfiable (V : Type) [Language.graph.Structure V] :
+    ThreeColorable V ↔ Satisfiable (threeColToSat.Map V) := by
+  unfold ThreeColorable Satisfiable
   constructor
   · -- from a proper coloring to a satisfying assignment
     rintro ⟨col, hcol⟩
@@ -226,16 +226,16 @@ theorem threeColorableStructure_iff_satSatisfiable (V : Type) [Language.graph.St
         exact hcolSpec y
 
 /-- **3-colorability FO-reduces to SAT.** The `fo_reduction` theorem: the
-first-order interpretation `colToSat` maps a graph to a satisfiable CNF
+first-order interpretation `threeColToSat` maps a graph to a satisfiable CNF
 instance iff the graph is 3-colorable. -/
-def threeCol_fo_reduction_sat : FOReduction ThreeCol SAT where
+def threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT where
   Tag := ColTag
   dim := 2
-  toInterpretation := colToSat
-  correct A _ := threeColorableStructure_iff_satSatisfiable A
+  toInterpretation := threeColToSat
+  correct A _ := threeColorable_iff_satisfiable A
 
 /-- The reduction is even quantifier-free. -/
-theorem colToSat_isQuantifierFree : colToSat.IsQuantifierFree := by
+theorem threeColToSat_isQuantifierFree : threeColToSat.IsQuantifierFree := by
   intro n R t
   cases R with
   | isClause =>
@@ -262,11 +262,11 @@ theorem colToSat_isQuantifierFree : colToSat.IsQuantifierFree := by
 
 /-- Corollary in terms of Mathlib's `SimpleGraph`: a simple graph is
 3-colorable iff the CNF instance interpreted in it is satisfiable. -/
-theorem SimpleGraph.colorable_iff_satSatisfiable {V : Type} (G : SimpleGraph V) :
+theorem SimpleGraph.colorable_iff_satisfiable {V : Type} (G : SimpleGraph V) :
     haveI := G.structure
-    G.Colorable 3 ↔ SatSatisfiable (colToSat.Map V) := by
+    G.Colorable 3 ↔ Satisfiable (threeColToSat.Map V) := by
   letI := G.structure
-  rw [← threeColorableStructure_iff_colorable G,
-    threeColorableStructure_iff_satSatisfiable V]
+  rw [← threeColorable_iff_colorable G,
+    threeColorable_iff_satisfiable V]
 
 end FirstOrder
