@@ -334,27 +334,28 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 theorem realize_edgeF {t₁ t₂ : SatTag} {v : Fin 2 × Fin 2 → A} :
     (edgeF t₁ t₂).Realize v ↔
       Core t₁ (v (0, 0)) (v (0, 1)) t₂ (v (1, 0)) (v (1, 1)) := by
-  cases t₁ <;> cases t₂ <;> try simp [edgeF, Core, and_assoc]
+  cases t₁ <;> cases t₂
   case lit.lit s t =>
     rcases eq_or_ne t (!s) with rfl | h
-    · simp [and_assoc]
-    · simp [h]
+    · simp [edgeF, Core, and_assoc]
+    · simp [edgeF, Core, h]
   case gv.lit s t =>
     rcases eq_or_ne t s with rfl | h
-    · simp [and_assoc]
-    · simp [h]
+    · simp [edgeF, Core, and_assoc]
+    · simp [edgeF, Core, h]
   case gu.gv s t =>
     rcases eq_or_ne t s with rfl | h
-    · simp [and_assoc]
-    · simp [h]
+    · simp [edgeF, Core, and_assoc]
+    · simp [edgeF, Core, h]
   case gu.go s t =>
     rcases eq_or_ne t s with rfl | h
-    · simp [and_assoc]
-    · simp [h]
+    · simp [edgeF, Core, and_assoc]
+    · simp [edgeF, Core, h, and_assoc]
   case gv.go s t =>
     rcases eq_or_ne t s with rfl | h
-    · simp [and_assoc]
-    · simp [h]
+    · simp [edgeF, Core, and_assoc]
+    · simp [edgeF, Core, h]
+  all_goals simp [edgeF, Core, and_assoc]
 
 /-- Characterization of the interpreted adjacency relation: it is the
 symmetrization of `Core`. -/
