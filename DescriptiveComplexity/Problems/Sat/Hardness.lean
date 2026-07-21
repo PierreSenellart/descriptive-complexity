@@ -11,12 +11,12 @@ import DescriptiveComplexity.Problems.Sat.TseitinFormulas
 
 The hardness half of the Cook–Levin theorem, machine-free and in the style of
 Dahlhaus: every existential-second-order definable problem admits an ordered
-first-order reduction to SAT (`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`, an
-axiom in earlier versions of this development). Since NP is *defined* as
+first-order reduction to SAT
+(`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`). Since NP is *defined* as
 `Σ₁`-definability (`DescriptiveComplexity.Hierarchy`), together with the membership
 half `DescriptiveComplexity.sat_sigmaSODefinable` this makes SAT NP-complete
-(`DescriptiveComplexity.SAT_NP_complete`) — with the three PTIME axioms of
-`DescriptiveComplexity.Hierarchy` as the only remaining axiomatic basis.
+(`DescriptiveComplexity.SAT_NP_complete`) — relying on no axioms beyond
+Lean's standard three, as `#print axioms` confirms.
 
 Given the single second-order block `B` and the first-order kernel `φ` of a
 `Σ₁` definition of a problem `Q`, the reduction interprets, inside an ordered
@@ -344,8 +344,7 @@ end Interp
 /-- The hardness half of the Cook–Levin theorem: every
 existential-second-order definable problem admits an ordered first-order
 reduction to SAT. Machine-free NP-hardness in the style of Dahlhaus, by the
-generic Tseitin reduction `DescriptiveComplexity.tseitinReduction`; an axiom in earlier
-versions of this development. -/
+generic Tseitin reduction `DescriptiveComplexity.tseitinReduction`. -/
 theorem sat_hard_of_sigmaSODefinable :
     ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
       SigmaSODefinable 1 Q → Nonempty (Q ≤ᶠᵒ[≤] SAT) := by

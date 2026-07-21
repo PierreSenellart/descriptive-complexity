@@ -23,8 +23,8 @@ This file also defines the complement of a decision problem
 (`DecisionProblem.compl`, notation `Pᶜ`).
 
 The polynomial hierarchy itself — `DescriptiveComplexity.SigmaP`/`DescriptiveComplexity.PiP`, with
-levels `k ≥ 1` *defined* by second-order quantifier alternation and only
-`PTIME` axiomatized — lives in `DescriptiveComplexity.Hierarchy`; the Cook–Levin
+levels `k ≥ 1` *defined* by second-order quantifier alternation and level 0
+left as an empty placeholder — lives in `DescriptiveComplexity.Hierarchy`; the Cook–Levin
 theorem lives with the problem SAT in `DescriptiveComplexity.Problems.Sat`, and
 completeness theorems for other problems in their files under
 `DescriptiveComplexity/Problems/` (e.g. `DescriptiveComplexity.threeCol_NP_complete` in
@@ -73,6 +73,19 @@ the element type `DecisionProblem L` is not determined by `ComplexityClass`.) -/
 scoped notation:50 P:51 " ∈ " C:51 => ComplexityClass.Mem C P
 
 namespace ComplexityClass
+
+/-- The empty complexity class: no members, and every problem vacuously hard
+(there is nothing that would have to reduce to it). It is a placeholder for
+levels of a hierarchy that are not (yet) characterized logically. -/
+def empty : ComplexityClass where
+  Mem _ := False
+  Hard _ := True
+  mem_of_foReduction _ h := h
+  hard_of_foReduction _ _ := trivial
+  mem_of_orderedReduction _ h := h
+  hard_of_orderedReduction _ _ := trivial
+  mem_congr_finite _ := Iff.rfl
+  hard_congr_finite _ := Iff.rfl
 
 /-- Inclusion of complexity classes. -/
 instance : HasSubset ComplexityClass :=

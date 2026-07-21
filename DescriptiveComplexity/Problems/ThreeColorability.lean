@@ -19,7 +19,7 @@ first-order reductions —
 * `DescriptiveComplexity.sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol`
   (ordered; `DescriptiveComplexity.Problems.ThreeColorability.FromSat`) —
 
-and deriving its NP-completeness from the Cook–Levin axiom
+and deriving its NP-completeness from the Cook–Levin theorem
 (`DescriptiveComplexity.SAT_NP_complete`), with no machine model anywhere. As with any
 complexity-theoretic statement, these results are about finite graphs only
 (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
@@ -39,7 +39,7 @@ theorem threeCol_NP_hard : NP.Hard ThreeCol :=
   NP.hard_of_orderedReduction sat_ordered_fo_reduction_threeCol sat_NP_hard
 
 /-- **3-colorability is NP-complete**, derived from the two first-order
-reductions of this library and the Cook–Levin axiom. -/
+reductions of this library and the Cook–Levin theorem. -/
 theorem threeCol_NP_complete : NP.Complete ThreeCol :=
   ⟨threeCol_mem_NP, threeCol_NP_hard⟩
 

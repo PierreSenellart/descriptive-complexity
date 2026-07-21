@@ -27,19 +27,19 @@ equivalent to the usual "everything in the class reduces to `P`"
 formulation makes hardness travel forward along reductions even through
 non-relational vocabularies.
 
-Level 0 — `PTIME` — remains axiomatized (`DescriptiveComplexity.PTIME`): no known
-order-free logic captures polynomial time (the Chandra–Harel/Gurevich
-problem), and the Immerman–Vardi characterization `P = FO(LFP)` on ordered
-structures would require formalizing least fixed points and a built-in order.
-Two axioms relate it to the defined levels: closure under complement
-(`DescriptiveComplexity.PTIME_mem_compl`) and `PTIME ⊆ NP`
-(`DescriptiveComplexity.PTIME_sigmaSODefinable`, the machine-model-dependent half of
-Fagin's theorem). All three axioms hold e.g. of the empty class, so they are
-jointly consistent; they of course also hold of actual polynomial time.
+Level 0 — polynomial time — is *not* defined: no known order-free logic
+captures polynomial time (the Chandra–Harel/Gurevich problem), and the
+Immerman–Vardi characterization `P = FO(LFP)` on ordered structures would
+require formalizing least fixed points and a built-in order. Rather than
+axiomatize PTIME, `SigmaP 0` and `PiP 0` are set to the empty class
+(`ComplexityClass.empty`) — nothing is claimed about level 0, all statements
+about it hold vacuously, and the library declares no axioms: every theorem
+depends on nothing beyond Lean's standard `propext`, `Classical.choice` and
+`Quot.sound` (check with `#print axioms`). PTIME can be added once a
+descriptive characterization of it is formalized.
 
-The level inclusions, the duality `Πₖᵖ = co-Σₖᵖ` and the class `PH` — all
-axioms in earlier versions of this development — are now theorems, with their
-former names (`DescriptiveComplexity.sigmaP_subset_sigmaP_succ`,
+The level inclusions, the duality `Πₖᵖ = co-Σₖᵖ` and the class `PH` are all
+proved (`DescriptiveComplexity.sigmaP_subset_sigmaP_succ`,
 `DescriptiveComplexity.mem_piP_iff`, …).
 -/
 
@@ -149,37 +149,20 @@ noncomputable def piLevel (k : ℕ) : ComplexityClass where
     ⟨fun hP => CofinalHard.congr h hP,
       fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
 
-/-! ### Level 0: polynomial time, axiomatized -/
-
-/-- Polynomial time, as an abstract complexity class. It remains axiomatized:
-no known order-free logic captures PTIME (Chandra–Harel/Gurevich), and the
-ordered Immerman–Vardi characterization `P = FO(LFP)` is out of scope for
-now. The axioms `PTIME`, `DescriptiveComplexity.PTIME_mem_compl` and
-`DescriptiveComplexity.PTIME_sigmaSODefinable` are jointly consistent: all hold of the
-class with no members and trivial hardness. -/
-axiom PTIME : ComplexityClass
-
-/-- PTIME is closed under complement (axiom). -/
-axiom PTIME_mem_compl {L : Language.{0, 0}} (P : DecisionProblem L) :
-    P ∈ PTIME ↔ Pᶜ ∈ PTIME
-
-/-- Polynomial-time problems are existential-second-order definable — the
-inclusion `PTIME ⊆ NP`, by the machine-model-dependent half of Fagin's
-theorem (axiom). -/
-axiom PTIME_sigmaSODefinable {L : Language.{0, 0}} (P : DecisionProblem L) :
-    P ∈ PTIME → SigmaSODefinable 1 P
-
 /-! ### The hierarchy -/
 
-/-- The `Σₖᵖ` levels of the polynomial hierarchy: `PTIME` at level 0
-(axiomatized), second-order definability with `k` alternations above. -/
+/-- The `Σₖᵖ` levels of the polynomial hierarchy: second-order definability
+with `k` alternations for `k ≥ 1`. Level 0 — polynomial time — has no known
+logical characterization without order, so it is left as the empty
+placeholder class: nothing is claimed about it. -/
 noncomputable def SigmaP : ℕ → ComplexityClass
-  | 0 => PTIME
+  | 0 => .empty
   | k + 1 => sigmaLevel k
 
-/-- The `Πₖᵖ` levels of the polynomial hierarchy. -/
+/-- The `Πₖᵖ` levels of the polynomial hierarchy; level 0 is the empty
+placeholder class, as in `DescriptiveComplexity.SigmaP`. -/
 noncomputable def PiP : ℕ → ComplexityClass
-  | 0 => PTIME
+  | 0 => .empty
   | k + 1 => piLevel k
 
 /-- NP is `Σ₁ᵖ`: by definition, the existential-second-order definable
@@ -189,44 +172,40 @@ noncomputable abbrev NP : ComplexityClass := SigmaP 1
 /-- coNP is `Π₁ᵖ`: the universal-second-order definable problems. -/
 noncomputable abbrev coNP : ComplexityClass := PiP 1
 
-/-- The zeroth levels coincide: `Π₀ᵖ = Σ₀ᵖ = PTIME`. -/
-theorem piP_zero_eq : PiP 0 = PTIME := rfl
+/-- The zeroth levels coincide. -/
+theorem piP_zero_eq : PiP 0 = SigmaP 0 := rfl
 
-/-- `Πₖᵖ` consists of the complements of the `Σₖᵖ` problems: by the
-complement axiom for PTIME at level 0, by the quantifier duality
+/-- `Πₖᵖ` consists of the complements of the `Σₖᵖ` problems: vacuous at
+level 0, by the quantifier duality
 `DescriptiveComplexity.piSODefinable_iff_compl` above. -/
 theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} (P : DecisionProblem L) :
     P ∈ PiP k ↔ Pᶜ ∈ SigmaP k := by
   cases k with
-  | zero => exact PTIME_mem_compl P
+  | zero => exact Iff.rfl
   | succ k => exact piSODefinable_iff_compl (k + 1) P
 
-/-- `Σₖᵖ ⊆ Σₖ₊₁ᵖ`: the Fagin axiom at level 0, padding above. -/
+/-- `Σₖᵖ ⊆ Σₖ₊₁ᵖ`: vacuous at level 0, padding above. -/
 theorem sigmaP_subset_sigmaP_succ (k : ℕ) : SigmaP k ⊆ SigmaP (k + 1) := by
   cases k with
-  | zero => exact fun _ P hP => PTIME_sigmaSODefinable P hP
+  | zero => exact fun _ P hP => hP.elim
   | succ k => exact fun _ P hP => SigmaSODefinable.succ hP
 
 /-- `Σₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
 theorem sigmaP_subset_piP_succ (k : ℕ) : SigmaP k ⊆ PiP (k + 1) := by
   cases k with
-  | zero =>
-    exact fun _ P hP => (piSODefinable_iff_compl 1 P).mpr
-      (PTIME_sigmaSODefinable Pᶜ ((PTIME_mem_compl P).mp hP))
+  | zero => exact fun _ P hP => hP.elim
   | succ k => exact fun _ P hP => SigmaSODefinable.piSucc hP
 
 /-- `Πₖᵖ ⊆ Σₖ₊₁ᵖ`. -/
 theorem piP_subset_sigmaP_succ (k : ℕ) : PiP k ⊆ SigmaP (k + 1) := by
   cases k with
-  | zero => exact fun _ P hP => PTIME_sigmaSODefinable P hP
+  | zero => exact fun _ P hP => hP.elim
   | succ k => exact fun _ P hP => PiSODefinable.sigmaSucc hP
 
 /-- `Πₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
 theorem piP_subset_piP_succ (k : ℕ) : PiP k ⊆ PiP (k + 1) := by
   cases k with
-  | zero =>
-    exact fun _ P hP => (piSODefinable_iff_compl 1 P).mpr
-      (PTIME_sigmaSODefinable Pᶜ ((PTIME_mem_compl P).mp hP))
+  | zero => exact fun _ P hP => hP.elim
   | succ k => exact fun _ P hP => PiSODefinable.succ hP
 
 /-- The polynomial hierarchy: union of all the levels. A problem is PH-hard
@@ -246,14 +225,6 @@ theorem sigmaP_subset_PH (k : ℕ) : SigmaP k ⊆ PH :=
 
 theorem piP_subset_PH (k : ℕ) : PiP k ⊆ PH :=
   fun _ _ hP => ⟨k + 1, piP_subset_sigmaP_succ k hP⟩
-
-/-- `PTIME ⊆ NP`. -/
-theorem PTIME_subset_NP : PTIME ⊆ NP :=
-  sigmaP_subset_sigmaP_succ 0
-
-/-- `PTIME ⊆ coNP`. -/
-theorem PTIME_subset_coNP : PTIME ⊆ coNP :=
-  sigmaP_subset_piP_succ 0
 
 /-- A problem's complement is in coNP iff the problem is in NP. -/
 theorem compl_mem_coNP_iff {L : Language.{0, 0}} (P : DecisionProblem L) :

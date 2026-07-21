@@ -21,7 +21,7 @@ reductions —
   (ordered, clause splitting along the occurrence order;
   `DescriptiveComplexity.Problems.ThreeSat.FromSat`) —
 
-and deriving its NP-completeness from the Cook–Levin axiom
+and deriving its NP-completeness from the Cook–Levin theorem
 (`DescriptiveComplexity.SAT_NP_complete`), with no machine model anywhere. As with any
 complexity-theoretic statement, these results are about finite CNF structures
 only (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
@@ -41,7 +41,7 @@ theorem threeSat_NP_hard : NP.Hard ThreeSAT :=
   NP.hard_of_orderedReduction sat_ordered_fo_reduction_threeSat sat_NP_hard
 
 /-- **3SAT is NP-complete**, derived from the two first-order reductions of
-this library and the Cook–Levin axiom. -/
+this library and the Cook–Levin theorem. -/
 theorem threeSat_NP_complete : NP.Complete ThreeSAT :=
   ⟨threeSat_mem_NP, threeSat_NP_hard⟩
 

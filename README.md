@@ -50,7 +50,7 @@ the input structure to thread each clause's OR-gadget chain). SAT and
   - `Problems/Sat.lean`: the language `FirstOrder.Language.sat` of CNF
     instances (`isClause`, `posIn`, `negIn`), satisfiability
     `DescriptiveComplexity.Satisfiable`, the problem `DescriptiveComplexity.SAT`, and the
-    Cook–Levin axiom `DescriptiveComplexity.SAT_NP_complete` with its corollaries
+    Cook–Levin theorem `DescriptiveComplexity.SAT_NP_complete` with its corollaries
     (`sat_mem_NP`, `sat_NP_hard`, `sat_compl_mem_coNP`);
   - `Problems/ThreeColorability/Defs.lean`: 3-colorability
     `DescriptiveComplexity.ThreeColorable` over Mathlib's `FirstOrder.Language.graph`
@@ -99,12 +99,15 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     *finite* instances of a problem (`mem_congr_finite`/`hard_congr_finite`),
     making explicit that complexity statements say nothing about infinite
     structures;
-  - the polynomial hierarchy, axiomatized: `SigmaP k`/`PiP k` with
-    `PTIME := SigmaP 0`, `NP := SigmaP 1`, `coNP := PiP 1`, the level
-    inclusions, `Π₀ᵖ = Σ₀ᵖ`, and `Πₖᵖ` = complements (`Pᶜ`) of `Σₖᵖ`; all
-    axioms hold in the trivial model, so they are jointly consistent; `PH`
-    is defined from the levels;
-  - the Cook–Levin axiom and per-problem completeness theorems live with
+  - the polynomial hierarchy, *defined* by second-order quantifier
+    alternation (`DescriptiveComplexity/Hierarchy.lean`): `SigmaP k`/`PiP k`
+    for `k ≥ 1` with `NP := SigmaP 1` and `coNP := PiP 1`, the level
+    inclusions, `Πₖᵖ` = complements (`Pᶜ`) of `Σₖᵖ`, and `PH`; level 0
+    (polynomial time) is left as an empty placeholder class — no known
+    order-free logic captures PTIME — so the library declares no axioms:
+    `#print axioms` shows nothing beyond Lean's built-in `propext`,
+    `Classical.choice` and `Quot.sound`;
+  - the Cook–Levin theorem and per-problem completeness theorems live with
     their problems under `DescriptiveComplexity/Problems/`; in particular
     **`DescriptiveComplexity.threeCol_NP_complete : NP.Complete ThreeCol`**
     (`Problems/ThreeColorability.lean`) — NP-completeness of 3-colorability
