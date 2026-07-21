@@ -51,6 +51,11 @@ def Language.Term.varOf [L₂.IsRelational] {γ : Type*} : L₂.Term γ → γ
   | .func f _ => isEmptyElim f
 
 @[simp]
+theorem Language.Term.varOf_var [L₂.IsRelational] {γ : Type*} (x : γ) :
+    (Term.var x : L₂.Term γ).varOf = x :=
+  rfl
+
+@[simp]
 theorem Language.Term.realize_varOf [L₂.IsRelational] {γ : Type*} {M : Type*} [L₂.Structure M]
     {v : γ → M} (t : L₂.Term γ) : t.realize v = v t.varOf := by
   cases t with
@@ -280,10 +285,13 @@ noncomputable def FOReduction.trans {P : DecisionProblem L₁} {Q : DecisionProb
     P ≤ᶠᵒ R :=
   letI := f.tagFinite
   letI := g.tagFinite
+  letI := f.tagNonempty
+  letI := g.tagNonempty
   { Tag := f.Tag × (Fin f.dim → g.Tag)
     dim := f.dim * g.dim
     toInterpretation := f.toInterpretation.comp g.toInterpretation
-    correct := fun A _ =>
+    correct := fun A _ _ =>
+      haveI := g.toInterpretation.map_nonempty (A := A)
       ((g.correct A).trans (f.correct (g.toInterpretation.Map A))).trans
         (R.iso_invariant (f.toInterpretation.compLEquiv g.toInterpretation A)).symm }
 
@@ -328,7 +336,7 @@ def FOReduction.refl (P : DecisionProblem L) : P ≤ᶠᵒ P where
   Tag := Unit
   dim := 1
   toInterpretation := FOInterpretation.refl L
-  correct A _ := (P.iso_invariant (FOInterpretation.reflLEquiv L A)).symm
+  correct A _ _ := (P.iso_invariant (FOInterpretation.reflLEquiv L A)).symm
 
 /-- **FO reducibility is a preorder** on the decision problems over a fixed
 relational language, with `P ≤ Q` the propositional truncation of `P ≤ᶠᵒ Q`.

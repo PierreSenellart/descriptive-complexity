@@ -19,26 +19,16 @@ closure must be part of the *definition* of a complexity class rather than an
 axiom quantified over all classes: arbitrary collections of problems need not
 be closed, and the quantified axiom would be inconsistent.
 
-The polynomial hierarchy is then posited abstractly, as axioms about a family
-of classes (all these axioms hold in the trivial model where every class
-contains every problem, so they are jointly consistent):
+This file also defines the complement of a decision problem
+(`DecisionProblem.compl`, notation `Pᶜ`).
 
-* `FirstOrder.SigmaP k` and `FirstOrder.PiP k`: the levels `Σₖᵖ` and `Πₖᵖ`,
-  with `PTIME`, `NP` and `coNP` as abbreviations for `Σ₀ᵖ`, `Σ₁ᵖ` and `Π₁ᵖ`;
-* `FirstOrder.piP_zero_eq`: `Π₀ᵖ = Σ₀ᵖ` (both are PTIME);
-* the four level inclusions `Σₖᵖ ∪ Πₖᵖ ⊆ Σₖ₊₁ᵖ ∩ Πₖ₊₁ᵖ`;
-* `FirstOrder.mem_piP_iff`: `Πₖᵖ` consists of the complements of `Σₖᵖ`
-  problems (`DecisionProblem.compl`, notation `Pᶜ`).
-
-`FirstOrder.PH` is *defined* from the levels, and closure under FO reductions
-is proved for it. If NP is one day defined (e.g. via Fagin's theorem,
-`NP = ESO`), the axioms above become proof obligations.
-
-This file is problem-agnostic: the Cook–Levin axiom
-(`FirstOrder.SAT_NP_complete`) lives with the problem SAT in
-`FOReduction.Problems.Sat`, and completeness theorems for other problems live
-in their files under `FOReduction/Problems/` (e.g.
-`FirstOrder.threeCol_NP_complete` in `FOReduction.Problems.ThreeColorability`).
+The polynomial hierarchy itself — `FirstOrder.SigmaP`/`FirstOrder.PiP`, with
+levels `k ≥ 1` *defined* by second-order quantifier alternation and only
+`PTIME` axiomatized — lives in `FOReduction.Hierarchy`; the Cook–Levin
+theorem lives with the problem SAT in `FOReduction.Problems.Sat`, and
+completeness theorems for other problems in their files under
+`FOReduction/Problems/` (e.g. `FirstOrder.threeCol_NP_complete` in
+`FOReduction.Problems.ThreeColorability`).
 -/
 
 namespace FirstOrder
@@ -113,73 +103,5 @@ instance {L : Language.{0, 0}} : Compl (DecisionProblem L) :=
 theorem DecisionProblem.compl_compl {L : Language.{0, 0}} (P : DecisionProblem L) :
     Pᶜᶜ = P :=
   DecisionProblem.ext fun _ _ => not_not
-
-/-! ### The polynomial hierarchy, axiomatized -/
-
-/-- The `Σₖᵖ` levels of the polynomial hierarchy, as abstract classes. -/
-axiom SigmaP : ℕ → ComplexityClass
-
-/-- The `Πₖᵖ` levels of the polynomial hierarchy, as abstract classes. -/
-axiom PiP : ℕ → ComplexityClass
-
-/-- Polynomial time: the zeroth level of the hierarchy. -/
-noncomputable abbrev PTIME : ComplexityClass := SigmaP 0
-
-/-- NP is `Σ₁ᵖ`. -/
-noncomputable abbrev NP : ComplexityClass := SigmaP 1
-
-/-- coNP is `Π₁ᵖ`. -/
-noncomputable abbrev coNP : ComplexityClass := PiP 1
-
-/-- The zeroth levels coincide: `Π₀ᵖ = Σ₀ᵖ = PTIME`. -/
-axiom piP_zero_eq : PiP 0 = PTIME
-
-/-- `Σₖᵖ ⊆ Σₖ₊₁ᵖ`. -/
-axiom sigmaP_subset_sigmaP_succ (k : ℕ) : SigmaP k ⊆ SigmaP (k + 1)
-
-/-- `Σₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
-axiom sigmaP_subset_piP_succ (k : ℕ) : SigmaP k ⊆ PiP (k + 1)
-
-/-- `Πₖᵖ ⊆ Σₖ₊₁ᵖ`. -/
-axiom piP_subset_sigmaP_succ (k : ℕ) : PiP k ⊆ SigmaP (k + 1)
-
-/-- `Πₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
-axiom piP_subset_piP_succ (k : ℕ) : PiP k ⊆ PiP (k + 1)
-
-/-- `Πₖᵖ` consists of the complements of the `Σₖᵖ` problems. -/
-axiom mem_piP_iff (k : ℕ) {L : Language.{0, 0}} (P : DecisionProblem L) :
-    P ∈ PiP k ↔ Pᶜ ∈ SigmaP k
-
-/-- The polynomial hierarchy: union of all the levels. Unlike the levels, it
-is *defined*, and its closure under FO reductions is proved from that of the
-levels. A problem is PH-hard if it is hard for every level. -/
-noncomputable def PH : ComplexityClass where
-  Mem P := ∃ k, (SigmaP k).Mem P
-  Hard P := ∀ k, (SigmaP k).Hard P
-  mem_of_foReduction h := fun ⟨k, hk⟩ => ⟨k, (SigmaP k).mem_of_foReduction h hk⟩
-  hard_of_foReduction h hP k := (SigmaP k).hard_of_foReduction h (hP k)
-  mem_of_orderedReduction h := fun ⟨k, hk⟩ => ⟨k, (SigmaP k).mem_of_orderedReduction h hk⟩
-  hard_of_orderedReduction h hP k := (SigmaP k).hard_of_orderedReduction h (hP k)
-  mem_congr_finite h := exists_congr fun k => (SigmaP k).mem_congr_finite h
-  hard_congr_finite h := forall_congr' fun k => (SigmaP k).hard_congr_finite h
-
-theorem sigmaP_subset_PH (k : ℕ) : SigmaP k ⊆ PH :=
-  fun _ _ hP => ⟨k, hP⟩
-
-theorem piP_subset_PH (k : ℕ) : PiP k ⊆ PH :=
-  fun _ _ hP => ⟨k + 1, piP_subset_sigmaP_succ k hP⟩
-
-/-- `PTIME ⊆ NP`. -/
-theorem PTIME_subset_NP : PTIME ⊆ NP :=
-  sigmaP_subset_sigmaP_succ 0
-
-/-- `PTIME ⊆ coNP`. -/
-theorem PTIME_subset_coNP : PTIME ⊆ coNP :=
-  sigmaP_subset_piP_succ 0
-
-/-- A problem's complement is in coNP iff the problem is in NP. -/
-theorem compl_mem_coNP_iff {L : Language.{0, 0}} (P : DecisionProblem L) :
-    Pᶜ ∈ coNP ↔ P ∈ NP := by
-  rw [mem_piP_iff, DecisionProblem.compl_compl]
 
 end FirstOrder

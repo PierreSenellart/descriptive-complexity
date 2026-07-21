@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.Tactic.FinCases
-import FOReduction.Complexity
-import FOReduction.SecondOrder
+import FOReduction.Hierarchy
 
 /-!
 # SAT: propositional satisfiability
@@ -17,11 +16,15 @@ propositional variables, `satIsClause c` distinguishes the clauses, and
 clause `c`. `FirstOrder.Satisfiable` is the usual satisfiability, and
 `FirstOrder.SAT` the bundled decision problem.
 
-SAT is the archetypical NP-complete problem: this is the Cook–Levin theorem,
-assumed here as the axiom `FirstOrder.SAT_NP_complete` (see
-`FOReduction.Complexity` for the axiomatic setting; a statement about finite
-CNF structures only). Other problems' NP-completeness proofs derive from it
-through first-order reductions; see e.g.
+SAT is the archetypical NP-complete problem: this is the Cook–Levin theorem
+(`FirstOrder.SAT_NP_complete`, in `FOReduction.Problems.Sat.Hardness`). With
+NP *defined* as existential-second-order definability
+(`FOReduction.Hierarchy`), its membership half is the theorem
+`FirstOrder.sat_sigmaSODefinable` proved here — "there is a truth assignment
+making every clause true" — and its hardness half is the machine-free,
+Dahlhaus-style generic reduction `FirstOrder.sat_hard_of_sigmaSODefinable`
+of `FOReduction.Problems.Sat.Hardness`. Other problems' NP-completeness
+proofs derive from it through first-order reductions; see e.g.
 `FOReduction.Problems.ThreeColorability`.
 -/
 
@@ -117,36 +120,12 @@ def SAT : DecisionProblem Language.sat where
   Holds := fun A inst => @Satisfiable A inst
   iso_invariant := fun e => satisfiable_iso e
 
-/-- The Cook–Levin theorem, as an axiom: SAT is the archetypical NP-complete
-problem. Its NP-hardness holds even under (ordered) first-order reductions
-(Immerman), consistently with the abstract closure properties.
-
-Like every statement about complexity classes, this is a statement about the
-*finite* CNF structures only: by `ComplexityClass.mem_congr_finite` and
-`ComplexityClass.hard_congr_finite`, membership and hardness are unaffected
-by the behavior of `SAT` on infinite structures. -/
-axiom SAT_NP_complete : NP.Complete SAT
-
-/-- SAT is in NP. -/
-theorem sat_mem_NP : SAT ∈ NP :=
-  SAT_NP_complete.mem
-
-/-- SAT is NP-hard. -/
-theorem sat_NP_hard : NP.Hard SAT :=
-  SAT_NP_complete.hard
-
-/-- The complement of SAT (essentially, propositional entailment of `⊥`) is
-in coNP. -/
-theorem sat_compl_mem_coNP : SATᶜ ∈ coNP :=
-  (compl_mem_coNP_iff SAT).mpr sat_mem_NP
-
 /-! ### SAT is existential second-order definable
 
-The membership half of Fagin's characterization of SAT's NP-membership: SAT
-is `Σ₁`-definable in the sense of `FOReduction.SecondOrder` — "there exists a
-truth assignment (a unary relation) making every clause true", the inner part
-being first-order. This is a first consistency check of the second-order
-definability layer against a concrete problem. -/
+SAT is `Σ₁`-definable in the sense of `FOReduction.SecondOrder` — "there
+exists a truth assignment (a unary relation) making every clause true", the
+inner part being first-order. Since NP is *defined* as `Σ₁`-definability,
+this is the membership half of the Cook–Levin theorem. -/
 
 section SigmaOne
 
@@ -155,11 +134,11 @@ open SOBlock
 /-- The single existential block of the `Σ₁` definition of SAT: one unary
 relation variable, the truth assignment. -/
 def satAssignBlock : SOBlock where
-  num := 1
+  ι := Unit
   arity := fun _ => 1
 
 /-- The symbol of the truth-assignment relation variable. -/
-def satNuSym : satAssignBlock.lang.Relations 1 := ⟨⟨0, Nat.one_pos⟩, rfl⟩
+def satNuSym : satAssignBlock.lang.Relations 1 := ⟨(), rfl⟩
 
 /-- The vocabulary of the kernel: CNF instances together with the
 truth-assignment relation variable. -/
@@ -227,7 +206,7 @@ by existentially quantifying a truth assignment and checking, in first-order
 logic, that every clause contains a true literal. -/
 theorem sat_sigmaSODefinable : SigmaSODefinable 1 SAT := by
   refine ⟨[satAssignBlock], rfl, satKernel, ?_⟩
-  intro A _ _
+  intro A _ _ _
   constructor
   · rintro ⟨ν, hν⟩
     exact ⟨fun _ x => ν (x ⟨0, Nat.one_pos⟩),

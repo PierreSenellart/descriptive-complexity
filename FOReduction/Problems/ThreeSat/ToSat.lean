@@ -230,6 +230,6 @@ noncomputable def threeSat_fo_reduction_sat : ThreeSAT ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := threeSatToSat
-  correct A _ := threeSatisfiable_iff_satisfiable A
+  correct A _ _ := threeSatisfiable_iff_satisfiable A
 
 end FirstOrder

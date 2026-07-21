@@ -65,7 +65,7 @@ inductive SatTag : Type
   | go (s : Bool)
   /-- Spoiler for empty clauses, at diagonal pairs `(c, c)`. -/
   | spoil
-  deriving DecidableEq, Fintype
+  deriving DecidableEq, Fintype, Nonempty
 
 /-- Everything in `Fin 3` is one of three pairwise distinct values. -/
 private theorem fin3_cases : ∀ z a b c : Fin 3, a ≠ b → b ≠ c → c ≠ a →

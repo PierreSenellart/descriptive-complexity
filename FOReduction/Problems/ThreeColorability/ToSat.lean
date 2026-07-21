@@ -48,7 +48,7 @@ inductive ColTag : Type
   /-- `(edgClause i, ![u, v])` is the clause "`u` and `v` do not both get color
   `i`" (present when `(u, v)` is an edge). -/
   | edgClause : Fin 3 → ColTag
-  deriving DecidableEq, Fintype
+  deriving DecidableEq, Fintype, Nonempty
 
 /-- Defining formula for `satIsClause`: vertex clauses are the diagonal
 `vtxClause`-elements, edge clauses for color `i` are the `edgClause i`-elements
@@ -233,7 +233,7 @@ def threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT where
   Tag := ColTag
   dim := 2
   toInterpretation := threeColToSat
-  correct A _ := threeColorable_iff_satisfiable A
+  correct A _ _ := threeColorable_iff_satisfiable A
 
 /-- The reduction is even quantifier-free. -/
 theorem threeColToSat_isQuantifierFree : threeColToSat.IsQuantifierFree := by

@@ -57,7 +57,7 @@ inductive SplitTag : Type
   | piece (s : Bool)
   /-- `(.empty, (c, c))` is the copy of the empty clause `c`. -/
   | empty
-  deriving DecidableEq, Fintype
+  deriving DecidableEq, Fintype, Nonempty
 
 /-- Defining formula for `satIsClause`: clause pieces sit on occurrences,
 empty-clause copies on diagonal pairs carrying an empty clause. -/
@@ -514,6 +514,6 @@ noncomputable def sat_ordered_fo_reduction_threeSat : SAT ≤ᶠᵒ[≤] ThreeSA
   Tag := SplitTag
   dim := 2
   toInterpretation := satToThreeSat
-  correct A _ _ _ := satisfiable_iff_threeSatisfiable A
+  correct A _ _ _ _ := satisfiable_iff_threeSatisfiable A
 
 end FirstOrder

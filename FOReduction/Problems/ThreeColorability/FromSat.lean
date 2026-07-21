@@ -157,6 +157,6 @@ noncomputable def sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCo
   Tag := SatTag
   dim := 2
   toInterpretation := satToCol
-  correct A _ _ _ := satisfiable_iff_threeColorable A
+  correct A _ _ _ _ := satisfiable_iff_threeColorable A
 
 end FirstOrder

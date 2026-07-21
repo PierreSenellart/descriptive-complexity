@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import FOReduction.Problems.Sat
+import FOReduction.Problems.Sat.Hardness
 import FOReduction.Problems.ThreeColorability
 import FOReduction.Problems.ThreeSat
 import FOReduction.Problems.CliqueFamily

@@ -259,14 +259,14 @@ def indSet_fo_reduction_clique : IndependentSet ≤ᶠᵒ Clique where
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
-  correct A _ := hasLargeIndependentSet_iff_map A
+  correct A _ _ := hasLargeIndependentSet_iff_map A
 
 /-- **Clique FO-reduces to Independent Set**, by complementing the edges. -/
 def clique_fo_reduction_indSet : Clique ≤ᶠᵒ IndependentSet where
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
-  correct A _ := hasLargeClique_iff_map A
+  correct A _ _ := hasLargeClique_iff_map A
 
 /-- **Vertex Cover FO-reduces to Independent Set**, by complementing the
 marked set. -/
@@ -274,7 +274,7 @@ def vertexCover_fo_reduction_indSet : VertexCover ≤ᶠᵒ IndependentSet where
   Tag := Unit
   dim := 1
   toInterpretation := complMarkInterp
-  correct A _ := hasSmallVertexCover_iff_map A
+  correct A _ _ := hasSmallVertexCover_iff_map A
 
 /-- **Independent Set FO-reduces to Vertex Cover**, by complementing the
 marked set. -/
@@ -282,6 +282,6 @@ def indSet_fo_reduction_vertexCover : IndependentSet ≤ᶠᵒ VertexCover where
   Tag := Unit
   dim := 1
   toInterpretation := complMarkInterp
-  correct A _ := hasLargeIndependentSet_iff_cover_map A
+  correct A _ _ := hasLargeIndependentSet_iff_cover_map A
 
 end FirstOrder

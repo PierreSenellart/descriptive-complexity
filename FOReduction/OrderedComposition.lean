@@ -247,13 +247,16 @@ noncomputable def OrderedFOReduction.trans (g : P ≤ᶠᵒ[≤] Q) (f : Q ≤�
     P ≤ᶠᵒ[≤] R :=
   letI := g.tagFinite
   letI := f.tagFinite
+  letI := g.tagNonempty
+  letI := f.tagNonempty
   letI : LinearOrder g.Tag := finiteLinearOrder g.Tag
   { Tag := f.Tag × (Fin f.dim → g.Tag)
     dim := f.dim * g.dim
     toInterpretation := f.toInterpretation.comp g.toInterpretation.ordExtend
-    correct := fun A _ _ _ => by
+    correct := fun A _ _ _ _ => by
       letI := g.toInterpretation.mapLinearOrder A
       haveI : Finite (g.toInterpretation.Map A) := g.toInterpretation.map_finite A
+      haveI : Nonempty (g.toInterpretation.Map A) := g.toInterpretation.map_nonempty A
       have h1 := g.correct A
       have h2 := f.correct (g.toInterpretation.Map A)
       have e1 := g.toInterpretation.ordExtendLEquiv A
@@ -265,11 +268,12 @@ noncomputable def OrderedFOReduction.trans (g : P ≤ᶠᵒ[≤] Q) (f : Q ≤�
 defining formulas to the ordered expansion (they simply ignore the order). -/
 noncomputable def FOReduction.toOrdered (g : P ≤ᶠᵒ Q) : P ≤ᶠᵒ[≤] Q :=
   letI := g.tagFinite
+  letI := g.tagNonempty
   { Tag := g.Tag
     dim := g.dim
     toInterpretation :=
       { relFormula := fun R t => LHom.sumInl.onFormula (g.toInterpretation.relFormula R t) }
-    correct := fun A _ _ _ => by
+    correct := fun A _ _ _ _ => by
       refine (g.correct A).trans (Q.iso_invariant ?_)
       exact
         { toEquiv := Equiv.refl _

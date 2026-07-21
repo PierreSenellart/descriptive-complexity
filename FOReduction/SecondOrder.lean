@@ -23,7 +23,8 @@ an assignment of relations into a structure over the block's vocabulary
 over the base language expanded by all blocks (`FirstOrder.soLang`).
 `FirstOrder.SORealize` evaluates the alternating quantification, and
 `FirstOrder.SigmaSODefinable` / `FirstOrder.PiSODefinable` state that a
-decision problem is defined by such a sentence *on finite structures*.
+decision problem is defined by such a sentence *on nonempty finite
+structures*.
 
 This file proves the two structural facts about these notions that do not
 involve reductions:
@@ -33,13 +34,11 @@ involve reductions:
 * the duality `Πₖ = co-Σₖ` (`FirstOrder.piSODefinable_iff_compl`), by
   negating the kernel and flipping the quantifiers.
 
-Still missing before the axioms of `FOReduction.Complexity` at levels `k ≥ 1`
-can be discharged: closure of definability under (ordered) FO reductions
-(pulling the kernel back through an interpretation, second-order quantifiers
-becoming finitely many quantifiers over higher-arity relations, the order
-being re-quantified inside the first block), the level inclusions (padding
-with trivial blocks), and the generic reduction from any `Σ₁`-definable
-problem to SAT (machine-free Cook–Levin, Dahlhaus-style).
+The rest of the definitional theory lives in dedicated files: functoriality
+and padding in `FOReduction.SecondOrderLift`, closure under FO reductions in
+`FOReduction.SecondOrderPull`, closure under ordered FO reductions in
+`FOReduction.SecondOrderOrdered`, and the resulting definition of the levels
+`Σₖᵖ`/`Πₖᵖ` for `k ≥ 1` in `FOReduction.Hierarchy`.
 -/
 
 namespace FirstOrder
@@ -49,17 +48,23 @@ open Language Structure
 /-! ### Second-order quantifier blocks -/
 
 /-- A second-order quantifier block: finitely many relation variables, with
-given arities. -/
-structure SOBlock : Type where
-  /-- The number of relation variables of the block. -/
-  num : ℕ
+given arities. (The index type is arbitrary rather than an initial segment of
+`ℕ`, so that constructions on blocks — e.g. pulling a block back through an
+interpretation — can build their natural index types directly.) -/
+structure SOBlock : Type 1 where
+  /-- The index type of the relation variables of the block. -/
+  ι : Type
+  /-- A block has finitely many relation variables. -/
+  [ιFinite : Finite ι]
   /-- The arity of each relation variable. -/
-  arity : Fin num → ℕ
+  arity : ι → ℕ
+
+attribute [instance] SOBlock.ιFinite
 
 /-- The (relational) vocabulary of a block: one relation symbol per relation
 variable. -/
 def SOBlock.lang (B : SOBlock) : Language :=
-  ⟨fun _ => Empty, fun n => {i : Fin B.num // B.arity i = n}⟩
+  ⟨fun _ => Empty, fun n => {i : B.ι // B.arity i = n}⟩
 
 instance (B : SOBlock) : IsRelational B.lang :=
   fun _ => ⟨fun f => Empty.elim f⟩
@@ -67,7 +72,7 @@ instance (B : SOBlock) : IsRelational B.lang :=
 /-- An assignment of actual relations (on a universe `A`) to the relation
 variables of a block. -/
 def SOBlock.Assignment (B : SOBlock) (A : Type) : Type :=
-  ∀ i : Fin B.num, (Fin (B.arity i) → A) → Prop
+  ∀ i : B.ι, (Fin (B.arity i) → A) → Prop
 
 /-- The structure over the block's vocabulary determined by an assignment. -/
 @[instance_reducible]
@@ -99,21 +104,22 @@ def SORealize (L : Language.{0, 0}) (A : Type) [inst : L.Structure A] :
 
 variable {L : Language.{0, 0}}
 
-/-- A decision problem is `Σₖ`-definable if, on finite structures, it is
-defined by a second-order sentence with `k` alternating blocks of
-second-order quantifiers, starting existentially. -/
+/-- A decision problem is `Σₖ`-definable if, on nonempty finite structures, it
+is defined by a second-order sentence with `k` alternating blocks of
+second-order quantifiers, starting existentially. (As everywhere in this
+development, complexity notions are about nonempty finite structures.) -/
 def SigmaSODefinable (k : ℕ) (P : DecisionProblem L) : Prop :=
   ∃ Bs : List SOBlock, Bs.length = k ∧
     ∃ φ : (soLang L Bs).Sentence,
-      ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ SORealize L A Bs φ true
+      ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], P A ↔ SORealize L A Bs φ true
 
-/-- A decision problem is `Πₖ`-definable if, on finite structures, it is
-defined by a second-order sentence with `k` alternating blocks of
+/-- A decision problem is `Πₖ`-definable if, on nonempty finite structures, it
+is defined by a second-order sentence with `k` alternating blocks of
 second-order quantifiers, starting universally. -/
 def PiSODefinable (k : ℕ) (P : DecisionProblem L) : Prop :=
   ∃ Bs : List SOBlock, Bs.length = k ∧
     ∃ φ : (soLang L Bs).Sentence,
-      ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ SORealize L A Bs φ false
+      ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], P A ↔ SORealize L A Bs φ false
 
 /-! ### Isomorphism-invariance -/
 
@@ -223,13 +229,13 @@ theorem piSODefinable_iff_compl (k : ℕ) (P : DecisionProblem L) :
   constructor
   · rintro ⟨Bs, hk, φ, hφ⟩
     refine ⟨Bs, hk, ∼φ, ?_⟩
-    intro A _ _
+    intro A _ _ _
     have hd := sorealize_not Bs L A inferInstance φ true
     simp only [Bool.not_true] at hd
     exact (not_congr (hφ A)).trans hd.symm
   · rintro ⟨Bs, hk, φ, hφ⟩
     refine ⟨Bs, hk, ∼φ, ?_⟩
-    intro A _ _
+    intro A _ _ _
     have hd := sorealize_not Bs L A inferInstance φ false
     simp only [Bool.not_false] at hd
     exact (not_not.symm.trans (not_congr (hφ A))).trans hd.symm

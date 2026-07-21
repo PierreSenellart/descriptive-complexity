@@ -77,12 +77,15 @@ structure OrderedFOReduction [L'.IsRelational]
   Tag : Type
   /-- Tags are finite, so that finite structures map to finite structures. -/
   [tagFinite : Finite Tag]
+  /-- Tags are nonempty, so that nonempty structures map to nonempty
+  structures. -/
+  [tagNonempty : Nonempty Tag]
   /-- The dimension of the underlying interpretation. -/
   dim : ℕ
   /-- The underlying first-order interpretation, over the ordered expansion. -/
   toInterpretation : FOInterpretation (L.sum Language.order) L' Tag dim
   /-- Yes-instances map exactly to yes-instances, whatever the linear order. -/
-  correct : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A],
+  correct : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
     P A ↔ Q (toInterpretation.Map A)
 
 @[inherit_doc]

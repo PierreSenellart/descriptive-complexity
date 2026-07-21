@@ -49,6 +49,15 @@ The universe of `I.Map A` is `Tag × (Fin dim → A)`, which is finite whenever
 `A` and `Tag` are (`FOInterpretation.map_finite`): FO reductions map finite
 structures to finite structures, as required for reductions between decision
 problems on finite structures.
+
+Following the usual convention of finite model theory, reductions are only
+required to be correct on *nonempty* structures (and their tag types are
+required to be nonempty, so that nonempty structures map to nonempty
+structures). Empty structures are degenerate: no fixed-dimension
+interpretation can produce a nonempty structure from an empty one, so e.g. no
+problem that is false on an empty structure could reduce to SAT (whose empty
+instance is trivially satisfiable), and hardness results would fail for
+spurious reasons.
 -/
 
 namespace FirstOrder
@@ -128,6 +137,12 @@ omit [L.Structure A] in
 theorem map_finite [Finite Tag] [Finite A] : Finite (I.Map A) :=
   inferInstanceAs (Finite (Tag × (Fin dim → A)))
 
+omit [L.Structure A] in
+/-- FO interpretations with nonempty tags map nonempty structures to nonempty
+structures. -/
+theorem map_nonempty [Nonempty Tag] [Nonempty A] : Nonempty (I.Map A) :=
+  inferInstanceAs (Nonempty (Tag × (Fin dim → A)))
+
 /-- An interpretation is quantifier-free if all its defining formulas are.
 Quantifier-free reductions are the weakest reduction notion in common use in
 descriptive complexity; SAT remains NP-complete under them. -/
@@ -151,12 +166,15 @@ structure FOReduction [L'.IsRelational] (P : DecisionProblem L) (Q : DecisionPro
   Tag : Type
   /-- Tags are finite, so that finite structures map to finite structures. -/
   [tagFinite : Finite Tag]
+  /-- Tags are nonempty, so that nonempty structures map to nonempty
+  structures. -/
+  [tagNonempty : Nonempty Tag]
   /-- The dimension of the underlying interpretation. -/
   dim : ℕ
   /-- The underlying first-order interpretation. -/
   toInterpretation : FOInterpretation L L' Tag dim
-  /-- Yes-instances map exactly to yes-instances. -/
-  correct : ∀ (A : Type) [L.Structure A], P A ↔ Q (toInterpretation.Map A)
+  /-- Yes-instances map exactly to yes-instances (on nonempty structures). -/
+  correct : ∀ (A : Type) [L.Structure A] [Nonempty A], P A ↔ Q (toInterpretation.Map A)
 
 @[inherit_doc]
 scoped notation:50 P:51 " ≤ᶠᵒ " Q:51 => FOReduction P Q
