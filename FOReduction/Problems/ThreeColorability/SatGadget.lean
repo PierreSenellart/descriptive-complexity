@@ -11,8 +11,9 @@ import FOReduction.OccurrenceOrder
 Combinatorial core of the reduction from SAT to 3-colorability: the classical
 gadget graph associated to a CNF, and the proof that it is 3-colorable iff the
 CNF is satisfiable. The first-order definition of this graph (as a tagged
-2-dimensional interpretation) is in `FOReduction.SatToThreeCol`; here
-everything is purely semantic.
+2-dimensional interpretation) is in
+`FOReduction.Problems.ThreeColorability.FromSat`; here everything is purely
+semantic.
 
 Vertices are tagged pairs `(t, a, b)` with `t : SatTag` and `a b` elements of
 the CNF structure:
@@ -44,7 +45,7 @@ namespace FirstOrder
 
 namespace SatToCol
 
-open Language Structure
+open Language Structure SatOcc
 
 /-- Tags of the gadget graph. -/
 inductive SatTag : Type
@@ -101,61 +102,6 @@ def Core : SatTag → A → A → SatTag → A → A → Prop
   | .spoil, c, c', .palF, _, _ => c = c' ∧ EmptyCl c
   | .spoil, c, c', .palB, _, _ => c = c' ∧ EmptyCl c
   | _, _, _, _, _, _ => False
-
-/-! ### Truth of literals and prefix disjunctions -/
-
-/-- The literal `(x, s)` is true under the assignment `ν`. -/
-def LitTrue (ν : A → Prop) (x : A) (s : Bool) : Prop := if s then ν x else ¬ν x
-
-omit [Language.sat.Structure A] [LinearOrder A] in
-theorem litTrue_not {ν : A → Prop} {x : A} {s : Bool} :
-    LitTrue ν x (!s) ↔ ¬LitTrue ν x s := by
-  cases s <;> simp [LitTrue]
-
-/-- Some occurrence of `c` strictly before `(x, s)` is true under `ν`. -/
-def PrefixOrStrict (ν : A → Prop) (c x : A) (s : Bool) : Prop :=
-  ∃ y t, OccIn c y t ∧ occLt y t x s ∧ LitTrue ν y t
-
-/-- Some occurrence of `c` up to `(x, s)` (inclusive) is true under `ν`. -/
-def PrefixOr (ν : A → Prop) (c x : A) (s : Bool) : Prop :=
-  ∃ y t, OccIn c y t ∧ (occLt y t x s ∨ (y = x ∧ t = s)) ∧ LitTrue ν y t
-
-theorem not_prefixOrStrict_min {ν : A → Prop} {c y : A} {t : Bool} (hmin : MinOcc c y t) :
-    ¬PrefixOrStrict ν c y t := by
-  rintro ⟨z, u, hz, hlt, -⟩
-  exact hmin.2 z u hz hlt
-
-theorem prefixOr_iff {ν : A → Prop} {c x : A} {s : Bool} (hx : OccIn c x s) :
-    PrefixOr ν c x s ↔ PrefixOrStrict ν c x s ∨ LitTrue ν x s := by
-  constructor
-  · rintro ⟨y, t, hy, hlt | ⟨rfl, rfl⟩, hT⟩
-    · exact Or.inl ⟨y, t, hy, hlt, hT⟩
-    · exact Or.inr hT
-  · rintro (⟨y, t, hy, hlt, hT⟩ | hT)
-    · exact ⟨y, t, hy, Or.inl hlt, hT⟩
-    · exact ⟨x, s, hx, Or.inr ⟨rfl, rfl⟩, hT⟩
-
-theorem prefixOrStrict_succ {ν : A → Prop} {c y x : A} {t s : Bool}
-    (hsucc : SuccOcc c y t x s) : PrefixOrStrict ν c x s ↔ PrefixOr ν c y t := by
-  constructor
-  · rintro ⟨z, u, hz, hlt, hT⟩
-    exact ⟨z, u, hz, (succOcc_occLt_iff hsucc hz).mp hlt, hT⟩
-  · rintro ⟨z, u, hz, h, hT⟩
-    exact ⟨z, u, hz, (succOcc_occLt_iff hsucc hz).mpr h, hT⟩
-
-theorem prefixOrStrict_of_min_succ {ν : A → Prop} {c y x : A} {t s : Bool}
-    (hmin : MinOcc c y t) (hsucc : SuccOcc c y t x s) :
-    PrefixOrStrict ν c x s ↔ LitTrue ν y t := by
-  rw [prefixOrStrict_succ hsucc, prefixOr_iff hmin.occIn]
-  exact ⟨fun h => h.resolve_left (not_prefixOrStrict_min hmin), Or.inr⟩
-
-theorem prefixOr_of_max {ν : A → Prop} {c x y : A} {s t : Bool} (hmax : MaxOcc c x s)
-    (hy : OccIn c y t) (hT : LitTrue ν y t) : PrefixOr ν c x s := by
-  refine ⟨y, t, hy, ?_, hT⟩
-  rcases occLt_trichotomy y t x s with h | h | h
-  · exact Or.inl h
-  · exact Or.inr h
-  · exact absurd h (hmax.2 y t hy)
 
 /-! ### From a satisfying assignment to a proper coloring -/
 
@@ -261,19 +207,6 @@ theorem gadCol_proper {ν : A → Prop}
     exact absurd hz (hemp.2 z u)
 
 /-! ### Main combinatorial equivalence -/
-
-omit [LinearOrder A] in
-/-- Bridge from the `Satisfiable` form of clause satisfaction to the
-occurrence form. -/
-theorem satClauses_occ {ν : A → Prop}
-    (hν : ∀ c : A, RelMap satIsClause ![c] →
-      ∃ x : A, (RelMap satPosIn ![c, x] ∧ ν x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν x)) :
-    ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s := by
-  intro c hc
-  obtain ⟨x, hx⟩ := hν c hc
-  rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
-  · exact ⟨x, true, ⟨hc, hp⟩, hT⟩
-  · exact ⟨x, false, ⟨hc, hn⟩, hT⟩
 
 variable (A) in
 /-- **Combinatorial correctness of the SAT → 3COL gadget**: a CNF structure is
