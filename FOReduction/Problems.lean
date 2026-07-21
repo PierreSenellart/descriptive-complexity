@@ -5,6 +5,8 @@ Authors: Pierre Senellart
 -/
 import FOReduction.Problems.Sat
 import FOReduction.Problems.ThreeColorability
+import FOReduction.Problems.ThreeSat
+import FOReduction.Problems.CliqueFamily
 
 /-!
 # The problem catalog
