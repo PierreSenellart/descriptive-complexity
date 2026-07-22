@@ -164,8 +164,10 @@ noncomputable def satKernel : satSOLang.Sentence :=
       Unit)).iAlls (Fin 1)
 
 /-- Realization of the kernel under an assignment of the truth-assignment
-variable: every clause contains a true literal. -/
-private theorem realize_satKernel {A : Type} [Language.sat.Structure A]
+variable: every clause contains a true literal. (Reused by the membership
+proof of HORN-SAT, whose kernel is this one conjoined with the first-order
+Horn condition.) -/
+theorem realize_satKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) satKernel) ↔

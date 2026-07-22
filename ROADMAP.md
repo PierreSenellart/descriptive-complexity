@@ -109,13 +109,15 @@ carried through:
 |---|---|---|
 | ∃SO | SAT | done (Cook–Levin discharge) |
 | SO alternation, level k | QBF_k | done (same construction + block marks) |
-| SO-Horn (P) | HORN-SAT | Horn kernel ⇒ Horn clauses; easier than Cook–Levin |
+| SO-Horn (P) | HORN-SAT | done (no gates needed: guards are evaluated, not encoded) |
 | SO-Krom (NL) | 2SAT | Krom kernel ⇒ binary clauses |
 | SO(TC) (PSPACE) | QSAT | least mechanical: natural image is a succinct/game reachability, QSAT via the standard alternation argument |
 
-Consequence: do HORN-SAT while the Cook–Levin machinery is warm (QBF_k
-is done, and its merging/transfer infrastructure is reusable); CVP and alternating reachability then enter the catalog as
-ordinary reductions *from* HORN-SAT rather than as primary discharges.
+HORN-SAT is done; CVP and alternating reachability now enter the catalog
+as ordinary reductions *from* HORN-SAT rather than as primary discharges.
+Note that the Horn discharge did **not** reuse the Tseitin machinery: a
+Horn kernel needs no gates at all, only the canonical padding of
+`Padding.lean` (factored out of the Tseitin files for the purpose).
 
 - **QBF_k (Σₖ/Πₖ-QSAT)** [M, *done*]: quantified Boolean formulas with k
   alternation blocks. `QBF k` is `Σₖᵖ`-complete (`QBF_complete`) and the
@@ -139,7 +141,7 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
     existential iff k is odd, so `QBF k` takes a conjunctive matrix for
     odd k and a disjunctive one for even k, linked by
     `dnfSat_iff_not_cnfSatWith_true` (negation plus a swap of all literal
-    signs — *not* a complementation of the assignments, which would only
+    signs – *not* a complementation of the assignments, which would only
     be correct on instances whose block marks partition the variables).
     Choosing the interpretation's literal signs by the same flag makes
     the parity vanish from the correctness proof: the literal a satisfied
@@ -154,7 +156,7 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
     (move an alternating prefix between truth assignments and block
     assignments, given a reading that is surjective at every block).
     `qbfT_clauses_iff` is the `∃`-free form of `tseitin_satisfiable_iff`
-    — the shape any *alternating* discharge needs, since the prefix
+    – the shape any *alternating* discharge needs, since the prefix
     supplies the assignment rather than quantifying it.
 
 - **TAUT** [S, *done*]: coNP-complete (`TAUT_coNP_complete`, in
@@ -176,11 +178,64 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
   SO-Horn-definable (or FO(LFP)-definable) problem FO-reduces to X”,
   mirroring the SAT discharge one level down (meaningful even before
   PTIME is defined):
-  - HORN-SAT: the primary discharge, per the symmetry table above;
+  - HORN-SAT: the primary discharge, per the symmetry table above.
+    **Done** (`hornSat_hard_of_sigmaSOHornDefinable`, in
+    `Problems/HornSat/`): the Horn program is read as data, its guards
+    are *evaluated* in the input structure rather than encoded, and each
+    clause instance emits one propositional clause – no Tseitin gates,
+    hence Horn output (`horn_atMostOnePositive`). Membership
+    `HORNSAT ∈ NP` is there too (`hornSat_sigmaSODefinable`), and
+    `Problems/Reachability.lean` gives the fragment its worked instance:
+    UNREACH is SO-Horn definable, hence FO-reduces to HORN-SAT.
   - Circuit Value Problem, Monotone CVP, and alternating reachability
     (DC's canonical P-complete problem, with quantifier-free
     projection hardness in the book): as catalog reductions from
     HORN-SAT.
+  - **The PTIME class is done** (`PTIME`, in `Hierarchy.lean`): guards
+    live over the ordered expansion, and `SecondOrderHornPull.lean`
+    proves the *shape-preserving* pullback – the Horn condition
+    constrains only the second-order atoms, which an interpretation
+    merely re-indexes, while the input-vocabulary atoms it rewrites live
+    in the guards. Hence `hornSat_PTIME_hard` and `PTIME_subset_NP` (the
+    latter for free: everything reduces to HORN-SAT, which is in NP), and
+    `unreach_mem_PTIME`.
+  - **HORN-SAT's own SO-Horn definability** [M–L, *done*]:
+    `hornSat_mem_PTIME` in `Problems/HornSat/Definability.lean`, hence
+    `HORNSAT_PTIME_complete`. An input clause has unboundedly many
+    negative literals, which a program with a fixed number of body atoms
+    cannot collect in one clause; the program walks them along the order
+    with a derived relation `B c z` = “every negative literal of `c` up
+    to `z` is forced”, four rules (base/step × literal/non-literal)
+    assembling the unbounded body one element at a time, one rule
+    deriving `T` from a complete body, and two goal clauses (an
+    all-negative clause with complete body; two positive literals in one
+    clause). The semantic half is the least-model theory of
+    `Problems/HornSat/Unsat.lean` (stages `ForcedIn`, closure `Forced`,
+    `forced_subset_model`).
+  - **Level 0 of the hierarchy is `PTIME`** (`SigmaP 0 = PTIME`,
+    `PiP 0 = PTIME.compl`), `mem_piP_iff` holds at every level, and all
+    four inclusions into level 1 are proved: `PTIME_subset_NP`,
+    `PTIME_subset_coNP`, `coPTIME_subset_NP`, `coPTIME_subset_coNP`. The
+    two crossing ones go through **`HORNSAT ∈ coNP`**
+    (`Problems/HornSat/Unsat.lean`, done): a `Σ₁` certificate of Horn
+    *un*satisfiability – guess a strict order and a set `T`, check
+    first-order that each element of `T` is derived by a clause whose
+    negative literals are in `T` and strictly earlier (which pins `T`
+    inside the propagation closure), and that some all-negative clause
+    has all its literals in `T`. Soundness is a well-founded induction
+    using the Horn condition; completeness is that the closure is
+    otherwise a model.
+  - **Still open at level 0** [R]: that the two zeroth levels *coincide*,
+    `PiP 0 = SigmaP 0` (P closed under complement). With HORN-SAT now
+    PTIME-complete this reduces to one crisp question: is Horn
+    *un*satisfiability SO-Horn definable? A Horn program accepts when the
+    least model of its rules satisfies its goal clauses, so accepting the
+    unsatisfiable instances would mean deriving a contradiction from a
+    universal statement about the least model – negative information a
+    goal clause cannot supply. The route is *not* a machine simulation
+    but the logic-to-logic equivalence SO-Horn = FO(LFP) (§3): a full
+    logic is closed under negation by construction, so `piP_zero_eq`
+    follows from it in one line.
 - **NL: REACH** [M]: directed st-reachability, the canonical
   NL-complete problem; hardness = “every FO(TC)-definable problem
   FO-reduces to REACH”. Also **2SAT** [M after REACH] (via implication
@@ -196,14 +251,25 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
 
 ## 3. Logics and framework extensions
 
-- **SO-Horn and SO-Krom (Grädel)** [M–L]: existential SO with
-  Horn (resp. Krom) FO kernel captures P (resp. NL) on ordered
-  structures. Key observation: this fits the existing framework far
-  more cheaply than fixpoint logics, since SO quantifiers are already
-  Lean-level and only the kernel shape (Horn/Krom, already close to
-  `Mathlib.ModelTheory.Complexity`'s formula-shape predicates) is
-  object-level. Likely the cheapest path to an axiom-free definition
-  of PTIME, ahead of FO(LFP).
+- **SO-Horn and SO-Krom (Grädel)** [M–L, *SO-Horn done, SO-Krom open*]:
+  existential SO with Horn (resp. Krom) FO kernel captures P (resp. NL)
+  on ordered structures. Key observation: this fits the existing
+  framework far more cheaply than fixpoint logics, since SO quantifiers
+  are already Lean-level and only the kernel shape is object-level.
+  Still the cheapest path to an axiom-free definition of PTIME, ahead
+  of FO(LFP). Landed: `SecondOrderHorn.lean` – the kernel *as data*
+  (`HornProgram`: a list of clauses, each a first-order guard over the
+  input vocabulary, a list of body atoms and an optional head atom) and
+  `SigmaSOHornDefinable`. Representing the kernel as a clause list
+  rather than carving a shape predicate out of `BoundedFormula` is what
+  keeps this cheap: it is Grädel's clausal normal form, and it is the
+  form a consuming reduction has to see anyway. `SecondOrderHornPull.lean`
+  adds the shape-preserving pullback, hence the class `PTIME`, and
+  `Problems/HornSat/` its complete problem. Remaining: SO-Krom by the same
+  recipe – the Krom shape (at most two second-order atoms per clause, of
+  either sign) is another clause-list datatype, and its discharge to 2SAT
+  should be the same construction with the literal signs read off the
+  clause.
 - **FO(LFP)** [L]: syntax and semantics of least fixed points;
   order-invariant FO(LFP) as the *definition* of PTIME
   (Immerman–Vardi), filling level 0 of the hierarchy (currently an
@@ -334,7 +400,10 @@ separations and non-reducibility, impossible in the machine world.
 1. Cheap catalog wins: Set Cover, Dominating Set, k-COL (TAUT is done).
 1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
-2. SO-Horn path to an axiom-free PTIME; HORN-SAT hardness.
+2. SO-Horn path to an axiom-free PTIME: **done** – the class, its
+   closure under reductions, and HORN-SAT complete for it. What is left at
+   level 0 is only `PiP 0 = SigmaP 0` (§2), which is Grädel's capture
+   theorem in disguise.
 3. EF games + EVEN/REACH inexpressibility (opens §5).
 4. FO(TC)/REACH, then Immerman–Szelepcsényi as the flagship theorem.
 5. SO(TC) and QSAT for PSPACE; then FO(LFP)/FO(PFP) as the

@@ -13,6 +13,8 @@ import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.SecondOrderOrdered
 import DescriptiveComplexity.SecondOrderMerge
+import DescriptiveComplexity.SecondOrderHorn
+import DescriptiveComplexity.SecondOrderHornPull
 import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -80,13 +82,34 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.Hierarchy` – the levels `Σₖᵖ`/`Πₖᵖ` and `PH` as
   complexity classes, via Fagin's ([Fagin 1974][fagin1974generalized]) and
   Stockmeyer's ([Stockmeyer 1976][stockmeyer1976polynomial]) theorems. The
-  level inclusions and the duality `Πₖᵖ = co-Σₖᵖ` are proved,
-  not assumed. Level 0 – polynomial time – is deliberately left as the *empty
-  placeholder* class: no order-free logic is known to capture PTIME, and the
-  ordered Immerman–Vardi characterization `P = FO(LFP)`
-  ([Immerman 1986][immerman1986relational]; [Vardi 1982][vardi1982complexity])
-  would require fixpoint logic and a built-in order. As a result the library
-  declares **no axioms** (check with `#print axioms`).
+  level inclusions and the duality `Πₖᵖ = co-Σₖᵖ` are proved, not assumed.
+  Level 0 is `DescriptiveComplexity.PTIME`, polynomial time, defined by the Horn
+  fragment SO-Horn (below); the level-0 statements that would amount to
+  closure under complement are the one thing the fragment does not give, and
+  are restricted to levels `≥ 1`. Everything remains a definition or a
+  theorem: the library declares **no axioms** (check with `#print axioms`).
+
+## Polynomial time, by the Horn fragment
+
+* `DescriptiveComplexity.SecondOrderHorn` – SO-Horn ([Grädel
+  1992][gradel1992capturing]): existential second-order logic whose kernel is a
+  conjunction of Horn clauses in the quantified relation variables, the
+  fragment that captures polynomial time on ordered structures. The kernel is
+  represented as *data* (`DescriptiveComplexity.HornProgram`, a list of clauses with a
+  first-order guard over the ordered expansion, body atoms and an optional
+  head), which is Grädel's clausal normal form and what a reduction consuming
+  such a definition needs to read.
+* `DescriptiveComplexity.SecondOrderHornPull` – the pullback of an SO-Horn definition
+  through an interpretation *stays Horn*: the Horn condition constrains only
+  the second-order atoms, and an interpretation rewrites the
+  input-vocabulary ones, which live in the guard. This closure is what makes
+  `DescriptiveComplexity.PTIME` (in `DescriptiveComplexity.Hierarchy`) a genuine complexity
+  class, and hence level 0 of the hierarchy, *defined* by SO-Horn definability
+  just as NP is defined by `Σ₁`-definability. HORN-SAT is PTIME-complete – hard
+  by the Horn discharge, and a member by the Horn program that computes unit
+  propagation along the order – which also yields the four inclusions of level
+  0 into level 1. See `DescriptiveComplexity.Problems.HornSat` for what is and is not
+  claimed.
 
 ## Shared encodings
 
@@ -113,11 +136,14 @@ individual declarations are documented on their own pages.
   the clique family (Clique, Independent Set, Vertex Cover) with their
   inter-reductions and NP-completeness; TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
-  Cook–Levin discharge; and `QBF k`, quantified Boolean formulas with `k`
+  Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
   alternating blocks, complete for the `k`-th level of the hierarchy
   ([Stockmeyer 1976][stockmeyer1976polynomial]; [Wrathall
   1976][wrathall1976complete]) by the same Tseitin discharge carrying block
-  marks.
+  marks; HORN-SAT, PTIME-complete by the Horn discharge and a Horn program for
+  unit propagation – the P-level analogue of Cook–Levin, equally machine-free;
+  and REACH/UNREACH, whose Horn program is a second worked instance of the
+  fragment.
 
 ## Worked examples
 

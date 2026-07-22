@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.SecondOrderHornPull
 
 /-!
 # The polynomial hierarchy, defined by second-order alternation
@@ -24,25 +25,48 @@ Hardness is defined *cofinally*: `P` is hard when every problem of the class
 reduces (by an ordered FO reduction) to every relational problem that `P`
 itself reduces to. For a problem over a relational vocabulary this is
 equivalent to the usual “everything in the class reduces to `P`”
-(`DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff`), and the
-formulation makes hardness travel forward along reductions even through
-non-relational vocabularies.
+(`DescriptiveComplexity.cofinalHard_iff`, with per-class specializations
+`DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff` and
+`DescriptiveComplexity.hard_PTIME_iff`), and the formulation makes hardness travel
+forward along reductions even through non-relational vocabularies.
 
-Level 0 – polynomial time – is *not* defined: no known order-free logic
-captures polynomial time (the Chandra–Harel/Gurevich problem), and the
-Immerman–Vardi characterization `P = FO(LFP)`
-([Immerman 1986][immerman1986relational]; [Vardi 1982][vardi1982complexity]) on
-ordered structures would
-require formalizing least fixed points and a built-in order. Rather than
-axiomatize PTIME, `SigmaP 0` and `PiP 0` are set to the empty class
-(`ComplexityClass.empty`) – nothing is claimed about level 0, all statements
-about it hold vacuously, and the library declares no axioms: every theorem
-depends on nothing beyond Lean's standard `propext`, `Classical.choice` and
-`Quot.sound` (check with `#print axioms`). PTIME can be added once a
-descriptive characterization of it is formalized.
+Level 0 is `DescriptiveComplexity.PTIME`, polynomial time, *defined* here as
+definability in the Horn fragment SO-Horn of existential second-order logic
+([Grädel 1992][gradel1992capturing]) – the same move as defining NP by
+`Σ₁`-definability, and equally a definition rather than an axiom: the library
+declares **no axioms**, every theorem depending on nothing beyond Lean's
+standard `propext`, `Classical.choice` and `Quot.sound` (check with
+`#print axioms`). The order-free characterization of PTIME is the
+Chandra–Harel/Gurevich problem and is not needed here: SO-Horn definability,
+like ordered FO reductions, is stated over ordered structures.
 
-The level inclusions, the duality `Πₖᵖ = co-Σₖᵖ` and the class `PH` are all
-proved (`DescriptiveComplexity.sigmaP_subset_sigmaP_succ`,
+**What level 0 does and does not give.** It is a genuine class, closed under
+(ordered) FO reductions by the shape-preserving pullback of
+`DescriptiveComplexity.SecondOrderHornPull`, and `Πₖᵖ` is the complements of `Σₖᵖ` at
+*every* level (`DescriptiveComplexity.mem_piP_iff`) – at level 0 by definition, above
+it by the quantifier duality.
+
+All four inclusions of level 0 into level 1 are proved – `PTIME ⊆ NP`,
+`PTIME ⊆ coNP` and their complements (`DescriptiveComplexity.PTIME_subset_NP`,
+`DescriptiveComplexity.PTIME_subset_coNP`, `DescriptiveComplexity.coPTIME_subset_NP`,
+`DescriptiveComplexity.coPTIME_subset_coNP`); they live downstream with HORN-SAT, since
+they go through the Horn discharge and, for the two crossing ones, through the
+certificate of Horn *un*satisfiability of
+`DescriptiveComplexity.Problems.HornSat.Unsat`.
+
+What is **not** proved is that the two zeroth levels *coincide*:
+`PiP 0 = SigmaP 0` says that polynomial time is closed under complement. Since
+HORN-SAT is PTIME-complete (`DescriptiveComplexity.HORNSAT_PTIME_complete`), that
+identity is equivalent to Horn *un*satisfiability being SO-Horn definable –
+knowing the complement is in NP ∩ coNP, as the inclusions above give, is not
+enough. The standard route to it is the equivalence of SO-Horn with the *logic*
+FO(LFP), which is closed under negation by construction; no machine model is
+involved. (There is
+deliberately no `piP_zero_eq`: it would be true of polynomial time, but here it
+is an open statement, not a theorem.)
+
+The level inclusions above 0, the duality `Πₖᵖ = co-Σₖᵖ` and the class `PH` are
+all proved (`DescriptiveComplexity.sigmaP_subset_sigmaP_succ`,
 `DescriptiveComplexity.mem_piP_iff`…).
 -/
 
@@ -122,6 +146,49 @@ theorem CofinalHard.congr
   intro L' _ S hS L'' R hR
   exact hP S (hS.map fun g => g.congrSource fun A _ _ => (h A).symm) R hR
 
+/-- **Over a relational vocabulary, cofinal hardness is the usual notion**:
+every problem of the collection reduces to `P` itself. This holds whatever the
+collection is – the proof only uses reflexivity and transitivity of reductions
+– so the specializations to the individual classes below
+(`DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff`,
+`DescriptiveComplexity.hard_PTIME_iff`) are corollaries by definitional unfolding.
+
+The left-to-right direction is what a *user* of a hardness result needs, to
+extract an actual reduction; it is where relationality of `P` is used, to
+instantiate the cofinal quantifier at `P` itself. -/
+theorem cofinalHard_iff [L.IsRelational]
+    (Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop) (P : DecisionProblem L) :
+    CofinalHard Mem P ↔
+      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+        Mem Q → Nonempty (Q ≤ᶠᵒ[≤] P) := by
+  constructor
+  · intro h L'' Q hQ
+    exact h P ⟨(FOReduction.refl P).toOrdered⟩ Q hQ
+  · intro h L' _ S hS L'' Q hQ
+    exact ⟨(h Q hQ).some.trans hS.some⟩
+
+/-! ### The complement of a class -/
+
+/-- The *complement* of a complexity class: the problems whose complement
+belongs to it – the “co-” operator. Closure under reductions is inherited,
+since a reduction complements (`DescriptiveComplexity.FOReduction.compl`). -/
+noncomputable def ComplexityClass.compl (C : ComplexityClass) : ComplexityClass where
+  Mem P := C.Mem Pᶜ
+  Hard P := CofinalHard (fun Q => C.Mem Qᶜ) P
+  mem_of_foReduction f h := C.mem_of_foReduction f.compl h
+  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
+  mem_of_orderedReduction f h := C.mem_of_orderedReduction f.compl h
+  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
+  mem_congr_finite h := C.mem_congr_finite fun A _ _ => not_congr (h A)
+  hard_congr_finite h :=
+    ⟨fun hP => CofinalHard.congr h hP,
+      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+
+@[simp]
+theorem ComplexityClass.mem_compl (C : ComplexityClass) {L : Language.{0, 0}}
+    (P : DecisionProblem L) : P ∈ C.compl ↔ Pᶜ ∈ C :=
+  Iff.rfl
+
 /-! ### The levels of the hierarchy -/
 
 /-- The class `Σₖ₊₁ᵖ`, defined by second-order definability with `k + 1`
@@ -152,20 +219,47 @@ noncomputable def piLevel (k : ℕ) : ComplexityClass where
     ⟨fun hP => CofinalHard.congr h hP,
       fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
 
+/-! ### Polynomial time, by the Horn fragment -/
+
+/-- **The class PTIME**: the problems definable in the Horn fragment SO-Horn of
+existential second-order logic ([Grädel 1992][gradel1992capturing]), which
+captures polynomial time on ordered structures. It is a bona fide
+`DescriptiveComplexity.ComplexityClass` because SO-Horn definability is closed under
+(ordered) first-order reductions – the Horn shape survives the pullback, see
+`DescriptiveComplexity.SecondOrderHornPull`.
+
+This is level 0 of the hierarchy below (`DescriptiveComplexity.SigmaP`,
+`DescriptiveComplexity.PiP`), and it has a complete problem, HORN-SAT
+(`DescriptiveComplexity.HORNSAT_PTIME_complete`). The one statement about it that is not
+available is that `PiP 0 = SigmaP 0`, i.e. that the class is closed under
+complement. -/
+noncomputable def PTIME : ComplexityClass where
+  Mem P := SigmaSOHornDefinable P
+  Hard P := CofinalHard (fun Q => SigmaSOHornDefinable Q) P
+  mem_of_foReduction f h := h.of_foReduction f
+  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
+  mem_of_orderedReduction f h := h.of_orderedReduction f
+  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
+  mem_congr_finite h := sigmaSOHornDefinable_congr h
+  hard_congr_finite h :=
+    ⟨fun hP => CofinalHard.congr h hP,
+      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+
 /-! ### The hierarchy -/
 
-/-- The `Σₖᵖ` levels of the polynomial hierarchy: second-order definability
-with `k` alternations for `k ≥ 1`. Level 0 – polynomial time – has no known
-logical characterization without order, so it is left as the empty
-placeholder class: nothing is claimed about it. -/
+/-- The `Σₖᵖ` levels of the polynomial hierarchy: polynomial time at level 0
+(`DescriptiveComplexity.PTIME`, defined by the Horn fragment SO-Horn), second-order
+definability with `k` alternations above. -/
 noncomputable def SigmaP : ℕ → ComplexityClass
-  | 0 => .empty
+  | 0 => PTIME
   | k + 1 => sigmaLevel k
 
-/-- The `Πₖᵖ` levels of the polynomial hierarchy; level 0 is the empty
-placeholder class, as in `DescriptiveComplexity.SigmaP`. -/
+/-- The `Πₖᵖ` levels of the polynomial hierarchy; level 0 is *co*-polynomial
+time, the complements of the SO-Horn definable problems. That this coincides
+with `DescriptiveComplexity.PTIME` is the (true, but here unproved) closure of polynomial
+time under complement – see the module docstring. -/
 noncomputable def PiP : ℕ → ComplexityClass
-  | 0 => .empty
+  | 0 => PTIME.compl
   | k + 1 => piLevel k
 
 /-- NP is `Σ₁ᵖ`: by definition, the existential-second-order definable
@@ -175,41 +269,37 @@ noncomputable abbrev NP : ComplexityClass := SigmaP 1
 /-- coNP is `Π₁ᵖ`: the universal-second-order definable problems. -/
 noncomputable abbrev coNP : ComplexityClass := PiP 1
 
-/-- The zeroth levels coincide. -/
-theorem piP_zero_eq : PiP 0 = SigmaP 0 := rfl
+/-- **`Πₖᵖ` consists of the complements of the `Σₖᵖ` problems**, at every
+level: by definition at level 0, and by the quantifier duality
+`DescriptiveComplexity.piSODefinable_iff_compl` above from level 1 on.
 
-/-- `Πₖᵖ` consists of the complements of the `Σₖᵖ` problems: vacuous at
-level 0, by the quantifier duality
-`DescriptiveComplexity.piSODefinable_iff_compl` above. -/
+Note what is *not* claimed: that `PiP 0 = SigmaP 0`, i.e. that polynomial time
+is closed under complement. That is true of polynomial time, but proving it for
+SO-Horn definability means complementing a Horn program, which needs its least
+model computed inside the fragment. -/
 theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} (P : DecisionProblem L) :
     P ∈ PiP k ↔ Pᶜ ∈ SigmaP k := by
   cases k with
   | zero => exact Iff.rfl
   | succ k => exact piSODefinable_iff_compl (k + 1) P
 
-/-- `Σₖᵖ ⊆ Σₖ₊₁ᵖ`: vacuous at level 0, padding above. -/
-theorem sigmaP_subset_sigmaP_succ (k : ℕ) : SigmaP k ⊆ SigmaP (k + 1) := by
-  cases k with
-  | zero => exact fun _ P hP => hP.elim
-  | succ k => exact fun _ P hP => SigmaSODefinable.succ hP
+/-- `Σₖ₊₁ᵖ ⊆ Σₖ₊₂ᵖ`, by padding. (The level-0 inclusions are proved downstream
+with HORN-SAT, which their proofs go through: `DescriptiveComplexity.PTIME_subset_NP`
+and friends.) -/
+theorem sigmaP_subset_sigmaP_succ (k : ℕ) : SigmaP (k + 1) ⊆ SigmaP (k + 2) :=
+  fun _ _ hP => SigmaSODefinable.succ hP
 
-/-- `Σₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
-theorem sigmaP_subset_piP_succ (k : ℕ) : SigmaP k ⊆ PiP (k + 1) := by
-  cases k with
-  | zero => exact fun _ P hP => hP.elim
-  | succ k => exact fun _ P hP => SigmaSODefinable.piSucc hP
+/-- `Σₖ₊₁ᵖ ⊆ Πₖ₊₂ᵖ`. -/
+theorem sigmaP_subset_piP_succ (k : ℕ) : SigmaP (k + 1) ⊆ PiP (k + 2) :=
+  fun _ _ hP => SigmaSODefinable.piSucc hP
 
-/-- `Πₖᵖ ⊆ Σₖ₊₁ᵖ`. -/
-theorem piP_subset_sigmaP_succ (k : ℕ) : PiP k ⊆ SigmaP (k + 1) := by
-  cases k with
-  | zero => exact fun _ P hP => hP.elim
-  | succ k => exact fun _ P hP => PiSODefinable.sigmaSucc hP
+/-- `Πₖ₊₁ᵖ ⊆ Σₖ₊₂ᵖ`. -/
+theorem piP_subset_sigmaP_succ (k : ℕ) : PiP (k + 1) ⊆ SigmaP (k + 2) :=
+  fun _ _ hP => PiSODefinable.sigmaSucc hP
 
-/-- `Πₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
-theorem piP_subset_piP_succ (k : ℕ) : PiP k ⊆ PiP (k + 1) := by
-  cases k with
-  | zero => exact fun _ P hP => hP.elim
-  | succ k => exact fun _ P hP => PiSODefinable.succ hP
+/-- `Πₖ₊₁ᵖ ⊆ Πₖ₊₂ᵖ`. -/
+theorem piP_subset_piP_succ (k : ℕ) : PiP (k + 1) ⊆ PiP (k + 2) :=
+  fun _ _ hP => PiSODefinable.succ hP
 
 /-- The polynomial hierarchy: union of all the levels. A problem is PH-hard
 if it is hard for every level. -/
@@ -226,8 +316,11 @@ noncomputable def PH : ComplexityClass where
 theorem sigmaP_subset_PH (k : ℕ) : SigmaP k ⊆ PH :=
   fun _ _ hP => ⟨k, hP⟩
 
-theorem piP_subset_PH (k : ℕ) : PiP k ⊆ PH :=
-  fun _ _ hP => ⟨k + 1, piP_subset_sigmaP_succ k hP⟩
+/-- `Πₖ₊₁ᵖ ⊆ PH`. (At level 0 this is
+`DescriptiveComplexity.piP_zero_subset_PH`, which needs `PTIME ⊆ NP` and so lives
+downstream, with HORN-SAT.) -/
+theorem piP_subset_PH (k : ℕ) : PiP (k + 1) ⊆ PH :=
+  fun _ _ hP => ⟨k + 2, piP_subset_sigmaP_succ k hP⟩
 
 /-- A problem's complement is in coNP iff the problem is in NP. -/
 theorem compl_mem_coNP_iff {L : Language.{0, 0}} (P : DecisionProblem L) :
@@ -241,23 +334,23 @@ notion: every `Σₖ₊₁`-definable problem reduces to `P`. -/
 theorem hard_sigmaP_succ_iff [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
     (SigmaP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
-        SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] P) := by
-  constructor
-  · intro h L'' Q hQ
-    exact h P ⟨(FOReduction.refl P).toOrdered⟩ Q hQ
-  · intro h L' _ S hS L'' Q hQ
-    exact ⟨(h Q hQ).some.trans hS.some⟩
+        SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] P) :=
+  cofinalHard_iff _ P
 
 /-- Over a relational vocabulary, cofinal `Πₖ₊₁ᵖ`-hardness is the usual
 notion: every `Πₖ₊₁`-definable problem reduces to `P`. -/
 theorem hard_piP_succ_iff [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
     (PiP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
-        PiSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] P) := by
-  constructor
-  · intro h L'' Q hQ
-    exact h P ⟨(FOReduction.refl P).toOrdered⟩ Q hQ
-  · intro h L' _ S hS L'' Q hQ
-    exact ⟨(h Q hQ).some.trans hS.some⟩
+        PiSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] P) :=
+  cofinalHard_iff _ P
+
+/-- Over a relational vocabulary, cofinal PTIME-hardness is the usual notion:
+every SO-Horn definable problem reduces to `P`. -/
+theorem hard_PTIME_iff [L.IsRelational] (P : DecisionProblem L) :
+    PTIME.Hard P ↔
+      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+        SigmaSOHornDefinable Q → Nonempty (Q ≤ᶠᵒ[≤] P) :=
+  cofinalHard_iff _ P
 
 end DescriptiveComplexity
