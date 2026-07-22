@@ -9,7 +9,7 @@ import Mathlib.ModelTheory.Order
 /-!
 # Ordered first-order reductions
 
-Textbook FO reductions (Immerman, "Descriptive Complexity", ch. 3) operate on
+Textbook FO reductions (Immerman, “Descriptive Complexity”, ch. 3) operate on
 *ordered* finite structures: the input structure comes with a linear order on
 its universe, which the defining formulas may mention. The order is essential
 for many reductions: e.g. reducing SAT to 3-colorability threads an OR-gadget
@@ -22,7 +22,7 @@ This file provides the ordered variant of `DescriptiveComplexity.FOReduction`:
   `L`-structure, realizing the extra binary symbol `leSymb` as `≤`;
 * `DescriptiveComplexity.OrderedFOReduction P Q`: a first-order interpretation of `L'` in
   the ordered expansion `L.sum Language.order`, mapping yes-instances of `P`
-  exactly to yes-instances of `Q` — for every *finite* linearly ordered input
+  exactly to yes-instances of `Q` – for every *finite* linearly ordered input
   structure. Finiteness matters: gadget constructions traverse the order and
   need minima, maxima and successors.
 

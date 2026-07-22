@@ -10,7 +10,7 @@ import Mathlib.Data.Set.Finite.Lemmas
 # Literal occurrences of a CNF structure, ordered
 
 Semantic layer shared by the reductions *from* SAT (to 3-colorability, to
-3SAT, …): literal *occurrences* of a `Language.sat`-structure, their traversal
+3SAT…): literal *occurrences* of a `Language.sat`-structure, their traversal
 along a linear order of the universe, and the truth of literals and of prefix
 disjunctions under an assignment.
 

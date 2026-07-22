@@ -11,7 +11,7 @@ import Mathlib.Logic.Equiv.Prod
 # Unary representation of numbers in finite structures
 
 Representation (A) of the design notes: a number carried by an instance is
-the *cardinality of a marked set* — `Set.ncard` is the decoding function, and
+the *cardinality of a marked set* – `Set.ncard` is the decoding function, and
 no order is needed. This file provides the shared lemma kit so that problem
 files do not hand-roll cardinality reasoning:
 
@@ -21,10 +21,10 @@ files do not hand-roll cardinality reasoning:
   of `k ≤ n` as the initial segment of `Fin n`;
 * `DescriptiveComplexity.ncard_compl_eq`: complement cardinality (`n - k`), as used by
   the Vertex Cover ↔ Independent Set reductions;
-* `DescriptiveComplexity.ncard_tagged_eq_sum`: cardinality under tag-disjoint union —
+* `DescriptiveComplexity.ncard_tagged_eq_sum`: cardinality under tag-disjoint union –
   the tagged framework's *addition*;
 * `DescriptiveComplexity.ncard_univ_pi`: cardinality of a product of marked sets over
-  the coordinates of a tuple — the tagged framework's *multiplication*.
+  the coordinates of a tuple – the tagged framework's *multiplication*.
 
 Unary representation keeps numbers polynomial in the instance size; problems
 whose numbers must be exponential (SubsetSum and friends) use the binary

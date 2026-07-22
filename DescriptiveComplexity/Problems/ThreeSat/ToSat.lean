@@ -15,9 +15,9 @@ instance is a SAT instance *plus* the promise that every clause has at most
 three literals, and the promise is checked by a closed first-order sentence.
 
 The interpretation (`DescriptiveComplexity.ThreeSatToSat.threeSatToSat`) is
-identity-like — one tag, dimension one — with all relation formulas gated on
-the sentence `DescriptiveComplexity.ThreeSatToSat.wideS` ("some clause has at least four
-distinct literal occurrences"):
+identity-like – one tag, dimension one – with all relation formulas gated on
+the sentence `DescriptiveComplexity.ThreeSatToSat.wideS` (“some clause has at least four
+distinct literal occurrences”):
 
 * if the input is not wide, the output is a copy of the input, so the output
   is satisfiable iff the input is (and the width promise holds);
@@ -122,7 +122,7 @@ theorem wide_iff_not_widthAtMostThree : Wide A ↔ ¬WidthAtMostThree A := by
     obtain ⟨c, x, s, hocc, hdist⟩ := h
     exact ⟨c, x, s, hocc, fun i j hij hs hx => hdist i j hij hx hs⟩
 
-/-- Realization of the formula `wideS` (under any assignment of its — absent —
+/-- Realization of the formula `wideS` (under any assignment of its – absent –
 free variables). -/
 @[simp]
 theorem realize_wideS {w : Empty → A} : Formula.Realize wideS w ↔ Wide A := by

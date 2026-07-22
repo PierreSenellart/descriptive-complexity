@@ -20,7 +20,7 @@ of `DescriptiveComplexity.Composition` is that the outer reduction's formulas me
 the *order of the intermediate structure*, which is not part of the inner
 interpretation's output. The fix is classical: the interpreted universe
 `Tag × A^dim` carries a linear order that is first-order definable from the
-order of `A` — the lexicographic order comparing tags first (by an arbitrary
+order of `A` – the lexicographic order comparing tags first (by an arbitrary
 fixed linear order on the finite tag type; tag comparisons are static, i.e.
 resolved at formula-construction time), then the tuple coordinates in order.
 

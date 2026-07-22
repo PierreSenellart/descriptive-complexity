@@ -20,8 +20,8 @@ SAT is the archetypical NP-complete problem: this is the Cook–Levin theorem
 (`DescriptiveComplexity.SAT_NP_complete`, in `DescriptiveComplexity.Problems.Sat.Hardness`). With
 NP *defined* as existential-second-order definability
 (`DescriptiveComplexity.Hierarchy`), its membership half is the theorem
-`DescriptiveComplexity.sat_sigmaSODefinable` proved here — "there is a truth assignment
-making every clause true" — and its hardness half is the machine-free,
+`DescriptiveComplexity.sat_sigmaSODefinable` proved here – “there is a truth assignment
+making every clause true” – and its hardness half is the machine-free,
 Dahlhaus-style generic reduction `DescriptiveComplexity.sat_hard_of_sigmaSODefinable`
 of `DescriptiveComplexity.Problems.Sat.Hardness`. Other problems' NP-completeness
 proofs derive from it through first-order reductions; see e.g.
@@ -29,7 +29,7 @@ proofs derive from it through first-order reductions; see e.g.
 -/
 
 /- The language of CNF instances lives in Mathlib's `FirstOrder.Language`
-namespace, next to `Language.graph` and `Language.order` — a project-local
+namespace, next to `Language.graph` and `Language.order` – a project-local
 `Language` namespace would shadow Mathlib's under `open Language`. -/
 namespace FirstOrder
 
@@ -52,13 +52,13 @@ protected def sat : Language :=
   ⟨fun _ => Empty, satRel⟩
   deriving IsRelational
 
-/-- The symbol for "is a clause". -/
+/-- The symbol for “is a clause”. -/
 abbrev satIsClause : Language.sat.Relations 1 := .isClause
 
-/-- The symbol for "occurs positively in". -/
+/-- The symbol for “occurs positively in”. -/
 abbrev satPosIn : Language.sat.Relations 2 := .posIn
 
-/-- The symbol for "occurs negatively in". -/
+/-- The symbol for “occurs negatively in”. -/
 abbrev satNegIn : Language.sat.Relations 2 := .negIn
 
 end Language
@@ -114,8 +114,8 @@ def SAT : DecisionProblem Language.sat where
 
 /-! ### SAT is existential second-order definable
 
-SAT is `Σ₁`-definable in the sense of `DescriptiveComplexity.SecondOrder` — "there
-exists a truth assignment (a unary relation) making every clause true", the
+SAT is `Σ₁`-definable in the sense of `DescriptiveComplexity.SecondOrder` – “there
+exists a truth assignment (a unary relation) making every clause true”, the
 inner part being first-order. Since NP is *defined* as `Σ₁`-definability,
 this is the membership half of the Cook–Levin theorem. -/
 
@@ -136,13 +136,13 @@ def satNuSym : satAssignBlock.lang.Relations 1 := ⟨(), rfl⟩
 truth-assignment relation variable. -/
 abbrev satSOLang : Language := Language.sat.sum satAssignBlock.lang
 
-/-- The symbol for "is a clause" in the kernel's vocabulary. -/
+/-- The symbol for “is a clause” in the kernel's vocabulary. -/
 abbrev kIsClSym : satSOLang.Relations 1 := Sum.inl satIsClause
 
-/-- The symbol for "occurs positively in" in the kernel's vocabulary. -/
+/-- The symbol for “occurs positively in” in the kernel's vocabulary. -/
 abbrev kPosSym : satSOLang.Relations 2 := Sum.inl satPosIn
 
-/-- The symbol for "occurs negatively in" in the kernel's vocabulary. -/
+/-- The symbol for “occurs negatively in” in the kernel's vocabulary. -/
 abbrev kNegSym : satSOLang.Relations 2 := Sum.inl satNegIn
 
 /-- The truth-assignment symbol in the kernel's vocabulary. -/

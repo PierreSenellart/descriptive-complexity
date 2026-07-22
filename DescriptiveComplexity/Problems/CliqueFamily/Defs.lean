@@ -13,8 +13,8 @@ import DescriptiveComplexity.Interpretation
 The three classical threshold problems on graphs, as decision problems on
 *marked graphs*: `FirstOrder.Language.markedGraph`-structures, carrying a
 binary adjacency relation and a unary mark. The marked set plays the role of
-the numeric threshold `k` of the textbook problems — its *cardinality* is the
-threshold — so that no number encoding is needed:
+the numeric threshold `k` of the textbook problems – its *cardinality* is the
+threshold – so that no number encoding is needed:
 
 * `DescriptiveComplexity.Clique`: some clique is at least as large as the marked set;
 * `DescriptiveComplexity.IndependentSet`: some independent set is at least as large as
@@ -41,7 +41,7 @@ reductions of `DescriptiveComplexity.Problems.CliqueFamily.Reductions`.
 -/
 
 /- The language of marked graphs lives in Mathlib's `FirstOrder.Language`
-namespace, next to `Language.graph` and `Language.order` — a project-local
+namespace, next to `Language.graph` and `Language.order` – a project-local
 `Language` namespace would shadow Mathlib's under `open Language`. -/
 namespace FirstOrder
 
@@ -87,21 +87,21 @@ section Generic
 variable {A : Type}
 
 /-- Some set that is pairwise `Adjp`-related (off the diagonal) admits an
-injection from the `Kp`-marked elements: "some clique is at least as large as
-the marked set". -/
+injection from the `Kp`-marked elements: “some clique is at least as large as
+the marked set”. -/
 def CliqueOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
   ∃ S : A → Prop, (∀ x y, S x → S y → x ≠ y → Adjp x y) ∧
     Nonempty ({x // Kp x} ↪ {x // S x})
 
 /-- Some set that is pairwise non-`Adjp`-related (off the diagonal) admits an
-injection from the `Kp`-marked elements: "some independent set is at least as
-large as the marked set". -/
+injection from the `Kp`-marked elements: “some independent set is at least as
+large as the marked set”. -/
 def IndepOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
   CliqueOn (fun x y => ¬Adjp x y) Kp
 
 /-- Some set meeting every (off-diagonal) `Adjp`-edge injects into the
-`Kp`-marked elements: "some vertex cover is at most as large as the marked
-set". -/
+`Kp`-marked elements: “some vertex cover is at most as large as the marked
+set”. -/
 def CoverOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
   ∃ C : A → Prop, (∀ x y, x ≠ y → Adjp x y → C x ∨ C y) ∧
     Nonempty ({x // C x} ↪ {x // Kp x})

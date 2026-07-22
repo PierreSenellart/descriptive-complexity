@@ -12,14 +12,14 @@ import DescriptiveComplexity.Problems.ThreeSat.FromSat
 
 Umbrella file for the problem 3SAT (`DescriptiveComplexity.ThreeSAT`, defined in
 `DescriptiveComplexity.Problems.ThreeSat.Defs`), collecting its two first-order
-reductions —
+reductions –
 
 * `DescriptiveComplexity.threeSat_fo_reduction_sat : ThreeSAT ≤ᶠᵒ SAT` (order-free,
   identity-like, gated on the first-order width check;
   `DescriptiveComplexity.Problems.ThreeSat.ToSat`), and
 * `DescriptiveComplexity.sat_ordered_fo_reduction_threeSat : SAT ≤ᶠᵒ[≤] ThreeSAT`
   (ordered, clause splitting along the occurrence order;
-  `DescriptiveComplexity.Problems.ThreeSat.FromSat`) —
+  `DescriptiveComplexity.Problems.ThreeSat.FromSat`) –
 
 and deriving its NP-completeness from the Cook–Levin theorem
 (`DescriptiveComplexity.SAT_NP_complete`), with no machine model anywhere. As with any

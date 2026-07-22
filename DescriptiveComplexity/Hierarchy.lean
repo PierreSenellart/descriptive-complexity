@@ -10,8 +10,8 @@ import DescriptiveComplexity.SecondOrderOrdered
 /-!
 # The polynomial hierarchy, defined by second-order alternation
 
-The levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy for `k ≥ 1` — in
-particular `NP = Σ₁ᵖ` and `coNP = Π₁ᵖ` — are *defined* here as
+The levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy for `k ≥ 1` – in
+particular `NP = Σ₁ᵖ` and `coNP = Π₁ᵖ` – are *defined* here as
 `ComplexityClass`es, via Fagin's and Stockmeyer's theorems: membership is
 second-order definability with `k` alternating quantifier blocks
 (`DescriptiveComplexity.SigmaSODefinable` / `DescriptiveComplexity.PiSODefinable`), and the closure
@@ -22,17 +22,17 @@ theorems of `DescriptiveComplexity.SecondOrderPull` and
 Hardness is defined *cofinally*: `P` is hard when every problem of the class
 reduces (by an ordered FO reduction) to every relational problem that `P`
 itself reduces to. For a problem over a relational vocabulary this is
-equivalent to the usual "everything in the class reduces to `P`"
+equivalent to the usual “everything in the class reduces to `P`”
 (`DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff`), and the
 formulation makes hardness travel forward along reductions even through
 non-relational vocabularies.
 
-Level 0 — polynomial time — is *not* defined: no known order-free logic
+Level 0 – polynomial time – is *not* defined: no known order-free logic
 captures polynomial time (the Chandra–Harel/Gurevich problem), and the
 Immerman–Vardi characterization `P = FO(LFP)` on ordered structures would
 require formalizing least fixed points and a built-in order. Rather than
 axiomatize PTIME, `SigmaP 0` and `PiP 0` are set to the empty class
-(`ComplexityClass.empty`) — nothing is claimed about level 0, all statements
+(`ComplexityClass.empty`) – nothing is claimed about level 0, all statements
 about it hold vacuously, and the library declares no axioms: every theorem
 depends on nothing beyond Lean's standard `propext`, `Classical.choice` and
 `Quot.sound` (check with `#print axioms`). PTIME can be added once a
@@ -40,7 +40,7 @@ descriptive characterization of it is formalized.
 
 The level inclusions, the duality `Πₖᵖ = co-Σₖᵖ` and the class `PH` are all
 proved (`DescriptiveComplexity.sigmaP_subset_sigmaP_succ`,
-`DescriptiveComplexity.mem_piP_iff`, …).
+`DescriptiveComplexity.mem_piP_iff`…).
 -/
 
 namespace DescriptiveComplexity
@@ -152,7 +152,7 @@ noncomputable def piLevel (k : ℕ) : ComplexityClass where
 /-! ### The hierarchy -/
 
 /-- The `Σₖᵖ` levels of the polynomial hierarchy: second-order definability
-with `k` alternations for `k ≥ 1`. Level 0 — polynomial time — has no known
+with `k` alternations for `k ≥ 1`. Level 0 – polynomial time – has no known
 logical characterization without order, so it is left as the empty
 placeholder class: nothing is claimed about it. -/
 noncomputable def SigmaP : ℕ → ComplexityClass

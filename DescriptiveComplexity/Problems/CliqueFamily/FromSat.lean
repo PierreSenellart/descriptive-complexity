@@ -20,7 +20,7 @@ CNF structure (`DescriptiveComplexity.SatCliqueTag`, dimension 2):
 * `(pos, (c, x))` / `(neg, (c, x))`: a positive/negative occurrence of the
   variable `x` in the clause `c`; two occurrence vertices are adjacent iff
   both are genuine, they belong to *distinct* clauses, and they are not
-  conflicting — the same variable with opposite signs
+  conflicting – the same variable with opposite signs
   (`DescriptiveComplexity.SatToClique.Compat`);
 * `(cl, (c, c))`: one *marked* vertex per clause, isolated in the graph, so
   that the cardinality of the marked set is the number of clauses.
@@ -28,8 +28,8 @@ CNF structure (`DescriptiveComplexity.SatCliqueTag`, dimension 2):
 A clique at least as large as the marked set must pick one occurrence per
 clause, pairwise non-conflicting, which is exactly a satisfying assignment;
 conversely, choosing a true literal in each clause under a satisfying
-assignment yields such a clique. Empty clauses — which make the CNF
-unsatisfiable but carry no occurrence vertex — are handled by a spoiler in
+assignment yields such a clique. Empty clauses – which make the CNF
+unsatisfiable but carry no occurrence vertex – are handled by a spoiler in
 the mark formula: if some clause is empty, *every* vertex is marked, and no
 clique can be as large as the whole universe since clause vertices are
 isolated.
@@ -37,7 +37,7 @@ isolated.
 The formulas do not mention the order. The reduction is nevertheless packaged
 as an ordered one because `DescriptiveComplexity.Clique` folds finiteness of the
 universe into its yes-instances, so correctness can only hold on finite
-structures — exactly the correctness contract of
+structures – exactly the correctness contract of
 `DescriptiveComplexity.OrderedFOReduction` (a plain `FOReduction` would have to be
 correct on infinite structures as well, where SAT can hold while no clique
 instance is a yes-instance).
@@ -93,7 +93,7 @@ def AdjCore : SatCliqueTag → (Fin 2 → A) → SatCliqueTag → (Fin 2 → A) 
   | _, _, _, _ => False
 
 /-- The marking condition of the interpreted graph: diagonal clause vertices
-— or every vertex, if some clause is empty. -/
+– or every vertex, if some clause is empty. -/
 def MarkedCore : SatCliqueTag → (Fin 2 → A) → Prop
   | .cl, w => (w 0 = w 1 ∧ IsCl (w 0)) ∨ ∃ c : A, EmptyCl c
   | _, _ => ∃ c : A, EmptyCl c
@@ -154,7 +154,7 @@ def adjF : SatCliqueTag → SatCliqueTag → satOrd.Formula (Fin 2 × Fin 2)
   | _, _ => ⊥
 
 /-- The mark formulas of the interpretation, by tag: diagonal clause vertices
-— or everything, if some clause is empty. -/
+– or everything, if some clause is empty. -/
 noncomputable def markedF : SatCliqueTag → satOrd.Formula (Fin 1 × Fin 2)
   | .cl => (eqF (0, 0) (0, 1) ⊓ clF (0, 0)) ⊔ exEmptyClF
   | _ => exEmptyClF

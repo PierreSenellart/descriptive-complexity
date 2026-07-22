@@ -12,8 +12,8 @@ import DescriptiveComplexity.SecondOrder
 The membership half of the NP-completeness of Clique: the clique threshold
 property is `Σ₁`-definable in the sense of `DescriptiveComplexity.SecondOrder`
 (`DescriptiveComplexity.clique_sigmaSODefinable`). The single existential block
-guesses two relations — a unary one, the clique itself, and a binary one, an
-injection of the marked set into the clique — and the first-order kernel
+guesses two relations – a unary one, the clique itself, and a binary one, an
+injection of the marked set into the clique – and the first-order kernel
 checks that the unary relation is a clique and that the binary relation is
 total on the marked set, lands in the clique, and is injective. On (finite)
 structures this is equivalent to the existence of an embedding of the marked
@@ -62,7 +62,7 @@ abbrev kCliqueSym : cliqueSOLang.Relations 1 := Sum.inr cgCliqueSym
 abbrev kInjSym : cliqueSOLang.Relations 2 := Sum.inr cgInjSym
 
 /-- The first-order kernel of the `Σ₁` definition of Clique: the guessed
-unary relation is a clique — any two distinct members are adjacent — and the
+unary relation is a clique – any two distinct members are adjacent – and the
 guessed binary relation maps every marked element to some clique member,
 injectively. -/
 noncomputable def cliqueKernel : cliqueSOLang.Sentence :=

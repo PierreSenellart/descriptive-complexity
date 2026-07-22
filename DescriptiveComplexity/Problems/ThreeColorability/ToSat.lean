@@ -15,7 +15,7 @@ FOReduction ThreeCol SAT`, formalizing the classical encoding used by SAT
 solvers:
 
 * for every vertex `u` and color `i < 3`, a propositional variable `xᵤᵢ`
-  ("`u` gets color `i`"), represented by the element `(varC i, ![u, u])`;
+  (“`u` gets color `i`”), represented by the element `(varC i, ![u, u])`;
 * for every vertex `u`, a clause `xᵤ₀ ∨ xᵤ₁ ∨ xᵤ₂`, represented by
   `(vtxClause, ![u, u])`;
 * for every edge `(u, v)` and color `i`, a clause `¬xᵤᵢ ∨ ¬xᵥᵢ`, represented
@@ -23,12 +23,12 @@ solvers:
 
 The resulting CNF is satisfiable iff the graph is 3-colorable
 (`DescriptiveComplexity.threeColorable_iff_satisfiable`); note that the usual
-"at most one color per vertex" clauses are not needed for the equivalence. All
+“at most one color per vertex” clauses are not needed for the equivalence. All
 defining formulas are quantifier-free (`DescriptiveComplexity.threeColToSat_isQuantifierFree`),
 so this is even a quantifier-free reduction, the weakest reduction notion in
 common use in descriptive complexity.
 
-Elements of the interpreted universe not of the shapes above ("junk", e.g.
+Elements of the interpreted universe not of the shapes above (“junk”, e.g.
 `(varC i, ![u, v])` with `u ≠ v`, or `(edgClause i, ![u, v])` with `(u, v)` not
 an edge) are neither clauses nor occur in any clause, so they do not affect
 satisfiability.
@@ -43,12 +43,12 @@ open Language Structure BoundedFormula
 /-- Tags for the tagged 2-dimensional interpretation of SAT instances in
 graphs. -/
 inductive ColTag : Type
-  /-- `(varC i, ![u, u])` is the propositional variable "`u` gets color `i`". -/
+  /-- `(varC i, ![u, u])` is the propositional variable “`u` gets color `i`”. -/
   | varC : Fin 3 → ColTag
-  /-- `(vtxClause, ![u, u])` is the clause "`u` gets some color". -/
+  /-- `(vtxClause, ![u, u])` is the clause “`u` gets some color”. -/
   | vtxClause : ColTag
-  /-- `(edgClause i, ![u, v])` is the clause "`u` and `v` do not both get color
-  `i`" (present when `(u, v)` is an edge). -/
+  /-- `(edgClause i, ![u, v])` is the clause “`u` and `v` do not both get color
+  `i`” (present when `(u, v)` is an edge). -/
   | edgClause : Fin 3 → ColTag
   deriving DecidableEq, Fintype, Nonempty
 

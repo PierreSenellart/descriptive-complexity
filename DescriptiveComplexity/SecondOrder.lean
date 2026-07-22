@@ -11,7 +11,7 @@ import DescriptiveComplexity.Complexity
 Foundation for *defining* the levels `Σₖ`/`Πₖ` (`k ≥ 1`) of the polynomial
 hierarchy logically, by Fagin's and Stockmeyer's theorems: `Σₖᵖ` consists of
 the problems definable by a second-order sentence with `k` alternating blocks
-of second-order quantifiers starting existentially — on unordered finite
+of second-order quantifiers starting existentially – on unordered finite
 structures (the first existential block can guess a linear order, so the
 order-free definition is equivalent to the classical ordered one).
 
@@ -19,7 +19,7 @@ No object-level second-order syntax is needed: a second-order quantifier
 block (`DescriptiveComplexity.SOBlock`) is a finite family of relation variables with
 given arities, its instantiations are Lean-level (`SOBlock.structure` turns
 an assignment of relations into a structure over the block's vocabulary
-`SOBlock.lang`), and only the first-order kernel is object-level — a sentence
+`SOBlock.lang`), and only the first-order kernel is object-level – a sentence
 over the base language expanded by all blocks (`DescriptiveComplexity.soLang`).
 `DescriptiveComplexity.SORealize` evaluates the alternating quantification, and
 `DescriptiveComplexity.SigmaSODefinable` / `DescriptiveComplexity.PiSODefinable` state that a
@@ -29,7 +29,7 @@ structures*.
 This file proves the two structural facts about these notions that do not
 involve reductions:
 
-* isomorphism-invariance (`DescriptiveComplexity.sorealize_iso`) — so second-order
+* isomorphism-invariance (`DescriptiveComplexity.sorealize_iso`) – so second-order
   definable properties are bona fide decision problems;
 * the duality `Πₖ = co-Σₖ` (`DescriptiveComplexity.piSODefinable_iff_compl`), by
   negating the kernel and flipping the quantifiers.
@@ -51,8 +51,8 @@ open Language Structure
 
 /-- A second-order quantifier block: finitely many relation variables, with
 given arities. (The index type is arbitrary rather than an initial segment of
-`ℕ`, so that constructions on blocks — e.g. pulling a block back through an
-interpretation — can build their natural index types directly.) -/
+`ℕ`, so that constructions on blocks – e.g. pulling a block back through an
+interpretation – can build their natural index types directly.) -/
 structure SOBlock : Type 1 where
   /-- The index type of the relation variables of the block. -/
   ι : Type
@@ -90,7 +90,7 @@ def soLang (L : Language.{0, 0}) : List SOBlock → Language.{0, 0}
 
 /-- Alternating second-order satisfaction: `SORealize L A Bs φ pol` states
 that the sentence obtained from the first-order kernel `φ` by quantifying the
-blocks `Bs` alternately — existentially first if `pol` is `true` — holds in
+blocks `Bs` alternately – existentially first if `pol` is `true` – holds in
 the `L`-structure `A`. -/
 def SORealize (L : Language.{0, 0}) (A : Type) [inst : L.Structure A] :
     ∀ (Bs : List SOBlock), (soLang L Bs).Sentence → Bool → Prop

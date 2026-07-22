@@ -17,7 +17,7 @@ If `P ≤ᶠᵒ[≤] Q` and `Q` is `Σₖ₊₁`- (resp. `Πₖ₊₁`-) definab
 
 Pulling the defining sentence back through the interpretation
 (`DescriptiveComplexity.SecondOrderPull`) yields a sentence over the *ordered*
-expansion `L.sum Language.order` — correct for every linear order on the
+expansion `L.sum Language.order` – correct for every linear order on the
 input, by order-invariance of the reduction. The order is then eliminated by
 re-quantifying it inside the first second-order block:
 
@@ -26,7 +26,7 @@ re-quantifying it inside the first second-order block:
 * the sentence is transported along the language morphism
   `DescriptiveComplexity.orderElimLHom` mapping the order symbol to the new variable;
 * it is guarded by the first-order sentence `DescriptiveComplexity.linearGuard` stating
-  that the variable is a linear order — as a conjunct if the block is
+  that the variable is a linear order – as a conjunct if the block is
   existential (`Σₖ₊₁`), as a premise if it is universal (`Πₖ₊₁`).
 
 Correctness of the guard uses `DescriptiveComplexity.linearOrderOfGuard` to promote a

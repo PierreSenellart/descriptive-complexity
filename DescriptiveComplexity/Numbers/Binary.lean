@@ -15,12 +15,12 @@ Representation (C) of the design notes: a number carried by an instance is
 encoded in binary by a set of *bit positions*, the positions being linearly
 ordered elements of the structure. This is the honest encoding for problems
 whose numbers must be exponential in the instance size (SubsetSum, Partition,
-Knapsack, …), where the unary representation of
+Knapsack…), where the unary representation of
 `DescriptiveComplexity.Numbers.Unary` would change the complexity.
 
 * `DescriptiveComplexity.posRank`: the rank of a position in the increasing enumeration
   (via `monoEquivOfFin`, so positions need not literally be `Fin m`);
-* `DescriptiveComplexity.binValue b`: the number `∑ 2 ^ rank p` over set bits — the
+* `DescriptiveComplexity.binValue b`: the number `∑ 2 ^ rank p` over set bits – the
   decoding function;
 * `DescriptiveComplexity.binEncode k`: the canonical encoding, via `Nat.testBit`;
 * round-trips `DescriptiveComplexity.binValue_binEncode` (for `k < 2 ^ #positions`) and
@@ -29,7 +29,7 @@ Knapsack, …), where the unary representation of
 * invariance under order-isomorphisms (`DescriptiveComplexity.binValue_orderIso`), which
   feeds `DecisionProblem.iso_invariant` proofs;
 * the most-significant-differing-bit comparison
-  `DescriptiveComplexity.binValue_lt_binValue_iff` — the Lean counterpart of the FO(≤)
+  `DescriptiveComplexity.binValue_lt_binValue_iff` – the Lean counterpart of the FO(≤)
   formula comparing two binary numbers.
 -/
 

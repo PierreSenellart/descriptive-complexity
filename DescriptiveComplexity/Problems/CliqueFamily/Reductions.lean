@@ -16,7 +16,7 @@ first-order reductions on marked graphs (all of tag `Unit` and dimension 1):
   diagonal) exchanges cliques and independent sets, keeping the marked set;
 * `DescriptiveComplexity.vertexCover_fo_reduction_indSet` and
   `DescriptiveComplexity.indSet_fo_reduction_vertexCover`: complementing the *marked
-  set* exchanges vertex covers and independent sets, keeping the edges — a
+  set* exchanges vertex covers and independent sets, keeping the edges – a
   set is a vertex cover iff its complement is independent, and (on a finite
   universe) it is at most as large as the marked set iff its complement is at
   least as large as the complement of the marked set;

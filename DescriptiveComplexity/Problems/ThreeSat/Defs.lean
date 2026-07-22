@@ -15,7 +15,7 @@ occurrences (`DescriptiveComplexity.WidthAtMostThree`) *and* the CNF is satisfia
 
 Folding the width bound into the yes-instances (rather than into the
 vocabulary) is what makes 3SAT a decision problem on arbitrary
-`Language.sat`-structures; the bound "at most three" is expressed without
+`Language.sat`-structures; the bound “at most three” is expressed without
 counting, as: among any four literal occurrences of a clause, two coincide.
 
 The reductions to and from SAT, and NP-completeness, are in

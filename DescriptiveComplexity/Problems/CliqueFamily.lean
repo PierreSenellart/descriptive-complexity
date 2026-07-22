@@ -18,7 +18,7 @@ marked graphs (`DescriptiveComplexity.Clique`, `DescriptiveComplexity.Independen
 `DescriptiveComplexity.VertexCover`, defined in
 `DescriptiveComplexity.Problems.CliqueFamily.Defs`), collecting the quantifier-free
 reductions of `DescriptiveComplexity.Problems.CliqueFamily.Reductions` and their
-composites — all three problems are FO-interreducible — and deriving the
+composites – all three problems are FO-interreducible – and deriving the
 NP-completeness of all three from
 
 * `DescriptiveComplexity.clique_sigmaSODefinable`

@@ -14,18 +14,18 @@ The reverse direction of `DescriptiveComplexity.Problems.ThreeColorability.ToSat
 the gadget graph of `DescriptiveComplexity.Problems.ThreeColorability.SatGadget` is
 first-order definable over the *ordered* expansion
 `Language.sat.sum Language.order` of the language of CNF instances, giving an
-ordered first-order reduction from SAT to 3-colorability —
+ordered first-order reduction from SAT to 3-colorability –
 `DescriptiveComplexity.sat_ordered_fo_reduction_threeCol : OrderedFOReduction SAT ThreeCol`.
 
 The order is genuinely needed: the OR-gadget chain of a clause is threaded
-along the order of its literal occurrences ("first occurrence", "immediate
-predecessor" and "last occurrence" are FO(≤)-definable, but not FO-definable).
+along the order of its literal occurrences (“first occurrence”, “immediate
+predecessor” and “last occurrence” are FO(≤)-definable, but not FO-definable).
 This is the standard situation in descriptive complexity, where reductions
 operate on ordered finite structures.
 
 The file assembles the edge formulas `edgeF` mirroring `SatToCol.Core` from
 the shared occurrence formula builders of `DescriptiveComplexity.OccurrenceFormulas`
-(`occF`, `minOccF`, `succOccF`, …), and packages everything into the
+(`occF`, `minOccF`, `succOccF`…), and packages everything into the
 interpretation `SatToCol.satToCol` and the final reduction.
 -/
 

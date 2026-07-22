@@ -4,7 +4,7 @@ Long-term catalog of things worth incorporating. Organized by theme;
 each item carries a rough scale of the effort ([S] short, [M] medium,
 [L] long, [R] research-level, i.e., the Lean proof would itself be a
 contribution) and its prerequisites. Main source: Immerman,
-"Descriptive Complexity" (DC below); also Garey–Johnson and Karp's 21
+“Descriptive Complexity” (DC below); also Garey–Johnson and Karp's 21
 problems for the catalog.
 
 ## 0. Integer representations (referenced as (A)–(D) below)
@@ -24,7 +24,7 @@ and iso-invariance of the decoding.
   subtracts). Only for numbers that are honestly polynomial: unary
   SubsetSum-style problems are in P, hence not NP-hard under (A).
 - **(B) Positions in an order** that is part of the problem's own
-  vocabulary ("≤ is linear" folded into `Holds`); buys FO comparison
+  vocabulary (“≤ is linear” folded into `Holds`); buys FO comparison
   of numbers, still unary; forces every reduction *into* the problem
   to construct the order.
 - **(C) Binary via bit relations**: universe = items ∪ positions
@@ -32,7 +32,7 @@ and iso-invariance of the decoding.
   positions, Bit(e, p); `Holds` decodes ∑ 2^i in Lean. The honest
   encoding for SubsetSum-like problems (weights up to 2^n). If a
   reduction needs arithmetic inside formulas: comparison and addition
-  are FO(≤)-definable; multiplication is TC⁰, not FO — avoid
+  are FO(≤)-definable; multiplication is TC⁰, not FO – avoid
   reductions that must multiply.
 - **(D) Built-in arithmetic FO(≤, BIT)** (DC's standard setting):
   every instance ordered, BIT primitive. Needed for the
@@ -81,11 +81,11 @@ SAT-side reduction yet.
   gadgets, probably ordered.
 - **Steiner Tree** [M]: from X3C or VC; threshold via (A).
 - **SubsetSum / Partition / Knapsack** [M]: representation (C), with a
-  shared "weighted items" vocabulary (unary Item/Pos marks, order on
+  shared “weighted items” vocabulary (unary Item/Pos marks, order on
   positions, binary Bit) carrying a well-formedness predicate and a
   decode to `Multiset ℕ`. The classical SAT ≤ SubsetSum reduction
-  defines the output *digits* combinatorially ("clause j contains
-  literal ℓ"), so the Bit formulas are easy FO.
+  defines the output *digits* combinatorially (“clause j contains
+  literal ℓ”), so the Bit formulas are easy FO.
 - **0-1 Integer Programming** [M]: from 3SAT; representation (C) for
   coefficients.
 - **3-Partition** [L]: strongly NP-complete, so representation (A)
@@ -93,7 +93,7 @@ SAT-side reduction yet.
   source for packing/scheduling reductions (Bin Packing [M after it]).
   Warning: the 3DM → 3-Partition reduction is arithmetic-heavy; check
   FO-expressibility carefully before committing.
-- **Milestone: Karp's 21** — a recognizable public target for catalog
+- **Milestone: Karp's 21** – a recognizable public target for catalog
   completeness (cf. the Isabelle/AFP efforts around Karp's problems);
   the list above covers most of it.
 
@@ -126,8 +126,8 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
   is fresh. Gives the PH levels their canonical complete problems.
 - **TAUT / 3-DNF tautology** [S]: coNP-complete via the existing
   complement machinery (`PiP 1` = complements of `SigmaP 1`).
-- **P-hardness family** [M–L]: statements of the form "every
-  SO-Horn-definable (or FO(LFP)-definable) problem FO-reduces to X",
+- **P-hardness family** [M–L]: statements of the form “every
+  SO-Horn-definable (or FO(LFP)-definable) problem FO-reduces to X”,
   mirroring the SAT discharge one level down (meaningful even before
   PTIME is defined):
   - HORN-SAT: the primary discharge, per the symmetry table above;
@@ -136,14 +136,14 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
     projection hardness in the book): as catalog reductions from
     HORN-SAT.
 - **NL: REACH** [M]: directed st-reachability, the canonical
-  NL-complete problem; hardness = "every FO(TC)-definable problem
-  FO-reduces to REACH". Also **2SAT** [M after REACH] (via implication
+  NL-complete problem; hardness = “every FO(TC)-definable problem
+  FO-reduces to REACH”. Also **2SAT** [M after REACH] (via implication
   graphs; mind the complementation, Immerman–Szelepcsényi territory).
 - **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
-- **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
+- **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = “every
   SO(TC)-definable (equivalently FO(PFP)-definable) problem
-  ordered-FO-reduces to QSAT". Downstream: game problems (Generalized
-  Geography, …) [L each, gadget-heavy].
+  ordered-FO-reduces to QSAT”. Downstream: game problems (Generalized
+  Geography…) [L each, gadget-heavy].
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input
   problems [R]; Δₖᵖ and oracle classes are blocked on machine models,
   presumably forever out of scope.
@@ -185,7 +185,7 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
   SAT complete under first-order projections.
 - **Reduction-notion refinements** [M]: track quantifier-free /
   projection / dimension-1 status through composition (currently only
-  `IsQuantifierFree` exists); "problem X is complete under qfps" is
+  `IsQuantifierFree` exists); “problem X is complete under qfps” is
   the DC-faithful statement.
 - **FO(COUNT) / counting quantifiers** [L]: with BIT, captures uniform
   TC⁰; relevant to the representation-(C) arithmetic boundary
@@ -210,12 +210,12 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
 - **Spectra** [M]: Fagin's connection between generalized spectra and
   NP; mostly definitional given the SO layer, historically resonant.
 - **Machine bridge: bounded NTM acceptance is NP-complete** [L]:
-  the problem "the NTM M accepts x within t steps" (t unary; unary is
+  the problem “the NTM M accepts x within t steps” (t unary; unary is
   what keeps this NP- rather than NEXP-complete), with the machine as
   *data*: universe = time/tape positions (order in the problem's own
   vocabulary, representation (B)) ∪ states ∪ symbols; transition table
   a relation; `Holds` = a bespoke Lean operational semantics
-  (configurations, step, accepting run — Mathlib's
+  (configurations, step, accepting run – Mathlib's
   `Computability.TuringMachine` does not help: fixed machines as
   types, not machines-as-data). Three parts:
   - problem definition + iso-invariance [M];
@@ -227,10 +227,10 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
     (states = tagged clause/occurrence elements, transitions
     FO-defined from posIn/negIn, time O(n·m) in a dimension-2 lex
     universe); correctness is genuine operational reasoning
-    (configuration invariants, induction on steps) — the machine-model
+    (configuration invariants, induction on steps) – the machine-model
     tax paid exactly once, in miniature [L].
-  Payoff: both halves of Fagin's theorem inside the library ("P ∈ NP
-  iff P FO-reduces to machine acceptance"), making the identification
+  Payoff: both halves of Fagin's theorem inside the library (“P ∈ NP
+  iff P FO-reduces to machine acceptance”), making the identification
   with machine NP a theorem rather than a citation; the remaining gap
   with textbook NP (structures vs strings) is thin and honestly
   statable in prose.
@@ -243,8 +243,8 @@ separations and non-reducibility, impossible in the machine world.
 - **Ehrenfeucht–Fraïssé games on finite structures** [L]: build on
   Mathlib's `ModelTheory/PartialEquiv.lean` (back-and-forth) and
   `Fraisse.lean`; what is missing is the finite, graded (quantifier-
-  rank) version and the methodology lemmas ("same rank-k type ⇒ agree
-  on rank-k sentences").
+  rank) version and the methodology lemmas (“same rank-k type ⇒ agree
+  on rank-k sentences”).
 - **First applications** [M after EF]: EVEN is not FO-definable (even
   order-invariantly); REACH/connectivity is not FO-definable. Library
   payoff: FO ⊊ FO(TC) as an unconditional strict inclusion, and
@@ -275,7 +275,7 @@ separations and non-reducibility, impossible in the machine world.
   L-reductions, MAX-3SAT completeness. The syntactic layer fits this
   framework natively; PCP-based hardness of approximation stays out of
   scope.
-- **Teaching material** [M]: a curated "reduction cookbook" example set
+- **Teaching material** [M]: a curated “reduction cookbook” example set
   (cf. Grange et al., MFCS 2024) once the catalog is broad enough; the
   library doubles as a complexity-course companion.
 

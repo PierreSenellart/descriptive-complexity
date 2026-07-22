@@ -10,12 +10,12 @@ import DescriptiveComplexity.Ordered
 # First-order formulas for literal occurrences, over the ordered expansion
 
 First-order counterpart of `DescriptiveComplexity.OccurrenceOrder`, shared by the
-reductions *from* SAT (to 3-colorability, to 3SAT, …): parameterized formula
+reductions *from* SAT (to 3-colorability, to 3SAT…): parameterized formula
 builders over the ordered expansion `Language.sat.sum Language.order`
 (`DescriptiveComplexity.SatOcc.satOrd`) mirroring the semantic predicates on literal
-occurrences — `occF` for `OccIn`, `minOccF`/`maxOccF` for `MinOcc`/`MaxOcc`,
+occurrences – `occF` for `OccIn`, `minOccF`/`maxOccF` for `MinOcc`/`MaxOcc`,
 `succOccF` for `SuccOcc`, `chainedF` for `Chained`, `emptyClF` for `EmptyCl`,
-… — together with their realization lemmas (`realize_occF`, …).
+… – together with their realization lemmas (`realize_occF`…).
 
 All builders are parameterized by the indices of their free variables, so that
 they can be instantiated at any variable type (in particular under
@@ -35,13 +35,13 @@ open Language Structure
 /-- The ordered expansion of the language of CNF instances. -/
 abbrev satOrd : Language := Language.sat.sum Language.order
 
-/-- The symbol for "is a clause" in the ordered expansion. -/
+/-- The symbol for “is a clause” in the ordered expansion. -/
 abbrev clSym : satOrd.Relations 1 := Sum.inl satIsClause
 
-/-- The symbol for "occurs positively in" in the ordered expansion. -/
+/-- The symbol for “occurs positively in” in the ordered expansion. -/
 abbrev posSym : satOrd.Relations 2 := Sum.inl satPosIn
 
-/-- The symbol for "occurs negatively in" in the ordered expansion. -/
+/-- The symbol for “occurs negatively in” in the ordered expansion. -/
 abbrev negSym : satOrd.Relations 2 := Sum.inl satNegIn
 
 /-! ### Formula builders -/

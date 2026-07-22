@@ -12,12 +12,12 @@ import DescriptiveComplexity.Problems.ThreeColorability.FromSat
 
 Umbrella file for the problem 3COL (`DescriptiveComplexity.ThreeCol`, defined in
 `DescriptiveComplexity.Problems.ThreeColorability.Defs`), collecting its two
-first-order reductions —
+first-order reductions –
 
 * `DescriptiveComplexity.threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT` (order-free,
   quantifier-free; `DescriptiveComplexity.Problems.ThreeColorability.ToSat`), and
 * `DescriptiveComplexity.sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol`
-  (ordered; `DescriptiveComplexity.Problems.ThreeColorability.FromSat`) —
+  (ordered; `DescriptiveComplexity.Problems.ThreeColorability.FromSat`) –
 
 and deriving its NP-completeness from the Cook–Levin theorem
 (`DescriptiveComplexity.SAT_NP_complete`), with no machine model anywhere. As with any

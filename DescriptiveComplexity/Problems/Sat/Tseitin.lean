@@ -18,8 +18,8 @@ Dahlhaus. Given the first-order kernel `φ` (a sentence over the input
 vocabulary expanded by one second-order block), the produced CNF instance has
 
 * one propositional variable per relation variable `i` of the block and tuple
-  `ā` ("`ā ∈ Rᵢ`"), and one per subformula position `p` of `φ` and context
-  tuple `w` ("the subformula at `p` holds under `w`");
+  `ā` (“`ā ∈ Rᵢ`”), and one per subformula position `p` of `φ` and context
+  tuple `w` (“the subformula at `p` holds under `w`”);
 * Tseitin-style clauses per subformula position, forcing the position
   variables to compute the truth value of their subformulas bottom-up.
 
@@ -30,7 +30,7 @@ the FO formulas defining the CNF instance inside the input structure:
   with context length `m` (the root is uniformly reachable via
   `DescriptiveComplexity.Tseitin.rootAt`);
 * `DescriptiveComplexity.Tseitin.Gates`: a valuation of the position variables computes
-  truth values correctly at every position ("all Tseitin gates hold");
+  truth values correctly at every position (“all Tseitin gates hold”);
 * `DescriptiveComplexity.Tseitin.canonVal`, the canonical valuation by actual truth
   values, which satisfies all gates (`DescriptiveComplexity.Tseitin.gates_canonVal`),
   and the converse reading (`DescriptiveComplexity.Tseitin.gates_realize`): any
@@ -61,7 +61,7 @@ section Nodes
 
 variable {L' : Language.{0, 0}}
 
-/-- The type of subformula positions ("nodes") of `f` with context length
+/-- The type of subformula positions (“nodes”) of `f` with context length
 `m`: positions at which the subformula has `m` free de Bruijn variables. The
 family is indexed by the context length so that all node-dependent data
 (valuations, clauses) can be typed uniformly, without a dependent context

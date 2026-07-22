@@ -11,7 +11,7 @@ import DescriptiveComplexity.Ordered
 Complexity classes are introduced *abstractly*: a `ComplexityClass` assigns to
 decision problems (over arbitrary vocabularies) a membership predicate and a
 hardness predicate, and is required to be closed under (ordered) first-order
-reductions — membership downward (`P ≤ᶠᵒ Q` and `Q ∈ 𝒞` give `P ∈ 𝒞`),
+reductions – membership downward (`P ≤ᶠᵒ Q` and `Q ∈ 𝒞` give `P ∈ 𝒞`),
 hardness upward (`P ≤ᶠᵒ Q` and `P` `𝒞`-hard give `Q` `𝒞`-hard). Since FO
 reductions are computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, every class from
 LOGSPACE up is closed in this sense, so this is a mild requirement. Note that
@@ -22,9 +22,9 @@ be closed, and the quantified axiom would be inconsistent.
 This file also defines the complement of a decision problem
 (`DecisionProblem.compl`, notation `Pᶜ`).
 
-The polynomial hierarchy itself — `DescriptiveComplexity.SigmaP`/`DescriptiveComplexity.PiP`, with
+The polynomial hierarchy itself – `DescriptiveComplexity.SigmaP`/`DescriptiveComplexity.PiP`, with
 levels `k ≥ 1` *defined* by second-order quantifier alternation and level 0
-left as an empty placeholder — lives in `DescriptiveComplexity.Hierarchy`; the Cook–Levin
+left as an empty placeholder – lives in `DescriptiveComplexity.Hierarchy`; the Cook–Levin
 theorem lives with the problem SAT in `DescriptiveComplexity.Problems.Sat`, and
 completeness theorems for other problems in their files under
 `DescriptiveComplexity/Problems/` (e.g. `DescriptiveComplexity.threeCol_NP_complete` in
@@ -45,7 +45,7 @@ LOGSPACE, since (ordered) FO reductions are computable in AC⁰. -/
 structure ComplexityClass where
   /-- The problems belonging to the class. Use the notation `P ∈ 𝒞`. -/
   Mem : ∀ {L : Language.{0, 0}}, DecisionProblem L → Prop
-  /-- The problems every problem of the class reduces to ("`𝒞`-hard"). -/
+  /-- The problems every problem of the class reduces to (“`𝒞`-hard”). -/
   Hard : ∀ {L : Language.{0, 0}}, DecisionProblem L → Prop
   /-- Membership travels backward along FO reductions. -/
   mem_of_foReduction : ∀ {L L' : Language.{0, 0}} [L'.IsRelational]

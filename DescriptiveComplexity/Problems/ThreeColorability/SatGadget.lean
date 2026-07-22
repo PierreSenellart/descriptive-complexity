@@ -18,7 +18,7 @@ semantic.
 Vertices are tagged pairs `(t, a, b)` with `t : SatTag` and `a b` elements of
 the CNF structure:
 
-* `palT`/`palF`/`palB`: the palette ("true"/"false"/"base"). All copies of one
+* `palT`/`palF`/`palB`: the palette (“true”/“false”/“base”). All copies of one
   palette tag form one color class: every copy of one tag is adjacent to every
   copy of every other tag, so in a proper coloring all `palT` copies share a
   color, etc. This avoids singling out canonical elements.
@@ -29,7 +29,7 @@ the CNF structure:
   `(x, s)` of the clause `c`: a triangle whose inputs `gu`, `gv` are adjacent
   respectively to the previous prefix node (the literal vertex of the first
   occurrence, or the previous gate output `go`) and to the literal vertex of
-  `(x, s)`. The gate output `go` can be colored "true" iff some input is; the
+  `(x, s)`. The gate output `go` can be colored “true” iff some input is; the
   output of the last gate is forced true by edges to `palF` and `palB`.
 * a clause whose unique literal is `(x, s)` forces its literal directly:
   `lit s` at `(x, x)` is adjacent to `palF` (as well as `palB`);
@@ -51,11 +51,11 @@ open Language Structure SatOcc
 
 /-- Tags of the gadget graph. -/
 inductive SatTag : Type
-  /-- Palette "true". -/
+  /-- Palette “true”. -/
   | palT
-  /-- Palette "false". -/
+  /-- Palette “false”. -/
   | palF
-  /-- Palette "base". -/
+  /-- Palette “base”. -/
   | palB
   /-- Literal vertex, at diagonal pairs `(x, x)`. -/
   | lit (s : Bool)
@@ -109,7 +109,7 @@ def Core : SatTag → A → A → SatTag → A → A → Prop
 
 open Classical in
 /-- The coloring of the gadget graph induced by an assignment `ν`:
-`0` is "true", `1` is "false", `2` is "base". -/
+`0` is “true”, `1` is “false”, `2` is “base”. -/
 noncomputable def gadCol (ν : A → Prop) : SatTag → A → A → Fin 3
   | .palT, _, _ => 0
   | .palF, _, _ => 1
@@ -244,7 +244,7 @@ theorem satisfiable_iff_gadColoring [Finite A] :
     refine ⟨fun x => col (.lit true) x x = tc, ?_⟩
     intro c hc
     by_contra hno
-    -- all literals of `c` are colored "false"
+    -- all literals of `c` are colored “false”
     have Hfalse : ∀ y t, OccIn c y t → col (.lit t) y y = fc := by
       intro y t hyt
       rcases hlitTF y t with hT | hF
@@ -255,7 +255,7 @@ theorem satisfiable_iff_gadColoring [Finite A] :
         | true => exact ⟨y, Or.inl ⟨hyt.2, hT⟩⟩
       · exact hF
     by_cases hocc : ∃ y t, OccIn c y t
-    · -- the chain of `c` is forced to "false", contradicting the forced output
+    · -- the chain of `c` is forced to “false”, contradicting the forced output
       classical
       have step : ∀ x s, OccIn c x s →
           (∀ y t, OccIn c y t → occLt y t x s →

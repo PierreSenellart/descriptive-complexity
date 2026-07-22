@@ -13,7 +13,7 @@ import Mathlib.Tactic.FinCases
 Complexity theory is essentially absent from Mathlib because formalizing a
 machine model of computation (and resource bounds on it) is hard. However, many
 classical NP-hardness reductions do not need the full power of polynomial-time
-computation: the reduction is *first-order expressible* — the output structure
+computation: the reduction is *first-order expressible* – the output structure
 can be described by fixed first-order formulas evaluated in the input
 structure. Such FO reductions are computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so
 exhibiting an FO reduction is (much) stronger than exhibiting a Karp
@@ -22,7 +22,7 @@ formalize on top of Mathlib's `ModelTheory` library.
 
 This file defines:
 
-* `DescriptiveComplexity.DecisionProblem L`: a "problem" over the vocabulary `L`, i.e. a
+* `DescriptiveComplexity.DecisionProblem L`: a “problem” over the vocabulary `L`, i.e. a
   property of `L`-structures;
 * `DescriptiveComplexity.FOInterpretation L L' Tag dim`: a tagged, `dim`-dimensional
   first-order interpretation of a relational language `L'` in a language `L`,
@@ -38,7 +38,7 @@ This file defines:
 
 The textbook notion of FO reduction maps a structure `A` to a structure with
 universe a definable subset of `A^k`, using a linear order on `A` to encode
-constantly many "sorts" of elements. To stay order-free and subset-free we
+constantly many “sorts” of elements. To stay order-free and subset-free we
 instead tag tuples with elements of a finite type `Tag`, and use the full
 universe `Tag × A^dim`: junk elements are harmless in practice because the
 defining formulas can exclude them from all relations. Every tagged
@@ -71,7 +71,7 @@ variable (L L' : Language.{0, 0})
 
 /-- A decision problem in the sense of descriptive complexity: an
 isomorphism-closed property of `L`-structures, whose yes-instances are the
-`L`-structures satisfying it. Isomorphism-invariance is part of the notion —
+`L`-structures satisfying it. Isomorphism-invariance is part of the notion –
 a decision problem cannot distinguish isomorphic presentations of the same
 structure. -/
 structure DecisionProblem where
@@ -140,8 +140,8 @@ end RelMapTransport
 language `L'` in the language `L`. It maps an `L`-structure `A` to the
 `L'`-structure with universe `Tag × A^dim` in which an `n`-ary relation symbol
 `R` holds of tagged tuples `(t₁, ā₁), …, (tₙ, āₙ)` iff the first-order
-`L`-formula `relFormula R (t₁, …, tₙ)` — whose free variable `(i, j)` stands
-for the `j`-th coordinate `āᵢ j` of the `i`-th argument — holds in `A`. -/
+`L`-formula `relFormula R (t₁, …, tₙ)` – whose free variable `(i, j)` stands
+for the `j`-th coordinate `āᵢ j` of the `i`-th argument – holds in `A`. -/
 structure FOInterpretation (Tag : Type) (dim : ℕ) where
   /-- The defining `L`-formula of each relation symbol of `L'`, for each tuple
   of tags; the free variable `(i, j)` is the `j`-th coordinate of the `i`-th

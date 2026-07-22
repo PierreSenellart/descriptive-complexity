@@ -15,7 +15,7 @@ first-order reduction to SAT
 (`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`). Since NP is *defined* as
 `Σ₁`-definability (`DescriptiveComplexity.Hierarchy`), together with the membership
 half `DescriptiveComplexity.sat_sigmaSODefinable` this makes SAT NP-complete
-(`DescriptiveComplexity.SAT_NP_complete`) — relying on no axioms beyond
+(`DescriptiveComplexity.SAT_NP_complete`) – relying on no axioms beyond
 Lean's standard three, as `#print axioms` confirms.
 
 Given the single second-order block `B` and the first-order kernel `φ` of a
@@ -31,7 +31,7 @@ input structure `A`, the CNF instance of the Tseitin encoding of `φ`
   `(Sum.inl (Sum.inl (⟨m, p⟩, k)), u)`), plus the top-level unit clause
   `(Sum.inl (Sum.inr ()), u)` forcing the root variable;
 * tuples of length `DescriptiveComplexity.tseitinDim B φ` are padded canonically with
-  minimal elements of the order — the one place where the order is used;
+  minimal elements of the order – the one place where the order is used;
   non-canonical tuples are junk: they are neither clauses nor occur in any
   clause.
 

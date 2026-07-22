@@ -21,8 +21,8 @@ Infrastructure for the second-order definability layer of
   premise of an implication (`DescriptiveComplexity.sorealize_inf_embed`,
   `DescriptiveComplexity.sorealize_imp_embed`). This is how the auxiliary order of an
   ordered reduction is eliminated: the order becomes a second-order variable
-  of the first block, guarded by the first-order sentence "it is a linear
-  order".
+  of the first block, guarded by the first-order sentence “it is a linear
+  order”.
 * *Padding*: appending or prepending the trivial (empty) block
   (`DescriptiveComplexity.SOBlock.trivial`) does not change alternating second-order
   satisfaction (`DescriptiveComplexity.sorealize_append_trivial`), so `Σₖ`- and

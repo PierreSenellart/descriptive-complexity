@@ -7,7 +7,7 @@ import Mathlib.Tactic.FinCases
 import DescriptiveComplexity.Problems.ThreeColorability
 
 /-!
-# Worked example: Boolean conjunctive queries — evaluation and containment
+# Worked example: Boolean conjunctive queries – evaluation and containment
 
 This file is a *tutorial*: it walks, step by step, through the addition of a
 new problem domain to the library, with NP-completeness proofs at the end. It
@@ -23,7 +23,7 @@ Chandra and Merlin (STOC 1977):
   `q₁` also a model of `q₂`?
 
 To keep the tutorial focused we fix the schema to a single binary relation
-`E` — graph databases. This loses no complexity-theoretic generality (both
+`E` – graph databases. This loses no complexity-theoretic generality (both
 problems are already NP-hard for this schema) and everything below extends
 mechanically to any fixed relational schema. A BCQ is then an expression
 `∃ x₁ … xₖ, E(t₁, t₁') ∧ … ∧ E(tₘ, tₘ')` where each term `tᵢ` is a variable
@@ -34,7 +34,7 @@ The recipe, common to every problem in the library:
 1. **Vocabulary**: a relational `FirstOrder.Language` whose finite structures
    are the problem instances.
 2. **Semantics**: a `Prop`-valued predicate on structures of that vocabulary,
-   total on *all* structures (also the meaningless "junk" ones), with the
+   total on *all* structures (also the meaningless “junk” ones), with the
    convention for junk made explicit.
 3. **Invariance**: the predicate is isomorphism-invariant, giving a bundled
    `DecisionProblem`.
@@ -45,8 +45,8 @@ The recipe, common to every problem in the library:
 6. **Completeness**: combine 4 and 5.
 
 Evaluation goes through steps 1–6 directly; containment then reuses
-evaluation on both sides — its membership is an FO reduction *to* evaluation
-and its hardness an FO reduction *from* evaluation — with the classical
+evaluation on both sides – its membership is an FO reduction *to* evaluation
+and its hardness an FO reduction *from* evaluation – with the classical
 Chandra–Merlin homomorphism theorem (`DescriptiveComplexity.queryContained_iff_hom`)
 as the bridge. The reductions are all order-free and quantifier-free.
 
@@ -54,11 +54,11 @@ Main results:
 
 * `DescriptiveComplexity.CQEval`, `DescriptiveComplexity.CQContainment`: the two bundled
   decision problems;
-* `DescriptiveComplexity.queryContained_iff_hom`: the Chandra–Merlin theorem —
+* `DescriptiveComplexity.queryContained_iff_hom`: the Chandra–Merlin theorem –
   containment holds iff there is a homomorphism from the right query to the
   canonical database of the left one;
 * `DescriptiveComplexity.concreteQueryHolds_iff_queryHolds`: faithfulness of the
-  encoding — on instances built (by `DescriptiveComplexity.queryDbStructure`) from a
+  encoding – on instances built (by `DescriptiveComplexity.queryDbStructure`) from a
   concrete query (a list of atoms) and a concrete database (a list of
   facts), the abstract semantics agrees with the textbook one;
 * `DescriptiveComplexity.threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval`;
@@ -74,7 +74,7 @@ Main results:
 An instance of the evaluation problem is a query *and* a database, packaged
 in a single finite structure. Elements of the structure play three roles:
 query variables (distinguished by a unary predicate), database elements, and
-constants — a constant is simply an element that is not marked as a variable
+constants – a constant is simply an element that is not marked as a variable
 and can appear both in query atoms and in database facts, which is how the
 two halves of the instance share constants. Two binary relations record the
 query atoms and the database facts.
@@ -107,13 +107,13 @@ protected def queryDb : Language :=
   ⟨fun _ => Empty, queryDbRel⟩
   deriving IsRelational
 
-/-- The symbol for "is a query variable". -/
+/-- The symbol for “is a query variable”. -/
 abbrev qdbIsVar : Language.queryDb.Relations 1 := .isVar
 
-/-- The symbol for "is an atom of the query". -/
+/-- The symbol for “is an atom of the query”. -/
 abbrev qdbAtom : Language.queryDb.Relations 2 := .atom
 
-/-- The symbol for "is a fact of the database". -/
+/-- The symbol for “is a fact of the database”. -/
 abbrev qdbFact : Language.queryDb.Relations 2 := .fact
 
 end Language
@@ -155,8 +155,8 @@ end EvalShorthands
 
 /-!
 The semantic core is *satisfaction of a conjunctive query in a database*,
-which we set up generically — for an arbitrary "variable" predicate and
-"atom" relation on the instance, and an arbitrary external database — because
+which we set up generically – for an arbitrary “variable” predicate and
+“atom” relation on the instance, and an arbitrary external database – because
 the very same notion drives evaluation (database inside the instance),
 containment (database quantified over), and the homomorphism criterion
 (database = canonical instance). Factoring it out is what will later make the
@@ -176,7 +176,7 @@ instances that faithfully encode actual queries:
   somewhere but unconstrained (in a real BCQ every variable occurs in an
   atom, so this is a junk-only concern);
 * `ι` being total forces the database universe to be nonempty as soon as the
-  instance is — the usual nonempty-universe convention of finite model
+  instance is – the usual nonempty-universe convention of finite model
   theory, applied to the quantified databases as well.
 -/
 
@@ -275,7 +275,7 @@ NP is *defined* in this library as `Σ₁` second-order definability (Fagin's
 theorem), so membership means exhibiting a second-order sentence: guess an
 object-level certificate, check it with a first-order kernel. The natural
 certificate here is (the graph of) the valuation: a single binary relation
-variable `H`, with `H x u` read as "`x` is mapped to `u`".
+variable `H`, with `H x u` read as “`x` is mapped to `u`”.
 
 Since a raw guessed relation need not be the graph of a function, the kernel
 does not try to say so; it checks instead that
@@ -287,8 +287,8 @@ does not try to say so; it checks instead that
 2. every variable has at least one `H`-image;
 
 which is equivalent to the existence of a valuation (pick any image for each
-variable: by 1 *all* image choices work). This "all images are good, and
-images exist" trick avoids expressing functionality in the kernel and is a
+variable: by 1 *all* image choices work). This “all images are good, and
+images exist” trick avoids expressing functionality in the kernel and is a
 reusable pattern for guessing functions by relations.
 
 The construction mirrors `sat_sigmaSODefinable` (`Problems/Sat.lean`): a
@@ -311,13 +311,13 @@ def cqHomSym : cqHomBlock.lang.Relations 2 := ⟨(), rfl⟩
 guessed-valuation relation variable. -/
 abbrev cqSOLang : Language := Language.queryDb.sum cqHomBlock.lang
 
-/-- The symbol for "is a query variable" in the kernel's vocabulary. -/
+/-- The symbol for “is a query variable” in the kernel's vocabulary. -/
 abbrev kQVar : cqSOLang.Relations 1 := Sum.inl qdbIsVar
 
-/-- The symbol for "is an atom of the query" in the kernel's vocabulary. -/
+/-- The symbol for “is an atom of the query” in the kernel's vocabulary. -/
 abbrev kQAtom : cqSOLang.Relations 2 := Sum.inl qdbAtom
 
-/-- The symbol for "is a fact of the database" in the kernel's vocabulary. -/
+/-- The symbol for “is a fact of the database” in the kernel's vocabulary. -/
 abbrev kDbFact : cqSOLang.Relations 2 := Sum.inl qdbFact
 
 /-- The guessed-valuation symbol in the kernel's vocabulary. -/
@@ -327,7 +327,7 @@ abbrev kHom : cqSOLang.Relations 2 := Sum.inr cqHomSym
 kernel conjunct. -/
 private def kv (i : Fin 4) : cqSOLang.Term (Empty ⊕ Fin 4) := Term.var (Sum.inr i)
 
-/-- The kernel formula "`kv j` is a possible image of `kv i`": an `H`-image
+/-- The kernel formula “`kv j` is a possible image of `kv i`”: an `H`-image
 if `kv i` is a query variable, `kv i` itself otherwise. -/
 def cqImgFormula (i j : Fin 4) : cqSOLang.Formula (Empty ⊕ Fin 4) :=
   (Relations.formula₁ kQVar (kv i) ⊓ Relations.formula₂ kHom (kv i) (kv j)) ⊔
@@ -483,7 +483,7 @@ def cevIsVarFormula : ColEvalTag → Language.graph.Formula (Fin 1 × Fin 1)
   | .qvtx => ⊤
   | .color _ => ⊥
 
-/-- Defining formula for `atom`: the canonical query of the graph — one atom
+/-- Defining formula for `atom`: the canonical query of the graph – one atom
 per (directed) edge, between the corresponding query variables. -/
 def cevAtomFormula : ColEvalTag → ColEvalTag → Language.graph.Formula (Fin 2 × Fin 1)
   | .qvtx, .qvtx => adj.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
@@ -496,7 +496,7 @@ def cevFactFormula : ColEvalTag → ColEvalTag → Language.graph.Formula (Fin 2
   | _, _ => ⊥
 
 /-- The first-order interpretation producing, from a graph, the evaluation
-instance "does the canonical query of the graph hold in `K₃`?". -/
+instance “does the canonical query of the graph hold in `K₃`?”. -/
 def threeColToCQEval : FOInterpretation Language.graph Language.queryDb ColEvalTag 1 where
   relFormula {n} R :=
     match n, R with
@@ -591,7 +591,7 @@ theorem threeColorable_iff_map_queryHolds (V : Type) [Language.graph.Structure V
     rw [← h1, ← h2]
     exact hxy
 
-/-- **3-colorability FO-reduces to BCQ evaluation** — the `fo_reduction`
+/-- **3-colorability FO-reduces to BCQ evaluation** – the `fo_reduction`
 theorem for the hardness half. -/
 def threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval where
   Tag := ColEvalTag
@@ -643,11 +643,11 @@ theorem cqEval_NP_complete : NP.Complete CQEval :=
 /-!
 ### Interlude: tying the encoding to concrete queries and databases
 
-So far "a query and a database" has meant "a `Language.queryDb`-structure",
+So far “a query and a database” has meant “a `Language.queryDb`-structure”,
 and one should not take on faith that this abstraction encodes the real
 thing. This interlude closes the loop: a *concrete* Boolean conjunctive
-query over variables `V` and constants `C` is a list of atoms — each
-argument a variable or a constant, i.e. an element of `V ⊕ C` — and a
+query over variables `V` and constants `C` is a list of atoms – each
+argument a variable or a constant, i.e. an element of `V ⊕ C` – and a
 concrete graph database is a list of facts over the constants. Their
 textbook semantics (`DescriptiveComplexity.ConcreteQueryHolds`) is: some assignment of
 the variables to constants sends every atom to a fact.
@@ -658,7 +658,7 @@ Any such pair is encoded as a structure on the universe `V ⊕ C`
 semantics of step 2 agrees with the textbook one on every encoded instance.
 The `Nonempty C` hypothesis is this file's junk conventions surfacing one
 last time: a variable occurring in no atom is unconstrained in the abstract
-semantics but must still be assigned a constant in the concrete one — for
+semantics but must still be assigned a constant in the concrete one – for
 genuine BCQs (every variable occurs in an atom) over a nonempty database
 domain, nothing is lost.
 -/
@@ -770,7 +770,7 @@ end Concrete
 end DescriptiveComplexity
 
 /-!
-### Step 7: containment — vocabulary, semantics, and the Chandra–Merlin
+### Step 7: containment – vocabulary, semantics, and the Chandra–Merlin
 theorem
 
 An instance of the containment problem is a *pair* of queries over a shared
@@ -779,7 +779,7 @@ query, binary relations record their atoms, and the remaining elements are
 shared constants. The problem asks whether the left query is contained in the
 right one: every database satisfying the left query satisfies the right one.
 
-Unlike evaluation, the defining property quantifies over *all* databases —
+Unlike evaluation, the defining property quantifies over *all* databases –
 this is where the generic `SatisfiedIn` with an external database pays off.
 Note the junk convention it implies: in an atom of one query, an element
 marked only as a variable of the *other* query is not a constant, so it acts
@@ -788,7 +788,7 @@ query's atoms only involve its own variables and constants) are unaffected.
 
 The key structural result is the **Chandra–Merlin theorem**: containment
 holds iff there is a homomorphism from the right query into the *canonical
-database* of the left one — the instance universe itself, with the left
+database* of the left one – the instance universe itself, with the left
 atoms as facts and every element denoting itself. Both directions are short:
 the canonical database trivially satisfies the left query, and conversely a
 homomorphism composes with any satisfying valuation. This theorem is what
@@ -818,16 +818,16 @@ protected def queryPair : Language :=
   ⟨fun _ => Empty, queryPairRel⟩
   deriving IsRelational
 
-/-- The symbol for "is a variable of the left query". -/
+/-- The symbol for “is a variable of the left query”. -/
 abbrev qpLeftVar : Language.queryPair.Relations 1 := .leftVar
 
-/-- The symbol for "is a variable of the right query". -/
+/-- The symbol for “is a variable of the right query”. -/
 abbrev qpRightVar : Language.queryPair.Relations 1 := .rightVar
 
-/-- The symbol for "is an atom of the left query". -/
+/-- The symbol for “is an atom of the left query”. -/
 abbrev qpLeftAtom : Language.queryPair.Relations 2 := .leftAtom
 
-/-- The symbol for "is an atom of the right query". -/
+/-- The symbol for “is an atom of the right query”. -/
 abbrev qpRightAtom : Language.queryPair.Relations 2 := .rightAtom
 
 end Language
@@ -871,7 +871,7 @@ def QueryContained (A : Type) [Language.queryPair.Structure A] : Prop :=
       SatisfiedIn (PairVar (A := A)) (RAtom (A := A)) F ι
 
 /-- **The Chandra–Merlin theorem**: containment holds iff there is a
-homomorphism from the right query to the canonical database of the left one —
+homomorphism from the right query to the canonical database of the left one –
 i.e. a map of the universe to itself, fixing the constants, that sends every
 right atom to a left atom. The forward direction instantiates containment at
 the canonical database (which satisfies the left query via the identity
@@ -911,7 +911,7 @@ def CQContainment : DecisionProblem Language.queryPair where
 ### Step 8: containment is in NP, by reduction to evaluation
 
 By Chandra–Merlin, containment is evaluation of the right query in the
-canonical database of the left one — so containment FO-reduces to
+canonical database of the left one – so containment FO-reduces to
 evaluation, and membership in NP follows from `cqEval_mem_NP` through
 `ComplexityClass.mem_of_foReduction`. No second kernel needed.
 
@@ -922,8 +922,8 @@ semantics have different junk conventions. In the homomorphism criterion the
 canonical database consists of *all* elements (frozen variables and
 constants alike), while in an evaluation instance the database elements are
 exactly the non-variables. A single copy of the universe cannot be split
-both ways, so the interpretation uses two tags — a query side and a database
-side — and *routes* each atom endpoint to the query side if it is a variable
+both ways, so the interpretation uses two tags – a query side and a database
+side – and *routes* each atom endpoint to the query side if it is a variable
 of either query (recall the junk convention of step 7) and to the database
 side otherwise. The database side carries the left atoms as facts, on all
 elements. All formulas remain quantifier-free.
@@ -988,8 +988,8 @@ def ctevFactFormula : PairTag → PairTag → Language.queryPair.Formula (Fin 2 
   | _, _ => ⊥
 
 /-- The first-order interpretation producing, from a query pair, the
-evaluation instance "does the right query hold in the canonical database of
-the left one?". -/
+evaluation instance “does the right query hold in the canonical database of
+the left one?”. -/
 def containmentToEval :
     FOInterpretation Language.queryPair Language.queryDb PairTag 1 where
   relFormula {n} R :=
@@ -1038,7 +1038,7 @@ open Classical in
 containment homomorphism `h`: move each query-side variable to the
 database-side copy of its `h`-image, fix everything else. (A top-level
 definition rather than a `fun` inside the proof, so that its defining
-equations are available to `simp` — a trick worth remembering whenever a
+equations are available to `simp` – a trick worth remembering whenever a
 witness is defined by cases.) -/
 private noncomputable def routedVal {A : Type} [Language.queryPair.Structure A]
     (h : A → A) : containmentToEval.Map A → containmentToEval.Map A
@@ -1125,7 +1125,7 @@ theorem queryContained_iff_map_queryHolds (A : Type) [Language.queryPair.Structu
     rw [← hp3, ← hq3]
     exact hL
 
-/-- **BCQ containment FO-reduces to BCQ evaluation** — the Chandra–Merlin
+/-- **BCQ containment FO-reduces to BCQ evaluation** – the Chandra–Merlin
 theorem, in reduction form: evaluate the right query in the canonical
 database of the left one. -/
 def cqContainment_fo_reduction_cqEval : CQContainment ≤ᶠᵒ CQEval where
@@ -1144,17 +1144,17 @@ theorem cqContainment_mem_NP : CQContainment ∈ NP :=
 
 The reverse reduction expresses the other classical half of the
 correspondence: *a database is just a conjunctive query with no variables*.
-An evaluation instance `(q, D)` becomes the pair "(the canonical query of
-`D`) ⊆ `q`": the left query has no variables and one atom per genuine
+An evaluation instance `(q, D)` becomes the pair “(the canonical query of
+`D`) ⊆ `q`”: the left query has no variables and one atom per genuine
 database edge, the right query is `q` itself. Every element keeps its role,
-so a single tag and dimension 1 suffice, and correctness reduces — through
-Chandra–Merlin on the interpreted side — to comparing two homomorphism
+so a single tag and dimension 1 suffice, and correctness reduces – through
+Chandra–Merlin on the interpreted side – to comparing two homomorphism
 conditions over universes identified by `FOInterpretation.mapEquivSelf`.
 -/
 
 /-- The first-order interpretation producing, from an evaluation instance,
-the containment instance "(the database, viewed as a variable-free query)
-is contained in the query". -/
+the containment instance “(the database, viewed as a variable-free query)
+is contained in the query”. -/
 def evalToContainment : FOInterpretation Language.queryDb Language.queryPair Unit 1 where
   relFormula {n} R :=
     match n, R with
@@ -1260,7 +1260,7 @@ the recipe; a few directions the reader can take next, in rough order of
 effort:
 
 * *other schemas*: redo the development for a schema with several relations
-  of higher arity — the vocabulary grows, the proofs do not change shape
+  of higher arity – the vocabulary grows, the proofs do not change shape
   (atoms of arity `k` need interpreted elements of dimension `k`, i.e.
   `dim > 1` interpretations as in `Problems/ThreeColorability/ToSat.lean`);
 * *quantifier-free status of the containment reductions*: state and prove

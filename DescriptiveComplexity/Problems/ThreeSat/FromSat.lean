@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.ThreeSat.Defs
 # SAT reduces to 3SAT by an ordered FO reduction
 
 The classical clause-splitting reduction, as an ordered first-order
-reduction — `DescriptiveComplexity.sat_ordered_fo_reduction_threeSat : SAT ≤ᶠᵒ[≤]
+reduction – `DescriptiveComplexity.sat_ordered_fo_reduction_threeSat : SAT ≤ᶠᵒ[≤]
 ThreeSAT`. Every clause of the input CNF is split along the linear order of
 its literal occurrences (`DescriptiveComplexity.OccurrenceOrder`) into a chain of
 clauses of width at most three, linked by fresh variables.
@@ -19,8 +19,8 @@ Concretely, the interpretation (`DescriptiveComplexity.SatToThreeSat.satToThreeS
 tags `SplitTag`, dimension 2) produces, for each occurrence `(x, s)` of a
 clause `c`:
 
-* a linking variable `(.link s, (c, x))`, intended to mean "no occurrence of
-  `c` strictly before `(x, s)` is true";
+* a linking variable `(.link s, (c, x))`, intended to mean “no occurrence of
+  `c` strictly before `(x, s)` is true”;
 * a clause piece `(.piece s, (c, x))` containing the literal `(x, s)` itself
   (on the variable copy `(.var, (x, x))`), the linking variable of the
   *successor* occurrence positively (if any), and its own linking variable
@@ -32,7 +32,7 @@ as empty clauses `(.empty, (c, c))`, keeping the output unsatisfiable. All
 other tuples are junk: they are neither clauses nor occur in any clause.
 
 The two halves of correctness are `SatToThreeSat.widthAtMostThree_map` (the
-output always satisfies the width promise — each piece has at most three
+output always satisfies the width promise – each piece has at most three
 literals, by uniqueness of the successor occurrence) and
 `SatToThreeSat.satisfiable_iff_map` (satisfiability is preserved, by the
 usual chain argument, threaded along the occurrence order).
@@ -173,7 +173,7 @@ private theorem pair_congr {B C : Type} {t t' : B} {w w' : C} (h1 : t = t') (h2 
 
 /-- The interpreted structure always satisfies the width promise of 3SAT:
 every clause piece has at most three literal occurrences (its own literal, the
-successor's linking variable — unique by `succOcc_right_unique` — and its own
+successor's linking variable – unique by `succOcc_right_unique` – and its own
 linking variable), and empty-clause copies have none. -/
 theorem widthAtMostThree_map : WidthAtMostThree (satToThreeSat.Map A) := by
   rintro ⟨tc, wc⟩ x s hocc
