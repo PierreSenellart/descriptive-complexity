@@ -41,10 +41,11 @@ The library is organized in three layers:
   the library declares no axioms.
 * **A problem catalog and worked examples**: SAT (with a machine-free
   Cook–Levin theorem), 3-colorability, 3SAT, the clique family
-  (Clique / Independent Set / Vertex Cover), and `QBF k` – quantified Boolean
-  formulas with `k` alternating blocks, complete for the `k`-th level of the
-  polynomial hierarchy – plus a tutorial on conjunctive queries; each with its
-  vocabulary, FO reductions and completeness theorems.
+  (Clique / Independent Set / Vertex Cover), TAUT (coNP-complete), and
+  `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
+  for the `k`-th level of the polynomial hierarchy – plus a tutorial on
+  conjunctive queries; each with its vocabulary, FO reductions and
+  completeness theorems.
 
 ## Documentation
 

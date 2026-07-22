@@ -20,7 +20,9 @@ axiom quantified over all classes: arbitrary collections of problems need not
 be closed, and the quantified axiom would be inconsistent.
 
 This file also defines the complement of a decision problem
-(`DecisionProblem.compl`, notation `Pᶜ`).
+(`DecisionProblem.compl`, notation `Pᶜ`), and the observation that a reduction
+complements: the same interpretation reduces `Pᶜ` to `Qᶜ`
+(`DescriptiveComplexity.FOReduction.compl`).
 
 The polynomial hierarchy itself – `DescriptiveComplexity.SigmaP`/`DescriptiveComplexity.PiP`, with
 levels `k ≥ 1` *defined* by second-order quantifier alternation and level 0
@@ -119,5 +121,28 @@ instance {L : Language.{0, 0}} : Compl (DecisionProblem L) :=
 theorem DecisionProblem.compl_compl {L : Language.{0, 0}} (P : DecisionProblem L) :
     Pᶜᶜ = P :=
   DecisionProblem.ext fun _ _ => not_not
+
+/-- **Reductions complement**: the very same interpretation reduces `Pᶜ` to
+`Qᶜ`, since the correctness of a reduction is an equivalence. This is what
+turns a hardness discharge for a `Σ`-level into one for the dual `Π`-level;
+see `DescriptiveComplexity.taut_hard_of_piSODefinable`. -/
+def FOReduction.compl {L L' : Language.{0, 0}} [L'.IsRelational]
+    {P : DecisionProblem L} {Q : DecisionProblem L'} (f : P ≤ᶠᵒ Q) : Pᶜ ≤ᶠᵒ Qᶜ :=
+  letI := f.tagFinite
+  letI := f.tagNonempty
+  { Tag := f.Tag
+    dim := f.dim
+    toInterpretation := f.toInterpretation
+    correct := fun A _ _ => not_congr (f.correct A) }
+
+@[inherit_doc FOReduction.compl]
+def OrderedFOReduction.compl {L L' : Language.{0, 0}} [L'.IsRelational]
+    {P : DecisionProblem L} {Q : DecisionProblem L'} (f : P ≤ᶠᵒ[≤] Q) : Pᶜ ≤ᶠᵒ[≤] Qᶜ :=
+  letI := f.tagFinite
+  letI := f.tagNonempty
+  { Tag := f.Tag
+    dim := f.dim
+    toInterpretation := f.toInterpretation
+    correct := fun A _ _ _ _ => not_congr (f.correct A) }
 
 end DescriptiveComplexity

@@ -152,8 +152,21 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
     — the shape any *alternating* discharge needs, since the prefix
     supplies the assignment rather than quantifying it.
 
-- **TAUT / 3-DNF tautology** [S]: coNP-complete via the existing
-  complement machinery (`PiP 1` = complements of `SigmaP 1`).
+- **TAUT** [S, *done*]: coNP-complete (`TAUT_coNP_complete`, in
+  `Problems/Taut.lean`) via the complement machinery. Same vocabulary as
+  SAT, read disjunctively; both halves come from the single sign-swapping
+  interpretation `swapSignInterp` (De Morgan: a DNF is a tautology iff the
+  sign-swapped CNF is unsatisfiable), together with the observation that a
+  reduction complements – `FOReduction.compl` / `OrderedFOReduction.compl`
+  in `Complexity.lean`, which turns a `Σ`-level discharge into the dual
+  `Π`-level one for free.
+  - **The 3-DNF variant does not come for free** [M]: 3SAT folds its width
+    bound into the yes-instances (`ThreeSatisfiable = WidthAtMostThree ∧
+    Satisfiable`), so its complement is a disjunction and the sign swap does
+    not transfer. 3-DNF-TAUT hardness needs the *invariant* that the
+    SAT → 3SAT reduction always outputs width-≤ 3 instances, which the
+    `≤ᶠᵒ` interface hides; it would have to be exposed alongside the
+    reduction.
 - **P-hardness family** [M–L]: statements of the form “every
   SO-Horn-definable (or FO(LFP)-definable) problem FO-reduces to X”,
   mirroring the SAT discharge one level down (meaningful even before
@@ -313,7 +326,7 @@ separations and non-reducibility, impossible in the machine world.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
-1. Cheap catalog wins: Set Cover, Dominating Set, k-COL, TAUT.
+1. Cheap catalog wins: Set Cover, Dominating Set, k-COL (TAUT is done).
 1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
 2. SO-Horn path to an axiom-free PTIME; HORN-SAT hardness.
