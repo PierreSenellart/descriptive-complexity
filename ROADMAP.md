@@ -113,13 +113,16 @@ is done, and its merging/transfer infrastructure is reusable); CVP and alternati
 ordinary reductions *from* HORN-SAT rather than as primary discharges.
 
 - **QBF_k (Σₖ/Πₖ-QSAT)** [M, *done*]: quantified Boolean formulas with k
-  alternation blocks, `Σₖᵖ`-complete (`QBF_complete`). Vocabulary = sat
-  plus k unary block marks on variables (`Language.qbf k`), semantics =
-  alternating quantification `altQuant` over k truth assignments.
-  Landed in `Problems/Qbf/` (`Defs`, `Membership`, `Transfer`,
-  `Hardness`) plus the reusable `SecondOrderMerge.lean`; axiom-free. At
-  k = 1 it specializes to a second NP-completeness proof
-  (`QBF_one_NP_complete`).
+  alternation blocks. `QBF k` is `Σₖᵖ`-complete (`QBF_complete`) and the
+  dual `QBFPi k`, with a universal outermost block, is `Πₖᵖ`-complete
+  (`QBFPi_complete`); both come from the *same* reduction
+  (`qbfReduction`), parameterized by the starting polarity. Vocabulary =
+  sat plus k unary block marks on variables (`Language.qbf k`),
+  semantics = alternating quantification `altQuant` over k truth
+  assignments. Landed in `Problems/Qbf/` (`Defs`, `Membership`,
+  `Transfer`, `Hardness`) plus the reusable `SecondOrderMerge.lean`;
+  axiom-free. At k = 1 the two specialize to NP- and coNP-completeness
+  (`QBF_one_NP_complete`, `QBFPi_one_coNP_complete`).
   - **The matrix shape follows the parity of k** – forced, and the
     standard form of the Σₖᵖ-complete QBF problems. Tseitin introduces
     *gate* variables; they are functionally determined
@@ -135,7 +138,10 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
     be correct on instances whose block marks partition the variables).
     Choosing the interpretation's literal signs by the same flag makes
     the parity vanish from the correctness proof: the literal a satisfied
-    clause must make true is always the positive Tseitin one.
+    clause must make true is always the positive Tseitin one. The
+    parity flips with the starting polarity, so `QBFPi k` has the mirror
+    convention (conjunctive for even k). This CNF/DNF-by-parity normal
+    form is the classical one (Wrathall 1976).
   - Reusable pieces worth knowing about for the other discharges of this
     section: `SecondOrderMerge.lean` (merge a prefix into one block and
     back; enlarge the innermost block by an auxiliary one, so a

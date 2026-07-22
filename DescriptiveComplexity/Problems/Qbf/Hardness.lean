@@ -268,29 +268,29 @@ theorem altQuant_cast {A : Type} {m n : ℕ} (h : m = n)
   subst h
   exact Iff.rfl
 
-variable (B : SOBlock) (Bs : List SOBlock) (φ : (soLang L (B :: Bs)).Sentence)
+variable (st : Bool) (B : SOBlock) (Bs : List SOBlock) (φ : (soLang L (B :: Bs)).Sentence)
 
 /-- Whether the innermost quantifier of an existentially-starting prefix with
 `Bs.length + 1` blocks is universal – equivalently, whether `Bs.length + 1` is
 even. The Tseitin gates can only be absorbed by an existential quantifier, so
 this is the flag that decides both the shape of the matrix and whether the
 kernel gets negated. -/
-def qbfSwap (Bs : List SOBlock) : Bool := !innerPol Bs.length true
+def qbfSwap : Bool := !innerPol Bs.length st
 
 /-- The sentence that is actually Tseitin-encoded: the merged kernel, negated
 when the innermost quantifier is universal. -/
 noncomputable def qbfEnc : (L.sum (mergeBlocks (B :: Bs)).lang).Sentence :=
-  if qbfSwap Bs then ∼((mergeHom (B :: Bs) L).onSentence φ)
+  if qbfSwap st Bs then ∼((mergeHom (B :: Bs) L).onSentence φ)
   else (mergeHom (B :: Bs) L).onSentence φ
 
 /-- The block of gate variables of the encoding. -/
-noncomputable abbrev qbfGt : SOBlock := gateBlock (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ)
+noncomputable abbrev qbfGt : SOBlock := gateBlock (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ)
 
 /-- The block marks of the interpreted instance: a relation variable is marked
 by the block it comes from, a gate variable by the innermost block. -/
 noncomputable def qbfMk :
-    ((mergeBlocks (B :: Bs)).ι ⊕ Σ m, NodeAt (qbfEnc B Bs φ) m) → Fin (Bs.length + 1) :=
-  fun vt => Fin.cast (consLast_length (qbfGt B Bs φ) B Bs) (markC (qbfGt B Bs φ) B Bs vt)
+    ((mergeBlocks (B :: Bs)).ι ⊕ Σ m, NodeAt (qbfEnc st B Bs φ) m) → Fin (Bs.length + 1) :=
+  fun vt => Fin.cast (consLast_length (qbfGt st B Bs φ) B Bs) (markC (qbfGt st B Bs φ) B Bs vt)
 
 /-- The interpretation of the reduction: the Tseitin encoding of the merged
 kernel, with block marks. Reducible, so that the characterizations of
@@ -298,14 +298,26 @@ kernel, with block marks. Reducible, so that the characterizations of
 @[reducible]
 noncomputable def qbfRedInterp :
     FOInterpretation (L.sum Language.order) (Language.qbf (Bs.length + 1))
-      (TseitinTag (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ))
-      (tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ)) :=
-  qbfTseitinInterp (Bs.length + 1) (qbfSwap Bs) (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ)
-    (qbfMk B Bs φ)
+      (TseitinTag (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ))
+      (tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ)) :=
+  qbfTseitinInterp (Bs.length + 1) (qbfSwap st Bs) (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ)
+    (qbfMk st B Bs φ)
 
-/-- The swap flag is the parity of the number of blocks: the matrix of
-`DescriptiveComplexity.QBF k` is disjunctive exactly when a swap is needed. -/
-theorem qbfSwap_eq (Bs : List SOBlock) : qbfSwap Bs = !((Bs.length + 1) % 2 == 1) := by
+/-- The swap flag is the parity of the number of blocks: with an existential
+outermost block, the matrix of `DescriptiveComplexity.QBF k` is disjunctive exactly when
+a swap is needed. -/
+theorem qbfSwap_true_eq (Bs : List SOBlock) :
+    qbfSwap true Bs = !((Bs.length + 1) % 2 == 1) := by
+  rw [qbfSwap, innerPol_eq]
+  rcases Nat.mod_two_eq_zero_or_one Bs.length with h | h
+  · have h1 : (Bs.length + 1) % 2 = 1 := by omega
+    rw [h, h1]; rfl
+  · have h1 : (Bs.length + 1) % 2 = 0 := by omega
+    rw [h, h1]; rfl
+
+/-- Dually, with a universal outermost block. -/
+theorem qbfSwap_false_eq (Bs : List SOBlock) :
+    qbfSwap false Bs = !((Bs.length + 1) % 2 == 0) := by
   rw [qbfSwap, innerPol_eq]
   rcases Nat.mod_two_eq_zero_or_one Bs.length with h | h
   · have h1 : (Bs.length + 1) % 2 = 1 := by omega
@@ -355,8 +367,8 @@ theorem exists_gates {M : SOBlock} (a₀ : A) (μ : M.Assignment A)
 /-- The reading of the interpreted instance: each propositional variable is
 read at its canonically padded tuple. -/
 noncomputable def qbfRd (a₀ : A) :
-    BlockRead A ((qbfRedInterp B Bs φ).Map A) (consLast (qbfGt B Bs φ) B Bs) :=
-  fun i ν a => ν (Sum.inr (splitIdx (qbfGt B Bs φ) B Bs i), pad a₀ a)
+    BlockRead A ((qbfRedInterp st B Bs φ).Map A) (consLast (qbfGt st B Bs φ) B Bs) :=
+  fun i ν a => ν (Sum.inr (splitIdx (qbfGt st B Bs φ) B Bs i), pad a₀ a)
 
 omit [LinearOrder A] in
 /-- **The innermost quantifier absorbs the gates**: quantifying the gate block
@@ -365,51 +377,51 @@ of the merged kernel. When the innermost quantifier is existential this is
 `DescriptiveComplexity.exists_gates`; when it is universal it is the same fact under the
 negation that the swapped encoding introduces. -/
 theorem qbf_inner (a₀ : A) (μ : (mergeBlocks (B :: Bs)).Assignment A) :
-    quantB (innerPol Bs.length true)
-        (fun g : (qbfGt B Bs φ).Assignment A => xorP (qbfSwap Bs)
-          (Gates μ (qbfEnc B Bs φ) (fun m q w => g ⟨m, q⟩ (pad a₀ w)) ∧
-            RealizeWith μ (qbfEnc B Bs φ) finZeroElim)) ↔
+    quantB (innerPol Bs.length st)
+        (fun g : (qbfGt st B Bs φ).Assignment A => xorP (qbfSwap st Bs)
+          (Gates μ (qbfEnc st B Bs φ) (fun m q w => g ⟨m, q⟩ (pad a₀ w)) ∧
+            RealizeWith μ (qbfEnc st B Bs φ) finZeroElim)) ↔
       RealizeWith μ ((mergeHom (B :: Bs) L).onSentence φ) finZeroElim := by
-  have hsw : qbfSwap Bs = !innerPol Bs.length true := rfl
-  cases hp : innerPol Bs.length true with
+  have hsw : qbfSwap st Bs = !innerPol Bs.length st := rfl
+  cases hp : innerPol Bs.length st with
   | false =>
-    have hswt : qbfSwap Bs = true := by rw [hsw, hp]; rfl
-    have hχ : qbfEnc B Bs φ = ∼((mergeHom (B :: Bs) L).onSentence φ) := by
+    have hswt : qbfSwap st Bs = true := by rw [hsw, hp]; rfl
+    have hχ : qbfEnc st B Bs φ = ∼((mergeHom (B :: Bs) L).onSentence φ) := by
       rw [qbfEnc, hswt]; rfl
-    have hnot : RealizeWith μ (qbfEnc B Bs φ) finZeroElim ↔
+    have hnot : RealizeWith μ (qbfEnc st B Bs φ) finZeroElim ↔
         ¬RealizeWith μ ((mergeHom (B :: Bs) L).onSentence φ) finZeroElim := by
       rw [hχ]; exact Iff.rfl
     rw [hswt]
     constructor
     · intro h
       by_contra hc
-      obtain ⟨g, hg⟩ := (exists_gates a₀ μ (qbfEnc B Bs φ)).mpr (hnot.mpr hc)
+      obtain ⟨g, hg⟩ := (exists_gates a₀ μ (qbfEnc st B Bs φ)).mpr (hnot.mpr hc)
       exact h g hg
     · intro h g hg
       exact hnot.mp hg.2 h
   | true =>
-    have hswf : qbfSwap Bs = false := by rw [hsw, hp]; rfl
-    have hχ : qbfEnc B Bs φ = (mergeHom (B :: Bs) L).onSentence φ := by
+    have hswf : qbfSwap st Bs = false := by rw [hsw, hp]; rfl
+    have hχ : qbfEnc st B Bs φ = (mergeHom (B :: Bs) L).onSentence φ := by
       rw [qbfEnc, hswf]; rfl
     rw [hswf]
-    refine (exists_gates a₀ μ (qbfEnc B Bs φ)).trans ?_
+    refine (exists_gates a₀ μ (qbfEnc st B Bs φ)).trans ?_
     rw [hχ]
 
 /-- **Correctness of the reduction**: the interpreted quantified Boolean
 formula is true exactly when the second-order sentence holds. -/
 theorem qbfRed_correct [Finite A] [Nonempty A] :
-    @DecisionProblem.Holds _ (QbfProblem (Bs.length + 1) true (!qbfSwap Bs))
-        ((qbfRedInterp B Bs φ).Map A) _ ↔
-      SORealize L A (B :: Bs) φ true := by
+    @DecisionProblem.Holds _ (QbfProblem (Bs.length + 1) st (!qbfSwap st Bs))
+        ((qbfRedInterp st B Bs φ).Map A) _ ↔
+      SORealize L A (B :: Bs) φ st := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  have hlen := consLast_length (qbfGt B Bs φ) B Bs
+  have hlen := consLast_length (qbfGt st B Bs φ) B Bs
   -- reading a propositional variable gives the assignment of its block
-  have hcast : ∀ vt, Fin.cast hlen.symm (qbfMk B Bs φ vt) = markC (qbfGt B Bs φ) B Bs vt :=
+  have hcast : ∀ vt, Fin.cast hlen.symm (qbfMk st B Bs φ vt) = markC (qbfGt st B Bs φ) B Bs vt :=
     fun _ => rfl
-  have hval : ∀ (νs : Fin (consLast (qbfGt B Bs φ) B Bs).length →
-        (qbfRedInterp B Bs φ).Map A → Prop) vt x,
+  have hval : ∀ (νs : Fin (consLast (qbfGt st B Bs φ) B Bs).length →
+        (qbfRedInterp st B Bs φ).Map A → Prop) vt x,
       qbfVal (fun j => νs (Fin.cast hlen.symm j)) (Sum.inr vt, x) ↔
-        νs (markC (qbfGt B Bs φ) B Bs vt) (Sum.inr vt, x) := by
+        νs (markC (qbfGt st B Bs φ) B Bs vt) (Sum.inr vt, x) := by
     intro νs vt x
     constructor
     · rintro ⟨j, hj, h⟩
@@ -417,102 +429,105 @@ theorem qbfRed_correct [Finite A] [Nonempty A] :
       subst hj
       exact h
     · intro h
-      exact ⟨qbfMk B Bs φ vt, (qbfT_block_var _ _ _ _ _ _ _ _).mpr rfl, h⟩
+      exact ⟨qbfMk st B Bs φ vt, (qbfT_block_var _ _ _ _ _ _ _ _).mpr rfl, h⟩
   -- the read assignment splits into the block variables and the gates
-  have hread : ∀ νs : Fin (consLast (qbfGt B Bs φ) B Bs).length →
-        (qbfRedInterp B Bs φ).Map A → Prop,
-      readAll (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) νs =
-        combineLast (qbfGt B Bs φ) B Bs
-          (fun i' a => νs (markC (qbfGt B Bs φ) B Bs (Sum.inl i'))
+  have hread : ∀ νs : Fin (consLast (qbfGt st B Bs φ) B Bs).length →
+        (qbfRedInterp st B Bs φ).Map A → Prop,
+      readAll (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) νs =
+        combineLast (qbfGt st B Bs φ) B Bs
+          (fun i' a => νs (markC (qbfGt st B Bs φ) B Bs (Sum.inl i'))
             (Sum.inr (Sum.inl i'), pad a₀ a))
-          (fun j x => νs (markC (qbfGt B Bs φ) B Bs (Sum.inr j))
+          (fun j x => νs (markC (qbfGt st B Bs φ) B Bs (Sum.inr j))
             (Sum.inr (Sum.inr j), pad a₀ x)) :=
-    fun νs => readAll_consLast (qbfGt B Bs φ) (fun {_} a => pad a₀ a) B Bs
+    fun νs => readAll_consLast (qbfGt st B Bs φ) (fun {_} a => pad a₀ a) B Bs
       (fun z u => (Sum.inr z, u)) νs
   -- the QBF matrix is the Tseitin condition at the assignment it encodes
-  have hcompat : ∀ νs : Fin (consLast (qbfGt B Bs φ) B Bs).length →
-        (qbfRedInterp B Bs φ).Map A → Prop,
-      QbfMatrix (!qbfSwap Bs) (fun j => νs (Fin.cast hlen.symm j)) ↔
-        xorP (qbfSwap Bs)
-          (Gates (atomPart (qbfGt B Bs φ) B Bs
-              (readAll (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) νs))
-            (qbfEnc B Bs φ)
-            (fun m q w => gatePart (qbfGt B Bs φ) B Bs
-              (readAll (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) νs) ⟨m, q⟩ (pad a₀ w)) ∧
-          RealizeWith (atomPart (qbfGt B Bs φ) B Bs
-              (readAll (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) νs))
-            (qbfEnc B Bs φ) finZeroElim) := by
+  have hcompat : ∀ νs : Fin (consLast (qbfGt st B Bs φ) B Bs).length →
+        (qbfRedInterp st B Bs φ).Map A → Prop,
+      QbfMatrix (!qbfSwap st Bs) (fun j => νs (Fin.cast hlen.symm j)) ↔
+        xorP (qbfSwap st Bs)
+          (Gates (atomPart (qbfGt st B Bs φ) B Bs
+              (readAll (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) νs))
+            (qbfEnc st B Bs φ)
+            (fun m q w => gatePart (qbfGt st B Bs φ) B Bs
+              (readAll (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) νs)
+              ⟨m, q⟩ (pad a₀ w)) ∧
+          RealizeWith (atomPart (qbfGt st B Bs φ) B Bs
+              (readAll (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) νs))
+            (qbfEnc st B Bs φ) finZeroElim) := by
     intro νs
-    have hatom : atomPart (qbfGt B Bs φ) B Bs
-          (readAll (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) νs) =
+    have hatom : atomPart (qbfGt st B Bs φ) B Bs
+          (readAll (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) νs) =
         padAssign a₀ (fun vt x =>
           qbfVal (fun j => νs (Fin.cast hlen.symm j)) (Sum.inr vt, x)) := by
       rw [hread νs]
-      refine (atomPart_combineLast (qbfGt B Bs φ) B Bs _ _).trans ?_
+      refine (atomPart_combineLast (qbfGt st B Bs φ) B Bs _ _).trans ?_
       exact funext fun i' => funext fun a => propext (hval νs (Sum.inl i') _).symm
-    have hgate : (fun m q w => gatePart (qbfGt B Bs φ) B Bs
-          (readAll (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) νs) ⟨m, q⟩ (pad a₀ w)) =
+    have hgate : (fun m q w => gatePart (qbfGt st B Bs φ) B Bs
+          (readAll (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) νs) ⟨m, q⟩ (pad a₀ w)) =
         padVal a₀ (fun vt x =>
           qbfVal (fun j => νs (Fin.cast hlen.symm j)) (Sum.inr vt, x)) := by
       rw [hread νs]
-      have hg := gatePart_combineLast (qbfGt B Bs φ) B Bs
-        (fun i' a => νs (markC (qbfGt B Bs φ) B Bs (Sum.inl i')) (Sum.inr (Sum.inl i'), pad a₀ a))
-        (fun j x => νs (markC (qbfGt B Bs φ) B Bs (Sum.inr j)) (Sum.inr (Sum.inr j), pad a₀ x))
+      have hg := gatePart_combineLast (qbfGt st B Bs φ) B Bs
+        (fun i' a => νs (markC (qbfGt st B Bs φ) B Bs (Sum.inl i'))
+          (Sum.inr (Sum.inl i'), pad a₀ a))
+        (fun j x => νs (markC (qbfGt st B Bs φ) B Bs (Sum.inr j))
+          (Sum.inr (Sum.inr j), pad a₀ x))
       refine funext fun m => funext fun q => funext fun w => ?_
       rw [hg]
-      change νs (markC (qbfGt B Bs φ) B Bs (Sum.inr ⟨m, q⟩))
+      change νs (markC (qbfGt st B Bs φ) B Bs (Sum.inr ⟨m, q⟩))
             (Sum.inr (Sum.inr ⟨m, q⟩), pad a₀ (pad a₀ w)) =
           qbfVal (fun j => νs (Fin.cast hlen.symm j)) (Sum.inr (Sum.inr ⟨m, q⟩), pad a₀ w)
       rw [pad_full]
       exact propext (hval νs (Sum.inr ⟨m, q⟩) _).symm
     rw [qbfMatrix_eq_xorP, hatom, hgate]
-    refine xorP_congr (qbfSwap Bs) ?_
-    refine Iff.trans (qbfT_clauses_iff (Bs.length + 1) (qbfSwap Bs) (mergeBlocks (B :: Bs))
-      (qbfEnc B Bs φ) (qbfMk B Bs φ) ha₀ (qbfVal fun j => νs (Fin.cast hlen.symm j))) ?_
-    rw [satCond_iff_gates ha₀ (arity_le_tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ))
-      (qbfEnc B Bs φ) (maxCtx_le_tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ))]
-    exact and_congr_right fun hg => gates_realize _ (qbfEnc B Bs φ) _ hg finZeroElim
+    refine xorP_congr (qbfSwap st Bs) ?_
+    refine Iff.trans (qbfT_clauses_iff (Bs.length + 1) (qbfSwap st Bs) (mergeBlocks (B :: Bs))
+      (qbfEnc st B Bs φ) (qbfMk st B Bs φ) ha₀ (qbfVal fun j => νs (Fin.cast hlen.symm j))) ?_
+    rw [satCond_iff_gates ha₀ (arity_le_tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ))
+      (qbfEnc st B Bs φ) (maxCtx_le_tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ))]
+    exact and_congr_right fun hg => gates_realize _ (qbfEnc st B Bs φ) _ hg finZeroElim
   -- the reading is surjective at every block
-  have hsurj : ReadSurj (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) :=
-    readSurj_consLast (qbfGt B Bs φ) (fun {_} a => pad a₀ a) B Bs (fun z u => (Sum.inr z, u))
+  have hsurj : ReadSurj (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) :=
+    readSurj_consLast (qbfGt st B Bs φ) (fun {_} a => pad a₀ a) B Bs (fun z u => (Sum.inr z, u))
       (fun z z' u u' h => by
         simp only [Prod.mk.injEq, Sum.inr.injEq] at h
         exact h)
       (fun i a a' h => by
-        have hb : (mergeBlocks (consLast (qbfGt B Bs φ) B Bs)).arity i ≤
-            tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ) :=
-          arity_consLast_le (qbfGt B Bs φ) (fun _ => le_rfl) B Bs
-            (arity_le_tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ)) i
+        have hb : (mergeBlocks (consLast (qbfGt st B Bs φ) B Bs)).arity i ≤
+            tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ) :=
+          arity_consLast_le (qbfGt st B Bs φ) (fun _ => le_rfl) B Bs
+            (arity_le_tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ)) i
         rw [← pref_pad a₀ hb a, ← pref_pad a₀ hb a', h])
   -- the chain
-  have h1 := (altQuant_cast (A := (qbfRedInterp B Bs φ).Map A) hlen
-    (fun νs => QbfMatrix (!qbfSwap Bs) νs) true).symm
-  have h2 := altQuant_iff_altAssign (consLast (qbfGt B Bs φ) B Bs) (qbfRd B Bs φ a₀) hsurj
-    (fun νs => QbfMatrix (!qbfSwap Bs) fun j => νs (Fin.cast hlen.symm j))
-    (fun μ => xorP (qbfSwap Bs)
-      (Gates (atomPart (qbfGt B Bs φ) B Bs μ) (qbfEnc B Bs φ)
-          (fun m q w => gatePart (qbfGt B Bs φ) B Bs μ ⟨m, q⟩ (pad a₀ w)) ∧
-        RealizeWith (atomPart (qbfGt B Bs φ) B Bs μ) (qbfEnc B Bs φ) finZeroElim))
-    hcompat true
+  have h1 := (altQuant_cast (A := (qbfRedInterp st B Bs φ).Map A) hlen
+    (fun νs => QbfMatrix (!qbfSwap st Bs) νs) st).symm
+  have h2 := altQuant_iff_altAssign (consLast (qbfGt st B Bs φ) B Bs) (qbfRd st B Bs φ a₀) hsurj
+    (fun νs => QbfMatrix (!qbfSwap st Bs) fun j => νs (Fin.cast hlen.symm j))
+    (fun μ => xorP (qbfSwap st Bs)
+      (Gates (atomPart (qbfGt st B Bs φ) B Bs μ) (qbfEnc st B Bs φ)
+          (fun m q w => gatePart (qbfGt st B Bs φ) B Bs μ ⟨m, q⟩ (pad a₀ w)) ∧
+        RealizeWith (atomPart (qbfGt st B Bs φ) B Bs μ) (qbfEnc st B Bs φ) finZeroElim))
+    hcompat st
   refine h1.trans (h2.trans ?_)
-  refine Iff.trans (altAssign_consLast (qbfGt B Bs φ) B Bs _ true) ?_
-  refine Iff.trans (altAssign_congr (B :: Bs) _ _ (fun μ => ?_) true)
-    (sorealize_iff_altAssign (B :: Bs) L A inferInstance φ true).symm
-  refine Iff.trans (iff_of_eq (congrArg (quantB (innerPol Bs.length true))
+  refine Iff.trans (altAssign_consLast (qbfGt st B Bs φ) B Bs _ st) ?_
+  refine Iff.trans (altAssign_congr (B :: Bs) _ _ (fun μ => ?_) st)
+    (sorealize_iff_altAssign (B :: Bs) L A inferInstance φ st).symm
+  refine Iff.trans (iff_of_eq (congrArg (quantB (innerPol Bs.length st))
     (funext fun g => by rw [atomPart_combineLast, gatePart_combineLast]))) ?_
-  exact (qbf_inner B Bs φ a₀ μ).trans (realize_eq_realizeWith μ _).symm
+  exact (qbf_inner st B Bs φ a₀ μ).trans (realize_eq_realizeWith μ _).symm
 
 /-- **The generic marked Tseitin reduction**: an ordered first-order reduction
 to a quantified Boolean formula problem, from any problem defined on nonempty
 finite structures by a second-order sentence with a nonempty prefix. -/
 noncomputable def qbfReduction (Q : DecisionProblem L)
     (hφ : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
-      Q A ↔ SORealize L A (B :: Bs) φ true) :
-    Q ≤ᶠᵒ[≤] QbfProblem (Bs.length + 1) true (!qbfSwap Bs) where
-  Tag := TseitinTag (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ)
-  dim := tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc B Bs φ)
-  toInterpretation := qbfRedInterp B Bs φ
-  correct A _ _ _ _ := (hφ A).trans (qbfRed_correct B Bs φ).symm
+      Q A ↔ SORealize L A (B :: Bs) φ st) :
+    Q ≤ᶠᵒ[≤] QbfProblem (Bs.length + 1) st (!qbfSwap st Bs) where
+  Tag := TseitinTag (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ)
+  dim := tseitinDim (mergeBlocks (B :: Bs)) (qbfEnc st B Bs φ)
+  toInterpretation := qbfRedInterp st B Bs φ
+  correct A _ _ _ _ := (hφ A).trans (qbfRed_correct st B Bs φ).symm
 
 end Correct
 
@@ -538,10 +553,32 @@ theorem qbf_hard_of_sigmaSODefinable (k : ℕ) :
   | nil => exact absurd hlen (by simp)
   | cons B Bs' =>
     obtain rfl : Bs'.length = k := by simpa using hlen
-    have hm : QBF (Bs'.length + 1) = QbfProblem (Bs'.length + 1) true (!qbfSwap Bs') := by
-      rw [QBF, qbfSwap_eq, Bool.not_not]
+    have hm : QBF (Bs'.length + 1) = QbfProblem (Bs'.length + 1) true (!qbfSwap true Bs') := by
+      rw [QBF, qbfSwap_true_eq, Bool.not_not]
     rw [hm]
-    exact ⟨qbfReduction B Bs' φ Q hφ⟩
+    exact ⟨qbfReduction true B Bs' φ Q hφ⟩
 
+/-- **Hardness of the dual**: every problem definable by a second-order
+sentence with `k + 1` alternating blocks starting *universally* admits an
+ordered first-order reduction to `DescriptiveComplexity.QBFPi (k + 1)`.
+
+This is the same construction at the other starting polarity. The parity of
+the matrix flips with it: the innermost quantifier of a universally-starting
+prefix of `k + 1` blocks is existential exactly when `k + 1` is *even*, so
+`QBFPi k` takes a conjunctive matrix for even `k` and a disjunctive one for
+odd `k` – the mirror image of `DescriptiveComplexity.QBF`. -/
+theorem qbfPi_hard_of_piSODefinable (k : ℕ) :
+    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+      PiSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] QBFPi (k + 1)) := by
+  rintro L Q ⟨Bs, hlen, φ, hφ⟩
+  cases Bs with
+  | nil => exact absurd hlen (by simp)
+  | cons B Bs' =>
+    obtain rfl : Bs'.length = k := by simpa using hlen
+    have hm : QBFPi (Bs'.length + 1) =
+        QbfProblem (Bs'.length + 1) false (!qbfSwap false Bs') := by
+      rw [QBFPi, qbfSwap_false_eq, Bool.not_not]
+    rw [hm]
+    exact ⟨qbfReduction false B Bs' φ Q hφ⟩
 
 end DescriptiveComplexity

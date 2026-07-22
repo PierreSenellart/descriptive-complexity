@@ -50,12 +50,15 @@ uses the dual, disjunctive matrix, for which
 `DescriptiveComplexity.dnfSat_iff_not_cnfSatWith_true` turns the innermost universal
 quantifier back into an existential one over the gates.
 
-Both halves are complete: `DescriptiveComplexity.QBF_complete` states that `QBF (k + 1)`
-is `Σₖ₊₁ᵖ`-complete for every `k`, and at `k = 0` it specializes to a second
-proof of NP-completeness of a SAT-like problem
-(`DescriptiveComplexity.QBF_one_NP_complete`). Like the rest of the library the
-development is axiom-free: `#print axioms` reports only `propext`,
-`Classical.choice` and `Quot.sound`.
+Both halves are complete, for both families: `DescriptiveComplexity.QBF_complete` states
+that `QBF (k + 1)` is `Σₖ₊₁ᵖ`-complete and `DescriptiveComplexity.QBFPi_complete` that
+`QBFPi (k + 1)` is `Πₖ₊₁ᵖ`-complete, for every `k`. The two use the *same*
+reduction, `DescriptiveComplexity.qbfReduction`, which is parameterized by the starting
+polarity; only the parity of the matrix flips with it. At `k = 0` they
+specialize to NP- and coNP-completeness
+(`DescriptiveComplexity.QBF_one_NP_complete`, `DescriptiveComplexity.QBFPi_one_coNP_complete`).
+Like the rest of the library the development is axiom-free: `#print axioms`
+reports only `propext`, `Classical.choice` and `Quot.sound`.
 -/
 
 namespace DescriptiveComplexity
@@ -94,6 +97,24 @@ theorem QBF_complete (k : ℕ) : (SigmaP (k + 1)).Complete (QBF (k + 1)) :=
 /-- QBF is `Σₖ₊₁ᵖ`-hard. -/
 theorem qbf_hard (k : ℕ) : (SigmaP (k + 1)).Hard (QBF (k + 1)) :=
   (QBF_complete k).hard
+
+/-- **The dual family is `Πₖ₊₁ᵖ`-complete**: `QBFPi (k + 1)`, with a universal
+outermost block, is complete for `Πₖ₊₁ᵖ`. Membership is
+`DescriptiveComplexity.qbfPi_mem_piP`; hardness is
+`DescriptiveComplexity.qbfPi_hard_of_piSODefinable`, the same marked Tseitin discharge at
+the other starting polarity. -/
+theorem QBFPi_complete (k : ℕ) : (PiP (k + 1)).Complete (QBFPi (k + 1)) :=
+  ⟨qbfPi_mem_piP k,
+    (hard_piP_succ_iff k (QBFPi (k + 1))).mpr fun Q hQ =>
+      qbfPi_hard_of_piSODefinable k Q hQ⟩
+
+/-- `QBFPi` is `Πₖ₊₁ᵖ`-hard. -/
+theorem qbfPi_hard (k : ℕ) : (PiP (k + 1)).Hard (QBFPi (k + 1)) :=
+  (QBFPi_complete k).hard
+
+/-- QBF with one universal block is coNP-complete. -/
+theorem QBFPi_one_coNP_complete : coNP.Complete (QBFPi 1) :=
+  QBFPi_complete 0
 
 /-- QBF with one block and a conjunctive matrix is NP-complete – it is
 essentially SAT with all variables marked. -/
