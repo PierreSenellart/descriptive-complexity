@@ -48,32 +48,15 @@ end ThreeSat
 
 section Iso
 
-private theorem comp_vec₁ {A B : Type} (f : A → B) (a : A) : f ∘ ![a] = ![f a] := by
-  funext j
-  fin_cases j
-  simp
-
-private theorem comp_vec₂ {A B : Type} (f : A → B) (a b : A) : f ∘ ![a, b] = ![f a, f b] := by
-  funext j
-  fin_cases j <;> simp
-
 /-- Isomorphisms preserve literal occurrences. -/
 private theorem occIn_map {A B : Type} [Language.sat.Structure A] [Language.sat.Structure B]
     (e : A ≃[Language.sat] B) {c x : A} {s : Bool} (h : OccIn c x s) : OccIn (e c) (e x) s := by
   obtain ⟨hc, hs⟩ := h
   constructor
-  · have h' := StrongHomClass.map_rel e satIsClause ![c]
-    rw [comp_vec₁] at h'
-    exact h'.mpr hc
+  · exact (relMap_equiv₁ e satIsClause c).mp hc
   · cases s with
-    | false =>
-      have h' := StrongHomClass.map_rel e satNegIn ![c, x]
-      rw [comp_vec₂] at h'
-      exact h'.mpr hs
-    | true =>
-      have h' := StrongHomClass.map_rel e satPosIn ![c, x]
-      rw [comp_vec₂] at h'
-      exact h'.mpr hs
+    | false => exact (relMap_equiv₂ e satNegIn c x).mp hs
+    | true => exact (relMap_equiv₂ e satPosIn c x).mp hs
 
 private theorem widthAtMostThree_of_iso {A B : Type} [Language.sat.Structure A]
     [Language.sat.Structure B] (e : A ≃[Language.sat] B) (h : WidthAtMostThree A) :

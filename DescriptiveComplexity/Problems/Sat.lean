@@ -87,35 +87,18 @@ end Sat
 
 section Iso
 
-private theorem comp_vec₁ {A B : Type} (f : A → B) (a : A) : f ∘ ![a] = ![f a] := by
-  funext j
-  fin_cases j
-  simp
-
-private theorem comp_vec₂ {A B : Type} (f : A → B) (a b : A) : f ∘ ![a, b] = ![f a, f b] := by
-  funext j
-  fin_cases j <;> simp
-
 private theorem satisfiable_of_iso {A B : Type} [Language.sat.Structure A]
     [Language.sat.Structure B] (e : A ≃[Language.sat] B) (h : Satisfiable A) :
     Satisfiable B := by
   obtain ⟨ν, hν⟩ := h
   refine ⟨fun b => ν (e.symm b), fun c hc => ?_⟩
-  have hc' : RelMap satIsClause ![e.symm c] := by
-    have h' := StrongHomClass.map_rel e.symm satIsClause ![c]
-    rw [comp_vec₁] at h'
-    exact h'.mpr hc
-  obtain ⟨x, hx⟩ := hν (e.symm c) hc'
+  obtain ⟨x, hx⟩ := hν (e.symm c) ((relMap_equiv₁ e.symm satIsClause c).mp hc)
   refine ⟨e x, ?_⟩
   rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
   · refine Or.inl ⟨?_, by simpa using hT⟩
-    have h' := (StrongHomClass.map_rel e satPosIn ![e.symm c, x]).mpr hp
-    rw [comp_vec₂] at h'
-    simpa using h'
+    simpa using (relMap_equiv₂ e satPosIn (e.symm c) x).mp hp
   · refine Or.inr ⟨?_, by simpa using hT⟩
-    have h' := (StrongHomClass.map_rel e satNegIn ![e.symm c, x]).mpr hn
-    rw [comp_vec₂] at h'
-    simpa using h'
+    simpa using (relMap_equiv₂ e satNegIn (e.symm c) x).mp hn
 
 /-- Satisfiability is isomorphism-invariant. -/
 theorem satisfiable_iso {A B : Type} [Language.sat.Structure A] [Language.sat.Structure B]

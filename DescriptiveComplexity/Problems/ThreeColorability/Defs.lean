@@ -38,19 +38,12 @@ def ThreeColorable : Prop :=
 
 end Graph
 
-private theorem comp_vec₂ {A B : Type} (f : A → B) (a b : A) : f ∘ ![a, b] = ![f a, f b] := by
-  funext j
-  fin_cases j <;> simp
-
 private theorem threeColorable_of_iso {A B : Type} [Language.graph.Structure A]
     [Language.graph.Structure B] (e : A ≃[Language.graph] B) (h : ThreeColorable A) :
     ThreeColorable B := by
   obtain ⟨c, hc⟩ := h
   refine ⟨fun b => c (e.symm b), fun x y hxy => ?_⟩
-  refine hc (e.symm x) (e.symm y) ?_
-  have h' := StrongHomClass.map_rel e.symm adj ![x, y]
-  rw [comp_vec₂] at h'
-  exact h'.mpr hxy
+  exact hc (e.symm x) (e.symm y) ((relMap_equiv₂ e.symm adj x y).mp hxy)
 
 /-- 3-colorability is isomorphism-invariant. -/
 theorem threeColorable_iso {A B : Type} [Language.graph.Structure A]

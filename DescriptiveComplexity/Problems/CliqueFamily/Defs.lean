@@ -242,28 +242,15 @@ end Problems
 
 section Iso
 
-private theorem comp_vec₁ {A B : Type} (f : A → B) (a : A) : f ∘ ![a] = ![f a] := by
-  funext j
-  fin_cases j
-  simp
-
-private theorem comp_vec₂ {A B : Type} (f : A → B) (a b : A) : f ∘ ![a, b] = ![f a, f b] := by
-  funext j
-  fin_cases j <;> simp
-
 variable {A B : Type} [Language.markedGraph.Structure A] [Language.markedGraph.Structure B]
 
 private theorem mgAdj_map (e : A ≃[Language.markedGraph] B) (a b : A) :
-    MGAdj a b ↔ MGAdj (e a) (e b) := by
-  have h := StrongHomClass.map_rel e mgAdj ![a, b]
-  rw [comp_vec₂] at h
-  exact h.symm
+    MGAdj a b ↔ MGAdj (e a) (e b) :=
+  relMap_equiv₂ e mgAdj a b
 
 private theorem mgMarked_map (e : A ≃[Language.markedGraph] B) (a : A) :
-    MGMarked a ↔ MGMarked (e a) := by
-  have h := StrongHomClass.map_rel e mgMarked ![a]
-  rw [comp_vec₁] at h
-  exact h.symm
+    MGMarked a ↔ MGMarked (e a) :=
+  relMap_equiv₁ e mgMarked a
 
 /-- The clique threshold property is isomorphism-invariant. -/
 theorem hasLargeClique_iso (e : A ≃[Language.markedGraph] B) :
