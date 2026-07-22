@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import Mathlib.ModelTheory.Semantics
 import Mathlib.ModelTheory.Complexity
+import Mathlib.Tactic.FinCases
 
 /-!
 # First-order interpretations and FO reductions
@@ -98,6 +99,42 @@ theorem ext {P Q : DecisionProblem L} (h : ∀ (A : Type) [L.Structure A], P A �
   rfl
 
 end DecisionProblem
+
+/-! ### Transport of relations along isomorphisms
+
+Proving the `iso_invariant` field of a `DecisionProblem` always starts the
+same way: the semantic property is phrased in terms of `RelMap r ![a]` /
+`RelMap r ![a, b]`, and one must know that these transport along an
+`L`-isomorphism. The two lemmas below package this step once and for all
+(`Mathlib`'s `StrongHomClass.map_rel` states it with `e ∘ ![a, b]`, which
+must first be normalized to `![e a, e b]`). -/
+
+section RelMapTransport
+
+variable {L} {A B : Type} [L.Structure A] [L.Structure B]
+
+/-- A unary relation transports along an `L`-isomorphism. -/
+theorem relMap_equiv₁ (e : A ≃[L] B) (r : L.Relations 1) (a : A) :
+    RelMap r ![a] ↔ RelMap r ![e a] := by
+  have h := StrongHomClass.map_rel e r ![a]
+  have hv : e ∘ ![a] = ![e a] := by
+    funext j
+    fin_cases j
+    simp
+  rw [hv] at h
+  exact h.symm
+
+/-- A binary relation transports along an `L`-isomorphism. -/
+theorem relMap_equiv₂ (e : A ≃[L] B) (r : L.Relations 2) (a b : A) :
+    RelMap r ![a, b] ↔ RelMap r ![e a, e b] := by
+  have h := StrongHomClass.map_rel e r ![a, b]
+  have hv : e ∘ ![a, b] = ![e a, e b] := by
+    funext j
+    fin_cases j <;> simp
+  rw [hv] at h
+  exact h.symm
+
+end RelMapTransport
 
 /-- A *tagged `dim`-dimensional first-order interpretation* of the relational
 language `L'` in the language `L`. It maps an `L`-structure `A` to the

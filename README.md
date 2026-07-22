@@ -42,7 +42,10 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     between problems, i.e. interpretations mapping yes-instances exactly to
     yes-instances;
   - `DescriptiveComplexity.FOInterpretation.map_finite`: finite structures map to finite
-    structures.
+    structures;
+  - `DescriptiveComplexity.relMap_equiv₁`/`relMap_equiv₂`: transport of unary/binary
+    relations along isomorphisms, the common first step of every
+    `DecisionProblem.iso_invariant` proof.
 * `DescriptiveComplexity/Problems/` — the problem catalog, one file (or directory) per
   problem, each holding vocabulary, semantic definition, the bundled
   `DecisionProblem`, its FO reductions and its completeness theorems
@@ -90,6 +93,23 @@ the input structure to thread each clause's OR-gadget chain). SAT and
     quantifier-free;
   - `DescriptiveComplexity.SimpleGraph.colorable_iff_satisfiable`: the corollary for
     Mathlib simple graphs.
+* `DescriptiveComplexity/Examples/` — tutorial-style worked examples, each
+  walking through the full recipe for adding a new problem domain
+  (vocabulary → semantics → invariance → membership → hardness →
+  completeness) and meant to be read top to bottom as a template
+  (`DescriptiveComplexity/Examples.lean` is the umbrella):
+  - `Examples/ConjunctiveQueries.lean`: Boolean conjunctive queries over
+    relational databases — evaluation and containment, both NP-complete
+    (Chandra & Merlin, STOC 1977). The Chandra–Merlin homomorphism theorem
+    (`DescriptiveComplexity.queryContained_iff_hom`) is proved from a semantic,
+    ∀-databases definition of containment and powers the two reductions
+    between containment and evaluation; the hardness source is 3COL
+    (`ThreeCol ≤ᶠᵒ CQEval`, quantifier-free). All three reductions are
+    order-free and one-dimensional. A concrete bridge
+    (`DescriptiveComplexity.concreteQueryHolds_iff_queryHolds`) ties the structural
+    encoding to actual Lean data — queries as lists of atoms over
+    variables-or-constants, databases as lists of facts — proving the
+    abstract semantics faithful to the textbook one.
 * `DescriptiveComplexity/Complexity.lean` — abstract complexity:
   - `DescriptiveComplexity.ComplexityClass`: abstract complexity classes (membership
     `P ∈ 𝒞`, hardness `𝒞.Hard P`, completeness `𝒞.Complete P`, inclusion
