@@ -1,0 +1,62 @@
+name: Documentation
+
+# The site hosts the docs of the latest release only (single-version, in line
+# with the no-backport version scheme in PACKAGING.md): each release
+# overwrites it. The build is heavy – doc-gen4 covers the whole import closure,
+# Mathlib included – so it runs on releases and on demand only, never per-PR.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Grant the GITHUB_TOKEN the permissions required to deploy to GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent Pages deployment; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the API documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install elan/Lean, fetch the Mathlib cache and build the library, so
+      # that ../.lake/packages (shared with docbuild via packagesDir) is ready.
+      # Plain (auto-config) usage guarantees `lake exe cache get` runs – without
+      # the cache the doc build would recompile all of Mathlib from source.
+      - name: Build the library
+        uses: leanprover/lean-action@v1
+
+      # Pin/resolve doc-gen4 in the nested docbuild project and generate docs.
+      # MATHLIB_NO_CACHE_ON_UPDATE=1 works around a Mathlib caching issue on
+      # `lake update` (doc-gen4 README).
+      - name: Build the documentation
+        run: |
+          cd docbuild
+          MATHLIB_NO_CACHE_ON_UPDATE=1 lake update doc-gen4
+          lake build DescriptiveComplexity:docs
+
+      - name: Upload the Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docbuild/.lake/build/doc
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

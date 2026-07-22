@@ -1,0 +1,16 @@
+name = "docbuild"
+reservoir = false
+version = "0.1.0"
+packagesDir = "../.lake/packages"
+
+# Keep doc-gen4 pinned to the tag matching the toolchain (`lean-toolchain`).
+# When moving to a new Lean version, bump this `rev` together with the two
+# `lean-toolchain` files and the Mathlib pin in `../lakefile.lean`.
+[[require]]
+scope = "leanprover"
+name = "doc-gen4"
+rev = "v4.33.0-rc1"
+
+[[require]]
+name = "descriptive-complexity"
+path = "../"
