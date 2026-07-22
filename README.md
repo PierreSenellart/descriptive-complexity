@@ -25,145 +25,40 @@ quantifier-free reduction 3COL → SAT, and an ordered FO reduction SAT → 3COL
 the input structure to thread each clause's OR-gadget chain). SAT and
 3-colorability are thus FO-interreducible.
 
-## Contents
+## Overview
 
-* `DescriptiveComplexity/Interpretation.lean` – the framework:
-  - `DescriptiveComplexity.DecisionProblem L`: a decision problem as an
-    isomorphism-invariant property of `L`-structures (invariance is part of
-    the notion, as in descriptive complexity);
-  - `DescriptiveComplexity.FOInterpretation L L' Tag dim`: tagged `dim`-dimensional
-    first-order interpretations of a relational language `L'` in `L`, sending
-    an `L`-structure `A` to an `L'`-structure `I.Map A` on `Tag × A^dim`
-    (tags replace the linear order used by textbook FO reductions to encode
-    constantly many sorts of elements);
-  - `DescriptiveComplexity.FOInterpretation.IsQuantifierFree`: quantifier-free
-    interpretations;
-  - `DescriptiveComplexity.FOReduction P Q`, with notation `P ≤ᶠᵒ Q`: FO reductions
-    between problems, i.e. interpretations mapping yes-instances exactly to
-    yes-instances;
-  - `DescriptiveComplexity.FOInterpretation.map_finite`: finite structures map to finite
-    structures;
-  - `DescriptiveComplexity.relMap_equiv₁`/`relMap_equiv₂`: transport of unary/binary
-    relations along isomorphisms, the common first step of every
-    `DecisionProblem.iso_invariant` proof.
-* `DescriptiveComplexity/Problems/` – the problem catalog, one file (or directory) per
-  problem, each holding vocabulary, semantic definition, the bundled
-  `DecisionProblem`, its FO reductions and its completeness theorems
-  (`DescriptiveComplexity/Problems.lean` is the umbrella):
-  - `Problems/Sat.lean`: the language `FirstOrder.Language.sat` of CNF
-    instances (`isClause`, `posIn`, `negIn`), satisfiability
-    `DescriptiveComplexity.Satisfiable`, the problem `DescriptiveComplexity.SAT`, and the
-    Cook–Levin theorem `DescriptiveComplexity.SAT_NP_complete` with its corollaries
-    (`sat_mem_NP`, `sat_NP_hard`, `sat_compl_mem_coNP`);
-  - `Problems/ThreeColorability/Defs.lean`: 3-colorability
-    `DescriptiveComplexity.ThreeColorable` over Mathlib's `FirstOrder.Language.graph`
-    and the problem `DescriptiveComplexity.ThreeCol`, shown to agree with Mathlib's
-    `SimpleGraph.Colorable 3` on simple graphs.
-* `DescriptiveComplexity/Composition.lean` – transitivity:
-  - `DescriptiveComplexity.FOInterpretation.pull`: pullback of a formula through an
-    interpretation (quantifiers over the interpreted universe become finite
-    conjunctions over tags of blocks of quantifiers);
-  - `DescriptiveComplexity.FOInterpretation.comp`: composition of FO interpretations,
-    with `compLEquiv` identifying the composite universe with the
-    twice-interpreted one;
-  - `DescriptiveComplexity.FOReduction.refl` and `DescriptiveComplexity.FOReduction.trans`:
-    FO reducibility is reflexive (identity interpretation) and transitive,
-    with a `Trans` instance for `calc` chains and a `Preorder` instance on
-    `DecisionProblem L` (for relational `L`) where `P ≤ Q` is the
-    propositional truncation `Nonempty (P ≤ᶠᵒ Q)`.
-* `DescriptiveComplexity/Ordered.lean` – ordered machinery:
-  - an `(L.sum Language.order).Structure` instance on linearly ordered
-    `L`-structures, and `DescriptiveComplexity.OrderedFOReduction P Q`, with notation
-    `P ≤ᶠᵒ[≤] Q`: FO reductions over the ordered expansion of the source
-    language, correct for every finite linearly ordered input structure
-    (i.e. order-invariant FO(≤) reductions, the standard notion of
-    descriptive complexity).
-* `DescriptiveComplexity/Problems/ThreeColorability/ToSat.lean` – the reduction
-  3COL ⟶ SAT:
-  - `DescriptiveComplexity.threeColToSat`: the classical CNF encoding of 3-colorability
-    (variables `xᵤᵢ` “vertex `u` gets color `i`”; per-vertex clauses
-    `xᵤ₀ ∨ xᵤ₁ ∨ xᵤ₂`; per-edge, per-color clauses `¬xᵤᵢ ∨ ¬xᵥᵢ`) as a
-    2-dimensional interpretation with 7 tags;
-  - `DescriptiveComplexity.threeColorable_iff_satisfiable`: correctness, for
-    arbitrary (not necessarily finite, simple or undirected) graph
-    structures;
-  - `DescriptiveComplexity.threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT` – the
-    `fo_reduction` theorem;
-  - `DescriptiveComplexity.threeColToSat_isQuantifierFree`: the reduction is even
-    quantifier-free;
-  - `DescriptiveComplexity.SimpleGraph.colorable_iff_satisfiable`: the corollary for
-    Mathlib simple graphs.
-* `DescriptiveComplexity/Examples/` – tutorial-style worked examples, each
-  walking through the full recipe for adding a new problem domain
-  (vocabulary → semantics → invariance → membership → hardness →
-  completeness) and meant to be read top to bottom as a template
-  (`DescriptiveComplexity/Examples.lean` is the umbrella):
-  - `Examples/ConjunctiveQueries.lean`: Boolean conjunctive queries over
-    relational databases – evaluation and containment, both NP-complete
-    (Chandra & Merlin, STOC 1977). The Chandra–Merlin homomorphism theorem
-    (`DescriptiveComplexity.queryContained_iff_hom`) is proved from a semantic,
-    ∀-databases definition of containment and powers the two reductions
-    between containment and evaluation; the hardness source is 3COL
-    (`ThreeCol ≤ᶠᵒ CQEval`, quantifier-free). All three reductions are
-    order-free and one-dimensional. A concrete bridge
-    (`DescriptiveComplexity.concreteQueryHolds_iff_queryHolds`) ties the structural
-    encoding to actual Lean data – queries as lists of atoms over
-    variables-or-constants, databases as lists of facts – proving the
-    abstract semantics faithful to the textbook one.
-* `DescriptiveComplexity/Complexity.lean` – abstract complexity:
-  - `DescriptiveComplexity.ComplexityClass`: abstract complexity classes (membership
-    `P ∈ 𝒞`, hardness `𝒞.Hard P`, completeness `𝒞.Complete P`, inclusion
-    `𝒞 ⊆ 𝒟`), closed by definition under (ordered) FO reductions – closure
-    is part of the structure since an axiom over all classes would be
-    inconsistent; membership and hardness moreover only depend on the
-    *finite* instances of a problem (`mem_congr_finite`/`hard_congr_finite`),
-    making explicit that complexity statements say nothing about infinite
-    structures;
-  - the polynomial hierarchy, *defined* by second-order quantifier
-    alternation (`DescriptiveComplexity/Hierarchy.lean`): `SigmaP k`/`PiP k`
-    for `k ≥ 1` with `NP := SigmaP 1` and `coNP := PiP 1`, the level
-    inclusions, `Πₖᵖ` = complements (`Pᶜ`) of `Σₖᵖ`, and `PH`; level 0
-    (polynomial time) is left as an empty placeholder class – no known
-    order-free logic captures PTIME – so the library declares no axioms:
-    `#print axioms` shows nothing beyond Lean's built-in `propext`,
-    `Classical.choice` and `Quot.sound`;
-  - the Cook–Levin theorem and per-problem completeness theorems live with
-    their problems under `DescriptiveComplexity/Problems/`; in particular
-    **`DescriptiveComplexity.threeCol_NP_complete : NP.Complete ThreeCol`**
-    (`Problems/ThreeColorability.lean`) – NP-completeness of 3-colorability
-    from the two FO reductions, with no machine model.
-* `DescriptiveComplexity/OccurrenceOrder.lean`,
-  `DescriptiveComplexity/Problems/ThreeColorability/SatGadget.lean`,
-  `DescriptiveComplexity/Problems/ThreeColorability/FromSat.lean` – the reverse
-  reduction SAT ⟶ 3COL:
-  - literal occurrences of a clause and their traversal along the order
-    (first/last occurrence, immediate predecessor), with existence lemmas on
-    finite universes;
-  - the gadget graph (palette triangle with copy-rigidity, literal vertices,
-    per-occurrence OR-gate chains, unit-clause forcing, empty-clause
-    spoiler) and the combinatorial proof
-    `SatToCol.satisfiable_iff_gadColoring` that it is 3-colorable iff the
-    CNF is satisfiable;
-  - FO(≤) formulas defining the gadget graph, their realization lemmas, and
-    `DescriptiveComplexity.sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol` –
-    the reverse `fo_reduction` theorem.
+The library is organized in three layers:
 
-## Notes
+* **A reduction framework** over `ModelTheory`: decision problems as
+  isomorphism-invariant properties of finite structures, tagged first-order
+  interpretations between languages, and FO reductions `≤ᶠᵒ` – with their
+  order-invariant variant `≤ᶠᵒ[≤]` for gadgets that genuinely need a linear
+  order – closed under composition.
+* **An abstract complexity layer**: complexity classes closed under FO
+  reductions, and the polynomial hierarchy *defined* logically by second-order
+  quantifier alternation (`NP = Σ₁ᵖ`, with the level inclusions and the
+  duality `Πₖᵖ = co-Σₖᵖ` as theorems). Polynomial time is left undefined, so
+  the library declares no axioms.
+* **A problem catalog and worked examples**: SAT (with a machine-free
+  Cook–Levin theorem), 3-colorability, 3SAT and the clique family
+  (Clique / Independent Set / Vertex Cover), plus a tutorial on conjunctive
+  queries – each with its vocabulary, FO reductions and completeness theorems.
 
-* The direction 3COL → SAT is order-free and even quantifier-free; the gadget
-  direction SAT → 3COL is *not* FO-expressible without a linear order on the
-  input structure (clauses of unbounded width require an ordered traversal),
-  so it is formalized as an ordered (order-invariant) FO reduction, correct
-  for every finite linearly ordered input. Natural next steps: a catalog of
-  classical NP-complete problems with their FO reductions (3SAT, Vertex
-  Cover, Clique, Independent Set…), composition involving ordered
-  reductions, and `BIT`/arithmetic on ordered structures (under which SAT is
-  complete for NP under FO reductions, Immerman).
-* Junk elements of the interpreted universe (tags with non-diagonal or
-  non-edge tuples) are excluded from all relations by the defining formulas,
-  so no domain formula is needed.
+## Documentation
+
+* **API reference**:
+  <https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html>
+  – the `DescriptiveComplexity` module page is a part-by-part map of the
+  library, and every declaration is documented on its own page.
+* **Tutorial**: `DescriptiveComplexity/Examples/ConjunctiveQueries.lean` is a
+  worked example read top to bottom – it walks through adding a new problem
+  domain (vocabulary → semantics → invariance → membership → hardness →
+  completeness) and is meant to serve as a template.
 
 ## Building
+
+The library tracks a stable Mathlib release; the toolchain in `lean-toolchain`
+must match the pinned Mathlib version.
 
 ```
 lake exe cache get   # fetch Mathlib build cache

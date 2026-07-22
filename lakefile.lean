@@ -6,6 +6,8 @@ package "descriptive-complexity" where
   description := "Descriptive complexity in Lean 4: machine-model-free NP-completeness via first-order reductions, and the polynomial hierarchy via second-order alternation"
   keywords := #["complexity", "descriptive complexity", "model theory",
     "NP-completeness", "reductions"]
+  homepage := "https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html"
+  license := "Apache-2.0"
   leanOptions := #[
     ⟨`pp.unicode.fun, true⟩, -- pretty-prints `fun a ↦ b`
     ⟨`relaxedAutoImplicit, false⟩,
