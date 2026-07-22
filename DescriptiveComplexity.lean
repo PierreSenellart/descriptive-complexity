@@ -24,17 +24,16 @@ import DescriptiveComplexity.Examples
 
 A library for descriptive complexity built on Mathlib's `ModelTheory`:
 machine-model-free hardness reductions and a logically-defined polynomial
-hierarchy, in the style of [Immerman, *Descriptive
-Complexity*][immerman1999descriptive].
+hierarchy, in the style of Immerman's *Descriptive Complexity*
+([Immerman 1999][immerman1999descriptive]).
 
 Complexity theory is largely absent from Mathlib because formalizing a model
 of computation with resource bounds is hard. The observation this library
 rests on is that many classical NP-hardness reductions do not need the full
 strength of a Turing machine: they are *first-order expressible*. An FO
 reduction is computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so exhibiting one is
-strictly stronger than exhibiting a Karp
-reduction [Karp, *Reducibility among combinatorial
-problems*][karp1972reducibility], while needing no machine model at all –
+strictly stronger than exhibiting a Karp reduction
+([Karp 1972][karp1972reducibility]), while needing no machine model at all –
 only first-order logic, which Mathlib already provides.
 
 This page is the high-level map of the library, part by part. The `README`
@@ -77,16 +76,14 @@ individual declarations are documented on their own pages.
   existential/universal second-order definability with `k` quantifier-block
   alternations.
 * `DescriptiveComplexity.Hierarchy` – the levels `Σₖᵖ`/`Πₖᵖ` and `PH` as
-  complexity classes, via Fagin's [Fagin, *Generalized first-order spectra and
-  polynomial-time recognizable sets*][fagin1974generalized] and Stockmeyer's
-  [Stockmeyer, *The polynomial-time hierarchy*][stockmeyer1976polynomial]
-  theorems. The level inclusions and the duality `Πₖᵖ = co-Σₖᵖ` are proved,
+  complexity classes, via Fagin's ([Fagin 1974][fagin1974generalized]) and
+  Stockmeyer's ([Stockmeyer 1976][stockmeyer1976polynomial]) theorems. The
+  level inclusions and the duality `Πₖᵖ = co-Σₖᵖ` are proved,
   not assumed. Level 0 – polynomial time – is deliberately left as the *empty
   placeholder* class: no order-free logic is known to capture PTIME, and the
-  ordered Immerman–Vardi characterization `P = FO(LFP)` [Immerman, *Relational
-  queries computable in polynomial time*][immerman1986relational]; [Vardi,
-  *The complexity of relational query languages*][vardi1982complexity] would
-  require fixpoint logic and a built-in order. As a result the library
+  ordered Immerman–Vardi characterization `P = FO(LFP)`
+  ([Immerman 1986][immerman1986relational]; [Vardi 1982][vardi1982complexity])
+  would require fixpoint logic and a built-in order. As a result the library
   declares **no axioms** (check with `#print axioms`).
 
 ## Shared encodings
@@ -100,9 +97,8 @@ individual declarations are documented on their own pages.
 ## The problem catalog
 
 * `DescriptiveComplexity.Problems` – one decision problem per file: SAT with
-  the Cook–Levin theorem [Cook, *The complexity of theorem-proving
-  procedures*][cook1971complexity]; [Levin, *Universal sequential search
-  problems*][levin1973universal] proved by a machine-free Tseitin discharge,
+  the Cook–Levin theorem ([Cook 1971][cook1971complexity];
+  [Levin 1973][levin1973universal]) proved by a machine-free Tseitin discharge,
   3-colorability (FO-interreducible with SAT in both directions), 3SAT, and
   the clique family (Clique, Independent Set, Vertex Cover) with their
   inter-reductions and NP-completeness.
@@ -112,7 +108,6 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.Examples` – tutorial-style, domain-specific
   walkthroughs of the full recipe (vocabulary → semantics → invariance →
   membership → hardness → completeness). Currently Boolean conjunctive
-  queries – evaluation and containment, both NP-complete via
-  Chandra–Merlin [Chandra & Merlin, *Optimal implementation of conjunctive
-  queries in relational data bases*][chandra1977optimal].
+  queries – evaluation and containment, both NP-complete via Chandra–Merlin
+  ([Chandra & Merlin 1977][chandra1977optimal]).
 -/
