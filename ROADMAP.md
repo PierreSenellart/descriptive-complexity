@@ -46,17 +46,11 @@ read bits, never sum them.
 
 ## 1. NP-complete problems (catalog growth)
 
-Current: SAT, 3SAT, 3COL (both directions), Clique/IS/VC
-inter-reductions. Missing hardness link: the clique family has no
-SAT-side reduction yet.
+Current: SAT, 3SAT, 3COL (both directions), and the full
+NP-completeness of the clique family (Clique/IS/VC), via the
+SAT → Clique ordered reduction, the Σ₁ membership of Clique, and the
+existing Clique/IS/VC inter-reductions.
 
-- **3SAT → Clique** [S]: the standard reduction; vertices =
-  (clause, occurrence) pairs (dimension 2 over the sat vocabulary),
-  edges between compatible occurrences of distinct clauses:
-  quantifier-free, order-free. Threshold = number of clauses, i.e. a
-  marked-set cardinality (representation (A)). Unlocks
-  NP-hardness of Clique, IS, VC through the existing inter-reductions.
-  Highest value/effort ratio in this file.
 - **Set Cover / Hitting Set** [S]: from VC; bipartite incidence
   vocabulary, quantifier-free.
 - **Dominating Set** [S]: from VC by edge subdivision;
@@ -160,9 +154,10 @@ ordinary reductions *from* HORN-SAT rather than as primary discharges.
   of PTIME, ahead of FO(LFP).
 - **FO(LFP)** [L]: syntax and semantics of least fixed points;
   order-invariant FO(LFP) as the *definition* of PTIME
-  (Immerman–Vardi), discharging the current PTIME axioms; hardness
-  discharges for HORN-SAT/CVP (§2). Design cost: fixpoint operator
-  syntax, positivity, stages.
+  (Immerman–Vardi), filling level 0 of the hierarchy (currently an
+  empty placeholder class, since PTIME and its axioms were removed);
+  hardness discharges for HORN-SAT/CVP (§2). Design cost: fixpoint
+  operator syntax, positivity, stages.
 - **SO(TC) for PSPACE** [L]: second-order transitive closure logic,
   TC taken over tuples of *relation* variables (reachability in the
   exponential configuration graph); captures PSPACE on ordered
@@ -275,14 +270,16 @@ separations and non-reducibility, impossible in the machine world.
   L-reductions, MAX-3SAT completeness. The syntactic layer fits this
   framework natively; PCP-based hardness of approximation stays out of
   scope.
-- **Teaching material** [M]: a curated “reduction cookbook” example set
-  (cf. Grange et al., MFCS 2024) once the catalog is broad enough; the
-  library doubles as a complexity-course companion.
+- **Teaching material** [M]: the `Examples/` directory now holds the
+  first tutorial-style worked example (Boolean conjunctive queries,
+  evaluation and containment, Chandra–Merlin), walking through the full
+  recipe as a template. Remaining: grow this into a curated “reduction
+  cookbook” example set (cf. Grange et al., MFCS 2024) as the catalog
+  broadens, so the library doubles as a complexity-course companion.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
-1. 3SAT → Clique (closes the catalog's hardness gap) and QBF_k
-   (rides the Cook–Levin momentum).
+1. QBF_k (rides the Cook–Levin momentum).
 2. Cheap catalog wins: Set Cover, Dominating Set, k-COL, TAUT.
 2bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
