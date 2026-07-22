@@ -55,16 +55,6 @@ section Interp
 
 variable {L : Language.{0, 0}} (B : SOBlock) (φ : (L.sum B.lang).Sentence)
 
-/-- A bound on the arities of a block. -/
-noncomputable def blockArityBound (B : SOBlock) : ℕ :=
-  letI := Fintype.ofFinite B.ι
-  Finset.univ.sup B.arity
-
-theorem arity_le_blockArityBound (B : SOBlock) (i : B.ι) :
-    B.arity i ≤ blockArityBound B := by
-  letI := Fintype.ofFinite B.ι
-  exact Finset.le_sup (Finset.mem_univ i)
-
 /-- The dimension of the Tseitin interpretation: large enough for every
 context tuple of the kernel and every argument tuple of a block variable. -/
 noncomputable def tseitinDim : ℕ :=

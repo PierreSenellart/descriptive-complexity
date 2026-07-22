@@ -14,6 +14,7 @@ import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.SecondOrderOrdered
 import DescriptiveComplexity.SecondOrderMerge
 import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
 import DescriptiveComplexity.OccurrenceFormulas
 import DescriptiveComplexity.Numbers
@@ -92,6 +93,11 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.SecondOrderMerge` – merging a second-order quantifier
   prefix into a single block (and back), so that constructions stated for one
   block can read the kernel of a `k`-block sentence.
+* `DescriptiveComplexity.Padding` – canonically padded tuples: the convention
+  by which a single interpretation dimension can carry tuples of different
+  lengths (pad with a minimum of the input order), together with the FO(≤)
+  formulas expressing it. This is the one place where the SAT-family
+  reductions need their input to be ordered.
 * `DescriptiveComplexity.OccurrenceOrder` and
   `DescriptiveComplexity.OccurrenceFormulas` – machinery for encoding
   occurrences of literals in clauses, shared across the SAT-family reductions.

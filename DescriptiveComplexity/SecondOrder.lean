@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import Mathlib.Data.Fintype.Lattice
 import DescriptiveComplexity.Complexity
 
 /-!
@@ -72,6 +73,18 @@ def SOBlock.lang (B : SOBlock) : Language :=
 
 instance (B : SOBlock) : IsRelational B.lang :=
   fun _ => ⟨fun f => Empty.elim f⟩
+
+/-- A bound on the arities of a block: every relation variable of the block
+has arity at most `blockArityBound B`. Interpretations encoding the relation
+variables as tagged tuples use it to size their dimension. -/
+noncomputable def blockArityBound (B : SOBlock) : ℕ :=
+  letI := Fintype.ofFinite B.ι
+  Finset.univ.sup B.arity
+
+theorem arity_le_blockArityBound (B : SOBlock) (i : B.ι) :
+    B.arity i ≤ blockArityBound B := by
+  letI := Fintype.ofFinite B.ι
+  exact Finset.le_sup (Finset.mem_univ i)
 
 /-- An assignment of actual relations (on a universe `A`) to the relation
 variables of a block. -/

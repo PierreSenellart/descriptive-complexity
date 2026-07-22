@@ -38,32 +38,6 @@ section Builders
 
 variable {L : Language.{0, 0}} {γ : Type} {D : ℕ}
 
-/-- `x` is a minimum of the order, as a formula. -/
-noncomputable def botF (x : γ) : (L.sum Language.order).Formula γ :=
-  Formula.iAlls (Fin 1)
-    (Relations.formula₂ leSymb (Term.var (Sum.inl x)) (Term.var (Sum.inr 0)))
-
-/-- Finite conjunction of a list of formulas. -/
-def listInf {L' : Language.{0, 0}} : List (L'.Formula γ) → L'.Formula γ
-  | [] => ⊤
-  | φ :: l => φ ⊓ listInf l
-
-/-- The coordinates of `c` from `m` on are minima, as a formula: `c` holds a
-canonically padded context tuple of length `m`. -/
-noncomputable def canonF (m : ℕ) (c : Fin D → γ) : (L.sum Language.order).Formula γ :=
-  listInf ((List.finRange D).map fun (j : Fin D) =>
-    if m ≤ (j : ℕ) then botF (c j) else ⊤)
-
-/-- The tuples held by `u` and `x` are equal, as a formula. -/
-def eqTupF (u x : Fin D → γ) : (L.sum Language.order).Formula γ :=
-  listInf ((List.finRange D).map fun (j : Fin D) =>
-    Term.equal (Term.var (x j)) (Term.var (u j)))
-
-/-- The tuples held by `u` and `x` agree below `m`, as a formula. -/
-def agreeF (m : ℕ) (u x : Fin D → γ) : (L.sum Language.order).Formula γ :=
-  listInf ((List.finRange D).map fun (j : Fin D) =>
-    if (j : ℕ) < m then Term.equal (Term.var (x j)) (Term.var (u j)) else ⊤)
-
 variable {B : SOBlock}
 
 /-- A term of the kernel, over the ordered expansion, its variables read from
@@ -111,66 +85,6 @@ section RealizeBuilders
 
 variable {L : Language.{0, 0}} {γ : Type} {D : ℕ}
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
-
-@[simp]
-theorem realize_botF {x : γ} : (botF (L := L) x).Realize v ↔ IsBot (v x) := by
-  rw [botF]
-  simp only [Formula.realize_iAlls, Formula.realize_rel₂, Term.realize_var,
-    Sum.elim_inl, Sum.elim_inr, relMap_leSymb]
-  exact ⟨fun h b => h fun _ => b, fun h i => h (i 0)⟩
-
-omit [LinearOrder A] in
-theorem realize_listInf {L' : Language.{0, 0}} [L'.Structure A]
-    (l : List (L'.Formula γ)) :
-    (listInf l).Realize v ↔ ∀ φ ∈ l, φ.Realize v := by
-  induction l with
-  | nil => simp [listInf, Formula.realize_top]
-  | cons φ l ih => simp [listInf, Formula.realize_inf, ih]
-
-@[simp]
-theorem realize_canonF {m : ℕ} {c : Fin D → γ} :
-    (canonF (L := L) m c).Realize v ↔ Canon m fun j => v (c j) := by
-  rw [canonF, realize_listInf]
-  constructor
-  · intro h j hj
-    have := h _ (List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩)
-    rw [if_pos hj] at this
-    exact realize_botF.mp this
-  · intro h ψ hψ
-    obtain ⟨j, -, rfl⟩ := List.mem_map.mp hψ
-    split_ifs with hj
-    · exact realize_botF.mpr (h j hj)
-    · exact Formula.realize_top.mpr trivial
-
-@[simp]
-theorem realize_eqTupF {u x : Fin D → γ} :
-    (eqTupF (L := L) u x).Realize v ↔ (fun j => v (x j)) = fun j => v (u j) := by
-  rw [eqTupF, realize_listInf, funext_iff]
-  constructor
-  · intro h j
-    have := h _ (List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩)
-    rwa [Formula.realize_equal, Term.realize_var, Term.realize_var] at this
-  · intro h ψ hψ
-    obtain ⟨j, -, rfl⟩ := List.mem_map.mp hψ
-    rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
-    exact h j
-
-@[simp]
-theorem realize_agreeF {m : ℕ} {u x : Fin D → γ} :
-    (agreeF (L := L) m u x).Realize v ↔
-      Agree m (fun j => v (u j)) fun j => v (x j) := by
-  rw [agreeF, realize_listInf]
-  constructor
-  · intro h j hj
-    have := h _ (List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩)
-    rw [if_pos hj] at this
-    rwa [Formula.realize_equal, Term.realize_var, Term.realize_var] at this
-  · intro h ψ hψ
-    obtain ⟨j, -, rfl⟩ := List.mem_map.mp hψ
-    split_ifs with hj
-    · rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
-      exact h j hj
-    · exact Formula.realize_top.mpr trivial
 
 variable {B : SOBlock}
 

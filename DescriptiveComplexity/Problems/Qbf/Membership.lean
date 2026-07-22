@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Qbf.Defs
 import DescriptiveComplexity.SecondOrderMerge
+import DescriptiveComplexity.Padding
 
 /-!
 # QBF is second-order definable
@@ -156,17 +157,6 @@ abbrev qBlkSym {k : ℕ} (i : Fin k) : (qbfSOLang k).Relations 1 := Sum.inl (qbf
 
 /-- The truth-assignment variable of block `i` in the kernel's vocabulary. -/
 abbrev qNuSym {k : ℕ} (i : Fin k) : (qbfSOLang k).Relations 1 := Sum.inr (blockSym k i)
-
-/-- Finite disjunction of a list of formulas. -/
-def listSup {L' : Language.{0, 0}} {γ : Type} : List (L'.Formula γ) → L'.Formula γ
-  | [] => ⊥
-  | φ :: l => φ ⊔ listSup l
-
-theorem realize_listSup {L' : Language.{0, 0}} {γ A : Type} [L'.Structure A] {v : γ → A}
-    (l : List (L'.Formula γ)) : (listSup l).Realize v ↔ ∃ φ ∈ l, φ.Realize v := by
-  induction l with
-  | nil => simp [listSup]
-  | cons φ l ih => simp [listSup, ih]
 
 /-- The truth value of the variable `x`, as a formula: some block marking `x`
 assigns it the value true. -/

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.Padding
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.Tactic.FinCases
 
@@ -406,114 +407,6 @@ theorem gates_canonVal :
         gates_canonVal f⟩
 
 end Gates
-
-/-! ### Padded tuples -/
-
-section Padding
-
-variable {A : Type} {D : ℕ}
-
-/-- A `D`-tuple is canonical at context length `m`: every coordinate from `m`
-on is a minimum of the order. -/
-def Canon [LE A] (m : ℕ) (u : Fin D → A) : Prop :=
-  ∀ j : Fin D, m ≤ (j : ℕ) → IsBot (u j)
-
-/-- Two `D`-tuples agree below `m`. -/
-def Agree (m : ℕ) (u x : Fin D → A) : Prop :=
-  ∀ j : Fin D, (j : ℕ) < m → x j = u j
-
-/-- Pad a context tuple to a `D`-tuple with a (minimal) element. -/
-def pad (a₀ : A) {m : ℕ} (w : Fin m → A) : Fin D → A :=
-  fun j => if hj : (j : ℕ) < m then w ⟨j, hj⟩ else a₀
-
-/-- The prefix of a `D`-tuple. -/
-def pref {m : ℕ} (h : m ≤ D) (u : Fin D → A) : Fin m → A :=
-  fun j => u (Fin.castLE h j)
-
-theorem pref_pad (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) :
-    pref h (pad a₀ w) = w := by
-  funext j
-  rw [pref, pad, dif_pos (show ((Fin.castLE h j : Fin D) : ℕ) < m from j.isLt)]
-  exact congrArg w (Fin.ext rfl)
-
-theorem canon_pad [LE A] {a₀ : A} (h₀ : IsBot a₀) (m : ℕ) (w : Fin m → A) :
-    Canon m (pad (D := D) a₀ w) := by
-  intro j hj
-  rw [pad, dif_neg (not_lt.mpr hj)]
-  exact h₀
-
-theorem agree_pad_pad (a₀ : A) {m : ℕ} (w : Fin m → A) (a : A) :
-    Agree m (pad (D := D) a₀ (Fin.snoc w a)) (pad a₀ w) := by
-  intro j hj
-  rw [pad, pad, dif_pos hj, dif_pos (hj.trans (Nat.lt_succ_self m))]
-  rw [show (⟨(j : ℕ), hj.trans (Nat.lt_succ_self m)⟩ : Fin (m + 1)) =
-      Fin.castSucc ⟨(j : ℕ), hj⟩ from Fin.ext rfl, Fin.snoc_castSucc]
-
-/-- A canonical tuple is the padding of its prefix. -/
-theorem pad_pref_of_canon [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ} (h : m ≤ D)
-    {u : Fin D → A} (hc : Canon m u) : pad a₀ (pref h u) = u := by
-  funext j
-  rw [pad]
-  split_ifs with hj
-  · rw [pref]
-    exact congrArg u (Fin.ext rfl)
-  · exact (h₀ (u j)).antisymm (hc j (not_lt.mp hj) a₀)
-
-/-- A tuple canonical at `m` agreeing with `u` below `m` is the padding of
-`u`'s prefix. -/
-theorem eq_pad_of_canon_agree [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ}
-    (h : m ≤ D) {u x : Fin D → A} (hcx : Canon m x) (ha : Agree m u x) :
-    x = pad a₀ (pref h u) := by
-  funext j
-  rw [pad]
-  split_ifs with hj
-  · rw [pref]
-    exact (ha j hj).trans (congrArg u (Fin.ext rfl)).symm
-  · exact ((h₀ (x j)).antisymm (hcx j (not_lt.mp hj) a₀)).symm
-
-theorem pref_pad_snoc (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) (a : A) :
-    pref h (pad a₀ (Fin.snoc w a)) = w := by
-  funext j
-  rw [pref, pad, dif_pos (show ((Fin.castLE h j : Fin D) : ℕ) < m + 1 from
-    j.isLt.trans (Nat.lt_succ_self m))]
-  rw [show (⟨((Fin.castLE h j : Fin D) : ℕ), _⟩ : Fin (m + 1)) = Fin.castSucc j from
-    Fin.ext rfl, Fin.snoc_castSucc]
-
-theorem agree_pad_snoc (a₀ : A) {m : ℕ} (w : Fin m → A) (a : A) :
-    Agree m (pad (D := D) a₀ w) (pad a₀ (Fin.snoc w a)) := by
-  intro j hj
-  rw [pad, pad, dif_pos hj, dif_pos (hj.trans (Nat.lt_succ_self m))]
-  rw [show (⟨(j : ℕ), hj.trans (Nat.lt_succ_self m)⟩ : Fin (m + 1)) =
-      Fin.castSucc ⟨(j : ℕ), hj⟩ from Fin.ext rfl, Fin.snoc_castSucc]
-
-theorem agree_pad_snoc_pref (a₀ a : A) {m : ℕ} (h : m ≤ D) (u : Fin D → A) :
-    Agree m u (pad a₀ (Fin.snoc (pref h u) a)) := by
-  intro j hj
-  rw [pad, dif_pos (hj.trans (Nat.lt_succ_self m))]
-  rw [show (⟨(j : ℕ), hj.trans (Nat.lt_succ_self m)⟩ : Fin (m + 1)) =
-      Fin.castSucc ⟨(j : ℕ), hj⟩ from Fin.ext rfl, Fin.snoc_castSucc]
-  rw [pref]
-  exact congrArg u (Fin.ext rfl)
-
-/-- A tuple canonical at `m + 1` agreeing below `m` with `u` is the padding
-of the prefix of `u` extended by its own coordinate `m`. -/
-theorem eq_pad_snoc_of_canon_agree [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ}
-    (h : m < D) {u x : Fin D → A} (hcx : Canon (m + 1) x) (ha : Agree m u x) :
-    x = pad a₀ (Fin.snoc (pref h.le u) (x ⟨m, h⟩)) := by
-  funext j
-  rw [pad]
-  split_ifs with hj
-  · rcases Nat.lt_succ_iff_lt_or_eq.mp hj with hj' | hj'
-    · rw [show (⟨(j : ℕ), hj⟩ : Fin (m + 1)) = Fin.castSucc ⟨(j : ℕ), hj'⟩ from
-        Fin.ext rfl, Fin.snoc_castSucc]
-      rw [pref]
-      exact (ha j hj').trans (congrArg u (Fin.ext rfl)).symm
-    · rw [show (⟨(j : ℕ), hj⟩ : Fin (m + 1)) = Fin.last m from Fin.ext hj',
-        Fin.snoc_last]
-      exact congrArg x (Fin.ext hj')
-  · exact ((h₀ (x j)).antisymm (hcx j (not_lt.mp hj) a₀)).symm
-
-end Padding
 
 /-! ### The clauses of the encoding and their literals -/
 
