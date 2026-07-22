@@ -44,6 +44,15 @@ The recipe, common to every problem in the library:
 5. **Hardness**: an FO reduction *from* an NP-hard problem of the catalog.
 6. **Completeness**: combine 4 and 5.
 
+One concern sits outside this list, and outside what Lean checks for you: in
+practice one starts not from the abstract structure of step 1 but from
+*concrete data* (here lists of atoms and facts), which has to be *encoded*
+into such a structure. That encoding carries two obligations – semantic
+faithfulness (a Lean-checkable equivalence theorem) and size-faithfulness
+(no blow-up of the representation, which Lean cannot enforce). The interlude
+after step 6 works this through; it is arguably the step a library user
+should worry about most.
+
 Evaluation goes through steps 1–6 directly; containment then reuses
 evaluation on both sides – its membership is an FO reduction *to* evaluation
 and its hardness an FO reduction *from* evaluation – with the classical
@@ -57,10 +66,12 @@ Main results:
 * `DescriptiveComplexity.queryContained_iff_hom`: the Chandra–Merlin theorem –
   containment holds iff there is a homomorphism from the right query to the
   canonical database of the left one;
-* `DescriptiveComplexity.concreteQueryHolds_iff_queryHolds`: faithfulness of the
-  encoding – on instances built (by `DescriptiveComplexity.queryDbStructure`) from a
-  concrete query (a list of atoms) and a concrete database (a list of
-  facts), the abstract semantics agrees with the textbook one;
+* `DescriptiveComplexity.concreteQueryHolds_iff_queryHolds`: *semantic*
+  faithfulness of the encoding – on instances built (by
+  `DescriptiveComplexity.queryDbStructure`) from a concrete query (a list of atoms)
+  and a concrete database (a list of facts), the abstract semantics agrees
+  with the textbook one (the complementary, Lean-unchecked obligation that
+  the encoding not blow up the representation is discussed in the interlude);
 * `DescriptiveComplexity.threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval`;
 * `DescriptiveComplexity.cqContainment_fo_reduction_cqEval : CQContainment ≤ᶠᵒ CQEval`;
 * `DescriptiveComplexity.cqEval_fo_reduction_cqContainment : CQEval ≤ᶠᵒ CQContainment`;
@@ -644,23 +655,47 @@ theorem cqEval_NP_complete : NP.Complete CQEval :=
 ### Interlude: tying the encoding to concrete queries and databases
 
 So far “a query and a database” has meant “a `Language.queryDb`-structure”,
-and one should not take on faith that this abstraction encodes the real
-thing. This interlude closes the loop: a *concrete* Boolean conjunctive
-query over variables `V` and constants `C` is a list of atoms – each
-argument a variable or a constant, i.e. an element of `V ⊕ C` – and a
-concrete graph database is a list of facts over the constants. Their
-textbook semantics (`DescriptiveComplexity.ConcreteQueryHolds`) is: some assignment of
-the variables to constants sends every atom to a fact.
+an abstract finite structure. A *user* of the library, however, does not
+start there: they start from concrete data – here a query as a list of atoms
+and a database as a list of facts – and must *encode* it as a structure
+before any of the theorems above apply. That encoding step, common to every
+problem, carries two obligations, and it is worth being explicit that Lean
+discharges only one of them.
 
-Any such pair is encoded as a structure on the universe `V ⊕ C`
-(`DescriptiveComplexity.queryDbStructure`), and the round-trip theorem
-(`DescriptiveComplexity.concreteQueryHolds_iff_queryHolds`) shows that the abstract
-semantics of step 2 agrees with the textbook one on every encoded instance.
-The `Nonempty C` hypothesis is this file's junk conventions surfacing one
-last time: a variable occurring in no atom is unconstrained in the abstract
-semantics but must still be assigned a constant in the concrete one – for
-genuine BCQs (every variable occurs in an atom) over a nonempty database
-domain, nothing is lost.
+**(1) Semantic equivalence – enforced by Lean.** The abstract semantics on
+the encoded structure must agree, instance by instance, with the concrete
+textbook semantics of the original data; otherwise the complexity result is
+about the wrong predicate. This is a *theorem*, so Lean holds you to it.
+Concretely: a Boolean conjunctive query over variables `V` and constants `C`
+is a list of atoms – each argument in `V ⊕ C` – and a graph database is a
+list of facts over the constants, with textbook semantics
+`DescriptiveComplexity.ConcreteQueryHolds` (some assignment of the variables to
+constants sends every atom to a fact). Each pair is encoded on the universe
+`V ⊕ C` by `DescriptiveComplexity.queryDbStructure`, and the round-trip theorem
+`DescriptiveComplexity.concreteQueryHolds_iff_queryHolds` proves the abstract
+semantics of step 2 agrees with this textbook one on every encoded instance.
+Get the encoding subtly wrong and that proof simply does not close.
+
+**(2) Representation faithfulness – *not* enforced by Lean.** The encoding
+must also be of the right *size*: the structure it builds has to stay
+polynomially bounded (here linear) in the concrete input, or the abstract
+problem, however faithfully its *meaning* matches, is no longer the same
+*computational* problem. `queryDbStructure` is honest on this count – its
+universe is `V ⊕ C` and its two relations are `q` and `D` verbatim, so
+nothing blows up. But nothing in the *type* of
+`concreteQueryHolds_iff_queryHolds` says so: Lean would just as readily let
+one prove (1) for an encoding that padded the universe to `2 ^ |C|` elements,
+silently turning a hard problem into a trivially small one, or that smuggled
+a hard sub-computation into the encoding map itself. Size-faithfulness of the
+encoding therefore remains a proof obligation on whoever writes it, to be
+checked by hand – the one place in the recipe where Lean cannot stand in for
+the reader's judgement.
+
+The `Nonempty C` hypothesis on the equivalence theorem is this file's junk
+convention surfacing one last time: a variable occurring in no atom is
+unconstrained in the abstract semantics but must still be assigned a constant
+in the concrete one – for genuine BCQs (every variable occurs in an atom)
+over a nonempty database domain, nothing is lost.
 -/
 
 section Concrete
