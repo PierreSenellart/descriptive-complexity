@@ -47,6 +47,40 @@ The library is organized in three layers:
   conjunctive queries; each with its vocabulary, FO reductions and
   completeness theorems.
 
+## Use as a dependency
+
+The library tracks one Mathlib release at a time: a given version works with
+the Mathlib version it is named after, and `master` follows the latest stable
+Mathlib. Your project and this one must resolve to the **same** Mathlib
+version, since Lake builds a single Mathlib per workspace.
+
+In a `lakefile.lean`:
+
+```lean
+require "descriptive-complexity" from git
+  "https://github.com/PierreSenellart/descriptive-complexity" @ "master"
+```
+
+or, in a `lakefile.toml`:
+
+```toml
+[[require]]
+name = "descriptive-complexity"
+git = "https://github.com/PierreSenellart/descriptive-complexity"
+rev = "master"
+```
+
+The revision can be a branch, a tag or a commit hash; pin a version tag (such
+as `v4.33.0`) or a commit hash rather than `master`, for reproducible builds.
+Then
+
+```lean
+import DescriptiveComplexity
+```
+
+brings in the whole library; import individual modules (for instance
+`DescriptiveComplexity.Problems.Sat`) to keep build times down.
+
 ## Documentation
 
 * **API reference**:

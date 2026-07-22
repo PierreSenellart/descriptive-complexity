@@ -23,6 +23,11 @@ and iso-invariance of the decoding.
   (disjoint union via tags adds, dimension multiplies, complement
   subtracts). Only for numbers that are honestly polynomial: unary
   SubsetSum-style problems are in P, hence not NP-hard under (A).
+  *In use*: the clique family's thresholds are the `Set.ncard` of the
+  marked set (`Problems/CliqueFamily/Defs.lean`), with the arithmetic –
+  reversal of comparisons under complementation, and the equivalence
+  between comparing decoded numbers and exhibiting an injection – in
+  `Numbers/Unary.lean`.
 - **(B) Positions in an order** that is part of the problem's own
   vocabulary (“≤ is linear” folded into `Holds`); buys FO comparison
   of numbers, still unary; forces every reduction *into* the problem

@@ -3,18 +3,18 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.EquivFin
-import Mathlib.Tactic.FinCases
 import DescriptiveComplexity.Interpretation
+import DescriptiveComplexity.Numbers.Unary
 
 /-!
 # Clique, Independent Set and Vertex Cover: definitions
 
 The three classical threshold problems on graphs, as decision problems on
 *marked graphs*: `FirstOrder.Language.markedGraph`-structures, carrying a
-binary adjacency relation and a unary mark. The marked set plays the role of
-the numeric threshold `k` of the textbook problems – its *cardinality* is the
-threshold – so that no number encoding is needed:
+binary adjacency relation and a unary mark. The marked set carries the numeric
+threshold `k` of the textbook problems in the *unary representation* of
+`DescriptiveComplexity.Numbers.Unary`: the threshold is the cardinality
+`Set.ncard` of the marked set, order-free and isomorphism-invariant for free.
 
 * `DescriptiveComplexity.Clique`: some clique is at least as large as the marked set;
 * `DescriptiveComplexity.IndependentSet`: some independent set is at least as large as
@@ -22,12 +22,19 @@ threshold – so that no number encoding is needed:
 * `DescriptiveComplexity.VertexCover`: some vertex cover is at most as large as the
   marked set.
 
-Cardinality comparisons are phrased as existence of injections (type
-embeddings), which makes isomorphism-invariance compositional. Since
-cardinality thresholds are only meaningful on finite structures, finiteness
-of the universe is part of the yes-instances; by
-`ComplexityClass.mem_congr_finite` this does not affect any
-complexity-theoretic statement.
+The threshold comparisons are comparisons of decoded numbers, and the
+cardinality arithmetic they need is the shared kit of
+`DescriptiveComplexity.Numbers.Unary`: invariance of a decoded number under an
+equivalence of universes (`DescriptiveComplexity.ncard_image_equiv`) for the
+isomorphism-invariance proofs, the reversal of a comparison under
+complementation (`DescriptiveComplexity.ncard_compl_le_ncard_compl_iff`) for the
+Vertex Cover ↔ Independent Set reductions, and the equivalence with the
+existence of an injection (`DescriptiveComplexity.nonempty_embedding_iff_ncard_le`,
+here `DescriptiveComplexity.cliqueOn_iff_embedding`) for the second-order definition,
+which guesses that injection as a relation variable. Since cardinality
+thresholds are only meaningful on finite structures, finiteness of the
+universe is part of the yes-instances; by `ComplexityClass.mem_congr_finite`
+this does not affect any complexity-theoretic statement.
 
 Self-loops are ignored (all three properties are about the underlying
 loopless graph), and adjacency is required in both directions on ordered
@@ -86,27 +93,80 @@ section Generic
 
 variable {A : Type}
 
-/-- Some set that is pairwise `Adjp`-related (off the diagonal) admits an
-injection from the `Kp`-marked elements: “some clique is at least as large as
-the marked set”. -/
+/-- Some set that is pairwise `Adjp`-related (off the diagonal) is at least as
+large as the number encoded by the `Kp`-marked elements: “some clique is at
+least as large as the marked set”. -/
 def CliqueOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
   ∃ S : A → Prop, (∀ x y, S x → S y → x ≠ y → Adjp x y) ∧
-    Nonempty ({x // Kp x} ↪ {x // S x})
+    {x | Kp x}.ncard ≤ {x | S x}.ncard
 
-/-- Some set that is pairwise non-`Adjp`-related (off the diagonal) admits an
-injection from the `Kp`-marked elements: “some independent set is at least as
-large as the marked set”. -/
+/-- Some set that is pairwise non-`Adjp`-related (off the diagonal) is at least
+as large as the number encoded by the `Kp`-marked elements: “some independent
+set is at least as large as the marked set”. -/
 def IndepOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
   CliqueOn (fun x y => ¬Adjp x y) Kp
 
-/-- Some set meeting every (off-diagonal) `Adjp`-edge injects into the
-`Kp`-marked elements: “some vertex cover is at most as large as the marked
-set”. -/
+/-- Some set meeting every (off-diagonal) `Adjp`-edge is at most as large as
+the number encoded by the `Kp`-marked elements: “some vertex cover is at most
+as large as the marked set”. -/
 def CoverOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
   ∃ C : A → Prop, (∀ x y, x ≠ y → Adjp x y → C x ∨ C y) ∧
-    Nonempty ({x // C x} ↪ {x // Kp x})
+    {x | C x}.ncard ≤ {x | Kp x}.ncard
+
+/-! #### The threshold as an injection
+
+On a finite universe, comparing the decoded numbers is comparing sizes, so the
+threshold conditions can equivalently be read as the existence of an injection.
+This is the form the second-order definitions guess. -/
+
+section Embedding
+
+variable [Finite A]
+
+/-- The clique threshold as an injection of the marked set into the clique. -/
+theorem cliqueOn_iff_embedding (Adjp : A → A → Prop) (Kp : A → Prop) :
+    CliqueOn Adjp Kp ↔ ∃ S : A → Prop, (∀ x y, S x → S y → x ≠ y → Adjp x y) ∧
+      Nonempty ({x // Kp x} ↪ {x // S x}) :=
+  exists_congr fun S =>
+    and_congr_right fun _ => (nonempty_embedding_iff_ncard_le Kp S).symm
+
+/-- The independent-set threshold as an injection of the marked set into the
+independent set. -/
+theorem indepOn_iff_embedding (Adjp : A → A → Prop) (Kp : A → Prop) :
+    IndepOn Adjp Kp ↔ ∃ S : A → Prop, (∀ x y, S x → S y → x ≠ y → ¬Adjp x y) ∧
+      Nonempty ({x // Kp x} ↪ {x // S x}) :=
+  cliqueOn_iff_embedding _ Kp
+
+/-- The vertex-cover threshold as an injection of the cover into the marked
+set. -/
+theorem coverOn_iff_embedding (Adjp : A → A → Prop) (Kp : A → Prop) :
+    CoverOn Adjp Kp ↔ ∃ C : A → Prop, (∀ x y, x ≠ y → Adjp x y → C x ∨ C y) ∧
+      Nonempty ({x // C x} ↪ {x // Kp x}) :=
+  exists_congr fun C =>
+    and_congr_right fun _ => (nonempty_embedding_iff_ncard_le C Kp).symm
+
+end Embedding
 
 variable {B : Type}
+
+/-- The number encoded by a marked set is invariant under an equivalence of
+universes carrying one mark predicate to the other. -/
+private theorem ncard_setOf_equiv (u : B ≃ A) {KB : B → Prop} {KA : A → Prop}
+    (hK : ∀ b, KB b ↔ KA (u b)) : {b | KB b}.ncard = {a | KA a}.ncard := by
+  rw [← ncard_image_equiv u {b | KB b}]
+  congr 1
+  ext a
+  constructor
+  · rintro ⟨b, hb, rfl⟩
+    exact (hK b).mp hb
+  · intro ha
+    exact ⟨u.symm a, (hK _).mpr (by simpa using ha), by simp⟩
+
+/-- Pulling a predicate back along `u.symm` does not change the number it
+encodes. -/
+private theorem ncard_setOf_symm (u : B ≃ A) (S : B → Prop) :
+    {b | S b}.ncard = {a | S (u.symm a)}.ncard :=
+  ncard_setOf_equiv u fun b => by simp
 
 /-- `CliqueOn` transports along an equivalence commuting with the two
 predicates. -/
@@ -114,15 +174,13 @@ theorem CliqueOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Pr
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b))
     (h : CliqueOn AdjB KB) : CliqueOn AdjA KA := by
-  obtain ⟨S, hS, ⟨e⟩⟩ := h
-  refine ⟨fun a => S (u.symm a), fun x y hx hy hxy => ?_, ⟨?_⟩⟩
+  obtain ⟨S, hS, hcard⟩ := h
+  refine ⟨fun a => S (u.symm a), fun x y hx hy hxy => ?_, ?_⟩
   · have h' := (hadj (u.symm x) (u.symm y)).mp
       (hS _ _ hx hy fun h => hxy (u.symm.injective h))
     simpa using h'
-  · refine (Equiv.subtypeEquiv u.symm fun a => ?_).toEmbedding.trans
-      (e.trans (Equiv.subtypeEquiv u fun b => ?_).toEmbedding)
-    · simp [hK]
-    · simp
+  · rw [← ncard_setOf_equiv u hK, ← ncard_setOf_symm u S]
+    exact hcard
 
 /-- `IndepOn` transports along an equivalence commuting with the two
 predicates. -/
@@ -138,12 +196,12 @@ theorem CoverOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Pro
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b))
     (h : CoverOn AdjB KB) : CoverOn AdjA KA := by
-  obtain ⟨C, hC, ⟨e⟩⟩ := h
-  refine ⟨fun a => C (u.symm a), fun x y hxy hadjA => ?_, ⟨?_⟩⟩
+  obtain ⟨C, hC, hcard⟩ := h
+  refine ⟨fun a => C (u.symm a), fun x y hxy hadjA => ?_, ?_⟩
   · exact hC (u.symm x) (u.symm y) (fun h => hxy (u.symm.injective h))
       ((hadj (u.symm x) (u.symm y)).mpr (by simpa using hadjA))
-  · refine (Equiv.subtypeEquiv u.symm fun a => Iff.rfl).toEmbedding.trans
-      (e.trans (Equiv.subtypeEquiv u fun b => hK b).toEmbedding)
+  · rw [← ncard_setOf_equiv u hK, ← ncard_setOf_symm u C]
+    exact hcard
 
 private theorem symm_hadj {AdjB : B → B → Prop} {AdjA : A → A → Prop} (u : B ≃ A)
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (a a' : A) :
@@ -188,9 +246,9 @@ theorem cliqueOn_congr {P Q : A → A → Prop} {K K' : A → Prop}
   have h : ∀ {P Q : A → A → Prop} {K K' : A → Prop},
       (∀ x y, x ≠ y → (P x y ↔ Q x y)) → (∀ x, K x ↔ K' x) →
       CliqueOn P K → CliqueOn Q K' := by
-    rintro P Q K K' hPQ hK ⟨S, hS, ⟨e⟩⟩
-    exact ⟨S, fun x y hx hy hxy => (hPQ x y hxy).mp (hS x y hx hy hxy),
-      ⟨(Equiv.subtypeEquivRight hK).symm.toEmbedding.trans e⟩⟩
+    rintro P Q K K' hPQ hK ⟨S, hS, hcard⟩
+    refine ⟨S, fun x y hx hy hxy => (hPQ x y hxy).mp (hS x y hx hy hxy), ?_⟩
+    rwa [show {x | K' x} = {x | K x} from Set.ext fun x => (hK x).symm]
   exact ⟨h hPQ hK, h (fun x y hxy => (hPQ x y hxy).symm) fun x => (hK x).symm⟩
 
 /-- `IndepOn` only depends on the off-diagonal part of the adjacency

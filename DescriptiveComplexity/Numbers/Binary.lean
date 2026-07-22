@@ -26,11 +26,16 @@ Knapsack…), where the unary representation of
 * round-trips `DescriptiveComplexity.binValue_binEncode` (for `k < 2 ^ #positions`) and
   `DescriptiveComplexity.testBit_binValue`;
 * range bound `DescriptiveComplexity.binValue_lt_two_pow`;
-* invariance under order-isomorphisms (`DescriptiveComplexity.binValue_orderIso`), which
-  feeds `DecisionProblem.iso_invariant` proofs;
+* invariance under order-isomorphisms (`DescriptiveComplexity.binValue_orderIso`), for
+  the `DecisionProblem.iso_invariant` proof of a problem carrying binary
+  numbers;
 * the most-significant-differing-bit comparison
   `DescriptiveComplexity.binValue_lt_binValue_iff` – the Lean counterpart of the FO(≤)
   formula comparing two binary numbers.
+
+Unlike the unary layer, which the clique family uses for its thresholds, this
+one has no client yet: it is waiting for the first problem whose numbers must
+be exponential (SubsetSum and friends, see the roadmap).
 -/
 
 namespace DescriptiveComplexity

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import Mathlib.Data.Fintype.EquivFin
 import Mathlib.Data.Set.Card
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Logic.Equiv.Prod
@@ -19,8 +20,14 @@ files do not hand-roll cardinality reasoning:
   equivalences (this is what feeds `DecisionProblem.iso_invariant` proofs);
 * `DescriptiveComplexity.initSeg` and `DescriptiveComplexity.ncard_initSeg`: the canonical encoding
   of `k ≤ n` as the initial segment of `Fin n`;
-* `DescriptiveComplexity.ncard_compl_eq`: complement cardinality (`n - k`), as used by
-  the Vertex Cover ↔ Independent Set reductions;
+* `DescriptiveComplexity.ncard_compl_eq` and
+  `DescriptiveComplexity.ncard_compl_le_ncard_compl_iff`: complement cardinality
+  (`n - k`) and the resulting *reversal* of comparisons, which is what the
+  Vertex Cover ↔ Independent Set reductions run on;
+* `DescriptiveComplexity.nonempty_embedding_iff_ncard_le`: comparing decoded numbers is
+  comparing sizes – the bridge to the second-order rendering of a threshold,
+  where the injection witnessing the comparison is guessed as a relation
+  variable (used by the `Σ₁` definition of Clique);
 * `DescriptiveComplexity.ncard_tagged_eq_sum`: cardinality under tag-disjoint union –
   the tagged framework's *addition*;
 * `DescriptiveComplexity.ncard_univ_pi`: cardinality of a product of marked sets over
@@ -54,10 +61,48 @@ theorem ncard_initSeg (n k : ℕ) (h : k ≤ n) : (initSeg n k).ncard = k := by
       right_inv := fun j => rfl }
   rw [Nat.card_congr e, Nat.card_eq_fintype_card, Fintype.card_fin]
 
+/-- A decoded number never exceeds the size of the universe. -/
+theorem ncard_le_card {A : Type} [Finite A] (s : Set A) : s.ncard ≤ Nat.card A := by
+  rw [← Set.ncard_univ]
+  exact Set.ncard_le_ncard (Set.subset_univ s)
+
 /-- Complement cardinality: the marked complement encodes `n - k`. -/
 theorem ncard_compl_eq {A : Type} [Finite A] (s : Set A) :
     sᶜ.ncard = Nat.card A - s.ncard :=
   Set.ncard_compl s
+
+/-- Complementation *reverses* the comparison of decoded numbers – the
+subtraction `n - k` is monotone decreasing in `k`. This is the arithmetic
+content of the Vertex Cover ↔ Independent Set reductions. -/
+theorem ncard_compl_le_ncard_compl_iff {A : Type} [Finite A] (s t : Set A) :
+    sᶜ.ncard ≤ tᶜ.ncard ↔ t.ncard ≤ s.ncard := by
+  rw [ncard_compl_eq, ncard_compl_eq]
+  have hs := ncard_le_card s
+  have ht := ncard_le_card t
+  omega
+
+/-- Comparing a complement with a set, the two sides swap under
+complementation: `n - k ≤ l` iff `n - l ≤ k`. -/
+theorem ncard_compl_le_iff {A : Type} [Finite A] (s t : Set A) :
+    sᶜ.ncard ≤ t.ncard ↔ tᶜ.ncard ≤ s.ncard := by
+  rw [ncard_compl_eq, ncard_compl_eq]
+  have hs := ncard_le_card s
+  have ht := ncard_le_card t
+  omega
+
+/-- **Comparing decoded numbers is comparing sizes**: on a finite universe the
+number encoded by the marked set `P` is at most the one encoded by `Q` exactly
+when the `P`-elements inject into the `Q`-elements. This is the bridge between
+the cardinality reading of a threshold and its second-order rendering, where
+the injection is *guessed* as a binary relation variable. -/
+theorem nonempty_embedding_iff_ncard_le {A : Type} [Finite A] (P Q : A → Prop) :
+    Nonempty ({x // P x} ↪ {x // Q x}) ↔ {x | P x}.ncard ≤ {x | Q x}.ncard := by
+  classical
+  have : Fintype A := Fintype.ofFinite A
+  have hP : {x | P x}.ncard = Nat.card {x // P x} := (Nat.card_coe_set_eq _).symm
+  have hQ : {x | Q x}.ncard = Nat.card {x // Q x} := (Nat.card_coe_set_eq _).symm
+  rw [hP, hQ, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+  exact Function.Embedding.nonempty_iff_card_le
 
 /-- Cardinality under tag-disjoint union: on a universe of tagged elements,
 the cardinalities of the per-tag marked sets add up. This is how the tagged

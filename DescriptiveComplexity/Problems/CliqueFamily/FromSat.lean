@@ -258,7 +258,7 @@ theorem satisfiable_iff_hasLargeClique [Finite A] [Nonempty A] :
   classical
   have hfin : Finite (satToClique.Map A) := satToClique.map_finite A
   unfold HasLargeClique
-  rw [and_iff_right hfin]
+  rw [and_iff_right hfin, cliqueOn_iff_embedding]
   by_cases hne : ∃ c : A, EmptyCl c
   · -- Some clause is empty: the CNF is unsatisfiable, every vertex is
     -- marked, and no clique can be as large as the whole (≥ 2-element)

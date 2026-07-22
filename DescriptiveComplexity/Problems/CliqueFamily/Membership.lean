@@ -125,7 +125,8 @@ theorem clique_sigmaSODefinable : SigmaSODefinable 1 Clique := by
   refine ⟨[cliqueGuessBlock], rfl, cliqueKernel, ?_⟩
   intro A _ _ _
   constructor
-  · rintro ⟨-, S, hS, ⟨e⟩⟩
+  · rintro ⟨-, hcl⟩
+    obtain ⟨S, hS, ⟨e⟩⟩ := (cliqueOn_iff_embedding _ _).mp hcl
     refine ⟨fun i => match i with
       | true => fun w : Fin 1 → A => S (w 0)
       | false => fun w : Fin 2 → A =>
@@ -140,9 +141,9 @@ theorem clique_sigmaSODefinable : SigmaSODefinable 1 Clique := by
     have hch : ∀ m : {x : A // MGMarked x},
         ∃ b : A, ρ false ![m.1, b] ∧ ρ true ![b] := fun m => h2 m.1 m.2
     choose f hf1 hf2 using hch
-    refine ⟨‹Finite A›, fun a => ρ true ![a],
-      fun x y hx hy hxy => h1 x y hx hy hxy,
-      ⟨⟨fun m => ⟨f m, hf2 m⟩, fun m m' hmm' => ?_⟩⟩⟩
+    refine ⟨‹Finite A›, (cliqueOn_iff_embedding _ _).mpr
+      ⟨fun a => ρ true ![a], fun x y hx hy hxy => h1 x y hx hy hxy,
+        ⟨⟨fun m => ⟨f m, hf2 m⟩, fun m m' hmm' => ?_⟩⟩⟩⟩
     have hval : f m = f m' := congrArg Subtype.val hmm'
     refine Subtype.ext (h3 m.1 m'.1 (f m) (hf1 m) ?_)
     rw [hval]

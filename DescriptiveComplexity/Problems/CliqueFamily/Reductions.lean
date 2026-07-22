@@ -25,7 +25,12 @@ first-order reductions on marked graphs (all of tag `Unit` and dimension 1):
 
 The counting step of the vertex-cover reductions
 (`DescriptiveComplexity.coverOn_iff_indepOn_not`) is the only place where finiteness is
-used; it enters through the finiteness conjunct of the problems themselves.
+used; it enters through the finiteness conjunct of the problems themselves. That
+step is pure unary-representation arithmetic – complementing a marked set
+subtracts its decoded number from the size of the universe, hence reverses
+comparisons – and is discharged by
+`DescriptiveComplexity.ncard_compl_le_ncard_compl_iff` and
+`DescriptiveComplexity.ncard_compl_le_iff` of `DescriptiveComplexity.Numbers.Unary`.
 -/
 
 namespace DescriptiveComplexity
@@ -62,25 +67,18 @@ exists iff an independent set at least as large as the *complement* of the
 marked set does: complementation exchanges the two. -/
 theorem coverOn_iff_indepOn_not [Finite A] (Adjp : A → A → Prop) (Kp : A → Prop) :
     CoverOn Adjp Kp ↔ IndepOn Adjp fun x => ¬Kp x := by
-  classical
-  have := Fintype.ofFinite A
   constructor
-  · rintro ⟨C, hcov, ⟨e⟩⟩
-    refine ⟨fun x => ¬C x, fun x y hx hy hxy hadj => (hcov x y hxy hadj).elim hx hy, ?_⟩
-    refine Function.Embedding.nonempty_of_card_le ?_
-    rw [Fintype.card_subtype_compl, Fintype.card_subtype_compl]
-    exact Nat.sub_le_sub_left (Fintype.card_le_of_embedding e) _
-  · rintro ⟨S, hind, ⟨e⟩⟩
-    refine ⟨fun x => ¬S x, fun x y hxy hadj => ?_, ?_⟩
-    · rcases Classical.em (S x) with hx | hx
-      · rcases Classical.em (S y) with hy | hy
-        · exact absurd hadj (hind x y hx hy hxy)
-        · exact Or.inr hy
-      · exact Or.inl hx
-    · refine Function.Embedding.nonempty_of_card_le ?_
-      have h1 := Fintype.card_le_of_embedding e
-      rw [Fintype.card_subtype_compl] at h1 ⊢
-      omega
+  · rintro ⟨C, hcov, hcard⟩
+    exact ⟨fun x => ¬C x, fun x y hx hy hxy hadj => (hcov x y hxy hadj).elim hx hy,
+      (ncard_compl_le_ncard_compl_iff {x | Kp x} {x | C x}).mpr hcard⟩
+  · rintro ⟨S, hind, hcard⟩
+    refine ⟨fun x => ¬S x, fun x y hxy hadj => ?_,
+      (ncard_compl_le_iff {x | S x} {x | Kp x}).mpr hcard⟩
+    rcases Classical.em (S x) with hx | hx
+    · rcases Classical.em (S y) with hy | hy
+      · exact absurd hadj (hind x y hx hy hxy)
+      · exact Or.inr hy
+    · exact Or.inl hx
 
 /-- On a finite universe, an independent set at least as large as the marked
 set exists iff a vertex cover at most as large as the *complement* of the
