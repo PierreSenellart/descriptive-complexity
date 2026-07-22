@@ -15,6 +15,7 @@ meant to be read top to bottom as a template for new formalizations.
 
 * `DescriptiveComplexity.Examples.ConjunctiveQueries`: Boolean conjunctive queries
   over relational databases – evaluation and containment, both NP-complete
-  (Chandra–Merlin), with the Chandra–Merlin homomorphism theorem as the
+  ([Chandra & Merlin 1977][chandra1977optimal]), with the Chandra–Merlin
+  homomorphism theorem as the
   bridge between them.
 -/

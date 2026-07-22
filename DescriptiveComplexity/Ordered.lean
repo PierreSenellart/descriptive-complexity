@@ -9,8 +9,9 @@ import Mathlib.ModelTheory.Order
 /-!
 # Ordered first-order reductions
 
-Textbook FO reductions (Immerman, “Descriptive Complexity”, ch. 3) operate on
-*ordered* finite structures: the input structure comes with a linear order on
+Textbook FO reductions ([Immerman 1999][immerman1999descriptive],
+*Descriptive Complexity*, ch. 3) operate on *ordered* finite structures: the
+input structure comes with a linear order on
 its universe, which the defining formulas may mention. The order is essential
 for many reductions: e.g. reducing SAT to 3-colorability threads an OR-gadget
 chain along the order of each clause's literals, which no order-free

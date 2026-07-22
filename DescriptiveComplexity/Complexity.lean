@@ -25,7 +25,8 @@ This file also defines the complement of a decision problem
 The polynomial hierarchy itself – `DescriptiveComplexity.SigmaP`/`DescriptiveComplexity.PiP`, with
 levels `k ≥ 1` *defined* by second-order quantifier alternation and level 0
 left as an empty placeholder – lives in `DescriptiveComplexity.Hierarchy`; the Cook–Levin
-theorem lives with the problem SAT in `DescriptiveComplexity.Problems.Sat`, and
+theorem ([Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal]) lives
+with the problem SAT in `DescriptiveComplexity.Problems.Sat`, and
 completeness theorems for other problems in their files under
 `DescriptiveComplexity/Problems/` (e.g. `DescriptiveComplexity.threeCol_NP_complete` in
 `DescriptiveComplexity.Problems.ThreeColorability`).

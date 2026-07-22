@@ -9,7 +9,9 @@ import DescriptiveComplexity.Complexity
 # Second-order definability with bounded alternation
 
 Foundation for *defining* the levels `Σₖ`/`Πₖ` (`k ≥ 1`) of the polynomial
-hierarchy logically, by Fagin's and Stockmeyer's theorems: `Σₖᵖ` consists of
+hierarchy logically, by Fagin's ([Fagin 1974][fagin1974generalized]) and
+Stockmeyer's ([Stockmeyer 1976][stockmeyer1976polynomial]) theorems: `Σₖᵖ`
+consists of
 the problems definable by a second-order sentence with `k` alternating blocks
 of second-order quantifiers starting existentially – on unordered finite
 structures (the first existential block can guess a linear order, so the

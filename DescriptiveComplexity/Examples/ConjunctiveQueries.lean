@@ -15,7 +15,7 @@ is meant to be read top to bottom, and to serve as a template for formalizing
 further problems. The domain is database theory: **Boolean conjunctive
 queries** (BCQs) over relational databases with set semantics, and the two
 classical decision problems about them, both NP-complete by the results of
-Chandra and Merlin (STOC 1977):
+Chandra and Merlin ([1977][chandra1977optimal]):
 
 * **evaluation** (combined complexity): given a query `q` and a database `D`,
   does `q` hold in `D`?

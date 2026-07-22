@@ -26,7 +26,8 @@ NP-completeness of all three from
   by guessing the clique and an injection of the marked set into it;
 * `DescriptiveComplexity.sat_ordered_fo_reduction_clique : SAT ≤ᶠᵒ[≤] Clique`
   (`DescriptiveComplexity.Problems.CliqueFamily.FromSat`): hardness of Clique, from
-  the Cook–Levin theorem (`DescriptiveComplexity.SAT_NP_complete`);
+  the Cook–Levin theorem (`DescriptiveComplexity.SAT_NP_complete`;
+  [Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal]);
 
 with no machine model anywhere. Membership travels backward and hardness
 forward along the quantifier-free inter-reductions, yielding

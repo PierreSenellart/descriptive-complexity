@@ -20,7 +20,8 @@ first-order reductions –
   (ordered; `DescriptiveComplexity.Problems.ThreeColorability.FromSat`) –
 
 and deriving its NP-completeness from the Cook–Levin theorem
-(`DescriptiveComplexity.SAT_NP_complete`), with no machine model anywhere. As with any
+([Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal];
+`DescriptiveComplexity.SAT_NP_complete`), with no machine model anywhere. As with any
 complexity-theoretic statement, these results are about finite graphs only
 (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/

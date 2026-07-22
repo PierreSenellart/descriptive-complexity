@@ -17,12 +17,14 @@ clause `c`. `DescriptiveComplexity.Satisfiable` is the usual satisfiability, and
 `DescriptiveComplexity.SAT` the bundled decision problem.
 
 SAT is the archetypical NP-complete problem: this is the Cook–Levin theorem
-(`DescriptiveComplexity.SAT_NP_complete`, in `DescriptiveComplexity.Problems.Sat.Hardness`). With
+([Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal];
+`DescriptiveComplexity.SAT_NP_complete`, in `DescriptiveComplexity.Problems.Sat.Hardness`). With
 NP *defined* as existential-second-order definability
 (`DescriptiveComplexity.Hierarchy`), its membership half is the theorem
 `DescriptiveComplexity.sat_sigmaSODefinable` proved here – “there is a truth assignment
 making every clause true” – and its hardness half is the machine-free,
-Dahlhaus-style generic reduction `DescriptiveComplexity.sat_hard_of_sigmaSODefinable`
+Dahlhaus-style ([Dahlhaus 1983][dahlhaus1983reduction]) generic reduction
+`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`
 of `DescriptiveComplexity.Problems.Sat.Hardness`. Other problems' NP-completeness
 proofs derive from it through first-order reductions; see e.g.
 `DescriptiveComplexity.Problems.ThreeColorability`.

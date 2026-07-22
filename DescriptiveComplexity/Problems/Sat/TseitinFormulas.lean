@@ -11,8 +11,9 @@ import DescriptiveComplexity.Ordered
 
 First-order counterpart of `DescriptiveComplexity.Problems.Sat.Tseitin`: formulas over
 the ordered expansion `L.sum Language.order` defining, inside an input
-structure, the clauses of the Tseitin encoding of a kernel formula and their
-literals – `DescriptiveComplexity.Tseitin.isClauseF` mirroring
+structure, the clauses of the Tseitin ([Tseitin 1968][tseitin1968complexity])
+encoding of a kernel formula and their literals –
+`DescriptiveComplexity.Tseitin.isClauseF` mirroring
 `DescriptiveComplexity.Tseitin.IsClauseSem` and `DescriptiveComplexity.Tseitin.litF` mirroring
 `DescriptiveComplexity.Tseitin.LitSem`, with realization lemmas
 (`DescriptiveComplexity.Tseitin.realize_isClauseF`, `DescriptiveComplexity.Tseitin.realize_litF`).

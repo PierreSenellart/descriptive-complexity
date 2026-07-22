@@ -12,7 +12,8 @@ import DescriptiveComplexity.SecondOrderOrdered
 
 The levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy for `k ≥ 1` – in
 particular `NP = Σ₁ᵖ` and `coNP = Π₁ᵖ` – are *defined* here as
-`ComplexityClass`es, via Fagin's and Stockmeyer's theorems: membership is
+`ComplexityClass`es, via Fagin's ([Fagin 1974][fagin1974generalized]) and
+Stockmeyer's ([Stockmeyer 1976][stockmeyer1976polynomial]) theorems: membership is
 second-order definability with `k` alternating quantifier blocks
 (`DescriptiveComplexity.SigmaSODefinable` / `DescriptiveComplexity.PiSODefinable`), and the closure
 of membership under (ordered) FO reductions is provided by the pullback
@@ -29,7 +30,9 @@ non-relational vocabularies.
 
 Level 0 – polynomial time – is *not* defined: no known order-free logic
 captures polynomial time (the Chandra–Harel/Gurevich problem), and the
-Immerman–Vardi characterization `P = FO(LFP)` on ordered structures would
+Immerman–Vardi characterization `P = FO(LFP)`
+([Immerman 1986][immerman1986relational]; [Vardi 1982][vardi1982complexity]) on
+ordered structures would
 require formalizing least fixed points and a built-in order. Rather than
 axiomatize PTIME, `SigmaP 0` and `PiP 0` are set to the empty class
 (`ComplexityClass.empty`) – nothing is claimed about level 0, all statements

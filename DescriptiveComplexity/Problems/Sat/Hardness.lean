@@ -9,8 +9,10 @@ import DescriptiveComplexity.Problems.Sat.TseitinFormulas
 /-!
 # The Cook–Levin theorem: hardness of SAT
 
-The hardness half of the Cook–Levin theorem, machine-free and in the style of
-Dahlhaus: every existential-second-order definable problem admits an ordered
+The hardness half of the Cook–Levin theorem ([Cook 1971][cook1971complexity];
+[Levin 1973][levin1973universal]), machine-free and in the style of Dahlhaus
+([Dahlhaus 1983][dahlhaus1983reduction]): every existential-second-order
+definable problem admits an ordered
 first-order reduction to SAT
 (`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`). Since NP is *defined* as
 `Σ₁`-definability (`DescriptiveComplexity.Hierarchy`), together with the membership
@@ -20,7 +22,8 @@ Lean's standard three, as `#print axioms` confirms.
 
 Given the single second-order block `B` and the first-order kernel `φ` of a
 `Σ₁` definition of a problem `Q`, the reduction interprets, inside an ordered
-input structure `A`, the CNF instance of the Tseitin encoding of `φ`
+input structure `A`, the CNF instance of the Tseitin encoding
+([Tseitin 1968][tseitin1968complexity]) of `φ`
 (`DescriptiveComplexity.Problems.Sat.Tseitin`):
 
 * propositional variables: one per relation variable `i` of `B` and

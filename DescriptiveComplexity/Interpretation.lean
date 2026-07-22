@@ -17,7 +17,8 @@ computation: the reduction is *first-order expressible* – the output structure
 can be described by fixed first-order formulas evaluated in the input
 structure. Such FO reductions are computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so
 exhibiting an FO reduction is (much) stronger than exhibiting a Karp
-reduction, while being completely machine-model-free and therefore easy to
+reduction ([Karp 1972][karp1972reducibility]), while being completely
+machine-model-free and therefore easy to
 formalize on top of Mathlib's `ModelTheory` library.
 
 This file defines:

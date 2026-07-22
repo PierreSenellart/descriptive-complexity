@@ -11,10 +11,13 @@ import Mathlib.Tactic.FinCases
 # The Tseitin encoding of a first-order kernel: semantic layer
 
 Machinery for the hardness half of the Cook–Levin theorem
-(`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`, in
+([Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal];
+`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`, in
 `DescriptiveComplexity.Problems.Sat.Hardness`): the generic, machine-free reduction of
-any existential-second-order definable problem to SAT, in the style of
-Dahlhaus. Given the first-order kernel `φ` (a sentence over the input
+any existential-second-order definable problem to SAT (via a Tseitin
+([Tseitin 1968][tseitin1968complexity]) encoding), in the style of Dahlhaus
+([Dahlhaus 1983][dahlhaus1983reduction]). Given the first-order kernel `φ`
+(a sentence over the input
 vocabulary expanded by one second-order block), the produced CNF instance has
 
 * one propositional variable per relation variable `i` of the block and tuple
