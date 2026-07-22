@@ -122,6 +122,11 @@ noncomputable def unitLitF (s : Bool) (x : α) : satOrd.Formula α :=
 noncomputable def emptyClF (c : α) : satOrd.Formula α :=
   clF c ⊓ ∼((occF false (.inl c) (.inr ()) ⊔ occF true (.inl c) (.inr ())).iExs Unit)
 
+/-- Some clause is empty, as a (closed) formula: the standard spoiler
+condition of reductions from SAT, making the whole CNF unsatisfiable. -/
+noncomputable def exEmptyClF : satOrd.Formula α :=
+  (emptyClF (Sum.inr ())).iExs Unit
+
 end Builders
 
 /-! ### Realization lemmas -/
@@ -275,6 +280,11 @@ theorem realize_emptyClF {c : α} : (emptyClF c).Realize v ↔ EmptyCl (v c) := 
     refine ⟨h1, ?_⟩
     rintro ⟨i, h | h⟩
     exacts [h2 (i ()) false h, h2 (i ()) true h]
+
+@[simp]
+theorem realize_exEmptyClF : (exEmptyClF (α := α)).Realize v ↔ ∃ c : A, EmptyCl c := by
+  simp only [exEmptyClF, Formula.realize_iExs, realize_emptyClF, Sum.elim_inr]
+  exact ⟨fun ⟨i, h⟩ => ⟨i (), h⟩, fun ⟨c, h⟩ => ⟨fun _ => c, h⟩⟩
 
 end Realize
 
