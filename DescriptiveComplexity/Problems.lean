@@ -8,6 +8,7 @@ import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Problems.ThreeColorability
 import DescriptiveComplexity.Problems.ThreeSat
 import DescriptiveComplexity.Problems.CliqueFamily
+import DescriptiveComplexity.Problems.Qbf
 
 /-!
 # The problem catalog

@@ -40,9 +40,11 @@ The library is organized in three layers:
   duality `Πₖᵖ = co-Σₖᵖ` as theorems). Polynomial time is left undefined, so
   the library declares no axioms.
 * **A problem catalog and worked examples**: SAT (with a machine-free
-  Cook–Levin theorem), 3-colorability, 3SAT and the clique family
-  (Clique / Independent Set / Vertex Cover), plus a tutorial on conjunctive
-  queries – each with its vocabulary, FO reductions and completeness theorems.
+  Cook–Levin theorem), 3-colorability, 3SAT, the clique family
+  (Clique / Independent Set / Vertex Cover), and `QBF k` – quantified Boolean
+  formulas with `k` alternating blocks, complete for the `k`-th level of the
+  polynomial hierarchy – plus a tutorial on conjunctive queries; each with its
+  vocabulary, FO reductions and completeness theorems.
 
 ## Documentation
 

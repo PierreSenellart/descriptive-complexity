@@ -103,21 +103,49 @@ carried through:
 | fragment | complete problem | note |
 |---|---|---|
 | ∃SO | SAT | done (Cook–Levin discharge) |
-| SO alternation, level k | QBF_k | same construction + block marks |
+| SO alternation, level k | QBF_k | done (same construction + block marks) |
 | SO-Horn (P) | HORN-SAT | Horn kernel ⇒ Horn clauses; easier than Cook–Levin |
 | SO-Krom (NL) | 2SAT | Krom kernel ⇒ binary clauses |
 | SO(TC) (PSPACE) | QSAT | least mechanical: natural image is a succinct/game reachability, QSAT via the standard alternation argument |
 
-Consequence: do HORN-SAT and QBF_k while the Cook–Levin machinery is
-warm; CVP and alternating reachability then enter the catalog as
+Consequence: do HORN-SAT while the Cook–Levin machinery is warm (QBF_k
+is done, and its merging/transfer infrastructure is reusable); CVP and alternating reachability then enter the catalog as
 ordinary reductions *from* HORN-SAT rather than as primary discharges.
 
-- **QBF_k (Σₖ/Πₖ-QSAT)** [M]: quantified Boolean formulas with k
-  alternation blocks, complete for `SigmaP k` / `PiP k`. Vocabulary =
-  sat plus block-membership predicates on variables. The hardness proof
-  is a direct generalization of the Cook–Levin discharge
-  (`sat_hard_of_sigmaSODefinable`); best done while that construction
-  is fresh. Gives the PH levels their canonical complete problems.
+- **QBF_k (Σₖ/Πₖ-QSAT)** [M, *done*]: quantified Boolean formulas with k
+  alternation blocks, `Σₖᵖ`-complete (`QBF_complete`). Vocabulary = sat
+  plus k unary block marks on variables (`Language.qbf k`), semantics =
+  alternating quantification `altQuant` over k truth assignments.
+  Landed in `Problems/Qbf/` (`Defs`, `Membership`, `Transfer`,
+  `Hardness`) plus the reusable `SecondOrderMerge.lean`; axiom-free. At
+  k = 1 it specializes to a second NP-completeness proof
+  (`QBF_one_NP_complete`).
+  - **The matrix shape follows the parity of k** – forced, and the
+    standard form of the Σₖᵖ-complete QBF problems. Tseitin introduces
+    *gate* variables; they are functionally determined
+    (`∃ gates. CNF(atoms, gates) ↔ φ(atoms)`, `exists_gates`), so the
+    gate quantifier can be absorbed into the innermost quantifier of the
+    prefix *only when that quantifier is existential* – a universal
+    player would otherwise falsify a gate clause and collapse the
+    instance. With an existential outermost block the innermost is
+    existential iff k is odd, so `QBF k` takes a conjunctive matrix for
+    odd k and a disjunctive one for even k, linked by
+    `dnfSat_iff_not_cnfSatWith_true` (negation plus a swap of all literal
+    signs — *not* a complementation of the assignments, which would only
+    be correct on instances whose block marks partition the variables).
+    Choosing the interpretation's literal signs by the same flag makes
+    the parity vanish from the correctness proof: the literal a satisfied
+    clause must make true is always the positive Tseitin one.
+  - Reusable pieces worth knowing about for the other discharges of this
+    section: `SecondOrderMerge.lean` (merge a prefix into one block and
+    back; enlarge the innermost block by an auxiliary one, so a
+    quantifier can range over a pair) and `Problems/Qbf/Transfer.lean`
+    (move an alternating prefix between truth assignments and block
+    assignments, given a reading that is surjective at every block).
+    `qbfT_clauses_iff` is the `∃`-free form of `tseitin_satisfiable_iff`
+    — the shape any *alternating* discharge needs, since the prefix
+    supplies the assignment rather than quantifying it.
+
 - **TAUT / 3-DNF tautology** [S]: coNP-complete via the existing
   complement machinery (`PiP 1` = complements of `SigmaP 1`).
 - **P-hardness family** [M–L]: statements of the form “every
@@ -279,12 +307,11 @@ separations and non-reducibility, impossible in the machine world.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
-1. QBF_k (rides the Cook–Levin momentum).
-2. Cheap catalog wins: Set Cover, Dominating Set, k-COL, TAUT.
-2bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
+1. Cheap catalog wins: Set Cover, Dominating Set, k-COL, TAUT.
+1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
-3. SO-Horn path to an axiom-free PTIME; HORN-SAT hardness.
-4. EF games + EVEN/REACH inexpressibility (opens §5).
-5. FO(TC)/REACH, then Immerman–Szelepcsényi as the flagship theorem.
-6. SO(TC) and QSAT for PSPACE; then FO(LFP)/FO(PFP) as the
+2. SO-Horn path to an axiom-free PTIME; HORN-SAT hardness.
+3. EF games + EVEN/REACH inexpressibility (opens §5).
+4. FO(TC)/REACH, then Immerman–Szelepcsényi as the flagship theorem.
+5. SO(TC) and QSAT for PSPACE; then FO(LFP)/FO(PFP) as the
    textbook-faithfulness layer and the rest of §4.

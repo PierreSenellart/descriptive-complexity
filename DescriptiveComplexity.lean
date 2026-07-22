@@ -12,6 +12,7 @@ import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.SecondOrderMerge
 import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.OccurrenceOrder
 import DescriptiveComplexity.OccurrenceFormulas
@@ -88,6 +89,9 @@ individual declarations are documented on their own pages.
 
 ## Shared encodings
 
+* `DescriptiveComplexity.SecondOrderMerge` – merging a second-order quantifier
+  prefix into a single block (and back), so that constructions stated for one
+  block can read the kernel of a `k`-block sentence.
 * `DescriptiveComplexity.OccurrenceOrder` and
   `DescriptiveComplexity.OccurrenceFormulas` – machinery for encoding
   occurrences of literals in clauses, shared across the SAT-family reductions.
@@ -101,7 +105,11 @@ individual declarations are documented on their own pages.
   [Levin 1973][levin1973universal]) proved by a machine-free Tseitin discharge,
   3-colorability (FO-interreducible with SAT in both directions), 3SAT, and
   the clique family (Clique, Independent Set, Vertex Cover) with their
-  inter-reductions and NP-completeness.
+  inter-reductions and NP-completeness; and `QBF k`, quantified Boolean
+  formulas with `k` alternating blocks, complete for the `k`-th level of the
+  hierarchy ([Stockmeyer 1976][stockmeyer1976polynomial]; [Wrathall
+  1976][wrathall1976complete]) by the same Tseitin discharge carrying block
+  marks.
 
 ## Worked examples
 
