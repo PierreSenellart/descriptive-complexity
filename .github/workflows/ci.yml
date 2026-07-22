@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Installs elan/Lean from lean-toolchain, runs `lake exe cache get`
+      # (Mathlib is in the closure) and `lake build`; also runs any test and
+      # lint targets it can auto-detect.
+      - name: Build, test and lint
+        uses: leanprover/lean-action@v1

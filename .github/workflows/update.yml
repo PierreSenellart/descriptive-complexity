@@ -1,0 +1,29 @@
+name: Update Mathlib
+
+# Periodically try bumping the toolchain and Mathlib. On success a PR is
+# opened for review (the pin still has to be moved to the next *stable* tag by
+# hand, per the version scheme in PACKAGING.md); on failure an issue is filed.
+# Monthly cadence keeps each breakage small.
+on:
+  schedule:
+    - cron: "0 6 1 * *" # 06:00 UTC on the 1st of each month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  update:
+    name: Try updating Mathlib
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update Lean and Mathlib
+        uses: oliver-butterley/lean-update@v1-alpha
+        with:
+          on_update_succeeds: pr
+          on_update_fails: issue
