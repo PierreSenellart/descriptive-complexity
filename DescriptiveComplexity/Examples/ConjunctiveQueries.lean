@@ -805,8 +805,7 @@ end Concrete
 end DescriptiveComplexity
 
 /-!
-### Step 7: containment – vocabulary, semantics, and the Chandra–Merlin
-theorem
+### Step 7: containment – vocabulary, semantics, and the Chandra–Merlin theorem
 
 An instance of the containment problem is a *pair* of queries over a shared
 universe: unary predicates mark the variables of the left and of the right
