@@ -289,6 +289,7 @@ theorem bitRank_lt (hlin : IsLinOrd Le) {p q : A} (hp : Posn p) (hle : Le p q)
   have hnot : p ∉ {r : A | Posn r ∧ Le r p ∧ r ≠ p} := fun h => h.2.2 rfl
   exact Set.ncard_lt_ncard ⟨hsub, fun hcon => hnot (hcon hmem)⟩ (Set.toFinite _)
 
+omit [Finite A] in
 /-- The element immediately below a given one is unique. -/
 theorem succPos_left_unique (hlin : IsLinOrd Le) {p p' q : A}
     (h : SuccPos Le Posn p q) (h' : SuccPos Le Posn p' q) : p = p' := by
