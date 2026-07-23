@@ -351,18 +351,8 @@ theorem steinerTree_sigmaSODefinable : SigmaSODefinable 1 SteinerTree := by
 
 The same certificate, plus the edge set itself, and with the threshold
 injection mapping *pairs* to *elements* – hence a ternary relation variable,
-for which `DescriptiveComplexity.realize_rel₃` plays the role Mathlib's
-`Formula.realize_rel₁`/`₂` play at lower arity. -/
-
-/-- Realization of an atom of arity 3. -/
-theorem realize_rel₃ {L : Language} {α M : Type} [L.Structure M] {R : L.Relations 3}
-    {t₁ t₂ t₃ : L.Term α} {v : α → M} :
-    (R.formula ![t₁, t₂, t₃]).Realize v ↔
-      RelMap R ![t₁.realize v, t₂.realize v, t₃.realize v] := by
-  rw [Formula.realize_rel, iff_eq_eq]
-  congr 1
-  funext i
-  fin_cases i <;> rfl
+for which `DescriptiveComplexity.realize_rel₃` (`DescriptiveComplexity.Interpretation`)
+plays the role Mathlib's `Formula.realize_rel₁`/`₂` play at lower arity. -/
 
 /-- The five relation variables guessed by the `Σ₁` definition of the
 edge-weighted Steiner tree. -/

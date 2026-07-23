@@ -135,6 +135,37 @@ theorem relMap_equiv₂ (e : A ≃[L] B) (r : L.Relations 2) (a b : A) :
   rw [hv] at h
   exact h.symm
 
+/-- A ternary relation transports along an `L`-isomorphism. -/
+theorem relMap_equiv₃ (e : A ≃[L] B) (r : L.Relations 3) (a b c : A) :
+    RelMap r ![a, b, c] ↔ RelMap r ![e a, e b, e c] := by
+  have h := StrongHomClass.map_rel e r ![a, b, c]
+  have hv : e ∘ ![a, b, c] = ![e a, e b, e c] := by
+    funext j
+    fin_cases j <;> simp
+  rw [hv] at h
+  exact h.symm
+
+/-- Realization of an atom of arity 3, the shape Mathlib's
+`Formula.realize_rel₁` and `Formula.realize_rel₂` stop short of. -/
+theorem realize_rel₃ {L : Language} {α M : Type} [L.Structure M] {R : L.Relations 3}
+    {t₁ t₂ t₃ : L.Term α} {v : α → M} :
+    (R.formula ![t₁, t₂, t₃]).Realize v ↔
+      RelMap R ![t₁.realize v, t₂.realize v, t₃.realize v] := by
+  rw [Formula.realize_rel, iff_eq_eq]
+  congr 1
+  funext i
+  fin_cases i <;> rfl
+
+/-- Realization of an atom of arity 4. -/
+theorem realize_rel₄ {L : Language} {α M : Type} [L.Structure M] {R : L.Relations 4}
+    {t₁ t₂ t₃ t₄ : L.Term α} {v : α → M} :
+    (R.formula ![t₁, t₂, t₃, t₄]).Realize v ↔
+      RelMap R ![t₁.realize v, t₂.realize v, t₃.realize v, t₄.realize v] := by
+  rw [Formula.realize_rel, iff_eq_eq]
+  congr 1
+  funext i
+  fin_cases i <;> rfl
+
 end RelMapTransport
 
 /-- A *tagged `dim`-dimensional first-order interpretation* of the relational

@@ -13,7 +13,7 @@ import DescriptiveComplexity.Hierarchy
 The `Σ₁` definition of `DescriptiveComplexity.MaxCut`: guess one side `S` of the cut
 and an injection of the marked pairs into the cut, the injection being a
 *quaternary* relation variable since it maps pairs to pairs, exactly as for
-Feedback Arc Set (whose `DescriptiveComplexity.realize_rel₄` this file reuses).
+Feedback Arc Set, and reusing its `DescriptiveComplexity.realize_rel₄`.
 -/
 
 namespace DescriptiveComplexity

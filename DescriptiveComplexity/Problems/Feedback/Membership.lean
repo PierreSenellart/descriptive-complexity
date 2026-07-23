@@ -29,8 +29,8 @@ same five-clause shape. A single existential block guesses
 and the kernel checks transitivity, irreflexivity, that every surviving arc
 goes forward in the order, and that the injection is total and injective. The
 arity-4 atom is the only thing the second definition needs beyond the first,
-and it costs one general-arity realization lemma
-(`DescriptiveComplexity.realize_rel₄`), Mathlib's `Formula.realize_rel₁`/`₂` stopping
+and it costs nothing beyond `DescriptiveComplexity.realize_rel₄`
+(`DescriptiveComplexity.Interpretation`), Mathlib's `Formula.realize_rel₁`/`₂` stopping
 at arity 2.
 -/
 
@@ -39,17 +39,6 @@ namespace DescriptiveComplexity
 open FirstOrder
 
 open Language Structure SOBlock
-
-/-- Realization of an atom of arity 4, the shape Mathlib's `realize_rel₁` and
-`realize_rel₂` stop short of. -/
-theorem realize_rel₄ {L : Language} {α M : Type} [L.Structure M] {R : L.Relations 4}
-    {t₁ t₂ t₃ t₄ : L.Term α} {v : α → M} :
-    (R.formula ![t₁, t₂, t₃, t₄]).Realize v ↔
-      RelMap R ![t₁.realize v, t₂.realize v, t₃.realize v, t₄.realize v] := by
-  rw [Formula.realize_rel, iff_eq_eq]
-  congr 1
-  funext i
-  fin_cases i <;> rfl
 
 section SigmaOne
 

@@ -39,16 +39,6 @@ open FirstOrder
 
 open Language Structure SOBlock
 
-/-- Realization of an atom of arity 3. -/
-theorem realize_rel₃ {L : Language} {α M : Type} [L.Structure M] {R : L.Relations 3}
-    {t₁ t₂ t₃ : L.Term α} {v : α → M} :
-    (R.formula ![t₁, t₂, t₃]).Realize v ↔
-      RelMap R ![t₁.realize v, t₂.realize v, t₃.realize v] := by
-  rw [Formula.realize_rel, iff_eq_eq]
-  congr 1
-  funext i
-  fin_cases i <;> rfl
-
 section SigmaOne
 
 /-- The relation variables of the certificate: the chosen items, and the
