@@ -51,22 +51,90 @@ read bits, never sum them.
 
 ## 1. NP-complete problems (catalog growth)
 
-Current: SAT, 3SAT, 3COL (both directions), and the full
+Current: SAT, 3SAT, 3COL (both directions), the full
 NP-completeness of the clique family (Clique/IS/VC), via the
 SAT → Clique ordered reduction, the Σ₁ membership of Clique, and the
-existing Clique/IS/VC inter-reductions.
+existing Clique/IS/VC inter-reductions; Set Cover / Hitting Set,
+Set Packing, k-colorability and Feedback Vertex Set (see the items
+below). `TODO.md` carries the running status table of Karp's 21 with a
+proof plan for each problem still open.
 
-- **Set Cover / Hitting Set** [S]: from VC; bipartite incidence
-  vocabulary, quantifier-free.
-- **Dominating Set** [S]: from VC by edge subdivision;
-  quantifier-free, 2-dimensional.
-- **Graph k-colorability, fixed k ≥ 3** [S]: from 3COL by adding k−3
-  universal vertices (tags). Chromatic-number threshold version via
-  representation (A).
+- **Set Cover / Hitting Set / Set Packing** [S, *done*]: `Problems/SetFamily/`
+  (`Defs`, `Reductions`, `FromGraphs`, `Membership`) plus the umbrella
+  `Problems/SetFamily.lean`, laid out like `Problems/CliqueFamily/`:
+  generic properties on predicates, inter-reductions inside the family, the
+  hardness source, the `Σ₁` definitions, and completeness theorems in the
+  umbrella. Vocabulary `Language.setSystem`: two unary
+  marks separating ground elements from sets of the family, a binary
+  incidence relation, and the threshold mark (representation (A)). The
+  two problems are one generic property `CoversOn` read in the two
+  directions of the incidence relation, so a single dimension-1
+  quantifier-free interpretation (`transposeInterp`) reduces each to
+  the other, as complementation does for Clique/IS. Hardness comes
+  from VC by the textbook edge-incidence reading (`edgeIncidenceInterp`,
+  dimension 2: off-diagonal adjacent pairs are the edge-elements,
+  diagonal pairs the vertex-sets, everything else junk that no relation
+  mentions), membership by the same `Σ₁` shape as Clique with the
+  injection running *into* the marked set, the threshold being an upper
+  bound here. Note the general lesson: junk tuples are free whenever
+  the target vocabulary carries its own “this element is a real one”
+  marks.
+- **Graph k-colorability, fixed k ≥ 3** [S, *done*]:
+  `Problems/KColorability.lean`. `KColorable k`/`KCol k` for all k
+  (`kCol_three : KCol 3 = ThreeCol`), `kCol_NP_complete (hk : 3 ≤ k)`.
+  Membership guesses the k color classes as k unary relation variables
+  (`Formula.iSup`/`iInf` over `Fin k` in the kernel); hardness pads
+  3COL with m = k − 3 universal vertices, which an interpretation can
+  only add as *tags*, hence as blown-up independent classes
+  (`padColorInterp`, tag type `Option (Fin m)`). The blow-up is
+  harmless: the classes take pairwise disjoint colors, all distinct
+  from the original part's, which is what leaves exactly 3 colors for
+  the input graph – a counting argument that needs the input structure
+  nonempty (an empty class would eat no color). Chromatic-number
+  threshold version via representation (A) is still open.
+- **Set Packing** [S, *done*]: the third member of the family above,
+  `PacksOn` (a pairwise disjoint subfamily at least as large as the marked
+  set) and `setPacking_NP_complete`. Its hardness reduction is the *same*
+  `edgeIncidenceInterp` as for Set Cover, read from Independent Set: two distinct vertices are non-adjacent exactly when their sets of
+  incident edges are disjoint (`exists_elem_mem_both_iff`). Note the design
+  point: disjointness is required of the *ground elements* only, and that
+  guard is load-bearing – the junk pairs of the interpretation are incident
+  to two vertex-sets each, and they are exactly the pairs that must not
+  witness an intersection.
+- **Feedback Vertex Set** [M, *done*]: `Problems/FeedbackVertexSet.lean`,
+  `feedbackVertexSet_NP_complete`. On marked graphs, whose adjacency is an
+  arbitrary binary relation, i.e. a digraph; acyclicity of what survives the
+  removal is `Relation.TransGen`-irreflexivity (`AcyclicOff`). Hardness is
+  Vertex Cover with the arcs *symmetrized off the diagonal*
+  (`symmetrizeInterp`, quantifier-free, dimension 1): every edge becomes a
+  2-cycle, so killing all cycles is exactly meeting all edges, and the marked
+  set is copied, so there is no counting step at all. Membership rests on
+  `acyclic_iff_exists_order`: acyclicity is equivalent to the existence of a
+  strict partial order containing every surviving arc, which is the
+  first-order certificate the `Σ₁` block guesses (together with the removed
+  set and the threshold injection). That certificate shape is the reusable
+  piece for Feedback Arc Set, Steiner Tree and the Hamilton problems.
+- **Dominating Set** [M–L, *harder than it looks*]: the classical
+  reduction from VC by edge subdivision does not survive the tagged
+  framework as an order-free reduction. Domination is a condition on
+  *every* element of the universe, so junk tuples cannot be ignored:
+  they are isolated vertices, each forcing itself into the dominating
+  set. Blowing junk up into cliques of existing vertices fixes that
+  (clique blow-ups preserve the domination number), but isolated
+  vertices of the input, and the fact that γ ≥ 1 while a vertex cover
+  may be empty, still need a canonical extra element – i.e. an *ordered*
+  reduction (`≤ᶠᵒ[≤]`), where “the minimum element” is definable. Plan
+  it as an ordered reduction from Set Cover (elements ∪ sets, sets made
+  into a clique), not as a quantifier-free one.
 - **NAE-3SAT and 1-in-3SAT** [M]: Schaefer-style variants; valuable as
   reduction *sources* (their gadgets are more local than 3SAT's).
 - **Max Cut** [M]: from NAE-3SAT; threshold via (A).
-- **Feedback Vertex Set / Feedback Arc Set** [M]: from VC.
+- **Feedback Arc Set** [M]: from Feedback Vertex Set by the standard
+  vertex-splitting; it reuses `AcyclicOff`/`acyclic_iff_exists_order`, but
+  its threshold counts *arcs*, so it needs the threshold as the cardinality
+  of a marked **binary** relation – the one-arity-up version of
+  representation (A), also needed by Max Cut. Decide that before defining
+  either problem.
 - **Subgraph Isomorphism** [S]: generalizes Clique; two-graphs-in-one
   vocabulary via `Language.markedGraph`-style unary marks.
 - **Hamiltonian Cycle (directed and undirected)** [L]: from VC or 3SAT;
@@ -443,7 +511,13 @@ separations and non-reducibility, impossible in the machine world.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
-1. Cheap catalog wins: Set Cover, Dominating Set, k-COL (TAUT is done).
+1. Cheap catalog wins: **done** (Set Cover / Hitting Set, Set Packing,
+   k-COL, Feedback Vertex Set, TAUT); next in the same vein are Subgraph
+   Isomorphism [S] and the Schaefer-style variants NAE-3SAT / 1-in-3SAT
+   [M], which are worth having as reduction *sources*, then the
+   binary-threshold extension of representation (A) that unblocks
+   Feedback Arc Set and Max Cut. Dominating Set has been reclassified as
+   an ordered reduction (see §1).
 1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
 2. SO-Horn path to an axiom-free PTIME: **done** – the class, its

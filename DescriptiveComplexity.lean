@@ -163,7 +163,11 @@ individual declarations are documented on their own pages.
   [Levin 1973][levin1973universal]) proved by a machine-free Tseitin discharge,
   3-colorability (FO-interreducible with SAT in both directions), 3SAT, and
   the clique family (Clique, Independent Set, Vertex Cover) with their
-  inter-reductions and NP-completeness; TAUT, the tautology problem for
+  inter-reductions and NP-completeness; `k`-colorability for every `k ≥ 3`, by
+  padding 3-colorability with blown-up universal vertices; Set Cover and
+  Hitting Set, transposes of each other on a bipartite incidence vocabulary,
+  NP-hard by reading a graph as the incidence system of its edges
+  ([Karp 1972][karp1972reducibility]); TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
   alternating blocks, complete for the `k`-th level of the hierarchy
