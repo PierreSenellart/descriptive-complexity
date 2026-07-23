@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.SecondOrderHorn
+import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.Problems.HornSat.Unsat
 
 /-!
@@ -33,7 +34,8 @@ clause with two distinct positive literals (the Horn condition itself, which
 `DescriptiveComplexity.HORNSAT` folds into its yes-instances).
 
 All the order-dependent predicates – being minimal or maximal, being the
-immediate successor – are first-order over `Language.sat.sum Language.order`,
+immediate successor – are first-order over `Language.sat.sum Language.order`
+(the shared guards of `DescriptiveComplexity.OrderWalk`),
 and appear only in *guards*, where arbitrary first-order formulas are allowed.
 The second-order atoms are `T` and `B` only, one or two per clause body: the
 program is Horn.
@@ -44,108 +46,6 @@ namespace DescriptiveComplexity
 open FirstOrder
 
 open Language Structure
-
-/-! ### Order guards -/
-
-section Guards
-
-variable {L : Language.{0, 0}} {α : Type}
-
-/-- `t₁ ≤ t₂`, as a formula over the ordered expansion. -/
-noncomputable def leF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (L.sum Language.order).Formula α :=
-  Relations.formula₂ leSymb t₁ t₂
-
-/-- `t₁ < t₂`, as a formula over the ordered expansion. -/
-noncomputable def ltF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (L.sum Language.order).Formula α :=
-  leF t₁ t₂ ⊓ ∼(leF t₂ t₁)
-
-/-- The variable `x` holds a minimum. -/
-noncomputable def minF (x : α) : (L.sum Language.order).Formula α :=
-  (leF (Term.var (Sum.inl x)) (Term.var (Sum.inr 0))).iAlls (Fin 1)
-
-/-- The variable `x` holds a maximum. -/
-noncomputable def maxF (x : α) : (L.sum Language.order).Formula α :=
-  (leF (Term.var (Sum.inr 0)) (Term.var (Sum.inl x))).iAlls (Fin 1)
-
-/-- `w` holds the immediate predecessor of `z`. -/
-noncomputable def succF (w z : α) : (L.sum Language.order).Formula α :=
-  ltF (Term.var w) (Term.var z) ⊓
-    (show (L.sum Language.order).Formula (α ⊕ Fin 1) from
-      ∼(ltF (Term.var (Sum.inl w)) (Term.var (Sum.inr 0)) ⊓
-        ltF (Term.var (Sum.inr 0)) (Term.var (Sum.inl z)))).iAlls (Fin 1)
-
-variable {A : Type} [L.Structure A] [LinearOrder A] {v : α → A}
-
-@[simp]
-theorem realize_leF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (leF t₁ t₂).Realize v ↔ t₁.realize v ≤ t₂.realize v := by
-  rw [leF, Formula.realize_rel₂, relMap_leSymb]
-  exact Iff.rfl
-
-@[simp]
-theorem realize_ltF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (ltF t₁ t₂).Realize v ↔ t₁.realize v < t₂.realize v := by
-  rw [ltF, Formula.realize_inf, Formula.realize_not, realize_leF, realize_leF]
-  exact lt_iff_le_not_ge.symm
-
-@[simp]
-theorem realize_minF (x : α) : (minF (L := L) x).Realize v ↔ ∀ a : A, v x ≤ a := by
-  rw [minF]
-  simp only [Formula.realize_iAlls, realize_leF, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
-  exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
-
-@[simp]
-theorem realize_maxF (x : α) : (maxF (L := L) x).Realize v ↔ ∀ a : A, a ≤ v x := by
-  rw [maxF]
-  simp only [Formula.realize_iAlls, realize_leF, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
-  exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
-
-@[simp]
-theorem realize_succF (w z : α) :
-    (succF (L := L) w z).Realize v ↔ v w < v z ∧ ∀ a : A, ¬(v w < a ∧ a < v z) := by
-  rw [succF]
-  simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_not, realize_ltF,
-    Term.realize_var, Sum.elim_inl, Sum.elim_inr]
-  exact and_congr Iff.rfl ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
-
-end Guards
-
-/-! ### Immediate predecessors in a finite linear order -/
-
-section Pred
-
-variable {A : Type} [LinearOrder A] [Finite A]
-
-/-- In a finite linear order, an element that is not a minimum has an
-immediate predecessor. -/
-theorem exists_succ_of_not_min {z : A} (hz : ¬∀ a : A, z ≤ a) :
-    ∃ w : A, w < z ∧ ∀ a : A, ¬(w < a ∧ a < z) := by
-  classical
-  have := Fintype.ofFinite A
-  have hne : (Finset.univ.filter fun a : A => a < z).Nonempty := by
-    push Not at hz
-    obtain ⟨a, ha⟩ := hz
-    exact ⟨a, Finset.mem_filter.mpr ⟨Finset.mem_univ a, ha⟩⟩
-  refine ⟨(Finset.univ.filter fun a : A => a < z).max' hne, ?_, ?_⟩
-  · exact (Finset.mem_filter.mp ((Finset.univ.filter fun a : A => a < z).max'_mem hne)).2
-  · rintro a ⟨hwa, haz⟩
-    exact absurd ((Finset.univ.filter fun a : A => a < z).le_max'
-      a (Finset.mem_filter.mpr ⟨Finset.mem_univ a, haz⟩)) (not_le.mpr hwa)
-
-/-- Induction along a finite linear order: from the minimum, one immediate
-successor at a time. -/
-theorem order_induction {P : A → Prop} (hmin : ∀ z : A, (∀ a : A, z ≤ a) → P z)
-    (hstep : ∀ w z : A, w < z → (∀ a : A, ¬(w < a ∧ a < z)) → P w → P z) (z : A) : P z := by
-  induction z using (Finite.to_wellFoundedLT (α := A)).wf.induction with
-  | _ z ih =>
-    by_cases hz : ∀ a : A, z ≤ a
-    · exact hmin z hz
-    · obtain ⟨w, hwz, hnb⟩ := exists_succ_of_not_min hz
-      exact hstep w z hwz hnb (ih w hwz)
-
-end Pred
 
 /-! ### The Horn program -/
 

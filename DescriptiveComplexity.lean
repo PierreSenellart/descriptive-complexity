@@ -15,6 +15,9 @@ import DescriptiveComplexity.SecondOrderOrdered
 import DescriptiveComplexity.SecondOrderMerge
 import DescriptiveComplexity.SecondOrderHorn
 import DescriptiveComplexity.SecondOrderHornPull
+import DescriptiveComplexity.FixedPoint
+import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.FixedPointHorn
 import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -111,6 +114,28 @@ individual declarations are documented on their own pages.
   0 into level 1. See `DescriptiveComplexity.Problems.HornSat` for what is and is not
   claimed.
 
+* `DescriptiveComplexity.FixedPoint` – FO(LFP) ([Immerman
+  1986][immerman1986relational]; [Vardi 1982][vardi1982complexity]), in the same
+  clausal style: a rule system defining a least fixed point, plus an
+  *unrestricted* first-order output sentence read at it. Because the output may
+  negate fixed-point atoms, FO(LFP) definability is closed under complement by
+  construction (`DescriptiveComplexity.LFPDefinable.compl`) – the one thing the Horn
+  fragment cannot do head-on – and every SO-Horn definition transports into it
+  (`DescriptiveComplexity.SigmaSOHornDefinable.lfpDefinable`).
+
+* `DescriptiveComplexity.FixedPointHorn` – the converse translation, the hard half of
+  Grädel's equivalence: every FO(LFP) definition compiles back into the Horn
+  fragment, by deriving the *complement* of the fixed point stage by stage
+  along the order and evaluating the output sentence clausewise
+  (`DescriptiveComplexity.LFPDefinable.sigmaSOHornDefinable`). The two formalisms are
+  therefore interchangeable
+  (`DescriptiveComplexity.lfpDefinable_iff_sigmaSOHornDefinable`), SO-Horn definability
+  is closed under complement (`DescriptiveComplexity.SigmaSOHornDefinable.compl`), and
+  level 0 of the hierarchy collapses: `PiP 0 = SigmaP 0`
+  (`DescriptiveComplexity.piP_zero_eq`), polynomial time closed under complement. The
+  order-walking machinery shared with the HORN-SAT program lives in
+  `DescriptiveComplexity.OrderWalk`.
+
 ## Shared encodings
 
 * `DescriptiveComplexity.SecondOrderMerge` – merging a second-order quantifier
@@ -124,6 +149,10 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.OccurrenceOrder` and
   `DescriptiveComplexity.OccurrenceFormulas` – machinery for encoding
   occurrences of literals in clauses, shared across the SAT-family reductions.
+* `DescriptiveComplexity.OrderWalk` – walking a finite linear order (or the
+  lexicographic order on tuples) first-order: min/max/successor guards and
+  their tuple analogues, induction along covers, and the rank of an element.
+  Shared between the HORN-SAT program and the FO(LFP) → SO-Horn translation.
 * `DescriptiveComplexity.Numbers` – unary and binary encodings of numbers as
   finite structures, for threshold and weight parameters of problems.
 

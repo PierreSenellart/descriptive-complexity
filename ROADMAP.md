@@ -225,17 +225,17 @@ Horn kernel needs no gates at all, only the canonical padding of
     has all its literals in `T`. Soundness is a well-founded induction
     using the Horn condition; completeness is that the closure is
     otherwise a model.
-  - **Still open at level 0** [R]: that the two zeroth levels *coincide*,
-    `PiP 0 = SigmaP 0` (P closed under complement). With HORN-SAT now
-    PTIME-complete this reduces to one crisp question: is Horn
-    *un*satisfiability SO-Horn definable? A Horn program accepts when the
-    least model of its rules satisfies its goal clauses, so accepting the
-    unsatisfiable instances would mean deriving a contradiction from a
-    universal statement about the least model – negative information a
-    goal clause cannot supply. The route is *not* a machine simulation
-    but the logic-to-logic equivalence SO-Horn = FO(LFP) (§3): a full
-    logic is closed under negation by construction, so `piP_zero_eq`
-    follows from it in one line.
+  - **Level 0 closed under complement** [*done*]: the two zeroth levels
+    coincide, `piP_zero_eq : PiP 0 = SigmaP 0`, via the logic-to-logic
+    equivalence SO-Horn = FO(LFP) (§3, `FixedPointHorn.lean`): a full
+    logic is closed under negation by construction, and the translation
+    back into the fragment makes the two interchangeable
+    (`lfpDefinable_iff_sigmaSOHornDefinable`,
+    `SigmaSOHornDefinable.compl`). Concretely: Horn *un*satisfiability is
+    SO-Horn definable (`hornSat_compl_mem_PTIME`) and
+    `reach_mem_PTIME` – statements a goal clause could not supply
+    head-on, since goal clauses carry no negative information about the
+    least model.
 - **NL: REACH** [M]: directed st-reachability, the canonical
   NL-complete problem; hardness = “every FO(TC)-definable problem
   FO-reduces to REACH”. Also **2SAT** [M after REACH] (via implication
@@ -270,12 +270,58 @@ Horn kernel needs no gates at all, only the canonical padding of
   either sign) is another clause-list datatype, and its discharge to 2SAT
   should be the same construction with the literal signs read off the
   clause.
-- **FO(LFP)** [L]: syntax and semantics of least fixed points;
-  order-invariant FO(LFP) as the *definition* of PTIME
-  (Immerman–Vardi), filling level 0 of the hierarchy (currently an
-  empty placeholder class, since PTIME and its axioms were removed);
-  hardness discharges for HORN-SAT/CVP (§2). Design cost: fixpoint
-  operator syntax, positivity, stages.
+- **FO(LFP)** [L, *done*, including the equivalence with SO-Horn]:
+  `FixedPoint.lean` defines it in the
+  same clausal style as SO-Horn – a rule system whose least fixed point
+  is the inductive predicate `Derives`, plus an **unrestricted**
+  first-order output sentence read at that fixed point. No object-level
+  fixpoint binder, no positivity predicate and no stage machinery were
+  needed: positivity is built into the rule shape, and leastness comes
+  from the inductive definition (`lfpAssign_rule`,
+  `lfpAssign_least_of_closed`). Landed with it:
+  - `LFPDefinable.compl` – closure under complement, *one line*: negate
+    the output. This is precisely what SO-Horn cannot do, and why the
+    logic is worth having.
+  - `SigmaSOHornDefinable.lfpDefinable` – every SO-Horn definition is an
+    FO(LFP) definition: keep the rules, turn the goal clauses into the
+    output. Hence `PTIME ⊆ FO(LFP)` and, by complement, also
+    `co-PTIME ⊆ FO(LFP)`; concretely `reach_lfpDefinable` and
+    `hornSat_compl_lfpDefinable` are statements the fragment cannot make.
+  - `LFPDefinable.of_orderedReduction` – closure under (ordered) FO
+    reductions, so FO(LFP) definability is a class-worthy notion: the
+    rules pull back as a Horn program, their fixed point commutes with
+    the pullback (`lfpAssign_pull`, `lfpAssign_map`), and the output
+    sentence pulls back through `extendSO`, the three views of the
+    interpreted structure being identified by `extendSOEquiv` and
+    `ordExtendLEquiv`.
+  - `derivesIn`/`depth`/`derives_eq_of_closed_of_wf` – the stage theory
+    and the **certificate characterization**: a relation closed under the
+    rules and well-foundedly derivable *is* the least fixed point, with
+    `derives_step_of_depth` supplying the order. Packaged for use as
+    `LFPDef.holds_iff_of_certificate`. This is the semantic key to both
+    remaining constructions.
+  - **The converse translation FO(LFP) → SO-Horn** [*done*,
+    `FixedPointHorn.lean`]: where a `Σ₁` version would *guess* the
+    certificate, the Horn version *derives* it – the complement of the
+    fixed point via stage-indexed derivations along the order (stages =
+    lexicographic tuples times a static copy count, enough to exceed the
+    stabilization point `derivesIn_iff_derives_of_card_le` on every
+    nonempty structure, one-element universes included), the unbounded
+    “nothing derives this” conjunctions assembled by order-walking
+    accumulators (the technique of `Problems/HornSat/Definability.lean`,
+    applied to a rule system rather than one clause body; the shared
+    order-walk machinery now lives in `OrderWalk.lean`), and a clausal
+    evaluator for the output formula over its subformula closure. With
+    it: `lfpDefinable_iff_sigmaSOHornDefinable`,
+    `SigmaSOHornDefinable.compl`, `piP_zero_eq`, and the option of
+    *defining* PTIME by the logic.
+  - **Remaining**: `FO(LFP) ⊆ NP` *directly* [M], by guessing the fixed
+    point and the derivation order and checking both first-order against
+    the certificate interface (`derives_eq_of_closed_of_wf`). No new
+    mathematics – the inclusion already follows by composing the
+    translation with the Horn discharge – but the direct `Σ₁` definition
+    would be textbook-faithful; the work is formula building, made
+    tedious by the varying arities of a block's atoms.
 - **SO(TC) for PSPACE** [L]: second-order transitive closure logic,
   TC taken over tuples of *relation* variables (reachability in the
   exponential configuration graph); captures PSPACE on ordered
@@ -401,9 +447,9 @@ separations and non-reducibility, impossible in the machine world.
 1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
 2. SO-Horn path to an axiom-free PTIME: **done** – the class, its
-   closure under reductions, and HORN-SAT complete for it. What is left at
-   level 0 is only `PiP 0 = SigmaP 0` (§2), which is Grädel's capture
-   theorem in disguise.
+   closure under reductions, HORN-SAT complete for it, and now
+   `PiP 0 = SigmaP 0` (§2) through the equivalence SO-Horn = FO(LFP),
+   Grädel's capture theorem in its machine-free form.
 3. EF games + EVEN/REACH inexpressibility (opens §5).
 4. FO(TC)/REACH, then Immerman–Szelepcsényi as the flagship theorem.
 5. SO(TC) and QSAT for PSPACE; then FO(LFP)/FO(PFP) as the

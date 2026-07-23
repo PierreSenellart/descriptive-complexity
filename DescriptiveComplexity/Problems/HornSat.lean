@@ -7,6 +7,8 @@ import DescriptiveComplexity.Problems.HornSat.Defs
 import DescriptiveComplexity.Problems.HornSat.Membership
 import DescriptiveComplexity.Problems.HornSat.Unsat
 import DescriptiveComplexity.Problems.HornSat.Definability
+import DescriptiveComplexity.FixedPoint
+import DescriptiveComplexity.FixedPointHorn
 import DescriptiveComplexity.Problems.HornSat.Hardness
 
 /-!
@@ -46,28 +48,27 @@ is defined – it says that HORN-SAT is at least as hard as everything the Horn
 fragment can express. It is also markedly simpler, since a Horn program needs
 no Tseitin gates.
 
-Two things are deliberately *not* claimed.
+One thing is deliberately *not* claimed: **Grädel's capture theorem against
+machines is not formalized.** That SO-Horn captures polynomial time on ordered
+structures ([Grädel 1992][gradel1992capturing]) has a direction – every
+machine-polynomial-time problem is SO-Horn definable – that simulates a
+machine, and so lies outside a machine-model-free library. So
+`DescriptiveComplexity.PTIME` is *defined* as SO-Horn definability, exactly as NP is
+defined as `Σ₁`-definability, and the identification with the
+machine-theoretic class stays a citation.
 
-* **Grädel's capture theorem is not formalized.** That SO-Horn captures
-  polynomial time on ordered structures ([Grädel 1992][gradel1992capturing])
-  has a hard direction – every polynomial-time problem is SO-Horn definable –
-  that simulates a machine, and so lies outside a machine-model-free library.
-  So `DescriptiveComplexity.PTIME` is *defined* as SO-Horn definability, exactly as
-  NP is defined as `Σ₁`-definability, and the identification with the
-  machine-theoretic class stays a citation.
-* **That level 0 is closed under complement is not proved.** PTIME is level 0
-  of `DescriptiveComplexity.SigmaP`/`DescriptiveComplexity.PiP` and all four inclusions into
-  level 1 hold, but `PiP 0 = SigmaP 0` does not follow. Since HORN-SAT is
-  PTIME-complete, that identity is equivalent to a single crisp question:
-  **is Horn *un*satisfiability SO-Horn definable?** The certificate of
-  `DescriptiveComplexity.Problems.HornSat.Unsat` only puts it in NP, and the fragment
-  cannot obviously do better: a Horn program accepts when the least model of
-  its rules satisfies its goal clauses, so to accept the *unsatisfiable*
-  instances one would have to derive a contradiction from a universally
-  quantified statement about the least model – the negative information a
-  goal clause cannot supply. This does *not* need a machine simulation: the
-  standard route is the logic-to-logic equivalence SO-Horn = FO(LFP), a full
-  logic being closed under negation by construction.
+Closure of level 0 under complement, by contrast, *is* a theorem. Since
+HORN-SAT is PTIME-complete, `PiP 0 = SigmaP 0` is equivalent to a single crisp
+question: **is Horn *un*satisfiability SO-Horn definable?** The certificate of
+`DescriptiveComplexity.Problems.HornSat.Unsat` only puts it in NP, and the fragment
+cannot do it head-on: a Horn program accepts when the least model of its rules
+satisfies its goal clauses, so to accept the *unsatisfiable* instances one
+would have to derive a contradiction from a universally quantified statement
+about the least model – the negative information a goal clause cannot supply.
+The route that works is the logic-to-logic equivalence SO-Horn = FO(LFP) of
+`DescriptiveComplexity.FixedPointHorn`, a full logic being closed under negation by
+construction; `DescriptiveComplexity.hornSat_compl_mem_PTIME` below is the resulting
+answer, and `DescriptiveComplexity.piP_zero_eq` the resulting identity.
 -/
 
 namespace DescriptiveComplexity
@@ -123,5 +124,22 @@ theorem coPTIME_subset_NP : PiP 0 ⊆ NP := by
 /-- `PiP 0 ⊆ PH`, the level-0 case of `DescriptiveComplexity.piP_subset_PH`. -/
 theorem piP_zero_subset_PH : PiP 0 ⊆ PH :=
   fun _ _ hP => ⟨1, coPTIME_subset_NP hP⟩
+
+/-- HORN-SAT is FO(LFP) definable, being SO-Horn definable. -/
+theorem hornSat_lfpDefinable : LFPDefinable HORNSAT :=
+  hornSat_sigmaSOHornDefinable.lfpDefinable
+
+/-- **Horn unsatisfiability is FO(LFP) definable**: in the logic it is one
+negation away from `DescriptiveComplexity.hornSat_lfpDefinable`. In the fragment there
+is no such move – the statement below needs the full translation back. -/
+theorem hornSat_compl_lfpDefinable : LFPDefinable HORNSATᶜ :=
+  hornSat_lfpDefinable.compl
+
+/-- **Horn unsatisfiability is SO-Horn definable** – the crisp question behind
+`PiP 0 = SigmaP 0`, answered through the equivalence with FO(LFP): the
+translation of `DescriptiveComplexity.FixedPointHorn` turns the negated unit
+propagation back into a Horn program. -/
+theorem hornSat_compl_mem_PTIME : HORNSATᶜ ∈ PTIME :=
+  hornSat_sigmaSOHornDefinable.compl
 
 end DescriptiveComplexity

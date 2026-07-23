@@ -54,16 +54,13 @@ they go through the Horn discharge and, for the two crossing ones, through the
 certificate of Horn *un*satisfiability of
 `DescriptiveComplexity.Problems.HornSat.Unsat`.
 
-What is **not** proved is that the two zeroth levels *coincide*:
-`PiP 0 = SigmaP 0` says that polynomial time is closed under complement. Since
-HORN-SAT is PTIME-complete (`DescriptiveComplexity.HORNSAT_PTIME_complete`), that
-identity is equivalent to Horn *un*satisfiability being SO-Horn definable –
-knowing the complement is in NP ∩ coNP, as the inclusions above give, is not
-enough. The standard route to it is the equivalence of SO-Horn with the *logic*
-FO(LFP), which is closed under negation by construction; no machine model is
-involved. (There is
-deliberately no `piP_zero_eq`: it would be true of polynomial time, but here it
-is an open statement, not a theorem.)
+That the two zeroth levels *coincide* – `PiP 0 = SigmaP 0`, polynomial time
+closed under complement – is proved downstream, as
+`DescriptiveComplexity.piP_zero_eq`: it is Grädel's capture theorem at level 0, and
+its route is the logic-to-logic equivalence of SO-Horn with FO(LFP)
+(`DescriptiveComplexity.lfpDefinable_iff_sigmaSOHornDefinable`, in
+`DescriptiveComplexity.FixedPointHorn`), a full logic being closed under negation by
+construction; no machine model is involved.
 
 The level inclusions above 0, the duality `Πₖᵖ = co-Σₖᵖ` and the class `PH` are
 all proved (`DescriptiveComplexity.sigmaP_subset_sigmaP_succ`,
@@ -230,9 +227,9 @@ captures polynomial time on ordered structures. It is a bona fide
 
 This is level 0 of the hierarchy below (`DescriptiveComplexity.SigmaP`,
 `DescriptiveComplexity.PiP`), and it has a complete problem, HORN-SAT
-(`DescriptiveComplexity.HORNSAT_PTIME_complete`). The one statement about it that is not
-available is that `PiP 0 = SigmaP 0`, i.e. that the class is closed under
-complement. -/
+(`DescriptiveComplexity.HORNSAT_PTIME_complete`). That the class is closed under
+complement – `PiP 0 = SigmaP 0` – is `DescriptiveComplexity.piP_zero_eq`, through the
+equivalence with FO(LFP). -/
 noncomputable def PTIME : ComplexityClass where
   Mem P := SigmaSOHornDefinable P
   Hard P := CofinalHard (fun Q => SigmaSOHornDefinable Q) P
@@ -256,8 +253,8 @@ noncomputable def SigmaP : ℕ → ComplexityClass
 
 /-- The `Πₖᵖ` levels of the polynomial hierarchy; level 0 is *co*-polynomial
 time, the complements of the SO-Horn definable problems. That this coincides
-with `DescriptiveComplexity.PTIME` is the (true, but here unproved) closure of polynomial
-time under complement – see the module docstring. -/
+with `DescriptiveComplexity.PTIME` is the closure of polynomial time under complement,
+`DescriptiveComplexity.piP_zero_eq` – see the module docstring. -/
 noncomputable def PiP : ℕ → ComplexityClass
   | 0 => PTIME.compl
   | k + 1 => piLevel k
@@ -273,10 +270,10 @@ noncomputable abbrev coNP : ComplexityClass := PiP 1
 level: by definition at level 0, and by the quantifier duality
 `DescriptiveComplexity.piSODefinable_iff_compl` above from level 1 on.
 
-Note what is *not* claimed: that `PiP 0 = SigmaP 0`, i.e. that polynomial time
-is closed under complement. That is true of polynomial time, but proving it for
-SO-Horn definability means complementing a Horn program, which needs its least
-model computed inside the fragment. -/
+(That moreover `PiP 0 = SigmaP 0` – polynomial time closed under complement –
+is `DescriptiveComplexity.piP_zero_eq`: complementing a Horn program needs its least
+model computed inside the fragment, which is what the translation from FO(LFP)
+provides.) -/
 theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} (P : DecisionProblem L) :
     P ∈ PiP k ↔ Pᶜ ∈ SigmaP k := by
   cases k with

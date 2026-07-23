@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.HornSat.Hardness
+import DescriptiveComplexity.FixedPoint
+import DescriptiveComplexity.FixedPointHorn
 
 /-!
 # Reachability, and the Horn fragment at work
@@ -341,5 +343,23 @@ theorem unreach_mem_PTIME : UNREACH ∈ PTIME :=
 /-- **UNREACH first-order reduces to HORN-SAT**, by the Horn discharge. -/
 theorem unreach_le_hornSat : Nonempty (UNREACH ≤ᶠᵒ[≤] HORNSAT) :=
   hornSat_hard_of_sigmaSOHornDefinable UNREACH unreach_sigmaSOHornDefinable
+
+/-- UNREACH is FO(LFP) definable, being SO-Horn definable. -/
+theorem unreach_lfpDefinable : LFPDefinable UNREACH :=
+  unreach_sigmaSOHornDefinable.lfpDefinable
+
+/-- **REACH is FO(LFP) definable** – and this is a statement the Horn fragment
+cannot make head-on. Reachability is the complement of the SO-Horn definable
+UNREACH, and complementing is free in the logic
+(`DescriptiveComplexity.LFPDefinable.compl`), while a goal clause can only reject. -/
+theorem reach_lfpDefinable : LFPDefinable REACH :=
+  SigmaSOHornDefinable.compl_lfpDefinable unreach_sigmaSOHornDefinable
+
+/-- **REACH is in PTIME** after all: what the fragment cannot say head-on it
+can say through the equivalence with FO(LFP)
+(`DescriptiveComplexity.SigmaSOHornDefinable.compl`). -/
+theorem reach_mem_PTIME : REACH ∈ PTIME := by
+  have h := unreach_sigmaSOHornDefinable.compl
+  rwa [UNREACH, DecisionProblem.compl_compl] at h
 
 end DescriptiveComplexity

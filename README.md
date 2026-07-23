@@ -38,8 +38,10 @@ The library is organized in three layers:
   reductions, and the polynomial hierarchy *defined* logically – `NP = Σ₁ᵖ` by
   second-order quantifier alternation, with the level inclusions and the
   duality `Πₖᵖ = co-Σₖᵖ` as theorems, and level 0, `PTIME`, by the Horn
-  fragment SO-Horn of existential second-order logic. Everything is a
-  definition or a theorem: the library declares no axioms.
+  fragment SO-Horn of existential second-order logic – equivalent to the logic
+  FO(LFP) by a formalized Grädel translation, so that PTIME is closed under
+  complement (`Π₀ᵖ = Σ₀ᵖ`) as a theorem. Everything is a definition or a
+  theorem: the library declares no axioms.
 * **A problem catalog and worked examples**: SAT (with a machine-free
   Cook–Levin theorem), 3-colorability, 3SAT, the clique family
   (Clique / Independent Set / Vertex Cover), TAUT (coNP-complete),

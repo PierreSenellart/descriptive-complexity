@@ -77,6 +77,24 @@ scoped notation:50 P:51 " ∈ " C:51 => ComplexityClass.Mem C P
 
 namespace ComplexityClass
 
+/-- Two complexity classes with the same members and the same hard problems
+are equal: the remaining fields are proofs. -/
+theorem ext {C₁ C₂ : ComplexityClass}
+    (hMem : ∀ {L : Language.{0, 0}} (P : DecisionProblem L), C₁.Mem P ↔ C₂.Mem P)
+    (hHard : ∀ {L : Language.{0, 0}} (P : DecisionProblem L), C₁.Hard P ↔ C₂.Hard P) :
+    C₁ = C₂ := by
+  obtain ⟨M₁, H₁, _, _, _, _, _, _⟩ := C₁
+  obtain ⟨M₂, H₂, _, _, _, _, _, _⟩ := C₂
+  have hM : @M₁ = @M₂ := by
+    funext L P
+    exact propext (hMem P)
+  have hH : @H₁ = @H₂ := by
+    funext L P
+    exact propext (hHard P)
+  subst hM
+  subst hH
+  rfl
+
 /-- The empty complexity class: no members, and every problem vacuously hard
 (there is nothing that would have to reduce to it). It is a placeholder for
 levels of a hierarchy that are not (yet) characterized logically. -/

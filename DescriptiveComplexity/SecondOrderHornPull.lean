@@ -170,7 +170,7 @@ variable (prog : HornProgram L₂ B k)
 
 omit [Finite Tag] [L₂.IsRelational] [L₁.Structure A] in
 /-- Splitting an interpreted valuation into its tags and its coordinates. -/
-private theorem tagVal_split (v : Fin k → I.Map A) :
+theorem tagVal_split (v : Fin k → I.Map A) :
     tagVal I (fun p => (v p).1)
       (fun m => (v (finProdFinEquiv.symm m).1).2 (finProdFinEquiv.symm m).2) = v := by
   funext p
