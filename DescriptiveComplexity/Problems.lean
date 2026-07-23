@@ -18,6 +18,7 @@ import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.ExactCover
+import DescriptiveComplexity.Problems.SetSplitting
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner

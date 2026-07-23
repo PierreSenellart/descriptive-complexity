@@ -178,9 +178,11 @@ individual declarations are documented on their own pages.
   set family – Set Cover, Hitting Set and Set Packing on a bipartite
   incidence vocabulary, the first two transposes of
   each other, all three NP-hard by reading a graph as the incidence system of
-  its edges ([Karp 1972][karp1972reducibility]), and Exact Cover on that same
-  vocabulary, where exactness replaces the threshold and hardness comes from
-  exactly-one satisfiability with no gadget and no counting; Feedback Vertex Set and
+  its edges ([Karp 1972][karp1972reducibility]), and, on that same vocabulary,
+  Exact Cover, where exactness replaces the threshold and hardness comes from
+  exactly-one satisfiability, and Set Splitting – hypergraph
+  2-colourability – hard from NAE-SAT, both by reductions with no gadget and
+  no counting at all; Feedback Vertex Set and
   Feedback Arc Set, NP-hard by symmetrizing the arcs of a digraph and then
   splitting its vertices, with a first-order certificate of acyclicity (a
   guessed strict partial order) for their membership and a threshold carried

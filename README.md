@@ -47,7 +47,8 @@ The library is organized in three layers:
   3SAT, NAE-SAT with its width-three restriction NAE-3SAT and 1-in-SAT,
   Chromatic Number and Clique Cover, the clique family
   (Clique / Independent Set / Vertex Cover), Subgraph Isomorphism, Set Cover,
-  Hitting Set, Set Packing and Exact Cover, Feedback Vertex Set and Feedback Arc Set,
+  Hitting Set, Set Packing, Exact Cover and Set Splitting,
+  Feedback Vertex Set and Feedback Arc Set,
   Steiner Tree, Max Cut, TAUT (coNP-complete),
   `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
   for the `k`-th level of the polynomial hierarchy – and HORN-SAT, complete for

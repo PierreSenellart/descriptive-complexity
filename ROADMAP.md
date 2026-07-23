@@ -233,6 +233,18 @@ proof plan for each problem still open.
   covering a clause exactly once *is* exactly-one satisfaction. Nothing
   depends on the clause width, which is why the source is unrestricted
   1-in-SAT.
+- **Set Splitting** [S, *done*]: `Problems/SetSplitting.lean`,
+  `setSplitting_NP_complete`. Hypergraph 2-colourability, on
+  `Language.setSystem` unchanged and with no threshold: `SplitsOn` asks for a
+  colour class meeting every set of the family and its complement, so the `Σ₁`
+  definition guesses that class and checks two clauses. Hardness is the
+  shortest reduction in the catalog: the ground elements are the *literals*,
+  the family is one pair set `{x, ¬x}` per variable plus one set per clause.
+  Splitting a pair set is exactly “the two literals of `x` get opposite
+  colours”, i.e. an assignment; splitting a clause set is exactly not-all-equal
+  satisfaction. Order-free, dimension 1, no gadget, no counting – the pair
+  sets are the only thing the reduction adds.
+
 - **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
   local gadgets, probably ordered.
 - **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`
