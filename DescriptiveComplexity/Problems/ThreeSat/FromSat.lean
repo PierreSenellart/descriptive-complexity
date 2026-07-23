@@ -292,6 +292,151 @@ def splitAssign (ν : A → Prop) : SplitTag × (Fin 2 → A) → Prop
 
 variable [Finite A]
 
+/-- The chain argument of the reduction, isolated in the form its
+not-all-equal variant reuses (`DescriptiveComplexity.NaeSatToNaeThreeSat`): if an
+assignment of the split gives every output clause a true literal, then, read on
+the variable copies, it gives every clause of the input a true literal. -/
+theorem exists_litTrue_of_map {ν' : satToThreeSat.Map A → Prop}
+    (hν' : ∀ c : satToThreeSat.Map A, RelMap satIsClause ![c] → ∃ x : satToThreeSat.Map A,
+      (RelMap satPosIn ![c, x] ∧ ν' x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν' x))
+    {c : A} (hcl : IsCl c) :
+    ∃ x s, OccIn c x s ∧ LitTrue (fun a => ν' (.var, fun _ => a)) x s := by
+  by_contra hno
+  -- every literal of `c` is false under the restricted assignment
+  have Hfalse : ∀ z u, OccIn c z u → ¬LitTrue (fun a => ν' (.var, fun _ => a)) z u :=
+    fun z u hz hT => hno ⟨z, u, hz, hT⟩
+  -- congruence of the assignment, at raw product type
+  have hcongr : ∀ (g : SplitTag × (Fin 2 → A) → Prop)
+      (p q : SplitTag × (Fin 2 → A)), p = q → g p → g q :=
+    fun g p q h hg => h ▸ hg
+  by_cases hocc : ∃ z u, OccIn c z u
+  · -- the linking variables of the chained occurrences of `c` are all
+    -- forced true, from first to last
+    have step : ∀ x s, OccIn c x s → Chained c x s →
+        (∀ y t, OccIn c y t → Chained c y t → occLt y t x s →
+          ν' (.link t, ![c, y])) →
+        ν' (.link s, ![c, x]) := by
+      intro x s hxs hch IH
+      obtain ⟨z, u, hsucc⟩ := exists_succOcc hch
+      have hclz : RelMap (M := satToThreeSat.Map A) satIsClause
+          ![(SplitTag.piece u, ![c, z])] := by
+        rw [isClause_iff]
+        exact Or.inl ⟨u, rfl, by simpa using hsucc.1⟩
+      obtain ⟨⟨te, we⟩, hlit⟩ := hν' _ hclz
+      rcases hlit with ⟨hpos, hT⟩ | ⟨hneg, hF⟩
+      · rw [posIn_iff] at hpos
+        rcases hpos with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', t', hpc, rfl, hce, hsucc'⟩
+        · -- the literal of the predecessor would be true
+          obtain rfl : u = true := by simpa using hpc
+          exfalso
+          refine Hfalse z true hsucc.1 ?_
+          have hez : we 0 = z := by simpa using he
+          have hwe : we = fun _ => z := ext2 _ _ hez (hd.symm.trans hez)
+          exact hcongr ν' (SplitTag.var, we) (SplitTag.var, fun _ => z) (by rw [hwe]) hT
+        · -- the successor's linking variable is true, and the successor
+          -- is `(x, s)`
+          have heq : u = s' := by simpa using hpc
+          have hsucc'' : SuccOcc c z u (we 1) t' := by
+            rw [heq]
+            simpa using hsucc'
+          obtain ⟨hxeq, hteq⟩ := succOcc_right_unique hsucc'' hsucc
+          have hwe : we = ![c, x] :=
+            ext2 _ _ (by simpa using hce.symm) (by simpa using hxeq)
+          exact hcongr ν' (SplitTag.link t', we) (SplitTag.link s, ![c, x])
+            (by rw [hteq, hwe]) hT
+      · rw [negIn_iff] at hneg
+        rcases hneg with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', hpc, rfl, ⟨h0, h1⟩, hchz⟩
+        · -- the literal of the predecessor would be true
+          obtain rfl : u = false := by simpa using hpc
+          exfalso
+          refine hF ?_
+          have hez : we 0 = z := by simpa using he
+          have hwe : (fun _ => z : Fin 2 → A) = we := ext2 _ _ hez.symm (hez.symm.trans hd)
+          refine hcongr ν' (SplitTag.var, fun _ => z) (SplitTag.var, we) (by rw [hwe]) ?_
+          exact not_not.mp (Hfalse z false hsucc.1)
+        · -- the predecessor's own linking variable is true by induction
+          have heq : u = s' := by simpa using hpc
+          exfalso
+          refine hF ?_
+          have hchz' : Chained c z u := by
+            rw [heq]
+            simpa using hchz
+          have hwe : (![c, z] : Fin 2 → A) = we :=
+            ext2 _ _ (by simpa using h0) (by simpa using h1)
+          refine hcongr ν' (SplitTag.link u, ![c, z]) (SplitTag.link s', we) ?_
+            (IH z u hsucc.1 hchz' hsucc.2.2.1)
+          rw [heq, hwe]
+    have main : ∀ x : A, ∀ s, OccIn c x s → Chained c x s →
+        ν' (.link s, ![c, x]) := by
+      intro x
+      refine wellFounded_lt.induction
+        (C := fun x => ∀ s, OccIn c x s → Chained c x s → ν' (.link s, ![c, x])) x ?_
+      intro x IH s hxs hch
+      refine step x s hxs hch fun y t hyt hcht hlt => ?_
+      rcases hlt with hlt | ⟨heq, hlt⟩
+      · exact IH y hlt t hyt hcht
+      · rw [Bool.lt_iff] at hlt
+        obtain ⟨rfl, rfl⟩ := hlt
+        subst heq
+        refine step y false hyt hcht fun z u hz hchz hlt' => ?_
+        rcases hlt' with hlt' | ⟨heq', hlt'⟩
+        · exact IH z hlt' u hz hchz
+        · simp [Bool.lt_iff] at hlt'
+    -- the piece of the last occurrence cannot be satisfied
+    obtain ⟨xm, sm, hmax⟩ := exists_maxOcc hocc
+    have hclm : RelMap (M := satToThreeSat.Map A) satIsClause
+        ![(SplitTag.piece sm, ![c, xm])] := by
+      rw [isClause_iff]
+      exact Or.inl ⟨sm, rfl, by simpa using hmax.occIn⟩
+    obtain ⟨⟨te, we⟩, hlit⟩ := hν' _ hclm
+    rcases hlit with ⟨hpos, hT⟩ | ⟨hneg, hF⟩
+    · rw [posIn_iff] at hpos
+      rcases hpos with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', t', hpc, rfl, -, hsucc'⟩
+      · -- its literal would be true
+        obtain rfl : sm = true := by simpa using hpc
+        refine Hfalse xm true hmax.occIn ?_
+        have hez : we 0 = xm := by simpa using he
+        have hwe : we = fun _ => xm := ext2 _ _ hez (hd.symm.trans hez)
+        exact hcongr ν' (SplitTag.var, we) (SplitTag.var, fun _ => xm) (by rw [hwe]) hT
+      · -- the last occurrence has no successor
+        have heq : sm = s' := by simpa using hpc
+        have hsucc'' : SuccOcc c xm sm (we 1) t' := by
+          rw [heq]
+          simpa using hsucc'
+        exact hmax.2 (we 1) t' hsucc''.2.1 hsucc''.2.2.1
+    · rw [negIn_iff] at hneg
+      rcases hneg with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', hpc, rfl, ⟨h0, h1⟩, hch⟩
+      · -- its literal would be true
+        obtain rfl : sm = false := by simpa using hpc
+        refine hF ?_
+        have hez : we 0 = xm := by simpa using he
+        have hwe : (fun _ => xm : Fin 2 → A) = we := ext2 _ _ hez.symm (hez.symm.trans hd)
+        refine hcongr ν' (SplitTag.var, fun _ => xm) (SplitTag.var, we) (by rw [hwe]) ?_
+        exact not_not.mp (Hfalse xm false hmax.occIn)
+      · -- its own linking variable is true, by the chain invariant
+        have heq : sm = s' := by simpa using hpc
+        refine hF ?_
+        have hch' : Chained c xm sm := by
+          rw [heq]
+          simpa using hch
+        have hwe : (![c, xm] : Fin 2 → A) = we :=
+          ext2 _ _ (by simpa using h0) (by simpa using h1)
+        refine hcongr ν' (SplitTag.link sm, ![c, xm]) (SplitTag.link s', we) ?_
+          (main xm sm hmax.occIn hch')
+        rw [heq, hwe]
+  · -- `c` is an empty clause: its copy is an unsatisfiable output clause
+    have hemp : EmptyCl c := ⟨hcl, fun z u hz => hocc ⟨z, u, hz⟩⟩
+    have hcle : RelMap (M := satToThreeSat.Map A) satIsClause
+        ![(SplitTag.empty, fun _ => c)] := by
+      rw [isClause_iff]
+      exact Or.inr ⟨rfl, rfl, hemp⟩
+    obtain ⟨⟨te, we⟩, hlit⟩ := hν' _ hcle
+    rcases hlit with ⟨hpos, -⟩ | ⟨hneg, -⟩
+    · rw [posIn_iff] at hpos
+      simp at hpos
+    · rw [negIn_iff] at hneg
+      simp at hneg
+
 /-- Correctness of the reduction, satisfiability half: an ordered CNF
 structure is satisfiable iff its width-three split is. -/
 theorem satisfiable_iff_map :
@@ -351,148 +496,12 @@ theorem satisfiable_iff_map :
       exact absurd hz (hemp.2 z u)
   · -- a satisfying assignment of the split restricts to the input
     rintro ⟨ν', hν'⟩
-    refine ⟨fun a => ν' (.var, fun _ => a), ?_⟩
-    intro c hcl
-    by_contra hno
-    -- congruence of the assignment, at raw product type
-    have hcongr : ∀ (g : SplitTag × (Fin 2 → A) → Prop)
-        (p q : SplitTag × (Fin 2 → A)), p = q → g p → g q :=
-      fun g p q h hg => h ▸ hg
-    -- every literal of `c` is false under the restricted assignment
-    have Hfalse : ∀ z u, OccIn c z u →
-        ¬LitTrue (fun a => ν' (.var, fun _ => a)) z u := by
-      intro z u hz hT
-      refine hno ⟨z, ?_⟩
-      cases u with
-      | true => exact Or.inl ⟨hz.2, hT⟩
-      | false => exact Or.inr ⟨hz.2, hT⟩
-    by_cases hocc : ∃ z u, OccIn c z u
-    · -- the linking variables of the chained occurrences of `c` are all
-      -- forced true, from first to last
-      have step : ∀ x s, OccIn c x s → Chained c x s →
-          (∀ y t, OccIn c y t → Chained c y t → occLt y t x s →
-            ν' (.link t, ![c, y])) →
-          ν' (.link s, ![c, x]) := by
-        intro x s hxs hch IH
-        obtain ⟨z, u, hsucc⟩ := exists_succOcc hch
-        have hclz : RelMap (M := satToThreeSat.Map A) satIsClause
-            ![(SplitTag.piece u, ![c, z])] := by
-          rw [isClause_iff]
-          exact Or.inl ⟨u, rfl, by simpa using hsucc.1⟩
-        obtain ⟨⟨te, we⟩, hlit⟩ := hν' _ hclz
-        rcases hlit with ⟨hpos, hT⟩ | ⟨hneg, hF⟩
-        · rw [posIn_iff] at hpos
-          rcases hpos with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', t', hpc, rfl, hce, hsucc'⟩
-          · -- the literal of the predecessor would be true
-            obtain rfl : u = true := by simpa using hpc
-            exfalso
-            refine Hfalse z true hsucc.1 ?_
-            have hez : we 0 = z := by simpa using he
-            have hwe : we = fun _ => z := ext2 _ _ hez (hd.symm.trans hez)
-            exact hcongr ν' (SplitTag.var, we) (SplitTag.var, fun _ => z) (by rw [hwe]) hT
-          · -- the successor's linking variable is true, and the successor
-            -- is `(x, s)`
-            have heq : u = s' := by simpa using hpc
-            have hsucc'' : SuccOcc c z u (we 1) t' := by
-              rw [heq]
-              simpa using hsucc'
-            obtain ⟨hxeq, hteq⟩ := succOcc_right_unique hsucc'' hsucc
-            have hwe : we = ![c, x] :=
-              ext2 _ _ (by simpa using hce.symm) (by simpa using hxeq)
-            exact hcongr ν' (SplitTag.link t', we) (SplitTag.link s, ![c, x])
-              (by rw [hteq, hwe]) hT
-        · rw [negIn_iff] at hneg
-          rcases hneg with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', hpc, rfl, ⟨h0, h1⟩, hchz⟩
-          · -- the literal of the predecessor would be true
-            obtain rfl : u = false := by simpa using hpc
-            exfalso
-            refine hF ?_
-            have hez : we 0 = z := by simpa using he
-            have hwe : (fun _ => z : Fin 2 → A) = we := ext2 _ _ hez.symm (hez.symm.trans hd)
-            refine hcongr ν' (SplitTag.var, fun _ => z) (SplitTag.var, we) (by rw [hwe]) ?_
-            exact not_not.mp (Hfalse z false hsucc.1)
-          · -- the predecessor's own linking variable is true by induction
-            have heq : u = s' := by simpa using hpc
-            exfalso
-            refine hF ?_
-            have hchz' : Chained c z u := by
-              rw [heq]
-              simpa using hchz
-            have hwe : (![c, z] : Fin 2 → A) = we :=
-              ext2 _ _ (by simpa using h0) (by simpa using h1)
-            refine hcongr ν' (SplitTag.link u, ![c, z]) (SplitTag.link s', we) ?_
-              (IH z u hsucc.1 hchz' hsucc.2.2.1)
-            rw [heq, hwe]
-      have main : ∀ x : A, ∀ s, OccIn c x s → Chained c x s →
-          ν' (.link s, ![c, x]) := by
-        intro x
-        refine wellFounded_lt.induction
-          (C := fun x => ∀ s, OccIn c x s → Chained c x s → ν' (.link s, ![c, x])) x ?_
-        intro x IH s hxs hch
-        refine step x s hxs hch fun y t hyt hcht hlt => ?_
-        rcases hlt with hlt | ⟨heq, hlt⟩
-        · exact IH y hlt t hyt hcht
-        · rw [Bool.lt_iff] at hlt
-          obtain ⟨rfl, rfl⟩ := hlt
-          subst heq
-          refine step y false hyt hcht fun z u hz hchz hlt' => ?_
-          rcases hlt' with hlt' | ⟨heq', hlt'⟩
-          · exact IH z hlt' u hz hchz
-          · simp [Bool.lt_iff] at hlt'
-      -- the piece of the last occurrence cannot be satisfied
-      obtain ⟨xm, sm, hmax⟩ := exists_maxOcc hocc
-      have hclm : RelMap (M := satToThreeSat.Map A) satIsClause
-          ![(SplitTag.piece sm, ![c, xm])] := by
-        rw [isClause_iff]
-        exact Or.inl ⟨sm, rfl, by simpa using hmax.occIn⟩
-      obtain ⟨⟨te, we⟩, hlit⟩ := hν' _ hclm
-      rcases hlit with ⟨hpos, hT⟩ | ⟨hneg, hF⟩
-      · rw [posIn_iff] at hpos
-        rcases hpos with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', t', hpc, rfl, -, hsucc'⟩
-        · -- its literal would be true
-          obtain rfl : sm = true := by simpa using hpc
-          refine Hfalse xm true hmax.occIn ?_
-          have hez : we 0 = xm := by simpa using he
-          have hwe : we = fun _ => xm := ext2 _ _ hez (hd.symm.trans hez)
-          exact hcongr ν' (SplitTag.var, we) (SplitTag.var, fun _ => xm) (by rw [hwe]) hT
-        · -- the last occurrence has no successor
-          have heq : sm = s' := by simpa using hpc
-          have hsucc'' : SuccOcc c xm sm (we 1) t' := by
-            rw [heq]
-            simpa using hsucc'
-          exact hmax.2 (we 1) t' hsucc''.2.1 hsucc''.2.2.1
-      · rw [negIn_iff] at hneg
-        rcases hneg with ⟨hpc, rfl, ⟨hd, he⟩, -⟩ | ⟨s', hpc, rfl, ⟨h0, h1⟩, hch⟩
-        · -- its literal would be true
-          obtain rfl : sm = false := by simpa using hpc
-          refine hF ?_
-          have hez : we 0 = xm := by simpa using he
-          have hwe : (fun _ => xm : Fin 2 → A) = we := ext2 _ _ hez.symm (hez.symm.trans hd)
-          refine hcongr ν' (SplitTag.var, fun _ => xm) (SplitTag.var, we) (by rw [hwe]) ?_
-          exact not_not.mp (Hfalse xm false hmax.occIn)
-        · -- its own linking variable is true, by the chain invariant
-          have heq : sm = s' := by simpa using hpc
-          refine hF ?_
-          have hch' : Chained c xm sm := by
-            rw [heq]
-            simpa using hch
-          have hwe : (![c, xm] : Fin 2 → A) = we :=
-            ext2 _ _ (by simpa using h0) (by simpa using h1)
-          refine hcongr ν' (SplitTag.link sm, ![c, xm]) (SplitTag.link s', we) ?_
-            (main xm sm hmax.occIn hch')
-          rw [heq, hwe]
-    · -- `c` is an empty clause: its copy is an unsatisfiable output clause
-      have hemp : EmptyCl c := ⟨hcl, fun z u hz => hocc ⟨z, u, hz⟩⟩
-      have hcle : RelMap (M := satToThreeSat.Map A) satIsClause
-          ![(SplitTag.empty, fun _ => c)] := by
-        rw [isClause_iff]
-        exact Or.inr ⟨rfl, rfl, hemp⟩
-      obtain ⟨⟨te, we⟩, hlit⟩ := hν' _ hcle
-      rcases hlit with ⟨hpos, -⟩ | ⟨hneg, -⟩
-      · rw [posIn_iff] at hpos
-        simp at hpos
-      · rw [negIn_iff] at hneg
-        simp at hneg
+    refine ⟨fun a => ν' (.var, fun _ => a), fun c hcl => ?_⟩
+    obtain ⟨x, s, hocc, hT⟩ := exists_litTrue_of_map hν' hcl
+    cases s with
+    | true => exact ⟨x, Or.inl ⟨hocc.2, hT⟩⟩
+    | false => exact ⟨x, Or.inr ⟨hocc.2, hT⟩⟩
+
 
 end Satisfiability
 
