@@ -162,9 +162,11 @@ individual declarations are documented on their own pages.
   the Cook–Levin theorem ([Cook 1971][cook1971complexity];
   [Levin 1973][levin1973universal]) proved by a machine-free Tseitin discharge,
   3-colorability (FO-interreducible with SAT in both directions), 3SAT,
-  NAE-SAT – the Schaefer-style variant ([Schaefer
-  1978][schaefer1978complexity]) whose flip symmetry makes it a convenient
-  reduction source – and the clique family (Clique, Independent Set, Vertex Cover) with their
+  NAE-SAT and its width-three restriction NAE-3SAT – the Schaefer-style
+  variants ([Schaefer 1978][schaefer1978complexity]) whose flip symmetry makes
+  them convenient reduction sources, and which reuse the SAT/3SAT
+  interpretations unchanged, only the notion of satisfaction differing – and
+  the clique family (Clique, Independent Set, Vertex Cover) with their
   inter-reductions and NP-completeness; the coloring family – `k`-colorability
   for every `k ≥ 3` by padding 3-colorability with blown-up universal
   vertices, then Chromatic Number and Clique Cover, whose threshold is a
@@ -178,7 +180,11 @@ individual declarations are documented on their own pages.
   Feedback Arc Set, NP-hard by symmetrizing the arcs of a digraph and then
   splitting its vertices, with a first-order certificate of acyclicity (a
   guessed strict partial order) for their membership and a threshold carried
-  by a marked *binary* relation for the second; Steiner Tree in both its node- and its
+  by a marked *binary* relation for the second; Max Cut, on that same
+  arc-marked vocabulary, hard from NAE-3SAT by a gadget needing neither edge
+  weights nor parallel edges – the cut is read as the ordered pairs crossing
+  it, and the whole counting argument is one injective charge map from the cut
+  to the marks; Steiner Tree in both its node- and its
   edge-weighted reading, the connectivity condition certified first-order by a
   guessed root and order, from which the `n − 1` edge bound also follows;
   TAUT, the tautology problem for

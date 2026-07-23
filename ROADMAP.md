@@ -165,15 +165,65 @@ proof plan for each problem still open.
   reduction false, since a private `s` can always be set opposite to a
   literal. Membership reuses `realize_satKernel` verbatim: the NAE kernel is
   SAT's conjoined with its mirror image.
-- **NAE-3SAT and 1-in-3SAT** [M]: the width-3 variants. NAE-3SAT follows from
-  NAE-SAT restricted to width 3 by the classical splitting NAE(a,b,c,d) ⟺
-  ∃y. NAE(a,b,y) ∧ NAE(¬y,c,d), whose auxiliary is *per clause* and hence
-  order-free (a tag suffices); 1-in-3SAT is Schaefer's other local gadget and
-  is the natural source for Exact Cover.
-- **Max Cut** [M]: from NAE-3SAT (NAE-SAT is done, the width bound is what
-  remains); threshold via (A) at arity 2, i.e. the marked-binary-relation form
-  introduced for Feedback Arc Set (`nonempty_embedding_iff_ncard_le₂`). The
-  counting step – a cut of size ≥ 5m for m clauses – is the real work.
+- **NAE-3SAT** [M, *done*]: `Problems/NaeThreeSat.lean`,
+  `nae3Sat_NP_complete`. The width-3 variant, on the SAT vocabulary with
+  3SAT's promise `WidthAtMostThree` folded into the yes-instances. Both
+  reductions reuse the SAT/3SAT *interpretations verbatim* – the width-gated
+  copy `threeSatToSat` for membership, the clause-splitting `satToThreeSat`
+  for hardness – only the notion of satisfaction differing; the width promise
+  `widthAtMostThree_map` is inherited as proved. Two corrections to the plan
+  this item used to carry: the splitting auxiliary is *not* per clause but per
+  *occurrence* (a clause of width k needs k−2 of them, each naming its
+  position), so the reduction is ordered, not order-free – which is precisely
+  why 3SAT's chain can be reused; and the chain works unchanged in the
+  not-all-equal reading, `NAE(T_i, ℓ_i, ¬T_{i+1})` being the peeling identity
+  `NAE(a, ℓ, ℓ', …) ↔ ∃ y, NAE(a, ℓ, y) ∧ NAE(¬y, ℓ', …)` applied along the
+  occurrence order. Only the witnessing assignment is new (`LinkVal`: a
+  linking variable carries the negation of the value common to all earlier
+  occurrences while they agree, its own literal's value once they do not).
+  The converse half needs nothing new: a not-all-equal assignment is in
+  particular a satisfying one, so 3SAT's chain argument – isolated as
+  `SatToThreeSat.exists_litTrue_of_map` – applies to it and, by the flip
+  symmetry `NAEProper.not`, to its negation.
+- **1-in-3SAT** [M]: Schaefer's other local gadget, the natural source for
+  Exact Cover; still open.
+- **Max Cut** [M, *done*]: `Problems/MaxCut/`, `maxCut_NP_complete`. On
+  `Language.markedArcGraph` unchanged, reused from Feedback Arc Set: the
+  threshold is representation (A) at arity 2
+  (`nonempty_embedding_iff_ncard_le₂`), and the cut is read as the set of
+  *ordered* pairs `(u, v)` with `u` adjacent to `v`, `u` in `S` and `v`
+  outside (`CutRel`), which counts every cut edge of a symmetric relation once
+  and so needs no division by two. Membership guesses `S` and a quaternary
+  injection of the marked pairs into the cut; hardness is an ordered reduction
+  from NAE-3SAT. Four things worth remembering from it:
+  - **No edge weights, no multiplicities.** Max Cut is already hard on
+    unweighted simple graphs: the cut value splits into three families that
+    are separately maximal, so one edge per variable already forces the two
+    literal vertices apart. The textbook `n_x` parallel edges buy nothing.
+  - **Gadget overlap is the real obstacle**, not weights. Clause triangles on
+    literal vertices would be shared by two clauses over the same two
+    literals, and would reuse a variable edge for a clause containing `x` and
+    `¬x`. The fix: every *occurrence* gets its own vertex `occPt s c x`,
+    joined to its literal vertex by one edge, with the clause gadget on
+    occurrence vertices. The three edge families then sit on disjoint pairs of
+    tags, hence are edge-disjoint by construction. The occurrence vertex
+    carries the *negation* of its literal, which is harmless since
+    not-all-equal satisfaction is invariant under flipping a whole clause.
+  - **The width bound is load-bearing** and the reduction is gated on
+    `ThreeSatToSat.Wide`: the per-clause budget is `k − 1`, which bounds the
+    gadget's cut only because a clique on `k` vertices cuts `⌊k²/4⌋ > k − 1`
+    from `k = 4` on.
+  - **One map does all the counting.** `MaxCutRed.cutMap` charges each cut
+    edge to a threshold unit (a clause edge to whichever endpoint is not the
+    clause's last occurrence, ties broken towards the side the last occurrence
+    lies on). It is injective on the cut – that is exactly where the width
+    bound enters, two clause edges with the same charge exhibiting four
+    distinct occurrences – which gives `cut ≤ threshold`; and under a
+    not-all-equal assignment it is *onto* the marks, which gives the converse.
+    Equality then forces every gadget to be maximal, which reads back an
+    assignment. Clauses with at most one occurrence are excluded by a penalty
+    mark on an isolated vertex, never charged by anything.
+
 - **Subgraph Isomorphism** [S, *done*]: `Problems/SubgraphIso.lean`,
   `subgraphIso_NP_complete`. Vocabulary `Language.twoGraphs`: two unary vertex
   marks and two adjacency relations, i.e. two graphs side by side in one
@@ -582,11 +632,9 @@ separations and non-reducibility, impossible in the machine world.
 1. Cheap catalog wins: **done** (Set Cover / Hitting Set, Set Packing,
    k-COL, Chromatic Number, Clique Cover, Feedback Vertex Set, Feedback Arc
    Set, Subgraph Isomorphism, TAUT); next in the same
-   vein are the width-3 Schaefer variants NAE-3SAT / 1-in-3SAT [M] (NAE-SAT
-   itself is done), worth having as reduction *sources* for Max Cut and
-   Exact Cover, and the
-   Schaefer-style variants as reduction sources for Max Cut, which the
-   binary-threshold extension of representation (A) (done, §0) now unblocks.
+   vein is the remaining width-3 Schaefer variant 1-in-3SAT [M] (NAE-SAT and
+   NAE-3SAT are done), worth having as a reduction *source* for Exact Cover;
+   Max Cut is done too (§1), so the Schaefer-style sources have paid off.
    Dominating Set has been reclassified as an ordered reduction (see §1).
 1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
