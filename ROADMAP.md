@@ -142,18 +142,20 @@ proof plan for each problem still open.
   certificate form of acyclicity turns out to be the right tool for reductions
   and not only for membership; Steiner Tree and the Hamilton problems should
   reuse it.
-- **Dominating Set** [M–L, *harder than it looks*]: the classical
-  reduction from VC by edge subdivision does not survive the tagged
-  framework as an order-free reduction. Domination is a condition on
-  *every* element of the universe, so junk tuples cannot be ignored:
-  they are isolated vertices, each forcing itself into the dominating
-  set. Blowing junk up into cliques of existing vertices fixes that
-  (clique blow-ups preserve the domination number), but isolated
-  vertices of the input, and the fact that γ ≥ 1 while a vertex cover
-  may be empty, still need a canonical extra element – i.e. an *ordered*
-  reduction (`≤ᶠᵒ[≤]`), where “the minimum element” is definable. Plan
-  it as an ordered reduction from Set Cover (elements ∪ sets, sets made
-  into a clique), not as a quantifier-free one.
+- **Dominating Set** [M, *done*]: `Problems/DominatingSet/`,
+  `dominatingSet_NP_complete`. On `Language.markedGraph` unchanged. The entry
+  that used to stand here predicted an *ordered* reduction; that was wrong,
+  and the correction is worth keeping. Domination does constrain every element
+  of the universe, junk tuples included, so junk cannot be ignored the way the
+  covering and packing conditions ignore it – the fix is simply to make the
+  junk adjacent to all set-vertices, so that any nonempty solution dominates
+  it. And the two degenerate cases that seemed to need a canonical extra
+  vertex are both *first-order*, so gating on them suffices: “some element
+  belongs to no set” (input and output both no-instances: the output is made
+  edgeless with an empty threshold) and “there is no element at all” (both
+  yes-instances: the output is made edgeless with everything marked). Outside
+  those two cases every cover is nonempty, which is exactly what makes the
+  clique of set-vertices dominated. The reduction is therefore order-free.
 - **NAE-SAT** [M, *done*]: `Problems/NaeSat.lean`, `naeSat_NP_complete`. On
   the SAT vocabulary unchanged – only the notion of satisfaction differs
   (`NAEProper`: every clause has a true *and* a false literal), so this adds a

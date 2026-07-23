@@ -182,7 +182,11 @@ individual declarations are documented on their own pages.
   Exact Cover, where exactness replaces the threshold and hardness comes from
   exactly-one satisfiability, and Set Splitting – hypergraph
   2-colourability – hard from NAE-SAT, both by reductions with no gadget and
-  no counting at all; Feedback Vertex Set and
+  no counting at all;
+  Dominating Set, whose condition ranges over *every* vertex – junk tuples
+  included, which is what makes its reduction from Set Cover delicate – and
+  which is nevertheless order-free, the two degenerate cases being gated
+  first-order; Feedback Vertex Set and
   Feedback Arc Set, NP-hard by symmetrizing the arcs of a digraph and then
   splitting its vertices, with a first-order certificate of acyclicity (a
   guessed strict partial order) for their membership and a threshold carried
