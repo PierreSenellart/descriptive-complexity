@@ -392,7 +392,7 @@ theorem knapsack_sigmaSODefinable : SigmaSODefinable 1 Knapsack := by
     rintro ⟨ρ, hρ⟩
     obtain ⟨hlin, hsel, hbase, hstepsum, hstepcarry, hstepbot, hsteptop, hfinal, hempty⟩ :=
       (realize_knapsackKernel ρ).mp hρ
-    have hchain : IsChain BWLe BWPosn (Sel ρ) BWBit (PSum ρ) (Cy ρ) :=
+    have hchain : IsChain BWLe BWItem BWLe BWPosn (Sel ρ) BWBit (PSum ρ) (Cy ρ) :=
       ⟨hbase, hstepsum, hstepcarry, hstepbot, hsteptop⟩
     refine ⟨‹Finite A›, hlin, Sel ρ, hsel, ?_⟩
     by_cases hitems : ∃ i : A, BWItem i

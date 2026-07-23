@@ -565,7 +565,8 @@ theorem partition_sigmaSODefinable : SigmaSODefinable 1 Partition := by
     have h₀ : ∀ y : A, BWLe a₀ y := fun y => h₀' y trivial
     have hwlin : IsLinOrd (wideLe (BWLe (A := A))) := isLinOrd_wideLe hlin
     have hchain : ∀ b : Bool,
-        IsChain (wideLe BWLe) (WidePosn BWPosn) (PSide ρ b) PWt (PPS ρ b) (PCy ρ b) :=
+        IsChain BWLe BWItem (wideLe BWLe) (WidePosn BWPosn) (PSide ρ b) PWt (PPS ρ b)
+          (PCy ρ b) :=
       fun b => ⟨fun i u hi hp => (hwalk b).1 i u.1 u.2 hi hp,
         fun i j u hij hp => (hwalk b).2.1 i j u.1 u.2 hij hp,
         fun i j u v hij hpq =>
