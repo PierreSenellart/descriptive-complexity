@@ -351,4 +351,368 @@ noncomputable def vertexCover_ordered_fo_reduction_steinerTree :
   toInterpretation := steinerInterp
   correct A _ _ _ _ := hasSmallVertexCover_iff_steiner_map A
 
+/-! ### The edge-weighted variant
+
+The same construction, with one clause changed: the marked set must now count
+`k` *plus one unit per edge point*, since a Steiner tree of the incidence
+structure spends one edge joining each edge point to an endpoint before it can
+spend anything on the cover. Marking the edge points themselves is exactly
+that budget, and it needs no arithmetic in the formulas. -/
+
+/-- The interpretation of Vertex Cover into the edge-weighted Steiner Tree:
+as `DescriptiveComplexity.steinerInterp`, but the marked set also contains every edge
+point. -/
+noncomputable def steinerEdgeInterp :
+    FOInterpretation (Language.markedGraph.sum Language.order) Language.steinerGraph
+      SteinerTag 2 where
+  relFormula {n} R :=
+    match n, R with
+    | _, .adj => fun t =>
+        match t 0, t 1 with
+        | .vertex, .edge =>
+            isDiagF 0 ⊓ isEdgeF 1 ⊓
+              (Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊔
+                Term.equal (Term.var (0, 0)) (Term.var (1, 1)))
+        | .root, .vertex => isDiagF 0 ⊓ minF (0, 0) ⊓ isDiagF 1
+        | _, _ => ⊥
+    | _, .terminal => fun t =>
+        match t 0 with
+        | .edge => isEdgeF 0
+        | .root => isDiagF 0 ⊓ minF (0, 0)
+        | _ => ⊥
+    | _, .marked => fun t =>
+        match t 0 with
+        | .vertex => isDiagF 0 ⊓ Relations.formula₁ sMarkedSym (Term.var (0, 0))
+        | .edge => isEdgeF 0
+        | _ => ⊥
+
+section EdgePoints
+
+variable {A : Type}
+
+/-- The vertex point of the edge-weighted interpretation. -/
+def veePt (v : A) : steinerEdgeInterp.Map A := (.vertex, ![v, v])
+
+/-- The edge point of the edge-weighted interpretation. -/
+def eeePt (u v : A) : steinerEdgeInterp.Map A := (.edge, ![u, v])
+
+/-- The root point of the edge-weighted interpretation. -/
+def reePt (m : A) : steinerEdgeInterp.Map A := (.root, ![m, m])
+
+theorem veePt_injective : Function.Injective (veePt (A := A)) :=
+  fun _ _ h => congrArg (fun p : SteinerTag × (Fin 2 → A) => p.2 0) h
+
+end EdgePoints
+
+section EdgeShapes
+
+variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
+
+theorem steinerE_adj_iff (t t' : SteinerTag) (w w' : Fin 2 → A) :
+    STAdj (A := steinerEdgeInterp.Map A) (t, w) (t', w') ↔
+      (t = .vertex ∧ t' = .edge ∧ w 0 = w 1 ∧ (MGAdj (w' 0) (w' 1) ∧ w' 0 ≠ w' 1) ∧
+        (w 0 = w' 0 ∨ w 0 = w' 1)) ∨
+      (t = .root ∧ t' = .vertex ∧ w 0 = w 1 ∧ (∀ a : A, w 0 ≤ a) ∧ w' 0 = w' 1) := by
+  change RelMap (M := steinerEdgeInterp.Map A) stAdj ![(t, w), (t', w')] ↔ _
+  rw [FOInterpretation.relMap_map]
+  cases t <;> cases t' <;>
+    simp [steinerEdgeInterp, isDiagF, isEdgeF, MGAdj, realize_minF, Formula.realize_rel₂,
+      and_assoc]
+
+theorem steinerE_terminal_iff (t : SteinerTag) (w : Fin 2 → A) :
+    STTerminal (A := steinerEdgeInterp.Map A) (t, w) ↔
+      (t = .edge ∧ MGAdj (w 0) (w 1) ∧ w 0 ≠ w 1) ∨
+      (t = .root ∧ w 0 = w 1 ∧ ∀ a : A, w 0 ≤ a) := by
+  change RelMap (M := steinerEdgeInterp.Map A) stTerminal ![(t, w)] ↔ _
+  rw [FOInterpretation.relMap_map]
+  cases t <;>
+    simp [steinerEdgeInterp, isDiagF, isEdgeF, MGAdj, realize_minF, Formula.realize_rel₂]
+
+theorem steinerE_marked_iff (t : SteinerTag) (w : Fin 2 → A) :
+    STMarked (A := steinerEdgeInterp.Map A) (t, w) ↔
+      (t = .vertex ∧ w 0 = w 1 ∧ MGMarked (w 0)) ∨
+      (t = .edge ∧ MGAdj (w 0) (w 1) ∧ w 0 ≠ w 1) := by
+  change RelMap (M := steinerEdgeInterp.Map A) stMarked ![(t, w)] ↔ _
+  rw [FOInterpretation.relMap_map]
+  cases t <;>
+    simp [steinerEdgeInterp, isDiagF, isEdgeF, MGMarked, MGAdj, Formula.realize_rel₁,
+      Formula.realize_rel₂]
+
+@[simp]
+theorem steinerE_adj_ve (v u w : A) :
+    STAdj (veePt v) (eeePt u w) ↔ (MGAdj u w ∧ u ≠ w) ∧ (v = u ∨ v = w) := by
+  simpa [veePt, eeePt] using steinerE_adj_iff (A := A) .vertex .edge ![v, v] ![u, w]
+
+@[simp]
+theorem steinerE_adj_rv (m v : A) : STAdj (reePt m) (veePt v) ↔ ∀ a : A, m ≤ a := by
+  simpa [reePt, veePt] using steinerE_adj_iff (A := A) .root .vertex ![m, m] ![v, v]
+
+@[simp]
+theorem steinerE_terminal_e (u v : A) : STTerminal (eeePt u v) ↔ MGAdj u v ∧ u ≠ v := by
+  simpa [eeePt] using steinerE_terminal_iff (A := A) .edge ![u, v]
+
+@[simp]
+theorem steinerE_terminal_r (m : A) : STTerminal (reePt m) ↔ ∀ a : A, m ≤ a := by
+  simpa [reePt] using steinerE_terminal_iff (A := A) .root ![m, m]
+
+@[simp]
+theorem steinerE_terminal_v (v : A) : ¬STTerminal (veePt v) := by
+  simpa [veePt] using steinerE_terminal_iff (A := A) .vertex ![v, v]
+
+@[simp]
+theorem steinerE_marked_v (v : A) : STMarked (veePt v) ↔ MGMarked v := by
+  simpa [veePt] using steinerE_marked_iff (A := A) .vertex ![v, v]
+
+@[simp]
+theorem steinerE_marked_e (u v : A) : STMarked (eeePt u v) ↔ MGAdj u v ∧ u ≠ v := by
+  simpa [eeePt] using steinerE_marked_iff (A := A) .edge ![u, v]
+
+/-- The neighbours of an edge point are the points of its two endpoints. -/
+theorem steinerE_link_ePt {S : steinerEdgeInterp.Map A → Prop} {u v : A}
+    {q : steinerEdgeInterp.Map A} (h : Link STAdj S (eeePt u v) q) :
+    (q = veePt u ∨ q = veePt v) ∧ S q := by
+  refine ⟨?_, h.2.1⟩
+  rcases q with ⟨t', w'⟩
+  rcases h.2.2 with hadj | hadj
+  · rcases (steinerE_adj_iff .edge t' ![u, v] w').mp hadj with ⟨h0, -⟩ | ⟨h0, -⟩ <;>
+      exact absurd h0 (by decide)
+  · rcases (steinerE_adj_iff t' .edge w' ![u, v]).mp hadj with
+      ⟨rfl, -, hdiag, -, hinc⟩ | ⟨-, h1, -⟩
+    · have hq : ((SteinerTag.vertex, w') : steinerEdgeInterp.Map A) = veePt (w' 0) :=
+        Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> simp [veePt, hdiag]⟩
+      rcases hinc with hu | hv
+      · exact Or.inl (hq.trans (congrArg veePt (by simpa using hu)))
+      · exact Or.inr (hq.trans (congrArg veePt (by simpa using hv)))
+    · exact absurd h1 (by decide)
+
+end EdgeShapes
+
+/-! #### Correctness of the edge-weighted reduction -/
+
+section EdgeCorrectness
+
+variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
+
+/-- The edge points of the interpreted structure: what the marked set pays for
+before any cover. -/
+def EdgePtSet (A : Type) [Language.markedGraph.Structure A] [LinearOrder A] :
+    Set (steinerEdgeInterp.Map A) :=
+  {p | ∃ u v, (MGAdj u v ∧ u ≠ v) ∧ p = eeePt u v}
+
+theorem steinerE_terminal_shape {p : steinerEdgeInterp.Map A} (h : STTerminal p) :
+    p ∈ EdgePtSet A ∨ ∃ r, p = reePt r ∧ ∀ a : A, r ≤ a := by
+  rcases p with ⟨t, w⟩
+  rcases (steinerE_terminal_iff t w).mp h with ⟨rfl, hadj, hne⟩ | ⟨rfl, hdiag, hmin⟩
+  · exact Or.inl ⟨w 0, w 1, ⟨hadj, hne⟩,
+      Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> simp [eeePt]⟩⟩
+  · exact Or.inr ⟨w 0, Prod.ext_iff.mpr ⟨rfl, funext fun i => by
+      fin_cases i <;> simp [reePt, hdiag]⟩, hmin⟩
+
+theorem steinerE_marked_shape {p : steinerEdgeInterp.Map A} (h : STMarked p) :
+    (∃ v, p = veePt v ∧ MGMarked v) ∨ p ∈ EdgePtSet A := by
+  rcases p with ⟨t, w⟩
+  rcases (steinerE_marked_iff t w).mp h with ⟨rfl, hdiag, hm⟩ | ⟨rfl, hadj, hne⟩
+  · exact Or.inl ⟨w 0, Prod.ext_iff.mpr ⟨rfl, funext fun i => by
+      fin_cases i <;> simp [veePt, hdiag]⟩, hm⟩
+  · exact Or.inr ⟨w 0, w 1, ⟨hadj, hne⟩,
+      Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> simp [eeePt]⟩⟩
+
+/-- The marked set of the interpreted structure is one unit per edge point,
+plus the marked vertices. -/
+theorem ncard_marked_edge [Finite A] :
+    {p : steinerEdgeInterp.Map A | STMarked p}.ncard
+      = {v : A | MGMarked v}.ncard + (EdgePtSet A).ncard := by
+  haveI : Finite (steinerEdgeInterp.Map A) := steinerEdgeInterp.map_finite A
+  have hdisj : Disjoint (veePt '' {v : A | MGMarked v}) (EdgePtSet A) := by
+    rw [Set.disjoint_left]
+    rintro p ⟨v, -, rfl⟩ ⟨u, w, -, hp⟩
+    have htag : SteinerTag.vertex = SteinerTag.edge :=
+      congrArg (fun q : SteinerTag × (Fin 2 → A) => q.1) hp
+    exact absurd htag (by decide)
+  have hset : {p : steinerEdgeInterp.Map A | STMarked p}
+      = veePt '' {v : A | MGMarked v} ∪ EdgePtSet A := by
+    ext p
+    constructor
+    · intro hp
+      rcases steinerE_marked_shape hp with ⟨v, rfl, hv⟩ | he
+      · exact Or.inl ⟨v, hv, rfl⟩
+      · exact Or.inr he
+    · rintro (⟨v, hv, rfl⟩ | ⟨u, w, hedge, rfl⟩)
+      · exact (steinerE_marked_v v).mpr hv
+      · exact (steinerE_marked_e u w).mpr hedge
+  rw [hset, Set.ncard_union_eq hdisj (Set.toFinite _) (Set.toFinite _),
+    Set.ncard_image_of_injective _ veePt_injective]
+
+end EdgeCorrectness
+
+section CoverPick
+
+variable {A : Type}
+
+open Classical in
+/-- The endpoint through which an edge is attached to the cover. -/
+private noncomputable def coverPick (C : A → Prop) (u v : A) : A := if C u then u else v
+
+private theorem coverPick_mem (C : A → Prop) {u v : A} (h : C u ∨ C v) :
+    C (coverPick C u v) := by
+  classical
+  rw [coverPick]
+  split
+  · assumption
+  · exact h.resolve_left ‹¬C u›
+
+private theorem coverPick_eq (C : A → Prop) (u v : A) :
+    coverPick C u v = u ∨ coverPick C u v = v := by
+  classical
+  rw [coverPick]
+  split
+  · exact Or.inl rfl
+  · exact Or.inr rfl
+
+end CoverPick
+
+section EdgeCorrectness'
+
+variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
+
+/-- Correctness of the edge-weighted interpretation: a graph has a vertex
+cover at most as large as its marked set iff the associated incidence
+structure has an edge-weighted Steiner tree within the enlarged budget. -/
+theorem hasSmallVertexCover_iff_edgeSteiner_map (A : Type)
+    [Language.markedGraph.Structure A] [LinearOrder A] [Finite A] [Nonempty A] :
+    HasSmallVertexCover A ↔ HasSmallEdgeSteinerTree (steinerEdgeInterp.Map A) := by
+  classical
+  obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
+  haveI : Finite (steinerEdgeInterp.Map A) := steinerEdgeInterp.map_finite A
+  have hroot : STTerminal (reePt m (A := A)) := (steinerE_terminal_r m).mpr hm
+  have hedgeS : ∀ p ∈ EdgePtSet A, STTerminal p := by
+    rintro p ⟨u, w, hedge, rfl⟩
+    exact (steinerE_terminal_e u w).mpr hedge
+  have hedge_ne_root : ∀ p ∈ EdgePtSet A, p ≠ reePt m := by
+    rintro p ⟨u, w, -, rfl⟩ h
+    have htag : SteinerTag.edge = SteinerTag.root :=
+      congrArg (fun q : SteinerTag × (Fin 2 → A) => q.1) h
+    exact absurd htag (by decide)
+  constructor
+  · rintro ⟨hfin, C, hcov, hcard⟩
+    haveI := hfin
+    set Tset : steinerEdgeInterp.Map A → steinerEdgeInterp.Map A → Prop :=
+      fun p q => (∃ v, C v ∧ p = reePt m ∧ q = veePt v) ∨
+        (q ∈ EdgePtSet A ∧ p = veePt (coverPick C (q.2 0) (q.2 1))) with hTdef
+    set Sset : steinerEdgeInterp.Map A → Prop :=
+      fun p => STTerminal p ∨ ∃ v, C v ∧ p = veePt v with hSdef
+    refine ⟨inferInstance, Tset, Sset, ?_, fun x hx => Or.inl hx, ?_, ?_⟩
+    · -- the chosen pairs are edges of the interpreted graph
+      rintro a b (⟨v, hv, rfl, rfl⟩ | ⟨⟨u, w, hedge, rfl⟩, rfl⟩)
+      · exact (steinerE_adj_rv m v).mpr hm
+      · exact (steinerE_adj_ve _ u w).mpr ⟨hedge, by
+          simpa [eeePt] using coverPick_eq C u w⟩
+    · -- connectivity, through the root
+      have hlinkroot : ∀ v : A, C v → Link Tset Sset (veePt v) (reePt m) :=
+        fun v hv => ⟨Or.inr ⟨v, hv, rfl⟩, Or.inl hroot, Or.inr (Or.inl ⟨v, hv, rfl, rfl⟩)⟩
+      have hreach : ∀ p, Sset p → Relation.ReflTransGen (Link Tset Sset) p (reePt m) := by
+        rintro p (hp | ⟨v, hv, rfl⟩)
+        · rcases steinerE_terminal_shape hp with ⟨u, w, hedge, rfl⟩ | ⟨r, rfl, hminr⟩
+          · have hpick : C (coverPick C u w) := coverPick_mem C (hcov u w hedge.2 hedge.1)
+            refine Relation.ReflTransGen.head ?_
+              (Relation.ReflTransGen.single (hlinkroot _ hpick))
+            exact ⟨Or.inl hp, Or.inr ⟨_, hpick, rfl⟩,
+              Or.inr (Or.inr ⟨⟨u, w, hedge, rfl⟩, by simp [eeePt]⟩)⟩
+          · have hrm : r = m := le_antisymm (hminr m) (hm r)
+            subst hrm
+            exact Relation.ReflTransGen.refl
+        · exact Relation.ReflTransGen.single (hlinkroot v hv)
+      intro x y hx hy
+      exact (hreach x hx).trans
+        (reflTransGen_symm (fun _ _ hab => link_symm hab) (hreach y hy))
+    · -- the budget: the chosen pairs are one per cover vertex and one per edge point
+      have hdisj : Disjoint ((fun v : A => (reePt m (A := A), veePt v)) '' {v : A | C v})
+          ((fun q : steinerEdgeInterp.Map A =>
+            (veePt (coverPick C (q.2 0) (q.2 1)), q)) '' EdgePtSet A) := by
+        rw [Set.disjoint_left]
+        rintro ⟨p, q⟩ ⟨v, -, hv⟩ ⟨e, -, he⟩
+        have h1 : p = reePt m := (Prod.ext_iff.mp hv.symm).1
+        have h2 : p = veePt (coverPick C (e.2 0) (e.2 1)) := (Prod.ext_iff.mp he.symm).1
+        have htag : SteinerTag.root = SteinerTag.vertex :=
+          congrArg (fun r : SteinerTag × (Fin 2 → A) => r.1) (h1.symm.trans h2)
+        exact absurd htag (by decide)
+      have hTset : {p : steinerEdgeInterp.Map A × steinerEdgeInterp.Map A |
+            (∃ v, C v ∧ p.1 = reePt m ∧ p.2 = veePt v) ∨
+              (p.2 ∈ EdgePtSet A ∧ p.1 = veePt (coverPick C (p.2.2 0) (p.2.2 1)))}
+          = ((fun v : A => (reePt m (A := A), veePt v)) '' {v : A | C v}) ∪
+            ((fun q : steinerEdgeInterp.Map A =>
+              (veePt (coverPick C (q.2 0) (q.2 1)), q)) '' EdgePtSet A) := by
+        ext ⟨p, q⟩
+        constructor
+        · rintro (⟨v, hv, hp, hq⟩ | ⟨hq, hp⟩)
+          · exact Or.inl ⟨v, hv, Prod.ext hp.symm hq.symm⟩
+          · exact Or.inr ⟨q, hq, Prod.ext hp.symm rfl⟩
+        · rintro (⟨v, hv, hpq⟩ | ⟨e, he, hpq⟩)
+          · exact Or.inl ⟨v, hv, (Prod.ext_iff.mp hpq.symm).1, (Prod.ext_iff.mp hpq.symm).2⟩
+          · refine Or.inr ⟨(Prod.ext_iff.mp hpq.symm).2 ▸ he, ?_⟩
+            rw [(Prod.ext_iff.mp hpq.symm).1, (Prod.ext_iff.mp hpq.symm).2]
+      have hinj₁ : Function.Injective fun v : A => (reePt m (A := A), veePt v) :=
+        fun _ _ h => veePt_injective (Prod.ext_iff.mp h).2
+      have hinj₂ : Function.Injective fun q : steinerEdgeInterp.Map A =>
+          (veePt (coverPick C (q.2 0) (q.2 1)), q) := fun _ _ h => (Prod.ext_iff.mp h).2
+      rw [hTset, Set.ncard_union_eq hdisj (Set.toFinite _) (Set.toFinite _),
+        Set.ncard_image_of_injective _ hinj₁, Set.ncard_image_of_injective _ hinj₂,
+        ncard_marked_edge]
+      omega
+  · rintro ⟨hfin, T, S, hsub, hterms, hconn, hcard⟩
+    have hA : Finite A := Finite.of_injective _ (veePt_injective (A := A))
+    haveI := hA
+    have hlinkmono : ∀ p q, Link T S p q → Link STAdj S p q :=
+      fun _ _ h => ⟨h.1, h.2.1, h.2.2.imp (hsub _ _) (hsub _ _)⟩
+    refine ⟨hA, fun v => S (veePt v), fun x y hxy hadj => ?_, ?_⟩
+    · -- the first step out of an edge terminal lands on one of its endpoints
+      have hex : S (eeePt x y) := hterms _ ((steinerE_terminal_e x y).mpr ⟨hadj, hxy⟩)
+      have hrt : S (reePt m) := hterms _ hroot
+      rcases Relation.ReflTransGen.cases_head (hconn (eeePt x y) (reePt m) hex hrt) with
+        heq | ⟨q, hlink, -⟩
+      · have htag : SteinerTag.edge = SteinerTag.root :=
+          congrArg (fun r : SteinerTag × (Fin 2 → A) => r.1) heq
+        exact absurd htag (by decide)
+      · obtain ⟨hq, hqS⟩ := steinerE_link_ePt (hlinkmono _ _ hlink)
+        rcases hq with rfl | rfl
+        · exact Or.inl hqS
+        · exact Or.inr hqS
+    · -- the budget: edge points and cover vertices are disjoint members of the tree
+      have hrt : S (reePt m) := hterms _ hroot
+      have hdisj : Disjoint (EdgePtSet A) (veePt '' {v : A | S (veePt v)}) := by
+        rw [Set.disjoint_left]
+        rintro p ⟨u, w, -, rfl⟩ ⟨v, -, hv⟩
+        have htag : SteinerTag.vertex = SteinerTag.edge :=
+          congrArg (fun r : SteinerTag × (Fin 2 → A) => r.1) hv
+        exact absurd htag (by decide)
+      have hsubset : EdgePtSet A ∪ veePt '' {v : A | S (veePt v)} ⊆
+          {x : steinerEdgeInterp.Map A | S x ∧ x ≠ reePt m} := by
+        rintro p (hp | ⟨v, hv, rfl⟩)
+        · exact ⟨hterms _ (hedgeS p hp), hedge_ne_root p hp⟩
+        · refine ⟨hv, fun h => ?_⟩
+          have htag : SteinerTag.vertex = SteinerTag.root :=
+            congrArg (fun r : SteinerTag × (Fin 2 → A) => r.1) h
+          exact absurd htag (by decide)
+      have hsum : (EdgePtSet A).ncard + {v : A | S (veePt v)}.ncard
+          ≤ {x : steinerEdgeInterp.Map A | S x ∧ x ≠ reePt m}.ncard := by
+        rw [← Set.ncard_image_of_injective {v : A | S (veePt v)} veePt_injective,
+          ← Set.ncard_union_eq hdisj (Set.toFinite _) (Set.toFinite _)]
+        exact Set.ncard_le_ncard hsubset (Set.toFinite _)
+      have hconncard := ncard_le_ncard_of_connected hrt hconn
+      rw [ncard_marked_edge] at hcard
+      change {v : A | S (veePt v)}.ncard ≤ {x : A | MGMarked x}.ncard
+      omega
+
+end EdgeCorrectness'
+
+/-- **Vertex Cover ordered-FO-reduces to the edge-weighted Steiner Tree**:
+Karp's original reading of the problem, with the budget enlarged by one unit
+per edge point – the price of attaching each terminal to the tree. -/
+noncomputable def vertexCover_ordered_fo_reduction_edgeSteinerTree :
+    VertexCover ≤ᶠᵒ[≤] EdgeSteinerTree where
+  Tag := SteinerTag
+  dim := 2
+  toInterpretation := steinerEdgeInterp
+  correct A _ _ _ _ := hasSmallVertexCover_iff_edgeSteiner_map A
+
 end DescriptiveComplexity

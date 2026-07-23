@@ -47,4 +47,21 @@ of this library and the Cook–Levin theorem. -/
 theorem steinerTree_NP_complete : NP.Complete SteinerTree :=
   ⟨steinerTree_mem_NP, steinerTree_NP_hard⟩
 
+/-! ### The edge-weighted variant -/
+
+/-- The edge-weighted Steiner Tree is in NP: it is `Σ₁`-definable. -/
+theorem edgeSteinerTree_mem_NP : EdgeSteinerTree ∈ NP :=
+  edgeSteinerTree_sigmaSODefinable
+
+/-- The edge-weighted Steiner Tree is NP-hard: Vertex Cover, which is NP-hard,
+ordered-FO-reduces to it. -/
+theorem edgeSteinerTree_NP_hard : NP.Hard EdgeSteinerTree :=
+  NP.hard_of_orderedReduction vertexCover_ordered_fo_reduction_edgeSteinerTree
+    vertexCover_NP_hard
+
+/-- **The edge-weighted Steiner Tree is NP-complete** – Karp's original
+reading of the problem. -/
+theorem edgeSteinerTree_NP_complete : NP.Complete EdgeSteinerTree :=
+  ⟨edgeSteinerTree_mem_NP, edgeSteinerTree_NP_hard⟩
+
 end DescriptiveComplexity

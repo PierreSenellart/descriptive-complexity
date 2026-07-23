@@ -347,6 +347,278 @@ theorem steinerTree_sigmaSODefinable : SigmaSODefinable 1 SteinerTree := by
       rw [hval]
       exact hf1 x'
 
+/-! ### The edge-weighted variant
+
+The same certificate, plus the edge set itself, and with the threshold
+injection mapping *pairs* to *elements* – hence a ternary relation variable,
+for which `DescriptiveComplexity.realize_rel₃` plays the role Mathlib's
+`Formula.realize_rel₁`/`₂` play at lower arity. -/
+
+/-- Realization of an atom of arity 3. -/
+theorem realize_rel₃ {L : Language} {α M : Type} [L.Structure M] {R : L.Relations 3}
+    {t₁ t₂ t₃ : L.Term α} {v : α → M} :
+    (R.formula ![t₁, t₂, t₃]).Realize v ↔
+      RelMap R ![t₁.realize v, t₂.realize v, t₃.realize v] := by
+  rw [Formula.realize_rel, iff_eq_eq]
+  congr 1
+  funext i
+  fin_cases i <;> rfl
+
+/-- The five relation variables guessed by the `Σ₁` definition of the
+edge-weighted Steiner tree. -/
+inductive EdgeSteinerGuess
+  /-- The chosen set of edges. -/
+  | tree
+  /-- The chosen set of vertices. -/
+  | set
+  /-- The root of the chosen set. -/
+  | root
+  /-- The order certifying connectivity. -/
+  | order
+  /-- The injection witnessing the threshold. -/
+  | inj
+  deriving DecidableEq
+
+instance : Fintype EdgeSteinerGuess :=
+  ⟨{.tree, .set, .root, .order, .inj}, fun t => by cases t <;> decide⟩
+
+/-- The single existential block of the `Σ₁` definition of the edge-weighted
+Steiner tree. -/
+def edgeSteinerGuessBlock : SOBlock where
+  ι := EdgeSteinerGuess
+  arity := fun i => match i with
+    | .tree => 2
+    | .set => 1
+    | .root => 1
+    | .order => 2
+    | .inj => 3
+
+/-- The symbol of the edge-set relation variable. -/
+def esTreeRel : edgeSteinerGuessBlock.lang.Relations 2 := ⟨.tree, rfl⟩
+
+/-- The symbol of the chosen-set relation variable. -/
+def esSetRel : edgeSteinerGuessBlock.lang.Relations 1 := ⟨.set, rfl⟩
+
+/-- The symbol of the root relation variable. -/
+def esRootRel : edgeSteinerGuessBlock.lang.Relations 1 := ⟨.root, rfl⟩
+
+/-- The symbol of the order relation variable. -/
+def esOrderRel : edgeSteinerGuessBlock.lang.Relations 2 := ⟨.order, rfl⟩
+
+/-- The symbol of the injection relation variable. -/
+def esInjRel : edgeSteinerGuessBlock.lang.Relations 3 := ⟨.inj, rfl⟩
+
+/-- The vocabulary of the edge-weighted kernel. -/
+abbrev edgeSteinerSOLang : Language := Language.steinerGraph.sum edgeSteinerGuessBlock.lang
+
+/-- The adjacency symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsAdjSym : edgeSteinerSOLang.Relations 2 := Sum.inl stAdj
+
+/-- The terminal symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsTermSym : edgeSteinerSOLang.Relations 1 := Sum.inl stTerminal
+
+/-- The mark symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsMarkedSym : edgeSteinerSOLang.Relations 1 := Sum.inl stMarked
+
+/-- The edge-set symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsTreeSym : edgeSteinerSOLang.Relations 2 := Sum.inr esTreeRel
+
+/-- The chosen-set symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsSetSym : edgeSteinerSOLang.Relations 1 := Sum.inr esSetRel
+
+/-- The root symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsRootSym : edgeSteinerSOLang.Relations 1 := Sum.inr esRootRel
+
+/-- The order symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsLtSym : edgeSteinerSOLang.Relations 2 := Sum.inr esOrderRel
+
+/-- The injection symbol in the edge-weighted kernel's vocabulary. -/
+abbrev kEsInjSym : edgeSteinerSOLang.Relations 3 := Sum.inr esInjRel
+
+/-- Kernel clause: the chosen pairs are edges. -/
+private noncomputable def esAdjClause : edgeSteinerSOLang.Sentence :=
+  ((Relations.formula₂ kEsTreeSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
+    (Relations.formula₂ kEsAdjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+
+/-- Kernel clause: every terminal is spanned. -/
+private noncomputable def esTermClause : edgeSteinerSOLang.Sentence :=
+  Formula.iAlls (Fin 1)
+    ((Relations.formula₁ kEsTermSym (Term.var (Sum.inr 0))).imp
+      (Relations.formula₁ kEsSetSym (Term.var (Sum.inr 0))))
+
+/-- Kernel clause: the root is spanned. -/
+private noncomputable def esRootInClause : edgeSteinerSOLang.Sentence :=
+  Formula.iAlls (Fin 1)
+    ((Relations.formula₁ kEsRootSym (Term.var (Sum.inr 0))).imp
+      (Relations.formula₁ kEsSetSym (Term.var (Sum.inr 0))))
+
+/-- Kernel clause: there is at most one root. -/
+private noncomputable def esRootUniqueClause : edgeSteinerSOLang.Sentence :=
+  ((Relations.formula₁ kEsRootSym (Term.var (Sum.inr 0)) ⊓
+      Relations.formula₁ kEsRootSym (Term.var (Sum.inr 1))).imp
+    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+
+/-- Kernel clause: the guessed order is transitive. -/
+private noncomputable def esTransClause : edgeSteinerSOLang.Sentence :=
+  ((Relations.formula₂ kEsLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
+      Relations.formula₂ kEsLtSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
+    (Relations.formula₂ kEsLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+
+/-- Kernel clause: the guessed order is irreflexive. -/
+private noncomputable def esIrreflClause : edgeSteinerSOLang.Sentence :=
+  Formula.iAlls (Fin 1)
+    (∼(Relations.formula₂ kEsLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
+
+/-- Kernel clause: every spanned non-root steps down along a chosen edge. -/
+private noncomputable def esStepClause : edgeSteinerSOLang.Sentence :=
+  Formula.iAlls (Fin 1)
+    ((Relations.formula₁ kEsSetSym (Term.var (Sum.inr 0)) ⊓
+        ∼(Relations.formula₁ kEsRootSym (Term.var (Sum.inr 0)))).imp
+      ((Relations.formula₁ kEsSetSym (Term.var (Sum.inr ())) ⊓
+        (Relations.formula₂ kEsTreeSym (Term.var (Sum.inl (Sum.inr 0)))
+            (Term.var (Sum.inr ())) ⊔
+          Relations.formula₂ kEsTreeSym (Term.var (Sum.inr ()))
+            (Term.var (Sum.inl (Sum.inr 0)))) ⊓
+        Relations.formula₂ kEsLtSym (Term.var (Sum.inr ()))
+          (Term.var (Sum.inl (Sum.inr 0)))).iExs Unit))
+
+/-- Kernel clause: the guessed injection maps every chosen edge to a marked
+element. -/
+private noncomputable def esTotalClause : edgeSteinerSOLang.Sentence :=
+  Formula.iAlls (Fin 2)
+    ((Relations.formula₂ kEsTreeSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
+      ((Relations.formula kEsInjSym ![Term.var (Sum.inl (Sum.inr 0)),
+            Term.var (Sum.inl (Sum.inr 1)), Term.var (Sum.inr ())] ⊓
+        Relations.formula₁ kEsMarkedSym (Term.var (Sum.inr ()))).iExs Unit))
+
+/-- Kernel clause: the guessed injection is injective. -/
+private noncomputable def esInjClause : edgeSteinerSOLang.Sentence :=
+  ((Relations.formula kEsInjSym ![Term.var (Sum.inr 0), Term.var (Sum.inr 1),
+        Term.var (Sum.inr 4)] ⊓
+      Relations.formula kEsInjSym ![Term.var (Sum.inr 2), Term.var (Sum.inr 3),
+        Term.var (Sum.inr 4)]).imp
+    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
+      Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3)))).iAlls (Fin 5)
+
+/-- The first-order kernel of the `Σ₁` definition of the edge-weighted Steiner
+tree. -/
+noncomputable def edgeSteinerKernel : edgeSteinerSOLang.Sentence :=
+  esAdjClause ⊓ (esTermClause ⊓ (esRootInClause ⊓ (esRootUniqueClause ⊓ (esTransClause ⊓
+    (esIrreflClause ⊓ (esStepClause ⊓ (esTotalClause ⊓ esInjClause)))))))
+
+/-- Realization of the edge-weighted kernel. -/
+private theorem realize_edgeSteinerKernel {A : Type} [Language.steinerGraph.Structure A]
+    (ρ : edgeSteinerGuessBlock.Assignment A) :
+    (@Sentence.Realize edgeSteinerSOLang A
+        (@sumStructure _ _ A _ (edgeSteinerGuessBlock.structure ρ)) edgeSteinerKernel) ↔
+      (∀ a b : A, ρ .tree ![a, b] → STAdj a b) ∧
+      (∀ x : A, STTerminal x → ρ .set ![x]) ∧
+      (∀ x : A, ρ .root ![x] → ρ .set ![x]) ∧
+      (∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y) ∧
+      (∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z]) ∧
+      (∀ x : A, ¬ρ .order ![x, x]) ∧
+      (∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
+        ∃ y : A, (ρ .set ![y] ∧ (ρ .tree ![x, y] ∨ ρ .tree ![y, x])) ∧ ρ .order ![y, x]) ∧
+      (∀ a b : A, ρ .tree ![a, b] → ∃ y : A, ρ .inj ![a, b, y] ∧ STMarked y) ∧
+      (∀ a b a' b' y : A, ρ .inj ![a, b, y] → ρ .inj ![a', b', y] → a = a' ∧ b = b') := by
+  letI := edgeSteinerGuessBlock.structure ρ
+  have hT : ∀ (w : Fin 2 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsTreeSym w ↔ ρ .tree w := fun _ => Iff.rfl
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+  have hI : ∀ (w : Fin 3 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [edgeSteinerKernel]
+  simp only [esAdjClause, esTermClause, esRootInClause, esRootUniqueClause, esTransClause,
+    esIrreflClause, esStepClause, esTotalClause, esInjClause, Sentence.Realize,
+    Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_sup, Formula.realize_not, realize_rel₃,
+    Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
+    Sum.elim_inr, Sum.elim_inl, Language.relMap_sumInl, hT, hS, hR, hL, hI]
+  refine and_congr ⟨fun h a b hab => ?_, fun h i hi => ?_⟩
+    (and_congr ⟨fun h x hx => ?_, fun h i hi => ?_⟩
+      (and_congr ⟨fun h x hx => ?_, fun h i hi => ?_⟩
+        (and_congr ⟨fun h x y hx hy => ?_, fun h i hi => ?_⟩
+          (and_congr ⟨fun h x y z h₁ h₂ => ?_, fun h i hi => ?_⟩
+            (and_congr ⟨fun h x => ?_, fun h i => ?_⟩
+              (and_congr ⟨fun h x hx hnr => ?_, fun h i hi => ?_⟩
+                (and_congr ⟨fun h a b hab => ?_, fun h i hi => ?_⟩
+                  ⟨fun h a b a' b' y h₁ h₂ => ?_, fun h i hi => ?_⟩)))))))
+  · exact h ![a, b] hab
+  · exact h (i 0) (i 1) hi
+  · exact h (fun _ => x) hx
+  · exact h (i 0) hi
+  · exact h (fun _ => x) hx
+  · exact h (i 0) hi
+  · exact h ![x, y] ⟨hx, hy⟩
+  · exact h (i 0) (i 1) hi.1 hi.2
+  · exact h ![x, y, z] ⟨h₁, h₂⟩
+  · exact h (i 0) (i 1) (i 2) hi.1 hi.2
+  · exact h fun _ => x
+  · exact h (i 0)
+  · obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnr⟩
+    exact ⟨y (), hy⟩
+  · obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
+    exact ⟨fun _ => y, hy⟩
+  · obtain ⟨y, hy⟩ := h ![a, b] hab
+    exact ⟨y (), hy⟩
+  · obtain ⟨y, hy⟩ := h (i 0) (i 1) hi
+    exact ⟨fun _ => y, hy⟩
+  · exact h ![a, b, a', b', y] ⟨h₁, h₂⟩
+  · exact h (i 0) (i 1) (i 2) (i 3) (i 4) hi.1 hi.2
+
+/-- **The edge-weighted Steiner Tree is `Σ₁`-definable**: guess the edge set,
+the vertices it spans, a root, an order certifying connectivity, and an
+injection of the chosen edges into the marked set. -/
+theorem edgeSteinerTree_sigmaSODefinable : SigmaSODefinable 1 EdgeSteinerTree := by
+  refine ⟨[edgeSteinerGuessBlock], rfl, edgeSteinerKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨-, hst⟩
+    obtain ⟨T, S, hsub, hterms, ⟨Rt, hRtS, huniq, Lt, htrans, hirr, hstep⟩, ⟨e⟩⟩ :=
+      (steinerEdgeOn_iff_certificate _ _ _).mp hst
+    refine ⟨fun i => match i with
+      | .tree => fun w : Fin 2 → A => T (w 0) (w 1)
+      | .set => fun w : Fin 1 → A => S (w 0)
+      | .root => fun w : Fin 1 → A => Rt (w 0)
+      | .order => fun w : Fin 2 → A => Lt (w 0) (w 1)
+      | .inj => fun w : Fin 3 → A =>
+          ∃ h : T (w 0) (w 1), (e ⟨(w 0, w 1), h⟩ : {x // STMarked x}).1 = w 2, ?_⟩
+    refine (realize_edgeSteinerKernel _).mpr
+      ⟨hsub, hterms, hRtS, huniq, htrans, hirr, ?_,
+        fun a b hab => ⟨(e ⟨(a, b), hab⟩).1, ⟨hab, rfl⟩, (e ⟨(a, b), hab⟩).2⟩, ?_⟩
+    · intro x hx hnr
+      obtain ⟨y, hlink, hlt⟩ := hstep x hx hnr
+      exact ⟨y, ⟨hlink.2.1, hlink.2.2⟩, hlt⟩
+    · rintro a b a' b' y ⟨h, hy⟩ ⟨h', hy'⟩
+      have heq := e.injective (Subtype.ext (hy.trans hy'.symm) :
+        (e ⟨(a, b), h⟩ : {x // STMarked x}) = e ⟨(a', b'), h'⟩)
+      exact ⟨congrArg Prod.fst (congrArg Subtype.val heq),
+        congrArg Prod.snd (congrArg Subtype.val heq)⟩
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨hsub, hterms, hRtS, huniq, htrans, hirr, hstep, htot, hinj⟩ :=
+      (realize_edgeSteinerKernel ρ).mp hρ
+    have hch : ∀ p : {p : A × A // ρ .tree ![p.1, p.2]},
+        ∃ y : A, ρ .inj ![p.1.1, p.1.2, y] ∧ STMarked y := by
+      rintro ⟨⟨a, b⟩, hab⟩
+      exact htot a b hab
+    choose f hf1 hf2 using hch
+    refine ⟨‹Finite A›, (steinerEdgeOn_iff_certificate _ _ _).mpr
+      ⟨fun a b => ρ .tree ![a, b], fun x => ρ .set ![x], hsub, hterms,
+        ⟨fun x => ρ .root ![x], hRtS, huniq, fun x y => ρ .order ![x, y], htrans, hirr, ?_⟩,
+        ⟨⟨fun p => ⟨f p, hf2 p⟩, fun p p' hpp' => ?_⟩⟩⟩⟩
+    · intro x hx hnr
+      obtain ⟨y, ⟨hy, hlink⟩, hlt⟩ := hstep x hx hnr
+      exact ⟨y, ⟨hx, hy, hlink⟩, hlt⟩
+    · have hval : f p = f p' := congrArg Subtype.val hpp'
+      obtain ⟨h₁, h₂⟩ := hinj p.1.1 p.1.2 p'.1.1 p'.1.2 (f p) (hf1 p)
+        (by rw [hval]; exact hf1 p')
+      exact Subtype.ext (Prod.ext h₁ h₂)
+
 end SigmaOne
 
 end DescriptiveComplexity
