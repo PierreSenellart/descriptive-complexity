@@ -161,8 +161,10 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.Problems` – one decision problem per file: SAT with
   the Cook–Levin theorem ([Cook 1971][cook1971complexity];
   [Levin 1973][levin1973universal]) proved by a machine-free Tseitin discharge,
-  3-colorability (FO-interreducible with SAT in both directions), 3SAT, and
-  the clique family (Clique, Independent Set, Vertex Cover) with their
+  3-colorability (FO-interreducible with SAT in both directions), 3SAT,
+  NAE-SAT – the Schaefer-style variant ([Schaefer
+  1978][schaefer1978complexity]) whose flip symmetry makes it a convenient
+  reduction source – and the clique family (Clique, Independent Set, Vertex Cover) with their
   inter-reductions and NP-completeness; the coloring family – `k`-colorability
   for every `k ≥ 3` by padding 3-colorability with blown-up universal
   vertices, then Chromatic Number and Clique Cover, whose threshold is a

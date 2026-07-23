@@ -11,6 +11,7 @@ import DescriptiveComplexity.Problems.Reachability
 import DescriptiveComplexity.Problems.ThreeColorability
 import DescriptiveComplexity.Problems.Coloring
 import DescriptiveComplexity.Problems.ThreeSat
+import DescriptiveComplexity.Problems.NaeSat
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Problems.SetFamily

@@ -154,11 +154,26 @@ proof plan for each problem still open.
   reduction (`≤ᶠᵒ[≤]`), where “the minimum element” is definable. Plan
   it as an ordered reduction from Set Cover (elements ∪ sets, sets made
   into a clique), not as a quantifier-free one.
-- **NAE-3SAT and 1-in-3SAT** [M]: Schaefer-style variants; valuable as
-  reduction *sources* (their gadgets are more local than 3SAT's).
-- **Max Cut** [M]: from NAE-3SAT; threshold via (A) at arity 2, i.e. the
-  marked-binary-relation form introduced for Feedback Arc Set
-  (`nonempty_embedding_iff_ncard_le₂`).
+- **NAE-SAT** [M, *done*]: `Problems/NaeSat.lean`, `naeSat_NP_complete`. On
+  the SAT vocabulary unchanged – only the notion of satisfaction differs
+  (`NAEProper`: every clause has a true *and* a false literal), so this adds a
+  problem, not a language. Hardness is the classical fresh-variable reduction
+  from SAT, and it is *ordered* for a structural reason worth remembering: an
+  interpretation adds elements only by tags, and a tag contributes a whole
+  copy of the universe, so “one fresh variable” has to be picked out as the
+  minimum of its copy (`minF`). One fresh variable *per clause* would make the
+  reduction false, since a private `s` can always be set opposite to a
+  literal. Membership reuses `realize_satKernel` verbatim: the NAE kernel is
+  SAT's conjoined with its mirror image.
+- **NAE-3SAT and 1-in-3SAT** [M]: the width-3 variants. NAE-3SAT follows from
+  NAE-SAT restricted to width 3 by the classical splitting NAE(a,b,c,d) ⟺
+  ∃y. NAE(a,b,y) ∧ NAE(¬y,c,d), whose auxiliary is *per clause* and hence
+  order-free (a tag suffices); 1-in-3SAT is Schaefer's other local gadget and
+  is the natural source for Exact Cover.
+- **Max Cut** [M]: from NAE-3SAT (NAE-SAT is done, the width bound is what
+  remains); threshold via (A) at arity 2, i.e. the marked-binary-relation form
+  introduced for Feedback Arc Set (`nonempty_embedding_iff_ncard_le₂`). The
+  counting step – a cut of size ≥ 5m for m clauses – is the real work.
 - **Subgraph Isomorphism** [S, *done*]: `Problems/SubgraphIso.lean`,
   `subgraphIso_NP_complete`. Vocabulary `Language.twoGraphs`: two unary vertex
   marks and two adjacency relations, i.e. two graphs side by side in one
@@ -547,8 +562,9 @@ separations and non-reducibility, impossible in the machine world.
 1. Cheap catalog wins: **done** (Set Cover / Hitting Set, Set Packing,
    k-COL, Chromatic Number, Clique Cover, Feedback Vertex Set, Feedback Arc
    Set, Subgraph Isomorphism, TAUT); next in the same
-   vein are the Schaefer-style variants NAE-3SAT / 1-in-3SAT [M], worth
-   having as reduction *sources* for Max Cut, and the
+   vein are the width-3 Schaefer variants NAE-3SAT / 1-in-3SAT [M] (NAE-SAT
+   itself is done), worth having as reduction *sources* for Max Cut and
+   Exact Cover, and the
    Schaefer-style variants as reduction sources for Max Cut, which the
    binary-threshold extension of representation (A) (done, §0) now unblocks.
    Dominating Set has been reclassified as an ordered reduction (see §1).
