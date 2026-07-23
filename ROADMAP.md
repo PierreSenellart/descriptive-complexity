@@ -288,8 +288,12 @@ proof plan for each problem still open.
      name the lowest position of a block and to pin the padding of the items
      down – so the reduction is ordered, which conveniently also supplies the
      finiteness the counting needs.
-  3. *Partition* (#20), *started*: `Problems/Partition/Defs.lean` defines it on
-     the same vocabulary with the *target symbol unused* – what a split must
+  3. *Partition* (#20), *in NP*: `Problems/Partition/` defines it on
+     the same vocabulary with the *target symbol unused*, and proves
+     `partition_mem_NP` – the certificate guesses the split and two
+     ripple-carry walks on the wide positions, one per side, required to agree
+     at the last item (no guessed value, and no degenerate clause: with no
+     items both sides are empty). What is left is the hardness gadget – what a split must
      match is the weight of the items it leaves out. Two findings shape the
      rest of the work:
      - The classical reduction from Knapsack, padding with the two weights

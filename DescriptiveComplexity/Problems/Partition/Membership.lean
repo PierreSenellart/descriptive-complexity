@@ -483,6 +483,132 @@ private theorem realize_partitionKernel :
 
 end Realize
 
+/-! ### Membership -/
+
+section Membership
+
+variable {A : Type} [Finite A] [Language.binWeights.Structure A]
+
+omit [Finite A] in
+/-- Read on the wide positions, an item still weighs its weight. -/
+private theorem binNum_pWt (hlin : IsLinOrd (BWLe (A := A))) {a₀ : A}
+    (h₀ : ∀ y : A, BWLe a₀ y) (i : A) :
+    binNum (wideLe BWLe) (WidePosn BWPosn) (PWt i) = BWWeight i := by
+  have hcongr : binNum (wideLe BWLe) (WidePosn BWPosn) (PWt i) =
+      binNum (wideLe BWLe) (WidePosn BWPosn) (fun u => u.1 = a₀ ∧ BWBit i u.2) := by
+    refine binNum_congr fun u => and_congr ?_ Iff.rfl
+    exact ⟨fun h => hlin.2.2.1 _ _ (h fun _ => a₀) (h₀ u.1), fun h y => h ▸ h₀ (y ())⟩
+  rw [hcongr, binNum_wide hlin h₀ (BWBit i)]
+  rfl
+
+omit [Finite A] in
+/-- The same, for a sum over any set of items. -/
+private theorem finsum_pWt (hlin : IsLinOrd (BWLe (A := A))) {a₀ : A}
+    (h₀ : ∀ y : A, BWLe a₀ y) (T : A → Prop) :
+    (∑ᶠ j ∈ {j : A | T j}, binNum (wideLe BWLe) (WidePosn BWPosn) (PWt j)) =
+      ∑ᶠ j ∈ {j : A | T j}, BWWeight j :=
+  finsum_mem_congr rfl fun j _ => binNum_pWt hlin h₀ j
+
+/-- **Partition is `Σ₁`-definable**: guess the split and the two ripple-carry
+walks, one along the chosen items and one along the others, and check
+first-order that they end on the same number. Since NP is defined as
+`Σ₁`-definability, this is the membership half of the NP-completeness of
+Partition. -/
+theorem partition_sigmaSODefinable : SigmaSODefinable 1 Partition := by
+  refine ⟨[partitionGuessBlock], rfl, partitionKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · -- a split yields a certificate: two walks, one per side
+    rintro ⟨hfin, hlin, S, hSitem, hsumeq⟩
+    obtain ⟨a₀, -, h₀'⟩ := exists_minPos (Le := BWLe (A := A)) (Posn := fun _ => True) hlin
+      ⟨Classical.arbitrary A, trivial⟩
+    have h₀ : ∀ y : A, BWLe a₀ y := fun y => h₀' y trivial
+    have hwlin : IsLinOrd (wideLe (BWLe (A := A))) := isLinOrd_wideLe hlin
+    have hbound : ∀ T : A → Prop,
+        (∑ᶠ j ∈ {j : A | T j}, binNum (wideLe BWLe) (WidePosn BWPosn) (PWt j)) <
+          2 ^ ({u : A × A | WidePosn BWPosn u} : Set (A × A)).ncard := by
+      intro T
+      rw [finsum_pWt hlin h₀ T]
+      exact finsum_binNum_lt_wide hlin BWBit {j : A | T j}
+    obtain ⟨PS1, Cy1, hchain1⟩ :=
+      exists_chain (wt := PWt) (S := S) hlin hwlin hSitem (hbound S)
+    obtain ⟨PS0, Cy0, hchain0⟩ :=
+      exists_chain (wt := PWt) (S := fun i => BWItem i ∧ ¬S i) hlin hwlin
+        (fun i hi => hi.1) (hbound _)
+    refine ⟨fun idx => match idx with
+      | .sel => fun w : Fin 1 → A => S (w 0)
+      | .ps b => fun w : Fin 3 → A =>
+          (match b with | true => PS1 | false => PS0) (w 0) (w 1, w 2)
+      | .cy b => fun w : Fin 3 → A =>
+          (match b with | true => Cy1 | false => Cy0) (w 0) (w 1, w 2), ?_⟩
+    refine (realize_partitionKernel _).mpr ⟨hlin, hSitem, fun b => ?_, ?_⟩
+    · cases b
+      · exact ⟨fun i x p hi hp => hchain0.1 i (x, p) hi hp,
+          fun i j x p hij hp => hchain0.2.1 i j (x, p) hij hp,
+          fun i j x p y q hij hpq =>
+            hchain0.2.2.1 i j (x, p) (y, q) hij ((succPos_wide hlin).mpr hpq),
+          fun i j x p hij hp =>
+            hchain0.2.2.2.1 i j (x, p) hij ((minPos_wide hlin).mpr hp),
+          fun i j x p hij hp =>
+            hchain0.2.2.2.2 i j (x, p) hij ((maxPos_wide hlin).mpr hp)⟩
+      · exact ⟨fun i x p hi hp => hchain1.1 i (x, p) hi hp,
+          fun i j x p hij hp => hchain1.2.1 i j (x, p) hij hp,
+          fun i j x p y q hij hpq =>
+            hchain1.2.2.1 i j (x, p) (y, q) hij ((succPos_wide hlin).mpr hpq),
+          fun i j x p hij hp =>
+            hchain1.2.2.2.1 i j (x, p) hij ((minPos_wide hlin).mpr hp),
+          fun i j x p hij hp =>
+            hchain1.2.2.2.2 i j (x, p) hij ((maxPos_wide hlin).mpr hp)⟩
+    · -- at the last item the two walks agree, both weighing one side
+      intro i x p hi hp
+      refine binNum_inj_on hwlin _ (WidePosn BWPosn) rfl (PS1 i) (PS0 i) ?_ (x, p) hp
+      rw [chain_sound hlin hwlin hSitem hchain1 i hi.1,
+        chain_sound hlin hwlin (fun i hi => hi.1) hchain0 i hi.1,
+        partSum_max hSitem hi, partSum_max (fun i hi => hi.1) hi,
+        finsum_pWt hlin h₀, finsum_pWt hlin h₀]
+      exact hsumeq
+  · -- a certificate yields a split: both walks are sound
+    rintro ⟨ρ, hρ⟩
+    obtain ⟨hlin, hsel, hwalk, hfin⟩ := (realize_partitionKernel ρ).mp hρ
+    obtain ⟨a₀, -, h₀'⟩ := exists_minPos (Le := BWLe (A := A)) (Posn := fun _ => True) hlin
+      ⟨Classical.arbitrary A, trivial⟩
+    have h₀ : ∀ y : A, BWLe a₀ y := fun y => h₀' y trivial
+    have hwlin : IsLinOrd (wideLe (BWLe (A := A))) := isLinOrd_wideLe hlin
+    have hchain : ∀ b : Bool,
+        IsChain (wideLe BWLe) (WidePosn BWPosn) (PSide ρ b) PWt (PPS ρ b) (PCy ρ b) :=
+      fun b => ⟨fun i u hi hp => (hwalk b).1 i u.1 u.2 hi hp,
+        fun i j u hij hp => (hwalk b).2.1 i j u.1 u.2 hij hp,
+        fun i j u v hij hpq =>
+          (hwalk b).2.2.1 i j u.1 u.2 v.1 v.2 hij ((succPos_wide hlin).mp hpq),
+        fun i j u hij hp =>
+          (hwalk b).2.2.2.1 i j u.1 u.2 hij ((minPos_wide hlin).mp hp),
+        fun i j u hij hp =>
+          (hwalk b).2.2.2.2 i j u.1 u.2 hij ((maxPos_wide hlin).mp hp)⟩
+    refine ⟨‹Finite A›, hlin, PSel ρ, hsel, ?_⟩
+    by_cases hitems : ∃ i : A, BWItem i
+    · obtain ⟨imax, himax⟩ := exists_maxPos hlin hitems
+      have h1 := chain_sound hlin hwlin hsel (hchain true) imax himax.1
+      have h0 := chain_sound hlin hwlin (fun i hi => hi.1) (hchain false) imax himax.1
+      rw [partSum_max hsel himax] at h1
+      rw [partSum_max (fun i hi => hi.1) himax] at h0
+      have heq : binNum (wideLe BWLe) (WidePosn BWPosn) (PPS ρ true imax) =
+          binNum (wideLe BWLe) (WidePosn BWPosn) (PPS ρ false imax) :=
+        binNum_congr_on fun u hu => hfin imax u.1 u.2 himax hu
+      rw [h1, h0, finsum_pWt hlin h₀, finsum_pWt hlin h₀] at heq
+      exact heq
+    · have hno : ∀ i : A, ¬BWItem i := fun i hi => hitems ⟨i, hi⟩
+      have hS : {i : A | PSel ρ i} = (∅ : Set A) := by
+        ext i
+        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        exact fun hi => hno i (hsel i hi)
+      have hS' : {i : A | BWItem i ∧ ¬PSel ρ i} = (∅ : Set A) := by
+        ext i
+        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        exact fun hi => hno i hi.1
+      rw [hS, hS', finsum_mem_empty]
+
+end Membership
+
 end SigmaOne
 
 end DescriptiveComplexity

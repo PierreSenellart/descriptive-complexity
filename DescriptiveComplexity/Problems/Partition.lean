@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Partition.Defs
 import DescriptiveComplexity.Problems.Partition.Membership
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # Partition
@@ -12,11 +13,21 @@ import DescriptiveComplexity.Problems.Partition.Membership
 Umbrella file for `DescriptiveComplexity.Partition`, Karp's PARTITION – can a
 family of numbers, written in *binary*, be split into two parts of equal sum?
 
-So far it collects the definition and its isomorphism-invariance, and the
-first-order kernel of the `Σ₁` definition
-(`DescriptiveComplexity.partitionKernel`): the certificate guesses the split and two
+It collects the definition, its isomorphism-invariance and the membership half
+(`DescriptiveComplexity.partition_mem_NP`): the certificate guesses the split and two
 ripple-carry walks – one along the chosen items, one along the others – on the
 *wide* positions of `DescriptiveComplexity.Numbers.Wide`, and requires them to agree
-at the last item. The semantic half of the membership proof, and the hardness
-reduction from NAE-3SAT, are under construction – see `ROADMAP.md`.
+at the last item, which says exactly that the two sides weigh the same. The
+hardness reduction from NAE-3SAT is under construction – see `ROADMAP.md`.
 -/
+
+namespace DescriptiveComplexity
+
+open FirstOrder
+
+/-- Partition is in NP: it is `Σ₁`-definable, the certificate carrying the
+split and the two ripple-carry walks that weigh its two sides. -/
+theorem partition_mem_NP : Partition ∈ NP :=
+  partition_sigmaSODefinable
+
+end DescriptiveComplexity
