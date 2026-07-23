@@ -20,8 +20,9 @@ Knapsack rather than a special case: the number to reach, half the total, is
 not part of the instance, so an interpretation cannot compute it. Hardness
 therefore does not come from Knapsack by the classical two-extra-items padding
 (those two weights are arithmetic in the total, hence not first-order
-definable); it comes from NAE-3SAT, whose *not-all-equal* condition is exactly
-the two-sided constraint a balanced split imposes.
+definable); it comes from NAE-SAT, whose *not-all-equal* condition is exactly
+the two-sided constraint a balanced split imposes
+(`DescriptiveComplexity.naeSat_ordered_fo_reduction_partition`).
 -/
 
 namespace DescriptiveComplexity

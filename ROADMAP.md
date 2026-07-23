@@ -288,26 +288,39 @@ proof plan for each problem still open.
      name the lowest position of a block and to pin the padding of the items
      down – so the reduction is ordered, which conveniently also supplies the
      finiteness the counting needs.
-  3. *Partition* (#20), *in NP*: `Problems/Partition/` defines it on
-     the same vocabulary with the *target symbol unused*, and proves
-     `partition_mem_NP` – the certificate guesses the split and two
-     ripple-carry walks on the wide positions, one per side, required to agree
-     at the last item (no guessed value, and no degenerate clause: with no
-     items both sides are empty). What is left is the hardness gadget – what a split must
-     match is the weight of the items it leaves out. Two findings shape the
-     rest of the work:
+  3. *Partition* (#20), **done** (`partition_NP_complete`):
+     `Problems/Partition/` defines it on the same vocabulary with the *target
+     symbol unused* – what a split must match is the weight of the items it
+     leaves out, not a number the instance carries. Membership
+     (`partition_mem_NP`) guesses the split and two ripple-carry walks on the
+     wide positions, one per side, required to agree at the last item (no
+     guessed value, and no degenerate clause: with no items both sides are
+     empty). Two facts shaped the work:
      - The classical reduction from Knapsack, padding with the two weights
        `2Σ − T` and `Σ + T`, is **not first-order**: both are arithmetic in the
-       total `Σ`, whose bits no interpretation can define. Hardness must come
-       from a source whose condition is already two-sided, and NAE-3SAT is the
-       fit: one digit block per variable (total digit 2, so each side gets one
-       literal – an assignment) and one per clause (total digit 4 for a
-       width-3 clause, one literal item plus a slack item, so each side gets
-       2, i.e. between one and two true literals – exactly not-all-equal).
-       Clauses of width 2 need no slack, and of width ≤ 1 the block total is
-       odd, so no split exists at all – which is the right answer, those
-       instances being NAE-unsatisfiable. The base must exceed 4, so the
-       blocks are widened by a `Fin 3` tag on the positions.
+       total `Σ`, whose bits no interpretation can define. Hardness comes
+       instead from a source whose condition is already two-sided, NAE-SAT
+       (`naeSat_ordered_fo_reduction_partition`, `Partition/Hardness.lean`):
+       one digit block per variable (total digit 2, so each side gets one
+       literal – an assignment) and one per clause, carrying one item per
+       occurrence plus one *slack* item per occurrence that is neither the
+       first nor the last of the clause. A clause of width `w` then totals
+       `w + (w − 2)`, and a balanced split takes `w − 1` of those items,
+       i.e. between `1` and `w − 1` true literals: exactly not-all-equal
+       satisfaction, **at every width**, so the reduction starts from NAE-SAT
+       and needs no width bound – the width-three restriction was a false
+       constraint. A clause of width one has no slack occurrence, so its block
+       totals `1`, an odd digit that no split can halve, which is the right
+       answer; an empty clause gets an item of its own for the same reason.
+       Blocks are `3 |A|` positions wide (a `Fin 3` tag on the position tags),
+       which keeps the base above the `4 |A| + 1` items a block can hold
+       without gating small universes. The one-off Lean content is the
+       *two-level* product-rank lemma `bitRank_pLow` – blocks are pairs
+       (kind, element), so a block's lowest position has rank `3 |A| ·` the
+       rank of the block – and describing the interpreted order once, by an
+       injective *key* into `ℕ × A × ℕ × A` read lexicographically
+       (`bwLe_iff`, `isLinOrd_of_key`), rather than tag pair by tag pair:
+       with eleven tags the case explosion is otherwise cubic.
      - The `Σ₁` certificate needs **wider numbers than the instance writes**:
        each half is `total / 2`, which may exceed `2 ^ n` for `n` the number of
        positions, so the running totals cannot live on the positions the way
@@ -317,7 +330,7 @@ proof plan for each problem still open.
        `binNum_wide`), there are `|A| · n` of them, and every sum of weights
        fits (`finsum_binNum_lt_wide`). The walk along them splits into
        “inside a block” and “top of one block to the bottom of the next”
-       (`succPos_wide`), which is what the first-order clauses will follow.
+       (`succPos_wide`), which is what the first-order clauses follow.
   4. *Job Sequencing* (#19) from Partition, and *0-1 Integer Programming* (#2)
      by reading a single equation with 0-1 variables as a Knapsack instance.
 - **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
@@ -343,9 +356,10 @@ proof plan for each problem still open.
   each other. Reusable output: the connectivity certificate
   (`connectedOn_iff_exists_root`), the bounded-reachability staging `reachIn`,
   and that edge bound, all stated for an arbitrary relation.
-- **Partition** [M, *defined*]: see the (C) entry above for the two findings
-  that fix its shape – hardness from NAE-3SAT rather than by padding Knapsack,
-  and a certificate on the wide positions of `Numbers/Wide.lean`.
+- **Partition** [M, **done**]: `partition_NP_complete`; see the (C) entry
+  above for the two facts that fixed its shape – hardness from NAE-SAT by a
+  slack item per non-extremal occurrence rather than by padding Knapsack, and
+  a certificate on the wide positions of `Numbers/Wide.lean`.
 - **0-1 Integer Programming** [M]: from Knapsack, by reading a single equation
   with 0-1 variables as a subset-sum instance; representation (C) for the
   coefficients.

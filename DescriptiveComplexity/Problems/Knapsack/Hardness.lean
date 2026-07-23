@@ -571,18 +571,6 @@ section Counting
 
 variable {A : Type} [Language.setSystem.Structure A] [LinearOrder A] [Finite A]
 
-/-- A sum of `0`s and `1`s counts. -/
-theorem finsum_mem_ite_one {ι : Type} [Finite ι] (S : Set ι) (p : ι → Prop)
-    [DecidablePred p] :
-    (∑ᶠ i ∈ S, if p i then 1 else 0) = ({i | i ∈ S ∧ p i} : Set ι).ncard := by
-  classical
-  rw [finsum_mem_eq_finite_toFinset_sum _ (Set.toFinite S), Finset.sum_ite,
-    Finset.sum_const, Finset.sum_const_zero, smul_eq_mul, mul_one, add_zero,
-    ← Set.ncard_coe_finset]
-  congr 1
-  ext i
-  simp
-
 open Classical in
 /-- **The sum of the selected weights**, read digit by digit: the digit of the
 block of `e` is the number of selected items whose set contains `e`. -/

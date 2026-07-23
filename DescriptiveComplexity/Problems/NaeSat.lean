@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # NAE-SAT is NP-complete
@@ -50,7 +51,7 @@ namespace DescriptiveComplexity
 
 open FirstOrder
 
-open Language Structure SOBlock BoundedFormula
+open Language Structure SOBlock BoundedFormula SatOcc
 
 /-! ### The problem -/
 
@@ -80,6 +81,41 @@ theorem NAEProper.not {ν : A → Prop} (h : NAEProper ν) : NAEProper fun x => 
     rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
     · exact Or.inl ⟨hp, not_not_intro hT⟩
     · exact Or.inr ⟨hn, hT⟩
+
+omit [Language.sat.Structure A] in
+/-- Flipping the assignment flips the truth of every literal. -/
+theorem litTrue_compl {ν : A → Prop} {x : A} {s : Bool} :
+    LitTrue (fun a => ¬ν a) x s ↔ ¬LitTrue ν x s := by
+  cases s <;> simp [LitTrue]
+
+/-- Occurrence form of not-all-equal properness: every clause has a true and a
+false literal occurrence. -/
+theorem naeProper_occ {ν : A → Prop} (h : NAEProper ν) (c : A)
+    (hc : RelMap satIsClause ![c]) :
+    (∃ x s, OccIn c x s ∧ LitTrue ν x s) ∧ ∃ x s, OccIn c x s ∧ ¬LitTrue ν x s := by
+  obtain ⟨⟨x, hx⟩, ⟨y, hy⟩⟩ := h c hc
+  constructor
+  · rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact ⟨x, true, ⟨hc, hp⟩, hT⟩
+    · exact ⟨x, false, ⟨hc, hn⟩, hT⟩
+  · rcases hy with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact ⟨y, true, ⟨hc, hp⟩, hT⟩
+    · exact ⟨y, false, ⟨hc, hn⟩, not_not_intro hT⟩
+
+/-- Not-all-equal properness from the occurrence form. -/
+theorem naeProper_of_occ {ν : A → Prop}
+    (h : ∀ c : A, RelMap satIsClause ![c] →
+      (∃ x s, OccIn c x s ∧ LitTrue ν x s) ∧ ∃ x s, OccIn c x s ∧ ¬LitTrue ν x s) :
+    NAEProper ν := by
+  intro c hc
+  obtain ⟨⟨x, s, hx, hT⟩, ⟨y, t, hy, hF⟩⟩ := h c hc
+  constructor
+  · cases s with
+    | true => exact ⟨x, Or.inl ⟨hx.2, hT⟩⟩
+    | false => exact ⟨x, Or.inr ⟨hx.2, hT⟩⟩
+  · cases t with
+    | true => exact ⟨y, Or.inl ⟨hy.2, hF⟩⟩
+    | false => exact ⟨y, Or.inr ⟨hy.2, not_not.mp hF⟩⟩
 
 end Semantics
 

@@ -202,7 +202,16 @@ individual declarations are documented on their own pages.
   of the instance: membership verifies a ripple-carry addition along a guessed
   sequence of partial sums, and hardness reads an exact-cover instance as a
   base-`2 ^ |A|` number, one digit block of bit positions per ground element,
-  wide enough that no carry ever crosses a block;
+  wide enough that no carry ever crosses a block; Partition, on that same
+  binary vocabulary with the target unused, since the number to reach – half
+  the total – is not part of the instance: its certificate walks *two*
+  ripple-carry chains, one per side, on positions twice as wide as the ones
+  the instance writes, and its hardness comes from NAE-SAT rather than from
+  Knapsack, Karp's padding by `2Σ − T` and `Σ + T` being arithmetic in the
+  total, hence not first-order – one digit block per variable, totalling `2`,
+  makes a balanced split an assignment, and one per clause, totalling
+  `w + (w − 2)` with one slack item per occurrence that is neither the first
+  nor the last, makes it a not-all-equal one;
   TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
