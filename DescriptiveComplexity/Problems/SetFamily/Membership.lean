@@ -144,6 +144,30 @@ disjoint – and, exactness replacing the threshold, no injection clause. -/
 noncomputable def exactCoverKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfCoverClause ⊓ sfDisjClause)
 
+/-- Kernel clause (Set Splitting): every set of the family contains a
+coloured ground element. -/
+noncomputable def sfSplitInClause : setFamilySOLang.Sentence :=
+  ((Relations.formula₁ sfFamSym (Term.var (Sum.inr 0))).imp
+    ((Relations.formula₁ sfElemSym (Term.var (Sum.inr ())) ⊓
+      Relations.formula₂ sfMemSym (Term.var (Sum.inr ()))
+        (Term.var (Sum.inl (Sum.inr 0))) ⊓
+      Relations.formula₁ sfGuessSym (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
+
+/-- Kernel clause (Set Splitting): every set of the family contains an
+uncoloured ground element. -/
+noncomputable def sfSplitOutClause : setFamilySOLang.Sentence :=
+  ((Relations.formula₁ sfFamSym (Term.var (Sum.inr 0))).imp
+    ((Relations.formula₁ sfElemSym (Term.var (Sum.inr ())) ⊓
+      Relations.formula₂ sfMemSym (Term.var (Sum.inr ()))
+        (Term.var (Sum.inl (Sum.inr 0))) ⊓
+      ∼(Relations.formula₁ sfGuessSym (Term.var (Sum.inr ())))).iExs Unit)).iAlls (Fin 1)
+
+/-- The first-order kernel of the `Σ₁` definition of Set Splitting: the
+guessed relation is read as one colour class, and every set of the family
+meets it and its complement. -/
+noncomputable def setSplittingKernel : setFamilySOLang.Sentence :=
+  sfSplitInClause ⊓ sfSplitOutClause
+
 /-- The kernel of the `Σ₁` definition of Set Packing. -/
 noncomputable def setPackingKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfDisjClause ⊓ (sfMarkedToGuessClause ⊓ sfInjClause))
@@ -296,6 +320,52 @@ private theorem realize_exactCoverKernel :
   exact and_congr (realize_sfFamClause ρ)
     (and_congr (realize_sfCoverClause ρ) (realize_sfDisjClause ρ))
 
+private theorem realize_sfSplitInClause :
+    SFRealize ρ sfSplitInClause ↔
+      ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ true ![x] := by
+  letI := familyGuessBlock.structure ρ
+  have hsub : ∀ (w : Fin 1 → A),
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+  rw [sfSplitInClause]
+  simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
+    Term.realize_var, Sum.elim_inr, Sum.elim_inl, Language.relMap_sumInl, hsub]
+  constructor
+  · intro h f hf
+    obtain ⟨x, ⟨hx1, hx2⟩, hx3⟩ := h (fun _ => f) hf
+    exact ⟨x (), hx1, hx2, hx3⟩
+  · intro h i hi
+    obtain ⟨x, hx1, hx2, hx3⟩ := h (i 0) hi
+    exact ⟨fun _ => x, ⟨hx1, hx2⟩, hx3⟩
+
+private theorem realize_sfSplitOutClause :
+    SFRealize ρ sfSplitOutClause ↔
+      ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ true ![x] := by
+  letI := familyGuessBlock.structure ρ
+  have hsub : ∀ (w : Fin 1 → A),
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+  rw [sfSplitOutClause]
+  simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
+    Language.relMap_sumInl, hsub]
+  constructor
+  · intro h f hf
+    obtain ⟨x, ⟨hx1, hx2⟩, hx3⟩ := h (fun _ => f) hf
+    exact ⟨x (), hx1, hx2, hx3⟩
+  · intro h i hi
+    obtain ⟨x, hx1, hx2, hx3⟩ := h (i 0) hi
+    exact ⟨fun _ => x, ⟨hx1, hx2⟩, hx3⟩
+
+/-- Realization of the Set Splitting kernel. -/
+private theorem realize_setSplittingKernel :
+    SFRealize ρ setSplittingKernel ↔
+      (∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ true ![x]) ∧
+        ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ true ![x] := by
+  rw [setSplittingKernel]
+  simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
+  exact and_congr (realize_sfSplitInClause ρ) (realize_sfSplitOutClause ρ)
+
 end Realize
 
 /-! ### The two definitions -/
@@ -386,5 +456,22 @@ theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
     obtain ⟨hGfam, hcov, hdisj⟩ := (realize_exactCoverKernel ρ).mp hρ
     exact ⟨fun s => ρ true ![s], hGfam, hcov,
       fun s s' hs hs' hne x hx => hdisj s s' x hs hs' hne hx⟩
+
+/-- **Set Splitting is `Σ₁`-definable**: existentially guess one colour class
+and check first-order that every set of the family meets it and its
+complement. -/
+theorem setSplitting_sigmaSODefinable : SigmaSODefinable 1 SetSplitting := by
+  refine ⟨[familyGuessBlock], rfl, setSplittingKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨S, hS⟩
+    refine ⟨fun i => match i with
+      | true => fun w : Fin 1 → A => S (w 0)
+      | false => fun _ : Fin 2 → A => False, ?_⟩
+    exact (realize_setSplittingKernel _).mpr
+      ⟨fun f hf => (hS f hf).1, fun f hf => (hS f hf).2⟩
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨hin, hout⟩ := (realize_setSplittingKernel ρ).mp hρ
+    exact ⟨fun x => ρ true ![x], fun f hf => ⟨hin f hf, hout f hf⟩⟩
 
 end DescriptiveComplexity

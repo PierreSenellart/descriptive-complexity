@@ -163,6 +163,13 @@ theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) 
       obtain ⟨s₀, -, huniq⟩ := h x hx
       exact hne ((huniq s ⟨hs, h1⟩).trans (huniq s' ⟨hs', h2⟩).symm)
 
+/-- Some two-colouring of the ground elements *splits* every set of the
+family: no set is monochromatic. Like `DescriptiveComplexity.ExactlyCoversOn` this
+property carries no threshold. -/
+def SplitsOn (Ep Fp : A → Prop) (Mp : A → A → Prop) : Prop :=
+  ∃ S : A → Prop, ∀ f, Fp f →
+    (∃ x, Ep x ∧ Mp x f ∧ S x) ∧ ∃ x, Ep x ∧ Mp x f ∧ ¬S x
+
 /-! #### The threshold as an injection
 
 On a finite universe, comparing the decoded numbers is comparing sizes, so the
@@ -290,6 +297,34 @@ theorem ExactlyCoversOn.of_equiv (u : B ≃ A) {EB FB : B → Prop} {MB : B → 
       ⟨(hM (u.symm x) (u.symm s)).mpr (by simpa using h1),
         (hM (u.symm x) (u.symm s')).mpr (by simpa using h2)⟩
 
+/-- `SplitsOn` transports along an equivalence commuting with the three
+predicates. -/
+theorem SplitsOn.of_equiv (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+    {EA FA : A → Prop} {MA : A → A → Prop}
+    (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
+    (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) (h : SplitsOn EB FB MB) :
+    SplitsOn EA FA MA := by
+  obtain ⟨S, hS⟩ := h
+  refine ⟨fun a => S (u.symm a), fun f hf => ?_⟩
+  obtain ⟨⟨x, hx, hmx, hSx⟩, ⟨y, hy, hmy, hSy⟩⟩ :=
+    hS (u.symm f) ((hF (u.symm f)).mpr (by simpa using hf))
+  constructor
+  · refine ⟨u x, (hE x).mp hx, ?_, by simpa using hSx⟩
+    have := (hM x (u.symm f)).mp hmx
+    simpa using this
+  · refine ⟨u y, (hE y).mp hy, ?_, by simpa using hSy⟩
+    have := (hM y (u.symm f)).mp hmy
+    simpa using this
+
+/-- `SplitsOn` transports along an equivalence, iff version. -/
+theorem SplitsOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+    {EA FA : A → Prop} {MA : A → A → Prop}
+    (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
+    (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) :
+    SplitsOn EB FB MB ↔ SplitsOn EA FA MA :=
+  ⟨SplitsOn.of_equiv u hE hF hM,
+    SplitsOn.of_equiv u.symm (symm_hUn u hE) (symm_hUn u hF) (symm_hBin u hM)⟩
+
 /-- `ExactlyCoversOn` transports along an equivalence, iff version. -/
 theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
     {EA FA : A → Prop} {MA : A → A → Prop}
@@ -355,6 +390,11 @@ assumption either. -/
 def HasExactCover : Prop :=
   ExactlyCoversOn (SSElem (A := A)) SSFam SSMem
 
+/-- A set system admits a splitting two-colouring: no set of the family is
+monochromatic. -/
+def HasSetSplitting : Prop :=
+  SplitsOn (SSElem (A := A)) SSFam SSMem
+
 end Problems
 
 /-! ### Isomorphism-invariance and the bundled problems -/
@@ -405,6 +445,11 @@ theorem hasExactCover_iso (e : A ≃[Language.setSystem] B) :
     HasExactCover A ↔ HasExactCover B :=
   ExactlyCoversOn.equiv_iff e.toEquiv (ssElem_map e) (ssFam_map e) (ssMem_map e)
 
+/-- The set-splitting property is isomorphism-invariant. -/
+theorem hasSetSplitting_iso (e : A ≃[Language.setSystem] B) :
+    HasSetSplitting A ↔ HasSetSplitting B :=
+  SplitsOn.equiv_iff e.toEquiv (ssElem_map e) (ssFam_map e) (ssMem_map e)
+
 end Iso
 
 /-- SET COVER, as a problem on set systems: is there a subfamily covering
@@ -432,5 +477,12 @@ replaces the threshold. -/
 def ExactCover : DecisionProblem Language.setSystem where
   Holds := fun A inst => @HasExactCover A inst
   iso_invariant := fun e => hasExactCover_iso e
+
+/-- SET SPLITTING, as a problem on set systems: is there a two-colouring of
+the ground elements leaving no set of the family monochromatic? (Also known as
+hypergraph 2-colourability.) -/
+def SetSplitting : DecisionProblem Language.setSystem where
+  Holds := fun A inst => @HasSetSplitting A inst
+  iso_invariant := fun e => hasSetSplitting_iso e
 
 end DescriptiveComplexity
