@@ -12,6 +12,7 @@ import DescriptiveComplexity.Problems.ThreeColorability
 import DescriptiveComplexity.Problems.Coloring
 import DescriptiveComplexity.Problems.ThreeSat
 import DescriptiveComplexity.Problems.CliqueFamily
+import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.Qbf

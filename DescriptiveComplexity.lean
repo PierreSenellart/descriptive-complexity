@@ -167,8 +167,10 @@ individual declarations are documented on their own pages.
   for every `k ≥ 3` by padding 3-colorability with blown-up universal
   vertices, then Chromatic Number and Clique Cover, whose threshold is a
   *number of colors*, so that their membership guesses a coloring by the
-  marked elements themselves; the set family – Set Cover, Hitting Set and Set
-  Packing on a bipartite incidence vocabulary, the first two transposes of
+  marked elements themselves; Subgraph Isomorphism, where an injective
+  homomorphism of a pattern graph into a host graph generalizes Clique; the
+  set family – Set Cover, Hitting Set and Set Packing on a bipartite
+  incidence vocabulary, the first two transposes of
   each other, all three NP-hard by reading a graph as the incidence system of
   its edges ([Karp 1972][karp1972reducibility]); Feedback Vertex Set and
   Feedback Arc Set, NP-hard by symmetrizing the arcs of a digraph and then

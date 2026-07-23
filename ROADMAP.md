@@ -159,8 +159,17 @@ proof plan for each problem still open.
 - **Max Cut** [M]: from NAE-3SAT; threshold via (A) at arity 2, i.e. the
   marked-binary-relation form introduced for Feedback Arc Set
   (`nonempty_embedding_iff_ncard_le₂`).
-- **Subgraph Isomorphism** [S]: generalizes Clique; two-graphs-in-one
-  vocabulary via `Language.markedGraph`-style unary marks.
+- **Subgraph Isomorphism** [S, *done*]: `Problems/SubgraphIso.lean`,
+  `subgraphIso_NP_complete`. Vocabulary `Language.twoGraphs`: two unary vertex
+  marks and two adjacency relations, i.e. two graphs side by side in one
+  universe – the shape Exact Cover and 3DM will want as well. The property is
+  an injective homomorphism of the pattern into the host (not an *induced*
+  subgraph), so Clique is the special case where the pattern is complete, and
+  that is exactly the reduction (`cliquePatternInterp`, tag `Bool`, dimension
+  1, quantifier-free): the pattern is the complete graph on the marked set, so
+  the threshold is consumed by the shape of the pattern and no counting
+  argument is needed at all. Membership guesses the map as one binary
+  relation.
 - **Hamiltonian Cycle (directed and undirected)** [L]: from VC or 3SAT;
   the gadget chaining almost certainly needs the order (ordered
   reduction, like SAT → 3COL). Prerequisite for TSP.
@@ -537,10 +546,9 @@ separations and non-reducibility, impossible in the machine world.
 
 1. Cheap catalog wins: **done** (Set Cover / Hitting Set, Set Packing,
    k-COL, Chromatic Number, Clique Cover, Feedback Vertex Set, Feedback Arc
-   Set, TAUT); next in the same
-   vein are Subgraph Isomorphism [S] and the Schaefer-style variants
-   NAE-3SAT / 1-in-3SAT [M], which are worth having as reduction *sources*
-   for Max Cut, and the
+   Set, Subgraph Isomorphism, TAUT); next in the same
+   vein are the Schaefer-style variants NAE-3SAT / 1-in-3SAT [M], worth
+   having as reduction *sources* for Max Cut, and the
    Schaefer-style variants as reduction sources for Max Cut, which the
    binary-threshold extension of representation (A) (done, §0) now unblocks.
    Dominating Set has been reclassified as an ordered reduction (see §1).
