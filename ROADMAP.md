@@ -194,7 +194,20 @@ proof plan for each problem still open.
 - **Longest Path / Longest Cycle** [S after HC].
 - **Exact Cover, X3C, 3-Dimensional Matching** [M–L]: from 3SAT; local
   gadgets, probably ordered.
-- **Steiner Tree** [M]: from X3C or VC; threshold via (A).
+- **Steiner Tree** [M, *node-weighted variant done*]: `Problems/Steiner/`
+  (`Defs`, `Reductions`, `Membership`) plus the umbrella
+  `Problems/Steiner.lean`, `steinerTree_NP_complete`. Vocabulary
+  `Language.steinerGraph`: adjacency plus two unary marks, the terminals and
+  the threshold. The formalized problem is the node-weighted one with unit
+  weights – a connected set spanning the terminals with at most `k`
+  non-terminals – hard from Vertex Cover by an ordered reduction (tag
+  `SteinerTag`, dimension 2): edges become the terminals, vertices the
+  available Steiner points, and the minimum of a spare copy the root joining
+  them. Karp's edge-weighted version is the remaining gap: it needs "a
+  connected graph has at least `n − 1` edges", which Mathlib provides only for
+  trees on a whole vertex type. Reusable output: the connectivity certificate
+  (`connectedOn_iff_exists_root`) and the bounded-reachability staging
+  `reachIn`, both stated for an arbitrary relation.
 - **SubsetSum / Partition / Knapsack** [M]: representation (C), with a
   shared “weighted items” vocabulary (unary Item/Pos marks, order on
   positions, binary Bit) carrying a well-formedness predicate and a

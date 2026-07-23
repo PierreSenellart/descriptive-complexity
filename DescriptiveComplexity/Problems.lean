@@ -16,6 +16,7 @@ import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.Feedback
+import DescriptiveComplexity.Problems.Steiner
 import DescriptiveComplexity.Problems.Qbf
 
 /-!

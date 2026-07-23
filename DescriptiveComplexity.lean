@@ -178,7 +178,9 @@ individual declarations are documented on their own pages.
   Feedback Arc Set, NP-hard by symmetrizing the arcs of a digraph and then
   splitting its vertices, with a first-order certificate of acyclicity (a
   guessed strict partial order) for their membership and a threshold carried
-  by a marked *binary* relation for the second; TAUT, the tautology problem for
+  by a marked *binary* relation for the second; Steiner Tree, whose
+  connectivity condition is certified first-order by a guessed root and order;
+  TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
   alternating blocks, complete for the `k`-th level of the hierarchy
