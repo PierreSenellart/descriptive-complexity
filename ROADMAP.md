@@ -288,8 +288,33 @@ proof plan for each problem still open.
      name the lowest position of a block and to pin the padding of the items
      down – so the reduction is ordered, which conveniently also supplies the
      finiteness the counting needs.
-  3. *Partition* (#20) from Knapsack by the classical two-extra-items padding,
-     *Job Sequencing* (#19) from Partition, and *0-1 Integer Programming* (#2)
+  3. *Partition* (#20), *started*: `Problems/Partition/Defs.lean` defines it on
+     the same vocabulary with the *target symbol unused* – what a split must
+     match is the weight of the items it leaves out. Two findings shape the
+     rest of the work:
+     - The classical reduction from Knapsack, padding with the two weights
+       `2Σ − T` and `Σ + T`, is **not first-order**: both are arithmetic in the
+       total `Σ`, whose bits no interpretation can define. Hardness must come
+       from a source whose condition is already two-sided, and NAE-3SAT is the
+       fit: one digit block per variable (total digit 2, so each side gets one
+       literal – an assignment) and one per clause (total digit 4 for a
+       width-3 clause, one literal item plus a slack item, so each side gets
+       2, i.e. between one and two true literals – exactly not-all-equal).
+       Clauses of width 2 need no slack, and of width ≤ 1 the block total is
+       odd, so no split exists at all – which is the right answer, those
+       instances being NAE-unsatisfiable. The base must exceed 4, so the
+       blocks are widened by a `Fin 3` tag on the positions.
+     - The `Σ₁` certificate needs **wider numbers than the instance writes**:
+       each half is `total / 2`, which may exceed `2 ^ n` for `n` the number of
+       positions, so the running totals cannot live on the positions the way
+       Knapsack's do. `Numbers/Wide.lean` supplies the room: bit positions
+       become pairs, ordered with the first coordinate major, so the instance's
+       positions sit at the bottom with unchanged ranks (`bitRank_wide`,
+       `binNum_wide`), there are `|A| · n` of them, and every sum of weights
+       fits (`finsum_binNum_lt_wide`). The walk along them splits into
+       “inside a block” and “top of one block to the bottom of the next”
+       (`succPos_wide`), which is what the first-order clauses will follow.
+  4. *Job Sequencing* (#19) from Partition, and *0-1 Integer Programming* (#2)
      by reading a single equation with 0-1 variables as a Knapsack instance.
 - **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
   local gadgets, probably ordered.
@@ -314,10 +339,9 @@ proof plan for each problem still open.
   each other. Reusable output: the connectivity certificate
   (`connectedOn_iff_exists_root`), the bounded-reachability staging `reachIn`,
   and that edge bound, all stated for an arbitrary relation.
-- **Partition** [M]: representation (C), now in place – the shared
-  “weighted items” vocabulary `Language.binWeights` and the base-`B`
-  arithmetic of `Numbers/Digits.lean`. The cheapest route is the classical
-  two-extra-items padding of Knapsack rather than a fresh reduction from SAT.
+- **Partition** [M, *defined*]: see the (C) entry above for the two findings
+  that fix its shape – hardness from NAE-3SAT rather than by padding Knapsack,
+  and a certificate on the wide positions of `Numbers/Wide.lean`.
 - **0-1 Integer Programming** [M]: from Knapsack, by reading a single equation
   with 0-1 variables as a subset-sum instance; representation (C) for the
   coefficients.

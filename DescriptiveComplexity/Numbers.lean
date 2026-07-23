@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Numbers.Unary
 import DescriptiveComplexity.Numbers.Binary
 import DescriptiveComplexity.Numbers.Digits
+import DescriptiveComplexity.Numbers.Wide
 
 /-!
 # Number encodings
