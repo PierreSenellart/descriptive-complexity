@@ -22,6 +22,7 @@ import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
 import DescriptiveComplexity.OccurrenceFormulas
+import DescriptiveComplexity.OccurrenceSlack
 import DescriptiveComplexity.Numbers
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.Examples
@@ -217,7 +218,17 @@ individual declarations are documented on their own pages.
   the reduction is the identity in everything but the vocabulary, its one
   piece of work being to name the single row, and the certificate is
   Knapsack's read once per row, the guessed running totals and carries
-  carrying a row argument and every clause a guard;
+  carrying a row argument and every clause a guard; job sequencing, the first
+  problem whose kernel has to **compare** numbers rather than add them – a job
+  is late when its deadline falls below its completion time, which is written
+  by the highest position where the two differ – and whose certificate guesses
+  the schedule itself, as a linear order, the walk layer taking that guessed
+  order as the one it follows, while its hardness has a gadget *write half of
+  its own total*: every digit block is given an even total, `2` per variable
+  and `2 (w − 1)` per clause of width `w ∈ {2, 3}`, so the common deadline –
+  and the bound, which equals it – is the digit-wise half, one bit per block,
+  and a schedule meeting it is a balanced split, that is, a not-all-equal
+  satisfying assignment;
   TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`

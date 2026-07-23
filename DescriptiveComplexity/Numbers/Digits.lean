@@ -52,6 +52,14 @@ theorem digitNum_congr_on {Le : A → A → Prop} {Blk : A → Prop} {B : ℕ} {
   refine finsum_mem_congr rfl fun e he => ?_
   rw [h e he]
 
+/-- Scaling every digit scales the value. A gadget whose block totals are all
+even therefore weighs twice the number obtained by halving each digit, which
+is how a reduction can *write* half of a total it cannot compute. -/
+theorem digitNum_mul_left {Le : A → A → Prop} {Blk : A → Prop} {B : ℕ} (k : ℕ)
+    (c : A → ℕ) : digitNum Le Blk B (fun e => k * c e) = k * digitNum Le Blk B c := by
+  rw [digitNum, digitNum, mul_finsum_mem' _ k (Set.toFinite _)]
+  exact finsum_mem_congr rfl fun e _ => by ring
+
 /-- **Peeling the lowest block**: the value is the lowest digit plus `B` times
 the value of the rest. -/
 theorem digitNum_peel_min {Le : A → A → Prop} {Blk : A → Prop} {B : ℕ} {c : A → ℕ}
@@ -135,15 +143,17 @@ theorem digitNum_inj {Le : A → A → Prop} {B : ℕ} (hlin : IsLinOrd Le)
         (fun q => Blk q ∧ q ≠ e₀) rfl c d hc hd hrest e ⟨he, hne⟩
 
 open Classical in
-/-- **Selecting blocks**: the sum of the place values of the blocks satisfying
-`sub` is the number whose digits are `1` there and `0` elsewhere. -/
-theorem finsum_pow_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} {B : ℕ}
+/-- **Weighing blocks**: a sum of place values of the blocks satisfying `sub`,
+each taken `k` times, is the number whose digits are `k` there and `0`
+elsewhere. A number written by *one bit per block*, at a height inside the
+block that may vary from block to block, is of this shape. -/
+theorem finsum_coeff_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} {B : ℕ} (k : A → ℕ)
     (h : ∀ e, sub e → Blk e) :
-    (∑ᶠ e ∈ {e : A | sub e}, B ^ bitRank Le Blk e) =
-      digitNum Le Blk B (fun e => if sub e then 1 else 0) := by
+    (∑ᶠ e ∈ {e : A | sub e}, k e * B ^ bitRank Le Blk e) =
+      digitNum Le Blk B (fun e => if sub e then k e else 0) := by
   classical
-  have h1 : (∑ᶠ e ∈ {e : A | sub e}, B ^ bitRank Le Blk e) =
-      ∑ᶠ e ∈ {e : A | sub e}, (if sub e then 1 else 0) * B ^ bitRank Le Blk e := by
+  have h1 : (∑ᶠ e ∈ {e : A | sub e}, k e * B ^ bitRank Le Blk e) =
+      ∑ᶠ e ∈ {e : A | sub e}, (if sub e then k e else 0) * B ^ bitRank Le Blk e := by
     refine finsum_mem_congr rfl fun e he => ?_
     have he' : sub e := he
     simp [he']
@@ -154,6 +164,19 @@ theorem finsum_pow_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} {B
     exact h e he
   · simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at he he'
     simp [he']
+
+open Classical in
+/-- **Selecting blocks**: the sum of the place values of the blocks satisfying
+`sub` is the number whose digits are `1` there and `0` elsewhere. -/
+theorem finsum_pow_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} {B : ℕ}
+    (h : ∀ e, sub e → Blk e) :
+    (∑ᶠ e ∈ {e : A | sub e}, B ^ bitRank Le Blk e) =
+      digitNum Le Blk B (fun e => if sub e then 1 else 0) := by
+  classical
+  have h1 : (∑ᶠ e ∈ {e : A | sub e}, B ^ bitRank Le Blk e) =
+      ∑ᶠ e ∈ {e : A | sub e}, 1 * B ^ bitRank Le Blk e :=
+    finsum_mem_congr rfl fun e _ => (one_mul _).symm
+  rw [h1, finsum_coeff_eq_digitNum (fun _ => 1) h]
 
 open Classical in
 /-- Base two with digits `0` and `1` is the binary reading. -/

@@ -28,7 +28,12 @@ is what the `DecisionProblem.iso_invariant` proofs of the group need.
 The arithmetic the `Σ₁` definitions need – that a bitwise ripple-carry chain
 computes an addition – is built on `DescriptiveComplexity.binNum_peel_min`, which
 peels the lowest position off a decoded number: `binNum = bit at the bottom +
-2 * (the rest)`, the recursion binary numbers actually satisfy.
+2 * (the rest)`, the recursion binary numbers actually satisfy. The same
+recursion gives the two facts a kernel needs about *whole* numbers rather than
+their bits: `DescriptiveComplexity.binNum_inj_on`, two numbers are equal exactly when
+their bits agree, and `DescriptiveComplexity.binNum_lt_iff`, one is smaller exactly
+when they differ and the higher bit is the second's – both bitwise, hence
+first-order, which is why a kernel can compare numbers it has guessed.
 -/
 
 namespace DescriptiveComplexity
@@ -60,6 +65,58 @@ theorem IsLinOrd.of_equiv {B : Type} (u : B ≃ A) {LeB : B → B → Prop} {LeA
   · rcases htot (u.symm a) (u.symm b) with h | h
     · exact Or.inl (by simpa using (hle _ _).mp h)
     · exact Or.inr (by simpa using (hle _ _).mp h)
+
+/-! ### Building linear orders
+
+Reductions into a problem of representation (C) have to *construct* the order
+of the instance they produce, and a `Σ₁` certificate sometimes has to exhibit
+one. Both do it the same way: read the elements through a key into a
+lexicographic product of orders already at hand. -/
+
+section Build
+
+variable {α β : Type} {Ra : α → α → Prop} {Rb : β → β → Prop}
+
+/-- The lexicographic product of two relations. -/
+def lexRel (Ra : α → α → Prop) (Rb : β → β → Prop) : α × β → α × β → Prop := fun u v =>
+  (Ra u.1 v.1 ∧ u.1 ≠ v.1) ∨ (u.1 = v.1 ∧ Rb u.2 v.2)
+
+/-- The lexicographic product of two linear orders is a linear order. -/
+theorem isLinOrd_lexRel (ha : IsLinOrd Ra) (hb : IsLinOrd Rb) : IsLinOrd (lexRel Ra Rb) := by
+  obtain ⟨ha₁, ha₂, ha₃, ha₄⟩ := ha
+  obtain ⟨hb₁, hb₂, hb₃, hb₄⟩ := hb
+  refine ⟨fun u => Or.inr ⟨rfl, hb₁ _⟩, fun u v w h₁ h₂ => ?_, fun u v h₁ h₂ => ?_,
+    fun u v => ?_⟩
+  · rcases h₁ with ⟨h₁, hne₁⟩ | ⟨he₁, h₁⟩ <;> rcases h₂ with ⟨h₂, hne₂⟩ | ⟨he₂, h₂⟩
+    · refine Or.inl ⟨ha₂ _ _ _ h₁ h₂, fun he => ?_⟩
+      exact hne₁ (ha₃ _ _ h₁ (he ▸ h₂))
+    · exact Or.inl ⟨he₂ ▸ h₁, he₂ ▸ hne₁⟩
+    · exact Or.inl ⟨he₁ ▸ h₂, he₁ ▸ hne₂⟩
+    · exact Or.inr ⟨he₁.trans he₂, hb₂ _ _ _ h₁ h₂⟩
+  · rcases h₁ with ⟨h₁, hne₁⟩ | ⟨he₁, h₁⟩ <;> rcases h₂ with ⟨h₂, hne₂⟩ | ⟨he₂, h₂⟩
+    · exact absurd (ha₃ _ _ h₁ h₂) hne₁
+    · exact absurd he₂.symm hne₁
+    · exact absurd he₁.symm hne₂
+    · exact Prod.ext he₁ (hb₃ _ _ h₁ h₂)
+  · rcases eq_or_ne u.1 v.1 with he | hne
+    · exact (hb₄ u.2 v.2).imp (fun h => Or.inr ⟨he, h⟩) fun h => Or.inr ⟨he.symm, h⟩
+    · exact (ha₄ u.1 v.1).imp (fun h => Or.inl ⟨h, hne⟩) fun h => Or.inl ⟨h, hne.symm⟩
+
+end Build
+
+/-- A relation read through an injective key into a linear order is a linear
+order. -/
+theorem isLinOrd_of_key {M K : Type} {LeK : K → K → Prop} {R : M → M → Prop}
+    (hK : IsLinOrd LeK) (key : M → K) (hinj : Function.Injective key)
+    (h : ∀ a b, R a b ↔ LeK (key a) (key b)) : IsLinOrd R :=
+  ⟨fun a => (h a a).mpr (hK.1 _),
+    fun a b c hab hbc => (h a c).mpr (hK.2.1 _ _ _ ((h a b).mp hab) ((h b c).mp hbc)),
+    fun a b hab hba => hinj (hK.2.2.1 _ _ ((h a b).mp hab) ((h b a).mp hba)),
+    fun a b => (hK.2.2.2 (key a) (key b)).imp (h a b).mpr (h b a).mpr⟩
+
+/-- The natural order of a linear order, as a relation. -/
+theorem isLinOrd_le {α : Type} [LinearOrder α] : IsLinOrd (· ≤ · : α → α → Prop) :=
+  ⟨fun _ => le_rfl, fun _ _ _ => le_trans, fun _ _ => le_antisymm, le_total⟩
 
 end LinOrd
 
@@ -691,6 +748,75 @@ theorem binNum_inj_on (hlin : IsLinOrd Le) :
       · exact iff_of_false h h'
     · exact IH ({p : A | Posn p ∧ p ≠ p₀} : Set A).ncard (by omega)
         (fun q => Posn q ∧ q ≠ p₀) rfl b b' hrest p ⟨hp, hpne⟩
+
+open Classical in
+/-- **Comparison by the highest differing position**: one decoded number is
+smaller than another exactly when there is a position carrying `0` in the
+first and `1` in the second above which the two agree. Unlike the value
+itself, this is a *first-order* reading of `<`, which is what a kernel
+comparing two guessed numbers writes. -/
+theorem binNum_lt_iff (hlin : IsLinOrd Le) :
+    ∀ (n : ℕ) (Posn : A → Prop), ({p : A | Posn p} : Set A).ncard = n →
+      ∀ b b' : A → Prop, (binNum Le Posn b < binNum Le Posn b' ↔
+        ∃ p, Posn p ∧ ¬b p ∧ b' p ∧ ∀ q, Posn q → Le p q → q ≠ p → (b q ↔ b' q)) := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro Posn hn b b'
+    classical
+    by_cases hne : ∃ p, Posn p
+    · obtain ⟨p₀, hp₀, hminp⟩ := exists_minPos hlin hne
+      have hpos : 0 < ({p : A | Posn p} : Set A).ncard := by
+        rw [Set.ncard_pos (Set.toFinite _)]
+        exact hne
+      have hset' : {p : A | Posn p ∧ p ≠ p₀} = {p : A | Posn p} \ {p₀} := by
+        ext r
+        simp
+      have hcard : ({p : A | Posn p ∧ p ≠ p₀} : Set A).ncard + 1 = n := by
+        rw [hset', Set.ncard_sdiff_singleton_of_mem (show p₀ ∈ {p : A | Posn p} from hp₀),
+          ← hn]
+        omega
+      have hIH := IH ({p : A | Posn p ∧ p ≠ p₀} : Set A).ncard (by omega)
+        (fun q => Posn q ∧ q ≠ p₀) rfl b b'
+      -- above the lowest position, equality of the two values is agreement
+      have heq : (binNum Le (fun q => Posn q ∧ q ≠ p₀) b =
+          binNum Le (fun q => Posn q ∧ q ≠ p₀) b') ↔
+            ∀ q, Posn q → q ≠ p₀ → (b q ↔ b' q) :=
+        ⟨fun h q hq hq₀ => binNum_inj_on hlin _ _ rfl b b' h q ⟨hq, hq₀⟩,
+          fun h => binNum_congr_on fun q hq => h q hq.1 hq.2⟩
+      -- a witness is either the lowest position or one above it, and nothing
+      -- lies above `p₀` that is not a position of its own
+      have hsplit : (∃ p, Posn p ∧ ¬b p ∧ b' p ∧
+            ∀ q, Posn q → Le p q → q ≠ p → (b q ↔ b' q)) ↔
+          (∃ p, (Posn p ∧ p ≠ p₀) ∧ ¬b p ∧ b' p ∧
+            ∀ q, (Posn q ∧ q ≠ p₀) → Le p q → q ≠ p → (b q ↔ b' q)) ∨
+          ((∀ q, Posn q → q ≠ p₀ → (b q ↔ b' q)) ∧ ¬b p₀ ∧ b' p₀) := by
+        constructor
+        · rintro ⟨p, hp, hbp, hb'p, habove⟩
+          rcases eq_or_ne p p₀ with rfl | hpne
+          · exact Or.inr ⟨fun q hq hq₀ => habove q hq (hminp q hq) hq₀, hbp, hb'p⟩
+          · exact Or.inl ⟨p, ⟨hp, hpne⟩, hbp, hb'p,
+              fun q hq hle hqp => habove q hq.1 hle hqp⟩
+        · rintro (⟨p, ⟨hp, hpne⟩, hbp, hb'p, habove⟩ | ⟨hag, hbp, hb'p⟩)
+          · refine ⟨p, hp, hbp, hb'p, fun q hq hle hqp => ?_⟩
+            rcases eq_or_ne q p₀ with rfl | hq₀
+            · exact absurd (hlin.2.2.1 p q hle (hminp p hp)) hpne
+            · exact habove q ⟨hq, hq₀⟩ hle hqp
+          · exact ⟨p₀, hp₀, hbp, hb'p, fun q hq _ hq₀ => hag q hq hq₀⟩
+      rw [binNum_peel_min hlin hp₀ hminp (b := b),
+        binNum_peel_min hlin hp₀ hminp (b := b'), hsplit, ← hIH, ← heq]
+      by_cases h : b p₀ <;> by_cases h' : b' p₀ <;> simp [h, h'] <;> omega
+    · have hempty : ∀ p, ¬Posn p := fun p hp => hne ⟨p, hp⟩
+      have hzero : ∀ c : A → Prop, binNum Le Posn c = 0 := by
+        intro c
+        have hset : {p : A | Posn p ∧ c p} = (∅ : Set A) := by
+          ext p
+          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          exact fun h => hempty p h.1
+        rw [binNum, hset, finsum_mem_empty]
+      rw [hzero b, hzero b']
+      simp only [lt_self_iff_false, false_iff, not_exists]
+      exact fun p hcon => hempty p hcon.1
 
 end Ripple
 

@@ -124,6 +124,19 @@ theorem binNum_wide (hlin : IsLinOrd Le) {a₀ : A} (h₀ : ∀ x, Le a₀ x) (b
   exact finsum_mem_congr rfl fun q _ => by rw [bitRank_wide hlin h₀]
 
 omit [Finite A] in
+/-- The same, with the bottom block named by minimality rather than by a
+constant: this is the shape a first-order kernel produces, since a formula can
+only say “this block is minimal”. -/
+theorem binNum_wide_bot (hlin : IsLinOrd Le) {a₀ : A} (h₀ : ∀ x, Le a₀ x) (b : A → Prop) :
+    binNum (wideLe Le) (WidePosn Posn) (fun u => (∀ y, Le u.1 y) ∧ b u.2) =
+      binNum Le Posn b := by
+  have hcongr : binNum (wideLe Le) (WidePosn Posn) (fun u => (∀ y, Le u.1 y) ∧ b u.2) =
+      binNum (wideLe Le) (WidePosn Posn) (fun u => u.1 = a₀ ∧ b u.2) :=
+    binNum_congr fun u => and_congr
+      ⟨fun h => hlin.2.2.1 _ _ (h a₀) (h₀ u.1), fun h y => by rw [h]; exact h₀ y⟩ Iff.rfl
+  rw [hcongr, binNum_wide hlin h₀ b]
+
+omit [Finite A] in
 /-- There are `|A|` times as many wide positions as positions. -/
 theorem ncard_widePosn :
     ({u : A × A | WidePosn Posn u} : Set (A × A)).ncard =

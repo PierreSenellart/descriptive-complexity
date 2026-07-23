@@ -349,7 +349,83 @@ proof plan for each problem still open.
      arbitrary walk order and item predicate, it takes `IPLe`/`IPCol` where
      Knapsack passes `BWLe`/`BWItem`, and the whole certificate is
      `exists_chain`/`chain_sound` applied once per row.
-  5. *Job Sequencing* (#19) from Partition.
+  5. *Job Sequencing* (#19), **done**
+     (`jobSequencing_NP_complete`, `Problems/JobSequencing/`: `Defs`,
+     `Schedule`, `Kernel`, `Membership`, `Hardness`):
+     vocabulary `Language.jobSeq` – jobs, positions, the bits of each job's
+     execution time, deadline and penalty, the bits of the penalty bound, and
+     `le`. A schedule is a *linear order on the universe*, which on a finite
+     universe is a permutation and is what a certificate can guess; a job's
+     completion time is the total execution time of the jobs at or before it,
+     and the instance is a yes-instance when the late jobs' penalties sum to
+     at most the bound. `Schedule.lean` then reduces scheduling to *choosing*,
+     which is what both halves consume: with a common deadline and each
+     penalty its job's time, the on-time jobs of a schedule are the jobs at or
+     before the last of them, so they weigh at most the deadline
+     (`finsum_onTime_le`), and conversely any set weighing at most the
+     deadline can be put first, by ordering the universe through the key
+     “not chosen, then the ambient order” (`exists_schedule_onTime`). Hence
+     `hasGoodSchedule_iff_exists_subset` and, when the jobs weigh twice the
+     deadline and the bound is the deadline,
+     `hasGoodSchedule_iff_exists_half`: a yes-instance is a set of jobs
+     weighing *exactly* the deadline – Partition's condition.
+     - Hardness is **not** Karp's reduction from Partition (jobs `T = P = a_j`,
+       deadline and bound both `Σ/2`): the deadline and the bound are numbers
+       the *target instance must write in binary*, and `Σ/2` is an iterated
+       sum, hence not first-order – the same obstruction that ruled out
+       Karp's padding for Partition, one step further along. The reduction
+       (`nae3Sat_ordered_fo_reduction_jobSequencing`, `Hardness.lean`) instead
+       makes the gadget's own total a number it *can* write: from NAE-**3**SAT,
+       one job per literal and one per slack occurrence, exactly as in the
+       reduction to Partition, so that every digit block totals an even
+       number – `2` per variable, `2 (w − 1)` per clause of width `w` – and
+       the deadline is the digit-wise **half**: one bit per block, at its base
+       when the digit is `1` (a variable block, or a clause of width two) and
+       one position up when it is `2` (a clause of width three, tested
+       first-order as “has a slack occurrence”). `Σ = 2 D` is then
+       `digitNum_mul_left` (`Numbers/Digits.lean`), scaling every digit scales
+       the value, and the bound is `D` again, so
+       `hasGoodSchedule_iff_exists_half` applies and a good schedule is a
+       balanced split. Note the contrast with Partition, which needed *no*
+       width bound: there the number to reach was never written, here it is,
+       and only `w − 1 ∈ {1, 2}` is a single bit.
+     - Two consequences of writing `D`. The **key is reordered**: positions
+       are ordered by `(tag rank, block, second coordinate, index)`, the index
+       *last*, so that the positions of a block are consecutive and the bit
+       just above a block's base is worth twice it – `bitRank_jPos`, the
+       two-level rank lemma with the offset inside the block, generalizing
+       Partition's `bitRank_pLow`, and `finsum_coeff_eq_digitNum`
+       (`Numbers/Digits.lean`), which reads one bit per block, at a height
+       that may vary from block to block, as a digit `2 ^ height`. And the
+       **degenerate inputs are gated** (`JSRed.Deg`): a wide clause, which
+       breaks the width bound, and a *short* one – at most one occurrence,
+       first-order as “no occurrence is a non-first one”, and not-all-equal
+       unsatisfiable – would leave a block no half can split, so the
+       deadline and the bound are conjoined with their absence and such an
+       input is sent to an instance of deadline `0` and bound `0`, which no
+       schedule can meet.
+     - Membership walks the **guessed schedule**; its syntax is written
+       (`Kernel.lean`: the block guesses the schedule, the late jobs, and the
+       running totals and carries of two walks indexed by a `Bool` – completion
+       times along the schedule, penalties of the late jobs along the
+       instance's order – plus the clauses, including the two *comparisons*,
+       which are what no earlier problem needed), together with the semantic
+       side of the certificate: what the guessed relations mean, and
+       `binNum_jWide`, that a number of the instance keeps its value when read
+       on the wide positions through its lowest block, and the bridge between
+       the two, `realize_jobSequencingKernel`, which reads every clause back as
+       a statement about the guessed relations, and finally
+       `jobSequencing_sigmaSODefinable`. `Problems/Knapsack/Chain.lean`
+       takes its walk order as a parameter, so the running totals are
+       the completion times along the guessed order rather than along the
+       vocabulary's own. It also uses the wide positions of
+       `Numbers/Wide.lean` (a completion time is a sum of all the times,
+       which need not fit where the instance writes) – the deadline being
+       lifted there by `binNum_wide_bot`, the minimality-phrased form a kernel
+       can actually write, so no new embedding is needed – and a
+       *comparison* of decoded numbers, `binNum_lt_iff`: one number is smaller
+       than another exactly when they differ and the second carries the higher
+       bit, which is bitwise, hence first-order.
 - **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
   local gadgets, probably ordered.
 - **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`

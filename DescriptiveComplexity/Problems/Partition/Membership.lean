@@ -485,11 +485,11 @@ private theorem binNum_pWt (hlin : IsLinOrd (BWLe (A := A))) {a₀ : A}
     (h₀ : ∀ y : A, BWLe a₀ y) (i : A) :
     binNum (wideLe BWLe) (WidePosn BWPosn) (PWt i) = BWWeight i := by
   have hcongr : binNum (wideLe BWLe) (WidePosn BWPosn) (PWt i) =
-      binNum (wideLe BWLe) (WidePosn BWPosn) (fun u => u.1 = a₀ ∧ BWBit i u.2) := by
-    refine binNum_congr fun u => and_congr ?_ Iff.rfl
-    exact ⟨fun h => hlin.2.2.1 _ _ (h fun _ => a₀) (h₀ u.1), fun h y => h ▸ h₀ (y ())⟩
-  rw [hcongr, binNum_wide hlin h₀ (BWBit i)]
-  rfl
+      binNum (wideLe BWLe) (WidePosn BWPosn)
+        (fun u => (∀ y : A, BWLe u.1 y) ∧ BWBit i u.2) :=
+    binNum_congr fun _ => pWt_iff
+  rw [hcongr]
+  exact binNum_wide_bot hlin h₀ (BWBit i)
 
 omit [Finite A] in
 /-- The same, for a sum over any set of items. -/

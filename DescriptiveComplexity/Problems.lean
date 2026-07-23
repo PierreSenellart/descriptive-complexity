@@ -23,6 +23,7 @@ import DescriptiveComplexity.Problems.DominatingSet
 import DescriptiveComplexity.Problems.Knapsack
 import DescriptiveComplexity.Problems.Partition
 import DescriptiveComplexity.Problems.ZeroOneIP
+import DescriptiveComplexity.Problems.JobSequencing
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner
@@ -36,4 +37,7 @@ lives in its own file (or directory) under `DescriptiveComplexity/Problems/`,
 containing its vocabulary, its semantic definition, the bundled
 `DescriptiveComplexity.DecisionProblem`, its first-order reductions, and its
 completeness theorems.
+
+Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
+only the membership half – see `ROADMAP.md`.
 -/

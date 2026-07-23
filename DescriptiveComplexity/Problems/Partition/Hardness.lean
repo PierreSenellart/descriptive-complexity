@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Partition.Defs
 import DescriptiveComplexity.Problems.NaeSat
-import DescriptiveComplexity.OccurrenceFormulas
+import DescriptiveComplexity.OccurrenceSlack
 import DescriptiveComplexity.Numbers.Digits
 import DescriptiveComplexity.Padding
 
@@ -64,77 +64,11 @@ namespace PartRed
 
 open Language Structure SatOcc
 
-/-! ### Lexicographic combination of two relations
-
-The order of the interpreted structure and the order of the blocks are both
-lexicographic products, of a numeric tag rank and of the input order. -/
-
-section Lex
-
-variable {α β : Type} {Ra : α → α → Prop} {Rb : β → β → Prop}
-
-/-- The lexicographic product of two relations. -/
-def lexRel (Ra : α → α → Prop) (Rb : β → β → Prop) : α × β → α × β → Prop := fun u v =>
-  (Ra u.1 v.1 ∧ u.1 ≠ v.1) ∨ (u.1 = v.1 ∧ Rb u.2 v.2)
-
-/-- The lexicographic product of two linear orders is a linear order. -/
-theorem isLinOrd_lexRel (ha : IsLinOrd Ra) (hb : IsLinOrd Rb) : IsLinOrd (lexRel Ra Rb) := by
-  obtain ⟨ha₁, ha₂, ha₃, ha₄⟩ := ha
-  obtain ⟨hb₁, hb₂, hb₃, hb₄⟩ := hb
-  refine ⟨fun u => Or.inr ⟨rfl, hb₁ _⟩, fun u v w h₁ h₂ => ?_, fun u v h₁ h₂ => ?_,
-    fun u v => ?_⟩
-  · rcases h₁ with ⟨h₁, hne₁⟩ | ⟨he₁, h₁⟩ <;> rcases h₂ with ⟨h₂, hne₂⟩ | ⟨he₂, h₂⟩
-    · refine Or.inl ⟨ha₂ _ _ _ h₁ h₂, fun he => ?_⟩
-      exact hne₁ (ha₃ _ _ h₁ (he ▸ h₂))
-    · exact Or.inl ⟨he₂ ▸ h₁, he₂ ▸ hne₁⟩
-    · exact Or.inl ⟨he₁ ▸ h₂, he₁ ▸ hne₂⟩
-    · exact Or.inr ⟨he₁.trans he₂, hb₂ _ _ _ h₁ h₂⟩
-  · rcases h₁ with ⟨h₁, hne₁⟩ | ⟨he₁, h₁⟩ <;> rcases h₂ with ⟨h₂, hne₂⟩ | ⟨he₂, h₂⟩
-    · exact absurd (ha₃ _ _ h₁ h₂) hne₁
-    · exact absurd he₂.symm hne₁
-    · exact absurd he₁.symm hne₂
-    · exact Prod.ext he₁ (hb₃ _ _ h₁ h₂)
-  · rcases eq_or_ne u.1 v.1 with he | hne
-    · exact (hb₄ u.2 v.2).imp (fun h => Or.inr ⟨he, h⟩) fun h => Or.inr ⟨he.symm, h⟩
-    · exact (ha₄ u.1 v.1).imp (fun h => Or.inl ⟨h, hne⟩) fun h => Or.inl ⟨h, hne.symm⟩
-
-end Lex
-
-/-- A relation read through an injective key into a linear order is a linear
-order. -/
-theorem isLinOrd_of_key {M K : Type} {LeK : K → K → Prop} {R : M → M → Prop}
-    (hK : IsLinOrd LeK) (key : M → K) (hinj : Function.Injective key)
-    (h : ∀ a b, R a b ↔ LeK (key a) (key b)) : IsLinOrd R :=
-  ⟨fun a => (h a a).mpr (hK.1 _),
-    fun a b c hab hbc => (h a c).mpr (hK.2.1 _ _ _ ((h a b).mp hab) ((h b c).mp hbc)),
-    fun a b hab hba => hinj (hK.2.2.1 _ _ ((h a b).mp hab) ((h b a).mp hba)),
-    fun a b => (hK.2.2.2 (key a) (key b)).imp (h a b).mpr (h b a).mpr⟩
-
-/-- The natural order of a linear order, as a relation. -/
-theorem isLinOrd_le {α : Type} [LinearOrder α] : IsLinOrd (· ≤ · : α → α → Prop) :=
-  ⟨fun _ => le_rfl, fun _ _ _ => le_trans, fun _ _ => le_antisymm, le_total⟩
-
-/-! ### Slack occurrences -/
+/-! ### The minimum of the order -/
 
 section Mid
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
-
-/-- A *slack occurrence* of a clause: an occurrence that is neither the first
-nor the last one. A clause of width `w ≥ 1` has `w − 2` of them (or none, if
-`w = 1`), which is exactly the slack a balanced split needs. -/
-def Mid (c x : A) (s : Bool) : Prop := Chained c x s ∧ ¬MaxOcc c x s
-
-theorem Mid.occIn {c x : A} {s : Bool} (h : Mid c x s) : OccIn c x s := h.1.1
-
-/-- A slack occurrence of `c`, as a formula. -/
-noncomputable def midF {α : Type} (s : Bool) (c x : α) : satOrd.Formula α :=
-  chainedF s c x ⊓ ∼(maxOccF s c x)
-
-@[simp]
-theorem realize_midF {α : Type} {v : α → A} {s : Bool} {c x : α} :
-    (midF s c x).Realize v ↔ Mid (v c) (v x) s := by
-  simp [midF, Mid]
 
 /-- A minimum of the order, as a formula over the ordered expansion of the
 vocabulary of CNF instances. -/
@@ -761,98 +695,6 @@ theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Pr
   exact congrArg Set.ncard (by ext i; simp)
 
 end Numbers
-
-/-! ### The occurrences of a clause, and its slack -/
-
-section Occurrences
-
-variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A] {c : A}
-
-/-- The occurrences of a clause, as a set of signed positions. -/
-def OccSet (c : A) : Set (A × Bool) := {p | OccIn c p.1 p.2}
-
-/-- The slack occurrences of a clause. -/
-def MidSet (c : A) : Set (A × Bool) := {p | Mid c p.1 p.2}
-
-omit [Finite A] in
-theorem midSet_subset : MidSet c ⊆ OccSet c := fun _ hp => hp.occIn
-
-omit [Finite A] in
-/-- The first occurrence of a clause is unique. -/
-theorem minOcc_unique {x y : A} {s t : Bool} (h : MinOcc c x s) (h' : MinOcc c y t) :
-    (x, s) = (y, t) := by
-  rcases occLt_trichotomy x s y t with hlt | ⟨hx, hs⟩ | hlt
-  · exact absurd hlt (h'.2 x s h.1)
-  · exact Prod.ext hx hs
-  · exact absurd hlt (h.2 y t h'.1)
-
-omit [Finite A] in
-/-- The last occurrence of a clause is unique. -/
-theorem maxOcc_unique {x y : A} {s t : Bool} (h : MaxOcc c x s) (h' : MaxOcc c y t) :
-    (x, s) = (y, t) := by
-  rcases occLt_trichotomy x s y t with hlt | ⟨hx, hs⟩ | hlt
-  · exact absurd hlt (h.2 y t h'.1)
-  · exact Prod.ext hx hs
-  · exact absurd hlt (h'.2 x s h.1)
-
-/-- A clause with an occurrence has strictly fewer slack occurrences than
-occurrences: its first one is not one of them. -/
-theorem card_midSet_lt (hne : (OccSet c).Nonempty) : (MidSet c).ncard < (OccSet c).ncard := by
-  obtain ⟨⟨x, s⟩, hp⟩ := hne
-  obtain ⟨y, t, hmin⟩ := exists_minOcc ⟨x, s, hp⟩
-  refine Set.ncard_lt_ncard ⟨midSet_subset, fun hsub => ?_⟩ (Set.toFinite _)
-  exact (hsub (show (y, t) ∈ OccSet c from hmin.1)).1.2 hmin
-
-/-- A clause with at least two occurrences has exactly two fewer slack
-occurrences: its first and its last one. -/
-theorem card_midSet_add_two (h2 : 2 ≤ (OccSet c).ncard) :
-    (MidSet c).ncard + 2 = (OccSet c).ncard := by
-  have hne : (OccSet c).Nonempty := by
-    rw [← Set.ncard_pos (Set.toFinite _)]
-    omega
-  obtain ⟨⟨x, s⟩, hp⟩ := hne
-  obtain ⟨y, t, hmin⟩ := exists_minOcc ⟨x, s, hp⟩
-  obtain ⟨z, u, hmax⟩ := exists_maxOcc ⟨x, s, hp⟩
-  have hne' : ((y, t) : A × Bool) ≠ (z, u) := by
-    intro heq
-    have hy : y = z := congrArg Prod.fst heq
-    have ht : t = u := congrArg Prod.snd heq
-    subst hy
-    subst ht
-    have hsingle : OccSet c = {(y, t)} := by
-      ext ⟨v, r⟩
-      simp only [OccSet, Set.mem_setOf_eq, Set.mem_singleton_iff, Prod.mk.injEq]
-      refine ⟨fun hv => eq_of_minOcc_of_maxOcc hmin hmax hv, ?_⟩
-      rintro ⟨rfl, rfl⟩
-      exact hmin.1
-    rw [hsingle, Set.ncard_singleton] at h2
-    omega
-  have hpair : ({(y, t), (z, u)} : Set (A × Bool)) ⊆ OccSet c := by
-    rintro ⟨v, r⟩ hv
-    simp only [Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq] at hv
-    rcases hv with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
-    · exact hmin.1
-    · exact hmax.1
-  have hdiff : MidSet c = OccSet c \ {(y, t), (z, u)} := by
-    ext ⟨v, r⟩
-    simp only [MidSet, OccSet, Set.mem_setOf_eq, Set.mem_sdiff, Set.mem_insert_iff,
-      Set.mem_singleton_iff, Prod.mk.injEq, not_or]
-    constructor
-    · rintro ⟨⟨hocc, hmin'⟩, hmax'⟩
-      refine ⟨hocc, ?_, ?_⟩
-      · rintro ⟨rfl, rfl⟩
-        exact hmin' hmin
-      · rintro ⟨rfl, rfl⟩
-        exact hmax' hmax
-    · rintro ⟨hocc, hn1, hn2⟩
-      refine ⟨⟨hocc, fun hmin' => hn1 ⟨congrArg Prod.fst (minOcc_unique hmin' hmin),
-        congrArg Prod.snd (minOcc_unique hmin' hmin)⟩⟩,
-        fun hmax' => hn2 ⟨congrArg Prod.fst (maxOcc_unique hmax' hmax),
-          congrArg Prod.snd (maxOcc_unique hmax' hmax)⟩⟩
-  rw [hdiff, Set.ncard_sdiff hpair (Set.toFinite _), Set.ncard_pair hne']
-  omega
-
-end Occurrences
 
 /-! ### Counting the items of a block -/
 
