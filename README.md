@@ -49,7 +49,8 @@ The library is organized in three layers:
   (Clique / Independent Set / Vertex Cover), Subgraph Isomorphism, Set Cover,
   Hitting Set, Set Packing, Exact Cover, Set Splitting and Dominating Set,
   Feedback Vertex Set and Feedback Arc Set,
-  Steiner Tree, Max Cut, TAUT (coNP-complete),
+  Steiner Tree, Max Cut, Knapsack – the subset-sum problem, with the weights
+  in binary – TAUT (coNP-complete),
   `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
   for the `k`-th level of the polynomial hierarchy – and HORN-SAT, complete for
   PTIME by the analogous machine-free discharge one level down; plus a tutorial

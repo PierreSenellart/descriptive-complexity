@@ -247,6 +247,50 @@ proof plan for each problem still open.
   satisfaction. Order-free, dimension 1, no gadget, no counting – the pair
   sets are the only thing the reduction adds.
 
+- **Representation (C): the binary layer** [L, *Knapsack done*].
+  `Problems/Knapsack/` opens the representation the last four Karp
+  problems need. Vocabulary `Language.binWeights`: `item`, `posn`, `bit i p`,
+  `tgt p` and `le`. Two design decisions worth keeping:
+  - The place values come from `bitRank`, the number of positions strictly
+    below a given one, defined for an *arbitrary* relation `le` – no
+    well-formedness assumption, so the decoding `binNum = ∑ 2 ^ rank` is total
+    and isomorphism-invariance is a plain transport statement. Being a linear
+    order is folded into the yes-instances (`IsLinOrd`) instead, as 3SAT folds
+    in its width bound. On a linear order this agrees with `binValue` of
+    `Numbers/Binary.lean`, which already had the decode/encode round trips,
+    the range bound and the most-significant-differing-bit comparison.
+  - Sums range over *sets* via `finsum`, not over `Finset`s, so that no
+    finiteness assumption is needed to state a value; on an infinite universe
+    the value is `0`, which no yes-instance looks at since finiteness is part
+    of the problem.
+
+  `Knapsack` (Karp's #18, i.e. subset sum: some set of items whose weights sum
+  exactly to the target) is **NP-complete** (`knapsack_NP_complete`), by the
+  two halves below; what remains of the group is the third item.
+  1. *Membership* (`Knapsack/Membership.lean`), done. Verifying a sum of
+     binary numbers is the interesting part: guess the chosen set `S`, the
+     running partial sums `PS(i, p)` along the item order and the carries
+     `C(i, p)`, then check ripple-carry addition first-order at each step,
+     plus `PS(max item, ·) = tgt` and no overflow. This is why `le` orders the
+     items and not only the positions.
+  2. *Hardness* (`Knapsack/Hardness.lean`), done, from Exact Cover. Positions
+     are pairs `(ground element e, index x)` ordered lexicographically –
+     blocks of `|A|` bits, one block per ground element, so the rank of the
+     lowest position of a block is `|A| * rank e` (`bitRank_kLow`) and the
+     place value is `(2 ^ |A|) ^ rank e`. The weight of the set `s` has bit 1
+     at `(e, ⊥)` for every `e ∈ s`, and the target has bit 1 at `(e, ⊥)` for
+     every ground element. A block receives at most `|A| < 2 ^ |A|`
+     contributions, so no carry ever crosses a block boundary and the sum
+     equals the target iff the chosen sets cover each element exactly once.
+     The Lean content is `Numbers/Digits.lean`: base-`B` expansions
+     (`digitNum`), their peeling lemma, uniqueness (`digitNum_inj`) and
+     digit-wise addition (`digitNum_finsum`). The order is used twice – to
+     name the lowest position of a block and to pin the padding of the items
+     down – so the reduction is ordered, which conveniently also supplies the
+     finiteness the counting needs.
+  3. *Partition* (#20) from Knapsack by the classical two-extra-items padding,
+     *Job Sequencing* (#19) from Partition, and *0-1 Integer Programming* (#2)
+     by reading a single equation with 0-1 variables as a Knapsack instance.
 - **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
   local gadgets, probably ordered.
 - **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`
@@ -270,13 +314,12 @@ proof plan for each problem still open.
   each other. Reusable output: the connectivity certificate
   (`connectedOn_iff_exists_root`), the bounded-reachability staging `reachIn`,
   and that edge bound, all stated for an arbitrary relation.
-- **SubsetSum / Partition / Knapsack** [M]: representation (C), with a
-  shared “weighted items” vocabulary (unary Item/Pos marks, order on
-  positions, binary Bit) carrying a well-formedness predicate and a
-  decode to `Multiset ℕ`. The classical SAT ≤ SubsetSum reduction
-  defines the output *digits* combinatorially (“clause j contains
-  literal ℓ”), so the Bit formulas are easy FO.
-- **0-1 Integer Programming** [M]: from 3SAT; representation (C) for
+- **Partition** [M]: representation (C), now in place – the shared
+  “weighted items” vocabulary `Language.binWeights` and the base-`B`
+  arithmetic of `Numbers/Digits.lean`. The cheapest route is the classical
+  two-extra-items padding of Knapsack rather than a fresh reduction from SAT.
+- **0-1 Integer Programming** [M]: from Knapsack, by reading a single equation
+  with 0-1 variables as a subset-sum instance; representation (C) for the
   coefficients.
 - **3-Partition** [L]: strongly NP-complete, so representation (A)
   (unary) suffices and the hardness claim is honest; the classical

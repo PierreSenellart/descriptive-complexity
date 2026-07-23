@@ -197,6 +197,12 @@ individual declarations are documented on their own pages.
   to the marks; Steiner Tree in both its node- and its
   edge-weighted reading, the connectivity condition certified first-order by a
   guessed root and order, from which the `n − 1` edge bound also follows;
+  Knapsack – Karp's subset sum – the first problem of the catalog whose
+  numbers are written in *binary*, so that they may be exponential in the size
+  of the instance: membership verifies a ripple-carry addition along a guessed
+  sequence of partial sums, and hardness reads an exact-cover instance as a
+  base-`2 ^ |A|` number, one digit block of bit positions per ground element,
+  wide enough that no carry ever crosses a block;
   TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`

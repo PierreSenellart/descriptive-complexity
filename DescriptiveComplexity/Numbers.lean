@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Numbers.Unary
 import DescriptiveComplexity.Numbers.Binary
+import DescriptiveComplexity.Numbers.Digits
 
 /-!
 # Number encodings

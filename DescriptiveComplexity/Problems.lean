@@ -20,6 +20,7 @@ import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetSplitting
 import DescriptiveComplexity.Problems.DominatingSet
+import DescriptiveComplexity.Problems.Knapsack
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner
