@@ -82,8 +82,11 @@ proof plan for each problem still open.
   bound here. Note the general lesson: junk tuples are free whenever
   the target vocabulary carries its own “this element is a real one”
   marks.
-- **Graph k-colorability, fixed k ≥ 3** [S, *done*]:
-  `Problems/KColorability.lean`. `KColorable k`/`KCol k` for all k
+- **The coloring family** [M, *done*]: `Problems/Coloring/` (`Defs`,
+  `Reductions`, `Membership`) plus the umbrella `Problems/Coloring.lean`,
+  holding k-colorability for fixed k, Chromatic Number and Clique Cover on
+  one generic property `ColorableOn` (a map into `Fin k` separating a
+  *conflict* relation). `KColorable k`/`KCol k` for all k
   (`kCol_three : KCol 3 = ThreeCol`), `kCol_NP_complete (hk : 3 ≤ k)`.
   Membership guesses the k color classes as k unary relation variables
   (`Formula.iSup`/`iInf` over `Fin k` in the kernel); hardness pads
@@ -93,8 +96,19 @@ proof plan for each problem still open.
   harmless: the classes take pairwise disjoint colors, all distinct
   from the original part's, which is what leaves exactly 3 colors for
   the input graph – a counting argument that needs the input structure
-  nonempty (an empty class would eat no color). Chromatic-number
-  threshold version via representation (A) is still open.
+  nonempty (an empty class would eat no color).
+  **Chromatic Number** (threshold k = |marked|) and **Clique Cover** are the
+  other two members. Chromatic Number is hard by the catalog's first ordered
+  reduction outside the SAT family (`chromInterp`, tag `Fin 4`): the marked
+  set must have *exactly three* elements, which only an order can produce
+  (three copies of the minimum, via `minF`), and the fourth tag turns each
+  self-looped vertex into a `K₄`, since the threshold problems read their
+  conflict relation off the diagonal while 3-colorability does not. Clique
+  Cover is coloring of the complement, so `complEdgeInterp` of the clique
+  family relates the two in both directions. Their membership uses the
+  *palette* form of a threshold (`paletteColorableOn_iff`): with `k` unavailable
+  to the formulas, colouring with `|marked|` colors is colouring *by* the
+  marked set, which one binary relation variable expresses.
 - **Set Packing** [S, *done*]: the third member of the family above,
   `PacksOn` (a pairwise disjoint subfamily at least as large as the marked
   set) and `setPacking_NP_complete`. Its hardness reduction is the *same*
@@ -522,7 +536,8 @@ separations and non-reducibility, impossible in the machine world.
 ## Suggested ordering (value vs. prerequisite chains)
 
 1. Cheap catalog wins: **done** (Set Cover / Hitting Set, Set Packing,
-   k-COL, Feedback Vertex Set, Feedback Arc Set, TAUT); next in the same
+   k-COL, Chromatic Number, Clique Cover, Feedback Vertex Set, Feedback Arc
+   Set, TAUT); next in the same
    vein are Subgraph Isomorphism [S] and the Schaefer-style variants
    NAE-3SAT / 1-in-3SAT [M], which are worth having as reduction *sources*
    for Max Cut, and the
