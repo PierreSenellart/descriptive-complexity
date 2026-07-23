@@ -138,6 +138,12 @@ noncomputable def sfInjClause : setFamilySOLang.Sentence :=
 noncomputable def setCoverKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfCoverClause ⊓ (sfGuessToMarkedClause ⊓ sfInjClause))
 
+/-- The first-order kernel of the `Σ₁` definition of Exact Cover: the same
+kit again, this time asking for a subfamily that both covers and is pairwise
+disjoint – and, exactness replacing the threshold, no injection clause. -/
+noncomputable def exactCoverKernel : setFamilySOLang.Sentence :=
+  sfFamClause ⊓ (sfCoverClause ⊓ sfDisjClause)
+
 /-- The kernel of the `Σ₁` definition of Set Packing. -/
 noncomputable def setPackingKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfDisjClause ⊓ (sfMarkedToGuessClause ⊓ sfInjClause))
@@ -276,6 +282,20 @@ private theorem realize_setPackingKernel :
     (and_congr (realize_sfDisjClause ρ)
       (and_congr (realize_sfMarkedToGuessClause ρ) (realize_sfInjClause ρ)))
 
+/-- Realization of the Exact Cover kernel: the guessed subfamily consists of
+sets of the family, covers every ground element, and no element belongs to two
+distinct members. -/
+private theorem realize_exactCoverKernel :
+    SFRealize ρ exactCoverKernel ↔
+      (∀ s : A, ρ true ![s] → SSFam s) ∧
+        (∀ x : A, SSElem x → ∃ s : A, ρ true ![s] ∧ SSMem x s) ∧
+        ∀ s s' x : A, ρ true ![s] → ρ true ![s'] → s ≠ s' → SSElem x →
+          ¬(SSMem x s ∧ SSMem x s') := by
+  rw [exactCoverKernel]
+  simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
+  exact and_congr (realize_sfFamClause ρ)
+    (and_congr (realize_sfCoverClause ρ) (realize_sfDisjClause ρ))
+
 end Realize
 
 /-! ### The two definitions -/
@@ -346,5 +366,25 @@ theorem setPacking_sigmaSODefinable : SigmaSODefinable 1 SetPacking := by
     exact hf1 y'
 
 end SigmaOne
+
+/-- **Exact Cover is `Σ₁`-definable**: existentially guess the subfamily and
+check first-order that it covers every ground element and that no element is
+covered twice. Since NP is defined as `Σ₁`-definability, this is the
+membership half of the NP-completeness of Exact Cover. -/
+theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
+  refine ⟨[familyGuessBlock], rfl, exactCoverKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨G, hGfam, hcov, hdisj⟩
+    refine ⟨fun i => match i with
+      | true => fun w : Fin 1 → A => G (w 0)
+      | false => fun _ : Fin 2 → A => False, ?_⟩
+    exact (realize_exactCoverKernel _).mpr
+      ⟨fun s hs => hGfam s hs, fun x hx => hcov x hx,
+        fun s s' x hs hs' hne hx => hdisj s s' hs hs' hne x hx⟩
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨hGfam, hcov, hdisj⟩ := (realize_exactCoverKernel ρ).mp hρ
+    exact ⟨fun s => ρ true ![s], hGfam, hcov,
+      fun s s' hs hs' hne x hx => hdisj s s' x hs hs' hne hx⟩
 
 end DescriptiveComplexity

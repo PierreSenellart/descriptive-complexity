@@ -135,6 +135,34 @@ def PacksOn (Ep Fp : A → Prop) (Mp : A → A → Prop) (Kp : A → Prop) : Pro
     (∀ s s', G s → G s' → s ≠ s' → ∀ x, Ep x → ¬(Mp x s ∧ Mp x s')) ∧
     {x | Kp x}.ncard ≤ {s | G s}.ncard
 
+/-- Some subfamily of the `Fp`-sets covers every `Ep`-element *exactly once*:
+it covers, and no element belongs to two distinct members. Unlike the three
+properties above this one carries no threshold – exactness is the whole
+constraint. -/
+def ExactlyCoversOn (Ep Fp : A → Prop) (Mp : A → A → Prop) : Prop :=
+  ∃ G : A → Prop, (∀ s, G s → Fp s) ∧ (∀ x, Ep x → ∃ s, G s ∧ Mp x s) ∧
+    ∀ s s', G s → G s' → s ≠ s' → ∀ x, Ep x → ¬(Mp x s ∧ Mp x s')
+
+/-- Exactness in the “exactly one” form: covering plus disjointness is one
+covering set per element. -/
+theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
+    ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, (∀ s, G s → Fp s) ∧
+      ∀ x, Ep x → ∃! s, G s ∧ Mp x s := by
+  refine exists_congr fun G => and_congr_right fun _ => ?_
+  constructor
+  · rintro ⟨hcov, hdisj⟩ x hx
+    obtain ⟨s, hs, hms⟩ := hcov x hx
+    refine ⟨s, ⟨hs, hms⟩, fun s' hs' => ?_⟩
+    by_contra hne
+    exact hdisj s' s hs'.1 hs hne x hx ⟨hs'.2, hms⟩
+  · intro h
+    refine ⟨fun x hx => ?_, fun s s' hs hs' hne x hx => ?_⟩
+    · obtain ⟨s, hs, -⟩ := h x hx
+      exact ⟨s, hs⟩
+    · rintro ⟨h1, h2⟩
+      obtain ⟨s₀, -, huniq⟩ := h x hx
+      exact hne ((huniq s ⟨hs, h1⟩).trans (huniq s' ⟨hs', h2⟩).symm)
+
 /-! #### The threshold as an injection
 
 On a finite universe, comparing the decoded numbers is comparing sizes, so the
@@ -240,6 +268,37 @@ theorem PacksOn.of_equiv (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B →
   · rw [← ncard_setOf_equiv u hK, ← ncard_setOf_symm u G]
     exact hcard
 
+/-- `ExactlyCoversOn` transports along an equivalence commuting with the three
+predicates. -/
+theorem ExactlyCoversOn.of_equiv (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+    {EA FA : A → Prop} {MA : A → A → Prop}
+    (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
+    (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) (h : ExactlyCoversOn EB FB MB) :
+    ExactlyCoversOn EA FA MA := by
+  obtain ⟨G, hGF, hcov, hdisj⟩ := h
+  refine ⟨fun a => G (u.symm a), fun s hs => ?_, fun x hx => ?_,
+    fun s s' hs hs' hne x hx => ?_⟩
+  · have := (hF (u.symm s)).mp (hGF _ hs)
+    simpa using this
+  · obtain ⟨s, hs, hms⟩ := hcov (u.symm x) ((hE (u.symm x)).mpr (by simpa using hx))
+    refine ⟨u s, by simpa using hs, ?_⟩
+    have := (hM (u.symm x) s).mp hms
+    simpa using this
+  · rintro ⟨h1, h2⟩
+    exact hdisj (u.symm s) (u.symm s') hs hs' (fun h => hne (u.symm.injective h))
+      (u.symm x) ((hE (u.symm x)).mpr (by simpa using hx))
+      ⟨(hM (u.symm x) (u.symm s)).mpr (by simpa using h1),
+        (hM (u.symm x) (u.symm s')).mpr (by simpa using h2)⟩
+
+/-- `ExactlyCoversOn` transports along an equivalence, iff version. -/
+theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+    {EA FA : A → Prop} {MA : A → A → Prop}
+    (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
+    (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) :
+    ExactlyCoversOn EB FB MB ↔ ExactlyCoversOn EA FA MA :=
+  ⟨ExactlyCoversOn.of_equiv u hE hF hM,
+    ExactlyCoversOn.of_equiv u.symm (symm_hUn u hE) (symm_hUn u hF) (symm_hBin u hM)⟩
+
 /-- `PacksOn` transports along an equivalence, iff version. -/
 theorem PacksOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
     {EA FA KA : A → Prop} {MA : A → A → Prop}
@@ -290,6 +349,12 @@ def HasSmallHittingSet : Prop :=
 def HasLargeSetPacking : Prop :=
   Finite A ∧ PacksOn (SSElem (A := A)) SSFam SSMem SSMarked
 
+/-- A set system admits an exact cover: a subfamily covering every ground
+element exactly once. There is no threshold here, so no finiteness
+assumption either. -/
+def HasExactCover : Prop :=
+  ExactlyCoversOn (SSElem (A := A)) SSFam SSMem
+
 end Problems
 
 /-! ### Isomorphism-invariance and the bundled problems -/
@@ -335,6 +400,11 @@ theorem hasLargeSetPacking_iso (e : A ≃[Language.setSystem] B) :
     (PacksOn.equiv_iff e.toEquiv (ssElem_map e) (ssFam_map e) (ssMem_map e)
       (ssMarked_map e))
 
+/-- The exact-cover property is isomorphism-invariant. -/
+theorem hasExactCover_iso (e : A ≃[Language.setSystem] B) :
+    HasExactCover A ↔ HasExactCover B :=
+  ExactlyCoversOn.equiv_iff e.toEquiv (ssElem_map e) (ssFam_map e) (ssMem_map e)
+
 end Iso
 
 /-- SET COVER, as a problem on set systems: is there a subfamily covering
@@ -355,5 +425,12 @@ subfamily at least as large as the marked set? -/
 def SetPacking : DecisionProblem Language.setSystem where
   Holds := fun A inst => @HasLargeSetPacking A inst
   iso_invariant := fun e => hasLargeSetPacking_iso e
+
+/-- EXACT COVER, as a problem on set systems: is there a subfamily covering
+every ground element exactly once? The marked set plays no role – exactness
+replaces the threshold. -/
+def ExactCover : DecisionProblem Language.setSystem where
+  Holds := fun A inst => @HasExactCover A inst
+  iso_invariant := fun e => hasExactCover_iso e
 
 end DescriptiveComplexity

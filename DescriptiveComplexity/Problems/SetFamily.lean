@@ -97,4 +97,10 @@ theorem setPacking_NP_hard : NP.Hard SetPacking :=
 theorem setPacking_NP_complete : NP.Complete SetPacking :=
   ⟨setPacking_mem_NP, setPacking_NP_hard⟩
 
+/-- Exact Cover is in NP: it is `Σ₁`-definable – guess the subfamily, then
+check covering and disjointness first-order. Its NP-hardness, from
+exactly-one satisfiability, is in `DescriptiveComplexity.Problems.ExactCover`. -/
+theorem exactCover_mem_NP : ExactCover ∈ NP :=
+  exactCover_sigmaSODefinable
+
 end DescriptiveComplexity
