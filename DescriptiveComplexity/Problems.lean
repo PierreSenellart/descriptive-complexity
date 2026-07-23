@@ -24,6 +24,8 @@ import DescriptiveComplexity.Problems.Knapsack
 import DescriptiveComplexity.Problems.Partition
 import DescriptiveComplexity.Problems.ZeroOneIP
 import DescriptiveComplexity.Problems.JobSequencing
+import DescriptiveComplexity.Problems.ThreeDimMatching
+import DescriptiveComplexity.Problems.Hamilton
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner

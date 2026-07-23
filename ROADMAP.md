@@ -426,8 +426,74 @@ proof plan for each problem still open.
        *comparison* of decoded numbers, `binNum_lt_iff`: one number is smaller
        than another exactly when they differ and the second carries the higher
        bit, which is bitwise, hence first-order.
-- **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
-  local gadgets, probably ordered.
+- **3-Dimensional Matching** (#17), **done**
+  (`threeDimMatching_NP_complete`, `Problems/ThreeDimMatching/`): vocabulary
+  `Language.tripleSys` – three unary marks `xEl`, `yEl`, `zEl` and a ternary
+  `trip` – with a yes-instance one admitting a *matching*
+  (`IsMatchingOn`): a sub-relation of `trip`, inside the three classes,
+  covering every marked element exactly once. Membership is the cheapest of
+  the catalog now that the certificate may be ternary: guess the matching,
+  and the kernel is the seven clauses of the definition. Hardness is Karp's
+  reduction, from **SAT** itself – nothing here bounds the width of a clause –
+  read off the *occurrences*:
+  - the **truth-setting gadget** of a variable `x` gives every occurrence
+    `(c, s)` of `x` a `Y`-element `a(x, c, s)`, a `Z`-element `b(x, c, s)` and
+    two tips, with the triples `(tip(x, c, s, true), a(x, c, s), b(x, c, s))`
+    and `(tip(x, c, s, false), a(x, next(c, s)), b(x, c, s))`, where `next`
+    runs **cyclically** through the occurrences of `x`
+    (`SatOcc.VarNext`, `OccurrenceVar.lean`, the variable-side companion of
+    `OccurrenceOrder.lean`). Covering the `b`s picks one triple per
+    occurrence and covering the `a`s propagates the choice around the cycle,
+    so the gadget has exactly two matchings: the two truth values. A gadget
+    laid along a *path* would have only one, which is why the walk has to
+    close;
+  - the **clause gadget** gives `c` a `Y`- and a `Z`-element coverable only
+    through `tip(x, c, s, !s)`, a tip the truth-setting gadget leaves free
+    exactly when the literal `(x, s)` is true;
+  - **garbage collection** pairs every leftover tip with a private `Y`/`Z`
+    pair, and there have to be exactly as many pairs as leftover tips:
+    `#occurrences − #clauses`, so they are indexed by the occurrences that are
+    **not the first of their clause** (`SatOcc.Chained`) – the counting trick
+    of Partition's slack items, used here to *match cardinalities* rather than
+    to balance a digit. The bijection between the two is local to each clause
+    (identity, except that the first occurrence is sent to the one the clause
+    gadget consumes), so the reduction never counts.
+- **Hamilton Circuits** (#9, #10), *both in NP; hardness open* **[L]**
+  (`Problems/Hamilton/`, `dirHamCircuit_mem_NP`, `hamCircuit_mem_NP`):
+  vocabulary `Language.digraph`, a single binary relation, read as it stands
+  by DIRECTED HAMILTON CIRCUIT and *symmetrically* (`DGEdge`) by HAMILTON
+  CIRCUIT – the honest reading of an undirected graph presented by a possibly
+  asymmetric edge relation, and one that makes the two problems share
+  everything but two clauses. A circuit is read as a **linear order of the
+  universe** whose consecutive elements are adjacent and whose last element is
+  adjacent to its first (`TourOn`), the job-sequencing schedule closed into a
+  cycle: that is what a `Σ₁` block can guess, so membership is four order
+  axioms plus “is the immediate successor” plus the two adjacency demands, all
+  first-order. The undirected problem reduces to the directed one by doubling
+  each edge (`hamCircuit_fo_reduction_dirHamCircuit`, dimension one, one tag),
+  so **hardness only has to be proved on the undirected side**, from Vertex
+  Cover with the 12-vertex cover-testing gadget, or on the directed side (the
+  4-vertex gadget) together with the 3-vertices-per-vertex reduction back to
+  the undirected problem. Of the two pieces that needs, the first is **done**:
+  - the **tour/enumeration bridge**, `tourOn_iff_enum` (`Hamilton/Cycle.lean`):
+    `TourOn R ↔ ∃ n (f : Fin n ≃ A), ∀ i, R (f i) (f (nextIdx i))`. A gadget
+    builds its circuit as an explicit enumeration and consumes `←`; it reads a
+    given circuit through the cyclic successor and consumes `→`, which turns
+    `IsLinOrd` into a `LinearOrder` (`IsLinOrd.toLinearOrder`,
+    `Numbers/BinRel.lean`) and sorts the universe with Mathlib's
+    `monoEquivOfFin`. It is also what makes the definition honest: reading a
+    circuit as a linear order *is* reading it as a cyclic enumeration;
+  - what is left is the **walk along the incidence list** of a vertex, plus
+    the gadget itself: entering a vertex's chain of edge gadgets happens only
+    at its first edge, so the cover is read off the selectors by induction
+    along the neighbour order – the same shape as
+    `OccurrenceOrder`/`OccurrenceVar`, one index further out. The local half
+    of the analysis is cheap (a gadget node has at most two possible
+    predecessors, and one whose two are used elsewhere cannot be reached); it
+    is that induction, and the explicit enumeration of the tour in the other
+    direction, that carry the weight.
+- **X3C** [M–L]: from 3-Dimensional Matching, now that it is hard, or from
+  Exact Cover; local gadgets, probably ordered.
 - **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`
   (`Defs`, `Reductions`, `Membership`) plus the umbrella
   `Problems/Steiner.lean`, `steinerTree_NP_complete`. Vocabulary

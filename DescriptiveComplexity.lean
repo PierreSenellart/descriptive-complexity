@@ -23,6 +23,7 @@ import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
 import DescriptiveComplexity.OccurrenceFormulas
 import DescriptiveComplexity.OccurrenceSlack
+import DescriptiveComplexity.OccurrenceVar
 import DescriptiveComplexity.Numbers
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.Examples
@@ -229,6 +230,18 @@ individual declarations are documented on their own pages.
   and the bound, which equals it – is the digit-wise half, one bit per block,
   and a schedule meeting it is a balanced split, that is, a not-all-equal
   satisfying assignment;
+  3-dimensional matching, the tripartite exact cover, whose
+  certificate is the first **ternary** one of the catalog and whose hardness is
+  Karp's own reduction from SAT: a truth-setting gadget running *cyclically*
+  through the occurrences of each variable – a cycle has exactly two matchings,
+  a path only one – a pair per clause reachable only through the tip of a true
+  literal, and one garbage pair per occurrence that is not the first of its
+  clause, which is exactly the number of tips left over;
+  the two Hamilton circuit problems, directed and undirected, *in NP* so far,
+  a circuit being read as a **linear order of the universe** whose consecutive
+  elements are adjacent and whose last is adjacent to its first – the
+  job-sequencing schedule closed into a cycle – with the undirected problem
+  reducing to the directed one by doubling each edge;
   TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`

@@ -114,6 +114,22 @@ theorem isLinOrd_of_key {M K : Type} {LeK : K → K → Prop} {R : M → M → P
     fun a b hab hba => hinj (hK.2.2.1 _ _ ((h a b).mp hab) ((h b a).mp hba)),
     fun a b => (hK.2.2.2 (key a) (key b)).imp (h a b).mpr (h b a).mpr⟩
 
+open Classical in
+/-- A relation that *is* a linear order induces a `LinearOrder` structure,
+which is what Mathlib's order library asks for. Guessed orders – a schedule, a
+circuit – arrive as relations, so this is the bridge to it. -/
+@[instance_reducible]
+noncomputable def IsLinOrd.toLinearOrder {A : Type} {Le : A → A → Prop} (h : IsLinOrd Le) :
+    LinearOrder A where
+  le := Le
+  lt a b := Le a b ∧ ¬Le b a
+  le_refl := h.1
+  le_trans := h.2.1
+  le_antisymm := h.2.2.1
+  le_total := h.2.2.2
+  lt_iff_le_not_ge _ _ := Iff.rfl
+  toDecidableLE := Classical.decRel _
+
 /-- The natural order of a linear order, as a relation. -/
 theorem isLinOrd_le {α : Type} [LinearOrder α] : IsLinOrd (· ≤ · : α → α → Prop) :=
   ⟨fun _ => le_rfl, fun _ _ _ => le_trans, fun _ _ => le_antisymm, le_total⟩

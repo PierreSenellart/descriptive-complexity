@@ -48,14 +48,16 @@ The library is organized in three layers:
   Chromatic Number and Clique Cover, the clique family
   (Clique / Independent Set / Vertex Cover), Subgraph Isomorphism, Set Cover,
   Hitting Set, Set Packing, Exact Cover, Set Splitting and Dominating Set,
-  Feedback Vertex Set and Feedback Arc Set,
+  3-dimensional matching, Feedback Vertex Set and Feedback Arc Set,
   Steiner Tree, Max Cut, Knapsack – the subset-sum problem, with the weights
   in binary – Partition, 0-1 integer programming, job sequencing,
   TAUT (coNP-complete),
   `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
   for the `k`-th level of the polynomial hierarchy – and HORN-SAT, complete for
-  PTIME by the analogous machine-free discharge one level down; plus a tutorial
-  on conjunctive queries. Each comes with its vocabulary, FO reductions and
+  PTIME by the analogous machine-free discharge one level down; plus the two
+  Hamilton circuit problems, directed and undirected, so far only shown to be
+  in NP – a circuit being read as a linear order of the universe – and a
+  tutorial on conjunctive queries. Each comes with its vocabulary, FO reductions and
   completeness theorems.
 
 ## Use as a dependency
