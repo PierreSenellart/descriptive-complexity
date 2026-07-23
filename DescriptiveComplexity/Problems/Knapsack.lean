@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Knapsack.Defs
+import DescriptiveComplexity.Problems.Knapsack.Chain
 import DescriptiveComplexity.Problems.Knapsack.Membership
 import DescriptiveComplexity.Problems.Knapsack.Hardness
 import DescriptiveComplexity.Problems.ExactCover

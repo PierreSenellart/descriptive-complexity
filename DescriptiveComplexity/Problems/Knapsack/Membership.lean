@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Knapsack.Defs
+import DescriptiveComplexity.Problems.Knapsack.Chain
 import DescriptiveComplexity.SecondOrder
 
 /-!
@@ -343,131 +343,6 @@ private theorem realize_knapsackKernel :
 
 end Realize
 
-/-! ### Partial sums along the item order -/
-
-section PartSums
-
-variable {A : Type} [Language.binWeights.Structure A]
-
-/-- The total weight of the chosen items up to `i`. -/
-noncomputable def PartSum (S : A → Prop) (i : A) : ℕ :=
-  ∑ᶠ j ∈ {j : A | S j ∧ BWLe j i}, BWWeight j
-
-open Classical in
-/-- The value contributed by one item. -/
-theorem binNum_add (S : A → Prop) (i : A) :
-    binNum BWLe BWPosn (fun p => S i ∧ BWBit i p) = if S i then BWWeight i else 0 := by
-  by_cases hi : S i
-  · rw [if_pos hi]
-    exact binNum_congr fun p => by simp [hi]
-  · rw [if_neg hi]
-    have : {p : A | BWPosn p ∧ (S i ∧ BWBit i p)} = (∅ : Set A) := by
-      ext p
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
-      exact fun h => hi h.2.1
-    rw [binNum, this, finsum_mem_empty]
-
-open Classical in
-/-- At the first item, the running total is that item's contribution. -/
-theorem partSum_min {S : A → Prop} (hlin : IsLinOrd (BWLe (A := A)))
-    (hS : ∀ i, S i → BWItem i) {i : A} (hi : MinPos BWLe BWItem i) :
-    PartSum S i = if S i then BWWeight i else 0 := by
-  have hset : {j : A | S j ∧ BWLe j i} = {j : A | j = i ∧ S j} := by
-    ext j
-    constructor
-    · rintro ⟨hj, hji⟩
-      exact ⟨hlin.2.2.1 j i hji (hi.2 j (hS j hj)), hj⟩
-    · rintro ⟨rfl, hj⟩
-      exact ⟨hj, hlin.1 j⟩
-  by_cases hSi : S i
-  · have : {j : A | j = i ∧ S j} = {i} := by
-      ext j
-      simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
-      exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hSi⟩⟩
-    rw [PartSum, hset, this, finsum_mem_singleton, if_pos hSi]
-  · have : {j : A | j = i ∧ S j} = (∅ : Set A) := by
-      ext j
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
-      rintro ⟨rfl, hj⟩
-      exact hSi hj
-    rw [PartSum, hset, this, finsum_mem_empty, if_neg hSi]
-
-open Classical in
-/-- Each step of the walk adds one item's contribution. -/
-theorem partSum_succ [Finite A] {S : A → Prop} (hlin : IsLinOrd (BWLe (A := A)))
-    (hS : ∀ i, S i → BWItem i) {h i : A} (hsucc : SuccPos BWLe BWItem h i) :
-    PartSum S i = PartSum S h + if S i then BWWeight i else 0 := by
-  have hset : {j : A | S j ∧ BWLe j i} =
-      {j : A | S j ∧ BWLe j h} ∪ {j : A | j = i ∧ S j} := by
-    ext j
-    constructor
-    · rintro ⟨hj, hji⟩
-      rcases eq_or_ne j i with rfl | hjne
-      · exact Or.inr ⟨rfl, hj⟩
-      · refine Or.inl ⟨hj, ?_⟩
-        rcases hlin.2.2.2 j h with hle | hle
-        · exact hle
-        · rcases hsucc.2.2.2.2 j (hS j hj) hle hji with h1 | h1
-          · exact h1 ▸ hlin.1 j
-          · exact absurd h1 hjne
-    · rintro (⟨hj, hjh⟩ | ⟨rfl, hj⟩)
-      · exact ⟨hj, hlin.2.1 j h i hjh hsucc.2.2.1⟩
-      · exact ⟨hj, hlin.1 j⟩
-  have hdisj : Disjoint {j : A | S j ∧ BWLe j h} {j : A | j = i ∧ S j} := by
-    rw [Set.disjoint_left]
-    rintro j ⟨hj, hjh⟩ ⟨rfl, -⟩
-    exact hsucc.2.2.2.1 (hlin.2.2.1 h j hsucc.2.2.1 hjh)
-  rw [PartSum, hset, finsum_mem_union hdisj (Set.toFinite _) (Set.toFinite _)]
-  by_cases hSi : S i
-  · have hsingle : {j : A | j = i ∧ S j} = {i} := by
-      ext j
-      simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
-      exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hSi⟩⟩
-    rw [hsingle, finsum_mem_singleton, if_pos hSi]
-    rfl
-  · have hempty : {j : A | j = i ∧ S j} = (∅ : Set A) := by
-      ext j
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
-      rintro ⟨rfl, hj⟩
-      exact hSi hj
-    rw [hempty, finsum_mem_empty, if_neg hSi]
-    rfl
-
-/-- The parity of three bits, as an iterated equivalence. -/
-theorem xor3_iff (x y z : Prop) : Xor x (Xor y z) ↔ (x ↔ (y ↔ z)) := by
-  by_cases hx : x <;> by_cases hy : y <;> by_cases hz : z <;> simp [Xor, hx, hy, hz]
-
-/-- A running total never exceeds the total. -/
-theorem partSum_le [Finite A] {S : A → Prop} (i : A) :
-    PartSum S i ≤ ∑ᶠ j ∈ {j : A | S j}, BWWeight j := by
-  classical
-  have hset : {j : A | S j} =
-      {j : A | S j ∧ BWLe j i} ∪ {j : A | S j ∧ ¬BWLe j i} := by
-    ext j
-    constructor
-    · intro hj
-      by_cases hle : BWLe j i
-      · exact Or.inl ⟨hj, hle⟩
-      · exact Or.inr ⟨hj, hle⟩
-    · rintro (⟨hj, -⟩ | ⟨hj, -⟩) <;> exact hj
-  have hdisj : Disjoint {j : A | S j ∧ BWLe j i} {j : A | S j ∧ ¬BWLe j i} := by
-    rw [Set.disjoint_left]
-    rintro j ⟨-, hle⟩ ⟨-, hnle⟩
-    exact hnle hle
-  rw [hset, finsum_mem_union hdisj (Set.toFinite _) (Set.toFinite _)]
-  exact Nat.le_add_right _ _
-
-/-- At the last item, the running total is the total. -/
-theorem partSum_max {S : A → Prop} (hS : ∀ i, S i → BWItem i) {i : A}
-    (hi : MaxPos BWLe BWItem i) :
-    PartSum S i = ∑ᶠ j ∈ {j : A | S j}, BWWeight j := by
-  have hset : {j : A | S j ∧ BWLe j i} = {j : A | S j} := by
-    ext j
-    exact ⟨fun h => h.1, fun h => ⟨h, hi.2 j (hS j h)⟩⟩
-  rw [PartSum, hset]
-
-end PartSums
-
 /-! ### Membership -/
 
 open Classical in
@@ -480,63 +355,26 @@ theorem knapsack_sigmaSODefinable : SigmaSODefinable 1 Knapsack := by
   refine ⟨[knapsackGuessBlock], rfl, knapsackKernel, ?_⟩
   intro A _ _ _
   constructor
-  · -- a solution yields a certificate
+  · -- a solution yields a certificate: the walk of `exists_chain`
     rintro ⟨hfin, hlin, S, hSitem, hsumeq⟩
-    have htot : (∑ᶠ j ∈ {j : A | S j}, BWWeight j) <
+    have htot : (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) <
         2 ^ ({p : A | BWPosn p} : Set A).ncard := by
-      rw [hsumeq, BWTarget]
+      rw [show (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) =
+        ∑ᶠ j ∈ {j : A | S j}, BWWeight j from rfl, hsumeq, BWTarget]
       exact binNum_lt_two_pow hlin _ BWPosn rfl BWTgt
-    -- the running totals, decoded
-    have hPSex : ∀ i : A, ∃ b : A → Prop, binNum BWLe BWPosn b = PartSum S i := fun i =>
-      exists_binNum hlin _ BWPosn rfl (PartSum S i) (lt_of_le_of_lt (partSum_le i) htot)
-    choose PS hPS using hPSex
-    -- the carries of each step
-    have hCyex : ∀ i : A, ∃ c : A → Prop, ∀ h : A, SuccPos BWLe BWItem h i →
-        (∀ p, BWPosn p → (PS i p ↔ (PS h p ↔ ((S i ∧ BWBit i p) ↔ c p)))) ∧
-        (∀ p q, SuccPos BWLe BWPosn p q →
-          (c q ↔ maj (PS h p) (S i ∧ BWBit i p) (c p))) ∧
-        (∀ p, MinPos BWLe BWPosn p → ¬c p) ∧
-        (∀ p, MaxPos BWLe BWPosn p → ¬maj (PS h p) (S i ∧ BWBit i p) (c p)) := by
-      intro i
-      by_cases hpred : ∃ h, SuccPos BWLe BWItem h i
-      · obtain ⟨h, hsucc⟩ := hpred
-        have hstep : PartSum S h + (if S i then BWWeight i else 0) = PartSum S i :=
-          (partSum_succ hlin hSitem hsucc).symm
-        have hb : binNum BWLe BWPosn (PS h) +
-            binNum BWLe BWPosn (fun p => S i ∧ BWBit i p) <
-              2 ^ ({p : A | BWPosn p} : Set A).ncard := by
-          rw [hPS h, binNum_add S i, hstep]
-          exact lt_of_le_of_lt (partSum_le i) htot
-        obtain ⟨s, c, hs1, hs2, hs3, hs4, hval⟩ :=
-          exists_ripple hlin _ BWPosn (PS h) (fun p => S i ∧ BWBit i p) False rfl
-            (by simpa using hb)
-        have hagree : ∀ p, BWPosn p → (s p ↔ PS i p) := by
-          refine binNum_inj_on hlin _ BWPosn rfl s (PS i) ?_
-          rw [hPS i, ← hstep, ← hPS h, ← binNum_add S i]
-          simpa using hval
-        refine ⟨c, fun h' hsucc' => ?_⟩
-        obtain rfl : h' = h := succPos_left_unique hlin hsucc' hsucc
-        exact ⟨fun p hp => ((hagree p hp).symm.trans (hs1 p hp)).trans (xor3_iff _ _ _),
-          hs2, fun p hp => (hs3 p hp).mp, hs4⟩
-      · exact ⟨fun _ => False, fun h hsucc => absurd ⟨h, hsucc⟩ hpred⟩
-    choose Cy hCy using hCyex
+    obtain ⟨PS, Cy, hchain⟩ := exists_chain (wt := BWBit) hlin hlin hSitem htot
     refine ⟨fun idx => match idx with
       | none => fun w : Fin 1 → A => S (w 0)
       | some true => fun w : Fin 2 → A => PS (w 0) (w 1)
       | some false => fun w : Fin 2 → A => Cy (w 0) (w 1), ?_⟩
-    refine (realize_knapsackKernel _).mpr ⟨hlin, hSitem, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-    · -- the first item
-      intro i p hi hp
-      refine binNum_inj_on hlin _ BWPosn rfl (PS i) (fun p => S i ∧ BWBit i p) ?_ p hp
-      rw [hPS i, binNum_add S i, partSum_min hlin hSitem hi]
-    · exact fun i j p hij hp => (hCy j i hij).1 p hp
-    · exact fun i j p q hij hpq => (hCy j i hij).2.1 p q hpq
-    · exact fun i j p hij hp => (hCy j i hij).2.2.1 p hp
-    · exact fun i j p hij hp => (hCy j i hij).2.2.2 p hp
-    · -- the last item carries the target
+    refine (realize_knapsackKernel _).mpr ⟨hlin, hSitem, hchain.1, hchain.2.1,
+      hchain.2.2.1, hchain.2.2.2.1, hchain.2.2.2.2, ?_, ?_⟩
+    · -- at the last item the running total is the target
       intro i p hi hp
       refine binNum_inj_on hlin _ BWPosn rfl (PS i) BWTgt ?_ p hp
-      rw [hPS i, partSum_max hSitem hi, hsumeq, BWTarget]
+      rw [chain_sound hlin hlin hSitem hchain i hi.1, partSum_max hSitem hi]
+      rw [show (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) =
+        ∑ᶠ j ∈ {j : A | S j}, BWWeight j from rfl, hsumeq, BWTarget]
     · -- with no items the target must vanish
       intro hno p hp
       have hSempty : {j : A | S j} = (∅ : Set A) := by
@@ -550,43 +388,21 @@ theorem knapsack_sigmaSODefinable : SigmaSODefinable 1 Knapsack := by
       have := binNum_inj_on hlin _ BWPosn rfl BWTgt (fun _ => False)
         (by rw [hzero, binNum_bot]) p hp
       exact this.mp
-  · -- a certificate yields a solution
+  · -- a certificate yields a solution: the walk is sound
     rintro ⟨ρ, hρ⟩
     obtain ⟨hlin, hsel, hbase, hstepsum, hstepcarry, hstepbot, hsteptop, hfinal, hempty⟩ :=
       (realize_knapsackKernel ρ).mp hρ
+    have hchain : IsChain BWLe BWPosn (Sel ρ) BWBit (PSum ρ) (Cy ρ) :=
+      ⟨hbase, hstepsum, hstepcarry, hstepbot, hsteptop⟩
     refine ⟨‹Finite A›, hlin, Sel ρ, hsel, ?_⟩
-    -- the running totals are what the guessed relation says
-    have hkey : ∀ (m : ℕ) (i : A), bitRank BWLe BWItem i = m → BWItem i →
-        binNum BWLe BWPosn (PSum ρ i) = PartSum (Sel ρ) i := by
-      intro m
-      induction m using Nat.strong_induction_on with
-      | _ m IH =>
-        intro i hr hi
-        by_cases hmin : MinPos BWLe BWItem i
-        · rw [partSum_min hlin hsel hmin, ← binNum_add (Sel ρ) i]
-          exact binNum_congr_on fun p hp => hbase i p hmin hp
-        · obtain ⟨h, hsucc⟩ := exists_predPos hlin hi hmin
-          have hlt : bitRank BWLe BWItem h < m := by
-            rw [← hr]
-            exact bitRank_lt hlin hsucc.1 hsucc.2.2.1 hsucc.2.2.2.1
-          have hIH := IH (bitRank BWLe BWItem h) hlt h rfl hsucc.1
-          have hripple := binNum_ripple (a := PSum ρ h) (b := Add ρ i) (s := PSum ρ i)
-            hlin ({p : A | BWPosn p} : Set A).ncard BWPosn (Cy ρ i) False False rfl
-            (fun p hp => ((hstepsum h i p hsucc hp).trans (xor3_iff _ _ _).symm))
-            (fun p q hpq => hstepcarry h i p q hsucc hpq)
-            (fun p hp => iff_false_intro (hstepbot h i p hsucc hp))
-            (fun p hp => (iff_false_intro (hsteptop h i p hsucc hp)).symm)
-            (fun _ => Iff.rfl)
-          rw [if_neg not_false, Nat.mul_zero, Nat.add_zero, Nat.add_zero] at hripple
-          rw [hripple, hIH, partSum_succ hlin hsel hsucc]
-          congr 1
-          exact binNum_add (Sel ρ) i
     by_cases hitems : ∃ i : A, BWItem i
     · obtain ⟨imax, himax⟩ := exists_maxPos hlin hitems
-      have h1 := hkey _ imax rfl himax.1
+      have h1 := chain_sound hlin hlin hsel hchain imax himax.1
       have h2 : binNum BWLe BWPosn (PSum ρ imax) = BWTarget A :=
         binNum_congr_on fun p hp => hfinal imax p himax hp
-      rw [← partSum_max hsel himax, ← h1, h2]
+      rw [show (∑ᶠ j ∈ {j : A | Sel ρ j}, BWWeight j) =
+        ∑ᶠ j ∈ {j : A | Sel ρ j}, binNum BWLe BWPosn (BWBit j) from rfl,
+        ← partSum_max hsel himax, ← h1, h2]
     · have hno : ∀ i, ¬BWItem i := fun i hi => hitems ⟨i, hi⟩
       have hSempty : {i : A | Sel ρ i} = (∅ : Set A) := by
         ext i
