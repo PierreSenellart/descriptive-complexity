@@ -331,8 +331,25 @@ proof plan for each problem still open.
        fits (`finsum_binNum_lt_wide`). The walk along them splits into
        “inside a block” and “top of one block to the bottom of the next”
        (`succPos_wide`), which is what the first-order clauses follow.
-  4. *Job Sequencing* (#19) from Partition, and *0-1 Integer Programming* (#2)
-     by reading a single equation with 0-1 variables as a Knapsack instance.
+  4. *0-1 Integer Programming* (#2), **done**
+     (`zeroOneIP_NP_complete`, `Problems/ZeroOneIP/`): vocabulary
+     `Language.zeroOneIP` (columns, rows, positions, the ternary
+     `coef r j p`, `rhs r p`, `le`), entries natural – Karp's signed form is a
+     superset, so hardness transfers, while membership for it would need each
+     equation weighed on both sides. Hardness is the identity in everything
+     but the vocabulary: one tag, dimension one, the interpreted universe a
+     copy of the input (`ipEquiv`), and the single row named as the minimum of
+     the order, which is the only use the reduction makes of it. Membership is
+     one ripple-carry walk **per row**: the guessed `ps`/`cy` gain a row
+     argument and every clause a guard `row r`, the rows not interacting, and
+     each row's total is its own right-hand side, which the instance writes –
+     so, unlike Partition, the walks stay on the instance's own positions.
+     That it is only Knapsack's file re-read per row is what the
+     generalization of `Problems/Knapsack/Chain.lean` bought: stated over an
+     arbitrary walk order and item predicate, it takes `IPLe`/`IPCol` where
+     Knapsack passes `BWLe`/`BWItem`, and the whole certificate is
+     `exists_chain`/`chain_sound` applied once per row.
+  5. *Job Sequencing* (#19) from Partition.
 - **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
   local gadgets, probably ordered.
 - **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`
@@ -360,9 +377,9 @@ proof plan for each problem still open.
   above for the two facts that fixed its shape – hardness from NAE-SAT by a
   slack item per non-extremal occurrence rather than by padding Knapsack, and
   a certificate on the wide positions of `Numbers/Wide.lean`.
-- **0-1 Integer Programming** [M]: from Knapsack, by reading a single equation
-  with 0-1 variables as a subset-sum instance; representation (C) for the
-  coefficients.
+- **0-1 Integer Programming** [M, **done**]: `zeroOneIP_NP_complete`; see the
+  (C) entry above. The cheapest of the (C) group at both ends: hardness is a
+  change of vocabulary, membership Knapsack's certificate read once per row.
 - **3-Partition** [L]: strongly NP-complete, so representation (A)
   (unary) suffices and the hardness claim is honest; the classical
   source for packing/scheduling reductions (Bin Packing [M after it]).

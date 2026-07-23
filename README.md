@@ -50,7 +50,8 @@ The library is organized in three layers:
   Hitting Set, Set Packing, Exact Cover, Set Splitting and Dominating Set,
   Feedback Vertex Set and Feedback Arc Set,
   Steiner Tree, Max Cut, Knapsack – the subset-sum problem, with the weights
-  in binary – Partition, TAUT (coNP-complete),
+  in binary – Partition, 0-1 integer programming,
+  TAUT (coNP-complete),
   `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
   for the `k`-th level of the polynomial hierarchy – and HORN-SAT, complete for
   PTIME by the analogous machine-free discharge one level down; plus a tutorial

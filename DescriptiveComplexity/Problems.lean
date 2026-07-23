@@ -22,6 +22,7 @@ import DescriptiveComplexity.Problems.SetSplitting
 import DescriptiveComplexity.Problems.DominatingSet
 import DescriptiveComplexity.Problems.Knapsack
 import DescriptiveComplexity.Problems.Partition
+import DescriptiveComplexity.Problems.ZeroOneIP
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner

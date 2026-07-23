@@ -211,7 +211,13 @@ individual declarations are documented on their own pages.
   total, hence not first-order – one digit block per variable, totalling `2`,
   makes a balanced split an assignment, and one per clause, totalling
   `w + (w − 2)` with one slack item per occurrence that is neither the first
-  nor the last, makes it a not-all-equal one;
+  nor the last, makes it a not-all-equal one; 0-1 integer programming, the
+  multi-row form of Knapsack, whose two halves are the cheapest of the group –
+  a single equation with `0-1` variables already is a subset-sum instance, so
+  the reduction is the identity in everything but the vocabulary, its one
+  piece of work being to name the single row, and the certificate is
+  Knapsack's read once per row, the guessed running totals and carries
+  carrying a row argument and every clause a guard;
   TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
