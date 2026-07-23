@@ -29,6 +29,10 @@ files do not hand-roll cardinality reasoning:
   comparing sizes – the bridge to the second-order rendering of a threshold,
   where the injection witnessing the comparison is guessed as a relation
   variable (used by the `Σ₁` definition of Clique);
+* `DescriptiveComplexity.nonempty_embedding_iff_ncard_le₂` and
+  `DescriptiveComplexity.ncard_setOf_equiv₂`: the same, for a threshold carried by a
+  marked *binary* relation – the arity-2 form of the representation, which is
+  what problems counting arcs rather than vertices need;
 * `DescriptiveComplexity.ncard_tagged_eq_sum`: cardinality under tag-disjoint union –
   the tagged framework's *addition*;
 * `DescriptiveComplexity.ncard_univ_pi`: cardinality of a product of marked sets over
@@ -126,6 +130,30 @@ theorem nonempty_embedding_iff_ncard_le {A : Type} [Finite A] (P Q : A → Prop)
   have hQ : {x | Q x}.ncard = Nat.card {x // Q x} := (Nat.card_coe_set_eq _).symm
   rw [hP, hQ, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
   exact Function.Embedding.nonempty_iff_card_le
+
+/-! ### Thresholds on pairs
+
+Problems whose objective counts *arcs* rather than vertices – Feedback Arc Set,
+Max Cut – need a threshold that can reach `n²`, which a marked subset of the
+universe cannot. The same unary idea one arity up does reach it: the number is
+the cardinality of a marked *binary* relation, decoded as the `Set.ncard` of the
+corresponding set of pairs. It stays order-free and isomorphism-invariant, and
+the whole kit above applies at the type `A × A`; the two lemmas below are just
+its curried form. -/
+
+/-- Comparing decoded numbers is comparing sizes, for thresholds carried by a
+binary relation. -/
+theorem nonempty_embedding_iff_ncard_le₂ {A : Type} [Finite A] (P Q : A → A → Prop) :
+    Nonempty ({p : A × A // P p.1 p.2} ↪ {p : A × A // Q p.1 p.2}) ↔
+      {p : A × A | P p.1 p.2}.ncard ≤ {p : A × A | Q p.1 p.2}.ncard :=
+  nonempty_embedding_iff_ncard_le (fun p : A × A => P p.1 p.2) fun p : A × A => Q p.1 p.2
+
+/-- The number encoded by a marked binary relation is invariant under an
+equivalence of universes carrying one relation to the other. -/
+theorem ncard_setOf_equiv₂ {A B : Type} (u : B ≃ A) {RB : B → B → Prop}
+    {RA : A → A → Prop} (hR : ∀ b b', RB b b' ↔ RA (u b) (u b')) :
+    {p : B × B | RB p.1 p.2}.ncard = {p : A × A | RA p.1 p.2}.ncard :=
+  ncard_setOf_equiv (u.prodCongr u) fun p => hR p.1 p.2
 
 /-- Cardinality under tag-disjoint union: on a universe of tagged elements,
 the cardinalities of the per-tag marked sets add up. This is how the tagged
