@@ -149,25 +149,6 @@ end Embedding
 
 variable {B : Type}
 
-/-- The number encoded by a marked set is invariant under an equivalence of
-universes carrying one mark predicate to the other. -/
-private theorem ncard_setOf_equiv (u : B ≃ A) {KB : B → Prop} {KA : A → Prop}
-    (hK : ∀ b, KB b ↔ KA (u b)) : {b | KB b}.ncard = {a | KA a}.ncard := by
-  rw [← ncard_image_equiv u {b | KB b}]
-  congr 1
-  ext a
-  constructor
-  · rintro ⟨b, hb, rfl⟩
-    exact (hK b).mp hb
-  · intro ha
-    exact ⟨u.symm a, (hK _).mpr (by simpa using ha), by simp⟩
-
-/-- Pulling a predicate back along `u.symm` does not change the number it
-encodes. -/
-private theorem ncard_setOf_symm (u : B ≃ A) (S : B → Prop) :
-    {b | S b}.ncard = {a | S (u.symm a)}.ncard :=
-  ncard_setOf_equiv u fun b => by simp
-
 /-- `CliqueOn` transports along an equivalence commuting with the two
 predicates. -/
 theorem CliqueOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}

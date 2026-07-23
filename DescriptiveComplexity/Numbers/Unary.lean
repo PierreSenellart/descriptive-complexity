@@ -16,7 +16,8 @@ the *cardinality of a marked set* – `Set.ncard` is the decoding function, and
 no order is needed. This file provides the shared lemma kit so that problem
 files do not hand-roll cardinality reasoning:
 
-* `DescriptiveComplexity.ncard_image_equiv`: invariance of the decoded number under
+* `DescriptiveComplexity.ncard_image_equiv` and its predicate form
+  `DescriptiveComplexity.ncard_setOf_equiv`: invariance of the decoded number under
   equivalences (this is what feeds `DecisionProblem.iso_invariant` proofs);
 * `DescriptiveComplexity.initSeg` and `DescriptiveComplexity.ncard_initSeg`: the canonical encoding
   of `k ≤ n` as the initial segment of `Fin n`;
@@ -46,6 +47,28 @@ open Set
 theorem ncard_image_equiv {A B : Type} (e : A ≃ B) (s : Set A) :
     (e '' s).ncard = s.ncard :=
   Set.ncard_image_of_injective s e.injective
+
+/-- The number encoded by a marked set is invariant under an equivalence of
+universes carrying one mark predicate to the other. This is the form the
+transport of a threshold along an isomorphism (or along the equivalence
+underlying a one-dimensional interpretation) takes in practice. -/
+theorem ncard_setOf_equiv {A B : Type} (u : B ≃ A) {KB : B → Prop} {KA : A → Prop}
+    (hK : ∀ b, KB b ↔ KA (u b)) : {b | KB b}.ncard = {a | KA a}.ncard := by
+  rw [← ncard_image_equiv u {b | KB b}]
+  congr 1
+  ext a
+  constructor
+  · rintro ⟨b, hb, rfl⟩
+    exact (hK b).mp hb
+  · intro ha
+    exact ⟨u.symm a, (hK _).mpr (by simpa using ha), by simp⟩
+
+/-- Pulling a mark predicate back along `u.symm` does not change the number it
+encodes: the special case of `DescriptiveComplexity.ncard_setOf_equiv` where the
+predicate on the target universe is the transported one. -/
+theorem ncard_setOf_symm {A B : Type} (u : B ≃ A) (S : B → Prop) :
+    {b | S b}.ncard = {a | S (u.symm a)}.ncard :=
+  ncard_setOf_equiv u fun b => by simp
 
 /-- The canonical unary encoding of `k` in a universe of size `n`: the
 initial segment of `Fin n` of length `k`. -/
