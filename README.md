@@ -44,10 +44,10 @@ The library is organized in three layers:
   theorem: the library declares no axioms.
 * **A problem catalog and worked examples**: SAT (with a machine-free
   Cook–Levin theorem), 3-colorability and `k`-colorability for every `k ≥ 3`,
-  3SAT and NAE-SAT with its width-three restriction NAE-3SAT,
+  3SAT, NAE-SAT with its width-three restriction NAE-3SAT and 1-in-SAT,
   Chromatic Number and Clique Cover, the clique family
   (Clique / Independent Set / Vertex Cover), Subgraph Isomorphism, Set Cover,
-  Hitting Set and Set Packing, Feedback Vertex Set and Feedback Arc Set,
+  Hitting Set, Set Packing and Exact Cover, Feedback Vertex Set and Feedback Arc Set,
   Steiner Tree, Max Cut, TAUT (coNP-complete),
   `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
   for the `k`-th level of the polynomial hierarchy – and HORN-SAT, complete for

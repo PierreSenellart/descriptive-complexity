@@ -162,10 +162,12 @@ individual declarations are documented on their own pages.
   the Cook–Levin theorem ([Cook 1971][cook1971complexity];
   [Levin 1973][levin1973universal]) proved by a machine-free Tseitin discharge,
   3-colorability (FO-interreducible with SAT in both directions), 3SAT,
-  NAE-SAT and its width-three restriction NAE-3SAT – the Schaefer-style
-  variants ([Schaefer 1978][schaefer1978complexity]) whose flip symmetry makes
-  them convenient reduction sources, and which reuse the SAT/3SAT
-  interpretations unchanged, only the notion of satisfaction differing – and
+  NAE-SAT with its width-three restriction NAE-3SAT, and 1-in-SAT – the
+  Schaefer-style variants ([Schaefer 1978][schaefer1978complexity]) that make
+  convenient reduction sources: the first two reuse the SAT/3SAT
+  interpretations unchanged, only the notion of satisfaction differing, and
+  the third normalizes every clause to three slots, so that one gadget covers
+  every width at once – and
   the clique family (Clique, Independent Set, Vertex Cover) with their
   inter-reductions and NP-completeness; the coloring family – `k`-colorability
   for every `k ≥ 3` by padding 3-colorability with blown-up universal
@@ -176,7 +178,9 @@ individual declarations are documented on their own pages.
   set family – Set Cover, Hitting Set and Set Packing on a bipartite
   incidence vocabulary, the first two transposes of
   each other, all three NP-hard by reading a graph as the incidence system of
-  its edges ([Karp 1972][karp1972reducibility]); Feedback Vertex Set and
+  its edges ([Karp 1972][karp1972reducibility]), and Exact Cover on that same
+  vocabulary, where exactness replaces the threshold and hardness comes from
+  exactly-one satisfiability with no gadget and no counting; Feedback Vertex Set and
   Feedback Arc Set, NP-hard by symmetrizing the arcs of a digraph and then
   splitting its vertices, with a first-order certificate of acyclicity (a
   guessed strict partial order) for their membership and a threshold carried

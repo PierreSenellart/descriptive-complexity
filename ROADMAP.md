@@ -185,65 +185,56 @@ proof plan for each problem still open.
   particular a satisfying one, so 3SAT's chain argument – isolated as
   `SatToThreeSat.exists_litTrue_of_map` – applies to it and, by the flip
   symmetry `NAEProper.not`, to its negation.
-- **1-in-3SAT** [M]: Schaefer's other local gadget, the natural source for
-  Exact Cover; still open.
-- **Max Cut** [M, *done*]: `Problems/MaxCut/`, `maxCut_NP_complete`. On
-  `Language.markedArcGraph` unchanged, reused from Feedback Arc Set: the
-  threshold is representation (A) at arity 2
-  (`nonempty_embedding_iff_ncard_le₂`), and the cut is read as the set of
-  *ordered* pairs `(u, v)` with `u` adjacent to `v`, `u` in `S` and `v`
-  outside (`CutRel`), which counts every cut edge of a symmetric relation once
-  and so needs no division by two. Membership guesses `S` and a quaternary
-  injection of the marked pairs into the cut; hardness is an ordered reduction
-  from NAE-3SAT. Four things worth remembering from it:
-  - **No edge weights, no multiplicities.** Max Cut is already hard on
-    unweighted simple graphs: the cut value splits into three families that
-    are separately maximal, so one edge per variable already forces the two
-    literal vertices apart. The textbook `n_x` parallel edges buy nothing.
-  - **Gadget overlap is the real obstacle**, not weights. Clause triangles on
-    literal vertices would be shared by two clauses over the same two
-    literals, and would reuse a variable edge for a clause containing `x` and
-    `¬x`. The fix: every *occurrence* gets its own vertex `occPt s c x`,
-    joined to its literal vertex by one edge, with the clause gadget on
-    occurrence vertices. The three edge families then sit on disjoint pairs of
-    tags, hence are edge-disjoint by construction. The occurrence vertex
-    carries the *negation* of its literal, which is harmless since
-    not-all-equal satisfaction is invariant under flipping a whole clause.
-  - **The width bound is load-bearing** and the reduction is gated on
-    `ThreeSatToSat.Wide`: the per-clause budget is `k − 1`, which bounds the
-    gadget's cut only because a clique on `k` vertices cuts `⌊k²/4⌋ > k − 1`
-    from `k = 4` on.
-  - **One map does all the counting.** `MaxCutRed.cutMap` charges each cut
-    edge to a threshold unit (a clause edge to whichever endpoint is not the
-    clause's last occurrence, ties broken towards the side the last occurrence
-    lies on). It is injective on the cut – that is exactly where the width
-    bound enters, two clause edges with the same charge exhibiting four
-    distinct occurrences – which gives `cut ≤ threshold`; and under a
-    not-all-equal assignment it is *onto* the marks, which gives the converse.
-    Equality then forces every gadget to be maximal, which reads back an
-    assignment. Clauses with at most one occurrence are excluded by a penalty
-    mark on an isolated vertex, never charged by anything.
+- **1-in-SAT** [M, *done*]: `Problems/OneInSat/`, `oneInSat_NP_complete`.
+  Exactly-one satisfiability, on the SAT vocabulary unchanged – a third notion
+  of satisfaction (`OneInProper`) rather than a new language. Membership
+  reuses `realize_satKernel` and adds uniqueness as *three* clauses, one per
+  sign pattern (positive/positive, negative/negative, and the mixed one simply
+  forbidden); splitting the sign cases at the formula level, instead of a
+  metalevel `if`, is what keeps the realization proof cheap – the `if` version
+  blew past the heartbeat limit.
 
-- **Subgraph Isomorphism** [S, *done*]: `Problems/SubgraphIso.lean`,
-  `subgraphIso_NP_complete`. Vocabulary `Language.twoGraphs`: two unary vertex
-  marks and two adjacency relations, i.e. two graphs side by side in one
-  universe – the shape Exact Cover and 3DM will want as well. The property is
-  an injective homomorphism of the pattern into the host (not an *induced*
-  subgraph), so Clique is the special case where the pattern is complete, and
-  that is exactly the reduction (`cliquePatternInterp`, tag `Bool`, dimension
-  1, quantifier-free): the pattern is the complete graph on the marked set, so
-  the threshold is consumed by the shape of the pattern and no counting
-  argument is needed at all. Membership guesses the map as one binary
-  relation.
-- **Hamiltonian Cycle (directed and undirected)** [L]: from VC or 3SAT;
-  the gadget chaining almost certainly needs the order (ordered
-  reduction, like SAT → 3COL). Prerequisite for TSP.
-- **TSP** [M after HC]: from Hamiltonian Cycle, with weights in
-  {1, 2} via representation (A); that variant is NP-hard and needs no
-  arithmetic.
-- **Longest Path / Longest Cycle** [S after HC].
-- **Exact Cover, X3C, 3-Dimensional Matching** [M–L]: from 3SAT; local
-  gadgets, probably ordered.
+  The unrestricted version is deliberate: Exact Cover reduces from it at any
+  clause width, so the width-three variant would be dead weight.
+
+  Hardness is an ordered reduction from 3SAT whose point is the **three-slot
+  normalization** (`Problems/OneInSat/Slots.lean`), which removes the width
+  case analysis the textbook gadget forces. Every clause gets slots
+  `sl₁, sl₂, sl₃` and, per slot, a link clause `{¬slᵢ} ∪ {the i-th occurrence,
+  if there is one}`: read as exactly-one clauses this says `slᵢ ↔ (i-th
+  literal)` when the occurrence exists and `slᵢ = false` when it does not,
+  *the same clause description in both cases*, one literal shorter. The gadget
+  proper is then always `1-in-3(¬sl₁, d, e)`, `1-in-3(sl₂, e, f)`,
+  `1-in-3(¬sl₃, f, g)`, satisfiable iff some slot is true, with explicit
+  witnesses `d = sl₁ ∧ sl₂`, `e = sl₁ ∧ ¬sl₂`, `f = ¬sl₁ ∧ ¬sl₂`,
+  `g = (sl₁ ∨ sl₂) ∧ sl₃`. Clauses of width 0, 1 and 2 need no special case.
+  Two engineering notes: with 14 tags, the defining formulas must *not* match
+  on tag pairs (that would be ~200 cases in every characterization lemma) –
+  `posPair`/`negPair` are `Bool`-valued functions instead, the characterization
+  lemmas then need no tag case analysis at all, and the tag combinatorics is
+  discharged later by `decide`; and the “exactly one true literal” obligations
+  are best discharged by explicit defeq terms rather than `simp`, which
+  requires making the helper's literal arguments explicit so that the slots
+  are not metavariables.
+- **Exact Cover** [M, *done*]: `ExactCover` and `exactCover_NP_complete`
+  (`Problems/ExactCover.lean`), on `Language.setSystem` unchanged. Exactness
+  is a new `…On` predicate, not a new vocabulary: `ExactlyCoversOn` is
+  covering *plus* the disjointness Set Packing already asks for
+  (`exactlyCoversOn_iff_unique` restates it as “exactly one covering set per
+  element”), and the marked set plays no role – exactness replaces the
+  threshold, so there is no injection to guess and the `Σ₁` kernel is three
+  existing clauses conjoined (`sfFamClause ⊓ sfCoverClause ⊓ sfDisjClause`).
+
+  Hardness is the cheapest reduction in the catalog: **no order, no gadget, no
+  counting**, dimension 1. The ground elements are the variables and the
+  clauses; the family has one set per literal `(x, s)`, namely `{x} ∪
+  {clauses where (x, s) occurs}`. Covering the element `x` exactly once picks
+  exactly one of the two literals of `x` – that *is* an assignment – and
+  covering a clause exactly once *is* exactly-one satisfaction. Nothing
+  depends on the clause width, which is why the source is unrestricted
+  1-in-SAT.
+- **X3C, 3-Dimensional Matching** [M–L]: from Exact Cover once it is hard;
+  local gadgets, probably ordered.
 - **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`
   (`Defs`, `Reductions`, `Membership`) plus the umbrella
   `Problems/Steiner.lean`, `steinerTree_NP_complete`. Vocabulary
@@ -632,8 +623,8 @@ separations and non-reducibility, impossible in the machine world.
 1. Cheap catalog wins: **done** (Set Cover / Hitting Set, Set Packing,
    k-COL, Chromatic Number, Clique Cover, Feedback Vertex Set, Feedback Arc
    Set, Subgraph Isomorphism, TAUT); next in the same
-   vein is the remaining width-3 Schaefer variant 1-in-3SAT [M] (NAE-SAT and
-   NAE-3SAT are done), worth having as a reduction *source* for Exact Cover;
+   vein: the Schaefer-style sources (NAE-SAT, NAE-3SAT, 1-in-SAT) are all
+   done, and with them Max Cut and Exact Cover;
    Max Cut is done too (§1), so the Schaefer-style sources have paid off.
    Dominating Set has been reclassified as an ordered reduction (see §1).
 1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
