@@ -19,7 +19,10 @@ and iso-invariance of the decoding.
 - **(A) Cardinalities of marked sets** (unary): threshold k = |K| for
   a unary predicate K; weight w(e) = |{x : W(e, x)}| for binary W.
   Order-free, iso-invariant for free, lives in the quantifier-free
-  fragment; the tagged framework does cardinality arithmetic natively
+  fragment; also available *at arity 2* – the threshold as the cardinality of
+  a marked binary relation, which is what objectives counting arcs need
+  (`nonempty_embedding_iff_ncard_le₂`, `Language.markedArcGraph`). The tagged
+  framework does cardinality arithmetic natively
   (disjoint union via tags adds, dimension multiplies, complement
   subtracts). Only for numbers that are honestly polynomial: unary
   SubsetSum-style problems are in P, hence not NP-hard under (A).
@@ -101,8 +104,10 @@ proof plan for each problem still open.
   guard is load-bearing – the junk pairs of the interpretation are incident
   to two vertex-sets each, and they are exactly the pairs that must not
   witness an intersection.
-- **Feedback Vertex Set** [M, *done*]: `Problems/FeedbackVertexSet.lean`,
-  `feedbackVertexSet_NP_complete`. On marked graphs, whose adjacency is an
+- **Feedback Vertex Set and Feedback Arc Set** [M, *done*]:
+  `Problems/Feedback/` (`Defs`, `Reductions`, `Membership`) plus the umbrella
+  `Problems/Feedback.lean`, `feedbackVertexSet_NP_complete` and
+  `feedbackArcSet_NP_complete`. On marked graphs, whose adjacency is an
   arbitrary binary relation, i.e. a digraph; acyclicity of what survives the
   removal is `Relation.TransGen`-irreflexivity (`AcyclicOff`). Hardness is
   Vertex Cover with the arcs *symmetrized off the diagonal*
@@ -112,8 +117,17 @@ proof plan for each problem still open.
   `acyclic_iff_exists_order`: acyclicity is equivalent to the existence of a
   strict partial order containing every surviving arc, which is the
   first-order certificate the `Σ₁` block guesses (together with the removed
-  set and the threshold injection). That certificate shape is the reusable
-  piece for Feedback Arc Set, Steiner Tree and the Hamilton problems.
+  set and the threshold injection). Feedback Arc Set follows by the classical
+  vertex splitting (`splitInterp`, tag `Bool`): each vertex becomes an in-copy
+  and an out-copy joined by an internal arc, cutting which is deleting the
+  vertex. Its vocabulary is `Language.markedArcGraph`, whose threshold is the
+  cardinality of a marked *binary* relation – representation (A) read at arity
+  2, the extension §0 needed for arc-counting objectives – so its `Σ₁`
+  definition guesses a 4-ary injection of pairs into pairs. Both directions of
+  the splitting correctness *build an order* from another one, so the
+  certificate form of acyclicity turns out to be the right tool for reductions
+  and not only for membership; Steiner Tree and the Hamilton problems should
+  reuse it.
 - **Dominating Set** [M–L, *harder than it looks*]: the classical
   reduction from VC by edge subdivision does not survive the tagged
   framework as an order-free reduction. Domination is a condition on
@@ -128,13 +142,9 @@ proof plan for each problem still open.
   into a clique), not as a quantifier-free one.
 - **NAE-3SAT and 1-in-3SAT** [M]: Schaefer-style variants; valuable as
   reduction *sources* (their gadgets are more local than 3SAT's).
-- **Max Cut** [M]: from NAE-3SAT; threshold via (A).
-- **Feedback Arc Set** [M]: from Feedback Vertex Set by the standard
-  vertex-splitting; it reuses `AcyclicOff`/`acyclic_iff_exists_order`, but
-  its threshold counts *arcs*, so it needs the threshold as the cardinality
-  of a marked **binary** relation – the one-arity-up version of
-  representation (A), also needed by Max Cut. Decide that before defining
-  either problem.
+- **Max Cut** [M]: from NAE-3SAT; threshold via (A) at arity 2, i.e. the
+  marked-binary-relation form introduced for Feedback Arc Set
+  (`nonempty_embedding_iff_ncard_le₂`).
 - **Subgraph Isomorphism** [S]: generalizes Clique; two-graphs-in-one
   vocabulary via `Language.markedGraph`-style unary marks.
 - **Hamiltonian Cycle (directed and undirected)** [L]: from VC or 3SAT;
@@ -512,12 +522,13 @@ separations and non-reducibility, impossible in the machine world.
 ## Suggested ordering (value vs. prerequisite chains)
 
 1. Cheap catalog wins: **done** (Set Cover / Hitting Set, Set Packing,
-   k-COL, Feedback Vertex Set, TAUT); next in the same vein are Subgraph
-   Isomorphism [S] and the Schaefer-style variants NAE-3SAT / 1-in-3SAT
-   [M], which are worth having as reduction *sources*, then the
-   binary-threshold extension of representation (A) that unblocks
-   Feedback Arc Set and Max Cut. Dominating Set has been reclassified as
-   an ordered reduction (see §1).
+   k-COL, Feedback Vertex Set, Feedback Arc Set, TAUT); next in the same
+   vein are Subgraph Isomorphism [S] and the Schaefer-style variants
+   NAE-3SAT / 1-in-3SAT [M], which are worth having as reduction *sources*
+   for Max Cut, and the
+   Schaefer-style variants as reduction sources for Max Cut, which the
+   binary-threshold extension of representation (A) (done, §0) now unblocks.
+   Dominating Set has been reclassified as an ordered reduction (see §1).
 1bis. Machine bridge (bounded NTM acceptance NP-complete, §4): high
    foundational value; schedule early.
 2. SO-Horn path to an axiom-free PTIME: **done** – the class, its

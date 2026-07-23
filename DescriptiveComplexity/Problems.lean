@@ -13,7 +13,7 @@ import DescriptiveComplexity.Problems.KColorability
 import DescriptiveComplexity.Problems.ThreeSat
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SetFamily
-import DescriptiveComplexity.Problems.FeedbackVertexSet
+import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.Qbf
 
 /-!
