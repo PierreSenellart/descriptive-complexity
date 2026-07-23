@@ -194,7 +194,7 @@ proof plan for each problem still open.
 - **Longest Path / Longest Cycle** [S after HC].
 - **Exact Cover, X3C, 3-Dimensional Matching** [M–L]: from 3SAT; local
   gadgets, probably ordered.
-- **Steiner Tree** [M, *node-weighted variant done*]: `Problems/Steiner/`
+- **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`
   (`Defs`, `Reductions`, `Membership`) plus the umbrella
   `Problems/Steiner.lean`, `steinerTree_NP_complete`. Vocabulary
   `Language.steinerGraph`: adjacency plus two unary marks, the terminals and
@@ -203,11 +203,18 @@ proof plan for each problem still open.
   non-terminals – hard from Vertex Cover by an ordered reduction (tag
   `SteinerTag`, dimension 2): edges become the terminals, vertices the
   available Steiner points, and the minimum of a spare copy the root joining
-  them. Karp's edge-weighted version is the remaining gap: it needs "a
-  connected graph has at least `n − 1` edges", which Mathlib provides only for
-  trees on a whole vertex type. Reusable output: the connectivity certificate
-  (`connectedOn_iff_exists_root`) and the bounded-reachability staging
-  `reachIn`, both stated for an arbitrary relation.
+  them. Karp's **edge-weighted** reading is `EdgeSteinerTree`
+  (`edgeSteinerTree_NP_complete`), on the same vocabulary – a threshold is a
+  number, so it may bound a count of *pairs*
+  (`nonempty_embedding_iff_ncard_le'`) – with the budget enlarged by one unit
+  per edge point, marked by marking the edge points themselves so that no
+  arithmetic enters the formulas. Its key ingredient is the `n − 1` edge bound
+  `ncard_le_ncard_of_connected`, which follows from the certificate rather
+  than from a spanning tree: each non-root member has a parent edge, and two
+  members sharing an edge would be each other's parent, hence strictly below
+  each other. Reusable output: the connectivity certificate
+  (`connectedOn_iff_exists_root`), the bounded-reachability staging `reachIn`,
+  and that edge bound, all stated for an arbitrary relation.
 - **SubsetSum / Partition / Knapsack** [M]: representation (C), with a
   shared “weighted items” vocabulary (unary Item/Pos marks, order on
   positions, binary Bit) carrying a well-formedness predicate and a
