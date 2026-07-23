@@ -131,6 +131,21 @@ theorem nonempty_embedding_iff_ncard_le {A : Type} [Finite A] (P Q : A → Prop)
   rw [hP, hQ, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
   exact Function.Embedding.nonempty_iff_card_le
 
+/-- **Comparing decoded numbers across universes**: the same bridge as
+`DescriptiveComplexity.nonempty_embedding_iff_ncard_le`, when the two marked sets live
+on different types. This is what a threshold comparing a count of *pairs* with
+a count of *elements* needs. -/
+theorem nonempty_embedding_iff_ncard_le' {α β : Type} [Finite α] [Finite β]
+    (P : α → Prop) (Q : β → Prop) :
+    Nonempty ({x // P x} ↪ {y // Q y}) ↔ {x | P x}.ncard ≤ {y | Q y}.ncard := by
+  classical
+  have : Fintype α := Fintype.ofFinite α
+  have : Fintype β := Fintype.ofFinite β
+  have hP : {x | P x}.ncard = Nat.card {x // P x} := (Nat.card_coe_set_eq _).symm
+  have hQ : {y | Q y}.ncard = Nat.card {y // Q y} := (Nat.card_coe_set_eq _).symm
+  rw [hP, hQ, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+  exact Function.Embedding.nonempty_iff_card_le
+
 /-! ### Thresholds on pairs
 
 Problems whose objective counts *arcs* rather than vertices – Feedback Arc Set,
