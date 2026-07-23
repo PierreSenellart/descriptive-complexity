@@ -83,15 +83,6 @@ section Builders
 
 variable {α : Type}
 
-/-- Some clause has at least four distinct literal occurrences, as a formula
-over the ordered expansion: the same check as `ThreeSatToSat.wideS`, whose
-negation gates the whole gadget. -/
-noncomputable def wideF : satOrd.Formula α :=
-  (Formula.iSup fun s : Fin 4 → Bool =>
-      (Formula.iInf fun i : Fin 4 => occF (s i) (Sum.inr 0) (Sum.inr i.succ)) ⊓
-      Formula.iInf fun p : {p : Fin 4 × Fin 4 // p.1 ≠ p.2 ∧ s p.1 = s p.2} =>
-        ∼(eqF (Sum.inr (p.1.1.succ : Fin 5)) (Sum.inr p.1.2.succ))).iExs (Fin 5)
-
 /-- No occurrence of `c` is a non-first one, as a formula: this says exactly
 that the clause `c` has at most one occurrence. -/
 noncomputable def noChainedF (c : α) : satOrd.Formula α :=
@@ -103,18 +94,6 @@ end Builders
 section Realize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
-
-@[simp]
-theorem realize_wideF : (wideF (α := α)).Realize v ↔ ThreeSatToSat.Wide A := by
-  simp only [wideF, Formula.realize_iExs, Formula.realize_iSup, Formula.realize_inf,
-    Formula.realize_iInf, Formula.realize_not, realize_occF, realize_eqF, Sum.elim_inr]
-  constructor
-  · rintro ⟨e, s, hocc, hdist⟩
-    exact ⟨e 0, fun i => e i.succ, s, hocc, fun i j hij hs => hdist ⟨(i, j), hij, hs⟩⟩
-  · rintro ⟨c, x, s, hocc, hdist⟩
-    refine ⟨Fin.cases c x, s, fun i => ?_, fun p => ?_⟩
-    · simpa using hocc i
-    · simpa using hdist p.1.1 p.1.2 p.2.1 p.2.2
 
 @[simp]
 theorem realize_noChainedF {c : α} :
@@ -167,7 +146,7 @@ gadget graph, with every edge gated on the width check. -/
 noncomputable def mcInterp : FOInterpretation satOrd Language.markedArcGraph MCTag 2 where
   relFormula {n} R :=
     match n, R with
-    | _, .adj => fun t => adjF (t 0) (t 1) ⊓ ∼wideF
+    | _, .adj => fun t => adjF (t 0) (t 1) ⊓ ∼ThreeSatToSat.wideOrdF
     | _, .markedArc => fun t => markF (t 0) (t 1)
 
 /-! ### The vertices -/

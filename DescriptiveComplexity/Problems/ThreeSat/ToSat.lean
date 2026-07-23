@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.ThreeSat.Defs
+import DescriptiveComplexity.OccurrenceFormulas
 
 /-!
 # 3SAT FO-reduces to SAT
@@ -135,6 +136,40 @@ theorem realize_wideS {w : Empty → A} : Formula.Realize wideS w ↔ Wide A := 
     refine ⟨Fin.cases c x, s, fun i => ?_, fun p => ?_⟩
     · simpa using hocc i
     · simpa using hdist p.1.1 p.1.2 p.2.1 p.2.2
+
+/-! ### The same check over the ordered expansion
+
+The reductions that build gadgets over `SatOcc.satOrd` (Max Cut, 1-in-SAT)
+gate themselves on the width check too, and need it as a formula of the
+ordered vocabulary. -/
+
+section Ordered
+
+variable {α : Type}
+
+/-- Some clause has at least four distinct literal occurrences, as a formula
+over the ordered expansion: `wideS` read there. -/
+noncomputable def wideOrdF : SatOcc.satOrd.Formula α :=
+  (Formula.iSup fun s : Fin 4 → Bool =>
+      (Formula.iInf fun i : Fin 4 => SatOcc.occF (s i) (Sum.inr 0) (Sum.inr i.succ)) ⊓
+      Formula.iInf fun p : {p : Fin 4 × Fin 4 // p.1 ≠ p.2 ∧ s p.1 = s p.2} =>
+        ∼(SatOcc.eqF (Sum.inr (p.1.1.succ : Fin 5)) (Sum.inr p.1.2.succ))).iExs (Fin 5)
+
+@[simp]
+theorem realize_wideOrdF {A : Type} [Language.sat.Structure A] [LinearOrder A]
+    {v : α → A} : (wideOrdF (α := α)).Realize v ↔ Wide A := by
+  simp only [wideOrdF, Formula.realize_iExs, Formula.realize_iSup, Formula.realize_inf,
+    Formula.realize_iInf, Formula.realize_not, SatOcc.realize_occF, SatOcc.realize_eqF,
+    Sum.elim_inr]
+  constructor
+  · rintro ⟨e, s, hocc, hdist⟩
+    exact ⟨e 0, fun i => e i.succ, s, hocc, fun i j hij hs => hdist ⟨(i, j), hij, hs⟩⟩
+  · rintro ⟨c, x, s, hocc, hdist⟩
+    refine ⟨Fin.cases c x, s, fun i => ?_, fun p => ?_⟩
+    · simpa using hocc i
+    · simpa using hdist p.1.1 p.1.2 p.2.1 p.2.2
+
+end Ordered
 
 end Semantics
 
