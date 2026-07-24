@@ -109,6 +109,12 @@ private theorem tagTupleLe_iff (p q : Tag × (Fin d → A)) :
 noncomputable def tagTupleOrder : LinearOrder (Tag × (Fin d → A)) :=
   LinearOrder.lift' lexEmbed lexEmbed_injective
 
+/-- The relation `tagTupleLe` is the `≤` of `tagTupleOrder`. (Public companion
+to the private `tagTupleLe_iff`, for use in relativized composition.) -/
+theorem tagTupleLe_iff_le (p q : Tag × (Fin d → A)) :
+    tagTupleLe p q ↔ (tagTupleOrder : LinearOrder (Tag × (Fin d → A))).le p q :=
+  tagTupleLe_iff p q
+
 end LexOrder
 
 /-! ### First-order formulas for the lexicographic order -/

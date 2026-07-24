@@ -7,6 +7,7 @@ import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.SecondOrderOrdered
 import DescriptiveComplexity.SecondOrderHornPull
+import DescriptiveComplexity.RelComposition
 
 /-!
 # The polynomial hierarchy, defined by second-order alternation
@@ -116,8 +117,8 @@ reductions out of arbitrary vocabularies. -/
 def CofinalHard (Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) : Prop :=
   ∀ {L' : Language.{0, 0}} [L'.IsRelational] (S : DecisionProblem L'),
-    Nonempty (P ≤ᶠᵒ[≤] S) →
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''), Mem Q → Nonempty (Q ≤ᶠᵒ[≤] S)
+    Nonempty (P ≤ʳᶠᵒ[≤] S) →
+      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''), Mem Q → Nonempty (Q ≤ʳᶠᵒ[≤] S)
 
 theorem CofinalHard.of_foReduction
     {Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop}
@@ -125,13 +126,21 @@ theorem CofinalHard.of_foReduction
     {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
     (f : P ≤ᶠᵒ Q) (hP : CofinalHard Mem P) : CofinalHard Mem Q := by
   intro L' _ S hQS L'' R hR
-  exact hP S (hQS.map fun g => f.trans_ordered g) R hR
+  exact hP S (hQS.map fun g => f.toOrdered.toRel.trans g) R hR
 
 theorem CofinalHard.of_orderedReduction
     {Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop}
     {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
     {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
     (f : P ≤ᶠᵒ[≤] Q) (hP : CofinalHard Mem P) : CofinalHard Mem Q := by
+  intro L' _ S hQS L'' R hR
+  exact hP S (hQS.map fun g => f.toRel.trans g) R hR
+
+theorem CofinalHard.of_relOrderedReduction
+    {Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop}
+    {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+    {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
+    (f : P ≤ʳᶠᵒ[≤] Q) (hP : CofinalHard Mem P) : CofinalHard Mem Q := by
   intro L' _ S hQS L'' R hR
   exact hP S (hQS.map fun g => f.trans g) R hR
 
@@ -157,10 +166,10 @@ theorem cofinalHard_iff [L.IsRelational]
     (Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop) (P : DecisionProblem L) :
     CofinalHard Mem P ↔
       ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
-        Mem Q → Nonempty (Q ≤ᶠᵒ[≤] P) := by
+        Mem Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) := by
   constructor
   · intro h L'' Q hQ
-    exact h P ⟨(FOReduction.refl P).toOrdered⟩ Q hQ
+    exact h P ⟨(FOReduction.refl P).toOrdered.toRel⟩ Q hQ
   · intro h L' _ S hS L'' Q hQ
     exact ⟨(h Q hQ).some.trans hS.some⟩
 
@@ -176,6 +185,7 @@ noncomputable def ComplexityClass.compl (C : ComplexityClass) : ComplexityClass 
   hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
   mem_of_orderedReduction f h := C.mem_of_orderedReduction f.compl h
   hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
+  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
   mem_congr_finite h := C.mem_congr_finite fun A _ _ => not_congr (h A)
   hard_congr_finite h :=
     ⟨fun hP => CofinalHard.congr h hP,
@@ -197,6 +207,7 @@ noncomputable def sigmaLevel (k : ℕ) : ComplexityClass where
   hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
   mem_of_orderedReduction f h := h.of_orderedReduction f
   hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
+  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
   mem_congr_finite h := sigmaSODefinable_congr h _
   hard_congr_finite h :=
     ⟨fun hP => CofinalHard.congr h hP,
@@ -211,6 +222,7 @@ noncomputable def piLevel (k : ℕ) : ComplexityClass where
   hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
   mem_of_orderedReduction f h := h.of_orderedReduction f
   hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
+  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
   mem_congr_finite h := piSODefinable_congr h _
   hard_congr_finite h :=
     ⟨fun hP => CofinalHard.congr h hP,
@@ -237,6 +249,7 @@ noncomputable def PTIME : ComplexityClass where
   hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
   mem_of_orderedReduction f h := h.of_orderedReduction f
   hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
+  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
   mem_congr_finite h := sigmaSOHornDefinable_congr h
   hard_congr_finite h :=
     ⟨fun hP => CofinalHard.congr h hP,
@@ -307,6 +320,7 @@ noncomputable def PH : ComplexityClass where
   hard_of_foReduction h hP k := (SigmaP k).hard_of_foReduction h (hP k)
   mem_of_orderedReduction h := fun ⟨k, hk⟩ => ⟨k, (SigmaP k).mem_of_orderedReduction h hk⟩
   hard_of_orderedReduction h hP k := (SigmaP k).hard_of_orderedReduction h (hP k)
+  hard_of_relOrderedReduction h hP k := (SigmaP k).hard_of_relOrderedReduction h (hP k)
   mem_congr_finite h := exists_congr fun k => (SigmaP k).mem_congr_finite h
   hard_congr_finite h := forall_congr' fun k => (SigmaP k).hard_congr_finite h
 
@@ -331,7 +345,7 @@ notion: every `Σₖ₊₁`-definable problem reduces to `P`. -/
 theorem hard_sigmaP_succ_iff [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
     (SigmaP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
-        SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] P) :=
+        SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
 /-- Over a relational vocabulary, cofinal `Πₖ₊₁ᵖ`-hardness is the usual
@@ -339,7 +353,7 @@ notion: every `Πₖ₊₁`-definable problem reduces to `P`. -/
 theorem hard_piP_succ_iff [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
     (PiP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
-        PiSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] P) :=
+        PiSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
 /-- Over a relational vocabulary, cofinal PTIME-hardness is the usual notion:
@@ -347,7 +361,7 @@ every SO-Horn definable problem reduces to `P`. -/
 theorem hard_PTIME_iff [L.IsRelational] (P : DecisionProblem L) :
     PTIME.Hard P ↔
       ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
-        SigmaSOHornDefinable Q → Nonempty (Q ≤ᶠᵒ[≤] P) :=
+        SigmaSOHornDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
 end DescriptiveComplexity

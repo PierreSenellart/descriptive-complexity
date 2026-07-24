@@ -92,7 +92,7 @@ second-order relations and evaluate the matrix first-order. Hardness is
 theorem QBF_complete (k : ℕ) : (SigmaP (k + 1)).Complete (QBF (k + 1)) :=
   ⟨qbf_mem_sigmaP k,
     (hard_sigmaP_succ_iff k (QBF (k + 1))).mpr fun Q hQ =>
-      qbf_hard_of_sigmaSODefinable k Q hQ⟩
+      (qbf_hard_of_sigmaSODefinable k Q hQ).map OrderedFOReduction.toRel⟩
 
 /-- QBF is `Σₖ₊₁ᵖ`-hard. -/
 theorem qbf_hard (k : ℕ) : (SigmaP (k + 1)).Hard (QBF (k + 1)) :=
@@ -106,7 +106,7 @@ the other starting polarity. -/
 theorem QBFPi_complete (k : ℕ) : (PiP (k + 1)).Complete (QBFPi (k + 1)) :=
   ⟨qbfPi_mem_piP k,
     (hard_piP_succ_iff k (QBFPi (k + 1))).mpr fun Q hQ =>
-      qbfPi_hard_of_piSODefinable k Q hQ⟩
+      (qbfPi_hard_of_piSODefinable k Q hQ).map OrderedFOReduction.toRel⟩
 
 /-- `QBFPi` is `Πₖ₊₁ᵖ`-hard. -/
 theorem qbfPi_hard (k : ℕ) : (PiP (k + 1)).Hard (QBFPi (k + 1)) :=

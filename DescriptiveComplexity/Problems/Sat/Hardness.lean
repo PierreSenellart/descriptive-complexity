@@ -354,7 +354,8 @@ theorem sat_hard_of_sigmaSODefinable :
 `DescriptiveComplexity.sat_hard_of_sigmaSODefinable`, the generic Tseitin reduction. -/
 theorem SAT_NP_complete : NP.Complete SAT :=
   ⟨sat_sigmaSODefinable,
-    (hard_sigmaP_succ_iff 0 SAT).mpr fun Q hQ => sat_hard_of_sigmaSODefinable Q hQ⟩
+    (hard_sigmaP_succ_iff 0 SAT).mpr fun Q hQ =>
+      (sat_hard_of_sigmaSODefinable Q hQ).map OrderedFOReduction.toRel⟩
 
 /-- SAT is in NP. -/
 theorem sat_mem_NP : SAT ∈ NP :=

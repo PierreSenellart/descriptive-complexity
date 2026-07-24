@@ -265,7 +265,8 @@ theorem read through the complement, with no second-order argument of their
 own. -/
 theorem TAUT_coNP_complete : coNP.Complete TAUT :=
   ⟨taut_mem_coNP,
-    (hard_piP_succ_iff 0 TAUT).mpr fun Q hQ => taut_hard_of_piSODefinable Q hQ⟩
+    (hard_piP_succ_iff 0 TAUT).mpr fun Q hQ =>
+      (taut_hard_of_piSODefinable Q hQ).map OrderedFOReduction.toRel⟩
 
 /-- TAUT is coNP-hard. -/
 theorem taut_coNP_hard : coNP.Hard TAUT :=

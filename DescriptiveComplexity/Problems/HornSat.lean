@@ -76,7 +76,8 @@ namespace DescriptiveComplexity
 /-- **HORN-SAT is PTIME-hard**, machine-free: every SO-Horn definable problem
 admits an ordered first-order reduction to it. -/
 theorem hornSat_PTIME_hard : PTIME.Hard HORNSAT :=
-  (hard_PTIME_iff HORNSAT).mpr fun Q hQ => hornSat_hard_of_sigmaSOHornDefinable Q hQ
+  (hard_PTIME_iff HORNSAT).mpr fun Q hQ =>
+    (hornSat_hard_of_sigmaSOHornDefinable Q hQ).map OrderedFOReduction.toRel
 
 /-- **HORN-SAT is PTIME-complete.** Membership is
 `DescriptiveComplexity.hornSat_mem_PTIME` – the Horn program that computes unit

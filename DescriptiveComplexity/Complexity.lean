@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Relativized
 
 /-!
 # Abstract complexity classes, the polynomial hierarchy, and NP-completeness
@@ -62,6 +62,10 @@ structure ComplexityClass where
   /-- Hardness travels forward along ordered FO reductions. -/
   hard_of_orderedReduction : ∀ {L L' : Language.{0, 0}} [L'.IsRelational]
     {P : DecisionProblem L} {Q : DecisionProblem L'}, (P ≤ᶠᵒ[≤] Q) → Hard P → Hard Q
+  /-- Hardness travels forward along relativized ordered FO reductions – the
+  reductions with a definable target universe, needed for spanning problems. -/
+  hard_of_relOrderedReduction : ∀ {L L' : Language.{0, 0}} [L'.IsRelational]
+    {P : DecisionProblem L} {Q : DecisionProblem L'}, (P ≤ʳᶠᵒ[≤] Q) → Hard P → Hard Q
   /-- Complexity classes speak about *finite* instances only: membership does
   not depend on the behavior of a problem on infinite structures. -/
   mem_congr_finite : ∀ {L : Language.{0, 0}} {P Q : DecisionProblem L},
@@ -83,8 +87,8 @@ theorem ext {C₁ C₂ : ComplexityClass}
     (hMem : ∀ {L : Language.{0, 0}} (P : DecisionProblem L), C₁.Mem P ↔ C₂.Mem P)
     (hHard : ∀ {L : Language.{0, 0}} (P : DecisionProblem L), C₁.Hard P ↔ C₂.Hard P) :
     C₁ = C₂ := by
-  obtain ⟨M₁, H₁, _, _, _, _, _, _⟩ := C₁
-  obtain ⟨M₂, H₂, _, _, _, _, _, _⟩ := C₂
+  obtain ⟨M₁, H₁, _, _, _, _, _, _, _⟩ := C₁
+  obtain ⟨M₂, H₂, _, _, _, _, _, _, _⟩ := C₂
   have hM : @M₁ = @M₂ := by
     funext L P
     exact propext (hMem P)
@@ -105,6 +109,7 @@ def empty : ComplexityClass where
   hard_of_foReduction _ _ := trivial
   mem_of_orderedReduction _ h := h
   hard_of_orderedReduction _ _ := trivial
+  hard_of_relOrderedReduction _ _ := trivial
   mem_congr_finite _ := Iff.rfl
   hard_congr_finite _ := Iff.rfl
 
