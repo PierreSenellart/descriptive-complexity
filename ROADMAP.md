@@ -458,8 +458,9 @@ proof plan for each problem still open.
     to balance a digit. The bijection between the two is local to each clause
     (identity, except that the first occurrence is sent to the one the clause
     gadget consumes), so the reduction never counts.
-- **Hamilton Circuits** (#9, #10), *both in NP; hardness open* **[L]**
-  (`Problems/Hamilton/`, `dirHamCircuit_mem_NP`, `hamCircuit_mem_NP`):
+- **Hamilton Circuits** (#9, #10) [L, *both done* –
+  `hamCircuit_NP_complete`, `dirHamCircuit_NP_complete`, closing Karp's 21]
+  (`Problems/Hamilton/`):
   vocabulary `Language.digraph`, a single binary relation, read as it stands
   by DIRECTED HAMILTON CIRCUIT and *symmetrically* (`DGEdge`) by HAMILTON
   CIRCUIT – the honest reading of an undirected graph presented by a possibly
@@ -471,10 +472,8 @@ proof plan for each problem still open.
   axioms plus “is the immediate successor” plus the two adjacency demands, all
   first-order. The undirected problem reduces to the directed one by doubling
   each edge (`hamCircuit_fo_reduction_dirHamCircuit`, dimension one, one tag),
-  so **hardness only has to be proved on the undirected side**, from Vertex
-  Cover with the 12-vertex cover-testing gadget, or on the directed side (the
-  4-vertex gadget) together with the 3-vertices-per-vertex reduction back to
-  the undirected problem. Of the two pieces that needs, the first is **done**:
+  so hardness was proved once, on the undirected side, from Vertex Cover with
+  Karp's 12-vertex cover-testing gadget. The pieces:
   - the **tour/enumeration bridge**, `tourOn_iff_enum` (`Hamilton/Cycle.lean`):
     `TourOn R ↔ ∃ n (f : Fin n ≃ A), ∀ i, R (f i) (f (nextIdx i))`. A gadget
     builds its circuit as an explicit enumeration and consumes `←`; it reads a
@@ -483,15 +482,22 @@ proof plan for each problem still open.
     `Numbers/BinRel.lean`) and sorts the universe with Mathlib's
     `monoEquivOfFin`. It is also what makes the definition honest: reading a
     circuit as a linear order *is* reading it as a cyclic enumeration;
-  - what is left is the **walk along the incidence list** of a vertex, plus
-    the gadget itself: entering a vertex's chain of edge gadgets happens only
-    at its first edge, so the cover is read off the selectors by induction
-    along the neighbour order – the same shape as
-    `OccurrenceOrder`/`OccurrenceVar`, one index further out. The local half
-    of the analysis is cheap (a gadget node has at most two possible
-    predecessors, and one whose two are used elsewhere cannot be reached); it
-    is that induction, and the explicit enumeration of the tour in the other
-    direction, that carry the weight.
+  - the **gadget interpretation** (`Hamilton/Gadget.lean`, `hamInterp`): the
+    first reduction of the catalog whose target is a *spanning* problem, so
+    the interpretation carries a **domain formula**
+    (`RelFOInterpretation`, `Relativized.lean`) cutting the output universe
+    down to the twelve vertices per edge, one selector per marked vertex, and
+    a degenerate-case hub; its adjacency is characterized once (`dgEdge_iff`);
+  - the **forward direction** (`Hamilton/Forward.lean`): a cover threads the
+    selectors with the covering vertices' chains into one explicit block
+    cycle;
+  - the **reverse direction** (`Hamilton/Reverse.lean`): local analysis
+    (degree-two vertices force their edges; each edge has a *straight* side,
+    never both crossed), then straightness propagated along the owner's
+    neighbour list by two well-founded inductions – down to the chain
+    entrance, up to the exit – putting a selector at both ends, and a
+    counting injection from the active chains' endpoints into the selector
+    slots (`active_ncard_le`), so the active set is a small cover.
 - **X3C** [M–L]: from 3-Dimensional Matching, now that it is hard, or from
   Exact Cover; local gadgets, probably ordered.
 - **Steiner Tree** [M, *both variants done*]: `Problems/Steiner/`
@@ -529,7 +535,7 @@ proof plan for each problem still open.
   FO-expressibility carefully before committing.
 - **Milestone: Karp's 21** – a recognizable public target for catalog
   completeness (cf. the Isabelle/AFP efforts around Karp's problems);
-  the list above covers most of it.
+  **reached 2026-07-25**, with the Hamilton circuits the last to land.
 
 ## 2. Complete problems for other classes
 

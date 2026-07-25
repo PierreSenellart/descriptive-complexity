@@ -55,8 +55,9 @@ The library is organized in three layers:
   `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
   for the `k`-th level of the polynomial hierarchy – and HORN-SAT, complete for
   PTIME by the analogous machine-free discharge one level down; plus the two
-  Hamilton circuit problems, directed and undirected, so far only shown to be
-  in NP – a circuit being read as a linear order of the universe – and a
+  Hamilton circuit problems, directed and undirected – a circuit being read as
+  a linear order of the universe, and hardness by Karp's twelve-vertex
+  cover-testing gadget, completing **all of Karp's 21 problems** – and a
   tutorial on conjunctive queries. Each comes with its vocabulary, FO reductions and
   completeness theorems.
 

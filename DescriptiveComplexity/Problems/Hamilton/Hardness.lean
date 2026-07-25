@@ -7,8 +7,6 @@ import DescriptiveComplexity.Problems.Hamilton.Gadget
 import DescriptiveComplexity.Problems.Hamilton.Cycle
 import DescriptiveComplexity.Problems.Hamilton.Forward
 import DescriptiveComplexity.Problems.Hamilton.Reverse
-import DescriptiveComplexity.Problems.Hamilton.Reductions
-import DescriptiveComplexity.Problems.Hamilton.Membership
 import DescriptiveComplexity.Problems.CliqueFamily
 import Mathlib.Data.Fintype.Lattice
 
@@ -17,9 +15,10 @@ import Mathlib.Data.Fintype.Lattice
 
 Assembles the relativized ordered first-order reduction
 `DescriptiveComplexity.vertexCover_rel_ordered_fo_reduction_hamCircuit` out of the
-gadget interpretation `DescriptiveComplexity.hamInterp` of `Gadget`, and derives the
-NP-hardness of HAMILTON CIRCUIT (hence, through the existing reduction to the
-directed problem, of DIRECTED HAMILTON CIRCUIT).
+gadget interpretation `DescriptiveComplexity.hamInterp` of `Gadget`, from which the
+umbrella `DescriptiveComplexity.Problems.Hamilton` derives the NP-hardness of
+HAMILTON CIRCUIT (hence, through the existing reduction to the directed
+problem, of DIRECTED HAMILTON CIRCUIT).
 
 The interpretation carries a **domain formula** (it is a
 `DescriptiveComplexity.RelFOInterpretation`), so it is the first reduction of the catalog
@@ -31,7 +30,7 @@ yields the hub.
 
 The correctness of the interpretation
 (`DescriptiveComplexity.hasSmallVertexCover_iff_hamCircuit_mapRel`) splits into the two
-classical directions, in `Forward` and `Reverse` (to be linked here).
+classical directions, proved in `Forward` and `Reverse` and linked here.
 -/
 
 namespace DescriptiveComplexity
@@ -142,23 +141,5 @@ noncomputable def vertexCover_rel_ordered_fo_reduction_hamCircuit :
   toRelInterpretation := hamInterp
   dom_nonempty := fun A => hamInterp_dom_nonempty A
   correct := fun A _ _ _ _ => hasSmallVertexCover_iff_hamCircuit_mapRel A
-
-/-- **Hamilton Circuit is NP-hard**: Vertex Cover, which is NP-hard, relativized
--ordered-FO-reduces to it. -/
-theorem hamCircuit_NP_hard : NP.Hard HamCircuit :=
-  NP.hard_of_relOrderedReduction vertexCover_rel_ordered_fo_reduction_hamCircuit vertexCover_NP_hard
-
-/-- **Directed Hamilton Circuit is NP-hard**: the undirected problem, now
-NP-hard, FO-reduces to it by doubling each edge. -/
-theorem dirHamCircuit_NP_hard : NP.Hard DirHamCircuit :=
-  NP.hard_of_foReduction hamCircuit_fo_reduction_dirHamCircuit hamCircuit_NP_hard
-
-/-- **Hamilton Circuit is NP-complete.** -/
-theorem hamCircuit_NP_complete : NP.Complete HamCircuit :=
-  ⟨hamCircuit_sigmaSODefinable, hamCircuit_NP_hard⟩
-
-/-- **Directed Hamilton Circuit is NP-complete** – closing Karp's 21. -/
-theorem dirHamCircuit_NP_complete : NP.Complete DirHamCircuit :=
-  ⟨dirHamCircuit_sigmaSODefinable, dirHamCircuit_NP_hard⟩
 
 end DescriptiveComplexity

@@ -8,14 +8,14 @@ import DescriptiveComplexity.Problems.Hamilton.Cycle
 import Mathlib.Logic.Equiv.Fin.Rotate
 
 /-!
-# Vertex Cover from a Hamilton circuit: foundations (work in progress)
+# Vertex Cover from a Hamilton circuit
 
 The reverse direction of the reduction reads a vertex cover off a Hamilton
 circuit of the gadget graph. Its foundation is a precise characterization of the
 neighbours of each gadget vertex (`DescriptiveComplexity.dgEdge_iff` /
 `DescriptiveComplexity.IAdjRaw`).
 
-## Plan
+## Structure
 
 1. **Neighbour sets.** For each gadget vertex, the exact set of its
    `DescriptiveComplexity.DGEdge`-neighbours (by cases on the other vertex's tag, via
@@ -23,17 +23,25 @@ neighbours of each gadget vertex (`DescriptiveComplexity.dgEdge_iff` /
    exactly two neighbours, `⟨g0/g2⟩` and `⟨g3/g5⟩` respectively.
 2. **Forced edges.** In a Hamilton circuit each vertex has exactly two
    tour-neighbours, both adjacent to it. So a degree-two vertex uses *both* its
-   edges, forcing the paths `g0-g1-g2` and `g3-g4-g5` in every gadget.
+   edges, forcing the paths `g0-g1-g2` and `g3-g4-g5` in every gadget
+   (`DescriptiveComplexity.forced_g1`, `DescriptiveComplexity.forced_g4`).
 3. **The three traversals.** Propagating through `g2`, `g3` (degree three) shows
    each gadget is traversed through the `u`-side, the `v`-side, or both – never
-   neither (which would isolate it as two 6-cycles).
-4. **The cover.** `C := {a | a's chain is active}`; every edge is covered
-   (never-neither), and `|C| ≤ |marked|` via the cyclic-predecessor injection
-   into the selectors.
+   neither (which would isolate it as two 6-cycles): every edge has a *straight*
+   side (`DescriptiveComplexity.side_straight`).
+4. **Chain propagation.** A straight side `(b,a)` frees the entrance and exit
+   slots of the opposite side `(a,b)` from the cross edges
+   (`DescriptiveComplexity.g0_other`/`g5_other`); the freed slot is a selector at the
+   ends of `a`'s chain, or a chain-link that straightens the walked side in turn
+   (`DescriptiveComplexity.straight_of_chain_down`/`up`). Well-founded induction along
+   `a`'s neighbour list puts a selector at both chain ends: `a` is *active*
+   (`DescriptiveComplexity.active_of_straight`).
+5. **The cover.** `C := {a | Active f a}` covers every edge
+   (`DescriptiveComplexity.cover_property`), and `|C| ≤ |marked|` by the
+   selector-slot injection (`DescriptiveComplexity.active_ncard_le`).
 
 `DescriptiveComplexity.eq_gPt_of_val` below reconstructs a vertex from its tag and
-coordinates (sidestepping a `simp`/subtype mismatch), the workhorse of step 1;
-`DescriptiveComplexity.nbrs_gPt_g1` and `nbrs_gPt_g4` are the first two neighbour sets.
+coordinates (sidestepping a `simp`/subtype mismatch), the workhorse of step 1.
 -/
 
 namespace DescriptiveComplexity
@@ -157,6 +165,22 @@ theorem tourSucc_mem_of_tadj {f : Fin N ≃ H} {x p q : H}
   · rcases tadj_eq hq with hq' | hq'
     · exact Or.inr hq'.symm
     · exact absurd (hp'.trans hq'.symm) hpq
+
+/-- **A vertex has only two tour-neighbours**: once two distinct ones are known,
+every tour-neighbour is one of them. -/
+theorem tadj_two {f : Fin N ≃ H} {x p q y : H} (hp : TAdj f x p) (hq : TAdj f x q)
+    (hpq : p ≠ q) (hy : TAdj f x y) : y = p ∨ y = q := by
+  rcases tadj_eq hy with hy' | hy'
+  · rcases tadj_eq hp with hp' | hp'
+    · exact Or.inl (hy'.trans hp'.symm)
+    · rcases tadj_eq hq with hq' | hq'
+      · exact Or.inr (hy'.trans hq'.symm)
+      · exact absurd (hp'.trans hq'.symm) hpq
+  · rcases tadj_eq hp with hp' | hp'
+    · rcases tadj_eq hq with hq' | hq'
+      · exact absurd (hp'.trans hq'.symm) hpq
+      · exact Or.inr (hy'.trans hq'.symm)
+    · exact Or.inl (hy'.trans hp'.symm)
 
 open Fin.NatCast in
 /-- **A successor-closed subset of `Fin N` is everything.** Starting from any
@@ -612,14 +636,142 @@ theorem side_straight {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     · rw [gPt_edge_irrel (hEdge_symm (hEdge_symm h)) h] at hBcross
       exact (not_both_crossed f hf h hAcross hBcross).elim
 
+/-! ### Straightness propagates along the owner's chain -/
+
+/-- Whether a vertex is a selector. -/
+def isSel (q : hamInterp.MapRel A) : Prop := q.1.1 = HTag.sel
+
+instance : DecidablePred (isSel (A := A)) := fun q => inferInstanceAs (Decidable (q.1.1 = _))
+
+/-- **The entrance slot of a straight-opposite side.** When the `b`-side of the
+edge `{a, b}` is straight, both tour-slots of `⟨g2,(b,a)⟩` are known, so the
+cross edge into `⟨g0,(a,b)⟩` is unused: the tour-neighbour of `⟨g0,(a,b)⟩` other
+than the forced `⟨g1,(a,b)⟩` is a selector (and `b` is `a`'s least neighbour) or
+the chain-link from the predecessor side. -/
+theorem g0_other {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b : A} (h : HEdge a b)
+    (hS : TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h))
+      (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h))) :
+    ((∀ d, HEdge a d → b ≤ d) ∧
+        (isSel (tourSucc f (gPt .g0 ⟨by decide, by decide⟩ h)) ∨
+          isSel ((tourSucc f).symm (gPt .g0 ⟨by decide, by decide⟩ h)))) ∨
+      ∃ (c : A) (hc : HEdge a c), c < b ∧
+        TAdj f (gPt .g0 ⟨by decide, by decide⟩ h) (gPt .g5 ⟨by decide, by decide⟩ hc) := by
+  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => Or.symm
+  have hN := three_le_of_edge f h
+  have h01 : TAdj f (gPt .g0 ⟨by decide, by decide⟩ h) (gPt .g1 ⟨by decide, by decide⟩ h) :=
+    TAdj_symm (forced_g1 f hf h).1
+  obtain ⟨X, hX, hXne⟩ :
+      ∃ X, TAdj f (gPt .g0 ⟨by decide, by decide⟩ h) X ∧
+        X ≠ gPt .g1 ⟨by decide, by decide⟩ h := by
+    rcases tadj_eq h01 with h1 | h1
+    · exact ⟨(tourSucc f).symm _, tadj_pred f _,
+        fun he => tourSucc_ne_symm f hN _ (h1.symm.trans he.symm)⟩
+    · exact ⟨tourSucc f _, tadj_succ f _, fun he => tourSucc_ne_symm f hN _ (he.trans h1)⟩
+  rcases (nbrs_gPt_g0 h X).mp (tadj_dgEdge hf hsymm hX) with
+    h1 | h2 | ⟨c, hc, hlt, -, rfl⟩ | ⟨hmin, m, hm, rfl⟩
+  · exact absurd h1 hXne
+  · exfalso
+    have h2ta : TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h))
+        (gPt .g0 ⟨by decide, by decide⟩ h) := TAdj_symm (h2 ▸ hX)
+    have h21 : TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h))
+        (gPt .g1 ⟨by decide, by decide⟩ (hEdge_symm h)) :=
+      TAdj_symm (forced_g1 f hf (hEdge_symm h)).2
+    rcases tadj_two h21 hS (gPt_ne_tag (by decide) _ _) h2ta with hE | hE
+    · exact gPt_ne_tag (by decide) h (hEdge_symm h) hE
+    · exact gPt_ne_tag (by decide) h (hEdge_symm h) hE
+  · exact Or.inr ⟨c, hc, hlt, hX⟩
+  · refine Or.inl ⟨hmin, ?_⟩
+    rcases tadj_eq hX with h1 | h1
+    · exact Or.inl (by rw [← h1]; rfl)
+    · exact Or.inr (by rw [← h1]; rfl)
+
+/-- **The exit slot of a straight-opposite side**, symmetrically: the
+tour-neighbour of `⟨g5,(a,b)⟩` other than the forced `⟨g4,(a,b)⟩` is a selector
+(and `b` is `a`'s greatest neighbour) or the chain-link to the successor side. -/
+theorem g5_other {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b : A} (h : HEdge a b)
+    (hS : TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h))
+      (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h))) :
+    ((∀ d, HEdge a d → d ≤ b) ∧
+        (isSel (tourSucc f (gPt .g5 ⟨by decide, by decide⟩ h)) ∨
+          isSel ((tourSucc f).symm (gPt .g5 ⟨by decide, by decide⟩ h)))) ∨
+      ∃ (c : A) (hc : HEdge a c), b < c ∧
+        TAdj f (gPt .g5 ⟨by decide, by decide⟩ h) (gPt .g0 ⟨by decide, by decide⟩ hc) := by
+  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => Or.symm
+  have hN := three_le_of_edge f h
+  have h54 : TAdj f (gPt .g5 ⟨by decide, by decide⟩ h) (gPt .g4 ⟨by decide, by decide⟩ h) :=
+    TAdj_symm (forced_g4 f hf h).2
+  obtain ⟨X, hX, hXne⟩ :
+      ∃ X, TAdj f (gPt .g5 ⟨by decide, by decide⟩ h) X ∧
+        X ≠ gPt .g4 ⟨by decide, by decide⟩ h := by
+    rcases tadj_eq h54 with h1 | h1
+    · exact ⟨(tourSucc f).symm _, tadj_pred f _,
+        fun he => tourSucc_ne_symm f hN _ (h1.symm.trans he.symm)⟩
+    · exact ⟨tourSucc f _, tadj_succ f _, fun he => tourSucc_ne_symm f hN _ (he.trans h1)⟩
+  rcases (nbrs_gPt_g5 h X).mp (tadj_dgEdge hf hsymm hX) with
+    h1 | h2 | ⟨c, hc, hlt, -, rfl⟩ | ⟨hmax, m, hm, rfl⟩
+  · exact absurd h1 hXne
+  · exfalso
+    have h2ta : TAdj f (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h))
+        (gPt .g5 ⟨by decide, by decide⟩ h) := TAdj_symm (h2 ▸ hX)
+    have h34 : TAdj f (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h))
+        (gPt .g4 ⟨by decide, by decide⟩ (hEdge_symm h)) :=
+      TAdj_symm (forced_g4 f hf (hEdge_symm h)).1
+    rcases tadj_two h34 (TAdj_symm hS) (gPt_ne_tag (by decide) _ _) h2ta with hE | hE
+    · exact gPt_ne_tag (by decide) h (hEdge_symm h) hE
+    · exact gPt_ne_tag (by decide) h (hEdge_symm h) hE
+  · exact Or.inr ⟨c, hc, hlt, hX⟩
+  · refine Or.inl ⟨hmax, ?_⟩
+    rcases tadj_eq hX with h1 | h1
+    · exact Or.inl (by rw [← h1]; rfl)
+    · exact Or.inr (by rw [← h1]; rfl)
+
+/-- **A used chain-link straightens the earlier side.** If the tour uses the
+chain edge `⟨g0,(a,b)⟩–⟨g5,(a,c)⟩`, both tour-slots of `⟨g5,(a,c)⟩` are known, so
+its cross edge is unused and (by `prop_g3`) the side `(c,a)` is straight. -/
+theorem straight_of_chain_down {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b c : A} (h : HEdge a b) (hc : HEdge a c)
+    (hch : TAdj f (gPt .g0 ⟨by decide, by decide⟩ h) (gPt .g5 ⟨by decide, by decide⟩ hc)) :
+    TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm hc))
+      (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm hc)) := by
+  have h54 : TAdj f (gPt .g5 ⟨by decide, by decide⟩ hc) (gPt .g4 ⟨by decide, by decide⟩ hc) :=
+    TAdj_symm (forced_g4 f hf hc).2
+  rcases prop_g3 f hf (hEdge_symm hc) with hstr | hcross
+  · exact TAdj_symm hstr
+  · exfalso
+    rw [gPt_edge_irrel (hEdge_symm (hEdge_symm hc)) hc] at hcross
+    rcases tadj_two h54 (TAdj_symm hch) (gPt_ne_tag (by decide) hc h)
+        (TAdj_symm hcross) with hE | hE
+    · exact gPt_ne_tag (by decide) (hEdge_symm hc) hc hE
+    · exact gPt_ne_tag (by decide) (hEdge_symm hc) h hE
+
+/-- **A used chain-link straightens the later side**, symmetrically: a tour edge
+`⟨g5,(a,b)⟩–⟨g0,(a,c)⟩` fills both slots of `⟨g0,(a,c)⟩`, so its cross edge is
+unused and (by `prop_g2`) the side `(c,a)` is straight. -/
+theorem straight_of_chain_up {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b c : A} (h : HEdge a b) (hc : HEdge a c)
+    (hch : TAdj f (gPt .g5 ⟨by decide, by decide⟩ h) (gPt .g0 ⟨by decide, by decide⟩ hc)) :
+    TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm hc))
+      (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm hc)) := by
+  have h01 : TAdj f (gPt .g0 ⟨by decide, by decide⟩ hc) (gPt .g1 ⟨by decide, by decide⟩ hc) :=
+    TAdj_symm (forced_g1 f hf hc).1
+  rcases prop_g2 f hf (hEdge_symm hc) with hstr | hcross
+  · exact hstr
+  · exfalso
+    rw [gPt_edge_irrel (hEdge_symm (hEdge_symm hc)) hc] at hcross
+    rcases tadj_two h01 (TAdj_symm hch) (gPt_ne_tag (by decide) hc h)
+        (TAdj_symm hcross) with hE | hE
+    · exact gPt_ne_tag (by decide) (hEdge_symm hc) hc hE
+    · exact gPt_ne_tag (by decide) (hEdge_symm hc) h hE
+
 /-! ### Counting: the active chains inject into the selectors -/
 
 section Counting
 
-open scoped Classical
-
 variable [Fintype A]
 
+open Classical in
 /-- The neighbours of `a` as a finset. -/
 noncomputable def nbrFinset (a : A) : Finset A := Finset.univ.filter (HEdge a)
 
@@ -691,11 +843,6 @@ theorem exit_nbr {a : A} (h : ∃ b, HEdge a b) {q : hamInterp.MapRel A}
       ∃ (m : A) (hm : MGMarked m), q = selPt hm :=
   (nbrs_exit (hEdge_maxNbr h) (fun _ hd => le_maxNbr h hd) q).mp hq
 
-/-- Whether a vertex is a selector. -/
-def isSel (q : hamInterp.MapRel A) : Prop := q.1.1 = HTag.sel
-
-instance : DecidablePred (isSel (A := A)) := fun q => inferInstanceAs (Decidable (q.1.1 = _))
-
 /-- The selector tour-neighbour of `v` (well-defined when `v` has one): the tour
 successor if that is the selector, else the predecessor. -/
 noncomputable def selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInterp.MapRel A) :
@@ -740,6 +887,7 @@ def Active {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (a : A) : Prop :=
     (isSel (tourSucc f (entrancePt h)) ∨ isSel ((tourSucc f).symm (entrancePt h))) ∧
       (isSel (tourSucc f (exitPt h)) ∨ isSel ((tourSucc f).symm (exitPt h)))
 
+open Classical in
 /-- The entrance (`d = false`) or exit (`d = true`) of `a`; junk if `a` is isolated. -/
 noncomputable def ptOf [Nonempty (hamInterp.MapRel A)] (a : A) (d : Bool) : hamInterp.MapRel A :=
   if ha : ∃ b, HEdge a b then (bif d then exitPt ha else entrancePt ha) else Classical.arbitrary _
@@ -823,15 +971,73 @@ theorem active_ncard_le {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
   rw [e1, e2, Set.ncard_coe_finset, Set.ncard_coe_finset]
   exact hle
 
-/-- **Cover property** (the remaining combinatorial core): every edge has an
-*active* endpoint. The gadget of `{a,b}` is traversed on the `a`-side or the
-`b`-side (`side_straight`); the traversed chain, once entered, runs all the way
-to a selector at each end (the detour-return / arc-ownership argument), so that
-endpoint is active. -/
+/-- **Straightness reaches the entrance.** If some side `(b,a)` of `a`'s chain
+is straight, the entrance slot of `⟨g0,(a,b)⟩` is a selector or a chain-link
+(`g0_other`); a chain-link keeps the walked side straight
+(`straight_of_chain_down`), so by well-founded descent along `a`'s neighbour
+list the chain entrance has a selector tour-neighbour. -/
+theorem entrance_sel_of_straight {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a : A} :
+    ∀ b : A, ∀ h : HEdge a b,
+      TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h))
+        (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h)) →
+      isSel (tourSucc f (entrancePt ⟨b, h⟩)) ∨
+        isSel ((tourSucc f).symm (entrancePt ⟨b, h⟩)) := by
+  intro b
+  induction b using WellFoundedLT.induction with
+  | ind b IH =>
+    intro h hS
+    rcases g0_other f hf h hS with ⟨hmin, hsel⟩ | ⟨c, hc, hlt, hch⟩
+    · have hb : minNbr (⟨b, h⟩ : ∃ d, HEdge a d) = b :=
+        le_antisymm (minNbr_le ⟨b, h⟩ h) (hmin _ (hEdge_minNbr ⟨b, h⟩))
+      have he : entrancePt (⟨b, h⟩ : ∃ d, HEdge a d) = gPt .g0 ⟨by decide, by decide⟩ h :=
+        eq_gPt_of_val h rfl rfl hb
+      rw [he]
+      exact hsel
+    · exact IH c hlt hc (straight_of_chain_down f hf h hc hch)
+
+/-- **Straightness reaches the exit**, symmetrically: well-founded ascent along
+`a`'s neighbour list through `g5_other` and `straight_of_chain_up`. -/
+theorem exit_sel_of_straight {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a : A} :
+    ∀ b : A, ∀ h : HEdge a b,
+      TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h))
+        (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h)) →
+      isSel (tourSucc f (exitPt ⟨b, h⟩)) ∨ isSel ((tourSucc f).symm (exitPt ⟨b, h⟩)) := by
+  intro b
+  induction b using WellFoundedGT.induction with
+  | ind b IH =>
+    intro h hS
+    rcases g5_other f hf h hS with ⟨hmax, hsel⟩ | ⟨c, hc, hlt, hch⟩
+    · have hb : maxNbr (⟨b, h⟩ : ∃ d, HEdge a d) = b :=
+        le_antisymm (hmax _ (hEdge_maxNbr ⟨b, h⟩)) (le_maxNbr ⟨b, h⟩ h)
+      have he : exitPt (⟨b, h⟩ : ∃ d, HEdge a d) = gPt .g5 ⟨by decide, by decide⟩ h :=
+        eq_gPt_of_val h rfl rfl hb
+      rw [he]
+      exact hsel
+    · exact IH c hlt hc (straight_of_chain_up f hf h hc hch)
+
+/-- **A straight side makes the opposite owner active**: if the side `(u,v)` of
+the edge `{u,v}` is traversed straight through `g2–g3`, then `v`'s chain runs
+selector to selector, so `v` is active. -/
+theorem active_of_straight {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {u v : A} (h : HEdge u v)
+    (hS : TAdj f (gPt .g2 ⟨by decide, by decide⟩ h) (gPt .g3 ⟨by decide, by decide⟩ h)) :
+    Active f v := by
+  have h' : HEdge v u := hEdge_symm h
+  have hS' : TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h'))
+      (gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h')) := hS
+  exact ⟨⟨u, h'⟩, entrance_sel_of_straight f hf u h' hS', exit_sel_of_straight f hf u h' hS'⟩
+
+/-- **Cover property**: every edge has an *active* endpoint. The gadget of
+`{a,b}` is traversed straight on the `a`-side or the `b`-side (`side_straight`),
+and a straight side activates the opposite owner (`active_of_straight`). -/
 theorem cover_property {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
-    [Nonempty (hamInterp.MapRel A)] (hf : ∀ i, DGEdge (f i) (f (nextIdx i)))
+    (hf : ∀ i, DGEdge (f i) (f (nextIdx i)))
     {a b : A} (h : HEdge a b) : Active f a ∨ Active f b := by
-  sorry
+  rcases side_straight f hf h with hstr | hstr
+  · exact Or.inr (active_of_straight f hf h hstr)
+  · exact Or.inl (active_of_straight f hf (hEdge_symm h) hstr)
 
 end Counting
 

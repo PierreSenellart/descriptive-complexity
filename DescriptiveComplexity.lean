@@ -237,11 +237,15 @@ individual declarations are documented on their own pages.
   a path only one – a pair per clause reachable only through the tip of a true
   literal, and one garbage pair per occurrence that is not the first of its
   clause, which is exactly the number of tips left over;
-  the two Hamilton circuit problems, directed and undirected, *in NP* so far,
+  the two Hamilton circuit problems, directed and undirected – the last of
+  Karp's 21, whose completeness closes the list –
   a circuit being read as a **linear order of the universe** whose consecutive
   elements are adjacent and whose last is adjacent to its first – the
   job-sequencing schedule closed into a cycle – with the undirected problem
-  reducing to the directed one by doubling each edge;
+  reducing to the directed one by doubling each edge, and the undirected one
+  NP-hard from Vertex Cover by Karp's twelve-vertex cover-testing gadget, the
+  first reduction of the catalog whose target is a *spanning* problem, so
+  that its interpretation carries a definable domain;
   TAUT, the tautology problem for
   formulas in disjunctive normal form, coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
