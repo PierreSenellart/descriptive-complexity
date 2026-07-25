@@ -144,12 +144,6 @@ theorem posBits_posRank (b : P → Prop) (p : P) : posBits P b (posRank P p) = t
   simp only [posBits, decide_eq_true_eq]
   exact ⟨fun ⟨q, hq, hb⟩ => posRank_injective P hq ▸ hb, fun hb => ⟨p, rfl, hb⟩⟩
 
-theorem posBits_of_le (b : P → Prop) {i : ℕ} (h : Fintype.card P ≤ i) :
-    posBits P b i = false := by
-  simp only [posBits, decide_eq_false_iff_not]
-  rintro ⟨p, hp, -⟩
-  exact absurd (hp ▸ posRank_lt P p) (not_lt.mpr h)
-
 open Classical in
 theorem binValue_eq_sum_range (b : P → Prop) :
     binValue P b = ∑ i ∈ range (Fintype.card P), if posBits P b i then 2 ^ i else 0 := by

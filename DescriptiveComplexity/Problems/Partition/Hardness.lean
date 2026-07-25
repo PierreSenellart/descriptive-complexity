@@ -513,26 +513,6 @@ theorem eq_pLow_of_bit {a₀ : A} (ha₀ : IsBot a₀) {i q : pInterp.Map A} (h 
       exact hlow k f hf hb
     | pos k' f' => exact absurd h (bwBit_pos_left k' f' w _)
 
-/-- The bit of a literal item in a block. -/
-theorem bwBit_pLit_pLow {a₀ : A} (ha₀ : IsBot a₀) (s : Bool) (x : A) (b : Bool × A) :
-    BWBit (pLit a₀ s x) (pLow a₀ b) ↔ (if b.1 then OccIn b.2 x s else b.2 = x) := by
-  rw [pLit, pLow, pPos, bwBit_lit_pos]
-  simp [ha₀]
-
-/-- The bit of a slack item in a block. -/
-theorem bwBit_pSlk_pLow {a₀ : A} (ha₀ : IsBot a₀) (s : Bool) (c x : A) (b : Bool × A) :
-    BWBit (pSlk s c x) (pLow a₀ b) ↔ b.1 = true ∧ b.2 = c ∧ Mid c x s := by
-  rw [pSlk, pLow, pPos, bwBit_slk_pos]
-  simp [ha₀]
-  tauto
-
-/-- The bit of the item of an empty clause in a block. -/
-theorem bwBit_pEmp_pLow {a₀ : A} (ha₀ : IsBot a₀) (c : A) (b : Bool × A) :
-    BWBit (pEmp a₀ c) (pLow a₀ b) ↔ b.1 = true ∧ b.2 = c ∧ EmptyCl c := by
-  rw [pEmp, pLow, pPos, bwBit_emp_pos]
-  simp [ha₀]
-  tauto
-
 end Bits
 
 /-! ### The place values -/

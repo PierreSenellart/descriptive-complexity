@@ -207,9 +207,6 @@ def oPt (v : A) : naeInterp.Map A := (true, fun _ => v)
 used). -/
 def xPt (v : A) : naeInterp.Map A := (false, fun _ => v)
 
-theorem oPt_injective : Function.Injective (oPt (A := A)) :=
-  fun _ _ h => congrArg (fun p : Bool × (Fin 1 → A) => p.2 0) h
-
 theorem oPt_eta (w : Fin 1 → A) : ((true, w) : naeInterp.Map A) = oPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 

@@ -420,13 +420,6 @@ theorem jPos_injective : Function.Injective fun u : (Bool × A) × Fin 3 × A =>
   subst h0; subst h1; subst hk₁; subst hk₂
   rfl
 
-theorem jLow_injective (a₀ : A) : Function.Injective (jLow a₀ (A := A)) := by
-  rintro ⟨k, e⟩ ⟨k', e'⟩ h
-  obtain ⟨ht, hw⟩ := jPt_eq_iff.mp h
-  have h0 : e = e' := by simpa using congrArg (fun u : Fin 2 → A => u 0) hw
-  have hk : k = k' := by injection ht
-  exact Prod.ext hk h0
-
 theorem jLit_ne_jSlk (a₀ : A) (s s' : Bool) (x c y : A) : jLit a₀ s x ≠ jSlk s' c y := by
   intro h
   rw [jLit, jSlk] at h
@@ -655,19 +648,6 @@ theorem eq_jLow_of_time {a₀ : A} (ha₀ : IsBot a₀) {i q : jInterp.Map A} (h
       obtain ⟨hf, -, -, hb, -⟩ := (jsTime_slk_pos s w k f w').mp h
       exact hlow k f hf hb
     | pos k' f' => exact absurd h (jsTime_pos_left k' f' w _)
-
-/-- The bit of a literal job in a block. -/
-theorem jsTime_jLit_jLow {a₀ : A} (ha₀ : IsBot a₀) (s : Bool) (x : A) (b : Bool × A) :
-    JSTime (jLit a₀ s x) (jLow a₀ b) ↔ (if b.1 then OccIn b.2 x s else b.2 = x) := by
-  rw [jLit, jLow, jPos, jsTime_lit_pos]
-  simp [ha₀]
-
-/-- The bit of a slack job in a block. -/
-theorem jsTime_jSlk_jLow {a₀ : A} (ha₀ : IsBot a₀) (s : Bool) (c x : A) (b : Bool × A) :
-    JSTime (jSlk s c x) (jLow a₀ b) ↔ b.1 = true ∧ b.2 = c ∧ Mid c x s := by
-  rw [jSlk, jLow, jPos, jsTime_slk_pos]
-  simp [ha₀]
-  tauto
 
 end Bits
 

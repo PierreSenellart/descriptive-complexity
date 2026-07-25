@@ -210,13 +210,6 @@ section Peel
 
 variable {A : Type} [Finite A]
 
-open Classical in
-/-- The decoded value, as a sum over a finite set. -/
-theorem binNum_eq_sum (Le : A → A → Prop) (Posn b : A → Prop) :
-    binNum Le Posn b =
-      ∑ p ∈ (Set.toFinite {p : A | Posn p ∧ b p}).toFinset, 2 ^ bitRank Le Posn p :=
-  finsum_mem_eq_finite_toFinset_sum _ _
-
 /-- Removing the lowest position lowers every other rank by one. -/
 theorem bitRank_erase_min {Le : A → A → Prop} {Posn : A → Prop} {p₀ : A}
     (h₀ : Posn p₀) (hmin : ∀ q, Posn q → Le p₀ q) {p : A} (hp : Posn p) (hne : p ≠ p₀) :

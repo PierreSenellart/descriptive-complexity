@@ -195,27 +195,11 @@ theorem inPt_injective : Function.Injective (inPt (A := A)) := by
   intro v v' h
   exact congrArg (fun p : Bool × (Fin 1 → A) => p.2 0) h
 
-theorem outPt_injective : Function.Injective (outPt (A := A)) := by
-  intro v v' h
-  exact congrArg (fun p : Bool × (Fin 1 → A) => p.2 0) h
-
-theorem inPt_ne_outPt (v v' : A) : inPt v ≠ outPt v' := by
-  intro h
-  exact Bool.noConfusion (congrArg (fun p : Bool × (Fin 1 → A) => p.1) h)
-
 theorem inPt_eta (w : Fin 1 → A) : ((true, w) : splitInterp.Map A) = inPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
 theorem outPt_eta (w : Fin 1 → A) : ((false, w) : splitInterp.Map A) = outPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
-
-/-- Every element of the split universe is a copy of a vertex. -/
-theorem eq_inPt_or_outPt (p : splitInterp.Map A) :
-    (∃ v, p = inPt v) ∨ ∃ v, p = outPt v := by
-  rcases p with ⟨b, w⟩
-  cases b
-  · exact Or.inr ⟨w 0, outPt_eta w⟩
-  · exact Or.inl ⟨w 0, inPt_eta w⟩
 
 end Copies
 

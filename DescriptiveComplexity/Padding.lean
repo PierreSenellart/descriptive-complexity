@@ -150,13 +150,6 @@ theorem pref_pad_snoc (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) (a : 
   rw [show (⟨((Fin.castLE h j : Fin D) : ℕ), _⟩ : Fin (m + 1)) = Fin.castSucc j from
     Fin.ext rfl, Fin.snoc_castSucc]
 
-theorem agree_pad_snoc (a₀ : A) {m : ℕ} (w : Fin m → A) (a : A) :
-    Agree m (pad (D := D) a₀ w) (pad a₀ (Fin.snoc w a)) := by
-  intro j hj
-  rw [pad, pad, dif_pos hj, dif_pos (hj.trans (Nat.lt_succ_self m))]
-  rw [show (⟨(j : ℕ), hj.trans (Nat.lt_succ_self m)⟩ : Fin (m + 1)) =
-      Fin.castSucc ⟨(j : ℕ), hj⟩ from Fin.ext rfl, Fin.snoc_castSucc]
-
 theorem agree_pad_snoc_pref (a₀ a : A) {m : ℕ} (h : m ≤ D) (u : Fin D → A) :
     Agree m u (pad a₀ (Fin.snoc (pref h u) a)) := by
   intro j hj

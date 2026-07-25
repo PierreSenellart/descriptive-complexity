@@ -107,11 +107,6 @@ inductive Derives (rules : List (HornClause Lg B k)) :
 def lfpAssign (rules : List (HornClause Lg B k)) : B.Assignment A :=
   fun i x => Derives rules ⟨i, x⟩
 
-theorem soAtom_holds_lfpAssign {rules : List (HornClause Lg B k)}
-    (a : SOAtom B k) (v : Fin k → A) :
-    a.Holds (lfpAssign rules) v ↔ Derives rules ⟨a.idx, fun j => v (a.args j)⟩ :=
-  Iff.rfl
-
 /-- The least fixed point satisfies every rule with a head. (A clause with no
 head is a *constraint*, not a rule: it derives nothing, and is what the output
 formula of `DescriptiveComplexity.LFPDef` takes over.) -/

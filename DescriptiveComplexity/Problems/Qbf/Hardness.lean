@@ -148,13 +148,6 @@ theorem qbfT_block_var (j : Fin k) (vt : M.ι ⊕ Σ m, NodeAt ψ m)
   · exact iff_of_true (by simp) h
   · exact iff_of_false (by simp) h
 
-theorem qbfT_block_clause (j : Fin k) (tc : (Σ m, NodeAt ψ m) × Fin 3 ⊕ Unit)
-    (u : Fin (tseitinDim M ψ) → A) :
-    ¬RelMap (M := (qbfTseitinInterp k sw M ψ mark).Map A) (qbfBlock j)
-      ![(Sum.inl tc, u)] := by
-  rw [FOInterpretation.relMap_map]
-  exact id
-
 /-- The literal that a satisfied clause needs to make *true*: whichever of
 `posIn`/`negIn` carries the positive Tseitin literals. -/
 theorem qbfT_lit_pos (tc tx : TseitinTag M ψ) (u x : Fin (tseitinDim M ψ) → A) :

@@ -1283,16 +1283,6 @@ theorem packV_comp_vT2 : (fun q => packV t1 t2 x w1 w2 e sp (vT2 d q)) = t2 := b
   exact congrArg t2 (Fin.ext
     (show ((vT2 d q : Fin (kk d)) : ℕ) - hm d = (q : ℕ) from by rw [hv]; omega))
 
-theorem packV_comp_vX : (fun q => packV t1 t2 x w1 w2 e sp (vX d q)) = x := by
-  funext q
-  have hq := q.isLt
-  have hv : ((vX d q : Fin (kk d)) : ℕ) = 2 * hm d + (q : ℕ) := rfl
-  simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_pos (by rw [hv]; omega)]
-  exact congrArg x (Fin.ext
-    (show ((vX d q : Fin (kk d)) : ℕ) - 2 * hm d = (q : ℕ) from by rw [hv]; omega))
-
 theorem packV_comp_vW1 : (fun q => packV t1 t2 x w1 w2 e sp (vW1 d q)) = w1 := by
   funext q
   have hq := q.isLt

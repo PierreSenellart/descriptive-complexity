@@ -34,12 +34,6 @@ variable {A A' : Type}
 
 /-! ### Which block a merged relation variable belongs to -/
 
-/-- The block a relation variable of the merged block comes from. -/
-def blockOf : ∀ (Bs : List SOBlock), (mergeBlocks Bs).ι → Fin Bs.length
-  | [], i => Empty.elim (i : Empty)
-  | _ :: _, Sum.inl _ => 0
-  | _ :: Bs, Sum.inr i => (blockOf Bs i).succ
-
 /-! ### Reading block assignments off a truth assignment -/
 
 /-- A reading of relations off a truth assignment of the propositional

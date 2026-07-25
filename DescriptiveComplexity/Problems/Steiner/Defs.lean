@@ -118,9 +118,6 @@ def reachIn (R : A → A → Prop) : ℕ → A → A → Prop
   | 0, x, y => x = y
   | n + 1, x, y => reachIn R n x y ∨ ∃ z, reachIn R n x z ∧ R z y
 
-theorem reachIn_succ_of_reachIn {R : A → A → Prop} {n : ℕ} {x y : A}
-    (h : reachIn R n x y) : reachIn R (n + 1) x y := Or.inl h
-
 /-- Reachability is reachability in some bounded number of steps. -/
 theorem reflTransGen_iff_exists_reachIn (R : A → A → Prop) (x y : A) :
     Relation.ReflTransGen R x y ↔ ∃ n, reachIn R n x y := by
