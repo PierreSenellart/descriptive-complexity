@@ -104,12 +104,6 @@ theorem gv_adj {a b a' b' : A} (i j : HTag) (hi hj) (h : HEdge a b) (h' : HEdge 
     DGEdge (gPt i hi h) (gPt j hj h') ↔ IAdjRaw (i, ![a, b]) (j, ![a', b']) :=
   dgEdge_iff _ _
 
-/-- The two gadget-node tags used only as literals here; a helper for the
-`decide` side-conditions. -/
-private theorem gtag_ne (i : HTag) (hne : i = .g0 ∨ i = .g1 ∨ i = .g2 ∨ i = .g3 ∨ i = .g4 ∨ i = .g5) :
-    i ≠ .sel ∧ i ≠ .hub := by
-  rcases hne with rfl | rfl | rfl | rfl | rfl | rfl <;> exact ⟨by decide, by decide⟩
-
 /-- Gadget vertex `0` (a side's entrance). -/
 abbrev gv0 {a b : A} (h : HEdge a b) : hamInterp.MapRel A := gPt .g0 ⟨by decide, by decide⟩ h
 /-- Gadget vertex `1`. -/
@@ -158,16 +152,6 @@ theorem snakeBoth_ne_nil {a b : A} (h : HEdge a b) : snakeBoth h ≠ [] := by si
 theorem snakeThrough_ne_nil {a b : A} (h : HEdge a b) : snakeThrough h ≠ [] := by simp [snakeThrough]
 
 /-! #### Distinctness of gadget vertices -/
-
-/-- Gadget vertices with distinct tags are distinct. -/
-theorem gPt_ne_of_tag {i j : HTag} (hij : i ≠ j) {hi hj} {a b a' b' : A}
-    (h : HEdge a b) (h' : HEdge a' b') : gPt i hi h ≠ gPt j hj h' :=
-  fun he => hij (congrArg (fun p : hamInterp.MapRel A => p.1.1) he)
-
-/-- Gadget vertices with distinct owners are distinct. -/
-theorem gPt_ne_of_fst {i j : HTag} {hi hj} {a b a' b' : A}
-    (h : HEdge a b) (h' : HEdge a' b') (hne : a ≠ a') : gPt i hi h ≠ gPt j hj h' :=
-  fun he => hne (congrArg (fun p : hamInterp.MapRel A => p.1.2 0) he)
 
 theorem snakeBoth_nodup {a b : A} (h : HEdge a b) : (snakeBoth h).Nodup := by
   apply List.Nodup.of_map (fun p => p.1.1)

@@ -362,7 +362,7 @@ theorem forced_g1 {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b : A} (h : HEdge a b) :
     TAdj f (gPt .g1 ⟨by decide, by decide⟩ h) (gPt .g0 ⟨by decide, by decide⟩ h) ∧
       TAdj f (gPt .g1 ⟨by decide, by decide⟩ h) (gPt .g2 ⟨by decide, by decide⟩ h) :=
-  tour_forced f hf (fun _ _ => Or.symm) (three_le_of_edge f h)
+  tour_forced f hf (fun _ _ => dgEdge_symm) (three_le_of_edge f h)
     (fun y hy => (nbrs_gPt_g1 h y).mp hy)
 
 /-- **Forced `v`-path.** Symmetrically, `⟨g4,(a,b)⟩` uses both `⟨g3⟩` and `⟨g5⟩`. -/
@@ -370,7 +370,7 @@ theorem forced_g4 {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b : A} (h : HEdge a b) :
     TAdj f (gPt .g4 ⟨by decide, by decide⟩ h) (gPt .g3 ⟨by decide, by decide⟩ h) ∧
       TAdj f (gPt .g4 ⟨by decide, by decide⟩ h) (gPt .g5 ⟨by decide, by decide⟩ h) :=
-  tour_forced f hf (fun _ _ => Or.symm) (three_le_of_edge f h)
+  tour_forced f hf (fun _ _ => dgEdge_symm) (three_le_of_edge f h)
     (fun y hy => (nbrs_gPt_g4 h y).mp hy)
 
 /-- **Propagation at `g2`.** With the forced `u`-path, `⟨g1⟩` is one of `⟨g2⟩`'s
@@ -382,7 +382,7 @@ theorem prop_g2 {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     TAdj f (gPt .g2 ⟨by decide, by decide⟩ h) (gPt .g3 ⟨by decide, by decide⟩ h) ∨
       TAdj f (gPt .g2 ⟨by decide, by decide⟩ h)
         (gPt .g0 ⟨by decide, by decide⟩ (hEdge_symm h)) := by
-  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => Or.symm
+  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => dgEdge_symm
   have hne := tourSucc_ne_symm f (three_le_of_edge f h) (gPt .g2 ⟨by decide, by decide⟩ h)
   have h21 : TAdj f (gPt .g2 ⟨by decide, by decide⟩ h) (gPt .g1 ⟨by decide, by decide⟩ h) :=
     TAdj_symm (forced_g1 f hf h).2
@@ -407,7 +407,7 @@ theorem prop_g3 {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     TAdj f (gPt .g3 ⟨by decide, by decide⟩ h) (gPt .g2 ⟨by decide, by decide⟩ h) ∨
       TAdj f (gPt .g3 ⟨by decide, by decide⟩ h)
         (gPt .g5 ⟨by decide, by decide⟩ (hEdge_symm h)) := by
-  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => Or.symm
+  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => dgEdge_symm
   have hne := tourSucc_ne_symm f (three_le_of_edge f h) (gPt .g3 ⟨by decide, by decide⟩ h)
   have h34 : TAdj f (gPt .g3 ⟨by decide, by decide⟩ h) (gPt .g4 ⟨by decide, by decide⟩ h) :=
     TAdj_symm (forced_g4 f hf h).1
@@ -532,95 +532,6 @@ theorem nbrs_gPt_g5 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     · exact ⟨rfl, hc, hlt, hsucc⟩
     · exact hmax
 
-/-- **Neighbours of a chain entrance.** When `b` is the least neighbour of `a`,
-the vertex `⟨g0,(a,b)⟩` is adjacent to `⟨g1,(a,b)⟩`, to the cross vertex
-`⟨g2,(b,a)⟩`, and to *every* selector (and nothing else – in particular no chain
-link, as the least neighbour has no predecessor). -/
-theorem nbrs_entrance {a b : A} (h : HEdge a b) (hmin : ∀ d, HEdge a d → b ≤ d)
-    (q : hamInterp.MapRel A) :
-    DGEdge (gPt .g0 ⟨by decide, by decide⟩ h) q ↔
-      q = gPt .g1 ⟨by decide, by decide⟩ h ∨
-        q = gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h) ∨
-        ∃ (m : A) (hm : MGMarked m), q = selPt hm := by
-  rw [dgEdge_iff]
-  constructor
-  · intro hadj
-    obtain ⟨⟨t, w⟩, hq⟩ := q
-    cases t <;> simp only [IAdjRaw] at hadj
-    · exact hadj.elim
-    · exact Or.inl (eq_gPt_of_val h rfl hadj.1.symm hadj.2.symm)
-    · exact Or.inr (Or.inl (eq_gPt_of_val (hEdge_symm h) rfl hadj.2.symm hadj.1.symm))
-    · exact hadj.elim
-    · exact hadj.elim
-    · exfalso
-      have hdom := (dom_gadget .g5 ⟨by decide, by decide⟩ w).mp hq
-      rw [← hadj.1] at hdom
-      exact absurd hadj.2.2.1 (not_lt.mpr (hmin (w 1) hdom))
-    · exact Or.inr (Or.inr (eq_selPt_of_tag rfl))
-    · exact hadj.elim
-  · rintro (rfl | rfl | ⟨m, hm, rfl⟩) <;> simp only [IAdjRaw]
-    · exact ⟨rfl, rfl⟩
-    · exact ⟨rfl, rfl⟩
-    · exact hmin
-
-/-- **Neighbours of a chain exit.** When `b` is the greatest neighbour of `a`,
-the vertex `⟨g5,(a,b)⟩` is adjacent to `⟨g4,(a,b)⟩`, to the cross vertex
-`⟨g3,(b,a)⟩`, and to every selector (no chain link – the greatest neighbour has no
-successor). -/
-theorem nbrs_exit {a b : A} (h : HEdge a b) (hmax : ∀ d, HEdge a d → d ≤ b)
-    (q : hamInterp.MapRel A) :
-    DGEdge (gPt .g5 ⟨by decide, by decide⟩ h) q ↔
-      q = gPt .g4 ⟨by decide, by decide⟩ h ∨
-        q = gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm h) ∨
-        ∃ (m : A) (hm : MGMarked m), q = selPt hm := by
-  rw [dgEdge_iff]
-  constructor
-  · intro hadj
-    obtain ⟨⟨t, w⟩, hq⟩ := q
-    cases t <;> simp only [IAdjRaw] at hadj
-    · exact absurd hadj.2.2.1 (not_lt.mpr (hmax (w 1) hadj.2.1))
-    · exact hadj.elim
-    · exact hadj.elim
-    · exact Or.inr (Or.inl (eq_gPt_of_val (hEdge_symm h) rfl hadj.2.symm hadj.1.symm))
-    · exact Or.inl (eq_gPt_of_val h rfl hadj.1.symm hadj.2.symm)
-    · exact hadj.elim
-    · exact Or.inr (Or.inr (eq_selPt_of_tag rfl))
-    · exact hadj.elim
-  · rintro (rfl | rfl | ⟨m, hm, rfl⟩) <;> simp only [IAdjRaw]
-    · exact ⟨rfl, rfl⟩
-    · exact ⟨rfl, rfl⟩
-    · exact hmax
-
-/-- **Neighbours of a selector.** A selector is adjacent to every other selector
-(the selector clique), to every chain entrance `⟨g0,(a,minNbr)⟩`, and to every
-chain exit `⟨g5,(a,maxNbr)⟩` – nothing else. -/
-theorem nbrs_selector {m : A} (hm : MGMarked m) (q : hamInterp.MapRel A) :
-    DGEdge (selPt hm) q ↔
-      (∃ (m' : A) (hm' : MGMarked m'), q = selPt hm') ∨
-        (∃ (a b : A) (h : HEdge a b), (∀ d, HEdge a d → b ≤ d) ∧
-          q = gPt .g0 ⟨by decide, by decide⟩ h) ∨
-        ∃ (a b : A) (h : HEdge a b), (∀ d, HEdge a d → d ≤ b) ∧
-          q = gPt .g5 ⟨by decide, by decide⟩ h := by
-  rw [dgEdge_iff]
-  constructor
-  · intro hadj
-    obtain ⟨⟨t, w⟩, hq⟩ := q
-    cases t <;> simp only [IAdjRaw] at hadj
-    · exact Or.inr (Or.inl ⟨w 0, w 1, (dom_gadget .g0 ⟨by decide, by decide⟩ w).mp hq, hadj,
-        eq_gPt_of_val _ rfl rfl rfl⟩)
-    · exact hadj.elim
-    · exact hadj.elim
-    · exact hadj.elim
-    · exact hadj.elim
-    · exact Or.inr (Or.inr ⟨w 0, w 1, (dom_gadget .g5 ⟨by decide, by decide⟩ w).mp hq, hadj,
-        eq_gPt_of_val _ rfl rfl rfl⟩)
-    · exact Or.inl (eq_selPt_of_tag rfl)
-    · exact hadj.elim
-  · rintro (⟨m', hm', rfl⟩ | ⟨a, b, he, hmin, rfl⟩ | ⟨a, b, he, hmax, rfl⟩)
-    · exact trivial
-    · exact hmin
-    · exact hmax
-
 /-- **At least one side is straight.** Combining the `g2` case split
 (`prop_g2`) on both sides with `not_both_crossed`: for every edge, the tour runs
 straight through the `a`-side gadget (`g2-g3`) or through the `b`-side gadget. -/
@@ -657,7 +568,7 @@ theorem g0_other {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
           isSel ((tourSucc f).symm (gPt .g0 ⟨by decide, by decide⟩ h)))) ∨
       ∃ (c : A) (hc : HEdge a c), c < b ∧
         TAdj f (gPt .g0 ⟨by decide, by decide⟩ h) (gPt .g5 ⟨by decide, by decide⟩ hc) := by
-  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => Or.symm
+  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => dgEdge_symm
   have hN := three_le_of_edge f h
   have h01 : TAdj f (gPt .g0 ⟨by decide, by decide⟩ h) (gPt .g1 ⟨by decide, by decide⟩ h) :=
     TAdj_symm (forced_g1 f hf h).1
@@ -698,7 +609,7 @@ theorem g5_other {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
           isSel ((tourSucc f).symm (gPt .g5 ⟨by decide, by decide⟩ h)))) ∨
       ∃ (c : A) (hc : HEdge a c), b < c ∧
         TAdj f (gPt .g5 ⟨by decide, by decide⟩ h) (gPt .g0 ⟨by decide, by decide⟩ hc) := by
-  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => Or.symm
+  have hsymm : ∀ x y : hamInterp.MapRel A, DGEdge x y → DGEdge y x := fun _ _ => dgEdge_symm
   have hN := three_le_of_edge f h
   have h54 : TAdj f (gPt .g5 ⟨by decide, by decide⟩ h) (gPt .g4 ⟨by decide, by decide⟩ h) :=
     TAdj_symm (forced_g4 f hf h).2
@@ -827,22 +738,6 @@ theorem entrancePt_ne_exitPt {a a' : A} (h : ∃ b, HEdge a b) (h' : ∃ b, HEdg
   have : (entrancePt h).1.1 ≠ (exitPt h').1.1 := by simp [entrancePt, exitPt]
   exact fun he => this (congrArg (fun p : hamInterp.MapRel A => p.1.1) he)
 
-/-- A tour-neighbour of the entrance is either `⟨g1⟩`, the cross vertex, or a selector. -/
-theorem entrance_nbr {a : A} (h : ∃ b, HEdge a b) {q : hamInterp.MapRel A}
-    (hq : DGEdge (entrancePt h) q) :
-    q = gPt .g1 ⟨by decide, by decide⟩ (hEdge_minNbr h) ∨
-      q = gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm (hEdge_minNbr h)) ∨
-      ∃ (m : A) (hm : MGMarked m), q = selPt hm :=
-  (nbrs_entrance (hEdge_minNbr h) (fun _ hd => minNbr_le h hd) q).mp hq
-
-/-- A tour-neighbour of the exit is either `⟨g4⟩`, the cross vertex, or a selector. -/
-theorem exit_nbr {a : A} (h : ∃ b, HEdge a b) {q : hamInterp.MapRel A}
-    (hq : DGEdge (exitPt h) q) :
-    q = gPt .g4 ⟨by decide, by decide⟩ (hEdge_maxNbr h) ∨
-      q = gPt .g3 ⟨by decide, by decide⟩ (hEdge_symm (hEdge_maxNbr h)) ∨
-      ∃ (m : A) (hm : MGMarked m), q = selPt hm :=
-  (nbrs_exit (hEdge_maxNbr h) (fun _ hd => le_maxNbr h hd) q).mp hq
-
 /-- The selector tour-neighbour of `v` (well-defined when `v` has one): the tour
 successor if that is the selector, else the predecessor. -/
 noncomputable def selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInterp.MapRel A) :
@@ -875,10 +770,6 @@ theorem isSel_selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) {v : hamInterp.
   by_cases hs : isSel (tourSucc f v)
   · rwa [if_pos hs]
   · rw [if_neg hs]; exact h.resolve_left hs
-
-/-- The entrance and exit of `a` do not depend on the choice of neighbour-witness. -/
-theorem entrancePt_pi {a : A} (h₁ h₂ : ∃ b, HEdge a b) : entrancePt h₁ = entrancePt h₂ := rfl
-theorem exitPt_pi {a : A} (h₁ h₂ : ∃ b, HEdge a b) : exitPt h₁ = exitPt h₂ := rfl
 
 /-- `a` is *active* in tour `f`: both its chain entrance and its chain exit are
 tour-adjacent to a selector (so its whole chain is a selector-to-selector arc). -/
