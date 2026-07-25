@@ -115,7 +115,8 @@ variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] {α : Typ
 
 @[simp]
 theorem realize_adjOrF (s t : hamL.Term α) :
-    (adjOrF s t).Realize v ↔ MGAdj (s.realize v) (t.realize v) ∨ MGAdj (t.realize v) (s.realize v) := by
+    (adjOrF s t).Realize v ↔
+      MGAdj (s.realize v) (t.realize v) ∨ MGAdj (t.realize v) (s.realize v) := by
   rw [adjOrF, Formula.realize_sup, Formula.realize_rel₂, Formula.realize_rel₂]
   simp [MGAdj]
 
@@ -144,7 +145,8 @@ theorem realize_succNbrF (a b c : α) :
       ∀ d : A, HEdge (v a) d → d ≤ v b ∨ v c ≤ d := by
   rw [succNbrF]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_sup,
-    realize_edgeF, realize_ltF, realize_leF, Term.realize_var, Sum.elim_inl, Sum.elim_inr, and_assoc]
+    realize_edgeF, realize_ltF, realize_leF, Term.realize_var, Sum.elim_inl, Sum.elim_inr,
+    and_assoc]
   refine and_congr Iff.rfl (and_congr Iff.rfl ?_)
   exact ⟨fun h d => h (fun _ => d), fun h i => h (i 0)⟩
 
@@ -272,7 +274,7 @@ theorem dom_gadget (t : HTag) (ht : t ≠ .sel ∧ t ≠ .hub) (w : Fin 2 → A)
 
 theorem dom_sel (w : Fin 2 → A) :
     (hamInterp.domFormula .sel).Realize w ↔ w 0 = w 1 ∧ MGMarked (w 0) := by
-  show (Term.equal (Term.var 0) (Term.var 1) ⊓
+  change (Term.equal (Term.var 0) (Term.var 1) ⊓
     Relations.formula₁ hMarkedSym (Term.var 0)).Realize w ↔ _
   rw [Formula.realize_inf, Formula.realize_equal, Formula.realize_rel₁]
   simp [MGMarked]
@@ -280,7 +282,7 @@ theorem dom_sel (w : Fin 2 → A) :
 theorem dom_hub (w : Fin 2 → A) :
     (hamInterp.domFormula .hub).Realize w ↔
       w 0 = w 1 ∧ (∀ a : A, w 0 ≤ a) ∧ (∀ y : A, ¬MGMarked y) ∧ ∀ y z : A, ¬HEdge y z := by
-  show (Term.equal (Term.var 0) (Term.var 1) ⊓ minF 0 ⊓ noMarksF ⊓ noEdgesF).Realize w ↔ _
+  change (Term.equal (Term.var 0) (Term.var 1) ⊓ minF 0 ⊓ noMarksF ⊓ noEdgesF).Realize w ↔ _
   rw [Formula.realize_inf, Formula.realize_inf, Formula.realize_inf, Formula.realize_equal,
     realize_minF, realize_noMarksF, realize_noEdgesF]
   tauto
