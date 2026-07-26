@@ -728,6 +728,48 @@ theorem step_functional_off_guess {c c₁ c₂ : Config (SatV A)}
     · exact satWrite_functional hwrite hwrite'
     · rw [hframe p hne, hframe' p hne]
 
+/-! ### The intended run: the guess phase -/
+
+open Classical in
+/-- The tape during the guess sweep, with the head at `p`: the markers hold
+their own symbols, a cell strictly below the head has been assigned its value
+under `ν`, a cell at or above the head is still unassigned, and every other
+element reads blank. -/
+noncomputable def guessTape (ν : A → Bool) (p q : SatV A) : SatV A :=
+  match q.1 with
+  | .pStart => symStart
+  | .pEnd => symEnd
+  | .pCell => if tagTupleLe q p ∧ q ≠ p then symV (ν (q.2 0)) (q.2 0) else symU (q.2 0)
+  | _ => symBlank
+
+/-- The configuration during the guess sweep, with the head at `p`. -/
+noncomputable def confGuess (ν : A → Bool) (p : SatV A) : Config (SatV A) where
+  state := stGuess
+  head := p
+  tape := guessTape ν p
+
+/-- **The guess sweep starts from an initial configuration**: at the left
+marker no cell is below the head, so every cell still reads unassigned – which
+is exactly the input `DescriptiveComplexity.SatInp` describes. -/
+theorem isInit_confGuess (ν : A → Bool) :
+    (satMachine A).IsInit (confGuess ν posStart) := by
+  have hne : ∀ q : SatV A, q.1 = SatTag.pCell → ¬ (tagTupleLe q (posStart : SatV A) ∧
+      q ≠ posStart) := by
+    rintro q hq ⟨hle, -⟩
+    have := tagTupleLe_tag_le hle
+    rw [hq] at this
+    exact absurd this (show ¬(SatTag.pCell ≤ SatTag.pStart) by decide)
+  refine ⟨⟨rfl, isMinTup_bot⟩, minPos_posStart, fun q => ?_⟩
+  change TMData.InitTape (satMachine A) q (guessTape ν posStart q)
+  cases hq : q.1 <;> simp only [guessTape, hq] <;>
+    first
+      | exact Or.inl (Or.inl ⟨hq, rfl, isMinTup_bot⟩)
+      | exact Or.inl (Or.inr (Or.inr ⟨hq, rfl, isMinTup_bot⟩))
+      | (rw [if_neg (hne q hq)]
+         exact Or.inl (Or.inr (Or.inl ⟨hq, rfl, rfl, fun b => botA_le b⟩)))
+      | (refine Or.inr ⟨fun b hb => ?_, rfl, isMinTup_bot⟩
+         rcases hb with ⟨h, -⟩ | ⟨h, -, -, -⟩ | ⟨h, -⟩ <;> rw [hq] at h <;> simp at h)
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
