@@ -810,6 +810,56 @@ theorem isInit_confGuess (ν : A → Bool) :
       | (refine Or.inr ⟨fun b hb => ?_, rfl, isMinTup_bot⟩
          rcases hb with ⟨h, -⟩ | ⟨h, -, -, -⟩ | ⟨h, -⟩ <;> rw [hq] at h <;> simp at h)
 
+/-- Only the three bracketing tags are at or below the right marker's. -/
+theorem tag_le_pEnd {t : SatTag} (h : t ≤ SatTag.pEnd) :
+    t = SatTag.pStart ∨ t = SatTag.pCell ∨ t = SatTag.pEnd := by
+  revert h; revert t; decide
+
+/-- **One step of the guess sweep.** At the left marker the machine steps over
+it; at a cell it writes the guessed value and moves on; past the right marker
+the segment bound leaves nothing to prove. -/
+theorem step_guess (ν : A → Bool) {p q : SatV A}
+    (hsucc : SuccPos tagTupleLe SatPosn p q) (hb : tagTupleLe q posEnd) :
+    (satMachine A).Step (confGuess ν p) (confGuess ν q) := by
+  classical
+  have hframe : ∀ r, r ≠ p → guessTape ν q r = guessTape ν p r :=
+    fun r hr => guessTape_frame ν hsucc hr
+  have hpe : p.1 ≤ SatTag.pEnd :=
+    tagTupleLe_tag_le (isLinOrd_tagTupleLe.2.1 p q posEnd hsucc.2.2.1 hb)
+  rcases tag_le_pEnd hpe with h | h | h
+  · refine ⟨cst .tGuessStart, isMinTup_bot, rfl, ?_, rfl, ?_, hframe,
+      Or.inl ⟨trivial, hsucc⟩⟩
+    · change guessTape ν p p = symStart
+      simp only [guessTape, h]
+    · change guessTape ν q p = symStart
+      simp only [guessTape, h]
+  · have hpos : ∀ a : A, p.2 1 ≤ a := by
+      have := hsucc.1
+      rw [SatPosn, h] at this
+      exact this
+    refine ⟨one (.tGuessVal (ν (p.2 0))) (p.2 0), fun a => botA_le a, rfl, ?_, rfl, ?_, hframe,
+      Or.inl ⟨trivial, hsucc⟩⟩
+    · change guessTape ν p p = symU (p.2 0)
+      simp only [guessTape, h]
+      exact if_neg (fun hc => hc.2.2 rfl)
+    · change guessTape ν q p = symV (ν (p.2 0)) (p.2 0)
+      simp only [guessTape, h]
+      exact if_pos ⟨hpos, hsucc.2.2.1, hsucc.2.2.2.1⟩
+  · exact absurd (isLinOrd_tagTupleLe.2.2.1 p q hsucc.2.2.1
+      ((eq_posEnd_of_posn hsucc.1 h) ▸ hb)) hsucc.2.2.2.1
+
+/-- **The whole guess sweep.** From the left marker to the right one, the
+machine writes a truth value in every cell, in as many steps as there are
+positions strictly between the markers – plus the two markers themselves. -/
+theorem steps_guess (ν : A → Bool) :
+    (satMachine A).StepsIn
+      (bitRank tagTupleLe SatPosn (posEnd : SatV A) -
+        bitRank tagTupleLe SatPosn (posStart : SatV A))
+      (confGuess ν posStart) (confGuess ν posEnd) :=
+  TMData.stepsIn_of_segment isLinOrd_tagTupleLe satPosn_posStart
+    (fun _ _ hsucc _ hb => step_guess ν hsucc hb) posEnd satPosn_posEnd
+    (minPos_posStart.2 posEnd satPosn_posEnd) (tagTupleLe_refl _)
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
