@@ -213,7 +213,9 @@ def SatWrite (τ a : SatV A) : Prop :=
   | _ => False
 
 /-- Which transitions move the head right: the guess phase always does, a check
-sweep goes in its own direction, and a turn reverses. -/
+sweep goes in its own direction, and a turn – whether it takes the next clause
+or accepts – reverses. A turn must reverse even when accepting: it fires *at* a
+marker, and there is no position beyond one. -/
 def SatRight (τ : SatV A) : Prop :=
   match τ.1 with
   | .tGuessStart => True
@@ -222,7 +224,7 @@ def SatRight (τ : SatV A) : Prop :=
   | .tGuessEndChk => False
   | .tChk _ _ d => d = true
   | .tTurnNext d => d = false
-  | .tTurnAcc _ => False
+  | .tTurnAcc d => d = false
   | _ => False
 
 /-- Accepting states: just `DescriptiveComplexity.stAcc`. -/
@@ -1134,6 +1136,28 @@ theorem step_turnNextR (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
     rw [hflag]
   · change stChk (chkFlagL ν c' (posCell topA)) false c' = stChk false false c'
     rw [chkFlagL_top]
+
+/-- **Accepting at the left marker**: the flag is set and the clause just
+checked was the last one. -/
+theorem step_turnAccL (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
+    (hflag : chkFlagL ν c (posStart : SatV A) = true) :
+    (satMachine A).Step (confChkL ν c posStart)
+      { state := stAcc, head := posCell botA, tape := doneTape ν } := by
+  refine ⟨one (.tTurnAcc false) c, ⟨fun a => botA_le a, hmax⟩, ?_, doneTape_start ν, rfl,
+    doneTape_start ν, fun r _ => rfl, Or.inl ⟨rfl, succPos_posStart_posCell⟩⟩
+  change stChk (chkFlagL ν c posStart) false c = stChk true false c
+  rw [hflag]
+
+/-- **Accepting at the right marker** – the mirror. -/
+theorem step_turnAccR (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
+    (hflag : chkFlagR ν c (posEnd : SatV A) = true) :
+    (satMachine A).Step (confChkR ν c posEnd)
+      { state := stAcc, head := posCell topA, tape := doneTape ν } := by
+  refine ⟨one (.tTurnAcc true) c, ⟨fun a => botA_le a, hmax⟩, ?_, doneTape_end ν, rfl,
+    doneTape_end ν, fun r _ => rfl,
+    Or.inr ⟨fun h => Bool.noConfusion h, succPos_posCell_posEnd⟩⟩
+  change stChk (chkFlagR ν c posEnd) true c = stChk true true c
+  rw [hflag]
 
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
