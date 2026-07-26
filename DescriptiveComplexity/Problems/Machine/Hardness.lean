@@ -521,6 +521,33 @@ theorem satTr_unique {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
 
 end Functional
 
+/-- **The machine is deterministic away from the guess.** Once the transition
+is pinned (`DescriptiveComplexity.satTr_unique`), the successor configuration is too: its
+state by `satDst_functional`, the cell under the head by `satWrite_functional`,
+every other cell by the frame condition, and the head itself by uniqueness of
+the neighbour in the direction the transition names.
+
+This is design decision (d) of `MACHINE.md`: with only the guess phase
+branching, the `⇒` half of correctness becomes a corollary of uniqueness rather
+than a second invariant induction. -/
+theorem step_functional_off_guess {c c₁ c₂ : Config (SatV A)}
+    (hguess : ¬ (c.state = stGuess ∧ ∃ x : A, c.tape c.head = symU x))
+    (h₁ : (satMachine A).Step c c₁) (h₂ : (satMachine A).Step c c₂) : c₁ = c₂ := by
+  obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := h₁
+  obtain ⟨σ, hσ, hsrc', hread', hdst', hwrite', hframe', hmove'⟩ := h₂
+  have hteq : τ = σ := satTr_unique hτ hσ hsrc hsrc' hread hread' hguess
+  subst hteq
+  refine Config.ext (satDst_functional hdst hdst') ?_ (funext fun p => ?_)
+  · rcases hmove with ⟨hrt, hsp⟩ | ⟨hrt, hsp⟩ <;>
+      rcases hmove' with ⟨hrt', hsp'⟩ | ⟨hrt', hsp'⟩
+    · exact TMData.succPos_right_unique isLinOrd_tagTupleLe hsp hsp'
+    · exact absurd hrt hrt'
+    · exact absurd hrt' hrt
+    · exact succPos_left_unique isLinOrd_tagTupleLe hsp hsp'
+  · rcases eq_or_ne p c.head with rfl | hne
+    · exact satWrite_functional hwrite hwrite'
+    · rw [hframe p hne, hframe' p hne]
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
