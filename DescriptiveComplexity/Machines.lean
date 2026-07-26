@@ -123,10 +123,30 @@ state within as many steps as there are positions.
 The bound is unary by construction – it counts elements of the universe – which
 is what makes this an NP problem rather than an NEXP one, with no arithmetic
 anywhere. A reduction buys itself `|Tag| · nᵈ` steps by choosing the dimension
-`d` of its interpretation. -/
+`d` of its interpretation.
+
+The bound is *strict* because the positions index the time points of the run:
+`N` of them leave `N - 1` steps between them, which is what makes
+`DescriptiveComplexity.TMData.accepts_iff_exists_walk` an equivalence on the nose. -/
 def Accepts : Prop :=
-  ∃ (c₀ c : Config A) (n : ℕ), M.IsInit c₀ ∧ n ≤ Nat.card {p : A // M.Posn p} ∧
+  ∃ (c₀ c : Config A) (n : ℕ), M.IsInit c₀ ∧ n < Nat.card {p : A // M.Posn p} ∧
     M.StepsIn n c₀ c ∧ M.Acc c.state
+
+section Steps
+
+variable {M}
+
+/-- A run extended by one more step at its end. -/
+theorem StepsIn.trans_step : ∀ {n : ℕ} {c d e : Config A},
+    M.StepsIn n c d → M.Step d e → M.StepsIn (n + 1) c e := by
+  intro n
+  induction n with
+  | zero => intro c d e hcd hde; exact ⟨e, by rw [show c = d from hcd]; exact hde, rfl⟩
+  | succ n ih =>
+    rintro c d e ⟨m, hstep, hrest⟩ hde
+    exact ⟨m, hstep, ih hrest hde⟩
+
+end Steps
 
 /-- **Well-formedness**, folded into the yes-instances in the style of
 `DescriptiveComplexity.IsLinOrd` for Knapsack: the order is linear, there is a position

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Machine.Defs
+import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Machine acceptance (the machine bridge, in progress)
@@ -20,10 +21,14 @@ NP-complete closes that gap from inside the framework.
 
 What is here so far is stage 1 of that plan: the semantics
 (`DescriptiveComplexity.Machines`), the vocabulary, the problem and its
-isomorphism-invariance. Still to come, in order:
+isomorphism-invariance, and the bridge
+`DescriptiveComplexity.TMData.accepts_iff_exists_walk` between an `ℕ`-indexed run and
+one indexed by the position elements – which is the form a first-order kernel
+can talk about, and where the unary time bound is cashed in. Still to come, in
+order:
 
-* `NTMAccept ∈ NP` – guess the run as three relations indexed by the positions
-  and check the tableau clauses first-order;
+* `NTMAccept ∈ NP` – guess that walk as three relations indexed by the
+  positions and check the tableau clauses first-order;
 * `SAT ≤ᶠᵒ[≤] NTMAccept` – a bespoke machine built inside a SAT instance;
 * and the two characterizations `mem_NP_iff_le_ntmAccept` and its `PTIME`
   analogue.
