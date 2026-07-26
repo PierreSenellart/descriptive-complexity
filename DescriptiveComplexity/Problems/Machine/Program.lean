@@ -17,8 +17,11 @@ such a phase should not require redoing an induction along the order each time.
 
 `DescriptiveComplexity.TMData.stepsIn_of_segment` is that induction, done once: given a
 family of configurations indexed by the positions and a step between each
-consecutive pair *from a starting position onwards*, the machine walks from
-that position to any later one, in exactly as many steps as their ranks differ.
+consecutive pair *of a segment* `[p₀, p₁]`, the machine walks from `p₀` to any
+position of the segment, in exactly as many steps as their ranks differ. The
+segment is bounded at both ends because a phase stops – at a marker, or where
+the next phase begins – and the transitions that carry it need not exist
+beyond.
 A phase is then described by exhibiting its intended configuration at each
 position and checking a single step, which is a statement about the transition
 table rather than about runs.
@@ -71,48 +74,51 @@ later position, in exactly the number of steps their ranks differ by.
 This is the sweep primitive: a reduction describes a phase by giving its
 intended configuration at each position and discharging the single-step
 obligation, with no induction of its own. -/
-theorem stepsIn_of_segment (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ : A}
+theorem stepsIn_of_segment (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p₁ : A}
     (hp₀ : M.Posn p₀)
-    (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Step (conf p) (conf q)) :
-    ∀ p, M.Posn p → M.Le p₀ p →
+    (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ →
+      M.Step (conf p) (conf q)) :
+    ∀ p, M.Posn p → M.Le p₀ p → M.Le p p₁ →
       M.StepsIn (bitRank M.Le M.Posn p - bitRank M.Le M.Posn p₀) (conf p₀) (conf p) := by
-  have key : ∀ k : ℕ, ∀ p, M.Posn p → M.Le p₀ p → bitRank M.Le M.Posn p = k →
+  have key : ∀ k : ℕ, ∀ p, M.Posn p → M.Le p₀ p → M.Le p p₁ → bitRank M.Le M.Posn p = k →
       M.StepsIn (bitRank M.Le M.Posn p - bitRank M.Le M.Posn p₀) (conf p₀) (conf p) := by
     intro k
     induction k using Nat.strong_induction_on with
     | _ k ih =>
-      intro p hp hle hrank
+      intro p hp hle hub hrank
       rcases eq_or_ne p₀ p with rfl | hne
       · rw [Nat.sub_self]
         exact rfl
       · obtain ⟨q, hq⟩ := exists_predPos hlin hp (not_minPos_of_lt hlin hp₀ hle hne)
-        -- the predecessor of `p` is still at or above `p₀`
+        -- the predecessor of `p` is still at or above `p₀`, and still below `p₁`
         have hq₀ : M.Le p₀ q := by
           rcases hlin.2.2.2 p₀ q with h | h
           · exact h
           · rcases hq.2.2.2.2 p₀ hp₀ h hle with h' | h'
             · exact h' ▸ hlin.1 p₀
             · exact absurd h' hne
+        have hq₁ : M.Le q p₁ := hlin.2.1 q p p₁ hq.2.2.1 hub
         have hrq : bitRank M.Le M.Posn p = bitRank M.Le M.Posn q + 1 := bitRank_succPos hlin hq
         have hmono : bitRank M.Le M.Posn p₀ ≤ bitRank M.Le M.Posn q :=
           bitRank_le_of_le hlin hp₀ hq₀
-        have hstep' := hstep q p hq hq₀
-        have hrec := ih (bitRank M.Le M.Posn q) (by omega) q hq.1 hq₀ rfl
+        have hstep' := hstep q p hq hq₀ hub
+        have hrec := ih (bitRank M.Le M.Posn q) (by omega) q hq.1 hq₀ hq₁ rfl
         have := hrec.trans_step hstep'
         rwa [show bitRank M.Le M.Posn q - bitRank M.Le M.Posn p₀ + 1 =
           bitRank M.Le M.Posn p - bitRank M.Le M.Posn p₀ by omega] at this
-  exact fun p hp hle => key _ p hp hle rfl
+  exact fun p hp hle hub => key _ p hp hle hub rfl
 
 /-- **Running a phase to the end of the tape.** The special case a reduction's
 last phase needs: from `p₀` to the highest position, in `Nat.card - 1 - rank p₀`
 steps. -/
 theorem stepsIn_to_maxPos (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p₁ : A}
     (hp₀ : M.Posn p₀) (hp₁ : MaxPos M.Le M.Posn p₁)
-    (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Step (conf p) (conf q)) :
+    (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ →
+      M.Step (conf p) (conf q)) :
     M.StepsIn (Nat.card {p : A // M.Posn p} - 1 - bitRank M.Le M.Posn p₀)
       (conf p₀) (conf p₁) := by
   have hmax : bitRank M.Le M.Posn p₁ + 1 = Nat.card {p : A // M.Posn p} := bitRank_maxPos hp₁
-  have := stepsIn_of_segment hlin hp₀ hstep p₁ hp₁.1 (hp₁.2 p₀ hp₀)
+  have := stepsIn_of_segment hlin hp₀ hstep p₁ hp₁.1 (hp₁.2 p₀ hp₀) (hlin.1 p₁)
   rwa [show Nat.card {p : A // M.Posn p} - 1 - bitRank M.Le M.Posn p₀ =
     bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn p₀ by omega]
 
@@ -123,10 +129,11 @@ correctness proof needs. -/
 theorem accepts_of_segment (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p : A}
     (hp₀ : MinPos M.Le M.Posn p₀) (hinit : M.IsInit (conf p₀)) (hp : M.Posn p)
     (hacc : M.Acc (conf p).state)
-    (hstep : ∀ r q, SuccPos M.Le M.Posn r q → M.Le p₀ r → M.Step (conf r) (conf q)) :
+    (hstep : ∀ r q, SuccPos M.Le M.Posn r q → M.Le p₀ r → M.Le q p →
+      M.Step (conf r) (conf q)) :
     M.Accepts := by
   refine ⟨conf p₀, conf p, bitRank M.Le M.Posn p - bitRank M.Le M.Posn p₀, hinit, ?_,
-    stepsIn_of_segment hlin hp₀.1 hstep p hp (hp₀.2 p hp), hacc⟩
+    stepsIn_of_segment hlin hp₀.1 hstep p hp (hp₀.2 p hp) (hlin.1 p), hacc⟩
   have := bitRank_lt_card (Le := M.Le) hp
   omega
 
