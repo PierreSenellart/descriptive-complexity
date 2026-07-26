@@ -1270,6 +1270,28 @@ theorem exists_satNextCl {c : A} (hc : SatCl c) (hnmax : ¬ SatMaxCl c) :
       ⟨le_refl, fun a b c => le_trans, fun a b => le_antisymm, le_total⟩ hne
   exact ⟨c', hc, hc', hlt, fun e he hce => hmin e ⟨he, hce⟩⟩
 
+/-- **The machine checks every remaining clause and accepts.** Induction along
+the clauses from `c` upwards: if `c` is the last one the machine accepts at the
+marker it reaches, and otherwise it turns to the next clause, reversing
+direction – which is why the statement carries both orientations at once. -/
+theorem accepts_from_chk (ν : A → Bool) (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
+    ∀ c : A, SatCl c →
+      (∃ (n : ℕ) (cfin : Config (SatV A)),
+          (satMachine A).StepsIn n (confChkL ν c (posCell topA)) cfin ∧ SatAcc cfin.state) ∧
+        ∃ (n : ℕ) (cfin : Config (SatV A)),
+          (satMachine A).StepsIn n (confChkR ν c (posCell botA)) cfin ∧ SatAcc cfin.state := by
+  intro c
+  induction c using WellFoundedGT.induction with
+  | ind c IH =>
+    intro hc
+    by_cases hmax : SatMaxCl c
+    · exact ⟨steps_clauseAccL ν hc hmax (hsat c hc), steps_clauseAccR ν hc hmax (hsat c hc)⟩
+    · obtain ⟨c', hnext⟩ := exists_satNextCl hc hmax
+      obtain ⟨⟨nL, cfL, hL, haL⟩, ⟨nR, cfR, hR, haR⟩⟩ := IH c' hnext.2.2.1 hnext.2.1
+      obtain ⟨j, hj⟩ := steps_clauseL ν hc hnext (hsat c hc)
+      obtain ⟨j', hj'⟩ := steps_clauseR ν hc hnext (hsat c hc)
+      exact ⟨⟨j + nR, cfR, hj.trans hR, haR⟩, ⟨j' + nL, cfL, hj'.trans hL, haL⟩⟩
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
