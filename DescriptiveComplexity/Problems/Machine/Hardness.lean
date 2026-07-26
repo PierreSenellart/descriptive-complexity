@@ -917,6 +917,39 @@ theorem chkFlagL_top (ν : A → Bool) (c : A) :
   rintro ⟨y, hle, hne, -⟩
   exact hne (congrArg _ (le_antisymm (le_topA y) (posCell_le_iff.mp hle))).symm
 
+/-- **Stepping down adds exactly one literal to the flag.** Moving the head
+from `q` to the position below it brings `q`'s own cell into view and nothing
+else, because `DescriptiveComplexity.SuccPos` leaves no room between them. This is the
+whole content of a check sweep. -/
+theorem chkFlagL_succ (ν : A → Bool) (c : A) {p q : SatV A}
+    (hsucc : SuccPos tagTupleLe SatPosn p q) (hq : q.1 = SatTag.pCell) :
+    chkFlagL ν c p = true ↔
+      (chkFlagL ν c q = true ∨ SatLit c (q.2 0) (ν (q.2 0))) := by
+  classical
+  have hqc : q = posCell (q.2 0) := eq_posCell_of_posn hsucc.2.1 hq
+  simp only [chkFlagL, decide_eq_true_eq]
+  constructor
+  · rintro ⟨y, hle, hne, hlit⟩
+    by_cases hcase : tagTupleLe q (posCell y) ∧ q ≠ posCell y
+    · exact Or.inl ⟨y, hcase.1, hcase.2, hlit⟩
+    · refine Or.inr ?_
+      have hyq : posCell y = q := by
+        by_cases hle' : tagTupleLe q (posCell y)
+        · exact (not_not.mp (by simpa [hle'] using hcase : ¬ q ≠ posCell y)).symm
+        · rcases hsucc.2.2.2.2 (posCell y) (satPosn_posCell y) hle
+            ((isLinOrd_tagTupleLe.2.2.2 (posCell y) q).resolve_right hle') with h | h
+          · exact absurd h.symm hne
+          · exact h
+      have : y = q.2 0 := by
+        have := congrArg (fun z : SatV A => z.2 0) (hyq.trans hqc)
+        simpa [one] using this
+      rwa [← this]
+  · rintro (⟨y, hle, hne, hlit⟩ | hlit)
+    · refine ⟨y, isLinOrd_tagTupleLe.2.1 p q _ hsucc.2.2.1 hle, ?_, hlit⟩
+      rintro rfl
+      exact hsucc.2.2.2.1 (isLinOrd_tagTupleLe.2.2.1 _ _ hsucc.2.2.1 hle)
+    · exact ⟨q.2 0, hqc ▸ hsucc.2.2.1, hqc ▸ hsucc.2.2.2.1, hlit⟩
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
