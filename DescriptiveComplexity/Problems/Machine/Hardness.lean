@@ -1046,6 +1046,63 @@ theorem step_turnNextL (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
   · change stChk (chkFlagR ν c' (posCell botA)) true c' = stChk false true c'
     rw [chkFlagR_bot]
 
+/-- **Stepping up adds exactly one literal to the flag** – the mirror of
+`DescriptiveComplexity.chkFlagL_succ`. -/
+theorem chkFlagR_succ (ν : A → Bool) (c : A) {p q : SatV A}
+    (hsucc : SuccPos tagTupleLe SatPosn p q) (hp : p.1 = SatTag.pCell) :
+    chkFlagR ν c q = true ↔ (chkFlagR ν c p = true ∨ SatLit c (p.2 0) (ν (p.2 0))) := by
+  classical
+  have hpc : p = posCell (p.2 0) := eq_posCell_of_posn hsucc.1 hp
+  simp only [chkFlagR, decide_eq_true_eq]
+  constructor
+  · rintro ⟨y, hle, hne, hlit⟩
+    by_cases hcase : tagTupleLe (posCell y) p ∧ posCell y ≠ p
+    · exact Or.inl ⟨y, hcase.1, hcase.2, hlit⟩
+    · refine Or.inr ?_
+      have hyp : posCell y = p := by
+        by_cases hle' : tagTupleLe (posCell y) p
+        · exact not_not.mp (by simpa [hle'] using hcase)
+        · rcases hsucc.2.2.2.2 (posCell y) (satPosn_posCell y)
+            ((isLinOrd_tagTupleLe.2.2.2 p (posCell y)).resolve_right hle') hle with h | h
+          · exact h
+          · exact absurd h hne
+      have hy : y = p.2 0 := by
+        have := congrArg (fun z : SatV A => z.2 0) (hyp.trans hpc)
+        simpa [one] using this
+      rwa [← hy]
+  · rintro (⟨y, hle, hne, hlit⟩ | hlit)
+    · refine ⟨y, isLinOrd_tagTupleLe.2.1 _ p q hle hsucc.2.2.1, ?_, hlit⟩
+      rintro rfl
+      exact hne (isLinOrd_tagTupleLe.2.2.1 _ _ hle hsucc.2.2.1)
+    · exact ⟨p.2 0, hpc ▸ hsucc.2.2.1, hpc ▸ hsucc.2.2.2.1, hlit⟩
+
+/-- **One step of a rightward check sweep** – the mirror of
+`DescriptiveComplexity.step_chkL`. -/
+theorem step_chkR (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
+    (hsucc : SuccPos tagTupleLe SatPosn p q) (hp : p.1 = SatTag.pCell) :
+    (satMachine A).Step (confChkR ν c p) (confChkR ν c q) := by
+  classical
+  have hpos : ∀ a : A, p.2 1 ≤ a := by
+    have := hsucc.1
+    rw [SatPosn, hp] at this
+    exact this
+  have hread : doneTape ν p = symV (ν (p.2 0)) (p.2 0) := doneTape_cell ν hp hpos
+  refine ⟨(SatTag.tChk (ν (p.2 0)) (chkFlagR ν c p) true, ![c, p.2 0]), hc, rfl, hread, ?_,
+    hread, fun r _ => rfl, Or.inl ⟨rfl, hsucc⟩⟩
+  by_cases hflag : chkFlagR ν c q = true
+  · refine Or.inl ⟨?_, ?_⟩
+    · change stChk (chkFlagR ν c q) true c = stChk true true c
+      rw [hflag]
+    · exact (chkFlagR_succ ν c hsucc hp).mp hflag
+  · refine Or.inr ⟨?_, ?_, ?_⟩
+    · change stChk (chkFlagR ν c q) true c = stChk false true c
+      rw [Bool.not_eq_true] at hflag
+      rw [hflag]
+    · by_contra hcon
+      exact hflag ((chkFlagR_succ ν c hsucc hp).mpr (Or.inl (by simpa using hcon)))
+    · intro hlit
+      exact hflag ((chkFlagR_succ ν c hsucc hp).mpr (Or.inr hlit))
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
