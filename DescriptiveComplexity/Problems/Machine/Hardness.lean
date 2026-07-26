@@ -992,6 +992,22 @@ theorem step_chkL (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
     · intro hlit
       exact hflag ((chkFlagL_succ ν c hsucc hq).mpr (Or.inr hlit))
 
+/-- **A whole leftward check sweep.** From the highest cell down to the left
+marker, the flag accumulating the literals of `c` satisfied along the way. -/
+theorem steps_chkL (ν : A → Bool) {c : A} (hc : SatCl c) :
+    (satMachine A).StepsIn
+      (bitRank tagTupleLe SatPosn (posCell (topA (A := A))) -
+        bitRank tagTupleLe SatPosn (posStart : SatV A))
+      (confChkL ν c (posCell topA)) (confChkL ν c posStart) := by
+  refine TMData.stepsIn_of_segment_down isLinOrd_tagTupleLe (satPosn_posCell _)
+    (fun p q hsucc _ hub => step_chkL ν hc hsucc ?_) posStart satPosn_posStart
+    (tagTupleLe_refl _) (posStart_le_posCell _)
+  rcases tag_le_pCell (tagTupleLe_tag_le hub) with h | h
+  · refine absurd (isLinOrd_tagTupleLe.2.2.1 p q hsucc.2.2.1 ?_) hsucc.2.2.2.1
+    rw [eq_posStart_of_posn hsucc.2.1 h]
+    exact minPos_posStart.2 p hsucc.1
+  · exact h
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
