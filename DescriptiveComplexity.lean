@@ -25,6 +25,7 @@ import DescriptiveComplexity.OccurrenceFormulas
 import DescriptiveComplexity.OccurrenceSlack
 import DescriptiveComplexity.OccurrenceVar
 import DescriptiveComplexity.Numbers
+import DescriptiveComplexity.Machines
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.Examples
 
@@ -157,6 +158,10 @@ individual declarations are documented on their own pages.
   Shared between the HORN-SAT program and the FO(LFP) → SO-Horn translation.
 * `DescriptiveComplexity.Numbers` – unary and binary encodings of numbers as
   finite structures, for threshold and weight parameters of problems.
+* `DescriptiveComplexity.Machines` – Turing machines as relations on a
+  universe, with no vocabulary: configurations, steps, and acceptance within a
+  budget counted in universe elements. The semantics the machine bridge of
+  `MACHINE.md` reads off an instance.
 
 ## The problem catalog
 

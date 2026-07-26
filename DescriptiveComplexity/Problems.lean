@@ -30,6 +30,7 @@ import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner
 import DescriptiveComplexity.Problems.Qbf
+import DescriptiveComplexity.Problems.Machine
 
 /-!
 # The problem catalog
@@ -41,5 +42,7 @@ containing its vocabulary, its semantic definition, the bundled
 completeness theorems.
 
 Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
-only the membership half – see `ROADMAP.md`.
+only the membership half – see `ROADMAP.md`. Machine acceptance
+(`DescriptiveComplexity.NTMAccept`) is the machine bridge of `MACHINE.md`, so far
+only defined.
 -/
