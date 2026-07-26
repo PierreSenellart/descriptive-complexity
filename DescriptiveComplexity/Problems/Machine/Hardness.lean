@@ -370,6 +370,47 @@ theorem satRead_tag {τ a : SatV A} (hτ : SatTr τ) (hr : SatRead τ a) :
       | (rw [hr]; rfl)
       | (rename_i d; cases d <;> (rw [hr]; rfl))
 
+/-- Being the tag of a transition. -/
+def isTrTag : SatTag → Bool
+  | .tGuessStart | .tGuessVal _ | .tGuessEndAcc | .tGuessEndChk
+  | .tChk _ _ _ | .tTurnNext _ | .tTurnAcc _ => true
+  | _ => false
+
+/-- The tag of a guess-phase write. -/
+def isGuessVal : SatTag → Bool
+  | .tGuessVal _ => true
+  | _ => false
+
+/-- The tag ending the guess phase with no clause to check. -/
+def isEndAcc : SatTag → Bool
+  | .tGuessEndAcc => true
+  | _ => false
+
+/-- The tag ending the guess phase with a clause to check. -/
+def isEndChk : SatTag → Bool
+  | .tGuessEndChk => true
+  | _ => false
+
+/-- The tag turning to the next clause. -/
+def isTurnNext : SatTag → Bool
+  | .tTurnNext _ => true
+  | _ => false
+
+/-- The tag accepting after the last clause. -/
+def isTurnAcc : SatTag → Bool
+  | .tTurnAcc _ => true
+  | _ => false
+
+/-- **The state and the symbol determine the transition's tag, up to the three
+known ambiguities**: the guess itself, the end of the guess phase, and a turn.
+A finite check over the tags – no case analysis by hand. -/
+theorem tag_cases : ∀ t t' : SatTag, isTrTag t → isTrTag t' →
+    stateTag t = stateTag t' → readTag t = readTag t' →
+    t = t' ∨ (isGuessVal t ∧ isGuessVal t') ∨
+      (isEndAcc t ∧ isEndChk t') ∨ (isEndChk t ∧ isEndAcc t') ∨
+      (isTurnNext t ∧ isTurnAcc t') ∨ (isTurnAcc t ∧ isTurnNext t') := by
+  decide
+
 end Functional
 
 /-- **The machine is well formed**, which is all of
