@@ -521,6 +521,25 @@ theorem satTr_unique {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
 
 end Functional
 
+/-! ### The positions of the tape, concretely -/
+
+omit [Language.sat.Structure A] in
+/-- The left marker is a position. -/
+theorem satPosn_posStart : SatPosn (posStart : SatV A) := fun a => ⟨botA_le a, botA_le a⟩
+
+omit [Language.sat.Structure A] in
+/-- The cell of an element is a position. -/
+theorem satPosn_posCell (x : A) : SatPosn (posCell x : SatV A) := fun a => botA_le a
+
+omit [Language.sat.Structure A] in
+/-- The right marker is a position. -/
+theorem satPosn_posEnd : SatPosn (posEnd : SatV A) := fun a => ⟨botA_le a, botA_le a⟩
+
+omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
+/-- Every filler tuple is a position. -/
+theorem satPosn_fill (i : Fin 4) (w : Fin 2 → A) : SatPosn ((SatTag.pFill i, w) : SatV A) :=
+  trivial
+
 /-- **The machine is deterministic away from the guess.** Once the transition
 is pinned (`DescriptiveComplexity.satTr_unique`), the successor configuration is too: its
 state by `satDst_functional`, the cell under the head by `satWrite_functional`,
