@@ -1008,6 +1008,44 @@ theorem steps_chkL (ν : A → Bool) {c : A} (hc : SatCl c) :
     exact minPos_posStart.2 p hsucc.1
   · exact h
 
+open Classical in
+/-- The flag of a *rightward* check sweep with the head at `p`: some cell
+already visited – strictly below `p` – satisfies `c`. -/
+noncomputable def chkFlagR (ν : A → Bool) (c : A) (p : SatV A) : Bool :=
+  decide (∃ y : A, tagTupleLe (posCell y) p ∧ posCell y ≠ p ∧ SatLit c y (ν y))
+
+/-- The configuration during a rightward check sweep of the clause `c`. -/
+noncomputable def confChkR (ν : A → Bool) (c : A) (p : SatV A) : Config (SatV A) where
+  state := stChk (chkFlagR ν c p) true c
+  head := p
+  tape := doneTape ν
+
+/-- **A rightward sweep also starts with an empty flag**: nothing lies below
+the lowest cell. -/
+theorem chkFlagR_bot (ν : A → Bool) (c : A) :
+    chkFlagR ν c (posCell (botA (A := A))) = false := by
+  classical
+  simp only [chkFlagR, decide_eq_false_iff_not]
+  rintro ⟨y, hle, hne, -⟩
+  exact hne (congrArg _ (le_antisymm (posCell_le_iff.mp hle) (botA_le y)))
+
+omit [Language.sat.Structure A] in
+/-- The left marker keeps its symbol throughout. -/
+theorem doneTape_start (ν : A → Bool) : doneTape ν (posStart : SatV A) = symStart := rfl
+
+/-- **The turn at the left marker**, when another clause follows: the flag is
+set, so the machine takes the next clause, empties the flag and reverses to
+sweep rightwards. -/
+theorem step_turnNextL (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
+    (hflag : chkFlagL ν c (posStart : SatV A) = true) :
+    (satMachine A).Step (confChkL ν c posStart) (confChkR ν c' (posCell botA)) := by
+  refine ⟨(SatTag.tTurnNext false, ![c, c']), hnext, ?_, doneTape_start ν, ?_,
+    doneTape_start ν, fun r _ => rfl, Or.inl ⟨rfl, succPos_posStart_posCell⟩⟩
+  · change stChk (chkFlagL ν c posStart) false c = stChk true false c
+    rw [hflag]
+  · change stChk (chkFlagR ν c' (posCell botA)) true c' = stChk false true c'
+    rw [chkFlagR_bot]
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
