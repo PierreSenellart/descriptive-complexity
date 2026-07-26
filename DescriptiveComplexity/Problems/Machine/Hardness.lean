@@ -540,6 +540,53 @@ omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 theorem satPosn_fill (i : Fin 4) (w : Fin 2 → A) : SatPosn ((SatTag.pFill i, w) : SatV A) :=
   trivial
 
+omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
+/-- The tape order is reflexive. -/
+theorem tagTupleLe_refl (p : SatV A) : tagTupleLe p p := Or.inr ⟨rfl, Or.inl rfl⟩
+
+omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
+/-- A tag strictly below another puts its tuples below all of theirs. -/
+theorem tagTupleLe_of_tag_lt {p q : SatV A} (h : p.1 < q.1) : tagTupleLe p q := Or.inl h
+
+/-- Every tag other than the left marker's is above it. -/
+theorem pStart_lt {t : SatTag} (h : t ≠ SatTag.pStart) : SatTag.pStart < t := by
+  revert h; revert t; decide
+
+omit [Language.sat.Structure A] in
+/-- There is only one left marker. -/
+theorem eq_posStart_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pStart) :
+    p = posStart := by
+  obtain ⟨t, w⟩ := p
+  cases h
+  refine Prod.ext rfl (funext fun i => ?_)
+  fin_cases i
+  · exact le_antisymm (hp botA).1 (botA_le _)
+  · exact le_antisymm (hp botA).2 (botA_le _)
+
+omit [Language.sat.Structure A] in
+/-- **The left marker is the lowest position**: the head starts there. -/
+theorem minPos_posStart : MinPos tagTupleLe SatPosn (posStart : SatV A) := by
+  refine ⟨satPosn_posStart, fun q hq => ?_⟩
+  rcases eq_or_ne q.1 SatTag.pStart with h | h
+  · rw [eq_posStart_of_posn hq h]
+    exact tagTupleLe_refl _
+  · exact tagTupleLe_of_tag_lt (pStart_lt h)
+
+omit [Language.sat.Structure A] in
+/-- The left marker precedes every cell. -/
+theorem posStart_le_posCell (x : A) : tagTupleLe (posStart : SatV A) (posCell x) :=
+  tagTupleLe_of_tag_lt (show SatTag.pStart < SatTag.pCell by decide)
+
+omit [Language.sat.Structure A] in
+/-- Every cell precedes the right marker. -/
+theorem posCell_le_posEnd (x : A) : tagTupleLe (posCell x : SatV A) posEnd :=
+  tagTupleLe_of_tag_lt (show SatTag.pCell < SatTag.pEnd by decide)
+
+omit [Language.sat.Structure A] in
+/-- The left marker precedes the right marker. -/
+theorem posStart_le_posEnd : tagTupleLe (posStart : SatV A) posEnd :=
+  tagTupleLe_of_tag_lt (show SatTag.pStart < SatTag.pEnd by decide)
+
 /-- **The machine is deterministic away from the guess.** Once the transition
 is pinned (`DescriptiveComplexity.satTr_unique`), the successor configuration is too: its
 state by `satDst_functional`, the cell under the head by `satWrite_functional`,
