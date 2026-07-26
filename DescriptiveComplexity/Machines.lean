@@ -50,6 +50,7 @@ namespace DescriptiveComplexity
 
 /-- A configuration: the current state, the position of the head, and the
 contents of the tape. -/
+@[ext]
 structure Config (A : Type) where
   /-- The current state. -/
   state : A

@@ -185,6 +185,132 @@ theorem accepts_iff_exists_walk [Finite A] (hwf : M.WellFormed) :
       bitRank_maxPos hp₁
     exact ⟨conf p₀, conf p₁, n, hinit p₀ hp₀, by omega, hsteps, haccept p₁ hp₁⟩
 
+/-! ### The relational form of a walk
+
+A first-order kernel cannot guess a *function* `A → Config A`; it guesses
+relations. `DescriptiveComplexity.TMData.RelWalk` is the walk written with the three
+relations a `Σ₁` block can supply – `Q t q`, “the state at time `t` is `q`”,
+`H t p`, “the head is on `p`”, and `T t p a`, “the cell `p` holds `a`” – each
+asserted to be functional, which is where the equivalence with a walk by
+configurations is bought.
+
+Every clause below is a literal transcription target for
+`DescriptiveComplexity.Problems.Machine.Membership`: nothing here quantifies over
+anything but elements of the universe. -/
+
+section Relational
+
+variable {A : Type} (M : TMData A) (Q H : A → A → Prop) (T : A → A → A → Prop)
+
+/-- The step clause, relationally: some transition takes the configuration at
+`t` to the one at `t'`. -/
+def RelStep (t t' : A) : Prop :=
+  ∃ τ, M.Tr τ ∧ (∀ q, Q t q → M.Src τ q) ∧ (∀ p a, H t p → T t p a → M.Read τ a) ∧
+    (∀ q, Q t' q → M.Dst τ q) ∧ (∀ p a, H t p → T t' p a → M.Write τ a) ∧
+    (∀ p a, ¬ H t p → (T t p a ↔ T t' p a)) ∧
+    ((M.Right τ ∧ ∀ p p', H t p → H t' p' → SuccPos M.Le M.Posn p p') ∨
+      (¬ M.Right τ ∧ ∀ p p', H t p → H t' p' → SuccPos M.Le M.Posn p' p))
+
+/-- The stutter clause, relationally: an accepting configuration repeated. -/
+def RelStutter (t t' : A) : Prop :=
+  (∀ q, Q t q → M.Acc q) ∧ (∀ q, Q t' q ↔ Q t q) ∧ (∀ p, H t' p ↔ H t p) ∧
+    ∀ p a, T t' p a ↔ T t p a
+
+/-- **A walk, guessed as three relations.** -/
+structure RelWalk : Prop where
+  /-- There is a state at each time. -/
+  qex : ∀ t, ∃ q, Q t q
+  /-- There is only one. -/
+  quniq : ∀ t q q', Q t q → Q t q' → q = q'
+  /-- The head is somewhere at each time. -/
+  hex : ∀ t, ∃ p, H t p
+  /-- It is in only one place. -/
+  huniq : ∀ t p p', H t p → H t p' → p = p'
+  /-- Every cell holds a symbol at each time. -/
+  tex : ∀ t p, ∃ a, T t p a
+  /-- It holds only one. -/
+  tuniq : ∀ t p a a', T t p a → T t p a' → a = a'
+  /-- At the lowest time the configuration is initial. -/
+  init : ∀ t, MinPos M.Le M.Posn t →
+    (∀ q, Q t q → M.Start q) ∧ (∀ p, H t p → MinPos M.Le M.Posn p) ∧
+      ∀ p a, T t p a → M.InitTape p a
+  /-- Consecutive times are related by a step or by an accepting stutter. -/
+  step : ∀ t t', SuccPos M.Le M.Posn t t' →
+    RelStep M Q H T t t' ∨ RelStutter M Q H T t t'
+  /-- At the highest time the state is accepting. -/
+  acc : ∀ t, MaxPos M.Le M.Posn t → ∀ q, Q t q → M.Acc q
+
+variable {M Q H T}
+
+/-- **The two forms of a walk agree.** Left to right the relations are read off
+the configurations; right to left the configurations are chosen, which is what
+the functionality clauses make well defined. -/
+theorem exists_relWalk_iff_exists_walk :
+    (∃ Q H T, M.RelWalk Q H T) ↔ ∃ conf : A → Config A, M.IsWalk conf := by
+  constructor
+  · rintro ⟨Q, H, T, h⟩
+    classical
+    refine ⟨fun t => ⟨(h.qex t).choose, (h.hex t).choose, fun p => (h.tex t p).choose⟩,
+      ?_, ?_, ?_⟩
+    · -- the configuration chosen at the lowest time is initial
+      intro t ht
+      obtain ⟨hst, hhd, htp⟩ := h.init t ht
+      exact ⟨hst _ (h.qex t).choose_spec, hhd _ (h.hex t).choose_spec,
+        fun p => htp p _ (h.tex t p).choose_spec⟩
+    · -- consecutive chosen configurations step or stutter
+      intro t t' hs
+      have hQ : ∀ s, Q s (h.qex s).choose := fun s => (h.qex s).choose_spec
+      have hH : ∀ s, H s (h.hex s).choose := fun s => (h.hex s).choose_spec
+      have hT : ∀ s p, T s p (h.tex s p).choose := fun s p => (h.tex s p).choose_spec
+      rcases h.step t t' hs with ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ | hstut
+      · refine Or.inl ⟨τ, hτ, hsrc _ (hQ t), hread _ _ (hH t) (hT t _),
+          hdst _ (hQ t'), hwrite _ _ (hH t) (hT t' _), fun p hp => ?_, ?_⟩
+        · have hnh : ¬ H t p := fun hcon => hp (h.huniq t p _ hcon (hH t))
+          dsimp only
+          exact h.tuniq t' p _ _ (hT t' p) ((hframe p _ hnh).mp (hT t p))
+        · rcases hmove with ⟨hr, hmv⟩ | ⟨hr, hmv⟩
+          · exact Or.inl ⟨hr, hmv _ _ (hH t) (hH t')⟩
+          · exact Or.inr ⟨hr, hmv _ _ (hH t) (hH t')⟩
+      · obtain ⟨hacc, hq, hh, ht⟩ := hstut
+        refine Or.inr ⟨hacc _ (hQ t), ?_⟩
+        dsimp only
+        refine Config.ext (h.quniq t _ _ ((hq _).mp (hQ t')) (hQ t))
+          (h.huniq t _ _ ((hh _).mp (hH t')) (hH t)) (funext fun p => ?_)
+        exact h.tuniq t p _ _ ((ht p _).mp (hT t' p)) (hT t p)
+    · intro t ht
+      exact h.acc t ht _ (h.qex t).choose_spec
+  · rintro ⟨conf, hinit, hstep, hacc⟩
+    refine ⟨fun t q => q = (conf t).state, fun t p => p = (conf t).head,
+      fun t p a => a = (conf t).tape p, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    · exact fun t => ⟨_, rfl⟩
+    · rintro t q q' rfl rfl; rfl
+    · exact fun t => ⟨_, rfl⟩
+    · rintro t p p' rfl rfl; rfl
+    · exact fun t p => ⟨_, rfl⟩
+    · rintro t p a a' rfl rfl; rfl
+    · rintro t ht
+      obtain ⟨hst, hhd, htp⟩ := hinit t ht
+      exact ⟨by rintro q rfl; exact hst, by rintro p rfl; exact hhd,
+        by rintro p a rfl; exact htp p⟩
+    · intro t t' hs
+      rcases hstep t t' hs with ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ | ⟨hacc', heq⟩
+      · refine Or.inl ⟨τ, hτ, by rintro q rfl; exact hsrc, ?_, by rintro q rfl; exact hdst,
+          ?_, ?_, ?_⟩
+        · rintro p a rfl rfl; exact hread
+        · rintro p a rfl rfl; exact hwrite
+        · intro p a hp
+          dsimp only at hp ⊢
+          rw [hframe p fun hcon => hp hcon]
+        · rcases hmove with ⟨hr, hmv⟩ | ⟨hr, hmv⟩
+          · exact Or.inl ⟨hr, by rintro p p' rfl rfl; exact hmv⟩
+          · exact Or.inr ⟨hr, by rintro p p' rfl rfl; exact hmv⟩
+      · refine Or.inr ⟨by rintro q rfl; exact hacc', fun q => ?_, fun p => ?_, fun p a => ?_⟩ <;>
+          dsimp only <;> rw [heq]
+    · rintro t ht q rfl
+      exact hacc t ht
+
+end Relational
+
 end TMData
 
 end DescriptiveComplexity
