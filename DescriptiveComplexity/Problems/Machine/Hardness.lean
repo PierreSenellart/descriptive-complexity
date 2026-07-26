@@ -587,6 +587,63 @@ omit [Language.sat.Structure A] in
 theorem posStart_le_posEnd : tagTupleLe (posStart : SatV A) posEnd :=
   tagTupleLe_of_tag_lt (show SatTag.pStart < SatTag.pEnd by decide)
 
+omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
+/-- The tape order refines the tag order. -/
+theorem tagTupleLe_tag_le {p q : SatV A} (h : tagTupleLe p q) : p.1 ≤ q.1 := by
+  rcases h with h | ⟨h, -⟩
+  · exact le_of_lt h
+  · exact le_of_eq h
+
+omit [Language.sat.Structure A] in
+/-- **Cells are ordered as their elements are.** The tape order between two
+cells is the source order between the elements they belong to – which is what
+makes a sweep over the cells a walk along the instance. -/
+theorem posCell_le_iff {x y : A} : tagTupleLe (posCell x : SatV A) (posCell y) ↔ x ≤ y := by
+  constructor
+  · rintro (h | ⟨-, h | ⟨j, hlt, hj⟩⟩)
+    · exact absurd h (lt_irrefl _)
+    · exact le_of_eq (by simpa [one] using congrFun h 0)
+    · fin_cases j
+      · exact le_of_lt (by simpa [one] using hj)
+      · exact le_of_eq (by simpa [one] using hlt 0 (by decide))
+  · intro h
+    refine Or.inr ⟨rfl, ?_⟩
+    rcases eq_or_lt_of_le h with rfl | hlt
+    · exact Or.inl rfl
+    · exact Or.inr ⟨0, fun i hi => absurd hi (by omega), by simpa [one] using hlt⟩
+
+/-- Only the two lowest tags are at or below a cell's. -/
+theorem tag_le_pCell {t : SatTag} (h : t ≤ SatTag.pCell) :
+    t = SatTag.pStart ∨ t = SatTag.pCell := by
+  revert h; revert t; decide
+
+omit [Language.sat.Structure A] in
+/-- A cell is the cell of the element it carries. -/
+theorem eq_posCell_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pCell) :
+    p = posCell (p.2 0) := by
+  obtain ⟨t, w⟩ := p
+  cases h
+  refine Prod.ext rfl (funext fun i => ?_)
+  fin_cases i
+  · simp [one]
+  · exact le_antisymm (hp botA) (botA_le _)
+
+omit [Language.sat.Structure A] in
+/-- **The head's first move.** The cell of the least element follows the left
+marker immediately: the guess sweep starts by stepping over `⊢`. -/
+theorem succPos_posStart_posCell :
+    SuccPos tagTupleLe SatPosn (posStart : SatV A) (posCell botA) := by
+  refine ⟨satPosn_posStart, satPosn_posCell _, posStart_le_posCell _, ?_, ?_⟩
+  · intro h
+    exact absurd (congrArg Prod.fst h) (show ¬(SatTag.pStart = SatTag.pCell) by decide)
+  · intro r hr h1 h2
+    rcases tag_le_pCell (tagTupleLe_tag_le h2) with h | h
+    · exact Or.inl (eq_posStart_of_posn hr h)
+    · refine Or.inr ?_
+      have hcell := eq_posCell_of_posn hr h
+      have hle : r.2 0 ≤ botA := posCell_le_iff.mp (hcell ▸ h2)
+      rw [hcell, le_antisymm hle (botA_le _)]
+
 /-- **The machine is deterministic away from the guess.** Once the transition
 is pinned (`DescriptiveComplexity.satTr_unique`), the successor configuration is too: its
 state by `satDst_functional`, the cell under the head by `satWrite_functional`,
