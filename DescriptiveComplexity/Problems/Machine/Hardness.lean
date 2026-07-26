@@ -1224,6 +1224,37 @@ theorem steps_clauseAccR (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMax
   ⟨_, _, (steps_chkR ν hc).trans_step
     (step_turnAccR ν hmax ((chkFlagR_posEnd ν c).mpr hsat)), rfl⟩
 
+omit [Language.sat.Structure A] in
+/-- **A sweep is short.** Only the left marker and the cells lie below the
+right marker, so a sweep of the tape takes about as many steps as the instance
+has elements – not as many as the tape has positions, which is what makes the
+run fit the budget. Proved by injecting into `Option A` rather than by counting.
+-/
+theorem bitRank_posEnd_le :
+    bitRank tagTupleLe SatPosn (posEnd : SatV A) ≤ Nat.card A + 1 := by
+  classical
+  have hcell : ∀ r : SatV A, SatPosn r → tagTupleLe r posEnd → r ≠ posEnd →
+      r.1 ≠ SatTag.pStart → r.1 = SatTag.pCell := by
+    intro r hr hle hne hns
+    rcases tag_le_pEnd (tagTupleLe_tag_le hle) with h | h | h
+    · exact absurd h hns
+    · exact h
+    · exact absurd (eq_posEnd_of_posn hr h) hne
+  refine le_trans (Set.ncard_le_ncard_of_injOn
+    (fun r : SatV A => if r.1 = SatTag.pStart then none else some (r.2 0))
+    (fun _ _ => Set.mem_univ _) ?_ (Set.toFinite _)) ?_
+  · rintro r ⟨hr, hle, hne⟩ r' ⟨hr', hle', hne'⟩ heq
+    by_cases hs : r.1 = SatTag.pStart <;> by_cases hs' : r'.1 = SatTag.pStart
+    · rw [eq_posStart_of_posn hr hs, eq_posStart_of_posn hr' hs']
+    · simp [hs, hs'] at heq
+    · simp [hs, hs'] at heq
+    · have h0 : r.2 0 = r'.2 0 := by simpa [hs, hs'] using heq
+      rw [eq_posCell_of_posn hr (hcell r hr hle hne hs),
+        eq_posCell_of_posn hr' (hcell r' hr' hle' hne' hs'), h0]
+  · rw [Set.ncard_univ]
+    haveI := Fintype.ofFinite A
+    simp [Nat.card_eq_fintype_card]
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
