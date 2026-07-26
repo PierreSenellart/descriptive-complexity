@@ -50,6 +50,20 @@ private theorem not_minPos_of_lt (hlin : IsLinOrd M.Le) {p₀ p : A} (hp₀ : M.
     (hle : M.Le p₀ p) (hne : p₀ ≠ p) : ¬ MinPos M.Le M.Posn p :=
   fun hmin => hne (hlin.2.2.1 p₀ p hle (hmin.2 p₀ hp₀))
 
+omit [Finite A] in
+/-- **The successor of a position is unique.** `DescriptiveComplexity.succPos_left_unique`
+gives the predecessor; a step of a machine needs this direction, since the head
+moves to *the* neighbour in the direction the transition names. -/
+theorem succPos_right_unique (hlin : IsLinOrd M.Le) {p q q' : A}
+    (h : SuccPos M.Le M.Posn p q) (h' : SuccPos M.Le M.Posn p q') : q = q' := by
+  rcases hlin.2.2.2 q q' with hle | hle
+  · rcases h'.2.2.2.2 q h.2.1 h.2.2.1 hle with hcon | hcon
+    · exact absurd hcon.symm h.2.2.2.1
+    · exact hcon
+  · rcases h.2.2.2.2 q' h'.2.1 h'.2.2.1 hle with hcon | hcon
+    · exact absurd hcon.symm h'.2.2.2.1
+    · exact hcon.symm
+
 /-- **Running a phase.** If from `p₀` onwards every immediate successor of
 positions carries a step of the machine, then the machine runs from `p₀` to any
 later position, in exactly the number of steps their ranks differ by.
