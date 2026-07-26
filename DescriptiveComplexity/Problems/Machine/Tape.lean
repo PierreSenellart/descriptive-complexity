@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Machine.Program
 import DescriptiveComplexity.OrderedComposition
+import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The tape of the SAT machine
@@ -70,12 +71,25 @@ inductive SatTag : Type
   | pEnd
   /-- Filler cells, four tags' worth, supplying the time budget. -/
   | pFill (i : Fin 4)
+  /-- The left-marker symbol `⊢`. -/
+  | sStart
+  /-- The right-marker symbol `⊣`. -/
+  | sEnd
+  /-- The blank symbol. -/
+  | sBlank
+  /-- The symbol `(x, U)`: the cell of `x`, not yet assigned. -/
+  | sU
+  /-- The symbol `(x, T)`: the cell of `x`, assigned true. -/
+  | sT
+  /-- The symbol `(x, F)`: the cell of `x`, assigned false. -/
+  | sF
   deriving DecidableEq
 
 instance : Fintype SatTag where
   elems :=
     {SatTag.pStart, SatTag.pCell, SatTag.pEnd,
-      SatTag.pFill 0, SatTag.pFill 1, SatTag.pFill 2, SatTag.pFill 3}
+      SatTag.pFill 0, SatTag.pFill 1, SatTag.pFill 2, SatTag.pFill 3,
+      SatTag.sStart, SatTag.sEnd, SatTag.sBlank, SatTag.sU, SatTag.sT, SatTag.sF}
   complete := fun t => by cases t with
     | pFill i => fin_cases i <;> decide
     | _ => decide
@@ -88,6 +102,12 @@ def satTagIdx : SatTag → ℕ
   | .pCell => 1
   | .pEnd => 2
   | .pFill i => 3 + (i : ℕ)
+  | .sStart => 7
+  | .sEnd => 8
+  | .sBlank => 9
+  | .sU => 10
+  | .sT => 11
+  | .sF => 12
 
 theorem satTagIdx_injective : Function.Injective satTagIdx := by
   intro s t h
@@ -123,6 +143,7 @@ def SatPosn (p : SatTag × (Fin 2 → A)) : Prop :=
   | .pCell => ∀ a : A, p.2 1 ≤ a
   | .pEnd => ∀ a : A, p.2 0 ≤ a ∧ p.2 1 ≤ a
   | .pFill _ => True
+  | _ => False
 
 /-- There is exactly one start marker. -/
 theorem satPosn_pStart_iff {w : Fin 2 → A} :
@@ -136,6 +157,91 @@ theorem satPosn_pCell_iff {w : Fin 2 → A} :
 
 /-- Every filler tuple is a position. -/
 theorem satPosn_pFill {i : Fin 4} {w : Fin 2 → A} : SatPosn (SatTag.pFill i, w) := trivial
+
+/-! ### The instance data of the machine
+
+The order, the blank symbol and the initial tape – everything
+`DescriptiveComplexity.TMData.WellFormed` asks about, which is therefore discharged here
+once, before any transition exists. -/
+
+/-- The tuple of minima: the coordinates a marker or a constant symbol is
+pinned to, so that exactly one tuple carries such a tag. -/
+def IsMinTup (w : Fin 2 → A) : Prop := (∀ a : A, w 0 ≤ a) ∧ ∀ a : A, w 1 ≤ a
+
+theorem isMinTup_unique {w w' : Fin 2 → A} (h : IsMinTup w) (h' : IsMinTup w') : w = w' := by
+  funext i
+  fin_cases i
+  · exact le_antisymm (h.1 _) (h'.1 _)
+  · exact le_antisymm (h.2 _) (h'.2 _)
+
+variable [Finite A] [Nonempty A]
+
+theorem exists_isMinTup : ∃ w : Fin 2 → A, IsMinTup w := by
+  obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
+  exact ⟨fun _ => m, hm, hm⟩
+
+/-- The blank symbol: one element, pinned to the tuple of minima. -/
+def SatBlank (p : SatTag × (Fin 2 → A)) : Prop := p.1 = SatTag.sBlank ∧ IsMinTup p.2
+
+theorem exists_satBlank : ∃ p : SatTag × (Fin 2 → A), SatBlank p := by
+  obtain ⟨w, hw⟩ := exists_isMinTup (A := A)
+  exact ⟨(SatTag.sBlank, w), rfl, hw⟩
+
+omit [Finite A] [Nonempty A] in
+theorem satBlank_unique {p q : SatTag × (Fin 2 → A)} (hp : SatBlank p) (hq : SatBlank q) :
+    p = q :=
+  Prod.ext (hp.1.trans hq.1.symm) (isMinTup_unique hp.2 hq.2)
+
+/-- **The initial tape**: the markers hold their own symbols, the cell of an
+element holds that element still unassigned, and the fillers hold nothing – so
+the blank, by `DescriptiveComplexity.TMData.InitTape`. -/
+def SatInp (p a : SatTag × (Fin 2 → A)) : Prop :=
+  (p.1 = SatTag.pStart ∧ a.1 = SatTag.sStart ∧ IsMinTup a.2) ∨
+    (p.1 = SatTag.pCell ∧ a.1 = SatTag.sU ∧ a.2 0 = p.2 0 ∧ ∀ b : A, a.2 1 ≤ b) ∨
+      (p.1 = SatTag.pEnd ∧ a.1 = SatTag.sEnd ∧ IsMinTup a.2)
+
+omit [Finite A] [Nonempty A] in
+/-- **The initial tape is functional**: a cell holds at most one symbol. The
+three cases are separated by the tag of the cell, and within each case the
+symbol's tuple is pinned. -/
+theorem satInp_functional {p a b : SatTag × (Fin 2 → A)} (ha : SatInp p a) (hb : SatInp p b) :
+    a = b := by
+  have htup : ∀ u v : Fin 2 → A, u 0 = p.2 0 → (∀ c : A, u 1 ≤ c) →
+      v 0 = p.2 0 → (∀ c : A, v 1 ≤ c) → u = v := by
+    intro u v hu0 hu1 hv0 hv1
+    funext i
+    fin_cases i
+    · exact hu0.trans hv0.symm
+    · exact le_antisymm (hu1 _) (hv1 _)
+  rcases ha with ⟨hp, hat, haw⟩ | ⟨hp, hat, ha0, ha1⟩ | ⟨hp, hat, haw⟩ <;>
+    rcases hb with ⟨hq, hbt, hbw⟩ | ⟨hq, hbt, hb0, hb1⟩ | ⟨hq, hbt, hbw⟩ <;>
+      first
+        | exact Prod.ext (hat.trans hbt.symm) (isMinTup_unique haw hbw)
+        | exact Prod.ext (hat.trans hbt.symm) (htup _ _ ha0 ha1 hb0 hb1)
+        | (rw [hp] at hq; exact absurd hq (by decide))
+
+/-- There is a position: the start marker. -/
+theorem exists_satPosn : ∃ p : SatTag × (Fin 2 → A), SatPosn p := by
+  obtain ⟨w, hw⟩ := exists_isMinTup (A := A)
+  exact ⟨(SatTag.pStart, w), fun a => ⟨hw.1 a, hw.2 a⟩⟩
+
+omit [Finite A] [Nonempty A] in
+/-- The `≤` of a `LinearOrder`, as an `DescriptiveComplexity.IsLinOrd`. -/
+private theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOrd o.le :=
+  ⟨fun a => @le_refl X o.toPreorder a, fun a b c => @le_trans X o.toPreorder a b c,
+    fun a b => @le_antisymm X o.toPartialOrder a b, fun a b => @le_total X o a b⟩
+
+omit [Finite A] [Nonempty A] in
+/-- **The interpreted order is linear**, from `DescriptiveComplexity.tagTupleOrder` –
+no tag-pair case analysis. -/
+theorem isLinOrd_tagTupleLe :
+    IsLinOrd (tagTupleLe (Tag := SatTag) (d := 2) (A := A)) := by
+  have heq : (tagTupleLe (Tag := SatTag) (d := 2) (A := A)) =
+      (tagTupleOrder : LinearOrder (SatTag × (Fin 2 → A))).le := by
+    funext p q
+    exact propext (tagTupleLe_iff_le p q)
+  rw [heq]
+  exact isLinOrd_of_linearOrder _
 
 end Positions
 
