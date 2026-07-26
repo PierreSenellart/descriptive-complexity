@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.Problems.Machine.Walk
+import DescriptiveComplexity.Problems.Machine.Membership
 
 /-!
 # Machine acceptance (the machine bridge, in progress)
@@ -28,7 +29,8 @@ can talk about, and where the unary time bound is cashed in. Still to come, in
 order:
 
 * `NTMAccept ∈ NP` – guess that walk as three relations indexed by the
-  positions and check the tableau clauses first-order;
+  positions and check the tableau clauses first-order (*in progress*, see
+  `DescriptiveComplexity.Problems.Machine.Membership`);
 * `SAT ≤ᶠᵒ[≤] NTMAccept` – a bespoke machine built inside a SAT instance;
 * and the two characterizations `mem_NP_iff_le_ntmAccept` and its `PTIME`
   analogue.
