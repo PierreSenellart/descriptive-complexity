@@ -539,7 +539,7 @@ theorem satPosn_posEnd : SatPosn (posEnd : SatV A) := fun a => ⟨botA_le a, bot
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- Every filler tuple is a position. -/
-theorem satPosn_fill (i : Fin 4) (w : Fin 2 → A) : SatPosn ((SatTag.pFill i, w) : SatV A) :=
+theorem satPosn_fill (i : Fin 8) (w : Fin 2 → A) : SatPosn ((SatTag.pFill i, w) : SatV A) :=
   trivial
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in

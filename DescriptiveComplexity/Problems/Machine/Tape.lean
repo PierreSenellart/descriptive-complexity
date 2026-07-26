@@ -43,8 +43,9 @@ constructor list.
 
 The machine needs one sweep to guess an assignment and one sweep per clause to
 check it, so `(m + 1) · (n + 2)` steps for `n` elements and `m ≤ n` clauses.
-Four filler tags at dimension two give `4n² + n + 2` positions, and
-`DescriptiveComplexity.sat_budget` says that is always more. Following the plan's advice
+Eight filler tags at dimension two give `8n²` positions on their own – no need
+to count the markers and cells – and `DescriptiveComplexity.sat_budget` says that is
+always more than the machine needs. Following the plan's advice
 on risk #3, the filler is over-provisioned rather than the bound tightened:
 nothing downstream depends on the constant, and an off-by-one here would only
 surface at the very end of the correctness proof.
@@ -69,8 +70,8 @@ inductive SatTag : Type
   | pCell
   /-- The right marker cell. -/
   | pEnd
-  /-- Filler cells, four tags' worth, supplying the time budget. -/
-  | pFill (i : Fin 4)
+  /-- Filler cells, eight tags' worth, supplying the time budget. -/
+  | pFill (i : Fin 8)
   /-- The left-marker symbol `⊢`. -/
   | sStart
   /-- The right-marker symbol `⊣`. -/
@@ -114,22 +115,22 @@ def satTagIdx : SatTag → ℕ
   | .pCell => 1
   | .pEnd => 2
   | .pFill i => 3 + (i : ℕ)
-  | .sStart => 7
-  | .sEnd => 8
-  | .sBlank => 9
-  | .sU => 10
-  | .sT => 11
-  | .sF => 12
-  | .qGuess => 13
-  | .qChk f d => 14 + (if f then 1 else 0) + (if d then 2 else 0)
-  | .qAcc => 18
-  | .tGuessStart => 19
-  | .tGuessVal b => 20 + (if b then 1 else 0)
-  | .tGuessEndAcc => 22
-  | .tGuessEndChk => 23
-  | .tChk b f d => 24 + (if b then 1 else 0) + (if f then 2 else 0) + (if d then 4 else 0)
-  | .tTurnNext d => 32 + (if d then 1 else 0)
-  | .tTurnAcc d => 34 + (if d then 1 else 0)
+  | .sStart => 11
+  | .sEnd => 12
+  | .sBlank => 13
+  | .sU => 14
+  | .sT => 15
+  | .sF => 16
+  | .qGuess => 17
+  | .qChk f d => 18 + (if f then 1 else 0) + (if d then 2 else 0)
+  | .qAcc => 22
+  | .tGuessStart => 23
+  | .tGuessVal b => 24 + (if b then 1 else 0)
+  | .tGuessEndAcc => 26
+  | .tGuessEndChk => 27
+  | .tChk b f d => 28 + (if b then 1 else 0) + (if f then 2 else 0) + (if d then 4 else 0)
+  | .tTurnNext d => 36 + (if d then 1 else 0)
+  | .tTurnAcc d => 38 + (if d then 1 else 0)
 
 theorem satTagIdx_injective : Function.Injective satTagIdx := by
   have hb : ∀ b : Bool, (if b then 1 else 0) < 2 := by decide
@@ -182,7 +183,7 @@ theorem satPosn_pCell_iff {w : Fin 2 → A} :
     SatPosn (SatTag.pCell, w) ↔ ∀ a : A, w 1 ≤ a := Iff.rfl
 
 /-- Every filler tuple is a position. -/
-theorem satPosn_pFill {i : Fin 4} {w : Fin 2 → A} : SatPosn (SatTag.pFill i, w) := trivial
+theorem satPosn_pFill {i : Fin 8} {w : Fin 2 → A} : SatPosn (SatTag.pFill i, w) := trivial
 
 /-! ### The instance data of the machine
 
@@ -273,18 +274,37 @@ end Positions
 
 /-! ### The budget -/
 
-/-- **There are enough positions.** The machine takes one sweep to guess an
-assignment and one per clause to check it, `(m + 1) · (n + 2)` steps in all for
-`n` elements and `m ≤ n` clauses; the tape has `4n² + n + 2` positions.
+/-- **The filler cells alone are enough.** The machine takes one sweep to guess
+an assignment and one per clause to check it, `(m + 1) · (n + 2)` steps in all
+for `n` elements and `m ≤ n` clauses; the eight filler tags contribute `8n²`
+positions by themselves, so no count of the markers and cells is needed.
 
 The inequality is strict, as `DescriptiveComplexity.TMData.Accepts` requires: `N`
 positions are `N` time points and so `N - 1` steps. -/
 theorem sat_budget {n m : ℕ} (hn : 1 ≤ n) (hm : m ≤ n) :
-    (m + 1) * (n + 2) < 4 * n ^ 2 + n + 2 := by
+    (m + 1) * (n + 2) < 8 * n * n := by
   have hstep : (m + 1) * (n + 2) ≤ (n + 1) * (n + 2) :=
     Nat.mul_le_mul_right _ (Nat.succ_le_succ hm)
-  have hsq : n ^ 2 = n * n := sq n
   have hnn : n ≤ n * n := Nat.le_mul_of_pos_left n hn
-  nlinarith [hstep, hsq, hnn]
+  nlinarith [hstep, hnn]
+
+/-- **The tape really has that many positions**: the filler tuples alone inject
+into the positions, which is all the budget argument needs. -/
+theorem card_le_card_posn (A : Type) [LinearOrder A] [Finite A] :
+    8 * Nat.card A * Nat.card A ≤ Nat.card {p : SatTag × (Fin 2 → A) // SatPosn p} := by
+  have hinj : Function.Injective
+      (fun q : Fin 8 × A × A => (⟨(SatTag.pFill q.1, ![q.2.1, q.2.2]), trivial⟩ :
+        {p : SatTag × (Fin 2 → A) // SatPosn p})) := by
+    rintro ⟨i, a, b⟩ ⟨i', a', b'⟩ h
+    have h' := congrArg Subtype.val h
+    obtain ⟨ht, hw⟩ := Prod.mk.injEq .. ▸ h'
+    have h0 := congrFun hw 0
+    have h1 := congrFun hw 1
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at h0 h1
+    cases ht
+    simp [h0, h1]
+  have := Nat.card_le_card_of_injective _ hinj
+  rwa [Nat.card_prod, Nat.card_prod, Nat.card_eq_fintype_card (α := Fin 8),
+    Fintype.card_fin, ← mul_assoc] at this
 
 end DescriptiveComplexity
