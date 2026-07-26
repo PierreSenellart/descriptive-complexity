@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.Problems.Machine.Walk
 import DescriptiveComplexity.Problems.Machine.Membership
+import DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # Machine acceptance (the machine bridge, in progress)
@@ -28,7 +29,11 @@ one indexed by the position elements – which is the form a first-order kernel
 can talk about, and where the unary time bound is cashed in. Still to come, in
 order:
 
-* `SAT ≤ᶠᵒ[≤] NTMAccept` – a bespoke machine built inside a SAT instance;
+* `SAT ≤ᶠᵒ[≤] NTMAccept` – a bespoke machine built inside a SAT instance. Its
+  reusable half, `DescriptiveComplexity.Problems.Machine.Program`, is written: running a
+  phase of a machine along a stretch of the positions, once, so that a
+  reduction describes a phase by its intended configurations and a single-step
+  obligation;
 * and the two characterizations `mem_NP_iff_le_ntmAccept` and its `PTIME`
   analogue.
 
