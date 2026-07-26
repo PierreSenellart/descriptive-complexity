@@ -147,6 +147,22 @@ theorem StepsIn.trans_step : ∀ {n : ℕ} {c d e : Config A},
     rintro c d e ⟨m, hstep, hrest⟩ hde
     exact ⟨m, hstep, ih hrest hde⟩
 
+/-- **Runs compose.** Phases of a constructed machine are proved one at a time
+and chained with this; the step counts add, which is the form the budget
+obligation of a reduction takes. -/
+theorem StepsIn.trans : ∀ {n m : ℕ} {c d e : Config A},
+    M.StepsIn n c d → M.StepsIn m d e → M.StepsIn (n + m) c e := by
+  intro n
+  induction n with
+  | zero =>
+    intro m c d e hcd hde
+    rw [show c = d from hcd, Nat.zero_add]
+    exact hde
+  | succ n ih =>
+    rintro m c d e ⟨f, hstep, hrest⟩ hde
+    rw [Nat.succ_add]
+    exact ⟨f, hstep, ih hrest hde⟩
+
 end Steps
 
 /-- **Well-formedness**, folded into the yes-instances in the style of
