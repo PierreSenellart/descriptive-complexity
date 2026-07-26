@@ -328,6 +328,48 @@ theorem satTr_turn_excl {τ τ' : SatV A} {d d' : Bool} (h : SatTr τ) (h' : Sat
   rw [hτ'] at h'
   exact absurd (h'.2.2 _ h.2.1) (not_le.mpr (hc ▸ h.2.2.1))
 
+/-- The tag of the state a transition applies in, as a function of its own tag.
+Junk tags are sent to themselves; they are never transitions. -/
+def stateTag : SatTag → SatTag
+  | .tGuessStart => .qGuess
+  | .tGuessVal _ => .qGuess
+  | .tGuessEndAcc => .qGuess
+  | .tGuessEndChk => .qGuess
+  | .tChk _ f d => .qChk f d
+  | .tTurnNext d => .qChk true d
+  | .tTurnAcc d => .qChk true d
+  | t => t
+
+/-- The tag of the symbol a transition reads, as a function of its own tag. -/
+def readTag : SatTag → SatTag
+  | .tGuessStart => .sStart
+  | .tGuessVal _ => .sU
+  | .tGuessEndAcc => .sEnd
+  | .tGuessEndChk => .sEnd
+  | .tChk v _ _ => if v then .sT else .sF
+  | .tTurnNext d => if d then .sEnd else .sStart
+  | .tTurnAcc d => if d then .sEnd else .sStart
+  | t => t
+
+/-- **The state pins the transition's tag.** -/
+theorem satSrc_tag {τ q : SatV A} (hτ : SatTr τ) (hs : SatSrc τ q) :
+    q.1 = stateTag τ.1 := by
+  obtain ⟨t, w⟩ := τ
+  cases t <;> dsimp only [SatTr, SatSrc] at hτ hs <;>
+    first
+      | exact False.elim hτ
+      | (rw [hs]; rfl)
+
+/-- **The symbol read pins the transition's tag.** -/
+theorem satRead_tag {τ a : SatV A} (hτ : SatTr τ) (hr : SatRead τ a) :
+    a.1 = readTag τ.1 := by
+  obtain ⟨t, w⟩ := τ
+  cases t <;> dsimp only [SatTr, SatRead] at hτ hr <;>
+    first
+      | exact False.elim hτ
+      | (rw [hr]; rfl)
+      | (rename_i d; cases d <;> (rw [hr]; rfl))
+
 end Functional
 
 /-- **The machine is well formed**, which is all of
