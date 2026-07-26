@@ -886,6 +886,37 @@ theorem step_turnAcc (ν : A → Bool) (hno : ∀ e : A, ¬ SatCl e) :
   · change guessTape ν posEnd posEnd = symEnd
     rfl
 
+/-! ### The intended run: a check sweep -/
+
+/-- The tape once the guess sweep has finished: every cell assigned. It does
+not change again, so the frame condition of every later step is `rfl`. -/
+noncomputable def doneTape (ν : A → Bool) : SatV A → SatV A := guessTape ν posEnd
+
+open Classical in
+/-- The flag of a leftward check sweep with the head at `p`: some cell already
+visited – that is, strictly above `p` – satisfies the clause `c`. -/
+noncomputable def chkFlagL (ν : A → Bool) (c : A) (p : SatV A) : Bool :=
+  decide (∃ y : A, tagTupleLe p (posCell y) ∧ p ≠ posCell y ∧ SatLit c y (ν y))
+
+/-- The configuration during a leftward check sweep of the clause `c`. -/
+noncomputable def confChkL (ν : A → Bool) (c : A) (p : SatV A) : Config (SatV A) where
+  state := stChk (chkFlagL ν c p) false c
+  head := p
+  tape := doneTape ν
+
+/-- A check sweep leaves the tape alone, so its frame condition is trivial. -/
+theorem confChkL_tape (ν : A → Bool) (c : A) (p p' : SatV A) :
+    (confChkL ν c p').tape = (confChkL ν c p).tape := rfl
+
+/-- **A check sweep starts with an empty flag**: at the highest cell nothing has
+been visited yet. -/
+theorem chkFlagL_top (ν : A → Bool) (c : A) :
+    chkFlagL ν c (posCell (topA (A := A))) = false := by
+  classical
+  simp only [chkFlagL, decide_eq_false_iff_not]
+  rintro ⟨y, hle, hne, -⟩
+  exact hne (congrArg _ (le_antisymm (le_topA y) (posCell_le_iff.mp hle))).symm
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
