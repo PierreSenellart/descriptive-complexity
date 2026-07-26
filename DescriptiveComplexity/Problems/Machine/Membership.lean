@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Machine.Walk
 import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # Machine acceptance is existential second-order definable
@@ -32,14 +33,16 @@ field of `RelWalk` or one conjunct of `DescriptiveComplexity.TMData.WellFormed`,
 has its own realization lemma. Nothing here does mathematics; the mathematics is
 in `DescriptiveComplexity.Problems.Machine.Walk`.
 
-## Status
+## The clauses
 
-In progress. The block, the formula builders with their realization lemmas, and
-the clauses transcribing the six functionality fields of `RelWalk` together with
-its accepting clause are done. Still to write: the initial clause (which needs
-`InitTape` as a formula), the step clause, the first-order transcription of
-`WellFormed`, the kernel as their conjunction, and the two theorems
-`ntmAccept_sigmaSODefinable` / `ntmAccept_mem_NP`.
+Seventeen of them, conjoined into `DescriptiveComplexity.tqKernel`: four saying the
+order is linear, four more for the remaining promises of `WellFormed`, six for
+the functionality of the guess, then the initial clause, the step clause and
+the accepting clause. The step clause is the largest formula in the library –
+an existential over a transition element with seven conjuncts, against a
+stutter alternative – and is kept manageable by parameterizing its body
+(`DescriptiveComplexity.tqStepBodyF`) over the three variables it reads, so that no
+`Sum` nesting goes deeper than two levels.
 
 ## The order predicates
 
@@ -220,6 +223,52 @@ noncomputable def tqSuccPosF (x y : α) : tqSOLang.Formula α :=
           tqLeF (Sum.inr 0) (Sum.inl y))).imp
         (tqEqF (Sum.inr 0) (Sum.inl x) ⊔ tqEqF (Sum.inr 0) (Sum.inl y))))))
 
+/-- The head moves from its cell at `t` to its cell at `t'`, in the direction
+`dir`. -/
+noncomputable def tqMoveF (t t' : α) (dir : Bool) : tqSOLang.Formula α :=
+  Formula.iAlls (Fin 2)
+    ((tqHeadF (Sum.inl t) (Sum.inr 0) ⊓ tqHeadF (Sum.inl t') (Sum.inr 1)).imp
+      (if dir then tqSuccPosF (Sum.inr 0) (Sum.inr 1) else tqSuccPosF (Sum.inr 1) (Sum.inr 0)))
+
+/-- **The step body**: the transition `τ` takes the configuration at `t` to the
+one at `t'`. Its seven conjuncts are those of `DescriptiveComplexity.TMData.RelStep`. -/
+noncomputable def tqStepBodyF (t t' τ : α) : tqSOLang.Formula α :=
+  tqTrF τ ⊓
+    (Formula.iAlls (Fin 1)
+        ((tqStateF (Sum.inl t) (Sum.inr 0)).imp (tqSrcF (Sum.inl τ) (Sum.inr 0))) ⊓
+      (Formula.iAlls (Fin 2)
+          ((tqHeadF (Sum.inl t) (Sum.inr 0) ⊓
+              tqTapeF (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).imp
+            (tqReadF (Sum.inl τ) (Sum.inr 1))) ⊓
+        (Formula.iAlls (Fin 1)
+            ((tqStateF (Sum.inl t') (Sum.inr 0)).imp (tqDstF (Sum.inl τ) (Sum.inr 0))) ⊓
+          (Formula.iAlls (Fin 2)
+              ((tqHeadF (Sum.inl t) (Sum.inr 0) ⊓
+                  tqTapeF (Sum.inl t') (Sum.inr 0) (Sum.inr 1)).imp
+                (tqWriteF (Sum.inl τ) (Sum.inr 1))) ⊓
+            (Formula.iAlls (Fin 2)
+                ((∼(tqHeadF (Sum.inl t) (Sum.inr 0))).imp
+                  ((tqTapeF (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).iff
+                    (tqTapeF (Sum.inl t') (Sum.inr 0) (Sum.inr 1)))) ⊓
+              ((tqRightF τ ⊓ tqMoveF t t' true) ⊔
+                (∼(tqRightF τ) ⊓ tqMoveF t t' false)))))))
+
+/-- **The stutter body**: an accepting configuration repeated. -/
+noncomputable def tqStutterBodyF (t t' : α) : tqSOLang.Formula α :=
+  Formula.iAlls (Fin 1) ((tqStateF (Sum.inl t) (Sum.inr 0)).imp (tqAccF (Sum.inr 0))) ⊓
+    (Formula.iAlls (Fin 1)
+        ((tqStateF (Sum.inl t') (Sum.inr 0)).iff (tqStateF (Sum.inl t) (Sum.inr 0))) ⊓
+      (Formula.iAlls (Fin 1)
+          ((tqHeadF (Sum.inl t') (Sum.inr 0)).iff (tqHeadF (Sum.inl t) (Sum.inr 0))) ⊓
+        Formula.iAlls (Fin 2)
+          ((tqTapeF (Sum.inl t') (Sum.inr 0) (Sum.inr 1)).iff
+            (tqTapeF (Sum.inl t) (Sum.inr 0) (Sum.inr 1)))))
+
+/-- The cell `x` may initially hold `y`: the input where it is defined, the
+blank elsewhere. -/
+noncomputable def tqInitTapeF (x y : α) : tqSOLang.Formula α :=
+  tqInpF x y ⊔ (Formula.iAlls (Fin 1) (∼(tqInpF (Sum.inl x) (Sum.inr 0))) ⊓ tqBlankF y)
+
 end Builders
 
 /-! ### Realization of the builders -/
@@ -345,6 +394,66 @@ variable {α : Type} (v : α → A)
   exact ⟨fun h a ha h₁ h₂ => h (fun _ => a) ⟨ha, h₁, h₂⟩,
     fun h i hi => h (i 0) hi.1 hi.2.1 hi.2.2⟩
 
+@[simp] theorem realize_tqInitTapeF (x y : α) :
+    (@Formula.Realize tqSOLang A SOStruc _ (tqInitTapeF x y) v) ↔
+      TMInp (v x) (v y) ∨ ((∀ b, ¬ TMInp (v x) b) ∧ TMBlank (v y)) := by
+  letI := tmGuessBlock.structure ρ
+  simp only [tqInitTapeF, Formula.realize_sup, Formula.realize_inf, Formula.realize_iAlls,
+    Formula.realize_not, realize_tqInpF, realize_tqBlankF, Sum.elim_inl, Sum.elim_inr]
+  exact or_congr Iff.rfl (and_congr ⟨fun h b => h fun _ => b, fun h i => h (i 0)⟩ Iff.rfl)
+
+@[simp] theorem realize_tqMoveF (t t' : α) (dir : Bool) :
+    (@Formula.Realize tqSOLang A SOStruc _ (tqMoveF t t' dir) v) ↔
+      ∀ p p', ρ .head ![v t, p] → ρ .head ![v t', p'] →
+        (if dir then SuccPos TMLe TMPosn p p' else SuccPos TMLe TMPosn p' p) := by
+  letI := tmGuessBlock.structure ρ
+  cases dir <;>
+    simp only [tqMoveF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
+      realize_tqHeadF, realize_tqSuccPosF, Sum.elim_inl, Sum.elim_inr, if_true, if_false,
+      Bool.false_eq_true] <;>
+    exact ⟨fun h p p' h₁ h₂ => h ![p, p'] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
+
+theorem realize_tqStepBodyF (t t' τ : α) :
+    (@Formula.Realize tqSOLang A SOStruc _ (tqStepBodyF t t' τ) v) ↔
+      TMTr (v τ) ∧ (∀ q, ρ .state ![v t, q] → TMSrc (v τ) q) ∧
+        (∀ p a, ρ .head ![v t, p] → ρ .tape ![v t, p, a] → TMRead (v τ) a) ∧
+        (∀ q, ρ .state ![v t', q] → TMDst (v τ) q) ∧
+        (∀ p a, ρ .head ![v t, p] → ρ .tape ![v t', p, a] → TMWrite (v τ) a) ∧
+        (∀ p a, ¬ ρ .head ![v t, p] → (ρ .tape ![v t, p, a] ↔ ρ .tape ![v t', p, a])) ∧
+        ((TMRight (v τ) ∧ ∀ p p', ρ .head ![v t, p] → ρ .head ![v t', p'] →
+            SuccPos TMLe TMPosn p p') ∨
+          (¬ TMRight (v τ) ∧ ∀ p p', ρ .head ![v t, p] → ρ .head ![v t', p'] →
+            SuccPos TMLe TMPosn p' p)) := by
+  letI := tmGuessBlock.structure ρ
+  simp only [tqStepBodyF, Formula.realize_inf, Formula.realize_sup, Formula.realize_imp,
+    Formula.realize_not, Formula.realize_iff, Formula.realize_iAlls, realize_tqTrF,
+    realize_tqStateF, realize_tqSrcF, realize_tqHeadF, realize_tqTapeF, realize_tqReadF,
+    realize_tqDstF, realize_tqWriteF, realize_tqRightF, realize_tqMoveF, Sum.elim_inl,
+    Sum.elim_inr, if_true, if_false, Bool.false_eq_true]
+  refine and_congr Iff.rfl (and_congr ?_ (and_congr ?_ (and_congr ?_ (and_congr ?_
+    (and_congr ?_ Iff.rfl)))))
+  · exact ⟨fun h q hq => h (fun _ => q) hq, fun h i hi => h (i 0) hi⟩
+  · exact ⟨fun h p a h₁ h₂ => h ![p, a] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
+  · exact ⟨fun h q hq => h (fun _ => q) hq, fun h i hi => h (i 0) hi⟩
+  · exact ⟨fun h p a h₁ h₂ => h ![p, a] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
+  · exact ⟨fun h p a hp => h ![p, a] hp, fun h i hi => h (i 0) (i 1) hi⟩
+
+theorem realize_tqStutterBodyF (t t' : α) :
+    (@Formula.Realize tqSOLang A SOStruc _ (tqStutterBodyF t t') v) ↔
+      (∀ q, ρ .state ![v t, q] → TMAcc q) ∧
+        (∀ q, ρ .state ![v t', q] ↔ ρ .state ![v t, q]) ∧
+        (∀ p, ρ .head ![v t', p] ↔ ρ .head ![v t, p]) ∧
+        ∀ p a, ρ .tape ![v t', p, a] ↔ ρ .tape ![v t, p, a] := by
+  letI := tmGuessBlock.structure ρ
+  simp only [tqStutterBodyF, Formula.realize_inf, Formula.realize_imp, Formula.realize_iff,
+    Formula.realize_iAlls, realize_tqStateF, realize_tqAccF, realize_tqHeadF, realize_tqTapeF,
+    Sum.elim_inl, Sum.elim_inr]
+  refine and_congr ?_ (and_congr ?_ (and_congr ?_ ?_))
+  · exact ⟨fun h q hq => h (fun _ => q) hq, fun h i hi => h (i 0) hi⟩
+  · exact ⟨fun h q => h fun _ => q, fun h i => h (i 0)⟩
+  · exact ⟨fun h p => h fun _ => p, fun h i => h (i 0)⟩
+  · exact ⟨fun h p a => h ![p, a], fun h i => h (i 0) (i 1)⟩
+
 end Realize
 
 /-! ### The clauses of the kernel
@@ -386,10 +495,79 @@ noncomputable def tqTapeUniqClause : tqSOLang.Sentence :=
         tqTapeF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3)).imp
       (tqEqF (Sum.inr 2) (Sum.inr 3)))
 
+/-- Consecutive times are related by a step or by an accepting stutter. -/
+noncomputable def tqStepClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 2)
+    ((tqSuccPosF (Sum.inr 0) (Sum.inr 1)).imp
+      (Formula.iExs (Fin 1)
+          (tqStepBodyF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1)) (Sum.inr 0)) ⊔
+        tqStutterBodyF (Sum.inr 0) (Sum.inr 1)))
+
+/-- At the lowest time the configuration is initial. -/
+noncomputable def tqInitClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 1)
+    ((tqMinPosF (Sum.inr 0)).imp
+      (Formula.iAlls (Fin 1)
+          ((tqStateF (Sum.inl (Sum.inr 0)) (Sum.inr 0)).imp (tqStartF (Sum.inr 0))) ⊓
+        (Formula.iAlls (Fin 1)
+            ((tqHeadF (Sum.inl (Sum.inr 0)) (Sum.inr 0)).imp (tqMinPosF (Sum.inr 0))) ⊓
+          Formula.iAlls (Fin 2)
+            ((tqTapeF (Sum.inl (Sum.inr 0)) (Sum.inr 0) (Sum.inr 1)).imp
+              (tqInitTapeF (Sum.inr 0) (Sum.inr 1))))))
+
+/-- The order is reflexive. -/
+noncomputable def tqReflClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 1) (tqLeF (Sum.inr 0) (Sum.inr 0))
+
+/-- The order is transitive. -/
+noncomputable def tqTransClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 3)
+    ((tqLeF (Sum.inr 0) (Sum.inr 1) ⊓ tqLeF (Sum.inr 1) (Sum.inr 2)).imp
+      (tqLeF (Sum.inr 0) (Sum.inr 2)))
+
+/-- The order is antisymmetric. -/
+noncomputable def tqAntisymClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 2)
+    ((tqLeF (Sum.inr 0) (Sum.inr 1) ⊓ tqLeF (Sum.inr 1) (Sum.inr 0)).imp
+      (tqEqF (Sum.inr 0) (Sum.inr 1)))
+
+/-- The order is total. -/
+noncomputable def tqTotalClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 2) (tqLeF (Sum.inr 0) (Sum.inr 1) ⊔ tqLeF (Sum.inr 1) (Sum.inr 0))
+
+/-- There is a position. -/
+noncomputable def tqPosnExClause : tqSOLang.Sentence :=
+  Formula.iExs (Fin 1) (tqPosnF (Sum.inr 0))
+
+/-- The input is functional. -/
+noncomputable def tqInpFunClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 3)
+    ((tqInpF (Sum.inr 0) (Sum.inr 1) ⊓ tqInpF (Sum.inr 0) (Sum.inr 2)).imp
+      (tqEqF (Sum.inr 1) (Sum.inr 2)))
+
+/-- There is a blank symbol. -/
+noncomputable def tqBlankExClause : tqSOLang.Sentence :=
+  Formula.iExs (Fin 1) (tqBlankF (Sum.inr 0))
+
+/-- There is only one blank symbol. -/
+noncomputable def tqBlankUniqClause : tqSOLang.Sentence :=
+  Formula.iAlls (Fin 2)
+    ((tqBlankF (Sum.inr 0) ⊓ tqBlankF (Sum.inr 1)).imp (tqEqF (Sum.inr 0) (Sum.inr 1)))
+
 /-- At the highest time the state is accepting. -/
 noncomputable def tqAccClause : tqSOLang.Sentence :=
   Formula.iAlls (Fin 2)
     (((tqMaxPosF (Sum.inr 0)) ⊓ tqStateF (Sum.inr 0) (Sum.inr 1)).imp (tqAccF (Sum.inr 1)))
+
+/-- **The kernel**: well-formedness of the instance, then that the guess is a
+run – the six functionality clauses, the initial clause, the step clause and
+the accepting clause. -/
+noncomputable def tqKernel : tqSOLang.Sentence :=
+  tqReflClause ⊓ (tqTransClause ⊓ (tqAntisymClause ⊓ (tqTotalClause ⊓
+    (tqPosnExClause ⊓ (tqInpFunClause ⊓ (tqBlankExClause ⊓ (tqBlankUniqClause ⊓
+      (tqStateExClause ⊓ (tqStateUniqClause ⊓ (tqHeadExClause ⊓ (tqHeadUniqClause ⊓
+        (tqTapeExClause ⊓ (tqTapeUniqClause ⊓ (tqInitClause ⊓
+          (tqStepClause ⊓ tqAccClause)))))))))))))))
 
 end Clauses
 
@@ -471,6 +649,156 @@ theorem realize_tqAccClause :
   exact ⟨fun h t ht q hq => h ![t, q] ⟨ht, hq⟩,
     fun h i hi => h (i 0) hi.1 (i 1) hi.2⟩
 
+theorem realize_tqInitClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqInitClause) ↔
+      ∀ t, MinPos TMLe TMPosn t →
+        (∀ q, ρ .state ![t, q] → TMStart q) ∧
+          (∀ p, ρ .head ![t, p] → MinPos TMLe TMPosn p) ∧
+            ∀ p a, ρ .tape ![t, p, a] → TMInp p a ∨ ((∀ b, ¬ TMInp p b) ∧ TMBlank a) := by
+  simp only [tqInitClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, realize_tqMinPosF, realize_tqStateF, realize_tqStartF,
+    realize_tqHeadF, realize_tqTapeF, realize_tqInitTapeF, Sum.elim_inl, Sum.elim_inr]
+  constructor
+  · intro h t ht
+    obtain ⟨h1, h2, h3⟩ := h (fun _ => t) ht
+    exact ⟨fun q hq => h1 (fun _ => q) hq, fun p hp => h2 (fun _ => p) hp,
+      fun p a hpa => h3 ![p, a] (by simpa using hpa)⟩
+  · intro h i hi
+    obtain ⟨h1, h2, h3⟩ := h (i 0) hi
+    exact ⟨fun j hj => h1 (j 0) hj, fun j hj => h2 (j 0) hj, fun j hj => h3 (j 0) (j 1) hj⟩
+
+theorem realize_tqReflClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqReflClause) ↔ ∀ a : A, TMLe a a := by
+  simp only [tqReflClause, Sentence.Realize, Formula.realize_iAlls, realize_tqLeF, Sum.elim_inr]
+  exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
+
+theorem realize_tqTransClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqTransClause) ↔
+      ∀ a b c : A, TMLe a b → TMLe b c → TMLe a c := by
+  simp only [tqTransClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, realize_tqLeF, Sum.elim_inr]
+  exact ⟨fun h a b c h₁ h₂ => h ![a, b, c] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
+
+theorem realize_tqAntisymClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqAntisymClause) ↔
+      ∀ a b : A, TMLe a b → TMLe b a → a = b := by
+  simp only [tqAntisymClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, realize_tqLeF, realize_tqEqF, Sum.elim_inr]
+  exact ⟨fun h a b h₁ h₂ => h ![a, b] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
+
+theorem realize_tqTotalClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqTotalClause) ↔
+      ∀ a b : A, TMLe a b ∨ TMLe b a := by
+  simp only [tqTotalClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_sup,
+    realize_tqLeF, Sum.elim_inr]
+  exact ⟨fun h a b => h ![a, b], fun h i => h (i 0) (i 1)⟩
+
+theorem realize_tqPosnExClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqPosnExClause) ↔ ∃ p : A, TMPosn p := by
+  simp only [tqPosnExClause, Sentence.Realize, Formula.realize_iExs, realize_tqPosnF,
+    Sum.elim_inr]
+  exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨p, hp⟩ => ⟨fun _ => p, hp⟩⟩
+
+theorem realize_tqInpFunClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqInpFunClause) ↔
+      ∀ p a b : A, TMInp p a → TMInp p b → a = b := by
+  simp only [tqInpFunClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, realize_tqInpF, realize_tqEqF, Sum.elim_inr]
+  exact ⟨fun h p a b h₁ h₂ => h ![p, a, b] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
+
+theorem realize_tqBlankExClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqBlankExClause) ↔ ∃ b : A, TMBlank b := by
+  simp only [tqBlankExClause, Sentence.Realize, Formula.realize_iExs, realize_tqBlankF,
+    Sum.elim_inr]
+  exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨b, hb⟩ => ⟨fun _ => b, hb⟩⟩
+
+theorem realize_tqBlankUniqClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqBlankUniqClause) ↔
+      ∀ a b : A, TMBlank a → TMBlank b → a = b := by
+  simp only [tqBlankUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, realize_tqBlankF, realize_tqEqF, Sum.elim_inr]
+  exact ⟨fun h a b h₁ h₂ => h ![a, b] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
+
+theorem realize_tqStepClause :
+    (@Sentence.Realize tqSOLang A SOStruc tqStepClause) ↔
+      ∀ t t', SuccPos TMLe TMPosn t t' →
+        (∃ τ, TMTr τ ∧ (∀ q, ρ .state ![t, q] → TMSrc τ q) ∧
+            (∀ p a, ρ .head ![t, p] → ρ .tape ![t, p, a] → TMRead τ a) ∧
+            (∀ q, ρ .state ![t', q] → TMDst τ q) ∧
+            (∀ p a, ρ .head ![t, p] → ρ .tape ![t', p, a] → TMWrite τ a) ∧
+            (∀ p a, ¬ ρ .head ![t, p] → (ρ .tape ![t, p, a] ↔ ρ .tape ![t', p, a])) ∧
+            ((TMRight τ ∧ ∀ p p', ρ .head ![t, p] → ρ .head ![t', p'] →
+                SuccPos TMLe TMPosn p p') ∨
+              (¬ TMRight τ ∧ ∀ p p', ρ .head ![t, p] → ρ .head ![t', p'] →
+                SuccPos TMLe TMPosn p' p))) ∨
+          ((∀ q, ρ .state ![t, q] → TMAcc q) ∧
+            (∀ q, ρ .state ![t', q] ↔ ρ .state ![t, q]) ∧
+            (∀ p, ρ .head ![t', p] ↔ ρ .head ![t, p]) ∧
+            ∀ p a, ρ .tape ![t', p, a] ↔ ρ .tape ![t, p, a]) := by
+  simp only [tqStepClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_sup, Formula.realize_iExs, realize_tqSuccPosF, realize_tqStepBodyF,
+    realize_tqStutterBodyF, Sum.elim_inl, Sum.elim_inr]
+  constructor
+  · intro h t t' hs
+    rcases h ![t, t'] (by simpa using hs) with ⟨i, hi⟩ | hstut
+    · exact Or.inl ⟨i 0, by simpa using hi⟩
+    · exact Or.inr (by simpa using hstut)
+  · intro h i hi
+    rcases h (i 0) (i 1) hi with ⟨τ, hτ⟩ | hstut
+    · exact Or.inl ⟨fun _ => τ, hτ⟩
+    · exact Or.inr hstut
+
+private theorem realize_inf_sentence (φ ψ : tqSOLang.Sentence) :
+    (@Sentence.Realize tqSOLang A SOStruc (φ ⊓ ψ)) ↔
+      (@Sentence.Realize tqSOLang A SOStruc φ) ∧ (@Sentence.Realize tqSOLang A SOStruc ψ) := by
+  letI := tmGuessBlock.structure ρ
+  exact Formula.realize_inf
+
+/-- **The kernel says exactly what it should**: the instance is well formed and
+the guessed relations are a run. -/
+theorem realize_tqKernel :
+    (@Sentence.Realize tqSOLang A SOStruc tqKernel) ↔
+      (tmData A).WellFormed ∧
+        (tmData A).RelWalk (fun t q => ρ .state ![t, q]) (fun t p => ρ .head ![t, p])
+          (fun t p a => ρ .tape ![t, p, a]) := by
+  simp only [tqKernel, realize_inf_sentence, realize_tqReflClause, realize_tqTransClause,
+    realize_tqAntisymClause, realize_tqTotalClause, realize_tqPosnExClause,
+    realize_tqInpFunClause, realize_tqBlankExClause, realize_tqBlankUniqClause,
+    realize_tqStateExClause, realize_tqStateUniqClause, realize_tqHeadExClause,
+    realize_tqHeadUniqClause, realize_tqTapeExClause, realize_tqTapeUniqClause,
+    realize_tqInitClause, realize_tqStepClause, realize_tqAccClause]
+  constructor
+  · rintro ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15, h16, h17⟩
+    exact ⟨⟨⟨h1, h2, h3, h4⟩, h5, h6, h7, h8⟩, ⟨h9, h10, h11, h12, h13, h14, h15, h16, h17⟩⟩
+  · rintro ⟨⟨⟨h1, h2, h3, h4⟩, h5, h6, h7, h8⟩, hw⟩
+    exact ⟨h1, h2, h3, h4, h5, h6, h7, h8, hw.qex, hw.quniq, hw.hex, hw.huniq, hw.tex,
+      hw.tuniq, hw.init, hw.step, hw.acc⟩
+
 end RealizeClauses
+
+/-! ### The definability theorems -/
+
+/-- **Machine acceptance is `Σ₁`-definable**: one existential block guesses the
+run – the state, the head cell and the tape contents at each time – and the
+first-order kernel checks that it is one. -/
+theorem ntmAccept_sigmaSODefinable : SigmaSODefinable 1 NTMAccept := by
+  refine ⟨[tmGuessBlock], rfl, tqKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨hwf, hacc⟩
+    obtain ⟨Q, H, T, hrel⟩ := TMData.exists_relWalk_iff_exists_walk.mpr
+      ((TMData.accepts_iff_exists_walk hwf).mp hacc)
+    refine ⟨fun i => match i with
+      | .state => fun w : Fin 2 → A => Q (w 0) (w 1)
+      | .head => fun w : Fin 2 → A => H (w 0) (w 1)
+      | .tape => fun w : Fin 3 → A => T (w 0) (w 1) (w 2), ?_⟩
+    exact (realize_tqKernel _).mpr ⟨hwf, hrel⟩
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨hwf, hrel⟩ := (realize_tqKernel ρ).mp hρ
+    exact ⟨hwf, (TMData.accepts_iff_exists_walk hwf).mpr
+      (TMData.exists_relWalk_iff_exists_walk.mp ⟨_, _, _, hrel⟩)⟩
+
+/-- **Machine acceptance is in NP.** -/
+theorem ntmAccept_mem_NP : NTMAccept ∈ NP := ntmAccept_sigmaSODefinable
 
 end DescriptiveComplexity

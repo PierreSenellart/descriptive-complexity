@@ -20,7 +20,7 @@ discharged by a first-order reduction, so that these classes really are *the*
 NP and *the* P is, as the development stands, a citation. Proving `NTMAccept`
 NP-complete closes that gap from inside the framework.
 
-What is here so far is stage 1 of that plan: the semantics
+What is here so far is stages 1 and 2a of that plan: the semantics
 (`DescriptiveComplexity.Machines`), the vocabulary, the problem and its
 isomorphism-invariance, and the bridge
 `DescriptiveComplexity.TMData.accepts_iff_exists_walk` between an `ℕ`-indexed run and
@@ -28,12 +28,14 @@ one indexed by the position elements – which is the form a first-order kernel
 can talk about, and where the unary time bound is cashed in. Still to come, in
 order:
 
-* `NTMAccept ∈ NP` – guess that walk as three relations indexed by the
-  positions and check the tableau clauses first-order (*in progress*, see
-  `DescriptiveComplexity.Problems.Machine.Membership`);
 * `SAT ≤ᶠᵒ[≤] NTMAccept` – a bespoke machine built inside a SAT instance;
 * and the two characterizations `mem_NP_iff_le_ntmAccept` and its `PTIME`
   analogue.
+
+`DescriptiveComplexity.ntmAccept_mem_NP` (membership, stage 2a) is proved in
+`DescriptiveComplexity.Problems.Machine.Membership`: one existential block guesses the
+run and a first-order kernel checks it. Hardness is still open, so no
+completeness theorem is available yet.
 
 As with any complexity-theoretic statement, these results are about finite
 structures only
