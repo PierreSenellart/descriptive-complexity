@@ -756,6 +756,38 @@ noncomputable def confGuess (ν : A → Bool) (p : SatV A) : Config (SatV A) whe
   head := p
   tape := guessTape ν p
 
+omit [Language.sat.Structure A] in
+/-- **The guess sweep only ever changes the cell under the head.** Every other
+element reads the same before and after: markers and non-cells do not depend on
+the head at all, junk cells are frozen, and a real cell is below the new head
+exactly when it was below the old one – by the between-condition of
+`DescriptiveComplexity.SuccPos` in one direction and transitivity in the other. -/
+theorem guessTape_frame (ν : A → Bool) {p q r : SatV A}
+    (hsucc : SuccPos tagTupleLe SatPosn p q) (hr : r ≠ p) :
+    guessTape ν q r = guessTape ν p r := by
+  classical
+  obtain ⟨t, w⟩ := r
+  cases t <;> simp only [guessTape]
+  case pCell =>
+    have hiff : ((∀ a : A, w 1 ≤ a) ∧ tagTupleLe ((SatTag.pCell, w) : SatV A) q ∧
+          ((SatTag.pCell, w) : SatV A) ≠ q) ↔
+        ((∀ a : A, w 1 ≤ a) ∧ tagTupleLe ((SatTag.pCell, w) : SatV A) p ∧
+          ((SatTag.pCell, w) : SatV A) ≠ p) := by
+      constructor
+      · rintro ⟨hpos, hle, hne⟩
+        refine ⟨hpos, ?_, hr⟩
+        by_contra hcon
+        rcases isLinOrd_tagTupleLe.2.2.2 p (SatTag.pCell, w) with h | h
+        · rcases hsucc.2.2.2.2 (SatTag.pCell, w) hpos h hle with h' | h'
+          · exact hr h'
+          · exact hne h'
+        · exact hcon h
+      · rintro ⟨hpos, hle, -⟩
+        refine ⟨hpos, isLinOrd_tagTupleLe.2.1 _ p q hle hsucc.2.2.1, ?_⟩
+        rintro rfl
+        exact hsucc.2.2.2.1 (isLinOrd_tagTupleLe.2.2.1 _ _ hsucc.2.2.1 hle)
+    exact if_congr hiff rfl rfl
+
 /-- **The guess sweep starts from an initial configuration**: at the left
 marker no cell is below the head, so every cell still reads unassigned – which
 is exactly the input `DescriptiveComplexity.SatInp` describes. -/
