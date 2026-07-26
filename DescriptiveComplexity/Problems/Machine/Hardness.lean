@@ -860,6 +860,32 @@ theorem steps_guess (ν : A → Bool) :
     (fun _ _ hsucc _ hb => step_guess ν hsucc hb) posEnd satPosn_posEnd
     (minPos_posStart.2 posEnd satPosn_posEnd) (tagTupleLe_refl _)
 
+/-- **The turn out of the guess phase**, when there is a clause to check: the
+machine reads the right marker, takes the lowest clause with an empty flag, and
+turns round to sweep leftwards. -/
+theorem step_turnChk (ν : A → Bool) {c₀ : A} (hc₀ : SatMinCl c₀) :
+    (satMachine A).Step (confGuess ν posEnd)
+      { state := stChk false false c₀, head := posCell topA, tape := guessTape ν posEnd } := by
+  refine ⟨one .tGuessEndChk c₀, ⟨fun a => botA_le a, hc₀⟩, rfl, ?_, rfl, ?_,
+    fun r _ => rfl, Or.inr ⟨id, succPos_posCell_posEnd⟩⟩
+  · change guessTape ν posEnd posEnd = symEnd
+    rfl
+  · change guessTape ν posEnd posEnd = symEnd
+    rfl
+
+/-- **The turn out of the guess phase**, when the instance has no clause at
+all: the formula is vacuously satisfiable and the machine accepts. Without this
+tag the run would die and the reduction would be wrong on the empty CNF. -/
+theorem step_turnAcc (ν : A → Bool) (hno : ∀ e : A, ¬ SatCl e) :
+    (satMachine A).Step (confGuess ν posEnd)
+      { state := stAcc, head := posCell topA, tape := guessTape ν posEnd } := by
+  refine ⟨cst .tGuessEndAcc, ⟨isMinTup_bot, hno⟩, rfl, ?_, rfl, ?_,
+    fun r _ => rfl, Or.inr ⟨id, succPos_posCell_posEnd⟩⟩
+  · change guessTape ν posEnd posEnd = symEnd
+    rfl
+  · change guessTape ν posEnd posEnd = symEnd
+    rfl
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
