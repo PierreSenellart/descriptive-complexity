@@ -1159,6 +1159,35 @@ theorem step_turnAccR (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
   change stChk (chkFlagR ν c posEnd) true c = stChk true true c
   rw [hflag]
 
+/-- **A completed leftward sweep has seen every cell**: its flag says exactly
+that some element satisfies the clause. -/
+theorem chkFlagL_posStart (ν : A → Bool) (c : A) :
+    chkFlagL ν c (posStart : SatV A) = true ↔ ∃ y : A, SatLit c y (ν y) := by
+  classical
+  simp only [chkFlagL, decide_eq_true_eq]
+  constructor
+  · rintro ⟨y, -, -, hlit⟩
+    exact ⟨y, hlit⟩
+  · rintro ⟨y, hlit⟩
+    refine ⟨y, posStart_le_posCell y, ?_, hlit⟩
+    intro h
+    exact absurd (congrArg Prod.fst h) (show ¬(SatTag.pStart = SatTag.pCell) by decide)
+
+/-- **A completed rightward sweep has seen every cell** – the same statement,
+which is why the alternating directions never have to be reconciled inside the
+induction over clauses. -/
+theorem chkFlagR_posEnd (ν : A → Bool) (c : A) :
+    chkFlagR ν c (posEnd : SatV A) = true ↔ ∃ y : A, SatLit c y (ν y) := by
+  classical
+  simp only [chkFlagR, decide_eq_true_eq]
+  constructor
+  · rintro ⟨y, -, -, hlit⟩
+    exact ⟨y, hlit⟩
+  · rintro ⟨y, hlit⟩
+    refine ⟨y, posCell_le_posEnd y, ?_, hlit⟩
+    intro h
+    exact absurd (congrArg Prod.fst h) (show ¬(SatTag.pCell = SatTag.pEnd) by decide)
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
