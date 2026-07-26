@@ -950,6 +950,48 @@ theorem chkFlagL_succ (ν : A → Bool) (c : A) {p q : SatV A}
       exact hsucc.2.2.2.1 (isLinOrd_tagTupleLe.2.2.1 _ _ hsucc.2.2.1 hle)
     · exact ⟨q.2 0, hqc ▸ hsucc.2.2.1, hqc ▸ hsucc.2.2.2.1, hlit⟩
 
+omit [Language.sat.Structure A] in
+/-- After the guess sweep every real cell holds its assigned value. -/
+theorem doneTape_cell (ν : A → Bool) {q : SatV A} (hq : q.1 = SatTag.pCell)
+    (hpos : ∀ a : A, q.2 1 ≤ a) : doneTape ν q = symV (ν (q.2 0)) (q.2 0) := by
+  classical
+  simp only [doneTape, guessTape, hq]
+  refine if_pos ⟨hpos, tagTupleLe_of_tag_lt ?_, ?_⟩
+  · rw [hq]
+    exact show SatTag.pCell < SatTag.pEnd by decide
+  · intro h
+    rw [h] at hq
+    exact absurd hq (show ¬(SatTag.pEnd = SatTag.pCell) by decide)
+
+/-- **One step of a leftward check sweep.** The machine reads the cell it is
+on, folds that literal into the flag, and moves one place left. Which of the
+two `DescriptiveComplexity.SatDst` branches applies is exactly
+`DescriptiveComplexity.chkFlagL_succ`. -/
+theorem step_chkL (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
+    (hsucc : SuccPos tagTupleLe SatPosn p q) (hq : q.1 = SatTag.pCell) :
+    (satMachine A).Step (confChkL ν c q) (confChkL ν c p) := by
+  classical
+  have hpos : ∀ a : A, q.2 1 ≤ a := by
+    have := hsucc.2.1
+    rw [SatPosn, hq] at this
+    exact this
+  have hread : doneTape ν q = symV (ν (q.2 0)) (q.2 0) := doneTape_cell ν hq hpos
+  refine ⟨(SatTag.tChk (ν (q.2 0)) (chkFlagL ν c q) false, ![c, q.2 0]), hc, rfl, hread, ?_,
+    hread, fun r _ => rfl, Or.inr ⟨Bool.false_ne_true, hsucc⟩⟩
+  by_cases hflag : chkFlagL ν c p = true
+  · refine Or.inl ⟨?_, ?_⟩
+    · change stChk (chkFlagL ν c p) false c = stChk true false c
+      rw [hflag]
+    · exact (chkFlagL_succ ν c hsucc hq).mp hflag
+  · refine Or.inr ⟨?_, ?_, ?_⟩
+    · change stChk (chkFlagL ν c p) false c = stChk false false c
+      rw [Bool.not_eq_true] at hflag
+      rw [hflag]
+    · by_contra hcon
+      exact hflag ((chkFlagL_succ ν c hsucc hq).mpr (Or.inl (by simpa using hcon)))
+    · intro hlit
+      exact hflag ((chkFlagL_succ ν c hsucc hq).mpr (Or.inr hlit))
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
