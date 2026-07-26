@@ -1255,6 +1255,21 @@ theorem bitRank_posEnd_le :
     haveI := Fintype.ofFinite A
     simp [Nat.card_eq_fintype_card]
 
+omit [Nonempty A] in
+/-- **Every clause but the last has a next one.** The clause the machine turns
+to is the least one above the current one, which is what
+`DescriptiveComplexity.SatNextCl` asserts. -/
+theorem exists_satNextCl {c : A} (hc : SatCl c) (hnmax : ¬ SatMaxCl c) :
+    ∃ c', SatNextCl c c' := by
+  have hne : ∃ e : A, SatCl e ∧ c < e := by
+    by_contra hcon
+    push Not at hcon
+    exact hnmax ⟨hc, hcon⟩
+  obtain ⟨c', ⟨hc', hlt⟩, hmin⟩ :=
+    exists_minPos (Le := (· ≤ ·)) (Posn := fun e : A => SatCl e ∧ c < e)
+      ⟨le_refl, fun a b c => le_trans, fun a b => le_antisymm, le_total⟩ hne
+  exact ⟨c', hc, hc', hlt, fun e he hce => hmin e ⟨he, hce⟩⟩
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
