@@ -1188,6 +1188,42 @@ theorem chkFlagR_posEnd (ν : A → Bool) (c : A) :
     intro h
     exact absurd (congrArg Prod.fst h) (show ¬(SatTag.pCell = SatTag.pEnd) by decide)
 
+/-! ### One clause, checked end to end
+
+Each of these is a sweep followed by its turn. They are the step and the base
+case of the induction over clauses; the induction itself only has to choose
+between them. -/
+
+/-- Checking `c` leftwards and moving on to the next clause. -/
+theorem steps_clauseL (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
+    (hsat : ∃ y : A, SatLit c y (ν y)) :
+    ∃ k, (satMachine A).StepsIn k (confChkL ν c (posCell topA))
+      (confChkR ν c' (posCell botA)) :=
+  ⟨_, (steps_chkL ν hc).trans_step (step_turnNextL ν hnext ((chkFlagL_posStart ν c).mpr hsat))⟩
+
+/-- Checking `c` rightwards and moving on to the next clause. -/
+theorem steps_clauseR (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
+    (hsat : ∃ y : A, SatLit c y (ν y)) :
+    ∃ k, (satMachine A).StepsIn k (confChkR ν c (posCell botA))
+      (confChkL ν c' (posCell topA)) :=
+  ⟨_, (steps_chkR ν hc).trans_step (step_turnNextR ν hnext ((chkFlagR_posEnd ν c).mpr hsat))⟩
+
+/-- Checking the last clause leftwards, and accepting. -/
+theorem steps_clauseAccL (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
+    (hsat : ∃ y : A, SatLit c y (ν y)) :
+    ∃ (k : ℕ) (cfin : Config (SatV A)), (satMachine A).StepsIn k
+      (confChkL ν c (posCell topA)) cfin ∧ SatAcc cfin.state :=
+  ⟨_, _, (steps_chkL ν hc).trans_step
+    (step_turnAccL ν hmax ((chkFlagL_posStart ν c).mpr hsat)), rfl⟩
+
+/-- Checking the last clause rightwards, and accepting. -/
+theorem steps_clauseAccR (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
+    (hsat : ∃ y : A, SatLit c y (ν y)) :
+    ∃ (k : ℕ) (cfin : Config (SatV A)), (satMachine A).StepsIn k
+      (confChkR ν c (posCell botA)) cfin ∧ SatAcc cfin.state :=
+  ⟨_, _, (steps_chkR ν hc).trans_step
+    (step_turnAccR ν hmax ((chkFlagR_posEnd ν c).mpr hsat)), rfl⟩
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
