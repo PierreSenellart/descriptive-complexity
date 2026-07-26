@@ -467,6 +467,58 @@ theorem satTr_payload {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
          exact le_antisymm (hτ.2.2.2 _ hτ'.2.1 (h0 ▸ hτ'.2.2.1))
            (hτ'.2.2.2 _ hτ.2.1 (h0 ▸ hτ.2.2.1)))
 
+omit [Language.sat.Structure A] in
+/-- Reading off `DescriptiveComplexity.SatSrc` at a guess-write tag. -/
+theorem satSrc_guessVal {τ q : SatV A} {v : Bool} (h : τ.1 = .tGuessVal v)
+    (hs : SatSrc τ q) : q = stGuess := by
+  obtain ⟨t, w⟩ := τ; cases h; exact hs
+
+omit [Language.sat.Structure A] in
+/-- Reading off `DescriptiveComplexity.SatRead` at a guess-write tag. -/
+theorem satRead_guessVal {τ a : SatV A} {v : Bool} (h : τ.1 = .tGuessVal v)
+    (hr : SatRead τ a) : a = symU (τ.2 0) := by
+  obtain ⟨t, w⟩ := τ; cases h; exact hr
+
+omit [Language.sat.Structure A] in
+/-- Reading off `DescriptiveComplexity.SatSrc` at a turn-to-next tag. -/
+theorem satSrc_turnNext {τ q : SatV A} {d : Bool} (h : τ.1 = .tTurnNext d)
+    (hs : SatSrc τ q) : q = stChk true d (τ.2 0) := by
+  obtain ⟨t, w⟩ := τ; cases h; exact hs
+
+omit [Language.sat.Structure A] in
+/-- Reading off `DescriptiveComplexity.SatSrc` at a turn-to-accept tag. -/
+theorem satSrc_turnAcc {τ q : SatV A} {d : Bool} (h : τ.1 = .tTurnAcc d)
+    (hs : SatSrc τ q) : q = stChk true d (τ.2 0) := by
+  obtain ⟨t, w⟩ := τ; cases h; exact hs
+
+/-- **At most one transition applies**, away from the one nondeterministic
+choice of the guess phase: the state and the symbol read pin the tag
+(`DescriptiveComplexity.tag_cases`), the tag pins the payload
+(`DescriptiveComplexity.satTr_payload`), and the three ambiguities are the guess itself
+and the two exclusive branch points. -/
+theorem satTr_unique {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
+    (hs : SatSrc τ q) (hs' : SatSrc τ' q) (hr : SatRead τ a) (hr' : SatRead τ' a)
+    (hguess : ¬ (q = stGuess ∧ ∃ x : A, a = symU x)) : τ = τ' := by
+  have hst : stateTag τ.1 = stateTag τ'.1 :=
+    (satSrc_tag hτ hs).symm.trans (satSrc_tag hτ' hs')
+  have hrd : readTag τ.1 = readTag τ'.1 :=
+    (satRead_tag hτ hr).symm.trans (satRead_tag hτ' hr')
+  rcases tag_cases τ.1 τ'.1 (satTr_isTrTag hτ) (satTr_isTrTag hτ') hst hrd with
+    heq | ⟨hg, -⟩ | ⟨ha, hc⟩ | ⟨hc, ha⟩ | ⟨hn, hac⟩ | ⟨hac, hn⟩
+  · exact satTr_payload hτ hτ' hs hs' hr hr' heq
+  · obtain ⟨v, hv⟩ := isGuessVal_iff.mp hg
+    exact absurd ⟨satSrc_guessVal hv hs, τ.2 0, satRead_guessVal hv hr⟩ hguess
+  · exact (satTr_guessEnd_excl hτ hτ' (isEndAcc_iff.mp ha) (isEndChk_iff.mp hc)).elim
+  · exact (satTr_guessEnd_excl hτ' hτ (isEndAcc_iff.mp ha) (isEndChk_iff.mp hc)).elim
+  · obtain ⟨d, hd⟩ := isTurnNext_iff.mp hn
+    obtain ⟨d', hd'⟩ := isTurnAcc_iff.mp hac
+    exact (satTr_turn_excl hτ hτ' hd hd'
+      (one_eq_one_iff.mp ((satSrc_turnNext hd hs).symm.trans (satSrc_turnAcc hd' hs'))).2).elim
+  · obtain ⟨d, hd⟩ := isTurnAcc_iff.mp hac
+    obtain ⟨d', hd'⟩ := isTurnNext_iff.mp hn
+    exact (satTr_turn_excl hτ' hτ hd' hd
+      (one_eq_one_iff.mp ((satSrc_turnNext hd' hs').symm.trans (satSrc_turnAcc hd hs))).2).elim
+
 end Functional
 
 /-- **The machine is well formed**, which is all of
