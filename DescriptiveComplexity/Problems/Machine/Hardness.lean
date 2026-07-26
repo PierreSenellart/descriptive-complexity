@@ -644,6 +644,63 @@ theorem succPos_posStart_posCell :
       have hle : r.2 0 ≤ botA := posCell_le_iff.mp (hcell ▸ h2)
       rw [hcell, le_antisymm hle (botA_le _)]
 
+/-- The greatest element of the instance: the last cell of the tape. -/
+def topA : A := (Finite.exists_max (id : A → A)).choose
+
+omit [Language.sat.Structure A] in
+theorem le_topA (a : A) : a ≤ topA (A := A) := (Finite.exists_max (id : A → A)).choose_spec a
+
+/-- Only the two highest of the bracketing tags lie between a cell's and the
+right marker's. -/
+theorem tag_between {t : SatTag} (h₁ : SatTag.pCell ≤ t) (h₂ : t ≤ SatTag.pEnd) :
+    t = SatTag.pCell ∨ t = SatTag.pEnd := by
+  revert h₁ h₂; revert t; decide
+
+omit [Language.sat.Structure A] in
+/-- There is only one right marker. -/
+theorem eq_posEnd_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pEnd) :
+    p = posEnd := by
+  obtain ⟨t, w⟩ := p
+  cases h
+  refine Prod.ext rfl (funext fun i => ?_)
+  fin_cases i
+  · exact le_antisymm (hp botA).1 (botA_le _)
+  · exact le_antisymm (hp botA).2 (botA_le _)
+
+omit [Language.sat.Structure A] in
+/-- **The head moves from cell to cell along the instance.** -/
+theorem succPos_posCell_posCell {x x' : A} (hlt : x < x')
+    (hcov : ∀ y : A, x ≤ y → y ≤ x' → y = x ∨ y = x') :
+    SuccPos tagTupleLe SatPosn (posCell x : SatV A) (posCell x') := by
+  refine ⟨satPosn_posCell _, satPosn_posCell _, posCell_le_iff.mpr (le_of_lt hlt), ?_, ?_⟩
+  · intro h
+    exact absurd (by simpa [one] using congrFun (congrArg Prod.snd h) 0 : x = x') (ne_of_lt hlt)
+  · intro r hr h1 h2
+    have ht : r.1 = SatTag.pCell :=
+      le_antisymm (tagTupleLe_tag_le h2) (tagTupleLe_tag_le h1)
+    have hcell := eq_posCell_of_posn hr ht
+    have hx : x ≤ r.2 0 := posCell_le_iff.mp (hcell ▸ h1)
+    have hx' : r.2 0 ≤ x' := posCell_le_iff.mp (hcell ▸ h2)
+    rcases hcov _ hx hx' with h | h
+    · exact Or.inl (by rw [hcell, h])
+    · exact Or.inr (by rw [hcell, h])
+
+omit [Language.sat.Structure A] in
+/-- **The head's last move of a sweep.** The right marker follows the cell of
+the greatest element: this is where the guess sweep stops. -/
+theorem succPos_posCell_posEnd :
+    SuccPos tagTupleLe SatPosn (posCell (topA (A := A)) : SatV A) posEnd := by
+  refine ⟨satPosn_posCell _, satPosn_posEnd, posCell_le_posEnd _, ?_, ?_⟩
+  · intro h
+    exact absurd (congrArg Prod.fst h) (show ¬(SatTag.pCell = SatTag.pEnd) by decide)
+  · intro r hr h1 h2
+    rcases tag_between (tagTupleLe_tag_le h1) (tagTupleLe_tag_le h2) with h | h
+    · refine Or.inl ?_
+      have hcell := eq_posCell_of_posn hr h
+      have hx : topA ≤ r.2 0 := posCell_le_iff.mp (hcell ▸ h1)
+      rw [hcell, le_antisymm (le_topA _) hx]
+    · exact Or.inr (eq_posEnd_of_posn hr h)
+
 /-- **The machine is deterministic away from the guess.** Once the transition
 is pinned (`DescriptiveComplexity.satTr_unique`), the successor configuration is too: its
 state by `satDst_functional`, the cell under the head by `satWrite_functional`,
