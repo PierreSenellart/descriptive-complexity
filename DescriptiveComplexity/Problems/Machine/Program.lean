@@ -67,6 +67,54 @@ theorem succPos_right_unique (hlin : IsLinOrd M.Le) {p q q' : A}
     · exact absurd hcon.symm h'.2.2.2.1
     · exact hcon.symm
 
+/-- Every position that is not the highest has one immediately above it – the
+mirror of `DescriptiveComplexity.exists_predPos`, read in the reversed order. -/
+theorem exists_succPos' (hlin : IsLinOrd M.Le) {p : A} (hp : M.Posn p)
+    (hmax : ¬ MaxPos M.Le M.Posn p) : ∃ q, SuccPos M.Le M.Posn p q := by
+  obtain ⟨q, hq⟩ := exists_predPos (Le := fun a b => M.Le b a) hlin.reverse hp hmax
+  exact ⟨q, hq.2.1, hq.1, hq.2.2.1, fun h => hq.2.2.2.1 h.symm,
+    fun r hr h₁ h₂ => (hq.2.2.2.2 r hr h₂ h₁).symm⟩
+
+/-- **Running a phase leftwards.** The mirror of
+`DescriptiveComplexity.TMData.stepsIn_of_segment`: when each consecutive pair of a
+segment carries a step *downwards*, the machine walks from the top of the
+segment to any position of it. The check sweeps of a reduction alternate
+direction, so both readings are needed. -/
+theorem stepsIn_of_segment_down (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p₁ : A}
+    (hp₁ : M.Posn p₁)
+    (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ →
+      M.Step (conf q) (conf p)) :
+    ∀ p, M.Posn p → M.Le p₀ p → M.Le p p₁ →
+      M.StepsIn (bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn p) (conf p₁) (conf p) := by
+  have key : ∀ k : ℕ, ∀ p, M.Posn p → M.Le p₀ p → M.Le p p₁ →
+      bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn p = k →
+      M.StepsIn (bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn p) (conf p₁) (conf p) := by
+    intro k
+    induction k using Nat.strong_induction_on with
+    | _ k ih =>
+      intro p hp hlb hub hrank
+      rcases eq_or_ne p p₁ with rfl | hne
+      · rw [Nat.sub_self]
+        exact rfl
+      · have hnmax : ¬ MaxPos M.Le M.Posn p := fun hmax =>
+          hne (hlin.2.2.1 p p₁ hub (hmax.2 p₁ hp₁))
+        obtain ⟨q, hq⟩ := exists_succPos' hlin hp hnmax
+        have hq₁ : M.Le q p₁ := by
+          rcases hlin.2.2.2 q p₁ with h | h
+          · exact h
+          · rcases hq.2.2.2.2 p₁ hp₁ hub h with h' | h'
+            · exact absurd h'.symm hne
+            · exact h' ▸ hlin.1 q
+        have hrq : bitRank M.Le M.Posn q = bitRank M.Le M.Posn p + 1 := bitRank_succPos hlin hq
+        have hmono : bitRank M.Le M.Posn q ≤ bitRank M.Le M.Posn p₁ :=
+          bitRank_le_of_le hlin hq.2.1 hq₁
+        have hrec := ih (bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn q) (by omega) q hq.2.1
+          (hlin.2.1 p₀ p q hlb hq.2.2.1) hq₁ rfl
+        have := hrec.trans_step (hstep p q hq hlb hq₁)
+        rwa [show bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn q + 1 =
+          bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn p by omega] at this
+  exact fun p hp hlb hub => key _ p hp hlb hub rfl
+
 /-- **Running a phase.** If from `p₀` onwards every immediate successor of
 positions carries a step of the machine, then the machine runs from `p₀` to any
 later position, in exactly the number of steps their ranks differ by.
