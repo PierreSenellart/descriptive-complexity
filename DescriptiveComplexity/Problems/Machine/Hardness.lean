@@ -411,6 +411,62 @@ theorem tag_cases : ∀ t t' : SatTag, isTrTag t → isTrTag t' →
       (isTurnNext t ∧ isTurnAcc t') ∨ (isTurnAcc t ∧ isTurnNext t') := by
   decide
 
+omit [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
+/-- Two elements agree when their tag and both coordinates do. -/
+theorem satV_ext {τ τ' : SatV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0) (h1 : τ.2 1 = τ'.2 1) :
+    τ = τ' := by
+  refine Prod.ext ht (funext fun i => ?_)
+  fin_cases i
+  · exact h0
+  · exact h1
+
+omit [Finite A] [Nonempty A] in
+/-- Only transitions have transition tags. -/
+theorem satTr_isTrTag {τ : SatV A} (hτ : SatTr τ) : isTrTag τ.1 := by
+  obtain ⟨t, w⟩ := τ
+  cases t <;> first | exact False.elim hτ | rfl
+
+theorem isGuessVal_iff {t : SatTag} : isGuessVal t ↔ ∃ v, t = .tGuessVal v := by
+  cases t <;> simp [isGuessVal]
+
+theorem isEndAcc_iff {t : SatTag} : isEndAcc t ↔ t = .tGuessEndAcc := by
+  cases t <;> simp [isEndAcc]
+
+theorem isEndChk_iff {t : SatTag} : isEndChk t ↔ t = .tGuessEndChk := by
+  cases t <;> simp [isEndChk]
+
+theorem isTurnNext_iff {t : SatTag} : isTurnNext t ↔ ∃ d, t = .tTurnNext d := by
+  cases t <;> simp [isTurnNext]
+
+theorem isTurnAcc_iff {t : SatTag} : isTurnAcc t ↔ ∃ d, t = .tTurnAcc d := by
+  cases t <;> simp [isTurnAcc]
+
+/-- Equal tags force equal payloads: the state and symbol pin one coordinate,
+the promises in `DescriptiveComplexity.SatTr` pin the other. -/
+theorem satTr_payload {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
+    (hs : SatSrc τ q) (hs' : SatSrc τ' q) (hr : SatRead τ a) (hr' : SatRead τ' a)
+    (ht : τ.1 = τ'.1) : τ = τ' := by
+  have hmin : ∀ u v : A, (∀ b : A, u ≤ b) → (∀ b : A, v ≤ b) → u = v :=
+    fun u v hu hv => le_antisymm (hu v) (hv u)
+  obtain ⟨t, w⟩ := τ
+  obtain ⟨t', w'⟩ := τ'
+  cases ht
+  cases t <;> dsimp only [SatTr, SatSrc, SatRead] at hτ hτ' hs hs' hr hr' <;>
+    first
+      | exact False.elim hτ
+      | exact Prod.ext rfl (isMinTup_unique hτ hτ')
+      | exact Prod.ext rfl (isMinTup_unique hτ.1 hτ'.1)
+      | exact satV_ext rfl (one_eq_one_iff.mp (hr.symm.trans hr')).2 (hmin _ _ hτ hτ')
+      | exact satV_ext rfl (le_antisymm (hτ.2.2 _ hτ'.2.1) (hτ'.2.2 _ hτ.2.1))
+          (hmin _ _ hτ.1 hτ'.1)
+      | exact satV_ext rfl (one_eq_one_iff.mp (hs.symm.trans hs')).2
+          (one_eq_one_iff.mp (hr.symm.trans hr')).2
+      | exact satV_ext rfl (one_eq_one_iff.mp (hs.symm.trans hs')).2 (hmin _ _ hτ.1 hτ'.1)
+      | (refine satV_ext rfl (one_eq_one_iff.mp (hs.symm.trans hs')).2 ?_
+         have h0 := (one_eq_one_iff.mp (hs.symm.trans hs')).2
+         exact le_antisymm (hτ.2.2.2 _ hτ'.2.1 (h0 ▸ hτ'.2.2.1))
+           (hτ'.2.2.2 _ hτ.2.1 (h0 ▸ hτ.2.2.1)))
+
 end Functional
 
 /-- **The machine is well formed**, which is all of
