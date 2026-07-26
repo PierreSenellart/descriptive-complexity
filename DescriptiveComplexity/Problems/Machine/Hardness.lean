@@ -247,6 +247,89 @@ def satMachine (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A]
   Write := SatWrite
   Inp := SatInp
 
+/-! ### The table is a table
+
+Before any run is considered: each transition has exactly one source, symbol
+read, destination and symbol written, and the two places where two tags could
+otherwise both apply are exclusive. A mistake in the table shows up here first,
+which is why these come before the correctness proof. -/
+
+section Functional
+
+omit [Language.sat.Structure A] in
+theorem one_eq_one_iff {t t' : SatTag} {a a' : A} :
+    (one t a : SatV A) = one t' a' ↔ t = t' ∧ a = a' := by
+  constructor
+  · intro h
+    refine ⟨congrArg Prod.fst h, ?_⟩
+    have := congrFun (congrArg Prod.snd h) 0
+    simpa [one] using this
+  · rintro ⟨rfl, rfl⟩; rfl
+
+omit [Language.sat.Structure A] in
+theorem cst_eq_cst_iff {t t' : SatTag} : (cst t : SatV A) = cst t' ↔ t = t' :=
+  ⟨congrArg Prod.fst, fun h => h ▸ rfl⟩
+
+omit [Language.sat.Structure A] in
+/-- A transition applies in exactly one state. -/
+theorem satSrc_functional {τ q q' : SatV A} (h : SatSrc τ q) (h' : SatSrc τ q') : q = q' := by
+  unfold SatSrc at h h'
+  cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
+
+omit [Language.sat.Structure A] in
+/-- A transition reads exactly one symbol. -/
+theorem satRead_functional {τ a a' : SatV A} (h : SatRead τ a) (h' : SatRead τ a') : a = a' := by
+  unfold SatRead at h h'
+  cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
+
+omit [Language.sat.Structure A] in
+/-- A transition writes exactly one symbol. -/
+theorem satWrite_functional {τ a a' : SatV A} (h : SatWrite τ a) (h' : SatWrite τ a') :
+    a = a' := by
+  unfold SatWrite at h h'
+  cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
+
+/-- A transition moves to exactly one state. The only case with a choice is the
+check clause, whose two branches are separated by the flag and by
+`DescriptiveComplexity.SatLit`. -/
+theorem satDst_functional {τ q q' : SatV A} (h : SatDst τ q) (h' : SatDst τ q') : q = q' := by
+  unfold SatDst at h h'
+  cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h'
+  case tChk v f d =>
+    rcases h with ⟨hq, hcase⟩ | ⟨hq, hf, hlit⟩ <;> rcases h' with ⟨hq', hcase'⟩ | ⟨hq', hf', hlit'⟩
+    · exact hq.trans hq'.symm
+    · rcases hcase with hc | hc
+      · exact absurd (hc.symm.trans hf') (by decide)
+      · exact absurd hc hlit'
+    · rcases hcase' with hc | hc
+      · exact absurd (hc.symm.trans hf) (by decide)
+      · exact absurd hc hlit
+    · exact hq.trans hq'.symm
+  all_goals exact h.trans h'.symm
+
+omit [Finite A] [Nonempty A] in
+/-- **The end of the guess phase is not ambiguous**: an instance either has a
+clause to check or has none. -/
+theorem satTr_guessEnd_excl {τ τ' : SatV A} (h : SatTr τ) (h' : SatTr τ')
+    (hτ : τ.1 = SatTag.tGuessEndAcc) (hτ' : τ'.1 = SatTag.tGuessEndChk) : False := by
+  unfold SatTr at h h'
+  rw [hτ] at h
+  rw [hτ'] at h'
+  exact h.2 _ h'.2.1
+
+omit [Finite A] [Nonempty A] in
+/-- **A turn is not ambiguous**: the clause just checked either has a successor
+or is the last one. -/
+theorem satTr_turn_excl {τ τ' : SatV A} {d d' : Bool} (h : SatTr τ) (h' : SatTr τ')
+    (hτ : τ.1 = SatTag.tTurnNext d) (hτ' : τ'.1 = SatTag.tTurnAcc d')
+    (hc : τ.2 0 = τ'.2 0) : False := by
+  unfold SatTr at h h'
+  rw [hτ] at h
+  rw [hτ'] at h'
+  exact absurd (h'.2.2 _ h.2.1) (not_le.mpr (hc ▸ h.2.2.1))
+
+end Functional
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
