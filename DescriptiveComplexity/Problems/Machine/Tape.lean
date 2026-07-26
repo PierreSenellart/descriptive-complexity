@@ -83,16 +83,28 @@ inductive SatTag : Type
   | sT
   /-- The symbol `(x, F)`: the cell of `x`, assigned false. -/
   | sF
-  deriving DecidableEq
-
-instance : Fintype SatTag where
-  elems :=
-    {SatTag.pStart, SatTag.pCell, SatTag.pEnd,
-      SatTag.pFill 0, SatTag.pFill 1, SatTag.pFill 2, SatTag.pFill 3,
-      SatTag.sStart, SatTag.sEnd, SatTag.sBlank, SatTag.sU, SatTag.sT, SatTag.sF}
-  complete := fun t => by cases t with
-    | pFill i => fin_cases i <;> decide
-    | _ => decide
+  /-- The guessing state. -/
+  | qGuess
+  /-- Checking clause `c` with the accumulated flag `f`, sweeping in direction
+  `d` (`true` = rightwards). -/
+  | qChk (f d : Bool)
+  /-- The accepting state. -/
+  | qAcc
+  /-- Guess phase: step over the left marker. -/
+  | tGuessStart
+  /-- Guess phase: write the truth value `b` in an unassigned cell. -/
+  | tGuessVal (b : Bool)
+  /-- Guess phase over, and there is no clause: accept. -/
+  | tGuessEndAcc
+  /-- Guess phase over: start checking the lowest clause. -/
+  | tGuessEndChk
+  /-- Check phase: read `(x, b)` with flag `f`, sweeping in direction `d`. -/
+  | tChk (b f d : Bool)
+  /-- Check phase: the clause is satisfied and another one follows. -/
+  | tTurnNext (d : Bool)
+  /-- Check phase: the clause is satisfied and it was the last one. -/
+  | tTurnAcc (d : Bool)
+  deriving DecidableEq, Fintype
 
 instance : Nonempty SatTag := ⟨SatTag.pStart⟩
 
@@ -108,14 +120,28 @@ def satTagIdx : SatTag → ℕ
   | .sU => 10
   | .sT => 11
   | .sF => 12
+  | .qGuess => 13
+  | .qChk f d => 14 + (if f then 1 else 0) + (if d then 2 else 0)
+  | .qAcc => 18
+  | .tGuessStart => 19
+  | .tGuessVal b => 20 + (if b then 1 else 0)
+  | .tGuessEndAcc => 22
+  | .tGuessEndChk => 23
+  | .tChk b f d => 24 + (if b then 1 else 0) + (if f then 2 else 0) + (if d then 4 else 0)
+  | .tTurnNext d => 32 + (if d then 1 else 0)
+  | .tTurnAcc d => 34 + (if d then 1 else 0)
 
 theorem satTagIdx_injective : Function.Injective satTagIdx := by
+  have hb : ∀ b : Bool, (if b then 1 else 0) < 2 := by decide
   intro s t h
-  cases s <;> cases t <;> simp only [satTagIdx] at h ⊢ <;>
-    first
-      | rfl
-      | omega
-      | (rename_i i j; exact congrArg _ (Fin.ext (by omega)))
+  cases s <;> cases t <;>
+    simp only [satTagIdx] at h ⊢ <;>
+      first
+        | rfl
+        | omega
+        | (rename_i i j; exact congrArg _ (Fin.ext (by omega)))
+        | (rename_i i; omega)
+        | (repeat' first | rfl | (rename_i b; cases b) | omega | simp_all)
 
 /-- The tape order on tags. -/
 instance : LinearOrder SatTag := LinearOrder.lift' satTagIdx satTagIdx_injective

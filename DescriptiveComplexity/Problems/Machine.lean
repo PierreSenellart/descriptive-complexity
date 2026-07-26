@@ -8,6 +8,7 @@ import DescriptiveComplexity.Problems.Machine.Walk
 import DescriptiveComplexity.Problems.Machine.Membership
 import DescriptiveComplexity.Problems.Machine.Program
 import DescriptiveComplexity.Problems.Machine.Tape
+import DescriptiveComplexity.Problems.Machine.Hardness
 
 /-!
 # Machine acceptance (the machine bridge, in progress)
@@ -36,7 +37,9 @@ order:
   reduction describes a phase by its intended configurations and a single-step
   obligation; `DescriptiveComplexity.Problems.Machine.Tape` fixes the tape layout –
   which tagged tuples are positions, in what order, and the budget
-  `DescriptiveComplexity.sat_budget` showing there are enough of them;
+  `DescriptiveComplexity.sat_budget` showing there are enough of them, and
+  `DescriptiveComplexity.Problems.Machine.Hardness` builds the machine itself
+  (`DescriptiveComplexity.satMachine`, well formed) – its correctness is what remains;
 * and the two characterizations `mem_NP_iff_le_ntmAccept` and its `PTIME`
   analogue.
 
