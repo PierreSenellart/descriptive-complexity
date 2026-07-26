@@ -1103,6 +1103,38 @@ theorem step_chkR (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
     · intro hlit
       exact hflag ((chkFlagR_succ ν c hsucc hp).mpr (Or.inr hlit))
 
+omit [Language.sat.Structure A] in
+/-- The right marker keeps its symbol throughout. -/
+theorem doneTape_end (ν : A → Bool) : doneTape ν (posEnd : SatV A) = symEnd := rfl
+
+/-- **A whole rightward check sweep** – the mirror of
+`DescriptiveComplexity.steps_chkL`. -/
+theorem steps_chkR (ν : A → Bool) {c : A} (hc : SatCl c) :
+    (satMachine A).StepsIn
+      (bitRank tagTupleLe SatPosn (posEnd : SatV A) -
+        bitRank tagTupleLe SatPosn (posCell (botA (A := A))))
+      (confChkR ν c (posCell botA)) (confChkR ν c posEnd) := by
+  refine TMData.stepsIn_of_segment isLinOrd_tagTupleLe (satPosn_posCell _)
+    (fun p q hsucc hlb hub => step_chkR ν hc hsucc ?_) posEnd satPosn_posEnd
+    (posCell_le_posEnd _) (tagTupleLe_refl _)
+  rcases tag_between (tagTupleLe_tag_le hlb)
+      (tagTupleLe_tag_le (isLinOrd_tagTupleLe.2.1 p q posEnd hsucc.2.2.1 hub)) with h | h
+  · exact h
+  · exact absurd (isLinOrd_tagTupleLe.2.2.1 p q hsucc.2.2.1
+      ((eq_posEnd_of_posn hsucc.1 h) ▸ hub)) hsucc.2.2.2.1
+
+/-- **The turn at the right marker**, when another clause follows – the mirror
+of `DescriptiveComplexity.step_turnNextL`. -/
+theorem step_turnNextR (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
+    (hflag : chkFlagR ν c (posEnd : SatV A) = true) :
+    (satMachine A).Step (confChkR ν c posEnd) (confChkL ν c' (posCell topA)) := by
+  refine ⟨(SatTag.tTurnNext true, ![c, c']), hnext, ?_, doneTape_end ν, ?_,
+    doneTape_end ν, fun r _ => rfl, Or.inr ⟨fun h => Bool.noConfusion h, succPos_posCell_posEnd⟩⟩
+  · change stChk (chkFlagR ν c posEnd) true c = stChk true true c
+    rw [hflag]
+  · change stChk (chkFlagL ν c' (posCell topA)) false c' = stChk false false c'
+    rw [chkFlagL_top]
+
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
