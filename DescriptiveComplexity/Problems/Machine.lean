@@ -7,6 +7,7 @@ import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.Problems.Machine.Walk
 import DescriptiveComplexity.Problems.Machine.Membership
 import DescriptiveComplexity.Problems.Machine.Program
+import DescriptiveComplexity.Problems.Machine.Tape
 
 /-!
 # Machine acceptance (the machine bridge, in progress)
@@ -33,7 +34,9 @@ order:
   reusable half, `DescriptiveComplexity.Problems.Machine.Program`, is written: running a
   phase of a machine along a stretch of the positions, once, so that a
   reduction describes a phase by its intended configurations and a single-step
-  obligation;
+  obligation; `DescriptiveComplexity.Problems.Machine.Tape` fixes the tape layout –
+  which tagged tuples are positions, in what order, and the budget
+  `DescriptiveComplexity.sat_budget` showing there are enough of them;
 * and the two characterizations `mem_NP_iff_le_ntmAccept` and its `PTIME`
   analogue.
 
