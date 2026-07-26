@@ -736,18 +736,17 @@ their own symbols, a cell strictly below the head has been assigned its value
 under `ν`, a cell at or above the head is still unassigned, and every other
 element reads blank.
 
-The test is on the *canonical* cell of the element `q` carries, not on `q`
-itself. A tagged tuple with a cell's tag but a junk second coordinate is not a
-position, yet the frame condition of a step quantifies over it too; comparing
-`q` directly would make such a tuple change value as the head advances, and the
-frame condition would be false. Normalising to `posCell (q.2 0)` makes junk
-behave exactly like the cell it shadows. -/
+A tuple carrying a cell's tag but a junk second coordinate is not a position,
+and the machine never visits it – but the frame condition of a step quantifies
+over it all the same, so its value must not move as the head advances. Hence
+the guard `∀ a, q.2 1 ≤ a`: junk cells read unassigned forever, which is also
+what `DescriptiveComplexity.SatInp` says they hold initially. -/
 noncomputable def guessTape (ν : A → Bool) (p q : SatV A) : SatV A :=
   match q.1 with
   | .pStart => symStart
   | .pEnd => symEnd
   | .pCell =>
-      if tagTupleLe (posCell (q.2 0)) p ∧ posCell (q.2 0) ≠ p then symV (ν (q.2 0)) (q.2 0)
+      if (∀ a : A, q.2 1 ≤ a) ∧ tagTupleLe q p ∧ q ≠ p then symV (ν (q.2 0)) (q.2 0)
       else symU (q.2 0)
   | _ => symBlank
 
@@ -762,17 +761,19 @@ marker no cell is below the head, so every cell still reads unassigned – which
 is exactly the input `DescriptiveComplexity.SatInp` describes. -/
 theorem isInit_confGuess (ν : A → Bool) :
     (satMachine A).IsInit (confGuess ν posStart) := by
-  have hne : ∀ q : SatV A, ¬ (tagTupleLe (posCell (q.2 0)) (posStart : SatV A) ∧
-      posCell (q.2 0) ≠ posStart) := by
-    rintro q ⟨hle, -⟩
-    exact absurd (tagTupleLe_tag_le hle) (show ¬(SatTag.pCell ≤ SatTag.pStart) by decide)
+  have hne : ∀ q : SatV A, q.1 = SatTag.pCell →
+      ¬ ((∀ a : A, q.2 1 ≤ a) ∧ tagTupleLe q (posStart : SatV A) ∧ q ≠ posStart) := by
+    rintro q hq ⟨-, hle, -⟩
+    have h := tagTupleLe_tag_le hle
+    rw [hq] at h
+    exact absurd h (show ¬(SatTag.pCell ≤ SatTag.pStart) by decide)
   refine ⟨⟨rfl, isMinTup_bot⟩, minPos_posStart, fun q => ?_⟩
   change TMData.InitTape (satMachine A) q (guessTape ν posStart q)
   cases hq : q.1 <;> simp only [guessTape, hq] <;>
     first
       | exact Or.inl (Or.inl ⟨hq, rfl, isMinTup_bot⟩)
       | exact Or.inl (Or.inr (Or.inr ⟨hq, rfl, isMinTup_bot⟩))
-      | (rw [if_neg (hne q)]
+      | (rw [if_neg (hne q hq)]
          exact Or.inl (Or.inr (Or.inl ⟨hq, rfl, rfl, fun b => botA_le b⟩)))
       | (refine Or.inr ⟨fun b hb => ?_, rfl, isMinTup_bot⟩
          rcases hb with ⟨h, -⟩ | ⟨h, -, -, -⟩ | ⟨h, -⟩ <;> rw [hq] at h <;> simp at h)
