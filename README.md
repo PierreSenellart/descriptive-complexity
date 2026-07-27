@@ -164,6 +164,35 @@ no such logical characterization: it is a deterministic class defined by bounded
 oracle access, so capturing it faithfully would need the oracle-machine model
 the framework deliberately avoids, and it may stay out of reach.
 
+## Related projects
+
+Other formalizations of complexity theory, and how they differ:
+
+* **[Complexitylib](https://github.com/SamuelSchlesinger/complexitylib)** (Lean 4
+  and Mathlib) is machine-model-first: `P` and `NP` are defined by time-bounded
+  multi-tape Turing machines, and hardness is a polynomial-time many-one
+  reduction whose reducing function is exhibited as a machine. It reaches
+  results out of scope here, notably the deterministic time hierarchy theorem
+  and a body of circuit lower bounds; its complete problems are SAT and 3SAT. It
+  also contains a descriptive-complexity component, developed independently of
+  this library and on its own foundations rather than Mathlib's `ModelTheory`.
+* **[Karp21](https://github.com/wimmers/poly-reductions)** (Isabelle/HOL)
+  formalizes polynomial-time reductions between Karp's problems, with running
+  times accounted for in NREST; the public repository covers about eight of the
+  21 (3CNF-SAT, Independent Set, Vertex Cover, Set Cover, Clique, Feedback Node
+  Set, and the two Hamiltonian Cycle variants).
+* **The Cook–Levin theorem** is mechanized against concrete models of
+  computation by [Gäher and Kunze, ITP 2021](https://uds-psl.github.io/cook-levin/)
+  in Coq/Rocq (call-by-value λ-calculus) and [Balbach, AFP
+  2023](https://www.isa-afp.org/entries/Cook_Levin.html) in Isabelle/HOL
+  (two-tape oblivious Turing machines). Here (`SAT_NP_complete`) it is proved
+  for the logically defined `NP`, the identification with the machine class
+  being a separate theorem.
+* **[Cookbook reductions](https://doi.org/10.4230/LIPIcs.MFCS.2024.56)** (Grange,
+  Vehlken, Vortmeier and Zeume, MFCS 2024) also specify reductions in
+  first-order logic, but check them automatically in a teaching setting rather
+  than in an interactive theorem prover.
+
 ## Use as a dependency
 
 The library tracks one Mathlib release at a time: a version works with the
