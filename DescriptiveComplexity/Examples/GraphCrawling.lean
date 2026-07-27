@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.Tactic.FinCases
 import DescriptiveComplexity.Encoding
+import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.Ordered
 import DescriptiveComplexity.OrderWalk
@@ -62,7 +63,10 @@ Main results:
 * **`DescriptiveComplexity.graphCrawling_NP_complete`**;
 * `DescriptiveComplexity.crawlEncoding` with
   `DescriptiveComplexity.crawlEncoding_faithful`: the size-honest concrete
-  encoding and its semantic faithfulness.
+  encoding and its semantic faithfulness;
+* `DescriptiveComplexity.crawlDecoding` and
+  **`DescriptiveComplexity.crawlWF_NP_complete`**: the computable decoding of
+  well-formed (single-root) websites, and completeness restricted to them.
 -/
 
 /-!
@@ -472,17 +476,19 @@ bounds already discharged by the bundle of step 3, this equivalence is the
 `GraphCrawling` reads back to the concrete instances. The worked instance
 and the `#guard`s then *run* the encoder against a hand computation.
 
-The decoding direction (`Encoding.CoversUpTo`) is *not* proved here, and the
-omission is instructive twice over. First, an abstract structure may mark
-several roots (read disjunctively by the semantics), which no packaged
-instance – carrying a single root – transcribes directly; the honest fix
-would decide which root works, a computation a transcription should not
-contain. Second, `CoversUpTo` as a *statement* is classically near-vacuous
-anyway: for any concrete type with one yes- and one no-instance it can be
-proved by casing on `P A`. Its value is the explicit decoding a proof like
-the CQ tutorial's constructs, not the fact it certifies; where no honest
-decoding exists, the right move is to say so rather than to discharge the
-statement by classical casing.
+The decoding direction is where well-formedness earns its keep. An abstract
+structure may mark several roots (read disjunctively by the semantics), and
+no packaged instance – carrying a single root – transcribes such a structure
+without *deciding* which root works, a computation a decoder should not
+contain. The well-formedness sentence `crawlWFSentence` ("exactly one root")
+removes these, and on well-formed structures a computable decoder
+`crawlDecode` exists: find the root, read the links, targets and clamped
+budget off the tables. It assembles into
+`DescriptiveComplexity.crawlDecoding`, runs (`#guard`s below), and step 9
+restricts the completeness theorem to well-formed instances accordingly
+(`crawlWF_NP_complete`). See `DescriptiveComplexity/Decoding.lean` for why
+the bundled computation – and not an `∃`-only covering statement – is the
+meaningful notion.
 -/
 
 /-- **The packaged encoding is faithful**: the abstract problem
@@ -571,6 +577,278 @@ set_option linter.hashCommand false
 #guard crawlEncoding.relBool crawlExample wsTarget (![2] : Fin 1 → Fin 4)
 #guard !crawlEncoding.relBool crawlExample wsTarget (![0] : Fin 1 → Fin 4)
 #guard crawlEncoding.relBool crawlExample wsMarked (![3] : Fin 1 → Fin 4)
+
+end
+
+/-!
+The well-formedness sentence, its meaning, and the decoder.
+-/
+
+/-- Well-formedness of a website graph: exactly one root page. What makes an
+honest decoder possible. -/
+noncomputable def crawlWFSentence : Language.siteGraph.Sentence :=
+  Formula.iExs (Fin 1) (Relations.formula₁ wsRoot (Term.var (Sum.inr 0)) ⊓
+    Formula.iAlls (Fin 1)
+      ((Relations.formula₁ wsRoot (Term.var (Sum.inr 0))).imp
+        (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inl (Sum.inr 0))))))
+
+theorem realize_crawlWFSentence {A : Type} [Language.siteGraph.Structure A] :
+    A ⊨ crawlWFSentence ↔ ∃ x : A, WSRoot x ∧ ∀ y : A, WSRoot y → y = x := by
+  simp only [crawlWFSentence, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
+    Formula.realize_iAlls, Formula.realize_imp, Formula.realize_rel₁, Formula.realize_equal,
+    Term.realize_var, Sum.elim_inr, Sum.elim_inl, WSRoot]
+  constructor
+  · rintro ⟨i, hr, hu⟩
+    exact ⟨i 0, hr, fun y hy => hu (fun _ => y) hy⟩
+  · rintro ⟨x, hr, hu⟩
+    exact ⟨fun _ => x, hr, fun j hj => hu (j 0) hj⟩
+
+section Decoder
+
+variable (S : FinPresentation Language.siteGraph)
+
+/-- The root pages of a presented website. -/
+def crawlRoots : Finset (Fin S.card) :=
+  Finset.univ.filter fun x => S.relBool wsRoot ![x]
+
+theorem mem_crawlRoots (x : Fin S.card) : x ∈ crawlRoots S ↔ WSRoot x := by
+  simp [crawlRoots, WSRoot]
+
+private theorem gc_cast_cast {n m : ℕ} (h : n = m) (v : Fin n) :
+    Fin.cast h.symm (Fin.cast h v) = v := by
+  ext
+  simp
+
+private theorem gc_cast_cast' {n m : ℕ} (h : n = m) (v : Fin m) :
+    Fin.cast h (Fin.cast h.symm v) = v := by
+  ext
+  simp
+
+/-- Decode a presented website whose unique root has been found: read the
+links, targets and budget off the tables, the budget clamped to the page
+count as the packaging requires. (The root's existence is what makes the
+page count positive.) -/
+def crawlDecodeAt (r : Fin S.card) : CrawlInstance :=
+  ⟨S.card - 1,
+    Finset.univ.filter fun p : Fin (S.card - 1 + 1) × Fin (S.card - 1 + 1) =>
+      S.relBool wsEdge ![Fin.cast (Nat.succ_pred_eq_of_pos r.pos) p.1,
+        Fin.cast (Nat.succ_pred_eq_of_pos r.pos) p.2],
+    Fin.cast (Nat.succ_pred_eq_of_pos r.pos).symm r,
+    Finset.univ.filter fun x : Fin (S.card - 1 + 1) =>
+      S.relBool wsTarget ![Fin.cast (Nat.succ_pred_eq_of_pos r.pos) x],
+    ⟨min ((Finset.univ.filter fun x : Fin (S.card - 1 + 1) =>
+        S.relBool wsMarked ![Fin.cast (Nat.succ_pred_eq_of_pos r.pos) x]).card)
+      (S.card - 1 + 1), by omega⟩⟩
+
+/-- The decoder: `none` unless the site has exactly one root. -/
+def crawlDecode : Option CrawlInstance :=
+  match (crawlRoots S).sort (· ≤ ·) with
+  | [] => none
+  | [r] => some (crawlDecodeAt S r)
+  | _ :: _ :: _ => none
+
+theorem crawlDecode_sound (i : CrawlInstance) (hi : i ∈ crawlDecode S) :
+    ConcreteCrawlHolds i ↔ GraphCrawling (Fin S.card) := by
+  unfold crawlDecode at hi
+  split at hi
+  · exact absurd hi (by simp)
+  case _ r hr =>
+    rw [Option.mem_def, Option.some.injEq] at hi
+    subst hi
+    have hn : S.card - 1 + 1 = S.card := Nat.succ_pred_eq_of_pos r.pos
+    have hroot : ∀ x : Fin S.card, WSRoot x ↔ x = r := by
+      intro x
+      rw [← mem_crawlRoots]
+      constructor
+      · intro hxx
+        have hxs : x ∈ (crawlRoots S).sort (· ≤ ·) := (Finset.mem_sort _).mpr hxx
+        rw [hr] at hxs
+        simpa using hxs
+      · rintro rfl
+        refine (Finset.mem_sort (α := Fin S.card) (· ≤ ·)).mp ?_
+        rw [hr]
+        simp
+    unfold crawlDecodeAt
+    -- the marked set of the presented structure, counted once for both
+    -- directions
+    have hiffm : ∀ b : Fin S.card, WSMarked b ↔
+        (finCongr hn.symm) b ∈ Finset.univ.filter
+          (fun x : Fin (S.card - 1 + 1) =>
+            S.relBool wsMarked ![Fin.cast (Nat.succ_pred_eq_of_pos r.pos) x]) := by
+      intro b
+      rw [finCongr_apply, Finset.mem_filter]
+      constructor
+      · intro hb
+        refine ⟨Finset.mem_univ _, ?_⟩
+        rw [gc_cast_cast']
+        exact hb
+      · rintro ⟨-, hb⟩
+        rw [gc_cast_cast'] at hb
+        exact hb
+    have h2 : {x : Fin S.card | WSMarked x}.ncard =
+        (Finset.univ.filter fun x : Fin (S.card - 1 + 1) =>
+          S.relBool wsMarked ![Fin.cast (Nat.succ_pred_eq_of_pos r.pos) x]).card := by
+      rw [ncard_setOf_equiv (finCongr hn.symm)
+        (KB := fun x : Fin S.card => WSMarked x) hiffm]
+      generalize (Finset.univ.filter fun x : Fin (S.card - 1 + 1) =>
+        S.relBool wsMarked ![Fin.cast (Nat.succ_pred_eq_of_pos r.pos) x]) = K
+      simp
+    constructor
+    · rintro ⟨Sc, hrS, hTS, hreach, hcard⟩
+      refine ⟨Finite.of_fintype _, r, (hroot r).mpr rfl,
+        fun v => Fin.cast hn.symm v ∈ Sc, hrS, ?_, ?_, ?_⟩
+      · intro x hx
+        refine hTS (Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩)
+        rw [gc_cast_cast']
+        exact hx
+      · intro x hx
+        have hmap : ∀ {u v : Fin (S.card - 1 + 1)}, Relation.ReflTransGen
+            (fun a b => a ∈ Sc ∧ b ∈ Sc ∧ (a, b) ∈ Finset.univ.filter
+              (fun p : Fin (S.card - 1 + 1) × Fin (S.card - 1 + 1) =>
+                S.relBool wsEdge ![Fin.cast (Nat.succ_pred_eq_of_pos r.pos) p.1,
+                  Fin.cast (Nat.succ_pred_eq_of_pos r.pos) p.2])) u v →
+            Relation.ReflTransGen (DiLink (WSEdge (A := Fin S.card))
+              fun w => Fin.cast hn.symm w ∈ Sc) (Fin.cast hn u) (Fin.cast hn v) := by
+          intro u v hp
+          induction hp with
+          | refl => exact Relation.ReflTransGen.refl
+          | tail _ hcd ih =>
+            refine ih.tail ⟨?_, ?_, ?_⟩
+            · dsimp only
+              rw [gc_cast_cast]
+              exact hcd.1
+            · dsimp only
+              rw [gc_cast_cast]
+              exact hcd.2.1
+            · exact (Finset.mem_filter.mp hcd.2.2).2
+        have hpath := hmap (hreach (Fin.cast hn.symm x) hx)
+        rw [gc_cast_cast'] at hpath
+        exact hpath
+      · change {x : Fin S.card | Fin.cast hn.symm x ∈ Sc}.ncard ≤
+          {x : Fin S.card | WSMarked x}.ncard
+        have hiffs : ∀ b : Fin S.card, Fin.cast hn.symm b ∈ Sc ↔
+            (finCongr hn.symm) b ∈ Sc := fun b => by rw [finCongr_apply]
+        have h1 : {x : Fin S.card | Fin.cast hn.symm x ∈ Sc}.ncard = Sc.card := by
+          rw [ncard_setOf_equiv (finCongr hn.symm)
+            (KB := fun x : Fin S.card => Fin.cast hn.symm x ∈ Sc)
+            (KA := fun a : Fin (S.card - 1 + 1) => a ∈ Sc) hiffs]
+          simp
+        rw [h1, h2]
+        exact le_trans hcard (min_le_left _ _)
+    · rintro ⟨-, r'', hR'', S', hS'r, hTgt, hreach, hcard⟩
+      obtain rfl : r'' = r := (hroot r'').mp hR''
+      classical
+      refine ⟨Finset.univ.filter fun v : Fin (S.card - 1 + 1) => S' (Fin.cast hn v),
+        Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩, ?_, ?_, ?_⟩
+      · rw [gc_cast_cast']
+        exact hS'r
+      · intro v hv
+        refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+        exact hTgt _ (Finset.mem_filter.mp hv).2
+      · intro v hv
+        have hmap : ∀ {u w : Fin S.card}, Relation.ReflTransGen
+            (DiLink (WSEdge (A := Fin S.card)) S') u w →
+            Relation.ReflTransGen (fun a b =>
+              (a ∈ Finset.univ.filter fun v : Fin (S.card - 1 + 1) =>
+                S' (Fin.cast hn v)) ∧
+              (b ∈ Finset.univ.filter fun v : Fin (S.card - 1 + 1) =>
+                S' (Fin.cast hn v)) ∧
+              (a, b) ∈ Finset.univ.filter (fun p : Fin (S.card - 1 + 1) ×
+                  Fin (S.card - 1 + 1) =>
+                S.relBool wsEdge ![Fin.cast hn p.1, Fin.cast hn p.2]))
+              (Fin.cast hn.symm u) (Fin.cast hn.symm w) := by
+          intro u w hp
+          induction hp with
+          | refl => exact Relation.ReflTransGen.refl
+          | tail _ hcd ih =>
+            refine ih.tail ⟨Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩,
+              Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩,
+              Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩⟩
+            · rw [gc_cast_cast']
+              exact hcd.1
+            · rw [gc_cast_cast']
+              exact hcd.2.1
+            · change (S.relBool wsEdge ![Fin.cast hn (Fin.cast hn.symm _),
+                Fin.cast hn (Fin.cast hn.symm _)]) = true
+              rw [gc_cast_cast', gc_cast_cast']
+              exact hcd.2.2
+        have hpath := hmap (hreach (Fin.cast hn v) (Finset.mem_filter.mp hv).2)
+        rw [gc_cast_cast] at hpath
+        exact hpath
+      · refine le_min ?_ ?_
+        · have hiffs : ∀ b : Fin S.card, S' b ↔
+              (finCongr hn.symm) b ∈ Finset.univ.filter
+                (fun v : Fin (S.card - 1 + 1) => S' (Fin.cast hn v)) := by
+            intro b
+            rw [finCongr_apply, Finset.mem_filter]
+            constructor
+            · intro hb
+              refine ⟨Finset.mem_univ _, ?_⟩
+              rw [gc_cast_cast']
+              exact hb
+            · rintro ⟨-, hb⟩
+              rw [gc_cast_cast'] at hb
+              exact hb
+          have h1 : (Finset.univ.filter fun v : Fin (S.card - 1 + 1) =>
+              S' (Fin.cast hn v)).card = {x : Fin S.card | S' x}.ncard := by
+            rw [ncard_setOf_equiv (finCongr hn.symm)
+              (KB := fun x : Fin S.card => S' x) hiffs]
+            generalize (Finset.univ.filter fun v : Fin (S.card - 1 + 1) =>
+              S' (Fin.cast hn v)) = K
+            simp
+          rw [h1, ← h2]
+          exact hcard
+        · simpa using Finset.card_le_univ (Finset.univ.filter
+            fun v : Fin (S.card - 1 + 1) => S' (Fin.cast hn v))
+  · exact absurd hi (by simp)
+
+theorem crawlDecode_total (_hpos : 0 < S.card)
+    (hW : DecisionProblem.ofSentence crawlWFSentence (Fin S.card)) :
+    (crawlDecode S).isSome := by
+  obtain ⟨x, hx, hu⟩ := realize_crawlWFSentence.mp hW
+  have hset : crawlRoots S = {x} := by
+    ext y
+    rw [mem_crawlRoots, Finset.mem_singleton]
+    exact ⟨fun hy => hu y hy, fun hy => hy ▸ hx⟩
+  unfold crawlDecode
+  split
+  · next hr =>
+    rw [hset, Finset.sort_singleton] at hr
+    exact absurd hr (by simp)
+  · rfl
+  · next _ _ _ hr =>
+    rw [hset, Finset.sort_singleton] at hr
+    exact absurd hr (by simp)
+
+end Decoder
+
+/-- **The computable decoding of well-formed website graphs**. Together with
+`crawlEncoding_faithful` it closes the loop between the concrete and the
+abstract problem – a decoder that exists only because well-formedness
+removed the multi-root structures. -/
+def crawlDecoding : Decoding Language.siteGraph
+    (DecisionProblem.ofSentence crawlWFSentence) ConcreteCrawlHolds GraphCrawling where
+  dec := crawlDecode
+  sound := crawlDecode_sound
+  total := crawlDecode_total
+
+/-- The worked instance of step 1, presented as raw tables. -/
+def crawlPres : FinPresentation Language.siteGraph where
+  card := 4
+  relBool := fun {n} R =>
+    match n, R with
+    | _, .edge => fun x =>
+        x 0 == 0 && x 1 == 1 || x 0 == 1 && x 1 == 2 || x 0 == 0 && x 1 == 3
+    | _, .root => fun x => x 0 == 0
+    | _, .target => fun x => x 0 == 2 || x 0 == 3
+    | _, .marked => fun _ => true
+
+section
+set_option linter.hashCommand false
+
+/- Decoding the presented tables recovers exactly the packaged worked
+instance – the decoder and the encoder meet in the middle. -/
+#guard crawlDecode crawlPres = some crawlExample
 
 end
 
@@ -1284,5 +1562,28 @@ theorem graphCrawling_NP_hard : NP.Hard GraphCrawling :=
 ([Gauquier–Manolescu–Senellart 2026][gauquier2026efficient2], Prop. 4). -/
 theorem graphCrawling_NP_complete : NP.Complete GraphCrawling :=
   ⟨graphCrawling_mem_NP, graphCrawling_NP_hard⟩
+
+/-- The image of the hardness reduction is well-formed: the only root-marked
+page of an interpreted website is the minimum\'s root copy. -/
+theorem crawlInterp_wf (A : Type) [Language.setSystem.Structure A] [LinearOrder A]
+    [Finite A] [Nonempty A] :
+    DecisionProblem.ofSentence crawlWFSentence (crawlInterp.Map A) := by
+  obtain ⟨mn, hmn⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
+  refine realize_crawlWFSentence.mpr ⟨(.root, fun _ => mn),
+    (crawl_root_iff _ _).mpr ⟨rfl, hmn⟩, ?_⟩
+  rintro ⟨t, w⟩ hy
+  obtain ⟨rfl, hw⟩ := (crawl_root_iff t w).mp hy
+  have hw0 : w 0 = mn := le_antisymm (hw mn) (hmn (w 0))
+  exact congrArg (Prod.mk CrawlTag.root) (by rw [tuple_eta w, hw0])
+
+/-- **Well-formed graph crawling is NP-complete**: crawling restricted to
+websites with exactly one root – the instances the decoder of step 6
+handles. Both halves are one-line upgrades of the plain completeness proof
+(`OrderedFOReduction.withInvariant`, `SigmaSODefinable.inf_ofSentence`). -/
+theorem crawlWF_NP_complete :
+    NP.Complete (DecisionProblem.ofSentence crawlWFSentence ⊓ GraphCrawling) :=
+  ⟨graphCrawling_sigmaSODefinable.inf_ofSentence crawlWFSentence,
+    NP.hard_of_orderedReduction (setCover_ordered_fo_reduction_graphCrawling.withInvariant _
+      fun A _ _ _ _ => crawlInterp_wf A) setCover_NP_hard⟩
 
 end DescriptiveComplexity
