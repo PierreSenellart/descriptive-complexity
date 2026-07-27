@@ -92,7 +92,7 @@ and SO-Horn → HORN-SAT; the discharges still to do:
   gadget-heavy].
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
-  of scope.
+  of scope (§7 refines both judgments).
 
 ## 3. Logics and framework extensions
 
@@ -221,6 +221,114 @@ non-reducibility, impossible in the machine world.
   first tutorial-style worked example, Boolean conjunctive queries) into a
   curated "reduction cookbook" example set (cf. Grange et al., MFCS 2024) as the
   catalog broadens, so the library doubles as a complexity-course companion.
+
+## 7. Machine bridges beyond NP and PTIME
+
+The machine bridge is done for NP and PTIME (`ntmAccept_NP_complete`,
+`dtmAccept_PTIME_complete`, and the characterizations
+`mem_NP_iff_le_ntmAccept` / `mem_PTIME_iff_le_dtmAccept` — see the
+`Problems/Machine.lean` docstring). This section is the design analysis for
+extending it, with the class-defining logic assumed to exist (§3 work).
+
+**Standing scope limit.** Textbook `NP = NTIME(nᵏ)` over string encodings
+needs the converse compilation — that an FO interpretation or a `Σ₁` kernel is
+*evaluated* by a polynomial-time machine: a verified compiler with a step
+count, plus string encodings of structures [R]. Nothing in the bridge claims
+it; the residual gap (FO reductions are AC⁰-computable, by inspection) is
+documented in the README. Instances carry their own transition table, so
+reduction-built machines have polynomially many states — standard for an
+acceptance problem; the constant-alphabet simulation is never needed.
+
+**Cost of a bridge, given the logic:**
+
+| class | logic | membership | hardness | total |
+|---|---|---|---|---|
+| L | FO(DTC) | S | S | ~1–1.7k [M], but see below |
+| NL | FO(TC) | S | S | ~1–1.7k [M], but see below |
+| Σₖᵖ, Πₖᵖ | `Σₖ`-SO | M (reuses the NP membership) | M (reuses the SAT machine) | +0.6–1.2k [M] |
+| PSPACE | SO(TC) | S | L–XL | ~3–5.5k |
+| EXPTIME | SO(LFP) | L | XL | ~4–7k |
+| EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
+
+Three rules govern the table:
+
+1. **Membership is cheap when the logic is a reachability/fixpoint logic, dear
+   when it quantifies.** For DTC/TC/LFP/SO(TC) the machine problem is the
+   *syntactic image* of the logic and membership is unfolding plus an encoding
+   bijection; for ∃SO/`Σₖ` the run must be guessed and checked (Fagin's
+   tableau). So PSPACE has one of the cheapest memberships and NP one of the
+   dearest: space-bounded acceptance is to SO(TC) what SAT is to ∃SO — tape as
+   a relation variable, the step clause of `Machine/Membership.lean` as the
+   transition formula, acceptance its TC, no budget hence no walk lemma
+   (400–700 lines).
+2. **Hardness is cheap when the class has a one-loop complete problem** (REACH
+   "guess a neighbour", HORN-SAT "propagate", SAT "guess then sweep").
+   Otherwise the discharge must compile arbitrary formulas of the logic into a
+   machine — the **evaluator** (static quantifier nesting → nested loops), in
+   three variants of increasing cost: *state-registers* (loop counters as
+   elements in the state; what PSPACE needs), *tape-registers with logarithmic
+   addresses* (honest fixed-control logspace), *tape-registers with
+   exponential addresses* (EXPTIME/EXPSPACE). Consequences: for PSPACE the
+   direct SO(TC) discharge is easier than routing through QSAT (a QBF
+   evaluator needs a stack for the input-given prefix); a
+   *nondeterministically* stated space-bounded problem avoids Savitch
+   entirely.
+3. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
+   (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
+   `Relation.ReflTransGen`, strictly cheaper; exponential (EXPTIME) needs a
+   walk along the lexicographic order of subsets, whose successor is
+   FO-definable by ripple-carry (`Numbers/Binary.lean`,
+   `Problems/Knapsack/Chain.lean` supply most of it).
+
+The concrete items:
+
+- **The polynomial hierarchy, the one cheap add-on** [M, +0.6–1.2k]:
+  `Language.turing` plus `k` unary block marks on states (the state marks are
+  deliberately a family for this), transitions non-decreasing in block index —
+  a *local*, hence first-order condition, which is what makes "at most `k−1`
+  alternations" checkable. Alternating acceptance is a Lean-level recursion on
+  the budget. Membership in `Σₖᵖ` reuses the membership clauses per phase with
+  `SecondOrderMerge.lean` as block bookkeeping; hardness from `QBF k` by the
+  SAT machine with `k` guess sweeps; `Πₖᵖ` free by swapping the marks.
+- **L and NL: the Turing model is the wrong one** [L, ~2.5–4.5k for both].
+  As machine-as-data these are cheap for a bad reason: a logspace
+  configuration is a constant-length tuple of elements, the configuration
+  space is polynomial, and acceptance is REACH up to renaming — true, easy,
+  contentless. A telling bridge needs storage matching what the logic's
+  variables range over and *local* input access (else the FO-definable table
+  smuggles in the whole input). The right model: a **fixed finite control
+  with `k` two-way heads** on universe elements, no work tape, reading only
+  the atomic type of its head tuple; determinism vs. nondeterminism is then L
+  vs. NL, mirroring FO(DTC) vs. FO(TC). The machine is Lean-level data, so
+  the statement is a **capture theorem**
+  (`TCDefinable P ↔ ∃ k s (M : Automaton L k s), ∀ A, P A ↔ M.Accepts A`) —
+  no reductions, no string encoding. Machine → logic is near-trivial (the
+  configuration graph is FO-definable, acceptance its TC); logic → machine is
+  the evaluator in its friendliest form (heads only, no addressing).
+  Rejected models: registers (must legislate arithmetic; a head move *is* a
+  step in the order), JAGs/pointer machines (lower-bound devices), branching
+  programs (nonuniform). With BIT (§3), a circuit-family bridge (FO-uniform
+  AC⁰ = FO(≤, BIT)) is more natural than any machine at that level.
+- **Capture vs. completeness, the choice forced by the evaluator.** A capture
+  theorem is also available at NP (fixed control, input heads, poly work
+  tape) but is not taken: logic → machine there needs the evaluator *with*
+  tape addressing (lockstep address computation to test a guessed relation) —
+  exactly the cost the existing bridge dodges by routing hardness through
+  SAT/HORN-SAT. So: capture at L/NL (evaluator cheap, model first-order),
+  completeness at P/NP/`Σₖᵖ`/PSPACE and above (evaluator dear).
+- **The exponential classes are not blocked by the framework**: the machine
+  description stays polynomial (a reduction can write it) and only the run is
+  exponential, living in Lean just as `SigmaSODefinable` quantifies over
+  exponential-size assignment types; tape cells indexed by subsets of the
+  positions, budget `2 ^ |pos|`, a legitimate iso-invariant problem. The
+  expensive pair: the exponential-order walk (feasible) and the
+  exponential-address evaluator (the real cost).
+- **Limits that survive every variant**: the string-encoding layer (above);
+  Savitch, if *deterministic* PSPACE machines are wanted complete; oracle and
+  `Δₖᵖ` classes — the bridge would make them definable, but by a machine,
+  against the library's classes-are-logic principle (a decision, not a
+  drift); `#P` as "number of accepting runs" is easy to state but needs a
+  parsimonious-reduction notion the framework lacks (§6).
 
 ## Suggested ordering (value vs. prerequisite chains)
 
