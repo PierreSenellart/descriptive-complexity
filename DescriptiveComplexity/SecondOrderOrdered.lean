@@ -205,6 +205,117 @@ theorem orderElimLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Typ
         | _, Sum.inl (Sum.inr .le) => exact propext (hord x)
         | _, Sum.inr s => rfl }
 
+/-! ### Order elimination, as a statement about sentences
+
+The two theorems below are the order-elimination construction on its own,
+separated from the reduction that usually produces the sentence: a problem
+defined – over the *ordered* expansion, so with the order visible to the
+sentence – by a `Σₖ₊₁` sentence *for some* linear order, or by a `Πₖ₊₁`
+sentence *for every* linear order, is definable at that level over the bare
+vocabulary. The closure theorems of the next section are the case where the
+sentence comes from pulling a definition back through an ordered reduction,
+where order-invariance makes "for some" and "for every" agree.
+
+Stated this way the construction also applies where no single order-invariant
+problem is in sight – to each half of a `DescriptiveComplexity.DPDefinable`
+definition separately, say, whose two halves are *not* individually
+order-invariant. -/
+
+section OrderPull
+
+variable {L₁ : Language.{0, 0}} {P : DecisionProblem L₁} {k : ℕ}
+
+/-- **Order elimination, existentially**: a problem defined by a `Σₖ₊₁`
+sentence over the ordered expansion, correct for *some* linear order on each
+instance, is `Σₖ₊₁`-definable. The order is re-quantified inside the first
+block, guarded by a conjunct stating that it is a linear order. -/
+theorem sigmaSODefinable_of_orderPull (Cs : List SOBlock) (hk : Cs.length = k + 1)
+    (χ : (soLang (L₁.sum Language.order) Cs).Sentence)
+    (h : ∀ (A : Type) [L₁.Structure A] [Finite A] [Nonempty A],
+      P A ↔ ∃ lo : LinearOrder A,
+        letI := lo
+        SORealize (L₁.sum Language.order) A Cs χ true) :
+    SigmaSODefinable (k + 1) P := by
+  cases Cs with
+  | nil => exact absurd hk (by simp)
+  | cons C₀ Cs' =>
+    refine ⟨C₀.withOrder :: Cs', by simpa using hk,
+      (soLangEmbed Cs' (L₁.sum C₀.withOrder.lang)).onSentence (linearGuard L₁ C₀) ⊓
+        (soLangLift Cs' ((L₁.sum Language.order).sum C₀.lang)
+            (L₁.sum C₀.withOrder.lang) (orderElimLHom L₁ C₀)).onSentence χ, ?_⟩
+    intro A instA _ _
+    constructor
+    · intro hP
+      obtain ⟨lo, ρ₀, hρ₀⟩ := (h A).mp hP
+      letI := lo
+      refine ⟨C₀.joinOrder (fun w => w 0 ≤ w 1) ρ₀, ?_⟩
+      refine (sorealize_inf_embed Cs' (L₁.sum C₀.withOrder.lang) A _
+        (linearGuard L₁ C₀) _ false).mpr ⟨?_, ?_⟩
+      · exact (realize_linearGuard L₁ C₀ instA _).mpr
+          ⟨fun a => le_refl a, fun a b c hab hbc => le_trans hab hbc,
+            fun a b hab hba => le_antisymm hab hba, fun a b => le_total a b⟩
+      · exact (sorealize_soLangLift Cs' _ _ (orderElimLHom L₁ C₀) A _ _
+          (orderElimLHom_isExpansionOn L₁ C₀ A instA lo
+            (C₀.joinOrder (fun w => w 0 ≤ w 1) ρ₀)
+            (fun _ => Iff.rfl)) _ false).mpr hρ₀
+    · rintro ⟨ρ'', hρ''⟩
+      obtain ⟨hguard, hrest⟩ := (sorealize_inf_embed Cs' (L₁.sum C₀.withOrder.lang) A _
+        (linearGuard L₁ C₀) _ false).mp hρ''
+      obtain ⟨h1, h2, h3, h4⟩ := (realize_linearGuard L₁ C₀ instA ρ'').mp hguard
+      letI lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
+      refine (h A).mpr ⟨lo, C₀.restPart ρ'', ?_⟩
+      exact (sorealize_soLangLift Cs' _ _ (orderElimLHom L₁ C₀) A _ _
+        (orderElimLHom_isExpansionOn L₁ C₀ A instA lo ρ''
+          (fun w => (iff_of_eq (congrArg (ρ'' (Sum.inl ())) (vec_eta₂ w))).symm))
+        _ false).mp hrest
+
+/-- **Order elimination, universally**: a problem defined by a `Πₖ₊₁` sentence
+over the ordered expansion, correct for *every* linear order on each instance,
+is `Πₖ₊₁`-definable. The order is re-quantified inside the first block, guarded
+as the premise of an implication. -/
+theorem piSODefinable_of_orderPull (Cs : List SOBlock) (hk : Cs.length = k + 1)
+    (χ : (soLang (L₁.sum Language.order) Cs).Sentence)
+    (h : ∀ (A : Type) [L₁.Structure A] [Finite A] [Nonempty A],
+      P A ↔ ∀ lo : LinearOrder A,
+        letI := lo
+        SORealize (L₁.sum Language.order) A Cs χ false) :
+    PiSODefinable (k + 1) P := by
+  cases Cs with
+  | nil => exact absurd hk (by simp)
+  | cons C₀ Cs' =>
+    refine ⟨C₀.withOrder :: Cs', by simpa using hk,
+      (soLangEmbed Cs' (L₁.sum C₀.withOrder.lang)).onSentence (linearGuard L₁ C₀) ⟹
+        (soLangLift Cs' ((L₁.sum Language.order).sum C₀.lang)
+            (L₁.sum C₀.withOrder.lang) (orderElimLHom L₁ C₀)).onSentence χ, ?_⟩
+    intro A instA _ _
+    constructor
+    · intro hP ρ''
+      refine (sorealize_imp_embed Cs' (L₁.sum C₀.withOrder.lang) A _
+        (linearGuard L₁ C₀) _ true).mpr fun hguard => ?_
+      obtain ⟨h1, h2, h3, h4⟩ := (realize_linearGuard L₁ C₀ instA ρ'').mp hguard
+      letI lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
+      have hinner := (h A).mp hP lo (C₀.restPart ρ'')
+      exact (sorealize_soLangLift Cs' _ _ (orderElimLHom L₁ C₀) A _ _
+        (orderElimLHom_isExpansionOn L₁ C₀ A instA lo ρ''
+          (fun w => (iff_of_eq (congrArg (ρ'' (Sum.inl ())) (vec_eta₂ w))).symm))
+        _ true).mpr hinner
+    · intro hall
+      refine (h A).mpr fun lo ρ₀ => ?_
+      letI := lo
+      have hguard := (realize_linearGuard L₁ C₀ instA
+          (C₀.joinOrder (fun w => w 0 ≤ w 1) ρ₀)).mpr
+        ⟨fun a => le_refl a, fun a b c hab hbc => le_trans hab hbc,
+          fun a b hab hba => le_antisymm hab hba, fun a b => le_total a b⟩
+      have hinner := (sorealize_imp_embed Cs' (L₁.sum C₀.withOrder.lang) A _
+        (linearGuard L₁ C₀) _ true).mp
+        (hall (C₀.joinOrder (fun w => w 0 ≤ w 1) ρ₀)) hguard
+      exact (sorealize_soLangLift Cs' _ _ (orderElimLHom L₁ C₀) A _ _
+        (orderElimLHom_isExpansionOn L₁ C₀ A instA lo
+          (C₀.joinOrder (fun w => w 0 ≤ w 1) ρ₀)
+          (fun _ => Iff.rfl)) _ true).mp hinner
+
+end OrderPull
+
 /-! ### Closure of the definability levels under ordered FO reductions -/
 
 section Closure
@@ -214,65 +325,30 @@ variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂} {k : ℕ}
 
 /-- `Σₖ₊₁`-definability is closed under ordered FO reductions: the order is
 re-quantified existentially inside the first block, guarded by a conjunct
-stating that it is a linear order. -/
+stating that it is a linear order. Order-invariance of the reduction is what
+lets `DescriptiveComplexity.sigmaSODefinable_of_orderPull` be applied: the pulled-back
+sentence is correct not merely for *some* order but for every one. -/
 theorem SigmaSODefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
     (h : SigmaSODefinable (k + 1) Q) : SigmaSODefinable (k + 1) P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
   letI := f.tagFinite
   letI := f.tagNonempty
-  have hpull : ∀ (A : Type) [L₁.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
-      P A ↔ SORealize (L₁.sum Language.order) A (pullBlocks f.Tag f.dim Bs)
-        (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) true := by
-    intro A _ _ _ _
+  refine sigmaSODefinable_of_orderPull (pullBlocks f.Tag f.dim Bs)
+    (by simpa [pullBlocks] using hk)
+    (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) ?_
+  intro A _ _ _
+  have hpull : ∀ lo : LinearOrder A,
+      letI := lo
+      (P A ↔ SORealize (L₁.sum Language.order) A (pullBlocks f.Tag f.dim Bs)
+        (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) true) := by
+    intro lo
+    letI := lo
     haveI := f.toInterpretation.map_finite A
     haveI := f.toInterpretation.map_nonempty A
     exact (f.correct A).trans ((hφ (f.toInterpretation.Map A)).trans
       (sorealize_pullSO f.toInterpretation A Bs φ true))
-  cases Bs with
-  | nil => exact absurd hk (by simp)
-  | cons B₀ Bs' =>
-    refine ⟨(B₀.pull f.Tag f.dim).withOrder :: pullBlocks f.Tag f.dim Bs',
-      by simpa [pullBlocks] using hk,
-      (soLangEmbed (pullBlocks f.Tag f.dim Bs')
-          (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang)).onSentence
-          (linearGuard L₁ (B₀.pull f.Tag f.dim)) ⊓
-        (soLangLift (pullBlocks f.Tag f.dim Bs')
-            ((L₁.sum Language.order).sum (B₀.pull f.Tag f.dim).lang)
-            (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang)
-            (orderElimLHom L₁ (B₀.pull f.Tag f.dim))).onSentence
-          (pullSO Bs' ((L₁.sum Language.order).sum (B₀.pull f.Tag f.dim).lang)
-            (L₂.sum B₀.lang) (f.toInterpretation.extendSO B₀) φ), ?_⟩
-    intro A instA _ _
-    constructor
-    · intro hP
-      letI := finiteLinearOrder A
-      obtain ⟨ρ₀, hρ₀⟩ := (hpull A).mp hP
-      refine ⟨(B₀.pull f.Tag f.dim).joinOrder (fun w => w 0 ≤ w 1) ρ₀, ?_⟩
-      refine (sorealize_inf_embed (pullBlocks f.Tag f.dim Bs')
-        (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang) A _
-        (linearGuard L₁ (B₀.pull f.Tag f.dim)) _ false).mpr ⟨?_, ?_⟩
-      · exact (realize_linearGuard L₁ (B₀.pull f.Tag f.dim) instA _).mpr
-          ⟨fun a => le_refl a, fun a b c hab hbc => le_trans hab hbc,
-            fun a b hab hba => le_antisymm hab hba, fun a b => le_total a b⟩
-      · exact (sorealize_soLangLift (pullBlocks f.Tag f.dim Bs') _ _
-          (orderElimLHom L₁ (B₀.pull f.Tag f.dim)) A _ _
-          (orderElimLHom_isExpansionOn L₁ (B₀.pull f.Tag f.dim) A instA
-            (finiteLinearOrder A)
-            ((B₀.pull f.Tag f.dim).joinOrder (fun w => w 0 ≤ w 1) ρ₀)
-            (fun _ => Iff.rfl)) _ false).mpr hρ₀
-    · rintro ⟨ρ'', hρ''⟩
-      obtain ⟨hguard, hrest⟩ := (sorealize_inf_embed (pullBlocks f.Tag f.dim Bs')
-        (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang) A _
-        (linearGuard L₁ (B₀.pull f.Tag f.dim)) _ false).mp hρ''
-      obtain ⟨h1, h2, h3, h4⟩ :=
-        (realize_linearGuard L₁ (B₀.pull f.Tag f.dim) instA ρ'').mp hguard
-      letI lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
-      refine (hpull A).mpr ⟨(B₀.pull f.Tag f.dim).restPart ρ'', ?_⟩
-      exact (sorealize_soLangLift (pullBlocks f.Tag f.dim Bs') _ _
-        (orderElimLHom L₁ (B₀.pull f.Tag f.dim)) A _ _
-        (orderElimLHom_isExpansionOn L₁ (B₀.pull f.Tag f.dim) A instA lo ρ''
-          (fun w => (iff_of_eq (congrArg (ρ'' (Sum.inl ())) (vec_eta₂ w))).symm))
-        _ false).mp hrest
+  exact ⟨fun hP => ⟨finiteLinearOrder A, (hpull _).mp hP⟩,
+    fun hex => (hpull hex.choose).mpr hex.choose_spec⟩
 
 /-- `Πₖ₊₁`-definability is closed under ordered FO reductions: the order is
 re-quantified universally inside the first block, guarded as the premise of
@@ -282,60 +358,22 @@ theorem PiSODefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
   obtain ⟨Bs, hk, φ, hφ⟩ := h
   letI := f.tagFinite
   letI := f.tagNonempty
-  have hpull : ∀ (A : Type) [L₁.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
-      P A ↔ SORealize (L₁.sum Language.order) A (pullBlocks f.Tag f.dim Bs)
-        (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) false := by
-    intro A _ _ _ _
+  refine piSODefinable_of_orderPull (pullBlocks f.Tag f.dim Bs)
+    (by simpa [pullBlocks] using hk)
+    (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) ?_
+  intro A _ _ _
+  have hpull : ∀ lo : LinearOrder A,
+      letI := lo
+      (P A ↔ SORealize (L₁.sum Language.order) A (pullBlocks f.Tag f.dim Bs)
+        (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) false) := by
+    intro lo
+    letI := lo
     haveI := f.toInterpretation.map_finite A
     haveI := f.toInterpretation.map_nonempty A
     exact (f.correct A).trans ((hφ (f.toInterpretation.Map A)).trans
       (sorealize_pullSO f.toInterpretation A Bs φ false))
-  cases Bs with
-  | nil => exact absurd hk (by simp)
-  | cons B₀ Bs' =>
-    refine ⟨(B₀.pull f.Tag f.dim).withOrder :: pullBlocks f.Tag f.dim Bs',
-      by simpa [pullBlocks] using hk,
-      (soLangEmbed (pullBlocks f.Tag f.dim Bs')
-          (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang)).onSentence
-          (linearGuard L₁ (B₀.pull f.Tag f.dim)) ⟹
-        (soLangLift (pullBlocks f.Tag f.dim Bs')
-            ((L₁.sum Language.order).sum (B₀.pull f.Tag f.dim).lang)
-            (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang)
-            (orderElimLHom L₁ (B₀.pull f.Tag f.dim))).onSentence
-          (pullSO Bs' ((L₁.sum Language.order).sum (B₀.pull f.Tag f.dim).lang)
-            (L₂.sum B₀.lang) (f.toInterpretation.extendSO B₀) φ), ?_⟩
-    intro A instA _ _
-    constructor
-    · intro hP ρ''
-      refine (sorealize_imp_embed (pullBlocks f.Tag f.dim Bs')
-        (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang) A _
-        (linearGuard L₁ (B₀.pull f.Tag f.dim)) _ true).mpr fun hguard => ?_
-      obtain ⟨h1, h2, h3, h4⟩ :=
-        (realize_linearGuard L₁ (B₀.pull f.Tag f.dim) instA ρ'').mp hguard
-      letI lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
-      have hinner := (hpull A).mp hP ((B₀.pull f.Tag f.dim).restPart ρ'')
-      exact (sorealize_soLangLift (pullBlocks f.Tag f.dim Bs') _ _
-        (orderElimLHom L₁ (B₀.pull f.Tag f.dim)) A _ _
-        (orderElimLHom_isExpansionOn L₁ (B₀.pull f.Tag f.dim) A instA lo ρ''
-          (fun w => (iff_of_eq (congrArg (ρ'' (Sum.inl ())) (vec_eta₂ w))).symm))
-        _ true).mpr hinner
-    · intro h
-      letI := finiteLinearOrder A
-      refine (hpull A).mpr fun ρ₀ => ?_
-      have hguard := (realize_linearGuard L₁ (B₀.pull f.Tag f.dim) instA
-          ((B₀.pull f.Tag f.dim).joinOrder (fun w => w 0 ≤ w 1) ρ₀)).mpr
-        ⟨fun a => le_refl a, fun a b c hab hbc => le_trans hab hbc,
-          fun a b hab hba => le_antisymm hab hba, fun a b => le_total a b⟩
-      have hinner := (sorealize_imp_embed (pullBlocks f.Tag f.dim Bs')
-        (L₁.sum (B₀.pull f.Tag f.dim).withOrder.lang) A _
-        (linearGuard L₁ (B₀.pull f.Tag f.dim)) _ true).mp
-        (h ((B₀.pull f.Tag f.dim).joinOrder (fun w => w 0 ≤ w 1) ρ₀)) hguard
-      exact (sorealize_soLangLift (pullBlocks f.Tag f.dim Bs') _ _
-        (orderElimLHom L₁ (B₀.pull f.Tag f.dim)) A _ _
-        (orderElimLHom_isExpansionOn L₁ (B₀.pull f.Tag f.dim) A instA
-          (finiteLinearOrder A)
-          ((B₀.pull f.Tag f.dim).joinOrder (fun w => w 0 ≤ w 1) ρ₀)
-          (fun _ => Iff.rfl)) _ true).mp hinner
+  exact ⟨fun hP lo => (hpull lo).mp hP,
+    fun hall => (hpull (finiteLinearOrder A)).mpr (hall _)⟩
 
 end Closure
 
