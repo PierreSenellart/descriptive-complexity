@@ -33,10 +33,10 @@ interpretation, reduction or problem file changes:
   case being an isomorphism (`DescriptiveComplexity.FOInterpretation.toRelLEquiv`) rather than
   a definitional equality.
 
-This is Phase 1 of `DOMAIN_FORMULA.md`; it is what a hardness proof for a
-spanning problem needs. Membership closure under relativized reductions
-(Phase 2) is deferred, and not needed when membership is a direct second-order
-sentence.
+This is the hardness-side machinery of relativized reductions; it is what a
+hardness proof for a spanning problem needs. Membership closure under
+relativized reductions is deferred, and not needed when membership is a direct
+second-order sentence.
 -/
 
 namespace DescriptiveComplexity

@@ -12,7 +12,7 @@ import DescriptiveComplexity.FixedPointHorn
 /-!
 # Deterministic machine acceptance is in PTIME
 
-Stage 2b of the machine bridge (`MACHINE.md`): a *deterministic* run is exactly
+Stage 2b of the machine bridge: a *deterministic* run is exactly
 a least fixed point, so `DescriptiveComplexity.DTMAccept` is FO(LFP) definable –
 `DescriptiveComplexity.dtmAccept_lfpDefinable` – and hence, through the formalized
 translation `DescriptiveComplexity.lfpDefinable_iff_sigmaSOHornDefinable`, SO-Horn

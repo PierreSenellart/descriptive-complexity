@@ -43,6 +43,6 @@ completeness theorems.
 
 Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
 only the membership half – see `ROADMAP.md`. Machine acceptance
-(`DescriptiveComplexity.NTMAccept`) is the machine bridge of `MACHINE.md`, so far
+(`DescriptiveComplexity.NTMAccept`) is the machine bridge, so far
 only defined.
 -/

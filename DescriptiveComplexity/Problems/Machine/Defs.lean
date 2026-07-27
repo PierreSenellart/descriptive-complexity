@@ -43,7 +43,8 @@ kernel of the membership proof can check them.
 
 ## A deviation from the plan, recorded
 
-`MACHINE.md` lists `state` and `sym` sorts alongside `posn` and `tr`. They are
+The original machine design listed `state` and `sym` sorts alongside `posn` and
+`tr`. They are
 omitted here because nothing in the semantics or in the membership proof reads
 them: a junk element is harmless as a state, since it is reachable only through
 a transition, and a reduction controls which elements it marks accepting. If

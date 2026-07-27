@@ -33,7 +33,7 @@ there are no rewind states; the markers are what tell the machine a pass has
 ended.
 
 The machine is nondeterministic in exactly one place, the choice of `(x,T)` or
-`(x,F)` in the guess phase. That is design decision (d) of `MACHINE.md`, and it
+`(x,F)` in the guess phase. That is a deliberate design decision, and it
 is what will make the `⇒` half of correctness a corollary of uniqueness rather
 than a second invariant induction.
 
@@ -672,7 +672,7 @@ state by `satDst_functional`, the cell under the head by `satWrite_functional`,
 every other cell by the frame condition, and the head itself by uniqueness of
 the neighbour in the direction the transition names.
 
-This is design decision (d) of `MACHINE.md`: with only the guess phase
+This is a deliberate design decision: with only the guess phase
 branching, the `⇒` half of correctness becomes a corollary of uniqueness rather
 than a second invariant induction. -/
 theorem step_functional_off_guess {c c₁ c₂ : Config (SatV A)}
@@ -1396,7 +1396,7 @@ theorem satMachine_accepts_of_sat (ν : A → Bool)
 
 /-! ### Correctness, from an accepting run to an assignment
 
-Design decision (d) of `MACHINE.md`: the machine branches only at the guess, so
+By design, the machine branches only at the guess, so
 an accepting run *is* the intended run of the assignment it wrote, and the flag
 conditions along it force every clause to be satisfied. The analysis is one
 induction on the length of the run, with one case per tag of the head position.

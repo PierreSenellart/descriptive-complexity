@@ -11,7 +11,7 @@ import DescriptiveComplexity.OrderedComposition
 
 Transitivity of `P ≤ʳᶠᵒ[≤] Q` (`DescriptiveComplexity.RelOrderedFOReduction.trans`), the
 relativized analogue of `DescriptiveComplexity.OrderedFOReduction.trans`. This is the one
-piece the hardness rewiring of `DOMAIN_FORMULA.md` (Phase 1, Step 3) needs
+piece the hardness rewiring for relativized reductions needs
 that does not reduce to `DescriptiveComplexity.OrderedFOReduction.toRel`.
 
 The plain composition of `DescriptiveComplexity.Composition` pulls the outer relation
