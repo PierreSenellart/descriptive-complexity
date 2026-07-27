@@ -8,6 +8,8 @@ import DescriptiveComplexity.Ordered
 import DescriptiveComplexity.Composition
 import DescriptiveComplexity.OrderedComposition
 import DescriptiveComplexity.Complexity
+import DescriptiveComplexity.Encoding
+import DescriptiveComplexity.Encoding.UnaryBlowup
 import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
@@ -29,6 +31,9 @@ import DescriptiveComplexity.Machines
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.Examples
 
+-- The rows of the catalog table below cannot be broken across lines.
+set_option linter.style.longLine false
+
 /-!
 # Descriptive complexity in Lean 4
 
@@ -47,8 +52,11 @@ strictly stronger than exhibiting a Karp reduction
 only first-order logic, which Mathlib already provides.
 
 This page is the high-level map of the library, part by part. The `README`
-gives the general pitch; the worked example in
-`DescriptiveComplexity.Examples.ConjunctiveQueries` is the hands-on tutorial;
+gives the general pitch; the worked examples in
+`DescriptiveComplexity.Examples.ConjunctiveQueries` (conjunctive-query
+evaluation and containment) and `DescriptiveComplexity.Examples.GraphCrawling`
+(Web data acquisition, with a cardinality threshold, a reachability
+certificate and an ordered reduction) are the hands-on tutorials;
 individual declarations are documented on their own pages.
 
 ## The framework: problems, interpretations, reductions
@@ -79,6 +87,21 @@ individual declarations are documented on their own pages.
   (ordered) FO reductions. Membership and hardness depend only on the
   *finite* instances of a problem, making explicit that these statements say
   nothing about infinite structures.
+* `DescriptiveComplexity.Encoding` – bringing your own instance types: a
+  `DescriptiveComplexity.Encoding` bundles a concrete instance type, its declared
+  size, a computable encoding into finite structures, and polynomial bounds
+  *both ways* between size and universe – no padding, no compression – so an
+  encoding cannot be built size-dishonest. Semantic agreement is the separate
+  predicate `DescriptiveComplexity.Encoding.Faithful`, and the decoding
+  direction (for reading hardness concretely) is
+  `DescriptiveComplexity.Encoding.CoversUpTo`. That the bounds have teeth is a
+  theorem: no unary encoding of subset-sum passes them
+  (`DescriptiveComplexity.no_unary_encoding`, in
+  `DescriptiveComplexity.Encoding.UnaryBlowup`, with the honest binary encoding
+  as the positive contrast). Both tutorials –
+  `DescriptiveComplexity.Examples.ConjunctiveQueries` and
+  `DescriptiveComplexity.Examples.GraphCrawling` – open with a concrete
+  instance type and its bundled encoding, before any abstract development.
 
 ## The polynomial hierarchy, defined logically
 
@@ -175,7 +198,7 @@ reduction and certificate in full.
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
-| `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine<br>**Queries:** Conjunctive Query Evaluation · CQ Containment |
+| `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT (and QBF∀ at one block) |
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order blocks, existential first ([Stockmeyer 1976][stockmeyer1976polynomial]) | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |

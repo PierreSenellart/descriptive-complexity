@@ -42,7 +42,11 @@ The library is organized in three layers:
   isomorphism-invariant properties of finite structures, tagged first-order
   interpretations between languages, and FO reductions `≤ᶠᵒ` – with their
   order-invariant variant `≤ᶠᵒ[≤]` for gadgets that genuinely need a linear
-  order – closed under composition.
+  order – closed under composition. You can also bring your own concrete
+  instance types: a bundled `Encoding` cannot be constructed without proving
+  polynomial size bounds in both directions (no padding, no compression), so
+  an encoding cannot silently cheat on instance size – and a theorem shows the
+  bounds have teeth (no unary encoding of subset-sum passes them).
 * **An abstract complexity layer**: complexity classes closed under FO
   reductions, and the polynomial hierarchy *defined* logically – `NP = Σ₁ᵖ` by
   second-order quantifier alternation, with the level inclusions and the
@@ -75,7 +79,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi; equivalently acceptance by a deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
-| **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine<br>**Queries:** Conjunctive Query Evaluation · CQ Containment |
+| **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT (and QBF∀ at one block) |
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order blocks, existential first (Stockmeyer) | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order blocks, universal first | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
@@ -102,7 +106,8 @@ below.
   completeness for the coarse classes above.
 * **Instances are finite relational structures, not strings.** Every problem is
   modeled by choosing a vocabulary and encoding its inputs as finite structures
-  (numbers via the integer representations of `ROADMAP.md §0`), and yes-instance
+  (numbers via the integer representations of `ROADMAP.md §0`, size honesty of
+  user-supplied encodings via the bundled `Encoding` bounds), and yes-instance
   sets must be isomorphism-invariant. Reasoning is about **finite** structures
   only; nothing is claimed about infinite ones. The identification with the
   textbook *string*-based classes rests on the machine-bridge theorems plus the
@@ -196,10 +201,12 @@ brings in the whole library; import individual modules (for instance
   <https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html>
   – the `DescriptiveComplexity` module page is a part-by-part map of the
   library, and every declaration is documented on its own page.
-* **Tutorial**: `DescriptiveComplexity/Examples/ConjunctiveQueries.lean` is a
-  worked example read top to bottom – it walks through adding a new problem
-  domain (vocabulary → semantics → invariance → membership → hardness →
-  completeness) and is meant to serve as a template.
+* **Tutorials**: `DescriptiveComplexity/Examples/ConjunctiveQueries.lean` and
+  `DescriptiveComplexity/Examples/GraphCrawling.lean` are worked examples read
+  top to bottom – each walks through adding a new problem domain in the order
+  a user meets it (concrete problem → encoding, size bounds discharged at
+  construction → vocabulary and semantics → faithfulness → membership →
+  hardness → completeness) and is meant to serve as a template.
 
 ## Building
 
