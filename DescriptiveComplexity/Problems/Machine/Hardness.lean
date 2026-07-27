@@ -251,10 +251,12 @@ def satMachine (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A]
 
 /-! ### The table is a table
 
-Before any run is considered: each transition has exactly one source, symbol
-read, destination and symbol written, and the two places where two tags could
-otherwise both apply are exclusive. A mistake in the table shows up here first,
-which is why these come before the correctness proof. -/
+Before any run is considered: each transition has exactly one destination and
+symbol written, and the two places where two tags could otherwise both apply
+are exclusive. A mistake in the table shows up here first, which is why these
+come before the correctness proof. (Sources and symbols read need no
+functionality lemma of their own: `DescriptiveComplexity.satTr_unique` pins the whole
+transition from them.) -/
 
 section Functional
 
@@ -267,22 +269,6 @@ theorem one_eq_one_iff {t t' : SatTag} {a a' : A} :
     have := congrFun (congrArg Prod.snd h) 0
     simpa [one] using this
   · rintro ⟨rfl, rfl⟩; rfl
-
-omit [Language.sat.Structure A] in
-theorem cst_eq_cst_iff {t t' : SatTag} : (cst t : SatV A) = cst t' ↔ t = t' :=
-  ⟨congrArg Prod.fst, fun h => h ▸ rfl⟩
-
-omit [Language.sat.Structure A] in
-/-- A transition applies in exactly one state. -/
-theorem satSrc_functional {τ q q' : SatV A} (h : SatSrc τ q) (h' : SatSrc τ q') : q = q' := by
-  unfold SatSrc at h h'
-  cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
-
-omit [Language.sat.Structure A] in
-/-- A transition reads exactly one symbol. -/
-theorem satRead_functional {τ a a' : SatV A} (h : SatRead τ a) (h' : SatRead τ a') : a = a' := by
-  unfold SatRead at h h'
-  cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
 
 omit [Language.sat.Structure A] in
 /-- A transition writes exactly one symbol. -/
@@ -538,11 +524,6 @@ omit [Language.sat.Structure A] in
 theorem satPosn_posEnd : SatPosn (posEnd : SatV A) := fun a => ⟨botA_le a, botA_le a⟩
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
-/-- Every filler tuple is a position. -/
-theorem satPosn_fill (i : Fin 8) (w : Fin 2 → A) : SatPosn ((SatTag.pFill i, w) : SatV A) :=
-  trivial
-
-omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- The tape order is reflexive. -/
 theorem tagTupleLe_refl (p : SatV A) : tagTupleLe p p := Or.inr ⟨rfl, Or.inl rfl⟩
 
@@ -668,24 +649,6 @@ theorem eq_posEnd_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pEnd) 
   fin_cases i
   · exact le_antisymm (hp botA).1 (botA_le _)
   · exact le_antisymm (hp botA).2 (botA_le _)
-
-omit [Language.sat.Structure A] in
-/-- **The head moves from cell to cell along the instance.** -/
-theorem succPos_posCell_posCell {x x' : A} (hlt : x < x')
-    (hcov : ∀ y : A, x ≤ y → y ≤ x' → y = x ∨ y = x') :
-    SuccPos tagTupleLe SatPosn (posCell x : SatV A) (posCell x') := by
-  refine ⟨satPosn_posCell _, satPosn_posCell _, posCell_le_iff.mpr (le_of_lt hlt), ?_, ?_⟩
-  · intro h
-    exact absurd (by simpa [one] using congrFun (congrArg Prod.snd h) 0 : x = x') (ne_of_lt hlt)
-  · intro r hr h1 h2
-    have ht : r.1 = SatTag.pCell :=
-      le_antisymm (tagTupleLe_tag_le h2) (tagTupleLe_tag_le h1)
-    have hcell := eq_posCell_of_posn hr ht
-    have hx : x ≤ r.2 0 := posCell_le_iff.mp (hcell ▸ h1)
-    have hx' : r.2 0 ≤ x' := posCell_le_iff.mp (hcell ▸ h2)
-    rcases hcov _ hx hx' with h | h
-    · exact Or.inl (by rw [hcell, h])
-    · exact Or.inr (by rw [hcell, h])
 
 omit [Language.sat.Structure A] in
 /-- **The head's last move of a sweep.** The right marker follows the cell of
@@ -905,10 +868,6 @@ noncomputable def confChkL (ν : A → Bool) (c : A) (p : SatV A) : Config (SatV
   state := stChk (chkFlagL ν c p) false c
   head := p
   tape := doneTape ν
-
-/-- A check sweep leaves the tape alone, so its frame condition is trivial. -/
-theorem confChkL_tape (ν : A → Bool) (c : A) (p p' : SatV A) :
-    (confChkL ν c p').tape = (confChkL ν c p).tape := rfl
 
 /-- **A check sweep starts with an empty flag**: at the highest cell nothing has
 been visited yet. -/
@@ -1192,37 +1151,72 @@ theorem chkFlagR_posEnd (ν : A → Bool) (c : A) :
 
 Each of these is a sweep followed by its turn. They are the step and the base
 case of the induction over clauses; the induction itself only has to choose
-between them. -/
+between them. Each carries its step count, bounded by the rank of the right
+marker: that is the honest per-clause cost, roughly the size of the instance,
+and what lets the whole run fit the budget of
+`DescriptiveComplexity.TMData.Accepts`. -/
+
+omit [Language.sat.Structure A] in
+/-- The left marker has rank `0`: it is the lowest position. -/
+theorem bitRank_posStart : bitRank tagTupleLe SatPosn (posStart : SatV A) = 0 :=
+  bitRank_eq_zero_of_minPos isLinOrd_tagTupleLe minPos_posStart
+
+omit [Language.sat.Structure A] in
+/-- The right marker sits one step above the last cell. -/
+theorem bitRank_posEnd_eq :
+    bitRank tagTupleLe SatPosn (posEnd : SatV A) =
+      bitRank tagTupleLe SatPosn (posCell (topA (A := A))) + 1 :=
+  bitRank_succPos isLinOrd_tagTupleLe succPos_posCell_posEnd
+
+omit [Language.sat.Structure A] in
+/-- The first cell has rank `1`: it follows the left marker. -/
+theorem bitRank_posCell_botA :
+    bitRank tagTupleLe SatPosn (posCell (botA (A := A)) : SatV A) = 1 := by
+  rw [bitRank_succPos isLinOrd_tagTupleLe succPos_posStart_posCell, bitRank_posStart]
 
 /-- Checking `c` leftwards and moving on to the next clause. -/
 theorem steps_clauseL (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
     (hsat : ∃ y : A, SatLit c y (ν y)) :
-    ∃ k, (satMachine A).StepsIn k (confChkL ν c (posCell topA))
-      (confChkR ν c' (posCell botA)) :=
-  ⟨_, (steps_chkL ν hc).trans_step (step_turnNextL ν hnext ((chkFlagL_posStart ν c).mpr hsat))⟩
+    ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A),
+      (satMachine A).StepsIn k (confChkL ν c (posCell topA)) (confChkR ν c' (posCell botA)) := by
+  refine ⟨_, ?_,
+    (steps_chkL ν hc).trans_step (step_turnNextL ν hnext ((chkFlagL_posStart ν c).mpr hsat))⟩
+  have h1 := bitRank_posStart (A := A)
+  have h2 := bitRank_posEnd_eq (A := A)
+  omega
 
 /-- Checking `c` rightwards and moving on to the next clause. -/
 theorem steps_clauseR (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
     (hsat : ∃ y : A, SatLit c y (ν y)) :
-    ∃ k, (satMachine A).StepsIn k (confChkR ν c (posCell botA))
-      (confChkL ν c' (posCell topA)) :=
-  ⟨_, (steps_chkR ν hc).trans_step (step_turnNextR ν hnext ((chkFlagR_posEnd ν c).mpr hsat))⟩
+    ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A),
+      (satMachine A).StepsIn k (confChkR ν c (posCell botA)) (confChkL ν c' (posCell topA)) := by
+  refine ⟨_, ?_,
+    (steps_chkR ν hc).trans_step (step_turnNextR ν hnext ((chkFlagR_posEnd ν c).mpr hsat))⟩
+  have h1 := bitRank_posCell_botA (A := A)
+  have h2 := bitRank_posEnd_eq (A := A)
+  omega
 
 /-- Checking the last clause leftwards, and accepting. -/
 theorem steps_clauseAccL (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
     (hsat : ∃ y : A, SatLit c y (ν y)) :
-    ∃ (k : ℕ) (cfin : Config (SatV A)), (satMachine A).StepsIn k
-      (confChkL ν c (posCell topA)) cfin ∧ SatAcc cfin.state :=
-  ⟨_, _, (steps_chkL ν hc).trans_step
+    ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A), ∃ cfin : Config (SatV A),
+      (satMachine A).StepsIn k (confChkL ν c (posCell topA)) cfin ∧ SatAcc cfin.state := by
+  refine ⟨_, ?_, _, (steps_chkL ν hc).trans_step
     (step_turnAccL ν hmax ((chkFlagL_posStart ν c).mpr hsat)), rfl⟩
+  have h1 := bitRank_posStart (A := A)
+  have h2 := bitRank_posEnd_eq (A := A)
+  omega
 
 /-- Checking the last clause rightwards, and accepting. -/
 theorem steps_clauseAccR (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
     (hsat : ∃ y : A, SatLit c y (ν y)) :
-    ∃ (k : ℕ) (cfin : Config (SatV A)), (satMachine A).StepsIn k
-      (confChkR ν c (posCell botA)) cfin ∧ SatAcc cfin.state :=
-  ⟨_, _, (steps_chkR ν hc).trans_step
+    ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A), ∃ cfin : Config (SatV A),
+      (satMachine A).StepsIn k (confChkR ν c (posCell botA)) cfin ∧ SatAcc cfin.state := by
+  refine ⟨_, ?_, _, (steps_chkR ν hc).trans_step
     (step_turnAccR ν hmax ((chkFlagR_posEnd ν c).mpr hsat)), rfl⟩
+  have h1 := bitRank_posCell_botA (A := A)
+  have h2 := bitRank_posEnd_eq (A := A)
+  omega
 
 omit [Language.sat.Structure A] in
 /-- **A sweep is short.** Only the left marker and the cells lie below the
@@ -1270,27 +1264,63 @@ theorem exists_satNextCl {c : A} (hc : SatCl c) (hnmax : ¬ SatMaxCl c) :
       ⟨le_refl, fun a b c => le_trans, fun a b => le_antisymm, le_total⟩ hne
   exact ⟨c', hc, hc', hlt, fun e he hce => hmin e ⟨he, hce⟩⟩
 
-/-- **The machine checks every remaining clause and accepts.** Induction along
-the clauses from `c` upwards: if `c` is the last one the machine accepts at the
-marker it reaches, and otherwise it turns to the next clause, reversing
-direction – which is why the statement carries both orientations at once. -/
+omit [Nonempty A] in
+/-- Passing to the next clause removes exactly one clause from the ones still
+to be checked. -/
+theorem ncard_clauses_next {c c' : A} (hnext : SatNextCl c c') :
+    {e : A | SatCl e ∧ c ≤ e}.ncard = {e : A | SatCl e ∧ c' ≤ e}.ncard + 1 := by
+  obtain ⟨hc, hc', hlt, hmin⟩ := hnext
+  have hset : {e : A | SatCl e ∧ c ≤ e} = insert c {e : A | SatCl e ∧ c' ≤ e} := by
+    ext e
+    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    constructor
+    · rintro ⟨he, hce⟩
+      rcases eq_or_lt_of_le hce with rfl | hlt'
+      · exact Or.inl rfl
+      · exact Or.inr ⟨he, hmin e he hlt'⟩
+    · rintro (rfl | ⟨he, hce⟩)
+      · exact ⟨hc, le_refl _⟩
+      · exact ⟨he, le_trans hlt.le hce⟩
+  rw [hset,
+    Set.ncard_insert_of_notMem (fun hmem => absurd hmem.2 (not_le.mpr hlt)) (Set.toFinite _)]
+
+/-- **The machine checks every remaining clause and accepts**, in at most one
+sweep's worth of steps per clause. Induction along the clauses from `c`
+upwards: if `c` is the last one the machine accepts at the marker it reaches,
+and otherwise it turns to the next clause, reversing direction – which is why
+the statement carries both orientations at once. -/
 theorem accepts_from_chk (ν : A → Bool) (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
     ∀ c : A, SatCl c →
       (∃ (n : ℕ) (cfin : Config (SatV A)),
+          n ≤ {e : A | SatCl e ∧ c ≤ e}.ncard * bitRank tagTupleLe SatPosn (posEnd : SatV A) ∧
           (satMachine A).StepsIn n (confChkL ν c (posCell topA)) cfin ∧ SatAcc cfin.state) ∧
         ∃ (n : ℕ) (cfin : Config (SatV A)),
+          n ≤ {e : A | SatCl e ∧ c ≤ e}.ncard * bitRank tagTupleLe SatPosn (posEnd : SatV A) ∧
           (satMachine A).StepsIn n (confChkR ν c (posCell botA)) cfin ∧ SatAcc cfin.state := by
   intro c
   induction c using WellFoundedGT.induction with
   | ind c IH =>
     intro hc
+    have hpos : 0 < {e : A | SatCl e ∧ c ≤ e}.ncard :=
+      (Set.ncard_pos (Set.toFinite _)).mpr ⟨c, hc, le_refl c⟩
     by_cases hmax : SatMaxCl c
-    · exact ⟨steps_clauseAccL ν hc hmax (hsat c hc), steps_clauseAccR ν hc hmax (hsat c hc)⟩
+    · obtain ⟨kL, hkL, cfL, hL, haL⟩ := steps_clauseAccL ν hc hmax (hsat c hc)
+      obtain ⟨kR, hkR, cfR, hR, haR⟩ := steps_clauseAccR ν hc hmax (hsat c hc)
+      exact ⟨⟨kL, cfL, hkL.trans (Nat.le_mul_of_pos_left _ hpos), hL, haL⟩,
+        ⟨kR, cfR, hkR.trans (Nat.le_mul_of_pos_left _ hpos), hR, haR⟩⟩
     · obtain ⟨c', hnext⟩ := exists_satNextCl hc hmax
-      obtain ⟨⟨nL, cfL, hL, haL⟩, ⟨nR, cfR, hR, haR⟩⟩ := IH c' hnext.2.2.1 hnext.2.1
-      obtain ⟨j, hj⟩ := steps_clauseL ν hc hnext (hsat c hc)
-      obtain ⟨j', hj'⟩ := steps_clauseR ν hc hnext (hsat c hc)
-      exact ⟨⟨j + nR, cfR, hj.trans hR, haR⟩, ⟨j' + nL, cfL, hj'.trans hL, haL⟩⟩
+      obtain ⟨⟨nL, cfL, hnL, hL, haL⟩, ⟨nR, cfR, hnR, hR, haR⟩⟩ := IH c' hnext.2.2.1 hnext.2.1
+      obtain ⟨j, hj, hstepL⟩ := steps_clauseL ν hc hnext (hsat c hc)
+      obtain ⟨j', hj', hstepR⟩ := steps_clauseR ν hc hnext (hsat c hc)
+      have hcount : ∀ {a b : ℕ}, a ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A) →
+          b ≤ {e : A | SatCl e ∧ c' ≤ e}.ncard * bitRank tagTupleLe SatPosn (posEnd : SatV A) →
+          a + b ≤
+            {e : A | SatCl e ∧ c ≤ e}.ncard * bitRank tagTupleLe SatPosn (posEnd : SatV A) := by
+        intro a b ha hb
+        rw [ncard_clauses_next hnext, Nat.succ_mul]
+        exact (Nat.add_le_add ha hb).trans (le_of_eq (Nat.add_comm _ _))
+      exact ⟨⟨j + nR, cfR, hcount hj hnR, hstepL.trans hR, haR⟩,
+        ⟨j' + nL, cfL, hcount hj' hnL, hstepR.trans hL, haL⟩⟩
 
 /-- **The machine is well formed**, which is all of
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
@@ -1299,6 +1329,464 @@ the tape layer, before any transition existed. -/
 theorem satMachine_wellFormed : (satMachine A).WellFormed :=
   ⟨isLinOrd_tagTupleLe, exists_satPosn, fun _ _ _ ha hb => satInp_functional ha hb,
     exists_satBlank, fun _ _ ha hb => satBlank_unique ha hb⟩
+
+/-! ### Correctness, the chaining half -/
+
+/-- **A satisfying assignment makes the machine accept, within the budget.**
+The run is the guess sweep, the turn into the lowest clause, and one sweep per
+clause; its length is at most `(m + 1) · (n + 2)` steps for `n` elements and
+`m` clauses, which `DescriptiveComplexity.sat_budget` puts strictly below the number
+of filler positions alone. -/
+theorem satMachine_accepts_of_sat (ν : A → Bool)
+    (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
+    (satMachine A).Accepts := by
+  have hguess : (satMachine A).StepsIn (bitRank tagTupleLe SatPosn (posEnd : SatV A))
+      (confGuess ν posStart) (confGuess ν posEnd) := by
+    have h := steps_guess ν
+    rwa [bitRank_posStart, Nat.sub_zero] at h
+  have hRle : bitRank tagTupleLe SatPosn (posEnd : SatV A) ≤ Nat.card A + 1 :=
+    bitRank_posEnd_le
+  have hA : 1 ≤ Nat.card A := Nat.card_pos
+  have hbudget := card_le_card_posn A
+  by_cases hcl : ∃ e : A, SatCl e
+  · obtain ⟨c₀, hc₀, hmin⟩ := exists_minPos (Le := (· ≤ · : A → A → Prop))
+      (Posn := fun e : A => SatCl e)
+      ⟨le_refl, fun _ _ _ => le_trans, fun _ _ => le_antisymm, le_total⟩ hcl
+    have hmincl : SatMinCl c₀ := ⟨hc₀, hmin⟩
+    obtain ⟨⟨n, cfin, hn, hrun, hacc⟩, -⟩ := accepts_from_chk ν hsat c₀ hc₀
+    have hturn : (satMachine A).Step (confGuess ν posEnd) (confChkL ν c₀ (posCell topA)) := by
+      have heq : confChkL ν c₀ (posCell (topA (A := A))) =
+          { state := stChk false false c₀, head := posCell topA,
+            tape := guessTape ν posEnd } := by
+        refine Config.ext ?_ rfl rfl
+        change stChk (chkFlagL ν c₀ (posCell topA)) false c₀ = stChk false false c₀
+        rw [chkFlagL_top]
+      rw [heq]
+      exact step_turnChk ν hmincl
+    have hchain := (hguess.trans_step hturn).trans hrun
+    refine ⟨confGuess ν posStart, cfin,
+      bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 + n, isInit_confGuess ν, ?_, hchain, hacc⟩
+    have hm : {e : A | SatCl e ∧ c₀ ≤ e}.ncard ≤ Nat.card A := by
+      have h := Set.ncard_le_ncard (Set.subset_univ {e : A | SatCl e ∧ c₀ ≤ e})
+        (Set.toFinite _)
+      rwa [Set.ncard_univ] at h
+    have hs := sat_budget hA hm
+    calc bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 + n
+        ≤ ({e : A | SatCl e ∧ c₀ ≤ e}.ncard + 1) * (Nat.card A + 2) := by
+          have h2 : {e : A | SatCl e ∧ c₀ ≤ e}.ncard *
+                bitRank tagTupleLe SatPosn (posEnd : SatV A) ≤
+              {e : A | SatCl e ∧ c₀ ≤ e}.ncard * (Nat.card A + 1) :=
+            Nat.mul_le_mul_left _ hRle
+          have h3 : ({e : A | SatCl e ∧ c₀ ≤ e}.ncard + 1) * (Nat.card A + 2) =
+              {e : A | SatCl e ∧ c₀ ≤ e}.ncard * (Nat.card A + 1) +
+                ({e : A | SatCl e ∧ c₀ ≤ e}.ncard + Nat.card A + 2) := by ring
+          have h4 := hn.trans h2
+          linarith
+      _ < 8 * Nat.card A * Nat.card A := hs
+      _ ≤ _ := hbudget
+  · have hno : ∀ e : A, ¬ SatCl e := fun e he => hcl ⟨e, he⟩
+    have hchain := hguess.trans_step (step_turnAcc ν hno)
+    refine ⟨confGuess ν posStart, _, bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1,
+      isInit_confGuess ν, ?_, hchain, rfl⟩
+    have hs := sat_budget (m := 0) hA (Nat.zero_le _)
+    calc bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 ≤ Nat.card A + 2 := by omega
+      _ = (0 + 1) * (Nat.card A + 2) := by ring
+      _ < 8 * Nat.card A * Nat.card A := hs
+      _ ≤ _ := hbudget
+
+/-! ### Correctness, from an accepting run to an assignment
+
+Design decision (d) of `MACHINE.md`: the machine branches only at the guess, so
+an accepting run *is* the intended run of the assignment it wrote, and the flag
+conditions along it force every clause to be satisfied. The analysis is one
+induction on the length of the run, with one case per tag of the head position.
+At each non-guess configuration the transition that fired is identified through
+its tag – a `decide` over the finite tag type – and the actual step is equated
+with the intended one by `DescriptiveComplexity.step_functional_off_guess`; at a guess
+configuration the transition itself says which value was written. -/
+
+section Reverse
+
+/-- In the guessing state over an unassigned cell, only a guess write can
+fire. -/
+theorem trTag_guess_sU : ∀ t : SatTag, isTrTag t → stateTag t = SatTag.qGuess →
+    readTag t = SatTag.sU → ∃ v, t = SatTag.tGuessVal v := by decide
+
+/-- In the guessing state over the right marker, only the two turns out of the
+guess phase can fire. -/
+theorem trTag_guess_sEnd : ∀ t : SatTag, isTrTag t → stateTag t = SatTag.qGuess →
+    readTag t = SatTag.sEnd → t = SatTag.tGuessEndAcc ∨ t = SatTag.tGuessEndChk := by decide
+
+/-- In a check state over the left marker, only a leftward turn can fire, and
+only with the flag set. -/
+theorem trTag_chk_sStart : ∀ (t : SatTag) (f d : Bool), isTrTag t →
+    stateTag t = SatTag.qChk f d → readTag t = SatTag.sStart →
+    f = true ∧ d = false ∧ (t = SatTag.tTurnNext false ∨ t = SatTag.tTurnAcc false) := by decide
+
+/-- In a check state over the right marker, only a rightward turn can fire, and
+only with the flag set. -/
+theorem trTag_chk_sEnd : ∀ (t : SatTag) (f d : Bool), isTrTag t →
+    stateTag t = SatTag.qChk f d → readTag t = SatTag.sEnd →
+    f = true ∧ d = true ∧ (t = SatTag.tTurnNext true ∨ t = SatTag.tTurnAcc true) := by decide
+
+/-- No transition reads the blank symbol: the head never leaves the bracketed
+tape, so a run that somehow stood on a filler could not move. -/
+theorem trTag_read_ne_sBlank : ∀ t : SatTag, isTrTag t → readTag t ≠ SatTag.sBlank := by decide
+
+omit [Language.sat.Structure A] in
+/-- Changing the assignment anywhere but strictly below the head leaves the
+guess tape unchanged: only the cells already passed read it. -/
+theorem guessTape_congr {ν ν' : A → Bool} {p : SatV A}
+    (h : ∀ y : A, tagTupleLe (posCell y) p → posCell y ≠ p → ν y = ν' y) (r : SatV A) :
+    guessTape ν p r = guessTape ν' p r := by
+  classical
+  obtain ⟨t, w⟩ := r
+  cases t <;> simp only [guessTape]
+  case pCell =>
+    by_cases hcond : (∀ a : A, w 1 ≤ a) ∧ tagTupleLe ((SatTag.pCell, w) : SatV A) p ∧
+        ((SatTag.pCell, w) : SatV A) ≠ p
+    · rw [if_pos hcond, if_pos hcond]
+      have hcw : ((SatTag.pCell, w) : SatV A) = posCell (w 0) := by
+        refine satV_ext rfl ?_ ?_
+        · simp [one]
+        · exact le_antisymm (hcond.1 botA) (botA_le _)
+      change symV (ν (w 0)) (w 0) = symV (ν' (w 0)) (w 0)
+      rw [h (w 0) (hcw ▸ hcond.2.1) (hcw ▸ hcond.2.2)]
+    · rw [if_neg hcond, if_neg hcond]
+
+/-- **The initial configuration is unique**: the start state and the lowest
+position are pinned, and the initial tape is functional, so any initial
+configuration starts a guess run – of every assignment at once, no cell of the
+guess tape at the left marker reading the assignment at all. -/
+theorem isInit_eq_confGuess {c : Config (SatV A)} (h : (satMachine A).IsInit c) (ν : A → Bool) :
+    c = confGuess ν posStart := by
+  obtain ⟨hstart, hmin, htape⟩ := h
+  refine Config.ext ?_ ?_ (funext fun p => ?_)
+  · exact satV_ext hstart.1 (le_antisymm (hstart.2.1 botA) (botA_le _))
+      (le_antisymm (hstart.2.2 botA) (botA_le _))
+  · exact isLinOrd_tagTupleLe.2.2.1 c.head posStart
+      (hmin.2 posStart satPosn_posStart) (minPos_posStart.2 c.head hmin.1)
+  · have h1 := htape p
+    have h2 : (satMachine A).InitTape p (guessTape ν posStart p) := (isInit_confGuess ν).2.2 p
+    rcases h1 with ha | ⟨hna, ha⟩ <;> rcases h2 with hb | ⟨hnb, hb⟩
+    · exact satInp_functional ha hb
+    · exact absurd ha (hnb _)
+    · exact absurd hb (hna _)
+    · exact satBlank_unique ha hb
+
+/-- **The check-phase analysis**, both directions at once: an accepting run
+from a check configuration forces every clause from the current one upwards to
+be satisfied. The only live positions are the cells – where the step is pinned
+by determinism and the sweep continues – and the marker the sweep is headed to,
+where the transition that fired says the flag was set, hence the clause
+satisfied, and either names the next clause or certifies this one was last. -/
+theorem sat_of_chk (k : ℕ) :
+    (∀ (ν : A → Bool) (c : A) (p : SatV A) (cfin : Config (SatV A)), SatCl c → SatPosn p →
+      (satMachine A).StepsIn k (confChkL ν c p) cfin → SatAcc cfin.state →
+      ∀ e : A, SatCl e → c ≤ e → ∃ y : A, SatLit e y (ν y)) ∧
+    (∀ (ν : A → Bool) (c : A) (p : SatV A) (cfin : Config (SatV A)), SatCl c → SatPosn p →
+      (satMachine A).StepsIn k (confChkR ν c p) cfin → SatAcc cfin.state →
+      ∀ e : A, SatCl e → c ≤ e → ∃ y : A, SatLit e y (ν y)) := by
+  induction k with
+  | zero =>
+    constructor <;>
+      · intro ν c p cfin hc hp hk hacc
+        have heq : _ = cfin := hk
+        rw [← heq] at hacc
+        exact SatTag.noConfusion hacc
+  | succ k ih =>
+    obtain ⟨ihL, ihR⟩ := ih
+    constructor
+    · rintro ν c p cfin hc hp ⟨c₁, hstep, hrest⟩ hacc
+      cases htag : p.1
+      case pStart =>
+        rw [show p = posStart from eq_posStart_of_posn hp htag] at hstep
+        have hstep' := hstep
+        obtain ⟨τ, hτ, hsrc, hread, -, -, -, -⟩ := hstep'
+        obtain ⟨hflag, -, hcase⟩ := trTag_chk_sStart τ.1 (chkFlagL ν c posStart) false
+          (satTr_isTrTag hτ) (satSrc_tag hτ hsrc).symm (satRead_tag hτ hread).symm
+        have hcsat : ∃ y : A, SatLit c y (ν y) := (chkFlagL_posStart ν c).mp hflag
+        rcases hcase with hτ₁ | hτ₁
+        · have hc0 : c = τ.2 0 := (one_eq_one_iff.mp (satSrc_turnNext hτ₁ hsrc)).2
+          have hnext' : SatNextCl (τ.2 0) (τ.2 1) := by
+            have h : SatTr τ := hτ
+            unfold SatTr at h
+            rw [hτ₁] at h
+            exact h
+          rw [← hc0] at hnext'
+          have hc₁ : c₁ = confChkR ν (τ.2 1) (posCell botA) :=
+            step_functional_off_guess
+              (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.1)) hstep
+              (step_turnNextL ν hnext' hflag)
+          rw [hc₁] at hrest
+          intro e he hce
+          rcases eq_or_lt_of_le hce with rfl | hlt
+          · exact hcsat
+          · exact ihR ν (τ.2 1) (posCell botA) cfin hnext'.2.1 (satPosn_posCell _) hrest hacc
+              e he (hnext'.2.2.2 e he hlt)
+        · have hc0 : c = τ.2 0 := (one_eq_one_iff.mp (satSrc_turnAcc hτ₁ hsrc)).2
+          have hmax' : SatMaxCl (τ.2 0) := by
+            have h : SatTr τ := hτ
+            unfold SatTr at h
+            rw [hτ₁] at h
+            exact h.2
+          rw [← hc0] at hmax'
+          intro e he hce
+          rw [le_antisymm (hmax'.2 e he) hce]
+          exact hcsat
+      case pCell =>
+        have hnmin : ¬ MinPos tagTupleLe SatPosn p := by
+          intro hmin
+          have hpp : p = posStart := isLinOrd_tagTupleLe.2.2.1 p posStart
+            (hmin.2 posStart satPosn_posStart) (minPos_posStart.2 p hmin.1)
+          rw [hpp] at htag
+          exact SatTag.noConfusion htag
+        obtain ⟨q, hqp⟩ := exists_predPos isLinOrd_tagTupleLe hp hnmin
+        have hc₁ : c₁ = confChkL ν c q :=
+          step_functional_off_guess
+            (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.1)) hstep
+            (step_chkL ν hc hqp htag)
+        rw [hc₁] at hrest
+        exact ihL ν c q cfin hc hqp.1 hrest hacc
+      case pEnd =>
+        rw [show p = posEnd from eq_posEnd_of_posn hp htag] at hstep
+        obtain ⟨τ, hτ, hsrc, hread, -, -, -, -⟩ := hstep
+        obtain ⟨-, hd, -⟩ := trTag_chk_sEnd τ.1 (chkFlagL ν c posEnd) false
+          (satTr_isTrTag hτ) (satSrc_tag hτ hsrc).symm (satRead_tag hτ hread).symm
+        exact Bool.noConfusion hd
+      case pFill _ =>
+        obtain ⟨τ, hτ, -, hread, -, -, -, -⟩ := hstep
+        have hbl : (confChkL ν c p).tape ((confChkL ν c p).head) = symBlank := by
+          change doneTape ν p = symBlank
+          simp only [doneTape, guessTape, htag]
+        rw [hbl] at hread
+        exact absurd (satRead_tag hτ hread).symm (trTag_read_ne_sBlank τ.1 (satTr_isTrTag hτ))
+      all_goals (rw [SatPosn, htag] at hp; exact hp.elim)
+    · rintro ν c p cfin hc hp ⟨c₁, hstep, hrest⟩ hacc
+      cases htag : p.1
+      case pEnd =>
+        rw [show p = posEnd from eq_posEnd_of_posn hp htag] at hstep
+        have hstep' := hstep
+        obtain ⟨τ, hτ, hsrc, hread, -, -, -, -⟩ := hstep'
+        obtain ⟨hflag, -, hcase⟩ := trTag_chk_sEnd τ.1 (chkFlagR ν c posEnd) true
+          (satTr_isTrTag hτ) (satSrc_tag hτ hsrc).symm (satRead_tag hτ hread).symm
+        have hcsat : ∃ y : A, SatLit c y (ν y) := (chkFlagR_posEnd ν c).mp hflag
+        rcases hcase with hτ₁ | hτ₁
+        · have hc0 : c = τ.2 0 := (one_eq_one_iff.mp (satSrc_turnNext hτ₁ hsrc)).2
+          have hnext' : SatNextCl (τ.2 0) (τ.2 1) := by
+            have h : SatTr τ := hτ
+            unfold SatTr at h
+            rw [hτ₁] at h
+            exact h
+          rw [← hc0] at hnext'
+          have hc₁ : c₁ = confChkL ν (τ.2 1) (posCell topA) :=
+            step_functional_off_guess
+              (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.1)) hstep
+              (step_turnNextR ν hnext' hflag)
+          rw [hc₁] at hrest
+          intro e he hce
+          rcases eq_or_lt_of_le hce with rfl | hlt
+          · exact hcsat
+          · exact ihL ν (τ.2 1) (posCell topA) cfin hnext'.2.1 (satPosn_posCell _) hrest hacc
+              e he (hnext'.2.2.2 e he hlt)
+        · have hc0 : c = τ.2 0 := (one_eq_one_iff.mp (satSrc_turnAcc hτ₁ hsrc)).2
+          have hmax' : SatMaxCl (τ.2 0) := by
+            have h : SatTr τ := hτ
+            unfold SatTr at h
+            rw [hτ₁] at h
+            exact h.2
+          rw [← hc0] at hmax'
+          intro e he hce
+          rw [le_antisymm (hmax'.2 e he) hce]
+          exact hcsat
+      case pCell =>
+        have hnmax : ¬ MaxPos tagTupleLe SatPosn p := by
+          intro hmax
+          have hple : tagTupleLe p posEnd := by
+            refine tagTupleLe_of_tag_lt ?_
+            rw [htag]
+            exact (show SatTag.pCell < SatTag.pEnd by decide)
+          have hpe : p = posEnd :=
+            isLinOrd_tagTupleLe.2.2.1 p posEnd hple (hmax.2 posEnd satPosn_posEnd)
+          rw [hpe] at htag
+          exact SatTag.noConfusion htag
+        obtain ⟨q, hpq⟩ := TMData.exists_succPos' (M := satMachine A) isLinOrd_tagTupleLe hp hnmax
+        have hc₁ : c₁ = confChkR ν c q :=
+          step_functional_off_guess
+            (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.1)) hstep
+            (step_chkR ν hc hpq htag)
+        rw [hc₁] at hrest
+        exact ihR ν c q cfin hc hpq.2.1 hrest hacc
+      case pStart =>
+        rw [show p = posStart from eq_posStart_of_posn hp htag] at hstep
+        obtain ⟨τ, hτ, hsrc, hread, -, -, -, -⟩ := hstep
+        obtain ⟨-, hd, -⟩ := trTag_chk_sStart τ.1 (chkFlagR ν c posStart) true
+          (satTr_isTrTag hτ) (satSrc_tag hτ hsrc).symm (satRead_tag hτ hread).symm
+        exact Bool.noConfusion hd
+      case pFill _ =>
+        obtain ⟨τ, hτ, -, hread, -, -, -, -⟩ := hstep
+        have hbl : (confChkR ν c p).tape ((confChkR ν c p).head) = symBlank := by
+          change doneTape ν p = symBlank
+          simp only [doneTape, guessTape, htag]
+        rw [hbl] at hread
+        exact absurd (satRead_tag hτ hread).symm (trTag_read_ne_sBlank τ.1 (satTr_isTrTag hτ))
+      all_goals (rw [SatPosn, htag] at hp; exact hp.elim)
+
+/-- **The guess-phase analysis**: an accepting run from a guess configuration
+yields a satisfying assignment. Walking the guess sweep, the assignment is
+rebuilt one cell at a time from the values the run chose to write; at the right
+marker the run either accepts – no clause exists – or enters the check phase,
+where `DescriptiveComplexity.sat_of_chk` takes over. -/
+theorem sat_of_guess : ∀ (k : ℕ) (ν : A → Bool) (p : SatV A) (cfin : Config (SatV A)),
+    SatPosn p → tagTupleLe p posEnd →
+    (satMachine A).StepsIn k (confGuess ν p) cfin → SatAcc cfin.state →
+    ∃ ν' : A → Bool, ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν' y) := by
+  intro k
+  induction k with
+  | zero =>
+    intro ν p cfin hp hle hk hacc
+    have heq : _ = cfin := hk
+    rw [← heq] at hacc
+    exact SatTag.noConfusion hacc
+  | succ k ih =>
+    rintro ν p cfin hp hle ⟨c₁, hstep, hrest⟩ hacc
+    rcases tag_le_pEnd (tagTupleLe_tag_le hle) with htag | htag | htag
+    · -- the left marker: step over it
+      rw [show p = posStart from eq_posStart_of_posn hp htag] at hstep
+      have hc₁ : c₁ = confGuess ν (posCell botA) :=
+        step_functional_off_guess
+          (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.2.choose_spec)) hstep
+          (step_guess ν succPos_posStart_posCell (posCell_le_posEnd botA))
+      rw [hc₁] at hrest
+      exact ih ν (posCell botA) cfin (satPosn_posCell _) (posCell_le_posEnd _) hrest hacc
+    · -- a cell: the guess itself
+      obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := hstep
+      have hpos1 : ∀ a : A, p.2 1 ≤ a := by
+        have h := hp
+        rw [SatPosn, htag] at h
+        exact h
+      have hcell : (confGuess ν p).tape ((confGuess ν p).head) = symU (p.2 0) := by
+        change guessTape ν p p = symU (p.2 0)
+        simp only [guessTape, htag]
+        exact if_neg (fun hcon => hcon.2.2 rfl)
+      rw [hcell] at hread
+      obtain ⟨v, hτ₁⟩ := trTag_guess_sU τ.1 (satTr_isTrTag hτ)
+        (satSrc_tag hτ hsrc).symm (satRead_tag hτ hread).symm
+      have hx : τ.2 0 = p.2 0 := (one_eq_one_iff.mp (satRead_guessVal hτ₁ hread)).2.symm
+      have hst : c₁.state = stGuess := by
+        have h : SatDst τ c₁.state := hdst
+        unfold SatDst at h
+        rw [hτ₁] at h
+        exact h
+      have hwr : c₁.tape p = symV v (p.2 0) := by
+        have h : SatWrite τ (c₁.tape ((confGuess ν p).head)) := hwrite
+        unfold SatWrite at h
+        rw [hτ₁, hx] at h
+        exact h
+      have hsucc : SuccPos tagTupleLe SatPosn p c₁.head := by
+        rcases hmove with ⟨-, hs⟩ | ⟨hr, -⟩
+        · exact hs
+        · refine absurd ?_ hr
+          change SatRight τ
+          unfold SatRight
+          rw [hτ₁]
+          trivial
+      have hpc : p = posCell (p.2 0) := eq_posCell_of_posn hp htag
+      have hc₁ : c₁ = confGuess (Function.update ν (p.2 0) v) c₁.head := by
+        refine Config.ext hst rfl (funext fun r => ?_)
+        rcases eq_or_ne r p with heq | hr
+        · rw [heq, hwr]
+          change _ = guessTape (Function.update ν (p.2 0) v) c₁.head p
+          simp only [guessTape, htag]
+          rw [if_pos ⟨hpos1, hsucc.2.2.1, hsucc.2.2.2.1⟩, Function.update_self]
+        · rw [hframe r hr]
+          change guessTape ν p r = guessTape (Function.update ν (p.2 0) v) c₁.head r
+          rw [guessTape_frame (Function.update ν (p.2 0) v) hsucc hr]
+          refine guessTape_congr (fun y hyle hyne => ?_) r
+          refine (Function.update_of_ne (fun hy : y = p.2 0 => ?_) _ _).symm
+          rw [hy] at hyne
+          exact hyne hpc.symm
+      rw [hc₁] at hrest
+      have hqle : tagTupleLe c₁.head posEnd := by
+        rcases isLinOrd_tagTupleLe.2.2.2 c₁.head posEnd with h | h
+        · exact h
+        · rcases hsucc.2.2.2.2 posEnd satPosn_posEnd hle h with h' | h'
+          · exact SatTag.noConfusion ((congrArg Prod.fst h').trans htag)
+          · rw [← h']
+            exact isLinOrd_tagTupleLe.1 posEnd
+      exact ih (Function.update ν (p.2 0) v) c₁.head cfin hsucc.2.1 hqle hrest hacc
+    · -- the right marker: turn out of the guess phase
+      rw [show p = posEnd from eq_posEnd_of_posn hp htag] at hstep
+      have hstep' := hstep
+      obtain ⟨τ, hτ, hsrc, hread, -, -, -, -⟩ := hstep'
+      rcases trTag_guess_sEnd τ.1 (satTr_isTrTag hτ)
+          (satSrc_tag hτ hsrc).symm (satRead_tag hτ hread).symm with hτ₁ | hτ₁
+      · -- no clause at all: vacuously satisfiable
+        have hno : ∀ e : A, ¬ SatCl e := by
+          have h : SatTr τ := hτ
+          unfold SatTr at h
+          rw [hτ₁] at h
+          exact h.2
+        exact ⟨ν, fun e he => absurd he (hno e)⟩
+      · -- start checking the lowest clause
+        have htr : (∀ a : A, τ.2 1 ≤ a) ∧ SatMinCl (τ.2 0) := by
+          have h : SatTr τ := hτ
+          unfold SatTr at h
+          rw [hτ₁] at h
+          exact h
+        have hint : (satMachine A).Step (confGuess ν posEnd)
+            (confChkL ν (τ.2 0) (posCell topA)) := by
+          have heq : confChkL ν (τ.2 0) (posCell (topA (A := A))) =
+              { state := stChk false false (τ.2 0), head := posCell topA,
+                tape := guessTape ν posEnd } := by
+            refine Config.ext ?_ rfl rfl
+            change stChk (chkFlagL ν (τ.2 0) (posCell topA)) false (τ.2 0) =
+              stChk false false (τ.2 0)
+            rw [chkFlagL_top]
+          rw [heq]
+          exact step_turnChk ν htr.2
+        have hc₁ : c₁ = confChkL ν (τ.2 0) (posCell topA) :=
+          step_functional_off_guess
+            (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.2.choose_spec)) hstep hint
+        rw [hc₁] at hrest
+        exact ⟨ν, fun e he => (sat_of_chk k).1 ν (τ.2 0) (posCell topA) cfin htr.2.1
+          (satPosn_posCell _) hrest hacc e he (htr.2.2 e he)⟩
+
+end Reverse
+
+/-! ### The machine accepts exactly the satisfiable instances -/
+
+omit [LinearOrder A] [Finite A] [Nonempty A] in
+/-- Satisfiability with a `Bool`-valued assignment, the form the machine
+manipulates. -/
+theorem satisfiable_iff_exists_bool :
+    Satisfiable A ↔ ∃ ν : A → Bool, ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y) := by
+  constructor
+  · rintro ⟨ν, hν⟩
+    classical
+    refine ⟨fun a => decide (ν a), fun e he => ?_⟩
+    obtain ⟨x, hx⟩ := hν e he
+    rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact ⟨x, Or.inl ⟨hp, decide_eq_true hT⟩⟩
+    · exact ⟨x, Or.inr ⟨hn, decide_eq_false hT⟩⟩
+  · rintro ⟨ν, hν⟩
+    refine ⟨fun a => ν a = true, fun c hc => ?_⟩
+    obtain ⟨y, hy⟩ := hν c hc
+    rcases hy with ⟨hp, hT⟩ | ⟨hn, hF⟩
+    · exact ⟨y, Or.inl ⟨hp, hT⟩⟩
+    · exact ⟨y, Or.inr ⟨hn, by simp [hF]⟩⟩
+
+/-- **Correctness of the machine of a CNF formula**: it accepts – within the
+budget – exactly the satisfiable instances. -/
+theorem satMachine_accepts_iff_satisfiable : (satMachine A).Accepts ↔ Satisfiable A := by
+  rw [satisfiable_iff_exists_bool]
+  constructor
+  · rintro ⟨c₀, cfin, n, hinit, -, hrun, hacc⟩
+    rw [isInit_eq_confGuess hinit (fun _ => false)] at hrun
+    exact sat_of_guess n (fun _ => false) posStart cfin satPosn_posStart
+      posStart_le_posEnd hrun hacc
+  · rintro ⟨ν, hν⟩
+    exact satMachine_accepts_of_sat ν hν
 
 end Machine
 
