@@ -257,6 +257,17 @@ documented in the README. Instances carry their own transition table, so
 reduction-built machines have polynomially many states — standard for an
 acceptance problem; the constant-alphabet simulation is never needed.
 
+A further application of the same machinery, once step-counted machines can
+run over string encodings: bounding the *encoders and decoders* of the
+concrete-instance layer. The `Encoding`/`Decoding` bundles enforce that
+`relBool` and `dec` are computations, but not that they are cheap (a decoder
+may brute-force the answer; see the "what this does not buy" notes in
+`DescriptiveComplexity/Encoding.lean` and `DescriptiveComplexity/Decoding.lean`).
+With the bridge, "computed by a polynomial-time machine" becomes a statable
+side condition on both, closing the last gap in reading completeness theorems
+as statements about concrete data. [R], and only worthwhile after the
+compilation direction above exists.
+
 **Cost of a bridge, given the logic:**
 
 | class | logic | membership | hardness | total |
