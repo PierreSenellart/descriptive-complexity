@@ -276,6 +276,9 @@ individual declarations are documented on their own pages.
   reduction needs no relativization; the one adjustment is
   `DescriptiveComplexity.TCSpec.pad`, adding a spare mode so that the tag type is
   nonempty, since a reduction must map nonempty structures to nonempty ones.
+  UNREACH is complete too (`DescriptiveComplexity.UNREACH_NL_complete`), by
+  complementing that reduction – which is again `NL = coNL`, each fragment
+  defining only one of the two problems head-on.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads
@@ -330,7 +333,7 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing]; equivalently FO(TC) (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), so `NL = coNL` | REACH · 2SAT |
+| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing]; equivalently FO(TC) (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), so `NL = coNL` | REACH · UNREACH · 2SAT |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
@@ -386,7 +389,9 @@ Headline results and cross-references:
   `DescriptiveComplexity.TCSpec`. Both halves of REACH's completeness pass
   through Immerman–Szelepcsényi: membership because a clausal fragment defines
   only non-reachability, hardness because SO-Krom definability has to be turned
-  into an FO(TC) definition of the problem itself.
+  into an FO(TC) definition of the problem itself. UNREACH is then complete as
+  well (`DescriptiveComplexity.UNREACH_NL_complete`), the two problems trading
+  which half is the easy one.
 * **Above NP**: TAUT (DNF tautology) is coNP-complete by complementing the
   Cook–Levin discharge, and its width-three restriction 3-DNF-TAUT
   (`DescriptiveComplexity.ThreeDnfTAUT_coNP_complete`) follows the same route

@@ -81,7 +81,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| **NL** | SO-Krom (existential second-order Krom: at most two second-order literals per clause, either sign) – Grädel; equivalently FO(TC), since FO(TC) is closed under complement (Immerman–Szelepcsényi), whence `NL = coNL` | REACH · 2SAT |
+| **NL** | SO-Krom (existential second-order Krom: at most two second-order literals per clause, either sign) – Grädel; equivalently FO(TC), since FO(TC) is closed under complement (Immerman–Szelepcsényi), whence `NL = coNL` | REACH · UNREACH · 2SAT |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi; equivalently acceptance by a deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
@@ -91,8 +91,6 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above); the inclusions and dualities relating them are theorems.
-UNREACH, the complement of REACH, is given as a further worked instance of the
-Horn and Krom fragments – the shape a clausal fragment can define head-on.
 
 ## Scope and limitations
 

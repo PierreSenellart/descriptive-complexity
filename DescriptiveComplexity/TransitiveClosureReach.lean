@@ -232,4 +232,28 @@ reductions rather than logarithmic-space ones. -/
 theorem REACH_NL_complete : NL.Complete REACH :=
   ⟨reach_mem_NL, reach_NL_hard⟩
 
+/-- **UNREACH is NL-hard**, by complementing the reduction: the complement of
+a problem in NL is in NL (`DescriptiveComplexity.mem_NL_compl_iff`), that complement
+reduces to REACH, and *the very same interpretation* reduces the problem itself
+to UNREACH (`DescriptiveComplexity.OrderedFOReduction.compl`, the correctness of a
+reduction being an equivalence). -/
+theorem unreach_NL_hard : NL.Hard UNREACH :=
+  (hard_NL_iff UNREACH).mpr fun Q hQ => by
+    have h := (reach_hard_of_tcDefinable Qᶜ
+      ((tcDefinable_iff_mem_NL Qᶜ).mpr ((mem_NL_compl_iff Q).mpr hQ))).map
+        OrderedFOReduction.compl
+    rw [DecisionProblem.compl_compl] at h
+    exact h.map OrderedFOReduction.toRel
+
+/-- **UNREACH is NL-complete** as well, and the two halves come from opposite
+sides. Membership is the head-on Krom program
+(`DescriptiveComplexity.unreach_mem_NL`): a clausal fragment states closure and
+rejection, so non-reachability is what it defines directly. Hardness is
+`DescriptiveComplexity.unreach_NL_hard`, which needs `NL = coNL`; without
+Immerman–Szelepcsényi neither half would be available for *both* problems, and
+the two would sit on either side of a complement that is not known to be
+crossable. -/
+theorem UNREACH_NL_complete : NL.Complete UNREACH :=
+  ⟨unreach_mem_NL, unreach_NL_hard⟩
+
 end DescriptiveComplexity
