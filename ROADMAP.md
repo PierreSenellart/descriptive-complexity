@@ -224,21 +224,115 @@ non-reducibility, impossible in the machine world.
 - Horizon: PARITY not in FO(≤, BIT) (Håstad/Ajtai/FSS, i.e. uniform AC⁰ lower
   bounds) [R]: a switching-lemma formalization is a major standalone project.
 
-## 6. Further horizons
+## 6. Beyond decision problems: counting and optimization
 
-- **Counting: #P via counting SO assignments** [R]: the
-  Saluja–Subrahmanyam–Thakur #FO framework; #SAT, permanent, #3COL. Direct
-  bridge to provenance-lean: counting provenance semantics of a query is exactly
-  a model count, so the two libraries would meet here (semiring provenance as
-  the common generalization).
-- **Optimization: MaxSNP** [R]: Papadimitriou–Yannakakis's syntactically defined
-  optimization classes (Π₁-definable objective), L-reductions, MAX-3SAT
-  completeness. The syntactic layer fits this framework natively; PCP-based
-  hardness of approximation stays out of scope.
-- **Teaching material** [M]: grow the `Examples/` directory (which now holds the
-  first tutorial-style worked example, Boolean conjunctive queries) into a
-  curated "reduction cookbook" example set (cf. Grange et al., MFCS 2024) as the
-  catalog broadens, so the library doubles as a complexity-course companion.
+Everything above measures *decision* problems. The non-decision world repeats
+the same pattern, a syntactic class matching a computational one, with a number
+or a relation in place of the yes/no answer: Saluja–Subrahmanyam–Thakur (1995)
+prove `#FO = #P` with the hierarchy `#Σ₀ ⊊ #Σ₁ ⊊ #Π₁ ⊊ #Σ₂ ⊊ #Π₂ = #FO`;
+Arenas–Muñoz–Riveros (LICS 2017; LMCS 16(1), 2020) give a cleaner framework,
+**QSO** (Quantitative Second-Order logic), a restriction of Droste–Gastin
+weighted logics to the semiring ℕ; on the optimization side there is
+Papadimitriou–Yannakakis's **MAX SNP** (1991), and for numeric output
+Grädel–Gurevich metafinite model theory.
+
+Two observations set the design. First, the **core generalization is cheap**: a
+decision problem is an iso-invariant `Structure → Prop`, a counting problem an
+iso-invariant `Structure → ℕ`, and vocabularies, tagged interpretations and the
+invariance discipline transport unchanged. Second, **QSO is already this
+library's idiom**, so prefer ΣQSO over raw #FO as the object-level logic. QSO
+has a two-layer syntax: the Boolean layer is an ordinary SO formula evaluating
+to 1 or 0 (Mathlib's `BoundedFormula` untouched), the quantitative layer is
+built from `+`, `·` and the quantifiers `Σx`, `Πx`, `ΣX`, `ΠX` (`Σx` sums a
+subformula's value over domain elements, `ΣX` over all relations of the
+relevant arity). That is exactly "kernel as data rather than a shape carved out
+of `BoundedFormula`", the way SO-Horn is a `HornProgram` clause list and
+FO(LFP) a rule system. Formulas transcribe the mathematics directly; the
+permanent of a 0-1 matrix is
+
+```
+ΣS. permut(S) · Πx.(∃y. S(x,y) ∧ M(x,y))
+```
+
+a second-order sum over binary relations, `permut(S)` acting as a filter and
+the product computing `∏ A[i, σ(i)]`.
+
+The capture results, all over ordered structures, are what the class
+definitions should be read against (as in §4, the library would *define* its
+classes by these fragments rather than prove machine equivalences):
+
+| fragment | class |
+|---|---|
+| ΣQSO(FO) | #P (`#FO = #P` is inherited; #FO sits inside ΣQSO(FO)) |
+| ΣQSO(∃SO) | SpanP (the paper captures SpanP, not SpanL; #L appears only via a support-based quantitative least fixed point) |
+| QFO(LFP) | FP |
+| QSO(PFP) / QFO(PFP) | FPSPACE / FPSPACE(poly) |
+| ΣQSO with ℤ constants | GapP |
+| MaxQSO(FO) / MinQSO(FO) | MaxP / MinP |
+
+The FP row is the methodologically interesting one: FP is *not* reachable by
+counting satisfying tuples of any FO fragment (`#Σ₁` already encodes
+#P-complete problems such as #3-DNF, and dropping second-order free variables
+loses `2ⁿ`). Products rescue it, `Πȳ.((ȳ < x̄) ↦ 2)` yielding `2^m`, which lets
+a formula reconstruct a machine's binary output bit by bit.
+
+The concrete items, in dependency order:
+
+- **Parsimonious reductions** [M]: the real framework work. `≤ᶠᵒ` preserves
+  membership (`A ∈ P ↔ I(A) ∈ Q`); counting needs `f A = g (I A)`: same
+  interpretations, the iff replaced by an equation. Composition closure mirrors
+  `Complexity.lean`, so the quantitative classes are again closed under
+  reduction by construction. Depends on nothing beyond what exists today.
+- **ΣQSO evaluator** [M–L]: a fresh inductive for the quantitative layer (~8
+  constructors) over the existing Boolean layer, with a recursive evaluator
+  into ℕ whose semantics is Mathlib-native (`⟦Σx.α⟧ = Finset.sum`,
+  `⟦Πx.α⟧ = Finset.prod`). Recover #FO as the prenex fragment `ΣX̄.Σx̄.φ`.
+- **`#P := ΣQSO(FO)`** [M after the two above]: as with `NP = Σ₁ᵖ` and
+  PTIME = SO-Horn, the class is a definition and the theorem content is closure
+  under parsimonious reductions plus completeness, not a machine equivalence.
+  The discharge symmetry of §2 extends unchanged, each quantitative fragment
+  getting the complete problem that is its syntactic image (ΣQSO(FO) ↔ #SAT,
+  QFO(LFP) ↔ FP). Note that the output number lives in Lean, computed by the
+  evaluator, so the representation taxonomy of §0 constrains only the numbers
+  inside *instances*, never the value of a counting problem.
+- **#SAT complete for ΣQSO(FO)** [M–L]: the high-value target, and probably the
+  cheapest route to a headline result. Tseitin gates preserve solution counts
+  precisely because they are functionally determined, and `exists_gates`
+  (`∃ gates. CNF(atoms, gates) ↔ φ(atoms)`) already exists in the QBF
+  development; strengthen it to `ExistsUnique` and the Cook–Levin discharge
+  becomes parsimonious.
+- **The free catalog entries** [S each]: reductions already bijective on
+  solutions are parsimonious almost by inspection, notably 1-in-3-SAT → Exact
+  Cover (no order, no gadget, no counting, dimension 1: covering `x` once *is*
+  an assignment) and Set Splitting. Also #3COL and the permanent as new
+  entries.
+- **Structure inside #P** [R]: the ΣQSO(FO)-hierarchy tracks the #FO one but
+  diverges at the bottom (`#Σᵢ ⊊ ΣQSO(Σᵢ)` for `i = 0, 1`, coinciding from Π₁
+  up; ΣQSO(Σ₀) and #Σ₁ incomparable), and the gap is the point: #Σ₁ has an
+  FPRAS but is not closed under sum; ΣQSO(Σ₁) is, but subtraction by one is
+  open (conjectured to fail); ΣQSO(Σ₁[FO]), allowing FO subformulas as atoms,
+  is closed under sum, product and subtraction by one, sits in TotP and has an
+  FPRAS everywhere (that subtraction proof is the paper's hardest, turning on
+  logarithmic-size witnesses a fixed formula can identify and delete). A
+  Grädel-style Horn restriction ΣQSO(Σ₂-Horn) has #DisjHornSAT as a natural
+  complete problem under parsimonious reductions, rhyming with the SO-Horn
+  layer already in the library.
+- **Quantitative least fixed point** [R, deferred]: the support-based `lsfp`
+  needed for QFO(LFP) = FP and for #L. It needs its own monotonicity and
+  termination argument; `derivesIn`/`depth` in the FO(LFP) layer is the right
+  precedent.
+- **Optimization: MaxSNP** [R, deferred furthest]: Papadimitriou–Yannakakis's
+  syntactically defined optimization classes (Π₁-definable objective),
+  L-reductions, MAX-3SAT completeness; MaxQSO/MinQSO is the definitional route
+  to the same territory. L-reductions are approximation-preserving and far more
+  delicate than parsimonious ones, which is also why PCP-based hardness of
+  approximation stays out of scope.
+
+Beyond the library, the counting track is the direct bridge to provenance-lean:
+the counting provenance semantics of a query is exactly a model count, so the
+two libraries would meet here, with semiring provenance as the common
+generalization (and QSO's weighted-logic ancestry is the same idea from the
+other side).
 
 ## 7. Machine bridges beyond NP and PTIME
 
@@ -356,8 +450,17 @@ The concrete items:
   Savitch, if *deterministic* PSPACE machines are wanted complete; oracle and
   `Δₖᵖ` classes — the bridge would make them definable, but by a machine,
   against the library's classes-are-logic principle (a decision, not a
-  drift); `#P` as "number of accepting runs" is easy to state but needs a
-  parsimonious-reduction notion the framework lacks (§6).
+  drift); `#P` as "number of accepting runs" is easy to state but needs the
+  parsimonious-reduction notion the framework still lacks (§6, first item);
+  the classes-are-logic principle points at `ΣQSO(FO)` for the definition
+  either way, with the machine count as a bridge statement.
+
+## 8. Teaching material
+
+- **Reduction cookbook** [M]: grow the `Examples/` directory (which now holds
+  the first tutorial-style worked example, Boolean conjunctive queries) into a
+  curated example set (cf. Grange et al., MFCS 2024) as the catalog broadens,
+  so the library doubles as a complexity-course companion.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
@@ -368,3 +471,10 @@ The concrete items:
 4. Remaining catalog growth (X3C, 3-Partition, Bin Packing) and the
    other-class discharges (SO-Krom/2SAT, REACH, REACHd) as they become useful
    worked instances of the fragments above.
+
+The counting track of §6 is an independent chain: parsimonious reductions, the
+ΣQSO evaluator and the #SAT discharge depend on nothing above (only on the
+existing ∃SO layer and the QBF `exists_gates` lemma), so it can be interleaved
+anywhere. Its own internal order is parsimonious reductions → evaluator →
+`#P := ΣQSO(FO)` → #SAT → the free catalog entries, with the quantitative
+fixed point and MaxSNP deferred.
