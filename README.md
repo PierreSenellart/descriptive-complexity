@@ -1,13 +1,22 @@
 # DescriptiveComplexity
 
 A Lean 4 library for descriptive complexity on top of Mathlib's
-`ModelTheory` library: machine-model-free hardness reductions in the style
-of Immerman (*Descriptive Complexity*, ch. 3). All declarations live in the
+`ModelTheory` library, in the style of Immerman (*Descriptive Complexity*,
+ch. 3). Its main goal is to let users **formalize membership, hardness, and
+completeness proofs for common complexity classes** — NP and coNP, PTIME, and
+the levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy — with no machine model:
+each class is *defined* logically, so a completeness proof is a definability
+witness for membership together with a first-order reduction for hardness,
+which the framework closes into a `Complete` theorem. Along the way the library
+also **proves a number of results of complexity and descriptive complexity
+themselves** — a machine-free Cook–Levin theorem, Fagin's theorem, the Grädel /
+Immerman–Vardi capture of PTIME, and the machine bridges that identify these
+logically defined classes with the machine ones. All declarations live in the
 `DescriptiveComplexity` namespace; the top-level module is
 `DescriptiveComplexity`.
 
 Complexity theory is essentially absent from Lean/Mathlib because formalizing
-a model of computation with resource bounds is hard. But many classical
+a model of computation with resource bounds is hard. But most classical
 NP-hardness reductions do not need the full power of PTIME: they are
 *first-order expressible*. An FO reduction is computable in AC⁰ ⊆ LOGSPACE ⊆
 PTIME, so exhibiting one is strictly stronger than exhibiting a Karp
@@ -76,6 +85,76 @@ The characterizations are the logical *definitions* of the classes (see the
 Overview above); the inclusions and dualities relating them are theorems.
 REACH/UNREACH is given as a further worked instance in PTIME – a membership
 example, not proved complete.
+
+## Scope and limitations
+
+These are *intrinsic* to the descriptive, machine-free approach — the price of
+needing no model of computation. They are the nature of the framework, not a
+backlog; for capabilities that are simply not built yet, see *On the roadmap*
+below.
+
+* **Complexity of problems, not of algorithms.** Complexity is attributed to a
+  decision *problem* (is it in / hard for / complete for a class), never to a
+  procedure. There is no cost model, no running-time or space bound as a number,
+  **no `O(·)`, and no fine-grained complexity**: the framework cannot separate
+  `O(n)` from `O(n²)`, track polynomial degrees, or reason about a particular
+  algorithm's resource use. What you prove is membership, hardness and
+  completeness for the coarse classes above.
+* **Instances are finite relational structures, not strings.** Every problem is
+  modeled by choosing a vocabulary and encoding its inputs as finite structures
+  (numbers via the integer representations of `ROADMAP.md §0`), and yes-instance
+  sets must be isomorphism-invariant. Reasoning is about **finite** structures
+  only; nothing is claimed about infinite ones. The identification with the
+  textbook *string*-based classes rests on the machine-bridge theorems plus the
+  fact that FO reductions are AC⁰-computable.
+* **Hardness is an FO reduction; membership is a logical definition.** You show
+  hardness by exhibiting a first-order (or order-invariant FO) reduction, and
+  membership by a definability witness (∃SO for NP, SO-Horn / FO(LFP) for
+  PTIME, …) — not by describing a polynomial-time algorithm. This is *stronger*
+  than a Karp reduction, but the reduction must be expressible in logic: a
+  poly-time reduction that is not FO-expressible cannot be used, gadget
+  constructions must be encoded (often needing a linear order, tags, or extra
+  dimensions), and arithmetic inside formulas is limited (addition and
+  comparison are FO(≤); multiplication is not FO).
+* **Completeness and structure, not separations.** The library proves
+  completeness, inclusions and logical characterizations. Whether the classes
+  are *distinct* (P vs NP, and the like) is open mathematics the framework does
+  not decide. Unconditional *inexpressibility* results — a genuine strength of
+  the descriptive approach — are a planned direction, not yet present (below).
+
+## On the roadmap
+
+The following are *feasible* within this framework and planned, but **not yet
+implemented**. `ROADMAP.md` is the detailed version; the highlights a typical
+user is most likely to want:
+
+* **Complexity classes beyond the polynomial hierarchy.** L, NL, PSPACE, and up
+  toward EXPTIME/EXPSPACE, via the transitive-closure and fixpoint logics that
+  capture them (FO(DTC), FO(TC), SO(TC), FO(PFP)/SO(LFP)) and their complete
+  problems (REACHd, REACH, QSAT), each with a machine bridge as for NP and
+  PTIME. Below NP this also brings 2SAT (NL) and the P-complete problems
+  (Circuit Value, alternating reachability).
+* **Counting and optimization problems.** Only decision problems are modeled
+  today. Planned: #P via counting second-order assignments (#SAT, permanent,
+  #3COL) and MaxSNP-style optimization classes — i.e. function and search
+  problems, not just yes/no ones.
+* **Unconditional lower bounds (inexpressibility).** The payoff unique to the
+  descriptive approach, impossible in the machine world: Ehrenfeucht–Fraïssé
+  games, EVEN and reachability not being FO-definable, `FO ⊊ FO(TC)` as a strict
+  inclusion, locality, 0-1 laws, and eventually PARITY ∉ AC⁰.
+* **Structural / capture theorems.** Immerman–Szelepcsényi (NL = coNL),
+  Immerman–Vardi (P = order-invariant FO(LFP)), Grädel's capture theorems, and
+  Fagin's spectra connection.
+* **A broader catalog and finer reductions.** More complete problems, and the
+  finer reduction notions descriptive complexity uses (quantifier-free
+  projections; FO(≤, BIT) = uniform AC⁰ as the bottom of the ordered world).
+
+One caveat within this list: the `Δₖᵖ` levels of the polynomial hierarchy
+(`Δₖᵖ = P^{Σₖ₋₁ᵖ}`, e.g. `Δ₂ᵖ = P^NP`). The `Σₖᵖ`/`Πₖᵖ` levels are in scope —
+they are *defined* here by second-order quantifier alternation — but `Δₖᵖ` has
+no such logical characterization: it is a deterministic class defined by bounded
+oracle access, so capturing it faithfully would need the oracle-machine model
+the framework deliberately avoids, and it may stay out of reach.
 
 ## Use as a dependency
 

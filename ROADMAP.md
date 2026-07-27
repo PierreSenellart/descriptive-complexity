@@ -121,10 +121,11 @@ and SO-Horn → HORN-SAT; the discharges still to do:
   of PSPACE, NL, L on ordered structures (DC ch. 9–10); for PSPACE, SO(TC) above
   is the cheaper route and FO(PFP) becomes a textbook-faithfulness layer.
 - **BIT and FO(≤, BIT)** [L]: representation (D); FO-definability of `+` and `×`
-  from BIT, `FO(≤, BIT)` = uniform AC⁰ as the bottom of the ordered world;
-  **quantifier-free projections** as the finest reduction notion (DC uses them
-  for almost all completeness results); SAT complete under first-order
-  projections.
+  from BIT, `FO(≤, BIT)` = uniform AC⁰ as the bottom of the ordered world
+  (formalizing that *capture* — against a circuit model — is the separate §4
+  item **FO(≤, BIT) = AC⁰**); **quantifier-free projections** as the finest
+  reduction notion (DC uses them for almost all completeness results); SAT
+  complete under first-order projections.
 - **Reduction-notion refinements** [M]: track quantifier-free / projection /
   dimension-1 status through composition (currently only `IsQuantifierFree`
   exists); "problem X is complete under qfps" is the DC-faithful statement.
@@ -179,6 +180,20 @@ and SO-Horn → HORN-SAT; the discharges still to do:
 - **Grädel's theorems** [M–L]: SO-Horn = P, SO-Krom = NL on ordered structures
   (see §3; the capture statements relative to the library's own class
   definitions).
+- **FO(≤, BIT) = AC⁰** [R]: the bottom-level capture theorem (Immerman;
+  Barrington–Immerman–Straubing) — first-order logic with a linear order and
+  BIT is exactly (DLOGTIME-)uniform AC⁰. Unlike the other captures here, this
+  one needs a *model of computation* on the far side: uniform AC⁰ circuit
+  families (bounded depth, polynomial size, unbounded fan-in) plus a uniformity
+  condition — introduced only to prove the bridge, exactly as the NP and PTIME
+  machine bridges introduce Turing machines as data. Two payoffs justify the
+  cost. The `FO ⊆ AC⁰` half turns the library's currently *by-inspection* claim
+  that FO reductions are AC⁰-computable — the structures-vs-strings bridge of §7
+  and of the README's *Scope and limitations* — into a theorem; and a formal
+  AC⁰ is the prerequisite for the PARITY ∉ AC⁰ lower bound of §5. The converse
+  `AC⁰ ⊆ FO(≤, BIT)`, simulating a uniform circuit family by an FO(≤, BIT)
+  sentence, is the harder half. Depends on the BIT layer of §3; cf. the
+  circuit-family-bridge remark in §7.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
 
