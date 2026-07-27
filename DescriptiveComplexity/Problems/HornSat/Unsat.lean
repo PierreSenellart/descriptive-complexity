@@ -7,6 +7,7 @@ import Mathlib.Order.Lattice.Nat
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.Lattice
 import DescriptiveComplexity.Problems.HornSat.Membership
+import Mathlib.Data.Set.Card
 
 /-!
 # Horn *un*satisfiability has a short certificate
@@ -224,6 +225,72 @@ theorem not_atMostOnePositive_iff :
   rw [AtMostOnePositive]
   push Not
   exact Iff.rfl
+
+/-- **The stages of unit propagation stabilize at the size of the universe**:
+they form an increasing chain of subsets, so if each of the first `Nat.card A`
+steps grew strictly the last would overflow the universe. This honest bound –
+rather than the indefinite one of
+`DescriptiveComplexity.exists_forcedIn_bound` – is what a machine doing one
+propagation round per element needs. -/
+theorem forced_forcedIn_card [Finite A] {x : A} (hx : Forced x) :
+    ForcedIn (Nat.card A) x := by
+  classical
+  have hstab : ∀ N : ℕ, (∀ y : A, ForcedIn (N + 1) y → ForcedIn N y) →
+      ∀ (s : ℕ) (y : A), ForcedIn s y → ForcedIn N y := by
+    intro N hN s
+    induction s with
+    | zero => exact fun y hy => hy.elim
+    | succ s ih =>
+      intro y hy
+      rcases Nat.lt_or_ge N (s + 1) with hlt | hge
+      · obtain ⟨c, hc, hp, hneg⟩ := hy
+        exact hN y ⟨c, hc, hp, fun z hz => ih z (hneg z hz)⟩
+      · exact forcedIn_le hge hy
+  by_cases hgood : ∃ N ≤ Nat.card A, ∀ y : A, ForcedIn (N + 1) y → ForcedIn N y
+  · obtain ⟨N, hNle, hN⟩ := hgood
+    obtain ⟨n, hn⟩ := hx
+    exact forcedIn_le hNle (hstab N hN n x hn)
+  · exfalso
+    push Not at hgood
+    have hcard : ∀ N ≤ Nat.card A + 1, N ≤ {y : A | ForcedIn N y}.ncard := by
+      intro N
+      induction N with
+      | zero => simp
+      | succ N ih =>
+        intro hN
+        obtain ⟨y, hy1, hy2⟩ := hgood N (by omega)
+        have hsub : {y : A | ForcedIn N y} ⊂ {y : A | ForcedIn (N + 1) y} :=
+          ⟨fun z hz => forcedIn_succ hz, fun hcontra => hy2 (hcontra hy1)⟩
+        have h1 := ih (by omega)
+        have h2 := Set.ncard_lt_ncard hsub (Set.toFinite _)
+        omega
+    have h1 := hcard (Nat.card A + 1) le_rfl
+    have h2 := Set.ncard_le_ncard
+      (Set.subset_univ {y : A | ForcedIn (Nat.card A + 1) y}) (Set.toFinite _)
+    rw [Set.ncard_univ] at h2
+    omega
+
+/-- **For a Horn instance, satisfiability is decided by the propagation
+closure**: the CNF is satisfiable exactly when the closure, read as an
+assignment, satisfies every clause. This is the semantic half of the
+unit-propagation machine of the machine bridge: the machine computes the
+closure and then verifies each clause against it. -/
+theorem satisfiable_iff_forced_model [Finite A] (hhorn : AtMostOnePositive A) :
+    Satisfiable A ↔ ∀ c : A, RelMap satIsClause ![c] →
+      ∃ x : A, (RelMap satPosIn ![c, x] ∧ Forced x) ∨
+        (RelMap satNegIn ![c, x] ∧ ¬Forced x) := by
+  constructor
+  · rintro ⟨ν, hν⟩ c hc
+    by_cases hall : ∀ y : A, RelMap satNegIn ![c, y] → Forced y
+    · obtain ⟨x, hx⟩ := hν c hc
+      rcases hx with ⟨hp, -⟩ | ⟨hn, hνx⟩
+      · exact ⟨x, Or.inl ⟨hp, forced_of_allNeg hc hp hall⟩⟩
+      · exact absurd (forced_subset_model hhorn hν x (hall x hn)) hνx
+    · push Not at hall
+      obtain ⟨y, hy, hyn⟩ := hall
+      exact ⟨y, Or.inr ⟨hy, hyn⟩⟩
+  · intro h
+    exact ⟨Forced, h⟩
 
 end LeastModel
 
