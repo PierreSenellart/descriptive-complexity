@@ -3,7 +3,8 @@ name: Documentation
 # The site hosts the docs of the latest release only (single-version, in line
 # with the no-backport version scheme in PACKAGING.md): each release
 # overwrites it. The build is heavy – doc-gen4 covers the whole import closure,
-# Mathlib included – so it runs on releases and on demand only, never per-PR.
+# Mathlib included, and the dependency figures run `dot` once per declaration –
+# so it runs on releases and on demand only, never per-PR.
 on:
   release:
     types: [published]
@@ -35,14 +36,27 @@ jobs:
       - name: Build the library
         uses: leanprover/lean-action@v1
 
+      # The per-declaration dependency figures: `dot` renders them, and
+      # result-graph produces them from the built oleans. It is not a
+      # dependency of this library and is kept outside the workspace, so that
+      # its own sources are never taken for part of it; it needs core Lean
+      # only, so this build is seconds and needs no cache.
+      - name: Build result-graph
+        run: |
+          sudo apt-get update && sudo apt-get install -y graphviz
+          git clone --depth 1 https://github.com/PierreSenellart/result-graph \
+            "$RUNNER_TEMP/result-graph"
+          cd "$RUNNER_TEMP/result-graph" && lake build
+
       # Pin/resolve doc-gen4 in the nested docbuild project and generate docs.
       # MATHLIB_NO_CACHE_ON_UPDATE=1 works around a Mathlib caching issue on
-      # `lake update` (doc-gen4 README).
+      # `lake update` (doc-gen4 README). `make docs` runs doc-gen4 and then
+      # splices a figure into each declaration's page; see docbuild/Makefile.
       - name: Build the documentation
         run: |
           cd docbuild
           MATHLIB_NO_CACHE_ON_UPDATE=1 lake update doc-gen4
-          lake build DescriptiveComplexity:docs
+          make docs RESULT_GRAPH_REPO="$RUNNER_TEMP/result-graph"
 
       - name: Upload the Pages artifact
         uses: actions/upload-pages-artifact@v3
