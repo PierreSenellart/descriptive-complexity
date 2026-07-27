@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import Mathlib.Tactic.FinCases
 import DescriptiveComplexity.Encoding
+import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.Problems.ThreeColorability
 
 /-!
@@ -74,10 +75,11 @@ Main results:
   `DescriptiveComplexity.queryDbStructure`) from a concrete query (a list of atoms)
   and a concrete database (a list of facts), the abstract semantics agrees
   with the textbook one;
-* `DescriptiveComplexity.cqEncoding` with `DescriptiveComplexity.cqEncoding_faithful`
-  and `DescriptiveComplexity.cqEncoding_coversUpTo`: the packaged, bundled form
-  of the encoding – size bounds discharged by construction, semantics
-  faithful, and every finite structure semantically covered;
+* `DescriptiveComplexity.cqEncoding` with `DescriptiveComplexity.cqEncoding_faithful`:
+  the bundled encoding – size bounds discharged by construction, semantics
+  faithful – and `DescriptiveComplexity.cqDecoding`, the computable decoding
+  back, with **`DescriptiveComplexity.cqEvalWF_NP_complete`**, completeness on
+  well-formed instances;
 * `DescriptiveComplexity.threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval`;
 * `DescriptiveComplexity.cqContainment_fo_reduction_cqEval : CQContainment ≤ᶠᵒ CQEval`;
 * `DescriptiveComplexity.cqEval_fo_reduction_cqContainment : CQEval ≤ᶠᵒ CQContainment`;
@@ -620,44 +622,62 @@ end
 
 /-!
 Faithfulness reads membership results into the concrete world; *hardness*
-results need the converse: every abstract instance must be – at least
-semantically – an encoded one, or the concrete problem could be the easy
-fragment of a hard abstract one. The ideal statement, `Encoding.Covers`
-(every finite structure isomorphic to an encoded one), is *unprovable* here,
-and instructively so: an abstract structure may carry a `fact` touching a
-query variable, which no packaged instance represents. But such junk facts
-are invisible to the semantics (`DbEdge` guards both endpoints with `¬QVar`),
-which is exactly the slack `Encoding.CoversUpTo` allows – and that weaker,
-semantic covering is what the hardness reading actually needs.
+results also need a decoding direction: the abstract problem must not be hard
+only on junk structures the encoding never produces. Following
+`DescriptiveComplexity/Decoding.lean`, this takes two steps, both cheap here.
+
+*Well-formedness.* The one junk convention that matters for decoding is a
+structure with no constant at all (the abstract semantics can satisfy a
+query on it that no concrete assignment – needing a constant to map
+variables to – satisfies). The sentence `cqWFSentence`, "some element is not
+a variable", cuts these out; read as a `DecisionProblem` (via
+`DecisionProblem.ofSentence`) it restricts evaluation to the well-formed
+problem, whose completeness is step 9's `cqEvalWF_NP_complete`. Junk *facts*
+(touching a variable) need no well-formedness at all: `DbEdge` guards both
+endpoints with `¬QVar`, so the decoder below simply drops them, invisibly to
+the semantics.
+
+*The decoder.* The computable
+`cqDecode : FinPresentation Language.queryDb → Option CQInstance` enumerates
+the variables and the constants of a presented structure
+(`Finset.orderIsoOfFin` supplies the renumbering) and reads the atoms and
+facts through it, returning `none` exactly when there is no constant.
+Soundness and totality assemble it into `DescriptiveComplexity.cqDecoding`,
+and – like the encoder – it *runs*: see the `#guard`s below. An `∃`-only
+decoding statement would be classically near-vacuous (case on the abstract
+truth value); the bundled computation is what makes the decoding direction
+mean something – see the module docstring of
+`DescriptiveComplexity/Decoding.lean`.
 -/
 
-/-- On an all-variables structure the query holds iff it has no atoms: a
-valuation would have to send an atom endpoint to a non-variable. The
-degenerate case of the covering theorem. -/
-private theorem queryHolds_iff_of_forall_qvar {A : Type} [Language.queryDb.Structure A]
-    (hall : ∀ x : A, QVar x) :
-    QueryHolds A ↔ ∀ x y : A, ¬QAtom x y := by
-  constructor
-  · rintro ⟨v, -, hatom⟩ x y hxy
-    obtain ⟨-, hnv, -⟩ := hatom x y hxy
-    exact hnv (hall _)
-  · exact fun h => ⟨id, fun x _ => rfl, fun x y hxy => absurd hxy (h x y)⟩
+/-- Well-formedness of an evaluation instance: some element is a constant.
+The one condition the decoder needs. -/
+noncomputable def cqWFSentence : Language.queryDb.Sentence :=
+  Formula.iExs (Fin 1) (∼(Relations.formula₁ qdbIsVar (Term.var (Sum.inr 0))))
 
-/-- Any structure whose universe is identified with `Fin n ⊕ Fin (m + 1)`,
-variables on the left, is semantically an encoded instance: read the atoms
-and the genuine database edges off the relations. The junk facts the packaged
-type cannot represent are exactly those `DbEdge` ignores. -/
-private theorem queryHolds_iff_encoded {A : Type} [Language.queryDb.Structure A]
-    {n m : ℕ} (φ : A ≃ (Fin n ⊕ Fin (m + 1)))
-    (hvar : ∀ x : A, QVar x ↔ (φ x).isLeft = true) :
-    ∃ i : CQInstance, ConcreteCQHolds i ↔ QueryHolds A := by
-  classical
-  refine ⟨⟨n, m, Finset.univ.filter fun p => QAtom (φ.symm p.1) (φ.symm p.2),
-    Finset.univ.filter fun p => DbEdge (φ.symm (Sum.inr p.1)) (φ.symm (Sum.inr p.2))⟩,
-    (cqEncoding_faithful _).trans ((CQHom.equiv_iff φ (fun x => ?_) (fun x y => ?_)
-      (fun x y => ?_)).symm)⟩
+theorem realize_cqWFSentence {A : Type} [Language.queryDb.Structure A] :
+    A ⊨ cqWFSentence ↔ ∃ x : A, ¬QVar x := by
+  simp only [cqWFSentence, Sentence.Realize, Formula.realize_iExs, Formula.realize_not,
+    Formula.realize_rel₁, Term.realize_var, Sum.elim_inr, QVar]
+  exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨x, hx⟩ => ⟨fun _ => x, hx⟩⟩
+
+/-- Any structure whose universe is identified with `Fin nv ⊕ Fin (m + 1)`,
+variables on the left, is semantically the packaged instance reading its
+atoms and facts through the identification. The workhorse behind the
+decoder's soundness; junk facts are invisible to both sides. -/
+private theorem concreteCQHolds_iff_of_equiv {A : Type} [Language.queryDb.Structure A]
+    {nv m : ℕ} (φ : A ≃ (Fin nv ⊕ Fin (m + 1)))
+    (hvar : ∀ x : A, QVar x ↔ (φ x).isLeft = true)
+    (q : Finset ((Fin nv ⊕ Fin (m + 1)) × (Fin nv ⊕ Fin (m + 1))))
+    (hq : ∀ s t, (s, t) ∈ q ↔ QAtom (φ.symm s) (φ.symm t))
+    (D : Finset (Fin (m + 1) × Fin (m + 1)))
+    (hD : ∀ a b, (a, b) ∈ D ↔ DbFact (φ.symm (Sum.inr a)) (φ.symm (Sum.inr b))) :
+    ConcreteCQHolds ⟨nv, m, q, D⟩ ↔ QueryHolds A := by
+  refine (cqEncoding_faithful _).trans ((CQHom.equiv_iff φ (fun x => ?_) (fun x y => ?_)
+    (fun x y => ?_)).symm)
   · exact hvar x
-  · change QAtom x y ↔ decide ((φ x, φ y) ∈ _) = true
+  · change QAtom x y ↔ decide ((φ x, φ y) ∈ q) = true
+    rw [decide_eq_true_eq, hq]
     simp
   · constructor
     · rintro ⟨hf, hnx, hny⟩
@@ -671,76 +691,156 @@ private theorem queryHolds_iff_encoded {A : Type} [Language.queryDb.Structure A]
         exact absurd rfl hy'
       have hxx : φ.symm (Sum.inr a) = x := by rw [← hφx, Equiv.symm_apply_apply]
       have hyy : φ.symm (Sum.inr b) = y := by rw [← hφy, Equiv.symm_apply_apply]
-      -- the two `rcases` have already substituted `φ x` and `φ y` in the
-      -- goal, which is now `DbEdge (Sum.inr a) (Sum.inr b)` on the encoded
-      -- structure; its components reduce definitionally
       refine ⟨?_, fun h => Bool.noConfusion h, fun h => Bool.noConfusion h⟩
-      change decide ((a, b) ∈ _) = true
-      rw [decide_eq_true_eq]
-      refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
-      change DbEdge (φ.symm (Sum.inr a)) (φ.symm (Sum.inr b))
-      rw [hxx, hyy]
-      exact ⟨hf, hnx, hny⟩
-    · rintro ⟨hf, -, -⟩
-      have hf' : @DbFact (Fin n ⊕ Fin (m + 1))
-          (cqEncoding.str ⟨n, m, _, _⟩) (φ x) (φ y) := hf
+      change decide ((a, b) ∈ D) = true
+      rw [decide_eq_true_eq, hD, hxx, hyy]
+      exact hf
+    · rintro ⟨hf, hnx', hny'⟩
       rcases hφx : φ x with u | a
-      · rw [hφx] at hf'
-        exact Bool.noConfusion hf'
+      · rw [hφx] at hnx'
+        exact absurd rfl (fun h => hnx' h)
       rcases hφy : φ y with u | b
-      · rw [hφx, hφy] at hf'
-        exact Bool.noConfusion hf'
+      · rw [hφy] at hny'
+        exact absurd rfl (fun h => hny' h)
+      have hf' : @DbFact (Fin nv ⊕ Fin (m + 1)) (cqEncoding.str ⟨nv, m, q, D⟩)
+          (φ x) (φ y) := hf
       rw [hφx, hφy] at hf'
-      obtain ⟨-, hD⟩ := Finset.mem_filter.mp (of_decide_eq_true hf')
+      have hD' := (hD a b).mp (of_decide_eq_true hf')
       have hxx : φ.symm (Sum.inr a) = x := by rw [← hφx, Equiv.symm_apply_apply]
       have hyy : φ.symm (Sum.inr b) = y := by rw [← hφy, Equiv.symm_apply_apply]
-      rwa [hxx, hyy] at hD
+      rw [hxx, hyy] at hD'
+      exact ⟨hD', (not_congr (hvar x)).mpr hnx', (not_congr (hvar y)).mpr hny'⟩
 
-/-- **The packaged instances cover the abstract problem**: every finite
-`Language.queryDb`-structure is decided by `CQEval` exactly as some packaged
-instance is by the textbook semantics. Together with `cqEncoding_faithful`
-this is the checkable piece of reading the completeness theorem
-`cqEval_NP_complete` as a statement about concrete queries and databases. -/
-theorem cqEncoding_coversUpTo : cqEncoding.CoversUpTo ConcreteCQHolds CQEval := by
-  intro A _ _
-  classical
-  haveI : Fintype A := Fintype.ofFinite A
-  obtain ⟨eV⟩ : Nonempty ({x : A // QVar x} ≃ Fin (Fintype.card {x : A // QVar x})) :=
-    ⟨Fintype.equivFin _⟩
-  cases hm : Fintype.card {x : A // ¬QVar x} with
-  | zero =>
-    -- no constants: `A` is all query variables and the query holds iff it
-    -- has no atoms; the witness has one junk constant, no facts, and the
-    -- transported atoms
-    have hall : ∀ x : A, QVar x := fun x =>
-      not_not.mp fun hx => (Fintype.card_eq_zero_iff.mp hm).elim ⟨x, hx⟩
-    refine ⟨⟨Fintype.card {x : A // QVar x}, 0,
-      Finset.univ.filter fun p =>
-        ∃ a b, p = (Sum.inl a, Sum.inl b) ∧ QAtom (eV.symm a).1 (eV.symm b).1, ∅⟩, ?_⟩
-    change _ ↔ QueryHolds A
-    rw [queryHolds_iff_of_forall_qvar hall]
-    constructor
-    · rintro ⟨v, hv⟩ x y hxy
-      exact absurd
-        (hv (Sum.inl (eV ⟨x, hall x⟩), Sum.inl (eV ⟨y, hall y⟩))
-          (Finset.mem_filter.mpr ⟨Finset.mem_univ _,
-            eV ⟨x, hall x⟩, eV ⟨y, hall y⟩, rfl, by simpa using hxy⟩))
-        (Finset.notMem_empty _)
-    · intro h
-      refine ⟨fun _ => 0, ?_⟩
-      rintro p hp
-      obtain ⟨-, a, b, rfl, hab⟩ := Finset.mem_filter.mp hp
-      exact absurd hab (h _ _)
-  | succ m =>
-    -- at least one constant: identify the universe with
-    -- `Fin n ⊕ Fin (m + 1)` and apply the generic lemma
-    obtain ⟨eC⟩ : Nonempty ({x : A // ¬QVar x} ≃ Fin (m + 1)) :=
-      ⟨Fintype.equivFinOfCardEq hm⟩
-    refine queryHolds_iff_encoded
-      ((Equiv.sumCompl fun x : A => QVar x).symm.trans (eV.sumCongr eC)) fun x => ?_
-    by_cases hx : QVar x
-    · simp [Equiv.sumCompl_symm_apply_of_pos hx, hx]
-    · simp [Equiv.sumCompl_symm_apply_of_neg hx, hx]
+section Decoder
+
+variable (S : FinPresentation Language.queryDb)
+
+/-- The variable elements of a presented instance. -/
+def cqVars : Finset (Fin S.card) :=
+  Finset.univ.filter fun x => S.relBool qdbIsVar ![x]
+
+/-- The constant elements of a presented instance. -/
+def cqConsts : Finset (Fin S.card) :=
+  Finset.univ.filter fun x => ¬S.relBool qdbIsVar ![x]
+
+theorem mem_cqVars (x : Fin S.card) : x ∈ cqVars S ↔ QVar x := by
+  simp [cqVars, QVar]
+
+theorem mem_cqConsts (x : Fin S.card) : x ∈ cqConsts S ↔ ¬QVar x := by
+  simp [cqConsts, QVar]
+
+private theorem fin_cast_cast {n m : ℕ} (h : n = m) (v : Fin n) :
+    Fin.cast h.symm (Fin.cast h v) = v := by
+  ext
+  simp
+
+private theorem fin_cast_cast' {n m : ℕ} (h : n = m) (v : Fin m) :
+    Fin.cast h (Fin.cast h.symm v) = v := by
+  ext
+  simp
+
+/-- The renumbering of a presented instance: variables to the left,
+constants to the right, each in order. -/
+def cqCode {m : ℕ} (h : (cqConsts S).card = m + 1) :
+    Fin S.card ≃ (Fin (cqVars S).card ⊕ Fin (m + 1)) where
+  toFun x :=
+    if hx : x ∈ cqVars S then Sum.inl (((cqVars S).orderIsoOfFin rfl).symm ⟨x, hx⟩)
+    else Sum.inr (Fin.cast h (((cqConsts S).orderIsoOfFin rfl).symm
+      ⟨x, (mem_cqConsts S x).mpr fun hv => hx ((mem_cqVars S x).mpr hv)⟩))
+  invFun := Sum.elim (fun a => (((cqVars S).orderIsoOfFin rfl) a : Fin S.card))
+    fun b => (((cqConsts S).orderIsoOfFin rfl) (Fin.cast h.symm b) : Fin S.card)
+  left_inv x := by
+    dsimp only
+    by_cases hx : x ∈ cqVars S
+    · rw [dif_pos hx, Sum.elim_inl, OrderIso.apply_symm_apply]
+    · rw [dif_neg hx, Sum.elim_inr, fin_cast_cast, OrderIso.apply_symm_apply]
+  right_inv y := by
+    rcases y with a | b
+    · dsimp only [Sum.elim_inl]
+      rw [dif_pos (Finset.coe_mem _), Subtype.coe_eta, OrderIso.symm_apply_apply]
+    · dsimp only [Sum.elim_inr]
+      have hb : (((cqConsts S).orderIsoOfFin rfl) (Fin.cast h.symm b) : Fin S.card) ∉
+          cqVars S :=
+        fun hv => ((mem_cqConsts S _).mp (Finset.coe_mem _)) ((mem_cqVars S _).mp hv)
+      rw [dif_neg hb, Subtype.coe_eta, OrderIso.symm_apply_apply, fin_cast_cast']
+
+theorem cqCode_isLeft {m : ℕ} (h : (cqConsts S).card = m + 1) (x : Fin S.card) :
+    QVar x ↔ ((cqCode S h) x).isLeft = true := by
+  by_cases hx : x ∈ cqVars S
+  · simp only [cqCode, Equiv.coe_fn_mk]
+    rw [dif_pos hx]
+    simp [(mem_cqVars S x).mp hx]
+  · have hnq : ¬QVar x := fun hq => hx ((mem_cqVars S x).mpr hq)
+    simp only [cqCode, Equiv.coe_fn_mk]
+    rw [dif_neg hx]
+    simp [hnq]
+
+/-- The decoder: enumerate variables and constants, read the atoms and facts
+through the renumbering; `none` exactly when the instance has no constant. -/
+def cqDecode : Option CQInstance :=
+  match h : (cqConsts S).card with
+  | 0 => none
+  | m + 1 => some ⟨(cqVars S).card, m,
+      Finset.univ.filter fun p => S.relBool qdbAtom
+        ![(cqCode S h).symm p.1, (cqCode S h).symm p.2],
+      Finset.univ.filter fun p => S.relBool qdbFact
+        ![(cqCode S h).symm (Sum.inr p.1), (cqCode S h).symm (Sum.inr p.2)]⟩
+
+theorem cqDecode_sound (i : CQInstance) (hi : i ∈ cqDecode S) :
+    ConcreteCQHolds i ↔ CQEval (Fin S.card) := by
+  unfold cqDecode at hi
+  split at hi
+  · exact absurd hi (by simp)
+  · next m h =>
+    rw [Option.mem_def, Option.some.injEq] at hi
+    subst hi
+    refine concreteCQHolds_iff_of_equiv (cqCode S h) (fun x => cqCode_isLeft S h x)
+      _ (fun s t => ?_) _ (fun a b => ?_)
+    · simp [Finset.mem_filter, QAtom]
+    · simp [Finset.mem_filter, DbFact]
+
+theorem cqDecode_total (_hpos : 0 < S.card)
+    (hW : DecisionProblem.ofSentence cqWFSentence (Fin S.card)) : (cqDecode S).isSome := by
+  obtain ⟨x, hx⟩ := realize_cqWFSentence.mp hW
+  have hcard : 0 < (cqConsts S).card := Finset.card_pos.mpr ⟨x, (mem_cqConsts S x).mpr hx⟩
+  unfold cqDecode
+  split
+  · next h => omega
+  · next m h => rfl
+
+end Decoder
+
+/-- **The computable decoding of well-formed evaluation instances**. Together
+with `cqEncoding_faithful` it closes the loop between the concrete and the
+abstract problem: encoded instances are equidecided (step 6 above), and every
+well-formed presented structure decodes to an equidecided concrete instance
+(`Decoding.exists_conc_iff`). -/
+def cqDecoding : Decoding Language.queryDb (DecisionProblem.ofSentence cqWFSentence)
+    ConcreteCQHolds CQEval where
+  dec := cqDecode
+  sound := cqDecode_sound
+  total := cqDecode_total
+
+/-- A presented three-element structure: element `0` a variable, elements
+`1`, `2` constants, one atom `E(0, 1)`, one fact `E(1, 2)`. -/
+def cqPres : FinPresentation Language.queryDb where
+  card := 3
+  relBool := fun {n} R =>
+    match n, R with
+    | _, .isVar => fun x => x 0 == 0
+    | _, .atom => fun x => x 0 == 0 && x 1 == 1
+    | _, .fact => fun x => x 0 == 1 && x 1 == 2
+
+section
+set_option linter.hashCommand false
+
+#guard (cqDecode cqPres).isSome
+#guard ((cqDecode cqPres).map fun i => i.1) = some 1
+#guard ((cqDecode cqPres).map fun i => i.2.1) = some 1
+#guard ((cqDecode cqPres).map fun i => i.2.2.1.card) = some 1
+#guard ((cqDecode cqPres).map fun i => i.2.2.2.card) = some 1
+
+end
 
 /-!
 ### Step 7: membership in NP
@@ -1113,6 +1213,26 @@ theorem cqEval_NP_hard : NP.Hard CQEval :=
 -/
 theorem cqEval_NP_complete : NP.Complete CQEval :=
   ⟨cqEval_mem_NP, cqEval_NP_hard⟩
+
+/-- The image of the hardness reduction is well-formed: interpreted instances
+always carry a constant (any database-side copy). -/
+theorem threeColToCQEval_wf (V : Type) [Language.graph.Structure V] [Nonempty V] :
+    DecisionProblem.ofSentence cqWFSentence (threeColToCQEval.Map V) := by
+  obtain ⟨v⟩ := ‹Nonempty V›
+  refine realize_cqWFSentence.mpr ⟨(ColEvalTag.color 0, fun _ => v), ?_⟩
+  simp
+
+/-- **Well-formed BCQ evaluation is NP-complete**: evaluation restricted to
+the well-formed instances of step 6. Both halves are one-line upgrades of the
+plain completeness proof – the same reduction with its image lemma
+(`FOReduction.withInvariant`), the same kernel with the sentence conjoined
+(`SigmaSODefinable.inf_ofSentence`) – the pattern for reading hardness on
+non-junk instances (`DescriptiveComplexity/Decoding.lean`). -/
+theorem cqEvalWF_NP_complete :
+    NP.Complete (DecisionProblem.ofSentence cqWFSentence ⊓ CQEval) :=
+  ⟨cqEval_sigmaSODefinable.inf_ofSentence cqWFSentence,
+    NP.hard_of_foReduction (threeCol_fo_reduction_cqEval.withInvariant _
+      fun V _ _ => threeColToCQEval_wf V) threeCol_NP_hard⟩
 
 end DescriptiveComplexity
 

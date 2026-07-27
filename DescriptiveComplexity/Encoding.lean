@@ -79,16 +79,15 @@ two obligations is machine-checked and which still requires reading `relBool`.
 ## The decoding direction
 
 Membership results transfer to the concrete problem along a faithful encoding;
-*hardness* results need the converse – every abstract instance is (equivalent
-to) an encoded one, else the concrete problem could be the easy fragment of a
-hard abstract one. `DescriptiveComplexity.Encoding.Covers` is the ideal,
-isomorphism-based statement; `DescriptiveComplexity.Encoding.CoversUpTo` is the
-weaker, semantic variant that suffices for the hardness reading and that
-remains provable when junk conventions make some abstract structures literally
-unrepresentable (their junk being invisible to the semantics). Neither feeds a
-*formal* hardness transfer – the library has no complexity classes over
-concrete instance types – but each is the checkable piece of the transfer the
-reader performs.
+*hardness* results need a converse – the abstract problem must not be hard
+only on junk structures the encoding never produces. The machinery for that
+converse lives in `DescriptiveComplexity/Decoding.lean`: well-formedness as a
+decision problem (restricting hardness to `W ⊓ P`) and computable decodings
+(`DescriptiveComplexity.Decoding`), with the same hygiene as the encoders
+here. `DescriptiveComplexity.Encoding.Covers` below is the ideal,
+isomorphism-based decoding statement; junk conventions usually make it
+unprovable for honest encodings, which is exactly what the well-formedness
+route is for.
 
 ## Main declarations
 
@@ -98,8 +97,9 @@ reader performs.
   universe;
 * `DescriptiveComplexity.Encoding.Faithful`: obligation 1, semantic
   equivalence with a concrete predicate;
-* `DescriptiveComplexity.Encoding.Covers`, `DescriptiveComplexity.Encoding.CoversUpTo`:
-  the decoding direction;
+* `DescriptiveComplexity.Encoding.Covers`: the ideal, isomorphism-based
+  decoding statement (see `DescriptiveComplexity/Decoding.lean` for the
+  practical route);
 * `DescriptiveComplexity.Encoding.linear_bound`: discharge a bound field from a
   linear estimate, the common case.
 
@@ -206,34 +206,11 @@ theorem faithful_congr {e : Encoding L ι} {Conc : ι → Prop} {P Q : DecisionP
 /-- The encoding reaches every finite structure up to isomorphism: the ideal
 decoding direction. Junk conventions can make this literally unprovable for an
 honest encoding (some abstract structures carry facts the concrete type cannot
-represent); `CoversUpTo` is the semantic fallback. -/
+represent); the practical route is a computable decoding of the *well-formed*
+structures – `DescriptiveComplexity.Decoding`, in
+`DescriptiveComplexity/Decoding.lean`. -/
 def Covers (e : Encoding L ι) : Prop :=
   ∀ (A : Type) [L.Structure A] [Finite A], ∃ i, Nonempty (A ≃[L] e.Univ i)
-
-/-- The encoding reaches every finite structure up to the *semantics* of `P`:
-each abstract instance is decided by `P` exactly as some concrete instance is
-by `Conc`. This is what the hardness reading actually needs, and it survives
-junk conventions (unrepresentable facts being invisible to the semantics).
-
-Two honesty caveats. It does not feed a formal hardness transfer – the
-library has no complexity classes over concrete instance types. And as a
-*statement* it is classically near-vacuous: whenever `Conc` has one
-yes-instance and one no-instance, casing on `P A` discharges it without any
-decoding. Its value is therefore the explicit transcription an honest proof
-constructs (as the conjunctive-query tutorial's does); a proof by classical
-casing certifies nothing, and where no honest transcription exists (see the
-graph-crawling tutorial) the right move is to say so. -/
-def CoversUpTo (_e : Encoding L ι) (Conc : ι → Prop) (P : DecisionProblem L) : Prop :=
-  ∀ (A : Type) [L.Structure A] [Finite A], ∃ i, Conc i ↔ P A
-
-/-- A faithful encoding that covers all finite structures up to isomorphism
-covers them up to semantics: isomorphism-invariance of the problem closes the
-square. -/
-theorem Faithful.coversUpTo {e : Encoding L ι} {Conc : ι → Prop} {P : DecisionProblem L}
-    (hf : e.Faithful Conc P) (hc : e.Covers) : e.CoversUpTo Conc P := by
-  intro A _ _
-  obtain ⟨i, ⟨u⟩⟩ := hc A
-  exact ⟨i, (hf i).trans (P.iso_invariant u).symm⟩
 
 end Encoding
 
