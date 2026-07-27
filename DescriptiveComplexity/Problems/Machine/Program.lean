@@ -67,6 +67,42 @@ theorem succPos_right_unique (hlin : IsLinOrd M.Le) {p q q' : A}
     · exact absurd hcon.symm h'.2.2.2.1
     · exact hcon.symm
 
+omit [Finite A] in
+/-- **A deterministic machine takes at most one step** from any configuration:
+the transition is pinned by the state and the symbol read, its effect by the
+functionality of `Dst` and `Write`, and the new head by uniqueness of the
+neighbour in the direction the transition names. -/
+theorem step_functional (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
+    {c c₁ c₂ : Config A} (h₁ : M.Step c c₁) (h₂ : M.Step c c₂) : c₁ = c₂ := by
+  obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := h₁
+  obtain ⟨σ, hσ, hsrc', hread', hdst', hwrite', hframe', hmove'⟩ := h₂
+  obtain ⟨-, huniq, hdstf, hwritef⟩ := hdet
+  obtain rfl := huniq τ σ c.state (c.tape c.head) hτ hσ hsrc hsrc' hread hread'
+  refine Config.ext (hdstf τ _ _ hdst hdst') ?_ (funext fun p => ?_)
+  · rcases hmove with ⟨hr, hs⟩ | ⟨hr, hs⟩ <;> rcases hmove' with ⟨hr', hs'⟩ | ⟨hr', hs'⟩
+    · exact succPos_right_unique hlin hs hs'
+    · exact absurd hr hr'
+    · exact absurd hr' hr
+    · exact succPos_left_unique hlin hs hs'
+  · rcases eq_or_ne p c.head with rfl | hne
+    · exact hwritef τ _ _ hwrite hwrite'
+    · rw [hframe p hne, hframe' p hne]
+
+omit [Finite A] in
+/-- **Deterministic runs of equal length agree**: the run is unique, which is
+what lets a least fixed point compute it. -/
+theorem stepsIn_functional (hlin : IsLinOrd M.Le) (hdet : M.Deterministic) :
+    ∀ {n : ℕ} {c d d' : Config A}, M.StepsIn n c d → M.StepsIn n c d' → d = d' := by
+  intro n
+  induction n with
+  | zero =>
+    intro c d d' h h'
+    exact (show c = d from h).symm.trans h'
+  | succ n ih =>
+    rintro c d d' ⟨e, he, hrest⟩ ⟨e', he', hrest'⟩
+    obtain rfl := step_functional hlin hdet he he'
+    exact ih hrest hrest'
+
 /-- Every position that is not the highest has one immediately above it – the
 mirror of `DescriptiveComplexity.exists_predPos`, read in the reversed order. -/
 theorem exists_succPos' (hlin : IsLinOrd M.Le) {p : A} (hp : M.Posn p)

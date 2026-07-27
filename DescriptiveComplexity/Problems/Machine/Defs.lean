@@ -233,6 +233,18 @@ def NTMAccept : DecisionProblem Language.turing where
     have h := agree_of_equiv e
     exact (and_congr h.wellFormed h.accepts).symm
 
+/-- **Deterministic machine acceptance.** The same question with the extra
+promise `DescriptiveComplexity.TMData.Deterministic` folded into the yes-instances,
+exactly as the Horn condition is folded into `DescriptiveComplexity.HORNSAT`: the
+table is functional, so the run is unique – the shape a least fixed point can
+compute, which is what puts this problem in PTIME. -/
+def DTMAccept : DecisionProblem Language.turing where
+  Holds := fun A inst => @TMData.WellFormed A (tmData A) ∧
+    @TMData.Deterministic A (tmData A) ∧ @TMData.Accepts A (tmData A)
+  iso_invariant := fun {A B} _ _ e => by
+    have h := agree_of_equiv e
+    exact (and_congr h.wellFormed (and_congr h.deterministic h.accepts)).symm
+
 end Problem
 
 end DescriptiveComplexity

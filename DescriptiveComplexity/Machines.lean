@@ -147,6 +147,30 @@ theorem StepsIn.trans_step : ∀ {n : ℕ} {c d e : Config A},
     rintro c d e ⟨m, hstep, hrest⟩ hde
     exact ⟨m, hstep, ih hrest hde⟩
 
+/-- **A run decomposed at its far end**: `n + 1` steps are `n` steps and then
+one. `DescriptiveComplexity.TMData.StepsIn` recurses at the near end; inductions along
+the *time order* – the fixed-point description of a deterministic run – need
+this reading. -/
+theorem stepsIn_succ_iff : ∀ {n : ℕ} {c e : Config A},
+    M.StepsIn (n + 1) c e ↔ ∃ d, M.StepsIn n c d ∧ M.Step d e := by
+  intro n
+  induction n with
+  | zero =>
+    intro c e
+    constructor
+    · rintro ⟨d, hstep, hde⟩
+      exact ⟨c, rfl, (show d = e from hde) ▸ hstep⟩
+    · rintro ⟨d, hcd, hstep⟩
+      exact ⟨e, (show c = d from hcd) ▸ hstep, rfl⟩
+  | succ n ih =>
+    intro c e
+    constructor
+    · rintro ⟨d, hstep, hrest⟩
+      obtain ⟨d', h1, h2⟩ := ih.mp hrest
+      exact ⟨d', ⟨d, hstep, h1⟩, h2⟩
+    · rintro ⟨d', ⟨d, hstep, h1⟩, h2⟩
+      exact ⟨d, hstep, ih.mpr ⟨d', h1, h2⟩⟩
+
 /-- **Runs compose.** Phases of a constructed machine are proved one at a time
 and chained with this; the step counts add, which is the form the budget
 obligation of a reduction takes. -/
@@ -173,6 +197,63 @@ def WellFormed : Prop :=
   IsLinOrd M.Le ∧ (∃ p, M.Posn p) ∧
     (∀ p a b, M.Inp p a → M.Inp p b → a = b) ∧
     (∃ b, M.Blank b) ∧ (∀ a b, M.Blank a → M.Blank b → a = b)
+
+/-- **Determinism**, folded into the yes-instances of
+`DescriptiveComplexity.DTMAccept`: one start state, at most one transition applicable
+in a given state on a given symbol, and at most one destination and written
+symbol per transition. Together with well-formedness this leaves at most one
+step from any configuration (`DescriptiveComplexity.TMData.step_functional`) and at
+most one initial configuration (`DescriptiveComplexity.TMData.isInit_unique`), so the
+run is unique – the shape a least fixed point can compute. Every conjunct is
+first-order. -/
+def Deterministic : Prop :=
+  (∀ q q', M.Start q → M.Start q' → q = q') ∧
+    (∀ τ τ' q a, M.Tr τ → M.Tr τ' → M.Src τ q → M.Src τ' q → M.Read τ a → M.Read τ' a →
+      τ = τ') ∧
+    (∀ τ q q', M.Dst τ q → M.Dst τ q' → q = q') ∧
+    ∀ τ a a', M.Write τ a → M.Write τ a' → a = a'
+
+section Unique
+
+variable {M}
+
+/-- **A well-formed initial tape is functional**: a cell holds either its
+unique input symbol or the unique blank, and the two cases exclude each
+other. -/
+theorem initTape_functional (hwf : M.WellFormed) {p a b : A}
+    (ha : M.InitTape p a) (hb : M.InitTape p b) : a = b := by
+  rcases ha with ha | ⟨hna, ha⟩ <;> rcases hb with hb | ⟨hnb, hb⟩
+  · exact hwf.2.2.1 p _ _ ha hb
+  · exact absurd ha (hnb _)
+  · exact absurd hb (hna _)
+  · exact hwf.2.2.2.2 _ _ ha hb
+
+/-- **A machine with one start state has at most one initial configuration**:
+the start state and the lowest position are pinned, and well-formedness makes
+the initial tape functional. -/
+theorem isInit_unique (hwf : M.WellFormed)
+    (hstart : ∀ q q', M.Start q → M.Start q' → q = q')
+    {c c' : Config A} (h : M.IsInit c) (h' : M.IsInit c') : c = c' := by
+  refine Config.ext (hstart _ _ h.1 h'.1) ?_ (funext fun p => ?_)
+  · exact hwf.1.2.2.1 _ _ (h.2.1.2 c'.head h'.2.1.1) (h'.2.1.2 c.head h.2.1.1)
+  · exact initTape_functional hwf (h.2.2 p) (h'.2.2 p)
+
+/-- **A well-formed machine with a start state has an initial configuration**:
+put the head on the lowest position and read the tape off the input, filling
+the unwritten cells with the blank. -/
+theorem exists_isInit [Finite A] (hwf : M.WellFormed) {q₀ : A} (hq : M.Start q₀) :
+    ∃ c₀ : Config A, M.IsInit c₀ ∧ c₀.state = q₀ := by
+  classical
+  obtain ⟨p₀, hp₀⟩ := exists_minPos hwf.1 hwf.2.1
+  obtain ⟨b₀, hb₀⟩ := hwf.2.2.2.1
+  refine ⟨⟨q₀, p₀, fun p => if h : ∃ a, M.Inp p a then h.choose else b₀⟩, ⟨hq, hp₀, fun p => ?_⟩,
+    rfl⟩
+  by_cases h : ∃ a, M.Inp p a
+  · exact Or.inl (by simpa only [dif_pos h] using h.choose_spec)
+  · refine Or.inr ⟨fun b hb => h ⟨b, hb⟩, ?_⟩
+    simpa only [dif_neg h] using hb₀
+
+end Unique
 
 /-! ### Transport along an equivalence of universes -/
 
@@ -343,6 +424,49 @@ theorem Agree.accepts (h : Agree u N M) : N.Accepts ↔ M.Accepts := by
     obtain ⟨d, rfl⟩ := Config.map_surjective u c
     exact ⟨d₀, d, n, h.isInit.mpr hinit, hcard ▸ hle,
       (h.stepsIn n d₀ d).mpr hrun, (h.acc _).mpr hacc⟩
+
+/-- **Determinism transports along an equivalence.** -/
+theorem Agree.deterministic (h : Agree u N M) : N.Deterministic ↔ M.Deterministic := by
+  have hstart : (∀ q q', N.Start q → N.Start q' → q = q') ↔
+      ∀ q q', M.Start q → M.Start q' → q = q' :=
+    ⟨fun hf q q' hq hq' => by
+      simpa using congrArg u (hf (u.symm q) (u.symm q')
+        ((h.start _).mpr (by rwa [Equiv.apply_symm_apply]))
+        ((h.start _).mpr (by rwa [Equiv.apply_symm_apply]))),
+      fun hf q q' hq hq' =>
+        u.injective (hf (u q) (u q') ((h.start q).mp hq) ((h.start q').mp hq'))⟩
+  have huniq : (∀ τ τ' q a, N.Tr τ → N.Tr τ' → N.Src τ q → N.Src τ' q →
+        N.Read τ a → N.Read τ' a → τ = τ') ↔
+      ∀ τ τ' q a, M.Tr τ → M.Tr τ' → M.Src τ q → M.Src τ' q →
+        M.Read τ a → M.Read τ' a → τ = τ' :=
+    ⟨fun hf τ τ' q a h1 h2 h3 h4 h5 h6 => by
+      simpa using congrArg u (hf (u.symm τ) (u.symm τ') (u.symm q) (u.symm a)
+        ((h.tr _).mpr (by rwa [Equiv.apply_symm_apply]))
+        ((h.tr _).mpr (by rwa [Equiv.apply_symm_apply]))
+        ((h.src _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))
+        ((h.src _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))
+        ((h.read _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))
+        ((h.read _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))),
+      fun hf τ τ' q a h1 h2 h3 h4 h5 h6 =>
+        u.injective (hf (u τ) (u τ') (u q) (u a) ((h.tr _).mp h1) ((h.tr _).mp h2)
+          ((h.src _ _).mp h3) ((h.src _ _).mp h4) ((h.read _ _).mp h5) ((h.read _ _).mp h6))⟩
+  have hdst : (∀ τ q q', N.Dst τ q → N.Dst τ q' → q = q') ↔
+      ∀ τ q q', M.Dst τ q → M.Dst τ q' → q = q' :=
+    ⟨fun hf τ q q' h1 h2 => by
+      simpa using congrArg u (hf (u.symm τ) (u.symm q) (u.symm q')
+        ((h.dst _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))
+        ((h.dst _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))),
+      fun hf τ q q' h1 h2 =>
+        u.injective (hf (u τ) (u q) (u q') ((h.dst _ _).mp h1) ((h.dst _ _).mp h2))⟩
+  have hwrite : (∀ τ a a', N.Write τ a → N.Write τ a' → a = a') ↔
+      ∀ τ a a', M.Write τ a → M.Write τ a' → a = a' :=
+    ⟨fun hf τ a a' h1 h2 => by
+      simpa using congrArg u (hf (u.symm τ) (u.symm a) (u.symm a')
+        ((h.write _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))
+        ((h.write _ _).mpr (by rwa [Equiv.apply_symm_apply, Equiv.apply_symm_apply]))),
+      fun hf τ a a' h1 h2 =>
+        u.injective (hf (u τ) (u a) (u a') ((h.write _ _).mp h1) ((h.write _ _).mp h2))⟩
+  exact and_congr hstart (and_congr huniq (and_congr hdst hwrite))
 
 /-- **Well-formedness transports along an equivalence.** -/
 theorem Agree.wellFormed (h : Agree u N M) : N.WellFormed ↔ M.WellFormed := by
