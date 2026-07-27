@@ -464,17 +464,68 @@ The concrete items:
 
 ## Suggested ordering (value vs. prerequisite chains)
 
-1. EF games + EVEN/REACH inexpressibility (opens §5).
-2. FO(TC)/REACH, then Immerman–Szelepcsényi as the flagship theorem.
-3. SO(TC) and QSAT for PSPACE; then FO(LFP)/FO(PFP) as the
-   textbook-faithfulness layer and the rest of §4.
-4. Remaining catalog growth (X3C, 3-Partition, Bin Packing) and the
-   other-class discharges (SO-Krom/2SAT, REACH, REACHd) as they become useful
-   worked instances of the fragments above.
+Ordered for headline theorems not yet formalized anywhere, maximal reuse of
+machinery that already exists, and low risk of an item turning out to be
+blocked.
 
-The counting track of §6 is an independent chain: parsimonious reductions, the
-ΣQSO evaluator and the #SAT discharge depend on nothing above (only on the
-existing ∃SO layer and the QBF `exists_gates` lemma), so it can be interleaved
-anywhere. Its own internal order is parsimonious reductions → evaluator →
-`#P := ΣQSO(FO)` → #SAT → the free catalog entries, with the quantitative
-fixed point and MaxSNP deferred.
+**The serial line:**
+
+1. **A sharpening pass on what is already public** (each [M], no
+   prerequisites, no new surface): the **PH machine bridge** (§7), closing the
+   visible asymmetry of a bridge that exists for NP and PTIME but not for the
+   hierarchy they sit in; **invariant exposure through the reduction
+   interface** (§3's reduction-notion refinements and §2's 3-DNF-TAUT are the
+   same mechanism, so do them together: tracking shape invariants through
+   composition upgrades catalog statements to the DC-faithful "complete under
+   qfps" and yields 3-DNF-TAUT as a by-product); **Spectra** (§4) and **CVP
+   from HORN-SAT** (§2), two near-free recognizable names, the latter also the
+   discharge Immerman–Vardi wants.
+2. **The NL layer, cheapest piece first**: **SO-Krom** before FO(TC). It is the
+   best effort/value ratio in this document, a clause-list clone of the
+   finished SO-Horn whose discharge is the HORN-SAT construction with signs
+   read off the clause, so NL enters the hierarchy with a completeness theorem
+   before any new infrastructure exists, and **2SAT** and **REACH** arrive as
+   worked instances rather than separate projects. Then **FO(TC)** (which
+   Immerman–Szelepcsényi is stated about, and which inductive counting wants
+   rather than the Krom fragment) and **FO(DTC)**/**REACHd**.
+3. **Immerman–Szelepcsényi** (§4), the flagship: spectacular, self-contained,
+   unconditional.
+4. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the
+   textbook-faithfulness layer and Immerman–Vardi.
+
+**Running alongside, from the start:**
+
+- **The counting track of §6**, as far as #SAT plus the free catalog entries.
+  Promoted above PSPACE deliberately: PSPACE repeats a shape the library
+  already executes (define a fragment, discharge to its syntactic image),
+  whereas counting descriptive complexity has no formalization anywhere and
+  ΣQSO's two-layer syntax fits the kernel-as-data idiom unusually well. It
+  depends on nothing unbuilt, so it cannot be blocked by the chain above; a
+  cheap headline (#SAT complete for ΣQSO(FO)) sits one `exists_gates`
+  strengthening in; and it is the meeting point with provenance-lean. Internal
+  order: parsimonious reductions → evaluator → `#P := ΣQSO(FO)` → #SAT → the
+  free entries; stop there (structure inside #P, the quantitative fixed point
+  and MaxSNP are genuine research).
+- **EF games + EVEN/connectivity inexpressibility** (§5), as a parallel and
+  delegable line rather than the serial next step: it unblocks nothing else,
+  its own headline `FO ⊊ FO(TC)` waits on step 2 anyway, and it is the most
+  Mathlib-facing item here, hence where an estimate is likeliest to slip. Also
+  the best student project in the document.
+
+**Deferred, and deliberately so:**
+
+- Catalog growth (§1) as opportunistic filler now that Karp's 21 is done. Check
+  FO-expressibility of the 3DM → 3-Partition arithmetic *before* committing: it
+  is the one item with a real chance of being unbuildable.
+- Relativized membership closure and FO(LFP) ⊆ NP directly: correctly parked,
+  neither buys a new statement.
+- The BIT / FO(≤, BIT) / AC⁰ / PARITY chain: a multi-year project with three
+  [R] items and a switching lemma at the end, to be decided as a whole rather
+  than drifted into via representation (D). Until then the by-inspection AC⁰
+  claim in the README stays an honest, documented gap.
+- Abiteboul–Vianu and the exponential classes.
+
+This weighting assumes the goal is research output and formalization firsts. If
+the near-term goal is the course companion of §8, the cookbook and catalog
+growth move up and PSPACE slides down: students meet NL, P-completeness and
+reductions long before they meet SO(TC).
