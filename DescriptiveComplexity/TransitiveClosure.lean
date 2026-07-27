@@ -39,12 +39,13 @@ against a machine.
 ## What this is for
 
 `DescriptiveComplexity.NL` is already defined, by the Krom fragment
-(`DescriptiveComplexity.LogSpace`), and FO(TC) is deliberately *not* set up as a
-second complexity class: closure under first-order reductions is awkward for
-it, since a reduction's tags vary along a walk while the walk's state is a
-tuple of elements (a relation-valued state, as in SO(TC), would not have this
-problem). FO(TC) is here as the logic in which two things are naturally
-stated:
+(`DescriptiveComplexity.LogSpace`), so FO(TC) is not set up as a second complexity
+class; the modes are what would make that possible, should it become useful. A
+walk whose state were only a tuple of elements could not be pulled back through
+an interpretation, whose tags vary from node to node, and could not carry the
+finite data a translation needs (the atom index and sign of a literal, say);
+carrying it in coordinates would fail on a one-element universe. FO(TC) is here
+as the logic in which two things are naturally stated:
 
 * the translation to the Krom fragment, which goes through the *complement* –
   a clausal fragment states closure and rejection, so it defines
@@ -55,9 +56,9 @@ stated:
   so lives naturally inside a single `TC`. That theorem is what would turn the
   above translation into an equivalence, and give `REACH ∈ NL`.
 
-The canonical example is here: `DescriptiveComplexity.reach_tcDefinable` – REACH *is* a
-`TC`, at arity one, over the edge relation between the marked sources and the
-marked targets.
+The canonical example is `DescriptiveComplexity.reach_tcDefinable` – REACH *is* a `TC`,
+at arity one and with a single mode, over the edge relation between the marked
+sources and the marked targets.
 -/
 
 namespace DescriptiveComplexity
@@ -76,15 +77,25 @@ first-order over the ordered expansion of the vocabulary, so that they may
 mention the linear order, as the ordered setting of the capture theorem
 allows. -/
 structure TCSpec (L : Language.{0, 0}) where
+  /-- The *modes*: a finite amount of state the walk carries besides its tuple
+  of elements. Tuples of elements cannot hold finite data of their own – a
+  one-element universe has only one tuple – so, exactly as tags replace the
+  order-encoded sorts of a textbook interpretation in
+  `DescriptiveComplexity.FOInterpretation`, a mode carries what the tuple cannot. -/
+  Mode : Type
+  /-- Modes are finite. -/
+  [modeFinite : Finite Mode]
   /-- The arity: the walk runs on `k`-tuples of elements. -/
   k : ℕ
-  /-- The transition formula, with two `k`-tuples of free variables: the
-  current tuple on the left, the next one on the right. -/
-  step : (L.sum Language.order).Formula (Fin k ⊕ Fin k)
-  /-- The formula defining the admissible starting tuples. -/
-  src : (L.sum Language.order).Formula (Fin k)
-  /-- The formula defining the accepting tuples. -/
-  tgt : (L.sum Language.order).Formula (Fin k)
+  /-- The transition formula, one per pair of modes, with two `k`-tuples of
+  free variables: the current tuple on the left, the next one on the right. -/
+  step : Mode → Mode → (L.sum Language.order).Formula (Fin k ⊕ Fin k)
+  /-- The formula defining the admissible starting tuples, per mode. -/
+  src : Mode → (L.sum Language.order).Formula (Fin k)
+  /-- The formula defining the accepting tuples, per mode. -/
+  tgt : Mode → (L.sum Language.order).Formula (Fin k)
+
+attribute [instance] TCSpec.modeFinite
 
 namespace TCSpec
 
@@ -92,21 +103,33 @@ section Semantics
 
 variable (spec : TCSpec L) {A : Type} [L.Structure A] [LinearOrder A]
 
-/-- One step of the walk: the transition formula, read with the current tuple
-on the left and the next one on the right. -/
-def Step (a b : Fin spec.k → A) : Prop :=
-  spec.step.Realize (Sum.elim a b)
+variable (A) in
+/-- A node of the walk: a mode together with a `k`-tuple of elements. -/
+abbrev Node : Type := spec.Mode × (Fin spec.k → A)
+
+/-- One step of the walk: the transition formula of the two modes, read with
+the current tuple on the left and the next one on the right. -/
+def Step (a b : spec.Node A) : Prop :=
+  (spec.step a.1 b.1).Realize (Sum.elim a.2 b.2)
 
 /-- Reachability in the walk: the reflexive-transitive closure of
 `DescriptiveComplexity.TCSpec.Step`. -/
-abbrev Reach : (Fin spec.k → A) → (Fin spec.k → A) → Prop :=
+abbrev Reach : spec.Node A → spec.Node A → Prop :=
   Relation.ReflTransGen spec.Step
 
+/-- A node is a starting node when its tuple satisfies the source formula of
+its mode. -/
+def IsSrc (a : spec.Node A) : Prop := (spec.src a.1).Realize a.2
+
+/-- A node is accepting when its tuple satisfies the target formula of its
+mode. -/
+def IsTgt (a : spec.Node A) : Prop := (spec.tgt a.1).Realize a.2
+
 variable (A) in
-/-- The structure is accepted: some accepting tuple is reachable from some
-starting tuple. -/
+/-- The structure is accepted: some accepting node is reachable from some
+starting node. -/
 def Accepts : Prop :=
-  ∃ u v : Fin spec.k → A, spec.src.Realize u ∧ spec.tgt.Realize v ∧ spec.Reach u v
+  ∃ u v : spec.Node A, spec.IsSrc u ∧ spec.IsTgt v ∧ spec.Reach u v
 
 end Semantics
 
@@ -117,16 +140,21 @@ section Iso
 variable (spec : TCSpec L) {A B : Type} [L.Structure A] [LinearOrder A]
 variable [L.Structure B] [LinearOrder B]
 
+/-- The image of a node under an isomorphism: same mode, transported tuple. -/
+def mapNode (e : A ≃[L.sum Language.order] B) (a : spec.Node A) : spec.Node B :=
+  (a.1, fun i => e (a.2 i))
+
 /-- One step is preserved by an isomorphism of the ordered expansions. -/
-theorem step_equiv (e : A ≃[L.sum Language.order] B) (a b : Fin spec.k → A) :
-    spec.Step (fun i => e (a i)) (fun i => e (b i)) ↔ spec.Step a b := by
-  rw [Step, Step, ← StrongHomClass.realize_formula (φ := spec.step) e]
-  refine iff_of_eq (congrArg spec.step.Realize (funext fun i => ?_))
+theorem step_equiv (e : A ≃[L.sum Language.order] B) (a b : spec.Node A) :
+    spec.Step (spec.mapNode e a) (spec.mapNode e b) ↔ spec.Step a b := by
+  rw [Step, Step, mapNode, mapNode, ← StrongHomClass.realize_formula
+    (φ := spec.step a.1 b.1) e]
+  refine iff_of_eq (congrArg (spec.step a.1 b.1).Realize (funext fun i => ?_))
   cases i <;> rfl
 
 /-- Reachability is preserved by an isomorphism of the ordered expansions. -/
-theorem reach_equiv (e : A ≃[L.sum Language.order] B) {a b : Fin spec.k → A}
-    (h : spec.Reach a b) : spec.Reach (fun i => e (a i)) (fun i => e (b i)) := by
+theorem reach_equiv (e : A ≃[L.sum Language.order] B) {a b : spec.Node A}
+    (h : spec.Reach a b) : spec.Reach (spec.mapNode e a) (spec.mapNode e b) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
   | @tail c d _ hcd ih => exact ih.tail ((spec.step_equiv e c d).mpr hcd)
@@ -134,10 +162,12 @@ theorem reach_equiv (e : A ≃[L.sum Language.order] B) {a b : Fin spec.k → A}
 private theorem accepts_of_equiv (e : A ≃[L.sum Language.order] B) (h : spec.Accepts A) :
     spec.Accepts B := by
   obtain ⟨u, v, hu, hv, huv⟩ := h
-  refine ⟨fun i => e (u i), fun i => e (v i), ?_, ?_, spec.reach_equiv e huv⟩
-  · rw [← StrongHomClass.realize_formula (φ := spec.src) e] at hu
+  refine ⟨spec.mapNode e u, spec.mapNode e v, ?_, ?_, spec.reach_equiv e huv⟩
+  · change (spec.src u.1).Realize (⇑e ∘ u.2)
+    rw [StrongHomClass.realize_formula (φ := spec.src u.1) e]
     exact hu
-  · rw [← StrongHomClass.realize_formula (φ := spec.tgt) e] at hv
+  · change (spec.tgt v.1).Realize (⇑e ∘ v.2)
+    rw [StrongHomClass.realize_formula (φ := spec.tgt v.1) e]
     exact hv
 
 /-- **Acceptance is isomorphism-invariant** (for isomorphisms of the ordered

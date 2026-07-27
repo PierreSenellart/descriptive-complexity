@@ -22,8 +22,11 @@ import DescriptiveComplexity.ClauseDischarge
 import DescriptiveComplexity.SecondOrderKrom
 import DescriptiveComplexity.SecondOrderKromPull
 import DescriptiveComplexity.LogSpace
+import DescriptiveComplexity.TwoCnf
 import DescriptiveComplexity.TransitiveClosure
 import DescriptiveComplexity.TransitiveClosureKrom
+import DescriptiveComplexity.KromImplication
+import DescriptiveComplexity.KromTransitiveClosure
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -202,19 +205,42 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.TransitiveClosure` – FO(TC) ([Immerman
   1987][immerman1987languages]), the logic that captures NL on ordered
   structures, in the same kernel-as-data style: a `DescriptiveComplexity.TCSpec` is an
-  arity, a first-order transition formula on `k`-tuples and two endpoint
-  formulas, with `Relation.ReflTransGen` supplying the closure. It is
-  deliberately *not* a second complexity class (a walk's state is a tuple of
-  elements, so a reduction's tags would have to vary along it); it is the logic
-  in which REACH is stated head-on (`DescriptiveComplexity.reach_tcDefinable`) and in
-  which Immerman–Szelepcsényi would be proved – the missing bridge that would
-  give `REACH ∈ NL`, the clausal fragments defining only the complement.
+  arity, a finite *mode* component, a first-order transition formula on
+  `k`-tuples per pair of modes and two endpoint formulas, with
+  `Relation.ReflTransGen` supplying the closure. Modes are what tuples of
+  elements cannot supply – a one-element universe has one tuple – and play the
+  role tags play in an interpretation. It is the logic in which REACH is stated
+  head-on (`DescriptiveComplexity.reach_tcDefinable`) and in which
+  Immerman–Szelepcsényi would be proved: the missing bridge that would give
+  `REACH ∈ NL`, the clausal fragments defining only the complement.
+* `DescriptiveComplexity.TwoCnf` – the criterion for 2-satisfiability ([Aspvall,
+  Plass & Tarjan 1979][aspvall1979linear]) with no logic in it at all: over a
+  finite type of variables, a 2-CNF is satisfiable iff no literal reaches its
+  own negation and back in the implication graph. It is needed once for CNF
+  structures (2SAT ∈ PTIME) and once for the atoms of a Krom program (turning a
+  Krom definition into a transitive closure); the two differ only in what plays
+  the part of a variable.
+* `DescriptiveComplexity.KromImplication` and
+  `DescriptiveComplexity.KromTransitiveClosure` – **the converse translation**: the
+  complement of an SO-Krom definable problem is FO(TC) definable
+  (`DescriptiveComplexity.TCDefinable.compl_of_sigmaSOKromDefinable`). A Krom program
+  instantiated in a structure *is* a 2-CNF, whose variables are the atoms of
+  its block at tuples of elements, so it is satisfiable exactly when no goal
+  clause fires and no literal reaches its own negation and back
+  (`DescriptiveComplexity.KromImpl.exists_holds_iff`); the second file expresses the
+  implication graph as first-order transition formulas
+  (`DescriptiveComplexity.KromTC.realize_edgeF`) and walks the cycle-witnessing graph
+  of `DescriptiveComplexity.TwoCnf.carryReach_iff`, the start literal, the current one
+  and the flag being the mode and the two atoms' arguments the two halves of
+  the tuple. With the direction below it gives `co-NL(Krom) = NL(TC)`
+  (`DescriptiveComplexity.mem_NL_iff_tcDefinable_compl`) – not `REACH ∈ NL`, which
+  needs the complementation of FO(TC) itself.
 * `DescriptiveComplexity.TransitiveClosureKrom` – the translation that *is* free:
   the complement of an FO(TC) definable problem is SO-Krom definable
   (`DescriptiveComplexity.SigmaSOKromDefinable.compl_of_tcDefinable`), hence in NL, by
-  the arity-`k` program guessing the tuples from which an accepting tuple is
-  reachable. `DescriptiveComplexity.unreach_mem_NL` is its arity-one instance, written
-  out by hand as a worked example.
+  the program guessing the nodes from which an accepting node is reachable, one
+  `k`-ary relation variable per mode. `DescriptiveComplexity.unreach_mem_NL` is its
+  single-mode, arity-one instance, written out by hand as a worked example.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads

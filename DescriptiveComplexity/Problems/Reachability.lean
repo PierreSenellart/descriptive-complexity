@@ -578,19 +578,20 @@ noncomputable def tcTargetF : (Language.stGraph.sum Language.order).Formula (Fin
 /-- REACH as a single transitive closure: a walk along edges, from a marked
 source to a marked target. -/
 noncomputable abbrev reachSpec : TCSpec Language.stGraph where
+  Mode := Unit
   k := 1
-  step := tcEdgeF
-  src := tcSourceF
-  tgt := tcTargetF
+  step := fun _ _ => tcEdgeF
+  src := fun _ => tcSourceF
+  tgt := fun _ => tcTargetF
 
 section TCProgram
 
 variable {A : Type} [Language.stGraph.Structure A] [LinearOrder A]
 
 @[simp]
-theorem step_reachSpec (a b : Fin 1 → A) :
-    reachSpec.Step a b ↔ SGEdge (a 0) (b 0) := by
-  change tcEdgeF.Realize (Sum.elim a b) ↔ _
+theorem step_reachSpec (a b : reachSpec.Node A) :
+    reachSpec.Step a b ↔ SGEdge (a.2 0) (b.2 0) := by
+  change tcEdgeF.Realize (Sum.elim a.2 b.2) ↔ _
   rw [tcEdgeF, Formula.realize_rel₂, relMap_sumInl]
   exact Iff.rfl
 
@@ -606,14 +607,15 @@ theorem realize_tcTargetF (v : Fin 1 → A) : tcTargetF.Realize v ↔ SGTarget (
 
 /-- A path in the graph is a walk of the specification. -/
 theorem reach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen SGEdge x y) :
-    reachSpec.Reach (fun _ => x) (fun _ => y) := by
+    reachSpec.Reach ((), fun _ => x) ((), fun _ => y) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
-  | @tail b c _ hbc ih => exact ih.tail ((step_reachSpec (fun _ => b) fun _ => c).mpr hbc)
+  | @tail b c _ hbc ih =>
+    exact ih.tail ((step_reachSpec ((), fun _ => b) ((), fun _ => c)).mpr hbc)
 
 /-- A walk of the specification is a path in the graph. -/
-theorem reflTransGen_of_reach {u v : Fin 1 → A} (h : reachSpec.Reach u v) :
-    Relation.ReflTransGen SGEdge (u 0) (v 0) := by
+theorem reflTransGen_of_reach {u v : reachSpec.Node A} (h : reachSpec.Reach u v) :
+    Relation.ReflTransGen SGEdge (u.2 0) (v.2 0) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
   | @tail b c _ hbc ih => exact ih.tail ((step_reachSpec b c).mp hbc)
@@ -627,10 +629,10 @@ theorem reach_tcDefinable : TCDefinable REACH := by
   intro A _ _ _ _
   constructor
   · rintro ⟨s, t, hs, ht, hpath⟩
-    exact ⟨fun _ => s, fun _ => t, (realize_tcSourceF _).mpr hs,
+    exact ⟨((), fun _ => s), ((), fun _ => t), (realize_tcSourceF _).mpr hs,
       (realize_tcTargetF _).mpr ht, reach_of_reflTransGen hpath⟩
   · rintro ⟨u, v, hu, hv, huv⟩
-    exact ⟨u 0, v 0, (realize_tcSourceF u).mp hu, (realize_tcTargetF v).mp hv,
+    exact ⟨u.2 0, v.2 0, (realize_tcSourceF u.2).mp hu, (realize_tcTargetF v.2).mp hv,
       reflTransGen_of_reach huv⟩
 
 end DescriptiveComplexity

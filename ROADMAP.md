@@ -121,18 +121,22 @@ in `ClauseDischarge.lean`); the discharges still to do:
   FO(PFP). Note: no fragment of *plain* SO can play this role: SO = PH
   (Fagin/Stockmeyer), so an SO fragment capturing PSPACE would collapse PH; some
   iteration/recursion operator is unavoidable.
-- **FO(TC), the rest of it** [M–L]: the definability layer exists
+- **FO(TC), the rest of it** [M]: the definability layer exists
   (`TransitiveClosure.lean`: `TCSpec`/`TCDefinable`, a single TC over a
   first-order transition formula on `k`-tuples, with `reach_tcDefinable` as the
-  canonical instance), and so does the translation *out* of it:
-  `SigmaSOKromDefinable.compl_of_tcDefinable` in `TransitiveClosureKrom.lean`.
-  What remains is the converse direction `SigmaSOKromDefinable P → TCDefinable
-  Pᶜ` [M–L]: the implication graph of the clause instances read as a `TCSpec`,
-  on top of `TwoSat/Implication.lean` (literals are atom instances plus a sign,
-  so the walk is on `k+1`-tuples if the sign is carried as an extra coordinate,
-  or on tuples with the sign folded into the arity by a two-variable block).
-  Composed with the direction already proved it gives `co-NL(Krom) = NL(TC)`;
-  upgrading that to `NL = coNL` is Immerman–Szelepcsényi (§4).
+  canonical instance; a `TCSpec` carries a finite *mode* component beside its
+  tuple, the analogue of an interpretation's tags, without which neither the
+  translations nor closure under reductions can be stated), and so do both
+  translations against the Krom fragment: `co-NL(Krom) = NL(TC)`, i.e.
+  `mem_NL_iff_tcDefinable_compl` (`SigmaSOKromDefinable.compl_of_tcDefinable` in
+  `TransitiveClosureKrom.lean`, `TCDefinable.compl_of_sigmaSOKromDefinable` in
+  `KromTransitiveClosure.lean`). Upgrading that to `NL = coNL` is
+  Immerman–Szelepcsényi (§4), and it is what `REACH ∈ NL` waits on. What remains
+  here is **closure of `TCDefinable` under ordered FO reductions** [M] – pull
+  the spec back with modes `spec.Mode × (Fin k → Tag)` and tuples of length
+  `k · d` – which would make FO(TC) a `ComplexityClass` in its own right if that
+  is ever wanted; today it is a definability notion only, tied to NL through the
+  translations above.
 - **FO(DTC)** [M, after the above]: the deterministic variant, i.e. the same
   `TCSpec` with `step` replaced by its FO determinization
   `step(x̄, ȳ) ∧ ∀z̄. step(x̄, z̄) → z̄ = ȳ`; that formula is first-order, so
@@ -292,8 +296,8 @@ classes by these fragments rather than prove machine equivalences):
 | MaxQSO(FO) / MinQSO(FO) | MaxP / MinP |
 
 The FP row is the methodologically interesting one: FP is *not* reachable by
-counting satisfying tuples of any FO fragment (`#Σ₁` already encodes
-#P-complete problems such as #3-DNF, and dropping second-order free variables
+counting satisfying tuples of any FO fragment (`#Σ₁` already encodes such
+`#P`-complete problems as #3-DNF, and dropping second-order free variables
 loses `2ⁿ`). Products rescue it, `Πȳ.((ȳ < x̄) ↦ 2)` yielding `2^m`, which lets
 a formula reconstruct a machine's binary output bit by bit.
 

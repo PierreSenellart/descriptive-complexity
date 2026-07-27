@@ -81,7 +81,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| **NL** | SO-Krom (existential second-order Krom: at most two second-order literals per clause, either sign) – Grädel | 2SAT |
+| **NL** | SO-Krom (existential second-order Krom: at most two second-order literals per clause, either sign) – Grädel; equivalently the complements of the FO(TC) definable problems (FO(TC) itself would need Immerman–Szelepcsényi) | 2SAT |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi; equivalently acceptance by a deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
@@ -92,11 +92,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 The characterizations are the logical *definitions* of the classes (see the
 Overview above); the inclusions and dualities relating them are theorems.
 REACH/UNREACH is given as a further worked instance – a membership example, not
-proved complete – at *two* levels: UNREACH is defined head-on by a Horn program
-(PTIME) and by a Krom program (NL), while REACH is in PTIME only through the
-equivalence of SO-Horn with FO(LFP). Its NL membership would need the
-corresponding closure under complement one level down, i.e.
-Immerman–Szelepcsényi.
+proved complete.
 
 ## Scope and limitations
 
@@ -141,15 +137,16 @@ The following are *feasible* within this framework and planned, but **not yet
 implemented**. `ROADMAP.md` is the detailed version; the highlights a typical
 user is most likely to want:
 
-* **Complexity classes beyond the polynomial hierarchy.** L, NL, PSPACE, and up
+* **Complexity classes beyond the polynomial hierarchy.** L, PSPACE, and up
   toward EXPTIME/EXPSPACE, via the transitive-closure and fixpoint logics that
-  capture them (FO(DTC), FO(TC), SO(TC), FO(PFP)/SO(LFP)) and their complete
-  problems (REACHd, REACH, QSAT), each with a machine bridge as for NP and
-  PTIME. Below NP this also brings 2SAT (NL) and the P-complete problems
-  (Circuit Value, alternating reachability).
+  capture them (FO(DTC), SO(TC), FO(PFP)/SO(LFP)) and their complete problems
+  (REACHd, QSAT), each with a machine bridge as for NP and PTIME. Below NP this
+  also brings the P-complete problems (Circuit Value, alternating
+  reachability). `NL = coNL` (Immerman–Szelepcsényi) is not done either, and it
+  is what `REACH ∈ NL` waits on.
 * **Counting and optimization problems.** Only decision problems are modeled
-  today. Planned: #P via counting second-order assignments (#SAT, permanent,
-  #3COL) and MaxSNP-style optimization classes — i.e. function and search
+  today. Planned: #P via counting second-order assignments (#SAT, #3COL, the
+  permanent) and MaxSNP-style optimization classes — i.e. function and search
   problems, not just yes/no ones.
 * **Unconditional lower bounds (inexpressibility).** The payoff unique to the
   descriptive approach, impossible in the machine world: Ehrenfeucht–Fraïssé
