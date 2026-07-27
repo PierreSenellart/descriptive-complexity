@@ -171,6 +171,24 @@ theorem stepsIn_succ_iff : ∀ {n : ℕ} {c e : Config A},
     · rintro ⟨d', ⟨d, hstep, h1⟩, h2⟩
       exact ⟨d, hstep, ih.mpr ⟨d', h1, h2⟩⟩
 
+/-- **A run splits anywhere**: `m + k` steps decompose into `m` and then `k`,
+through the configuration reached halfway. This is what lets two runs from the
+same configuration be compared at a common time. -/
+theorem stepsIn_split : ∀ {m k : ℕ} {c e : Config A},
+    M.StepsIn (m + k) c e → ∃ d, M.StepsIn m c d ∧ M.StepsIn k d e := by
+  intro m
+  induction m with
+  | zero =>
+    intro k c e h
+    rw [Nat.zero_add] at h
+    exact ⟨c, rfl, h⟩
+  | succ m ih =>
+    intro k c e h
+    rw [Nat.succ_add] at h
+    obtain ⟨d, hstep, hrest⟩ := h
+    obtain ⟨d', h1, h2⟩ := ih hrest
+    exact ⟨d', ⟨d, hstep, h1⟩, h2⟩
+
 /-- **Runs compose.** Phases of a constructed machine are proved one at a time
 and chained with this; the step counts add, which is the form the budget
 obligation of a reduction takes. -/
