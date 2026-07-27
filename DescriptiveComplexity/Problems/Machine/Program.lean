@@ -156,35 +156,6 @@ theorem stepsIn_of_segment (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ 
           bitRank M.Le M.Posn p - bitRank M.Le M.Posn p₀ by omega] at this
   exact fun p hp hle hub => key _ p hp hle hub rfl
 
-/-- **Running a phase to the end of the tape.** The special case a reduction's
-last phase needs: from `p₀` to the highest position, in `Nat.card - 1 - rank p₀`
-steps. -/
-theorem stepsIn_to_maxPos (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p₁ : A}
-    (hp₀ : M.Posn p₀) (hp₁ : MaxPos M.Le M.Posn p₁)
-    (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ →
-      M.Step (conf p) (conf q)) :
-    M.StepsIn (Nat.card {p : A // M.Posn p} - 1 - bitRank M.Le M.Posn p₀)
-      (conf p₀) (conf p₁) := by
-  have hmax : bitRank M.Le M.Posn p₁ + 1 = Nat.card {p : A // M.Posn p} := bitRank_maxPos hp₁
-  have := stepsIn_of_segment hlin hp₀ hstep p₁ hp₁.1 (hp₁.2 p₀ hp₀) (hlin.1 p₁)
-  rwa [show Nat.card {p : A // M.Posn p} - 1 - bitRank M.Le M.Posn p₀ =
-    bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn p₀ by omega]
-
-/-- **A phase reaches acceptance.** Packaging the sweep as the acceptance of the
-machine: a run from an initial configuration along the positions, ending in an
-accepting state, accepts. This is the shape the `⇐` half of a reduction's
-correctness proof needs. -/
-theorem accepts_of_segment (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p : A}
-    (hp₀ : MinPos M.Le M.Posn p₀) (hinit : M.IsInit (conf p₀)) (hp : M.Posn p)
-    (hacc : M.Acc (conf p).state)
-    (hstep : ∀ r q, SuccPos M.Le M.Posn r q → M.Le p₀ r → M.Le q p →
-      M.Step (conf r) (conf q)) :
-    M.Accepts := by
-  refine ⟨conf p₀, conf p, bitRank M.Le M.Posn p - bitRank M.Le M.Posn p₀, hinit, ?_,
-    stepsIn_of_segment hlin hp₀.1 hstep p hp (hp₀.2 p hp) (hlin.1 p), hacc⟩
-  have := bitRank_lt_card (Le := M.Le) hp
-  omega
-
 end TMData
 
 end DescriptiveComplexity

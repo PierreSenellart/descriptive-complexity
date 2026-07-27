@@ -147,10 +147,6 @@ theorem satTagIdx_injective : Function.Injective satTagIdx := by
 /-- The tape order on tags. -/
 instance : LinearOrder SatTag := LinearOrder.lift' satTagIdx satTagIdx_injective
 
-theorem satTag_lt_iff {s t : SatTag} : s < t ↔ satTagIdx s < satTagIdx t := Iff.rfl
-
-theorem satTag_le_iff {s t : SatTag} : s ≤ t ↔ satTagIdx s ≤ satTagIdx t := Iff.rfl
-
 /-! ### The intended positions
 
 Stated as a plain predicate on tagged tuples, in the style of
@@ -171,19 +167,6 @@ def SatPosn (p : SatTag × (Fin 2 → A)) : Prop :=
   | .pEnd => ∀ a : A, p.2 0 ≤ a ∧ p.2 1 ≤ a
   | .pFill _ => True
   | _ => False
-
-/-- There is exactly one start marker. -/
-theorem satPosn_pStart_iff {w : Fin 2 → A} :
-    SatPosn (SatTag.pStart, w) ↔ (∀ a : A, w 0 ≤ a) ∧ ∀ a : A, w 1 ≤ a :=
-  ⟨fun h => ⟨fun a => (h a).1, fun a => (h a).2⟩, fun h a => ⟨h.1 a, h.2 a⟩⟩
-
-/-- A cell is a position exactly when its second coordinate is the minimum: one
-cell per element, indexed by the first coordinate. -/
-theorem satPosn_pCell_iff {w : Fin 2 → A} :
-    SatPosn (SatTag.pCell, w) ↔ ∀ a : A, w 1 ≤ a := Iff.rfl
-
-/-- Every filler tuple is a position. -/
-theorem satPosn_pFill {i : Fin 8} {w : Fin 2 → A} : SatPosn (SatTag.pFill i, w) := trivial
 
 /-! ### The instance data of the machine
 
