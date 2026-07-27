@@ -59,7 +59,15 @@ The library is organized in three layers:
   a linear order of the universe, and hardness by Karp's twelve-vertex
   cover-testing gadget, completing **all of Karp's 21 problems** – and a
   tutorial on conjunctive queries. Each comes with its vocabulary, FO reductions and
-  completeness theorems.
+  completeness theorems. Machine acceptance – does this nondeterministic
+  Turing machine, carried as data by the instance, accept its input within as
+  many steps as there are positions? – is NP-complete
+  (`ntmAccept_NP_complete`), with a bespoke machine built inside the SAT
+  instance for hardness; a problem is therefore in the library's NP exactly
+  when it ordered-FO-reduces to machine acceptance
+  (`mem_NP_iff_le_ntmAccept`), so the logically defined class is the machine
+  one, and the textbook form of Cook–Levin – machine acceptance reduces to
+  SAT – falls out of the generic discharge (`ntmAccept_reduces_to_sat`).
 
 ## Use as a dependency
 

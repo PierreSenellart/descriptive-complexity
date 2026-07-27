@@ -809,7 +809,11 @@ Horn kernel needs no gates at all, only the canonical padding of
   own class definitions).
 - **Spectra** [M]: Fagin's connection between generalized spectra and
   NP; mostly definitional given the SO layer, historically resonant.
-- **Machine bridge: bounded NTM acceptance is NP-complete** [L]:
+- **Machine bridge: bounded NTM acceptance is NP-complete** [L] –
+  **done, 2026-07-27** (`ntmAccept_NP_complete`, `mem_NP_iff_le_ntmAccept`,
+  `ntmAccept_reduces_to_sat` in `Problems/Machine.lean`; plan, design
+  decisions and stage notes in `MACHINE.md`, which supersedes the sketch
+  below – the deterministic side, `DTMAccept`/PTIME, is still open there):
   the problem “the NTM M accepts x within t steps” (t unary; unary is
   what keeps this NP- rather than NEXP-complete), with the machine as
   *data*: universe = time/tape positions (order in the problem's own

@@ -260,7 +260,18 @@ individual declarations are documented on their own pages.
   marks; HORN-SAT, PTIME-complete by the Horn discharge and a Horn program for
   unit propagation – the P-level analogue of Cook–Levin, equally machine-free;
   and REACH/UNREACH, whose Horn program is a second worked instance of the
-  fragment.
+  fragment;
+  and machine acceptance (`DescriptiveComplexity.NTMAccept`) – does this
+  nondeterministic Turing machine, carried as data by the instance, accept its
+  input within as many steps as there are positions? – NP-complete, membership
+  by guessing the run (Fagin's tableau argument) and hardness by a bespoke
+  machine built inside the SAT instance: guess an assignment in one sweep,
+  check one clause per sweep, alternating direction. This is the machine
+  bridge of `MACHINE.md`: a problem is in the library's NP exactly when it
+  ordered-FO-reduces to machine acceptance
+  (`DescriptiveComplexity.mem_NP_iff_le_ntmAccept`), so the logically defined class
+  is the machine one, and the textbook form of Cook–Levin – machine acceptance
+  reduces to SAT – is `DescriptiveComplexity.ntmAccept_reduces_to_sat`.
 
 ## Worked examples
 
