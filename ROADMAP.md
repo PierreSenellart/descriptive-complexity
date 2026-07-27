@@ -14,7 +14,10 @@ Reference taxonomy for how numbers in problem instances are encoded as finite
 structures; a per-problem choice. The *semantics* of numbers (sums, comparisons)
 is always computed in Lean inside `Holds`; the representation only constrains
 which reductions are FO-expressible, whether the problem keeps its intended
-complexity (unary vs binary genuinely changes it), and iso-invariance of the
+complexity (unary vs binary genuinely changes it — now a theorem:
+`no_unary_encoding` in `DescriptiveComplexity/Encoding/UnaryBlowup.lean` shows
+no bit-length-sized encoding of subset-sum can be unary, with the honest
+binary encoding as the positive contrast), and iso-invariance of the
 decoding. (A)–(C) are in use across the catalog; (D) is the one still to build.
 
 - **(A) Cardinalities of marked sets** (unary): threshold `k = |K|` for a unary
