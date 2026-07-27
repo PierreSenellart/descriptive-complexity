@@ -19,16 +19,18 @@ and a `Π₁` sentence.
 DP is not a level of the polynomial hierarchy, and not the same thing as
 `NP ∩ coNP`: the conjunction is of *two different* problems, whereas
 `P ∈ NP ∩ coNP` asks one problem to have both kinds of definition. It sits
-just above NP and coNP: `NP ⊆ DP` and `coNP ⊆ DP`
-(`DescriptiveComplexity.NP_subset_DP`, `DescriptiveComplexity.coNP_subset_DP`), each
-by conjoining the tautology to the other side.
+just above NP and coNP and inside the second level of the hierarchy:
+`NP ∪ coNP ⊆ DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` (`DescriptiveComplexity.NP_subset_DP`,
+`DescriptiveComplexity.coNP_subset_DP`, `DescriptiveComplexity.DP_subset_sigmaP_two`,
+`DescriptiveComplexity.DP_subset_piP_two`). The lower bounds conjoin the tautology
+to the other side; the upper bounds merge `(∃X. φ) ∧ (∀Y. ψ)` into the single
+alternation `∃X ∀Y. (φ ∧ ψ)`, which is sound in both block orders because
+neither kernel mentions the other's variables.
 
-Two things are *not* here yet. The upper bounds `DP ⊆ Σ₂ᵖ` and `DP ⊆ Π₂ᵖ`
-need `(∃X. φ) ∧ (∀Y. ψ)` merged into the single alternation `∃X ∀Y. (φ ∧ ψ)`,
-i.e. the two kernels transported into one doubly expanded language; and the
-canonical DP-complete problem, SAT-UNSAT ([Papadimitriou & Yannakakis
-1984][papadimitriou1984complexity]), needs the Cook–Levin discharge and its
-complement run side by side into one paired-CNF instance.
+What is *not* here yet is the canonical DP-complete problem, SAT-UNSAT
+([Papadimitriou & Yannakakis 1984][papadimitriou1984complexity]): it needs the
+Cook–Levin discharge and its complement run side by side into one paired-CNF
+instance.
 
 ## Why closure needs the order-elimination lemma
 
@@ -256,6 +258,89 @@ theorem DPDefinable.of_orderedReduction [L'.IsRelational] {P : DecisionProblem L
       haveI := f.toInterpretation.map_nonempty A
       exact (f.correct A).mpr ((hST _).mpr ⟨hS', hT' lo⟩)
 
+/-! ### DP inside the second level
+
+The `Σ` half's guess and the `Π` half's challenge become the two blocks of a
+single alternation. The two kernels live over different expansions of the
+vocabulary, so each is transported into the doubly expanded one: the head
+kernel by `DescriptiveComplexity.soLangEmbed`, the other by
+`DescriptiveComplexity.soLangLift` along `LHom.sumInl`, which is an expansion on a
+sum structure. -/
+
+section Merge
+
+variable {P : DecisionProblem L}
+
+private theorem eq_singleton_of_length_one {Bs : List SOBlock} (h : Bs.length = 1) :
+    ∃ B, Bs = [B] := by
+  cases Bs with
+  | nil => simp at h
+  | cons B t =>
+    cases t with
+    | nil => exact ⟨B, rfl⟩
+    | cons _ _ => simp at h
+
+/-- **DP ⊆ Σ₂ᵖ**: `(∃X. φ) ∧ (∀Y. ψ)` is the single alternation
+`∃X ∀Y. (φ ∧ ψ)`. Nothing has to be guessed twice – the `Π` kernel does not
+mention `X`, which is what makes the conjunction slide inside both
+quantifiers. -/
+theorem DPDefinable.sigmaSODefinable_two (h : DPDefinable P) : SigmaSODefinable 2 P := by
+  obtain ⟨S, T, hS, hT, hST⟩ := h
+  obtain ⟨Bs₁, hk1, φ, hφ⟩ := hS
+  obtain ⟨Bs₂, hk2, ψ, hψ⟩ := hT
+  obtain ⟨B₁, rfl⟩ := eq_singleton_of_length_one hk1
+  obtain ⟨B₂, rfl⟩ := eq_singleton_of_length_one hk2
+  refine ⟨[B₁, B₂], rfl,
+    (soLangEmbed [B₂] (L.sum B₁.lang)).onSentence φ ⊓
+      (soLangLift [B₂] L (L.sum B₁.lang) LHom.sumInl).onSentence ψ, ?_⟩
+  intro A instA _ _
+  refine (hST A).trans ?_
+  constructor
+  · rintro ⟨hs, ht⟩
+    obtain ⟨ρ₁, hρ₁⟩ := (hφ A).mp hs
+    letI := B₁.structure ρ₁
+    refine ⟨ρ₁, (sorealize_inf_embed [B₂] (L.sum B₁.lang) A _ φ _ false).mpr ⟨hρ₁, ?_⟩⟩
+    exact (sorealize_soLangLift [B₂] L (L.sum B₁.lang) LHom.sumInl A instA _
+      (LHom.sumInl_isExpansionOn A) ψ false).mpr ((hψ A).mp ht)
+  · rintro ⟨ρ₁, hρ₁⟩
+    letI := B₁.structure ρ₁
+    obtain ⟨hf, hg⟩ := (sorealize_inf_embed [B₂] (L.sum B₁.lang) A _ φ _ false).mp hρ₁
+    refine ⟨(hφ A).mpr ⟨ρ₁, hf⟩, (hψ A).mpr ?_⟩
+    exact (sorealize_soLangLift [B₂] L (L.sum B₁.lang) LHom.sumInl A instA _
+      (LHom.sumInl_isExpansionOn A) ψ false).mp hg
+
+/-- **DP ⊆ Π₂ᵖ**, the same merge with the blocks in the other order:
+`∀Y ∃X. (φ ∧ ψ)`. Recovering the `Σ` half from it uses that a block always has
+*some* assignment – the constantly true one will do. -/
+theorem DPDefinable.piSODefinable_two (h : DPDefinable P) : PiSODefinable 2 P := by
+  obtain ⟨S, T, hS, hT, hST⟩ := h
+  obtain ⟨Bs₁, hk1, φ, hφ⟩ := hS
+  obtain ⟨Bs₂, hk2, ψ, hψ⟩ := hT
+  obtain ⟨B₁, rfl⟩ := eq_singleton_of_length_one hk1
+  obtain ⟨B₂, rfl⟩ := eq_singleton_of_length_one hk2
+  refine ⟨[B₂, B₁], rfl,
+    (soLangEmbed [B₁] (L.sum B₂.lang)).onSentence ψ ⊓
+      (soLangLift [B₁] L (L.sum B₂.lang) LHom.sumInl).onSentence φ, ?_⟩
+  intro A instA _ _
+  refine (hST A).trans ?_
+  constructor
+  · rintro ⟨hs, ht⟩ ρ₂
+    letI := B₂.structure ρ₂
+    refine (sorealize_inf_embed [B₁] (L.sum B₂.lang) A _ ψ _ true).mpr ⟨(hψ A).mp ht ρ₂, ?_⟩
+    exact (sorealize_soLangLift [B₁] L (L.sum B₂.lang) LHom.sumInl A instA _
+      (LHom.sumInl_isExpansionOn A) φ true).mpr ((hφ A).mp hs)
+  · intro hall
+    have hs : S A := by
+      letI := B₂.structure (fun _ _ => True : B₂.Assignment A)
+      obtain ⟨-, hg⟩ := (sorealize_inf_embed [B₁] (L.sum B₂.lang) A _ ψ _ true).mp
+        (hall (fun _ _ => True))
+      exact (hφ A).mpr ((sorealize_soLangLift [B₁] L (L.sum B₂.lang) LHom.sumInl A instA _
+        (LHom.sumInl_isExpansionOn A) φ true).mp hg)
+    exact ⟨hs, (hψ A).mpr fun ρ₂ =>
+      ((sorealize_inf_embed [B₁] (L.sum B₂.lang) A _ ψ _ true).mp (hall ρ₂)).1⟩
+
+end Merge
+
 /-! ### The class -/
 
 /-- **The class DP** ([Papadimitriou & Yannakakis
@@ -321,6 +406,15 @@ theorem coNP_subset_DP : coNP ⊆ DP := by
   intro L P hP
   exact ⟨DecisionProblem.triv L, P, sigmaSODefinable_triv, hP,
     fun A _ _ _ => ⟨fun h => ⟨trivial, h⟩, And.right⟩⟩
+
+/-- **DP ⊆ Σ₂ᵖ**, as an inclusion of classes. -/
+theorem DP_subset_sigmaP_two : DP ⊆ SigmaP 2 :=
+  fun _ _ hP => DPDefinable.sigmaSODefinable_two ((mem_DP_iff _).mp hP)
+
+/-- **DP ⊆ Π₂ᵖ**, as an inclusion of classes: DP sits inside the second level
+of the hierarchy from both sides. -/
+theorem DP_subset_piP_two : DP ⊆ PiP 2 :=
+  fun _ _ hP => DPDefinable.piSODefinable_two ((mem_DP_iff _).mp hP)
 
 /-- Over a relational vocabulary, DP-hardness is the usual notion: every
 DP-definable problem reduces to `P`. -/
