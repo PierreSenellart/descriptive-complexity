@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.HornSat.Hardness
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.FixedPointHorn
+import DescriptiveComplexity.LogSpace
 
 /-!
 # Reachability, and the Horn fragment at work
@@ -38,6 +39,27 @@ reduces to HORN-SAT.
 Note that it is the *complement* that the fragment defines: goal clauses can
 only rule models out. This is the usual state of affairs for SO-Horn, and
 harmless, both problems being in polynomial time.
+
+The same file also places UNREACH one level lower, in
+`DescriptiveComplexity.NL`: the Krom fragment defines it by a *two-literal*
+program guessing the set `U` of vertices from which a marked target is
+reachable,
+
+```
+              target(x) → U(x)
+  edge(x, y)            → ¬U(y) ∨ U(x)
+              source(x) → ¬U(x)
+```
+
+and the same asymmetry appears one level down, for the same reason. A clausal
+fragment states closure and rejection, so it defines UNREACH head-on
+(`DescriptiveComplexity.unreach_mem_NL`) while REACH would need the guessed set to be
+*contained* in the true reachable set – a minimality condition no clause can
+impose. At the Horn level the way out was the equivalence with FO(LFP), a full
+logic closed under negation; at the Krom level the corresponding statement is
+`NL = coNL`, i.e. Immerman–Szelepcsényi, which this library does not (yet)
+prove. So `REACH ∈ NL` is exactly one Immerman–Szelepcsényi away from
+`DescriptiveComplexity.unreach_mem_NL`; see `ROADMAP.md` §4.
 -/
 
 /- The vocabulary of graphs with marked sources and targets lives in Mathlib's
@@ -361,5 +383,172 @@ can say through the equivalence with FO(LFP)
 theorem reach_mem_PTIME : REACH ∈ PTIME := by
   have h := unreach_sigmaSOHornDefinable.compl
   rwa [UNREACH, DecisionProblem.compl_compl] at h
+
+/-! ### UNREACH is SO-Krom definable, hence in NL
+
+The Krom fragment needs no transitive closure: it guesses the set of vertices
+from which a marked target is reachable, closes it under *predecessors* – a
+two-literal implication – and forbids a marked source to belong to it. -/
+
+/-- The block of the SO-Krom definition of UNREACH: one unary relation
+variable, the set of vertices from which a marked target is reachable. -/
+def uBlock : SOBlock where
+  ι := Unit
+  arity := fun _ => 1
+
+/-- The atom `U xᵢ` of the guessed set. -/
+def uAtom (i : Fin 3) : SOAtom uBlock 3 :=
+  ⟨(), ![i]⟩
+
+/-- The literal `U xᵢ`, positive or negated. -/
+def uLit (i : Fin 3) (pos : Bool) : KromLit uBlock 3 :=
+  ⟨uAtom i, pos⟩
+
+/-- A marked target belongs to `U`. -/
+noncomputable def unreachK1 :
+    KromClause (Language.stGraph.sum Language.order) uBlock 3 :=
+  { guard := targetG 0, lit₁ := some (uLit 0 true), lit₂ := none }
+
+/-- `U` is closed under predecessors: an edge into `U` starts in `U`. -/
+noncomputable def unreachK2 :
+    KromClause (Language.stGraph.sum Language.order) uBlock 3 :=
+  { guard := edgeG 0 1, lit₁ := some (uLit 1 false), lit₂ := some (uLit 0 true) }
+
+/-- No marked source belongs to `U`. -/
+noncomputable def unreachK3 :
+    KromClause (Language.stGraph.sum Language.order) uBlock 3 :=
+  { guard := sourceG 0, lit₁ := some (uLit 0 false), lit₂ := none }
+
+/-- The Krom program defining UNREACH. -/
+noncomputable def unreachKromProgram :
+    KromProgram (Language.stGraph.sum Language.order) uBlock 3 :=
+  [unreachK1, unreachK2, unreachK3]
+
+section KromProgram
+
+variable {A : Type} [Language.stGraph.Structure A] [LinearOrder A]
+
+/-- The set guessed by an assignment of the block. -/
+def URel (ρ : uBlock.Assignment A) (x : A) : Prop := ρ () ![x]
+
+omit [Language.stGraph.Structure A] [LinearOrder A] in
+private theorem uLit_holds (ρ : uBlock.Assignment A) (v : Fin 3 → A) (i : Fin 3)
+    (pos : Bool) : (uLit i pos).Holds ρ v ↔ (if pos then URel ρ (v i) else ¬URel ρ (v i)) := by
+  have hatom : (uAtom i).Holds ρ v ↔ URel ρ (v i) := by
+    refine iff_of_eq (congrArg (ρ ()) (funext fun l => ?_))
+    fin_cases l
+    rfl
+  cases pos with
+  | false => exact not_congr hatom
+  | true => exact hatom
+
+private theorem realize_edgeG' (v : Fin 3 → A) (i j : Fin 3) :
+    (edgeG i j).Realize v ↔ SGEdge (v i) (v j) := by
+  rw [edgeG, Formula.realize_rel₂, relMap_sumInl]
+  exact Iff.rfl
+
+private theorem realize_sourceG' (v : Fin 3 → A) (i : Fin 3) :
+    (sourceG i).Realize v ↔ SGSource (v i) := by
+  rw [sourceG, Formula.realize_rel₁, relMap_sumInl]
+  exact Iff.rfl
+
+private theorem realize_targetG' (v : Fin 3 → A) (i : Fin 3) :
+    (targetG i).Realize v ↔ SGTarget (v i) := by
+  rw [targetG, Formula.realize_rel₁, relMap_sumInl]
+  exact Iff.rfl
+
+/-- What it means for an assignment to satisfy the Krom program: the guessed
+set contains the marked targets, is closed under predecessors, and avoids the
+marked sources. -/
+theorem unreachKromProgram_holds_iff (ρ : uBlock.Assignment A) :
+    unreachKromProgram.Holds ρ ↔
+      (∀ x : A, SGTarget x → URel ρ x) ∧
+      (∀ x y : A, SGEdge x y → URel ρ y → URel ρ x) ∧
+      (∀ x : A, SGSource x → ¬URel ρ x) := by
+  constructor
+  · intro h
+    refine ⟨fun x hx => ?_, fun x y hxy hy => ?_, fun x hx hu => ?_⟩
+    · have hcl := h ![x, x, x] unreachK1 (by simp [unreachKromProgram])
+      have := hcl ((realize_targetG' _ 0).mpr hx)
+      simp only [unreachK1, KromLit.slotHolds, Option.elim_some, Option.elim_none,
+        or_false] at this
+      simpa using (uLit_holds ρ _ 0 true).mp this
+    · have hcl := h ![x, y, x] unreachK2 (by simp [unreachKromProgram])
+      have := hcl ((realize_edgeG' _ 0 1).mpr hxy)
+      simp only [unreachK2, KromLit.slotHolds, Option.elim_some] at this
+      rcases this with hneg | hpos
+      · exact absurd (by simpa using hy) ((uLit_holds ρ _ 1 false).mp hneg)
+      · simpa using (uLit_holds ρ _ 0 true).mp hpos
+    · have hcl := h ![x, x, x] unreachK3 (by simp [unreachKromProgram])
+      have := hcl ((realize_sourceG' _ 0).mpr hx)
+      simp only [unreachK3, KromLit.slotHolds, Option.elim_some, Option.elim_none,
+        or_false] at this
+      exact (uLit_holds ρ _ 0 false).mp this (by simpa using hu)
+  · rintro ⟨h1, h2, h3⟩ v c hc
+    simp only [unreachKromProgram, List.mem_cons, List.not_mem_nil, or_false] at hc
+    rcases hc with rfl | rfl | rfl
+    · intro hg
+      refine Or.inl ?_
+      simp only [unreachK1, KromLit.slotHolds, Option.elim_some]
+      exact (uLit_holds ρ _ 0 true).mpr (h1 _ ((realize_targetG' _ 0).mp hg))
+    · intro hg
+      by_cases hy : URel ρ (v 1)
+      · refine Or.inr ?_
+        simp only [unreachK2, KromLit.slotHolds, Option.elim_some]
+        exact (uLit_holds ρ _ 0 true).mpr (h2 _ _ ((realize_edgeG' _ 0 1).mp hg) hy)
+      · refine Or.inl ?_
+        simp only [unreachK2, KromLit.slotHolds, Option.elim_some]
+        exact (uLit_holds ρ _ 1 false).mpr hy
+    · intro hg
+      refine Or.inl ?_
+      simp only [unreachK3, KromLit.slotHolds, Option.elim_some]
+      exact (uLit_holds ρ _ 0 false).mpr (h3 _ ((realize_sourceG' _ 0).mp hg))
+
+/-- The set of vertices from which a marked target is reachable: the witness
+of the nontrivial direction. -/
+def coReachAssign : uBlock.Assignment A :=
+  fun _ w => ∃ t : A, SGTarget t ∧ Relation.ReflTransGen SGEdge (w ⟨0, Nat.zero_lt_one⟩) t
+
+omit [LinearOrder A] in
+@[simp]
+theorem uRel_coReachAssign (x : A) :
+    URel (coReachAssign (A := A)) x ↔ ∃ t : A, SGTarget t ∧ Relation.ReflTransGen SGEdge x t :=
+  Iff.rfl
+
+omit [LinearOrder A] in
+/-- A set closed under predecessors and containing the marked targets contains
+every vertex from which a marked target is reachable. -/
+theorem uRel_of_reflTransGen {ρ : uBlock.Assignment A}
+    (h2 : ∀ x y : A, SGEdge x y → URel ρ y → URel ρ x) {x y : A}
+    (h : Relation.ReflTransGen SGEdge x y) : URel ρ y → URel ρ x := by
+  induction h with
+  | refl => exact id
+  | tail _ hbc ih => exact fun hc => ih (h2 _ _ hbc hc)
+
+end KromProgram
+
+/-- **UNREACH is SO-Krom definable**: guess the set of vertices from which a
+marked target is reachable. The clauses are two-literal – the closure rule is
+`¬U(y) ∨ U(x)` – so no transitive closure has to be built, unlike in the Horn
+program above. -/
+theorem unreach_sigmaSOKromDefinable : SigmaSOKromDefinable UNREACH := by
+  refine ⟨uBlock, 3, unreachKromProgram, ?_⟩
+  intro A _ _ _ _
+  constructor
+  · intro h
+    refine ⟨coReachAssign, (unreachKromProgram_holds_iff _).mpr
+      ⟨fun x hx => ⟨x, hx, Relation.ReflTransGen.refl⟩, fun x y hxy hy => ?_, fun x hx hu => ?_⟩⟩
+    · obtain ⟨t, ht, hpath⟩ := hy
+      exact ⟨t, ht, Relation.ReflTransGen.head hxy hpath⟩
+    · obtain ⟨t, ht, hpath⟩ := hu
+      exact h ⟨x, t, hx, ht, hpath⟩
+  · rintro ⟨ρ, hρ⟩ ⟨s, t, hs, ht, hpath⟩
+    obtain ⟨h1, h2, h3⟩ := (unreachKromProgram_holds_iff ρ).mp hρ
+    exact h3 s hs (uRel_of_reflTransGen h2 hpath (h1 t ht))
+
+/-- **UNREACH is in NL**, by definition of the class as SO-Krom
+definability. -/
+theorem unreach_mem_NL : UNREACH ∈ NL :=
+  unreach_sigmaSOKromDefinable
 
 end DescriptiveComplexity

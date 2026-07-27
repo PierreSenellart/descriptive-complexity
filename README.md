@@ -91,8 +91,12 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above); the inclusions and dualities relating them are theorems.
-REACH/UNREACH is given as a further worked instance in PTIME – a membership
-example, not proved complete.
+REACH/UNREACH is given as a further worked instance – a membership example, not
+proved complete – at *two* levels: UNREACH is defined head-on by a Horn program
+(PTIME) and by a Krom program (NL), while REACH is in PTIME only through the
+equivalence of SO-Horn with FO(LFP). Its NL membership would need the
+corresponding closure under complement one level down, i.e.
+Immerman–Szelepcsényi.
 
 ## Scope and limitations
 

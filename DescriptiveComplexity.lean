@@ -291,7 +291,13 @@ Headline results and cross-references:
   (`DescriptiveComplexity.HORNSAT_PTIME_complete`) by the Horn discharge and a
   Horn program for unit propagation – the P-level analogue of Cook–Levin,
   equally machine-free. REACH/UNREACH is a second worked instance of the
-  fragment (a membership example, not proved complete).
+  fragment (a membership example, not proved complete), and a third one of the
+  Krom fragment: `DescriptiveComplexity.unreach_mem_NL` defines UNREACH by a
+  two-literal program guessing the vertices from which a marked target is
+  reachable. In both fragments it is the *complement* that is definable
+  head-on, clauses being able to close and to reject but not to force
+  minimality; REACH escapes at the Horn level through FO(LFP), and would escape
+  at the Krom level through `NL = coNL`, which is not proved here.
 * **Above NP**: TAUT (DNF tautology) is coNP-complete by complementing the
   Cook–Levin discharge, and its width-three restriction 3-DNF-TAUT
   (`DescriptiveComplexity.ThreeDnfTAUT_coNP_complete`) follows the same route

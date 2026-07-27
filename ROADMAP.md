@@ -77,8 +77,18 @@ in `ClauseDischarge.lean`); the discharges still to do:
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **NL: REACH** [M]: directed st-reachability, the canonical NL-complete
-  problem; hardness = "every FO(TC)-definable problem FO-reduces to REACH".
+- **NL: REACH** [M for hardness, R for membership]: directed st-reachability,
+  the canonical NL-complete problem. Its *hardness* is "every FO(TC)-definable
+  problem FO-reduces to REACH", so it waits on FO(TC) (§3). Its *membership* is
+  a subtler matter than it looks under the Krom definition of NL: the Krom
+  fragment defines UNREACH head-on (done, `unreach_mem_NL`: guess the set of
+  vertices from which a marked target is reachable, close it under
+  predecessors with the 2-clause `¬U(y) ∨ U(x)`, forbid the marked sources),
+  but REACH would need the guessed set to be *contained* in the reachable set,
+  a minimality condition no clause can impose – the same asymmetry as SO-Horn
+  one level up, where REACH escaped through FO(LFP). At the Krom level the
+  escape is `NL = coNL`, i.e. Immerman–Szelepcsényi (§4), so `REACH ∈ NL` is
+  exactly one Immerman–Szelepcsényi away and is not an independent item.
 - **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
 - **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
   SO(TC)-definable (equivalently FO(PFP)-definable) problem ordered-FO-reduces
