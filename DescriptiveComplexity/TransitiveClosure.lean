@@ -39,22 +39,25 @@ against a machine.
 ## What this is for
 
 `DescriptiveComplexity.NL` is already defined, by the Krom fragment
-(`DescriptiveComplexity.LogSpace`), so FO(TC) is not set up as a second complexity
-class; the modes are what would make that possible, should it become useful. A
-walk whose state were only a tuple of elements could not be pulled back through
-an interpretation, whose tags vary from node to node, and could not carry the
-finite data a translation needs (the atom index and sign of a literal, say);
-carrying it in coordinates would fail on a one-element universe. FO(TC) is here
-as the logic in which two things are naturally stated:
+(`DescriptiveComplexity.LogSpace`), and the two coincide
+(`DescriptiveComplexity.tcDefinable_iff_mem_NL`), so FO(TC) is not set up as a
+second complexity class; the modes are what would make that possible, should it
+become useful. A walk whose state were only a tuple of elements could not be
+pulled back through an interpretation, whose tags vary from node to node, and
+could not carry the finite data a translation needs (the atom index and sign of
+a literal, say); carrying it in coordinates would fail on a one-element
+universe. FO(TC) is here as the logic in which two things are naturally stated:
 
 * the translation to the Krom fragment, which goes through the *complement* –
   a clausal fragment states closure and rejection, so it defines
   non-reachability head-on, exactly as `DescriptiveComplexity.unreach_mem_NL` does for
   the concrete case;
-* **Immerman–Szelepcsényi**, closure of FO(TC) under complement, whose
-  inductive-counting proof is a walk on tuples of (stage, count, vertex) and
-  so lives naturally inside a single `TC`. That theorem is what would turn the
-  above translation into an equivalence, and give `REACH ∈ NL`.
+* **Immerman–Szelepcsényi**, closure of FO(TC) under complement
+  (`DescriptiveComplexity.TCDefinable.compl` in
+  `DescriptiveComplexity.TransitiveClosureCompl`), whose inductive-counting proof is a
+  walk on configurations – a phase, a flag and eight registers, each a node or
+  a count – and so lives inside a single `TC`. That theorem turns the above
+  translation into an equivalence and gives `REACH ∈ NL`.
 
 The canonical example is `DescriptiveComplexity.reach_tcDefinable` – REACH *is* a `TC`,
 at arity one and with a single mode, over the edge relation between the marked

@@ -837,8 +837,8 @@ its own negation and back, and the second condition is a single walk of the
 cycle-witnessing graph – whose nodes are a pair of literals and a flag, i.e. a
 mode and two canonically padded tuples. Together with
 `DescriptiveComplexity.SigmaSOKromDefinable.compl_of_tcDefinable` this gives
-`co-NL(Krom) = NL(TC)`; upgrading it to `NL = coNL` is
-Immerman–Szelepcsényi. -/
+`co-NL(Krom) = NL(TC)`; it is upgraded to `NL = coNL` by Immerman–Szelepcsényi
+(`DescriptiveComplexity.NL_eq_coNL`). -/
 theorem TCDefinable.compl_of_sigmaSOKromDefinable {L : Language.{0, 0}}
     {P : DecisionProblem L} (h : SigmaSOKromDefinable P) : TCDefinable Pᶜ := by
   obtain ⟨B, k, prog, hprog⟩ := h

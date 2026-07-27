@@ -32,10 +32,12 @@ two theorems that are *not* free here:
   variable reaches its own negation and back.
 * **`NL = coNL`** (Immerman–Szelepcsényi) is not the definitional duality that
   gives `PiP k` from `SigmaP k`: the complement of an SO-Krom definable problem
-  is not obviously SO-Krom definable. It is a genuine theorem, not proved here,
-  and the reason the fixpoint logic FO(TC) is still wanted even once this
-  fragment exists – the inductive-counting proof is naturally a statement about
-  FO(TC). See `ROADMAP.md` §4.
+  is not obviously SO-Krom definable. It is a genuine theorem, and the reason
+  the fixpoint logic FO(TC) is still wanted even once this fragment exists –
+  the inductive-counting proof is naturally a statement about FO(TC), and that
+  is where it is proved (`DescriptiveComplexity.TCDefinable.compl`), reaching this
+  fragment through the two translations as `DescriptiveComplexity.NL_eq_coNL` in
+  `DescriptiveComplexity.ImmermanSzelepcsenyi`.
 
 Note that the *containment* `SO-Krom ⊆ NL` on the machine side already uses
 Immerman–Szelepcsényi: satisfiability of a 2-CNF is the complement of a

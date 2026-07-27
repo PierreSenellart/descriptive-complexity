@@ -58,9 +58,10 @@ fragment states closure and rejection, so it defines UNREACH head-on
 *contained* in the true reachable set – a minimality condition no clause can
 impose. At the Horn level the way out was the equivalence with FO(LFP), a full
 logic closed under negation; at the Krom level the corresponding statement is
-`NL = coNL`, i.e. Immerman–Szelepcsényi, which this library does not (yet)
-prove. So `REACH ∈ NL` is exactly one Immerman–Szelepcsényi away from
-`DescriptiveComplexity.unreach_mem_NL`; see `ROADMAP.md` §4.
+`NL = coNL`, i.e. Immerman–Szelepcsényi, and it is what carries
+`DescriptiveComplexity.unreach_mem_NL` over to `REACH ∈ NL`
+(`DescriptiveComplexity.reach_mem_NL`, in
+`DescriptiveComplexity.ImmermanSzelepcsenyi`).
 -/
 
 /- The vocabulary of graphs with marked sources and targets lives in Mathlib's
