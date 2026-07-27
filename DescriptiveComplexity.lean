@@ -206,7 +206,7 @@ reduction and certificate in full.
 | --- | --- | --- |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT (and QBF∀ at one block) |
+| `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order blocks, existential first ([Stockmeyer 1976][stockmeyer1976polynomial]) | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — |
@@ -246,7 +246,12 @@ Headline results and cross-references:
   equally machine-free. REACH/UNREACH is a second worked instance of the
   fragment (a membership example, not proved complete).
 * **Above NP**: TAUT (DNF tautology) is coNP-complete by complementing the
-  Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
+  Cook–Levin discharge, and its width-three restriction 3-DNF-TAUT
+  (`DescriptiveComplexity.ThreeDnfTAUT_coNP_complete`) follows the same route
+  through the CNF-side reading 3-UNSAT, which is where the width promise of the
+  clause-splitting reduction is still in hand (`3SATᶜ` would not do: it is a
+  disjunction, since 3SAT folds the width bound into its yes-instances);
+  `QBF k`, quantified Boolean formulas with `k`
   alternating blocks, is complete for the `k`-th level of the hierarchy
   ([Stockmeyer 1976][stockmeyer1976polynomial]; [Wrathall
   1976][wrathall1976complete]) by the same Tseitin discharge carrying block

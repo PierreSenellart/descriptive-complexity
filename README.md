@@ -83,7 +83,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 | --- | --- | --- |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi; equivalently acceptance by a deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT (and QBF∀ at one block) |
+| **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order blocks, existential first (Stockmeyer) | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order blocks, universal first | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — |

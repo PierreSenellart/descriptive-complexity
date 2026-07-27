@@ -73,13 +73,6 @@ and SO-Horn → HORN-SAT; the discharges still to do:
 | SO-Krom (NL) | 2SAT | Krom kernel ⇒ binary clauses |
 | SO(TC) (PSPACE) | QSAT | least mechanical: natural image is a succinct/game reachability, QSAT via the standard alternation argument |
 
-- **3-DNF-TAUT** [M]: the width-three variant of TAUT does not come for free.
-  3SAT folds its width bound into the yes-instances
-  (`ThreeSatisfiable = WidthAtMostThree ∧ Satisfiable`), so its complement is a
-  disjunction and the sign swap that gives plain TAUT does not transfer. 3-DNF-
-  TAUT hardness needs the *invariant* that the SAT → 3SAT reduction always
-  outputs width-≤ 3 instances, which the `≤ᶠᵒ` interface hides; it would have to
-  be exposed alongside the reduction.
 - **P-complete reductions from HORN-SAT** [M]: Circuit Value Problem, Monotone
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
@@ -473,13 +466,16 @@ blocked.
 1. **A sharpening pass on what is already public** (each [M], no
    prerequisites, no new surface): the **PH machine bridge** (§7), closing the
    visible asymmetry of a bridge that exists for NP and PTIME but not for the
-   hierarchy they sit in; **invariant exposure through the reduction
-   interface** (§3's reduction-notion refinements and §2's 3-DNF-TAUT are the
-   same mechanism, so do them together: tracking shape invariants through
-   composition upgrades catalog statements to the DC-faithful "complete under
-   qfps" and yields 3-DNF-TAUT as a by-product); **Spectra** (§4) and **CVP
-   from HORN-SAT** (§2), two near-free recognizable names, the latter also the
-   discharge Immerman–Vardi wants.
+   hierarchy they sit in; **quantifier-free / projection / dimension tracking
+   through composition** (§3's reduction-notion refinements), which upgrades
+   catalog statements to the DC-faithful "complete under qfps"; **Spectra**
+   (§4) and **CVP from HORN-SAT** (§2), two near-free recognizable names, the
+   latter also the discharge Immerman–Vardi wants. Note what 3-DNF-TAUT (done)
+   taught about the first of these: a discharge that needs an *image* invariant
+   the `≤ᶠᵒ` interface hides does not force a general invariant-tracking layer,
+   because building the reduction from the complement side keeps the promise in
+   hand where it is proved. Reach for tracking when a second consumer appears,
+   not before.
 2. **The NL layer, cheapest piece first**: **SO-Krom** before FO(TC). It is the
    best effort/value ratio in this document, a clause-list clone of the
    finished SO-Horn whose discharge is the HORN-SAT construction with signs
