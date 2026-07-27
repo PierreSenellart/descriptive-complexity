@@ -86,9 +86,20 @@ namespace DescriptiveComplexity
 /-- A packaged concrete crawling instance: `n + 1` pages, the hyperlinks, the
 root page, the target pages, and the budget (clamped to `n + 1` by its type:
 a crawl never has more pages than the site). -/
-abbrev CrawlInstance : Type :=
-  Σ n : ℕ, Finset (Fin (n + 1) × Fin (n + 1)) × Fin (n + 1) ×
-    Finset (Fin (n + 1)) × Fin (n + 2)
+structure CrawlInstance where
+  /-- The page count, minus one: pages are `Fin (n + 1)`, so a website is
+  never empty. -/
+  n : ℕ
+  /-- The hyperlinks. -/
+  edges : Finset (Fin (n + 1) × Fin (n + 1))
+  /-- The root page, where crawls start. -/
+  root : Fin (n + 1)
+  /-- The target pages. -/
+  targets : Finset (Fin (n + 1))
+  /-- The budget, clamped by its type: a crawl never has more pages than the
+  site. -/
+  budget : Fin (n + 2)
+  deriving DecidableEq
 
 /-- The textbook size of a packaged instance: pages, links, targets, and the
 budget in unary. The one audited line of the encoding. -/
@@ -189,12 +200,12 @@ Two packaging choices are dictated by the machinery:
 /-- The encoder, standalone and auditable (cf. `cqRelBool`): a plain `def`,
 so the compiler vouches that it computes, and the `#guard`s below run it. -/
 def crawlRelBool (i : CrawlInstance) {n : ℕ} (R : Language.siteGraph.Relations n) :
-    (Fin n → Fin (i.1 + 1)) → Bool :=
+    (Fin n → Fin (i.n + 1)) → Bool :=
   match n, R with
-  | _, .edge => fun x => decide ((x 0, x 1) ∈ i.2.1)
-  | _, .root => fun x => decide (x 0 = i.2.2.1)
-  | _, .target => fun x => decide (x 0 ∈ i.2.2.2.1)
-  | _, .marked => fun x => decide ((x 0).1 < i.2.2.2.2.1)
+  | _, .edge => fun x => decide ((x 0, x 1) ∈ i.edges)
+  | _, .root => fun x => decide (x 0 = i.root)
+  | _, .target => fun x => decide (x 0 ∈ i.targets)
+  | _, .marked => fun x => decide ((x 0).1 < i.budget.1)
 
 /-- The encoding of packaged crawling instances by
 `Language.siteGraph`-structures: the pages themselves as universe, the budget
@@ -202,7 +213,7 @@ decoded as the marked initial segment `DescriptiveComplexity.initSeg`. Both size
 bounds are discharged at construction. -/
 def crawlEncoding : Encoding Language.siteGraph CrawlInstance where
   size := crawlSize
-  Univ := fun i => Fin (i.1 + 1)
+  Univ := fun i => Fin (i.n + 1)
   deceq := fun _ => inferInstance
   fintype := fun _ => inferInstance
   relBool := fun i {n} R => crawlRelBool i R

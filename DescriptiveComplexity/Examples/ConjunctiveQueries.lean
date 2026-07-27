@@ -105,8 +105,8 @@ encoding must preserve the *meaning* (semantic equivalence, step 6) and the
 *size* (no padding, no compression, step 3) – and the machinery of
 `DescriptiveComplexity.Encoding` makes both machine-checked. Stating the size
 obligation needs the whole family of instances to be a single type, so the
-data is also *packaged* as a dependent tuple `CQInstance` of its dimensions
-and contents. Two choices in the packaging are dictated by the machinery
+data is also *packaged* as a record `CQInstance` of its dimensions and
+contents. Two choices in the packaging are dictated by the machinery
 itself, and both are the kind of judgement call the size bounds exist to
 catch:
 
@@ -143,10 +143,17 @@ end Concrete
 /-- A packaged concrete evaluation instance: `n` query variables, `m + 1`
 database constants, a finite set of query atoms over them, and a finite set
 of database facts on the constants. -/
-abbrev CQInstance : Type :=
-  Σ n m : ℕ,
-    Finset ((Fin n ⊕ Fin (m + 1)) × (Fin n ⊕ Fin (m + 1))) ×
-      Finset (Fin (m + 1) × Fin (m + 1))
+structure CQInstance where
+  /-- The number of query variables. -/
+  vars : ℕ
+  /-- The number of constants, minus one: constants are `Fin (consts + 1)`,
+  so the database domain is never empty. -/
+  consts : ℕ
+  /-- The query atoms, over variables and constants. -/
+  atoms : Finset ((Fin vars ⊕ Fin (consts + 1)) × (Fin vars ⊕ Fin (consts + 1)))
+  /-- The database facts, over the constants. -/
+  facts : Finset (Fin (consts + 1) × Fin (consts + 1))
+  deriving DecidableEq
 
 /-- The textbook size of a packaged instance: elements (variables and
 constants) plus atoms plus facts. This is the one audited line of the
@@ -241,13 +248,13 @@ membership is decided through `Multiset` quotients, whose instances cite them
 in *proof* positions only – executability is witnessed by execution, not by
 the axiom report. -/
 def cqRelBool (i : CQInstance) {n : ℕ} (R : Language.queryDb.Relations n) :
-    (Fin n → (Fin i.1 ⊕ Fin (i.2.1 + 1))) → Bool :=
+    (Fin n → (Fin i.vars ⊕ Fin (i.consts + 1))) → Bool :=
   match n, R with
   | _, .isVar => fun x => (x 0).isLeft
-  | _, .atom => fun x => decide ((x 0, x 1) ∈ i.2.2.1)
+  | _, .atom => fun x => decide ((x 0, x 1) ∈ i.atoms)
   | _, .fact => fun x =>
     match x 0, x 1 with
-    | Sum.inr a, Sum.inr b => decide ((a, b) ∈ i.2.2.2)
+    | Sum.inr a, Sum.inr b => decide ((a, b) ∈ i.facts)
     | _, _ => false
 
 /-- The encoding of packaged instances by `Language.queryDb`-structures:
@@ -256,7 +263,7 @@ packaged sets (`cqRelBool`, a `Bool`-valued query/database structure).
 The bounds record that nothing blows up and nothing is compressed. -/
 def cqEncoding : Encoding Language.queryDb CQInstance where
   size := cqSize
-  Univ := fun i => Fin i.1 ⊕ Fin (i.2.1 + 1)
+  Univ := fun i => Fin i.vars ⊕ Fin (i.consts + 1)
   deceq := fun _ => inferInstance
   fintype := fun _ => inferInstance
   relBool := fun i {n} R => cqRelBool i R
@@ -835,10 +842,10 @@ section
 set_option linter.hashCommand false
 
 #guard (cqDecode cqPres).isSome
-#guard ((cqDecode cqPres).map fun i => i.1) = some 1
-#guard ((cqDecode cqPres).map fun i => i.2.1) = some 1
-#guard ((cqDecode cqPres).map fun i => i.2.2.1.card) = some 1
-#guard ((cqDecode cqPres).map fun i => i.2.2.2.card) = some 1
+#guard ((cqDecode cqPres).map fun i => i.vars) = some 1
+#guard ((cqDecode cqPres).map fun i => i.consts) = some 1
+#guard ((cqDecode cqPres).map fun i => i.atoms.card) = some 1
+#guard ((cqDecode cqPres).map fun i => i.facts.card) = some 1
 
 end
 
