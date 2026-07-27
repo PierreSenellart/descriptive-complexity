@@ -165,113 +165,53 @@ individual declarations are documented on their own pages.
 
 ## The problem catalog
 
-* `DescriptiveComplexity.Problems` – one decision problem per file: SAT with
-  the Cook–Levin theorem ([Cook 1971][cook1971complexity];
-  [Levin 1973][levin1973universal]) proved by a machine-free Tseitin discharge,
-  3-colorability (FO-interreducible with SAT in both directions), 3SAT,
-  NAE-SAT with its width-three restriction NAE-3SAT, and 1-in-SAT – the
-  Schaefer-style variants ([Schaefer 1978][schaefer1978complexity]) that make
-  convenient reduction sources: the first two reuse the SAT/3SAT
-  interpretations unchanged, only the notion of satisfaction differing, and
-  the third normalizes every clause to three slots, so that one gadget covers
-  every width at once – and
-  the clique family (Clique, Independent Set, Vertex Cover) with their
-  inter-reductions and NP-completeness; the coloring family – `k`-colorability
-  for every `k ≥ 3` by padding 3-colorability with blown-up universal
-  vertices, then Chromatic Number and Clique Cover, whose threshold is a
-  *number of colors*, so that their membership guesses a coloring by the
-  marked elements themselves; Subgraph Isomorphism, where an injective
-  homomorphism of a pattern graph into a host graph generalizes Clique; the
-  set family – Set Cover, Hitting Set and Set Packing on a bipartite
-  incidence vocabulary, the first two transposes of
-  each other, all three NP-hard by reading a graph as the incidence system of
-  its edges ([Karp 1972][karp1972reducibility]), and, on that same vocabulary,
-  Exact Cover, where exactness replaces the threshold and hardness comes from
-  exactly-one satisfiability, and Set Splitting – hypergraph
-  2-colourability – hard from NAE-SAT, both by reductions with no gadget and
-  no counting at all;
-  Dominating Set, whose condition ranges over *every* vertex – junk tuples
-  included, which is what makes its reduction from Set Cover delicate – and
-  which is nevertheless order-free, the two degenerate cases being gated
-  first-order; Feedback Vertex Set and
-  Feedback Arc Set, NP-hard by symmetrizing the arcs of a digraph and then
-  splitting its vertices, with a first-order certificate of acyclicity (a
-  guessed strict partial order) for their membership and a threshold carried
-  by a marked *binary* relation for the second; Max Cut, on that same
-  arc-marked vocabulary, hard from NAE-3SAT by a gadget needing neither edge
-  weights nor parallel edges – the cut is read as the ordered pairs crossing
-  it, and the whole counting argument is one injective charge map from the cut
-  to the marks; Steiner Tree in both its node- and its
-  edge-weighted reading, the connectivity condition certified first-order by a
-  guessed root and order, from which the `n − 1` edge bound also follows;
-  Knapsack – Karp's subset sum – the first problem of the catalog whose
-  numbers are written in *binary*, so that they may be exponential in the size
-  of the instance: membership verifies a ripple-carry addition along a guessed
-  sequence of partial sums, and hardness reads an exact-cover instance as a
-  base-`2 ^ |A|` number, one digit block of bit positions per ground element,
-  wide enough that no carry ever crosses a block; Partition, on that same
-  binary vocabulary with the target unused, since the number to reach – half
-  the total – is not part of the instance: its certificate walks *two*
-  ripple-carry chains, one per side, on positions twice as wide as the ones
-  the instance writes, and its hardness comes from NAE-SAT rather than from
-  Knapsack, Karp's padding by `2Σ − T` and `Σ + T` being arithmetic in the
-  total, hence not first-order – one digit block per variable, totalling `2`,
-  makes a balanced split an assignment, and one per clause, totalling
-  `w + (w − 2)` with one slack item per occurrence that is neither the first
-  nor the last, makes it a not-all-equal one; 0-1 integer programming, the
-  multi-row form of Knapsack, whose two halves are the cheapest of the group –
-  a single equation with `0-1` variables already is a subset-sum instance, so
-  the reduction is the identity in everything but the vocabulary, its one
-  piece of work being to name the single row, and the certificate is
-  Knapsack's read once per row, the guessed running totals and carries
-  carrying a row argument and every clause a guard; job sequencing, the first
-  problem whose kernel has to **compare** numbers rather than add them – a job
-  is late when its deadline falls below its completion time, which is written
-  by the highest position where the two differ – and whose certificate guesses
-  the schedule itself, as a linear order, the walk layer taking that guessed
-  order as the one it follows, while its hardness has a gadget *write half of
-  its own total*: every digit block is given an even total, `2` per variable
-  and `2 (w − 1)` per clause of width `w ∈ {2, 3}`, so the common deadline –
-  and the bound, which equals it – is the digit-wise half, one bit per block,
-  and a schedule meeting it is a balanced split, that is, a not-all-equal
-  satisfying assignment;
-  3-dimensional matching, the tripartite exact cover, whose
-  certificate is the first **ternary** one of the catalog and whose hardness is
-  Karp's own reduction from SAT: a truth-setting gadget running *cyclically*
-  through the occurrences of each variable – a cycle has exactly two matchings,
-  a path only one – a pair per clause reachable only through the tip of a true
-  literal, and one garbage pair per occurrence that is not the first of its
-  clause, which is exactly the number of tips left over;
-  the two Hamilton circuit problems, directed and undirected – the last of
-  Karp's 21, whose completeness closes the list –
-  a circuit being read as a **linear order of the universe** whose consecutive
-  elements are adjacent and whose last is adjacent to its first – the
-  job-sequencing schedule closed into a cycle – with the undirected problem
-  reducing to the directed one by doubling each edge, and the undirected one
-  NP-hard from Vertex Cover by Karp's twelve-vertex cover-testing gadget, the
-  first reduction of the catalog whose target is a *spanning* problem, so
-  that its interpretation carries a definable domain;
-  TAUT, the tautology problem for
-  formulas in disjunctive normal form, coNP-complete by complementing the
+`DescriptiveComplexity.Problems` holds one decision problem per file, each with
+its vocabulary, FO reductions and a completeness theorem. Every class in the
+table below is *defined* logically; each problem listed is proved **complete**
+for it – both a member and hard under FO reductions. The catalog covers all of
+Karp's 21 NP-complete problems. Each problem's own module page documents its
+reduction and certificate in full.
+
+| Complexity class | Logical characterization | Problems proved complete |
+| --- | --- | --- |
+| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
+| `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine<br>**Queries:** Conjunctive Query Evaluation · CQ Containment |
+| `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT (and QBF∀ at one block) |
+| `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order blocks, existential first ([Stockmeyer 1976][stockmeyer1976polynomial]) | `QBF k` – at `k = 1`, NP |
+| `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
+| `PH` | full second-order logic | — |
+
+Headline results and cross-references:
+
+* **Cook–Levin, machine-free** (`DescriptiveComplexity.SAT_NP_complete`;
+  [Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal]): SAT is
+  NP-complete by a Tseitin discharge, no machine model. 3-colorability is
+  FO-interreducible with SAT in both directions.
+* **The machine bridge** (`MACHINE.md`): machine acceptance
+  (`DescriptiveComplexity.NTMAccept`) – does this nondeterministic Turing
+  machine, carried as data by the instance, accept its input within a
+  polynomial step budget (as many steps as there are tape positions)? – is
+  NP-complete
+  (`DescriptiveComplexity.ntmAccept_NP_complete`), so a problem is in the
+  library's NP exactly when it ordered-FO-reduces to it
+  (`DescriptiveComplexity.mem_NP_iff_le_ntmAccept`): the logically defined
+  class *is* the machine one. The textbook Cook–Levin – machine acceptance
+  reduces to SAT – is `DescriptiveComplexity.ntmAccept_reduces_to_sat`.
+* **All of Karp's 21** ([Karp 1972][karp1972reducibility]): the SAT, clique,
+  set, coloring, graph and number families above, closed by the two Hamilton
+  circuit problems – a circuit read as a linear order of the universe, hard
+  from Vertex Cover by Karp's twelve-vertex cover-testing gadget.
+* **PTIME by the Horn fragment**: HORN-SAT is PTIME-complete
+  (`DescriptiveComplexity.HORNSAT_PTIME_complete`) by the Horn discharge and a
+  Horn program for unit propagation – the P-level analogue of Cook–Levin,
+  equally machine-free. REACH/UNREACH is a second worked instance of the
+  fragment (a membership example, not proved complete).
+* **Above NP**: TAUT (DNF tautology) is coNP-complete by complementing the
   Cook–Levin discharge; `QBF k`, quantified Boolean formulas with `k`
-  alternating blocks, complete for the `k`-th level of the hierarchy
+  alternating blocks, is complete for the `k`-th level of the hierarchy
   ([Stockmeyer 1976][stockmeyer1976polynomial]; [Wrathall
   1976][wrathall1976complete]) by the same Tseitin discharge carrying block
-  marks; HORN-SAT, PTIME-complete by the Horn discharge and a Horn program for
-  unit propagation – the P-level analogue of Cook–Levin, equally machine-free;
-  and REACH/UNREACH, whose Horn program is a second worked instance of the
-  fragment;
-  and machine acceptance (`DescriptiveComplexity.NTMAccept`) – does this
-  nondeterministic Turing machine, carried as data by the instance, accept its
-  input within as many steps as there are positions? – NP-complete, membership
-  by guessing the run (Fagin's tableau argument) and hardness by a bespoke
-  machine built inside the SAT instance: guess an assignment in one sweep,
-  check one clause per sweep, alternating direction. This is the machine
-  bridge of `MACHINE.md`: a problem is in the library's NP exactly when it
-  ordered-FO-reduces to machine acceptance
-  (`DescriptiveComplexity.mem_NP_iff_le_ntmAccept`), so the logically defined class
-  is the machine one, and the textbook form of Cook–Levin – machine acceptance
-  reduces to SAT – is `DescriptiveComplexity.ntmAccept_reduces_to_sat`.
+  marks.
 
 ## Worked examples
 

@@ -42,32 +42,36 @@ The library is organized in three layers:
   FO(LFP) by a formalized Grädel translation, so that PTIME is closed under
   complement (`Π₀ᵖ = Σ₀ᵖ`) as a theorem. Everything is a definition or a
   theorem: the library declares no axioms.
-* **A problem catalog and worked examples**: SAT (with a machine-free
-  Cook–Levin theorem), 3-colorability and `k`-colorability for every `k ≥ 3`,
-  3SAT, NAE-SAT with its width-three restriction NAE-3SAT and 1-in-SAT,
-  Chromatic Number and Clique Cover, the clique family
-  (Clique / Independent Set / Vertex Cover), Subgraph Isomorphism, Set Cover,
-  Hitting Set, Set Packing, Exact Cover, Set Splitting and Dominating Set,
-  3-dimensional matching, Feedback Vertex Set and Feedback Arc Set,
-  Steiner Tree, Max Cut, Knapsack – the subset-sum problem, with the weights
-  in binary – Partition, 0-1 integer programming, job sequencing,
-  TAUT (coNP-complete),
-  `QBF k` – quantified Boolean formulas with `k` alternating blocks, complete
-  for the `k`-th level of the polynomial hierarchy – and HORN-SAT, complete for
-  PTIME by the analogous machine-free discharge one level down; plus the two
-  Hamilton circuit problems, directed and undirected – a circuit being read as
-  a linear order of the universe, and hardness by Karp's twelve-vertex
-  cover-testing gadget, completing **all of Karp's 21 problems** – and a
-  tutorial on conjunctive queries. Each comes with its vocabulary, FO reductions and
-  completeness theorems. Machine acceptance – does this nondeterministic
-  Turing machine, carried as data by the instance, accept its input within as
-  many steps as there are positions? – is NP-complete
-  (`ntmAccept_NP_complete`), with a bespoke machine built inside the SAT
-  instance for hardness; a problem is therefore in the library's NP exactly
-  when it ordered-FO-reduces to machine acceptance
-  (`mem_NP_iff_le_ntmAccept`), so the logically defined class is the machine
-  one, and the textbook form of Cook–Levin – machine acceptance reduces to
-  SAT – falls out of the generic discharge (`ntmAccept_reduces_to_sat`).
+* **A problem catalog and worked examples**: one decision problem per file,
+  each with its vocabulary, FO reductions and a completeness theorem, plus
+  tutorial-style worked examples. Highlights: a machine-free Cook–Levin theorem
+  for SAT, **all of Karp's 21 problems**, PTIME-completeness of HORN-SAT by the
+  analogous machine-free discharge one level down, and the *machine bridge* –
+  machine acceptance is NP-complete (`ntmAccept_NP_complete`), so a problem is
+  in the library's NP exactly when it ordered-FO-reduces to it
+  (`mem_NP_iff_le_ntmAccept`) and the logically defined class *is* the machine
+  one. The classes these problems populate, their logical characterizations,
+  and the problems proved complete for each are collected in the table below.
+
+## Complexity classes and complete problems
+
+Every class is *defined* logically – no machine model, no axioms. Each problem
+listed is proved **complete** for its class: both a member and hard for it
+under FO reductions. Karp's 21 NP-complete problems are all present.
+
+| Complexity class | Logical characterization | Problems proved complete |
+| --- | --- | --- |
+| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi | HORN-SAT |
+| **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine<br>**Queries:** Conjunctive Query Evaluation · CQ Containment |
+| **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT (and QBF∀ at one block) |
+| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order blocks, existential first (Stockmeyer) | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
+| **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order blocks, universal first | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
+| **PH** | full second-order logic | — |
+
+The characterizations are the logical *definitions* of the classes (see the
+Overview above); the inclusions and dualities relating them are theorems.
+REACH/UNREACH is given as a further worked instance in PTIME – a membership
+example, not proved complete.
 
 ## Use as a dependency
 
