@@ -10,7 +10,9 @@ import DescriptiveComplexity.Problems.Machine.Program
 import DescriptiveComplexity.Problems.Machine.Tape
 import DescriptiveComplexity.Problems.Machine.Hardness
 import DescriptiveComplexity.Problems.Machine.Interp
+import DescriptiveComplexity.Problems.Machine.Fixpoint
 import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Problems.HornSat
 
 /-!
 # Machine acceptance is NP-complete
@@ -86,5 +88,30 @@ satisfiability. No tableau-to-CNF encoding appears: the `Σ₁` definition of
 acceptance feeds the machine-free Tseitin discharge. -/
 theorem ntmAccept_reduces_to_sat : Nonempty (NTMAccept ≤ᶠᵒ[≤] SAT) :=
   sat_hard_of_sigmaSODefinable NTMAccept ntmAccept_sigmaSODefinable
+
+/-! ### The deterministic problem
+
+`DescriptiveComplexity.dtmAccept_mem_PTIME` – a deterministic run is a least fixed
+point – is stage 2b of the bridge, proved in
+`DescriptiveComplexity.Problems.Machine.Fixpoint`. Its hardness half (stage 4, the
+unit-propagation machine for `HORNSAT ≤ᶠᵒ[≤] DTMAccept`) is still open, so the
+PTIME-completeness theorem is not yet available; what already follows from
+membership alone is recorded here. -/
+
+/-- Deterministic machine acceptance is in NP: `PTIME ⊆ NP`. -/
+theorem dtmAccept_mem_NP : DTMAccept ∈ NP :=
+  PTIME_subset_NP dtmAccept_mem_PTIME
+
+/-- **Determinism is a special case of nondeterminism**, as a reduction:
+deterministic acceptance reduces to machine acceptance. (Through SAT, by the
+machine characterization of NP – no bespoke interpretation needed.) -/
+theorem dtmAccept_reduces_to_ntmAccept : Nonempty (DTMAccept ≤ᶠᵒ[≤] NTMAccept) :=
+  (mem_NP_iff_le_ntmAccept DTMAccept).mp dtmAccept_mem_NP
+
+/-- **The textbook Grädel-side discharge**: deterministic machine acceptance
+reduces to HORN-SAT, the P-level analogue of
+`DescriptiveComplexity.ntmAccept_reduces_to_sat`. -/
+theorem dtmAccept_reduces_to_hornSat : Nonempty (DTMAccept ≤ᶠᵒ[≤] HORNSAT) :=
+  hornSat_hard_of_sigmaSOHornDefinable DTMAccept dtmAccept_mem_PTIME
 
 end DescriptiveComplexity
