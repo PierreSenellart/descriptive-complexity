@@ -126,6 +126,53 @@ theorem coPTIME_subset_NP : PiP 0 ⊆ NP := by
 theorem piP_zero_subset_PH : PiP 0 ⊆ PH :=
   fun _ _ hP => ⟨1, coPTIME_subset_NP hP⟩
 
+/-! ### Monotonicity of the hierarchy
+
+`DescriptiveComplexity.sigmaP_subset_sigmaP_succ` climbs one level at a time and only
+from level 1 up, its level-0 step being `DescriptiveComplexity.PTIME_subset_NP` above:
+padding an existential second-order sentence with an unused block is not what
+takes a Horn program to `Σ₁`. Assembling the two into the uniform statement
+therefore has to happen here, downstream of the Horn discharge. -/
+
+/-- One step up, at every level: `Σₖᵖ ⊆ Σₖ₊₁ᵖ`, by padding above level 0 and by
+the Horn discharge at level 0. -/
+theorem sigmaP_subset_succ (k : ℕ) : SigmaP k ⊆ SigmaP (k + 1) := by
+  cases k with
+  | zero => exact PTIME_subset_NP
+  | succ k => exact sigmaP_subset_sigmaP_succ k
+
+/-- One step up on the `Π` side: `Πₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
+theorem piP_subset_succ (k : ℕ) : PiP k ⊆ PiP (k + 1) := by
+  cases k with
+  | zero => exact coPTIME_subset_coNP
+  | succ k => exact piP_subset_piP_succ k
+
+/-- **The `Σ` levels are monotone**: `j ≤ k` gives `Σⱼᵖ ⊆ Σₖᵖ`, by induction on
+`k` along `DescriptiveComplexity.sigmaP_subset_succ`. In particular `PTIME ⊆ Σₖᵖ` and
+`NP ⊆ Σₖᵖ` for every `k ≥ 1`. -/
+theorem sigmaP_mono {j k : ℕ} (h : j ≤ k) : SigmaP j ⊆ SigmaP k := by
+  induction k, h using Nat.le_induction with
+  | base => exact fun _ _ hP => hP
+  | succ k hk ih => exact fun _ _ hP => sigmaP_subset_succ k (ih hP)
+
+/-- **The `Π` levels are monotone**: `j ≤ k` gives `Πⱼᵖ ⊆ Πₖᵖ`. -/
+theorem piP_mono {j k : ℕ} (h : j ≤ k) : PiP j ⊆ PiP k := by
+  induction k, h using Nat.le_induction with
+  | base => exact fun _ _ hP => hP
+  | succ k hk ih => exact fun _ _ hP => piP_subset_succ k (ih hP)
+
+/-- **`PTIME ⊆ Σₖᵖ`** at every level. Stated separately because
+`DescriptiveComplexity.PTIME` is a definition of its own rather than the literal
+`SigmaP 0`: the two are definitionally equal, but unification cannot guess the
+level, so `DescriptiveComplexity.sigmaP_mono` does not apply as it stands. -/
+theorem PTIME_subset_sigmaP (k : ℕ) : PTIME ⊆ SigmaP k :=
+  sigmaP_mono (Nat.zero_le k)
+
+/-- **`co-PTIME ⊆ Πₖᵖ`** at every level, the mirror of
+`DescriptiveComplexity.PTIME_subset_sigmaP`. -/
+theorem piP_zero_subset_piP (k : ℕ) : PiP 0 ⊆ PiP k :=
+  piP_mono (Nat.zero_le k)
+
 /-- HORN-SAT is FO(LFP) definable, being SO-Horn definable. -/
 theorem hornSat_lfpDefinable : LFPDefinable HORNSAT :=
   hornSat_sigmaSOHornDefinable.lfpDefinable

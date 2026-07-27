@@ -157,8 +157,11 @@ individual declarations are documented on their own pages.
   just as NP is defined by `Σ₁`-definability. HORN-SAT is PTIME-complete – hard
   by the Horn discharge, and a member by the Horn program that computes unit
   propagation along the order – which also yields the four inclusions of level
-  0 into level 1. See `DescriptiveComplexity.Problems.HornSat` for what is and is not
-  claimed.
+  0 into level 1, and with them the monotonicity of the hierarchy
+  (`DescriptiveComplexity.sigmaP_mono`, `DescriptiveComplexity.piP_mono`): the padding
+  step of `DescriptiveComplexity.Hierarchy` climbs only from level 1 up, its level-0
+  step being the Horn discharge. See `DescriptiveComplexity.Problems.HornSat` for what
+  is and is not claimed.
 
 * `DescriptiveComplexity.FixedPoint` – FO(LFP) ([Immerman
   1986][immerman1986relational]; [Vardi 1982][vardi1982complexity]), in the same

@@ -295,7 +295,8 @@ theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} (P : DecisionProblem L) :
 
 /-- `Σₖ₊₁ᵖ ⊆ Σₖ₊₂ᵖ`, by padding. (The level-0 inclusions are proved downstream
 with HORN-SAT, which their proofs go through: `DescriptiveComplexity.PTIME_subset_NP`
-and friends.) -/
+and friends. Uniform monotonicity, `j ≤ k → Σⱼᵖ ⊆ Σₖᵖ`, therefore also lives
+there: `DescriptiveComplexity.sigmaP_mono`.) -/
 theorem sigmaP_subset_sigmaP_succ (k : ℕ) : SigmaP (k + 1) ⊆ SigmaP (k + 2) :=
   fun _ _ hP => SigmaSODefinable.succ hP
 
