@@ -27,6 +27,9 @@ import DescriptiveComplexity.TransitiveClosure
 import DescriptiveComplexity.TransitiveClosureKrom
 import DescriptiveComplexity.KromImplication
 import DescriptiveComplexity.KromTransitiveClosure
+import DescriptiveComplexity.Counting
+import DescriptiveComplexity.TransitiveClosureCompl
+import DescriptiveComplexity.ImmermanSzelepcsenyi
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -199,9 +202,10 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.LogSpace` – the class `DescriptiveComplexity.NL`. Its inclusion
   in the classes above is *not* syntactic (a Krom kernel is not a Horn kernel)
   and goes through the complete problem: `DescriptiveComplexity.NL_subset_PTIME` and
-  `DescriptiveComplexity.NL_subset_NP`, both downstream with 2SAT. What stays
-  unproved is `NL = coNL` (Immerman–Szelepcsényi), which is a genuine theorem
-  rather than the definitional duality that gives `PiP k` from `SigmaP k`.
+  `DescriptiveComplexity.NL_subset_NP`, both downstream with 2SAT. That the class is
+  closed under complement – `NL = coNL` – is *not* the definitional duality
+  that gives `PiP k` from `SigmaP k` but Immerman–Szelepcsényi, proved in
+  `DescriptiveComplexity.ImmermanSzelepcsenyi` (`DescriptiveComplexity.NL_eq_coNL`).
 * `DescriptiveComplexity.TransitiveClosure` – FO(TC) ([Immerman
   1987][immerman1987languages]), the logic that captures NL on ordered
   structures, in the same kernel-as-data style: a `DescriptiveComplexity.TCSpec` is an
@@ -211,8 +215,8 @@ individual declarations are documented on their own pages.
   elements cannot supply – a one-element universe has one tuple – and play the
   role tags play in an interpretation. It is the logic in which REACH is stated
   head-on (`DescriptiveComplexity.reach_tcDefinable`) and in which
-  Immerman–Szelepcsényi would be proved: the missing bridge that would give
-  `REACH ∈ NL`, the clausal fragments defining only the complement.
+  Immerman–Szelepcsényi is proved, the bridge that gives `REACH ∈ NL`, the
+  clausal fragments defining only the complement.
 * `DescriptiveComplexity.TwoCnf` – the criterion for 2-satisfiability ([Aspvall,
   Plass & Tarjan 1979][aspvall1979linear]) with no logic in it at all: over a
   finite type of variables, a 2-CNF is satisfiable iff no literal reaches its
@@ -233,14 +237,33 @@ individual declarations are documented on their own pages.
   of `DescriptiveComplexity.TwoCnf.carryReach_iff`, the start literal, the current one
   and the flag being the mode and the two atoms' arguments the two halves of
   the tuple. With the direction below it gives `co-NL(Krom) = NL(TC)`
-  (`DescriptiveComplexity.mem_NL_iff_tcDefinable_compl`) – not `REACH ∈ NL`, which
-  needs the complementation of FO(TC) itself.
+  (`DescriptiveComplexity.mem_NL_iff_tcDefinable_compl`); `NL(Krom) = NL(TC)`, and
+  with it `REACH ∈ NL`, needs the complementation of FO(TC) itself, which is
+  `DescriptiveComplexity.TCDefinable.compl`.
 * `DescriptiveComplexity.TransitiveClosureKrom` – the translation that *is* free:
   the complement of an FO(TC) definable problem is SO-Krom definable
   (`DescriptiveComplexity.SigmaSOKromDefinable.compl_of_tcDefinable`), hence in NL, by
   the program guessing the nodes from which an accepting node is reachable, one
   `k`-ary relation variable per mode. `DescriptiveComplexity.unreach_mem_NL` is its
   single-mode, arity-one instance, written out by hand as a worked example.
+* `DescriptiveComplexity.Counting` and `DescriptiveComplexity.TransitiveClosureCompl` –
+  **FO(TC) is closed under complement** (`DescriptiveComplexity.TCDefinable.compl`), by
+  inductive counting. The machine is combinatorial, on an abstract finite
+  linearly ordered node set: eight registers, each a node or a count read as a
+  rank, and four nested loops – the stages, the outer scan, the inner scan and
+  a certifying walk – that compute `|Rset (d+1)|` from `|Rset d|`, the count
+  check leaving a guessed set of layer nodes no room to be too small. The
+  first-order layer stores a register as one `k`-tuple beside a mode kept in
+  the control, so a configuration *is* a mode with an `8k`-tuple, and compiles
+  every atomic constraint of the machine into a formula once the modes are
+  known – mode-level conditions ("the least mode", "this mode covers that
+  one") being decided outside the formula.
+* `DescriptiveComplexity.ImmermanSzelepcsenyi` – **`NL = coNL`**
+  (`DescriptiveComplexity.NL_eq_coNL`), assembled from the complementation of FO(TC)
+  and the two translations against the Krom fragment. It also gives what those
+  translations alone could not: NL *is* FO(TC)
+  (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), the Krom fragment is closed under
+  complement, and `REACH ∈ NL` (`DescriptiveComplexity.reach_mem_NL`).
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads
@@ -275,7 +298,8 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.OrderWalk` – walking a finite linear order (or the
   lexicographic order on tuples) first-order: min/max/successor guards and
   their tuple analogues, induction along covers, and the rank of an element.
-  Shared between the HORN-SAT program and the FO(LFP) → SO-Horn translation.
+  Shared between the HORN-SAT program, the FO(LFP) → SO-Horn translation and
+  the counting machine, whose registers are exactly ranks and tuple walks.
 * `DescriptiveComplexity.Numbers` – unary and binary encodings of numbers as
   finite structures, for threshold and weight parameters of problems.
 * `DescriptiveComplexity.Machines` – Turing machines as relations on a
@@ -294,7 +318,7 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing] | 2SAT |
+| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing]; equivalently FO(TC) (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), so `NL = coNL` | 2SAT |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
@@ -340,8 +364,8 @@ Headline results and cross-references:
   two-literal program guessing the vertices from which a marked target is
   reachable. In both fragments it is the *complement* that is definable
   head-on, clauses being able to close and to reject but not to force
-  minimality; REACH escapes at the Horn level through FO(LFP), and would escape
-  at the Krom level through `NL = coNL`, which is not proved here.
+  minimality; REACH escapes at the Horn level through FO(LFP), and at the Krom
+  level through `NL = coNL` (`DescriptiveComplexity.reach_mem_NL`).
 * **Above NP**: TAUT (DNF tautology) is coNP-complete by complementing the
   Cook–Levin discharge, and its width-three restriction 3-DNF-TAUT
   (`DescriptiveComplexity.ThreeDnfTAUT_coNP_complete`) follows the same route

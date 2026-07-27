@@ -81,7 +81,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| **NL** | SO-Krom (existential second-order Krom: at most two second-order literals per clause, either sign) – Grädel; equivalently the complements of the FO(TC) definable problems (FO(TC) itself would need Immerman–Szelepcsényi) | 2SAT |
+| **NL** | SO-Krom (existential second-order Krom: at most two second-order literals per clause, either sign) – Grädel; equivalently FO(TC), since FO(TC) is closed under complement (Immerman–Szelepcsényi), whence `NL = coNL` | 2SAT · (REACH is a member) |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi; equivalently acceptance by a deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
@@ -142,8 +142,7 @@ user is most likely to want:
   capture them (FO(DTC), SO(TC), FO(PFP)/SO(LFP)) and their complete problems
   (REACHd, QSAT), each with a machine bridge as for NP and PTIME. Below NP this
   also brings the P-complete problems (Circuit Value, alternating
-  reachability). `NL = coNL` (Immerman–Szelepcsényi) is not done either, and it
-  is what `REACH ∈ NL` waits on.
+  reachability).
 * **Counting and optimization problems.** Only decision problems are modeled
   today. Planned: #P via counting second-order assignments (#SAT, #3COL, the
   permanent) and MaxSNP-style optimization classes — i.e. function and search
@@ -152,9 +151,8 @@ user is most likely to want:
   descriptive approach, impossible in the machine world: Ehrenfeucht–Fraïssé
   games, EVEN and reachability not being FO-definable, `FO ⊊ FO(TC)` as a strict
   inclusion, locality, 0-1 laws, and eventually PARITY ∉ AC⁰.
-* **Structural / capture theorems.** Immerman–Szelepcsényi (NL = coNL),
-  Immerman–Vardi (P = order-invariant FO(LFP)), Grädel's capture theorems, and
-  Fagin's spectra connection.
+* **Structural / capture theorems.** Immerman–Vardi (P = order-invariant
+  FO(LFP)), Grädel's capture theorems, and Fagin's spectra connection.
 * **A broader catalog and finer reductions.** More complete problems, and the
   finer reduction notions descriptive complexity uses (quantifier-free
   projections; FO(≤, BIT) = uniform AC⁰ as the bottom of the ordered world).

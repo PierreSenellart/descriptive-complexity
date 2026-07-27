@@ -77,18 +77,10 @@ in `ClauseDischarge.lean`); the discharges still to do:
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **NL: REACH** [M for hardness, R for membership]: directed st-reachability,
-  the canonical NL-complete problem. Its *hardness* is "every FO(TC)-definable
-  problem FO-reduces to REACH", so it waits on FO(TC) (§3). Its *membership* is
-  a subtler matter than it looks under the Krom definition of NL: the Krom
-  fragment defines UNREACH head-on (done, `unreach_mem_NL`: guess the set of
-  vertices from which a marked target is reachable, close it under
-  predecessors with the 2-clause `¬U(y) ∨ U(x)`, forbid the marked sources),
-  but REACH would need the guessed set to be *contained* in the reachable set,
-  a minimality condition no clause can impose – the same asymmetry as SO-Horn
-  one level up, where REACH escaped through FO(LFP). At the Krom level the
-  escape is `NL = coNL`, i.e. Immerman–Szelepcsényi (§4), so `REACH ∈ NL` is
-  exactly one Immerman–Szelepcsényi away and is not an independent item.
+- **NL: REACH's hardness** [M]: directed st-reachability is the canonical
+  NL-complete problem, and a member of NL; what is missing is "every
+  FO(TC)-definable problem FO-reduces to REACH", so it waits on a discharge for
+  FO(TC) (§3).
 - **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
 - **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
   SO(TC)-definable (equivalently FO(PFP)-definable) problem ordered-FO-reduces
@@ -100,11 +92,6 @@ in `ClauseDischarge.lean`); the discharges still to do:
 
 ## 3. Logics and framework extensions
 
-- **`NL = coNL`** [L–R]: not the definitional duality that relates `PiP k` to
-  `SigmaP k` – the complement of an SO-Krom definable problem is not obviously
-  SO-Krom definable – but Immerman–Szelepcsényi (§4), whose inductive-counting
-  proof is naturally a statement about FO(TC). (The class inclusions
-  `NL ⊆ PTIME` and `NL ⊆ NP` are done, through 2SAT.)
 - **FO(LFP) ⊆ NP, directly** [M]: by guessing the fixed point and the derivation
   order and checking both first-order against the certificate interface
   (`derives_eq_of_closed_of_wf`). No new mathematics — the inclusion already
@@ -130,9 +117,9 @@ in `ClauseDischarge.lean`); the discharges still to do:
   translations against the Krom fragment: `co-NL(Krom) = NL(TC)`, i.e.
   `mem_NL_iff_tcDefinable_compl` (`SigmaSOKromDefinable.compl_of_tcDefinable` in
   `TransitiveClosureKrom.lean`, `TCDefinable.compl_of_sigmaSOKromDefinable` in
-  `KromTransitiveClosure.lean`). Upgrading that to `NL = coNL` is
-  Immerman–Szelepcsényi (§4), and it is what `REACH ∈ NL` waits on. What remains
-  here is **closure of `TCDefinable` under ordered FO reductions** [M] – pull
+  `KromTransitiveClosure.lean`), sharpened to `NL(Krom) = NL(TC)` by the
+  complementation of FO(TC) (`tcDefinable_iff_mem_NL`). What remains here is
+  **closure of `TCDefinable` under ordered FO reductions** [M] – pull
   the spec back with modes `spec.Mode × (Fin k → Tag)` and tuples of length
   `k · d` – which would make FO(TC) a `ComplexityClass` in its own right if that
   is ever wanted; today it is a definability notion only, tied to NL through the
@@ -192,13 +179,6 @@ in `ClauseDischarge.lean`); the discharges still to do:
 
 ## 4. Capture and structural theorems (DC's greatest hits)
 
-- **Immerman–Szelepcsényi as a logic theorem** [L–R]: FO(TC) is closed under
-  complement on finite ordered structures (NL = coNL). Its prerequisite is now
-  in place (`TransitiveClosure.lean`), and the inductive-counting proof is well
-  suited to formalization: the certificate is a walk on tuples of (stage,
-  count, vertex), all of them elements or positions in the order, so it stays
-  inside a single `TC`. Flagship target; it would also deliver `REACH ∈ NL`,
-  which the clausal fragments cannot state (they define the complement).
 - **Immerman–Vardi** [L]: P = order-invariant FO(LFP); in this library's
   definitional style it is the pair (definition, HORN-SAT/CVP hardness
   discharge) rather than a machine-model equivalence.
@@ -512,14 +492,12 @@ blocked.
    the fragment, its closure under reductions, the class `NL`, **2SAT
    NL-complete** (membership by a Krom program, hardness by the Krom
    discharge), the inclusions `NL ⊆ PTIME` and `NL ⊆ NP` (through 2SAT, since a
-   Krom kernel is not a Horn kernel), UNREACH defined in the Krom fragment, and
-   the **FO(TC)** definability layer with REACH as its canonical instance. What
-   remains of this step: the two translations between FO(TC) and the Krom
-   fragment (§3), then **FO(DTC)**/**REACHd**, and REACH's hardness once FO(TC)
-   can be discharged.
-3. **Immerman–Szelepcsényi** (§4), the flagship: spectacular, self-contained,
-   unconditional.
-4. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the
+   Krom kernel is not a Horn kernel), UNREACH defined in the Krom fragment, the
+   **FO(TC)** definability layer with its two translations against the Krom
+   fragment, and **Immerman–Szelepcsényi** on top of them. What remains of this
+   step: **FO(DTC)**/**REACHd**, and REACH's hardness once FO(TC) can be
+   discharged.
+3. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the
    textbook-faithfulness layer and Immerman–Vardi.
 
 **Running alongside, from the start:**
