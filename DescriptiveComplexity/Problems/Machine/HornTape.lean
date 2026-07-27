@@ -21,7 +21,7 @@ As for the SAT machine of stage 3: one cell per element of the instance,
 bracketed by two markers, followed by filler cells supplying time. The
 difference is the **dimension**: this machine does `n` propagation rounds of
 one check-and-mark pass per clause, `O(n³)` steps in all, so the interpreted
-universe is `HTag × A³` and sixteen filler tags give `16n³` positions.
+universe is `UPTag × A³` and sixteen filler tags give `16n³` positions.
 
 A cell holds its element together with a mark – `sU x` unmarked, `sM x`
 marked – and the marked set is the machine's working copy of the unit
@@ -44,7 +44,7 @@ open FirstOrder
 
 /-- The tags of the unit-propagation machine. Position tags first – their
 constructor order is the tape order – then symbols, states and transitions. -/
-inductive HTag : Type
+inductive UPTag : Type
   /-- The left marker cell. -/
   | pStart
   /-- The cell of an element: one per element of the instance. -/
@@ -102,10 +102,10 @@ inductive HTag : Type
   | tVerAcc (d : Bool)
   deriving DecidableEq, Fintype
 
-instance : Nonempty HTag := ⟨HTag.pStart⟩
+instance : Nonempty UPTag := ⟨UPTag.pStart⟩
 
 /-- The position of a tag in the tape order. -/
-def hTagIdx : HTag → ℕ
+def hTagIdx : UPTag → ℕ
   | .pStart => 0
   | .pCell => 1
   | .pEnd => 2
@@ -134,10 +134,10 @@ def hTagIdx : HTag → ℕ
 
 set_option maxRecDepth 8000 in
 theorem hTagIdx_injective : Function.Injective hTagIdx := fun {s t} h =>
-  (by decide : ∀ s t : HTag, hTagIdx s = hTagIdx t → s = t) s t h
+  (by decide : ∀ s t : UPTag, hTagIdx s = hTagIdx t → s = t) s t h
 
 /-- The tape order on tags. -/
-instance : LinearOrder HTag := LinearOrder.lift' hTagIdx hTagIdx_injective
+instance : LinearOrder UPTag := LinearOrder.lift' hTagIdx hTagIdx_injective
 
 /-! ### The intended positions -/
 
@@ -159,7 +159,7 @@ theorem isMinTup3_unique {w w' : Fin 3 → A} (h : IsMinTup3 w) (h' : IsMinTup3 
 
 /-- The tagged tuples that are positions: the markers on the triple of minima,
 an element's cell that element with a minimal rest, the fillers unrestricted. -/
-def HPosn (p : HTag × (Fin 3 → A)) : Prop :=
+def HPosn (p : UPTag × (Fin 3 → A)) : Prop :=
   match p.1 with
   | .pStart => IsMinTup3 p.2
   | .pCell => (∀ a : A, p.2 1 ≤ a) ∧ ∀ a : A, p.2 2 ≤ a
@@ -174,27 +174,27 @@ theorem exists_isMinTup3 : ∃ w : Fin 3 → A, IsMinTup3 w := by
   exact ⟨fun _ => m, hm, hm, hm⟩
 
 /-- The blank symbol of the machine: pinned to the triple of minima. -/
-def HBlank (p : HTag × (Fin 3 → A)) : Prop := p.1 = HTag.sBlank ∧ IsMinTup3 p.2
+def HBlank (p : UPTag × (Fin 3 → A)) : Prop := p.1 = UPTag.sBlank ∧ IsMinTup3 p.2
 
-theorem exists_hBlank : ∃ p : HTag × (Fin 3 → A), HBlank p := by
+theorem exists_hBlank : ∃ p : UPTag × (Fin 3 → A), HBlank p := by
   obtain ⟨w, hw⟩ := exists_isMinTup3 (A := A)
-  exact ⟨(HTag.sBlank, w), rfl, hw⟩
+  exact ⟨(UPTag.sBlank, w), rfl, hw⟩
 
 omit [Finite A] [Nonempty A] in
-theorem hBlank_unique {p q : HTag × (Fin 3 → A)} (hp : HBlank p) (hq : HBlank q) : p = q :=
+theorem hBlank_unique {p q : UPTag × (Fin 3 → A)} (hp : HBlank p) (hq : HBlank q) : p = q :=
   Prod.ext (hp.1.trans hq.1.symm) (isMinTup3_unique hp.2 hq.2)
 
 /-- **The initial tape**: the markers hold their own symbols and the cell of
 an element holds that element, unmarked. -/
-def HInp (p a : HTag × (Fin 3 → A)) : Prop :=
-  (p.1 = HTag.pStart ∧ a.1 = HTag.sStart ∧ IsMinTup3 a.2) ∨
-    (p.1 = HTag.pCell ∧ a.1 = HTag.sU ∧ a.2 0 = p.2 0 ∧
+def HInp (p a : UPTag × (Fin 3 → A)) : Prop :=
+  (p.1 = UPTag.pStart ∧ a.1 = UPTag.sStart ∧ IsMinTup3 a.2) ∨
+    (p.1 = UPTag.pCell ∧ a.1 = UPTag.sU ∧ a.2 0 = p.2 0 ∧
       (∀ b : A, a.2 1 ≤ b) ∧ ∀ b : A, a.2 2 ≤ b) ∨
-      (p.1 = HTag.pEnd ∧ a.1 = HTag.sEnd ∧ IsMinTup3 a.2)
+      (p.1 = UPTag.pEnd ∧ a.1 = UPTag.sEnd ∧ IsMinTup3 a.2)
 
 omit [Finite A] [Nonempty A] in
 /-- The initial tape is functional. -/
-theorem hInp_functional {p a b : HTag × (Fin 3 → A)} (ha : HInp p a) (hb : HInp p b) :
+theorem hInp_functional {p a b : UPTag × (Fin 3 → A)} (ha : HInp p a) (hb : HInp p b) :
     a = b := by
   have htup : ∀ u v : Fin 3 → A, u 0 = p.2 0 → (∀ c : A, u 1 ≤ c) → (∀ c : A, u 2 ≤ c) →
       v 0 = p.2 0 → (∀ c : A, v 1 ≤ c) → (∀ c : A, v 2 ≤ c) → u = v := by
@@ -212,9 +212,9 @@ theorem hInp_functional {p a b : HTag × (Fin 3 → A)} (ha : HInp p a) (hb : HI
         | (rw [hp] at hq; exact absurd hq (by decide))
 
 /-- There is a position: the left marker. -/
-theorem exists_hPosn : ∃ p : HTag × (Fin 3 → A), HPosn p := by
+theorem exists_hPosn : ∃ p : UPTag × (Fin 3 → A), HPosn p := by
   obtain ⟨w, hw⟩ := exists_isMinTup3 (A := A)
-  exact ⟨(HTag.pStart, w), hw⟩
+  exact ⟨(UPTag.pStart, w), hw⟩
 
 omit [Finite A] [Nonempty A] in
 private theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOrd o.le :=
@@ -225,9 +225,9 @@ omit [Finite A] [Nonempty A] in
 /-- **The interpreted order is linear**, from `DescriptiveComplexity.tagTupleOrder` –
 no tag-pair case analysis, exactly as for stage 3. -/
 theorem isLinOrd_hTagTupleLe :
-    IsLinOrd (tagTupleLe (Tag := HTag) (d := 3) (A := A)) := by
-  have heq : (tagTupleLe (Tag := HTag) (d := 3) (A := A)) =
-      (tagTupleOrder : LinearOrder (HTag × (Fin 3 → A))).le := by
+    IsLinOrd (tagTupleLe (Tag := UPTag) (d := 3) (A := A)) := by
+  have heq : (tagTupleLe (Tag := UPTag) (d := 3) (A := A)) =
+      (tagTupleOrder : LinearOrder (UPTag × (Fin 3 → A))).le := by
     funext p q
     exact propext (tagTupleLe_iff_le p q)
   rw [heq]
@@ -249,10 +249,10 @@ theorem horn_budget {n : ℕ} (hn : 1 ≤ n) :
 into the positions. -/
 theorem card_le_card_hPosn (A : Type) [LinearOrder A] [Finite A] :
     16 * Nat.card A * Nat.card A * Nat.card A ≤
-      Nat.card {p : HTag × (Fin 3 → A) // HPosn p} := by
+      Nat.card {p : UPTag × (Fin 3 → A) // HPosn p} := by
   have hinj : Function.Injective
-      (fun q : Fin 16 × A × A × A => (⟨(HTag.pFill q.1, ![q.2.1, q.2.2.1, q.2.2.2]), trivial⟩ :
-        {p : HTag × (Fin 3 → A) // HPosn p})) := by
+      (fun q : Fin 16 × A × A × A => (⟨(UPTag.pFill q.1, ![q.2.1, q.2.2.1, q.2.2.2]), trivial⟩ :
+        {p : UPTag × (Fin 3 → A) // HPosn p})) := by
     rintro ⟨i, a, b, c⟩ ⟨i', a', b', c'⟩ h
     have h' := congrArg Subtype.val h
     obtain ⟨ht, hw⟩ := Prod.mk.injEq .. ▸ h'
