@@ -19,22 +19,23 @@ definability is closed under (ordered) first-order reductions – the Krom shape
 survives the pullback, see `DescriptiveComplexity.SecondOrderKromPull`.
 
 NL is not a level of the polynomial hierarchy of `DescriptiveComplexity.Hierarchy`,
-which is why it lives in its own file; what relates it to that hierarchy are
-two theorems that are *not* free here, and are deliberately not asserted:
+which is why it lives in its own file. What relates it to that hierarchy are
+two theorems that are *not* free here:
 
 * **`NL ⊆ PTIME`** has no syntactic route: a Krom kernel is not a Horn kernel
   (Horn clauses may be wide, Krom clauses may have two positive literals), so
-  the inclusion is not an instance of "restrict the kernel further". The
-  idiomatic proof goes through the complete problem: 2SAT is in PTIME, by a
-  Horn program computing reachability in the implication graph, with the
-  complementation covered by `DescriptiveComplexity.piP_zero_eq`; then
-  `DescriptiveComplexity.PTIME` is closed under reductions.
+  the inclusion is not an instance of "restrict the kernel further". It goes
+  through the complete problem instead, and is proved downstream with 2SAT
+  (`DescriptiveComplexity.NL_subset_PTIME`, with `DescriptiveComplexity.NL_subset_NP` in its
+  wake): 2SAT is in PTIME by a Horn program that guesses reachability in the
+  implication graph and rejects, by a goal clause, the instances where a
+  variable reaches its own negation and back.
 * **`NL = coNL`** (Immerman–Szelepcsényi) is not the definitional duality that
   gives `PiP k` from `SigmaP k`: the complement of an SO-Krom definable problem
-  is not obviously SO-Krom definable. It is a genuine theorem, and the reason
-  the fixpoint logic FO(TC) is still wanted even once this fragment exists –
-  the inductive-counting proof is naturally a statement about FO(TC). See
-  `ROADMAP.md` §4.
+  is not obviously SO-Krom definable. It is a genuine theorem, not proved here,
+  and the reason the fixpoint logic FO(TC) is still wanted even once this
+  fragment exists – the inductive-counting proof is naturally a statement about
+  FO(TC). See `ROADMAP.md` §4.
 
 Note that the *containment* `SO-Krom ⊆ NL` on the machine side already uses
 Immerman–Szelepcsényi: satisfiability of a 2-CNF is the complement of a

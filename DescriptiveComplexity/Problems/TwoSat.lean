@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.TwoSat.Defs
 import DescriptiveComplexity.Problems.TwoSat.Membership
 import DescriptiveComplexity.Problems.TwoSat.Hardness
+import DescriptiveComplexity.Problems.TwoSat.Ptime
+import DescriptiveComplexity.Problems.HornSat
 
 /-!
 # 2SAT is NL-complete
@@ -39,11 +41,12 @@ complement of a reachability condition on the implication graph. So
 `DescriptiveComplexity.NL` is *defined* as SO-Krom definability, exactly as
 `DescriptiveComplexity.PTIME` is defined as SO-Horn definability.
 
-Two consequences of this completeness theorem are not proved yet, both waiting
-on 2SAT being placed in a *larger* class: `NL ⊆ PTIME` needs a Horn program for
-implication-graph reachability (the inclusion has no syntactic route, a Krom
-kernel not being a Horn kernel), and `NL ⊆ NP` needs the `Σ₁` definition of
-2SAT. See `ROADMAP.md`.
+Completeness is also what places NL inside the classes above it. Neither
+inclusion is syntactic – a Krom kernel is not a Horn kernel – so both go through
+this problem: 2SAT is in PTIME by the Horn program of
+`DescriptiveComplexity.Problems.TwoSat.Ptime`, which guesses reachability in the
+implication graph, whence `DescriptiveComplexity.NL_subset_PTIME` and, composing with
+`DescriptiveComplexity.PTIME_subset_NP`, `DescriptiveComplexity.NL_subset_NP`.
 -/
 
 namespace DescriptiveComplexity
@@ -60,5 +63,21 @@ a guard; hardness is `DescriptiveComplexity.twoSat_NL_hard`, the Krom discharge.
 is the NL-level analogue of the Cook–Levin theorem, and like it machine-free. -/
 theorem TwoSAT_NL_complete : NL.Complete TwoSAT :=
   ⟨twoSat_mem_NL, twoSat_NL_hard⟩
+
+/-- **NL ⊆ PTIME**: every SO-Krom definable problem reduces to 2SAT, which is in
+PTIME by the Horn program for its implication graph. The inclusion has no
+syntactic route – a Krom kernel is not a Horn kernel – so it goes through the
+complete problem, exactly as `DescriptiveComplexity.PTIME_subset_NP` goes through
+HORN-SAT. -/
+theorem NL_subset_PTIME : NL ⊆ PTIME := by
+  intro L P hP
+  obtain ⟨f⟩ := twoSat_hard_of_sigmaSOKromDefinable P hP
+  exact PTIME.mem_of_orderedReduction f twoSat_mem_PTIME
+
+/-- **NL ⊆ NP**, by composing `DescriptiveComplexity.NL_subset_PTIME` with
+`DescriptiveComplexity.PTIME_subset_NP`. -/
+theorem NL_subset_NP : NL ⊆ NP := by
+  intro L P hP
+  exact PTIME_subset_NP (NL_subset_PTIME hP)
 
 end DescriptiveComplexity

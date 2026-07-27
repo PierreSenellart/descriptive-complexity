@@ -77,21 +77,6 @@ in `ClauseDischarge.lean`); the discharges still to do:
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **Placing 2SAT in the larger classes** [M each], the two corollaries the
-  (done) NL-completeness of 2SAT does not yet yield:
-  - **`NL ⊆ NP`**: needs the `Σ₁` definition of 2SAT, i.e. `satKernel` conjoined
-    with the first-order width-two condition, exactly as
-    `hornSat_sigmaSODefinable` conjoins it with the Horn condition. Then the
-    inclusion is the Krom discharge composed with `twoSat_mem_NP`, as
-    `PTIME_subset_NP` is the Horn discharge composed with `hornSat_mem_NP`.
-  - **`NL ⊆ PTIME`**: needs 2SAT ∈ PTIME, i.e. a *Horn program* deciding
-    2-satisfiability. Unit propagation does not suffice; the program has to
-    build the implication graph of the 2-clauses and compute its reachability
-    (both Horn-definable), and then the acceptance condition is *negative*
-    ("no variable reaches its own negation and back"), so the program computes
-    the complement and the answer comes from closure of level 0 under
-    complement (`piP_zero_eq`), as `hornSat_compl_mem_PTIME` does for Horn
-    unsatisfiability.
 - **NL: REACH** [M]: directed st-reachability, the canonical NL-complete
   problem; hardness = "every FO(TC)-definable problem FO-reduces to REACH".
 - **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
@@ -108,8 +93,8 @@ in `ClauseDischarge.lean`); the discharges still to do:
 - **`NL = coNL`** [L–R]: not the definitional duality that relates `PiP k` to
   `SigmaP k` – the complement of an SO-Krom definable problem is not obviously
   SO-Krom definable – but Immerman–Szelepcsényi (§4), whose inductive-counting
-  proof is naturally a statement about FO(TC). The class inclusions of NL are
-  §2 ("placing 2SAT in the larger classes").
+  proof is naturally a statement about FO(TC). (The class inclusions
+  `NL ⊆ PTIME` and `NL ⊆ NP` are done, through 2SAT.)
 - **FO(LFP) ⊆ NP, directly** [M]: by guessing the fixed point and the derivation
   order and checking both first-order against the certificate interface
   (`derives_eq_of_closed_of_wf`). No new mathematics — the inclusion already
@@ -490,11 +475,13 @@ blocked.
    hand where it is proved. Reach for tracking when a second consumer appears,
    not before.
 2. **The NL layer, cheapest piece first**: **SO-Krom** before FO(TC). Done —
-   the fragment, its closure under reductions, the class `NL`, and **2SAT
+   the fragment, its closure under reductions, the class `NL`, **2SAT
    NL-complete** (membership by a Krom program, hardness by the Krom
-   discharge). What remains of this step: placing 2SAT in the larger classes,
-   which is what yields `NL ⊆ NP` and `NL ⊆ PTIME` (§2), and then **REACH**.
-   Afterwards **FO(TC)** (which Immerman–Szelepcsényi is stated about, and which
+   discharge), and the inclusions `NL ⊆ PTIME` and `NL ⊆ NP`, which go through
+   2SAT because a Krom kernel is not a Horn kernel: 2SAT is in PTIME by a Horn
+   program for its implication graph, on top of a formalization of the
+   Aspvall–Plass–Tarjan criterion. What remains of this step is **REACH**;
+   afterwards **FO(TC)** (which Immerman–Szelepcsényi is stated about, and which
    inductive counting wants rather than the Krom fragment) and
    **FO(DTC)**/**REACHd**.
 3. **Immerman–Szelepcsényi** (§4), the flagship: spectacular, self-contained,

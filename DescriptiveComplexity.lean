@@ -191,11 +191,12 @@ individual declarations are documented on their own pages.
   class. The pieces shared with the Horn pullback (atoms, guard pullback, tag
   assignments) live in `DescriptiveComplexity.SecondOrder` and
   `DescriptiveComplexity.SecondOrderPull`.
-* `DescriptiveComplexity.LogSpace` – the class `DescriptiveComplexity.NL`, with two
-  deliberate non-claims: `NL ⊆ PTIME` is *not* syntactic here (a Krom kernel is
-  not a Horn kernel; the route is through 2SAT ∈ PTIME), and `NL = coNL`
-  (Immerman–Szelepcsényi) is a genuine theorem, not the definitional duality
-  that gives `PiP k` from `SigmaP k`. Neither is proved yet.
+* `DescriptiveComplexity.LogSpace` – the class `DescriptiveComplexity.NL`. Its inclusion
+  in the classes above is *not* syntactic (a Krom kernel is not a Horn kernel)
+  and goes through the complete problem: `DescriptiveComplexity.NL_subset_PTIME` and
+  `DescriptiveComplexity.NL_subset_NP`, both downstream with 2SAT. What stays
+  unproved is `NL = coNL` (Immerman–Szelepcsényi), which is a genuine theorem
+  rather than the definitional duality that gives `PiP k` from `SigmaP k`.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads
@@ -206,7 +207,13 @@ individual declarations are documented on their own pages.
   instantiation satisfying its guard, the output being width-two by
   construction. The scaffolding shared with the Horn discharge (dimension,
   tags, guard and atom-occurrence formulas over the canonical padding) is
-  `DescriptiveComplexity.ClauseDischarge`.
+  `DescriptiveComplexity.ClauseDischarge`. 2SAT is *also* in PTIME
+  (`DescriptiveComplexity.twoSat_mem_PTIME`), by a Horn program guessing reachability
+  in the implication graph of the 2-clauses and rejecting a variable that
+  reaches its own negation and back – the classical criterion of [Aspvall,
+  Plass & Tarjan 1979][aspvall1979linear], formalized in
+  `DescriptiveComplexity.Problems.TwoSat.Implication`; this is what yields the two
+  inclusions of NL.
 
 ## Shared encodings
 
