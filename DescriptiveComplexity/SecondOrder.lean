@@ -264,4 +264,42 @@ theorem sigmaSODefinable_iff_compl (k : ℕ) (P : DecisionProblem L) :
 
 end Duality
 
+/-! ### Atoms in the relation variables of a block
+
+The clausal fragments of existential second-order logic – SO-Horn
+(`DescriptiveComplexity.SecondOrderHorn`) and SO-Krom
+(`DescriptiveComplexity.SecondOrderKrom`) – represent their first-order kernel as
+data: a list of clauses built from *atoms* in the quantified relation
+variables, over a shared list of universally quantified first-order variables.
+The atom type and its semantics are common to both fragments, so they live
+here. -/
+
+section Atoms
+
+/-- An atom `R i (x_{f 0}, …)` in the relation variables of a block, with
+arguments read from `k` universally quantified first-order variables. -/
+structure SOAtom (B : SOBlock) (k : ℕ) where
+  /-- The relation variable of the block the atom is about. -/
+  idx : B.ι
+  /-- The arguments, as indices among the `k` universally quantified
+  variables. -/
+  args : Fin (B.arity idx) → Fin k
+
+variable {B : SOBlock} {k : ℕ}
+
+/-- The truth value of a second-order atom under an assignment of the block
+and a valuation of the universally quantified variables. -/
+def SOAtom.Holds {A : Type} (a : SOAtom B k) (ρ : B.Assignment A) (v : Fin k → A) : Prop :=
+  ρ a.idx fun j => v (a.args j)
+
+/-- Atoms are insensitive to transporting an assignment along an
+isomorphism. -/
+theorem SOAtom.holds_equiv {M N : Type} [L.Structure M] [L.Structure N] (e : M ≃[L] N)
+    (a : SOAtom B k) (ρ : B.Assignment M) (v : Fin k → M) :
+    a.Holds (B.mapAssign e.toEquiv ρ) (fun j => e (v j)) ↔ a.Holds ρ v := by
+  refine iff_of_eq (congrArg (ρ a.idx) (funext fun j => ?_))
+  exact e.toEquiv.symm_apply_apply _
+
+end Atoms
+
 end DescriptiveComplexity

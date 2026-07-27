@@ -18,6 +18,10 @@ import DescriptiveComplexity.SecondOrderOrdered
 import DescriptiveComplexity.SecondOrderMerge
 import DescriptiveComplexity.SecondOrderHorn
 import DescriptiveComplexity.SecondOrderHornPull
+import DescriptiveComplexity.ClauseDischarge
+import DescriptiveComplexity.SecondOrderKrom
+import DescriptiveComplexity.SecondOrderKromPull
+import DescriptiveComplexity.LogSpace
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -169,6 +173,41 @@ individual declarations are documented on their own pages.
   order-walking machinery shared with the HORN-SAT program lives in
   `DescriptiveComplexity.OrderWalk`.
 
+## Nondeterministic logarithmic space, by the Krom fragment
+
+* `DescriptiveComplexity.SecondOrderKrom` – SO-Krom ([Grädel
+  1992][gradel1992capturing]): the same clausal style with the *Krom* (2-CNF)
+  restriction in place of the Horn one, at most two second-order literals per
+  clause and of either sign (`DescriptiveComplexity.KromProgram`, whose literals carry
+  a sign and sit in two `Option` slots, so unit and goal clauses need no
+  special case). It captures nondeterministic logarithmic space on ordered
+  structures. Neither fragment contains the other: Horn clauses may be wide,
+  Krom clauses may have two positive literals – and the difference is exactly
+  determinism, a Horn program having a least model where a 2-CNF has none.
+* `DescriptiveComplexity.SecondOrderKromPull` – the pullback stays Krom, for the reason
+  it stays Horn (the shape constrains second-order atoms; an interpretation
+  rewrites input-vocabulary ones, which live in the guard), so
+  `DescriptiveComplexity.NL` in `DescriptiveComplexity.LogSpace` is a genuine complexity
+  class. The pieces shared with the Horn pullback (atoms, guard pullback, tag
+  assignments) live in `DescriptiveComplexity.SecondOrder` and
+  `DescriptiveComplexity.SecondOrderPull`.
+* `DescriptiveComplexity.LogSpace` – the class `DescriptiveComplexity.NL`, with two
+  deliberate non-claims: `NL ⊆ PTIME` is *not* syntactic here (a Krom kernel is
+  not a Horn kernel; the route is through 2SAT ∈ PTIME), and `NL = coNL`
+  (Immerman–Szelepcsényi) is a genuine theorem, not the definitional duality
+  that gives `PiP k` from `SigmaP k`. Neither is proved yet.
+* `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
+  (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
+  PTIME. A member by a Krom program that guesses the truth assignment and reads
+  each clause through a covering pair of occurrences, enforcing the width
+  promise and the absence of an empty clause by *guards* – first-order over the
+  input, so a promise costs one goal clause; NL-hard by the Krom discharge,
+  which emits one propositional 2-clause per clause of the program and per
+  instantiation satisfying its guard, the output being width-two by
+  construction. The scaffolding shared with the Horn discharge (dimension,
+  tags, guard and atom-occurrence formulas over the canonical padding) is
+  `DescriptiveComplexity.ClauseDischarge`.
+
 ## Shared encodings
 
 * `DescriptiveComplexity.SecondOrderMerge` – merging a second-order quantifier
@@ -204,6 +243,7 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
+| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing] | 2SAT |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |

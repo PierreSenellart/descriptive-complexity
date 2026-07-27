@@ -53,15 +53,6 @@ open Language Structure
 
 /-! ### Horn programs -/
 
-/-- An atom `R i (x_{f 0}, …)` in the relation variables of a block, with
-arguments read from `k` universally quantified first-order variables. -/
-structure SOAtom (B : SOBlock) (k : ℕ) where
-  /-- The relation variable of the block the atom is about. -/
-  idx : B.ι
-  /-- The arguments, as indices among the `k` universally quantified
-  variables. -/
-  args : Fin (B.arity idx) → Fin k
-
 /-- A Horn clause over the input vocabulary `L` and the block `B`, with `k`
 universally quantified first-order variables: an arbitrary first-order guard
 over `L` and a list of second-order body atoms imply the head atom – or `⊥`,
@@ -84,11 +75,6 @@ abbrev HornProgram (L : Language.{0, 0}) (B : SOBlock) (k : ℕ) : Type :=
 section Semantics
 
 variable {L : Language.{0, 0}} {B : SOBlock} {k : ℕ} {A : Type} [L.Structure A]
-
-/-- The truth value of a second-order atom under an assignment of the block
-and a valuation of the universally quantified variables. -/
-def SOAtom.Holds (a : SOAtom B k) (ρ : B.Assignment A) (v : Fin k → A) : Prop :=
-  ρ a.idx fun j => v (a.args j)
 
 /-- The truth value of the head of a clause: `False` for a goal clause. -/
 def HornClause.HeadHolds (c : HornClause L B k) (ρ : B.Assignment A)
@@ -114,12 +100,6 @@ section Iso
 
 variable {L : Language.{0, 0}} {B : SOBlock} {k : ℕ} {M N : Type}
 variable [L.Structure M] [L.Structure N]
-
-theorem SOAtom.holds_equiv (e : M ≃[L] N) (a : SOAtom B k) (ρ : B.Assignment M)
-    (v : Fin k → M) :
-    a.Holds (B.mapAssign e.toEquiv ρ) (fun j => e (v j)) ↔ a.Holds ρ v := by
-  refine iff_of_eq (congrArg (ρ a.idx) (funext fun j => ?_))
-  exact e.toEquiv.symm_apply_apply _
 
 theorem HornClause.holds_equiv (e : M ≃[L] N) (c : HornClause L B k)
     (ρ : B.Assignment M) (v : Fin k → M) :

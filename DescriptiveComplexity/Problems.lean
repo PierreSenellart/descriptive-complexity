@@ -12,6 +12,7 @@ import DescriptiveComplexity.Problems.Reachability
 import DescriptiveComplexity.Problems.ThreeColorability
 import DescriptiveComplexity.Problems.Coloring
 import DescriptiveComplexity.Problems.ThreeSat
+import DescriptiveComplexity.Problems.TwoSat
 import DescriptiveComplexity.Problems.NaeSat
 import DescriptiveComplexity.Problems.NaeThreeSat
 import DescriptiveComplexity.Problems.OneInSat

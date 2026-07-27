@@ -321,4 +321,91 @@ theorem PiSODefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : PiSODefinable k Q)
 
 end Closure
 
+/-! ### Pulling back atoms, guards and tag assignments
+
+The clausal fragments (SO-Horn, SO-Krom) pull a *clause list* back through an
+interpretation rather than a formula: each clause becomes one clause per static
+assignment of tags to its universally quantified variables, its guard becoming
+an ordinary formula pullback and its atoms becoming atoms of the pulled
+relation variables. The pieces that do not depend on the shape of a clause are
+collected here, and are shared by `DescriptiveComplexity.SecondOrderHornPull` and
+`DescriptiveComplexity.SecondOrderKromPull`. -/
+
+section Clausal
+
+variable {Tag : Type} [Finite Tag] {d : ℕ} {B : SOBlock} {k : ℕ}
+
+/-- The pullback of a second-order atom at a static assignment of tags to the
+universally quantified variables: the atom of the pulled relation variable
+selected by the tags, its arguments the `d` coordinates of each original
+argument. -/
+def SOAtom.pull (a : SOAtom B k) (d : ℕ) (t : Fin k → Tag) :
+    SOAtom (B.pull Tag d) (k * d) where
+  idx := ⟨a.idx, fun j => t (a.args j)⟩
+  args := fun m =>
+    finProdFinEquiv (a.args (finProdFinEquiv.symm m).1, (finProdFinEquiv.symm m).2)
+
+/-- The interpreted valuation determined by a tag assignment and a valuation
+of the coordinates. -/
+def tagVal (I : FOInterpretation L₁ L₂ Tag d) {A : Type} (t : Fin k → Tag)
+    (w : Fin (k * d) → A) : Fin k → I.Map A :=
+  fun p => (t p, fun j => w (finProdFinEquiv (p, j)))
+
+theorem SOAtom.pull_holds {A : Type} (I : FOInterpretation L₁ L₂ Tag d) (a : SOAtom B k)
+    (t : Fin k → Tag) (ρ : B.Assignment (I.Map A)) (w : Fin (k * d) → A) :
+    (a.pull d t).Holds (B.pullAssign ρ) w ↔ a.Holds ρ (tagVal I t w) := by
+  refine iff_of_eq (congrArg (ρ a.idx) (funext fun j => ?_))
+  refine Prod.ext_iff.mpr ⟨rfl, funext fun i => ?_⟩
+  refine congrArg w ?_
+  change finProdFinEquiv (a.args (finProdFinEquiv.symm (finProdFinEquiv (j, i))).1,
+    (finProdFinEquiv.symm (finProdFinEquiv (j, i))).2) = finProdFinEquiv (a.args j, i)
+  rw [Equiv.symm_apply_apply]
+
+omit [Finite Tag] in
+/-- Splitting an interpreted valuation into its tags and its coordinates. -/
+theorem tagVal_split {A : Type} (I : FOInterpretation L₁ L₂ Tag d) (v : Fin k → I.Map A) :
+    tagVal I (fun p => (v p).1)
+      (fun m => (v (finProdFinEquiv.symm m).1).2 (finProdFinEquiv.symm m).2) = v := by
+  funext p
+  refine Prod.ext_iff.mpr ⟨rfl, funext fun j => ?_⟩
+  rw [tagVal]
+  exact congrArg₂ (fun (q : Fin k) (i : Fin d) => (v q).2 i)
+    (congrArg Prod.fst (Equiv.symm_apply_apply _ _))
+    (congrArg Prod.snd (Equiv.symm_apply_apply _ _))
+
+section Guards
+
+variable [L₂.IsRelational]
+
+/-- The pullback of a guard: the ordinary formula pullback at the tag
+assignment `t`, its variables re-indexed as coordinates. -/
+noncomputable def guardPull (I : FOInterpretation L₁ L₂ Tag d) (φ : L₂.Formula (Fin k))
+    (t : Fin k → Tag) : L₁.Formula (Fin (k * d)) :=
+  (I.pull (φ : L₂.BoundedFormula (Fin k) 0) (Sum.elim t finZeroElim)).relabel
+    fun p => finProdFinEquiv (Sum.elim id finZeroElim p.1, p.2)
+
+theorem realize_guardPull {A : Type} [L₁.Structure A] (I : FOInterpretation L₁ L₂ Tag d)
+    (φ : L₂.Formula (Fin k)) (t : Fin k → Tag) (w : Fin (k * d) → A) :
+    (guardPull I φ t).Realize w ↔ φ.Realize (M := I.Map A) (tagVal I t w) := by
+  rw [guardPull, Formula.realize_relabel, I.realize_pull]
+  exact iff_of_eq (congrArg₂
+    (fun a b => BoundedFormula.Realize (M := I.Map A) (φ : L₂.BoundedFormula (Fin k) 0) a b)
+    (funext fun _ => rfl) (Subsingleton.elim _ _))
+
+end Guards
+
+open Classical in
+/-- All assignments of tags to the `k` universally quantified variables, as a
+list: the pullback of a clause is instantiated at each of them. -/
+noncomputable def allTagAssign (Tag : Type) [Finite Tag] (k : ℕ) : List (Fin k → Tag) :=
+  letI : Fintype Tag := Fintype.ofFinite Tag
+  (Finset.univ : Finset (Fin k → Tag)).toList
+
+open Classical in
+theorem mem_allTagAssign (t : Fin k → Tag) : t ∈ allTagAssign Tag k := by
+  letI : Fintype Tag := Fintype.ofFinite Tag
+  exact Finset.mem_toList.mpr (Finset.mem_univ t)
+
+end Clausal
+
 end DescriptiveComplexity

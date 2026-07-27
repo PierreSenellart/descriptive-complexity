@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.SecondOrderHorn
-import DescriptiveComplexity.Padding
+import DescriptiveComplexity.ClauseDischarge
 import DescriptiveComplexity.Problems.HornSat.Defs
 
 /-!
@@ -31,7 +31,7 @@ structure `A`:
 * propositional variables: one per relation variable `i` of `B` and per
   `B.arity i`-tuple over `A`, canonically padded
   (`DescriptiveComplexity.Padding`) to the common dimension
-  `DescriptiveComplexity.hornDim`;
+  `DescriptiveComplexity.clauseDim`;
 * clauses: one per clause `c` of the program and per `k`-tuple over `A`
   *satisfying the guard of `c`* – the guard is an input-vocabulary formula, so
   “the guard holds” is literally what the defining formula of `satIsClause`
@@ -62,45 +62,20 @@ section Discharge
 
 variable {L : Language.{0, 0}} {B : SOBlock} {k : ℕ}
 
-/-! ### Dimension and tags -/
+/-! ### Tags and clause access
 
-/-- The dimension of the Horn interpretation: large enough for the `k`
-universally quantified first-order variables of the program and for every
-argument tuple of a relation variable of the block. -/
-noncomputable def hornDim (B : SOBlock) (k : ℕ) : ℕ :=
-  max k (blockArityBound B)
+The dimension, the tags and the two generic defining formulas are shared with
+the Krom discharge; they live in `DescriptiveComplexity.ClauseDischarge`. -/
 
-theorem le_hornDim : k ≤ hornDim B k :=
-  le_max_left _ _
-
-theorem arity_le_hornDim (i : B.ι) : B.arity i ≤ hornDim B k :=
-  (arity_le_blockArityBound B i).trans (le_max_right _ _)
-
-/-- The tags of the Horn interpretation: one per clause of the program, one
-per relation variable of the block, plus a junk tag keeping the tag type
-nonempty when the program has no clause and the block no variable (its
-elements are neither clauses nor literals). -/
+/-- The tags of the Horn interpretation: the generic clausal tags at the
+program's number of clauses. -/
 abbrev HornTag (prog : HornProgram (L.sum Language.order) B k) : Type :=
-  (Fin prog.length ⊕ B.ι) ⊕ Unit
-
-/-- The tag of the clauses coming from the `c`-th clause of the program. -/
-abbrev clTag {prog : HornProgram (L.sum Language.order) B k} (c : Fin prog.length) : HornTag prog :=
-  Sum.inl (Sum.inl c)
-
-/-- The tag of the propositional variables standing for the atoms of the
-relation variable `i`. -/
-abbrev varTag {prog : HornProgram (L.sum Language.order) B k} (i : B.ι) : HornTag prog :=
-  Sum.inl (Sum.inr i)
+  ClauseTag prog.length B
 
 /-- The `c`-th clause of the program. -/
 abbrev clauseAt (prog : HornProgram (L.sum Language.order) B k) (c : Fin prog.length) :
     HornClause (L.sum Language.order) B k :=
   prog[(c : ℕ)]'c.isLt
-
-/-- The arguments of a second-order atom, as coordinates of the clause
-tuple. -/
-noncomputable def atomIdx (a : SOAtom B k) : Fin (B.arity a.idx) → Fin (hornDim B k) :=
-  fun j => Fin.castLE le_hornDim (a.args j)
 
 /-! ### The defining formulas -/
 
@@ -108,51 +83,26 @@ section Formulas
 
 variable {γ : Type}
 
-/-- The guard of a clause, reading its variables off the coordinates selected
-by `u`. -/
-noncomputable def guardF (φ : (L.sum Language.order).Formula (Fin k))
-    (u : Fin (hornDim B k) → γ) : (L.sum Language.order).Formula γ :=
-  φ.relabel fun j => u (Fin.castLE (le_hornDim (B := B)) j)
-
-/-- The occurrence formula of a second-order atom: the coordinates selected by
-`x` hold the canonically padded tuple of the atom's arguments, read off the
-coordinates selected by `u`. -/
-noncomputable def atomOccF (a : SOAtom B k) (u x : Fin (hornDim B k) → γ) :
-    (L.sum Language.order).Formula γ :=
-  padTupF (atomIdx a) u x
-
 open Classical in
 /-- The defining formula of a positive occurrence: the head atom of the
 clause, when it is an atom of the relation variable `i`. -/
 noncomputable def headOccF (c : HornClause (L.sum Language.order) B k) (i : B.ι)
-    (u x : Fin (hornDim B k) → γ) : (L.sum Language.order).Formula γ :=
+    (u x : Fin (clauseDim B k) → γ) : (L.sum Language.order).Formula γ :=
   c.head.elim ⊥ fun a => if a.idx = i then atomOccF a u x else ⊥
 
 open Classical in
 /-- The defining formula of a negative occurrence: any body atom of the
 clause that is an atom of the relation variable `i`. -/
 noncomputable def bodyOccF (c : HornClause (L.sum Language.order) B k) (i : B.ι)
-    (u x : Fin (hornDim B k) → γ) : (L.sum Language.order).Formula γ :=
+    (u x : Fin (clauseDim B k) → γ) : (L.sum Language.order).Formula γ :=
   listSup (c.body.map fun a => if a.idx = i then atomOccF a u x else ⊥)
 
 /-! #### Realization of the defining formulas -/
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
-theorem realize_guardF {φ : (L.sum Language.order).Formula (Fin k)}
-    {u : Fin (hornDim B k) → γ} :
-    (guardF (L := L) (B := B) φ u).Realize v ↔
-      φ.Realize fun j => v (u (Fin.castLE le_hornDim j)) := by
-  rw [guardF, Formula.realize_relabel]
-  rfl
-
-theorem realize_atomOccF {a : SOAtom B k} {u x : Fin (hornDim B k) → γ} :
-    (atomOccF (L := L) a u x).Realize v ↔
-      PadTup (atomIdx a) (fun j => v (u j)) fun j => v (x j) := by
-  rw [atomOccF, realize_padTupF]
-
 theorem realize_headOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
-    {u x : Fin (hornDim B k) → γ} :
+    {u x : Fin (clauseDim B k) → γ} :
     (headOccF c i u x).Realize v ↔
       ∃ a ∈ c.head, a.idx = i ∧
         PadTup (atomIdx a) (fun j => v (u j)) fun j => v (x j) := by
@@ -183,7 +133,7 @@ theorem realize_headOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
       exact hi hi'
 
 theorem realize_bodyOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
-    {u x : Fin (hornDim B k) → γ} :
+    {u x : Fin (clauseDim B k) → γ} :
     (bodyOccF c i u x).Realize v ↔
       ∃ a ∈ c.body, a.idx = i ∧
         PadTup (atomIdx a) (fun j => v (u j)) fun j => v (x j) := by
@@ -207,7 +157,7 @@ end Formulas
 /-- The Horn interpretation: the CNF instance of the propositional translation
 of the program, defined inside the ordered input structure. -/
 noncomputable def hornInterp (prog : HornProgram (L.sum Language.order) B k) :
-    FOInterpretation (L.sum Language.order) Language.sat (HornTag prog) (hornDim B k) where
+    FOInterpretation (L.sum Language.order) Language.sat (HornTag prog) (clauseDim B k) where
   relFormula {n} R :=
     match n, R with
     | _, .isClause => fun t =>
@@ -240,19 +190,19 @@ variable {prog : HornProgram (L.sum Language.order) B k}
 
 /-- **The clause elements**: one per clause of the program and per canonically
 padded tuple satisfying that clause's guard. -/
-theorem horn_isClause_cl (c : Fin prog.length) (w : Fin (hornDim B k) → A) :
+theorem horn_isClause_cl (c : Fin prog.length) (w : Fin (clauseDim B k) → A) :
     RelMap (M := (hornInterp prog).Map A) satIsClause ![(clTag c, w)] ↔
-      (clauseAt prog c).guard.Realize (fun j => w (Fin.castLE le_hornDim j)) ∧ Canon k w := by
+      (clauseAt prog c).guard.Realize (fun j => w (Fin.castLE le_clauseDim j)) ∧ Canon k w := by
   rw [FOInterpretation.relMap_map]
   exact Formula.realize_inf.trans (and_congr realize_guardF realize_canonF)
 
 /-- Elements carrying a variable tag are not clauses. -/
-theorem horn_not_isClause_var (i : B.ι) (w : Fin (hornDim B k) → A) :
+theorem horn_not_isClause_var (i : B.ι) (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (hornInterp prog).Map A) satIsClause ![(varTag i, w)] :=
   id
 
 /-- Elements carrying the junk tag are not clauses. -/
-theorem horn_not_isClause_junk (w : Fin (hornDim B k) → A) :
+theorem horn_not_isClause_junk (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (hornInterp prog).Map A) satIsClause
       ![((Sum.inr () : HornTag prog), w)] :=
   id
@@ -260,7 +210,7 @@ theorem horn_not_isClause_junk (w : Fin (hornDim B k) → A) :
 /-- **The positive literals**: the head atom of the clause, at the canonically
 padded tuple of its arguments. -/
 theorem horn_posIn_cl_var (c : Fin prog.length) (i : B.ι)
-    (u x : Fin (hornDim B k) → A) :
+    (u x : Fin (clauseDim B k) → A) :
     RelMap (M := (hornInterp prog).Map A) satPosIn ![(clTag c, u), (varTag i, x)] ↔
       ∃ a ∈ (clauseAt prog c).head, a.idx = i ∧ PadTup (atomIdx a) u x := by
   rw [FOInterpretation.relMap_map]
@@ -269,7 +219,7 @@ theorem horn_posIn_cl_var (c : Fin prog.length) (i : B.ι)
 /-- **The negative literals**: any body atom of the clause, at the canonically
 padded tuple of its arguments. -/
 theorem horn_negIn_cl_var (c : Fin prog.length) (i : B.ι)
-    (u x : Fin (hornDim B k) → A) :
+    (u x : Fin (clauseDim B k) → A) :
     RelMap (M := (hornInterp prog).Map A) satNegIn ![(clTag c, u), (varTag i, x)] ↔
       ∃ a ∈ (clauseAt prog c).body, a.idx = i ∧ PadTup (atomIdx a) u x := by
   rw [FOInterpretation.relMap_map]
@@ -314,22 +264,22 @@ theorem horn_satisfiable_iff :
   · rintro ⟨ρ, hρ⟩
     refine ⟨fun z =>
       match z with
-      | (Sum.inl (Sum.inr i), y) => ρ i (pref (arity_le_hornDim (k := k) i) y)
+      | (Sum.inl (Sum.inr i), y) => ρ i (pref (arity_le_clauseDim (k := k) i) y)
       | _ => False, ?_⟩
     rintro ⟨tc, u⟩ hc
     rcases tc with (c | i) | ⟨⟩
     · obtain ⟨hguard, -⟩ := (horn_isClause_cl c u).mp hc
       -- the truth value of the propositional variable encoding an atom
       have hval : ∀ a : SOAtom B k,
-          ρ a.idx (pref (arity_le_hornDim (k := k) a.idx) (pad a₀ fun j => u (atomIdx a j))) ↔
-            a.Holds ρ fun j => u (Fin.castLE le_hornDim j) := by
+          ρ a.idx (pref (arity_le_clauseDim (k := k) a.idx) (pad a₀ fun j => u (atomIdx a j))) ↔
+            a.Holds ρ fun j => u (Fin.castLE le_clauseDim j) := by
         intro a
         rw [pref_pad]
         exact Iff.rfl
       by_cases hbody : ∀ a ∈ (clauseAt prog c).body,
-          a.Holds ρ fun j => u (Fin.castLE le_hornDim j)
+          a.Holds ρ fun j => u (Fin.castLE le_clauseDim j)
       · -- every body atom is true, so the head atom is, and it occurs positively
-        have hhead := hρ (fun j => u (Fin.castLE le_hornDim j)) (clauseAt prog c)
+        have hhead := hρ (fun j => u (Fin.castLE le_clauseDim j)) (clauseAt prog c)
           (List.getElem_mem c.isLt) ⟨hguard, hbody⟩
         rw [HornClause.HeadHolds] at hhead
         cases hh : (clauseAt prog c).head with
@@ -360,8 +310,8 @@ theorem horn_satisfiable_iff :
     have hcl : RelMap (M := (hornInterp prog).Map A) satIsClause
         ![((clTag ⟨n, hn⟩ : HornTag prog), pad a₀ v)] := by
       refine (horn_isClause_cl ⟨n, hn⟩ (pad a₀ v)).mpr ⟨?_, canon_pad ha₀ k v⟩
-      rw [show (fun j => pad (D := hornDim B k) a₀ v (Fin.castLE le_hornDim j)) = v from
-        pref_pad a₀ le_hornDim v]
+      rw [show (fun j => pad (D := clauseDim B k) a₀ v (Fin.castLE le_clauseDim j)) = v from
+        pref_pad a₀ le_clauseDim v]
       exact hpre.1
     obtain ⟨⟨tx, x⟩, hx⟩ := hν _ hcl
     -- the element encoding an atom is the canonical padding of its arguments
@@ -369,7 +319,7 @@ theorem horn_satisfiable_iff :
         x = pad a₀ fun j => v (a.args j) := by
       intro a hpad
       rw [eq_pad_of_padTup ha₀ hpad]
-      exact congrArg (pad a₀) (funext fun j => congrFun (pref_pad a₀ le_hornDim v) (a.args j))
+      exact congrArg (pad a₀) (funext fun j => congrFun (pref_pad a₀ le_clauseDim v) (a.args j))
     rcases tx with (c' | i') | ⟨⟩
     · rcases hx with ⟨h, -⟩ | ⟨h, -⟩ <;> exact h.elim
     · rcases hx with ⟨hpos, hval⟩ | ⟨hneg, hval⟩
@@ -403,7 +353,7 @@ noncomputable def hornReduction (prog : HornProgram (L.sum Language.order) B k)
     (hQ : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       Q A ↔ ∃ ρ : B.Assignment A, prog.Holds ρ) : Q ≤ᶠᵒ[≤] HORNSAT where
   Tag := HornTag prog
-  dim := hornDim B k
+  dim := clauseDim B k
   toInterpretation := hornInterp prog
   correct A _ _ _ _ := (hQ A).trans (horn_hornSatisfiable_iff prog)
 

@@ -66,21 +66,34 @@ each hardness discharge is a Tseitin-style translation of the defining logic
 into the problem's vocabulary, i.e. a variation on
 `sat_hard_of_sigmaSODefinable` with a shape invariant carried through. The
 pattern is already instantiated by ∃SO → SAT, SO-alternation-level-`k` → QBF_k,
-and SO-Horn → HORN-SAT; the discharges still to do:
+SO-Horn → HORN-SAT and SO-Krom → 2SAT (the last two sharing their scaffolding
+in `ClauseDischarge.lean`); the discharges still to do:
 
 | fragment | complete problem | note |
 |---|---|---|
-| SO-Krom (NL) | 2SAT | Krom kernel ⇒ binary clauses |
 | SO(TC) (PSPACE) | QSAT | least mechanical: natural image is a succinct/game reachability, QSAT via the standard alternation argument |
 
 - **P-complete reductions from HORN-SAT** [M]: Circuit Value Problem, Monotone
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
+- **Placing 2SAT in the larger classes** [M each], the two corollaries the
+  (done) NL-completeness of 2SAT does not yet yield:
+  - **`NL ⊆ NP`**: needs the `Σ₁` definition of 2SAT, i.e. `satKernel` conjoined
+    with the first-order width-two condition, exactly as
+    `hornSat_sigmaSODefinable` conjoins it with the Horn condition. Then the
+    inclusion is the Krom discharge composed with `twoSat_mem_NP`, as
+    `PTIME_subset_NP` is the Horn discharge composed with `hornSat_mem_NP`.
+  - **`NL ⊆ PTIME`**: needs 2SAT ∈ PTIME, i.e. a *Horn program* deciding
+    2-satisfiability. Unit propagation does not suffice; the program has to
+    build the implication graph of the 2-clauses and compute its reachability
+    (both Horn-definable), and then the acceptance condition is *negative*
+    ("no variable reaches its own negation and back"), so the program computes
+    the complement and the answer comes from closure of level 0 under
+    complement (`piP_zero_eq`), as `hornSat_compl_mem_PTIME` does for Horn
+    unsatisfiability.
 - **NL: REACH** [M]: directed st-reachability, the canonical NL-complete
-  problem; hardness = "every FO(TC)-definable problem FO-reduces to REACH". Also
-  **2SAT** [M after REACH] (via implication graphs; mind the complementation,
-  Immerman–Szelepcsényi territory).
+  problem; hardness = "every FO(TC)-definable problem FO-reduces to REACH".
 - **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
 - **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
   SO(TC)-definable (equivalently FO(PFP)-definable) problem ordered-FO-reduces
@@ -92,11 +105,11 @@ and SO-Horn → HORN-SAT; the discharges still to do:
 
 ## 3. Logics and framework extensions
 
-- **SO-Krom (Grädel)** [M–L]: existential SO with a Krom FO kernel captures NL
-  on ordered structures, the NL analogue of the (done) SO-Horn = P. By the same
-  recipe as SO-Horn: the Krom shape (at most two second-order atoms per clause,
-  of either sign) is another clause-list datatype, and its discharge to 2SAT
-  should be the same construction with the literal signs read off the clause.
+- **`NL = coNL`** [L–R]: not the definitional duality that relates `PiP k` to
+  `SigmaP k` – the complement of an SO-Krom definable problem is not obviously
+  SO-Krom definable – but Immerman–Szelepcsényi (§4), whose inductive-counting
+  proof is naturally a statement about FO(TC). The class inclusions of NL are
+  §2 ("placing 2SAT in the larger classes").
 - **FO(LFP) ⊆ NP, directly** [M]: by guessing the fixed point and the derivation
   order and checking both first-order against the certificate interface
   (`derives_eq_of_closed_of_wf`). No new mathematics — the inclusion already
@@ -476,14 +489,14 @@ blocked.
    because building the reduction from the complement side keeps the promise in
    hand where it is proved. Reach for tracking when a second consumer appears,
    not before.
-2. **The NL layer, cheapest piece first**: **SO-Krom** before FO(TC). It is the
-   best effort/value ratio in this document, a clause-list clone of the
-   finished SO-Horn whose discharge is the HORN-SAT construction with signs
-   read off the clause, so NL enters the hierarchy with a completeness theorem
-   before any new infrastructure exists, and **2SAT** and **REACH** arrive as
-   worked instances rather than separate projects. Then **FO(TC)** (which
-   Immerman–Szelepcsényi is stated about, and which inductive counting wants
-   rather than the Krom fragment) and **FO(DTC)**/**REACHd**.
+2. **The NL layer, cheapest piece first**: **SO-Krom** before FO(TC). Done —
+   the fragment, its closure under reductions, the class `NL`, and **2SAT
+   NL-complete** (membership by a Krom program, hardness by the Krom
+   discharge). What remains of this step: placing 2SAT in the larger classes,
+   which is what yields `NL ⊆ NP` and `NL ⊆ PTIME` (§2), and then **REACH**.
+   Afterwards **FO(TC)** (which Immerman–Szelepcsényi is stated about, and which
+   inductive counting wants rather than the Krom fragment) and
+   **FO(DTC)**/**REACHd**.
 3. **Immerman–Szelepcsényi** (§4), the flagship: spectacular, self-contained,
    unconditional.
 4. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the
