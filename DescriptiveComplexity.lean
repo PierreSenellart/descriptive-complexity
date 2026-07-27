@@ -10,6 +10,7 @@ import DescriptiveComplexity.OrderedComposition
 import DescriptiveComplexity.Complexity
 import DescriptiveComplexity.Encoding
 import DescriptiveComplexity.Encoding.UnaryBlowup
+import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
@@ -92,16 +93,22 @@ individual declarations are documented on their own pages.
   size, a computable encoding into finite structures, and polynomial bounds
   *both ways* between size and universe – no padding, no compression – so an
   encoding cannot be built size-dishonest. Semantic agreement is the separate
-  predicate `DescriptiveComplexity.Encoding.Faithful`, and the decoding
-  direction (for reading hardness concretely) is
-  `DescriptiveComplexity.Encoding.CoversUpTo`. That the bounds have teeth is a
-  theorem: no unary encoding of subset-sum passes them
+  predicate `DescriptiveComplexity.Encoding.Faithful`. That the bounds have
+  teeth is a theorem: no unary encoding of subset-sum passes them
   (`DescriptiveComplexity.no_unary_encoding`, in
   `DescriptiveComplexity.Encoding.UnaryBlowup`, with the honest binary encoding
-  as the positive contrast). Both tutorials –
-  `DescriptiveComplexity.Examples.ConjunctiveQueries` and
+  as the positive contrast).
+* `DescriptiveComplexity.Decoding` – the decoding direction, for reading
+  *hardness* concretely: well-formedness conditions as decision problems
+  (`DescriptiveComplexity.DecisionProblem.ofSentence`, restricting a problem to
+  its non-junk instances as `W ⊓ P` with one-line upgrades of existing
+  completeness proofs), and computable decodings
+  (`DescriptiveComplexity.Decoding`) from concretely presented structures back
+  to concrete instances, with the same executable hygiene as the encoders.
+  Both tutorials – `DescriptiveComplexity.Examples.ConjunctiveQueries` and
   `DescriptiveComplexity.Examples.GraphCrawling` – open with a concrete
-  instance type and its bundled encoding, before any abstract development.
+  instance type and its bundled encoding, and close the loop with a decoder
+  and a well-formed completeness theorem.
 
 ## The polynomial hierarchy, defined logically
 

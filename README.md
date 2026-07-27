@@ -46,7 +46,10 @@ The library is organized in three layers:
   instance types: a bundled `Encoding` cannot be constructed without proving
   polynomial size bounds in both directions (no padding, no compression), so
   an encoding cannot silently cheat on instance size – and a theorem shows the
-  bounds have teeth (no unary encoding of subset-sum passes them).
+  bounds have teeth (no unary encoding of subset-sum passes them). The
+  converse direction is covered too: computable `Decoding`s read well-formed
+  structures back into concrete instances, and completeness theorems restrict
+  to the well-formed (non-junk) instances with one-line upgrades.
 * **An abstract complexity layer**: complexity classes closed under FO
   reductions, and the polynomial hierarchy *defined* logically – `NP = Σ₁ᵖ` by
   second-order quantifier alternation, with the level inclusions and the
