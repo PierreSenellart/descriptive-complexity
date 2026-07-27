@@ -124,15 +124,15 @@ in `ClauseDischarge.lean`); the discharges still to do:
 - **FO(TC), the rest of it** [M–L]: the definability layer exists
   (`TransitiveClosure.lean`: `TCSpec`/`TCDefinable`, a single TC over a
   first-order transition formula on `k`-tuples, with `reach_tcDefinable` as the
-  canonical instance). What remains: (i) `TCDefinable P → SigmaSOKromDefinable
-  Pᶜ` [M], the arity-`k` generalization of the UNREACH program of
-  `Problems/Reachability.lean` — guess the tuples from which an accepting tuple
-  is reachable, close under predecessors with the 2-clause `¬U(ȳ) ∨ U(x̄)`,
-  forbid the starting tuples; (ii) the converse direction
-  `SigmaSOKromDefinable P → TCDefinable Pᶜ` [M–L], the implication graph of the
-  clause instances read as a `TCSpec`, on top of `TwoSat/Implication.lean`.
-  Composed they give `co-NL(Krom) = NL(TC)`; upgrading that to `NL = coNL` is
-  Immerman–Szelepcsényi (§4).
+  canonical instance), and so does the translation *out* of it:
+  `SigmaSOKromDefinable.compl_of_tcDefinable` in `TransitiveClosureKrom.lean`.
+  What remains is the converse direction `SigmaSOKromDefinable P → TCDefinable
+  Pᶜ` [M–L]: the implication graph of the clause instances read as a `TCSpec`,
+  on top of `TwoSat/Implication.lean` (literals are atom instances plus a sign,
+  so the walk is on `k+1`-tuples if the sign is carried as an extra coordinate,
+  or on tuples with the sign folded into the arity by a two-variable block).
+  Composed with the direction already proved it gives `co-NL(Krom) = NL(TC)`;
+  upgrading that to `NL = coNL` is Immerman–Szelepcsényi (§4).
 - **FO(DTC)** [M, after the above]: the deterministic variant, i.e. the same
   `TCSpec` with `step` replaced by its FO determinization
   `step(x̄, ȳ) ∧ ∀z̄. step(x̄, z̄) → z̄ = ȳ`; that formula is first-order, so

@@ -23,6 +23,7 @@ import DescriptiveComplexity.SecondOrderKrom
 import DescriptiveComplexity.SecondOrderKromPull
 import DescriptiveComplexity.LogSpace
 import DescriptiveComplexity.TransitiveClosure
+import DescriptiveComplexity.TransitiveClosureKrom
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -208,6 +209,12 @@ individual declarations are documented on their own pages.
   in which REACH is stated head-on (`DescriptiveComplexity.reach_tcDefinable`) and in
   which Immerman–Szelepcsényi would be proved – the missing bridge that would
   give `REACH ∈ NL`, the clausal fragments defining only the complement.
+* `DescriptiveComplexity.TransitiveClosureKrom` – the translation that *is* free:
+  the complement of an FO(TC) definable problem is SO-Krom definable
+  (`DescriptiveComplexity.SigmaSOKromDefinable.compl_of_tcDefinable`), hence in NL, by
+  the arity-`k` program guessing the tuples from which an accepting tuple is
+  reachable. `DescriptiveComplexity.unreach_mem_NL` is its arity-one instance, written
+  out by hand as a worked example.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads
