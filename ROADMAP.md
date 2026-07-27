@@ -77,10 +77,6 @@ in `ClauseDischarge.lean`); the discharges still to do:
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **NL: REACH's hardness** [M]: directed st-reachability is the canonical
-  NL-complete problem, and a member of NL; what is missing is "every
-  FO(TC)-definable problem FO-reduces to REACH", so it waits on a discharge for
-  FO(TC) (§3).
 - **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
 - **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
   SO(TC)-definable (equivalently FO(PFP)-definable) problem ordered-FO-reduces
@@ -494,9 +490,10 @@ blocked.
    discharge), the inclusions `NL ⊆ PTIME` and `NL ⊆ NP` (through 2SAT, since a
    Krom kernel is not a Horn kernel), UNREACH defined in the Krom fragment, the
    **FO(TC)** definability layer with its two translations against the Krom
-   fragment, and **Immerman–Szelepcsényi** on top of them. What remains of this
-   step: **FO(DTC)**/**REACHd**, and REACH's hardness once FO(TC) can be
-   discharged.
+   fragment, **Immerman–Szelepcsényi** on top of them, and **REACH
+   NL-complete** (membership through the complementation of FO(TC), hardness by
+   the FO(TC) discharge, whose interpretation is the graph of the walk itself).
+   What remains of this step: **FO(DTC)**/**REACHd**.
 3. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the
    textbook-faithfulness layer and Immerman–Vardi.
 

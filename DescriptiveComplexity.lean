@@ -30,6 +30,7 @@ import DescriptiveComplexity.KromTransitiveClosure
 import DescriptiveComplexity.Counting
 import DescriptiveComplexity.TransitiveClosureCompl
 import DescriptiveComplexity.ImmermanSzelepcsenyi
+import DescriptiveComplexity.TransitiveClosureReach
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -264,6 +265,17 @@ individual declarations are documented on their own pages.
   translations alone could not: NL *is* FO(TC)
   (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), the Krom fragment is closed under
   complement, and `REACH ∈ NL` (`DescriptiveComplexity.reach_mem_NL`).
+* `DescriptiveComplexity.TransitiveClosureReach` – **REACH is NL-complete**
+  (`DescriptiveComplexity.REACH_NL_complete`), the discharge of FO(TC) into its
+  canonical problem. Unlike the clausal discharges, this one emits nothing: the
+  graph of the walk of a `DescriptiveComplexity.TCSpec` already *is* a marked graph –
+  a node is a mode with a `k`-tuple, which is exactly the universe
+  `Tag × A^dim` of a tagged interpretation – so the three defining formulas are
+  the specification's own, relabelled
+  (`DescriptiveComplexity.reach_hard_of_tcDefinable`). No junk arises, so the
+  reduction needs no relativization; the one adjustment is
+  `DescriptiveComplexity.TCSpec.pad`, adding a spare mode so that the tag type is
+  nonempty, since a reduction must map nonempty structures to nonempty ones.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads
@@ -318,7 +330,7 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing]; equivalently FO(TC) (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), so `NL = coNL` | 2SAT |
+| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing]; equivalently FO(TC) (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), so `NL = coNL` | REACH · 2SAT |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
@@ -359,13 +371,22 @@ Headline results and cross-references:
   (`DescriptiveComplexity.HORNSAT_PTIME_complete`) by the Horn discharge and a
   Horn program for unit propagation – the P-level analogue of Cook–Levin,
   equally machine-free. REACH/UNREACH is a second worked instance of the
-  fragment (a membership example, not proved complete), and a third one of the
-  Krom fragment: `DescriptiveComplexity.unreach_mem_NL` defines UNREACH by a
-  two-literal program guessing the vertices from which a marked target is
-  reachable. In both fragments it is the *complement* that is definable
-  head-on, clauses being able to close and to reject but not to force
-  minimality; REACH escapes at the Horn level through FO(LFP), and at the Krom
-  level through `NL = coNL` (`DescriptiveComplexity.reach_mem_NL`).
+  fragment, and a third one of the Krom fragment:
+  `DescriptiveComplexity.unreach_mem_NL` defines UNREACH by a two-literal
+  program guessing the vertices from which a marked target is reachable. In
+  both fragments it is the *complement* that is definable head-on, clauses
+  being able to close and to reject but not to force minimality; REACH escapes
+  at the Horn level through FO(LFP), and at the Krom level through `NL = coNL`
+  (`DescriptiveComplexity.reach_mem_NL`).
+* **NL by the Krom fragment and FO(TC)**: 2SAT is NL-complete
+  (`DescriptiveComplexity.TwoSAT_NL_complete`) by the Krom discharge, and so is
+  REACH (`DescriptiveComplexity.REACH_NL_complete`), the canonical NL-complete
+  problem ([Jones 1975][jones1975space]), whose hardness is the FO(TC)
+  discharge – the interpretation *is* the graph of the walk of a
+  `DescriptiveComplexity.TCSpec`. Both halves of REACH's completeness pass
+  through Immerman–Szelepcsényi: membership because a clausal fragment defines
+  only non-reachability, hardness because SO-Krom definability has to be turned
+  into an FO(TC) definition of the problem itself.
 * **Above NP**: TAUT (DNF tautology) is coNP-complete by complementing the
   Cook–Levin discharge, and its width-three restriction 3-DNF-TAUT
   (`DescriptiveComplexity.ThreeDnfTAUT_coNP_complete`) follows the same route
