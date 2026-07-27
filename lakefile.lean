@@ -2,7 +2,7 @@ import Lake
 open Lake DSL
 
 package "descriptive-complexity" where
-  version := v!"0.1.0"
+  version := v!"4.33.0-rc1"
   description := "Descriptive complexity in Lean 4: machine-model-free NP-completeness via first-order reductions, and the polynomial hierarchy via second-order alternation"
   keywords := #["complexity", "descriptive complexity", "model theory",
     "NP-completeness", "reductions"]

@@ -166,16 +166,18 @@ the framework deliberately avoids, and it may stay out of reach.
 
 ## Use as a dependency
 
-The library tracks one Mathlib release at a time: a given version works with
-the Mathlib version it is named after, and `master` follows the latest stable
-Mathlib. Your project and this one must resolve to the **same** Mathlib
-version, since Lake builds a single Mathlib per workspace.
+The library tracks one Mathlib release at a time: a version works with the
+Mathlib version it is named after, and `master` follows the latest Mathlib pin.
+Your project and this one must resolve to the **same** Mathlib version, since
+Lake builds a single Mathlib per workspace. The current release is
+`v4.33.0-rc1`, for Mathlib `v4.33.0-rc1` and toolchain
+`leanprover/lean4:v4.33.0-rc1`.
 
 In a `lakefile.lean`:
 
 ```lean
 require "descriptive-complexity" from git
-  "https://github.com/PierreSenellart/descriptive-complexity" @ "master"
+  "https://github.com/PierreSenellart/descriptive-complexity" @ "v4.33.0-rc1"
 ```
 
 or, in a `lakefile.toml`:
@@ -184,12 +186,11 @@ or, in a `lakefile.toml`:
 [[require]]
 name = "descriptive-complexity"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "master"
+rev = "v4.33.0-rc1"
 ```
 
-The revision can be a branch, a tag or a commit hash; pin a version tag (such
-as `v4.33.0`) or a commit hash rather than `master`, for reproducible builds.
-Then
+The revision can be a branch, a tag or a commit hash; pin a version tag or a
+commit hash rather than `master`, for reproducible builds. Then
 
 ```lean
 import DescriptiveComplexity
