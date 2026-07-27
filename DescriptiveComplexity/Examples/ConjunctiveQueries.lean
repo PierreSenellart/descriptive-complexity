@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.Encoding
 import DescriptiveComplexity.Problems.ThreeColorability
 
 /-!
@@ -44,16 +45,18 @@ The recipe, common to every problem in the library:
 5. **Hardness**: an FO reduction *from* an NP-hard problem of the catalog.
 6. **Completeness**: combine 4 and 5.
 
-One concern sits outside this list, and outside what Lean checks for you: in
-practice one starts not from the abstract structure of step 1 but from
-*concrete data* (here lists of atoms and facts), which has to be *encoded*
-into such a structure. That encoding carries two obligations – semantic
-faithfulness (a Lean-checkable equivalence theorem) and size-faithfulness
-(no blow-up of the representation, which Lean cannot enforce). The interlude
-after step 6 works this through; it is arguably the step a library user
-should worry about most.
+This tutorial wraps that recipe in the full user-facing arc, which is how
+the steps below are numbered: start from the *concrete problem in the user's
+own formalism* (step 1), construct the encoding with the machinery of
+`DescriptiveComplexity.Encoding` – size bounds discharged at construction
+(step 3) – prove the encoded problem equivalent to the concrete one (step
+6), and only then establish the NP-completeness of the encoded variant,
+which faithfulness reads back to the concrete data. The two encoding
+obligations – semantic equivalence and size-faithfulness – are both
+machine-checked, and they are arguably the steps a library user should worry
+about most.
 
-Evaluation goes through steps 1–6 directly; containment then reuses
+Evaluation goes through this arc directly (steps 1–9); containment reuses
 evaluation on both sides – its membership is an FO reduction *to* evaluation
 and its hardness an FO reduction *from* evaluation – with the classical
 Chandra–Merlin homomorphism theorem (`DescriptiveComplexity.queryContained_iff_hom`)
@@ -70,8 +73,11 @@ Main results:
   faithfulness of the encoding – on instances built (by
   `DescriptiveComplexity.queryDbStructure`) from a concrete query (a list of atoms)
   and a concrete database (a list of facts), the abstract semantics agrees
-  with the textbook one (the complementary, Lean-unchecked obligation that
-  the encoding not blow up the representation is discussed in the interlude);
+  with the textbook one;
+* `DescriptiveComplexity.cqEncoding` with `DescriptiveComplexity.cqEncoding_faithful`
+  and `DescriptiveComplexity.cqEncoding_coversUpTo`: the packaged, bundled form
+  of the encoding – size bounds discharged by construction, semantics
+  faithful, and every finite structure semantically covered;
 * `DescriptiveComplexity.threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval`;
 * `DescriptiveComplexity.cqContainment_fo_reduction_cqEval : CQContainment ≤ᶠᵒ CQEval`;
 * `DescriptiveComplexity.cqEval_fo_reduction_cqContainment : CQEval ≤ᶠᵒ CQContainment`;
@@ -80,7 +86,82 @@ Main results:
 -/
 
 /-!
-### Step 1: the vocabulary of evaluation instances
+### Step 1: the concrete problem, in the user's own formalism
+
+A user of the library does not start from finite structures: they start from
+concrete data. Here a Boolean conjunctive query over variables `V` and
+constants `C` is a list of atoms – each argument in `V ⊕ C` – and a graph
+database is a list of facts over the constants, with the textbook semantics
+`ConcreteQueryHolds` (some assignment of the variables to constants sends
+every atom to a fact). Nothing in this step mentions model theory; it is the
+problem as a database theorist states it, and it is what the final
+completeness theorem will be *about*, through the faithfulness theorem of
+step 6.
+
+Encoding this data into finite structures carries two obligations – the
+encoding must preserve the *meaning* (semantic equivalence, step 6) and the
+*size* (no padding, no compression, step 3) – and the machinery of
+`DescriptiveComplexity.Encoding` makes both machine-checked. Stating the size
+obligation needs the whole family of instances to be a single type, so the
+data is also *packaged* as a dependent tuple `CQInstance` of its dimensions
+and contents. Two choices in the packaging are dictated by the machinery
+itself, and both are the kind of judgement call the size bounds exist to
+catch:
+
+* **Finite sets, not lists.** With `List`-valued atoms an instance could
+  repeat one atom arbitrarily often: its declared size grows without bound
+  while the encoded universe stays put, and the no-compression bound
+  `le_card` of step 3 would be simply false. Under set semantics the honest
+  concrete object is a finite *set* of atoms anyway.
+* **The size counts `n` and `m`, not just the sets.** The universe is the
+  variables and constants: with `2 ^ k` variables and a one-atom query, a
+  size that only counted the sets would hide an exponential universe, and
+  the no-padding bound `card_le` would be false.
+
+The packaged type also carries `m + 1` constants, so the nonempty-database
+junk convention of the equivalence theorem (step 6) holds by construction.
+-/
+
+namespace DescriptiveComplexity
+
+section Concrete
+
+variable {V C : Type}
+
+/-- The textbook semantics of a concrete Boolean conjunctive query `q` (a
+list of binary atoms with arguments in `V ⊕ C`: variables to the left,
+constants to the right) on a concrete graph database `D` (a list of facts
+over the constants): some assignment of the variables to constants sends
+every atom to a fact. -/
+def ConcreteQueryHolds (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) : Prop :=
+  ∃ v : V → C, ∀ p ∈ q, (Sum.elim v id p.1, Sum.elim v id p.2) ∈ D
+
+end Concrete
+
+/-- A packaged concrete evaluation instance: `n` query variables, `m + 1`
+database constants, a finite set of query atoms over them, and a finite set
+of database facts on the constants. -/
+abbrev CQInstance : Type :=
+  Σ n m : ℕ,
+    Finset ((Fin n ⊕ Fin (m + 1)) × (Fin n ⊕ Fin (m + 1))) ×
+      Finset (Fin (m + 1) × Fin (m + 1))
+
+/-- The textbook size of a packaged instance: elements (variables and
+constants) plus atoms plus facts. This is the one audited line of the
+encoding – everything else is checked against it. -/
+def cqSize : CQInstance → ℕ
+  | ⟨n, m, q, D⟩ => n + (m + 1) + q.card + D.card
+
+/-- The textbook semantics of a packaged instance: `ConcreteQueryHolds`, with
+the finite sets in place of lists. -/
+def ConcreteCQHolds : CQInstance → Prop
+  | ⟨n, m, q, D⟩ => ∃ v : Fin n → Fin (m + 1),
+      ∀ p ∈ q, (Sum.elim v id p.1, Sum.elim v id p.2) ∈ D
+
+end DescriptiveComplexity
+
+/-!
+### Step 2: the vocabulary of evaluation instances
 
 An instance of the evaluation problem is a query *and* a database, packaged
 in a single finite structure. Elements of the structure play three roles:
@@ -138,7 +219,72 @@ open FirstOrder
 open Language Structure BoundedFormula
 
 /-!
-### Step 2: semantics
+### Step 3: the encoding, size bounds discharged at construction
+
+With the vocabulary fixed, the packaged instances are encoded as
+`Language.queryDb`-structures: universe `Fin n ⊕ Fin (m + 1)`, relations
+decided by membership in the packaged sets. The encoder `cqRelBool` is a
+standalone, auditable `def`, and the bundle `cqEncoding` cannot be
+*constructed* without discharging the two size bounds – the
+representation-faithfulness obligation, closed here before anything is
+proved about meaning (that is step 6, once the abstract semantics exists).
+-/
+
+/-- The encoder itself, standalone rather than inline in the bundle, so that
+it can be audited in isolation: it elaborates as a plain `def` – an encoder
+deciding an undecidable predicate could not, the compiler would demand
+`noncomputable` – and it genuinely runs (the `#guard`s below). Its
+`#print axioms` still cites the classical axioms, harmlessly: `Finset`
+membership is decided through `Multiset` quotients, whose instances cite them
+in *proof* positions only – executability is witnessed by execution, not by
+the axiom report. -/
+def cqRelBool (i : CQInstance) {n : ℕ} (R : Language.queryDb.Relations n) :
+    (Fin n → (Fin i.1 ⊕ Fin (i.2.1 + 1))) → Bool :=
+  match n, R with
+  | _, .isVar => fun x => (x 0).isLeft
+  | _, .atom => fun x => decide ((x 0, x 1) ∈ i.2.2.1)
+  | _, .fact => fun x =>
+    match x 0, x 1 with
+    | Sum.inr a, Sum.inr b => decide ((a, b) ∈ i.2.2.2)
+    | _, _ => false
+
+/-- The encoding of packaged instances by `Language.queryDb`-structures:
+universe `Fin n ⊕ Fin (m + 1)`, relations decided by membership in the
+packaged sets (`cqRelBool`, a `Bool`-valued query/database structure).
+The bounds record that nothing blows up and nothing is compressed. -/
+def cqEncoding : Encoding Language.queryDb CQInstance where
+  size := cqSize
+  Univ := fun i => Fin i.1 ⊕ Fin (i.2.1 + 1)
+  deceq := fun _ => inferInstance
+  fintype := fun _ => inferInstance
+  relBool := fun i {n} R => cqRelBool i R
+  card_le := Encoding.linear_bound (c := 1) fun i => by
+    obtain ⟨n, m, q, D⟩ := i
+    simp only [Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin, cqSize]
+    omega
+  le_card := ⟨2, 2, fun i => by
+    obtain ⟨n, m, q, D⟩ := i
+    have hq : q.card ≤ (n + (m + 1)) * (n + (m + 1)) := by
+      simpa [Fintype.card_prod, Fintype.card_sum, Fintype.card_fin] using q.card_le_univ
+    have hD : D.card ≤ (n + (m + 1) + 1) * (n + (m + 1) + 1) := by
+      have h0 : D.card ≤ (m + 1) * (m + 1) := by
+        simpa [Fintype.card_prod, Fintype.card_fin] using D.card_le_univ
+      exact h0.trans (Nat.mul_le_mul (by omega) (by omega))
+    have h1 : n + (m + 1) + q.card ≤ (n + (m + 1) + 1) * (n + (m + 1) + 1) := by
+      have hx : (n + (m + 1) + 1) * (n + (m + 1) + 1) =
+          (n + (m + 1) + (n + (m + 1)) * (n + (m + 1))) + (n + (m + 1) + 1) := by ring
+      rw [hx]
+      exact (Nat.add_le_add_left hq _).trans (Nat.le_add_right _ _)
+    simp only [cqSize, Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin]
+    have hexp : 2 * (n + (m + 1) + 1) ^ 2 =
+        (n + (m + 1) + 1) * (n + (m + 1) + 1) +
+          (n + (m + 1) + 1) * (n + (m + 1) + 1) := by
+      ring
+    rw [hexp]
+    exact Nat.add_le_add h1 hD⟩
+
+/-!
+### Step 4: semantics
 
 `RelMap`-based shorthands first: they keep every later statement readable
 (compare `MGAdj` and `MGMarked` in `Problems/CliqueFamily/Defs.lean`).
@@ -211,8 +357,8 @@ def CQHom (VarP : A → Prop) (AtomP FactP : A → A → Prop) : Prop :=
 
 /-- The homomorphism condition transports along an equivalence commuting with
 the three predicates. This is the generic workhorse for the
-isomorphism-invariance proofs (step 3) and for the dimension-1, single-tag
-reduction of step 9. -/
+isomorphism-invariance proofs (step 5) and for the dimension-1, single-tag
+reduction of step 12. -/
 theorem CQHom.of_equiv (u : A ≃ B) {VarA : A → Prop} {AtomA FactA : A → A → Prop}
     {VarB : B → Prop} {AtomB FactB : B → B → Prop}
     (hVar : ∀ a, VarA a ↔ VarB (u a))
@@ -255,7 +401,7 @@ def QueryHolds (A : Type) [Language.queryDb.Structure A] : Prop :=
   CQHom (QVar (A := A)) (QAtom (A := A)) (DbEdge (A := A))
 
 /-!
-### Step 3: isomorphism-invariance and the bundled problem
+### Step 5: isomorphism-invariance and the bundled problem
 
 A `DecisionProblem` requires isomorphism-invariance. Thanks to the generic
 transport lemma this is a matter of transporting the three `RelMap`
@@ -280,7 +426,324 @@ def CQEval : DecisionProblem Language.queryDb where
   iso_invariant := fun e => queryHolds_iso e
 
 /-!
-### Step 4: membership in NP
+### Step 6: faithfulness – the encoded problem is the concrete one
+
+The bridge between steps 1 and 5: the abstract semantics of the encoded
+structure agrees, instance by instance, with the textbook semantics of the
+data; otherwise the complexity results to come would be about the wrong
+predicate. This is a *theorem*, so Lean holds you to it – get the encoding
+subtly wrong and the proof simply does not close.
+
+The equivalence is proved in two moves. First, in the generic `V C` setting
+of step 1: each pair is encoded on the universe `V ⊕ C` by
+`queryDbStructure`, and the round-trip theorem
+`concreteQueryHolds_iff_queryHolds` relates the abstract semantics of step 4
+to the textbook one on every such structure. (Its `Nonempty C` hypothesis is
+the junk convention of step 4 surfacing: a variable occurring in no atom is
+unconstrained abstractly but must still be assigned a constant concretely –
+for genuine BCQs over a nonempty database domain nothing is lost, and the
+packaged type of step 1 discharges the hypothesis by construction.) Then the
+packaged encoding is reduced to that generic statement, giving
+`cqEncoding_faithful`: obligation (1) of step 1, against the bundle whose
+construction already discharged obligation (2).
+-/
+
+section Concrete
+
+variable {V C : Type}
+
+/-- The `Language.queryDb`-structure encoding a concrete instance: universe
+`V ⊕ C`, the variables being the left summands, with the atoms of `q` and
+the facts of `D`. -/
+@[instance_reducible]
+def queryDbStructure (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
+    Language.queryDb.Structure (V ⊕ C) where
+  funMap f := isEmptyElim f
+  RelMap {n} R :=
+    match n, R with
+    | _, .isVar => fun x =>
+      match x 0 with
+      | Sum.inl _ => True
+      | Sum.inr _ => False
+    | _, .atom => fun x => (x 0, x 1) ∈ q
+    | _, .fact => fun x =>
+      match x 0, x 1 with
+      | Sum.inr a, Sum.inr b => (a, b) ∈ D
+      | _, _ => False
+
+/-- The concrete assignment read off a structural valuation: the constant
+the valuation sends a variable to (or a default for the junk case of a
+variable mapped to a variable, possible only for variables in no atom). -/
+private noncomputable def concreteVal [Nonempty C] (h : V ⊕ C → V ⊕ C) (x : V) : C :=
+  match h (Sum.inl x) with
+  | Sum.inr c => c
+  | Sum.inl _ => Classical.arbitrary C
+
+private theorem concreteVal_eq [Nonempty C] {h : V ⊕ C → V ⊕ C} {x : V} {c : C}
+    (hs : h (Sum.inl x) = Sum.inr c) : concreteVal h x = c := by
+  simp only [concreteVal]
+  rw [hs]
+
+/-- **The encoding is faithful**: the abstract semantics `QueryHolds` of the
+encoded structure agrees with the textbook semantics of the concrete query
+on the concrete database. -/
+theorem concreteQueryHolds_iff_queryHolds [Nonempty C]
+    (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
+    ConcreteQueryHolds q D ↔ @QueryHolds (V ⊕ C) (queryDbStructure q D) := by
+  letI := queryDbStructure q D
+  constructor
+  · -- an assignment becomes a valuation, sending `Sum.inl x` to
+    -- `Sum.inr (v x)` and fixing the constants
+    rintro ⟨v, hv⟩
+    refine ⟨Sum.elim (fun x => Sum.inr (v x)) Sum.inr, fun t ht => ?_, fun t t' hat => ?_⟩
+    · rcases t with x | c
+      · exact absurd trivial ht
+      · rfl
+    · have hq : (t, t') ∈ q := hat
+      have hf := hv (t, t') hq
+      rcases t with x | c <;> rcases t' with x' | c' <;>
+        exact ⟨hf, fun hh => hh, fun hh => hh⟩
+  · -- a valuation becomes an assignment: atoms force every variable's image
+    -- onto the constant side, where its value can be read off
+    rintro ⟨h, hfix, hatom⟩
+    have himg : ∀ t t' : V ⊕ C, (t, t') ∈ q →
+        ∃ a b : C, h t = Sum.inr a ∧ h t' = Sum.inr b ∧ (a, b) ∈ D := by
+      intro t t' hq
+      obtain ⟨hf, hnv, hnv'⟩ := hatom t t' hq
+      rcases hht : h t with x | a
+      · rw [hht] at hnv
+        exact absurd trivial hnv
+      rcases hht' : h t' with x' | b
+      · rw [hht'] at hnv'
+        exact absurd trivial hnv'
+      rw [hht, hht'] at hf
+      exact ⟨a, b, rfl, rfl, hf⟩
+    have hval : ∀ (s : V ⊕ C) (e : C), h s = Sum.inr e →
+        Sum.elim (concreteVal h) id s = e := by
+      intro s e hs
+      rcases s with x | c'
+      · exact concreteVal_eq hs
+      · have hfix' : h (Sum.inr c') = Sum.inr c' := hfix (Sum.inr c') fun hh => hh
+        rw [hfix'] at hs
+        exact Sum.inr.inj hs
+    refine ⟨concreteVal h, ?_⟩
+    rintro ⟨t, t'⟩ hp
+    obtain ⟨a, b, ha, hb, hab⟩ := himg t t' hp
+    change (Sum.elim (concreteVal h) id t, Sum.elim (concreteVal h) id t') ∈ D
+    rw [hval t a ha, hval t' b hb]
+    exact hab
+
+/-- A concrete worked instance: the query `∃ x, E(x, c₀) ∧ E(c₀, x)` (one
+variable, one constant `c₀`) holds in the two-fact database
+`{E(c₁, c₀), E(c₀, c₁)}`, witnessed by `x ↦ c₁`. -/
+example :
+    ConcreteQueryHolds (V := Fin 1) (C := Fin 2)
+      [(Sum.inl 0, Sum.inr 0), (Sum.inr 0, Sum.inl 0)]
+      [(1, 0), (0, 1)] :=
+  ⟨fun _ => 1, by decide⟩
+
+end Concrete
+
+/-- `QueryHolds` only reads the three relations, so it transports across two
+structures on the same universe that interpret them equivalently. -/
+private theorem queryHolds_congr {A : Type} (S T : Language.queryDb.Structure A)
+    (hVar : ∀ x, @QVar A S x ↔ @QVar A T x)
+    (hAtom : ∀ x y, @QAtom A S x y ↔ @QAtom A T x y)
+    (hFact : ∀ x y, @DbFact A S x y ↔ @DbFact A T x y) :
+    @QueryHolds A S ↔ @QueryHolds A T :=
+  CQHom.equiv_iff (Equiv.refl A) hVar hAtom fun x y =>
+    and_congr (hFact x y) (and_congr (not_congr (hVar x)) (not_congr (hVar y)))
+
+/-- **The packaged encoding is faithful**: the abstract problem `CQEval`
+computes the textbook semantics on every encoded instance. This is obligation
+(1) of step 1, proved against the bundled encoding – whose construction
+already discharged obligation (2). -/
+theorem cqEncoding_faithful : cqEncoding.Faithful ConcreteCQHolds CQEval := by
+  rintro ⟨n, m, q, D⟩
+  have hconc : ConcreteCQHolds ⟨n, m, q, D⟩ ↔ ConcreteQueryHolds q.toList D.toList := by
+    simp only [ConcreteCQHolds, ConcreteQueryHolds, Finset.mem_toList]
+  rw [hconc, concreteQueryHolds_iff_queryHolds q.toList D.toList]
+  refine queryHolds_congr (queryDbStructure q.toList D.toList)
+    (cqEncoding.str ⟨n, m, q, D⟩) (fun x => ?_) (fun x y => ?_) (fun x y => ?_)
+  · cases x with
+    | inl v => exact iff_of_true trivial rfl
+    | inr c => exact iff_of_false (fun h => h) (fun h => Bool.noConfusion h)
+  · change (x, y) ∈ q.toList ↔ decide ((x, y) ∈ q) = true
+    simp
+  · rcases x with v | a <;> rcases y with w | b
+    · exact iff_of_false (fun h => h) (fun h => Bool.noConfusion h)
+    · exact iff_of_false (fun h => h) (fun h => Bool.noConfusion h)
+    · exact iff_of_false (fun h => h) (fun h => Bool.noConfusion h)
+    · change (a, b) ∈ D.toList ↔ decide ((a, b) ∈ D) = true
+      simp
+
+/-- The worked two-fact instance of step 6, packaged: one variable,
+two constants, the query `∃ x, E(x, c₀) ∧ E(c₀, x)`, the database
+`{E(c₁, c₀), E(c₀, c₁)}`. -/
+def cqExample : CQInstance :=
+  ⟨1, 1, {(Sum.inl 0, Sum.inr 0), (Sum.inr 0, Sum.inl 0)}, {(1, 0), (0, 1)}⟩
+
+/-- The packaged instance is a concrete yes-instance, witnessed by
+`x ↦ c₁`. -/
+example : ConcreteCQHolds cqExample := ⟨fun _ => 1, by decide⟩
+
+/-- … and, through the faithfulness theorem, its *encoded structure* is a
+yes-instance of the abstract problem. -/
+example : CQEval (cqEncoding.Univ cqExample) :=
+  (cqEncoding_faithful cqExample).mp ⟨fun _ => 1, by decide⟩
+
+/-!
+The encoder is a computation, so it can also be *run*: the `#guard`s below
+evaluate the encoded relations of the worked instance and check them against
+the hand computation – the cheapest guard against an encoding that is
+faithful and size-honest but simply not the one the author meant. That they
+compile at all is itself a check: an encoder whose data decided an
+undecidable predicate would be rejected by the compiler (see the hygiene
+section of `DescriptiveComplexity/Encoding.lean`).
+-/
+
+section
+set_option linter.hashCommand false
+
+#guard cqEncoding.relBool cqExample qdbIsVar (![Sum.inl 0] : Fin 1 → Fin 1 ⊕ Fin 2)
+#guard !cqEncoding.relBool cqExample qdbIsVar (![Sum.inr 0] : Fin 1 → Fin 1 ⊕ Fin 2)
+#guard cqEncoding.relBool cqExample qdbAtom
+  (![Sum.inl 0, Sum.inr 0] : Fin 2 → Fin 1 ⊕ Fin 2)
+#guard !cqEncoding.relBool cqExample qdbAtom
+  (![Sum.inr 0, Sum.inr 1] : Fin 2 → Fin 1 ⊕ Fin 2)
+#guard cqEncoding.relBool cqExample qdbFact
+  (![Sum.inr 1, Sum.inr 0] : Fin 2 → Fin 1 ⊕ Fin 2)
+#guard !cqEncoding.relBool cqExample qdbFact
+  (![Sum.inl 0, Sum.inr 0] : Fin 2 → Fin 1 ⊕ Fin 2)
+
+end
+
+/-!
+Faithfulness reads membership results into the concrete world; *hardness*
+results need the converse: every abstract instance must be – at least
+semantically – an encoded one, or the concrete problem could be the easy
+fragment of a hard abstract one. The ideal statement, `Encoding.Covers`
+(every finite structure isomorphic to an encoded one), is *unprovable* here,
+and instructively so: an abstract structure may carry a `fact` touching a
+query variable, which no packaged instance represents. But such junk facts
+are invisible to the semantics (`DbEdge` guards both endpoints with `¬QVar`),
+which is exactly the slack `Encoding.CoversUpTo` allows – and that weaker,
+semantic covering is what the hardness reading actually needs.
+-/
+
+/-- On an all-variables structure the query holds iff it has no atoms: a
+valuation would have to send an atom endpoint to a non-variable. The
+degenerate case of the covering theorem. -/
+private theorem queryHolds_iff_of_forall_qvar {A : Type} [Language.queryDb.Structure A]
+    (hall : ∀ x : A, QVar x) :
+    QueryHolds A ↔ ∀ x y : A, ¬QAtom x y := by
+  constructor
+  · rintro ⟨v, -, hatom⟩ x y hxy
+    obtain ⟨-, hnv, -⟩ := hatom x y hxy
+    exact hnv (hall _)
+  · exact fun h => ⟨id, fun x _ => rfl, fun x y hxy => absurd hxy (h x y)⟩
+
+/-- Any structure whose universe is identified with `Fin n ⊕ Fin (m + 1)`,
+variables on the left, is semantically an encoded instance: read the atoms
+and the genuine database edges off the relations. The junk facts the packaged
+type cannot represent are exactly those `DbEdge` ignores. -/
+private theorem queryHolds_iff_encoded {A : Type} [Language.queryDb.Structure A]
+    {n m : ℕ} (φ : A ≃ (Fin n ⊕ Fin (m + 1)))
+    (hvar : ∀ x : A, QVar x ↔ (φ x).isLeft = true) :
+    ∃ i : CQInstance, ConcreteCQHolds i ↔ QueryHolds A := by
+  classical
+  refine ⟨⟨n, m, Finset.univ.filter fun p => QAtom (φ.symm p.1) (φ.symm p.2),
+    Finset.univ.filter fun p => DbEdge (φ.symm (Sum.inr p.1)) (φ.symm (Sum.inr p.2))⟩,
+    (cqEncoding_faithful _).trans ((CQHom.equiv_iff φ (fun x => ?_) (fun x y => ?_)
+      (fun x y => ?_)).symm)⟩
+  · exact hvar x
+  · change QAtom x y ↔ decide ((φ x, φ y) ∈ _) = true
+    simp
+  · constructor
+    · rintro ⟨hf, hnx, hny⟩
+      have hx' := (not_congr (hvar x)).mp hnx
+      have hy' := (not_congr (hvar y)).mp hny
+      rcases hφx : φ x with u | a
+      · rw [hφx] at hx'
+        exact absurd rfl hx'
+      rcases hφy : φ y with u | b
+      · rw [hφy] at hy'
+        exact absurd rfl hy'
+      have hxx : φ.symm (Sum.inr a) = x := by rw [← hφx, Equiv.symm_apply_apply]
+      have hyy : φ.symm (Sum.inr b) = y := by rw [← hφy, Equiv.symm_apply_apply]
+      -- the two `rcases` have already substituted `φ x` and `φ y` in the
+      -- goal, which is now `DbEdge (Sum.inr a) (Sum.inr b)` on the encoded
+      -- structure; its components reduce definitionally
+      refine ⟨?_, fun h => Bool.noConfusion h, fun h => Bool.noConfusion h⟩
+      change decide ((a, b) ∈ _) = true
+      rw [decide_eq_true_eq]
+      refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+      change DbEdge (φ.symm (Sum.inr a)) (φ.symm (Sum.inr b))
+      rw [hxx, hyy]
+      exact ⟨hf, hnx, hny⟩
+    · rintro ⟨hf, -, -⟩
+      have hf' : @DbFact (Fin n ⊕ Fin (m + 1))
+          (cqEncoding.str ⟨n, m, _, _⟩) (φ x) (φ y) := hf
+      rcases hφx : φ x with u | a
+      · rw [hφx] at hf'
+        exact Bool.noConfusion hf'
+      rcases hφy : φ y with u | b
+      · rw [hφx, hφy] at hf'
+        exact Bool.noConfusion hf'
+      rw [hφx, hφy] at hf'
+      obtain ⟨-, hD⟩ := Finset.mem_filter.mp (of_decide_eq_true hf')
+      have hxx : φ.symm (Sum.inr a) = x := by rw [← hφx, Equiv.symm_apply_apply]
+      have hyy : φ.symm (Sum.inr b) = y := by rw [← hφy, Equiv.symm_apply_apply]
+      rwa [hxx, hyy] at hD
+
+/-- **The packaged instances cover the abstract problem**: every finite
+`Language.queryDb`-structure is decided by `CQEval` exactly as some packaged
+instance is by the textbook semantics. Together with `cqEncoding_faithful`
+this is the checkable piece of reading the completeness theorem
+`cqEval_NP_complete` as a statement about concrete queries and databases. -/
+theorem cqEncoding_coversUpTo : cqEncoding.CoversUpTo ConcreteCQHolds CQEval := by
+  intro A _ _
+  classical
+  haveI : Fintype A := Fintype.ofFinite A
+  obtain ⟨eV⟩ : Nonempty ({x : A // QVar x} ≃ Fin (Fintype.card {x : A // QVar x})) :=
+    ⟨Fintype.equivFin _⟩
+  cases hm : Fintype.card {x : A // ¬QVar x} with
+  | zero =>
+    -- no constants: `A` is all query variables and the query holds iff it
+    -- has no atoms; the witness has one junk constant, no facts, and the
+    -- transported atoms
+    have hall : ∀ x : A, QVar x := fun x =>
+      not_not.mp fun hx => (Fintype.card_eq_zero_iff.mp hm).elim ⟨x, hx⟩
+    refine ⟨⟨Fintype.card {x : A // QVar x}, 0,
+      Finset.univ.filter fun p =>
+        ∃ a b, p = (Sum.inl a, Sum.inl b) ∧ QAtom (eV.symm a).1 (eV.symm b).1, ∅⟩, ?_⟩
+    change _ ↔ QueryHolds A
+    rw [queryHolds_iff_of_forall_qvar hall]
+    constructor
+    · rintro ⟨v, hv⟩ x y hxy
+      exact absurd
+        (hv (Sum.inl (eV ⟨x, hall x⟩), Sum.inl (eV ⟨y, hall y⟩))
+          (Finset.mem_filter.mpr ⟨Finset.mem_univ _,
+            eV ⟨x, hall x⟩, eV ⟨y, hall y⟩, rfl, by simpa using hxy⟩))
+        (Finset.notMem_empty _)
+    · intro h
+      refine ⟨fun _ => 0, ?_⟩
+      rintro p hp
+      obtain ⟨-, a, b, rfl, hab⟩ := Finset.mem_filter.mp hp
+      exact absurd hab (h _ _)
+  | succ m =>
+    -- at least one constant: identify the universe with
+    -- `Fin n ⊕ Fin (m + 1)` and apply the generic lemma
+    obtain ⟨eC⟩ : Nonempty ({x : A // ¬QVar x} ≃ Fin (m + 1)) :=
+      ⟨Fintype.equivFinOfCardEq hm⟩
+    refine queryHolds_iff_encoded
+      ((Equiv.sumCompl fun x : A => QVar x).symm.trans (eV.sumCongr eC)) fun x => ?_
+    by_cases hx : QVar x
+    · simp [Equiv.sumCompl_symm_apply_of_pos hx, hx]
+    · simp [Equiv.sumCompl_symm_apply_of_neg hx, hx]
+
+/-!
+### Step 7: membership in NP
 
 NP is *defined* in this library as `Σ₁` second-order definability (Fagin's
 theorem), so membership means exhibiting a second-order sentence: guess an
@@ -456,7 +919,7 @@ theorem cqEval_mem_NP : CQEval ∈ NP := cqEval_sigmaSODefinable
 end Membership
 
 /-!
-### Step 5: NP-hardness, by reduction from 3-colorability
+### Step 8: NP-hardness, by reduction from 3-colorability
 
 The hardness half is a first-order reduction *from* a problem the catalog
 already knows to be NP-hard. The classical source for evaluation is graph
@@ -634,11 +1097,11 @@ theorem threeColToCQEval_isQuantifierFree : threeColToCQEval.IsQuantifierFree :=
     · exact isQF_bot.imp isQF_bot
 
 /-!
-### Step 6: completeness of evaluation
+### Step 9: completeness of evaluation
 
 Membership and hardness combine into the completeness theorem. This is the
 end of the recipe for a single problem; the remaining steps treat containment
-by *reusing* evaluation instead of repeating steps 4 and 5 from scratch.
+by *reusing* evaluation instead of repeating steps 7 and 8 from scratch.
 -/
 
 /-- BCQ evaluation is NP-hard: 3-colorability, which is NP-hard, FO-reduces
@@ -651,161 +1114,10 @@ theorem cqEval_NP_hard : NP.Hard CQEval :=
 theorem cqEval_NP_complete : NP.Complete CQEval :=
   ⟨cqEval_mem_NP, cqEval_NP_hard⟩
 
-/-!
-### Interlude: tying the encoding to concrete queries and databases
-
-So far “a query and a database” has meant “a `Language.queryDb`-structure”,
-an abstract finite structure. A *user* of the library, however, does not
-start there: they start from concrete data – here a query as a list of atoms
-and a database as a list of facts – and must *encode* it as a structure
-before any of the theorems above apply. That encoding step, common to every
-problem, carries two obligations, and it is worth being explicit that Lean
-discharges only one of them.
-
-**(1) Semantic equivalence – enforced by Lean.** The abstract semantics on
-the encoded structure must agree, instance by instance, with the concrete
-textbook semantics of the original data; otherwise the complexity result is
-about the wrong predicate. This is a *theorem*, so Lean holds you to it.
-Concretely: a Boolean conjunctive query over variables `V` and constants `C`
-is a list of atoms – each argument in `V ⊕ C` – and a graph database is a
-list of facts over the constants, with textbook semantics
-`DescriptiveComplexity.ConcreteQueryHolds` (some assignment of the variables to
-constants sends every atom to a fact). Each pair is encoded on the universe
-`V ⊕ C` by `DescriptiveComplexity.queryDbStructure`, and the round-trip theorem
-`DescriptiveComplexity.concreteQueryHolds_iff_queryHolds` proves the abstract
-semantics of step 2 agrees with this textbook one on every encoded instance.
-Get the encoding subtly wrong and that proof simply does not close.
-
-**(2) Representation faithfulness – *not* enforced by Lean.** The encoding
-must also be of the right *size*: the structure it builds has to stay
-polynomially bounded (here linear) in the concrete input, or the abstract
-problem, however faithfully its *meaning* matches, is no longer the same
-*computational* problem. `queryDbStructure` is honest on this count – its
-universe is `V ⊕ C` and its two relations are `q` and `D` verbatim, so
-nothing blows up. But nothing in the *type* of
-`concreteQueryHolds_iff_queryHolds` says so: Lean would just as readily let
-one prove (1) for an encoding that padded the universe to `2 ^ |C|` elements,
-silently turning a hard problem into a trivially small one, or that smuggled
-a hard sub-computation into the encoding map itself. Size-faithfulness of the
-encoding therefore remains a proof obligation on whoever writes it, to be
-checked by hand – the one place in the recipe where Lean cannot stand in for
-the reader's judgement.
-
-The `Nonempty C` hypothesis on the equivalence theorem is this file's junk
-convention surfacing one last time: a variable occurring in no atom is
-unconstrained in the abstract semantics but must still be assigned a constant
-in the concrete one – for genuine BCQs (every variable occurs in an atom)
-over a nonempty database domain, nothing is lost.
--/
-
-section Concrete
-
-variable {V C : Type}
-
-/-- The textbook semantics of a concrete Boolean conjunctive query `q` (a
-list of binary atoms with arguments in `V ⊕ C`: variables to the left,
-constants to the right) on a concrete graph database `D` (a list of facts
-over the constants): some assignment of the variables to constants sends
-every atom to a fact. -/
-def ConcreteQueryHolds (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) : Prop :=
-  ∃ v : V → C, ∀ p ∈ q, (Sum.elim v id p.1, Sum.elim v id p.2) ∈ D
-
-/-- The `Language.queryDb`-structure encoding a concrete instance: universe
-`V ⊕ C`, the variables being the left summands, with the atoms of `q` and
-the facts of `D`. -/
-@[instance_reducible]
-def queryDbStructure (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
-    Language.queryDb.Structure (V ⊕ C) where
-  funMap f := isEmptyElim f
-  RelMap {n} R :=
-    match n, R with
-    | _, .isVar => fun x =>
-      match x 0 with
-      | Sum.inl _ => True
-      | Sum.inr _ => False
-    | _, .atom => fun x => (x 0, x 1) ∈ q
-    | _, .fact => fun x =>
-      match x 0, x 1 with
-      | Sum.inr a, Sum.inr b => (a, b) ∈ D
-      | _, _ => False
-
-/-- The concrete assignment read off a structural valuation: the constant
-the valuation sends a variable to (or a default for the junk case of a
-variable mapped to a variable, possible only for variables in no atom). -/
-private noncomputable def concreteVal [Nonempty C] (h : V ⊕ C → V ⊕ C) (x : V) : C :=
-  match h (Sum.inl x) with
-  | Sum.inr c => c
-  | Sum.inl _ => Classical.arbitrary C
-
-private theorem concreteVal_eq [Nonempty C] {h : V ⊕ C → V ⊕ C} {x : V} {c : C}
-    (hs : h (Sum.inl x) = Sum.inr c) : concreteVal h x = c := by
-  simp only [concreteVal]
-  rw [hs]
-
-/-- **The encoding is faithful**: the abstract semantics `QueryHolds` of the
-encoded structure agrees with the textbook semantics of the concrete query
-on the concrete database. -/
-theorem concreteQueryHolds_iff_queryHolds [Nonempty C]
-    (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
-    ConcreteQueryHolds q D ↔ @QueryHolds (V ⊕ C) (queryDbStructure q D) := by
-  letI := queryDbStructure q D
-  constructor
-  · -- an assignment becomes a valuation, sending `Sum.inl x` to
-    -- `Sum.inr (v x)` and fixing the constants
-    rintro ⟨v, hv⟩
-    refine ⟨Sum.elim (fun x => Sum.inr (v x)) Sum.inr, fun t ht => ?_, fun t t' hat => ?_⟩
-    · rcases t with x | c
-      · exact absurd trivial ht
-      · rfl
-    · have hq : (t, t') ∈ q := hat
-      have hf := hv (t, t') hq
-      rcases t with x | c <;> rcases t' with x' | c' <;>
-        exact ⟨hf, fun hh => hh, fun hh => hh⟩
-  · -- a valuation becomes an assignment: atoms force every variable's image
-    -- onto the constant side, where its value can be read off
-    rintro ⟨h, hfix, hatom⟩
-    have himg : ∀ t t' : V ⊕ C, (t, t') ∈ q →
-        ∃ a b : C, h t = Sum.inr a ∧ h t' = Sum.inr b ∧ (a, b) ∈ D := by
-      intro t t' hq
-      obtain ⟨hf, hnv, hnv'⟩ := hatom t t' hq
-      rcases hht : h t with x | a
-      · rw [hht] at hnv
-        exact absurd trivial hnv
-      rcases hht' : h t' with x' | b
-      · rw [hht'] at hnv'
-        exact absurd trivial hnv'
-      rw [hht, hht'] at hf
-      exact ⟨a, b, rfl, rfl, hf⟩
-    have hval : ∀ (s : V ⊕ C) (e : C), h s = Sum.inr e →
-        Sum.elim (concreteVal h) id s = e := by
-      intro s e hs
-      rcases s with x | c'
-      · exact concreteVal_eq hs
-      · have hfix' : h (Sum.inr c') = Sum.inr c' := hfix (Sum.inr c') fun hh => hh
-        rw [hfix'] at hs
-        exact Sum.inr.inj hs
-    refine ⟨concreteVal h, ?_⟩
-    rintro ⟨t, t'⟩ hp
-    obtain ⟨a, b, ha, hb, hab⟩ := himg t t' hp
-    change (Sum.elim (concreteVal h) id t, Sum.elim (concreteVal h) id t') ∈ D
-    rw [hval t a ha, hval t' b hb]
-    exact hab
-
-/-- A concrete worked instance: the query `∃ x, E(x, c₀) ∧ E(c₀, x)` (one
-variable, one constant `c₀`) holds in the two-fact database
-`{E(c₁, c₀), E(c₀, c₁)}`, witnessed by `x ↦ c₁`. -/
-example :
-    ConcreteQueryHolds (V := Fin 1) (C := Fin 2)
-      [(Sum.inl 0, Sum.inr 0), (Sum.inr 0, Sum.inl 0)]
-      [(1, 0), (0, 1)] :=
-  ⟨fun _ => 1, by decide⟩
-
-end Concrete
-
 end DescriptiveComplexity
 
 /-!
-### Step 7: containment – vocabulary, semantics, and the Chandra–Merlin theorem
+### Step 10: containment – vocabulary, semantics, and the Chandra–Merlin theorem
 
 An instance of the containment problem is a *pair* of queries over a shared
 universe: unary predicates mark the variables of the left and of the right
@@ -923,7 +1235,7 @@ theorem queryContained_iff_hom (A : Type) [Language.queryPair.Structure A] :
 
 /-- Containment is isomorphism-invariant: via the Chandra–Merlin theorem, it
 suffices to transport the homomorphism criterion, which the generic transport
-lemma of step 2 does. (Transporting the ∀-databases definition directly would
+lemma of step 4 does. (Transporting the ∀-databases definition directly would
 also work, but reusing the homomorphism form is shorter.) -/
 theorem queryContained_iso {A B : Type} [Language.queryPair.Structure A]
     [Language.queryPair.Structure B] (e : A ≃[Language.queryPair] B) :
@@ -942,7 +1254,7 @@ def CQContainment : DecisionProblem Language.queryPair where
   iso_invariant := fun e => queryContained_iso e
 
 /-!
-### Step 8: containment is in NP, by reduction to evaluation
+### Step 11: containment is in NP, by reduction to evaluation
 
 By Chandra–Merlin, containment is evaluation of the right query in the
 canonical database of the left one – so containment FO-reduces to
@@ -958,7 +1270,7 @@ constants alike), while in an evaluation instance the database elements are
 exactly the non-variables. A single copy of the universe cannot be split
 both ways, so the interpretation uses two tags – a query side and a database
 side – and *routes* each atom endpoint to the query side if it is a variable
-of either query (recall the junk convention of step 7) and to the database
+of either query (recall the junk convention of step 10) and to the database
 side otherwise. The database side carries the left atoms as facts, on all
 elements. All formulas remain quantifier-free.
 -/
@@ -1174,7 +1486,7 @@ theorem cqContainment_mem_NP : CQContainment ∈ NP :=
   NP.mem_of_foReduction cqContainment_fo_reduction_cqEval cqEval_mem_NP
 
 /-!
-### Step 9: containment is NP-hard, by reduction from evaluation
+### Step 12: containment is NP-hard, by reduction from evaluation
 
 The reverse reduction expresses the other classical half of the
 correspondence: *a database is just a conjunctive query with no variables*.
