@@ -121,9 +121,26 @@ in `ClauseDischarge.lean`); the discharges still to do:
   FO(PFP). Note: no fragment of *plain* SO can play this role: SO = PH
   (Fagin/Stockmeyer), so an SO fragment capturing PSPACE would collapse PH; some
   iteration/recursion operator is unavoidable.
-- **FO(PFP), FO(TC), FO(DTC)** [L, sharing infrastructure with LFP]: definitions
-  of PSPACE, NL, L on ordered structures (DC ch. 9–10); for PSPACE, SO(TC) above
-  is the cheaper route and FO(PFP) becomes a textbook-faithfulness layer.
+- **FO(TC), the rest of it** [M–L]: the definability layer exists
+  (`TransitiveClosure.lean`: `TCSpec`/`TCDefinable`, a single TC over a
+  first-order transition formula on `k`-tuples, with `reach_tcDefinable` as the
+  canonical instance). What remains: (i) `TCDefinable P → SigmaSOKromDefinable
+  Pᶜ` [M], the arity-`k` generalization of the UNREACH program of
+  `Problems/Reachability.lean` — guess the tuples from which an accepting tuple
+  is reachable, close under predecessors with the 2-clause `¬U(ȳ) ∨ U(x̄)`,
+  forbid the starting tuples; (ii) the converse direction
+  `SigmaSOKromDefinable P → TCDefinable Pᶜ` [M–L], the implication graph of the
+  clause instances read as a `TCSpec`, on top of `TwoSat/Implication.lean`.
+  Composed they give `co-NL(Krom) = NL(TC)`; upgrading that to `NL = coNL` is
+  Immerman–Szelepcsényi (§4).
+- **FO(DTC)** [M, after the above]: the deterministic variant, i.e. the same
+  `TCSpec` with `step` replaced by its FO determinization
+  `step(x̄, ȳ) ∧ ∀z̄. step(x̄, z̄) → z̄ = ȳ`; that formula is first-order, so
+  `DTCDefinable P → TCDefinable P` (the definability-level `L ⊆ NL`) is a
+  one-liner once the determinizing formula and its realization lemma exist.
+- **FO(PFP)** [L, sharing infrastructure with LFP]: PSPACE on ordered
+  structures (DC ch. 9–10); SO(TC) above is the cheaper route to the class, so
+  this is a textbook-faithfulness layer.
 - **BIT and FO(≤, BIT)** [L]: representation (D); FO-definability of `+` and `×`
   from BIT, `FO(≤, BIT)` = uniform AC⁰ as the bottom of the ordered world
   (formalizing that *capture* — against a circuit model — is the separate §4
@@ -172,9 +189,12 @@ in `ClauseDischarge.lean`); the discharges still to do:
 ## 4. Capture and structural theorems (DC's greatest hits)
 
 - **Immerman–Szelepcsényi as a logic theorem** [L–R]: FO(TC) is closed under
-  complement on finite ordered structures (NL = coNL). Self-contained once
-  FO(TC) exists, spectacular, and the inductive-counting proof is well suited to
-  formalization. Flagship target; a major milestone on its own.
+  complement on finite ordered structures (NL = coNL). Its prerequisite is now
+  in place (`TransitiveClosure.lean`), and the inductive-counting proof is well
+  suited to formalization: the certificate is a walk on tuples of (stage,
+  count, vertex), all of them elements or positions in the order, so it stays
+  inside a single `TC`. Flagship target; it would also deliver `REACH ∈ NL`,
+  which the clausal fragments cannot state (they define the complement).
 - **Immerman–Vardi** [L]: P = order-invariant FO(LFP); in this library's
   definitional style it is the pair (definition, HORN-SAT/CVP hardness
   discharge) rather than a machine-model equivalence.
@@ -487,13 +507,12 @@ blocked.
 2. **The NL layer, cheapest piece first**: **SO-Krom** before FO(TC). Done —
    the fragment, its closure under reductions, the class `NL`, **2SAT
    NL-complete** (membership by a Krom program, hardness by the Krom
-   discharge), and the inclusions `NL ⊆ PTIME` and `NL ⊆ NP`, which go through
-   2SAT because a Krom kernel is not a Horn kernel: 2SAT is in PTIME by a Horn
-   program for its implication graph, on top of a formalization of the
-   Aspvall–Plass–Tarjan criterion. What remains of this step is **REACH**;
-   afterwards **FO(TC)** (which Immerman–Szelepcsényi is stated about, and which
-   inductive counting wants rather than the Krom fragment) and
-   **FO(DTC)**/**REACHd**.
+   discharge), the inclusions `NL ⊆ PTIME` and `NL ⊆ NP` (through 2SAT, since a
+   Krom kernel is not a Horn kernel), UNREACH defined in the Krom fragment, and
+   the **FO(TC)** definability layer with REACH as its canonical instance. What
+   remains of this step: the two translations between FO(TC) and the Krom
+   fragment (§3), then **FO(DTC)**/**REACHd**, and REACH's hardness once FO(TC)
+   can be discharged.
 3. **Immerman–Szelepcsényi** (§4), the flagship: spectacular, self-contained,
    unconditional.
 4. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the

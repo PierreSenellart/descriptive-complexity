@@ -22,6 +22,7 @@ import DescriptiveComplexity.ClauseDischarge
 import DescriptiveComplexity.SecondOrderKrom
 import DescriptiveComplexity.SecondOrderKromPull
 import DescriptiveComplexity.LogSpace
+import DescriptiveComplexity.TransitiveClosure
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -197,6 +198,16 @@ individual declarations are documented on their own pages.
   `DescriptiveComplexity.NL_subset_NP`, both downstream with 2SAT. What stays
   unproved is `NL = coNL` (Immerman–Szelepcsényi), which is a genuine theorem
   rather than the definitional duality that gives `PiP k` from `SigmaP k`.
+* `DescriptiveComplexity.TransitiveClosure` – FO(TC) ([Immerman
+  1987][immerman1987languages]), the logic that captures NL on ordered
+  structures, in the same kernel-as-data style: a `DescriptiveComplexity.TCSpec` is an
+  arity, a first-order transition formula on `k`-tuples and two endpoint
+  formulas, with `Relation.ReflTransGen` supplying the closure. It is
+  deliberately *not* a second complexity class (a walk's state is a tuple of
+  elements, so a reduction's tags would have to vary along it); it is the logic
+  in which REACH is stated head-on (`DescriptiveComplexity.reach_tcDefinable`) and in
+  which Immerman–Szelepcsényi would be proved – the missing bridge that would
+  give `REACH ∈ NL`, the clausal fragments defining only the complement.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads

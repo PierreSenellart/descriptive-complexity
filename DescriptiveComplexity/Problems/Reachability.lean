@@ -7,6 +7,7 @@ import DescriptiveComplexity.Problems.HornSat.Hardness
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.FixedPointHorn
 import DescriptiveComplexity.LogSpace
+import DescriptiveComplexity.TransitiveClosure
 
 /-!
 # Reachability, and the Horn fragment at work
@@ -550,5 +551,86 @@ theorem unreach_sigmaSOKromDefinable : SigmaSOKromDefinable UNREACH := by
 definability. -/
 theorem unreach_mem_NL : UNREACH ∈ NL :=
   unreach_sigmaSOKromDefinable
+
+/-! ### REACH is FO(TC) definable
+
+The canonical example of `DescriptiveComplexity.TCDefinable`, and the one the logic is
+shaped after: REACH *is* a transitive closure, at arity one, of the edge
+relation between the marked sources and the marked targets. Note the contrast
+with the two clausal fragments above, which define the *complement* head-on:
+here it is reachability itself that is stated, which is why closing FO(TC)
+under complement (Immerman–Szelepcsényi) is what `REACH ∈ NL` waits on. -/
+
+/-- The transition formula of the walk: an edge from the current vertex to the
+next one. -/
+noncomputable def tcEdgeF :
+    (Language.stGraph.sum Language.order).Formula (Fin 1 ⊕ Fin 1) :=
+  Relations.formula₂ sgEdgeO (Term.var (Sum.inl 0)) (Term.var (Sum.inr 0))
+
+/-- The starting tuples of the walk: the marked sources. -/
+noncomputable def tcSourceF : (Language.stGraph.sum Language.order).Formula (Fin 1) :=
+  Relations.formula₁ sgSourceO (Term.var 0)
+
+/-- The accepting tuples of the walk: the marked targets. -/
+noncomputable def tcTargetF : (Language.stGraph.sum Language.order).Formula (Fin 1) :=
+  Relations.formula₁ sgTargetO (Term.var 0)
+
+/-- REACH as a single transitive closure: a walk along edges, from a marked
+source to a marked target. -/
+noncomputable abbrev reachSpec : TCSpec Language.stGraph where
+  k := 1
+  step := tcEdgeF
+  src := tcSourceF
+  tgt := tcTargetF
+
+section TCProgram
+
+variable {A : Type} [Language.stGraph.Structure A] [LinearOrder A]
+
+@[simp]
+theorem step_reachSpec (a b : Fin 1 → A) :
+    reachSpec.Step a b ↔ SGEdge (a 0) (b 0) := by
+  change tcEdgeF.Realize (Sum.elim a b) ↔ _
+  rw [tcEdgeF, Formula.realize_rel₂, relMap_sumInl]
+  exact Iff.rfl
+
+@[simp]
+theorem realize_tcSourceF (v : Fin 1 → A) : tcSourceF.Realize v ↔ SGSource (v 0) := by
+  rw [tcSourceF, Formula.realize_rel₁, relMap_sumInl]
+  exact Iff.rfl
+
+@[simp]
+theorem realize_tcTargetF (v : Fin 1 → A) : tcTargetF.Realize v ↔ SGTarget (v 0) := by
+  rw [tcTargetF, Formula.realize_rel₁, relMap_sumInl]
+  exact Iff.rfl
+
+/-- A path in the graph is a walk of the specification. -/
+theorem reach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen SGEdge x y) :
+    reachSpec.Reach (fun _ => x) (fun _ => y) := by
+  induction h with
+  | refl => exact Relation.ReflTransGen.refl
+  | @tail b c _ hbc ih => exact ih.tail ((step_reachSpec (fun _ => b) fun _ => c).mpr hbc)
+
+/-- A walk of the specification is a path in the graph. -/
+theorem reflTransGen_of_reach {u v : Fin 1 → A} (h : reachSpec.Reach u v) :
+    Relation.ReflTransGen SGEdge (u 0) (v 0) := by
+  induction h with
+  | refl => exact Relation.ReflTransGen.refl
+  | @tail b c _ hbc ih => exact ih.tail ((step_reachSpec b c).mp hbc)
+
+end TCProgram
+
+/-- **REACH is FO(TC) definable**: it is a single transitive closure of the
+edge relation, at arity one. -/
+theorem reach_tcDefinable : TCDefinable REACH := by
+  refine ⟨reachSpec, ?_⟩
+  intro A _ _ _ _
+  constructor
+  · rintro ⟨s, t, hs, ht, hpath⟩
+    exact ⟨fun _ => s, fun _ => t, (realize_tcSourceF _).mpr hs,
+      (realize_tcTargetF _).mpr ht, reach_of_reflTransGen hpath⟩
+  · rintro ⟨u, v, hu, hv, huv⟩
+    exact ⟨u 0, v 0, (realize_tcSourceF u).mp hu, (realize_tcTargetF v).mp hv,
+      reflTransGen_of_reach huv⟩
 
 end DescriptiveComplexity
