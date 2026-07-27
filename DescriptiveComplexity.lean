@@ -35,6 +35,7 @@ import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
 import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
 import DescriptiveComplexity.OccurrenceFormulas
@@ -162,6 +163,18 @@ individual declarations are documented on their own pages.
   step of `DescriptiveComplexity.Hierarchy` climbs only from level 1 up, its level-0
   step being the Horn discharge. See `DescriptiveComplexity.Problems.HornSat` for what
   is and is not claimed.
+
+* `DescriptiveComplexity.Difference` – **the class DP**
+  (`DescriptiveComplexity.DP`), the conjunctions of an NP condition and a coNP one
+  ([Papadimitriou & Yannakakis 1984][papadimitriou1984complexity]), with
+  `NP ⊆ DP` and `coNP ⊆ DP`. Closure under reductions is the interesting part:
+  the two halves of a DP definition are individually *not* order-invariant, so
+  an ordered reduction cannot be pulled back half by half in the usual way. The
+  order is instead quantified in opposite directions on the two sides –
+  existentially on the `Σ` half, universally on the `Π` half – whose conjunction
+  is again the pullback, each half then handled by the sentence-level order
+  elimination of `DescriptiveComplexity.SecondOrderOrdered`. The upper bounds
+  `DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` and the complete problem SAT-UNSAT are not yet formalized.
 
 * `DescriptiveComplexity.FixedPoint` – FO(LFP) ([Immerman
   1986][immerman1986relational]; [Vardi 1982][vardi1982complexity]), in the same
@@ -340,6 +353,7 @@ reduction and certificate in full.
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
+| `DP` | a `Σ₁` and a `Π₁` sentence conjoined: a difference of NP problems ([Papadimitriou & Yannakakis 1984][papadimitriou1984complexity]) | — (SAT-UNSAT not yet formalized) |
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order blocks, existential first ([Stockmeyer 1976][stockmeyer1976polynomial]) | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — |
