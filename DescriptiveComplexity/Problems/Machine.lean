@@ -11,17 +11,18 @@ import DescriptiveComplexity.Problems.Machine.Tape
 import DescriptiveComplexity.Problems.Machine.Hardness
 import DescriptiveComplexity.Problems.Machine.Interp
 import DescriptiveComplexity.Problems.Machine.Fixpoint
+import DescriptiveComplexity.Problems.Machine.HornInterp
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Problems.HornSat
 
 /-!
-# Machine acceptance is NP-complete
+# Machine acceptance is NP-complete, and its deterministic restriction PTIME-complete
 
 Umbrella file for `DescriptiveComplexity.NTMAccept`, the problem “does this
 nondeterministic Turing machine accept its input within as many steps as there
 are positions?”, with the machine carried by the instance.
 
-The point of the problem is the bridge described in `MACHINE.md`: every class
+The point of the problem is the machine bridge: every class
 in this library is a definition in logic and every completeness theorem is
 discharged by a first-order reduction, so that these classes really are *the*
 NP and *the* P was, until this file, a citation. `NTMAccept` closes that gap
@@ -91,12 +92,14 @@ theorem ntmAccept_reduces_to_sat : Nonempty (NTMAccept ≤ᶠᵒ[≤] SAT) :=
 
 /-! ### The deterministic problem
 
-`DescriptiveComplexity.dtmAccept_mem_PTIME` – a deterministic run is a least fixed
-point – is stage 2b of the bridge, proved in
-`DescriptiveComplexity.Problems.Machine.Fixpoint`. Its hardness half (stage 4, the
-unit-propagation machine for `HORNSAT ≤ᶠᵒ[≤] DTMAccept`) is still open, so the
-PTIME-completeness theorem is not yet available; what already follows from
-membership alone is recorded here. -/
+The same bridge one level down, for `DescriptiveComplexity.DTMAccept`: membership –
+a deterministic run is a least fixed point, proved in
+`DescriptiveComplexity.Problems.Machine.Fixpoint` through the formalized FO(LFP) →
+SO-Horn translation – and hardness by the unit-propagation machine of
+`DescriptiveComplexity.Problems.Machine.HornHardness`, transcribed in
+`DescriptiveComplexity.Problems.Machine.HornInterp`. Together they make deterministic
+machine acceptance PTIME-complete, and the library's logically defined
+polynomial time the machine one. -/
 
 /-- Deterministic machine acceptance is in NP: `PTIME ⊆ NP`. -/
 theorem dtmAccept_mem_NP : DTMAccept ∈ NP :=
@@ -113,5 +116,32 @@ reduces to HORN-SAT, the P-level analogue of
 `DescriptiveComplexity.ntmAccept_reduces_to_sat`. -/
 theorem dtmAccept_reduces_to_hornSat : Nonempty (DTMAccept ≤ᶠᵒ[≤] HORNSAT) :=
   hornSat_hard_of_sigmaSOHornDefinable DTMAccept dtmAccept_mem_PTIME
+
+/-- Deterministic machine acceptance is PTIME-hard: HORN-SAT reduces to it by
+building the unit-propagation machine inside the instance. -/
+theorem dtmAccept_PTIME_hard : PTIME.Hard DTMAccept :=
+  PTIME.hard_of_orderedReduction HornTM.hornSat_ordered_fo_reduction_dtmAccept
+    hornSat_PTIME_hard
+
+/-- **Deterministic machine acceptance is PTIME-complete**: the analogue of
+`DescriptiveComplexity.ntmAccept_NP_complete` one level down. The library's
+polynomial time is defined by the Horn fragment; this theorem is the bridge
+saying it is the machine one. -/
+theorem dtmAccept_PTIME_complete : PTIME.Complete DTMAccept :=
+  ⟨dtmAccept_mem_PTIME, dtmAccept_PTIME_hard⟩
+
+/-- **The machine characterization of PTIME**: a problem is SO-Horn definable
+– equivalently, FO(LFP) definable – exactly when it ordered-FO-reduces to
+deterministic machine acceptance. Forward through HORN-SAT – the Horn
+discharge followed by the unit-propagation machine – and backward because
+membership travels along reductions. -/
+theorem mem_PTIME_iff_le_dtmAccept {L : Language.{0, 0}} (P : DecisionProblem L) :
+    P ∈ PTIME ↔ Nonempty (P ≤ᶠᵒ[≤] DTMAccept) := by
+  constructor
+  · intro hP
+    obtain ⟨g⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP
+    exact ⟨g.trans HornTM.hornSat_ordered_fo_reduction_dtmAccept⟩
+  · rintro ⟨f⟩
+    exact PTIME.mem_of_orderedReduction f dtmAccept_mem_PTIME
 
 end DescriptiveComplexity

@@ -47,10 +47,14 @@ The library is organized in three layers:
   tutorial-style worked examples. Highlights: a machine-free Cook–Levin theorem
   for SAT, **all of Karp's 21 problems**, PTIME-completeness of HORN-SAT by the
   analogous machine-free discharge one level down, and the *machine bridge* –
-  machine acceptance is NP-complete (`ntmAccept_NP_complete`), so a problem is
-  in the library's NP exactly when it ordered-FO-reduces to it
-  (`mem_NP_iff_le_ntmAccept`) and the logically defined class *is* the machine
-  one. The classes these problems populate, their logical characterizations,
+  acceptance by a nondeterministic polynomial-time Turing machine is
+  NP-complete (`ntmAccept_NP_complete`), acceptance by a deterministic one
+  PTIME-complete (`dtmAccept_PTIME_complete`), so a problem is in the
+  library's NP (resp. PTIME) exactly when it ordered-FO-reduces to Turing
+  machine acceptance (`mem_NP_iff_le_ntmAccept`,
+  `mem_PTIME_iff_le_dtmAccept`): both halves of Fagin's theorem and its
+  Grädel / Immerman–Vardi analogue, and the logically defined classes *are*
+  the machine ones. The classes these problems populate, their logical characterizations,
   and the problems proved complete for each are collected in the table below.
 
 ## Complexity classes and complete problems
@@ -61,7 +65,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi | HORN-SAT |
+| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi; equivalently acceptance by a deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine<br>**Queries:** Conjunctive Query Evaluation · CQ Containment |
 | **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT (and QBF∀ at one block) |
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order blocks, existential first (Stockmeyer) | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |

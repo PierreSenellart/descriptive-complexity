@@ -160,8 +160,8 @@ individual declarations are documented on their own pages.
   finite structures, for threshold and weight parameters of problems.
 * `DescriptiveComplexity.Machines` – Turing machines as relations on a
   universe, with no vocabulary: configurations, steps, and acceptance within a
-  budget counted in universe elements. The semantics the machine bridge of
-  `MACHINE.md` reads off an instance.
+  budget counted in universe elements. The semantics the machine bridge reads
+  off an instance.
 
 ## The problem catalog
 
@@ -187,7 +187,7 @@ Headline results and cross-references:
   [Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal]): SAT is
   NP-complete by a Tseitin discharge, no machine model. 3-colorability is
   FO-interreducible with SAT in both directions.
-* **The machine bridge** (`MACHINE.md`): machine acceptance
+* **The machine bridge**: machine acceptance
   (`DescriptiveComplexity.NTMAccept`) – does this nondeterministic Turing
   machine, carried as data by the instance, accept its input within a
   polynomial step budget (as many steps as there are tape positions)? – is
@@ -196,7 +196,16 @@ Headline results and cross-references:
   library's NP exactly when it ordered-FO-reduces to it
   (`DescriptiveComplexity.mem_NP_iff_le_ntmAccept`): the logically defined
   class *is* the machine one. The textbook Cook–Levin – machine acceptance
-  reduces to SAT – is `DescriptiveComplexity.ntmAccept_reduces_to_sat`.
+  reduces to SAT – is `DescriptiveComplexity.ntmAccept_reduces_to_sat`. One
+  level down, the *deterministic* restriction
+  (`DescriptiveComplexity.DTMAccept`, a functional transition table folded into
+  the yes-instances) is PTIME-complete
+  (`DescriptiveComplexity.dtmAccept_PTIME_complete`): membership because a
+  deterministic run is a least fixed point, read through the formalized
+  FO(LFP) → SO-Horn translation, and hardness by a unit-propagation machine
+  built inside the HORN-SAT instance – so PTIME, too, is the machine class
+  (`DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`), with the Grädel-side
+  textbook discharge `DescriptiveComplexity.dtmAccept_reduces_to_hornSat`.
 * **All of Karp's 21** ([Karp 1972][karp1972reducibility]): the SAT, clique,
   set, coloring, graph and number families above, closed by the two Hamilton
   circuit problems – a circuit read as a linear order of the universe, hard
