@@ -303,8 +303,9 @@ noncomputable def FOReduction.trans {P : DecisionProblem L₁} {Q : DecisionProb
   { Tag := f.Tag × (Fin f.dim → g.Tag)
     dim := f.dim * g.dim
     toInterpretation := f.toInterpretation.comp g.toInterpretation
-    correct := fun A _ _ =>
+    correct := fun A _ _ _ =>
       haveI := g.toInterpretation.map_nonempty (A := A)
+      haveI := g.toInterpretation.map_finite A
       ((g.correct A).trans (f.correct (g.toInterpretation.Map A))).trans
         (R.iso_invariant (f.toInterpretation.compLEquiv g.toInterpretation A)).symm }
 
@@ -349,7 +350,7 @@ def FOReduction.refl (P : DecisionProblem L) : P ≤ᶠᵒ P where
   Tag := Unit
   dim := 1
   toInterpretation := FOInterpretation.refl L
-  correct A _ _ := (P.iso_invariant (FOInterpretation.reflLEquiv L A)).symm
+  correct A _ _ _ := (P.iso_invariant (FOInterpretation.reflLEquiv L A)).symm
 
 /-- **FO reducibility is a preorder** on the decision problems over a fixed
 relational language, with `P ≤ Q` the propositional truncation of `P ≤ᶠᵒ Q`.

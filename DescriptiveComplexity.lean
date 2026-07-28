@@ -103,9 +103,10 @@ individual declarations are documented on their own pages.
   complexity). A `DescriptiveComplexity.FOInterpretation` is a tagged,
   `dim`-dimensional first-order interpretation of one language in another,
   and a `DescriptiveComplexity.FOReduction` (notation `P ≤ᶠᵒ Q`) is one that
-  maps yes-instances exactly to yes-instances. Tags replace the linear order
-  that textbook FO reductions use to encode constantly-many sorts of
-  elements.
+  maps yes-instances exactly to yes-instances, on the *finite* nonempty
+  structures – the only ones membership and hardness ever read. Tags replace
+  the linear order that textbook FO reductions use to encode constantly-many
+  sorts of elements.
 * `DescriptiveComplexity.Composition` – the pullback of a formula through an
   interpretation and the composition of interpretations, giving reflexivity
   and transitivity of `≤ᶠᵒ` (a `Preorder` on problems, usable in `calc`).

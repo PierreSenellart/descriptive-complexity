@@ -132,7 +132,7 @@ def setCover_fo_reduction_hittingSet : SetCover ≤ᶠᵒ HittingSet where
   Tag := Unit
   dim := 1
   toInterpretation := transposeInterp
-  correct A _ _ := hasSmallSetCover_iff_map A
+  correct A _ _ _ := hasSmallSetCover_iff_map A
 
 /-- **Hitting Set FO-reduces to Set Cover**, by transposing the incidence
 relation. -/
@@ -140,5 +140,5 @@ def hittingSet_fo_reduction_setCover : HittingSet ≤ᶠᵒ SetCover where
   Tag := Unit
   dim := 1
   toInterpretation := transposeInterp
-  correct A _ _ := hasSmallHittingSet_iff_map A
+  correct A _ _ _ := hasSmallHittingSet_iff_map A
 end DescriptiveComplexity

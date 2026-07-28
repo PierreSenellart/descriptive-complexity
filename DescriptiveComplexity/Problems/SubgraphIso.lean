@@ -369,7 +369,7 @@ def clique_fo_reduction_subgraphIso : Clique ≤ᶠᵒ SubgraphIso where
   Tag := Bool
   dim := 1
   toInterpretation := cliquePatternInterp
-  correct A _ _ := hasLargeClique_iff_subgraphIso_map A
+  correct A _ _ _ := hasLargeClique_iff_subgraphIso_map A
 
 /-! ### Membership -/
 

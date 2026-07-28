@@ -301,14 +301,14 @@ def satFirst_le_sat : SatFirst ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := sideInterp spIsCl₁ spPos₁ spNeg₁
-  correct _ _ _ := (satisfiable_sideInterp spIsCl₁ spPos₁ spNeg₁).symm
+  correct _ _ _ _ := (satisfiable_sideInterp spIsCl₁ spPos₁ spNeg₁).symm
 
 /-- Projecting the second side is a reduction of `SatSecond` to SAT. -/
 def satSecond_le_sat : SatSecond ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := sideInterp spIsCl₂ spPos₂ spNeg₂
-  correct _ _ _ := (satisfiable_sideInterp spIsCl₂ spPos₂ spNeg₂).symm
+  correct _ _ _ _ := (satisfiable_sideInterp spIsCl₂ spPos₂ spNeg₂).symm
 
 /-- **The first side's satisfiability is `Σ₁`-definable**, inherited from SAT
 along the projection. -/

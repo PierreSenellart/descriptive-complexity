@@ -156,7 +156,7 @@ def FOReduction.compl {L L' : Language.{0, 0}} [L'.IsRelational]
   { Tag := f.Tag
     dim := f.dim
     toInterpretation := f.toInterpretation
-    correct := fun A _ _ => not_congr (f.correct A) }
+    correct := fun A _ _ _ => not_congr (f.correct A) }
 
 @[inherit_doc FOReduction.compl]
 def OrderedFOReduction.compl {L L' : Language.{0, 0}} [L'.IsRelational]

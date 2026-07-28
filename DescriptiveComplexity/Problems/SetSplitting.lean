@@ -262,7 +262,7 @@ noncomputable def naeSat_fo_reduction_setSplitting : NAESAT ≤ᶠᵒ SetSplitti
   Tag := SplTag
   dim := 1
   toInterpretation := splInterp
-  correct A _ _ := naeSatisfiable_iff_hasSetSplitting A
+  correct A _ _ _ := naeSatisfiable_iff_hasSetSplitting A
 
 /-! ### NP-completeness -/
 

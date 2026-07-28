@@ -151,7 +151,7 @@ def FOReduction.withInvariant {P : DecisionProblem L} {Q : DecisionProblem L'}
   { Tag := f.Tag
     dim := f.dim
     toInterpretation := f.toInterpretation
-    correct := fun A _ _ => (f.correct A).trans ⟨fun hq => ⟨h A, hq⟩, And.right⟩ }
+    correct := fun A _ _ _ => (f.correct A).trans ⟨fun hq => ⟨h A, hq⟩, And.right⟩ }
 
 /-- Strengthen the target of an ordered reduction by an invariant its images
 satisfy. -/

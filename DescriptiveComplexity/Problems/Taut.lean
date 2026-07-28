@@ -225,14 +225,14 @@ def taut_fo_reduction_sat_compl : TAUT ≤ᶠᵒ SATᶜ where
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp
-  correct A _ _ := tautology_iff_not_satisfiable_map A
+  correct A _ _ _ := tautology_iff_not_satisfiable_map A
 
 /-- **The complement of SAT FO-reduces to TAUT**, by the same swap. -/
 def sat_compl_fo_reduction_taut : SATᶜ ≤ᶠᵒ TAUT where
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp
-  correct A _ _ := (tautology_map_iff_not_satisfiable A).symm
+  correct A _ _ _ := (tautology_map_iff_not_satisfiable A).symm
 
 /-- **The complement of TAUT FO-reduces to SAT**: a DNF formula fails to be a
 tautology exactly when its sign swap is satisfiable. -/
@@ -240,7 +240,7 @@ def taut_compl_fo_reduction_sat : TAUTᶜ ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp
-  correct A _ _ := (not_congr (tautology_iff_not_satisfiable_map A)).trans not_not
+  correct A _ _ _ := (not_congr (tautology_iff_not_satisfiable_map A)).trans not_not
 
 /-! ### coNP-completeness -/
 

@@ -235,7 +235,7 @@ def threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT where
   Tag := ColTag
   dim := 2
   toInterpretation := threeColToSat
-  correct A _ _ := threeColorable_iff_satisfiable A
+  correct A _ _ _ := threeColorable_iff_satisfiable A
 
 /-- The reduction is even quantifier-free. -/
 theorem threeColToSat_isQuantifierFree : threeColToSat.IsQuantifierFree := by

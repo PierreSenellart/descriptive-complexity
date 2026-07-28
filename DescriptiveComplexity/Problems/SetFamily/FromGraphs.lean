@@ -243,7 +243,7 @@ def vertexCover_fo_reduction_setCover : VertexCover ≤ᶠᵒ SetCover where
   Tag := Unit
   dim := 2
   toInterpretation := edgeIncidenceInterp
-  correct A _ _ := hasSmallVertexCover_iff_setCover_map A
+  correct A _ _ _ := hasSmallVertexCover_iff_setCover_map A
 
 /-! ### Independent Set reduces to Set Packing
 
@@ -322,5 +322,5 @@ def indSet_fo_reduction_setPacking : IndependentSet ≤ᶠᵒ SetPacking where
   Tag := Unit
   dim := 2
   toInterpretation := edgeIncidenceInterp
-  correct A _ _ := hasLargeIndependentSet_iff_setPacking_map A
+  correct A _ _ _ := hasLargeIndependentSet_iff_setPacking_map A
 end DescriptiveComplexity

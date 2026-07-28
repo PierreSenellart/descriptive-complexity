@@ -1178,7 +1178,7 @@ def threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval where
   Tag := ColEvalTag
   dim := 1
   toInterpretation := threeColToCQEval
-  correct A _ _ := threeColorable_iff_map_queryHolds A
+  correct A _ _ _ := threeColorable_iff_map_queryHolds A
 
 /-- The reduction is even quantifier-free. -/
 theorem threeColToCQEval_isQuantifierFree : threeColToCQEval.IsQuantifierFree := by
@@ -1605,7 +1605,7 @@ def cqContainment_fo_reduction_cqEval : CQContainment ≤ᶠᵒ CQEval where
   Tag := PairTag
   dim := 1
   toInterpretation := containmentToEval
-  correct A _ _ := queryContained_iff_map_queryHolds A
+  correct A _ _ _ := queryContained_iff_map_queryHolds A
 
 /-- BCQ containment is in NP: it FO-reduces to BCQ evaluation, which is in
 NP. -/
@@ -1714,7 +1714,7 @@ def cqEval_fo_reduction_cqContainment : CQEval ≤ᶠᵒ CQContainment where
   Tag := Unit
   dim := 1
   toInterpretation := evalToContainment
-  correct A _ _ := queryHolds_iff_map_queryContained A
+  correct A _ _ _ := queryHolds_iff_map_queryContained A
 
 /-- BCQ containment is NP-hard: BCQ evaluation, which is NP-hard, FO-reduces
 to it. -/

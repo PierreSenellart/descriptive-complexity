@@ -267,7 +267,7 @@ noncomputable def oneInSat_fo_reduction_exactCover : OneInSAT ≤ᶠᵒ ExactCov
   Tag := ECTag
   dim := 1
   toInterpretation := ecInterp
-  correct A _ _ := oneInSatisfiable_iff_hasExactCover A
+  correct A _ _ _ := oneInSatisfiable_iff_hasExactCover A
 
 /-! ### NP-completeness -/
 

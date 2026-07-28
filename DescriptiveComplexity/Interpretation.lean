@@ -244,8 +244,13 @@ structure FOReduction [L'.IsRelational] (P : DecisionProblem L) (Q : DecisionPro
   dim : ℕ
   /-- The underlying first-order interpretation. -/
   toInterpretation : FOInterpretation L L' Tag dim
-  /-- Yes-instances map exactly to yes-instances (on nonempty structures). -/
-  correct : ∀ (A : Type) [L.Structure A] [Nonempty A], P A ↔ Q (toInterpretation.Map A)
+  /-- Yes-instances map exactly to yes-instances, on the *finite* nonempty
+  structures: membership and hardness read a problem only there
+  (`DescriptiveComplexity.ComplexityClass`), so asking anything of the infinite
+  ones would be an obligation nothing consumes. The ordered and relativized
+  notions restrict the same way. -/
+  correct : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
+    P A ↔ Q (toInterpretation.Map A)
 
 @[inherit_doc]
 scoped notation:50 P:51 " ≤ᶠᵒ " Q:51 => FOReduction P Q

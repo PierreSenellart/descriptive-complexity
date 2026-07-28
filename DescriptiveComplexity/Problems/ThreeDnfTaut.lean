@@ -195,7 +195,7 @@ def threeUnsat_fo_reduction_threeDnfTaut : ThreeUNSAT ≤ᶠᵒ ThreeDnfTAUT whe
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp
-  correct A _ _ := threeUnsatisfiable_iff_threeDnfTautology_map A
+  correct A _ _ _ := threeUnsatisfiable_iff_threeDnfTautology_map A
 
 end Reductions
 
@@ -277,7 +277,7 @@ noncomputable def threeDnfTaut_compl_fo_reduction_sat : ThreeDnfTAUTᶜ ≤ᶠ�
   Tag := Unit
   dim := 1
   toInterpretation := gatedSwap
-  correct A _ _ := not_threeDnfTautology_iff_satisfiable A
+  correct A _ _ _ := not_threeDnfTautology_iff_satisfiable A
 
 /-! ### coNP-completeness -/
 

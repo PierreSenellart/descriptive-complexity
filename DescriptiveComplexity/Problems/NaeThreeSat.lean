@@ -159,7 +159,7 @@ noncomputable def nae3Sat_fo_reduction_naeSat : NAE3SAT ≤ᶠᵒ NAESAT where
   Tag := Unit
   dim := 1
   toInterpretation := threeSatToSat
-  correct A _ _ := naeThreeSatisfiable_iff_naeSatisfiable A
+  correct A _ _ _ := naeThreeSatisfiable_iff_naeSatisfiable A
 
 /-! ### NAE-SAT reduces to NAE-3SAT -/
 

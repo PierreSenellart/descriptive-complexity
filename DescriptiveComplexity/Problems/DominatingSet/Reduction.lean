@@ -394,7 +394,7 @@ noncomputable def setCover_fo_reduction_dominatingSet : SetCover ≤ᶠᵒ Domin
   Tag := DSTag
   dim := 1
   toInterpretation := dsInterp
-  correct A _ _ := hasSmallSetCover_iff_hasSmallDominatingSet A
+  correct A _ _ _ := hasSmallSetCover_iff_hasSmallDominatingSet A
 
 end DomRed
 

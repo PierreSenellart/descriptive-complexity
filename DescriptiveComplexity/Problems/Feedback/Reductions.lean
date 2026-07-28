@@ -133,7 +133,7 @@ def vertexCover_fo_reduction_feedbackVertexSet : VertexCover ≤ᶠᵒ FeedbackV
   Tag := Unit
   dim := 1
   toInterpretation := symmetrizeInterp
-  correct A _ _ := hasSmallVertexCover_iff_feedback_map A
+  correct A _ _ _ := hasSmallVertexCover_iff_feedback_map A
 
 /-! ### Feedback Vertex Set reduces to Feedback Arc Set
 
@@ -486,6 +486,6 @@ def feedbackVertexSet_fo_reduction_feedbackArcSet :
   Tag := Bool
   dim := 1
   toInterpretation := splitInterp
-  correct A _ _ := hasSmallFeedbackSet_iff_feedbackArc_map A
+  correct A _ _ _ := hasSmallFeedbackSet_iff_feedbackArc_map A
 
 end DescriptiveComplexity

@@ -85,6 +85,6 @@ def hamCircuit_fo_reduction_dirHamCircuit : HamCircuit ≤ᶠᵒ DirHamCircuit w
   Tag := Unit
   dim := 1
   toInterpretation := symInterp
-  correct A _ _ := hasHamCircuit_iff A
+  correct A _ _ _ := hasHamCircuit_iff A
 
 end DescriptiveComplexity

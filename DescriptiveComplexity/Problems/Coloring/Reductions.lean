@@ -222,7 +222,7 @@ def threeCol_fo_reduction_kCol (m : ℕ) : ThreeCol ≤ᶠᵒ KCol (3 + m) where
   Tag := Option (Fin m)
   dim := 1
   toInterpretation := padColorInterp m
-  correct _ _ _ := threeColorable_iff_kColorable_map
+  correct _ _ _ _ := threeColorable_iff_kColorable_map
 
 
 /-! ### Chromatic Number and Clique Cover are complements of each other -/
@@ -299,7 +299,7 @@ def chromaticNumber_fo_reduction_cliqueCover : ChromaticNumber ≤ᶠᵒ CliqueC
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
-  correct A _ _ := hasSmallChromaticNumber_iff_cliqueCover_map A
+  correct A _ _ _ := hasSmallChromaticNumber_iff_cliqueCover_map A
 
 /-- **Clique Cover FO-reduces to Chromatic Number**, by the same
 complementation. -/
@@ -307,7 +307,7 @@ def cliqueCover_fo_reduction_chromaticNumber : CliqueCover ≤ᶠᵒ ChromaticNu
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
-  correct A _ _ := hasSmallCliqueCover_iff_chromaticNumber_map A
+  correct A _ _ _ := hasSmallCliqueCover_iff_chromaticNumber_map A
 
 /-! ### 3-colorability reduces to Chromatic Number
 
