@@ -1,18 +1,15 @@
 # DescriptiveComplexity
 
 A Lean 4 library for descriptive complexity on top of Mathlib's
-`ModelTheory` library, in the style of Immerman (*Descriptive Complexity*,
-ch. 3). Its main goal is to let users **formalize membership, hardness, and
-completeness proofs for common complexity classes** — NP and coNP, PTIME,
-PSPACE, and the levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy — with no machine
-model required:
-each class is *defined* logically, so a completeness proof is a definability
-witness for membership together with a first-order reduction for hardness,
-which the framework closes into a `Complete` theorem. Along the way the library
-also **proves a number of results of complexity and descriptive complexity
-themselves** — a machine-free Cook–Levin theorem, Fagin's theorem, the Grädel /
-Immerman–Vardi capture of PTIME, and the machine bridges that identify these
-logically defined classes with the machine ones. All declarations live in the
+`ModelTheory` library, based on first-order reductions, in the style of
+Immerman (*Descriptive Complexity*, ch. 3). Its main goal is to let users
+**formalize membership, hardness, and completeness proofs for common
+complexity classes** (NP, PTIME, PSPACE, etc.) with no machine model
+required: each class is *defined* logically, so a completeness proof is a
+definability witness for membership together with a first-order reduction
+for hardness, which the framework closes into a `Complete` theorem.
+Along the way the library also **proves a number of results of complexity
+and descriptive complexity themselves. All declarations live in the
 `DescriptiveComplexity` namespace; the top-level module is
 `DescriptiveComplexity`.
 
@@ -24,55 +21,36 @@ PTIME, so exhibiting one is strictly stronger than exhibiting a Karp
 reduction, while requiring no machine model at all: only first-order logic,
 which Mathlib already has.
 
-As far as we know this is the first use of FO-expressible reductions in a
-proof assistant (the closest prior work is the “cookbook reductions” of
-Grange, Vehlken, Vortmeier and Zeume, MFCS 2024, which uses FO-definable
-reductions in an automated-verification/teaching setting, not an ITP).
-
-Both directions between SAT and 3-colorability are formalized: an order-free,
-quantifier-free reduction 3COL → SAT, and an ordered FO reduction SAT → 3COL
-(the classical gadget construction, which genuinely needs a linear order on
-the input structure to thread each clause's OR-gadget chain). SAT and
-3-colorability are thus FO-interreducible.
-
 ## Overview
 
 The library is organized in three layers:
 
-* **A reduction framework** over `ModelTheory`: decision problems as
-  isomorphism-invariant properties of finite structures, tagged first-order
-  interpretations between languages, and FO reductions `≤ᶠᵒ` – with their
-  order-invariant variant `≤ᶠᵒ[≤]` for gadgets that genuinely need a linear
-  order – closed under composition. You can also bring your own concrete
-  instance types: a bundled `Encoding` cannot be constructed without proving
-  polynomial size bounds in both directions (no padding, no compression), so
-  an encoding cannot silently cheat on instance size – and a theorem shows the
-  bounds have teeth (no unary encoding of subset-sum passes them). The
-  converse direction is covered too: computable `Decoding`s read well-formed
-  structures back into concrete instances, and completeness theorems restrict
-  to the well-formed (non-junk) instances with one-line upgrades.
+* **A reduction framework** over `ModelTheory`: decision problems
+  as isomorphism-invariant properties of finite structures, tagged
+  first-order interpretations between languages, and FO reductions
+  `≤ᶠᵒ` – with their order-invariant variant `≤ᶠᵒ[≤]` for gadgets
+  that genuinely need a linear order – closed under composition. You can
+  also bring your own concrete instance types: a bundled `Encoding`
+  cannot be constructed without proving polynomial size bounds in both
+  directions (no padding, no compression), so an encoding cannot silently
+  cheat on instance size. The converse direction is covered too:
+  computable `Decoding`s read well-formed structures back into concrete
+  instances, and completeness theorems restrict to the well-formed
+  (non-junk) instances with one-line upgrades.
 * **An abstract complexity layer**: complexity classes closed under FO
-  reductions, and the polynomial hierarchy *defined* logically – `NP = Σ₁ᵖ` by
-  second-order quantifier alternation, with the level inclusions and the
-  duality `Πₖᵖ = co-Σₖᵖ` as theorems, and level 0, `PTIME`, by the Horn
-  fragment SO-Horn of existential second-order logic – equivalent to the logic
-  FO(LFP) by a formalized Grädel translation, so that PTIME is closed under
-  complement (`Π₀ᵖ = Σ₀ᵖ`) as a theorem. Everything is a definition or a
-  theorem: the library declares no axioms.
+  reductions, and the polynomial hierarchy and beyond *defined*
+  logically.
 * **A problem catalog and worked examples**: one decision problem per file,
   each with its vocabulary, FO reductions and a completeness theorem, plus
   tutorial-style worked examples. Highlights: a machine-free Cook–Levin theorem
-  for SAT, **all of Karp's 21 problems**, PTIME-completeness of HORN-SAT by the
-  analogous machine-free discharge one level down, and the *machine bridge* –
+  for SAT, **all of Karp's 21 problems**, PTIME-completeness of HORN-SAT,
+  and the *machine bridge* –
   acceptance by a nondeterministic polynomial-time Turing machine is
   NP-complete (`ntmAccept_NP_complete`), acceptance by a deterministic one
   PTIME-complete (`dtmAccept_PTIME_complete`), so a problem is in the
   library's NP (resp. PTIME) exactly when it ordered-FO-reduces to Turing
   machine acceptance (`mem_NP_iff_le_ntmAccept`,
-  `mem_PTIME_iff_le_dtmAccept`): both halves of Fagin's theorem and its
-  Grädel / Immerman–Vardi analogue, and the logically defined classes *are*
-  the machine ones. The classes these problems populate, their logical characterizations,
-  and the problems proved complete for each are collected in the table below.
+  `mem_PTIME_iff_le_dtmAccept`).
 
 ## Complexity classes and complete problems
 
@@ -83,33 +61,27 @@ for its class: both a member and hard for it under FO reductions. Karp's
 
 | Complexity class | Logical characterization | Machine model | Problems proved complete |
 | --- | --- | --- | --- |
-| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | deterministic two-way `k`-head automaton | REACHd · UNREACHd |
-| **NL** | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | two-way `k`-head automaton | REACH · UNREACH · 2SAT |
-| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
-| **NP** = Σ₁ᵖ | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| **coNP** = Π₁ᵖ | ∀SO: universal second-order logic | — | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
+| **L** = LOGSPACE | FO(DTC) | deterministic two-way `k`-head automaton | REACHd · UNREACHd |
+| **NL** | SO-Krom; equivalently FO(TC) | two-way `k`-head automaton | REACH · UNREACH · 2SAT |
+| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn; equivalently FO(LFP) | deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
+| **NP** = Σ₁ᵖ | ∃SO | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
+| **coNP** = Π₁ᵖ | ∀SO | — | TAUT · 3-DNF-TAUT · 3-UNSAT |
 | **DP** | a Σ₁ and a Π₁ sentence conjoined | — | SAT-UNSAT |
-| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
-| **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
-| **PH** | full second-order logic | — | — |
-| **PSPACE** | SO(TC): second-order logic with a transitive closure taken over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not ‡ | SUCCINCT-REACH (reachability in a transition system given by three CNF formulas over marked state variables) · QSAT (quantified Boolean formulas, the prefix carried by the instance) |
-| **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | FINSAT (finite satisfiability of a first-order sentence: Trakhtenbrot's theorem) |
+| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` (quantified Boolean formulas, `k` blocks)|
+| **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) |
+| **PH** | SO | — | — |
+| **PSPACE** | SO(TC) | polynomial-space Turing machine, deterministic or not ‡ | SUCCINCT-REACH · QSAT |
+| **RE** | ∃SO[new] (∃SO with value invention) | — | FINSAT (Trakhtenbrot's theorem) |
 
-‡ Only the membership half is formalized: acceptance by a space-bounded Turing
-machine, deterministic (`dtmAcceptSpace_mem_PSPACE`) or not
-(`ntmAcceptSpace_mem_PSPACE`), is in PSPACE, since a configuration is an
-assignment of a block of relation variables and a run is a transitive closure
-over them. Hardness for those problems – the capture, which would also give
-`PSPACE = NPSPACE` – is not proved yet, so they are not listed as complete.
+‡ Only the membership half is formalized
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above).
 
 ## Scope and limitations
 
-These are *intrinsic* to the descriptive, machine-free approach — the price of
-needing no model of computation. They are the nature of the framework, not a
-backlog; for capabilities that are simply not built yet, see *On the roadmap*
+These are *intrinsic* to the descriptive, machine-free approach – the price of
+needing no model of computation. For capabilities that are simply not built yet, see *On the roadmap*
 below.
 
 * **Complexity of problems, not of algorithms.** Complexity is attributed to a
@@ -119,18 +91,17 @@ below.
   `O(n)` from `O(n²)`, track polynomial degrees, or reason about a particular
   algorithm's resource use. What you prove is membership, hardness and
   completeness for the coarse classes above.
-* **Instances are finite relational structures, not strings.** Every problem is
-  modeled by choosing a vocabulary and encoding its inputs as finite structures
-  (numbers via the integer representations of `ROADMAP.md §0`, size honesty of
-  user-supplied encodings via the bundled `Encoding` bounds), and yes-instance
-  sets must be isomorphism-invariant. Reasoning is about **finite** structures
-  only; nothing is claimed about infinite ones. The identification with the
-  textbook *string*-based classes rests on the machine-bridge theorems plus the
-  fact that FO reductions are AC⁰-computable.
+* **Instances are finite relational structures, not strings.** Every
+  problem is modeled by choosing a vocabulary and encoding its inputs as
+  finite structures and yes-instance sets must be isomorphism-invariant.
+  Reasoning is about **finite** structures only; nothing is claimed about
+  infinite ones. The identification with the textbook *string*-based
+  classes rests on the machine-bridge theorems plus the fact that FO
+  reductions are AC⁰-computable.
 * **Hardness is an FO reduction; membership is a logical definition.** You show
   hardness by exhibiting a first-order (or order-invariant FO) reduction, and
   membership by a definability witness (∃SO for NP, SO-Horn / FO(LFP) for
-  PTIME, …) — not by describing a polynomial-time algorithm. This is *stronger*
+  PTIME, …) – not by describing a polynomial-time algorithm. This is *stronger*
   than a Karp reduction, but the reduction must be expressible in logic: a
   poly-time reduction that is not FO-expressible cannot be used, gadget
   constructions must be encoded (often needing a linear order, tags, or extra
@@ -139,8 +110,7 @@ below.
 * **Completeness and structure, not separations.** The library proves
   completeness, inclusions and logical characterizations. Whether the classes
   are *distinct* (P vs NP, and the like) is open mathematics the framework does
-  not decide. Unconditional *inexpressibility* results — a genuine strength of
-  the descriptive approach — are a planned direction, not yet present (below).
+  not decide.
 
 ## On the roadmap
 
@@ -148,43 +118,24 @@ The following are *feasible* within this framework and planned, but **not yet
 implemented**. `ROADMAP.md` is the detailed version; the highlights a typical
 user is most likely to want:
 
-* **More complete problems for PSPACE.** The class exists, defined by SO(TC)
-  like the others and closed under FO reductions like the others, with
-  `NP ⊆ PSPACE`, two complete problems (SUCCINCT-REACH and QSAT), `PSPACE =
-  coPSPACE` and `PH ⊆ PSPACE`. The machine bridge is half-built: the
-  space-bounded machine problems are known to be *in* PSPACE, and their
-  hardness – which would also give `PSPACE = NPSPACE` – is what is planned
-  next, plus the game problems (Generalized Geography…).
-* **Complexity classes beyond PSPACE**, up toward EXPTIME/EXPSPACE, via the
-  fixpoint logics that capture them (FO(PFP)/SO(LFP)) and their complete
-  problems, each with a machine bridge as for NP and PTIME – the
-  logarithmic-space classes already have theirs, in both directions. Below NP
-  this also brings the P-complete problems (Circuit Value, alternating
-  reachability).
-* **Undecidability, by reduction.** The class RE is defined logically like the
-  others as `∃SO[new]` (table above), closed under FO reductions like the
-  others, and has its first complete problem: finite satisfiability of a
-  first-order sentence, i.e. Trakhtenbrot's theorem. What is planned is further
-  complete problems, such as Post's correspondence problem, together with the
-  bridge to Mathlib's computability layer that would let RE-hardness be read as
-  undecidability.
+* **Complexity classes beyond PSPACE**, up toward EXPTIME/EXPSPACE.
 * **Counting and optimization problems.** Only decision problems are modeled
   today. Planned: #P via counting second-order assignments (#SAT, #3COL, the
-  permanent) and MaxSNP-style optimization classes — i.e. function and search
+  permanent) and MaxSNP-style optimization classes – i.e. function and search
   problems, not just yes/no ones.
 * **Unconditional lower bounds (inexpressibility).** The payoff unique to the
   descriptive approach, impossible in the machine world: Ehrenfeucht–Fraïssé
   games, EVEN and reachability not being FO-definable, `FO ⊊ FO(TC)` as a strict
   inclusion, locality, 0-1 laws, and eventually PARITY ∉ AC⁰.
-* **Structural / capture theorems.** Immerman–Vardi (P = order-invariant
-  FO(LFP)), Grädel's capture theorems, and Fagin's spectra connection.
+* **Structural / capture theorems.**
+  Grädel's capture theorems, Fagin's spectra connection, Abiteboul--Vianu.
 * **A broader catalog and finer reductions.** More complete problems, and the
   finer reduction notions descriptive complexity uses (quantifier-free
   projections; FO(≤, BIT) = uniform AC⁰ as the bottom of the ordered world).
 
 One caveat within this list: the `Δₖᵖ` levels of the polynomial hierarchy
-(`Δₖᵖ = P^{Σₖ₋₁ᵖ}`, e.g. `Δ₂ᵖ = P^NP`). The `Σₖᵖ`/`Πₖᵖ` levels are in scope —
-they are *defined* here by second-order quantifier alternation — but `Δₖᵖ` has
+(`Δₖᵖ = P^{Σₖ₋₁ᵖ}`, e.g. `Δ₂ᵖ = P^NP`). The `Σₖᵖ`/`Πₖᵖ` levels are in scope –
+they are *defined* here by second-order quantifier alternation – but `Δₖᵖ` has
 no such logical characterization: it is a deterministic class defined by bounded
 oracle access, so capturing it faithfully would need the oracle-machine model
 the framework deliberately avoids, and it may stay out of reach.
