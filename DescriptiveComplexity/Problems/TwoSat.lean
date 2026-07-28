@@ -8,6 +8,7 @@ import DescriptiveComplexity.Problems.TwoSat.Membership
 import DescriptiveComplexity.Problems.TwoSat.Hardness
 import DescriptiveComplexity.Problems.TwoSat.Ptime
 import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.DetLogSpace
 
 /-!
 # 2SAT is NL-complete
@@ -46,7 +47,10 @@ inclusion is syntactic – a Krom kernel is not a Horn kernel – so both go thr
 this problem: 2SAT is in PTIME by the Horn program of
 `DescriptiveComplexity.Problems.TwoSat.Ptime`, which guesses reachability in the
 implication graph, whence `DescriptiveComplexity.NL_subset_PTIME` and, composing with
-`DescriptiveComplexity.PTIME_subset_NP`, `DescriptiveComplexity.NL_subset_NP`.
+`DescriptiveComplexity.PTIME_subset_NP`, `DescriptiveComplexity.NL_subset_NP`. The
+logarithmic-space class below inherits both
+(`DescriptiveComplexity.LOGSPACE_subset_PTIME`, `DescriptiveComplexity.LOGSPACE_subset_NP`),
+its own inclusion in NL being immediate.
 -/
 
 namespace DescriptiveComplexity
@@ -79,5 +83,17 @@ theorem NL_subset_PTIME : NL ⊆ PTIME := by
 theorem NL_subset_NP : NL ⊆ NP := by
   intro L P hP
   exact PTIME_subset_NP (NL_subset_PTIME hP)
+
+/-- **L ⊆ PTIME**, by composing `DescriptiveComplexity.LOGSPACE_subset_NL` with
+`DescriptiveComplexity.NL_subset_PTIME`: a deterministic walk is a walk, and NL is
+inside polynomial time through 2SAT. -/
+theorem LOGSPACE_subset_PTIME : LOGSPACE ⊆ PTIME := by
+  intro L P hP
+  exact NL_subset_PTIME (LOGSPACE_subset_NL hP)
+
+/-- **L ⊆ NP**, in the same way. -/
+theorem LOGSPACE_subset_NP : LOGSPACE ⊆ NP := by
+  intro L P hP
+  exact PTIME_subset_NP (LOGSPACE_subset_PTIME hP)
 
 end DescriptiveComplexity

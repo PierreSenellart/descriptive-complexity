@@ -38,8 +38,9 @@ walk on the base structure with the tags carried in the mode.
 `L ⊆ NL` (`DescriptiveComplexity.LOGSPACE_subset_NL`) is immediate at the level of
 definability – a determinized specification is a specification – followed by
 the FO(TC)/SO-Krom translation of `DescriptiveComplexity.ImmermanSzelepcsenyi`.
-Composing with `DescriptiveComplexity.NL_subset_PTIME` (proved downstream, with
-2SAT) places it inside polynomial time as well.
+`DescriptiveComplexity.LOGSPACE_subset_PTIME` and
+`DescriptiveComplexity.LOGSPACE_subset_NP` compose that with the inclusions of NL
+(proved downstream, with 2SAT).
 
 The canonical complete problem is REACHd, deterministic reachability, in
 `DescriptiveComplexity.Problems.ReachabilityDet`; its complement UNREACHd is complete
