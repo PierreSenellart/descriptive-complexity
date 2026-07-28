@@ -81,7 +81,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | REACHd |
+| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | REACHd · UNREACHd |
 | **NL** | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | REACH · UNREACH · 2SAT |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO: existential second-order logic | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |

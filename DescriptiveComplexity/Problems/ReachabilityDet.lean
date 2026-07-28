@@ -42,6 +42,10 @@ being functional by construction.
   very specification `DescriptiveComplexity.reachSpec` that witnesses
   `DescriptiveComplexity.reach_tcDefinable`, read through its determinization. The
   determinized step relation *is* `DescriptiveComplexity.DetEdge`.
+* **The complement**, UNREACHd, is complete as well
+  (`DescriptiveComplexity.UNREACHd_LOGSPACE_complete`, in
+  `DescriptiveComplexity.Problems.ReachabilityDet.Complement`), which is how
+  `L = coL` is obtained.
 * **Hardness** (`DescriptiveComplexity.reachd_hard_of_dtcDefinable`): the interpretation
   is the graph of the walk itself (`DescriptiveComplexity.TCDischarge.tcInterp`), reused
   verbatim from the FO(TC) discharge; all that is new is that the walk of a

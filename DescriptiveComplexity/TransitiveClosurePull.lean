@@ -147,6 +147,13 @@ theorem det_step_congr (e : spec₁.Node A ≃ spec₂.Node B)
     rw [← h (e.symm c) hc', e.apply_symm_apply]
   · exact e.injective (h (e c) ((hstep a c).mp hc))
 
+/-- On a functional specification the deterministic reading changes nothing,
+acceptance included. -/
+theorem det_accepts_iff (spec : TCSpec L) {A : Type} [L.Structure A] [LinearOrder A]
+    (h : spec.Functional A) : spec.det.Accepts A ↔ spec.Accepts A :=
+  accepts_congr (Equiv.refl (spec.Node A)) (fun a b => det_step_of_functional h a b)
+    (fun _ => Iff.rfl) fun _ => Iff.rfl
+
 end TCSpec
 
 end Transfer

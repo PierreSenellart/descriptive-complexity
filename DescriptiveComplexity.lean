@@ -338,6 +338,21 @@ individual declarations are documented on their own pages.
   its arcs. Both halves are cheaper than REACH's, whose membership needs
   Immerman–Szelepcsényi – the fragment asymmetry that forces it does not arise
   for an operator-based logic.
+* `DescriptiveComplexity.Problems.ReachabilityDet.Complement` – **`L = coL`**
+  (`DescriptiveComplexity.LOGSPACE_eq_coLOGSPACE`) and **UNREACHd is
+  LOGSPACE-complete** (`DescriptiveComplexity.UNREACHd_LOGSPACE_complete`). Everything
+  rests on one membership statement: the complement of REACHd is itself a
+  deterministic walk, which *scans* – it tries each vertex as a source in the
+  order of the structure, following forced arcs from it with a budget, and
+  accepts once the candidates are exhausted. The budget is a third coordinate
+  holding a vertex, read through `DescriptiveComplexity.orank`, and it replaces cycle
+  detection: a walk that has not arrived after `|A| - 1` steps never will, since
+  a minimal number of steps visits distinct vertices
+  (`DescriptiveComplexity.exists_iterate_lt_card`). The scan quantifies the sources
+  itself because acceptance quantifies the *start* node existentially while a
+  complement needs them universally. Given that one problem, closure of the
+  class under complement is free: a reduction complements along with its two
+  problems, and REACHd is hard.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads
@@ -413,7 +428,7 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| `LOGSPACE` (`L`) | FO(DTC): first-order logic with a deterministic transitive closure | REACHd |
+| `LOGSPACE` (`L`) | FO(DTC): first-order logic with a deterministic transitive closure | REACHd · UNREACHd |
 | `NL` | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | REACH · UNREACH · 2SAT |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
@@ -471,6 +486,12 @@ Headline results and cross-references:
   the completeness proof are the same observation read in opposite directions,
   the graph of a deterministic walk being a deterministic-reachability instance
   and conversely.
+* **`L = coL`, cheaply** (`DescriptiveComplexity.LOGSPACE_eq_coLOGSPACE`):
+  deterministic logarithmic space is closed under complement, and UNREACHd is
+  complete for it. Where `NL = coNL` needs Immerman–Szelepcsényi's inductive
+  counting, a *deterministic* walk has only one thing to do at each node, so
+  failing to arrive is witnessed by walking until a budget runs out – and the
+  budget is just a vertex, counted by its rank in the order.
 * **NL by the Krom fragment and FO(TC)**: 2SAT is NL-complete
   (`DescriptiveComplexity.TwoSAT_NL_complete`) by the Krom discharge, and so is
   REACH (`DescriptiveComplexity.REACH_NL_complete`), the canonical NL-complete

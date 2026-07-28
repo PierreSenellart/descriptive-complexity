@@ -42,7 +42,12 @@ Composing with `DescriptiveComplexity.NL_subset_PTIME` (proved downstream, with
 2SAT) places it inside polynomial time as well.
 
 The canonical complete problem is REACHd, deterministic reachability, in
-`DescriptiveComplexity.Problems.ReachabilityDet`.
+`DescriptiveComplexity.Problems.ReachabilityDet`; its complement UNREACHd is complete
+too, and with it the class is closed under complement
+(`DescriptiveComplexity.LOGSPACE_eq_coLOGSPACE`, in
+`DescriptiveComplexity.Problems.ReachabilityDet.Complement`) – with no analogue of
+Immerman–Szelepcsényi needed, a deterministic walk being witnessed not to arrive
+by a step budget.
 
 What is *not* claimed, here as for the other classes: nothing relates this
 class to a machine model. `L ≠ NL` and `L = NL` are both consistent with
