@@ -81,17 +81,18 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| **NL** | SO-Krom (existential second-order Krom: at most two second-order literals per clause, either sign) – Grädel; equivalently FO(TC), since FO(TC) is closed under complement (Immerman–Szelepcsényi), whence `NL = coNL` | REACH · UNREACH · 2SAT |
-| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – Grädel; Immerman–Vardi; equivalently acceptance by a deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
-| **NP** = Σ₁ᵖ | ∃SO, existential second-order logic (Fagin); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| **coNP** = Π₁ᵖ | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
-| **DP** | a Σ₁ and a Π₁ sentence conjoined: a difference of NP problems – Papadimitriou & Yannakakis; `NP ∪ coNP ⊆ DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` | SAT-UNSAT |
-| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order blocks, existential first (Stockmeyer) | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
-| **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order blocks, universal first | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
+| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | REACHd |
+| **NL** | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | REACH · UNREACH · 2SAT |
+| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
+| **NP** = Σ₁ᵖ | ∃SO: existential second-order logic | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
+| **coNP** = Π₁ᵖ | ∀SO: universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
+| **DP** | a Σ₁ and a Π₁ sentence conjoined | SAT-UNSAT |
+| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
+| **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — |
 
 The characterizations are the logical *definitions* of the classes (see the
-Overview above); the inclusions and dualities relating them are theorems.
+Overview above).
 
 ## Scope and limitations
 
@@ -136,12 +137,12 @@ The following are *feasible* within this framework and planned, but **not yet
 implemented**. `ROADMAP.md` is the detailed version; the highlights a typical
 user is most likely to want:
 
-* **Complexity classes beyond the polynomial hierarchy.** L, PSPACE, and up
-  toward EXPTIME/EXPSPACE, via the transitive-closure and fixpoint logics that
-  capture them (FO(DTC), SO(TC), FO(PFP)/SO(LFP)) and their complete problems
-  (REACHd, QSAT), each with a machine bridge as for NP and PTIME. Below NP this
-  also brings the P-complete problems (Circuit Value, alternating
-  reachability).
+* **Complexity classes beyond the polynomial hierarchy.** PSPACE, and up toward
+  EXPTIME/EXPSPACE, via the transitive-closure and fixpoint logics that capture
+  them (SO(TC), FO(PFP)/SO(LFP)) and their complete problems (QSAT), each with a
+  machine bridge as for NP and PTIME – a bridge the logarithmic-space classes,
+  already present, do not have either. Below NP this also brings the P-complete
+  problems (Circuit Value, alternating reachability).
 * **Undecidability, by reduction.** The class RE, defined logically like the
   others as `∃SO[new]` — existential second-order logic over a universe extended
   by finitely many *invented* values (Abiteboul–Hull–Vianu), which unbounds the

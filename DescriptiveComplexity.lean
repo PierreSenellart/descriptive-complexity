@@ -32,6 +32,9 @@ import DescriptiveComplexity.Counting
 import DescriptiveComplexity.TransitiveClosureCompl
 import DescriptiveComplexity.ImmermanSzelepcsenyi
 import DescriptiveComplexity.TransitiveClosureReach
+import DescriptiveComplexity.TransitiveClosureDet
+import DescriptiveComplexity.TransitiveClosurePull
+import DescriptiveComplexity.DetLogSpace
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -303,6 +306,38 @@ individual declarations are documented on their own pages.
   UNREACH is complete too (`DescriptiveComplexity.UNREACH_NL_complete`), by
   complementing that reduction – which is again `NL = coNL`, each fragment
   defining only one of the two problems head-on.
+* `DescriptiveComplexity.TransitiveClosureDet` and
+  `DescriptiveComplexity.TransitiveClosurePull` – FO(DTC), and closure of both
+  reachability logics under reductions. Determinism is a *formula*, not a side
+  condition: a `DescriptiveComplexity.TCSpec` is read through
+  `DescriptiveComplexity.TCSpec.det`, which conjoins to each transition the statement
+  that no other transition leaves the current node – a finite conjunction over
+  the modes, the mode comparison being static. Every specification then denotes
+  a deterministic walk and nothing has to be preserved by a pullback, which is
+  what makes the closure argument syntactic. The pullback itself
+  (`DescriptiveComplexity.TCSpec.comap`) walks the interpreted structure while
+  writing everything on the base one: `k` tags ride along in the mode, the
+  coordinates flatten to a `k · d`-tuple, and the resulting bijection of nodes
+  carries steps to steps – whence determinism travels for free, "no competing
+  successor" being invariant under a bijection.
+* `DescriptiveComplexity.DetLogSpace` – the class `DescriptiveComplexity.LOGSPACE`
+  (named in full, `L` being a vocabulary everywhere in this development),
+  defined by FO(DTC) definability. It is the first class here defined by an
+  operator-as-data logic rather than by the shape of a kernel: no fragment of
+  ∃SO comparable to SO-Horn or SO-Krom is known for deterministic logarithmic
+  space. `DescriptiveComplexity.LOGSPACE_subset_NL` is a determinized walk being a
+  walk, followed by the FO(TC)/SO-Krom translation.
+* `DescriptiveComplexity.Problems.ReachabilityDet` – **REACHd is LOGSPACE-complete**
+  (`DescriptiveComplexity.REACHd_LOGSPACE_complete`). The outdegree bound of the
+  textbook statement is imposed semantically rather than as a promise: the walk
+  follows an arc only when it is the only arc out of its source
+  (`DescriptiveComplexity.DetEdge`), so every marked graph is a legal instance and
+  invariance is free. Membership is `DescriptiveComplexity.reachSpec` read through its
+  determinization; hardness reuses the FO(TC) interpretation verbatim, the graph
+  of a determinized walk being functional, so that its forced arcs are all of
+  its arcs. Both halves are cheaper than REACH's, whose membership needs
+  Immerman–Szelepcsényi – the fragment asymmetry that forces it does not arise
+  for an operator-based logic.
 * `DescriptiveComplexity.Problems.TwoSat` – **2SAT is NL-complete**
   (`DescriptiveComplexity.TwoSAT_NL_complete`), the NL-level analogue of HORN-SAT for
   PTIME. A member by a Krom program that guesses the truth assignment and reads
@@ -378,13 +413,14 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Problems proved complete |
 | --- | --- | --- |
-| `NL` | SO-Krom (existential second-order Krom, at most two second-order literals per clause) – [Grädel 1992][gradel1992capturing]; equivalently FO(TC) (`DescriptiveComplexity.tcDefinable_iff_mem_NL`), so `NL = coNL` | REACH · UNREACH · 2SAT |
-| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
-| `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
-| `DP` | a `Σ₁` and a `Π₁` sentence conjoined: a difference of NP problems ([Papadimitriou & Yannakakis 1984][papadimitriou1984complexity]); `NP ∪ coNP ⊆ DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` | SAT-UNSAT |
-| `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order blocks, existential first ([Stockmeyer 1976][stockmeyer1976polynomial]) | `QBF k` – at `k = 1`, NP |
-| `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
+| `LOGSPACE` (`L`) | FO(DTC): first-order logic with a deterministic transitive closure | REACHd |
+| `NL` | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | REACH · UNREACH · 2SAT |
+| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | HORN-SAT |
+| `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
+| `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
+| `DP` | a `Σ₁` and a `Π₁` sentence conjoined | SAT-UNSAT |
+| `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | `QBF k` – at `k = 1`, NP |
+| `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — |
 
 Headline results and cross-references:
@@ -427,6 +463,14 @@ Headline results and cross-references:
   being able to close and to reject but not to force minimality; REACH escapes
   at the Horn level through FO(LFP), and at the Krom level through `NL = coNL`
   (`DescriptiveComplexity.reach_mem_NL`).
+* **L by deterministic transitive closure**: REACHd – reachability along
+  *forced* arcs – is complete for `DescriptiveComplexity.LOGSPACE`
+  (`DescriptiveComplexity.REACHd_LOGSPACE_complete`), the class defined by FO(DTC).
+  Determinism is carried by a formula rather than by a hypothesis, which is what
+  lets the class be closed under reductions syntactically; and both halves of
+  the completeness proof are the same observation read in opposite directions,
+  the graph of a deterministic walk being a deterministic-reachability instance
+  and conversely.
 * **NL by the Krom fragment and FO(TC)**: 2SAT is NL-complete
   (`DescriptiveComplexity.TwoSAT_NL_complete`) by the Krom discharge, and so is
   REACH (`DescriptiveComplexity.REACH_NL_complete`), the canonical NL-complete

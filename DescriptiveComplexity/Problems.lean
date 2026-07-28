@@ -11,6 +11,7 @@ import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut
 import DescriptiveComplexity.Problems.HornSat
 import DescriptiveComplexity.Problems.Reachability
+import DescriptiveComplexity.Problems.ReachabilityDet
 import DescriptiveComplexity.Problems.ThreeColorability
 import DescriptiveComplexity.Problems.Coloring
 import DescriptiveComplexity.Problems.ThreeSat

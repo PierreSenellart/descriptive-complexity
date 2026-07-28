@@ -77,7 +77,6 @@ in `ClauseDischarge.lean`); the discharges still to do:
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
 - **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
   SO(TC)-definable (equivalently FO(PFP)-definable) problem ordered-FO-reduces
   to QSAT". Downstream: game problems (Generalized Geography…) [L each,
@@ -104,7 +103,7 @@ in `ClauseDischarge.lean`); the discharges still to do:
   FO(PFP). Note: no fragment of *plain* SO can play this role: SO = PH
   (Fagin/Stockmeyer), so an SO fragment capturing PSPACE would collapse PH; some
   iteration/recursion operator is unavoidable.
-- **FO(TC), the rest of it** [M]: the definability layer exists
+- **FO(TC), the layer as it stands** [done]: the definability layer exists
   (`TransitiveClosure.lean`: `TCSpec`/`TCDefinable`, a single TC over a
   first-order transition formula on `k`-tuples, with `reach_tcDefinable` as the
   canonical instance; a `TCSpec` carries a finite *mode* component beside its
@@ -114,17 +113,14 @@ in `ClauseDischarge.lean`); the discharges still to do:
   `mem_NL_iff_tcDefinable_compl` (`SigmaSOKromDefinable.compl_of_tcDefinable` in
   `TransitiveClosureKrom.lean`, `TCDefinable.compl_of_sigmaSOKromDefinable` in
   `KromTransitiveClosure.lean`), sharpened to `NL(Krom) = NL(TC)` by the
-  complementation of FO(TC) (`tcDefinable_iff_mem_NL`). What remains here is
-  **closure of `TCDefinable` under ordered FO reductions** [M] – pull
-  the spec back with modes `spec.Mode × (Fin k → Tag)` and tuples of length
-  `k · d` – which would make FO(TC) a `ComplexityClass` in its own right if that
-  is ever wanted; today it is a definability notion only, tied to NL through the
-  translations above.
-- **FO(DTC)** [M, after the above]: the deterministic variant, i.e. the same
-  `TCSpec` with `step` replaced by its FO determinization
-  `step(x̄, ȳ) ∧ ∀z̄. step(x̄, z̄) → z̄ = ȳ`; that formula is first-order, so
-  `DTCDefinable P → TCDefinable P` (the definability-level `L ⊆ NL`) is a
-  one-liner once the determinizing formula and its realization lemma exist.
+  complementation of FO(TC) (`tcDefinable_iff_mem_NL`). **Closure of
+  `TCDefinable` under ordered FO reductions** is done too
+  (`TransitiveClosurePull.lean`, `TCDefinable.of_orderedReduction`: the spec is
+  pulled back with modes `spec.Mode × (Fin k → Tag)` and tuples of length
+  `k · d`), so FO(TC) could be a `ComplexityClass` in its own right – with
+  little point, since it coincides with NL through the translations above.
+  Nothing is outstanding in this item; it is kept as the map of what the layer
+  contains.
 - **FO(PFP)** [L, sharing infrastructure with LFP]: PSPACE on ordered
   structures (DC ch. 9–10); SO(TC) above is the cheaper route to the class, so
   this is a textbook-faithfulness layer.
@@ -560,7 +556,9 @@ blocked.
    fragment, **Immerman–Szelepcsényi** on top of them, and **REACH
    NL-complete** (membership through the complementation of FO(TC), hardness by
    the FO(TC) discharge, whose interpretation is the graph of the walk itself).
-   What remains of this step: **FO(DTC)**/**REACHd**.
+   This step is complete: **FO(DTC)**, the class **LOGSPACE** and **REACHd**
+   closed it (`TransitiveClosureDet.lean`, `TransitiveClosurePull.lean`,
+   `DetLogSpace.lean`, `Problems/ReachabilityDet.lean`).
 3. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the
    textbook-faithfulness layer and Immerman–Vardi.
 
