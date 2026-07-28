@@ -466,36 +466,53 @@ original elements. Unbounding `m` is the *only* change from `Σ₁`, and it is
 exactly the step from "search a space exponential in `|A|`" (NP) to "search an
 unbounded space of finite witnesses" (RE).
 
-Done: `DescriptiveComplexity/SecondOrderNew.lean` — the extended structure, the
-definability notion `SigmaSONewDefinable`, functoriality in the base
-isomorphism, congruence on finite instances, and `Σ₁ ⊆ ∃SO[new]`
-(`SigmaSODefinable.toNew`, the future `NP ⊆ RE`), whose kernel is guarded by
-"nothing was invented" so that the `∃m` cannot be satisfied spuriously.
+Done so far:
 
-- **RE as a `ComplexityClass`** [L, ~800–1200 lines, the gating item]: needs
-  the closure of `∃SO[new]` definability under (ordered) FO reductions.
-  *Do not reach for `RelSecondOrderPull`* (§3): value invention pays for a much
-  cheaper argument than the arity-encoding pullback of `SecondOrderPull`. Given
-  `f : P ≤ᶠᵒ Q` and an `∃SO[new]` definition of `Q` witnessed by `(m, ρ)` over
-  `(I.Map A) ⊕ Fin m`, invent `n = |Tag × A^dim| + m` values and *guess the
-  isomorphism*: one `(1 + dim)`-ary relation variable `D t` per tag, asserted
-  first-order to biject a set of invented values with `Tag × A^dim`. The
-  relation variables of the target's block are then re-guessed over the same
-  universe at the *same arity* — no tag-tuple indexing, no arity blow-up — and
-  the kernel is translated by (i) relativizing its quantifiers to `¬ old`,
-  (ii) replacing each target atom `R x̄` by the disjunction over tag tuples of
-  `∃ȳ. ⋀ D tᵢ (xᵢ, ȳᵢ) ∧ relFormula R t̄ [ȳ]`, and (iii) reading the target's
-  own `old` predicate as "is a copy of an `I.Map A` point".
-  The one genuinely new piece of machinery this needs is **relativization**
-  (`BoundedFormula.relativize` to a unary predicate, with its realization lemma
-  against the subtype structure, ~200–300 lines): both for (i) and because the
-  interpretation's own defining formulas, which quantify over `A`, must be
-  guarded by `old` when read in the extended universe. It is reusable — it is
-  also what `RelSecondOrderPull` would want. For the *ordered* variant, guess
-  the linear order inside the same block, restricted to the `old` part, and
-  reuse the guard/elimination shape of `SecondOrderOrdered` (`linearGuard`,
-  `linearOrderOfGuard`) with the guard relativized to `old`.
-- **Trakhtenbrot's theorem** [L, after the class]: finite satisfiability of a
+- `DescriptiveComplexity/SecondOrderNew.lean` — the extended structure, the
+  definability notion `SigmaSONewDefinable`, functoriality in the base
+  isomorphism, congruence on finite instances, and `Σ₁ ⊆ ∃SO[new]`
+  (`SigmaSODefinable.toNew`, the future `NP ⊆ RE`), whose kernel is guarded by
+  "nothing was invented" so that the `∃m` cannot be satisfied spuriously.
+- `DescriptiveComplexity/Relativize.lean` — relativization of a formula to a
+  unary relation symbol (`relativizeTo`), correct against the `Substructure`
+  the symbol defines (so it covers vocabularies with function symbols, which
+  the `ComplexityClass` interface forces since the *source* language of a
+  reduction is arbitrary); `relOld` is its instance at the marker `old`.
+  Reusable for the relativized *membership* pullback of §3.
+- `DescriptiveComplexity/SecondOrderNewPull.lean` — **closure under FO
+  reductions** (`SigmaSONewDefinable.of_foReduction`). The construction worth
+  not rediscovering: *do not* guess an isomorphism, and do not reach for
+  `RelSecondOrderPull` (§3). With the **same** number of invented values, the
+  target's extended universe `I.Map A ⊕ Fin m` is *definable inside* the
+  source's `A ⊕ Fin m` — an interpreted point is a tag with `dim` original
+  coordinates, an invented value is itself — so it is the universe of a
+  `RelFOInterpretation` with tags `Tag ⊕ Unit` and dimension `dim + 1`, and the
+  existing guarded pullback `RelFOInterpretation.pullRel` does the translation,
+  relativizing quantifiers and substituting the defining formulas in one pass.
+  Two details that are not optional: the spare coordinate of an interpreted
+  point must be pinned to a **guessed canonical element** (a unary variable with
+  a uniqueness guard) — pinning it to a coordinate of the tuple fails at
+  `dim = 0`, where `I.Map A` is constant-size; and the interpretation's own
+  defining formulas, which quantify over `A`, must be read through `relOld`.
+  The block transfer is the *flipped* one a definable universe forces
+  (`targetAssign` restricting, `sourceAssign` extending by junk, exact in that
+  order), which is enough because the block is existential.
+
+- `DescriptiveComplexity/SecondOrderNewOrdered.lean` — closure under **ordered**
+  FO reductions, by re-quantifying the order inside the guessed block as in
+  `SecondOrderOrdered`, with the guard **relativized to `old`**
+  (`extLinearGuard`): the order symbol of an extended structure relates original
+  elements only, so an unrelativized linear-order guard is unsatisfiable as soon
+  as something is invented. `sigmaSONewDefinable_of_orderPull` is the
+  order-elimination step on its own, the `∃SO[new]` analogue of
+  `sigmaSODefinable_of_orderPull`.
+- `DescriptiveComplexity/RecursivelyEnumerable.lean` — **the class `RE`**, a
+  `ComplexityClass` by the two closures, with `coRE`, `NP ⊆ RE`
+  (`NP_subset_RE`), `coNP ⊆ coRE`, and `hard_RE_iff` (cofinal hardness is the
+  usual notion over a relational vocabulary). Nothing relates RE and co-RE, by
+  design: `∃SO[new]` has no dual reading, and the separation is a machine-bridge
+  statement (last item below).
+- **Trakhtenbrot's theorem** [L, the next step]: finite satisfiability of a
   first-order sentence is RE-complete. Membership is nearly definitional —
   invent the model and check satisfaction — but "check satisfaction" is the
   catch: satisfaction of an *input* sentence is not first-order in the sentence,

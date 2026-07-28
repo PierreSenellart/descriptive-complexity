@@ -90,6 +90,7 @@ under FO reductions. Karp's 21 NP-complete problems are all present.
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — |
+| **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — |
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above).
@@ -143,14 +144,13 @@ user is most likely to want:
   machine bridge as for NP and PTIME – a bridge the logarithmic-space classes,
   already present, do not have either. Below NP this also brings the P-complete
   problems (Circuit Value, alternating reachability).
-* **Undecidability, by reduction.** The class RE, defined logically like the
-  others as `∃SO[new]` — existential second-order logic over a universe extended
-  by finitely many *invented* values (Abiteboul–Hull–Vianu), which unbounds the
-  certificate and nothing else. The definability layer exists today
-  (`DescriptiveComplexity.SecondOrderNew`, with `Σ₁ ⊆ ∃SO[new]`); planned are
-  the class itself and its complete problems — finite satisfiability
-  (Trakhtenbrot's theorem) and Post's correspondence problem — so that
-  incomputability results become ordinary first-order reductions.
+* **Undecidability, by reduction.** The class RE exists today, defined
+  logically like the others as `∃SO[new]` (table above) and closed under FO
+  reductions like the others. What is planned is its complete problems — finite
+  satisfiability (Trakhtenbrot's theorem) and Post's correspondence problem — so
+  that incomputability results become ordinary first-order reductions, together
+  with the bridge to Mathlib's computability layer that would let RE-hardness be
+  read as undecidability.
 * **Counting and optimization problems.** Only decision problems are modeled
   today. Planned: #P via counting second-order assignments (#SAT, #3COL, the
   permanent) and MaxSNP-style optimization classes — i.e. function and search

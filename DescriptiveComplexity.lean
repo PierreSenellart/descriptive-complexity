@@ -22,6 +22,10 @@ import DescriptiveComplexity.ClauseDischarge
 import DescriptiveComplexity.SecondOrderKrom
 import DescriptiveComplexity.SecondOrderKromPull
 import DescriptiveComplexity.SecondOrderNew
+import DescriptiveComplexity.Relativize
+import DescriptiveComplexity.SecondOrderNewPull
+import DescriptiveComplexity.SecondOrderNewOrdered
+import DescriptiveComplexity.RecursivelyEnumerable
 import DescriptiveComplexity.LogSpace
 import DescriptiveComplexity.TwoCnf
 import DescriptiveComplexity.TransitiveClosure
@@ -386,11 +390,38 @@ individual declarations are documented on their own pages.
   is still finite and the kernel still decidable on it, so definability in this
   logic is a machine-model-free reading of *recursive enumerability*.
   `DescriptiveComplexity.SigmaSODefinable.toNew` is `Σ₁ ⊆ ∃SO[new]`, by
-  inventing nothing. What exists today is the definability notion with its
-  isomorphism-invariance and congruence lemmas; the class RE itself – i.e. the
-  closure of `∃SO[new]` definability under FO reductions – and its complete
-  problems (finite satisfiability, by Trakhtenbrot's theorem; PCP) are the next
-  steps, planned in `ROADMAP.md`.
+  inventing nothing.
+* `DescriptiveComplexity.Relativize` – relativization of a formula to a unary
+  predicate (`DescriptiveComplexity.relativizeTo`), with its correctness against
+  the substructure the predicate defines. Its instance here is
+  `DescriptiveComplexity.relOld`: a formula about the instance, read in the
+  extended universe with its quantifiers restricted to the original elements,
+  says what it says in the instance.
+* `DescriptiveComplexity.SecondOrderNewPull` – **`∃SO[new]` definability is
+  closed under FO reductions** (`DescriptiveComplexity.SigmaSONewDefinable.of_foReduction`).
+  The construction is the one value invention makes cheap: with the *same*
+  number of invented values, the target's extended universe `I.Map A ⊕ Fin m` is
+  **definable inside** the source's `A ⊕ Fin m` – an interpreted point is a tag
+  with `dim` original coordinates, an invented value is itself – so it is the
+  universe of a relativized interpretation with tags `Tag ⊕ Unit` and dimension
+  `dim + 1`, and the kernel is pulled back through it by the guarded pullback of
+  `DescriptiveComplexity.RelComposition`. The spare coordinate is pinned to a
+  guessed canonical element, which is what makes the construction survive
+  `dim = 0`.
+* `DescriptiveComplexity.SecondOrderNewOrdered` – the same closure under
+  *ordered* FO reductions: the order is re-quantified inside the block, guarded
+  by `DescriptiveComplexity.extLinearGuard`, which must be **relativized** –
+  the order symbol of an extended structure relates original elements only, so
+  an unrelativized linear-order guard would be unsatisfiable as soon as
+  something is invented.
+* `DescriptiveComplexity.RecursivelyEnumerable` – **the class RE**
+  (`DescriptiveComplexity.RE`), a `DescriptiveComplexity.ComplexityClass` by
+  those two closures, with `NP ⊆ RE` (`DescriptiveComplexity.NP_subset_RE`) and
+  the complement operator `DescriptiveComplexity.coRE`. Nothing here relates RE
+  and co-RE: `∃SO[new]` has no dual reading, and the separation that turns
+  RE-hardness into undecidability is a machine-bridge statement. The complete
+  problems – finite satisfiability, by Trakhtenbrot's theorem, and PCP – are
+  planned in `ROADMAP.md`.
 
 ## Shared encodings
 
@@ -437,6 +468,7 @@ reduction and certificate in full.
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — |
+| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — |
 
 Headline results and cross-references:
 

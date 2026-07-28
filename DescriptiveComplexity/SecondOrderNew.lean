@@ -59,8 +59,8 @@ every `L`, as the membership predicate of a
 * `DescriptiveComplexity.SigmaSODefinable.toNew`: `Σ₁ ⊆ ∃SO[new]`, by
   inventing nothing – the kernel is guarded by
   `DescriptiveComplexity.noNewSentence`, “every element is original”, which
-  pins the number of invented values to zero. Once RE is a complexity class
-  this is the inclusion `NP ⊆ RE`.
+  pins the number of invented values to zero. As a statement about classes this
+  is `DescriptiveComplexity.NP_subset_RE`.
 
 No alternation hierarchy is built on top of `∃SO[new]`, deliberately:
 alternating second-order blocks over a *finite* extended universe are still
@@ -317,12 +317,17 @@ def allOldStructure (A : Type) [L.Structure A] : (newLang L).Structure A :=
   @sumStructure L Language.oldMark A _ (allOldMarkStructure A)
 
 /-- With no invented values, the extended structure is the instance itself. -/
-def extEquivNoNew [L.IsRelational] (A : Type) [L.Structure A] [Nonempty A] (m : ℕ)
+def extEquivNoNew (A : Type) [L.Structure A] [Nonempty A] (m : ℕ)
     [IsEmpty (Fin m)] :
     @Language.Equiv (newLang L) A (A ⊕ Fin m) (allOldStructure L A) (extStructure L A m) :=
   letI := allOldStructure L A
   { toEquiv := (Equiv.sumEmpty A (Fin m)).symm
-    map_fun' := fun f _ => isEmptyElim f
+    map_fun' := fun {_n} f x => by
+      cases f with
+      | inl f =>
+        change Sum.inl (funMap f x) = Sum.inl (funMap f fun i => oldPart A m (Sum.inl (x i)))
+        simp
+      | inr f => exact isEmptyElim f
     map_rel' := fun {_k} r x => by
       cases r with
       | inl s => exact relMap_ext_inl s x
@@ -339,7 +344,7 @@ variable {L : Language.{0, 0}}
 /-- **Existential second-order definability implies `∃SO[new]`-definability**:
 an `∃SO` sentence becomes an `∃SO[new]` sentence when guarded by “nothing was
 invented”. Once RE is a complexity class, this is the inclusion `NP ⊆ RE`. -/
-theorem SigmaSODefinable.toNew [L.IsRelational] {P : DecisionProblem L}
+theorem SigmaSODefinable.toNew {P : DecisionProblem L}
     (h : SigmaSODefinable 1 P) : SigmaSONewDefinable P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
   obtain ⟨B, rfl⟩ : ∃ B, Bs = [B] := by
