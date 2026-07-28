@@ -133,6 +133,21 @@ def Accepts : Prop :=
   ∃ (c₀ c : Config A) (n : ℕ), M.IsInit c₀ ∧ n < Nat.card {p : A // M.Posn p} ∧
     M.StepsIn n c₀ c ∧ M.Acc c.state
 
+/-- **Acceptance in bounded space**: some run from an initial configuration
+reaches an accepting state, with *no bound on its length*.
+
+This is `DescriptiveComplexity.TMData.Accepts` with the step bound dropped, and
+that is all the difference between the time-bounded and the space-bounded model:
+the space is already bounded by construction, since the tape is indexed by the
+positions and a reduction of dimension `d` therefore buys `nᵈ` cells exactly as
+it buys `nᵈ` steps. What changes is that a run no longer fits inside the
+structure – it may visit exponentially many configurations – so acceptance is
+*reachability* in the configuration graph rather than a walk indexed by the
+positions, which is why the membership proof for the space-bounded problems is
+an SO(TC) specification rather than a `Σ₁` definition. -/
+def AcceptsSpace : Prop :=
+  ∃ c₀ c : Config A, M.IsInit c₀ ∧ Relation.ReflTransGen M.Step c₀ c ∧ M.Acc c.state
+
 section Steps
 
 variable {M}
@@ -442,6 +457,38 @@ theorem Agree.accepts (h : Agree u N M) : N.Accepts ↔ M.Accepts := by
     obtain ⟨d, rfl⟩ := Config.map_surjective u c
     exact ⟨d₀, d, n, h.isInit.mpr hinit, hcard ▸ hle,
       (h.stepsIn n d₀ d).mpr hrun, (h.acc _).mpr hacc⟩
+
+/-- Reachability in the configuration graph transports along an equivalence. -/
+theorem Agree.reach (h : Agree u N M) (c c' : Config B) :
+    Relation.ReflTransGen N.Step c c' ↔ Relation.ReflTransGen M.Step (c.map u) (c'.map u) := by
+  constructor
+  · intro hr
+    induction hr with
+    | refl => exact Relation.ReflTransGen.refl
+    | @tail d e _ hde ih => exact ih.tail (h.step.mp hde)
+  · intro hr
+    have key : ∀ x y : Config A, Relation.ReflTransGen M.Step x y →
+        ∀ d e : Config B, x = d.map u → y = e.map u → Relation.ReflTransGen N.Step d e := by
+      intro x y hxy
+      induction hxy with
+      | refl =>
+        intro d e hd he
+        exact (Config.map_injective u (hd.symm.trans he)) ▸ Relation.ReflTransGen.refl
+      | @tail p q _ hpq ih =>
+        intro d e hd he
+        obtain ⟨p₀, rfl⟩ := Config.map_surjective u p
+        exact (ih d p₀ hd rfl).tail (h.step.mpr (he ▸ hpq))
+    exact key _ _ hr c c' rfl rfl
+
+/-- **Acceptance in bounded space transports along an equivalence.** -/
+theorem Agree.acceptsSpace (h : Agree u N M) : N.AcceptsSpace ↔ M.AcceptsSpace := by
+  constructor
+  · rintro ⟨c₀, c, hinit, hreach, hacc⟩
+    exact ⟨c₀.map u, c.map u, h.isInit.mp hinit, (h.reach c₀ c).mp hreach, (h.acc _).mp hacc⟩
+  · rintro ⟨c₀, c, hinit, hreach, hacc⟩
+    obtain ⟨d₀, rfl⟩ := Config.map_surjective u c₀
+    obtain ⟨d, rfl⟩ := Config.map_surjective u c
+    exact ⟨d₀, d, h.isInit.mpr hinit, (h.reach d₀ d).mpr hreach, (h.acc _).mpr hacc⟩
 
 /-- **Determinism transports along an equivalence.** -/
 theorem Agree.deterministic (h : Agree u N M) : N.Deterministic ↔ M.Deterministic := by

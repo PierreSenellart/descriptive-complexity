@@ -246,6 +246,29 @@ def DTMAccept : DecisionProblem Language.turing where
     have h := agree_of_equiv e
     exact (and_congr h.wellFormed (and_congr h.deterministic h.accepts)).symm
 
+/-- **Machine acceptance in bounded space**: the same question as
+`DescriptiveComplexity.NTMAccept` with the step bound dropped. Nothing else
+changes – the tape is indexed by the positions, so the space a machine may use
+is bounded by construction and a reduction of dimension `d` buys `nᵈ` cells
+exactly as it buys `nᵈ` steps – but a run may now visit exponentially many
+configurations, so acceptance is reachability in the configuration graph. -/
+def NTMAcceptSpace : DecisionProblem Language.turing where
+  Holds := fun A inst => @TMData.WellFormed A (tmData A) ∧ @TMData.AcceptsSpace A (tmData A)
+  iso_invariant := fun {A B} _ _ e => by
+    have h := agree_of_equiv e
+    exact (and_congr h.wellFormed h.acceptsSpace).symm
+
+/-- **Deterministic machine acceptance in bounded space**, with determinism
+folded into the yes-instances as in `DescriptiveComplexity.DTMAccept`. That this
+problem and `DescriptiveComplexity.NTMAcceptSpace` are complete for the same class
+is the content of `PSPACE = NPSPACE`. -/
+def DTMAcceptSpace : DecisionProblem Language.turing where
+  Holds := fun A inst => @TMData.WellFormed A (tmData A) ∧
+    @TMData.Deterministic A (tmData A) ∧ @TMData.AcceptsSpace A (tmData A)
+  iso_invariant := fun {A B} _ _ e => by
+    have h := agree_of_equiv e
+    exact (and_congr h.wellFormed (and_congr h.deterministic h.acceptsSpace)).symm
+
 end Problem
 
 end DescriptiveComplexity
