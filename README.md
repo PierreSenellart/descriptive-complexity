@@ -142,6 +142,14 @@ user is most likely to want:
   (REACHd, QSAT), each with a machine bridge as for NP and PTIME. Below NP this
   also brings the P-complete problems (Circuit Value, alternating
   reachability).
+* **Undecidability, by reduction.** The class RE, defined logically like the
+  others as `∃SO[new]` — existential second-order logic over a universe extended
+  by finitely many *invented* values (Abiteboul–Hull–Vianu), which unbounds the
+  certificate and nothing else. The definability layer exists today
+  (`DescriptiveComplexity.SecondOrderNew`, with `Σ₁ ⊆ ∃SO[new]`); planned are
+  the class itself and its complete problems — finite satisfiability
+  (Trakhtenbrot's theorem) and Post's correspondence problem — so that
+  incomputability results become ordinary first-order reductions.
 * **Counting and optimization problems.** Only decision problems are modeled
   today. Planned: #P via counting second-order assignments (#SAT, #3COL, the
   permanent) and MaxSNP-style optimization classes — i.e. function and search

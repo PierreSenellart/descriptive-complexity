@@ -21,6 +21,7 @@ import DescriptiveComplexity.SecondOrderHornPull
 import DescriptiveComplexity.ClauseDischarge
 import DescriptiveComplexity.SecondOrderKrom
 import DescriptiveComplexity.SecondOrderKromPull
+import DescriptiveComplexity.SecondOrderNew
 import DescriptiveComplexity.LogSpace
 import DescriptiveComplexity.TwoCnf
 import DescriptiveComplexity.TransitiveClosure
@@ -319,6 +320,27 @@ individual declarations are documented on their own pages.
   Plass & Tarjan 1979][aspvall1979linear], formalized in
   `DescriptiveComplexity.Problems.TwoSat.Implication`; this is what yields the two
   inclusions of NL.
+
+## Value invention, towards the recursively enumerable
+
+* `DescriptiveComplexity.SecondOrderNew` – `∃SO[new]`, existential second-order
+  logic whose relation variables range over the universe *extended by finitely
+  many invented values*, in the style of the object-creating query languages of
+  ([Abiteboul–Hull–Vianu 1995][abiteboul1995foundations], ch. 18). Every other
+  logic here bounds its certificate by the instance – a `Σ₁` sentence guesses
+  relations over `A`, so the search space is exponential in `|A|` and the class
+  sits inside NP. Value invention removes that bound and nothing else: the
+  certificate is a finite extension `A ⊕ Fin m` with `m` unbounded, together
+  with relations over it, checked by a fixed first-order kernel over the base
+  vocabulary plus one predicate `old` marking the original elements. A witness
+  is still finite and the kernel still decidable on it, so definability in this
+  logic is a machine-model-free reading of *recursive enumerability*.
+  `DescriptiveComplexity.SigmaSODefinable.toNew` is `Σ₁ ⊆ ∃SO[new]`, by
+  inventing nothing. What exists today is the definability notion with its
+  isomorphism-invariance and congruence lemmas; the class RE itself – i.e. the
+  closure of `∃SO[new]` definability under FO reductions – and its complete
+  problems (finite satisfiability, by Trakhtenbrot's theorem; PCP) are the next
+  steps, planned in `ROADMAP.md`.
 
 ## Shared encodings
 

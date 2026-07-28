@@ -456,7 +456,74 @@ The concrete items:
   the classes-are-logic principle points at `ΣQSO(FO)` for the definition
   either way, with the machine count as a bridge statement.
 
-## 8. Teaching material
+## 8. Undecidability: RE, by value invention
+
+The one class here whose problems are not decidable at all, and the entry point
+to incomputability results proved the same way as everything else: by a
+first-order reduction from a complete problem. The defining logic is
+**`∃SO[new]`**, existential second-order logic over a universe extended by
+finitely many *invented* values ([Abiteboul–Hull–Vianu 1995]
+[abiteboul1995foundations], ch. 18): the certificate is a finite extension
+`A ⊕ Fin m` with `m` unbounded plus relations over it, checked by a fixed
+first-order kernel over the base vocabulary plus a predicate `old` marking the
+original elements. Unbounding `m` is the *only* change from `Σ₁`, and it is
+exactly the step from "search a space exponential in `|A|`" (NP) to "search an
+unbounded space of finite witnesses" (RE).
+
+Done: `DescriptiveComplexity/SecondOrderNew.lean` — the extended structure, the
+definability notion `SigmaSONewDefinable`, functoriality in the base
+isomorphism, congruence on finite instances, and `Σ₁ ⊆ ∃SO[new]`
+(`SigmaSODefinable.toNew`, the future `NP ⊆ RE`), whose kernel is guarded by
+"nothing was invented" so that the `∃m` cannot be satisfied spuriously.
+
+- **RE as a `ComplexityClass`** [L, ~800–1200 lines, the gating item]: needs
+  the closure of `∃SO[new]` definability under (ordered) FO reductions.
+  *Do not reach for `RelSecondOrderPull`* (§3): value invention pays for a much
+  cheaper argument than the arity-encoding pullback of `SecondOrderPull`. Given
+  `f : P ≤ᶠᵒ Q` and an `∃SO[new]` definition of `Q` witnessed by `(m, ρ)` over
+  `(I.Map A) ⊕ Fin m`, invent `n = |Tag × A^dim| + m` values and *guess the
+  isomorphism*: one `(1 + dim)`-ary relation variable `D t` per tag, asserted
+  first-order to biject a set of invented values with `Tag × A^dim`. The
+  relation variables of the target's block are then re-guessed over the same
+  universe at the *same arity* — no tag-tuple indexing, no arity blow-up — and
+  the kernel is translated by (i) relativizing its quantifiers to `¬ old`,
+  (ii) replacing each target atom `R x̄` by the disjunction over tag tuples of
+  `∃ȳ. ⋀ D tᵢ (xᵢ, ȳᵢ) ∧ relFormula R t̄ [ȳ]`, and (iii) reading the target's
+  own `old` predicate as "is a copy of an `I.Map A` point".
+  The one genuinely new piece of machinery this needs is **relativization**
+  (`BoundedFormula.relativize` to a unary predicate, with its realization lemma
+  against the subtype structure, ~200–300 lines): both for (i) and because the
+  interpretation's own defining formulas, which quantify over `A`, must be
+  guarded by `old` when read in the extended universe. It is reusable — it is
+  also what `RelSecondOrderPull` would want. For the *ordered* variant, guess
+  the linear order inside the same block, restricted to the `old` part, and
+  reuse the guard/elimination shape of `SecondOrderOrdered` (`linearGuard`,
+  `linearOrderOfGuard`) with the guard relativized to `old`.
+- **Trakhtenbrot's theorem** [L, after the class]: finite satisfiability of a
+  first-order sentence is RE-complete. Membership is nearly definitional —
+  invent the model and check satisfaction — but "check satisfaction" is the
+  catch: satisfaction of an *input* sentence is not first-order in the sentence,
+  so the instance vocabulary must present the sentence as a structure (a parse
+  forest) and the kernel must verify a guessed satisfaction relation over
+  subformula/valuation pairs, in the style of the FO(LFP) rule systems. This is
+  the file that decides whether the sentence-as-instance encoding is shared with
+  §7's machine layer. Hardness is the `∃SO[new]` discharge: the syntactic image
+  of the logic, exactly as SAT is the image of `Σ₁`.
+- **PCP (Post's correspondence problem)** [M–L, after Trakhtenbrot]: the
+  classical target for undecidability by reduction, and the natural second
+  complete problem; instance is a marked list of domino pairs over an alphabet,
+  a solution an invented sequence of indices with the two concatenations
+  guessed as invented strings and matched position by position.
+- **What incomputability actually needs** [R, separate]: RE-hardness alone does
+  not yet say "undecidable" inside this library — that statement needs the
+  other side, RE ⊆ (Mathlib's) `RePred` through an encoding of finite
+  structures, plus a co-RE problem shown not to be RE. Mathlib's computability
+  layer (`Nat.Partrec`, `ComputablePred`, the halting problem) is the target,
+  and the `Encoding`/`Decoding` bundles are the bridge; this is the same
+  standing-scope question as §7's converse compilation, and the honest reading
+  until it exists is "complete for the logically defined class RE".
+
+## 9. Teaching material
 
 - **Reduction cookbook** [M]: grow the `Examples/` directory (which now holds
   the first tutorial-style worked example, Boolean conjunctive queries) into a
@@ -530,6 +597,6 @@ blocked.
 - Abiteboul–Vianu and the exponential classes.
 
 This weighting assumes the goal is research output and formalization firsts. If
-the near-term goal is the course companion of §8, the cookbook and catalog
+the near-term goal is the course companion of §9, the cookbook and catalog
 growth move up and PSPACE slides down: students meet NL, P-completeness and
 reductions long before they meet SO(TC).
