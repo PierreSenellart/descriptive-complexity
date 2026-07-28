@@ -34,14 +34,17 @@ it will conjoin. Satisfiability of a side is stated once, parameterized by the
 triple of relation symbols to read (`DescriptiveComplexity.SatWith`), since the two
 sides differ only in that.
 
-**Membership in DP and DP-hardness are not formalized yet.** Membership needs
-the `Σ₁` kernel of `DescriptiveComplexity.sat_sigmaSODefinable` restated for a
-parameterized symbol triple – the realization proof there is a `simp` normal
-form that does not survive replacing the concrete relation symbols by
-variables, so it wants either two copies of the kernel or a transport along the
-language morphism embedding one side. Hardness needs the Cook–Levin discharge
-and its complement run side by side into a single paired instance (see the note
-in `DescriptiveComplexity.Difference`).
+**Membership in DP** (`DescriptiveComplexity.satUnsat_mem_DP`) is proved without
+writing a single new kernel: each side is *projected* onto a plain
+`Language.sat` instance by a one-dimensional, single-tag interpretation
+(`DescriptiveComplexity.sideInterp`), so `SatFirst` reduces to SAT and `SatSecond`
+does too; `Σ₁`-definability of the first half and `Π₁`-definability of the
+second then come from `DescriptiveComplexity.sat_sigmaSODefinable` by closure of the
+levels under FO reductions, the second after complementing the reduction.
+
+**DP-hardness is not formalized**: it needs the Cook–Levin discharge and its
+complement run side by side into a single paired instance (see the note in
+`DescriptiveComplexity.Difference`).
 -/
 
 namespace FirstOrder
@@ -156,5 +159,119 @@ def SATUNSAT : DecisionProblem Language.satPair where
     @SatWith A inst spIsCl₁ spPos₁ spNeg₁ ∧ ¬@SatWith A inst spIsCl₂ spPos₂ spNeg₂
   iso_invariant := fun e =>
     and_congr (satWith_iso e _ _ _) (not_congr (satWith_iso e _ _ _))
+
+/-! ### Reading one side as a plain CNF instance
+
+Rather than restate SAT's `Σ₁` kernel for a pair of formulas, each side is
+*projected* onto a plain `Language.sat` instance by a one-dimensional,
+single-tag interpretation. Definability of both halves is then inherited from
+`DescriptiveComplexity.sat_sigmaSODefinable` by closure under FO reductions – no new
+kernel, and no second copy of its realization proof. -/
+
+section Projection
+
+/-- The interpretation reading the side given by a triple of symbols as a
+plain CNF instance: same universe, the three relations renamed. -/
+def sideInterp (isCl : Language.satPair.Relations 1)
+    (pos neg : Language.satPair.Relations 2) :
+    FOInterpretation Language.satPair Language.sat Unit 1 where
+  relFormula {n} R :=
+    match n, R with
+    | _, .isClause => fun _ => Relations.formula₁ isCl (Term.var (0, 0))
+    | _, .posIn => fun _ => Relations.formula₂ pos (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .negIn => fun _ => Relations.formula₂ neg (Term.var (0, 0)) (Term.var (1, 0))
+
+variable {A : Type} [Language.satPair.Structure A]
+variable (isCl : Language.satPair.Relations 1) (pos neg : Language.satPair.Relations 2)
+
+@[simp]
+theorem sideInterp_isClause (w : Fin 1 → A) :
+    RelMap (M := (sideInterp isCl pos neg).Map A) satIsClause ![((), w)] ↔
+      RelMap isCl ![w 0] := by
+  rw [FOInterpretation.relMap_map]
+  exact Formula.realize_rel₁
+
+@[simp]
+theorem sideInterp_posIn (w w' : Fin 1 → A) :
+    RelMap (M := (sideInterp isCl pos neg).Map A) satPosIn ![((), w), ((), w')] ↔
+      RelMap pos ![w 0, w' 0] := by
+  rw [FOInterpretation.relMap_map]
+  exact Formula.realize_rel₂
+
+@[simp]
+theorem sideInterp_negIn (w w' : Fin 1 → A) :
+    RelMap (M := (sideInterp isCl pos neg).Map A) satNegIn ![((), w), ((), w')] ↔
+      RelMap neg ![w 0, w' 0] := by
+  rw [FOInterpretation.relMap_map]
+  exact Formula.realize_rel₂
+
+/-- The projected instance is satisfiable exactly when that side is. -/
+theorem satisfiable_sideInterp :
+    Satisfiable ((sideInterp isCl pos neg).Map A) ↔ SatWith A isCl pos neg := by
+  constructor
+  · rintro ⟨ν, hν⟩
+    refine ⟨fun a => ν ((), fun _ => a), fun c hc => ?_⟩
+    obtain ⟨x, hx⟩ := hν ((), fun _ => c) ((sideInterp_isClause isCl pos neg _).mpr hc)
+    obtain ⟨⟨⟩, w⟩ := x
+    have hw : (fun _ : Fin 1 => w 0) = w := funext fun j => congrArg w (Subsingleton.elim 0 j)
+    rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact ⟨w 0, Or.inl ⟨(sideInterp_posIn isCl pos neg _ _).mp hp, by
+        change ν ((), fun _ => w 0); rw [hw]; exact hT⟩⟩
+    · exact ⟨w 0, Or.inr ⟨(sideInterp_negIn isCl pos neg _ _).mp hn, by
+        change ¬ν ((), fun _ => w 0); rw [hw]; exact hT⟩⟩
+  · rintro ⟨ν, hν⟩
+    refine ⟨fun p => ν (p.2 0), ?_⟩
+    rintro ⟨⟨⟩, w⟩ hc
+    obtain ⟨x, hx⟩ := hν (w 0) ((sideInterp_isClause isCl pos neg w).mp hc)
+    refine ⟨((), fun _ => x), ?_⟩
+    rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact Or.inl ⟨(sideInterp_posIn isCl pos neg w _).mpr hp, hT⟩
+    · exact Or.inr ⟨(sideInterp_negIn isCl pos neg w _).mpr hn, hT⟩
+
+end Projection
+
+/-! ### Membership in DP -/
+
+/-- The second formula of the pair is satisfiable: the problem
+`DescriptiveComplexity.UnsatSecond` complements. -/
+def SatSecond : DecisionProblem Language.satPair where
+  Holds := fun A inst => @SatWith A inst spIsCl₂ spPos₂ spNeg₂
+  iso_invariant := fun e => satWith_iso e _ _ _
+
+/-- Projecting the first side is a reduction of `SatFirst` to SAT. -/
+def satFirst_le_sat : SatFirst ≤ᶠᵒ SAT where
+  Tag := Unit
+  dim := 1
+  toInterpretation := sideInterp spIsCl₁ spPos₁ spNeg₁
+  correct _ _ _ := (satisfiable_sideInterp spIsCl₁ spPos₁ spNeg₁).symm
+
+/-- Projecting the second side is a reduction of `SatSecond` to SAT. -/
+def satSecond_le_sat : SatSecond ≤ᶠᵒ SAT where
+  Tag := Unit
+  dim := 1
+  toInterpretation := sideInterp spIsCl₂ spPos₂ spNeg₂
+  correct _ _ _ := (satisfiable_sideInterp spIsCl₂ spPos₂ spNeg₂).symm
+
+/-- **The first side's satisfiability is `Σ₁`-definable**, inherited from SAT
+along the projection. -/
+theorem satFirst_sigmaSODefinable : SigmaSODefinable 1 SatFirst :=
+  sat_sigmaSODefinable.of_foReduction satFirst_le_sat
+
+/-- `UnsatSecond` is the complement of `SatSecond`. -/
+theorem unsatSecond_eq_compl : UnsatSecond = SatSecondᶜ :=
+  DecisionProblem.ext fun _ _ => Iff.rfl
+
+/-- **The second side's unsatisfiability is `Π₁`-definable**: the complement of
+an NP condition, the reduction complementing along with it. -/
+theorem unsatSecond_piSODefinable : PiSODefinable 1 UnsatSecond := by
+  rw [unsatSecond_eq_compl]
+  exact PiSODefinable.of_foReduction satSecond_le_sat.compl
+    ((compl_mem_coNP_iff SAT).mpr sat_sigmaSODefinable)
+
+/-- **SAT-UNSAT is in DP**, by its very shape: an NP condition on one side and
+a coNP condition on the other, imposed together. -/
+theorem satUnsat_mem_DP : SATUNSAT ∈ DP :=
+  ⟨SatFirst, UnsatSecond, satFirst_sigmaSODefinable, unsatSecond_piSODefinable,
+    fun _ _ _ _ => Iff.rfl⟩
 
 end DescriptiveComplexity

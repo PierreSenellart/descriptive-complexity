@@ -175,7 +175,10 @@ individual declarations are documented on their own pages.
   is again the pullback, each half then handled by the sentence-level order
   elimination of `DescriptiveComplexity.SecondOrderOrdered`. The upper bounds
   `DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` merge the two kernels into one alternation, in either block
-  order. The complete problem SAT-UNSAT is not yet formalized.
+  order. SAT-UNSAT, the canonical DP problem, is defined in
+  `DescriptiveComplexity.Problems.SatUnsat` and proved to be *in* DP by projecting
+  each of its two sides onto a plain CNF instance and inheriting definability
+  from SAT; its DP-hardness is not yet formalized.
 
 * `DescriptiveComplexity.FixedPoint` – FO(LFP) ([Immerman
   1986][immerman1986relational]; [Vardi 1982][vardi1982complexity]), in the same
