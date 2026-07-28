@@ -258,12 +258,9 @@ def atomFml {n : ℕ} (R : (atomLang L).Relations n) : L.Formula (Fin n × Fin 1
   | Sum.inr (t₁, t₂) =>
       Term.equal (t₁.relabel fun i => (i, 0)) (t₂.relabel fun i => (i, 0))
 
-/-- **The atomic diagram, as a one-dimensional first-order interpretation** over
-the ordered expansion (the order is not used; the reduction is ordered only
-because its correctness is asserted of finite structures). -/
-def atomInterp (L : Language.{0, 0}) :
-    FOInterpretation (L.sum Language.order) (atomLang L) Unit 1 where
-  relFormula R _ := (LHom.sumInl : L →ᴸ L.sum Language.order).onFormula (atomFml R)
+/-- **The atomic diagram, as a one-dimensional first-order interpretation.** -/
+def atomInterp (L : Language.{0, 0}) : FOInterpretation L (atomLang L) Unit 1 where
+  relFormula R _ := atomFml R
 
 /-- What the defining formula of an atomic-diagram symbol says: the symbol
 holds of the tuple. -/
@@ -287,7 +284,7 @@ theorem realize_atomFml {n : ℕ} (R : (atomLang L).Relations n) {A : Type} [L.S
 
 /-- **The interpreted structure is the atomic diagram**, through the equivalence
 of a one-dimensional single-tag universe with its own carrier. -/
-def atomMapEquiv (A : Type) [L.Structure A] [LinearOrder A] :
+def atomMapEquiv (A : Type) [L.Structure A] :
     @Language.Equiv (atomLang L) ((atomInterp L).Map A) A
       (FOInterpretation.mapStructure (atomInterp L) A) (atomStructure L A) :=
   @Language.Equiv.mk (atomLang L) ((atomInterp L).Map A) A
@@ -296,20 +293,18 @@ def atomMapEquiv (A : Type) [L.Structure A] [LinearOrder A] :
     (fun {_n} f _ => isEmptyElim f)
     (fun {_n} R x => by
       rw [FOInterpretation.relMap_map]
-      refine ((LHom.realize_onFormula (M := A)
-        (LHom.sumInl : L →ᴸ L.sum Language.order) (atomFml R)).trans
-        (realize_atomFml (A := A) R fun p => (x p.1).2 p.2)).symm)
+      exact (realize_atomFml (A := A) R fun p => (x p.1).2 p.2).symm)
 
 /-- **The relationalizing reduction**: any problem reduces, first-order, to a
-problem over the atomic diagram language that agrees with it on atomic
-diagrams. -/
+problem over the atomic diagram language that agrees with it on the atomic
+diagrams of finite structures. -/
 def atomReduction (P : DecisionProblem L) (Q : DecisionProblem (atomLang L))
-    (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
-      P A ↔ @DecisionProblem.Holds (atomLang L) Q A (atomStructure L A)) : P ≤ᶠᵒ[≤] Q where
+    (h : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
+      P A ↔ @DecisionProblem.Holds (atomLang L) Q A (atomStructure L A)) : P ≤ᶠᵒ Q where
   Tag := Unit
   dim := 1
   toInterpretation := atomInterp L
-  correct A _ _ _ _ :=
+  correct A _ _ _ :=
     (h A).trans (@DecisionProblem.iso_invariant (atomLang L) Q ((atomInterp L).Map A) A
       (FOInterpretation.mapStructure (atomInterp L) A) (atomStructure L A)
       (atomMapEquiv A)).symm
@@ -1119,8 +1114,8 @@ end Flatten
 
 /-! ### The theorem -/
 
-/-- **Every `∃SO[new]`-definable problem admits an ordered first-order reduction
-to an `∃SO[new]`-definable problem over a relational vocabulary.**
+/-- **Every `∃SO[new]`-definable problem admits a first-order reduction to an
+`∃SO[new]`-definable problem over a relational vocabulary.**
 
 The relational vocabulary is the atomic diagram language
 `DescriptiveComplexity.atomLang`, and the reduction is the identity on the
@@ -1136,10 +1131,10 @@ hardness result for all of them, which is what
 theorem exists_relational_of_sigmaSONewDefinable {L : Language.{0, 0}}
     {P : DecisionProblem L} (h : SigmaSONewDefinable P) :
     ∃ (L' : Language.{0, 0}) (hrel : L'.IsRelational) (Q : DecisionProblem L'),
-      SigmaSONewDefinable Q ∧ Nonempty (@OrderedFOReduction L L' hrel P Q) := by
+      SigmaSONewDefinable Q ∧ Nonempty (@FOReduction L L' hrel P Q) := by
   obtain ⟨B, φ, hφ⟩ := sigmaSONewDefinable_junk h
   exact ⟨atomLang L, atomLang_isRelational, relProblem B φ,
     sigmaSONewDefinable_relProblem B φ,
-    ⟨atomReduction P (relProblem B φ) fun A _ _ _ _ => relProblem_iff φ hφ⟩⟩
+    ⟨atomReduction P (relProblem B φ) fun A _ _ _ => relProblem_iff φ hφ⟩⟩
 
 end DescriptiveComplexity

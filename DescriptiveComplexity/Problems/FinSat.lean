@@ -72,7 +72,7 @@ theorem finsat_hard_of_sigmaSONewDefinable :
   obtain ⟨L', hrel, Q', hQ', ⟨f⟩⟩ := exists_relational_of_sigmaSONewDefinable hQ
   haveI := hrel
   obtain ⟨g⟩ := FinSat.finsat_hard_of_sigmaSONewDefinable Q' hQ'
-  exact ⟨f.toRel.trans g.toRel⟩
+  exact ⟨f.toOrdered.toRel.trans g.toRel⟩
 
 /-- **Trakhtenbrot's theorem, in the logical form**: finite satisfiability of a
 first-order sentence is RE-complete.

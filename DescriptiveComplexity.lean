@@ -595,8 +595,8 @@ individual declarations are documented on their own pages.
   complete problem is finite satisfiability, by Trakhtenbrot's theorem
   (`DescriptiveComplexity.Problems.FinSat`); PCP is planned in `ROADMAP.md`.
 * `DescriptiveComplexity.Relationalize` – **removing function symbols from a
-  source**: every `∃SO[new]`-definable problem admits an ordered first-order
-  reduction to an `∃SO[new]`-definable problem over a *relational* vocabulary
+  source**: every `∃SO[new]`-definable problem admits a first-order reduction to
+  an `∃SO[new]`-definable problem over a *relational* vocabulary
   (`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable`), the
   **atomic diagram language** `DescriptiveComplexity.atomLang` – one relation
   symbol of arity `n` per atomic formula of the source in `n` variables. A
