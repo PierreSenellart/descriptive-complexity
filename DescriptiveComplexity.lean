@@ -54,6 +54,7 @@ import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
 import DescriptiveComplexity.PSpaceCompl
+import DescriptiveComplexity.PSpaceHierarchy
 import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -499,9 +500,10 @@ individual declarations are documented on their own pages.
   closure, with the complement operator `DescriptiveComplexity.coPSPACE` and the
   hardness discharge `DescriptiveComplexity.PSPACE_hard_of_sotcDefinable`. What is
   immediate is `DescriptiveComplexity.NP_subset_PSPACE`: an existential block is
-  the walk that guesses its state and takes no step. Two things are *not* free:
+  the walk that guesses its state and takes no step. Two things are *not* free –
   `PSPACE = coPSPACE`, since the complement of a walk is not a walk, and
-  `PH ⊆ PSPACE`, since a `Σₖ` sentence is not a walk either.
+  `PH ⊆ PSPACE`, since a `Σₖ` sentence is not a walk either – and both are proved
+  downstream, in the two files below.
 * `DescriptiveComplexity.PSpaceCompl` – **`PSPACE = coPSPACE`**
   (`DescriptiveComplexity.PSPACE_eq_coPSPACE`), the first of those two, proved
   downstream once QSAT is available: every SO(TC) definable problem reduces to
@@ -513,6 +515,20 @@ individual declarations are documented on their own pages.
   logical shadow of the machine-theoretic reason: space-bounded computation can
   be made deterministic, and a deterministic decider is complemented by flipping
   its answer.
+* `DescriptiveComplexity.PSpaceHierarchy` – **`PH ⊆ PSPACE`**
+  (`DescriptiveComplexity.PH_subset_PSPACE`), the other one, by alternating that
+  complement with the second closure property of SO(TC): a walk can *guess a
+  block into its own state and never touch it again*
+  (`DescriptiveComplexity.SOTCDefinable.exBlock`), so `∃R̄` in front of an SO(TC)
+  condition is again one. The state of the guessing walk is an assignment of the
+  merged block, and its transition sentence adds one universally quantified
+  equivalence per relation variable of the guessed block, saying that component
+  is unchanged; a whole walk therefore keeps it fixed, which is what makes
+  accepting mean “the inner walk accepts under some assignment of it”. Peeling
+  the quantifier prefix one block at a time, existential blocks by that closure
+  and universal ones by complementing twice around it, gives every `Σₖ` and every
+  `Πₖ` level (`DescriptiveComplexity.sigmaP_subset_PSPACE`,
+  `DescriptiveComplexity.piP_subset_PSPACE`).
 
 ## Value invention, towards the recursively enumerable
 

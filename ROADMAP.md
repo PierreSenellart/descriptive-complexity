@@ -127,8 +127,11 @@ in `ClauseDischarge.lean`); the discharges still to do:
   analysis. The `∀b_ℓ`-with-a-fresh-copy form of the level gadget keeps the
   matrix clausal, so no Tseitin encoding appears anywhere.
 
-  Downstream in turn: `PH ⊆ PSPACE` through it, and game problems (Generalized
-  Geography…) [L each, gadget-heavy].
+  Downstream, and now also done: `PSPACE = coPSPACE` (`PSpaceCompl.lean`) and
+  `PH ⊆ PSPACE` (`PSpaceHierarchy.lean`). Still downstream: the machine bridge
+  for PSPACE — the same `TMData` with the step bound dropped, space being
+  bounded by construction since the tape is indexed by the positions — and the
+  game problems (Generalized Geography…) [L each, gadget-heavy].
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
@@ -157,9 +160,9 @@ in `ClauseDischarge.lean`); the discharges still to do:
   `NP ⊆ PSPACE` (an existential block is the walk that guesses and stops) and
   the discharge shape `PSPACE_hard_of_sotcDefinable`. `PSPACE = coPSPACE` is
   now done (`PSpaceCompl.lean`), through QSAT: reduce to QSAT and read its
-  *deterministic* evaluation walk backwards. Still open: `PH ⊆ PSPACE`, which is
-  not a syntactic inclusion either and is expected to come through the same
-  door — see the entry in §3 below. Note: no
+  *deterministic* evaluation walk backwards. So is `PH ⊆ PSPACE`
+  (`PSpaceHierarchy.lean`), by alternating that complement with the closure of
+  SO(TC) under prefixing a guessed block. Note: no
   fragment of *plain* SO can play this role: SO = PH (Fagin/Stockmeyer), so an
   SO fragment capturing PSPACE would collapse PH; some iteration/recursion
   operator is unavoidable.
@@ -757,7 +760,9 @@ blocked.
 3. **PSPACE**: SO(TC), the class, and SUCCINCT-REACH's PSPACE-completeness are
    **done**, and so are QSAT (membership by the depth-first game walk, hardness
    by recursive doubling from SUCCINCT-REACH) and `PSPACE = coPSPACE` through
-   it; next is `PH ⊆ PSPACE`; afterwards FO(PFP)/FO(LFP) as the
+   it and `PH ⊆ PSPACE`; next is the machine bridge for the class (the `TMData`
+   of the NP/PTIME bridge with the step bound dropped, which is already a
+   space-bounded model), then FO(PFP)/FO(LFP) as the
    textbook-faithfulness layer and Immerman–Vardi.
 
 **Running alongside, from the start:**

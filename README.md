@@ -143,9 +143,9 @@ user is most likely to want:
 
 * **More complete problems for PSPACE.** The class exists, defined by SO(TC)
   like the others and closed under FO reductions like the others, with
-  `NP ⊆ PSPACE` and two complete problems, SUCCINCT-REACH and QSAT. What is
-  planned next is `PH ⊆ PSPACE` through QSAT, plus the game problems
-  (Generalized Geography…).
+  `NP ⊆ PSPACE`, two complete problems (SUCCINCT-REACH and QSAT), `PSPACE =
+  coPSPACE` and `PH ⊆ PSPACE`. What is planned next is the machine bridge for
+  the class, plus the game problems (Generalized Geography…).
 * **Complexity classes beyond PSPACE**, up toward EXPTIME/EXPSPACE, via the
   fixpoint logics that capture them (FO(PFP)/SO(LFP)) and their complete
   problems, each with a machine bridge as for NP and PTIME – the

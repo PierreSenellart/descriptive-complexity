@@ -42,11 +42,14 @@ assumed (see `DescriptiveComplexity.Machines`).
   walk that decides QSAT is deterministic, so reading its answer the other way
   round decides the complement.
 * **PH ⊆ PSPACE** is not a syntactic inclusion either: a `Σₖ` sentence is not a
-  walk. What *is* immediate is the bottom of the tower, `NP ⊆ PSPACE`
-  (`DescriptiveComplexity.NP_subset_PSPACE`): an existential block is a walk that
-  guesses its state in one step and then stops, so `Σ₁`-definability is SO(TC)
-  definability with an empty transition relation. Everything below NP follows
-  by composition.
+  walk. It too is proved downstream, in `DescriptiveComplexity.PSpaceHierarchy`,
+  by alternating that complement with the other closure property of SO(TC) – a
+  walk can guess a block into its own state and never touch it again – along the
+  quantifier prefix. What *is* immediate here is the bottom of the tower,
+  `NP ⊆ PSPACE` (`DescriptiveComplexity.NP_subset_PSPACE`): an existential block
+  is a walk that guesses its state in one step and then stops, so
+  `Σ₁`-definability is SO(TC) definability with an empty transition relation.
+  Everything below NP follows by composition.
 -/
 
 namespace DescriptiveComplexity
