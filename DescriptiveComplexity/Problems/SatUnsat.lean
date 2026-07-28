@@ -42,9 +42,12 @@ does too; `Σ₁`-definability of the first half and `Π₁`-definability of the
 second then come from `DescriptiveComplexity.sat_sigmaSODefinable` by closure of the
 levels under FO reductions, the second after complementing the reduction.
 
-**DP-hardness is not formalized**: it needs the Cook–Levin discharge and its
-complement run side by side into a single paired instance (see the note in
-`DescriptiveComplexity.Difference`).
+**DP-hardness** is in `DescriptiveComplexity.Problems.SatUnsat.Hardness`
+(`DescriptiveComplexity.satUnsat_hard_of_dpDefinable`, whence
+`DescriptiveComplexity.SATUNSAT_DP_complete`): the Cook–Levin discharge of the `Σ₁`
+half and that of the complement of the `Π₁` half, run side by side into a
+single paired instance. The lemma below on satisfiability along a
+clause-covering embedding is the step it needs.
 -/
 
 namespace FirstOrder

@@ -27,10 +27,11 @@ to the other side; the upper bounds merge `(∃X. φ) ∧ (∀Y. ψ)` into the s
 alternation `∃X ∀Y. (φ ∧ ψ)`, which is sound in both block orders because
 neither kernel mentions the other's variables.
 
-What is *not* here yet is the canonical DP-complete problem, SAT-UNSAT
-([Papadimitriou & Yannakakis 1984][papadimitriou1984complexity]): it needs the
-Cook–Levin discharge and its complement run side by side into one paired-CNF
-instance.
+The canonical DP-complete problem, SAT-UNSAT ([Papadimitriou & Yannakakis
+1984][papadimitriou1984complexity]), lives in
+`DescriptiveComplexity.Problems.SatUnsat`: its hardness runs the Cook–Levin
+discharge of the `Σ₁` half and that of the complement of the `Π₁` half side by
+side into one paired-CNF instance.
 
 ## Why closure needs the order-elimination lemma
 

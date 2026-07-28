@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.Problems.SatUnsat
 import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Problems.SatUnsat.Hardness
 import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut
 import DescriptiveComplexity.Problems.HornSat

@@ -176,9 +176,12 @@ individual declarations are documented on their own pages.
   elimination of `DescriptiveComplexity.SecondOrderOrdered`. The upper bounds
   `DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` merge the two kernels into one alternation, in either block
   order. SAT-UNSAT, the canonical DP problem, is defined in
-  `DescriptiveComplexity.Problems.SatUnsat` and proved to be *in* DP by projecting
-  each of its two sides onto a plain CNF instance and inheriting definability
-  from SAT; its DP-hardness is not yet formalized.
+  `DescriptiveComplexity.Problems.SatUnsat` and proved DP-complete: *in* DP by
+  projecting each of its two sides onto a plain CNF instance and inheriting
+  definability from SAT, and DP-hard in
+  `DescriptiveComplexity.Problems.SatUnsat.Hardness` by running the Cook–Levin
+  discharge of the `Σ₁` half and of the complement of the `Π₁` half side by side
+  into one paired instance.
 
 * `DescriptiveComplexity.FixedPoint` – FO(LFP) ([Immerman
   1986][immerman1986relational]; [Vardi 1982][vardi1982complexity]), in the same
@@ -357,7 +360,7 @@ reduction and certificate in full.
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn (existential second-order Horn), proved equivalent to FO(LFP) – [Grädel 1992][gradel1992capturing]; [Immerman 1986][immerman1986relational], [Vardi 1982][vardi1982complexity] | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO, existential second-order logic ([Fagin 1974][fagin1974generalized]); equivalently acceptance by a nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO, universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
-| `DP` | a `Σ₁` and a `Π₁` sentence conjoined: a difference of NP problems ([Papadimitriou & Yannakakis 1984][papadimitriou1984complexity]); `NP ∪ coNP ⊆ DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` | — (SAT-UNSAT not yet formalized) |
+| `DP` | a `Σ₁` and a `Π₁` sentence conjoined: a difference of NP problems ([Papadimitriou & Yannakakis 1984][papadimitriou1984complexity]); `NP ∪ coNP ⊆ DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ` | SAT-UNSAT |
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order blocks, existential first ([Stockmeyer 1976][stockmeyer1976polynomial]) | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — |
@@ -424,6 +427,16 @@ Headline results and cross-references:
   ([Stockmeyer 1976][stockmeyer1976polynomial]; [Wrathall
   1976][wrathall1976complete]) by the same Tseitin discharge carrying block
   marks.
+* **Between NP and the second level**: SAT-UNSAT – is the first of two CNF
+  formulas satisfiable and the second not? – is DP-complete
+  (`DescriptiveComplexity.SATUNSAT_DP_complete`; [Papadimitriou & Yannakakis
+  1984][papadimitriou1984complexity]). Membership is the shape of the problem
+  itself; hardness runs *two* Cook–Levin discharges, one for the `Σ₁` half and
+  one for the complement of the `Π₁` half, side by side into a single paired
+  instance. Pairing forces a common universe, so each side's tuples are pinned
+  to canonically padded ones: with the spare coordinates left free, every clause
+  and variable would acquire copies and an unsatisfiable formula could blow up
+  into a satisfiable one.
 
 ## Worked examples
 
