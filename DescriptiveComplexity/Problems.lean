@@ -36,6 +36,7 @@ import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner
 import DescriptiveComplexity.Problems.Qbf
+import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.SuccinctReach
 import DescriptiveComplexity.Problems.Machine
 

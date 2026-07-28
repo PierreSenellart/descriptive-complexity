@@ -92,7 +92,7 @@ for its class: both a member and hard for it under FO reductions. Karp's
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — | — |
-| **PSPACE** | SO(TC): second-order logic with a transitive closure taken over assignments of a block of relation variables | — | SUCCINCT-REACH (reachability in a transition system given by three CNF formulas over marked state variables) |
+| **PSPACE** | SO(TC): second-order logic with a transitive closure taken over assignments of a block of relation variables | — | SUCCINCT-REACH (reachability in a transition system given by three CNF formulas over marked state variables) · QSAT (quantified Boolean formulas, the prefix carried by the instance) |
 | **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
 
 The characterizations are the logical *definitions* of the classes (see the
@@ -143,10 +143,9 @@ user is most likely to want:
 
 * **More complete problems for PSPACE.** The class exists, defined by SO(TC)
   like the others and closed under FO reductions like the others, with
-  `NP ⊆ PSPACE` and a first complete problem, SUCCINCT-REACH. What is planned is
-  QSAT (unbounded-alternation quantified Boolean formulas), downstream of
-  SUCCINCT-REACH by the recursive-doubling argument, and then `PH ⊆ PSPACE`
-  through it, plus the game problems (Generalized Geography…).
+  `NP ⊆ PSPACE` and two complete problems, SUCCINCT-REACH and QSAT. What is
+  planned next is `PH ⊆ PSPACE` through QSAT, plus the game problems
+  (Generalized Geography…).
 * **Complexity classes beyond PSPACE**, up toward EXPTIME/EXPSPACE, via the
   fixpoint logics that capture them (FO(PFP)/SO(LFP)) and their complete
   problems, each with a machine bridge as for NP and PTIME – the

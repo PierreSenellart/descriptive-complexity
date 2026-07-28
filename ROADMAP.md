@@ -94,10 +94,41 @@ in `ClauseDischarge.lean`); the discharges still to do:
   copies into the doubled block, one copy into its first half, and a merge of
   the two order symbols the Tseitin builders leave behind when their base
   vocabulary is already ordered.
-- **PSPACE: QSAT** [L]: unbounded-alternation QBF, downstream of the above by
-  the recursive-doubling (Savitch) construction as an FO interpretation, which
-  is why it is no longer the first target. Downstream in turn: game problems
-  (Generalized Geography…) [L each, gadget-heavy].
+- **PSPACE: QSAT** [**done**]: unbounded-alternation QBF, i.e. the quantifier
+  prefix carried by the instance (`Problems/Qsat/`, `QSAT_PSPACE_complete`).
+  The vocabulary is that of SAT plus a variable mark, a polarity mark and a
+  prefix order (`Defs.lean`); the semantics is the *game* on positions
+  `(played set, valuation)` as an inductive predicate – so that it is defined on
+  an arbitrary structure, the recursion along the prefix having nowhere else to
+  live – and its three rules are equivalences by inversion alone, uniqueness of
+  the next variable being what makes them exclusive.
+
+  Membership (`Membership.lean`, `qsat_sotcDefinable`): the walk is the
+  depth-first evaluation of the game tree, whose stack is the *set* of played
+  variables, i.e. one monadic relation variable; short-circuiting the evaluation
+  (pop as soon as the value returned settles the node) removes the accumulator
+  and leaves only four transitions. The walk is *deterministic*, which is what
+  gives the converse direction: the returning state at the empty position is a
+  dead end, two dead ends reachable from one state coincide, so an accepting
+  walk has to be the run.
+
+  Hardness is Savitch's recursive doubling from SUCCINCT-REACH, as an ordered
+  (not relativized – junk tuples are left unmarked, hence neither variables nor
+  clauses) interpretation of dimension 2. Three things carry it. `Savitch.lean`
+  states the doubling for a relation whose vertices are known only up to a
+  classifying map into a finite type, because a state is a predicate on the whole
+  universe but the clauses read it only on the state variables; the pigeonhole
+  then runs on the classes. `Blocks.lean` reads the prefix one quantifier per
+  block of like polarity instead of one per variable, and the prefix built by the
+  reduction is a lexicographic comparison of *static* keys, so its blocks are
+  exactly the variables sharing a key prefix and each peeling step is a
+  computation on those. Each clause carries a fixed *literal list* rather than a
+  match on pairs of tags, so one realization lemma replaces a 21 × 10 case
+  analysis. The `∀b_ℓ`-with-a-fresh-copy form of the level gadget keeps the
+  matrix clausal, so no Tseitin encoding appears anywhere.
+
+  Downstream in turn: `PH ⊆ PSPACE` through it, and game problems (Generalized
+  Geography…) [L each, gadget-heavy].
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
@@ -722,8 +753,8 @@ blocked.
    closed it (`TransitiveClosureDet.lean`, `TransitiveClosurePull.lean`,
    `DetLogSpace.lean`, `Problems/ReachabilityDet.lean`).
 3. **PSPACE**: SO(TC), the class, and SUCCINCT-REACH's PSPACE-completeness are
-   **done**; next is QSAT by recursive doubling (as a reduction from
-   SUCCINCT-REACH, both sides being concrete propositional objects), then
+   **done**, and so is QSAT (membership by the depth-first game walk, hardness
+   by recursive doubling from SUCCINCT-REACH); next is
    `PH ⊆ PSPACE` through it, and `PSPACE = coPSPACE` (Savitch) which no
    syntactic argument gives; afterwards FO(PFP)/FO(LFP) as the
    textbook-faithfulness layer and Immerman–Vardi.

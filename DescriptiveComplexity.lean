@@ -596,7 +596,7 @@ reduction and certificate in full.
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — | — |
-| `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | — | SUCCINCT-REACH |
+| `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | — | SUCCINCT-REACH · QSAT |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
 
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
@@ -714,6 +714,30 @@ Headline results and cross-references:
   the interpreted system is therefore an assignment of the block and nothing
   else, and the two walks correspond step by step, with no initialization or
   finalization steps to peel off.
+* **At PSPACE, again**: QSAT (`DescriptiveComplexity.Problems.Qsat`) – is a fully
+  quantified Boolean formula true, when the quantifier prefix is *part of the
+  instance* rather than fixed by the problem? – is PSPACE-complete
+  (`DescriptiveComplexity.QSAT_PSPACE_complete`; [Stockmeyer–Meyer
+  1973][stockmeyer1973word]). That an instance carries its own prefix is exactly
+  the step from the polynomial hierarchy to PSPACE, and it is what the semantics
+  has to pay for: a position is a set of already-quantified variables together
+  with a valuation, the next variable to play is the least unplayed one, and the
+  game value is an inductive predicate rather than a recursion, so that it is
+  defined on infinite structures too. Membership walks that game tree
+  depth-first, short-circuiting so that no accumulator is needed – four relation
+  variables and four transitions. Hardness is Savitch's recursive doubling
+  ([Savitch 1970][savitch1970relationships]) written as an interpretation:
+  reachability in at most `2 ^ m` steps, `m` the number of state variables of a
+  SUCCINCT-REACH instance, unfolds into a prefix of `m` blocks `∃Z_ℓ ∀b_ℓ
+  ∃(U_ℓ, V_ℓ)`, the universal bit choosing which half of the level is checked and
+  a *fresh copy* of the pair receiving it – which is what keeps the matrix
+  clausal, so that no Tseitin encoding is needed anywhere. Two things make the
+  proof go through: the vertices of the walk are states only up to their
+  restriction to the state variables, which is why `DescriptiveComplexity.Savitch`
+  is stated for a relation classified into a finite type; and the prefix is a
+  lexicographic comparison of static keys, so that its blocks are the sets of
+  variables sharing the first three components of a key and the peeling lemmas of
+  `DescriptiveComplexity.Problems.Qsat.Blocks` apply level by level.
 * **Between NP and the second level**: SAT-UNSAT – is the first of two CNF
   formulas satisfiable and the second not? – is DP-complete
   (`DescriptiveComplexity.SATUNSAT_DP_complete`; [Papadimitriou & Yannakakis
