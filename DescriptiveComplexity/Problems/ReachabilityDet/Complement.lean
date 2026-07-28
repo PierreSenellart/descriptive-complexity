@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.ReachabilityDet
 import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.WalkBudget
 
 /-!
 # UNREACHd, and `L = coL`
@@ -70,77 +71,31 @@ theorem detEdge_unique {x y z : A} (hy : DetEdge x y) (hz : DetEdge x z) : y = z
 outgoing arc at all, or it has several. -/
 def Stuck (x : A) : Prop := ¬∃ y, DetEdge x y
 
-open Classical in
 /-- The successor map of the deterministic walk: the endpoint of the forced arc
-out of `x`, and `x` itself where the walk is stuck. Making it total is what
-lets reachability be read as iteration. -/
-noncomputable def detNext (x : A) : A :=
-  if h : ∃ y, DetEdge x y then h.choose else x
+out of `x`, and `x` itself where the walk is stuck – the walk of the forced arcs
+read as an iterated function, `DescriptiveComplexity.stepNext`. Making it total is
+what lets reachability be read as iteration. -/
+noncomputable def detNext (x : A) : A := stepNext DetEdge x
 
-theorem detEdge_detNext {x : A} (h : ¬Stuck x) : DetEdge x (detNext x) := by
-  rw [Stuck, not_not] at h
-  rw [detNext, dif_pos h]
-  exact h.choose_spec
+theorem detEdge_detNext {x : A} (h : ¬Stuck x) : DetEdge x (detNext x) :=
+  step_stepNext (not_not.mp h)
 
-theorem detNext_eq_self {x : A} (h : Stuck x) : detNext x = x := by
-  rw [detNext, dif_neg h]
+theorem detNext_eq_self {x : A} (h : Stuck x) : detNext x = x := stepNext_eq_self h
 
 theorem detNext_eq {x y : A} (h : DetEdge x y) : detNext x = y :=
-  detEdge_unique (detEdge_detNext (fun hs => hs ⟨y, h⟩)) h
+  stepNext_eq (fun _ _ _ hv hw => detEdge_unique hv hw) h
 
 /-- **Reachability along forced arcs is iteration of the successor map.** -/
 theorem reflTransGen_detEdge_iff_iterate (s t : A) :
-    Relation.ReflTransGen DetEdge s t ↔ ∃ n, detNext^[n] s = t := by
-  constructor
-  · intro h
-    induction h with
-    | refl => exact ⟨0, rfl⟩
-    | @tail b c _ hbc ih =>
-      obtain ⟨n, hn⟩ := ih
-      exact ⟨n + 1, by rw [Function.iterate_succ_apply', hn, detNext_eq hbc]⟩
-  · rintro ⟨n, rfl⟩
-    induction n with
-    | zero => exact Relation.ReflTransGen.refl
-    | succ m ih =>
-      rw [Function.iterate_succ_apply']
-      by_cases hs : Stuck (detNext^[m] s)
-      · rw [detNext_eq_self hs]
-        exact ih
-      · exact ih.tail (detEdge_detNext hs)
+    Relation.ReflTransGen DetEdge s t ↔ ∃ n, detNext^[n] s = t :=
+  reach_iff_iterate (R := DetEdge) (fun _ _ _ hv hw => detEdge_unique hv hw) s t
 
 /-- **The step budget**: a vertex reachable along forced arcs is reachable in
-fewer steps than the universe has elements. Taking a minimal number of steps
-makes the vertices visited on the way distinct. -/
-theorem exists_iterate_lt_card [Finite A] {s t : A} (h : ∃ n, detNext^[n] s = t) :
-    ∃ n, n < Nat.card A ∧ detNext^[n] s = t := by
-  classical
-  refine ⟨Nat.find h, ?_, Nat.find_spec h⟩
-  set n := Nat.find h with hn
-  have hinj : Function.Injective fun i : Fin (n + 1) => detNext^[(i : ℕ)] s := by
-    intro i j hij
-    by_contra hne
-    have hne' : (i : ℕ) ≠ (j : ℕ) := fun he => hne (Fin.ext he)
-    -- the smaller index can be spliced out of the walk, contradicting minimality
-    have key : ∀ p q : Fin (n + 1), (p : ℕ) < (q : ℕ) →
-        (detNext^[(p : ℕ)] s = detNext^[(q : ℕ)] s) → False := by
-      intro p q hpq hval
-      have hsplice : detNext^[n - (q : ℕ) + (p : ℕ)] s = t := by
-        have : detNext^[n - (q : ℕ)] (detNext^[(p : ℕ)] s) =
-            detNext^[n - (q : ℕ)] (detNext^[(q : ℕ)] s) := by rw [hval]
-        rw [← Function.iterate_add_apply, ← Function.iterate_add_apply] at this
-        rw [this]
-        have hq : n - (q : ℕ) + (q : ℕ) = n := Nat.sub_add_cancel (Nat.lt_succ_iff.mp q.isLt)
-        rw [hq]
-        exact Nat.find_spec h
-      have hlt : n - (q : ℕ) + (p : ℕ) < n := by
-        have hq : (q : ℕ) ≤ n := Nat.lt_succ_iff.mp q.isLt
-        omega
-      exact absurd hsplice (Nat.find_min h hlt)
-    rcases Nat.lt_or_ge (i : ℕ) (j : ℕ) with hlt | hge
-    · exact key i j hlt hij
-    · exact key j i (lt_of_le_of_ne hge fun he => hne' he.symm) hij.symm
-  have hcard : Nat.card (Fin (n + 1)) ≤ Nat.card A := Nat.card_le_card_of_injective _ hinj
-  simpa using hcard
+fewer steps than the universe has elements – the machine-free
+`DescriptiveComplexity.exists_iterate_lt_card`, read for the forced arcs. -/
+theorem exists_iterate_detNext_lt_card [Finite A] {s t : A} (h : ∃ n, detNext^[n] s = t) :
+    ∃ n, n < Nat.card A ∧ detNext^[n] s = t :=
+  exists_iterate_lt_card (R := DetEdge) h
 
 end Walk
 
@@ -597,7 +552,7 @@ theorem inv_step {a b : Bool × (Fin 3 → A)} (h : UStep a b) (hinv : Inv a) : 
       · rintro - hbad
         obtain ⟨-, t, ht, hp⟩ := hbad
         obtain ⟨n, hn, hit⟩ :=
-          exists_iterate_lt_card ((reflTransGen_detEdge_iff_iterate _ _).mp hp)
+          exists_iterate_detNext_lt_card ((reflTransGen_detEdge_iff_iterate _ _).mp hp)
         refine ⟨t, n, ht, ?_, ?_⟩
         · rw [orank_of_isMinA hmin2]
           omega
@@ -620,7 +575,8 @@ theorem inv_of_isSrc {a : unreachdSpec.Node A} (h : unreachdSpec.IsSrc a) : Inv 
     fun hf => Bool.noConfusion (h0.symm.trans hf)⟩
   rintro - hbad
   obtain ⟨-, t, ht, hp⟩ := hbad
-  obtain ⟨n, hn, hit⟩ := exists_iterate_lt_card ((reflTransGen_detEdge_iff_iterate _ _).mp hp)
+  obtain ⟨n, hn, hit⟩ :=
+    exists_iterate_detNext_lt_card ((reflTransGen_detEdge_iff_iterate _ _).mp hp)
   refine ⟨t, n, ht, ?_, ?_⟩
   · rw [orank_of_isMinA hmin2]
     omega

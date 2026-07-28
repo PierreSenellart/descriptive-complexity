@@ -410,7 +410,7 @@ The concrete items:
   the budget. Membership in `Σₖᵖ` reuses the membership clauses per phase with
   `SecondOrderMerge.lean` as block bookkeeping; hardness from `QBF k` by the
   SAT machine with `k` guess sweeps; `Πₖᵖ` free by swapping the marks.
-- **L and NL: the Turing model is the wrong one** [L, ~2.5–4.5k for both].
+- **L and NL: the Turing model is the wrong one** [done].
   As machine-as-data these are cheap for a bad reason: a logspace
   configuration is a constant-length tuple of elements, the configuration
   space is polynomial, and acceptance is REACH up to renaming — true, easy,
@@ -418,13 +418,131 @@ The concrete items:
   variables range over and *local* input access (else the FO-definable table
   smuggles in the whole input). The right model: a **fixed finite control
   with `k` two-way heads** on universe elements, no work tape, reading only
-  the atomic type of its head tuple; determinism vs. nondeterminism is then L
-  vs. NL, mirroring FO(DTC) vs. FO(TC). The machine is Lean-level data, so
-  the statement is a **capture theorem**
-  (`TCDefinable P ↔ ∃ k s (M : Automaton L k s), ∀ A, P A ↔ M.Accepts A`) —
-  no reductions, no string encoding. Machine → logic is near-trivial (the
-  configuration graph is FO-definable, acceptance its TC); logic → machine is
-  the evaluator in its friendliest form (heads only, no addressing).
+  quantifier-free tests of its head tuple; determinism vs. nondeterminism is
+  then L vs. NL, mirroring FO(DTC) vs. FO(TC). The machine is Lean-level data,
+  so the statement is a **capture theorem**
+  (`TCDefinable P ↔ ∃ k (M : HeadAutomaton L k), ∀ A, P A ↔ M.Accepts A`) —
+  no reductions, no string encoding.
+  **Done: machine → logic** (`HeadAutomaton.lean`): the model, and
+  `tcDefinable_of_automaton` / `dtcDefinable_of_automaton` with their
+  `mem_NL_of_automaton` / `mem_LOGSPACE_of_automaton` corollaries. It is
+  near-trivial as predicted — a configuration *is* a `TCSpec.Node`, the control
+  being the mode — and determinism of the control lands on `TCSpec.det` through
+  `functional_toSpec`.
+  **Done: logic → machine, nondeterministically** — so the NL half is a capture
+  theorem on the nose: `tcDefinable_iff_automaton` and `mem_NL_iff_automaton`
+  (`HeadCapture.lean`), on top of two reusable layers.
+  1. `HeadProgram.lean` — the *assembly language*: the same machines with their
+     transitions presented one at a time, each with its own quantifier-free
+     guard, and with two exits so that fragments compose. A fragment's spec is
+     `Runs` (exact soundness, completeness up to the scratch heads); everything
+     is assembled with one combinator, `wireP` (a finite family of fragments,
+     one per node of a control graph), whose lemma `runs_wireP` reduces runs to
+     a *walk in the control graph*. The workhorse under it is
+     `Embeds.reach_cases`: a run that starts inside a fragment either is still
+     inside it or has left it by one of its exits. Two compilations back to
+     `HeadAutomaton` (all enabled transitions, or only the first — the latter
+     syntactically deterministic).
+  2. `HeadEval.lean` — the *evaluator*, and the surprise is how cheap it is once
+     quantifiers are *walked* rather than read: `decides_evalP` is a structural
+     recursion on the `BoundedFormula`, atoms being guards, implication a branch
+     (`iteP`), and a quantifier a sweep (`scanP`) of **two** fresh heads. Two,
+     not one, is the design point: the sweep must know when to stop, and "this
+     head is at the greatest element" is not a quantifier-free fact of one head,
+     while "these two heads are equal" is an atom — so one head walks and one is
+     parked at the maximum. No subroutine calculus was needed, and no
+     normalization to prenex or to quantifier-free specifications; the sweep is
+     proved by `order_induction_down` (added to `OrderWalk.lean`), the direction
+     that knows about the elements a walker has not yet reached. The evaluator
+     is deterministic, which is what makes it reusable for L.
+  The driver in `HeadCapture.lean` is then a control graph: pick a source mode
+  (a chain of free choices, since `wireP`'s wiring is a function of the exit
+  bool — that chain is how a nondeterministic *mode* choice is expressed), guess
+  the tuple and test the source formula, then loop {test the target formula and
+  accept; else pick a candidate mode, guess the candidate tuple, test the
+  transition formula, commit by copying}. Soundness is an invariant along the
+  control walk, completeness an induction along `TCSpec.Reach` with an escape
+  clause (if the target formula holds early, the machine has already accepted).
+  **Done: the deterministic capture** — `dtcDefinable_iff_automaton` and
+  `mem_LOGSPACE_iff_automaton`, `DTCDefinable P ↔ ∃ k (M) (hdet :
+  M.IsDeterministic), …`. What a deterministic driver adds is *search where the
+  nondeterministic one guesses*, and a bound on its own walk. Four layers:
+  - `WalkBudget.lean` — the two counting facts, both machine-free.
+    `stepNext`/`reach_iff_iterate` walk a functional relation as an iterated
+    function, and `exists_iterate_lt_card` is the pigeonhole that bounds it: a
+    reachable node is reachable in fewer steps than the type has elements, since
+    a shortest walk cannot repeat. `Ticks n z` says `n` covers are available
+    above `z` in a finite linear order, and `ticks_of_orank`/`ticks_bot` supply
+    them from `orank` — at the bottom, one tick short of the whole order. The
+    two meet by counting nodes and counter values with the same number.
+  - `HeadLex.lean` — the **odometer** `lexNextP`: the lexicographic successor of
+    the tuple on a block of heads, exiting `false` at the greatest tuple. The
+    chain walks the positions from the last and steps the first one that is not
+    at its greatest value, resetting those after it. Since "this head is at the
+    greatest element" is not a quantifier-free fact of one head, the block comes
+    with a **marker head** parked there and the test is the atom "these two heads
+    are equal"; accordingly `lexRel` is stated by the marker's *value*, an honest
+    description whatever the marker holds, and `tupSucc_of_lexRel` turns it into
+    `OrderWalk`'s `TupSucc` where the marker is known to be at the top — so the
+    scan becomes a walk along covers of `Lex (Fin n → A)` like any other.
+  - `HeadCaptureDet.lean` — **the machine, its soundness and its
+    completeness**. The machine: the control graph
+    `DetNode` (source scan, walk, candidate scan, commit, tick), its fragments
+    `dFam`, its arcs `dWire`, the four-block head layout (current tuple,
+    candidate, source, counter) with `dHeadAgree_iff` (the protected heads are
+    exactly the blocks and the marker), the relations `dRel` its fragments run —
+    all of them proved (`runs_dFam`) and local (`headLocal2_dRel`) — and the
+    invariant `dInv`: at any node of the walk phase the first block holds a node
+    reachable from a source, and at `commit` the candidate is one deterministic
+    step away. It is carried along every arc (`dInv_of_walk`), and at the
+    accepting arc it says the specification accepts (`accepts_of_dExit`). So the
+    machine provably never lies.
+    The **search for the successor** is proved in full, both ways. Over the
+    tuples of one mode: `scanFound` (if the current node's successor — unique, by
+    `det_step_iff` — is in the mode being tried, with a tuple at or above the
+    block's, the scan walks the block up to it and reaches `commit` holding it)
+    and `scanNone` (if there is none in that mode, the scan runs the block to its
+    greatest tuple and moves on), both inductions downwards along the
+    lexicographic order in the style of `decides_scanP`, resting on
+    `HeadLex.exists_lexRel_succ` and `lexRel_top` — that the odometer can always
+    step below the greatest tuple and exactly fails at it. Over the modes:
+    `modeFound` and `modeNone`, inductions on the number of mode indices left. So
+    from `candMode` the machine provably reaches `commit` holding the successor
+    when there is one and `srcNext` when there is none, leaving the current
+    tuple, the source and the counter alone in both cases.
+    One **step of the simulated walk** follows: `walkStep` — at a node that is
+    not accepting but has a successor, with a counter block that can still be
+    stepped, the machine tests the target formula, searches out the successor,
+    commits it onto the current block and ticks, arriving at `tgtTest` one node
+    along with the counter advanced by one in the lexicographic order.
+  - **Completeness**, and the one idea that made it short: read the counter as a
+    value of a *single* finite linear order, `dcount` — the index of its mode
+    lexicographically above the tuple on its block (`OrderWalk`'s
+    `prodLex_covBy_iff` and `finCovBy_iff` are that order's covering lemmas).
+    Then a tick *is* a cover (`dcount_covBy_tup` inside a mode,
+    `dcount_covBy_mode` across one), the order has exactly as many values as the
+    specification has nodes (`card_dcount`), and both inductions run along it.
+    `dTick` packages one tick; `walkAcc` — the walk reaching an accepting node
+    within the budget makes the machine accept — is an induction on the steps
+    left, `Ticks` supplying the cover at each; `walkOut` — whatever happens, the
+    machine accepts or comes back to `srcNext` with its source block untouched —
+    is an induction *downwards along the counter*, which is the termination
+    argument, with `dcount_of_isTop` (at the top the tuple is greatest and the
+    mode last, so `tickReset` falls through to the next source) and `walkStuck`
+    (nowhere to go: the chain of candidate modes is exhausted) as its two ends.
+    `srcEnum` then enumerates the sources downwards along the *same* order,
+    `srcTried` (`walkOut` with the `start` arc in front) returning to `srcNext`
+    and the odometer advancing the position by one cover. `accepts_dP` conjoins
+    the halves, and `compile true` — syntactically deterministic whatever the
+    guards, and agreeing with the program where they are exclusive, which
+    `deterministic_dP` says they are — gives the automaton.
+    Two notes for the next machine built this way. The budget is *exactly* tight:
+    a walk visits at most `card Node` nodes, so it takes at most `card Node - 1`
+    steps, and a counter with `card Node` values ticks exactly that often — there
+    is no slack to spend, which is why the counter has to carry a mode as well as
+    a tuple. And phrasing both inductions as `order_induction_down` over one
+    order, rather than as nested inductions over modes and tuples, is what keeps
+    the two walk arguments to a page each.
   Rejected models: registers (must legislate arithmetic; a head move *is* a
   step in the order), JAGs/pointer machines (lower-bound devices), branching
   programs (nonuniform). With BIT (§3), a circuit-family bridge (FO-uniform

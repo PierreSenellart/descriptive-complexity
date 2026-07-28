@@ -152,6 +152,35 @@ theorem order_induction {P : A → Prop} (hmin : ∀ z : A, (∀ a : A, z ≤ a)
     · obtain ⟨w, hwz, hnb⟩ := exists_succ_of_not_min hz
       exact hstep w z hwz hnb (ih w hwz)
 
+/-- In a finite linear order, an element that is not a maximum has an
+immediate successor. -/
+theorem exists_gt_of_not_max {z : A} (hz : ¬∀ a : A, a ≤ z) :
+    ∃ w : A, z < w ∧ ∀ a : A, ¬(z < a ∧ a < w) := by
+  classical
+  have := Fintype.ofFinite A
+  have hne : (Finset.univ.filter fun a : A => z < a).Nonempty := by
+    push Not at hz
+    obtain ⟨a, ha⟩ := hz
+    exact ⟨a, Finset.mem_filter.mpr ⟨Finset.mem_univ a, ha⟩⟩
+  refine ⟨(Finset.univ.filter fun a : A => z < a).min' hne, ?_, ?_⟩
+  · exact (Finset.mem_filter.mp ((Finset.univ.filter fun a : A => z < a).min'_mem hne)).2
+  · rintro a ⟨hza, haw⟩
+    exact absurd ((Finset.univ.filter fun a : A => z < a).min'_le
+      a (Finset.mem_filter.mpr ⟨Finset.mem_univ a, hza⟩)) (not_le.mpr haw)
+
+/-- Induction along a finite linear order, downwards: from the maximum, one
+immediate predecessor at a time. This is the direction a *scan* is proved
+correct in – a walk that stops at the greatest element knows about the elements
+above the one it stands on. -/
+theorem order_induction_down {P : A → Prop} (hmax : ∀ z : A, (∀ a : A, a ≤ z) → P z)
+    (hstep : ∀ w z : A, w < z → (∀ a : A, ¬(w < a ∧ a < z)) → P z → P w) (z : A) : P z := by
+  induction z using (Finite.to_wellFoundedGT (α := A)).wf.induction with
+  | _ z ih =>
+    by_cases hz : ∀ a : A, a ≤ z
+    · exact hmax z hz
+    · obtain ⟨w, hzw, hnb⟩ := exists_gt_of_not_max hz
+      exact hstep z w hzw hnb (ih w hzw)
+
 end Pred
 
 /-! ### The lexicographic successor of a tuple, coordinatewise -/

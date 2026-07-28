@@ -82,8 +82,8 @@ for its class: both a member and hard for it under FO reductions. Karp's
 
 | Complexity class | Logical characterization | Machine model | Problems proved complete |
 | --- | --- | --- | --- |
-| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | deterministic two-way `k`-head automaton † | REACHd · UNREACHd |
-| **NL** | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | two-way `k`-head automaton † | REACH · UNREACH · 2SAT |
+| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | deterministic two-way `k`-head automaton | REACHd · UNREACHd |
+| **NL** | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | two-way `k`-head automaton | REACH · UNREACH · 2SAT |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | **coNP** = Π₁ᵖ | ∀SO: universal second-order logic | — | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
@@ -92,10 +92,6 @@ for its class: both a member and hard for it under FO reductions. Karp's
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — | — |
 | **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
-
-† Only the machine-to-logic direction is proved for the logarithmic-space
-classes: recognition by such an automaton implies membership. The converse is on
-the roadmap.
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above).
@@ -146,9 +142,9 @@ user is most likely to want:
 * **Complexity classes beyond the polynomial hierarchy.** PSPACE, and up toward
   EXPTIME/EXPSPACE, via the transitive-closure and fixpoint logics that capture
   them (SO(TC), FO(PFP)/SO(LFP)) and their complete problems (QSAT), each with a
-  machine bridge as for NP and PTIME – a bridge the logarithmic-space classes,
-  already present, still have in only one direction. Below NP this also brings
-  the P-complete problems (Circuit Value, alternating reachability).
+  machine bridge as for NP and PTIME – the logarithmic-space classes already
+  have theirs, in both directions. Below NP this also brings the P-complete
+  problems (Circuit Value, alternating reachability).
 * **Undecidability, by reduction.** The class RE exists today, defined
   logically like the others as `∃SO[new]` (table above) and closed under FO
   reductions like the others. What is planned is its complete problems — finite

@@ -39,6 +39,13 @@ import DescriptiveComplexity.TransitiveClosureReach
 import DescriptiveComplexity.TransitiveClosureDet
 import DescriptiveComplexity.TransitiveClosurePull
 import DescriptiveComplexity.DetLogSpace
+import DescriptiveComplexity.HeadAutomaton
+import DescriptiveComplexity.HeadProgram
+import DescriptiveComplexity.HeadEval
+import DescriptiveComplexity.HeadCapture
+import DescriptiveComplexity.WalkBudget
+import DescriptiveComplexity.HeadLex
+import DescriptiveComplexity.HeadCaptureDet
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
@@ -342,6 +349,86 @@ individual declarations are documented on their own pages.
   its arcs. Both halves are cheaper than REACH's, whose membership needs
   Immerman–Szelepcsényi – the fragment asymmetry that forces it does not arise
   for an operator-based logic.
+* `DescriptiveComplexity.HeadAutomaton` – **the machine model of the
+  logarithmic-space level**, and the containment "machine ⊆ logic" for it. The
+  model is a *two-way `k`-head automaton over the structure*: a finite control,
+  `k` heads each holding an element of the universe, **no work tape**; a step
+  reads the truth values of a fixed finite list of **quantifier-free** tests of
+  the head positions (the `test_qf` field is what keeps the model a machine
+  rather than first-order logic in disguise) and moves each head to the least or
+  greatest element, to another head, or to the immediate successor or
+  predecessor of another head – a head at the last element moving right having
+  no successor, so the transition is disabled, as in
+  `DescriptiveComplexity.TMData`. It is deliberately *not* a one-way `DFA`/`NFA` over
+  an alphabet: the input is a structure and not a word, so such a machine would
+  have to be given a serialization, and one-way single-head machines recognize
+  only regular languages – the two-wayness and the `k` heads *are* the
+  logarithmic-space bound. A configuration is a control state with a `k`-tuple,
+  which is exactly a `DescriptiveComplexity.TCSpec.Node`, so an automaton compiles
+  into a specification whose modes are its states
+  (`DescriptiveComplexity.HeadAutomaton.toSpec`), whence
+  `DescriptiveComplexity.mem_NL_of_automaton` and, for a deterministic control,
+  `DescriptiveComplexity.mem_LOGSPACE_of_automaton`.
+* `DescriptiveComplexity.HeadProgram` – **the assembly language of those
+  machines**: the same model with its transitions presented one at a time, each
+  with its own quantifier-free guard and with two *exits*, so that machines can
+  be pasted together. A fragment's specification is
+  `DescriptiveComplexity.HeadProgram.Runs` – which exits are reachable, with which
+  head positions – split into an exact soundness half and a completeness half
+  that is up to the *scratch* heads, the ones a fragment may leave dirty.
+  Everything is built with one combinator,
+  `DescriptiveComplexity.HeadProgram.wireP`: a finite family of fragments, one per
+  node of a control graph. `DescriptiveComplexity.HeadProgram.runs_wireP` reduces the
+  runs of the assembly to a *walk in the control graph* whose steps are the runs
+  of the fragments, which is what every correctness proof downstream argues
+  about; its engine is
+  `DescriptiveComplexity.HeadProgram.Embeds.reach_cases`, that a run which starts
+  inside a fragment either is still inside it or has left it by one of its
+  exits. Two compilations back to `DescriptiveComplexity.HeadAutomaton` enable either
+  every transition whose guard holds or only the first, the latter being
+  syntactically deterministic whatever the guards.
+* `DescriptiveComplexity.HeadEval` – **a machine can decide any fixed first-order
+  formula of its head positions** (`DescriptiveComplexity.HeadProgram.decides_evalP`),
+  by structural recursion on the formula: atoms are guards, implication is a
+  branch, and a quantifier is a *sweep* of two fresh heads – one walking the
+  order from the least element, one parked at the greatest so that "the sweep is
+  over" is the atom "these two heads are equal". Quantifiers are thus not read
+  but walked, which is why quantifier-free guards cost nothing in expressive
+  power, and the sweep is deterministic
+  (`DescriptiveComplexity.HeadProgram.deterministic_evalP`).
+* `DescriptiveComplexity.HeadCapture` – **the capture theorem for NL**
+  (`DescriptiveComplexity.tcDefinable_iff_automaton`,
+  `DescriptiveComplexity.mem_NL_iff_automaton`): every FO(TC) definable problem is
+  recognized by a two-way multi-head automaton, so the machine model and the
+  logic define the same class. The machine keeps the walk's current tuple on one
+  block of heads and a candidate on another, holds the *mode* in its control –
+  where it must be, a one-element universe having only one tuple – and loops:
+  guess a source, evaluate the target formula, else guess a candidate, evaluate
+  the transition formula, commit. Guessing (a head walked up the order for a
+  nondeterministic number of steps) is the only nondeterminism. Soundness is an
+  invariant carried along the control walk – the current tuple is a node
+  reachable from a source – and completeness an induction along
+  `DescriptiveComplexity.TCSpec.Reach`.
+* `DescriptiveComplexity.HeadCaptureDet` – **the capture theorem for L**
+  (`DescriptiveComplexity.dtcDefinable_iff_automaton`,
+  `DescriptiveComplexity.mem_LOGSPACE_iff_automaton`): the same statement for FO(DTC)
+  and *deterministic* machines. A deterministic machine may not guess, so it
+  **searches** – the candidate tuple, the source tuple and the counter are each
+  a block of heads walked by the odometer of `DescriptiveComplexity.HeadLex`
+  (`lexNextP`, the lexicographic successor of a block, tested against a head
+  parked at the greatest element, since maximality of one head is not a
+  quantifier-free fact) – and it **counts**, so that a walk leading nowhere is
+  abandoned rather than followed around its cycle for ever. The budget is
+  `DescriptiveComplexity.WalkBudget`: a node reachable along a *functional* relation
+  is reachable in fewer steps than the type has elements, and a counter in a
+  finite linear order can tick as often as its rank leaves room. The two meet
+  because the machine's counter – a mode in the control above a tuple on a block –
+  *is* a finite linear order, whose covers are exactly its ticks and which has
+  exactly as many values as the specification has nodes. Soundness is again an
+  invariant along the control walk; completeness is the walk (an induction on the
+  steps left, on the budget) inside the source enumeration (an induction
+  downwards along the same order, the walk lemma supplying the return to the next
+  source when one leads nowhere).
 * `DescriptiveComplexity.Problems.ReachabilityDet.Complement` – **`L = coL`**
   (`DescriptiveComplexity.LOGSPACE_eq_coLOGSPACE`) and **UNREACHd is
   LOGSPACE-complete** (`DescriptiveComplexity.UNREACHd_LOGSPACE_complete`). Everything
@@ -457,18 +544,22 @@ for it – both a member and hard under FO reductions. The catalog covers all of
 Karp's 21 NP-complete problems. Each problem's own module page documents its
 reduction and certificate in full.
 
-| Complexity class | Logical characterization | Problems proved complete |
-| --- | --- | --- |
-| `LOGSPACE` (`L`) | FO(DTC): first-order logic with a deterministic transitive closure | REACHd · UNREACHd |
-| `NL` | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | REACH · UNREACH · 2SAT |
-| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | HORN-SAT |
-| `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
-| `DP` | a `Σ₁` and a `Π₁` sentence conjoined | SAT-UNSAT |
-| `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | `QBF k` – at `k = 1`, NP |
-| `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | `QBF∀ k` – at `k = 1`, coNP |
-| `PH` | full second-order logic | — |
-| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — |
+| Complexity class | Logical characterization | Machine model | Problems proved complete |
+| --- | --- | --- | --- |
+| `LOGSPACE` (`L`) | FO(DTC): first-order logic with a deterministic transitive closure | deterministic two-way `k`-head automaton † | REACHd · UNREACHd |
+| `NL` | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | two-way `k`-head automaton † | REACH · UNREACH · 2SAT |
+| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | deterministic polynomial-time Turing machine | HORN-SAT |
+| `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
+| `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | — | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
+| `DP` | a `Σ₁` and a `Π₁` sentence conjoined | — | SAT-UNSAT |
+| `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` – at `k = 1`, NP |
+| `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
+| `PH` | full second-order logic | — | — |
+| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
+
+† Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
+for `NL`, and `DescriptiveComplexity.mem_LOGSPACE_iff_automaton` for `LOGSPACE`,
+where the machine is required to be deterministic.
 
 Headline results and cross-references:
 
@@ -535,6 +626,18 @@ Headline results and cross-references:
   into an FO(TC) definition of the problem itself. UNREACH is then complete as
   well (`DescriptiveComplexity.UNREACH_NL_complete`), the two problems trading
   which half is the easy one.
+* **The logarithmic-space machine model, captured**
+  (`DescriptiveComplexity.mem_NL_iff_automaton`,
+  `DescriptiveComplexity.mem_LOGSPACE_iff_automaton`): a problem is in `NL` exactly
+  when a two-way `k`-head automaton over the structure recognizes it, and in
+  `LOGSPACE` exactly when a *deterministic* one does. There is no string
+  encoding anywhere: the machine reads the structure through quantifier-free
+  tests of its heads, and `k` head positions are the `k · log n` bits of
+  storage. The logic-to-machine half is a compiler – quantifiers are *walked*
+  by a two-head sweep rather than read – and its deterministic version is the
+  same machine with search in place of guessing and a step budget in place of
+  an oracle: the counter is a mode above a tuple, one finite linear order with
+  exactly as many values as the specification has nodes.
 * **Above NP**: TAUT (DNF tautology) is coNP-complete by complementing the
   Cook–Levin discharge, and its width-three restriction 3-DNF-TAUT
   (`DescriptiveComplexity.ThreeDnfTAUT_coNP_complete`) follows the same route
