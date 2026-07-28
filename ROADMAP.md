@@ -77,6 +77,26 @@ in `ClauseDischarge.lean`); the discharges still to do:
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
+- **DP: SAT-UNSAT's hardness** [M–L, ~400–600 lines]: the class `DP` exists
+  (`Difference.lean`), with `NP ∪ coNP ⊆ DP ⊆ Σ₂ᵖ ∩ Π₂ᵖ`, and SAT-UNSAT is
+  defined and *in* DP (`Problems/SatUnsat.lean`); what is missing is "every
+  DP-definable problem ordered-FO-reduces to SAT-UNSAT". The construction: from
+  `Q ≡ S ⊓ T` take the Cook–Levin discharge `f₁ : S ≤ᶠᵒ[≤] SAT` and
+  `f₂ : Tᶜ ≤ᶠᵒ[≤] SAT` (`T` being `Π₁`, its complement is `Σ₁`), and pair them
+  into one interpretation into `Language.satPair`: tags `f₁.Tag ⊕ f₂.Tag`,
+  dimension `max f₁.dim f₂.dim`, each side's three relations defined by that
+  side's formulas on its own tags and `⊥` on the other's.
+
+  **The hazard, worked out and worth not rediscovering:** the extra coordinates
+  of the shorter side must be pinned to a minimum with `Padding.lean`'s `Canon`
+  / `canonF`, with junk excluded from all six relations. Simply letting the
+  spare coordinates range freely is *unsound*, not merely wasteful: every
+  clause and every variable then acquires `|A|^(dim−dᵢ)` copies, each clause
+  copy containing *all* copies of each of its variables, and the blow-up can be
+  satisfiable when the original is not – the unsatisfiable `{x}, {¬x}` blows up
+  to `(x₁ ∨ x₂ ∨ …) ∧ (¬x₁ ∨ ¬x₂ ∨ …)`, satisfiable as soon as there are two
+  copies. Canonical padding restores the bijection with the original points and
+  the correctness proof goes through side by side.
 - **L: REACHd** [M]: outdegree-≤1 reachability, complete for FO(DTC).
 - **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
   SO(TC)-definable (equivalently FO(PFP)-definable) problem ordered-FO-reduces
