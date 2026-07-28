@@ -3,8 +3,9 @@
 A Lean 4 library for descriptive complexity on top of Mathlib's
 `ModelTheory` library, in the style of Immerman (*Descriptive Complexity*,
 ch. 3). Its main goal is to let users **formalize membership, hardness, and
-completeness proofs for common complexity classes** — NP and coNP, PTIME, and
-the levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy — with no machine model required:
+completeness proofs for common complexity classes** — NP and coNP, PTIME,
+PSPACE, and the levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy — with no machine
+model required:
 each class is *defined* logically, so a completeness proof is a definability
 witness for membership together with a first-order reduction for hardness,
 which the framework closes into a `Complete` theorem. Along the way the library
@@ -91,6 +92,7 @@ for its class: both a member and hard for it under FO reductions. Karp's
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — | — |
+| **PSPACE** | SO(TC): second-order logic with a transitive closure taken over assignments of a block of relation variables | — | SUCCINCT-REACH (reachability in a transition system given by three CNF formulas over marked state variables) |
 | **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
 
 The characterizations are the logical *definitions* of the classes (see the
@@ -139,12 +141,18 @@ The following are *feasible* within this framework and planned, but **not yet
 implemented**. `ROADMAP.md` is the detailed version; the highlights a typical
 user is most likely to want:
 
-* **Complexity classes beyond the polynomial hierarchy.** PSPACE, and up toward
-  EXPTIME/EXPSPACE, via the transitive-closure and fixpoint logics that capture
-  them (SO(TC), FO(PFP)/SO(LFP)) and their complete problems (QSAT), each with a
-  machine bridge as for NP and PTIME – the logarithmic-space classes already
-  have theirs, in both directions. Below NP this also brings the P-complete
-  problems (Circuit Value, alternating reachability).
+* **More complete problems for PSPACE.** The class exists, defined by SO(TC)
+  like the others and closed under FO reductions like the others, with
+  `NP ⊆ PSPACE` and a first complete problem, SUCCINCT-REACH. What is planned is
+  QSAT (unbounded-alternation quantified Boolean formulas), downstream of
+  SUCCINCT-REACH by the recursive-doubling argument, and then `PH ⊆ PSPACE`
+  through it, plus the game problems (Generalized Geography…).
+* **Complexity classes beyond PSPACE**, up toward EXPTIME/EXPSPACE, via the
+  fixpoint logics that capture them (FO(PFP)/SO(LFP)) and their complete
+  problems, each with a machine bridge as for NP and PTIME – the
+  logarithmic-space classes already have theirs, in both directions. Below NP
+  this also brings the P-complete problems (Circuit Value, alternating
+  reachability).
 * **Undecidability, by reduction.** The class RE exists today, defined
   logically like the others as `∃SO[new]` (table above) and closed under FO
   reductions like the others. What is planned is its complete problems — finite

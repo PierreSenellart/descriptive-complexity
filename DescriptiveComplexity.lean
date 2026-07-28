@@ -50,6 +50,9 @@ import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
 import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.SecondOrderTransitiveClosure
+import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+import DescriptiveComplexity.PSpace
 import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -462,6 +465,44 @@ individual declarations are documented on their own pages.
   `DescriptiveComplexity.Problems.TwoSat.Implication`; this is what yields the two
   inclusions of NL.
 
+## Polynomial space, by second-order transitive closure
+
+* `DescriptiveComplexity.SecondOrderTransitiveClosure` – **SO(TC)**, the logic
+  that captures polynomial space on ordered structures ([Immerman
+  1999][immerman1999descriptive], ch. 10): a transitive closure taken not over
+  tuples of *elements*, as in `DescriptiveComplexity.TransitiveClosure`, but over
+  assignments of a block of *relation* variables. A
+  `DescriptiveComplexity.SOTCSpec` bundles the block, a transition sentence over
+  two copies of it – the current state and the next – and two endpoint
+  sentences; reachability itself is `Relation.ReflTransGen`, so no fixpoint
+  syntax, positivity condition or stage machinery is needed, exactly as for
+  SO-Horn and SO-Krom. A state is `2^(n^a)` bits remembered along a walk of
+  possibly exponentially many first-order steps, which is what PSPACE measures.
+  No modes or element tuples ride alongside the state: a relation variable of
+  arity `0` is a bit and one of arity `1` holding a singleton is an element
+  register, so a block already carries whatever finite control a walk needs.
+  Note that no fragment of *plain* second-order logic could play this role –
+  SO is PH, so such a fragment would collapse the hierarchy; an iteration
+  operator is unavoidable.
+* `DescriptiveComplexity.SecondOrderTransitiveClosurePull` – **SO(TC)
+  definability is closed under (ordered) FO reductions**
+  (`DescriptiveComplexity.SOTCDefinable.of_orderedReduction`). Since a state is an
+  assignment, the pullback is entirely the block pullback of
+  `DescriptiveComplexity.SecondOrderPull`: the states of the pulled walk are the
+  states of the original walk on the interpreted structure
+  (`DescriptiveComplexity.SOBlock.pullAssignEquiv`), and each sentence is pulled
+  back through the interpretation extended with the order and along the block –
+  twice for the transition sentence.
+* `DescriptiveComplexity.PSpace` – **the class PSPACE**
+  (`DescriptiveComplexity.PSPACE`), a `DescriptiveComplexity.ComplexityClass` by that
+  closure, with the complement operator `DescriptiveComplexity.coPSPACE` and the
+  hardness discharge `DescriptiveComplexity.PSPACE_hard_of_sotcDefinable`. Two
+  things are *not* free here and are not proved: `PSPACE = coPSPACE` (Savitch),
+  since the complement of a walk is not a walk, and `PH ⊆ PSPACE`, since a
+  `Σₖ` sentence is not a walk either. What is immediate is
+  `DescriptiveComplexity.NP_subset_PSPACE`: an existential block is the walk that
+  guesses its state and takes no step.
+
 ## Value invention, towards the recursively enumerable
 
 * `DescriptiveComplexity.SecondOrderNew` – `∃SO[new]`, existential second-order
@@ -555,6 +596,7 @@ reduction and certificate in full.
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — | — |
+| `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | — | SUCCINCT-REACH |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
 
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
@@ -649,6 +691,29 @@ Headline results and cross-references:
   ([Stockmeyer 1976][stockmeyer1976polynomial]; [Wrathall
   1976][wrathall1976complete]) by the same Tseitin discharge carrying block
   marks.
+* **At PSPACE**: SUCCINCT-REACH (`DescriptiveComplexity.Problems.SuccinctReach`)
+  – reachability in a transition system whose states are the truth assignments
+  to marked *state variables* and whose transitions, sources and targets are
+  described by three CNF formulas rather than listed – is PSPACE-complete
+  (`DescriptiveComplexity.SUCCINCTREACH_PSPACE_complete`). The two halves are the
+  two readings of one identification, and they mirror the Cook–Levin pair
+  exactly. Membership is cheap for the structural reason that makes every
+  reachability logic's image cheap: the problem *is* the syntactic image of
+  SO(TC), so the specification is a transcription. Its four monadic relation
+  variables are the state being walked plus the three existential witnesses –
+  one per clause group – that a transitive closure cannot quantify on its own;
+  two endpoint witnesses rather than one, because a walk of length zero must
+  meet both endpoint conditions at the same state. Hardness Tseitin-encodes the
+  three sentences of a `DescriptiveComplexity.SOTCSpec` into the three clause
+  groups, reusing the semantic core of the SAT discharge unchanged
+  (`DescriptiveComplexity.Tseitin.satCond_iff_gates`); what is new is that the three
+  encodings are taken over the *doubled* block
+  (`DescriptiveComplexity.SOBlock.double`), so that the propositional variables for
+  the atoms of the block are the same elements in all three – they are exactly
+  the state variables, their second copies the next-state copies. A state of
+  the interpreted system is therefore an assignment of the block and nothing
+  else, and the two walks correspond step by step, with no initialization or
+  finalization steps to peel off.
 * **Between NP and the second level**: SAT-UNSAT – is the first of two CNF
   formulas satisfiable and the second not? – is DP-complete
   (`DescriptiveComplexity.SATUNSAT_DP_complete`; [Papadimitriou & Yannakakis

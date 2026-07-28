@@ -71,16 +71,33 @@ in `ClauseDischarge.lean`); the discharges still to do:
 
 | fragment | complete problem | note |
 |---|---|---|
-| SO(TC) (PSPACE) | QSAT | least mechanical: natural image is a succinct/game reachability, QSAT via the standard alternation argument |
+| SO(TC) (PSPACE) | SUCCINCT-REACH [done], then QSAT | the fragment, the class and the syntactic image are done: SUCCINCT-REACH is PSPACE-complete (`Problems/SuccinctReach/`), its discharge being the Tseitin translation of the three sentences of an `SOTCSpec` over the *doubled* block, so that the block's atoms are shared propositional variables across the three clause groups; QSAT then follows by the standard alternation argument |
 
 - **P-complete reductions from HORN-SAT** [M]: Circuit Value Problem, Monotone
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **PSPACE: QSAT** [L]: unbounded-alternation QBF; hardness = "every
-  SO(TC)-definable (equivalently FO(PFP)-definable) problem ordered-FO-reduces
-  to QSAT". Downstream: game problems (Generalized Geography…) [L each,
-  gadget-heavy].
+- **PSPACE: SUCCINCT-REACH** [done]: the syntactic image of SO(TC) – a
+  transition system given by three CNFs over marked state variables and their
+  next-state copies – is PSPACE-complete (`SUCCINCTREACH_PSPACE_complete`).
+  Membership is the four-variable specification `srSpec` (state, transition
+  witness, and *two* endpoint witnesses – two rather than one because a
+  zero-length walk must meet both endpoint conditions at one state). Hardness
+  (`succinctReach_hard_of_sotcDefinable`) is the Tseitin translation run three
+  times, over the *doubled* block in all three cases so that the block's atoms
+  are shared variables: `Sat/Tseitin.lean`'s semantic interface
+  (`satCond_iff_gates`, `gates_realize`, `gates_canonVal`) and
+  `Sat/TseitinFormulas.lean`'s builders turned out to be generic enough to be
+  reused unchanged — no refactor of `Sat/Hardness.lean` was needed, only a new
+  interpretation into `Language.transSys` with the same defining formulas, plus
+  three language renamings (`Problems/SuccinctReach/Double.lean`): two block
+  copies into the doubled block, one copy into its first half, and a merge of
+  the two order symbols the Tseitin builders leave behind when their base
+  vocabulary is already ordered.
+- **PSPACE: QSAT** [L]: unbounded-alternation QBF, downstream of the above by
+  the recursive-doubling (Savitch) construction as an FO interpretation, which
+  is why it is no longer the first target. Downstream in turn: game problems
+  (Generalized Geography…) [L each, gadget-heavy].
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
@@ -93,16 +110,26 @@ in `ClauseDischarge.lean`); the discharges still to do:
   follows by composing the FO(LFP) → SO-Horn translation with the Horn discharge
   — but the direct `Σ₁` definition would be textbook-faithful; the work is
   formula building, made tedious by the varying arities of a block's atoms.
-- **SO(TC) for PSPACE** [L]: second-order transitive closure logic, TC taken
-  over tuples of *relation* variables (reachability in the exponential
-  configuration graph); captures PSPACE on ordered structures
-  (DC: FO(PFP) = SO(TC) = PSPACE). Same cheapness argument as SO-Horn: the TC can
-  be Lean-level (`Relation.TransGen` over SO assignments) with only the FO
-  transition formula over a doubled block-language object-level, so no fixpoint
-  syntax, positivity or stage machinery. Preferred path to PSPACE, ahead of
-  FO(PFP). Note: no fragment of *plain* SO can play this role: SO = PH
-  (Fagin/Stockmeyer), so an SO fragment capturing PSPACE would collapse PH; some
-  iteration/recursion operator is unavoidable.
+- **SO(TC) for PSPACE** [done]: second-order transitive closure logic, TC taken
+  over assignments of a block of *relation* variables (reachability in the
+  exponential configuration graph); captures PSPACE on ordered structures
+  (DC: FO(PFP) = SO(TC) = PSPACE). The cheapness argument of SO-Horn held: the
+  TC is Lean-level (`Relation.ReflTransGen` over SO assignments,
+  `SecondOrderTransitiveClosure.lean`) with only the FO transition *sentence*
+  over the doubled block language object-level, so no fixpoint syntax,
+  positivity or stage machinery — and no modes or element tuples either, since a
+  relation variable of arity 0 is a bit and one of arity 1 is an element
+  register, which is what makes the pullback
+  (`SecondOrderTransitiveClosurePull.lean`,
+  `SOTCDefinable.of_orderedReduction`) purely the block pullback of
+  `SecondOrderPull.lean`. The class is `PSPACE` in `PSpace.lean`, with
+  `NP ⊆ PSPACE` (an existential block is the walk that guesses and stops) and
+  the discharge shape `PSPACE_hard_of_sotcDefinable`. Still open and *not*
+  free: `PSPACE = coPSPACE` (Savitch) and `PH ⊆ PSPACE`, neither of which is a
+  syntactic inclusion; the latter is expected to come through QSAT. Note: no
+  fragment of *plain* SO can play this role: SO = PH (Fagin/Stockmeyer), so an
+  SO fragment capturing PSPACE would collapse PH; some iteration/recursion
+  operator is unavoidable.
 - **FO(TC), the layer as it stands** [done]: the definability layer exists
   (`TransitiveClosure.lean`: `TCSpec`/`TCDefinable`, a single TC over a
   first-order transition formula on `k`-tuples, with `reach_tcDefinable` as the
@@ -694,7 +721,11 @@ blocked.
    This step is complete: **FO(DTC)**, the class **LOGSPACE** and **REACHd**
    closed it (`TransitiveClosureDet.lean`, `TransitiveClosurePull.lean`,
    `DetLogSpace.lean`, `Problems/ReachabilityDet.lean`).
-3. **PSPACE**: SO(TC), then QSAT; afterwards FO(PFP)/FO(LFP) as the
+3. **PSPACE**: SO(TC), the class, and SUCCINCT-REACH's PSPACE-completeness are
+   **done**; next is QSAT by recursive doubling (as a reduction from
+   SUCCINCT-REACH, both sides being concrete propositional objects), then
+   `PH ⊆ PSPACE` through it, and `PSPACE = coPSPACE` (Savitch) which no
+   syntactic argument gives; afterwards FO(PFP)/FO(LFP) as the
    textbook-faithfulness layer and Immerman–Vardi.
 
 **Running alongside, from the start:**
