@@ -530,6 +530,21 @@ individual declarations are documented on their own pages.
   and universal ones by complementing twice around it, gives every `Σₖ` and every
   `Πₖ` level (`DescriptiveComplexity.sigmaP_subset_PSPACE`,
   `DescriptiveComplexity.piP_subset_PSPACE`).
+* `DescriptiveComplexity.Problems.Machine.Space` – **the machines of the class,
+  membership half**: the same Turing machines that give NP and PTIME their
+  bridges, with the step bound simply dropped
+  (`DescriptiveComplexity.NTMAcceptSpace`,
+  `DescriptiveComplexity.DTMAcceptSpace`). A run may then be arbitrarily long,
+  but it never leaves the positions of the instance, so a configuration is an
+  assignment of a three-variable block – the tape a binary relation, the state
+  and the head unary marks – one step is a first-order condition on two
+  consecutive assignments, and acceptance is their transitive closure. That is
+  an SO(TC) specification, so both problems are in PSPACE
+  (`DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE`,
+  `DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`), hence both reduce to QSAT
+  (`DescriptiveComplexity.ntmAcceptSpace_reduces_to_qsat`) – the machine-side
+  reading of Savitch's theorem. The converse, PSPACE-hardness of these problems,
+  is not proved yet; it would complete the bridge and give `PSPACE = NPSPACE`.
 
 ## Value invention, towards the recursively enumerable
 
@@ -638,12 +653,17 @@ reduction and certificate in full.
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — | — |
-| `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | — | SUCCINCT-REACH · QSAT |
+| `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not ‡ | SUCCINCT-REACH · QSAT |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | FINSAT |
 
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
 for `NL`, and `DescriptiveComplexity.mem_LOGSPACE_iff_automaton` for `LOGSPACE`,
 where the machine is required to be deterministic.
+
+‡ Membership only, so far: `DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE` and
+`DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`. Hardness for those problems –
+the capture, which would also give `PSPACE = NPSPACE` – is not proved yet, so
+they are not listed as complete.
 
 Headline results and cross-references:
 

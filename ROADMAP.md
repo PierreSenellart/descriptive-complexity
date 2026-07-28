@@ -127,11 +127,14 @@ in `ClauseDischarge.lean`); the discharges still to do:
   analysis. The `∀b_ℓ`-with-a-fresh-copy form of the level gadget keeps the
   matrix clausal, so no Tseitin encoding appears anywhere.
 
-  Downstream, and now also done: `PSPACE = coPSPACE` (`PSpaceCompl.lean`) and
-  `PH ⊆ PSPACE` (`PSpaceHierarchy.lean`). Still downstream: the machine bridge
-  for PSPACE — the same `TMData` with the step bound dropped, space being
-  bounded by construction since the tape is indexed by the positions — and the
-  game problems (Generalized Geography…) [L each, gadget-heavy].
+  Downstream, and now also done: `PSPACE = coPSPACE` (`PSpaceCompl.lean`),
+  `PH ⊆ PSPACE` (`PSpaceHierarchy.lean`), and the **membership half of the
+  machine bridge** (`Problems/Machine/Space.lean`) — the same `TMData` with the
+  step bound dropped, space being bounded by construction since the tape is
+  indexed by the positions, so `NTMAcceptSpace` and `DTMAcceptSpace` are in
+  PSPACE and reduce to QSAT. Still downstream: the hardness half of that bridge
+  (which also gives `PSPACE = NPSPACE`) and the game problems (Generalized
+  Geography…) [L each, gadget-heavy].
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
@@ -429,7 +432,7 @@ compilation direction above exists.
 | L | FO(DTC) | S | S | ~1–1.7k [M], but see below |
 | NL | FO(TC) | S | S | ~1–1.7k [M], but see below |
 | Σₖᵖ, Πₖᵖ | `Σₖ`-SO | M (reuses the NP membership) | M (reuses the SAT machine) | +0.6–1.2k [M] |
-| PSPACE | SO(TC) | S | L–XL | ~3–5.5k |
+| PSPACE | SO(TC) | S [done] | L–XL | ~3–5.5k |
 | EXPTIME | SO(LFP) | L | XL | ~4–7k |
 | EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
 
@@ -443,7 +446,12 @@ Three rules govern the table:
    dearest: space-bounded acceptance is to SO(TC) what SAT is to ∃SO — tape as
    a relation variable, the step clause of `Machine/Membership.lean` as the
    transition formula, acceptance its TC, no budget hence no walk lemma
-   (400–700 lines).
+   (400–700 lines). **Confirmed** by `Problems/Machine/Space.lean` (~840 lines,
+   the estimate missing only the size of the sentence-builder layer: fifteen
+   shapes with a realization lemma each, since an `SOTCSpec` wants *sentences*,
+   not formulas with parameters). The block is three relation variables — the
+   tape binary, the state and the head unary marks — and determinism is a source
+   condition, so `DTMAcceptSpace` costs one extra sentence over `NTMAcceptSpace`.
 2. **Hardness is cheap when the class has a one-loop complete problem** (REACH
    "guess a neighbour", HORN-SAT "propagate", SAT "guess then sweep").
    Otherwise the discharge must compile arbitrary formulas of the logic into a

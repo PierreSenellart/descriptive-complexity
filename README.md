@@ -92,8 +92,15 @@ for its class: both a member and hard for it under FO reductions. Karp's
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — | — |
-| **PSPACE** | SO(TC): second-order logic with a transitive closure taken over assignments of a block of relation variables | — | SUCCINCT-REACH (reachability in a transition system given by three CNF formulas over marked state variables) · QSAT (quantified Boolean formulas, the prefix carried by the instance) |
+| **PSPACE** | SO(TC): second-order logic with a transitive closure taken over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not ‡ | SUCCINCT-REACH (reachability in a transition system given by three CNF formulas over marked state variables) · QSAT (quantified Boolean formulas, the prefix carried by the instance) |
 | **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | FINSAT (finite satisfiability of a first-order sentence: Trakhtenbrot's theorem) |
+
+‡ Only the membership half is formalized: acceptance by a space-bounded Turing
+machine, deterministic (`dtmAcceptSpace_mem_PSPACE`) or not
+(`ntmAcceptSpace_mem_PSPACE`), is in PSPACE, since a configuration is an
+assignment of a block of relation variables and a run is a transitive closure
+over them. Hardness for those problems – the capture, which would also give
+`PSPACE = NPSPACE` – is not proved yet, so they are not listed as complete.
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above).
@@ -144,8 +151,10 @@ user is most likely to want:
 * **More complete problems for PSPACE.** The class exists, defined by SO(TC)
   like the others and closed under FO reductions like the others, with
   `NP ⊆ PSPACE`, two complete problems (SUCCINCT-REACH and QSAT), `PSPACE =
-  coPSPACE` and `PH ⊆ PSPACE`. What is planned next is the machine bridge for
-  the class, plus the game problems (Generalized Geography…).
+  coPSPACE` and `PH ⊆ PSPACE`. The machine bridge is half-built: the
+  space-bounded machine problems are known to be *in* PSPACE, and their
+  hardness – which would also give `PSPACE = NPSPACE` – is what is planned
+  next, plus the game problems (Generalized Geography…).
 * **Complexity classes beyond PSPACE**, up toward EXPTIME/EXPSPACE, via the
   fixpoint logics that capture them (FO(PFP)/SO(LFP)) and their complete
   problems, each with a machine bridge as for NP and PTIME – the

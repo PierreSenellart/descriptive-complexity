@@ -12,6 +12,8 @@ import DescriptiveComplexity.Problems.Machine.Hardness
 import DescriptiveComplexity.Problems.Machine.Interp
 import DescriptiveComplexity.Problems.Machine.Fixpoint
 import DescriptiveComplexity.Problems.Machine.HornInterp
+import DescriptiveComplexity.Problems.Machine.Space
+import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Problems.HornSat
 
@@ -143,5 +145,29 @@ theorem mem_PTIME_iff_le_dtmAccept {L : Language.{0, 0}} (P : DecisionProblem L)
     exact ⟨g.trans HornTM.hornSat_ordered_fo_reduction_dtmAccept⟩
   · rintro ⟨f⟩
     exact PTIME.mem_of_orderedReduction f dtmAccept_mem_PTIME
+
+/-! ### The space-bounded problems
+
+Drop the step bound and the same machines measure *space* instead of time: a
+run of `DescriptiveComplexity.NTMAcceptSpace` may be arbitrarily long, but it
+never leaves the positions of the instance, so its configurations are the
+assignments of a fixed second-order block and its runs are a transitive closure
+over them. That is exactly an SO(TC) specification, so both problems are in
+PSPACE (`DescriptiveComplexity.Problems.Machine.Space`); the hardness half – the
+capture direction, which would give `PSPACE = NPSPACE` – is not proved here. -/
+
+/-- **Space-bounded machine acceptance reduces to QSAT**, the machine-side
+reading of Savitch's theorem: the nondeterministic space-bounded run is
+evaluated by a quantified Boolean formula, whose decision procedure is
+deterministic. -/
+theorem ntmAcceptSpace_reduces_to_qsat : Nonempty (NTMAcceptSpace ≤ʳᶠᵒ[≤] QSAT) :=
+  qsat_PSPACE_hard QSAT ⟨(FOReduction.refl QSAT).toOrdered.toRel⟩ NTMAcceptSpace
+    ntmAcceptSpace_sotcDefinable
+
+/-- **Determinism costs nothing in space**, at the level of reductions:
+deterministic space-bounded acceptance also reduces to QSAT. -/
+theorem dtmAcceptSpace_reduces_to_qsat : Nonempty (DTMAcceptSpace ≤ʳᶠᵒ[≤] QSAT) :=
+  qsat_PSPACE_hard QSAT ⟨(FOReduction.refl QSAT).toOrdered.toRel⟩ DTMAcceptSpace
+    dtmAcceptSpace_sotcDefinable
 
 end DescriptiveComplexity
