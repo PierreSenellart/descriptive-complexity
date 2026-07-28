@@ -93,7 +93,7 @@ for its class: both a member and hard for it under FO reductions. Karp's
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
 | **PH** | full second-order logic | — | — |
 | **PSPACE** | SO(TC): second-order logic with a transitive closure taken over assignments of a block of relation variables | — | SUCCINCT-REACH (reachability in a transition system given by three CNF formulas over marked state variables) · QSAT (quantified Boolean formulas, the prefix carried by the instance) |
-| **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
+| **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | FINSAT (finite satisfiability of a first-order sentence: Trakhtenbrot's theorem) |
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above).
@@ -152,13 +152,13 @@ user is most likely to want:
   logarithmic-space classes already have theirs, in both directions. Below NP
   this also brings the P-complete problems (Circuit Value, alternating
   reachability).
-* **Undecidability, by reduction.** The class RE exists today, defined
-  logically like the others as `∃SO[new]` (table above) and closed under FO
-  reductions like the others. What is planned is its complete problems — finite
-  satisfiability (Trakhtenbrot's theorem) and Post's correspondence problem — so
-  that incomputability results become ordinary first-order reductions, together
-  with the bridge to Mathlib's computability layer that would let RE-hardness be
-  read as undecidability.
+* **Undecidability, by reduction.** The class RE is defined logically like the
+  others as `∃SO[new]` (table above), closed under FO reductions like the
+  others, and has its first complete problem: finite satisfiability of a
+  first-order sentence, i.e. Trakhtenbrot's theorem. What is planned is further
+  complete problems, such as Post's correspondence problem, together with the
+  bridge to Mathlib's computability layer that would let RE-hardness be read as
+  undecidability.
 * **Counting and optimization problems.** Only decision problems are modeled
   today. Planned: #P via counting second-order assignments (#SAT, #3COL, the
   permanent) and MaxSNP-style optimization classes — i.e. function and search

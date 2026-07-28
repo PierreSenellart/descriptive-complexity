@@ -693,16 +693,57 @@ Done so far:
   usual notion over a relational vocabulary). Nothing relates RE and co-RE, by
   design: `∃SO[new]` has no dual reading, and the separation is a machine-bridge
   statement (last item below).
-- **Trakhtenbrot's theorem** [L, the next step]: finite satisfiability of a
-  first-order sentence is RE-complete. Membership is nearly definitional —
-  invent the model and check satisfaction — but "check satisfaction" is the
-  catch: satisfaction of an *input* sentence is not first-order in the sentence,
-  so the instance vocabulary must present the sentence as a structure (a parse
-  forest) and the kernel must verify a guessed satisfaction relation over
-  subformula/valuation pairs, in the style of the FO(LFP) rule systems. This is
-  the file that decides whether the sentence-as-instance encoding is shared with
-  §7's machine layer. Hardness is the `∃SO[new]` discharge: the syntactic image
-  of the logic, exactly as SAT is the image of `Σ₁`.
+- **Trakhtenbrot's theorem** [done]: finite satisfiability of a
+  first-order sentence is RE-complete (`FINSAT_RE_complete`). The design, the hazards and the file
+  plan are in `TRAKHTENBROT.md`; the short version is that the instance is a
+  parse DAG **in negation normal form** with **n-ary** ∧/∨ nodes and a linear
+  order on its own syntax. Negation at the leaves makes the value of a node
+  monotone in its children, so satisfaction is a least fixed point rather than a
+  well-founded recursion on a decoded parse tree (there is no decoding: the
+  symbols of the encoded sentence are elements of the instance, so the decoded
+  vocabulary would depend on the instance); n-ary gates make the unbounded
+  conjunctions of the reduction single nodes, which keeps `OrderWalk` out of it;
+  and the order makes acyclicity — `child g c → c < g` — first-order, which the
+  membership kernel needs since it has to *check* well-formedness.
+
+  Done, and axiom-clean: `Problems/FinSat/Defs.lean` (vocabulary,
+  well-formedness, the truth definition, `FINSAT` with its iso-invariance),
+  `Problems/FinSat/Fixpoint.lean` (satisfaction is the *unique* fixed point of
+  the truth definition — the lemma both halves rest on: it is what forces the
+  guessed relation of the membership kernel to be satisfaction, and what lets
+  the hardness proof evaluate the sentence it builds by exhibiting its intended
+  valuation), `Problems/FinSat/Invented.lean` (`finSatOn_iff_cert`: an encoded
+  sentence has a finite model exactly when a finite set of *invented values*
+  carries one — the model, and the environments, which must be reified as values
+  since an assignment cannot be a tuple of unbounded arity; the interpretation of
+  the symbols is not guessed at all but recovered from the guessed truth values
+  of the atoms by a coherence condition, which is what avoids reified tuples) and
+  `Problems/FinSat/Membership.lean` (`finsat_sigmaSONewDefinable`,
+  `finsat_mem_RE`).
+
+  **Hardness**: `Problems/FinSat/Nodes.lean`, `Kernel.lean` and `Interp.lean`
+  build the interpretation and prove its image well formed, `Hardness.lean`
+  reads the sentence back off the image and evaluates it node by node (up to
+  `gval_kernel`, the induction on the kernel), and `Reduction.lean` closes both
+  directions and gives `FinSat.finsat_hard_of_sigmaSONewDefinable` for a
+  *relational* source. The sentence's vocabulary is *only* the block's relation
+  variables: `old` and the symbols of `L` are eliminated by translating `old(t)`
+  to `⋁_a t = x_a` and `r(t̄)` to `⋁_{ā ∈ r^A} ⋀_i t_i = x_{a_i}`, the disjunction
+  being indexed by the tuples the interpretation's own formulas select.
+
+  Source vocabularies with function symbols – which `CofinalHard` admits – are
+  handled *before* the reduction, by a general theorem about the logic in
+  `DescriptiveComplexity/Relationalize.lean`: every `∃SO[new]`-definable problem
+  reduces to an `∃SO[new]`-definable problem over the **atomic diagram
+  language**, one relation symbol of arity `n` per atomic formula of the source
+  in `n` variables. The undefinable junk element of `oldPart` is harmless
+  because a definition may be read with any junk element at all
+  (`sigmaSONewDefinable_junk`, by transporting the instance along a
+  transposition), and the kernel is translated atom by atom in place, each atom
+  becoming a short existential block holding the coerced context, the guessed
+  junk and the values of the arguments. Composing the two gives
+  `finsat_hard_of_sigmaSONewDefinable` and `FINSAT_RE_complete`.
+
 - **PCP (Post's correspondence problem)** [M–L, after Trakhtenbrot]: the
   classical target for undecidability by reduction, and the natural second
   complete problem; instance is a marked list of domino pairs over an alphabet,

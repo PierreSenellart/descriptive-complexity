@@ -55,6 +55,7 @@ import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
 import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.PSpaceHierarchy
+import DescriptiveComplexity.Relationalize
 import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -574,9 +575,23 @@ individual declarations are documented on their own pages.
   those two closures, with `NP ⊆ RE` (`DescriptiveComplexity.NP_subset_RE`) and
   the complement operator `DescriptiveComplexity.coRE`. Nothing here relates RE
   and co-RE: `∃SO[new]` has no dual reading, and the separation that turns
-  RE-hardness into undecidability is a machine-bridge statement. The complete
-  problems – finite satisfiability, by Trakhtenbrot's theorem, and PCP – are
-  planned in `ROADMAP.md`.
+  RE-hardness into undecidability is a machine-bridge statement. Its first
+  complete problem is finite satisfiability, by Trakhtenbrot's theorem
+  (`DescriptiveComplexity.Problems.FinSat`); PCP is planned in `ROADMAP.md`.
+* `DescriptiveComplexity.Relationalize` – **removing function symbols from a
+  source**: every `∃SO[new]`-definable problem admits an ordered first-order
+  reduction to an `∃SO[new]`-definable problem over a *relational* vocabulary
+  (`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable`), the
+  **atomic diagram language** `DescriptiveComplexity.atomLang` – one relation
+  symbol of arity `n` per atomic formula of the source in `n` variables. A
+  hardness proof whose target must *name* what a function does, rather than read
+  it off the source through a defining formula, needs this. Two things make it
+  work: the junk element by which an extended universe interprets a function on
+  an invented argument may be *guessed*, since transporting the instance along a
+  transposition moves it (`DescriptiveComplexity.sigmaSONewDefinable_junk`), and
+  the kernel is then translated atom by atom *in place*, each atom becoming a
+  short existential block holding the coerced context, the guessed junk and the
+  values of the arguments, so that no de Bruijn index is ever shifted.
 
 ## Shared encodings
 
@@ -624,7 +639,7 @@ reduction and certificate in full.
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | — | SUCCINCT-REACH · QSAT |
-| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
+| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | FINSAT |
 
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
 for `NL`, and `DescriptiveComplexity.mem_LOGSPACE_iff_automaton` for `LOGSPACE`,
@@ -775,6 +790,27 @@ Headline results and cross-references:
   to canonically padded ones: with the spare coordinates left free, every clause
   and variable would acquire copies and an unsatisfiable formula could blow up
   into a satisfiable one.
+
+* **At RE**: FINSAT (`DescriptiveComplexity.Problems.FinSat`) – does a
+  first-order sentence, encoded as a finite structure, have a *finite* model? –
+  is RE-complete (`DescriptiveComplexity.FINSAT_RE_complete`), which is
+  Trakhtenbrot's theorem in the logical form. FINSAT is the syntactic image of
+  `∃SO[new]` exactly as SAT is that of `Σ₁`: a certificate is “a finite
+  extension of the universe plus relations on it satisfying a fixed first-order
+  kernel”, a finite model is “a finite universe plus relations on it satisfying
+  a given first-order sentence”, and the reduction translates the first into the
+  second. Two decisions carry the encoding: the instance is a parse DAG **in
+  negation normal form**, so that the value of a node is monotone in its
+  children and satisfaction is a least fixed point rather than a well-founded
+  recursion on a decoded parse tree – there is no decoding, the symbols of the
+  encoded sentence being elements of the instance – and its ∧/∨ nodes are
+  **n-ary**, so that the unbounded conjunctions of the reduction are single
+  nodes. The encoded sentence carries its own quantifiers, so the reduction
+  needs no context tuples, and its vocabulary is *only* the relation variables of
+  the block: `old` and the symbols of the source are translated away into
+  disjunctions indexed by the tuples the interpretation's own formulas select.
+  Function symbols in the source are removed beforehand, by
+  `DescriptiveComplexity.Relationalize`.
 
 ## Worked examples
 

@@ -38,6 +38,7 @@ import DescriptiveComplexity.Problems.Steiner
 import DescriptiveComplexity.Problems.Qbf
 import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.SuccinctReach
+import DescriptiveComplexity.Problems.FinSat
 import DescriptiveComplexity.Problems.Machine
 
 /-!
