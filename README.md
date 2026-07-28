@@ -4,7 +4,7 @@ A Lean 4 library for descriptive complexity on top of Mathlib's
 `ModelTheory` library, in the style of Immerman (*Descriptive Complexity*,
 ch. 3). Its main goal is to let users **formalize membership, hardness, and
 completeness proofs for common complexity classes** — NP and coNP, PTIME, and
-the levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy — with no machine model:
+the levels `Σₖᵖ`/`Πₖᵖ` of the polynomial hierarchy — with no machine model required:
 each class is *defined* logically, so a completeness proof is a definability
 witness for membership together with a first-order reduction for hardness,
 which the framework closes into a `Complete` theorem. Along the way the library
@@ -75,22 +75,27 @@ The library is organized in three layers:
 
 ## Complexity classes and complete problems
 
-Every class is *defined* logically – no machine model, no axioms. Each problem
-listed is proved **complete** for its class: both a member and hard for it
-under FO reductions. Karp's 21 NP-complete problems are all present.
+Every class is *defined* logically – machine models, when they exist, are
+additional characterizations. Each problem listed is proved **complete**
+for its class: both a member and hard for it under FO reductions. Karp's
+21 NP-complete problems are all present.
 
-| Complexity class | Logical characterization | Problems proved complete |
-| --- | --- | --- |
-| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | REACHd · UNREACHd |
-| **NL** | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | REACH · UNREACH · 2SAT |
-| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
-| **NP** = Σ₁ᵖ | ∃SO: existential second-order logic | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| **coNP** = Π₁ᵖ | ∀SO: universal second-order logic | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
-| **DP** | a Σ₁ and a Π₁ sentence conjoined | SAT-UNSAT |
-| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
-| **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
-| **PH** | full second-order logic | — |
-| **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — |
+| Complexity class | Logical characterization | Machine model | Problems proved complete |
+| --- | --- | --- | --- |
+| **L** = LOGSPACE | FO(DTC): first-order logic with a deterministic transitive closure | deterministic two-way `k`-head automaton † | REACHd · UNREACHd |
+| **NL** | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | two-way `k`-head automaton † | REACH · UNREACH · 2SAT |
+| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | deterministic polynomial-time Turing machine | HORN-SAT · acceptance by a deterministic polynomial-time Turing machine |
+| **NP** = Σ₁ᵖ | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
+| **coNP** = Π₁ᵖ | ∀SO: universal second-order logic | — | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
+| **DP** | a Σ₁ and a Π₁ sentence conjoined | — | SAT-UNSAT |
+| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` (quantified Boolean formulas, `k` blocks) – at `k = 1`, NP |
+| **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) – at `k = 1`, coNP |
+| **PH** | full second-order logic | — | — |
+| **RE** | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | — |
+
+† Only the machine-to-logic direction is proved for the logarithmic-space
+classes: recognition by such an automaton implies membership. The converse is on
+the roadmap.
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above).
@@ -142,8 +147,8 @@ user is most likely to want:
   EXPTIME/EXPSPACE, via the transitive-closure and fixpoint logics that capture
   them (SO(TC), FO(PFP)/SO(LFP)) and their complete problems (QSAT), each with a
   machine bridge as for NP and PTIME – a bridge the logarithmic-space classes,
-  already present, do not have either. Below NP this also brings the P-complete
-  problems (Circuit Value, alternating reachability).
+  already present, still have in only one direction. Below NP this also brings
+  the P-complete problems (Circuit Value, alternating reachability).
 * **Undecidability, by reduction.** The class RE exists today, defined
   logically like the others as `∃SO[new]` (table above) and closed under FO
   reductions like the others. What is planned is its complete problems — finite
