@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Sat
+import DescriptiveComplexity.Problems.SatUnsat
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut
