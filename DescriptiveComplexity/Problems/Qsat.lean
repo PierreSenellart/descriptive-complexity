@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Qsat.Blocks
+import DescriptiveComplexity.Problems.Qsat.Complement
 import DescriptiveComplexity.Problems.Qsat.Hardness
 
 /-!
@@ -73,6 +74,14 @@ ordered first-order interpretation of dimension `2`. Its pieces are:
 * `DescriptiveComplexity.Problems.Qsat.Hardness`: correctness
   (`DescriptiveComplexity.qsatHolds_iff`) and the reduction
   `DescriptiveComplexity.succinctReach_ordered_fo_reduction_qsat`.
+
+## The complement
+
+The evaluation walk of the membership half is *deterministic*: it does not
+search for an accepting computation, it computes the value of the formula. So
+reading its answer the other way round decides the complement,
+`DescriptiveComplexity.Problems.Qsat.Complement`. Together with hardness that is
+`PSPACE = coPSPACE` (`DescriptiveComplexity.PSpaceCompl`).
 -/
 
 namespace DescriptiveComplexity

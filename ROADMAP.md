@@ -155,9 +155,11 @@ in `ClauseDischarge.lean`); the discharges still to do:
   `SOTCDefinable.of_orderedReduction`) purely the block pullback of
   `SecondOrderPull.lean`. The class is `PSPACE` in `PSpace.lean`, with
   `NP ⊆ PSPACE` (an existential block is the walk that guesses and stops) and
-  the discharge shape `PSPACE_hard_of_sotcDefinable`. Still open and *not*
-  free: `PSPACE = coPSPACE` (Savitch) and `PH ⊆ PSPACE`, neither of which is a
-  syntactic inclusion; the latter is expected to come through QSAT. Note: no
+  the discharge shape `PSPACE_hard_of_sotcDefinable`. `PSPACE = coPSPACE` is
+  now done (`PSpaceCompl.lean`), through QSAT: reduce to QSAT and read its
+  *deterministic* evaluation walk backwards. Still open: `PH ⊆ PSPACE`, which is
+  not a syntactic inclusion either and is expected to come through the same
+  door — see the entry in §3 below. Note: no
   fragment of *plain* SO can play this role: SO = PH (Fagin/Stockmeyer), so an
   SO fragment capturing PSPACE would collapse PH; some iteration/recursion
   operator is unavoidable.
@@ -753,10 +755,9 @@ blocked.
    closed it (`TransitiveClosureDet.lean`, `TransitiveClosurePull.lean`,
    `DetLogSpace.lean`, `Problems/ReachabilityDet.lean`).
 3. **PSPACE**: SO(TC), the class, and SUCCINCT-REACH's PSPACE-completeness are
-   **done**, and so is QSAT (membership by the depth-first game walk, hardness
-   by recursive doubling from SUCCINCT-REACH); next is
-   `PH ⊆ PSPACE` through it, and `PSPACE = coPSPACE` (Savitch) which no
-   syntactic argument gives; afterwards FO(PFP)/FO(LFP) as the
+   **done**, and so are QSAT (membership by the depth-first game walk, hardness
+   by recursive doubling from SUCCINCT-REACH) and `PSPACE = coPSPACE` through
+   it; next is `PH ⊆ PSPACE`; afterwards FO(PFP)/FO(LFP) as the
    textbook-faithfulness layer and Immerman–Vardi.
 
 **Running alongside, from the start:**

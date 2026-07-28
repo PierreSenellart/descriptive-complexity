@@ -53,6 +53,7 @@ import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
+import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -496,12 +497,22 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.PSpace` – **the class PSPACE**
   (`DescriptiveComplexity.PSPACE`), a `DescriptiveComplexity.ComplexityClass` by that
   closure, with the complement operator `DescriptiveComplexity.coPSPACE` and the
-  hardness discharge `DescriptiveComplexity.PSPACE_hard_of_sotcDefinable`. Two
-  things are *not* free here and are not proved: `PSPACE = coPSPACE` (Savitch),
-  since the complement of a walk is not a walk, and `PH ⊆ PSPACE`, since a
-  `Σₖ` sentence is not a walk either. What is immediate is
-  `DescriptiveComplexity.NP_subset_PSPACE`: an existential block is the walk that
-  guesses its state and takes no step.
+  hardness discharge `DescriptiveComplexity.PSPACE_hard_of_sotcDefinable`. What is
+  immediate is `DescriptiveComplexity.NP_subset_PSPACE`: an existential block is
+  the walk that guesses its state and takes no step. Two things are *not* free:
+  `PSPACE = coPSPACE`, since the complement of a walk is not a walk, and
+  `PH ⊆ PSPACE`, since a `Σₖ` sentence is not a walk either.
+* `DescriptiveComplexity.PSpaceCompl` – **`PSPACE = coPSPACE`**
+  (`DescriptiveComplexity.PSPACE_eq_coPSPACE`), the first of those two, proved
+  downstream once QSAT is available: every SO(TC) definable problem reduces to
+  QSAT (through SUCCINCT-REACH and Savitch's recursive doubling), complementing
+  an ordered reduction is free, and the walk that decides QSAT is
+  *deterministic* – it computes the value of the formula rather than searching
+  for a witness – so reading its answer the other way round decides the
+  complement (`DescriptiveComplexity.qsatCompl_sotcDefinable`). That is the
+  logical shadow of the machine-theoretic reason: space-bounded computation can
+  be made deterministic, and a deterministic decider is complemented by flipping
+  its answer.
 
 ## Value invention, towards the recursively enumerable
 

@@ -34,10 +34,13 @@ assumed (see `DescriptiveComplexity.Machines`).
 
 ## What is *not* free here
 
-* **PSPACE = coPSPACE** (by Savitch's theorem, or by Immerman–Szelepcsényi
-  applied at exponential space) is not the definitional duality that gives
-  `PiP k` from `SigmaP k`: the complement of an SO(TC) definable problem is not
-  obviously SO(TC) definable. It is a genuine theorem and is not proved here.
+* **PSPACE = coPSPACE** is not the definitional duality that gives `PiP k` from
+  `SigmaP k`: the complement of an SO(TC) definable problem is not *obviously*
+  SO(TC) definable. It is a genuine theorem, and it is proved – downstream, in
+  `DescriptiveComplexity.PSpaceCompl`, once QSAT is available: every SO(TC)
+  definable problem reduces to QSAT, complementing a reduction is free, and the
+  walk that decides QSAT is deterministic, so reading its answer the other way
+  round decides the complement.
 * **PH ⊆ PSPACE** is not a syntactic inclusion either: a `Σₖ` sentence is not a
   walk. What *is* immediate is the bottom of the tower, `NP ⊆ PSPACE`
   (`DescriptiveComplexity.NP_subset_PSPACE`): an existential block is a walk that
