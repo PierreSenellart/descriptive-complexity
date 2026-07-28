@@ -230,6 +230,61 @@ theorem satisfiable_sideInterp :
 
 end Projection
 
+/-! ### Satisfiability ignores elements outside the formula
+
+The step both halves of a DP-hardness pairing will need. Pairing two
+reductions into one instance forces a common dimension and a common universe,
+so each side's formula ends up sitting inside a larger structure: the other
+side's points are there too, and so are the tuples the shorter side does not
+use. Those extra elements are *not* harmless by fiat – see the padding warning
+in `ROADMAP.md` – but they are harmless once they are neither clauses nor
+occurrences, which is what the lemma below says.
+
+It is stated as transfer along an injection `j` that reflects the three
+relations, hits every clause, and hits every element occurring in a clause of
+its image. Elements outside the image are then pure spectators: a truth
+assignment may do as it likes on them. -/
+
+section Cover
+
+variable {A B : Type} [Language.sat.Structure A] [Language.sat.Structure B]
+
+/-- **Satisfiability transfers along a clause-covering embedding.** The extra
+elements of `A` – those outside the image of `j` – are neither clauses nor
+occurrences, so they constrain nothing and a satisfying assignment of `B`
+extends to them arbitrarily. -/
+theorem satisfiable_iff_of_cover (j : B → A) (hj : Function.Injective j)
+    (hcl : ∀ b : B, RelMap satIsClause ![j b] ↔ RelMap satIsClause ![b])
+    (hpos : ∀ b b' : B, RelMap satPosIn ![j b, j b'] ↔ RelMap satPosIn ![b, b'])
+    (hneg : ∀ b b' : B, RelMap satNegIn ![j b, j b'] ↔ RelMap satNegIn ![b, b'])
+    (hclImg : ∀ c : A, RelMap satIsClause ![c] → ∃ b : B, c = j b)
+    (hoccImg : ∀ (b : B) (x : A),
+      RelMap satPosIn ![j b, x] ∨ RelMap satNegIn ![j b, x] → ∃ b' : B, x = j b') :
+    Satisfiable A ↔ Satisfiable B := by
+  constructor
+  · rintro ⟨ν, hν⟩
+    refine ⟨fun b => ν (j b), fun c hc => ?_⟩
+    obtain ⟨x, hx⟩ := hν (j c) ((hcl c).mpr hc)
+    rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · obtain ⟨c', rfl⟩ := hoccImg c x (Or.inl hp)
+      exact ⟨c', Or.inl ⟨(hpos c c').mp hp, hT⟩⟩
+    · obtain ⟨c', rfl⟩ := hoccImg c x (Or.inr hn)
+      exact ⟨c', Or.inr ⟨(hneg c c').mp hn, hT⟩⟩
+  · rintro ⟨ν, hν⟩
+    refine ⟨fun a => ∃ b : B, a = j b ∧ ν b, fun c hc => ?_⟩
+    have himg : ∀ b : B, (∃ b' : B, j b = j b' ∧ ν b') ↔ ν b := by
+      refine fun b => ⟨?_, fun h => ⟨b, rfl, h⟩⟩
+      rintro ⟨b', hb', hν'⟩
+      exact hj hb' ▸ hν'
+    obtain ⟨c', rfl⟩ := hclImg c hc
+    obtain ⟨x, hx⟩ := hν c' ((hcl c').mp hc)
+    refine ⟨j x, ?_⟩
+    rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
+    · exact Or.inl ⟨(hpos c' x).mpr hp, (himg x).mpr hT⟩
+    · exact Or.inr ⟨(hneg c' x).mpr hn, fun h => hT ((himg x).mp h)⟩
+
+end Cover
+
 /-! ### Membership in DP -/
 
 /-- The second formula of the pair is satisfiable: the problem
