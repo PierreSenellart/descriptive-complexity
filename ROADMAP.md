@@ -533,7 +533,12 @@ The concrete items:
   SAT/HORN-SAT. So: capture at L/NL (evaluator cheap, model first-order),
   completeness at P/NP/`Σₖᵖ`/PSPACE and above (evaluator dear) — and at PSPACE
   the completeness route turned out to need no evaluator at all, only the one
-  algorithm QSAT names.
+  algorithm QSAT names. At RE the same escape exists in a stronger form: the
+  target model can be chosen so that the program is *obtained* rather than
+  written – `Nat.Partrec.Code`, where Mathlib's `exists_code` supplies it – so
+  the addressed evaluator is avoided there too (§8, `RE.Hard CODEHALT`). The
+  rule the two cases share: never compile the logic; pick a target whose
+  programs already exist.
 - **The exponential classes are not blocked by the framework**: the machine
   description stays polynomial (a reduction can write it) and only the run is
   exponential, living in Lean just as `SigmaSODefinable` quantifies over
@@ -580,6 +585,84 @@ problem. The bridge to Mathlib's computability layer is built too
 problems are undecidable, and `finsat_not_computable` is Trakhtenbrot's theorem
 as everyone states it. What remains:
 
+- **`RE.Hard CODEHALT`, and with it `REPred = RE`** [M–L, *one* construction
+  serving both]: the converse half of the RE machine bridge, taken at the
+  **code** model rather than at a machine. This is the pivot of the whole
+  section: it re-prices the two items below, and it is the item to do first.
+
+  The asymmetry that decides it: for `HALT` and PCP the program the reduction
+  must produce is a `TMData` record or a domino system, so it has to be
+  *constructed* and its run proved correct – the evaluator with addressed
+  storage, priced at XL in §7. For `CODEHALT` the program is a
+  `Nat.Partrec.Code`, and “a program exists” is a *theorem* of Mathlib
+  (`REPred` → `Partrec` → `Nat.Partrec.Code.exists_code`). The evaluator is
+  never built, only named. Nothing analogous is available on the machine side,
+  and that is exactly the obstruction already recorded here: Mathlib's
+  universal machine is not finite-state.
+
+  **The construction – the instance, as a program.** A reduction
+  `P ≤ᶠᵒ[≤] CODEHALT` drawing the tree
+
+  ```
+  comp c_P (pair numeral_n bitnest)
+  ```
+
+  where `bitnest = pair b_{t₀} (pair b_{t₁} (…))` runs over the tuples of the
+  ordered instance in lex order, one leaf per atom, and `c_P` is the opaque
+  code of `fun m => semiDecider (structOf V m)`. Five design points make it
+  small:
+
+  - **only constructors on the instance-dependent side.** Since
+    `eval (pair cf cg) 0 = ⟨eval cf 0, eval cg 0⟩`, every branch is still
+    evaluated at input `0`, so a bit is a *single node*: `zero` for `0`,
+    `succ` for `1`. Two nodes per bit, all constructors whose `eval` is
+    definitional; `n` is a `comp succ` chain; the only abstract code is `c_P`,
+    under one `comp` at the root. No arithmetic gadget, no repeated constant
+    subtree (the Horner-with-doubling variant needs one copy of a doubling code
+    per bit, and is strictly worse);
+  - **a plain ordered reduction, not a relativized one.** Membership travels
+    along `≤ᶠᵒ` and `≤ᶠᵒ[≤]` only – the `ComplexityClass` record has
+    `hard_of_relOrderedReduction` but deliberately no `mem_` counterpart – and
+    that costs nothing here: `CODEHALT.Holds` is an existential over a root and
+    a code, so junk tuples of the tagged space, being unmarked, decode to
+    nothing and carry no root;
+  - **a fixed abstract code is drawn with one tag per node**, by structural
+    recursion on the code, so its defining formulas are per-tag constants and
+    `DecodesTo` for it is a structural induction. Tags are free at *any*
+    instance size, which is what makes this survive `CofinalHard` being
+    cofinality in the reduction order and not “large instances only”;
+  - **layout off the shelf**: tags = symbol of `V` × role, `dim` = max arity,
+    `Padding.lean` for the mixed arities in one dimension, `OrderWalk.lean` for
+    the lex order and the induction along it, the order formula as in
+    `Machine/Tape.lean`;
+  - **two lemmas carry the mathematics**, the rest being transcription:
+    `eval bitnest 0` is the intended nested-pair value (induction along the lex
+    walk), and `structOf V` of that value is *isomorphic* to the instance –
+    which lands on `FinStruct.ofEquiv` / `toPred_ofEquiv` and the renumbering
+    already built in `Computability/Reduction.lean`, to be read before writing
+    any decoder.
+
+  **What one construction buys, if it is written general in `V` from the
+  start** (the marginal cost over instantiating it at FINSAT is small):
+
+  - `RE.Hard CODEHALT`, by instantiating at `P = FINSAT`, which is already
+    RE-hard, and transferring along `CofinalHard.of_relOrderedReduction`; with
+    `codehalt_mem_RE`, `CODEHALT` is **RE-complete**. Going through FINSAT
+    also sidesteps the question of arbitrary source vocabularies, which the
+    general-`V` statement below meets through `Relationalize.lean`;
+  - `mem_RE_iff_rePred (V : FinVocab L) (P : DecisionProblem L) :`
+    `P ∈ RE ↔ REPred (P.toPred V)` – **“RE is exactly the recursively
+    enumerable properties of finite structures”**, the RE analogue of the
+    machine side of Fagin's theorem, with no machine model on either side. The
+    forward half is `RE_subset_rePred`, done; the converse is steps 1–4 above
+    plus `codehalt_mem_RE` and closure under ordered reductions;
+  - **`RE ≠ coRE`**, which the library currently disclaims twice (the
+    `RecursivelyEnumerable.lean` docstring and the landing page): were
+    `CODEHALTᶜ` in RE, the equivalence would make `CODEHALT.toPred` and its
+    complement both `REPred`, hence computable by Post, against
+    `not_computablePred_codehalt`. Needs a presented `codeVocab` beside
+    `turingVocab`/`finsatVocab` in `Computability/Catalog.lean`.
+
 - **PCP (Post's correspondence problem)**: the classical target for
   undecidability by reduction. **Defined** (`Problems/Pcp/Defs.lean`): the
   instance is a marked list of domino pairs over an alphabet, ordered by the
@@ -598,24 +681,25 @@ as everyone states it. What remains:
     enumerations (by uniqueness of sorted enumerations, not by induction).
     Four files: the sorted-enumeration layer, `pcpOn_iff_cert` with its
     relabelling to `Fin m`, the block and guarded kernel, and an umbrella;
-  - **hardness** [XL]: *not a catalog item*. PCP is not the syntactic image of
-    any logic – a certificate of `∃SO[new]` is a structure with relations, a
-    certificate of PCP is a string with two parses – and a PCP instance is
-    really a *program*: reading a solution left to right and keeping the
-    unmatched overhang makes it a nondeterministic queue machine whose
-    transitions the reduction writes. So RE-hardness of PCP *is* the RE machine
-    bridge: the discharge must guess a block assignment on unbounded storage and
-    then evaluate a first-order kernel against it, every atom test being a random
-    access into the guessed table – the “evaluator with tape addressing” priced
-    at XL in §7. The honest decomposition is `HALT` (unbounded tape, no step
-    bound) as a catalog problem and `HALT ∈ RE` – both done – then `HALT`
-    RE-hard [XL, the whole cost] and `HALT ≤ᶠᵒ[≤] PCP` by the classical
-    computation-history dominoes [L]. Only the third is blocked, and on effort
-    rather than on an idea.
+  - **hardness** [L, once `CODEHALT` is RE-hard; XL if attempted directly]:
+    `CODEHALT ≤ᶠᵒ[≤] PCP` by the classical computation-history dominoes, after
+    which hardness travels forward along the reduction. These are the *same*
+    dominoes that give **undecidability** of PCP – reachable independently of
+    everything else, since first-order reductions are computable and
+    `CODEHALT` is undecidable – so one construction serves both readings, and
+    the item is no longer gated on the machine bridge.
 
-    **Undecidability** of PCP, on the other hand, is reachable now and does not
-    need any of this: `CODEHALT ≤ᶠᵒ[≤] PCP` [L, the same dominoes] suffices,
-    since first-order reductions are computable and `CODEHALT` is undecidable.
+    Why the direct route is XL, and why it should not be taken: PCP is not the
+    syntactic image of any logic – a certificate of `∃SO[new]` is a structure
+    with relations, a certificate of PCP is a string with two parses – and a
+    PCP instance is really a *program*: reading a solution left to right and
+    keeping the unmatched overhang makes it a nondeterministic queue machine
+    whose transitions the reduction writes. Discharging `∃SO[new]` into it
+    directly means guessing a block assignment on unbounded storage and then
+    evaluating a first-order kernel against it, every atom test being a random
+    access into the guessed table – the “evaluator with tape addressing” priced
+    at XL in §7. The code model is where that cost is avoided, which is the
+    item above.
 
     Three shortcuts fail, and are worth not rediscovering. `HeadEval` does not
     apply: its heads range over the elements of a *structure* and its guards are
@@ -628,13 +712,23 @@ as everyone states it. What remains:
     lexicographic layout, and a stride is not a bounded distance. And reducing
     from FINSAT instead is harder, not easier: the sentence would be input
     rather than parameter, so the instance would have to be a *universal* model
-    checker.
-- **`RE.Hard HALT`**, i.e. “RE is the class of semi-decidable problems”
-  [XL, the same item as the PCP hardness above]: the converse half of the RE
-  machine bridge. It needs the evaluator with addressed storage (§7), and it
-  buys no statement about any catalog problem – whereas the easy half,
-  `halt_mem_RE`, already buys `halt_le_finsat`, and buys the same for every
-  future problem shown to be in RE.
+    checker – an objection that is about *building* one, and hence does not
+    bite at `CODEHALT`, where the model checker is `finsat_rePred`, a theorem
+    already proved, and the reduction only has to name it.
+- **`RE.Hard HALT`** [last, and no longer the load-bearing item]: with
+  `CODEHALT` RE-hard, the statement “RE is the class of semi-decidable
+  problems” is *already* had, in the code model and in the sharper form
+  `REPred = RE`; what remains here is the same fact at the machine model, which
+  is a statement about `Language.turing`, not about RE. Two routes, neither
+  needing the evaluator with addressed storage: `CODEHALT ≤ᶠᵒ[≤] HALT`, a
+  machine interpreting the code drawn in the instance, or `PCP ≤ᶠᵒ[≤] HALT`, a
+  machine that guesses dominoes and keeps the overhang on the unbounded tape,
+  its data read by the transition formulas – the regime of the SAT machine
+  (`Machine/Hardness.lean`, ~2.7k with its tape and interpretation files)
+  rather than of an evaluator. So [L–XL] and unblocked, but last: it buys the
+  machine-model wording of a theorem the code model already states, whereas the
+  easy half, `halt_mem_RE`, already buys `halt_le_finsat` and buys the same for
+  every future problem shown to be in RE.
 - **Housekeeping left by the FINSAT build** [S each]: `lexLtF`/`lexLeF`, which
   decide the lexicographic order on `D`-tuples, sit in `Problems/FinSat/Nodes.lean`
   but belong in `OrderWalk.lean` next to `succTupF`, which walks that order
@@ -675,7 +769,18 @@ blocked.
    because building the reduction from the complement side keeps the promise in
    hand where it is proved. Reach for tracking when a second consumer appears,
    not before.
-2. **The fixpoint logics, as textbook faithfulness**: FO(PFP) (§3) and
+2. **The RE bridge, closed at the code model** [M–L] (§8): the
+   instance-as-a-program reduction `P ≤ᶠᵒ[≤] CODEHALT`, written general in the
+   presented vocabulary. Three headlines out of one construction – `CODEHALT`
+   RE-complete, `REPred = RE`, and `RE ≠ coRE`, the last removing a
+   disclaimer the library currently repeats – and it re-prices two items that
+   have stood at XL since the section was written: PCP hardness drops to the
+   dominoes it already wanted for undecidability, and `RE.Hard HALT` stops
+   being load-bearing. It is also the only place in the document where an
+   evaluator was the stated blocker and the blocker turns out to be avoidable
+   rather than merely expensive, which is reason enough to take it before
+   anything that only adds vocabulary.
+3. **The fixpoint logics, as textbook faithfulness**: FO(PFP) (§3) and
    Immerman–Vardi (§4), both [L]. Neither unblocks anything else and neither
    buys a class the library lacks – SO(TC) already captures PSPACE – so what
    they add is DC's own vocabulary for classes held here under other names,
