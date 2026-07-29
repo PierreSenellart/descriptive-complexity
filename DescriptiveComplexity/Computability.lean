@@ -11,6 +11,7 @@ import DescriptiveComplexity.Computability.REPred
 import DescriptiveComplexity.Computability.Reduction
 import DescriptiveComplexity.Computability.Catalog
 import DescriptiveComplexity.Computability.CodeHalt
+import DescriptiveComplexity.Computability.CodeHaltComplete
 
 /-!
 # The bridge to Mathlib's computability layer
@@ -71,12 +72,16 @@ list of the symbols of its vocabulary.
    computable – and hence
    `DescriptiveComplexity.finsat_not_computable`, Trakhtenbrot's theorem.
 
-## What this layer does not yet do
-
-Only one inclusion, `RE ⊆ REPred`. The converse, that every recursively
-enumerable predicate is `∃SO[new]`-definable, is the RE machine bridge and is
-priced in `ROADMAP.md` (§7, §8): it needs an evaluator with addressed storage,
-and nothing here approaches it. So a problem shown to be in RE is honestly
-semi-decidable, but a semi-decidable problem is not thereby known to be in the
-library's RE.
+7. `DescriptiveComplexity.Computability.CodeHaltComplete` – **the converse
+   inclusion**, and with it the identity `RE = REPred`. A semi-decidable
+   problem reduces to `CODEHALT` (`DescriptiveComplexity.Problems.CodeHalt.Hardness`):
+   the reduction draws the instance as the *program* that runs a semi-decision
+   procedure on it, and the procedure is *obtained* from Mathlib
+   (`Nat.Partrec.Code.exists_code`) rather than built, which is what avoids the
+   evaluator with addressed storage the machine route would need. Whence
+   `DescriptiveComplexity.mem_RE_iff_rePred` – RE is exactly the recursively
+   enumerable properties of finite structures – and
+   `DescriptiveComplexity.codehalt_RE_complete`, and
+   `DescriptiveComplexity.RE_ne_coRE`, by Post's theorem applied to the
+   undecidability of (6).
 -/

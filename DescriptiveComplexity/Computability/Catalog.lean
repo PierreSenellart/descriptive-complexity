@@ -24,11 +24,14 @@ Both are instances of one theorem and neither needs anything problem-specific
 beyond listing the symbols of the vocabulary: this is the point of encoding
 structures once for the catalog rather than once per problem.
 
-Neither statement says *undecidable*. That reading needs one more thing, and
-exactly one: a computable map of a known-undecidable set into concrete machine
-instances (`ROADMAP.md` §8, not built). Everything that would follow from it is
-here – `DescriptiveComplexity.finsat_not_computable_of_halt` is Trakhtenbrot's
-theorem waiting on that single hypothesis.
+Neither statement says *undecidable*. That reading is supplied one file over,
+by `DescriptiveComplexity.Computability.CodeHalt`: a known-undecidable set –
+Mathlib's halting problem – maps computably into concrete instances of
+`DescriptiveComplexity.CODEHALT`, whence
+`DescriptiveComplexity.finsat_not_computable`, Trakhtenbrot's theorem outright.
+The hypothetical form kept here,
+`DescriptiveComplexity.finsat_not_computable_of_halt`, is the same statement at
+the *machine* model, which is still open (`ROADMAP.md` §8).
 -/
 
 namespace DescriptiveComplexity

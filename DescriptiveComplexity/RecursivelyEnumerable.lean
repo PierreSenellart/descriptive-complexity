@@ -29,21 +29,25 @@ original elements.
 `DescriptiveComplexity.NP_subset_RE` is the inclusion `NP ⊆ RE`, by inventing
 nothing.
 
-## What this class does and does not claim
+## What this file claims, and where the rest is
 
 RE is here a *logically defined* class, exactly as NP is `Σ₁`-definability
 rather than a machine notion: a completeness proof for it is an `∃SO[new]`
-definition plus a first-order reduction. Two things are deliberately **not**
-claimed and are recorded in `ROADMAP.md` (§8):
+definition plus a first-order reduction. Two facts about it are proved
+elsewhere, where the class meets Mathlib's computability layer, and nothing in
+this file assumes them:
 
-* that RE coincides with recursive enumerability in the sense of a machine
-  model – that is the Trakhtenbrot-style bridge, needing an encoding of finite
-  structures and Mathlib's computability layer;
-* any relation between RE and its complement `DescriptiveComplexity.coRE`. In
-  particular `coNP = Π₁ᵖ` has a *logical* dual definition, while co-RE has
-  none here: nothing in this file suggests `RE = coRE`, and the separation
-  (which is what turns RE-hardness into undecidability) is exactly what the
-  machine bridge would buy.
+* `DescriptiveComplexity.mem_RE_iff_rePred` – RE *is* recursive enumerability:
+  a problem is `∃SO[new]`-definable exactly when its concrete instances form an
+  `REPred`;
+* `DescriptiveComplexity.RE_ne_coRE` – RE differs from its complement
+  `DescriptiveComplexity.coRE`. That separation is not available here:
+  `coNP = Π₁ᵖ` has a *logical* dual definition, while `∃SO[new]` has no dual
+  reading, so nothing in this file relates the two classes. It is the
+  undecidability of an RE-complete problem, through Post's theorem, that
+  separates them.
+
+Both are in `DescriptiveComplexity.Computability.CodeHaltComplete`.
 -/
 
 namespace DescriptiveComplexity
@@ -78,8 +82,9 @@ noncomputable def RE : ComplexityClass where
 /-- **co-RE**: the problems whose complement is recursively enumerable. Unlike
 `coNP`, which the second-order quantifier duality identifies with `Π₁`
 definability, this is only the complement operator applied to RE: `∃SO[new]`
-has no dual reading here, and the library proves no inclusion between RE and
-co-RE in either direction. -/
+has no dual reading here, and no inclusion between RE and co-RE is available at
+this level. That the two classes differ is
+`DescriptiveComplexity.RE_ne_coRE`. -/
 noncomputable abbrev coRE : ComplexityClass := RE.compl
 
 variable {L : Language.{0, 0}}

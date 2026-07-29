@@ -41,11 +41,13 @@ Two facts carry the proof:
   of the logic (`DescriptiveComplexity.extIso`), so the fixed sentence says the
   same thing about both.
 
-## What is not claimed
+## The converse
 
-The converse, that every `REPred` is in `RE`, is the evaluator with addressed
-storage (`ROADMAP.md` §7) and is not proved here; see the module docstring of
-`DescriptiveComplexity.RecursivelyEnumerable`.
+That every `REPred` is in `RE` is proved one layer up, in
+`DescriptiveComplexity.Computability.CodeHaltComplete`
+(`DescriptiveComplexity.mem_RE_iff_rePred`). It needs a target whose programs
+already exist, so that the reduction can draw a semi-decision procedure inside
+the instance rather than build one.
 -/
 
 namespace DescriptiveComplexity

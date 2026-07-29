@@ -598,10 +598,12 @@ individual declarations are documented on their own pages.
 * `DescriptiveComplexity.RecursivelyEnumerable` – **the class RE**
   (`DescriptiveComplexity.RE`), a `DescriptiveComplexity.ComplexityClass` by
   those two closures, with `NP ⊆ RE` (`DescriptiveComplexity.NP_subset_RE`) and
-  the complement operator `DescriptiveComplexity.coRE`. Nothing here relates RE
-  and co-RE: `∃SO[new]` has no dual reading, and the separation that turns
-  RE-hardness into undecidability is a machine-bridge statement. Its first
-  complete problem is finite satisfiability, by Trakhtenbrot's theorem
+  the complement operator `DescriptiveComplexity.coRE`. `∃SO[new]` has no dual
+  reading, so nothing in that file relates RE and co-RE; the separation
+  `DescriptiveComplexity.RE_ne_coRE` is proved where the class meets Mathlib's
+  computability layer, in
+  `DescriptiveComplexity.Computability.CodeHaltComplete`. Its first complete
+  problem is finite satisfiability, by Trakhtenbrot's theorem
   (`DescriptiveComplexity.Problems.FinSat`), and Post's correspondence problem
   is a member of it (`DescriptiveComplexity.pcp_mem_RE`).
 * `DescriptiveComplexity.Relationalize` – **removing function symbols from a
@@ -695,6 +697,17 @@ once for the catalog rather than once per problem.
   `DescriptiveComplexity.finsat_not_computable`, **Trakhtenbrot's theorem**:
   whether a first-order sentence has a *finite* model is undecidable.
 
+* `DescriptiveComplexity.mem_RE_iff_rePred` – **RE is exactly recursive
+  enumerability**, the converse inclusion and with it the identity of the
+  logically defined class with the machine one. A semi-decidable problem
+  reduces to CODEHALT by drawing the instance as the *program* that runs a
+  semi-decision procedure on it: the procedure is
+  *obtained* from Mathlib (`Nat.Partrec.Code.exists_code`) rather than built,
+  which is exactly what spares the layer the evaluator with addressed storage
+  a machine target would need. Whence
+  `DescriptiveComplexity.codehalt_RE_complete` and, by Post's theorem applied
+  to the undecidability above, `DescriptiveComplexity.RE_ne_coRE`.
+
 ## The problem catalog
 
 `DescriptiveComplexity.Problems` holds one decision problem per file, each with
@@ -716,26 +729,29 @@ reduction and certificate in full.
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
-| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound ‡ | FINSAT |
+| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT ‡ |
+
+Each entry of the **machine model** column is an equivalence *proved here*
+between the logical definition of the class and acceptance by that model:
+`DescriptiveComplexity.mem_LOGSPACE_iff_automaton` and
+`DescriptiveComplexity.mem_NL_iff_automaton` (†), and, through the completeness
+of an acceptance problem, `DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`,
+`DescriptiveComplexity.mem_NP_iff_le_ntmAccept`,
+`DescriptiveComplexity.le_dtmAcceptSpace_of_mem_PSPACE` and
+`DescriptiveComplexity.mem_RE_iff_rePred`. A dash marks a class for which no
+such equivalence is proved here.
 
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
 for `NL`, and `DescriptiveComplexity.mem_LOGSPACE_iff_automaton` for `LOGSPACE`,
 where the machine is required to be deterministic.
 
-‡ Membership only, so far, so these problems are not listed as complete. At
-`PSPACE`: `DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE` and
-`DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`, whose hardness – the capture,
-which would also give `PSPACE = NPSPACE` – is not proved yet. At `RE`:
-`DescriptiveComplexity.halt_mem_RE`,
-`DescriptiveComplexity.codehalt_mem_RE` and
-`DescriptiveComplexity.pcp_mem_RE`, each giving at once a first-order
-reduction to finite satisfiability (`DescriptiveComplexity.halt_le_finsat`,
-`DescriptiveComplexity.codehalt_le_finsat`,
-`DescriptiveComplexity.pcp_le_finsat`); none of `DescriptiveComplexity.HALT`,
-`DescriptiveComplexity.CODEHALT` and `DescriptiveComplexity.PCP` is proved
-RE-hard, that being the converse half of the RE machine bridge (`ROADMAP.md`
-§7, §8). `CODEHALT` is nonetheless undecidable outright, and it is what makes
-finite satisfiability undecidable.
+‡ Two further problems at `RE` have membership only, so far, and are therefore
+not listed as complete: `DescriptiveComplexity.halt_mem_RE` and
+`DescriptiveComplexity.pcp_mem_RE` each give at once a first-order reduction to
+finite satisfiability (`DescriptiveComplexity.halt_le_finsat`,
+`DescriptiveComplexity.pcp_le_finsat`), but neither `DescriptiveComplexity.HALT`
+nor `DescriptiveComplexity.PCP` is proved RE-hard; both are now reachable from
+`CODEHALT`, and `ROADMAP.md` (§8) records what each would cost.
 
 Headline results and cross-references:
 
@@ -913,8 +929,9 @@ Headline results and cross-references:
   FINSAT is already RE-hard, that yields
   `DescriptiveComplexity.halt_le_finsat` at once: the halting problem
   first-order-reduces to finite satisfiability, which is Trakhtenbrot's theorem in
-  the form it is usually stated. RE-*hardness* of `HALT` is not proved and is a
-  far larger item; see `ROADMAP.md` (§7, §8).
+  the form it is usually stated. RE-*hardness* of `HALT` is not proved; it is
+  now a statement about the machine model rather than about RE, since the code
+  model already has it (`ROADMAP.md` §8).
 
   **Post's correspondence problem** (`DescriptiveComplexity.PCP`,
   [Post 1946][post1946variant]) has the same membership half
@@ -937,8 +954,32 @@ Headline results and cross-references:
   Being a sequence is also why `PCP` is not a second syntactic image: reading a
   solution left to right and keeping the unmatched overhang turns a PCP
   instance into a nondeterministic queue machine whose transitions a reduction
-  writes, so RE-*hardness* of PCP is the RE machine bridge rather than a
-  translation of the logic. `ROADMAP.md` (§8) records it.
+  writes, so RE-*hardness* of PCP is a computation-history construction rather
+  than a translation of the logic; with `CODEHALT` RE-hard it is a reduction
+  from one *program* to another, which is where `ROADMAP.md` (§8) now prices
+  it.
+
+  **CODEHALT** (`DescriptiveComplexity.Problems.CodeHalt`) – does the
+  `Nat.Partrec.Code` drawn as the syntax tree of the instance halt on `0`? – is
+  **RE-complete** (`DescriptiveComplexity.codehalt_RE_complete`), and its
+  hardness proof is general enough to give the identity of the class with its
+  machine reading: `DescriptiveComplexity.mem_RE_iff_rePred`, a problem is in
+  RE exactly when its concrete instances are semi-decidable. The reduction
+  writes the instance *as a program*: the root of the drawn code is
+  `comp cP (pair numeral nest)`, where `cP` is a code semi-deciding the source
+  problem – supplied by `Nat.Partrec.Code.exists_code`, never built – and the
+  rest is a constant that first-order formulas can draw. Since every branch is
+  evaluated at input `0`, a constant is a tree of `pair`, `succ` and `zero`
+  nodes, so a bit of the input instance is *one node*, and the table is nested
+  by coordinate rather than numbered in a mixed radix: each level of the nest
+  is then a plain walk of the input order, which is what a first-order guard
+  can describe, and no arithmetic on positions appears anywhere. The two
+  shared leaves `succ` and `zero` let a bit be read as an *edge* of the
+  drawing rather than as a mark, so every element has exactly one constructor
+  and the drawing is well formed by inspection. Three headlines come out of
+  the one construction: RE-completeness of `CODEHALT`, `RE = REPred`, and –
+  with Post's theorem and the undecidability of `CODEHALT` –
+  `DescriptiveComplexity.RE_ne_coRE`.
 
 ## Worked examples
 
