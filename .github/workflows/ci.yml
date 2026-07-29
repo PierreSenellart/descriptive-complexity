@@ -6,6 +6,18 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Nothing here writes to the repository; the docs and update workflows ask for
+# the extra scopes they need.
+permissions:
+  contents: read
+
+# Collapse a burst of pushes onto the newest commit, as `docs.yml` does: a full
+# Lean + Mathlib build is expensive, and a superseded one is of no interest.
+# Pull requests are keyed separately from branches by `github.ref`.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build
