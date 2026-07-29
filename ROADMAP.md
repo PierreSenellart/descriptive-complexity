@@ -731,6 +731,122 @@ as everyone states it. What remains:
   curated example set (cf. Grange et al., MFCS 2024) as the catalog broadens,
   so the library doubles as a complexity-course companion.
 
+## 10. Completeness without a class: FO degrees and `ComplexityClass.below`
+
+Every completeness result above measures a problem against a class *defined by
+a logic*. The same machinery supports a second, orthogonal notion at almost no
+cost, and it is not currently exploited: completeness for the degree of a fixed
+*problem*, with no logic anywhere. "GI-complete" is the literature's standard
+example. Nothing in `Complexity.lean` is specific to logically defined classes,
+so the notion is expressible today.
+
+- **`ComplexityClass.below`** [S, ~150 lines, no prerequisites]: the downward
+  closure of a fixed relational problem, as a `ComplexityClass`.
+
+  ```lean
+  def ComplexityClass.below {L₀ : Language.{0,0}} [L₀.IsRelational]
+      (Q₀ : DecisionProblem L₀) : ComplexityClass where
+    Mem P := Nonempty (P ≤ᶠᵒ[≤] Q₀)
+    Hard P := CofinalHard (fun Q => Nonempty (Q ≤ᶠᵒ[≤] Q₀)) P
+    …
+  ```
+
+  The `Hard` side is *entirely free*: `CofinalHard` (`Hierarchy.lean`) is
+  already parameterized by an arbitrary `Mem` predicate, and
+  `CofinalHard.of_foReduction`, `.of_orderedReduction`,
+  `.of_relOrderedReduction`, `.congr` are proved generically for it – the class
+  literals of `Hierarchy.lean` and `LogSpace.lean` differ only in which
+  predicate they pass. The `Mem` side is `FOReduction.toOrdered`,
+  `OrderedFOReduction.trans` and `OrderedFOReduction.congrSource`; that
+  `correct` quantifies over finite nonempty structures only is what makes
+  `mem_congr_finite` go through. `(below Q₀).Complete P` is then literally
+  "`P` is `Q₀`-complete", and mutual reducibility `≡ᶠᵒ` names the degree it
+  lives in.
+- **`C = below Q₀` when `Q₀` is complete for `C`** [S per instance; blocked in
+  general]: the sanity check that the construction is the right one, and a
+  theorem rather than a tautology. `ComplexityClass.ext` plus monotonicity of
+  `CofinalHard` in its `Mem` argument reduce it to
+  `C.Mem P ↔ Nonempty (P ≤ᶠᵒ[≤] Q₀)`, whose forward half is the class's own
+  discharge and whose backward half is `mem_of_orderedReduction` applied to
+  `Q₀ ∈ C`. So `NP = below SAT`, `PTIME = below HORNSAT`, `NL = below TwoSAT`
+  and `coNP = below TAUT` are a few lines each, since
+  `sat_hard_of_sigmaSODefinable`, `hornSat_hard_of_sigmaSOHornDefinable`,
+  `twoSat_hard_of_sigmaSOKromDefinable` and `taut_hard_of_piSODefinable` all
+  deliver a *non-relativized* ordered reduction. Payoff: "SAT-hardness is
+  NP-hardness" stops being folklore and becomes a lemma. The *generic*
+  statement, over an arbitrary class and its complete problem, is blocked, and
+  instructively so: `cofinalHard_iff` yields only `≤ʳᶠᵒ[≤]`, so it needs the
+  `mem_of_relOrderedReduction` closure that §3 parks as unmotivated – this is
+  the first thing that would motivate it. RE is exactly the case that needs it
+  (`finsat_hard_of_sigmaSONewDefinable` is relativized).
+- **Graph Isomorphism, the point of the exercise** [S]: the vocabulary already
+  exists, `Language.twoGraphs` from `Problems/SubgraphIso.lean` (marks
+  `patV`/`hostV`, relations `patE`/`hostE`); GI is "the two marked subgraphs
+  are isomorphic", with junk outside both marks ignorable as usual. Membership
+  is a textbook `Σ₁` – guess a binary relation, check bijection-on-marks and
+  both edge directions (`realize_rel₂`) – with no order, no counting and no
+  threshold, hence cheaper than most of the NP catalog. It is the library's
+  first NP problem conjecturally neither in P nor NP-complete, and the problem
+  of deciding the very equivalence the framework quotients by, which is worth a
+  sentence in its docstring.
+- **Hardness for isomorphism problems must be order-free** – a triage rule to
+  record beside those of §0. The classical arc is a gadget `F` on single graphs
+  with `G ≅ H ↔ F G ≅ F H`, and the forward half is *free* here because an
+  interpretation is functorial, i.e. commutes with isomorphisms
+  (`relMap_equiv₁/₂`). An *ordered* reduction destroys that: order-invariance
+  makes the yes/no answer order-independent, not the constructed structure
+  independent up to isomorphism, so every gadget would owe a structure-level
+  argument. Order-free is available because `twoGraphs` carries its own "this
+  element is real" marks: run `F` relativized to `patV` and to `hostV` in
+  parallel inside one order-free interpretation, leaving junk unmarked. Side
+  benefit – both sides are built by the same gadget out of the same universe,
+  so they come out size-balanced and the padding step most textbook GI
+  reductions need disappears. The one reusable lemma, which is what makes each
+  catalog entry short afterwards [M]:
+
+  ```lean
+  theorem gi_hard_of_isoReflecting (F : FOInterpretation Language.graph L' Tag d)
+      (h : ∀ G H, … → Nonempty (F.Map G ≃[L'] F.Map H) → Nonempty (G ≃[Language.graph] H)) :
+      GraphIso ≤ᶠᵒ GraphIso'
+  ```
+- **The GI degree, in order of cost** [M each]: hypergraph / set-system
+  isomorphism first, since `Problems/SetFamily/FromGraphs.lean` already builds
+  set systems from graphs and the incidence construction is order-free; then
+  digraph and colored-graph isomorphism (colored → plain is the content); then
+  bipartite-graph isomorphism, the first entry with a real rigidity argument
+  (incidence graph, dimension 2, tags `{V, E}`, and the isomorphism must be
+  prevented from swapping the two sides); finite-automaton isomorphism as a
+  re-reading of `Machines.lean`. Excluded: line graphs (Whitney's theorem, with
+  its K₃/K₁,₃ exception) and Latin-square isotopy / Steiner-system isomorphism
+  (Miller's reductions are arithmetic-heavy and would fail the §0
+  bitwise-definability check). Companions that populate the degree without
+  completing it: Graph Automorphism and Group Isomorphism (multiplication
+  tables, one ternary relation), both below GI with the converse open – though
+  `GA ≤ᶠᵒ GI` is not free, the classical reduction being genuinely clever.
+  **Caution for the docstrings**: classical GI-completeness is stated under
+  polynomial-time reductions, so no result here may be cited, only re-proved;
+  under `≤ᶠᵒ` the degree is finer, which makes each statement *stronger* than
+  the literature's, and some classically GI-complete problems will not survive.
+- **CSP templates and pp-interpretations** [M for the reduction theory, R for
+  the dichotomy]: the other reduction theory not organized around a class, and
+  the better fit of the two. For a fixed finite template `B`, `CSP(B)` is a
+  decision problem in this library's sense, and the field's reduction notion –
+  primitive-positive interpretations – *is* a first-order interpretation
+  restricted to the existential-conjunctive fragment, so `FOInterpretation` is
+  already the right object and `IsQuantifierFree` shows how a fragment gets
+  tracked (§3, reduction-notion refinements). "`B'` pp-interprets `B` implies
+  `CSP(B) ≤ᶠᵒ CSP(B')`" is directly formalizable. What makes it worth doing is
+  **Schaefer's dichotomy**, a finite case analysis over Boolean templates whose
+  tractable cases are already in the catalog – 2SAT, HORN-SAT and dual-Horn,
+  1-in-3-SAT, NAE-SAT – with affine the only one missing. Also the item in this
+  document closest to conjunctive-query evaluation and containment
+  (`Examples/ConjunctiveQueries.lean`).
+- **The negative half is §5.** A degree structure is only worth building if
+  non-reducibility is provable, and Ehrenfeucht–Fraïssé games are exactly that.
+  The two together give an *unconditional* degree structure at the FO level,
+  where every machine-world degree statement is conjectural – a better framing
+  for §5 than "inexpressibility results" standing alone.
+
 ## Suggested ordering (value vs. prerequisite chains)
 
 Ordered for headline theorems not yet formalized anywhere, maximal reuse of
