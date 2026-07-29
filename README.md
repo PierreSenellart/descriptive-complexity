@@ -1,5 +1,7 @@
 # DescriptiveComplexity
 
+[![CI](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml)
+
 A Lean 4 library for descriptive complexity on top of Mathlib's
 `ModelTheory` library, based on first-order reductions, in the style of
 Immerman (*Descriptive Complexity*, ch. 3). Its main goal is to let users
