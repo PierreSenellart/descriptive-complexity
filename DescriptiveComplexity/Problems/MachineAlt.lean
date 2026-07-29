@@ -173,6 +173,16 @@ theorem mem_sigmaP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} (k : ℕ)
   · rintro ⟨f⟩
     exact (SigmaP (k + 1)).mem_of_orderedReduction f (atmAccept_mem_sigmaP k)
 
+/-- **The machine bridge at one universal block**: alternating acceptance with
+a single universal block is coNP-complete. The model is the
+*co*-nondeterministic one – a universal configuration accepts when it has a
+successor and every successor accepts, so the machine accepts exactly when
+every run of it does – and this is the dual of
+`DescriptiveComplexity.atmAccept_one_complete`, which reads the same machine at
+the existential polarity as `DescriptiveComplexity.NTMAccept`. -/
+theorem atmAccept_one_coNP_complete : coNP.Complete (ATMAccept 1 false) :=
+  atmAccept_piP_complete 0
+
 /-- **The machine characterization of `Πₖ₊₁ᵖ`.** -/
 theorem mem_piP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} (k : ℕ)
     (P : DecisionProblem L) :

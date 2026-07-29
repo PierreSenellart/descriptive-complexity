@@ -723,7 +723,7 @@ reduction and certificate in full.
 | `NL` | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | two-way `k`-head automaton † | REACH · UNREACH · 2SAT |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | deterministic polynomial-time Turing machine | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | — | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
+| `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | nondeterministic polynomial-time Turing machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) · `ATMAccept 1 false` |
 | `DP` | a `Σ₁` and a `Π₁` sentence conjoined | — | SAT-UNSAT |
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine, `k` blocks, existential first | `QBF k` – at `k = 1`, NP · `ATMAccept k true` |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` – at `k = 1`, coNP · `ATMAccept k false` |
@@ -787,7 +787,10 @@ Headline results and cross-references:
   universal one (`DescriptiveComplexity.atmAccept_piP_complete`), so each level
   of the logically defined hierarchy is the corresponding level of the
   alternating-machine hierarchy of [Chandra–Kozen–Stockmeyer
-  1981][chandra1981alternation] (`DescriptiveComplexity.mem_sigmaP_iff_le_atmAccept`,
+  1981][chandra1981alternation]. At one block the two are the nondeterministic
+  model and its dual, which is where coNP gets its machine
+  (`DescriptiveComplexity.atmAccept_one_complete`,
+  `DescriptiveComplexity.atmAccept_one_coNP_complete`) (`DescriptiveComplexity.mem_sigmaP_iff_le_atmAccept`,
   `DescriptiveComplexity.mem_piP_iff_le_atmAccept`). Membership reads a run as
   a `k`-round game, each round guessing one walk; hardness builds the machine
   `M_φ` of a quantified Boolean formula inside the instance – one sweep of the
