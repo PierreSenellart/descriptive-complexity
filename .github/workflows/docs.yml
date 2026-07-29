@@ -36,7 +36,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Install elan/Lean, fetch the Mathlib cache and build the library, so
       # that ../.lake/packages (shared with docbuild via packagesDir) is ready.
@@ -62,7 +62,7 @@ jobs:
       #
       # A miss only costs time: the build is correct either way.
       - name: Restore the documentation database
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             docbuild/.lake/build/doc-data
@@ -104,7 +104,7 @@ jobs:
           make docs RESULT_GRAPH_REPO="$RUNNER_TEMP/result-graph"
 
       - name: Upload the Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docbuild/.lake/build/doc
 
@@ -122,4 +122,4 @@ jobs:
     steps:
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

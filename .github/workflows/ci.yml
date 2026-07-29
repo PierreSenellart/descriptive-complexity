@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Installs elan/Lean from lean-toolchain, runs `lake exe cache get`
       # (Mathlib is in the closure) and `lake build`; also runs any test and
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # The library version and the Mathlib pin are each recorded in several
       # files; this catches the one that was forgotten.
