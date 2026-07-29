@@ -10,6 +10,7 @@ import DescriptiveComplexity.Computability.Eval
 import DescriptiveComplexity.Computability.REPred
 import DescriptiveComplexity.Computability.Reduction
 import DescriptiveComplexity.Computability.Catalog
+import DescriptiveComplexity.Computability.CodeHalt
 
 /-!
 # The bridge to Mathlib's computability layer
@@ -55,13 +56,23 @@ list of the symbols of its vocabulary.
    forced by a definable target domain, and the tags of a defining formula,
    which are known only at run time.
 
+6. `DescriptiveComplexity.Computability.CodeHalt` – **undecidability**. The
+   known-undecidable set is Mathlib's halting problem, and it is carried into
+   the catalog by making the *code the instance*: a
+   `Nat.Partrec.Code` is drawn as its syntax tree
+   (`DescriptiveComplexity.codeStruct`), which is a plain tree flattening and
+   so primitive recursive, and the problem
+   `DescriptiveComplexity.CODEHALT` asks whether the drawn code halts on `0`.
+   Whence `DescriptiveComplexity.not_computablePred_codehalt`: the library's
+   first problem proved **undecidable outright**.
+
 ## What this layer does not yet do
 
-Nothing here says *undecidable*, and exactly one step is missing: a
-**computable map of a known-undecidable set** into concrete machine instances,
-i.e. the simulation of Mathlib's halting problem by a
-`DescriptiveComplexity.TMData` (`ROADMAP.md` §8, which records why Mathlib's
-`Nat.Partrec.Code` chain does not supply it). Everything downstream of it is in
-place – `DescriptiveComplexity.finsat_not_computable_of_halt` is Trakhtenbrot's
-theorem with that single hypothesis left open.
+Trakhtenbrot's theorem is one hypothesis away:
+`DescriptiveComplexity.finsat_not_computable_of_codehalt_mem_RE` derives the
+undecidability of finite satisfiability from `CODEHALT ∈ RE`, everything else
+being proved. That hypothesis is now a purely *logical* statement about one
+catalog problem – guess the evaluation of the drawn code, as invented values –
+with no Mathlib computability content left in it; `ROADMAP.md` §8 records what
+it needs.
 -/

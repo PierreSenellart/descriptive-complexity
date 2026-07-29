@@ -677,11 +677,19 @@ once for the catalog rather than once per problem.
   definable target domain forces, and the run-time choice among the `|Tag|ⁿ`
   instances of a defining formula.
 
-Nothing here says *undecidable* yet, and exactly one thing is missing: a
-computable map of a known-undecidable set into concrete machine instances.
-`DescriptiveComplexity.finsat_not_computable_of_halt` is Trakhtenbrot's theorem
-with that single hypothesis left open; `ROADMAP.md` (§8) records why Mathlib's
-`Nat.Partrec.Code` chain does not supply it.
+* `DescriptiveComplexity.not_computablePred_codehalt` – **the first problem of
+  the catalog proved undecidable outright**. Mathlib's halting problem is
+  carried in by making the *code the instance*: a `Nat.Partrec.Code` is drawn
+  as its syntax tree (`DescriptiveComplexity.CODEHALT`,
+  `DescriptiveComplexity.codeStruct`), so the map from codes to instances is a
+  plain tree flattening and hence primitive recursive – which the simulation of
+  a machine could not be, Mathlib's universal machine not being finite-state.
+
+Trakhtenbrot's theorem is then one hypothesis away:
+`DescriptiveComplexity.finsat_not_computable_of_codehalt_mem_RE` derives the
+undecidability of finite satisfiability from `CODEHALT ∈ RE`, and that
+hypothesis is a purely logical statement about one catalog problem, with no
+computability content left in it. See `ROADMAP.md` (§8).
 
 ## The problem catalog
 

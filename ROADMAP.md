@@ -627,11 +627,12 @@ problem. What remains:
   buys no statement about any catalog problem – whereas the easy half,
   `halt_mem_RE`, already buys `halt_le_finsat`, and buys the same for every
   future problem shown to be in RE.
-- **Undecidability: the bridge to Mathlib's computability layer** [partly built;
-  see `UN-DECIDABLE.md` for the design and the current state]. This is all that
-  stands between `halt_le_finsat` and Trakhtenbrot's theorem as everyone states
-  it; until it is finished the honest reading of every result here is "complete
-  for the logically defined class RE".
+- **Undecidability: the bridge to Mathlib's computability layer** [one item
+  left, `CODEHALT ∈ RE`]. This is all that stands between the RE results and
+  Trakhtenbrot's theorem as everyone states it; until it is finished the honest
+  reading of the RE results is "complete for the logically defined class RE",
+  though `not_computablePred_codehalt` is already an unconditional
+  undecidability statement about a catalog problem.
 
   `ComputablePred` is a predicate on a `Primcodable` type while a
   `DecisionProblem` is a property of finite structures up to isomorphism, so
@@ -665,22 +666,39 @@ problem. What remains:
     definable domain, and the run-time choice among the `|Tag|ⁿ` instances of a
     defining formula, are where the `Primrec` work sits.
 
-  Whence `finsat_not_computable_of_halt`: Trakhtenbrot's theorem in the sense
-  everyone means, with a single hypothesis left open. That hypothesis is the one
-  thing that remains:
+  Whence `finsat_not_computable_of_halt`: Trakhtenbrot's theorem with a single
+  hypothesis left open, on the machine side. That hypothesis has since been
+  removed, by **not going through a machine at all**:
 
-  - **the halting link** [XL, and the piece that turned out to bite]: a
-    computable map from an undecidable set into the concrete instances of
-    `HALT`. Mathlib's chain does give what §6 of `UN-DECIDABLE.md` hoped for –
-    `Turing.PartrecToTM2.tr` is a *single* machine and the code enters through
-    the initial configuration – but that machine is **not finite-state**
-    (`Λ'` embeds `Code`), while a `TMData` lives on a finite universe. Either
-    extract the finite accessible part per code, which needs `Primrec` facts
-    about the compilation that Mathlib does not prove, or formalize a genuinely
-    finite universal machine.
+  - **the code is the instance** (`Problems/CodeHalt.lean`,
+    `Computability/CodeHalt.lean`). A new catalog problem `CODEHALT` draws a
+    `Nat.Partrec.Code` as its *syntax tree* – eleven relation symbols, one
+    element per node – and asks whether the drawn code halts on `0`. The map
+    `code ↦ instance` is then a plain tree flattening, primitive recursive
+    (`primrec_codeStruct`), which the simulation of a machine could not be:
+    Mathlib's universal machine `Turing.PartrecToTM2.tr` is not finite-state
+    (`Λ'` embeds `Code`), while a `TMData` lives on a finite universe. Whence
+    `not_computablePred_codehalt`, the first catalog problem proved
+    **undecidable outright**, and
+    `finsat_not_computable_of_codehalt_mem_RE`: Trakhtenbrot's theorem from
+    `CODEHALT ∈ RE` alone.
 
-  Discharging it makes `HALT` undecidable and `FINSAT` with it, and every future
-  `HALT ≤ᶠᵒ[≤] X` makes `X` undecidable – in particular **Post's problem**,
+  What remains is that single membership:
+
+  - **`CODEHALT ∈ RE`** [L]. An `∃SO[new]` definition of "the drawn code halts
+    on `0`". The certificate is the evaluation, invented: a numeral segment
+    with its successor and order; `Add` and `Mul` as guessed relations, checked
+    by their recurrences, which is what `Nat.pair`/`Nat.unpair` (and so
+    `left`, `right`, `pair`, and the `prec`/`rfind'` arguments) need; the
+    evaluation relation "node `n` on input `x` yields `v`", with the chains a
+    `prec` recursion and an `rfind'` search unroll into; and a rank into the
+    segment justifying each fact by facts of smaller rank, so that the guessed
+    relation is *supported* rather than merely closed – the
+    `acyclicRel_iff_exists_order` pattern. Completeness of the guess is the
+    finiteness of an actual halting computation.
+
+  Discharging it makes `FINSAT` undecidable, and every future
+  `CODEHALT ≤ᶠᵒ[≤] X` makes `X` undecidable – in particular **Post's problem**,
   whose classical theorem therefore needs the dominoes of the PCP item above but
   *not* RE-hardness of PCP.
 - **Housekeeping left by the FINSAT build** [S each]: `lexLtF`/`lexLeF`, which

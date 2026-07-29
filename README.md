@@ -81,7 +81,9 @@ layer: through a generic encoding of finite structures as data, the problems of
 **RE** really are recursively enumerable predicates (`RE_subset_rePred`), and
 first-order reductions really are computable, so undecidability transfers
 backwards along `≤ᶠᵒ`, `≤ᶠᵒ[≤]` and `≤ʳᶠᵒ[≤]` – both with no machine model on
-either side.
+either side. On top of that sits the first **undecidability** result of the
+catalog, `not_computablePred_codehalt`: whether the partial recursive code
+drawn by an instance halts is not decidable.
 
 ## Scope and limitations
 
