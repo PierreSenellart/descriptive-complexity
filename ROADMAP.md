@@ -536,9 +536,10 @@ The concrete items:
   algorithm QSAT names. At RE the same escape exists in a stronger form: the
   target model can be chosen so that the program is *obtained* rather than
   written – `Nat.Partrec.Code`, where Mathlib's `exists_code` supplies it – so
-  the addressed evaluator is avoided there too – and that is how §8 was
-  closed, `orderedReduction_codehalt`. The rule the two cases share: never
-  compile the logic; pick a target whose programs already exist.
+  the addressed evaluator is avoided there too, which is how the converse half
+  of the RE bridge was got (`orderedReduction_codehalt`, §8). The rule the two
+  cases share: never compile the logic; pick a target whose programs already
+  exist.
 - **The exponential classes are not blocked by the framework**: the machine
   description stays polynomial (a reduction can write it) and only the run is
   exponential, living in Lean just as `SigmaSODefinable` quantifies over
@@ -583,7 +584,7 @@ problem. The bridge to Mathlib's computability layer is built too
 problems are undecidable, and `finsat_not_computable` is Trakhtenbrot's theorem
 as everyone states it.
 
-**The converse half is built too, at the code model**
+**The converse half is built as well, at the code model**
 (`Problems/CodeHalt/Hardness/`, `Computability/CodeHaltComplete.lean`):
 `orderedReduction_codehalt` reduces *any* problem whose concrete instances are
 semi-decidable to `CODEHALT`, whence `codehalt_RE_complete`,
@@ -615,40 +616,23 @@ semi-decidable to `CODEHALT`, whence `codehalt_RE_complete`,
 
 What remains:
 
-- **PCP hardness, and with it the undecidability of Post's problem**
-  [L; XL if attempted directly]: `CODEHALT ≤ᶠᵒ[≤] PCP` by the classical
-  computation-history dominoes, after which hardness travels forward along the
-  reduction – `CODEHALT` being RE-hard, this is now the *only* thing missing.
-  These are the *same* dominoes that give **undecidability** of PCP – reachable
-  independently of everything else, since first-order reductions are computable
-  and `CODEHALT` is undecidable – so one construction serves both readings.
+- **PCP hardness, and with it the undecidability of Post's problem** [L]:
+  `CODEHALT ≤ᶠᵒ[≤] PCP` by the classical computation-history dominoes, after
+  which hardness travels forward along the reduction. These are the *same*
+  dominoes that give **undecidability** of PCP – reachable independently of
+  everything else, since first-order reductions are computable and `CODEHALT`
+  is undecidable – so one construction serves both readings.
 
-  Why the direct route is XL, and why it should not be taken: PCP is not the
-  syntactic image of any logic – a certificate of `∃SO[new]` is a structure
-  with relations, a certificate of PCP is a string with two parses – and a
-  PCP instance is really a *program*: reading a solution left to right and
-  keeping the unmatched overhang makes it a nondeterministic queue machine
-  whose transitions the reduction writes. Discharging `∃SO[new]` into it
-  directly means guessing a block assignment on unbounded storage and then
-  evaluating a first-order kernel against it, every atom test being a random
-  access into the guessed table – the “evaluator with tape addressing” priced
-  at XL in §7. The code model is where that cost is avoided, which is the
-  item above.
-
-  Three shortcuts fail, and are worth not rediscovering. `HeadEval` does not
-  apply: its heads range over the elements of a *structure* and its guards are
-  atoms of that structure, so it presupposes the certificate as something
-  queryable, whereas a PCP solution is a string and supplying the query is
-  exactly the work to be avoided. Laying the certificate out as a grid and
-  checking it locally makes the *fan-in* local – partial conjunctions carried
-  along the order – but not the **shared atoms**: the value of `R(x₁, x₂)`
-  occurs in every cell whose tuple extends it, at a stride of `nʲ` in any
-  lexicographic layout, and a stride is not a bounded distance. And reducing
-  from FINSAT instead is harder, not easier: the sentence would be input
-  rather than parameter, so the instance would have to be a *universal* model
-  checker – an objection that is about *building* one, and hence does not
-  bite at `CODEHALT`, where the model checker is `finsat_rePred`, a theorem
-  already proved, and the reduction only has to name it.
+  The construction has to be dominoes rather than a translation of the logic:
+  PCP is the syntactic image of no logic – a certificate of `∃SO[new]` is a
+  structure with relations, a certificate of PCP is a string with two parses –
+  and a PCP instance is really a *program*, a nondeterministic queue machine
+  whose transitions the reduction writes, read off a solution left to right by
+  keeping the unmatched overhang. Reducing from `CODEHALT` rather than from
+  `FINSAT` is what keeps it small: from FINSAT the sentence would be input
+  rather than parameter, so the dominoes would have to simulate a *universal*
+  model checker, whereas a `CODEHALT` instance already carries the program they
+  are to simulate.
 - **`RE.Hard HALT`** [last, and no longer the load-bearing item]: with
   `CODEHALT` RE-hard, the statement “RE is the class of semi-decidable
   problems” is *already* had, in the code model and in the sharper form
@@ -729,8 +713,10 @@ so the notion is expressible today.
   statement, over an arbitrary class and its complete problem, is blocked, and
   instructively so: `cofinalHard_iff` yields only `≤ʳᶠᵒ[≤]`, so it needs the
   `mem_of_relOrderedReduction` closure that §3 parks as unmotivated – this is
-  the first thing that would motivate it. RE is exactly the case that needs it
-  (`finsat_hard_of_sigmaSONewDefinable` is relativized).
+  the first thing that would motivate it. RE used to be the case that needed it
+  (`finsat_hard_of_sigmaSONewDefinable` is relativized); it no longer does,
+  `orderedReduction_codehalt` delivering a non-relativized ordered reduction,
+  so `RE = below CODEHALT` joins the four above.
 - **Graph Isomorphism, the point of the exercise** [S]: the vocabulary already
   exists, `Language.twoGraphs` from `Problems/SubgraphIso.lean` (marks
   `patV`/`hostV`, relations `patE`/`hostE`); GI is "the two marked subgraphs
