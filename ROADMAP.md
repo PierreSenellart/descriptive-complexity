@@ -78,7 +78,7 @@ remains below are ordinary catalog reductions and machine bridges.
 - **PSPACE, downstream of QSAT** [L each, gadget-heavy]: the **hardness half of
   the machine bridge**, `QSAT ≤ᶠᵒ[≤] DTMAcceptSpace` – a deterministic
   QBF-evaluation machine written inside a QSAT instance, which also gives
-  `PSPACE = NPSPACE`; in progress, designed in `PSPACE-MACHINE.md` – and the
+  `PSPACE = NPSPACE`; in progress – and the
   game problems (Generalized Geography…).
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
@@ -345,7 +345,7 @@ compilation direction above exists.
 | L | FO(DTC) | S | S | done, as a capture theorem – see below |
 | NL | FO(TC) | S | S | done, as a capture theorem – see below |
 | Σₖᵖ, Πₖᵖ | `Σₖ`-SO | M (reuses the NP membership) | M (reuses the SAT machine) | +0.6–1.2k [M] |
-| PSPACE | SO(TC) | S [done] | L–XL | ~3–5.5k |
+| PSPACE | SO(TC) | S [done] | L–XL [done, ~3.2k] | ~3–5.5k |
 | EXPTIME | SO(LFP) | L | XL | ~4–7k |
 | EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
 
@@ -450,8 +450,7 @@ ordered ones), `RecursivelyEnumerable.lean` (the class `RE`, with `coRE` and
 reading, and the separation is a machine-bridge statement, the last item below),
 `Relationalize.lean` (every `∃SO[new]`-definable problem reduces to one over a
 relational vocabulary, which is how source vocabularies with function symbols
-are handled), Trakhtenbrot's theorem `FINSAT_RE_complete` (design record:
-`TRAKHTENBROT.md`), and `halt_mem_RE`, whence `halt_le_finsat` – Trakhtenbrot's
+are handled), Trakhtenbrot's theorem `FINSAT_RE_complete`, and `halt_mem_RE`, whence `halt_le_finsat` – Trakhtenbrot's
 theorem in the form it is usually stated, the reduction from the halting
 problem. What remains:
 
@@ -459,8 +458,7 @@ problem. What remains:
   undecidability by reduction. **Defined** (`Problems/Pcp/Defs.lean`): the
   instance is a marked list of domino pairs over an alphabet, ordered by the
   order of the positions of its own words, and a match is a nonempty sequence of
-  marked dominoes whose top and bottom words have the same concatenation. The
-  design of both halves, and the hazards, are in `PCP.md`.
+  marked dominoes whose top and bottom words have the same concatenation.
 
   The [M–L] estimate this item used to carry was wrong, and splitting it is the
   point:
@@ -471,7 +469,9 @@ problem. What remains:
     position in the top word) in lexicographic order. The mathematical content
     is the bridge `pcpOn_iff_cert`, whose one real lemma is that the sorted
     enumeration of a lexicographic sum is the `flatMap` of the sorted
-    enumerations (by uniqueness of sorted enumerations, not by induction);
+    enumerations (by uniqueness of sorted enumerations, not by induction).
+    Four files: the sorted-enumeration layer, `pcpOn_iff_cert` with its
+    relabelling to `Fin m`, the block and guarded kernel, and an umbrella;
   - **hardness** [XL]: *not a catalog item*. PCP is not the syntactic image of
     any logic – a certificate of `∃SO[new]` is a structure with relations, a
     certificate of PCP is a string with two parses – and a PCP instance is
@@ -485,22 +485,91 @@ problem. What remains:
     bound) as a catalog problem and `HALT ∈ RE` – both done – then `HALT`
     RE-hard [XL, the whole cost] and `HALT ≤ᶠᵒ[≤] PCP` by the classical
     computation-history dominoes [L]. Only the third is blocked, and on effort
-    rather than on an idea; `PCP.md` §5 records the three shortcuts that do not
-    work, including why the cheap `HeadEval` evaluator does not apply.
+    rather than on an idea.
+
+    Three shortcuts fail, and are worth not rediscovering. `HeadEval` does not
+    apply: its heads range over the elements of a *structure* and its guards are
+    atoms of that structure, so it presupposes the certificate as something
+    queryable, whereas a PCP solution is a string and supplying the query is
+    exactly the work to be avoided. Laying the certificate out as a grid and
+    checking it locally makes the *fan-in* local – partial conjunctions carried
+    along the order – but not the **shared atoms**: the value of `R(x₁, x₂)`
+    occurs in every cell whose tuple extends it, at a stride of `nʲ` in any
+    lexicographic layout, and a stride is not a bounded distance. And reducing
+    from FINSAT instead is harder, not easier: the sentence would be input
+    rather than parameter, so the instance would have to be a *universal* model
+    checker.
 - **`RE.Hard HALT`**, i.e. “RE is the class of semi-decidable problems”
   [XL, the same item as the PCP hardness above]: the converse half of the RE
   machine bridge. It needs the evaluator with addressed storage (§7), and it
   buys no statement about any catalog problem – whereas the easy half,
   `halt_mem_RE`, already buys `halt_le_finsat`, and buys the same for every
   future problem shown to be in RE.
-- **What incomputability actually needs** [R, separate]: RE-hardness alone does
-  not yet say "undecidable" inside this library — that statement needs the
-  other side, RE ⊆ (Mathlib's) `RePred` through an encoding of finite
-  structures, plus a co-RE problem shown not to be RE. Mathlib's computability
-  layer (`Nat.Partrec`, `ComputablePred`, the halting problem) is the target,
-  and the `Encoding`/`Decoding` bundles are the bridge; this is the same
-  standing-scope question as §7's converse compilation, and the honest reading
-  until it exists is "complete for the logically defined class RE".
+- **Undecidability: the bridge to Mathlib's computability layer** [L–XL]. This
+  is all that stands between `halt_le_finsat` and Trakhtenbrot's theorem as
+  everyone states it; until it exists the honest reading of every result here is
+  "complete for the logically defined class RE".
+
+  `ComputablePred` is a predicate on a `Primcodable` type while a
+  `DecisionProblem` is a property of finite structures up to isomorphism, so
+  something must name instances concretely. **Not** the `Encoding`/`Decoding`
+  bundles: what they guarantee is size-honesty, which undecidability does not
+  need, and a concrete instance type per problem would be ceremony over data
+  that is already a relational structure. The right object is generic: over a
+  *finite relational vocabulary* – every vocabulary in the catalog – a finite
+  structure is a universe `Fin n` plus a Boolean table, so one `Primcodable`
+  type serves the whole catalog at once. In dependency order:
+
+  - **decidable realization** [S]: `Decidable (φ.Realize v xs)` on a finite
+    structure with decidable relations, by recursion on the formula. Mathlib has
+    no such instance. No dependencies, and it is the first formal justification
+    of the README's by-inspection claim that FO reductions are effective;
+  - **the concrete instances** [S–M]: `Fin n` plus the table, with its
+    `Primcodable` instance. State the table as nested `List`s and *not* as a
+    dependent function `(Fin k → Fin n) → Bool`, which is pleasant semantically
+    and painful to prove `Primrec` facts about; `Fin n` is already linearly
+    ordered, so an *ordered* reduction instantiates with no order to encode;
+  - **`RE ⊆ RePred`** [M, and it needs no machine at all – the cheapest real
+    payoff here]: for a fixed `m` the extended universe is finite, so there are
+    finitely many assignments and the kernel is decidable by the first item;
+    unbounded search over `m` makes any `P ∈ RE` an `REPred`. This turns the
+    class's name into a theorem, and with `halting_problem_not_re` it is what
+    lets a problem be shown *not* to be in RE – the co-RE separation this
+    section has always lacked;
+  - **FO reductions are computable** [M], whence `¬ComputablePred` transfers
+    backwards along `≤ᶠᵒ`, `≤ᶠᵒ[≤]` and `≤ʳᶠᵒ[≤]`. The `Primrec` work
+    concentrates not in the interpretation but in the *renumbering* a
+    relativized reduction forces: the image universe is a subtype, so the
+    surviving points must be listed and re-indexed, `iso_invariant` carrying
+    correctness across;
+  - **the halting link** [L–XL, the piece that can slip]: a computable map from
+    an undecidable set into the concrete instances of `HALT`.
+    `ComputablePred.halting_problem` is about `Nat.Partrec.Code.eval` and
+    `Mathlib/Computability/TMToPartrec.lean` is the meeting point with a machine
+    model – check which direction of that chain it gives before committing. The
+    page-structured tape helps: take the positions to be the `|w|` input cells
+    and the tape is *blanks · w · blanks*, an ordinary two-way tape, so the
+    simulation is a renaming of cells. Three details bite: Mathlib's TM0 halts by
+    having *no* transition apply while `AcceptsU` wants an accepting state;
+    `Turing.Tape` is a `ListBlank` on each side, so its correspondence with a
+    finitely supported `ℤ → Γ` is a lemma; and `WellFormed` has to be
+    established of the built instance.
+
+  Then `HALT` is undecidable and `FINSAT` with it, and every future
+  `HALT ≤ᶠᵒ[≤] X` makes `X` undecidable – in particular **Post's problem**,
+  whose classical theorem therefore needs the dominoes of the PCP item above but
+  *not* RE-hardness of PCP.
+- **Housekeeping left by the FINSAT build** [S each]: `lexLtF`/`lexLeF`, which
+  decide the lexicographic order on `D`-tuples, sit in `Problems/FinSat/Nodes.lean`
+  but belong in `OrderWalk.lean` next to `succTupF`, which walks that order
+  without deciding it; `Nodes.lean` imports `Sat/Tseitin.lean` for `NodeAt`, and
+  if that cross-problem dependency ever grates the node machinery is generic and
+  belongs at top level; and `extBase` could be given an *equivariant* junk
+  convention – the value on a tuple with an invented argument is its first
+  invented argument – which would remove the `[L.IsRelational]` hypothesis from
+  `extEquiv` and the `[Nonempty A]` from `extBase`. The last is a change to
+  `SecondOrderNew.lean` and its three dependents, so a decision rather than a
+  chore.
 
 ## 9. Teaching material
 
@@ -533,7 +602,7 @@ blocked.
 2. **PSPACE, the one open piece**: SO(TC), the class, SUCCINCT-REACH, QSAT,
    `PSPACE = coPSPACE` and `PH ⊆ PSPACE` are done, as is the membership half of
    the machine bridge; what is left is its hardness half
-   (`QSAT ≤ᶠᵒ[≤] DTMAcceptSpace`, in progress, `PSPACE-MACHINE.md`), and after
+   (`QSAT ≤ᶠᵒ[≤] DTMAcceptSpace`, in progress), and after
    it FO(PFP)/FO(LFP) as the textbook-faithfulness layer and Immerman–Vardi.
 
 **Running alongside, from the start:**
@@ -573,3 +642,29 @@ This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §9, the cookbook and catalog
 growth move up and PSPACE slides down: students meet NL, P-completeness and
 reductions long before they meet SO(TC).
+
+
+## The PSPACE machine bridge, as built (2026-07-29)
+
+~4.1k lines over nine files; the §7 estimate of L–XL for hardness was right.
+What the plan did not anticipate:
+
+* **Prove hardness for the deterministic problem, not the nondeterministic
+  one.** Hardness travels *forward* along reductions, and
+  `DTMAcceptSpace ≤ᶠᵒ NTMAcceptSpace` is nearly free (the identity
+  interpretation with the accepting predicate guarded by the determinism
+  sentence). Proving `NTMAcceptSpace` hard first would have forced Savitch on
+  the machine side — a recursive-doubling machine with a stack. Avoided
+  entirely; the only Savitch in the library stays the logical one, inside
+  `Problems/Qsat`.
+* **Reduce from QSAT, not SUCCINCT-REACH.** A deterministic machine has to run
+  an algorithm; QBF evaluation is one, succinct reachability has none.
+* **The evaluator is not needed.** §7 predicted the PSPACE discharge would need
+  an evaluator compiling arbitrary formulas of the logic into a machine. It did
+  not: reducing from QSAT means compiling *one fixed* algorithm, exactly as the
+  SAT machine compiles one fixed clause check.
+* **No step budget is a real saving.** `AcceptsSpace` is `ReflTransGen`, so the
+  `bitRank` arithmetic and filler cells of the NP bridge disappear, and the
+  converse half is free from `Relation.ReflTransGen.total_of_right_unique`
+  (`Problems/Machine/DetRun.lean`): exhibit one run ending stuck and
+  non-accepting, and non-acceptance follows.
