@@ -36,7 +36,7 @@ the halting problem is `∃SO[new]`-definable yields a first-order reduction fro
 it to finite satisfiability with no further work – Trakhtenbrot's theorem in the
 form it is usually stated. RE-*hardness* of `HALT`, which is the converse half
 and would give “RE is the class of semi-decidable problems”, is a separate and
-far larger item; see `HALT.md` and `ROADMAP.md` (§7, §8).
+far larger item; see `ROADMAP.md` (§7, §8).
 
 Neither statement says *undecidable*. That reading needs the bridge to Mathlib's
 computability layer, recorded in `ROADMAP.md` (§8).

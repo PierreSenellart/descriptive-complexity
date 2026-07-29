@@ -65,76 +65,21 @@ has a canonical complete problem that is essentially its *syntactic image*, so
 each hardness discharge is a Tseitin-style translation of the defining logic
 into the problem's vocabulary, i.e. a variation on
 `sat_hard_of_sigmaSODefinable` with a shape invariant carried through. The
-pattern is already instantiated by ∃SO → SAT, SO-alternation-level-`k` → QBF_k,
-SO-Horn → HORN-SAT and SO-Krom → 2SAT (the last two sharing their scaffolding
-in `ClauseDischarge.lean`); the discharges still to do:
-
-| fragment | complete problem | note |
-|---|---|---|
-| SO(TC) (PSPACE) | SUCCINCT-REACH [done], then QSAT | the fragment, the class and the syntactic image are done: SUCCINCT-REACH is PSPACE-complete (`Problems/SuccinctReach/`), its discharge being the Tseitin translation of the three sentences of an `SOTCSpec` over the *doubled* block, so that the block's atoms are shared propositional variables across the three clause groups; QSAT then follows by the standard alternation argument |
+pattern is instantiated for every fragment the library defines: ∃SO → SAT,
+SO-alternation-level-`k` → QBF_k, SO-Horn → HORN-SAT, SO-Krom → 2SAT (the last
+two sharing their scaffolding in `ClauseDischarge.lean`), SO(TC) →
+SUCCINCT-REACH and ∃SO[new] → FINSAT, so no discharge is outstanding; what
+remains below are ordinary catalog reductions and machine bridges.
 
 - **P-complete reductions from HORN-SAT** [M]: Circuit Value Problem, Monotone
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **PSPACE: SUCCINCT-REACH** [done]: the syntactic image of SO(TC) – a
-  transition system given by three CNFs over marked state variables and their
-  next-state copies – is PSPACE-complete (`SUCCINCTREACH_PSPACE_complete`).
-  Membership is the four-variable specification `srSpec` (state, transition
-  witness, and *two* endpoint witnesses – two rather than one because a
-  zero-length walk must meet both endpoint conditions at one state). Hardness
-  (`succinctReach_hard_of_sotcDefinable`) is the Tseitin translation run three
-  times, over the *doubled* block in all three cases so that the block's atoms
-  are shared variables: `Sat/Tseitin.lean`'s semantic interface
-  (`satCond_iff_gates`, `gates_realize`, `gates_canonVal`) and
-  `Sat/TseitinFormulas.lean`'s builders turned out to be generic enough to be
-  reused unchanged — no refactor of `Sat/Hardness.lean` was needed, only a new
-  interpretation into `Language.transSys` with the same defining formulas, plus
-  three language renamings (`Problems/SuccinctReach/Double.lean`): two block
-  copies into the doubled block, one copy into its first half, and a merge of
-  the two order symbols the Tseitin builders leave behind when their base
-  vocabulary is already ordered.
-- **PSPACE: QSAT** [**done**]: unbounded-alternation QBF, i.e. the quantifier
-  prefix carried by the instance (`Problems/Qsat/`, `QSAT_PSPACE_complete`).
-  The vocabulary is that of SAT plus a variable mark, a polarity mark and a
-  prefix order (`Defs.lean`); the semantics is the *game* on positions
-  `(played set, valuation)` as an inductive predicate – so that it is defined on
-  an arbitrary structure, the recursion along the prefix having nowhere else to
-  live – and its three rules are equivalences by inversion alone, uniqueness of
-  the next variable being what makes them exclusive.
-
-  Membership (`Membership.lean`, `qsat_sotcDefinable`): the walk is the
-  depth-first evaluation of the game tree, whose stack is the *set* of played
-  variables, i.e. one monadic relation variable; short-circuiting the evaluation
-  (pop as soon as the value returned settles the node) removes the accumulator
-  and leaves only four transitions. The walk is *deterministic*, which is what
-  gives the converse direction: the returning state at the empty position is a
-  dead end, two dead ends reachable from one state coincide, so an accepting
-  walk has to be the run.
-
-  Hardness is Savitch's recursive doubling from SUCCINCT-REACH, as an ordered
-  (not relativized – junk tuples are left unmarked, hence neither variables nor
-  clauses) interpretation of dimension 2. Three things carry it. `Savitch.lean`
-  states the doubling for a relation whose vertices are known only up to a
-  classifying map into a finite type, because a state is a predicate on the whole
-  universe but the clauses read it only on the state variables; the pigeonhole
-  then runs on the classes. `Blocks.lean` reads the prefix one quantifier per
-  block of like polarity instead of one per variable, and the prefix built by the
-  reduction is a lexicographic comparison of *static* keys, so its blocks are
-  exactly the variables sharing a key prefix and each peeling step is a
-  computation on those. Each clause carries a fixed *literal list* rather than a
-  match on pairs of tags, so one realization lemma replaces a 21 × 10 case
-  analysis. The `∀b_ℓ`-with-a-fresh-copy form of the level gadget keeps the
-  matrix clausal, so no Tseitin encoding appears anywhere.
-
-  Downstream, and now also done: `PSPACE = coPSPACE` (`PSpaceCompl.lean`),
-  `PH ⊆ PSPACE` (`PSpaceHierarchy.lean`), and the **membership half of the
-  machine bridge** (`Problems/Machine/Space.lean`) — the same `TMData` with the
-  step bound dropped, space being bounded by construction since the tape is
-  indexed by the positions, so `NTMAcceptSpace` and `DTMAcceptSpace` are in
-  PSPACE and reduce to QSAT. Still downstream: the hardness half of that bridge
-  (which also gives `PSPACE = NPSPACE`) and the game problems (Generalized
-  Geography…) [L each, gadget-heavy].
+- **PSPACE, downstream of QSAT** [L each, gadget-heavy]: the **hardness half of
+  the machine bridge**, `QSAT ≤ᶠᵒ[≤] DTMAcceptSpace` – a deterministic
+  QBF-evaluation machine written inside a QSAT instance, which also gives
+  `PSPACE = NPSPACE`; in progress, designed in `PSPACE-MACHINE.md` – and the
+  game problems (Generalized Geography…).
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
@@ -147,49 +92,17 @@ in `ClauseDischarge.lean`); the discharges still to do:
   follows by composing the FO(LFP) → SO-Horn translation with the Horn discharge
   — but the direct `Σ₁` definition would be textbook-faithful; the work is
   formula building, made tedious by the varying arities of a block's atoms.
-- **SO(TC) for PSPACE** [done]: second-order transitive closure logic, TC taken
-  over assignments of a block of *relation* variables (reachability in the
-  exponential configuration graph); captures PSPACE on ordered structures
-  (DC: FO(PFP) = SO(TC) = PSPACE). The cheapness argument of SO-Horn held: the
-  TC is Lean-level (`Relation.ReflTransGen` over SO assignments,
-  `SecondOrderTransitiveClosure.lean`) with only the FO transition *sentence*
-  over the doubled block language object-level, so no fixpoint syntax,
-  positivity or stage machinery — and no modes or element tuples either, since a
-  relation variable of arity 0 is a bit and one of arity 1 is an element
-  register, which is what makes the pullback
-  (`SecondOrderTransitiveClosurePull.lean`,
-  `SOTCDefinable.of_orderedReduction`) purely the block pullback of
-  `SecondOrderPull.lean`. The class is `PSPACE` in `PSpace.lean`, with
-  `NP ⊆ PSPACE` (an existential block is the walk that guesses and stops) and
-  the discharge shape `PSPACE_hard_of_sotcDefinable`. `PSPACE = coPSPACE` is
-  now done (`PSpaceCompl.lean`), through QSAT: reduce to QSAT and read its
-  *deterministic* evaluation walk backwards. So is `PH ⊆ PSPACE`
-  (`PSpaceHierarchy.lean`), by alternating that complement with the closure of
-  SO(TC) under prefixing a guessed block. Note: no
-  fragment of *plain* SO can play this role: SO = PH (Fagin/Stockmeyer), so an
-  SO fragment capturing PSPACE would collapse PH; some iteration/recursion
-  operator is unavoidable.
-- **FO(TC), the layer as it stands** [done]: the definability layer exists
-  (`TransitiveClosure.lean`: `TCSpec`/`TCDefinable`, a single TC over a
-  first-order transition formula on `k`-tuples, with `reach_tcDefinable` as the
-  canonical instance; a `TCSpec` carries a finite *mode* component beside its
-  tuple, the analogue of an interpretation's tags, without which neither the
-  translations nor closure under reductions can be stated), and so do both
-  translations against the Krom fragment: `co-NL(Krom) = NL(TC)`, i.e.
-  `mem_NL_iff_tcDefinable_compl` (`SigmaSOKromDefinable.compl_of_tcDefinable` in
-  `TransitiveClosureKrom.lean`, `TCDefinable.compl_of_sigmaSOKromDefinable` in
-  `KromTransitiveClosure.lean`), sharpened to `NL(Krom) = NL(TC)` by the
-  complementation of FO(TC) (`tcDefinable_iff_mem_NL`). **Closure of
-  `TCDefinable` under ordered FO reductions** is done too
-  (`TransitiveClosurePull.lean`, `TCDefinable.of_orderedReduction`: the spec is
-  pulled back with modes `spec.Mode × (Fin k → Tag)` and tuples of length
-  `k · d`), so FO(TC) could be a `ComplexityClass` in its own right – with
-  little point, since it coincides with NL through the translations above.
-  Nothing is outstanding in this item; it is kept as the map of what the layer
-  contains.
+- **Housekeeping in the shared machinery** [S]: `lexLtF`/`lexLeF`, which decide
+  the lexicographic order of two tuples first-order, sit in
+  `Problems/FinSat/Nodes.lean` for a build reason only; they belong in
+  `OrderWalk.lean` next to `succTupF`. Open beside it, and a design decision
+  rather than a refactor: giving `extBase` (`SecondOrderNew.lean`) an
+  *equivariant* junk convention – the value on a tuple with an invented argument
+  is its first invented argument – which would remove `[L.IsRelational]` from
+  `extEquiv` and `[Nonempty A]` from `extBase`.
 - **FO(PFP)** [L, sharing infrastructure with LFP]: PSPACE on ordered
-  structures (DC ch. 9–10); SO(TC) above is the cheaper route to the class, so
-  this is a textbook-faithfulness layer.
+  structures (DC ch. 9–10); SO(TC), which already captures the class, is the
+  cheaper route, so this is a textbook-faithfulness layer.
 - **BIT and FO(≤, BIT)** [L]: representation (D); FO-definability of `+` and `×`
   from BIT, `FO(≤, BIT)` = uniform AC⁰ as the bottom of the ordered world
   (formalizing that *capture* — against a circuit model — is the separate §4
@@ -429,8 +342,8 @@ compilation direction above exists.
 
 | class | logic | membership | hardness | total |
 |---|---|---|---|---|
-| L | FO(DTC) | S | S | ~1–1.7k [M], but see below |
-| NL | FO(TC) | S | S | ~1–1.7k [M], but see below |
+| L | FO(DTC) | S | S | done, as a capture theorem – see below |
+| NL | FO(TC) | S | S | done, as a capture theorem – see below |
 | Σₖᵖ, Πₖᵖ | `Σₖ`-SO | M (reuses the NP membership) | M (reuses the SAT machine) | +0.6–1.2k [M] |
 | PSPACE | SO(TC) | S [done] | L–XL | ~3–5.5k |
 | EXPTIME | SO(LFP) | L | XL | ~4–7k |
@@ -446,12 +359,9 @@ Three rules govern the table:
    dearest: space-bounded acceptance is to SO(TC) what SAT is to ∃SO — tape as
    a relation variable, the step clause of `Machine/Membership.lean` as the
    transition formula, acceptance its TC, no budget hence no walk lemma
-   (400–700 lines). **Confirmed** by `Problems/Machine/Space.lean` (~840 lines,
-   the estimate missing only the size of the sentence-builder layer: fifteen
-   shapes with a realization lemma each, since an `SOTCSpec` wants *sentences*,
-   not formulas with parameters). The block is three relation variables — the
-   tape binary, the state and the head unary marks — and determinism is a source
-   condition, so `DTMAcceptSpace` costs one extra sentence over `NTMAcceptSpace`.
+   (400–700 lines). Confirmed by `Problems/Machine/Space.lean`, which came in at
+   ~840: the estimate missed only the sentence-builder layer, an `SOTCSpec`
+   wanting *sentences* rather than formulas with parameters.
 2. **Hardness is cheap when the class has a one-loop complete problem** (REACH
    "guess a neighbour", HORN-SAT "propagate", SAT "guess then sweep").
    Otherwise the discharge must compile arbitrary formulas of the logic into a
@@ -481,143 +391,20 @@ The concrete items:
   the budget. Membership in `Σₖᵖ` reuses the membership clauses per phase with
   `SecondOrderMerge.lean` as block bookkeeping; hardness from `QBF k` by the
   SAT machine with `k` guess sweeps; `Πₖᵖ` free by swapping the marks.
-- **L and NL: the Turing model is the wrong one** [done].
-  As machine-as-data these are cheap for a bad reason: a logspace
-  configuration is a constant-length tuple of elements, the configuration
-  space is polynomial, and acceptance is REACH up to renaming — true, easy,
-  contentless. A telling bridge needs storage matching what the logic's
-  variables range over and *local* input access (else the FO-definable table
-  smuggles in the whole input). The right model: a **fixed finite control
-  with `k` two-way heads** on universe elements, no work tape, reading only
-  quantifier-free tests of its head tuple; determinism vs. nondeterminism is
-  then L vs. NL, mirroring FO(DTC) vs. FO(TC). The machine is Lean-level data,
-  so the statement is a **capture theorem**
-  (`TCDefinable P ↔ ∃ k (M : HeadAutomaton L k), ∀ A, P A ↔ M.Accepts A`) —
-  no reductions, no string encoding.
-  **Done: machine → logic** (`HeadAutomaton.lean`): the model, and
-  `tcDefinable_of_automaton` / `dtcDefinable_of_automaton` with their
-  `mem_NL_of_automaton` / `mem_LOGSPACE_of_automaton` corollaries. It is
-  near-trivial as predicted — a configuration *is* a `TCSpec.Node`, the control
-  being the mode — and determinism of the control lands on `TCSpec.det` through
-  `functional_toSpec`.
-  **Done: logic → machine, nondeterministically** — so the NL half is a capture
-  theorem on the nose: `tcDefinable_iff_automaton` and `mem_NL_iff_automaton`
-  (`HeadCapture.lean`), on top of two reusable layers.
-  1. `HeadProgram.lean` — the *assembly language*: the same machines with their
-     transitions presented one at a time, each with its own quantifier-free
-     guard, and with two exits so that fragments compose. A fragment's spec is
-     `Runs` (exact soundness, completeness up to the scratch heads); everything
-     is assembled with one combinator, `wireP` (a finite family of fragments,
-     one per node of a control graph), whose lemma `runs_wireP` reduces runs to
-     a *walk in the control graph*. The workhorse under it is
-     `Embeds.reach_cases`: a run that starts inside a fragment either is still
-     inside it or has left it by one of its exits. Two compilations back to
-     `HeadAutomaton` (all enabled transitions, or only the first — the latter
-     syntactically deterministic).
-  2. `HeadEval.lean` — the *evaluator*, and the surprise is how cheap it is once
-     quantifiers are *walked* rather than read: `decides_evalP` is a structural
-     recursion on the `BoundedFormula`, atoms being guards, implication a branch
-     (`iteP`), and a quantifier a sweep (`scanP`) of **two** fresh heads. Two,
-     not one, is the design point: the sweep must know when to stop, and "this
-     head is at the greatest element" is not a quantifier-free fact of one head,
-     while "these two heads are equal" is an atom — so one head walks and one is
-     parked at the maximum. No subroutine calculus was needed, and no
-     normalization to prenex or to quantifier-free specifications; the sweep is
-     proved by `order_induction_down` (added to `OrderWalk.lean`), the direction
-     that knows about the elements a walker has not yet reached. The evaluator
-     is deterministic, which is what makes it reusable for L.
-  The driver in `HeadCapture.lean` is then a control graph: pick a source mode
-  (a chain of free choices, since `wireP`'s wiring is a function of the exit
-  bool — that chain is how a nondeterministic *mode* choice is expressed), guess
-  the tuple and test the source formula, then loop {test the target formula and
-  accept; else pick a candidate mode, guess the candidate tuple, test the
-  transition formula, commit by copying}. Soundness is an invariant along the
-  control walk, completeness an induction along `TCSpec.Reach` with an escape
-  clause (if the target formula holds early, the machine has already accepted).
-  **Done: the deterministic capture** — `dtcDefinable_iff_automaton` and
-  `mem_LOGSPACE_iff_automaton`, `DTCDefinable P ↔ ∃ k (M) (hdet :
-  M.IsDeterministic), …`. What a deterministic driver adds is *search where the
-  nondeterministic one guesses*, and a bound on its own walk. Four layers:
-  - `WalkBudget.lean` — the two counting facts, both machine-free.
-    `stepNext`/`reach_iff_iterate` walk a functional relation as an iterated
-    function, and `exists_iterate_lt_card` is the pigeonhole that bounds it: a
-    reachable node is reachable in fewer steps than the type has elements, since
-    a shortest walk cannot repeat. `Ticks n z` says `n` covers are available
-    above `z` in a finite linear order, and `ticks_of_orank`/`ticks_bot` supply
-    them from `orank` — at the bottom, one tick short of the whole order. The
-    two meet by counting nodes and counter values with the same number.
-  - `HeadLex.lean` — the **odometer** `lexNextP`: the lexicographic successor of
-    the tuple on a block of heads, exiting `false` at the greatest tuple. The
-    chain walks the positions from the last and steps the first one that is not
-    at its greatest value, resetting those after it. Since "this head is at the
-    greatest element" is not a quantifier-free fact of one head, the block comes
-    with a **marker head** parked there and the test is the atom "these two heads
-    are equal"; accordingly `lexRel` is stated by the marker's *value*, an honest
-    description whatever the marker holds, and `tupSucc_of_lexRel` turns it into
-    `OrderWalk`'s `TupSucc` where the marker is known to be at the top — so the
-    scan becomes a walk along covers of `Lex (Fin n → A)` like any other.
-  - `HeadCaptureDet.lean` — **the machine, its soundness and its
-    completeness**. The machine: the control graph
-    `DetNode` (source scan, walk, candidate scan, commit, tick), its fragments
-    `dFam`, its arcs `dWire`, the four-block head layout (current tuple,
-    candidate, source, counter) with `dHeadAgree_iff` (the protected heads are
-    exactly the blocks and the marker), the relations `dRel` its fragments run —
-    all of them proved (`runs_dFam`) and local (`headLocal2_dRel`) — and the
-    invariant `dInv`: at any node of the walk phase the first block holds a node
-    reachable from a source, and at `commit` the candidate is one deterministic
-    step away. It is carried along every arc (`dInv_of_walk`), and at the
-    accepting arc it says the specification accepts (`accepts_of_dExit`). So the
-    machine provably never lies.
-    The **search for the successor** is proved in full, both ways. Over the
-    tuples of one mode: `scanFound` (if the current node's successor — unique, by
-    `det_step_iff` — is in the mode being tried, with a tuple at or above the
-    block's, the scan walks the block up to it and reaches `commit` holding it)
-    and `scanNone` (if there is none in that mode, the scan runs the block to its
-    greatest tuple and moves on), both inductions downwards along the
-    lexicographic order in the style of `decides_scanP`, resting on
-    `HeadLex.exists_lexRel_succ` and `lexRel_top` — that the odometer can always
-    step below the greatest tuple and exactly fails at it. Over the modes:
-    `modeFound` and `modeNone`, inductions on the number of mode indices left. So
-    from `candMode` the machine provably reaches `commit` holding the successor
-    when there is one and `srcNext` when there is none, leaving the current
-    tuple, the source and the counter alone in both cases.
-    One **step of the simulated walk** follows: `walkStep` — at a node that is
-    not accepting but has a successor, with a counter block that can still be
-    stepped, the machine tests the target formula, searches out the successor,
-    commits it onto the current block and ticks, arriving at `tgtTest` one node
-    along with the counter advanced by one in the lexicographic order.
-  - **Completeness**, and the one idea that made it short: read the counter as a
-    value of a *single* finite linear order, `dcount` — the index of its mode
-    lexicographically above the tuple on its block (`OrderWalk`'s
-    `prodLex_covBy_iff` and `finCovBy_iff` are that order's covering lemmas).
-    Then a tick *is* a cover (`dcount_covBy_tup` inside a mode,
-    `dcount_covBy_mode` across one), the order has exactly as many values as the
-    specification has nodes (`card_dcount`), and both inductions run along it.
-    `dTick` packages one tick; `walkAcc` — the walk reaching an accepting node
-    within the budget makes the machine accept — is an induction on the steps
-    left, `Ticks` supplying the cover at each; `walkOut` — whatever happens, the
-    machine accepts or comes back to `srcNext` with its source block untouched —
-    is an induction *downwards along the counter*, which is the termination
-    argument, with `dcount_of_isTop` (at the top the tuple is greatest and the
-    mode last, so `tickReset` falls through to the next source) and `walkStuck`
-    (nowhere to go: the chain of candidate modes is exhausted) as its two ends.
-    `srcEnum` then enumerates the sources downwards along the *same* order,
-    `srcTried` (`walkOut` with the `start` arc in front) returning to `srcNext`
-    and the odometer advancing the position by one cover. `accepts_dP` conjoins
-    the halves, and `compile true` — syntactically deterministic whatever the
-    guards, and agreeing with the program where they are exclusive, which
-    `deterministic_dP` says they are — gives the automaton.
-    Two notes for the next machine built this way. The budget is *exactly* tight:
-    a walk visits at most `card Node` nodes, so it takes at most `card Node - 1`
-    steps, and a counter with `card Node` values ticks exactly that often — there
-    is no slack to spend, which is why the counter has to carry a mode as well as
-    a tuple. And phrasing both inductions as `order_induction_down` over one
-    order, rather than as nested inductions over modes and tuples, is what keeps
-    the two walk arguments to a page each.
-  Rejected models: registers (must legislate arithmetic; a head move *is* a
-  step in the order), JAGs/pointer machines (lower-bound devices), branching
-  programs (nonuniform). With BIT (§3), a circuit-family bridge (FO-uniform
-  AC⁰ = FO(≤, BIT)) is more natural than any machine at that level.
+- **L and NL: the Turing model is the wrong one** [done, kept for the judgment
+  it records]. As machine-as-data, logspace Turing machines are cheap for a bad
+  reason: a logspace configuration is a constant-length tuple of elements, the
+  configuration space is polynomial, and acceptance is REACH up to renaming –
+  true, easy, contentless. The model that says something is a fixed finite
+  control with `k` two-way heads on universe elements, reading only
+  quantifier-free tests of its head tuple, so that determinism vs.
+  nondeterminism is L vs. NL, mirroring FO(DTC) vs. FO(TC); it is Lean-level
+  data, so both halves are *capture* theorems (`mem_LOGSPACE_iff_automaton`,
+  `mem_NL_iff_automaton`) rather than completeness results. Rejected models:
+  registers (must legislate arithmetic; a head move *is* a step in the order),
+  JAGs/pointer machines (lower-bound devices), branching programs (nonuniform).
+  With BIT (§3), a circuit-family bridge (FO-uniform AC⁰ = FO(≤, BIT)) is more
+  natural than any machine at that level.
 - **Capture vs. completeness, the choice forced by the evaluator.** A capture
   theorem is also available at NP (fixed control, input heads, poly work
   tape) but is not taken: logic → machine there needs the evaluator *with*
@@ -655,102 +442,18 @@ original elements. Unbounding `m` is the *only* change from `Σ₁`, and it is
 exactly the step from "search a space exponential in `|A|`" (NP) to "search an
 unbounded space of finite witnesses" (RE).
 
-Done so far:
-
-- `DescriptiveComplexity/SecondOrderNew.lean` — the extended structure, the
-  definability notion `SigmaSONewDefinable`, functoriality in the base
-  isomorphism, congruence on finite instances, and `Σ₁ ⊆ ∃SO[new]`
-  (`SigmaSODefinable.toNew`, the future `NP ⊆ RE`), whose kernel is guarded by
-  "nothing was invented" so that the `∃m` cannot be satisfied spuriously.
-- `DescriptiveComplexity/Relativize.lean` — relativization of a formula to a
-  unary relation symbol (`relativizeTo`), correct against the `Substructure`
-  the symbol defines (so it covers vocabularies with function symbols, which
-  the `ComplexityClass` interface forces since the *source* language of a
-  reduction is arbitrary); `relOld` is its instance at the marker `old`.
-  Reusable for the relativized *membership* pullback of §3.
-- `DescriptiveComplexity/SecondOrderNewPull.lean` — **closure under FO
-  reductions** (`SigmaSONewDefinable.of_foReduction`). The construction worth
-  not rediscovering: *do not* guess an isomorphism, and do not reach for
-  `RelSecondOrderPull` (§3). With the **same** number of invented values, the
-  target's extended universe `I.Map A ⊕ Fin m` is *definable inside* the
-  source's `A ⊕ Fin m` — an interpreted point is a tag with `dim` original
-  coordinates, an invented value is itself — so it is the universe of a
-  `RelFOInterpretation` with tags `Tag ⊕ Unit` and dimension `dim + 1`, and the
-  existing guarded pullback `RelFOInterpretation.pullRel` does the translation,
-  relativizing quantifiers and substituting the defining formulas in one pass.
-  Two details that are not optional: the spare coordinate of an interpreted
-  point must be pinned to a **guessed canonical element** (a unary variable with
-  a uniqueness guard) — pinning it to a coordinate of the tuple fails at
-  `dim = 0`, where `I.Map A` is constant-size; and the interpretation's own
-  defining formulas, which quantify over `A`, must be read through `relOld`.
-  The block transfer is the *flipped* one a definable universe forces
-  (`targetAssign` restricting, `sourceAssign` extending by junk, exact in that
-  order), which is enough because the block is existential.
-
-- `DescriptiveComplexity/SecondOrderNewOrdered.lean` — closure under **ordered**
-  FO reductions, by re-quantifying the order inside the guessed block as in
-  `SecondOrderOrdered`, with the guard **relativized to `old`**
-  (`extLinearGuard`): the order symbol of an extended structure relates original
-  elements only, so an unrelativized linear-order guard is unsatisfiable as soon
-  as something is invented. `sigmaSONewDefinable_of_orderPull` is the
-  order-elimination step on its own, the `∃SO[new]` analogue of
-  `sigmaSODefinable_of_orderPull`.
-- `DescriptiveComplexity/RecursivelyEnumerable.lean` — **the class `RE`**, a
-  `ComplexityClass` by the two closures, with `coRE`, `NP ⊆ RE`
-  (`NP_subset_RE`), `coNP ⊆ coRE`, and `hard_RE_iff` (cofinal hardness is the
-  usual notion over a relational vocabulary). Nothing relates RE and co-RE, by
-  design: `∃SO[new]` has no dual reading, and the separation is a machine-bridge
-  statement (last item below).
-- **Trakhtenbrot's theorem** [done]: finite satisfiability of a
-  first-order sentence is RE-complete (`FINSAT_RE_complete`). The design, the hazards and the file
-  plan are in `TRAKHTENBROT.md`; the short version is that the instance is a
-  parse DAG **in negation normal form** with **n-ary** ∧/∨ nodes and a linear
-  order on its own syntax. Negation at the leaves makes the value of a node
-  monotone in its children, so satisfaction is a least fixed point rather than a
-  well-founded recursion on a decoded parse tree (there is no decoding: the
-  symbols of the encoded sentence are elements of the instance, so the decoded
-  vocabulary would depend on the instance); n-ary gates make the unbounded
-  conjunctions of the reduction single nodes, which keeps `OrderWalk` out of it;
-  and the order makes acyclicity — `child g c → c < g` — first-order, which the
-  membership kernel needs since it has to *check* well-formedness.
-
-  Done, and axiom-clean: `Problems/FinSat/Defs.lean` (vocabulary,
-  well-formedness, the truth definition, `FINSAT` with its iso-invariance),
-  `Problems/FinSat/Fixpoint.lean` (satisfaction is the *unique* fixed point of
-  the truth definition — the lemma both halves rest on: it is what forces the
-  guessed relation of the membership kernel to be satisfaction, and what lets
-  the hardness proof evaluate the sentence it builds by exhibiting its intended
-  valuation), `Problems/FinSat/Invented.lean` (`finSatOn_iff_cert`: an encoded
-  sentence has a finite model exactly when a finite set of *invented values*
-  carries one — the model, and the environments, which must be reified as values
-  since an assignment cannot be a tuple of unbounded arity; the interpretation of
-  the symbols is not guessed at all but recovered from the guessed truth values
-  of the atoms by a coherence condition, which is what avoids reified tuples) and
-  `Problems/FinSat/Membership.lean` (`finsat_sigmaSONewDefinable`,
-  `finsat_mem_RE`).
-
-  **Hardness**: `Problems/FinSat/Nodes.lean`, `Kernel.lean` and `Interp.lean`
-  build the interpretation and prove its image well formed, `Hardness.lean`
-  reads the sentence back off the image and evaluates it node by node (up to
-  `gval_kernel`, the induction on the kernel), and `Reduction.lean` closes both
-  directions and gives `FinSat.finsat_hard_of_sigmaSONewDefinable` for a
-  *relational* source. The sentence's vocabulary is *only* the block's relation
-  variables: `old` and the symbols of `L` are eliminated by translating `old(t)`
-  to `⋁_a t = x_a` and `r(t̄)` to `⋁_{ā ∈ r^A} ⋀_i t_i = x_{a_i}`, the disjunction
-  being indexed by the tuples the interpretation's own formulas select.
-
-  Source vocabularies with function symbols – which `CofinalHard` admits – are
-  handled *before* the reduction, by a general theorem about the logic in
-  `DescriptiveComplexity/Relationalize.lean`: every `∃SO[new]`-definable problem
-  reduces to an `∃SO[new]`-definable problem over the **atomic diagram
-  language**, one relation symbol of arity `n` per atomic formula of the source
-  in `n` variables. The undefinable junk element of `oldPart` is harmless
-  because a definition may be read with any junk element at all
-  (`sigmaSONewDefinable_junk`, by transporting the instance along a
-  transposition), and the kernel is translated atom by atom in place, each atom
-  becoming a short existential block holding the coerced context, the guessed
-  junk and the values of the arguments. Composing the two gives
-  `finsat_hard_of_sigmaSONewDefinable` and `FINSAT_RE_complete`.
+Built: `SecondOrderNew.lean` (the extended structure, `SigmaSONewDefinable`,
+`Σ₁ ⊆ ∃SO[new]`), `Relativize.lean`, the two closure files
+(`SecondOrderNewPull.lean` for FO reductions, `SecondOrderNewOrdered.lean` for
+ordered ones), `RecursivelyEnumerable.lean` (the class `RE`, with `coRE` and
+`NP ⊆ RE`; nothing relates RE and co-RE, by design – `∃SO[new]` has no dual
+reading, and the separation is a machine-bridge statement, the last item below),
+`Relationalize.lean` (every `∃SO[new]`-definable problem reduces to one over a
+relational vocabulary, which is how source vocabularies with function symbols
+are handled), Trakhtenbrot's theorem `FINSAT_RE_complete` (design record:
+`TRAKHTENBROT.md`), and `halt_mem_RE`, whence `halt_le_finsat` – Trakhtenbrot's
+theorem in the form it is usually stated, the reduction from the halting
+problem. What remains:
 
 - **PCP (Post's correspondence problem)**: the classical target for
   undecidability by reduction. **Defined** (`Problems/Pcp/Defs.lean`): the
@@ -779,46 +482,17 @@ Done so far:
     then evaluate a first-order kernel against it, every atom test being a random
     access into the guessed table – the “evaluator with tape addressing” priced
     at XL in §7. The honest decomposition is `HALT` (unbounded tape, no step
-    bound) as a catalog problem [S], `HALT ∈ RE` by the invented tableau [M],
-    `HALT` RE-hard [XL, the whole cost], `HALT ≤ᶠᵒ[≤] PCP` by the classical
+    bound) as a catalog problem and `HALT ∈ RE` – both done – then `HALT`
+    RE-hard [XL, the whole cost] and `HALT ≤ᶠᵒ[≤] PCP` by the classical
     computation-history dominoes [L]. Only the third is blocked, and on effort
     rather than on an idea; `PCP.md` §5 records the three shortcuts that do not
     work, including why the cheap `HeadEval` evaluator does not apply.
-- **HALT, the halting problem** [**done**]: acceptance of a Turing machine
-  with *no step bound and no space bound* – the same `TMData` as the NP and
-  PSPACE bridges, with the tape leaving the instance. **Done**: the semantics
-  (`MachinesUnbounded.lean`: the cells are `ℤ × A`, an unbounded strip of pages
-  each a copy of the instance's positions, so the input needs no placement and
-  no arithmetic enters the model), the problem (`Problems/Machine/Halt.lean`),
-  the certificate bridge (`Problems/Machine/HaltCert.lean`,
-  `acceptsU_iff_runCert`: a machine accepts exactly when a finite linear order of
-  time points and a finite linear order of pages carry a run of it – finite
-  because a run of `n` steps moves the head by at most one page per step, and
-  unbounded by the instance, which is why the certificate needs invented values),
-  and its relational form on invented values (`Problems/Machine/HaltFin.lean`,
-  `acceptsU_iff_runRel` and `halt_iff_runRel`, the statement the kernel mirrors
-  clause by clause). No relabelling step was needed: the two sorts are
-  independent predicates on the invented values, so a run of `n` steps is read
-  off over `Fin (2n + 1)` alone with the time points its first `n + 1` values.
-  and the `∃SO[new]` kernel (`Problems/Machine/HaltMem.lean`: nine relation
-  variables, eight well-formedness conjuncts and eighteen certificate conjuncts,
-  each with its own realization lemma, the repeated order shapes factored into
-  builders, and `runAssign` dispatching on the sort of each argument so that
-  reading an assignment back is `rfl`). Whence `halt_mem_RE` and, *for free* from
-  `finsat_hard_of_sigmaSONewDefinable`,
-
-  ```
-  halt_le_finsat : Nonempty (HALT ≤ʳᶠᵒ[≤] FINSAT)
-  ```
-
-  which is Trakhtenbrot's theorem in the form it is usually stated, the reduction
-  from the halting problem. Design and hazards: `HALT.md`.
-
-  Note what this deliberately does *not* attempt: `RE.Hard HALT`, i.e. “RE is the
-  class of semi-decidable problems”. That is the converse half, it needs the
-  evaluator with addressed storage (§7), and it buys no statement about any
-  catalog problem – whereas the easy half above buys one immediately, and buys it
-  again for every future RE-hard problem.
+- **`RE.Hard HALT`**, i.e. “RE is the class of semi-decidable problems”
+  [XL, the same item as the PCP hardness above]: the converse half of the RE
+  machine bridge. It needs the evaluator with addressed storage (§7), and it
+  buys no statement about any catalog problem – whereas the easy half,
+  `halt_mem_RE`, already buys `halt_le_finsat`, and buys the same for every
+  future problem shown to be in RE.
 - **What incomputability actually needs** [R, separate]: RE-hardness alone does
   not yet say "undecidable" inside this library — that statement needs the
   other side, RE ⊆ (Mathlib's) `RePred` through an encoding of finite
@@ -856,25 +530,11 @@ blocked.
    because building the reduction from the complement side keeps the promise in
    hand where it is proved. Reach for tracking when a second consumer appears,
    not before.
-2. **The NL layer, cheapest piece first**: **SO-Krom** before FO(TC). Done —
-   the fragment, its closure under reductions, the class `NL`, **2SAT
-   NL-complete** (membership by a Krom program, hardness by the Krom
-   discharge), the inclusions `NL ⊆ PTIME` and `NL ⊆ NP` (through 2SAT, since a
-   Krom kernel is not a Horn kernel), UNREACH defined in the Krom fragment, the
-   **FO(TC)** definability layer with its two translations against the Krom
-   fragment, **Immerman–Szelepcsényi** on top of them, and **REACH
-   NL-complete** (membership through the complementation of FO(TC), hardness by
-   the FO(TC) discharge, whose interpretation is the graph of the walk itself).
-   This step is complete: **FO(DTC)**, the class **LOGSPACE** and **REACHd**
-   closed it (`TransitiveClosureDet.lean`, `TransitiveClosurePull.lean`,
-   `DetLogSpace.lean`, `Problems/ReachabilityDet.lean`).
-3. **PSPACE**: SO(TC), the class, and SUCCINCT-REACH's PSPACE-completeness are
-   **done**, and so are QSAT (membership by the depth-first game walk, hardness
-   by recursive doubling from SUCCINCT-REACH) and `PSPACE = coPSPACE` through
-   it and `PH ⊆ PSPACE`; next is the machine bridge for the class (the `TMData`
-   of the NP/PTIME bridge with the step bound dropped, which is already a
-   space-bounded model), then FO(PFP)/FO(LFP) as the
-   textbook-faithfulness layer and Immerman–Vardi.
+2. **PSPACE, the one open piece**: SO(TC), the class, SUCCINCT-REACH, QSAT,
+   `PSPACE = coPSPACE` and `PH ⊆ PSPACE` are done, as is the membership half of
+   the machine bridge; what is left is its hardness half
+   (`QSAT ≤ᶠᵒ[≤] DTMAcceptSpace`, in progress, `PSPACE-MACHINE.md`), and after
+   it FO(PFP)/FO(LFP) as the textbook-faithfulness layer and Immerman–Vardi.
 
 **Running alongside, from the start:**
 
@@ -891,9 +551,10 @@ blocked.
   and MaxSNP are genuine research).
 - **EF games + EVEN/connectivity inexpressibility** (§5), as a parallel and
   delegable line rather than the serial next step: it unblocks nothing else,
-  its own headline `FO ⊊ FO(TC)` waits on step 2 anyway, and it is the most
-  Mathlib-facing item here, hence where an estimate is likeliest to slip. Also
-  the best student project in the document.
+  and it is the most Mathlib-facing item here, hence where an estimate is
+  likeliest to slip. Its own headline `FO ⊊ FO(TC)` is blocked on nothing –
+  the FO(TC) layer exists – only on the games themselves. Also the best student
+  project in the document.
 
 **Deferred, and deliberately so:**
 

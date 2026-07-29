@@ -9,7 +9,7 @@ required: each class is *defined* logically, so a completeness proof is a
 definability witness for membership together with a first-order reduction
 for hardness, which the framework closes into a `Complete` theorem.
 Along the way the library also **proves a number of results of complexity
-and descriptive complexity themselves. All declarations live in the
+and descriptive complexity themselves**. All declarations live in the
 `DescriptiveComplexity` namespace; the top-level module is
 `DescriptiveComplexity`.
 

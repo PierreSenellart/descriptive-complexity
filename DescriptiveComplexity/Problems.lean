@@ -61,7 +61,7 @@ only the membership half – see `ROADMAP.md`. Machine acceptance
 only defined. The halting problem (`DescriptiveComplexity.HALT`, the same machine
 with the tape unbounded) is **in RE** (`DescriptiveComplexity.halt_mem_RE`),
 whence `DescriptiveComplexity.halt_le_finsat`, Trakhtenbrot's theorem in the form
-it is usually stated; it is not proved RE-*hard*, see `HALT.md`. Post's
+it is usually stated; it is not proved RE-*hard*, see `ROADMAP.md` (§8). Post's
 correspondence problem
 (`DescriptiveComplexity.PCP`) is so far only defined as well: its membership in
 RE is designed in `PCP.md`, and its RE-hardness is not a catalog item at all but
