@@ -27,6 +27,10 @@ quantifier block. Two conventions fix the game the marks describe.
   `DescriptiveComplexity.altQuant` alternates the quantifiers of a quantified
   Boolean formula. A state marked by a block of the other polarity is
   *universal* (`DescriptiveComplexity.ATMData.IsUniv`).
+* **Blocks mark states, not times.** A variant marking the *time* – the phases
+  of the run scheduled in advance – makes the round structure independent of
+  the run, and is rejected for exactly that: it clocks the alternation, which
+  is half of what the model is supposed to say.
 * **A stuck universal state rejects.** A universal configuration accepts when
   every successor accepts *and there is one*
   (`DescriptiveComplexity.ATMData.AltAcc`). The other convention – vacuous

@@ -43,6 +43,16 @@ ordered lexicographically (`DescriptiveComplexity.altTagKey`). The position
 families come first, so the order of the positions is undisturbed by the
 program's tags, exactly as `DescriptiveComplexity.satTagIdx` arranges.
 
+The `Fin (k + 1)` every tag carries is the price of one sweep per block, and
+the alternative is worth recording because it looks cheaper and is not: a
+*single* sweep, with the cells ordered by (block of the variable, variable), so
+that the state's block is read off the variable under the head. It removes the
+`Fin (k + 1)` from the tags and puts a bespoke linear order on the interpreted
+universe in its place – `DescriptiveComplexity.isLinOrd_altTagTupleLe` no
+longer applies – and `DescriptiveComplexity.QBF` promises nothing about its
+marks, so the sort key must still invent a `k`-th class for the unmarked
+variables. Not taken.
+
 ## The budget
 
 Each of the `k` sweeps goes right and comes back, so `2k(n + 2)` steps, and the

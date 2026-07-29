@@ -100,7 +100,11 @@ remains below are ordinary catalog reductions and machine bridges.
   rather than a refactor: giving `extBase` (`SecondOrderNew.lean`) an
   *equivariant* junk convention – the value on a tuple with an invented argument
   is its first invented argument – which would remove `[L.IsRelational]` from
-  `extEquiv` and `[Nonempty A]` from `extBase`.
+  `extEquiv` and `[Nonempty A]` from `extBase`. A third: `blockSym` /
+  `repAssign` / `altAssign_qbfBlocks` in `Problems/Qbf/Membership.lean` are the
+  monadic special case of `SecondOrderReplicate.lean` and should be folded into
+  it – noticed while building the PH bridge, left alone because it touches a
+  working file and bought that bridge nothing.
 - **FO(PFP)** [L, sharing infrastructure with LFP]: PSPACE on ordered
   structures (DC ch. 9–10); SO(TC), which already captures the class, is the
   cheaper route, so this is a textbook-faithfulness layer.
@@ -457,12 +461,12 @@ compilation direction above exists.
 |---|---|---|---|---|
 | L | FO(DTC) | S | S | done, as a capture theorem – see below |
 | NL | FO(TC) | S | S | done, as a capture theorem – see below |
-| Σₖᵖ, Πₖᵖ | `Σₖ`-SO | done | done | done, ~10.5k — the estimate was low by an order of magnitude |
+| Σₖᵖ, Πₖᵖ | `Σₖ`-SO | done | done | done, ~10.5k against an estimate of 0.6–1.2k |
 | PSPACE | SO(TC) | S [done] | L–XL [done, ~4.1k] | ~3–5.5k |
 | EXPTIME | SO(LFP) | L | XL | ~4–7k |
 | EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
 
-Three rules govern the table:
+Four rules govern the table:
 
 1. **Membership is cheap when the logic is a reachability/fixpoint logic, dear
    when it quantifies.** For DTC/TC/LFP/SO(TC) the machine problem is the
@@ -494,7 +498,17 @@ Three rules govern the table:
    interpretation, with the accepting predicate guarded by the first-order
    determinism sentence). The lesson generalizes: pick the source problem so
    that the algorithm is fixed, and prove the deterministic side hard.
-3. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
+3. **A machine reused at a new polarity is not a machine reused.** The `Σₖᵖ`
+   row was estimated at +0.6–1.2k on the strength of "hardness from `QBF k` by
+   the SAT machine with `k` guess sweeps"; it came to ~10.5k. The sweeps were
+   indeed the easy part. What a nondeterministic machine never needs, and a
+   *universal* round does, is the converse of every existence statement: that
+   whatever the machine does during a round it is the intended run of *some*
+   assignment (the read-off), that it always has a move, that it terminates,
+   and that its checking phase proves the matrix rather than merely being able
+   to. Budget the same asymmetry for EXPTIME and EXPSPACE below.
+
+4. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
    (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
    `Relation.ReflTransGen`, strictly cheaper — and buys the converse half free,
    since a deterministic machine's reachable configurations are linearly
@@ -506,14 +520,6 @@ Three rules govern the table:
 
 The concrete items:
 
-- **The polynomial hierarchy, the one cheap add-on** [M, +0.6–1.2k]:
-  `Language.turing` plus `k` unary block marks on states (the state marks are
-  deliberately a family for this), transitions non-decreasing in block index —
-  a *local*, hence first-order condition, which is what makes "at most `k−1`
-  alternations" checkable. Alternating acceptance is a Lean-level recursion on
-  the budget. Membership in `Σₖᵖ` reuses the membership clauses per phase with
-  `SecondOrderMerge.lean` as block bookkeeping; hardness from `QBF k` by the
-  SAT machine with `k` guess sweeps; `Πₖᵖ` free by swapping the marks.
 - **L and NL: the Turing model is the wrong one** [done, kept for the judgment
   it records]. As machine-as-data, logspace Turing machines are cheap for a bad
   reason: a logspace configuration is a constant-length tuple of elements, the
@@ -797,11 +803,8 @@ blocked.
 **The serial line:**
 
 1. **A sharpening pass on what is already public** (each [M], no
-   prerequisites, no new surface): the **PH machine bridge** (§7) is *done* —
-   it closed the visible asymmetry of a bridge that existed for NP and PTIME
-   but not for the hierarchy they sit in, at about ten times the estimated
-   cost; **quantifier-free / projection / dimension tracking
-   through composition** (§3's reduction-notion refinements), which upgrades
+   prerequisites, no new surface): **quantifier-free / projection / dimension
+   tracking through composition** (§3's reduction-notion refinements), which upgrades
    catalog statements to the DC-faithful "complete under qfps"; **Spectra**
    (§4) and **CVP from HORN-SAT** (§2), two near-free recognizable names, the
    latter also the discharge Immerman–Vardi wants. Note what 3-DNF-TAUT (done)
