@@ -41,6 +41,7 @@ import DescriptiveComplexity.Problems.SuccinctReach
 import DescriptiveComplexity.Problems.FinSat
 import DescriptiveComplexity.Problems.Pcp.Defs
 import DescriptiveComplexity.Problems.Machine
+import DescriptiveComplexity.Problems.MachineAlt
 import DescriptiveComplexity.Problems.Machine.Halt
 import DescriptiveComplexity.Problems.Machine.HaltCert
 import DescriptiveComplexity.Problems.Machine.HaltFin
@@ -57,9 +58,12 @@ containing its vocabulary, its semantic definition, the bundled
 completeness theorems.
 
 Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
-only the membership half – see `ROADMAP.md`. Machine acceptance
-(`DescriptiveComplexity.NTMAccept`) is the machine bridge, so far
-only defined. The halting problem (`DescriptiveComplexity.HALT`, the same machine
+only the membership half – see `ROADMAP.md`. Alternating machine acceptance
+(`DescriptiveComplexity.ATMAccept`) is the machine bridge for the polynomial
+hierarchy: complete at one block (`DescriptiveComplexity.atmAccept_one_complete`)
+and a member of its level at every one (`DescriptiveComplexity.atmAccept_mem_sigmaP`,
+`DescriptiveComplexity.atmAccept_mem_piP`), with hardness above level one still
+open – see `DescriptiveComplexity.Problems.MachineAlt` and `ROADMAP.md` (§7). The halting problem (`DescriptiveComplexity.HALT`, the same machine
 with the tape unbounded) is **in RE** (`DescriptiveComplexity.halt_mem_RE`),
 whence `DescriptiveComplexity.halt_le_finsat`, Trakhtenbrot's theorem in the form
 it is usually stated; it is not proved RE-*hard*, see `ROADMAP.md` (§8). The
