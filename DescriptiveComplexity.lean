@@ -685,11 +685,11 @@ once for the catalog rather than once per problem.
   plain tree flattening and hence primitive recursive – which the simulation of
   a machine could not be, Mathlib's universal machine not being finite-state.
 
-Trakhtenbrot's theorem is then one hypothesis away:
-`DescriptiveComplexity.finsat_not_computable_of_codehalt_mem_RE` derives the
-undecidability of finite satisfiability from `CODEHALT ∈ RE`, and that
-hypothesis is a purely logical statement about one catalog problem, with no
-computability content left in it. See `ROADMAP.md` (§8).
+* `DescriptiveComplexity.finsat_not_computable` – **Trakhtenbrot's theorem**:
+  whether a first-order sentence has a *finite* model is undecidable. FINSAT is
+  RE-hard and `DescriptiveComplexity.codehalt_mem_RE` puts CODEHALT in RE, so
+  CODEHALT first-order-reduces to FINSAT; the reduction is computable, and
+  CODEHALT is undecidable.
 
 ## The problem catalog
 
@@ -722,12 +722,13 @@ where the machine is required to be deterministic.
 `PSPACE`: `DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE` and
 `DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`, whose hardness – the capture,
 which would also give `PSPACE = NPSPACE` – is not proved yet. At `RE`:
-`DescriptiveComplexity.halt_mem_RE`, whence
-`DescriptiveComplexity.halt_le_finsat` at once, the halting problem
-first-order-reduced to finite satisfiability, which is Trakhtenbrot's theorem in
-the form it is usually stated; `DescriptiveComplexity.HALT` is not proved
-RE-hard, that being the converse half of the RE machine bridge
-(`ROADMAP.md` §7, §8).
+`DescriptiveComplexity.halt_mem_RE` and
+`DescriptiveComplexity.codehalt_mem_RE`, each giving at once a first-order
+reduction to finite satisfiability (`DescriptiveComplexity.halt_le_finsat`,
+`DescriptiveComplexity.codehalt_le_finsat`); neither `DescriptiveComplexity.HALT`
+nor `DescriptiveComplexity.CODEHALT` is proved RE-hard, that being the converse
+half of the RE machine bridge (`ROADMAP.md` §7, §8). `CODEHALT` is nonetheless
+undecidable outright, and it is what makes finite satisfiability undecidable.
 
 Headline results and cross-references:
 

@@ -45,6 +45,7 @@ import DescriptiveComplexity.Problems.Machine.Halt
 import DescriptiveComplexity.Problems.Machine.HaltCert
 import DescriptiveComplexity.Problems.Machine.HaltFin
 import DescriptiveComplexity.Problems.Machine.HaltMem
+import DescriptiveComplexity.Problems.CodeHalt
 
 /-!
 # The problem catalog
@@ -61,7 +62,13 @@ only the membership half – see `ROADMAP.md`. Machine acceptance
 only defined. The halting problem (`DescriptiveComplexity.HALT`, the same machine
 with the tape unbounded) is **in RE** (`DescriptiveComplexity.halt_mem_RE`),
 whence `DescriptiveComplexity.halt_le_finsat`, Trakhtenbrot's theorem in the form
-it is usually stated; it is not proved RE-*hard*, see `ROADMAP.md` (§8). Post's
+it is usually stated; it is not proved RE-*hard*, see `ROADMAP.md` (§8). The
+halting of a *partial recursive code* drawn as a syntax tree
+(`DescriptiveComplexity.CODEHALT`) is in RE too
+(`DescriptiveComplexity.codehalt_mem_RE`), and is the problem the
+**undecidability** of the development goes through: it is undecidable outright
+(`DescriptiveComplexity.not_computablePred_codehalt`), whence
+`DescriptiveComplexity.finsat_not_computable`. Post's
 correspondence problem
 (`DescriptiveComplexity.PCP`) is so far only defined as well: its membership in
 RE is designed in `ROADMAP.md` (§8), which also records why its RE-hardness is

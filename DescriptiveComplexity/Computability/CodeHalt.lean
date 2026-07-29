@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 import Mathlib.Computability.Halting
 import DescriptiveComplexity.Computability.Catalog
-import DescriptiveComplexity.Problems.CodeHalt
+import DescriptiveComplexity.Problems.CodeHalt.Membership
 
 /-!
 # Drawing a partial recursive code as a concrete instance
@@ -502,19 +502,23 @@ theorem not_computablePred_codehalt : ¬ComputablePred (CODEHALT.toPred codeVoca
 /-- **Trakhtenbrot's theorem**, from `CODEHALT ∈ RE`: finite satisfiability is
 undecidable.
 
-Everything but the hypothesis is proved. FINSAT is RE-hard, so a proof that
-CODEHALT is `∃SO[new]`-definable yields a first-order reduction
-`CODEHALT ≤ʳᶠᵒ[≤] FINSAT`; that reduction is a *computable* many-one reduction
-of the induced sets
+The chain: FINSAT is RE-hard, so `∃SO[new]`-definability of CODEHALT yields a
+first-order reduction `CODEHALT ≤ʳᶠᵒ[≤] FINSAT`; that reduction is a
+*computable* many-one reduction of the induced sets
 (`DescriptiveComplexity.not_computablePred_of_relOrderedReduction`); and
 CODEHALT is undecidable because Mathlib's halting problem maps into it
-primitive recursively. The hypothesis is what remains of the machine bridge,
-and it is now a purely logical statement about one catalog problem: guess the
-evaluation of the drawn code, as invented values. -/
+primitive recursively. The hypothesis is discharged by
+`DescriptiveComplexity.codehalt_mem_RE`; see
+`DescriptiveComplexity.finsat_not_computable`. -/
 theorem finsat_not_computable_of_codehalt_mem_RE (h : CODEHALT ∈ RE) :
     ¬ComputablePred (FINSAT.toPred finsatVocab) := by
   obtain ⟨f⟩ := (hard_RE_iff FINSAT).mp finsat_RE_hard CODEHALT h
   exact not_computablePred_of_relOrderedReduction f codeVocab finsatVocab
     not_computablePred_codehalt
+
+/-- **Trakhtenbrot's theorem**: whether a first-order sentence has a *finite*
+model is undecidable. -/
+theorem finsat_not_computable : ¬ComputablePred (FINSAT.toPred finsatVocab) :=
+  finsat_not_computable_of_codehalt_mem_RE codehalt_mem_RE
 
 end DescriptiveComplexity

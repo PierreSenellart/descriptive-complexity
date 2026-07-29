@@ -569,12 +569,16 @@ Built: `SecondOrderNew.lean` (the extended structure, `SigmaSONewDefinable`,
 (`SecondOrderNewPull.lean` for FO reductions, `SecondOrderNewOrdered.lean` for
 ordered ones), `RecursivelyEnumerable.lean` (the class `RE`, with `coRE` and
 `NP ⊆ RE`; nothing relates RE and co-RE, by design – `∃SO[new]` has no dual
-reading, and the separation is a machine-bridge statement, the last item below),
+reading, and the separation is a machine-bridge statement, the `RE.Hard HALT`
+item below),
 `Relationalize.lean` (every `∃SO[new]`-definable problem reduces to one over a
 relational vocabulary, which is how source vocabularies with function symbols
 are handled), Trakhtenbrot's theorem `FINSAT_RE_complete`, and `halt_mem_RE`, whence `halt_le_finsat` – Trakhtenbrot's
 theorem in the form it is usually stated, the reduction from the halting
-problem. What remains:
+problem. The bridge to Mathlib's computability layer is built too
+(`DescriptiveComplexity/Computability/`, `Problems/CodeHalt/`): RE-hard
+problems are undecidable, and `finsat_not_computable` is Trakhtenbrot's theorem
+as everyone states it. What remains:
 
 - **PCP (Post's correspondence problem)**: the classical target for
   undecidability by reduction. **Defined** (`Problems/Pcp/Defs.lean`): the
@@ -609,6 +613,10 @@ problem. What remains:
     computation-history dominoes [L]. Only the third is blocked, and on effort
     rather than on an idea.
 
+    **Undecidability** of PCP, on the other hand, is reachable now and does not
+    need any of this: `CODEHALT ≤ᶠᵒ[≤] PCP` [L, the same dominoes] suffices,
+    since first-order reductions are computable and `CODEHALT` is undecidable.
+
     Three shortcuts fail, and are worth not rediscovering. `HeadEval` does not
     apply: its heads range over the elements of a *structure* and its guards are
     atoms of that structure, so it presupposes the certificate as something
@@ -627,80 +635,6 @@ problem. What remains:
   buys no statement about any catalog problem – whereas the easy half,
   `halt_mem_RE`, already buys `halt_le_finsat`, and buys the same for every
   future problem shown to be in RE.
-- **Undecidability: the bridge to Mathlib's computability layer** [one item
-  left, `CODEHALT ∈ RE`]. This is all that stands between the RE results and
-  Trakhtenbrot's theorem as everyone states it; until it is finished the honest
-  reading of the RE results is "complete for the logically defined class RE",
-  though `not_computablePred_codehalt` is already an unconditional
-  undecidability statement about a catalog problem.
-
-  `ComputablePred` is a predicate on a `Primcodable` type while a
-  `DecisionProblem` is a property of finite structures up to isomorphism, so
-  something must name instances concretely. **Not** the `Encoding`/`Decoding`
-  bundles: what they guarantee is size-honesty, which undecidability does not
-  need, and a concrete instance type per problem would be ceremony over data
-  that is already a relational structure. The right object is generic: over a
-  *finite relational vocabulary* – every vocabulary in the catalog – a finite
-  structure is a universe `Fin (n + 1)` plus a Boolean table, so one
-  `Primcodable` type serves the whole catalog at once. Built, in
-  `DescriptiveComplexity/Computability/`:
-
-  - **decidable realization**: `BoundedFormula.decidableRealize`, the first
-    formal justification of the README's by-inspection claim that FO reductions
-    are effective;
-  - **the concrete instances**: `FinVocab` and `FinStruct`, with `Primcodable`
-    and the induced predicate `DecisionProblem.toPred`; and the evaluator
-    `FinStruct.primrec_evalBF` – a *fixed* formula is evaluated on a concrete
-    structure primitive recursively, which is what everything downstream is an
-    application of;
-  - **`RE ⊆ REPred`** (`RE_subset_rePred`, read at the catalog by
-    `halt_rePred` and `finsat_rePred`): the class's name is now a theorem, and
-    no machine model was involved. With `halting_problem_not_re` this is also
-    what lets a problem be shown *not* to be in RE – the co-RE separation this
-    section has always lacked;
-  - **FO reductions are computable**
-    (`not_computablePred_of_relOrderedReduction`, with its `≤ᶠᵒ[≤]` and `≤ᶠᵒ`
-    corollaries): proved once for the relativized ordered notion, the other two
-    being special cases. The order costs nothing – a concrete instance's
-    universe is already `Fin (n + 1)` – while the *renumbering* forced by a
-    definable domain, and the run-time choice among the `|Tag|ⁿ` instances of a
-    defining formula, are where the `Primrec` work sits.
-
-  Whence `finsat_not_computable_of_halt`: Trakhtenbrot's theorem with a single
-  hypothesis left open, on the machine side. That hypothesis has since been
-  removed, by **not going through a machine at all**:
-
-  - **the code is the instance** (`Problems/CodeHalt.lean`,
-    `Computability/CodeHalt.lean`). A new catalog problem `CODEHALT` draws a
-    `Nat.Partrec.Code` as its *syntax tree* – eleven relation symbols, one
-    element per node – and asks whether the drawn code halts on `0`. The map
-    `code ↦ instance` is then a plain tree flattening, primitive recursive
-    (`primrec_codeStruct`), which the simulation of a machine could not be:
-    Mathlib's universal machine `Turing.PartrecToTM2.tr` is not finite-state
-    (`Λ'` embeds `Code`), while a `TMData` lives on a finite universe. Whence
-    `not_computablePred_codehalt`, the first catalog problem proved
-    **undecidable outright**, and
-    `finsat_not_computable_of_codehalt_mem_RE`: Trakhtenbrot's theorem from
-    `CODEHALT ∈ RE` alone.
-
-  What remains is that single membership:
-
-  - **`CODEHALT ∈ RE`** [L]. An `∃SO[new]` definition of "the drawn code halts
-    on `0`". The certificate is the evaluation, invented: a numeral segment
-    with its successor and order; `Add` and `Mul` as guessed relations, checked
-    by their recurrences, which is what `Nat.pair`/`Nat.unpair` (and so
-    `left`, `right`, `pair`, and the `prec`/`rfind'` arguments) need; the
-    evaluation relation "node `n` on input `x` yields `v`", with the chains a
-    `prec` recursion and an `rfind'` search unroll into; and a rank into the
-    segment justifying each fact by facts of smaller rank, so that the guessed
-    relation is *supported* rather than merely closed – the
-    `acyclicRel_iff_exists_order` pattern. Completeness of the guess is the
-    finiteness of an actual halting computation.
-
-  Discharging it makes `FINSAT` undecidable, and every future
-  `CODEHALT ≤ᶠᵒ[≤] X` makes `X` undecidable – in particular **Post's problem**,
-  whose classical theorem therefore needs the dominoes of the PCP item above but
-  *not* RE-hardness of PCP.
 - **Housekeeping left by the FINSAT build** [S each]: `lexLtF`/`lexLeF`, which
   decide the lexicographic order on `D`-tuples, sit in `Problems/FinSat/Nodes.lean`
   but belong in `OrderWalk.lean` next to `succTupF`, which walks that order
