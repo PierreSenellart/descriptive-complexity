@@ -2,8 +2,11 @@ name: Documentation
 
 # The site tracks `master`: every push rebuilds and redeploys it, so the
 # published pages – and the commit-pinned source links in them, line numbers
-# included – never lag the code. Releases and manual runs trigger it too; pull
-# requests never do.
+# included – never lag the code. Manual runs trigger it too; pull requests never
+# do, and neither do releases: a release points at a commit already on `master`
+# and so already deployed, and its run carries the *tag* as its ref, which the
+# `github-pages` environment refuses to deploy from (its branch policy allows
+# `master` alone). Such a run rebuilt for eight minutes and then failed.
 #
 # The build is heavy – doc-gen4 covers the whole import closure, Mathlib
 # included, and the dependency figures run `dot` once per declaration – so two
@@ -12,8 +15,6 @@ name: Documentation
 on:
   push:
     branches: [master]
-  release:
-    types: [published]
   workflow_dispatch:
 
 # Grant the GITHUB_TOKEN the permissions required to deploy to GitHub Pages.
