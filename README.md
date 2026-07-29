@@ -209,7 +209,9 @@ brings in the whole library; import individual modules (for instance
 * **API reference**:
   <https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html>
   – the `DescriptiveComplexity` module page is a part-by-part map of the
-  library, and every declaration is documented on its own page.
+  library, and every declaration is documented on its own page. Rebuilt from
+  `master` on every push, so it documents the current code, not the last
+  release.
 * **Tutorials**: `DescriptiveComplexity/Examples/ConjunctiveQueries.lean` and
   `DescriptiveComplexity/Examples/GraphCrawling.lean` are worked examples read
   top to bottom – each walks through adding a new problem domain in the order
