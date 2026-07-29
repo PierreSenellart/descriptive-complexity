@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml)
 [![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0--rc1-blue)](https://github.com/leanprover-community/mathlib4/releases/tag/v4.33.0-rc1)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21678423.svg)](https://doi.org/10.5281/zenodo.21678423)
 
 A Lean 4 library for descriptive complexity on top of Mathlib's
 `ModelTheory` library, based on first-order reductions, in the style of

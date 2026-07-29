@@ -34,6 +34,9 @@ pin_docbuild()   { grep -oP '(?<=leanprover/lean4:)\S+' docbuild/lean-toolchain;
 pin_mathlib()    { grep -oP '(?<=/ "mathlib" @ git ")[^"]+' lakefile.lean; }
 pin_docgen()     { grep -oP '(?<=^rev = ")[^"]+' docbuild/lakefile.toml; }
 pin_readme_row() { sed -n '/^| --- | --- | --- |$/{n;s/^| `[^`]*` | `\([^`]*\)`.*/\1/p;q;}' README.md; }
+# The concept DOI: minted once, then the same for every later version.
+doi_citation()   { grep -oP '(?<=value: ")10\.5281/zenodo\.[0-9]+' CITATION.cff | head -1; }
+doi_readme()     { grep -oP '(?<=zenodo\.org/badge/DOI/)10\.5281/zenodo\.[0-9]+' README.md | head -1; }
 # shields.io escapes a literal hyphen as `--`, so undo that before comparing.
 pin_readme_badge() { grep -oP '(?<=/badge/Mathlib-)[^-][^)]*?(?=-blue\))' README.md | sed 's/--/-/g'; }
 
@@ -67,6 +70,7 @@ cmd_check() {
   report "README Mathlib badge"         "$pin" "$(pin_readme_badge)"
 
   printf 'Other:\n'
+  report "README DOI badge" "$(doi_citation)" "$(doi_readme)"
   local today; today="$(date -u +%Y-%m-%d)"
   if [[ "$(lib_cff_date)" > "$today" ]]; then
     printf '  FAIL  %-34s %s is in the future\n' "CITATION.cff date-released" "$(lib_cff_date)"
@@ -158,8 +162,8 @@ require \"descriptive-complexity\" from git
 See the [compatibility table](https://github.com/$REPO#use-as-a-dependency) for
 which version to use with which Mathlib."
 
-  printf '\nReleased %s. Zenodo archives on the release event; the DOI appears within\n' "$tag"
-  printf 'a few minutes at https://zenodo.org (concept DOI goes in CITATION.cff + README badge).\n'
+  printf '\nReleased %s (Mathlib %s). Zenodo archives it on the release event, under the\n' "$tag" "$pin"
+  printf 'concept DOI already recorded in CITATION.cff, which covers every version.\n'
 }
 
 case "${1:-}" in

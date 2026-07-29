@@ -25,6 +25,9 @@ abstract: >-
   and machine-bridge theorems identifying the logically defined classes with
   the Turing-machine ones.
 identifiers:
+  - type: doi
+    value: "10.5281/zenodo.21678423"
+    description: "Concept DOI, resolving to the latest version of DescriptiveComplexity"
   - type: url
     value: "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/PierreSenellart/descriptive-complexity"
     description: "Software Heritage archive of the repository"
