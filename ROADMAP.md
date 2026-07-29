@@ -313,8 +313,9 @@ other side).
 
 ## 7. Machine bridges beyond NP and PTIME
 
-The machine bridge is done for NP and PTIME (`ntmAccept_NP_complete`,
-`dtmAccept_PTIME_complete`, and the characterizations
+The machine bridge is done for NP, PTIME and PSPACE (`ntmAccept_NP_complete`,
+`dtmAccept_PTIME_complete`, `dtmAcceptSpace_PSPACE_complete`,
+`ntmAcceptSpace_PSPACE_complete`, and the characterizations
 `mem_NP_iff_le_ntmAccept` / `mem_PTIME_iff_le_dtmAccept` — see the
 `Problems/Machine.lean` docstring). This section is the design analysis for
 extending it, with the class-defining logic assumed to exist (§3 work).
@@ -346,7 +347,7 @@ compilation direction above exists.
 | L | FO(DTC) | S | S | done, as a capture theorem – see below |
 | NL | FO(TC) | S | S | done, as a capture theorem – see below |
 | Σₖᵖ, Πₖᵖ | `Σₖ`-SO | M (reuses the NP membership) | M (reuses the SAT machine) | +0.6–1.2k [M] |
-| PSPACE | SO(TC) | S [done] | L–XL [done, ~3.2k] | ~3–5.5k |
+| PSPACE | SO(TC) | S [done] | L–XL [done, ~4.1k] | ~3–5.5k |
 | EXPTIME | SO(LFP) | L | XL | ~4–7k |
 | EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
 
@@ -370,14 +371,24 @@ Three rules govern the table:
    three variants of increasing cost: *state-registers* (loop counters as
    elements in the state; what PSPACE needs), *tape-registers with logarithmic
    addresses* (honest fixed-control logspace), *tape-registers with
-   exponential addresses* (EXPTIME/EXPSPACE). Consequences: for PSPACE the
-   direct SO(TC) discharge is easier than routing through QSAT (a QBF
-   evaluator needs a stack for the input-given prefix); a
-   *nondeterministically* stated space-bounded problem avoids Savitch
-   entirely.
+   exponential addresses* (EXPTIME/EXPSPACE). **Both consequences drawn here
+   for PSPACE were wrong**, as the build showed. Routing through QSAT is what
+   worked, and needs no evaluator at all: reducing *from* QSAT means compiling
+   one fixed algorithm — iterative QBF evaluation, whose stack is one bit per
+   variable in the variable's own cell — exactly as the SAT machine compiles
+   one fixed clause check. And Savitch is avoided not by stating the problem
+   nondeterministically but by proving hardness for the *deterministic*
+   problem and transferring: hardness travels forward along reductions, and
+   `DTMAcceptSpace ≤ᶠᵒ NTMAcceptSpace` is nearly free (the identity
+   interpretation, with the accepting predicate guarded by the first-order
+   determinism sentence). The lesson generalizes: pick the source problem so
+   that the algorithm is fixed, and prove the deterministic side hard.
 3. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
    (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
-   `Relation.ReflTransGen`, strictly cheaper; exponential (EXPTIME) needs a
+   `Relation.ReflTransGen`, strictly cheaper — and buys the converse half free,
+   since a deterministic machine's reachable configurations are linearly
+   ordered (`Problems/Machine/DetRun.lean`), so one run ending stuck and
+   non-accepting settles a no-instance with no second induction; exponential (EXPTIME) needs a
    walk along the lexicographic order of subsets, whose successor is
    FO-definable by ripple-carry (`Numbers/Binary.lean`,
    `Problems/Knapsack/Chain.lean` supply most of it).
@@ -412,7 +423,9 @@ The concrete items:
   tape addressing (lockstep address computation to test a guessed relation) —
   exactly the cost the existing bridge dodges by routing hardness through
   SAT/HORN-SAT. So: capture at L/NL (evaluator cheap, model first-order),
-  completeness at P/NP/`Σₖᵖ`/PSPACE and above (evaluator dear).
+  completeness at P/NP/`Σₖᵖ`/PSPACE and above (evaluator dear) — and at PSPACE
+  the completeness route turned out to need no evaluator at all, only the one
+  algorithm QSAT names.
 - **The exponential classes are not blocked by the framework**: the machine
   description stays polynomial (a reduction can write it) and only the run is
   exponential, living in Lean just as `SigmaSODefinable` quantifies over
