@@ -18,7 +18,7 @@ fragment of existential second-order logic
 
 * `DescriptiveComplexity.TCDefinable.compl` – FO(TC) is closed under complement, the
   content of the theorem, proved by the inductive-counting machine of
-  `DescriptiveComplexity.Counting` run inside a single transitive closure
+  `DescriptiveComplexity.InductiveCounting` run inside a single transitive closure
   (`DescriptiveComplexity.TransitiveClosureCompl`);
 * the two translations between the Krom fragment and FO(TC), which say that
   SO-Krom definability is FO(TC) definability *of the complement*

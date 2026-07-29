@@ -3,14 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Order
+import DescriptiveComplexity.InductiveCounting.Order
 
 /-!
 # Soundness of the inductive-counting machine
 
-Every accepting run of `DescriptiveComplexity.Counting.CfgStep` proves what it claims:
+Every accepting run of `DescriptiveComplexity.InductiveCounting.CfgStep` proves what it claims:
 no target is reachable from a source. The proof is a phase-indexed invariant,
-`DescriptiveComplexity.Counting.Inv`, preserved by every transition.
+`DescriptiveComplexity.InductiveCounting.Inv`, preserved by every transition.
 
 The delicate part is the inner loop, where the machine *guesses* which nodes
 belong to the current layer. A guess is certified, so the guessed set is always
@@ -19,13 +19,13 @@ the invariant records that the counter is at most the number of layer nodes
 already scanned, and that it is *strictly* below that number as soon as a node
 that would have mattered – a target, or a node putting the outer node into the
 next layer – has been skipped
-(`DescriptiveComplexity.Counting.InnerInv`, last clause). At the end of the scan the
+(`DescriptiveComplexity.InductiveCounting.InnerInv`, last clause). At the end of the scan the
 counter is checked against `|Rset d|`, which leaves no room for a skipped node.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Counting
+namespace InductiveCounting
 
 section Sound
 
@@ -712,6 +712,6 @@ theorem not_reach_of_machineAccepts (h : MachineAccepts E S T) :
 
 end Sound
 
-end Counting
+end InductiveCounting
 
 end DescriptiveComplexity

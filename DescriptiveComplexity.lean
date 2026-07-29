@@ -32,7 +32,7 @@ import DescriptiveComplexity.TransitiveClosure
 import DescriptiveComplexity.TransitiveClosureKrom
 import DescriptiveComplexity.KromImplication
 import DescriptiveComplexity.KromTransitiveClosure
-import DescriptiveComplexity.Counting
+import DescriptiveComplexity.InductiveCounting
 import DescriptiveComplexity.TransitiveClosureCompl
 import DescriptiveComplexity.ImmermanSzelepcsenyi
 import DescriptiveComplexity.TransitiveClosureReach
@@ -292,7 +292,7 @@ individual declarations are documented on their own pages.
   the program guessing the nodes from which an accepting node is reachable, one
   `k`-ary relation variable per mode. `DescriptiveComplexity.unreach_mem_NL` is its
   single-mode, arity-one instance, written out by hand as a worked example.
-* `DescriptiveComplexity.Counting` and `DescriptiveComplexity.TransitiveClosureCompl` –
+* `DescriptiveComplexity.InductiveCounting` and `DescriptiveComplexity.TransitiveClosureCompl` –
   **FO(TC) is closed under complement** (`DescriptiveComplexity.TCDefinable.compl`), by
   inductive counting. The machine is combinatorial, on an abstract finite
   linearly ordered node set: eight registers, each a node or a count read as a

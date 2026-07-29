@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Sound
+import DescriptiveComplexity.InductiveCounting.Sound
 
 /-!
 # Completeness of the inductive-counting machine
@@ -18,7 +18,7 @@ to grow.
 
 namespace DescriptiveComplexity
 
-namespace Counting
+namespace InductiveCounting
 
 section Complete
 
@@ -677,6 +677,6 @@ theorem machineAccepts_iff [Nonempty V] :
 end Runs
 
 
-end Counting
+end InductiveCounting
 
 end DescriptiveComplexity

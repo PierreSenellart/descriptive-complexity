@@ -4,15 +4,15 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.SetTheory.Cardinal.NatCard
-import DescriptiveComplexity.Counting.Machine
+import DescriptiveComplexity.InductiveCounting.Machine
 
 /-!
 # Registers as counters and as loop positions
 
-The registers of `DescriptiveComplexity.Counting.Cfg` hold values in `WithBot V`, read in
+The registers of `DescriptiveComplexity.InductiveCounting.Cfg` hold values in `WithBot V`, read in
 two ways: as a *count*, through `DescriptiveComplexity.orank` (so `⊥` is `0` and each
 cover adds one), and as a *loop position*, through
-`DescriptiveComplexity.Counting.predSet` (the set of nodes already scanned). This file
+`DescriptiveComplexity.InductiveCounting.predSet` (the set of nodes already scanned). This file
 collects the arithmetic of the two readings: how a cover moves a loop past one
 more node, how the count of a set restricted to the scanned part grows, and
 when a counter still has room to be incremented.
@@ -20,7 +20,7 @@ when a counter still has room to be incremented.
 
 namespace DescriptiveComplexity
 
-namespace Counting
+namespace InductiveCounting
 
 instance instFiniteWithBot {V : Type} [Finite V] : Finite (WithBot V) :=
   inferInstanceAs (Finite (Option V))
@@ -217,6 +217,6 @@ theorem ncard_inter_predSet_isMax_of_notMem {x : V} (h : ∀ z : V, z ≤ x) (hx
 
 end Counting
 
-end Counting
+end InductiveCounting
 
 end DescriptiveComplexity

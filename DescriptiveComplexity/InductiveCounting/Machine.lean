@@ -16,8 +16,8 @@ graph.
 
 Everything here is about an abstract finite linearly ordered node type `V` with
 an edge relation `E` and source and target predicates `S`, `T`; nothing is
-first-order yet. `DescriptiveComplexity.Counting.Sound` and
-`DescriptiveComplexity.Counting.Complete` prove the two directions, and
+first-order yet. `DescriptiveComplexity.InductiveCounting.Sound` and
+`DescriptiveComplexity.InductiveCounting.Complete` prove the two directions, and
 `DescriptiveComplexity.TransitiveClosureCompl` runs the whole machine inside a single
 `TC` by realizing each configuration as a mode together with a tuple of
 elements.
@@ -47,7 +47,7 @@ elements together with a finite mode.
 
 namespace DescriptiveComplexity
 
-namespace Counting
+namespace InductiveCounting
 
 /-! ### Layered reachability -/
 
@@ -445,6 +445,6 @@ def MachineAccepts : Prop :=
 
 end Semantics
 
-end Counting
+end InductiveCounting
 
 end DescriptiveComplexity

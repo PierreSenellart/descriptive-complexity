@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.TransitiveClosure
-import DescriptiveComplexity.Counting.Complete
+import DescriptiveComplexity.InductiveCounting.Complete
 
 /-!
 # FO(TC) is closed under complement
@@ -14,7 +14,7 @@ structures, the complement of an FO(TC) definable problem is FO(TC) definable
 ([Immerman 1988][immerman1988nondeterministic], [Szelepcsényi
 1988][szelepcsenyi1988method]).
 
-The proof runs the inductive-counting machine of `DescriptiveComplexity.Counting`
+The proof runs the inductive-counting machine of `DescriptiveComplexity.InductiveCounting`
 inside a single transitive closure. The machine's nodes are the nodes of the
 given `DescriptiveComplexity.TCSpec`, linearly ordered mode-major by the order of the
 structure; its configurations are a finite control together with eight
@@ -24,7 +24,7 @@ together with a `8k`-tuple, which is exactly what a `TCSpec` of arity `8k` can
 walk on.
 
 The one thing the translation must supply is the *formulas*: each atomic
-constraint of `DescriptiveComplexity.Counting.VAtom` becomes, given the modes recorded
+constraint of `DescriptiveComplexity.InductiveCounting.VAtom` becomes, given the modes recorded
 by the two control states, either a first-order formula over the two tuples or
 the information that no tuples can satisfy it (`compileAtom`). Since the modes
 are finite control data, every mode-level condition – "these two registers hold
@@ -37,7 +37,7 @@ formulas.
 
 namespace DescriptiveComplexity
 
-open FirstOrder Language Counting
+open FirstOrder Language InductiveCounting
 
 variable {L : Language.{0, 0}}
 
