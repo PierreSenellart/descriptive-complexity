@@ -6,6 +6,7 @@
 #
 #   release.sh check              verify every version/pin location agrees
 #   release.sh prepare <version>  bump the library version everywhere, then check
+#   release.sh notes              print draft release notes for the current version
 #   release.sh publish            tag the current commit and cut the GitHub release
 #
 # `check` is safe to run any time (and in CI); `prepare` only edits tracked files
@@ -127,6 +128,32 @@ cmd_prepare() {
   printf '\nReview the diff, then commit and run: %s publish\n' "$0"
 }
 
+# --- notes -------------------------------------------------------------------
+# A draft, not the final word: the commit subjects are one line each and read
+# well as a changelog, but they are written for the log, not for a reader
+# arriving at the release page. Curate before publishing.
+
+cmd_notes() {
+  local version pin tag prev
+  version="$(lib_lakefile)"; pin="$(pin_toolchain)"; tag="v$version"
+  # No previous tag (or none but this one) is not an error: the first release
+  # simply has nothing to list. `|| true` keeps `pipefail` from treating the
+  # empty grep as a failure.
+  prev="$(git tag --sort=-creatordate | grep -v "^$tag\$" | head -1 || true)"
+
+  printf 'Requires Mathlib `%s` and toolchain `leanprover/lean4:%s`.\n\n' "$pin" "$pin"
+  if [[ -n "$prev" ]]; then
+    printf '## Changes since %s\n\n' "$prev"
+    git log --no-merges --reverse --pretty='- %s' "$prev..HEAD"
+    printf '\n'
+  fi
+  printf '## Use\n\n```lean\nrequire "descriptive-complexity" from git\n  "https://github.com/%s" @ "%s"\n```\n\n' \
+    "$REPO" "$tag"
+  printf 'See the [compatibility table](https://github.com/%s#use-as-a-dependency)\n' "$REPO"
+  printf 'for which version to use with which Mathlib.\n'
+  [[ -z "$prev" ]] || printf '\n**Full changelog**: https://github.com/%s/compare/%s...%s\n' "$REPO" "$prev" "$tag"
+}
+
 # --- publish -----------------------------------------------------------------
 
 cmd_publish() {
@@ -142,6 +169,16 @@ cmd_publish() {
     || die "HEAD and origin/master differ; push first, and let CI go green"
   ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null || die "tag $tag already exists"
 
+  # Kept in .git/, so a draft is never mistaken for a tracked file.
+  local notes_file=".git/RELEASE_NOTES-$tag.md"
+  cmd_notes > "$notes_file"
+  if [[ -t 0 ]]; then
+    printf '\nDrafted release notes from the log into %s.\n' "$notes_file"
+    read -r -p "Edit them in ${EDITOR:-vi} before publishing? [Y/n] " edit_reply || true
+    [[ "$edit_reply" == "n" || "$edit_reply" == "N" ]] || "${EDITOR:-vi}" "$notes_file"
+  fi
+  printf '\n--- release notes ---\n'; cat "$notes_file"; printf -- '--- end notes -------\n'
+
   printf '\nAbout to publish %s (Mathlib %s) from %s.\n' "$tag" "$pin" "$(git rev-parse --short HEAD)"
   read -r -p 'This mints a permanent Zenodo DOI. Continue? [y/N] ' reply
   [[ "$reply" == "y" || "$reply" == "Y" ]] || die "aborted"
@@ -150,17 +187,7 @@ cmd_publish() {
   git push origin "$tag"
   gh release create "$tag" --repo "$REPO" \
     --title "$tag – for Mathlib $pin" \
-    --notes "Requires Mathlib \`$pin\` and toolchain \`leanprover/lean4:$pin\`.
-
-Add to a \`lakefile.lean\` with
-
-\`\`\`lean
-require \"descriptive-complexity\" from git
-  \"https://github.com/$REPO\" @ \"$tag\"
-\`\`\`
-
-See the [compatibility table](https://github.com/$REPO#use-as-a-dependency) for
-which version to use with which Mathlib."
+    --notes-file "$notes_file"
 
   printf '\nReleased %s (Mathlib %s). Zenodo archives it on the release event, under the\n' "$tag" "$pin"
   printf 'concept DOI already recorded in CITATION.cff, which covers every version.\n'
@@ -169,6 +196,7 @@ which version to use with which Mathlib."
 case "${1:-}" in
   check)   cmd_check ;;
   prepare) shift; cmd_prepare "$@" ;;
+  notes)   cmd_notes ;;
   publish) cmd_publish ;;
-  *) die "usage: $0 {check | prepare <version> | publish}" ;;
+  *) die "usage: $0 {check | prepare <version> | notes | publish}" ;;
 esac
