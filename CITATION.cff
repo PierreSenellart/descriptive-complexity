@@ -13,8 +13,8 @@ authors:
 repository-code: "https://github.com/PierreSenellart/descriptive-complexity"
 url: "https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html"
 license: Apache-2.0
-version: "4.33.0-rc1"
-date-released: "2026-07-27"
+version: "1.0.0"
+date-released: "2026-07-29"
 abstract: >-
   A Lean library for descriptive complexity, built on Mathlib's ModelTheory.
   Complexity classes are defined logically rather than by a machine model, so

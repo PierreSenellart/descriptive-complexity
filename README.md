@@ -1,6 +1,7 @@
 # DescriptiveComplexity
 
 [![CI](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml)
+[![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0--rc1-blue)](https://github.com/leanprover-community/mathlib4/releases/tag/v4.33.0-rc1)
 
 A Lean 4 library for descriptive complexity on top of Mathlib's
 `ModelTheory` library, based on first-order reductions, in the style of
@@ -174,18 +175,30 @@ Other formalizations of complexity theory, and how they differ:
 
 ## Use as a dependency
 
-The library tracks one Mathlib release at a time: a version works with the
-Mathlib version it is named after, and `master` follows the latest Mathlib pin.
-Your project and this one must resolve to the **same** Mathlib version, since
-Lake builds a single Mathlib per workspace. The current release is
-`v4.33.0-rc1`, for Mathlib `v4.33.0-rc1` and toolchain
-`leanprover/lean4:v4.33.0-rc1`.
+**Which version do I use?** Lake builds a single Mathlib per workspace, so pick
+the release whose Mathlib pin matches your project's – they must be the *same*
+Mathlib version, not merely compatible ones.
+
+| DescriptiveComplexity | Mathlib | Toolchain |
+| --- | --- | --- |
+| `v1.0.0` | `v4.33.0-rc1` | `leanprover/lean4:v4.33.0-rc1` |
+| `master` | latest pin, moves | see `lean-toolchain` |
+
+Version numbers are the library's own, and follow [semantic
+versioning](https://semver.org/): they say nothing about the Mathlib version,
+which this table records instead, together with the `lean-toolchain` file at
+each tag (authoritative) and the title of each [GitHub
+release](https://github.com/PierreSenellart/descriptive-complexity/releases).
+A **patch** release keeps the Mathlib pin it was cut against, and **a new pin
+always takes at least a minor bump**. So if you depend on a version range rather
+than on a tag, write `~1.0.0`, which stays within a single pin; `^1.0.0` spans
+several, and Lake resolves one Mathlib per workspace.
 
 In a `lakefile.lean`:
 
 ```lean
 require "descriptive-complexity" from git
-  "https://github.com/PierreSenellart/descriptive-complexity" @ "v4.33.0-rc1"
+  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.0.0"
 ```
 
 or, in a `lakefile.toml`:
@@ -194,7 +207,7 @@ or, in a `lakefile.toml`:
 [[require]]
 name = "descriptive-complexity"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "v4.33.0-rc1"
+rev = "v1.0.0"
 ```
 
 The revision can be a branch, a tag or a commit hash; pin a version tag or a
