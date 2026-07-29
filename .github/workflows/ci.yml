@@ -19,3 +19,20 @@ jobs:
       # lint targets it can auto-detect.
       - name: Build, test and lint
         uses: leanprover/lean-action@v1
+
+  metadata:
+    name: Release metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The library version and the Mathlib pin are each recorded in several
+      # files; this catches the one that was forgotten.
+      - name: Check that every version and pin location agrees
+        run: bash ./scripts/release.sh check
+
+      - name: Validate CITATION.cff
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "--validate"
