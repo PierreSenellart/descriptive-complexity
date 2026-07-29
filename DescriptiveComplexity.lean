@@ -685,11 +685,14 @@ once for the catalog rather than once per problem.
   plain tree flattening and hence primitive recursive – which the simulation of
   a machine could not be, Mathlib's universal machine not being finite-state.
 
-* `DescriptiveComplexity.finsat_not_computable` – **Trakhtenbrot's theorem**:
-  whether a first-order sentence has a *finite* model is undecidable. FINSAT is
-  RE-hard and `DescriptiveComplexity.codehalt_mem_RE` puts CODEHALT in RE, so
-  CODEHALT first-order-reduces to FINSAT; the reduction is computable, and
-  CODEHALT is undecidable.
+* `DescriptiveComplexity.not_computablePred_of_RE_hard` – **an RE-hard problem
+  is undecidable**, once and for all. Hardness here is cofinal, so an RE-hard
+  problem is in particular a target of CODEHALT, which is undecidable, and the
+  reduction is computable. This is the leverage the layer exists for: a
+  completeness theorem for RE now yields undecidability with no computability
+  work of its own. Its first instance is
+  `DescriptiveComplexity.finsat_not_computable`, **Trakhtenbrot's theorem**:
+  whether a first-order sentence has a *finite* model is undecidable.
 
 ## The problem catalog
 

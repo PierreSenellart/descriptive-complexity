@@ -516,9 +516,24 @@ theorem finsat_not_computable_of_codehalt_mem_RE (h : CODEHALT ∈ RE) :
   exact not_computablePred_of_relOrderedReduction f codeVocab finsatVocab
     not_computablePred_codehalt
 
+/-- **An RE-hard problem is undecidable.** Hardness in this library is cofinal,
+so an RE-hard problem is in particular a target of `CODEHALT`, which is
+undecidable; and a first-order reduction is a computable many-one reduction of
+the induced sets
+(`DescriptiveComplexity.not_computablePred_of_relOrderedReduction`).
+
+This is the leverage the whole `DescriptiveComplexity.Computability` layer
+exists for: every completeness theorem for RE now yields undecidability with no
+computability work of its own. -/
+theorem not_computablePred_of_RE_hard {L : Language.{0, 0}} [L.IsRelational]
+    {P : DecisionProblem L} (hP : RE.Hard P) (V : FinVocab L) :
+    ¬ComputablePred (P.toPred V) := by
+  obtain ⟨f⟩ := (hard_RE_iff P).mp hP CODEHALT codehalt_mem_RE
+  exact not_computablePred_of_relOrderedReduction f codeVocab V not_computablePred_codehalt
+
 /-- **Trakhtenbrot's theorem**: whether a first-order sentence has a *finite*
 model is undecidable. -/
 theorem finsat_not_computable : ¬ComputablePred (FINSAT.toPred finsatVocab) :=
-  finsat_not_computable_of_codehalt_mem_RE codehalt_mem_RE
+  not_computablePred_of_RE_hard finsat_RE_hard finsatVocab
 
 end DescriptiveComplexity
