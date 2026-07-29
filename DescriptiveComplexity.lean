@@ -65,6 +65,7 @@ import DescriptiveComplexity.OccurrenceVar
 import DescriptiveComplexity.Numbers
 import DescriptiveComplexity.Machines
 import DescriptiveComplexity.Problems
+import DescriptiveComplexity.Computability
 import DescriptiveComplexity.Examples
 
 -- The rows of the catalog table below cannot be broken across lines.
@@ -641,6 +642,46 @@ individual declarations are documented on their own pages.
   universe, with no vocabulary: configurations, steps, and acceptance within a
   budget counted in universe elements. The semantics the machine bridge reads
   off an instance.
+
+## The bridge to Mathlib's computability layer
+
+Every class of this development is defined by a *logic*, and every problem is
+an isomorphism-closed property of finite structures. `ComputablePred` and
+`REPred`, on the other hand, are predicates on a `Primcodable` type, so
+relating the two needs a passage from isomorphism classes to data. It is built
+once for the catalog rather than once per problem.
+
+* `DescriptiveComplexity.Computability` – the umbrella. A finite structure over
+  a finitely presented relational vocabulary becomes a universe `Fin (n + 1)`
+  and a list of Boolean tables (`FirstOrder.Language.FinStruct`, a
+  `Primcodable` type, nonempty and linearly ordered by construction); a fixed
+  first-order formula is evaluated on it *primitive recursively*
+  (`FirstOrder.Language.FinStruct.primrec_evalBF`), and hence decidably on any
+  finite structure at all (`FirstOrder.Language.BoundedFormula.decidableRealize`
+  – the first formal justification of the claim, elsewhere by inspection, that
+  first-order interpretations are effective).
+* `DescriptiveComplexity.RE_subset_rePred` – **RE really is recursively
+  enumerable**: the `∃SO[new]` certificate, a number of invented values and an
+  assignment of the relation variables, is a finite object, so it is *searched
+  for*, and the first-order kernel is checked on it by the evaluator. This makes
+  the name of the class a theorem rather than a convention, and it needs no
+  machine model. Read at the two problems of the machine bridge, it gives
+  `DescriptiveComplexity.halt_rePred` and
+  `DescriptiveComplexity.finsat_rePred`.
+
+* `DescriptiveComplexity.not_computablePred_of_relOrderedReduction` – **first-order
+  reductions are computable**: an interpretation induces a computable many-one
+  reduction of the induced sets, so undecidability transfers backwards along
+  `≤ᶠᵒ`, `≤ᶠᵒ[≤]` and `≤ʳᶠᵒ[≤]`. The order costs nothing (the universe of a
+  concrete instance is already `Fin (n + 1)`); the work is the *renumbering* a
+  definable target domain forces, and the run-time choice among the `|Tag|ⁿ`
+  instances of a defining formula.
+
+Nothing here says *undecidable* yet, and exactly one thing is missing: a
+computable map of a known-undecidable set into concrete machine instances.
+`DescriptiveComplexity.finsat_not_computable_of_halt` is Trakhtenbrot's theorem
+with that single hypothesis left open; `ROADMAP.md` (§8) records why Mathlib's
+`Nat.Partrec.Code` chain does not supply it.
 
 ## The problem catalog
 

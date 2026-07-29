@@ -76,7 +76,12 @@ for its class: both a member and hard for it under FO reductions. Karp's
 † Only the membership half is formalized
 
 The characterizations are the logical *definitions* of the classes (see the
-Overview above).
+Overview above). They are moreover matched against Mathlib's computability
+layer: through a generic encoding of finite structures as data, the problems of
+**RE** really are recursively enumerable predicates (`RE_subset_rePred`), and
+first-order reductions really are computable, so undecidability transfers
+backwards along `≤ᶠᵒ`, `≤ᶠᵒ[≤]` and `≤ʳᶠᵒ[≤]` – both with no machine model on
+either side.
 
 ## Scope and limitations
 

@@ -627,10 +627,11 @@ problem. What remains:
   buys no statement about any catalog problem – whereas the easy half,
   `halt_mem_RE`, already buys `halt_le_finsat`, and buys the same for every
   future problem shown to be in RE.
-- **Undecidability: the bridge to Mathlib's computability layer** [L–XL]. This
-  is all that stands between `halt_le_finsat` and Trakhtenbrot's theorem as
-  everyone states it; until it exists the honest reading of every result here is
-  "complete for the logically defined class RE".
+- **Undecidability: the bridge to Mathlib's computability layer** [partly built;
+  see `UN-DECIDABLE.md` for the design and the current state]. This is all that
+  stands between `halt_le_finsat` and Trakhtenbrot's theorem as everyone states
+  it; until it is finished the honest reading of every result here is "complete
+  for the logically defined class RE".
 
   `ComputablePred` is a predicate on a `Primcodable` type while a
   `DecisionProblem` is a property of finite structures up to isomorphism, so
@@ -639,45 +640,46 @@ problem. What remains:
   need, and a concrete instance type per problem would be ceremony over data
   that is already a relational structure. The right object is generic: over a
   *finite relational vocabulary* – every vocabulary in the catalog – a finite
-  structure is a universe `Fin n` plus a Boolean table, so one `Primcodable`
-  type serves the whole catalog at once. In dependency order:
+  structure is a universe `Fin (n + 1)` plus a Boolean table, so one
+  `Primcodable` type serves the whole catalog at once. Built, in
+  `DescriptiveComplexity/Computability/`:
 
-  - **decidable realization** [S]: `Decidable (φ.Realize v xs)` on a finite
-    structure with decidable relations, by recursion on the formula. Mathlib has
-    no such instance. No dependencies, and it is the first formal justification
-    of the README's by-inspection claim that FO reductions are effective;
-  - **the concrete instances** [S–M]: `Fin n` plus the table, with its
-    `Primcodable` instance. State the table as nested `List`s and *not* as a
-    dependent function `(Fin k → Fin n) → Bool`, which is pleasant semantically
-    and painful to prove `Primrec` facts about; `Fin n` is already linearly
-    ordered, so an *ordered* reduction instantiates with no order to encode;
-  - **`RE ⊆ RePred`** [M, and it needs no machine at all – the cheapest real
-    payoff here]: for a fixed `m` the extended universe is finite, so there are
-    finitely many assignments and the kernel is decidable by the first item;
-    unbounded search over `m` makes any `P ∈ RE` an `REPred`. This turns the
-    class's name into a theorem, and with `halting_problem_not_re` it is what
-    lets a problem be shown *not* to be in RE – the co-RE separation this
+  - **decidable realization**: `BoundedFormula.decidableRealize`, the first
+    formal justification of the README's by-inspection claim that FO reductions
+    are effective;
+  - **the concrete instances**: `FinVocab` and `FinStruct`, with `Primcodable`
+    and the induced predicate `DecisionProblem.toPred`; and the evaluator
+    `FinStruct.primrec_evalBF` – a *fixed* formula is evaluated on a concrete
+    structure primitive recursively, which is what everything downstream is an
+    application of;
+  - **`RE ⊆ REPred`** (`RE_subset_rePred`, read at the catalog by
+    `halt_rePred` and `finsat_rePred`): the class's name is now a theorem, and
+    no machine model was involved. With `halting_problem_not_re` this is also
+    what lets a problem be shown *not* to be in RE – the co-RE separation this
     section has always lacked;
-  - **FO reductions are computable** [M], whence `¬ComputablePred` transfers
-    backwards along `≤ᶠᵒ`, `≤ᶠᵒ[≤]` and `≤ʳᶠᵒ[≤]`. The `Primrec` work
-    concentrates not in the interpretation but in the *renumbering* a
-    relativized reduction forces: the image universe is a subtype, so the
-    surviving points must be listed and re-indexed, `iso_invariant` carrying
-    correctness across;
-  - **the halting link** [L–XL, the piece that can slip]: a computable map from
-    an undecidable set into the concrete instances of `HALT`.
-    `ComputablePred.halting_problem` is about `Nat.Partrec.Code.eval` and
-    `Mathlib/Computability/TMToPartrec.lean` is the meeting point with a machine
-    model – check which direction of that chain it gives before committing. The
-    page-structured tape helps: take the positions to be the `|w|` input cells
-    and the tape is *blanks · w · blanks*, an ordinary two-way tape, so the
-    simulation is a renaming of cells. Three details bite: Mathlib's TM0 halts by
-    having *no* transition apply while `AcceptsU` wants an accepting state;
-    `Turing.Tape` is a `ListBlank` on each side, so its correspondence with a
-    finitely supported `ℤ → Γ` is a lemma; and `WellFormed` has to be
-    established of the built instance.
+  - **FO reductions are computable**
+    (`not_computablePred_of_relOrderedReduction`, with its `≤ᶠᵒ[≤]` and `≤ᶠᵒ`
+    corollaries): proved once for the relativized ordered notion, the other two
+    being special cases. The order costs nothing – a concrete instance's
+    universe is already `Fin (n + 1)` – while the *renumbering* forced by a
+    definable domain, and the run-time choice among the `|Tag|ⁿ` instances of a
+    defining formula, are where the `Primrec` work sits.
 
-  Then `HALT` is undecidable and `FINSAT` with it, and every future
+  Whence `finsat_not_computable_of_halt`: Trakhtenbrot's theorem in the sense
+  everyone means, with a single hypothesis left open. That hypothesis is the one
+  thing that remains:
+
+  - **the halting link** [XL, and the piece that turned out to bite]: a
+    computable map from an undecidable set into the concrete instances of
+    `HALT`. Mathlib's chain does give what §6 of `UN-DECIDABLE.md` hoped for –
+    `Turing.PartrecToTM2.tr` is a *single* machine and the code enters through
+    the initial configuration – but that machine is **not finite-state**
+    (`Λ'` embeds `Code`), while a `TMData` lives on a finite universe. Either
+    extract the finite accessible part per code, which needs `Primrec` facts
+    about the compilation that Mathlib does not prove, or formalize a genuinely
+    finite universal machine.
+
+  Discharging it makes `HALT` undecidable and `FINSAT` with it, and every future
   `HALT ≤ᶠᵒ[≤] X` makes `X` undecidable – in particular **Post's problem**,
   whose classical theorem therefore needs the dominoes of the PCP item above but
   *not* RE-hardness of PCP.
