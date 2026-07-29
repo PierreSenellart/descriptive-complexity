@@ -61,7 +61,7 @@ jobs:
       #
       # A miss only costs time: the build is correct either way.
       - name: Restore the documentation database
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             docbuild/.lake/build/doc-data
