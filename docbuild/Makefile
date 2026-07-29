@@ -18,6 +18,13 @@ docs: graphs
 	# added module (the underlying .olean/docInfo artifacts are still cached, so
 	# the cost is just the final fromDb HTML pass).
 	rm -f .lake/build/doc-data/DescriptiveComplexity--library.docs_built
+	# Same for the bibliography prepass, for a sharper reason: the output Lake
+	# tracks for it sits in doc-data/, but the files it emits – doc/references.bib
+	# and doc/declarations/references.json – sit under doc/. Carry doc-data/ over
+	# without doc/, as CI does when it caches the database alone, and Lake finds
+	# the prepass up to date while its real outputs are absent, so the final
+	# fromDb pass dies on a missing doc/references.bib. Re-running it is cheap.
+	rm -f .lake/build/doc-data/references.json
 	lake build DescriptiveComplexity:docs
 	# Dependency figure at the foot of each declaration, folded away by
 	# default. Idempotent, and skipped entirely when result-graph is absent,
