@@ -13,6 +13,7 @@ import DescriptiveComplexity.Problems.Machine.Interp
 import DescriptiveComplexity.Problems.Machine.Fixpoint
 import DescriptiveComplexity.Problems.Machine.HornInterp
 import DescriptiveComplexity.Problems.Machine.Space
+import DescriptiveComplexity.Problems.Machine.SpaceHard
 import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Problems.HornSat
@@ -153,8 +154,21 @@ run of `DescriptiveComplexity.NTMAcceptSpace` may be arbitrarily long, but it
 never leaves the positions of the instance, so its configurations are the
 assignments of a fixed second-order block and its runs are a transitive closure
 over them. That is exactly an SO(TC) specification, so both problems are in
-PSPACE (`DescriptiveComplexity.Problems.Machine.Space`); the hardness half – the
-capture direction, which would give `PSPACE = NPSPACE` – is not proved here. -/
+PSPACE (`DescriptiveComplexity.Problems.Machine.Space`). Hardness is proved once,
+for the *deterministic* problem, by the QBF-evaluating machine of
+`DescriptiveComplexity.Problems.Machine.QsatInterp`, and travels to the
+nondeterministic one along `DescriptiveComplexity.dtmAcceptSpace_fo_reduction_ntmAcceptSpace`
+– hardness moves forward along reductions, which is why the deterministic
+problem is the one to prove hard and why Savitch is never run on the machine
+side. Both are therefore PSPACE-complete. -/
+
+/-- **Space-bounded machine acceptance is PSPACE-complete**, deterministic
+(`DescriptiveComplexity.dtmAcceptSpace_PSPACE_complete`) or not
+(`DescriptiveComplexity.ntmAcceptSpace_PSPACE_complete`): the library's
+logically defined PSPACE is the machine one. -/
+theorem spaceMachines_PSPACE_complete :
+    PSPACE.Complete DTMAcceptSpace ∧ PSPACE.Complete NTMAcceptSpace :=
+  ⟨dtmAcceptSpace_PSPACE_complete, ntmAcceptSpace_PSPACE_complete⟩
 
 /-- **Space-bounded machine acceptance reduces to QSAT**, the machine-side
 reading of Savitch's theorem: the nondeterministic space-bounded run is

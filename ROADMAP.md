@@ -75,11 +75,12 @@ remains below are ordinary catalog reductions and machine bridges.
   CVP, and alternating reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
-- **PSPACE, downstream of QSAT** [L each, gadget-heavy]: the **hardness half of
-  the machine bridge**, `QSAT ≤ᶠᵒ[≤] DTMAcceptSpace` – a deterministic
-  QBF-evaluation machine written inside a QSAT instance, which also gives
-  `PSPACE = NPSPACE`; in progress – and the
-  game problems (Generalized Geography…).
+- **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
+  (Generalized Geography…). The machine bridge is done: a deterministic
+  QBF-evaluation machine written inside a QSAT instance makes `DTMAcceptSpace`
+  PSPACE-hard, and `DTMAcceptSpace ≤ᶠᵒ NTMAcceptSpace` carries it to the
+  nondeterministic problem, so both are complete – this framework's
+  `PSPACE = NPSPACE`, with no machine-side Savitch.
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).

@@ -544,8 +544,16 @@ individual declarations are documented on their own pages.
   (`DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE`,
   `DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`), hence both reduce to QSAT
   (`DescriptiveComplexity.ntmAcceptSpace_reduces_to_qsat`) – the machine-side
-  reading of Savitch's theorem. The converse, PSPACE-hardness of these problems,
-  is not proved yet; it would complete the bridge and give `PSPACE = NPSPACE`.
+  reading of Savitch's theorem. Hardness is proved once, for the *deterministic*
+  problem, by a machine that evaluates a quantified Boolean formula by the
+  standard iterative algorithm – the recursion stack being one bit per variable,
+  in the variable's own cell – and travels to the nondeterministic problem along
+  a reduction that enforces determinism as a first-order promise. So both are
+  PSPACE-complete (`DescriptiveComplexity.dtmAcceptSpace_PSPACE_complete`,
+  `DescriptiveComplexity.ntmAcceptSpace_PSPACE_complete`), which is this
+  framework's `PSPACE = NPSPACE`: nothing simulates a nondeterministic machine
+  deterministically, Savitch having already been spent logically in
+  `DescriptiveComplexity.Problems.Qsat`.
 
 ## Value invention, towards the recursively enumerable
 
@@ -654,7 +662,7 @@ reduction and certificate in full.
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` – at `k = 1`, NP |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — | — |
-| `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not ‡ | SUCCINCT-REACH · QSAT |
+| `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound ‡ | FINSAT |
 
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
