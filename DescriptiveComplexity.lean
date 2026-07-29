@@ -655,16 +655,22 @@ reduction and certificate in full.
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not ‡ | SUCCINCT-REACH · QSAT |
-| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | — | FINSAT |
+| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound ‡ | FINSAT |
 
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
 for `NL`, and `DescriptiveComplexity.mem_LOGSPACE_iff_automaton` for `LOGSPACE`,
 where the machine is required to be deterministic.
 
-‡ Membership only, so far: `DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE` and
-`DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`. Hardness for those problems –
-the capture, which would also give `PSPACE = NPSPACE` – is not proved yet, so
-they are not listed as complete.
+‡ Membership only, so far, so these problems are not listed as complete. At
+`PSPACE`: `DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE` and
+`DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`, whose hardness – the capture,
+which would also give `PSPACE = NPSPACE` – is not proved yet. At `RE`:
+`DescriptiveComplexity.halt_mem_RE`, whence
+`DescriptiveComplexity.halt_le_finsat` at once, the halting problem
+first-order-reduced to finite satisfiability, which is Trakhtenbrot's theorem in
+the form it is usually stated; `DescriptiveComplexity.HALT` is not proved
+RE-hard, that being the converse half of the RE machine bridge
+(`ROADMAP.md` §7, §8).
 
 Headline results and cross-references:
 
@@ -832,6 +838,30 @@ Headline results and cross-references:
   disjunctions indexed by the tuples the interpretation's own formulas select.
   Function symbols in the source are removed beforehand, by
   `DescriptiveComplexity.Relationalize`.
+
+  The **halting problem** (`DescriptiveComplexity.HALT`) is the same machine data
+  as the NP and PSPACE bridges with *both* bounds dropped: the tape is an
+  unbounded strip of pages, each a copy of the instance's positions, so no
+  arithmetic enters the model and the input needs no placement. It is in RE
+  (`DescriptiveComplexity.halt_mem_RE`) because a run – finite, but bounded by no
+  function of the instance – is exactly what value invention guesses; and since
+  FINSAT is already RE-hard, that yields
+  `DescriptiveComplexity.halt_le_finsat` at once: the halting problem
+  first-order-reduces to finite satisfiability, which is Trakhtenbrot's theorem in
+  the form it is usually stated. RE-*hardness* of `HALT` is not proved and is a
+  far larger item; see `ROADMAP.md` (§7, §8).
+
+  Post's correspondence problem (`DescriptiveComplexity.PCP`,
+  [Post 1946][post1946variant]) is so far only *defined*: a match is a nonempty
+  sequence of marked dominoes whose top words and bottom words have the same
+  concatenation, the words of a domino being its letters read in the order the
+  instance carries on their positions. It is the first catalog problem whose
+  certificate is a *sequence* rather than a structure, and that is also why it
+  is not a second syntactic image: reading a solution left to right and keeping
+  the unmatched overhang turns a PCP instance into a nondeterministic queue
+  machine whose transitions a reduction writes, so RE-hardness of PCP is the RE
+  machine bridge rather than a translation of the logic. `PCP.md` records the
+  design of both halves.
 
 ## Worked examples
 

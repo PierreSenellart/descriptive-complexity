@@ -39,7 +39,12 @@ import DescriptiveComplexity.Problems.Qbf
 import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.SuccinctReach
 import DescriptiveComplexity.Problems.FinSat
+import DescriptiveComplexity.Problems.Pcp.Defs
 import DescriptiveComplexity.Problems.Machine
+import DescriptiveComplexity.Problems.Machine.Halt
+import DescriptiveComplexity.Problems.Machine.HaltCert
+import DescriptiveComplexity.Problems.Machine.HaltFin
+import DescriptiveComplexity.Problems.Machine.HaltMem
 
 /-!
 # The problem catalog
@@ -53,5 +58,12 @@ completeness theorems.
 Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
 only the membership half – see `ROADMAP.md`. Machine acceptance
 (`DescriptiveComplexity.NTMAccept`) is the machine bridge, so far
-only defined.
+only defined. The halting problem (`DescriptiveComplexity.HALT`, the same machine
+with the tape unbounded) is **in RE** (`DescriptiveComplexity.halt_mem_RE`),
+whence `DescriptiveComplexity.halt_le_finsat`, Trakhtenbrot's theorem in the form
+it is usually stated; it is not proved RE-*hard*, see `HALT.md`. Post's
+correspondence problem
+(`DescriptiveComplexity.PCP`) is so far only defined as well: its membership in
+RE is designed in `PCP.md`, and its RE-hardness is not a catalog item at all but
+the RE machine bridge, for the reason that file gives.
 -/

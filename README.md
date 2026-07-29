@@ -70,10 +70,10 @@ for its class: both a member and hard for it under FO reductions. Karp's
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` (quantified Boolean formulas, `k` blocks)|
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` (universal-first, `k` blocks) |
 | **PH** | SO | — | — |
-| **PSPACE** | SO(TC) | polynomial-space Turing machine, deterministic or not ‡ | SUCCINCT-REACH · QSAT |
-| **RE** | ∃SO[new] (∃SO with value invention) | — | FINSAT (Trakhtenbrot's theorem) |
+| **PSPACE** | SO(TC) | polynomial-space Turing machine, deterministic or not † | SUCCINCT-REACH · QSAT |
+| **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound † | FINSAT (Trakhtenbrot's theorem) |
 
-‡ Only the membership half is formalized
+† Only the membership half is formalized
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above).

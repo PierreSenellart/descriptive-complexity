@@ -752,11 +752,73 @@ Done so far:
   junk and the values of the arguments. Composing the two gives
   `finsat_hard_of_sigmaSONewDefinable` and `FINSAT_RE_complete`.
 
-- **PCP (Post's correspondence problem)** [M–L, after Trakhtenbrot]: the
-  classical target for undecidability by reduction, and the natural second
-  complete problem; instance is a marked list of domino pairs over an alphabet,
-  a solution an invented sequence of indices with the two concatenations
-  guessed as invented strings and matched position by position.
+- **PCP (Post's correspondence problem)**: the classical target for
+  undecidability by reduction. **Defined** (`Problems/Pcp/Defs.lean`): the
+  instance is a marked list of domino pairs over an alphabet, ordered by the
+  order of the positions of its own words, and a match is a nonempty sequence of
+  marked dominoes whose top and bottom words have the same concatenation. The
+  design of both halves, and the hazards, are in `PCP.md`.
+
+  The [M–L] estimate this item used to carry was wrong, and splitting it is the
+  point:
+  - **membership** [M, ~2–2.5k]: the match is invented. Four relation variables
+    – the slots, their order, the domino at a slot, and a 4-ary variable holding
+    the letter-preserving order isomorphism between the two parses – with the
+    common word *not* invented at all, its positions being the pairs (slot,
+    position in the top word) in lexicographic order. The mathematical content
+    is the bridge `pcpOn_iff_cert`, whose one real lemma is that the sorted
+    enumeration of a lexicographic sum is the `flatMap` of the sorted
+    enumerations (by uniqueness of sorted enumerations, not by induction);
+  - **hardness** [XL]: *not a catalog item*. PCP is not the syntactic image of
+    any logic – a certificate of `∃SO[new]` is a structure with relations, a
+    certificate of PCP is a string with two parses – and a PCP instance is
+    really a *program*: reading a solution left to right and keeping the
+    unmatched overhang makes it a nondeterministic queue machine whose
+    transitions the reduction writes. So RE-hardness of PCP *is* the RE machine
+    bridge: the discharge must guess a block assignment on unbounded storage and
+    then evaluate a first-order kernel against it, every atom test being a random
+    access into the guessed table – the “evaluator with tape addressing” priced
+    at XL in §7. The honest decomposition is `HALT` (unbounded tape, no step
+    bound) as a catalog problem [S], `HALT ∈ RE` by the invented tableau [M],
+    `HALT` RE-hard [XL, the whole cost], `HALT ≤ᶠᵒ[≤] PCP` by the classical
+    computation-history dominoes [L]. Only the third is blocked, and on effort
+    rather than on an idea; `PCP.md` §5 records the three shortcuts that do not
+    work, including why the cheap `HeadEval` evaluator does not apply.
+- **HALT, the halting problem** [**done**]: acceptance of a Turing machine
+  with *no step bound and no space bound* – the same `TMData` as the NP and
+  PSPACE bridges, with the tape leaving the instance. **Done**: the semantics
+  (`MachinesUnbounded.lean`: the cells are `ℤ × A`, an unbounded strip of pages
+  each a copy of the instance's positions, so the input needs no placement and
+  no arithmetic enters the model), the problem (`Problems/Machine/Halt.lean`),
+  the certificate bridge (`Problems/Machine/HaltCert.lean`,
+  `acceptsU_iff_runCert`: a machine accepts exactly when a finite linear order of
+  time points and a finite linear order of pages carry a run of it – finite
+  because a run of `n` steps moves the head by at most one page per step, and
+  unbounded by the instance, which is why the certificate needs invented values),
+  and its relational form on invented values (`Problems/Machine/HaltFin.lean`,
+  `acceptsU_iff_runRel` and `halt_iff_runRel`, the statement the kernel mirrors
+  clause by clause). No relabelling step was needed: the two sorts are
+  independent predicates on the invented values, so a run of `n` steps is read
+  off over `Fin (2n + 1)` alone with the time points its first `n + 1` values.
+  and the `∃SO[new]` kernel (`Problems/Machine/HaltMem.lean`: nine relation
+  variables, eight well-formedness conjuncts and eighteen certificate conjuncts,
+  each with its own realization lemma, the repeated order shapes factored into
+  builders, and `runAssign` dispatching on the sort of each argument so that
+  reading an assignment back is `rfl`). Whence `halt_mem_RE` and, *for free* from
+  `finsat_hard_of_sigmaSONewDefinable`,
+
+  ```
+  halt_le_finsat : Nonempty (HALT ≤ʳᶠᵒ[≤] FINSAT)
+  ```
+
+  which is Trakhtenbrot's theorem in the form it is usually stated, the reduction
+  from the halting problem. Design and hazards: `HALT.md`.
+
+  Note what this deliberately does *not* attempt: `RE.Hard HALT`, i.e. “RE is the
+  class of semi-decidable problems”. That is the converse half, it needs the
+  evaluator with addressed storage (§7), and it buys no statement about any
+  catalog problem – whereas the easy half above buys one immediately, and buys it
+  again for every future RE-hard problem.
 - **What incomputability actually needs** [R, separate]: RE-hardness alone does
   not yet say "undecidable" inside this library — that statement needs the
   other side, RE ⊆ (Mathlib's) `RePred` through an encoding of finite
