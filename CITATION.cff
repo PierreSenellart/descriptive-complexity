@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+title: "DescriptiveComplexity: Completeness by First-Order Reductions in Lean"
+message: >-
+  If you use DescriptiveComplexity in academic work, please cite it using the
+  metadata in this file.
+type: software
+authors:
+  - family-names: Senellart
+    given-names: Pierre
+    orcid: "https://orcid.org/0000-0002-7909-5369"
+    affiliation: "DI ENS, ENS-PSL, CNRS, Inria, Paris, France"
+    website: "https://pierre.senellart.com"
+repository-code: "https://github.com/PierreSenellart/descriptive-complexity"
+url: "https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html"
+license: Apache-2.0
+version: "4.33.0-rc1"
+date-released: "2026-07-27"
+abstract: >-
+  A Lean library for descriptive complexity, built on Mathlib's ModelTheory.
+  Complexity classes are defined logically rather than by a machine model, so
+  membership is a definability witness and hardness a first-order reduction,
+  which is strictly stronger than a polynomial-time (Karp) reduction. The
+  library proves a machine-free Cook-Levin theorem, NP-completeness for all 21
+  of Karp's problems, completeness results for classes from L to PSPACE and RE,
+  and machine-bridge theorems identifying the logically defined classes with
+  the Turing-machine ones.
+identifiers:
+  - type: url
+    value: "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/PierreSenellart/descriptive-complexity"
+    description: "Software Heritage archive of the repository"
+keywords:
+  - descriptive complexity
+  - computational complexity
+  - finite model theory
+  - NP-completeness
+  - Cook-Levin theorem
+  - polynomial-time reductions
+  - first-order reductions
+  - Karp's 21 problems
+  - polynomial hierarchy
+  - Lean
+  - Mathlib
+  - formalized mathematics
