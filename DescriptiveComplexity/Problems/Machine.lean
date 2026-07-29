@@ -93,6 +93,15 @@ acceptance feeds the machine-free Tseitin discharge. -/
 theorem ntmAccept_reduces_to_sat : Nonempty (NTMAccept ≤ᶠᵒ[≤] SAT) :=
   sat_hard_of_sigmaSODefinable NTMAccept ntmAccept_sigmaSODefinable
 
+/-- **Machine acceptance and satisfiability are interreducible.** Both
+directions of the Cook–Levin correspondence in one statement: acceptance
+reduces to `DescriptiveComplexity.SAT` through the `Σ₁` definition of a run,
+and `DescriptiveComplexity.SAT` reduces back by building the machine `M_φ`
+inside the instance. -/
+theorem ntmAccept_interreducible_sat :
+    Nonempty (NTMAccept ≤ᶠᵒ[≤] SAT) ∧ Nonempty (SAT ≤ᶠᵒ[≤] NTMAccept) :=
+  ⟨ntmAccept_reduces_to_sat, ⟨SatTM.sat_ordered_fo_reduction_ntmAccept⟩⟩
+
 /-! ### The deterministic problem
 
 The same bridge one level down, for `DescriptiveComplexity.DTMAccept`: membership –
