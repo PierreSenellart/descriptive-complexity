@@ -21,9 +21,9 @@ positions* of `DescriptiveComplexity.Tseitin.NodeAt`, reused verbatim from the
 Cook–Levin reduction – as is the whole semantic layer of
 `DescriptiveComplexity.Problems.Sat.Tseitin`, whose
 `DescriptiveComplexity.Tseitin.Gates` is exactly the recursion the encoded
-sentence has to compute (see `TRAKHTENBROT.md` §5). What that layer does not
-carry, and this file adds, is a *size*: `DescriptiveComplexity.FinSat.nodeSize`,
-the size of the subformula at a position, which is what makes the parse DAG of
+sentence has to compute. What that layer does not carry, and this file adds, is
+a *size*: `DescriptiveComplexity.FinSat.nodeSize`, the size of the subformula at
+a position, which is what makes the parse DAG of
 the image descend along the order of the syntax
 (`DescriptiveComplexity.FinSat.IsWF.child_lt`).
 

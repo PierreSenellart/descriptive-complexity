@@ -10,9 +10,8 @@ import DescriptiveComplexity.Ordered
 /-!
 # The sentence a reduction into FINSAT produces
 
-The interpretation `σ_A` of `TRAKHTENBROT.md` §5: given the second-order block
-`B` and the first-order kernel `φ` of an `∃SO[new]` definition, the encoded
-sentence
+The interpretation `σ_A`: given the second-order block `B` and the first-order
+kernel `φ` of an `∃SO[new]` definition, the encoded sentence
 
 ```
 ∃x_{a₁} … ∃x_{aₙ} ( ⋀_{a ≠ b} x_a ≠ x_b  ∧  φ* )
@@ -126,7 +125,7 @@ theorem lt_arity_of_blockArg {p : Pos B φ} {i : B.ι} {j l : ℕ}
 
 /-- **A block atom has an argument at every position of its signature**, and it
 is the variable of one of the de Bruijn levels of the kernel. Relational: a
-function symbol would have no level to give (`TRAKHTENBROT.md` §5). -/
+function symbol would have no level to give. -/
 theorem exists_blockArg [L.IsRelational] {p : Pos B φ} {i : B.ι} {j : ℕ}
     (hs : blockSym B φ p = some i) (hj : j < B.arity i) :
     ∃ l : ℕ, blockArg B φ p j = some l ∧ l < Tseitin.maxCtx φ :=
@@ -909,7 +908,7 @@ theorem arg_sig_map (g s p x : (finsatInterp B φ).Map A)
 signature** (`DescriptiveComplexity.FinSat.IsWF.arg_tot`): the variable of the de
 Bruijn level the corresponding term takes, which exists because the source
 vocabulary is relational – a function symbol would have no level to give
-(`TRAKHTENBROT.md` §5, the junk-value hazard). -/
+(the junk-value hazard). -/
 theorem arg_tot_map [L.IsRelational] [Finite A] [Nonempty A]
     (g s p : (finsatInterp B φ).Map A) (h : PosG g s ∨ NegG g s) (hsig : SigG s p) :
     ∃ x, ArgG g p x := by

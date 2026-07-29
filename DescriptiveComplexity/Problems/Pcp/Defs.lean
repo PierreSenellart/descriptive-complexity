@@ -57,11 +57,11 @@ RE is the logically defined class of
 `DescriptiveComplexity.RecursivelyEnumerable` (definability in `∃SO[new]`), so
 membership of PCP in it is a statement about that logic; it becomes
 *undecidability* of Post's problem only through the machine bridge recorded in
-`ROADMAP.md` (§8). `PCP.md` records the design of this development, and in
-particular why RE-*hardness* of PCP is not a catalog-sized item: unlike
-`DescriptiveComplexity.FINSAT`, PCP is not the syntactic image of a logic, and
-a PCP instance is really a program – a nondeterministic queue machine whose
-configuration is the unmatched overhang – so hardness is the RE machine bridge.
+`ROADMAP.md` (§8), which also records why RE-*hardness* of PCP is not a
+catalog-sized item: unlike `DescriptiveComplexity.FINSAT`, PCP is not the
+syntactic image of a logic, and a PCP instance is really a program – a
+nondeterministic queue machine whose configuration is the unmatched overhang –
+so hardness is the RE machine bridge.
 -/
 
 /- The language of encoded domino lists lives in Mathlib's

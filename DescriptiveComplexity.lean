@@ -860,8 +860,8 @@ Headline results and cross-references:
   is not a second syntactic image: reading a solution left to right and keeping
   the unmatched overhang turns a PCP instance into a nondeterministic queue
   machine whose transitions a reduction writes, so RE-hardness of PCP is the RE
-  machine bridge rather than a translation of the logic. `PCP.md` records the
-  design of both halves.
+  machine bridge rather than a translation of the logic. `ROADMAP.md` (§8)
+  records both halves.
 
 ## Worked examples
 

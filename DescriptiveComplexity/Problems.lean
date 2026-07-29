@@ -64,6 +64,6 @@ whence `DescriptiveComplexity.halt_le_finsat`, Trakhtenbrot's theorem in the for
 it is usually stated; it is not proved RE-*hard*, see `ROADMAP.md` (§8). Post's
 correspondence problem
 (`DescriptiveComplexity.PCP`) is so far only defined as well: its membership in
-RE is designed in `PCP.md`, and its RE-hardness is not a catalog item at all but
-the RE machine bridge, for the reason that file gives.
+RE is designed in `ROADMAP.md` (§8), which also records why its RE-hardness is
+not a catalog item at all but the RE machine bridge.
 -/

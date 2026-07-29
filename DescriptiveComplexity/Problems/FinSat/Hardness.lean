@@ -13,7 +13,7 @@ import DescriptiveComplexity.Problems.FinSat.Fixpoint
 well formed (`DescriptiveComplexity.FinSat.image_isWF`); this file reads it back
 as a *sentence* – what its nodes are, and which of them are children, binders and
 literals of which – which is what the correctness of the reduction is then
-stated and proved against (`TRAKHTENBROT.md` §5).
+stated and proved against.
 
 ## The elements are points
 
@@ -1762,9 +1762,9 @@ theorem gstep_blockAtom_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : 
 
 /-! ### The kernel, position by position
 
-The cases of the induction §5 of `TRAKHTENBROT.md` designs, each stated for a
-subformula of the kernel embedded by a `DescriptiveComplexity.FinSat.SubEmb`:
-the shape facts come from `SubEmb.node`, the children from `SubEmb.kid` and
+The cases of the induction, each stated for a subformula of the kernel embedded
+by a `DescriptiveComplexity.FinSat.SubEmb`: the shape facts come from
+`SubEmb.node`, the children from `SubEmb.kid` and
 `SubEmb.kid_range` through
 `DescriptiveComplexity.FinSat.childG_nd_iff`. -/
 

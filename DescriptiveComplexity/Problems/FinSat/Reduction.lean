@@ -11,7 +11,7 @@ import DescriptiveComplexity.RecursivelyEnumerable
 
 `DescriptiveComplexity.FinSat.Hardness` evaluates the encoded sentence `σ_A`
 node by node; this file closes the two directions and assembles the ordered
-first-order reduction (`TRAKHTENBROT.md` §5).
+first-order reduction.
 
 * **⟹** – an assignment of the block over an extended universe `A ⊕ Fin m` *is*
   a model of `σ_A`: take `A ⊕ Fin m` as the model, the intended assignment
@@ -516,7 +516,9 @@ finite structures, by an `∃SO[new]` sentence with a single block.
 
 Relational for now: `DescriptiveComplexity.CofinalHard` admits source languages
 with function symbols, whose junk interpretation on invented arguments the
-sentence would have to guess (`TRAKHTENBROT.md` §5, the term layer). -/
+sentence would have to guess: the term layer, which
+`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable` removes from the
+source instead. -/
 noncomputable def finsatReduction (Q : DecisionProblem L)
     (hφ : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
       Q A ↔ ∃ m : ℕ, SORealize (newLang L) (A ⊕ Fin m) [B] φ true) :
@@ -534,9 +536,11 @@ ordered first-order reduction to finite satisfiability.
 
 Membership is `DescriptiveComplexity.FinSat.finsat_mem_RE`; together they say
 that finite satisfiability is complete for `∃SO[new]` among relational
-vocabularies. Lifting the restriction is the term layer of `TRAKHTENBROT.md`
-§5, which is what `DescriptiveComplexity.RE.Hard` – cofinal hardness, quantified
-over *every* source vocabulary – additionally asks for. -/
+vocabularies. Lifting the restriction is the term layer, which is what
+`DescriptiveComplexity.RE.Hard` – cofinal hardness, quantified over *every*
+source vocabulary – additionally asks for;
+`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable` supplies it, and
+the umbrella composes the two. -/
 theorem finsat_hard_of_sigmaSONewDefinable :
     ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSONewDefinable Q → Nonempty (Q ≤ᶠᵒ[≤] FINSAT) := by

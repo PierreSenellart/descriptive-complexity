@@ -10,9 +10,8 @@ import DescriptiveComplexity.SecondOrderNew
 # Reading the kernel of an `∃SO[new]` definition, position by position
 
 The encoded sentence the RE-hardness reduction produces has one node per
-*(subformula position, polarity)* of the kernel `φ` (`TRAKHTENBROT.md` §5), so
-the defining formulas of the interpretation have to answer two questions about a
-position:
+*(subformula position, polarity)* of the kernel `φ`, so the defining formulas of
+the interpretation have to answer two questions about a position:
 
 * **what does the kernel say there?** –
   `DescriptiveComplexity.FinSat.kernelNode`, which reads off the constructor at
@@ -187,8 +186,7 @@ variable {L : Language.{0, 0}} {B : SOBlock}
 
 /-- The de Bruijn level a term denotes, when it is a variable at all: `none` for
 a function application, which the relational milestone of the reduction excludes
-and the term layer will have to translate by its graph
-(`TRAKHTENBROT.md` §5, the junk-value hazard). -/
+and the term layer translates by its graph (the junk-value hazard). -/
 def termLevel {m : ℕ} : ∀ _ : ((newLang L).sum B.lang).Term (Empty ⊕ Fin m), Option ℕ
   | .var (Sum.inl e) => e.elim
   | .var (Sum.inr j) => some (j : ℕ)
