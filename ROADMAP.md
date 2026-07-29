@@ -656,29 +656,3 @@ This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §9, the cookbook and catalog
 growth move up and PSPACE slides down: students meet NL, P-completeness and
 reductions long before they meet SO(TC).
-
-
-## The PSPACE machine bridge, as built (2026-07-29)
-
-~4.1k lines over nine files; the §7 estimate of L–XL for hardness was right.
-What the plan did not anticipate:
-
-* **Prove hardness for the deterministic problem, not the nondeterministic
-  one.** Hardness travels *forward* along reductions, and
-  `DTMAcceptSpace ≤ᶠᵒ NTMAcceptSpace` is nearly free (the identity
-  interpretation with the accepting predicate guarded by the determinism
-  sentence). Proving `NTMAcceptSpace` hard first would have forced Savitch on
-  the machine side — a recursive-doubling machine with a stack. Avoided
-  entirely; the only Savitch in the library stays the logical one, inside
-  `Problems/Qsat`.
-* **Reduce from QSAT, not SUCCINCT-REACH.** A deterministic machine has to run
-  an algorithm; QBF evaluation is one, succinct reachability has none.
-* **The evaluator is not needed.** §7 predicted the PSPACE discharge would need
-  an evaluator compiling arbitrary formulas of the logic into a machine. It did
-  not: reducing from QSAT means compiling *one fixed* algorithm, exactly as the
-  SAT machine compiles one fixed clause check.
-* **No step budget is a real saving.** `AcceptsSpace` is `ReflTransGen`, so the
-  `bitRank` arithmetic and filler cells of the NP bridge disappear, and the
-  converse half is free from `Relation.ReflTransGen.total_of_right_unique`
-  (`Problems/Machine/DetRun.lean`): exhibit one run ending stuck and
-  non-accepting, and non-acceptance follows.
