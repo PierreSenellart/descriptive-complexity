@@ -255,11 +255,61 @@ a formula reconstruct a machine's binary output bit by bit.
 
 The concrete items, in dependency order:
 
-- **Parsimonious reductions** [M]: the real framework work. `≤ᶠᵒ` preserves
-  membership (`A ∈ P ↔ I(A) ∈ Q`); counting needs `f A = g (I A)`: same
-  interpretations, the iff replaced by an equation. Composition closure mirrors
-  `Complexity.lean`, so the quantitative classes are again closed under
-  reduction by construction. Depends on nothing beyond what exists today.
+- **The quantitative framework layer** [M]: the real framework work, and it
+  depends on nothing beyond what exists today. A `CountingProblem` is an
+  iso-invariant `Count : Structure → ℕ`; the reductions reuse
+  `FOInterpretation`, `Tag`, `dim` and the finite/nonempty side conditions of
+  `FOReduction` verbatim, only the `correct` field changing. The names
+  `Counting.lean` / `Counting/` are free for this layer (the
+  Immerman–Szelepcsényi module having become `InductiveCounting`), with the
+  ΣQSO syntax and evaluator in `Quantitative.lean` / `QSO/`: the same split
+  between framework and defining logic that `Complexity.lean` and the
+  `SecondOrder*` / `FixedPoint*` files already make on the decision side.
+- **The reduction ladder** [M for levels 0–1, L for level 2]: three notions,
+  each a special case of the next, so a hardness result proved low transports
+  up.
+  - *Parsimonious* (`≤ᵖ`): `P.Count A = Q.Count (I A)`, the iff of
+    `FOReduction.correct` replaced by an equation. Composition is
+    `FOInterpretation.comp` plus `compLEquiv`, with `iso_invariant` where the
+    decision proof rewrites with it.
+  - *Counting, one oracle call* (`≤ᶜ`):
+    `(P.Count A : ℤ) = scale A * Q.Count (I A) + shift A`. Typing the equation
+    in ℤ is not a convenience: the monotone sources need subtraction (the
+    independent sets of a bipartite graph are exactly the worlds where no edge
+    is fully selected, `#IS = 2^{n+m} − #PP2DNF`), which is the
+    ΣQSO-with-ℤ-constants/GapP phenomenon of the table above. Composing
+    `c·Q∘I + d` with `c'·R∘J + d'` gives
+    `(c · c'∘I)·R∘(J∘I) + (c · d'∘I + d)`, so the coefficients must be closed
+    under sum, product and *pullback along an interpretation* – the last being
+    the same `comp`/`compLEquiv` argument again, plus iso-invariance.
+  - *Non-adaptive linear combinations* [L]:
+    `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
+    i.e. polynomially many oracle calls at definable parameters, combined
+    definably. It needs *parameterized* interpretations (thread `k` extra free
+    variables through every defining formula and through `Map`), which is the
+    level's main cost; the divisor on the left keeps Lagrange denominators out
+    of the statement. Index sets multiply, parameters concatenate and divisors
+    multiply, so composition still closes. This is the shape of every
+    interpolation-based `#P`-hardness proof. *Adaptive* Turing reductions,
+    where a later query depends on an earlier answer, stay out: that is the
+    honest boundary of a machine-free framework, and `FP^#P` lives beyond it.
+- **The coefficient budget** [S, but load-bearing]: coefficients must come from
+  a class *strictly weaker* than the one being defined, exactly as the
+  classical definition asks its post-processing to be polynomial-time.
+  Otherwise the notion is vacuous: with arbitrary `#P` coefficients, take `Q`
+  constantly `1` and `scale := P`, and every counting problem reduces to a
+  trivial one. The principled budget is `QFO(LFP) = FP`, deferred below; the
+  cheap interim one is the grammar
+  `b ::= k ∈ ℤ | |{x̄ : φ}| | 2^{|{x̄ : φ}|} | b + b | b · b` with `φ ∈ FO(≤)`,
+  which contains `n^k` and `2^n`, is closed under pullback for free (FO
+  formulas pull back along interpretations, which is `relMap_map`), and sits
+  comfortably inside FP.
+- **`CountingClass`** [S]: `Mem`, `Hard` and `Complete` as in
+  `Complexity.lean`, with one structural difference: closure is *asymmetric*.
+  `Mem` is closed under `≤ᵖ` only, since `#P` is not closed under the
+  subtractive correction (that is what GapP is for); `Hard` is closed under
+  `≤ᶜ`, which needs only transitivity of the reduction, supplied by the
+  composition above.
 - **ΣQSO evaluator** [M–L]: a fresh inductive for the quantitative layer (~8
   constructors) over the existing Boolean layer, with a recursive evaluator
   into ℕ whose semantics is Mathlib-native (`⟦Σx.α⟧ = Finset.sum`,
@@ -305,11 +355,69 @@ The concrete items, in dependency order:
   delicate than parsimonious ones, which is also why PCP-based hardness of
   approximation stays out of scope.
 
+### Probabilistic query evaluation, and what "`#P`-hard" should mean
+
+The intended consumer of this track is probability computation, where the
+field's own "`#P`-hard" is an abuse: computing a probability is a map into ℚ,
+so the honest classical statement is `FP^#P`-completeness under Turing
+reductions, which the ladder above deliberately does not reach. The abuse is an
+artifact of the *output type*, and it disappears by counting worlds instead:
+for a fixed query `Q` and a TID instance whose probabilistic tuples `T` all
+carry probability 1/2,
+
+```
+#PQE(Q) : Structure → ℕ,   #PQE(Q)(D) = P(Q on D) · 2^{|T|}
+```
+
+is an iso-invariant counting problem, and the normalization `2^{|T|}` is a
+property of the instance, not of the answer, so it is definable and the two
+formulations differ by a fixed factor rather than by an oracle protocol. Only
+uniform 1/2 is covered; non-uniform dyadic probabilities are a *weighted* model
+count, whose weight is a product over tuples, hence a `Π` that ΣQSO lacks by
+design (the same reason FP is not reachable by counting) – bit-blasting
+`a_t / 2^k` into `k` independent 1/2-tuples brings them back into the
+unweighted setting at a `k`-fold blow-up, if ever needed.
+
+- **Membership** [S]: `ΣX̄. φ_Q(X̄)` is #FO, and for a UCQ it lands at the very
+  bottom, `#Σ₁` / `ΣQSO(Σ₁)`. Worth noting that the FPRAS story of that level –
+  approximable, not closed under sum – *is* the probabilistic-database
+  approximability story (Karp–Luby on the lineage DNF), so "structure inside
+  `#P`" above is not an unrelated research item but this application's own
+  fine print.
+- **Tier 1, an FO query with negation** [S]: put the assignment in a
+  probabilistic unary relation, the clauses in deterministic ones, and let `Q`
+  say "this assignment satisfies the formula"; worlds satisfying `Q` are the
+  satisfying assignments, on the nose. The reduction from #SAT is a dimension-1
+  interpretation re-reading a SAT instance as a PQE instance, parsimonious
+  because the correspondence is a bijection. Nearly free once #SAT is complete
+  for ΣQSO(FO), and enough to state "probabilistic query evaluation is
+  `#P`-complete" with no abuse at all. It says nothing about the queries the
+  field cares about.
+- **Tier 2, a UCQ** [L, gated on a literature check]: for
+  `h₀ = ∃x∃y. R(x) ∧ S(x,y) ∧ T(y)` with `R`, `T` probabilistic, `#PQE(h₀)`
+  *is* `#PP2DNF` up to renaming, by a bijection between worlds and assignments.
+  So the difficulty is not in the database layer: proving it hard *is* proving
+  Provan–Ball, which would have to be formalized. Tier 1's trick cannot help,
+  because the query is monotone: fix one edge and let the other `|T| − 2`
+  tuples vary, and the count is either 0 or `≥ 2^{|T|}/4`, so a parsimonious
+  reduction from a formula with three models would force `|T| ≤ 3`, i.e. a
+  logarithmic-size output instance, i.e. a reduction that counted by itself.
+  This holds for every monotone query, which is why the field's own statements
+  here are Turing-flavored. **Check before committing**: whether the classical
+  proof is one oracle call plus arithmetic (level 1) or genuinely interpolates
+  (level 2). If neither, the hardness would have to be imported as a hypothesis
+  and only the bijection formalized.
+- **The dichotomy itself** [R]: safe queries in PTIME needs the FP side
+  (`QFO(LFP)`) and is a meta-theorem quantifying over queries rather than a
+  completeness result about one problem. Much larger than the hardness half,
+  and out of scope here.
+
 Beyond the library, the counting track is the direct bridge to provenance-lean:
 the counting provenance semantics of a query is exactly a model count, so the
 two libraries would meet here, with semiring provenance as the common
 generalization (and QSO's weighted-logic ancestry is the same idea from the
-other side).
+other side). PQE above is the concrete meeting point: `#PQE(Q)` is the model
+count of the query's lineage.
 
 ## 7. Machine bridges beyond NP and PTIME
 
@@ -629,9 +737,10 @@ blocked.
   depends on nothing unbuilt, so it cannot be blocked by the chain above; a
   cheap headline (#SAT complete for ΣQSO(FO)) sits one `exists_gates`
   strengthening in; and it is the meeting point with provenance-lean. Internal
-  order: parsimonious reductions → evaluator → `#P := ΣQSO(FO)` → #SAT → the
-  free entries; stop there (structure inside #P, the quantitative fixed point
-  and MaxSNP are genuine research).
+  order: framework layer and ladder levels 0–1 → evaluator →
+  `#P := ΣQSO(FO)` → #SAT → the free entries and PQE tier 1; stop there
+  (level 2 of the ladder, PQE tier 2, structure inside #P, the quantitative
+  fixed point and MaxSNP are genuine research, or gated on a literature check).
 - **EF games + EVEN/connectivity inexpressibility** (§5), as a parallel and
   delegable line rather than the serial next step: it unblocks nothing else,
   and it is the most Mathlib-facing item here, hence where an estimate is
