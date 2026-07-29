@@ -35,7 +35,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Install elan/Lean, fetch the Mathlib cache and build the library, so
       # that ../.lake/packages (shared with docbuild via packagesDir) is ready.
