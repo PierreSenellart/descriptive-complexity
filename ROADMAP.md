@@ -721,11 +721,13 @@ blocked.
    because building the reduction from the complement side keeps the promise in
    hand where it is proved. Reach for tracking when a second consumer appears,
    not before.
-2. **PSPACE, the one open piece**: SO(TC), the class, SUCCINCT-REACH, QSAT,
-   `PSPACE = coPSPACE` and `PH ⊆ PSPACE` are done, as is the membership half of
-   the machine bridge; what is left is its hardness half
-   (`QSAT ≤ᶠᵒ[≤] DTMAcceptSpace`, in progress), and after
-   it FO(PFP)/FO(LFP) as the textbook-faithfulness layer and Immerman–Vardi.
+2. **The fixpoint logics, as textbook faithfulness**: FO(PFP) (§3) and
+   Immerman–Vardi (§4), both [L]. Neither unblocks anything else and neither
+   buys a class the library lacks – SO(TC) already captures PSPACE – so what
+   they add is DC's own vocabulary for classes held here under other names,
+   which is the first thing a reader arriving from the textbook looks for.
+   The two share the fixpoint infrastructure, and Immerman–Vardi's hardness
+   discharge is step 1's CVP from HORN-SAT, so take that one first.
 
 **Running alongside, from the start:**
 
@@ -763,5 +765,5 @@ blocked.
 
 This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §9, the cookbook and catalog
-growth move up and PSPACE slides down: students meet NL, P-completeness and
-reductions long before they meet SO(TC).
+growth move up and the fixpoint logics slide down: students meet NL,
+P-completeness and reductions long before they meet FO(PFP).
