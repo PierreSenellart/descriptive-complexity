@@ -421,12 +421,15 @@ count of the query's lineage.
 
 ## 7. Machine bridges beyond NP and PTIME
 
-The machine bridge is done for NP, PTIME and PSPACE (`ntmAccept_NP_complete`,
-`dtmAccept_PTIME_complete`, `dtmAcceptSpace_PSPACE_complete`,
-`ntmAcceptSpace_PSPACE_complete`, and the characterizations
-`mem_NP_iff_le_ntmAccept` / `mem_PTIME_iff_le_dtmAccept` — see the
-`Problems/Machine.lean` docstring). This section is the design analysis for
-extending it, with the class-defining logic assumed to exist (§3 work).
+The machine bridge is done for NP, PTIME, PSPACE and **every level of the
+polynomial hierarchy** (`ntmAccept_NP_complete`, `dtmAccept_PTIME_complete`,
+`dtmAcceptSpace_PSPACE_complete`, `ntmAcceptSpace_PSPACE_complete`,
+`atmAccept_sigmaP_complete`, `atmAccept_piP_complete`, and the
+characterizations `mem_NP_iff_le_ntmAccept` / `mem_PTIME_iff_le_dtmAccept` /
+`mem_sigmaP_iff_le_atmAccept` / `mem_piP_iff_le_atmAccept` — see the
+`Problems/Machine.lean` and `Problems/MachineAlt.lean` docstrings). This
+section is the design analysis for extending it further, with the
+class-defining logic assumed to exist (§3 work).
 
 **Standing scope limit.** Textbook `NP = NTIME(nᵏ)` over string encodings
 needs the converse compilation — that an FO interpretation or a `Σ₁` kernel is
@@ -454,7 +457,7 @@ compilation direction above exists.
 |---|---|---|---|---|
 | L | FO(DTC) | S | S | done, as a capture theorem – see below |
 | NL | FO(TC) | S | S | done, as a capture theorem – see below |
-| Σₖᵖ, Πₖᵖ | `Σₖ`-SO | M (reuses the NP membership) | M (reuses the SAT machine) | +0.6–1.2k [M] |
+| Σₖᵖ, Πₖᵖ | `Σₖ`-SO | done | done | done, ~10.5k — the estimate was low by an order of magnitude |
 | PSPACE | SO(TC) | S [done] | L–XL [done, ~4.1k] | ~3–5.5k |
 | EXPTIME | SO(LFP) | L | XL | ~4–7k |
 | EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
@@ -794,9 +797,10 @@ blocked.
 **The serial line:**
 
 1. **A sharpening pass on what is already public** (each [M], no
-   prerequisites, no new surface): the **PH machine bridge** (§7), closing the
-   visible asymmetry of a bridge that exists for NP and PTIME but not for the
-   hierarchy they sit in; **quantifier-free / projection / dimension tracking
+   prerequisites, no new surface): the **PH machine bridge** (§7) is *done* —
+   it closed the visible asymmetry of a bridge that existed for NP and PTIME
+   but not for the hierarchy they sit in, at about ten times the estimated
+   cost; **quantifier-free / projection / dimension tracking
    through composition** (§3's reduction-notion refinements), which upgrades
    catalog statements to the DC-faithful "complete under qfps"; **Spectra**
    (§4) and **CVP from HORN-SAT** (§2), two near-free recognizable names, the

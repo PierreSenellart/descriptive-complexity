@@ -7,6 +7,8 @@ import DescriptiveComplexity.Problems.Machine.AltDefs
 import DescriptiveComplexity.Problems.Machine.AltOne
 import DescriptiveComplexity.Problems.Machine.AltRound
 import DescriptiveComplexity.Problems.Machine.AltMembership
+import DescriptiveComplexity.Problems.Machine.AltInterp
+import DescriptiveComplexity.Problems.Qbf
 import DescriptiveComplexity.SecondOrderReplicate
 import DescriptiveComplexity.MachinesAltPlay
 
@@ -74,13 +76,23 @@ of [Chandra–Kozen–Stockmeyer 1981][chandra1981alternation].
   `ATMAccept 1 true` is NP-complete – by two identity interpretations, one
   marking every element and one forgetting the mark under a guard.
 
-## What is not here yet
+* **The hardness half at every level**: the machine `M_φ` of a quantified
+  Boolean formula, one guessing sweep per quantifier block, built inside an
+  ordered QBF instance. Its tape is the instance's elements bracketed by two
+  markers; sweep `i` walks it once in each direction, and the only choice it
+  ever makes is whether to set the cell of a variable block `i` marks – so the
+  moves of round `i` are exactly the truth assignments of block `i`
+  (`DescriptiveComplexity.Problems.Machine.AltGuess`). After the last sweep a
+  deterministic check phase walks the clauses, which is where the matrix is
+  read (`DescriptiveComplexity.Problems.Machine.AltVerdict`). The rounds
+  compose into the quantifier prefix
+  (`DescriptiveComplexity.Problems.Machine.AltRounds`), and
+  `DescriptiveComplexity.Problems.Machine.AltInterp` writes the machine down as
+  a two-dimensional interpretation. So `ATMAccept (k+1) true` is `Σₖ₊₁ᵖ`-hard
+  and `ATMAccept (k+1) false` is `Πₖ₊₁ᵖ`-hard.
 
-The hardness half above level one: `ATMAccept (k+1) true` hard for `Σₖ₊₁ᵖ` and
-`ATMAccept (k+1) false` for `Πₖ₊₁ᵖ`, by a reduction from
-`DescriptiveComplexity.QBF`, the machine of
-`DescriptiveComplexity.Problems.Machine.Hardness` with one guessing sweep per
-quantifier block. See `ROADMAP.md` and the design note `PH-MACHINE.md`.
+Both halves are complete at every level, so the levels of this library's
+hierarchy are the levels of the alternating-machine one.
 -/
 
 namespace DescriptiveComplexity
@@ -109,5 +121,68 @@ theorem ATMData.accepts_iff_game {A : Type} [Finite A] {M : ATMData A} {k : ℕ}
     {p₀ p₁ : A} (hmin : MinPos M.Le M.Posn p₀) (hmax : MaxPos M.Le M.Posn p₁)
     (start : Bool) : M.AltAccepts start ↔ M.AltGame start k :=
   M.altAccepts_iff_altGame hbwf hlin hmax start hmin hk
+
+/-! ### The hardness half -/
+
+/-- **Alternating acceptance with an existential first block is `Σₖ₊₁ᵖ`-hard**:
+`DescriptiveComplexity.QBF` reduces to it by building the machine `M_φ` of the
+formula inside the instance, one guessing sweep per quantifier block. -/
+theorem atmAccept_sigmaP_hard (k : ℕ) : (SigmaP (k + 1)).Hard (ATMAccept (k + 1) true) :=
+  (SigmaP (k + 1)).hard_of_orderedReduction
+    (AltQbf.qbf_ordered_fo_reduction_atmAccept (Nat.succ_pos k) true ((k + 1) % 2 == 1))
+    (qbf_hard k)
+
+/-- **Alternating acceptance with a universal first block is `Πₖ₊₁ᵖ`-hard**, by
+the same reduction at the other starting polarity: the machine is the same, and
+only the matrix shape and the block that moves first change. -/
+theorem atmAccept_piP_hard (k : ℕ) : (PiP (k + 1)).Hard (ATMAccept (k + 1) false) :=
+  (PiP (k + 1)).hard_of_orderedReduction
+    (AltQbf.qbf_ordered_fo_reduction_atmAccept (Nat.succ_pos k) false ((k + 1) % 2 == 0))
+    (qbfPi_hard k)
+
+/-! ### The bridge -/
+
+/-- **The machine bridge for the polynomial hierarchy, existential half**:
+alternating acceptance with `k + 1` blocks, the first existential, is
+`Σₖ₊₁ᵖ`-complete. The classes of this library are defined by second-order
+alternation; this theorem says they are the levels of the alternating-machine
+hierarchy of [Chandra–Kozen–Stockmeyer 1981][chandra1981alternation]. -/
+theorem atmAccept_sigmaP_complete (k : ℕ) :
+    (SigmaP (k + 1)).Complete (ATMAccept (k + 1) true) :=
+  ⟨atmAccept_mem_sigmaP k, atmAccept_sigmaP_hard k⟩
+
+/-- **The machine bridge, universal half**: with a universal first block,
+`Πₖ₊₁ᵖ`-complete. -/
+theorem atmAccept_piP_complete (k : ℕ) :
+    (PiP (k + 1)).Complete (ATMAccept (k + 1) false) :=
+  ⟨atmAccept_mem_piP k, atmAccept_piP_hard k⟩
+
+/-- **The machine characterization of `Σₖ₊₁ᵖ`**: a problem sits at the `k+1`-st
+level exactly when it ordered-FO-reduces to acceptance by an alternating
+machine with `k + 1` blocks starting existentially. Forward through
+`DescriptiveComplexity.QBF`, backward because membership travels along
+reductions. -/
+theorem mem_sigmaP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} (k : ℕ)
+    (P : DecisionProblem L) :
+    P ∈ SigmaP (k + 1) ↔ Nonempty (P ≤ᶠᵒ[≤] ATMAccept (k + 1) true) := by
+  constructor
+  · intro hP
+    obtain ⟨g⟩ := qbf_hard_of_sigmaSODefinable k P hP
+    exact ⟨g.trans (AltQbf.qbf_ordered_fo_reduction_atmAccept
+      (Nat.succ_pos k) true ((k + 1) % 2 == 1))⟩
+  · rintro ⟨f⟩
+    exact (SigmaP (k + 1)).mem_of_orderedReduction f (atmAccept_mem_sigmaP k)
+
+/-- **The machine characterization of `Πₖ₊₁ᵖ`.** -/
+theorem mem_piP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} (k : ℕ)
+    (P : DecisionProblem L) :
+    P ∈ PiP (k + 1) ↔ Nonempty (P ≤ᶠᵒ[≤] ATMAccept (k + 1) false) := by
+  constructor
+  · intro hP
+    obtain ⟨g⟩ := qbfPi_hard_of_piSODefinable k P hP
+    exact ⟨g.trans (AltQbf.qbf_ordered_fo_reduction_atmAccept
+      (Nat.succ_pos k) false ((k + 1) % 2 == 0))⟩
+  · rintro ⟨f⟩
+    exact (PiP (k + 1)).mem_of_orderedReduction f (atmAccept_mem_piP k)
 
 end DescriptiveComplexity

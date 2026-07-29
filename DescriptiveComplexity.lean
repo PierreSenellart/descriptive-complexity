@@ -725,8 +725,8 @@ reduction and certificate in full.
 | `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | — | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) |
 | `DP` | a `Σ₁` and a `Π₁` sentence conjoined | — | SAT-UNSAT |
-| `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | — | `QBF k` – at `k = 1`, NP |
-| `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | — | `QBF∀ k` – at `k = 1`, coNP |
+| `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine, `k` blocks, existential first | `QBF k` – at `k = 1`, NP · `ATMAccept k true` |
+| `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` – at `k = 1`, coNP · `ATMAccept k false` |
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT ‡ |
@@ -778,6 +778,22 @@ Headline results and cross-references:
   built inside the HORN-SAT instance – so PTIME, too, is the machine class
   (`DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`), with the Grädel-side
   textbook discharge `DescriptiveComplexity.dtmAccept_reduces_to_hornSat`.
+* **The machine bridge for the hierarchy**: the same identification one level
+  of alternation at a time. `DescriptiveComplexity.ATMAccept k start` – does
+  this *alternating* machine, whose states carry `k` block marks entered in
+  order, accept its input within the same unary budget? – is `Σₖᵖ`-complete for
+  an existential first block
+  (`DescriptiveComplexity.atmAccept_sigmaP_complete`) and `Πₖᵖ`-complete for a
+  universal one (`DescriptiveComplexity.atmAccept_piP_complete`), so each level
+  of the logically defined hierarchy is the corresponding level of the
+  alternating-machine hierarchy of [Chandra–Kozen–Stockmeyer
+  1981][chandra1981alternation] (`DescriptiveComplexity.mem_sigmaP_iff_le_atmAccept`,
+  `DescriptiveComplexity.mem_piP_iff_le_atmAccept`). Membership reads a run as
+  a `k`-round game, each round guessing one walk; hardness builds the machine
+  `M_φ` of a quantified Boolean formula inside the instance – one sweep of the
+  tape per quantifier block, whose only choice is which of its block's
+  variables to set, so that the moves of a round *are* the truth assignments of
+  its block, followed by a deterministic check phase walking the clauses.
 * **All of Karp's 21** ([Karp 1972][karp1972reducibility]): the SAT, clique,
   set, coloring, graph and number families above, closed by the two Hamilton
   circuit problems – a circuit read as a linear order of the universe, hard
