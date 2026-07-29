@@ -103,7 +103,7 @@ jobs:
           make docs RESULT_GRAPH_REPO="$RUNNER_TEMP/result-graph"
 
       - name: Upload the Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docbuild/.lake/build/doc
 
