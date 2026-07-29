@@ -602,7 +602,8 @@ individual declarations are documented on their own pages.
   and co-RE: `∃SO[new]` has no dual reading, and the separation that turns
   RE-hardness into undecidability is a machine-bridge statement. Its first
   complete problem is finite satisfiability, by Trakhtenbrot's theorem
-  (`DescriptiveComplexity.Problems.FinSat`); PCP is planned in `ROADMAP.md`.
+  (`DescriptiveComplexity.Problems.FinSat`), and Post's correspondence problem
+  is a member of it (`DescriptiveComplexity.pcp_mem_RE`).
 * `DescriptiveComplexity.Relationalize` – **removing function symbols from a
   source**: every `∃SO[new]`-definable problem admits a first-order reduction to
   an `∃SO[new]`-definable problem over a *relational* vocabulary
@@ -725,13 +726,16 @@ where the machine is required to be deterministic.
 `PSPACE`: `DescriptiveComplexity.ntmAcceptSpace_mem_PSPACE` and
 `DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`, whose hardness – the capture,
 which would also give `PSPACE = NPSPACE` – is not proved yet. At `RE`:
-`DescriptiveComplexity.halt_mem_RE` and
-`DescriptiveComplexity.codehalt_mem_RE`, each giving at once a first-order
+`DescriptiveComplexity.halt_mem_RE`,
+`DescriptiveComplexity.codehalt_mem_RE` and
+`DescriptiveComplexity.pcp_mem_RE`, each giving at once a first-order
 reduction to finite satisfiability (`DescriptiveComplexity.halt_le_finsat`,
-`DescriptiveComplexity.codehalt_le_finsat`); neither `DescriptiveComplexity.HALT`
-nor `DescriptiveComplexity.CODEHALT` is proved RE-hard, that being the converse
-half of the RE machine bridge (`ROADMAP.md` §7, §8). `CODEHALT` is nonetheless
-undecidable outright, and it is what makes finite satisfiability undecidable.
+`DescriptiveComplexity.codehalt_le_finsat`,
+`DescriptiveComplexity.pcp_le_finsat`); none of `DescriptiveComplexity.HALT`,
+`DescriptiveComplexity.CODEHALT` and `DescriptiveComplexity.PCP` is proved
+RE-hard, that being the converse half of the RE machine bridge (`ROADMAP.md`
+§7, §8). `CODEHALT` is nonetheless undecidable outright, and it is what makes
+finite satisfiability undecidable.
 
 Headline results and cross-references:
 
@@ -912,17 +916,29 @@ Headline results and cross-references:
   the form it is usually stated. RE-*hardness* of `HALT` is not proved and is a
   far larger item; see `ROADMAP.md` (§7, §8).
 
-  Post's correspondence problem (`DescriptiveComplexity.PCP`,
-  [Post 1946][post1946variant]) is so far only *defined*: a match is a nonempty
-  sequence of marked dominoes whose top words and bottom words have the same
-  concatenation, the words of a domino being its letters read in the order the
-  instance carries on their positions. It is the first catalog problem whose
-  certificate is a *sequence* rather than a structure, and that is also why it
-  is not a second syntactic image: reading a solution left to right and keeping
-  the unmatched overhang turns a PCP instance into a nondeterministic queue
-  machine whose transitions a reduction writes, so RE-hardness of PCP is the RE
-  machine bridge rather than a translation of the logic. `ROADMAP.md` (§8)
-  records both halves.
+  **Post's correspondence problem** (`DescriptiveComplexity.PCP`,
+  [Post 1946][post1946variant]) has the same membership half
+  (`DescriptiveComplexity.pcp_mem_RE`, whence
+  `DescriptiveComplexity.pcp_le_finsat`): a match is a nonempty sequence of
+  marked dominoes whose top words and bottom words have the same concatenation,
+  the words of a domino being its letters read in the order the instance
+  carries on their positions. It is the first catalog problem whose certificate
+  is a *sequence* rather than a structure, and the common word it spells is
+  **never invented**: its letters are indexed by the pairs (slot, position of
+  the word sitting there) in lexicographic order, once for each of the two
+  parses, and what the certificate carries is a **matching** between the two
+  index lists. A first-order kernel can ask of a relation variable only that it
+  land in the two parses, be defined everywhere on both, reflect the two orders
+  and preserve letters, and that is already enough
+  (`DescriptiveComplexity.Pcp.forall₂_of_matching`): such a relation pairs the
+  entries of two strictly sorted lists index by index, so the two
+  concatenations agree letter by letter.
+
+  Being a sequence is also why `PCP` is not a second syntactic image: reading a
+  solution left to right and keeping the unmatched overhang turns a PCP
+  instance into a nondeterministic queue machine whose transitions a reduction
+  writes, so RE-*hardness* of PCP is the RE machine bridge rather than a
+  translation of the logic. `ROADMAP.md` (§8) records it.
 
 ## Worked examples
 

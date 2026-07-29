@@ -663,58 +663,41 @@ as everyone states it. What remains:
     `not_computablePred_codehalt`. Needs a presented `codeVocab` beside
     `turingVocab`/`finsatVocab` in `Computability/Catalog.lean`.
 
-- **PCP (Post's correspondence problem)**: the classical target for
-  undecidability by reduction. **Defined** (`Problems/Pcp/Defs.lean`): the
-  instance is a marked list of domino pairs over an alphabet, ordered by the
-  order of the positions of its own words, and a match is a nonempty sequence of
-  marked dominoes whose top and bottom words have the same concatenation.
+- **PCP hardness, and with it the undecidability of Post's problem**
+  [L, once `CODEHALT` is RE-hard; XL if attempted directly]:
+  `CODEHALT ≤ᶠᵒ[≤] PCP` by the classical computation-history dominoes, after
+  which hardness travels forward along the reduction. These are the *same*
+  dominoes that give **undecidability** of PCP – reachable independently of
+  everything else, since first-order reductions are computable and `CODEHALT`
+  is undecidable – so one construction serves both readings, and the item is no
+  longer gated on the machine bridge.
 
-  The [M–L] estimate this item used to carry was wrong, and splitting it is the
-  point:
-  - **membership** [M, ~2–2.5k]: the match is invented. Four relation variables
-    – the slots, their order, the domino at a slot, and a 4-ary variable holding
-    the letter-preserving order isomorphism between the two parses – with the
-    common word *not* invented at all, its positions being the pairs (slot,
-    position in the top word) in lexicographic order. The mathematical content
-    is the bridge `pcpOn_iff_cert`, whose one real lemma is that the sorted
-    enumeration of a lexicographic sum is the `flatMap` of the sorted
-    enumerations (by uniqueness of sorted enumerations, not by induction).
-    Four files: the sorted-enumeration layer, `pcpOn_iff_cert` with its
-    relabelling to `Fin m`, the block and guarded kernel, and an umbrella;
-  - **hardness** [L, once `CODEHALT` is RE-hard; XL if attempted directly]:
-    `CODEHALT ≤ᶠᵒ[≤] PCP` by the classical computation-history dominoes, after
-    which hardness travels forward along the reduction. These are the *same*
-    dominoes that give **undecidability** of PCP – reachable independently of
-    everything else, since first-order reductions are computable and
-    `CODEHALT` is undecidable – so one construction serves both readings, and
-    the item is no longer gated on the machine bridge.
+  Why the direct route is XL, and why it should not be taken: PCP is not the
+  syntactic image of any logic – a certificate of `∃SO[new]` is a structure
+  with relations, a certificate of PCP is a string with two parses – and a
+  PCP instance is really a *program*: reading a solution left to right and
+  keeping the unmatched overhang makes it a nondeterministic queue machine
+  whose transitions the reduction writes. Discharging `∃SO[new]` into it
+  directly means guessing a block assignment on unbounded storage and then
+  evaluating a first-order kernel against it, every atom test being a random
+  access into the guessed table – the “evaluator with tape addressing” priced
+  at XL in §7. The code model is where that cost is avoided, which is the
+  item above.
 
-    Why the direct route is XL, and why it should not be taken: PCP is not the
-    syntactic image of any logic – a certificate of `∃SO[new]` is a structure
-    with relations, a certificate of PCP is a string with two parses – and a
-    PCP instance is really a *program*: reading a solution left to right and
-    keeping the unmatched overhang makes it a nondeterministic queue machine
-    whose transitions the reduction writes. Discharging `∃SO[new]` into it
-    directly means guessing a block assignment on unbounded storage and then
-    evaluating a first-order kernel against it, every atom test being a random
-    access into the guessed table – the “evaluator with tape addressing” priced
-    at XL in §7. The code model is where that cost is avoided, which is the
-    item above.
-
-    Three shortcuts fail, and are worth not rediscovering. `HeadEval` does not
-    apply: its heads range over the elements of a *structure* and its guards are
-    atoms of that structure, so it presupposes the certificate as something
-    queryable, whereas a PCP solution is a string and supplying the query is
-    exactly the work to be avoided. Laying the certificate out as a grid and
-    checking it locally makes the *fan-in* local – partial conjunctions carried
-    along the order – but not the **shared atoms**: the value of `R(x₁, x₂)`
-    occurs in every cell whose tuple extends it, at a stride of `nʲ` in any
-    lexicographic layout, and a stride is not a bounded distance. And reducing
-    from FINSAT instead is harder, not easier: the sentence would be input
-    rather than parameter, so the instance would have to be a *universal* model
-    checker – an objection that is about *building* one, and hence does not
-    bite at `CODEHALT`, where the model checker is `finsat_rePred`, a theorem
-    already proved, and the reduction only has to name it.
+  Three shortcuts fail, and are worth not rediscovering. `HeadEval` does not
+  apply: its heads range over the elements of a *structure* and its guards are
+  atoms of that structure, so it presupposes the certificate as something
+  queryable, whereas a PCP solution is a string and supplying the query is
+  exactly the work to be avoided. Laying the certificate out as a grid and
+  checking it locally makes the *fan-in* local – partial conjunctions carried
+  along the order – but not the **shared atoms**: the value of `R(x₁, x₂)`
+  occurs in every cell whose tuple extends it, at a stride of `nʲ` in any
+  lexicographic layout, and a stride is not a bounded distance. And reducing
+  from FINSAT instead is harder, not easier: the sentence would be input
+  rather than parameter, so the instance would have to be a *universal* model
+  checker – an objection that is about *building* one, and hence does not
+  bite at `CODEHALT`, where the model checker is `finsat_rePred`, a theorem
+  already proved, and the reduction only has to name it.
 - **`RE.Hard HALT`** [last, and no longer the load-bearing item]: with
   `CODEHALT` RE-hard, the statement “RE is the class of semi-decidable
   problems” is *already* had, in the code model and in the sharper form

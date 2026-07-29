@@ -39,7 +39,7 @@ import DescriptiveComplexity.Problems.Qbf
 import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.SuccinctReach
 import DescriptiveComplexity.Problems.FinSat
-import DescriptiveComplexity.Problems.Pcp.Defs
+import DescriptiveComplexity.Problems.Pcp
 import DescriptiveComplexity.Problems.Machine
 import DescriptiveComplexity.Problems.MachineAlt
 import DescriptiveComplexity.Problems.Machine.Halt
@@ -73,8 +73,9 @@ halting of a *partial recursive code* drawn as a syntax tree
 **undecidability** of the development goes through: it is undecidable outright
 (`DescriptiveComplexity.not_computablePred_codehalt`), whence
 `DescriptiveComplexity.finsat_not_computable`. Post's
-correspondence problem
-(`DescriptiveComplexity.PCP`) is so far only defined as well: its membership in
-RE is designed in `ROADMAP.md` (§8), which also records why its RE-hardness is
-not a catalog item at all but the RE machine bridge.
+correspondence problem (`DescriptiveComplexity.PCP`) is in RE too
+(`DescriptiveComplexity.pcp_mem_RE`), the invented values being the slots of
+the sequence of dominoes together with a matching between the two parses of
+the word it spells; its RE-*hardness* is not a catalog item at all but the RE
+machine bridge, see `ROADMAP.md` (§8).
 -/
