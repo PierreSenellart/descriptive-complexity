@@ -64,15 +64,19 @@ list of the symbols of its vocabulary.
    so primitive recursive, and the problem
    `DescriptiveComplexity.CODEHALT` asks whether the drawn code halts on `0`.
    Whence `DescriptiveComplexity.not_computablePred_codehalt`: the library's
-   first problem proved **undecidable outright**.
+   first problem proved **undecidable outright**. With
+   `DescriptiveComplexity.codehalt_mem_RE` it gives
+   `DescriptiveComplexity.not_computablePred_of_RE_hard` – *every* RE-hard
+   problem is undecidable, since hardness here is cofinal and reductions are
+   computable – and hence
+   `DescriptiveComplexity.finsat_not_computable`, Trakhtenbrot's theorem.
 
 ## What this layer does not yet do
 
-Trakhtenbrot's theorem is one hypothesis away:
-`DescriptiveComplexity.finsat_not_computable_of_codehalt_mem_RE` derives the
-undecidability of finite satisfiability from `CODEHALT ∈ RE`, everything else
-being proved. That hypothesis is now a purely *logical* statement about one
-catalog problem – guess the evaluation of the drawn code, as invented values –
-with no Mathlib computability content left in it; `ROADMAP.md` §8 records what
-it needs.
+Only one inclusion, `RE ⊆ REPred`. The converse, that every recursively
+enumerable predicate is `∃SO[new]`-definable, is the RE machine bridge and is
+priced in `ROADMAP.md` (§7, §8): it needs an evaluator with addressed storage,
+and nothing here approaches it. So a problem shown to be in RE is honestly
+semi-decidable, but a semi-decidable problem is not thereby known to be in the
+library's RE.
 -/

@@ -29,8 +29,14 @@ what makes the correctness proof an induction on the code and nothing more.
 This is exactly what the machine route could not deliver. Mathlib's universal
 machine `Turing.PartrecToTM2.tr` is not finite-state, so `code ↦ machine
 instance` is not available; `code ↦ syntax tree` is trivially primitive
-recursive, and pushes the whole difficulty into the one statement that is
-still open, `CODEHALT ∈ RE` (see `ROADMAP.md` §8).
+recursive, and pushes the whole difficulty into `CODEHALT ∈ RE`, an ordinary
+membership proof of the catalog
+(`DescriptiveComplexity.Problems.CodeHalt.Membership`).
+
+Whence the two results the layer exists for:
+`DescriptiveComplexity.not_computablePred_of_RE_hard`, every RE-hard problem is
+undecidable, and its first instance
+`DescriptiveComplexity.finsat_not_computable`, Trakhtenbrot's theorem.
 -/
 
 namespace DescriptiveComplexity
@@ -498,23 +504,6 @@ theorem not_computablePred_codehalt : ¬ComputablePred (CODEHALT.toPred codeVoca
     ⟨fun c => D _, hD.comp primrec_codeStruct.to_comp⟩ ?_
   intro c
   exact codehalt_toPred_codeStruct c
-
-/-- **Trakhtenbrot's theorem**, from `CODEHALT ∈ RE`: finite satisfiability is
-undecidable.
-
-The chain: FINSAT is RE-hard, so `∃SO[new]`-definability of CODEHALT yields a
-first-order reduction `CODEHALT ≤ʳᶠᵒ[≤] FINSAT`; that reduction is a
-*computable* many-one reduction of the induced sets
-(`DescriptiveComplexity.not_computablePred_of_relOrderedReduction`); and
-CODEHALT is undecidable because Mathlib's halting problem maps into it
-primitive recursively. The hypothesis is discharged by
-`DescriptiveComplexity.codehalt_mem_RE`; see
-`DescriptiveComplexity.finsat_not_computable`. -/
-theorem finsat_not_computable_of_codehalt_mem_RE (h : CODEHALT ∈ RE) :
-    ¬ComputablePred (FINSAT.toPred finsatVocab) := by
-  obtain ⟨f⟩ := (hard_RE_iff FINSAT).mp finsat_RE_hard CODEHALT h
-  exact not_computablePred_of_relOrderedReduction f codeVocab finsatVocab
-    not_computablePred_codehalt
 
 /-- **An RE-hard problem is undecidable.** Hardness in this library is cofinal,
 so an RE-hard problem is in particular a target of `CODEHALT`, which is
