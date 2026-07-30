@@ -23,7 +23,7 @@ same five-clause shape. A single existential block guesses
 * an injection of the removed object into the marked set, witnessing the
   threshold – arity 2 for Feedback Vertex Set, where it maps vertices to
   vertices, and **arity 4** for Feedback Arc Set, where it maps pairs to
-  pairs, the threshold living one arity up (representation (A) read at arity
+  pairs, the threshold living one arity up (the unary encoding read at arity
   2, see `DescriptiveComplexity.nonempty_embedding_iff_ncard_le₂`);
 
 and the kernel checks transitivity, irreflexivity, that every surviving arc

@@ -11,10 +11,10 @@ import Mathlib.Logic.Equiv.Prod
 /-!
 # Unary representation of numbers in finite structures
 
-Representation (A) of the design notes: a number carried by an instance is
-the *cardinality of a marked set* – `Set.ncard` is the decoding function, and
-no order is needed. This file provides the shared lemma kit so that problem
-files do not hand-roll cardinality reasoning:
+The unary encoding: a number carried by an instance is the *cardinality of a
+marked set* – `Set.ncard` is the decoding function, and no order is needed.
+This file provides the shared lemma kit so that problem files do not hand-roll
+cardinality reasoning:
 
 * `DescriptiveComplexity.ncard_image_equiv` and its predicate form
   `DescriptiveComplexity.ncard_setOf_equiv`: invariance of the decoded number under

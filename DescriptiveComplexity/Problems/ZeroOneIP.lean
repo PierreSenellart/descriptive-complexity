@@ -14,8 +14,8 @@ import DescriptiveComplexity.Hierarchy
 
 Umbrella file for `DescriptiveComplexity.ZeroOneIP`, Karp's 0-1 INTEGER
 PROGRAMMING – is there a `0-1` vector `x` with `C x = d`? – with the entries
-written in *binary* (representation (C)), which is what makes the problem
-NP-hard rather than polynomial-time.
+written in *binary* (`DescriptiveComplexity.Numbers.BinRel`), which is what
+makes the problem NP-hard rather than polynomial-time.
 
 It collects the membership half
 (`DescriptiveComplexity.zeroOneIP_sigmaSODefinable`, the certificate carrying one

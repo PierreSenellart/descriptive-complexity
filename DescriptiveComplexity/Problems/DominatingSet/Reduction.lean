@@ -12,8 +12,8 @@ import DescriptiveComplexity.Problems.SetFamily
 The classical reduction – ground elements and sets become vertices, the sets
 form a clique, and a set is joined to its elements – with the two degenerate
 cases that make it delicate handled by *gates* rather than by a canonical
-extra vertex. The reduction is therefore order-free, which the roadmap did not
-expect.
+extra vertex. The reduction is therefore order-free, which a condition ranging
+over *every* vertex would not lead one to expect.
 
 The two gates, both first-order:
 

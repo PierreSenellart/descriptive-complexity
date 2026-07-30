@@ -30,8 +30,9 @@ Mathlib's halting problem – maps computably into concrete instances of
 `DescriptiveComplexity.CODEHALT`, whence
 `DescriptiveComplexity.finsat_not_computable`, Trakhtenbrot's theorem outright.
 The hypothetical form kept here,
-`DescriptiveComplexity.finsat_not_computable_of_halt`, is the same statement at
-the *machine* model, which is still open (`ROADMAP.md` §8).
+`DescriptiveComplexity.finsat_not_computable_of_halt`, routes the same
+conclusion through the *machine* model instead; its hypothesis is supplied by
+`DescriptiveComplexity.halt_not_computable`.
 -/
 
 namespace DescriptiveComplexity
@@ -77,7 +78,7 @@ easy half of Trakhtenbrot's theorem, on concrete instances. -/
 theorem finsat_rePred : REPred (FINSAT.toPred finsatVocab) :=
   RE_subset_rePred finsatVocab FINSAT finsat_mem_RE
 
-/-- **Trakhtenbrot's theorem, waiting on the halting link**: if the halting
+/-- **Trakhtenbrot's theorem, through the halting link**: if the halting
 problem is undecidable *as a set of concrete machine instances*, then finite
 satisfiability is undecidable too.
 
@@ -85,8 +86,10 @@ The reduction is `DescriptiveComplexity.halt_le_finsat`, which exists because
 FINSAT is RE-hard and `HALT` is in RE; that it is a *computable* many-one
 reduction of the induced sets is
 `DescriptiveComplexity.not_computablePred_of_relOrderedReduction`. The
-hypothesis is the one thing the bridge still lacks, and it is about Mathlib's
-halting problem, not about this library. -/
+hypothesis is discharged by `DescriptiveComplexity.halt_not_computable`; the
+conditional form is kept because it is Trakhtenbrot's theorem in the shape it
+is usually stated – undecidability imported from the halting problem by a
+reduction. -/
 theorem finsat_not_computable_of_halt (h : ¬ComputablePred (HALT.toPred turingVocab)) :
     ¬ComputablePred (FINSAT.toPred finsatVocab) :=
   halt_le_finsat.elim fun f =>

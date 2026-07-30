@@ -20,7 +20,8 @@ instance is a plain tree encoding – `DescriptiveComplexity.codeStruct`, in
 `DescriptiveComplexity.Computability.CodeHalt` – rather than the simulation of
 a machine: the code *is* the instance, and only the computation has to be
 guessed. That is what makes the map `c ↦ instance` primitive recursive, which
-the machine route could not deliver (see `ROADMAP.md` §8).
+the machine route could not deliver: Mathlib's universal machine is not
+finite-state, so a machine instance cannot carry the program it runs.
 
 ## The semantics
 

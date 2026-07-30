@@ -10,10 +10,11 @@ import Mathlib.Algebra.BigOperators.Finprod
 /-!
 # Binary-weighted instances, and Karp's Knapsack
 
-This file opens **representation (C)** of the design notes, the one the last
-four problems of Karp's list need: numbers that must be *exponential* in the
-size of the instance, hence written in binary. Under the unary representation
-of `DescriptiveComplexity.Numbers.Unary` these problems are solvable in polynomial
+This file opens the **binary encoding** of
+`DescriptiveComplexity.Numbers.BinRel`, the one the last four problems of
+Karp's list need: numbers that must be *exponential* in the size of the
+instance, hence written in binary. Under the unary encoding of
+`DescriptiveComplexity.Numbers.Unary` these problems are solvable in polynomial
 time by dynamic programming, so they are simply not NP-hard there – the
 representation is not a detail of the encoding but part of the statement.
 

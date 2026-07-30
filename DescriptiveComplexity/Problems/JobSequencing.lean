@@ -17,8 +17,8 @@ import DescriptiveComplexity.Hierarchy
 Umbrella file for `DescriptiveComplexity.JobSequencing`, Karp's SEQUENCING – is
 there a one-processor schedule whose late jobs carry a total penalty at most
 the bound? – with the times, deadlines, penalties and bound written in
-*binary* (representation (C)), which is what makes the problem NP-hard rather
-than polynomial-time.
+*binary* (`DescriptiveComplexity.Numbers.BinRel`), which is what makes the
+problem NP-hard rather than polynomial-time.
 
 It collects the membership half
 (`DescriptiveComplexity.jobSequencing_sigmaSODefinable`): the certificate guesses the

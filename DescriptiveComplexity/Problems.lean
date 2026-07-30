@@ -59,7 +59,7 @@ containing its vocabulary, its semantic definition, the bundled
 completeness theorems.
 
 Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
-only the membership half – see `ROADMAP.md`. Alternating machine acceptance
+only the membership half. Alternating machine acceptance
 (`DescriptiveComplexity.ATMAccept`) is the machine bridge for the polynomial
 hierarchy, complete at every level
 (`DescriptiveComplexity.atmAccept_sigmaP_complete`,

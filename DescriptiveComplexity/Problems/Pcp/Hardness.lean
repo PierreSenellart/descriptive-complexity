@@ -31,8 +31,8 @@ The construction is layered below this file:
   drawing.
 
 With `DescriptiveComplexity.pcp_mem_RE` this makes PCP RE-complete as soon as
-`HALT` is RE-hard; that half of the machine bridge is recorded in `ROADMAP.md`
-(§8).
+`HALT` is RE-hard, which is `DescriptiveComplexity.halt_RE_hard`
+(`DescriptiveComplexity.Problems.Machine.HaltHard`).
 -/
 
 namespace DescriptiveComplexity

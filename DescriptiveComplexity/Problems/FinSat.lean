@@ -47,8 +47,9 @@ reduces to an `∃SO[new]`-definable problem over the atomic diagram language.
 RE here is the logically defined class of
 `DescriptiveComplexity.RecursivelyEnumerable`, so this is “finite satisfiability
 is complete for `∃SO[new]`”. It becomes *undecidability* of finite
-satisfiability only through the machine bridge of `ROADMAP.md` §8 – an encoding
-of finite structures into Mathlib's computability layer, plus co-RE ≠ RE.
+satisfiability only through the bridge to Mathlib's computability layer,
+`DescriptiveComplexity.Computability`, where the encoding of finite structures
+as numbers turns it into `DescriptiveComplexity.finsat_not_computable`.
 -/
 
 namespace DescriptiveComplexity

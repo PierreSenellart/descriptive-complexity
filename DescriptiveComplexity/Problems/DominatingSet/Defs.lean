@@ -12,7 +12,7 @@ DOMINATING SET: is there a set of vertices, at most as large as the marked
 set, such that every vertex is in it or adjacent to it? The vocabulary is
 `FirstOrder.Language.markedGraph`, the one Vertex Cover and Clique already use: a
 graph together with a marked set whose cardinality is the threshold
-(representation (A)).
+(`DescriptiveComplexity.Numbers.Unary`).
 
 Domination differs from the covering properties of the clique family in one
 respect that matters for reductions: its condition ranges over *every* element

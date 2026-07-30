@@ -19,8 +19,8 @@ map into `Fin k` separating the pairs related by a *conflict* relation.
   `DescriptiveComplexity.ThreeCol`.
 * `DescriptiveComplexity.ChromaticNumber`, on `FirstOrder.Language.markedGraph`-structures:
   is the chromatic number at most `k`, where `k` is the cardinality of the
-  marked set (representation (A))? This is Karp's CHROMATIC NUMBER, with `k`
-  part of the instance rather than of the problem.
+  marked set (`DescriptiveComplexity.Numbers.Unary`)? This is Karp's CHROMATIC
+  NUMBER, with `k` part of the instance rather than of the problem.
 * `DescriptiveComplexity.CliqueCover`, on the same vocabulary: can the vertices be
   covered by at most `k` cliques? A clique cover is a proper coloring of the
   complement graph, so this is the same generic property with the conflict

@@ -11,7 +11,7 @@ import Mathlib.Data.Set.Finite.Lemmas
 # Binary numbers carried by a relation
 
 The layer between `DescriptiveComplexity.Numbers.Binary`, which decodes a set of bits
-sitting on a genuine `LinearOrder`, and the problems of representation (C),
+sitting on a genuine `LinearOrder`, and the problems carrying binary numbers,
 whose order is a *relation symbol* of the vocabulary and therefore an
 arbitrary binary relation until the yes-instances say otherwise.
 
@@ -68,9 +68,9 @@ theorem IsLinOrd.of_equiv {B : Type} (u : B ≃ A) {LeB : B → B → Prop} {LeA
 
 /-! ### Building linear orders
 
-Reductions into a problem of representation (C) have to *construct* the order
-of the instance they produce, and a `Σ₁` certificate sometimes has to exhibit
-one. Both do it the same way: read the elements through a key into a
+Reductions into a problem carrying binary numbers have to *construct* the
+order of the instance they produce, and a `Σ₁` certificate sometimes has to
+exhibit one. Both do it the same way: read the elements through a key into a
 lexicographic product of orders already at hand. -/
 
 section Build

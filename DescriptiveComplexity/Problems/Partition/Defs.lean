@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Knapsack.Defs
 PARTITION ([Karp 1972][karp1972reducibility]): can a family of numbers be split
 into two parts of equal sum? It lives on `FirstOrder.Language.binWeights`
 unchanged (`DescriptiveComplexity.Problems.Knapsack.Defs`), the vocabulary of
-representation (C) – items, bit positions, the bits of each weight, and a
+the binary encoding – items, bit positions, the bits of each weight, and a
 linear order – with the *target* symbol simply unused: what a partition must
 match is not a given number but the weight of the items it leaves out.
 

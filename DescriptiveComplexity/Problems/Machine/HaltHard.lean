@@ -15,7 +15,7 @@ import DescriptiveComplexity.Computability.CodeHalt
 **`DescriptiveComplexity.orderedReduction_halt`**: every decision problem
 whose concrete instances form a recursively enumerable set reduces to
 `DescriptiveComplexity.HALT` by an ordered first-order reduction – the
-machine bridge of the roadmap, at the machine model. The reduction draws the
+machine bridge for RE, at the machine model. The reduction draws the
 fixed simulating machine of `DescriptiveComplexity.HaltHard.simTM` – whose
 states, symbols and transitions are tags, free at every instance size –
 together with the instance's own relation tables as the chain of one-bit

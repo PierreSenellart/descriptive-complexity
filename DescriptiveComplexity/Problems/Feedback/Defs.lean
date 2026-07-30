@@ -17,7 +17,7 @@ digraph:
 
 * `DescriptiveComplexity.FeedbackVertexSet`: is there a set of at most `k` *vertices*
   whose removal leaves an acyclic digraph? The threshold `k` is the
-  cardinality of the marked set, representation (A) of
+  cardinality of the marked set, the unary encoding of
   `DescriptiveComplexity.Numbers.Unary`, so the vocabulary is that of marked graphs;
 * `DescriptiveComplexity.FeedbackArcSet`: is there a set of at most `k` *arcs* whose
   removal leaves an acyclic digraph? Its objective counts arcs, and a set of
@@ -26,7 +26,7 @@ digraph:
   vocabulary `FirstOrder.Language.markedArcGraph` marks a binary relation, and
   the number it encodes is the `Set.ncard` of the corresponding set of pairs
   (`DescriptiveComplexity.nonempty_embedding_iff_ncard_le₂`). This is still
-  representation (A) – order-free and isomorphism-invariant – simply read at
+  the unary encoding – order-free and isomorphism-invariant – simply read at
   arity 2.
 
 ## Acyclicity, and why it stays first-order checkable

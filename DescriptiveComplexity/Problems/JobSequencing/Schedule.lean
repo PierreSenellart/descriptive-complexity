@@ -29,7 +29,7 @@ yes-instance exactly when some set of jobs weighs *exactly* the deadline.
 That last form is Partition's condition, which is why a reduction into job
 sequencing can be built out of a balanced-split gadget – provided it also
 writes the deadline, its double and the bound, which is what constrains the
-gadget (see `ROADMAP.md`).
+gadget.
 -/
 
 namespace DescriptiveComplexity

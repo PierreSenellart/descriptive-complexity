@@ -15,16 +15,15 @@ import DescriptiveComplexity.Hierarchy
 
 Umbrella file for `DescriptiveComplexity.Knapsack`, Karp's KNAPSACK – some set of
 items whose weights sum exactly to the target – with the weights written in
-*binary* (representation (C)), which is what makes the problem NP-hard rather
-than polynomial-time.
+*binary* (`DescriptiveComplexity.Numbers.BinRel`), which is what makes the
+problem NP-hard rather than polynomial-time.
 
 It collects the membership half (`DescriptiveComplexity.knapsack_sigmaSODefinable`,
 the certificate carrying the running totals and the carries of a ripple-carry
 addition) and the hardness half
 (`DescriptiveComplexity.exactCover_ordered_fo_reduction_knapsack`, one digit block of
 bit positions per ground element of an exact-cover instance). Partition, Job
-Sequencing and 0-1 Integer Programming follow from Knapsack – see
-`ROADMAP.md`.
+Sequencing and 0-1 Integer Programming follow from Knapsack.
 -/
 
 namespace DescriptiveComplexity

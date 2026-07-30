@@ -39,8 +39,9 @@ predecessors contains every node from which one is reachable, so a starting
 node could not be excluded if the structure were accepted.
 
 **This is the direction that is free.** The converse – expressing reachability
-itself in the Krom fragment – is Immerman–Szelepcsényi; see `ROADMAP.md` §4 and
-the discussion in `DescriptiveComplexity.LogSpace`.
+itself in the Krom fragment – is Immerman–Szelepcsényi, proved through FO(TC)
+in `DescriptiveComplexity.ImmermanSzelepcsenyi`; see also the discussion in
+`DescriptiveComplexity.LogSpace`.
 -/
 
 namespace DescriptiveComplexity

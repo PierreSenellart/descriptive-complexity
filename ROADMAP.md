@@ -8,50 +8,13 @@ i.e., the Lean proof would itself be a contribution) and its prerequisites.
 Main source: Immerman, "Descriptive Complexity" (DC below); also Garey–Johnson
 and Karp's 21 problems for the catalog.
 
-## 0. Integer representations (referenced as (A)–(D) below)
-
-Reference taxonomy for how numbers in problem instances are encoded as finite
-structures; a per-problem choice. The *semantics* of numbers (sums, comparisons)
-is always computed in Lean inside `Holds`; the representation only constrains
-which reductions are FO-expressible, whether the problem keeps its intended
-complexity (unary vs binary genuinely changes it — now a theorem:
-`no_unary_encoding` in `DescriptiveComplexity/Encoding/UnaryBlowup.lean` shows
-no bit-length-sized encoding of subset-sum can be unary, with the honest
-binary encoding as the positive contrast), and iso-invariance of the
-decoding. (A)–(C) are in use across the catalog; (D) is the one still to build.
-
-- **(A) Cardinalities of marked sets** (unary): threshold `k = |K|` for a unary
-  predicate `K`; weight `w(e) = |{x : W(e, x)}|` for binary `W`. Order-free,
-  iso-invariant for free, quantifier-free; also available *at arity 2* — the
-  threshold as the cardinality of a marked binary relation, which is what
-  objectives counting arcs need. The tagged framework does cardinality
-  arithmetic natively (disjoint union via tags adds, dimension multiplies,
-  complement subtracts). Only for numbers that are honestly polynomial: unary
-  SubsetSum-style problems are in P, hence not NP-hard under (A).
-- **(B) Positions in an order** that is part of the problem's own vocabulary
-  ("≤ is linear" folded into `Holds`): buys FO comparison of numbers, still
-  unary; forces every reduction *into* the problem to construct the order.
-- **(C) Binary via bit relations**: universe = items ∪ positions (separated by
-  unary predicates), linear order (or successor) on positions, `Bit(e, p)`;
-  `Holds` decodes `∑ 2^i` in Lean. The honest encoding for SubsetSum-like
-  problems (weights up to `2^n`). If a reduction needs arithmetic inside
-  formulas: comparison and addition are FO(≤)-definable; multiplication is TC⁰,
-  not FO — avoid reductions that must multiply.
-- **(D) Built-in arithmetic FO(≤, BIT)** (DC's standard setting) [L]: every
-  instance ordered, BIT primitive. Needed for the descriptive-complexity
-  endgame (§3) but a tax on every reduction; not the default.
-
-(A) and (C) are complements, not rivals: (A) where numbers are polynomially
-bounded, (C) where they must be exponential. Reductions from (C)-problems to
-(A)-problems are unproblematic: FO formulas only read bits, never sum them.
-
 ## 1. NP-complete problems (catalog growth)
 
 Karp's 21 are complete (reached 2026-07-25). Remaining catalog growth:
 
 - **X3C** [M–L]: exact cover by 3-sets, from 3-Dimensional Matching (now hard)
   or from Exact Cover; local gadgets, probably ordered.
-- **3-Partition** [L]: strongly NP-complete, so representation (A) (unary)
+- **3-Partition** [L]: strongly NP-complete, so the unary representation
   suffices and the hardness claim is honest; the classical source for
   packing/scheduling reductions. Warning: the 3DM → 3-Partition reduction is
   arithmetic-heavy; check FO-expressibility carefully before committing.
@@ -108,8 +71,10 @@ remains below are ordinary catalog reductions and machine bridges.
 - **FO(PFP)** [L, sharing infrastructure with LFP]: PSPACE on ordered
   structures (DC ch. 9–10); SO(TC), which already captures the class, is the
   cheaper route, so this is a textbook-faithfulness layer.
-- **BIT and FO(≤, BIT)** [L]: representation (D); FO-definability of `+` and `×`
-  from BIT, `FO(≤, BIT)` = uniform AC⁰ as the bottom of the ordered world
+- **BIT and FO(≤, BIT)** [L]: DC's standard setting – every instance ordered,
+  BIT primitive, a tax on every reduction and so not the library's default;
+  FO-definability of `+` and `×` from BIT, `FO(≤, BIT)` = uniform AC⁰ as the
+  bottom of the ordered world
   (formalizing that *capture* — against a circuit model — is the separate §4
   item **FO(≤, BIT) = AC⁰**); **quantifier-free projections** as the finest
   reduction notion (DC uses them for almost all completeness results); SAT
@@ -118,8 +83,8 @@ remains below are ordinary catalog reductions and machine bridges.
   dimension-1 status through composition (currently only `IsQuantifierFree`
   exists); "problem X is complete under qfps" is the DC-faithful statement.
 - **FO(COUNT) / counting quantifiers** [L]: with BIT, captures uniform TC⁰;
-  relevant to the representation-(C) arithmetic boundary (multiplication is TC⁰,
-  not FO).
+  relevant to the arithmetic boundary of the binary representation
+  (multiplication is TC⁰, not FO).
 - **Relativized (domain-formula) reductions — membership closure** [M]:
   Immerman's textbook FO reduction restricts the target universe to a definable
   subset via a **domain formula**, needed for *spanning* problems (Hamilton
@@ -324,7 +289,7 @@ The concrete items, in dependency order:
   The discharge symmetry of §2 extends unchanged, each quantitative fragment
   getting the complete problem that is its syntactic image (ΣQSO(FO) ↔ #SAT,
   QFO(LFP) ↔ FP). Note that the output number lives in Lean, computed by the
-  evaluator, so the representation taxonomy of §0 constrains only the numbers
+  evaluator, so the choice of number representation constrains only the numbers
   inside *instances*, never the value of a counting problem.
 - **#SAT complete for ΣQSO(FO)** [M–L]: the high-value target, and probably the
   cheapest route to a headline result. Tseitin gates preserve solution counts
@@ -752,10 +717,11 @@ so the notion is expressible today.
   first NP problem conjecturally neither in P nor NP-complete, and the problem
   of deciding the very equivalence the framework quotients by, which is worth a
   sentence in its docstring.
-- **Hardness for isomorphism problems must be order-free** – a triage rule to
-  record beside those of §0. The classical arc is a gadget `F` on single graphs
-  with `G ≅ H ↔ F G ≅ F H`, and the forward half is *free* here because an
-  interpretation is functorial, i.e. commutes with isomorphisms
+- **Hardness for isomorphism problems must be order-free** – a design-triage
+  rule, beside the choice of number encoding
+  (`DescriptiveComplexity/Numbers.lean`). The classical arc is a gadget `F` on
+  single graphs with `G ≅ H ↔ F G ≅ F H`, and the forward half is *free* here
+  because an interpretation is functorial, i.e. commutes with isomorphisms
   (`relMap_equiv₁/₂`). An *ordered* reduction destroys that: order-invariance
   makes the yes/no answer order-independent, not the constructed structure
   independent up to isomorphism, so every gadget would owe a structure-level
@@ -781,8 +747,8 @@ so the notion is expressible today.
   prevented from swapping the two sides); finite-automaton isomorphism as a
   re-reading of `Machines.lean`. Excluded: line graphs (Whitney's theorem, with
   its K₃/K₁,₃ exception) and Latin-square isotopy / Steiner-system isomorphism
-  (Miller's reductions are arithmetic-heavy and would fail the §0
-  bitwise-definability check). Companions that populate the degree without
+  (Miller's reductions are arithmetic-heavy and would fail the bitwise-
+  definability check the binary representation imposes). Companions that populate the degree without
   completing it: Graph Automorphism and Group Isomorphism (multiplication
   tables, one ternary relation), both below GI with the converse open – though
   `GA ≤ᶠᵒ GI` is not free, the classical reduction being genuinely clever.
@@ -873,7 +839,7 @@ blocked.
   neither buys a new statement.
 - The BIT / FO(≤, BIT) / AC⁰ / PARITY chain: a multi-year project with three
   [R] items and a switching lemma at the end, to be decided as a whole rather
-  than drifted into via representation (D). Until then the by-inspection AC⁰
+  than drifted into via built-in arithmetic. Until then the by-inspection AC⁰
   claim in the README stays an honest, documented gap.
 - Abiteboul–Vianu and the exponential classes.
 

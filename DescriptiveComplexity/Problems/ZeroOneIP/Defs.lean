@@ -12,8 +12,8 @@ import Mathlib.Algebra.BigOperators.Finprod
 
 0-1 INTEGER PROGRAMMING ([Karp 1972][karp1972reducibility]): given a matrix
 `C` and a vector `d`, is there a `0-1` vector `x` with `C x = d`? It is the
-multi-row form of Knapsack, and like it belongs to **representation (C)**: the
-entries are written in binary, since under the unary representation the
+multi-row form of Knapsack, and like it is written in **binary**
+(`DescriptiveComplexity.Numbers.BinRel`), since under the unary encoding the
 problem is solvable in polynomial time by dynamic programming and is therefore
 not NP-hard at all.
 
@@ -27,7 +27,7 @@ not NP-hard at all.
   `p`”, the only ternary symbol of the catalog;
 * `rhs r p`, the bits of the right-hand side of row `r`;
 * `le`, a linear order fixing the place values, folded into the yes-instances
-  (`DescriptiveComplexity.IsLinOrd`) as everywhere in representation (C).
+  (`DescriptiveComplexity.IsLinOrd`) as everywhere in the binary encoding.
 
 Entries are **natural numbers**: Karp states the problem over the integers,
 and the restriction formalized here is the one his reduction produces – a

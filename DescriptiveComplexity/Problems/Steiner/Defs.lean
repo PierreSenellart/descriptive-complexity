@@ -15,7 +15,7 @@ with unit weights: given a graph, a set of *terminals* and a threshold `k`, is
 there a connected set of vertices containing every terminal and using at most
 `k` non-terminals? The vocabulary `FirstOrder.Language.steinerGraph` is that of
 graphs with two unary marks – the terminals, and the marked set carrying `k`
-in the unary representation (A) of `DescriptiveComplexity.Numbers.Unary`.
+in the *unary representation* of `DescriptiveComplexity.Numbers.Unary`.
 
 Karp's original problem weights *edges* and bounds the total weight; on a tree
 the two readings differ by one (`#edges = #vertices - 1`), so the reduction

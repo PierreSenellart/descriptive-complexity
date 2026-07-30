@@ -15,7 +15,7 @@ whose concrete instances form a recursively enumerable set – in Mathlib's
 sense, `REPred` – reduces to `DescriptiveComplexity.CODEHALT` by an ordered
 first-order reduction.
 
-This is the pivot of the undecidability section of `ROADMAP.md`: it makes
+This is the pivot of the library's undecidability results: it makes
 `CODEHALT` RE-hard (instantiate at a problem already known to be RE-hard) and
 it makes “RE is exactly the recursively enumerable properties of finite
 structures” a theorem (instantiate at an arbitrary problem and push membership

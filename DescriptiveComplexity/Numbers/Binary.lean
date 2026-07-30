@@ -11,12 +11,12 @@ import Mathlib.Order.Hom.Set
 /-!
 # Binary representation of numbers in finite structures
 
-Representation (C) of the design notes: a number carried by an instance is
-encoded in binary by a set of *bit positions*, the positions being linearly
-ordered elements of the structure. This is the honest encoding for problems
-whose numbers must be exponential in the instance size (SubsetSum, Partition,
-Knapsack…), where the unary representation of
-`DescriptiveComplexity.Numbers.Unary` would change the complexity.
+The binary encoding: a number carried by an instance is given by a set of
+*bit positions*, the positions being linearly ordered elements of the
+structure. This is the honest encoding for problems whose numbers must be
+exponential in the instance size (SubsetSum, Partition, Knapsack…), where the
+unary representation of `DescriptiveComplexity.Numbers.Unary` would change the
+complexity.
 
 * `DescriptiveComplexity.posRank`: the rank of a position in the increasing enumeration
   (via `monoEquivOfFin`, so positions need not literally be `Fin m`);
@@ -33,9 +33,12 @@ Knapsack…), where the unary representation of
   `DescriptiveComplexity.binValue_lt_binValue_iff` – the Lean counterpart of the FO(≤)
   formula comparing two binary numbers.
 
-Unlike the unary layer, which the clique family uses for its thresholds, this
-one has no client yet: it is waiting for the first problem whose numbers must
-be exponential (SubsetSum and friends, see the roadmap).
+The problems of the catalog reach this layer through
+`DescriptiveComplexity.Numbers.BinRel`, which decodes the same bits when the
+order on positions is a relation symbol of the vocabulary rather than a
+`LinearOrder` instance: Knapsack, Partition, Job Sequencing and 0-1 Integer
+Programming. The choice between this encoding and the unary one is argued in
+`DescriptiveComplexity.Numbers`.
 -/
 
 namespace DescriptiveComplexity

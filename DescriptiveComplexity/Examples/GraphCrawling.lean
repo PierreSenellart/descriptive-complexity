@@ -39,8 +39,8 @@ back to the concrete instances. Every step exercises machinery the CQ file
 does not, which is why this example is worth reading second:
 
 * the budget is a *cardinality threshold* – a number in the unary
-  representation (A) of `ROADMAP.md` §0, honest here because crawl costs are
-  bounded by the page count – checked by a guessed injection
+  representation of `DescriptiveComplexity.Numbers.Unary`, honest here because
+  crawl costs are bounded by the page count – checked by a guessed injection
   (`DescriptiveComplexity.nonempty_embedding_iff_ncard_le`);
 * the semantics contains a *reachability* condition, which is not
   first-order; the membership proof replaces it by a certificate (an order in
@@ -121,7 +121,7 @@ end DescriptiveComplexity
 
 An instance is a single finite structure: the pages, the directed links, a
 mark for the root, a mark for the targets, and a marked set whose
-cardinality is the budget – the unary representation (A) of numbers, as used
+cardinality is the budget – the unary representation of numbers, as used
 by Set Cover, Steiner Tree and the other threshold problems of the catalog.
 -/
 
@@ -190,9 +190,10 @@ Two packaging choices are dictated by the machinery:
   and an unclamped `ℕ` budget, counted in unary in the size, would break
   `le_card` exactly as `List`-repetition would for CQ atoms. The WLOG is
   baked into the packaging;
-* **the budget is counted in unary** in `crawlSize`. This is representation
-  (A) of `ROADMAP.md` §0, and it is *honest* here because the clamp keeps
-  the budget below the page count – contrast the weighted problems of
+* **the budget is counted in unary** in `crawlSize`. This is the unary
+  representation of `DescriptiveComplexity.Numbers.Unary`, and it is *honest*
+  here because the clamp keeps the budget below the page count – contrast the
+  weighted problems of
   `DescriptiveComplexity/Encoding/UnaryBlowup.lean`, where unary weights are
   exactly what the size bounds reject.
 -/

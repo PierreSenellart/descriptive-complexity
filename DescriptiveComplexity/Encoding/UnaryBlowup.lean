@@ -12,12 +12,12 @@ import DescriptiveComplexity.Problems.Knapsack.Defs
 
 A criterion nobody can fail is worth nothing. This file proves that the
 `card_le` bound of `DescriptiveComplexity.Encoding` genuinely rejects the one
-mistake the library worries about most (`ROADMAP.md` §0): encoding a number in
-*unary* – as the cardinality of a marked set – when the honest size of the
-instance counts its *bit length*. Under a unary encoding a subset-sum instance
-sits on a universe exponential in its own size, and the NP-hardness of the
-weighted problems of the catalog (Knapsack, Partition, Job Sequencing, 0-1
-Integer Programming) would silently evaporate.
+mistake the choice of number encoding (`DescriptiveComplexity.Numbers`) can
+lead to: encoding a number in *unary* – as the cardinality of a marked set –
+when the honest size of the instance counts its *bit length*. Under a unary
+encoding a subset-sum instance sits on a universe exponential in its own size,
+and the NP-hardness of the weighted problems of the catalog (Knapsack,
+Partition, Job Sequencing, 0-1 Integer Programming) would silently evaporate.
 
 * `DescriptiveComplexity.no_unary_encoding`: there is **no** encoding of
   subset-sum instances, sized by bit length, whose universe holds one element
@@ -25,11 +25,12 @@ Integer Programming) would silently evaporate.
   `Θ(k)`: a unary universe on it is exponential in the declared size, so
   `card_le` cannot be discharged.
 * `DescriptiveComplexity.binarySubsetSumEncoding`: the honest *binary*
-  encoding of the same instance type (representation (C): items and bit
-  positions, a `bit` relation) satisfies both bounds with room to spare.
+  encoding of the same instance type (`DescriptiveComplexity.Numbers.Binary`:
+  items and bit positions, a `bit` relation) satisfies both bounds with room
+  to spare.
 
-Together they turn the prose lesson of `ROADMAP.md` §0 – unary versus binary
-genuinely changes the problem – into a theorem.
+Together they turn the prose lesson of `DescriptiveComplexity.Numbers` – unary
+versus binary genuinely changes the problem – into a theorem.
 
 This file is deliberately off the library's core import path: the negative
 result needs a little asymptotics (`Mathlib.Analysis.SpecificLimits.Normed`),

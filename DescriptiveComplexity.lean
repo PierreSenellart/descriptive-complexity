@@ -640,7 +640,8 @@ individual declarations are documented on their own pages.
   Shared between the HORN-SAT program, the FO(LFP) → SO-Horn translation and
   the counting machine, whose registers are exactly ranks and tuple walks.
 * `DescriptiveComplexity.Numbers` – unary and binary encodings of numbers as
-  finite structures, for threshold and weight parameters of problems.
+  finite structures, for threshold and weight parameters of problems; its
+  module docstring argues the per-problem choice between the two.
 * `DescriptiveComplexity.Machines` – Turing machines as relations on a
   universe, with no vocabulary: configurations, steps, and acceptance within a
   budget counted in universe elements. The semantics the machine bridge reads

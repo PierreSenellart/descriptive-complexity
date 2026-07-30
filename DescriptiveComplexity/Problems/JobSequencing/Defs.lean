@@ -13,10 +13,10 @@ import Mathlib.Algebra.BigOperators.Finprod
 SEQUENCING ([Karp 1972][karp1972reducibility]): given jobs with execution
 times, deadlines and penalties, and a bound, is there a one-processor schedule
 whose jobs missing their deadline carry a total penalty at most the bound?
-Like Knapsack it belongs to **representation (C)** – times, deadlines,
-penalties and the bound are written in binary – since under the unary
-representation the problem is solvable in polynomial time by dynamic
-programming and is therefore not NP-hard at all.
+Like Knapsack it is written in **binary**
+(`DescriptiveComplexity.Numbers.BinRel`) – times, deadlines, penalties and the
+bound – since under the unary encoding the problem is solvable in polynomial
+time by dynamic programming and is therefore not NP-hard at all.
 
 ## The vocabulary
 
@@ -27,7 +27,7 @@ programming and is therefore not NP-hard at all.
   the deadline and of the penalty of `j`;
 * `bnd p`, the bits of the penalty bound;
 * `le`, a linear order fixing the place values, folded into the yes-instances
-  (`DescriptiveComplexity.IsLinOrd`) as everywhere in representation (C).
+  (`DescriptiveComplexity.IsLinOrd`) as everywhere in the binary encoding.
 
 ## The schedule
 

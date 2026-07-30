@@ -1746,7 +1746,8 @@ effort:
 * *query equivalence*: two-sided containment; its NP-completeness follows
   from this file's results with a pair of FO reductions;
 * *acyclic-query evaluation*: the tractable fragment (Yannakakis); its
-  membership statement needs a logic for PTIME first (see the roadmap, §3).
+  membership statement is a `DescriptiveComplexity.PTIME` one, hence an
+  SO-Horn definition (`DescriptiveComplexity.SigmaSOHornDefinable`).
 -/
 
 end DescriptiveComplexity

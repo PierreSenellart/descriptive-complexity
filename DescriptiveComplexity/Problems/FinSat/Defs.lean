@@ -75,8 +75,8 @@ first-order.
 RE is the logically defined class of
 `DescriptiveComplexity.RecursivelyEnumerable` (definability in `∃SO[new]`), so
 completeness of FINSAT for it is a statement about that logic. It becomes
-*undecidability* of finite satisfiability only through the machine bridge
-recorded in `ROADMAP.md` (§8).
+*undecidability* of finite satisfiability only through the bridge to Mathlib's
+computability layer (`DescriptiveComplexity.finsat_not_computable`).
 -/
 
 /- The language of encoded sentences lives in Mathlib's `FirstOrder.Language`

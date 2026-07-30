@@ -11,8 +11,9 @@ import DescriptiveComplexity.Problems.Feedback.Defs
 MAX CUT ([Karp 1972][karp1972reducibility]): is there a set `S` of vertices
 such that at least `k` edges have exactly one endpoint in `S`? Here, as
 everywhere in this library, the threshold `k` is carried by the instance in
-representation (A) – and, since a cut can have quadratically many edges, at
-arity 2: `k` is the number of pairs in the marked relation of
+the *unary representation* of `DescriptiveComplexity.Numbers.Unary` – and,
+since a cut can have quadratically many edges, at arity 2: `k` is the number
+of pairs in the marked relation of
 `FirstOrder.Language.markedArcGraph`, the vocabulary introduced for Feedback Arc Set
 and reused here unchanged.
 

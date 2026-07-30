@@ -33,8 +33,8 @@ is exactly relativization to the predicate `old`. The specialization
 `DescriptiveComplexity.extBase`) isomorphic to `A`
 (`DescriptiveComplexity.oldSubEquiv`).
 
-The same machinery is what a relativized *membership* pullback
-(`ROADMAP.md`, the domain-formula item) would want.
+The same machinery is what a relativized *membership* pullback – the
+domain-formula item of `ROADMAP.md` §3 – would want.
 -/
 
 namespace DescriptiveComplexity

@@ -239,9 +239,9 @@ The step both halves of a DP-hardness pairing will need. Pairing two
 reductions into one instance forces a common dimension and a common universe,
 so each side's formula ends up sitting inside a larger structure: the other
 side's points are there too, and so are the tuples the shorter side does not
-use. Those extra elements are *not* harmless by fiat – see the padding warning
-in `ROADMAP.md` – but they are harmless once they are neither clauses nor
-occurrences, which is what the lemma below says.
+use. Those extra elements are *not* harmless by fiat, but they are harmless
+once they are neither clauses nor occurrences, which is what the lemma below
+says.
 
 It is stated as transfer along an injection `j` that reflects the three
 relations, hits every clause, and hits every element occurring in a clause of
