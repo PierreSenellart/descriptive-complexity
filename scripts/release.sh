@@ -4,13 +4,24 @@
 # release keeps the Mathlib pin it was cut against, and a new pin always takes
 # at least a minor bump, so that `~x.y.z` means "stay on my Mathlib".
 #
+# One Mathlib version is pinned in four places, which move together and are what
+# `pins` rewrites and `check` compares:
+#
+#   /lean-toolchain            /lakefile.lean          (the Mathlib `require`)
+#   /docbuild/lean-toolchain   /docbuild/lakefile.toml (the doc-gen4 `rev`)
+#
 #   release.sh check              verify every version/pin location agrees
+#   release.sh next-pin           print the Mathlib tag to move to, if any
+#   release.sh pins <tag>         move the four Mathlib/toolchain pins to <tag>
+#   release.sh next-minor         print the next minor library version
 #   release.sh prepare <version>  bump the library version everywhere, then check
 #   release.sh notes              print draft release notes for the current version
 #   release.sh publish            tag the current commit and cut the GitHub release
 #
-# `check` is safe to run any time (and in CI); `prepare` only edits tracked files
-# and leaves the commit to you; `publish` is the only step that touches origin.
+# `check`, `next-minor` and `next-pin` are safe to run any time (`next-pin` asks
+# GitHub what exists, the others are offline); `pins` and `prepare` only edit
+# tracked files and leave the commit to you; `publish` is the only step that
+# touches origin. `update.yml` drives `next-pin` -> `pins` -> `prepare` monthly.
 
 set -euo pipefail
 
@@ -91,6 +102,107 @@ cmd_check() {
 
   [[ $failed -eq 0 ]] || die "some locations disagree; fix them (or run: $0 prepare <version>)"
   printf '\nAll release metadata agrees.\n'
+}
+
+# --- pins --------------------------------------------------------------------
+# Moving the Mathlib pin is the other half of a release; `next-pin` decides
+# whether there is anything to move to, and `pins` performs the move. The
+# library version is `prepare`'s business, below: a new pin always takes at
+# least a minor bump, which is what `next-minor` computes.
+
+# Lake's own order on version strings (`Lake/Util/Version.lean`): the numeric
+# `major.minor.patch` first, then the *empty* suffix ranks highest, and two
+# non-empty suffixes compare as plain strings. A leading `v` is ignored, so
+# `v4.33.0-rc1 < v4.33.0 < v4.33.1`.
+ver_lt() { # ver_lt A B -- true when A is strictly older than B
+  local a="${1#v}" b="${2#v}" an as bn bs first
+  an="${a%%-*}"; as="${a#"$an"}"; as="${as#-}"
+  bn="${b%%-*}"; bs="${b#"$bn"}"; bs="${bs#-}"
+  if [[ "$an" != "$bn" ]]; then
+    [[ "$(printf '%s\n%s\n' "$an" "$bn" | sort -V | head -1)" == "$an" ]]
+    return
+  fi
+  # Same numbers: a suffixed version is older than the unsuffixed one.
+  [[ -n "$as" && -z "$bs" ]] && return 0
+  if [[ -n "$as" && -n "$bs" ]]; then
+    first="$(LC_ALL=C printf '%s\n%s\n' "$as" "$bs" | LC_ALL=C sort | head -1)"
+    [[ "$first" == "$as" && "$as" != "$bs" ]]
+    return
+  fi
+  return 1
+}
+
+cmd_next_minor() {
+  local version major minor
+  version="$(lib_lakefile)" || die "no version in lakefile.lean"
+  IFS=. read -r major minor _ <<< "$version"
+  printf '%d.%d.0\n' "$major" $((minor + 1))
+}
+
+# Prints the tag to move to on stdout, or nothing at all when the answer is
+# "stay where you are"; everything else goes to stderr, so the caller can just
+# test whether stdout is empty.
+cmd_next_pin() {
+  local pin latest mathlib_toolchain
+  pin="$(pin_toolchain)" || die "no toolchain in lean-toolchain"
+  command -v gh >/dev/null || die "next-pin needs the gh CLI"
+
+  # Tags, not releases: Mathlib only started publishing GitHub releases in 2026,
+  # and the tag is what the `require` names anyway. Stable lines only, since
+  # master tracks a stable Mathlib.
+  latest="$(gh api --paginate repos/leanprover-community/mathlib4/git/matching-refs/tags/v4. \
+              -q '.[].ref' | sed 's|^refs/tags/||' \
+              | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)" \
+    || die "could not list the Mathlib tags"
+  [[ -n "$latest" ]] || die "no stable Mathlib tag found"
+  printf 'Pinned: %s. Newest stable Mathlib tag: %s.\n' "$pin" "$latest" >&2
+
+  if ! ver_lt "$pin" "$latest"; then
+    printf 'Nothing to move to: the pin is not older than that.\n' >&2
+    return 0
+  fi
+  # A patch release *inside* the pinned line is deliberately not chased: Mathlib
+  # cuts those often (7 over the last 10 minor lines), and each would spend a
+  # minor bump here on no new content. Take such a pin by hand when it fixes
+  # something the library needs. An rc pin, on the other hand, is exactly what
+  # its own stable release supersedes, so that move is offered.
+  if [[ "$pin" != *-* && "${pin%.*}" == "${latest%.*}" ]]; then
+    printf 'Nothing to do: %s is only a patch release of the pinned line.\n' "$latest" >&2
+    return 0
+  fi
+  # All four pins move together, so refuse unless the whole set exists and
+  # agrees: Mathlib's own toolchain at that tag, and a doc-gen4 tag to match.
+  mathlib_toolchain="$(curl -fsSL \
+    "https://raw.githubusercontent.com/leanprover-community/mathlib4/$latest/lean-toolchain" \
+    | tr -d '[:space:]')" || die "could not read Mathlib's lean-toolchain at $latest"
+  [[ "$mathlib_toolchain" == "leanprover/lean4:$latest" ]] \
+    || die "Mathlib $latest is built with $mathlib_toolchain, so the pins do not
+       share one version any more; move them by hand"
+  if ! gh api "repos/leanprover/doc-gen4/git/ref/tags/$latest" >/dev/null 2>&1; then
+    printf 'Waiting: doc-gen4 has no %s tag yet, so docbuild cannot follow.\n' "$latest" >&2
+    return 0
+  fi
+
+  printf '%s\n' "$latest"
+}
+
+cmd_pins() {
+  local ver="${1:-}" old
+  [[ -n "$ver" ]] || die "usage: $0 pins <mathlib tag>   (e.g. v4.33.0)"
+  [[ "$ver" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || die "not a Mathlib tag: $ver"
+  old="$(pin_toolchain)" || die "no toolchain in lean-toolchain"
+  [[ "$ver" != "$old" ]] || die "already pinned to $ver"
+
+  printf 'leanprover/lean4:%s\n' "$ver" > lean-toolchain
+  printf 'leanprover/lean4:%s\n' "$ver" > docbuild/lean-toolchain
+  sed -i "s|\"mathlib\" @ git \"[^\"]*\"|\"mathlib\" @ git \"$ver\"|" lakefile.lean
+  # The only `rev` in that file is doc-gen4's; the local package uses `path`.
+  sed -i "s|^rev = \"[^\"]*\"|rev = \"$ver\"|" docbuild/lakefile.toml
+
+  printf 'Moved the pin %s -> %s in the four pinned places.\n\n' "$old" "$ver"
+  printf 'Next: `lake update` (the manifest still records the old Mathlib), let the\n'
+  printf 'build go green, then `%s prepare %s`. The README badge and table\n' "$0" "$(cmd_next_minor)"
+  printf 'follow the pin from there, so `check` stays red until that runs.\n'
 }
 
 # --- prepare -----------------------------------------------------------------
@@ -194,9 +306,12 @@ cmd_publish() {
 }
 
 case "${1:-}" in
-  check)   cmd_check ;;
-  prepare) shift; cmd_prepare "$@" ;;
-  notes)   cmd_notes ;;
-  publish) cmd_publish ;;
-  *) die "usage: $0 {check | prepare <version> | notes | publish}" ;;
+  check)      cmd_check ;;
+  next-pin)   cmd_next_pin ;;
+  pins)       shift; cmd_pins "$@" ;;
+  next-minor) cmd_next_minor ;;
+  prepare)    shift; cmd_prepare "$@" ;;
+  notes)      cmd_notes ;;
+  publish)    cmd_publish ;;
+  *) die "usage: $0 {check | next-pin | pins <tag> | next-minor | prepare <version> | notes | publish}" ;;
 esac

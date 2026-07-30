@@ -1,6 +1,6 @@
 # Keeps the GitHub Actions used by the workflows current. The Lean and Mathlib
 # pins are deliberately *not* managed here: they move together with the four
-# pinned files, one release at a time, via `update.yml` (see PACKAGING.md).
+# pinned files, one release at a time, via `update.yml` and `scripts/release.sh`.
 version: 2
 updates:
   - package-ecosystem: "github-actions"
