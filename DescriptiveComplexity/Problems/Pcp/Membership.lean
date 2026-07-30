@@ -32,8 +32,9 @@ binder, exactly as in `DescriptiveComplexity.Problems.CodeHalt.Membership`.
 Nothing here is a machine model: `DescriptiveComplexity.pcp_mem_RE` is a
 statement about the logic `∃SO[new]`, and it is what makes Post's problem
 reduce to finite satisfiability (`DescriptiveComplexity.pcp_le_finsat`).
-RE-*hardness* of `PCP` is a different matter, recorded in `ROADMAP.md` (§8) and
-not proved here.
+RE-*hardness* of `PCP` is a different matter – the computation-history
+dominoes of `DescriptiveComplexity.Problems.Pcp.Hardness` – and with it Post's
+problem is RE-complete (`DescriptiveComplexity.pcp_RE_complete`).
 -/
 
 namespace DescriptiveComplexity

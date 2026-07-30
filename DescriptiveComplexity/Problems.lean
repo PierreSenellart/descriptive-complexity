@@ -46,6 +46,7 @@ import DescriptiveComplexity.Problems.Machine.Halt
 import DescriptiveComplexity.Problems.Machine.HaltCert
 import DescriptiveComplexity.Problems.Machine.HaltFin
 import DescriptiveComplexity.Problems.Machine.HaltMem
+import DescriptiveComplexity.Problems.Machine.HaltHard
 import DescriptiveComplexity.Problems.CodeHalt
 
 /-!
@@ -65,9 +66,10 @@ hierarchy, complete at every level
 `DescriptiveComplexity.atmAccept_piP_complete`) – see
 `DescriptiveComplexity.Problems.MachineAlt`. The halting problem
 (`DescriptiveComplexity.HALT`, the same machine with the tape unbounded) is
-**in RE** (`DescriptiveComplexity.halt_mem_RE`), whence
-`DescriptiveComplexity.halt_le_finsat`, Trakhtenbrot's theorem in the form it
-is usually stated; it is not proved RE-*hard*, see `ROADMAP.md` (§8). The
+**RE-complete** (`DescriptiveComplexity.halt_RE_complete`, hardness being the
+machine bridge of `DescriptiveComplexity.Problems.Machine.HaltHard`); its
+membership half alone already gives `DescriptiveComplexity.halt_le_finsat`,
+Trakhtenbrot's theorem in the form it is usually stated. The
 halting of a *partial recursive code* drawn as a syntax tree
 (`DescriptiveComplexity.CODEHALT`) is **RE-complete**
 (`DescriptiveComplexity.codehalt_RE_complete`), and is the problem the
@@ -78,9 +80,11 @@ instance as the *program* that runs a semi-decision procedure on it, which is
 general enough to identify the class with its machine reading
 (`DescriptiveComplexity.mem_RE_iff_rePred`) and to separate it from its
 complement (`DescriptiveComplexity.RE_ne_coRE`). Post's
-correspondence problem (`DescriptiveComplexity.PCP`) is in RE too
-(`DescriptiveComplexity.pcp_mem_RE`), the invented values being the slots of
+correspondence problem (`DescriptiveComplexity.PCP`) is **RE-complete** too
+(`DescriptiveComplexity.pcp_RE_complete`): membership invents the slots of
 the sequence of dominoes together with a matching between the two parses of
-the word it spells; its RE-*hardness* awaits the computation-history dominoes
-from `CODEHALT`, see `ROADMAP.md` (§8).
+the word it spells, and hardness is the computation-history dominoes from
+`HALT` (`DescriptiveComplexity.Problems.Pcp.Hardness`), whence the
+undecidability of Post's problem
+(`DescriptiveComplexity.pcp_not_computable`).
 -/

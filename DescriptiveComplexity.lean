@@ -729,7 +729,7 @@ reduction and certificate in full.
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` – at `k = 1`, coNP · `ATMAccept k false` |
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
-| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT ‡ |
+| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 
 Each entry of the **machine model** column is an equivalence *proved here*
 between the logical definition of the class and acceptance by that model:
@@ -744,14 +744,6 @@ such equivalence is proved here.
 † Capture theorems, both directions: `DescriptiveComplexity.mem_NL_iff_automaton`
 for `NL`, and `DescriptiveComplexity.mem_LOGSPACE_iff_automaton` for `LOGSPACE`,
 where the machine is required to be deterministic.
-
-‡ Two further problems at `RE` have membership only, so far, and are therefore
-not listed as complete: `DescriptiveComplexity.halt_mem_RE` and
-`DescriptiveComplexity.pcp_mem_RE` each give at once a first-order reduction to
-finite satisfiability (`DescriptiveComplexity.halt_le_finsat`,
-`DescriptiveComplexity.pcp_le_finsat`), but neither `DescriptiveComplexity.HALT`
-nor `DescriptiveComplexity.PCP` is proved RE-hard; both are now reachable from
-`CODEHALT`, and `ROADMAP.md` (§8) records what each would cost.
 
 Headline results and cross-references:
 
@@ -948,9 +940,18 @@ Headline results and cross-references:
   FINSAT is already RE-hard, that yields
   `DescriptiveComplexity.halt_le_finsat` at once: the halting problem
   first-order-reduces to finite satisfiability, which is Trakhtenbrot's theorem in
-  the form it is usually stated. RE-*hardness* of `HALT` is not proved; it is
-  now a statement about the machine model rather than about RE, since the code
-  model already has it (`ROADMAP.md` §8).
+  the form it is usually stated. RE-*hardness* of `HALT`
+  (`DescriptiveComplexity.halt_RE_hard`, whence
+  `DescriptiveComplexity.halt_RE_complete`) is the machine bridge: the
+  reduction draws a **fixed** simulating machine – its states, symbols and
+  transitions are tags, free at every instance size – and spells the
+  instance's own relation tables as a chain of one-bit `comp` frames on the
+  initial tape, folded at run time into the one number that a semi-decision
+  code – named by `Turing.ToPartrec.Code.exists_code`, never built – decodes
+  back into the instance. The simulation of the code model on one unbounded
+  tape is a string-rewriting argument against the same configuration-word
+  layer the PCP reduction uses, so the tape-function bookkeeping is paid for
+  once (`DescriptiveComplexity.Problems.Machine.HaltHard`).
 
   **Post's correspondence problem** (`DescriptiveComplexity.PCP`,
   [Post 1946][post1946variant]) has the same membership half
@@ -970,13 +971,16 @@ Headline results and cross-references:
   entries of two strictly sorted lists index by index, so the two
   concatenations agree letter by letter.
 
-  Being a sequence is also why `PCP` is not a second syntactic image: reading a
-  solution left to right and keeping the unmatched overhang turns a PCP
-  instance into a nondeterministic queue machine whose transitions a reduction
-  writes, so RE-*hardness* of PCP is a computation-history construction rather
-  than a translation of the logic; with `CODEHALT` RE-hard it is a reduction
-  from one *program* to another, which is where `ROADMAP.md` (§8) now prices
-  it.
+  Being a sequence is also why `PCP` is not a second syntactic image:
+  RE-*hardness* is the classical computation-history construction
+  (`DescriptiveComplexity.halt_ordered_fo_reduction_pcp`). A `HALT` instance
+  carries its transitions as elements, so the interpretation emits one
+  decorated domino per transition-attribute tuple – the words are data, read
+  off one shared table – plus a start domino spelling the initial
+  configuration, and a match is exactly a halting derivation of the machine's
+  rewriting system. With `HALT` RE-hard this makes PCP **RE-complete**
+  (`DescriptiveComplexity.pcp_RE_complete`) and Post's problem undecidable
+  (`DescriptiveComplexity.pcp_not_computable`).
 
   **CODEHALT** (`DescriptiveComplexity.Problems.CodeHalt`) – does the
   `Nat.Partrec.Code` drawn as the syntax tree of the instance halt on `0`? – is

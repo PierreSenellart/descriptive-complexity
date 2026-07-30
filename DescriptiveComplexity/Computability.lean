@@ -12,6 +12,7 @@ import DescriptiveComplexity.Computability.Reduction
 import DescriptiveComplexity.Computability.Catalog
 import DescriptiveComplexity.Computability.CodeHalt
 import DescriptiveComplexity.Computability.CodeHaltComplete
+import DescriptiveComplexity.Computability.PcpComplete
 
 /-!
 # The bridge to Mathlib's computability layer
@@ -84,4 +85,15 @@ list of the symbols of its vocabulary.
    `DescriptiveComplexity.codehalt_RE_complete`, and
    `DescriptiveComplexity.RE_ne_coRE`, by Post's theorem applied to the
    undecidability of (6).
+
+8. `DescriptiveComplexity.Computability.PcpComplete` – **the machine bridge's
+   harvest**. `DescriptiveComplexity.orderedReduction_halt`
+   (`DescriptiveComplexity.Problems.Machine.HaltHard`) is the same statement
+   as (7) at the machine model, and the computation-history dominoes
+   `DescriptiveComplexity.halt_ordered_fo_reduction_pcp` carry hardness on:
+   the halting problem and Post's correspondence problem are RE-complete
+   (`DescriptiveComplexity.halt_RE_complete`,
+   `DescriptiveComplexity.pcp_RE_complete`) and undecidable
+   (`DescriptiveComplexity.halt_not_computable`,
+   `DescriptiveComplexity.pcp_not_computable`).
 -/

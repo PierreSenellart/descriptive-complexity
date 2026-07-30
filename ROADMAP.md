@@ -623,40 +623,56 @@ semi-decidable to `CODEHALT`, whence `codehalt_RE_complete`,
 - a plain ordered reduction suffices, not a relativized one: junk tuples are
   unmarked, so they draw nothing and carry no root.
 
+**Both closing items are built** (2026-07-30: `Problems/Pcp/Hardness/`,
+`Problems/Machine/HaltHard/`, `Computability/PcpComplete.lean`):
+`halt_RE_complete` and `pcp_RE_complete`, with the undecidability of Post's
+problem (`pcp_not_computable`) and of the machine halting problem
+(`halt_not_computable`) falling out of `not_computablePred_of_RE_hard`. The
+build inverted the plan above: instead of `CODEHALT ≤ᶠᵒ[≤] PCP` – which
+would have asked the dominoes to simulate a code-tree interpreter – the
+split is **`RE.Hard HALT`** (`orderedReduction_halt`, the machine bridge)
+then **`HALT ≤ᶠᵒ[≤] PCP`** (`halt_ordered_fo_reduction_pcp`, the
+computation-history dominoes for the machine *drawn in the instance*), with
+the roadmap's `CODEHALT ≤ᶠᵒ[≤] PCP` an instance via `CODEHALT ∈ RE`. What
+each half taught, worth not rediscovering:
+
+- **make the rewriting format strict, and let the rules restore it**: every
+  move rule of `HaltPcp.MRule` is three letters with a boundary variant that
+  grows the window and writes the entering blank in the same step, so every
+  derivation word between boot and halt is a configuration word and the
+  backward reading is a case analysis, not an induction;
+- **index rules by attribute values, not by the transition** – attributes
+  are relations, so a domino per transition would be ill-defined; one per
+  tuple `(q, a, b, q', c)` with the transition existentially quantified is
+  what sets the PCP interpretation's dimension at 5;
+- **words as data beat words as cases** (one `List LSpec` read both
+  semantically and as a formula), **one order key for the whole universe,
+  junk included** (block index, then coordinates in the source's order, then
+  a static sub-index – two tags sharing a block index is what interleaves a
+  long word), and **separate the drawing from the formulas** – the
+  `Draw`/`Match`/`Interp` split is where the cost sits, and the part to
+  estimate honestly;
+- on the machine side, **audit a tape layout for markers that can drift
+  unboundedly against the direction of growth before proving anything** (the
+  first layout died exactly there: mirroring the value turned every prepend
+  into an append toward the blank half-tape), and **make the step table
+  deterministic even where the design does not need it**, so the backward
+  simulation is a case analysis on `stepsTo_det`;
+- the machine bridge never touches tape functions: the zipper semantics is
+  proved against `Turing.ToPartrec` (`reach_acc_iff_evalDom`), turned into
+  word rewriting once (`derives_startWord_iff_evalDom`), and transported to
+  the drawn machine along an injective predicate-image embedding
+  (`TMEmbed`), with `acceptsU_iff_derives` – paid for once by the PCP half –
+  supplying the `ConfigU` bookkeeping;
+- the instance enters as a **chain of one-bit `comp` frames**
+  (`inputChain`): `exists_code` gives fixed-arity codes only, and the
+  continuation stack applies a fixed code once per frame, so the initial
+  tape is one letter per bit of the flattened relation table
+  (`FinStruct.ofEquiv`'s table, folded back by `structOfBits`, which is
+  primitive recursive because a `FinStruct` *is* a size and a table).
+
 What remains:
 
-- **PCP hardness, and with it the undecidability of Post's problem** [L]:
-  `CODEHALT ≤ᶠᵒ[≤] PCP` by the classical computation-history dominoes, after
-  which hardness travels forward along the reduction. These are the *same*
-  dominoes that give **undecidability** of PCP – reachable independently of
-  everything else, since first-order reductions are computable and `CODEHALT`
-  is undecidable – so one construction serves both readings.
-
-  The construction has to be dominoes rather than a translation of the logic:
-  PCP is the syntactic image of no logic – a certificate of `∃SO[new]` is a
-  structure with relations, a certificate of PCP is a string with two parses –
-  and a PCP instance is really a *program*, a nondeterministic queue machine
-  whose transitions the reduction writes, read off a solution left to right by
-  keeping the unmatched overhang. Reducing from `CODEHALT` rather than from
-  `FINSAT` is what keeps it small: from FINSAT the sentence would be input
-  rather than parameter, so the dominoes would have to simulate a *universal*
-  model checker, whereas a `CODEHALT` instance already carries the program they
-  are to simulate.
-- **`RE.Hard HALT`** [last, and no longer the load-bearing item]: with
-  `CODEHALT` RE-hard, the statement “RE is the class of semi-decidable
-  problems” is *already* had, in the code model and in the sharper form
-  `RE = REPred` (`mem_RE_iff_rePred`); what remains here is the same fact at
-  the machine model, which is a statement about `Language.turing`, not about
-  RE. Two routes, neither
-  needing the evaluator with addressed storage: `CODEHALT ≤ᶠᵒ[≤] HALT`, a
-  machine interpreting the code drawn in the instance, or `PCP ≤ᶠᵒ[≤] HALT`, a
-  machine that guesses dominoes and keeps the overhang on the unbounded tape,
-  its data read by the transition formulas – the regime of the SAT machine
-  (`Machine/Hardness.lean`, ~2.7k with its tape and interpretation files)
-  rather than of an evaluator. So [L–XL] and unblocked, but last: it buys the
-  machine-model wording of a theorem the code model already states, whereas the
-  easy half, `halt_mem_RE`, already buys `halt_le_finsat` and buys the same for
-  every future problem shown to be in RE.
 - **Housekeeping left by the FINSAT build** [S each]: `lexLtF`/`lexLeF`, which
   decide the lexicographic order on `D`-tuples, sit in `Problems/FinSat/Nodes.lean`
   but belong in `OrderWalk.lean` next to `succTupF`, which walks that order
@@ -813,15 +829,12 @@ blocked.
    because building the reduction from the complement side keeps the promise in
    hand where it is proved. Reach for tracking when a second consumer appears,
    not before.
-2. **PCP hardness** [L] (§8), now that the RE bridge is closed at the code
-   model: `CODEHALT ≤ᶠᵒ[≤] PCP` by the computation-history dominoes, which are
-   the same dominoes the undecidability of Post's problem wants, so one
-   construction serves both readings. The item that used to head this line –
-   the instance-as-a-program reduction `P ≤ᶠᵒ[≤] CODEHALT` – is done, and with
-   it `CODEHALT` RE-complete, `RE = REPred` and `RE ≠ coRE`; what it taught is
-   recorded in §8 and generalizes: when an evaluator is the stated blocker,
-   look for a target whose programs already exist rather than pay for the
-   evaluator.
+2. **PCP hardness** – done (§8): `pcp_RE_complete` and `halt_RE_complete`,
+   via `RE.Hard HALT` then `HALT ≤ᶠᵒ[≤] PCP`. The item that used to head this
+   line – the instance-as-a-program reduction `P ≤ᶠᵒ[≤] CODEHALT` – is done
+   too; what both taught is recorded in §8 and generalizes: when an evaluator
+   is the stated blocker, look for a target whose programs already exist
+   rather than pay for the evaluator.
 3. **The fixpoint logics, as textbook faithfulness**: FO(PFP) (§3) and
    Immerman–Vardi (§4), both [L]. Neither unblocks anything else and neither
    buys a class the library lacks – SO(TC) already captures PSPACE – so what

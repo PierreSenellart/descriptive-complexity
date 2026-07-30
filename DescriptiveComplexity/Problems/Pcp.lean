@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Pcp.Defs
 import DescriptiveComplexity.Problems.Pcp.Membership
+import DescriptiveComplexity.Problems.Pcp.Hardness
 
 /-!
 # PCP: Post's correspondence problem
@@ -15,7 +16,7 @@ the yes-instances are those with a **match**: a nonempty sequence of marked
 dominoes whose top words and whose bottom words have the same concatenation
 (`DescriptiveComplexity.PCP`, in `DescriptiveComplexity.Problems.Pcp.Defs`).
 
-What is proved is the membership half:
+What is proved:
 
 * `DescriptiveComplexity.pcp_mem_RE` – the match is *invented*, as a segment of
   slots carrying one domino each, together with a **matching between the two
@@ -23,7 +24,13 @@ What is proved is the membership half:
   (`DescriptiveComplexity.Problems.Pcp.Cert` for the mathematics,
   `DescriptiveComplexity.Problems.Pcp.Membership` for the syntax);
 * `DescriptiveComplexity.pcp_le_finsat` – whence Post's problem reduces to
-  finite satisfiability, `DescriptiveComplexity.FINSAT` being RE-hard.
+  finite satisfiability, `DescriptiveComplexity.FINSAT` being RE-hard;
+* `DescriptiveComplexity.halt_ordered_fo_reduction_pcp` – RE-*hardness*, the
+  computation-history dominoes for the machine drawn in the instance
+  (`DescriptiveComplexity.Problems.Pcp.Hardness`); whence
+  `DescriptiveComplexity.pcp_RE_complete` and the undecidability of Post's
+  problem, `DescriptiveComplexity.pcp_not_computable`
+  (`DescriptiveComplexity.Computability.PcpComplete`).
 
 The common word is never written down. Its letters are indexed, on the top
 side, by the pairs (slot, position of the top word sitting there) in
@@ -35,10 +42,10 @@ two orders, and preserves letters. That is enough
 the members of two strictly sorted lists with those properties pairs their
 entries index by index.
 
-RE-*hardness* of `PCP` is **not** proved, and is not a catalog-sized item: `PCP`
-is not the syntactic image of any logic – a certificate of `∃SO[new]` is a
-structure with relations, a certificate of `PCP` is a string with two parses –
-and a `PCP` instance is really a *program*, the nondeterministic queue machine
-whose configuration is the unmatched overhang. That is the RE machine bridge,
-recorded in `ROADMAP.md` (§8).
+RE-*hardness* could not be a translation of the logic: `PCP` is not the
+syntactic image of any logic – a certificate of `∃SO[new]` is a structure with
+relations, a certificate of `PCP` is a string with two parses – so the
+reduction is the classical computation-history construction, one decorated
+domino per transition-attribute tuple of the machine the `HALT` instance
+carries as elements.
 -/

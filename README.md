@@ -76,13 +76,15 @@ for its class: both a member and hard for it under FO reductions. Karp's
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` (universal-first, `k` blocks) · acceptance by such a machine |
 | **PH** | SO | — | — |
 | **PSPACE** | SO(TC) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
-| **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT |
+| **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 
 The characterizations are the logical *definitions* of the classes (see the
 Overview above). Each entry of the machine column is an equivalence *proved
 here* between the logical definition and acceptance by that model.
-The classes are also matched against Mathlib's computability layer,
-which shows RE-hard problems undecidable and separates RE from co-RE.
+The classes are also matched against Mathlib's computability layer: RE *is*
+recursive enumerability – a problem is ∃SO[new]-definable exactly when its
+concrete instances are semi-decidable – every RE-hard problem is
+undecidable, and RE ≠ co-RE.
 
 ## Scope and limitations
 

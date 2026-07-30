@@ -55,13 +55,15 @@ whose top words and bottom words have the same concatenation.
 
 RE is the logically defined class of
 `DescriptiveComplexity.RecursivelyEnumerable` (definability in `∃SO[new]`), so
-membership of PCP in it is a statement about that logic; it becomes
-*undecidability* of Post's problem only through the machine bridge recorded in
-`ROADMAP.md` (§8), which also records why RE-*hardness* of PCP is not a
-catalog-sized item: unlike `DescriptiveComplexity.FINSAT`, PCP is not the
-syntactic image of a logic, and a PCP instance is really a program – a
-nondeterministic queue machine whose configuration is the unmatched overhang –
-so hardness is the RE machine bridge.
+membership of PCP in it is a statement about that logic. RE-*hardness* is the
+computation-history dominoes from the halting problem
+(`DescriptiveComplexity.halt_ordered_fo_reduction_pcp`, in
+`DescriptiveComplexity.Problems.Pcp.Hardness`) – a machine construction of
+necessity, since unlike `DescriptiveComplexity.FINSAT`, PCP is not the
+syntactic image of any logic. Together the two halves make PCP RE-complete
+and Post's problem undecidable (`DescriptiveComplexity.pcp_RE_complete`,
+`DescriptiveComplexity.pcp_not_computable`, in
+`DescriptiveComplexity.Computability.PcpComplete`).
 -/
 
 /- The language of encoded domino lists lives in Mathlib's

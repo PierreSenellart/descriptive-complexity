@@ -34,12 +34,13 @@ the half that pays: FINSAT is already RE-hard
 (`DescriptiveComplexity.finsat_hard_of_sigmaSONewDefinable`), so a proof that
 the halting problem is `∃SO[new]`-definable yields a first-order reduction from
 it to finite satisfiability with no further work – Trakhtenbrot's theorem in the
-form it is usually stated. RE-*hardness* of `HALT`, which is the converse half
-and would give “RE is the class of semi-decidable problems”, is a separate and
-far larger item; see `ROADMAP.md` (§7, §8).
-
-Neither statement says *undecidable*. That reading needs the bridge to Mathlib's
-computability layer, recorded in `ROADMAP.md` (§8).
+form it is usually stated. RE-*hardness* of `HALT`, the converse half, is the
+machine bridge itself (`DescriptiveComplexity.halt_RE_hard`, in
+`DescriptiveComplexity.Problems.Machine.HaltHard`): with membership it makes
+the halting problem RE-complete (`DescriptiveComplexity.halt_RE_complete`) and
+undecidable (`DescriptiveComplexity.halt_not_computable`), stating “RE is the
+class of semi-decidable problems” at the machine model as
+`DescriptiveComplexity.mem_RE_iff_rePred` states it at the code model.
 -/
 
 namespace DescriptiveComplexity
