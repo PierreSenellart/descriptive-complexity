@@ -52,7 +52,10 @@ And `DescriptiveComplexity.ntmAccept_reduces_to_sat` is the *textbook form* of t
 Cook–Levin theorem – machine acceptance reduces to satisfiability – obtained
 from the machine-free Tseitin discharge with no tableau-to-CNF encoding: the
 membership proof already wrote the run as a `Σ₁` formula, and the generic
-reduction to SAT applies to it like to any other.
+reduction to SAT applies to it like to any other. Conjoined with the hardness
+direction, this gives `DescriptiveComplexity.ntmAccept_interreducible_sat` –
+machine acceptance and satisfiability reduce to each other – the most faithful
+representation of the Cook–Levin theorem this library offers.
 
 As with any complexity-theoretic statement, these results are about finite
 structures only
@@ -93,10 +96,11 @@ acceptance feeds the machine-free Tseitin discharge. -/
 theorem ntmAccept_reduces_to_sat : Nonempty (NTMAccept ≤ᶠᵒ[≤] SAT) :=
   sat_hard_of_sigmaSODefinable NTMAccept ntmAccept_sigmaSODefinable
 
-/-- **Machine acceptance and satisfiability are interreducible.** Both
-directions of the Cook–Levin correspondence in one statement: acceptance
-reduces to `DescriptiveComplexity.SAT` through the `Σ₁` definition of a run,
-and `DescriptiveComplexity.SAT` reduces back by building the machine `M_φ`
+/-- **Machine acceptance and satisfiability are interreducible** – the most
+faithful representation of the Cook–Levin theorem in this library, both
+directions of the correspondence in one statement: acceptance reduces to
+`DescriptiveComplexity.SAT` through the `Σ₁` definition of a run, and
+`DescriptiveComplexity.SAT` reduces back by building the machine `M_φ`
 inside the instance. -/
 theorem ntmAccept_interreducible_sat :
     Nonempty (NTMAccept ≤ᶠᵒ[≤] SAT) ∧ Nonempty (SAT ≤ᶠᵒ[≤] NTMAccept) :=
