@@ -48,7 +48,9 @@ pin_docgen()     { grep -oP '(?<=^rev = ")[^"]+' docbuild/lakefile.toml; }
 pin_readme_row() { sed -n '/^| --- | --- | --- |$/{n;s/^| `[^`]*` | `\([^`]*\)`.*/\1/p;q;}' README.md; }
 # The concept DOI: minted once, then the same for every later version.
 doi_citation()   { grep -oP '(?<=value: ")10\.5281/zenodo\.[0-9]+' CITATION.cff | head -1; }
-doi_readme()     { grep -oP '(?<=zenodo\.org/badge/DOI/)10\.5281/zenodo\.[0-9]+' README.md | head -1; }
+# Read the badge's *link target*, not its image URL: the image is a styling
+# choice (zenodo.org/badge vs shields.io), the doi.org link is what must be right.
+doi_readme()     { grep -oP '(?<=doi\.org/)10\.5281/zenodo\.[0-9]+' README.md | head -1; }
 # shields.io escapes a literal hyphen as `--`, so undo that before comparing.
 pin_readme_badge() { grep -oP '(?<=/badge/Mathlib-)[^-][^)]*?(?=-blue\))' README.md | sed 's/--/-/g'; }
 
