@@ -44,7 +44,16 @@ open Language
 `Mem`bership predicate) together with a `Hard`ness predicate, closed under
 (ordered) first-order reductions. Both predicates are left completely
 abstract; the closure requirements are sound for every class containing
-LOGSPACE, since (ordered) FO reductions are computable in AC⁰. -/
+LOGSPACE, since (ordered) FO reductions are computable in AC⁰.
+
+Hardness is a field of its own rather than a function of `Mem`: the naive
+“every member reduces to `P`” cannot even be stated here, since a reduction
+has a *relational* target while `Hard` ranges over arbitrary vocabularies. The
+classes of this library take it to be cofinal hardness for their own members
+and are built by `DescriptiveComplexity.ComplexityClass.ofMem`, which supplies both
+that reading of `Hard` and the three closure proofs it needs; keeping the field
+abstract leaves room for the two that read hardness differently
+(`DescriptiveComplexity.ComplexityClass.empty`, `DescriptiveComplexity.PH`). -/
 structure ComplexityClass where
   /-- The problems belonging to the class. Use the notation `P ∈ 𝒞`. -/
   Mem : ∀ {L : Language.{0, 0}}, DecisionProblem L → Prop

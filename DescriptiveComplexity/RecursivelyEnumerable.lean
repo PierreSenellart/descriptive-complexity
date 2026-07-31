@@ -66,18 +66,11 @@ It is a `DescriptiveComplexity.ComplexityClass` by the two closure theorems of
 `DescriptiveComplexity.SecondOrderNewPull` and
 `DescriptiveComplexity.SecondOrderNewOrdered`; hardness is *cofinal*, as
 everywhere in this development (see `DescriptiveComplexity.hard_RE_iff`). -/
-noncomputable def RE : ComplexityClass where
-  Mem P := SigmaSONewDefinable P
-  Hard P := CofinalHard (fun Q => SigmaSONewDefinable Q) P
-  mem_of_foReduction f h := h.of_foReduction f
-  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
-  mem_of_orderedReduction f h := h.of_orderedReduction f
-  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
-  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
-  mem_congr_finite h := sigmaSONewDefinable_congr h
-  hard_congr_finite h :=
-    ⟨fun hP => CofinalHard.congr h hP,
-      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+noncomputable def RE : ComplexityClass :=
+  .ofMem (fun P => SigmaSONewDefinable P)
+    (fun f h => h.of_foReduction f)
+    (fun f h => h.of_orderedReduction f)
+    (fun h => sigmaSONewDefinable_congr h)
 
 /-- **co-RE**: the problems whose complement is recursively enumerable. Unlike
 `coNP`, which the second-order quantifier duality identifies with `Π₁`

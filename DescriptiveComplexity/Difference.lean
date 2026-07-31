@@ -348,18 +348,11 @@ end Merge
 1984][papadimitriou1984complexity]): the conjunctions of an NP condition and a
 coNP one. Hardness is stated cofinally, as for the other classes of this
 library (`DescriptiveComplexity.CofinalHard`). -/
-noncomputable def DP : ComplexityClass where
-  Mem P := DPDefinable P
-  Hard P := CofinalHard (fun Q => DPDefinable Q) P
-  mem_of_foReduction f h := h.of_foReduction f
-  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
-  mem_of_orderedReduction f h := h.of_orderedReduction f
-  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
-  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
-  mem_congr_finite h := dpDefinable_congr h
-  hard_congr_finite h :=
-    ⟨fun hP => CofinalHard.congr h hP,
-      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+noncomputable def DP : ComplexityClass :=
+  .ofMem (fun P => DPDefinable P)
+    (fun f h => h.of_foReduction f)
+    (fun f h => h.of_orderedReduction f)
+    (fun h => dpDefinable_congr h)
 
 /-- Membership in DP is exactly DP definability, by definition. -/
 theorem mem_DP_iff (P : DecisionProblem L) : P ∈ DP ↔ DPDefinable P :=

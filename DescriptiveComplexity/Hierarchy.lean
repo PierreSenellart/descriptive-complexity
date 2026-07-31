@@ -173,23 +173,51 @@ theorem cofinalHard_iff [L.IsRelational]
   · intro h L' _ S hS L'' Q hQ
     exact ⟨(h Q hQ).some.trans hS.some⟩
 
+/-! ### Classes defined by their members -/
+
+/-- The complexity class with a given membership predicate, hardness being
+cofinal hardness for it (`DescriptiveComplexity.CofinalHard`) – the shape of every
+logically-defined class of this library. Only the three *membership*
+obligations have to be supplied: the hardness half of the closure requirements
+is discharged uniformly, by `DescriptiveComplexity.CofinalHard.of_foReduction` and
+its siblings.
+
+A class whose hardness is not cofinal hardness for its own members is built by
+hand instead: `DescriptiveComplexity.ComplexityClass.empty`, where hardness is
+outright trivial, and `DescriptiveComplexity.PH`, whose hardness is stated level by
+level (an equivalent statement, since membership is the union of the levels,
+but not a definitional one). -/
+def ComplexityClass.ofMem
+    (Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop)
+    (mem_of_foReduction : ∀ {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+      {P : DecisionProblem L₁} {Q : DecisionProblem L₂}, (P ≤ᶠᵒ Q) → Mem Q → Mem P)
+    (mem_of_orderedReduction : ∀ {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+      {P : DecisionProblem L₁} {Q : DecisionProblem L₂}, (P ≤ᶠᵒ[≤] Q) → Mem Q → Mem P)
+    (mem_congr_finite : ∀ {L₁ : Language.{0, 0}} {P Q : DecisionProblem L₁},
+      (∀ (A : Type) [L₁.Structure A] [Finite A], P A ↔ Q A) → (Mem P ↔ Mem Q)) :
+    ComplexityClass where
+  Mem P := Mem P
+  Hard P := CofinalHard Mem P
+  mem_of_foReduction f h := mem_of_foReduction f h
+  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
+  mem_of_orderedReduction f h := mem_of_orderedReduction f h
+  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
+  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
+  mem_congr_finite h := mem_congr_finite h
+  hard_congr_finite h :=
+    ⟨fun hP => CofinalHard.congr h hP,
+      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+
 /-! ### The complement of a class -/
 
 /-- The *complement* of a complexity class: the problems whose complement
 belongs to it – the “co-” operator. Closure under reductions is inherited,
 since a reduction complements (`DescriptiveComplexity.FOReduction.compl`). -/
-noncomputable def ComplexityClass.compl (C : ComplexityClass) : ComplexityClass where
-  Mem P := C.Mem Pᶜ
-  Hard P := CofinalHard (fun Q => C.Mem Qᶜ) P
-  mem_of_foReduction f h := C.mem_of_foReduction f.compl h
-  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
-  mem_of_orderedReduction f h := C.mem_of_orderedReduction f.compl h
-  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
-  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
-  mem_congr_finite h := C.mem_congr_finite fun A _ _ => not_congr (h A)
-  hard_congr_finite h :=
-    ⟨fun hP => CofinalHard.congr h hP,
-      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+noncomputable def ComplexityClass.compl (C : ComplexityClass) : ComplexityClass :=
+  .ofMem (fun P => C.Mem Pᶜ)
+    (fun f h => C.mem_of_foReduction f.compl h)
+    (fun f h => C.mem_of_orderedReduction f.compl h)
+    (fun h => C.mem_congr_finite fun A _ _ => not_congr (h A))
 
 @[simp]
 theorem ComplexityClass.mem_compl (C : ComplexityClass) {L : Language.{0, 0}}
@@ -200,33 +228,19 @@ theorem ComplexityClass.mem_compl (C : ComplexityClass) {L : Language.{0, 0}}
 
 /-- The class `Σₖ₊₁ᵖ`, defined by second-order definability with `k + 1`
 alternating blocks starting existentially. -/
-noncomputable def sigmaLevel (k : ℕ) : ComplexityClass where
-  Mem P := SigmaSODefinable (k + 1) P
-  Hard P := CofinalHard (fun Q => SigmaSODefinable (k + 1) Q) P
-  mem_of_foReduction f h := h.of_foReduction f
-  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
-  mem_of_orderedReduction f h := h.of_orderedReduction f
-  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
-  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
-  mem_congr_finite h := sigmaSODefinable_congr h _
-  hard_congr_finite h :=
-    ⟨fun hP => CofinalHard.congr h hP,
-      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+noncomputable def sigmaLevel (k : ℕ) : ComplexityClass :=
+  .ofMem (fun P => SigmaSODefinable (k + 1) P)
+    (fun f h => h.of_foReduction f)
+    (fun f h => h.of_orderedReduction f)
+    (fun h => sigmaSODefinable_congr h _)
 
 /-- The class `Πₖ₊₁ᵖ`, defined by second-order definability with `k + 1`
 alternating blocks starting universally. -/
-noncomputable def piLevel (k : ℕ) : ComplexityClass where
-  Mem P := PiSODefinable (k + 1) P
-  Hard P := CofinalHard (fun Q => PiSODefinable (k + 1) Q) P
-  mem_of_foReduction f h := h.of_foReduction f
-  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
-  mem_of_orderedReduction f h := h.of_orderedReduction f
-  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
-  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
-  mem_congr_finite h := piSODefinable_congr h _
-  hard_congr_finite h :=
-    ⟨fun hP => CofinalHard.congr h hP,
-      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+noncomputable def piLevel (k : ℕ) : ComplexityClass :=
+  .ofMem (fun P => PiSODefinable (k + 1) P)
+    (fun f h => h.of_foReduction f)
+    (fun f h => h.of_orderedReduction f)
+    (fun h => piSODefinable_congr h _)
 
 /-! ### Polynomial time, by the Horn fragment -/
 
@@ -242,18 +256,11 @@ This is level 0 of the hierarchy below (`DescriptiveComplexity.SigmaP`,
 (`DescriptiveComplexity.HORNSAT_PTIME_complete`). That the class is closed under
 complement – `PiP 0 = SigmaP 0` – is `DescriptiveComplexity.piP_zero_eq`, through the
 equivalence with FO(LFP). -/
-noncomputable def PTIME : ComplexityClass where
-  Mem P := SigmaSOHornDefinable P
-  Hard P := CofinalHard (fun Q => SigmaSOHornDefinable Q) P
-  mem_of_foReduction f h := h.of_foReduction f
-  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
-  mem_of_orderedReduction f h := h.of_orderedReduction f
-  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
-  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
-  mem_congr_finite h := sigmaSOHornDefinable_congr h
-  hard_congr_finite h :=
-    ⟨fun hP => CofinalHard.congr h hP,
-      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+noncomputable def PTIME : ComplexityClass :=
+  .ofMem (fun P => SigmaSOHornDefinable P)
+    (fun f h => h.of_foReduction f)
+    (fun f h => h.of_orderedReduction f)
+    (fun h => sigmaSOHornDefinable_congr h)
 
 /-! ### The hierarchy -/
 

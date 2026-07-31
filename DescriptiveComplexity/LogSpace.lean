@@ -61,18 +61,11 @@ space on ordered structures ([Grädel 1992][gradel1992capturing]).
 Hardness is stated cofinally, exactly as for the other classes of this library
 (`DescriptiveComplexity.CofinalHard`); over a relational vocabulary it is the usual
 notion, `DescriptiveComplexity.hard_NL_iff`. -/
-noncomputable def NL : ComplexityClass where
-  Mem P := SigmaSOKromDefinable P
-  Hard P := CofinalHard (fun Q => SigmaSOKromDefinable Q) P
-  mem_of_foReduction f h := h.of_foReduction f
-  hard_of_foReduction f hP := CofinalHard.of_foReduction f hP
-  mem_of_orderedReduction f h := h.of_orderedReduction f
-  hard_of_orderedReduction f hP := CofinalHard.of_orderedReduction f hP
-  hard_of_relOrderedReduction f hP := CofinalHard.of_relOrderedReduction f hP
-  mem_congr_finite h := sigmaSOKromDefinable_congr h
-  hard_congr_finite h :=
-    ⟨fun hP => CofinalHard.congr h hP,
-      fun hP' => CofinalHard.congr (fun A _ _ => (h A).symm) hP'⟩
+noncomputable def NL : ComplexityClass :=
+  .ofMem (fun P => SigmaSOKromDefinable P)
+    (fun f h => h.of_foReduction f)
+    (fun f h => h.of_orderedReduction f)
+    (fun h => sigmaSOKromDefinable_congr h)
 
 /-- Membership in NL is exactly SO-Krom definability, by definition. -/
 theorem mem_NL_iff (P : DecisionProblem L) : P ∈ NL ↔ SigmaSOKromDefinable P :=
