@@ -99,7 +99,10 @@ jobs:
         uses: leanprover/lean-action@v1
 
       # A PR opened with the default token does not itself trigger `ci.yml`,
-      # which is why the build above runs first. This step needs "Allow GitHub
+      # which is why the build above runs first. `metadata.yml`'s check is
+      # covered too: `release.sh prepare` ends by running `release.sh check`, and
+      # a disagreement there would already have failed the step above. This
+      # step needs "Allow GitHub
       # Actions to create and approve pull requests" under Settings → Actions →
       # General; it was turned on for this repository on 2026-07-30.
       - name: Open a PR when the build is green

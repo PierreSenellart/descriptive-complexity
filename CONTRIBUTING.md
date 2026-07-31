@@ -149,7 +149,9 @@ appears in neither is invisible.
 
 CI must pass: the `Build` job compiles the library, and the `Release metadata`
 job checks that the version and Mathlib pin agree across every file that
-records them.
+records them. Each runs only when the change can affect it – a documentation-only
+or prose-only pull request will show one of them, or neither, and that is not a
+sign that something failed to start.
 
 ## License
 

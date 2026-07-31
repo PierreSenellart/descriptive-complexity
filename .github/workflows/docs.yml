@@ -9,12 +9,33 @@ name: Documentation
 # `master` alone). Such a run rebuilt for eight minutes and then failed.
 #
 # The build is heavy – doc-gen4 covers the whole import closure, Mathlib
-# included, and the dependency figures run `dot` once per declaration – so two
+# included, and the dependency figures run `dot` once per declaration – so three
 # things keep the per-push cost down: the documentation database is carried
-# between runs (see the cache step), and a superseded build is cancelled.
+# between runs (see the cache step), a superseded build is cancelled, and the
+# `paths` below skip the pushes that cannot change a page.
+#
+# What the site is made of is the library sources (doc-gen4 reads the docstrings
+# and renders the source links from them) and the `docbuild/` project that
+# renders them – its `Makefile`, the doc-gen4 pin, and the bibliography. Nothing
+# else reaches a page: the landing page is `DescriptiveComplexity.lean`'s module
+# docstring, not `README.md`, and `scripts/`, `CITATION.cff` and the other prose
+# files are never read. Skipping such a push leaves the deployed site in place,
+# which is correct precisely because it would have rebuilt to the same bytes –
+# including the commit-pinned source links, which only move for modules whose
+# content changed. As in `ci.yml`, the list is written once (this workflow has a
+# single trigger with `paths`), and `workflow_dispatch` ignores it, so a forced
+# rebuild is always one click away.
 on:
   push:
     branches: [master]
+    paths:
+      - "DescriptiveComplexity.lean"
+      - "DescriptiveComplexity/**"
+      - "lakefile.lean"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+      - "docbuild/**"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 # Grant the GITHUB_TOKEN the permissions required to deploy to GitHub Pages.

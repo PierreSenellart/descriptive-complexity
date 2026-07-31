@@ -1,0 +1,70 @@
+name: Release metadata
+
+# The cheap half of CI: `release.sh check` (every place that records the library
+# version or the Mathlib pin agrees) and the CFF schema. Seconds, no Lean, so it
+# is split from `ci.yml` — that way a README-only or `scripts/`-only change runs
+# this alone, and a library-only change runs the Lean build alone.
+#
+# The `paths` are exactly what `release.sh check` reads, plus `scripts/` itself:
+#
+#   - `lakefile.lean`      the library version, and the Mathlib `require`
+#   - `lean-toolchain`     the reference pin the other three are checked against
+#   - `docbuild/lean-toolchain`, `docbuild/lakefile.toml`   pins 3 and 4
+#   - `CITATION.cff`       version, `date-released`, the DOI, and the schema
+#   - `README.md`          both `require` forms, the version/toolchain table row,
+#                          the Mathlib badge and the DOI badge — which is why a
+#                          README change is not quite "requires nothing"
+#   - `scripts/**`         the checker itself
+#
+# Prose that records none of these (`ROADMAP.md`, `CONTRIBUTING.md`, `LICENSE`)
+# triggers nothing at all. Adding a fifth pinned place to `release.sh` means
+# adding it here too. As in `ci.yml`, the list is written twice because GitHub
+# Actions does not expand YAML anchors, and `workflow_dispatch` ignores it.
+on:
+  push:
+    branches: [master]
+    paths:
+      - "CITATION.cff"
+      - "README.md"
+      - "lakefile.lean"
+      - "lean-toolchain"
+      - "docbuild/lean-toolchain"
+      - "docbuild/lakefile.toml"
+      - "scripts/**"
+      - ".github/workflows/metadata.yml"
+  pull_request:
+    paths:
+      - "CITATION.cff"
+      - "README.md"
+      - "lakefile.lean"
+      - "lean-toolchain"
+      - "docbuild/lean-toolchain"
+      - "docbuild/lakefile.toml"
+      - "scripts/**"
+      - ".github/workflows/metadata.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metadata-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  metadata:
+    name: Release metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The library version and the Mathlib pin are each recorded in several
+      # files; this catches the one that was forgotten.
+      - name: Check that every version and pin location agrees
+        run: bash ./scripts/release.sh check
+
+      - name: Validate CITATION.cff
+        uses: citation-file-format/cffconvert-github-action@2.0.0
+        with:
+          args: "--validate"

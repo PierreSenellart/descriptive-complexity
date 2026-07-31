@@ -1,9 +1,36 @@
 name: CI
 
+# The Lean build, and nothing else. What it consumes is the library sources and
+# the four files Lake reads to build them, so the `paths` below list exactly
+# those: a change confined to `docbuild/` (the documentation project), `scripts/`,
+# or prose (`README.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `LICENSE`) cannot change
+# what this builds, and skipping it saves a full Mathlib-closure build. The
+# metadata checks that *do* care about those files live in `metadata.yml`, which
+# is filtered on its own inputs; between the two, every push is covered.
+#
+# The two lists are identical and have to be written twice: GitHub Actions does
+# not expand YAML anchors. `workflow_dispatch` ignores `paths`, so a manual run
+# is always available. Note that a run skipped by a path filter is *not* reported
+# as a check at all, so if these ever become required status checks, the
+# `paths`/`paths-ignore` pair will have to be revisited.
 on:
   push:
     branches: [master]
+    paths:
+      - "DescriptiveComplexity.lean"
+      - "DescriptiveComplexity/**"
+      - "lakefile.lean"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+      - ".github/workflows/ci.yml"
   pull_request:
+    paths:
+      - "DescriptiveComplexity.lean"
+      - "DescriptiveComplexity/**"
+      - "lakefile.lean"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 # Nothing here writes to the repository; the docs and update workflows ask for
@@ -31,20 +58,3 @@ jobs:
       # lint targets it can auto-detect.
       - name: Build, test and lint
         uses: leanprover/lean-action@v1
-
-  metadata:
-    name: Release metadata
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      # The library version and the Mathlib pin are each recorded in several
-      # files; this catches the one that was forgotten.
-      - name: Check that every version and pin location agrees
-        run: bash ./scripts/release.sh check
-
-      - name: Validate CITATION.cff
-        uses: citation-file-format/cffconvert-github-action@2.0.0
-        with:
-          args: "--validate"
