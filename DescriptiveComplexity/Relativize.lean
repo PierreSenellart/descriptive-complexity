@@ -64,6 +64,17 @@ def relativizeTo (R : L.Relations 1) :
   | _, .imp φ ψ => .imp (relativizeTo R φ) (relativizeTo R ψ)
   | n, .all φ => .all ((lastGuard R n).imp (relativizeTo R φ))
 
+/-- Guards are inserted at quantifiers only, so relativization is the identity
+on a quantifier-free formula. Not a `simp` lemma: `simp` has no way to
+discharge the `IsQF` side condition on its own, so it would only ever fire when
+passed the hypothesis explicitly. -/
+theorem relativizeTo_of_isQF {R : L.Relations 1} {n : ℕ} {φ : L.BoundedFormula α n}
+    (h : φ.IsQF) : relativizeTo R φ = φ := by
+  induction h with
+  | falsum => rfl
+  | of_isAtomic h => cases h <;> rfl
+  | imp _ _ ih₁ ih₂ => rw [relativizeTo, ih₁, ih₂]
+
 variable {M : Type} [L.Structure M] {R : L.Relations 1}
 
 theorem realize_lastGuard {n : ℕ} (v : α → M) (xs : Fin (n + 1) → M) :
