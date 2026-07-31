@@ -21,8 +21,8 @@ and descriptive complexity themselves**. All declarations live in the
 Complexity theory is essentially absent from Lean/Mathlib because formalizing
 a model of computation with resource bounds is hard. But most classical
 NP-hardness reductions do not need the full power of PTIME: they are
-*first-order expressible*. An FO reduction is computable in AC⁰ ⊆ LOGSPACE ⊆
-PTIME, so exhibiting one is strictly stronger than exhibiting a Karp
+*first-order expressible*. Classically, an FO reduction is computable in
+AC⁰ ⊆ LOGSPACE ⊆ PTIME, so exhibiting one is strictly stronger than exhibiting a Karp
 reduction, while requiring no machine model at all: only first-order logic,
 which Mathlib already has.
 
@@ -103,9 +103,13 @@ below.
   problem is modeled by choosing a vocabulary and encoding its inputs as
   finite structures and yes-instance sets must be isomorphism-invariant.
   Reasoning is about **finite** structures only; nothing is claimed about
-  infinite ones. The identification with the textbook *string*-based
-  classes rests on the machine-bridge theorems plus the fact that FO
-  reductions are AC⁰-computable.
+  infinite ones. The classes here are *defined* logically, and the machine
+  bridges characterize them from inside the framework, by acceptance problems
+  whose instances carry the machine. Their agreement with the usual
+  presentations over string encodings is classical (Fagin; Immerman–Vardi) and
+  is not formalized here – that would need FO evaluation compiled to a
+  step-counted machine, for reductions and definability witnesses alike.
+  `ROADMAP.md` §4 and §7 record what it would take.
 * **Hardness is an FO reduction; membership is a logical definition.** You show
   hardness by exhibiting a first-order (or order-invariant FO) reduction, and
   membership by a definability witness (∃SO for NP, SO-Horn / FO(LFP) for

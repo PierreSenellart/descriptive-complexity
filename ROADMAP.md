@@ -139,7 +139,11 @@ remains below are ordinary catalog reductions and machine bridges.
   cost. The `FO ⊆ AC⁰` half turns the library's currently *by-inspection* claim
   that FO reductions are AC⁰-computable — the structures-vs-strings bridge of §7
   and of the README's *Scope and limitations* — into a theorem; and a formal
-  AC⁰ is the prerequisite for the PARITY ∉ AC⁰ lower bound of §5. The converse
+  AC⁰ is the prerequisite for the PARITY ∉ AC⁰ lower bound of §5. Note that it
+  closes only the *reduction* half of that bridge: the membership half, that a
+  definability witness is evaluated within its class's bound, needs the same FO
+  evaluator at a coarser resource accounting, so neither half is worth building
+  alone. The converse
   `AC⁰ ⊆ FO(≤, BIT)`, simulating a uniform circuit family by an FO(≤, BIT)
   sentence, is the harder half. Depends on the BIT layer of §3; cf. the
   circuit-family-bridge remark in §7.
@@ -404,10 +408,27 @@ class-defining logic assumed to exist (§3 work).
 needs the converse compilation — that an FO interpretation or a `Σ₁` kernel is
 *evaluated* by a polynomial-time machine: a verified compiler with a step
 count, plus string encodings of structures [R]. Nothing in the bridge claims
-it; the residual gap (FO reductions are AC⁰-computable, by inspection) is
-documented in the README. Instances carry their own transition table, so
-reduction-built machines have polynomially many states — standard for an
-acceptance problem; the constant-alphabet simulation is never needed.
+it; the residual gap – two classical facts taken by inspection: that FO
+reductions are AC⁰-computable, and that a definability witness is evaluated
+within its class's bound – is documented in the README. Instances carry their
+own transition table, so reduction-built machines have polynomially many
+states — standard for an acceptance problem; the constant-alphabet simulation
+is never needed.
+
+**And it is an interface obligation, not a soundness debt.** The classes here
+are defined logically and the bridges characterize them from inside the
+framework, so the string presentations are never the referent (the
+classes-are-logic principle, below). Nor is the structural presentation the
+weaker of the two. Fagin needs no order, so `NP = ∃SO` agrees with the string
+class tax-free; the order tax bites only at P and below, exactly where the
+library already works over ordered structures; and isomorphism-invariance,
+which a string presentation must prove for every encoding it picks, holds here
+by construction. The one place a structural presentation can state something
+false is the *size measure*, and that is already discharged in both directions
+by `Encoding.lean`. What the string layer would buy is legibility to a reader
+arriving with the textbook definition, plus the inherited robustness of a model
+whose invariance results have been accumulating for decades – worth having,
+worth not confusing with a hole in the foundations.
 
 A further application of the same machinery, once step-counted machines can
 run over string encodings: bounding the *encoders and decoders* of the
@@ -839,8 +860,8 @@ blocked.
   neither buys a new statement.
 - The BIT / FO(≤, BIT) / AC⁰ / PARITY chain: a multi-year project with three
   [R] items and a switching lemma at the end, to be decided as a whole rather
-  than drifted into via built-in arithmetic. Until then the by-inspection AC⁰
-  claim in the README stays an honest, documented gap.
+  than drifted into via built-in arithmetic. Until then the two by-inspection
+  claims in the README stay an honest, documented gap.
 - Abiteboul–Vianu and the exponential classes.
 
 This weighting assumes the goal is research output and formalization firsts. If

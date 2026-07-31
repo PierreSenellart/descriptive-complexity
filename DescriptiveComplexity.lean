@@ -82,8 +82,8 @@ hierarchy, in the style of Immerman's *Descriptive Complexity*
 Complexity theory is largely absent from Mathlib because formalizing a model
 of computation with resource bounds is hard. The observation this library
 rests on is that many classical NP-hardness reductions do not need the full
-strength of a Turing machine: they are *first-order expressible*. An FO
-reduction is computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so exhibiting one is
+strength of a Turing machine: they are *first-order expressible*. Classically,
+an FO reduction is computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so exhibiting one is
 strictly stronger than exhibiting a Karp reduction
 ([Karp 1972][karp1972reducibility]), while needing no machine model at all –
 only first-order logic, which Mathlib already provides.
