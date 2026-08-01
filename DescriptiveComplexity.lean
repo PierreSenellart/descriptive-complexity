@@ -53,6 +53,7 @@ import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
+import DescriptiveComplexity.SecondOrderTransitiveClosureFree
 import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.PSpaceHierarchy
 import DescriptiveComplexity.Relationalize
@@ -507,6 +508,23 @@ individual declarations are documented on their own pages.
   `PSPACE = coPSPACE`, since the complement of a walk is not a walk, and
   `PH ⊆ PSPACE`, since a `Σₖ` sentence is not a walk either – and both are proved
   downstream, in the two files below.
+* `DescriptiveComplexity.SecondOrderTransitiveClosureFree` – **SO(TC) needs no
+  order** (`DescriptiveComplexity.sotcDefinable_iff_free`,
+  `DescriptiveComplexity.mem_PSPACE_iff_sotcDefinableFree`). Unlike the clausal
+  fragments and the reachability logics, this one can *guess* its order, for the
+  reason Fagin's theorem can: a state of the walk is an assignment of relation
+  variables, so one more binary variable holds a candidate order, the source
+  condition checks that it is linear (`DescriptiveComplexity.linearGuard`,
+  shared with the order elimination of
+  `DescriptiveComplexity.SecondOrderOrdered`), every step freezes it, and the
+  three sentences read it in place of the order symbol. The order is then a
+  component of the certificate and nothing outside the specification sees it, so
+  `DescriptiveComplexity.SOTCDefinableFree` – definability by a
+  `DescriptiveComplexity.SOTCSpecFree`, stated on structures carrying **no
+  order at all** – defines the same class. A deterministic fragment cannot do
+  this, which is why `DescriptiveComplexity.PTIME`,
+  `DescriptiveComplexity.NL` and `DescriptiveComplexity.LOGSPACE` keep the
+  hypothesis.
 * `DescriptiveComplexity.PSpaceCompl` – **`PSPACE = coPSPACE`**
   (`DescriptiveComplexity.PSPACE_eq_coPSPACE`), the first of those two, proved
   downstream once QSAT is available: every SO(TC) definable problem reduces to
@@ -720,9 +738,9 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Machine model | Problems proved complete |
 | --- | --- | --- | --- |
-| `LOGSPACE` (`L`) | FO(DTC): first-order logic with a deterministic transitive closure | deterministic two-way `k`-head automaton † | REACHd · UNREACHd |
-| `NL` | SO-Krom: ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(TC), first-order logic with a transitive closure | two-way `k`-head automaton † | REACH · UNREACH · 2SAT |
-| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn: ∃SO with a Horn kernel; equivalently FO(LFP), first-order logic with a least fixed point | deterministic polynomial-time Turing machine | HORN-SAT |
+| `LOGSPACE` (`L`) | FO(≤, DTC): first-order logic with a deterministic transitive closure, over a linearly ordered universe | deterministic two-way `k`-head automaton, walking a linear order of the universe † | REACHd · UNREACHd |
+| `NL` | SO-Krom(≤): ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(≤, TC), first-order logic with a transitive closure – both over a linearly ordered universe | two-way `k`-head automaton, walking a linear order of the universe † | REACH · UNREACH · 2SAT |
+| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn(≤): ∃SO with a Horn kernel; equivalently FO(≤, LFP), first-order logic with a least fixed point – both over a linearly ordered universe | deterministic polynomial-time Turing machine | HORN-SAT |
 | `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | nondeterministic polynomial-time Turing machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) · `ATMAccept 1 false` |
 | `DP` | a `Σ₁` and a `Π₁` sentence conjoined | — | SAT-UNSAT |

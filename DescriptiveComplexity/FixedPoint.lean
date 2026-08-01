@@ -526,7 +526,10 @@ theorem LFPDef.holds_iff_of_certificate {L : Language.{0, 0}} (d : LFPDef L) {A 
 /-- A decision problem is *FO(LFP) definable* if, on nonempty finite ordered
 structures, it is the value of a definition in FO(LFP). As for
 `DescriptiveComplexity.SigmaSOHornDefinable`, the equivalence is required for every
-linear order, so the notion is order-invariant. -/
+linear order, so the notion is order-invariant – and, as there, the order is
+genuinely needed: it is the setting of the capture theorem, and no guess
+replaces it the way one does for SO(TC)
+(`DescriptiveComplexity.sotcDefinable_iff_free`). -/
 def LFPDefinable {L : Language.{0, 0}} (P : DecisionProblem L) : Prop :=
   ∃ d : LFPDef L, ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
     P A ↔ d.Holds A

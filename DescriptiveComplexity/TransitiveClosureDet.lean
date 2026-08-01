@@ -227,7 +227,9 @@ its starting nodes *along its determinization* exactly on the yes-instances.
 As for `DescriptiveComplexity.TCDefinable`, the equivalence is required for every
 linear order on the universe, so this is order-invariant FO(DTC) definability:
 the problem itself does not see the order, while the transition and endpoint
-formulas may. -/
+formulas may. The order cannot be guessed away here either
+(`DescriptiveComplexity.sotcDefinable_iff_free` is what SO(TC) can do and this
+logic cannot): a deterministic walk has nothing to guess with. -/
 def DTCDefinable (P : DecisionProblem L) : Prop :=
   ∃ spec : TCSpec L,
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

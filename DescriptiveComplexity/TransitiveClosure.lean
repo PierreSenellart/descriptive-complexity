@@ -192,7 +192,9 @@ tuples exactly on the yes-instances.
 As for `DescriptiveComplexity.SigmaSOHornDefinable`, the equivalence is required for
 *every* linear order on the universe, so this is order-invariant FO(TC)
 definability: the problem itself does not see the order, while the transition
-and endpoint formulas may. -/
+and endpoint formulas may. The order cannot be guessed away here – the logic has
+no second-order quantifier to guess with – unlike in SO(TC)
+(`DescriptiveComplexity.sotcDefinable_iff_free`). -/
 def TCDefinable (P : DecisionProblem L) : Prop :=
   ∃ spec : TCSpec L,
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

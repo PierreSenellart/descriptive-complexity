@@ -210,7 +210,11 @@ is required for *every* linear order on `A`, so this is order-invariant
 SO-Krom definability: the order is the setting of Grädel's capture theorem, and
 it is forced by closure under ordered first-order reductions
 (`DescriptiveComplexity.SigmaSOKromDefinable.of_orderedReduction`), which pull the
-lexicographic order of the interpreted universe back into the guards. -/
+lexicographic order of the interpreted universe back into the guards. Nor can
+the order be guessed away, as it is for the existential logics and – see
+`DescriptiveComplexity.sotcDefinable_iff_free` – for SO(TC): a Krom kernel
+cannot state that a guessed relation is transitive, that clause having three
+second-order literals. -/
 def SigmaSOKromDefinable (P : DecisionProblem L) : Prop :=
   ∃ (B : SOBlock) (k : ℕ) (prog : KromProgram (L.sum Language.order) B k),
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

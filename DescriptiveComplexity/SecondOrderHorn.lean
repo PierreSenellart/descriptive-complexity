@@ -164,7 +164,11 @@ convenience here – it is the setting of Grädel's capture theorem, it is what
 lets a Horn program traverse an unbounded conjunction along the order, and it
 is forced by closure under ordered first-order reductions
 (`DescriptiveComplexity.SigmaSOHornDefinable.of_orderedReduction`), which pull the
-lexicographic order of the interpreted universe back into the guards. -/
+lexicographic order of the interpreted universe back into the guards. Nor can
+the order be guessed away, as it is for the existential logics and – see
+`DescriptiveComplexity.sotcDefinable_iff_free` – for SO(TC): a Horn kernel
+cannot state that a guessed relation is total, two positive literals in one
+clause not being Horn. -/
 def SigmaSOHornDefinable (P : DecisionProblem L) : Prop :=
   ∃ (B : SOBlock) (k : ℕ) (prog : HornProgram (L.sum Language.order) B k),
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

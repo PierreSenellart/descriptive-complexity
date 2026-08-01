@@ -300,7 +300,11 @@ yes-instances.
 As for `DescriptiveComplexity.TCDefinable` and the clausal fragments, the
 equivalence is required for *every* linear order on the universe, so this is
 order-invariant SO(TC) definability: the problem itself does not see the order,
-while the three sentences may. -/
+while the three sentences may. Unlike those, however, SO(TC) does not *need* the
+order: a walk can guess it into its own state, so this notion coincides with the
+order-free `DescriptiveComplexity.SOTCDefinableFree`
+(`DescriptiveComplexity.sotcDefinable_iff_free`, in
+`DescriptiveComplexity.SecondOrderTransitiveClosureFree`). -/
 def SOTCDefinable (P : DecisionProblem L) : Prop :=
   ∃ spec : SOTCSpec L,
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
