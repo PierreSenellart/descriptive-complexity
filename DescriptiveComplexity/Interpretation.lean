@@ -182,7 +182,7 @@ structure FOInterpretation (Tag : Type) (dim : ℕ) where
 
 namespace FOInterpretation
 
-variable {L L'} {Tag : Type} {dim : ℕ}
+variable {L L' : Language.{0, 0}} {Tag : Type} {dim : ℕ}
 
 /-- The universe of the structure interpreted in `A`: tagged `dim`-tuples.
 
@@ -222,7 +222,7 @@ def IsQuantifierFree : Prop :=
 
 end FOInterpretation
 
-variable {L L'}
+variable {L L' : Language.{0, 0}}
 
 /-- A first-order reduction from the problem `P` (on `L`-structures) to the
 problem `Q` (on `L'`-structures): a first-order interpretation mapping
