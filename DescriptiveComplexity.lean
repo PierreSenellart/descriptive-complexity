@@ -46,14 +46,24 @@ import DescriptiveComplexity.HeadCapture
 import DescriptiveComplexity.WalkBudget
 import DescriptiveComplexity.HeadLex
 import DescriptiveComplexity.HeadCaptureDet
+import DescriptiveComplexity.Iterate
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.FixedPointHorn
+import DescriptiveComplexity.FixedPointStep
+import DescriptiveComplexity.SecondOrderBlockHom
+import DescriptiveComplexity.FixedPointInflationary
+import DescriptiveComplexity.FixedPointInflationaryLFP
+import DescriptiveComplexity.FixedPointPartial
 import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
 import DescriptiveComplexity.SecondOrderTransitiveClosureFree
+import DescriptiveComplexity.FixedPointPartialSpace
+import DescriptiveComplexity.FixedPointStepRel
+import DescriptiveComplexity.FixedPointPartialMachine
+import DescriptiveComplexity.AbiteboulVianuOrdered
 import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.PSpaceHierarchy
 import DescriptiveComplexity.Relationalize
@@ -228,6 +238,55 @@ individual declarations are documented on their own pages.
   (`DescriptiveComplexity.piP_zero_eq`), polynomial time closed under complement. The
   order-walking machinery shared with the HORN-SAT program lives in
   `DescriptiveComplexity.OrderWalk`.
+
+## The inflationary and partial fixed points
+
+* `DescriptiveComplexity.FixedPointStep` – **one iteration skeleton for
+  FO(IFP) and FO(PFP)** (`DescriptiveComplexity.StepDef`): a block of relation
+  variables, one unrestricted first-order step formula per variable, an output
+  sentence. The two logics differ only in what a step does with the previous
+  stage – accumulate into it or replace it – so the stages, their
+  stabilization on finite structures (through the orbit pigeonholes of
+  `DescriptiveComplexity.Iterate`, a file free of library concepts), their
+  transport along isomorphisms and their pullback through an interpretation
+  are all built once, on `DescriptiveComplexity.StepDef.next` alone.
+* `DescriptiveComplexity.SecondOrderBlockHom` – **morphisms of blocks**: an
+  arity-preserving map of relation variables induces a morphism of the
+  blocks' vocabularies, along which sentences transport
+  (`DescriptiveComplexity.SOBlock.realize_homSentence`) – the bookkeeping for
+  reading a formula written for one block inside a larger block containing a
+  copy of it, which the translations between the fixed-point logics need.
+* `DescriptiveComplexity.FixedPointInflationary` – **FO(IFP)**
+  ([Gurevich–Shelah 1986][gurevich1986fixed]; [Abiteboul–Vianu
+  1989][abiteboul1989fixpoint]): iterate inflationarily, read the output at
+  the limit. Ordered (`DescriptiveComplexity.IFPDefinable`) and order-free
+  (`DescriptiveComplexity.IFPDefinableFree`) definability are kept apart – for
+  the fixed-point logics, unlike for SO(TC), the two must differ or the
+  Abiteboul–Vianu theorem would be trivial. Closed under complement by
+  construction and under (ordered) reductions; FO(LFP) embeds by reading a
+  rule system as one simultaneous step
+  (`DescriptiveComplexity.LFPDefinable.ifpDefinable`), which needs no
+  positivity because inflation supplies the monotonicity.
+* `DescriptiveComplexity.FixedPointInflationaryLFP` – **FO(≤, IFP) = FO(LFP)**
+  (`DescriptiveComplexity.ifpDefinable_iff_lfpDefinable`), whence the capture
+  theorem **FO(≤, IFP) = PTIME**
+  (`DescriptiveComplexity.ifpDefinable_iff_mem_PTIME`): an inflationary
+  definition compiles back into FO(LFP) by walking the stages
+  (`DescriptiveComplexity.FixedPointHorn`'s stage apparatus) with a *dual*
+  positive evaluator deriving truth and falsity of the step formulas'
+  subformulas per stage – inflation is what makes the complement of a stage
+  advance positively, which is precisely why PFP admits no such translation
+  and goes to SO(TC) instead. The output sentence survives unchanged modulo
+  the block injection, which is why the target is FO(LFP) and not SO-Horn.
+* `DescriptiveComplexity.FixedPointPartial` – **FO(PFP)** ([Abiteboul–Vianu
+  1989][abiteboul1989fixpoint]): iterate by replacement, read the output at
+  the first stable stage – requiring convergence, a divergence convention
+  chosen deliberately and compared precisely with the textbook one
+  (`DescriptiveComplexity.StepDef.realize_pfpValue_iff`). FO(IFP) is contained
+  in it by disjoining each variable's own atom onto its step
+  (`DescriptiveComplexity.StepDef.inflate`) – the easy inclusion of
+  Abiteboul–Vianu, in both the ordered and the order-free form. The PSPACE
+  capture lives with the other PSPACE files, below.
 
 ## Nondeterministic logarithmic space, by the Krom fragment
 
@@ -525,6 +584,43 @@ individual declarations are documented on their own pages.
   this, which is why `DescriptiveComplexity.PTIME`,
   `DescriptiveComplexity.NL` and `DescriptiveComplexity.LOGSPACE` keep the
   hypothesis.
+* `DescriptiveComplexity.FixedPointPartialSpace` – **FO(≤, PFP) ⊆ PSPACE**
+  (`DescriptiveComplexity.PFPDefinable.sotcDefinable`): a partial fixed-point
+  iteration *is* a deterministic walk on the assignments of its own block, so
+  it translates into an `DescriptiveComplexity.SOTCSpec` verbatim – source the
+  empty assignment, step «the next copy is one application of the step
+  formulas», target «a stable stage satisfying the output». No divergence
+  detection is needed: under the convergence-requiring semantics a diverging
+  iteration simply reaches no target state.
+* `DescriptiveComplexity.FixedPointStepRel` – **membership closure under
+  relativized ordered reductions** `≤ʳᶠᵒ[≤]`, which no definability notion of
+  the library had needed before
+  (`DescriptiveComplexity.IFPDefinable.of_relOrderedReduction`,
+  `DescriptiveComplexity.PFPDefinable.of_relOrderedReduction`): the block is
+  pulled back onto the definable domain with the step formulas gated by the
+  domain formulas of their arguments, and the assignment transfer is a
+  *bijection* onto the in-domain assignments – which is what a deterministic
+  iteration needs where an existential block would settle for less. Required
+  because all the library's hardness travels along relativized reductions, and
+  the PSPACE capture below crosses one in the membership direction.
+* `DescriptiveComplexity.FixedPointPartialMachine` – **PSPACE ⊆ FO(≤, PFP)**,
+  completing the capture theorem **FO(≤, PFP) = PSPACE**
+  (`DescriptiveComplexity.pfpDefinable_iff_mem_PSPACE`,
+  [Abiteboul–Vianu 1989][abiteboul1989fixpoint]): a partial fixed point
+  iterates the PSPACE-complete deterministic machine problem – load the
+  initial configuration from the empty assignment, take the unique machine
+  step while one exists, stutter on accepting or stuck configurations so that
+  a halting run is exactly a converging iteration – and every PSPACE problem
+  pulls that definition back along its relativized reduction to the machine
+  problem.
+* `DescriptiveComplexity.AbiteboulVianuOrdered` – **Abiteboul–Vianu, the
+  ordered case**
+  (`DescriptiveComplexity.ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace`):
+  on ordered structures the inflationary and partial fixed-point logics agree
+  exactly when `PTIME = PSPACE` – a corollary of the two capture theorems,
+  and the honest milestone on the way to the unordered Abiteboul–Vianu
+  theorem (`ROADMAP.md` §4), whose remaining gap it makes exactly «the
+  unordered case».
 * `DescriptiveComplexity.PSpaceCompl` – **`PSPACE = coPSPACE`**
   (`DescriptiveComplexity.PSPACE_eq_coPSPACE`), the first of those two, proved
   downstream once QSAT is available: every SO(TC) definable problem reduces to

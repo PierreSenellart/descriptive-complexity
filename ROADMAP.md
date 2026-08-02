@@ -68,9 +68,6 @@ remains below are ordinary catalog reductions and machine bridges.
   monadic special case of `SecondOrderReplicate.lean` and should be folded into
   it – noticed while building the PH bridge, left alone because it touches a
   working file and bought that bridge nothing.
-- **FO(PFP)** [L, sharing infrastructure with LFP]: PSPACE on ordered
-  structures (DC ch. 9–10); SO(TC), which already captures the class, is the
-  cheaper route, so this is a textbook-faithfulness layer.
 - **BIT and FO(≤, BIT)** [L]: DC's standard setting – every instance ordered,
   BIT primitive, a tax on every reduction and so not the library's default;
   FO-definability of `+` and `×` from BIT, `FO(≤, BIT)` = uniform AC⁰ as the
@@ -123,9 +120,17 @@ remains below are ordinary catalog reductions and machine bridges.
 - **Immerman–Vardi** [L]: P = order-invariant FO(LFP); in this library's
   definitional style it is the pair (definition, HORN-SAT/CVP hardness
   discharge) rather than a machine-model equivalence.
-- **Abiteboul–Vianu** [R]: LFP = PFP on unordered structures iff P = PSPACE.
-  Deep; needs both fixpoint logics plus the stage-comparison machinery.
-  Long-range flagship.
+- **Abiteboul–Vianu** [L]: IFP = PFP on unordered structures iff P = PSPACE.
+  The whole *ordered* half has landed – FO(IFP) and FO(PFP) on one shared
+  iteration skeleton, both capture theorems (FO(≤, IFP) = PTIME through the
+  translation back into FO(LFP), FO(≤, PFP) = PSPACE through the machine
+  problem, with closure under *relativized* ordered reductions built on the
+  way), and the ordered corollary
+  (`ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace`). What remains is
+  exactly the unordered case: the `≡ᵏ`-invariant layer and the transfer
+  through the invariant structure (phases F–G of `ABITEBOUL-VIANU.md`). The
+  prerequisite is the *invariant* machinery, not stage comparison – that is
+  Gurevich–Shelah's tool, which phrasing the theorem with IFP avoids.
 - **Grädel's theorems** [M–L]: SO-Horn = P, SO-Krom = NL on ordered structures
   (see §3; the capture statements relative to the library's own class
   definitions).
@@ -822,10 +827,10 @@ blocked.
    too; what both taught is recorded in §8 and generalizes: when an evaluator
    is the stated blocker, look for a target whose programs already exist
    rather than pay for the evaluator.
-3. **The fixpoint logics, as textbook faithfulness**: FO(PFP) (§3) and
-   Immerman–Vardi (§4), both [L]. Neither unblocks anything else and neither
-   buys a class the library lacks – SO(TC) already captures PSPACE – so what
-   they add is DC's own vocabulary for classes held here under other names,
+3. **The fixpoint logics, as textbook faithfulness**: FO(PFP) is done –
+   FO(≤, PFP) = PSPACE, both directions – leaving Immerman–Vardi (§4) [L].
+   It unblocks nothing else and buys no class the library lacks, so what
+   it adds is DC's own vocabulary for classes held here under other names,
    which is the first thing a reader arriving from the textbook looks for.
    The two share the fixpoint infrastructure, and Immerman–Vardi's hardness
    discharge is step 1's CVP from HORN-SAT, so take that one first.

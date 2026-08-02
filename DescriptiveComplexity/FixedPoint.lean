@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import Mathlib.Order.Lattice.Nat
 import Mathlib.Data.Set.Card
+import DescriptiveComplexity.Iterate
 import DescriptiveComplexity.SecondOrderHorn
 import DescriptiveComplexity.SecondOrderHornPull
 import DescriptiveComplexity.Padding
@@ -254,10 +255,12 @@ theorem derives_step_of_depth {rules : List (HornClause Lg B k)} {q : BAtom B A}
 /-! #### Stabilization: the stages close within `Nat.card` many rounds
 
 On a finite structure the stages are an increasing chain of subsets of the
-finitely many atoms, so they stabilize by the time the atom count is reached –
-after that many rounds, `DescriptiveComplexity.derivesIn` *is* the least fixed point.
-This is what lets a stage indexed by a large enough tuple stand in for the
-fixed point itself in `DescriptiveComplexity.FixedPointHorn`. -/
+finitely many atoms, so they stabilize by the time the atom count is reached
+(`DescriptiveComplexity.exists_succ_eq_of_monotone_subset`, the one chain
+pigeonhole of the library, in `DescriptiveComplexity.Iterate`) – after that many
+rounds, `DescriptiveComplexity.derivesIn` *is* the least fixed point. This is
+what lets a stage indexed by a large enough tuple stand in for the fixed point
+itself in `DescriptiveComplexity.FixedPointHorn`. -/
 
 private theorem stepDerives_congr {rules : List (HornClause Lg B k)}
     {S S' : BAtom B A → Prop} (h : ∀ q, S q ↔ S' q) (q : BAtom B A) :
@@ -291,36 +294,10 @@ private theorem derivesIn_of_stab {rules : List (HornClause Lg B k)} {N : ℕ}
 private theorem exists_stab [Finite A] (rules : List (HornClause Lg B k)) :
     ∃ N ≤ Nat.card (BAtom B A),
       ∀ q : BAtom B A, derivesIn rules N q ↔ derivesIn rules (N + 1) q := by
-  by_contra hcon
-  push Not at hcon
-  have hgrow : ∀ N ≤ Nat.card (BAtom B A),
-      ∃ q : BAtom B A, derivesIn rules (N + 1) q ∧ ¬derivesIn rules N q := by
-    intro N hN
-    obtain ⟨q, hq⟩ := hcon N hN
-    rcases hq with ⟨h1, h2⟩ | ⟨h1, h2⟩
-    · exact absurd (derivesIn_succ h1) h2
-    · exact ⟨q, h2, h1⟩
-  have hcard : ∀ N ≤ Nat.card (BAtom B A) + 1,
-      N ≤ {q : BAtom B A | derivesIn rules N q}.ncard := by
-    intro N
-    induction N with
-    | zero => simp
-    | succ N ihN =>
-      intro hN
-      have hN' : N ≤ Nat.card (BAtom B A) := by omega
-      obtain ⟨q, hq1, hq2⟩ := hgrow N hN'
-      have hsub : {q : BAtom B A | derivesIn rules N q} ⊂
-          {q : BAtom B A | derivesIn rules (N + 1) q} :=
-        ⟨fun r hr => derivesIn_succ hr, fun hcontra => hq2 (hcontra hq1)⟩
-      have h1 := ihN (by omega)
-      have h2 := Set.ncard_lt_ncard hsub (Set.toFinite _)
-      omega
-  have h1 := hcard (Nat.card (BAtom B A) + 1) le_rfl
-  have h2 := Set.ncard_le_ncard
-    (Set.subset_univ {q : BAtom B A | derivesIn rules (Nat.card (BAtom B A) + 1) q})
-    (Set.toFinite _)
-  rw [Set.ncard_univ] at h2
-  omega
+  obtain ⟨N, hN, heq⟩ := exists_succ_eq_of_monotone_subset
+    (c := fun n => {q : BAtom B A | derivesIn rules n q}) fun n q hq => derivesIn_succ hq
+  exact ⟨N, hN, fun q =>
+    ⟨fun hq => (Set.ext_iff.mp heq q).mpr hq, fun hq => (Set.ext_iff.mp heq q).mp hq⟩⟩
 
 /-- **The stages stabilize at the atom count**: after `Nat.card (BAtom B A)`
 many rounds, being derivable within that many rounds is being derivable. -/
