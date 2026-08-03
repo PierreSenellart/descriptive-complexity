@@ -64,6 +64,9 @@ import DescriptiveComplexity.FixedPointPartialSpace
 import DescriptiveComplexity.FixedPointStepRel
 import DescriptiveComplexity.FixedPointPartialMachine
 import DescriptiveComplexity.AbiteboulVianuOrdered
+import DescriptiveComplexity.Invariant.Pebble
+import DescriptiveComplexity.Invariant.EquivK
+import DescriptiveComplexity.Invariant.Stages
 import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.PSpaceHierarchy
 import DescriptiveComplexity.Relationalize
@@ -287,6 +290,21 @@ individual declarations are documented on their own pages.
   (`DescriptiveComplexity.StepDef.inflate`) – the easy inclusion of
   Abiteboul–Vianu, in both the ordered and the order-free form. The PSPACE
   capture lives with the other PSPACE files, below.
+* `DescriptiveComplexity.Invariant.Pebble`,
+  `DescriptiveComplexity.Invariant.EquivK`,
+  `DescriptiveComplexity.Invariant.Stages` – **the `≡ᵏ`-invariant layer**
+  (toward the unordered Abiteboul–Vianu theorem, `ABITEBOUL-VIANU.md` phases
+  F–G): the `k`-pebble refinement over an abstract initial relation
+  (`DescriptiveComplexity.EquivK`, a greatest fixed point with its coinduction
+  principle `DescriptiveComplexity.le_equivK` and expansion lemma
+  `DescriptiveComplexity.equivK_inf_eq`), its instantiation at agreement on
+  the atomic type over a relational structure, the `k`-variable invariance
+  lemma (`DescriptiveComplexity.realize_equivK` – a formula with enough room
+  for its quantifier depth cannot separate `≡ᵏ`-equivalent tuples; no
+  syntactic `k`-variable fragment is ever defined), and the `≡ᵏ`-invariance
+  of every inflationary and partial stage of a `StepDef` within its variable
+  budget (`DescriptiveComplexity.StepDef.inflLimit_invariant`,
+  `DescriptiveComplexity.StepDef.partStage_invariant`).
 
 ## Nondeterministic logarithmic space, by the Krom fragment
 
