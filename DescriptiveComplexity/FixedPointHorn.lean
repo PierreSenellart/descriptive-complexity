@@ -2309,6 +2309,25 @@ theorem lfpDefinable_iff_sigmaSOHornDefinable [L.IsRelational] (P : DecisionProb
     LFPDefinable P ↔ SigmaSOHornDefinable P :=
   ⟨LFPDefinable.sigmaSOHornDefinable, SigmaSOHornDefinable.lfpDefinable⟩
 
+/-- **Immerman–Vardi: `PTIME = FO(≤, LFP)`** ([Vardi 1982][vardi1982complexity];
+[Immerman 1986][immerman1986relational]) – a problem is in polynomial time exactly
+when it is the value of a least-fixed-point definition read over a linearly ordered
+universe.
+
+Two readings of the statement are worth separating. Against the library's own class
+it is `DescriptiveComplexity.lfpDefinable_iff_sigmaSOHornDefinable` under the definition
+of `DescriptiveComplexity.PTIME` by the Horn fragment, so the mathematical content is
+the pair of translations above; that the definition is *order-invariant*, the side
+condition of the classical statement, is built into
+`DescriptiveComplexity.LFPDefinable`, which asks for the equivalence at every linear
+order. Against machines the reading is
+`DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`, deterministic polynomial-time
+acceptance being complete for the class; the residual gap there is the string-encoding
+one documented in `DescriptiveComplexity.Problems.Machine`, not this equivalence. -/
+theorem lfpDefinable_iff_mem_PTIME [L.IsRelational] (P : DecisionProblem L) :
+    LFPDefinable P ↔ P ∈ PTIME :=
+  lfpDefinable_iff_sigmaSOHornDefinable P
+
 /-- **SO-Horn definability is closed under complement**: through the logic
 FO(LFP), where complementation is negating the output formula. This is the
 statement that was out of reach of the fragment alone. -/
