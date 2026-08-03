@@ -39,12 +39,9 @@ vocabulary `L` together with one unary predicate `old`:
   (`DescriptiveComplexity.extBase`);
 * `old` marks the original elements (`DescriptiveComplexity.IsOld`).
 
-A vocabulary with *function* symbols additionally needs a value on invented
-arguments; `DescriptiveComplexity.oldPart` reads them as an arbitrary original
-element. Every vocabulary in this library is relational, where the convention
-is invisible; it is only there so that `∃SO[new]`-definability is defined for
-every `L`, as the membership predicate of a
-`DescriptiveComplexity.ComplexityClass` must be.
+The vocabulary is relational, as every vocabulary of a
+`DescriptiveComplexity.DecisionProblem` is, so invented values carry no
+structure at all until the certificate's relations put some on them.
 
 ## Main definitions and results
 
@@ -114,20 +111,13 @@ def IsOld {A : Type} {m : ℕ} : A ⊕ Fin m → Prop
   | Sum.inl _ => True
   | Sum.inr _ => False
 
-/-- The original-element part of an element of the extended universe, reading
-an invented value as an arbitrary original element. It only serves to give
-*function* symbols an interpretation on invented arguments; every vocabulary
-in this library is relational, where the choice is invisible. -/
-noncomputable def oldPart (A : Type) [Nonempty A] (m : ℕ) : A ⊕ Fin m → A :=
-  Sum.elim id fun _ => Classical.arbitrary A
-
 /-- The base structure carried by the extended universe: a relation symbol
 holds of a tuple exactly when all its entries are original elements and it
 holds of them in `A`. Invented values are related to nothing. -/
 @[instance_reducible]
-noncomputable def extBase (L : Language.{0, 0}) (A : Type) [L.Structure A] [Nonempty A]
-    (m : ℕ) : L.Structure (A ⊕ Fin m) where
-  funMap f x := Sum.inl (funMap f fun i => oldPart A m (x i))
+def extBase (L : Language.{0, 0}) [L.IsRelational] (A : Type) [L.Structure A] (m : ℕ) :
+    L.Structure (A ⊕ Fin m) where
+  funMap f := isEmptyElim f
   RelMap {_k} r x := ∃ y, (∀ i, x i = Sum.inl (y i)) ∧ RelMap r y
 
 /-- The interpretation of the marking predicate on the extended universe. -/
@@ -137,8 +127,8 @@ def oldMarkStructure (A : Type) (m : ℕ) : Language.oldMark.Structure (A ⊕ Fi
 
 /-- **The extended structure**: the instance `A` together with `m` invented
 values, over the vocabulary `DescriptiveComplexity.newLang L`. -/
-noncomputable instance extStructure (L : Language.{0, 0}) (A : Type) [L.Structure A]
-    [Nonempty A] (m : ℕ) : (newLang L).Structure (A ⊕ Fin m) :=
+instance extStructure (L : Language.{0, 0}) [L.IsRelational] (A : Type) [L.Structure A]
+    (m : ℕ) : (newLang L).Structure (A ⊕ Fin m) :=
   @sumStructure L Language.oldMark (A ⊕ Fin m) (extBase L A m) (oldMarkStructure A m)
 
 variable {L : Language.{0, 0}} {A A' : Type} {m m' : ℕ}
@@ -152,17 +142,14 @@ theorem not_isOld_inr (i : Fin m) : ¬IsOld (Sum.inr i : A ⊕ Fin m) := id
 theorem isOld_iff {x : A ⊕ Fin m} : IsOld x ↔ ∃ a : A, x = Sum.inl a := by
   cases x <;> simp
 
-@[simp]
-theorem oldPart_inl [Nonempty A] (a : A) : oldPart A m (Sum.inl a) = a := rfl
-
-theorem relMap_ext_iff [L.Structure A] [Nonempty A] {k : ℕ} (r : L.Relations k)
+theorem relMap_ext_iff [L.IsRelational] [L.Structure A] {k : ℕ} (r : L.Relations k)
     (x : Fin k → A ⊕ Fin m) :
     RelMap (L := newLang L) (Sum.inl r) x ↔ ∃ y, (∀ i, x i = Sum.inl (y i)) ∧ RelMap r y :=
   Iff.rfl
 
 /-- On original elements, the extended structure is the original one. -/
 @[simp]
-theorem relMap_ext_inl [L.Structure A] [Nonempty A] {k : ℕ} (r : L.Relations k)
+theorem relMap_ext_inl [L.IsRelational] [L.Structure A] {k : ℕ} (r : L.Relations k)
     (y : Fin k → A) :
     RelMap (L := newLang L) (M := A ⊕ Fin m) (Sum.inl r) (fun i => Sum.inl (y i)) ↔
       RelMap r y := by
@@ -173,13 +160,13 @@ theorem relMap_ext_inl [L.Structure A] [Nonempty A] {k : ℕ} (r : L.Relations k
   exact hyy ▸ h
 
 @[simp]
-theorem relMap_ext_old [L.Structure A] [Nonempty A] (x : Fin 1 → A ⊕ Fin m) :
+theorem relMap_ext_old [L.IsRelational] [L.Structure A] (x : Fin 1 → A ⊕ Fin m) :
     RelMap (L := newLang L) (Sum.inr Language.oldSym) x ↔ IsOld (x 0) :=
   Iff.rfl
 
 /-! ### Functoriality in the base structure -/
 
-private theorem relMap_ext_map [L.Structure A] [L.Structure A'] [Nonempty A] [Nonempty A']
+private theorem relMap_ext_map [L.IsRelational] [L.Structure A] [L.Structure A']
     (e : A ≃[L] A') (σ : Fin m ≃ Fin m') {k : ℕ} (r : L.Relations k)
     (x : Fin k → A ⊕ Fin m) :
     RelMap (L := newLang L) (Sum.inl r) (fun i => Sum.map e σ (x i)) ↔
@@ -205,13 +192,8 @@ private theorem relMap_ext_map [L.Structure A] [L.Structure A'] [Nonempty A] [No
 
 /-- Extended structures are functorial in the base structure: an isomorphism
 of instances and a bijection of the invented values induce an isomorphism of
-the extended structures.
-
-Stated for relational vocabularies, the only ones the library uses: on a
-vocabulary with function symbols the junk interpretation of
-`DescriptiveComplexity.oldPart` on invented arguments need not be
-equivariant. -/
-def extEquiv [L.IsRelational] [L.Structure A] [L.Structure A'] [Nonempty A] [Nonempty A']
+the extended structures. -/
+def extEquiv [L.IsRelational] [L.Structure A] [L.Structure A']
     (e : A ≃[L] A') (σ : Fin m ≃ Fin m') : (A ⊕ Fin m) ≃[newLang L] (A' ⊕ Fin m') where
   toEquiv := e.toEquiv.sumCongr σ
   map_fun' f _ := isEmptyElim f
@@ -271,7 +253,7 @@ theorem sigmaSONewDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
 /-- An `∃SO[new]` sentence expresses an isomorphism-invariant property: what
 it says of an instance is transported by `DescriptiveComplexity.extEquiv`. -/
 theorem sorealize_new_iso [L.IsRelational] {A A' : Type} [L.Structure A] [L.Structure A']
-    [Nonempty A] [Nonempty A'] (e : A ≃[L] A') (B : SOBlock)
+    (e : A ≃[L] A') (B : SOBlock)
     (φ : (soLang (newLang L) [B]).Sentence) (m : ℕ) :
     SORealize (newLang L) (A ⊕ Fin m) [B] φ true ↔
       SORealize (newLang L) (A' ⊕ Fin m) [B] φ true :=
@@ -298,7 +280,7 @@ original element. -/
 noncomputable def noNewSentence : (newLang L).Sentence :=
   (oldF L (Sum.inr 0)).iAlls (Fin 1)
 
-theorem realize_noNewSentence (A : Type) [L.Structure A] [Nonempty A] (m : ℕ) :
+theorem realize_noNewSentence [L.IsRelational] (A : Type) [L.Structure A] (m : ℕ) :
     @Sentence.Realize (newLang L) (A ⊕ Fin m) _ (noNewSentence L) ↔
       ∀ x : A ⊕ Fin m, IsOld x := by
   simp only [noNewSentence, oldF, Sentence.Realize, Formula.realize_iAlls]
@@ -317,17 +299,12 @@ def allOldStructure (A : Type) [L.Structure A] : (newLang L).Structure A :=
   @sumStructure L Language.oldMark A _ (allOldMarkStructure A)
 
 /-- With no invented values, the extended structure is the instance itself. -/
-def extEquivNoNew (A : Type) [L.Structure A] [Nonempty A] (m : ℕ)
+def extEquivNoNew [L.IsRelational] (A : Type) [L.Structure A] (m : ℕ)
     [IsEmpty (Fin m)] :
     @Language.Equiv (newLang L) A (A ⊕ Fin m) (allOldStructure L A) (extStructure L A m) :=
   letI := allOldStructure L A
   { toEquiv := (Equiv.sumEmpty A (Fin m)).symm
-    map_fun' := fun {_n} f x => by
-      cases f with
-      | inl f =>
-        change Sum.inl (funMap f x) = Sum.inl (funMap f fun i => oldPart A m (Sum.inl (x i)))
-        simp
-      | inr f => exact isEmptyElim f
+    map_fun' := fun {_n} f _ => isEmptyElim f
     map_rel' := fun {_k} r x => by
       cases r with
       | inl s => exact relMap_ext_inl s x

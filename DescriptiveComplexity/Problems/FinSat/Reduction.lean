@@ -70,7 +70,7 @@ The two facts about the model that the kernel recursion
 structure. -/
 
 omit [LinearOrder A] in
-theorem relMap_ext_iff' [Nonempty A] {m k : ℕ} (r : L.Relations k)
+theorem relMap_ext_iff' [L.IsRelational] {m k : ℕ} (r : L.Relations k)
     (u : Fin k → A ⊕ Fin m) :
     RelMap (L := newLang L) (Sum.inl r) u ↔
       ∃ y : Fin k → A, RelMap r y ∧ ∀ j, u j = Sum.inl (y j) :=
@@ -78,7 +78,7 @@ theorem relMap_ext_iff' [Nonempty A] {m k : ℕ} (r : L.Relations k)
     ⟨fun ⟨y, h1, h2⟩ => ⟨y, h2, h1⟩, fun ⟨y, h1, h2⟩ => ⟨y, h2, h1⟩⟩
 
 omit [LinearOrder A] in
-theorem relMap_ext_old' [Nonempty A] {m : ℕ} (u : Fin 1 → A ⊕ Fin m) :
+theorem relMap_ext_old' [L.IsRelational] {m : ℕ} (u : Fin 1 → A ⊕ Fin m) :
     RelMap (L := newLang L) (Sum.inr Language.oldSym) u ↔ ∃ a : A, u 0 = Sum.inl a :=
   (relMap_ext_old u).trans isOld_iff
 

@@ -130,7 +130,7 @@ abbrev symSym : runLang.Relations 4 := Sum.inr ⟨RunIx.sym, rfl⟩
 
 section Structures
 
-variable {A : Type} [Language.turing.Structure A] [Nonempty A] {m : ℕ}
+variable {A : Type} [Language.turing.Structure A] {m : ℕ}
 
 /-- The vocabulary of the instance, read on the extended universe. -/
 noncomputable scoped instance extTuring : Language.turing.Structure (A ⊕ Fin m) :=
@@ -178,7 +178,7 @@ tape contents across the two sorts. -/
 
 section Carried
 
-omit [Language.turing.Structure A] [Nonempty A]
+omit [Language.turing.Structure A]
 
 variable (ρ : runBlock.Assignment (A ⊕ Fin m))
 
@@ -487,7 +487,7 @@ noncomputable def exNewF (φ : runLang.Formula (γ ⊕ Unit)) : runLang.Formula 
 noncomputable def allNewF (φ : runLang.Formula (γ ⊕ Unit)) : runLang.Formula γ :=
   Formula.iAlls Unit (∼(oldF vr0) ⟹ φ)
 
-omit [Language.turing.Structure A] [Nonempty A] in
+omit [Language.turing.Structure A] in
 theorem exists_inr_of_not_isOld {x : A ⊕ Fin m} (h : ¬IsOld x) : ∃ j : Fin m, x = Sum.inr j := by
   cases x with
   | inl a => exact absurd (isOld_inl a) h
@@ -1134,7 +1134,7 @@ def runAssign (c : TMData.RunRel A (Fin m)) : runBlock.Assignment (A ⊕ Fin m) 
           Sum.elim (c.Sym t z p) (fun _ => False) (x (3 : Fin 4)))
           (fun _ => False) (x (2 : Fin 4))) (x (1 : Fin 4))) (x (0 : Fin 4))
 
-omit [Language.turing.Structure A] [Nonempty A] in
+omit [Language.turing.Structure A] in
 @[simp]
 theorem certRun_runAssign (c : TMData.RunRel A (Fin m)) : certRun (runAssign c) = c := rfl
 

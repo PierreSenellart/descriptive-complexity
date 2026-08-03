@@ -93,7 +93,7 @@ abbrev mtSym : certLang.Relations 4 := Sum.inr ⟨CertIx.mt, rfl⟩
 
 section Structures
 
-variable {A : Type} [Language.pcp.Structure A] [Nonempty A] {m : ℕ}
+variable {A : Type} [Language.pcp.Structure A] {m : ℕ}
 
 /-- The vocabulary of the instance, read on the extended universe. -/
 noncomputable scoped instance extPcp : Language.pcp.Structure (A ⊕ Fin m) :=
@@ -150,7 +150,7 @@ theorem relMap_inl₃ (R : Language.pcp.Relations 3) (a b c : A) :
 
 section Carried
 
-omit [Language.pcp.Structure A] [Nonempty A]
+omit [Language.pcp.Structure A]
 
 variable (ρ : certBlock.Assignment (A ⊕ Fin m))
 
@@ -336,7 +336,7 @@ noncomputable def exNewF (φ : certLang.Formula (γ ⊕ Unit)) : certLang.Formul
 noncomputable def allNewF (φ : certLang.Formula (γ ⊕ Unit)) : certLang.Formula γ :=
   Formula.iAlls Unit (∼(oldF vr0) ⟹ φ)
 
-omit [Language.pcp.Structure A] [Nonempty A] in
+omit [Language.pcp.Structure A] in
 theorem exists_inr_of_not_isOld {x : A ⊕ Fin m} (h : ¬IsOld x) : ∃ j : Fin m, x = Sum.inr j := by
   cases x with
   | inl a => exact absurd (isOld_inl a) h
@@ -677,7 +677,7 @@ def certAssign (c : Cert A (Fin m)) : certBlock.Assignment (A ⊕ Fin m) := fun 
         (fun _ => False) (x (1 : Fin 4)))
       (x (0 : Fin 4))
 
-omit [Language.pcp.Structure A] [Nonempty A] in
+omit [Language.pcp.Structure A] in
 @[simp]
 theorem certOf_certAssign (c : Cert A (Fin m)) : certOf (certAssign c) = c := rfl
 

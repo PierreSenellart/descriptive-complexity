@@ -14,11 +14,11 @@ that the formula, read in a structure `M`, says exactly what it says in the
 part of `M` that the symbol marks
 (`DescriptiveComplexity.realize_relativizeTo`).
 
-The part must be closed under the function symbols of the language, so that it
-carries a structure at all; the statement therefore takes the marked part as a
-`FirstOrder.Language.Substructure` whose carrier the symbol defines. Marking
-by a *symbol* rather than by an arbitrary formula is what the users below
-need, and keeps the guard a one-line atom.
+The statement takes the marked part as a `FirstOrder.Language.Substructure`
+whose carrier the symbol defines (for the relational vocabularies of this
+library there is nothing to be closed under, so any marked part qualifies).
+Marking by a *symbol* rather than by an arbitrary formula is what the users
+below need, and keeps the guard a one-line atom.
 
 ## Where this is used
 
@@ -29,8 +29,7 @@ then be read with its quantifiers restricted to the original elements, which
 is exactly relativization to the predicate `old`. The specialization
 `DescriptiveComplexity.relOld` and its correctness
 `DescriptiveComplexity.realize_relOld` package that instance: the old part of
-`A ⊕ Fin m` is a substructure (function symbols return original elements by
-`DescriptiveComplexity.extBase`) isomorphic to `A`
+`A ⊕ Fin m` is a substructure isomorphic to `A`
 (`DescriptiveComplexity.oldSubEquiv`).
 
 The same machinery is what a relativized *membership* pullback – the
@@ -142,67 +141,42 @@ end Relativize
 
 section Old
 
-variable (L : Language.{0, 0}) (A : Type) [L.Structure A] [Nonempty A] (m : ℕ)
+variable (L : Language.{0, 0}) [L.IsRelational] (A : Type) [L.Structure A] (m : ℕ)
 
-/-- The original elements of the extended universe form a substructure: by
-`DescriptiveComplexity.extBase`, function symbols take their values among the
-original elements. -/
+/-- The original elements of the extended universe form a substructure: the
+vocabulary is relational, so there is nothing to be closed under. -/
 def oldSub : (newLang L).Substructure (A ⊕ Fin m) where
   carrier := {x | IsOld x}
-  fun_mem := fun {_n} f x _ => by
-    cases f with
-    | inl f => exact trivial
-    | inr f => exact isEmptyElim f
+  fun_mem := fun {_n} f _ _ => isEmptyElim f
 
 theorem mem_oldSub_iff (x : A ⊕ Fin m) : x ∈ oldSub L A m ↔ IsOld x := Iff.rfl
 
-/-- The substructure of original elements is the instance itself, over the
-extended vocabulary (where every element is marked as original). -/
-noncomputable def oldSubEquiv :
-    @Language.Equiv (newLang L) (oldSub L A m) A Substructure.inducedStructure
-      (allOldStructure L A) :=
+/-- The instance is the substructure of original elements, over the extended
+vocabulary (where every element is marked as original). -/
+def oldSubEquiv :
+    @Language.Equiv (newLang L) A (oldSub L A m) (allOldStructure L A)
+      Substructure.inducedStructure :=
   letI := allOldStructure L A
   { toEquiv :=
-      { toFun := fun x => oldPart A m (x : A ⊕ Fin m)
-        invFun := fun a => ⟨Sum.inl a, isOld_inl (m := m) a⟩
-        left_inv := fun x => Subtype.ext (by
-          obtain ⟨a, ha⟩ := isOld_iff.mp (x.2 : IsOld (x : A ⊕ Fin m))
-          change Sum.inl (oldPart A m (x : A ⊕ Fin m)) = (x : A ⊕ Fin m)
-          rw [ha]
-          rfl)
-        right_inv := fun _ => rfl }
-    map_fun' := fun {_n} f x => by
-      cases f with
-      | inl f =>
-        change oldPart A m (funMap (L := newLang L) (Sum.inl f) fun i => ((x i : A ⊕ Fin m))) = _
-        rfl
-      | inr f => exact isEmptyElim f
+      { toFun := fun a => ⟨Sum.inl a, isOld_inl (m := m) a⟩
+        invFun := fun x => match x with
+          | ⟨Sum.inl a, _⟩ => a
+          | ⟨Sum.inr _, h⟩ => h.elim
+        left_inv := fun _ => rfl
+        right_inv := fun x => match x with
+          | ⟨Sum.inl _, _⟩ => rfl
+          | ⟨Sum.inr _, h⟩ => h.elim }
+    map_fun' := fun {_n} f _ => isEmptyElim f
     map_rel' := fun {_n} r x => by
       cases r with
-      | inl s =>
-        change RelMap (L := newLang L) (M := A) (Sum.inl s)
-            (fun i => oldPart A m ((x i : A ⊕ Fin m))) ↔
-          RelMap (L := newLang L) (M := A ⊕ Fin m) (Sum.inl s)
-            (fun i => ((x i : A ⊕ Fin m)))
-        have hcoe : ∀ i, ((x i : A ⊕ Fin m)) = Sum.inl (oldPart A m ((x i : A ⊕ Fin m))) := by
-          intro i
-          obtain ⟨a, ha⟩ := isOld_iff.mp (x i).2
-          rw [ha]
-          rfl
-        rw [relMap_ext_iff]
-        refine ⟨fun h => ⟨_, hcoe, h⟩, fun h => ?_⟩
-        obtain ⟨y, hy, h⟩ := h
-        have hyy : (fun i => oldPart A m ((x i : A ⊕ Fin m))) = y := by
-          funext i
-          exact Sum.inl_injective ((hcoe i).symm.trans (hy i))
-        rw [hyy]
-        exact h
+      | inl s => exact relMap_ext_inl s x
       | inr s =>
         cases s with
-        | old => exact iff_of_true trivial (x 0).2 }
+        | old => exact iff_of_true (isOld_inl (m := m) (x 0)) trivial }
 
 variable {L A m}
 
+omit [L.IsRelational] in
 /-- The relativization of an `L`-formula to the original elements of an
 extended universe: an `L`-formula becomes a formula over the extended
 vocabulary, with every quantifier restricted to the elements marked `old`. -/
@@ -221,9 +195,9 @@ theorem realize_relOld {γ : Type} (φ : L.Formula γ) (v : γ → A) :
   have h1 := realize_relativizeTo (R := (Sum.inr Language.oldSym : (newLang L).Relations 1))
     (oldSub L A m) hsub (LHom.sumInl.onFormula φ) w (default : Fin 0 → oldSub L A m)
   have h2 := StrongHomClass.realize_formula (L := newLang L) (oldSubEquiv L A m)
-    (LHom.sumInl.onFormula φ) (v := w)
+    (LHom.sumInl.onFormula φ) (v := v)
   have h3 := LHom.realize_onFormula (M := A) (LHom.sumInl : L →ᴸ newLang L) φ (v := v)
-  refine Iff.trans ?_ (h1.trans (h2.symm.trans h3))
+  refine Iff.trans ?_ (h1.trans (h2.trans h3))
   exact iff_of_eq (congrArg
     (fun xs => BoundedFormula.Realize (M := A ⊕ Fin m) (relOld φ) (fun g => Sum.inl (v g)) xs)
     (Subsingleton.elim _ _))

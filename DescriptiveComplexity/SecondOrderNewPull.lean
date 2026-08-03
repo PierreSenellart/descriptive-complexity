@@ -225,8 +225,8 @@ end Interp
 
 section Realize
 
-variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {dim : ℕ} {B : SOBlock}
-variable (A : Type) [L₁.Structure A] [Nonempty A] (n : ℕ)
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] {Tag : Type} [Finite Tag] {dim : ℕ}
+variable {B : SOBlock} (A : Type) [L₁.Structure A] (n : ℕ)
 variable (ρ : (newBlock Tag dim B).Assignment (A ⊕ Fin n))
 
 /-- The host structure: the extended structure of the instance, expanded by
@@ -315,6 +315,7 @@ theorem realize_newRelF_base {k : ℕ} (R : L₂.Relations k) (t : Fin k → Tag
   rw [hval]
   exact realize_relOld (I.relFormula R t) fun p => a p.1 p.2
 
+omit [L₁.IsRelational] in
 /-- A base symbol never holds of an invented point. -/
 theorem newRelF_base_eq_bot {k : ℕ} (R : L₂.Relations k) (τ : Fin k → Tag ⊕ Unit)
     (h : ¬∃ t : Fin k → Tag, ∀ i, τ i = Sum.inl (t i)) :
@@ -352,8 +353,9 @@ end Realize
 
 section Universe
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational] {Tag : Type} [Finite Tag] {dim : ℕ}
-variable {B : SOBlock} {A : Type} [L₁.Structure A] [Nonempty A] {n : ℕ}
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational] {Tag : Type}
+variable [Finite Tag] {dim : ℕ}
+variable {B : SOBlock} {A : Type} [L₁.Structure A] {n : ℕ}
 variable (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
 
 /-- The tagged tuple representing a point of the target's extended universe:
@@ -363,17 +365,17 @@ def newPoint : (I.Map A) ⊕ Fin n → (Tag ⊕ Unit) × (Fin (dim + 1) → A �
   | Sum.inl p => (Sum.inl p.1, Fin.snoc (fun j => Sum.inl (p.2 j)) c₀)
   | Sum.inr i => (Sum.inr (), fun _ => Sum.inr i)
 
-omit [L₂.IsRelational] [Finite Tag] [L₁.Structure A] [Nonempty A] in
+omit [L₁.IsRelational] [L₂.IsRelational] [Finite Tag] [L₁.Structure A] in
 @[simp]
 theorem newPoint_inl (p : I.Map A) :
     newPoint I c₀ (Sum.inl p) = (Sum.inl p.1, Fin.snoc (fun j => Sum.inl (p.2 j)) c₀) := rfl
 
-omit [L₂.IsRelational] [Finite Tag] [L₁.Structure A] [Nonempty A] in
+omit [L₁.IsRelational] [L₂.IsRelational] [Finite Tag] [L₁.Structure A] in
 @[simp]
 theorem newPoint_inr (i : Fin n) :
     newPoint I c₀ (Sum.inr i) = (Sum.inr (), fun _ => Sum.inr i) := rfl
 
-omit [L₂.IsRelational] [Finite Tag] [L₁.Structure A] [Nonempty A] in
+omit [L₁.IsRelational] [L₂.IsRelational] [Finite Tag] [L₁.Structure A] in
 theorem newPoint_injective : Function.Injective (newPoint I c₀) := by
   rintro (p | i) (q | j) h
   · have htag : (Sum.inl p.1 : Tag ⊕ Unit) = Sum.inl q.1 := congrArg Prod.fst h
@@ -442,7 +444,7 @@ theorem newPoint_surjective (hc : ∀ y : A ⊕ Fin n, canonPart ρ y ↔ y = c�
     · exact hi.symm
     · exact ((hdiag j').trans hi).symm
 
-omit [L₂.IsRelational] [Finite Tag] [L₁.Structure A] [Nonempty A] in
+omit [L₁.IsRelational] [L₂.IsRelational] [Finite Tag] [L₁.Structure A] in
 theorem isLeft_newPoint (x : (I.Map A) ⊕ Fin n) :
     (newPoint I c₀ x).1.isLeft = true ↔ IsOld x := by
   cases x <;> simp
@@ -453,7 +455,8 @@ end Universe
 
 section Transfer
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational] {Tag : Type} [Finite Tag] [Nonempty Tag]
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational] {Tag : Type}
+variable [Finite Tag] [Nonempty Tag]
 variable {dim : ℕ} {B : SOBlock} {A : Type} [L₁.Structure A] [Nonempty A] {n : ℕ}
 
 /-- The assignment of the target's block on the target's extended universe,
@@ -559,6 +562,7 @@ noncomputable def newTargetEquiv (I : FOInterpretation L₁ L₂ Tag dim) (c₀ 
           realize_newRelF_block (ρ := ρ) I r _ _]
         exact Iff.rfl }
 
+omit [Nonempty Tag] [Nonempty A] in
 /-- Sentence transfer: what the target's kernel says in the target's extended
 universe, it says in the interpreted universe. -/
 theorem realize_transfer (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
@@ -567,13 +571,11 @@ theorem realize_transfer (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ 
     (ρT : B.Assignment ((I.Map A) ⊕ Fin n)) (hT : targetAssign I c₀ ρ = ρT)
     (φ : (newTarget L₂ B).Sentence) :
     letI := hostStruc (L₁ := L₁) A n ρ
-    haveI := I.map_nonempty A
     ((@Sentence.Realize (newTarget L₂ B) ((I.Map A) ⊕ Fin n)
         (@sumStructure (newLang L₂) B.lang ((I.Map A) ⊕ Fin n) (extStructure L₂ (I.Map A) n)
           (B.structure ρT)) φ) ↔
       ((newInterp L₁ Tag dim B I).MapRel (A ⊕ Fin n) ⊨ φ)) := by
   letI := hostStruc (L₁ := L₁) A n ρ
-  haveI := I.map_nonempty A
   subst hT
   letI := B.structure (targetAssign I c₀ ρ)
   exact StrongHomClass.realize_sentence (newTargetEquiv I c₀ ρ hc) φ
@@ -614,7 +616,8 @@ end RelFOInterpretation
 
 section Source
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational] {Tag : Type} [Finite Tag] [Nonempty Tag]
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational] {Tag : Type}
+variable [Finite Tag] [Nonempty Tag]
 variable {dim : ℕ} {B : SOBlock} {A : Type} [L₁.Structure A] [Nonempty A] {n : ℕ}
 
 /-- The pulled-block assignment reproducing a given assignment of the target's
@@ -626,7 +629,7 @@ def sourceAssign (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
   fun p v => ∃ y : Fin (B.arity p.1) → (I.Map A) ⊕ Fin n,
     (∀ k, newPoint I c₀ (y k) = (p.2 k, fun j => v (finProdFinEquiv (k, j)))) ∧ ρT p.1 y
 
-omit [L₂.IsRelational] [Nonempty Tag] [L₁.Structure A] [Nonempty A] in
+omit [L₁.IsRelational] [L₂.IsRelational] [Nonempty Tag] [L₁.Structure A] [Nonempty A] in
 /-- Reading the reproduced assignment back gives the original one: the two
 transfers compose to the identity in the direction a definable universe
 allows. -/
@@ -654,7 +657,7 @@ end Source
 
 section Closure
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
 
 /-- **Definability in `∃SO[new]` transfers through an interpretation**: with
 the *same* number of invented values, the target's kernel holds in the
@@ -694,7 +697,7 @@ theorem sorealize_newPull {Tag : Type} [Finite Tag] [Nonempty Tag] {dim : ℕ}
     refine (realize_transfer I c₀ ρ hc _ rfl φ).mpr ?_
     exact ((newInterp L₁ Tag dim B I).realize_pullRelSentence φ (A ⊕ Fin n)).mp hpull
 
-variable [L₁.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
+variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
 /-- **`∃SO[new]`-definability is closed under first-order reductions**, the
 closure that makes RE a complexity class: the target's extended universe is

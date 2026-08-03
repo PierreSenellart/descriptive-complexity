@@ -105,7 +105,7 @@ abbrev evSym : certLang.Relations 3 := Sum.inr ⟨EvIx.ev, rfl⟩
 
 section Structures
 
-variable {A : Type} [Language.code.Structure A] [Nonempty A] {m : ℕ}
+variable {A : Type} [Language.code.Structure A] {m : ℕ}
 
 /-- The vocabulary of the instance, read on the extended universe. -/
 noncomputable scoped instance extCode : Language.code.Structure (A ⊕ Fin m) :=
@@ -147,7 +147,7 @@ theorem relMap_inl₂ (R : Language.code.Relations 2) (a b : A) :
 
 section Carried
 
-omit [Language.code.Structure A] [Nonempty A]
+omit [Language.code.Structure A]
 
 variable (ρ : evBlock.Assignment (A ⊕ Fin m))
 
@@ -391,7 +391,7 @@ noncomputable def exNewF (φ : certLang.Formula (γ ⊕ Unit)) : certLang.Formul
 noncomputable def allNewF (φ : certLang.Formula (γ ⊕ Unit)) : certLang.Formula γ :=
   Formula.iAlls Unit (∼(oldF vr0) ⟹ φ)
 
-omit [Language.code.Structure A] [Nonempty A] in
+omit [Language.code.Structure A] in
 theorem exists_inr_of_not_isOld {x : A ⊕ Fin m} (h : ¬IsOld x) : ∃ j : Fin m, x = Sum.inr j := by
   cases x with
   | inl a => exact absurd (isOld_inl a) h
@@ -722,7 +722,7 @@ def certAssign (c : Cert A (Fin m)) : evBlock.Assignment (A ⊕ Fin m) := fun i 
       Sum.elim (fun _ => False) (fun b =>
         Sum.elim (fun _ => False) (c.Ev a b) (x (2 : Fin 3))) (x (1 : Fin 3))) (x (0 : Fin 3))
 
-omit [Language.code.Structure A] [Nonempty A] in
+omit [Language.code.Structure A] in
 @[simp]
 theorem certOf_certAssign (c : Cert A (Fin m)) : certOf (certAssign c) = c := rfl
 

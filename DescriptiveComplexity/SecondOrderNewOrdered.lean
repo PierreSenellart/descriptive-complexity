@@ -67,7 +67,7 @@ theorem extLeRel_inl (a b : A) : extLeRel A n ![Sum.inl a, Sum.inl b] ↔ a ≤ 
   rw [h0, h1]
   exact hle
 
-theorem relMap_ext_le (L : Language.{0, 0}) [L.Structure A] [Nonempty A]
+theorem relMap_ext_le (L : Language.{0, 0}) [L.IsRelational] [L.Structure A]
     (w : Fin 2 → A ⊕ Fin n) :
     RelMap (L := newLang (L.sum Language.order)) (Sum.inl (Sum.inr Language.leSymb)) w ↔
       extLeRel A n w :=
@@ -103,7 +103,7 @@ def extOrderElim :
     | _, Sum.inl (Sum.inr s) => Sum.inl (Sum.inr s)
     | _, Sum.inr s => Sum.inr ⟨Sum.inr s.1, s.2⟩
 
-variable {L C} {A : Type} [L.Structure A] [Nonempty A] {n : ℕ}
+variable {L C} [L.IsRelational] {A : Type} [L.Structure A] {n : ℕ}
 
 /-- When the order variable is assigned the order of the instance, read in the
 extended universe, the extended structure over the bare vocabulary is an
@@ -184,7 +184,7 @@ invented. -/
 noncomputable def extLinearGuard : ((newLang L).sum C.withOrder.lang).Sentence :=
   oldOnlyS L C ⊓ (reflES L C ⊓ (transES L C ⊓ (antisymmES L C ⊓ totalES L C)))
 
-variable {L C} (A : Type) [L.Structure A] [Nonempty A] (n : ℕ)
+variable {L C} [L.IsRelational] (A : Type) [L.Structure A] (n : ℕ)
 
 theorem realize_extLinearGuard (ρ : C.withOrder.Assignment (A ⊕ Fin n)) :
     letI := C.withOrder.structure ρ

@@ -103,7 +103,7 @@ abbrev hSym : certLang.Relations 2 := Sum.inr ⟨CertIx.hv, rfl⟩
 
 section Structures
 
-variable {A : Type} [Language.finsat.Structure A] [Nonempty A] {m : ℕ}
+variable {A : Type} [Language.finsat.Structure A] {m : ℕ}
 
 /-- The vocabulary of the instance, read on the extended universe: a relation
 holds only of original elements, and there of what it holds of in the
@@ -168,7 +168,7 @@ assignment is. -/
 
 section Carried
 
-omit [Language.finsat.Structure A] [Nonempty A]
+omit [Language.finsat.Structure A]
 
 variable (ρ : certBlock.Assignment (A ⊕ Fin m))
 
@@ -486,7 +486,7 @@ noncomputable def exNewF (φ : certLang.Formula (γ ⊕ Unit)) : certLang.Formul
 noncomputable def allNewF (φ : certLang.Formula (γ ⊕ Unit)) : certLang.Formula γ :=
   Formula.iAlls Unit (∼(oldF vr0) ⟹ φ)
 
-omit [Language.finsat.Structure A] [Nonempty A] in
+omit [Language.finsat.Structure A] in
 theorem exists_inr_of_not_isOld {x : A ⊕ Fin m} (h : ¬IsOld x) : ∃ j : Fin m, x = Sum.inr j := by
   cases x with
   | inl a => exact absurd (isOld_inl a) h
@@ -839,7 +839,7 @@ theorem realize_kernelS :
 
 section Building
 
-omit [Language.finsat.Structure A] [Nonempty A]
+omit [Language.finsat.Structure A]
 
 variable (Elt Env : Fin m → Prop) (Val : Fin m → A → Fin m → Prop) (G H : A → Fin m → Prop)
 
