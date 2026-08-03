@@ -61,6 +61,14 @@ The library is organized in three layers:
   library's NP (resp. PTIME) exactly when it ordered-FO-reduces to Turing
   machine acceptance (`mem_NP_iff_le_ntmAccept`,
   `mem_PTIME_iff_le_dtmAccept`).
+* **Unconditional lower bounds**, the payoff no machine-first development has:
+  Ehrenfeucht–Fraïssé games on finite structures, with the strategies on bare
+  sets and on linear orders, and the inexpressibility of EVEN – deciding the
+  parity of a finite set is beyond first-order logic, and stays beyond it when
+  the sentence is handed a linear order on the universe
+  (`even_not_foDefinable`). Since a walk along that order does decide it,
+  this yields **`FO ⊊ FO(TC)`** as a *strict* inclusion proved outright
+  (`exists_tcDefinable_not_foDefinable`). No complexity assumption enters.
 
 ## Complexity classes and complete problems
 
@@ -124,10 +132,12 @@ below.
   constructions must be encoded (often needing a linear order, tags, or extra
   dimensions), and arithmetic inside formulas is limited (addition and
   comparison are FO(≤); multiplication is not FO).
-* **Completeness and structure, not separations.** The library proves
-  completeness, inclusions and logical characterizations. Whether the classes
-  are *distinct* (P vs NP, and the like) is open mathematics the framework does
-  not decide.
+* **Completeness and structure, not class separations.** The library proves
+  completeness, inclusions and logical characterizations. Whether the
+  *complexity classes* are distinct (P vs NP, and the like) is open mathematics
+  the framework does not decide. Separations between *logics* are a different
+  matter and are in scope: first-order logic is proved strictly weaker than
+  what sits above it, unconditionally, by Ehrenfeucht–Fraïssé games.
 
 ## On the roadmap
 
@@ -140,10 +150,10 @@ user is most likely to want:
   today. Planned: #P via counting second-order assignments (#SAT, #3COL, the
   permanent) and MaxSNP-style optimization classes – i.e. function and search
   problems, not just yes/no ones.
-* **Unconditional lower bounds (inexpressibility).** The payoff unique to the
-  descriptive approach, impossible in the machine world: Ehrenfeucht–Fraïssé
-  games, EVEN and reachability not being FO-definable, `FO ⊊ FO(TC)` as a strict
-  inclusion, locality, 0-1 laws, and eventually PARITY ∉ AC⁰.
+* **More unconditional lower bounds (inexpressibility).** The games, the
+  inexpressibility of EVEN and `FO ⊊ FO(TC)` are in (see *Overview*); still to
+  come: reachability not being FO-definable, locality, 0-1 laws, and eventually
+  PARITY ∉ AC⁰.
 * **Structural theorems.** Fagin's spectra connection.
 * **A broader catalog and finer reductions.** More complete problems, and the
   finer reduction notions descriptive complexity uses (quantifier-free

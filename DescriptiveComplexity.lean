@@ -72,6 +72,12 @@ import DescriptiveComplexity.Invariant.Structure
 import DescriptiveComplexity.Invariant.Simulation
 import DescriptiveComplexity.Invariant.OrderDef
 import DescriptiveComplexity.Invariant.Backward
+import DescriptiveComplexity.FirstOrderDefinable
+import DescriptiveComplexity.Games.Ehrenfeucht
+import DescriptiveComplexity.Games.Bare
+import DescriptiveComplexity.Games.Distance
+import DescriptiveComplexity.Games.LinearOrder
+import DescriptiveComplexity.TransitiveClosureFO
 import DescriptiveComplexity.FixedPointOrderTransfer
 import DescriptiveComplexity.FixedPointStratify
 import DescriptiveComplexity.AbiteboulVianu
@@ -359,6 +365,62 @@ individual declarations are documented on their own pages.
   linear order, and `P` holds on the reduct») over the ordered expansion, and
   order-free definability implies ordered definability
   (`DescriptiveComplexity.StepDef.liftOrder`).
+
+## Inexpressibility: Ehrenfeucht–Fraïssé games
+
+The one part of the library that proves things logic *cannot* do, with no
+complexity-theoretic assumption anywhere – the payoff a machine-first
+development has no counterpart for.
+
+* `DescriptiveComplexity.FirstOrderDefinable` – plain first-order
+  definability of a decision problem, order-free
+  (`DescriptiveComplexity.FODefinableFree`) and order-invariant
+  (`DescriptiveComplexity.FODefinable`), the bottom of every ladder above and
+  the notion these results refute.
+* `DescriptiveComplexity.Games.Ehrenfeucht` – **the Ehrenfeucht–Fraïssé
+  game** ([Ehrenfeucht 1961][ehrenfeucht1961application]) between two
+  structures: legal positions (`DescriptiveComplexity.PartialIso`, agreement
+  on the atomic type read across two structures), the graded refinement
+  `DescriptiveComplexity.efStage` – whose rounds *append* a coordinate over
+  two structures, which is why it is not an instance of the `≡ᵏ` pebble
+  skeleton of `DescriptiveComplexity.Invariant.Pebble` – and **the
+  methodology lemma** (`DescriptiveComplexity.realize_sentence_of_efEquiv`):
+  `n`-round equivalent structures satisfy the same sentences of quantifier
+  rank at most `n`, the measure being the `DescriptiveComplexity.qdepth`
+  shared with the invariant layer. Everything below is a contrapositive of it.
+* `DescriptiveComplexity.Games.Bare` – the strategy on **bare sets**: two
+  sets with at least `n` elements each are `n`-round equivalent
+  (`DescriptiveComplexity.efEquiv_bare`), so an order-free first-order
+  definable property of a bare set is constant beyond a threshold
+  (`DescriptiveComplexity.exists_card_bound_of_foDefinableFree`) – first-order
+  logic counts up to its quantifier rank and no further.
+* `DescriptiveComplexity.Games.Distance`,
+  `DescriptiveComplexity.Games.LinearOrder` – **Ehrenfeucht's theorem on
+  linear orders**: two finite linear orders with at least `2 ^ n` elements
+  each are `n`-round equivalent (`DescriptiveComplexity.efEquiv_linearOrder`).
+  The duplicator's invariant is one equation per pair of points – equal
+  distances *up to truncation at* `2 ^ n` (`DescriptiveComplexity.truncAt`),
+  with the two ends of the order joined to the position as sentinels so that
+  distances to them are distances like any other – and a round is one
+  application of the answer lemma `DescriptiveComplexity.exists_answer`, where
+  the budget halves: copy the distance to the nearer neighbour, or, when both
+  are far, land in the middle of a gap the invariant makes twice as wide on
+  the other side.
+* `DescriptiveComplexity.Problems.Even` – **EVEN is not first-order
+  definable** (`DescriptiveComplexity.even_not_foDefinableFree`), and **not
+  even order-invariantly so** (`DescriptiveComplexity.even_not_foDefinable`):
+  over the empty vocabulary, deciding the parity of the universe is beyond
+  first-order logic however it is allowed to use a linear order. It is a
+  single walk along that order, though – step to the successor, flip a bit –
+  so it *is* FO(≤, TC) definable (`DescriptiveComplexity.even_tcDefinable`),
+  hence in `DescriptiveComplexity.NL` (`DescriptiveComplexity.even_mem_NL`).
+  Together with the trivial inclusion
+  (`DescriptiveComplexity.FODefinable.tcDefinable`, in
+  `DescriptiveComplexity.TransitiveClosureFO`: a sentence is the walk that
+  takes no step) that is **`FO ⊊ FO(TC)`**, unconditionally
+  (`DescriptiveComplexity.exists_tcDefinable_not_foDefinable`) – a strict
+  inclusion proved outright, where every other separation in this library is
+  conditional.
 
 ## Nondeterministic logarithmic space, by the Krom fragment
 

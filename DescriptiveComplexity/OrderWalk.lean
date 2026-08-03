@@ -585,6 +585,55 @@ theorem orank_covBy {w z : A} (h : w ⋖ z) : orank z = orank w + 1 := by
     exact le_iff_eq_or_lt
   rw [hset, Set.ncard_insert_of_notMem (by simp)]
 
+/-- Rank is monotone. -/
+theorem orank_le_orank {x y : A} (h : x ≤ y) : orank x ≤ orank y :=
+  Set.ncard_le_ncard (fun _ hz => lt_of_lt_of_le hz h) (Set.toFinite _)
+
+/-- Rank is strictly monotone. -/
+theorem orank_lt_orank {x y : A} (h : x < y) : orank x < orank y :=
+  Set.ncard_lt_ncard ⟨fun _ hz => lt_trans hz h, fun hsup => lt_irrefl x (hsup h)⟩
+    (Set.toFinite _)
+
+/-- **Rank reflects the order**: it is an order isomorphism onto an initial
+segment of `ℕ`, which is what lets a walk along the order be replayed as
+arithmetic. -/
+theorem orank_le_iff {x y : A} : orank x ≤ orank y ↔ x ≤ y := by
+  refine ⟨fun h => ?_, orank_le_orank⟩
+  by_contra hxy
+  exact absurd (orank_lt_orank (lt_of_not_ge hxy)) (by omega)
+
+/-- Rank tells elements apart. -/
+theorem orank_inj_iff {x y : A} : orank x = orank y ↔ x = y :=
+  ⟨fun h => le_antisymm (orank_le_iff.mp h.le) (orank_le_iff.mp h.ge), fun h => h ▸ rfl⟩
+
+/-- The rank determines the element. -/
+theorem orank_inj {x y : A} (h : orank x = orank y) : x = y :=
+  orank_inj_iff.mp h
+
+/-- Rank is below the cardinality. -/
+theorem orank_lt_card (x : A) : orank x < Nat.card A := by
+  have hsub : {y : A | y < x} ⊆ {x}ᶜ := fun _ hy => ne_of_lt hy
+  have hle : orank x ≤ Nat.card A - 1 := by
+    rw [orank]
+    calc {y : A | y < x}.ncard ≤ ({x}ᶜ : Set A).ncard := Set.ncard_le_ncard hsub (Set.toFinite _)
+      _ = Nat.card A - 1 := by rw [Set.ncard_compl, Set.ncard_singleton]
+  have hpos : 0 < Nat.card A := Nat.card_pos_iff.mpr ⟨⟨x⟩, ‹Finite A›⟩
+  omega
+
+/-- **Every position below the cardinality is a rank**: the ranks exhaust the
+initial segment, by injectivity between two finite types of the same size. -/
+theorem exists_orank_eq {m : ℕ} (h : m < Nat.card A) : ∃ x : A, orank x = m := by
+  classical
+  letI := Fintype.ofFinite A
+  have hcard : Fintype.card A = Fintype.card (Fin (Nat.card A)) := by
+    rw [Fintype.card_fin, Nat.card_eq_fintype_card]
+  have hbij : Function.Bijective
+      (fun x : A => (⟨orank x, orank_lt_card x⟩ : Fin (Nat.card A))) :=
+    (Fintype.bijective_iff_injective_and_card _).mpr
+      ⟨fun x y hxy => orank_inj_iff.mp (congrArg Fin.val hxy), hcard⟩
+  obtain ⟨x, hx⟩ := hbij.2 ⟨m, h⟩
+  exact ⟨x, congrArg Fin.val hx⟩
+
 /-- A maximum has rank `Nat.card A - 1`. -/
 theorem orank_isTop {z : A} (hz : ∀ a : A, a ≤ z) : orank z = Nat.card A - 1 := by
   rw [orank]

@@ -49,6 +49,7 @@ import DescriptiveComplexity.Problems.Machine.HaltFin
 import DescriptiveComplexity.Problems.Machine.HaltMem
 import DescriptiveComplexity.Problems.Machine.HaltHard
 import DescriptiveComplexity.Problems.CodeHalt
+import DescriptiveComplexity.Problems.Even
 
 /-!
 # The problem catalog

@@ -153,22 +153,16 @@ X"), and the two formula compilers along a definable quotient
 The unique payoff of the descriptive approach: *unconditional* separations and
 non-reducibility, impossible in the machine world.
 
-- **Ehrenfeucht–Fraïssé games on finite structures** [L]: build on Mathlib's
-  `ModelTheory/PartialEquiv.lean` (back-and-forth) and `Fraisse.lean`; what is
-  missing is the finite, graded (quantifier-rank) version and the methodology
-  lemmas ("same rank-k type ⇒ agree on rank-k sentences"). The `k`-pebble
-  refinement of `Invariant/Pebble.lean` is stated over an abstract initial
-  relation precisely so the EF skeleton can be its second instance (rounds in
-  place of pebbles), and the `k`-variable invariance lemma
-  (`realize_equivK`) is the model for the methodology lemma. A first
-  fixed-point inexpressibility result is also within reach from the invariant
-  layer alone: a query not `≡ᵏ`-invariant for any `k` is not order-free
-  FO(IFP)-definable (`StepDef.inflLimit_invariant`), so order-free FO(IFP)
-  does not capture P.
-- **First applications** [M after EF]: EVEN is not FO-definable (even
-  order-invariantly); REACH/connectivity is not FO-definable. Library payoff:
-  FO ⊊ FO(TC) as an unconditional strict inclusion, and non-existence of FO
-  reductions in specific cases.
+- **Order-free FO(IFP) does not capture P** [S]: within reach from the
+  invariant layer alone, with no game: a query not `≡ᵏ`-invariant for any `k`
+  is not order-free FO(IFP)-definable (`StepDef.inflLimit_invariant`), and on
+  a bare set with `k` elements any two `k`-tuples with the same equality
+  pattern are `≡ᵏ`-equivalent, so no order-free inflationary induction defines
+  a linear order. This turns the library's order-invariant convention into a
+  theorem.
+- **Further applications of the games** [M]: REACH/connectivity is not
+  FO-definable, and non-existence of FO reductions in specific cases. The
+  games are also the natural route to separating `≤ᶠᵒ` from `≤ᶠᵒ[≤]` below.
 - **Locality (Hanf, Gaifman)** [L]: the workhorse for graph inexpressibility;
   gives connectivity/acyclicity results without bespoke games.
 - **0-1 laws (Glebskii et al., Fagin)** [L]: FO 0-1 law on random structures;
@@ -651,19 +645,13 @@ provable rather than merely reasonable.
 
 **Next, in this order:**
 
-1. **EF games and the first inexpressibility results** (§5) [L]: the payoff
-   that has no counterpart in a machine-first development, and the reason the
-   degree structure of §9 is worth having at all. Take it in two steps, the
-   first of which is nearly free and worth landing on its own: an order-free
-   inflationary induction computes only `≡ᵏ`-invariant relations
-   (`StepDef.inflLimit_invariant`), so it cannot define a linear order on a
-   bare set – which turns the library's order-invariant variant from a
-   convention into a theorem. Only then the games themselves, `EVEN` and
-   `FO ⊊ FO(TC)`, which are the Mathlib-facing part and where an estimate is
-   likeliest to slip.
+1. **Order-free FO(IFP) does not capture P** (§5) [S]: the cheap piece left in
+   the inexpressibility track, from the invariant layer with no game at all,
+   and the one that turns the library's order-invariant convention into a
+   theorem. Locality and the 0-1 laws are the next substantial pieces there.
 2. **`ComplexityClass.below` and the GI degree** (§9) [S+S]: the framework side
    is ~150 lines with the `Hard` half free, and Graph Isomorphism itself is a
-   `Σ₁` with no order, no counting and no threshold. Taken after step 2 on
+   `Σ₁` with no order, no counting and no threshold. Taken after step 1 on
    purpose: a degree structure is worth building where non-reducibility is
    provable.
 

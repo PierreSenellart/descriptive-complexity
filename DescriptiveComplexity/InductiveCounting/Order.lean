@@ -57,19 +57,6 @@ variable {A : Type} [LinearOrder A] [Finite A] {V : Type} [LinearOrder V] [Finit
 omit [Finite V] in
 @[simp] theorem orank_bot : orank (⊥ : WithBot V) = 0 := orank_eq_zero (fun _ => bot_le)
 
-/-- The rank is strictly monotone. -/
-theorem orank_lt_orank {a b : A} (h : a < b) : orank a < orank b := by
-  refine Set.ncard_lt_ncard ⟨fun y hy => lt_trans hy h, ?_⟩ (Set.toFinite _)
-  intro hsub
-  exact absurd (hsub h) (lt_irrefl a)
-
-/-- The rank determines the element. -/
-theorem orank_inj {a b : A} (h : orank a = orank b) : a = b := by
-  rcases lt_trichotomy a b with hlt | heq | hgt
-  · exact absurd h (Nat.ne_of_lt (orank_lt_orank hlt))
-  · exact heq
-  · exact absurd h.symm (Nat.ne_of_lt (orank_lt_orank hgt))
-
 /-- A counter whose value is still below the number of nodes can be
 incremented. -/
 theorem exists_covBy_of_orank_lt {r : WithBot V} (h : orank r < Nat.card V) :

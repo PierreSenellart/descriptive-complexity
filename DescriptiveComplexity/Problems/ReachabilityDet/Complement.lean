@@ -377,15 +377,6 @@ theorem exists_isSuccA_of_not_isMaxA {c : A} (h : ¬IsMaxA c) : ∃ c', IsSuccA 
     exact absurd (Finset.min'_le _ a (Finset.mem_filter.mpr ⟨Finset.mem_univ a, hca⟩))
       (not_le.mpr hac)
 
-/-- The rank of an element is smaller than the size of the universe: the budget
-allows exactly as many steps as there are elements, less one. -/
-theorem orank_lt_card (z : A) : orank z < Nat.card A := by
-  have hss : {y : A | y < z} ⊂ Set.univ := by
-    refine ⟨Set.subset_univ _, fun h => ?_⟩
-    exact absurd (h (Set.mem_univ z)) (lt_irrefl z)
-  have := Set.ncard_lt_ncard hss Set.finite_univ
-  rwa [Set.ncard_univ] at this
-
 omit [Finite A] in
 theorem orank_of_isMinA {a : A} (h : IsMinA a) : orank a = 0 := orank_eq_zero h
 
