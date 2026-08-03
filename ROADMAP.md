@@ -548,7 +548,9 @@ class.
 - **The GI degree, in order of cost** [M each]: hypergraph / set-system
   isomorphism first, since `Problems/SetFamily/FromGraphs.lean` already builds
   set systems from graphs and the incidence construction is order-free; then
-  digraph and colored-graph isomorphism (colored → plain is the content); then
+  colored-graph isomorphism (colored → plain is the content – the *directed*
+  case needs no entry, `twoGraphs` carrying two arbitrary binary relations);
+  then
   bipartite-graph isomorphism, the first entry with a real rigidity argument
   (incidence graph, dimension 2, tags `{V, E}`, and the isomorphism must be
   prevented from swapping the two sides); finite-automaton isomorphism as a
