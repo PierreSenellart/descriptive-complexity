@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.DigraphIso
+import DescriptiveComplexity.Degree
 
 /-!
 # Graph Isomorphism: vocabulary, semantics, and membership in the GI degree
@@ -16,13 +17,12 @@ restricted to instances whose relations are symmetric and irreflexive.
 
 Unlike acyclicity (`DescriptiveComplexity.Problems.DagIso`), that restriction
 *is* first-order, so nothing has to be carried by the instance: the reduction
-into `DigraphIso` simply tests it. This file therefore contains the whole
-membership half; the hardness half – the classical construction turning a
-digraph into a simple graph with the same isomorphisms – is the substantial
-one, and is not built yet. Until it is, the degree
-`DescriptiveComplexity.GI` stays anchored on
-`DescriptiveComplexity.DigraphIso`: only one of the two reductions between the
-problems exists, so they are not yet known to have the same degree here.
+into `DigraphIso` simply tests it. This file also **defines the GI degree**
+(`DescriptiveComplexity.GI`), on this problem: it is what the literature means
+by graph isomorphism, so it is what the degree should be named after. The
+directed problem is complete for it too – the two are interreducible – but that
+needs the gadget of `DescriptiveComplexity.Problems.GraphIso.Hardness`, so it is
+proved there.
 -/
 
 namespace DescriptiveComplexity
@@ -265,8 +265,32 @@ noncomputable def graphIso_fo_reduction_digraphIso : GraphIso ≤ᶠᵒ DigraphI
   toInterpretation := GraphIso.simpleInterp
   correct A _ _ _ := GraphIso.hasGraphIso_iff_hasDigraphIso_map A
 
-/-- Graph Isomorphism belongs to the GI degree. -/
+/-! ### The degree -/
+
+/-- **The GI degree**: the problems that (ordered) first-order reduce to Graph
+Isomorphism, as a complexity class
+(`DescriptiveComplexity.ComplexityClass.below`). A problem is *GI-complete* –
+in this library's finer, first-order sense – when it is
+`DescriptiveComplexity.ComplexityClass.Complete` for `GI`.
+
+The degree is named after the *undirected* problem, as the literature is: the
+directed one has the same degree
+(`DescriptiveComplexity.GI_eq_below_digraphIso`), but is not what “GI” means. -/
+noncomputable def GI : ComplexityClass :=
+  .below GraphIso
+
+/-- Graph Isomorphism belongs to its own degree. -/
 theorem graphIso_mem_GI : GraphIso ∈ GI :=
-  ⟨graphIso_fo_reduction_digraphIso.toOrdered⟩
+  ComplexityClass.mem_below_self GraphIso
+
+/-- Graph Isomorphism is in NP: it reduces to the directed problem, which is. -/
+theorem graphIso_mem_NP : GraphIso ∈ NP :=
+  NP.mem_of_foReduction graphIso_fo_reduction_digraphIso digraphIso_mem_NP
+
+/-- The whole GI degree lies inside NP, since Graph Isomorphism does and
+membership travels backward along reductions. (Whether the inclusion is strict
+is the open question; the framework decides no such thing.) -/
+theorem GI_subset_NP : GI ⊆ NP :=
+  fun _ _ _ h => NP.mem_of_orderedReduction h.some graphIso_mem_NP
 
 end DescriptiveComplexity

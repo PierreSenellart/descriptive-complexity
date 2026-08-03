@@ -240,8 +240,4 @@ noncomputable def dagIso_fo_reduction_digraphIso : DagIso ≤ᶠᵒ DigraphIso w
   toInterpretation := DagIso.dagInterp
   correct A _ _ _ := DagIso.hasDagIso_iff_hasDigraphIso_map A
 
-/-- DAG Isomorphism belongs to the GI degree. -/
-theorem dagIso_mem_GI : DagIso ∈ GI :=
-  ⟨dagIso_fo_reduction_digraphIso.toOrdered⟩
-
 end DescriptiveComplexity

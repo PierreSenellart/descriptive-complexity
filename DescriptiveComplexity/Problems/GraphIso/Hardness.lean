@@ -176,21 +176,28 @@ vocabulary. -/
 noncomputable def digraphIso_fo_reduction_graphIso : DigraphIso ≤ᶠᵒ GraphIso :=
   digraphIso_fo_reduction_twoCopiesIso.trans twoCopiesIso_fo_reduction_graphIso
 
-/-- **Graph Isomorphism is GI-complete**: it reduces to Digraph Isomorphism by
-testing simplicity, and Digraph Isomorphism reduces back to it by the gadget.
-This is the statement in the shape the literature uses – GI is the problem for
-*simple* graphs – and it says the directed and undirected problems have the
-same degree. -/
+/-- **Graph Isomorphism is GI-complete**, the degree being defined on it. -/
 theorem graphIso_GI_complete : GI.Complete GraphIso :=
-  ⟨graphIso_mem_GI,
-    GI.hard_of_foReduction digraphIso_fo_reduction_graphIso digraphIso_GI_complete.hard⟩
+  ComplexityClass.below_complete_self GraphIso
 
-/-- **The GI degree is the degree of the undirected problem.** The anchor can
-therefore move to `DescriptiveComplexity.GraphIso`, which is what the
-literature means by GI, without touching any completeness theorem: they
-transfer along this equality. -/
-theorem GI_eq_below_graphIso : GI = ComplexityClass.below GraphIso :=
-  ComplexityClass.below_congr ⟨digraphIso_fo_reduction_graphIso.toOrdered⟩
-    ⟨graphIso_fo_reduction_digraphIso.toOrdered⟩
+/-- **Digraph Isomorphism is GI-complete too**: it reduces to the undirected
+problem by the gadget – every arc subdivided three times, each vertex carrying
+a lollipop and each tail a pendant – and the undirected problem reduces back to
+it by testing simplicity. The directed problem is *not* what the literature
+calls GI, which is why the degree is named after the other one; this theorem is
+what says the choice costs nothing. -/
+theorem digraphIso_GI_complete : GI.Complete DigraphIso :=
+  ⟨⟨digraphIso_fo_reduction_graphIso.toOrdered⟩,
+    GI.hard_of_foReduction graphIso_fo_reduction_digraphIso graphIso_GI_complete.hard⟩
+
+/-- **The directed and undirected problems have the same degree.** -/
+theorem GI_eq_below_digraphIso : GI = ComplexityClass.below DigraphIso :=
+  ComplexityClass.below_congr ⟨graphIso_fo_reduction_digraphIso.toOrdered⟩
+    ⟨digraphIso_fo_reduction_graphIso.toOrdered⟩
+
+/-- And the same as the degree of the generic isomorphism problem of the graph
+vocabulary, which is what a new entry stated over `twoCopies` reduces to. -/
+theorem GI_eq_below_twoCopiesIso : GI = ComplexityClass.below (TwoCopiesIso Language.graph) :=
+  GI_eq_below_digraphIso.trans below_digraphIso_eq_below_twoCopiesIso
 
 end DescriptiveComplexity

@@ -29,27 +29,15 @@ forward half of each correctness proof available at all, and an order-invariant
 reduction would only fix the *answer*, not the constructed structure up to
 isomorphism.
 
-Since the whole degree sits inside NP (`DescriptiveComplexity.GI_subset_NP`),
-membership in NP comes for free
+Membership in NP comes from the same reduction as membership in the degree
 (`DescriptiveComplexity.dagIso_mem_NP`); no hardness for a *class* is claimed,
 and none is expected – that is what makes the degree worth having.
 -/
 
 namespace DescriptiveComplexity
 
-/-- DAG Isomorphism is hard for the GI degree: Digraph Isomorphism, which is,
-reduces to it. -/
-theorem dagIso_GI_hard : GI.Hard DagIso :=
-  GI.hard_of_foReduction digraphIso_fo_reduction_dagIso digraphIso_GI_complete.hard
-
-/-- **DAG Isomorphism is GI-complete**: it reduces to Digraph Isomorphism by
-forgetting the carried topological orders, and Digraph Isomorphism reduces to it
-by subdividing every arc twice. -/
-theorem dagIso_GI_complete : GI.Complete DagIso :=
-  ⟨dagIso_mem_GI, dagIso_GI_hard⟩
-
-/-- DAG Isomorphism is in NP, since the whole GI degree is. -/
+/-- DAG Isomorphism is in NP: it reduces to Digraph Isomorphism, which is. -/
 theorem dagIso_mem_NP : DagIso ∈ NP :=
-  GI_subset_NP dagIso_mem_GI
+  NP.mem_of_foReduction dagIso_fo_reduction_digraphIso digraphIso_mem_NP
 
 end DescriptiveComplexity

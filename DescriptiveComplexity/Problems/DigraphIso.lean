@@ -5,7 +5,6 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.IsoGadget
-import DescriptiveComplexity.Degree
 
 /-!
 # Digraph Isomorphism, and the degree it defines
@@ -37,16 +36,14 @@ is not known to be in P, and is not known to be NP-complete ([Babai
 2016][babai2016graph] gives a quasipolynomial algorithm; [Köbler, Schöning and
 Torán 1993][kobler1993graph] is the structural account).
 
-**It is the reason `DescriptiveComplexity.ComplexityClass.below` exists.**
-“GI-complete” is the standard example of completeness for the degree of a
-*problem* rather than for a logically defined class, and
-`DescriptiveComplexity.GI` is that degree here – with `DigraphIso` complete for
-it (`DescriptiveComplexity.digraphIso_GI_complete`) and the whole degree inside
-NP (`DescriptiveComplexity.GI_subset_NP`). The degree is anchored on the
-directed problem only until the digraph-to-graph gadget lands: the two are then
-mutually reducible, and `DescriptiveComplexity.ComplexityClass.below_congr`
-moves the anchor to `DescriptiveComplexity.GraphIso` in one line, every
-completeness theorem transferring with it.
+**It is one half of the reason `DescriptiveComplexity.ComplexityClass.below`
+exists.** “GI-complete” is the standard example of completeness for the degree
+of a *problem* rather than for a logically defined class. The degree itself
+(`DescriptiveComplexity.GI`) is defined on the *undirected* problem, in
+`DescriptiveComplexity.Problems.GraphIso.Defs`, since that is what the
+literature names GI; this problem is complete for it too
+(`DescriptiveComplexity.digraphIso_GI_complete`), the two being
+interreducible.
 
 There is also a pleasant circularity worth noting: a decision problem in this
 library is by definition an isomorphism-invariant property of finite structures
@@ -262,25 +259,5 @@ end SigmaOne
 /-- Digraph Isomorphism is in NP: it is `Σ₁`-definable. -/
 theorem digraphIso_mem_NP : DigraphIso ∈ NP :=
   digraphIso_sigmaSODefinable
-
-/-! ### The GI degree -/
-
-/-- **The GI degree**: the problems that (ordered) first-order reduce to Digraph
-Isomorphism, as a complexity class
-(`DescriptiveComplexity.ComplexityClass.below`). A problem is *GI-complete* –
-in this library's finer, first-order sense – when it is
-`DescriptiveComplexity.ComplexityClass.Complete` for `GI`. -/
-noncomputable def GI : ComplexityClass :=
-  .below DigraphIso
-
-/-- **Digraph Isomorphism is GI-complete**, by construction. -/
-theorem digraphIso_GI_complete : GI.Complete DigraphIso :=
-  ComplexityClass.below_complete_self DigraphIso
-
-/-- The whole GI degree lies inside NP, since Digraph Isomorphism does and
-membership travels backward along reductions. (Whether the inclusion is strict
-is the open question; the framework decides no such thing.) -/
-theorem GI_subset_NP : GI ⊆ NP :=
-  fun _ _ _ h => NP.mem_of_orderedReduction h.some digraphIso_mem_NP
 
 end DescriptiveComplexity

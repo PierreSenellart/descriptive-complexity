@@ -191,7 +191,7 @@ individual declarations are documented on their own pages.
   under ordered FO reductions is itself a `ComplexityClass`, so
   `(below Q₀).Complete P` is literally “`P` is `Q₀`-complete”, with no logic
   anywhere – the notion behind “GI-complete”
-  (`DescriptiveComplexity.GI`, the degree of `DescriptiveComplexity.DigraphIso`).
+  (`DescriptiveComplexity.GI`, the degree of `DescriptiveComplexity.GraphIso`).
   Hardness needs no new proof: `DescriptiveComplexity.CofinalHard` is already
   parameterized by an arbitrary membership predicate. Completeness for a degree
   is mutual reducibility
@@ -1269,11 +1269,11 @@ Headline results and cross-references:
   one direction only tests it, and the other is the classical digraph-to-graph
   gadget – every arc subdivided three times, each vertex carrying a lollipop
   and each tail a pendant, so that the levels are recovered from adjacency
-  alone and the pendant carries the arc's direction. The directed and
-  undirected problems therefore have the same degree
-  (`DescriptiveComplexity.GI_eq_below_graphIso`), so which of them `GI` is
-  *defined* on is immaterial; it sits on the directed one because `GI` is
-  needed before the undirected problem is available. The shared layer for
+  alone and the pendant carries the arc's direction. The degree is *defined* on
+  this problem – the literature's GI is the undirected one – and the directed
+  problem is complete for it too
+  (`DescriptiveComplexity.digraphIso_GI_complete`,
+  `DescriptiveComplexity.GI_eq_below_digraphIso`). The shared layer for
   reductions between isomorphism problems is `DescriptiveComplexity.IsoGadget`:
   it reads a marked binary relation as a
   `FirstOrder.Language.graph`-structure in its own right, so that the semantic

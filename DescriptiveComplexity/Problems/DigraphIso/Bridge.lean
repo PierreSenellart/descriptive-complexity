@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.DigraphIso
 import DescriptiveComplexity.GadgetDouble
+import DescriptiveComplexity.Degree
 
 /-!
 # Digraph Isomorphism is the generic isomorphism problem of the graph vocabulary
@@ -16,10 +17,12 @@ to renaming – `patV`/`patE` against the pattern mark and the pattern copy of
 `adj` – and this file proves the problems are FO-interreducible, in both
 directions, by the interpretation that renames the symbols.
 
-The payoff is `DescriptiveComplexity.GI_eq_below_twoCopiesIso`: the GI degree
-*is* the degree of `DescriptiveComplexity.TwoCopiesIso
-FirstOrder.Language.graph`. A problem stated over `twoCopies` – as every entry
-added from here on is meant to be – therefore reaches the degree through
+The payoff is
+`DescriptiveComplexity.below_digraphIso_eq_below_twoCopiesIso`: the degree of
+`DescriptiveComplexity.DigraphIso` *is* the degree of
+`DescriptiveComplexity.TwoCopiesIso FirstOrder.Language.graph`, and hence the
+GI degree. A problem stated over `twoCopies` – as every entry added from here
+on is meant to be – therefore reaches the degree through
 `DescriptiveComplexity.isoReflecting_fo_reduction` and this bridge, with no
 further vocabulary bookkeeping.
 -/
@@ -251,11 +254,13 @@ def twoCopiesIso_fo_reduction_digraphIso : TwoCopiesIso Language.graph ≤ᶠᵒ
   toInterpretation := DigraphBridge.ofTC
   correct A _ _ _ := DigraphBridge.ofTC_correct A
 
-/-- **The GI degree is the degree of the generic isomorphism problem** of the
-graph vocabulary. A problem stated over `twoCopies` reaches the degree through
-this equality, so `DescriptiveComplexity.isoReflecting_fo_reduction` – a gadget
-on single structures – is all a new entry needs. -/
-theorem GI_eq_below_twoCopiesIso : GI = ComplexityClass.below (TwoCopiesIso Language.graph) :=
+/-- **Digraph Isomorphism and the generic isomorphism problem of the graph
+vocabulary have the same degree.** A problem stated over `twoCopies` reaches the
+GI degree through this equality, so
+`DescriptiveComplexity.isoReflecting_fo_reduction` – a gadget on single
+structures – is all a new entry needs. -/
+theorem below_digraphIso_eq_below_twoCopiesIso :
+    ComplexityClass.below DigraphIso = ComplexityClass.below (TwoCopiesIso Language.graph) :=
   ComplexityClass.below_congr ⟨digraphIso_fo_reduction_twoCopiesIso.toOrdered⟩
     ⟨twoCopiesIso_fo_reduction_digraphIso.toOrdered⟩
 
