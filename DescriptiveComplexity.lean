@@ -98,6 +98,7 @@ import DescriptiveComplexity.Numbers
 import DescriptiveComplexity.Machines
 import DescriptiveComplexity.IsoGadget
 import DescriptiveComplexity.TwoCopies
+import DescriptiveComplexity.GadgetDouble
 import DescriptiveComplexity.Degree
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.ClassDegrees
@@ -1281,6 +1282,16 @@ Headline results and cross-references:
   relativized to each mark – only against a target of that shape, the defining
   formulas having to be given symbol by symbol; problems joining the degree from
   here on are meant to be stated over it.
+  `DescriptiveComplexity.GadgetDouble` closes the layer: it doubles a gadget –
+  a construction on *single* structures – by renaming its atoms to each side's
+  copy and relativizing its quantifiers to that side's mark, and identifies the
+  sides of the result (`DescriptiveComplexity.patSideDoubleEquiv`: the pattern
+  side of the doubled gadget is the gadget on the pattern side). What a client
+  then owes is `DescriptiveComplexity.IsoReflecting`, “isomorphic values come
+  from isomorphic arguments”, a statement about single structures with no
+  pattern/host distinction in it; the converse is free by functoriality, and
+  `DescriptiveComplexity.isoReflecting_fo_reduction` turns the pair into an
+  order-free reduction.
 
 * **At RE**: FINSAT (`DescriptiveComplexity.Problems.FinSat`) – does a
   first-order sentence, encoded as a finite structure, have a *finite* model? –
