@@ -96,6 +96,7 @@ import DescriptiveComplexity.OccurrenceSlack
 import DescriptiveComplexity.OccurrenceVar
 import DescriptiveComplexity.Numbers
 import DescriptiveComplexity.Machines
+import DescriptiveComplexity.IsoGadget
 import DescriptiveComplexity.Degree
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.ClassDegrees
@@ -1264,7 +1265,14 @@ Headline results and cross-references:
   GI (`DescriptiveComplexity.GraphIso`) – is in the degree
   (`DescriptiveComplexity.graphIso_mem_GI`), simplicity being first-order; the
   converse reduction is the classical digraph-to-graph gadget, and until it is
-  built the degree stays anchored on the directed problem.
+  built the degree stays anchored on the directed problem. The shared layer for
+  reductions between isomorphism problems is `DescriptiveComplexity.IsoGadget`:
+  it reads a marked binary relation as a
+  `FirstOrder.Language.graph`-structure in its own right, so that the semantic
+  condition of every problem in the degree becomes an isomorphism of the two
+  sides (`DescriptiveComplexity.relIsoOn_iff_nonempty_sideEquiv`) and a gadget's
+  correctness can be stated on *single* graphs instead of twice over, once per
+  side.
 
 * **At RE**: FINSAT (`DescriptiveComplexity.Problems.FinSat`) – does a
   first-order sentence, encoded as a finite structure, have a *finite* model? –
