@@ -97,6 +97,7 @@ import DescriptiveComplexity.OccurrenceVar
 import DescriptiveComplexity.Numbers
 import DescriptiveComplexity.Machines
 import DescriptiveComplexity.IsoGadget
+import DescriptiveComplexity.TwoCopies
 import DescriptiveComplexity.Degree
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.ClassDegrees
@@ -1272,7 +1273,14 @@ Headline results and cross-references:
   condition of every problem in the degree becomes an isomorphism of the two
   sides (`DescriptiveComplexity.relIsoOn_iff_nonempty_sideEquiv`) and a gadget's
   correctness can be stated on *single* graphs instead of twice over, once per
-  side.
+  side. `DescriptiveComplexity.TwoCopies` is the other half of that layer: the
+  vocabulary `FirstOrder.Language.twoCopies L₁` – two marks and two copies of
+  every symbol of `L₁` – together with the problem
+  `DescriptiveComplexity.TwoCopiesIso` asking whether the two marked
+  `L₁`-structures of an instance are isomorphic. A gadget can be *doubled* – run
+  relativized to each mark – only against a target of that shape, the defining
+  formulas having to be given symbol by symbol; problems joining the degree from
+  here on are meant to be stated over it.
 
 * **At RE**: FINSAT (`DescriptiveComplexity.Problems.FinSat`) – does a
   first-order sentence, encoded as a finite structure, have a *finite* model? –
