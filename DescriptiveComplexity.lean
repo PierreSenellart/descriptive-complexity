@@ -95,7 +95,9 @@ import DescriptiveComplexity.OccurrenceSlack
 import DescriptiveComplexity.OccurrenceVar
 import DescriptiveComplexity.Numbers
 import DescriptiveComplexity.Machines
+import DescriptiveComplexity.Degree
 import DescriptiveComplexity.Problems
+import DescriptiveComplexity.ClassDegrees
 import DescriptiveComplexity.Computability
 import DescriptiveComplexity.Examples
 
@@ -180,6 +182,23 @@ individual declarations are documented on their own pages.
   `DescriptiveComplexity.Examples.GraphCrawling` – open with a concrete
   instance type and its bundled encoding, and close the loop with a decoder
   and a well-formed completeness theorem.
+* `DescriptiveComplexity.Degree` – completeness *without a class*: the downward
+  closure `DescriptiveComplexity.ComplexityClass.below Q₀` of a fixed problem
+  under ordered FO reductions is itself a `ComplexityClass`, so
+  `(below Q₀).Complete P` is literally “`P` is `Q₀`-complete”, with no logic
+  anywhere – the notion behind “GI-complete”
+  (`DescriptiveComplexity.GI`, the degree of `DescriptiveComplexity.GraphIso`).
+  Hardness needs no new proof: `DescriptiveComplexity.CofinalHard` is already
+  parameterized by an arbitrary membership predicate. Completeness for a degree
+  is mutual reducibility
+  (`DescriptiveComplexity.ComplexityClass.complete_below_iff`), and the degree
+  depends only on the degree
+  (`DescriptiveComplexity.ComplexityClass.below_congr`). The construction is
+  checked against the classes that have complete problems, in
+  `DescriptiveComplexity.ClassDegrees`: `NP = below SAT`,
+  `coNP = below TAUT`, `PTIME = below HORN-SAT`, `NL = below 2SAT` and
+  `RE = below FINSAT` (`DescriptiveComplexity.NP_eq_below_sat` and siblings),
+  so “SAT-hardness is NP-hardness” is a lemma rather than folklore.
 
 ## The polynomial hierarchy, defined logically
 
@@ -1011,6 +1030,7 @@ reduction and certificate in full.
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g. `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | Graph Isomorphism, for `GI` |
 
 Each entry of the **machine model** column is an equivalence *proved here*
 between the logical definition of the class and acceptance by that model:
@@ -1216,6 +1236,21 @@ Headline results and cross-references:
   to canonically padded ones: with the spare coordinates left free, every clause
   and variable would acquire copies and an unsatisfiable formula could blow up
   into a satisfiable one.
+
+* **Complete, but not for a class**: Graph Isomorphism
+  (`DescriptiveComplexity.Problems.GraphIso`) – are the two marked graphs of
+  the instance isomorphic? – is in NP by a textbook `Σ₁` guessing the bijection
+  (`DescriptiveComplexity.graphIso_mem_NP`), with no order, no counting and no
+  threshold, and is the library's first problem conjecturally neither in P nor
+  NP-complete ([Babai 2016][babai2016graph]; [Köbler, Schöning and Torán
+  1993][kobler1993graph]). What it *is* complete for is its own degree
+  (`DescriptiveComplexity.graphIso_GI_complete`), which is the whole point of
+  `DescriptiveComplexity.ComplexityClass.below`, and that degree lies inside NP
+  (`DescriptiveComplexity.GI_subset_NP`). It is also the problem of deciding the
+  very equivalence a `DescriptiveComplexity.DecisionProblem` is required to be
+  invariant under: `DescriptiveComplexity.graphIsoOn_iff_equiv` states the
+  semantics as the existence of an equivalence between the two marked sets
+  carrying one adjacency relation to the other.
 
 * **At RE**: FINSAT (`DescriptiveComplexity.Problems.FinSat`) – does a
   first-order sentence, encoded as a finite structure, have a *finite* model? –

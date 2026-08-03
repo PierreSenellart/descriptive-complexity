@@ -93,8 +93,12 @@ remains below are ordinary catalog reductions and machine bridges.
   Remaining — the symmetric **membership** closure `mem_of_relOrderedReduction`,
   with two consumers: it would turn `le_dtmAcceptSpace_of_mem_PSPACE` into the
   missing `iff` (`Problems/Machine/SpaceHard.lean` records why PSPACE's machine
-  characterization stops short of `mem_NP_iff_le_ntmAccept`'s shape), and §9's
-  *generic* `C = below Q₀` is blocked on it:
+  characterization stops short of `mem_NP_iff_le_ntmAccept`'s shape), and the
+  *generic* `C = below Q₀` is blocked on it – the per-class instances are
+  proved in `ClassDegrees.lean`, each from its own non-relativized hardness
+  discharge, but the statement over an arbitrary class and an arbitrary
+  complete problem of it needs the closure, since `cofinalHard_iff` yields only
+  `≤ʳᶠᵒ[≤]`:
   - `RelSecondOrderPull.lean` (~700 lines): `SOBlock.pull` is reused verbatim
     (a relation variable on the subtype pulls to one `(n·d)`-ary variable per
     tag tuple), but the assignment-transfer layer is rewritten **flipped** — on
@@ -511,64 +515,15 @@ The concrete items:
   tutorial-style example set (cf. Grange et al., MFCS 2024) as the catalog
   broadens, so the library doubles as a complexity-course companion.
 
-## 9. Completeness without a class: FO degrees and `ComplexityClass.below`
+## 9. Populating the GI degree, and reduction theories without a class
 
-Every completeness result above measures a problem against a class *defined by
-a logic*. The same machinery supports a second, orthogonal notion at almost no
-cost, and it is not currently exploited: completeness for the degree of a fixed
-*problem*, with no logic anywhere. "GI-complete" is the literature's standard
-example. Nothing in `Complexity.lean` is specific to logically defined classes,
-so the notion is expressible today.
+The degree machinery itself is built (`DescriptiveComplexity.Degree`:
+`ComplexityClass.below`, completeness for a degree as mutual reducibility, and
+the check that the logically defined classes *are* the degrees of their
+complete problems), and Graph Isomorphism sits in it. What is left is
+populating that degree, and the second reduction theory not organized around a
+class.
 
-- **`ComplexityClass.below`** [S, ~150 lines, no prerequisites]: the downward
-  closure of a fixed relational problem, as a `ComplexityClass`.
-
-  ```lean
-  def ComplexityClass.below {L₀ : Language.{0,0}} [L₀.IsRelational]
-      (Q₀ : DecisionProblem L₀) : ComplexityClass where
-    Mem P := Nonempty (P ≤ᶠᵒ[≤] Q₀)
-    Hard P := CofinalHard (fun Q => Nonempty (Q ≤ᶠᵒ[≤] Q₀)) P
-    …
-  ```
-
-  The `Hard` side is *entirely free*: `CofinalHard` (`Hierarchy.lean`) is
-  already parameterized by an arbitrary `Mem` predicate, and
-  `CofinalHard.of_foReduction`, `.of_orderedReduction`,
-  `.of_relOrderedReduction`, `.congr` are proved generically for it – the class
-  literals of `Hierarchy.lean` and `LogSpace.lean` differ only in which
-  predicate they pass. The `Mem` side is `FOReduction.toOrdered`,
-  `OrderedFOReduction.trans` and `OrderedFOReduction.congrSource`; that
-  `correct` quantifies over finite nonempty structures only is what makes
-  `mem_congr_finite` go through. `(below Q₀).Complete P` is then literally
-  "`P` is `Q₀`-complete", and mutual reducibility `≡ᶠᵒ` names the degree it
-  lives in.
-- **`C = below Q₀` when `Q₀` is complete for `C`** [S per instance; blocked in
-  general]: the sanity check that the construction is the right one, and a
-  theorem rather than a tautology. `ComplexityClass.ext` plus monotonicity of
-  `CofinalHard` in its `Mem` argument reduce it to
-  `C.Mem P ↔ Nonempty (P ≤ᶠᵒ[≤] Q₀)`, whose forward half is the class's own
-  discharge and whose backward half is `mem_of_orderedReduction` applied to
-  `Q₀ ∈ C`. So `NP = below SAT`, `PTIME = below HORNSAT`, `NL = below TwoSAT`,
-  `coNP = below TAUT` and `RE = below CODEHALT` are a few lines each, since
-  `sat_hard_of_sigmaSODefinable`, `hornSat_hard_of_sigmaSOHornDefinable`,
-  `twoSat_hard_of_sigmaSOKromDefinable`, `taut_hard_of_piSODefinable` and
-  `orderedReduction_codehalt` all deliver a *non-relativized* ordered
-  reduction. Payoff: "SAT-hardness is
-  NP-hardness" stops being folklore and becomes a lemma. The *generic*
-  statement, over an arbitrary class and its complete problem, is blocked, and
-  instructively so: `cofinalHard_iff` yields only `≤ʳᶠᵒ[≤]`, so it needs the
-  `mem_of_relOrderedReduction` closure of §3, the second consumer motivating
-  it.
-- **Graph Isomorphism, the point of the exercise** [S]: the vocabulary already
-  exists, `Language.twoGraphs` from `Problems/SubgraphIso.lean` (marks
-  `patV`/`hostV`, relations `patE`/`hostE`); GI is "the two marked subgraphs
-  are isomorphic", with junk outside both marks ignorable as usual. Membership
-  is a textbook `Σ₁` – guess a binary relation, check bijection-on-marks and
-  both edge directions (`realize_rel₂`) – with no order, no counting and no
-  threshold, hence cheaper than most of the NP catalog. It is the library's
-  first NP problem conjecturally neither in P nor NP-complete, and the problem
-  of deciding the very equivalence the framework quotients by, which is worth a
-  sentence in its docstring.
 - **Hardness for isomorphism problems must be order-free** – a design-triage
   rule, beside the choice of number encoding
   (`DescriptiveComplexity/Numbers.lean`). The classical arc is a gadget `F` on
@@ -642,10 +597,11 @@ provable rather than merely reasonable.
    next substantial piece of the inexpressibility track, and the one that
    gives connectivity and acyclicity without bespoke strategies. The 0-1 laws
    are its independent neighbour.
-2. **`ComplexityClass.below` and the GI degree** (§9) [S+S]: the framework side
-   is ~150 lines with the `Hard` half free, and Graph Isomorphism itself is a
-   `Σ₁` with no order, no counting and no threshold. Taken after step 1 on
-   purpose: a degree structure is worth building where non-reducibility is
+2. **Populating the GI degree** (§9) [M each]: with `below` and Graph
+   Isomorphism in place, the degree has one inhabitant and no companions.
+   Hypergraph / set-system isomorphism first, and `gi_hard_of_isoReflecting`
+   with it, since it is what makes every later entry short. Taken after step 1
+   on purpose: a degree structure is worth building where non-reducibility is
    provable.
 
 **Alongside, or after:**

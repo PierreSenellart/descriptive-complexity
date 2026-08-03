@@ -34,7 +34,9 @@ requiring only first-order logic, which Mathlib already has.
   quantifier alternation, PTIME by the Horn fragment, NL by the Krom fragment,
   PSPACE by second-order transitive closure, RE by value invention, with the
   fixed-point logics FO(LFP)/FO(IFP)/FO(PFP) alongside. Machine models are
-  *theorems* here, not definitions (see the table below).
+  *theorems* here, not definitions (see the table below). Completeness without
+  a class is available too: the downward closure `below Q₀` of a fixed problem
+  is itself a class, so “GI-complete” is expressible with no logic anywhere.
 * **Reductions.** Tagged `dim`-dimensional first-order interpretations between
   languages give the reduction `≤ᶠᵒ`, with its order-invariant variant `≤ᶠᵒ[≤]`
   for gadgets that genuinely need a linear order and a relativized variant
@@ -78,11 +80,17 @@ hard for it under FO reductions.
 | **PH** | SO | – | – |
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
 | **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | Graph Isomorphism, for GI |
 
 Each entry of the machine column is an equivalence *proved here* between the
 logical definition and acceptance by that model. The classes are also matched
 against Mathlib's computability layer: RE *is* recursive enumerability, every
 RE-hard problem is undecidable, and RE ≠ co-RE.
+
+The last row states completeness against a *problem* instead of a logic, which
+is what “GI-complete” means. It agrees with the logical definitions where both
+apply: `NP = below SAT`, `PTIME = below HORN-SAT` and their siblings are
+theorems, so SAT-hardness *is* NP-hardness.
 
 ## Scope
 

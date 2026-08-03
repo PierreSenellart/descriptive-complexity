@@ -1,0 +1,366 @@
+/-
+Copyright (c) 2026 Pierre Senellart. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Pierre Senellart
+-/
+import DescriptiveComplexity.Problems.SubgraphIso
+import DescriptiveComplexity.Degree
+
+/-!
+# Graph Isomorphism, and the degree it defines
+
+GRAPH ISOMORPHISM: are the two graphs of the instance isomorphic? The
+vocabulary is the pattern-and-host one of
+`DescriptiveComplexity.Problems.SubgraphIso`
+(`FirstOrder.Language.twoGraphs`, two marks and two adjacency relations), and
+the yes-instances are the structures whose two marked subgraphs are isomorphic
+(`DescriptiveComplexity.GraphIsoOn`); as everywhere in the catalog, elements
+outside both marks are junk that no condition mentions.
+
+Two things make this problem worth its own file.
+
+**It is the library's first problem conjecturally neither in P nor
+NP-complete.** Membership is a textbook `Σ₁` – guess a binary relation, check
+first-order that it is a bijection of the pattern vertices onto the host
+vertices preserving adjacency in both directions – with no order, no counting
+and no threshold, so `DescriptiveComplexity.graphIso_mem_NP` is cheap. No
+hardness result accompanies it, and none is expected: the problem is in NP,
+is not known to be in P, and is not known to be NP-complete ([Babai
+2016][babai2016graph] gives a quasipolynomial algorithm; [Köbler, Schöning and
+Torán 1993][kobler1993graph] is the structural account).
+
+**It is the reason `DescriptiveComplexity.ComplexityClass.below` exists.**
+“GI-complete” is the standard example of completeness for the degree of a
+*problem* rather than for a logically defined class, and
+`DescriptiveComplexity.GI` is that degree here – with `GraphIso` complete for
+it (`DescriptiveComplexity.graphIso_GI_complete`) and the whole degree inside
+NP (`DescriptiveComplexity.GI_subset_NP`).
+
+There is also a pleasant circularity worth noting: a decision problem in this
+library is by definition an isomorphism-invariant property of finite structures
+(`DescriptiveComplexity.DecisionProblem`), so Graph Isomorphism is the problem
+of deciding the very equivalence the framework quotients by. That reading is
+`DescriptiveComplexity.graphIsoOn_iff_equiv`: the semantic condition is
+literally the existence of an equivalence between the two marked sets carrying
+one adjacency relation to the other.
+-/
+
+namespace DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure SOBlock
+
+/-! ### The generic property -/
+
+section Generic
+
+variable {A : Type}
+
+/-- Some map is a bijection of the `PV`-vertices onto the `HV`-vertices
+carrying `PE`-edges to `HE`-edges *and back*: an isomorphism of the two marked
+graphs. Compare `DescriptiveComplexity.SubgraphIsoOn`, which asks only for an
+injection and only for the forward implication. -/
+def GraphIsoOn (PV HV : A → Prop) (PE HE : A → A → Prop) : Prop :=
+  ∃ f : A → A, (∀ x, PV x → HV (f x)) ∧
+    (∀ x y, PV x → PV y → f x = f y → x = y) ∧
+    (∀ y, HV y → ∃ x, PV x ∧ f x = y) ∧
+    ∀ x y, PV x → PV y → (PE x y ↔ HE (f x) (f y))
+
+variable {B : Type}
+
+/-- `GraphIsoOn` transports along an equivalence commuting with the four
+predicates. -/
+theorem GraphIsoOn.of_equiv (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
+    {PVA HVA : A → Prop} {PEA HEA : A → A → Prop}
+    (hPV : ∀ b, PVB b ↔ PVA (u b)) (hHV : ∀ b, HVB b ↔ HVA (u b))
+    (hPE : ∀ b b', PEB b b' ↔ PEA (u b) (u b'))
+    (hHE : ∀ b b', HEB b b' ↔ HEA (u b) (u b'))
+    (h : GraphIsoOn PVB HVB PEB HEB) : GraphIsoOn PVA HVA PEA HEA := by
+  obtain ⟨f, hmaps, hinj, hsurj, hedge⟩ := h
+  refine ⟨fun a => u (f (u.symm a)), fun x hx => ?_, fun x y hx hy hxy => ?_,
+    fun y hy => ?_, fun x y hx hy => ?_⟩
+  · exact (hHV (f (u.symm x))).mp (hmaps _ ((hPV (u.symm x)).mpr (by simpa using hx)))
+  · have hux : u.symm x = u.symm y :=
+      hinj _ _ ((hPV _).mpr (by simpa using hx)) ((hPV _).mpr (by simpa using hy))
+        (u.injective hxy)
+    simpa using congrArg u hux
+  · obtain ⟨b, hb, hfb⟩ := hsurj (u.symm y) ((hHV (u.symm y)).mpr (by simpa using hy))
+    exact ⟨u b, (hPV b).mp hb, by simp [hfb]⟩
+  · have h := hedge (u.symm x) (u.symm y) ((hPV _).mpr (by simpa using hx))
+      ((hPV _).mpr (by simpa using hy))
+    rw [hPE, hHE] at h
+    simpa using h
+
+/-- `GraphIsoOn` transports along an equivalence, iff version. -/
+theorem GraphIsoOn.equiv_iff (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
+    {PVA HVA : A → Prop} {PEA HEA : A → A → Prop}
+    (hPV : ∀ b, PVB b ↔ PVA (u b)) (hHV : ∀ b, HVB b ↔ HVA (u b))
+    (hPE : ∀ b b', PEB b b' ↔ PEA (u b) (u b'))
+    (hHE : ∀ b b', HEB b b' ↔ HEA (u b) (u b')) :
+    GraphIsoOn PVB HVB PEB HEB ↔ GraphIsoOn PVA HVA PEA HEA :=
+  ⟨GraphIsoOn.of_equiv u hPV hHV hPE hHE,
+    GraphIsoOn.of_equiv u.symm (fun a => by rw [hPV]; simp) (fun a => by rw [hHV]; simp)
+      (fun a a' => by rw [hPE]; simp) fun a a' => by rw [hHE]; simp⟩
+
+/-- **The property is isomorphism of the two marked graphs**: a map of the
+universe as in `DescriptiveComplexity.GraphIsoOn` is the same thing as an
+equivalence of the marked subsets carrying one adjacency relation to the
+other. -/
+theorem graphIsoOn_iff_equiv (PV HV : A → Prop) (PE HE : A → A → Prop) :
+    GraphIsoOn PV HV PE HE ↔
+      ∃ e : {x : A // PV x} ≃ {y : A // HV y},
+        ∀ x y : {x : A // PV x}, PE x.1 y.1 ↔ HE (e x).1 (e y).1 := by
+  classical
+  constructor
+  · rintro ⟨f, hmaps, hinj, hsurj, hedge⟩
+    have hbij : Function.Bijective fun x : {x : A // PV x} => (⟨f x.1, hmaps x.1 x.2⟩ :
+        {y : A // HV y}) := by
+      constructor
+      · exact fun x y hxy => Subtype.ext (hinj x.1 y.1 x.2 y.2 (congrArg Subtype.val hxy))
+      · rintro ⟨y, hy⟩
+        obtain ⟨x, hx, hfx⟩ := hsurj y hy
+        exact ⟨⟨x, hx⟩, Subtype.ext hfx⟩
+    exact ⟨Equiv.ofBijective _ hbij, fun x y => hedge x.1 y.1 x.2 y.2⟩
+  · rintro ⟨e, hedge⟩
+    refine ⟨fun x => if h : PV x then (e ⟨x, h⟩).1 else x, fun x hx => ?_,
+      fun x y hx hy hxy => ?_, fun y hy => ?_, fun x y hx hy => ?_⟩
+    · change HV (if h : PV x then (e ⟨x, h⟩).1 else x)
+      rw [dif_pos hx]
+      exact (e ⟨x, hx⟩).2
+    · have hxy' : (if h : PV x then (e ⟨x, h⟩).1 else x) =
+          if h : PV y then (e ⟨y, h⟩).1 else y := hxy
+      rw [dif_pos hx, dif_pos hy] at hxy'
+      exact congrArg Subtype.val (e.injective (Subtype.ext hxy'))
+    · obtain ⟨z, hz⟩ : ∃ z : {x : A // PV x}, e z = ⟨y, hy⟩ :=
+        ⟨e.symm ⟨y, hy⟩, e.apply_symm_apply _⟩
+      refine ⟨z.1, z.2, ?_⟩
+      change (if h : PV z.1 then (e ⟨z.1, h⟩).1 else z.1) = y
+      rw [dif_pos z.2, Subtype.coe_eta, hz]
+    · change PE x y ↔ HE (if h : PV x then (e ⟨x, h⟩).1 else x)
+        (if h : PV y then (e ⟨y, h⟩).1 else y)
+      rw [dif_pos hx, dif_pos hy]
+      exact hedge ⟨x, hx⟩ ⟨y, hy⟩
+
+end Generic
+
+/-! ### The problem -/
+
+section Problem
+
+variable (A : Type) [Language.twoGraphs.Structure A]
+
+/-- The two marked graphs of the instance are isomorphic. -/
+def HasGraphIso : Prop :=
+  Finite A ∧ GraphIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE
+
+end Problem
+
+section Iso
+
+variable {A B : Type} [Language.twoGraphs.Structure A] [Language.twoGraphs.Structure B]
+
+/-- The graph-isomorphism property is isomorphism-invariant. -/
+theorem hasGraphIso_iso (e : A ≃[Language.twoGraphs] B) :
+    HasGraphIso A ↔ HasGraphIso B :=
+  and_congr e.toEquiv.finite_iff
+    (GraphIsoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tgPatV a)
+      (fun a => relMap_equiv₁ e tgHostV a) (fun a b => relMap_equiv₂ e tgPatE a b)
+      fun a b => relMap_equiv₂ e tgHostE a b)
+
+end Iso
+
+/-- GRAPH ISOMORPHISM, as a problem on pattern-and-host structures: are the two
+marked graphs isomorphic? -/
+def GraphIso : DecisionProblem Language.twoGraphs where
+  Holds := fun A inst => @HasGraphIso A inst
+  iso_invariant := fun e => hasGraphIso_iso e
+
+/-! ### Membership -/
+
+section SigmaOne
+
+/-- Kernel clause: every pattern vertex is mapped to some host vertex. -/
+private noncomputable def giTotalClause : subgraphSOLang.Sentence :=
+  Formula.iAlls (Fin 1)
+    ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0))).imp
+      ((Relations.formula₂ sgMapSym (Term.var (Sum.inl (Sum.inr 0)))
+          (Term.var (Sum.inr ())) ⊓
+        Relations.formula₁ sgHostVSym (Term.var (Sum.inr ()))).iExs Unit))
+
+/-- Kernel clause: the guessed map is a function on the pattern. -/
+private noncomputable def giFuncClause : subgraphSOLang.Sentence :=
+  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2))).imp
+    (Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+
+/-- Kernel clause: the guessed map is injective on the pattern. -/
+private noncomputable def giInjClause : subgraphSOLang.Sentence :=
+  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
+      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
+    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+
+/-- Kernel clause: every host vertex is hit – what makes the map onto, and the
+one clause Subgraph Isomorphism does not have. -/
+private noncomputable def giSurjClause : subgraphSOLang.Sentence :=
+  Formula.iAlls (Fin 1)
+    ((Relations.formula₁ sgHostVSym (Term.var (Sum.inr 0))).imp
+      ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr ())) ⊓
+        Relations.formula₂ sgMapSym (Term.var (Sum.inr ()))
+          (Term.var (Sum.inl (Sum.inr 0)))).iExs Unit))
+
+/-- Kernel clause: the guessed map carries pattern edges to host edges. -/
+private noncomputable def giEdgeClause : subgraphSOLang.Sentence :=
+  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
+      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
+      Relations.formula₂ sgPatESym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3))).imp
+    (Relations.formula₂ sgHostESym (Term.var (Sum.inr 2))
+      (Term.var (Sum.inr 3)))).iAlls (Fin 4)
+
+/-- Kernel clause: the guessed map reflects host edges to pattern edges – the
+other clause distinguishing isomorphism from an injective homomorphism. -/
+private noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
+  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
+      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
+      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3)) ⊓
+      Relations.formula₂ sgHostESym (Term.var (Sum.inr 2)) (Term.var (Sum.inr 3))).imp
+    (Relations.formula₂ sgPatESym (Term.var (Sum.inr 0))
+      (Term.var (Sum.inr 1)))).iAlls (Fin 4)
+
+/-- The first-order kernel of the `Σ₁` definition of Graph Isomorphism: the
+guessed relation is a bijection of the pattern vertices onto the host vertices,
+preserving and reflecting adjacency. -/
+noncomputable def graphIsoKernel : subgraphSOLang.Sentence :=
+  giTotalClause ⊓ (giFuncClause ⊓ (giInjClause ⊓
+    (giSurjClause ⊓ (giEdgeClause ⊓ giEdgeBackClause))))
+
+/-- Realization of the kernel under an assignment of the guessed map. -/
+private theorem realize_graphIsoKernel {A : Type} [Language.twoGraphs.Structure A]
+    (ρ : isoGuessBlock.Assignment A) :
+    (@Sentence.Realize subgraphSOLang A
+        (@sumStructure _ _ A _ (isoGuessBlock.structure ρ)) graphIsoKernel) ↔
+      (∀ x : A, TGPatV x → ∃ y : A, ρ () ![x, y] ∧ TGHostV y) ∧
+        (∀ x y y' : A, TGPatV x → ρ () ![x, y] → ρ () ![x, y'] → y = y') ∧
+        (∀ x x' y : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y] → x = x') ∧
+        (∀ y : A, TGHostV y → ∃ x : A, TGPatV x ∧ ρ () ![x, y]) ∧
+        (∀ x x' y y' : A, TGPatV x → TGPatV x' → TGPatE x x' → ρ () ![x, y] →
+          ρ () ![x', y'] → TGHostE y y') ∧
+        ∀ x x' y y' : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y'] →
+          TGHostE y y' → TGPatE x x' := by
+  letI := isoGuessBlock.structure ρ
+  have hsub : ∀ (w : Fin 2 → A),
+      RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ () w := fun _ => Iff.rfl
+  rw [graphIsoKernel]
+  simp only [giTotalClause, giFuncClause, giInjClause, giSurjClause, giEdgeClause,
+    giEdgeBackClause, Sentence.Realize, Formula.realize_inf, Formula.realize_iAlls,
+    Formula.realize_imp, Formula.realize_iExs, Formula.realize_rel₁, Formula.realize_rel₂,
+    Formula.realize_equal, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
+    Language.relMap_sumInl, hsub]
+  refine and_congr ⟨fun h x hx => ?_, fun h i hi => ?_⟩
+    (and_congr ⟨fun h x y y' hx h₁ h₂ => ?_, fun h i hi => ?_⟩
+      (and_congr ⟨fun h x x' y hx hx' h₁ h₂ => ?_, fun h i hi => ?_⟩
+        (and_congr ⟨fun h y hy => ?_, fun h i hi => ?_⟩
+          (and_congr ⟨fun h x x' y y' hx hx' hpe h₁ h₂ => ?_, fun h i hi => ?_⟩
+            ⟨fun h x x' y y' hx hx' h₁ h₂ hhe => ?_, fun h i hi => ?_⟩))))
+  · obtain ⟨y, hy1, hy2⟩ := h (fun _ => x) hx
+    exact ⟨y (), hy1, hy2⟩
+  · obtain ⟨y, hy1, hy2⟩ := h (i 0) hi
+    exact ⟨fun _ => y, hy1, hy2⟩
+  · exact h ![x, y, y'] ⟨⟨hx, h₁⟩, h₂⟩
+  · exact h (i 0) (i 1) (i 2) hi.1.1 hi.1.2 hi.2
+  · exact h ![x, x', y] ⟨⟨⟨hx, hx'⟩, h₁⟩, h₂⟩
+  · exact h (i 0) (i 1) (i 2) hi.1.1.1 hi.1.1.2 hi.1.2 hi.2
+  · obtain ⟨x, hx1, hx2⟩ := h (fun _ => y) hy
+    exact ⟨x (), hx1, hx2⟩
+  · obtain ⟨x, hx1, hx2⟩ := h (i 0) hi
+    exact ⟨fun _ => x, hx1, hx2⟩
+  · exact h ![x, x', y, y'] ⟨⟨⟨⟨hx, hx'⟩, hpe⟩, h₁⟩, h₂⟩
+  · exact h (i 0) (i 1) (i 2) (i 3) hi.1.1.1.1 hi.1.1.1.2 hi.1.1.2 hi.1.2 hi.2
+  · exact h ![x, x', y, y'] ⟨⟨⟨⟨hx, hx'⟩, h₁⟩, h₂⟩, hhe⟩
+  · exact h (i 0) (i 1) (i 2) (i 3) hi.1.1.1.1 hi.1.1.1.2 hi.1.1.2 hi.1.2 hi.2
+
+/-- **Graph Isomorphism is `Σ₁`-definable**: existentially guess the map, then
+check first-order that it is a bijection of the pattern vertices onto the host
+vertices preserving adjacency in both directions. One binary relation variable,
+no order, no counting, no threshold. -/
+theorem graphIso_sigmaSODefinable : SigmaSODefinable 1 GraphIso := by
+  refine ⟨[isoGuessBlock], rfl, graphIsoKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨-, f, hmaps, hinj, hsurj, hedge⟩
+    refine ⟨fun i => match i with | () => fun w : Fin 2 → A => f (w 0) = w 1,
+      (realize_graphIsoKernel _).mpr ⟨fun x hx => ⟨f x, rfl, hmaps x hx⟩,
+        fun x y y' _ h₁ h₂ => h₁.symm.trans h₂,
+        fun x x' y hx hx' h₁ h₂ => hinj x x' hx hx' (h₁.trans h₂.symm),
+        fun y hy => ?_, ?_, ?_⟩⟩
+    · obtain ⟨x, hx, hfx⟩ := hsurj y hy
+      exact ⟨x, hx, hfx⟩
+    · intro x x' y y' hx hx' hpe h₁ h₂
+      have h₁' : f x = y := h₁
+      have h₂' : f x' = y' := h₂
+      rw [← h₁', ← h₂']
+      exact (hedge x x' hx hx').mp hpe
+    · intro x x' y y' hx hx' h₁ h₂ hhe
+      have h₁' : f x = y := h₁
+      have h₂' : f x' = y' := h₂
+      rw [← h₁', ← h₂'] at hhe
+      exact (hedge x x' hx hx').mpr hhe
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨htot, hfunc, hinj, hsurj, hedge, hedgeBack⟩ := (realize_graphIsoKernel ρ).mp hρ
+    classical
+    have hch : ∀ x : {x : A // TGPatV x}, ∃ y : A, ρ () ![x.1, y] ∧ TGHostV y :=
+      fun x => htot x.1 x.2
+    choose g hg1 hg2 using hch
+    refine ⟨‹Finite A›, fun x => if h : TGPatV x then g ⟨x, h⟩ else x, fun x hx => ?_,
+      fun x y hx hy hxy => ?_, fun y hy => ?_, fun x y hx hy => ?_⟩
+    · change TGHostV (if h : TGPatV x then g ⟨x, h⟩ else x)
+      rw [dif_pos hx]
+      exact hg2 ⟨x, hx⟩
+    · have hxy' : (if h : TGPatV x then g ⟨x, h⟩ else x) =
+          if h : TGPatV y then g ⟨y, h⟩ else y := hxy
+      rw [dif_pos hx, dif_pos hy] at hxy'
+      exact hinj x y (g ⟨x, hx⟩) hx hy (hg1 ⟨x, hx⟩) (hxy' ▸ hg1 ⟨y, hy⟩)
+    · obtain ⟨x, hx, hxy⟩ := hsurj y hy
+      refine ⟨x, hx, ?_⟩
+      change (if h : TGPatV x then g ⟨x, h⟩ else x) = y
+      rw [dif_pos hx]
+      exact hfunc x (g ⟨x, hx⟩) y hx (hg1 ⟨x, hx⟩) hxy
+    · change TGPatE x y ↔ TGHostE (if h : TGPatV x then g ⟨x, h⟩ else x)
+        (if h : TGPatV y then g ⟨y, h⟩ else y)
+      rw [dif_pos hx, dif_pos hy]
+      exact ⟨fun hpe => hedge x y _ _ hx hy hpe (hg1 ⟨x, hx⟩) (hg1 ⟨y, hy⟩),
+        fun hhe => hedgeBack x y _ _ hx hy (hg1 ⟨x, hx⟩) (hg1 ⟨y, hy⟩) hhe⟩
+
+end SigmaOne
+
+/-- Graph Isomorphism is in NP: it is `Σ₁`-definable. -/
+theorem graphIso_mem_NP : GraphIso ∈ NP :=
+  graphIso_sigmaSODefinable
+
+/-! ### The GI degree -/
+
+/-- **The GI degree**: the problems that (ordered) first-order reduce to Graph
+Isomorphism, as a complexity class
+(`DescriptiveComplexity.ComplexityClass.below`). A problem is *GI-complete* –
+in this library's finer, first-order sense – when it is
+`DescriptiveComplexity.ComplexityClass.Complete` for `GI`. -/
+noncomputable def GI : ComplexityClass :=
+  .below GraphIso
+
+/-- **Graph Isomorphism is GI-complete**, by construction. -/
+theorem graphIso_GI_complete : GI.Complete GraphIso :=
+  ComplexityClass.below_complete_self GraphIso
+
+/-- The whole GI degree lies inside NP, since Graph Isomorphism does and
+membership travels backward along reductions. (Whether the inclusion is strict
+is the open question; the framework decides no such thing.) -/
+theorem GI_subset_NP : GI ⊆ NP :=
+  fun _ _ _ h => NP.mem_of_orderedReduction h.some graphIso_mem_NP
+
+end DescriptiveComplexity

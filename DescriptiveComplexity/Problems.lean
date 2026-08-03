@@ -23,6 +23,7 @@ import DescriptiveComplexity.Problems.NaeThreeSat
 import DescriptiveComplexity.Problems.OneInSat
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SubgraphIso
+import DescriptiveComplexity.Problems.GraphIso
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetSplitting
@@ -61,7 +62,11 @@ containing its vocabulary, its semantic definition, the bundled
 completeness theorems.
 
 Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
-only the membership half. Alternating machine acceptance
+only the membership half. Graph Isomorphism
+(`DescriptiveComplexity.GraphIso`) carries the membership half on purpose: it
+is in NP (`DescriptiveComplexity.graphIso_mem_NP`) and conjecturally neither in
+P nor NP-complete, so what it is complete for is its *own* degree
+(`DescriptiveComplexity.GI`, from `DescriptiveComplexity.Degree`). Alternating machine acceptance
 (`DescriptiveComplexity.ATMAccept`) is the machine bridge for the polynomial
 hierarchy, complete at every level
 (`DescriptiveComplexity.atmAccept_sigmaP_complete`,
