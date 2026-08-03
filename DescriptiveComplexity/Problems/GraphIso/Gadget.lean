@@ -605,6 +605,158 @@ theorem not_onTri_pPt (u v : G) : ¬OnTri (pPt u v) := by
   · exact (edge_tagAdj hrp).elim
   · exact edge_irrefl_pt _ _ _ hrp
 
+/-! ### Junk points are isolated
+
+A point whose coordinates do not fit its tag – a lollipop node off the
+diagonal, a subdivision node on a pair that is not an arc – is joined to
+nothing, so an isomorphism can only match it with another such point. This is
+what lets the recovery below case over *all* points rather than only the
+well-formed ones. -/
+
+/-- A `vtx` node off the diagonal is isolated. -/
+theorem isolated_vtx {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+    ¬GEdge (pt .vtx u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .vtx u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .vtx u v) z) hq) he
+  cases s
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_vtx_m₁ u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_vtx_a u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_vtx_c u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+
+/-- A `m₁` node off the diagonal is isolated. -/
+theorem isolated_m₁ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+    ¬GEdge (pt .m₁ u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .m₁ u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .m₁ u v) z) hq) he
+  cases s
+  · exact h ((edge_m₁_vtx u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_m₁_m₂ u v (x 0) (x 1)).mp he').1
+  · exact h ((edge_m₁_m₃ u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+
+/-- A `m₂` node off the diagonal is isolated. -/
+theorem isolated_m₂ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+    ¬GEdge (pt .m₂ u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .m₂ u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .m₂ u v) z) hq) he
+  cases s
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_m₂_m₁ u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_m₂_m₃ u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+
+/-- A `m₃` node off the diagonal is isolated. -/
+theorem isolated_m₃ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+    ¬GEdge (pt .m₃ u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .m₃ u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .m₃ u v) z) hq) he
+  cases s
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_m₃_m₁ u v (x 0) (x 1)).mp he').1
+  · exact h ((edge_m₃_m₂ u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+
+/-- An `a` node on a pair that is not an arc is isolated. -/
+theorem isolated_a {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+    ¬GEdge (pt .a u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .a u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .a u v) z) hq) he
+  cases s
+  · exact h ((edge_a_vtx u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_a_b u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_a_p u v (x 0) (x 1)).mp he').1
+
+/-- An `b` node on a pair that is not an arc is isolated. -/
+theorem isolated_b {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+    ¬GEdge (pt .b u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .b u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .b u v) z) hq) he
+  cases s
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_b_a u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_b_c u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+
+/-- An `c` node on a pair that is not an arc is isolated. -/
+theorem isolated_c {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+    ¬GEdge (pt .c u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .c u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .c u v) z) hq) he
+  cases s
+  · exact h ((edge_c_vtx u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_c_b u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+
+/-- An `p` node on a pair that is not an arc is isolated. -/
+theorem isolated_p {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+    ¬GEdge (pt .p u v) q := by
+  intro he
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have he' : GEdge (pt .p u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pt .p u v) z) hq) he
+  cases s
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact h ((edge_p_a u v (x 0) (x 1)).mp he').1
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+  · exact (edge_tagAdj he).elim
+
 /-! ### Adjacency to a triangle: the vertices -/
 
 /-- A vertex node is adjacent to its lollipop. -/
@@ -638,6 +790,60 @@ theorem not_adjTri_pPt (u v : G) : ¬AdjTri (pPt u v) := by
   rintro ⟨q, hq, htri⟩
   rcases nbr_of_pPt hq with rfl
   exact not_onTri_aPt u v htri
+
+/-- The other two corners of a lollipop lie on its triangle too. -/
+theorem onTri_m₂Pt (u : G) : OnTri (m₂Pt u) :=
+  ⟨m₃Pt u, m₁Pt u, (edge_m₂_m₃ u u u u).mpr ⟨rfl, rfl, rfl⟩,
+    (edge_m₃_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩, (edge_m₁_m₂ u u u u).mpr ⟨rfl, rfl, rfl⟩⟩
+
+@[inherit_doc onTri_m₂Pt]
+theorem onTri_m₃Pt (u : G) : OnTri (m₃Pt u) :=
+  ⟨m₁Pt u, m₂Pt u, (edge_m₃_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩,
+    (edge_m₁_m₂ u u u u).mpr ⟨rfl, rfl, rfl⟩, (edge_m₂_m₃ u u u u).mpr ⟨rfl, rfl, rfl⟩⟩
+
+/-- **The vertices are recoverable from adjacency alone**: they are the nodes
+adjacent to a triangle without lying on one. Junk points fail the test by being
+isolated, lollipop nodes by lying on their triangle, and subdivision nodes and
+pendants by touching no triangle. -/
+theorem vertex_iff (p : gadget.Map G) : (¬OnTri p ∧ AdjTri p) ↔ ∃ u, p = vPt u := by
+  constructor
+  · rintro ⟨hnt, q, hq, htri⟩
+    obtain ⟨t, x⟩ := p
+    have hp : ((t, x) : gadget.Map G) = pt t (x 0) (x 1) := pt_eta _
+    have hq' : GEdge (pt t (x 0) (x 1)) q := Eq.mp (congrArg (fun z => GEdge z q) hp) hq
+    have hnt' : ¬OnTri (pt t (x 0) (x 1)) := fun h =>
+      hnt (Eq.mp (congrArg OnTri hp.symm) h)
+    rw [hp]
+    cases t
+    · by_cases hd : x 0 = x 1
+      · exact ⟨x 0, by rw [vPt, ← hd]⟩
+      · exact absurd hq' (isolated_vtx hd q)
+    · by_cases hd : x 0 = x 1
+      · refine absurd (Eq.mp (congrArg OnTri ?_) (onTri_m₁Pt (x 0))) hnt'
+        rw [m₁Pt, hd]
+      · exact absurd hq' (isolated_m₁ hd q)
+    · by_cases hd : x 0 = x 1
+      · refine absurd (Eq.mp (congrArg OnTri ?_) (onTri_m₂Pt (x 0))) hnt'
+        rw [m₂Pt, hd]
+      · exact absurd hq' (isolated_m₂ hd q)
+    · by_cases hd : x 0 = x 1
+      · refine absurd (Eq.mp (congrArg OnTri ?_) (onTri_m₃Pt (x 0))) hnt'
+        rw [m₃Pt, hd]
+      · exact absurd hq' (isolated_m₃ hd q)
+    · by_cases hd : GAdj (x 0) (x 1)
+      · exact absurd ⟨q, hq', htri⟩ (not_adjTri_aPt (x 0) (x 1))
+      · exact absurd hq' (isolated_a hd q)
+    · by_cases hd : GAdj (x 0) (x 1)
+      · exact absurd ⟨q, hq', htri⟩ (not_adjTri_bPt (x 0) (x 1))
+      · exact absurd hq' (isolated_b hd q)
+    · by_cases hd : GAdj (x 0) (x 1)
+      · exact absurd ⟨q, hq', htri⟩ (not_adjTri_cPt (x 0) (x 1))
+      · exact absurd hq' (isolated_c hd q)
+    · by_cases hd : GAdj (x 0) (x 1)
+      · exact absurd ⟨q, hq', htri⟩ (not_adjTri_pPt (x 0) (x 1))
+      · exact absurd hq' (isolated_p hd q)
+  · rintro ⟨u, rfl⟩
+    exact ⟨not_onTri_vPt u, adjTri_vPt u⟩
 
 /-! ### Leaves: the pendant marks the tail -/
 
@@ -685,9 +891,186 @@ theorem not_hasLeafNbr_cPt {u v : G} (h : GAdj u v) : ¬HasLeafNbr (cPt u v) := 
   · exact not_leaf_bPt h hleaf
   · exact not_leaf_vPt_of_in h hleaf
 
+/-! ### The arcs are recoverable -/
+
+/-- **An arc of the input is a guarded path of length four between the two
+vertex nodes.** Each guard rules out a concrete impostor: without `¬OnTri` the
+lollipop of an isolated vertex closes the chain, without `¬AdjTri` it turns
+back through the vertex node, without `¬Leaf` it goes out to the pendant and
+back, and without `¬HasLeafNbr` it returns along the tail-side node – each of
+which would claim an arc from a vertex to itself. The direction of the arc is
+carried by `HasLeafNbr`: only the tail side has a pendant. -/
+theorem arc_iff (u v : G) :
+    GAdj u v ↔ ∃ p q r, GEdge (vPt u) p ∧ ¬OnTri p ∧ ¬AdjTri p ∧ HasLeafNbr p ∧
+      GEdge p q ∧ ¬OnTri q ∧ ¬AdjTri q ∧ ¬Leaf q ∧
+      GEdge q r ∧ ¬OnTri r ∧ ¬HasLeafNbr r ∧ GEdge r (vPt v) := by
+  constructor
+  · intro h
+    exact ⟨aPt u v, bPt u v, cPt u v,
+      (edge_vtx_a u u u v).mpr ⟨rfl, h, rfl⟩,
+      not_onTri_aPt u v, not_adjTri_aPt u v, hasLeafNbr_aPt h,
+      (edge_a_b u v u v).mpr ⟨h, h, rfl, rfl⟩,
+      not_onTri_bPt u v, not_adjTri_bPt u v, not_leaf_bPt h,
+      (edge_b_c u v u v).mpr ⟨h, h, rfl, rfl⟩,
+      not_onTri_cPt u v, not_hasLeafNbr_cPt h,
+      (edge_c_vtx u v v v).mpr ⟨h, rfl, rfl⟩⟩
+  · rintro ⟨p, q, r, hvp, hntp, hnap, hlp, hpq, hntq, hnaq, hnlq, hqr, hntr, hnlr, hrv⟩
+    -- the first step leaves the tail-side subdivision node as the only option
+    rcases nbr_of_vPt hvp with rfl | ⟨v', harc, rfl⟩ | ⟨w, harc, rfl⟩
+    · exact absurd (onTri_m₁Pt u) hntp
+    · -- the second step: neither back to the vertex nor out to the pendant
+      rcases nbr_of_aPt hpq with rfl | rfl | rfl
+      · exact absurd (adjTri_vPt u) hnaq
+      · -- the third step: not back along the tail-side node
+        rcases nbr_of_bPt hqr with rfl | rfl
+        · exact absurd (hasLeafNbr_aPt harc) hnlr
+        · -- the head of the arc is where the chain lands
+          obtain ⟨-, -, hv⟩ := (edge_c_vtx u v' v v).mp hrv
+          rw [hv] at harc
+          exact harc
+      · exact absurd (leaf_pPt harc) hnlq
+    · exact absurd (not_hasLeafNbr_cPt harc) (fun hn => hn hlp)
+
 end Levels
 
 end Edges
+
+/-! ### An isomorphism of the constructions is one of the inputs -/
+
+section Reflect
+
+variable {G H : Type} [Language.graph.Structure G] [Language.graph.Structure H]
+variable (φ : gadget.Map G ≃[Language.graph] gadget.Map H)
+
+/-- An isomorphism preserves and reflects the constructed adjacency. -/
+theorem edge_map (p q : gadget.Map G) : GEdge (φ p) (φ q) ↔ GEdge p q := by
+  have h := φ.map_rel' Language.adj ![p, q]
+  rw [show (φ.toFun ∘ ![p, q]) = ![φ p, φ q] by funext i; fin_cases i <;> rfl] at h
+  exact h
+
+theorem edge_map_symm (p q : gadget.Map H) : GEdge (φ.symm p) (φ.symm q) ↔ GEdge p q := by
+  have h := edge_map φ (φ.symm p) (φ.symm q)
+  rw [φ.apply_symm_apply, φ.apply_symm_apply] at h
+  exact h.symm
+
+/-- Lying on a triangle is preserved. -/
+theorem onTri_map (p : gadget.Map G) : OnTri (φ p) ↔ OnTri p := by
+  constructor
+  · rintro ⟨q, r, h₁, h₂, h₃⟩
+    refine ⟨φ.symm q, φ.symm r, ?_, ?_, ?_⟩
+    · rw [← edge_map_symm φ, φ.symm_apply_apply] at h₁; exact h₁
+    · rw [← edge_map_symm φ] at h₂; exact h₂
+    · rw [← edge_map_symm φ, φ.symm_apply_apply] at h₃; exact h₃
+  · rintro ⟨q, r, h₁, h₂, h₃⟩
+    exact ⟨φ q, φ r, (edge_map φ _ _).mpr h₁, (edge_map φ _ _).mpr h₂, (edge_map φ _ _).mpr h₃⟩
+
+/-- Adjacency to a triangle is preserved. -/
+theorem adjTri_map (p : gadget.Map G) : AdjTri (φ p) ↔ AdjTri p := by
+  constructor
+  · rintro ⟨q, h₁, h₂⟩
+    refine ⟨φ.symm q, ?_, ?_⟩
+    · rw [← edge_map_symm φ, φ.symm_apply_apply] at h₁; exact h₁
+    · rw [← onTri_map φ, φ.apply_symm_apply]; exact h₂
+  · rintro ⟨q, h₁, h₂⟩
+    exact ⟨φ q, (edge_map φ _ _).mpr h₁, (onTri_map φ q).mpr h₂⟩
+
+/-- Being a leaf is preserved: the uniqueness clause transfers because every
+neighbour of the image is the image of a neighbour. -/
+theorem leaf_map (p : gadget.Map G) : Leaf (φ p) ↔ Leaf p := by
+  constructor
+  · rintro ⟨q, h₁, h₂⟩
+    refine ⟨φ.symm q, ?_, fun r hr => ?_⟩
+    · rw [← edge_map_symm φ, φ.symm_apply_apply] at h₁; exact h₁
+    · have := h₂ (φ r) ((edge_map φ p r).mpr hr)
+      rw [← this, φ.symm_apply_apply]
+  · rintro ⟨q, h₁, h₂⟩
+    refine ⟨φ q, (edge_map φ _ _).mpr h₁, fun r hr => ?_⟩
+    have hr' : GEdge p (φ.symm r) := by
+      rw [← edge_map_symm φ, φ.symm_apply_apply] at hr; exact hr
+    rw [← h₂ (φ.symm r) hr', φ.apply_symm_apply]
+
+/-- Having a leaf neighbour is preserved. -/
+theorem hasLeafNbr_map (p : gadget.Map G) : HasLeafNbr (φ p) ↔ HasLeafNbr p := by
+  constructor
+  · rintro ⟨q, h₁, h₂⟩
+    refine ⟨φ.symm q, ?_, ?_⟩
+    · rw [← edge_map_symm φ, φ.symm_apply_apply] at h₁; exact h₁
+    · rw [← leaf_map φ, φ.apply_symm_apply]; exact h₂
+  · rintro ⟨q, h₁, h₂⟩
+    exact ⟨φ q, (edge_map φ _ _).mpr h₁, (leaf_map φ q).mpr h₂⟩
+
+omit [Language.graph.Structure G] in
+theorem vPt_injective : Function.Injective (vPt (G := G)) := fun _ _ h =>
+  congrArg (fun z : gadget.Map G => z.2 0) h
+
+/-- **The gadget reflects isomorphism**: an isomorphism of the constructed
+graphs restricts to the vertex nodes, and the arcs are read off it by
+`DescriptiveComplexity.GraphGadget.arc_iff`. Together with functoriality – free
+for an interpretation – this says the construction is faithful. -/
+theorem gadget_isoReflecting : IsoReflecting gadget := by
+  intro G H _ _ _ _ hiso
+  obtain ⟨φ⟩ := hiso
+  classical
+  have hvtx : ∀ u : G, ∃ w : H, φ (vPt u) = vPt w := fun u =>
+    (vertex_iff (φ (vPt u))).mp
+      ⟨by rw [onTri_map φ]; exact not_onTri_vPt u, by rw [adjTri_map φ]; exact adjTri_vPt u⟩
+  choose g hg using hvtx
+  have hvtx' : ∀ w : H, ∃ u : G, φ.symm (vPt w) = vPt u := fun w =>
+    (vertex_iff (φ.symm (vPt w))).mp
+      ⟨by rw [← onTri_map φ, φ.apply_symm_apply]; exact not_onTri_vPt w,
+        by rw [← adjTri_map φ, φ.apply_symm_apply]; exact adjTri_vPt w⟩
+  choose g' hg' using hvtx'
+  have hsymm : ∀ u : G, φ.symm (vPt (g u)) = vPt u := fun u => by
+    rw [← hg u, φ.symm_apply_apply]
+  have hginj : Function.Injective g := fun u v huv => by
+    have : φ (vPt u) = φ (vPt v) := by rw [hg u, hg v, huv]
+    exact vPt_injective (φ.injective this)
+  have hgsurj : Function.Surjective g := fun w => by
+    refine ⟨g' w, vPt_injective ?_⟩
+    have : φ (vPt (g' w)) = vPt w := by rw [← hg' w, φ.apply_symm_apply]
+    rw [← hg (g' w), this]
+  -- the arcs, through the guarded chain on both sides
+  have hadj : ∀ u v : G, GAdj u v ↔ GAdj (g u) (g v) := by
+    intro u v
+    rw [arc_iff, arc_iff]
+    constructor
+    · rintro ⟨p, q, r, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12⟩
+      refine ⟨φ p, φ q, φ r, ?_, ?_, ?_, ?_, (edge_map φ _ _).mpr h5, ?_, ?_, ?_,
+        (edge_map φ _ _).mpr h9, ?_, ?_, ?_⟩
+      · rw [← hg u]; exact (edge_map φ _ _).mpr h1
+      · rw [onTri_map φ]; exact h2
+      · rw [adjTri_map φ]; exact h3
+      · rw [hasLeafNbr_map φ]; exact h4
+      · rw [onTri_map φ]; exact h6
+      · rw [adjTri_map φ]; exact h7
+      · rw [leaf_map φ]; exact h8
+      · rw [onTri_map φ]; exact h10
+      · rw [hasLeafNbr_map φ]; exact h11
+      · rw [← hg v]; exact (edge_map φ _ _).mpr h12
+    · rintro ⟨p, q, r, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12⟩
+      refine ⟨φ.symm p, φ.symm q, φ.symm r, ?_, ?_, ?_, ?_,
+        (edge_map_symm φ _ _).mpr h5, ?_, ?_, ?_, (edge_map_symm φ _ _).mpr h9, ?_, ?_, ?_⟩
+      · rw [← hsymm u]; exact (edge_map_symm φ _ _).mpr h1
+      · rw [← onTri_map φ, φ.apply_symm_apply]; exact h2
+      · rw [← adjTri_map φ, φ.apply_symm_apply]; exact h3
+      · rw [← hasLeafNbr_map φ, φ.apply_symm_apply]; exact h4
+      · rw [← onTri_map φ, φ.apply_symm_apply]; exact h6
+      · rw [← adjTri_map φ, φ.apply_symm_apply]; exact h7
+      · rw [← leaf_map φ, φ.apply_symm_apply]; exact h8
+      · rw [← onTri_map φ, φ.apply_symm_apply]; exact h10
+      · rw [← hasLeafNbr_map φ, φ.apply_symm_apply]; exact h11
+      · rw [← hsymm v]; exact (edge_map_symm φ _ _).mpr h12
+  refine ⟨{ toEquiv := Equiv.ofBijective g ⟨hginj, hgsurj⟩
+            map_fun' := fun f => isEmptyElim f
+            map_rel' := ?_ }⟩
+  intro n r x
+  cases r
+  rw [show x = ![x 0, x 1] by funext i; fin_cases i <;> rfl]
+  rw [show ((Equiv.ofBijective g ⟨hginj, hgsurj⟩).toFun ∘ ![x 0, x 1])
+      = ![g (x 0), g (x 1)] by funext i; fin_cases i <;> rfl]
+  exact (hadj (x 0) (x 1)).symm
+
+end Reflect
 
 end GraphGadget
 
