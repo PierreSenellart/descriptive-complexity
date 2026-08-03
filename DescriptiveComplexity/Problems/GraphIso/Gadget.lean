@@ -353,6 +353,34 @@ theorem edge_irrefl_pt (t : GTag) (u v : G) : ¬GEdge (pt t u v) (pt t u v) := b
   rw [GEdge, FOInterpretation.relMap_map]
   cases t <;> exact fun h => h.elim
 
+/-! ### The construction is a simple graph -/
+
+/-- **Symmetric**: every clause of `DescriptiveComplexity.GraphGadget.edgeF` is
+stated in both directions, so the constructed relation is undirected. -/
+theorem edge_symm_pt (t s : GTag) (u v u' v' : G) :
+    GEdge (pt t u v) (pt s u' v') ↔ GEdge (pt s u' v') (pt t u v) := by
+  cases t <;> cases s <;>
+    first
+      | exact ⟨fun h => (edge_tagAdj h).elim, fun h => (edge_tagAdj h).elim⟩
+      | (simp only [edge_vtx_m₁, edge_m₁_vtx, edge_m₁_m₂, edge_m₂_m₁, edge_m₁_m₃, edge_m₃_m₁,
+      edge_m₂_m₃, edge_m₃_m₂, edge_vtx_a, edge_a_vtx, edge_a_b, edge_b_a,
+      edge_b_c, edge_c_b, edge_c_vtx, edge_vtx_c, edge_a_p, edge_p_a]
+         tauto)
+
+@[inherit_doc edge_symm_pt]
+theorem edge_symm (p q : gadget.Map G) : GEdge p q ↔ GEdge q p := by
+  obtain ⟨t, w⟩ := p
+  obtain ⟨s, x⟩ := q
+  rw [pt_eta ((t, w) : gadget.Map G), pt_eta ((s, x) : gadget.Map G)]
+  exact edge_symm_pt _ _ _ _ _ _
+
+/-- **Irreflexive**: no clause relates a tag to itself, so the constructed
+graph has no loops. -/
+theorem edge_irrefl (p : gadget.Map G) : ¬GEdge p p := by
+  obtain ⟨t, w⟩ := p
+  rw [pt_eta ((t, w) : gadget.Map G)]
+  exact edge_irrefl_pt _ _ _
+
 /-! ### The neighbours of each kind of node -/
 
 section Neighbours
