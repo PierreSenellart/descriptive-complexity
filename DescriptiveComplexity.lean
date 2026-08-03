@@ -72,6 +72,10 @@ import DescriptiveComplexity.Invariant.Structure
 import DescriptiveComplexity.Invariant.Simulation
 import DescriptiveComplexity.Invariant.OrderDef
 import DescriptiveComplexity.Invariant.Backward
+import DescriptiveComplexity.Invariant.Bare
+import DescriptiveComplexity.Invariant.TwoPebble
+import DescriptiveComplexity.Invariant.TwoInvariance
+import DescriptiveComplexity.Invariant.TwoStages
 import DescriptiveComplexity.FirstOrderDefinable
 import DescriptiveComplexity.Games.Ehrenfeucht
 import DescriptiveComplexity.Games.Bare
@@ -406,6 +410,32 @@ development has no counterpart for.
   the budget halves: copy the distance to the nearer neighbour, or, when both
   are far, land in the middle of a gap the invariant makes twice as wide on
   the other side.
+* `DescriptiveComplexity.Invariant.Bare` – **the order no induction defines**:
+  over the empty vocabulary `≡ᵏ` is the equality pattern
+  (`DescriptiveComplexity.equivK_bare`, the pebble twin of
+  `DescriptiveComplexity.efStage_bare`), so a transposition of the universe
+  leaves it alone and every binary variable of an order-free inflationary
+  limit is symmetric – whence
+  `DescriptiveComplexity.not_isLinearOrder_inflLimit`: **no order-free
+  `StepDef` defines a linear order on a bare set**. This is the
+  order-invariance of the definability notions of this library as a theorem:
+  the order they are handed is not a convenience but something no
+  isomorphism-invariant logic can build. It is a statement about a defined
+  *relation*; the class-level one needs the two-structure game below, since
+  `≡ᵏ` relates tuples inside one structure.
+* `DescriptiveComplexity.Invariant.TwoPebble`,
+  `DescriptiveComplexity.Invariant.TwoInvariance`,
+  `DescriptiveComplexity.Invariant.TwoStages` – **the `k`-pebble game between
+  two structures**, the pebble counterpart of the round game above and the
+  layer a *Boolean* query needs: the same chain, coinduction and stabilization
+  with the two sides in different types (`DescriptiveComplexity.EquivK₂`), the
+  `k`-variable invariance lemma across the pair
+  (`DescriptiveComplexity.realize_equivK₂`), the collapse on bare sets
+  (`DescriptiveComplexity.equivK₂_bare`: `k` pebbles cannot count past `k`,
+  whatever the two sizes), and the transfer of an inflationary induction stage
+  by stage (`DescriptiveComplexity.StepDef.inflStage_invariant₂`), so that its
+  output sentence cannot separate the two structures
+  (`DescriptiveComplexity.StepDef.ifpHolds_equivK₂`).
 * `DescriptiveComplexity.Problems.Even` – **EVEN is not first-order
   definable** (`DescriptiveComplexity.even_not_foDefinableFree`), and **not
   even order-invariantly so** (`DescriptiveComplexity.even_not_foDefinable`):
@@ -420,7 +450,13 @@ development has no counterpart for.
   takes no step) that is **`FO ⊊ FO(TC)`**, unconditionally
   (`DescriptiveComplexity.exists_tcDefinable_not_foDefinable`) – a strict
   inclusion proved outright, where every other separation in this library is
-  conditional.
+  conditional. EVEN also settles the *unordered* fixed-point question:
+  `DescriptiveComplexity.even_not_ifpDefinableFree`, whence
+  `DescriptiveComplexity.exists_mem_PTIME_not_ifpDefinableFree` – **order-free
+  FO(IFP) does not capture PTIME**, against
+  `DescriptiveComplexity.lfpDefinable_iff_mem_PTIME`, which says it does over
+  ordered structures. The order in every capture theorem here is doing real
+  work.
 
 ## Nondeterministic logarithmic space, by the Krom fragment
 

@@ -68,7 +68,11 @@ The library is organized in three layers:
   the sentence is handed a linear order on the universe
   (`even_not_foDefinable`). Since a walk along that order does decide it,
   this yields **`FO ⊊ FO(TC)`** as a *strict* inclusion proved outright
-  (`exists_tcDefinable_not_foDefinable`). No complexity assumption enters.
+  (`exists_tcDefinable_not_foDefinable`). The same problem also shows that
+  **order-free FO(IFP) does not capture PTIME**
+  (`exists_mem_PTIME_not_ifpDefinableFree`), by the `k`-pebble game between two
+  structures – so the linear order in the capture theorems is not a
+  convenience. No complexity assumption enters any of this.
 
 ## Complexity classes and complete problems
 

@@ -153,13 +153,6 @@ X"), and the two formula compilers along a definable quotient
 The unique payoff of the descriptive approach: *unconditional* separations and
 non-reducibility, impossible in the machine world.
 
-- **Order-free FO(IFP) does not capture P** [S]: within reach from the
-  invariant layer alone, with no game: a query not `≡ᵏ`-invariant for any `k`
-  is not order-free FO(IFP)-definable (`StepDef.inflLimit_invariant`), and on
-  a bare set with `k` elements any two `k`-tuples with the same equality
-  pattern are `≡ᵏ`-equivalent, so no order-free inflationary induction defines
-  a linear order. This turns the library's order-invariant convention into a
-  theorem.
 - **Further applications of the games** [M]: REACH/connectivity is not
   FO-definable, and non-existence of FO reductions in specific cases. The
   games are also the natural route to separating `≤ᶠᵒ` from `≤ᶠᵒ[≤]` below.
@@ -645,10 +638,10 @@ provable rather than merely reasonable.
 
 **Next, in this order:**
 
-1. **Order-free FO(IFP) does not capture P** (§5) [S]: the cheap piece left in
-   the inexpressibility track, from the invariant layer with no game at all,
-   and the one that turns the library's order-invariant convention into a
-   theorem. Locality and the 0-1 laws are the next substantial pieces there.
+1. **Locality (Hanf, Gaifman)** (§5) [L]: with the two games in place, the
+   next substantial piece of the inexpressibility track, and the one that
+   gives connectivity and acyclicity without bespoke strategies. The 0-1 laws
+   are its independent neighbour.
 2. **`ComplexityClass.below` and the GI degree** (§9) [S+S]: the framework side
    is ~150 lines with the `Hard` half free, and Graph Isomorphism itself is a
    `Σ₁` with no order, no counting and no threshold. Taken after step 1 on

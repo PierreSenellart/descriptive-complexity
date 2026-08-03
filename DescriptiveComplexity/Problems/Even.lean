@@ -7,6 +7,8 @@ import DescriptiveComplexity.Games.Bare
 import DescriptiveComplexity.Games.LinearOrder
 import DescriptiveComplexity.TransitiveClosureFO
 import DescriptiveComplexity.ImmermanSzelepcsenyi
+import DescriptiveComplexity.Invariant.TwoStages
+import DescriptiveComplexity.Problems.TwoSat
 
 /-!
 # EVEN: the parity of a bare set
@@ -301,5 +303,57 @@ theorem exists_tcDefinable_not_foDefinable :
 compute. -/
 theorem even_mem_NL : EVEN ∈ NL :=
   (tcDefinable_iff_mem_NL EVEN).mp even_tcDefinable
+
+/-- **EVEN is in PTIME**. -/
+theorem even_mem_PTIME : EVEN ∈ PTIME :=
+  NL_subset_PTIME even_mem_NL
+
+/-! ### Order-free FO(IFP) does not capture PTIME
+
+The order-invariant capture theorem `lfpDefinable_iff_mem_PTIME` says that
+over *ordered* structures a least fixed point defines exactly the polynomial
+time properties. Drop the order and the inflationary logic – which is the same
+logic there – no longer reaches all of PTIME, and EVEN is the witness: a
+`k`-variable induction cannot count past `k` pebbles, and two bare sets with
+`k` elements each are `k`-pebble equivalent whatever their sizes
+(`DescriptiveComplexity.equivK₂_bare`). -/
+
+/-- **EVEN is not order-free FO(IFP) definable**: a defining induction with
+variable budget `k` – covering also the quantifier depth of its output
+sentence – would have to separate two bare sets of `2 * k + 2` and `2 * k + 3`
+elements, which `DescriptiveComplexity.StepDef.ifpHolds_equivK₂` forbids. -/
+theorem even_not_ifpDefinableFree : ¬IFPDefinableFree EVEN := by
+  rintro ⟨d, hd⟩
+  obtain ⟨k₀, hk₀⟩ := d.exists_varBound
+  set k := max k₀ (qdepth d.out) with hkdef
+  have hbound : d.VarBound k := hk₀.mono (le_max_left _ _)
+  have hout : qdepth d.out ≤ k := le_max_right _ _
+  letI : Language.empty.Structure (Fin (2 * k + 2)) := Language.emptyStructure
+  letI : Language.empty.Structure (Fin (2 * k + 3)) := Language.emptyStructure
+  haveI : Nonempty (Fin (2 * k + 2)) := ⟨⟨0, by omega⟩⟩
+  haveI : Nonempty (Fin (2 * k + 3)) := ⟨⟨0, by omega⟩⟩
+  have hcard₁ : Nat.card (Fin (2 * k + 2)) = 2 * k + 2 := by simp
+  have hcard₂ : Nat.card (Fin (2 * k + 3)) = 2 * k + 3 := by simp
+  -- the constant tuples have the same (trivial) equality pattern
+  have hvw : EquivK₂ (atomicAgreeOn₂ (Set.univ : Set (Σ n, Language.empty.Relations n))
+      (Fin (2 * k + 2)) (Fin (2 * k + 3)) k)
+      (fun _ => ⟨0, by omega⟩) (fun _ => ⟨0, by omega⟩) :=
+    equivK₂_bare (by omega) (by omega) fun _ _ => iff_of_true rfl rfl
+  have hiff := d.ifpHolds_equivK₂ hbound d.usesRels_univ hout hvw
+  rw [← hd (Fin (2 * k + 2)), ← hd (Fin (2 * k + 3)), even_holds_iff, even_holds_iff,
+    hcard₁, hcard₂] at hiff
+  have h₁ : Even (2 * k + 2) := ⟨k + 1, by omega⟩
+  have h₂ : ¬Even (2 * k + 3) := by
+    rintro ⟨m, hm⟩
+    omega
+  exact h₂ (hiff.mp h₁)
+
+/-- **Order-free FO(IFP) does not capture PTIME**, unconditionally – against
+`DescriptiveComplexity.lfpDefinable_iff_mem_PTIME`, which says it *does* over
+ordered structures. The order in every capture theorem of this library is
+therefore doing real work. -/
+theorem exists_mem_PTIME_not_ifpDefinableFree :
+    ∃ P : DecisionProblem Language.empty, P ∈ PTIME ∧ ¬IFPDefinableFree P :=
+  ⟨EVEN, even_mem_PTIME, even_not_ifpDefinableFree⟩
 
 end DescriptiveComplexity
