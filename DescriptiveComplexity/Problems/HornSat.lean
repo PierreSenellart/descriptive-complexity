@@ -183,6 +183,17 @@ is no such move – the statement below needs the full translation back. -/
 theorem hornSat_compl_lfpDefinable : LFPDefinable HORNSATᶜ :=
   hornSat_lfpDefinable.compl
 
+/-- **The discharge from the logic**: every FO(LFP) definable problem admits an
+ordered first-order reduction to HORN-SAT. This is
+`DescriptiveComplexity.hornSat_hard_of_sigmaSOHornDefinable` read through
+Immerman–Vardi (`DescriptiveComplexity.lfpDefinable_iff_mem_PTIME`), and it is what
+makes HORN-SAT the complete problem *of the logic* and not only of the fragment:
+a hardness proof may start from a fixed-point definition, where negation is free,
+rather than from a Horn program. -/
+theorem hornSat_hard_of_lfpDefinable {L : FirstOrder.Language.{0, 0}} [L.IsRelational]
+    (Q : DecisionProblem L) (h : LFPDefinable Q) : Nonempty (Q ≤ᶠᵒ[≤] HORNSAT) :=
+  hornSat_hard_of_sigmaSOHornDefinable Q h.sigmaSOHornDefinable
+
 /-- **Horn unsatisfiability is SO-Horn definable** – the crisp question behind
 `PiP 0 = SigmaP 0`, answered through the equivalence with FO(LFP): the
 translation of `DescriptiveComplexity.FixedPointHorn` turns the negated unit

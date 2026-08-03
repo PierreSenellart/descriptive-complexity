@@ -1,8 +1,9 @@
 # Roadmap
 
-Forward-looking catalog of work **not yet done** — completed items have been
-removed, and the record of what already exists in the library is `git log`
-together with the module docstrings. Organized by theme; each item carries a
+Catalog of work **not yet done**, and of nothing else: an item is deleted when
+it is built, never annotated as finished, the record of what the library
+contains being `git log` together with the module docstrings. Organized by
+theme; each item carries a
 rough scale of effort ([S] short, [M] medium, [L] long, [R] research-level,
 i.e., the Lean proof would itself be a contribution) and its prerequisites.
 Main source: Immerman, "Descriptive Complexity" (DC below); also Garey–Johnson
@@ -10,7 +11,7 @@ and Karp's 21 problems for the catalog.
 
 ## 1. NP-complete problems (catalog growth)
 
-Karp's 21 are complete (reached 2026-07-25). Remaining catalog growth:
+Beyond Karp's 21:
 
 - **X3C** [M–L]: exact cover by 3-sets, from 3-Dimensional Matching (now hard)
   or from Exact Cover; local gadgets, probably ordered.
@@ -39,11 +40,7 @@ remains below are ordinary catalog reductions and machine bridges.
   quantifier-free-projection hardness in the book), entering the catalog as
   ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
-  (Generalized Geography…). The machine bridge is done: a deterministic
-  QBF-evaluation machine written inside a QSAT instance makes `DTMAcceptSpace`
-  PSPACE-hard, and `DTMAcceptSpace ≤ᶠᵒ NTMAcceptSpace` carries it to the
-  nondeterministic problem, so both are complete – this framework's
-  `PSPACE = NPSPACE`, with no machine-side Savitch.
+  (Generalized Geography…), the only PSPACE entries still missing.
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
   Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
@@ -59,15 +56,14 @@ remains below are ordinary catalog reductions and machine bridges.
 - **Housekeeping in the shared machinery** [S]: `lexLtF`/`lexLeF`, which decide
   the lexicographic order of two tuples first-order, sit in
   `Problems/FinSat/Nodes.lean` for a build reason only; they belong in
-  `OrderWalk.lean` next to `succTupF`. Open beside it, and a design decision
-  rather than a refactor: giving `extBase` (`SecondOrderNew.lean`) an
-  *equivariant* junk convention – the value on a tuple with an invented argument
-  is its first invented argument – which would remove `[L.IsRelational]` from
-  `extEquiv` and `[Nonempty A]` from `extBase`. A third: `blockSym` /
-  `repAssign` / `altAssign_qbfBlocks` in `Problems/Qbf/Membership.lean` are the
-  monadic special case of `SecondOrderReplicate.lean` and should be folded into
-  it – noticed while building the PH bridge, left alone because it touches a
-  working file and bought that bridge nothing.
+  `OrderWalk.lean` next to `succTupF`, which walks that order without deciding
+  it. `Nodes.lean` also imports `Sat/Tseitin.lean` for `NodeAt`, so if that
+  cross-problem dependency ever grates, the node machinery is generic and
+  belongs at top level. Beside it: `blockSym` / `repAssign` /
+  `altAssign_qbfBlocks` in `Problems/Qbf/Membership.lean` are the monadic
+  special case of `SecondOrderReplicate.lean` and should be folded into it –
+  noticed while building the PH bridge, left alone because it touches a working
+  file and bought that bridge nothing.
 - **BIT and FO(≤, BIT)** [L]: DC's standard setting – every instance ordered,
   BIT primitive, a tax on every reduction and so not the library's default;
   FO-definability of `+` and `×` from BIT, `FO(≤, BIT)` = uniform AC⁰ as the
@@ -93,7 +89,10 @@ remains below are ordinary catalog reductions and machine bridges.
   `hard_of_relOrderedReduction` field), which is all a spanning problem's
   NP-hardness needs while its membership is a direct second-order sentence.
   Remaining — the symmetric **membership** closure `mem_of_relOrderedReduction`,
-  deferred because nothing yet needs it:
+  with two consumers: it would turn `le_dtmAcceptSpace_of_mem_PSPACE` into the
+  missing `iff` (`Problems/Machine/SpaceHard.lean` records why PSPACE's machine
+  characterization stops short of `mem_NP_iff_le_ntmAccept`'s shape), and §9's
+  *generic* `C = below Q₀` is blocked on it:
   - `RelSecondOrderPull.lean` (~700 lines): `SOBlock.pull` is reused verbatim
     (a relation variable on the subtype pulls to one `(n·d)`-ary variable per
     tag tuple), but the assignment-transfer layer is rewritten **flipped** — on
@@ -117,19 +116,15 @@ remains below are ordinary catalog reductions and machine bridges.
 
 ## 4. Capture and structural theorems (DC's greatest hits)
 
-- **Immerman–Vardi** [L]: P = order-invariant FO(LFP); in this library's
-  definitional style it is the pair (definition, HORN-SAT/CVP hardness
-  discharge) rather than a machine-model equivalence. Three pieces built for
-  Abiteboul–Vianu are the ones to reach for here and in any later capture:
-  the order-relativization transfer (`FixedPointOrderTransfer.lean`, for
-  every statement that moves an order between instance and vocabulary),
-  stratification of inflationary inductions (`FixedPointStratify.lean`, for
-  any "define X by induction, then induct over X"), and the two formula
-  compilers along a definable quotient (`Invariant/Simulation.lean`,
-  `Invariant/Backward.lean` – the missing dual of `Relativized.lean`).
-- **Grädel's theorems** [M–L]: SO-Horn = P, SO-Krom = NL on ordered structures
-  (see §3; the capture statements relative to the library's own class
-  definitions).
+Three pieces built for Abiteboul–Vianu are the ones to reach for in any capture
+attempted here: the order-relativization transfer
+(`FixedPointOrderTransfer.lean`, for every statement that moves an order
+between instance and vocabulary), stratification of inflationary inductions
+(`FixedPointStratify.lean`, for any "define X by induction, then induct over
+X"), and the two formula compilers along a definable quotient
+(`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
+`Relativized.lean`).
+
 - **FO(≤, BIT) = AC⁰** [R]: the bottom-level capture theorem (Immerman;
   Barrington–Immerman–Straubing) — first-order logic with a linear order and
   BIT is exactly (DLOGTIME-)uniform AC⁰. Unlike the other captures here, this
@@ -160,7 +155,7 @@ non-reducibility, impossible in the machine world.
   `ModelTheory/PartialEquiv.lean` (back-and-forth) and `Fraisse.lean`; what is
   missing is the finite, graded (quantifier-rank) version and the methodology
   lemmas ("same rank-k type ⇒ agree on rank-k sentences"). The `k`-pebble
-  refinement of `Invariant/Pebble.lean` was built over an abstract initial
+  refinement of `Invariant/Pebble.lean` is stated over an abstract initial
   relation precisely so the EF skeleton can be its second instance (rounds in
   place of pebbles), and the `k`-variable invariance lemma
   (`realize_equivK`) is the model for the methodology lemma. A first
@@ -403,15 +398,12 @@ count of the query's lineage.
 
 ## 7. Machine bridges beyond NP and PTIME
 
-The machine bridge is done for NP, PTIME, PSPACE and **every level of the
-polynomial hierarchy** (`ntmAccept_NP_complete`, `dtmAccept_PTIME_complete`,
-`dtmAcceptSpace_PSPACE_complete`, `ntmAcceptSpace_PSPACE_complete`,
-`atmAccept_sigmaP_complete`, `atmAccept_piP_complete`, and the
-characterizations `mem_NP_iff_le_ntmAccept` / `mem_PTIME_iff_le_dtmAccept` /
-`mem_sigmaP_iff_le_atmAccept` / `mem_piP_iff_le_atmAccept` — see the
-`Problems/Machine.lean` and `Problems/MachineAlt.lean` docstrings). This
-section is the design analysis for extending it further, with the
-class-defining logic assumed to exist (§3 work).
+Design analysis for extending the machine bridge past the classes it reaches
+today – to EXPTIME and EXPSPACE, and to the string-encoding layer – with the
+class-defining logic assumed to exist (§3 work). The bridges already in the
+library are documented in the `Problems/Machine.lean` and
+`Problems/MachineAlt.lean` docstrings, which is where their shape should be
+read off before building another.
 
 **Standing scope limit.** Textbook `NP = NTIME(nᵏ)` over string encodings
 needs the converse compilation — that an FO interpretation or a `Σ₁` kernel is
@@ -424,20 +416,18 @@ own transition table, so reduction-built machines have polynomially many
 states — standard for an acceptance problem; the constant-alphabet simulation
 is never needed.
 
-**And it is an interface obligation, not a soundness debt.** The classes here
-are defined logically and the bridges characterize them from inside the
-framework, so the string presentations are never the referent (the
-classes-are-logic principle, below). Nor is the structural presentation the
-weaker of the two. Fagin needs no order, so `NP = ∃SO` agrees with the string
-class tax-free; the order tax bites only at P and below, exactly where the
-library already works over ordered structures; and isomorphism-invariance,
-which a string presentation must prove for every encoding it picks, holds here
-by construction. The one place a structural presentation can state something
-false is the *size measure*, and that is already discharged in both directions
-by `Encoding.lean`. What the string layer would buy is legibility to a reader
-arriving with the textbook definition, plus the inherited robustness of a model
-whose invariance results have been accumulating for decades – worth having,
-worth not confusing with a hole in the foundations.
+**And it is an interface obligation, not a soundness debt** – which is what
+sets its priority. The classes here are defined logically and the bridges
+characterize them from inside the framework, so the string presentations are
+never the referent (the classes-are-logic principle, below), and the structural
+presentation is not the weaker of the two: Fagin needs no order, the order tax
+bites only at P and below where the library already works over ordered
+structures, isomorphism-invariance holds by construction, and the one place a
+structural presentation could state something false – the *size measure* – is
+discharged in both directions by `Encoding.lean`. What the string layer would
+buy is legibility to a reader arriving with the textbook definition, plus the
+inherited robustness of a model whose invariance results have been accumulating
+for decades – worth having, worth not confusing with a hole in the foundations.
 
 A further application of the same machinery, once step-counted machines can
 run over string encodings: bounding the *encoders and decoders* of the
@@ -454,55 +444,39 @@ compilation direction above exists.
 
 | class | logic | membership | hardness | total |
 |---|---|---|---|---|
-| L | FO(DTC) | S | S | done, as a capture theorem – see below |
-| NL | FO(TC) | S | S | done, as a capture theorem – see below |
-| Σₖᵖ, Πₖᵖ | `Σₖ`-SO | done | done | done, ~10.5k against an estimate of 0.6–1.2k |
-| PSPACE | SO(TC) | S [done] | L–XL [done, ~4.1k] | ~3–5.5k |
 | EXPTIME | SO(LFP) | L | XL | ~4–7k |
 | EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
 
-Four rules govern the table:
+Four rules price such a bridge:
 
 1. **Membership is cheap when the logic is a reachability/fixpoint logic, dear
    when it quantifies.** For DTC/TC/LFP/SO(TC) the machine problem is the
    *syntactic image* of the logic and membership is unfolding plus an encoding
    bijection; for ∃SO/`Σₖ` the run must be guessed and checked (Fagin's
-   tableau). So PSPACE has one of the cheapest memberships and NP one of the
-   dearest: space-bounded acceptance is to SO(TC) what SAT is to ∃SO — tape as
-   a relation variable, the step clause of `Machine/Membership.lean` as the
-   transition formula, acceptance its TC, no budget hence no walk lemma
-   (400–700 lines). Confirmed by `Problems/Machine/Space.lean`, which came in at
-   ~840: the estimate missed only the sentence-builder layer, an `SOTCSpec`
-   wanting *sentences* rather than formulas with parameters.
+   tableau). Budget a sentence-builder layer on top of the transition formula:
+   an `SOTCSpec`-style interface wants *sentences*, not formulas with
+   parameters, and that gap is what a naive estimate misses.
 2. **Hardness is cheap when the class has a one-loop complete problem** (REACH
    "guess a neighbour", HORN-SAT "propagate", SAT "guess then sweep").
    Otherwise the discharge must compile arbitrary formulas of the logic into a
    machine — the **evaluator** (static quantifier nesting → nested loops), in
    three variants of increasing cost: *state-registers* (loop counters as
-   elements in the state; what PSPACE needs), *tape-registers with logarithmic
-   addresses* (honest fixed-control logspace), *tape-registers with
-   exponential addresses* (EXPTIME/EXPSPACE). **Both consequences drawn here
-   for PSPACE were wrong**, as the build showed. Routing through QSAT is what
-   worked, and needs no evaluator at all: reducing *from* QSAT means compiling
-   one fixed algorithm — iterative QBF evaluation, whose stack is one bit per
-   variable in the variable's own cell — exactly as the SAT machine compiles
-   one fixed clause check. And Savitch is avoided not by stating the problem
-   nondeterministically but by proving hardness for the *deterministic*
-   problem and transferring: hardness travels forward along reductions, and
-   `DTMAcceptSpace ≤ᶠᵒ NTMAcceptSpace` is nearly free (the identity
-   interpretation, with the accepting predicate guarded by the first-order
-   determinism sentence). The lesson generalizes: pick the source problem so
-   that the algorithm is fixed, and prove the deterministic side hard.
-3. **A machine reused at a new polarity is not a machine reused.** The `Σₖᵖ`
-   row was estimated at +0.6–1.2k on the strength of "hardness from `QBF k` by
-   the SAT machine with `k` guess sweeps"; it came to ~10.5k. The sweeps were
-   indeed the easy part. What a nondeterministic machine never needs, and a
-   *universal* round does, is the converse of every existence statement: that
-   whatever the machine does during a round it is the intended run of *some*
-   assignment (the read-off), that it always has a move, that it terminates,
-   and that its checking phase proves the matrix rather than merely being able
-   to. Budget the same asymmetry for EXPTIME and EXPSPACE below.
-
+   elements in the state), *tape-registers with logarithmic addresses* (honest
+   fixed-control logspace), *tape-registers with exponential addresses*
+   (EXPTIME/EXPSPACE). The way out, and the rule to apply before pricing an
+   evaluator: **pick the source problem so that the algorithm is fixed** – one
+   compiled algorithm, as the SAT machine compiles one clause check – **and
+   prove the deterministic side hard**, letting hardness travel forward along a
+   nearly-free reduction to the nondeterministic problem rather than
+   simulating.
+3. **A machine reused at a new polarity is not a machine reused.** Adding
+   universal rounds to a nondeterministic machine costs an order of magnitude
+   more than the guess sweeps suggest, because a universal round needs the
+   converse of every existence statement: that whatever the machine does during
+   a round is the intended run of *some* assignment (the read-off), that it
+   always has a move, that it terminates, and that its checking phase proves
+   the matrix rather than merely being able to. Budget the same asymmetry for
+   EXPTIME and EXPSPACE.
 4. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
    (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
    `Relation.ReflTransGen`, strictly cheaper — and buys the converse half free,
@@ -515,35 +489,18 @@ Four rules govern the table:
 
 The concrete items:
 
-- **L and NL: the Turing model is the wrong one** [done, kept for the judgment
-  it records]. As machine-as-data, logspace Turing machines are cheap for a bad
-  reason: a logspace configuration is a constant-length tuple of elements, the
-  configuration space is polynomial, and acceptance is REACH up to renaming –
-  true, easy, contentless. The model that says something is a fixed finite
-  control with `k` two-way heads on universe elements, reading only
-  quantifier-free tests of its head tuple, so that determinism vs.
-  nondeterminism is L vs. NL, mirroring FO(DTC) vs. FO(TC); it is Lean-level
-  data, so both halves are *capture* theorems (`mem_LOGSPACE_iff_automaton`,
-  `mem_NL_iff_automaton`) rather than completeness results. Rejected models:
-  registers (must legislate arithmetic; a head move *is* a step in the order),
-  JAGs/pointer machines (lower-bound devices), branching programs (nonuniform).
-  With BIT (§3), a circuit-family bridge (FO-uniform AC⁰ = FO(≤, BIT)) is more
-  natural than any machine at that level.
 - **Capture vs. completeness, the choice forced by the evaluator.** A capture
-  theorem is also available at NP (fixed control, input heads, poly work
-  tape) but is not taken: logic → machine there needs the evaluator *with*
-  tape addressing (lockstep address computation to test a guessed relation) —
-  exactly the cost the existing bridge dodges by routing hardness through
-  SAT/HORN-SAT. So: capture at L/NL (evaluator cheap, model first-order),
-  completeness at P/NP/`Σₖᵖ`/PSPACE and above (evaluator dear) — and at PSPACE
-  the completeness route turned out to need no evaluator at all, only the one
-  algorithm QSAT names. At RE the same escape exists in a stronger form: the
-  target model can be chosen so that the program is *obtained* rather than
-  written – `Nat.Partrec.Code`, where Mathlib's `exists_code` supplies it – so
-  the addressed evaluator is avoided there too, which is how the converse half
-  of the RE bridge was got (`orderedReduction_codehalt`, §8). The rule the two
-  cases share: never compile the logic; pick a target whose programs already
-  exist.
+  theorem is available at NP (fixed control, input heads, poly work tape) but
+  is not worth taking: logic → machine there needs the evaluator *with* tape
+  addressing (lockstep address computation to test a guessed relation) —
+  exactly the cost routing hardness through SAT/HORN-SAT avoids. So: capture
+  where the evaluator is cheap and the model first-order (as at L/NL, where a
+  `k`-head automaton walking the order mirrors FO(DTC) vs. FO(TC) and rules out
+  registers, JAGs and branching programs as models), completeness where it is
+  dear (P/NP/`Σₖᵖ`/PSPACE and above). The rule to carry into any new bridge:
+  never compile the logic; pick a target whose programs already exist – a fixed
+  algorithm named by the source problem, or a code model like
+  `Nat.Partrec.Code` where Mathlib's `exists_code` hands over the program.
 - **The exponential classes are not blocked by the framework**: the machine
   description stays polynomial (a reduction can write it) and only the run is
   exponential, living in Lean just as `SigmaSODefinable` quantifies over
@@ -552,142 +509,20 @@ The concrete items:
   expensive pair: the exponential-order walk (feasible) and the
   exponential-address evaluator (the real cost).
 - **Limits that survive every variant**: the string-encoding layer (above);
-  Savitch, if *deterministic* PSPACE machines are wanted complete; oracle and
-  `Δₖᵖ` classes — the bridge would make them definable, but by a machine,
+  oracle and `Δₖᵖ` classes — the bridge would make them definable, but by a machine,
   against the library's classes-are-logic principle (a decision, not a
   drift); `#P` as "number of accepting runs" is easy to state but needs the
   parsimonious-reduction notion the framework still lacks (§6, first item);
   the classes-are-logic principle points at `ΣQSO(FO)` for the definition
   either way, with the machine count as a bridge statement.
 
-## 8. Undecidability: RE, by value invention
+## 8. Teaching material
 
-The one class here whose problems are not decidable at all, and the entry point
-to incomputability results proved the same way as everything else: by a
-first-order reduction from a complete problem. The defining logic is
-**`∃SO[new]`**, existential second-order logic over a universe extended by
-finitely many *invented* values ([Abiteboul–Hull–Vianu 1995]
-[abiteboul1995foundations], ch. 18): the certificate is a finite extension
-`A ⊕ Fin m` with `m` unbounded plus relations over it, checked by a fixed
-first-order kernel over the base vocabulary plus a predicate `old` marking the
-original elements. Unbounding `m` is the *only* change from `Σ₁`, and it is
-exactly the step from "search a space exponential in `|A|`" (NP) to "search an
-unbounded space of finite witnesses" (RE).
+- **Reduction cookbook** [M]: grow the `Examples/` directory into a curated,
+  tutorial-style example set (cf. Grange et al., MFCS 2024) as the catalog
+  broadens, so the library doubles as a complexity-course companion.
 
-Built: `SecondOrderNew.lean` (the extended structure, `SigmaSONewDefinable`,
-`Σ₁ ⊆ ∃SO[new]`), `Relativize.lean`, the two closure files
-(`SecondOrderNewPull.lean` for FO reductions, `SecondOrderNewOrdered.lean` for
-ordered ones), `RecursivelyEnumerable.lean` (the class `RE`, with `coRE` and
-`NP ⊆ RE`),
-`Relationalize.lean` (every `∃SO[new]`-definable problem reduces to one over a
-relational vocabulary, which is how source vocabularies with function symbols
-are handled), Trakhtenbrot's theorem `FINSAT_RE_complete`, and `halt_mem_RE`, whence `halt_le_finsat` – Trakhtenbrot's
-theorem in the form it is usually stated, the reduction from the halting
-problem. The bridge to Mathlib's computability layer is built too
-(`DescriptiveComplexity/Computability/`, `Problems/CodeHalt/`): RE-hard
-problems are undecidable, and `finsat_not_computable` is Trakhtenbrot's theorem
-as everyone states it.
-
-**The converse half is built as well, at the code model**
-(`Problems/CodeHalt/Hardness/`, `Computability/CodeHaltComplete.lean`):
-`orderedReduction_codehalt` reduces *any* problem whose concrete instances are
-semi-decidable to `CODEHALT`, whence `codehalt_RE_complete`,
-`mem_RE_iff_rePred` (`RE = REPred`, the class *is* recursive enumerability) and
-`RE_ne_coRE`. What made it small, and is worth not rediscovering:
-
-- the reduction *names* a program instead of building one: the drawn code is
-  `comp cP (pair numeral nest)` with `cP` supplied by
-  `Nat.Partrec.Code.exists_code`. This is what the machine model cannot offer
-  (Mathlib's universal machine is not finite-state), and it is why the
-  evaluator with addressed storage priced at XL in §7 is not needed here;
-- every branch is evaluated at input `0`, so a constant is a tree of `pair`,
-  `succ` and `zero` nodes and a bit is *one* node;
-- the table is nested **by coordinate**, not numbered in a mixed radix: each
-  level is then a plain walk of the input order (`succF`, `maxF`, canonical
-  padding), so no arithmetic on positions has to be proved, and the decoder
-  (`structOf`) follows the coordinates down the nests. The rank-of-a-tuple
-  lemma a lexicographic layout would need is the whole cost the nesting avoids;
-- the two leaves `succ` and `zero` are **shared** elements, so a bit of the
-  input is read as an *edge* of the drawing rather than as a mark: every tag
-  then has exactly one constructor (`ProgTag.mark`), and exclusivity of the
-  marks – half of `CodeWF` – is immediate;
-- the fixed code `cP` is drawn with one tag per node (`SubPos`, by recursion on
-  the code), and `decodesTo_subPos` is one structural induction. Tags are free
-  at any instance size, which is what makes this compatible with hardness being
-  cofinal;
-- a plain ordered reduction suffices, not a relativized one: junk tuples are
-  unmarked, so they draw nothing and carry no root.
-
-**Both closing items are built** (2026-07-30: `Problems/Pcp/Hardness/`,
-`Problems/Machine/HaltHard/`, `Computability/PcpComplete.lean`):
-`halt_RE_complete` and `pcp_RE_complete`, with the undecidability of Post's
-problem (`pcp_not_computable`) and of the machine halting problem
-(`halt_not_computable`) falling out of `not_computablePred_of_RE_hard`. The
-build inverted the plan above: instead of `CODEHALT ≤ᶠᵒ[≤] PCP` – which
-would have asked the dominoes to simulate a code-tree interpreter – the
-split is **`RE.Hard HALT`** (`orderedReduction_halt`, the machine bridge)
-then **`HALT ≤ᶠᵒ[≤] PCP`** (`halt_ordered_fo_reduction_pcp`, the
-computation-history dominoes for the machine *drawn in the instance*), with
-the roadmap's `CODEHALT ≤ᶠᵒ[≤] PCP` an instance via `CODEHALT ∈ RE`. What
-each half taught, worth not rediscovering:
-
-- **make the rewriting format strict, and let the rules restore it**: every
-  move rule of `HaltPcp.MRule` is three letters with a boundary variant that
-  grows the window and writes the entering blank in the same step, so every
-  derivation word between boot and halt is a configuration word and the
-  backward reading is a case analysis, not an induction;
-- **index rules by attribute values, not by the transition** – attributes
-  are relations, so a domino per transition would be ill-defined; one per
-  tuple `(q, a, b, q', c)` with the transition existentially quantified is
-  what sets the PCP interpretation's dimension at 5;
-- **words as data beat words as cases** (one `List LSpec` read both
-  semantically and as a formula), **one order key for the whole universe,
-  junk included** (block index, then coordinates in the source's order, then
-  a static sub-index – two tags sharing a block index is what interleaves a
-  long word), and **separate the drawing from the formulas** – the
-  `Draw`/`Match`/`Interp` split is where the cost sits, and the part to
-  estimate honestly;
-- on the machine side, **audit a tape layout for markers that can drift
-  unboundedly against the direction of growth before proving anything** (the
-  first layout died exactly there: mirroring the value turned every prepend
-  into an append toward the blank half-tape), and **make the step table
-  deterministic even where the design does not need it**, so the backward
-  simulation is a case analysis on `stepsTo_det`;
-- the machine bridge never touches tape functions: the zipper semantics is
-  proved against `Turing.ToPartrec` (`reach_acc_iff_evalDom`), turned into
-  word rewriting once (`derives_startWord_iff_evalDom`), and transported to
-  the drawn machine along an injective predicate-image embedding
-  (`TMEmbed`), with `acceptsU_iff_derives` – paid for once by the PCP half –
-  supplying the `ConfigU` bookkeeping;
-- the instance enters as a **chain of one-bit `comp` frames**
-  (`inputChain`): `exists_code` gives fixed-arity codes only, and the
-  continuation stack applies a fixed code once per frame, so the initial
-  tape is one letter per bit of the flattened relation table
-  (`FinStruct.ofEquiv`'s table, folded back by `structOfBits`, which is
-  primitive recursive because a `FinStruct` *is* a size and a table).
-
-What remains:
-
-- **Housekeeping left by the FINSAT build** [S each]: `lexLtF`/`lexLeF`, which
-  decide the lexicographic order on `D`-tuples, sit in `Problems/FinSat/Nodes.lean`
-  but belong in `OrderWalk.lean` next to `succTupF`, which walks that order
-  without deciding it; `Nodes.lean` imports `Sat/Tseitin.lean` for `NodeAt`, and
-  if that cross-problem dependency ever grates the node machinery is generic and
-  belongs at top level; and `extBase` could be given an *equivariant* junk
-  convention – the value on a tuple with an invented argument is its first
-  invented argument – which would remove the `[L.IsRelational]` hypothesis from
-  `extEquiv` and the `[Nonempty A]` from `extBase`. The last is a change to
-  `SecondOrderNew.lean` and its three dependents, so a decision rather than a
-  chore.
-
-## 9. Teaching material
-
-- **Reduction cookbook** [M]: grow the `Examples/` directory (which now holds
-  the first tutorial-style worked example, Boolean conjunctive queries) into a
-  curated example set (cf. Grange et al., MFCS 2024) as the catalog broadens,
-  so the library doubles as a complexity-course companion.
-
-## 10. Completeness without a class: FO degrees and `ComplexityClass.below`
+## 9. Completeness without a class: FO degrees and `ComplexityClass.below`
 
 Every completeness result above measures a problem against a class *defined by
 a logic*. The same machinery supports a second, orthogonal notion at almost no
@@ -724,19 +559,17 @@ so the notion is expressible today.
   `CofinalHard` in its `Mem` argument reduce it to
   `C.Mem P ↔ Nonempty (P ≤ᶠᵒ[≤] Q₀)`, whose forward half is the class's own
   discharge and whose backward half is `mem_of_orderedReduction` applied to
-  `Q₀ ∈ C`. So `NP = below SAT`, `PTIME = below HORNSAT`, `NL = below TwoSAT`
-  and `coNP = below TAUT` are a few lines each, since
+  `Q₀ ∈ C`. So `NP = below SAT`, `PTIME = below HORNSAT`, `NL = below TwoSAT`,
+  `coNP = below TAUT` and `RE = below CODEHALT` are a few lines each, since
   `sat_hard_of_sigmaSODefinable`, `hornSat_hard_of_sigmaSOHornDefinable`,
-  `twoSat_hard_of_sigmaSOKromDefinable` and `taut_hard_of_piSODefinable` all
-  deliver a *non-relativized* ordered reduction. Payoff: "SAT-hardness is
+  `twoSat_hard_of_sigmaSOKromDefinable`, `taut_hard_of_piSODefinable` and
+  `orderedReduction_codehalt` all deliver a *non-relativized* ordered
+  reduction. Payoff: "SAT-hardness is
   NP-hardness" stops being folklore and becomes a lemma. The *generic*
   statement, over an arbitrary class and its complete problem, is blocked, and
   instructively so: `cofinalHard_iff` yields only `≤ʳᶠᵒ[≤]`, so it needs the
-  `mem_of_relOrderedReduction` closure that §3 parks as unmotivated – this is
-  the first thing that would motivate it. RE used to be the case that needed it
-  (`finsat_hard_of_sigmaSONewDefinable` is relativized); it no longer does,
-  `orderedReduction_codehalt` delivering a non-relativized ordered reduction,
-  so `RE = below CODEHALT` joins the four above.
+  `mem_of_relOrderedReduction` closure of §3, the second consumer motivating
+  it.
 - **Graph Isomorphism, the point of the exercise** [S]: the vocabulary already
   exists, `Language.twoGraphs` from `Problems/SubgraphIso.lean` (marks
   `patV`/`hostV`, relations `patE`/`hostE`); GI is "the two marked subgraphs
@@ -808,65 +641,67 @@ so the notion is expressible today.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
-Ordered for headline theorems not yet formalized anywhere, maximal reuse of
-machinery that already exists, and low risk of an item turning out to be
-blocked.
+Nothing here is a prerequisite of anything else here, so the order is a
+weighting, not a chain: headline theorems not yet formalized anywhere, maximal
+reuse of machinery that already exists, low risk of an item turning out to be
+blocked, and a preference for results that make an existing design decision
+provable rather than merely reasonable.
 
-**The serial line:**
+**Next, in this order:**
 
-1. **A sharpening pass on what is already public** (each [M], no
-   prerequisites, no new surface): **quantifier-free / projection / dimension
-   tracking through composition** (§3's reduction-notion refinements), which upgrades
-   catalog statements to the DC-faithful "complete under qfps"; **Spectra**
-   (§4) and **CVP from HORN-SAT** (§2), two near-free recognizable names, the
-   latter also the discharge Immerman–Vardi wants. Note what 3-DNF-TAUT (done)
-   taught about the first of these: a discharge that needs an *image* invariant
-   the `≤ᶠᵒ` interface hides does not force a general invariant-tracking layer,
-   because building the reduction from the complement side keeps the promise in
-   hand where it is proved. Reach for tracking when a second consumer appears,
-   not before.
-2. **PCP hardness** – done (§8): `pcp_RE_complete` and `halt_RE_complete`,
-   via `RE.Hard HALT` then `HALT ≤ᶠᵒ[≤] PCP`. The item that used to head this
-   line – the instance-as-a-program reduction `P ≤ᶠᵒ[≤] CODEHALT` – is done
-   too; what both taught is recorded in §8 and generalizes: when an evaluator
-   is the stated blocker, look for a target whose programs already exist
-   rather than pay for the evaluator.
-3. **The fixpoint logics, as textbook faithfulness**: FO(PFP) is done –
-   FO(≤, PFP) = PSPACE, both directions – leaving Immerman–Vardi (§4) [L].
-   It unblocks nothing else and buys no class the library lacks, so what
-   it adds is DC's own vocabulary for classes held here under other names,
-   which is the first thing a reader arriving from the textbook looks for.
-   The two share the fixpoint infrastructure, and Immerman–Vardi's hardness
-   discharge is step 1's CVP from HORN-SAT, so take that one first.
+1. **CVP from HORN-SAT** (§2) [M]: the canonical P-complete problem, and the
+   one recognizable name the catalog lacks below `NP`. An ordinary ordered
+   reduction with no new machinery – gates walked along the order, the Horn
+   program's least model read as the circuit's value – so the risk is in the
+   gadget, not in the framework. Monotone CVP and alternating reachability
+   follow from it.
+2. **EF games and the first inexpressibility results** (§5) [L]: the payoff
+   that has no counterpart in a machine-first development, and the reason the
+   degree structure of §9 is worth having at all. Take it in two steps, the
+   first of which is nearly free and worth landing on its own: an order-free
+   inflationary induction computes only `≡ᵏ`-invariant relations
+   (`StepDef.inflLimit_invariant`), so it cannot define a linear order on a
+   bare set – which turns the library's order-invariant variant from a
+   convention into a theorem. Only then the games themselves, `EVEN` and
+   `FO ⊊ FO(TC)`, which are the Mathlib-facing part and where an estimate is
+   likeliest to slip.
+3. **`ComplexityClass.below` and the GI degree** (§9) [S+S]: the framework side
+   is ~150 lines with the `Hard` half free, and Graph Isomorphism itself is a
+   `Σ₁` with no order, no counting and no threshold. Taken after step 2 on
+   purpose: a degree structure is worth building where non-reducibility is
+   provable.
 
-**Running alongside, from the start:**
+**Alongside, or after:**
 
-- **The counting track of §6**, as far as #SAT plus the free catalog entries.
-  Promoted above PSPACE deliberately: PSPACE repeats a shape the library
-  already executes (define a fragment, discharge to its syntactic image),
-  whereas counting descriptive complexity has no formalization anywhere and
-  ΣQSO's two-layer syntax fits the kernel-as-data idiom unusually well. It
-  depends on nothing unbuilt, so it cannot be blocked by the chain above; a
-  cheap headline (#SAT complete for ΣQSO(FO)) sits one `exists_gates`
-  strengthening in; and it is the meeting point with provenance-lean. Internal
-  order: framework layer and ladder levels 0–1 → evaluator →
-  `#P := ΣQSO(FO)` → #SAT → the free entries and PQE tier 1; stop there
-  (level 2 of the ladder, PQE tier 2, structure inside #P, the quantitative
-  fixed point and MaxSNP are genuine research, or gated on a literature check).
-- **EF games + EVEN/connectivity inexpressibility** (§5), as a parallel and
-  delegable line rather than the serial next step: it unblocks nothing else,
-  and it is the most Mathlib-facing item here, hence where an estimate is
-  likeliest to slip. Its own headline `FO ⊊ FO(TC)` is blocked on nothing –
-  the FO(TC) layer exists – only on the games themselves. Also the best student
-  project in the document.
+- **The counting track of §6**, as far as #SAT plus the free catalog entries:
+  counting descriptive complexity has no formalization anywhere, and ΣQSO's
+  two-layer syntax fits the kernel-as-data idiom unusually well. It depends on
+  nothing unbuilt, so nothing else here can block it; a cheap headline (#SAT
+  complete for ΣQSO(FO)) sits one `exists_gates` strengthening in; and it is
+  the meeting point with provenance-lean. Internal order: framework layer and
+  ladder levels 0–1 → evaluator → `#P := ΣQSO(FO)` → #SAT → the free entries
+  and PQE tier 1; stop there (level 2 of the ladder, PQE tier 2, structure
+  inside #P, the quantitative fixed point and MaxSNP are genuine research, or
+  gated on a literature check). Its size is what puts it beside the numbered
+  line rather than in it.
+- **The rest of the sharpening pass** (each [M], no prerequisites, no new
+  surface): **quantifier-free / projection / dimension tracking through
+  composition** (§3's reduction-notion refinements), which upgrades catalog
+  statements to the DC-faithful "complete under qfps", and **Spectra** (§4).
+  The lesson 3-DNF-TAUT taught about the first of these: a discharge that needs
+  an *image* invariant the `≤ᶠᵒ` interface hides does not force a general
+  invariant-tracking layer, because building the reduction from the complement
+  side keeps the promise in hand where it is proved. Reach for tracking when a
+  second consumer appears, not before.
 
 **Deferred, and deliberately so:**
 
-- Catalog growth (§1) as opportunistic filler now that Karp's 21 is done. Check
+- Catalog growth (§1), as opportunistic filler. Check
   FO-expressibility of the 3DM → 3-Partition arithmetic *before* committing: it
   is the one item with a real chance of being unbuildable.
-- Relativized membership closure and FO(LFP) ⊆ NP directly: correctly parked,
-  neither buys a new statement.
+- FO(LFP) ⊆ NP directly: correctly parked, it buys no new statement.
+  Relativized membership closure has two consumers (§3), so it moves up as
+  soon as either is wanted.
 - The BIT / FO(≤, BIT) / AC⁰ / PARITY chain: a multi-year project with three
   [R] items and a switching lemma at the end, to be decided as a whole rather
   than drifted into via built-in arithmetic. Until then the two by-inspection
@@ -874,6 +709,7 @@ blocked.
 - The exponential classes (SO(LFP), SO(PFP)).
 
 This weighting assumes the goal is research output and formalization firsts. If
-the near-term goal is the course companion of §9, the cookbook and catalog
-growth move up and the fixpoint logics slide down: students meet NL,
-P-completeness and reductions long before they meet FO(PFP).
+the near-term goal is the course companion of §8, the cookbook and catalog
+growth move up and the counting and inexpressibility tracks slide down:
+students meet NL, P-completeness and reductions long before they meet ΣQSO or
+an Ehrenfeucht–Fraïssé game.

@@ -245,7 +245,9 @@ individual declarations are documented on their own pages.
   along the order and evaluating the output sentence clausewise
   (`DescriptiveComplexity.LFPDefinable.sigmaSOHornDefinable`). The two formalisms are
   therefore interchangeable
-  (`DescriptiveComplexity.lfpDefinable_iff_sigmaSOHornDefinable`), SO-Horn definability
+  (`DescriptiveComplexity.lfpDefinable_iff_sigmaSOHornDefinable`), which read against
+  the definition of the class is **Immerman–Vardi**, `PTIME = FO(≤, LFP)`
+  (`DescriptiveComplexity.lfpDefinable_iff_mem_PTIME`); SO-Horn definability
   is closed under complement (`DescriptiveComplexity.SigmaSOHornDefinable.compl`), and
   level 0 of the hierarchy collapses: `PiP 0 = SigmaP 0`
   (`DescriptiveComplexity.piP_zero_eq`), polynomial time closed under complement. The
@@ -985,6 +987,20 @@ Headline results and cross-references:
   being able to close and to reject but not to force minimality; REACH escapes
   at the Horn level through FO(LFP), and at the Krom level through `NL = coNL`
   (`DescriptiveComplexity.reach_mem_NL`).
+* **Immerman–Vardi, `PTIME = FO(≤, LFP)`**
+  (`DescriptiveComplexity.lfpDefinable_iff_mem_PTIME`; [Vardi
+  1982][vardi1982complexity]; [Immerman 1986][immerman1986relational]): a problem is
+  in polynomial time exactly when a least-fixed-point definition computes it over a
+  linearly ordered universe – order-*invariantly*, since
+  `DescriptiveComplexity.LFPDefinable` asks for the equivalence at every linear order.
+  The class being *defined* by the Horn fragment, the content is the pair of
+  translations of `DescriptiveComplexity.FixedPointHorn`, so the theorem is
+  machine-free like everything else here; the machine reading is the bridge
+  `DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`. The inflationary variant
+  `DescriptiveComplexity.ifpDefinable_iff_mem_PTIME` is the same statement for
+  FO(≤, IFP), and `DescriptiveComplexity.hornSat_hard_of_lfpDefinable` is the
+  hardness discharge from the logic – a hardness proof may start from a fixed-point
+  definition, where negation is free, rather than from a Horn program.
 * **L by deterministic transitive closure**: REACHd – reachability along
   *forced* arcs – is complete for `DescriptiveComplexity.LOGSPACE`
   (`DescriptiveComplexity.REACHd_LOGSPACE_complete`), the class defined by FO(DTC).

@@ -49,7 +49,9 @@ The library is organized in three layers:
   each with its vocabulary, FO reductions and a completeness theorem, plus
   tutorial-style worked examples. Highlights: a machine-free Cook–Levin theorem
   for SAT, **all of Karp's 21 problems**, PTIME-completeness of HORN-SAT,
-  the **Abiteboul–Vianu theorem** – the inflationary and partial fixed-point
+  the **Immerman–Vardi theorem** – polynomial time is exactly what a least
+  fixed point defines over an ordered universe
+  (`lfpDefinable_iff_mem_PTIME`) – the **Abiteboul–Vianu theorem** – the inflationary and partial fixed-point
   logics agree on unordered finite structures exactly when PTIME = PSPACE
   (`ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace`) –
   and the *machine bridge* –
@@ -142,8 +144,7 @@ user is most likely to want:
   descriptive approach, impossible in the machine world: Ehrenfeucht–Fraïssé
   games, EVEN and reachability not being FO-definable, `FO ⊊ FO(TC)` as a strict
   inclusion, locality, 0-1 laws, and eventually PARITY ∉ AC⁰.
-* **Structural / capture theorems.**
-  Grädel's capture theorems, Fagin's spectra connection.
+* **Structural theorems.** Fagin's spectra connection.
 * **A broader catalog and finer reductions.** More complete problems, and the
   finer reduction notions descriptive complexity uses (quantifier-free
   projections; FO(≤, BIT) = uniform AC⁰ as the bottom of the ordered world).
