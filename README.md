@@ -80,7 +80,7 @@ hard for it under FO reductions.
 | **PH** | SO | – | – |
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
 | **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · DAG Isomorphism |
+| **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Digraph Isomorphism · DAG Isomorphism |
 
 Each entry of the machine column is an equivalence *proved here* between the
 logical definition and acceptance by that model. The classes are also matched

@@ -23,9 +23,9 @@ import DescriptiveComplexity.Problems.NaeThreeSat
 import DescriptiveComplexity.Problems.OneInSat
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SubgraphIso
-import DescriptiveComplexity.Problems.GraphIso
+import DescriptiveComplexity.Problems.DigraphIso
 import DescriptiveComplexity.Problems.DagIso
-import DescriptiveComplexity.Problems.UGraphIso.Defs
+import DescriptiveComplexity.Problems.GraphIso.Defs
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetSplitting
@@ -64,19 +64,20 @@ containing its vocabulary, its semantic definition, the bundled
 completeness theorems.
 
 Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
-only the membership half. Graph Isomorphism
-(`DescriptiveComplexity.GraphIso`) carries the membership half on purpose: it
-is in NP (`DescriptiveComplexity.graphIso_mem_NP`) and conjecturally neither in
+only the membership half. Digraph Isomorphism
+(`DescriptiveComplexity.DigraphIso`) carries the membership half on purpose: it
+is in NP (`DescriptiveComplexity.digraphIso_mem_NP`) and conjecturally neither in
 P nor NP-complete, so what it is complete for is its *own* degree
 (`DescriptiveComplexity.GI`, from `DescriptiveComplexity.Degree`). DAG
 Isomorphism (`DescriptiveComplexity.DagIso`) is the first other problem of that
 degree: **GI-complete** (`DescriptiveComplexity.dagIso_GI_complete`), by
 subdividing every arc twice in one direction and forgetting the carried
-topological order in the other. Undirected Graph Isomorphism
-(`DescriptiveComplexity.UGraphIso`), the same question restricted to simple
-graphs, carries only its membership half so far
-(`DescriptiveComplexity.ugraphIso_mem_GI`): simplicity is first-order, so the
-reduction into `GraphIso` only has to test it, while the converse needs the
+topological order in the other. Graph Isomorphism
+(`DescriptiveComplexity.GraphIso`) is the same question restricted to *simple*
+graphs – what the literature means by GI – and carries only its membership half
+so far
+(`DescriptiveComplexity.graphIso_mem_GI`): simplicity is first-order, so the
+reduction into `DigraphIso` only has to test it, while the converse needs the
 classical digraph-to-graph gadget. Alternating machine acceptance
 (`DescriptiveComplexity.ATMAccept`) is the machine bridge for the polynomial
 hierarchy, complete at every level

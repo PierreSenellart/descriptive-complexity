@@ -12,7 +12,7 @@ Every completeness result of this library measures a problem against a class
 *defined by a logic*. The same machinery supports a second, orthogonal notion,
 at almost no cost: completeness for the degree of a fixed *problem*, with no
 logic anywhere. “GI-complete” – complete for the degree of Graph Isomorphism
-(`DescriptiveComplexity.GraphIso`) – is the standard example, and the reason
+(`DescriptiveComplexity.DigraphIso`) – is the standard example, and the reason
 this file exists.
 
 `DescriptiveComplexity.ComplexityClass.below Q₀` is the downward closure of a

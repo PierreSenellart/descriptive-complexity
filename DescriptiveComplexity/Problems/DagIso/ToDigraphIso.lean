@@ -6,13 +6,13 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.DagIso.Defs
 
 /-!
-# DAG Isomorphism reduces to Graph Isomorphism
+# DAG Isomorphism reduces to Digraph Isomorphism
 
 The easy half of GI-completeness, and the half that pays for the design of
 `DescriptiveComplexity.Problems.DagIso.Defs`: since
 `FirstOrder.Language.twoGraphs` carries two *arbitrary* binary relations –
 nothing asks them to be symmetric –
-`DescriptiveComplexity.GraphIso` is already isomorphism of two directed graphs,
+`DescriptiveComplexity.DigraphIso` is already isomorphism of two directed graphs,
 so a DAG instance only has to forget its two topological orders.
 
 What it may not forget is well-formedness. The reduction is a one-dimensional,
@@ -96,7 +96,7 @@ theorem realize_wfSentence {A : Type} [Language.twoDags.Structure A] {α : Type}
 
 /-! ### The interpretation -/
 
-/-- The interpretation of DAG Isomorphism into Graph Isomorphism: one
+/-- The interpretation of DAG Isomorphism into Digraph Isomorphism: one
 dimension, one tag. If the instance is well formed, the two marked arc
 relations are copied verbatim – `FirstOrder.Language.twoGraphs` holds arbitrary
 binary relations, so a DAG needs no encoding. If it is not, the pattern is
@@ -210,12 +210,12 @@ variable {A : Type} [Language.twoDags.Structure A]
 
 /-- Correctness of the interpretation: the image is a yes-instance of Graph
 Isomorphism exactly when the input is one of DAG Isomorphism. -/
-theorem hasDagIso_iff_hasGraphIso_map (A : Type) [Language.twoDags.Structure A] [Finite A]
+theorem hasDagIso_iff_hasDigraphIso_map (A : Type) [Language.twoDags.Structure A] [Finite A]
     [Nonempty A] :
-    HasDagIso A ↔ HasGraphIso (dagInterp.Map A) := by
+    HasDagIso A ↔ HasDigraphIso (dagInterp.Map A) := by
   by_cases hwf : TopoOn (TDPatV (A := A)) TDPatLt TDPatArc ∧
       TopoOn (TDHostV (A := A)) TDHostLt TDHostArc
-  · have hiso := GraphIsoOn.equiv_iff (A := A) (B := dagInterp.Map A) dagEquiv
+  · have hiso := RelIsoOn.equiv_iff (A := A) (B := dagInterp.Map A) dagEquiv
       (patV_map hwf) (hostV_map hwf) (patE_map hwf) (hostE_map hwf)
     constructor
     · rintro ⟨-, -, -, h⟩
@@ -231,17 +231,17 @@ end Correctness
 
 end DagIso
 
-/-- **DAG Isomorphism FO-reduces to Graph Isomorphism**: forget the two
+/-- **DAG Isomorphism FO-reduces to Digraph Isomorphism**: forget the two
 topological orders, after checking first-order that they are ones. The
 reduction is order-free. -/
-noncomputable def dagIso_fo_reduction_graphIso : DagIso ≤ᶠᵒ GraphIso where
+noncomputable def dagIso_fo_reduction_digraphIso : DagIso ≤ᶠᵒ DigraphIso where
   Tag := Unit
   dim := 1
   toInterpretation := DagIso.dagInterp
-  correct A _ _ _ := DagIso.hasDagIso_iff_hasGraphIso_map A
+  correct A _ _ _ := DagIso.hasDagIso_iff_hasDigraphIso_map A
 
 /-- DAG Isomorphism belongs to the GI degree. -/
 theorem dagIso_mem_GI : DagIso ∈ GI :=
-  ⟨dagIso_fo_reduction_graphIso.toOrdered⟩
+  ⟨dagIso_fo_reduction_digraphIso.toOrdered⟩
 
 end DescriptiveComplexity

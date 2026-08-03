@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.DagIso.Defs
 
 /-!
-# Graph Isomorphism reduces to DAG Isomorphism
+# Digraph Isomorphism reduces to DAG Isomorphism
 
 The substantial half of GI-completeness: an arbitrary directed graph is turned
 into a DAG whose isomorphisms are exactly the isomorphisms of the graph. Every
@@ -107,7 +107,7 @@ def ltF (t s : NodeTag) : Language.twoGraphs.Formula α :=
 
 end Formulas
 
-/-- The interpretation of Graph Isomorphism into DAG Isomorphism: two
+/-- The interpretation of Digraph Isomorphism into DAG Isomorphism: two
 dimensions (an arc is a pair), three tags (the three levels), the same gadget
 run on the pattern side and on the host side. -/
 def incInterp : FOInterpretation Language.twoGraphs Language.twoDags NodeTag 2 where
@@ -467,12 +467,12 @@ theorem patV_coords {p : incInterp.Map A} (h : TDPatV p) : TGPatV (p.2 0) ∧ TG
 graphs lifts, level by level, to an isomorphism of the two DAGs. The six
 combinations of levels that carry no arc are dispatched by the level lemmas,
 the three that do by the corresponding characterizations. -/
-theorem graphIsoOn_map (g : A → A)
+theorem relIsoOn_map (g : A → A)
     (hmaps : ∀ x, TGPatV x → TGHostV (g x))
     (hinj : ∀ x y, TGPatV x → TGPatV y → g x = g y → x = y)
     (hsurj : ∀ y, TGHostV y → ∃ x, TGPatV x ∧ g x = y)
     (hedge : ∀ x y, TGPatV x → TGPatV y → (TGPatE x y ↔ TGHostE (g x) (g y))) :
-    GraphIsoOn (TDPatV (A := incInterp.Map A)) TDHostV TDPatArc TDHostArc := by
+    RelIsoOn (TDPatV (A := incInterp.Map A)) TDHostV TDPatArc TDHostArc := by
   refine ⟨liftMap g, ?_, ?_, ?_, ?_⟩
   · rintro p hp
     rcases patV_cases hp with ⟨v, hv, rfl⟩ | ⟨u, v, ⟨hu, hv, he⟩, rfl⟩ | ⟨u, v, ⟨hu, hv, he⟩, rfl⟩
@@ -645,9 +645,9 @@ variable {A : Type} [Language.twoGraphs.Structure A]
 vertex nodes, so it restricts to a bijection of the marked vertices, and the
 arcs of the graphs are recovered from the arcs of the gadget through the middle
 and end nodes. -/
-theorem graphIsoOn_of_dagIso
-    (h : GraphIsoOn (TDPatV (A := incInterp.Map A)) TDHostV TDPatArc TDHostArc) :
-    GraphIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE := by
+theorem relIsoOn_of_dagIso
+    (h : RelIsoOn (TDPatV (A := incInterp.Map A)) TDHostV TDPatArc TDHostArc) :
+    RelIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE := by
   classical
   obtain ⟨F, hmaps, hinj, hsurj, hedge⟩ := h
   have hstep : ∀ v : {v : A // TGPatV v}, ∃ w, TGHostV w ∧ F (vPt v.1) = vPt w :=
@@ -699,27 +699,27 @@ theorem graphIsoOn_of_dagIso
 
 /-- **Correctness of the reduction**: the two graphs are isomorphic exactly
 when the two DAGs built from them are. -/
-theorem hasGraphIso_iff_hasDagIso_map (A : Type) [Language.twoGraphs.Structure A] [Finite A] :
-    HasGraphIso A ↔ HasDagIso (incInterp.Map A) := by
+theorem hasDigraphIso_iff_hasDagIso_map (A : Type) [Language.twoGraphs.Structure A] [Finite A] :
+    HasDigraphIso A ↔ HasDagIso (incInterp.Map A) := by
   constructor
   · rintro ⟨-, g, hmaps, hinj, hsurj, hedge⟩
     exact ⟨incInterp.map_finite A, topoOn_pat, topoOn_host,
-      graphIsoOn_map g hmaps hinj hsurj hedge⟩
+      relIsoOn_map g hmaps hinj hsurj hedge⟩
   · rintro ⟨-, -, -, hiso⟩
-    exact ⟨‹Finite A›, graphIsoOn_of_dagIso hiso⟩
+    exact ⟨‹Finite A›, relIsoOn_of_dagIso hiso⟩
 
 end Correctness
 
 end DagIso
 
-/-- **Graph Isomorphism FO-reduces to DAG Isomorphism**: subdivide every arc
+/-- **Digraph Isomorphism FO-reduces to DAG Isomorphism**: subdivide every arc
 twice, and carry the level comparison as the topological order. Two dimensions,
 three tags, and no order on the input – the reduction is order-free, as every
 reduction between isomorphism problems must be. -/
-def graphIso_fo_reduction_dagIso : GraphIso ≤ᶠᵒ DagIso where
+def digraphIso_fo_reduction_dagIso : DigraphIso ≤ᶠᵒ DagIso where
   Tag := DagIso.NodeTag
   dim := 2
   toInterpretation := DagIso.incInterp
-  correct A _ _ _ := DagIso.hasGraphIso_iff_hasDagIso_map A
+  correct A _ _ _ := DagIso.hasDigraphIso_iff_hasDagIso_map A
 
 end DescriptiveComplexity

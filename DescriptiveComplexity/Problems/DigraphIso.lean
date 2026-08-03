@@ -7,15 +7,22 @@ import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Degree
 
 /-!
-# Graph Isomorphism, and the degree it defines
+# Digraph Isomorphism, and the degree it defines
 
-GRAPH ISOMORPHISM: are the two graphs of the instance isomorphic? The
-vocabulary is the pattern-and-host one of
+DIGRAPH ISOMORPHISM: are the two *directed* graphs of the instance isomorphic?
+The vocabulary is the pattern-and-host one of
 `DescriptiveComplexity.Problems.SubgraphIso`
-(`FirstOrder.Language.twoGraphs`, two marks and two adjacency relations), and
+(`FirstOrder.Language.twoGraphs`, two marks and two binary relations – nothing
+asks them to be symmetric, which is what makes this the directed problem), and
 the yes-instances are the structures whose two marked subgraphs are isomorphic
-(`DescriptiveComplexity.GraphIsoOn`); as everywhere in the catalog, elements
+(`DescriptiveComplexity.RelIsoOn`); as everywhere in the catalog, elements
 outside both marks are junk that no condition mentions.
+
+The undirected problem, which is what the literature calls graph isomorphism,
+is `DescriptiveComplexity.GraphIso` (`DescriptiveComplexity.Problems.GraphIso`);
+it reduces to this one by testing simplicity first-order. The converse
+reduction – the classical digraph-to-graph gadget – is what the degree below is
+still anchored on this problem for.
 
 Two things make this problem worth its own file.
 
@@ -23,7 +30,7 @@ Two things make this problem worth its own file.
 NP-complete.** Membership is a textbook `Σ₁` – guess a binary relation, check
 first-order that it is a bijection of the pattern vertices onto the host
 vertices preserving adjacency in both directions – with no order, no counting
-and no threshold, so `DescriptiveComplexity.graphIso_mem_NP` is cheap. No
+and no threshold, so `DescriptiveComplexity.digraphIso_mem_NP` is cheap. No
 hardness result accompanies it, and none is expected: the problem is in NP,
 is not known to be in P, and is not known to be NP-complete ([Babai
 2016][babai2016graph] gives a quasipolynomial algorithm; [Köbler, Schöning and
@@ -32,15 +39,19 @@ Torán 1993][kobler1993graph] is the structural account).
 **It is the reason `DescriptiveComplexity.ComplexityClass.below` exists.**
 “GI-complete” is the standard example of completeness for the degree of a
 *problem* rather than for a logically defined class, and
-`DescriptiveComplexity.GI` is that degree here – with `GraphIso` complete for
-it (`DescriptiveComplexity.graphIso_GI_complete`) and the whole degree inside
-NP (`DescriptiveComplexity.GI_subset_NP`).
+`DescriptiveComplexity.GI` is that degree here – with `DigraphIso` complete for
+it (`DescriptiveComplexity.digraphIso_GI_complete`) and the whole degree inside
+NP (`DescriptiveComplexity.GI_subset_NP`). The degree is anchored on the
+directed problem only until the digraph-to-graph gadget lands: the two are then
+mutually reducible, and `DescriptiveComplexity.ComplexityClass.below_congr`
+moves the anchor to `DescriptiveComplexity.GraphIso` in one line, every
+completeness theorem transferring with it.
 
 There is also a pleasant circularity worth noting: a decision problem in this
 library is by definition an isomorphism-invariant property of finite structures
-(`DescriptiveComplexity.DecisionProblem`), so Graph Isomorphism is the problem
-of deciding the very equivalence the framework quotients by. That reading is
-`DescriptiveComplexity.graphIsoOn_iff_equiv`: the semantic condition is
+(`DescriptiveComplexity.DecisionProblem`), so isomorphism is the problem of
+deciding the very equivalence the framework quotients by. That reading is
+`DescriptiveComplexity.relIsoOn_iff_equiv`: the semantic condition is
 literally the existence of an equivalence between the two marked sets carrying
 one adjacency relation to the other.
 -/
@@ -61,7 +72,7 @@ variable {A : Type}
 carrying `PE`-edges to `HE`-edges *and back*: an isomorphism of the two marked
 graphs. Compare `DescriptiveComplexity.SubgraphIsoOn`, which asks only for an
 injection and only for the forward implication. -/
-def GraphIsoOn (PV HV : A → Prop) (PE HE : A → A → Prop) : Prop :=
+def RelIsoOn (PV HV : A → Prop) (PE HE : A → A → Prop) : Prop :=
   ∃ f : A → A, (∀ x, PV x → HV (f x)) ∧
     (∀ x y, PV x → PV y → f x = f y → x = y) ∧
     (∀ y, HV y → ∃ x, PV x ∧ f x = y) ∧
@@ -69,14 +80,14 @@ def GraphIsoOn (PV HV : A → Prop) (PE HE : A → A → Prop) : Prop :=
 
 variable {B : Type}
 
-/-- `GraphIsoOn` transports along an equivalence commuting with the four
+/-- `RelIsoOn` transports along an equivalence commuting with the four
 predicates. -/
-theorem GraphIsoOn.of_equiv (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
+theorem RelIsoOn.of_equiv (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
     {PVA HVA : A → Prop} {PEA HEA : A → A → Prop}
     (hPV : ∀ b, PVB b ↔ PVA (u b)) (hHV : ∀ b, HVB b ↔ HVA (u b))
     (hPE : ∀ b b', PEB b b' ↔ PEA (u b) (u b'))
     (hHE : ∀ b b', HEB b b' ↔ HEA (u b) (u b'))
-    (h : GraphIsoOn PVB HVB PEB HEB) : GraphIsoOn PVA HVA PEA HEA := by
+    (h : RelIsoOn PVB HVB PEB HEB) : RelIsoOn PVA HVA PEA HEA := by
   obtain ⟨f, hmaps, hinj, hsurj, hedge⟩ := h
   refine ⟨fun a => u (f (u.symm a)), fun x hx => ?_, fun x y hx hy hxy => ?_,
     fun y hy => ?_, fun x y hx hy => ?_⟩
@@ -92,23 +103,23 @@ theorem GraphIsoOn.of_equiv (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B �
     rw [hPE, hHE] at h
     simpa using h
 
-/-- `GraphIsoOn` transports along an equivalence, iff version. -/
-theorem GraphIsoOn.equiv_iff (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
+/-- `RelIsoOn` transports along an equivalence, iff version. -/
+theorem RelIsoOn.equiv_iff (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
     {PVA HVA : A → Prop} {PEA HEA : A → A → Prop}
     (hPV : ∀ b, PVB b ↔ PVA (u b)) (hHV : ∀ b, HVB b ↔ HVA (u b))
     (hPE : ∀ b b', PEB b b' ↔ PEA (u b) (u b'))
     (hHE : ∀ b b', HEB b b' ↔ HEA (u b) (u b')) :
-    GraphIsoOn PVB HVB PEB HEB ↔ GraphIsoOn PVA HVA PEA HEA :=
-  ⟨GraphIsoOn.of_equiv u hPV hHV hPE hHE,
-    GraphIsoOn.of_equiv u.symm (fun a => by rw [hPV]; simp) (fun a => by rw [hHV]; simp)
+    RelIsoOn PVB HVB PEB HEB ↔ RelIsoOn PVA HVA PEA HEA :=
+  ⟨RelIsoOn.of_equiv u hPV hHV hPE hHE,
+    RelIsoOn.of_equiv u.symm (fun a => by rw [hPV]; simp) (fun a => by rw [hHV]; simp)
       (fun a a' => by rw [hPE]; simp) fun a a' => by rw [hHE]; simp⟩
 
 /-- **The property is isomorphism of the two marked graphs**: a map of the
-universe as in `DescriptiveComplexity.GraphIsoOn` is the same thing as an
+universe as in `DescriptiveComplexity.RelIsoOn` is the same thing as an
 equivalence of the marked subsets carrying one adjacency relation to the
 other. -/
-theorem graphIsoOn_iff_equiv (PV HV : A → Prop) (PE HE : A → A → Prop) :
-    GraphIsoOn PV HV PE HE ↔
+theorem relIsoOn_iff_equiv (PV HV : A → Prop) (PE HE : A → A → Prop) :
+    RelIsoOn PV HV PE HE ↔
       ∃ e : {x : A // PV x} ≃ {y : A // HV y},
         ∀ x y : {x : A // PV x}, PE x.1 y.1 ↔ HE (e x).1 (e y).1 := by
   classical
@@ -151,8 +162,8 @@ section Problem
 variable (A : Type) [Language.twoGraphs.Structure A]
 
 /-- The two marked graphs of the instance are isomorphic. -/
-def HasGraphIso : Prop :=
-  Finite A ∧ GraphIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE
+def HasDigraphIso : Prop :=
+  Finite A ∧ RelIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE
 
 end Problem
 
@@ -161,20 +172,20 @@ section Iso
 variable {A B : Type} [Language.twoGraphs.Structure A] [Language.twoGraphs.Structure B]
 
 /-- The graph-isomorphism property is isomorphism-invariant. -/
-theorem hasGraphIso_iso (e : A ≃[Language.twoGraphs] B) :
-    HasGraphIso A ↔ HasGraphIso B :=
+theorem hasDigraphIso_iso (e : A ≃[Language.twoGraphs] B) :
+    HasDigraphIso A ↔ HasDigraphIso B :=
   and_congr e.toEquiv.finite_iff
-    (GraphIsoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tgPatV a)
+    (RelIsoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tgPatV a)
       (fun a => relMap_equiv₁ e tgHostV a) (fun a b => relMap_equiv₂ e tgPatE a b)
       fun a b => relMap_equiv₂ e tgHostE a b)
 
 end Iso
 
-/-- GRAPH ISOMORPHISM, as a problem on pattern-and-host structures: are the two
-marked graphs isomorphic? -/
-def GraphIso : DecisionProblem Language.twoGraphs where
-  Holds := fun A inst => @HasGraphIso A inst
-  iso_invariant := fun e => hasGraphIso_iso e
+/-- DIGRAPH ISOMORPHISM, as a problem on pattern-and-host structures: are the
+two marked directed graphs isomorphic? -/
+def DigraphIso : DecisionProblem Language.twoGraphs where
+  Holds := fun A inst => @HasDigraphIso A inst
+  iso_invariant := fun e => hasDigraphIso_iso e
 
 /-! ### Membership -/
 
@@ -233,18 +244,18 @@ private noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
     (Relations.formula₂ sgPatESym (Term.var (Sum.inr 0))
       (Term.var (Sum.inr 1)))).iAlls (Fin 4)
 
-/-- The first-order kernel of the `Σ₁` definition of Graph Isomorphism: the
+/-- The first-order kernel of the `Σ₁` definition of Digraph Isomorphism: the
 guessed relation is a bijection of the pattern vertices onto the host vertices,
 preserving and reflecting adjacency. -/
-noncomputable def graphIsoKernel : subgraphSOLang.Sentence :=
+noncomputable def digraphIsoKernel : subgraphSOLang.Sentence :=
   giTotalClause ⊓ (giFuncClause ⊓ (giInjClause ⊓
     (giSurjClause ⊓ (giEdgeClause ⊓ giEdgeBackClause))))
 
 /-- Realization of the kernel under an assignment of the guessed map. -/
-private theorem realize_graphIsoKernel {A : Type} [Language.twoGraphs.Structure A]
+private theorem realize_digraphIsoKernel {A : Type} [Language.twoGraphs.Structure A]
     (ρ : isoGuessBlock.Assignment A) :
     (@Sentence.Realize subgraphSOLang A
-        (@sumStructure _ _ A _ (isoGuessBlock.structure ρ)) graphIsoKernel) ↔
+        (@sumStructure _ _ A _ (isoGuessBlock.structure ρ)) digraphIsoKernel) ↔
       (∀ x : A, TGPatV x → ∃ y : A, ρ () ![x, y] ∧ TGHostV y) ∧
         (∀ x y y' : A, TGPatV x → ρ () ![x, y] → ρ () ![x, y'] → y = y') ∧
         (∀ x x' y : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y] → x = x') ∧
@@ -256,7 +267,7 @@ private theorem realize_graphIsoKernel {A : Type} [Language.twoGraphs.Structure 
   letI := isoGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
       RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ () w := fun _ => Iff.rfl
-  rw [graphIsoKernel]
+  rw [digraphIsoKernel]
   simp only [giTotalClause, giFuncClause, giInjClause, giSurjClause, giEdgeClause,
     giEdgeBackClause, Sentence.Realize, Formula.realize_inf, Formula.realize_iAlls,
     Formula.realize_imp, Formula.realize_iExs, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -285,17 +296,17 @@ private theorem realize_graphIsoKernel {A : Type} [Language.twoGraphs.Structure 
   · exact h ![x, x', y, y'] ⟨⟨⟨⟨hx, hx'⟩, h₁⟩, h₂⟩, hhe⟩
   · exact h (i 0) (i 1) (i 2) (i 3) hi.1.1.1.1 hi.1.1.1.2 hi.1.1.2 hi.1.2 hi.2
 
-/-- **Graph Isomorphism is `Σ₁`-definable**: existentially guess the map, then
+/-- **Digraph Isomorphism is `Σ₁`-definable**: existentially guess the map, then
 check first-order that it is a bijection of the pattern vertices onto the host
 vertices preserving adjacency in both directions. One binary relation variable,
 no order, no counting, no threshold. -/
-theorem graphIso_sigmaSODefinable : SigmaSODefinable 1 GraphIso := by
-  refine ⟨[isoGuessBlock], rfl, graphIsoKernel, ?_⟩
+theorem digraphIso_sigmaSODefinable : SigmaSODefinable 1 DigraphIso := by
+  refine ⟨[isoGuessBlock], rfl, digraphIsoKernel, ?_⟩
   intro A _ _ _
   constructor
   · rintro ⟨-, f, hmaps, hinj, hsurj, hedge⟩
     refine ⟨fun i => match i with | () => fun w : Fin 2 → A => f (w 0) = w 1,
-      (realize_graphIsoKernel _).mpr ⟨fun x hx => ⟨f x, rfl, hmaps x hx⟩,
+      (realize_digraphIsoKernel _).mpr ⟨fun x hx => ⟨f x, rfl, hmaps x hx⟩,
         fun x y y' _ h₁ h₂ => h₁.symm.trans h₂,
         fun x x' y hx hx' h₁ h₂ => hinj x x' hx hx' (h₁.trans h₂.symm),
         fun y hy => ?_, ?_, ?_⟩⟩
@@ -312,7 +323,7 @@ theorem graphIso_sigmaSODefinable : SigmaSODefinable 1 GraphIso := by
       rw [← h₁', ← h₂'] at hhe
       exact (hedge x x' hx hx').mpr hhe
   · rintro ⟨ρ, hρ⟩
-    obtain ⟨htot, hfunc, hinj, hsurj, hedge, hedgeBack⟩ := (realize_graphIsoKernel ρ).mp hρ
+    obtain ⟨htot, hfunc, hinj, hsurj, hedge, hedgeBack⟩ := (realize_digraphIsoKernel ρ).mp hρ
     classical
     have hch : ∀ x : {x : A // TGPatV x}, ∃ y : A, ρ () ![x.1, y] ∧ TGHostV y :=
       fun x => htot x.1 x.2
@@ -339,28 +350,28 @@ theorem graphIso_sigmaSODefinable : SigmaSODefinable 1 GraphIso := by
 
 end SigmaOne
 
-/-- Graph Isomorphism is in NP: it is `Σ₁`-definable. -/
-theorem graphIso_mem_NP : GraphIso ∈ NP :=
-  graphIso_sigmaSODefinable
+/-- Digraph Isomorphism is in NP: it is `Σ₁`-definable. -/
+theorem digraphIso_mem_NP : DigraphIso ∈ NP :=
+  digraphIso_sigmaSODefinable
 
 /-! ### The GI degree -/
 
-/-- **The GI degree**: the problems that (ordered) first-order reduce to Graph
+/-- **The GI degree**: the problems that (ordered) first-order reduce to Digraph
 Isomorphism, as a complexity class
 (`DescriptiveComplexity.ComplexityClass.below`). A problem is *GI-complete* –
 in this library's finer, first-order sense – when it is
 `DescriptiveComplexity.ComplexityClass.Complete` for `GI`. -/
 noncomputable def GI : ComplexityClass :=
-  .below GraphIso
+  .below DigraphIso
 
-/-- **Graph Isomorphism is GI-complete**, by construction. -/
-theorem graphIso_GI_complete : GI.Complete GraphIso :=
-  ComplexityClass.below_complete_self GraphIso
+/-- **Digraph Isomorphism is GI-complete**, by construction. -/
+theorem digraphIso_GI_complete : GI.Complete DigraphIso :=
+  ComplexityClass.below_complete_self DigraphIso
 
-/-- The whole GI degree lies inside NP, since Graph Isomorphism does and
+/-- The whole GI degree lies inside NP, since Digraph Isomorphism does and
 membership travels backward along reductions. (Whether the inclusion is strict
 is the open question; the framework decides no such thing.) -/
 theorem GI_subset_NP : GI ⊆ NP :=
-  fun _ _ _ h => NP.mem_of_orderedReduction h.some graphIso_mem_NP
+  fun _ _ _ h => NP.mem_of_orderedReduction h.some digraphIso_mem_NP
 
 end DescriptiveComplexity

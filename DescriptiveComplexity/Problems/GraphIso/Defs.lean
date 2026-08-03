@@ -3,23 +3,26 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.GraphIso
+import DescriptiveComplexity.Problems.DigraphIso
 
 /-!
-# Undirected Graph Isomorphism: vocabulary, semantics, and membership in the GI degree
+# Graph Isomorphism: vocabulary, semantics, and membership in the GI degree
 
-`DescriptiveComplexity.GraphIso` is isomorphism of two *directed* graphs:
-`FirstOrder.Language.twoGraphs` carries two arbitrary binary relations, and
-nothing asks them to be symmetric. UNDIRECTED GRAPH ISOMORPHISM is the same
-question on the same vocabulary, restricted to instances whose two relations
-are symmetric and irreflexive – simple graphs.
+GRAPH ISOMORPHISM, as the literature means it: are the two *simple* graphs of
+the instance isomorphic? `DescriptiveComplexity.DigraphIso` is the same
+question over `FirstOrder.Language.twoGraphs` with no condition on the two
+binary relations, hence for directed graphs; this problem is that one
+restricted to instances whose relations are symmetric and irreflexive.
 
 Unlike acyclicity (`DescriptiveComplexity.Problems.DagIso`), that restriction
 *is* first-order, so nothing has to be carried by the instance: the reduction
-into `GraphIso` simply tests it. This file therefore contains the whole
+into `DigraphIso` simply tests it. This file therefore contains the whole
 membership half; the hardness half – the classical construction turning a
 digraph into a simple graph with the same isomorphisms – is the substantial
-one, and lives in `DescriptiveComplexity.Problems.UGraphIso.FromGraphIso`.
+one, and is not built yet. Until it is, the degree
+`DescriptiveComplexity.GI` stays anchored on
+`DescriptiveComplexity.DigraphIso`: only one of the two reductions between the
+problems exists, so they are not yet known to have the same degree here.
 -/
 
 namespace DescriptiveComplexity
@@ -71,9 +74,9 @@ section Problem
 variable (A : Type) [Language.twoGraphs.Structure A]
 
 /-- Both marked graphs are simple, and they are isomorphic. -/
-def HasUGraphIso : Prop :=
+def HasGraphIso : Prop :=
   Finite A ∧ SimpleOn (TGPatV (A := A)) TGPatE ∧ SimpleOn (TGHostV (A := A)) TGHostE ∧
-    GraphIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE
+    RelIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE
 
 end Problem
 
@@ -81,9 +84,9 @@ section Iso
 
 variable {A B : Type} [Language.twoGraphs.Structure A] [Language.twoGraphs.Structure B]
 
-/-- The undirected-isomorphism property is isomorphism-invariant. -/
-theorem hasUGraphIso_iso (e : A ≃[Language.twoGraphs] B) :
-    HasUGraphIso A ↔ HasUGraphIso B :=
+/-- The graph-isomorphism property is isomorphism-invariant. -/
+theorem hasGraphIso_iso (e : A ≃[Language.twoGraphs] B) :
+    HasGraphIso A ↔ HasGraphIso B :=
   and_congr e.toEquiv.finite_iff
     (and_congr
       (SimpleOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tgPatV a)
@@ -91,22 +94,23 @@ theorem hasUGraphIso_iso (e : A ≃[Language.twoGraphs] B) :
       (and_congr
         (SimpleOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tgHostV a)
           fun a b => relMap_equiv₂ e tgHostE a b)
-        (GraphIsoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tgPatV a)
+        (RelIsoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tgPatV a)
           (fun a => relMap_equiv₁ e tgHostV a) (fun a b => relMap_equiv₂ e tgPatE a b)
           fun a b => relMap_equiv₂ e tgHostE a b)))
 
 end Iso
 
-/-- UNDIRECTED GRAPH ISOMORPHISM: are the two marked *simple* graphs
-isomorphic? Simplicity is part of the yes-condition, and is first-order, so a
-reduction can test it. -/
-def UGraphIso : DecisionProblem Language.twoGraphs where
-  Holds := fun A inst => @HasUGraphIso A inst
-  iso_invariant := fun e => hasUGraphIso_iso e
+/-- GRAPH ISOMORPHISM: are the two marked *simple* graphs isomorphic?
+Simplicity is part of the yes-condition, and is first-order, so a reduction can
+test it – unlike acyclicity in `DescriptiveComplexity.DagIso`, which has to be
+carried by the instance. -/
+def GraphIso : DecisionProblem Language.twoGraphs where
+  Holds := fun A inst => @HasGraphIso A inst
+  iso_invariant := fun e => hasGraphIso_iso e
 
 /-! ### Membership: forget nothing, just check simplicity -/
 
-namespace UGraphIso
+namespace GraphIso
 
 /-- `E` is symmetric and irreflexive on `V`, as a first-order sentence over any
 variable type, so that it can be conjoined inside the defining formulas of an
@@ -140,9 +144,9 @@ theorem realize_wfSentence {A : Type} [Language.twoGraphs.Structure A] {α : Typ
   rw [wfSentence, Formula.realize_inf, realize_simpleSentence, realize_simpleSentence]
   rfl
 
-/-- The interpretation of Undirected Graph Isomorphism into Graph
-Isomorphism: copy both marked graphs if they are simple, and otherwise emit a
-pattern with no vertices facing a host with all of them. -/
+/-- The interpretation of Graph Isomorphism into Digraph Isomorphism: copy both
+marked graphs if they are simple, and otherwise emit a pattern with no vertices
+facing a host with all of them. -/
 noncomputable def simpleInterp :
     FOInterpretation Language.twoGraphs Language.twoGraphs Unit 1 where
   relFormula {n} R :=
@@ -231,13 +235,13 @@ end IllFormed
 
 section Correctness
 
-/-- Correctness: the image is a yes-instance of Graph Isomorphism exactly when
-the input is one of Undirected Graph Isomorphism. -/
-theorem hasUGraphIso_iff_hasGraphIso_map (A : Type) [Language.twoGraphs.Structure A] [Finite A]
+/-- Correctness: the image is a yes-instance of Digraph Isomorphism exactly
+when the input is one of Graph Isomorphism. -/
+theorem hasGraphIso_iff_hasDigraphIso_map (A : Type) [Language.twoGraphs.Structure A] [Finite A]
     [Nonempty A] :
-    HasUGraphIso A ↔ HasGraphIso (simpleInterp.Map A) := by
+    HasGraphIso A ↔ HasDigraphIso (simpleInterp.Map A) := by
   by_cases hwf : SimpleOn (TGPatV (A := A)) TGPatE ∧ SimpleOn (TGHostV (A := A)) TGHostE
-  · have hiso := GraphIsoOn.equiv_iff (A := A) (B := simpleInterp.Map A) uEquiv
+  · have hiso := RelIsoOn.equiv_iff (A := A) (B := simpleInterp.Map A) uEquiv
       (patV_map hwf) (hostV_map hwf) (patE_map hwf) (hostE_map hwf)
     constructor
     · rintro ⟨-, -, -, h⟩
@@ -251,18 +255,18 @@ theorem hasUGraphIso_iff_hasGraphIso_map (A : Type) [Language.twoGraphs.Structur
 
 end Correctness
 
-end UGraphIso
+end GraphIso
 
-/-- **Undirected Graph Isomorphism FO-reduces to Graph Isomorphism**: check
-simplicity first-order, then copy. -/
-noncomputable def ugraphIso_fo_reduction_graphIso : UGraphIso ≤ᶠᵒ GraphIso where
+/-- **Graph Isomorphism FO-reduces to Digraph Isomorphism**: check simplicity
+first-order, then copy. -/
+noncomputable def graphIso_fo_reduction_digraphIso : GraphIso ≤ᶠᵒ DigraphIso where
   Tag := Unit
   dim := 1
-  toInterpretation := UGraphIso.simpleInterp
-  correct A _ _ _ := UGraphIso.hasUGraphIso_iff_hasGraphIso_map A
+  toInterpretation := GraphIso.simpleInterp
+  correct A _ _ _ := GraphIso.hasGraphIso_iff_hasDigraphIso_map A
 
-/-- Undirected Graph Isomorphism belongs to the GI degree. -/
-theorem ugraphIso_mem_GI : UGraphIso ∈ GI :=
-  ⟨ugraphIso_fo_reduction_graphIso.toOrdered⟩
+/-- Graph Isomorphism belongs to the GI degree. -/
+theorem graphIso_mem_GI : GraphIso ∈ GI :=
+  ⟨graphIso_fo_reduction_digraphIso.toOrdered⟩
 
 end DescriptiveComplexity

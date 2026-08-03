@@ -543,7 +543,7 @@ class.
   ```lean
   theorem gi_hard_of_isoReflecting (F : FOInterpretation Language.graph L' Tag d)
       (h : ∀ G H, … → Nonempty (F.Map G ≃[L'] F.Map H) → Nonempty (G ≃[Language.graph] H)) :
-      GraphIso ≤ᶠᵒ GraphIso'
+      DigraphIso ≤ᶠᵒ DigraphIso'
   ```
 - **The GI degree, in order of cost** [M each]: hypergraph / set-system
   isomorphism first, since `Problems/SetFamily/FromGraphs.lean` already builds

@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.GraphIso
+import DescriptiveComplexity.Problems.DigraphIso
 import DescriptiveComplexity.Problems.Feedback.Defs
 
 /-!
@@ -12,14 +12,14 @@ import DescriptiveComplexity.Problems.Feedback.Defs
 DAG ISOMORPHISM: are the two directed acyclic graphs of the instance
 isomorphic? This file fixes the vocabulary and the yes-instance predicate; the
 two halves of GI-completeness live in
-`DescriptiveComplexity.Problems.DagIso.ToGraphIso` and
-`DescriptiveComplexity.Problems.DagIso.FromGraphIso`.
+`DescriptiveComplexity.Problems.DagIso.ToDigraphIso` and
+`DescriptiveComplexity.Problems.DagIso.FromDigraphIso`.
 
 ## Why the instances carry a topological order
 
 Acyclicity is **not first-order definable**, so a problem whose yes-instances
 are “both sides acyclic *and* isomorphic” could not be reduced back to
-`DescriptiveComplexity.GraphIso`: the reduction would have to decide acyclicity
+`DescriptiveComplexity.DigraphIso`: the reduction would have to decide acyclicity
 first-order, and no first-order interpretation can (a directed cycle is a
 reachability question). A classical polynomial-time reduction simply tests
 acyclicity and maps a cyclic instance to a fixed no-instance; an FO reduction,
@@ -208,7 +208,7 @@ instance's acyclicity witnesses, not part of the structure being matched. -/
 def HasDagIso : Prop :=
   Finite A ∧ TopoOn (TDPatV (A := A)) TDPatLt TDPatArc ∧
     TopoOn (TDHostV (A := A)) TDHostLt TDHostArc ∧
-    GraphIsoOn (TDPatV (A := A)) TDHostV TDPatArc TDHostArc
+    RelIsoOn (TDPatV (A := A)) TDHostV TDPatArc TDHostArc
 
 end Problem
 
@@ -226,7 +226,7 @@ theorem hasDagIso_iso (e : A ≃[Language.twoDags] B) :
       (and_congr
         (TopoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tdHostV a)
           (fun a b => relMap_equiv₂ e tdHostLt a b) fun a b => relMap_equiv₂ e tdHostArc a b)
-        (GraphIsoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tdPatV a)
+        (RelIsoOn.equiv_iff e.toEquiv (fun a => relMap_equiv₁ e tdPatV a)
           (fun a => relMap_equiv₁ e tdHostV a) (fun a b => relMap_equiv₂ e tdPatArc a b)
           fun a b => relMap_equiv₂ e tdHostArc a b)))
 

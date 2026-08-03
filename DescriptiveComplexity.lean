@@ -188,7 +188,7 @@ individual declarations are documented on their own pages.
   under ordered FO reductions is itself a `ComplexityClass`, so
   `(below Q₀).Complete P` is literally “`P` is `Q₀`-complete”, with no logic
   anywhere – the notion behind “GI-complete”
-  (`DescriptiveComplexity.GI`, the degree of `DescriptiveComplexity.GraphIso`).
+  (`DescriptiveComplexity.GI`, the degree of `DescriptiveComplexity.DigraphIso`).
   Hardness needs no new proof: `DescriptiveComplexity.CofinalHard` is already
   parameterized by an arbitrary membership predicate. Completeness for a degree
   is mutual reducibility
@@ -1031,7 +1031,7 @@ reduction and certificate in full.
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g. `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · DAG Isomorphism |
+| the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g. `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Digraph Isomorphism · DAG Isomorphism (Graph Isomorphism, the simple-graph problem, is in the degree; whether it is complete for it waits on the digraph-to-graph gadget) |
 
 Each entry of the **machine model** column is an equivalence *proved here*
 between the logical definition of the class and acceptance by that model:
@@ -1238,18 +1238,18 @@ Headline results and cross-references:
   and variable would acquire copies and an unsatisfiable formula could blow up
   into a satisfiable one.
 
-* **Complete, but not for a class**: Graph Isomorphism
-  (`DescriptiveComplexity.Problems.GraphIso`) – are the two marked graphs of
-  the instance isomorphic? – is in NP by a textbook `Σ₁` guessing the bijection
-  (`DescriptiveComplexity.graphIso_mem_NP`), with no order, no counting and no
+* **Complete, but not for a class**: Digraph Isomorphism
+  (`DescriptiveComplexity.Problems.DigraphIso`) – are the two marked directed
+  graphs of the instance isomorphic? – is in NP by a textbook `Σ₁` guessing the bijection
+  (`DescriptiveComplexity.digraphIso_mem_NP`), with no order, no counting and no
   threshold, and is the library's first problem conjecturally neither in P nor
   NP-complete ([Babai 2016][babai2016graph]; [Köbler, Schöning and Torán
   1993][kobler1993graph]). What it *is* complete for is its own degree
-  (`DescriptiveComplexity.graphIso_GI_complete`), which is the whole point of
+  (`DescriptiveComplexity.digraphIso_GI_complete`), which is the whole point of
   `DescriptiveComplexity.ComplexityClass.below`, and that degree lies inside NP
   (`DescriptiveComplexity.GI_subset_NP`). It is also the problem of deciding the
   very equivalence a `DescriptiveComplexity.DecisionProblem` is required to be
-  invariant under: `DescriptiveComplexity.graphIsoOn_iff_equiv` states the
+  invariant under: `DescriptiveComplexity.relIsoOn_iff_equiv` states the
   semantics as the existence of an equivalence between the two marked sets
   carrying one adjacency relation to the other. **DAG Isomorphism**
   (`DescriptiveComplexity.Problems.DagIso`) is the first companion in that
@@ -1260,6 +1260,11 @@ Headline results and cross-references:
   not first-order definable, so a reduction could not otherwise test it – the
   place where the first-order setting genuinely constrains what a problem may
   be, and where a polynomial-time reduction would simply run a cycle check.
+  **Graph Isomorphism** proper – the simple-graph problem the literature names
+  GI (`DescriptiveComplexity.GraphIso`) – is in the degree
+  (`DescriptiveComplexity.graphIso_mem_GI`), simplicity being first-order; the
+  converse reduction is the classical digraph-to-graph gadget, and until it is
+  built the degree stays anchored on the directed problem.
 
 * **At RE**: FINSAT (`DescriptiveComplexity.Problems.FinSat`) – does a
   first-order sentence, encoded as a finite structure, have a *finite* model? –
