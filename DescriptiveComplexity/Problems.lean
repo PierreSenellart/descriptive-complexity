@@ -10,6 +10,7 @@ import DescriptiveComplexity.Problems.SatUnsat.Hardness
 import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut
 import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.Problems.Cvp
 import DescriptiveComplexity.Problems.Reachability
 import DescriptiveComplexity.Problems.ReachabilityDet
 import DescriptiveComplexity.Problems.ReachabilityDet.Complement

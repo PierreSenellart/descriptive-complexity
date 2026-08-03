@@ -35,10 +35,12 @@ two sharing their scaffolding in `ClauseDischarge.lean`), SO(TC) →
 SUCCINCT-REACH and ∃SO[new] → FINSAT, so no discharge is outstanding; what
 remains below are ordinary catalog reductions and machine bridges.
 
-- **P-complete reductions from HORN-SAT** [M]: Circuit Value Problem, Monotone
-  CVP, and alternating reachability (DC's canonical P-complete problem, with
+- **P-complete reductions from CVP** [M]: Monotone CVP, and alternating
+  reachability (DC's canonical P-complete problem, with
   quantifier-free-projection hardness in the book), entering the catalog as
-  ordinary catalog reductions *from* HORN-SAT rather than as primary discharges.
+  ordinary catalog reductions rather than as primary discharges. The
+  unit-propagation circuit is monotone as drawn, so Monotone CVP is a matter of
+  restricting the vocabulary rather than of a new gadget.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
   (Generalized Geography…), the only PSPACE entries still missing.
 - Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
@@ -649,13 +651,7 @@ provable rather than merely reasonable.
 
 **Next, in this order:**
 
-1. **CVP from HORN-SAT** (§2) [M]: the canonical P-complete problem, and the
-   one recognizable name the catalog lacks below `NP`. An ordinary ordered
-   reduction with no new machinery – gates walked along the order, the Horn
-   program's least model read as the circuit's value – so the risk is in the
-   gadget, not in the framework. Monotone CVP and alternating reachability
-   follow from it.
-2. **EF games and the first inexpressibility results** (§5) [L]: the payoff
+1. **EF games and the first inexpressibility results** (§5) [L]: the payoff
    that has no counterpart in a machine-first development, and the reason the
    degree structure of §9 is worth having at all. Take it in two steps, the
    first of which is nearly free and worth landing on its own: an order-free
@@ -665,7 +661,7 @@ provable rather than merely reasonable.
    convention into a theorem. Only then the games themselves, `EVEN` and
    `FO ⊊ FO(TC)`, which are the Mathlib-facing part and where an estimate is
    likeliest to slip.
-3. **`ComplexityClass.below` and the GI degree** (§9) [S+S]: the framework side
+2. **`ComplexityClass.below` and the GI degree** (§9) [S+S]: the framework side
    is ~150 lines with the `Hard` half free, and Graph Isomorphism itself is a
    `Σ₁` with no order, no counting and no threshold. Taken after step 2 on
    purpose: a degree structure is worth building where non-reducibility is
