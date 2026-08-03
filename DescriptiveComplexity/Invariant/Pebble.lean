@@ -229,6 +229,62 @@ theorem EquivK.update_right {a b : Fin k → A} (h : EquivK E₀ a b) (i : Fin k
     ∃ c : A, EquivK E₀ (Function.update a i c) (Function.update b i d) :=
   (((equivK_iff E₀ a b).mp h).2 i).2 d
 
+/-! ### Pair substructures
+
+A tuple pair obtained by selecting, permuting and repeating coordinate pairs
+of an equivalent pair is equivalent: duplicated pebbles only make the
+duplicator's task easier. This is the well-definedness lemma behind every
+operation on `≡ᵏ`-classes that rearranges coordinates – the substitution and
+rearrangement relations of the invariant structure. -/
+
+/-- **Equivalence is inherited by pair substructures**: if every coordinate
+pair of `(x, y)` is a coordinate pair of `(u, v)`, and the initial relation is
+closed under this passage, then `u ≡ᵏ v` forces `x ≡ᵏ y`. Coinduction: the
+spoiler's move on `(x, y)` frees a pebble of `(u, v)` (at most `k - 1` pairs
+are still needed), where the duplicator answers via the game move. -/
+theorem equivK_of_pairSub
+    (hE₀ : ∀ {x y u v : Fin k → A}, (∀ j, ∃ i, x j = u i ∧ y j = v i) →
+      E₀ u v → E₀ x y)
+    {x y u v : Fin k → A} (hsub : ∀ j, ∃ i, x j = u i ∧ y j = v i)
+    (huv : EquivK E₀ u v) : EquivK E₀ x y := by
+  classical
+  refine le_equivK (E := fun x y => ∃ u v, EquivK E₀ u v ∧
+    ∀ j, ∃ i, x j = u i ∧ y j = v i) ?_ x y ⟨u, v, huv, hsub⟩
+  rintro x y ⟨u, v, huv, hsub⟩
+  choose I hI using hsub
+  -- a pebble of `(u, v)` not needed once pebble `j` of `(x, y)` is replaced
+  have hfree : ∀ j : Fin k, ∃ i : Fin k, i ∉ (Finset.univ.erase j).image I := by
+    intro j
+    obtain ⟨i, -, hi⟩ := Finset.exists_mem_notMem_of_card_lt_card
+      (s := (Finset.univ.erase j).image I) (t := Finset.univ)
+      (lt_of_le_of_lt Finset.card_image_le
+        (Finset.card_erase_lt_of_mem (Finset.mem_univ j)))
+    exact ⟨i, hi⟩
+  -- the substructure witness after a joint move at pebbles `j` and `i`
+  have hwit : ∀ (j i : Fin k), i ∉ (Finset.univ.erase j).image I →
+      ∀ c d : A, ∀ j' : Fin k, ∃ i',
+        Function.update x j c j' = Function.update u i c i' ∧
+          Function.update y j d j' = Function.update v i d i' := by
+    intro j i hi c d j'
+    by_cases hj : j' = j
+    · subst hj
+      exact ⟨i, by rw [Function.update_self, Function.update_self,
+        Function.update_self, Function.update_self]; exact ⟨rfl, rfl⟩⟩
+    · refine ⟨I j', ?_⟩
+      have hne : I j' ≠ i := fun heq =>
+        hi (heq ▸ Finset.mem_image_of_mem I (Finset.mem_erase.mpr
+          ⟨hj, Finset.mem_univ j'⟩))
+      rw [Function.update_of_ne hj, Function.update_of_ne hj,
+        Function.update_of_ne hne, Function.update_of_ne hne]
+      exact hI j'
+  refine ⟨hE₀ (fun j => ⟨I j, hI j⟩) huv.initial, fun j => ⟨fun c => ?_, fun d => ?_⟩⟩
+  · obtain ⟨i, hi⟩ := hfree j
+    obtain ⟨d, hd⟩ := huv.update i c
+    exact ⟨d, Function.update u i c, Function.update v i d, hd, hwit j i hi c d⟩
+  · obtain ⟨i, hi⟩ := hfree j
+    obtain ⟨c, hc⟩ := huv.update_right i d
+    exact ⟨c, Function.update u i c, Function.update v i d, hc, hwit j i hi c d⟩
+
 end Finite
 
 /-! ### Equivalence -/

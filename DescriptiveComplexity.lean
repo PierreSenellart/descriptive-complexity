@@ -67,6 +67,14 @@ import DescriptiveComplexity.AbiteboulVianuOrdered
 import DescriptiveComplexity.Invariant.Pebble
 import DescriptiveComplexity.Invariant.EquivK
 import DescriptiveComplexity.Invariant.Stages
+import DescriptiveComplexity.Invariant.OrderedPebble
+import DescriptiveComplexity.Invariant.Structure
+import DescriptiveComplexity.Invariant.Simulation
+import DescriptiveComplexity.Invariant.OrderDef
+import DescriptiveComplexity.Invariant.Backward
+import DescriptiveComplexity.FixedPointOrderTransfer
+import DescriptiveComplexity.FixedPointStratify
+import DescriptiveComplexity.AbiteboulVianu
 import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.PSpaceHierarchy
 import DescriptiveComplexity.Difference
@@ -294,19 +302,61 @@ individual declarations are documented on their own pages.
   capture lives with the other PSPACE files, below.
 * `DescriptiveComplexity.Invariant.Pebble`,
   `DescriptiveComplexity.Invariant.EquivK`,
-  `DescriptiveComplexity.Invariant.Stages` – **the `≡ᵏ`-invariant layer**
-  (toward the unordered Abiteboul–Vianu theorem, `ABITEBOUL-VIANU.md` phases
-  F–G): the `k`-pebble refinement over an abstract initial relation
+  `DescriptiveComplexity.Invariant.Stages` – **the `≡ᵏ`-invariant layer**:
+  the `k`-pebble refinement over an abstract initial relation
   (`DescriptiveComplexity.EquivK`, a greatest fixed point with its coinduction
-  principle `DescriptiveComplexity.le_equivK` and expansion lemma
-  `DescriptiveComplexity.equivK_inf_eq`), its instantiation at agreement on
-  the atomic type over a relational structure, the `k`-variable invariance
-  lemma (`DescriptiveComplexity.realize_equivK` – a formula with enough room
-  for its quantifier depth cannot separate `≡ᵏ`-equivalent tuples; no
-  syntactic `k`-variable fragment is ever defined), and the `≡ᵏ`-invariance
-  of every inflationary and partial stage of a `StepDef` within its variable
-  budget (`DescriptiveComplexity.StepDef.inflLimit_invariant`,
+  principle `DescriptiveComplexity.le_equivK`, expansion lemma
+  `DescriptiveComplexity.equivK_inf_eq` and pair-substructure closure
+  `DescriptiveComplexity.equivK_of_pairSub`), its instantiation at agreement
+  on the atomic type over a relational structure – relative to a family of
+  relation symbols, since a definition only mentions finitely many
+  (`DescriptiveComplexity.StepDef.exists_usesRels`) – the `k`-variable
+  invariance lemma (`DescriptiveComplexity.realize_equivK` – a formula with
+  enough room for its quantifier depth cannot separate `≡ᵏ`-equivalent
+  tuples; no syntactic `k`-variable fragment is ever defined), and the
+  `≡ᵏ`-invariance of every inflationary and partial stage of a `StepDef`
+  within its variable budget
+  (`DescriptiveComplexity.StepDef.inflLimit_invariant`,
   `DescriptiveComplexity.StepDef.partStage_invariant`).
+* `DescriptiveComplexity.Invariant.OrderedPebble`,
+  `DescriptiveComplexity.Invariant.OrderDef` – **the canonical order on
+  `≡ᵏ`-classes**: the ordered pebble refinement, a strict order on `k`-tuples
+  growing as the classes split, whose incomparability is stage by stage the
+  pebble refinement (`DescriptiveComplexity.ordStage_invariant`) and at the
+  limit `≡ᵏ` (`DescriptiveComplexity.incompRel_ordK_eq`) – a linear order on
+  the classes, *inflationary by construction*, so computed by one relation
+  variable of a simultaneous induction (`DescriptiveComplexity.ordStepDef`,
+  with `DescriptiveComplexity.inflStage_ordStepDef` matching the two
+  round for round) and canonical because inflationary stages transport along
+  isomorphisms.
+* `DescriptiveComplexity.Invariant.Structure`,
+  `DescriptiveComplexity.Invariant.Simulation`,
+  `DescriptiveComplexity.Invariant.Backward` – **the invariant structure
+  `Iᵏ A`** (`DescriptiveComplexity.InvMap`: the `≡ᵏ`-classes of `k`-tuples,
+  with atomic-type bits, substitution and rearrangement relations, and the
+  linear order induced by the canonical order,
+  `DescriptiveComplexity.invLinearOrder`) **and the two-way simulation**: the
+  pebble compiler (`DescriptiveComplexity.pebbleCompile`) runs a `k`-variable
+  induction over `A` on the classes –
+  `DescriptiveComplexity.StepDef.pfpHolds_invStepDef`, every quantifier
+  spending a pebble along a substitution relation – and the class compiler
+  (`DescriptiveComplexity.backCompile`) runs an induction over the *ordered*
+  invariant vocabulary back on `A`, each class variable becoming `k` element
+  variables and the order read off the (frozen) order variable
+  (`DescriptiveComplexity.StepDef.ifpHolds_backStepDef`).
+* `DescriptiveComplexity.FixedPointStratify` – **stratification**: nested
+  inflationary inductions are one induction
+  (`DescriptiveComplexity.StepDef.ifpHolds_stratify`) – the second stratum,
+  a `StepDef` over the base vocabulary *expanded by the first stratum's
+  block*, is gated on an arity-`0` variable derived exactly when the first
+  stratum's step formulas add nothing, so it replays its own stages over the
+  frozen limit.
+* `DescriptiveComplexity.FixedPointOrderTransfer` – **order relativization**:
+  FO(≤, IFP)/FO(≤, PFP) definability of `P` is order-free definability of
+  `DescriptiveComplexity.DecisionProblem.withOrder P` («the order symbol is a
+  linear order, and `P` holds on the reduct») over the ordered expansion, and
+  order-free definability implies ordered definability
+  (`DescriptiveComplexity.StepDef.liftOrder`).
 
 ## Nondeterministic logarithmic space, by the Krom fragment
 
@@ -637,10 +687,20 @@ individual declarations are documented on their own pages.
   ordered case**
   (`DescriptiveComplexity.ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace`):
   on ordered structures the inflationary and partial fixed-point logics agree
-  exactly when `PTIME = PSPACE` – a corollary of the two capture theorems,
-  and the honest milestone on the way to the unordered Abiteboul–Vianu
-  theorem (`ROADMAP.md` §4), whose remaining gap it makes exactly «the
-  unordered case».
+  exactly when `PTIME = PSPACE` – a corollary of the two capture theorems.
+* `DescriptiveComplexity.AbiteboulVianu` – **the Abiteboul–Vianu theorem**
+  ([Abiteboul–Vianu 1991][abiteboul1991generic];
+  [Ebbinghaus–Flum 1995][ebbinghaus1995finite], ch. 7): the inflationary and
+  partial fixed-point logics have the same expressive power **on unordered
+  finite structures** exactly when `PTIME = PSPACE`
+  (`DescriptiveComplexity.ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace`).
+  Right to left through the order-relativization transfer and the two
+  captures; left to right through the invariant structure: an order-free
+  FO(PFP) computation is `≡ᵏ`-invariant, so it runs on `Iᵏ A`, where
+  `PTIME = PSPACE` turns it into an ordered inflationary induction, pulled
+  back along the quotient map and stratified over the canonical order's own
+  induction. Stated for IFP versus PFP, as in the original – Gurevich–Shelah
+  is deliberately not involved.
 * `DescriptiveComplexity.PSpaceCompl` – **`PSPACE = coPSPACE`**
   (`DescriptiveComplexity.PSPACE_eq_coPSPACE`), the first of those two, proved
   downstream once QSAT is available: every SO(TC) definable problem reduces to

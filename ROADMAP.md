@@ -119,18 +119,14 @@ remains below are ordinary catalog reductions and machine bridges.
 
 - **Immerman–Vardi** [L]: P = order-invariant FO(LFP); in this library's
   definitional style it is the pair (definition, HORN-SAT/CVP hardness
-  discharge) rather than a machine-model equivalence.
-- **Abiteboul–Vianu** [L]: IFP = PFP on unordered structures iff P = PSPACE.
-  The whole *ordered* half has landed – FO(IFP) and FO(PFP) on one shared
-  iteration skeleton, both capture theorems (FO(≤, IFP) = PTIME through the
-  translation back into FO(LFP), FO(≤, PFP) = PSPACE through the machine
-  problem, with closure under *relativized* ordered reductions built on the
-  way), and the ordered corollary
-  (`ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace`). What remains is
-  exactly the unordered case: the `≡ᵏ`-invariant layer and the transfer
-  through the invariant structure (phases F–G of `ABITEBOUL-VIANU.md`). The
-  prerequisite is the *invariant* machinery, not stage comparison – that is
-  Gurevich–Shelah's tool, which phrasing the theorem with IFP avoids.
+  discharge) rather than a machine-model equivalence. Three pieces built for
+  Abiteboul–Vianu are the ones to reach for here and in any later capture:
+  the order-relativization transfer (`FixedPointOrderTransfer.lean`, for
+  every statement that moves an order between instance and vocabulary),
+  stratification of inflationary inductions (`FixedPointStratify.lean`, for
+  any "define X by induction, then induct over X"), and the two formula
+  compilers along a definable quotient (`Invariant/Simulation.lean`,
+  `Invariant/Backward.lean` – the missing dual of `Relativized.lean`).
 - **Grädel's theorems** [M–L]: SO-Horn = P, SO-Krom = NL on ordered structures
   (see §3; the capture statements relative to the library's own class
   definitions).
@@ -163,7 +159,15 @@ non-reducibility, impossible in the machine world.
 - **Ehrenfeucht–Fraïssé games on finite structures** [L]: build on Mathlib's
   `ModelTheory/PartialEquiv.lean` (back-and-forth) and `Fraisse.lean`; what is
   missing is the finite, graded (quantifier-rank) version and the methodology
-  lemmas ("same rank-k type ⇒ agree on rank-k sentences").
+  lemmas ("same rank-k type ⇒ agree on rank-k sentences"). The `k`-pebble
+  refinement of `Invariant/Pebble.lean` was built over an abstract initial
+  relation precisely so the EF skeleton can be its second instance (rounds in
+  place of pebbles), and the `k`-variable invariance lemma
+  (`realize_equivK`) is the model for the methodology lemma. A first
+  fixed-point inexpressibility result is also within reach from the invariant
+  layer alone: a query not `≡ᵏ`-invariant for any `k` is not order-free
+  FO(IFP)-definable (`StepDef.inflLimit_invariant`), so order-free FO(IFP)
+  does not capture P.
 - **First applications** [M after EF]: EVEN is not FO-definable (even
   order-invariantly); REACH/connectivity is not FO-definable. Library payoff:
   FO ⊊ FO(TC) as an unconditional strict inclusion, and non-existence of FO
@@ -867,7 +871,7 @@ blocked.
   [R] items and a switching lemma at the end, to be decided as a whole rather
   than drifted into via built-in arithmetic. Until then the two by-inspection
   claims in the README stay an honest, documented gap.
-- Abiteboul–Vianu and the exponential classes.
+- The exponential classes (SO(LFP), SO(PFP)).
 
 This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §9, the cookbook and catalog

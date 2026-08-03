@@ -21,11 +21,10 @@ through its capture.
 The theorem proper – the same statement for the *order-free* logics
 `DescriptiveComplexity.IFPDefinableFree` and
 `DescriptiveComplexity.PFPDefinableFree`, where no capture is available and
-the equivalence with `P = PSPACE` is the celebrated content – is the
-Abiteboul–Vianu item of `ROADMAP.md` §4, with `ABITEBOUL-VIANU.md` (phases
-F–G: the `≡ᵏ`-invariant layer) as its worked plan. This file is the honest
-ordered milestone on that route, and the natural stopping point of the
-capture half: it makes the remaining gap exactly «the unordered case».
+the equivalence with `P = PSPACE` is the celebrated content – is
+`DescriptiveComplexity.AbiteboulVianu`, built on the `≡ᵏ`-invariant layer of
+`DescriptiveComplexity.Invariant`. This file is the ordered milestone on that
+route, and the natural stopping point of the capture half.
 -/
 
 namespace DescriptiveComplexity

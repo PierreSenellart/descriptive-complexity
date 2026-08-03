@@ -58,6 +58,20 @@ theorem homLHom_isExpansionOn (σ : B'.Assignment A) :
   refine ⟨fun {n} g => isEmptyElim g, fun {n} r x => ?_⟩
   rfl
 
+/-- **Transport of a formula along a block morphism**: realization over the
+target block's assignment is realization of the original formula over the
+pulled-back assignment. -/
+theorem realize_homFormula {α : Type} (σ : B'.Assignment A)
+    (φ : (L.sum B.lang).Formula α) (v : α → A) :
+    (@Formula.Realize _ A (B'.structure₁ (L := L) σ) _
+      ((LHom.sumMap (LHom.id L) (homLHom f hf (B := B))).onFormula φ) v) ↔
+      @Formula.Realize _ A (B.structure₁ (L := L) (B.homAssign f hf σ)) _ φ v := by
+  letI := B.structure (B.homAssign f hf σ)
+  letI := B'.structure σ
+  haveI := homLHom_isExpansionOn f hf (A := A) σ
+  exact LHom.realize_onFormula
+    (φ := LHom.sumMap (LHom.id L) (homLHom f hf (B := B))) φ
+
 /-- **Transport of a sentence along a block morphism**: realization over the
 target block's assignment is realization of the original sentence over the
 pulled-back assignment. -/
