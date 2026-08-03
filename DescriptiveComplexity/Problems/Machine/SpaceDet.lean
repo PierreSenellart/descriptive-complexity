@@ -70,7 +70,8 @@ variable {A : Type} [Language.turing.Structure A]
 noncomputable abbrev toBase (x : detInterp.Map A) : A := detInterp.mapEquivSelf A x
 
 @[simp]
-theorem detG_realize (v : γ → A) : (detG γ).Realize v ↔ (tmData A).Deterministic := by
+theorem detG_realize {γ : Type} (v : γ → A) :
+    (detG γ).Realize v ↔ (tmData A).Deterministic := by
   rw [detG]
   simp only [SpaceTM.realize_detF]
   exact Iff.rfl

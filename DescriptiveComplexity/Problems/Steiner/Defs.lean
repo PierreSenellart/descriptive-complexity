@@ -283,7 +283,8 @@ tree. -/
 
 /-- **A connected set costs edges**: a set connected through `T` has at most
 one more element than `T` has pairs. -/
-theorem ncard_le_ncard_of_connected [Finite A] {T : A → A → Prop} {S : A → Prop} {r : A}
+theorem ncard_le_ncard_of_connected {A : Type} [Finite A] {T : A → A → Prop} {S : A → Prop}
+    {r : A}
     (hr : S r) (hconn : ConnectedOn T S) :
     {x | S x ∧ x ≠ r}.ncard ≤ {p : A × A | T p.1 p.2}.ncard := by
   classical
@@ -409,7 +410,8 @@ end Generic
 
 /-- `SteinerEdgeOn` transports along an equivalence commuting with the three
 predicates. -/
-theorem SteinerEdgeOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B → Prop}
+theorem SteinerEdgeOn.of_equiv {A B : Type} (u : B ≃ A) {AdjB : B → B → Prop}
+    {TermB KB : B → Prop}
     {AdjA : A → A → Prop} {TermA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hterm : ∀ b, TermB b ↔ TermA (u b))
     (hK : ∀ b, KB b ↔ KA (u b)) (h : SteinerEdgeOn AdjB TermB KB) :
@@ -426,7 +428,8 @@ theorem SteinerEdgeOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB
     exact hcard
 
 /-- `SteinerEdgeOn` transports along an equivalence, iff version. -/
-theorem SteinerEdgeOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B → Prop}
+theorem SteinerEdgeOn.equiv_iff {A B : Type} (u : B ≃ A) {AdjB : B → B → Prop}
+    {TermB KB : B → Prop}
     {AdjA : A → A → Prop} {TermA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hterm : ∀ b, TermB b ↔ TermA (u b))
     (hK : ∀ b, KB b ↔ KA (u b)) :
