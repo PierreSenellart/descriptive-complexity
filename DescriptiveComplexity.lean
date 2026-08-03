@@ -77,6 +77,7 @@ import DescriptiveComplexity.Invariant.TwoPebble
 import DescriptiveComplexity.Invariant.TwoInvariance
 import DescriptiveComplexity.Invariant.TwoStages
 import DescriptiveComplexity.FirstOrderDefinable
+import DescriptiveComplexity.FirstOrderPull
 import DescriptiveComplexity.Games.Ehrenfeucht
 import DescriptiveComplexity.Games.Bare
 import DescriptiveComplexity.Games.Distance

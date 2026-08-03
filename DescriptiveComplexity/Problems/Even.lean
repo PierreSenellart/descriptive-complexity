@@ -9,6 +9,7 @@ import DescriptiveComplexity.TransitiveClosureFO
 import DescriptiveComplexity.ImmermanSzelepcsenyi
 import DescriptiveComplexity.Invariant.TwoStages
 import DescriptiveComplexity.Problems.TwoSat
+import DescriptiveComplexity.FirstOrderPull
 
 /-!
 # EVEN: the parity of a bare set
@@ -355,5 +356,17 @@ therefore doing real work. -/
 theorem exists_mem_PTIME_not_ifpDefinableFree :
     ∃ P : DecisionProblem Language.empty, P ∈ PTIME ∧ ¬IFPDefinableFree P :=
   ⟨EVEN, even_mem_PTIME, even_not_ifpDefinableFree⟩
+
+/-- **EVEN reduces to no first-order definable problem**, whatever the target's
+vocabulary: parity escapes FO(≤) even with an order
+(`DescriptiveComplexity.even_not_foDefinable`), and definability travels
+backward along ordered reductions
+(`DescriptiveComplexity.FODefinable.of_orderedReduction`).
+
+This is the library's first statement that a reduction *does not exist*;
+everything else it proves about the reduction order exhibits one. -/
+theorem even_not_le_of_foDefinable {L : Language.{0, 0}} [L.IsRelational]
+    {Q : DecisionProblem L} (hQ : FODefinable Q) : IsEmpty (EVEN ≤ᶠᵒ[≤] Q) :=
+  not_le_of_not_foDefinable even_not_foDefinable hQ
 
 end DescriptiveComplexity
