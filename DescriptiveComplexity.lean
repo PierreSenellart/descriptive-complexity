@@ -904,7 +904,7 @@ reduction and certificate in full.
 | --- | --- | --- | --- |
 | `LOGSPACE` (`L`) | FO(≤, DTC): first-order logic with a deterministic transitive closure, over a linearly ordered universe | deterministic two-way `k`-head automaton, walking a linear order of the universe † | REACHd · UNREACHd |
 | `NL` | SO-Krom(≤): ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(≤, TC), first-order logic with a transitive closure – both over a linearly ordered universe | two-way `k`-head automaton, walking a linear order of the universe † | REACH · UNREACH · 2SAT |
-| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn(≤): ∃SO with a Horn kernel; equivalently FO(≤, LFP), first-order logic with a least fixed point – both over a linearly ordered universe | deterministic polynomial-time Turing machine | HORN-SAT |
+| `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn(≤): ∃SO with a Horn kernel; equivalently FO(≤, LFP), first-order logic with a least fixed point – both over a linearly ordered universe | deterministic polynomial-time Turing machine | HORN-SAT · CVP |
 | `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | nondeterministic polynomial-time Turing machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) · `ATMAccept 1 false` |
 | `DP` | a `Σ₁` and a `Π₁` sentence conjoined | — | SAT-UNSAT |
@@ -976,6 +976,18 @@ Headline results and cross-references:
   set, coloring, graph and number families above, closed by the two Hamilton
   circuit problems – a circuit read as a linear order of the universe, hard
   from Vertex Cover by Karp's twelve-vertex cover-testing gadget.
+* **CVP, the textbook `PTIME`-complete problem**
+  (`DescriptiveComplexity.CVP_PTIME_complete`; [Ladner
+  1975][ladner1975circuit]): membership is an FO(LFP) definition – the problem's
+  semantics *is* a least fixed point, so the rule system is the gate rules
+  transcribed and the output sentence is the one a Horn program cannot write,
+  “the output gate is in the true rail”. Hardness draws the unit-propagation
+  circuit inside a HORN-SAT instance and reports the *failure* of Horn
+  satisfiability, which keeps the circuit monotone and costs nothing, polynomial
+  time being closed under complement. The stages of the fixed point are unrolled
+  along the order and the two unbounded quantifiers of a round become chains of
+  fan-in-two gates; what makes it work is that the *wiring*, being defined by a
+  formula, may test where a literal occurs, where a fixed circuit may not.
 * **PTIME by the Horn fragment**: HORN-SAT is PTIME-complete
   (`DescriptiveComplexity.HORNSAT_PTIME_complete`) by the Horn discharge and a
   Horn program for unit propagation – the P-level analogue of Cook–Levin,
