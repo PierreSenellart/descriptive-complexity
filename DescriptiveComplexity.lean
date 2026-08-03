@@ -1034,7 +1034,7 @@ reduction and certificate in full.
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g. `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Digraph Isomorphism · DAG Isomorphism (Graph Isomorphism, the simple-graph problem, is in the degree; whether it is complete for it waits on the digraph-to-graph gadget) |
+| the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g. `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Each entry of the **machine model** column is an equivalence *proved here*
 between the logical definition of the class and acceptance by that model:
@@ -1264,10 +1264,16 @@ Headline results and cross-references:
   place where the first-order setting genuinely constrains what a problem may
   be, and where a polynomial-time reduction would simply run a cycle check.
   **Graph Isomorphism** proper – the simple-graph problem the literature names
-  GI (`DescriptiveComplexity.GraphIso`) – is in the degree
-  (`DescriptiveComplexity.graphIso_mem_GI`), simplicity being first-order; the
-  converse reduction is the classical digraph-to-graph gadget, and until it is
-  built the degree stays anchored on the directed problem. The shared layer for
+  GI (`DescriptiveComplexity.GraphIso`) – is **GI-complete**
+  (`DescriptiveComplexity.graphIso_GI_complete`): simplicity is first-order, so
+  one direction only tests it, and the other is the classical digraph-to-graph
+  gadget – every arc subdivided three times, each vertex carrying a lollipop
+  and each tail a pendant, so that the levels are recovered from adjacency
+  alone and the pendant carries the arc's direction. The directed and
+  undirected problems therefore have the same degree
+  (`DescriptiveComplexity.GI_eq_below_graphIso`), so which of them `GI` is
+  *defined* on is immaterial; it sits on the directed one because `GI` is
+  needed before the undirected problem is available. The shared layer for
   reductions between isomorphism problems is `DescriptiveComplexity.IsoGadget`:
   it reads a marked binary relation as a
   `FirstOrder.Language.graph`-structure in its own right, so that the semantic

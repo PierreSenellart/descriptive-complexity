@@ -28,6 +28,7 @@ import DescriptiveComplexity.Problems.DigraphIso.Bridge
 import DescriptiveComplexity.Problems.DagIso
 import DescriptiveComplexity.Problems.GraphIso.Defs
 import DescriptiveComplexity.Problems.GraphIso.Gadget
+import DescriptiveComplexity.Problems.GraphIso.Hardness
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetSplitting
