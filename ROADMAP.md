@@ -641,43 +641,58 @@ so the notion is expressible today.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
-No item below is a prerequisite of another: these are parallel lines, to be
-picked by value. The weighting is for headline theorems not yet formalized
-anywhere, maximal reuse of machinery that already exists, and low risk of an
-item turning out to be blocked.
+Nothing here is a prerequisite of anything else here, so the order is a
+weighting, not a chain: headline theorems not yet formalized anywhere, maximal
+reuse of machinery that already exists, low risk of an item turning out to be
+blocked, and a preference for results that make an existing design decision
+provable rather than merely reasonable.
 
-- **A sharpening pass on what is already public** (each [M], no
-  prerequisites, no new surface): **quantifier-free / projection / dimension
-  tracking through composition** (§3's reduction-notion refinements), which upgrades
-  catalog statements to the DC-faithful "complete under qfps"; **Spectra**
-  (§4) and **CVP from HORN-SAT** (§2), two near-free recognizable names. The
-  lesson 3-DNF-TAUT taught about the first of these: a discharge that needs an
-  *image* invariant the `≤ᶠᵒ` interface hides does not force a general
+**Next, in this order:**
+
+1. **CVP from HORN-SAT** (§2) [M]: the canonical P-complete problem, and the
+   one recognizable name the catalog lacks below `NP`. An ordinary ordered
+   reduction with no new machinery – gates walked along the order, the Horn
+   program's least model read as the circuit's value – so the risk is in the
+   gadget, not in the framework. Monotone CVP and alternating reachability
+   follow from it.
+2. **EF games and the first inexpressibility results** (§5) [L]: the payoff
+   that has no counterpart in a machine-first development, and the reason the
+   degree structure of §9 is worth having at all. Take it in two steps, the
+   first of which is nearly free and worth landing on its own: an order-free
+   inflationary induction computes only `≡ᵏ`-invariant relations
+   (`StepDef.inflLimit_invariant`), so it cannot define a linear order on a
+   bare set – which turns the library's order-invariant variant from a
+   convention into a theorem. Only then the games themselves, `EVEN` and
+   `FO ⊊ FO(TC)`, which are the Mathlib-facing part and where an estimate is
+   likeliest to slip.
+3. **`ComplexityClass.below` and the GI degree** (§9) [S+S]: the framework side
+   is ~150 lines with the `Hard` half free, and Graph Isomorphism itself is a
+   `Σ₁` with no order, no counting and no threshold. Taken after step 2 on
+   purpose: a degree structure is worth building where non-reducibility is
+   provable.
+
+**Alongside, or after:**
+
+- **The counting track of §6**, as far as #SAT plus the free catalog entries:
+  counting descriptive complexity has no formalization anywhere, and ΣQSO's
+  two-layer syntax fits the kernel-as-data idiom unusually well. It depends on
+  nothing unbuilt, so nothing else here can block it; a cheap headline (#SAT
+  complete for ΣQSO(FO)) sits one `exists_gates` strengthening in; and it is
+  the meeting point with provenance-lean. Internal order: framework layer and
+  ladder levels 0–1 → evaluator → `#P := ΣQSO(FO)` → #SAT → the free entries
+  and PQE tier 1; stop there (level 2 of the ladder, PQE tier 2, structure
+  inside #P, the quantitative fixed point and MaxSNP are genuine research, or
+  gated on a literature check). Its size is what puts it beside the numbered
+  line rather than in it.
+- **The rest of the sharpening pass** (each [M], no prerequisites, no new
+  surface): **quantifier-free / projection / dimension tracking through
+  composition** (§3's reduction-notion refinements), which upgrades catalog
+  statements to the DC-faithful "complete under qfps", and **Spectra** (§4).
+  The lesson 3-DNF-TAUT taught about the first of these: a discharge that needs
+  an *image* invariant the `≤ᶠᵒ` interface hides does not force a general
   invariant-tracking layer, because building the reduction from the complement
   side keeps the promise in hand where it is proved. Reach for tracking when a
   second consumer appears, not before.
-- **The counting track of §6**, as far as #SAT plus the free catalog entries –
-  the highest-value line here: counting descriptive complexity has no
-  formalization anywhere, and ΣQSO's two-layer syntax fits the kernel-as-data
-  idiom unusually well. It
-  depends on nothing unbuilt, so nothing else here can block it; a
-  cheap headline (#SAT complete for ΣQSO(FO)) sits one `exists_gates`
-  strengthening in; and it is the meeting point with provenance-lean. Internal
-  order: framework layer and ladder levels 0–1 → evaluator →
-  `#P := ΣQSO(FO)` → #SAT → the free entries and PQE tier 1; stop there
-  (level 2 of the ladder, PQE tier 2, structure inside #P, the quantitative
-  fixed point and MaxSNP are genuine research, or gated on a literature check).
-- **EF games + EVEN/connectivity inexpressibility** (§5), the most delegable
-  line: it unblocks nothing else,
-  and it is the most Mathlib-facing item here, hence where an estimate is
-  likeliest to slip. Its own headline `FO ⊊ FO(TC)` is blocked on nothing –
-  the FO(TC) layer exists – only on the games themselves. Also the best student
-  project in the document.
-- **`ComplexityClass.below` and the GI degree** (§9), the cheapest of
-  these: the framework side is ~150 lines with the `Hard` half free, and Graph
-  Isomorphism itself is a `Σ₁` with no order, no counting and no threshold. It
-  is also the item §5 completes, a degree structure being worth building only
-  where non-reducibility is provable.
 
 **Deferred, and deliberately so:**
 
