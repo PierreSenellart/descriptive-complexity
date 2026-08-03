@@ -348,6 +348,11 @@ reading `DescriptiveComplexity.GraphGadget.edge_tagAdj` off a named pair. -/
 theorem not_edge_of_not_tagAdj {t s : GTag} (h : ¬TagAdj t s) (u v u' v' : G) :
     ¬GEdge (pt t u v) (pt s u' v') := fun he => h (edge_tagAdj he)
 
+/-- No clause relates a tag to itself, so the construction has no loops. -/
+theorem edge_irrefl_pt (t : GTag) (u v : G) : ¬GEdge (pt t u v) (pt t u v) := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  cases t <;> exact fun h => h.elim
+
 /-! ### The neighbours of each kind of node -/
 
 section Neighbours
@@ -515,6 +520,172 @@ theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
   · exact (edge_tagAdj h).elim
 
 end Neighbours
+
+/-! ### The structural predicates that recover the levels -/
+
+section Levels
+
+/-- Lying on a triangle. -/
+def OnTri (p : gadget.Map G) : Prop := ∃ q r, GEdge p q ∧ GEdge q r ∧ GEdge r p
+
+/-- Being adjacent to a node that lies on a triangle. -/
+def AdjTri (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ OnTri q
+
+/-- Having exactly one neighbour. -/
+def Leaf (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ ∀ r, GEdge p r → r = q
+
+/-- Having a neighbour with exactly one neighbour. -/
+def HasLeafNbr (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ Leaf q
+
+/-- The lollipop triangle is a triangle. -/
+theorem onTri_m₁Pt (u : G) : OnTri (m₁Pt u) :=
+  ⟨m₂Pt u, m₃Pt u, (edge_m₁_m₂ u u u u).mpr ⟨rfl, rfl, rfl⟩,
+    (edge_m₂_m₃ u u u u).mpr ⟨rfl, rfl, rfl⟩, (edge_m₃_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩⟩
+
+/-- A vertex node lies on no triangle: no two of its neighbours are joined. -/
+theorem not_onTri_vPt (u : G) : ¬OnTri (vPt u) := by
+  rintro ⟨q, r, hpq, hqr, hrp⟩
+  rcases nbr_of_vPt hpq with rfl | ⟨v, -, rfl⟩ | ⟨w, -, rfl⟩
+  · rcases nbr_of_m₁Pt hqr with rfl | rfl | rfl
+    · exact edge_irrefl_pt _ _ _ hrp
+    · exact (edge_tagAdj hrp).elim
+    · exact (edge_tagAdj hrp).elim
+  · rcases nbr_of_aPt hqr with rfl | rfl | rfl
+    · exact edge_irrefl_pt _ _ _ hrp
+    · exact (edge_tagAdj hrp).elim
+    · exact (edge_tagAdj hrp).elim
+  · rcases nbr_of_cPt hqr with rfl | rfl
+    · exact (edge_tagAdj hrp).elim
+    · exact edge_irrefl_pt _ _ _ hrp
+
+/-- A tail-side subdivision node lies on no triangle. -/
+theorem not_onTri_aPt (u v : G) : ¬OnTri (aPt u v) := by
+  rintro ⟨q, r, hpq, hqr, hrp⟩
+  rcases nbr_of_aPt hpq with rfl | rfl | rfl
+  · rcases nbr_of_vPt hqr with rfl | ⟨v', -, rfl⟩ | ⟨w, -, rfl⟩
+    · exact (edge_tagAdj hrp).elim
+    · exact (edge_tagAdj hrp).elim
+    · exact (edge_tagAdj hrp).elim
+  · rcases nbr_of_bPt hqr with rfl | rfl
+    · exact edge_irrefl_pt _ _ _ hrp
+    · exact (edge_tagAdj hrp).elim
+  · rcases nbr_of_pPt hqr with rfl
+    · exact edge_irrefl_pt _ _ _ hrp
+
+/-- A middle subdivision node lies on no triangle. -/
+theorem not_onTri_bPt (u v : G) : ¬OnTri (bPt u v) := by
+  rintro ⟨q, r, hpq, hqr, hrp⟩
+  rcases nbr_of_bPt hpq with rfl | rfl
+  · rcases nbr_of_aPt hqr with rfl | rfl | rfl
+    · exact (edge_tagAdj hrp).elim
+    · exact edge_irrefl_pt _ _ _ hrp
+    · exact (edge_tagAdj hrp).elim
+  · rcases nbr_of_cPt hqr with rfl | rfl
+    · exact edge_irrefl_pt _ _ _ hrp
+    · exact (edge_tagAdj hrp).elim
+
+/-- A head-side subdivision node lies on no triangle. -/
+theorem not_onTri_cPt (u v : G) : ¬OnTri (cPt u v) := by
+  rintro ⟨q, r, hpq, hqr, hrp⟩
+  rcases nbr_of_cPt hpq with rfl | rfl
+  · rcases nbr_of_bPt hqr with rfl | rfl
+    · exact (edge_tagAdj hrp).elim
+    · exact edge_irrefl_pt _ _ _ hrp
+  · rcases nbr_of_vPt hqr with rfl | ⟨v', -, rfl⟩ | ⟨w, -, rfl⟩
+    · exact (edge_tagAdj hrp).elim
+    · exact (edge_tagAdj hrp).elim
+    · exact (edge_tagAdj hrp).elim
+
+/-- A pendant lies on no triangle. -/
+theorem not_onTri_pPt (u v : G) : ¬OnTri (pPt u v) := by
+  rintro ⟨q, r, hpq, hqr, hrp⟩
+  rcases nbr_of_pPt hpq with rfl
+  rcases nbr_of_aPt hqr with rfl | rfl | rfl
+  · exact (edge_tagAdj hrp).elim
+  · exact (edge_tagAdj hrp).elim
+  · exact edge_irrefl_pt _ _ _ hrp
+
+/-! ### Adjacency to a triangle: the vertices -/
+
+/-- A vertex node is adjacent to its lollipop. -/
+theorem adjTri_vPt (u : G) : AdjTri (vPt u) :=
+  ⟨m₁Pt u, (edge_vtx_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩, onTri_m₁Pt u⟩
+
+/-- No subdivision node is adjacent to a triangle. -/
+theorem not_adjTri_aPt (u v : G) : ¬AdjTri (aPt u v) := by
+  rintro ⟨q, hq, htri⟩
+  rcases nbr_of_aPt hq with rfl | rfl | rfl
+  · exact not_onTri_vPt u htri
+  · exact not_onTri_bPt u v htri
+  · exact not_onTri_pPt u v htri
+
+@[inherit_doc not_adjTri_aPt]
+theorem not_adjTri_bPt (u v : G) : ¬AdjTri (bPt u v) := by
+  rintro ⟨q, hq, htri⟩
+  rcases nbr_of_bPt hq with rfl | rfl
+  · exact not_onTri_aPt u v htri
+  · exact not_onTri_cPt u v htri
+
+@[inherit_doc not_adjTri_aPt]
+theorem not_adjTri_cPt (u v : G) : ¬AdjTri (cPt u v) := by
+  rintro ⟨q, hq, htri⟩
+  rcases nbr_of_cPt hq with rfl | rfl
+  · exact not_onTri_bPt u v htri
+  · exact not_onTri_vPt v htri
+
+@[inherit_doc not_adjTri_aPt]
+theorem not_adjTri_pPt (u v : G) : ¬AdjTri (pPt u v) := by
+  rintro ⟨q, hq, htri⟩
+  rcases nbr_of_pPt hq with rfl
+  exact not_onTri_aPt u v htri
+
+/-! ### Leaves: the pendant marks the tail -/
+
+/-- The pendant of an arc is a leaf. -/
+theorem leaf_pPt {u v : G} (h : GAdj u v) : Leaf (pPt u v) :=
+  ⟨aPt u v, (edge_p_a u v u v).mpr ⟨h, h, rfl, rfl⟩, fun _ hr => nbr_of_pPt hr⟩
+
+/-- A middle subdivision node is not a leaf: it has both an `a` and a `c`
+neighbour, and those have different tags. -/
+theorem not_leaf_bPt {u v : G} (h : GAdj u v) : ¬Leaf (bPt u v) := by
+  rintro ⟨q, -, huniq⟩
+  have h₁ := huniq (aPt u v) ((edge_b_a u v u v).mpr ⟨h, h, rfl, rfl⟩)
+  have h₂ := huniq (cPt u v) ((edge_b_c u v u v).mpr ⟨h, h, rfl, rfl⟩)
+  have : (aPt u v).1 = (cPt u v).1 := by rw [h₁, h₂]
+  exact absurd this (by simp [aPt, cPt, pt])
+
+/-- A vertex node incident to an arc is not a leaf: it has its lollipop and the
+arc's subdivision node. -/
+theorem not_leaf_vPt_of_out {u v : G} (h : GAdj u v) : ¬Leaf (vPt u) := by
+  rintro ⟨q, -, huniq⟩
+  have h₁ := huniq (m₁Pt u) ((edge_vtx_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩)
+  have h₂ := huniq (aPt u v) ((edge_vtx_a u u u v).mpr ⟨rfl, h, rfl⟩)
+  have : (m₁Pt u).1 = (aPt u v).1 := by rw [h₁, h₂]
+  exact absurd this (by simp [m₁Pt, aPt, pt])
+
+@[inherit_doc not_leaf_vPt_of_out]
+theorem not_leaf_vPt_of_in {w u : G} (h : GAdj w u) : ¬Leaf (vPt u) := by
+  rintro ⟨q, -, huniq⟩
+  have h₁ := huniq (m₁Pt u) ((edge_vtx_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩)
+  have h₂ := huniq (cPt w u) ((edge_vtx_c u u w u).mpr ⟨rfl, h, rfl⟩)
+  have : (m₁Pt u).1 = (cPt w u).1 := by rw [h₁, h₂]
+  exact absurd this (by simp [m₁Pt, cPt, pt])
+
+/-! ### Which nodes have a leaf neighbour: the tail side -/
+
+/-- The tail-side subdivision node has the pendant as a neighbour. -/
+theorem hasLeafNbr_aPt {u v : G} (h : GAdj u v) : HasLeafNbr (aPt u v) :=
+  ⟨pPt u v, (edge_a_p u v u v).mpr ⟨h, h, rfl, rfl⟩, leaf_pPt h⟩
+
+/-- The head-side subdivision node has none: its neighbours are the middle node
+and the head, and the head is incident to this very arc. -/
+theorem not_hasLeafNbr_cPt {u v : G} (h : GAdj u v) : ¬HasLeafNbr (cPt u v) := by
+  rintro ⟨q, hq, hleaf⟩
+  rcases nbr_of_cPt hq with rfl | rfl
+  · exact not_leaf_bPt h hleaf
+  · exact not_leaf_vPt_of_in h hleaf
+
+end Levels
 
 end Edges
 
