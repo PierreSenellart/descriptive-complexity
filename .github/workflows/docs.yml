@@ -107,10 +107,46 @@ jobs:
             "$RUNNER_TEMP/result-graph"
           cd "$RUNNER_TEMP/result-graph" && lake build
 
-      # Pin/resolve doc-gen4 in the nested docbuild project and generate docs.
+      # Pin/resolve doc-gen4 in the nested docbuild project. It is a separate
+      # step only so that the cache below can sit between the resolution and
+      # the build: `lake update` writes the manifest the cache key reads, and
+      # clones the packages whose build trees it restores.
       # MATHLIB_NO_CACHE_ON_UPDATE=1 works around a Mathlib caching issue on
-      # `lake update` (doc-gen4 README). `make docs` runs doc-gen4 and then
-      # splices a figure into each declaration's page; see docbuild/Makefile.
+      # `lake update` (doc-gen4 README).
+      - name: Resolve doc-gen4
+        run: |
+          cd docbuild
+          MATHLIB_NO_CACHE_ON_UPDATE=1 lake update doc-gen4
+
+      # doc-gen4 and the four packages that only it needs are compiled from
+      # source on every run – sqlite's C sources included – because `lake
+      # update` clones them into ../.lake/packages only here, long after
+      # `lean-action` has saved the `.lake` tree it caches. That is a minute
+      # per run, so carry their build trees under their own key. Exactly these
+      # five: `Cli` is theirs too, but it arrives with Mathlib and so already
+      # lives in the tree `lean-action` restores, and two caches writing one
+      # directory is not worth the five seconds it would save.
+      #
+      # The key is the manifest `lake update` just wrote, which pins the exact
+      # revision of each of the five, plus the toolchain that compiled them.
+      # Those are the only inputs, so an exact key with no `restore-keys` is
+      # right: anything else means different sources, and Lake would rebuild
+      # what it restored anyway. A miss only costs the minute back.
+      - name: Cache the doc-gen4 executable
+        uses: actions/cache@v6
+        with:
+          path: |
+            .lake/packages/doc-gen4/.lake/build
+            .lake/packages/leansqlite/.lake/build
+            .lake/packages/MD4Lean/.lake/build
+            .lake/packages/UnicodeBasic/.lake/build
+            .lake/packages/BibtexQuery/.lake/build
+          key: >-
+            docgen4-${{ runner.os }}-${{ runner.arch }}-${{
+            hashFiles('docbuild/lean-toolchain', 'docbuild/lake-manifest.json') }}
+
+      # `make docs` runs doc-gen4 and then splices a figure into each
+      # declaration's page; see docbuild/Makefile.
       #
       # A module carried over from the cache keeps the source URL it was
       # documented with, which pins an *older* commit than this run's: doc-gen4
@@ -118,10 +154,15 @@ jobs:
       # the module's trace. That is correct, not stale – the module is in the
       # cache precisely because its content has not changed since, so the
       # permalink and its line numbers still resolve to what the page shows.
+      #
+      # What is *not* incremental is a change to docs/references.bib: every
+      # module's `docInfo` trace mixes in the bibliography prepass, so editing
+      # a citation re-documents the whole import closure, Mathlib included, and
+      # costs some twenty minutes. Nothing here can avoid that; it is doc-gen4's
+      # dependency graph, and the price of a citation being renderable anywhere.
       - name: Build the documentation
         run: |
           cd docbuild
-          MATHLIB_NO_CACHE_ON_UPDATE=1 lake update doc-gen4
           make docs RESULT_GRAPH_REPO="$RUNNER_TEMP/result-graph"
 
       - name: Upload the Pages artifact
