@@ -202,57 +202,127 @@ def GAdj (u v : G) : Prop := RelMap Language.adj ![u, v]
 /-- Adjacency in the constructed graph. -/
 def GEdge (p q : gadget.Map G) : Prop := RelMap Language.adj ![p, q]
 
-@[simp]
-theorem edge_vtx_m₁ (u v : G) : GEdge (vPt u) (m₁Pt v) ↔ u = v := by
-  rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, diagF, sameVtxF, vPt, m₁Pt, Formula.realize_equal]
+/-! Every clause of `DescriptiveComplexity.GraphGadget.edgeF`, read on general
+points. The coordinates of a neighbour are not known to be diagonal before the
+clause is read, so these are the forms the case analysis needs; the diagonal
+corollaries follow. -/
 
 @[simp]
-theorem edge_m₁_m₂ (u v : G) : GEdge (m₁Pt u) (m₂Pt v) ↔ u = v := by
+theorem edge_vtx_m₁ (u v u' v' : G) :
+    GEdge (pt .vtx u v) (pt .m₁ u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, diagF, sameVtxF, m₁Pt, m₂Pt, Formula.realize_equal]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
 
 @[simp]
-theorem edge_m₁_m₃ (u v : G) : GEdge (m₁Pt u) (m₃Pt v) ↔ u = v := by
+theorem edge_m₁_vtx (u v u' v' : G) :
+    GEdge (pt .m₁ u v) (pt .vtx u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, diagF, sameVtxF, m₁Pt, m₃Pt, Formula.realize_equal]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
 
 @[simp]
-theorem edge_m₂_m₃ (u v : G) : GEdge (m₂Pt u) (m₃Pt v) ↔ u = v := by
+theorem edge_m₁_m₂ (u v u' v' : G) :
+    GEdge (pt .m₁ u v) (pt .m₂ u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, diagF, sameVtxF, m₂Pt, m₃Pt, Formula.realize_equal]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
 
 @[simp]
-theorem edge_vtx_a (w u v : G) : GEdge (vPt w) (aPt u v) ↔ GAdj u v ∧ w = u := by
+theorem edge_m₂_m₁ (u v u' v' : G) :
+    GEdge (pt .m₂ u v) (pt .m₁ u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, diagF, arcF, sameVtxF, vPt, aPt, GAdj, Formula.realize_equal,
-    Formula.realize_rel₂]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
+
+@[simp]
+theorem edge_m₁_m₃ (u v u' v' : G) :
+    GEdge (pt .m₁ u v) (pt .m₃ u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
+
+@[simp]
+theorem edge_m₃_m₁ (u v u' v' : G) :
+    GEdge (pt .m₃ u v) (pt .m₁ u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
+
+@[simp]
+theorem edge_m₂_m₃ (u v u' v' : G) :
+    GEdge (pt .m₂ u v) (pt .m₃ u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
+
+@[simp]
+theorem edge_m₃_m₂ (u v u' v' : G) :
+    GEdge (pt .m₃ u v) (pt .m₂ u' v') ↔ u = v ∧ u' = v' ∧ u = u' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, sameVtxF, Formula.realize_equal, and_assoc]
+
+@[simp]
+theorem edge_vtx_a (u v u' v' : G) :
+    GEdge (pt .vtx u v) (pt .a u' v') ↔ u = v ∧ GAdj u' v' ∧ u = u' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, arcF, sameVtxF, GAdj, Formula.realize_equal,
+    Formula.realize_rel₂, and_assoc]
+
+@[simp]
+theorem edge_a_vtx (u v u' v' : G) :
+    GEdge (pt .a u v) (pt .vtx u' v') ↔ GAdj u v ∧ u' = v' ∧ u' = u := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, arcF, sameVtxF, GAdj, Formula.realize_equal,
+    Formula.realize_rel₂, and_assoc]
+
+@[simp]
+theorem edge_c_vtx (u v u' v' : G) :
+    GEdge (pt .c u v) (pt .vtx u' v') ↔ GAdj u v ∧ u' = v' ∧ v = u' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, arcF, GAdj, Formula.realize_equal,
+    Formula.realize_rel₂, and_assoc]
+
+@[simp]
+theorem edge_vtx_c (u v u' v' : G) :
+    GEdge (pt .vtx u v) (pt .c u' v') ↔ u = v ∧ GAdj u' v' ∧ v' = u := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, diagF, arcF, GAdj, Formula.realize_equal,
+    Formula.realize_rel₂, and_assoc]
 
 @[simp]
 theorem edge_a_b (u v u' v' : G) :
-    GEdge (aPt u v) (bPt u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
+    GEdge (pt .a u v) (pt .b u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, arcF, sameArcF, aPt, bPt, GAdj, Formula.realize_equal,
+  simp [gadget, pt, edgeF, arcF, sameArcF, GAdj, Formula.realize_equal,
+    Formula.realize_rel₂, and_assoc]
+
+@[simp]
+theorem edge_b_a (u v u' v' : G) :
+    GEdge (pt .b u v) (pt .a u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, arcF, sameArcF, GAdj, Formula.realize_equal,
     Formula.realize_rel₂, and_assoc]
 
 @[simp]
 theorem edge_b_c (u v u' v' : G) :
-    GEdge (bPt u v) (cPt u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
+    GEdge (pt .b u v) (pt .c u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, arcF, sameArcF, bPt, cPt, GAdj, Formula.realize_equal,
+  simp [gadget, pt, edgeF, arcF, sameArcF, GAdj, Formula.realize_equal,
     Formula.realize_rel₂, and_assoc]
 
 @[simp]
-theorem edge_c_vtx (u v w : G) : GEdge (cPt u v) (vPt w) ↔ GAdj u v ∧ v = w := by
+theorem edge_c_b (u v u' v' : G) :
+    GEdge (pt .c u v) (pt .b u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, diagF, arcF, cPt, vPt, GAdj, Formula.realize_equal,
-    Formula.realize_rel₂]
+  simp [gadget, pt, edgeF, arcF, sameArcF, GAdj, Formula.realize_equal,
+    Formula.realize_rel₂, and_assoc]
 
 @[simp]
 theorem edge_a_p (u v u' v' : G) :
-    GEdge (aPt u v) (pPt u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
+    GEdge (pt .a u v) (pt .p u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
   rw [GEdge, FOInterpretation.relMap_map]
-  simp [gadget, pt, edgeF, arcF, sameArcF, aPt, pPt, GAdj, Formula.realize_equal,
+  simp [gadget, pt, edgeF, arcF, sameArcF, GAdj, Formula.realize_equal,
+    Formula.realize_rel₂, and_assoc]
+
+@[simp]
+theorem edge_p_a (u v u' v' : G) :
+    GEdge (pt .p u v) (pt .a u' v') ↔ GAdj u v ∧ GAdj u' v' ∧ u = u' ∧ v = v' := by
+  rw [GEdge, FOInterpretation.relMap_map]
+  simp [gadget, pt, edgeF, arcF, sameArcF, GAdj, Formula.realize_equal,
     Formula.realize_rel₂, and_assoc]
 
 /-! ### Which tag pairs can be joined at all -/
@@ -277,6 +347,174 @@ theorem edge_tagAdj {p q : gadget.Map G} (h : GEdge p q) : TagAdj p.1 q.1 := by
 reading `DescriptiveComplexity.GraphGadget.edge_tagAdj` off a named pair. -/
 theorem not_edge_of_not_tagAdj {t s : GTag} (h : ¬TagAdj t s) (u v u' v' : G) :
     ¬GEdge (pt t u v) (pt s u' v') := fun he => h (edge_tagAdj he)
+
+/-! ### The neighbours of each kind of node -/
+
+section Neighbours
+
+/-- The neighbours of a vertex node: its lollipop, the tail-side subdivision of
+each arc out of it, and the head-side subdivision of each arc into it. -/
+theorem nbr_of_vPt {u : G} {q : gadget.Map G} (h : GEdge (vPt u) q) :
+    q = m₁Pt u ∨ (∃ v, GAdj u v ∧ q = aPt u v) ∨ ∃ w, GAdj w u ∧ q = cPt w u := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (vPt u) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (vPt u) z) hq) h
+  rw [hq]
+  cases s
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, hx, hu⟩ := (edge_vtx_m₁ u u (x 0) (x 1)).mp h'
+    exact Or.inl (by rw [m₁Pt, ← hu, ← hx, ← hu])
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, harc, hu⟩ := (edge_vtx_a u u (x 0) (x 1)).mp h'
+    exact Or.inr (Or.inl ⟨x 1, by rw [← hu] at harc; exact harc, by rw [aPt, ← hu]⟩)
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, harc, hv⟩ := (edge_vtx_c u u (x 0) (x 1)).mp h'
+    exact Or.inr (Or.inr ⟨x 0, by rw [hv] at harc; exact harc, by rw [cPt, ← hv]⟩)
+  · exact (edge_tagAdj h).elim
+
+theorem nbr_of_m₁Pt {u : G} {q : gadget.Map G} (h : GEdge (m₁Pt u) q) :
+    q = vPt u ∨ q = m₂Pt u ∨ q = m₃Pt u := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (m₁Pt u) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (m₁Pt u) z) hq) h
+  rw [hq]
+  cases s
+  · obtain ⟨-, hx, hu⟩ := (edge_m₁_vtx u u (x 0) (x 1)).mp h'
+    exact Or.inl (by rw [vPt, ← hu, ← hx, ← hu])
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, hx, hu⟩ := (edge_m₁_m₂ u u (x 0) (x 1)).mp h'
+    exact Or.inr (Or.inl (by rw [m₂Pt, ← hu, ← hx, ← hu]))
+  · obtain ⟨-, hx, hu⟩ := (edge_m₁_m₃ u u (x 0) (x 1)).mp h'
+    exact Or.inr (Or.inr (by rw [m₃Pt, ← hu, ← hx, ← hu]))
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+
+
+theorem nbr_of_m₂Pt {u : G} {q : gadget.Map G} (h : GEdge (m₂Pt u) q) :
+    q = m₁Pt u ∨ q = m₃Pt u := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (m₂Pt u) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (m₂Pt u) z) hq) h
+  rw [hq]
+  cases s
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, hx, hu⟩ := (edge_m₂_m₁ u u (x 0) (x 1)).mp h'
+    exact Or.inl (by rw [m₁Pt, ← hu, ← hx, ← hu])
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, hx, hu⟩ := (edge_m₂_m₃ u u (x 0) (x 1)).mp h'
+    exact Or.inr (by rw [m₃Pt, ← hu, ← hx, ← hu])
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+
+
+theorem nbr_of_m₃Pt {u : G} {q : gadget.Map G} (h : GEdge (m₃Pt u) q) :
+    q = m₁Pt u ∨ q = m₂Pt u := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (m₃Pt u) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (m₃Pt u) z) hq) h
+  rw [hq]
+  cases s
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, hx, hu⟩ := (edge_m₃_m₁ u u (x 0) (x 1)).mp h'
+    exact Or.inl (by rw [m₁Pt, ← hu, ← hx, ← hu])
+  · obtain ⟨-, hx, hu⟩ := (edge_m₃_m₂ u u (x 0) (x 1)).mp h'
+    exact Or.inr (by rw [m₂Pt, ← hu, ← hx, ← hu])
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+
+
+theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
+    q = vPt u ∨ q = bPt u v ∨ q = pPt u v := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (aPt u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (aPt u v) z) hq) h
+  rw [hq]
+  cases s
+  · obtain ⟨-, hx, hu⟩ := (edge_a_vtx u v (x 0) (x 1)).mp h'
+    exact Or.inl (by rw [vPt, hu, ← hx, hu])
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, -, h0, h1⟩ := (edge_a_b u v (x 0) (x 1)).mp h'
+    exact Or.inr (Or.inl (by rw [bPt, h0, h1]))
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, -, h0, h1⟩ := (edge_a_p u v (x 0) (x 1)).mp h'
+    exact Or.inr (Or.inr (by rw [pPt, h0, h1]))
+
+
+theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
+    q = aPt u v ∨ q = cPt u v := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (bPt u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (bPt u v) z) hq) h
+  rw [hq]
+  cases s
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, -, h0, h1⟩ := (edge_b_a u v (x 0) (x 1)).mp h'
+    exact Or.inl (by rw [aPt, h0, h1])
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, -, h0, h1⟩ := (edge_b_c u v (x 0) (x 1)).mp h'
+    exact Or.inr (by rw [cPt, h0, h1])
+  · exact (edge_tagAdj h).elim
+
+
+theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
+    q = bPt u v ∨ q = vPt v := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (cPt u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (cPt u v) z) hq) h
+  rw [hq]
+  cases s
+  · obtain ⟨-, hx, hv⟩ := (edge_c_vtx u v (x 0) (x 1)).mp h'
+    exact Or.inr (by rw [vPt, ← hv, ← hx, ← hv])
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, -, h0, h1⟩ := (edge_c_b u v (x 0) (x 1)).mp h'
+    exact Or.inl (by rw [bPt, h0, h1])
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+
+
+theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
+    q = aPt u v := by
+  obtain ⟨s, x⟩ := q
+  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
+  have h' : GEdge (pPt u v) (pt s (x 0) (x 1)) :=
+    Eq.mp (congrArg (fun z => GEdge (pPt u v) z) hq) h
+  rw [hq]
+  cases s
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · obtain ⟨-, -, h0, h1⟩ := (edge_p_a u v (x 0) (x 1)).mp h'
+    exact (by rw [aPt, h0, h1])
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+  · exact (edge_tagAdj h).elim
+
+end Neighbours
 
 end Edges
 
