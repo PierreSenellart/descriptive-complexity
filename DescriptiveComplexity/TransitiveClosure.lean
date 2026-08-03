@@ -195,13 +195,13 @@ definability: the problem itself does not see the order, while the transition
 and endpoint formulas may. The order cannot be guessed away here – the logic has
 no second-order quantifier to guess with – unlike in SO(TC)
 (`DescriptiveComplexity.sotcDefinable_iff_free`). -/
-def TCDefinable (P : DecisionProblem L) : Prop :=
+def TCDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ spec : TCSpec L,
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ spec.Accepts A
 
 /-- FO(TC) definability only depends on the finite instances of a problem. -/
-theorem tcDefinable_congr {P Q : DecisionProblem L}
+theorem tcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     TCDefinable P ↔ TCDefinable Q := by
   constructor <;> rintro ⟨spec, hspec⟩ <;> refine ⟨spec, ?_⟩ <;> intro A _ _ _ _

@@ -75,14 +75,14 @@ noncomputable def PSPACE : ComplexityClass :=
     (fun h => sotcDefinable_congr h)
 
 /-- Membership in PSPACE is exactly SO(TC) definability, by definition. -/
-theorem mem_PSPACE_iff (P : DecisionProblem L) : P ∈ PSPACE ↔ SOTCDefinable P :=
+theorem mem_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ PSPACE ↔ SOTCDefinable P :=
   Iff.rfl
 
 /-- Over a relational vocabulary, PSPACE-hardness is the usual notion: every
 SO(TC) definable problem reduces to `P`. -/
 theorem hard_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
     PSPACE.Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SOTCDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
@@ -90,7 +90,7 @@ theorem hard_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
 to it; the discharge shape shared by every PSPACE-hardness proof of the
 catalog. -/
 theorem PSPACE_hard_of_sotcDefinable [L.IsRelational] (P : DecisionProblem L)
-    (h : ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+    (h : ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
       SOTCDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P)) : PSPACE.Hard P :=
   (hard_PSPACE_iff P).mpr h
 
@@ -170,7 +170,7 @@ theorem sigmaOneSpec_accepts_iff (φ : (L.sum B.lang).Sentence) :
 
 /-- **Every `Σ₁`-definable problem is SO(TC) definable**: guess the block in
 the state, take no step. -/
-theorem SOTCDefinable.of_sigmaSODefinable {P : DecisionProblem L}
+theorem SOTCDefinable.of_sigmaSODefinable [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSODefinable 1 P) : SOTCDefinable P := by
   obtain ⟨Bs, hlen, φ, hφ⟩ := h
   match Bs, hlen with
@@ -185,6 +185,6 @@ end SigmaOne
 definability, and an existential block is a walk that guesses its state and
 stops. -/
 theorem NP_subset_PSPACE : NP ⊆ PSPACE :=
-  fun _ _ h => SOTCDefinable.of_sigmaSODefinable h
+  fun _ _ _ h => SOTCDefinable.of_sigmaSODefinable h
 
 end DescriptiveComplexity

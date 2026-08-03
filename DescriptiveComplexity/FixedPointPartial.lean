@@ -142,7 +142,7 @@ end StepDef
 finite structures, it is the value of a simultaneous induction over its own
 vocabulary, read partially. This is the unordered notion on the fixed-point
 side of the Abiteboul–Vianu theorem. -/
-def PFPDefinableFree (P : DecisionProblem L) : Prop :=
+def PFPDefinableFree [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ d : StepDef L, ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
     P A ↔ d.PFPHolds A
 
@@ -152,14 +152,14 @@ ordered expansion of its vocabulary, read partially – for every linear order,
 the problem itself never seeing it. This is the setting of the capture
 theorem FO(≤, PFP) = PSPACE
 (`DescriptiveComplexity.FixedPointPartialSpace`). -/
-def PFPDefinable (P : DecisionProblem L) : Prop :=
+def PFPDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ d : StepDef (L.sum Language.order),
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ d.PFPHolds A
 
 /-- Order-free FO(PFP) definability only depends on the finite instances of a
 problem. -/
-theorem pfpDefinableFree_congr {P Q : DecisionProblem L}
+theorem pfpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     PFPDefinableFree P ↔ PFPDefinableFree Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _
@@ -168,7 +168,7 @@ theorem pfpDefinableFree_congr {P Q : DecisionProblem L}
 
 /-- FO(≤, PFP) definability only depends on the finite instances of a
 problem. -/
-theorem pfpDefinable_congr {P Q : DecisionProblem L}
+theorem pfpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     PFPDefinable P ↔ PFPDefinable Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _ _
@@ -179,7 +179,7 @@ theorem pfpDefinable_congr {P Q : DecisionProblem L}
 
 section Closure
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
 variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
 /-- **Order-free FO(PFP) definability is closed under first-order
@@ -331,7 +331,7 @@ theorem StepDef.pfpHolds_inflate (d : StepDef L) (A : Type) [L.Structure A]
 
 /-- **Order-free FO(IFP) is contained in order-free FO(PFP)**: inflate the
 induction. The easy inclusion of the Abiteboul–Vianu theorem. -/
-theorem IFPDefinableFree.pfpDefinableFree {P : DecisionProblem L}
+theorem IFPDefinableFree.pfpDefinableFree [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinableFree P) : PFPDefinableFree P := by
   obtain ⟨d, hd⟩ := h
   refine ⟨d.inflate, ?_⟩
@@ -339,7 +339,7 @@ theorem IFPDefinableFree.pfpDefinableFree {P : DecisionProblem L}
   exact (hd A).trans (d.pfpHolds_inflate A).symm
 
 /-- **FO(≤, IFP) is contained in FO(≤, PFP)**: inflate the induction. -/
-theorem IFPDefinable.pfpDefinable {P : DecisionProblem L}
+theorem IFPDefinable.pfpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinable P) : PFPDefinable P := by
   obtain ⟨d, hd⟩ := h
   refine ⟨d.inflate, ?_⟩

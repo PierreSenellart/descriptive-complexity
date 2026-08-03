@@ -266,7 +266,7 @@ end ToSOTC
 
 /-- **Every FO(≤, PFP) definable problem is SO(TC) definable**: the partial
 iteration is a deterministic walk on the assignments of its own block. -/
-theorem PFPDefinable.sotcDefinable {P : DecisionProblem L} (h : PFPDefinable P) :
+theorem PFPDefinable.sotcDefinable [L.IsRelational] {P : DecisionProblem L} (h : PFPDefinable P) :
     SOTCDefinable P := by
   obtain ⟨d, hd⟩ := h
   refine ⟨d.toSOTCSpec, ?_⟩
@@ -274,7 +274,7 @@ theorem PFPDefinable.sotcDefinable {P : DecisionProblem L} (h : PFPDefinable P) 
   exact (hd A).trans (d.accepts_toSOTCSpec (A := A)).symm
 
 /-- **FO(≤, PFP) is contained in PSPACE.** -/
-theorem mem_PSPACE_of_pfpDefinable {P : DecisionProblem L} (h : PFPDefinable P) :
+theorem mem_PSPACE_of_pfpDefinable [L.IsRelational] {P : DecisionProblem L} (h : PFPDefinable P) :
     P ∈ PSPACE :=
   (mem_PSPACE_iff P).mpr h.sotcDefinable
 

@@ -791,7 +791,7 @@ theorem dtmAcceptSpace_pfpDefinable : PFPDefinable DTMAcceptSpace := by
 
 /-- **PSPACE is contained in FO(≤, PFP)**: reduce to the machine problem and
 pull the iteration back through the relativized reduction. -/
-theorem pfpDefinable_of_mem_PSPACE {L : Language.{0, 0}} {P : DecisionProblem L}
+theorem pfpDefinable_of_mem_PSPACE {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : P ∈ PSPACE) : PFPDefinable P := by
   obtain ⟨f⟩ := le_dtmAcceptSpace_of_mem_PSPACE P h
   exact PFPDefinable.of_relOrderedReduction f dtmAcceptSpace_pfpDefinable
@@ -799,13 +799,14 @@ theorem pfpDefinable_of_mem_PSPACE {L : Language.{0, 0}} {P : DecisionProblem L}
 /-- **The capture theorem FO(≤, PFP) = PSPACE** ([Abiteboul–Vianu
 1989][abiteboul1989fixpoint]; [Ebbinghaus–Flum 1995][ebbinghaus1995finite],
 ch. 7): a problem is FO(≤, PFP) definable exactly when it is in PSPACE. -/
-theorem pfpDefinable_iff_mem_PSPACE {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem pfpDefinable_iff_mem_PSPACE {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     PFPDefinable P ↔ P ∈ PSPACE :=
   ⟨mem_PSPACE_of_pfpDefinable, pfpDefinable_of_mem_PSPACE⟩
 
 /-- The capture theorem, logic to logic: FO(≤, PFP) and SO(TC) define the
 same problems. -/
-theorem pfpDefinable_iff_sotcDefinable {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem pfpDefinable_iff_sotcDefinable {L : Language.{0, 0}} [L.IsRelational]
+    (P : DecisionProblem L) :
     PFPDefinable P ↔ SOTCDefinable P :=
   (pfpDefinable_iff_mem_PSPACE P).trans (mem_PSPACE_iff P)
 

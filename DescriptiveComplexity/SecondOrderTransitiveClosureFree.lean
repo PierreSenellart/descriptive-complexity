@@ -564,7 +564,7 @@ end Free
 `DescriptiveComplexity.SOTCSpecFree` on nonempty finite structures – with **no
 linear order in the statement at all**, unlike
 `DescriptiveComplexity.SOTCDefinable`. -/
-def SOTCDefinableFree (P : DecisionProblem L) : Prop :=
+def SOTCDefinableFree [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ spec : SOTCSpecFree L,
     ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], P A ↔ spec.Accepts A
 
@@ -574,7 +574,7 @@ Left to right the order is guessed into the state
 (`DescriptiveComplexity.SOTCSpec.orderFree`) – a linear order exists on every
 finite universe, and by order-invariance any one of them will do; right to left
 a specification that never mentions the order is one that ignores it. -/
-theorem sotcDefinable_iff_free {P : DecisionProblem L} :
+theorem sotcDefinable_iff_free [L.IsRelational] {P : DecisionProblem L} :
     SOTCDefinable P ↔ SOTCDefinableFree P := by
   constructor
   · rintro ⟨spec, hspec⟩
@@ -596,7 +596,7 @@ theorem sotcDefinable_iff_free {P : DecisionProblem L} :
 
 /-- **PSPACE needs no order**: membership is definability by an order-free
 SO(TC) specification. -/
-theorem mem_PSPACE_iff_sotcDefinableFree (P : DecisionProblem L) :
+theorem mem_PSPACE_iff_sotcDefinableFree [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PSPACE ↔ SOTCDefinableFree P :=
   (mem_PSPACE_iff P).trans sotcDefinable_iff_free
 

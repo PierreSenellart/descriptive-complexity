@@ -169,13 +169,13 @@ the order be guessed away, as it is for the existential logics and – see
 `DescriptiveComplexity.sotcDefinable_iff_free` – for SO(TC): a Horn kernel
 cannot state that a guessed relation is total, two positive literals in one
 clause not being Horn. -/
-def SigmaSOHornDefinable (P : DecisionProblem L) : Prop :=
+def SigmaSOHornDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ (B : SOBlock) (k : ℕ) (prog : HornProgram (L.sum Language.order) B k),
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ ∃ ρ : B.Assignment A, prog.Holds ρ
 
 /-- SO-Horn definability only depends on the finite instances of a problem. -/
-theorem sigmaSOHornDefinable_congr {P Q : DecisionProblem L}
+theorem sigmaSOHornDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     SigmaSOHornDefinable P ↔ SigmaSOHornDefinable Q := by
   constructor <;> rintro ⟨B, k, prog, hprog⟩ <;> refine ⟨B, k, prog, ?_⟩ <;>

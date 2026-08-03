@@ -158,7 +158,7 @@ end Correctness
 
 section Closure
 
-variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
+variable [L₁.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
 /-- **SO-Krom definability is closed under ordered first-order reductions.**
 The Krom shape survives the pullback because an interpretation only rewrites

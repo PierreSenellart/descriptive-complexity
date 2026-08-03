@@ -264,7 +264,7 @@ section Definability
 variable (k : ℕ) (cnf : Bool)
 
 private theorem qbf_definable_aux (pol : Bool) (A : Type) (instA : (Language.qbf k).Structure A) :
-    @DecisionProblem.Holds _ (QbfProblem k pol cnf) A instA ↔
+    @DecisionProblem.Holds _ _ (QbfProblem k pol cnf) A instA ↔
       @SORealize (Language.qbf k) A instA (qbfBlocks k)
         ((unmergeHom (qbfBlocks k) (Language.qbf k)).onSentence (qbfKernel k cnf)) pol := by
   have h1 := sorealize_unmerge (qbfBlocks k) (Language.qbf k) A instA (qbfKernel k cnf) pol

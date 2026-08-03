@@ -74,8 +74,13 @@ variable (L L' : Language.{0, 0})
 isomorphism-closed property of `L`-structures, whose yes-instances are the
 `L`-structures satisfying it. Isomorphism-invariance is part of the notion –
 a decision problem cannot distinguish isomorphic presentations of the same
-structure. -/
-structure DecisionProblem where
+structure.
+
+The vocabulary is *relational*, as everywhere in finite model theory: the
+instance argument makes the convention structural, so every notion built on
+decision problems – interpretations, reductions, complexity classes –
+inherits it once and for all. -/
+structure DecisionProblem [L.IsRelational] where
   /-- The predicate: `P A` (through the function coercion) states that the
   structure `A` is a yes-instance. -/
   Holds : ∀ (A : Type) [L.Structure A], Prop
@@ -85,7 +90,7 @@ structure DecisionProblem where
 
 namespace DecisionProblem
 
-variable {L}
+variable {L} [L.IsRelational]
 
 instance : CoeFun (DecisionProblem L) fun _ => ∀ (A : Type) [L.Structure A], Prop :=
   ⟨Holds⟩
@@ -232,7 +237,8 @@ Since FO interpretations are computable in AC⁰ ⊆ PTIME on (encodings of)
 finite structures, an `FOReduction P Q` is in particular a Karp reduction from
 `P` to `Q`: any NP-hardness argument for `P` transfers to `Q`, without any
 formalized machine model. -/
-structure FOReduction [L'.IsRelational] (P : DecisionProblem L) (Q : DecisionProblem L') where
+structure FOReduction [L.IsRelational] [L'.IsRelational] (P : DecisionProblem L)
+    (Q : DecisionProblem L') where
   /-- The tags (copies of `A^dim`) used by the underlying interpretation. -/
   Tag : Type
   /-- Tags are finite, so that finite structures map to finite structures. -/

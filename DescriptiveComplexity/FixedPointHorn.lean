@@ -2296,7 +2296,7 @@ variable {L : Language.{0, 0}}
 direction of Grädel's equivalence, by the staged translation above. Together
 with `DescriptiveComplexity.SigmaSOHornDefinable.lfpDefinable` this makes the two
 formalisms interchangeable. -/
-theorem LFPDefinable.sigmaSOHornDefinable {P : DecisionProblem L}
+theorem LFPDefinable.sigmaSOHornDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : LFPDefinable P) : SigmaSOHornDefinable P := by
   obtain ⟨d, hd⟩ := h
   refine ⟨LFPHorn.trBlock d, LFPHorn.kk d, LFPHorn.trProg d, ?_⟩
@@ -2305,21 +2305,21 @@ theorem LFPDefinable.sigmaSOHornDefinable {P : DecisionProblem L}
 
 /-- **FO(LFP) = SO-Horn** ([Grädel 1992][gradel1992capturing]): a problem is
 FO(LFP) definable iff it is SO-Horn definable, on ordered structures. -/
-theorem lfpDefinable_iff_sigmaSOHornDefinable (P : DecisionProblem L) :
+theorem lfpDefinable_iff_sigmaSOHornDefinable [L.IsRelational] (P : DecisionProblem L) :
     LFPDefinable P ↔ SigmaSOHornDefinable P :=
   ⟨LFPDefinable.sigmaSOHornDefinable, SigmaSOHornDefinable.lfpDefinable⟩
 
 /-- **SO-Horn definability is closed under complement**: through the logic
 FO(LFP), where complementation is negating the output formula. This is the
 statement that was out of reach of the fragment alone. -/
-theorem SigmaSOHornDefinable.compl {P : DecisionProblem L}
+theorem SigmaSOHornDefinable.compl [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSOHornDefinable P) : SigmaSOHornDefinable Pᶜ :=
   LFPDefinable.sigmaSOHornDefinable (LFPDefinable.compl h.lfpDefinable)
 
 /-! ### Level 0 of the hierarchy: `Π₀ᵖ = Σ₀ᵖ` -/
 
 /-- Complementation is a bijection of the SO-Horn definable problems. -/
-theorem sigmaSOHornDefinable_compl_iff (P : DecisionProblem L) :
+theorem sigmaSOHornDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
     SigmaSOHornDefinable Pᶜ ↔ SigmaSOHornDefinable P := by
   constructor
   · intro h
@@ -2336,9 +2336,9 @@ theorem piP_zero_eq : PiP 0 = SigmaP 0 := by
   change PTIME.compl = PTIME
   refine ComplexityClass.ext (fun P => sigmaSOHornDefinable_compl_iff P) fun P => ?_
   constructor
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((sigmaSOHornDefinable_compl_iff Q).mpr hQ)
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((sigmaSOHornDefinable_compl_iff Q).mp hQ)
 
 end DescriptiveComplexity

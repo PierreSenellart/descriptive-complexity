@@ -254,14 +254,14 @@ The number `m` of invented values is unbounded, which is precisely what takes
 the notion beyond `Σ₁` (`DescriptiveComplexity.SigmaSODefinable`, where the
 certificate lives over `A` itself): a witness is a finite object, but no
 function of `|A|` bounds its size. -/
-def SigmaSONewDefinable (P : DecisionProblem L) : Prop :=
+def SigmaSONewDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ B : SOBlock, ∃ φ : (soLang (newLang L) [B]).Sentence,
     ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
       P A ↔ ∃ m : ℕ, SORealize (newLang L) (A ⊕ Fin m) [B] φ true
 
 /-- `∃SO[new]`-definability only depends on the finite instances of a
 problem. -/
-theorem sigmaSONewDefinable_congr {P Q : DecisionProblem L}
+theorem sigmaSONewDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     SigmaSONewDefinable P ↔ SigmaSONewDefinable Q := by
   constructor <;> rintro ⟨B, φ, hφ⟩ <;> refine ⟨B, φ, ?_⟩ <;> intro A _ _ _
@@ -344,7 +344,7 @@ variable {L : Language.{0, 0}}
 /-- **Existential second-order definability implies `∃SO[new]`-definability**:
 an `∃SO` sentence becomes an `∃SO[new]` sentence when guarded by “nothing was
 invented”. Once RE is a complexity class, this is the inclusion `NP ⊆ RE`. -/
-theorem SigmaSODefinable.toNew {P : DecisionProblem L}
+theorem SigmaSODefinable.toNew [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSODefinable 1 P) : SigmaSONewDefinable P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
   obtain ⟨B, rfl⟩ : ∃ B, Bs = [B] := by

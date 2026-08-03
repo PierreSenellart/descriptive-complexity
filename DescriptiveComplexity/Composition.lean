@@ -293,8 +293,8 @@ noncomputable def FOInterpretation.compLEquiv (J : FOInterpretation L₂ L₃ Ta
 `P ≤ᶠᵒ R`. The composite interpretation is only isomorphic, not equal, to the
 twice-applied one, so the isomorphism-invariance built into `DecisionProblem`
 is used to conclude. -/
-noncomputable def FOReduction.trans {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
-    {R : DecisionProblem L₃} (g : P ≤ᶠᵒ Q) (f : Q ≤ᶠᵒ R) :
+noncomputable def FOReduction.trans [L₁.IsRelational] {P : DecisionProblem L₁}
+    {Q : DecisionProblem L₂} {R : DecisionProblem L₃} (g : P ≤ᶠᵒ Q) (f : Q ≤ᶠᵒ R) :
     P ≤ᶠᵒ R :=
   letI := f.tagFinite
   letI := g.tagFinite
@@ -311,7 +311,7 @@ noncomputable def FOReduction.trans {P : DecisionProblem L₁} {Q : DecisionProb
 
 /-- `Trans` instance for FO reductions, enabling `calc` chains
 `P ≤ᶠᵒ Q ≤ᶠᵒ R`. -/
-noncomputable instance :
+noncomputable instance [L₁.IsRelational] :
     Trans (α := DecisionProblem L₁) (β := DecisionProblem L₂) (γ := DecisionProblem L₃)
       FOReduction FOReduction FOReduction where
   trans g f := g.trans f

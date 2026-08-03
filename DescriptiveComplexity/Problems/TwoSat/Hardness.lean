@@ -426,8 +426,8 @@ end Correctness
 /-- **The generic Krom reduction**: an ordered first-order reduction to 2SAT
 from any problem defined, on nonempty finite structures, by an existential
 second-order sentence with a Krom kernel. -/
-noncomputable def kromReduction (prog : KromProgram (L.sum Language.order) B k)
-    (Q : DecisionProblem L)
+noncomputable def kromReduction [L.IsRelational]
+    (prog : KromProgram (L.sum Language.order) B k) (Q : DecisionProblem L)
     (hQ : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       Q A ↔ ∃ ρ : B.Assignment A, prog.Holds ρ) : Q ≤ᶠᵒ[≤] TwoSAT where
   Tag := KromTag prog
@@ -445,9 +445,9 @@ the Cook–Levin discharge above it: the clause list of the program is emitted
 directly, one 2-clause per clause and per instantiation of its universally
 quantified variables satisfying its guard. -/
 theorem twoSat_hard_of_sigmaSOKromDefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSOKromDefinable Q → Nonempty (Q ≤ᶠᵒ[≤] TwoSAT) := by
-  rintro L Q ⟨B, k, prog, hprog⟩
+  rintro L _ Q ⟨B, k, prog, hprog⟩
   exact ⟨kromReduction prog Q hprog⟩
 
 end DescriptiveComplexity

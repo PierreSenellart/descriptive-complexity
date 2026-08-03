@@ -444,7 +444,8 @@ end HeadAutomaton
 definable** – hence in `DescriptiveComplexity.NL`. The configurations of the automaton
 *are* the nodes of the specification: the control is the mode, the heads are the
 tuple. -/
-theorem tcDefinable_of_automaton {k : ℕ} {P : DecisionProblem L} (M : HeadAutomaton L k)
+theorem tcDefinable_of_automaton {k : ℕ} [L.IsRelational] {P : DecisionProblem L}
+    (M : HeadAutomaton L k)
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ M.Accepts A) : TCDefinable P := by
   refine ⟨M.toSpec, ?_⟩
@@ -455,7 +456,8 @@ theorem tcDefinable_of_automaton {k : ℕ} {P : DecisionProblem L} (M : HeadAuto
 FO(DTC) definable** – hence in `DescriptiveComplexity.LOGSPACE`. Determinism of the
 control is exactly what makes the walk functional, so its determinization
 changes nothing. -/
-theorem dtcDefinable_of_automaton {k : ℕ} {P : DecisionProblem L} (M : HeadAutomaton L k)
+theorem dtcDefinable_of_automaton {k : ℕ} [L.IsRelational] {P : DecisionProblem L}
+    (M : HeadAutomaton L k)
     (hdet : M.IsDeterministic)
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ M.Accepts A) : DTCDefinable P := by
@@ -467,14 +469,15 @@ theorem dtcDefinable_of_automaton {k : ℕ} {P : DecisionProblem L} (M : HeadAut
 /-- **A problem recognized by a two-way multi-head automaton is in NL**, the
 membership tool the compilation provides: exhibiting a machine is usually
 easier than writing a specification by hand. -/
-theorem mem_NL_of_automaton {k : ℕ} {P : DecisionProblem L} (M : HeadAutomaton L k)
+theorem mem_NL_of_automaton {k : ℕ} [L.IsRelational] {P : DecisionProblem L} (M : HeadAutomaton L k)
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ M.Accepts A) : P ∈ NL :=
   (tcDefinable_iff_mem_NL P).mp (tcDefinable_of_automaton M h)
 
 /-- **A problem recognized by a deterministic two-way multi-head automaton is in
 LOGSPACE.** -/
-theorem mem_LOGSPACE_of_automaton {k : ℕ} {P : DecisionProblem L} (M : HeadAutomaton L k)
+theorem mem_LOGSPACE_of_automaton {k : ℕ} [L.IsRelational] {P : DecisionProblem L}
+    (M : HeadAutomaton L k)
     (hdet : M.IsDeterministic)
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ M.Accepts A) : P ∈ LOGSPACE :=

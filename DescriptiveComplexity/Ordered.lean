@@ -74,7 +74,7 @@ As `P` does not depend on the order, correctness for every linear order makes
 this an order-invariant FO reduction; it is computable in AC⁰ ⊆ PTIME on
 (encodings of) finite ordered structures, hence in particular a Karp
 reduction. -/
-structure OrderedFOReduction [L'.IsRelational]
+structure OrderedFOReduction [L.IsRelational] [L'.IsRelational]
     (P : DecisionProblem L) (Q : DecisionProblem L') where
   /-- The tags (copies of `A^dim`) used by the underlying interpretation. -/
   Tag : Type

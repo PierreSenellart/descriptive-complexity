@@ -39,13 +39,13 @@ fixed-point logics agree on ordered structures exactly when `PTIME = PSPACE`.
 A corollary of the two capture theorems; see the module docstring for what it
 does *not* say (the unordered statement). -/
 theorem ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace :
-    (∀ {L : Language.{0, 0}} (P : DecisionProblem L),
+    (∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
         IFPDefinable P ↔ PFPDefinable P) ↔ PTIME = PSPACE := by
   constructor
   · intro h
-    have hMem : ∀ {L : Language.{0, 0}} (P : DecisionProblem L),
+    have hMem : ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
         SigmaSOHornDefinable P ↔ SOTCDefinable P := by
-      intro L P
+      intro L _ P
       constructor
       · intro hp
         exact ((h P).mp (SigmaSOHornDefinable.lfpDefinable hp).ifpDefinable).sotcDefinable
@@ -54,11 +54,11 @@ theorem ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace :
         exact (pfpDefinable_iff_mem_PSPACE P).mpr hp
     refine ComplexityClass.ext (fun P => hMem P) fun P => ?_
     constructor
-    · intro hh L' _ S hS L'' Q hQ
+    · intro hh L' _ S hS L'' _ Q hQ
       exact hh S hS Q ((hMem Q).mpr hQ)
-    · intro hh L' _ S hS L'' Q hQ
+    · intro hh L' _ S hS L'' _ Q hQ
       exact hh S hS Q ((hMem Q).mp hQ)
-  · intro h L P
+  · intro h L _ P
     constructor
     · exact IFPDefinable.pfpDefinable
     · intro hp

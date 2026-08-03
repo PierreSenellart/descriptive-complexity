@@ -507,14 +507,14 @@ linear order, so the notion is order-invariant – and, as there, the order is
 genuinely needed: it is the setting of the capture theorem, and no guess
 replaces it the way one does for SO(TC)
 (`DescriptiveComplexity.sotcDefinable_iff_free`). -/
-def LFPDefinable {L : Language.{0, 0}} (P : DecisionProblem L) : Prop :=
+def LFPDefinable {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ d : LFPDef L, ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
     P A ↔ d.Holds A
 
 /-- **FO(LFP) definability is closed under complement.** This is the one line
 that the Horn fragment cannot supply, and the reason to have the logic at all:
 negate the output formula. -/
-theorem LFPDefinable.compl {L : Language.{0, 0}} {P : DecisionProblem L}
+theorem LFPDefinable.compl {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : LFPDefinable P) : LFPDefinable Pᶜ := by
   obtain ⟨d, hd⟩ := h
   refine ⟨d.not, ?_⟩
@@ -619,7 +619,7 @@ end Realize
 
 /-- **Every SO-Horn definition is an FO(LFP) definition**: keep the rules,
 and turn the goal clauses into the output formula. -/
-theorem SigmaSOHornDefinable.lfpDefinable {P : DecisionProblem L}
+theorem SigmaSOHornDefinable.lfpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSOHornDefinable P) : LFPDefinable P := by
   obtain ⟨B, k, prog, hprog⟩ := h
   refine ⟨⟨B, k, prog, hornOutF prog⟩, ?_⟩
@@ -642,7 +642,7 @@ theorem SigmaSOHornDefinable.lfpDefinable {P : DecisionProblem L}
 
 /-- The complements of the SO-Horn definable problems are FO(LFP) definable
 too – which is what the Horn fragment on its own cannot say. -/
-theorem SigmaSOHornDefinable.compl_lfpDefinable {P : DecisionProblem L}
+theorem SigmaSOHornDefinable.compl_lfpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSOHornDefinable Pᶜ) : LFPDefinable P := by
   have h2 := (SigmaSOHornDefinable.lfpDefinable h).compl
   rwa [DecisionProblem.compl_compl] at h2
@@ -654,7 +654,7 @@ end OfHorn
 
 section Closure
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
 variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
 /-- **FO(LFP) definability is closed under ordered first-order reductions.**

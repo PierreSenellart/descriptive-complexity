@@ -5,7 +5,6 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.FinSat.Membership
 import DescriptiveComplexity.Problems.FinSat.Reduction
-import DescriptiveComplexity.Relationalize
 
 /-!
 # Trakhtenbrot's theorem: finite satisfiability is RE-complete
@@ -31,16 +30,11 @@ The mathematical content of hardness is
 the sentence `σ_A` – an existential prefix naming the elements of the instance, a
 diagram forcing them apart, and the negation-normal-form translation of the
 kernel, whose atoms of the instance's own vocabulary are read by the
-*interpretation* and never mentioned by the sentence. It asks the source
-vocabulary to be **relational**, because the encoded sentence carries its own
+*interpretation* and never mentioned by the sentence. The construction works
+because the source vocabulary is **relational** – as every vocabulary of a
+`DescriptiveComplexity.DecisionProblem` is: the encoded sentence carries its own
 quantifiers and would otherwise have to name what a function symbol does on an
 invented value – an undefinable junk element.
-
-`DescriptiveComplexity.CofinalHard` quantifies over every source vocabulary, and
-the step from one to the other is
-`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable`
-(`DescriptiveComplexity.Relationalize`): every `∃SO[new]`-definable problem
-reduces to an `∃SO[new]`-definable problem over the atomic diagram language.
 
 ## What the theorem does and does not say
 
@@ -59,21 +53,15 @@ open FirstOrder
 open Language
 
 /-- **The hardness half of Trakhtenbrot's theorem**: every `∃SO[new]`-definable
-problem, over *any* vocabulary, admits an ordered first-order reduction to
-finite satisfiability.
-
-The source is first moved to a relational vocabulary
-(`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable`), where
-`DescriptiveComplexity.FinSat.finsat_hard_of_sigmaSONewDefinable` – the encoded
-sentence `σ_A` – applies. -/
+problem admits an ordered first-order reduction to finite satisfiability –
+`DescriptiveComplexity.FinSat.finsat_hard_of_sigmaSONewDefinable`, the encoded
+sentence `σ_A`, in the relativized form hardness is stated in. -/
 theorem finsat_hard_of_sigmaSONewDefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSONewDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] FINSAT) := by
-  intro L Q hQ
-  obtain ⟨L', hrel, Q', hQ', ⟨f⟩⟩ := exists_relational_of_sigmaSONewDefinable hQ
-  haveI := hrel
-  obtain ⟨g⟩ := FinSat.finsat_hard_of_sigmaSONewDefinable Q' hQ'
-  exact ⟨f.toOrdered.toRel.trans g.toRel⟩
+  intro L _ Q hQ
+  obtain ⟨g⟩ := FinSat.finsat_hard_of_sigmaSONewDefinable Q hQ
+  exact ⟨g.toRel⟩
 
 /-- **Trakhtenbrot's theorem, in the logical form**: finite satisfiability of a
 first-order sentence is RE-complete.

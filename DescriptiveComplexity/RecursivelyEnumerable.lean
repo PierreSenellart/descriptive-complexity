@@ -83,18 +83,18 @@ noncomputable abbrev coRE : ComplexityClass := RE.compl
 variable {L : Language.{0, 0}}
 
 @[simp]
-theorem mem_RE_iff (P : DecisionProblem L) : P ∈ RE ↔ SigmaSONewDefinable P :=
+theorem mem_RE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ RE ↔ SigmaSONewDefinable P :=
   Iff.rfl
 
 @[simp]
-theorem mem_coRE_iff (P : DecisionProblem L) : P ∈ coRE ↔ SigmaSONewDefinable Pᶜ :=
+theorem mem_coRE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ coRE ↔ SigmaSONewDefinable Pᶜ :=
   Iff.rfl
 
 /-- Over a relational vocabulary, cofinal RE-hardness is the usual notion:
 every `∃SO[new]`-definable problem reduces to `P`. -/
 theorem hard_RE_iff [L.IsRelational] (P : DecisionProblem L) :
     RE.Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SigmaSONewDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
@@ -102,10 +102,10 @@ theorem hard_RE_iff [L.IsRelational] (P : DecisionProblem L) :
 sentence that invents nothing (`DescriptiveComplexity.SigmaSODefinable.toNew`).
 -/
 theorem NP_subset_RE : NP ⊆ RE :=
-  fun _ _ hP => SigmaSODefinable.toNew hP
+  fun _ _ _ hP => SigmaSODefinable.toNew hP
 
 /-- `coNP ⊆ coRE`, by complementing `DescriptiveComplexity.NP_subset_RE`. -/
 theorem coNP_subset_coRE : coNP ⊆ coRE :=
-  fun _ P hP => NP_subset_RE ((mem_piP_iff 1 P).mp hP)
+  fun _ _ P hP => NP_subset_RE ((mem_piP_iff 1 P).mp hP)
 
 end DescriptiveComplexity

@@ -2195,7 +2195,8 @@ specification, and determinism of the control is functionality of the walk –
 and the other is the machine built here: it scans where the machine of
 `DescriptiveComplexity.HeadCapture` guesses, and counts so that a walk leading nowhere
 is abandoned. -/
-theorem dtcDefinable_iff_automaton {P : DecisionProblem L} :
+theorem dtcDefinable_iff_automaton {L : Language.{0, 0}} [L.IsRelational]
+    {P : DecisionProblem L} :
     DTCDefinable P ↔ ∃ (k : ℕ) (M : HeadAutomaton L k) (_ : M.IsDeterministic),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
         P A ↔ M.Accepts A := by
@@ -2211,7 +2212,8 @@ theorem dtcDefinable_iff_automaton {P : DecisionProblem L} :
 automata**: membership in `DescriptiveComplexity.LOGSPACE` is recognizability by such
 a machine, the deterministic counterpart of
 `DescriptiveComplexity.mem_NL_iff_automaton`. -/
-theorem mem_LOGSPACE_iff_automaton {P : DecisionProblem L} :
+theorem mem_LOGSPACE_iff_automaton {L : Language.{0, 0}} [L.IsRelational]
+    {P : DecisionProblem L} :
     P ∈ LOGSPACE ↔ ∃ (k : ℕ) (M : HeadAutomaton L k) (_ : M.IsDeterministic),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
         P A ↔ M.Accepts A :=

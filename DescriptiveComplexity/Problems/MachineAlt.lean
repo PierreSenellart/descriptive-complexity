@@ -162,7 +162,7 @@ level exactly when it ordered-FO-reduces to acceptance by an alternating
 machine with `k + 1` blocks starting existentially. Forward through
 `DescriptiveComplexity.QBF`, backward because membership travels along
 reductions. -/
-theorem mem_sigmaP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} (k : ℕ)
+theorem mem_sigmaP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} [L.IsRelational] (k : ℕ)
     (P : DecisionProblem L) :
     P ∈ SigmaP (k + 1) ↔ Nonempty (P ≤ᶠᵒ[≤] ATMAccept (k + 1) true) := by
   constructor
@@ -184,7 +184,7 @@ theorem atmAccept_one_coNP_complete : coNP.Complete (ATMAccept 1 false) :=
   atmAccept_piP_complete 0
 
 /-- **The machine characterization of `Πₖ₊₁ᵖ`.** -/
-theorem mem_piP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} (k : ℕ)
+theorem mem_piP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} [L.IsRelational] (k : ℕ)
     (P : DecisionProblem L) :
     P ∈ PiP (k + 1) ↔ Nonempty (P ≤ᶠᵒ[≤] ATMAccept (k + 1) false) := by
   constructor

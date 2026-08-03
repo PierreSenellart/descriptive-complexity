@@ -81,7 +81,7 @@ theorem ntmAccept_NP_complete : NP.Complete NTMAccept :=
 when it ordered-FO-reduces to machine acceptance. Forward through SAT – the
 generic Tseitin discharge followed by the machine of a CNF formula – and
 backward because membership travels along reductions. -/
-theorem mem_NP_iff_le_ntmAccept {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem mem_NP_iff_le_ntmAccept {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ NP ↔ Nonempty (P ≤ᶠᵒ[≤] NTMAccept) := by
   constructor
   · intro hP
@@ -151,7 +151,7 @@ theorem dtmAccept_PTIME_complete : PTIME.Complete DTMAccept :=
 deterministic machine acceptance. Forward through HORN-SAT – the Horn
 discharge followed by the unit-propagation machine – and backward because
 membership travels along reductions. -/
-theorem mem_PTIME_iff_le_dtmAccept {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem mem_PTIME_iff_le_dtmAccept {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PTIME ↔ Nonempty (P ≤ᶠᵒ[≤] DTMAccept) := by
   constructor
   · intro hP

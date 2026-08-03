@@ -403,7 +403,7 @@ theorem qbf_inner (a₀ : A) (μ : (mergeBlocks (B :: Bs)).Assignment A) :
 /-- **Correctness of the reduction**: the interpreted quantified Boolean
 formula is true exactly when the second-order sentence holds. -/
 theorem qbfRed_correct [Finite A] [Nonempty A] :
-    @DecisionProblem.Holds _ (QbfProblem (Bs.length + 1) st (!qbfSwap st Bs))
+    @DecisionProblem.Holds _ _ (QbfProblem (Bs.length + 1) st (!qbfSwap st Bs))
         ((qbfRedInterp st B Bs φ).Map A) _ ↔
       SORealize L A (B :: Bs) φ st := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
@@ -513,7 +513,7 @@ theorem qbfRed_correct [Finite A] [Nonempty A] :
 /-- **The generic marked Tseitin reduction**: an ordered first-order reduction
 to a quantified Boolean formula problem, from any problem defined on nonempty
 finite structures by a second-order sentence with a nonempty prefix. -/
-noncomputable def qbfReduction (Q : DecisionProblem L)
+noncomputable def qbfReduction [L.IsRelational] (Q : DecisionProblem L)
     (hφ : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
       Q A ↔ SORealize L A (B :: Bs) φ st) :
     Q ≤ᶠᵒ[≤] QbfProblem (Bs.length + 1) st (!qbfSwap st Bs) where
@@ -539,9 +539,9 @@ are marked with the block they belong to – the gate variables with the
 innermost one, which is why the matrix and the encoded sentence follow the
 parity of `k + 1`. -/
 theorem qbf_hard_of_sigmaSODefinable (k : ℕ) :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] QBF (k + 1)) := by
-  rintro L Q ⟨Bs, hlen, φ, hφ⟩
+  rintro L _ Q ⟨Bs, hlen, φ, hφ⟩
   cases Bs with
   | nil => exact absurd hlen (by simp)
   | cons B Bs' =>
@@ -561,9 +561,9 @@ prefix of `k + 1` blocks is existential exactly when `k + 1` is *even*, so
 `QBFPi k` takes a conjunctive matrix for even `k` and a disjunctive one for
 odd `k` – the mirror image of `DescriptiveComplexity.QBF`. -/
 theorem qbfPi_hard_of_piSODefinable (k : ℕ) :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       PiSODefinable (k + 1) Q → Nonempty (Q ≤ᶠᵒ[≤] QBFPi (k + 1)) := by
-  rintro L Q ⟨Bs, hlen, φ, hφ⟩
+  rintro L _ Q ⟨Bs, hlen, φ, hφ⟩
   cases Bs with
   | nil => exact absurd hlen (by simp)
   | cons B Bs' =>

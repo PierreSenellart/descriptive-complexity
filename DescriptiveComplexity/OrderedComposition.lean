@@ -244,7 +244,7 @@ end OrdExtend
 
 section Trans
 
-variable {L₁ L₂ L₃ : Language.{0, 0}} [L₂.IsRelational] [L₃.IsRelational]
+variable {L₁ L₂ L₃ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational] [L₃.IsRelational]
 variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂} {R : DecisionProblem L₃}
 
 /-- **Transitivity of ordered FO reductions**: if `P ≤ᶠᵒ[≤] Q` and

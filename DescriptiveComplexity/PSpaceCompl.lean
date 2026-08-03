@@ -48,14 +48,14 @@ problem is SO(TC) definable.
 
 Reduce to QSAT – through SUCCINCT-REACH and Savitch's recursive doubling – and
 read the deterministic evaluation walk of QSAT backwards. -/
-theorem SOTCDefinable.compl {P : DecisionProblem L} (h : SOTCDefinable P) :
+theorem SOTCDefinable.compl [L.IsRelational] {P : DecisionProblem L} (h : SOTCDefinable P) :
     SOTCDefinable Pᶜ := by
   obtain ⟨f⟩ := succinctReach_hard_of_sotcDefinable P h
   exact qsatCompl_sotcDefinable.of_orderedReduction
     (f.trans succinctReach_ordered_fo_reduction_qsat).compl
 
 /-- Complementation is a bijection of the SO(TC) definable problems. -/
-theorem sotcDefinable_compl_iff (P : DecisionProblem L) :
+theorem sotcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
     SOTCDefinable Pᶜ ↔ SOTCDefinable P := by
   refine ⟨fun h => ?_, SOTCDefinable.compl⟩
   have h2 := h.compl
@@ -67,13 +67,13 @@ theorem sotcDefinable_compl_iff (P : DecisionProblem L) :
 theorem PSPACE_eq_coPSPACE : PSPACE = coPSPACE := by
   refine ComplexityClass.ext (fun P => (sotcDefinable_compl_iff P).symm) fun P => ?_
   constructor
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((sotcDefinable_compl_iff Q).mp hQ)
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((sotcDefinable_compl_iff Q).mpr hQ)
 
 /-- Membership in PSPACE is closed under complement. -/
-theorem mem_PSPACE_compl_iff (P : DecisionProblem L) : Pᶜ ∈ PSPACE ↔ P ∈ PSPACE :=
+theorem mem_PSPACE_compl_iff [L.IsRelational] (P : DecisionProblem L) : Pᶜ ∈ PSPACE ↔ P ∈ PSPACE :=
   sotcDefinable_compl_iff P
 
 /-- **QSAT is coPSPACE-complete**, since PSPACE and coPSPACE coincide. -/

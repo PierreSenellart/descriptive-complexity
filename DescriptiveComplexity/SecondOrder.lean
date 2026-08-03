@@ -125,7 +125,7 @@ variable {L : Language.{0, 0}}
 is defined by a second-order sentence with `k` alternating blocks of
 second-order quantifiers, starting existentially. (As everywhere in this
 development, complexity notions are about nonempty finite structures.) -/
-def SigmaSODefinable (k : ℕ) (P : DecisionProblem L) : Prop :=
+def SigmaSODefinable [L.IsRelational] (k : ℕ) (P : DecisionProblem L) : Prop :=
   ∃ Bs : List SOBlock, Bs.length = k ∧
     ∃ φ : (soLang L Bs).Sentence,
       ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], P A ↔ SORealize L A Bs φ true
@@ -133,7 +133,7 @@ def SigmaSODefinable (k : ℕ) (P : DecisionProblem L) : Prop :=
 /-- A decision problem is `Πₖ`-definable if, on nonempty finite structures, it
 is defined by a second-order sentence with `k` alternating blocks of
 second-order quantifiers, starting universally. -/
-def PiSODefinable (k : ℕ) (P : DecisionProblem L) : Prop :=
+def PiSODefinable [L.IsRelational] (k : ℕ) (P : DecisionProblem L) : Prop :=
   ∃ Bs : List SOBlock, Bs.length = k ∧
     ∃ φ : (soLang L Bs).Sentence,
       ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], P A ↔ SORealize L A Bs φ false
@@ -241,7 +241,7 @@ private theorem sorealize_not :
         exact (ih _ _ _ φ true).mpr fun hρ => h ⟨ρ, hρ⟩
 
 /-- A problem is `Πₖ`-definable iff its complement is `Σₖ`-definable. -/
-theorem piSODefinable_iff_compl (k : ℕ) (P : DecisionProblem L) :
+theorem piSODefinable_iff_compl [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
     PiSODefinable k P ↔ SigmaSODefinable k Pᶜ := by
   constructor
   · rintro ⟨Bs, hk, φ, hφ⟩
@@ -258,7 +258,7 @@ theorem piSODefinable_iff_compl (k : ℕ) (P : DecisionProblem L) :
     exact (not_not.symm.trans (not_congr (hφ A))).trans hd.symm
 
 /-- A problem is `Σₖ`-definable iff its complement is `Πₖ`-definable. -/
-theorem sigmaSODefinable_iff_compl (k : ℕ) (P : DecisionProblem L) :
+theorem sigmaSODefinable_iff_compl [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
     SigmaSODefinable k P ↔ PiSODefinable k Pᶜ := by
   rw [piSODefinable_iff_compl, DecisionProblem.compl_compl]
 

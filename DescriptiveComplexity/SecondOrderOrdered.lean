@@ -223,7 +223,7 @@ order-invariant. -/
 
 section OrderPull
 
-variable {L₁ : Language.{0, 0}} {P : DecisionProblem L₁} {k : ℕ}
+variable {L₁ : Language.{0, 0}} [L₁.IsRelational] {P : DecisionProblem L₁} {k : ℕ}
 
 /-- **Order elimination, existentially**: a problem defined by a `Σₖ₊₁`
 sentence over the ordered expansion, correct for *some* linear order on each
@@ -320,7 +320,7 @@ end OrderPull
 
 section Closure
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
 variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂} {k : ℕ}
 
 /-- `Σₖ₊₁`-definability is closed under ordered FO reductions: the order is

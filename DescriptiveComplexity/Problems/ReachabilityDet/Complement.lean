@@ -683,13 +683,13 @@ theorem unreachd_dtcDefinable : DTCDefinable REACHdᶜ := by
 /-- **FO(DTC) definability is closed under complement.** The complement of `P`
 reduces to the complement of REACHd – a reduction complements along with its two
 problems – and that complement is FO(DTC) definable. -/
-theorem dtcDefinable_compl {L : Language.{0, 0}} {P : DecisionProblem L}
+theorem dtcDefinable_compl {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : DTCDefinable P) : DTCDefinable Pᶜ := by
   obtain ⟨f⟩ := reachd_hard_of_dtcDefinable P h
   exact unreachd_dtcDefinable.of_orderedReduction f.compl
 
 /-- Membership in LOGSPACE is closed under complement. -/
-theorem mem_LOGSPACE_compl_iff {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem mem_LOGSPACE_compl_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     Pᶜ ∈ LOGSPACE ↔ P ∈ LOGSPACE := by
   refine ⟨fun h => ?_, fun h => dtcDefinable_compl h⟩
   have h' := dtcDefinable_compl h
@@ -707,9 +707,9 @@ out. -/
 theorem LOGSPACE_eq_coLOGSPACE : LOGSPACE = coLOGSPACE := by
   refine ComplexityClass.ext (fun P => (mem_LOGSPACE_compl_iff P).symm) fun P => ?_
   constructor
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((mem_LOGSPACE_compl_iff Q).mp hQ)
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((mem_LOGSPACE_compl_iff Q).mpr hQ)
 
 /-- **UNREACHd**, the complement of REACHd: no marked target is reachable from a

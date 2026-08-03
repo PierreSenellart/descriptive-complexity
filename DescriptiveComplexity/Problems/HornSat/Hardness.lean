@@ -348,8 +348,8 @@ end Correctness
 /-- **The generic Horn reduction**: an ordered first-order reduction to
 HORN-SAT from any problem defined, on nonempty finite structures, by an
 existential second-order sentence with a Horn kernel. -/
-noncomputable def hornReduction (prog : HornProgram (L.sum Language.order) B k)
-    (Q : DecisionProblem L)
+noncomputable def hornReduction [L.IsRelational]
+    (prog : HornProgram (L.sum Language.order) B k) (Q : DecisionProblem L)
     (hQ : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       Q A ↔ ∃ ρ : B.Assignment A, prog.Holds ρ) : Q ≤ᶠᵒ[≤] HORNSAT where
   Tag := HornTag prog
@@ -364,9 +364,9 @@ admits an ordered first-order reduction to HORN-SAT. This is the Horn analogue
 of the Cook–Levin discharge `DescriptiveComplexity.sat_hard_of_sigmaSODefinable`, one
 level below it. -/
 theorem hornSat_hard_of_sigmaSOHornDefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSOHornDefinable Q → Nonempty (Q ≤ᶠᵒ[≤] HORNSAT) := by
-  rintro L Q ⟨B, k, prog, hprog⟩
+  rintro L _ Q ⟨B, k, prog, hprog⟩
   exact ⟨hornReduction prog Q hprog⟩
 
 end DescriptiveComplexity

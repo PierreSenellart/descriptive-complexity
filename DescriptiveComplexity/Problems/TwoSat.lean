@@ -74,26 +74,26 @@ syntactic route – a Krom kernel is not a Horn kernel – so it goes through th
 complete problem, exactly as `DescriptiveComplexity.PTIME_subset_NP` goes through
 HORN-SAT. -/
 theorem NL_subset_PTIME : NL ⊆ PTIME := by
-  intro L P hP
+  intro L _ P hP
   obtain ⟨f⟩ := twoSat_hard_of_sigmaSOKromDefinable P hP
   exact PTIME.mem_of_orderedReduction f twoSat_mem_PTIME
 
 /-- **NL ⊆ NP**, by composing `DescriptiveComplexity.NL_subset_PTIME` with
 `DescriptiveComplexity.PTIME_subset_NP`. -/
 theorem NL_subset_NP : NL ⊆ NP := by
-  intro L P hP
+  intro L _ P hP
   exact PTIME_subset_NP (NL_subset_PTIME hP)
 
 /-- **L ⊆ PTIME**, by composing `DescriptiveComplexity.LOGSPACE_subset_NL` with
 `DescriptiveComplexity.NL_subset_PTIME`: a deterministic walk is a walk, and NL is
 inside polynomial time through 2SAT. -/
 theorem LOGSPACE_subset_PTIME : LOGSPACE ⊆ PTIME := by
-  intro L P hP
+  intro L _ P hP
   exact NL_subset_PTIME (LOGSPACE_subset_NL hP)
 
 /-- **L ⊆ NP**, in the same way. -/
 theorem LOGSPACE_subset_NP : LOGSPACE ⊆ NP := by
-  intro L P hP
+  intro L _ P hP
   exact PTIME_subset_NP (LOGSPACE_subset_PTIME hP)
 
 end DescriptiveComplexity

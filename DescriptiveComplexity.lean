@@ -69,7 +69,6 @@ import DescriptiveComplexity.Invariant.EquivK
 import DescriptiveComplexity.Invariant.Stages
 import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.PSpaceHierarchy
-import DescriptiveComplexity.Relationalize
 import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -113,9 +112,12 @@ individual declarations are documented on their own pages.
 ## The framework: problems, interpretations, reductions
 
 * `DescriptiveComplexity.Interpretation` – a `DescriptiveComplexity.DecisionProblem`
-  is an isomorphism-invariant property of finite structures of a language
-  (invariance is baked into the notion, as is standard in descriptive
-  complexity). A `DescriptiveComplexity.FOInterpretation` is a tagged,
+  is an isomorphism-invariant property of finite structures of a *relational*
+  language (invariance is baked into the notion, as is standard in descriptive
+  complexity; so is relationality, via an `IsRelational` instance argument –
+  the standing convention of the field, so every class equality below is a
+  statement about relational problems). A
+  `DescriptiveComplexity.FOInterpretation` is a tagged,
   `dim`-dimensional first-order interpretation of one language in another,
   and a `DescriptiveComplexity.FOReduction` (notation `P ≤ᶠᵒ Q`) is one that
   maps yes-instances exactly to yes-instances, on the *finite* nonempty
@@ -738,20 +740,6 @@ individual declarations are documented on their own pages.
   problem is finite satisfiability, by Trakhtenbrot's theorem
   (`DescriptiveComplexity.Problems.FinSat`), and Post's correspondence problem
   is a member of it (`DescriptiveComplexity.pcp_mem_RE`).
-* `DescriptiveComplexity.Relationalize` – **removing function symbols from a
-  source**: every `∃SO[new]`-definable problem admits a first-order reduction to
-  an `∃SO[new]`-definable problem over a *relational* vocabulary
-  (`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable`), the
-  **atomic diagram language** `DescriptiveComplexity.atomLang` – one relation
-  symbol of arity `n` per atomic formula of the source in `n` variables. A
-  hardness proof whose target must *name* what a function does, rather than read
-  it off the source through a defining formula, needs this. Two things make it
-  work: the junk element by which an extended universe interprets a function on
-  an invented argument may be *guessed*, since transporting the instance along a
-  transposition moves it (`DescriptiveComplexity.sigmaSONewDefinable_junk`), and
-  the kernel is then translated atom by atom *in place*, each atom becoming a
-  short existential block holding the coerced context, the guessed junk and the
-  values of the arguments, so that no de Bruijn index is ever shifted.
 
 ## Shared encodings
 
@@ -1061,8 +1049,8 @@ Headline results and cross-references:
   needs no context tuples, and its vocabulary is *only* the relation variables of
   the block: `old` and the symbols of the source are translated away into
   disjunctions indexed by the tuples the interpretation's own formulas select.
-  Function symbols in the source are removed beforehand, by
-  `DescriptiveComplexity.Relationalize`.
+  The source vocabulary is relational, as every vocabulary of a
+  `DescriptiveComplexity.DecisionProblem` is.
 
   The **halting problem** (`DescriptiveComplexity.HALT`) is the same machine data
   as the NP and PSPACE bridges with *both* bounds dropped: the tape is an

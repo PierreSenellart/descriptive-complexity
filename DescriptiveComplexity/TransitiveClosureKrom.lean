@@ -330,14 +330,14 @@ relation variable per mode – close it under predecessors with the 2-clause
 `¬U_q(ȳ) ∨ U_p(x̄)`, and forbid the starting nodes. This is the direction a
 clausal fragment gives for free; the converse is Immerman–Szelepcsényi. -/
 theorem SigmaSOKromDefinable.compl_of_tcDefinable {L : Language.{0, 0}}
-    {P : DecisionProblem L} (h : TCDefinable P) : SigmaSOKromDefinable Pᶜ := by
+    [L.IsRelational] {P : DecisionProblem L} (h : TCDefinable P) : SigmaSOKromDefinable Pᶜ := by
   obtain ⟨spec, hspec⟩ := h
   refine ⟨uBlock spec, spec.k + spec.k, program spec, ?_⟩
   intro A _ _ _ _
   exact (not_congr (hspec A)).trans (exists_holds_iff_not_accepts spec).symm
 
 /-- **The complement of an FO(TC) definable problem is in NL.** -/
-theorem mem_NL_compl_of_tcDefinable {L : Language.{0, 0}} {P : DecisionProblem L}
+theorem mem_NL_compl_of_tcDefinable {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : TCDefinable P) : Pᶜ ∈ NL :=
   (mem_NL_iff Pᶜ).mpr (SigmaSOKromDefinable.compl_of_tcDefinable h)
 

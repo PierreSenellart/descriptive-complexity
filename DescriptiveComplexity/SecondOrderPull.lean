@@ -289,7 +289,8 @@ end PullSO
 
 section Closure
 
-variable [L₂.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂} {k : ℕ}
+variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
+variable {k : ℕ}
 
 /-- `Σₖ`-definability is closed under first-order reductions. -/
 theorem SigmaSODefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : SigmaSODefinable k Q) :

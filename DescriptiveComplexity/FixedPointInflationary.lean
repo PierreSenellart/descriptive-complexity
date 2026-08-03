@@ -106,7 +106,7 @@ finite structures, it is the value of a simultaneous induction over its own
 vocabulary, read inflationarily. This is the unordered notion the
 Abiteboul–Vianu theorem is about; the capture theorem for PTIME instead uses
 the ordered `DescriptiveComplexity.IFPDefinable`. -/
-def IFPDefinableFree (P : DecisionProblem L) : Prop :=
+def IFPDefinableFree [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ d : StepDef L, ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
     P A ↔ d.IFPHolds A
 
@@ -116,14 +116,14 @@ ordered expansion of its vocabulary, read inflationarily. As everywhere in
 this library, the equivalence is required for every linear order, so the
 notion is order-invariant: the formulas see the order, the problem does
 not. -/
-def IFPDefinable (P : DecisionProblem L) : Prop :=
+def IFPDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ d : StepDef (L.sum Language.order),
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ d.IFPHolds A
 
 /-- Order-free FO(IFP) definability only depends on the finite instances of a
 problem. -/
-theorem ifpDefinableFree_congr {P Q : DecisionProblem L}
+theorem ifpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     IFPDefinableFree P ↔ IFPDefinableFree Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _
@@ -132,7 +132,7 @@ theorem ifpDefinableFree_congr {P Q : DecisionProblem L}
 
 /-- FO(≤, IFP) definability only depends on the finite instances of a
 problem. -/
-theorem ifpDefinable_congr {P Q : DecisionProblem L}
+theorem ifpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     IFPDefinable P ↔ IFPDefinable Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _ _
@@ -141,7 +141,7 @@ theorem ifpDefinable_congr {P Q : DecisionProblem L}
 
 /-- **Order-free FO(IFP) definability is closed under complement**: negate the
 output formula. -/
-theorem IFPDefinableFree.compl {P : DecisionProblem L}
+theorem IFPDefinableFree.compl [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinableFree P) : IFPDefinableFree Pᶜ := by
   obtain ⟨d, hd⟩ := h
   refine ⟨d.not, ?_⟩
@@ -150,7 +150,7 @@ theorem IFPDefinableFree.compl {P : DecisionProblem L}
 
 /-- **FO(≤, IFP) definability is closed under complement**: negate the output
 formula. -/
-theorem IFPDefinable.compl {P : DecisionProblem L}
+theorem IFPDefinable.compl [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinable P) : IFPDefinable Pᶜ := by
   obtain ⟨d, hd⟩ := h
   refine ⟨d.not, ?_⟩
@@ -161,7 +161,7 @@ theorem IFPDefinable.compl {P : DecisionProblem L}
 
 section Closure
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
 variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
 /-- **Order-free FO(IFP) definability is closed under first-order
@@ -412,7 +412,8 @@ theorem inflLimit_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrd
 as one simultaneous step; inflation iterates them to their least fixed point,
 and the output survives unchanged. (The converse, closing the circle back
 into FO(LFP), is `DescriptiveComplexity.FixedPointInflationaryLFP`.) -/
-theorem LFPDefinable.ifpDefinable {P : DecisionProblem L} (h : LFPDefinable P) :
+theorem LFPDefinable.ifpDefinable [L.IsRelational] {P : DecisionProblem L}
+    (h : LFPDefinable P) :
     IFPDefinable P := by
   obtain ⟨d, hd⟩ := h
   refine ⟨d.toStepDef, ?_⟩

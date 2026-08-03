@@ -136,7 +136,7 @@ interpretation: like `DescriptiveComplexity.OrderedFOReduction`, but the target 
 the definable subset carved out by the domain formula. The `Nonempty Tag`
 field of the ordinary reduction is replaced by `dom_nonempty`, since a
 definable domain may be empty even when the tags and the input are not. -/
-structure RelOrderedFOReduction [L'.IsRelational]
+structure RelOrderedFOReduction [L.IsRelational] [L'.IsRelational]
     (P : DecisionProblem L) (Q : DecisionProblem L') where
   /-- The tags used by the underlying interpretation. -/
   Tag : Type
@@ -159,7 +159,7 @@ scoped notation:50 P:51 " ≤ʳᶠᵒ[≤] " Q:51 => RelOrderedFOReduction P Q
 
 namespace RelOrderedFOReduction
 
-variable [L'.IsRelational] {P : DecisionProblem L} {Q : DecisionProblem L'}
+variable [L.IsRelational] [L'.IsRelational] {P : DecisionProblem L} {Q : DecisionProblem L'}
 
 /-- The relativized universe of the output of a reduction is nonempty on
 nonempty finite ordered inputs. -/
@@ -173,8 +173,8 @@ end RelOrderedFOReduction
 /-- An ordinary ordered FO reduction is a relativized one with `⊤` domain: the
 correctness is transported across `DescriptiveComplexity.FOInterpretation.toRelLEquiv`, and the
 domain is inhabited by any tag and any constant tuple. -/
-def OrderedFOReduction.toRel [L'.IsRelational] {P : DecisionProblem L} {Q : DecisionProblem L'}
-    (f : P ≤ᶠᵒ[≤] Q) : P ≤ʳᶠᵒ[≤] Q :=
+def OrderedFOReduction.toRel [L.IsRelational] [L'.IsRelational] {P : DecisionProblem L}
+    {Q : DecisionProblem L'} (f : P ≤ᶠᵒ[≤] Q) : P ≤ʳᶠᵒ[≤] Q :=
   letI := f.tagFinite
   letI := f.tagNonempty
   { Tag := f.Tag
@@ -186,7 +186,7 @@ def OrderedFOReduction.toRel [L'.IsRelational] {P : DecisionProblem L} {Q : Deci
 
 /-- A relativized reduction can be transported along an agreement of the source
 problems on finite structures. -/
-def RelOrderedFOReduction.congrSource [L'.IsRelational] {P P' : DecisionProblem L}
+def RelOrderedFOReduction.congrSource [L.IsRelational] [L'.IsRelational] {P P' : DecisionProblem L}
     {S : DecisionProblem L'} (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ P' A)
     (g : P ≤ʳᶠᵒ[≤] S) : P' ≤ʳᶠᵒ[≤] S :=
   letI := g.tagFinite

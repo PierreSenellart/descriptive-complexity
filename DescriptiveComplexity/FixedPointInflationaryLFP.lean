@@ -1968,7 +1968,7 @@ open IFPLfp in
 the capture theorem FO(≤, IFP) = PTIME – translate the inflationary iteration
 into a stage walk with a dual truth/falsity evaluator for the step
 formulas. -/
-theorem IFPDefinable.lfpDefinable {L : Language.{0, 0}} {P : DecisionProblem L}
+theorem IFPDefinable.lfpDefinable {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinable P) : LFPDefinable P := by
   obtain ⟨d, hd⟩ := h
   refine ⟨trDef d, ?_⟩
@@ -1979,13 +1979,14 @@ theorem IFPDefinable.lfpDefinable {L : Language.{0, 0}} {P : DecisionProblem L}
 ordered structures, and indeed on all structures, the inflationary fixed
 point adds no power over the least fixed point; here the ordered capture,
 proved by translation in both directions). -/
-theorem ifpDefinable_iff_lfpDefinable {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem ifpDefinable_iff_lfpDefinable {L : Language.{0, 0}} [L.IsRelational]
+    (P : DecisionProblem L) :
     IFPDefinable P ↔ LFPDefinable P :=
   ⟨IFPDefinable.lfpDefinable, LFPDefinable.ifpDefinable⟩
 
 /-- **The capture theorem FO(≤, IFP) = PTIME**: a problem is FO(≤, IFP)
 definable exactly when it is in PTIME. -/
-theorem ifpDefinable_iff_mem_PTIME {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem ifpDefinable_iff_mem_PTIME {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     IFPDefinable P ↔ P ∈ PTIME :=
   (ifpDefinable_iff_lfpDefinable P).trans (lfpDefinable_iff_sigmaSOHornDefinable P)
 

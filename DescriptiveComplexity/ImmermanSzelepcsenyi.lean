@@ -49,7 +49,8 @@ modes are the control states (a phase, one flag and the mode of each of eight
 registers) and its tuples hold the eight registers side by side, so that
 counting the nodes of every layer of the given walk – and certifying, at the
 last layer, that no accepting node was ever counted in – is itself one walk. -/
-theorem TCDefinable.compl {P : DecisionProblem L} (h : TCDefinable P) : TCDefinable Pᶜ := by
+theorem TCDefinable.compl [L.IsRelational] {P : DecisionProblem L} (h : TCDefinable P) :
+    TCDefinable Pᶜ := by
   classical
   obtain ⟨spec, hspec⟩ := h
   letI : LinearOrder (spec.pad).Mode :=
@@ -60,7 +61,8 @@ theorem TCDefinable.compl {P : DecisionProblem L} (h : TCDefinable P) : TCDefina
   exact not_congr ((hspec A).trans (spec.pad_accepts_iff A).symm)
 
 /-- Complementation is a bijection of the FO(TC) definable problems. -/
-theorem tcDefinable_compl_iff (P : DecisionProblem L) : TCDefinable Pᶜ ↔ TCDefinable P := by
+theorem tcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
+    TCDefinable Pᶜ ↔ TCDefinable P := by
   refine ⟨fun h => ?_, TCDefinable.compl⟩
   have h2 := h.compl
   rwa [DecisionProblem.compl_compl] at h2
@@ -70,13 +72,13 @@ theorem tcDefinable_compl_iff (P : DecisionProblem L) : TCDefinable Pᶜ ↔ TCD
 /-- **NL is FO(TC)**: a problem is in NL exactly when it is FO(TC) definable.
 The two translations against the Krom fragment give this only up to a
 complement; Immerman–Szelepcsényi removes it. -/
-theorem tcDefinable_iff_mem_NL (P : DecisionProblem L) : TCDefinable P ↔ P ∈ NL :=
+theorem tcDefinable_iff_mem_NL [L.IsRelational] (P : DecisionProblem L) : TCDefinable P ↔ P ∈ NL :=
   ((tcDefinable_compl_iff P).symm).trans (mem_NL_iff_tcDefinable_compl P).symm
 
 /-- **The Krom fragment is closed under complement**: a statement about a
 clausal fragment that no inspection of its clauses provides – it is
 Immerman–Szelepcsényi, read through the translations to FO(TC). -/
-theorem sigmaSOKromDefinable_compl_iff (P : DecisionProblem L) :
+theorem sigmaSOKromDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
     SigmaSOKromDefinable Pᶜ ↔ SigmaSOKromDefinable P := by
   rw [sigmaSOKromDefinable_iff_tcDefinable_compl, sigmaSOKromDefinable_iff_tcDefinable_compl,
     DecisionProblem.compl_compl, tcDefinable_compl_iff]
@@ -87,13 +89,13 @@ space is closed under complement. -/
 theorem NL_eq_coNL : NL = coNL := by
   refine ComplexityClass.ext (fun P => (sigmaSOKromDefinable_compl_iff P).symm) fun P => ?_
   constructor
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((sigmaSOKromDefinable_compl_iff Q).mp hQ)
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact h S hS Q ((sigmaSOKromDefinable_compl_iff Q).mpr hQ)
 
 /-- Membership in NL is closed under complement. -/
-theorem mem_NL_compl_iff (P : DecisionProblem L) : Pᶜ ∈ NL ↔ P ∈ NL :=
+theorem mem_NL_compl_iff [L.IsRelational] (P : DecisionProblem L) : Pᶜ ∈ NL ↔ P ∈ NL :=
   sigmaSOKromDefinable_compl_iff P
 
 /-! ### REACH is in NL -/

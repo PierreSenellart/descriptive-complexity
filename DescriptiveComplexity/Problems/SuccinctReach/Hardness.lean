@@ -1263,7 +1263,7 @@ open SuccinctReachHard in
 /-- **The generic reduction to SUCCINCT-REACH**: an ordered first-order
 reduction from any problem defined, on nonempty finite ordered structures, by
 an SO(TC) specification. -/
-noncomputable def sotcReduction {L : Language.{0, 0}} (Q : DecisionProblem L)
+noncomputable def sotcReduction {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L)
     (spec : SOTCSpec L)
     (hspec : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       Q A ↔ spec.Accepts A) : Q ≤ᶠᵒ[≤] SUCCINCTREACH where
@@ -1279,9 +1279,9 @@ noncomputable def sotcReduction {L : Language.{0, 0}} (Q : DecisionProblem L)
 /-- **Hardness**: every SO(TC) definable problem admits an ordered first-order
 reduction to SUCCINCT-REACH. -/
 theorem succinctReach_hard_of_sotcDefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SOTCDefinable Q → Nonempty (Q ≤ᶠᵒ[≤] SUCCINCTREACH) := by
-  rintro L Q ⟨spec, hspec⟩
+  rintro L _ Q ⟨spec, hspec⟩
   exact ⟨sotcReduction Q spec hspec⟩
 
 /-- **SUCCINCT-REACH is PSPACE-complete.** Membership is

@@ -251,7 +251,7 @@ REACHd from any problem defined, on nonempty finite ordered structures, by a
 single deterministic transitive closure. The interpretation is the graph of the
 determinized walk – functional by construction, which is exactly the condition
 under which the target problem's forced arcs are all of its arcs. -/
-noncomputable def dtcReduction (spec : TCSpec L) (P : DecisionProblem L)
+noncomputable def dtcReduction [L.IsRelational] (spec : TCSpec L) (P : DecisionProblem L)
     (hP : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ spec.det.Accepts A) : P ≤ᶠᵒ[≤] REACHd where
   Tag := spec.det.pad.Mode
@@ -264,7 +264,8 @@ noncomputable def dtcReduction (spec : TCSpec L) (P : DecisionProblem L)
 
 /-- **LOGSPACE-hardness of REACHd, machine-free**: every FO(DTC) definable
 problem admits an ordered first-order reduction to REACHd. -/
-theorem reachd_hard_of_dtcDefinable (P : DecisionProblem L) (hP : DTCDefinable P) :
+theorem reachd_hard_of_dtcDefinable [L.IsRelational] (P : DecisionProblem L)
+    (hP : DTCDefinable P) :
     Nonempty (P ≤ᶠᵒ[≤] REACHd) := by
   obtain ⟨spec, hspec⟩ := hP
   exact ⟨dtcReduction spec P hspec⟩

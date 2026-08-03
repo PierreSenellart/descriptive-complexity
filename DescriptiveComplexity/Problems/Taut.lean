@@ -253,9 +253,9 @@ theorem taut_mem_coNP : TAUT ∈ coNP :=
 complementing that reduction lands in `SATᶜ`, which the sign swap turns into
 TAUT. -/
 theorem taut_hard_of_piSODefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       PiSODefinable 1 Q → Nonempty (Q ≤ᶠᵒ[≤] TAUT) := by
-  intro L Q hQ
+  intro L _ Q hQ
   obtain ⟨g⟩ := sat_hard_of_sigmaSODefinable Qᶜ ((piSODefinable_iff_compl 1 Q).mp hQ)
   exact ⟨(g.compl.congrSource fun A _ _ => not_not).trans_fo sat_compl_fo_reduction_taut⟩
 

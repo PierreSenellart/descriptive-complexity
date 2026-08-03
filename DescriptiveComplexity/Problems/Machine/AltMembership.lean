@@ -72,7 +72,7 @@ variable (k : ℕ)
 
 private theorem atm_definable_aux (pol : Bool) (A : Type)
     (instA : (Language.turingAlt (k + 1)).Structure A) [Finite A] [Nonempty A] :
-    @DecisionProblem.Holds _ (ATMAccept (k + 1) pol) A instA ↔
+    @DecisionProblem.Holds _ _ (ATMAccept (k + 1) pol) A instA ↔
       @SORealize (Language.turingAlt (k + 1)) A instA (repBlocks tmGuessBlock (k + 1))
         ((unmergeHom (repBlocks tmGuessBlock (k + 1)) (Language.turingAlt (k + 1))).onSentence
           (akKernel pol (k + 1))) pol := by

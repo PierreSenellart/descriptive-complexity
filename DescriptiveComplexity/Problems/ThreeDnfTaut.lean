@@ -297,9 +297,9 @@ complement, which reduces to SAT; complementing that reduction lands in
 `SATᶜ`, which the clause-splitting interpretation carries to 3-UNSAT, width
 promise included. -/
 theorem threeUnsat_hard_of_piSODefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       PiSODefinable 1 Q → Nonempty (Q ≤ᶠᵒ[≤] ThreeUNSAT) := by
-  intro L Q hQ
+  intro L _ Q hQ
   obtain ⟨g⟩ := sat_hard_of_sigmaSODefinable Qᶜ ((piSODefinable_iff_compl 1 Q).mp hQ)
   exact ⟨(g.compl.congrSource fun A _ _ => not_not).trans
     sat_compl_ordered_fo_reduction_threeUnsat⟩
@@ -307,9 +307,9 @@ theorem threeUnsat_hard_of_piSODefinable :
 /-- **coNP-hardness of 3-DNF-TAUT**: the hardness of 3-UNSAT, followed by the
 sign swap. -/
 theorem threeDnfTaut_hard_of_piSODefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       PiSODefinable 1 Q → Nonempty (Q ≤ᶠᵒ[≤] ThreeDnfTAUT) := by
-  intro L Q hQ
+  intro L _ Q hQ
   exact (threeUnsat_hard_of_piSODefinable Q hQ).map fun f =>
     f.trans_fo threeUnsat_fo_reduction_threeDnfTaut
 

@@ -840,7 +840,7 @@ mode and two canonically padded tuples. Together with
 `co-NL(Krom) = NL(TC)`; it is upgraded to `NL = coNL` by Immerman–Szelepcsényi
 (`DescriptiveComplexity.NL_eq_coNL`). -/
 theorem TCDefinable.compl_of_sigmaSOKromDefinable {L : Language.{0, 0}}
-    {P : DecisionProblem L} (h : SigmaSOKromDefinable P) : TCDefinable Pᶜ := by
+    [L.IsRelational] {P : DecisionProblem L} (h : SigmaSOKromDefinable P) : TCDefinable Pᶜ := by
   obtain ⟨B, k, prog, hprog⟩ := h
   refine ⟨spec prog, ?_⟩
   intro A _ _ _ _
@@ -849,13 +849,14 @@ theorem TCDefinable.compl_of_sigmaSOKromDefinable {L : Language.{0, 0}}
 /-- **The two translations compose**: a problem is SO-Krom definable exactly
 when its complement is FO(TC) definable, `co-NL(Krom) = NL(TC)`. -/
 theorem sigmaSOKromDefinable_iff_tcDefinable_compl {L : Language.{0, 0}}
-    (P : DecisionProblem L) : SigmaSOKromDefinable P ↔ TCDefinable Pᶜ := by
+    [L.IsRelational] (P : DecisionProblem L) : SigmaSOKromDefinable P ↔ TCDefinable Pᶜ := by
   refine ⟨TCDefinable.compl_of_sigmaSOKromDefinable, fun h => ?_⟩
   have := SigmaSOKromDefinable.compl_of_tcDefinable h
   rwa [DecisionProblem.compl_compl] at this
 
 /-- **NL is the complements of the FO(TC) definable problems.** -/
-theorem mem_NL_iff_tcDefinable_compl {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem mem_NL_iff_tcDefinable_compl {L : Language.{0, 0}} [L.IsRelational]
+    (P : DecisionProblem L) :
     P ∈ NL ↔ TCDefinable Pᶜ :=
   (mem_NL_iff P).trans (sigmaSOKromDefinable_iff_tcDefinable_compl P)
 

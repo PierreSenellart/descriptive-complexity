@@ -324,10 +324,10 @@ end ExBlock
 
 /-- **SO(TC) is closed under prefixing an existential second-order block**: the
 walk carries the guessed block in its own state and never touches it again. -/
-theorem SOTCDefinable.exBlock {L : Language.{0, 0}} {B : SOBlock}
+theorem SOTCDefinable.exBlock {L : Language.{0, 0}} [L.IsRelational] {B : SOBlock}
     {Q : DecisionProblem (L.sum B.lang)} (hQ : SOTCDefinable Q) {P : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
-      P A ↔ ∃ ρ : B.Assignment A, @DecisionProblem.Holds _ Q A (B.structure₁ ρ)) :
+      P A ↔ ∃ ρ : B.Assignment A, @DecisionProblem.Holds _ _ Q A (B.structure₁ ρ)) :
     SOTCDefinable P := by
   obtain ⟨spec, hspec⟩ := hQ
   refine ⟨spec.exBlock B, fun A _ _ _ _ => ?_⟩
@@ -341,14 +341,16 @@ section Prefix
 /-- The decision problem defined by a second-order sentence with a given
 quantifier prefix: isomorphism-invariant by
 `DescriptiveComplexity.sorealize_iso`. -/
-def soProblem (L : Language.{0, 0}) (Bs : List SOBlock) (φ : (soLang L Bs).Sentence)
+def soProblem (L : Language.{0, 0}) [L.IsRelational] (Bs : List SOBlock)
+    (φ : (soLang L Bs).Sentence)
     (pol : Bool) : DecisionProblem L where
   Holds := fun A inst => @SORealize L A inst Bs φ pol
   iso_invariant := fun e => sorealize_iso e Bs φ pol
 
 /-- The base case: a first-order sentence is an SO(TC) condition – a walk with a
 trivial block and no step. -/
-theorem sotcDefinable_soProblem_nil (L : Language.{0, 0}) (φ : (soLang L []).Sentence)
+theorem sotcDefinable_soProblem_nil (L : Language.{0, 0}) [L.IsRelational]
+    (φ : (soLang L []).Sentence)
     (pol : Bool) : SOTCDefinable (soProblem L [] φ pol) := by
   refine SOTCDefinable.of_sigmaSODefinable ⟨[SOBlock.trivial], rfl,
     (LHom.sumInl : L →ᴸ L.sum SOBlock.trivial.lang).onSentence φ, fun A _ _ _ => ?_⟩
@@ -366,13 +368,14 @@ theorem sotcDefinable_soProblem_nil (L : Language.{0, 0}) (φ : (soLang L []).Se
 one block at a time, guessing an existential block into the state of the walk
 and complementing at a universal one. -/
 theorem sotcDefinable_soProblem :
-    ∀ (Bs : List SOBlock) (L : Language.{0, 0}) (φ : (soLang L Bs).Sentence) (pol : Bool),
+    ∀ (Bs : List SOBlock) (L : Language.{0, 0}) [L.IsRelational]
+      (φ : (soLang L Bs).Sentence) (pol : Bool),
       SOTCDefinable (soProblem L Bs φ pol) := by
   intro Bs
   induction Bs with
   | nil => exact sotcDefinable_soProblem_nil
   | cons B Bs ih =>
-    intro L φ pol
+    intro L _ φ pol
     cases pol
     · have hR : SOTCDefinable ((soProblem L (B :: Bs) φ false)ᶜ) := by
         refine SOTCDefinable.exBlock (B := B) (ih (L.sum B.lang) φ true).compl ?_
@@ -391,7 +394,7 @@ end Prefix
 variable {L : Language.{0, 0}}
 
 /-- **Every `Σₖ`-definable problem is SO(TC) definable.** -/
-theorem SOTCDefinable.of_sigmaSODefinable_any {k : ℕ} {P : DecisionProblem L}
+theorem SOTCDefinable.of_sigmaSODefinable_any {k : ℕ} [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSODefinable k P) : SOTCDefinable P := by
   obtain ⟨Bs, -, φ, hφ⟩ := h
   obtain ⟨spec, hspec⟩ := sotcDefinable_soProblem Bs L φ true
@@ -400,16 +403,16 @@ theorem SOTCDefinable.of_sigmaSODefinable_any {k : ℕ} {P : DecisionProblem L}
 /-- **Every level of the polynomial hierarchy is inside PSPACE.** -/
 theorem sigmaP_subset_PSPACE (k : ℕ) : SigmaP k ⊆ PSPACE := by
   cases k with
-  | zero => exact fun _ _ h => NP_subset_PSPACE (PTIME_subset_NP h)
-  | succ k => exact fun _ _ h => SOTCDefinable.of_sigmaSODefinable_any h
+  | zero => exact fun _ _ _ h => NP_subset_PSPACE (PTIME_subset_NP h)
+  | succ k => exact fun _ _ _ h => SOTCDefinable.of_sigmaSODefinable_any h
 
 /-- **`PH ⊆ PSPACE`**: the polynomial hierarchy is inside polynomial space. -/
 theorem PH_subset_PSPACE : PH ⊆ PSPACE :=
-  fun _ _ h => h.elim fun k hk => sigmaP_subset_PSPACE k hk
+  fun _ _ _ h => h.elim fun k hk => sigmaP_subset_PSPACE k hk
 
 /-- **`Πₖᵖ ⊆ PSPACE`** as well, since PSPACE is closed under complement. -/
 theorem piP_subset_PSPACE (k : ℕ) : PiP k ⊆ PSPACE := by
-  intro L P h
+  intro L _ P h
   rw [mem_piP_iff] at h
   exact (mem_PSPACE_compl_iff P).mp (sigmaP_subset_PSPACE k h)
 

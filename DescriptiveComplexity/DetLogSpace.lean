@@ -79,14 +79,14 @@ noncomputable def LOGSPACE : ComplexityClass :=
     (fun h => dtcDefinable_congr h)
 
 /-- Membership in LOGSPACE is exactly FO(DTC) definability, by definition. -/
-theorem mem_LOGSPACE_iff (P : DecisionProblem L) : P ∈ LOGSPACE ↔ DTCDefinable P :=
+theorem mem_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ LOGSPACE ↔ DTCDefinable P :=
   Iff.rfl
 
 /-- Over a relational vocabulary, LOGSPACE-hardness is the usual notion: every
 FO(DTC) definable problem reduces to `P`. -/
 theorem hard_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
     LOGSPACE.Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         DTCDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
@@ -94,6 +94,6 @@ theorem hard_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
 membership in NL (`DescriptiveComplexity.tcDefinable_iff_mem_NL`, the two
 translations through the Krom fragment). -/
 theorem LOGSPACE_subset_NL : LOGSPACE ⊆ NL :=
-  fun _ P hP => (tcDefinable_iff_mem_NL P).mp (DTCDefinable.tcDefinable hP)
+  fun _ _ P hP => (tcDefinable_iff_mem_NL P).mp (DTCDefinable.tcDefinable hP)
 
 end DescriptiveComplexity

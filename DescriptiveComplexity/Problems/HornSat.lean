@@ -93,14 +93,14 @@ reduces to HORN-SAT, which is in NP. This is the level-0 case of
 hierarchy because it goes through the Horn discharge, needing no separate
 compilation of a Horn program into an existential second-order sentence. -/
 theorem PTIME_subset_NP : PTIME ⊆ NP := by
-  intro L P hP
+  intro L _ P hP
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP
   exact NP.mem_of_orderedReduction f hornSat_mem_NP
 
 /-- **co-PTIME ⊆ coNP**, i.e. `PiP 0 ⊆ PiP 1`: the mirror of
 `DescriptiveComplexity.PTIME_subset_NP` under complementation. -/
 theorem coPTIME_subset_coNP : PiP 0 ⊆ PiP 1 := by
-  intro L P hP
+  intro L _ P hP
   rw [mem_piP_iff] at hP ⊢
   exact PTIME_subset_NP hP
 
@@ -109,14 +109,14 @@ discharge sends an SO-Horn definable problem to the complement of HORN-SAT,
 which is in NP by the unsatisfiability certificate
 `DescriptiveComplexity.hornSat_compl_mem_NP`. -/
 theorem PTIME_subset_coNP : PTIME ⊆ coNP := by
-  intro L P hP
+  intro L _ P hP
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP
   exact (mem_piP_iff 1 P).mpr (NP.mem_of_orderedReduction f.compl hornSat_compl_mem_NP)
 
 /-- **co-PTIME ⊆ NP**, i.e. `PiP 0 ⊆ SigmaP 1`: the mirror of
 `DescriptiveComplexity.PTIME_subset_coNP`. -/
 theorem coPTIME_subset_NP : PiP 0 ⊆ NP := by
-  intro L P hP
+  intro L _ P hP
   rw [mem_piP_iff] at hP
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable Pᶜ hP
   exact NP.mem_of_orderedReduction (f.compl.congrSource fun A _ _ => not_not)
@@ -124,7 +124,7 @@ theorem coPTIME_subset_NP : PiP 0 ⊆ NP := by
 
 /-- `PiP 0 ⊆ PH`, the level-0 case of `DescriptiveComplexity.piP_subset_PH`. -/
 theorem piP_zero_subset_PH : PiP 0 ⊆ PH :=
-  fun _ _ hP => ⟨1, coPTIME_subset_NP hP⟩
+  fun _ _ _ hP => ⟨1, coPTIME_subset_NP hP⟩
 
 /-! ### Monotonicity of the hierarchy
 
@@ -152,14 +152,14 @@ theorem piP_subset_succ (k : ℕ) : PiP k ⊆ PiP (k + 1) := by
 `NP ⊆ Σₖᵖ` for every `k ≥ 1`. -/
 theorem sigmaP_mono {j k : ℕ} (h : j ≤ k) : SigmaP j ⊆ SigmaP k := by
   induction k, h using Nat.le_induction with
-  | base => exact fun _ _ hP => hP
-  | succ k hk ih => exact fun _ _ hP => sigmaP_subset_succ k (ih hP)
+  | base => exact fun _ _ _ hP => hP
+  | succ k hk ih => exact fun _ _ _ hP => sigmaP_subset_succ k (ih hP)
 
 /-- **The `Π` levels are monotone**: `j ≤ k` gives `Πⱼᵖ ⊆ Πₖᵖ`. -/
 theorem piP_mono {j k : ℕ} (h : j ≤ k) : PiP j ⊆ PiP k := by
   induction k, h using Nat.le_induction with
-  | base => exact fun _ _ hP => hP
-  | succ k hk ih => exact fun _ _ hP => piP_subset_succ k (ih hP)
+  | base => exact fun _ _ _ hP => hP
+  | succ k hk ih => exact fun _ _ _ hP => piP_subset_succ k (ih hP)
 
 /-- **`PTIME ⊆ Σₖᵖ`** at every level. Stated separately because
 `DescriptiveComplexity.PTIME` is a definition of its own rather than the literal

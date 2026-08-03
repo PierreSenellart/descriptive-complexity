@@ -68,14 +68,14 @@ noncomputable def NL : ComplexityClass :=
     (fun h => sigmaSOKromDefinable_congr h)
 
 /-- Membership in NL is exactly SO-Krom definability, by definition. -/
-theorem mem_NL_iff (P : DecisionProblem L) : P ∈ NL ↔ SigmaSOKromDefinable P :=
+theorem mem_NL_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ NL ↔ SigmaSOKromDefinable P :=
   Iff.rfl
 
 /-- Over a relational vocabulary, NL-hardness is the usual notion: every
 SO-Krom definable problem reduces to `P`. -/
 theorem hard_NL_iff [L.IsRelational] (P : DecisionProblem L) :
     NL.Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SigmaSOKromDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 

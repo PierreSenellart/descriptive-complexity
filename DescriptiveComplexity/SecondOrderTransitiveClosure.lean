@@ -305,13 +305,13 @@ order: a walk can guess it into its own state, so this notion coincides with the
 order-free `DescriptiveComplexity.SOTCDefinableFree`
 (`DescriptiveComplexity.sotcDefinable_iff_free`, in
 `DescriptiveComplexity.SecondOrderTransitiveClosureFree`). -/
-def SOTCDefinable (P : DecisionProblem L) : Prop :=
+def SOTCDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ spec : SOTCSpec L,
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ spec.Accepts A
 
 /-- SO(TC) definability only depends on the finite instances of a problem. -/
-theorem sotcDefinable_congr {P Q : DecisionProblem L}
+theorem sotcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     SOTCDefinable P ↔ SOTCDefinable Q := by
   constructor <;> rintro ⟨spec, hspec⟩ <;> refine ⟨spec, ?_⟩ <;> intro A _ _ _ _

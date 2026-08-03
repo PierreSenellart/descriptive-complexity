@@ -222,7 +222,7 @@ end Guard
 
 section OrderPull
 
-variable {L : Language.{0, 0}} {P : DecisionProblem L}
+variable {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
 
 private theorem vec_eta₂' {M : Type} (w : Fin 2 → M) : ![w 0, w 1] = w := by
   funext j
@@ -336,7 +336,7 @@ end OrderPull
 
 section Closure
 
-variable {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational] {P : DecisionProblem L₁}
+variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁}
 variable {Q : DecisionProblem L₂}
 
 /-- **`∃SO[new]`-definability is closed under ordered FO reductions**: pull the

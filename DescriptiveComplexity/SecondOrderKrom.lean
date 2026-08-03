@@ -215,13 +215,13 @@ the order be guessed away, as it is for the existential logics and – see
 `DescriptiveComplexity.sotcDefinable_iff_free` – for SO(TC): a Krom kernel
 cannot state that a guessed relation is transitive, that clause having three
 second-order literals. -/
-def SigmaSOKromDefinable (P : DecisionProblem L) : Prop :=
+def SigmaSOKromDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ (B : SOBlock) (k : ℕ) (prog : KromProgram (L.sum Language.order) B k),
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ ∃ ρ : B.Assignment A, prog.Holds ρ
 
 /-- SO-Krom definability only depends on the finite instances of a problem. -/
-theorem sigmaSOKromDefinable_congr {P Q : DecisionProblem L}
+theorem sigmaSOKromDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     SigmaSOKromDefinable P ↔ SigmaSOKromDefinable Q := by
   constructor <;> rintro ⟨B, k, prog, hprog⟩ <;> refine ⟨B, k, prog, ?_⟩ <;>

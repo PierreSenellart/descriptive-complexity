@@ -102,6 +102,10 @@ below.
 * **Instances are finite relational structures, not strings.** Every
   problem is modeled by choosing a vocabulary and encoding its inputs as
   finite structures and yes-instance sets must be isomorphism-invariant.
+  Vocabularies are *relational* throughout, the standing convention of
+  descriptive complexity: `DecisionProblem` carries an `IsRelational`
+  instance as part of the notion, so classes, reductions and the class
+  equalities below are statements about relational problems.
   Reasoning is about **finite** structures only; nothing is claimed about
   infinite ones. The classes here are *defined* logically, and the machine
   bridges characterize them from inside the framework, by acceptance problems

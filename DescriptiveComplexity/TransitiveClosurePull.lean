@@ -306,7 +306,7 @@ end Comap
 
 section Closure
 
-variable {L L' : Language.{0, 0}} [L'.IsRelational] {P : DecisionProblem L}
+variable {L L' : Language.{0, 0}} [L.IsRelational] [L'.IsRelational] {P : DecisionProblem L}
   {Q : DecisionProblem L'}
 
 /-- **FO(TC) definability is closed under ordered first-order reductions.** The

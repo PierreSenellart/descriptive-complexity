@@ -107,27 +107,31 @@ variable {L : Language.{0, 0}}
 when it is one of both. Written `W ⊓ P` (through the `Min` instance below);
 with `W` a well-formedness condition, `W ⊓ P` is “`P`, on well-formed
 instances”. -/
-protected def DecisionProblem.and (W P : DecisionProblem L) : DecisionProblem L where
-  Holds := fun A inst => @DecisionProblem.Holds L W A inst ∧ @DecisionProblem.Holds L P A inst
+protected def DecisionProblem.and [L.IsRelational] (W P : DecisionProblem L) :
+    DecisionProblem L where
+  Holds := fun A inst => @DecisionProblem.Holds L _ W A inst ∧ @DecisionProblem.Holds L _ P A inst
   iso_invariant := fun e => and_congr (W.iso_invariant e) (P.iso_invariant e)
 
-instance : Min (DecisionProblem L) :=
+instance [L.IsRelational] : Min (DecisionProblem L) :=
   ⟨DecisionProblem.and⟩
 
 @[simp]
-theorem DecisionProblem.min_holds (W P : DecisionProblem L) (A : Type) [L.Structure A] :
+theorem DecisionProblem.min_holds [L.IsRelational] (W P : DecisionProblem L) (A : Type)
+    [L.Structure A] :
     (W ⊓ P) A ↔ W A ∧ P A :=
   Iff.rfl
 
 /-- A first-order sentence, read as a decision problem: the structures
 satisfying it. Isomorphism-invariance is automatic, which makes this the
 cheapest way to state a well-formedness condition `W`. -/
-protected def DecisionProblem.ofSentence (ψ : L.Sentence) : DecisionProblem L where
+protected def DecisionProblem.ofSentence [L.IsRelational] (ψ : L.Sentence) :
+    DecisionProblem L where
   Holds := fun A inst => @Sentence.Realize L A inst ψ
   iso_invariant := fun e => StrongHomClass.realize_sentence e ψ
 
 @[simp]
-theorem DecisionProblem.ofSentence_holds (ψ : L.Sentence) (A : Type) [L.Structure A] :
+theorem DecisionProblem.ofSentence_holds [L.IsRelational] (ψ : L.Sentence) (A : Type)
+    [L.Structure A] :
     DecisionProblem.ofSentence ψ A ↔ A ⊨ ψ :=
   Iff.rfl
 
@@ -142,7 +146,8 @@ unchanged. -/
 variable {L' : Language.{0, 0}} [L'.IsRelational]
 
 /-- Strengthen the target of a reduction by an invariant its images satisfy. -/
-def FOReduction.withInvariant {P : DecisionProblem L} {Q : DecisionProblem L'}
+def FOReduction.withInvariant [L.IsRelational] {P : DecisionProblem L}
+    {Q : DecisionProblem L'}
     (f : P ≤ᶠᵒ Q) (W : DecisionProblem L')
     (h : ∀ (A : Type) [L.Structure A] [Nonempty A], W (f.toInterpretation.Map A)) :
     P ≤ᶠᵒ (W ⊓ Q) :=
@@ -155,7 +160,8 @@ def FOReduction.withInvariant {P : DecisionProblem L} {Q : DecisionProblem L'}
 
 /-- Strengthen the target of an ordered reduction by an invariant its images
 satisfy. -/
-def OrderedFOReduction.withInvariant {P : DecisionProblem L} {Q : DecisionProblem L'}
+def OrderedFOReduction.withInvariant [L.IsRelational] {P : DecisionProblem L}
+    {Q : DecisionProblem L'}
     (f : P ≤ᶠᵒ[≤] Q) (W : DecisionProblem L')
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       W (f.toInterpretation.Map A)) :
@@ -224,7 +230,7 @@ private theorem sorealize_soLift_inf :
 /-- **Conjoining a first-order sentence preserves `Σₖ`-definability**: the
 sentence joins the kernel, lifted along the block languages. This is the
 membership half of restricting a problem to its well-formed instances. -/
-theorem SigmaSODefinable.inf_ofSentence {k : ℕ} {P : DecisionProblem L}
+theorem SigmaSODefinable.inf_ofSentence {k : ℕ} [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSODefinable k P) (ψ : L.Sentence) :
     SigmaSODefinable k (DecisionProblem.ofSentence ψ ⊓ P) := by
   obtain ⟨Bs, hlen, φ, hφ⟩ := h

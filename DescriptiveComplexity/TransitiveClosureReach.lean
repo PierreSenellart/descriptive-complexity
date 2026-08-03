@@ -191,7 +191,7 @@ end Correctness
 /-- **The generic FO(TC) reduction**: an ordered first-order reduction to
 REACH from any problem defined, on nonempty finite ordered structures, by a
 single transitive closure whose modes are nonempty. -/
-noncomputable def tcReduction [Nonempty spec.Mode] (P : DecisionProblem L)
+noncomputable def tcReduction [L.IsRelational] [Nonempty spec.Mode] (P : DecisionProblem L)
     (hP : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ spec.Accepts A) : P ≤ᶠᵒ[≤] REACH where
   Tag := spec.Mode
@@ -209,7 +209,7 @@ admits an ordered first-order reduction to REACH. The interpretation is the
 graph of the walk itself; padding the specification with one spare mode
 (`DescriptiveComplexity.TCSpec.pad`) is only there to keep the tag type nonempty, as a
 reduction requires. -/
-theorem reach_hard_of_tcDefinable (P : DecisionProblem L) (hP : TCDefinable P) :
+theorem reach_hard_of_tcDefinable [L.IsRelational] (P : DecisionProblem L) (hP : TCDefinable P) :
     Nonempty (P ≤ᶠᵒ[≤] REACH) := by
   obtain ⟨spec, hspec⟩ := hP
   exact ⟨tcReduction spec.pad P fun A => (hspec A).trans (spec.pad_accepts_iff A).symm⟩

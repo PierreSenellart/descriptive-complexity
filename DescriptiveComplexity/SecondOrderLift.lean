@@ -289,7 +289,7 @@ theorem sorealize_append_trivial :
 
 /-! ### Level inclusions at the definability level -/
 
-variable {L : Language.{0, 0}} {k : ℕ} {P : DecisionProblem L}
+variable {L : Language.{0, 0}} [L.IsRelational] {k : ℕ} {P : DecisionProblem L}
 
 /-- `Σₖ ⊆ Σₖ₊₁`: pad by appending the trivial block. -/
 theorem SigmaSODefinable.succ (h : SigmaSODefinable k P) : SigmaSODefinable (k + 1) P := by

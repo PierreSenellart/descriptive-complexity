@@ -73,7 +73,8 @@ the forward half of a machine characterization of the class. (The converse
 direction is membership, `DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`, but a
 *relativized* reduction only carries hardness, so the two do not assemble into
 an `iff` the way `DescriptiveComplexity.mem_NP_iff_le_ntmAccept` does.) -/
-theorem le_dtmAcceptSpace_of_mem_PSPACE {L : Language.{0, 0}} (P : DecisionProblem L)
+theorem le_dtmAcceptSpace_of_mem_PSPACE {L : Language.{0, 0}} [L.IsRelational]
+    (P : DecisionProblem L)
     (hP : P ∈ PSPACE) : Nonempty (P ≤ʳᶠᵒ[≤] DTMAcceptSpace) :=
   dtmAcceptSpace_PSPACE_hard DTMAcceptSpace
     ⟨(FOReduction.refl DTMAcceptSpace).toOrdered.toRel⟩ P hP

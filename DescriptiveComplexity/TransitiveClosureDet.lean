@@ -230,13 +230,13 @@ the problem itself does not see the order, while the transition and endpoint
 formulas may. The order cannot be guessed away here either
 (`DescriptiveComplexity.sotcDefinable_iff_free` is what SO(TC) can do and this
 logic cannot): a deterministic walk has nothing to guess with. -/
-def DTCDefinable (P : DecisionProblem L) : Prop :=
+def DTCDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ spec : TCSpec L,
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ spec.det.Accepts A
 
 /-- FO(DTC) definability only depends on the finite instances of a problem. -/
-theorem dtcDefinable_congr {P Q : DecisionProblem L}
+theorem dtcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     DTCDefinable P ↔ DTCDefinable Q := by
   constructor <;> rintro ⟨spec, hspec⟩ <;> refine ⟨spec, ?_⟩ <;> intro A _ _ _ _
@@ -245,7 +245,7 @@ theorem dtcDefinable_congr {P Q : DecisionProblem L}
 
 /-- **FO(DTC) ⊆ FO(TC)**, the definability-level `L ⊆ NL`: a determinized
 specification is a specification like any other. -/
-theorem DTCDefinable.tcDefinable {P : DecisionProblem L} (h : DTCDefinable P) :
+theorem DTCDefinable.tcDefinable [L.IsRelational] {P : DecisionProblem L} (h : DTCDefinable P) :
     TCDefinable P := by
   obtain ⟨spec, hspec⟩ := h
   exact ⟨spec.det, hspec⟩

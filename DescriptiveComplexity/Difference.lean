@@ -70,14 +70,14 @@ variable {L L' : Language.{0, 0}}
 structures whose image is a yes-instance of `Q`. It is a decision problem
 because interpretations are functorial on isomorphisms
 (`DescriptiveComplexity.FOInterpretation.mapLEquiv`). -/
-def DecisionProblem.comap [L'.IsRelational] {Tag : Type} {dim : ℕ}
+def DecisionProblem.comap [L.IsRelational] [L'.IsRelational] {Tag : Type} {dim : ℕ}
     (I : FOInterpretation L L' Tag dim) (Q : DecisionProblem L') : DecisionProblem L where
   Holds A _ := Q (I.Map A)
   iso_invariant e := Q.iso_invariant (I.mapLEquiv e)
 
 /-- The tautological reduction: the pullback of `Q` reduces to `Q`, by the
 very interpretation it was pulled back along. -/
-def FOInterpretation.comapReduction [L'.IsRelational] {Tag : Type} {dim : ℕ}
+def FOInterpretation.comapReduction [L.IsRelational] [L'.IsRelational] {Tag : Type} {dim : ℕ}
     [Finite Tag] [Nonempty Tag] (I : FOInterpretation L L' Tag dim)
     (Q : DecisionProblem L') : Q.comap I ≤ᶠᵒ Q where
   Tag := Tag
@@ -147,7 +147,7 @@ private theorem exOrd_iso {A B : Type} [L.Structure A] [L.Structure B] (e : A �
 /-- The pullback of `Q` along an *ordered* interpretation, with the order
 quantified existentially: some linear order on the instance sends it to a
 yes-instance of `Q`. -/
-def DecisionProblem.comapExOrd : DecisionProblem L where
+def DecisionProblem.comapExOrd [L.IsRelational] : DecisionProblem L where
   Holds A _ := ∃ lo : LinearOrder A,
     letI := lo
     Q (I.Map A)
@@ -156,7 +156,7 @@ def DecisionProblem.comapExOrd : DecisionProblem L where
 /-- The pullback of `Q` along an *ordered* interpretation, with the order
 quantified universally: every linear order on the instance sends it to a
 yes-instance of `Q`. -/
-def DecisionProblem.comapAllOrd : DecisionProblem L where
+def DecisionProblem.comapAllOrd [L.IsRelational] : DecisionProblem L where
   Holds A _ := ∀ lo : LinearOrder A,
     letI := lo
     Q (I.Map A)
@@ -172,6 +172,8 @@ def DecisionProblem.comapAllOrd : DecisionProblem L where
       exact (Q.iso_invariant (I.mapLEquiv (orderedEquivOfTransport e lo))).mpr (h _)
 
 end OrderedComap
+
+variable [L.IsRelational]
 
 /-! ### DP definability -/
 
@@ -364,7 +366,7 @@ Both inclusions take the other half of the conjunction to be trivial: an NP
 condition alone is an NP condition conjoined with the tautology, and dually. -/
 
 /-- The trivially true problem, the unit of conjunction. -/
-def DecisionProblem.triv (L : Language.{0, 0}) : DecisionProblem L where
+def DecisionProblem.triv (L : Language.{0, 0}) [L.IsRelational] : DecisionProblem L where
   Holds _ _ := True
   iso_invariant _ := Iff.rfl
 
@@ -391,30 +393,30 @@ theorem piSODefinable_triv : PiSODefinable 1 (DecisionProblem.triv L) := by
 /-- **NP ⊆ DP**: an NP condition is itself a DP condition, conjoined with the
 tautology. -/
 theorem NP_subset_DP : NP ⊆ DP := by
-  intro L P hP
+  intro L _ P hP
   exact ⟨P, DecisionProblem.triv L, hP, piSODefinable_triv,
     fun A _ _ _ => ⟨fun h => ⟨h, trivial⟩, And.left⟩⟩
 
 /-- **coNP ⊆ DP**, the mirror image. -/
 theorem coNP_subset_DP : coNP ⊆ DP := by
-  intro L P hP
+  intro L _ P hP
   exact ⟨DecisionProblem.triv L, P, sigmaSODefinable_triv, hP,
     fun A _ _ _ => ⟨fun h => ⟨trivial, h⟩, And.right⟩⟩
 
 /-- **DP ⊆ Σ₂ᵖ**, as an inclusion of classes. -/
 theorem DP_subset_sigmaP_two : DP ⊆ SigmaP 2 :=
-  fun _ _ hP => DPDefinable.sigmaSODefinable_two ((mem_DP_iff _).mp hP)
+  fun _ _ _ hP => DPDefinable.sigmaSODefinable_two ((mem_DP_iff _).mp hP)
 
 /-- **DP ⊆ Π₂ᵖ**, as an inclusion of classes: DP sits inside the second level
 of the hierarchy from both sides. -/
 theorem DP_subset_piP_two : DP ⊆ PiP 2 :=
-  fun _ _ hP => DPDefinable.piSODefinable_two ((mem_DP_iff _).mp hP)
+  fun _ _ _ hP => DPDefinable.piSODefinable_two ((mem_DP_iff _).mp hP)
 
 /-- Over a relational vocabulary, DP-hardness is the usual notion: every
 DP-definable problem reduces to `P`. -/
-theorem hard_DP_iff [L.IsRelational] (P : DecisionProblem L) :
+theorem hard_DP_iff (P : DecisionProblem L) :
     DP.Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         DPDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 

@@ -74,7 +74,7 @@ open FirstOrder
 
 open Language
 
-variable {L : Language.{0, 0}}
+variable {L : Language.{0, 0}} [L.IsRelational]
 
 /-! ### Congruence of definability in the problem -/
 
@@ -114,42 +114,43 @@ collection reduces to every relational problem that `P` reduces to. For `P`
 over a relational vocabulary this is the usual notion (see
 `DescriptiveComplexity.hard_sigmaP_succ_iff`); this formulation is closed under
 reductions out of arbitrary vocabularies. -/
-def CofinalHard (Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop)
+def CofinalHard (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) : Prop :=
   ∀ {L' : Language.{0, 0}} [L'.IsRelational] (S : DecisionProblem L'),
     Nonempty (P ≤ʳᶠᵒ[≤] S) →
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''), Mem Q → Nonempty (Q ≤ʳᶠᵒ[≤] S)
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
+        Mem Q → Nonempty (Q ≤ʳᶠᵒ[≤] S)
 
 theorem CofinalHard.of_foReduction
-    {Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop}
-    {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+    {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
+    {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
     {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
     (f : P ≤ᶠᵒ Q) (hP : CofinalHard Mem P) : CofinalHard Mem Q := by
-  intro L' _ S hQS L'' R hR
+  intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.toOrdered.toRel.trans g) R hR
 
 theorem CofinalHard.of_orderedReduction
-    {Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop}
-    {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+    {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
+    {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
     {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
     (f : P ≤ᶠᵒ[≤] Q) (hP : CofinalHard Mem P) : CofinalHard Mem Q := by
-  intro L' _ S hQS L'' R hR
+  intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.toRel.trans g) R hR
 
 theorem CofinalHard.of_relOrderedReduction
-    {Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop}
-    {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+    {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
+    {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
     {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
     (f : P ≤ʳᶠᵒ[≤] Q) (hP : CofinalHard Mem P) : CofinalHard Mem Q := by
-  intro L' _ S hQS L'' R hR
+  intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.trans g) R hR
 
 theorem CofinalHard.congr
-    {Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop}
-    {L₁ : Language.{0, 0}} {P P' : DecisionProblem L₁}
+    {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
+    {L₁ : Language.{0, 0}} [L₁.IsRelational] {P P' : DecisionProblem L₁}
     (h : ∀ (A : Type) [L₁.Structure A] [Finite A], P A ↔ P' A)
     (hP : CofinalHard Mem P) : CofinalHard Mem P' := by
-  intro L' _ S hS L'' R hR
+  intro L' _ S hS L'' _ R hR
   exact hP S (hS.map fun g => g.congrSource fun A _ _ => (h A).symm) R hR
 
 /-- **Over a relational vocabulary, cofinal hardness is the usual notion**:
@@ -162,15 +163,16 @@ collection is – the proof only uses reflexivity and transitivity of reductions
 The left-to-right direction is what a *user* of a hardness result needs, to
 extract an actual reduction; it is where relationality of `P` is used, to
 instantiate the cofinal quantifier at `P` itself. -/
-theorem cofinalHard_iff [L.IsRelational]
-    (Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop) (P : DecisionProblem L) :
+theorem cofinalHard_iff
+    (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
+    (P : DecisionProblem L) :
     CofinalHard Mem P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         Mem Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) := by
   constructor
-  · intro h L'' Q hQ
+  · intro h L'' _ Q hQ
     exact h P ⟨(FOReduction.refl P).toOrdered.toRel⟩ Q hQ
-  · intro h L' _ S hS L'' Q hQ
+  · intro h L' _ S hS L'' _ Q hQ
     exact ⟨(h Q hQ).some.trans hS.some⟩
 
 /-! ### Classes defined by their members -/
@@ -188,12 +190,12 @@ outright trivial, and `DescriptiveComplexity.PH`, whose hardness is stated level
 level (an equivalent statement, since membership is the union of the levels,
 but not a definitional one). -/
 def ComplexityClass.ofMem
-    (Mem : ∀ {L₀ : Language.{0, 0}}, DecisionProblem L₀ → Prop)
-    (mem_of_foReduction : ∀ {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+    (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
+    (mem_of_foReduction : ∀ {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
       {P : DecisionProblem L₁} {Q : DecisionProblem L₂}, (P ≤ᶠᵒ Q) → Mem Q → Mem P)
-    (mem_of_orderedReduction : ∀ {L₁ L₂ : Language.{0, 0}} [L₂.IsRelational]
+    (mem_of_orderedReduction : ∀ {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
       {P : DecisionProblem L₁} {Q : DecisionProblem L₂}, (P ≤ᶠᵒ[≤] Q) → Mem Q → Mem P)
-    (mem_congr_finite : ∀ {L₁ : Language.{0, 0}} {P Q : DecisionProblem L₁},
+    (mem_congr_finite : ∀ {L₁ : Language.{0, 0}} [L₁.IsRelational] {P Q : DecisionProblem L₁},
       (∀ (A : Type) [L₁.Structure A] [Finite A], P A ↔ Q A) → (Mem P ↔ Mem Q)) :
     ComplexityClass where
   Mem P := Mem P
@@ -220,7 +222,7 @@ noncomputable def ComplexityClass.compl (C : ComplexityClass) : ComplexityClass 
     (fun h => C.mem_congr_finite fun A _ _ => not_congr (h A))
 
 @[simp]
-theorem ComplexityClass.mem_compl (C : ComplexityClass) {L : Language.{0, 0}}
+theorem ComplexityClass.mem_compl (C : ComplexityClass) {L : Language.{0, 0}} [L.IsRelational]
     (P : DecisionProblem L) : P ∈ C.compl ↔ Pᶜ ∈ C :=
   Iff.rfl
 
@@ -294,7 +296,7 @@ level: by definition at level 0, and by the quantifier duality
 is `DescriptiveComplexity.piP_zero_eq`: complementing a Horn program needs its least
 model computed inside the fragment, which is what the translation from FO(LFP)
 provides.) -/
-theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PiP k ↔ Pᶜ ∈ SigmaP k := by
   cases k with
   | zero => exact Iff.rfl
@@ -305,19 +307,19 @@ with HORN-SAT, which their proofs go through: `DescriptiveComplexity.PTIME_subse
 and friends. Uniform monotonicity, `j ≤ k → Σⱼᵖ ⊆ Σₖᵖ`, therefore also lives
 there: `DescriptiveComplexity.sigmaP_mono`.) -/
 theorem sigmaP_subset_sigmaP_succ (k : ℕ) : SigmaP (k + 1) ⊆ SigmaP (k + 2) :=
-  fun _ _ hP => SigmaSODefinable.succ hP
+  fun _ _ _ hP => SigmaSODefinable.succ hP
 
 /-- `Σₖ₊₁ᵖ ⊆ Πₖ₊₂ᵖ`. -/
 theorem sigmaP_subset_piP_succ (k : ℕ) : SigmaP (k + 1) ⊆ PiP (k + 2) :=
-  fun _ _ hP => SigmaSODefinable.piSucc hP
+  fun _ _ _ hP => SigmaSODefinable.piSucc hP
 
 /-- `Πₖ₊₁ᵖ ⊆ Σₖ₊₂ᵖ`. -/
 theorem piP_subset_sigmaP_succ (k : ℕ) : PiP (k + 1) ⊆ SigmaP (k + 2) :=
-  fun _ _ hP => PiSODefinable.sigmaSucc hP
+  fun _ _ _ hP => PiSODefinable.sigmaSucc hP
 
 /-- `Πₖ₊₁ᵖ ⊆ Πₖ₊₂ᵖ`. -/
 theorem piP_subset_piP_succ (k : ℕ) : PiP (k + 1) ⊆ PiP (k + 2) :=
-  fun _ _ hP => PiSODefinable.succ hP
+  fun _ _ _ hP => PiSODefinable.succ hP
 
 /-- The polynomial hierarchy: union of all the levels. A problem is PH-hard
 if it is hard for every level. -/
@@ -333,16 +335,16 @@ noncomputable def PH : ComplexityClass where
   hard_congr_finite h := forall_congr' fun k => (SigmaP k).hard_congr_finite h
 
 theorem sigmaP_subset_PH (k : ℕ) : SigmaP k ⊆ PH :=
-  fun _ _ hP => ⟨k, hP⟩
+  fun _ _ _ hP => ⟨k, hP⟩
 
 /-- `Πₖ₊₁ᵖ ⊆ PH`. (At level 0 this is
 `DescriptiveComplexity.piP_zero_subset_PH`, which needs `PTIME ⊆ NP` and so lives
 downstream, with HORN-SAT.) -/
 theorem piP_subset_PH (k : ℕ) : PiP (k + 1) ⊆ PH :=
-  fun _ _ hP => ⟨k + 2, piP_subset_sigmaP_succ k hP⟩
+  fun _ _ _ hP => ⟨k + 2, piP_subset_sigmaP_succ k hP⟩
 
 /-- A problem's complement is in coNP iff the problem is in NP. -/
-theorem compl_mem_coNP_iff {L : Language.{0, 0}} (P : DecisionProblem L) :
+theorem compl_mem_coNP_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     Pᶜ ∈ coNP ↔ P ∈ NP := by
   rw [mem_piP_iff, DecisionProblem.compl_compl]
 
@@ -350,25 +352,25 @@ theorem compl_mem_coNP_iff {L : Language.{0, 0}} (P : DecisionProblem L) :
 
 /-- Over a relational vocabulary, cofinal `Σₖ₊₁ᵖ`-hardness is the usual
 notion: every `Σₖ₊₁`-definable problem reduces to `P`. -/
-theorem hard_sigmaP_succ_iff [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
+theorem hard_sigmaP_succ_iff (k : ℕ) (P : DecisionProblem L) :
     (SigmaP (k + 1)).Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
 /-- Over a relational vocabulary, cofinal `Πₖ₊₁ᵖ`-hardness is the usual
 notion: every `Πₖ₊₁`-definable problem reduces to `P`. -/
-theorem hard_piP_succ_iff [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
+theorem hard_piP_succ_iff (k : ℕ) (P : DecisionProblem L) :
     (PiP (k + 1)).Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         PiSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
 /-- Over a relational vocabulary, cofinal PTIME-hardness is the usual notion:
 every SO-Horn definable problem reduces to `P`. -/
-theorem hard_PTIME_iff [L.IsRelational] (P : DecisionProblem L) :
+theorem hard_PTIME_iff (P : DecisionProblem L) :
     PTIME.Hard P ↔
-      ∀ {L'' : Language.{0, 0}} (Q : DecisionProblem L''),
+      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SigmaSOHornDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 

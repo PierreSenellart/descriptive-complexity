@@ -694,7 +694,7 @@ theorem sorealize_newPull {Tag : Type} [Finite Tag] [Nonempty Tag] {dim : ℕ}
     refine (realize_transfer I c₀ ρ hc _ rfl φ).mpr ?_
     exact ((newInterp L₁ Tag dim B I).realize_pullRelSentence φ (A ⊕ Fin n)).mp hpull
 
-variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
+variable [L₁.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
 /-- **`∃SO[new]`-definability is closed under first-order reductions**, the
 closure that makes RE a complexity class: the target's extended universe is

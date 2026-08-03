@@ -428,7 +428,7 @@ variable {V}
 open Nat.Partrec' in
 /-- **The two codes of the chain exist**: a fold code, and a code whose
 halting on the folded number and the size decides the problem. -/
-theorem exists_chain_codes (P : DecisionProblem L) [L.IsRelational]
+theorem exists_chain_codes [L.IsRelational] (P : DecisionProblem L)
     (h : REPred (P.toPred V)) :
     ∃ cF cP : Code, (∀ v : List.Vector ℕ 3, cF.eval v.1 = pure <$> foldSpec v) ∧
       ∀ N n : ℕ, ((cP.eval [N, n]).Dom ↔ P.toPred V (structOfBits V (n - 1) N)) := by
@@ -461,7 +461,7 @@ theorem exists_chain_codes (P : DecisionProblem L) [L.IsRelational]
 /-- **What the chain decides**: started on `[0, n]` under the chain of the
 reversed flattened table, the machine's abstract evaluation terminates
 exactly when the decoded instance is a yes-instance. -/
-theorem inputChain_dom_iff (P : DecisionProblem L) [L.IsRelational] {cF cP : Code}
+theorem inputChain_dom_iff [L.IsRelational] (P : DecisionProblem L) {cF cP : Code}
     (hF : ∀ v : List.Vector ℕ 3, cF.eval v.1 = pure <$> foldSpec v)
     (hP : ∀ N n : ℕ, ((cP.eval [N, n]).Dom ↔ P.toPred V (structOfBits V (n - 1) N)))
     (bits : List Bool) (n : ℕ) :

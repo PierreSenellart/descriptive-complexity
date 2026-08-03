@@ -1306,7 +1306,7 @@ end Machine
 transitive closure exactly when a two-way multi-head automaton recognizes it.
 One direction is `DescriptiveComplexity.tcDefinable_of_automaton` – a configuration is
 a node of a specification – and the other is the machine built here. -/
-theorem tcDefinable_iff_automaton {P : DecisionProblem L} :
+theorem tcDefinable_iff_automaton [L.IsRelational] {P : DecisionProblem L} :
     TCDefinable P ↔ ∃ (k : ℕ) (M : HeadAutomaton L k),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
         P A ↔ M.Accepts A := by
@@ -1319,7 +1319,7 @@ theorem tcDefinable_iff_automaton {P : DecisionProblem L} :
 
 /-- **NL is the class of the two-way multi-head automata**: membership in
 `DescriptiveComplexity.NL` is recognizability by such a machine. -/
-theorem mem_NL_iff_automaton {P : DecisionProblem L} :
+theorem mem_NL_iff_automaton [L.IsRelational] {P : DecisionProblem L} :
     P ∈ NL ↔ ∃ (k : ℕ) (M : HeadAutomaton L k),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
         P A ↔ M.Accepts A :=

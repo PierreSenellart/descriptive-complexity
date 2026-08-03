@@ -320,7 +320,7 @@ theorem sorealize_head_iff {A : Type} [L.Structure A] :
 /-- **The generic Tseitin reduction**: an ordered first-order reduction to
 SAT from any problem defined, on nonempty finite structures, by an
 existential second-order sentence with a single block. -/
-noncomputable def tseitinReduction (Q : DecisionProblem L)
+noncomputable def tseitinReduction [L.IsRelational] (Q : DecisionProblem L)
     (hφ : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
       Q A ↔ SORealize L A [B] φ true) : Q ≤ᶠᵒ[≤] SAT where
   Tag := TseitinTag B φ
@@ -339,9 +339,9 @@ existential-second-order definable problem admits an ordered first-order
 reduction to SAT. Machine-free NP-hardness in the style of Dahlhaus, by the
 generic Tseitin reduction `DescriptiveComplexity.tseitinReduction`. -/
 theorem sat_hard_of_sigmaSODefinable :
-    ∀ {L : Language.{0, 0}} (Q : DecisionProblem L),
+    ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSODefinable 1 Q → Nonempty (Q ≤ᶠᵒ[≤] SAT) := by
-  rintro L Q ⟨Bs, hlen, φ, hφ⟩
+  rintro L _ Q ⟨Bs, hlen, φ, hφ⟩
   cases Bs with
   | nil => exact absurd hlen (by simp)
   | cons B Bs' =>

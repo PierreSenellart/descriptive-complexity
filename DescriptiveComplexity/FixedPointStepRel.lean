@@ -428,7 +428,7 @@ end StepDef
 
 section Closure
 
-variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
+variable [L₁.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
 /-- **FO(≤, IFP) definability is closed under relativized ordered
 reductions**: the induction pulls back through the order-extended relativized

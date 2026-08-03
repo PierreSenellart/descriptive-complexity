@@ -371,7 +371,8 @@ problem `Q` that is the conjunction of `S` and `T`, a reduction of `S` to SAT
 and one of `Tᶜ` to SAT, the paired interpretation sends `A` to the pair of
 their images: its first CNF instance is satisfiable iff `S` holds, and its
 second is *un*satisfiable iff `T` does. -/
-noncomputable def pairReduction {L : Language.{0, 0}} {S T Q : DecisionProblem L}
+noncomputable def pairReduction {L : Language.{0, 0}} [L.IsRelational]
+    {S T Q : DecisionProblem L}
     (f₁ : S ≤ᶠᵒ[≤] SAT) (f₂ : Tᶜ ≤ᶠᵒ[≤] SAT)
     (hQ : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], Q A ↔ (S A ∧ T A)) :
     Q ≤ᶠᵒ[≤] SATUNSAT :=
@@ -395,7 +396,8 @@ first-order reduction to SAT-UNSAT. The `Σ₁` half and the complement of the
 `Π₁` half are both discharged by Cook–Levin
 (`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`), and the two CNF instances so
 produced are paired into one. -/
-theorem satUnsat_hard_of_dpDefinable {L : Language.{0, 0}} (Q : DecisionProblem L)
+theorem satUnsat_hard_of_dpDefinable {L : Language.{0, 0}} [L.IsRelational]
+    (Q : DecisionProblem L)
     (h : DPDefinable Q) : Nonempty (Q ≤ᶠᵒ[≤] SATUNSAT) := by
   obtain ⟨S, T, hS, hT, hST⟩ := h
   obtain ⟨f₁⟩ := sat_hard_of_sigmaSODefinable S hS
