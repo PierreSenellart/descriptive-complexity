@@ -23,6 +23,7 @@ import DescriptiveComplexity.Exponential.Class
 import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
 import DescriptiveComplexity.Exponential.Classes
 import DescriptiveComplexity.Exponential.Reach
+import DescriptiveComplexity.Exponential.Game
 import DescriptiveComplexity.Exponential.Inclusions
 import DescriptiveComplexity.Exponential.PSpaceOn
 import DescriptiveComplexity.Exponential.Simulate
@@ -78,6 +79,17 @@ instead of being reproved:
   polynomial-level inclusion, whence `EXPTIME ⊆ NEXPTIME ⊆ EXPSPACE` and
   `EXPTIME ⊆ EXPSPACE` (which reads, on the definitions, **SO(LFP) ⊆
   SO(PFP)**).
+
+The same construction one operator up is `DescriptiveComplexity.Exponential.Game`:
+a **second-order alternating game** — four first-order sentences over a block,
+saying which assignments are universal, which win outright, which start and
+which moves are legal — is the AND/OR graph `DescriptiveComplexity.GAME` reads
+on the expansion whose points are its states, whence
+`DescriptiveComplexity.SOGameDefinable.mem_EXPTIME`: **SO-GAME ⊆ SO(LFP)**, the
+second-order shadow of `GAME ∈ PTIME`. It is the way into EXPTIME that needs no
+succinctness argument, and what an alternating space-bounded machine will
+consume — its configurations being the assignments of a block with one variable
+for the state, one for the head and one for the tape.
 
 The one inclusion with content is `DescriptiveComplexity.PSPACE_subset_EXPTIME`:
 an `DescriptiveComplexity.SOTCSpec` *is* the graph REACH reads on the expansion
@@ -181,6 +193,7 @@ first-order property of an exponential expansion is in `PH`, hence in
 | `Exponential.SecondOrderFixedPoint` | SO(LFP), SO(PFP) and the two bridge theorems |
 | `Exponential.Classes` | EXPTIME, NEXPTIME, EXPSPACE and their hardness discharges |
 | `Exponential.Reach` | an SO(TC) walk is REACH on an expansion |
+| `Exponential.Game` | a second-order alternating game is GAME on an expansion |
 | `Exponential.Inclusions` | the complement equalities and the inclusions |
 | `Exponential.PSpaceOn` | an FO property of an expansion is in `PH`, hence in `PSPACE` |
 | `Exponential.Simulate` | a machine walking an expanded universe, as a walk over the base |

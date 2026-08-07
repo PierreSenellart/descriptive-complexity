@@ -12,6 +12,7 @@ import DescriptiveComplexity.Problems.ThreeDnfTaut
 import DescriptiveComplexity.Problems.HornSat
 import DescriptiveComplexity.Problems.Cvp
 import DescriptiveComplexity.Problems.Reachability
+import DescriptiveComplexity.Problems.Game
 import DescriptiveComplexity.Problems.ReachabilityDet
 import DescriptiveComplexity.Problems.ReachabilityDet.Complement
 import DescriptiveComplexity.Problems.ThreeColorability
@@ -50,6 +51,8 @@ import DescriptiveComplexity.Problems.FinSat
 import DescriptiveComplexity.Problems.Pcp
 import DescriptiveComplexity.Problems.Machine
 import DescriptiveComplexity.Problems.MachineAlt
+import DescriptiveComplexity.Problems.MachineAltSpace
+import DescriptiveComplexity.Problems.MachineAltSpace.Membership
 import DescriptiveComplexity.Problems.Machine.Halt
 import DescriptiveComplexity.Problems.Machine.HaltCert
 import DescriptiveComplexity.Problems.Machine.HaltFin

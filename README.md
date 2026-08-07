@@ -71,7 +71,7 @@ hard for it under FO reductions.
 | --- | --- | --- | --- |
 | **L** = LOGSPACE | FO(≤, DTC) | deterministic two-way `k`-head automaton, walking a linear order of the universe | REACHd · UNREACHd |
 | **NL** | SO-Krom(≤); equivalently FO(≤, TC) | two-way `k`-head automaton, walking a linear order of the universe | REACH · UNREACH · 2SAT |
-| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn(≤); equivalently FO(≤, LFP) or FO(≤, IFP) | deterministic polynomial-time Turing machine | HORN-SAT · CVP (circuit value) · acceptance by a deterministic polynomial-time Turing machine |
+| **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn(≤); equivalently FO(≤, LFP) or FO(≤, IFP) | deterministic polynomial-time Turing machine | HORN-SAT · CVP (circuit value) · GAME (alternating reachability) · acceptance by a deterministic polynomial-time Turing machine |
 | **NP** = Σ₁ᵖ | ∃SO | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | **coNP** = Π₁ᵖ | ∀SO | nondeterministic polynomial-time Turing machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT · acceptance by such a machine |
 | **DP** | a Σ₁ and a Π₁ sentence conjoined | – | SAT-UNSAT |
@@ -84,15 +84,6 @@ hard for it under FO reductions.
 | **EXPSPACE** | SO(≤, PFP), i.e. PSPACE read over an exponential expansion | – | – |
 | **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 | **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
-
-The three exponential classes are read over a universe that is one exponential
-larger – a definable set of assignments of a second-order block – and their
-structural theorems are inherited rather than reproved: `EXPTIME = coEXPTIME`
-and `EXPSPACE = coEXPSPACE` come from closure of PTIME and PSPACE under
-complement, and `PSPACE ⊆ EXPTIME ⊆ NEXPTIME ⊆ EXPSPACE` from the corresponding
-polynomial-level inclusions. Complete problems for them are not built yet. The
-operator itself is pinned one level down: `PSPACE = NL.exp`, both inclusions
-proved.
 
 Each entry of the machine column is an equivalence *proved here* between the
 logical definition and acceptance by that model. The classes are also matched

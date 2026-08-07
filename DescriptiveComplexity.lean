@@ -612,6 +612,66 @@ development has no counterpart for.
   ∃SO comparable to SO-Horn or SO-Krom is known for deterministic logarithmic
   space. `DescriptiveComplexity.LOGSPACE_subset_NL` is a determinized walk being a
   walk, followed by the FO(TC)/SO-Krom translation.
+* `DescriptiveComplexity.Problems.Game` – **GAME, alternating reachability**
+  (`DescriptiveComplexity.GAME`), and `DescriptiveComplexity.game_mem_PTIME`.
+  An AND/OR graph is a directed graph whose nodes are split between two players,
+  with a set of nodes that win outright; a node is winning when it wins
+  outright, or belongs to the existential player and *some* successor wins, or
+  belongs to the universal player, *has* a successor and *all* its successors
+  win. Read with the universal player removed those are the three clauses of
+  `DescriptiveComplexity.REACH`, so this is reachability with alternation – one
+  operator more, one class up. A universal node with no successor **loses**,
+  which is the convention `DescriptiveComplexity.ATMData.AltWin` already uses,
+  and matching them is what will let an alternating machine's configuration
+  graph be an instance with nothing to adjust. Membership is FO(LFP)
+  definability (`DescriptiveComplexity.game_lfpDefinable`) with one twist: the
+  universal clause is not a Horn body, so a second relation variable computes
+  “every successor at least `y` wins” by a scan of the order from its greatest
+  element down (`DescriptiveComplexity.order_induction_down`). Hardness
+  (`DescriptiveComplexity.game_PTIME_hard`) is unit propagation read as a game:
+  variables are existential nodes, clauses universal ones, a clause with no
+  negative literal wins outright, and the goal clauses are the marked starts, so
+  the existential player wins exactly when the Horn formula is
+  *un*satisfiable — hardness of the complement, carried back by
+  `DescriptiveComplexity.piP_zero_eq`, the same last step CVP's hardness takes.
+  Whence `DescriptiveComplexity.game_PTIME_complete`.
+* `DescriptiveComplexity.MachinesAltSpace` and
+  `DescriptiveComplexity.Problems.MachineAltSpace` – **alternating acceptance in
+  bounded space** (`DescriptiveComplexity.ATMAcceptSpace`), the EXPTIME
+  candidate. It is `DescriptiveComplexity.ATMData.AltAccepts` with the step
+  budget dropped, exactly as `DescriptiveComplexity.TMData.AcceptsSpace` is
+  `DescriptiveComplexity.TMData.Accepts` with it dropped, so winning becomes the
+  least fixed point of the game operator – an inductive predicate
+  (`DescriptiveComplexity.ATMData.AltWin`), agreeing with the budgeted
+  definition over a finite configuration space
+  (`DescriptiveComplexity.ATMData.altWin_iff_exists_altAcc`). The alternation is
+  *unbounded*: `DescriptiveComplexity.ATMData.BlocksWellFormed` is dropped for
+  `DescriptiveComplexity.ATMData.BlocksSplit`, which only asks that the two
+  marks of `FirstOrder.Language.turingAlt 2` partition the states, so no second
+  machine record and no restated transport lemma is needed. With no universal
+  state the model is the space-bounded nondeterministic one
+  (`DescriptiveComplexity.ATMData.altAcceptsSpace_true_iff_acceptsSpace`), so it
+  is a conservative extension.
+* `DescriptiveComplexity.Problems.MachineAltSpace.Membership` –
+  **`ATMAcceptSpace ∈ EXPTIME`**
+  (`DescriptiveComplexity.atmAcceptSpace_mem_EXPTIME`), EXPTIME's first natural
+  problem and the half of `APSPACE = EXPTIME` ([Chandra–Kozen–Stockmeyer
+  1981][chandra1981alternation]) that this design reaches. The machine is a
+  `DescriptiveComplexity.SOGameSpec` at the block with one variable for the
+  state, one for the head and one — binary — for the tape; its `move` sentence
+  is `DescriptiveComplexity.TMData.Step` with seven elements of the *base*
+  quantified (the transition, the two states, the two head positions, the symbol
+  read and the symbol written) and one universal pair for the cells the head
+  does not touch, so nothing quantifies over a configuration and the sentence is
+  first-order over the base. The correspondence with
+  `DescriptiveComplexity.ATMData.AltWin` is a bisimulation between two
+  inductives of the same shape, needing only *a move lands on a configuration*
+  and *a start is a configuration*, so the block's junk assignments are never
+  reached. The two promises `DescriptiveComplexity.TMData.WellFormed` and
+  `DescriptiveComplexity.ATMData.BlocksSplit` ride on the `start` sentence:
+  `DescriptiveComplexity.ExpDefinable` compares `P A` with `Q (X.Map A)` and has
+  nowhere else to put a condition on `A` alone. **Hardness is not proved** and is
+  a separate project – see `ROADMAP.md` §2.
 * `DescriptiveComplexity.Problems.ReachabilityDet` – **REACHd is LOGSPACE-complete**
   (`DescriptiveComplexity.REACHd_LOGSPACE_complete`). The outdegree bound of the
   textbook statement is imposed semantically rather than as a promise: the walk
@@ -955,6 +1015,22 @@ development has no counterpart for.
   gives `PSPACE ⊆ NL.exp` as well, and `NL.exp ⊆ EXPTIME` comes back by
   monotonicity. On the definitions the inclusion is **SO(TC) ⊆ SO(LFP)**, the
   second-order shadow of `NL ⊆ PTIME`.
+* `DescriptiveComplexity.Exponential.Game` – the same construction one operator
+  up, and the way into EXPTIME that needs no succinctness argument. A
+  `DescriptiveComplexity.SOGameSpec` is four first-order sentences over a
+  second-order block – which assignments the universal player owns, which win
+  outright, which start the game, which moves are legal, the move sentence
+  seeing two copies as an `DescriptiveComplexity.SOTCSpec`'s transition does –
+  and it *is* the AND/OR graph `DescriptiveComplexity.GAME` reads on the
+  expansion whose points are its states
+  (`DescriptiveComplexity.SOGameSpec.gameWon_toExp_iff`). Since GAME is in
+  PTIME, `DescriptiveComplexity.SOGameDefinable.mem_EXPTIME` follows: **SO-GAME
+  ⊆ SO(LFP)**, the second-order shadow of `GAME ∈ PTIME`, exactly as the
+  previous entry is the shadow of `REACH ∈ PTIME`. It is what an alternating
+  space-bounded machine consumes, its configurations being the assignments of a
+  block with one variable for the state, one for the head and one for the tape;
+  what is left for `DescriptiveComplexity.ATMAcceptSpace` is to write that
+  machine's four sentences.
 * `DescriptiveComplexity.Exponential.Translate` – **the translation lemma**
   (`DescriptiveComplexity.ExpExpansion.exists_translate`): a first-order
   sentence *over an expansion* is a second-order sentence over the base, since

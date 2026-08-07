@@ -35,12 +35,20 @@ two sharing their scaffolding in `ClauseDischarge.lean`), SO(TC) →
 SUCCINCT-REACH and ∃SO[new] → FINSAT, so no discharge is outstanding; what
 remains below are ordinary catalog reductions and machine bridges.
 
-- **P-complete reductions from CVP** [M]: Monotone CVP, and alternating
-  reachability (DC's canonical P-complete problem, with
-  quantifier-free-projection hardness in the book), entering the catalog as
-  ordinary catalog reductions rather than as primary discharges. The
-  unit-propagation circuit is monotone as drawn, so Monotone CVP is a matter of
-  restricting the vocabulary rather than of a new gadget.
+- **Monotone CVP** [M]: the unit-propagation circuit is monotone as drawn, so
+  this is a matter of restricting the vocabulary rather than of a new gadget.
+- **Hardness of `ATMAcceptSpace` for EXPTIME** [XL, own project]: membership is
+  proved (`atmAcceptSpace_mem_EXPTIME`), so EXPTIME has a natural *member*; what
+  is missing is `EXPTIME ⊆ APSPACE`, the Chandra–Kozen–Stockmeyer simulation. It
+  cannot be routed through the outer composition of §3 — `Q ≤ᶠᵒ[≤] DTMAccept`
+  over `X.E` gives the blocked composite again — so it is a from-scratch
+  simulation, but a well-shaped one: a point of the expansion is a block
+  assignment, i.e. exactly one tape's worth, so the machine holds `O(1)` points
+  and needs no addressing arithmetic; the operations it needs are
+  `Exponential/Increment.lean`'s primitives at the *tape* level, which is what
+  `Problems/Machine/QsatTape.lean` and `QsatRun.lean` already do for QBF
+  assignments; and the control is the syntax tree of a **fixed** FO(LFP)
+  definition, hence finite control and not an interpreter.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
   (Generalized Geography…), the only PSPACE entries still missing.
 - **The exponential classes, complete problems** [XL]: EXPTIME, NEXPTIME and
@@ -52,7 +60,7 @@ remains below are ordinary catalog reductions and machine bridges.
   quantifier-free-completeness audit inside it is where the risk sits. A
   complete problem not routed through succinctness is the alternative:
   alternating space-bounded acceptance is in EXPTIME by definition, its
-  hardness wanting `succinct GAME` and so the P-complete item above.
+  hardness wanting `succinct GAME`, hence the outer composition above.
 - Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
 
