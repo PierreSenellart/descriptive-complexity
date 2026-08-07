@@ -145,6 +145,7 @@ pin is the *same* as your project's, not merely a compatible one.
 
 | DescriptiveComplexity | Mathlib | Toolchain |
 | --- | --- | --- |
+| `v1.1.0` | `v4.33.0-rc1` | `leanprover/lean4:v4.33.0-rc1` |
 | `v1.0.0` | `v4.33.0-rc1` | `leanprover/lean4:v4.33.0-rc1` |
 | `master` | latest pin, moves | see `lean-toolchain` |
 
@@ -160,14 +161,14 @@ In a `lakefile.toml`:
 [[require]]
 name = "descriptive-complexity"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "v1.0.0"
+rev = "v1.1.0"
 ```
 
 or, in a `lakefile.lean`:
 
 ```lean
 require "descriptive-complexity" from git
-  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.0.0"
+  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.1.0"
 ```
 
 Pin a version tag or a commit hash rather than `master`, for reproducible
