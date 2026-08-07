@@ -47,8 +47,12 @@ remains below are ordinary catalog reductions and machine bridges.
   EXPSPACE exist as logics and have their complement equalities and inclusions
   (`DescriptiveComplexity/Exponential.lean`), but **no complete problem**. The
   generic succinctness theorem that would supply them at one stroke – the
-  succinct version of a `C`-complete problem is `C.exp`-complete – is blocked
-  on the outer composition of §3; see the note there before pricing it.
+  succinct version of a `C`-complete problem is `C.exp`-complete – needs the
+  outer composition of §3, whose three-piece fix is described there; the
+  quantifier-free-completeness audit inside it is where the risk sits. A
+  complete problem not routed through succinctness is the alternative:
+  alternating space-bounded acceptance is in EXPTIME by definition, its
+  hardness wanting `succinct GAME` and so the P-complete item above.
 - Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
 
@@ -64,7 +68,11 @@ remains below are ordinary catalog reductions and machine bridges.
   the lexicographic order of two tuples first-order, sit in
   `Problems/FinSat/Nodes.lean` for a build reason only; they belong in
   `OrderWalk.lean` next to `succTupF`, which walks that order without deciding
-  it. `Nodes.lean` also imports `Sat/Tseitin.lean` for `NodeAt`, so if that
+  it. **This has stopped being optional**: the order on the expanded universe
+  (next item) is a framework file and cannot import a problem file, so the move
+  is its prerequisite — and, `OrderWalk.lean` being foundational, the one step
+  of that work that forces a full-library rebuild. Do it once, first.
+  `Nodes.lean` also imports `Sat/Tseitin.lean` for `NodeAt`, so if that
   cross-problem dependency ever grates, the node machinery is generic and
   belongs at top level. Beside it: `blockSym` / `repAssign` /
   `altAssign_qbfBlocks` in `Problems/Qbf/Membership.lean` are the monadic
@@ -83,16 +91,35 @@ remains below are ordinary catalog reductions and machine bridges.
   over the base. So the composite's relations are `Σₖ` over the base, not FO,
   and neither the plain composition nor a Tseitin description of the composite
   exists.
-  Three consequences, all of them design questions rather than proof effort:
-  the converse `NL.exp ⊆ PSPACE` of `PSPACE_subset_NL_exp` is open here (a walk
-  would have to absorb the alternation, in the manner of
-  `PSpaceHierarchy.lean`); a generic "succinct version of a complete problem"
-  theorem cannot be discharged from `C.Hard Q₀`, since cofinal hardness hands
-  out arbitrary FO reductions; and the literature's own side condition —
-  the succinctness upgrade needs *projections* or quantifier-free reductions
-  ([Veith 1998][veith1998succinct]) — is exactly this obstruction, so tracking
-  quantifier-free status through hardness (the reduction-notion item below) is
-  the likely way in.
+  **Quantifiers are the only obstruction**: an atom `R(x̄)` of `J` translates to
+  `X.relSentence`, `x = y` to equality of tagged assignments, and `x ≤ y` to a
+  definable order on the expanded universe, all first-order over the base;
+  Boolean combinations compose. So the fix is in three pieces, and it is the
+  library's version of the side condition the succinctness literature has always
+  attached ([Veith 1998][veith1998succinct] states the upgrade theorem for
+  *projection* reductions) — though quantifier-freeness alone suffices here,
+  projections being a strictly stronger property this framework does not need.
+  - **the order on the expanded universe** [L]: tags first, then assignments by
+    least differing atom; first-order over the base and two block copies, using
+    `lexLtF`, which is why the housekeeping move above stops being optional;
+  - **quantifier-free composition and quantifier-free hardness** [XL]: restrict
+    the outer composition to `IsQuantifierFree` interpretations, where it does
+    exist, and add a `HardQF` predicate *beside* `Hard` rather than a field of
+    `ComplexityClass` (a field would touch `Complexity.lean` and force a full
+    rebuild). The risk is not the definitions but re-proving one complete
+    problem per class under quantifier-free reductions — HORN-SAT first;
+  - **the translation lemma** [L]: an FO sentence over an expansion *is* a
+    second-order sentence over the base, by prenexing and peeling one quantifier
+    per block. It settles the membership half — every first-order property of an
+    expansion is in PH hence PSPACE — and gives the converse
+    `NL.exp ⊆ PSPACE` of `PSPACE_subset_NL_exp`, whose remaining step absorbs
+    the `Σₖ` step into the walk. That absorption is *not*
+    `SOTCDefinable.exBlock` (which prefixes a guessed block **outside** a walk,
+    while these quantifiers sit inside the step relation, under the transitive
+    closure) but the depth-first evaluation walk of
+    `Problems/Qsat/Membership.lean`: the state carries the configuration plus
+    one block component per quantifier of the step formula, a constant since
+    that formula is fixed, so the step stays first-order.
 - **BIT and FO(≤, BIT)** [L]: DC's standard setting – every instance ordered,
   BIT primitive, a tax on every reduction and so not the library's default;
   FO-definability of `+` and `×` from BIT, `FO(≤, BIT)` = uniform AC⁰ as the
@@ -669,8 +696,11 @@ provable rather than merely reasonable.
   than drifted into via built-in arithmetic. Until then the two by-inspection
   claims in the README stay an honest, documented gap.
 - Complete problems for the exponential classes, and with them the generic
-  succinctness theorem — blocked on the outer composition of §3, which is where
-  the design work is.
+  succinctness theorem. The design work is done (§3, the outer composition):
+  the order on the expanded universe first, then either the quantifier-free
+  track for succinct problems or a natural problem whose membership is direct.
+  The order and the translation lemma are the two bricks everything else waits
+  on, and both are [L] and self-contained.
 
 This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §8, the cookbook and catalog
