@@ -955,6 +955,65 @@ development has no counterpart for.
   gives `PSPACE ⊆ NL.exp` as well, and `NL.exp ⊆ EXPTIME` comes back by
   monotonicity. On the definitions the inclusion is **SO(TC) ⊆ SO(LFP)**, the
   second-order shadow of `NL ⊆ PTIME`.
+* `DescriptiveComplexity.Exponential.Translate` – **the translation lemma**
+  (`DescriptiveComplexity.ExpExpansion.exists_translate`): a first-order
+  sentence *over an expansion* is a second-order sentence over the base, since
+  a quantifier ranging over the points of the expanded universe ranges over
+  block assignments. This is the type-lowering reading of [Henkin
+  1950][henkin1950completeness] made into a theorem, and the honest statement
+  of the obstruction that keeps an interpretation from being composed *after*
+  an expansion. A quantified point is a block extended by tag bits, guarded to
+  satisfy its tag's domain sentence; each quantifier peels into two blocks, one
+  `∃` and one `∀`, of which one is real and the other vacuous, so that the
+  prefix alternates strictly; and the induction runs on the
+  `FirstOrder.Language.BoundedFormula.IsPrenex` proof, `∃` being encoded as
+  `∼(∼φ).all` and so unreachable by a structural recursion.
+* `DescriptiveComplexity.Exponential.Increment` – the **successor of an
+  assignment**, as a first-order sentence over the base and two copies of the
+  block: an assignment is a binary number, so the successor is the increment.
+  The subtlety it settles is that `DescriptiveComplexity.SOBlock.atomSet` reads
+  an assignment as a set of *padded* atoms, whose image is only the
+  padding-invariant sets, so the increment has to be taken at the honest atoms
+  `Σ i, Fin (B.arity i) → A` and matched to the padded order through least
+  representatives. With
+  `DescriptiveComplexity.ExpExpansion.trivialize` – which trades an expansion's
+  domain sentence for a mark, carrying an FO(TC) walk along
+  (`DescriptiveComplexity.ExpExpansion.accepts_relSpec`), so that a point is
+  *every* tagged assignment – these are the order primitives a machine needs to
+  walk an expanded universe.
+* `DescriptiveComplexity.Exponential.PSpaceOn` – its payoff,
+  `DescriptiveComplexity.ExpExpansion.mem_PSPACE_of_fo_on_expansion`: **every
+  first-order property of an exponential expansion is in `PH`, hence in
+  `PSPACE`**. This is one bound on the operator *from above*; most of what is
+  proved about it validates it from below, `PSPACE ⊆ NL.exp ⊆ EXPTIME`.
+* `DescriptiveComplexity.Exponential.Simulate` – **a machine that walks an
+  expanded universe is a walk over the base**
+  (`DescriptiveComplexity.ExpExpansion.autoSpec`,
+  `DescriptiveComplexity.ExpExpansion.accepts_autoSpec`). A configuration of a
+  two-way `k`-head automaton over an expansion is a control state and `k`
+  points, i.e. one assignment of the block
+  `(repMerged X.pointBlock k).withTag M.State` – a state of an
+  `DescriptiveComplexity.SOTCSpec`. The automaton's tests are quantifier-free
+  *by fiat* (`DescriptiveComplexity.HeadAutomaton.test_qf`), so
+  `DescriptiveComplexity.ExpExpansion.translQF` translates them as they stand
+  and no quantifier over the expanded universe is ever evaluated; its moves are
+  the order primitives of `Exponential.Increment`, read at a
+  `DescriptiveComplexity.ExpExpansion.PtSlot` – one interface for “a point sits
+  here inside that block”, used both for one configuration and for the two a
+  transition sentence compares. The correctness is a one-step bisimulation, the
+  one hypothesis being that every tagged assignment is a point, which is what
+  `DescriptiveComplexity.ExpExpansion.trivialize` arranges.
+* `DescriptiveComplexity.Exponential.Gate` – **`PSPACE = NL.exp`**
+  (`DescriptiveComplexity.PSPACE_eq_NL_exp`): polynomial space *is*
+  nondeterministic logarithmic space read one exponential up. Both inclusions
+  are theorems, so the exponential operator is pinned at the one level where
+  this library independently knows the answer, and not merely bounded. The
+  converse half chains three constructions – carry the walk to the trivialized
+  expansion, compile it into an automaton
+  (`DescriptiveComplexity.tcDefinable_iff_automaton`), simulate the automaton.
+  `LOGSPACE.exp ⊆ PSPACE` follows by monotonicity; the reverse inclusion is not
+  claimed, REACH not being known here to be in
+  `DescriptiveComplexity.LOGSPACE`.
 
 ## Value invention, towards the recursively enumerable
 

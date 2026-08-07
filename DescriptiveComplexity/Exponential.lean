@@ -16,11 +16,17 @@ import DescriptiveComplexity.Exponential.Rounds
 import DescriptiveComplexity.Exponential.PointAtoms
 import DescriptiveComplexity.Exponential.Matrix
 import DescriptiveComplexity.Exponential.Peel
+import DescriptiveComplexity.Exponential.Translate
+import DescriptiveComplexity.Exponential.Increment
+import DescriptiveComplexity.Exponential.Trivialize
 import DescriptiveComplexity.Exponential.Class
 import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
 import DescriptiveComplexity.Exponential.Classes
 import DescriptiveComplexity.Exponential.Reach
 import DescriptiveComplexity.Exponential.Inclusions
+import DescriptiveComplexity.Exponential.PSpaceOn
+import DescriptiveComplexity.Exponential.Simulate
+import DescriptiveComplexity.Exponential.Gate
 
 /-!
 # The exponential classes, by expansion
@@ -96,26 +102,60 @@ itself enough for such a composition: an interpretation's *quantifiers* range
 over the points of the expanded universe, hence over block assignments, which
 is a second-order condition over the base — see `ROADMAP.md` §3.
 
-## Towards the translation lemma
+## The translation lemma
 
-An FO sentence *over an expansion* is a second-order sentence over the base: a
-quantifier ranging over the points of `X.Map A` ranges over block assignments,
-which is a second-order quantifier over `A`. That statement — the type-lowering
-reading of [Henkin 1950][henkin1950completeness] made into a theorem — is what
-would give *every first-order property of an expansion is in PH, hence in
-PSPACE*, and with it the converse of
-`DescriptiveComplexity.PSPACE_subset_NL_exp`.
+**An FO sentence over an expansion is a second-order sentence over the base**
+(`DescriptiveComplexity.ExpExpansion.exists_translate`): a quantifier ranging
+over the points of `X.Map A` ranges over block assignments, which is a
+second-order quantifier over `A`. That is the type-lowering reading of
+[Henkin 1950][henkin1950completeness] made into a theorem, and the honest
+statement of what keeps an interpretation from being composed *after* an
+expansion (`ROADMAP.md` §3).
 
-Its pieces are built: a quantified point is a block extended by tag bits
+A quantified point is a block extended by tag bits
 (`DescriptiveComplexity.SOBlock.withTag`) satisfying a guard
 (`DescriptiveComplexity.ExpExpansion.pointGuardF`); the expansion's own
 sentences are read at chosen rounds of the prefix
 (`DescriptiveComplexity.ExpExpansion.roundLHom`); the three atoms and the
 quantifier-free matrix translate
 (`DescriptiveComplexity.ExpExpansion.realize_translQF`); and one quantifier
-peels into one block
-(`DescriptiveComplexity.ExpExpansion.altBlockQuant_peel_ex`). What remains is
-the induction over prenex form that assembles them; see `ROADMAP.md` §3.
+peels into two blocks — one `∃`, one `∀`, of which one is real and the other
+vacuous, so that the prefix alternates strictly as
+`DescriptiveComplexity.SORealize` requires
+(`DescriptiveComplexity.ExpExpansion.altBlockQuant_peel_step`). The assembly is
+an induction on the `FirstOrder.Language.BoundedFormula.IsPrenex` proof, with
+the translated sentence produced *existentially*: the inequalities bounding the
+rounds a subformula needs are then in scope exactly where its round indices are
+built, so no fallback round and no cast appears anywhere.
+
+## The gate: `PSPACE = NL.exp`
+
+`DescriptiveComplexity.PSPACE_eq_NL_exp` pins the operator at the one level
+where the library independently knows the answer, in **both** directions:
+polynomial space *is* nondeterministic logarithmic space read one exponential
+up. The easy half is `DescriptiveComplexity.PSPACE_subset_NL_exp` above; the
+converse (`DescriptiveComplexity.NL_exp_subset_PSPACE`) goes through the
+*machine* model of FO(TC) (`DescriptiveComplexity.tcDefinable_iff_automaton`),
+whose tests are quantifier-free by fiat, so that
+`DescriptiveComplexity.ExpExpansion.translQF` translates them as they stand and
+no quantifier over the expanded universe is ever evaluated. Three steps: the
+walk is carried to the **trivialized** expansion (`Exponential.Trivialize`),
+where every tagged assignment is a point and a head's `succ` is the plain binary
+increment (`Exponential.Increment`); the carried walk is compiled into a two-way
+multi-head automaton; and that automaton is simulated by an
+`DescriptiveComplexity.SOTCSpec` over the base
+(`DescriptiveComplexity.ExpExpansion.autoSpec`), a configuration — a control
+state and `k` points — being one assignment of one block.
+
+`LOGSPACE.exp ⊆ PSPACE` follows by monotonicity; the reverse inclusion is not
+claimed, since the graph a walk draws is asked REACH of, and REACH is not known
+here to be in `DescriptiveComplexity.LOGSPACE`.
+
+The other bound from above is the one nothing else tests
+(`DescriptiveComplexity.ExpExpansion.mem_PSPACE_of_fo_on_expansion`): **every
+first-order property of an exponential expansion is in `PH`, hence in
+`PSPACE`**. Everything else proved here validates the operator from below
+(`PSPACE ⊆ NL.exp ⊆ EXPTIME`).
 
 ## Layout
 
@@ -134,11 +174,17 @@ the induction over prenex form that assembles them; see `ROADMAP.md` §3.
 | `Exponential.PointAtoms` | the three atoms a kernel can state about points |
 | `Exponential.Matrix` | translating a quantifier-free matrix |
 | `Exponential.Peel` | peeling one quantifier into one block |
+| `Exponential.Translate` | the translation lemma, by induction on prenex form |
+| `Exponential.Increment` | the successor of a point, and the two endpoints of the order |
+| `Exponential.Trivialize` | trading an expansion's domain for a mark, walk included |
 | `Exponential.Class` | `ExpDefinable`, `ComplexityClass.exp`, `exp_mono`, `exp_compl` |
 | `Exponential.SecondOrderFixedPoint` | SO(LFP), SO(PFP) and the two bridge theorems |
 | `Exponential.Classes` | EXPTIME, NEXPTIME, EXPSPACE and their hardness discharges |
 | `Exponential.Reach` | an SO(TC) walk is REACH on an expansion |
 | `Exponential.Inclusions` | the complement equalities and the inclusions |
+| `Exponential.PSpaceOn` | an FO property of an expansion is in `PH`, hence in `PSPACE` |
+| `Exponential.Simulate` | a machine walking an expanded universe, as a walk over the base |
+| `Exponential.Gate` | `PSPACE = NL.exp` |
 
 ## Literature
 

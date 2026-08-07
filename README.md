@@ -90,7 +90,9 @@ larger – a definable set of assignments of a second-order block – and their
 structural theorems are inherited rather than reproved: `EXPTIME = coEXPTIME`
 and `EXPSPACE = coEXPSPACE` come from closure of PTIME and PSPACE under
 complement, and `PSPACE ⊆ EXPTIME ⊆ NEXPTIME ⊆ EXPSPACE` from the corresponding
-polynomial-level inclusions. Complete problems for them are not built yet.
+polynomial-level inclusions. Complete problems for them are not built yet. The
+operator itself is pinned one level down: `PSPACE = NL.exp`, both inclusions
+proved.
 
 Each entry of the machine column is an equivalence *proved here* between the
 logical definition and acceptance by that model. The classes are also matched

@@ -87,37 +87,24 @@ remains below are ordinary catalog reductions and machine bridges.
   **Quantifiers are the only obstruction**: an atom `R(x̄)` of `J` translates to
   `X.relSentence`, `x = y` to equality of tagged assignments, and `x ≤ y` to a
   definable order on the expanded universe, all first-order over the base;
-  Boolean combinations compose. So the fix is in two remaining pieces, and it is the
+  Boolean combinations compose. So the fix is quantifier-freeness, and it is the
   library's version of the side condition the succinctness literature has always
   attached ([Veith 1998][veith1998succinct] states the upgrade theorem for
   *projection* reductions) — though quantifier-freeness alone suffices here,
   projections being a strictly stronger property this framework does not need.
-  The order on the expanded universe, which both of the following need before
-  they can translate an atom `x ≤ y`, is **built**
-  (`DescriptiveComplexity.ExpExpansion.ordExtend`); what remains is:
-  - **quantifier-free composition and quantifier-free hardness** [XL]: restrict
-    the outer composition to `IsQuantifierFree` interpretations, where it does
-    exist, and add a `HardQF` predicate *beside* `Hard` rather than a field of
-    `ComplexityClass` (a field would touch `Complexity.lean` and force a full
-    rebuild). The risk is not the definitions but re-proving one complete
-    problem per class under quantifier-free reductions — HORN-SAT first;
-  - **the translation lemma** [L, most of it built]: an FO sentence over an
-    expansion *is* a second-order sentence over the base, by prenexing and
-    peeling one quantifier per block. The tag encoding, the point guard, the
-    round selection, the three atoms, the quantifier-free matrix and the two
-    peel steps are in `DescriptiveComplexity/Exponential/`; what remains is the
-    induction over `IsPrenex` that assembles them — pin the already-bound rounds
-    rather than quantifying a suffix, and pad runs of one quantifier with
-    vacuous rounds. It settles the membership half — every first-order property of an
-    expansion is in PH hence PSPACE — and gives the converse
-    `NL.exp ⊆ PSPACE` of `PSPACE_subset_NL_exp`, whose remaining step absorbs
-    the `Σₖ` step into the walk. That absorption is *not*
-    `SOTCDefinable.exBlock` (which prefixes a guessed block **outside** a walk,
-    while these quantifiers sit inside the step relation, under the transitive
-    closure) but the depth-first evaluation walk of
-    `Problems/Qsat/Membership.lean`: the state carries the configuration plus
-    one block component per quantifier of the step formula, a constant since
-    that formula is fixed, so the step stays first-order.
+  The order on the expanded universe, the translation lemma and the gate
+  `PSPACE = NL.exp` are **built**, so what remains is
+  **quantifier-free composition and quantifier-free hardness** [XL]: restrict
+  the outer composition to `IsQuantifierFree` interpretations, where it does
+  exist, and add a `HardQF` predicate *beside* `Hard` rather than a field of
+  `ComplexityClass` (a field would touch `Complexity.lean` and force a full
+  rebuild). The risk is not the definitions but re-proving one complete
+  problem per class under quantifier-free reductions — HORN-SAT first.
+- **`LOGSPACE.exp = PSPACE`** [M–L]: `LOGSPACE.exp ⊆ PSPACE` is monotonicity,
+  but the converse is not the `Exponential/Reach.lean` argument, which asks
+  REACH of the graph a walk draws and so lands in NL. It wants that graph read
+  *deterministically* — Savitch, or the determinization of the QSAT walk, one
+  exponential up.
 - **BIT and FO(≤, BIT)** [L]: DC's standard setting – every instance ordered,
   BIT primitive, a tax on every reduction and so not the library's default;
   FO-definability of `+` and `×` from BIT, `FO(≤, BIT)` = uniform AC⁰ as the
@@ -695,10 +682,9 @@ provable rather than merely reasonable.
   claims in the README stay an honest, documented gap.
 - Complete problems for the exponential classes, and with them the generic
   succinctness theorem. The design work is done (§3, the outer composition):
-  the order on the expanded universe first, then either the quantifier-free
+  the order on the expanded universe, the translation lemma and the gate
+  `PSPACE = NL.exp` are built, so what is left is either the quantifier-free
   track for succinct problems or a natural problem whose membership is direct.
-  The order and the translation lemma are the two bricks everything else waits
-  on, and both are [L] and self-contained.
 
 This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §8, the cookbook and catalog

@@ -108,6 +108,62 @@ theorem realize_twoLHom (ρs : Fin 2 → B.Assignment A)
   haveI := B.twoLHom_isExpansionOn (L := L) ρs
   LHom.realize_onSentence (M := A) (B.twoLHom L) φ
 
+/-! ### Two copies, the other way
+
+`DescriptiveComplexity.SOBlock.twoLHom` reads a *stacked* sentence inside a
+replicated one, which is what an expansion's defining sentence needs. A walk
+over an expanded universe needs the converse: an
+`DescriptiveComplexity.SOTCSpec` states its transition over two stacked copies
+of its state block, while everything said about two points of an expanded
+universe — their order, their equality, one being the successor of the other —
+is written over the block replicated twice. -/
+
+variable (L) in
+/-- Reading a sentence over a block replicated twice inside two *stacked*
+copies: copy `0` becomes the inner copy, copy `1` the outer. -/
+def twoLHom' : (L.sum (B.replicate 2).lang) →ᴸ ((L.sum B.lang).sum B.lang) where
+  onFunction {_} f :=
+    match f with
+    | Sum.inl g => Sum.inl (Sum.inl g)
+    | Sum.inr g => isEmptyElim g
+  onRelation {_} r :=
+    match r with
+    | Sum.inl s => Sum.inl (Sum.inl s)
+    | Sum.inr s =>
+        if s.1.1 = 0 then Sum.inl (Sum.inr ⟨s.1.2, s.2⟩) else Sum.inr ⟨s.1.2, s.2⟩
+
+theorem twoLHom'_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
+    @LHom.IsExpansionOn _ _ (B.twoLHom' L) A
+      ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs))
+      (B.structure₂ (L := L) (ρs 0) (ρs 1)) := by
+  letI := B.structure₂ (L := L) (ρs 0) (ρs 1)
+  letI := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
+  refine ⟨fun {_} f _ => ?_, fun {_} r x => ?_⟩
+  · match f with
+    | Sum.inl _ => rfl
+    | Sum.inr g => exact isEmptyElim g
+  · match r with
+    | Sum.inl _ => rfl
+    | Sum.inr s =>
+      obtain ⟨⟨⟨cv, hcv⟩, i⟩, hs⟩ := s
+      simp only [twoLHom']
+      rcases cv with _ | _ | cv
+      · rfl
+      · rfl
+      · omega
+
+/-- **Correctness of the reversed reading**: the stacked structure holds copy
+`0` in its inner copy and copy `1` in its outer one. -/
+theorem realize_twoLHom' (ρs : Fin 2 → B.Assignment A)
+    (φ : (L.sum (B.replicate 2).lang).Sentence) :
+    @Sentence.Realize _ A (B.structure₂ (L := L) (ρs 0) (ρs 1))
+        ((B.twoLHom' L).onSentence φ) ↔
+      @Sentence.Realize _ A ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)) φ :=
+  letI := B.structure₂ (L := L) (ρs 0) (ρs 1)
+  letI := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
+  haveI := B.twoLHom'_isExpansionOn (L := L) ρs
+  LHom.realize_onSentence (M := A) (B.twoLHom' L) φ
+
 end SOBlock
 
 end DescriptiveComplexity
