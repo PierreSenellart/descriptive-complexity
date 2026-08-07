@@ -9,6 +9,7 @@ import DescriptiveComplexity.Composition
 import DescriptiveComplexity.OrderedComposition
 import DescriptiveComplexity.Complexity
 import DescriptiveComplexity.Encoding
+import DescriptiveComplexity.Encoding.BinarySubsetSum
 import DescriptiveComplexity.Encoding.UnaryBlowup
 import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.SecondOrder
@@ -173,8 +174,15 @@ individual declarations are documented on their own pages.
   predicate `DescriptiveComplexity.Encoding.Faithful`. That the bounds have
   teeth is a theorem: no unary encoding of subset-sum passes them
   (`DescriptiveComplexity.no_unary_encoding`, in
-  `DescriptiveComplexity.Encoding.UnaryBlowup`, with the honest binary encoding
-  as the positive contrast).
+  `DescriptiveComplexity.Encoding.UnaryBlowup`).
+* `DescriptiveComplexity.Encoding.BinarySubsetSum` – the positive contrast,
+  worked out in full: the honest binary encoding of a list of weights and a
+  target (`DescriptiveComplexity.binarySubsetSumEncoding`), its decoding
+  lemmas, and `DescriptiveComplexity.binarySubsetSumEncoding_faithful`, which
+  makes `DescriptiveComplexity.knapsack_NP_complete` a statement about
+  concrete lists of binary-written numbers. Its
+  `BinarySubsetSum.selection_toFinset`/`selection_ofFinset` pair is what any
+  other problem quantifying over selections of items reuses.
 * `DescriptiveComplexity.Decoding` – the decoding direction, for reading
   *hardness* concretely: well-formedness conditions as decision problems
   (`DescriptiveComplexity.DecisionProblem.ofSentence`, restricting a problem to

@@ -104,9 +104,12 @@ route is for.
   linear estimate, the common case.
 
 A worked example – the packaged conjunctive-query instances – is in
-`DescriptiveComplexity/Examples/ConjunctiveQueries.lean`; the theorem that the
-size bounds have teeth (no unary encoding of subset-sum satisfies them) is in
-`DescriptiveComplexity/Encoding/UnaryBlowup.lean`.
+`DescriptiveComplexity/Examples/ConjunctiveQueries.lean`; a second one, for a
+catalog problem whose numbers must be written in binary, is
+`DescriptiveComplexity/Encoding/BinarySubsetSum.lean`, which encodes a list of
+weights and a target and proves the encoding faithful for Knapsack. The
+theorem that the size bounds have teeth (no unary encoding of subset-sum
+satisfies them) is in `DescriptiveComplexity/Encoding/UnaryBlowup.lean`.
 -/
 
 namespace DescriptiveComplexity

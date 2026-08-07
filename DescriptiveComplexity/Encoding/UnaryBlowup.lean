@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.Analysis.SpecificLimits.Normed
-import DescriptiveComplexity.Encoding
-import DescriptiveComplexity.Problems.Knapsack.Defs
+import DescriptiveComplexity.Encoding.BinarySubsetSum
 
 /-!
 # The size bounds have teeth: unary encodings are rejected
@@ -24,10 +23,12 @@ Partition, Job Sequencing, 0-1 Integer Programming) would silently evaporate.
   per unit of weight. The witness family is `([2 ^ k], 2 ^ k)`, of size
   `Θ(k)`: a unary universe on it is exponential in the declared size, so
   `card_le` cannot be discharged.
-* `DescriptiveComplexity.binarySubsetSumEncoding`: the honest *binary*
-  encoding of the same instance type (`DescriptiveComplexity.Numbers.Binary`:
-  items and bit positions, a `bit` relation) satisfies both bounds with room
-  to spare.
+* `DescriptiveComplexity.binarySubsetSumEncoding`, in
+  `DescriptiveComplexity.Encoding.BinarySubsetSum`, is the positive contrast:
+  the honest *binary* encoding of the same instance type
+  (`DescriptiveComplexity.Numbers.Binary`: items and bit positions, a `bit`
+  relation) satisfies both bounds with room to spare, and is faithful for
+  Knapsack.
 
 Together they turn the prose lesson of `DescriptiveComplexity.Numbers` – unary
 versus binary genuinely changes the problem – into a theorem.
@@ -42,16 +43,6 @@ namespace DescriptiveComplexity
 open FirstOrder
 
 open Language Structure
-
-/-- A concrete subset-sum instance: a list of weights and a target. -/
-abbrev SubsetSumInstance : Type := List ℕ × ℕ
-
-/-- The honest size of a subset-sum instance: the total *bit length* of its
-weights and of its target, plus the number of items (so that zero weights
-still take room). An encoding sized this way must represent weights in
-binary or violate `card_le`. -/
-def ssSize : SubsetSumInstance → ℕ := fun i =>
-  (i.1.map Nat.size).sum + Nat.size i.2 + i.1.length
 
 /-- Exponential beats polynomial, in the pointed form the negative example
 needs: some `k` has `c * (2 * k + 4) ^ d < 2 ^ k`. -/
@@ -114,45 +105,5 @@ theorem no_unary_encoding :
     rw [h4] at h1
     exact h2.trans h1
   exact absurd hcontr (not_le.mpr hk)
-
-/-- The positive counterpart: the honest **binary** encoding of subset-sum
-instances – one element per item, one element per bit position, `bit` and
-`tgt` reading the binary digits, place values carried by the order – passes
-both size bounds with room to spare. (Only the size discipline is at stake
-here, so no semantic theorem accompanies this encoding; the catalog's
-Knapsack development is where `Language.binWeights` structures get their
-semantics.) -/
-def binarySubsetSumEncoding : Encoding Language.binWeights SubsetSumInstance where
-  size := ssSize
-  Univ := fun i => Fin i.1.length ⊕ Fin (ssSize i + 1)
-  deceq := fun _ => inferInstance
-  fintype := fun _ => inferInstance
-  relBool := fun i {n} R =>
-    match n, R with
-    | _, .item => fun x => (x 0).isLeft
-    | _, .posn => fun x => (x 0).isRight
-    | _, .bit => fun x =>
-      match x 0, x 1 with
-      | Sum.inl j, Sum.inr p => (i.1.get j).testBit p.1
-      | _, _ => false
-    | _, .tgt => fun x =>
-      match x 0 with
-      | Sum.inr p => i.2.testBit p.1
-      | _ => false
-    | _, .le => fun x =>
-      match x 0, x 1 with
-      | Sum.inl j, Sum.inl j' => decide (j ≤ j')
-      | Sum.inl _, Sum.inr _ => true
-      | Sum.inr _, Sum.inl _ => false
-      | Sum.inr p, Sum.inr p' => decide (p ≤ p')
-  card_le := Encoding.linear_bound (c := 2) fun i => by
-    have hlen : i.1.length ≤ ssSize i := by
-      simp only [ssSize]
-      omega
-    simp only [Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin]
-    omega
-  le_card := Encoding.linear_bound (c := 1) fun i => by
-    simp only [Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin]
-    omega
 
 end DescriptiveComplexity

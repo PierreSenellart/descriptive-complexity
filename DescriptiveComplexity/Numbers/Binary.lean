@@ -125,6 +125,13 @@ theorem posRank_injective : Function.Injective (posRank P) := by
   intro p q h
   exact (monoEquivOfFin P rfl).symm.injective (Fin.val_injective h)
 
+/-- On `Fin m`, which is already the increasing enumeration of itself, the
+rank of a position is its index. This is what lets a concrete encoder lay its
+bit positions out as `Fin m` and read the place values off directly. -/
+@[simp]
+theorem posRank_fin {m : ℕ} (p : Fin m) : posRank (Fin m) p = (p : ℕ) := by
+  simp [posRank]
+
 open Classical in
 /-- The number represented in binary by a set of positions: the sum of
 `2 ^ rank` over the set bits. This is the decoding function of the binary
