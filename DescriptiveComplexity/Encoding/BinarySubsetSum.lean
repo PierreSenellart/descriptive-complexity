@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Encoding
+import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.Numbers.Binary
 import DescriptiveComplexity.Problems.Knapsack.Defs
 
@@ -33,18 +33,26 @@ statement – in unary they are solvable in polynomial time.
   (`BinarySubsetSum.bitRank_posnPt`), and therefore each item's decoded weight
   is its list entry and the decoded target is the target
   (`BinarySubsetSum.weight_itemPt`, `BinarySubsetSum.target`).
-* `BinarySubsetSum.selection_toFinset` and `BinarySubsetSum.selection_ofFinset`
-  turn a *selection of items* on an encoded structure into a `Finset` of list
-  indices and back, preserving both the total weight and whether the selection
-  is empty. They are the reusable half: any problem on `binWeights` that
+* `DescriptiveComplexity.selection_toIndex` and
+  `DescriptiveComplexity.selection_ofIndex` turn a *selection of items* on any
+  structure into a `Finset` of indices and back, along any injective indexing
+  of the items, preserving both the total weight and whether the selection is
+  empty. They are the reusable half: any problem on `binWeights` that
   quantifies over selections of items – Knapsack here, and variants that
-  constrain the selection further – gets its faithfulness from these two.
+  constrain the selection further – gets both directions from these two.
 * `DescriptiveComplexity.binarySubsetSumEncoding_faithful` closes the loop for
   Knapsack: `DescriptiveComplexity.ConcreteSubsetSum`, the textbook predicate
   on a list and a target, is exactly what `DescriptiveComplexity.Knapsack`
   computes on the encoded structure. Read through it,
   `DescriptiveComplexity.knapsack_NP_complete` is a statement about lists of
   binary-written numbers.
+* `DescriptiveComplexity.bwDecoding` is the converse direction, the one
+  *hardness* needs: a computable decoder from presented structures back to
+  lists of weights. It needs no well-formedness condition, there being no junk
+  to exclude – a structure whose order is not linear is a definite
+  no-instance, and a concrete no-instance decodes it. Hence
+  `DescriptiveComplexity.exists_concreteSubsetSum_iff`, for *every* nonempty
+  finite structure.
 
 The universe elements are named by `BinarySubsetSum.itemPt` and
 `BinarySubsetSum.posnPt` rather than written as `Sum.inl`/`Sum.inr`: the
@@ -310,63 +318,88 @@ theorem target_lt : i.2 < 2 ^ (ssSize i + 1) := by
 @[simp] theorem target : BWTarget (binarySubsetSumEncoding.Univ i) = i.2 :=
   binNum_eq _ target_lt _ fun p => by simp
 
+/-- The items of an encoded instance are exactly the elements it indexes. -/
+theorem item_iff_range (q : binarySubsetSumEncoding.Univ i) :
+    BWItem q ↔ ∃ j, itemPt i j = q := by
+  rcases pt_cases q with ⟨j, rfl⟩ | ⟨p, rfl⟩
+  · exact iff_of_true (item_itemPt j) ⟨j, rfl⟩
+  · exact iff_of_false (item_posnPt p) (by rintro ⟨j, hj⟩; exact absurd hj (itemPt_ne_posnPt j p))
+
+end BinarySubsetSum
+
 /-! ### Selections of items, both ways
 
-A selection of items on an encoded structure is a set of list indices, and
-conversely; the correspondence preserves the total weight and whether the
-selection is empty. Everything a problem on `binWeights` asks of a selection
-is therefore settled by these two lemmas.
+A selection of items is a set of indices, along *any* injective indexing of the
+items – the encoding's own, or a decoder's listing of the items of a presented
+structure. Both directions preserve the total weight and whether the selection
+is empty, which is everything a problem on `binWeights` asks of a selection.
 -/
 
-/-- Every selection of items on an encoded instance is a `Finset` of list
-indices with the same total weight and the same emptiness. -/
-theorem selection_toFinset (S : binarySubsetSumEncoding.Univ i → Prop)
-    (hS : ∀ q, S q → BWItem q) :
-    ∃ J : Finset (Fin i.1.length),
-      (∑ᶠ q ∈ {q | S q}, BWWeight q) = ∑ j ∈ J, i.1.get j ∧ ((∃ q, S q) ↔ J.Nonempty) := by
+section Selections
+
+variable {A : Type} [Language.binWeights.Structure A] {n : ℕ} (f : Fin n → A)
+
+/-- Every selection of items is a `Finset` of indices, with the same total
+weight and the same emptiness. -/
+theorem selection_toIndex (hf : Function.Injective f)
+    (hrange : ∀ a, BWItem a ↔ ∃ j, f j = a) (S : A → Prop) (hS : ∀ a, S a → BWItem a) :
+    ∃ J : Finset (Fin n),
+      (∑ᶠ a ∈ {a | S a}, BWWeight a) = ∑ j ∈ J, BWWeight (f j) ∧ ((∃ a, S a) ↔ J.Nonempty) := by
   classical
-  refine ⟨Finset.univ.filter fun j => S (itemPt i j), ?_, ?_⟩
-  · have hset : {q : binarySubsetSumEncoding.Univ i | S q}
-        = itemPt i '' ↑(Finset.univ.filter fun j : Fin i.1.length => S (itemPt i j)) := by
-      ext q
-      rcases pt_cases q with ⟨j, rfl⟩ | ⟨p, rfl⟩
-      · simp
-      · simpa using fun h => absurd (hS _ h) (item_posnPt p)
-    rw [hset, finsum_mem_image itemPt_injective.injOn,
-      finsum_mem_congr rfl fun j _ => weight_itemPt j, finsum_mem_coe_finset]
+  refine ⟨Finset.univ.filter fun j => S (f j), ?_, ?_⟩
+  · have hset : {a : A | S a} = f '' ↑(Finset.univ.filter fun j => S (f j)) := by
+      ext a
+      simp only [Set.mem_setOf_eq, Set.mem_image, Finset.coe_filter, Finset.mem_univ, true_and]
+      constructor
+      · intro ha
+        obtain ⟨j, rfl⟩ := (hrange a).mp (hS a ha)
+        exact ⟨j, ha, rfl⟩
+      · rintro ⟨j, hj, rfl⟩
+        exact hj
+    rw [hset, finsum_mem_image hf.injOn, finsum_mem_coe_finset]
   · simp only [Finset.filter_nonempty_iff, Finset.mem_univ, true_and]
     constructor
-    · rintro ⟨q, hq⟩
-      rcases pt_cases q with ⟨j, rfl⟩ | ⟨p, rfl⟩
-      · exact ⟨j, hq⟩
-      · exact absurd (hS _ hq) (item_posnPt p)
+    · rintro ⟨a, ha⟩
+      obtain ⟨j, rfl⟩ := (hrange a).mp (hS a ha)
+      exact ⟨j, ha⟩
     · rintro ⟨j, hj⟩
-      exact ⟨itemPt i j, hj⟩
+      exact ⟨f j, hj⟩
 
-/-- Conversely, every `Finset` of list indices is a selection of items on the
-encoded instance, with the same total weight and the same emptiness. -/
-theorem selection_ofFinset (J : Finset (Fin i.1.length)) :
-    ∃ S : binarySubsetSumEncoding.Univ i → Prop, (∀ q, S q → BWItem q) ∧
-      (∑ᶠ q ∈ {q | S q}, BWWeight q) = ∑ j ∈ J, i.1.get j ∧ ((∃ q, S q) ↔ J.Nonempty) := by
+/-- Conversely, every `Finset` of indices is a selection of items, with the
+same total weight and the same emptiness. -/
+theorem selection_ofIndex (hf : Function.Injective f) (hitem : ∀ j, BWItem (f j))
+    (J : Finset (Fin n)) :
+    ∃ S : A → Prop, (∀ a, S a → BWItem a) ∧
+      (∑ᶠ a ∈ {a | S a}, BWWeight a) = ∑ j ∈ J, BWWeight (f j) ∧ ((∃ a, S a) ↔ J.Nonempty) := by
   classical
-  refine ⟨fun q => ∃ j ∈ J, q = itemPt i j, ?_, ?_, ?_⟩
-  · rintro q ⟨j, -, rfl⟩
-    exact item_itemPt j
-  · have hset : {q : binarySubsetSumEncoding.Univ i | ∃ j ∈ J, q = itemPt i j}
-        = itemPt i '' ↑J := by
-      ext q
-      rcases pt_cases q with ⟨j, rfl⟩ | ⟨p, rfl⟩
-      · simp [eq_comm]
-      · simp
-    rw [hset, finsum_mem_image itemPt_injective.injOn,
-      finsum_mem_congr rfl fun j _ => weight_itemPt j, finsum_mem_coe_finset]
+  refine ⟨fun a => ∃ j ∈ J, a = f j, ?_, ?_, ?_⟩
+  · rintro a ⟨j, -, rfl⟩
+    exact hitem j
+  · have hset : {a : A | ∃ j ∈ J, a = f j} = f '' ↑J := by
+      ext a
+      simp only [Set.mem_setOf_eq, Set.mem_image, Finset.mem_coe]
+      exact ⟨fun ⟨j, hj, h⟩ => ⟨j, hj, h.symm⟩, fun ⟨j, hj, h⟩ => ⟨j, hj, h.symm⟩⟩
+    rw [hset, finsum_mem_image hf.injOn, finsum_mem_coe_finset]
   · constructor
     · rintro ⟨-, j, hj, -⟩
       exact ⟨j, hj⟩
     · rintro ⟨j, hj⟩
-      exact ⟨itemPt i j, j, hj, rfl⟩
+      exact ⟨f j, j, hj, rfl⟩
 
-end BinarySubsetSum
+/-- **Knapsack, read along an indexing of the items**: the abstract problem is
+the concrete subset-sum question about the indexed weights. -/
+theorem hasSubsetSum_iff_index [Finite A] (hf : Function.Injective f)
+    (hrange : ∀ a, BWItem a ↔ ∃ j, f j = a) (hlin : IsLinOrd (BWLe (A := A))) :
+    HasSubsetSum A ↔ ∃ J : Finset (Fin n), ∑ j ∈ J, BWWeight (f j) = BWTarget A := by
+  constructor
+  · rintro ⟨-, -, S, hSi, hsum⟩
+    obtain ⟨J, hJ, -⟩ := selection_toIndex f hf hrange S hSi
+    exact ⟨J, by rw [← hJ, hsum]⟩
+  · rintro ⟨J, hJ⟩
+    obtain ⟨S, hSi, hsum, -⟩ := selection_ofIndex f hf (fun j => (hrange _).mpr ⟨j, rfl⟩) J
+    exact ⟨inferInstance, hlin, S, hSi, by rw [hsum, hJ]⟩
+
+end Selections
 
 /-! ### Faithfulness for Knapsack -/
 
@@ -381,15 +414,191 @@ computes the textbook predicate `ConcreteSubsetSum`. With the size bounds
 discharged at construction, this is what makes `knapsack_NP_complete` a
 statement about lists of binary-written numbers. -/
 theorem binarySubsetSumEncoding_faithful :
-    binarySubsetSumEncoding.Faithful ConcreteSubsetSum Knapsack := by
-  intro i
+    binarySubsetSumEncoding.Faithful ConcreteSubsetSum Knapsack := fun i =>
+  Iff.symm <| (hasSubsetSum_iff_index (BinarySubsetSum.itemPt i)
+    BinarySubsetSum.itemPt_injective BinarySubsetSum.item_iff_range
+    BinarySubsetSum.isLinOrd).trans <| by
+      simp only [BinarySubsetSum.weight_itemPt, BinarySubsetSum.target]
+      exact Iff.rfl
+
+/-! ### The decoding direction
+
+Faithfulness reads *membership* back to concrete instances; reading *hardness*
+back needs the converse – that the abstract problem is not hard only on junk
+structures no encoding produces. Here there is no junk to exclude: every
+presented `binWeights` structure decodes. A structure whose order is not
+linear is a definite no-instance (`HasSubsetSum` carries `IsLinOrd` as a
+conjunct), and any concrete no-instance decodes it; on the rest, the decoder
+lists the items and reads their weights and the target off the presentation.
+So the well-formedness condition is trivial, and
+`exists_concreteSubsetSum_iff` holds for *every* nonempty finite structure.
+-/
+
+namespace BinarySubsetSum
+
+section Decoder
+
+variable (S : FinPresentation Language.binWeights)
+
+/-! The vocabulary of a presentation is decidable, being a table of `Bool`s;
+these instances are what lets a decoder build `Finset`s and sum over them. -/
+
+instance : DecidablePred (BWItem (A := Fin S.card)) :=
+  fun a => inferInstanceAs (Decidable (S.relBool bwItem ![a] = true))
+
+instance : DecidablePred (BWPosn (A := Fin S.card)) :=
+  fun a => inferInstanceAs (Decidable (S.relBool bwPosn ![a] = true))
+
+instance : DecidablePred (BWTgt (A := Fin S.card)) :=
+  fun a => inferInstanceAs (Decidable (S.relBool bwTgt ![a] = true))
+
+instance : DecidableRel (BWBit (A := Fin S.card)) :=
+  fun a b => inferInstanceAs (Decidable (S.relBool bwBit ![a, b] = true))
+
+instance : DecidableRel (BWLe (A := Fin S.card)) :=
+  fun a b => inferInstanceAs (Decidable (S.relBool bwLe ![a, b] = true))
+
+/-- Is the presented order linear? -/
+def isLinOrdB : Bool :=
+  decide (∀ a b c : Fin S.card, BWLe a a ∧ (BWLe a b → BWLe b c → BWLe a c) ∧
+    (BWLe a b → BWLe b a → a = b) ∧ (BWLe a b ∨ BWLe b a))
+
+theorem isLinOrdB_iff : isLinOrdB S = true ↔ IsLinOrd (BWLe (A := Fin S.card)) := by
+  rw [isLinOrdB, decide_eq_true_iff]
+  constructor
+  · intro h
+    exact ⟨fun a => (h a a a).1, fun a b c => (h a b c).2.1, fun a b => (h a b b).2.2.1,
+      fun a b => (h a b b).2.2.2⟩
+  · rintro ⟨hr, ht, ha, hto⟩ a b c
+    exact ⟨hr a, ht a b c, ha a b, hto a b⟩
+
+/-- The items of a presentation, listed without duplicates. -/
+def items : List (Fin S.card) := (List.finRange S.card).filter fun a => decide (BWItem a)
+
+/-- The rank of a bit position, as a computation. -/
+def rankB (p : Fin S.card) : ℕ := (Finset.univ.filter fun q => BWPosn q ∧ BWLe q p ∧ q ≠ p).card
+
+/-- A binary number of the presentation, as a computation: the noncomputable
+`binNum` is a `finsum`, and this is the `Finset` sum it equals. -/
+def numB (b : Fin S.card → Prop) [DecidablePred b] : ℕ :=
+  ∑ p ∈ Finset.univ.filter (fun p => BWPosn p ∧ b p), 2 ^ rankB S p
+
+theorem numB_eq (b : Fin S.card → Prop) [DecidablePred b] :
+    numB S b = binNum (BWLe (A := Fin S.card)) BWPosn b := by
+  rw [numB, binNum_eq_finsetSum]
+  exact Finset.sum_congr rfl fun p _ => by rw [rankB, bitRank_eq_card]
+
+@[simp] theorem numB_bit (a : Fin S.card) : numB S (BWBit a) = BWWeight a := numB_eq S _
+
+@[simp] theorem numB_tgt : numB S BWTgt = BWTarget (Fin S.card) := numB_eq S _
+
+variable {S}
+
+@[simp] theorem mem_items {a : Fin S.card} : a ∈ items S ↔ BWItem a := by
+  simp [items, List.mem_filter]
+
+theorem items_get_injective : Function.Injective (items S).get :=
+  List.nodup_iff_injective_get.mp ((List.nodup_finRange _).filter _)
+
+theorem items_range (a : Fin S.card) : BWItem a ↔ ∃ j, (items S).get j = a := by
+  rw [← mem_items, List.mem_iff_get]
+
+end Decoder
+
+end BinarySubsetSum
+
+/-- The decoder: on a presentation whose order is linear, list the items and
+read their weights and the target off it; otherwise return a concrete
+no-instance, the presented structure being one too. -/
+def bwDecode (S : FinPresentation Language.binWeights) : Option SubsetSumInstance :=
+  if BinarySubsetSum.isLinOrdB S then
+    some ((BinarySubsetSum.items S).map fun a => BinarySubsetSum.numB S (BWBit a),
+      BinarySubsetSum.numB S BWTgt)
+  else some ([], 1)
+
+/-- Reindexing a decoded weight list: the concrete question about `l.map g` is
+the same question about `g` along `l`. -/
+theorem concreteSubsetSum_map {α : Type} (l : List α) (g : α → ℕ) (t : ℕ) :
+    ConcreteSubsetSum (l.map g, t) ↔ ∃ J : Finset (Fin l.length), ∑ j ∈ J, g (l.get j) = t := by
+  have h : (l.map g).length = l.length := l.length_map g
+  have key : ∀ J : Finset (Fin (l.map g).length),
+      ∑ j ∈ J, (l.map g).get j = ∑ j ∈ J.map (finCongr h).toEmbedding, g (l.get j) := fun J => by
+    rw [Finset.sum_map]
+    exact Finset.sum_congr rfl fun j _ => by simp [List.get_eq_getElem, List.getElem_map]
+  change (∃ J : Finset (Fin (l.map g).length), ∑ j ∈ J, (l.map g).get j = t) ↔ _
   constructor
   · rintro ⟨J, hJ⟩
-    obtain ⟨S, hSi, hsum, -⟩ := BinarySubsetSum.selection_ofFinset J
-    exact ⟨inferInstance, BinarySubsetSum.isLinOrd, S, hSi,
-      by rw [hsum, hJ, BinarySubsetSum.target]⟩
-  · rintro ⟨-, -, S, hSi, hsum⟩
-    obtain ⟨J, hsum', -⟩ := BinarySubsetSum.selection_toFinset S hSi
-    exact ⟨J, by rw [← hsum', hsum, BinarySubsetSum.target]⟩
+    exact ⟨J.map (finCongr h).toEmbedding, (key J).symm.trans hJ⟩
+  · rintro ⟨J, hJ⟩
+    refine ⟨J.map (finCongr h.symm).toEmbedding, (key _).trans ?_⟩
+    rw [← hJ]
+    exact Finset.sum_congr (by ext j; simp) fun _ _ => rfl
+
+/-- The empty list with a positive target is a concrete no-instance – what the
+decoder returns on a structure that is a no-instance for lack of a linear
+order. -/
+theorem not_concreteSubsetSum_empty : ¬ ConcreteSubsetSum ([], 1) := by
+  rintro ⟨J, hJ⟩
+  rw [Finset.eq_empty_of_forall_notMem fun j (_ : j ∈ J) => j.elim0] at hJ
+  simp at hJ
+
+theorem bwDecode_sound (S : FinPresentation Language.binWeights) (i : SubsetSumInstance)
+    (hi : i ∈ bwDecode S) : ConcreteSubsetSum i ↔ Knapsack (Fin S.card) := by
+  unfold bwDecode at hi
+  split at hi
+  · next hlin =>
+    rw [Option.mem_def, Option.some.injEq] at hi
+    subst hi
+    rw [concreteSubsetSum_map]
+    refine Iff.symm ((hasSubsetSum_iff_index (BinarySubsetSum.items S).get
+      BinarySubsetSum.items_get_injective BinarySubsetSum.items_range
+      ((BinarySubsetSum.isLinOrdB_iff S).mp hlin)).trans ?_)
+    simp only [BinarySubsetSum.numB_bit, BinarySubsetSum.numB_tgt]
+  · next hlin =>
+    rw [Option.mem_def, Option.some.injEq] at hi
+    subst hi
+    refine iff_of_false not_concreteSubsetSum_empty ?_
+    rintro ⟨-, hl, -⟩
+    exact hlin ((BinarySubsetSum.isLinOrdB_iff S).mpr hl)
+
+theorem bwDecode_total (S : FinPresentation Language.binWeights) (_hpos : 0 < S.card)
+    (_hW : DecisionProblem.ofSentence (⊤ : Language.binWeights.Sentence) (Fin S.card)) :
+    (bwDecode S).isSome := by
+  unfold bwDecode
+  split <;> rfl
+
+/-- **The computable decoding of binary-weighted structures.** Together with
+`binarySubsetSumEncoding_faithful` it closes the loop: encoded instances are
+equidecided, and *every* nonempty finite structure decodes to an equidecided
+concrete instance, so `Knapsack` is nowhere hard only on junk. The
+well-formedness condition is `⊤` because there is no junk to exclude. -/
+def bwDecoding : Decoding Language.binWeights
+    (DecisionProblem.ofSentence ⊤) ConcreteSubsetSum Knapsack where
+  dec := bwDecode
+  sound := bwDecode_sound
+  total := bwDecode_total
+
+/-- A presented three-element structure: element `0` an item, elements `1`
+and `2` bit positions with `1` the low one, the item's weight and the target
+both `1`. The decoder *runs* on it. -/
+def bwPres : FinPresentation Language.binWeights where
+  card := 3
+  relBool := fun {n} R =>
+    match n, R with
+    | _, .item => fun x => decide (x 0 = 0)
+    | _, .posn => fun x => decide (x 0 ≠ 0)
+    | _, .bit => fun x => decide (x 0 = 0 ∧ x 1 = 1)
+    | _, .tgt => fun x => decide (x 0 = 1)
+    | _, .le => fun x => decide (x 0 ≤ x 1)
+
+set_option linter.hashCommand false in
+#guard bwDecode bwPres = some ([1], 1)
+
+/-- **Hardness reads back to concrete data**: every nonempty finite
+binary-weighted structure is decided by `Knapsack` exactly as some list of
+weights and target is by the textbook predicate. -/
+theorem exists_concreteSubsetSum_iff (A : Type) [Language.binWeights.Structure A]
+    [Finite A] [Nonempty A] : ∃ i, ConcreteSubsetSum i ↔ Knapsack A :=
+  bwDecoding.exists_conc_iff A (by simp)
 
 end DescriptiveComplexity

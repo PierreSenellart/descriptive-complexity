@@ -72,7 +72,11 @@ Worked decoders are in the two tutorials
 `DescriptiveComplexity.Examples.GraphCrawling`); the crawling one exists only
 thanks to well-formedness – on structures marking several roots no honest
 decoder can choose without computing reachability, and `W` (“exactly one
-root”) is what removes them.
+root”) is what removes them. `DescriptiveComplexity.bwDecoding`
+(`DescriptiveComplexity.Encoding.BinarySubsetSum`) is the opposite extreme,
+`W` being `⊤`: a binary-weighted structure whose order is not linear is a
+definite no-instance, so a concrete no-instance decodes it and there is
+nothing to exclude.
 
 ## Main declarations
 

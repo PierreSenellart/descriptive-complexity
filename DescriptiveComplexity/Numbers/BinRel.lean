@@ -201,6 +201,31 @@ theorem binNum_equiv (u : B ≃ A) {LeB : B → B → Prop} {PosnB bB : B → Pr
       by simp⟩
   · rw [bitRank_equiv u hle hp p]
 
+/-! On a finite universe both are finite sums over `Finset`s, which is what a
+decoder computes. The `Decidable` arguments are what makes those `Finset`s
+constructible; nothing here needs the relations to be well-behaved. -/
+
+section Finite
+
+variable [Fintype A] [DecidableEq A] {Le : A → A → Prop} [DecidableRel Le]
+  {Posn : A → Prop} [DecidablePred Posn]
+
+/-- The rank of a position, as the cardinality of a `Finset`. -/
+theorem bitRank_eq_card (p : A) :
+    bitRank Le Posn p = (Finset.univ.filter fun q => Posn q ∧ Le q p ∧ q ≠ p).card := by
+  rw [bitRank, show {q | Posn q ∧ Le q p ∧ q ≠ p}
+    = ↑(Finset.univ.filter fun q => Posn q ∧ Le q p ∧ q ≠ p) by ext q; simp,
+    Set.ncard_coe_finset]
+
+omit [DecidableEq A] [DecidableRel Le] in
+/-- The decoded number, as a sum over a `Finset`. -/
+theorem binNum_eq_finsetSum (b : A → Prop) [DecidablePred b] :
+    binNum Le Posn b = ∑ p ∈ Finset.univ.filter (fun p => Posn p ∧ b p), 2 ^ bitRank Le Posn p := by
+  rw [binNum, show {p | Posn p ∧ b p} = ↑(Finset.univ.filter fun p => Posn p ∧ b p) by
+    ext p; simp, finsum_mem_coe_finset]
+
+end Finite
+
 end Decode
 
 

@@ -176,12 +176,16 @@ individual declarations are documented on their own pages.
   (`DescriptiveComplexity.no_unary_encoding`, in
   `DescriptiveComplexity.Encoding.UnaryBlowup`).
 * `DescriptiveComplexity.Encoding.BinarySubsetSum` – the positive contrast,
-  worked out in full: the honest binary encoding of a list of weights and a
-  target (`DescriptiveComplexity.binarySubsetSumEncoding`), its decoding
-  lemmas, and `DescriptiveComplexity.binarySubsetSumEncoding_faithful`, which
-  makes `DescriptiveComplexity.knapsack_NP_complete` a statement about
-  concrete lists of binary-written numbers. Its
-  `BinarySubsetSum.selection_toFinset`/`selection_ofFinset` pair is what any
+  worked out in full and in both directions. The honest binary encoding of a
+  list of weights and a target (`DescriptiveComplexity.binarySubsetSumEncoding`),
+  its decoding lemmas and `DescriptiveComplexity.binarySubsetSumEncoding_faithful`
+  make `DescriptiveComplexity.knapsack_NP_complete` a statement about concrete
+  lists of binary-written numbers; `DescriptiveComplexity.bwDecoding` reads
+  *hardness* back the same way, and needs no well-formedness condition, a
+  structure whose order is not linear being a definite no-instance. Both rest
+  on `DescriptiveComplexity.hasSubsetSum_iff_index`, which reads the problem
+  along any injective indexing of the items, and on the
+  `DescriptiveComplexity.selection_toIndex`/`selection_ofIndex` pair that any
   other problem quantifying over selections of items reuses.
 * `DescriptiveComplexity.Decoding` – the decoding direction, for reading
   *hardness* concretely: well-formedness conditions as decision problems
