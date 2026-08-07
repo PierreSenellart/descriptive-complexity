@@ -7,6 +7,9 @@ import DescriptiveComplexity.Exponential.Block
 import DescriptiveComplexity.Exponential.Copies
 import DescriptiveComplexity.Exponential.Expansion
 import DescriptiveComplexity.Exponential.Pull
+import DescriptiveComplexity.Exponential.Order
+import DescriptiveComplexity.Exponential.OrdFormula
+import DescriptiveComplexity.Exponential.OrdExtend
 import DescriptiveComplexity.Exponential.Class
 import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
 import DescriptiveComplexity.Exponential.Classes
@@ -70,6 +73,23 @@ whose points are its states, so SO(TC) ⊆ SO(LFP) – the second-order shadow o
 `NL ⊆ PTIME`. It also gives `PSPACE ⊆ NL.exp`, and `NL.exp ⊆ EXPTIME` comes
 back by monotonicity.
 
+## The expanded universe is ordered, definably
+
+An expansion's own universe carries a linear order — tag first, then the
+assignment read as a **binary number**, `ρ` below `σ` at the least atom where
+they differ (`DescriptiveComplexity.ExpExpansion.mapLinearOrder`) — and that
+order is itself **first-order definable over the base**
+(`DescriptiveComplexity.SOBlock.realize_ordLtF`), because a padded atom is one
+of finitely many relation variables together with a tuple of *base* elements.
+`DescriptiveComplexity.ExpExpansion.ordExtend` adds the order symbol to the
+expanded vocabulary and defines it that way, exactly as
+`DescriptiveComplexity.FOInterpretation.ordExtend` does one level down.
+
+This is what any composition reading an expansion's order needs. It is not by
+itself enough for such a composition: an interpretation's *quantifiers* range
+over the points of the expanded universe, hence over block assignments, which
+is a second-order condition over the base — see `ROADMAP.md` §3.
+
 ## Layout
 
 | file | content |
@@ -78,6 +98,9 @@ back by monotonicity.
 | `Exponential.Copies` | reading stacked block expansions inside a replicated one |
 | `Exponential.Expansion` | `ExpExpansion`, its universe, its expanded structure |
 | `Exponential.Pull` | an interpretation followed by an expansion is an expansion |
+| `Exponential.Order` | the order on an expanded universe, semantically |
+| `Exponential.OrdFormula` | that order as a first-order sentence, and its correctness |
+| `Exponential.OrdExtend` | the expansion extended with its own order |
 | `Exponential.Class` | `ExpDefinable`, `ComplexityClass.exp`, `exp_mono`, `exp_compl` |
 | `Exponential.SecondOrderFixedPoint` | SO(LFP), SO(PFP) and the two bridge theorems |
 | `Exponential.Classes` | EXPTIME, NEXPTIME, EXPSPACE and their hardness discharges |

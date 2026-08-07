@@ -64,15 +64,8 @@ remains below are ordinary catalog reductions and machine bridges.
   follows by composing the FO(LFP) → SO-Horn translation with the Horn discharge
   — but the direct `Σ₁` definition would be textbook-faithful; the work is
   formula building, made tedious by the varying arities of a block's atoms.
-- **Housekeeping in the shared machinery** [S]: `lexLtF`/`lexLeF`, which decide
-  the lexicographic order of two tuples first-order, sit in
-  `Problems/FinSat/Nodes.lean` for a build reason only; they belong in
-  `OrderWalk.lean` next to `succTupF`, which walks that order without deciding
-  it. **This has stopped being optional**: the order on the expanded universe
-  (next item) is a framework file and cannot import a problem file, so the move
-  is its prerequisite — and, `OrderWalk.lean` being foundational, the one step
-  of that work that forces a full-library rebuild. Do it once, first.
-  `Nodes.lean` also imports `Sat/Tseitin.lean` for `NodeAt`, so if that
+- **Housekeeping in the shared machinery** [S]:
+  `Problems/FinSat/Nodes.lean` imports `Sat/Tseitin.lean` for `NodeAt`, so if that
   cross-problem dependency ever grates, the node machinery is generic and
   belongs at top level. Beside it: `blockSym` / `repAssign` /
   `altAssign_qbfBlocks` in `Problems/Qbf/Membership.lean` are the monadic
@@ -94,14 +87,14 @@ remains below are ordinary catalog reductions and machine bridges.
   **Quantifiers are the only obstruction**: an atom `R(x̄)` of `J` translates to
   `X.relSentence`, `x = y` to equality of tagged assignments, and `x ≤ y` to a
   definable order on the expanded universe, all first-order over the base;
-  Boolean combinations compose. So the fix is in three pieces, and it is the
+  Boolean combinations compose. So the fix is in two remaining pieces, and it is the
   library's version of the side condition the succinctness literature has always
   attached ([Veith 1998][veith1998succinct] states the upgrade theorem for
   *projection* reductions) — though quantifier-freeness alone suffices here,
   projections being a strictly stronger property this framework does not need.
-  - **the order on the expanded universe** [L]: tags first, then assignments by
-    least differing atom; first-order over the base and two block copies, using
-    `lexLtF`, which is why the housekeeping move above stops being optional;
+  The order on the expanded universe, which both of the following need before
+  they can translate an atom `x ≤ y`, is **built**
+  (`DescriptiveComplexity.ExpExpansion.ordExtend`); what remains is:
   - **quantifier-free composition and quantifier-free hardness** [XL]: restrict
     the outer composition to `IsQuantifierFree` interpretations, where it does
     exist, and add a `HardQF` predicate *beside* `Hard` rather than a field of
