@@ -10,6 +10,12 @@ import DescriptiveComplexity.Exponential.Pull
 import DescriptiveComplexity.Exponential.Order
 import DescriptiveComplexity.Exponential.OrdFormula
 import DescriptiveComplexity.Exponential.OrdExtend
+import DescriptiveComplexity.Exponential.TagBits
+import DescriptiveComplexity.Exponential.PointGuard
+import DescriptiveComplexity.Exponential.Rounds
+import DescriptiveComplexity.Exponential.PointAtoms
+import DescriptiveComplexity.Exponential.Matrix
+import DescriptiveComplexity.Exponential.Peel
 import DescriptiveComplexity.Exponential.Class
 import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
 import DescriptiveComplexity.Exponential.Classes
@@ -90,6 +96,27 @@ itself enough for such a composition: an interpretation's *quantifiers* range
 over the points of the expanded universe, hence over block assignments, which
 is a second-order condition over the base — see `ROADMAP.md` §3.
 
+## Towards the translation lemma
+
+An FO sentence *over an expansion* is a second-order sentence over the base: a
+quantifier ranging over the points of `X.Map A` ranges over block assignments,
+which is a second-order quantifier over `A`. That statement — the type-lowering
+reading of [Henkin 1950][henkin1950completeness] made into a theorem — is what
+would give *every first-order property of an expansion is in PH, hence in
+PSPACE*, and with it the converse of
+`DescriptiveComplexity.PSPACE_subset_NL_exp`.
+
+Its pieces are built: a quantified point is a block extended by tag bits
+(`DescriptiveComplexity.SOBlock.withTag`) satisfying a guard
+(`DescriptiveComplexity.ExpExpansion.pointGuardF`); the expansion's own
+sentences are read at chosen rounds of the prefix
+(`DescriptiveComplexity.ExpExpansion.roundLHom`); the three atoms and the
+quantifier-free matrix translate
+(`DescriptiveComplexity.ExpExpansion.realize_translQF`); and one quantifier
+peels into one block
+(`DescriptiveComplexity.ExpExpansion.altBlockQuant_peel_ex`). What remains is
+the induction over prenex form that assembles them; see `ROADMAP.md` §3.
+
 ## Layout
 
 | file | content |
@@ -101,6 +128,12 @@ is a second-order condition over the base — see `ROADMAP.md` §3.
 | `Exponential.Order` | the order on an expanded universe, semantically |
 | `Exponential.OrdFormula` | that order as a first-order sentence, and its correctness |
 | `Exponential.OrdExtend` | the expansion extended with its own order |
+| `Exponential.TagBits` | a tag as arity-0 relation variables, and its guard |
+| `Exponential.PointGuard` | the guard saying a guessed block is a point |
+| `Exponential.Rounds` | placing an expansion's sentences into a quantifier prefix |
+| `Exponential.PointAtoms` | the three atoms a kernel can state about points |
+| `Exponential.Matrix` | translating a quantifier-free matrix |
+| `Exponential.Peel` | peeling one quantifier into one block |
 | `Exponential.Class` | `ExpDefinable`, `ComplexityClass.exp`, `exp_mono`, `exp_compl` |
 | `Exponential.SecondOrderFixedPoint` | SO(LFP), SO(PFP) and the two bridge theorems |
 | `Exponential.Classes` | EXPTIME, NEXPTIME, EXPSPACE and their hardness discharges |

@@ -101,9 +101,14 @@ remains below are ordinary catalog reductions and machine bridges.
     `ComplexityClass` (a field would touch `Complexity.lean` and force a full
     rebuild). The risk is not the definitions but re-proving one complete
     problem per class under quantifier-free reductions — HORN-SAT first;
-  - **the translation lemma** [L]: an FO sentence over an expansion *is* a
-    second-order sentence over the base, by prenexing and peeling one quantifier
-    per block. It settles the membership half — every first-order property of an
+  - **the translation lemma** [L, most of it built]: an FO sentence over an
+    expansion *is* a second-order sentence over the base, by prenexing and
+    peeling one quantifier per block. The tag encoding, the point guard, the
+    round selection, the three atoms, the quantifier-free matrix and the two
+    peel steps are in `DescriptiveComplexity/Exponential/`; what remains is the
+    induction over `IsPrenex` that assembles them — pin the already-bound rounds
+    rather than quantifying a suffix, and pad runs of one quantifier with
+    vacuous rounds. It settles the membership half — every first-order property of an
     expansion is in PH hence PSPACE — and gives the converse
     `NL.exp ⊆ PSPACE` of `PSPACE_subset_NL_exp`, whose remaining step absorbs
     the `Σₖ` step into the walk. That absorption is *not*
