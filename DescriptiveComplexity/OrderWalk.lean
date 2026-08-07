@@ -537,6 +537,81 @@ theorem finCovBy_iff {n : ℕ} {j j' : Fin n} : j ⋖ j' ↔ (j : ℕ) + 1 = (j'
 
 end LexBridge
 
+/-! ### Deciding the lexicographic order of two tuples
+
+`DescriptiveComplexity.succTupF` *walks* the lexicographic order; the two
+guards below *decide* it, which is what a reduction defining the order of its
+image has to do. They are stated at arbitrary selectors `sel`, `sel'` into a
+shared variable type, rather than at the fixed layout `Fin 2 × Fin D` of
+`DescriptiveComplexity.lexTupleLeF`, because their consumers compare tuples
+sitting at arbitrary positions among the free variables. -/
+
+section LexDecide
+
+variable {D : ℕ} {L : Language.{0, 0}} {γ : Type}
+
+/-- The tuple held by `sel` is lexicographically strictly below the one held by
+`sel'`: the two agree before some coordinate, at which the first is strictly
+smaller. -/
+noncomputable def lexSelLtF (sel sel' : Fin D → γ) : (L.sum Language.order).Formula γ :=
+  listSup ((List.finRange D).map fun p =>
+    listInf (((List.finRange D).filter fun j => j < p).map fun j =>
+      Term.equal (Term.var (sel j)) (Term.var (sel' j))) ⊓
+    ltF (Term.var (sel p)) (Term.var (sel' p)))
+
+/-- The tuple held by `sel` is lexicographically below or equal to the one held
+by `sel'`. -/
+noncomputable def lexSelLeF (sel sel' : Fin D → γ) : (L.sum Language.order).Formula γ :=
+  lexSelLtF sel sel' ⊔
+    listInf ((List.finRange D).map fun j =>
+      Term.equal (Term.var (sel j)) (Term.var (sel' j)))
+
+variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
+
+@[simp]
+theorem realize_lexSelLtF (sel sel' : Fin D → γ) :
+    (lexSelLtF (L := L) sel sel').Realize v ↔ toLex (v ∘ sel) < toLex (v ∘ sel') := by
+  rw [lexSelLtF, realize_listSup, lex_lt_iff]
+  constructor
+  · rintro ⟨φ, hφ, hr⟩
+    obtain ⟨p, -, rfl⟩ := List.mem_map.mp hφ
+    rw [Formula.realize_inf, realize_listInf, realize_ltF] at hr
+    refine ⟨p, fun j hj => ?_, hr.2⟩
+    have := hr.1 _ (List.mem_map.mpr
+      ⟨j, List.mem_filter.mpr ⟨List.mem_finRange j, by simpa using hj⟩, rfl⟩)
+    rwa [Formula.realize_equal, Term.realize_var, Term.realize_var] at this
+  · rintro ⟨p, hag, hp⟩
+    refine ⟨_, List.mem_map.mpr ⟨p, List.mem_finRange p, rfl⟩, ?_⟩
+    rw [Formula.realize_inf, realize_listInf, realize_ltF]
+    refine ⟨fun φ hφ => ?_, hp⟩
+    obtain ⟨j, hj, rfl⟩ := List.mem_map.mp hφ
+    rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
+    exact hag j (by simpa using (List.mem_filter.mp hj).2)
+
+@[simp]
+theorem realize_lexSelLeF (sel sel' : Fin D → γ) :
+    (lexSelLeF (L := L) sel sel').Realize v ↔ toLex (v ∘ sel) ≤ toLex (v ∘ sel') := by
+  rw [lexSelLeF, Formula.realize_sup, realize_lexSelLtF, realize_listInf, le_iff_lt_or_eq]
+  refine or_congr Iff.rfl ?_
+  constructor
+  · intro h
+    refine funext fun j => ?_
+    have := h _ (List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩)
+    rwa [Formula.realize_equal, Term.realize_var, Term.realize_var] at this
+  · intro h φ hφ
+    obtain ⟨j, -, rfl⟩ := List.mem_map.mp hφ
+    rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
+    exact congrFun h j
+
+/-- The comparison is total, so a reduction may define the order of its image
+by emitting `DescriptiveComplexity.lexSelLeF` at equal tags. -/
+theorem lexSelLeF_total (sel sel' : Fin D → γ) :
+    (lexSelLeF (L := L) sel sel').Realize v ∨ (lexSelLeF (L := L) sel' sel).Realize v := by
+  rw [realize_lexSelLeF, realize_lexSelLeF]
+  exact le_total _ _
+
+end LexDecide
+
 /-! ### Reaching an element from below a cover -/
 
 section CovByCases

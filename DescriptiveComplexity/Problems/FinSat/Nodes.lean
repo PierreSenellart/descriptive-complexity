@@ -53,13 +53,11 @@ lowest, the prefix highest, the translated kernel ordered by the size of its
 subformula – and ties are broken by an arbitrary enumeration of the (finite)
 tag type. The resulting key `DescriptiveComplexity.FinSat.tagKey` is injective,
 so the reduction may compare two tags by trichotomy and emit `⊤`, `⊥` or a
-comparison of the tuples. That last comparison,
-`DescriptiveComplexity.FinSat.lexLtF` / `DescriptiveComplexity.FinSat.lexLeF`, is
-the one order guard `DescriptiveComplexity.OrderWalk` does not carry: it *walks*
-the lexicographic order (`succTupF`) where a reduction defining the order of its
-image has to *decide* it. It is written here rather than there only so that this
-work in progress adds files instead of changing one the whole library depends
-on; it belongs next to `succTupF`.
+comparison of the tuples. That last comparison is
+`DescriptiveComplexity.lexSelLeF`, which lives in
+`DescriptiveComplexity.OrderWalk` next to `succTupF`: the guard *walks* the
+lexicographic order where a reduction defining the order of its image has to
+*decide* it.
 -/
 
 namespace DescriptiveComplexity
@@ -178,74 +176,6 @@ def maxArity : ∀ {n : ℕ}, L'.BoundedFormula Empty n → ℕ
   | _, .all f => maxArity f
 
 end Sizes
-
-/-! ### Comparing two tuples lexicographically -/
-
-section LexCompare
-
-variable {D : ℕ} {L : Language.{0, 0}} {γ : Type}
-
-/-- The tuple held by `sel` is lexicographically strictly below the one held by
-`sel'`: the two agree before some coordinate, at which the first is strictly
-smaller. -/
-noncomputable def lexLtF (sel sel' : Fin D → γ) : (L.sum Language.order).Formula γ :=
-  listSup ((List.finRange D).map fun p =>
-    listInf (((List.finRange D).filter fun j => j < p).map fun j =>
-      Term.equal (Term.var (sel j)) (Term.var (sel' j))) ⊓
-    ltF (Term.var (sel p)) (Term.var (sel' p)))
-
-/-- The tuple held by `sel` is lexicographically below or equal to the one held
-by `sel'`. -/
-noncomputable def lexLeF (sel sel' : Fin D → γ) : (L.sum Language.order).Formula γ :=
-  lexLtF sel sel' ⊔
-    listInf ((List.finRange D).map fun j =>
-      Term.equal (Term.var (sel j)) (Term.var (sel' j)))
-
-variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
-
-@[simp]
-theorem realize_lexLtF (sel sel' : Fin D → γ) :
-    (lexLtF (L := L) sel sel').Realize v ↔ toLex (v ∘ sel) < toLex (v ∘ sel') := by
-  rw [lexLtF, realize_listSup, lex_lt_iff]
-  constructor
-  · rintro ⟨φ, hφ, hr⟩
-    obtain ⟨p, -, rfl⟩ := List.mem_map.mp hφ
-    rw [Formula.realize_inf, realize_listInf, realize_ltF] at hr
-    refine ⟨p, fun j hj => ?_, hr.2⟩
-    have := hr.1 _ (List.mem_map.mpr
-      ⟨j, List.mem_filter.mpr ⟨List.mem_finRange j, by simpa using hj⟩, rfl⟩)
-    rwa [Formula.realize_equal, Term.realize_var, Term.realize_var] at this
-  · rintro ⟨p, hag, hp⟩
-    refine ⟨_, List.mem_map.mpr ⟨p, List.mem_finRange p, rfl⟩, ?_⟩
-    rw [Formula.realize_inf, realize_listInf, realize_ltF]
-    refine ⟨fun φ hφ => ?_, hp⟩
-    obtain ⟨j, hj, rfl⟩ := List.mem_map.mp hφ
-    rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
-    exact hag j (by simpa using (List.mem_filter.mp hj).2)
-
-@[simp]
-theorem realize_lexLeF (sel sel' : Fin D → γ) :
-    (lexLeF (L := L) sel sel').Realize v ↔ toLex (v ∘ sel) ≤ toLex (v ∘ sel') := by
-  rw [lexLeF, Formula.realize_sup, realize_lexLtF, realize_listInf, le_iff_lt_or_eq]
-  refine or_congr Iff.rfl ?_
-  constructor
-  · intro h
-    refine funext fun j => ?_
-    have := h _ (List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩)
-    rwa [Formula.realize_equal, Term.realize_var, Term.realize_var] at this
-  · intro h φ hφ
-    obtain ⟨j, -, rfl⟩ := List.mem_map.mp hφ
-    rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
-    exact congrFun h j
-
-/-- The comparison is total, so a reduction may define the order of its image
-by emitting `DescriptiveComplexity.FinSat.lexLeF` at equal tags. -/
-theorem lexLeF_total (sel sel' : Fin D → γ) :
-    (lexLeF (L := L) sel sel').Realize v ∨ (lexLeF (L := L) sel' sel).Realize v := by
-  rw [realize_lexLeF, realize_lexLeF]
-  exact le_total _ _
-
-end LexCompare
 
 /-! ### The tags -/
 

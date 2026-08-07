@@ -221,8 +221,8 @@ grows. -/
 noncomputable def tupLeF (t : FTag B φ) :
     (L.sum Language.order).Formula (Fin 2 × Fin (finsatDim B φ)) :=
   match t with
-  | .pre => lexLeF (fun j => (1, j)) fun j => (0, j)
-  | _ => lexLeF (fun j => (0, j)) fun j => (1, j)
+  | .pre => lexSelLeF (fun j => (1, j)) fun j => (0, j)
+  | _ => lexSelLeF (fun j => (0, j)) fun j => (1, j)
 
 open Classical in
 /-- The order of the syntax: the tags by their key, and within one tag the
@@ -520,7 +520,7 @@ theorem tupLe_trans {t : FTag B φ} {u v w : Fin (finsatDim B φ) → A}
 
 theorem realize_tupLeF (t : FTag B φ) (v : Fin 2 × Fin (finsatDim B φ) → A) :
     (tupLeF B φ t).Realize v ↔ tupLe B φ t (fun j => v (0, j)) fun j => v (1, j) := by
-  cases t <;> simp only [tupLeF, tupLe, realize_lexLeF, Function.comp_def]
+  cases t <;> simp only [tupLeF, tupLe, realize_lexSelLeF, Function.comp_def]
 
 omit [L.Structure A] in
 /-- Tags are determined by their key. -/
