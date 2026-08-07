@@ -89,6 +89,7 @@ import DescriptiveComplexity.FixedPointStratify
 import DescriptiveComplexity.AbiteboulVianu
 import DescriptiveComplexity.PSpaceCompl
 import DescriptiveComplexity.PSpaceHierarchy
+import DescriptiveComplexity.Exponential
 import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.OccurrenceOrder
@@ -884,6 +885,76 @@ development has no counterpart for.
   framework's `PSPACE = NPSPACE`: nothing simulates a nondeterministic machine
   deterministically, Savitch having already been spent logically in
   `DescriptiveComplexity.Problems.Qsat`.
+
+## The exponential classes, by expansion
+
+* `DescriptiveComplexity.Exponential` – **EXPTIME, NEXPTIME and EXPSPACE**,
+  obtained by reading the polynomial-level logics over a universe one
+  exponential larger. An `DescriptiveComplexity.ExpExpansion` maps a finite
+  ordered structure `A` to a structure whose universe is a *definable set of
+  tagged assignments of a second-order block* – `2^(n^a)` points on a universe
+  of size `n` – each relation being defined by a first-order sentence over the
+  base vocabulary expanded by one copy of the block per argument. This is the
+  same construction the library already carries for SUCCINCT-REACH, made into
+  data and applied to an arbitrary vocabulary; it is also the standard
+  type-lowering translation of higher-order logic into many-sorted first-order
+  logic over the power type ([Henkin 1950][henkin1950completeness]), which is
+  why a *second*-order fixed point over `A` is an ordinary first-order fixed
+  point over the expansion, and why no third-order syntax is introduced.
+* `DescriptiveComplexity.Exponential.Pull` – **an interpretation followed by an
+  expansion is an expansion**
+  (`DescriptiveComplexity.ExpExpansion.pullOrdered`), which is what makes the
+  notion closed under (ordered) FO reductions. Everything it needs is already
+  in the library: the order of an interpreted universe is definable
+  (`DescriptiveComplexity.FOInterpretation.ordExtend`), a block pulls back
+  through an interpretation (`DescriptiveComplexity.SOBlock.pull`), and
+  replication commutes with that pullback definitionally
+  (`DescriptiveComplexity.SOBlock.homAssign_replicatePullHom`) – so the
+  defining sentences of the composite are the pulled ones read through a
+  renaming of relation variables and nothing more.
+* `DescriptiveComplexity.Exponential.Class` – the operator
+  `DescriptiveComplexity.ComplexityClass.exp`, applied to an **abstract**
+  class. That abstraction is the whole design: the succinctness upgrade
+  ([Galperin–Wigderson 1983][galperin1983succinct];
+  [Papadimitriou–Yannakakis 1986][papadimitriou1986note]; in general form
+  [Veith 1998][veith1998succinct]) is proved once, as
+  `DescriptiveComplexity.ComplexityClass.exp_compl` and
+  `DescriptiveComplexity.ComplexityClass.exp_mono`, and every exponential-level
+  statement is read off from its polynomial-level counterpart.
+* `DescriptiveComplexity.Exponential.Classes` – the three classes.
+  `EXPTIME` is *defined* as SO(≤, LFP) and `EXPSPACE` as SO(≤, PFP)
+  (`DescriptiveComplexity.SOLFPDefinable`,
+  `DescriptiveComplexity.SOPFPDefinable`), and each equals the exponential of
+  its polynomial counterpart by theorem
+  (`DescriptiveComplexity.EXPTIME_eq_PTIME_exp`,
+  `DescriptiveComplexity.EXPSPACE_eq_PSPACE_exp`) – these are the library's own
+  capture theorems FO(≤, LFP) = PTIME and FO(≤, PFP) = PSPACE, read on the
+  expanded universe. Naming the classes after these logics follows
+  [Abiteboul–Vardi–Vianu 1997][abiteboul1997fixpoint], cited for the *names*
+  only: that work is stated in the relational, order-free setting, and here the
+  logics are definitions, so no capture theorem is claimed. `NEXPTIME` is
+  defined as `NP.exp`; its literature characterization is existential
+  *third*-order logic ([Leivant 1989][leivant1989descriptive];
+  [Hella–Turull-Torres 2006][hella2006higher]) and the library does not state
+  that equivalence, having no third-order syntax – an honest and narrow gap,
+  since NEXPTIME still gets its logical reading, guess a relation over the
+  expanded universe and check a first-order condition there.
+* `DescriptiveComplexity.Exponential.Inclusions` – **`EXPTIME = coEXPTIME`**
+  and **`EXPSPACE = coEXPSPACE`**, inherited from
+  `DescriptiveComplexity.piP_zero_eq` (Grädel's capture theorem at level 0) and
+  `DescriptiveComplexity.PSPACE_eq_coPSPACE` (Savitch) through `exp_compl`.
+  Read on the definitions they say that SO(LFP) and SO(PFP) are closed under
+  complement. Nothing of those two developments is spent twice; no claim is
+  made for NEXPTIME. The inclusions `PSPACE ⊆ EXPTIME ⊆ NEXPTIME ⊆ EXPSPACE`
+  follow, all but the first by `exp_mono` on a polynomial-level inclusion.
+* `DescriptiveComplexity.Exponential.Reach` – the one inclusion with content,
+  `DescriptiveComplexity.PSPACE_subset_EXPTIME`: an
+  `DescriptiveComplexity.SOTCSpec` *is* the graph REACH reads on the expansion
+  whose points are its states, the two definitions being the same sentence up
+  to the name of the universe. Since REACH is in every class from NL up, this
+  gives `PSPACE ⊆ NL.exp` as well, and `NL.exp ⊆ EXPTIME` comes back by
+  monotonicity. On the definitions the inclusion is **SO(TC) ⊆ SO(LFP)**, the
+  second-order shadow of `NL ⊆ PTIME`.
 
 ## Value invention, towards the recursively enumerable
 

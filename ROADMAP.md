@@ -43,8 +43,13 @@ remains below are ordinary catalog reductions and machine bridges.
   restricting the vocabulary rather than of a new gadget.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
   (Generalized Geography…), the only PSPACE entries still missing.
-- Horizon: EXPTIME/NEXPTIME via SO(LFP)/SO(TC) and succinct-input problems [R];
-  Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
+- **The exponential classes, complete problems** [XL]: EXPTIME, NEXPTIME and
+  EXPSPACE exist as logics and have their complement equalities and inclusions
+  (`DescriptiveComplexity/Exponential.lean`), but **no complete problem**. The
+  generic succinctness theorem that would supply them at one stroke – the
+  succinct version of a `C`-complete problem is `C.exp`-complete – is blocked
+  on the outer composition of §3; see the note there before pricing it.
+- Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
 
 ## 3. Logics and framework extensions
@@ -66,6 +71,28 @@ remains below are ordinary catalog reductions and machine bridges.
   special case of `SecondOrderReplicate.lean` and should be folded into it –
   noticed while building the PH bridge, left alone because it touches a working
   file and bought that bridge nothing.
+- **Composing an expansion with an interpretation, the outer way** [XL, design
+  work first]: `DescriptiveComplexity.ExpExpansion.pullOrdered` composes an
+  interpretation *before* an expansion (`A ↦ X.Map (I.Map A)`) and is what makes
+  `ComplexityClass.exp` a class. The **other** order — an interpretation applied
+  to an expanded structure, `A ↦ J.MapRel (X.Map A)` — is what a complete
+  problem for an exponential class would need, and it is *not* an expansion:
+  an expansion's defining sentences are first-order over the base with the block
+  copies as parameters, while a quantifier of `J` ranges over the *points* of
+  `X.Map A`, i.e. over block assignments, which is a second-order quantifier
+  over the base. So the composite's relations are `Σₖ` over the base, not FO,
+  and neither the plain composition nor a Tseitin description of the composite
+  exists.
+  Three consequences, all of them design questions rather than proof effort:
+  the converse `NL.exp ⊆ PSPACE` of `PSPACE_subset_NL_exp` is open here (a walk
+  would have to absorb the alternation, in the manner of
+  `PSpaceHierarchy.lean`); a generic "succinct version of a complete problem"
+  theorem cannot be discharged from `C.Hard Q₀`, since cofinal hardness hands
+  out arbitrary FO reductions; and the literature's own side condition —
+  the succinctness upgrade needs *projections* or quantifier-free reductions
+  ([Veith 1998][veith1998succinct]) — is exactly this obstruction, so tracking
+  quantifier-free status through hardness (the reduction-notion item below) is
+  the likely way in.
 - **BIT and FO(≤, BIT)** [L]: DC's standard setting – every instance ordered,
   BIT primitive, a tax on every reduction and so not the library's default;
   FO-definability of `+` and `×` from BIT, `FO(≤, BIT)` = uniform AC⁰ as the
@@ -641,7 +668,9 @@ provable rather than merely reasonable.
   [R] items and a switching lemma at the end, to be decided as a whole rather
   than drifted into via built-in arithmetic. Until then the two by-inspection
   claims in the README stay an honest, documented gap.
-- The exponential classes (SO(LFP), SO(PFP)).
+- Complete problems for the exponential classes, and with them the generic
+  succinctness theorem — blocked on the outer composition of §3, which is where
+  the design work is.
 
 This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §8, the cookbook and catalog
