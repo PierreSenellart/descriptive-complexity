@@ -130,13 +130,14 @@ remains below are ordinary catalog reductions and machine bridges.
     carry-lookahead; multiplication needs a double-width digit product, which
     needs a half-width (base-`√n`) splitting. Note what it does *not* gate: a
     problem reducing to an AC⁰ problem is already known to be in PTIME.
-  * **BIT itself** [M–L]: as a *derived* predicate (Immerman's mutual
-    definability), not a primitive, so that the closure obligation above does
-    not grow a base-conversion. On the fixed-point side it is cheap – two more
-    induction variables, `pow2 (succ j) p' ← pow2 j p ∧ plus p p p'` and then
-    `bit` – which buys `BIT` for membership proofs without touching the class;
-    on the machine side a `bitP` fragment would slot into `evalArithP` beside
-    `plusP` and `timesP`.
+  * **What is left of BIT** [M]: the predicate itself is **built**, as a derived
+    one inside the logic (`LogTime/Bits.lean`, `BitAt`), so nothing here grows a
+    base-conversion. Two smaller pieces remain: a `bitP` head fragment slotted
+    into `evalArithP` beside `plusP` and `timesP`, which would keep the sharp
+    `AC⁰ ⊆ LOGSPACE` if the vocabulary ever grew a `BIT` symbol; and, if the
+    logic is ever to be *named* `FO(≤, BIT)`, the converse of Immerman's mutual
+    definability – `+` and `×` from `BIT` alone – which is the harder half and
+    is what the machine bridge of §4 also waits on.
 - **Quantifier-free projections** [L]: the finest reduction notion (DC uses them
   for almost all completeness results); SAT complete under first-order
   projections.
@@ -199,36 +200,29 @@ X"), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **The machine bridge for AC⁰** [L], and *not* through circuits: the class is
-  built as the logic (`AC0Definable`, §3), so what is missing is the bridge to
-  a model. Take it through the **logarithmic-time hierarchy**
-  `LH = ⋃ₖ Σₖ-TIME(log n)` – alternating random-access machines with a
-  logarithmic clock and constantly many alternation blocks – which is the
-  intermediate characterization of DLOGTIME-uniform AC⁰ ([Barrington, Immerman
-  & Straubing 1990][barrington1990uniformity]) and is far better suited to this
-  framework than the circuit end of it: random access, the awkward ingredient
-  of the string definition, is here just an atom of the input structure; an
-  alternation block of `O(log n)` guessed bits is one *element* of the
-  universe, so `Σₖ-TIME(log n)` is `k` first-order quantifier blocks over a
-  base check, the shape `ATMAccept k` already has; and the result refines level
-  by level, mirroring PH. The content sits entirely in the deterministic base,
-  which must be **bit-level** – addresses manipulated one bit at a time under a
-  logarithmic clock – or the bridge is vacuous; that is a finer-grained
-  `HeadArith.lean`, plus one genuinely new ingredient, a *sublinear* time
-  domain indexed by bit positions rather than by tuples of the universe.
-  Payoff: the `FO ⊆ AC⁰` half turns the library's currently *by-inspection*
-  claim that FO reductions are AC⁰-computable – the structures-vs-strings
-  bridge of §7 and of the README's *Scope* – into a theorem, and it is the
-  prerequisite for the PARITY ∉ AC⁰ lower bound of §5. It closes only the
-  *reduction* half of that bridge: the membership half, that a definability
-  witness is evaluated within its class's bound, needs the same evaluator at a
-  coarser resource accounting, so neither half is worth building alone. The
-  **circuit** route stays [R] and should be taken only if uniform circuit
-  families are wanted for their own sake: bounded-depth unbounded-fan-in
-  families, a direct-connection language for uniformity, and a converse half
-  (simulating a family by a sentence) harder than anything above. Independent
-  of the three remaining §3 items; design in `AC0.md` §4; cf. the
-  circuit-family-bridge remark in §7.
+- **The converse half of the AC⁰ machine bridge** [R]: the model is **built**
+  (`LogTime.lean`: alternating machines whose registers are `log n`-bit
+  addresses filled by the two players, and whose deterministic base is a Boolean
+  combination of input queries and of *sweeps* – single passes over the bit
+  positions by a finite automaton), and so is the inclusion
+  `LTDecidable ⊆ AC⁰ ⊆ LOGSPACE`, by guessing each sweep's history as a constant
+  number of bit vectors, one element apiece. What is missing is
+  `AC⁰ ⊆ LTDecidable`, and the build revised its price sharply upwards. A sweep
+  passes a constant number of bits across each position, so a constant number of
+  sweeps cannot multiply – the schoolbook product of two `log n`-bit numbers
+  accumulates a column count that grows with the positions. Widening the base
+  does not help by itself: a machine that revisits its positions unboundedly
+  often (one that *counts*) leaves the `O(log n)`-bit trace budget the
+  simulation lives on, so the two halves cannot both be had with a naive base,
+  and closing the sandwich is the hard half of [Barrington, Immerman &
+  Straubing 1990][barrington1990uniformity] – a genuine formalization project,
+  not an engineering task. Whoever takes it up should first decide what the
+  intended class *is*: the sweep model as built, a bounded-reversal refinement,
+  or the full `Σₖ-TIME(log n)` with a counting base. The **circuit** route stays
+  [R] and should be taken only if uniform circuit families are wanted for their
+  own sake. Note what neither half discharges: the structures-vs-strings bridge
+  of §7 and of the README's *Scope* is about string encodings, and no bridge
+  inside this framework closes it.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
 

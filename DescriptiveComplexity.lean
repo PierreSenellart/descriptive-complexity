@@ -85,6 +85,12 @@ import DescriptiveComplexity.FirstOrderPull
 import DescriptiveComplexity.Arithmetic
 import DescriptiveComplexity.ArithmeticDefinable
 import DescriptiveComplexity.ArithmeticFixedPoint
+import DescriptiveComplexity.LogTime.Definable
+import DescriptiveComplexity.LogTime.Bits
+import DescriptiveComplexity.LogTime.Machine
+import DescriptiveComplexity.LogTime.Simulate
+import DescriptiveComplexity.LogTime.Arith
+import DescriptiveComplexity.LogTime
 import DescriptiveComplexity.Games.Ehrenfeucht
 import DescriptiveComplexity.Games.Bare
 import DescriptiveComplexity.Games.Distance
@@ -916,6 +922,38 @@ The bottom of the ordered world, and the only vocabulary here that is a
   quantifier region. With this the bottom of the ladder is pinned:
   `FO(≤) ⊊ AC⁰ ⊆ LOGSPACE ⊆ NL ⊆ PTIME`, the first inclusion strict and the
   strictness of the second exactly the switching lemma.
+* `DescriptiveComplexity.LogTime` – **a machine model for the bottom of the
+  ladder**, in the shape the logarithmic-time hierarchy prescribes (Sipser 1983;
+  [Barrington, Immerman & Straubing 1990][barrington1990uniformity]) rather than
+  that of circuit families. A `DescriptiveComplexity.LTMachine` fills a list of
+  registers, each by one of the two players – a register is an address of
+  `DescriptiveComplexity.posCount A ≈ log n` bits, so filling one is the
+  logarithmic block of guesses of the `Σₖ-TIME(log n)` normal form, and an
+  alternation is a change of polarity along the list – and then runs a
+  deterministic **bit-level** base: a Boolean combination of *queries* (an input
+  relation at a tuple of registers, which is the random access of the model:
+  reading the input at an address *is* evaluating a relation at a tuple) and of
+  *sweeps*, single passes over the bit positions by a finite automaton reading
+  one bit of each register at each position. Nothing in the base evaluates a
+  numeric predicate, and that is the point: the arithmetic must be built, which
+  `DescriptiveComplexity.leSweep_accepts` and
+  `DescriptiveComplexity.plusSweep_accepts` do for `≤` and `plus` – the
+  bit-level analogues of `DescriptiveComplexity.HeadProgram.plusP`. The
+  inclusion proved is `DescriptiveComplexity.LTDecidable.ac0Definable`: a sweep
+  carries a constant number of state bits past each of the `log n` positions, so
+  its whole history is a constant number of *bit vectors over the positions*,
+  and such a vector **is** an element of the universe – the sentence guesses
+  those elements and pins them with the transition, determinism making the guess
+  unique. The bit predicate that makes this first-order is
+  `DescriptiveComplexity.BitAt`, `BIT` derived from `+` and `×` by naming a
+  position by its *place value* rather than its exponent
+  (`DescriptiveComplexity.IsPos`: a nonzero rank whose divisors are `1` or even),
+  so that the next position is `p + p` and the bit of `x` at `p` is a division
+  with remainder whose witnesses are all below `x`, hence ranks. The converse
+  inclusion is **not** proved and is not an oversight: multiplication is not a
+  constant number of sweeps, a base that revisits its positions unboundedly
+  often leaves the trace budget the simulation lives on, and simulating such a
+  base in the logic is the hard half of the classical `AC⁰ = LH` theorem.
 
 ## Polynomial space, by second-order transitive closure
 
