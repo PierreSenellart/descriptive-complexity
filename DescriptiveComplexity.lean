@@ -709,8 +709,27 @@ development has no counterpart for.
   reached. The two promises `DescriptiveComplexity.TMData.WellFormed` and
   `DescriptiveComplexity.ATMData.BlocksSplit` ride on the `start` sentence:
   `DescriptiveComplexity.ExpDefinable` compares `P A` with `Q (X.Map A)` and has
-  nowhere else to put a condition on `A` alone. **Hardness is not proved** and is
-  a separate project – see `ROADMAP.md` §2.
+  nowhere else to put a condition on `A` alone.
+* `DescriptiveComplexity.Exponential.GameInterp` – **`ATMAcceptSpace` is
+  EXPTIME-complete** (`DescriptiveComplexity.atmAcceptSpace_EXPTIME_complete`),
+  i.e. **`APSPACE = EXPTIME`** ([Chandra–Kozen–Stockmeyer
+  1981][chandra1981alternation]): an alternating machine given as much space as
+  its input has positions decides exactly the problems of deterministic
+  exponential time. Hardness is a machine *written* by the reduction, from
+  `EXPTIME = SO-GAME`: the tape holds two assignments of the game's block, cell
+  by cell, and the control walks the six questions of the game
+  (`DescriptiveComplexity.GameQuestion`) as quantifier prefixes, the existential
+  player claiming the truth value of every block atom and the universal player
+  challenging one of them – the challenge being *sought* on the tape, which is
+  why no evaluator for arbitrary formulas is ever needed. The nine rule
+  families and their walks are `DescriptiveComplexity.Exponential.GameMachine`;
+  the simulation is `DescriptiveComplexity.altAcceptsSpace_iff_accepts`, forward
+  in `DescriptiveComplexity.Exponential.GamePlay` and backwards in
+  `DescriptiveComplexity.Exponential.GamePlayBack`, whose induction has to
+  follow the universal sweep *forward* along a chain its motive quantifies over,
+  a mid-sweep configuration having nothing true to say. The reduction is an
+  ordinary ordered one, not a relativized one: the machine's `Posn` excludes the
+  junk tuples by a relation rather than by the universe.
 * `DescriptiveComplexity.Problems.ReachabilityDet` – **REACHd is LOGSPACE-complete**
   (`DescriptiveComplexity.REACHd_LOGSPACE_complete`). The outdegree bound of the
   textbook statement is imposed semantically rather than as a promise: the walk

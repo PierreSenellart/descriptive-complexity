@@ -9,8 +9,8 @@ import DescriptiveComplexity.Problems.Machine.AltDefs
 /-!
 # Alternating machine acceptance in bounded space, as a decision problem
 
-The EXPTIME candidate of `EXPONENTIAL.md` §6(1): an alternating Turing machine
-is *data in an instance*, and
+EXPTIME's complete problem: an alternating Turing machine is *data in an
+instance*, and
 
 > does this machine accept its input, with the tape indexed by the positions and
 > no bound whatever on the length of a play?

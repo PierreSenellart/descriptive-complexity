@@ -161,8 +161,9 @@ configurations, and GAME is in `DescriptiveComplexity.PTIME`.
 
 This is EXPTIME's first natural problem, and it needs no succinctness argument:
 the expansion is applied *after* the problem, which is the composition that
-exists. Hardness is a separate matter – it is the Chandra–Kozen–Stockmeyer
-simulation, and `ROADMAP.md` prices it. -/
+exists. The other half – the Chandra–Kozen–Stockmeyer simulation – is
+`DescriptiveComplexity.atmAcceptSpace_EXPTIME_hard`, whence
+`DescriptiveComplexity.atmAcceptSpace_EXPTIME_complete`. -/
 theorem atmAcceptSpace_mem_EXPTIME : ATMAcceptSpace ∈ EXPTIME :=
   atmAcceptSpace_soGameDefinable.mem_EXPTIME
 

@@ -84,7 +84,7 @@ hard for it under FO reductions.
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` (universal-first, `k` blocks) · acceptance by such a machine |
 | **PH** | SO | – | – |
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
-| **EXPTIME** | SO(LFP), i.e. PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | – | – |
+| **EXPTIME** | SO(LFP), i.e. PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating Turing machine, its tape indexed by the input's positions and no bound on the length of a play | acceptance by such a machine (`APSPACE = EXPTIME`) |
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there) | – | – |
 | **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | – | – |
 | **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |

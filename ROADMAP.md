@@ -37,30 +37,19 @@ remains below are ordinary catalog reductions and machine bridges.
 
 - **Monotone CVP** [M]: the unit-propagation circuit is monotone as drawn, so
   this is a matter of restricting the vocabulary rather than of a new gadget.
-- **Hardness of `ATMAcceptSpace` for EXPTIME** [XL, own project]: membership is
-  proved (`atmAcceptSpace_mem_EXPTIME`), so EXPTIME has a natural *member*; what
-  is missing is `EXPTIME ⊆ APSPACE`, the Chandra–Kozen–Stockmeyer simulation. It
-  cannot be routed through the outer composition of §3 — `Q ≤ᶠᵒ[≤] DTMAccept`
-  over `X.E` gives the blocked composite again — so it is a from-scratch
-  simulation, but a well-shaped one: a point of the expansion is a block
-  assignment, i.e. exactly one tape's worth, so the machine holds `O(1)` points
-  and needs no addressing arithmetic; the operations it needs are
-  `Exponential/Increment.lean`'s primitives at the *tape* level, which is what
-  `Problems/Machine/QsatTape.lean` and `QsatRun.lean` already do for QBF
-  assignments; and the control is the syntax tree of a **fixed** FO(LFP)
-  definition, hence finite control and not an interpreter.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
   (Generalized Geography…), the only PSPACE entries still missing.
-- **The exponential classes, complete problems** [XL]: EXPTIME, NEXPTIME and
-  EXPSPACE exist as logics and have their complement equalities and inclusions
-  (`DescriptiveComplexity/Exponential.lean`), but **no complete problem**. The
-  generic succinctness theorem that would supply them at one stroke – the
-  succinct version of a `C`-complete problem is `C.exp`-complete – needs the
-  outer composition of §3, whose three-piece fix is described there; the
-  quantifier-free-completeness audit inside it is where the risk sits. A
-  complete problem not routed through succinctness is the alternative:
-  alternating space-bounded acceptance is in EXPTIME by definition, its
-  hardness wanting `succinct GAME`, hence the outer composition above.
+- **NEXPTIME and EXPSPACE, complete problems** [XL]: both exist as logics, with
+  their complement equalities and inclusions
+  (`DescriptiveComplexity/Exponential.lean`), but neither has a complete
+  problem. The generic succinctness theorem that would supply them at one
+  stroke – the succinct version of a `C`-complete problem is `C.exp`-complete –
+  needs the outer composition of §3, whose three-piece fix is described there;
+  the quantifier-free-completeness audit inside it is where the risk sits. The
+  alternative is the route EXPTIME took: a machine written by the reduction out
+  of the class's own logic (`Exponential/GameInterp.lean`), which for NEXPTIME
+  means a nondeterministic machine over an expanded universe and for EXPSPACE an
+  alternating one with no space bound at all.
 - Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
 

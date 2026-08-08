@@ -44,6 +44,20 @@ import DescriptiveComplexity.Exponential.Simulate
 import DescriptiveComplexity.Exponential.Gate
 import DescriptiveComplexity.Exponential.FreeSpace
 import DescriptiveComplexity.Exponential.FreeTime
+import DescriptiveComplexity.Exponential.AltQuant
+import DescriptiveComplexity.Exponential.BlockClaim
+import DescriptiveComplexity.Exponential.GameProgram
+import DescriptiveComplexity.Exponential.GameTape
+import DescriptiveComplexity.Exponential.GameCtrl
+import DescriptiveComplexity.Exponential.GameMachine
+import DescriptiveComplexity.Exponential.GameRun
+import DescriptiveComplexity.Exponential.GameAsk
+import DescriptiveComplexity.Exponential.GameSweep
+import DescriptiveComplexity.Exponential.GamePlay
+import DescriptiveComplexity.Exponential.GameBack
+import DescriptiveComplexity.Exponential.GameAskBack
+import DescriptiveComplexity.Exponential.GameInterp
+import DescriptiveComplexity.Exponential.GamePlayBack
 
 /-!
 # The exponential classes, by expansion
@@ -110,6 +124,87 @@ second-order shadow of `GAME ∈ PTIME`. It is the way into EXPTIME that needs n
 succinctness argument, and what an alternating space-bounded machine will
 consume — its configurations being the assignments of a block with one variable
 for the state, one for the head and one for the tape.
+
+Two normal forms prepare the machine that will consume it, by giving a
+*finite control* everything it needs to decide a fixed first-order sentence:
+`DescriptiveComplexity.exists_altQuant` turns a sentence into an **alternating
+quantifier prefix**, played one variable at a time – a phase index and a tuple,
+one coordinate written per step – over a quantifier-free matrix, and
+`DescriptiveComplexity.exists_blockClaims` turns that matrix into a **base
+formula determined by the claimed truth values of finitely many block atoms**
+(`DescriptiveComplexity.BlockAtom`: a copy, a relation variable, and where its
+arguments sit among the matrix's variables). Together they say that a
+specification's sentences need no evaluator: the prefix is moves, the claims
+are one nondeterministic move and finitely many tape lookups, and what is left
+is a condition on the source structure, i.e. a guard of the transition
+relation. `DescriptiveComplexity.exists_questionData` packages the composite as
+the interface such a machine consumes, for each of the six questions
+(`DescriptiveComplexity.GameQuestion`) it has to answer – the four sentences of
+the specification and the two negations, all read in the same two-copy
+language. `DescriptiveComplexity.Exponential.GameTape` then lays out the tape
+such a machine runs on – two sentinels, one cell per atom of each of two
+regions, a right sentinel, ordered by
+`DescriptiveComplexity.TapeTag.fam` and then lexicographically – and identifies
+a tape with the *pair of block assignments* it holds
+(`DescriptiveComplexity.assignOfTape_tapeOfAssign`) – a cell carrying its own
+address, so that the machine never has to know where its head is.
+`DescriptiveComplexity.Exponential.GameCtrl` fixes the control: the phases
+(`DescriptiveComplexity.MachPh`) and which player owns each
+(`DescriptiveComplexity.MachPh.IsUniv`), and
+`DescriptiveComplexity.Exponential.GameMachine` assembles the
+`DescriptiveComplexity.ATMData` itself, with its rules as a parameter – the two
+promises `DescriptiveComplexity.ATMAcceptSpace` folds into its yes-instances
+being independent of them
+(`DescriptiveComplexity.gameMachine_wellFormed`,
+`DescriptiveComplexity.gameMachine_blocksSplit`). Its three walks are run in
+the same file – `DescriptiveComplexity.sweep_run` writes a guessed assignment
+into a region, `DescriptiveComplexity.rewind_run` brings the head back to the
+lowest position and hands over, `DescriptiveComplexity.seek_run` either meets
+the cell a challenged claim addresses or reaches the end of the tape having
+found none – and `DescriptiveComplexity.Exponential.GameRun` says what it is to
+sit at a phase of the control (`DescriptiveComplexity.CtrlCfg`), building a
+step of the control graph and, for the universal phases, reading every step
+back as one. On that, `DescriptiveComplexity.GameProg.altWin_ask`: **if a
+question holds of the two assignments the tape carries, the machine wins from
+the entry of its prefix** – the prefix played one variable at a time, the
+matrix claimed in one move and settled by a challenge round, and no evaluator
+anywhere. `DescriptiveComplexity.Exponential.GameSweep` does the same for the
+other half of a move: a sweep is read back at the level of configurations
+(`DescriptiveComplexity.sweepCfg_cases`), the invariant being *the tape holds
+some pair of assignments agreeing with the original outside the region being
+written* – so a half-finished sweep is again a tape, and the universal player's
+sweep is answered for every assignment of that region
+(`DescriptiveComplexity.altWin_sweep_all`). On those two,
+`DescriptiveComplexity.Exponential.GamePlay` runs the **forward simulation**:
+one clause of `DescriptiveComplexity.SOGameSpec.Wins` at a time, a winning
+state of the game is a winning configuration of the machine
+(`DescriptiveComplexity.altWin_play`), and the machine accepts whenever the
+game does (`DescriptiveComplexity.altAcceptsSpace_of_accepts`) – the starting
+position being *guessed* by the very first sweep, since the initial tape is
+empty. `DescriptiveComplexity.Exponential.GameBack` begins the converse, where
+the two players exchange roles: an existential phase has to be case-analysed
+and a universal one instantiated, so every step lemma is used in the other
+direction. Its content is the phases that settle a question –
+`DescriptiveComplexity.pre_of_altWin`, `claim_of_altWin`, `check_of_altWin`,
+`concOk_of_altWin`, and `seekArrives_of_altWin`, an induction on
+`DescriptiveComplexity.ATMData.AltWin` itself along a walk whose phase never
+changes. `DescriptiveComplexity.Exponential.GameAskBack` closes that half at the
+program: an *arrival* is a correct claim, and
+`DescriptiveComplexity.GameProg.ask_of_altWin` is the converse of `altWin_ask` –
+**if the machine wins from the entry of a question's prefix, the question
+holds**. `DescriptiveComplexity.Exponential.GamePlayBack` closes the
+simulation: one induction whose motive has a clause per phase of the game, with
+the universal sweep followed *forward* along a chain the motive quantifies over,
+giving `DescriptiveComplexity.altAcceptsSpace_iff_accepts` – **the machine
+accepts exactly when the game does**. `DescriptiveComplexity.Exponential.GameInterp`
+writes that machine *down*: every relation of the alternating vocabulary is a
+first-order formula of the ordered source, so the interpretation is an ordinary
+(not relativized) one – the junk tuples are excluded by `Posn`, a relation, and
+not by the universe. That is
+`DescriptiveComplexity.atmAcceptSpace_EXPTIME_hard` and, with the membership
+half, `DescriptiveComplexity.atmAcceptSpace_EXPTIME_complete`: **`APSPACE =
+EXPTIME`**, an alternating machine given as much space as its input has
+positions decides exactly deterministic exponential time.
 
 The one inclusion with content is `DescriptiveComplexity.PSPACE_subset_EXPTIME`:
 an `DescriptiveComplexity.SOTCSpec` *is* the graph REACH reads on the expansion
@@ -228,6 +323,20 @@ first-order property of an exponential expansion is in `PH`, hence in
 | `Exponential.GamePrefix` | the prefix phases play the alternating prefix |
 | `Exponential.GameNodes` | the node phases play the interpreted AND/OR graph |
 | `Exponential.GameExp` | **EXPTIME = SO-GAME** |
+| `Exponential.AltQuant` | a sentence as an alternating prefix over a quantifier-free matrix |
+| `Exponential.BlockClaim` | a matrix as a base formula plus claimed block atoms |
+| `Exponential.GameProgram` | the six questions a machine playing a game must answer |
+| `Exponential.GameTape` | the tape: positions, order, and a tape as a pair of assignments |
+| `Exponential.GameCtrl` | its control: the phases, who owns each, and the control graph |
+| `Exponential.GameMachine` | the machine itself, its nine rule families and its three walks |
+| `Exponential.GameRun` | a configuration of the control, and the steps out of it |
+| `Exponential.GameAsk` | asking a question of the machine: the prefix, the claim, the challenge |
+| `Exponential.GameSweep` | the sweep read back, and the two sweeps of the game |
+| `Exponential.GamePlay` | the machine plays the game: the forward simulation |
+| `Exponential.GameBack` | reading a win back: the phases that settle a question |
+| `Exponential.GameAskBack` | a question, read back: an arrival is a correct claim |
+| `Exponential.GamePlayBack` | the game read back: **acceptance is exactly the game's** |
+| `Exponential.GameInterp` | the machine in logic: **APSPACE = EXPTIME** |
 | `Exponential.Inclusions` | the complement equalities and the inclusions |
 | `Exponential.PSpaceOn` | an FO property of an expansion is in `PH`, hence in `PSPACE` |
 | `Exponential.Simulate` | a machine walking an expanded universe, as a walk over the base |
