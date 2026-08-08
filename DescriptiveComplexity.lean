@@ -1039,9 +1039,28 @@ development has no counterpart for.
   ⊆ SO(LFP)**, the second-order shadow of `GAME ∈ PTIME`, exactly as the
   previous entry is the shadow of `REACH ∈ PTIME`. It is what an alternating
   space-bounded machine consumes, its configurations being the assignments of a
-  block with one variable for the state, one for the head and one for the tape;
-  what is left for `DescriptiveComplexity.ATMAcceptSpace` is to write that
-  machine's four sentences.
+  block with one variable for the state, one for the head and one for the tape
+  (`DescriptiveComplexity.atmAcceptSpace_soGameDefinable`).
+* `DescriptiveComplexity.Exponential.GameExp` – the converse, and with it
+  **`EXPTIME = SO-GAME`** (`DescriptiveComplexity.exptime_eq_soGame`): *the
+  deterministic exponential class is second-order alternating reachability*.
+  This is Chandra–Kozen–Stockmeyer ([Chandra–Kozen–Stockmeyer
+  1981][chandra1981alternation]) with the machine removed. A problem of
+  `SO(≤, LFP)` is a `PTIME` property of an expansion
+  (`DescriptiveComplexity.solfpDefinable_iff_expDefinable`), hence `GameWon` of
+  the AND/OR graph an interpretation draws *on the expanded universe*
+  (`DescriptiveComplexity.game_hard_ordered`); its four defining relations are
+  first-order there, so by the translation lemma they are alternating block
+  prefixes over the base — and a prefix is a sequence of **moves**, which is
+  precisely what the obstruction of `Exponential.Translate` does not forbid.
+  `DescriptiveComplexity.ExpExpansion.graphGame` plays that graph, in six
+  phases: the four node phases (`main`, `exStep`, `allCert`, `allStep`) and the
+  prefix phases that decide the six questions
+  (`DescriptiveComplexity.Sub`) about one or two nodes. Two conventions are
+  load-bearing: a leaf whose kernel fails is existential and moveless, so an
+  unprovable claim loses; and `allCert` certifies a successor *before* the
+  universal player chooses one, since `DescriptiveComplexity.WinsOn.all` makes a
+  stuck universal node lose.
 * `DescriptiveComplexity.Exponential.Translate` – **the translation lemma**
   (`DescriptiveComplexity.ExpExpansion.exists_translate`): a first-order
   sentence *over an expansion* is a second-order sentence over the base, since

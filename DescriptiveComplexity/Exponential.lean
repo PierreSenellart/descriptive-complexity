@@ -26,6 +26,18 @@ import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
 import DescriptiveComplexity.Exponential.Classes
 import DescriptiveComplexity.Exponential.Reach
 import DescriptiveComplexity.Exponential.Game
+import DescriptiveComplexity.Exponential.GameSO
+import DescriptiveComplexity.Exponential.GameNode
+import DescriptiveComplexity.Exponential.GamePhase
+import DescriptiveComplexity.Exponential.GameMove
+import DescriptiveComplexity.Exponential.GameRounds
+import DescriptiveComplexity.Exponential.GameKernel
+import DescriptiveComplexity.Exponential.GameGraph
+import DescriptiveComplexity.Exponential.GameState
+import DescriptiveComplexity.Exponential.GameSpec
+import DescriptiveComplexity.Exponential.GamePrefix
+import DescriptiveComplexity.Exponential.GameNodes
+import DescriptiveComplexity.Exponential.GameExp
 import DescriptiveComplexity.Exponential.Inclusions
 import DescriptiveComplexity.Exponential.PSpaceOn
 import DescriptiveComplexity.Exponential.Simulate
@@ -204,6 +216,18 @@ first-order property of an exponential expansion is in `PH`, hence in
 | `Exponential.Classes` | EXPTIME, NEXPTIME, EXPSPACE and their hardness discharges |
 | `Exponential.Reach` | an SO(TC) walk is REACH on an expansion |
 | `Exponential.Game` | a second-order alternating game is GAME on an expansion |
+| `Exponential.GameSO` | a second-order quantifier prefix, played as a game: `SO ⊆ SO-GAME` |
+| `Exponential.GameNode` | the nodes of an interpreted AND/OR graph, as states of a game |
+| `Exponential.GamePhase` | the sentences a phased game is made of: phases, and freezing |
+| `Exponential.GameMove` | a one-copy sentence read in a copy, and one variable moved onto another |
+| `Exponential.GameRounds` | whole rounds kept, overwritten or shifted by a move |
+| `Exponential.GameKernel` | a defining formula of an interpretation, as an alternating prefix |
+| `Exponential.GameGraph` | the six questions an interpreted AND/OR graph asks, and their kernels |
+| `Exponential.GameState` | the phases of the graph game, and what a state of it is |
+| `Exponential.GameSpec` | the four sentences of the graph game, and what they say |
+| `Exponential.GamePrefix` | the prefix phases play the alternating prefix |
+| `Exponential.GameNodes` | the node phases play the interpreted AND/OR graph |
+| `Exponential.GameExp` | **EXPTIME = SO-GAME** |
 | `Exponential.Inclusions` | the complement equalities and the inclusions |
 | `Exponential.PSpaceOn` | an FO property of an expansion is in `PH`, hence in `PSPACE` |
 | `Exponential.Simulate` | a machine walking an expanded universe, as a walk over the base |
