@@ -56,7 +56,12 @@ characterizations up to EXPTIME. That work is stated in the *relational*
 (order-free, generic) setting, so it must not be cited as a capture theorem for
 the classes defined here; what this development proves in its place are the
 bridge theorems above, which are about this library's own classes and owe the
-literature nothing.
+literature nothing. The order these two definitions carry is nevertheless
+removable (`DescriptiveComplexity.solfpDefinable_iff_free`,
+`DescriptiveComplexity.sopfpDefinable_iff_free`): the expansion can guess it,
+and the resulting union of copies costs one existential – paid for by guessing
+the copy in `DescriptiveComplexity.Exponential.FreeSpace`, and by naming it with
+a point in `DescriptiveComplexity.Exponential.FreeTime`.
 -/
 
 namespace DescriptiveComplexity
@@ -71,12 +76,17 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 
 /-- **SO(≤, LFP)**: a least fixed point over a second-order universe. The
 problem holds of `A` exactly when an FO(≤, LFP) definition holds of an
-exponential expansion of `A`. -/
+exponential expansion of `A`. The order the expansion's own sentences read can
+be removed (`DescriptiveComplexity.solfpDefinable_iff_free`), by guessing it
+into the block. -/
 def SOLFPDefinable (P : DecisionProblem L) : Prop :=
   ∃ (X : ExpExpansion L) (Q : DecisionProblem X.E), LFPDefinable Q ∧
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A], P A ↔ Q (X.Map A)
 
-/-- **SO(≤, PFP)**: a partial fixed point over a second-order universe. -/
+/-- **SO(≤, PFP)**: a partial fixed point over a second-order universe. The
+order the expansion's own sentences read can be removed
+(`DescriptiveComplexity.sopfpDefinable_iff_free`), by guessing it into the
+block. -/
 def SOPFPDefinable (P : DecisionProblem L) : Prop :=
   ∃ (X : ExpExpansion L) (Q : DecisionProblem X.E), PFPDefinable Q ∧
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A], P A ↔ Q (X.Map A)

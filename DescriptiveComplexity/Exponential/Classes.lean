@@ -60,7 +60,9 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 
 /-! ### The three classes -/
 
-/-- **The class EXPTIME**, defined as SO(≤, LFP): a least fixed point over a
+/-- **The class EXPTIME**, defined as SO(≤, LFP) – equivalently, and with no
+order in the statement at all, as SO(LFP)
+(`DescriptiveComplexity.mem_EXPTIME_iff_solfpDefinableFree`): a least fixed point over a
 second-order universe. Equivalently, and by theorem, polynomial time read over
 an exponential expansion (`DescriptiveComplexity.EXPTIME_eq_PTIME_exp`).
 
@@ -73,7 +75,9 @@ noncomputable def EXPTIME : ComplexityClass :=
     (fun f h => h.of_orderedReduction f)
     (fun h => solfpDefinable_congr h)
 
-/-- **The class EXPSPACE**, defined as SO(≤, PFP): a partial fixed point over a
+/-- **The class EXPSPACE**, defined as SO(≤, PFP) – equivalently, and with no
+order in the statement at all, as SO(PFP)
+(`DescriptiveComplexity.mem_EXPSPACE_iff_sopfpDefinableFree`): a partial fixed point over a
 second-order universe. Equivalently, and by theorem, polynomial space read over
 an exponential expansion (`DescriptiveComplexity.EXPSPACE_eq_PSPACE_exp`). -/
 noncomputable def EXPSPACE : ComplexityClass :=

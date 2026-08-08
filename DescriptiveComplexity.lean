@@ -63,6 +63,7 @@ import DescriptiveComplexity.PSpace
 import DescriptiveComplexity.SecondOrderTransitiveClosureFree
 import DescriptiveComplexity.FixedPointPartialSpace
 import DescriptiveComplexity.FixedPointStepRel
+import DescriptiveComplexity.FixedPointParam
 import DescriptiveComplexity.FixedPointPartialMachine
 import DescriptiveComplexity.AbiteboulVianuOrdered
 import DescriptiveComplexity.Invariant.Pebble
@@ -858,6 +859,16 @@ development has no counterpart for.
   formulas», target «a stable stage satisfying the output». No divergence
   detection is needed: under the convergence-requiring semantics a diverging
   iteration simply reaches no target state.
+* `DescriptiveComplexity.FixedPointParam` – **an element, quantified in front
+  of a fixed point** (`DescriptiveComplexity.mem_PTIME_exElement`): if a problem
+  over the vocabulary extended by a mark is FO(≤, IFP) definable, so is “some
+  element, marked, makes it hold”. A fixed point cannot be restarted once per
+  element, so the construction runs all of them at once – every relation
+  variable gains the parameter as a further argument, and the atom `old t`
+  becomes `t = parameter`. It is the deterministic counterpart of
+  `DescriptiveComplexity.SOTCDefinable.exBlock`, which prefixes a *walk* with a
+  guessed relation: a walk may guess, a fixed point may not, and one element is
+  what it can afford instead.
 * `DescriptiveComplexity.FixedPointStepRel` – **membership closure under
   relativized ordered reductions** `≤ʳᶠᵒ[≤]`, which no definability notion of
   the library had needed before
@@ -1090,6 +1101,33 @@ development has no counterpart for.
   `LOGSPACE.exp ⊆ PSPACE` follows by monotonicity; the reverse inclusion is not
   claimed, REACH not being known here to be in
   `DescriptiveComplexity.LOGSPACE`.
+* `DescriptiveComplexity.Exponential.Free`, `.FreeCopy`, `.FreeSpace`,
+  `.FreeTime` – **the exponential classes need no order**
+  (`DescriptiveComplexity.mem_EXPTIME_iff_solfpDefinableFree`,
+  `DescriptiveComplexity.mem_EXPSPACE_iff_sopfpDefinableFree`): the expansion's
+  own sentences can be written over the bare vocabulary, so that the
+  equivalence is asked of structures carrying no order at all, which is the
+  setting of [Abiteboul–Vardi–Vianu 1997][abiteboul1997fixpoint]. The order is
+  *guessed* into the block, exactly as
+  `DescriptiveComplexity.sotcDefinable_iff_free` guesses it into the state of a
+  walk – but the price is different: the expanded universe becomes the disjoint
+  union, over the linear orders of the instance, of copies of the intended one,
+  and the inner problem must be replaced by “**some copy answers yes**”, which
+  is correct precisely because the problem is order-invariant. How that
+  existential is paid for is what separates the two classes. `PSPACE` **guesses
+  the copy** as a relation and freezes it in the state of a walk
+  (`DescriptiveComplexity.ExpExpansion.someCls`, on
+  `DescriptiveComplexity.SOTCDefinable.exBlock`, with the first-order guard that
+  it *is* a copy conjoined by
+  `DescriptiveComplexity.SOTCDefinable.and_sentence`). `PTIME` cannot guess, so
+  it **names the copy by one of its points**
+  (`DescriptiveComplexity.ExpExpansion.somePtCls`) and quantifies that point
+  away by carrying it through every relation variable of the induction
+  (`DescriptiveComplexity.mem_PTIME_exElement`). Both then read the problem
+  inside the copy by a relativized ordered reduction. A nullary symbol has no
+  copy of the block to read the guessed order from, so its content moves to a
+  **unary shift** whose argument names the copy – which is what lets the
+  construction carry no hypothesis on the arities.
 
 ## Value invention, towards the recursively enumerable
 

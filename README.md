@@ -79,9 +79,9 @@ hard for it under FO reductions.
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` (universal-first, `k` blocks) · acceptance by such a machine |
 | **PH** | SO | – | – |
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
-| **EXPTIME** | SO(≤, LFP), i.e. PTIME read over an exponential expansion | – | – |
+| **EXPTIME** | SO(LFP), i.e. PTIME read over an exponential expansion | – | – |
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there) | – | – |
-| **EXPSPACE** | SO(≤, PFP), i.e. PSPACE read over an exponential expansion | – | – |
+| **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | – | – |
 | **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 | **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 

@@ -20,6 +20,8 @@ import DescriptiveComplexity.Exponential.Translate
 import DescriptiveComplexity.Exponential.Increment
 import DescriptiveComplexity.Exponential.Trivialize
 import DescriptiveComplexity.Exponential.Class
+import DescriptiveComplexity.Exponential.Free
+import DescriptiveComplexity.Exponential.FreeCopy
 import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
 import DescriptiveComplexity.Exponential.Classes
 import DescriptiveComplexity.Exponential.Reach
@@ -28,6 +30,8 @@ import DescriptiveComplexity.Exponential.Inclusions
 import DescriptiveComplexity.Exponential.PSpaceOn
 import DescriptiveComplexity.Exponential.Simulate
 import DescriptiveComplexity.Exponential.Gate
+import DescriptiveComplexity.Exponential.FreeSpace
+import DescriptiveComplexity.Exponential.FreeTime
 
 /-!
 # The exponential classes, by expansion
@@ -53,7 +57,11 @@ EXPTIME := SO(≤, LFP)        EXPSPACE := SO(≤, PFP)        NEXPTIME := NP.ex
 EXPTIME  = PTIME.exp         EXPSPACE  = PSPACE.exp
 ```
 
-the first two equalities being theorems
+where the `≤` is the order the expansion's *own sentences* read; it can be
+removed from both, the expansion guessing it into its block
+(`DescriptiveComplexity.mem_EXPTIME_iff_solfpDefinableFree`,
+`DescriptiveComplexity.mem_EXPSPACE_iff_sopfpDefinableFree`). The two
+equalities on the second line are theorems
 (`DescriptiveComplexity.EXPTIME_eq_PTIME_exp`,
 `DescriptiveComplexity.EXPSPACE_eq_PSPACE_exp`) that hold because the library
 already proves FO(≤, LFP) = PTIME and FO(≤, PFP) = PSPACE: they are those two
@@ -190,6 +198,8 @@ first-order property of an exponential expansion is in `PH`, hence in
 | `Exponential.Increment` | the successor of a point, and the two endpoints of the order |
 | `Exponential.Trivialize` | trading an expansion's domain for a mark, walk included |
 | `Exponential.Class` | `ExpDefinable`, `ComplexityClass.exp`, `exp_mono`, `exp_compl` |
+| `Exponential.Free` | expansions that see no order; the order, guessed into the block |
+| `Exponential.FreeCopy` | the copies of an order-guessing expansion, and “some copy answers yes” |
 | `Exponential.SecondOrderFixedPoint` | SO(LFP), SO(PFP) and the two bridge theorems |
 | `Exponential.Classes` | EXPTIME, NEXPTIME, EXPSPACE and their hardness discharges |
 | `Exponential.Reach` | an SO(TC) walk is REACH on an expansion |
@@ -198,6 +208,8 @@ first-order property of an exponential expansion is in `PH`, hence in
 | `Exponential.PSpaceOn` | an FO property of an expansion is in `PH`, hence in `PSPACE` |
 | `Exponential.Simulate` | a machine walking an expanded universe, as a walk over the base |
 | `Exponential.Gate` | `PSPACE = NL.exp` |
+| `Exponential.FreeSpace` | `EXPSPACE = SO(PFP)`: the copy is guessed as a relation |
+| `Exponential.FreeTime` | `EXPTIME = SO(LFP)`: the copy is named by a point |
 
 ## Literature
 
