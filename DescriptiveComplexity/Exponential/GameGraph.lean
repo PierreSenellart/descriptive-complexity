@@ -9,9 +9,9 @@ import DescriptiveComplexity.Exponential.GameNode
 /-!
 # The six questions an interpreted AND/OR graph asks, and their kernels
 
-The road `APSPACE-HARDNESS.md` §1.5 takes from `DescriptiveComplexity.EXPTIME` to
-SO-GAME plays the AND/OR graph an interpretation `I` draws **on the expanded
-universe**. A node of that graph is a tag together with `d` points
+The road from `DescriptiveComplexity.EXPTIME` to SO-GAME plays the AND/OR graph
+an interpretation `I` draws **on the expanded universe**. A node of that graph
+is a tag together with `d` points
 (`DescriptiveComplexity.ExpExpansion.nodeBlock`), and everything the game ever
 has to decide about one or two nodes is one of six first-order questions:
 
@@ -24,8 +24,8 @@ has to decide about one or two nodes is one of six first-order questions:
 
 `DescriptiveComplexity.Sub` names the six. None of them is a *sentence* over the
 base — a quantifier of `I`'s defining formula ranges over points, so it is
-second-order over the base (`EXPONENTIAL.md` §1) — and that is exactly why they
-become **phases** rather than conjuncts:
+second-order over the base (`DescriptiveComplexity.exists_translate`) — and that
+is exactly why they become **phases** rather than conjuncts:
 `DescriptiveComplexity.ExpExpansion.exists_paramKernel` turns each into an
 alternating prefix over rounds of the point block, which a game plays one move
 per round.

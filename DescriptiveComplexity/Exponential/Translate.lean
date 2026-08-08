@@ -321,9 +321,9 @@ theorem exists_transl {j : ℕ} {ψ : (X.E.sum Language.order).BoundedFormula Em
       exact ha
 
 /-- **An `FO` sentence over an expansion is a second-order sentence over the
-base.** The obstruction of `EXPONENTIAL.md` §1, stated rather than avoided: the
-quantifiers of a sentence read on the expanded universe become second-order
-quantifier blocks over the base, two blocks per quantifier. -/
+base.** The obstruction the exponential classes are built around, stated rather
+than avoided: the quantifiers of a sentence read on the expanded universe become
+second-order quantifier blocks over the base, two blocks per quantifier. -/
 theorem exists_translate (X : ExpExpansion L) (φ : (X.E.sum Language.order).Sentence) :
     ∃ (Bs : List SOBlock) (ψ : (soLang (L.sum Language.order) Bs).Sentence) (pol : Bool),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

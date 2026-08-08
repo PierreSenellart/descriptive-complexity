@@ -10,8 +10,8 @@ import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
 /-!
 # The alphabet of the machine simulating a `ToPartrec` code
 
-The static data of the RE-hardness of `DescriptiveComplexity.HALT`
-(`PCP-HARDNESS.md` §2): the machine `M(c)` that the reduction draws simulates
+The static data of the RE-hardness of `DescriptiveComplexity.HALT`: the
+machine `M(c)` that the reduction draws simulates
 the sequential semantics `Turing.ToPartrec.step` of a **fixed** code `c`, so
 its states and symbols are indexed by the *positions of the syntax tree of
 `c`* – a finite type built by recursion on `c`, the `SubPos` pattern of the

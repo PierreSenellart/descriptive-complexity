@@ -29,8 +29,8 @@ PTIME-hard under ordinary ordered reductions
 (`DescriptiveComplexity.game_hard_ordered`), so that property is `GameWon` of the
 AND/OR graph an interpretation `I` draws **on the expanded universe**. Its four
 defining relations are first-order over the expansion, hence *alternating block
-prefixes* over the base (`EXPONENTIAL.md` §1), and a prefix is a sequence of
-moves. `DescriptiveComplexity.ExpExpansion.graphGame` plays that graph:
+prefixes* over the base (`DescriptiveComplexity.exists_translate`), and a prefix
+is a sequence of moves. `DescriptiveComplexity.ExpExpansion.graphGame` plays that graph:
 
 * `DescriptiveComplexity.ExpExpansion.wins_pre` — the prefix phases evaluate the
   six questions;
@@ -41,8 +41,10 @@ moves. `DescriptiveComplexity.ExpExpansion.graphGame` plays that graph:
   together at the starting phase.
 
 The one thing that never happens is a *sentence over the base* that quantifies a
-point. That is the obstruction of `EXPONENTIAL.md` §1, and the whole design is
-the observation that it does not apply to a **move**.
+point: a quantifier over the expanded universe is a second-order block over the
+base, never a first-order one. That is the obstruction the whole design works
+around, and it works around it by the observation that it does not apply to a
+**move**.
 -/
 
 namespace DescriptiveComplexity

@@ -10,8 +10,9 @@ import DescriptiveComplexity.Exponential.GameNode
 
 Every game this development builds over a tag-extended block —
 `DescriptiveComplexity.SOGameSpec.exBlock` in
-`DescriptiveComplexity.Exponential.GameSO`, and the graph game of
-`APSPACE-HARDNESS.md` §1.5 — says the same three things and nothing else:
+`DescriptiveComplexity.Exponential.GameSO`, and the graph game that carries
+`DescriptiveComplexity.EXPTIME` to SO-GAME — says the same three things and
+nothing else:
 
 * **which phase a state is in**, in one copy or in the second one of a move
   (`DescriptiveComplexity.atTagF`, `DescriptiveComplexity.atTagTwoF`);

@@ -60,7 +60,7 @@ variable {L : Language.{0, 0}} (B : SOBlock) (T : Type) [Finite T]
 variable is a bit, so an assignment of this block is an assignment of `B`
 together with a bit vector naming a tag.
 
-An `abbrev`, per `CLAUDE.md`: with a semireducible `def` in between, instance
+An `abbrev` deliberately: with a semireducible `def` in between, instance
 search cannot see that the arity of a tag variable is `0`, and `Fin 0 → A`
 stops being recognised as a subsingleton. -/
 abbrev withTag : SOBlock where

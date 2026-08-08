@@ -8,8 +8,8 @@ import DescriptiveComplexity.Problems.Machine.HaltHard.Tags
 /-!
 # The transition table of the simulating machine
 
-The control of the machine `M(c)` of `PCP-HARDNESS.md` §2.8, as one
-**deterministic step function**
+The control of the machine `M(c)` that the RE-hardness of
+`DescriptiveComplexity.HALT` draws, as one **deterministic step function**
 `DescriptiveComplexity.HaltHard.simStep : SimQ c → SimSym c → Option (SimSym c × SimQ c × Bool)`
 (the Boolean is “move right”). Determinism is what makes the backward
 direction of the simulation a case analysis rather than an invariant hunt,

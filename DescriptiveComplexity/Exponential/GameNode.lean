@@ -10,9 +10,9 @@ import DescriptiveComplexity.Problems.Game
 /-!
 # The nodes of an interpreted AND/OR graph, as states of a game
 
-The road from `DescriptiveComplexity.EXPTIME` to `SO-GAME` (`APSPACE-HARDNESS.md`
-§1.5) reads a `PTIME` inner problem as the **AND/OR graph an interpretation
-draws on the expanded universe**, and plays that graph. A node of the graph is a
+The road from `DescriptiveComplexity.EXPTIME` to `SO-GAME` reads a `PTIME` inner
+problem as the **AND/OR graph an interpretation draws on the expanded
+universe**, and plays that graph. A node of the graph is a
 tagged tuple of points, so a node is a *state* of a second-order game — that
 correspondence is what this file builds.
 

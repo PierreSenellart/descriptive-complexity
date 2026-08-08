@@ -9,7 +9,8 @@ import DescriptiveComplexity.Exponential.Translate
 /-!
 # Moving whole rounds
 
-The state of the game `APSPACE-HARDNESS.md` §1.5 plays is a tuple of **rounds**
+The state of the game that carries `DescriptiveComplexity.EXPTIME` to SO-GAME
+is a tuple of **rounds**
 — `DescriptiveComplexity.repMerged` of the point block — carrying a phase in its
 tag bits. Its moves never touch one relation variable at a time: they *keep* a
 round, *overwrite* a round, or *shift* a round onto another one (the points of

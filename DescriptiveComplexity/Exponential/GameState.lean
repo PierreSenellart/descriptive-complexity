@@ -8,7 +8,8 @@ import DescriptiveComplexity.Exponential.GameGraph
 /-!
 # The states of the graph game
 
-The game `APSPACE-HARDNESS.md` §1.5 plays has one block for everything: `n`
+The game that carries `DescriptiveComplexity.EXPTIME` to SO-GAME has one
+block for everything: `n`
 rounds of the point block (`DescriptiveComplexity.repMerged`) extended by tag
 bits naming a **phase**. This file fixes the phases and says what a state is.
 
@@ -33,8 +34,8 @@ expensive to discover late.
   `DescriptiveComplexity.WinsOn.all` requires a universal position to *have* a
   legal move, so a universal node with none loses; without the witness the
   simulation would let the existential player win there by refuting every
-  proposed move. This is the stuck-universal convention of `EXPONENTIAL.md`
-  §6(2), paid for once.
+  proposed move. The convention that a stuck universal position loses is paid
+  for here, once.
 * **`allStep` is existential and may refute.** The universal player proposes an
   arbitrary tagged tuple of points, legal or not; the existential player escapes
   an illegal proposal by proving `¬AGMove x y` rather than by the move being
