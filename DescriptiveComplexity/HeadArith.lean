@@ -1017,6 +1017,861 @@ theorem deterministic_timesP (i j k acc cnt cand tmk a b mk : Fin K) :
   · exact deterministic_moveP _
   · exact deterministic_moveP _
 
+/-! ### The invariant of a multiplication -/
+
+/-- The invariant of both loops: the accumulator carries the first factor times
+the round counter, the round counter has not passed the second factor, the scan's
+marker is at the greatest element, and nothing else below `m` has moved. -/
+def TimesBase (i j acc cnt cand tmk : Fin K) (m : ℕ) (x z : Fin K → A) : Prop :=
+  (∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → q ≠ cand → q ≠ tmk → z q = x q) ∧
+    orank (z acc) = orank (x i) * orank (z cnt) ∧
+      orank (z cnt) ≤ orank (x j) ∧
+        ∀ e : A, e ≤ z tmk
+
+/-- The invariant of the control walk of a multiplication, node by node. Inside
+the scan it also records how far the candidate has got: below the target while
+the probe keeps failing, at it when the probe succeeds. -/
+def TimesInv (i j acc cnt cand tmk : Fin K) (m : ℕ) (x : Fin K → A) :
+    TimesNode → (Fin K → A) → Prop
+  | .init => fun z => z = x
+  | .outer => fun z => TimesBase i j acc cnt cand tmk m x z
+  | .final => fun z => TimesBase i j acc cnt cand tmk m x z ∧ z cnt = x j
+  | .scanInit => fun z => TimesBase i j acc cnt cand tmk m x z ∧ z cnt ≠ x j
+  | .probe => fun z => TimesBase i j acc cnt cand tmk m x z ∧ z cnt ≠ x j ∧
+      orank (z cand) ≤ orank (z acc) + orank (x i)
+  | .scanOver => fun z => TimesBase i j acc cnt cand tmk m x z ∧ z cnt ≠ x j ∧
+      orank (z cand) < orank (z acc) + orank (x i)
+  | .scanStep => fun z => TimesBase i j acc cnt cand tmk m x z ∧ z cnt ≠ x j ∧
+      orank (z cand) < orank (z acc) + orank (x i)
+  | .commit => fun z => TimesBase i j acc cnt cand tmk m x z ∧ z cnt ≠ x j ∧
+      orank (z cand) = orank (z acc) + orank (x i)
+
+section TimesSound
+
+variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
+variable {i j k acc cnt cand tmk a b mk : Fin K} {p m : ℕ}
+
+omit [Finite A] [LinearOrder A] in
+/-- The interface heads a multiplication must not disturb are below every working
+head. -/
+theorem timesBase_headAgree (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    {x z : Fin K → A}
+    (hz : ∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → q ≠ cand → q ≠ tmk → z q = x q) :
+    HeadAgree p x z := by
+  intro q hq
+  have hpm : p ≤ m := by have := hh.hcnt; omega
+  refine (hz q (by omega) ?_ ?_ ?_ ?_).symm
+  · exact fun he => by rw [he] at hq; exact absurd hh.hacc (by omega)
+  · exact fun he => by rw [he] at hq; exact absurd hh.hcnt.1 (by omega)
+  · exact fun he => by rw [he] at hq; exact absurd hh.hcand (by omega)
+  · exact fun he => by rw [he] at hq; exact absurd hh.htmk.1 (by omega)
+
+omit [Finite A] in
+/-- The invariant reads only the heads below `m`, so it survives a fragment that
+dirties the addition's scratch heads. -/
+theorem TimesBase.congr (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    {x z z' : Fin K → A} (hb : TimesBase i j acc cnt cand tmk m x z)
+    (hzz : HeadAgree m z z') : TimesBase i j acc cnt cand tmk m x z' := by
+  have h1 : z' acc = z acc := (hzz acc hh.hplus.hi).symm
+  have h2 : z' cnt = z cnt := (hzz cnt hh.hcnt.2).symm
+  have h4 : z' tmk = z tmk := (hzz tmk hh.htmk.2).symm
+  refine ⟨fun q hq h5 h6 h7 h8 => ?_, ?_, ?_, ?_⟩
+  · rw [← hzz q hq]
+    exact hb.1 q hq h5 h6 h7 h8
+  · rw [h1, h2]
+    exact hb.2.1
+  · rw [h2]
+    exact hb.2.2.1
+  · rw [h4]
+    exact hb.2.2.2
+
+omit [Finite A] in
+/-- The moves that start a multiplication, read off. -/
+theorem holds_timesInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    {x y : Fin K → A}
+    (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesInitMoves acc cnt tmk q).Holds x q (y q)) :
+    (∀ e : A, y acc ≤ e) ∧ (∀ e : A, y cnt ≤ e) ∧ (∀ e : A, e ≤ y tmk) ∧
+      ∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → q ≠ tmk → y q = x q := by
+  classical
+  refine ⟨?_, ?_, ?_, fun q hq h1 h2 h3 => ?_⟩
+  · have := hmv acc hh.hplus.hi
+    rw [timesInitMoves, if_pos rfl] at this
+    exact this
+  · have := hmv cnt hh.hcnt.2
+    rw [timesInitMoves, if_neg (Ne.symm hh.hac), if_pos rfl] at this
+    exact this
+  · have := hmv tmk hh.htmk.2
+    rw [timesInitMoves, if_neg (Ne.symm hh.hacm), if_neg (Ne.symm hh.hcm), if_pos rfl] at this
+    exact this
+  · have := hmv q hq
+    rw [timesInitMoves, if_neg h1, if_neg h2, if_neg h3] at this
+    exact this
+
+omit [Finite A] in
+/-- The move that starts a scan, read off. -/
+theorem holds_timesScanInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    {x y : Fin K → A}
+    (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesScanInitMoves cand q).Holds x q (y q)) :
+    (∀ e : A, y cand ≤ e) ∧ ∀ q : Fin K, (q : ℕ) < m → q ≠ cand → y q = x q := by
+  classical
+  refine ⟨?_, fun q hq h1 => ?_⟩
+  · have := hmv cand hh.hplus.hk
+    rw [timesScanInitMoves, if_pos rfl] at this
+    exact this
+  · have := hmv q hq
+    rw [timesScanInitMoves, if_neg h1] at this
+    exact this
+
+omit [Finite A] in
+/-- The move of one scan step, read off. -/
+theorem holds_timesScanStepMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    {x y : Fin K → A}
+    (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesScanStepMoves cand q).Holds x q (y q)) :
+    x cand ⋖ y cand ∧ ∀ q : Fin K, (q : ℕ) < m → q ≠ cand → y q = x q := by
+  classical
+  refine ⟨?_, fun q hq h1 => ?_⟩
+  · have := hmv cand hh.hplus.hk
+    rw [timesScanStepMoves, if_pos rfl] at this
+    exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
+  · have := hmv q hq
+    rw [timesScanStepMoves, if_neg h1] at this
+    exact this
+
+omit [Finite A] in
+/-- The moves that close a round, read off. -/
+theorem holds_timesCommitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    {x y : Fin K → A}
+    (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesCommitMoves acc cnt cand q).Holds x q (y q)) :
+    y acc = x cand ∧ x cnt ⋖ y cnt ∧
+      ∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → y q = x q := by
+  classical
+  refine ⟨?_, ?_, fun q hq h1 h2 => ?_⟩
+  · have := hmv acc hh.hplus.hi
+    rw [timesCommitMoves, if_pos rfl] at this
+    exact this
+  · have := hmv cnt hh.hcnt.2
+    rw [timesCommitMoves, if_neg (Ne.symm hh.hac), if_pos rfl] at this
+    exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
+  · have := hmv q hq
+    rw [timesCommitMoves, if_neg h1, if_neg h2] at this
+    exact this
+
+/-- **The invariant holds all along the control walk of a multiplication.** -/
+theorem timesInv_of_walk (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x : Fin K → A) :
+    ∀ u : TimesNode × (Fin K → A),
+      Relation.ReflTransGen
+          (wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire) (.init, x) u →
+        TimesInv i j acc cnt cand tmk m x u.1 u.2 := by
+  have hjm : (j : ℕ) < m := by
+    have := hh.hj
+    have := hh.hcnt.1
+    have := hh.hcnt.2
+    omega
+  have hjne : j ≠ acc ∧ j ≠ cnt ∧ j ≠ cand ∧ j ≠ tmk := by
+    have h0 := hh.hj
+    refine ⟨fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
+    · have := hh.hacc
+      rw [he] at h0
+      omega
+    · have := hh.hcnt.1
+      rw [he] at h0
+      omega
+    · have := hh.hcand
+      rw [he] at h0
+      omega
+    · have := hh.htmk.1
+      rw [he] at h0
+      omega
+  have hine : (i : ℕ) < m ∧ i ≠ acc ∧ i ≠ cnt ∧ i ≠ cand ∧ i ≠ tmk := by
+    have h0 := hh.hi
+    refine ⟨hh.hplus.hj, fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
+    · have := hh.hacc
+      rw [he] at h0
+      omega
+    · have := hh.hcnt.1
+      rw [he] at h0
+      omega
+    · have := hh.hcand
+      rw [he] at h0
+      omega
+    · have := hh.htmk.1
+      rw [he] at h0
+      omega
+  intro u hu
+  induction hu with
+  | refl => exact rfl
+  | @tail v w hv hvw ih =>
+    obtain ⟨c, hrel, hwire⟩ := hvw
+    cases hnode : v.1 with
+    | init =>
+      have hvx : v.2 = x := by
+        have := ih
+        rw [hnode] at this
+        exact this
+      rw [hnode] at hrel hwire
+      obtain ⟨-, hmv⟩ := hrel
+      rw [hvx] at hmv
+      obtain ⟨hacc0, hcnt0, htmax, hyq⟩ := holds_timesInitMoves hh hmv
+      have hw : w.1 = .outer := by
+        rw [timesWire] at hwire
+        exact (Sum.inl.inj hwire).symm ▸ rfl
+      rw [hw]
+      refine ⟨fun q hq h1 h2 _ h4 => hyq q hq h1 h2 h4, ?_, ?_, htmax⟩
+      · rw [orank_eq_zero hacc0, orank_eq_zero hcnt0]
+        omega
+      · rw [orank_eq_zero hcnt0]
+        omega
+    | outer =>
+      have hbase : TimesBase i j acc cnt cand tmk m x v.2 := by
+        have := ih
+        rw [hnode] at this
+        exact this
+      rw [hnode] at hrel hwire
+      obtain ⟨hc, hag⟩ := hrel
+      have hbase' := hbase.congr hh hag
+      have hcnteq : w.2 cnt = v.2 cnt := (hag cnt hh.hcnt.2).symm
+      have hjeq : v.2 j = x j := hbase.1 j hjm hjne.1 hjne.2.1 hjne.2.2.1 hjne.2.2.2
+      cases c with
+      | true =>
+        have hw : w.1 = .final := by
+          rw [timesWire, if_pos rfl] at hwire
+          exact (Sum.inl.inj hwire).symm ▸ rfl
+        rw [hw]
+        exact ⟨hbase', by rw [hcnteq, hc.mp rfl, hjeq]⟩
+      | false =>
+        have hw : w.1 = .scanInit := by
+          rw [timesWire, if_neg (by simp)] at hwire
+          exact (Sum.inl.inj hwire).symm ▸ rfl
+        rw [hw]
+        refine ⟨hbase', fun he => ?_⟩
+        rw [hcnteq, ← hjeq] at he
+        exact absurd (hc.mpr he) (by simp)
+    | final =>
+      rw [hnode, timesWire] at hwire
+      exact absurd hwire (by simp)
+    | scanInit =>
+      have hsi : TimesBase i j acc cnt cand tmk m x v.2 ∧ v.2 cnt ≠ x j := by
+        have := ih
+        rw [hnode] at this
+        exact this
+      obtain ⟨hbase, hne⟩ := hsi
+      rw [hnode] at hrel hwire
+      obtain ⟨-, hmv⟩ := hrel
+      obtain ⟨hcand0, hyq⟩ := holds_timesScanInitMoves hh hmv
+      have hw : w.1 = .probe := by
+        rw [timesWire] at hwire
+        exact (Sum.inl.inj hwire).symm ▸ rfl
+      have hacceq : w.2 acc = v.2 acc := hyq acc hh.hplus.hi hh.haca
+      have hcnteq : w.2 cnt = v.2 cnt := hyq cnt hh.hcnt.2 hh.hcc
+      have htmkeq : w.2 tmk = v.2 tmk := hyq tmk hh.htmk.2 (Ne.symm hh.hcam)
+      rw [hw]
+      refine ⟨⟨fun q hq h1 h2 h3 h4 => (hyq q hq h3).trans (hbase.1 q hq h1 h2 h3 h4), ?_, ?_, ?_⟩,
+        ?_, ?_⟩
+      · rw [hacceq, hcnteq]
+        exact hbase.2.1
+      · rw [hcnteq]
+        exact hbase.2.2.1
+      · rw [htmkeq]
+        exact hbase.2.2.2
+      · rw [hcnteq]
+        exact hne
+      · rw [orank_eq_zero hcand0]
+        omega
+    | probe =>
+      have hpr : TimesBase i j acc cnt cand tmk m x v.2 ∧ v.2 cnt ≠ x j ∧
+          orank (v.2 cand) ≤ orank (v.2 acc) + orank (x i) := by
+        have := ih
+        rw [hnode] at this
+        exact this
+      obtain ⟨hbase, hne, hle⟩ := hpr
+      rw [hnode] at hrel hwire
+      obtain ⟨hc, hag⟩ := hrel
+      have hbase' := hbase.congr hh hag
+      have hacceq : w.2 acc = v.2 acc := (hag acc hh.hplus.hi).symm
+      have hcnteq : w.2 cnt = v.2 cnt := (hag cnt hh.hcnt.2).symm
+      have hcandeq : w.2 cand = v.2 cand := (hag cand hh.hplus.hk).symm
+      have hieq : v.2 i = x i :=
+        hbase.1 i hine.1 hine.2.1 hine.2.2.1 hine.2.2.2.1 hine.2.2.2.2
+      cases c with
+      | true =>
+        have hw : w.1 = .commit := by
+          rw [timesWire, if_pos rfl] at hwire
+          exact (Sum.inl.inj hwire).symm ▸ rfl
+        rw [hw]
+        refine ⟨hbase', by rw [hcnteq]; exact hne, ?_⟩
+        rw [hacceq, hcandeq, ← hieq]
+        exact (hc.mp rfl).symm
+      | false =>
+        have hw : w.1 = .scanOver := by
+          rw [timesWire, if_neg (by simp)] at hwire
+          exact (Sum.inl.inj hwire).symm ▸ rfl
+        rw [hw]
+        refine ⟨hbase', by rw [hcnteq]; exact hne, ?_⟩
+        rw [hacceq, hcandeq]
+        refine lt_of_le_of_ne hle fun he => ?_
+        rw [hieq] at hc
+        exact absurd (hc.mpr he.symm) (by simp)
+    | scanOver =>
+      have hso : TimesBase i j acc cnt cand tmk m x v.2 ∧ v.2 cnt ≠ x j ∧
+          orank (v.2 cand) < orank (v.2 acc) + orank (x i) := by
+        have := ih
+        rw [hnode] at this
+        exact this
+      obtain ⟨hbase, hne, hlt⟩ := hso
+      rw [hnode] at hrel hwire
+      obtain ⟨-, hag⟩ := hrel
+      cases c with
+      | true =>
+        rw [timesWire, if_pos rfl] at hwire
+        exact absurd hwire (by simp)
+      | false =>
+        have hw : w.1 = .scanStep := by
+          rw [timesWire, if_neg (by simp)] at hwire
+          exact (Sum.inl.inj hwire).symm ▸ rfl
+        have hacceq : w.2 acc = v.2 acc := (hag acc hh.hplus.hi).symm
+        have hcnteq : w.2 cnt = v.2 cnt := (hag cnt hh.hcnt.2).symm
+        have hcandeq : w.2 cand = v.2 cand := (hag cand hh.hplus.hk).symm
+        rw [hw]
+        refine ⟨hbase.congr hh hag, by rw [hcnteq]; exact hne, ?_⟩
+        rw [hacceq, hcandeq]
+        exact hlt
+    | scanStep =>
+      have hss : TimesBase i j acc cnt cand tmk m x v.2 ∧ v.2 cnt ≠ x j ∧
+          orank (v.2 cand) < orank (v.2 acc) + orank (x i) := by
+        have := ih
+        rw [hnode] at this
+        exact this
+      obtain ⟨hbase, hne, hlt⟩ := hss
+      rw [hnode] at hrel hwire
+      obtain ⟨-, hmv⟩ := hrel
+      obtain ⟨hcov, hyq⟩ := holds_timesScanStepMoves hh hmv
+      have hw : w.1 = .probe := by
+        rw [timesWire] at hwire
+        exact (Sum.inl.inj hwire).symm ▸ rfl
+      have hacceq : w.2 acc = v.2 acc := hyq acc hh.hplus.hi hh.haca
+      have hcnteq : w.2 cnt = v.2 cnt := hyq cnt hh.hcnt.2 hh.hcc
+      have htmkeq : w.2 tmk = v.2 tmk := hyq tmk hh.htmk.2 (Ne.symm hh.hcam)
+      rw [hw]
+      refine ⟨⟨fun q hq h1 h2 h3 h4 => (hyq q hq h3).trans (hbase.1 q hq h1 h2 h3 h4), ?_, ?_, ?_⟩,
+        ?_, ?_⟩
+      · rw [hacceq, hcnteq]
+        exact hbase.2.1
+      · rw [hcnteq]
+        exact hbase.2.2.1
+      · rw [htmkeq]
+        exact hbase.2.2.2
+      · rw [hcnteq]
+        exact hne
+      · rw [orank_covBy hcov, hacceq]
+        omega
+    | commit =>
+      have hcm : TimesBase i j acc cnt cand tmk m x v.2 ∧ v.2 cnt ≠ x j ∧
+          orank (v.2 cand) = orank (v.2 acc) + orank (x i) := by
+        have := ih
+        rw [hnode] at this
+        exact this
+      obtain ⟨hbase, hne, heq⟩ := hcm
+      rw [hnode] at hrel hwire
+      obtain ⟨-, hmv⟩ := hrel
+      obtain ⟨hacceq, hcov, hyq⟩ := holds_timesCommitMoves hh hmv
+      have hw : w.1 = .outer := by
+        rw [timesWire] at hwire
+        exact (Sum.inl.inj hwire).symm ▸ rfl
+      have htmkeq : w.2 tmk = v.2 tmk := hyq tmk hh.htmk.2 (Ne.symm hh.hacm) (Ne.symm hh.hcm)
+      have hcntlt : orank (v.2 cnt) < orank (x j) :=
+        lt_of_le_of_ne hbase.2.2.1 fun he => hne (orank_inj he)
+      rw [hw]
+      refine ⟨fun q hq h1 h2 h3 h4 => (hyq q hq h1 h2).trans (hbase.1 q hq h1 h2 h3 h4), ?_, ?_,
+        by rw [htmkeq]; exact hbase.2.2.2⟩
+      · rw [hacceq, heq, orank_covBy hcov, hbase.2.1, Nat.mul_succ]
+      · rw [orank_covBy hcov]
+        omega
+
+/-! ### Completeness: building the two walks -/
+
+/-- **The scan reaches every candidate up to its target**: from the start of a
+scan, the walk can be continued until the candidate has any prescribed rank at
+most the target's, the probe failing at every earlier one. -/
+theorem exists_walk_probe (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    (z₀ : Fin K → A) (hz₀ : orank (z₀ cand) = 0) (hmax : ∀ e : A, e ≤ z₀ tmk) :
+    ∀ t : ℕ, t ≤ orank (z₀ acc) + orank (z₀ i) → t < Nat.card A →
+      ∃ z : Fin K → A,
+        Relation.ReflTransGen
+            (wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire)
+            (.probe, z₀) (.probe, z) ∧
+          (∀ q : Fin K, (q : ℕ) < m → q ≠ cand → z q = z₀ q) ∧ orank (z cand) = t := by
+  classical
+  intro t
+  induction t with
+  | zero =>
+    intro _ _
+    exact ⟨z₀, .refl, fun _ _ _ => rfl, hz₀⟩
+  | succ t ih =>
+    intro htar hlt
+    obtain ⟨z, hwalk, hzq, hzc⟩ := ih (by omega) (by omega)
+    have hacceq : z acc = z₀ acc := hzq acc hh.hplus.hi hh.haca
+    have hieq : z i = z₀ i := by
+      refine hzq i hh.hplus.hj fun he => ?_
+      have h1 := hh.hi
+      have h2 := hh.hcand
+      rw [he] at h1
+      omega
+    have htmkeq : z tmk = z₀ tmk := hzq tmk hh.htmk.2 (Ne.symm hh.hcam)
+    -- the probe fails, the candidate not having reached the target
+    have hprobe : ¬(orank (z acc) + orank (z i) = orank (z cand)) := by
+      rw [hacceq, hieq, hzc]
+      omega
+    -- the candidate is not at the marker either, the target fitting in the universe
+    have hcandmk : z cand ≠ z tmk := by
+      intro he
+      have := orank_isTop (htmkeq ▸ hmax)
+      rw [he, htmkeq, orank_isTop hmax] at hzc
+      omega
+    -- so the candidate steps
+    obtain ⟨c', hc'⟩ := exists_orank_eq (A := A) (m := t + 1) hlt
+    set z' := Function.update z cand c' with hz'
+    have hz'c : z' cand = c' := by rw [hz', Function.update_self]
+    have hz'q : ∀ q : Fin K, q ≠ cand → z' q = z q := fun q hq => by
+      rw [hz', Function.update_of_ne hq]
+    have s1 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+        (.probe, z) (.scanOver, z) := ⟨false, ⟨by simp [hprobe], fun _ _ => rfl⟩, rfl⟩
+    have s2 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+        (.scanOver, z) (.scanStep, z) := ⟨false, ⟨by simp [hcandmk], fun _ _ => rfl⟩, rfl⟩
+    have s3 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+        (.scanStep, z) (.probe, z') := by
+      refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
+      by_cases hq : q = cand
+      · rw [timesScanStepMoves, if_pos hq, hq]
+        have hcov : z cand ⋖ c' := covBy_of_orank_succ (by rw [hc', hzc])
+        change z cand < z' cand ∧ ∀ e : A, ¬(z cand < e ∧ e < z' cand)
+        rw [hz'c]
+        exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
+      · rw [timesScanStepMoves, if_neg hq]
+        exact hz'q q hq
+    refine ⟨z', ((hwalk.tail s1).tail s2).tail s3, ?_, ?_⟩
+    · intro q hq hqc
+      exact (hz'q q hqc).trans (hzq q hq hqc)
+    · rw [hz'c, hc']
+
+/-- **The outer loop reaches every round whose partial product fits**: the state
+after `r` rounds is reachable, the accumulator carrying `orank (x i) * r`. -/
+theorem exists_walk_outer (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x : Fin K → A) :
+    ∀ r : ℕ, r ≤ orank (x j) → orank (x i) * r < Nat.card A →
+      ∃ z : Fin K → A,
+        Relation.ReflTransGen
+            (wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire)
+            (.init, x) (.outer, z) ∧
+          (∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → q ≠ cand → q ≠ tmk → z q = x q) ∧
+            orank (z acc) = orank (x i) * r ∧ orank (z cnt) = r ∧ ∀ e : A, e ≤ z tmk := by
+  classical
+  haveI : Nonempty A := ⟨x i⟩
+  have hjm : (j : ℕ) < m := by
+    have := hh.hj
+    have := hh.hcnt.1
+    have := hh.hcnt.2
+    omega
+  have hjne : j ≠ acc ∧ j ≠ cnt ∧ j ≠ cand ∧ j ≠ tmk := by
+    have h0 := hh.hj
+    refine ⟨fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
+    · have := hh.hacc
+      rw [he] at h0
+      omega
+    · have := hh.hcnt.1
+      rw [he] at h0
+      omega
+    · have := hh.hcand
+      rw [he] at h0
+      omega
+    · have := hh.htmk.1
+      rw [he] at h0
+      omega
+  have hine : i ≠ acc ∧ i ≠ cnt ∧ i ≠ cand ∧ i ≠ tmk := by
+    have h0 := hh.hi
+    refine ⟨fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
+    · have := hh.hacc
+      rw [he] at h0
+      omega
+    · have := hh.hcnt.1
+      rw [he] at h0
+      omega
+    · have := hh.hcand
+      rw [he] at h0
+      omega
+    · have := hh.htmk.1
+      rw [he] at h0
+      omega
+  intro r
+  induction r with
+  | zero =>
+    intro _ _
+    obtain ⟨m0, hm0⟩ := exists_orank_eq (A := A) (m := 0) Nat.card_pos
+    obtain ⟨mx, hmx⟩ := exists_orank_eq (A := A) (m := Nat.card A - 1) (by
+      have := Nat.card_pos (α := A)
+      omega)
+    have hmxtop : ∀ e : A, e ≤ mx := fun e =>
+      orank_le_iff.mp (by have := orank_lt_card e; omega)
+    have hm0min : ∀ e : A, m0 ≤ e := fun e => isMin_of_orank_eq_zero hm0 e
+    set z := Function.update (Function.update (Function.update x acc m0) cnt m0) tmk mx with hz
+    have hzacc : z acc = m0 := by
+      rw [hz, Function.update_of_ne hh.hacm, Function.update_of_ne hh.hac, Function.update_self]
+    have hzcnt : z cnt = m0 := by
+      rw [hz, Function.update_of_ne hh.hcm, Function.update_self]
+    have hztmk : z tmk = mx := by rw [hz, Function.update_self]
+    have hzq : ∀ q : Fin K, q ≠ acc → q ≠ cnt → q ≠ tmk → z q = x q := by
+      intro q h1 h2 h3
+      rw [hz, Function.update_of_ne h3, Function.update_of_ne h2, Function.update_of_ne h1]
+    refine ⟨z, Relation.ReflTransGen.single ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩,
+      fun q _ h1 h2 _ h4 => hzq q h1 h2 h4, ?_, ?_, ?_⟩
+    · by_cases h1 : q = acc
+      · rw [timesInitMoves, if_pos h1, h1]
+        change ∀ e : A, z acc ≤ e
+        rw [hzacc]
+        exact hm0min
+      · by_cases h2 : q = cnt
+        · rw [timesInitMoves, if_neg h1, if_pos h2, h2]
+          change ∀ e : A, z cnt ≤ e
+          rw [hzcnt]
+          exact hm0min
+        · by_cases h3 : q = tmk
+          · rw [timesInitMoves, if_neg h1, if_neg h2, if_pos h3, h3]
+            change ∀ e : A, e ≤ z tmk
+            rw [hztmk]
+            exact hmxtop
+          · rw [timesInitMoves, if_neg h1, if_neg h2, if_neg h3]
+            exact hzq q h1 h2 h3
+    · rw [hzacc, hm0]
+      omega
+    · rw [hzcnt, hm0]
+    · rw [hztmk]
+      exact hmxtop
+  | succ r ih =>
+    intro hrj hfit
+    have hfit' : orank (x i) * r < Nat.card A :=
+      lt_of_le_of_lt (Nat.mul_le_mul_left _ (by omega)) hfit
+    obtain ⟨z, hwalk, hzq, hzacc, hzcnt, hztmk⟩ := ih (by omega) hfit'
+    have hzj : z j = x j := hzq j hjm hjne.1 hjne.2.1 hjne.2.2.1 hjne.2.2.2
+    have hzi : z i = x i := hzq i hh.hplus.hj hine.1 hine.2.1 hine.2.2.1 hine.2.2.2
+    -- the round counter has not arrived
+    have hcntne : z cnt ≠ z j := by
+      rw [hzj]
+      intro he
+      rw [he] at hzcnt
+      omega
+    -- start the scan
+    obtain ⟨m0, hm0⟩ := exists_orank_eq (A := A) (m := 0) Nat.card_pos
+    set z₁ := Function.update z cand m0 with hz₁
+    have hz₁c : z₁ cand = m0 := by rw [hz₁, Function.update_self]
+    have hz₁q : ∀ q : Fin K, q ≠ cand → z₁ q = z q := fun q hq => by
+      rw [hz₁, Function.update_of_ne hq]
+    have s1 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+        (.outer, z) (.scanInit, z) := ⟨false, ⟨by simp [hcntne], fun _ _ => rfl⟩, rfl⟩
+    have s2 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+        (.scanInit, z) (.probe, z₁) := by
+      refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
+      by_cases hq : q = cand
+      · rw [timesScanInitMoves, if_pos hq, hq]
+        change ∀ e : A, z₁ cand ≤ e
+        rw [hz₁c]
+        exact fun e => isMin_of_orank_eq_zero hm0 e
+      · rw [timesScanInitMoves, if_neg hq]
+        exact hz₁q q hq
+    -- scan up to the next partial product
+    have h₁acc : orank (z₁ acc) = orank (x i) * r := by
+      rw [hz₁q acc hh.haca, hzacc]
+    have h₁i : z₁ i = x i := by rw [hz₁q i hine.2.2.1, hzi]
+    have h₁tmk : ∀ e : A, e ≤ z₁ tmk := by
+      rw [hz₁q tmk (Ne.symm hh.hcam)]
+      exact hztmk
+    obtain ⟨z₂, hwalk₂, hz₂q, hz₂c⟩ :=
+      exists_walk_probe hh z₁ (by rw [hz₁c, hm0]) h₁tmk (orank (x i) * (r + 1))
+        (by rw [h₁acc, h₁i, Nat.mul_succ]) hfit
+    have h₂acc : z₂ acc = z₁ acc := hz₂q acc hh.hplus.hi hh.haca
+    have h₂cnt : z₂ cnt = z₁ cnt := hz₂q cnt hh.hcnt.2 hh.hcc
+    have h₂tmk : z₂ tmk = z₁ tmk := hz₂q tmk hh.htmk.2 (Ne.symm hh.hcam)
+    have h₂i : z₂ i = z₁ i := hz₂q i hh.hplus.hj hine.2.2.1
+    -- the probe now succeeds, and the round closes
+    have hprobe : orank (z₂ acc) + orank (z₂ i) = orank (z₂ cand) := by
+      rw [h₂acc, h₂i, h₁acc, h₁i, hz₂c, Nat.mul_succ]
+    obtain ⟨cs, hcs⟩ := exists_orank_eq (A := A) (m := r + 1)
+      (lt_of_le_of_lt hrj (orank_lt_card (x j)))
+    set z₃ := Function.update (Function.update z₂ acc (z₂ cand)) cnt cs with hz₃
+    have h₃acc : z₃ acc = z₂ cand := by
+      rw [hz₃, Function.update_of_ne hh.hac, Function.update_self]
+    have h₃cnt : z₃ cnt = cs := by rw [hz₃, Function.update_self]
+    have h₃q : ∀ q : Fin K, q ≠ acc → q ≠ cnt → z₃ q = z₂ q := by
+      intro q h1 h2
+      rw [hz₃, Function.update_of_ne h2, Function.update_of_ne h1]
+    have s3 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+        (.probe, z₂) (.commit, z₂) := ⟨true, ⟨by simp [hprobe], fun _ _ => rfl⟩, rfl⟩
+    have s4 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+        (.commit, z₂) (.outer, z₃) := by
+      refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
+      by_cases h1 : q = acc
+      · rw [timesCommitMoves, if_pos h1, h1]
+        change z₃ acc = z₂ cand
+        exact h₃acc
+      · by_cases h2 : q = cnt
+        · rw [timesCommitMoves, if_neg h1, if_pos h2, h2]
+          have hcov : z₂ cnt ⋖ cs := covBy_of_orank_succ (by
+            rw [hcs, h₂cnt, hz₁q cnt hh.hcc, hzcnt])
+          change z₂ cnt < z₃ cnt ∧ ∀ e : A, ¬(z₂ cnt < e ∧ e < z₃ cnt)
+          rw [h₃cnt]
+          exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
+        · rw [timesCommitMoves, if_neg h1, if_neg h2]
+          exact h₃q q h1 h2
+    refine ⟨z₃, (((hwalk.tail s1).tail s2).trans hwalk₂).tail s3 |>.tail s4, ?_, ?_, ?_, ?_⟩
+    · intro q hq h1 h2 h3 h4
+      rw [h₃q q h1 h2, hz₂q q hq h3, hz₁q q h3]
+      exact hzq q hq h1 h2 h3 h4
+    · rw [h₃acc, hz₂c]
+    · rw [h₃cnt, hcs]
+    · rw [h₃q tmk (Ne.symm hh.hacm) (Ne.symm hh.hcm), h₂tmk]
+      exact h₁tmk
+
+/-! ### What a multiplication decides -/
+
+/-- **The multiplication fragment decides the multiplication**, with no side
+condition: the scan's marker is parked by the fragment itself, as the addition's
+is, so a product that leaves the universe is detected in the round where it does
+and is not the rank of the third head either. -/
+theorem decides_timesP (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK : m ≤ K) :
+    (timesP (L := L) i j k acc cnt cand tmk a b mk).Decides A p
+      (fun x => orank (x i) * orank (x j) = orank (x k)) := by
+  classical
+  have hpm : p ≤ m := by
+    have := hh.hcnt.1
+    have := hh.hcnt.2
+    omega
+  have hjm : (j : ℕ) < m := by
+    have := hh.hj
+    have := hh.hcnt.1
+    have := hh.hcnt.2
+    omega
+  have hjne : j ≠ acc ∧ j ≠ cnt ∧ j ≠ cand ∧ j ≠ tmk := by
+    have h0 := hh.hj
+    refine ⟨fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
+    · have := hh.hacc
+      rw [he] at h0
+      omega
+    · have := hh.hcnt.1
+      rw [he] at h0
+      omega
+    · have := hh.hcand
+      rw [he] at h0
+      omega
+    · have := hh.htmk.1
+      rw [he] at h0
+      omega
+  have hkm : (k : ℕ) < m ∧ k ≠ acc ∧ k ≠ cnt ∧ k ≠ cand ∧ k ≠ tmk := by
+    have h0 := hh.hk
+    refine ⟨by omega, fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
+    · have := hh.hacc
+      rw [he] at h0
+      omega
+    · have := hh.hcnt.1
+      rw [he] at h0
+      omega
+    · have := hh.hcand
+      rw [he] at h0
+      omega
+    · have := hh.htmk.1
+      rw [he] at h0
+      omega
+  have hine : i ≠ acc ∧ i ≠ cnt ∧ i ≠ cand ∧ i ≠ tmk := by
+    have h0 := hh.hi
+    refine ⟨fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
+    · have := hh.hacc
+      rw [he] at h0
+      omega
+    · have := hh.hcnt.1
+      rw [he] at h0
+      omega
+    · have := hh.hcand
+      rw [he] at h0
+      omega
+    · have := hh.htmk.1
+      rw [he] at h0
+      omega
+  refine (((runs_wireP (timesFam (L := L) i j k acc cnt cand tmk a b mk) timesWire
+    (runs_timesFam hh hmK) (headLocal2_timesFamRel hh) .init).weaken hpm).mono ?_ ?_)
+  · -- soundness
+    rintro x c y ⟨u, hwalk, c', hrel, hwire⟩
+    have hinv := timesInv_of_walk hh x u hwalk
+    have hkk : orank (x k) < Nat.card A := orank_lt_card _
+    cases hnode : u.1 with
+    | init =>
+      rw [hnode, timesWire] at hwire
+      exact absurd hwire (by simp)
+    | outer =>
+      rw [hnode, timesWire] at hwire
+      cases c' <;> simp at hwire
+    | scanInit =>
+      rw [hnode, timesWire] at hwire
+      exact absurd hwire (by simp)
+    | probe =>
+      rw [hnode, timesWire] at hwire
+      cases c' <;> simp at hwire
+    | scanStep =>
+      rw [hnode, timesWire] at hwire
+      exact absurd hwire (by simp)
+    | commit =>
+      rw [hnode, timesWire] at hwire
+      exact absurd hwire (by simp)
+    | final =>
+      have hfi : TimesBase i j acc cnt cand tmk m x u.2 ∧ u.2 cnt = x j := by
+        have := hinv
+        rw [hnode] at this
+        exact this
+      obtain ⟨hbase, hcnteq⟩ := hfi
+      rw [hnode] at hrel hwire
+      obtain ⟨hc, hag⟩ := hrel
+      rw [timesWire] at hwire
+      have hcc : c' = c := Sum.inr.inj hwire
+      have hkeq : u.2 k = x k := hbase.1 k hkm.1 hkm.2.1 hkm.2.2.1 hkm.2.2.2.1 hkm.2.2.2.2
+      have hprod : orank (u.2 acc) = orank (x i) * orank (x j) := by
+        rw [hbase.2.1, hcnteq]
+      refine ⟨?_, ?_⟩
+      · change c = true ↔ orank (x i) * orank (x j) = orank (x k)
+        rw [← hcc, hc, hkeq, ← orank_inj_iff (A := A), hprod]
+      · exact (timesBase_headAgree hh hbase.1).trans (hag.mono hpm)
+    | scanOver =>
+      have hso : TimesBase i j acc cnt cand tmk m x u.2 ∧ u.2 cnt ≠ x j ∧
+          orank (u.2 cand) < orank (u.2 acc) + orank (x i) := by
+        have := hinv
+        rw [hnode] at this
+        exact this
+      obtain ⟨hbase, hne, hlt⟩ := hso
+      rw [hnode] at hrel hwire
+      obtain ⟨hc, hag⟩ := hrel
+      cases c' with
+      | false =>
+        rw [timesWire, if_neg (by simp)] at hwire
+        exact absurd hwire (by simp)
+      | true =>
+        rw [timesWire, if_pos rfl] at hwire
+        have hcf : c = false := (Sum.inr.inj hwire).symm
+        have htop : orank (u.2 cand) = Nat.card A - 1 := by
+          rw [hc.mp rfl]
+          exact orank_isTop hbase.2.2.2
+        have hcntlt : orank (u.2 cnt) < orank (x j) :=
+          lt_of_le_of_ne hbase.2.2.1 fun he => hne (orank_inj he)
+        have hstep : orank (x i) * (orank (u.2 cnt) + 1) ≤ orank (x i) * orank (x j) :=
+          Nat.mul_le_mul_left _ (by omega)
+        have hbig : Nat.card A ≤ orank (x i) * orank (x j) := by
+          have h1 : orank (u.2 acc) + orank (x i) = orank (x i) * (orank (u.2 cnt) + 1) := by
+            rw [hbase.2.1, Nat.mul_succ]
+          omega
+        refine ⟨?_, ?_⟩
+        · change c = true ↔ orank (x i) * orank (x j) = orank (x k)
+          rw [hcf]
+          simp only [Bool.false_eq_true, false_iff]
+          omega
+        · exact (timesBase_headAgree hh hbase.1).trans (hag.mono hpm)
+  · -- completeness
+    rintro x c y ⟨hc, hag⟩
+    change c = true ↔ orank (x i) * orank (x j) = orank (x k) at hc
+    haveI : Nonempty A := ⟨x i⟩
+    have hkk : orank (x k) < Nat.card A := orank_lt_card _
+    have hpos : 0 < Nat.card A := Nat.card_pos
+    have hxy : ∀ z : Fin K → A,
+        (∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → q ≠ cand → q ≠ tmk → z q = x q) →
+        HeadAgree p y z := by
+      intro z hz q hq
+      rw [← hag q hq]
+      exact timesBase_headAgree hh hz q hq
+    by_cases hfits : orank (x i) * orank (x j) < Nat.card A
+    · obtain ⟨z, hwalk, hzq, hzacc, hzcnt, hztmk⟩ :=
+        exists_walk_outer hh x (orank (x j)) le_rfl hfits
+      have hzj : z j = x j := hzq j hjm hjne.1 hjne.2.1 hjne.2.2.1 hjne.2.2.2
+      have hzk : z k = x k := hzq k hkm.1 hkm.2.1 hkm.2.2.1 hkm.2.2.2.1 hkm.2.2.2.2
+      have hcnteq : z cnt = z j := by
+        rw [hzj]
+        exact orank_inj (by rw [hzcnt])
+      have s1 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+          (.outer, z) (.final, z) := ⟨true, ⟨by simp [hcnteq], fun _ _ => rfl⟩, rfl⟩
+      refine ⟨z, hxy z hzq, (.final, z), hwalk.tail s1, c, ⟨?_, fun _ _ => rfl⟩, rfl⟩
+      change c = true ↔ z acc = z k
+      rw [hc, hzk, ← orank_inj_iff (A := A), hzacc]
+    · -- the product overflows: find the round where the scan runs off the top
+      have hex : ∃ s, Nat.card A ≤ orank (x i) * s := ⟨orank (x j), by omega⟩
+      have hspec : Nat.card A ≤ orank (x i) * Nat.find hex := Nat.find_spec hex
+      have hsle : Nat.find hex ≤ orank (x j) := Nat.find_min' hex (by omega)
+      have hs0 : Nat.find hex ≠ 0 := by
+        intro h0
+        rw [h0, Nat.mul_zero] at hspec
+        omega
+      have hprev : orank (x i) * (Nat.find hex - 1) < Nat.card A := by
+        have := Nat.find_min hex (m := Nat.find hex - 1) (by omega)
+        omega
+      obtain ⟨z, hwalk, hzq, hzacc, hzcnt, hztmk⟩ :=
+        exists_walk_outer hh x (Nat.find hex - 1) (by omega) hprev
+      have hzj : z j = x j := hzq j hjm hjne.1 hjne.2.1 hjne.2.2.1 hjne.2.2.2
+      have hzi : z i = x i := hzq i hh.hplus.hj hine.1 hine.2.1 hine.2.2.1 hine.2.2.2
+      have hcntne : z cnt ≠ z j := by
+        rw [hzj]
+        intro he
+        rw [he] at hzcnt
+        omega
+      obtain ⟨m0, hm0⟩ := exists_orank_eq (A := A) (m := 0) hpos
+      set z₁ := Function.update z cand m0 with hz₁
+      have hz₁c : z₁ cand = m0 := by rw [hz₁, Function.update_self]
+      have hz₁q : ∀ q : Fin K, q ≠ cand → z₁ q = z q := fun q hq => by
+        rw [hz₁, Function.update_of_ne hq]
+      have s1 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+          (.outer, z) (.scanInit, z) := ⟨false, ⟨by simp [hcntne], fun _ _ => rfl⟩, rfl⟩
+      have s2 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+          (.scanInit, z) (.probe, z₁) := by
+        refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
+        by_cases hq : q = cand
+        · rw [timesScanInitMoves, if_pos hq, hq]
+          change ∀ e : A, z₁ cand ≤ e
+          rw [hz₁c]
+          exact fun e => isMin_of_orank_eq_zero hm0 e
+        · rw [timesScanInitMoves, if_neg hq]
+          exact hz₁q q hq
+      have h₁acc : orank (z₁ acc) = orank (x i) * (Nat.find hex - 1) := by
+        rw [hz₁q acc hh.haca, hzacc]
+      have h₁i : z₁ i = x i := by rw [hz₁q i hine.2.2.1, hzi]
+      have h₁tmk : ∀ e : A, e ≤ z₁ tmk := by
+        rw [hz₁q tmk (Ne.symm hh.hcam)]
+        exact hztmk
+      have htar : orank (z₁ acc) + orank (z₁ i) = orank (x i) * Nat.find hex := by
+        rw [h₁acc, h₁i, ← Nat.mul_succ]
+        congr 1
+        omega
+      obtain ⟨z₂, hwalk₂, hz₂q, hz₂c⟩ :=
+        exists_walk_probe hh z₁ (by rw [hz₁c, hm0]) h₁tmk (Nat.card A - 1)
+          (by omega) (by omega)
+      have h₂acc : z₂ acc = z₁ acc := hz₂q acc hh.hplus.hi hh.haca
+      have h₂i : z₂ i = z₁ i := hz₂q i hh.hplus.hj hine.2.2.1
+      have h₂tmk : z₂ tmk = z₁ tmk := hz₂q tmk hh.htmk.2 (Ne.symm hh.hcam)
+      have hprobe : ¬(orank (z₂ acc) + orank (z₂ i) = orank (z₂ cand)) := by
+        rw [h₂acc, h₂i, htar, hz₂c]
+        omega
+      have hcandmk : z₂ cand = z₂ tmk := by
+        refine orank_inj ?_
+        rw [hz₂c, h₂tmk, orank_isTop h₁tmk]
+      have hcf : c = false := by
+        cases c with
+        | false => rfl
+        | true => exact absurd (hc.mp rfl) (by omega)
+      have s3 : wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire
+          (.probe, z₂) (.scanOver, z₂) := ⟨false, ⟨by simp [hprobe], fun _ _ => rfl⟩, rfl⟩
+      refine ⟨z₂, ?_, (.scanOver, z₂), ((hwalk.tail s1).tail s2).trans hwalk₂ |>.tail s3, true,
+        ⟨by simp [hcandmk], fun _ _ => rfl⟩, ?_⟩
+      · intro q hq
+        rw [hxy z hzq q hq, ← hz₁q q (fun he => by
+            rw [he] at hq
+            have := hh.hcand
+            omega), ← hz₂q q (by omega) (fun he => by
+            rw [he] at hq
+            have := hh.hcand
+            omega)]
+      · rw [hcf]
+        rfl
+
+end TimesSound
+
 end TimesFam
 
 end HeadProgram

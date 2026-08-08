@@ -887,6 +887,15 @@ The bottom of the ordered world, and the only vocabulary here that is a
   walk with three regimes (exit `false` early, answer, or run off the end with no
   exit at all), and a specification stated by the marker's value, as
   `DescriptiveComplexity.HeadProgram.lexRel` must be.
+  `DescriptiveComplexity.HeadProgram.timesP` then **decides the multiplication**
+  (`DescriptiveComplexity.HeadProgram.decides_timesP`) with an addition *inside*
+  it: an outer loop counts the rounds, and in each round a **scan** walks a
+  candidate up the order asking `plusP` whether it carries the accumulator plus
+  the first factor – which is how a decider is made to compute. Its three-level
+  head layout is what makes the composition work: interface, then the four
+  working heads, then the addition's own scratch heads, the middle level being
+  where `DescriptiveComplexity.HeadProgram.runs_wireP`'s locality requirement
+  lives.
 
 ## Polynomial space, by second-order transitive closure
 
