@@ -15,9 +15,10 @@ sentence over the *arithmetic* expansion of its vocabulary decides it on
 nonempty finite ordered structures – first-order logic with `≤`, `+` and `×` on
 the ranks of the elements (`DescriptiveComplexity.AC0Definable`). Classically
 this is `FO(≤, +, ×) = FO(≤, BIT)`, and (DLOGTIME-)uniform AC⁰ ([Immerman
-1999][immerman1999descriptive], Thm 1.17; Barrington–Immerman–Straubing 1990);
-here, as everywhere in this library, the logic is the *definition*, and the
-identification with a circuit model is a bridge that is not built – see below.
+1999][immerman1999descriptive], Thm 1.17; [Barrington, Immerman & Straubing
+1990][barrington1990uniformity]); here, as everywhere in this library, the logic
+is the *definition*, and the identification with a circuit model is a bridge that
+is not built – see below.
 
 ## Why `+` and `×` rather than `BIT`
 

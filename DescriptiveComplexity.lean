@@ -516,8 +516,10 @@ development has no counterpart for.
   (`DescriptiveComplexity.even_fo_reduction_parity`). With
   `DescriptiveComplexity.even_ac0Definable` and
   `DescriptiveComplexity.ac0Definable_mem_PTIME` that is three sides of
-  `AC⁰ ⊊ LOGSPACE`; the fourth, PARITY ∉ AC⁰, is the switching lemma and is not
-  proved here – this library proves **no** AC⁰ lower bound.
+  `AC⁰ ⊊ LOGSPACE`; the fourth, PARITY ∉ AC⁰, is the switching lemma
+  ([Ajtai 1983][ajtai1983sigma11]; [Furst, Saxe & Sipser 1984][furst1984parity];
+  [Håstad 1986][hastad1986almost]) and is not proved here – this library proves
+  **no** AC⁰ lower bound.
 
 ## Nondeterministic logarithmic space, by the Krom fragment
 
@@ -842,7 +844,8 @@ The bottom of the ordered world, and the only vocabulary here that is a
   `DescriptiveComplexity.AC0Definable`, one sentence over the arithmetic
   expansion deciding the problem on every finite ordered instance. Classically
   this is `FO(≤, +, ×) = FO(≤, BIT)` and (DLOGTIME-)uniform AC⁰ ([Immerman
-  1999][immerman1999descriptive], Thm 1.17); no circuit model is introduced, so
+  1999][immerman1999descriptive], Thm 1.17; [Barrington, Immerman & Straubing
+  1990][barrington1990uniformity]); no circuit model is introduced, so
   that identification is a bridge this library does not (yet) build – unlike the
   machine bridges of the classes above, which are theorems here. `+` and `×`
   are primitive rather than `BIT` because it is *they* whose interpreted-universe

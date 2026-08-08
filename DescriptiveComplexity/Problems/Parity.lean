@@ -21,8 +21,9 @@ the question is whether **the marked subset** has an even number of elements.
 length – and that is AC⁰: an AC⁰ circuit family is indexed by the length, and in
 the logic the numeric predicates read the top rank
 (`DescriptiveComplexity.even_ac0Definable`). PARITY asks the parity of *part of
-the input*, and is the classical example of a problem **outside** AC⁰ (Ajtai;
-Furst–Saxe–Sipser; Håstad). Keeping both in the catalog is what makes the
+the input*, and is the classical example of a problem **outside** AC⁰
+([Ajtai 1983][ajtai1983sigma11]; [Furst, Saxe & Sipser 1984][furst1984parity];
+[Håstad 1986][hastad1986almost]). Keeping both in the catalog is what makes the
 distinction concrete rather than a warning in a docstring.
 
 What is proved here is the *easy* side of that separation, and it is worth
@@ -43,7 +44,8 @@ having on its own:
 ## What would finish the story, and is not here
 
 `AC⁰ ⊊ LOGSPACE` is now **one theorem away**: PARITY ∉ AC⁰. That theorem is the
-switching lemma, a major formalization on its own, and nothing in this library
+switching lemma ([Håstad 1986][hastad1986almost]), a major formalization on its
+own, and nothing in this library
 proves any AC⁰ lower bound. The gap is deliberate and documented; what is
 recorded here is that the *other* three sides of the square – PARITY in LOGSPACE,
 PARITY not in FO(≤), EVEN in AC⁰, AC⁰ inside PTIME – are theorems.

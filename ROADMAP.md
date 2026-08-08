@@ -113,20 +113,42 @@ remains below are ordinary catalog reductions and machine bridges.
   REACH of the graph a walk draws and so lands in NL. It wants that graph read
   *deterministically* — Savitch, or the determinization of the QSAT walk, one
   exponential up.
-- **BIT and FO(≤, BIT)** [L]: DC's standard setting – every instance ordered,
-  BIT primitive, a tax on every reduction and so not the library's default;
-  FO-definability of `+` and `×` from BIT, `FO(≤, BIT)` = uniform AC⁰ as the
-  bottom of the ordered world
-  (formalizing that *capture* — against a circuit model — is the separate §4
-  item **FO(≤, BIT) = AC⁰**); **quantifier-free projections** as the finest
-  reduction notion (DC uses them for almost all completeness results); SAT
-  complete under first-order projections.
+- **What is left of the BIT layer** [L]: the arithmetic vocabulary and the class
+  it defines are **built** (`Arithmetic.lean`, `ArithmeticDefinable.lean`,
+  `ArithmeticFixedPoint.lean`, `Problems/Parity.lean`: `AC0Definable`,
+  `FO(≤) ⊊ AC⁰`, `AC⁰ ⊆ PTIME`, PARITY in LOGSPACE and not in FO(≤)). `+` and
+  `×` are primitive rather than BIT, and deliberately so: the closure obligation
+  below is schoolbook base-`n` arithmetic for them and base conversion for BIT.
+  Three items remain, in this order.
+  * **`AC⁰ ⊆ LOGSPACE`** [L]: the sharp bound, which the fixed-point route
+    cannot give (a `TCSpec` is one operator over first-order kernels, with no
+    relation variables). It wants `plusP`/`timesP` as head-program fragments and
+    a *substitution lemma*: FO over head-computable relations is
+    head-computable, i.e. `HeadEval.evalP` generalized to a formula language
+    larger than the machine's. That lemma is worth more than the bound: it also
+    gives `FO(COUNT) ⊆ LOGSPACE` once a counting fragment exists.
+  * **AC⁰ as a `ComplexityClass`** [XL]: closure under `≤ᶠᵒ` needs the numeric
+    predicates of an interpreted universe – lex-ordered tagged tuples, hence
+    base-`n` digits – defined from those of the base. Addition is
+    carry-lookahead; multiplication needs a double-width digit product, which
+    needs a half-width (base-`√n`) splitting. Note what it does *not* gate: a
+    problem reducing to an AC⁰ problem is already known to be in PTIME.
+  * **BIT itself** [M–L]: as a *derived* predicate (Immerman's mutual
+    definability), not a primitive, so that the closure obligation above does
+    not grow a base-conversion. On the fixed-point side it is cheap – two more
+    induction variables, `pow2 (succ j) p' ← pow2 j p ∧ plus p p p'` and then
+    `bit` – which buys `BIT` for membership proofs without touching the class.
+- **Quantifier-free projections** [L]: the finest reduction notion (DC uses them
+  for almost all completeness results); SAT complete under first-order
+  projections.
 - **Reduction-notion refinements** [M]: track quantifier-free / projection /
   dimension-1 status through composition (currently only `IsQuantifierFree`
   exists); "problem X is complete under qfps" is the DC-faithful statement.
 - **FO(COUNT) / counting quantifiers** [L]: with BIT, captures uniform TC⁰;
   relevant to the arithmetic boundary of the binary representation
-  (multiplication is TC⁰, not FO).
+  (multiplication is TC⁰, not FO). Its inclusion in LOGSPACE would come free
+  from the substitution lemma of the `AC⁰ ⊆ LOGSPACE` item above, given a
+  counting head fragment.
 - **Relativized (domain-formula) reductions — membership closure** [M]:
   Immerman's textbook FO reduction restricts the target universe to a definable
   subset via a **domain formula**, needed for *spanning* problems (Hamilton
@@ -178,23 +200,24 @@ X"), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **FO(≤, BIT) = AC⁰** [R]: the bottom-level capture theorem (Immerman;
-  Barrington–Immerman–Straubing) — first-order logic with a linear order and
-  BIT is exactly (DLOGTIME-)uniform AC⁰. Unlike the other captures here, this
-  one needs a *model of computation* on the far side: uniform AC⁰ circuit
-  families (bounded depth, polynomial size, unbounded fan-in) plus a uniformity
-  condition — introduced only to prove the bridge, exactly as the NP and PTIME
-  machine bridges introduce Turing machines as data. Two payoffs justify the
-  cost. The `FO ⊆ AC⁰` half turns the library's currently *by-inspection* claim
-  that FO reductions are AC⁰-computable — the structures-vs-strings bridge of §7
-  and of the README's *Scope and limitations* — into a theorem; and a formal
-  AC⁰ is the prerequisite for the PARITY ∉ AC⁰ lower bound of §5. Note that it
-  closes only the *reduction* half of that bridge: the membership half, that a
-  definability witness is evaluated within its class's bound, needs the same FO
-  evaluator at a coarser resource accounting, so neither half is worth building
-  alone. The converse
-  `AC⁰ ⊆ FO(≤, BIT)`, simulating a uniform circuit family by an FO(≤, BIT)
-  sentence, is the harder half. Depends on the BIT layer of §3; cf. the
+- **The circuit bridge for AC⁰** [R]: the class is built as the logic
+  (`AC0Definable`, §3), so what is missing is the *bridge*: first-order logic
+  with a linear order and the numeric predicates is exactly (DLOGTIME-)uniform
+  AC⁰ ([Immerman 1999][immerman1999descriptive]; [Barrington, Immerman &
+  Straubing 1990][barrington1990uniformity]). It is the one bridge here whose
+  far side is a *circuit* model: uniform families (bounded depth, polynomial
+  size, unbounded fan-in) plus a uniformity condition, introduced as data as
+  the NP and PTIME machine bridges introduce Turing machines – so it is [R] for
+  the machinery, not out of reach in kind. Two payoffs justify the cost. The
+  `FO ⊆ AC⁰` half turns the library's currently *by-inspection* claim that FO
+  reductions are AC⁰-computable – the structures-vs-strings bridge of §7 and of
+  the README's *Scope* – into a theorem; and it is the prerequisite for the
+  PARITY ∉ AC⁰ lower bound of §5. Note that it closes only the *reduction* half
+  of that bridge: the membership half, that a definability witness is evaluated
+  within its class's bound, needs the same FO evaluator at a coarser resource
+  accounting, so neither half is worth building alone. The converse
+  `AC⁰ ⊆ FO(≤, BIT)`, simulating a uniform circuit family by a sentence, is the
+  harder half. Independent of the three remaining §3 items; cf. the
   circuit-family-bridge remark in §7.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
@@ -215,8 +238,14 @@ non-reducibility, impossible in the machine world.
   makes precise: show some catalog reduction (e.g. SAT → 3COL) provably has no
   order-free FO counterpart, separating `≤ᶠᵒ` from `≤ᶠᵒ[≤]` on concrete
   problems.
-- Horizon: PARITY not in FO(≤, BIT) (Håstad/Ajtai/FSS, i.e. uniform AC⁰ lower
-  bounds) [R]: a switching-lemma formalization is a major standalone project.
+- Horizon: **PARITY not in AC⁰** ([Ajtai 1983][ajtai1983sigma11];
+  [Furst, Saxe & Sipser 1984][furst1984parity];
+  [Håstad 1986][hastad1986almost]) [R]: a switching-lemma formalization is a
+  major standalone project. Everything around it is now in place – PARITY is in
+  the catalog and in LOGSPACE (`parity_mem_LOGSPACE`), AC⁰ is a logic and sits
+  inside PTIME – so this single theorem is what `AC⁰ ⊊ LOGSPACE` waits on. Do
+  not confuse it with EVEN, the parity of the *universe*, which **is** AC⁰
+  (`even_ac0Definable`) and is what separates `FO(≤)` from AC⁰.
 
 ## 6. Beyond decision problems: counting and optimization
 
@@ -684,10 +713,14 @@ provable rather than merely reasonable.
 - FO(LFP) ⊆ NP directly: correctly parked, it buys no new statement.
   Relativized membership closure has two consumers (§3), so it moves up as
   soon as either is wanted.
-- The BIT / FO(≤, BIT) / AC⁰ / PARITY chain: a multi-year project with three
-  [R] items and a switching lemma at the end, to be decided as a whole rather
-  than drifted into via built-in arithmetic. Until then the two by-inspection
-  claims in the README stay an honest, documented gap.
+- Of the BIT / AC⁰ / PARITY chain, only the two ends: the **circuit bridge**
+  (§4) and **PARITY ∉ AC⁰** (§5), both [R]. The chain turned out to split rather
+  than to stand or fall together – the arithmetic vocabulary, the class it
+  defines, `FO(≤) ⊊ AC⁰`, `AC⁰ ⊆ PTIME` and PARITY in LOGSPACE cost about
+  1 600 lines and are built (§3), but nothing above depends on the two ends,
+  and until they exist the two by-inspection claims in the README stay an
+  honest, documented gap. What is worth doing next in that area is the sharp
+  bound `AC⁰ ⊆ LOGSPACE` and, on demand, class-hood: both §3, neither [R].
 - Complete problems for the exponential classes, and with them the generic
   succinctness theorem. The design work is done (§3, the outer composition):
   the order on the expanded universe, the translation lemma and the gate
