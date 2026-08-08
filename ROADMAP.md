@@ -119,14 +119,11 @@ remains below are ordinary catalog reductions and machine bridges.
   `FO(≤) ⊊ AC⁰`, `AC⁰ ⊆ PTIME`, PARITY in LOGSPACE and not in FO(≤)). `+` and
   `×` are primitive rather than BIT, and deliberately so: the closure obligation
   below is schoolbook base-`n` arithmetic for them and base conversion for BIT.
-  Three items remain, in this order.
-  * **`AC⁰ ⊆ LOGSPACE`** [L]: the sharp bound, which the fixed-point route
-    cannot give (a `TCSpec` is one operator over first-order kernels, with no
-    relation variables). It wants `plusP`/`timesP` as head-program fragments and
-    a *substitution lemma*: FO over head-computable relations is
-    head-computable, i.e. `HeadEval.evalP` generalized to a formula language
-    larger than the machine's. That lemma is worth more than the bound: it also
-    gives `FO(COUNT) ⊆ LOGSPACE` once a counting fragment exists.
+  The sharp bound `AC⁰ ⊆ LOGSPACE` is **built** as well
+  (`HeadArith.lean`, `HeadEvalArith.lean`: `plusP` and `timesP` decide the two
+  numeric predicates with heads, and `evalArithP` evaluates a sentence over
+  them, computing the arithmetic atoms where `HeadEval.evalP` reads its
+  atoms). Two items remain, in this order.
   * **AC⁰ as a `ComplexityClass`** [XL]: closure under `≤ᶠᵒ` needs the numeric
     predicates of an interpreted universe – lex-ordered tagged tuples, hence
     base-`n` digits – defined from those of the base. Addition is
@@ -137,7 +134,9 @@ remains below are ordinary catalog reductions and machine bridges.
     definability), not a primitive, so that the closure obligation above does
     not grow a base-conversion. On the fixed-point side it is cheap – two more
     induction variables, `pow2 (succ j) p' ← pow2 j p ∧ plus p p p'` and then
-    `bit` – which buys `BIT` for membership proofs without touching the class.
+    `bit` – which buys `BIT` for membership proofs without touching the class;
+    on the machine side a `bitP` fragment would slot into `evalArithP` beside
+    `plusP` and `timesP`.
 - **Quantifier-free projections** [L]: the finest reduction notion (DC uses them
   for almost all completeness results); SAT complete under first-order
   projections.
@@ -146,9 +145,9 @@ remains below are ordinary catalog reductions and machine bridges.
   exists); "problem X is complete under qfps" is the DC-faithful statement.
 - **FO(COUNT) / counting quantifiers** [L]: with BIT, captures uniform TC⁰;
   relevant to the arithmetic boundary of the binary representation
-  (multiplication is TC⁰, not FO). Its inclusion in LOGSPACE would come free
-  from the substitution lemma of the `AC⁰ ⊆ LOGSPACE` item above, given a
-  counting head fragment.
+  (multiplication is TC⁰, not FO). Its inclusion in LOGSPACE would follow the
+  pattern of `HeadEvalArith.lean`: a counting head fragment, evaluated in place
+  of an atom.
 - **Relativized (domain-formula) reductions — membership closure** [M]:
   Immerman's textbook FO reduction restricts the target universe to a definable
   subset via a **domain formula**, needed for *spanning* problems (Hamilton

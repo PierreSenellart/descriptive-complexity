@@ -60,8 +60,10 @@ inexpressibility of EVEN even when the sentence is handed a linear order
 (`exists_tcDefinable_not_foDefinable`) and, since EVEN *is* definable once
 formulas may add ranks, **`FO(≤) ⊊ AC⁰`** as well
 (`exists_ac0Definable_not_foDefinable`, with AC⁰ read as the logic `FO(≤, +, ×)`
-– no circuit model is involved). The same problem shows, by the
-`k`-pebble game, that **order-free FO(IFP) does not capture PTIME**
+– no circuit model is involved; that class is proved to sit inside **L**,
+`ac0Definable_mem_LOGSPACE`, by a deterministic multi-head automaton that
+*computes* the numeric predicates instead of reading them). The same problem
+shows, by the `k`-pebble game, that **order-free FO(IFP) does not capture PTIME**
 (`exists_mem_PTIME_not_ifpDefinableFree`), so the linear order in the capture
 theorems is not a convenience. No complexity assumption enters any of this.
 

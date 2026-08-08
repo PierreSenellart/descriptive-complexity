@@ -48,6 +48,7 @@ import DescriptiveComplexity.WalkBudget
 import DescriptiveComplexity.HeadLex
 import DescriptiveComplexity.HeadCaptureDet
 import DescriptiveComplexity.HeadArith
+import DescriptiveComplexity.HeadEvalArith
 import DescriptiveComplexity.Iterate
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
@@ -896,6 +897,22 @@ The bottom of the ordered world, and the only vocabulary here that is a
   working heads, then the addition's own scratch heads, the middle level being
   where `DescriptiveComplexity.HeadProgram.runs_wireP`'s locality requirement
   lives.
+* `DescriptiveComplexity.HeadEvalArith` – **`AC⁰ ⊆ LOGSPACE`**
+  (`DescriptiveComplexity.ac0Definable_mem_LOGSPACE`), the sharp bound, by
+  evaluating the sentence with a deterministic multi-head automaton of
+  `qdepthA φ + 7` heads. It is `DescriptiveComplexity.HeadProgram.evalP` with one
+  case split four ways: an atom of the input vocabulary and an atom of `≤` stay
+  quantifier-free **guards**, while `plus` and `times` become the two *programs*
+  above – they are not relations of the instance at all, but functions of the
+  order, so they must be computed and not read. The sweep, the branch and the
+  head accounting are reused unchanged, which is why the file is short; what it
+  adds is `DescriptiveComplexity.relVar` and `DescriptiveComplexity.relTerm`
+  (over a relational vocabulary a term *is* a variable, which is how an atom's
+  arguments become head indices) and the head layout
+  `DescriptiveComplexity.HeadProgram.ArithScratch`, seven heads above the
+  quantifier region. With this the bottom of the ladder is pinned:
+  `FO(≤) ⊊ AC⁰ ⊆ LOGSPACE ⊆ NL ⊆ PTIME`, the first inclusion strict and the
+  strictness of the second exactly the switching lemma.
 
 ## Polynomial space, by second-order transitive closure
 
