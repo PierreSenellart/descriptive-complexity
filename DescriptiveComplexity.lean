@@ -489,7 +489,10 @@ development has no counterpart for.
   Together with the trivial inclusion
   (`DescriptiveComplexity.FODefinable.tcDefinable`, in
   `DescriptiveComplexity.TransitiveClosureFO`: a sentence is the walk that
-  takes no step) that is **`FO ⊊ FO(TC)`**, unconditionally
+  takes no step – and a walk with no step is deterministic for want of a
+  competitor, so the same construction gives
+  `DescriptiveComplexity.FODefinable.dtcDefinable`, the `FO(≤) ⊆ L` end of the
+  chain below) that is **`FO ⊊ FO(TC)`**, unconditionally
   (`DescriptiveComplexity.exists_tcDefinable_not_foDefinable`) – a strict
   inclusion proved outright, where every other separation in this library is
   conditional. The same problem separates the *arithmetic* logic from the bare
