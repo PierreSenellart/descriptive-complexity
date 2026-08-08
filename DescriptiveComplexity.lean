@@ -90,6 +90,7 @@ import DescriptiveComplexity.LogTime.Bits
 import DescriptiveComplexity.LogTime.Machine
 import DescriptiveComplexity.LogTime.Simulate
 import DescriptiveComplexity.LogTime.Arith
+import DescriptiveComplexity.LogTime.Compile
 import DescriptiveComplexity.LogTime
 import DescriptiveComplexity.Games.Ehrenfeucht
 import DescriptiveComplexity.Games.Bare
@@ -944,7 +945,11 @@ The bottom of the ordered world, and the only vocabulary here that is a
   its whole history is a constant number of *bit vectors over the positions*,
   and such a vector **is** an element of the universe – the sentence guesses
   those elements and pins them with the transition, determinism making the guess
-  unique. The bit predicate that makes this first-order is
+  unique. The other fence is `DescriptiveComplexity.BitDefinable.ltDecidable`:
+  every **prenex** sentence over `≤`, `+` and a *guarded* bit atom – `p` is a
+  position and the bit of `x` there is set, the guard being what keeps the atom
+  bit-level – is decided by such a machine, atom by atom. So the model is
+  sandwiched, `FO(≤, +, BIT)`-prenex ⊆ it ⊆ `FO(≤, +, ×)`. The bit predicate that makes this first-order is
   `DescriptiveComplexity.BitAt`, `BIT` derived from `+` and `×` by naming a
   position by its *place value* rather than its exponent
   (`DescriptiveComplexity.IsPos`: a nonzero rank whose divisors are `1` or even),
@@ -953,7 +958,9 @@ The bottom of the ordered world, and the only vocabulary here that is a
   inclusion is **not** proved and is not an oversight: multiplication is not a
   constant number of sweeps, a base that revisits its positions unboundedly
   often leaves the trace budget the simulation lives on, and simulating such a
-  base in the logic is the hard half of the classical `AC⁰ = LH` theorem.
+  base in the logic is the hard half of the classical `AC⁰ = LH` theorem. What
+  would collapse the sandwich is named rather than hidden: `×` from `BIT`, the
+  hard half of Immerman's mutual definability, plus a prenex normal form.
 
 ## Polynomial space, by second-order transitive closure
 

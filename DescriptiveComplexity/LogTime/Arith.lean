@@ -277,4 +277,198 @@ theorem plusSweep_accepts (x : Fin 3 → A) :
 
 end Addition
 
+
+/-! ### Positions and bits -/
+
+/-- **The position test**: one state bit records that a bit of the register has
+been seen, another that a second one has. The sweep accepts when exactly one bit
+is set, which is what it is for a rank to be a place value. -/
+@[reducible] def oneBitSweep : Sweep 1 where
+  σ := 2
+  init := ![false, false]
+  step := ![
+    -- seen: a bit has been read
+    .or (.var (Sum.inl 0)) (.var (Sum.inr 0)),
+    -- bad: a second bit has been read
+    .or (.var (Sum.inl 1)) (.and (.var (Sum.inl 0)) (.var (Sum.inr 0)))]
+  acc := .and (.var 0) (.not (.var 1))
+
+/-- **The bit-implication sweep**: the second register carries a `1` wherever
+the first does. -/
+@[reducible] def impliesSweep : Sweep 2 where
+  σ := 1
+  init := fun _ => true
+  step := fun _ =>
+    .and (.var (Sum.inl 0)) (.or (.not (.var (Sum.inr 0))) (.var (Sum.inr 1)))
+  acc := .var 0
+
+section Positions
+
+variable {A : Type} [LinearOrder A] [Finite A]
+
+omit [Finite A] in
+/-- The invariant of the position test: the two state bits track “some bit
+below `i` is set” and “at most one is”. -/
+theorem oneBitSweep_state (x : Fin 1 → A) :
+    ∀ i : ℕ, (oneBitSweep.state x i 0 = true ↔ orank (x 0) % 2 ^ i ≠ 0) ∧
+      (oneBitSweep.state x i 1 = true → oneBitSweep.state x i 0 = true) ∧
+      ((oneBitSweep.state x i 0 = true ∧ oneBitSweep.state x i 1 = false) ↔
+        ∃ j, orank (x 0) % 2 ^ i = 2 ^ j) := by
+  intro i
+  induction i with
+  | zero =>
+    refine ⟨?_, ?_, ?_⟩
+    · simp [oneBitSweep, Nat.mod_one]
+    · simp [oneBitSweep]
+    · constructor
+      · rintro ⟨h, -⟩
+        exact absurd h (by simp [oneBitSweep])
+      · rintro ⟨j, hj⟩
+        rw [pow_zero, Nat.mod_one] at hj
+        exact absurd hj.symm (Nat.two_pow_pos j).ne'
+  | succ i ih =>
+    obtain ⟨ihseen, ihmono, ihone⟩ := ih
+    have hx := mod_two_pow_succ (orank (x 0)) i
+    have hxlt : orank (x 0) % 2 ^ i < 2 ^ i := Nat.mod_lt _ (Nat.two_pow_pos i)
+    obtain ⟨st, hst⟩ : ∃ st, oneBitSweep.state x i = st := ⟨_, rfl⟩
+    rw [hst] at ihseen ihmono ihone
+    have hseen : oneBitSweep.state x (i + 1) 0 =
+        (st 0 || (orank (x 0)).testBit i) := by
+      rw [oneBitSweep.state_succ x i 0, hst]; rfl
+    have hbad : oneBitSweep.state x (i + 1) 1 =
+        (st 1 || (st 0 && (orank (x 0)).testBit i)) := by
+      rw [oneBitSweep.state_succ x i 1, hst]; rfl
+    rw [hseen, hbad]
+    cases ha : (orank (x 0)).testBit i
+    · have hval : orank (x 0) % 2 ^ (i + 1) = orank (x 0) % 2 ^ i := by
+        rw [hx, ha]; simp
+      rw [hval]
+      simp only [Bool.or_false, Bool.and_false]
+      exact ⟨ihseen, ihmono, ihone⟩
+    · have hval : orank (x 0) % 2 ^ (i + 1) = orank (x 0) % 2 ^ i + 2 ^ i := by
+        rw [hx, ha]; simp
+      rw [hval]
+      simp only [Bool.or_true, Bool.and_true]
+      refine ⟨?_, fun _ => trivial, ?_⟩
+      · have := Nat.two_pow_pos i
+        simp only [true_iff]
+        omega
+      · simp only [true_and]
+        constructor
+        · intro hb
+          have hst0 : st 0 = false := by
+            cases hs : st 0 with
+            | false => rfl
+            | true => rw [hs] at hb; exact absurd hb (by simp)
+          have hzero : orank (x 0) % 2 ^ i = 0 := by
+            by_contra hne
+            exact absurd (ihseen.mpr hne) (by rw [hst0]; simp)
+          exact ⟨i, by omega⟩
+        · rintro ⟨j, hj⟩
+          have hle : 2 ^ i ≤ 2 ^ j := by omega
+          have hlt : 2 ^ j < 2 ^ (i + 1) := by rw [pow_succ]; omega
+          have hij : i ≤ j := (Nat.pow_le_pow_iff_right (by norm_num)).mp hle
+          have hji : j < i + 1 := (Nat.pow_lt_pow_iff_right (by norm_num)).mp hlt
+          have hje : j = i := by omega
+          have hzero : orank (x 0) % 2 ^ i = 0 := by rw [hje] at hj; omega
+          have hst0 : st 0 = false := by
+            cases hs : st 0 with
+            | false => rfl
+            | true => exact absurd (ihseen.mp hs) (by omega)
+          have hst1 : st 1 = false := by
+            cases hs : st 1 with
+            | false => rfl
+            | true => rw [ihmono hs] at hst0; exact absurd hst0 (by simp)
+          simp [hst0, hst1]
+
+/-- **The position test decides `IsPos`**: a rank is a place value exactly when
+exactly one of its bits is set. -/
+theorem oneBitSweep_accepts (x : Fin 1 → A) : oneBitSweep.Accepts x ↔ IsPos (x 0) := by
+  obtain ⟨-, -, hone⟩ := oneBitSweep_state x (posCount A)
+  rw [orank_mod_two_pow_posCount] at hone
+  have hacc : oneBitSweep.Accepts x ↔
+      (oneBitSweep.state x (posCount A) 0 = true ∧
+        oneBitSweep.state x (posCount A) 1 = false) := by
+    have h : oneBitSweep.Accepts x ↔
+        (oneBitSweep.state x (posCount A) 0 &&
+          !(oneBitSweep.state x (posCount A) 1)) = true := Iff.rfl
+    rw [h]
+    simp only [Bool.and_eq_true, Bool.not_eq_true']
+  rw [hacc, hone]
+  exact Iff.rfl
+
+omit [Finite A] in
+/-- The invariant of the bit-implication sweep. -/
+theorem impliesSweep_state (x : Fin 2 → A) :
+    ∀ i : ℕ, (impliesSweep.state x i 0 = true ↔
+      ∀ j < i, (orank (x 0)).testBit j = true → (orank (x 1)).testBit j = true) := by
+  intro i
+  induction i with
+  | zero => simp [impliesSweep]
+  | succ i ih =>
+    obtain ⟨st, hst⟩ : ∃ st, impliesSweep.state x i = st := ⟨_, rfl⟩
+    rw [hst] at ih
+    have hstep : impliesSweep.state x (i + 1) 0 =
+        (st 0 && (!(orank (x 0)).testBit i || (orank (x 1)).testBit i)) := by
+      rw [impliesSweep.state_succ x i 0, hst]; rfl
+    rw [hstep]
+    simp only [Bool.and_eq_true, Bool.or_eq_true, Bool.not_eq_true', ih]
+    constructor
+    · rintro ⟨hall, hhere⟩ j hj hbit
+      rcases Nat.lt_or_ge j i with hlt | hge
+      · exact hall j hlt hbit
+      · have hji : j = i := by omega
+        subst hji
+        rcases hhere with h | h
+        · exact absurd hbit (by rw [h]; simp)
+        · exact h
+    · intro hall
+      refine ⟨fun j hj => hall j (by omega), ?_⟩
+      cases hb : (orank (x 0)).testBit i with
+      | false => exact Or.inl rfl
+      | true => exact Or.inr (hall i (by omega) hb)
+
+/-- **The bit-implication sweep decides bitwise implication**, over all
+positions: above them every rank has a zero bit, so the bound is immaterial. -/
+theorem impliesSweep_accepts (x : Fin 2 → A) :
+    impliesSweep.Accepts x ↔
+      ∀ j, (orank (x 0)).testBit j = true → (orank (x 1)).testBit j = true := by
+  have h := impliesSweep_state x (posCount A)
+  have hacc : impliesSweep.Accepts x ↔ impliesSweep.state x (posCount A) 0 = true := Iff.rfl
+  rw [hacc, h]
+  constructor
+  · intro hall j hbit
+    rcases Nat.lt_or_ge j (posCount A) with hlt | hge
+    · exact hall j hlt hbit
+    · exact absurd hbit (by rw [testBit_orank_eq_false hge]; simp)
+  · exact fun hall j _ => hall j
+
+/-- **A guarded bit is a bitwise implication**: when `p` is a position, the bit
+of `y` at `p` is set exactly when every bit of `p` is a bit of `y` – `p` having
+only one. This is the form a sweep can check. -/
+theorem bitAt_iff_bits (p y : A) :
+    (IsPos p ∧ BitAt p y) ↔
+      (IsPos p ∧ ∀ j, (orank p).testBit j = true → (orank y).testBit j = true) := by
+  refine and_congr_right fun hpos => ?_
+  obtain ⟨i, hi⟩ := hpos
+  rw [bitAt_iff hi]
+  constructor
+  · intro hbit j hj
+    rw [hi, Nat.testBit_two_pow] at hj
+    simp only [decide_eq_true_eq] at hj
+    exact hj ▸ hbit
+  · intro hall
+    exact hall i (by rw [hi, Nat.testBit_two_pow]; simp)
+
+/-- **The bit atom is two sweeps**: that `p` is a position, and that every bit
+of `p` is a bit of `y`. This is `DescriptiveComplexity.BitAt` guarded by
+`DescriptiveComplexity.IsPos`, decided from bits alone. -/
+theorem bitAt_iff_sweeps (p y : A) :
+    (IsPos p ∧ BitAt p y) ↔
+      (oneBitSweep.Accepts ![p] ∧ impliesSweep.Accepts ![p, y]) := by
+  rw [bitAt_iff_bits, oneBitSweep_accepts, impliesSweep_accepts]
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
+
+end Positions
+
 end DescriptiveComplexity

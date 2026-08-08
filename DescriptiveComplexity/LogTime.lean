@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.LogTime.Arith
+import DescriptiveComplexity.LogTime.Compile
 import DescriptiveComplexity.LogTime.Simulate
 import DescriptiveComplexity.HeadEvalArith
 
@@ -38,6 +39,16 @@ Nothing in the base evaluates `≤`, `+` or `×`: that is the point. The bound i
 constant number of passes over a tape of `log n` bits, hence a logarithmic clock
 with a constant number of head reversals.
 
+## The sandwich
+
+`FO(≤, +, BIT)` in prenex form  ⊆  sweeping logarithmic time  ⊆  `FO(≤, +, ×)`.
+
+Both fences are proved (`DescriptiveComplexity.BitDefinable.ltDecidable` and
+`DescriptiveComplexity.LTDecidable.ac0Definable`), and the gap between them is
+named rather than hidden: it is Immerman's mutual definability, of which the
+library has `BIT` from `+, ×` (`DescriptiveComplexity.arithDef_bit`) and not
+`×` from `BIT`.
+
 ## What is proved
 
 * **The arithmetic comes out, bit by bit.**
@@ -46,6 +57,13 @@ with a constant number of head reversals.
   addition are sweeps, so the model computes the numeric predicates `≤` and
   `plus` rather than reading them – the bit-level analogue of what
   `DescriptiveComplexity.HeadArith` does one resource bound higher.
+* **The logic is inside the model.**
+  `DescriptiveComplexity.BitDefinable.ltDecidable`: every prenex sentence over
+  the order, the addition and a *guarded* bit atom (`p` is a position and the
+  bit of `x` there is set) is decided by such a machine, atom by atom – the
+  guard is what keeps `BIT` bit-level, since for a `p` that is not a place value
+  `DescriptiveComplexity.BitAt` is a condition modulo `2p`, which no sweep
+  decides.
 * **The model is inside the logic.**
   `DescriptiveComplexity.LTDecidable.ac0Definable`: every problem decided by
   such a machine is AC⁰ definable, hence
@@ -60,16 +78,17 @@ with a constant number of head reversals.
 
 ## What is not proved, and why
 
-The converse – that every AC⁰ definable problem is decided by such a machine –
-is **open here, and not for want of engineering**. A sweep passes a constant
+That every AC⁰ definable problem is decided by such a machine – equivalently,
+that the sandwich collapses – is **open here, and not for want of
+engineering**. A sweep passes a constant
 number of bits across each position; multiplication of two `log n`-bit numbers
 accumulates a column count that grows with the number of positions, so `×` is
 not a constant number of sweeps. Lifting the restriction is no help either: a
 base that revisits its positions unboundedly often (a machine that *counts*)
 leaves the budget the simulation above lives on, and simulating it in the logic
 is exactly the hard half of the classical `AC⁰ = LH` theorem. The honest
-statement is therefore a sandwich with one side open, and the missing side is
-named rather than hidden.
+statement is therefore a sandwich that does not collapse, with the missing step
+named: `×` from `BIT`, and a prenex normal form for `BoundedFormula`.
 
 The bridge does not touch the structures-versus-strings gap either: like
 `DescriptiveComplexity.mem_LOGSPACE_iff_automaton`, it relates a logic and a
@@ -89,5 +108,10 @@ arithmetic head programs of `DescriptiveComplexity.HeadEvalArith`. -/
 theorem LTDecidable.mem_LOGSPACE {P : DecisionProblem L} (h : LTDecidable P) :
     P ∈ LOGSPACE :=
   ac0Definable_mem_LOGSPACE h.ac0Definable
+
+/-- **A bit-definable problem is in LOGSPACE**, through the machine and AC⁰. -/
+theorem BitDefinable.mem_LOGSPACE {P : DecisionProblem L} (h : BitDefinable P) :
+    P ∈ LOGSPACE :=
+  h.ltDecidable.mem_LOGSPACE
 
 end DescriptiveComplexity

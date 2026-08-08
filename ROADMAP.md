@@ -200,23 +200,26 @@ X"), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **The converse half of the AC⁰ machine bridge** [R]: the model is **built**
+- **Collapsing the AC⁰ machine sandwich** [R]: the model is **built**
   (`LogTime.lean`: alternating machines whose registers are `log n`-bit
   addresses filled by the two players, and whose deterministic base is a Boolean
   combination of input queries and of *sweeps* – single passes over the bit
-  positions by a finite automaton), and so is the inclusion
-  `LTDecidable ⊆ AC⁰ ⊆ LOGSPACE`, by guessing each sweep's history as a constant
-  number of bit vectors, one element apiece. What is missing is
-  `AC⁰ ⊆ LTDecidable`, and the build revised its price sharply upwards. A sweep
+  positions by a finite automaton), and so are **both fences** of
+  `FO(≤, +, BIT)`-prenex ⊆ `LTDecidable` ⊆ AC⁰ ⊆ LOGSPACE: the upper one by
+  guessing each sweep's history as a constant number of bit vectors, one element
+  apiece, the lower one by compiling a prenex bit-level logic atom by atom
+  (`BitDefinable.ltDecidable`). What is missing is the *collapse*, and the build
+  revised its price sharply upwards. A sweep
   passes a constant number of bits across each position, so a constant number of
   sweeps cannot multiply – the schoolbook product of two `log n`-bit numbers
   accumulates a column count that grows with the positions. Widening the base
   does not help by itself: a machine that revisits its positions unboundedly
   often (one that *counts*) leaves the `O(log n)`-bit trace budget the
   simulation lives on, so the two halves cannot both be had with a naive base,
-  and closing the sandwich is the hard half of [Barrington, Immerman &
-  Straubing 1990][barrington1990uniformity] – a genuine formalization project,
-  not an engineering task. Whoever takes it up should first decide what the
+  and closing the sandwich needs `×` from `BIT` – the hard half of Immerman's
+  mutual definability, cf. §3 – plus a prenex normal form for `BoundedFormula`,
+  which the lower fence currently sidesteps with a bespoke prenex syntax. The
+  first is a genuine formalization project, not an engineering task. Whoever takes it up should first decide what the
   intended class *is*: the sweep model as built, a bounded-reversal refinement,
   or the full `Σₖ-TIME(log n)` with a counting base. The **circuit** route stays
   [R] and should be taken only if uniform circuit families are wanted for their

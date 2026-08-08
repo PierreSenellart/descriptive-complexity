@@ -114,6 +114,26 @@ theorem holds_iff_eval (val : V → Bool) (e : BitExpr V) :
   | and e f ihe ihf => simp [Holds, eval, ihe, ihf]
   | or e f ihe ihf => simp [Holds, eval, ihe, ihf]
 
+/-- Renaming the bit variables of an expression. -/
+def mapVar {W : Type} (f : V → W) : BitExpr V → BitExpr W
+  | .var v => .var (f v)
+  | .tt => .tt
+  | .ff => .ff
+  | .not e => .not (e.mapVar f)
+  | .and e g => .and (e.mapVar f) (g.mapVar f)
+  | .or e g => .or (e.mapVar f) (g.mapVar f)
+
+/-- Renaming bit variables is composition on the assignment. -/
+theorem eval_mapVar {W : Type} (f : V → W) (val : W → Bool) (e : BitExpr V) :
+    (e.mapVar f).eval val = e.eval (val ∘ f) := by
+  induction e with
+  | var v => rfl
+  | tt => rfl
+  | ff => rfl
+  | not e ih => rw [mapVar, eval, ih, eval]
+  | and e g ihe ihg => rw [mapVar, eval, ihe, ihg, eval]
+  | or e g ihe ihg => rw [mapVar, eval, ihe, ihg, eval]
+
 /-- Holding only depends on the assignment pointwise. -/
 theorem holds_congr {val val' : V → Prop} (h : ∀ v, val v ↔ val' v) (e : BitExpr V) :
     e.Holds val ↔ e.Holds val' := by
@@ -168,6 +188,44 @@ theorem state_succ (S : Sweep ρ) (x : Fin ρ → A) (i : ℕ) (j : Fin S.σ) :
 after the last bit position. -/
 def Accepts (S : Sweep ρ) (x : Fin ρ → A) : Prop :=
   S.acc.eval (S.state x (posCount A)) = true
+
+/-- **Renaming the registers of a sweep**: what lets a sweep built once – the
+comparison, the addition – be run on any registers of a larger machine. -/
+def relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') : Sweep ρ' where
+  σ := S.σ
+  init := S.init
+  step := fun j => (S.step j).mapVar (Sum.map id f)
+  acc := S.acc
+
+omit [Finite A] in
+/-- A renamed sweep runs the original one on the renamed registers. -/
+theorem state_relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') (x : Fin ρ' → A) :
+    ∀ (i : ℕ) (j : Fin S.σ), (S.relabel f).state x i j = S.state (fun k => x (f k)) i j := by
+  intro i
+  induction i with
+  | zero => intro j; rfl
+  | succ i ih =>
+    intro j
+    have h1 := BitExpr.eval_mapVar (Sum.map id f)
+      (Sum.elim ((S.relabel f).state x i) fun k => (orank (x k)).testBit i) (S.step j)
+    have h2 : ((Sum.elim ((S.relabel f).state x i) fun k => (orank (x k)).testBit i) ∘
+        Sum.map id f) =
+        Sum.elim (S.state (fun k => x (f k)) i) fun k => (orank (x (f k))).testBit i := by
+      funext z
+      rcases z with j' | k
+      · exact ih j'
+      · rfl
+    exact h1.trans (congrArg (fun v => (S.step j).eval v) h2)
+
+/-- Acceptance of a renamed sweep. -/
+theorem accepts_relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') (x : Fin ρ' → A) :
+    (S.relabel f).Accepts x ↔ S.Accepts fun k => x (f k) := by
+  have h : (S.relabel f).state x (posCount A) = S.state (fun k => x (f k)) (posCount A) :=
+    funext fun j => state_relabel S f x _ j
+  have hacc : (S.relabel f).Accepts x ↔ S.acc.eval ((S.relabel f).state x (posCount A)) = true :=
+    Iff.rfl
+  rw [hacc, h]
+  exact Iff.rfl
 
 end Sweep
 
