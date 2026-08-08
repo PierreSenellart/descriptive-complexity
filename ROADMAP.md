@@ -199,24 +199,35 @@ X"), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **The circuit bridge for AC⁰** [R]: the class is built as the logic
-  (`AC0Definable`, §3), so what is missing is the *bridge*: first-order logic
-  with a linear order and the numeric predicates is exactly (DLOGTIME-)uniform
-  AC⁰ ([Immerman 1999][immerman1999descriptive]; [Barrington, Immerman &
-  Straubing 1990][barrington1990uniformity]). It is the one bridge here whose
-  far side is a *circuit* model: uniform families (bounded depth, polynomial
-  size, unbounded fan-in) plus a uniformity condition, introduced as data as
-  the NP and PTIME machine bridges introduce Turing machines – so it is [R] for
-  the machinery, not out of reach in kind. Two payoffs justify the cost. The
-  `FO ⊆ AC⁰` half turns the library's currently *by-inspection* claim that FO
-  reductions are AC⁰-computable – the structures-vs-strings bridge of §7 and of
-  the README's *Scope* – into a theorem; and it is the prerequisite for the
-  PARITY ∉ AC⁰ lower bound of §5. Note that it closes only the *reduction* half
-  of that bridge: the membership half, that a definability witness is evaluated
-  within its class's bound, needs the same FO evaluator at a coarser resource
-  accounting, so neither half is worth building alone. The converse
-  `AC⁰ ⊆ FO(≤, BIT)`, simulating a uniform circuit family by a sentence, is the
-  harder half. Independent of the three remaining §3 items; cf. the
+- **The machine bridge for AC⁰** [L], and *not* through circuits: the class is
+  built as the logic (`AC0Definable`, §3), so what is missing is the bridge to
+  a model. Take it through the **logarithmic-time hierarchy**
+  `LH = ⋃ₖ Σₖ-TIME(log n)` – alternating random-access machines with a
+  logarithmic clock and constantly many alternation blocks – which is the
+  intermediate characterization of DLOGTIME-uniform AC⁰ ([Barrington, Immerman
+  & Straubing 1990][barrington1990uniformity]) and is far better suited to this
+  framework than the circuit end of it: random access, the awkward ingredient
+  of the string definition, is here just an atom of the input structure; an
+  alternation block of `O(log n)` guessed bits is one *element* of the
+  universe, so `Σₖ-TIME(log n)` is `k` first-order quantifier blocks over a
+  base check, the shape `ATMAccept k` already has; and the result refines level
+  by level, mirroring PH. The content sits entirely in the deterministic base,
+  which must be **bit-level** – addresses manipulated one bit at a time under a
+  logarithmic clock – or the bridge is vacuous; that is a finer-grained
+  `HeadArith.lean`, plus one genuinely new ingredient, a *sublinear* time
+  domain indexed by bit positions rather than by tuples of the universe.
+  Payoff: the `FO ⊆ AC⁰` half turns the library's currently *by-inspection*
+  claim that FO reductions are AC⁰-computable – the structures-vs-strings
+  bridge of §7 and of the README's *Scope* – into a theorem, and it is the
+  prerequisite for the PARITY ∉ AC⁰ lower bound of §5. It closes only the
+  *reduction* half of that bridge: the membership half, that a definability
+  witness is evaluated within its class's bound, needs the same evaluator at a
+  coarser resource accounting, so neither half is worth building alone. The
+  **circuit** route stays [R] and should be taken only if uniform circuit
+  families are wanted for their own sake: bounded-depth unbounded-fan-in
+  families, a direct-connection language for uniformity, and a converse half
+  (simulating a family by a sentence) harder than anything above. Independent
+  of the three remaining §3 items; design in `AC0.md` §4; cf. the
   circuit-family-bridge remark in §7.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
@@ -712,14 +723,16 @@ provable rather than merely reasonable.
 - FO(LFP) ⊆ NP directly: correctly parked, it buys no new statement.
   Relativized membership closure has two consumers (§3), so it moves up as
   soon as either is wanted.
-- Of the BIT / AC⁰ / PARITY chain, only the two ends: the **circuit bridge**
-  (§4) and **PARITY ∉ AC⁰** (§5), both [R]. The chain turned out to split rather
-  than to stand or fall together – the arithmetic vocabulary, the class it
-  defines, `FO(≤) ⊊ AC⁰`, `AC⁰ ⊆ PTIME` and PARITY in LOGSPACE cost about
-  1 600 lines and are built (§3), but nothing above depends on the two ends,
-  and until they exist the two by-inspection claims in the README stay an
-  honest, documented gap. What is worth doing next in that area is the sharp
-  bound `AC⁰ ⊆ LOGSPACE` and, on demand, class-hood: both §3, neither [R].
+- Of the BIT / AC⁰ / PARITY chain, only the far end: **PARITY ∉ AC⁰** (§5),
+  [R]. The chain turned out to split rather than to stand or fall together –
+  the arithmetic vocabulary, the class it defines, `FO(≤) ⊊ AC⁰`,
+  `AC⁰ ⊆ PTIME`, `AC⁰ ⊆ LOGSPACE` and PARITY in LOGSPACE are built (§3) – and
+  the other end split too: the **machine bridge** (§4) is [L] rather than [R]
+  once it goes through the logarithmic hierarchy instead of through circuits.
+  Nothing above depends on either end, and until the bridge exists the two
+  by-inspection claims in the README stay an honest, documented gap. What is
+  worth doing next in that area is `BIT` as a derived predicate and, on demand,
+  class-hood: both §3, neither [R].
 - Complete problems for the exponential classes, and with them the generic
   succinctness theorem. The design work is done (§3, the outer composition):
   the order on the expanded universe, the translation lemma and the gate
