@@ -91,7 +91,11 @@ hard for it under FO reductions.
 | **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Each entry of the machine column is an equivalence *proved here* between the
-logical definition and acceptance by that model. The classes are also matched
+logical definition and acceptance by that model. The two dashes above NEXPTIME
+and EXPSPACE are not for want of a model: both classes have the *wide machine* –
+control in the instance, tape addressed by the subsets of the instance – as a
+proved member (`wideAccept_mem_NEXPTIME`, `wideAcceptSpace_mem_EXPSPACE`), and
+what is missing is its hardness. The classes are also matched
 against Mathlib's computability layer: RE *is* recursive enumerability, every
 RE-hard problem is undecidable, and RE ≠ co-RE.
 

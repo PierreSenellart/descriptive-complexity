@@ -53,6 +53,7 @@ import DescriptiveComplexity.Problems.Machine
 import DescriptiveComplexity.Problems.MachineAlt
 import DescriptiveComplexity.Problems.MachineAltSpace
 import DescriptiveComplexity.Problems.MachineAltSpace.Membership
+import DescriptiveComplexity.Problems.Wide
 import DescriptiveComplexity.Problems.Machine.Halt
 import DescriptiveComplexity.Problems.Machine.HaltCert
 import DescriptiveComplexity.Problems.Machine.HaltFin

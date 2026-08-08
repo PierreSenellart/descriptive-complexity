@@ -1331,6 +1331,32 @@ The bottom of the ordered world, and the only vocabulary here that is a
   copy of the block to read the guessed order from, so its content moves to a
   **unary shift** whose argument names the copy – which is what lets the
   construction carry no hypothesis on the arities.
+* `DescriptiveComplexity.Problems.Wide` – the **wide machine**, the catalog
+  side of the same construction and the first natural *member* NEXPTIME and
+  EXPSPACE have. Its control – transitions, states, symbols – is an ordinary
+  part of the instance, while its tape is addressed by the **subsets** of the
+  instance, so an instance of size `n` describes a machine with `2^n` cells and
+  `2^n` steps and the two resource variants land one exponential above
+  `DescriptiveComplexity.NTMAccept` and
+  `DescriptiveComplexity.NTMAcceptSpace`
+  (`DescriptiveComplexity.wideAccept_mem_NEXPTIME`,
+  `DescriptiveComplexity.wideAcceptSpace_mem_EXPSPACE`). Nothing is said about
+  resources: the machine's universe *is* the universe of an exponential
+  expansion whose expanded vocabulary is `FirstOrder.Language.turing` – two
+  tags, one for the addresses and one, cut out by a singleton domain sentence,
+  for the elements – so the memberships are `ExpDefinable` applied to the
+  polynomial-level machine problems, an expansion *after* a problem and not the
+  composition that does not exist. Why this and not more alternation:
+  with polynomially many cells an ordinary machine problem tops out at PSPACE
+  and an alternating one at EXPTIME whatever the play length, so the
+  exponentially large index set has to appear in the target problem's own
+  semantics. The order on addresses is the binary-number order induced by the
+  instance's own order, since a decision problem may not read the ambient one,
+  and the promises that order carries reduce to three first-order conditions
+  about the instance (`DescriptiveComplexity.wideData_wellFormed_iff`).
+  Hardness is **not** proved: as for `ATMAcceptSpace` it needs the machine
+  written in logic, an evaluator for a fixed first-order kernel whose
+  quantifiers range over addresses.
 
 ## Value invention, towards the recursively enumerable
 
