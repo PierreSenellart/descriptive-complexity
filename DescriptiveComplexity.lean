@@ -505,6 +505,19 @@ development has no counterpart for.
   `DescriptiveComplexity.lfpDefinable_iff_mem_PTIME`, which says it does over
   ordered structures. The order in every capture theorem here is doing real
   work.
+* `DescriptiveComplexity.Problems.Parity` – **PARITY**, the parity of a *marked
+  subset* rather than of the universe: the problem the AC⁰ lower bound is about,
+  in the catalog so that the distinction from EVEN is a definition and not a
+  warning. It is **in LOGSPACE** (`DescriptiveComplexity.parity_mem_LOGSPACE`) by
+  one deterministic walk – carry a bit, flip it at each marked element, a walk
+  functional on the nose so that determinizing is free – and **not first-order
+  definable** (`DescriptiveComplexity.parity_not_foDefinable`), EVEN being the
+  instance where everything is marked
+  (`DescriptiveComplexity.even_fo_reduction_parity`). With
+  `DescriptiveComplexity.even_ac0Definable` and
+  `DescriptiveComplexity.ac0Definable_mem_PTIME` that is three sides of
+  `AC⁰ ⊊ LOGSPACE`; the fourth, PARITY ∉ AC⁰, is the switching lemma and is not
+  proved here – this library proves **no** AC⁰ lower bound.
 
 ## Nondeterministic logarithmic space, by the Krom fragment
 
