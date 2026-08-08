@@ -757,6 +757,268 @@ theorem deterministic_plusP (i j k a b mk : Fin K) :
 
 end Complete
 
+/-! ### The control graph of a multiplication -/
+
+/-- The control nodes of a multiplication: an outer loop counting the rounds and,
+inside it, a scan looking for the element that carries the next partial
+product. -/
+inductive TimesNode
+  /-- Send the accumulator and the round counter to the least element, and the
+  scan's marker to the greatest. -/
+  | init : TimesNode
+  /-- Has the round counter reached the second factor? -/
+  | outer : TimesNode
+  /-- It has: is the accumulator the claimed product? -/
+  | final : TimesNode
+  /-- It has not: start the scan at the least element. -/
+  | scanInit : TimesNode
+  /-- Does the candidate carry the accumulator plus the first factor? -/
+  | probe : TimesNode
+  /-- It does not: is the candidate at the marker, i.e. would the product
+  overflow? -/
+  | scanOver : TimesNode
+  /-- Step the candidate. -/
+  | scanStep : TimesNode
+  /-- The candidate carries the next partial product: take it, and count the
+  round. -/
+  | commit : TimesNode
+  deriving DecidableEq
+
+instance : Finite TimesNode := by
+  refine Finite.of_injective (fun c : TimesNode => match c with
+      | .init => (0 : Fin 8)
+      | .outer => 1
+      | .final => 2
+      | .scanInit => 3
+      | .probe => 4
+      | .scanOver => 5
+      | .scanStep => 6
+      | .commit => 7) ?_
+  rintro (_ | _ | _ | _ | _ | _ | _ | _) (_ | _ | _ | _ | _ | _ | _ | _) h <;> simp_all
+
+/-- The wiring of a multiplication: the outer loop `outer → scan → commit →
+outer`, the scan `probe → scanOver → scanStep → probe`, and the two answers
+hanging off `final` and off the scan's overflow test. -/
+def timesWire : TimesNode → Bool → TimesNode ⊕ Bool
+  | .init, _ => Sum.inl .outer
+  | .outer, c => if c then Sum.inl .final else Sum.inl .scanInit
+  | .final, c => Sum.inr c
+  | .scanInit, _ => Sum.inl .probe
+  | .probe, c => if c then Sum.inl .commit else Sum.inl .scanOver
+  | .scanOver, c => if c then Sum.inr false else Sum.inl .scanStep
+  | .scanStep, _ => Sum.inl .probe
+  | .commit, _ => Sum.inl .outer
+
+open Classical in
+/-- The moves that start a multiplication: accumulator and round counter to the
+least element, the scan's marker to the greatest. -/
+noncomputable def timesInitMoves (acc cnt tmk : Fin K) : Fin K → HeadMove K :=
+  fun h => if h = acc then .toMin else if h = cnt then .toMin else
+    if h = tmk then .toMax else .stay
+
+open Classical in
+/-- The move that starts a scan: the candidate to the least element. -/
+noncomputable def timesScanInitMoves (cand : Fin K) : Fin K → HeadMove K :=
+  fun h => if h = cand then .toMin else .stay
+
+open Classical in
+/-- The move of one scan step: the candidate advances. -/
+noncomputable def timesScanStepMoves (cand : Fin K) : Fin K → HeadMove K :=
+  fun h => if h = cand then .succ cand else .stay
+
+open Classical in
+/-- The moves that close a round: the accumulator takes the candidate's value and
+the round counter advances. -/
+noncomputable def timesCommitMoves (acc cnt cand : Fin K) : Fin K → HeadMove K :=
+  fun h => if h = acc then .copy cand else if h = cnt then .succ cnt else .stay
+
+/-- The fragments of a multiplication. The `probe` node is a whole addition
+program (`DescriptiveComplexity.HeadProgram.plusP`), which is what makes the
+scan work: it asks whether the candidate carries the accumulator plus the first
+factor. -/
+noncomputable def timesFam (i j k acc cnt cand tmk a b mk : Fin K) :
+    TimesNode → HeadProgram L K
+  | .init => moveP (timesInitMoves acc cnt tmk)
+  | .outer => leafP (HeadMove.eqVarF L cnt j) ((BoundedFormula.IsAtomic.equal _ _).isQF)
+  | .final => leafP (HeadMove.eqVarF L acc k) ((BoundedFormula.IsAtomic.equal _ _).isQF)
+  | .scanInit => moveP (timesScanInitMoves cand)
+  | .probe => plusP acc i cand a b mk
+  | .scanOver => leafP (HeadMove.eqVarF L cand tmk) ((BoundedFormula.IsAtomic.equal _ _).isQF)
+  | .scanStep => moveP (timesScanStepMoves cand)
+  | .commit => moveP (timesCommitMoves acc cnt cand)
+
+/-- **Multiplication**: decide `orank (x i) * orank (x j) = orank (x k)`, by
+adding the first factor to an accumulator once per round. -/
+noncomputable def timesP (i j k acc cnt cand tmk a b mk : Fin K) : HeadProgram L K :=
+  wireP (timesFam (L := L) i j k acc cnt cand tmk a b mk) timesWire .init
+
+/-! ### The head layout of a multiplication -/
+
+/-- The head indices a caller of a multiplication must respect. Three levels: the
+interface below `p`, the four working heads between `p` and `m`, and the
+addition's own three scratch heads at `m` and above – the last group being
+exactly what `DescriptiveComplexity.HeadProgram.PlusHeads` asks of the addition
+called at the `probe` node. -/
+structure TimesHeads (i j k acc cnt cand tmk a b mk : Fin K) (p m : ℕ) : Prop where
+  /-- The first factor is interface. -/
+  hi : (i : ℕ) < p
+  /-- The second factor is interface. -/
+  hj : (j : ℕ) < p
+  /-- The claimed product is interface. -/
+  hk : (k : ℕ) < p
+  /-- The accumulator is a working head. -/
+  hacc : p ≤ (acc : ℕ)
+  /-- The round counter is a working head. -/
+  hcnt : p ≤ (cnt : ℕ) ∧ (cnt : ℕ) < m
+  /-- The scan's candidate is a working head. -/
+  hcand : p ≤ (cand : ℕ)
+  /-- The scan's marker is a working head. -/
+  htmk : p ≤ (tmk : ℕ) ∧ (tmk : ℕ) < m
+  /-- The addition at the `probe` node has the layout it needs, which also places
+  `acc`, `i` and `cand` below `m` and `a`, `b`, `mk` at `m` or above. -/
+  hplus : PlusHeads acc i cand a b mk m
+  /-- The accumulator is not the round counter. -/
+  hac : acc ≠ cnt
+  /-- The accumulator is not the candidate. -/
+  haca : acc ≠ cand
+  /-- The accumulator is not the scan's marker. -/
+  hacm : acc ≠ tmk
+  /-- The round counter is not the candidate. -/
+  hcc : cnt ≠ cand
+  /-- The round counter is not the scan's marker. -/
+  hcm : cnt ≠ tmk
+  /-- The candidate is not the scan's marker. -/
+  hcam : cand ≠ tmk
+
+/-! ### What the fragments of a multiplication run -/
+
+section TimesFam
+
+variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
+variable {i j k acc cnt cand tmk a b mk : Fin K} {p m : ℕ}
+
+/-- The relations the fragments of a multiplication run, at the level `m` that
+protects the working heads and leaves the addition's scratch heads free. -/
+noncomputable def timesFamRel (i j k acc cnt cand tmk : Fin K) (m : ℕ) :
+    TimesNode → (Fin K → A) → Bool → (Fin K → A) → Prop
+  | .init => fun x c y => c = true ∧
+      ∀ q : Fin K, (q : ℕ) < m → (timesInitMoves acc cnt tmk q).Holds x q (y q)
+  | .outer => fun x c y => (c = true ↔ x cnt = x j) ∧ HeadAgree m x y
+  | .final => fun x c y => (c = true ↔ x acc = x k) ∧ HeadAgree m x y
+  | .scanInit => fun x c y => c = true ∧
+      ∀ q : Fin K, (q : ℕ) < m → (timesScanInitMoves cand q).Holds x q (y q)
+  | .probe => fun x c y =>
+      (c = true ↔ orank (x acc) + orank (x i) = orank (x cand)) ∧ HeadAgree m x y
+  | .scanOver => fun x c y => (c = true ↔ x cand = x tmk) ∧ HeadAgree m x y
+  | .scanStep => fun x c y => c = true ∧
+      ∀ q : Fin K, (q : ℕ) < m → (timesScanStepMoves cand q).Holds x q (y q)
+  | .commit => fun x c y => c = true ∧
+      ∀ q : Fin K, (q : ℕ) < m → (timesCommitMoves acc cnt cand q).Holds x q (y q)
+
+theorem runs_timesFam (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK : m ≤ K)
+    (c : TimesNode) :
+    (timesFam (L := L) i j k acc cnt cand tmk a b mk c).Runs A m
+      (timesFamRel i j k acc cnt cand tmk m c) := by
+  classical
+  cases c with
+  | init =>
+    refine runs_moveP_local _ _ fun q hq => ?_
+    have h1 : q ≠ acc := fun he => by rw [he] at hq; exact absurd hh.hplus.hi (by omega)
+    have h2 : q ≠ cnt := fun he => by rw [he] at hq; exact absurd hh.hcnt.2 (by omega)
+    have h3 : q ≠ tmk := fun he => by rw [he] at hq; exact absurd hh.htmk.2 (by omega)
+    rw [timesInitMoves, if_neg h1, if_neg h2, if_neg h3]
+  | scanInit =>
+    refine runs_moveP_local _ _ fun q hq => ?_
+    have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.hplus.hk (by omega)
+    rw [timesScanInitMoves, if_neg h1]
+  | scanStep =>
+    refine runs_moveP_local _ _ fun q hq => ?_
+    have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.hplus.hk (by omega)
+    rw [timesScanStepMoves, if_neg h1]
+  | commit =>
+    refine runs_moveP_local _ _ fun q hq => ?_
+    have h1 : q ≠ acc := fun he => by rw [he] at hq; exact absurd hh.hplus.hi (by omega)
+    have h2 : q ≠ cnt := fun he => by rw [he] at hq; exact absurd hh.hcnt.2 (by omega)
+    rw [timesCommitMoves, if_neg h1, if_neg h2]
+  | outer =>
+    exact (decides_leafP (HeadMove.eqVarF L cnt j)
+      ((BoundedFormula.IsAtomic.equal _ _).isQF)).congr fun x => by simp
+  | final =>
+    exact (decides_leafP (HeadMove.eqVarF L acc k)
+      ((BoundedFormula.IsAtomic.equal _ _).isQF)).congr fun x => by simp
+  | scanOver =>
+    exact (decides_leafP (HeadMove.eqVarF L cand tmk)
+      ((BoundedFormula.IsAtomic.equal _ _).isQF)).congr fun x => by simp
+  | probe => exact decides_plusP hh.hplus hmK
+
+omit [Finite A] in
+theorem headLocal2_timesFamRel (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+    (c : TimesNode) :
+    HeadLocal2 m (timesFamRel (A := A) i j k acc cnt cand tmk m c) := by
+  have hacc : (acc : ℕ) < m := hh.hplus.hi
+  have hi' : (i : ℕ) < m := hh.hplus.hj
+  have hcand : (cand : ℕ) < m := hh.hplus.hk
+  have hcnt : (cnt : ℕ) < m := hh.hcnt.2
+  have htmk : (tmk : ℕ) < m := hh.htmk.2
+  have hj' : (j : ℕ) < m := by have := hh.hj; have := hh.hcnt.1; omega
+  have hk' : (k : ℕ) < m := by have := hh.hk; have := hh.hcnt.1; omega
+  cases c with
+  | init =>
+    refine headLocal2_moveP fun q _ => ?_
+    rw [timesInitMoves]
+    split_ifs <;> trivial
+  | scanInit =>
+    refine headLocal2_moveP fun q _ => ?_
+    rw [timesScanInitMoves]
+    split_ifs <;> trivial
+  | scanStep =>
+    refine headLocal2_moveP fun q _ => ?_
+    rw [timesScanStepMoves]
+    split_ifs with h
+    · exact hcand
+    · trivial
+  | commit =>
+    refine headLocal2_moveP fun q _ => ?_
+    rw [timesCommitMoves]
+    split_ifs with h1 h2
+    · exact hcand
+    · exact hcnt
+    · trivial
+  | outer =>
+    refine headLocal2_decides fun x x' hx => ?_
+    rw [hx _ hcnt, hx _ hj']
+  | final =>
+    refine headLocal2_decides fun x x' hx => ?_
+    rw [hx _ hacc, hx _ hk']
+  | scanOver =>
+    refine headLocal2_decides fun x x' hx => ?_
+    rw [hx _ hcand, hx _ htmk]
+  | probe =>
+    refine headLocal2_decides fun x x' hx => ?_
+    rw [hx _ hacc, hx _ hi', hx _ hcand]
+
+omit [Finite A] in
+/-- **A multiplication is deterministic**: every node of its control graph is –
+the `probe` node because an addition is
+(`DescriptiveComplexity.HeadProgram.deterministic_plusP`). -/
+theorem deterministic_timesP (i j k acc cnt cand tmk a b mk : Fin K) :
+    (timesP (L := L) i j k acc cnt cand tmk a b mk).Deterministic A := by
+  refine deterministic_wireP _ _ _ ?_
+  rintro (_ | _ | _ | _ | _ | _ | _ | _)
+  · exact deterministic_moveP _
+  · exact deterministic_leafP (HeadMove.eqVarF L cnt j)
+      ((BoundedFormula.IsAtomic.equal _ _).isQF)
+  · exact deterministic_leafP (HeadMove.eqVarF L acc k)
+      ((BoundedFormula.IsAtomic.equal _ _).isQF)
+  · exact deterministic_moveP _
+  · exact deterministic_plusP _ _ _ _ _ _
+  · exact deterministic_leafP (HeadMove.eqVarF L cand tmk)
+      ((BoundedFormula.IsAtomic.equal _ _).isQF)
+  · exact deterministic_moveP _
+  · exact deterministic_moveP _
+
+end TimesFam
+
 end HeadProgram
 
 end DescriptiveComplexity
