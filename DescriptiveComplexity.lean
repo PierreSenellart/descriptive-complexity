@@ -47,6 +47,7 @@ import DescriptiveComplexity.HeadCapture
 import DescriptiveComplexity.WalkBudget
 import DescriptiveComplexity.HeadLex
 import DescriptiveComplexity.HeadCaptureDet
+import DescriptiveComplexity.HeadArith
 import DescriptiveComplexity.Iterate
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
@@ -874,7 +875,13 @@ The bottom of the ordered world, and the only vocabulary here that is a
   The route through `FO(DTC)` does not work in the same way: a
   `DescriptiveComplexity.TCSpec` is one operator over first-order kernels with no
   relation variables, so the sharper `AC⁰ ⊆ LOGSPACE` wants the multi-head
-  automaton instead, and is not built.
+  automaton instead. `DescriptiveComplexity.HeadArith` is the beginning of that
+  route: `DescriptiveComplexity.HeadProgram.plusP` adds two ranks with two
+  scratch heads and a marker, its specification stated by the marker's value
+  (`DescriptiveComplexity.HeadProgram.plusRel`) because a fragment whose marker
+  is misplaced can exit `false` or not exit at all – only where the caller has
+  parked the marker at the greatest element does it decide the addition
+  (`DescriptiveComplexity.HeadProgram.plusRel_iff_of_isMax`).
 
 ## Polynomial space, by second-order transitive closure
 

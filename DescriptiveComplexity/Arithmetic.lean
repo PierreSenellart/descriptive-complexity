@@ -304,6 +304,50 @@ theorem realize_aMaxF (x : α) : (aMaxF (L := L) x).Realize v ↔ ∀ a : A, a �
 
 end Formulas
 
+/-! ### Ranks, minima and covers
+
+The order facts every walk over the ranks needs, stated once here because both
+routes to a complexity bound use them: the induction of
+`DescriptiveComplexity.ArithmeticFixedPoint` and the head programs of
+`DescriptiveComplexity.HeadArith`. -/
+
+section Ranks
+
+variable {A : Type} [LinearOrder A] [Finite A]
+
+/-- An element of rank `0` is least. -/
+theorem isMin_of_orank_eq_zero {z : A} (h : orank z = 0) (a : A) : z ≤ a := by
+  by_contra hlt
+  exact absurd (orank_lt_orank (lt_of_not_ge hlt)) (by omega)
+
+/-- The rank of an element with an immediate predecessor is one more. -/
+theorem orank_eq_succ_of_pred {y' y : A} (h1 : y' < y) (h2 : ∀ a : A, ¬(y' < a ∧ a < y)) :
+    orank y = orank y' + 1 :=
+  orank_covBy ⟨h1, fun a ha hb => h2 a ⟨ha, hb⟩⟩
+
+/-- **A rank one higher is a cover**: the converse of
+`DescriptiveComplexity.orank_covBy`, which is what lets a walk step a head by
+choosing the element of the next rank. -/
+theorem covBy_of_orank_succ {w z : A} (h : orank z = orank w + 1) : w ⋖ z := by
+  refine ⟨lt_of_le_of_ne (orank_le_iff.mp (by omega)) (fun he => by rw [he] at h; omega), ?_⟩
+  intro e h1 h2
+  have := orank_lt_orank h1
+  have := orank_lt_orank h2
+  omega
+
+/-- An element of positive rank has an immediate predecessor, of the rank
+below. -/
+theorem exists_pred_of_orank_succ {z : A} {k : ℕ} (h : orank z = k + 1) :
+    ∃ z' : A, orank z' = k ∧ z' < z ∧ ∀ a : A, ¬(z' < a ∧ a < z) := by
+  have hk : k < Nat.card A := by
+    have := orank_lt_card z
+    omega
+  obtain ⟨z', hz'⟩ := exists_orank_eq (A := A) hk
+  have hcov : z' ⋖ z := covBy_of_orank_succ (by omega)
+  exact ⟨z', hz', hcov.lt, fun a ha => hcov.2 ha.1 ha.2⟩
+
+end Ranks
+
 /-! ### Truncation, and the size of the universe -/
 
 section Truncation

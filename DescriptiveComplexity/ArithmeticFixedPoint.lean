@@ -252,36 +252,6 @@ theorem next_times_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
 
 variable [Finite A]
 
-/-! #### Order facts the induction walks on -/
-
-/-- An element of rank `0` is least. -/
-theorem isMin_of_orank_eq_zero {z : A} (h : orank z = 0) (a : A) : z ≤ a := by
-  by_contra hlt
-  exact absurd (orank_lt_orank (lt_of_not_ge hlt)) (by omega)
-
-/-- The rank of an element with an immediate predecessor is one more. -/
-theorem orank_eq_succ_of_pred {y' y : A} (h1 : y' < y) (h2 : ∀ a : A, ¬(y' < a ∧ a < y)) :
-    orank y = orank y' + 1 :=
-  orank_covBy ⟨h1, fun a ha hb => h2 a ⟨ha, hb⟩⟩
-
-/-- An element of positive rank has an immediate predecessor, of the rank
-below. -/
-theorem exists_pred_of_orank_succ {z : A} {k : ℕ} (h : orank z = k + 1) :
-    ∃ z' : A, orank z' = k ∧ z' < z ∧ ∀ a : A, ¬(z' < a ∧ a < z) := by
-  have hk : k < Nat.card A := by
-    have := orank_lt_card z
-    omega
-  obtain ⟨z', hz'⟩ := exists_orank_eq (A := A) hk
-  refine ⟨z', hz', ?_, ?_⟩
-  · refine lt_of_le_of_ne (orank_le_iff.mp (by omega)) ?_
-    intro he
-    rw [he] at hz'
-    omega
-  · rintro a ⟨h1, h2⟩
-    have := orank_lt_orank h1
-    have := orank_lt_orank h2
-    omega
-
 /-! #### Soundness: every stage holds only true facts -/
 
 /-- **Every stage of the numeric induction is sound**: the addition variable
