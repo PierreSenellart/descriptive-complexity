@@ -876,12 +876,17 @@ The bottom of the ordered world, and the only vocabulary here that is a
   `DescriptiveComplexity.TCSpec` is one operator over first-order kernels with no
   relation variables, so the sharper `AC⁰ ⊆ LOGSPACE` wants the multi-head
   automaton instead. `DescriptiveComplexity.HeadArith` is the beginning of that
-  route: `DescriptiveComplexity.HeadProgram.plusP` adds two ranks with two
-  scratch heads and a marker, its specification stated by the marker's value
-  (`DescriptiveComplexity.HeadProgram.plusRel`) because a fragment whose marker
-  is misplaced can exit `false` or not exit at all – only where the caller has
-  parked the marker at the greatest element does it decide the addition
-  (`DescriptiveComplexity.HeadProgram.plusRel_iff_of_isMax`).
+  route: `DescriptiveComplexity.HeadProgram.plusP` **decides the addition of two
+  ranks** (`DescriptiveComplexity.HeadProgram.decides_plusP`), by walking one
+  scratch head up from the first summand while a second counts to the second
+  summand. The design decision that makes its specification clean is that the
+  overflow marker – needed because “this head is at the greatest element” is not
+  a quantifier-free fact of one head, while “these two heads are equal” is – is
+  **parked by the fragment itself**, as a third scratch head, rather than being
+  an input the caller must have prepared: a marker sitting anywhere else gives a
+  walk with three regimes (exit `false` early, answer, or run off the end with no
+  exit at all), and a specification stated by the marker's value, as
+  `DescriptiveComplexity.HeadProgram.lexRel` must be.
 
 ## Polynomial space, by second-order transitive closure
 
