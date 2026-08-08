@@ -10,6 +10,7 @@ import DescriptiveComplexity.ImmermanSzelepcsenyi
 import DescriptiveComplexity.Invariant.TwoStages
 import DescriptiveComplexity.Problems.TwoSat
 import DescriptiveComplexity.FirstOrderPull
+import DescriptiveComplexity.ArithmeticDefinable
 
 /-!
 # EVEN: the parity of a bare set
@@ -38,6 +39,14 @@ the immediate successor, flip a bit – so EVEN *is* FO(≤, TC) definable
 `DescriptiveComplexity.NL`. The two halves together give `FO ⊊ FO(TC)`
 (`DescriptiveComplexity.exists_tcDefinable_not_foDefinable`): a *strict*
 inclusion between two logics of this library, proved outright.
+
+Deciding it needs no walk either, once formulas may do arithmetic: the greatest
+element has rank `Nat.card A - 1`, so EVEN *is* AC⁰ definable
+(`DescriptiveComplexity.even_ac0Definable`) by a sentence with one addition,
+whence `FO(≤) ⊊ AC⁰` as well
+(`DescriptiveComplexity.exists_ac0Definable_not_foDefinable`). That is the
+parity of the *universe*; the parity of a marked *subset* is PARITY, the problem
+outside AC⁰, about which nothing here is claimed.
 
 This is the first *unconditional* separation of the library – no complexity
 assumption enters, in contrast with everything the completeness results say,
@@ -308,6 +317,48 @@ theorem even_mem_NL : EVEN ∈ NL :=
 /-- **EVEN is in PTIME**. -/
 theorem even_mem_PTIME : EVEN ∈ PTIME :=
   NL_subset_PTIME even_mem_NL
+
+/-! ### EVEN is AC⁰: the numeric predicates see the size of the universe
+
+No walk is needed either. A bare set carries no information beyond its size,
+and the size is exactly what the numeric predicates of
+`DescriptiveComplexity.Arithmetic` make visible: the greatest element has rank
+`Nat.card A - 1`, so the universe is even precisely when nothing doubles to it
+(`DescriptiveComplexity.evenCardSentence`, one `∀` and one `∃`, using addition
+only). With `DescriptiveComplexity.even_not_foDefinable` this gives
+`FO(≤) ⊊ AC⁰` outright.
+
+**This says nothing about PARITY.** EVEN asks the parity of the *universe* –
+of the input's length, which a circuit family is indexed by and a sentence with
+`+` reads off the top rank. PARITY asks the parity of a *marked subset*, part of
+the input, and that is the problem outside AC⁰ by the switching lemma. The two
+must not be confused: nothing here bears on the second, and this library proves
+no AC⁰ lower bound. -/
+
+/-- **EVEN is AC⁰ definable**: the greatest element has rank `Nat.card A - 1`,
+so the universe has an even number of elements exactly when no element doubles
+to the greatest one – the sentence `DescriptiveComplexity.evenCardSentence`,
+which mentions the input vocabulary not at all.
+
+Contrast with PARITY, the parity of a marked *subset*, which is classically
+*not* in AC⁰: see the section docstring. -/
+theorem even_ac0Definable : AC0Definable EVEN :=
+  ⟨evenCardSentence Language.empty, fun A _ _ _ _ =>
+    (even_holds_iff A).trans (realize_evenCardSentence A).symm⟩
+
+/-- **`FO(≤) ⊊ AC⁰`, unconditionally.** First-order logic with the numeric
+predicates is *strictly* stronger than first-order logic with a bare linear
+order: the inclusion is `DescriptiveComplexity.FODefinable.ac0Definable`, and
+EVEN separates the two – addition reads the parity of the top rank, and no
+sentence over the order alone defines it, however it uses the order. No
+complexity-theoretic assumption enters either half.
+
+This is the second unconditional separation of the library, beside
+`DescriptiveComplexity.exists_tcDefinable_not_foDefinable`, and it is the one
+that says the arithmetic is not decoration. -/
+theorem exists_ac0Definable_not_foDefinable :
+    ∃ P : DecisionProblem Language.empty, AC0Definable P ∧ ¬FODefinable P :=
+  ⟨EVEN, even_ac0Definable, even_not_foDefinable⟩
 
 /-! ### Order-free FO(IFP) does not capture PTIME
 

@@ -80,6 +80,9 @@ import DescriptiveComplexity.Invariant.TwoInvariance
 import DescriptiveComplexity.Invariant.TwoStages
 import DescriptiveComplexity.FirstOrderDefinable
 import DescriptiveComplexity.FirstOrderPull
+import DescriptiveComplexity.Arithmetic
+import DescriptiveComplexity.ArithmeticDefinable
+import DescriptiveComplexity.ArithmeticFixedPoint
 import DescriptiveComplexity.Games.Ehrenfeucht
 import DescriptiveComplexity.Games.Bare
 import DescriptiveComplexity.Games.Distance
@@ -487,7 +490,15 @@ development has no counterpart for.
   takes no step) that is **`FO ⊊ FO(TC)`**, unconditionally
   (`DescriptiveComplexity.exists_tcDefinable_not_foDefinable`) – a strict
   inclusion proved outright, where every other separation in this library is
-  conditional. EVEN also settles the *unordered* fixed-point question:
+  conditional. The same problem separates the *arithmetic* logic from the bare
+  order, in the other direction: EVEN **is** AC⁰ definable
+  (`DescriptiveComplexity.even_ac0Definable`), the greatest element having rank
+  `Nat.card A - 1`, whence **`FO(≤) ⊊ AC⁰`**
+  (`DescriptiveComplexity.exists_ac0Definable_not_foDefinable`). That is the
+  parity of the *universe*, i.e. of the input's length; the parity of a marked
+  *subset* is PARITY, the problem outside AC⁰, about which nothing here is
+  claimed – no AC⁰ lower bound is proved in this library. EVEN also settles the
+  *unordered* fixed-point question:
   `DescriptiveComplexity.even_not_ifpDefinableFree`, whence
   `DescriptiveComplexity.exists_mem_PTIME_not_ifpDefinableFree` – **order-free
   FO(IFP) does not capture PTIME**, against
@@ -796,6 +807,58 @@ development has no counterpart for.
   Plass & Tarjan 1979][aspvall1979linear], formalized in
   `DescriptiveComplexity.Problems.TwoSat.Implication`; this is what yields the two
   inclusions of NL.
+
+## The numeric predicates, and AC⁰
+
+The bottom of the ordered world, and the only vocabulary here that is a
+*function of the order* rather than part of an instance.
+
+* `DescriptiveComplexity.Arithmetic` – the arithmetic expansion
+  `FirstOrder.Language.arith`: a binary `≤` and two ternary symbols read on a
+  finite linear order through the rank of an element
+  (`DescriptiveComplexity.orank`), as `orank x + orank y = orank z` and
+  `orank x * orank y = orank z`. Relations, not functions, hence *truncated*: a
+  sum that does not fit has no witness, and overflow is the first-order
+  `¬∃z, plus x y z` (`DescriptiveComplexity.no_plus_iff_card_le`). Since the
+  interpretation is canonical, an FO(≤) sentence is read arithmetically by a
+  language map (`DescriptiveComplexity.sumOrderToArith`), and – the smallest
+  thing the numeric predicates buy over a bare order – the *size* of the
+  universe becomes visible: `DescriptiveComplexity.evenCardSentence` says that
+  it is even, by the parity of the top rank.
+* `DescriptiveComplexity.ArithmeticDefinable` – **AC⁰** as a logic:
+  `DescriptiveComplexity.AC0Definable`, one sentence over the arithmetic
+  expansion deciding the problem on every finite ordered instance. Classically
+  this is `FO(≤, +, ×) = FO(≤, BIT)` and (DLOGTIME-)uniform AC⁰ ([Immerman
+  1999][immerman1999descriptive], Thm 1.17); no circuit model is introduced, so
+  that identification is a bridge this library does not (yet) build – unlike the
+  machine bridges of the classes above, which are theorems here. `+` and `×`
+  are primitive rather than `BIT` because it is *they* whose interpreted-universe
+  analogue is schoolbook arithmetic on base-`n` digits, where `BIT`'s is base
+  conversion. Two features distinguish this notion from every other definability
+  notion here: there is **no order-free variant**, the numeric predicates being
+  meaningless without an order; and closure under complement is free
+  (`DescriptiveComplexity.AC0Definable.compl`), the defining object being a
+  sentence, where NL needed Immerman–Szelepcsényi. `FO(≤) ⊆ AC⁰` is transport
+  (`DescriptiveComplexity.FODefinable.ac0Definable`) and is **strict**, by EVEN
+  (`DescriptiveComplexity.exists_ac0Definable_not_foDefinable`, below).
+* `DescriptiveComplexity.ArithmeticFixedPoint` – **`AC⁰ ⊆ PTIME`**
+  (`DescriptiveComplexity.ac0Definable_mem_PTIME`), because the numeric
+  predicates are themselves an induction: two relation variables of arity 3,
+  `plus` walking `y` and `z` down the order in lockstep and `times` peeling one
+  copy of `x` off `y` and adding it back with `plus`, in *one simultaneous*
+  `DescriptiveComplexity.StepDef` – no stratification, the occurrences being
+  positive. Soundness is an induction on the stages, completeness needs no stage
+  count at all, only that the limit is closed under the clauses
+  (`DescriptiveComplexity.inflLimit_arith_iff` is the resulting identification of
+  the limit with the arithmetic). What makes the last step free is that the
+  numeric predicates are *symbols*: the translation of an AC⁰ sentence is a
+  language map (`DescriptiveComplexity.arithToBlock`), not a recursion, and
+  `StepDef` accepts an unrestricted first-order output – which is exactly what an
+  AC⁰ sentence needs, its numeric atoms sitting under any number of negations.
+  The route through `FO(DTC)` does not work in the same way: a
+  `DescriptiveComplexity.TCSpec` is one operator over first-order kernels with no
+  relation variables, so the sharper `AC⁰ ⊆ LOGSPACE` wants the multi-head
+  automaton instead, and is not built.
 
 ## Polynomial space, by second-order transitive closure
 

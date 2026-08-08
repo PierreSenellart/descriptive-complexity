@@ -57,7 +57,10 @@ And the payoff no machine-first development has, **unconditional lower
 bounds**: Ehrenfeucht–Fraïssé games on finite structures, and the
 inexpressibility of EVEN even when the sentence is handed a linear order
 (`even_not_foDefinable`), whence **`FO ⊊ FO(TC)`** proved outright
-(`exists_tcDefinable_not_foDefinable`). The same problem shows, by the
+(`exists_tcDefinable_not_foDefinable`) and, since EVEN *is* definable once
+formulas may add ranks, **`FO(≤) ⊊ AC⁰`** as well
+(`exists_ac0Definable_not_foDefinable`, with AC⁰ read as the logic `FO(≤, +, ×)`
+– no circuit model is involved). The same problem shows, by the
 `k`-pebble game, that **order-free FO(IFP) does not capture PTIME**
 (`exists_mem_PTIME_not_ifpDefinableFree`), so the linear order in the capture
 theorems is not a convenience. No complexity assumption enters any of this.
