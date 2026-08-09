@@ -49,6 +49,8 @@ import DescriptiveComplexity.HeadLex
 import DescriptiveComplexity.HeadCaptureDet
 import DescriptiveComplexity.HeadArith
 import DescriptiveComplexity.HeadEvalArith
+import DescriptiveComplexity.HeadBit
+import DescriptiveComplexity.HeadEvalBit
 import DescriptiveComplexity.Iterate
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.OrderWalk
@@ -87,7 +89,9 @@ import DescriptiveComplexity.ArithmeticDefinable
 import DescriptiveComplexity.ArithmeticFixedPoint
 import DescriptiveComplexity.LogTime.Definable
 import DescriptiveComplexity.LogTime.Bits
+import DescriptiveComplexity.LogTime.Fields
 import DescriptiveComplexity.LogTime.Machine
+import DescriptiveComplexity.LogTime.BitLogic
 import DescriptiveComplexity.LogTime.Simulate
 import DescriptiveComplexity.LogTime.Arith
 import DescriptiveComplexity.LogTime.Compile
@@ -951,35 +955,49 @@ The bottom of the ordered world, and the only vocabulary here that is a
   logarithmic block of guesses of the `Σₖ-TIME(log n)` normal form, and an
   alternation is a change of polarity along the list – and then runs a
   deterministic **bit-level** base: a Boolean combination of *queries* (an input
-  relation at a tuple of registers, which is the random access of the model:
-  reading the input at an address *is* evaluating a relation at a tuple) and of
-  *sweeps*, single passes over the bit positions by a finite automaton reading
-  one bit of each register at each position. Nothing in the base evaluates a
-  numeric predicate, and that is the point: the arithmetic must be built, which
-  `DescriptiveComplexity.leSweep_accepts` and
+  relation at a tuple of registers, which is the random access to the instance:
+  reading the input at an address *is* evaluating a relation at a tuple), of
+  *reads* (`DescriptiveComplexity.BaseTest.bit`: the bit of one register at the
+  position named by another, the random access to the machine's own addresses)
+  and of *sweeps*, single passes over the bit positions by a finite automaton
+  reading one bit of each register at each position. Nothing in the base
+  evaluates a numeric predicate, and that is the point: the arithmetic must be
+  built, which `DescriptiveComplexity.leSweep_accepts` and
   `DescriptiveComplexity.plusSweep_accepts` do for `≤` and `plus` – the
-  bit-level analogues of `DescriptiveComplexity.HeadProgram.plusP`. The
-  inclusion proved is `DescriptiveComplexity.LTDecidable.ac0Definable`: a sweep
-  carries a constant number of state bits past each of the `log n` positions, so
-  its whole history is a constant number of *bit vectors over the positions*,
-  and such a vector **is** an element of the universe – the sentence guesses
-  those elements and pins them with the transition, determinism making the guess
-  unique. The other fence is `DescriptiveComplexity.BitDefinable.ltDecidable`:
-  every **prenex** sentence over `≤`, `+` and a *guarded* bit atom – `p` is a
-  position and the bit of `x` there is set, the guard being what keeps the atom
-  bit-level – is decided by such a machine, atom by atom. So the model is
-  sandwiched, `FO(≤, +, BIT)`-prenex ⊆ it ⊆ `FO(≤, +, ×)`. The bit predicate that makes this first-order is
-  `DescriptiveComplexity.BitAt`, `BIT` derived from `+` and `×` by naming a
-  position by its *place value* rather than its exponent
-  (`DescriptiveComplexity.IsPos`: a nonzero rank whose divisors are `1` or even),
-  so that the next position is `p + p` and the bit of `x` at `p` is a division
-  with remainder whose witnesses are all below `x`, hence ranks. The converse
-  inclusion is **not** proved and is not an oversight: multiplication is not a
-  constant number of sweeps, a base that revisits its positions unboundedly
-  often leaves the trace budget the simulation lives on, and simulating such a
-  base in the logic is the hard half of the classical `AC⁰ = LH` theorem. What
-  would collapse the sandwich is named rather than hidden: `×` from `BIT`, the
-  hard half of Immerman's mutual definability, plus a prenex normal form.
+  bit-level analogues of `DescriptiveComplexity.HeadProgram.plusP`. The model is
+  **exactly a logic** (`DescriptiveComplexity.ltDecidable_iff_bitDefinable`):
+  alternating logarithmic time decides exactly the problems defined by a *prenex*
+  sentence over `≤`, `+` and the bit atom `DescriptiveComplexity.BitIx` – the
+  classical `BIT(x, i)`, the position named by the element whose *rank* is the
+  exponent – that is, exactly `FO(≤, BIT)`, since `+` is itself derived
+  (`DescriptiveComplexity.bitDef_plus_free`, by carry-lookahead). One direction
+  (`DescriptiveComplexity.BitDefinable.ltDecidable`) compiles the logic atom by
+  atom; the other (`DescriptiveComplexity.LTDecidable.bitDefinable`) is the
+  interesting one: a sweep carries a constant number of state bits past each of
+  the `log n` positions, so its whole history is a constant number of *bit
+  vectors over the positions*, and such a vector **is** an element of the
+  universe – the sentence guesses those elements and pins them with the
+  transition, determinism making the guess unique. What the model does **not**
+  come with is the identification of that logic with `FO(≤, +, ×)`, i.e. with
+  `DescriptiveComplexity.AC0Definable`: classically the two are the same
+  ([Immerman 1999][immerman1999descriptive], Thm 1.17), and here each half is
+  named and neither built – `DescriptiveComplexity.PowArithDef`, the definability
+  of `i ↦ 2 ^ i`, which `DescriptiveComplexity.BitDefinable.ac0Definable` takes as
+  a hypothesis, and the Bit Sum Lemma the other way. That is a statement about
+  two vocabularies, not a defect of the machine – and it is not what places the
+  model: `DescriptiveComplexity.LTDecidable.mem_LOGSPACE` puts it inside LOGSPACE
+  outright, by evaluating the bit logic with a deterministic multi-head automaton
+  of `2 * vars + 8` heads whose bit atom is the halving loop
+  `DescriptiveComplexity.HeadProgram.bitP`
+  (`DescriptiveComplexity.HeadBit`, `DescriptiveComplexity.HeadEvalBit`). The naming of positions is what
+  decides this: with the *place-value* naming (`DescriptiveComplexity.BitAt`,
+  `DescriptiveComplexity.IsPos`, which is what makes a bit first-order in
+  `FO(≤, +, ×)`) every atom would be a regular relation of the registers' bit
+  tracks, alternation would be projection, and the model would collapse to what a
+  finite automaton reading the size of the universe in binary can decide – too
+  weak for AC⁰, which decides for instance whether that size is prime. Reading a
+  bit at a *guessed index* is what escapes that, and it is what a random-access
+  machine does.
 
 ## Polynomial space, by second-order transitive closure
 

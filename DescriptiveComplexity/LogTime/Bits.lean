@@ -6,40 +6,49 @@ Authors: Pierre Senellart
 import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.Nat.Log
 import Mathlib.Data.Nat.Prime.Basic
+import Mathlib.Data.Fintype.Lattice
 import DescriptiveComplexity.LogTime.Definable
 
 /-!
 # The bit layer of a finite ordered universe
 
 An element of a finite linearly ordered universe *is* a number, its rank; this
-file gives the formulas of `FO(≤, +, ×)` access to that number **one bit at a
-time**, which is what any machine below the level of the numeric predicates
-needs, and what the classical vocabulary `FO(≤, BIT)` takes as primitive.
+file gives access to that number **one bit at a time**, in the two ways a bit
+position can be named, and relates them.
 
-## Positions are powers of two, not exponents
+## Two namings, and what each is for
 
-The design decision of the file, and the one that makes `BIT` cheap here. A bit
-position could be named by its *exponent* `i`, but then `BIT i x` needs the place
-value `2 ^ i`, and exponentiation is not something the truncated arithmetic of a
-finite universe defines easily. Naming a position by its **place value** – the
-element `p` whose rank is `2 ^ i` (`DescriptiveComplexity.IsPos`) – costs
-nothing and buys everything:
+A bit position can be named by its **index** `i`, or by its **place value**, the
+element `p` whose rank is `2 ^ i`. Both appear here, and neither is a variant of
+the other:
 
-* being a position is `orank p ≠ 0` together with “every divisor is `1` or
-  even”, one universal quantifier over divisors
-  (`DescriptiveComplexity.isPos_iff_forall_dvd`);
-* the *next* position is `p + p`, so walking the positions upwards is one
-  addition, and the walk stops exactly when the doubling overflows – which is
-  the truncation of `DescriptiveComplexity.no_plus_iff_card_le`, read as “`p` is
-  the top position”;
-* the bit of `x` at place value `p` is a division with remainder,
-  `x = u + v` with `2p ∣ u` and `p ≤ v < 2p`
-  (`DescriptiveComplexity.BitAt`), all three of whose witnesses are below `x`,
-  hence are ranks of the universe and are not lost to truncation.
+* `DescriptiveComplexity.BitIx` is the index naming – `BIT(x, i)`, the primitive
+  of the classical vocabulary `FO(≤, BIT)`. It is total, needs no guard, and its
+  bookkeeping is the arithmetic of the universe: the next position is `i + 1`,
+  and “the bit `k` positions up” is an addition. It is what the logic and the
+  machine model of `DescriptiveComplexity.LogTime` are built on, because reading
+  a bit at a *guessed* index is the random access those machines have.
+* `DescriptiveComplexity.BitAt` is the place-value naming, and it is what makes
+  a bit first-order in `FO(≤, +, ×)` (`DescriptiveComplexity.arithDef_bit`): the
+  bit of `x` at place value `p` is a division with remainder, `x = u + v` with
+  `2p ∣ u` and `p ≤ v < 2p`, all three of whose witnesses are below `x`, hence
+  are ranks of the universe and are not lost to truncation. Being a place value
+  is itself first-order – `orank p ≠ 0` together with “every divisor is `1` or
+  even” (`DescriptiveComplexity.isPos_iff_forall_dvd`).
+
+`DescriptiveComplexity.bitIx_iff_bitAt` is the bridge, and it is one
+existential: `BitIx i x` is `BitAt p x` at the `p` of rank `2 ^ i`. What that
+existential costs is the *definability of the graph of* `i ↦ 2 ^ i`
+(`DescriptiveComplexity.PowArithDef`) – [Immerman 1999][immerman1999descriptive]
+Thm 1.17(2), and the single lemma on which the translation of the machine's
+logic into `FO(≤, +, ×)` waits. It is carried as a hypothesis rather than
+assumed: see `DescriptiveComplexity.LogTime`.
 
 The number of positions is `Nat.clog 2 (Nat.card A)`
 (`DescriptiveComplexity.posCount`), and the ranks are exactly the numbers whose
-bits live in that range.
+bits live in that range; the top index is
+`DescriptiveComplexity.IsTopIx`, read off the bits of the greatest element and
+so needing no arithmetic on exponents.
 
 ## What a bit vector can hold
 
@@ -261,30 +270,6 @@ theorem isPos_iff_forall_dvd (p : A) :
     · exact Or.inl (by rw [← hdA]; exact h1)
     · exact Or.inr ⟨orank e, by rw [← hdA, ← he]; ring⟩
 
-/-- `p` is the **top position**: a position whose doubling overflows the
-universe, so the walk of the positions stops there. -/
-def IsTopPos (p : A) : Prop := IsPos p ∧ ¬∃ q : A, orank p + orank p = orank q
-
-theorem isTopPos_iff {p : A} (h : IsPos p) :
-    IsTopPos p ↔ posExp p + 1 = posCount A := by
-  have hp : orank p = 2 ^ posExp p := orank_eq_two_pow_posExp h
-  have hlt : posExp p < posCount A := posExp_lt_posCount h
-  rw [IsTopPos]
-  simp only [h, true_and]
-  rw [← not_iff_not, not_not]
-  constructor
-  · rintro ⟨q, hq⟩
-    have : 2 ^ (posExp p + 1) < Nat.card A := by
-      rw [pow_succ]
-      have := orank_lt_card q
-      omega
-    rw [two_pow_lt_card_iff_lt_posCount] at this
-    omega
-  · intro hne
-    have : posExp p + 1 < posCount A := by omega
-    obtain ⟨q, hq⟩ := exists_isPos (A := A) this
-    exact ⟨q, by rw [hq, hp, pow_succ]; ring⟩
-
 /-- **The bit budget of a trace**: a bit vector supported below the top position
 is a rank, whatever the size of the universe. -/
 theorem exists_orank_testBit [Nonempty A] (b : ℕ → Bool) :
@@ -372,6 +357,137 @@ theorem bitAt_iff {p x : A} {i : ℕ} (hp : orank p = 2 ^ i) :
       exact Or.inr ⟨hq, orank_le_iff.mp h⟩
 
 end BitAt
+
+/-! ### The bit of an element at an index -/
+
+section BitIx
+
+variable {A : Type} [LinearOrder A] [Finite A]
+
+/-- **The bit of `x` at the index `i`**: the `BIT` of the classical vocabulary
+`FO(≤, BIT)`, the position being named by the element whose *rank* is the
+exponent. Total, and with no guard – above the bit positions of the universe
+every bit is simply clear. -/
+def BitIx (i x : A) : Prop := (orank x).testBit (orank i) = true
+
+omit [Finite A] in
+theorem bitIx_iff {i x : A} : BitIx i x ↔ (orank x).testBit (orank i) = true := Iff.rfl
+
+/-- **A bit that is set is at a position of the universe.** -/
+theorem orank_lt_posCount_of_bitIx {i x : A} (h : BitIx i x) : orank i < posCount A := by
+  by_contra hcon
+  rw [bitIx_iff, testBit_orank_eq_false (by omega)] at h
+  exact Bool.noConfusion h
+
+/-- Above the bit positions there is nothing to read. -/
+theorem not_bitIx_of_posCount_le {i x : A} (h : posCount A ≤ orank i) : ¬ BitIx i x :=
+  fun hb => absurd (orank_lt_posCount_of_bitIx hb) (by omega)
+
+/-- A finite nonempty order has a greatest element – the one a formula reads
+the top index off. -/
+theorem exists_isMax (A : Type) [LinearOrder A] [Finite A] [Nonempty A] :
+    ∃ m : A, ∀ k : A, k ≤ m := Finite.exists_max (fun a : A => a)
+
+/-- **The two namings agree**: the bit at the index `i` is the bit at the place
+value `2 ^ i`. The existential is the whole of the difference between the two
+readings of `BIT`, and `DescriptiveComplexity.PowArithDef` is what it costs. -/
+theorem bitIx_iff_bitAt {i x : A} :
+    BitIx i x ↔ ∃ p : A, orank p = 2 ^ orank i ∧ BitAt p x := by
+  constructor
+  · intro h
+    obtain ⟨p, hp⟩ := exists_isPos (A := A) (orank_lt_posCount_of_bitIx h)
+    exact ⟨p, hp, (bitAt_iff hp).mpr h⟩
+  · rintro ⟨p, hp, hb⟩
+    exact (bitAt_iff hp).mp hb
+
+/-- `i` is the **top index**: the highest bit position of the universe. -/
+def IsTopIx (i : A) : Prop := orank i + 1 = posCount A
+
+/-- `i` is a **low index**: a bit position with a further one above it. What
+separates the two is the budget of `DescriptiveComplexity.exists_orank_testBit`:
+a guessed trace carries a bit at every low index, and the top one has to be
+carried apart. -/
+def IsLowIx (i : A) : Prop := orank i + 1 < posCount A
+
+/-- **The greatest element has its highest bit at the top index**: `orank` of it
+is `Nat.card A - 1`, which lies between `2 ^ (posCount A - 1)` and
+`2 ^ posCount A`. This is what lets a formula find the end of the tape without
+any arithmetic on exponents – it reads it off the bits of an element it
+already has. -/
+theorem bitIx_max_of_isTopIx {i m : A} (hm : ∀ k : A, k ≤ m) (h : IsTopIx i) :
+    BitIx i m := by
+  have hcard : 0 < Nat.card A := lt_of_le_of_lt (Nat.zero_le _) (orank_lt_card m)
+  have hpos : 0 < posCount A := by rw [IsTopIx] at h; omega
+  have hd : orank i = posCount A - 1 := by rw [IsTopIx] at h; omega
+  have hsucc : posCount A - 1 + 1 = posCount A := by omega
+  have hlt : 2 ^ (posCount A - 1) < Nat.card A :=
+    (two_pow_lt_card_iff_lt_posCount _).mpr (by omega)
+  have hle : Nat.card A ≤ 2 ^ posCount A := Nat.le_pow_clog (by norm_num) _
+  rw [bitIx_iff, hd, orank_isTop hm, testBit_iff_le_of_lt
+    (by rw [hsucc]; exact lt_of_lt_of_le (Nat.sub_lt hcard Nat.one_pos) hle)]
+  exact Nat.le_sub_one_of_lt hlt
+
+/-- Every index below the count is the rank of an element. -/
+theorem lt_card_of_lt_posCount {d : ℕ} (h : d < posCount A) : d < Nat.card A :=
+  lt_of_le_of_lt (Nat.le_of_lt (Nat.lt_two_pow_self))
+    ((two_pow_lt_card_iff_lt_posCount d).mpr h)
+
+/-- **The count of positions is itself a rank**: there are never more bit
+positions than elements, so a formula may quantify over an index one above the
+top – which is what pins the absence of a carry out of the last position. -/
+theorem posCount_lt_card [Nonempty A] : posCount A < Nat.card A := by
+  rcases Nat.eq_zero_or_pos (posCount A) with h0 | hpos
+  · rw [h0]
+    exact Nat.card_pos
+  · have h1 : 2 ^ (posCount A - 1) < Nat.card A :=
+      (two_pow_lt_card_iff_lt_posCount _).mpr (by omega)
+    have h2 : posCount A - 1 < 2 ^ (posCount A - 1) := Nat.lt_two_pow_self
+    omega
+
+/-- **The top index, read from the bits of the greatest element**: it is the
+highest index carrying a bit there. -/
+theorem isTopIx_iff_bits {i m : A} (hm : ∀ k : A, k ≤ m) :
+    IsTopIx i ↔ (BitIx i m ∧ ∀ k : A, i < k → ¬ BitIx k m) := by
+  constructor
+  · intro h
+    refine ⟨bitIx_max_of_isTopIx hm h, fun k hk hb => ?_⟩
+    have h1 : orank i < orank k := orank_lt_orank hk
+    have h2 := orank_lt_posCount_of_bitIx hb
+    rw [IsTopIx] at h
+    omega
+  · rintro ⟨hb, hno⟩
+    have h1 := orank_lt_posCount_of_bitIx hb
+    by_contra hne
+    have hlt : orank i + 1 < posCount A := by rw [IsTopIx] at hne; omega
+    obtain ⟨t, ht⟩ := exists_orank_eq (A := A)
+      (lt_card_of_lt_posCount (A := A) (Nat.sub_lt (by omega) Nat.one_pos))
+    have hit : i < t := by
+      refine lt_of_not_ge fun hcon => ?_
+      have := orank_le_iff.mpr hcon
+      omega
+    exact hno t hit (bitIx_max_of_isTopIx hm (by rw [IsTopIx, ht]; omega))
+
+/-- **A low index, read from the same bits**: one with a bit of the greatest
+element strictly above it. -/
+theorem isLowIx_iff_bits {i m : A} (hm : ∀ k : A, k ≤ m) :
+    IsLowIx i ↔ ∃ k : A, i < k ∧ BitIx k m := by
+  constructor
+  · intro h
+    rw [IsLowIx] at h
+    obtain ⟨t, ht⟩ := exists_orank_eq (A := A)
+      (lt_card_of_lt_posCount (A := A) (Nat.sub_lt (by omega) Nat.one_pos))
+    have hit : i < t := by
+      refine lt_of_not_ge fun hcon => ?_
+      have := orank_le_iff.mpr hcon
+      omega
+    exact ⟨t, hit, bitIx_max_of_isTopIx hm (by rw [IsTopIx, ht]; omega)⟩
+  · rintro ⟨k, hik, hb⟩
+    have h1 : orank i < orank k := orank_lt_orank hik
+    have h2 := orank_lt_posCount_of_bitIx hb
+    rw [IsLowIx]
+    omega
+
+end BitIx
 
 /-! ### Definability of the bit layer -/
 
@@ -466,22 +582,37 @@ theorem arithDef_bit (p x : α) :
     · rintro h ⟨q, hq⟩
       exact h ⟨q 0, hq⟩
 
-/-- **Being the top position is definable**: a position whose doubling
-overflows. -/
-theorem arithDef_isTopPos (x : α) :
-    ArithDef (L := L) (fun _ _ _ _ _ v => IsTopPos (v x)) := by
-  have hover : ArithDef (L := L) (α := α)
-      (fun _ _ _ _ _ v => ∃ q : Fin 1 → _,
-        orank (v x) + orank (v x) = orank (q 0)) :=
-    (arithDef_plus (L := L) (α := α ⊕ Fin 1) (Sum.inl x) (Sum.inl x) (Sum.inr 0)).exs
-  refine ((arithDef_isPos x).and hover.not).congr fun A _ _ _ _ v => ?_
-  simp only [IsTopPos]
-  refine and_congr Iff.rfl ?_
-  constructor
-  · rintro h ⟨q, hq⟩
-    exact h ⟨fun _ => q, hq⟩
-  · rintro h ⟨q, hq⟩
-    exact h ⟨q 0, hq⟩
+/-! #### The naming bridge
+
+The one thing the place-value naming does not hand over. Everything above is a
+formula of `FO(≤, +, ×)` outright; the *index* naming needs, on top of it, the
+graph of `i ↦ 2 ^ i`, and that is a theorem rather than a construction – the
+half of [Immerman 1999][immerman1999descriptive] Thm 1.17 that goes from `+, ×`
+to `BIT` at an exponent. It is carried here as a named hypothesis, so that every
+consequence of it is visible in a type rather than assumed in prose. -/
+
+/-- **The naming bridge**: the graph of `i ↦ 2 ^ i` is a formula of
+`FO(≤, +, ×)`, uniformly in the variable layout.
+
+This is [Immerman 1999][immerman1999descriptive] Thm 1.17(2) – classically true,
+by a packing argument that guesses the doubling chain of `i` – and it is *not*
+proved in this library. Anything that needs to read the machine's logic as an
+AC⁰ definition takes it as a hypothesis: `DescriptiveComplexity.BitDefinable` is
+a logic over the index naming, and only this lemma turns its bit atom back into
+the place-value one. -/
+def PowArithDef (L : Language.{0, 0}) : Prop :=
+  ∀ {α : Type} (i p : α),
+    ArithDef (L := L) (α := α) fun _ _ _ _ _ v => orank (v p) = 2 ^ orank (v i)
+
+/-- **The bit at an index is first-order, given the bridge**: guess the place
+value, and read the place-value bit there. -/
+theorem PowArithDef.arithDef_bitIx (h : PowArithDef L) (i x : α) :
+    ArithDef (L := L) (α := α) fun _ _ _ _ _ v => BitIx (v i) (v x) := by
+  refine (((h (α := α ⊕ Fin 1) (Sum.inl i) (Sum.inr 0)).and
+    (arithDef_bit (L := L) (α := α ⊕ Fin 1) (Sum.inr 0) (Sum.inl x))).ex).congr
+    fun A _ _ _ _ v => ?_
+  simp only [Sum.elim_inl, Sum.elim_inr]
+  rw [bitIx_iff_bitAt]
 
 end Definability
 

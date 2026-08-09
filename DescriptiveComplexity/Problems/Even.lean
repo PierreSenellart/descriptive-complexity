@@ -11,6 +11,7 @@ import DescriptiveComplexity.Invariant.TwoStages
 import DescriptiveComplexity.Problems.TwoSat
 import DescriptiveComplexity.FirstOrderPull
 import DescriptiveComplexity.ArithmeticDefinable
+import DescriptiveComplexity.LogTime
 
 /-!
 # EVEN: the parity of a bare set
@@ -47,6 +48,18 @@ whence `FO(≤) ⊊ AC⁰` as well
 (`DescriptiveComplexity.exists_ac0Definable_not_foDefinable`). That is the
 parity of the *universe*; the parity of a marked *subset* is PARITY, the problem
 outside AC⁰, about which nothing here is claimed.
+
+Below the addition it is **one bit**: `Nat.card A` is even exactly when the
+greatest element's rank is odd, that is, when its lowest bit is set. So EVEN is
+also a sentence of the bit-level logic of `DescriptiveComplexity.LogTime` – two
+existential registers over one bit atom
+(`DescriptiveComplexity.even_bitDefinable`) – hence decided by an alternating
+machine with a logarithmic clock (`DescriptiveComplexity.even_ltDecidable`) and,
+through the multi-head automaton that evaluates that logic, in LOGSPACE a second
+time (`DescriptiveComplexity.even_mem_LOGSPACE_bit`). The end of this file is
+where that stack is exercised end to end, and it is the template for writing any
+other sentence of that logic: semantically, with the
+`DescriptiveComplexity.BitDef` combinators, never as syntax.
 
 This is the first *unconditional* separation of the library – no complexity
 assumption enters, in contrast with everything the completeness results say,
@@ -419,5 +432,71 @@ everything else it proves about the reduction order exhibits one. -/
 theorem even_not_le_of_foDefinable {L : Language.{0, 0}} [L.IsRelational]
     {Q : DecisionProblem L} (hQ : FODefinable Q) : IsEmpty (EVEN ≤ᶠᵒ[≤] Q) :=
   not_le_of_not_foDefinable even_not_foDefinable hQ
+
+/-! ### EVEN in the bit-level logic
+
+The parity of the universe is the lowest bit of its greatest element, so EVEN is
+a sentence of `DescriptiveComplexity.BitDefinable` – and therefore a machine, and
+therefore an automaton. Nothing here is new about EVEN; what it exercises is the
+bit-level stack of `DescriptiveComplexity.LogTime`, on the smallest instance
+there is. -/
+
+section BitLevel
+
+/-- **The whole content of the bit-level reading**: `Nat.card A` is even exactly
+when the greatest element's rank has its lowest bit set, `orank` of it being
+`Nat.card A - 1`. -/
+theorem even_iff_bitIx (A : Type) [LinearOrder A] [Finite A] [Nonempty A] :
+    Even (Nat.card A) ↔ ∃ m z : A, (∀ k : A, k ≤ m) ∧ orank z = 0 ∧ BitIx z m := by
+  have hcard : 0 < Nat.card A := Nat.card_pos
+  constructor
+  · intro hev
+    obtain ⟨m, hm⟩ := exists_isMax A
+    obtain ⟨z, hz⟩ := exists_orank_eq (A := A) (m := 0) hcard
+    refine ⟨m, z, hm, hz, ?_⟩
+    rw [bitIx_iff, hz, orank_isTop hm, Nat.testBit_eq_decide_div_mod_eq]
+    obtain ⟨k, hk⟩ := hev
+    simp only [pow_zero, Nat.div_one, decide_eq_true_eq]
+    omega
+  · rintro ⟨m, z, hm, hz, hbit⟩
+    rw [bitIx_iff, hz, orank_isTop hm, Nat.testBit_eq_decide_div_mod_eq] at hbit
+    simp only [pow_zero, Nat.div_one, decide_eq_true_eq] at hbit
+    exact ⟨Nat.card A / 2, by omega⟩
+
+/-- **EVEN is bit-definable**: two existential registers over a single bit atom.
+The sentence is built with the `DescriptiveComplexity.BitDef` combinators –
+`bitDef_isMax`, `bitDef_isZero`, `bitDef_bit`, `.and`, `.ex` – and read off only
+at the end, exactly as `DescriptiveComplexity.ArithDef` is used one logic up. The
+variable layout is the only bookkeeping: an `.ex` binds the variables of `Fin 1`
+in `α ⊕ Fin 1`, so the register bound *first* is the outer one and is reached
+through `Sum.inl`. -/
+theorem even_bitDefinable : BitDefinable EVEN := by
+  have hbody : BitDef (L := Language.empty) (α := (Empty ⊕ Fin 1) ⊕ Fin 1)
+      (fun A _ _ _ _ u => (∀ k : A, k ≤ u (Sum.inl (Sum.inr 0))) ∧
+        (orank (u (Sum.inr 0)) = 0 ∧ BitIx (u (Sum.inr 0)) (u (Sum.inl (Sum.inr 0))))) :=
+    (bitDef_isMax (Sum.inl (Sum.inr 0))).and
+      ((bitDef_isZero (Sum.inr 0)).and (bitDef_bit (Sum.inr 0) (Sum.inl (Sum.inr 0))))
+  refine BitDef.bitDefinable (R := fun A _ _ _ _ _ =>
+    ∃ m z : A, (∀ k : A, k ≤ m) ∧ orank z = 0 ∧ BitIx z m) ?_ ?_
+  · refine (hbody.ex.ex).congr fun A _ _ _ _ v => ?_
+    simp only [Sum.elim_inl, Sum.elim_inr]
+  · intro A _ _ _ _
+    rw [even_holds_iff]
+    exact even_iff_bitIx A
+
+/-- **EVEN is decided by an alternating machine with a logarithmic clock**: the
+compilation of the sentence above, register by register. -/
+theorem even_ltDecidable : LTDecidable EVEN :=
+  even_bitDefinable.ltDecidable
+
+/-- **EVEN is in LOGSPACE by the bit-level route**: the machine is evaluated by a
+deterministic multi-head automaton whose bit atom is the halving loop
+`DescriptiveComplexity.HeadProgram.bitP`. A second proof of a known fact –
+`DescriptiveComplexity.even_ac0Definable` gives it through AC⁰ – and the one that
+uses no part of Immerman's mutual definability. -/
+theorem even_mem_LOGSPACE_bit : EVEN ∈ LOGSPACE :=
+  even_bitDefinable.mem_LOGSPACE
+
+end BitLevel
 
 end DescriptiveComplexity

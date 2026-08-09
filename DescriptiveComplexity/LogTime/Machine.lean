@@ -27,31 +27,46 @@ predicate.
   registers. This is the random access of the model, and in a structure-based
   framework it needs no index tape: *reading the input at an address is
   evaluating a relation at a tuple*.
-* **Sweeps.** Everything else the machine computes it computes bit by bit, with
+* **Sweeps.** Everything the machine *computes* it computes bit by bit, with
   `DescriptiveComplexity.Sweep`: one pass over the bit positions, from the
   lowest to the highest, run by a finite automaton with `σ` state bits that
   reads, at each position, one bit of each register. A base test is a Boolean
-  combination of sweeps and queries, so a machine performs a *constant number of
-  passes* over a logarithmic tape: a logarithmic clock, and a constant number of
-  head reversals.
+  combination of sweeps, reads and queries, so a machine performs a *constant
+  number of passes* over a logarithmic tape: a logarithmic clock, and a constant
+  number of head reversals.
+* **Reads.** `DescriptiveComplexity.BaseTest.bit`: the bit of one register at
+  the position *named by another register*, that is,
+  `DescriptiveComplexity.BitIx`. This is the second random access of the model –
+  the machine addresses its own bits, not only the instance – and it is the one
+  thing a sweep cannot do: finding the position `orank i` requires counting
+  positions, which a finite automaton passing a constant number of bits cannot.
 
 ## Why the base has to be this weak, and what it can still do
 
 Letting the base evaluate an atom of `≤`, `+` or `×` in one step would make the
 model a prenex `FO(≤, +, ×)` sentence in disguise, and the bridge to the logic
-vacuous. Sweeps are the honest opposite: they see nothing but bits, and the
-arithmetic has to be *built* – `DescriptiveComplexity.leSweep` and
+vacuous. Sweeps and reads are the honest opposite: they see nothing but bits,
+and the arithmetic has to be *built* – `DescriptiveComplexity.leSweep` and
 `DescriptiveComplexity.plusSweep` (in `DescriptiveComplexity.LogTime.Arith`)
 are the comparison and the ripple-carry addition, exactly as
-`DescriptiveComplexity.HeadArith` builds them one resource bound higher.
+`DescriptiveComplexity.HeadArith` builds them one resource bound higher. A read
+is an addressing operation, not an arithmetic one: it computes nothing, and the
+model still has no product.
 
-The restriction is real, and its boundary is worth naming: a sweep carries `σ`
-bits of state past each position, so a constant number of sweeps carries a
+Both restrictions are real, and their boundary is worth naming: a sweep carries
+`σ` bits of state past each position, so a constant number of sweeps carries a
 constant number of bits per position, that is, `O(log n)` bits of trace in
 total – which is what a first-order formula can guess, one element per bit
 vector (`DescriptiveComplexity.LogTime.Simulate`). A machine that could *count*
 its positions, or revisit them unboundedly often, would leave that budget, and
 with it the reach of the simulation.
+
+Without the reads the model would be strictly weaker than AC⁰, and provably so:
+with a base of sweeps alone every atom is a regular relation of the bit tracks,
+alternating quantifiers over registers are projections, and the whole model
+collapses to what a finite automaton reading `Nat.card A` in binary can decide.
+That is the reason a read is a primitive here and not a convenience; see
+`DescriptiveComplexity.LogTime`.
 -/
 
 namespace DescriptiveComplexity
@@ -237,6 +252,10 @@ positions, hence `O(log n)` steps; nothing here evaluates a numeric predicate. -
 inductive BaseTest (L : Language.{0, 0}) (ρ : ℕ) where
   /-- Run a sweep on the registers. -/
   | sweep (S : Sweep ρ) : BaseTest L ρ
+  /-- Read a bit: the bit of register `x` at the position named by register
+  `i`. The addressing the model has over its own registers, and the one base
+  operation that is not a pass over the positions. -/
+  | bit (i x : Fin ρ) : BaseTest L ρ
   /-- Query the instance: an input relation at a tuple of registers. -/
   | query {a : ℕ} (R : L.Relations a) (arg : Fin a → Fin ρ) : BaseTest L ρ
   /-- Negation. -/
@@ -254,6 +273,7 @@ variable {L : Language.{0, 0}} {ρ : ℕ}
 def Holds {A : Type} [L.Structure A] [LinearOrder A] [Finite A] :
     BaseTest L ρ → (Fin ρ → A) → Prop
   | .sweep S, x => S.Accepts x
+  | .bit i y, x => BitIx (x i) (x y)
   | .query R arg, x => RelMap R fun t => x (arg t)
   | .not t, x => ¬ t.Holds x
   | .and t u, x => t.Holds x ∧ u.Holds x
@@ -304,6 +324,152 @@ theorem prefixHolds_congr {A : Type} :
     · rw [if_neg hp, if_neg hp]
       exact forall_congr' fun a => h _
 
+/-! ### Prenexing: what a quantifier prefix does to the connectives
+
+The three lemmas a bit-level *definability* API needs, so that a construction
+built from the connectives and the quantifiers can be read off as a single
+prefix over a quantifier-free kernel. They are about `prefixHolds` alone, and
+they are what replaces a normal-form theorem: negation dualizes a prefix, a
+prefix absorbs a side condition it does not mention, and two prefixes
+concatenate. -/
+
+/-- **Negating a prefix dualizes it**: every quantifier flips, and the body is
+negated. Classical, as prenexing is. -/
+theorem prefixHolds_not {A : Type} :
+    ∀ (m : ℕ) (pol : Fin m → Bool) (P : (Fin m → A) → Prop),
+      (¬ prefixHolds m pol P) ↔ prefixHolds m (fun j => !pol j) fun v => ¬ P v := by
+  intro m
+  induction m with
+  | zero => intro pol P; exact Iff.rfl
+  | succ m ih =>
+    intro pol P
+    rw [prefixHolds, prefixHolds, ih]
+    refine prefixHolds_congr m _ fun v => ?_
+    by_cases hp : pol (Fin.last m) = true
+    · rw [if_pos hp, if_neg (by simp [hp])]
+      exact not_exists
+    · rw [if_neg hp, if_pos (by simp only [Bool.not_eq_true] at hp; simp [hp])]
+      exact not_forall
+
+/-- **A prefix absorbs a side condition** it does not mention. The universal
+steps are what needs the universe to be nonempty. -/
+theorem prefixHolds_and_const {A : Type} [Nonempty A] :
+    ∀ (m : ℕ) (pol : Fin m → Bool) (P : (Fin m → A) → Prop) (Q : Prop),
+      prefixHolds m pol (fun v => P v ∧ Q) ↔ prefixHolds m pol P ∧ Q := by
+  intro m
+  induction m with
+  | zero => intro pol P Q; exact Iff.rfl
+  | succ m ih =>
+    intro pol P Q
+    rw [prefixHolds, prefixHolds, ← ih]
+    refine prefixHolds_congr m _ fun v => ?_
+    by_cases hp : pol (Fin.last m) = true
+    · rw [if_pos hp, if_pos hp]
+      exact exists_and_right
+    · rw [if_neg hp, if_neg hp]
+      exact forall_and.trans (and_congr Iff.rfl (forall_const A))
+
+/-- **Two prefixes concatenate**: a prefix of `k₁ + k₂` variables, read on a
+body that splits its valuation into the first `k₁` and the last `k₂`, is the
+first prefix wrapped around the second. This is the only place the index
+arithmetic of `Fin` appears; everything downstream uses it as a black box. -/
+theorem prefixHolds_add {A : Type} (k₁ : ℕ) :
+    ∀ (k₂ : ℕ) (pol : Fin (k₁ + k₂) → Bool) (P : (Fin k₁ → A) → (Fin k₂ → A) → Prop),
+      prefixHolds (k₁ + k₂) pol
+          (fun u => P (fun i => u (i.castAdd k₂)) fun j => u (j.natAdd k₁)) ↔
+        prefixHolds k₁ (fun i => pol (i.castAdd k₂))
+          fun v => prefixHolds k₂ (fun j => pol (j.natAdd k₁)) (P v) := by
+  intro k₂
+  induction k₂ with
+  | zero =>
+    intro pol P
+    have hpol : (fun i : Fin k₁ => pol (i.castAdd 0)) = pol :=
+      funext fun i => congrArg pol (Fin.ext rfl)
+    rw [hpol]
+    refine prefixHolds_congr k₁ _ fun u => ?_
+    have h1 : (fun i : Fin k₁ => u (i.castAdd 0)) = u :=
+      funext fun i => congrArg u (Fin.ext rfl)
+    have h2 : (fun j : Fin 0 => u (j.natAdd k₁)) = Fin.elim0 := funext fun j => j.elim0
+    rw [h1, h2]
+    exact Iff.rfl
+  | succ k₂ ih =>
+    intro pol P
+    have hstep : ∀ (v : Fin (k₁ + k₂) → A) (a : A) (w : Fin (k₁ + k₂ + 1) → A),
+        w = Fin.snoc v a →
+        (P (fun i => w (i.castAdd (k₂ + 1))) fun j => w (j.natAdd k₁)) =
+          P (fun i => v (i.castAdd k₂)) (Fin.snoc (fun j => v (j.natAdd k₁)) a) := by
+      intro v a w hw
+      have h1 : (fun i : Fin k₁ => w (i.castAdd (k₂ + 1))) = fun i => v (i.castAdd k₂) := by
+        funext i
+        have h : (i.castAdd (k₂ + 1) : Fin (k₁ + k₂ + 1)) = (i.castAdd k₂).castSucc := Fin.ext rfl
+        rw [hw, h, Fin.snoc_castSucc]
+      have h2 : (fun j : Fin (k₂ + 1) => w (j.natAdd k₁)) =
+          Fin.snoc (fun j : Fin k₂ => v (j.natAdd k₁)) a := by
+        funext j
+        refine Fin.lastCases ?_ (fun j' => ?_) j
+        · have h : ((Fin.last k₂).natAdd k₁ : Fin (k₁ + k₂ + 1)) = Fin.last (k₁ + k₂) :=
+            Fin.ext rfl
+          rw [hw, h, Fin.snoc_last, Fin.snoc_last]
+        · have h : ((j'.castSucc).natAdd k₁ : Fin (k₁ + k₂ + 1)) = (j'.natAdd k₁).castSucc :=
+            Fin.ext rfl
+          rw [hw, h, Fin.snoc_castSucc, Fin.snoc_castSucc]
+      rw [h1, h2]
+    refine Iff.trans (prefixHolds_congr (k₁ + k₂) (fun j => pol j.castSucc) ?_)
+      (ih (fun j => pol j.castSucc)
+        fun x y => if pol (Fin.last (k₁ + k₂)) = true then ∃ a, P x (Fin.snoc y a)
+          else ∀ a, P x (Fin.snoc y a))
+    intro v
+    split
+    · next hp =>
+      have hp' : pol (Fin.last (k₁ + k₂)) = true := hp
+      rw [if_pos hp']
+      exact exists_congr fun a => Iff.of_eq (hstep v a _ rfl)
+    · next hp =>
+      have hp' : ¬ pol (Fin.last (k₁ + k₂)) = true := hp
+      rw [if_neg hp']
+      exact forall_congr' fun a => Iff.of_eq (hstep v a _ rfl)
+
+/-- **A block of equal polarity is one quantifier** over the tuple it fills:
+the existential case. -/
+theorem prefixHolds_const_true {A : Type} :
+    ∀ (m : ℕ) (P : (Fin m → A) → Prop),
+      prefixHolds m (fun _ => true) P ↔ ∃ w, P w := by
+  intro m
+  induction m with
+  | zero =>
+    intro P
+    refine ⟨fun h => ⟨Fin.elim0, h⟩, fun hw => ?_⟩
+    obtain ⟨w, hw⟩ := hw
+    have hwe : w = Fin.elim0 := funext fun i => i.elim0
+    rwa [hwe] at hw
+  | succ m ih =>
+    intro P
+    refine Iff.trans (ih fun v => ∃ a, P (Fin.snoc v a)) ⟨?_, ?_⟩
+    · rintro ⟨v, a, h⟩
+      exact ⟨Fin.snoc v a, h⟩
+    · rintro ⟨u, h⟩
+      exact ⟨Fin.init u, u (Fin.last m), by rwa [Fin.snoc_init_self]⟩
+
+/-- **A block of equal polarity is one quantifier**: the universal case. -/
+theorem prefixHolds_const_false {A : Type} :
+    ∀ (m : ℕ) (P : (Fin m → A) → Prop),
+      prefixHolds m (fun _ => false) P ↔ ∀ w, P w := by
+  intro m
+  induction m with
+  | zero =>
+    intro P
+    refine ⟨fun h w => ?_, fun h => h _⟩
+    have hwe : w = Fin.elim0 := funext fun i => i.elim0
+    rwa [hwe]
+  | succ m ih =>
+    intro P
+    refine Iff.trans (ih fun v => ∀ a, P (Fin.snoc v a)) ⟨?_, ?_⟩
+    · intro h u
+      have := h (Fin.init u) (u (Fin.last m))
+      rwa [Fin.snoc_init_self] at this
+    · intro h v a
+      exact h _
+
 /-- **The machine accepts** the instance when the two players, filling the
 registers in order, leave a tuple passing the base test. -/
 def LTMachine.Accepts {L : Language.{0, 0}} (M : LTMachine L) (A : Type) [L.Structure A]
@@ -312,8 +478,8 @@ def LTMachine.Accepts {L : Language.{0, 0}} (M : LTMachine L) (A : Type) [L.Stru
 
 /-- **The class decided by the machines of this section**: the analogue, at the
 bottom of the ladder, of `DescriptiveComplexity.LOGSPACE`'s automata. A problem
-is decidable in *sweeping logarithmic time* when one machine decides it on every
-nonempty finite ordered structure. -/
+is decidable in *alternating logarithmic time* when one machine decides it on
+every nonempty finite ordered structure. -/
 def LTDecidable {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ M : LTMachine L, ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
     P A ↔ M.Accepts A

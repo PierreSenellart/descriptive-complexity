@@ -3,54 +3,64 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Machine
+import DescriptiveComplexity.LogTime.BitLogic
 
 /-!
-# Sweeping logarithmic time is inside AC⁰
+# The upper fence: a machine's acceptance is a sentence of the bit-level logic
 
-The half of the machine bridge that this file proves: **every problem decided by
-an alternating machine with a logarithmic clock and a bit-level base is AC⁰
-definable** (`DescriptiveComplexity.LTDecidable.ac0Definable`), hence, through
-`DescriptiveComplexity.ac0Definable_mem_LOGSPACE`, inside LOGSPACE.
+**Every problem decided by an alternating machine with a logarithmic clock and a
+bit-level base is defined by a prenex sentence of `FO(≤, +, BIT)`**
+(`DescriptiveComplexity.LTDecidable.bitDefinable`). With
+`DescriptiveComplexity.BitDefinable.ltDecidable` this makes the model *exactly*
+that logic.
 
-## The three moving parts
+## The four moving parts
 
 * **The guesses are quantifiers.** A register holds an element of the universe,
   and filling it existentially or universally is `∃` or `∀` – the alternation
   structure of the machine is the quantifier prefix of the sentence, on the
-  nose (`DescriptiveComplexity.arithDef_prefix`).
+  nose.
 * **A query is an atom.** Reading the instance at a tuple of registers is an
   atomic formula of the input vocabulary; no encoding of addresses is involved,
   which is the whole reason the model fits a structure-based framework.
+* **A read is an atom too.** `DescriptiveComplexity.BaseTest.bit` is the bit
+  atom of the logic and nothing more: both name a bit position by an *element*,
+  so the translation has nothing to do.
 * **A sweep is a guessed trace.** This is the content. A sweep carries `σ` bits
   of state past each of the `posCount A` bit positions, so its entire history is
   `σ` bit *vectors over the positions* – and a bit vector over the positions **is
   an element of the universe**. The formula therefore guesses `σ` elements, says
-  with `DescriptiveComplexity.BitAt` that the bit of the `j`-th at each position
-  is what the transition of the sweep produces there, and reads acceptance off
-  the top. Determinism of the sweep makes the guess unique, so the existential
-  is faithful.
+  with `DescriptiveComplexity.BitIx` that the bit of the `j`-th at each index is
+  what the transition of the sweep produces there, and reads acceptance off the
+  top. Determinism of the sweep makes the guess unique, so the existential is
+  faithful.
+
+## Two places the index naming pays
+
+The trace is pinned by a condition relating the bit at an index to the bit at
+the index *below*, and under the index naming that is the cover relation of the
+order (`DescriptiveComplexity.stepAt`), where naming positions by their place
+value made it a doubling. The end of the tape is likewise *read* rather than
+computed: `DescriptiveComplexity.IsTopIx` is “the highest index carrying a bit of
+the greatest element”, an order condition on the bit atom
+(`DescriptiveComplexity.isTopIx_iff_bits`).
 
 ## The one asymmetry: the last position
 
 A bit vector over *all* the positions need not be a rank – the universe need not
 have a power of two elements – so the trace elements can only carry the state up
-to the position below the top (`DescriptiveComplexity.exists_orank_testBit`).
-The state after the top position is therefore carried by `σ` further elements
-used as *flags*, one bit each, read as “nonzero rank”. Everything else in the
+to the index below the top (`DescriptiveComplexity.exists_orank_testBit`). The
+state after the top position is therefore carried by `σ` further elements used
+as *flags*, one bit each, read as “nonzero rank”. Everything else in the
 construction is uniform.
 
-## Why this is the direction that goes through
+## Why this direction needs no hypothesis
 
-The converse inclusion – that every AC⁰ definable problem is decided by such a
-machine – is *not* proved here, and cannot be with this base: a constant number
-of sweeps cannot multiply, since a sweep passes only `σ` bits of state across a
-position while the schoolbook product of two `log n`-bit numbers needs a running
-count. That is the same wall as the classical statement that `AC⁰ = LH` needs a
-log-time machine that *counts* – whose simulation in the logic is exactly the
-hard half of [Barrington, Immerman & Straubing 1990][barrington1990uniformity].
-What the model does compute is the rest of the arithmetic, bit by bit:
-`DescriptiveComplexity.LogTime.Arith`.
+Landing in `FO(≤, +, BIT)` is unconditional; landing in `FO(≤, +, ×)` is not,
+and the difference is one lemma – `DescriptiveComplexity.PowArithDef`, the
+definability of `i ↦ 2 ^ i`. That is why the statement of record here is
+`DescriptiveComplexity.LTDecidable.bitDefinable` and the AC⁰ reading takes the
+bridge as an argument.
 -/
 
 namespace DescriptiveComplexity
@@ -58,51 +68,6 @@ namespace DescriptiveComplexity
 open FirstOrder
 
 open Language Structure
-
-/-! ### The quantifier prefix -/
-
-section Prefix
-
-variable {L : Language.{0, 0}}
-
-/-- The variable layout of one quantifier step: the last variable of an
-`m + 1`-tuple is the bound one. -/
-private def lastSplit (m : ℕ) : Fin (m + 1) → Fin m ⊕ Fin 1 :=
-  Fin.lastCases (Sum.inr 0) fun j => Sum.inl j
-
-private theorem elim_lastSplit {A : Type} {m : ℕ} (v : Fin m → A) (a : A) :
-    (Sum.elim v fun _ => a) ∘ lastSplit m = Fin.snoc v a := by
-  funext i
-  refine Fin.lastCases ?_ (fun j => ?_) i
-  · simp [lastSplit, Fin.snoc_last]
-  · simp [lastSplit, Fin.snoc_castSucc]
-
-/-- **A quantifier prefix of a machine is a quantifier prefix of a formula**:
-the registers, filled in order by the two players, become nested `∃` and `∀`
-over the universe. -/
-theorem arithDef_prefix : ∀ (m : ℕ) (pol : Fin m → Bool) {R : ArithRel L (Fin m)},
-    ArithDef R →
-      ArithDef (L := L) (α := Empty)
-        (fun A _ _ _ _ _ => prefixHolds (A := A) m pol fun x => R A x) := by
-  intro m
-  induction m with
-  | zero =>
-    intro pol R h
-    refine (h.relabel (Fin.elim0 : Fin 0 → Empty)).congr fun A _ _ _ _ v => ?_
-    rw [Subsingleton.elim (v ∘ (Fin.elim0 : Fin 0 → Empty)) (Fin.elim0 : Fin 0 → A)]
-    exact Iff.rfl
-  | succ m ih =>
-    intro pol R h
-    refine ih (fun j => pol j.castSucc) ?_
-    by_cases hp : pol (Fin.last m) = true
-    · refine ((h.relabel (lastSplit m)).ex).congr fun A _ _ _ _ v => ?_
-      rw [if_pos hp]
-      exact exists_congr fun a => by rw [elim_lastSplit]
-    · refine ((h.relabel (lastSplit m)).all).congr fun A _ _ _ _ v => ?_
-      rw [if_neg hp]
-      exact forall_congr' fun a => by rw [elim_lastSplit]
-
-end Prefix
 
 /-! ### Boolean expressions, read as formulas -/
 
@@ -112,16 +77,16 @@ variable {L : Language.{0, 0}} {α : Type} {V : Type}
 
 /-- A Boolean expression of definable bits is definable: the translation is a
 recursion over the expression, not an enumeration of its truth table. -/
-theorem arithDef_bitExpr {val : V → ArithRel L α} (h : ∀ z, ArithDef (val z)) :
+theorem bitDef_bitExpr {val : V → ArithRel L α} (h : ∀ z, BitDef (val z)) :
     ∀ e : BitExpr V,
-      ArithDef (L := L) (α := α) (fun A _ _ _ _ v => e.Holds fun z => val z A v)
+      BitDef (L := L) (α := α) (fun A _ _ _ _ v => e.Holds fun z => val z A v)
   | .var z => (h z).congr fun _A _ _ _ _ _v => Iff.rfl
-  | .tt => ArithDef.top.congr fun _A _ _ _ _ _v => Iff.rfl
-  | .ff => ArithDef.bot.congr fun _A _ _ _ _ _v => Iff.rfl
-  | .not e => (arithDef_bitExpr h e).not.congr fun _A _ _ _ _ _v => Iff.rfl
-  | .and e f => ((arithDef_bitExpr h e).and (arithDef_bitExpr h f)).congr
+  | .tt => BitDef.top.congr fun _A _ _ _ _ _v => Iff.rfl
+  | .ff => BitDef.bot.congr fun _A _ _ _ _ _v => Iff.rfl
+  | .not e => (bitDef_bitExpr h e).not.congr fun _A _ _ _ _ _v => Iff.rfl
+  | .and e f => ((bitDef_bitExpr h e).and (bitDef_bitExpr h f)).congr
       fun _A _ _ _ _ _v => Iff.rfl
-  | .or e f => ((arithDef_bitExpr h e).or (arithDef_bitExpr h f)).congr
+  | .or e f => ((bitDef_bitExpr h e).or (bitDef_bitExpr h f)).congr
       fun _A _ _ _ _ _v => Iff.rfl
 
 end BitExprDef
@@ -132,90 +97,83 @@ section SweepTrace
 
 variable {ρ : ℕ} {A : Type} [LinearOrder A] [Finite A]
 
-/-- **The transition of a sweep at a position**, as a statement about a guessed
-trace: the state bits before the position are the initial ones if the position
-is the lowest, and the trace bits at the position below otherwise. -/
-def stepAt (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (p : A) (j : Fin S.σ) : Prop :=
+/-- **The transition of a sweep at an index**, as a statement about a guessed
+trace: the state bits before the position are the initial ones at the lowest
+index, and the trace bits at the index *covered* by this one otherwise. Under
+the index naming the previous position is the predecessor in the order, so
+nothing but `≤` is needed to find it. -/
+def stepAt (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A) (j : Fin S.σ) : Prop :=
   (S.step j).Holds (Sum.elim
-    (fun j' => (orank p = 1 ∧ S.init j' = true) ∨
-      ∃ p' : A, orank p' + orank p' = orank p ∧ BitAt p' (t j'))
-    fun k => BitAt p (x k))
+    (fun j' => (orank i = 0 ∧ S.init j' = true) ∨
+      ∃ i' : A, (i' < i ∧ ∀ k : A, i' < k → i ≤ k) ∧ BitIx i' (t j'))
+    fun k => BitIx i (x k))
 
 /-- **What the formula asks of the guessed trace and flags**: the trace records
-the state after each position below the top, the flags record the state after
-the top position, and the acceptance condition holds of the flags – of the
-initial state, if the universe has no bit position at all. -/
+the state after each index below the top, the flags record the state after the
+top position, and the acceptance condition holds of the flags – of the initial
+state, if the universe has no bit position at all. -/
 def SweepWitness (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ → A) : Prop :=
-  (∀ p : A, IsPos p → ¬IsTopPos p → ∀ j, (BitAt p (t j) ↔ stepAt S x t p j)) ∧
-    (∀ p : A, IsTopPos p → ∀ j, (orank (f j) ≠ 0 ↔ stepAt S x t p j)) ∧
-      ((∃ p : A, IsPos p) → S.acc.Holds fun j => orank (f j) ≠ 0) ∧
-        ((¬∃ p : A, IsPos p) → S.acc.eval S.init = true)
+  (∀ i : A, IsLowIx i → ∀ j, (BitIx i (t j) ↔ stepAt S x t i j)) ∧
+    (∀ i : A, IsTopIx i → ∀ j, (orank (f j) ≠ 0 ↔ stepAt S x t i j)) ∧
+      ((∃ i : A, IsTopIx i) → S.acc.Holds fun j => orank (f j) ≠ 0) ∧
+        ((¬∃ i : A, IsTopIx i) → S.acc.eval S.init = true)
 
 /-- The state the witnesses record after position `i`: a trace bit below the
 top, a flag at the top. -/
 def storedAfter (S : Sweep ρ) (t f : Fin S.σ → A) (i : ℕ) (j : Fin S.σ) : Prop :=
   if i + 1 < posCount A then (orank (t j)).testBit i = true else orank (f j) ≠ 0
 
-/-- Positions exist exactly when the universe has more than one element. -/
-theorem exists_isPos_iff : (∃ p : A, IsPos p) ↔ 0 < posCount A := by
+/-- A top index exists exactly when the universe has more than one element. -/
+theorem exists_isTopIx_iff : (∃ i : A, IsTopIx i) ↔ 0 < posCount A := by
   constructor
-  · rintro ⟨p, i, hi⟩
-    have h1 : 2 ^ i < Nat.card A := by rw [← hi]; exact orank_lt_card p
-    have h2 : i < posCount A := (two_pow_lt_card_iff_lt_posCount i).mp h1
+  · rintro ⟨i, hi⟩
+    rw [IsTopIx] at hi
     omega
   · intro h
-    obtain ⟨p, hp⟩ := exists_isPos (A := A) h
-    exact ⟨p, 0, hp⟩
+    obtain ⟨i, hi⟩ := exists_orank_eq (A := A)
+      (lt_card_of_lt_posCount (A := A) (Nat.sub_lt h Nat.one_pos))
+    exact ⟨i, by rw [IsTopIx, hi]; omega⟩
 
 /-- **The transition read from the trace is the transition of the sweep**: at
-the position of place value `2 ^ i`, the guessed bits say exactly what the
-automaton computes from the state before that position. -/
-theorem stepAt_iff (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) {p : A} {i : ℕ}
-    (hp : orank p = 2 ^ i) (j : Fin S.σ) :
-    stepAt S x t p j ↔ (S.step j).eval (Sum.elim
-      (fun j' => if i = 0 then S.init j' else (orank (t j')).testBit (i - 1))
-      fun k => (orank (x k)).testBit i) = true := by
+the index `i`, the guessed bits say exactly what the automaton computes from the
+state before that position. -/
+theorem stepAt_iff (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A) (j : Fin S.σ) :
+    stepAt S x t i j ↔ (S.step j).eval (Sum.elim
+      (fun j' => if orank i = 0 then S.init j' else (orank (t j')).testBit (orank i - 1))
+      fun k => (orank (x k)).testBit (orank i)) = true := by
   rw [stepAt, ← BitExpr.holds_iff_eval]
   refine BitExpr.holds_congr ?_ _
   rintro (j' | k)
   · simp only [Sum.elim_inl]
-    cases i with
-    | zero =>
-      simp only [pow_zero] at hp ⊢
+    rcases Nat.eq_zero_or_pos (orank i) with h0 | hpos
+    · rw [if_pos h0]
       constructor
-      · rintro (⟨-, h⟩ | ⟨p', hp', -⟩)
+      · rintro (⟨-, h⟩ | ⟨i', ⟨hlt, -⟩, -⟩)
         · exact h
-        · rw [hp] at hp'
-          omega
+        · exact absurd (orank_lt_orank hlt) (by omega)
       · intro h
-        exact Or.inl ⟨hp, h⟩
-    | succ i =>
-      have hne : orank p ≠ 1 := by
-        rw [hp]
-        have : 2 ≤ 2 ^ (i + 1) := by
-          calc (2 : ℕ) = 2 ^ 1 := by norm_num
-            _ ≤ 2 ^ (i + 1) := Nat.pow_le_pow_right (by norm_num) (by omega)
-        omega
-      simp only [Nat.succ_sub_one, if_neg (Nat.succ_ne_zero i)]
+        exact Or.inl ⟨h0, h⟩
+    · rw [if_neg (by omega)]
       constructor
-      · rintro (⟨h, -⟩ | ⟨p', hp', hbit⟩)
-        · exact absurd h hne
-        · have hp'' : orank p' = 2 ^ i := by rw [hp] at hp'; rw [pow_succ] at hp'; omega
-          exact (bitAt_iff hp'').mp hbit
+      · rintro (⟨h0, -⟩ | ⟨i', ⟨hlt, hcov⟩, hbit⟩)
+        · exact absurd h0 (by omega)
+        · have hsucc : orank i = orank i' + 1 :=
+            orank_eq_succ_of_pred hlt fun a ha => absurd (hcov a ha.1) (not_le_of_gt ha.2)
+          rw [bitIx_iff] at hbit
+          rw [show orank i - 1 = orank i' by omega]
+          exact hbit
       · intro h
-        have hlt : 2 ^ i < Nat.card A := by
-          have := orank_lt_card p
-          rw [hp, pow_succ] at this
-          have : (0 : ℕ) < 2 ^ i := Nat.two_pow_pos i
-          omega
-        obtain ⟨p', hp'⟩ := exists_orank_eq (A := A) hlt
-        exact Or.inr ⟨p', by rw [hp', hp, pow_succ]; ring, (bitAt_iff hp').mpr h⟩
+        obtain ⟨i', hi', hlt, hno⟩ := exists_pred_of_orank_succ (A := A)
+          (show orank i = (orank i - 1) + 1 by omega)
+        refine Or.inr ⟨i', ⟨hlt, fun k hk => le_of_not_gt fun hcon => hno k ⟨hk, hcon⟩⟩, ?_⟩
+        rw [bitIx_iff, hi']
+        exact h
   · simp only [Sum.elim_inr]
-    exact bitAt_iff hp
+    exact bitIx_iff
 
 /-- **The guessed trace is the run**: the witnesses of the formula record,
 position by position, the states of the sweep. Determinism does the work – the
-local conditions pin the trace by induction along the positions. -/
+local conditions pin the trace by induction along the indices. -/
 theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ → A)
     (hw : SweepWitness S x t f) :
     ∀ i, i < posCount A → ∀ j, (storedAfter S t f i j ↔ S.state x (i + 1) j = true) := by
@@ -223,8 +181,7 @@ theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ 
   induction i using Nat.strong_induction_on with
   | _ i IH =>
     intro hi j
-    obtain ⟨p, hp⟩ := exists_isPos (A := A) hi
-    have hpos : IsPos p := ⟨i, hp⟩
+    obtain ⟨e, he⟩ := exists_orank_eq (A := A) (lt_card_of_lt_posCount (A := A) hi)
     have hprev : ∀ j', (if i = 0 then S.init j' else (orank (t j')).testBit (i - 1)) =
         S.state x i j' := by
       intro j'
@@ -244,21 +201,15 @@ theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ 
         · have hb : (orank (t j')).testBit i' ≠ true := fun hc => hs (hiff.mp hc)
           simp only [Bool.not_eq_true] at hb hs
           rw [hb, hs]
-    have hstep : stepAt S x t p j ↔ S.state x (i + 1) j = true := by
-      rw [stepAt_iff S x t hp j, S.state_succ x i j]
-      have : (fun j' => if i = 0 then S.init j' else (orank (t j')).testBit (i - 1)) =
-          S.state x i := funext hprev
-      rw [this]
+    have hstep : stepAt S x t e j ↔ S.state x (i + 1) j = true := by
+      rw [stepAt_iff S x t e j, he, S.state_succ x i j, funext hprev]
     rcases Nat.lt_or_ge (i + 1) (posCount A) with hlt | hge
-    · have hntop : ¬IsTopPos p := by
-        rw [isTopPos_iff hpos, posExp_eq hp]
-        omega
-      rw [storedAfter, if_pos hlt, ← bitAt_iff hp, hw.1 p hpos hntop j]
+    · have hlow : IsLowIx e := by rw [IsLowIx, he]; omega
+      have hbit : ((orank (t j)).testBit i = true) ↔ BitIx e (t j) := by rw [bitIx_iff, he]
+      rw [storedAfter, if_pos hlt, hbit, hw.1 e hlow j]
       exact hstep
-    · have htop : IsTopPos p := by
-        rw [isTopPos_iff hpos, posExp_eq hp]
-        omega
-      rw [storedAfter, if_neg (by omega), hw.2.1 p htop j]
+    · have htop : IsTopIx e := by rw [IsTopIx, he]; omega
+      rw [storedAfter, if_neg (by omega), hw.2.1 e htop j]
       exact hstep
 
 /-- **The formula says what the sweep does.** -/
@@ -268,15 +219,15 @@ theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
   · rintro ⟨t, f, hw⟩
     rw [Sweep.Accepts, ← BitExpr.holds_iff_eval]
     rcases Nat.eq_zero_or_pos (posCount A) with h0 | hpos
-    · have hnone : ¬∃ p : A, IsPos p := by
-        rw [exists_isPos_iff]
+    · have hnone : ¬∃ i : A, IsTopIx i := by
+        rw [exists_isTopIx_iff]
         omega
       have := hw.2.2.2 hnone
       rw [h0, Sweep.state_zero, BitExpr.holds_iff_eval]
       exact this
     · have hstate := storedAfter_iff_state S x t f hw (posCount A - 1) (by omega)
       refine (BitExpr.holds_congr (fun j => ?_) _).mpr
-        (hw.2.2.1 (exists_isPos_iff.mpr hpos))
+        (hw.2.2.1 (exists_isTopIx_iff.mpr hpos))
       have h1 : posCount A - 1 + 1 = posCount A := by omega
       have := hstate j
       rw [storedAfter, if_neg (by omega), h1] at this
@@ -285,12 +236,13 @@ theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
     rcases Nat.eq_zero_or_pos (posCount A) with h0 | hpos
     · obtain ⟨a⟩ := ‹Nonempty A›
       refine ⟨fun _ => a, fun _ => a, ?_, ?_, ?_, ?_⟩
-      · intro p hp
-        exact absurd (exists_isPos_iff.mp ⟨p, hp⟩) (by omega)
-      · intro p hp
-        exact absurd (exists_isPos_iff.mp ⟨p, hp.1⟩) (by omega)
+      · intro i hi
+        rw [IsLowIx] at hi
+        omega
+      · intro i hi
+        exact absurd (exists_isTopIx_iff.mp ⟨i, hi⟩) (by omega)
       · intro hex
-        exact absurd (exists_isPos_iff.mp hex) (by omega)
+        exact absurd (exists_isTopIx_iff.mp hex) (by omega)
       · intro _
         rw [Sweep.Accepts, h0, Sweep.state_zero] at hacc
         exact hacc
@@ -305,39 +257,26 @@ theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
           (orank t).testBit i = S.state x (i + 1) j := fun j =>
         exists_orank_testBit (A := A) fun i => S.state x (i + 1) j
       choose t ht using htrace
+      have hprev : ∀ (i : A), orank i + 1 ≤ posCount A →
+          (fun j' => if orank i = 0 then S.init j'
+            else (orank (t j')).testBit (orank i - 1)) = S.state x (orank i) := by
+        intro i hi
+        funext j'
+        obtain ⟨d, hd⟩ : ∃ d, orank i = d := ⟨_, rfl⟩
+        rw [hd]
+        cases d with
+        | zero => simp
+        | succ d' =>
+          simp only [Nat.succ_sub_one, if_neg (Nat.succ_ne_zero d')]
+          exact ht j' d' (by omega)
       refine ⟨t, fun j => if S.state x (posCount A) j = true then one else zero, ?_, ?_, ?_, ?_⟩
-      · intro p hpos' hntop j
-        obtain ⟨i, hi⟩ := hpos'
-        have hilt : i < posCount A := by
-          rw [← two_pow_lt_card_iff_lt_posCount, ← hi]
-          exact orank_lt_card p
-        have hne : i + 1 ≠ posCount A := by
-          intro hcon
-          exact hntop (by rw [isTopPos_iff ⟨i, hi⟩, posExp_eq hi]; exact hcon)
-        have hprev : (fun j' => if i = 0 then S.init j' else (orank (t j')).testBit (i - 1)) =
-            S.state x i := by
-          funext j'
-          cases i with
-          | zero => simp
-          | succ i' =>
-            simp only [Nat.succ_sub_one, if_neg (Nat.succ_ne_zero i')]
-            exact ht j' i' (by omega)
-        rw [bitAt_iff hi, stepAt_iff S x t hi j, hprev, ← S.state_succ x i j,
-          ht j i (by omega)]
-      · intro p htop j
-        obtain ⟨i, hi⟩ := htop.1
-        have heq : i + 1 = posCount A := by
-          rw [← posExp_eq hi]
-          exact (isTopPos_iff htop.1).mp htop
-        have hprev : (fun j' => if i = 0 then S.init j' else (orank (t j')).testBit (i - 1)) =
-            S.state x i := by
-          funext j'
-          cases i with
-          | zero => simp
-          | succ i' =>
-            simp only [Nat.succ_sub_one, if_neg (Nat.succ_ne_zero i')]
-            exact ht j' i' (by omega)
-        rw [stepAt_iff S x t hi j, hprev, ← S.state_succ x i j, heq]
+      · intro i hlow j
+        rw [IsLowIx] at hlow
+        rw [bitIx_iff, stepAt_iff S x t i j, hprev i (by omega), ← S.state_succ x (orank i) j,
+          ht j (orank i) (by omega)]
+      · intro i htop j
+        rw [IsTopIx] at htop
+        rw [stepAt_iff S x t i j, hprev i (by omega), ← S.state_succ x (orank i) j, htop]
         by_cases hs : S.state x (posCount A) j = true
         · simp [hs, hone]
         · simp [hs, hzero]
@@ -348,7 +287,7 @@ theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
         · simp [hs, hone]
         · simp [hs, hzero]
       · intro hnone
-        exact absurd (exists_isPos_iff.mpr hpos) hnone
+        exact absurd (exists_isTopIx_iff.mpr hpos) hnone
 
 end SweepTrace
 
@@ -358,33 +297,36 @@ section MachineDef
 
 variable {L : Language.{0, 0}} {α : Type} {ρ : ℕ}
 
-/-- The transition condition at a position is definable. -/
-theorem arithDef_stepAt (S : Sweep ρ) (reg : Fin ρ → α) (tr : Fin S.σ → α) (p : α)
+/-- The transition condition at an index is definable. -/
+theorem bitDef_stepAt (S : Sweep ρ) (reg : Fin ρ → α) (tr : Fin S.σ → α) (p : α)
     (j : Fin S.σ) :
-    ArithDef (L := L) (α := α) (fun _A _ _ _ _ v =>
+    BitDef (L := L) (α := α) (fun _A _ _ _ _ v =>
       stepAt S (fun k => v (reg k)) (fun j' => v (tr j')) (v p) j) := by
-  have hval : ∀ z : Fin S.σ ⊕ Fin ρ, ArithDef (L := L) (α := α)
+  have hval : ∀ z : Fin S.σ ⊕ Fin ρ, BitDef (L := L) (α := α)
       (Sum.elim
         (fun j' : Fin S.σ => fun A _ _ _ _ (v : α → A) =>
-          (orank (v p) = 1 ∧ S.init j' = true) ∨
-            ∃ p' : A, orank p' + orank p' = orank (v p) ∧ BitAt p' (v (tr j')))
-        (fun k : Fin ρ => fun A _ _ _ _ (v : α → A) => BitAt (v p) (v (reg k))) z) := by
+          (orank (v p) = 0 ∧ S.init j' = true) ∨
+            ∃ i' : A, (i' < v p ∧ ∀ k : A, i' < k → v p ≤ k) ∧ BitIx i' (v (tr j')))
+        (fun k : Fin ρ => fun A _ _ _ _ (v : α → A) => BitIx (v p) (v (reg k))) z) := by
     rintro (j' | k)
-    · refine (((arithDef_isOne p).and (ArithDef.prop (S.init j' = true))).or
-        (((arithDef_plus (L := L) (α := α ⊕ Fin 1) (Sum.inr 0) (Sum.inr 0)
-            (Sum.inl p)).and
-          (arithDef_bit (L := L) (α := α ⊕ Fin 1) (Sum.inr 0)
-            (Sum.inl (tr j')))).ex)).congr fun A _ _ _ _ v => ?_
+    · have hcov : BitDef (L := L) (α := α ⊕ Fin 1) (fun A _ _ _ _ u =>
+          ∀ k : A, u (Sum.inr 0) < k → u (Sum.inl p) ≤ k) :=
+        ((bitDef_lt (L := L) (α := (α ⊕ Fin 1) ⊕ Fin 1)
+          (Sum.inl (Sum.inr 0)) (Sum.inr 0)).imp
+          (bitDef_le (Sum.inl (Sum.inl p)) (Sum.inr 0))).all
+      refine (((bitDef_isZero p).and (BitDef.prop (S.init j' = true))).or
+        ((((bitDef_lt (L := L) (α := α ⊕ Fin 1) (Sum.inr 0) (Sum.inl p)).and hcov).and
+          (bitDef_bit (Sum.inr 0) (Sum.inl (tr j')))).ex)).congr fun A _ _ _ _ v => ?_
       simp only [Sum.elim_inl, Sum.elim_inr]
-    · exact (arithDef_bit p (reg k)).congr fun _A _ _ _ _ _v => Iff.rfl
-  exact (arithDef_bitExpr hval (S.step j)).congr fun A _ _ _ _ v => by
+    · exact (bitDef_bit p (reg k)).congr fun _A _ _ _ _ _v => Iff.rfl
+  exact (bitDef_bitExpr hval (S.step j)).congr fun A _ _ _ _ v => by
     rw [stepAt]
     exact BitExpr.holds_congr (by rintro (j' | k) <;> exact Iff.rfl) _
 
 /-- **A sweep is definable**: the formula guesses the trace and the flags, and
 asks that they be the run. -/
-theorem arithDef_sweep (S : Sweep ρ) (reg : Fin ρ → α) :
-    ArithDef (L := L) (α := α)
+theorem bitDef_sweep (S : Sweep ρ) (reg : Fin ρ → α) :
+    BitDef (L := L) (α := α)
       (fun _A _ _ _ _ v => S.Accepts fun k => v (reg k)) := by
   classical
   -- variables: the ambient ones, then the trace, then the flags
@@ -392,47 +334,47 @@ theorem arithDef_sweep (S : Sweep ρ) (reg : Fin ρ → α) :
   let amb : α → γ := fun a => Sum.inl (Sum.inl a)
   let tr : Fin S.σ → γ := fun j => Sum.inl (Sum.inr j)
   let fl : Fin S.σ → γ := fun j => Sum.inr j
-  -- the local condition at a position, with the position bound as `Sum.inr 0`
-  have hlocal : ArithDef (L := L) (α := γ) (fun A _ _ _ _ v =>
-      ∀ p : A, IsPos p → ¬IsTopPos p → ∀ j,
-        (BitAt p (v (tr j)) ↔ stepAt S (fun k => v (amb (reg k)))
-          (fun j' => v (tr j')) p j)) := by
-    refine (((arithDef_isPos (L := L) (α := γ ⊕ Fin 1) (Sum.inr 0)).imp
-      (((arithDef_isTopPos (L := L) (α := γ ⊕ Fin 1) (Sum.inr 0)).not).imp
-        (ArithDef.forallFin (R := fun j => fun A _ _ _ _ (v : (γ ⊕ Fin 1) → A) =>
-            (BitAt (v (Sum.inr 0)) (v (Sum.inl (tr j))) ↔
-              stepAt S (fun k => v (Sum.inl (amb (reg k))))
-                (fun j' => v (Sum.inl (tr j'))) (v (Sum.inr 0)) j))
-          fun j => (arithDef_bit (Sum.inr 0) (Sum.inl (tr j))).iff
-            (arithDef_stepAt S (fun k => Sum.inl (amb (reg k))) (fun j' => Sum.inl (tr j'))
-              (Sum.inr 0) j)))).all).congr fun A _ _ _ _ v => ?_
-    exact forall_congr' fun a => by simp only [Sum.elim_inl, Sum.elim_inr]
-  -- the condition at the top position, recorded by the flags
-  have htop : ArithDef (L := L) (α := γ) (fun A _ _ _ _ v =>
-      ∀ p : A, IsTopPos p → ∀ j,
+  -- the local condition at an index below the top, with the index bound as `Sum.inr 0`
+  have hlocal : BitDef (L := L) (α := γ) (fun A _ _ _ _ v =>
+      ∀ i : A, IsLowIx i → ∀ j,
+        (BitIx i (v (tr j)) ↔ stepAt S (fun k => v (amb (reg k)))
+          (fun j' => v (tr j')) i j)) := by
+    refine (((bitDef_isLowIx (L := L) (α := γ ⊕ Fin 1) (Sum.inr 0)).imp
+      (BitDef.forallFin (R := fun j => fun A _ _ _ _ (v : (γ ⊕ Fin 1) → A) =>
+          (BitIx (v (Sum.inr 0)) (v (Sum.inl (tr j))) ↔
+            stepAt S (fun k => v (Sum.inl (amb (reg k))))
+              (fun j' => v (Sum.inl (tr j'))) (v (Sum.inr 0)) j))
+        fun j => (bitDef_bit (Sum.inr 0) (Sum.inl (tr j))).iff
+          (bitDef_stepAt S (fun k => Sum.inl (amb (reg k))) (fun j' => Sum.inl (tr j'))
+            (Sum.inr 0) j))).all).congr fun A _ _ _ _ v => ?_
+    refine forall_congr' fun a => ?_
+    simp only [Sum.elim_inl, Sum.elim_inr]
+  -- the condition at the top index, recorded by the flags
+  have htop : BitDef (L := L) (α := γ) (fun A _ _ _ _ v =>
+      ∀ i : A, IsTopIx i → ∀ j,
         (orank (v (fl j)) ≠ 0 ↔ stepAt S (fun k => v (amb (reg k)))
-          (fun j' => v (tr j')) p j)) := by
-    refine (((arithDef_isTopPos (L := L) (α := γ ⊕ Fin 1) (Sum.inr 0)).imp
-      (ArithDef.forallFin (R := fun j => fun A _ _ _ _ (v : (γ ⊕ Fin 1) → A) =>
+          (fun j' => v (tr j')) i j)) := by
+    refine (((bitDef_isTopIx (L := L) (α := γ ⊕ Fin 1) (Sum.inr 0)).imp
+      (BitDef.forallFin (R := fun j => fun A _ _ _ _ (v : (γ ⊕ Fin 1) → A) =>
           (¬ orank (v (Sum.inl (fl j))) = 0 ↔
             stepAt S (fun k => v (Sum.inl (amb (reg k))))
               (fun j' => v (Sum.inl (tr j'))) (v (Sum.inr 0)) j))
-        fun j => ((arithDef_isZero (Sum.inl (fl j))).not).iff
-          (arithDef_stepAt S (fun k => Sum.inl (amb (reg k))) (fun j' => Sum.inl (tr j'))
+        fun j => ((bitDef_isZero (Sum.inl (fl j))).not).iff
+          (bitDef_stepAt S (fun k => Sum.inl (amb (reg k))) (fun j' => Sum.inl (tr j'))
             (Sum.inr 0) j))).all).congr fun A _ _ _ _ v => ?_
     exact forall_congr' fun a => by simp only [Sum.elim_inl, Sum.elim_inr]
   -- acceptance, read from the flags, or from the initial state if there are no positions
-  have hex : ArithDef (L := L) (α := γ) (fun A _ _ _ _ v => ∃ p : A, IsPos p) := by
-    refine ((arithDef_isPos (L := L) (α := γ ⊕ Fin 1) (Sum.inr 0)).ex).congr
+  have hex : BitDef (L := L) (α := γ) (fun A _ _ _ _ v => ∃ i : A, IsTopIx i) := by
+    refine ((bitDef_isTopIx (L := L) (α := γ ⊕ Fin 1) (Sum.inr 0)).ex).congr
       fun A _ _ _ _ v => ?_
     exact exists_congr fun a => by simp only [Sum.elim_inr]
-  have hacc : ArithDef (L := L) (α := γ) (fun A _ _ _ _ v =>
+  have hacc : BitDef (L := L) (α := γ) (fun A _ _ _ _ v =>
       S.acc.Holds fun j => orank (v (fl j)) ≠ 0) :=
-    arithDef_bitExpr (fun j => (arithDef_isZero (L := L) (α := γ) (fl j)).not) S.acc
-  have hbody : ArithDef (L := L) (α := γ) (fun A _ _ _ _ v =>
+    bitDef_bitExpr (fun j => (bitDef_isZero (L := L) (α := γ) (fl j)).not) S.acc
+  have hbody : BitDef (L := L) (α := γ) (fun A _ _ _ _ v =>
       SweepWitness S (fun k => v (amb (reg k))) (fun j => v (tr j)) fun j => v (fl j)) :=
     hlocal.and (htop.and ((hex.imp hacc).and
-      (hex.not.imp (ArithDef.prop (S.acc.eval S.init = true)))))
+      (hex.not.imp (BitDef.prop (S.acc.eval S.init = true)))))
   refine (hbody.exs.exs).congr fun A _ _ _ _ v => ?_
   rw [← sweepWitness_iff S fun k => v (reg k)]
   constructor
@@ -441,14 +383,15 @@ theorem arithDef_sweep (S : Sweep ρ) (reg : Fin ρ → α) :
   · rintro ⟨tw, fw, hw⟩
     exact ⟨tw, fw, hw⟩
 
-/-- **A base test is definable**: sweeps by the construction above, queries as
-atoms, and the Boolean structure by the closure lemmas. -/
-theorem arithDef_baseTest (t : BaseTest L ρ) (reg : Fin ρ → α) :
-    ArithDef (L := L) (α := α) (fun _A _ _ _ _ v => t.Holds fun k => v (reg k)) := by
+/-- **A base test is definable**: sweeps by the construction above, reads and
+queries as atoms, and the Boolean structure by the closure lemmas. -/
+theorem bitDef_baseTest (t : BaseTest L ρ) (reg : Fin ρ → α) :
+    BitDef (L := L) (α := α) (fun _A _ _ _ _ v => t.Holds fun k => v (reg k)) := by
   induction t with
-  | sweep S => exact (arithDef_sweep S reg).congr fun A _ _ _ _ v => Iff.rfl
+  | sweep S => exact (bitDef_sweep S reg).congr fun A _ _ _ _ v => Iff.rfl
+  | bit i y => exact (bitDef_bit (reg i) (reg y)).congr fun A _ _ _ _ v => Iff.rfl
   | query R arg =>
-    exact (arithDef_rel R fun i => reg (arg i)).congr fun A _ _ _ _ v => Iff.rfl
+    exact (bitDef_rel R fun i => reg (arg i)).congr fun A _ _ _ _ v => Iff.rfl
   | not t ih => exact ih.not.congr fun A _ _ _ _ v => Iff.rfl
   | and t u iht ihu => exact (iht.and ihu).congr fun A _ _ _ _ v => Iff.rfl
   | or t u iht ihu => exact (iht.or ihu).congr fun A _ _ _ _ v => Iff.rfl
@@ -459,16 +402,31 @@ end MachineDef
 
 variable {L : Language.{0, 0}} [L.IsRelational]
 
-/-- **Sweeping logarithmic time is inside AC⁰**: every problem decided by an
-alternating machine with a logarithmic clock and a bit-level base is defined by
-a sentence of `FO(≤, +, ×)`. The guesses are the quantifier prefix, the queries
-are atoms, and each sweep is a guessed trace pinned by its transition. -/
-theorem LTDecidable.ac0Definable {P : DecisionProblem L} (h : LTDecidable P) :
-    AC0Definable P := by
+/-- **The machine model is inside the bit-level logic**: every problem decided
+by an alternating machine with a logarithmic clock and a bit-level base is
+defined by a prenex sentence over `≤`, `+` and the bit at an index. The guesses
+are the quantifier prefix, the queries and the reads are atoms, and each sweep is
+a guessed trace pinned by its transition.
+
+With `DescriptiveComplexity.BitDefinable.ltDecidable` this makes the fence an
+**equality**: the machine model is exactly characterized by a logic, and by the
+logic that is classically AC⁰. -/
+theorem LTDecidable.bitDefinable {P : DecisionProblem L} (h : LTDecidable P) :
+    BitDefinable P := by
   obtain ⟨M, hM⟩ := h
-  refine (arithDef_prefix M.regs M.pol (arithDef_baseTest M.base id)).ac0Definable ?_
-  intro A _ _ _ _
-  rw [hM A, LTMachine.Accepts]
-  exact prefixHolds_congr M.regs M.pol fun v => Iff.rfl
+  refine BitDef.bitDefinable (R := fun A _ _ _ _ _ =>
+    prefixHolds (A := A) M.regs M.pol fun x => M.base.Holds x) ?_ ?_
+  · exact ((bitDef_baseTest M.base fun k => Sum.inr k).block M.pol).congr
+      fun A _ _ _ _ v => Iff.rfl
+  · intro A _ _ _ _
+    rw [hM A, LTMachine.Accepts]
+
+/-- **The machine model is inside AC⁰, given the naming bridge**: a corollary of
+the statement above and of the translation of the bit-level logic into
+`FO(≤, +, ×)`, which needs `DescriptiveComplexity.PowArithDef` for its bit atom
+and nothing else. -/
+theorem LTDecidable.ac0Definable {P : DecisionProblem L} (h : LTDecidable P)
+    (hpow : PowArithDef L) : AC0Definable P :=
+  h.bitDefinable.ac0Definable hpow
 
 end DescriptiveComplexity

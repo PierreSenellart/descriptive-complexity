@@ -4,20 +4,22 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.LogTime.Arith
+import DescriptiveComplexity.LogTime.Fields
 import DescriptiveComplexity.LogTime.Compile
 import DescriptiveComplexity.LogTime.Simulate
 import DescriptiveComplexity.HeadEvalArith
+import DescriptiveComplexity.HeadEvalBit
 
 /-!
-# A machine model at the bottom of the ladder: sweeping logarithmic time
+# A machine model at the bottom of the ladder: alternating logarithmic time
 
 Every class of this library above the bottom has its machine model *proved*
 equal to the logic that defines it – `LOGSPACE` its multi-head automaton, `NL`
 its nondeterministic one, `PTIME` its program. AC⁰ had nothing. This module
 gives it a machine, in the shape the classical theory prescribes for the
 logarithmic-time hierarchy (Sipser 1983; [Barrington, Immerman & Straubing
-1990][barrington1990uniformity]), and proves the inclusion that the shape makes
-provable.
+1990][barrington1990uniformity]), and proves it equal to a logic – to
+`FO(≤, BIT)`, which is the classical logic for AC⁰.
 
 ## The model
 
@@ -29,25 +31,30 @@ one is the logarithmic block of guesses of the classical `Σₖ-TIME(log n)` nor
 form. The base test is a Boolean combination of
 
 * **queries** – an input relation at a tuple of registers, which is the random
-  access of the model and needs no index tape here: reading the input at an
-  address *is* evaluating a relation at a tuple; and
+  access to the *instance* and needs no index tape here: reading the input at an
+  address *is* evaluating a relation at a tuple;
+* **reads** – `DescriptiveComplexity.BaseTest.bit`, the bit of one register at
+  the position named by another, which is the random access to the machine's own
+  *addresses*; and
 * **sweeps** – one pass over the bit positions, low to high, by a finite
   automaton reading one bit of each register at each position
   (`DescriptiveComplexity.Sweep`).
 
 Nothing in the base evaluates `≤`, `+` or `×`: that is the point. The bound is a
 constant number of passes over a tape of `log n` bits, hence a logarithmic clock
-with a constant number of head reversals.
+with a constant number of head reversals, plus addressing.
 
-## The sandwich
+## The characterization
 
-`FO(≤, +, BIT)` in prenex form  ⊆  sweeping logarithmic time  ⊆  `FO(≤, +, ×)`.
+prenex `FO(≤, +, BIT)`  =  alternating logarithmic time,
 
-Both fences are proved (`DescriptiveComplexity.BitDefinable.ltDecidable` and
-`DescriptiveComplexity.LTDecidable.ac0Definable`), and the gap between them is
-named rather than hidden: it is Immerman's mutual definability, of which the
-library has `BIT` from `+, ×` (`DescriptiveComplexity.arithDef_bit`) and not
-`×` from `BIT`.
+which is `DescriptiveComplexity.ltDecidable_iff_bitDefinable`: **the machine
+model is exactly a logic**, and – since `+` is a derived predicate here
+(`DescriptiveComplexity.bitDef_plus_free`) and `≤` is classically derivable from
+`BIT` too – exactly the logic `FO(≤, BIT)` whose identification with
+`FO(≤, +, ×)` and with (DLOGTIME-uniform) AC⁰ is [Immerman
+1999][immerman1999descriptive] Thm 1.17 and [Barrington, Immerman & Straubing
+1990][barrington1990uniformity].
 
 ## What is proved
 
@@ -56,39 +63,68 @@ library has `BIT` from `+, ×` (`DescriptiveComplexity.arithDef_bit`) and not
   `DescriptiveComplexity.plusSweep_accepts`: the comparison and the ripple-carry
   addition are sweeps, so the model computes the numeric predicates `≤` and
   `plus` rather than reading them – the bit-level analogue of what
-  `DescriptiveComplexity.HeadArith` does one resource bound higher.
+  `DescriptiveComplexity.HeadArith` does one resource bound higher. Nothing was
+  handed to the base but addressing.
 * **The logic is inside the model.**
   `DescriptiveComplexity.BitDefinable.ltDecidable`: every prenex sentence over
-  the order, the addition and a *guarded* bit atom (`p` is a position and the
-  bit of `x` there is set) is decided by such a machine, atom by atom – the
-  guard is what keeps `BIT` bit-level, since for a `p` that is not a place value
-  `DescriptiveComplexity.BitAt` is a condition modulo `2p`, which no sweep
-  decides.
+  the order, the addition and the bit atom is decided by such a machine, atom by
+  atom.
 * **The model is inside the logic.**
-  `DescriptiveComplexity.LTDecidable.ac0Definable`: every problem decided by
-  such a machine is AC⁰ definable, hence
-  (`DescriptiveComplexity.LTDecidable.mem_LOGSPACE`) in LOGSPACE. The proof is
-  the interesting one: a sweep carries a constant number of state bits past each
-  of the `log n` positions, so its whole history is a constant number of *bit
+  `DescriptiveComplexity.LTDecidable.bitDefinable`: every problem decided by such
+  a machine is defined by a prenex sentence of the *same* logic. The proof is the
+  interesting one: a sweep carries a constant number of state bits past each of
+  the `log n` positions, so its whole history is a constant number of *bit
   vectors over the positions* – and such a vector is an element of the universe.
   The sentence guesses those elements and pins them with the transition of the
-  sweep, using the bit predicate `DescriptiveComplexity.BitAt`, which is itself
-  first-order in `≤`, `+` and `×` once positions are named by their place values
-  (`DescriptiveComplexity.LogTime.Bits`).
+  sweep.
 
-## What is not proved, and why
+## Why bit positions are named by their index
 
-That every AC⁰ definable problem is decided by such a machine – equivalently,
-that the sandwich collapses – is **open here, and not for want of
-engineering**. A sweep passes a constant
-number of bits across each position; multiplication of two `log n`-bit numbers
-accumulates a column count that grows with the number of positions, so `×` is
-not a constant number of sweeps. Lifting the restriction is no help either: a
-base that revisits its positions unboundedly often (a machine that *counts*)
-leaves the budget the simulation above lives on, and simulating it in the logic
-is exactly the hard half of the classical `AC⁰ = LH` theorem. The honest
-statement is therefore a sandwich that does not collapse, with the missing step
-named: `×` from `BIT`, and a prenex normal form for `BoundedFormula`.
+The bit atom is `DescriptiveComplexity.BitIx`: `BIT(x, i)` with the position
+named by the element whose *rank* is the exponent. The alternative – naming a
+position by its place value, the element of rank `2 ^ i` – makes the bit atom
+first-order in `FO(≤, +, ×)` outright (`DescriptiveComplexity.arithDef_bit`), and
+was the earlier design here. It cannot be used for a machine, and the reason is
+worth keeping:
+
+> With a base of sweeps and a place-value bit atom, every atom is a **regular**
+> relation of the registers' bit tracks read in parallel, alternating registers
+> are projections and complements, and the whole model collapses to what a finite
+> automaton reading `Nat.card A` in binary can decide. Such a model cannot
+> multiply, and does not contain AC⁰: “the universe has a prime number of
+> elements” is `FO(≤, +, ×)` – try all pairs of divisors – and is not a
+> 2-automatic set of cardinalities.
+
+Reading a bit at a *guessed index* is exactly what escapes that: it is not a
+regular relation of the tracks, and it is what a random-access machine does. The
+price is paid on the other side, in `DescriptiveComplexity.PowArithDef`.
+
+## Where it lands, and what is not proved
+
+**`LTDecidable ⊆ LOGSPACE`, outright**
+(`DescriptiveComplexity.LTDecidable.mem_LOGSPACE`, through
+`DescriptiveComplexity.BitDefinable.dtcDefinable` in
+`DescriptiveComplexity.HeadEvalBit`): the logic is evaluated by a deterministic
+multi-head automaton with `2 * vars + 8` heads, the registers swept, the order
+and the input atoms read as guards, the addition and the bit *computed* by
+`DescriptiveComplexity.HeadProgram.plusP` and
+`DescriptiveComplexity.HeadProgram.bitP`. No part of Immerman's mutual
+definability is used on this route.
+
+What is **not** proved is that the logic of this module *is*
+`DescriptiveComplexity.AC0Definable`, i.e. `FO(≤, +, BIT) = FO(≤, +, ×)`. That is
+a statement about two vocabularies, not about the machine, and it is [Immerman
+1999][immerman1999descriptive] Thm 1.17, whose two halves are named here and
+neither built:
+
+* **`⊆`** is `DescriptiveComplexity.PowArithDef`, the definability of `i ↦ 2 ^ i`
+  in `FO(≤, +, ×)` (Thm 1.17(2), a packing argument on the doubling chain of
+  `i`). Everything else in that translation is built, so the AC⁰ reading
+  (`DescriptiveComplexity.BitDefinable.ac0Definable`) takes it as a hypothesis.
+* **`⊇`** is the Bit Sum Lemma (Thm 1.17(1)): counting the ones of a `log n`-bit
+  word by guessing packed running sums, which eliminates `×` in favour of the bit
+  atom. The counting it needs is in a *formula*, not in a machine; the base never
+  has to multiply.
 
 The bridge does not touch the structures-versus-strings gap either: like
 `DescriptiveComplexity.mem_LOGSPACE_iff_automaton`, it relates a logic and a
@@ -97,21 +133,12 @@ machine over the *same* structure-based framework.
 
 namespace DescriptiveComplexity
 
-open FirstOrder
-
-open Language
-
-variable {L : Language.{0, 0}} [L.IsRelational]
-
-/-- **Sweeping logarithmic time is inside LOGSPACE**, through AC⁰ and the
-arithmetic head programs of `DescriptiveComplexity.HeadEvalArith`. -/
-theorem LTDecidable.mem_LOGSPACE {P : DecisionProblem L} (h : LTDecidable P) :
-    P ∈ LOGSPACE :=
-  ac0Definable_mem_LOGSPACE h.ac0Definable
-
-/-- **A bit-definable problem is in LOGSPACE**, through the machine and AC⁰. -/
-theorem BitDefinable.mem_LOGSPACE {P : DecisionProblem L} (h : BitDefinable P) :
-    P ∈ LOGSPACE :=
-  h.ltDecidable.mem_LOGSPACE
+/-! The results of this module are stated where they are proved:
+`DescriptiveComplexity.ltDecidable_iff_bitDefinable`
+(`DescriptiveComplexity.LogTime.Compile`),
+`DescriptiveComplexity.LTDecidable.mem_LOGSPACE`
+(`DescriptiveComplexity.HeadEvalBit`) and
+`DescriptiveComplexity.BitDefinable.ac0Definable`
+(`DescriptiveComplexity.LogTime.BitLogic`). -/
 
 end DescriptiveComplexity

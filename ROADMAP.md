@@ -119,14 +119,15 @@ remains below are ordinary catalog reductions and machine bridges.
     carry-lookahead; multiplication needs a double-width digit product, which
     needs a half-width (base-`√n`) splitting. Note what it does *not* gate: a
     problem reducing to an AC⁰ problem is already known to be in PTIME.
-  * **What is left of BIT** [M]: the predicate itself is **built**, as a derived
-    one inside the logic (`LogTime/Bits.lean`, `BitAt`), so nothing here grows a
-    base-conversion. Two smaller pieces remain: a `bitP` head fragment slotted
-    into `evalArithP` beside `plusP` and `timesP`, which would keep the sharp
-    `AC⁰ ⊆ LOGSPACE` if the vocabulary ever grew a `BIT` symbol; and, if the
-    logic is ever to be *named* `FO(≤, BIT)`, the converse of Immerman's mutual
-    definability – `+` and `×` from `BIT` alone – which is the harder half and
-    is what the machine bridge of §4 also waits on.
+  * **What is left of BIT** [M–L]: the predicate itself is **built**, in both
+    of its namings (`LogTime/Bits.lean`: `BitAt` at a place value, `BitIx` at an
+    index), and the machine model of §4 is exactly `FO(≤, BIT)`. What is left is
+    Immerman's mutual definability, both halves of it, and neither is an
+    engineering task: `PowArithDef` – the graph of `i ↦ 2 ^ i` in `FO(≤, +, ×)`,
+    carried as an explicit hypothesis wherever it is needed – and `×` from `BIT`,
+    the Bit Sum Lemma. A `bitP` head fragment slotted into `evalArithP` beside
+    `plusP` and `timesP` is **built** (`HeadBit.lean`), and with its evaluator it
+    puts the machine's logic inside LOGSPACE without either half. Design and prices in `AC0.md`.
 - **Quantifier-free projections** [L]: the finest reduction notion (DC uses them
   for almost all completeness results); SAT complete under first-order
   projections.
@@ -189,32 +190,37 @@ X"), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **Collapsing the AC⁰ machine sandwich** [R]: the model is **built**
+- **Making the AC⁰ machine model complete** [L–R]: the model is **built**
   (`LogTime.lean`: alternating machines whose registers are `log n`-bit
   addresses filled by the two players, and whose deterministic base is a Boolean
-  combination of input queries and of *sweeps* – single passes over the bit
-  positions by a finite automaton), and so are **both fences** of
-  `FO(≤, +, BIT)`-prenex ⊆ `LTDecidable` ⊆ AC⁰ ⊆ LOGSPACE: the upper one by
-  guessing each sweep's history as a constant number of bit vectors, one element
-  apiece, the lower one by compiling a prenex bit-level logic atom by atom
-  (`BitDefinable.ltDecidable`). What is missing is the *collapse*, and the build
-  revised its price sharply upwards. A sweep
-  passes a constant number of bits across each position, so a constant number of
-  sweeps cannot multiply – the schoolbook product of two `log n`-bit numbers
-  accumulates a column count that grows with the positions. Widening the base
-  does not help by itself: a machine that revisits its positions unboundedly
-  often (one that *counts*) leaves the `O(log n)`-bit trace budget the
-  simulation lives on, so the two halves cannot both be had with a naive base,
-  and closing the sandwich needs `×` from `BIT` – the hard half of Immerman's
-  mutual definability, cf. §3 – plus a prenex normal form for `BoundedFormula`,
-  which the lower fence currently sidesteps with a bespoke prenex syntax. The
-  first is a genuine formalization project, not an engineering task. Whoever takes it up should first decide what the
-  intended class *is*: the sweep model as built, a bounded-reversal refinement,
-  or the full `Σₖ-TIME(log n)` with a counting base. The **circuit** route stays
-  [R] and should be taken only if uniform circuit families are wanted for their
-  own sake. Note what neither half discharges: the structures-vs-strings bridge
-  of §7 and of the README's *Scope* is about string encodings, and no bridge
-  inside this framework closes it.
+  combination of input queries, of *reads* – one register's bit at the index in
+  another – and of *sweeps*, single passes over the bit positions by a finite
+  automaton), and so is its **characterization**: `LTDecidable` is *exactly*
+  prenex `FO(≤, +, BIT)`, hence `FO(≤, BIT)`, the addition being derived
+  (`ltDecidable_iff_bitDefinable`, `bitDef_plus_free`). The upper fence guesses
+  each sweep's history as a constant number of bit vectors, one element apiece;
+  the lower one compiles the logic atom by atom.
+
+  The model sits inside **LOGSPACE** outright (`LTDecidable.mem_LOGSPACE`): the
+  bit logic is evaluated by a deterministic multi-head automaton whose bit atom
+  is a halving loop (`HeadBit.lean`, `HeadEvalBit.lean`). What is missing is the
+  identification of that logic with `FO(≤, +, ×)`, that is, with `AC0Definable` –
+  a statement about two vocabularies, with no machine in it, and classically
+  Immerman's Thm 1.17. Its two halves are named in the library and neither is
+  built: `PowArithDef` (the graph of `i ↦ 2 ^ i`, which the AC⁰ readings take as
+  a hypothesis) and the Bit Sum Lemma.
+
+  Two things not to re-litigate. The base must **not** be widened to multiply: a
+  machine that revisits its positions unboundedly often leaves the `O(log n)`-bit
+  trace budget the simulation lives on, so the counting belongs in a formula.
+  And bit positions must **not** be renamed by their place values, however
+  tempting it is that this would make the bit atom first-order in `FO(≤, +, ×)`
+  for free: that logic is capped by finite automata and provably does not contain
+  AC⁰ (`AC0.md` §4, a theorem worth building for its own sake). The **circuit**
+  route stays [R] and should be taken only if uniform circuit families are wanted
+  for their own sake. Note what none of this discharges: the
+  structures-vs-strings bridge of §7 and of the README's *Scope* is about string
+  encodings, and no bridge inside this framework closes it.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
 
