@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Wide.Defs
 import DescriptiveComplexity.Problems.Wide.Expansion
 import DescriptiveComplexity.Problems.Wide.WellFormed
+import DescriptiveComplexity.Problems.Wide.Increment
+import DescriptiveComplexity.Problems.Wide.Blocks
+import DescriptiveComplexity.Problems.Wide.Sweep
+import DescriptiveComplexity.Problems.Wide.Fold
+import DescriptiveComplexity.Problems.Wide.Step
 import DescriptiveComplexity.Problems.Wide.Membership
 
 /-!
@@ -52,14 +57,53 @@ composition that exists.
 
 **Proved**: the three problems are iso-invariant problems of the catalog, their
 promises reduce to three first-order conditions on the instance
-(`DescriptiveComplexity.wideData_wellFormed_iff`), and all three are *members*
-of their class – the first natural members NEXPTIME and EXPSPACE have.
+(`DescriptiveComplexity.wideData_wellFormed_iff`), all three are *members* of
+their class – the first natural members NEXPTIME and EXPSPACE have – and the
+machine's three head primitives are identified
+(`DescriptiveComplexity.Problems.Wide.Increment`): the head starts on the empty
+address, the last cell is the full one, and one step is the **binary
+increment**. That last one is what a hardness reduction will build on, since a
+head cannot read the digits of its own address and must instead maintain a mirror
+of it by incrementing. `DescriptiveComplexity.Problems.Wide.Blocks` then reads an
+address **block by block**, which is how a reduction will lay one out – one block
+per variable of the kernel, one for scratch – and proves the two facts the layout
+turns on: the address order is lexicographic on the blocks
+(`DescriptiveComplexity.wmSetLt_lexRel_iff`), so addresses sharing a prefix of
+blocks are consecutive, and the increment carries block by block
+(`DescriptiveComplexity.wmIncr_lexRel_iff`), which is the roll-over information a
+sweep folds by. `DescriptiveComplexity.Problems.Wide.Sweep` closes the layer with
+the primitive a program cites instead of reasoning about runs: **a machine that
+steps at every increment of its address runs from the empty address to any
+address, within its clock**
+(`DescriptiveComplexity.stepsIn_of_wideSweep`,
+`DescriptiveComplexity.accepts_of_wideSweep`), together with the initial
+configuration a reduction starts from – a start state, the head on the empty
+address, every cell blank (`DescriptiveComplexity.isInit_wide`). Both promises a
+reduction owes are reduced to first-order conditions on the instance –
+well-formedness by `DescriptiveComplexity.wideData_wellFormed_iff` and determinism
+by `DescriptiveComplexity.wideData_deterministic_iff`, the latter being what lets
+the deterministic side of EXPSPACE be proved hard and the nondeterministic one
+inherit it. Finally `DescriptiveComplexity.Problems.Wide.Fold` supplies the
+machine-free half of a sweep, and the reason a *nondeterministic* machine can
+evaluate a first-order kernel at all: an alternating quantifier prefix
+(`DescriptiveComplexity.altQuantFrom`) is the **fold of its matrix along the
+lexicographic enumeration of its valuations**, so `k` accumulator bits in the
+control and one matrix evaluation per step suffice
+(`DescriptiveComplexity.foldFrom_bot`, `DescriptiveComplexity.foldFrom_top`,
+`DescriptiveComplexity.foldFrom_above`, `DescriptiveComplexity.foldFrom_carry`,
+`DescriptiveComplexity.foldFrom_below`), and
+`DescriptiveComplexity.Problems.Wide.Step` packages the eight obligations of a
+single machine step into one right-moving (or left-moving) move and, on top of
+them, the shape a one-pass program has:
+`DescriptiveComplexity.accepts_of_rightSweep` – give a state and a tape per
+address, check one transition per increment, start blank on the empty address,
+end accepting.
 
 **Not proved**: hardness. Completeness for these two classes needs the machine
 written in logic, as `DescriptiveComplexity.ATMAcceptSpace` needed for EXPTIME:
 a reduction cannot be routed through the outer composition of an interpretation
 with an expansion, which does not exist in general. The plan is `EXPONENTIAL.md`
-§6.4.4: a shared evaluator for a fixed first-order kernel whose quantifiers range
-over addresses, then a nondeterministic sweep for NEXPTIME and a partial-fixpoint
-loop for EXPSPACE.
+§6.4.4: one monotone sweep of the tape that folds a fixed prenex kernel, the
+valuation being the head position with a mirror kept in scratch, then a
+partial-fixpoint loop on top of it for EXPSPACE.
 -/

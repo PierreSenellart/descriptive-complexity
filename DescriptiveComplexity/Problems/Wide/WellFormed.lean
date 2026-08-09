@@ -20,6 +20,11 @@ when
 * its input is functional, and
 * it has exactly one blank symbol.
 
+The same holds of the determinism promise
+(`DescriptiveComplexity.wideData_deterministic_iff`), which is what lets the
+deterministic side of EXPSPACE be proved hard and the nondeterministic one
+inherit it.
+
 Nothing is asked of the addresses, which is the point: the binary-number order a
 linear order induces on the subsets of a finite set is linear
 (`DescriptiveComplexity.isLinOrd_wmSetLe`), and it is inherited from
@@ -75,6 +80,57 @@ theorem card_wpPosn [Finite A] :
   refine Nat.card_eq_two_iff.mpr ⟨True, False, by simp, Set.eq_univ_of_forall fun p => ?_⟩
   by_cases h : p <;> simp [h, eq_true, eq_false]
 
+/-- **Determinism of a wide-machine instance**: one start state, at most one
+transition per state and symbol read, and functional destination and written
+symbol. Every conjunct is first-order over the instance, exactly as for
+`DescriptiveComplexity.TMData.Deterministic` itself. -/
+def WideDet (A : Type) [Language.wide.Structure A] : Prop :=
+  (∀ q q' : A, WMStart q → WMStart q' → q = q') ∧
+    (∀ τ τ' q a : A, WMTr τ → WMTr τ' → WMSrc τ q → WMSrc τ' q → WMRead τ a →
+      WMRead τ' a → τ = τ') ∧
+    (∀ τ q q' : A, WMDst τ q → WMDst τ q' → q = q') ∧
+    ∀ τ a a' : A, WMWrite τ a → WMWrite τ a' → a = a'
+
+/-- **A wide machine is deterministic exactly when its instance is.** The
+addresses contribute nothing – no address is a state, a symbol or a transition –
+so the promise `DescriptiveComplexity.DWideAcceptSpace` folds in is again a
+first-order condition about the instance, which is what lets the deterministic
+side be proved hard and the nondeterministic one inherit it. -/
+theorem wideData_deterministic_iff : (wideData A).Deterministic ↔ WideDet A := by
+  constructor
+  · rintro ⟨hstart, huniq, hdst, hwrite⟩
+    refine ⟨fun q q' hq hq' => Sum.inr_injective (hstart (Sum.inr q) (Sum.inr q') hq hq'),
+      fun τ τ' q a h1 h2 h3 h4 h5 h6 => Sum.inr_injective
+        (huniq (Sum.inr τ) (Sum.inr τ') (Sum.inr q) (Sum.inr a) h1 h2 h3 h4 h5 h6),
+      fun τ q q' h1 h2 => Sum.inr_injective (hdst (Sum.inr τ) (Sum.inr q) (Sum.inr q') h1 h2),
+      fun τ a a' h1 h2 => Sum.inr_injective (hwrite (Sum.inr τ) (Sum.inr a) (Sum.inr a') h1 h2)⟩
+  · rintro ⟨hstart, huniq, hdst, hwrite⟩
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · rintro (s | q) (t | q') h1 h2 <;>
+        first
+          | exact False.elim h1
+          | exact False.elim h2
+          | exact congrArg Sum.inr (hstart q q' h1 h2)
+    · rintro (s | τ) (s' | τ') (t | q) (t' | a) h1 h2 h3 h4 h5 h6 <;>
+        first
+          | exact False.elim h1
+          | exact False.elim h2
+          | exact False.elim h3
+          | exact False.elim h4
+          | exact False.elim h5
+          | exact False.elim h6
+          | exact congrArg Sum.inr (huniq τ τ' q a h1 h2 h3 h4 h5 h6)
+    · rintro (s | τ) (t | q) (t' | q') h1 h2 <;>
+        first
+          | exact False.elim h1
+          | exact False.elim h2
+          | exact congrArg Sum.inr (hdst τ q q' h1 h2)
+    · rintro (s | τ) (t | a) (t' | a') h1 h2 <;>
+        first
+          | exact False.elim h1
+          | exact False.elim h2
+          | exact congrArg Sum.inr (hwrite τ a a' h1 h2)
+
 /-- Two elements cutting the same initial segment are equal. -/
 theorem eq_of_wmDown (h : IsLinOrd (WMLe (A := A))) {s : A → Prop} {x y : A}
     (hx : WMDown WMLe s x) (hy : WMDown WMLe s y) : x = y := by
@@ -83,15 +139,15 @@ theorem eq_of_wmDown (h : IsLinOrd (WMLe (A := A))) {s : A → Prop} {x y : A}
 /-- **The binary-number order on addresses is a linear order**, inherited from
 `DescriptiveComplexity.setLinearOrder`: the comparison is the same, so
 `DescriptiveComplexity.isLinOrd_of_key` at the identity key transports the
-axioms. -/
-theorem isLinOrd_wmSetLe [Finite A] (h : IsLinOrd (WMLe (A := A))) :
-    IsLinOrd (WMSetLe (WMLe (A := A))) := by
+axioms. Stated at an arbitrary order relation, since everything the address
+layer says is independent of where the order comes from. -/
+theorem isLinOrd_wmSetLe {α : Type} [Finite α] {Le : α → α → Prop} (h : IsLinOrd Le) :
+    IsLinOrd (WMSetLe Le) := by
   letI := h.toLinearOrder
-  have hkey : ∀ s t : A → Prop,
-      WMSetLe (WMLe (A := A)) s t ↔ (setLinearOrder A).le s t := by
+  have hkey : ∀ s t : α → Prop, WMSetLe Le s t ↔ (setLinearOrder α).le s t := by
     intro s t
-    rw [show ((setLinearOrder A).le s t ↔ _) from
-      @le_iff_lt_or_eq _ (setLinearOrder A).toPartialOrder s t, setLinearOrder_lt_iff,
+    rw [show ((setLinearOrder α).le s t ↔ _) from
+      @le_iff_lt_or_eq _ (setLinearOrder α).toPartialOrder s t, setLinearOrder_lt_iff,
       WMSetLe]
     constructor
     · rintro (hag | ⟨x, hb, hs, ht⟩)
@@ -100,9 +156,9 @@ theorem isLinOrd_wmSetLe [Finite A] (h : IsLinOrd (WMLe (A := A))) :
     · rintro (⟨x, hb, hs, ht⟩ | rfl)
       · exact Or.inr ⟨x, fun j hj => hb j hj, hs, ht⟩
       · exact Or.inl fun _ => Iff.rfl
-  have hK : IsLinOrd (setLinearOrder A).le :=
-    ⟨fun a => (setLinearOrder A).le_refl a, fun a b c => (setLinearOrder A).le_trans a b c,
-      fun a b => (setLinearOrder A).le_antisymm a b, fun a b => (setLinearOrder A).le_total a b⟩
+  have hK : IsLinOrd (setLinearOrder α).le :=
+    ⟨fun a => (setLinearOrder α).le_refl a, fun a b c => (setLinearOrder α).le_trans a b c,
+      fun a b => (setLinearOrder α).le_antisymm a b, fun a b => (setLinearOrder α).le_total a b⟩
   exact isLinOrd_of_key hK id Function.injective_id hkey
 
 /-- **The order of a wide machine is linear** as soon as the instance's is: the
