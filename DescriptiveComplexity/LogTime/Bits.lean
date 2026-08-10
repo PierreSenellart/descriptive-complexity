@@ -41,8 +41,9 @@ existential: `BitIx i x` is `BitAt p x` at the `p` of rank `2 ^ i`. What that
 existential costs is the *definability of the graph of* `i ↦ 2 ^ i`
 (`DescriptiveComplexity.PowArithDef`) – [Immerman 1999][immerman1999descriptive]
 Thm 1.17(2), and the single lemma on which the translation of the machine's
-logic into `FO(≤, +, ×)` waits. It is carried as a hypothesis rather than
-assumed: see `DescriptiveComplexity.LogTime`.
+logic into `FO(≤, +, ×)` rests. It is a named statement rather than an
+assumption, and it is proved: `DescriptiveComplexity.powArithDef`
+(`LogTime/Pow.lean`); see `DescriptiveComplexity.LogTime`.
 
 The number of positions is `Nat.clog 2 (Nat.card A)`
 (`DescriptiveComplexity.posCount`), and the ranks are exactly the numbers whose
@@ -284,6 +285,33 @@ theorem exists_orank_testBit [Nonempty A] (b : ℕ → Bool) :
       lt_trans (bitsVal_lt b _) hbound
     obtain ⟨t, ht⟩ := exists_orank_eq (A := A) hlt
     exact ⟨t, fun i hi => by rw [ht]; exact testBit_bitsVal b _ (by omega)⟩
+
+/-- **The same, with the top positions pinned to zero**: the element a bit
+vector names carries *no* bit at the top position, which is what a construction
+needs when it also has to say that nothing outside its layout is set. -/
+theorem exists_orank_testBit' [Nonempty A] (b : ℕ → Bool) :
+    ∃ t : A, (∀ i, i + 1 < posCount A → (orank t).testBit i = b i) ∧
+      ∀ i, posCount A ≤ i + 1 → (orank t).testBit i = false := by
+  rcases Nat.eq_zero_or_pos (posCount A) with h0 | hpos
+  · obtain ⟨t⟩ := ‹Nonempty A›
+    have hcard : Nat.card A ≤ 1 := by
+      by_contra hc
+      have : (0 : ℕ) < posCount A := by
+        rw [← two_pow_lt_card_iff_lt_posCount]
+        simpa using by omega
+      omega
+    have h0t : orank t = 0 := by have := orank_lt_card t; omega
+    exact ⟨t, fun i hi => by omega, fun i _ => by rw [h0t]; simp⟩
+  · have hbound : 2 ^ (posCount A - 1) < Nat.card A := by
+      rw [two_pow_lt_card_iff_lt_posCount]
+      omega
+    have hlt : bitsVal b (posCount A - 1) < Nat.card A :=
+      lt_trans (bitsVal_lt b _) hbound
+    obtain ⟨t, ht⟩ := exists_orank_eq (A := A) hlt
+    refine ⟨t, fun i hi => by rw [ht]; exact testBit_bitsVal b _ (by omega), fun i hi => ?_⟩
+    rw [ht]
+    exact Nat.testBit_lt_two_pow
+      (lt_of_lt_of_le (bitsVal_lt b _) (Nat.pow_le_pow_right (by norm_num) (by omega)))
 
 end Positions
 
@@ -588,18 +616,19 @@ The one thing the place-value naming does not hand over. Everything above is a
 formula of `FO(≤, +, ×)` outright; the *index* naming needs, on top of it, the
 graph of `i ↦ 2 ^ i`, and that is a theorem rather than a construction – the
 half of [Immerman 1999][immerman1999descriptive] Thm 1.17 that goes from `+, ×`
-to `BIT` at an exponent. It is carried here as a named hypothesis, so that every
-consequence of it is visible in a type rather than assumed in prose. -/
+to `BIT` at an exponent. It is named here, where its consumers are, and proved
+in `DescriptiveComplexity.LogTime.Pow`, which is where the certificate it is
+proved by can be stated. -/
 
 /-- **The naming bridge**: the graph of `i ↦ 2 ^ i` is a formula of
 `FO(≤, +, ×)`, uniformly in the variable layout.
 
-This is [Immerman 1999][immerman1999descriptive] Thm 1.17(2) – classically true,
-by a packing argument that guesses the doubling chain of `i` – and it is *not*
-proved in this library. Anything that needs to read the machine's logic as an
-AC⁰ definition takes it as a hypothesis: `DescriptiveComplexity.BitDefinable` is
-a logic over the index naming, and only this lemma turns its bit atom back into
-the place-value one. -/
+This is [Immerman 1999][immerman1999descriptive] Thm 1.17(2), and it is proved:
+`DescriptiveComplexity.powArithDef`, by the packing argument that guesses the
+doubling chain of `i`. It is a `def` rather than a plain statement because every
+consumer needs it at its own variable layout;
+`DescriptiveComplexity.BitDefinable` is a logic over the index naming, and this
+is what turns its bit atom back into the place-value one. -/
 def PowArithDef (L : Language.{0, 0}) : Prop :=
   ∀ {α : Type} (i p : α),
     ArithDef (L := L) (α := α) fun _ _ _ _ _ v => orank (v p) = 2 ^ orank (v i)

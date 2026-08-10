@@ -17,8 +17,8 @@ alternating machine with a logarithmic clock – is decided by a deterministic
 multi-head automaton, so it is in LOGSPACE.
 
 This is the fence the index naming cost, restored **without** either half of
-Immerman's mutual definability: nothing here goes through `FO(≤, +, ×)`, and
-`DescriptiveComplexity.PowArithDef` is not assumed.
+Immerman's mutual definability: nothing here goes through `FO(≤, +, ×)`, so this
+route is independent of `DescriptiveComplexity.powArithDef`.
 
 ## Why it is short
 
@@ -479,8 +479,9 @@ theorem BitDefinable.dtcDefinable (h : BitDefinable P) : DTCDefinable P := by
 
 /-- **The bit-level logic is inside LOGSPACE**, and with it the machine model of
 `DescriptiveComplexity.LogTime`. No part of Immerman's mutual definability is
-used: this holds outright, where the route through AC⁰ needs
-`DescriptiveComplexity.PowArithDef`. -/
+used: the route through AC⁰ (`DescriptiveComplexity.powArithDef`, then
+`DescriptiveComplexity.ac0Definable_mem_LOGSPACE`) is a different one, and
+longer. -/
 theorem BitDefinable.mem_LOGSPACE (h : BitDefinable P) : P ∈ LOGSPACE :=
   (mem_LOGSPACE_iff P).mpr h.dtcDefinable
 

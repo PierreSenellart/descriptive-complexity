@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.LogTime.Machine
+import DescriptiveComplexity.LogTime.Pow
 
 /-!
 # The bit-level logic, and definability in it
@@ -48,11 +49,11 @@ so costs one `congr` instead of a fourth prefix lemma.
 sentence, and `DescriptiveComplexity.BitDefinable.ac0Definable` translates the
 whole logic into `FO(≤, +, ×)` atom by atom. Three of the four atoms translate
 outright (`DescriptiveComplexity.arithDef_le`, `_plus`, `_rel`); the bit atom
-needs `DescriptiveComplexity.PowArithDef`, the definability of `i ↦ 2 ^ i`, which
-is carried as a hypothesis and is the one classical theorem this development does
-not prove. The converse direction, that a machine's acceptance is a sentence of
-*this* logic rather than of the arithmetic one, is
-`DescriptiveComplexity.LogTime.Simulate`, and it needs no such hypothesis.
+goes through `DescriptiveComplexity.powArithDef`, the definability of
+`i ↦ 2 ^ i`, which is proved in `DescriptiveComplexity.LogTime.Pow` and so costs
+the statement no hypothesis. The converse direction, that a machine's acceptance
+is a sentence of *this* logic rather than of the arithmetic one, is
+`DescriptiveComplexity.LogTime.Simulate`.
 -/
 
 namespace DescriptiveComplexity
@@ -316,6 +317,21 @@ theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, BitDef 
       fun _ _ _ _ _ _ => ?_
     exact ⟨fun hc j => Fin.cases hc.1 (fun j' => hc.2 j') j, fun hall => ⟨hall 0, fun j => hall _⟩⟩
 
+/-- **A conjunction over any finite index** of the machine. -/
+theorem forallFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, BitDef (R j)) :
+    BitDef (L := L) (α := α) fun A _ _ _ _ v => ∀ j, R j A v := by
+  obtain ⟨m, ⟨e⟩⟩ := Finite.exists_equiv_fin ι
+  refine (forallFin (R := fun j => R (e.symm j)) fun j => h _).congr fun _ _ _ _ _ _ => ?_
+  refine ⟨fun hall j => ?_, fun hall j => hall _⟩
+  have := hall (e j)
+  rwa [Equiv.symm_apply_apply] at this
+
+/-- **A disjunction over any finite index** of the machine, by De Morgan. -/
+theorem existsFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, BitDef (R j)) :
+    BitDef (L := L) (α := α) fun A _ _ _ _ v => ∃ j, R j A v :=
+  (forallFinite (R := fun j A _ _ _ _ v => ¬ R j A v) fun j => (h j).not).not.congr
+    fun _ _ _ _ _ _ => not_forall_not
+
 /-! #### Quantifiers -/
 
 /-- **A quantifier prefix of `m` variables, prepended**. The new block is
@@ -510,23 +526,22 @@ through `DescriptiveComplexity.LTDecidable.ac0Definable` is what lets the
 simulation of a machine land in this logic rather than in the arithmetic one. -/
 
 omit [L.IsRelational] in
-/-- Every bit-level atom is an atom of `FO(≤, +, ×)` – **given the naming
-bridge**, which is what the bit atom needs and the other three do not. -/
-theorem BitAtom.arithDef (hpow : PowArithDef L) (a : BitAtom L γ) :
+/-- Every bit-level atom is an atom of `FO(≤, +, ×)` – the bit atom through the
+naming bridge `DescriptiveComplexity.powArithDef`, the other three outright. -/
+theorem BitAtom.arithDef (a : BitAtom L γ) :
     ArithDef (L := L) (α := γ) fun _ _ _ _ _ v => a.Holds v := by
   cases a with
   | le x y => exact arithDef_le x y
   | plus x y z => exact arithDef_plus x y z
-  | bit i x => exact hpow.arithDef_bitIx i x
+  | bit i x => exact PowArithDef.arithDef_bitIx (powArithDef L) i x
   | rel R arg => exact arithDef_rel R arg
 
 omit [L.IsRelational] in
-/-- Every quantifier-free kernel is a formula of `FO(≤, +, ×)`, given the
-bridge. -/
-theorem BitKernel.arithDef (hpow : PowArithDef L) (k : BitKernel L γ) :
+/-- Every quantifier-free kernel is a formula of `FO(≤, +, ×)`. -/
+theorem BitKernel.arithDef (k : BitKernel L γ) :
     ArithDef (L := L) (α := γ) fun _ _ _ _ _ v => k.Holds v := by
   induction k with
-  | atom a => exact a.arithDef hpow
+  | atom a => exact a.arithDef
   | tt => exact ArithDef.top
   | not k ih => exact ih.not
   | and k k' ih ih' => exact ih.and ih'
@@ -600,18 +615,17 @@ theorem BitDef.bitDefinable {P : DecisionProblem L} {R : ArithRel L Empty}
   · exact e.elim
   · rfl
 
-/-- **The bit-level logic is inside `FO(≤, +, ×)` once the namings are
-bridged**: a `BitSentence` is an AC⁰ definition, proved directly rather than
-through the machine, and the only thing it waits on is
-`DescriptiveComplexity.PowArithDef` – the definability of `i ↦ 2 ^ i`, which is
-[Immerman 1999][immerman1999descriptive] Thm 1.17(2). Everything else in the
-translation is built. -/
-theorem BitDefinable.ac0Definable {P : DecisionProblem L} (h : BitDefinable P)
-    (hpow : PowArithDef L) : AC0Definable P := by
+/-- **The bit-level logic is inside `FO(≤, +, ×)`**: a `BitSentence` is an AC⁰
+definition, proved directly rather than through the machine. Its bit atom is
+translated by `DescriptiveComplexity.powArithDef`, which is
+[Immerman 1999][immerman1999descriptive] Thm 1.17(2); every other atom is a
+formula of the two numeric predicates outright. -/
+theorem BitDefinable.ac0Definable {P : DecisionProblem L} (h : BitDefinable P) :
+    AC0Definable P := by
   obtain ⟨φ, hφ⟩ := h
   refine ArithDef.ac0Definable (R := fun A _ _ _ _ v =>
     prefixHolds φ.vars φ.pol fun w => φ.kernel.Holds fun j => Sum.elim v w (Sum.inr j)) ?_ ?_
-  · exact arithDef_prefixHolds φ.vars φ.pol ((φ.kernel.arithDef hpow).relabel Sum.inr)
+  · exact arithDef_prefixHolds φ.vars φ.pol (φ.kernel.arithDef.relabel Sum.inr)
   · intro A _ _ _ _
     rw [hφ A]
     exact prefixHolds_congr φ.vars φ.pol fun w => Iff.rfl

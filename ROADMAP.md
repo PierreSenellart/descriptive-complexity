@@ -112,22 +112,15 @@ remains below are ordinary catalog reductions and machine bridges.
   (`HeadArith.lean`, `HeadEvalArith.lean`: `plusP` and `timesP` decide the two
   numeric predicates with heads, and `evalArithP` evaluates a sentence over
   them, computing the arithmetic atoms where `HeadEval.evalP` reads its
-  atoms). Two items remain, in this order.
+  atoms), and so is Immerman's Thm 1.17 in both directions (`powArithDef`,
+  `timesBitDef`), which makes `FO(≤, +, ×) = FO(≤, BIT)` and its machine model
+  a theorem. One item remains.
   * **AC⁰ as a `ComplexityClass`** [XL]: closure under `≤ᶠᵒ` needs the numeric
     predicates of an interpreted universe – lex-ordered tagged tuples, hence
     base-`n` digits – defined from those of the base. Addition is
     carry-lookahead; multiplication needs a double-width digit product, which
     needs a half-width (base-`√n`) splitting. Note what it does *not* gate: a
     problem reducing to an AC⁰ problem is already known to be in PTIME.
-  * **What is left of BIT** [M–L]: the predicate itself is **built**, in both
-    of its namings (`LogTime/Bits.lean`: `BitAt` at a place value, `BitIx` at an
-    index), and the machine model of §4 is exactly `FO(≤, BIT)`. What is left is
-    Immerman's mutual definability, both halves of it, and neither is an
-    engineering task: `PowArithDef` – the graph of `i ↦ 2 ^ i` in `FO(≤, +, ×)`,
-    carried as an explicit hypothesis wherever it is needed – and `×` from `BIT`,
-    the Bit Sum Lemma. A `bitP` head fragment slotted into `evalArithP` beside
-    `plusP` and `timesP` is **built** (`HeadBit.lean`), and with its evaluator it
-    puts the machine's logic inside LOGSPACE without either half. Design and prices in `AC0.md`.
 - **Quantifier-free projections** [L]: the finest reduction notion (DC uses them
   for almost all completeness results); SAT complete under first-order
   projections.
@@ -190,37 +183,15 @@ X"), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **Making the AC⁰ machine model complete** [L–R]: the model is **built**
-  (`LogTime.lean`: alternating machines whose registers are `log n`-bit
-  addresses filled by the two players, and whose deterministic base is a Boolean
-  combination of input queries, of *reads* – one register's bit at the index in
-  another – and of *sweeps*, single passes over the bit positions by a finite
-  automaton), and so is its **characterization**: `LTDecidable` is *exactly*
-  prenex `FO(≤, +, BIT)`, hence `FO(≤, BIT)`, the addition being derived
-  (`ltDecidable_iff_bitDefinable`, `bitDef_plus_free`). The upper fence guesses
-  each sweep's history as a constant number of bit vectors, one element apiece;
-  the lower one compiles the logic atom by atom.
-
-  The model sits inside **LOGSPACE** outright (`LTDecidable.mem_LOGSPACE`): the
-  bit logic is evaluated by a deterministic multi-head automaton whose bit atom
-  is a halving loop (`HeadBit.lean`, `HeadEvalBit.lean`). What is missing is the
-  identification of that logic with `FO(≤, +, ×)`, that is, with `AC0Definable` –
-  a statement about two vocabularies, with no machine in it, and classically
-  Immerman's Thm 1.17. Its two halves are named in the library and neither is
-  built: `PowArithDef` (the graph of `i ↦ 2 ^ i`, which the AC⁰ readings take as
-  a hypothesis) and the Bit Sum Lemma.
-
-  Two things not to re-litigate. The base must **not** be widened to multiply: a
-  machine that revisits its positions unboundedly often leaves the `O(log n)`-bit
-  trace budget the simulation lives on, so the counting belongs in a formula.
-  And bit positions must **not** be renamed by their place values, however
-  tempting it is that this would make the bit atom first-order in `FO(≤, +, ×)`
-  for free: that logic is capped by finite automata and provably does not contain
-  AC⁰ (`AC0.md` §4, a theorem worth building for its own sake). The **circuit**
-  route stays [R] and should be taken only if uniform circuit families are wanted
-  for their own sake. Note what none of this discharges: the
-  structures-vs-strings bridge of §7 and of the README's *Scope* is about string
-  encodings, and no bridge inside this framework closes it.
+- **The automaton cap** [L]: the negative result that pinned the AC⁰ machine
+  model's design – with a base of sweeps and a *place-value* bit atom, the
+  model collapses to the 2-automatic cardinality sets, hence cannot decide
+  whether the universe has a prime number of elements – as a theorem, worth
+  building for its own sake; design and prices in `AC0.md` §4. The **circuit**
+  route to AC⁰ stays [R] and should be taken only if uniform circuit families
+  are wanted for their own sake. Note what neither discharges: the
+  structures-vs-strings bridge of §7 and of the README's *Scope* is about
+  string encodings, and no bridge inside this framework closes it.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
 

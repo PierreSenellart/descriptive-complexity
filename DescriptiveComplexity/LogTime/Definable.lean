@@ -170,6 +170,23 @@ theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, ArithDe
       fun _A _ _ _ _ _v => ?_
     exact ⟨fun hc j => Fin.cases hc.1 (fun j' => hc.2 j') j, fun hall => ⟨hall 0, fun j => hall _⟩⟩
 
+/-- **A conjunction over a finite index** of the *machine*, not of the instance:
+the index type is any finite type, and the conjunction is unfolded rather than
+quantified. -/
+theorem forallFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, ArithDef (R j)) :
+    ArithDef (L := L) (α := α) (fun A _ _ _ _ v => ∀ j, R j A v) := by
+  obtain ⟨m, ⟨e⟩⟩ := Finite.exists_equiv_fin ι
+  refine (forallFin (R := fun j => R (e.symm j)) fun j => h _).congr fun A _ _ _ _ v => ?_
+  refine ⟨fun hall j => ?_, fun hall j => hall _⟩
+  have := hall (e j)
+  rwa [Equiv.symm_apply_apply] at this
+
+/-- **A disjunction over a finite index** of the machine, by De Morgan. -/
+theorem existsFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, ArithDef (R j)) :
+    ArithDef (L := L) (α := α) (fun A _ _ _ _ v => ∃ j, R j A v) :=
+  (forallFinite (R := fun j A _ _ _ _ v => ¬ R j A v) fun j => (h j).not).not.congr
+    fun _A _ _ _ _ _v => not_forall_not
+
 /-- A truth value fixed outside the structure is definable. -/
 theorem prop (c : Prop) : ArithDef (L := L) (α := α) (fun _ _ _ _ _ _ => c) := by
   by_cases hc : c

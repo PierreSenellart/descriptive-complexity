@@ -54,13 +54,13 @@ state after the top position is therefore carried by `σ` further elements used
 as *flags*, one bit each, read as “nonzero rank”. Everything else in the
 construction is uniform.
 
-## Why this direction needs no hypothesis
+## Two statements, one construction
 
-Landing in `FO(≤, +, BIT)` is unconditional; landing in `FO(≤, +, ×)` is not,
-and the difference is one lemma – `DescriptiveComplexity.PowArithDef`, the
-definability of `i ↦ 2 ^ i`. That is why the statement of record here is
-`DescriptiveComplexity.LTDecidable.bitDefinable` and the AC⁰ reading takes the
-bridge as an argument.
+Landing in `FO(≤, +, BIT)` is what the construction below does; landing in
+`FO(≤, +, ×)` is that plus one lemma – `DescriptiveComplexity.powArithDef`, the
+definability of `i ↦ 2 ^ i`. Both are unconditional, and the statement of record
+here is the first, `DescriptiveComplexity.LTDecidable.bitDefinable`: it is the
+classical logic for AC⁰, and it is what the converse direction reads.
 -/
 
 namespace DescriptiveComplexity
@@ -421,12 +421,12 @@ theorem LTDecidable.bitDefinable {P : DecisionProblem L} (h : LTDecidable P) :
   · intro A _ _ _ _
     rw [hM A, LTMachine.Accepts]
 
-/-- **The machine model is inside AC⁰, given the naming bridge**: a corollary of
-the statement above and of the translation of the bit-level logic into
-`FO(≤, +, ×)`, which needs `DescriptiveComplexity.PowArithDef` for its bit atom
-and nothing else. -/
-theorem LTDecidable.ac0Definable {P : DecisionProblem L} (h : LTDecidable P)
-    (hpow : PowArithDef L) : AC0Definable P :=
-  h.bitDefinable.ac0Definable hpow
+/-- **The machine model is inside AC⁰**: a corollary of the statement above and
+of the translation of the bit-level logic into `FO(≤, +, ×)`, whose bit atom is
+`DescriptiveComplexity.powArithDef` and whose other atoms are numeric predicates
+outright. -/
+theorem LTDecidable.ac0Definable {P : DecisionProblem L} (h : LTDecidable P) :
+    AC0Definable P :=
+  h.bitDefinable.ac0Definable
 
 end DescriptiveComplexity

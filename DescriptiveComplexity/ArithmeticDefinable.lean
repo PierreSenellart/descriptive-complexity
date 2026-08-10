@@ -125,4 +125,47 @@ theorem AC0Definable.compl {P : DecisionProblem L} (h : AC0Definable P) :
   intro A _ _ _ _
   exact not_congr (hφ A)
 
+/-! ### Terms of a relational language
+
+Every vocabulary in this library is relational, and so is
+`FirstOrder.Language.arith`: a term is a variable and nothing else. Two
+consumers need to say so – the evaluator of an arithmetic formula
+(`DescriptiveComplexity.HeadEvalArith`) and the translation of one into the bit
+logic – so it is said here, below both. -/
+
+/-! ### Terms of a relational language -/
+
+section RelTerm
+
+variable {L L' : Language.{0, 0}} [L.IsRelational] {β : Type}
+
+/-- **The variable a term of a relational vocabulary is**: with no function
+symbols, a term is nothing else. -/
+def relVar : L.Term β → β
+  | .var v => v
+  | .func f _ => isEmptyElim f
+
+/-- A term of a relational vocabulary, read as a term of another vocabulary: the
+identity on variables, and there is nothing else. -/
+def relTerm : L.Term β → L'.Term β
+  | .var v => .var v
+  | .func f _ => isEmptyElim f
+
+variable {A : Type} [L.Structure A]
+
+@[simp]
+theorem realize_relVar (v : β → A) (t : L.Term β) : t.realize v = v (relVar t) := by
+  cases t with
+  | var w => rfl
+  | func f _ => exact isEmptyElim f
+
+@[simp]
+theorem realize_relTerm [L'.Structure A] (v : β → A) (t : L.Term β) :
+    (relTerm (L' := L') t).realize v = t.realize v := by
+  cases t with
+  | var w => rfl
+  | func f _ => exact isEmptyElim f
+
+end RelTerm
+
 end DescriptiveComplexity

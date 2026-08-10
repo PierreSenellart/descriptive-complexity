@@ -5,6 +5,19 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.LogTime.Arith
 import DescriptiveComplexity.LogTime.Fields
+import DescriptiveComplexity.LogTime.Pow
+import DescriptiveComplexity.LogTime.Small
+import DescriptiveComplexity.LogTime.Translate
+import DescriptiveComplexity.LogTime.BitSum.Sizes
+import DescriptiveComplexity.LogTime.BitSum.Blocks
+import DescriptiveComplexity.LogTime.BitSum.Counter
+import DescriptiveComplexity.LogTime.BitSum.Ones
+import DescriptiveComplexity.LogTime.BitSum.Table
+import DescriptiveComplexity.LogTime.BitSum.Sum
+import DescriptiveComplexity.LogTime.BitSum.Level2
+import DescriptiveComplexity.LogTime.BitSum.Level1
+import DescriptiveComplexity.LogTime.BitSum.Columns
+import DescriptiveComplexity.LogTime.BitSum.Times
 import DescriptiveComplexity.LogTime.Compile
 import DescriptiveComplexity.LogTime.Simulate
 import DescriptiveComplexity.HeadEvalArith
@@ -19,7 +32,9 @@ its nondeterministic one, `PTIME` its program. AC⁰ had nothing. This module
 gives it a machine, in the shape the classical theory prescribes for the
 logarithmic-time hierarchy (Sipser 1983; [Barrington, Immerman & Straubing
 1990][barrington1990uniformity]), and proves it equal to a logic – to
-`FO(≤, BIT)`, which is the classical logic for AC⁰.
+`FO(≤, BIT)`, which is the classical logic for AC⁰ – and, through both halves
+of Immerman's Thm 1.17, to `DescriptiveComplexity.AC0Definable` itself: the
+machine model **is** AC⁰.
 
 ## The model
 
@@ -97,7 +112,8 @@ worth keeping:
 
 Reading a bit at a *guessed index* is exactly what escapes that: it is not a
 regular relation of the tracks, and it is what a random-access machine does. The
-price is paid on the other side, in `DescriptiveComplexity.PowArithDef`.
+price is paid on the other side, in `DescriptiveComplexity.powArithDef`, and it
+is paid in full.
 
 ## Where it lands, and what is not proved
 
@@ -111,20 +127,31 @@ and the input atoms read as guards, the addition and the bit *computed* by
 `DescriptiveComplexity.HeadProgram.bitP`. No part of Immerman's mutual
 definability is used on this route.
 
-What is **not** proved is that the logic of this module *is*
-`DescriptiveComplexity.AC0Definable`, i.e. `FO(≤, +, BIT) = FO(≤, +, ×)`. That is
-a statement about two vocabularies, not about the machine, and it is [Immerman
-1999][immerman1999descriptive] Thm 1.17, whose two halves are named here and
-neither built:
+**`LTDecidable = AC⁰`, outright**
+(`DescriptiveComplexity.ac0Definable_iff_ltDecidable`): the logic of this
+module *equals* `DescriptiveComplexity.AC0Definable` – `FO(≤, +, BIT)` equals
+`FO(≤, +, ×)`, which is the whole of [Immerman
+1999][immerman1999descriptive] Thm 1.17, a statement about two vocabularies and
+not about the machine:
 
-* **`⊆`** is `DescriptiveComplexity.PowArithDef`, the definability of `i ↦ 2 ^ i`
-  in `FO(≤, +, ×)` (Thm 1.17(2), a packing argument on the doubling chain of
-  `i`). Everything else in that translation is built, so the AC⁰ reading
-  (`DescriptiveComplexity.BitDefinable.ac0Definable`) takes it as a hypothesis.
-* **`⊇`** is the Bit Sum Lemma (Thm 1.17(1)): counting the ones of a `log n`-bit
-  word by guessing packed running sums, which eliminates `×` in favour of the bit
-  atom. The counting it needs is in a *formula*, not in a machine; the base never
-  has to multiply.
+* **`⊆`** is `DescriptiveComplexity.powArithDef`, the definability of `i ↦ 2 ^ i`
+  in `FO(≤, +, ×)` (Thm 1.17(2)), proved in `DescriptiveComplexity.LogTime.Pow`
+  by a packing argument on the doubling chain of `i`: two guessed elements, the
+  chain below the top and its exponents packed into the fields the chain
+  delimits.
+* **`⊇`** is `DescriptiveComplexity.AC0Definable.ltDecidable`:
+  `DescriptiveComplexity.LogTime.Translate` translates a whole `FO(≤, +, ×)`
+  formula atom by atom, and the one atom the bit logic does not have as a
+  primitive – `DescriptiveComplexity.TimesBitDef`, the bit-definability of
+  `orank x * orank y = orank z` – is Thm 1.17(1) whole, proved in
+  `DescriptiveComplexity.LogTime.BitSum`: the **Bit Sum Lemma**
+  (`DescriptiveComplexity.BitSum.PopAll`, three nested packings of running
+  sums, based on a guessed table indexed by the value of a doubly logarithmic
+  word) and, over it, the schoolbook columns of the product, each block of
+  columns added by a **guessed carry chain** packed into one element
+  (`DescriptiveComplexity.BitSum.RangeSum`,
+  `DescriptiveComplexity.BitSum.timesCert_iff`). The counting is in a
+  *formula*, not in a machine; the base never has to multiply.
 
 The bridge does not touch the structures-versus-strings gap either: like
 `DescriptiveComplexity.mem_LOGSPACE_iff_automaton`, it relates a logic and a
@@ -139,6 +166,10 @@ namespace DescriptiveComplexity
 `DescriptiveComplexity.LTDecidable.mem_LOGSPACE`
 (`DescriptiveComplexity.HeadEvalBit`) and
 `DescriptiveComplexity.BitDefinable.ac0Definable`
-(`DescriptiveComplexity.LogTime.BitLogic`). -/
+(`DescriptiveComplexity.LogTime.BitLogic`), with the naming bridge
+`DescriptiveComplexity.powArithDef` (`DescriptiveComplexity.LogTime.Pow`) and
+the converse translation
+`DescriptiveComplexity.ac0Definable_iff_ltDecidable`
+(`DescriptiveComplexity.LogTime.Translate`). -/
 
 end DescriptiveComplexity

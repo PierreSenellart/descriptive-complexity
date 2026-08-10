@@ -64,17 +64,17 @@ prenexify, because the source syntax is prenex by construction.
 
 ## What is closed, and what is not
 
-The equality with the logic is closed on both sides. What is *not* proved here
-is the identification of that logic with `FO(≤, +, ×)`, that is, with
-`DescriptiveComplexity.AC0Definable`. Classically the two are the same logic
-([Immerman 1999][immerman1999descriptive], Thm 1.17); here each direction is one
-named theorem and neither is built:
+The equality with the logic is closed on both sides. The identification of that
+logic with `FO(≤, +, ×)`, that is, with `DescriptiveComplexity.AC0Definable`, is
+[Immerman 1999][immerman1999descriptive] Thm 1.17, one named theorem per
+direction:
 
-* `FO(≤, +, BIT) ⊆ FO(≤, +, ×)` is `DescriptiveComplexity.PowArithDef`, the
-  definability of `i ↦ 2 ^ i`, which
-  `DescriptiveComplexity.BitDefinable.ac0Definable` takes as a hypothesis;
+* `FO(≤, +, BIT) ⊆ FO(≤, +, ×)` is `DescriptiveComplexity.powArithDef`, the
+  definability of `i ↦ 2 ^ i`, which is **proved**
+  (`DescriptiveComplexity.LogTime.Pow`), so
+  `DescriptiveComplexity.BitDefinable.ac0Definable` is unconditional;
 * `FO(≤, +, ×) ⊆ FO(≤, +, BIT)` is the Bit Sum Lemma, the counting argument that
-  eliminates `×` in favour of the bit atom.
+  eliminates `×` in favour of the bit atom, and it is **not** built.
 
 Neither is a defect of the machine: they are statements about two vocabularies,
 and the machine is exactly the one of them that a machine can be.

@@ -31,7 +31,9 @@ So this is `evalP` with one case split four ways
 * an atom of the input vocabulary, and an atom of `≤`, stay **guards**, their
   terms carried across the two languages by
   `DescriptiveComplexity.relTerm` (both languages being relational, a term is a
-  variable, so the map is the identity on variables);
+  variable, so the map is the identity on variables; the three declarations live
+  in `DescriptiveComplexity.ArithmeticDefinable`, low enough for the translation
+  into the bit logic to share them);
 * a `plus` atom becomes the **program** `DescriptiveComplexity.HeadProgram.plusP`
   on the three heads its arguments live in, and a `times` atom becomes
   `DescriptiveComplexity.HeadProgram.timesP` – the two deciders of
@@ -75,41 +77,6 @@ namespace DescriptiveComplexity
 open FirstOrder
 
 open Language Structure
-
-/-! ### Terms of a relational language -/
-
-section RelTerm
-
-variable {L L' : Language.{0, 0}} [L.IsRelational] {β : Type}
-
-/-- **The variable a term of a relational vocabulary is**: with no function
-symbols, a term is nothing else. -/
-def relVar : L.Term β → β
-  | .var v => v
-  | .func f _ => isEmptyElim f
-
-/-- A term of a relational vocabulary, read as a term of another vocabulary: the
-identity on variables, and there is nothing else. -/
-def relTerm : L.Term β → L'.Term β
-  | .var v => .var v
-  | .func f _ => isEmptyElim f
-
-variable {A : Type} [L.Structure A]
-
-@[simp]
-theorem realize_relVar (v : β → A) (t : L.Term β) : t.realize v = v (relVar t) := by
-  cases t with
-  | var w => rfl
-  | func f _ => exact isEmptyElim f
-
-@[simp]
-theorem realize_relTerm [L'.Structure A] (v : β → A) (t : L.Term β) :
-    (relTerm (L' := L') t).realize v = t.realize v := by
-  cases t with
-  | var w => rfl
-  | func f _ => exact isEmptyElim f
-
-end RelTerm
 
 namespace HeadProgram
 

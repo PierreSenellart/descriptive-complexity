@@ -90,6 +90,19 @@ import DescriptiveComplexity.ArithmeticFixedPoint
 import DescriptiveComplexity.LogTime.Definable
 import DescriptiveComplexity.LogTime.Bits
 import DescriptiveComplexity.LogTime.Fields
+import DescriptiveComplexity.LogTime.Pow
+import DescriptiveComplexity.LogTime.Small
+import DescriptiveComplexity.LogTime.Translate
+import DescriptiveComplexity.LogTime.BitSum.Sizes
+import DescriptiveComplexity.LogTime.BitSum.Blocks
+import DescriptiveComplexity.LogTime.BitSum.Counter
+import DescriptiveComplexity.LogTime.BitSum.Ones
+import DescriptiveComplexity.LogTime.BitSum.Table
+import DescriptiveComplexity.LogTime.BitSum.Sum
+import DescriptiveComplexity.LogTime.BitSum.Level2
+import DescriptiveComplexity.LogTime.BitSum.Level1
+import DescriptiveComplexity.LogTime.BitSum.Columns
+import DescriptiveComplexity.LogTime.BitSum.Times
 import DescriptiveComplexity.LogTime.Machine
 import DescriptiveComplexity.LogTime.BitLogic
 import DescriptiveComplexity.LogTime.Simulate
@@ -880,9 +893,10 @@ The bottom of the ordered world, and the only vocabulary here that is a
   expansion deciding the problem on every finite ordered instance. Classically
   this is `FO(≤, +, ×) = FO(≤, BIT)` and (DLOGTIME-)uniform AC⁰ ([Immerman
   1999][immerman1999descriptive], Thm 1.17; [Barrington, Immerman & Straubing
-  1990][barrington1990uniformity]); no circuit model is introduced, so
-  that identification is a bridge this library does not (yet) build – unlike the
-  machine bridges of the classes above, which are theorems here. `+` and `×`
+  1990][barrington1990uniformity]); the vocabulary identification
+  `FO(≤, +, ×) = FO(≤, BIT)` – both halves of Thm 1.17 – **is a theorem here**
+  (`DescriptiveComplexity.ac0Definable_iff_ltDecidable`, below), while the
+  circuit reading stays classical, no circuit model being introduced. `+` and `×`
   are primitive rather than `BIT` because it is *they* whose interpreted-universe
   analogue is schoolbook arithmetic on base-`n` digits, where `BIT`'s is base
   conversion. Two features distinguish this notion from every other definability
@@ -977,15 +991,41 @@ The bottom of the ordered world, and the only vocabulary here that is a
   the `log n` positions, so its whole history is a constant number of *bit
   vectors over the positions*, and such a vector **is** an element of the
   universe – the sentence guesses those elements and pins them with the
-  transition, determinism making the guess unique. What the model does **not**
-  come with is the identification of that logic with `FO(≤, +, ×)`, i.e. with
-  `DescriptiveComplexity.AC0Definable`: classically the two are the same
-  ([Immerman 1999][immerman1999descriptive], Thm 1.17), and here each half is
-  named and neither built – `DescriptiveComplexity.PowArithDef`, the definability
-  of `i ↦ 2 ^ i`, which `DescriptiveComplexity.BitDefinable.ac0Definable` takes as
-  a hypothesis, and the Bit Sum Lemma the other way. That is a statement about
-  two vocabularies, not a defect of the machine – and it is not what places the
-  model: `DescriptiveComplexity.LTDecidable.mem_LOGSPACE` puts it inside LOGSPACE
+  transition, determinism making the guess unique. The identification of that
+  logic with `FO(≤, +, ×)`, i.e. with `DescriptiveComplexity.AC0Definable`, is
+  Immerman's Thm 1.17 and is an **equality here too**
+  (`DescriptiveComplexity.ac0Definable_iff_ltDecidable`): **the machine model is
+  exactly AC⁰**. One half is `DescriptiveComplexity.LTDecidable.ac0Definable`,
+  through `DescriptiveComplexity.powArithDef` – the definability of `i ↦ 2 ^ i`
+  (Thm 1.17(2)), proved by guessing two elements, the doubling chain of the
+  exponent below its top and that chain's own exponents packed into the fields
+  it delimits (`DescriptiveComplexity.powCert_iff`). The other is translated
+  formula by formula in `DescriptiveComplexity.LogTime.Translate` and turns on a
+  single atom, `DescriptiveComplexity.timesBitDef` – the bit-definability of
+  `orank x * orank y = orank z`, which is Thm 1.17(1) whole, built in
+  `DescriptiveComplexity.LogTime.BitSum` where the textbook says “exercise”.
+  Its floor is the **Bit Sum Lemma** (`DescriptiveComplexity.BitSum.PopAll`):
+  counting the ones of a word as long as the tape, by three nested packings
+  where the textbook sketches two – running sums co-located in the blocks they
+  count (`DescriptiveComplexity.BitSum.SumOk`, one construction instantiated at
+  two sizes), based on a guessed **table indexed by the value** of a doubly
+  logarithmic word, pinned by clearing one bit at a time
+  (`DescriptiveComplexity.BitSum.TableOk`). On top of it, the schoolbook
+  columns (`DescriptiveComplexity.BitSum.timesCert_iff`): each column counted
+  by the Bit Sum Lemma on a sub-mask of a factor, the columns cut into blocks
+  at a gap `g` with `2 ^ g > log n`, the weighted sum of one block certified by
+  a **guessed carry chain** – the remainders of the column-by-column addition,
+  one field per column, packed into a single element and walked with the
+  boundary-set-and-counter device (`DescriptiveComplexity.BitSum.RangeSum`);
+  the block sums of each parity then tile one element exactly, and two
+  additions reassemble the product. Guessing a chain per block is what breaks
+  the iterated-sum barrier: for the whole product the carries would be
+  `log n · log log n` bits, one element too few, while a block's are
+  `(log log n)²` – and soundness holds for *whatever* is guessed, all the size
+  arithmetic being paid in the completeness half and the size threshold
+  absorbed by `DescriptiveComplexity.BitDef.of_large`. Neither equality is
+  what places the model:
+  `DescriptiveComplexity.LTDecidable.mem_LOGSPACE` puts it inside LOGSPACE
   outright, by evaluating the bit logic with a deterministic multi-head automaton
   of `2 * vars + 8` heads whose bit atom is the halving loop
   `DescriptiveComplexity.HeadProgram.bitP`
