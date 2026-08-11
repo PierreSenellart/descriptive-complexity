@@ -157,6 +157,26 @@ theorem exists_wmIncr (h : IsLinOrd Le) {s : α → Prop} (hne : ∃ x, ¬s x) :
   by_contra hs
   exact hv.2 (hmax v hs)
 
+/-- **Every address but the first has a predecessor.** The carry position of the
+step *into* an address is the greatest element that address contains: everything
+above it leaves, and it is what the increment put there. A program walking its
+mirror downwards – which is what an increment does, the least significant digit
+being the `Le`-greatest element – needs this end of the statement. -/
+theorem exists_wmPred (h : IsLinOrd Le) {s : α → Prop} (hne : ∃ x, s x) :
+    ∃ t, WMIncr Le t s := by
+  obtain ⟨u, hu, hmax⟩ := exists_greatest h hne
+  refine ⟨fun v => WMLt Le u v ∨ (s v ∧ v ≠ u), u, ?_, fun v hv => Or.inl hv, fun v => ?_⟩
+  · exact fun hc => hc.elim (fun hlt => hlt.2 (h.1 u)) fun hs => hs.2 rfl
+  · constructor
+    · intro hs
+      rcases eq_or_ne v u with rfl | hvu
+      · exact Or.inl rfl
+      · exact Or.inr ⟨Or.inr ⟨hs, hvu⟩, fun hlt => hlt.2 (hmax v hs)⟩
+    · rintro (rfl | ⟨ht | ht, hnlt⟩)
+      · exact hu
+      · exact absurd ht hnlt
+      · exact ht.1
+
 omit [Finite α] in
 /-- Strict comparison of addresses is weak comparison plus difference. -/
 theorem wmSetLt_iff (s t : α → Prop) : WMSetLt Le s t ↔ (WMSetLe Le s t ∧ s ≠ t) := by
@@ -166,6 +186,40 @@ theorem wmSetLt_iff (s t : α → Prop) : WMSetLt Le s t ↔ (WMSetLe Le s t ∧
   · rintro ⟨hle | hlt, hne⟩
     · exact absurd (funext fun z => propext (hle z)) hne
     · exact hlt
+
+/-- **An address holding nothing is below every address.** -/
+theorem wmSetLe_of_empty (h : IsLinOrd Le) {s : α → Prop} (hs : ∀ x, ¬s x) (t : α → Prop) :
+    WMSetLe Le s t := by
+  rcases Classical.em (∃ x, t x) with hne | hno
+  · obtain ⟨x, hx, hmin⟩ := exists_least h hne
+    exact Or.inr ⟨x, fun y hy => iff_of_false (hs y) fun hc => hy.2 (hmin y hc), hs x, hx⟩
+  · exact Or.inl fun z => iff_of_false (hs z) fun hc => hno ⟨z, hc⟩
+
+/-- **An address holding everything is above every address.** -/
+theorem wmSetLe_of_full (h : IsLinOrd Le) {t : α → Prop} (ht : ∀ x, t x) (s : α → Prop) :
+    WMSetLe Le s t := by
+  rcases Classical.em (∃ x, ¬s x) with hne | hno
+  · obtain ⟨x, hx, hmin⟩ := exists_least h hne
+    refine Or.inr ⟨x, fun y hy => iff_of_true ?_ (ht y), hx, ht x⟩
+    by_contra hc
+    exact hy.2 (hmin y hc)
+  · exact Or.inl fun z => iff_of_true (not_not.mp fun hc => hno ⟨z, hc⟩) (ht z)
+
+/-- **The strict part of the address order is the strict comparison of
+addresses**: the fold of `DescriptiveComplexity.Problems.Wide.Fold` writes its
+strict order as `DescriptiveComplexity.WMLt` of whatever relation it is given, and
+at addresses that is `DescriptiveComplexity.WMSetLt`. -/
+theorem wmLt_wmSetLe_iff (h : IsLinOrd Le) (s t : α → Prop) :
+    WMLt (WMSetLe Le) s t ↔ WMSetLt Le s t := by
+  have hlin := isLinOrd_wmSetLe h
+  rw [wmSetLt_iff]
+  constructor
+  · rintro ⟨hle, hnot⟩
+    refine ⟨hle, fun hc => hnot ?_⟩
+    rw [hc]
+    exact hlin.1 t
+  · rintro ⟨hle, hne⟩
+    exact ⟨hle, fun hc => hne (hlin.2.2.1 s t hle hc)⟩
 
 /-- **Nothing lies strictly between an address and its increment**: an address
 weakly between them agrees with one of the two. This is the half that makes the
@@ -270,11 +324,7 @@ theorem minPos_wpLe (h : IsLinOrd (WMLe (A := A))) :
     MinPos wpLe wpPosn (Sum.inl fun _ => False : WPoint A) := by
   refine ⟨trivial, ?_⟩
   rintro (t | x) hq
-  · rcases Classical.em (∃ x, t x) with hne | hno
-    · obtain ⟨x, hx, hmin⟩ := exists_least h hne
-      refine Or.inr ⟨x, fun y hy => ?_, fun hc => hc, hx⟩
-      exact iff_of_false (fun hc => hc) fun hc => hy.2 (hmin y hc)
-    · exact Or.inl fun z => iff_of_false (fun hc => hc) fun hc => hno ⟨z, hc⟩
+  · exact wmSetLe_of_empty h (fun _ hc => hc) t
   · exact absurd hq (fun hc => hc)
 
 /-- **The last cell of a wide machine is the full address.** -/
@@ -282,13 +332,7 @@ theorem maxPos_wpLe (h : IsLinOrd (WMLe (A := A))) :
     MaxPos wpLe wpPosn (Sum.inl fun _ => True : WPoint A) := by
   refine ⟨trivial, ?_⟩
   rintro (t | x) hq
-  · rcases Classical.em (∃ x, ¬t x) with hne | hno
-    · obtain ⟨x, hx, hmin⟩ := exists_least h hne
-      refine Or.inr ⟨x, fun y hy => ?_, hx, trivial⟩
-      refine iff_of_true ?_ trivial
-      by_contra hc
-      exact hy.2 (hmin y hc)
-    · exact Or.inl fun z => iff_of_true (not_not.mp fun hc => hno ⟨z, hc⟩) trivial
+  · exact wmSetLe_of_full h (fun _ => trivial) t
   · exact absurd hq (fun hc => hc)
 
 /-- **A step of a wide machine is the binary increment of its address.** The
