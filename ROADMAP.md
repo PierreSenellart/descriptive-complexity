@@ -106,8 +106,8 @@ remains below are ordinary catalog reductions and machine bridges.
   it defines are **built** (`Arithmetic.lean`, `ArithmeticDefinable.lean`,
   `ArithmeticFixedPoint.lean`, `Problems/Parity.lean`: `AC0Definable`,
   `FO(≤) ⊊ AC⁰`, `AC⁰ ⊆ PTIME`, PARITY in LOGSPACE and not in FO(≤)). `+` and
-  `×` are primitive rather than BIT, and deliberately so: the closure obligation
-  below is schoolbook base-`n` arithmetic for them and base conversion for BIT.
+  `×` are primitive rather than BIT; either choice faces the same closure
+  obligation below, schoolbook base-`n` digits for them, base conversion for BIT.
   The sharp bound `AC⁰ ⊆ LOGSPACE` is **built** as well
   (`HeadArith.lean`, `HeadEvalArith.lean`: `plusP` and `timesP` decide the two
   numeric predicates with heads, and `evalArithP` evaluates a sentence over
@@ -116,11 +116,60 @@ remains below are ordinary catalog reductions and machine bridges.
   `timesBitDef`), which makes `FO(≤, +, ×) = FO(≤, BIT)` and its machine model
   a theorem. One item remains.
   * **AC⁰ as a `ComplexityClass`** [XL]: closure under `≤ᶠᵒ` needs the numeric
-    predicates of an interpreted universe – lex-ordered tagged tuples, hence
-    base-`n` digits – defined from those of the base. Addition is
-    carry-lookahead; multiplication needs a double-width digit product, which
-    needs a half-width (base-`√n`) splitting. Note what it does *not* gate: a
-    problem reducing to an AC⁰ problem is already known to be in PTIME.
+    predicates of an interpreted universe – lex-ordered tagged tuples, whose
+    `tagTupleOrder` rank is a mixed-radix value – defined from those of the
+    base. No choice of definable order escapes that: an order is a bijection
+    onto `0 … N-1`, so reading such a rank is a base conversion either way, and
+    trading `×` for `BIT` renames the crux rather than removing it. Two routes,
+    priced against each other from the code at ≈ 4 000–7 000 lines each; a wash
+    on size, so the decision is risk shape.
+    - *FO side*, with `×`: addition by carry-lookahead on `d` base-`n` digits in
+      the truncated `PLUS` (`no_plus_iff_card_le` is exactly `x + y ≥ n`),
+      multiplication schoolbook, whose double-width digit product needs a
+      half-width (base-`⌊√n⌋`) splitting – `M` itself definable as the greatest
+      element with a square. That crux is a proof to *transcribe* rather than
+      invent ([Schweikardt 2005][schweikardt2005arithmetic] Thm. 3.4, proved in
+      an appendix precisely because she knows of no complete published one), but
+      it also wants a semantic layer for `2d`-digit vectors – values with no
+      `orank` meaning – that the library does not have. Before transcribing,
+      check whether `FO(+, Squares) = FO(+, ×)` (Thm. 3.2(f), "not so
+      difficult") lets `arithExtend` define only tuple *squaring*, the product
+      following by polarization: half a day, large payoff, if it survives
+      truncated arithmetic on tuples.
+    - *Bit side*, **preferred**: prove closure for `LTDecidable` at the machine
+      level and transport it along `ac0Definable_iff_ltDecidable`. Carry every
+      target register in two representations – its `d` source components, and
+      its rank's binary chunks, one per source element. The base then runs on
+      the binary side (`le` a comparison sweep, `plus` a ripple carry, `bit` a
+      read, a target sweep being `d` chained sweeps with the boundary states
+      guessed) while the interpretation's `FO(≤)` queries are evaluated on the
+      component side through `Translate.lean`. All that is new is **`Conv`**,
+      the agreement of the two representations, which by Horner is `d` rounds of
+      "accumulator times `n` plus a digit" – the exact shape of `Times.lean`'s
+      column sum at `d`-fold width, certificates widening from one element to a
+      constant family. Preferred because every hard piece re-instantiates an
+      in-house device whose estimate-vs-actual is calibrated, because it
+      consumes the machine model just built, and because its `d`-chunk element
+      families are the "big number as a family of elements" layer FO(COUNT) /
+      TC⁰ would want anyway.
+
+    Two unknowns to burn down first, half a day each: fields tiled across a
+    *family* of elements, the one variation of the packing devices never
+    exercised (write `BitSum/Sizes.lean`'s arithmetic at width `d`, check it at
+    `d = 2` on paper), and whether Horner's `d` dependent steps collapse into a
+    single `2d`-column convolution. Either route needs the **`orank` bridge** –
+    that the rank of a tagged tuple in `tagTupleOrder` *is* the mixed-radix
+    value, stated nowhere yet – and both `LEquiv`s are against it;
+    `LogTime/Small.lean`'s `ArithDef.of_large` already covers the degenerate
+    sizes the splitting excludes. The one place this could be *unsound* rather
+    than merely incomplete is `arithExtendLEquiv`, the proof that the formulas
+    realize the **canonical** arithmetic of that order: "the formula obviously
+    says addition" is not an argument, and `ordExtendLEquiv` is the template.
+    Note what class-hood does *not* gate: a problem reducing to an AC⁰ problem
+    is already in PTIME – indeed in LOGSPACE, by that class's own closure – so
+    build it for a consumer and not before. Until then AC⁰ gets **no row** in
+    the README's class table, every row there being a `ComplexityClass` closed
+    under `≤ᶠᵒ`; the row lands in the same commit as the closure.
 - **Quantifier-free projections** [L]: the finest reduction notion (DC uses them
   for almost all completeness results); SAT complete under first-order
   projections.
@@ -131,7 +180,19 @@ remains below are ordinary catalog reductions and machine bridges.
   relevant to the arithmetic boundary of the binary representation
   (multiplication is TC⁰, not FO). Its inclusion in LOGSPACE would follow the
   pattern of `HeadEvalArith.lean`: a counting head fragment, evaluated in place
-  of an atom.
+  of an atom. Better, and [M] on top: build the **substitution lemma** the
+  counting fragment then plugs into – if each relation symbol of a language `Lx`
+  is assigned a deterministic head-program fragment computing it from the heads
+  holding its arguments, then every `(L.sum Lx)` formula of the head positions is
+  computed by a deterministic head program, hence every sentence over it is
+  `DTCDefinable`. `evalArithP` is the `Lx = Language.arith` instance and
+  `HeadEval.evalP` the empty one, so `FO(COUNT) ⊆ LOGSPACE` becomes an instance
+  rather than a second evaluator. Generalize `evalArithP`, **not** `evalP` (its
+  four-way atom split already has the shape, and editing a module 100+ files
+  depend on is the trap), keep the arithmetic instance definitionally what it is
+  so `ac0Definable_mem_LOGSPACE` need not be reproved, and plan for the full
+  downstream rebuild rather than discovering it: `HeadCapture`, `HeadCaptureDet`
+  and every consumer of `Runs` re-elaborate.
 - **Relativized (domain-formula) reductions — membership closure** [M]:
   Immerman's textbook FO reduction restricts the target universe to a definable
   subset via a **domain formula**, needed for *spanning* problems (Hamilton
@@ -183,15 +244,11 @@ X"), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **The automaton cap** [L]: the negative result that pinned the AC⁰ machine
-  model's design – with a base of sweeps and a *place-value* bit atom, the
-  model collapses to the 2-automatic cardinality sets, hence cannot decide
-  whether the universe has a prime number of elements – as a theorem, worth
-  building for its own sake; design and prices in `AC0.md` §4. The **circuit**
-  route to AC⁰ stays [R] and should be taken only if uniform circuit families
-  are wanted for their own sake. Note what neither discharges: the
-  structures-vs-strings bridge of §7 and of the README's *Scope* is about
-  string encodings, and no bridge inside this framework closes it.
+- **Circuits as a route to AC⁰** [R]: bounded-depth uniform circuit families;
+  take it only if circuits are wanted for their own sake. Note what it does
+  not discharge: the structures-vs-strings bridge of §7 and of the README's
+  *Scope* is about string encodings, and no bridge inside this framework
+  closes it.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
 
@@ -219,6 +276,19 @@ non-reducibility, impossible in the machine world.
   inside PTIME – so this single theorem is what `AC⁰ ⊊ LOGSPACE` waits on. Do
   not confuse it with EVEN, the parity of the *universe*, which **is** AC⁰
   (`even_ac0Definable`) and is what separates `FO(≤)` from AC⁰.
+- **`FO(≤, +) ⊊ FO(≤, +, ×)`** [L]: classically true, and *not* out of reach in
+  the way PARITY is – primality of the universe is definable in the latter and
+  not in the former, by Ginsburg and Spanier's semilinearity of `FO(+)` spectra
+  ([Schweikardt 2005][schweikardt2005arithmetic] §3.2, which also collects the
+  sources for `FO(<) ⊊ FO(+)`). That is a quantifier-elimination argument rather
+  than a switching lemma, but Presburger quantifier elimination is not in the
+  library either; re-price only against a concrete plan for it.
+- Not a defect, an open question worth flagging as one: **expect no complete
+  problem for AC⁰**. The library's reductions are `FO(≤)`, strictly *weaker*
+  than AC⁰ reductions – that strictness is
+  `exists_ac0Definable_not_foDefinable` – so an AC⁰-complete problem under
+  `≤ᶠᵒ[≤]` would need a reduction that builds the arithmetic, which the
+  separation suggests `FO(≤)` cannot do. Suggests, not proves.
 
 ## 6. Beyond decision problems: counting and optimization
 
@@ -687,15 +757,11 @@ provable rather than merely reasonable.
   Relativized membership closure has two consumers (§3), so it moves up as
   soon as either is wanted.
 - Of the BIT / AC⁰ / PARITY chain, only the far end: **PARITY ∉ AC⁰** (§5),
-  [R]. The chain turned out to split rather than to stand or fall together –
-  the arithmetic vocabulary, the class it defines, `FO(≤) ⊊ AC⁰`,
-  `AC⁰ ⊆ PTIME`, `AC⁰ ⊆ LOGSPACE` and PARITY in LOGSPACE are built (§3) – and
-  the other end split too: the **machine bridge** (§4) is [L] rather than [R]
-  once it goes through the logarithmic hierarchy instead of through circuits.
-  Nothing above depends on either end, and until the bridge exists the two
-  by-inspection claims in the README stay an honest, documented gap. What is
-  worth doing next in that area is `BIT` as a derived predicate and, on demand,
-  class-hood: both §3, neither [R].
+  [R]. Everything short of it is built – the logic, the machine model and
+  their equality – and nothing above depends on it; the by-inspection claims
+  in the README stay an honest, documented gap, being about string encodings
+  (§7), which no bridge inside this framework closes. What is worth doing
+  next in that area is, on demand, class-hood (§3, not [R]).
 - Complete problems for the exponential classes, and with them the generic
   succinctness theorem. The design work is done (§3, the outer composition):
   the order on the expanded universe, the translation lemma and the gate
