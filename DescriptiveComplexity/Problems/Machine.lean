@@ -56,6 +56,10 @@ reduction to SAT applies to it like to any other. Conjoined with the hardness
 direction, this gives `DescriptiveComplexity.ntmAccept_interreducible_sat` –
 machine acceptance and satisfiability reduce to each other – the most faithful
 representation of the Cook–Levin theorem this library offers.
+`DescriptiveComplexity.SAT_complete_for_ntmAccept` states the same content with
+the hardness half quantified over the class, which is SAT's NP-completeness for
+the NP the *machine* defines and the form to compare with the mechanizations
+that prove Cook–Levin over a machine model.
 
 As with any complexity-theoretic statement, these results are about finite
 structures only
@@ -105,6 +109,26 @@ inside the instance. -/
 theorem ntmAccept_interreducible_sat :
     Nonempty (NTMAccept ≤ᶠᵒ[≤] SAT) ∧ Nonempty (SAT ≤ᶠᵒ[≤] NTMAccept) :=
   ⟨ntmAccept_reduces_to_sat, ⟨SatTM.sat_ordered_fo_reduction_ntmAccept⟩⟩
+
+/-- **`DescriptiveComplexity.SAT` is NP-complete, `NP` read as the machine
+class**: satisfiability is accepted by a machine, and *every* problem accepted
+by one reduces to it.
+
+This is `ntmAccept_interreducible_sat` with the hardness half quantified over
+the class rather than stated at one problem, which is the form the mechanized
+Cook–Levin literature proves; it is the statement to compare against, since
+nothing here is definitional about the logically defined
+`DescriptiveComplexity.NP` – the class it is complete for is the one the
+machine defines. The extra content over the interreducible form is exactly the
+cofinal quantifier: `DescriptiveComplexity.mem_NP_iff_le_ntmAccept` turns an
+arbitrary problem accepted by a machine into a `Σ₁` definition, which the
+generic discharge then sends to `DescriptiveComplexity.SAT`. -/
+theorem SAT_complete_for_ntmAccept :
+    Nonempty (SAT ≤ᶠᵒ[≤] NTMAccept) ∧
+      ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
+        Nonempty (P ≤ᶠᵒ[≤] NTMAccept) → Nonempty (P ≤ᶠᵒ[≤] SAT) :=
+  ⟨⟨SatTM.sat_ordered_fo_reduction_ntmAccept⟩,
+    fun P h => sat_hard_of_sigmaSODefinable P ((mem_NP_iff_le_ntmAccept P).mpr h)⟩
 
 /-! ### The deterministic problem
 
