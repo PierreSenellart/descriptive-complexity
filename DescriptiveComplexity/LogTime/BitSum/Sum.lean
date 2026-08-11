@@ -8,7 +8,8 @@ import DescriptiveComplexity.LogTime.BitSum.Table
 /-!
 # The running sum: counting a long word by counting its chunks
 
-Levels 1 and 2 of `AC0.md` §2.3 are the *same* construction at two sizes: cut a
+Levels 1 and 2 of the Bit Sum Lemma are the *same* construction at two sizes:
+cut a
 word into chunks, keep in each chunk the number of ones below it, and verify one
 step by counting the ones of a single chunk – which is what the level below is
 for. So it is written once here, with the chunk counter as a parameter:

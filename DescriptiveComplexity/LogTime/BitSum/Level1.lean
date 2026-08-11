@@ -8,8 +8,8 @@ import DescriptiveComplexity.LogTime.BitSum.Level2
 /-!
 # Level 1: counting all the ones of an element
 
-The top of `AC0.md` §2.3, and the same running sum once more, with level 2 in the
-place level 3 occupied there: cut the whole tape into blocks of
+The top of the Bit Sum Lemma, and the same running sum once more, with level 2
+in the place level 3 occupied at level 2: cut the whole tape into blocks of
 `DescriptiveComplexity.BitSum.lvl1Block` positions, keep the running count in
 each, and let `DescriptiveComplexity.BitSum.PopMid` count one block.
 

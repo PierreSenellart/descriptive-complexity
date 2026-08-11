@@ -14,8 +14,8 @@ The schoolbook product of two `P`-bit numbers is a sum of columns,
 add to `j` – a count the Bit Sum Lemma delivers, one column at a time
 (`DescriptiveComplexity.BitSum.mul_eq_colSum`). What the Bit Sum Lemma does
 *not* deliver is the outer sum: summing the `2 P` weighted columns is an
-iterated addition again, and every direct route to it fails
-(`AC0.md` §2.3 lists four).
+iterated addition again, and every direct route to it fails – brute force,
+carries guessed for the whole product, digit tables, Chinese remainders.
 
 The way out is the block split, taken once, plus a **guessed carry chain per
 block**. Cut the columns into blocks of `g` with `2 ^ g > P`; the sum of one

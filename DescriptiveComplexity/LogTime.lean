@@ -65,8 +65,9 @@ prenex `FO(≤, +, BIT)`  =  alternating logarithmic time,
 
 which is `DescriptiveComplexity.ltDecidable_iff_bitDefinable`: **the machine
 model is exactly a logic**, and – since `+` is a derived predicate here
-(`DescriptiveComplexity.bitDef_plus_free`) and `≤` is classically derivable from
-`BIT` too – exactly the logic `FO(≤, BIT)` whose identification with
+(`DescriptiveComplexity.bitDef_plus_free`) and `≤` is itself definable from `BIT`
+alone ([Dawar, Doets, Lindell & Weinstein 1998][dawar1998finiteranks]; not proved
+here) – exactly the logic `FO(≤, BIT)` whose identification with
 `FO(≤, +, ×)` and with (DLOGTIME-uniform) AC⁰ is [Immerman
 1999][immerman1999descriptive] Thm 1.17 and [Barrington, Immerman & Straubing
 1990][barrington1990uniformity].

@@ -20,9 +20,9 @@ field the same boundaries delimit, by a second guessed element:
 > nothing else.
 
 This is the second half of the device, and `LogTime/Pow.lean`'s `ValAt` is the
-same idea with a doubling gap. It is what level 3 of `AC0.md` §2.3 needs: its
-table's sections are indexed by a *count* of ones, and the section walk has to
-know which count it is at.
+same idea with a doubling gap. It is what level 3 of the Bit Sum Lemma
+(`LogTime/BitSum/Table.lean`) needs: its table's sections are indexed by a
+*count* of ones, and the section walk has to know which count it is at.
 
 ## What the guard is for
 

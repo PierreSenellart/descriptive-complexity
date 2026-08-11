@@ -9,8 +9,8 @@ import DescriptiveComplexity.LogTime.BitSum.Counter
 # Counting ones, and the two atoms level 3 counts with
 
 The Bit Sum Lemma is about *how many ones a word has*, and this file says what
-that means and gives the two bit-level operations the base level of `AC0.md`
-§2.3 breaks the circularity with.
+that means and gives the two bit-level operations its base level
+(`LogTime/BitSum/Table.lean`) breaks the circularity with.
 
 ## The count
 

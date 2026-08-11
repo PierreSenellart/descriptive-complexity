@@ -35,8 +35,8 @@ truth value decided outside the structure.
 A construction that lays out a certificate says what it needs of `n` and proves
 its statement for those `n` only; this turns that into the statement with no
 side condition. It is the shared prerequisite of two developments – the Bit Sum
-Lemma (`AC0.md` §2.3, whose two packing levels each need `n` above a bound) and
-the tuple arithmetic of AC⁰ class-hood (§3.2, whose half-width splitting needs
+Lemma (`LogTime/BitSum/`, whose packing levels each need `n` above a bound) and
+the tuple arithmetic of AC⁰ class-hood (whose half-width splitting needs
 `n ≥ 3`) – and it is deliberately built before either.
 
 The finiteness hypothesis is on the *variables*, not on anything else: a

@@ -9,7 +9,7 @@ import DescriptiveComplexity.LogTime.BitLogic
 /-!
 # Co-location: the one device the Bit Sum Lemma is built out of
 
-Every packing of `AC0.md` §2.3 has to answer the same question – *given the
+Every packing of the Bit Sum Lemma has to answer the same question – *given the
 item, where is its field?* – and the answer is never “compute the product of the
 item's number with the field width”, which is exactly what a logic without
 multiplication cannot do. It is always:

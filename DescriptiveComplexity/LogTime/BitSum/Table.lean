@@ -8,7 +8,8 @@ import DescriptiveComplexity.LogTime.BitSum.Ones
 /-!
 # Level 3: counting the ones of a short word, by a table indexed by its value
 
-This is the base of `AC0.md` §2.3 and the place where its circularity is broken.
+This is the base of the Bit Sum Lemma and the place where its circularity is
+broken.
 Levels 1 and 2 reduce “count the ones of a word” to “count the ones of a
 *shorter* word”, and that cannot go on for ever: at the bottom something has to
 count outright. Here it is, and the trick is that a **lookup is a bit read at an

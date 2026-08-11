@@ -41,8 +41,16 @@ construction.
 `DescriptiveComplexity.BitAtom.plus` is redundant. `orank x + orank y = orank z`
 is bit-definable from the order and the bit atom alone, by carry-lookahead
 (`DescriptiveComplexity.plus_iff_bits`), so the logic of this file is
-`FO(≤, BIT)` under another name – its classical name, since `≤` is classically
-definable from `BIT` too. The atom stays all the same:
+`FO(≤, BIT)` under another name – its classical name, and in the sharpest sense,
+since `≤` is itself first-order definable from `BIT` alone, whence
+`FO(BIT) = FO(≤, BIT)` ([Dawar, Doets, Lindell & Weinstein
+1998][dawar1998finiteranks] Thm. 2.1 and Cor. 2.3: `BIT` is Ackermann
+membership, `(A, BIT)` is an ∈-initial segment of the hereditarily finite sets,
+and one formula defines the order on all of them – it guesses the order relation
+itself as an *element*, a set of pairs, and checks it is a post-fixed point of
+the “greatest differing member” operator). That elimination is neither used nor
+proved here: every structure in this library carries its order anyway. The atom
+stays all the same:
 `DescriptiveComplexity.plusSweep_accepts` is half of what shows the machine has
 to *build* its arithmetic rather than read it, and deleting the atom would delete
 that demonstration for no theorem.

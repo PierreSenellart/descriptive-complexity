@@ -15,8 +15,8 @@ ones of a `P`-bit word, `P` being the number of bit positions
 and each of them has to *fit in one element*, that is, below the place value
 `2 ^ (P - 1)`, which is the only size a universe is guaranteed to have room for.
 This file fixes the three sizes and proves that they fit, with no formula and no
-structure in sight: it is the arithmetic that decides whether the construction
-of `AC0.md` §2.3 exists at all.
+structure in sight: it is the arithmetic that decides whether the packings of
+the Bit Sum Lemma exist at all.
 
 ## The sizes
 
@@ -40,8 +40,8 @@ of `AC0.md` §2.3 exists at all.
 
 Level 1 needs its field to hold `P`, so `2 ^ lvl1Block > P`; a table indexed by
 the value of a level-1 block would need `(lvl1Block + 1) · 2 ^ lvl1Block < P`.
-The two are contradictory, which is the arithmetic form of the obstruction
-recorded in `AC0.md` §2.3: a level's items and its fields are paired by
+The two are contradictory, which is the arithmetic form of the packing
+obstruction: a level's items and its fields are paired by
 co-location, and a level whose fields are wider than the gap between its items
 cannot be co-located. Three levels are compatible because the table is indexed
 by a *sub*-block, whose value is quadratic in `lvl1Width` and so far below `P`.
