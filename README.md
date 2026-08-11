@@ -7,36 +7,34 @@
 
 A Lean 4 library for descriptive complexity on top of Mathlib's `ModelTheory`,
 in the style of Immerman (*Descriptive Complexity*, ch. 3). Every complexity
-class is *defined* logically, so membership, hardness and completeness proofs
+class is defined logically, so membership, hardness and completeness proofs
 need no machine model: a definability witness for membership, a first-order
 reduction for hardness, and the framework closes them into a `Complete`
-theorem. Along the way the library proves a number of results of complexity and
-descriptive complexity themselves. All declarations live in the
-`DescriptiveComplexity` namespace.
+theorem. All declarations live in the `DescriptiveComplexity` namespace.
 
 Complexity theory is essentially absent from Mathlib because formalizing a
-model of computation with resource bounds is hard. But most classical hardness
-reductions do not need the full power of PTIME: they are *first-order
-expressible*. An FO reduction is computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so
-exhibiting one is strictly stronger than exhibiting a Karp reduction, while
+model of computation with resource bounds is hard. Most classical hardness
+reductions do not need the full power of PTIME: they are first-order
+expressible. An FO reduction is computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so
+exhibiting one is a stronger statement than exhibiting a Karp reduction, while
 requiring only first-order logic, which Mathlib already has.
 
 ## Three layers
 
 * **Model theory.** A decision problem is an isomorphism-invariant property of
-  finite structures over a chosen vocabulary. You can also bring your own
-  concrete instance types: a bundled `Encoding` cannot be constructed without
-  proving polynomial size bounds in both directions (no padding, no
-  compression), and computable `Decoding`s read well-formed structures back, so
-  completeness theorems restrict to the non-junk instances in one line.
+  finite structures over a chosen vocabulary. Concrete instance types can be
+  used instead: a bundled `Encoding` requires polynomial size bounds in both
+  directions to construct, and computable `Decoding`s read well-formed
+  structures back, so completeness theorems can be restricted to the non-junk
+  instances.
 * **Complexity classes.** Classes are logically defined and closed under FO
   reductions by construction: the polynomial hierarchy by second-order
   quantifier alternation, PTIME by the Horn fragment, NL by the Krom fragment,
   PSPACE by second-order transitive closure, RE by value invention, with the
   fixed-point logics FO(LFP)/FO(IFP)/FO(PFP) alongside. Machine models are
-  *theorems* here, not definitions (see the table below). Completeness without
-  a class is available too: the downward closure `below Q₀` of a fixed problem
-  is itself a class, so “GI-complete” is expressible with no logic anywhere.
+  theorems here, not definitions (see the table below). The downward closure
+  `below Q₀` of a fixed problem is itself a class, which expresses
+  “GI-complete” without any logic.
 * **Reductions.** Tagged `dim`-dimensional first-order interpretations between
   languages give the reduction `≤ᶠᵒ`, with its order-invariant variant `≤ᶠᵒ[≤]`
   for gadgets that genuinely need a linear order and a relativized variant
@@ -44,36 +42,37 @@ requiring only first-order logic, which Mathlib already has.
   composition. The problem catalog is one problem per file – vocabulary,
   reductions, completeness theorem – with tutorial-style worked examples.
 
-Highlights: a machine-free **Cook–Levin** theorem, **all of Karp's 21
-problems**, the **Immerman–Vardi** theorem (`lfpDefinable_iff_mem_PTIME`), the
-**Abiteboul–Vianu** theorem
-(`ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace`), and the *machine
-bridge*: a problem is in the library's NP (resp. PTIME) exactly when it
-ordered-FO-reduces to acceptance by a nondeterministic (resp. deterministic)
-polynomial-time Turing machine (`mem_NP_iff_le_ntmAccept`,
-`mem_PTIME_iff_le_dtmAccept`).
+## Results
 
-And the payoff no machine-first development has, **unconditional lower
-bounds**: Ehrenfeucht–Fraïssé games on finite structures, and the
-inexpressibility of EVEN even when the sentence is handed a linear order
-(`even_not_foDefinable`), whence **`FO ⊊ FO(TC)`** proved outright
-(`exists_tcDefinable_not_foDefinable`) and, since EVEN *is* definable once
-formulas may add ranks, **`FO(≤) ⊊ AC⁰`** as well
-(`exists_ac0Definable_not_foDefinable`, with AC⁰ read as the logic `FO(≤, +, ×)`
-– no circuit model is involved; that logic is proved to sit inside **L**,
-`ac0Definable_mem_LOGSPACE`, by a deterministic multi-head automaton that
-*computes* the numeric predicates instead of reading them, and to equal both
-`FO(≤, BIT)` and its machine model, alternating logarithmic time – both halves
-of Immerman's Thm 1.17, Bit Sum Lemma included,
-`ac0Definable_iff_ltDecidable`). The same problem
-shows, by the `k`-pebble game, that **order-free FO(IFP) does not capture PTIME**
-(`exists_mem_PTIME_not_ifpDefinableFree`), so the linear order in the capture
-theorems is not a convenience. No complexity assumption enters any of this.
+* Cook–Levin, without a machine model (`SAT_NP_complete`), and all of Karp's 21
+  problems.
+* The Immerman–Vardi theorem (`lfpDefinable_iff_mem_PTIME`) and the
+  Abiteboul–Vianu theorem
+  (`ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace`).
+* Machine bridges: a problem is in the library's NP (resp. PTIME) exactly when
+  it ordered-FO-reduces to acceptance by a nondeterministic (resp.
+  deterministic) polynomial-time Turing machine (`mem_NP_iff_le_ntmAccept`,
+  `mem_PTIME_iff_le_dtmAccept`).
+* Lower bounds, none of them conditional on a complexity assumption:
+  Ehrenfeucht–Fraïssé games on finite structures, and the inexpressibility of
+  EVEN even when the sentence is given a linear order (`even_not_foDefinable`),
+  whence `FO ⊊ FO(TC)` (`exists_tcDefinable_not_foDefinable`) and, since EVEN is
+  definable once formulas may add ranks, `FO(≤) ⊊ AC⁰`
+  (`exists_ac0Definable_not_foDefinable`). The same problem shows, by the
+  `k`-pebble game, that order-free FO(IFP) does not capture PTIME
+  (`exists_mem_PTIME_not_ifpDefinableFree`), so the linear order in the capture
+  theorems cannot be dropped.
+* AC⁰ is read here as the logic `FO(≤, +, ×)`; no circuit model is involved. It
+  is proved to sit inside L (`ac0Definable_mem_LOGSPACE`), by a deterministic
+  multi-head automaton that computes the numeric predicates instead of reading
+  them, and to equal both `FO(≤, BIT)` and its machine model, alternating
+  logarithmic time (`ac0Definable_iff_ltDecidable`: both halves of Immerman's
+  Thm 1.17, Bit Sum Lemma included).
 
 ## Complexity classes and complete problems
 
-Each problem listed is proved **complete** for its class: both a member, and
-hard for it under FO reductions.
+Each problem listed is proved complete for its class: both a member, and hard
+for it under FO reductions.
 
 | Complexity class | Logical characterization | Machine model | Problems proved complete |
 | --- | --- | --- | --- |
@@ -93,19 +92,19 @@ hard for it under FO reductions.
 | **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 | **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
-Each entry of the machine column is an equivalence *proved here* between the
-logical definition and acceptance by that model. The two dashes above NEXPTIME
-and EXPSPACE are not for want of a model: both classes have the *wide machine* –
-control in the instance, tape addressed by the subsets of the instance – as a
-proved member (`wideAccept_mem_NEXPTIME`, `wideAcceptSpace_mem_EXPSPACE`), and
-what is missing is its hardness. The classes are also matched
-against Mathlib's computability layer: RE *is* recursive enumerability, every
-RE-hard problem is undecidable, and RE ≠ co-RE.
+Each entry of the machine column is an equivalence proved here between the
+logical definition and acceptance by that model. For NEXPTIME and EXPSPACE only
+half of it is proved: the wide machine – control in the instance, tape addressed
+by the subsets of the instance – is a member of both
+(`wideAccept_mem_NEXPTIME`, `wideAcceptSpace_mem_EXPSPACE`), but its hardness is
+not formalized. The classes are also matched against Mathlib's computability
+layer: RE is recursive enumerability, every RE-hard problem is undecidable, and
+RE ≠ co-RE.
 
-The last row states completeness against a *problem* instead of a logic, which
-is what “GI-complete” means. It agrees with the logical definitions where both
+The last row states completeness against a problem instead of a logic, which is
+what “GI-complete” means. It agrees with the logical definitions where both
 apply: `NP = below SAT`, `PTIME = below HORN-SAT` and their siblings are
-theorems, so SAT-hardness *is* NP-hardness.
+theorems, so SAT-hardness is NP-hardness.
 
 ## Scope
 
