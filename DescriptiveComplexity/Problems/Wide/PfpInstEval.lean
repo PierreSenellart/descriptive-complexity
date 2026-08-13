@@ -338,6 +338,42 @@ theorem legStT_fields (j : Fin dt.nv)
     rfl
   exact ⟨hmir, hwk, hbot, hold, hltp, rfl⟩
 
+omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx] in
+/-- **A position's threaded leg computes the unthreaded fold**: its VAL loop
+is the unthreaded loop (`varFMT_eq_varFM`), its last round the unthreaded
+round (`varFXT_eq_roundFX`), and the background it folds against is the
+round state's, the loop's exit differing from it in SAV and TARGET alone.
+This is what makes the branched leg's stage bit
+(`DescriptiveComplexity.Pfp.PfpData.legBitB`) the verdict
+`DescriptiveComplexity.Pfp.PfpData.accVerdict_next` reads. -/
+theorem legCtlT_eq_legCtl
+    (hreg : ¬∃ u : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
+      v = wmSeg u)
+    (j : Fin dt.nv) (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (tOf : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
+    (sem₀ : ∀ a : ιV,
+      (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
+        dt.igPassP PR.zero PR.one (dt.varAt j) (dt.roundSt st (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (dt.varAt j)),
+        dt.KindSem PR.zero PR.one (dt.varAt j) (dt.roundSt st (mV a))
+          (dt.kindOf (dt.varAt j) b))
+    (f₀ : dt.CtlIx → A) :
+    dt.legCtlT (v := v) (aT := aT) mV j st tOf
+        (dt.semCastT (dt.varAt j) st v mV sem₀) f₀ =
+      dt.legCtl (v := v) (aT := aT) mV j st tOf sem₀ f₀ := by
+  have hSE : dt.ScratchEq
+      (dt.varStE (dt.varAt j) st v mV (dt.semCastT (dt.varAt j) st v mV sem₀)
+        (dt.varFG (PR := PR) (dt.varAt j) st v tOf f₀) aT)
+      (dt.roundSt st (mV aT)) :=
+    (dt.scratchEq_roundEndSt (dt.varAt j) _ v _).trans
+      (dt.scratchEq_varRdSt st _ (mV aT))
+  rw [legCtlT, legCtl,
+    dt.varFXT_eq_roundFX (dt.varAt j) st mV sem₀ hreg
+      (dt.varFG (PR := PR) (dt.varAt j) st v tOf f₀) aT,
+    dt.varFMT_eq_varFM (dt.varAt j) st mV sem₀ hreg
+      (dt.varFG (PR := PR) (dt.varAt j) st v tOf f₀) aT, hSE.back hreg]
+  rfl
+
 include hrules hR hlin hord htop hbot hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **One spine position's leg**: from the dispatch's landing one cell
@@ -1051,6 +1087,349 @@ theorem outLeg_run
   exact (Relation.ReflTransGen.single hback).trans
     (hmach.trans (Relation.ReflTransGen.single hexit))
 
+/-- **The state the output's leg ends at — threaded**: the machinery's own
+exit state, the accepting write at the marker being idempotent. -/
+noncomputable def outStE
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
+    (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
+      (∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+        dt.igPassP PR.zero PR.one none (dt.varRdSt st p (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (none : dt.VarIx)),
+        dt.KindSem PR.zero PR.one none
+          (dt.matSt none (dt.varRdSt st p (mV a)) v (b : ℕ))
+          (dt.kindOf none b))
+    (f₀ : dt.CtlIx → A) : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
+  dt.varStE none st v mV semT (dt.varFG (PR := PR) none st v tOf f₀) aT
+
+/-- **The control after the output's leg — threaded**: the out machinery's
+exit fold, at the states its own thread produces. -/
+noncomputable def outCtlT
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
+    (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
+      (∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+        dt.igPassP PR.zero PR.one none (dt.varRdSt st p (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (none : dt.VarIx)),
+        dt.KindSem PR.zero PR.one none
+          (dt.matSt none (dt.varRdSt st p (mV a)) v (b : ℕ))
+          (dt.kindOf none b))
+    (f₀ : dt.CtlIx → A) : dt.CtlIx → A :=
+  (dt.varArgsOf PR.zero PR.one none).postFold
+    (dt.varFXT none st v mV semT (dt.varFG (PR := PR) none st v tOf f₀) aT)
+    (dt.back PR.zero PR.one dt.dd0Le
+      (dt.outStE (v := v) (aT := aT) mV st tOf semT f₀) v)
+
+omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx] in
+/-- **The output's threaded leg computes the unthreaded fold**: as
+`DescriptiveComplexity.Pfp.PfpData.legCtlT_eq_legCtl` at the output
+variable — the VAL loop is the unthreaded loop, its last round the
+unthreaded round, and the exit state differs from the round state in SAV and
+TARGET alone, which the background does not see off the register file. This
+is what makes `outLeg_run_thread`'s `hacc` the verdict
+`DescriptiveComplexity.Pfp.PfpData.accVerdict_out` reads. -/
+theorem outCtlT_eq_outCtl
+    (hreg : ¬∃ u : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
+      v = wmSeg u)
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
+    (sem₀ : ∀ a : ιV,
+      (∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+        dt.igPassP PR.zero PR.one none (dt.roundSt st (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (none : dt.VarIx)),
+        dt.KindSem PR.zero PR.one none (dt.roundSt st (mV a))
+          (dt.kindOf none b))
+    (f₀ : dt.CtlIx → A) :
+    dt.outCtlT (v := v) (aT := aT) mV st tOf
+        (dt.semCastT none st v mV sem₀) f₀ =
+      dt.outCtl (v := v) (aT := aT) mV st tOf sem₀ f₀ := by
+  have hSE : dt.ScratchEq
+      (dt.varStE none st v mV (dt.semCastT none st v mV sem₀)
+        (dt.varFG (PR := PR) none st v tOf f₀) aT)
+      (dt.roundSt st (mV aT)) :=
+    (dt.scratchEq_roundEndSt none _ v _).trans
+      (dt.scratchEq_varRdSt st _ (mV aT))
+  rw [outCtlT, outStE, outCtl,
+    dt.varFXT_eq_roundFX none st mV sem₀ hreg
+      (dt.varFG (PR := PR) none st v tOf f₀) aT,
+    dt.varFMT_eq_varFM none st mV sem₀ hreg
+      (dt.varFG (PR := PR) none st v tOf f₀) aT, hSE.back hreg]
+  rfl
+
+open Classical in
+/-- **The state the output's leg leaves, whatever its verdict**: the
+machinery's exit state with the marker rewritten by the accepting bit — so
+the marker survives a *true* verdict and is cleared by a false one, which is
+what makes a false output halt and reject. -/
+noncomputable def outStA
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
+    (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
+      (∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+        dt.igPassP PR.zero PR.one none (dt.varRdSt st p (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (none : dt.VarIx)),
+        dt.KindSem PR.zero PR.one none
+          (dt.matSt none (dt.varRdSt st p (mV a)) v (b : ℕ))
+          (dt.kindOf none b))
+    (f₀ : dt.CtlIx → A) : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
+  { dt.outStE (v := v) (aT := aT) mV st tOf semT f₀ with
+    wk := (fun r => r = v ∧ (dt.varArgsOf PR.zero PR.one none).accBit
+      (dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀)) }
+
+include hrules hR hlin hord htop hbot hv hvi hbotV htopV hmV0 hIncr hTestT
+  hTestF in
+/-- **The output's leg — threaded, whatever the verdict**: as
+`DescriptiveComplexity.Pfp.PfpData.outLeg_run` without the boundary
+hypotheses `hsav`/`htgt`, which nothing supplies at the end of a sweep — the
+advance refreshes the marker and the mirror, not the two scratch registers —
+and without any assumption on the verdict. The leg ends in the accepting
+phase either way; what the verdict decides is the *bit* the exit writes at
+the marker (`DescriptiveComplexity.Pfp.PfpData.outStA`), and with it whether
+the machine's accepting predicate holds of the state it stops in. -/
+theorem outLeg_run_verdict
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (hwkSt : st.wk = fun r => r = v)
+    (TestOf : Fin (dt.arOf (none : dt.VarIx)) →
+      Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
+    (hcompatOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx)))
+      (u : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd),
+      dt.wellShapedG PR.zero PR.one
+        (Sum.inl (Fin.castLE (dt.arOf_le_ko none) ℓ))
+        (PR.passTracks Slot.mir (dt.back PR.zero PR.one dt.dd0Le st)
+          st.mir (wmSeg u)) ↔ TestOf ℓ u)
+    (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
+    (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
+      wmBlk st.mir
+        (PfpTag.arg (toLex ((Sum.inl
+          (Fin.castLE (dt.arOf_le_ko none) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) :
+          PfpTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
+        (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
+    (hmir : st.mir = v) (hbotSt : st.bot = fun r => r = (fun _ => False))
+    (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
+      (∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+        dt.igPassP PR.zero PR.one none (dt.varRdSt st p (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (none : dt.VarIx)),
+        dt.KindSem PR.zero PR.one none
+          (dt.matSt none (dt.varRdSt st p (mV a)) v (b : ℕ))
+          (dt.kindOf none b))
+    (hDom : ∀ ℓ : Fin (dt.arOf (none : dt.VarIx)),
+      ExpExpansion.DomHolds (X := dt.X)
+        (tOf ℓ, decRho dt.ly PR.zero PR.one
+          (wmBlk st.mir
+            (PfpTag.arg (toLex ((Sum.inl
+              (Fin.castLE (dt.arOf_le_ko none) ℓ) :
+              Fin dt.ko ⊕ Fin dt.ki))) :
+              PfpTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx))))
+    (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
+    Relation.ReflTransGen
+      (wideData (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)).Step
+      ⟨Sum.inr (PR.stElt (.evalP (.sub (dt.smEntryOut))) f₀), Sum.inl v',
+        wideTape (PR.trackTape Slot.val
+          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt .acceptP
+          (dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀)), Sum.inl v',
+        wideTape (PR.trackTape Slot.val
+          (dt.back PR.zero PR.one dt.dd0Le
+            (dt.outStA (v := v) (aT := aT) mV st tOf semT f₀))
+          (mV aT)) (PR.syElt PR.blank)⟩ := by
+  classical
+  have hzo := PR.zero_ne_one
+  set embO : dt.VarPhF (none : dt.VarIx) → OuterPh (EvalPh dt.nv dt.PMF) :=
+    fun p => .evalP (.sub (Sum.inr p)) with hembO
+  have hrulesJ : ∀ (i : dt.VarSiteF (none : dt.VarIx))
+      (ρ : dt.VarShF (none : dt.VarIx) i),
+      PR.rules (rEmb (.sub (Sum.inr i)) ρ) =
+        dt.varRuleF PR.zero PR.one none
+          (dt.varArgsOf PR.zero PR.one none) embO .acceptP i ρ :=
+    fun i ρ => hrules (.sub (Sum.inr i)) ρ
+  have hrulesV : ∀ (i : dt.VarSiteF (none : dt.VarIx))
+      (ρ : dt.VarShF (none : dt.VarIx) i),
+      PR.rules (rEmb (.sub (Sum.inr i)) ρ) =
+        dt.varRule PR.zero PR.one embO
+          (dt.gatesRule (one := PR.one) (v := (none : dt.VarIx))
+            (emb := fun p => embO (.gatesP p))
+            (argsG := (dt.varArgsOf PR.zero PR.one none).argsG)
+            (wellGOf := (dt.varArgsOf PR.zero PR.one none).wellGOf)
+            (setFail := (dt.varArgsOf PR.zero PR.one none).setFail)
+            (enterSt :=
+              (dt.varArgsOf PR.zero PR.one none).enterBlockSt)
+            (failPh := embO .vchk1) (exitPh := embO .vchk1))
+          (dt.roundRule (one := PR.one) (emb := fun p => embO (.matrixP p))
+            (ruleG := dt.igatesRule (one := PR.one) (v := (none : dt.VarIx))
+              (emb := fun p => embO (.matrixP (.igP p)))
+              (argsG := (dt.varArgsOf PR.zero PR.one none).argsIG)
+              (wellGOf := (dt.varArgsOf PR.zero PR.one none).wellIGOf)
+              (setFailOf := (dt.varArgsOf PR.zero PR.one none).setFailIGOf)
+              (enterSt := (dt.varArgsOf PR.zero PR.one none).enterIGSt)
+              (exitPh := embO (.matrixP .rchk)))
+            (ruleX := dt.matrixRule (zero := PR.zero) (one := PR.one)
+              (v := (none : dt.VarIx))
+              (emb := fun p => embO (.matrixP (.matP p)))
+              (argsA := (dt.varArgsOf PR.zero PR.one none).argsA)
+              (enterSt := (dt.varArgsOf PR.zero PR.one none).enterAtomSt)
+              (exitPh := embO .mchk1))
+            (pxEntry := embO (.matrixP (.matP (.chk 0))))
+            (exitPh := embO .mchk1)
+            (existFlag := (dt.varArgsOf PR.zero PR.one none).existFlag)
+            (allFlag := (dt.varArgsOf PR.zero PR.one none).allFlag))
+          (embO (.gatesP (.chk 0))) (embO (.matrixP (.igP (.chk 0)))) .acceptP
+          (dt.varArgsOf PR.zero PR.one none).newSlot
+          (dt.varArgsOf PR.zero PR.one none).gateFlag
+          (dt.varArgsOf PR.zero PR.one none).accBit
+          (dt.varArgsOf PR.zero PR.one none).enterSt
+          (dt.varArgsOf PR.zero PR.one none).initSt
+          (dt.varArgsOf PR.zero PR.one none).postFold
+          (dt.varArgsOf PR.zero PR.one none).storeCarry i ρ :=
+    fun i ρ => hrules (.sub (Sum.inr i)) ρ
+  -- the walk back to the marker
+  have hback := dt.step_var_back hrulesV hR hlin hvi
+    (rest := dt.back PR.zero PR.one dt.dd0Le st) (mval := st.val) (f := f₀)
+    (by rw [back_wk, hwkSt])
+  -- the machinery, at the states its own thread produces
+  have hmach := dt.varMachine_run_thread none st hrulesJ hR hlin hord htop
+    hbot hv hvi hwkSt TestOf hcompatOf tOf hbotV htopV mV hmV0 hIncr
+    hTestT hTestF hmir hbotSt semT hDom hwitOf hTestOf f₀
+  -- the loop's exit state, and the register it holds
+  set stE := dt.outStE (v := v) (aT := aT) mV st tOf semT f₀ with hstE
+  have hvalE : stE.val = mV aT := by
+    rw [hstE]; exact dt.varStE_val none st mV semT _ aT
+  have hwkE : stE.wk = fun r => r = v := by
+    rw [hstE, outStE, varStE]
+    refine ((dt.roundEndSt_fields none _ v _).1).trans ?_
+    exact ((dt.varStT_fields none st mV semT
+      (dt.varFG (PR := PR) none st v tOf f₀) aT).1).trans hwkSt
+  have hround : dt.roundSt stE (mV aT) = stE := hvalE ▸ dt.roundSt_val stE
+  -- the exit state: the same tape with the marker rewritten by the verdict
+  have hA : dt.outStA (v := v) (aT := aT) mV st tOf semT f₀ =
+      { stE with wk := (fun r => r = v ∧
+        (dt.varArgsOf PR.zero PR.one none).accBit
+          (dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀)) } := by
+    rw [hstE]; rfl
+  have hslot : ∀ (X : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+      (w : (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) →
+        Prop)
+      (r : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
+      (sl : dt.SlotIx), sl ≠ Slot.wk →
+      dt.back PR.zero PR.one dt.dd0Le { X with wk := w } r sl =
+        dt.back PR.zero PR.one dt.dd0Le X r sl := by
+    intro X w r sl hsl
+    cases sl <;> first
+      | exact absurd rfl hsl
+      | rfl
+  have hoff : ∀ r, r ≠ v →
+      dt.back PR.zero PR.one dt.dd0Le
+        (dt.outStA (v := v) (aT := aT) mV st tOf semT f₀) r =
+      dt.back PR.zero PR.one dt.dd0Le stE r := by
+    intro r hr
+    rw [hA]
+    funext sl
+    by_cases hsl : sl = Slot.wk
+    · subst hsl
+      rw [back_wk, back_wk, hwkE]
+      exact bitVal_congr (iff_of_false (fun hc => hr hc.1) hr)
+    · exact hslot _ _ r sl hsl
+  have hupd : dt.back PR.zero PR.one dt.dd0Le
+        (dt.outStA (v := v) (aT := aT) mV st tOf semT f₀) v =
+      Function.update (dt.back PR.zero PR.one dt.dd0Le stE v)
+        ((dt.varArgsOf PR.zero PR.one none).newSlot)
+        (bitVal PR.zero PR.one
+          ((dt.varArgsOf PR.zero PR.one none).accBit
+            (dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀))) := by
+    rw [hA]
+    funext sl
+    by_cases hs : sl = (dt.varArgsOf PR.zero PR.one none).newSlot
+    · subst hs
+      rw [Function.update_self]
+      exact bitVal_congr (and_iff_right rfl)
+    · rw [Function.update_of_ne hs]
+      exact hslot _ _ v sl (fun hc => hs hc)
+  have hns : (dt.varArgsOf PR.zero PR.one (none : dt.VarIx)).newSlot ≠
+      Slot.val := fun h => nomatch h
+  have hexit := dt.step_var_exit hrulesV hR hlin hbot hv hvi
+    (f := dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀)
+    (rest := dt.back PR.zero PR.one dt.dd0Le stE)
+    (rest' := dt.back PR.zero PR.one dt.dd0Le
+      (dt.outStA (v := v) (aT := aT) mV st tOf semT f₀))
+    (mval := mV aT)
+    (hvalE ▸ dt.varBg_back hlin hord htop stE hwkE) hns
+    hoff hupd
+  exact (Relation.ReflTransGen.single hback).trans
+    (hmach.trans (Relation.ReflTransGen.single hexit))
+
+include hrules hR hlin hord htop hbot hv hvi hbotV htopV hmV0 hIncr hTestT
+  hTestF in
+/-- **The output's leg — threaded, the verdict holding**: the special case of
+`DescriptiveComplexity.Pfp.PfpData.outLeg_run_verdict` in which the accepting
+write at the marker is *idempotent*, so the leg ends at the machinery's own
+exit state and nothing of the tape moves. -/
+theorem outLeg_run_thread
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (hwkSt : st.wk = fun r => r = v)
+    (TestOf : Fin (dt.arOf (none : dt.VarIx)) →
+      Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
+    (hcompatOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx)))
+      (u : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd),
+      dt.wellShapedG PR.zero PR.one
+        (Sum.inl (Fin.castLE (dt.arOf_le_ko none) ℓ))
+        (PR.passTracks Slot.mir (dt.back PR.zero PR.one dt.dd0Le st)
+          st.mir (wmSeg u)) ↔ TestOf ℓ u)
+    (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
+    (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
+      wmBlk st.mir
+        (PfpTag.arg (toLex ((Sum.inl
+          (Fin.castLE (dt.arOf_le_ko none) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) :
+          PfpTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
+        (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
+    (hmir : st.mir = v) (hbotSt : st.bot = fun r => r = (fun _ => False))
+    (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
+      (∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+        dt.igPassP PR.zero PR.one none (dt.varRdSt st p (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (none : dt.VarIx)),
+        dt.KindSem PR.zero PR.one none
+          (dt.matSt none (dt.varRdSt st p (mV a)) v (b : ℕ))
+          (dt.kindOf none b))
+    (hDom : ∀ ℓ : Fin (dt.arOf (none : dt.VarIx)),
+      ExpExpansion.DomHolds (X := dt.X)
+        (tOf ℓ, decRho dt.ly PR.zero PR.one
+          (wmBlk st.mir
+            (PfpTag.arg (toLex ((Sum.inl
+              (Fin.castLE (dt.arOf_le_ko none) ℓ) :
+              Fin dt.ko ⊕ Fin dt.ki))) :
+              PfpTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx))))
+    (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A)
+    (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
+      (dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀)) :
+    Relation.ReflTransGen
+      (wideData (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)).Step
+      ⟨Sum.inr (PR.stElt (.evalP (.sub (dt.smEntryOut))) f₀), Sum.inl v',
+        wideTape (PR.trackTape Slot.val
+          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt .acceptP
+          (dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀)), Sum.inl v',
+        wideTape (PR.trackTape Slot.val
+          (dt.back PR.zero PR.one dt.dd0Le
+            (dt.outStE (v := v) (aT := aT) mV st tOf semT f₀))
+          (mV aT)) (PR.syElt PR.blank)⟩ := by
+  have hwkE : (dt.outStE (v := v) (aT := aT) mV st tOf semT f₀).wk =
+      fun r => r = v := by
+    rw [outStE, varStE]
+    refine ((dt.roundEndSt_fields none _ v _).1).trans ?_
+    exact ((dt.varStT_fields none st mV semT
+      (dt.varFG (PR := PR) none st v tOf f₀) aT).1).trans hwkSt
+  have heq : dt.outStA (v := v) (aT := aT) mV st tOf semT f₀ =
+      dt.outStE (v := v) (aT := aT) mV st tOf semT f₀ := by
+    have hw : (fun r => r = v ∧ (dt.varArgsOf PR.zero PR.one none).accBit
+        (dt.outCtlT (v := v) (aT := aT) mV st tOf semT f₀)) =
+        (dt.outStE (v := v) (aT := aT) mV st tOf semT f₀).wk := by
+      rw [hwkE]
+      exact funext fun r => propext (and_iff_left hacc)
+    simp only [outStA, hw]
+  exact heq ▸ dt.outLeg_run_verdict hrules hR hlin hord htop hbot hv hvi
+    hbotV htopV mV hmV0 hIncr hTestT hTestF st hwkSt TestOf hcompatOf tOf
+    hwitOf hmir hbotSt semT hDom hTestOf f₀
+
 /-! ### Which leg a position takes
 
 A position's machinery has three runs, by what its gates do:
@@ -1214,6 +1593,72 @@ theorem legStB_fields (j : Fin dt.nv)
     exact ⟨h1, h2, h3, h4, h5⟩
   · rw [show dt.legStB (aT := aT) mV j st semT f₀ = _ from dif_neg hg]
     exact ⟨rfl, rfl, rfl, rfl, rfl⟩
+
+open Classical in
+/-- **The stage bit one position writes**, whichever leg it takes: the
+machinery's verdict at a gated position, `False` at the two ungated ones,
+which is what the stage dictionary holds where the blocks encode no
+point. -/
+noncomputable def legBitB (j : Fin dt.nv)
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (semT : dt.gatedAt (PR := PR) j st →
+      ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
+      (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
+        dt.igPassP PR.zero PR.one (dt.varAt j) (dt.varRdSt st p (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (dt.varAt j)),
+        dt.KindSem PR.zero PR.one (dt.varAt j)
+          (dt.matSt (dt.varAt j) (dt.varRdSt st p (mV a)) v (b : ℕ))
+          (dt.kindOf (dt.varAt j) b))
+    (f₀ : dt.CtlIx → A) : Prop :=
+  if hg : dt.gatedAt (PR := PR) j st then
+    (dt.varArgsOf PR.zero PR.one (dt.varAt j)).accBit
+      (dt.legCtlT (aT := aT) mV j st (dt.tagAt (PR := PR) j st) (semT hg) f₀)
+  else False
+
+omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
+  [Finite ιV] in
+open Classical in
+/-- **What a leg writes**: its variable's cell at the marker, and nothing
+else — the same equation whichever leg it takes, since the VAL loop
+threads the two scratch registers alone
+(`DescriptiveComplexity.Pfp.PfpData.varStE_new`) and the ungated legs
+write the stage bit directly. This is the branched twin of
+`DescriptiveComplexity.Pfp.PfpData.new_postVarSt`, and the only thing the
+spine's dictionary lemmas need of a leg. -/
+theorem legStB_new (j : Fin dt.nv)
+    (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+    (semT : dt.gatedAt (PR := PR) j st →
+      ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
+      (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
+        dt.igPassP PR.zero PR.one (dt.varAt j) (dt.varRdSt st p (mV a)) ℓ) →
+      ∀ b : Fin (dt.natOf (dt.varAt j)),
+        dt.KindSem PR.zero PR.one (dt.varAt j)
+          (dt.matSt (dt.varAt j) (dt.varRdSt st p (mV a)) v (b : ℕ))
+          (dt.kindOf (dt.varAt j) b))
+    (f₀ : dt.CtlIx → A) (i' : dt.d.B.ι)
+    (r : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
+    (dt.legStB (aT := aT) mV j st semT f₀).new i' r =
+      (if i' = dt.varList.get j ∧ r = v then
+        dt.legBitB (aT := aT) mV j st semT f₀ else st.new i' r) := by
+  classical
+  by_cases hg : dt.gatedAt (PR := PR) j st
+  · rw [show dt.legStB (aT := aT) mV j st semT f₀ = _ from dif_pos hg,
+      show dt.legBitB (aT := aT) mV j st semT f₀ = _ from dif_pos hg, legStT]
+    exact congrArg
+      (fun N : dt.d.B.ι →
+          (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) →
+          Prop =>
+        if i' = dt.varList.get j ∧ r = v then
+          (dt.varArgsOf PR.zero PR.one (dt.varAt j)).accBit
+            (dt.legCtlT (aT := aT) mV j st (dt.tagAt (PR := PR) j st)
+              (semT hg) f₀)
+        else N i' r)
+      (dt.varStE_new (dt.varAt j) st mV (semT hg)
+        (dt.varFG (PR := PR) (dt.varAt j) st v (dt.tagAt (PR := PR) j st) f₀)
+        aT)
+  · rw [show dt.legStB (aT := aT) mV j st semT f₀ = _ from dif_neg hg,
+      show dt.legBitB (aT := aT) mV j st semT f₀ = _ from dif_neg hg]
+    rfl
 
 include hrules hR hlin hord htop hbot hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in

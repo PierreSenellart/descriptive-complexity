@@ -158,24 +158,48 @@ def kinTop : Univ A R P dt.KIx dt.dd → Prop :=
 
 variable {dt}
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] in
 /-- **The VAL loop's enumeration exists**: an increment chain over
 `Fin (n + 1)` from the empty register to the Kin top, in exactly the forms
 `DescriptiveComplexity.Pfp.PfpData.var_run` demands — the covers are
-machine increments, the top passes the exhaustion test everywhere, and
-every earlier register fails it somewhere. -/
+machine increments, the top passes the exhaustion test everywhere, every
+earlier register fails it somewhere, and every register of the chain holds
+inner cells alone, the Kin blocks being a final segment of the universe
+(`DescriptiveComplexity.Pfp.kinSeg`, `DescriptiveComplexity.subset_of_wmSetLe`).
+That last fact is what the semantic layer reads a register through. -/
 theorem exists_valEnum
-    (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd))) :
+    (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
+    (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y) :
     ∃ (n : ℕ) (mV : Fin (n + 1) → (Univ A R P dt.KIx dt.dd → Prop)),
       mV 0 = (fun _ => False) ∧
       (∀ a a' : Fin (n + 1), a < a' → (∀ b, ¬(a < b ∧ b < a')) →
         WMIncr WMLe (mV a) (mV a')) ∧
       (∀ u, dt.InnerFull (mV (Fin.last n)) u) ∧
-      (∀ a, a < Fin.last n → ∃ u, ¬dt.InnerFull (mV a) u) := by
+      (∀ a, a < Fin.last n → ∃ u, ¬dt.InnerFull (mV a) u) ∧
+      (∀ (a : Fin (n + 1)) (t : PfpTag R P dt.KIx) (w : Fin dt.dd → A),
+        mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j) := by
   classical
   obtain ⟨n, mV, h0, hlast, hchain⟩ := exists_wmChain hlin (dt.kinTop
     (A := A) (R := R) (P := P))
-  refine ⟨n, mV, h0, ?_, ?_, ?_⟩
+  -- a Kin cell is an inner tag, and conversely
+  have hcvt : ∀ t : PfpTag R P dt.KIx, (∃ j : Fin dt.ki, tagBlk t = some (Sum.inr j)) →
+      ∃ j : Fin dt.ki, t = argIn dt.ko j := by
+    rintro t ⟨j, hj⟩
+    match t with
+    | .arg i =>
+      rcases h' : ofLex i with k | j'
+      · exact absurd hj (by rw [tagBlk, h']; exact fun hc => nomatch hc)
+      · exact ⟨j', congrArg PfpTag.arg (congrArg toLex h')⟩
+  -- the Kin cells are a final segment of the universe, so a register at or
+  -- below their address holds nothing else
+  have hup : ∀ x y : Univ A R P dt.KIx dt.dd,
+      dt.kinTop x → WMLt WMLe x y → dt.kinTop y := by
+    rintro ⟨t, w⟩ ⟨t', w'⟩ hx hlt
+    obtain ⟨j, rfl⟩ := hcvt t hx
+    rcases (hord _ _).mp hlt.1 with htag | ⟨htag, -⟩
+    · obtain ⟨j', rfl⟩ := kinSeg.final j t' (wmLt_le_iff.mpr htag)
+      exact ⟨j', rfl⟩
+    · exact ⟨j, by rw [← htag]; rfl⟩
+  refine ⟨n, mV, h0, ?_, ?_, ?_, ?_⟩
   · -- adjacency in `Fin (n + 1)` is the chain's cover
     intro a a' hlt hnb
     have hava : (a : ℕ) < (a' : ℕ) := hlt
@@ -207,6 +231,13 @@ theorem exists_valEnum
     have hne := (wmSetLt_iff _ _).mp (wmChain_lt hlin hchain ha)
     rw [heq, ← hlast] at hne
     exact hne.2 rfl
+  · -- every register of the chain is at or below the Kin top, hence inside it
+    intro a t w ha
+    have hle : WMSetLe WMLe (mV a) (dt.kinTop (A := A) (R := R) (P := P)) := by
+      rcases eq_or_lt_of_le (Fin.le_last a) with rfl | hlt
+      · exact hlast ▸ Or.inl fun _ => Iff.rfl
+      · exact hlast ▸ Or.inr (wmChain_lt hlin hchain hlt)
+    exact hcvt t (subset_of_wmSetLe hlin hup hle ha)
 
 end PfpData
 

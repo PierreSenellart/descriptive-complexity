@@ -400,18 +400,20 @@ theorem old_trackOf_stageTgtD (hzo : zero ≠ one)
     (vi : dt.VarIx) (iv : dt.d.B.ι) (ha : dt.d.B.arity iv ≤ dt.ko)
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (stV : TapeSt dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
-    (hdict : stV.old iv = trackOf dt.ly zero one ha σ)
+    {Below : (Univ A R P dt.KIx dt.dd → Prop) → Prop}
+    (hdict : ∀ s, Below s →
+      (stV.old iv s ↔ trackOf dt.ly zero one ha σ s))
     (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi))
     {p : Fin (dt.d.B.arity iv) → dt.X.Map A}
     (hsrc : ∀ ℓ : Fin (dt.d.B.arity iv),
       wmBlk (dt.lvSet stV vi (ts ℓ))
         (PfpTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : PfpTag R P dt.KIx) =
-        encMap dt.ly zero one (p ℓ)) :
+        encMap dt.ly zero one (p ℓ))
+    (hbelow : Below (dt.stageTgtD zero vi iv ts stV v (dt.d.B.arity iv))) :
     stV.old iv (dt.stageTgtD zero vi iv ts stV v (dt.d.B.arity iv)) ↔
-      σ iv p := by
-  rw [hdict]
-  exact trackOf_of_blocks hzo ha σ
-    (fun ℓ => dt.wmBlk_stageTgtD_eq_encMap vi iv ts stV v hsrc ℓ)
+      σ iv p :=
+  (hdict _ hbelow).trans (trackOf_of_blocks hzo ha σ
+    (fun ℓ => dt.wmBlk_stageTgtD_eq_encMap vi iv ts stV v hsrc ℓ))
 
 end StageDict
 

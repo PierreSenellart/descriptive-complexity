@@ -75,6 +75,17 @@ theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P) (v : dt.VarIx)
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
+/-- **A level's register set depends on the mirror and VAL alone** — which
+is what lets everything read through it be transported between states that
+share those two registers. -/
+theorem lvSet_congr (vi : dt.VarIx) {st st' : TapeSt dt A R P}
+    (hmir : st.mir = st'.mir) (hval : st.val = st'.val)
+    (j : Fin (dt.nOf vi)) : dt.lvSet st vi j = dt.lvSet st' vi j := by
+  rw [lvSet, lvSet, hmir, hval]
+
+omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
+  [Finite A] [Finite R] [Finite P] in
 /-- The marker slot is not a level's track. -/
 theorem wk_ne_lvTrack (v : dt.VarIx) (j : Fin (dt.nOf v)) :
     (Slot.wk : dt.SlotIx) ≠ dt.lvTrack v j := by
@@ -165,6 +176,23 @@ noncomputable def cmpFam (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A))
     (dt.cmpCell zero vi j₁ j₂) f₀ b j
 
 variable {zero one vi av isEq j₁ j₂ st vAdr}
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **A comparison is blind to the two scratch registers**: it reads the
+levels' register sets, which are the mirror and VAL
+(`DescriptiveComplexity.Pfp.PfpData.lvSet`), and its background at the
+working cell alone. -/
+theorem cmpFam_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A)) (j : Fin 3) :
+    dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ b j =
+      dt.cmpFam zero one vi av hnf isEq j₁ j₂ st' vAdr f₀ b j := by
+  have hset : dt.cmpSet vi j₁ j₂ st = dt.cmpSet vi j₁ j₂ st' := by
+    funext k
+    simp only [cmpSet, lvSet, h.2.1, h.2.2.1]
+  rw [cmpFam, cmpFam, hset]
+  exact elemFam_congr_rest (h.back hreg) _ _ _ _
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- The read tracks are backed by the register sets. -/

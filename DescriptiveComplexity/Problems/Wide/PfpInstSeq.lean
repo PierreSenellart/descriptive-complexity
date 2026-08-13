@@ -171,6 +171,68 @@ noncomputable def KindSem : MatAtom dt.X dt.d (dt.nOf vi) → Type
           (PfpTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : PfpTag R P dt.KIx) =
           encMap dt.ly zero one (pts ℓ) }
 
+/-- **A semantic pack transports along the registers it reads.**
+`DescriptiveComplexity.Pfp.PfpData.KindSem` sees the tape state only
+through the levels' register sets, so a pack at one state is a pack at
+every state with the same mirror and VAL. This is what lets *one* pack —
+built at an address's entry state — serve every position of the spine and
+every round of the VAL loop, whose states differ from it in the tracks
+they have written and in the two scratch registers. -/
+noncomputable def kindSemCast (zero one : A) (vi : dt.VarIx)
+    {st st' : TapeSt dt A R P}
+    (hmir : st.mir = st'.mir) (hval : st.val = st'.val)
+    (κ : MatAtom dt.X dt.d (dt.nOf vi))
+    (s : dt.KindSem zero one vi st κ) : dt.KindSem zero one vi st' κ :=
+  match κ, s with
+  | .eq _ _, s => s
+  | .ord _ _, s => s
+  | .stage _ _, s => s
+  | @MatAtom.exp _ _ _ _ _ _ ts, s =>
+    ⟨s.1, fun ℓ => by
+      rw [← dt.lvSet_congr vi hmir hval (ts ℓ)]
+      exact s.2 ℓ⟩
+
+omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
+  [Finite P] [Nonempty A] [L.IsRelational] in
+/-- **Transporting twice is transporting once**: the pack's content is its
+points, and the proof it carries is irrelevant. -/
+theorem kindSemCast_kindSemCast (zero one : A) (vi : dt.VarIx)
+    {st st' st'' : TapeSt dt A R P}
+    (h1 : st.mir = st'.mir) (h2 : st.val = st'.val)
+    (h3 : st'.mir = st''.mir) (h4 : st'.val = st''.val)
+    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (s : dt.KindSem zero one vi st κ) :
+    dt.kindSemCast zero one vi h3 h4 κ (dt.kindSemCast zero one vi h1 h2 κ s) =
+      dt.kindSemCast zero one vi (h1.trans h3) (h2.trans h4) κ s := by
+  cases κ <;> rfl
+
+omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
+  [Finite P] [Nonempty A] [L.IsRelational] in
+/-- **A round trip of transports is the identity** — the shape the VAL
+loop's bridge closes with: the pack leaves the round state, travels to the
+round's own state and to the state its matrix threads, and comes back. -/
+theorem kindSemCast_triple (zero one : A) (vi : dt.VarIx)
+    {st₁ st₂ st₃ : TapeSt dt A R P}
+    (h1 : st₁.mir = st₂.mir) (h2 : st₁.val = st₂.val)
+    (h3 : st₂.mir = st₃.mir) (h4 : st₂.val = st₃.val)
+    (h5 : st₃.mir = st₁.mir) (h6 : st₃.val = st₁.val)
+    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (s : dt.KindSem zero one vi st₁ κ) :
+    dt.kindSemCast zero one vi h5 h6 κ
+        (dt.kindSemCast zero one vi h3 h4 κ
+          (dt.kindSemCast zero one vi h1 h2 κ s)) = s := by
+  cases κ <;> rfl
+
+omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
+  [Finite P] [Nonempty A] [L.IsRelational] in
+/-- **Transporting to the same state is doing nothing.** -/
+theorem kindSemCast_self (zero one : A) (vi : dt.VarIx)
+    {st : TapeSt dt A R P} (h1 : st.mir = st.mir) (h2 : st.val = st.val)
+    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (s : dt.KindSem zero one vi st κ) :
+    dt.kindSemCast zero one vi h1 h2 κ s = s := by
+  cases κ <;> rfl
+
 open Classical in
 /-- **The control one atom's machinery leaves behind**, by kind: the fold's
 exit at the comparison's or the expansion atom's family, the verdict store
@@ -224,6 +286,57 @@ noncomputable def kindExitCtl :
       (dt.back zero one dt.dd0Le st v)
 
 variable {dt zero one vi av st v}
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **An atom's machinery is blind to the two scratch registers**: each
+kind's loop reads the levels' register sets and its background at the
+working cell, and each kind's exit reads the control alone
+(`DescriptiveComplexity.Pfp.PfpData.cmpArgs_exitSt_congr` and its two
+siblings). The pack travels by
+`DescriptiveComplexity.Pfp.PfpData.kindSemCast`, which keeps its points.
+This is the brick the whole threaded-versus-unthreaded bridge is built
+from. -/
+theorem kindExitCtl_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (sem : dt.KindSem zero one vi st κ)
+    (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
+    (hn : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
+    (f : dt.CtlIx → A) :
+    dt.kindExitCtl zero one vi av st v κ sem hk hn hrd f =
+      dt.kindExitCtl zero one vi av st' v κ
+        (dt.kindSemCast zero one vi h.2.1 h.2.2.1 κ sem) hk hn hrd f := by
+  classical
+  cases κ with
+  | eq j₁ j₂ =>
+    refine Eq.trans (dt.cmpArgs_exitSt_congr zero one vi av hrd true j₁ j₂ _ _
+      (dt.back zero one dt.dd0Le st' v)) ?_
+    rw [dt.cmpFam_congr_scratch hrd h hreg]
+    rfl
+  | ord j₁ j₂ =>
+    refine Eq.trans (dt.cmpArgs_exitSt_congr zero one vi av hrd false j₁ j₂ _ _
+      (dt.back zero one dt.dd0Le st' v)) ?_
+    rw [dt.cmpFam_congr_scratch hrd h hreg]
+    rfl
+  | stage i ts =>
+    have hold : st.old i (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i)) =
+        st'.old i (dt.stageTgtD zero vi i ts st' v (dt.d.B.arity i)) := by
+      rw [← dt.stageTgtD_congr_scratch (v := v) h (dt.d.B.arity i)]
+      exact congrFun (congrFun h.2.2.2.1 i) _
+    refine Eq.trans (dt.stageArgs_setAv_congr zero one vi i ts av _ _ _
+      (dt.back zero one dt.dd0Le
+        (dt.stageAtSt st' v
+          (dt.stageTgtD zero vi i ts st' v (dt.d.B.arity i)))
+        (dt.stageTgtD zero vi i ts st' v (dt.d.B.arity i)))) ?_
+    rw [if_congr (iff_of_eq hold) rfl rfl,
+      dt.stageFAt_congr_scratch h hreg f (dt.d.B.arity i)]
+    rfl
+  | @exp k e ts =>
+    refine Eq.trans (dt.expArgs_exitSt_congr zero one vi ts e av hk _ _ _ _ _
+      (dt.back zero one dt.dd0Le st' v)) ?_
+    rw [dt.expTagFam_congr_scratch (k := k) (hk := hk) h hreg,
+      dt.expFam_congr_scratch (k := k) (hk := hk) h hreg]
+    rfl
 
 section Run
 
@@ -1015,6 +1128,31 @@ noncomputable def mkKindSem (w : Fin (dt.nOf vi) → dt.X.Map A)
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
+/-- **The transport of a built pack is the built pack**: `mkKindSem` puts
+the valuation's points in and nothing else, and the proof components are
+irrelevant. -/
+theorem kindSemCast_mkKindSem (zero one : A) (vi : dt.VarIx)
+    {st st' : TapeSt dt A R P}
+    (hmir : st.mir = st'.mir) (hval : st.val = st'.val)
+    {w w' : Fin (dt.nOf vi) → dt.X.Map A} (hww : w = w')
+    (hENC : ∀ j : Fin (dt.nOf vi),
+      wmBlk (dt.lvSet st vi j)
+        (PfpTag.arg (toLex (dt.lvBlk vi j)) : PfpTag R P dt.KIx) =
+        encMap dt.ly zero one (w j))
+    (hENC' : ∀ j : Fin (dt.nOf vi),
+      wmBlk (dt.lvSet st' vi j)
+        (PfpTag.arg (toLex (dt.lvBlk vi j)) : PfpTag R P dt.KIx) =
+        encMap dt.ly zero one (w' j))
+    (κ : MatAtom dt.X dt.d (dt.nOf vi)) :
+    dt.kindSemCast zero one vi hmir hval κ
+        (dt.mkKindSem zero one vi st w hENC κ) =
+      dt.mkKindSem zero one vi st' w' hENC' κ := by
+  subst hww
+  cases κ <;> rfl
+
+omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
+  [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
 /-- **One round's agreement is the padded bits'**: given the two registers
 hold encodings, the machine's per-tuple question is the encodings'. -/
 theorem cmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
@@ -1256,6 +1394,74 @@ noncomputable def matFsT
         (enterSt ⟨n, h⟩ (matFsT enterSt sem f₀ n)
           (dt.back zero one dt.dd0Le (dt.matSt vi st v n) v))
     else matFsT enterSt sem f₀ n
+
+omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
+  [Finite P] [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
+/-- **A threaded state of the matrix is the entry state up to the two
+scratch registers** — `matSt_eq` in the form the congruences take. -/
+theorem scratchEq_matSt (n : ℕ) : dt.ScratchEq (dt.matSt vi st v n) st :=
+  ⟨(dt.matSt_fields (v := v) (st := st) n).1,
+    (dt.matSt_fields (v := v) (st := st) n).2.1,
+    (dt.matSt_fields (v := v) (st := st) n).2.2.2.1,
+    (dt.matSt_fields (v := v) (st := st) n).2.2.2.2,
+    (dt.matSt_fields' (v := v) (st := st) n).1,
+    (dt.matSt_fields (v := v) (st := st) n).2.2.1,
+    (dt.matSt_fields' (v := v) (st := st) n).2⟩
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite dt.KIx] in
+/-- **The matrix is blind to the two scratch registers**: atom by atom,
+`kindExitCtl_congr_scratch`. -/
+theorem matFs_congr_scratch {st' : TapeSt dt A R P} (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
+      dt.CtlIx → A)
+    (sem : ∀ a : Fin (dt.natOf vi), dt.KindSem zero one vi st (dt.kindOf vi a))
+    (f₀ : dt.CtlIx → A) (n : ℕ) :
+    dt.matFs zero one vi st v enterSt sem f₀ n =
+      dt.matFs zero one vi st' v enterSt
+        (fun a => dt.kindSemCast zero one vi h.2.1 h.2.2.1 (dt.kindOf vi a)
+          (sem a)) f₀ n := by
+  classical
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [matFs, matFs]
+    by_cases hn : n < dt.natOf vi
+    · rw [dif_pos hn, dif_pos hn, ih, h.back hreg]
+      exact dt.kindExitCtl_congr_scratch h hreg (dt.kindOf vi ⟨n, hn⟩)
+        (sem ⟨n, hn⟩) _ _ _ _
+    · rw [dif_neg hn, dif_neg hn, ih]
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite dt.KIx] in
+/-- **The threaded matrix is the unthreaded one**: an atom's machinery
+reads the levels' registers and its background at the working cell
+(`kindExitCtl_congr_scratch`), and the threading rewrites SAV and TARGET
+alone. This is the bridge between the control the *run* produces and the
+control the *semantics* is stated at. -/
+theorem matFsT_eq_matFs (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
+      dt.CtlIx → A)
+    (semT : ∀ a : Fin (dt.natOf vi),
+      dt.KindSem zero one vi (dt.matSt vi st v (a : ℕ)) (dt.kindOf vi a))
+    (f₀ : dt.CtlIx → A) (n : ℕ) :
+    dt.matFsT zero one vi st v enterSt semT f₀ n =
+      dt.matFs zero one vi st v enterSt
+        (fun a => dt.kindSemCast zero one vi
+          (dt.scratchEq_matSt (a : ℕ)).2.1
+          (dt.scratchEq_matSt (a : ℕ)).2.2.1
+          (dt.kindOf vi a) (semT a)) f₀ n := by
+  classical
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [matFsT, matFs]
+    by_cases hn : n < dt.natOf vi
+    · rw [dif_pos hn, dif_pos hn, ih,
+        (dt.scratchEq_matSt n).back hreg]
+      exact dt.kindExitCtl_congr_scratch (dt.scratchEq_matSt n) hreg
+        (dt.kindOf vi ⟨n, hn⟩) (semT ⟨n, hn⟩) _ _ _ _
+    · rw [dif_neg hn, dif_neg hn, ih]
 
 include hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt hrules in
 /-- **The matrix's run, threaded**: as

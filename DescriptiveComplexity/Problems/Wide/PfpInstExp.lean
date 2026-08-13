@@ -257,6 +257,23 @@ theorem readLvE_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
   rw [expFam, elemFam, hchain]
   exact hiter a
 
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **An expansion atom's element loop is blind to the two scratch
+registers**: it reads the levels' register sets — the mirror and VAL — and
+its background at the working cell alone. -/
+theorem expFam_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
+    (j : Fin (dt.relNr e τ + 1)) :
+    dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a j =
+      dt.expFam zero one vi ts e av st' τ hk hn hrd vAdr f₀ a j := by
+  have hset : dt.expESet vi ts e st τ = dt.expESet vi ts e st' τ := by
+    funext r
+    simp only [expESet, lvSet, h.2.1, h.2.2.1]
+  rw [expFam, expFam, hset]
+  exact elemFam_congr_rest (h.back hreg) _ _ _ _
+
 /-! ### The witness chain: its family, read-backs and decode -/
 
 variable (zero one vi ts e av st hk hn hrd vAdr) in
@@ -266,6 +283,20 @@ noncomputable def expTagFam (f₀ : dt.CtlIx → A)
   tagFam ((dt.expArgs zero one vi ts e av hk hn hrd).setTagFlag)
     (dt.back zero one dt.dd0Le st) vAdr (dt.expTagSet vi ts st)
     (dt.expTagCell zero one vi ts) f₀ i
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **The witness chain is blind to the two scratch registers too.** -/
+theorem expTagFam_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (f₀ : dt.CtlIx → A) (i : Fin (k * Fintype.card dt.X.Tag + 1)) :
+    dt.expTagFam zero one vi ts e av st hk hn hrd vAdr f₀ i =
+      dt.expTagFam zero one vi ts e av st' hk hn hrd vAdr f₀ i := by
+  have hset : dt.expTagSet vi ts st = dt.expTagSet vi ts st' := by
+    funext i'
+    simp only [expTagSet, lvSet, h.2.1, h.2.2.1]
+  rw [expTagFam, expTagFam, hset]
+  exact tagFam_congr_rest (h.back hreg) _ _ _
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]

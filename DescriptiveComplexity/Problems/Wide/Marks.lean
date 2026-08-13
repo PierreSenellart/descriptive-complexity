@@ -131,6 +131,17 @@ theorem wmSetLt_wmSeg_iff (h : IsLinOrd (WMLe (A := A))) (x y : A) :
   · exact hc ⟨hxy, fun hcon => ((wmSetLt_iff _ _).mp hlt).2
       (congrArg wmSeg (h.2.2.1 x y hxy hcon))⟩
 
+/-- **A cell of the working area is no register**: the first register is the
+cell of the least element, so an address strictly below it is the cell of no
+element at all. This is what tells a program's reads that the four register
+slots of its background do not matter where it stands
+(`DescriptiveComplexity.Pfp.PfpData.back_congr_off_reg`). -/
+theorem not_wmSeg_of_wmSetLt_wmSeg (h : IsLinOrd (WMLe (A := A))) {bot : A}
+    (hbot : ∀ y : A, WMLe bot y) {r : A → Prop}
+    (hr : WMSetLt WMLe r (wmSeg bot)) : ¬∃ u : A, r = wmSeg u := by
+  rintro ⟨u, rfl⟩
+  exact ((wmSetLt_wmSeg_iff h u bot).mp hr).2 (hbot u)
+
 /-- **Consecutive elements mark consecutive cells**: no cell strictly between the
 cell of an element and the cell of its successor is marked. That is what a
 program walking its register file needs – one scan carries it from each register

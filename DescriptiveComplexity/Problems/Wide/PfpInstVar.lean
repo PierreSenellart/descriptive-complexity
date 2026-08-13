@@ -517,6 +517,18 @@ noncomputable def roundSt (m : Univ A R P dt.KIx dt.dd → Prop) :
     TapeSt dt A R P :=
   { st with val := m }
 
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational]
+  [Finite dt.KIx] in
+/-- **Two round states at the same register ask the same pass.** -/
+theorem igPassP_roundSt (zero one : A) (vi : dt.VarIx)
+    (st st' : TapeSt dt A R P)
+    (m : Univ A R P dt.KIx dt.dd → Prop)
+    (ℓ : Fin (dt.nIn vi)) :
+    dt.igPassP zero one vi (dt.roundSt st m) ℓ ↔
+      dt.igPassP zero one vi (dt.roundSt st' m) ℓ :=
+  dt.igPassP_congr zero one vi rfl ℓ
+
+
 variable {dt}
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -1259,6 +1271,16 @@ theorem varStE_val (fG : dt.CtlIx → A) (a : ιV) :
     (dt.varFMT vi st v mV semT fG a)).2.2.2.1
 
 omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
+/-- **The VAL loop never touches a stage track**: only the two scratch
+registers are threaded, so the `new` tracks the spine writes ride the
+whole loop. -/
+theorem varStE_new (fG : dt.CtlIx → A) (a : ιV) :
+    (dt.varStE vi st v mV semT fG a).new = st.new := by
+  rw [varStE, dt.roundEndSt_eq vi (dt.varStT vi st v mV semT fG a) v
+    (dt.varFMT vi st v mV semT fG a)]
+  rfl
+
+omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **A round's exit state is the next round's entry state**, once the
 next round's register is written over it. -/
 theorem varRdSt_varStE (fG : dt.CtlIx → A) (a : ιV)
@@ -1321,6 +1343,118 @@ theorem varFMT_covers {a a' : ιV} (hlt : a < a')
         (dt.back PR.zero PR.one dt.dd0Le
           (dt.varStE vi st v mV semT fG a) v) :=
   congrArg Prod.snd (iterOrd_covers hlt hnb)
+
+/-! ### The threaded loop is the unthreaded one
+
+The VAL loop's rounds run at states that differ from the machinery's entry
+state in SAV and TARGET alone, and every control they compute is blind to
+that difference (`DescriptiveComplexity.Pfp.PfpData.roundCtlT_eq_roundCtl`,
+`DescriptiveComplexity.Pfp.PfpData.roundCtl_congr_scratch`). What the
+threading *can* change is the semantic pack, since a family indexed by the
+scratch registers may pick different points at different registers; so the
+bridge is stated at a pack that is one unthreaded pack transported
+(`semCastT`), which is what a reduction supplies
+(`DescriptiveComplexity.Pfp.PfpData.gatedSem`, whose points are the
+address's blocks and nothing else). -/
+
+section ThreadBridge
+
+variable {ιV : Type} [LinearOrder ιV] [Finite ιV]
+variable (mV : ιV → Univ A R P dt.KIx dt.dd → Prop)
+variable (sem₀ : ∀ a : ιV,
+  (∀ ℓ : Fin (dt.nIn vi),
+    dt.igPassP PR.zero PR.one vi (dt.roundSt st (mV a)) ℓ) →
+  ∀ b : Fin (dt.natOf vi),
+    dt.KindSem PR.zero PR.one vi (dt.roundSt st (mV a)) (dt.kindOf vi b))
+
+omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
+  [Finite P] [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
+/-- **A round's entry state is the round state up to the two scratch
+registers.** -/
+theorem scratchEq_varRdSt (p : Scratch dt A R P)
+    (m : Univ A R P dt.KIx dt.dd → Prop) :
+    dt.ScratchEq (dt.varRdSt st p m) (dt.roundSt st m) :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+variable (v) in
+/-- **One unthreaded pack, at every state a round reaches**: the round's own
+state and the states its matrix threads all share the mirror and VAL of the
+round state, so `kindSemCast` carries the pack to each of them. -/
+noncomputable def semCastT (p : Scratch dt A R P) (a : ιV)
+    (hp : ∀ ℓ : Fin (dt.nIn vi),
+      dt.igPassP PR.zero PR.one vi (dt.varRdSt st p (mV a)) ℓ)
+    (b : Fin (dt.natOf vi)) :
+    dt.KindSem PR.zero PR.one vi
+      (dt.matSt vi (dt.varRdSt st p (mV a)) v (b : ℕ)) (dt.kindOf vi b) :=
+  dt.kindSemCast (st := dt.roundSt st (mV a))
+    (st' := dt.matSt vi (dt.varRdSt st p (mV a)) v (b : ℕ)) PR.zero PR.one vi
+    ((dt.scratchEq_matSt (vi := vi) (st := dt.varRdSt st p (mV a)) (v := v)
+      (b : ℕ)).2.1).symm
+    ((dt.scratchEq_matSt (vi := vi) (st := dt.varRdSt st p (mV a)) (v := v)
+      (b : ℕ)).2.2.1).symm
+    (dt.kindOf vi b)
+    (sem₀ a (fun ℓ => (dt.igPassP_congr PR.zero PR.one vi rfl ℓ).mp (hp ℓ)) b)
+
+omit [Finite R] [Finite P] [Finite dt.KIx] [LinearOrder ιV] [Finite ιV] in
+/-- **One threaded round is the unthreaded round**: a round's own state is
+the round state up to SAV and TARGET, its matrix threads those two further,
+and the pack rides along — three transports that compose to none. -/
+theorem roundCtlT_semCastT (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (p : Scratch dt A R P) (a : ιV) (q : dt.CtlIx → A) :
+    dt.roundCtlT PR.zero_ne_one vi (dt.varRdSt st p (mV a)) v
+        (dt.semCastT vi st v mV sem₀ p a) q =
+      dt.roundFX vi st v mV sem₀ q a := by
+  classical
+  rw [roundFX, dt.roundCtlT_eq_roundCtl PR.zero_ne_one hreg vi _ _ _,
+    dt.roundCtl_congr_scratch PR.zero_ne_one
+      (dt.scratchEq_varRdSt st p (mV a)) hreg vi _ _]
+  congr 1
+  funext hp b
+  simp only [semCastT]
+  exact dt.kindSemCast_triple PR.zero PR.one vi _ _ _ _ _ _ (dt.kindOf vi b)
+    (sem₀ a _ b)
+
+omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
+/-- **The threaded round of the VAL loop is the unthreaded one**, at the
+state the loop's own thread produced. -/
+theorem varFXT_eq_roundFX
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (fG : dt.CtlIx → A) (a : ιV) :
+    dt.varFXT vi st v mV (dt.semCastT vi st v mV sem₀) fG a =
+      dt.roundFX vi st v mV sem₀
+        (dt.varFMT vi st v mV (dt.semCastT vi st v mV sem₀) fG a) a :=
+  dt.roundCtlT_semCastT vi st mV sem₀ hreg
+    (dt.varSTT vi st v mV (dt.semCastT vi st v mV sem₀) fG a) a
+    (dt.varFMT vi st v mV (dt.semCastT vi st v mV sem₀) fG a)
+
+omit [Finite R] [Finite P] [Finite dt.KIx] in
+/-- **The VAL loop's threaded control is its unthreaded control**: round by
+round, `varFXT_eq_roundFX`, the backgrounds agreeing because a round's exit
+state is the round state up to SAV and TARGET. This is the bridge between
+the control the machine's run produces and the control
+`DescriptiveComplexity.Pfp.PfpData.accVerdict_leafP` reads. -/
+theorem varFMT_eq_varFM
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (fG : dt.CtlIx → A) (a : ιV) :
+    dt.varFMT vi st v mV (dt.semCastT vi st v mV sem₀) fG a =
+      dt.varFM vi st v mV sem₀ fG a := by
+  classical
+  induction a using order_induction with
+  | hmin z hz =>
+    rw [dt.varFMT_bot vi st mV (dt.semCastT vi st v mV sem₀) hz fG,
+      show dt.varFM vi st v mV sem₀ fG z = _ from iterOrd_bot hz]
+  | hstep w z hwz hnb ih =>
+    have hSE : dt.ScratchEq
+        (dt.varStE vi st v mV (dt.semCastT vi st v mV sem₀) fG w)
+        (dt.roundSt st (mV w)) :=
+      (dt.scratchEq_roundEndSt vi _ v _).trans (dt.scratchEq_varRdSt st _ (mV w))
+    rw [dt.varFMT_covers vi st mV (dt.semCastT vi st v mV sem₀) hwz hnb fG,
+      show dt.varFM vi st v mV sem₀ fG z = _ from iterOrd_covers hwz hnb,
+      dt.varFXT_eq_roundFX vi st mV sem₀ hreg fG w, hSE.back hreg, ih]
+    rfl
+
+end ThreadBridge
 
 end ThreadsT
 

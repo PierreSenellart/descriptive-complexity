@@ -73,6 +73,30 @@ noncomputable def igateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
 
 variable {dt zero one b st t flag hnt hc hn hrd}
 
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **A gate's witness chain is blind to the two scratch registers**: it
+reads the VAL register and its background at the working cell. -/
+theorem igateTagFam_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (f₀ : dt.CtlIx → A) (i : Fin (Fintype.card dt.X.Tag + 1)) :
+    dt.igateTagFam zero one b st flag hc hn hrd vAdr f₀ i =
+      dt.igateTagFam zero one b st' flag hc hn hrd vAdr f₀ i := by
+  rw [igateTagFam, igateTagFam, h.2.2.1]
+  exact tagFam_congr_rest (h.back hreg) _ _ _
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **A gate's domain loop is blind to them too.** -/
+theorem igateFam_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
+    (j : Fin (dt.domNr t + 1)) :
+    dt.igateFam zero one b st t flag hc hn hrd vAdr f₀ a j =
+      dt.igateFam zero one b st' t flag hc hn hrd vAdr f₀ a j := by
+  rw [igateFam, igateFam, h.2.2.1]
+  exact elemFam_congr_rest (h.back hreg) _ _ _ _
+
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in

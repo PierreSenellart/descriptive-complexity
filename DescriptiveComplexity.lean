@@ -122,6 +122,7 @@ import DescriptiveComplexity.PSpaceHierarchy
 import DescriptiveComplexity.Exponential
 import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
+import DescriptiveComplexity.EqPattern
 import DescriptiveComplexity.OccurrenceOrder
 import DescriptiveComplexity.OccurrenceFormulas
 import DescriptiveComplexity.OccurrenceSlack
@@ -1412,9 +1413,30 @@ The bottom of the ordered world, and the only vocabulary here that is a
   instance's own order, since a decision problem may not read the ambient one,
   and the promises that order carries reduce to three first-order conditions
   about the instance (`DescriptiveComplexity.wideData_wellFormed_iff`).
-  Hardness is **not** proved: as for `ATMAcceptSpace` it needs the machine
-  written in logic, an evaluator for a fixed first-order kernel whose
-  quantifiers range over addresses.
+  Hardness **is** proved for the space variant:
+  `DescriptiveComplexity.dwideAcceptSpace_EXPSPACE_complete` and
+  `DescriptiveComplexity.wideAcceptSpace_EXPSPACE_complete`. The program is a
+  roaming machine with a register file, iterating a partial fixed point over the
+  expansion until it stabilises – no clock, and a diverging fixed point diverges,
+  which is a correct *no*. Three things make it fit in a first-order
+  interpretation. Every rule of the emitted machine is written down by **one
+  formula for every instance** (`DescriptiveComplexity.Pfp.uRulesDefinable_progOf`),
+  which is what an interpretation needs and what the guard interface
+  (`DescriptiveComplexity.Pfp.UGDefinable`) is shaped for. The eleven relations
+  are read off those (`DescriptiveComplexity.Pfp.PfpData.reads_progFrom`), the
+  input channel's mark being a register file whose two extremes are tag decisions
+  rather than quantifiers. And the base is not the instance but a **doubled**
+  universe (`DescriptiveComplexity.Pfp.dblInterp`), which is never a singleton –
+  a track is an element, so the machine needs two of them, and a reduction must
+  be correct at one-element structures too. The price of the doubling is paid on
+  the expansion's side, by relativizing it to the marked half
+  (`DescriptiveComplexity.Pfp.relExp`,
+  `DescriptiveComplexity.Pfp.relExpMapEquiv`), and the doubling being a plain
+  one-dimensional interpretation the composite keeps the dimension and only
+  multiplies the tags by `Bool ^ dd`. Hardness for the nondeterministic variant
+  is the deterministic one carried along
+  `DescriptiveComplexity.dwideAcceptSpace_fo_reduction_wideAcceptSpace`, which is
+  the library's standing rule that the deterministic side is the one to prove.
 
 ## Value invention, towards the recursively enumerable
 
@@ -1477,6 +1499,19 @@ The bottom of the ordered world, and the only vocabulary here that is a
   lengths (pad with a minimum of the input order), together with the FO(≤)
   formulas expressing it. This is the one place where the SAT-family
   reductions need their input to be ordered.
+* `DescriptiveComplexity.EqPattern` – data read only through its **equality
+  pattern** (which coordinates hold the least element, which the greatest,
+  which two are equal) is first-order definable, by one formula for every
+  structure. The pattern type is finite, so the formula is the disjunction of
+  the patterns admitted. This is what lets a machine assembled rule by rule be
+  written down as an interpretation without threading syntax through every
+  abstraction it is built from: a rule owes a `Prop` about its guard where the
+  guard is defined, not a formula. The write side is the same idea one step on:
+  `DescriptiveComplexity.SlotVal` names each output coordinate as a copy of an
+  input one, one of the two designated elements, or the **next** element after
+  an input one (`DescriptiveComplexity.ordSucc`, the cover in a finite linear
+  order), and `DescriptiveComplexity.writeTupF` is the formula that says a
+  tuple was written that way.
 * `DescriptiveComplexity.OccurrenceOrder` and
   `DescriptiveComplexity.OccurrenceFormulas` – machinery for encoding
   occurrences of literals in clauses, shared across the SAT-family reductions.

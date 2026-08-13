@@ -180,6 +180,43 @@ noncomputable def elemFam (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q �
     (fun j' b q' => setFlag j' b q' (rest v))
     (elemIter setFlag initEl advEl rest v m xOf f₀ a) (j : ℕ)
 
+/-! **The background is read at the working cell alone.** Both generated
+families mention `rest` only as `rest v`, so a background that moves
+elsewhere — at a register cell, say, where the four register slots live —
+generates the same control. This is what makes a loop blind to the two
+scratch registers of the state it is run at. -/
+
+section CongrRest
+
+variable {rest' : (Univ A R P K dd → Prop) → W → A}
+
+omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
+  [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
+  [Finite P] [Finite K] [Finite ι] in
+/-- Two backgrounds agreeing at the working cell give one round-entry
+family. -/
+theorem elemIter_congr_rest (h : rest v = rest' v)
+    (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A) (a : ι) :
+    elemIter setFlag initEl advEl rest v m xOf f₀ a =
+      elemIter setFlag initEl advEl rest' v m xOf f₀ a := by
+  simp only [elemIter, h]
+
+omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
+  [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
+  [Finite P] [Finite K] [Finite ι] in
+/-- Two backgrounds agreeing at the working cell give one within-round
+family. -/
+theorem elemFam_congr_rest (h : rest v = rest' v)
+    (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A) (a : ι)
+    (j : Fin (nr + 1)) :
+    elemFam setFlag initEl advEl rest v m xOf f₀ a j =
+      elemFam setFlag initEl advEl rest' v m xOf f₀ a j := by
+  simp only [elemFam, h, elemIter_congr_rest h]
+
+end CongrRest
+
 variable (hrules : ∀ (i : ElemSite nr) (ρ : ElemSh nr i),
   PR.rules (rEmb i ρ) = elemRule PR.one wk rg emb rdTrack MatchOf setFlag
     initEl advEl exitSt IsMaxEl exitPh i ρ)
@@ -276,6 +313,18 @@ noncomputable def tagFam (xT : Fin m → Univ A R P K dd) (f₀ : Q → A)
     (i : Fin (m + 1)) : Q → A :=
   chainSt (fun i' => mT i' (xT i'))
     (fun i' b q => setTagFlag i' b q (rest v)) f₀ (i : ℕ)
+
+omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
+  [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
+  [Finite P] [Finite K] in
+/-- **The witness chain reads its background at the working cell alone.** -/
+theorem tagFam_congr_rest {rest' : (Univ A R P K dd → Prop) → W → A}
+    (h : rest v = rest' v) (xT : Fin m → Univ A R P K dd) (f₀ : Q → A)
+    (i : Fin (m + 1)) :
+    tagFam setTagFlag rest v mT xT f₀ i =
+      tagFam setTagFlag rest' v mT xT f₀ i := by
+  simp only [tagFam, h]
 
 variable {rEmb : ∀ i : TagSite m T nrOf, TagSh m T nrOf i → R}
 variable (hrules : ∀ (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i),
@@ -429,6 +478,38 @@ noncomputable def tupleIter1 (xS xD : ι → Univ A R P K dd)
     setBit false (tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a)
       (restF (tupleIterD mSrc xS xD mD₀ a) v)
 
+section CongrRestF
+
+variable {restF' : (Univ A R P K dd → Prop) →
+  (Univ A R P K dd → Prop) → W → A}
+
+omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
+  [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
+  [Finite P] [Finite K] [Finite ι] in
+/-- **The copy loop reads its background at the working cell alone** — at
+every destination content, the cell being the same one. -/
+theorem tupleIter0_congr_restF (h : ∀ m', restF m' v = restF' m' v)
+    (xS xD : ι → Univ A R P K dd) (mD₀ : Univ A R P K dd → Prop)
+    (f₀ : Q → A) (a : ι) :
+    tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a =
+      tupleIter0 setBit initLv advLv mSrc v restF' xS xD mD₀ f₀ a := by
+  simp only [tupleIter0, h]
+
+omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
+  [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
+  [Finite P] [Finite K] [Finite ι] in
+/-- The same, after the round's store. -/
+theorem tupleIter1_congr_restF (h : ∀ m', restF m' v = restF' m' v)
+    (xS xD : ι → Univ A R P K dd) (mD₀ : Univ A R P K dd → Prop)
+    (f₀ : Q → A) (a : ι) :
+    tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a =
+      tupleIter1 setBit initLv advLv mSrc v restF' xS xD mD₀ f₀ a := by
+  simp only [tupleIter1, h, tupleIter0_congr_restF h]
+
+end CongrRestF
+
 variable {rEmb : ∀ i : ChainSite 3 TupleSS, ChainSh 3 TupleSS TupleSh i → R}
 variable (hrules : ∀ (i : ChainSite 3 TupleSS) (ρ : ChainSh 3 TupleSS TupleSh i),
   PR.rules (rEmb i ρ) = tupleRule PR.zero PR.one wk rg emb tSrc tDst MatchS
@@ -533,6 +614,28 @@ section TupleContent
 
 variable {A R P K : Type} {dd : ℕ}
 variable {ι : Type} [LinearOrder ι] [Finite ι]
+
+/-- **What the copy loop can hold**: every cell of the destination track is
+either one the loop wrote — a destination cell of some round — or one it
+started with. A property of cells closed under both is therefore closed
+under the whole loop; that is how the target of a random access is known to
+be an address of argument cells alone. -/
+theorem tupleIterD_of_mem {mSrc : Univ A R P K dd → Prop}
+    {xS xD : ι → Univ A R P K dd} {mD₀ : Univ A R P K dd → Prop}
+    (Q : Univ A R P K dd → Prop) (hxD : ∀ a : ι, Q (xD a))
+    (h₀ : ∀ y, mD₀ y → Q y) (b : ι) {y : Univ A R P K dd}
+    (hy : tupleIterD mSrc xS xD mD₀ b y) : Q y := by
+  induction b using order_induction with
+  | hmin z hz =>
+    rw [show tupleIterD mSrc xS xD mD₀ z = mD₀ from iterOrd_bot hz] at hy
+    exact h₀ y hy
+  | hstep w z hwz hnb ih =>
+    rw [show tupleIterD mSrc xS xD mD₀ z = fun y =>
+      (y = xD w ∧ mSrc (xS w)) ∨ (y ≠ xD w ∧ tupleIterD mSrc xS xD mD₀ w y)
+      from iterOrd_covers hwz hnb] at hy
+    rcases hy with ⟨rfl, -⟩ | ⟨-, hw⟩
+    · exact hxD w
+    · exact ih hw
 
 /-- **What the copy loop has written**: a cell holds a bit exactly when some
 earlier round wrote it – that round's source bit – or it held one from the

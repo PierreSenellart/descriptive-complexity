@@ -524,6 +524,69 @@ noncomputable def stageTgtD : ℕ → Univ A R P dt.KIx dt.dd → Prop
         (toLex topTup)
     else stageTgtD n
 
+omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite R] [Finite P] in
+/-- **The target of a random access is an address of argument cells alone**:
+every cell it holds was written by a copy round, at that round's destination
+(`stageXD`, in an argument block), over the empty address. This is
+`wmSetLe_logicalTop`'s hypothesis, and so the first half of «the address a
+stage atom reads lies in the logical interval». -/
+theorem stageTgtD_arg (n : ℕ) {y : Univ A R P dt.KIx dt.dd}
+    (hy : dt.stageTgtD zero vi iv ts st v n y) :
+    ∃ i : dt.KIx, y.1 = PfpTag.arg i := by
+  classical
+  induction n generalizing y with
+  | zero => exact hy.elim
+  | succ n ih =>
+    rw [stageTgtD] at hy
+    split at hy
+    · simp only [tuplePost] at hy
+      rcases hy with ⟨hy1, -⟩ | ⟨-, hw⟩
+      · exact ⟨_, by rw [hy1, stageXD, blkElt]⟩
+      · exact tupleIterD_of_mem (fun u => ∃ i : dt.KIx, u.1 = PfpTag.arg i)
+          (fun _ => ⟨_, by rw [stageXD, blkElt]⟩) (fun _ hy' => ih hy') _ hw
+    · exact ih hy
+
+omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite R] [Finite P] in
+/-- **The target of a random access is padded**: every cell it holds is a
+destination cell, and those carry the round's tuple in the name slots and
+`zero` beyond them (`stageXD` writes `pad`). With `stageTgtD_arg` this is what
+places the address strictly below the logical top, whose blocks are full. -/
+theorem stageTgtD_isPad (n : ℕ) {y : Univ A R P dt.KIx dt.dd}
+    (hy : dt.stageTgtD zero vi iv ts st v n y) : IsPad dt.dd0 zero y.2 := by
+  classical
+  induction n generalizing y with
+  | zero => exact hy.elim
+  | succ n ih =>
+    rw [stageTgtD] at hy
+    split at hy
+    · simp only [tuplePost] at hy
+      rcases hy with ⟨hy1, -⟩ | ⟨-, hw⟩
+      · rw [hy1]
+        exact isPad_pad
+      · exact tupleIterD_of_mem (fun u => IsPad dt.dd0 zero u.2)
+          (fun _ => isPad_pad) (fun _ hy' => ih hy') _ hw
+    · exact ih hy
+
+omit [Fintype dt.SlotIx] [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] in
+/-- **The address a stage atom reads lies in the logical interval**: it is
+built from padded destination cells in argument blocks alone
+(`stageTgtD_arg`, `stageTgtD_isPad`), which is exactly
+`wmSetLt_logicalTop_of_isPad`. This is the `hbelow` the dictionary invariant
+of `DescriptiveComplexity.Pfp.PfpData.stageSt_old` is owed: the invariant is an
+equivalence over the interval and nowhere else, so an address that is read has
+to be shown to lie there. -/
+theorem wmSetLt_stageTgtD_logicalTop (hne : zero ≠ one)
+    (hV : IsLinOrd (tupLeLex (A := A) (d := dt.dd))) (hd : dt.dd0 < dt.dd)
+    (i : dt.KIx) (n : ℕ) :
+    WMSetLt (lexRel (· ≤ · : PfpTag R P dt.KIx → PfpTag R P dt.KIx → Prop)
+      (tupLeLex (A := A) (d := dt.dd)))
+      (dt.stageTgtD zero vi iv ts st v n) logicalTop :=
+  wmSetLt_logicalTop_of_isPad hne hV hd i
+    (fun _ ht _ hs => (dt.stageTgtD_arg n hs).elim fun i hi => ht i hi)
+    (fun _ hs => dt.stageTgtD_isPad n hs)
+
 variable (dt zero one vi iv ts av st v) in
 /-- **The control after the first `n` copy loops.** -/
 noncomputable def stageFAt (f₀ : dt.CtlIx → A) : ℕ → dt.CtlIx → A
@@ -540,6 +603,54 @@ noncomputable def stageFAt (f₀ : dt.CtlIx → A) : ℕ → dt.CtlIx → A
         (dt.stageXS zero vi iv ts ⟨n, h⟩) (dt.stageXD zero iv ⟨n, h⟩)
         (dt.stageTgtD zero vi iv ts st v n) (stageFAt f₀ n) (toLex topTup)
     else stageFAt f₀ n
+
+omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
+  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite R] [Finite P] in
+/-- **The TARGET a random access builds is blind to the two scratch
+registers**: every copy round reads a level's register set, and the loop
+pins SAV at the home address itself. -/
+theorem stageTgtD_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st') (n : ℕ) :
+    dt.stageTgtD zero vi iv ts st v n = dt.stageTgtD zero vi iv ts st' v n := by
+  have hlv : ∀ j : Fin (dt.nOf vi),
+      dt.lvSet { st with sav := v } vi j = dt.lvSet { st' with sav := v } vi j := by
+    intro j
+    simp only [lvSet, h.2.1, h.2.2.1]
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    simp only [stageTgtD]
+    by_cases hn : n < dt.d.B.arity iv
+    · rw [dif_pos hn, dif_pos hn, hlv, ih]
+    · rw [dif_neg hn, dif_neg hn, ih]
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **The control of the copy loops is blind to them too** — the
+destination-dependent background overwrites TARGET, and the loop reads it
+at the home cell alone. -/
+theorem stageFAt_congr_scratch {st' : TapeSt dt A R P}
+    (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (f₀ : dt.CtlIx → A) (n : ℕ) :
+    dt.stageFAt zero one vi iv ts av st v f₀ n =
+      dt.stageFAt zero one vi iv ts av st' v f₀ n := by
+  have hlv : ∀ j : Fin (dt.nOf vi),
+      dt.lvSet { st with sav := v } vi j = dt.lvSet { st' with sav := v } vi j := by
+    intro j
+    simp only [lvSet, h.2.1, h.2.2.1]
+  have hrest : ∀ m' : Univ A R P dt.KIx dt.dd → Prop,
+      dt.stageRestF zero one { st with sav := v } m' v =
+        dt.stageRestF zero one { st' with sav := v } m' v :=
+    fun m' => (h.scratch v m').back hreg
+  induction n with
+  | zero => exact congrArg _ ((h.scratch v (fun _ => False)).back hreg)
+  | succ n ih =>
+    simp only [stageFAt]
+    by_cases hn : n < dt.d.B.arity iv
+    · rw [dif_pos hn, dif_pos hn, hlv, ih,
+        dt.stageTgtD_congr_scratch h n]
+      exact tupleIter1_congr_restF hrest _ _ _ _ _
+    · rw [dif_neg hn, dif_neg hn, ih]
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]

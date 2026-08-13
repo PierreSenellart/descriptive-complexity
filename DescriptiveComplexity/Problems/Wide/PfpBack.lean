@@ -149,6 +149,134 @@ theorem back_mir_bit (u : Univ A R' P' dt.KIx dt.dd) :
       bitVal zero one (regBit st.mir (wmSeg u)) :=
   rfl
 
+/-! ### What a state's scratch registers do not decide
+
+The VAL loop threads SAV and TARGET and nothing else
+(`DescriptiveComplexity.Pfp.PfpData.roundEndSt_eq`), so its rounds run at
+states that differ from the machinery's entry state in those two registers
+alone. `ScratchEq` names that relation, and the lemmas below say what it
+buys: every per-cell mark and track is shared, hence so is the background
+at every cell of the working area — the four register slots being
+`DescriptiveComplexity.regBit`s, set at a register cell only. -/
+
+/-- **Two states differing in the two scratch registers alone**: every mark
+and every track is shared, the saved mirror and the target need not be. -/
+def ScratchEq (st st' : TapeSt dt A R' P') : Prop :=
+  st.wk = st'.wk ∧ st.mir = st'.mir ∧ st.val = st'.val ∧ st.old = st'.old ∧
+    st.new = st'.new ∧ st.bot = st'.bot ∧ st.ltp = st'.ltp
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+/-- Rewriting the two scratch registers is a `ScratchEq`. -/
+theorem scratchEq_scratch (st : TapeSt dt A R' P')
+    (X Y : Univ A R' P' dt.KIx dt.dd → Prop) :
+    dt.ScratchEq { st with sav := X, tgt := Y } st :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+/-- Rewriting the target alone is a `ScratchEq`. -/
+theorem scratchEq_tgt (st : TapeSt dt A R' P')
+    (Y : Univ A R' P' dt.KIx dt.dd → Prop) :
+    dt.ScratchEq { st with tgt := Y } st :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+/-- `ScratchEq` is reflexive. -/
+theorem scratchEq_refl (st : TapeSt dt A R' P') : dt.ScratchEq st st :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+variable {dt} in
+/-- `ScratchEq` is symmetric. -/
+theorem ScratchEq.symm {st st' : TapeSt dt A R' P'}
+    (h : dt.ScratchEq st st') : dt.ScratchEq st' st :=
+  ⟨h.1.symm, h.2.1.symm, h.2.2.1.symm, h.2.2.2.1.symm, h.2.2.2.2.1.symm,
+    h.2.2.2.2.2.1.symm, h.2.2.2.2.2.2.symm⟩
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+variable {dt} in
+/-- `ScratchEq` is transitive. -/
+theorem ScratchEq.trans {st st' st'' : TapeSt dt A R' P'}
+    (h : dt.ScratchEq st st') (h' : dt.ScratchEq st' st'') :
+    dt.ScratchEq st st'' :=
+  ⟨h.1.trans h'.1, h.2.1.trans h'.2.1, h.2.2.1.trans h'.2.2.1,
+    h.2.2.2.1.trans h'.2.2.2.1, h.2.2.2.2.1.trans h'.2.2.2.2.1,
+    h.2.2.2.2.2.1.trans h'.2.2.2.2.2.1,
+    h.2.2.2.2.2.2.trans h'.2.2.2.2.2.2⟩
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+variable {dt} in
+/-- `ScratchEq` survives writing the same scratch registers on both
+sides. -/
+theorem ScratchEq.scratch {st st' : TapeSt dt A R' P'}
+    (h : dt.ScratchEq st st') (X Y : Univ A R' P' dt.KIx dt.dd → Prop) :
+    dt.ScratchEq { st with sav := X, tgt := Y }
+      { st' with sav := X, tgt := Y } :=
+  h
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+variable {dt} in
+/-- `ScratchEq` survives writing the same target on both sides. -/
+theorem ScratchEq.tgt {st st' : TapeSt dt A R' P'}
+    (h : dt.ScratchEq st st') (Y : Univ A R' P' dt.KIx dt.dd → Prop) :
+    dt.ScratchEq { st with tgt := Y } { st' with tgt := Y } :=
+  h
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
+variable {dt} in
+/-- `ScratchEq` survives writing the same VAL register on both sides. -/
+theorem ScratchEq.val {st st' : TapeSt dt A R' P'}
+    (h : dt.ScratchEq st st') (m : Univ A R' P' dt.KIx dt.dd → Prop) :
+    dt.ScratchEq { st with val := m } { st' with val := m } :=
+  ⟨h.1, h.2.1, rfl, h.2.2.2.1, h.2.2.2.2.1, h.2.2.2.2.2.1, h.2.2.2.2.2.2⟩
+
+/-- **Off the register file the background is blind to every register**: the
+four register slots read `DescriptiveComplexity.regBit`, which is set at a
+register cell only, so at a cell of the working area two states agree as
+soon as their per-cell marks and tracks do — whatever their mirror, their
+target, their saved mirror or their VAL content is. This is what lets the
+control of the VAL loop's *threaded* states be the control of the
+unthreaded ones: threading rewrites the two scratch registers, and the
+rounds read their background at the working cell. -/
+theorem back_congr_off_reg {st st' : TapeSt dt A R' P'}
+    (hwk : st.wk = st'.wk) (hbot : st.bot = st'.bot) (hltp : st.ltp = st'.ltp)
+    (hold : st.old = st'.old) (hnew : st.new = st'.new)
+    {r : Univ A R' P' dt.KIx dt.dd → Prop}
+    (hr : ¬∃ u : Univ A R' P' dt.KIx dt.dd, r = wmSeg u) :
+    dt.back zero one hdd st r = dt.back zero one hdd st' r := by
+  have hreg : ∀ m : Univ A R' P' dt.KIx dt.dd → Prop, ¬regBit m r :=
+    fun m hc => hr ⟨hc.choose, hc.choose_spec.1⟩
+  funext s
+  cases s with
+  | mir => exact bitVal_congr (iff_of_false (hreg st.mir) (hreg st'.mir))
+  | tgt => exact bitVal_congr (iff_of_false (hreg st.tgt) (hreg st'.tgt))
+  | sav => exact bitVal_congr (iff_of_false (hreg st.sav) (hreg st'.sav))
+  | val => exact bitVal_congr (iff_of_false (hreg st.val) (hreg st'.val))
+  | wk => exact congrArg (bitVal zero one) (congrFun hwk r)
+  | bot => exact congrArg (bitVal zero one) (congrFun hbot r)
+  | ltp => exact congrArg (bitVal zero one) (congrFun hltp r)
+  | old i =>
+    exact congrArg (bitVal zero one) (congrFun (congrFun hold i) r)
+  | new i =>
+    exact congrArg (bitVal zero one) (congrFun (congrFun hnew i) r)
+  | _ => rfl
+
+variable {dt} in
+/-- The background at a working cell, off a `ScratchEq`. -/
+theorem ScratchEq.back {st st' : TapeSt dt A R' P'} (h : dt.ScratchEq st st')
+    {r : Univ A R' P' dt.KIx dt.dd → Prop}
+    (hr : ¬∃ u : Univ A R' P' dt.KIx dt.dd, r = wmSeg u) :
+    dt.back zero one hdd st r = dt.back zero one hdd st' r :=
+  dt.back_congr_off_reg h.1 h.2.2.2.2.2.1 h.2.2.2.2.2.2 h.2.2.2.1
+    h.2.2.2.2.1 hr
+
 section Name
 
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]

@@ -284,6 +284,34 @@ noncomputable def igTest (stV : TapeSt dt A R P)
     (b : Fin dt.ko ⊕ Fin dt.ki) (u : Univ A R P dt.KIx dt.dd) : Prop :=
   dt.wellShapedIG zero one b (dt.back zero one dt.dd0Le stV (wmSeg u))
 
+omit [Fintype dt.SlotIx] [LinearOrder A] [Finite A] [Nonempty A]
+  [L.IsRelational] [L.Structure A] in
+/-- **A gate's file test reads four slots**: the block mark, the VAL digit,
+the padding mark and the name slots. -/
+theorem wellShapedIG_congr (zero one : A) (b : Fin dt.ko ⊕ Fin dt.ki)
+    {g g' : dt.SlotIx → A}
+    (hblk : g (Slot.blk (some b)) = g' (Slot.blk (some b)))
+    (hval : g Slot.val = g' Slot.val)
+    (hpdd : g Slot.pdd = g' Slot.pdd)
+    (hname : ∀ j : Fin dt.dd0, g (Slot.name j) = g' (Slot.name j)) :
+    dt.wellShapedIG zero one b g ↔ dt.wellShapedIG zero one b g' := by
+  rw [wellShapedIG, wellShapedIG, hblk, hval, hpdd]
+  simp only [hname]
+
+omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
+  [L.IsRelational] [L.Structure A] in
+/-- **A file test depends on the VAL register alone**: everything else it
+reads is the tape's permanent geometry. -/
+theorem igTest_congr (zero one : A)
+    {st st' : TapeSt dt A R P}
+    (hval : st.val = st'.val) (b : Fin dt.ko ⊕ Fin dt.ki)
+    (u : Univ A R P dt.KIx dt.dd) :
+    dt.igTest zero one st b u ↔ dt.igTest zero one st' b u := by
+  refine dt.wellShapedIG_congr zero one b rfl ?_ rfl (fun _ => rfl)
+  change bitVal zero one (regBit st.val (wmSeg u)) =
+    bitVal zero one (regBit st'.val (wmSeg u))
+  rw [hval]
+
 open Classical in
 /-- **The control thread across one round's inner gates**: each level's
 machinery entered through the pack's `enterIGSt` — the first level
@@ -324,6 +352,35 @@ noncomputable def igFs (vi : dt.VarIx) (stV : TapeSt dt A R P)
           (dt.back zero one dt.dd0Le stV v)
     else igFs vi stV v f₀ n
 
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **The inner gates are blind to the two scratch registers**: every
+level's test reads the VAL register (`igTest_congr`), its dispatched tag is
+that register's block value, and its two loops read their background at the
+working cell. -/
+theorem igFs_congr_scratch {v : Univ A R P dt.KIx dt.dd → Prop}
+    {stV stV' : TapeSt dt A R P} (h : dt.ScratchEq stV stV')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (vi : dt.VarIx) (f₀ : dt.CtlIx → A) (n : ℕ) :
+    dt.igFs zero one vi stV v f₀ n = dt.igFs zero one vi stV' v f₀ n := by
+  classical
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [igFs, igFs]
+    by_cases hn : n < dt.nIn vi
+    · rw [dif_pos hn, dif_pos hn, ih]
+      have htest : (∀ u, dt.igTest zero one stV (dt.igBlk vi ⟨n, hn⟩) u) =
+          (∀ u, dt.igTest zero one stV' (dt.igBlk vi ⟨n, hn⟩) u) :=
+        propext (forall_congr' fun u =>
+          dt.igTest_congr zero one h.2.2.1 (dt.igBlk vi ⟨n, hn⟩) u)
+      rw [htest, h.2.2.1, h.back hreg]
+      by_cases hp : ∀ u, dt.igTest zero one stV' (dt.igBlk vi ⟨n, hn⟩) u
+      · rw [if_pos hp, if_pos hp,
+          dt.igateTagFam_congr_scratch h hreg _ _,
+          dt.igateFam_congr_scratch h hreg _ _ _]
+      · rw [if_neg hp, if_neg hp]
+    · rw [dif_neg hn, dif_neg hn, ih]
+
 /-- **What one level's gate is worth**: the file test passed, the block
 value's witness one-hot at the dispatched tag, and the domain condition
 there. By `DescriptiveComplexity.Pfp.PfpData.igVerdict_iff_isEnc` this is
@@ -346,6 +403,20 @@ noncomputable def igPassP (vi : dt.VarIx) (stV : TapeSt dt A R P)
       decRho dt.ly zero one
         (wmBlk stV.val
           (PfpTag.arg (toLex (dt.igBlk vi ℓ)) : PfpTag R P dt.KIx)))
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational] in
+/-- **A round's pass depends on the VAL register alone.** Hence at a round
+state (`DescriptiveComplexity.Pfp.PfpData.roundSt`, which sets VAL and
+keeps everything else) the pass is the *same proposition* at every
+position of the spine — so a position's `hp` is the entry state's, and
+`kindSemCast` may carry the pack it unlocks. -/
+theorem igPassP_congr (zero one : A) (vi : dt.VarIx)
+    {st st' : TapeSt dt A R P}
+    (hval : st.val = st'.val) (ℓ : Fin (dt.nIn vi)) :
+    dt.igPassP zero one vi st ℓ ↔ dt.igPassP zero one vi st' ℓ := by
+  refine and_congr
+    (forall_congr' fun u => dt.igTest_congr zero one hval _ u) ?_
+  rw [hval]
 
 /-! ### The rides: what the round's machinery never writes -/
 
@@ -1090,6 +1161,16 @@ theorem roundEndSt_eq (vi : dt.VarIx) (stV : TapeSt dt A R P)
   · exact dt.matSt_eq (v := v) (st := stV) (dt.natOf vi)
   · rfl
 
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **A round's exit state differs from its entry state in the two scratch
+registers alone** — `roundEndSt_eq` in the form the congruences take. -/
+theorem scratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeSt dt A R P)
+    (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A) :
+    dt.ScratchEq (dt.roundEndSt zero one vi stV v f₀) stV := by
+  rw [dt.roundEndSt_eq vi stV v f₀]
+  exact dt.scratchEq_scratch stV _ _
+
+
 open Classical in
 /-- **The control one round leaves, threaded**: as
 `DescriptiveComplexity.Pfp.PfpData.roundCtl`, with the matrix's thread
@@ -1109,6 +1190,68 @@ noncomputable def roundCtlT (hzo : zero ≠ one) (vi : dt.VarIx)
       (sem (dt.roundPass_of_flags hzo vi stV v f₀ h))
       (dt.igFs zero one vi stV v f₀ (dt.nIn vi)) (dt.natOf vi)
   else dt.igFs zero one vi stV v f₀ (dt.nIn vi)
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **A round is blind to the two scratch registers**: its gates by
+`igFs_congr_scratch`, its matrix by `matFs_congr_scratch`. -/
+theorem roundCtl_congr_scratch (hzo : zero ≠ one)
+    {v : Univ A R P dt.KIx dt.dd → Prop} {stV stV' : TapeSt dt A R P}
+    (h : dt.ScratchEq stV stV')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u) (vi : dt.VarIx)
+    (sem : (∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ) →
+      ∀ a : Fin (dt.natOf vi), dt.KindSem zero one vi stV (dt.kindOf vi a))
+    (f₀ : dt.CtlIx → A) :
+    dt.roundCtl hzo vi stV v sem f₀ =
+      dt.roundCtl hzo vi stV' v
+        (fun hp a => dt.kindSemCast zero one vi h.2.1 h.2.2.1
+          (dt.kindOf vi a)
+          (sem (fun ℓ => (dt.igPassP_congr zero one vi h.2.2.1 ℓ).mpr (hp ℓ))
+            a)) f₀ := by
+  classical
+  have hig : dt.igFs zero one vi stV v f₀ (dt.nIn vi) =
+      dt.igFs zero one vi stV' v f₀ (dt.nIn vi) :=
+    dt.igFs_congr_scratch zero one h hreg vi f₀ (dt.nIn vi)
+  by_cases hc : dt.ctlBit one (dt.igFs zero one vi stV v f₀ (dt.nIn vi))
+        dt.existGateC ∧
+      dt.ctlBit one (dt.igFs zero one vi stV v f₀ (dt.nIn vi)) dt.allGateC
+  · rw [roundCtl, roundCtl, dif_pos hc, dif_pos (hig ▸ hc)]
+    refine Eq.trans (dt.matFs_congr_scratch h hreg _ _ _ _) ?_
+    exact congrArg (fun F : dt.CtlIx → A =>
+      dt.matFs zero one vi stV' v (dt.varArgsOf zero one vi).enterAtomSt
+        (fun a => dt.kindSemCast zero one vi h.2.1 h.2.2.1 (dt.kindOf vi a)
+          (sem (dt.roundPass_of_flags hzo vi stV v f₀ hc) a)) F
+        (dt.natOf vi)) hig
+  · rw [roundCtl, roundCtl, dif_neg hc, dif_neg (hig ▸ hc), hig]
+
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
+/-- **The threaded round is the unthreaded one**: the gates decide the
+branch off the same registers, and on the passing branch the matrix
+threads SAV and TARGET alone (`matFsT_eq_matFs`). With this the control the
+*run* produces is the control the semantic capstone
+(`DescriptiveComplexity.Pfp.PfpData.accVerdict_leafP`) is stated at. -/
+theorem roundCtlT_eq_roundCtl (hzo : zero ≠ one)
+    {v : Univ A R P dt.KIx dt.dd → Prop}
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u) (vi : dt.VarIx)
+    (stV : TapeSt dt A R P)
+    (sem : (∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ) →
+      ∀ a : Fin (dt.natOf vi),
+        dt.KindSem zero one vi (dt.matSt vi stV v (a : ℕ))
+          (dt.kindOf vi a))
+    (f₀ : dt.CtlIx → A) :
+    dt.roundCtlT hzo vi stV v sem f₀ =
+      dt.roundCtl hzo vi stV v
+        (fun hp a => dt.kindSemCast zero one vi
+          (dt.scratchEq_matSt (a : ℕ)).2.1
+          (dt.scratchEq_matSt (a : ℕ)).2.2.1 (dt.kindOf vi a) (sem hp a))
+        f₀ := by
+  classical
+  by_cases hc : dt.ctlBit one (dt.igFs zero one vi stV v f₀ (dt.nIn vi))
+        dt.existGateC ∧
+      dt.ctlBit one (dt.igFs zero one vi stV v f₀ (dt.nIn vi)) dt.allGateC
+  · rw [roundCtlT, roundCtl, dif_pos hc, dif_pos hc]
+    exact dt.matFsT_eq_matFs hreg _ _ _ _
+  · rw [roundCtlT, roundCtl, dif_neg hc, dif_neg hc]
+
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The accumulators survive one whole round.** -/

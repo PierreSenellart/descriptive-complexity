@@ -218,6 +218,14 @@ noncomputable def cmpArgs [LinearOrder A] [Finite A] [Nonempty A]
       (dt.cmpFold zero one hnf f)
   IsMaxEl := dt.IsMaxLvN
 
+/-- **A comparison's exit reads the control alone**: the atom's verdict is
+folded out of the flags, not off the tape. -/
+theorem cmpArgs_exitSt_congr [LinearOrder A] [Finite A] [Nonempty A]
+    (v : dt.VarIx) (a : Fin dt.natMax) (hnf : 2 ≤ dt.nfDim) (isEq : Bool)
+    (j₁ j₂ : Fin (dt.nOf v)) (f : dt.CtlIx → A) (g g' : dt.SlotIx → A) :
+    (dt.cmpArgs zero one v a hnf isEq j₁ j₂).exitSt f g =
+      (dt.cmpArgs zero one v a hnf isEq j₁ j₂).exitSt f g' := rfl
+
 /-! ### The tag witnesses of an expansion atom
 
 An expansion atom must know the **tags** of its argument points before it can
@@ -477,6 +485,16 @@ noncomputable def expArgs {k : ℕ} (v : dt.VarIx) (ts : Fin k → Fin (dt.nOf v
   exitSt := fun τ f _ => dt.expExit zero one e τ (hn τ) (hrd τ) a f
   IsMaxEl := fun _ => dt.IsMaxLvE
 
+/-- **An expansion atom's exit reads the control alone.** -/
+theorem expArgs_exitSt_congr {k : ℕ} (v : dt.VarIx)
+    (ts : Fin k → Fin (dt.nOf v)) (e : dt.X.E.Relations k) (a : Fin dt.natMax)
+    (hk : k * Fintype.card dt.X.Tag ≤ dt.ntgDim)
+    (hn : ∀ τ : Fin k → dt.X.Tag, (dt.relPk e τ).n ≤ dt.eDim)
+    (hrd : ∀ τ : Fin k → dt.X.Tag, dt.relNr e τ ≤ dt.nfDim)
+    (τ : Fin k → dt.X.Tag) (f : dt.CtlIx → A) (g g' : dt.SlotIx → A) :
+    (dt.expArgs zero one v ts e a hk hn hrd).exitSt τ f g =
+      (dt.expArgs zero one v ts e a hk hn hrd).exitSt τ f g' := rfl
+
 variable {dt zero one}
 
 /-! ### The gates
@@ -626,15 +644,22 @@ noncomputable def gateAdv (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
     (dt.carrySac zero one (dt.domPk t).pol (tupCarry (dt.readLvE f))
       (dt.setSubLeaf zero one (dt.domLeafVal one t hn hrd f) f))
 
-/-- **The dispatch's default tag**: the tag of some point of the expanded
-universe. A gate's branch checkpoint dispatches on the decoded tag of its
-block value; where the witness flags are not one-hot — block values the
-sweeps and the VAL enumeration produce and no point encodes — the
-checkpoint fires into *this* tag's branch instead, and the branch's
-conjoining exit reads the non-one-hotness off the surviving witness flags
-and clears the flag. Any tag serves. -/
+/-- **The dispatch's default tag**. A gate's branch checkpoint dispatches on
+the decoded tag of its block value; where the witness flags are not one-hot —
+block values the sweeps and the VAL enumeration produce and no point encodes —
+the checkpoint fires into *this* tag's branch instead, and the branch's
+conjoining exit reads the non-one-hotness off the surviving witness flags and
+clears the flag. Any tag serves.
+
+That last sentence is load-bearing, and is why the tag is chosen from a
+**nonemptiness of the tags** rather than from a point: an interpretation names
+this tag in a formula, so it must be the same tag at every instance, and by
+proof irrelevance a `Classical.ofNonempty` at a `Prop` is (the structure only
+witnesses that the tags are inhabited, and which structure witnessed it does
+not survive into the value). Choosing a point instead would give a different
+tag at a different instance, and no formula could name it. -/
 noncomputable def defTag : dt.X.Tag :=
-  (Classical.ofNonempty (α := dt.X.Map A)).1.1
+  @Classical.ofNonempty dt.X.Tag ⟨(Classical.ofNonempty (α := dt.X.Map A)).1.1⟩
 
 /-- **What a gate's branch checkpoint dispatches on**: the decoded tag
 where the witness flags are one-hot, the default tag where they are not —
@@ -754,6 +779,16 @@ noncomputable def stageArgs (v : dt.VarIx) (i : dt.d.B.ι)
   IsMaxLv := dt.IsMaxLvN
   oldSlot := Slot.old i
   setAv := fun b f _ => dt.setCtl zero one (dt.avC a) (b = true) f
+
+omit [L.IsRelational] [L.Structure A] in
+/-- **A stage atom's verdict store reads the control alone**: what it files
+is the bit the random access came back with, and that bit is a hypothesis
+of the store, not a read of it. -/
+theorem stageArgs_setAv_congr (v : dt.VarIx) (i : dt.d.B.ι)
+    (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf v)) (a : Fin dt.natMax)
+    (b : Bool) (f : dt.CtlIx → A) (g g' : dt.SlotIx → A) :
+    (dt.stageArgs zero one v i ts a).setAv b f g =
+      (dt.stageArgs zero one v i ts a).setAv b f g' := rfl
 
 end Stage
 

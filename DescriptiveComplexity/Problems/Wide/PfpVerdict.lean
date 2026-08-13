@@ -107,8 +107,14 @@ theorem accVerdict_leafP
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       dt.mirBlk st (Fin.castLE (dt.arOf_le_ko vi) ℓ) =
         encMap dt.ly PR.zero PR.one (mbW ℓ))
-    (hdict : ∀ iv : dt.d.B.ι, st.old iv =
-      trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some iv)) σ)
+    {Below : (Univ A R P dt.KIx dt.dd → Prop) → Prop}
+    (hdict : ∀ (iv : dt.d.B.ι) (s : Univ A R P dt.KIx dt.dd → Prop), Below s →
+      (st.old iv s ↔
+        trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some iv)) σ s))
+    (hbelow : ∀ (a : ιV) (iv : dt.d.B.ι)
+      (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi)),
+      Below (dt.stageTgtD PR.zero vi iv ts (dt.roundSt st (mV a)) v
+        (dt.d.B.arity iv)))
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly PR.zero PR.one PR.zero_ne_one).le p q)
     (hsem : ∀ (a : ιV)
@@ -136,7 +142,8 @@ theorem accVerdict_leafP
     (hOld := fun a hp iv ts => dt.old_trackOf_stageTgtD PR.zero_ne_one vi iv
       (dt.arOf_le_ko (some iv)) σ (dt.roundSt st (mV a)) v (hdict iv) ts
       (fun ℓ => dt.passW_hENC PR.zero_ne_one hlin vi
-        (dt.roundSt st (mV a)) hp mbW (fun ℓ' => hmb ℓ') (ts ℓ)))
+        (dt.roundSt st (mV a)) hp mbW (fun ℓ' => hmb ℓ') (ts ℓ))
+      (hbelow a iv ts))
     hordP (Ps := dt.leafP PR.zero PR.one vi σ (dt.mirBlk st)) hsem fG
     (Ex := fun a => ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.existGateC →
       dt.igPassP PR.zero PR.one vi (dt.roundSt st (mV a)) ℓ)
@@ -194,8 +201,14 @@ theorem accVerdict_next
     (hmb : ∀ ℓ : Fin (dt.arOf (some i)),
       dt.mirBlk st (Fin.castLE (dt.arOf_le_ko (some i)) ℓ) =
         encMap dt.ly PR.zero PR.one (mbW ℓ))
-    (hdict : ∀ iv : dt.d.B.ι, st.old iv =
-      trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some iv)) σ)
+    {Below : (Univ A R P dt.KIx dt.dd → Prop) → Prop}
+    (hdict : ∀ (iv : dt.d.B.ι) (s : Univ A R P dt.KIx dt.dd → Prop), Below s →
+      (st.old iv s ↔
+        trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some iv)) σ s))
+    (hbelow : ∀ (a : ιV) (iv : dt.d.B.ι)
+      (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf (some i))),
+      Below (dt.stageTgtD PR.zero (some i) iv ts (dt.roundSt st (mV a)) v
+        (dt.d.B.arity iv)))
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly PR.zero PR.one PR.zero_ne_one).le p q)
     (hsem : ∀ (a : ιV)
@@ -212,11 +225,73 @@ theorem accVerdict_next
         (dt.back PR.zero PR.one dt.dd0Le (dt.roundSt st (mV aT)) v)) ↔
       dt.d.next σ i mbW := by
   refine (dt.accVerdict_leafP (some i) st mV semOf hlin hord hbotV hmV0
-    hIncr hKin hTop σ mbW hmb hdict hordP hsem fG).trans ?_
+    hIncr hKin hTop σ mbW hmb hdict hbelow hordP hsem fG).trans ?_
   exact altQuantFrom_leafP PR.zero_ne_one i σ (dt.mirBlk st) mbW hmb
     (ixBlk (argIn dt.ko) (mV aT))
 
 end VerdictNext
+
+section VerdictOut
+
+variable (st : TapeSt dt A R P)
+variable {v : Univ A R P dt.KIx dt.dd → Prop}
+variable {ιV : Type} [LinearOrder ιV] [Finite ιV]
+variable (mV : ιV → Univ A R P dt.KIx dt.dd → Prop)
+variable (semOf : ∀ a : ιV,
+  (∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+    dt.igPassP PR.zero PR.one none (dt.roundSt st (mV a)) ℓ) →
+  ∀ b : Fin (dt.natOf (none : dt.VarIx)),
+    dt.KindSem PR.zero PR.one none (dt.roundSt st (mV a))
+      (dt.kindOf none b))
+
+omit [Finite dt.KIx] in
+/-- **The machinery's verdict at the output variable is the output sentence**
+at the stage the tracks hold: the prefix of
+`DescriptiveComplexity.Pfp.PfpData.accVerdict_leafP` read through
+`DescriptiveComplexity.Pfp.PfpData.altQuantFrom_leafP_out`. The output
+variable is nullary, so the working address's outer blocks encode the empty
+tuple and there is nothing to ask of them — which is why this is the one
+verdict a reduction can take at the *empty* address. -/
+theorem accVerdict_out
+    (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
+    (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
+    {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
+    (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
+      WMIncr WMLe (mV a) (mV a'))
+    (hKin : ∀ (a : ιV) (t : PfpTag R P dt.KIx) (w : Fin dt.dd → A),
+      mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
+    (hTop : ∀ u, dt.InnerFull (mV aT) u)
+    (σ : dt.d.B.Assignment (dt.X.Map A))
+    {Below : (Univ A R P dt.KIx dt.dd → Prop) → Prop}
+    (hdict : ∀ (iv : dt.d.B.ι) (s : Univ A R P dt.KIx dt.dd → Prop), Below s →
+      (st.old iv s ↔
+        trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some iv)) σ s))
+    (hbelow : ∀ (a : ιV) (iv : dt.d.B.ι)
+      (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf (none : dt.VarIx))),
+      Below (dt.stageTgtD PR.zero none iv ts (dt.roundSt st (mV a)) v
+        (dt.d.B.arity iv)))
+    (hordP : ∀ p q : dt.X.Map A,
+      p ≤ q ↔ (encOrder dt.ly PR.zero PR.one PR.zero_ne_one).le p q)
+    (hsem : ∀ (a : ιV)
+      (hp : ∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
+        dt.igPassP PR.zero PR.one none (dt.roundSt st (mV a)) ℓ)
+      (b : Fin (dt.natOf (none : dt.VarIx))),
+      semOf a hp b = dt.passSem PR.zero_ne_one hlin none
+        (dt.roundSt st (mV a)) hp (fun ℓ => ℓ.elim0) (fun ℓ => ℓ.elim0) b)
+    (fG : dt.CtlIx → A) :
+    dt.accVerdict PR.one (dt.polOf (none : dt.VarIx))
+      ((dt.varArgsOf PR.zero PR.one none).postFold
+        (dt.roundFX none st v mV semOf
+          (dt.varFM none st v mV semOf fG aT) aT)
+        (dt.back PR.zero PR.one dt.dd0Le (dt.roundSt st (mV aT)) v)) ↔
+      @Sentence.Realize _ (dt.X.Map A) (dt.d.B.structure₁ σ) dt.d.out := by
+  refine (dt.accVerdict_leafP none st mV semOf hlin hord hbotV hmV0
+    hIncr hKin hTop σ (fun ℓ => ℓ.elim0) (fun ℓ => ℓ.elim0) hdict hbelow
+    hordP hsem fG).trans ?_
+  exact altQuantFrom_leafP_out PR.zero_ne_one σ (dt.mirBlk st)
+    (ixBlk (argIn dt.ko) (mV aT))
+
+end VerdictOut
 
 end PfpData
 
