@@ -8,7 +8,7 @@ import DescriptiveComplexity.Problems.Wide.PfpSub
 /-!
 # Plain sweeps: one step per address, a flag or a write
 
-COMPARE and COPY (EXPONENTIAL.md §6.4.4) are *plain* sweeps: one step per
+COMPARE and COPY are *plain* sweeps: one step per
 address of a stretch, no register visits, no rounds. This file is their two
 shapes.
 

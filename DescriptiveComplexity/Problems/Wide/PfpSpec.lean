@@ -36,8 +36,8 @@ coordinates below its level (`DescriptiveComplexity.altQuantFrom_congr_val`).
 The linear order on the points is a *parameter* here (the step formula reads it
 through the structure); which order the reduction chooses – the pullback of the
 binary block-value order along the encoding, making order atoms the register
-comparison the machine can run – is its own decision, recorded in
-`EXPONENTIAL.md` §6.4.4 and discharged where the machine meets the tape.
+comparison the machine can run – is its own decision, discharged where the
+machine meets the tape.
 -/
 
 namespace DescriptiveComplexity

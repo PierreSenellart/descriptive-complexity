@@ -81,6 +81,17 @@ noncomputable def bitFlagC : dt.CtlIx := .flag 1
 loops' accumulator and their two verdict bits, and two spare. -/
 noncomputable def scratchC (k : Fin 6) : dt.CtlIx := .flag (k.addNat 2)
 
+/-- **The ∃-levels' gate flag of a VAL round**: the conjunction, over the
+existentially quantified levels of the variable's pack, of "this level's
+inner block is an encoding". The last free scratch flag. -/
+noncomputable def existGateC : dt.CtlIx := .flag 7
+
+/-- **The ∀-levels' gate flag of a VAL round**: the same conjunction over
+the universally quantified levels. Reuses the outer gates' flag, which is
+dead once the verdict checkpoint has dispatched on it — nothing inside the
+VAL loop reads it again. -/
+noncomputable def allGateC : dt.CtlIx := .flag 0
+
 theorem scratchC_injective : Function.Injective dt.scratchC := by
   intro k k' h
   have h' : k.addNat 2 = k'.addNat 2 := by injection h

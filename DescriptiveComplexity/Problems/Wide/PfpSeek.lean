@@ -9,8 +9,8 @@ import DescriptiveComplexity.Problems.Wide.PfpTrip
 /-!
 # Random access: seeking the working cell to a target address
 
-The R-atoms of the EXPSPACE program read the tape at a *computed* address
-(EXPONENTIAL.md §6.4.4): the machine builds the address in its TARGET
+The R-atoms of the EXPSPACE program read the tape at a *computed* address:
+the machine builds the address in its TARGET
 register, resets the working-cell marker to the empty address, and advances it
 – mirror in tow – until a file test says MIRROR = TARGET. This file is that
 loop.

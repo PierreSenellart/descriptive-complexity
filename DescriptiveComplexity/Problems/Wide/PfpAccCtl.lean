@@ -360,7 +360,7 @@ theorem ctlBit_subLeafC_carrySac (pol : ℕ → Bool) (c : ℕ) (f : dt.CtlIx �
 theorem sacVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}
     {P : (Fin dt.eDim → α) → Prop} {pol : ℕ → Bool} {v : Fin dt.eDim → α}
     {f : dt.CtlIx → A}
-    (hacc : ∀ j : ℕ, dt.readSac one f j ↔ accCVal pol P le j v)
+    (hacc : ∀ j : ℕ, j < dt.eDim → (dt.readSac one f j ↔ accCVal pol P le j v))
     (hleaf : dt.ctlBit one f dt.subLeafC ↔ P v) :
     dt.sacVerdict one pol f ↔ foldFrom pol P le 0 v :=
   chainFrom_iff_foldFrom hacc hleaf 0
@@ -374,7 +374,7 @@ sweep's answer off the control. -/
 theorem accVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}
     {P : (Fin dt.ki → α) → Prop} {pol : ℕ → Bool} {v : Fin dt.ki → α}
     {f : dt.CtlIx → A}
-    (hacc : ∀ j : ℕ, dt.readAcc one f j ↔ accCVal pol P le j v)
+    (hacc : ∀ j : ℕ, j < dt.ki → (dt.readAcc one f j ↔ accCVal pol P le j v))
     (hleaf : dt.ctlBit one f dt.leafC ↔ P v) :
     dt.accVerdict one pol f ↔ foldFrom pol P le 0 v :=
   chainFrom_iff_foldFrom hacc hleaf 0

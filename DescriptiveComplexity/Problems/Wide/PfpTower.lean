@@ -8,6 +8,7 @@ import DescriptiveComplexity.Problems.Wide.PfpTagged
 import DescriptiveComplexity.Problems.Wide.PfpSeq
 import DescriptiveComplexity.Problems.Wide.PfpRepAtoms
 import DescriptiveComplexity.Problems.Wide.PfpVar
+import DescriptiveComplexity.Problems.Wide.PfpRound
 
 /-!
 # The phase tower: the program's phase and site types, assembled
@@ -136,9 +137,26 @@ noncomputable def GatesPh (v : dt.VarIx) : Type :=
 noncomputable def GatesSite (v : dt.VarIx) : Type :=
   SeqSite (dt.arOf v) fun _ => dt.GateBlockSite
 
-/-- **One variable's machinery phases**, gates and matrix plugged in. -/
+/-- The number of quantified levels of a variable's pack. -/
+noncomputable def nIn (v : dt.VarIx) : ℕ := dt.nOf v - dt.arOf v
+
+/-- **The inner gates' phases**: one gate block per quantified level of
+the variable's pack, at the VAL register's blocks. -/
+noncomputable def IGatesPh (v : dt.VarIx) : Type :=
+  SeqPh (dt.nIn v) fun _ => dt.GateBlockPh
+
+/-- **The inner gates' sites.** -/
+noncomputable def IGatesSite (v : dt.VarIx) : Type :=
+  SeqSite (dt.nIn v) fun _ => dt.GateBlockSite
+
+/-- **One round's machinery phases**: the inner gates, the branch, and the
+matrix. -/
+noncomputable def RoundPhF (v : dt.VarIx) : Type :=
+  RoundPh (dt.IGatesPh v) (dt.MatrixPh v)
+
+/-- **One variable's machinery phases**, gates and round plugged in. -/
 noncomputable def VarPhF (v : dt.VarIx) : Type :=
-  VarPh dt.CarryB (dt.GatesPh v) (dt.MatrixPh v)
+  VarPh dt.CarryB (dt.GatesPh v) (dt.RoundPhF v)
 
 /-- **The enumeration of the fixed-point variables.** -/
 noncomputable def varList : List dt.d.B.ι :=
@@ -158,10 +176,10 @@ noncomputable def PMF : Type :=
   (Σ j : Fin dt.nv, dt.VarPhF (dt.varAt j)) ⊕ dt.VarPhF none
 
 /-- **The evaluation's phases**: the spine over the machineries. -/
-noncomputable def PEF : Type := EvalPh dt.nv dt.PMF
+@[reducible] noncomputable def PEF : Type := EvalPh dt.nv dt.PMF
 
 /-- **The program's phases.** -/
-noncomputable def PF : Type := OuterPh dt.PEF
+@[reducible] noncomputable def PF : Type := OuterPh dt.PEF
 
 /-! ### The site tower -/
 
@@ -173,13 +191,26 @@ noncomputable def MatrixSh (v : dt.VarIx) : dt.MatrixSite v → Type :=
 noncomputable def GatesSh (v : dt.VarIx) : dt.GatesSite v → Type :=
   SeqSh (dt.arOf v) fun _ => dt.GateBlockSh
 
+/-- **The rule shape of the inner gates' sites.** -/
+noncomputable def IGatesSh (v : dt.VarIx) : dt.IGatesSite v → Type :=
+  SeqSh (dt.nIn v) fun _ => dt.GateBlockSh
+
+/-- **One round's machinery sites.** -/
+noncomputable def RoundSiteF (v : dt.VarIx) : Type :=
+  RoundSite (dt.IGatesSite v) (dt.MatrixSite v)
+
+/-- **The rule shape of one round's machinery sites.** -/
+noncomputable def RoundShF (v : dt.VarIx) : dt.RoundSiteF v → Type :=
+  RoundSh (dt.IGatesSite v) (dt.MatrixSite v) (dt.IGatesSh v)
+    (dt.MatrixSh v)
+
 /-- **One variable's machinery sites.** -/
 noncomputable def VarSiteF (v : dt.VarIx) : Type :=
-  VarSite (dt.GatesSite v) (dt.MatrixSite v)
+  VarSite (dt.GatesSite v) (dt.RoundSiteF v)
 
 /-- **The rule shape of one variable's machinery sites.** -/
 noncomputable def VarShF (v : dt.VarIx) : dt.VarSiteF v → Type :=
-  VarSh (dt.GatesSite v) (dt.MatrixSite v) (dt.GatesSh v) (dt.MatrixSh v)
+  VarSh (dt.GatesSite v) (dt.RoundSiteF v) (dt.GatesSh v) (dt.RoundShF v)
     dt.CarryB
 
 /-- **The evaluation's machinery sites.** -/
@@ -230,10 +261,14 @@ noncomputable def gateBlockOwn : dt.GateBlockPh → dt.GateBlockSite
   | Sum.inl _ => Sum.inl ()
   | Sum.inr p => Sum.inr (tagOwn p)
 
+/-- The owner map of one round's machinery. -/
+noncomputable def roundOwnF (v : dt.VarIx) : dt.RoundPhF v → dt.RoundSiteF v :=
+  roundOwn (seqOwn fun _ => dt.gateBlockOwn)
+    (seqOwn fun a => dt.kindOwn (dt.kindOf v a))
+
 /-- The owner map of one variable's machinery. -/
 noncomputable def varOwnF (v : dt.VarIx) : dt.VarPhF v → dt.VarSiteF v :=
-  varOwn (seqOwn fun _ => dt.gateBlockOwn)
-    (seqOwn fun a => dt.kindOwn (dt.kindOf v a))
+  varOwn (seqOwn fun _ => dt.gateBlockOwn) (dt.roundOwnF v)
 
 /-- The owner map of the evaluation's machineries. -/
 noncomputable def smOwn : dt.PMF → dt.SMF
@@ -458,6 +493,18 @@ noncomputable instance (v : dt.VarIx) : Finite (dt.GatesPh v) :=
 
 noncomputable instance (v : dt.VarIx) : Finite (dt.GatesSite v) :=
   inferInstanceAs (Finite (SeqSite _ _))
+
+noncomputable instance (v : dt.VarIx) : Finite (dt.IGatesPh v) :=
+  inferInstanceAs (Finite (SeqPh _ _))
+
+noncomputable instance (v : dt.VarIx) : Finite (dt.IGatesSite v) :=
+  inferInstanceAs (Finite (SeqSite _ _))
+
+noncomputable instance (v : dt.VarIx) : Finite (dt.RoundPhF v) :=
+  inferInstanceAs (Finite (RoundPh _ _))
+
+noncomputable instance (v : dt.VarIx) : Finite (dt.RoundSiteF v) :=
+  inferInstanceAs (Finite (RoundSite _ _))
 
 noncomputable instance (v : dt.VarIx) : Finite (dt.VarPhF v) :=
   inferInstanceAs (Finite (VarPh _ _ _))

@@ -124,11 +124,16 @@ noncomputable def KindArgs {n : ℕ} : MatAtom dt.X dt.d n → Type
   | .eq _ _ => ElemArgs A Q dt.SlotIx 2
   | .ord _ _ => ElemArgs A Q dt.SlotIx 2
 
-/-- **The entry phase of an atom kind's machinery.** -/
+/-- **The entry phase of an atom kind's machinery**: the machinery's own
+first phase – for an expansion atom the *first witness read*, so the tag
+chain is entered, not skipped (the branch checkpoint only when there is no
+read at all). -/
 noncomputable def kindEntry {n : ℕ} :
     ∀ κ : MatAtom dt.X dt.d n, dt.KindPh κ
   | .stage _ _ => .savP .up
-  | @MatAtom.exp _ _ _ _ _ _ _ => .brP
+  | @MatAtom.exp _ _ _ _ k _ _ =>
+    letI := Fintype.ofFinite dt.X.Tag
+    if h : 0 < k * Fintype.card dt.X.Tag then .tagRdP ⟨0, h⟩ .start else .brP
   | .eq _ _ => .e0
   | .ord _ _ => .e0
 

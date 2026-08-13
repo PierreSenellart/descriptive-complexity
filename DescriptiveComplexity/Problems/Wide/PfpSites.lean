@@ -14,7 +14,7 @@ import DescriptiveComplexity.Problems.Wide.PfpSeekKit
 # The call sites' kits, at the concrete slots
 
 The kit instantiations of the EXPSPACE program: each call site of the plan
-(EXPONENTIAL.md §6.4.4) is one of the kit shapes of the layer, at the slot
+is one of the kit shapes of the layer, at the slot
 inventory of `DescriptiveComplexity.Problems.Wide.PfpSlots`. This file fixes
 the slots and guards; the phase embeddings stay parameters (each call site
 gets its own copy of the shape's phases in the program's phase sum), and so

@@ -28,7 +28,7 @@ the three ordinary machine problems read over the expansion. With
 No resource argument appears anywhere: the exponent is in the *universe* the
 machine runs over, and everything else is the composition that
 `DescriptiveComplexity.ExpDefinable` is made of – an expansion applied after the
-problem, which is the composition that exists (`EXPONENTIAL.md` §1).
+problem, which is the composition that exists.
 -/
 
 namespace DescriptiveComplexity

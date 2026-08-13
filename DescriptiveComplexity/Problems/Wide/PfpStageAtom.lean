@@ -10,8 +10,8 @@ import DescriptiveComplexity.Problems.Wide.PfpReset
 /-!
 # The stage atom's machinery: a random access
 
-The largest atom subroutine of the EXPSPACE program (EXPONENTIAL.md
-§6.4.4): to evaluate a stage atom `R i' (w̄)`, the machine saves its mirror,
+The largest atom subroutine of the EXPSPACE program: to evaluate a stage atom
+`R i' (w̄)`, the machine saves its mirror,
 builds the target address – one tuple loop per argument position, copying
 the source block of VAL or MIRROR into the target's block by named bits –
 resets to the bottom and seeks the target, reads the stage bit under the

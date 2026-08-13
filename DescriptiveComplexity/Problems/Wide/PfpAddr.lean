@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.PfpTable
 # The argument blocks, concretely: outer arguments first, inner variables last
 
 The EXPSPACE program keeps two families of argument blocks
-(`DescriptiveComplexity.Pfp.PfpTag`'s `K`, EXPONENTIAL.md §6.4.4): the **outer**
+(`DescriptiveComplexity.Pfp.PfpTag`'s `K`): the **outer**
 ones hold the arguments of the fixed-point variable at the working cell, the
 **inner** ones hold the valuations of the step formula's quantifier prefix,
 enumerated by the VAL register. This file fixes `K := Fin ko ⊕ₗ Fin ki` and
@@ -185,6 +185,19 @@ theorem trackOf_of_blocks (hne : zero ≠ one) {i : d.B.ι} (ha : d.B.arity i �
     rwa [hxx] at hσ
   · intro hσ
     exact ⟨x, hs, hσ⟩
+
+/-- **A track is empty at an address that encodes no tuple**: one block below
+the variable's arity holding no point is enough, whatever the stage. This is
+what the junk addresses of a sweep write, and it is why a program may leave
+them alone. -/
+theorem not_trackOf_of_notEnc {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    (σ : d.B.Assignment (X.Map A))
+    {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop} {ℓ₀ : Fin (d.B.arity i)}
+    (hℓ : ∀ p : X.Map A,
+      wmBlk s (argOut ki (Fin.castLE ha ℓ₀)) ≠ encMap ly zero one p) :
+    ¬trackOf ly zero one ha σ s := by
+  rintro ⟨x, hx, -⟩
+  exact hℓ (x ℓ₀) (hx ℓ₀)
 
 /-- **The empty stage writes an empty track**: at the bottom assignment nothing
 holds, whatever the address – the all-blank initial tape is stage `0`. -/

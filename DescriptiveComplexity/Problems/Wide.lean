@@ -65,6 +65,7 @@ import DescriptiveComplexity.Problems.Wide.PfpElem
 import DescriptiveComplexity.Problems.Wide.PfpTagged
 import DescriptiveComplexity.Problems.Wide.PfpSeq
 import DescriptiveComplexity.Problems.Wide.PfpRepAtoms
+import DescriptiveComplexity.Problems.Wide.PfpRound
 import DescriptiveComplexity.Problems.Wide.PfpTower
 import DescriptiveComplexity.Problems.Wide.PfpKindRule
 import DescriptiveComplexity.Problems.Wide.PfpVarRule
@@ -78,6 +79,31 @@ import DescriptiveComplexity.Problems.Wide.PfpAccCtl
 import DescriptiveComplexity.Problems.Wide.PfpArgs
 import DescriptiveComplexity.Problems.Wide.PfpProg
 import DescriptiveComplexity.Problems.Wide.PfpRun
+import DescriptiveComplexity.Problems.Wide.PfpRunElem
+import DescriptiveComplexity.Problems.Wide.PfpRunTagged
+import DescriptiveComplexity.Problems.Wide.PfpRunTuple
+import DescriptiveComplexity.Problems.Wide.PfpRunVar
+import DescriptiveComplexity.Problems.Wide.PfpRunEval
+import DescriptiveComplexity.Problems.Wide.PfpRunSeq
+import DescriptiveComplexity.Problems.Wide.PfpRunStage
+import DescriptiveComplexity.Problems.Wide.PfpRunIter
+import DescriptiveComplexity.Problems.Wide.PfpInstCmp
+import DescriptiveComplexity.Problems.Wide.PfpInstStage
+import DescriptiveComplexity.Problems.Wide.PfpInstExp
+import DescriptiveComplexity.Problems.Wide.PfpInstGate
+import DescriptiveComplexity.Problems.Wide.PfpInstIGate
+import DescriptiveComplexity.Problems.Wide.PfpInstMat
+import DescriptiveComplexity.Problems.Wide.PfpInstSeq
+import DescriptiveComplexity.Problems.Wide.PfpInstRound
+import DescriptiveComplexity.Problems.Wide.PfpGateFacts
+import DescriptiveComplexity.Problems.Wide.PfpInstVar
+import DescriptiveComplexity.Problems.Wide.PfpRoundSem
+import DescriptiveComplexity.Problems.Wide.PfpVerdict
+import DescriptiveComplexity.Problems.Wide.PfpInstEval
+import DescriptiveComplexity.Problems.Wide.PfpSpineSem
+import DescriptiveComplexity.Problems.Wide.PfpRunOuter
+import DescriptiveComplexity.Problems.Wide.PfpRunSpine
+import DescriptiveComplexity.Problems.Wide.PfpValEnum
 import DescriptiveComplexity.Problems.Wide.Bridge
 import DescriptiveComplexity.Problems.Wide.Instance
 import DescriptiveComplexity.Problems.Wide.Key
@@ -274,7 +300,12 @@ working area is `DescriptiveComplexity.reaches_of_wideRounds`: the same shape as
 sweep, but with a whole *run* between an address and its increment rather than a
 single step. That is what a program's loops are written with, and what a clock
 would forbid – each round costs exponentially many steps and there are
-exponentially many rounds.
+exponentially many rounds. Its semantic twin
+`DescriptiveComplexity.holds_of_wideRounds` walks the same stretch at the same
+measure to say what is *true* when the machine gets there: a property of the
+addresses established at the bottom and carried across each increment holds
+everywhere the loop has been. The two are used together, one taking the round's
+machine hypothesis and the other its tape hypothesis.
 
 One more piece of the layer belongs to no single pass and is used by all three.
 The passes take the tape as a function of *one track* and each asks the same
@@ -853,6 +884,35 @@ the join: the prefix of the leaf over *every* block, played from level `0`,
 address encodes; and `foldFrom_leafP_top` reads that off the accumulators at
 the address the loop stops at, the inner top.
 
+`DescriptiveComplexity.Problems.Wide.PfpVerdict` closes that circle at the
+machine: `DescriptiveComplexity.Pfp.PfpData.accVerdict_next` says the
+machinery's exit bit at a variable's position **is** `StepDef.next` at the
+working address's points, every abstract input of the run layer's capstone
+discharged from the two facts a reduction's tape maintains — the address's
+outer blocks encode the argument tuple, and each stage track holds the
+dictionary. `DescriptiveComplexity.Problems.Wide.PfpSpineSem` carries that
+along the whole spine: the mirror, the dictionary and the markers ride
+every position's write (`spineRide`), so after the spine each variable's
+`new` cell at the address holds one step of the iteration there
+(`new_last_next`) — or nothing, at an address encoding no tuple
+(`new_last_of_false`). Read in dictionary form (`new_last_trackOf`,
+`new_last_trackOf_of_junk`) and iterated along the addresses by
+`DescriptiveComplexity.holds_of_wideRounds`, that is `sweep_new`: a sweep
+rewrites the tracks of exactly the addresses it has passed. The same file
+carries the pack's transport (`kindSemCast` and its content lemmas): a
+position's semantic pack is typed at that position's state, but
+`DescriptiveComplexity.Pfp.PfpData.KindSem` reads the state only through
+the levels' register sets, so one pack built at the address's entry state
+serves every position. That is what makes the per-position families
+*constructible* rather than merely stateable: `spineNode` recurses along
+the positions producing state, mirror invariant and control together, and
+its projections satisfy exactly the cover equations `evalSpine_run` asks
+for. One scale up the same file builds the sweep's own families
+(`sweepSW`/`sweepFS`, `sweepSW_incr`/`sweepFS_incr`): an iteration along
+the addresses, because a leg's writes are local to its cell but its
+*control* accumulates — with the order on the addresses installed locally,
+never as an ambient instance.
+
 The **element loops** of the atom subroutines have the same anchor one scale
 down, `DescriptiveComplexity.Problems.Wide.PfpExp`: an atom of the expansion
 holds of a tuple of points exactly when the prefix of
@@ -870,8 +930,8 @@ sentence.
 **Not proved**: hardness. Completeness for these two classes needs the machine
 written in logic, as `DescriptiveComplexity.ATMAcceptSpace` needed for EXPTIME:
 a reduction cannot be routed through the outer composition of an interpretation
-with an expansion, which does not exist in general. The plan is `EXPONENTIAL.md`
-§6.4.4 – for EXPSPACE, a roaming program with the register file above that
+with an expansion, which does not exist in general. The plan – for EXPSPACE, a
+roaming program with the register file above that
 iterates a partial fixed point over the expansion until it stabilizes; for
 NEXPTIME, the harder one-pass sweep that folds a fixed prenex kernel with the
 valuation as its head position.

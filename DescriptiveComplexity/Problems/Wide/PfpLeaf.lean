@@ -121,6 +121,52 @@ theorem leafP_irrel (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
     have := j.isLt
     rcases hℓ with hℓ | hℓ <;> omega
 
+/-- **The leaf, machine-shaped**: at an address whose outer blocks encode
+points, the leaf splits into the two flags the machinery conjoins — every
+∃-level of the register an encoding, and if every ∀-level is one, the
+matrix at the decoded valuation. The free levels' gates are absorbed by
+the address's. -/
+theorem leafP_iff_split (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
+    (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
+    (w : Fin dt.ki → ((Fin dt.dd → A) → Prop))
+    (houter : ∀ k : Fin dt.ko, (k : ℕ) < dt.arOf v →
+      IsEnc dt.ly zero one (mb k)) :
+    dt.leafP zero one v σ mb w ↔
+      ((∀ j : Fin (dt.nOf v), dt.arOf v ≤ (j : ℕ) →
+          dt.polOf v (j : ℕ) = true →
+          IsEnc dt.ly zero one
+            (w ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki v)⟩)) ∧
+        ((∀ j : Fin (dt.nOf v), dt.arOf v ≤ (j : ℕ) →
+            dt.polOf v (j : ℕ) = false →
+            IsEnc dt.ly zero one
+              (w ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki v)⟩)) →
+          dt.matHolds v σ fun j =>
+            Function.invFun (encMap dt.ly zero one)
+              (dt.levelVal v mb w j))) := by
+  rw [leafP, gateHolds, gateMat]
+  have hval : ∀ (j : Fin (dt.nOf v)) (h : dt.arOf v ≤ (j : ℕ)),
+      dt.levelVal v mb w j =
+        w ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki v)⟩ := by
+    intro j h
+    rw [levelVal, dif_neg (by omega)]
+  have hfree : ∀ (j : Fin (dt.nOf v)) (h : (j : ℕ) < dt.arOf v),
+      IsEnc dt.ly zero one (dt.levelVal v mb w j) := by
+    intro j h
+    rw [levelVal, dif_pos h]
+    exact houter _ h
+  constructor
+  · rintro ⟨hex, hall⟩
+    refine ⟨fun j hj hp => hval j hj ▸ hex j hp, fun hin => hall fun j hp => ?_⟩
+    by_cases hj : (j : ℕ) < dt.arOf v
+    · exact hfree j hj
+    · exact (hval j (by omega)).symm ▸ hin j (by omega) hp
+  · rintro ⟨hex, hall⟩
+    refine ⟨fun j hp => ?_, fun hin => hall fun j hj hp => ?_⟩
+    · by_cases hj : (j : ℕ) < dt.arOf v
+      · exact hfree j hj
+      · exact (hval j (by omega)).symm ▸ hex j (by omega) hp
+    · exact hval j hj ▸ hin j hp
+
 /-! ### The join -/
 
 /-- **The inner loop computes the step formula.** The prefix of the leaf

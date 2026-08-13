@@ -180,6 +180,46 @@ theorem reaches_of_wideRounds (h : IsLinOrd (WMLe (A := A)))
         exact (ih _ (by omega) p rfl hpl hpu).trans (hround p s hp hpl hub)
   exact fun s hlb hub => key _ s rfl hlb hub
 
+/-- **What a sweep leaves behind, address by address.** The semantic twin of
+`DescriptiveComplexity.reaches_of_wideRounds`, at the same measure and the same
+stretch: a property of the addresses that holds at the bottom and is carried
+across each increment holds everywhere the sweep has been.
+
+`reaches_of_wideRounds` says the machine *gets* to every address of the stretch;
+this says what is *true* when it does — the two are used together, the run
+theorem consuming the round's machine hypothesis and this one the round's tape
+hypothesis. -/
+theorem holds_of_wideRounds (h : IsLinOrd (WMLe (A := A)))
+    {Q : (A → Prop) → Prop} {s₀ s₁ : A → Prop} (hbase : Q s₀)
+    (hround : ∀ s t : A → Prop, WMIncr WMLe s t → WMSetLe WMLe s₀ s →
+      WMSetLe WMLe t s₁ → Q s → Q t) :
+    ∀ s : A → Prop, WMSetLe WMLe s₀ s → WMSetLe WMLe s s₁ → Q s := by
+  have hlin : IsLinOrd (wideData A).Le := isLinOrd_wpLe h
+  have hset := isLinOrd_wmSetLe h
+  have key : ∀ k : ℕ, ∀ s : A → Prop,
+      bitRank (wideData A).Le (wideData A).Posn (Sum.inl s : WPoint A) = k →
+      WMSetLe WMLe s₀ s → WMSetLe WMLe s s₁ → Q s := by
+    intro k
+    induction k using Nat.strong_induction_on with
+    | _ k ih =>
+      intro s hrank hlb hub
+      rcases eq_or_ne s₀ s with rfl | hne
+      · exact hbase
+      · -- above the bottom of the stretch, so not the empty address
+        have hlt : WMSetLt WMLe s₀ s := (wmSetLt_iff _ _).mpr ⟨hlb, hne⟩
+        have hsome : ∃ x, s x := by
+          by_contra hc
+          exact hne (hset.2.2.1 s₀ s hlb
+            (wmSetLe_of_empty h (fun x hx => hc ⟨x, hx⟩) s₀))
+        obtain ⟨p, hp⟩ := exists_wmPred h hsome
+        have hpl : WMSetLe WMLe s₀ p := (wmSetLt_iff_of_wmIncr h hp s₀).mp hlt
+        have hpu : WMSetLe WMLe p s₁ := hset.2.1 p s s₁ (wmSetLe_of_wmIncr hp) hub
+        have hb : bitRank (wideData A).Le (wideData A).Posn (Sum.inl s : WPoint A) =
+            bitRank (wideData A).Le (wideData A).Posn (Sum.inl p : WPoint A) + 1 :=
+          bitRank_succPos hlin ((succPos_wpLe_iff h p s).mpr hp)
+        exact hround p s hp hpl hub (ih _ (by omega) p rfl hpl hpu)
+  exact fun s hlb hub => key _ s rfl hlb hub
+
 /-! ### The accumulator of a sweep
 
 A sweep that is asking a question of every address – *do these two tracks agree

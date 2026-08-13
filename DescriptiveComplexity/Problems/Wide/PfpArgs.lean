@@ -626,12 +626,72 @@ noncomputable def gateAdv (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
     (dt.carrySac zero one (dt.domPk t).pol (tupCarry (dt.readLvE f))
       (dt.setSubLeaf zero one (dt.domLeafVal one t hn hrd f) f))
 
-/-- **A gate's verdict**: the block passes only if every block passes, so a
-failing domain sentence clears the gates' flag. -/
-noncomputable def gateExit (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
+/-- **The dispatch's default tag**: the tag of some point of the expanded
+universe. A gate's branch checkpoint dispatches on the decoded tag of its
+block value; where the witness flags are not one-hot — block values the
+sweeps and the VAL enumeration produce and no point encodes — the
+checkpoint fires into *this* tag's branch instead, and the branch's
+conjoining exit reads the non-one-hotness off the surviving witness flags
+and clears the flag. Any tag serves. -/
+noncomputable def defTag : dt.X.Tag :=
+  (Classical.ofNonempty (α := dt.X.Map A)).1.1
+
+/-- **What a gate's branch checkpoint dispatches on**: the decoded tag
+where the witness flags are one-hot, the default tag where they are not —
+so some dispatch always fires, on *every* block value. The exit's
+one-hotness conjunct makes the default branch clear the flag, so totality
+costs no wrong verdict. Shared by the outer gates (at MIRROR) and the
+inner ones (at VAL). -/
+def DspTagsAre (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim) (t : dt.X.Tag)
+    (f : dt.CtlIx → A) : Prop :=
+  dt.GateTagsAre one hc t f ∨
+    (t = dt.defTag (A := A) ∧ ∀ t' : dt.X.Tag, ¬dt.GateTagsAre one hc t' f)
+
+variable {dt zero one} in
+omit [L.IsRelational] in
+/-- **The total dispatch is still exclusive**, so the branch never
+co-fires. -/
+theorem dspTagsAre_unique (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
+    (t t' : dt.X.Tag) (f : dt.CtlIx → A) (h : dt.DspTagsAre one hc t f)
+    (h' : dt.DspTagsAre one hc t' f) : t = t' := by
+  rcases h with h | ⟨he, hn⟩ <;> rcases h' with h' | ⟨he', hn'⟩
+  · exact gateTagsAre_unique hc t t' f h h'
+  · exact absurd h (hn' t)
+  · exact absurd h' (hn t')
+  · rw [he, he']
+
+open Classical in
+/-- **The tag a gate dispatches to**: the unique tag whose witness the
+block value holds, where there is one; the default tag otherwise. -/
+noncomputable def dspTagOf (S : (Fin dt.dd → A) → Prop) : dt.X.Tag :=
+  if h : ∃ t : dt.X.Tag, ∀ t' : dt.X.Tag,
+      S (encTagTup dt.ly zero one t') ↔ t' = t then h.choose
+  else dt.defTag (A := A)
+
+variable {dt zero one} in
+omit [L.IsRelational] in
+/-- **At a one-hot block value the dispatch is the decoded tag** — how a
+gated address's per-block tag data pins the dispatch. -/
+theorem dspTagOf_eq_of_onehot {S : (Fin dt.dd → A) → Prop} {t : dt.X.Tag}
+    (hone : ∀ t' : dt.X.Tag,
+      S (encTagTup dt.ly zero one t') ↔ t' = t) :
+    dt.dspTagOf zero one S = t := by
+  classical
+  have hex : ∃ t₁ : dt.X.Tag, ∀ t' : dt.X.Tag,
+      S (encTagTup dt.ly zero one t') ↔ t' = t₁ := ⟨t, hone⟩
+  rw [dspTagOf, dif_pos hex]
+  exact (hone hex.choose).mp ((hex.choose_spec hex.choose).mpr rfl)
+
+/-- **A gate's conjoining exit**: the flag keeps its value only if the
+block's witness flags are **one-hot at the dispatched tag** — so the
+default branch always clears — and the sub-fold of the tag's domain
+sentence holds. -/
+noncomputable def gateExit (t : dt.X.Tag)
+    (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
+    (hn : (dt.domPk t).n ≤ dt.eDim)
     (hrd : dt.domNr t ≤ dt.nfDim) (f : dt.CtlIx → A) : dt.CtlIx → A :=
   dt.setCtl zero one dt.gateFlagC
-    (dt.ctlBit one f dt.gateFlagC ∧
+    (dt.ctlBit one f dt.gateFlagC ∧ dt.GateTagsAre one hc t f ∧
       dt.sacVerdict one (dt.domPk t).pol
         (dt.setSubLeaf zero one (dt.domLeafVal one t hn hrd f) f))
     (dt.setSubLeaf zero one (dt.domLeafVal one t hn hrd f) f)
@@ -650,14 +710,14 @@ noncomputable def gateArgs (b : Fin dt.ko ⊕ Fin dt.ki)
   setTagFlag := fun c bb f _ =>
     dt.setCtl zero one (dt.gateTagC hc ((Fintype.equivFin dt.X.Tag).symm c))
       (bb = true) f
-  TagsAre := fun t => dt.GateTagsAre one hc t
-  hTags := fun t t' f h h' => gateTagsAre_unique hc t t' f h h'
+  TagsAre := fun t => dt.DspTagsAre one hc t
+  hTags := fun t t' f h h' => dspTagsAre_unique hc t t' f h h'
   rdTrackE := fun _ _ => Slot.mir
   MatchE := fun t r => dt.domMatch zero one b t r (hn t)
   setFlagE := fun t r bb f g => dt.domSetFlag zero one t r (hrd t) bb f g
   initEl := fun t f _ => dt.gateInit zero one t f
   advEl := fun t f _ => dt.gateAdv zero one t (hn t) (hrd t) f
-  exitSt := fun t f _ => dt.gateExit zero one t (hn t) (hrd t) f
+  exitSt := fun t f _ => dt.gateExit zero one t hc (hn t) (hrd t) f
   IsMaxEl := fun _ => dt.IsMaxLvE
 
 end Gate
@@ -752,6 +812,60 @@ noncomputable def wellShapedG (b : Fin dt.ko ⊕ Fin dt.ki) (g : dt.SlotIx → A
         ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A), ∀ j : Fin dt.dd0,
           g (.name j) = encAsgTup dt.ly zero one i w (Fin.castLE dt.dd0Le j)))
 
+/-- **The well-shapedness question of an inner gate**, per cell: the same
+question as `DescriptiveComplexity.Pfp.PfpData.wellShapedG` with the digit
+read off the VAL register instead of the mirror. -/
+noncomputable def wellShapedIG (b : Fin dt.ko ⊕ Fin dt.ki)
+    (g : dt.SlotIx → A) : Prop :=
+  g (.blk (some b)) = one → g Slot.val = one →
+    (g .pdd = one ∧
+      ((∃ t : dt.X.Tag, ∀ j : Fin dt.dd0,
+          g (.name j) = encTagTup dt.ly zero one t (Fin.castLE dt.dd0Le j)) ∨
+        ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A), ∀ j : Fin dt.dd0,
+          g (.name j) = encAsgTup dt.ly zero one i w (Fin.castLE dt.dd0Le j)))
+
+/-- **An inner gate's conjoining exit**: as
+`DescriptiveComplexity.Pfp.PfpData.gateExit`, into the given flag — the
+level's polarity chooses which of the round's two flags — with one
+conjunct more: the witness flags must be **one-hot at the dispatched
+tag**. On the genuine branch the conjunct is what the dispatch already
+knew; on the default branch it is false, so the flag is cleared — which is
+the right verdict, a block value with no one-hot witness encoding no
+point. -/
+noncomputable def igateExit (flag : dt.CtlIx) (t : dt.X.Tag)
+    (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
+    (hn : (dt.domPk t).n ≤ dt.eDim) (hrd : dt.domNr t ≤ dt.nfDim)
+    (f : dt.CtlIx → A) : dt.CtlIx → A :=
+  dt.setCtl zero one flag
+    (dt.ctlBit one f flag ∧ dt.GateTagsAre one hc t f ∧
+      dt.sacVerdict one (dt.domPk t).pol
+        (dt.setSubLeaf zero one (dt.domLeafVal one t hn hrd f) f))
+    (dt.setSubLeaf zero one (dt.domLeafVal one t hn hrd f) f)
+
+/-- **The parameter pack of one inner gate block**: the outer gates' pack
+with the read tracks on VAL and the verdict conjoined into the level's
+polarity flag. -/
+noncomputable def igateArgs (b : Fin dt.ko ⊕ Fin dt.ki) (flag : dt.CtlIx)
+    (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
+    (hn : ∀ t : dt.X.Tag, (dt.domPk t).n ≤ dt.eDim)
+    (hrd : ∀ t : dt.X.Tag, dt.domNr t ≤ dt.nfDim) :
+    TagArgs A dt.CtlIx dt.SlotIx (Fintype.card dt.X.Tag) dt.X.Tag dt.domNr where
+  rdTrackT := fun _ => Slot.val
+  MatchT := fun c =>
+    dt.tagWitnessMatch zero one b ((Fintype.equivFin dt.X.Tag).symm c)
+  setTagFlag := fun c bb f _ =>
+    dt.setCtl zero one (dt.gateTagC hc ((Fintype.equivFin dt.X.Tag).symm c))
+      (bb = true) f
+  TagsAre := fun t => dt.DspTagsAre one hc t
+  hTags := fun t t' f h h' => dspTagsAre_unique hc t t' f h h'
+  rdTrackE := fun _ _ => Slot.val
+  MatchE := fun t r => dt.domMatch zero one b t r (hn t)
+  setFlagE := fun t r bb f g => dt.domSetFlag zero one t r (hrd t) bb f g
+  initEl := fun t f _ => dt.gateInit zero one t f
+  advEl := fun t f _ => dt.gateAdv zero one t (hn t) (hrd t) f
+  exitSt := fun t f _ => dt.igateExit zero one flag t hc (hn t) (hrd t) f
+  IsMaxEl := fun _ => dt.IsMaxLvE
+
 /-- **The semantic pack of one variable's machinery**, assembled: the atoms'
 packs by kind, the gates' per block, the fold updates in the control, and the
 stage slot the variable writes – the output's being the marker itself, which
@@ -771,14 +885,54 @@ noncomputable def varArgsOf (v : dt.VarIx) : dt.VarArgs (A := A) (Q := dt.CtlIx)
     dt.wellShapedG zero one (Sum.inl (Fin.castLE (dt.arOf_le_ko v) ℓ))
   setFail := fun f _ => dt.setCtl zero one dt.gateFlagC False f
   enterBlockSt := fun _ f _ => f
+  argsIG := fun ℓ =>
+    dt.igateArgs zero one
+      (Sum.inr ⟨dt.arOf v + (ℓ : ℕ), by
+        have h1 := ℓ.isLt
+        have h2 := dt.nOf_le_ki v
+        have h3 := dt.arOf_le_nOf v
+        simp only [nIn] at h1
+        omega⟩)
+      (if dt.polOf v (dt.arOf v + (ℓ : ℕ)) then dt.existGateC
+        else dt.allGateC)
+      dt.card_le_ntgDim
+      (fun t => le_trans (Finset.le_sup (f := fun t' : dt.X.Tag =>
+        (dt.domPk t').n) (Finset.mem_univ t)) dt.domDepth_le_eDim)
+      (fun t => le_trans (Finset.le_sup
+        (f := fun t' : dt.X.Tag => (blkAtoms (dt.domPk t').mat).length)
+        (Finset.mem_univ t)) dt.domReads_le_nfDim)
+  wellIGOf := fun ℓ =>
+    dt.wellShapedIG zero one
+      (Sum.inr ⟨dt.arOf v + (ℓ : ℕ), by
+        have h1 := ℓ.isLt
+        have h2 := dt.nOf_le_ki v
+        have h3 := dt.arOf_le_nOf v
+        simp only [nIn] at h1
+        omega⟩)
+  setFailIGOf := fun ℓ f _ =>
+    dt.setCtl zero one
+      (if dt.polOf v (dt.arOf v + (ℓ : ℕ)) then dt.existGateC
+        else dt.allGateC) False f
+  enterIGSt := fun ℓ f _ =>
+    if (ℓ : ℕ) = 0 then
+      dt.setCtl zero one dt.existGateC True
+        (dt.setCtl zero one dt.allGateC True f)
+    else f
+  existFlag := dt.existGateC
+  allFlag := dt.allGateC
   newSlot := match v with
     | some i => Slot.new i
     | none => Slot.wk
   gateFlag := dt.gateFlagC
   accBit := fun f => dt.accVerdict one (dt.polOf v) f
   enterSt := fun f _ => dt.setCtl zero one dt.gateFlagC True f
-  initSt := fun f _ => dt.initAcc zero one (dt.polOf v) f
-  postFold := fun f _ => dt.setLeaf zero one (dt.postLeaf one v f) f
+  initSt := fun f _ =>
+    dt.setCtl zero one dt.existGateC True
+      (dt.setCtl zero one dt.allGateC True
+        (dt.initAcc zero one (dt.polOf v) f))
+  postFold := fun f _ => dt.setLeaf zero one
+    (dt.ctlBit one f dt.existGateC ∧
+      (dt.ctlBit one f dt.allGateC → dt.postLeaf one v f)) f
   storeCarry := fun b f _ =>
     dt.carryAcc zero one (dt.polOf v)
       (match b with

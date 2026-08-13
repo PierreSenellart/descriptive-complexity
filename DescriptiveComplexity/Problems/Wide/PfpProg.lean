@@ -70,6 +70,19 @@ structure VarArgs (v : dt.VarIx) where
   setFail : (Q → A) → (dt.SlotIx → A) → Q → A
   /-- The control update entering each gate block. -/
   enterBlockSt : Fin (dt.arOf v) → (Q → A) → (dt.SlotIx → A) → Q → A
+  /-- The parameter pack of each quantified level's inner gate. -/
+  argsIG : Fin (dt.nIn v) → dt.GateArgs (A := A) (Q := Q)
+  /-- The well-shapedness question of each inner gate. -/
+  wellIGOf : Fin (dt.nIn v) → (dt.SlotIx → A) → Prop
+  /-- Clearing the level's polarity flag on a failed inner gate. -/
+  setFailIGOf : Fin (dt.nIn v) → (Q → A) → (dt.SlotIx → A) → Q → A
+  /-- The control update entering each inner gate block — the first one
+  resets the round's two flags. -/
+  enterIGSt : Fin (dt.nIn v) → (Q → A) → (dt.SlotIx → A) → Q → A
+  /-- The ∃-levels' gate flag. -/
+  existFlag : Q
+  /-- The ∀-levels' gate flag. -/
+  allFlag : Q
   /-- The stage slot the variable writes. -/
   newSlot : dt.SlotIx
   /-- The gates' verdict flag. -/
@@ -102,10 +115,18 @@ noncomputable def varRuleF (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v
       (argsG := args.argsG) (wellGOf := args.wellGOf) (setFail := args.setFail)
       (enterSt := args.enterBlockSt) (failPh := emb .vchk1)
       (exitPh := emb .vchk1))
-    (dt.matrixRule (zero := zero) (one := one) (v := v)
-      (emb := fun p => emb (.matrixP p)) (argsA := args.argsA)
-      (enterSt := args.enterAtomSt) (exitPh := emb .mchk1))
-    (emb (.gatesP (.chk 0))) (emb (.matrixP (.chk 0))) exitPh
+    (dt.roundRule (one := one) (emb := fun p => emb (.matrixP p))
+      (ruleG := dt.igatesRule (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.igP p)))
+        (argsG := args.argsIG) (wellGOf := args.wellIGOf)
+        (setFailOf := args.setFailIGOf) (enterSt := args.enterIGSt)
+        (exitPh := emb (.matrixP .rchk)))
+      (ruleX := dt.matrixRule (zero := zero) (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.matP p))) (argsA := args.argsA)
+        (enterSt := args.enterAtomSt) (exitPh := emb .mchk1))
+      (pxEntry := emb (.matrixP (.matP (.chk 0)))) (exitPh := emb .mchk1)
+      (existFlag := args.existFlag) (allFlag := args.allFlag))
+    (emb (.gatesP (.chk 0))) (emb (.matrixP (.igP (.chk 0)))) exitPh
     args.newSlot args.gateFlag args.accBit args.enterSt args.initSt
     args.postFold args.storeCarry
 
@@ -121,14 +142,21 @@ theorem varHosrcF (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
           dt.varOwnF v p = i :=
   dt.varHosrc zero one _ _ _ _ _ _ _ _ _ _
     (ownG := seqOwn fun _ => dt.gateBlockOwn)
-    (ownX := seqOwn fun a => dt.kindOwn (dt.kindOf v a))
+    (ownX := dt.roundOwnF v)
     (dt.gatesHosrc (one := one) (v := v) (emb := fun p => emb (.gatesP p))
       (argsG := args.argsG) (wellGOf := args.wellGOf) (setFail := args.setFail)
       (enterSt := args.enterBlockSt) (failPh := emb .vchk1)
       (exitPh := emb .vchk1))
-    (dt.matrixHosrc (zero := zero) (one := one) (v := v)
-      (emb := fun p => emb (.matrixP p)) (argsA := args.argsA)
-      (enterSt := args.enterAtomSt) (exitPh := emb .mchk1))
+    (dt.roundHosrc one (emb (.matrixP (.matP (.chk 0)))) (emb .mchk1)
+      args.existFlag args.allFlag
+      (dt.igatesHosrc (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.igP p)))
+        (argsG := args.argsIG) (wellGOf := args.wellIGOf)
+        (setFailOf := args.setFailIGOf) (enterSt := args.enterIGSt)
+        (exitPh := emb (.matrixP .rchk)))
+      (dt.matrixHosrc (zero := zero) (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.matP p))) (argsA := args.argsA)
+        (enterSt := args.enterAtomSt) (exitPh := emb .mchk1)))
 
 /-- **One variable's machinery separates in-shape.** -/
 theorem varSepF (hzo : zero ≠ one) (v : dt.VarIx)
@@ -146,10 +174,24 @@ theorem varSepF (hzo : zero ≠ one) (v : dt.VarIx)
       (argsG := args.argsG) (wellGOf := args.wellGOf) (setFail := args.setFail)
       (enterSt := args.enterBlockSt) (failPh := emb .vchk1)
       (exitPh := emb .vchk1) (fun x y h => by cases hemb h; rfl))
-    (dt.matrixSep (zero := zero) (one := one) (v := v)
-      (emb := fun p => emb (.matrixP p)) (argsA := args.argsA)
-      (enterSt := args.enterAtomSt) (exitPh := emb .mchk1) hzo
-      (fun x y h => by cases hemb h; rfl))
+    (dt.roundSep one (emb (.matrixP (.matP (.chk 0)))) (emb .mchk1)
+      args.existFlag args.allFlag
+      (dt.igatesSep (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.igP p)))
+        (argsG := args.argsIG) (wellGOf := args.wellIGOf)
+        (setFailOf := args.setFailIGOf) (enterSt := args.enterIGSt)
+        (exitPh := emb (.matrixP .rchk))
+        (fun x y h => by
+          have h1 := hemb h
+          injection h1 with h2
+          injection h2))
+      (dt.matrixSep (zero := zero) (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.matP p))) (argsA := args.argsA)
+        (enterSt := args.enterAtomSt) (exitPh := emb .mchk1) hzo
+        (fun x y h => by
+          have h1 := hemb h
+          injection h1 with h2
+          injection h2)))
 
 /-! ### The evaluation's machineries -/
 
