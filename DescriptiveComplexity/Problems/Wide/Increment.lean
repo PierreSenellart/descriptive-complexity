@@ -187,6 +187,25 @@ theorem wmSetLt_iff (s t : α → Prop) : WMSetLt Le s t ↔ (WMSetLe Le s t ∧
     · exact absurd (funext fun z => propext (hle z)) hne
     · exact hlt
 
+omit [Finite α] in
+/-- **A set below an upward-closed address is contained in it**: at the element
+where they first differ the smaller one says no, and everything above that
+element is in the larger by closure — so nothing the smaller holds escapes.
+This is what says a register enumerated up to a *region* (the address whose
+elements are exactly a final segment's cells) never holds a cell outside it. -/
+theorem subset_of_wmSetLe (h : IsLinOrd Le) {s t : α → Prop}
+    (hup : ∀ x y, t x → WMLt Le x y → t y) (hle : WMSetLe Le s t)
+    {x : α} (hx : s x) : t x := by
+  rcases hle with hag | ⟨p, hagree, hnp, hp⟩
+  · exact (hag x).mp hx
+  by_contra hc
+  rcases Classical.em (WMLt Le x p) with hlt | hnlt
+  · exact hc ((hagree x hlt).mp hx)
+  · exact hc (hup p x hp (by
+      rcases Classical.em (WMLt Le p x) with hpx | hpx
+      · exact hpx
+      · exact absurd (eq_of_not_wmLt h hnlt hpx) (fun hxp => hc (hxp ▸ hp))))
+
 /-- **An address holding nothing is below every address.** -/
 theorem wmSetLe_of_empty (h : IsLinOrd Le) {s : α → Prop} (hs : ∀ x, ¬s x) (t : α → Prop) :
     WMSetLe Le s t := by

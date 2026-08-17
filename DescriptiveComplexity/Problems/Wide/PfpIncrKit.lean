@@ -12,8 +12,8 @@ The kit wrapping `DescriptiveComplexity.Pfp.Prog.reaches_incrAt` in its round
 trip: scan up to the file top, bounce, run the binary increment down the file
 – clearing set digits until the first clear one, setting it – and return to
 the marker **in the phase of the block that carried**. The inner VAL loop of
-the EXPSPACE program folds its accumulators against exactly that block
-(EXPONENTIAL.md §6.4.4), which is why the landing phase is indexed.
+the EXPSPACE program folds its accumulators against exactly that block,
+which is why the landing phase is indexed.
 
 The carry block is read off the *mark* of the register cell that carried: the
 kit takes one slot per block (`bs`), set exactly at the registers of that

@@ -16,11 +16,13 @@ import DescriptiveComplexity.Problems.Wide.Marks
 import DescriptiveComplexity.Problems.Wide.Tape
 import DescriptiveComplexity.Problems.Wide.Walk
 import DescriptiveComplexity.Problems.Wide.Mirror
+import DescriptiveComplexity.Problems.Wide.Det
 import DescriptiveComplexity.Problems.Wide.Test
 import DescriptiveComplexity.Problems.Wide.PfpTags
 import DescriptiveComplexity.Problems.Wide.PfpAlphabet
 import DescriptiveComplexity.Problems.Wide.PfpMatrix
 import DescriptiveComplexity.Problems.Wide.PfpGeom
+import DescriptiveComplexity.Problems.Wide.PfpShape
 import DescriptiveComplexity.Problems.Wide.PfpTable
 import DescriptiveComplexity.Problems.Wide.PfpTracks
 import DescriptiveComplexity.Problems.Wide.PfpRules
@@ -46,6 +48,29 @@ import DescriptiveComplexity.Problems.Wide.PfpAcc
 import DescriptiveComplexity.Problems.Wide.PfpAtoms
 import DescriptiveComplexity.Problems.Wide.PfpData
 import DescriptiveComplexity.Problems.Wide.PfpKit
+import DescriptiveComplexity.Problems.Wide.PfpFactor
+import DescriptiveComplexity.Problems.Wide.PfpDefKit
+import DescriptiveComplexity.Problems.Wide.PfpDefTower
+import DescriptiveComplexity.Problems.Wide.PfpDefStage
+import DescriptiveComplexity.Problems.Wide.PfpDefKind
+import DescriptiveComplexity.Problems.Wide.PfpDefVar
+import DescriptiveComplexity.Problems.Wide.PfpDefProg
+import DescriptiveComplexity.Problems.Wide.PfpDefAsm
+import DescriptiveComplexity.Problems.Wide.PfpDefLoop
+import DescriptiveComplexity.Problems.Wide.PfpDefCtl
+import DescriptiveComplexity.Problems.Wide.PfpDefAcc
+import DescriptiveComplexity.Problems.Wide.PfpDefTags
+import DescriptiveComplexity.Problems.Wide.PfpDefName
+import DescriptiveComplexity.Problems.Wide.PfpDefGate
+import DescriptiveComplexity.Problems.Wide.PfpDefExp
+import DescriptiveComplexity.Problems.Wide.PfpInterp
+import DescriptiveComplexity.Problems.Wide.PfpPack
+import DescriptiveComplexity.Problems.Wide.Double
+import DescriptiveComplexity.Problems.Wide.RelExp
+import DescriptiveComplexity.Problems.Wide.RelExpansion
+import DescriptiveComplexity.Problems.Wide.RelExpMap
+import DescriptiveComplexity.Problems.Wide.ShFinite
+import DescriptiveComplexity.Problems.Wide.Reduce
 import DescriptiveComplexity.Problems.Wide.PfpAsm
 import DescriptiveComplexity.Problems.Wide.PfpTripKits
 import DescriptiveComplexity.Problems.Wide.PfpIncrKit
@@ -65,6 +90,7 @@ import DescriptiveComplexity.Problems.Wide.PfpElem
 import DescriptiveComplexity.Problems.Wide.PfpTagged
 import DescriptiveComplexity.Problems.Wide.PfpSeq
 import DescriptiveComplexity.Problems.Wide.PfpRepAtoms
+import DescriptiveComplexity.Problems.Wide.PfpRound
 import DescriptiveComplexity.Problems.Wide.PfpTower
 import DescriptiveComplexity.Problems.Wide.PfpKindRule
 import DescriptiveComplexity.Problems.Wide.PfpVarRule
@@ -78,6 +104,34 @@ import DescriptiveComplexity.Problems.Wide.PfpAccCtl
 import DescriptiveComplexity.Problems.Wide.PfpArgs
 import DescriptiveComplexity.Problems.Wide.PfpProg
 import DescriptiveComplexity.Problems.Wide.PfpRun
+import DescriptiveComplexity.Problems.Wide.PfpRunElem
+import DescriptiveComplexity.Problems.Wide.PfpRunTagged
+import DescriptiveComplexity.Problems.Wide.PfpRunTuple
+import DescriptiveComplexity.Problems.Wide.PfpRunVar
+import DescriptiveComplexity.Problems.Wide.PfpRunEval
+import DescriptiveComplexity.Problems.Wide.PfpRunSeq
+import DescriptiveComplexity.Problems.Wide.PfpRunStage
+import DescriptiveComplexity.Problems.Wide.PfpRunIter
+import DescriptiveComplexity.Problems.Wide.PfpInstCmp
+import DescriptiveComplexity.Problems.Wide.PfpInstStage
+import DescriptiveComplexity.Problems.Wide.PfpInstExp
+import DescriptiveComplexity.Problems.Wide.PfpInstGate
+import DescriptiveComplexity.Problems.Wide.PfpInstIGate
+import DescriptiveComplexity.Problems.Wide.PfpInstMat
+import DescriptiveComplexity.Problems.Wide.PfpInstSeq
+import DescriptiveComplexity.Problems.Wide.PfpInstRound
+import DescriptiveComplexity.Problems.Wide.PfpGateFacts
+import DescriptiveComplexity.Problems.Wide.PfpInstVar
+import DescriptiveComplexity.Problems.Wide.PfpRoundSem
+import DescriptiveComplexity.Problems.Wide.PfpVerdict
+import DescriptiveComplexity.Problems.Wide.PfpInstEval
+import DescriptiveComplexity.Problems.Wide.PfpSpineSem
+import DescriptiveComplexity.Problems.Wide.PfpRunOuter
+import DescriptiveComplexity.Problems.Wide.PfpRunSpine
+import DescriptiveComplexity.Problems.Wide.PfpValEnum
+import DescriptiveComplexity.Problems.Wide.PfpHalt
+import DescriptiveComplexity.Problems.Wide.PfpYes
+import DescriptiveComplexity.Problems.Wide.PfpNo
 import DescriptiveComplexity.Problems.Wide.Bridge
 import DescriptiveComplexity.Problems.Wide.Instance
 import DescriptiveComplexity.Problems.Wide.Key
@@ -274,7 +328,12 @@ working area is `DescriptiveComplexity.reaches_of_wideRounds`: the same shape as
 sweep, but with a whole *run* between an address and its increment rather than a
 single step. That is what a program's loops are written with, and what a clock
 would forbid – each round costs exponentially many steps and there are
-exponentially many rounds.
+exponentially many rounds. Its semantic twin
+`DescriptiveComplexity.holds_of_wideRounds` walks the same stretch at the same
+measure to say what is *true* when the machine gets there: a property of the
+addresses established at the bottom and carried across each increment holds
+everywhere the loop has been. The two are used together, one taking the round's
+machine hypothesis and the other its tape hypothesis.
 
 One more piece of the layer belongs to no single pass and is used by all three.
 The passes take the tape as a function of *one track* and each asks the same
@@ -373,6 +432,283 @@ equations, and `DescriptiveComplexity.Pfp.Table.deterministic` reduces to one
 condition on the table, `DescriptiveComplexity.Pfp.Table.Sep`: two guarded rules
 that apply in the same state and read the same symbol are the same rule with the
 same data.
+
+What the interpretation that emits such an instance owes, and the algebra that
+pays it, is `DescriptiveComplexity.Problems.Wide.PfpFactor`. An interpretation
+carries *one* formula per relation symbol and tag tuple, so the obligation is
+quantified over the instance: `DescriptiveComplexity.Pfp.Env` bundles a finite
+nonempty linearly ordered structure with the two elements a reduction may
+designate – the order's least and greatest – and
+`DescriptiveComplexity.Pfp.URuleDefinable` says of a rule, at every such
+environment at once, that its two phases and its direction are decided when the
+formula is built, that its guard is a function of the **equality pattern** of
+its data (`DescriptiveComplexity.EqPattern`), and that the pointer it leaves
+and the tracks it writes are named slot by slot by
+`DescriptiveComplexity.SlotVal` – a copy, one of the two designated elements,
+or the **next** element after a slot, which is what advancing a loop variable
+needs and the only source that reads the order. The atoms and connectives are
+there (a slot holds `one`, a slot holds `zero`, two slots hold the same
+element; conjunctions and disjunctions over an arbitrary index; a bit whose
+question is itself definable; a choice between definably separated cases), and
+the discharge follows the program's own shape:
+`DescriptiveComplexity.Problems.Wide.PfpDefKit` does every leaf kit – the read
+and write trips, the file test, the three track passes, the increment, the
+seek, the advance, the reset, the walk home and the two sweeps – and
+`DescriptiveComplexity.Problems.Wide.PfpDefTower` carries the statement through
+the combinators – the chain, the sequencer, the element loop, the tag-branched
+machinery and the tuple loop – each checkpoint's dispatch being the standard
+exit guard conjoined with the caller's question, with the caller's control
+update as its `dstSt`. Above them the program's own two guards are definable
+once (`DescriptiveComplexity.Pfp.PfpData.uGDefinable_exitG` and
+`uGDefinable_nameG`) and the tower closes:
+`DescriptiveComplexity.Problems.Wide.PfpDefStage` the stage atom's machinery,
+`PfpDefKind` the three parameter packs
+(`DescriptiveComplexity.Pfp.UElemArgsDef`, `UTagArgsDef`,
+`DescriptiveComplexity.Pfp.PfpData.UStageArgsDef` – a pack's *static* fields,
+which slot a trip walks and which block it names, may not depend on the
+instance, and `DescriptiveComplexity.Pfp.UConst` says so) and an atom kind's
+machinery, `PfpDefVar` the matrix and the two runs of gates, `PfpDefProg` one
+round, one variable's machinery, the evaluation's spine and the outer loop,
+and `PfpDefAsm` the assembly – `uRulesDefinable_progAsm`, the whole rule set,
+conditional only on the semantic packs meeting
+`DescriptiveComplexity.Pfp.PfpData.UVarArgsDef`.
+
+Two files pay the packs' recurring debts. The **loop element** is the one write
+that is not a copy (`DescriptiveComplexity.Problems.Wide.PfpDefLoop`):
+advancing it is `DescriptiveComplexity.Pfp.tupNext`, whose coordinate at the
+carry is the order-successor, and
+`DescriptiveComplexity.Pfp.tupNext_apply_of_carry` reads it off – below the
+carry a copy, at it the next element, above it the least one – with the carry
+itself decided by which coordinates are maximal, hence by the pattern
+(`uStDefinable_advLvE`/`uStDefinable_initLvE`/`uGDefinable_isMaxLvE`, and their
+narrow twins). And the **control** is bits throughout
+(`DescriptiveComplexity.Problems.Wide.PfpDefCtl`): every write is
+`DescriptiveComplexity.Pfp.PfpData.putVec` or its one-slot case `setCtl`, and
+every read an existential over the levels of a slot family, so one lemma per
+shape settles the layer. On top of it the **folds**
+(`DescriptiveComplexity.Problems.Wide.PfpDefAcc`): reading one back is
+`DescriptiveComplexity.Pfp.chainFrom`, a recursion down a fixed number of
+levels, so recursing the same way builds the pattern function
+(`uGDefinable_chainFrom`, `accVerdict`, `sacVerdict`); writing one at a carry
+is `uStDefinable_carryVec` and its two instances; and the matrix's own value at
+its atoms' verdicts is the same shape over the syntax
+(`uGDefinable_qfValue`, `uGDefinable_postLeaf`).
+`DescriptiveComplexity.Problems.Wide.PfpDefTags` settles what a gate's branch
+dispatches on – the decoding outright, and the *total* dispatch because
+`DescriptiveComplexity.Pfp.PfpData.defTag` takes its tag from a nonemptiness of
+`X.Tag` rather than from a point, so that no instance can move it
+(`uConst_defTag`). And
+`DescriptiveComplexity.Problems.Wide.PfpDefName` settles the **names** a trip
+walks to: an encoded coordinate holds a component of the one-hot code, a
+payload position or the clear element, and which it holds the layout decides
+when the formula is built (`uReadable_encTup`), so a naming guard is definable
+as soon as its payload is (`uGDefinable_nameGF_of_readable`,
+`uGDefinable_tagWitnessMatch`, `uGDefinable_domMatch`). The same reading
+removes the existential over a *tuple of the instance* in the gates'
+well-shapedness question: the payload coordinates carry no condition – a
+witness is read straight off the cell – and every other coordinate is pinned
+(`uGDefinable_exists_encAsgTup`, `uGDefinable_wellShapedG`). Last,
+`DescriptiveComplexity.Problems.Wide.PfpDefGate` does a gate's **four folds** –
+started, advanced, and the two conjoining exits. Each is two or three writes
+nested, and what makes them definable is not new machinery but the
+*commutations*: the loop element, the sub-fold's accumulators and the sub-leaf
+flag are disjoint registers, so each write reads what it was given
+(`uStDefinable_putVec_comp`, `uStDefinable_putLvE_comp`), and the coordinate the
+fold carries is again a question about which coordinates are maximal
+(`uGDefinable_tupCarry_eq`). With them
+`DescriptiveComplexity.Problems.Wide.PfpDefExp` closes the discharge: an
+expansion atom runs the gates' machinery one exponent along, so its pack is a
+field-by-field check (`uTagArgsDef_expArgs`), and beside it the comparison and
+stage atoms (`uElemArgsDef_cmpArgs`, `uStageArgsDef_stageArgs`) and the two
+gate blocks (`uTagArgsDef_gateArgs`, `uTagArgsDef_igateArgs`). The result is
+`DescriptiveComplexity.Pfp.PfpData.uVarArgsDef_varArgsOf` – the semantic packs
+the reduction computes meet their obligation – and with it
+`uRulesDefinable_progOf`: **every rule of the emitted machine is written down
+by one formula for every instance**, which is what an interpretation needs.
+
+`DescriptiveComplexity.Problems.Wide.PfpInterp` begins the writing down. Where
+the coordinates go is fixed once: a defining formula of an `n`-ary relation has
+free variables `Fin n × Fin dd`, a payload occupies the first
+`card (CtlIx ⊕ SlotIx)` of an argument's, and the guard and payload formulas the
+definability layer hands over are **relabelled** onto them and nothing else
+(`DescriptiveComplexity.Pfp.guardAt`, `payAt`). Every one of the eleven
+relations is then one of three shapes: a **guarded padded tuple**
+(`padGuardF` – a transition, an accepting state), an **attribute**
+(`attrF` – an element of a tag the rule names whose payload it writes from the
+transition's own), or a **constant** (`constF` – a tag and the all-clear tuple,
+the start state and the blank), each with its realization, and
+`DescriptiveComplexity.Pfp.eq_pad_iff` is what splits “is this padded tuple”
+into the two halves a formula can say separately. The input channel's mark asks
+two questions the interpreted universe would otherwise have to be quantified
+over – is this cell the first, is it the last – and it must not be:
+`DescriptiveComplexity.Pfp.isLeast_tagTupleLe_iff` and
+`isGreatest_tagTupleLe_iff` say that in the block-major order an element is
+least exactly when its tag is the least tag and its tuple is all-clear, and
+greatest exactly when its tag is the greatest and its tuple all-set – a tag
+decision conjoined with a shape formula.
+
+On top of them the **transitions and their five attributes** are written down.
+`DescriptiveComplexity.Pfp.PfpData.RTag` is the rule names as a type the
+instance does not mention and `ITag` the tags of the interpreted universe;
+`srcPhOf`, `dstPhOf`, `rightOf`, `guardFOf`, `dstFOf`, `wrFOf` (and the two
+rule-independent `srcFOf`, `readFOf`) are the static data
+`DescriptiveComplexity.Pfp.URuleDefinable` says a rule has, extracted with
+their specifications; and `trF`, `rightF`, `srcF`, `readF`, `dstF`, `writeF`
+are the formulas, each with the realization that says it holds exactly of what
+`DescriptiveComplexity.Pfp.Table` says it should.
+
+The remaining five are the two constants (`startF`, `blankF`), the accepting
+states (`accF`, a `padGuardF` at the program's accepting predicate), the order
+– which is `DescriptiveComplexity.lexLeF`, the tags compared when the formula is
+built – and the **input channel**, the one with content. Its mark is
+`DescriptiveComplexity.Pfp.slotMark`, a register file, and every slot of it is a
+tag decision, a shape formula or an equality of variables: the register flag is
+set, the two extremes are the lemmas above, the block flags decode the cell's
+tag, the name slots carry the cell's own first `dd₀` coordinates and the padding
+flag is `canonF dd0` (`markSlotF`, `markCoordF`, `markF`, `inpF`). Not one of
+them quantifies over the interpreted universe.
+
+`DescriptiveComplexity.Pfp.PfpData.pfpInterp` is then the interpretation – one
+formula per relation symbol and tuple of tags – and
+`DescriptiveComplexity.Pfp.PfpData.reads_progFrom` its point: **the interpreted
+structure reads the program's table** (`DescriptiveComplexity.Pfp.Table.Reads`),
+so everything the run layer proved under that hypothesis applies to it. The
+eleven obligations are eleven definitional unfoldings through
+`relMap_one`/`relMap_two`; the only two rewrites are a rule's two phases, which
+`srcPhOf` and `dstPhOf` name. `DescriptiveComplexity.Pfp.PfpData.progFrom` is the
+program at one instance – the rules the definability layer hands over with the
+reduction's constants, an all-clear pointer, an all-clear blank and the register
+file.
+
+`DescriptiveComplexity.Problems.Wide.PfpPack` packs a source into that record.
+`DescriptiveComplexity.Pfp.exists_prenexPack` gives the prefix normal form of
+every formula the program evaluates, but the *shortest* one, and a step
+definition with only nullary variables and quantifier-free packs would leave the
+address blocks `Fin ko ⊕ₗ Fin ki` **empty** – which is what `reaches_mainB`
+spends. So the packs are padded, not cased on: `DescriptiveComplexity.Pfp.PrenexPack.succ`
+adds one vacuous innermost level, whose whole content is
+`DescriptiveComplexity.Pfp.altQuantFrom_liftLast` – a prefix over a predicate
+that ignores its last coordinate is the prefix without it, in *both* polarities,
+because the universe is nonempty. Beside it `DescriptiveComplexity.Pfp.stdLayout`
+is the encoding layout at the budget `encDim X` (the one-hot code first, the
+payload after it) and `DescriptiveComplexity.Pfp.PfpData.ofSource` is the record,
+with `PfpData.ki_pos` for the block index.
+
+`DescriptiveComplexity.Problems.Wide.Double` fixes the one thing the reduction
+cannot arrange after the fact. Every track of the machine is an *element* of the
+base universe, so the construction needs two of them, and a reduction has to be
+correct at one-element structures too. So the machinery is run not at the
+instance but at a **doubled** universe (`DescriptiveComplexity.Pfp.dblInterp`):
+`Bool × (Fin 1 → A)`, the `false` copy carrying the instance's relations and
+marked by the `old` symbol of `DescriptiveComplexity.newLang`, the `true` copy
+junk. It is never a singleton (`DescriptiveComplexity.Pfp.dblPt_ne`), it is a
+plain one-dimensional interpretation – so composing it under the wide
+interpretation keeps the dimension and only multiplies the tags by `Bool ^ dd` –
+and it is exactly the extended universe of value invention, so
+`DescriptiveComplexity.relativizeTo` is what reads a formula about the instance
+inside it. The same file carries
+`DescriptiveComplexity.Pfp.boolEnv`, the two-element environment over any
+relational vocabulary – the structure in which nothing holds – which is all
+`uRulesDefinable_progOf` wants an environment for: naming the gate dispatch's
+default tag, which is a nonemptiness the instance does not see.
+
+`DescriptiveComplexity.Problems.Wide.RelExp` pays the price of that move, one
+sentence at a time. A sentence about the instance's ordered vocabulary expanded
+by a block is renamed into the extended one
+(`DescriptiveComplexity.Pfp.newBlockLHom`) and relativized to the mark, and then
+says in the doubled universe exactly what it said in the instance
+(`DescriptiveComplexity.Pfp.realize_relOldBlock`): the marked part is a
+substructure – the vocabularies are relational, so nothing has to be closed
+under anything – and it *carries* the instance
+(`DescriptiveComplexity.Pfp.oldSubDLEquiv`), the reduct of its induced structure
+along the renaming being what a block assignment restricts to. The assignment
+travels by `DescriptiveComplexity.Pfp.extAssign`, which holds of a tuple exactly
+when every entry is marked and the entries' elements satisfy it; that is the
+shape the *support* condition pins down
+(`DescriptiveComplexity.Pfp.extAssign_resAssign`), and it is what makes an
+assignment over the doubled universe an assignment of the instance and nothing
+more.
+
+`DescriptiveComplexity.Problems.Wide.RelExpansion` puts the two together:
+`DescriptiveComplexity.Pfp.relExp` is the expansion relativized to the marked
+part – the same block and the same expanded vocabulary, every sentence renamed
+and relativized, every assignment required to be supported – so that a point of
+it over the doubled universe is a point of the original expansion over the
+instance. One tag is added, and only because `FirstOrder.Language.ExpExpansion`
+demands its domain sentence be satisfiable at *every* structure, including ones
+with no marked part at all, where a relativized sentence has nothing to be about:
+the tag `none` is the point that exists exactly there
+(`DescriptiveComplexity.Pfp.noOldSentence`,
+`DescriptiveComplexity.Pfp.emptyBlocksSentence`), and over a doubled universe –
+which always has a marked part – it contributes nothing. Discharging
+`dom_nonempty` at an arbitrary structure is what
+`DescriptiveComplexity.Pfp.MarkPart` and `realize_relOldMark` are for: the marked
+part is an instance in its own right wherever there is one.
+
+`DescriptiveComplexity.Problems.Wide.RelExpMap` discharges the point of all
+that: over a doubled universe the relativized expansion **is** the expansion over
+the instance, points and relations alike
+(`DescriptiveComplexity.Pfp.relExpMapEquiv`). Three things make it work, and each
+was arranged for it: a doubled universe always has a marked part, so the fallback
+tag contributes no point (`not_domHolds_none`); a point's assignment is supported,
+so it is the extension of a unique assignment of the instance
+(`supported_of_domHolds`, `extAssign_resAssign`); and every sentence transports by
+`realize_relOldBlock` – the domain sentence at one copy of the block, each
+defining sentence at `n` copies, where extending commutes with replication on the
+nose (`extAssign_replicateAssign`, which is `rfl`).
+
+`DescriptiveComplexity.Problems.Wide.ShFinite` closes the one hypothesis the run
+layer carries that was not yet a theorem. Every **site** type of the tower has a
+`Finite` instance where it is defined, and so does every leaf kit's rule type;
+what was missing is the tower's **shapes**, one instance per level
+(`ChainSh`, `SeqSh`, `ElemSh`, `StageSh`, `TagSh`, `RoundSh`, `VarSh`, `EvalSh`,
+`OuterSh`, then the concrete `KindSh` … `SFSh`). With them
+`DescriptiveComplexity.Pfp.PfpData.finite_RIx` is `Finite (Sigma …)`: **the rule
+names of the emitted machine are finitely many**, which is what the run layer
+assumed and what an interpretation needs of its tag type. Each instance has to be
+*applied*, not searched for, one level up: a shape's argument has the type of a
+site one level down, and instance search does not unfold the site definitions.
+
+`DescriptiveComplexity.Problems.Wide.Reduce` chooses the reduction's constants
+and writes the machine down. The base's extremes are
+`DescriptiveComplexity.Pfp.isBot_dblPt` and `isTop_dblPt` – the bottom of the
+doubled universe is the marked copy of the instance's minimum, the top the junk
+copy of its maximum. The dimension is `DescriptiveComplexity.Pfp.srcDim`, one
+coordinate of slack beyond the encoding budget and wide enough for a rule's
+payload, and `srcData` is the record at it, with `srcData_dd0_lt`,
+`srcData_payload_le` and `srcKIx`.
+
+That payload bound is where the one subtlety of the packing sits. It is true
+because no budget of a `PfpData` reads the dimension – but it is **not** `rfl`:
+`DescriptiveComplexity.Pfp.PfpData.nOf` and its relatives are defined by a match,
+so their compiled matchers take the whole record as a parameter and two records
+differing in the dimension are opaque to each other (`… .VarIx = … .VarIx` is
+`rfl`; `… .nOf ≍ … .nOf` is not). What closes it is a congruence at every level –
+`ofSource_nOf`, `ofSource_natOf`, `ofSource_kindDepth`/`kindReads`/`kindArgs`,
+then `ofSource_ki`/`naDim`/`natMax`/`eDim`/`nfDim`/`ntgDim` by `Finset.sup_congr`
+– each instantiated at a **constructor** of the scrutinee, where the matcher
+reduces, giving `ofSource_ctlIx` and `ofSource_slotIx`.
+
+On them `DescriptiveComplexity.Pfp.dblWideInterp` is the machine written down
+over the doubled universe – `pfpInterp` at the packed record, the environment
+`boolEnv`, and the accepting predicate `srcAccept` – and
+`DescriptiveComplexity.Pfp.wideInterp` is that composed with the doubling, an
+interpretation of `Language.wide` in the instance's own ordered vocabulary whose
+dimension is unchanged (the doubling is one-dimensional) and whose tags only gain
+a Boolean per coordinate.
+
+The correctness is then four equalities in a row.
+`DescriptiveComplexity.Pfp.srcReads` says the interpreted structure reads the
+program's table; `dwideAcceptSpace_srcEnv_iff` runs the run layer at the
+environment `srcEnv` – the doubled universe with the marked copy of the
+instance's minimum and the junk copy of its maximum as designated elements, and
+with the expanded universe's order *chosen* to be `encOrder`, which makes the run
+layer's `hordP` an `Iff.rfl`; `wideInterpEquiv` carries that back along the
+composition; and `relExpMapEquiv` plus the source problem's own
+`iso_invariant` turn the fixed point into the source. That is
+`DescriptiveComplexity.Pfp.dwideAcceptSpace_wideInterp_iff`, and with it
+`DescriptiveComplexity.dwideAcceptSpace_EXPSPACE_complete` and
+`DescriptiveComplexity.wideAcceptSpace_EXPSPACE_complete`.
 
 `DescriptiveComplexity.Problems.Wide.PfpTracks` names the coordinates. A payload
 is a function of a finite **slot** type (`DescriptiveComplexity.Pfp.slotPl`, read
@@ -645,7 +981,206 @@ access – is `DescriptiveComplexity.Pfp.Prog.reaches_reset` with its
 state – registers per element, stage tracks and markers per cell – and
 `DescriptiveComplexity.Pfp.PfpData.back` its presentation as the background
 family the pass layer walks, with the slot equations every kit discharge
-takes proved once over it.
+takes proved once over it – including the one that says what a symbol does
+*not* depend on: the four register slots read
+`DescriptiveComplexity.regBit`, set at a register cell alone, so off the
+register file the background is blind to the mirror, the target, the saved
+mirror and VAL alike (`DescriptiveComplexity.Pfp.PfpData.back_congr_off_reg`). That blindness is
+what separates the machine's *threaded* states from the *unthreaded* ones
+the semantics is stated at: a VAL round rewrites SAV and
+TARGET and nothing else
+(`DescriptiveComplexity.Pfp.PfpData.ScratchEq`,
+`DescriptiveComplexity.Pfp.PfpData.roundEndSt_eq`), and every control the
+machinery computes is blind to that difference – the generated families
+read their background at the working cell alone
+(`DescriptiveComplexity.Pfp.elemFam_congr_rest` and its two siblings),
+each atom kind's loop and exit follow
+(`DescriptiveComplexity.Pfp.PfpData.kindExitCtl_congr_scratch`), and so do
+the matrix and the round
+(`DescriptiveComplexity.Pfp.PfpData.matFs_congr_scratch`,
+`DescriptiveComplexity.Pfp.PfpData.matFsT_eq_matFs`,
+`DescriptiveComplexity.Pfp.PfpData.igFs_congr_scratch`,
+`DescriptiveComplexity.Pfp.PfpData.roundCtl_congr_scratch`,
+`DescriptiveComplexity.Pfp.PfpData.roundCtlT_eq_roundCtl`), and with them the
+VAL loop and one position's leg
+(`DescriptiveComplexity.Pfp.PfpData.varFXT_eq_roundFX`,
+`DescriptiveComplexity.Pfp.PfpData.varFMT_eq_varFM`,
+`DescriptiveComplexity.Pfp.PfpData.legCtlT_eq_legCtl`, and at the output
+variable `outCtlT_eq_outCtl`, which is what lets `outLeg_run_thread` — the
+out machinery's run with `hsav`/`htgt` dropped, since a sweep leaves the two
+scratch registers wherever the last position's evaluation left them — ask
+for its accepting verdict in the unthreaded form the semantics reads).
+What the threading
+*can* change is the semantic pack – a family indexed by the scratch
+registers may pick different points at different registers – so the loop's
+bridge is stated at a pack that is one pack at the round state transported
+(`DescriptiveComplexity.Pfp.PfpData.semCastT`, closed by
+`DescriptiveComplexity.Pfp.PfpData.kindSemCast_triple`: the pack leaves the
+round state, travels to the round's own state and to the state its matrix
+threads, and comes back). A gated position's own pack is of that shape
+(`DescriptiveComplexity.Pfp.PfpData.gatedSem_eq_semCastT`, its points being
+`isEnc_of_gatedAt`'s choices – a function of the mirror alone), so the
+branched leg's stage bit is the verdict the semantics reads
+(`DescriptiveComplexity.Pfp.PfpData.legBitB_gatedSem`), which is what
+`DescriptiveComplexity.Pfp.PfpData.new_last_next_at` – the per-position form
+of `new_last_next`, gating being per variable – consumes; and gating at a
+position *is* «the blocks below that variable's arity encode points», both
+directions
+(`DescriptiveComplexity.Pfp.PfpData.isEnc_of_gatedAt`,
+`DescriptiveComplexity.Pfp.PfpData.gatedAt_of_isEnc`). With those, the branched spine's
+own reading at one address is `DescriptiveComplexity.Pfp.PfpData.new_last_trackOf_B`
+– per variable, nothing assumed of the other variables' blocks – and along a
+whole sweep `DescriptiveComplexity.Pfp.PfpData.sweep_new_trackOf`: below the
+address reached every stage track holds the dictionary of the *next* stage,
+elsewhere what the sweep started with. One scale up again, a stage's `old`
+tracks hold that stage of the iteration
+(`DescriptiveComplexity.Pfp.PfpData.stageSt_old`, by induction through the
+copy-back), so the machine's convergence test is exactly the semantic one:
+`DescriptiveComplexity.Pfp.PfpData.stageEnd_conv_iff` – *this stage and the
+next agree at every address below the end marker* – which is what
+`DescriptiveComplexity.Pfp.PfpData.reaches_main`'s `hconv`/`hnotconv` ask
+for, with `DescriptiveComplexity.StepDef.partStage` on both sides. And the dictionary is
+**faithful**: `DescriptiveComplexity.Pfp.assignment_ext_of_trackOf` – two
+assignments whose tracks agree over a family of addresses carrying every
+tuple's own (`DescriptiveComplexity.Pfp.tupAddr`) are equal – so the test
+decides the *stages*, not merely their readings. A tuple's address lies in
+the logical interval because it has no non-argument block, and *strictly*
+below its top because the top's blocks are full while an encoding's never
+are – every member of one carries a one-hot code, so the all-`zero` tuple is
+not one (`DescriptiveComplexity.Pfp.not_encPt_zeroTup`,
+`DescriptiveComplexity.Pfp.wmSetLt_tupAddr_logicalTop`; at a **nullary**
+variable the address is the empty one and what places it is the interval's
+nonemptiness, the two cases joined in
+`DescriptiveComplexity.Pfp.wmSetLt_tupAddr_logicalTop'`). And the induction
+starts on a blank tape, which is stage `0` because the empty stage writes an
+empty track (`DescriptiveComplexity.Pfp.PfpData.old_trackOf_zero_of_blank`).
+With that,
+`DescriptiveComplexity.Pfp.PfpData.stageEnd_conv_of_eq` and
+`stageEnd_not_conv_of_ne` are the loop's two remaining hypotheses at the
+*first* stable stage, which `DescriptiveComplexity.StepDef.exists_least_stable`
+supplies from convergence – so what the machine's rounds test is the stage
+sequence itself. The invariant is stated *over the logical
+interval* and nowhere else, and that restriction is not a convenience:
+outside it an address may read a stage all the same – a tuple's address with
+one `ctrl` cell added lies above the top, non-argument tags being the most
+significant – while the machine's tracks there stay blank. So every
+dictionary hypothesis of the layer, from
+`DescriptiveComplexity.Pfp.PfpData.old_trackOf_stageTgtD` up, is an
+equivalence at the addresses that are *read* rather than an equation of
+tracks; what each site owes in exchange is that the address it reads lies in
+the interval, and for a stage atom that address is
+`DescriptiveComplexity.Pfp.PfpData.stageTgtD`, which **is** in it
+(`DescriptiveComplexity.Pfp.PfpData.wmSetLt_stageTgtD_logicalTop`): every
+cell it holds was written by a copy round at that round's destination, so it
+carries argument cells alone (`stageTgtD_arg`) and each of them is a padded
+one (`stageTgtD_isPad`) – which is the general
+`DescriptiveComplexity.Pfp.wmSetLt_logicalTop_of_isPad`, an address a program
+*builds* out of padded cells being strictly below a top whose blocks are
+full. Unlike the address a program *reads* from a register, this one is
+placed with no hypothesis on the machine's state at all.
+
+From the *initial* configuration the run reaches MAIN's starting one by
+`DescriptiveComplexity.Pfp.PfpData.reaches_evalEntry`: the startup, then two
+steps — `step_clearMir1_exit`, which leaves the marker to the right, and
+`step_chk0_back`, the checkpoint's `stay` rule walking back onto it — with
+the two presentations of the tape one term
+(`DescriptiveComplexity.Pfp.PfpData.trackTape_val_eq_mir`). The state it
+arrives with is `startupSt`, which is what `reaches_mainB` asks of its `st₀`,
+and whose `ltp` field is what pins the end marker of the whole run.
+
+With that the **forward half of the reduction is assembled**
+(`DescriptiveComplexity.Problems.Wide.PfpYes`): a partial fixed point that
+holds makes the emitted instance a yes-instance of
+`DescriptiveComplexity.DWideAcceptSpace`
+(`DescriptiveComplexity.Pfp.PfpData.dwideAcceptSpace_of_pfpHolds`), the two
+promises coming for free – well-formedness from the layout, determinism from
+`prog_sep` – and the run being `reaches_evalEntry`, `reaches_mainB` and the
+output leg in sequence
+(`DescriptiveComplexity.Pfp.PfpData.reaches_accept`). Everything semantic the
+loop asks for is a choice made once here: the end marker is
+`DescriptiveComplexity.Pfp.logicalTop`, which is *what the startup writes*
+(`DescriptiveComplexity.Pfp.PfpData.tgtTopSt_tgt` – a tag has a block exactly
+when it is an argument tag), and which lies below every register because the
+least element of the universe is not an argument
+(`tagBlk_eq_none_of_least`, `wmSetLt_wmSeg_of_not_bot`); the VAL enumeration
+is `exists_valEnum`'s chain over `Fin (n + 1)`, whose bottom and top are `0`
+and `Fin.last n`; and the stage the machine stops at is the *first stable*
+one (`DescriptiveComplexity.StepDef.exists_least_stable`), whose two sides
+are `stageEnd_conv_of_eq` and `stageEnd_not_conv_of_ne`. The output leg
+(`DescriptiveComplexity.Pfp.PfpData.outLeg_accept`) is the one place a
+verdict is *read*: the output variable is nullary, so every hypothesis the
+machinery asks about the working address's blocks is a function on `Fin 0`,
+its pack is `passSem` transported by `semCastT`, and what is left is
+`accVerdict_out` – the machinery's bit at the empty address **is** the output
+sentence at the stage the tracks hold.
+
+The **other half is rejection**, and it costs no invariant over the program's
+rules. The emitted machine is deterministic, so the configurations reachable
+from its initial one are linearly ordered
+(`DescriptiveComplexity.TMData.reach_total`), and it is enough to exhibit one
+run of the machine's own choosing that ends badly – provided accepting
+configurations are *stuck*. They are
+(`DescriptiveComplexity.Pfp.PfpData.stuck_acc`), and the fact is one the
+assembly already carries: every rule fires from a phase its own site owns
+(`DescriptiveComplexity.Pfp.Assembly.howner`), the accepting phase's site
+contributes no rules at all (`OuterSh … .accept` is `Empty`), so no rule has
+it as a source (`DescriptiveComplexity.Pfp.Assembly.srcPh_ne_of_isEmpty`,
+`DescriptiveComplexity.Pfp.PfpData.srcPh_ne_acceptP`) and the case analysis is
+on the *tag* of a transition rather than one case per rule. With it,
+`DescriptiveComplexity.Problems.Machine.DetRun` supplies both shapes of
+rejection: a run that ends badly
+(`DescriptiveComplexity.TMData.not_acceptsSpace_of_reaches_dead`) and one that
+never ends (`DescriptiveComplexity.TMData.not_acceptsSpace_of_chain` – each
+link of an unbounded chain costs at least one step, while a stuck
+configuration is reached in one fixed number of them, so a *diverging* fixed
+point is a correct rejection with no clock anywhere).
+
+With that the **converging case is settled both ways at once**
+(`DescriptiveComplexity.Problems.Wide.PfpNo`). The output leg does not need
+its verdict as a hypothesis: it lands in the accepting phase whatever the
+verdict, and what the verdict decides is the *bit* the exit writes at the
+marker (`DescriptiveComplexity.Pfp.PfpData.outStA`,
+`DescriptiveComplexity.Pfp.PfpData.outLeg_run_verdict` – the current
+`outLeg_run_thread` is its idempotent special case). So
+`DescriptiveComplexity.Pfp.PfpData.reaches_outVerdict` asks only that the
+iteration *converge* and delivers one run with an **equivalence** at its end:
+the machine's accepting predicate at the state it stops in holds exactly when
+the partial fixed point does. One direction is
+`DescriptiveComplexity.Pfp.PfpData.dwideAcceptSpace_of_pfpHolds`; the other,
+with the dead end, is
+`DescriptiveComplexity.Pfp.PfpData.not_dwideAcceptSpace_of_converges`.
+
+A **diverging** iteration is the remaining case, and the machine's lack of a
+clock is what makes it correct rather than a bug: when no stage is stable
+every convergence test fails, so MAIN keeps sweeping and its run passes an
+unbounded chain of stage entries
+(`DescriptiveComplexity.Pfp.PfpData.transGen_stageB` – each link at least one
+step, because the sweep leaves the head at the end-marked address and not at
+the empty one). A chain like that reaches no halting configuration at all
+(`DescriptiveComplexity.TMData.not_acceptsSpace_of_chain`), whence
+`DescriptiveComplexity.Pfp.PfpData.not_dwideAcceptSpace_of_diverges`.
+
+The three cases together are the **correctness of the reduction**,
+`DescriptiveComplexity.Pfp.PfpData.dwideAcceptSpace_iff_pfpHolds`: the emitted
+instance is a yes-instance exactly when the partial fixed point holds. No
+induction over the program's rules appears anywhere in it — the machine's
+determinism does that work, and the only side condition is that its accepting
+phase is a dead end.
+
+The **transfer to the nondeterministic problem** costs nothing and is written
+once (`DescriptiveComplexity.Problems.Wide.Det`): hardness travels forward
+along reductions, so proving the *deterministic* problem hard – which is what
+a program with a unique run naturally gives – hands
+`DescriptiveComplexity.WideAcceptSpace` its own hardness through
+`DescriptiveComplexity.dwideAcceptSpace_fo_reduction_wideAcceptSpace`. The
+reduction is the identity interpretation with its accepting states guarded by
+the determinism sentence (`DescriptiveComplexity.SpaceTM.detF` read at
+`FirstOrder.Language.wide`'s symbols, the very sentence the polynomial-level
+bridge uses): a deterministic instance is copied verbatim, so the two are
+isomorphic; a nondeterministic one loses every accepting state, so both sides
+are no-instances. This is `DescriptiveComplexity.Problems.Machine.SpaceDet` one
+exponent up, and it is why `PSPACE = NPSPACE` needs no machine-side Savitch
+here either.
 
 The **outer program is assembled**
 (`DescriptiveComplexity.Problems.Wide.PfpOuter`): the program factors as an
@@ -853,6 +1388,75 @@ the join: the prefix of the leaf over *every* block, played from level `0`,
 address encodes; and `foldFrom_leafP_top` reads that off the accumulators at
 the address the loop stops at, the inner top.
 
+`DescriptiveComplexity.Problems.Wide.PfpVerdict` closes that circle at the
+machine: `DescriptiveComplexity.Pfp.PfpData.accVerdict_next` says the
+machinery's exit bit at a variable's position **is** `StepDef.next` at the
+working address's points, every abstract input of the run layer's capstone
+discharged from the two facts a reduction's tape maintains — the address's
+outer blocks encode the argument tuple, and each stage track holds the
+dictionary. Its sibling `accVerdict_out` is the same reading at the
+**output** variable, where the answer is `d.out` itself at the stage the
+tracks hold: a sentence has no free level, so the prefix starts where the
+machine starts it (`altQuantFrom_leafP_out`, over
+`DescriptiveComplexity.Pfp.StepDef.out_iff_gateMat` — the nullary
+`next_iff_gateMat`) and the verdict is taken at the *empty* address. That is
+the bit the accepting dispatch reads, so it is the whole of what a yes-answer
+of `DescriptiveComplexity.StepDef.PFPHolds` has to deliver once the stage is
+stable.
+
+The enumeration both of those read a register through is
+`DescriptiveComplexity.Problems.Wide.PfpValEnum`: the VAL loop starts empty,
+increments, and stops at the **Kin top** – the set of the inner-block cells –
+so what it consumes is an initial segment of the binary-counter order,
+indexed by `Fin (n + 1)` for the instances the run theorems ask for
+(`DescriptiveComplexity.Pfp.PfpData.exists_valEnum`, built by
+`exists_wmChain` from repeated `DescriptiveComplexity.exists_wmPred`). It
+delivers the five facts a semantic reading needs, the last of them the one
+the machine could not be trusted for on its own: every register of the chain
+holds inner cells *alone*. That is not a property of the counter but of the
+layout — the Kin blocks are a final segment of the tag order
+(`DescriptiveComplexity.Pfp.kinSeg`), and a set at or below an upward-closed
+one is contained in it (`DescriptiveComplexity.subset_of_wmSetLe`).
+
+`DescriptiveComplexity.Problems.Wide.PfpSpineSem` carries that
+along the whole spine: the mirror, the dictionary and the markers ride
+every position's write (`spineRide`), so after the spine each variable's
+`new` cell at the address holds one step of the iteration there
+(`new_last_next`) — or nothing, at an address encoding no tuple
+(`new_last_of_false`). Read in dictionary form (`new_last_trackOf`,
+`new_last_trackOf_of_junk`) and iterated along the addresses by
+`DescriptiveComplexity.holds_of_wideRounds`, that is `sweep_new`: a sweep
+rewrites the tracks of exactly the addresses it has passed. The same file
+carries the pack's transport (`kindSemCast` and its content lemmas): a
+position's semantic pack is typed at that position's state, but
+`DescriptiveComplexity.Pfp.PfpData.KindSem` reads the state only through
+the levels' register sets, so one pack built at the address's entry state
+serves every position. That is what makes the per-position families
+*constructible* rather than merely stateable: `spineNode` recurses along
+the positions producing state, mirror invariant and control together, and
+its projections satisfy exactly the cover equations `evalSpine_run` asks
+for. One scale up the same file builds the sweep's own families
+(`sweepSW`/`sweepFS`, `sweepSW_incr`/`sweepFS_incr`): an iteration along
+the addresses, because a leg's writes are local to its cell but its
+*control* accumulates — with the order on the addresses installed locally,
+never as an ambient instance.
+
+The **branched** family — the one a sweep runs, each position taking
+whichever of its three legs its own gates call for — asks for no pack at
+all: its semantic parameter is the *conditioned* family
+`DescriptiveComplexity.Pfp.PfpData.gatedSem` inhabits, a pack at every
+gated position of every state and every address, built from
+`DescriptiveComplexity.Pfp.PfpData.isEnc_of_gatedAt` because a gated
+position's argument blocks **are** encodings. Supplied at the top as
+`fun w => dt.gatedSem hzo hlin mV`, it leaves no semantic assumption about
+a position anywhere in the run layer. What the dictionary lemmas ask of a
+leg is correspondingly weakened to the projection they read
+(`DescriptiveComplexity.Pfp.PfpData.WritesNew`: its variable's cell at the
+marker holds its verdict, every other cell rides), which a branched leg
+satisfies (`legStB_new`, `spineStOfB_writesNew`) while it is not literally
+a `postVarSt` of the position's entry state — its VAL loop may normalize
+the two scratch registers first.
+
 The **element loops** of the atom subroutines have the same anchor one scale
 down, `DescriptiveComplexity.Problems.Wide.PfpExp`: an atom of the expansion
 holds of a tuple of points exactly when the prefix of
@@ -870,8 +1474,8 @@ sentence.
 **Not proved**: hardness. Completeness for these two classes needs the machine
 written in logic, as `DescriptiveComplexity.ATMAcceptSpace` needed for EXPTIME:
 a reduction cannot be routed through the outer composition of an interpretation
-with an expansion, which does not exist in general. The plan is `EXPONENTIAL.md`
-§6.4.4 – for EXPSPACE, a roaming program with the register file above that
+with an expansion, which does not exist in general. The plan – for EXPSPACE, a
+roaming program with the register file above that
 iterates a partial fixed point over the expansion until it stabilizes; for
 NEXPTIME, the harder one-pass sweep that folds a fixed prenex kernel with the
 valuation as its head position.

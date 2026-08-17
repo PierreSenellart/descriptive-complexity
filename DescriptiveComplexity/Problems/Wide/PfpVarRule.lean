@@ -278,6 +278,95 @@ theorem gatesSep (hemb : Function.Injective emb) :
 
 end Gates
 
+/-! ### The inner gates
+
+The same sequencer-over-gate-blocks as the outer gates, with one
+difference: a failing block does **not** abort the sequence — every
+quantified level's flag must be computed, since the leaf reads both flag
+conjunctions whichever way the branch goes. So each block's fail exit
+continues to the next checkpoint, its `setFail` clearing the level's
+polarity flag. -/
+
+section IGates
+
+variable (v : dt.VarIx) (emb : dt.IGatesPh v → P)
+variable (argsG : Fin (dt.nIn v) →
+  letI := Fintype.ofFinite dt.X.Tag
+  TagArgs A Q dt.SlotIx (Fintype.card dt.X.Tag) dt.X.Tag dt.domNr)
+variable (wellGOf : Fin (dt.nIn v) → (dt.SlotIx → A) → Prop)
+variable (setFailOf : Fin (dt.nIn v) → (Q → A) → (dt.SlotIx → A) → Q → A)
+variable (enterSt : Fin (dt.nIn v) → (Q → A) → (dt.SlotIx → A) → Q → A)
+variable (exitPh : P)
+
+/-- **The inner gates' rules**: the sequencer over the quantified levels'
+blocks, every fail exit continuing. -/
+noncomputable def igatesRule :
+    ∀ i : dt.IGatesSite v, dt.IGatesSh v i → Rule A Q dt.SlotIx P :=
+  seqRule one Slot.wk Slot.reg emb
+    (fun b s ρ => dt.gateBlockRule (one := one)
+      (emb := fun p => emb (.sub b p)) (args := argsG b)
+      (wellG := wellGOf b) (setFail := setFailOf b)
+      (failPh := emb (.chk b.succ)) (exitPh := emb (.chk b.succ)) s ρ)
+    (fun _ => Sum.inl .up)
+    enterSt exitPh
+
+variable {emb}
+
+/-- **Every rule of the inner gates fires from a phase its site owns.** -/
+theorem igatesHosrc :
+    ∀ (i : dt.IGatesSite v) (ρ : dt.IGatesSh v i),
+      ∃ p : dt.IGatesPh v,
+        (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
+          (wellGOf := wellGOf) (setFailOf := setFailOf) (enterSt := enterSt)
+          (exitPh := exitPh) i ρ).srcPh = emb p ∧
+          seqOwn (fun _ => dt.gateBlockOwn) p = i :=
+  seqHosrc one Slot.wk Slot.reg emb
+    (fun b s ρ => dt.gateBlockRule (one := one)
+      (emb := fun p => emb (.sub b p)) (args := argsG b)
+      (wellG := wellGOf b) (setFail := setFailOf b)
+      (failPh := emb (.chk b.succ)) (exitPh := emb (.chk b.succ)) s ρ)
+    (fun _ => Sum.inl .up)
+    enterSt exitPh
+    (fun _ => dt.gateBlockOwn)
+    (fun b s ρ =>
+      dt.gateBlockHosrc (one := one) (args := argsG b) (wellG := wellGOf b)
+        (setFail := setFailOf b) (failPh := emb (.chk b.succ))
+        (exitPh := emb (.chk b.succ)) s ρ)
+
+/-- **The inner gates separate in-shape.** -/
+theorem igatesSep (hemb : Function.Injective emb) :
+    ∀ (i : dt.IGatesSite v) (ρ ρ' : dt.IGatesSh v i) (f : Q → A)
+      (g : dt.SlotIx → A),
+      (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
+        (wellGOf := wellGOf) (setFailOf := setFailOf) (enterSt := enterSt)
+        (exitPh := exitPh) i ρ).guard f g →
+      (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
+        (wellGOf := wellGOf) (setFailOf := setFailOf) (enterSt := enterSt)
+        (exitPh := exitPh) i ρ').guard f g →
+      (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
+        (wellGOf := wellGOf) (setFailOf := setFailOf) (enterSt := enterSt)
+        (exitPh := exitPh) i ρ).srcPh =
+        (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
+          (wellGOf := wellGOf) (setFailOf := setFailOf) (enterSt := enterSt)
+          (exitPh := exitPh) i ρ').srcPh →
+      ρ = ρ' :=
+  seqSep one Slot.wk Slot.reg emb
+    (fun b s ρ => dt.gateBlockRule (one := one)
+      (emb := fun p => emb (.sub b p)) (args := argsG b)
+      (wellG := wellGOf b) (setFail := setFailOf b)
+      (failPh := emb (.chk b.succ)) (exitPh := emb (.chk b.succ)) s ρ)
+    (fun _ => Sum.inl .up)
+    enterSt exitPh
+    (fun b s ρ ρ' f g hg hg' hph =>
+      dt.gateBlockSep (one := one) (args := argsG b) (wellG := wellGOf b)
+        (setFail := setFailOf b) (failPh := emb (.chk b.succ))
+        (exitPh := emb (.chk b.succ))
+        (fun x y h => by cases hemb h; rfl)
+        s ρ ρ' f g hg hg' hph)
+
+end IGates
+
+
 end PfpData
 
 end Pfp

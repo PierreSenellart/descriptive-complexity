@@ -121,6 +121,52 @@ theorem leafP_irrel (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
     have := j.isLt
     rcases hℓ with hℓ | hℓ <;> omega
 
+/-- **The leaf, machine-shaped**: at an address whose outer blocks encode
+points, the leaf splits into the two flags the machinery conjoins — every
+∃-level of the register an encoding, and if every ∀-level is one, the
+matrix at the decoded valuation. The free levels' gates are absorbed by
+the address's. -/
+theorem leafP_iff_split (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
+    (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
+    (w : Fin dt.ki → ((Fin dt.dd → A) → Prop))
+    (houter : ∀ k : Fin dt.ko, (k : ℕ) < dt.arOf v →
+      IsEnc dt.ly zero one (mb k)) :
+    dt.leafP zero one v σ mb w ↔
+      ((∀ j : Fin (dt.nOf v), dt.arOf v ≤ (j : ℕ) →
+          dt.polOf v (j : ℕ) = true →
+          IsEnc dt.ly zero one
+            (w ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki v)⟩)) ∧
+        ((∀ j : Fin (dt.nOf v), dt.arOf v ≤ (j : ℕ) →
+            dt.polOf v (j : ℕ) = false →
+            IsEnc dt.ly zero one
+              (w ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki v)⟩)) →
+          dt.matHolds v σ fun j =>
+            Function.invFun (encMap dt.ly zero one)
+              (dt.levelVal v mb w j))) := by
+  rw [leafP, gateHolds, gateMat]
+  have hval : ∀ (j : Fin (dt.nOf v)) (h : dt.arOf v ≤ (j : ℕ)),
+      dt.levelVal v mb w j =
+        w ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki v)⟩ := by
+    intro j h
+    rw [levelVal, dif_neg (by omega)]
+  have hfree : ∀ (j : Fin (dt.nOf v)) (h : (j : ℕ) < dt.arOf v),
+      IsEnc dt.ly zero one (dt.levelVal v mb w j) := by
+    intro j h
+    rw [levelVal, dif_pos h]
+    exact houter _ h
+  constructor
+  · rintro ⟨hex, hall⟩
+    refine ⟨fun j hj hp => hval j hj ▸ hex j hp, fun hin => hall fun j hp => ?_⟩
+    by_cases hj : (j : ℕ) < dt.arOf v
+    · exact hfree j hj
+    · exact (hval j (by omega)).symm ▸ hin j (by omega) hp
+  · rintro ⟨hex, hall⟩
+    refine ⟨fun j hp => ?_, fun hin => hall fun j hj hp => ?_⟩
+    · by_cases hj : (j : ℕ) < dt.arOf v
+      · exact hfree j hj
+      · exact (hval j (by omega)).symm ▸ hex j (by omega) hp
+    · exact hval j hj ▸ hin j hp
+
 /-! ### The join -/
 
 /-- **The inner loop computes the step formula.** The prefix of the leaf
@@ -206,6 +252,47 @@ theorem altQuantFrom_leafP (hzo : zero ≠ one) (i : dt.d.B.ι)
       rfl)
   rw [h0]
   exact (h1.trans (h2.trans h3)).trans h4.symm
+
+/-- **The inner loop at the output variable computes the output sentence.**
+The same three mismatches as `altQuantFrom_leafP`, minus the free levels: a
+sentence has none, so the prefix starts where the machine starts it and only
+the padding past the pack has to be skipped. -/
+theorem altQuantFrom_leafP_out (hzo : zero ≠ one)
+    (σ : dt.d.B.Assignment (dt.X.Map A))
+    (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
+    (w : Fin dt.ki → ((Fin dt.dd → A) → Prop)) :
+    altQuantFrom (dt.polOf none) (dt.leafP zero one none σ mb) 0 w ↔
+      @Sentence.Realize _ (dt.X.Map A) (dt.d.B.structure₁ σ) dt.d.out := by
+  classical
+  -- the levels past the prefix are padding
+  have h2 : altQuantFrom (dt.polOf none) (dt.leafP zero one none σ mb) 0 w ↔
+      altQuantFrom (dt.polOf none)
+        (fun u : Fin (dt.nOf none) → ((Fin dt.dd → A) → Prop) =>
+          dt.gateHolds zero one none σ (dt.freeVal none mb u)) 0
+        (fun j : Fin (dt.nOf none) => w (Fin.castLE (dt.nOf_le_ki none) j)) := by
+    have hfun : dt.leafP zero one none σ mb =
+        fun w' : Fin dt.ki → ((Fin dt.dd → A) → Prop) =>
+          (fun u : Fin (dt.nOf none) → ((Fin dt.dd → A) → Prop) =>
+            dt.gateHolds zero one none σ (dt.freeVal none mb u))
+            (fun j : Fin (dt.nOf none) => w' (Fin.castLE (dt.nOf_le_ki none) j)) :=
+      funext fun w' => leafP_eq_pad none σ mb w'
+    rw [hfun]
+    exact altQuantFrom_pad (P := fun u : Fin (dt.nOf none) → ((Fin dt.dd → A) → Prop) =>
+      dt.gateHolds zero one none σ (dt.freeVal none mb u))
+      (dt.nOf_le_ki none) (dt.arOf_le_nOf none) w
+  -- nothing is free, so the valuation the leaf reads is the pack's own
+  have h3 : altQuantFrom (dt.polOf none)
+        (fun u : Fin (dt.nOf none) → ((Fin dt.dd → A) → Prop) =>
+          dt.gateHolds zero one none σ (dt.freeVal none mb u)) 0
+        (fun j : Fin (dt.nOf none) => w (Fin.castLE (dt.nOf_le_ki none) j)) ↔
+      altQuantFrom (dt.polOf none) (dt.gateHolds zero one none σ) 0
+        (fun j : Fin (dt.nOf none) => w (Fin.castLE (dt.nOf_le_ki none) j)) := by
+    refine altQuantFrom_congr_mat fun u _ => ?_
+    refine iff_of_eq (congrArg (dt.gateHolds zero one none σ) (funext fun j => ?_))
+    rw [freeVal]
+    exact dif_neg (Nat.not_lt_zero _)
+  exact (h2.trans h3).trans
+    (StepDef.out_iff_gateMat (ly := dt.ly) hzo dt.pkOut σ _).symm
 
 /-! ### Read off the accumulators -/
 

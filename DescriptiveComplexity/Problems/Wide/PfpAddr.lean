@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.PfpTable
 # The argument blocks, concretely: outer arguments first, inner variables last
 
 The EXPSPACE program keeps two families of argument blocks
-(`DescriptiveComplexity.Pfp.PfpTag`'s `K`, EXPONENTIAL.md §6.4.4): the **outer**
+(`DescriptiveComplexity.Pfp.PfpTag`'s `K`): the **outer**
 ones hold the arguments of the fixed-point variable at the working cell, the
 **inner** ones hold the valuations of the step formula's quantifier prefix,
 enumerated by the VAL register. This file fixes `K := Fin ko ⊕ₗ Fin ki` and
@@ -185,6 +185,151 @@ theorem trackOf_of_blocks (hne : zero ≠ one) {i : d.B.ι} (ha : d.B.arity i �
     rwa [hxx] at hσ
   · intro hσ
     exact ⟨x, hs, hσ⟩
+
+/-- **A track is empty at an address that encodes no tuple**: one block below
+the variable's arity holding no point is enough, whatever the stage. This is
+what the junk addresses of a sweep write, and it is why a program may leave
+them alone. -/
+theorem not_trackOf_of_notEnc {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    (σ : d.B.Assignment (X.Map A))
+    {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop} {ℓ₀ : Fin (d.B.arity i)}
+    (hℓ : ∀ p : X.Map A,
+      wmBlk s (argOut ki (Fin.castLE ha ℓ₀)) ≠ encMap ly zero one p) :
+    ¬trackOf ly zero one ha σ s := by
+  rintro ⟨x, hx, -⟩
+  exact hℓ (x ℓ₀) (hx ℓ₀)
+
+variable (ly zero one) in
+/-- **The address of a tuple of points**: its outer blocks are the tuple's
+encodings, everything else empty — where the dictionary of a variable at that
+tuple is read. -/
+def tupAddr {i : d.B.ι} (_ha : d.B.arity i ≤ ko)
+    (x : Fin (d.B.arity i) → X.Map A) :
+    Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop :=
+  outAddr fun k =>
+    if h : (k : ℕ) < d.B.arity i then encMap ly zero one (x ⟨(k : ℕ), h⟩)
+    else fun _ => False
+
+/-- Its blocks below the variable's arity are the tuple's encodings. -/
+theorem wmBlk_tupAddr {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
+    {zero one : A} {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    (x : Fin (d.B.arity i) → X.Map A) (ℓ : Fin (d.B.arity i)) :
+    wmBlk (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x)
+        (argOut ki (Fin.castLE ha ℓ)) = encMap ly zero one (x ℓ) := by
+  rw [tupAddr, wmBlk_outAddr]
+  exact dif_pos ℓ.isLt
+
+/-- **A tuple's address lies in the logical interval**: its non-argument
+blocks are empty, which is exactly `wmSetLe_logicalTop`'s hypothesis. What is
+*not* automatic is that it lies strictly below the top — the reduction owes
+that where it plants the end marker. -/
+theorem wmSetLe_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
+    [Finite R] [Finite P] [Finite A]
+    (hV : IsLinOrd (tupLeLex (A := A) (d := dd)))
+    {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    (x : Fin (d.B.arity i) → X.Map A) :
+    WMSetLe (lexRel (· ≤ · : PfpTag R P (Fin ko ⊕ₗ Fin ki) →
+        PfpTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+      (tupLeLex (A := A) (d := dd)))
+      (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x) logicalTop :=
+  wmSetLe_logicalTop hV (fun _ ht v => outAddr_junk _ ht v)
+
+/-- **A tuple's address is strictly below the logical top**: the top's blocks
+are full, and an encoding is not (`not_encPt_zeroTup`). One position of the
+tuple is enough; at a nullary variable the address is the empty one, which is
+strictly below any nonempty top. -/
+theorem wmSetLt_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
+    [Finite R] [Finite P] [Finite A] (hne : zero ≠ one)
+    (hV : IsLinOrd (tupLeLex (A := A) (d := dd)))
+    {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    (x : Fin (d.B.arity i) → X.Map A) (ℓ : Fin (d.B.arity i)) :
+    WMSetLt (lexRel (· ≤ · : PfpTag R P (Fin ko ⊕ₗ Fin ki) →
+        PfpTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+      (tupLeLex (A := A) (d := dd)))
+      (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x) logicalTop := by
+  refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_tupAddr_logicalTop hV ha x, fun hc => ?_⟩
+  have hcell : tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x
+      (PfpTag.arg (Sum.inlₗ (Fin.castLE ha ℓ)), fun _ => zero) := by
+    rw [hc]
+    exact logicalTop_arg _ _
+  obtain ⟨k, hk, hv⟩ := hcell
+  rw [argOut_injective (P := P) (R := R) hk.symm] at hv
+  rw [dif_pos (show ((Fin.castLE ha ℓ : Fin ko) : ℕ) < d.B.arity i from ℓ.isLt)]
+    at hv
+  exact not_encPt_zeroTup ly hne (x ℓ).1 hv
+
+/-- **A padded address of argument cells alone is strictly below the logical
+top**: it is at or below it because its non-argument blocks are empty
+(`wmSetLe_logicalTop`), and it is not the top itself because the top's blocks
+are *full* — they hold the cells whose coordinates beyond the payload are not
+`zero`, and a padded address holds none of those. This is what an address a
+program *builds* out of padded cells (rather than reads from a register) has
+to offer, and it needs one coordinate of slack (`c < dd`) and one argument
+block to name (`i`) — the same nonemptiness the interval is given anyway. -/
+theorem wmSetLt_logicalTop_of_isPad [LinearOrder R] [LinearOrder P]
+    [Finite R] [Finite P] [Finite A] {c : ℕ} {zero one : A} (hne : zero ≠ one)
+    (hV : IsLinOrd (tupLeLex (A := A) (d := dd))) (hc : c < dd)
+    (i : Fin ko ⊕ₗ Fin ki)
+    {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop}
+    (hjunk : ∀ τ : PfpTag R P (Fin ko ⊕ₗ Fin ki),
+      (∀ i : Fin ko ⊕ₗ Fin ki, τ ≠ PfpTag.arg i) → ∀ v : Fin dd → A, ¬s (τ, v))
+    (hpad : ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, s y → IsPad c zero y.2) :
+    WMSetLt (lexRel (· ≤ · : PfpTag R P (Fin ko ⊕ₗ Fin ki) →
+        PfpTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+      (tupLeLex (A := A) (d := dd)))
+      s logicalTop := by
+  refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_logicalTop hV hjunk, fun heq => ?_⟩
+  have hcell : s (PfpTag.arg i, fun _ => one) := by
+    rw [heq]
+    exact logicalTop_arg _ _
+  exact hne (hpad _ hcell ⟨c, hc⟩ le_rfl).symm
+
+/-- **A tuple's address is strictly below the logical top, at every arity**:
+`wmSetLt_tupAddr_logicalTop` at a variable of arity ≥ 1, and at a **nullary**
+one the address is the empty one, which is strictly below any nonempty top —
+so what the nullary case asks for is an argument block to name, the same
+nonemptiness of the interval the run layer is given anyway. This is the form
+`assignment_ext_of_trackOf`'s `hS` is discharged in. -/
+theorem wmSetLt_tupAddr_logicalTop' [LinearOrder R] [LinearOrder P]
+    [Finite R] [Finite P] [Finite A] (hne : zero ≠ one)
+    (hV : IsLinOrd (tupLeLex (A := A) (d := dd))) (i₀ : Fin ko ⊕ₗ Fin ki)
+    {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    (x : Fin (d.B.arity i) → X.Map A) :
+    WMSetLt (lexRel (· ≤ · : PfpTag R P (Fin ko ⊕ₗ Fin ki) →
+        PfpTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+      (tupLeLex (A := A) (d := dd)))
+      (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x) logicalTop := by
+  rcases Nat.eq_zero_or_pos (d.B.arity i) with h0 | hpos
+  · refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_tupAddr_logicalTop hV ha x, fun heq => ?_⟩
+    have hcell : tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x
+        (PfpTag.arg i₀, fun _ => zero) := by
+      rw [heq]
+      exact logicalTop_arg _ _
+    obtain ⟨k, -, hv⟩ := hcell
+    rw [dif_neg (by omega : ¬((k : ℕ) < d.B.arity i))] at hv
+    exact hv
+  · exact wmSetLt_tupAddr_logicalTop hne hV ha x ⟨0, hpos⟩
+
+/-- **The dictionary determines the stage**: two assignments whose tracks agree
+at every address of a family that carries every tuple's own address are equal.
+This is what turns the machine's convergence test — the tracks of one stage and
+the next agreeing over the logical interval — back into «the stages are
+equal», which is what `hnotconv` needs. -/
+theorem assignment_ext_of_trackOf (hne : zero ≠ one)
+    (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
+    {σ σ' : d.B.Assignment (X.Map A)}
+    (S : (Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop) → Prop)
+    (hS : ∀ (i : d.B.ι) (x : Fin (d.B.arity i) → X.Map A),
+      S (tupAddr ly zero one (ha i) x))
+    (hagree : ∀ s, S s → ∀ i : d.B.ι,
+      (trackOf ly zero one (ha i) σ s ↔ trackOf ly zero one (ha i) σ' s)) :
+    σ = σ' := by
+  funext i x
+  refine propext ?_
+  have hb := wmBlk_tupAddr (R := R) (P := P) (ki := ki) (ly := ly)
+    (zero := zero) (one := one) (ha i) x
+  exact ((trackOf_of_blocks hne (ha i) σ hb).symm.trans
+    (hagree _ (hS i x) i)).trans (trackOf_of_blocks hne (ha i) σ' hb)
 
 /-- **The empty stage writes an empty track**: at the bottom assignment nothing
 holds, whatever the address – the all-blank initial tape is stage `0`. -/

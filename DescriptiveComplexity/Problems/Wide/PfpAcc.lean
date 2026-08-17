@@ -223,7 +223,8 @@ theorem chainFrom_succ {j : ℕ} (h : j < n) :
 contributions and whose leaf bit is the matrix at the current valuation reads
 off every accumulator of the sweep. -/
 theorem chainFrom_iff_foldFrom {v : Fin n → A}
-    (hacc : ∀ i : ℕ, acc i ↔ accCVal pol P le i v) (hleaf : leaf ↔ P v) (j : ℕ) :
+    (hacc : ∀ i : ℕ, i < n → (acc i ↔ accCVal pol P le i v))
+    (hleaf : leaf ↔ P v) (j : ℕ) :
     chainFrom pol acc leaf n j ↔ foldFrom pol P le j v := by
   have key : ∀ (r j : ℕ), n - j ≤ r →
       (chainFrom pol acc leaf n j ↔ foldFrom pol P le j v) := by
@@ -239,9 +240,9 @@ theorem chainFrom_iff_foldFrom {v : Fin n → A}
       · rw [chainFrom_succ hjn, foldFrom_eq_accCVal hjn]
         by_cases hp : pol j = true
         · rw [if_pos hp, if_pos hp]
-          exact or_congr (hacc j) (ih (j + 1) (by omega))
+          exact or_congr (hacc j hjn) (ih (j + 1) (by omega))
         · rw [if_neg hp, if_neg hp]
-          exact and_congr (hacc j) (ih (j + 1) (by omega))
+          exact and_congr (hacc j hjn) (ih (j + 1) (by omega))
       · rw [chainFrom_of_le (by omega), foldFrom_of_le (by omega)]
         exact hleaf
   exact key _ j le_rfl
@@ -255,30 +256,29 @@ theorem accCVal_step (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c < 
     (htop : ∀ i : Fin n, c < (i : ℕ) → ∀ a : A, le a (v i))
     (hbot : ∀ i : Fin n, c < (i : ℕ) → ∀ a : A, le (v' i) a)
     (hsucc : ∀ a : A, WMLt le a (v' ⟨c, hc⟩) ↔ le a (v ⟨c, hc⟩))
-    (hacc : ∀ i : ℕ, acc i ↔ accCVal pol P le i v) (hleaf : leaf ↔ P v)
-    (hnew : ∀ i : ℕ, acc' i ↔
+    (hacc : ∀ i : ℕ, i < n → (acc i ↔ accCVal pol P le i v))
+    (hleaf : leaf ↔ P v)
+    (hnew : ∀ i : ℕ, i < n → (acc' i ↔
       (if i < c then acc i
         else if i = c then
           (if pol c = true then acc c ∨ chainFrom pol acc leaf n (c + 1)
             else acc c ∧ chainFrom pol acc leaf n (c + 1))
-        else (pol i = false))) (i : ℕ) :
+        else (pol i = false)))) (i : ℕ) (hi : i < n) :
     acc' i ↔ accCVal pol P le i v' := by
-  rw [hnew i]
+  rw [hnew i hi]
   rcases lt_trichotomy i c with hic | rfl | hic
-  · rw [if_pos hic, hacc i]
+  · rw [if_pos hic, hacc i hi]
     exact (accCVal_congr_above (lt_trans hic hc)
       (fun k hk => hagree k (by omega))).symm
   · rw [if_neg (lt_irrefl i), if_pos rfl,
       accCVal_carry (P := P) h hc hagree htop hsucc]
     by_cases hp : pol i = true
-    · rw [if_pos hp, if_pos hp, hacc i]
+    · rw [if_pos hp, if_pos hp, hacc i hi]
       exact or_congr Iff.rfl (chainFrom_iff_foldFrom hacc hleaf (i + 1))
-    · rw [if_neg hp, if_neg hp, hacc i]
+    · rw [if_neg hp, if_neg hp, hacc i hi]
       exact and_congr Iff.rfl (chainFrom_iff_foldFrom hacc hleaf (i + 1))
   · rw [if_neg (by omega), if_neg (by omega)]
-    by_cases hin : i < n
-    · exact (accCVal_reset (P := P) hin (fun a => hbot ⟨i, hin⟩ hic a)).symm
-    · rw [accCVal, dif_neg hin]
+    exact (accCVal_reset (P := P) hi (fun a => hbot ⟨i, hi⟩ hic a)).symm
 
 /-- **At the first valuation every accumulator is the polarity's unit**:
 nothing lies below a minimal coordinate, so a cleared register starts the

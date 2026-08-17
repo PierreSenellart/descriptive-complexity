@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Wide.PfpElem
 # Tag-branched element loops: the expansion atoms and the domain gates
 
 An expansion atom's defining sentence – and a block's domain sentence –
-depends on the **tags** of its argument points (EXPONENTIAL.md §6.4.4). The
+depends on the **tags** of its argument points. The
 machine reads them first: one named-bit read per argument position and
 candidate tag, at the canonical tag-witness cell, the verdicts stored
 one-hot in the control. A branch checkpoint then dispatches on the decoded

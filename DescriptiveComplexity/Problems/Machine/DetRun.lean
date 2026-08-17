@@ -86,6 +86,86 @@ theorem not_acceptsSpace_of_reaches_dead (hwf : M.WellFormed) (hdet : M.Determin
   · exact hnacc ((eq_of_reach_stuck hdead h) ▸ hacc)
   · exact hnacc ((eq_of_reach_stuck (hsink c hacc) h) ▸ hacc)
 
+/-! ### A machine that never halts
+
+The other way a no-instance is discharged, and the one a machine with no clock
+needs: instead of *one* run that ends badly, an unbounded *chain* of runs that
+never ends. A halted configuration is reached in a fixed number of steps, so a
+chain whose `n`-th link costs at least `n` of them reaches none. -/
+
+omit [Finite A] in
+/-- Reachability is a run of some length. -/
+theorem exists_stepsIn {c d : Config A}
+    (h : Relation.ReflTransGen M.Step c d) : ∃ n, M.StepsIn n c d := by
+  induction h with
+  | refl => exact ⟨0, rfl⟩
+  | tail _ hstep ih => exact ⟨ih.choose + 1, ih.choose_spec.trans_step hstep⟩
+
+omit [Finite A] in
+/-- A *nonempty* reachability is a run of positive length. -/
+theorem exists_stepsIn_pos {c d : Config A}
+    (h : Relation.TransGen M.Step c d) : ∃ n, 1 ≤ n ∧ M.StepsIn n c d := by
+  induction h with
+  | single hstep => exact ⟨1, le_rfl, ⟨_, hstep, rfl⟩⟩
+  | tail _ hstep ih =>
+    exact ⟨ih.choose + 1, Nat.le_succ_of_le ih.choose_spec.1,
+      ih.choose_spec.2.trans_step hstep⟩
+
+omit [Finite A] in
+/-- **A stuck configuration is reached in one number of steps**: the shorter
+run is a prefix of the longer one, and nothing leaves a dead end. -/
+theorem stepsIn_eq_of_stuck (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
+    {i j : ℕ} {c d : Config A} (hi : M.StepsIn i c d) (hj : M.StepsIn j c d)
+    (hdead : ∀ e, ¬M.Step d e) : i = j := by
+  have key : ∀ {a b : ℕ}, a ≤ b → M.StepsIn a c d → M.StepsIn b c d → a = b := by
+    intro a b hab ha hb
+    obtain ⟨x, hcx, hxd⟩ := stepsIn_split (m := a) (k := b - a)
+      (Nat.add_sub_cancel' hab ▸ hb)
+    obtain rfl := stepsIn_functional hlin hdet ha hcx
+    match hba : b - a with
+    | 0 => omega
+    | k + 1 =>
+      obtain ⟨e, he, -⟩ := hba ▸ hxd
+      exact absurd he (hdead e)
+  rcases le_total i j with hle | hle
+  · exact key hle hi hj
+  · exact (key hle hj hi).symm
+
+omit [Finite A] in
+/-- **A deterministic machine whose run passes an unbounded chain does not
+accept.** Each link of the chain costs at least one step, so the `n`-th is
+reached in at least `n`; an accepting configuration is stuck, hence reached in
+one fixed number of steps, and lies beyond every link. This is what makes a
+*diverging* computation a correct rejection with no clock anywhere. -/
+theorem not_acceptsSpace_of_chain (hwf : M.WellFormed) (hdet : M.Deterministic)
+    {c₀ : Config A} (hinit : M.IsInit c₀) {c : ℕ → Config A}
+    (hc0 : Relation.ReflTransGen M.Step c₀ (c 0))
+    (hstep : ∀ n, Relation.TransGen M.Step (c n) (c (n + 1)))
+    (hsink : ∀ e : Config A, M.Acc e.state → ∀ e', ¬M.Step e e') :
+    ¬M.AcceptsSpace := by
+  rintro ⟨c₀', x, hinit', hr, hacc⟩
+  rw [isInit_unique hwf hdet.1 hinit' hinit] at hr
+  obtain ⟨k₀, hk₀⟩ := exists_stepsIn hc0
+  -- the chain's `n`-th link is reached in at least `n` steps
+  have hchain : ∀ n, ∃ m, n ≤ m ∧ M.StepsIn m c₀ (c n) := by
+    intro n
+    induction n with
+    | zero => exact ⟨k₀, Nat.zero_le _, hk₀⟩
+    | succ n ih =>
+      obtain ⟨m, hm, hrun⟩ := ih
+      obtain ⟨p, hp, hrun'⟩ := exists_stepsIn_pos (hstep n)
+      exact ⟨m + p, by omega, hrun.trans hrun'⟩
+  obtain ⟨k, hk⟩ := exists_stepsIn hr
+  obtain ⟨m, hm, hrun⟩ := hchain (k + 1)
+  -- and the accepting configuration lies beyond it, being stuck
+  have hbeyond : Relation.ReflTransGen M.Step (c (k + 1)) x := by
+    rcases reach_total hwf.1 hdet (reflTransGen_of_stepsIn hrun) hr with h | h
+    · exact h
+    · exact (eq_of_reach_stuck (hsink x hacc) h) ▸ Relation.ReflTransGen.refl
+  obtain ⟨j, hj⟩ := exists_stepsIn hbeyond
+  exact absurd (stepsIn_eq_of_stuck hwf.1 hdet hk (hrun.trans hj)
+    (hsink x hacc)) (by omega)
+
 omit [Finite A] in
 /-- **The positive half**, for symmetry: a run from the initial configuration
 to an accepting one is exactly what acceptance in bounded space asks for. -/

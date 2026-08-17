@@ -8,8 +8,8 @@ import DescriptiveComplexity.Problems.Wide.PfpTuple
 /-!
 # The element loop: a sub-fold over control-held tuples
 
-The remaining atom subroutines of the EXPSPACE program are all one shape
-(EXPONENTIAL.md §6.4.4): enumerate a tuple of **elements** in the control's
+The remaining atom subroutines of the EXPSPACE program are all one shape:
+enumerate a tuple of **elements** in the control's
 loop-variable slots, per tuple run a fixed sequence of named single-bit
 read trips – the `ρ`-bit leaves – and fold the leaf's value into the
 sub-fold accumulators. The expansion atoms run it over the defining

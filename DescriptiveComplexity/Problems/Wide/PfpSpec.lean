@@ -36,8 +36,8 @@ coordinates below its level (`DescriptiveComplexity.altQuantFrom_congr_val`).
 The linear order on the points is a *parameter* here (the step formula reads it
 through the structure); which order the reduction chooses – the pullback of the
 binary block-value order along the encoding, making order atoms the register
-comparison the machine can run – is its own decision, recorded in
-`EXPONENTIAL.md` §6.4.4 and discharged where the machine meets the tape.
+comparison the machine can run – is its own decision, discharged where the
+machine meets the tape.
 -/
 
 namespace DescriptiveComplexity
@@ -158,6 +158,48 @@ theorem StepDef.next_iff_gateMat (hne : zero ≠ one) {i : d.B.ι}
     rw [hjc, hV ⟨(j : ℕ), hj'⟩, hvB]
     simp only [Fin.val_castLE]
     rw [dif_pos hj']
+  exact h1.trans (h2.symm.trans (iff_of_eq h3))
+
+open Classical in
+/-- **The output sentence is the gated prefix over block values**, the nullary
+case of `DescriptiveComplexity.Pfp.StepDef.next_iff_gateMat`: a sentence has no
+free level, so the prefix is played from level `0` and the valuation it starts
+from is arbitrary. This is what the *output* evaluation's machinery computes,
+where the fixed-point variables' computes `DescriptiveComplexity.StepDef.next`. -/
+theorem StepDef.out_iff_gateMat (hne : zero ≠ one)
+    (pk : PrenexPack (d.out.relabel (Empty.elim : Empty → Fin 0)))
+    (σ : d.B.Assignment (X.Map A)) (V : Fin pk.n → ((Fin dd → A) → Prop)) :
+    @Sentence.Realize _ (X.Map A) (d.B.structure₁ σ) d.out ↔
+      altQuantFrom pk.pol
+        (gateMat (encMap ly zero one) (IsEnc ly zero one) pk.pol
+          fun w => @BoundedFormula.Realize _ (X.Map A)
+            (d.B.structure₁ σ) _ _ pk.mat default w)
+        0 V := by
+  letI inst : (X.E.sum Language.order).sum d.B.lang |>.Structure (X.Map A) :=
+    d.B.structure₁ σ
+  -- the sentence, as its own pack's prefix over an arbitrary valuation
+  set vB : Fin pk.n → X.Map A := fun _ => Classical.arbitrary (X.Map A) with hvB
+  have h1 : @Sentence.Realize _ (X.Map A) inst d.out ↔
+      altQuantFrom pk.pol (fun w => @BoundedFormula.Realize _ (X.Map A) inst _ _ pk.mat
+        default w) 0 vB := by
+    refine Iff.trans ?_ (pk.spec (X.Map A) vB default fun i => i.elim0)
+    rw [Formula.realize_relabel]
+    exact Iff.rfl
+  -- the prefix over block values, at the encoded valuation
+  have h2 := altQuantFrom_gateMat
+    (e := encMap ly zero one) (G := IsEnc ly zero one) (pol := pk.pol)
+    (P := fun w => @BoundedFormula.Realize _ (X.Map A) inst _ _ pk.mat default w)
+    (encMap_injective ly hne) (isEnc_iff ly) (j := 0) vB
+  -- level `0` reads no valuation
+  have h3 : altQuantFrom pk.pol
+      (gateMat (encMap ly zero one) (IsEnc ly zero one) pk.pol
+        fun w => @BoundedFormula.Realize _ (X.Map A) inst _ _ pk.mat default w)
+      0 (fun j => encMap ly zero one (vB j)) =
+      altQuantFrom pk.pol
+        (gateMat (encMap ly zero one) (IsEnc ly zero one) pk.pol
+          fun w => @BoundedFormula.Realize _ (X.Map A) inst _ _ pk.mat default w)
+        0 V :=
+    altQuantFrom_congr_val _ _ fun _ hj => absurd hj (Nat.not_lt_zero _)
   exact h1.trans (h2.symm.trans (iff_of_eq h3))
 
 end Chain

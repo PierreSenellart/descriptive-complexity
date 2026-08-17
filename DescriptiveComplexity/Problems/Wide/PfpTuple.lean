@@ -12,7 +12,7 @@ The stage atoms of the EXPSPACE program build their TARGET register by
 copying a block of VAL or MIRROR into a block of TARGET, one bit per **named
 cell**: a loop over the tuples the control enumerates in its loop-variable
 slots, each round a read trip at the source cell, a write trip at the
-destination cell, and an advance-or-exit dispatch (EXPONENTIAL.md §6.4.4).
+destination cell, and an advance-or-exit dispatch.
 
 This is the first client of the chain combinator
 (`DescriptiveComplexity.Problems.Wide.PfpChain`): three checkpoints around

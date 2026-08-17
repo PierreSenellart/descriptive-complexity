@@ -155,6 +155,19 @@ noncomputable def encPt (p : X.Point A) : (Fin dd → A) → Prop := fun v =>
 
 variable {zero one}
 
+/-- **An encoding is never everything**: every member of it carries a one-hot
+code, so the all-`zero` tuple is not one. This is what puts a tuple's address
+*strictly* below the logical top — the top's blocks are full. -/
+theorem not_encPt_zeroTup (hne : zero ≠ one) (p : X.Point A) :
+    ¬encPt ly zero one p (fun _ => zero) := by
+  rintro (h | ⟨i, w, -, h⟩)
+  · have hc := congrFun h (ly.cIx (Sum.inl p.1))
+    rw [encTagTup, encTup_cIx, if_pos rfl] at hc
+    exact hne hc
+  · have hc := congrFun h (ly.cIx (Sum.inr i))
+    rw [encAsgTup, encTup_cIx, if_pos rfl] at hc
+    exact hne hc
+
 /-- The tag witness belongs to the encoding. -/
 theorem encPt_tagTup (p : X.Point A) : encPt ly zero one p (encTagTup ly zero one p.1) :=
   Or.inl rfl

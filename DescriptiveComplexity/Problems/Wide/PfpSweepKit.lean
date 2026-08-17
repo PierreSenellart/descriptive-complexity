@@ -16,7 +16,7 @@ one question per cell with the verdict in the phase (COMPARE);
 `DescriptiveComplexity.Pfp.WriteSweepKit` rewrites each cell once (COPY).
 
 Both composites take their rules **bounded to the stretch**, and the kits
-realize the bound the way the program does (EXPONENTIAL.md §6.4.4): a
+realize the bound the way the program does: a
 permanent end marker `ltp` planted at the top of the stretch once, at
 startup. Every stepping rule is guarded `ltp ≠ one`, so the sweep has no
 rule at the marked cell and stops there; the caller's exit rule at

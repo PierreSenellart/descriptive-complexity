@@ -92,6 +92,25 @@ step. -/
 def PFPConverges (d : StepDef L) (A : Type) [L.Structure A] : Prop :=
   ∃ n, IsFixedPt d.next (d.partStage A n)
 
+/-- A definition whose value is read converges. -/
+theorem PFPHolds.converges {d : StepDef L} {A : Type} [L.Structure A]
+    (h : d.PFPHolds A) : d.PFPConverges A :=
+  ⟨h.choose, h.choose_spec.1⟩
+
+open Classical in
+/-- **The first stage that does not move**: convergence is witnessed by a
+*least* index. That is what a machine testing «this stage and the next
+agree» at each round stops at, and what makes its earlier rounds' tests
+fail. -/
+theorem exists_least_stable (d : StepDef L) (A : Type) [L.Structure A]
+    (h : d.PFPConverges A) :
+    ∃ N, d.partStage A N = d.partStage A (N + 1) ∧
+      ∀ n, n < N → d.partStage A n ≠ d.partStage A (n + 1) := by
+  have hex : ∃ n, d.partStage A n = d.partStage A (n + 1) := by
+    obtain ⟨n, hn⟩ := h
+    exact ⟨n, by rw [d.partStage_succ, hn]⟩
+  exact ⟨Nat.find hex, Nat.find_spec hex, fun n hn => Nat.find_min hex hn⟩
+
 open Classical in
 /-- The textbook value of the partial iteration: the stable stage if the
 iteration converges, the empty assignment otherwise. Only used to relate the

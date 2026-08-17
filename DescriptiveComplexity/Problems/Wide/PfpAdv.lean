@@ -8,8 +8,8 @@ import DescriptiveComplexity.Problems.Wide.PfpSub
 /-!
 # ADVANCE: moving the working cell one address, mirror in tow
 
-The round every sweep of the EXPSPACE program repeats
-(EXPONENTIAL.md §6.4.4): erase the working-cell marker and step right; write it
+The round every sweep of the EXPSPACE program repeats: erase the working-cell
+marker and step right; write it
 at the next address and step on; scan up to the top of the register file;
 **bounce** – the scan cannot overshoot the maximal cell, so entering the
 downward pass costs two steps, left to the top's predecessor and back right,

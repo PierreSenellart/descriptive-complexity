@@ -89,16 +89,15 @@ for it under FO reductions.
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
 | **EXPTIME** | SO(LFP), i.e. PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating Turing machine, its tape indexed by the input's positions and no bound on the length of a play | acceptance by such a machine (`APSPACE = EXPTIME`) |
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there) | – | – |
-| **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | – | – |
+| **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | wide machine, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine in bounded space (deterministic & not) |
 | **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 | **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Each entry of the machine column is an equivalence proved here between the
-logical definition and acceptance by that model. For NEXPTIME and EXPSPACE only
-half of it is proved: the wide machine – control in the instance, tape addressed
-by the subsets of the instance – is a member of both
-(`wideAccept_mem_NEXPTIME`, `wideAcceptSpace_mem_EXPSPACE`), but its hardness is
-not formalized. The classes are also matched against Mathlib's computability
+logical definition and acceptance by that model. For NEXPTIME only half of it is
+proved: the wide machine – control in the instance, tape addressed by the subsets
+of the instance – is a member of the class (`wideAccept_mem_NEXPTIME`), but its
+hardness is not formalized. The classes are also matched against Mathlib's computability
 layer: RE is recursive enumerability, every RE-hard problem is undecidable, and
 RE ≠ co-RE.
 

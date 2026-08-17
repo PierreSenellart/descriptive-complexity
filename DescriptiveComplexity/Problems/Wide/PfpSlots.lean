@@ -28,7 +28,7 @@ program's phases, so it is fixed before they are enumerated.
 | `ltp` | the working area | the end marker of the logical interval, planted at startup |
 | `old i`, `new i` | the working area | the current and next stage of variable `i` |
 
-The name slots are the budgeted register naming of EXPONENTIAL.md §6.4.4: a
+The name slots are the budgeted register naming: a
 mark cannot carry its cell's *full* name (`|Q| + |W| ≤ dd`), but the encodings
 only inhabit the first `dd₀ < dd` coordinates, and those fit. Together with
 `pdd` and the one-hot `blk` family they are what the navigation-by-name scans

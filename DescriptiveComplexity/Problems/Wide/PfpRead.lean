@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.PfpSub
 # Reading one named register bit
 
 The leaves of the element loops read single bits of the machine's registers at
-*computed* cells (EXPONENTIAL.md §6.4.4): a `ρ`-atom of an expansion sentence
+*computed* cells: a `ρ`-atom of an expansion sentence
 is one bit of VAL or MIRROR at the cell whose name marks match a tuple held in
 the control, a tag read is the same at a canonical cell. The trip is always
 the same: turn off the working-cell marker, scan up to the first cell whose

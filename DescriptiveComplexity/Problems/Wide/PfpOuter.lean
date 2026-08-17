@@ -19,7 +19,7 @@ boundary rules are parameters, exactly as
 `DescriptiveComplexity.Pfp.Prog.reaches_roundTrip` abstracts the middle of a
 trip.
 
-The control flow (EXPONENTIAL.md §6.4.4):
+The control flow:
 
 * `start` – one rule: plant `bot` and the marker at the empty address, step
   into the pattern write.
