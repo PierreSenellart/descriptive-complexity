@@ -65,9 +65,10 @@ requiring only first-order logic, which Mathlib already has.
 * AC⁰ is read here as the logic `FO(≤, +, ×)`; no circuit model is involved. It
   is proved to sit inside L (`ac0Definable_mem_LOGSPACE`), by a deterministic
   multi-head automaton that computes the numeric predicates instead of reading
-  them, and to equal both `FO(≤, BIT)` and its machine model, alternating
-  logarithmic time (`ac0Definable_iff_ltDecidable`: both halves of Immerman's
-  Thm 1.17, Bit Sum Lemma included).
+  them, and to equal both `FO(≤, BIT)` and its machine model, logarithmic time
+  with constantly many alternations (`ac0Definable_iff_ltDecidable`: both halves
+  of Immerman's Thm 1.17, Bit Sum Lemma included). That machine class is the
+  logarithmic-time hierarchy, not the larger ALOGTIME of unbounded alternation.
 
 ## Complexity classes and complete problems
 
@@ -114,11 +115,14 @@ merely not built yet, see `ROADMAP.md`.
 * **Complexity of problems, not of algorithms.** No cost model, no `O(·)`, no
   fine-grained complexity: what you prove is membership, hardness and
   completeness for the coarse classes above.
-* **Instances are finite relational structures, not strings.** The machine
-  bridges characterize the classes from inside the framework, by acceptance
-  problems whose instances carry the machine; their agreement with the usual
-  presentations over string encodings is classical (Fagin; Immerman–Vardi) and
-  is not formalized here.
+* **Instances are finite relational structures, not strings.** From PTIME up,
+  the machine bridges characterize the classes from inside the framework, by
+  acceptance problems whose instances carry the machine; at L, NL and AC⁰ a
+  single machine, fixed once, decides every instance. Either way their agreement
+  with the usual presentations over string encodings is classical (Fagin;
+  Immerman–Vardi) and is not formalized here – except for RE, where
+  `mem_RE_iff_rePred` identifies the class with Mathlib's `REPred` on an
+  encoding of finite structures.
 * **The reduction must be expressible in logic.** A poly-time reduction that is
   not FO-expressible cannot be used; gadgets often need a linear order, tags or
   extra dimensions, and arithmetic inside formulas is limited (addition and

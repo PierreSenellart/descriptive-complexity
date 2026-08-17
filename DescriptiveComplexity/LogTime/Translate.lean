@@ -18,9 +18,10 @@ and sits **inside** `FO(≤, +, ×)`
 
 > Every `DescriptiveComplexity.ArithDef` relation is
 > `DescriptiveComplexity.BitDef` (`DescriptiveComplexity.ArithDef.bitDef`),
-> every AC⁰-definable problem is decided by an alternating logarithmic-time
-> machine (`DescriptiveComplexity.AC0Definable.ltDecidable`), and the two
-> notions coincide (`DescriptiveComplexity.ac0Definable_iff_ltDecidable`).
+> every AC⁰-definable problem is decided by a logarithmic-time machine with
+> constantly many alternations
+> (`DescriptiveComplexity.AC0Definable.ltDecidable`), and the two notions
+> coincide (`DescriptiveComplexity.ac0Definable_iff_ltDecidable`).
 
 The one atom the translation turns on – multiplication of ranks in the bit
 logic, `DescriptiveComplexity.TimesBitDef` – is the whole of
@@ -162,14 +163,14 @@ theorem AC0Definable.bitDefinable {P : DecisionProblem L} (h : AC0Definable P) :
   rw [hφ A]
   exact Iff.of_eq (_root_.congrArg (fun v => Formula.Realize φ v) (Subsingleton.elim _ _))
 
-/-- **An AC⁰ definition is an alternating logarithmic-time machine**: the
-direction of Immerman's identification that the Bit Sum Lemma is the whole
-of. -/
+/-- **An AC⁰ definition is a logarithmic-time machine with constantly many
+alternations**: the direction of Immerman's identification that the Bit Sum
+Lemma is the whole of. -/
 theorem AC0Definable.ltDecidable {P : DecisionProblem L} (h : AC0Definable P) :
     LTDecidable P :=
   h.bitDefinable.ltDecidable
 
-/-- **AC⁰ is alternating logarithmic time** – the statement the whole
+/-- **AC⁰ is constant-alternation logarithmic time** – the statement the whole
 `DescriptiveComplexity.LogTime` development aims at, with `⊇` through
 `DescriptiveComplexity.powArithDef` and `⊆` through
 `DescriptiveComplexity.timesBitDef`: both halves of [Immerman

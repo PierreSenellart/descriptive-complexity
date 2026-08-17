@@ -14,7 +14,7 @@ import DescriptiveComplexity.LogTime.Simulate
 the bit-level logic. This file puts that logic back inside the machine model, so
 that the fence is an **equality** and the picture is
 
-prenex `FO(≤, +, BIT)`  =  alternating logarithmic time.
+prenex `FO(≤, +, BIT)`  =  constant-alternation logarithmic time.
 
 `DescriptiveComplexity.ltDecidable_iff_bitDefinable` is that equality: the
 machine model of this development is exactly characterized by a logic, with no
@@ -341,11 +341,12 @@ theorem BitDefinable.ltDecidable {P : DecisionProblem L} (h : BitDefinable P) :
   rw [hφ A]
   exact (φ.accepts_compile A).symm
 
-/-- **The machine model is exactly a logic.** Alternating logarithmic time – a
-machine whose registers are guessed addresses and whose base sees nothing but
-bits – decides exactly the problems defined by a prenex sentence over `≤`, `+`
-and the bit at an index, that is, by `FO(≤, BIT)`. The forward direction guesses
-each sweep's trace, one element per bit vector over the positions
+/-- **The machine model is exactly a logic.** Constant-alternation logarithmic
+time – a machine whose registers are guessed addresses, in a list whose
+polarities are fixed, and whose base sees nothing but bits – decides exactly the
+problems defined by a prenex sentence over `≤`, `+` and the bit at an index,
+that is, by `FO(≤, BIT)`. The forward direction guesses each sweep's trace, one
+element per bit vector over the positions
 (`DescriptiveComplexity.LTDecidable.bitDefinable`); the backward one compiles
 atom by atom into the sweeps of `DescriptiveComplexity.LogTime.Arith` and the
 machine's read. -/

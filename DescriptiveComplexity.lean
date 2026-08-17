@@ -980,13 +980,18 @@ The bottom of the ordered world, and the only vocabulary here that is a
   `DescriptiveComplexity.plusSweep_accepts` do for `≤` and `plus` – the
   bit-level analogues of `DescriptiveComplexity.HeadProgram.plusP`. The model is
   **exactly a logic** (`DescriptiveComplexity.ltDecidable_iff_bitDefinable`):
-  alternating logarithmic time decides exactly the problems defined by a *prenex*
-  sentence over `≤`, `+` and the bit atom `DescriptiveComplexity.BitIx` – the
-  classical `BIT(x, i)`, the position named by the element whose *rank* is the
-  exponent – that is, exactly `FO(≤, BIT)`, since `+` is itself derived
-  (`DescriptiveComplexity.bitDef_plus_free`, by carry-lookahead). One direction
-  (`DescriptiveComplexity.BitDefinable.ltDecidable`) compiles the logic atom by
-  atom; the other (`DescriptiveComplexity.LTDecidable.bitDefinable`) is the
+  logarithmic time with constantly many alternations decides exactly the
+  problems defined by a *prenex* sentence over `≤`, `+` and the bit atom
+  `DescriptiveComplexity.BitIx` – the classical `BIT(x, i)`, the position named
+  by the element whose *rank* is the exponent – that is, exactly `FO(≤, BIT)`,
+  since `+` is itself derived (`DescriptiveComplexity.bitDef_plus_free`, by
+  carry-lookahead). The alternations are constant because a machine fixes its
+  register list and their polarities, so the class is the logarithmic-time
+  hierarchy `⋃ₖ Σₖ-TIME(log n)`, which is AC⁰, and not the strictly larger
+  ALOGTIME, i.e., DLOGTIME-uniform NC¹ ([Ruzzo 1981][ruzzo1981uniform]).
+  One direction (`DescriptiveComplexity.BitDefinable.ltDecidable`) compiles the
+  logic atom by atom; the other
+  (`DescriptiveComplexity.LTDecidable.bitDefinable`) is the
   interesting one: a sweep carries a constant number of state bits past each of
   the `log n` positions, so its whole history is a constant number of *bit
   vectors over the positions*, and such a vector **is** an element of the

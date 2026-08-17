@@ -24,7 +24,7 @@ import DescriptiveComplexity.HeadEvalArith
 import DescriptiveComplexity.HeadEvalBit
 
 /-!
-# A machine model at the bottom of the ladder: alternating logarithmic time
+# A machine model at the bottom of the ladder: the logarithmic-time hierarchy
 
 Every class of this library above the bottom has its machine model *proved*
 equal to the logic that defines it – `LOGSPACE` its multi-head automaton, `NL`
@@ -61,7 +61,7 @@ with a constant number of head reversals, plus addressing.
 
 ## The characterization
 
-prenex `FO(≤, +, BIT)`  =  alternating logarithmic time,
+prenex `FO(≤, +, BIT)`  =  constant-alternation logarithmic time,
 
 which is `DescriptiveComplexity.ltDecidable_iff_bitDefinable`: **the machine
 model is exactly a logic**, and – since `+` is a derived predicate here
@@ -71,6 +71,15 @@ here) – exactly the logic `FO(≤, BIT)` whose identification with
 `FO(≤, +, ×)` and with (DLOGTIME-uniform) AC⁰ is [Immerman
 1999][immerman1999descriptive] Thm 1.17 and [Barrington, Immerman & Straubing
 1990][barrington1990uniformity].
+
+**Alternation is constant here, and has to be.** A machine fixes its register
+list and the polarity of each register, so the number of alternations is a
+constant of the machine and the class is the union `⋃ₖ Σₖ-TIME(log n)` of the
+logarithmic-time hierarchy – which is what AC⁰ is. Logarithmic time with
+*unbounded* alternation, the class usually called ALOGTIME, is
+(DLOGTIME-uniform) NC¹ ([Ruzzo 1981][ruzzo1981uniform]) and is strictly larger:
+PARITY lies in it and not in AC⁰ ([Furst, Saxe & Sipser 1984][furst1984parity];
+[Håstad 1986][hastad1986almost]). Nothing in this module bears on that class.
 
 ## What is proved
 

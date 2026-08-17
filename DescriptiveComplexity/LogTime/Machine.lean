@@ -478,8 +478,10 @@ def LTMachine.Accepts {L : Language.{0, 0}} (M : LTMachine L) (A : Type) [L.Stru
 
 /-- **The class decided by the machines of this section**: the analogue, at the
 bottom of the ladder, of `DescriptiveComplexity.LOGSPACE`'s automata. A problem
-is decidable in *alternating logarithmic time* when one machine decides it on
-every nonempty finite ordered structure. -/
+is decidable in *constant-alternation logarithmic time* – the level
+`Σₖ-TIME(log n)` of the logarithmic-time hierarchy fixed by the machine's own
+polarities – when one machine decides it on every nonempty finite ordered
+structure. -/
 def LTDecidable {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) : Prop :=
   ∃ M : LTMachine L, ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
     P A ↔ M.Accepts A

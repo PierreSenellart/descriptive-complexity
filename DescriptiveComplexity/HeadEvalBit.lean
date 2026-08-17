@@ -485,8 +485,8 @@ longer. -/
 theorem BitDefinable.mem_LOGSPACE (h : BitDefinable P) : P ∈ LOGSPACE :=
   (mem_LOGSPACE_iff P).mpr h.dtcDefinable
 
-/-- **Alternating logarithmic time is inside LOGSPACE**, through the logic it is
-equal to. -/
+/-- **Constant-alternation logarithmic time is inside LOGSPACE**, through the
+logic it is equal to. -/
 theorem LTDecidable.mem_LOGSPACE (h : LTDecidable P) : P ∈ LOGSPACE :=
   (LTDecidable.bitDefinable h).mem_LOGSPACE
 
