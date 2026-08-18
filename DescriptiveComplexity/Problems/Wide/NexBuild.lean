@@ -4,16 +4,16 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.NexSpec
-import DescriptiveComplexity.Problems.Wide.PfpBuild
+import DescriptiveComplexity.Problems.Wide.DrawBuild
 
 /-!
 # The clocked program lays its file out
 
 The file-laying phase, assembled: the run
-(`DescriptiveComplexity.Pfp.Prog.reachesIn_buildFile`) at the layout of
-`DescriptiveComplexity.Pfp.PfpData.blkLaid`, the write and the pointer of
-`DescriptiveComplexity.Pfp.PfpData.buildSpec`, and the rules of
-`DescriptiveComplexity.Pfp.PfpData.nexRule`.
+(`DescriptiveComplexity.Draw.Prog.reachesIn_buildFile`) at the layout of
+`DescriptiveComplexity.Draw.DrawData.blkLaid`, the write and the pointer of
+`DescriptiveComplexity.Draw.DrawData.buildSpec`, and the rules of
+`DescriptiveComplexity.Draw.DrawData.nexRule`.
 
 What ties them is that a sweep of the file's stretch **is** a walk of the file:
 every address the sweep stops at is some register's cell
@@ -29,29 +29,29 @@ What the run asks of the tape outside the stretch is that it be **what the
 background says** there, not that it be blank: the marker is planted before the
 file is laid, and the marker's cell lies below the file.
 
-The run is `DescriptiveComplexity.Pfp.PfpData.reachesIn_buildBlkFile`, and what
+The run is `DescriptiveComplexity.Draw.DrawData.reachesIn_buildBlkFile`, and what
 it costs is the stretch: one step per register, which is
 `(|K| + 1) · |A| ^ dd₀` of them (`DescriptiveComplexity.card_blkFile`).
 
 The **guessing** phase is the same walk over the same registers, writing at each
 the value the certificate has there
-(`DescriptiveComplexity.Pfp.PfpData.reachesIn_guessBlkTracks`); it exists for
+(`DescriptiveComplexity.Draw.DrawData.reachesIn_guessBlkTracks`); it exists for
 every certificate, which is what makes it a guess. Only the write differs, so
 the two share the pointer, the phase family and the step's case analysis.
 
 After either sweep the machine stands one cell past the file: it steps back onto
-the last register (`DescriptiveComplexity.Pfp.PfpData.step_doneBack`) and walks
+the last register (`DescriptiveComplexity.Draw.DrawData.step_doneBack`) and walks
 down to the marker (`reachesIn_homeAfterBuild`), which is
-`DescriptiveComplexity.Pfp.HomeKit`'s walk at the file's own top.
+`DescriptiveComplexity.Draw.HomeKit`'s walk at the file's own top.
 
-The three chain into `DescriptiveComplexity.Pfp.PfpData.reachesIn_buildPhase`,
+The three chain into `DescriptiveComplexity.Draw.DrawData.reachesIn_buildPhase`,
 whose budget is `2 · card + base`: the stretch out and back, the turn-around,
 and the descent from the file's foot to the marker.
-`DescriptiveComplexity.Pfp.PfpData.reachesIn_guessPhase` is the guess's copy of
+`DescriptiveComplexity.Draw.DrawData.reachesIn_guessPhase` is the guess's copy of
 that, at the same number – it is the same walk.
 
 The three single steps that join the phases are here as well:
-`DescriptiveComplexity.Pfp.PfpData.step_startBuild` plants the marker and enters
+`DescriptiveComplexity.Draw.DrawData.step_startBuild` plants the marker and enters
 the file, `step_homeBuildExit` turns round at the marker and re-enters it for
 the guess, and `step_homeGuessExit` enters the evaluation. The whole opening is
 those five legs, and `DescriptiveComplexity.TMData.reachesIn_five` adds them up:
@@ -60,9 +60,9 @@ twice a phase and three steps.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
@@ -70,7 +70,7 @@ open Language Structure
 
 section BuildRun
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 
@@ -409,10 +409,10 @@ theorem hasRight_buildSweep (hcoord : Function.Injective coord)
 the address one past the last, one step per register, turning the blank the tape
 starts with into the background of the file it has built.
 
-The run is `DescriptiveComplexity.Pfp.Prog.reachesIn_buildFile`'s, at the layout
+The run is `DescriptiveComplexity.Draw.Prog.reachesIn_buildFile`'s, at the layout
 of a clocked program's file, with the write and the pointer of
-`DescriptiveComplexity.Pfp.PfpData.buildSpec` and the rules of
-`DescriptiveComplexity.Pfp.PfpData.nexRule`; what it costs is the stretch, one
+`DescriptiveComplexity.Draw.DrawData.buildSpec` and the rules of
+`DescriptiveComplexity.Draw.DrawData.nexRule`; what it costs is the stretch, one
 step per register. -/
 theorem reachesIn_buildBlkFile (hcoord : Function.Injective coord)
     (hR : PR.table.Reads)
@@ -480,7 +480,7 @@ theorem reachesIn_buildBlkFile (hcoord : Function.Injective coord)
 
 /-! ### The guessing sweep
 
-The same walk over the same registers, with `DescriptiveComplexity.Pfp.PfpData.guessSpec`
+The same walk over the same registers, with `DescriptiveComplexity.Draw.DrawData.guessSpec`
 in place of `buildSpec`: what changes at a cell is the stage tracks, and which
 value is written there is a *shape* of the rule, so the sweep is the program's
 one nondeterministic phase. The steps below are the build's with the guessed
@@ -1117,7 +1117,7 @@ The five steps above read the file only through the *presentation* of the tape �
 `Prog.trackTapeAt cell …` – so they hold at whatever cells a program's file has.
 A program that is *handed* its file (`DescriptiveComplexity.WideRegAccept`) uses
 them at the channel's cells, where a program that lays one uses them at
-`DescriptiveComplexity.Pfp.PfpData.blkLaid`. Nothing but the presentation
+`DescriptiveComplexity.Draw.DrawData.blkLaid`. Nothing but the presentation
 changes, and the two sweep sites the steps mention are parameters already. -/
 
 section AnyFile
@@ -1220,7 +1220,7 @@ omit hrules [Nonempty A] [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt
 /-- **A sweep that is over at once, in one step**: when both of the sweep's
 tests hold where it starts, the phase fires its exit rule – it writes what the
 spec writes and leaves the pointer where the spec's roll-over leaves it, which
-for `DescriptiveComplexity.Pfp.PfpData.nullSpec` is nothing and the same
+for `DescriptiveComplexity.Draw.DrawData.nullSpec` is nothing and the same
 pointer. This is the whole of the file-laying phase of a program that is *handed*
 its file. -/
 theorem step_sweepDone (hR : PR.table.Reads)
@@ -1268,8 +1268,8 @@ end Run
 
 end BuildRun
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

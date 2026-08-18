@@ -13,13 +13,13 @@ import DescriptiveComplexity.SecondOrderTransitiveClosure
 that is never a singleton, at the price of a universe that is no longer the
 instance. This file pays that price for **one sentence at a time**: a sentence
 about the instance's ordered vocabulary, expanded by a block, is renamed into the
-extended vocabulary (`DescriptiveComplexity.Pfp.newBlockLHom`) and relativized to
+extended vocabulary (`DescriptiveComplexity.Draw.newBlockLHom`) and relativized to
 the mark (`DescriptiveComplexity.relativizeTo`), and then says in the doubled
 universe exactly what it said in the instance
-(`DescriptiveComplexity.Pfp.realize_relOldBlock`).
+(`DescriptiveComplexity.Draw.realize_relOldBlock`).
 
 The block assignment travels with it. An assignment of the instance is extended
-to the doubled universe by `DescriptiveComplexity.Pfp.extAssign` – it holds of a
+to the doubled universe by `DescriptiveComplexity.Draw.extAssign` – it holds of a
 tuple exactly when every entry is marked and the entries' elements satisfy it –
 and that is the shape the *support* condition of the relativized expansion will
 pin down: an assignment over the doubled universe that only ever holds of marked
@@ -28,7 +28,7 @@ tuples is an assignment of the instance and nothing more.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -421,6 +421,6 @@ theorem realize_suppSentence (ρ : B.Assignment M) :
 
 end MarkPart
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

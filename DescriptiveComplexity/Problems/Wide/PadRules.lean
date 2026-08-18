@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpInterp
+import DescriptiveComplexity.Problems.Wide.DrawInterp
 import DescriptiveComplexity.Problems.Wide.TrackWrites
 
 /-!
@@ -27,7 +27,7 @@ count is one line (`card_rTagOf_pad`).
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -35,7 +35,7 @@ open Language Structure
 
 section Pad
 
-variable {L : Language.{0, 0}} {dt : PfpData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
 variable {S : Type} {Sh : S → Type} {P : Type}
 
 /-- **A rule that never fires**: its guard is false, and everything else is the
@@ -147,7 +147,7 @@ theorem sep_padRulesAt {A : Type}
     (hsep : ∀ (i i' : S) (ρ : Sh i) (ρ' : Sh i') (f : dt.CtlIx → A)
         (g : dt.SlotIx → A), Ph (rl i ρ).srcPh → (rl i ρ).guard f g →
       (rl i' ρ').guard f g → (rl i ρ).srcPh = (rl i' ρ').srcPh →
-      (⟨i, ρ⟩ : PfpData.RTagOf S Sh) = ⟨i', ρ'⟩) :
+      (⟨i, ρ⟩ : DrawData.RTagOf S Sh) = ⟨i', ρ'⟩) :
     ∀ (i i' : S ⊕ Fin n) (ρ : padSh Sh n i) (ρ' : padSh Sh n i')
       (f : dt.CtlIx → A) (g : dt.SlotIx → A),
       Ph (padRulesAt (dt := dt) Sh rl p₀ n i ρ).srcPh →
@@ -155,7 +155,7 @@ theorem sep_padRulesAt {A : Type}
       (padRulesAt (dt := dt) Sh rl p₀ n i' ρ').guard f g →
       (padRulesAt (dt := dt) Sh rl p₀ n i ρ).srcPh =
         (padRulesAt (dt := dt) Sh rl p₀ n i' ρ').srcPh →
-      (⟨i, ρ⟩ : PfpData.RTagOf (S ⊕ Fin n) (padSh Sh n)) = ⟨i', ρ'⟩ := by
+      (⟨i, ρ⟩ : DrawData.RTagOf (S ⊕ Fin n) (padSh Sh n)) = ⟨i', ρ'⟩ := by
   rintro (i | k) (i' | k') ρ ρ' f g hph hg hg' hs
   · have h := hsep i i' ρ ρ' f g hph hg hg' hs
     have h1 : i = i' := congrArg Sigma.fst h
@@ -179,16 +179,16 @@ theorem padRules_eq_padRulesAt
 
 /-- **What the padding buys**: one rule name per junk site. -/
 theorem card_rTagOf_pad [Finite S] [∀ i, Finite (Sh i)] (n : ℕ) :
-    Nat.card (PfpData.RTagOf (S ⊕ Fin n) (padSh Sh n)) =
-      Nat.card (PfpData.RTagOf S Sh) + n := by
+    Nat.card (DrawData.RTagOf (S ⊕ Fin n) (padSh Sh n)) =
+      Nat.card (DrawData.RTagOf S Sh) + n := by
   classical
   haveI : Fintype S := Fintype.ofFinite S
   haveI : ∀ i, Fintype (Sh i) := fun i => Fintype.ofFinite _
   haveI : ∀ i : S ⊕ Fin n, Fintype (padSh Sh n i) := fun i => Fintype.ofFinite _
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
-  rw [show Fintype.card (PfpData.RTagOf (S ⊕ Fin n) (padSh Sh n)) =
+  rw [show Fintype.card (DrawData.RTagOf (S ⊕ Fin n) (padSh Sh n)) =
       ∑ i : S ⊕ Fin n, Fintype.card (padSh Sh n i) from Fintype.card_sigma,
-    show Fintype.card (PfpData.RTagOf S Sh) = ∑ i : S, Fintype.card (Sh i) from
+    show Fintype.card (DrawData.RTagOf S Sh) = ∑ i : S, Fintype.card (Sh i) from
       Fintype.card_sigma]
   rw [Fintype.sum_sum_type]
   have h1 : ∑ i : S, Fintype.card (padSh Sh n (Sum.inl i)) =
@@ -202,6 +202,6 @@ theorem card_rTagOf_pad [Finite S] [∀ i, Finite (Sh i)] (n : ℕ) :
 
 end Pad
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

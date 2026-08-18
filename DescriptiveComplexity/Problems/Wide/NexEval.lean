@@ -4,23 +4,23 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.NexSpec
-import DescriptiveComplexity.Problems.Wide.PfpProg
+import DescriptiveComplexity.Problems.Wide.DrawProg
 import DescriptiveComplexity.Problems.Wide.NexOuter
-import DescriptiveComplexity.Problems.Wide.PfpRunEval
+import DescriptiveComplexity.Problems.Wide.DrawRunEval
 
 /-!
 # The clocked evaluation's spine
 
-The space-bounded spine (`DescriptiveComplexity.Pfp.PfpData.evalRule`) ends its
+The space-bounded spine (`DescriptiveComplexity.Draw.DrawData.evalRule`) ends its
 last checkpoint in one of two outer phases – the sweep's advance, or the
 post-sweep reset – because it runs inside an iteration. A clocked program has
 neither: its evaluation runs **once**, and its last checkpoint leaves into
 whatever phase the caller names. So the spine's rules
 are not the space-bounded ones at another embedding; they are two rules per
 checkpoint instead of three, at the clocked program's own phases
-(`DescriptiveComplexity.Pfp.NexPh`).
+(`DescriptiveComplexity.Draw.NexPh`).
 
-Everything else is shared: the sites are `DescriptiveComplexity.Pfp.EvalSite`,
+Everything else is shared: the sites are `DescriptiveComplexity.Draw.EvalSite`,
 the machineries' rules are the parameter, and the ownership and separation
 proofs are the same case analysis with the dead third rule gone.
 
@@ -34,15 +34,15 @@ machineries – a clocked program's tower above the atom is the space-bounded on
 `nexEvalHosrcF`/`nexEvalSepF`, and `nexProg` – the outer layer's rules at the
 two sweep specifications with the evaluation's as their parameter. That last is
 built directly rather than through
-`DescriptiveComplexity.Pfp.Assembly`, because a clocked program is *not*
+`DescriptiveComplexity.Draw.Assembly`, because a clocked program is *not*
 deterministic: its guess site fires three rules on the same data, which is the
 one piece of nondeterminism it has, and what does hold there is
-`DescriptiveComplexity.Pfp.PfpData.nexSep_postGuess`.
+`DescriptiveComplexity.Draw.DrawData.nexSep_postGuess`.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 /-- **The rules of a clocked checkpoint**: the walk back to the marker, and the
 one dispatch – into the variable's machinery below the last checkpoint, out of
@@ -63,13 +63,13 @@ def NexEvalSh (nv : ℕ) (SM : Type) (ShM : SM → Type) : EvalSite nv SM → Ty
   | .chk _ => NexEvalChkRule
   | .sub s => ShM s
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A Q PM SM B : Type} {nv : ℕ}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A Q PM SM B : Type} {nv : ℕ}
 variable (one : A) {ShM : SM → Type}
 
 /-- **The rules of a clocked evaluation's spine**: per checkpoint the walk back
@@ -181,14 +181,14 @@ theorem nexEvalRule_dstIn {S : NexPh B (EvalPh nv PM) → Prop}
 /-! ### The spine at the clocked machineries
 
 The types of the spine, and its rules at the clocked variable machineries: what
-`DescriptiveComplexity.Pfp.PfpData.nexRule` takes as its evaluation parameter.
+`DescriptiveComplexity.Draw.DrawData.nexRule` takes as its evaluation parameter.
 The phases are `EvalPh` over the machineries', as in the space-bounded program;
 only the machineries are the clocked ones and the exit is the accepting phase.
 -/
 
 section Spine
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A Q B : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A Q B : Type}
 
 /-- **The rule shape of the clocked evaluation's sites**: the spine's own, two
 rules per checkpoint, over the machinery sites of the shared tower. -/
@@ -327,7 +327,7 @@ omit [Fintype dt.SlotIx] in
 /-- **The clocked evaluation never leaves the post-guess phases**: every phase
 its rules can move to is the evaluation's own or the accepting one, and
 `NexPh.PostGuess` holds of both. This is the one fact
-`DescriptiveComplexity.Pfp.PfpData.nexProg_uniqueFrom` takes from the
+`DescriptiveComplexity.Draw.DrawData.nexProg_uniqueFrom` takes from the
 evaluation, and the tower discharges it layer by layer down to the trips. -/
 theorem nexEvalRuleF_postGuess
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v)
@@ -347,14 +347,14 @@ end Spine
 The rule set assembled: the outer layer's rules at the two sweep
 specifications, with the evaluation's as their parameter. Unlike the
 space-bounded program this is *not* an
-`DescriptiveComplexity.Pfp.Assembly` – the guess site fires three rules on the
+`DescriptiveComplexity.Draw.Assembly` – the guess site fires three rules on the
 same data, which is the program's one piece of nondeterminism – so the record
 is built directly and the separation that does hold is
-`DescriptiveComplexity.Pfp.PfpData.nexSep_postGuess`. -/
+`DescriptiveComplexity.Draw.DrawData.nexSep_postGuess`. -/
 
 section Prog
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A G : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A G : Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 
@@ -416,7 +416,7 @@ omit [LinearOrder (dt.NexRIx (G := G))]
   [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))] in
 /-- **The clocked program's evaluation rules**: at an evaluation site the
 program's rule *is* the spine's, which is what discharges the rule hypothesis of
-`DescriptiveComplexity.Pfp.PfpData.nexEval_reachesIn` at the assembled
+`DescriptiveComplexity.Draw.DrawData.nexEval_reachesIn` at the assembled
 program. -/
 theorem nexProg_rules_eval (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
@@ -434,7 +434,7 @@ end Prog
 
 section NexEvalRun
 
-variable {L : Language.{0, 0}} {dt : PfpData L}
+variable {L : Language.{0, 0}} {dt : DrawData L}
 variable {A R Q PM SM B : Type} {nv : ℕ}
 variable [Fintype Q] [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
@@ -673,7 +673,7 @@ include hrules in
 /-- **The evaluation's entry walk-back**: whatever dispatches into the spine
 leaves the head one cell to the right of the marker, and a checkpoint's `stay`
 rule walks it back. This is the step between the opening and
-`DescriptiveComplexity.Pfp.PfpData.nexEval_reachesIn`. -/
+`DescriptiveComplexity.Draw.DrawData.nexEval_reachesIn`. -/
 theorem step_nexEvalBack (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd)))
     {v v' : Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd → Prop}
@@ -726,8 +726,8 @@ theorem step_nexEvalExit (hR : PR.table.Reads)
 
 end NexEvalRun
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

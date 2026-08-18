@@ -8,23 +8,23 @@ import DescriptiveComplexity.Problems.Wide.RelExpansion
 /-!
 # The relativized expansion over the doubled universe is the expansion
 
-The point of `DescriptiveComplexity.Pfp.relExp`, discharged: over the doubled
-universe of `DescriptiveComplexity.Pfp.dblInterp` its points are the original
+The point of `DescriptiveComplexity.Draw.relExp`, discharged: over the doubled
+universe of `DescriptiveComplexity.Draw.dblInterp` its points are the original
 expansion's points over the instance, and its relations are the original's
-(`DescriptiveComplexity.Pfp.relExpMapEquiv`).
+(`DescriptiveComplexity.Draw.relExpMapEquiv`).
 
 Three things make that work, and each was arranged for it. A doubled universe
 always has a marked part, so the fallback tag contributes no point. A point's
 assignment is *supported*, so it is the extension of a unique assignment of the
 instance. And every sentence the expansion is made of transports by
-`DescriptiveComplexity.Pfp.realize_relOldBlock` – the domain sentence at one copy
+`DescriptiveComplexity.Draw.realize_relOldBlock` – the domain sentence at one copy
 of the block, and each defining sentence at `n` copies, where the extension
 commutes with replication on the nose.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -140,6 +140,6 @@ noncomputable def relExpMapEquiv :
 
 end MapEquiv
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

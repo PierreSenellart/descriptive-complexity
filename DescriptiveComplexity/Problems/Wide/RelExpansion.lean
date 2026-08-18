@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.RelExp
 
 The doubled universe of `DescriptiveComplexity.Problems.Wide.Double` is never a
 singleton, which is what the machine needs, but it is no longer the instance.
-`DescriptiveComplexity.Pfp.relExp` repairs that on the expansion's side: every
+`DescriptiveComplexity.Draw.relExp` repairs that on the expansion's side: every
 sentence of the expansion is renamed and relativized to the mark, and every
 block assignment is required to be **supported** – to hold only of marked tuples
 – so that a point of the relativized expansion over the doubled universe is a
@@ -25,7 +25,7 @@ that always has a marked part – it contributes nothing.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -135,6 +135,6 @@ noncomputable def relExp (X : ExpExpansion L) : ExpExpansion (newLang L) where
 
 end RelExpansion
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

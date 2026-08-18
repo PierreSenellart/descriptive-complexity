@@ -13,15 +13,15 @@ import DescriptiveComplexity.Problems.Wide.RegChannelProg
 A program that lays its own file arrives at its evaluation with a background
 built by the sweep; a program that is *handed* its file has that background from
 time zero. This file says the two agree: the marks the register channel writes
-are, slot for slot, what `DescriptiveComplexity.Pfp.PfpData.ixBack` reads off the
+are, slot for slot, what `DescriptiveComplexity.Draw.DrawData.ixBack` reads off the
 entry state at the handed file.
 
 Only two slots need an argument, and both are about the file's ends:
 
 * `regFirst` – at this channel the first register is **not** the least element of
   the universe but the greatest carrying no argument block, which is why the mark
-  is `DescriptiveComplexity.Pfp.regSlotMark` and not
-  `DescriptiveComplexity.Pfp.slotMark` (`isTopNonArg_iff_least_marked`);
+  is `DescriptiveComplexity.Draw.regSlotMark` and not
+  `DescriptiveComplexity.Draw.slotMark` (`isTopNonArg_iff_least_marked`);
 * `regLast` – the last register *is* the last element, the argument tags being
   the greatest (`isGreatest_iff_greatest_marked`).
 
@@ -31,9 +31,9 @@ name slots, the padding flag) or a track that starts clear.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
@@ -41,7 +41,7 @@ open Language Structure
 
 section Entry
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -57,23 +57,23 @@ omit [Fintype dt.SlotIx] [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 argument block are finitely many and not none, so one of them is greatest. -/
 theorem exists_isTopNonArg : ∃ z : Univ A R' P' dt.KIx dt.dd, IsTopNonArg z := by
   obtain ⟨z, hz, hmax⟩ := exists_greatest
-    (Wide.isLinOrd_tagTupleLe (Tag := PfpTag R' P' dt.KIx) (A := A) (d := dt.dd))
-    (P := fun x : Univ A R' P' dt.KIx dt.dd => ∀ i, x.1 ≠ PfpTag.arg i)
-    ⟨(PfpTag.sym, fun _ => Classical.arbitrary A), fun i => fun h => nomatch h⟩
+    (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx) (A := A) (d := dt.dd))
+    (P := fun x : Univ A R' P' dt.KIx dt.dd => ∀ i, x.1 ≠ DrawTag.arg i)
+    ⟨(DrawTag.sym, fun _ => Classical.arbitrary A), fun i => fun h => nomatch h⟩
   exact ⟨z, hz, hmax⟩
 
 omit [Fintype dt.SlotIx] [Nonempty A]
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] [Finite A] [Finite R']
   [Finite P'] [Finite dt.KIx] in
 /-- **The greatest element carries an argument block**, provided there is one:
-the argument tags come last (`DescriptiveComplexity.Pfp.lt_arg`). -/
+the argument tags come last (`DescriptiveComplexity.Draw.lt_arg`). -/
 theorem arg_of_isGreatest [Nonempty dt.KIx] {x : Univ A R' P' dt.KIx dt.dd}
     (hx : ∀ y : Univ A R' P' dt.KIx dt.dd, tagTupleLe y x) :
-    ∃ i, x.1 = PfpTag.arg i := by
+    ∃ i, x.1 = DrawTag.arg i := by
   by_contra hc
   push Not at hc
-  have hlt : x.1 < PfpTag.arg (Classical.arbitrary dt.KIx) := lt_arg x.1 _ hc
-  rcases hx (PfpTag.arg (Classical.arbitrary dt.KIx), x.2) with hb | ⟨hb, -⟩
+  have hlt : x.1 < DrawTag.arg (Classical.arbitrary dt.KIx) := lt_arg x.1 _ hc
+  rcases hx (DrawTag.arg (Classical.arbitrary dt.KIx), x.2) with hb | ⟨hb, -⟩
   · exact absurd hb (asymm hlt)
   · exact absurd hb (ne_of_gt hlt)
 
@@ -85,7 +85,7 @@ tags**: the channel marks the argument elements and that one, and it is the
 least of them. This is the `regFirst` slot's whole content, and the reason the
 mark had to change. -/
 theorem isTopNonArg_iff_least_marked {Marked : Univ A R' P' dt.KIx dt.dd → Prop}
-    (hmk : ∀ x, Marked x ↔ (∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x)
+    (hmk : ∀ x, Marked x ↔ (∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)
     (hex : ∃ z : Univ A R' P' dt.KIx dt.dd, IsTopNonArg z)
     {x : Univ A R' P' dt.KIx dt.dd} (hx : Marked x) :
     IsTopNonArg x ↔ ∀ y, Marked y → tagTupleLe x y := by
@@ -115,16 +115,16 @@ being greatest among them is being greatest. The `regLast` slot therefore needs
 no change. -/
 theorem isGreatest_iff_greatest_marked [Nonempty dt.KIx]
     {Marked : Univ A R' P' dt.KIx dt.dd → Prop}
-    (hmk : ∀ x, Marked x ↔ (∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x)
+    (hmk : ∀ x, Marked x ↔ (∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)
     {x : Univ A R' P' dt.KIx dt.dd} :
     (∀ y : Univ A R' P' dt.KIx dt.dd, tagTupleLe y x) ↔ ∀ y, Marked y → tagTupleLe y x := by
   refine ⟨fun h y _ => h y, fun h y => ?_⟩
   obtain ⟨g, -, hmax⟩ := exists_greatest
-    (Wide.isLinOrd_tagTupleLe (Tag := PfpTag R' P' dt.KIx) (A := A) (d := dt.dd))
+    (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx) (A := A) (d := dt.dd))
     (P := fun _ : Univ A R' P' dt.KIx dt.dd => True) ⟨x, trivial⟩
   have hgall : ∀ z : Univ A R' P' dt.KIx dt.dd, tagTupleLe z g := fun z => hmax z trivial
   have hgm : Marked g := (hmk g).mpr (Or.inl (arg_of_isGreatest hgall))
-  exact (Wide.isLinOrd_tagTupleLe (Tag := PfpTag R' P' dt.KIx) (A := A) (d := dt.dd)).2.1
+  exact (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx) (A := A) (d := dt.dd)).2.1
     y g x (hgall y) (h g hgm)
 
 end Entry
@@ -133,7 +133,7 @@ end Entry
 
 section Back
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' PE : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' PE : Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R']
 variable [LinearOrder (NexPh (Option dt.KIx) PE)]
@@ -157,7 +157,7 @@ track is clear – except at the marker, where the start step sets `wk` and `bot
 and the entry state says the same. -/
 theorem startBack_initBackReg (hR : PR.table.Reads)
     (hmark : ∀ x, PR.mark x = regSlotMark PR.zero PR.one dt.dd0Le x)
-    (hmk : ∀ x, PR.marked x ↔ (∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x)
+    (hmk : ∀ x, PR.marked x ↔ (∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)
     (hblank : ∀ s, PR.blank s = PR.zero)
     {v : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hv : ∀ x, PR.marked x → v ≠ wmRegSeg x) :
@@ -391,7 +391,7 @@ track is a bit – the marks are `regSlotMark`s and the rest is blank. This is t
 base of an opening's reading. -/
 theorem tapeShape_initBackReg (hR : PR.table.Reads)
     (hmark : ∀ x, PR.mark x = regSlotMark PR.zero PR.one dt.dd0Le x)
-    (hmk : ∀ x, PR.marked x ↔ (∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x)
+    (hmk : ∀ x, PR.marked x ↔ (∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)
     (hblank : ∀ s, PR.blank s = PR.zero)
     {v : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hv : ∀ x, PR.marked x → v ≠ wmRegSeg x) :
@@ -449,7 +449,7 @@ end Back
 
 section Marks
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -457,21 +457,21 @@ variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] [Nonempty A]
 variable {PR : Prog A R' P' dt.CtlIx dt.SlotIx dt.KIx dt.dd}
 variable (hR : PR.table.Reads)
 variable (hmk : ∀ x : Univ A R' P' dt.KIx dt.dd,
-  PR.marked x ↔ (∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x)
+  PR.marked x ↔ (∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)
 variable (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 
 omit [Nonempty A] [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 include hR hmk in
 /-- **The channel writes for an element exactly when the program marks it.** -/
 theorem hasInp_iff_regMarked (x : Univ A R' P' dt.KIx dt.dd) :
-    WMHasInp x ↔ ((∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x) :=
+    WMHasInp x ↔ ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x) :=
   (Table.wmHasInp_iff_marked hR x).trans (hmk x)
 
 omit [Nonempty A] [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 include hR hmk in
 /-- **Every argument element carries input**: the `hargall` the run asks for. -/
 theorem hasInp_of_arg {x : Univ A R' P' dt.KIx dt.dd}
-    (hx : ∃ k : dt.KIx, x.1 = PfpTag.arg k) : WMHasInp x :=
+    (hx : ∃ k : dt.KIx, x.1 = DrawTag.arg k) : WMHasInp x :=
   (hasInp_iff_regMarked hR hmk x).mpr (Or.inl hx)
 
 omit [Nonempty A] [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
@@ -479,7 +479,7 @@ include hR hmk in
 /-- **Every named register carries input**: the `harg` the file's `HasName`
 asks for. -/
 theorem hasInp_blkElt (zero : A) (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
-    WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) zero c) :
+    WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
       Univ A R' P' dt.KIx dt.dd) :=
   hasInp_of_arg hR hmk ⟨toLex b, rfl⟩
 
@@ -496,26 +496,26 @@ theorem hasInp_up (x y : Univ A R' P' dt.KIx dt.dd) (hxy : WMLe x y)
   · refine (hasInp_iff_regMarked hR hmk y).mpr (Or.inl ?_)
     by_contra hc
     push Not at hc
-    have hlt : y.1 < PfpTag.arg k := lt_arg y.1 k hc
+    have hlt : y.1 < DrawTag.arg k := lt_arg y.1 k hc
     rcases (hord _ _).mp hxy with hb | ⟨hb, -⟩
     · rw [hk] at hb; exact absurd hb (asymm hlt)
     · rw [hk] at hb; exact absurd hb.symm (ne_of_lt hlt)
-  · rcases em (∃ k : dt.KIx, y.1 = PfpTag.arg k) with harg | hnarg
+  · rcases em (∃ k : dt.KIx, y.1 = DrawTag.arg k) with harg | hnarg
     · exact (hasInp_iff_regMarked hR hmk y).mpr (Or.inl harg)
     · push Not at hnarg
       refine (hasInp_iff_regMarked hR hmk y).mpr (Or.inr ⟨hnarg, fun z hz => ?_⟩)
-      exact (Wide.isLinOrd_tagTupleLe (Tag := PfpTag R' P' dt.KIx) (A := A)
+      exact (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx) (A := A)
         (d := dt.dd)).2.1 z x y (htop.2 z hz) ((hord _ _).mp hxy)
 
 omit [Finite dt.KIx] in
 include hR hmk hord in
 /-- **The element below the argument tags is marked and least among the marked
 ones**: the `bot` the working area is measured against
-(`DescriptiveComplexity.Pfp.PfpData.work_regLaid`). -/
+(`DescriptiveComplexity.Draw.DrawData.work_regLaid`). -/
 theorem exists_regBotElt :
     ∃ z : Univ A R' P' dt.KIx dt.dd, WMHasInp z ∧
       (∀ y : Univ A R' P' dt.KIx dt.dd, WMHasInp y → WMLe z y) ∧
-      ∀ i : dt.KIx, z.1 ≠ PfpTag.arg i := by
+      ∀ i : dt.KIx, z.1 ≠ DrawTag.arg i := by
   obtain ⟨z, hz⟩ := exists_isTopNonArg (A := A) (R' := R') (P' := P') (dt := dt)
   refine ⟨z, (hasInp_iff_regMarked hR hmk z).mpr (Or.inr hz), fun y hy => ?_, hz.1⟩
   rcases (hasInp_iff_regMarked hR hmk y).mp hy with ⟨k, hk⟩ | htop
@@ -524,8 +524,8 @@ theorem exists_regBotElt :
 
 end Marks
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

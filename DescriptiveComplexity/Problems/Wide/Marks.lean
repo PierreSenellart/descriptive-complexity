@@ -135,7 +135,7 @@ theorem wmSetLt_wmSeg_iff (h : IsLinOrd (WMLe (A := A))) (x y : A) :
 cell of the least element, so an address strictly below it is the cell of no
 element at all. This is what tells a program's reads that the four register
 slots of its background do not matter where it stands
-(`DescriptiveComplexity.Pfp.PfpData.back_congr_off_reg`). -/
+(`DescriptiveComplexity.Draw.DrawData.back_congr_off_reg`). -/
 theorem not_wmSeg_of_wmSetLt_wmSeg (h : IsLinOrd (WMLe (A := A))) {bot : A}
     (hbot : ∀ y : A, WMLe bot y) {r : A → Prop}
     (hr : WMSetLt WMLe r (wmSeg bot)) : ¬∃ u : A, r = wmSeg u := by

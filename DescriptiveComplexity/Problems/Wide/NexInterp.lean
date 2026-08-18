@@ -4,16 +4,16 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.NexDef
-import DescriptiveComplexity.Problems.Wide.PfpInterp
+import DescriptiveComplexity.Problems.Wide.DrawInterp
 
 /-!
 # The clocked machine, written down
 
-`DescriptiveComplexity.Pfp.PfpData.reads_progFrom` says of a program that the
+`DescriptiveComplexity.Draw.DrawData.reads_progFrom` says of a program that the
 interpreted structure reads its table, and it says it of
-`DescriptiveComplexity.Pfp.PfpData.progFrom` – the program assembled from a
+`DescriptiveComplexity.Draw.DrawData.progFrom` – the program assembled from a
 definable rule set, a start phase, an accepting predicate and an initial mark.
-The clocked program is written by hand (`DescriptiveComplexity.Pfp.PfpData.nexProg`),
+The clocked program is written by hand (`DescriptiveComplexity.Draw.DrawData.nexProg`),
 so what is needed here is that the two are the *same program*: they differ in
 one field only, the initial pointer, and there the file's first register carries
 the least tuple, which is clear at every coordinate.
@@ -21,33 +21,33 @@ the least tuple, which is clear at every coordinate.
 With that, the clocked machine is written down exactly as the space-bounded one
 is: `nexInterp` is the interpretation and `reads_nexProg` the fact a reduction
 hands the run layer. What is left to a reduction emitting it is its own
-`DescriptiveComplexity.Pfp.PfpData.VarArgs`, the obligation the space-bounded
+`DescriptiveComplexity.Draw.DrawData.VarArgs`, the obligation the space-bounded
 reduction already meets.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
 open Language Structure
 
-namespace PfpData
+namespace DrawData
 
-variable {L : Language.{0, 0}} {dt : PfpData L}
+variable {L : Language.{0, 0}} {dt : DrawData L}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] [Finite dt.KIx] [Nonempty dt.KIx]
 
 /-- **The clocked program's rule names**, as the interpretation names them: a
 site of the outer layer or of the evaluation, and one of that site's rules. -/
-abbrev NexRTag (dt : PfpData L) (G : Type) : Type :=
+abbrev NexRTag (dt : DrawData L) (G : Type) : Type :=
   RTagOf (NexSite dt.SEF) (NexSh dt.SEF (Option dt.KIx) G dt.NexSESh)
 
 /-- **The clocked program's phases.** -/
-abbrev NexPF (dt : PfpData L) : Type := NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)
+abbrev NexPF (dt : DrawData L) : Type := NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)
 
 /-- **The tags of the clocked machine's universe.** -/
-abbrev NexITag (dt : PfpData L) (G : Type) : Type :=
+abbrev NexITag (dt : DrawData L) (G : Type) : Type :=
   dt.ITagOf (NexSite dt.SEF) (NexSh dt.SEF (Option dt.KIx) G dt.NexSESh) dt.NexPF
 
 variable {G : Type}
@@ -100,7 +100,7 @@ noncomputable def nexInterp (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.
     (bot : Option dt.KIx) :
     FOInterpretation (L.sum Language.order) Language.wide
       (dt.NexITag (dt.d.B.ι → Bool)) dt.dd :=
-  dt.pfpInterp hpl (uRulesDefinable_nexProg (bot := bot) hcoord h)
+  dt.drawInterp hpl (uRulesDefinable_nexProg (bot := bot) hcoord h)
     (uGDefinable_nexAccept (h none)) NexPh.start blankMark
 
 /-- **The interpreted structure reads the clocked program's table**: the whole
@@ -119,8 +119,8 @@ theorem reads_nexProg (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
   exact dt.reads_progFrom hpl (uRulesDefinable_nexProg (bot := bot) hcoord h)
     (uGDefinable_nexAccept (h none)) NexPh.start blankMark e hws
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

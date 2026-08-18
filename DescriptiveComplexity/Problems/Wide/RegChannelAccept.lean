@@ -24,9 +24,9 @@ both directions of the correctness supply them the same way.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
@@ -34,7 +34,7 @@ open Language Structure
 
 section OpeningHandedAt
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Nonempty A] [Finite A] [Finite dt.KIx] [Nonempty dt.KIx]
 variable [L.IsRelational] [L.Structure A] [LinearOrder (dt.X.Map A)]
@@ -53,7 +53,7 @@ variable {zero one : A}
 
 section Exits
 
-variable {L' : Language.{0, 0}} {dt' : PfpData L'} {A' R'' P'' I' : Type}
+variable {L' : Language.{0, 0}} {dt' : DrawData L'} {A' R'' P'' I' : Type}
 variable [Fintype dt'.SlotIx] [LinearOrder A'] [LinearOrder R''] [LinearOrder P'']
 variable [Language.wide.Structure (Univ A' R'' P'' dt'.KIx dt'.dd)]
 variable [Finite A'] [Finite R''] [Finite P''] [Finite dt'.KIx]
@@ -106,12 +106,12 @@ theorem nexProgHanded_reachesIn_eval_verdict
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
     (he₀ : ∀ y, WMLe e₀ y)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A (R')
           (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ x : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = PfpTag.arg i) → WMHasInp x)
+      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x)
     (hupinp : ∀ x y : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe x y → WMHasInp x → WMHasInp y)
@@ -121,14 +121,14 @@ theorem nexProgHanded_reachesIn_eval_verdict
     (hleast : ∀ y : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMHasInp y → WMLe botE y)
-    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ PfpTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ DrawTag.arg i)
     (gtop gbot : dt.NexRegIx A (R') (Option dt.KIx))
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
     (hbotF : ∀ u, (dt.regLaid h hord).le gbot u)
     {v v' : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v ((dt.regLaid h hord).cell gbot))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -181,7 +181,7 @@ theorem nexProgHanded_reachesIn_eval_verdict
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd),
       Use u → WMLt WMLe (dt.regElt A (R') (Option dt.KIx) u) x →
       ∃ u', Use u' ∧ dt.regElt A (R') (Option dt.KIx) u' = x)
-    (hKin : ∀ (a : ιV) (t : PfpTag (R')
+    (hKin : ∀ (a : ιV) (t : DrawTag (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx)
         (w : Fin dt.dd → A),
       ixAddr (dt.regElt A (R') (Option dt.KIx)) (mV a) (t, w) →
@@ -266,8 +266,8 @@ theorem nexProgHanded_reachesIn_eval_verdict
 
 end OpeningHandedAt
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

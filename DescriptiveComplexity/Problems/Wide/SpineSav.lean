@@ -3,12 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpIxSpineSem
+import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
 
 /-!
 # The two scratch registers are parked at the marker
 
-`DescriptiveComplexity.Pfp.PfpData.ixLegStB_fields` says a leg of the spine
+`DescriptiveComplexity.Draw.DrawData.ixLegStB_fields` says a leg of the spine
 leaves the mirror, the working register, the bottom mark, the stage tracks and
 the last-pass flag alone. It says nothing about the two *scratch* registers, SAV
 and TARGET, because a leg does write them – and the evaluation's exit asks that
@@ -23,9 +23,9 @@ empty address, the entry state has them parked for free.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
@@ -33,7 +33,7 @@ open Language Structure
 
 section Parked
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R P I : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R P I : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -81,7 +81,7 @@ end Parked
 
 section Round
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R P I : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R P I : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -109,7 +109,7 @@ end Round
 
 section Tower
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R P I : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R P I : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -222,8 +222,8 @@ theorem parked_ixSpineStOfB {st₀ : TapeSt dt A R P I} {f₀ : dt.CtlIx → A}
 
 end Tower
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

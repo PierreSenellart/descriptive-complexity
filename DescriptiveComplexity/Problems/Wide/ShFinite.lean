@@ -3,13 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpProg
+import DescriptiveComplexity.Problems.Wide.DrawProg
 import DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!
 # The rule names of the EXPSPACE program are finitely many
 
-`DescriptiveComplexity.Problems.Wide.PfpTower` gives every **site** type of the
+`DescriptiveComplexity.Problems.Wide.DrawTower` gives every **site** type of the
 program's tower a `Finite` instance, and every leaf kit's rule type has one where
 it is defined; what was missing is the tower's **shapes** – the rules each site
 contributes – and hence the rule names themselves, which the run layer asks for
@@ -21,13 +21,13 @@ kit's rules, a sum of them with a verdict, or the shape one level down, so each
 instance is one line per constructor. They are stated at the abstract
 machineries first (`ChainSh`, `SeqSh`, `ElemSh`, `StageSh`, `TagSh`, `RoundSh`,
 `VarSh`, `EvalSh`, `OuterSh`), then read up the concrete tower to
-`DescriptiveComplexity.Pfp.PfpData.SFSh`, and the file ends at
-`DescriptiveComplexity.Pfp.PfpData.finite_RIx`.
+`DescriptiveComplexity.Draw.DrawData.SFSh`, and the file ends at
+`DescriptiveComplexity.Draw.DrawData.finite_RIx`.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -128,9 +128,9 @@ instance instFiniteOuterSh {SE : Type} {ShE : SE → Type} [∀ s, Finite (ShE s
 
 /-! ### And of the concrete tower -/
 
-namespace PfpData
+namespace DrawData
 
-variable {L : Language.{0, 0}} (dt : PfpData L)
+variable {L : Language.{0, 0}} (dt : DrawData L)
 
 noncomputable instance instFiniteKindSh {n : ℕ} :
     ∀ (κ : MatAtom dt.X dt.d.B n) (s : dt.KindSite κ), Finite (dt.KindSh κ s)
@@ -204,8 +204,8 @@ noncomputable instance finite_RIx {A Q : Type} [Fintype Q] [Fintype dt.SlotIx]
     Finite (dt.RIx zero one hzo args) :=
   inferInstanceAs (Finite ((i : dt.SF) × dt.SFSh i))
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

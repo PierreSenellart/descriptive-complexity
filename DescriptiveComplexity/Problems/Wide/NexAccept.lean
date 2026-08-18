@@ -12,7 +12,7 @@ import DescriptiveComplexity.Problems.Wide.NexInterp
 
 The opening and the evaluation are proved of an *arbitrary* program whose rules
 are the clocked ones; here they are read at
-`DescriptiveComplexity.Pfp.PfpData.nexProg` – the program a reduction actually
+`DescriptiveComplexity.Draw.DrawData.nexProg` – the program a reduction actually
 emits – so that what is left of each is what the *instance* decides and nothing
 about rule names.
 
@@ -27,17 +27,17 @@ hypotheses ask about).
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
 open Language Structure
 
-namespace PfpData
+namespace DrawData
 
 section OpeningAt
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Nonempty A] [Finite A] [Finite dt.KIx] [Nonempty dt.KIx]
 variable [L.IsRelational] [L.Structure A] [LinearOrder (dt.X.Map A)]
@@ -220,7 +220,7 @@ theorem nexProg_reachesIn_eval {base : ℕ} (hzo : zero ≠ one)
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v
       ((dt.blkLaid h hpos hbase).cell (blkBot A dt.KIx dt.dd)))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -276,7 +276,7 @@ theorem nexProg_reachesIn_eval {base : ℕ} (hzo : zero ≠ one)
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.dd u) x →
       ∃ u', Use u' ∧ blkIxElt (dt.NexRIx (G := dt.d.B.ι → Bool))
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.dd u' = x)
-    (hKin : ∀ (a : ιV) (t : PfpTag (dt.NexRIx (G := dt.d.B.ι → Bool))
+    (hKin : ∀ (a : ιV) (t : DrawTag (dt.NexRIx (G := dt.d.B.ι → Bool))
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx)
         (w : Fin dt.dd → A),
       ixAddr (blkIxElt (dt.NexRIx (G := dt.d.B.ι → Bool))
@@ -465,7 +465,7 @@ theorem nexProg_wideAccept_blkLaid (hzo : zero ≠ one)
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.dd u) x →
       ∃ u', Use u' ∧ blkIxElt (dt.NexRIx (G := dt.d.B.ι → Bool))
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.dd u' = x)
-    (hKin : ∀ (a : ιV) (t : PfpTag (dt.NexRIx (G := dt.d.B.ι → Bool))
+    (hKin : ∀ (a : ιV) (t : DrawTag (dt.NexRIx (G := dt.d.B.ι → Bool))
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx)
         (w : Fin dt.dd → A),
       ixAddr (blkIxElt (dt.NexRIx (G := dt.d.B.ι → Bool))
@@ -586,8 +586,8 @@ theorem hdict_guessTracks (hzo : zero ≠ one)
 
 end OpeningAt
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

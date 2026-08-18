@@ -9,18 +9,18 @@ import DescriptiveComplexity.Problems.Wide.NexOuter
 /-!
 # What the clocked program's file-laying sweep writes
 
-`DescriptiveComplexity.Pfp.SweepSpec` leaves the write to the caller, because
+`DescriptiveComplexity.Draw.SweepSpec` leaves the write to the caller, because
 what a cell of the file holds is a fact about the layout and not about the shape
 of the loop. This file is that fact at the layout a clocked program uses
-(`DescriptiveComplexity.Pfp.PfpData.blkLaid`): the sweep writes, at the register
+(`DescriptiveComplexity.Draw.DrawData.blkLaid`): the sweep writes, at the register
 the pointer names, the **mark** of that register – it is a register, whether it
 is the first or the last of the file, its block one-hot, its coordinates, and
 that it is canonically padded – and the blank in every track.
 
 The one theorem is that this *is* the background the file's run installs
-(`DescriptiveComplexity.Pfp.PfpData.buildWr_eq_ixBack`): slot by slot, the mark
+(`DescriptiveComplexity.Draw.DrawData.buildWr_eq_ixBack`): slot by slot, the mark
 the pointer can compute agrees with
-`DescriptiveComplexity.Pfp.PfpData.ixBack` at the register's cell, given that
+`DescriptiveComplexity.Draw.DrawData.ixBack` at the register's cell, given that
 the state's own tracks are clear – which they are, the file being laid before
 anything is written to it.
 
@@ -29,29 +29,29 @@ its block and its named tuple and on nothing else, which is the point the whole
 index parameter was introduced for: the pointer holds exactly those, the block in
 the phase and the tuple in the control.
 
-The pointer's advance is here too: `DescriptiveComplexity.Pfp.PfpData.ptrNext`
+The pointer's advance is here too: `DescriptiveComplexity.Draw.DrawData.ptrNext`
 writes the next register's tuple into the control's coordinate slots and leaves
 every other slot alone, and
-`DescriptiveComplexity.Pfp.PfpData.buildSpec` is the whole
-`DescriptiveComplexity.Pfp.SweepSpec` the file-laying phase runs at. The
+`DescriptiveComplexity.Draw.DrawData.buildSpec` is the whole
+`DescriptiveComplexity.Draw.SweepSpec` the file-laying phase runs at. The
 guessing phase's write is here as well
-(`DescriptiveComplexity.Pfp.PfpData.guessWr`): the cell it read with the stage
+(`DescriptiveComplexity.Draw.DrawData.guessWr`): the cell it read with the stage
 tracks holding the guessed value, and nothing else touched.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
 open Language Structure
 
-namespace PfpData
+namespace DrawData
 
 section BuildSpec
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Nonempty A] [Finite R'] [Finite P'] [Finite dt.KIx]
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -66,7 +66,7 @@ open Classical in
 /-- **What the file-laying sweep writes**: the mark of the register the pointer
 names, and the blank in every track. Every one of these is read off the block
 the phase carries and the coordinates the control holds, which is what makes it
-a legal `DescriptiveComplexity.Pfp.SweepSpec.wr`. -/
+a legal `DescriptiveComplexity.Draw.SweepSpec.wr`. -/
 noncomputable def buildWr (zero one : A) (coord : Fin dt.dd → dt.CtlIx)
     (b : Option dt.KIx) (f : dt.CtlIx → A) : dt.SlotIx → A
   | .reg => one
@@ -266,7 +266,7 @@ variable (dt) in
 over at once. A program that is *handed* its file – the register channel of
 `DescriptiveComplexity.WideRegAccept` hands one over – has nothing to lay, and
 this is what it puts where a file-laying program puts
-`DescriptiveComplexity.Pfp.PfpData.buildSpec`: the site's rules still exist, and
+`DescriptiveComplexity.Draw.DrawData.buildSpec`: the site's rules still exist, and
 the one that fires is the one whose guard is «rolled over and done», so the
 phase costs a single step.
 
@@ -300,7 +300,7 @@ noncomputable def buildSpec (zero one : A) (coord : Fin dt.dd → dt.CtlIx) :
 omit [Finite R'] [Finite P'] [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite (Univ A R' P' dt.KIx dt.dd)] in
 /-- **A roll-over lands in the next block's first register**, which is what
-`DescriptiveComplexity.Pfp.SweepSpec.nx` being a function of the block alone
+`DescriptiveComplexity.Draw.SweepSpec.nx` being a function of the block alone
 buys: at the last tuple the advance's block is `blkNextB` of the current one. -/
 theorem blkNext_fst_of_roll (zero one : A) (coord : Fin dt.dd → dt.CtlIx)
     {b : Option dt.KIx}
@@ -318,13 +318,13 @@ section GuessSpec
 /-! ### What the guessing sweep writes
 
 The guessing phase runs the same sweep over the same stretch with the background
-on *both* sides (`DescriptiveComplexity.Pfp.Prog.reachesIn_guessTracks`): what
+on *both* sides (`DescriptiveComplexity.Draw.Prog.reachesIn_guessTracks`): what
 changes at a cell is the stage tracks and nothing else, so the write is the cell
 it read with those tracks set to the guessed value, and the value is a *shape* –
 one rule per assignment of the tracks – which is the program's only
 nondeterminism. -/
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' P' Q : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' Q : Type}
 variable [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Nonempty A] [Finite dt.KIx]
@@ -406,8 +406,8 @@ noncomputable def regionSpec (zero one : A) :
 
 end GuessSpec
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

@@ -33,7 +33,7 @@ admits, of the conjunction of equalities and disequalities that pins a pattern
 copy, a designated element or a successor. It is not the whole guard language of
 a program that evaluates a *logic*: such a program eventually compares two of
 its slots in the order, or asks a relation of the source vocabulary of them, and
-neither is a function of the pattern. `DescriptiveComplexity.Pfp.UGDefinable`
+neither is a function of the pattern. `DescriptiveComplexity.Draw.UGDefinable`
 therefore carries a formula, with the disjunction below as one way of building
 it.
 
@@ -158,7 +158,7 @@ theorem covBy_unique [LinearOrder A] {a b b' : A} (h : a ⋖ b) (h' : a ⋖ b') 
 open Classical in
 /-- **The next element**: the cover, where there is one, and the element
 itself at the top – so that a loop variable at the end of its range simply
-stands still, which is what `DescriptiveComplexity.Pfp.tupNext` does. -/
+stands still, which is what `DescriptiveComplexity.Draw.tupNext` does. -/
 noncomputable def ordSucc [Preorder A] (a : A) : A :=
   if h : ∃ b : A, a ⋖ b then h.choose else a
 

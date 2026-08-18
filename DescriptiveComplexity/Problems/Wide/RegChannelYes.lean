@@ -6,12 +6,12 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Wide.RegChannelAccept
 import DescriptiveComplexity.Problems.Wide.RegChannelWalk
 import DescriptiveComplexity.Problems.Wide.SpineSav
-import DescriptiveComplexity.Problems.Wide.PfpYes
+import DescriptiveComplexity.Problems.Wide.DrawYes
 
 /-!
 # The handed program accepts, from the sentence alone
 
-`DescriptiveComplexity.Pfp.PfpData.wideRegAccept_regLaid_of_rules` joins the
+`DescriptiveComplexity.Draw.DrawData.wideRegAccept_regLaid_of_rules` joins the
 two legs of the run at the file the register channel hands over, and asks the
 caller for some thirty facts. Most of them are not about the instance at all:
 they follow from the *marking* (`hasInp_up`, `exists_regBotElt`), from the
@@ -26,9 +26,9 @@ the order on the expanded universe, and the three numbers of the clock.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
@@ -36,7 +36,7 @@ open Language Structure
 
 section Yes
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Nonempty A] [Finite A] [Finite dt.KIx] [Nonempty dt.KIx]
 variable [L.IsRelational] [L.Structure A] [LinearOrder (dt.X.Map A)]
@@ -66,8 +66,8 @@ channel marks below them, which is what the opening's walk needs. -/
 theorem exists_argElt :
     ∃ x : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      ∃ i : dt.KIx, x.1 = PfpTag.arg i :=
-  ⟨(PfpTag.arg (Classical.arbitrary dt.KIx), fun _ => Classical.arbitrary A),
+      ∃ i : dt.KIx, x.1 = DrawTag.arg i :=
+  ⟨(DrawTag.arg (Classical.arbitrary dt.KIx), fun _ => Classical.arbitrary A),
     Classical.arbitrary dt.KIx, rfl⟩
 
 omit [Finite dt.KIx] [LinearOrder (dt.X.Map A)] [Finite A] [L.IsRelational]
@@ -82,7 +82,7 @@ opening's walk asks of the instance, and the drawing always has it. -/
 theorem exists_above_botElt (hR : PR.table.Reads)
     {botE : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
-    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ PfpTag.arg i) :
+    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ DrawTag.arg i) :
     ∃ z : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd, WMLt WMLe botE z := by
   obtain ⟨x, i, hi⟩ := exists_argElt (dt := dt) (A := A)
@@ -109,7 +109,7 @@ theorem belowTop_regLaid (hlin : IsLinOrd (WMLe (A := Univ A (R')
       WMLe x y ↔ tagTupleLe x y)
     (hdd : dt.dd0 < dt.dd)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     {vi : dt.VarIx} {iv : dt.d.B.ι}
@@ -126,9 +126,9 @@ theorem belowTop_regLaid (hlin : IsLinOrd (WMLe (A := Univ A (R')
       logicalTop := by
   have hordL : ∀ x y : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      WMLe x y ↔ lexRel (· ≤ · : PfpTag (R')
+      WMLe x y ↔ lexRel (· ≤ · : DrawTag (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx →
-        PfpTag (R')
+        DrawTag (R')
           (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx → Prop)
         (tupLeLex (A := A) (d := dt.dd)) x y :=
     fun x y => (hord x y).trans (Wide.tagTupleLe_iff_lexRel x y)
@@ -207,7 +207,7 @@ theorem wideRegAccept_of_out_of_rules
   obtain ⟨e₀, -, he₀⟩ := exists_least hlin
     (P := fun _ : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd => True)
-    ⟨(PfpTag.sym, fun _ => Classical.arbitrary A), trivial⟩
+    ⟨(DrawTag.sym, fun _ => Classical.arbitrary A), trivial⟩
   refine dt.wideRegAccept_regLaid_of_rules (PR := PR) hpl hE hR hlin hR.le
     (v₁ := v₁) (x := xw) (y := wmRegSeg botE) (y' := y') (s₀ := v₁)
     (top := logicalTop) (v' := v₁)
@@ -271,8 +271,8 @@ theorem wideRegAccept_of_out_of_rules
 
 end Yes
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

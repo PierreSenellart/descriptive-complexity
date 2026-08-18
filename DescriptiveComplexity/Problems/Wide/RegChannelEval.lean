@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Wide.RegChannelLaid
 /-!
 # The clocked evaluation at the file the channel hands over
 
-`DescriptiveComplexity.Pfp.PfpData.nexIxEvalB_blkLaid_reachesIn` runs the clocked
+`DescriptiveComplexity.Draw.DrawData.nexIxEvalB_blkLaid_reachesIn` runs the clocked
 evaluation at the file a program *lays* – a stretch of consecutive addresses,
 each register one bit above the last. This file prices the same evaluation at the
 file the **register channel** hands over, where the registers are the cells the
@@ -17,7 +17,7 @@ channel writes and a step of a walk across the file can cost as much as the whol
 file.
 
 The four widths are `regW`, `regWP`, `regWR`, `regWK`
-(`DescriptiveComplexity.Pfp.PfpData.regW` and its neighbours), each bounded by
+(`DescriptiveComplexity.Draw.DrawData.regW` and its neighbours), each bounded by
 one number – `regWidthBound` – as the laid file's are by `blkWidthBound`. The
 shape is the same and so is the reason: three of the four are linear in the
 file's own bound, and the seek is quadratic, being a pass of the file per bit of
@@ -26,13 +26,13 @@ its target.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
 open Language Structure
 
-namespace PfpData
+namespace DrawData
 
 /-! ### One number above the register file's four widths -/
 
@@ -114,7 +114,7 @@ end WidthBound
 
 section Laid
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -157,9 +157,9 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Fini
   [Finite R'] [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
 /-- **The tower's costs at the handed file are polynomial in one number**: the
-`IxWidthBd` of `DescriptiveComplexity.Pfp.PfpData.ixLegWidth_le`, at the four
+`IxWidthBd` of `DescriptiveComplexity.Draw.DrawData.ixLegWidth_le`, at the four
 widths the register channel's file is charged. This is
-`DescriptiveComplexity.Pfp.PfpData.ixWidthBd_blkLaid` with the laid file's
+`DescriptiveComplexity.Draw.DrawData.ixWidthBd_blkLaid` with the laid file's
 numbers replaced by the handed one's; what an instantiation owes of the clock is
 again `q ^ 25 ≤ 2 ^ (k · m)`. -/
 theorem ixWidthBd_regLaid {q : ℕ} (hq : 16 ≤ q)
@@ -208,7 +208,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite A] [Finite R'] [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
 /-- **The evaluation's width at the handed file is polynomial in one number**:
-`DescriptiveComplexity.Pfp.PfpData.ixEvalWidth_le` at `ixWidthBd_regLaid`. This
+`DescriptiveComplexity.Draw.DrawData.ixEvalWidth_le` at `ixWidthBd_regLaid`. This
 is the `a` of the clock – what one round of the evaluation costs – and what an
 instantiation owes is `q ^ 26 ≤ 2 ^ (k · m)`. -/
 theorem ixEvalWidth_le_regLaid {q : ℕ} (hq : 16 ≤ q)
@@ -337,7 +337,7 @@ end Laid
 
 /-! ### The two bridges at the handed file
 
-`DescriptiveComplexity.Pfp.PfpData.passEnc_blkLaid` and `gateEnc_blkLaid`
+`DescriptiveComplexity.Draw.DrawData.passEnc_blkLaid` and `gateEnc_blkLaid`
 discharge the gates' bridges at the file a program lays. The generic lemmas they
 come from ask only that the registers stand for distinct elements, that the
 layout order is linear, that a register's block and tuple are its element's –
@@ -345,7 +345,7 @@ all of which the handed file has – so the same two statements hold here. -/
 
 section Bridges
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] [Nonempty A]
@@ -365,7 +365,7 @@ theorem passEnc_regLaid (hzo : PR.zero ≠ PR.one) (vi : dt.VarIx)
         (dt.regLaid h hord) PR.zero PR.one vi stV ℓ ↔
       IsEnc dt.ly PR.zero PR.one
         (wmBlk (ixAddr (fun u : dt.RegIx (A := A) (R' := R') (P' := P') => (u.1 : _)) stV.val)
-          (PfpTag.arg (toLex (dt.igBlk vi ℓ)) : PfpTag R' P' dt.KIx)) :=
+          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R' P' dt.KIx)) :=
   dt.ixIGPassP_iff_isEnc (F := dt.regLaid h hord) Subtype.val_injective
     isLinOrd_regLaid_le (fun u => dt.blk_regLaid_eq_tagBlk u) (fun _ => rfl) hzo vi stV ℓ
 
@@ -379,9 +379,9 @@ theorem gateEnc_regLaid (hzo : PR.zero ≠ PR.one) (j : Fin dt.nv)
       ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
         IsEnc dt.ly PR.zero PR.one
           (wmBlk (ixAddr (fun u : dt.RegIx (A := A) (R' := R') (P' := P') => (u.1 : _)) st.mir)
-            (PfpTag.arg (toLex ((Sum.inl
+            (DrawTag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
-              Fin dt.ko ⊕ Fin dt.ki))) : PfpTag R' P' dt.KIx)) :=
+              Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R' P' dt.KIx)) :=
   dt.ixGatedAt_iff_isEnc (F := dt.regLaid h hord) Subtype.val_injective
     isLinOrd_regLaid_le (fun u => dt.blk_regLaid_eq_tagBlk u) (wmSegFile h)
     (fun _ => rfl) hzo h j st
@@ -392,7 +392,7 @@ end Bridges
 
 section Eval
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A R B : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A R B : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
 variable [LinearOrder (NexPh B (EvalPh dt.nv dt.PMF))]
@@ -446,7 +446,7 @@ theorem regElt_injective : Function.Injective (dt.regElt A R B) := Subtype.val_i
 /-- **The clocked evaluation at the handed file**: the walk-back the opening's
 dispatch owes, the branched spine over the spine's positions, and the exit into
 the accepting phase, charged the handed file's own widths. This is
-`DescriptiveComplexity.Pfp.PfpData.nexIxEvalB_reachesIn` with every coherence of
+`DescriptiveComplexity.Draw.DrawData.nexIxEvalB_reachesIn` with every coherence of
 the register channel's file discharged; what is left is the program's own, and
 what the *reduction* still owes is its marking – the arguments, one element
 below them, and nothing else. -/
@@ -466,16 +466,16 @@ theorem nexIxEvalB_regLaid_reachesIn
     -- input symbol, one further element below them does too, and nothing else
     -- does. Together these put the file directly above the working area.
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = PfpTag.arg i) → WMHasInp x)
+      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x)
     (hupinp : ∀ x y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe x y → WMHasInp x → WMHasInp y)
     {bot : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd} (hbotm : WMHasInp bot)
     (hleast : ∀ y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMHasInp y → WMLe bot y)
-    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ PfpTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ DrawTag.arg i)
     -- The file's two ends (`exists_regTop`, `exists_regBot`).
     (gtop gbot : dt.NexRegIx A R B)
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
@@ -484,7 +484,7 @@ theorem nexIxEvalB_regLaid_reachesIn
     (hv : WMSetLt WMLe v
       ((dt.regLaid h hord).cell gbot))
     -- The marker is a *logical* address, so the registers of the file hold it.
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -554,10 +554,10 @@ theorem nexIxEvalB_regLaid_reachesIn
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr (dt.regElt A R B)
           (stOf (Fin.last dt.nv)).mir)
-        (PfpTag.arg (toLex ((Sum.inl
+        (DrawTag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : (stOf (Fin.last dt.nv)).mir =
       ixMark (dt.regElt A R B) v)
@@ -580,10 +580,10 @@ theorem nexIxEvalB_regLaid_reachesIn
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr (dt.regElt A R B)
               (stOf (Fin.last dt.nv)).mir)
-            (PfpTag.arg (toLex ((Sum.inl
+            (DrawTag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
       (dt.ixOutCtl (elt := dt.regElt A R B)
@@ -667,16 +667,16 @@ theorem nexIxEvalB_regLaid_any_reachesIn
     -- input symbol, one further element below them does too, and nothing else
     -- does. Together these put the file directly above the working area.
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = PfpTag.arg i) → WMHasInp x)
+      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x)
     (hupinp : ∀ x y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe x y → WMHasInp x → WMHasInp y)
     {bot : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd} (hbotm : WMHasInp bot)
     (hleast : ∀ y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMHasInp y → WMLe bot y)
-    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ PfpTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ DrawTag.arg i)
     -- The file's two ends (`exists_regTop`, `exists_regBot`).
     (gtop gbot : dt.NexRegIx A R B)
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
@@ -685,7 +685,7 @@ theorem nexIxEvalB_regLaid_any_reachesIn
     (hv : WMSetLt WMLe v
       ((dt.regLaid h hord).cell gbot))
     -- The marker is a *logical* address, so the registers of the file hold it.
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -755,10 +755,10 @@ theorem nexIxEvalB_regLaid_any_reachesIn
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr (dt.regElt A R B)
           (stOf (Fin.last dt.nv)).mir)
-        (PfpTag.arg (toLex ((Sum.inl
+        (DrawTag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : (stOf (Fin.last dt.nv)).mir =
       ixMark (dt.regElt A R B) v)
@@ -781,10 +781,10 @@ theorem nexIxEvalB_regLaid_any_reachesIn
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr (dt.regElt A R B)
               (stOf (Fin.last dt.nv)).mir)
-            (PfpTag.arg (toLex ((Sum.inl
+            (DrawTag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     :
     (wideData (Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)).ReachesIn
@@ -909,23 +909,23 @@ theorem nexIxEvalB_regLaid_thread_reachesIn
     {e₀ : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
     (he₀ : ∀ y, WMLe e₀ y)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = PfpTag.arg i) → WMHasInp x)
+      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x)
     (hupinp : ∀ x y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe x y → WMHasInp x → WMHasInp y)
     {bot : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd} (hbotm : WMHasInp bot)
     (hleast : ∀ y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMHasInp y → WMLe bot y)
-    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ PfpTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ DrawTag.arg i)
     (gtop gbot : dt.NexRegIx A R B)
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
     (hbotF : ∀ u, (dt.regLaid h hord).le gbot u)
     {v v' : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v
       ((dt.regLaid h hord).cell gbot))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -973,10 +973,10 @@ theorem nexIxEvalB_regLaid_thread_reachesIn
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr (dt.regElt A R B) stL.mir)
-        (PfpTag.arg (toLex ((Sum.inl
+        (DrawTag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : stL.mir = ixMark (dt.regElt A R B) v)
     (hbotL : stL.bot = fun r => r = (fun _ => False))
@@ -994,10 +994,10 @@ theorem nexIxEvalB_regLaid_thread_reachesIn
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr (dt.regElt A R B) stL.mir)
-            (PfpTag.arg (toLex ((Sum.inl
+            (DrawTag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
       (dt.ixOutCtl (elt := dt.regElt A R B)
@@ -1082,23 +1082,23 @@ theorem nexIxEvalB_regLaid_thread_any_reachesIn
     {e₀ : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
     (he₀ : ∀ y, WMLe e₀ y)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = PfpTag.arg i) → WMHasInp x)
+      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x)
     (hupinp : ∀ x y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe x y → WMHasInp x → WMHasInp y)
     {bot : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd} (hbotm : WMHasInp bot)
     (hleast : ∀ y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMHasInp y → WMLe bot y)
-    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ PfpTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ DrawTag.arg i)
     (gtop gbot : dt.NexRegIx A R B)
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
     (hbotF : ∀ u, (dt.regLaid h hord).le gbot u)
     {v v' : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v
       ((dt.regLaid h hord).cell gbot))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -1146,10 +1146,10 @@ theorem nexIxEvalB_regLaid_thread_any_reachesIn
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr (dt.regElt A R B) stL.mir)
-        (PfpTag.arg (toLex ((Sum.inl
+        (DrawTag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : stL.mir = ixMark (dt.regElt A R B) v)
     (hbotL : stL.bot = fun r => r = (fun _ => False))
@@ -1167,10 +1167,10 @@ theorem nexIxEvalB_regLaid_thread_any_reachesIn
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr (dt.regElt A R B) stL.mir)
-            (PfpTag.arg (toLex ((Sum.inl
+            (DrawTag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     :
     (wideData (Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)).ReachesIn
@@ -1268,23 +1268,23 @@ theorem nexIxEvalOut_regLaid_realize_reachesIn
     {e₀ : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
     (he₀ : ∀ y, WMLe e₀ y)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = PfpTag.arg i) → WMHasInp x)
+      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x)
     (hupinp : ∀ x y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe x y → WMHasInp x → WMHasInp y)
     {bot : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd} (hbotm : WMHasInp bot)
     (hleast : ∀ y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMHasInp y → WMLe bot y)
-    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ PfpTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ DrawTag.arg i)
     (gtop gbot : dt.NexRegIx A R B)
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
     (hbotF : ∀ u, (dt.regLaid h hord).le gbot u)
     {v v' : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v
       ((dt.regLaid h hord).cell gbot))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -1334,7 +1334,7 @@ theorem nexIxEvalOut_regLaid_realize_reachesIn
         (x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd),
       Use u → WMLt WMLe (dt.regElt A R B u) x →
       ∃ u', Use u' ∧ dt.regElt A R B u' = x)
-    (hKin : ∀ (a : ιV) (t : PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+    (hKin : ∀ (a : ιV) (t : DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (w : Fin dt.dd → A),
       ixAddr (dt.regElt A R B) (mV a) (t, w) →
         ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
@@ -1424,23 +1424,23 @@ theorem nexIxEvalOut_regLaid_verdict_reachesIn
     {e₀ : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
     (he₀ : ∀ y, WMLe e₀ y)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = PfpTag.arg i) → WMHasInp x)
+      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x)
     (hupinp : ∀ x y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe x y → WMHasInp x → WMHasInp y)
     {bot : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd} (hbotm : WMHasInp bot)
     (hleast : ∀ y : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMHasInp y → WMLe bot y)
-    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ PfpTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ DrawTag.arg i)
     (gtop gbot : dt.NexRegIx A R B)
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
     (hbotF : ∀ u, (dt.regLaid h hord).le gbot u)
     {v v' : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v
       ((dt.regLaid h hord).cell gbot))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -1490,7 +1490,7 @@ theorem nexIxEvalOut_regLaid_verdict_reachesIn
         (x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd),
       Use u → WMLt WMLe (dt.regElt A R B u) x →
       ∃ u', Use u' ∧ dt.regElt A R B u' = x)
-    (hKin : ∀ (a : ιV) (t : PfpTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+    (hKin : ∀ (a : ιV) (t : DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (w : Fin dt.dd → A),
       ixAddr (dt.regElt A R B) (mV a) (t, w) →
         ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
@@ -1568,8 +1568,8 @@ end Thread
 
 end Eval
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

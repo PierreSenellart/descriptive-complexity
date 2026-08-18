@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.Key
-import DescriptiveComplexity.Problems.Wide.PfpRules
+import DescriptiveComplexity.Problems.Wide.DrawRules
 
 /-!
 # What a wide machine cannot do: name its own elements
@@ -16,12 +16,12 @@ one bit of the address. A file that is to be *faithful*, i.e. to tell two
 addresses apart the way a scan of it does
 (`DescriptiveComplexity.ixAddr_ixMark`), needs one register per element, and its
 registers have to be told apart by the **names** the file records at them
-(`DescriptiveComplexity.Pfp.Layout.NameSep`).
+(`DescriptiveComplexity.Draw.Layout.NameSep`).
 
 The theorem below is the counting fact that follows, and it is what forbids a
 program from *laying* such a file. A state's payload carries one element of the
 universe's base type per control flag **and** one per slot, all inside a
-`dd`-tuple – that is `DescriptiveComplexity.Pfp.Prog.payload_le` – so the
+`dd`-tuple – that is `DescriptiveComplexity.Draw.Prog.payload_le` – so the
 control's value space is `|A| ^ #flags` with `#flags < dd`, while the elements
 number `|Tag| · |A| ^ dd`. **The control cannot hold a name that separates the
 registers**, and a sweep laying a file has nowhere else to hold one: at the cell
@@ -38,7 +38,7 @@ never records an address at all.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -74,14 +74,14 @@ theorem card_ctl_lt_card_univ [Nonempty W]
   have hlt : Nat.card A ^ Nat.card Q < Nat.card A ^ dd :=
     Nat.pow_lt_pow_right hA hQW
   have huniv : Nat.card (Univ A R P K dd) =
-      Nat.card (PfpTag R P K) * Nat.card (Fin dd → A) := Nat.card_prod _ _
-  have htag : 1 ≤ Nat.card (PfpTag R P K) := by
-    have : Nonempty (PfpTag R P K) := ⟨PfpTag.sym⟩
-    exact Nat.one_le_iff_ne_zero.mpr (Nat.card_pos (α := PfpTag R P K)).ne'
+      Nat.card (DrawTag R P K) * Nat.card (Fin dd → A) := Nat.card_prod _ _
+  have htag : 1 ≤ Nat.card (DrawTag R P K) := by
+    have : Nonempty (DrawTag R P K) := ⟨DrawTag.sym⟩
+    exact Nat.one_le_iff_ne_zero.mpr (Nat.card_pos (α := DrawTag R P K)).ne'
   calc Nat.card (Q → A) = Nat.card A ^ Nat.card Q := hfun
     _ < Nat.card A ^ dd := hlt
     _ = 1 * Nat.card (Fin dd → A) := by rw [htup, one_mul]
-    _ ≤ Nat.card (PfpTag R P K) * Nat.card (Fin dd → A) :=
+    _ ≤ Nat.card (DrawTag R P K) * Nat.card (Fin dd → A) :=
         Nat.mul_le_mul_right _ htag
     _ = Nat.card (Univ A R P K dd) := huniv.symm
 
@@ -98,6 +98,6 @@ theorem not_injective_ctl_name [Nonempty W]
 
 end Counting
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

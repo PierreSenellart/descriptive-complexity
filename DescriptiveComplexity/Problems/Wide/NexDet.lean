@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpTable
+import DescriptiveComplexity.Problems.Wide.DrawTable
 import DescriptiveComplexity.Problems.Machine.DetRun
 
 /-!
@@ -17,9 +17,9 @@ is `DescriptiveComplexity.TMData.UniqueFrom` – every configuration reachable f
 a given one has at most one successor – which all the read-off lemmas of
 `DescriptiveComplexity.Problems.Machine.DetRun` are stated at.
 
-This file joins the two halves. `DescriptiveComplexity.Pfp.Table.SepOn` is the
+This file joins the two halves. `DescriptiveComplexity.Draw.Table.SepOn` is the
 program's obligation, discharged rule by rule as
-`DescriptiveComplexity.Pfp.Table.Sep` is; `hclosed` says the phases it separates
+`DescriptiveComplexity.Draw.Table.Sep` is; `hclosed` says the phases it separates
 at are never left; and the conclusion is uniqueness from any configuration whose
 state has one of those phases. Global determinism is the case `Ph = fun _ => True`,
 where `hclosed` is free.
@@ -27,7 +27,7 @@ where `hclosed` is free.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -43,7 +43,7 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 /-- **A program that separates at the phases it can reach is unique from
 there.** The invariant is "the state's phase satisfies `Ph`": a rule fired from
 such a phase lands in one again by `hclosed`, and at such a state the transition
-is pinned by `DescriptiveComplexity.Pfp.Table.tr_unique_of_sepOn`. This is what a
+is pinned by `DescriptiveComplexity.Draw.Table.tr_unique_of_sepOn`. This is what a
 *guessing* program has in place of determinism. -/
 theorem uniqueFrom_of_sepOn (hR : T.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) {Ph : P → Prop}
@@ -123,6 +123,6 @@ theorem stuck_of_srcPh (hR : T.Reads) {Ph : P → Prop}
 
 end Table
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

@@ -3,13 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpOuter
-import DescriptiveComplexity.Problems.Wide.PfpBuild
+import DescriptiveComplexity.Problems.Wide.DrawOuter
+import DescriptiveComplexity.Problems.Wide.DrawBuild
 
 /-!
 # The clocked program's outer layer
 
-The EXPSPACE program's outer loop (`DescriptiveComplexity.Pfp.OuterPh`) is an
+The EXPSPACE program's outer loop (`DescriptiveComplexity.Draw.OuterPh`) is an
 iteration: startup, then a sweep, a convergence test and a copy-back, round after
 round until the fixed point stops moving. A program on a clock cannot iterate –
 a partial fixed point may run through doubly exponentially many stages – and it
@@ -25,11 +25,11 @@ than the clock allows. What it does instead is four things once:
 
 This file is that outer layer, with the evaluation abstract – its phase type
 `PE`, its site family and its boundary rules are parameters, as in
-`DescriptiveComplexity.Pfp.outerRule` – and with the two sweeps' *writes*
+`DescriptiveComplexity.Draw.outerRule` – and with the two sweeps' *writes*
 abstract too, because what a cell of the file holds is a fact about the layout
 the caller chose and not about the shape of the loop. The runs the two sweeps
-discharge against are `DescriptiveComplexity.Pfp.Prog.reachesIn_buildFile` and
-`DescriptiveComplexity.Pfp.Prog.reachesIn_guessTracks`.
+discharge against are `DescriptiveComplexity.Draw.Prog.reachesIn_buildFile` and
+`DescriptiveComplexity.Draw.Prog.reachesIn_guessTracks`.
 
 ## Why the guess is a shape and not a guard
 
@@ -74,7 +74,7 @@ at the first.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -230,9 +230,9 @@ def NexPh.PostGuess {B PE : Type} : NexPh B PE → Prop
   | .evalP _ => True
   | _ => False
 
-namespace PfpData
+namespace DrawData
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A Q B G PE SE : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A Q B G PE SE : Type}
 variable [DecidableEq dt.SlotIx]
 variable (one : A) {ShE : SE → Type}
 
@@ -374,7 +374,7 @@ variable {bot : B} {ownE : PE → SE}
 
 /-- **Every rule fires from a phase its site owns**, given that the evaluation's
 do. This is the `howner` field of the program's
-`DescriptiveComplexity.Pfp.Assembly`. -/
+`DescriptiveComplexity.Draw.Assembly`. -/
 theorem nexOwner_nexRule
     (hownE : ∀ (e : SE) (ρ : ShE e), nexOwner ownE (ruleE e ρ).srcPh = NexSite.eval e) :
     ∀ (i : NexSite SE) (ρ : NexSh SE B G ShE i),
@@ -538,7 +538,7 @@ their own rules are `hrules` specialized and need nothing here. -/
 
 section Discharge
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' Q B PE SE G : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' Q B PE SE G : Type}
 variable [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable {ShE : SE → Type}
 variable {PR : Prog A R' (NexPh B PE) Q dt.SlotIx dt.KIx dt.dd}
@@ -670,8 +670,8 @@ theorem hasRight_homeGuessExit (f : Q → A) (g : dt.SlotIx → A)
 end Discharge
 
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

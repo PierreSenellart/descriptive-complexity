@@ -4,12 +4,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.RegChannelTape
-import DescriptiveComplexity.Problems.Wide.PfpInit
+import DescriptiveComplexity.Problems.Wide.DrawInit
 
 /-!
 # A program's run at the register channel
 
-`DescriptiveComplexity.Pfp.Prog.wideAccept_prog` turns a program's run into a
+`DescriptiveComplexity.Draw.Prog.wideAccept_prog` turns a program's run into a
 yes-instance of `DescriptiveComplexity.WideAccept`, whose channel writes for
 every element. This file is the same statement at the **register channel**,
 where a program writes for the elements it marks and the file it is handed has
@@ -24,7 +24,7 @@ region (`DescriptiveComplexity.wideRank_wmRegSeg_lt`).
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -47,7 +47,7 @@ theorem wmHasInp_iff_marked (hR : T.Reads) (x : Univ A R P K dd) :
     fun hm => ⟨symElt T.zero (T.markPl x), (hR.inp _ _).mpr ⟨hm, rfl⟩⟩⟩
 
 /-- **The emitted machine accepts on the clock at the register channel**: the
-reading of `DescriptiveComplexity.Pfp.Table.accepts` whose marks sit on the file
+reading of `DescriptiveComplexity.Draw.Table.accepts` whose marks sit on the file
 of the elements the table writes for. -/
 theorem acceptsReg (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
     (hmark : ∀ x : Univ A R P K dd, T.Marked x →
@@ -270,6 +270,6 @@ theorem wideRegAccept_prog (hR : PR.table.Reads)
 
 end Prog
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.LowFile
 import DescriptiveComplexity.Problems.Wide.Key
-import DescriptiveComplexity.Problems.Wide.PfpTable
+import DescriptiveComplexity.Problems.Wide.DrawTable
 import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
@@ -20,9 +20,9 @@ number of **tuple roll-overs** long, and the universe is `|Tag|` of those with
 
 What it can afford is one register per **block and tuple**, which is also all
 that a register's contents ever depend on: the block one-hot goes through
-`DescriptiveComplexity.Pfp.tagBlk` alone and the name slots are the tuple, so
+`DescriptiveComplexity.Draw.tagBlk` alone and the name slots are the tuple, so
 nothing of a tag beyond its block is ever read back
-(`DescriptiveComplexity.Pfp.PfpData.ixBack`). This file is that file:
+(`DescriptiveComplexity.Draw.DrawData.ixBack`). This file is that file:
 `DescriptiveComplexity.blkFile`, one register per
 `DescriptiveComplexity.Wide.BlkIx`, laid out on a stretch of consecutive
 addresses in the block-major order `DescriptiveComplexity.Wide.blkLe`.
@@ -30,7 +30,7 @@ addresses in the block-major order `DescriptiveComplexity.Wide.blkLe`.
 Everything it needs is already general – the interface
 (`DescriptiveComplexity.IxFile`), the walks over it, the construction on a
 stretch (`DescriptiveComplexity.ixSegFile`) and the background
-(`DescriptiveComplexity.Pfp.PfpData.ixBack`) – so all that is added here is the
+(`DescriptiveComplexity.Draw.DrawData.ixBack`) – so all that is added here is the
 instantiation and the two numbers a caller has to check: how many registers
 there are, and that the stretch fits.
 -/
@@ -235,7 +235,7 @@ variable [LinearOrder K] [Finite K] (dd : ℕ)
 variable (R P K) in
 /-- The blockless register and each block, as tags: the alphabet tag stands for
 the blockless one. -/
-def blkTag : Option K → Pfp.PfpTag R P K
+def blkTag : Option K → Draw.DrawTag R P K
   | none => .sym
   | some k => .arg k
 
@@ -251,7 +251,7 @@ theorem blkTag_injective : Function.Injective (blkTag R P K) := by
 variable (A R P K) in
 omit [LinearOrder A] [LinearOrder K] in
 /-- **The file has no more registers than the universe has elements.** -/
-theorem card_blkIx_le : Nat.card (Wide.BlkIx K A dd) ≤ Nat.card (Pfp.Univ A R P K dd) :=
+theorem card_blkIx_le : Nat.card (Wide.BlkIx K A dd) ≤ Nat.card (Draw.Univ A R P K dd) :=
   Nat.card_le_card_of_injective (fun p => (blkTag R P K p.1, p.2)) (by
     intro p q h
     rw [Prod.ext_iff] at h
@@ -261,12 +261,12 @@ variable (A R P K) in
 omit [LinearOrder A] [LinearOrder K] in
 /-- **A stretch based at `1` fits below the top of the tape**, so a clocked
 program can always put its file at the bottom. -/
-theorem one_add_card_blkIx_le [Language.wide.Structure (Pfp.Univ A R P K dd)] :
+theorem one_add_card_blkIx_le [Language.wide.Structure (Draw.Univ A R P K dd)] :
     1 + Nat.card (Wide.BlkIx K A dd) ≤
-      Nat.card {p : WPoint (Pfp.Univ A R P K dd) // (wideData (Pfp.Univ A R P K dd)).Posn p} := by
+      Nat.card {p : WPoint (Draw.Univ A R P K dd) // (wideData (Draw.Univ A R P K dd)).Posn p} := by
   rw [card_wideAddr]
   have h1 := card_blkIx_le A R P K dd
-  have h2 := Nat.lt_two_pow_self (n := Nat.card (Pfp.Univ A R P K dd))
+  have h2 := Nat.lt_two_pow_self (n := Nat.card (Draw.Univ A R P K dd))
   omega
 
 end Fits
@@ -275,7 +275,7 @@ section IxAddr
 
 variable {A R P K : Type} [LinearOrder A] [Finite A] [Finite R] [Finite P]
 variable [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite K] (dd : ℕ)
-variable [Language.wide.Structure (Pfp.Univ A R P K dd)]
+variable [Language.wide.Structure (Draw.Univ A R P K dd)]
 
 /-! ### The address a clocked file's marks stand for
 
@@ -284,14 +284,14 @@ and the correspondence is what lets a program hold an address it cannot see –
 the one under its head – on registers it can. It is only used on the **argument**
 registers, and the two conditions of `DescriptiveComplexity.wmIncr_ixAddr` hold
 of exactly those: the argument tags are the greatest ones
-(`DescriptiveComplexity.Pfp.lt_arg`), so nothing the file has no register for
+(`DescriptiveComplexity.Draw.lt_arg`), so nothing the file has no register for
 lies above an argument element, and the block order was chosen to make
 `DescriptiveComplexity.blkTag` monotone.
 -/
 
 variable (R P) in
 /-- **The element a register holds the bit of.** -/
-def blkIxElt (u : Wide.BlkIx K A dd) : Pfp.Univ A R P K dd := (blkTag R P K u.1, u.2)
+def blkIxElt (u : Wide.BlkIx K A dd) : Draw.Univ A R P K dd := (blkTag R P K u.1, u.2)
 
 variable (A K) in
 /-- **The registers an address uses**: the argument blocks, the blockless ones
@@ -299,16 +299,16 @@ standing for the alphabet tag and never entering a logical address. -/
 def BlkIxUse (u : Wide.BlkIx K A dd) : Prop := ∃ k : K, u.1 = some k
 
 omit [Finite R] [Finite P] [LinearOrder K] [Finite K] [LinearOrder A] [Finite A]
-  [Language.wide.Structure (Pfp.Univ A R P K dd)] [LinearOrder R] [LinearOrder P] in
+  [Language.wide.Structure (Draw.Univ A R P K dd)] [LinearOrder R] [LinearOrder P] in
 /-- **Distinct registers hold the bits of distinct elements.** -/
 theorem blkIxElt_inj {u u' : Wide.BlkIx K A dd}
     (h : blkIxElt R P dd u = blkIxElt R P dd u') : u = u' := by
   have h1 : u.1 = u'.1 := blkTag_injective R P K (congrArg Prod.fst h)
-  have h2 : u.2 = u'.2 := congrArg (fun p : Pfp.Univ A R P K dd => p.2) h
+  have h2 : u.2 = u'.2 := congrArg (fun p : Draw.Univ A R P K dd => p.2) h
   exact Prod.ext h1 h2
 
 omit [Finite R] [Finite P] [Finite A] [Finite K]
-  [Language.wide.Structure (Pfp.Univ A R P K dd)] in
+  [Language.wide.Structure (Draw.Univ A R P K dd)] in
 /-- **A block is below another exactly when its tag is**: the block order was
 built for this, the blockless registers taking the alphabet tag, which the
 argument tags all sit above. -/
@@ -317,20 +317,20 @@ theorem blkTag_lt_iff {b b' : Option K} :
   match b, b' with
   | none, none => exact ⟨fun h => absurd rfl h.2, fun h => absurd h (lt_irrefl _)⟩
   | none, some k =>
-    exact ⟨fun _ => Pfp.lt_arg (Pfp.PfpTag.sym) k (by rintro j ⟨⟩),
+    exact ⟨fun _ => Draw.lt_arg (Draw.DrawTag.sym) k (by rintro j ⟨⟩),
       fun _ => ⟨trivial, by rintro ⟨⟩⟩⟩
   | some k, none =>
     exact ⟨fun h => h.1.elim, fun h =>
-      absurd (h.trans (Pfp.lt_arg (Pfp.PfpTag.sym) k (by rintro j ⟨⟩))) (lt_irrefl _)⟩
+      absurd (h.trans (Draw.lt_arg (Draw.DrawTag.sym) k (by rintro j ⟨⟩))) (lt_irrefl _)⟩
   | some k, some k' =>
-    refine ⟨fun h => (Pfp.lt_arg_arg k k').mpr (lt_of_le_of_ne h.1 fun hc =>
-      h.2 (congrArg some hc)), fun h => ⟨le_of_lt ((Pfp.lt_arg_arg k k').mp h), ?_⟩⟩
+    refine ⟨fun h => (Draw.lt_arg_arg k k').mpr (lt_of_le_of_ne h.1 fun hc =>
+      h.2 (congrArg some hc)), fun h => ⟨le_of_lt ((Draw.lt_arg_arg k k').mp h), ?_⟩⟩
     intro hc
-    exact absurd ((Pfp.lt_arg_arg k k').mp h) (by
+    exact absurd ((Draw.lt_arg_arg k k').mp h) (by
       rw [show k = k' from Option.some.inj hc]; exact lt_irrefl _)
 
 omit [Finite R] [Finite P] [Finite A] [Finite K]
-  [Language.wide.Structure (Pfp.Univ A R P K dd)] in
+  [Language.wide.Structure (Draw.Univ A R P K dd)] in
 /-- **The register order is the element order**: the block order was built
 for it. -/
 theorem blkLe_iff_tagTupleLe (u u' : Wide.BlkIx K A dd) :
@@ -342,7 +342,7 @@ theorem blkLe_iff_tagTupleLe (u u' : Wide.BlkIx K A dd) :
 omit [Finite R] [Finite P] [Finite A] [Finite K] in
 /-- **The register order is the element order**, strictly. -/
 theorem blkIxElt_mono
-    (hord : ∀ x y : Pfp.Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
+    (hord : ∀ x y : Draw.Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
     (u u' : Wide.BlkIx K A dd) :
     WMLt (Wide.blkLe K A dd) u u' ↔ WMLt WMLe (blkIxElt R P dd u) (blkIxElt R P dd u') := by
   unfold WMLt
@@ -354,18 +354,18 @@ omit [Finite R] [Finite P] [Finite A] [Finite K] in
 tags come last, so the elements the file names are upward closed and the
 addresses over them are an initial interval of the tape. -/
 theorem blkIxElt_up
-    (hord : ∀ x y : Pfp.Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
-    {u : Wide.BlkIx K A dd} (hu : BlkIxUse A K dd u) {x : Pfp.Univ A R P K dd}
+    (hord : ∀ x y : Draw.Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
+    {u : Wide.BlkIx K A dd} (hu : BlkIxUse A K dd u) {x : Draw.Univ A R P K dd}
     (hlt : WMLt WMLe (blkIxElt R P dd u) x) :
     ∃ u' : Wide.BlkIx K A dd, BlkIxUse A K dd u' ∧ blkIxElt R P dd u' = x := by
   obtain ⟨k, hk⟩ := hu
   have hle : tagTupleLe (blkIxElt R P dd u) x := (hord _ _).mp hlt.1
-  have hfst : (blkIxElt R P dd u).1 = Pfp.PfpTag.arg k := by
+  have hfst : (blkIxElt R P dd u).1 = Draw.DrawTag.arg k := by
     change blkTag R P K u.1 = _; rw [hk]; rfl
-  have harg : ∃ k' : K, x.1 = Pfp.PfpTag.arg k' := by
+  have harg : ∃ k' : K, x.1 = Draw.DrawTag.arg k' := by
     by_contra hc
     push Not at hc
-    have hlt' : x.1 < Pfp.PfpTag.arg k := Pfp.lt_arg x.1 k hc
+    have hlt' : x.1 < Draw.DrawTag.arg k := Draw.lt_arg x.1 k hc
     rcases hle with hb | ⟨hb, -⟩
     · rw [hfst] at hb
       exact absurd (hb.trans hlt') (lt_irrefl _)

@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.RegChannelEntry
 /-!
 # The handed program, with room on its clock
 
-`DescriptiveComplexity.Pfp.PfpData.nexProgHanded` is the program a reduction
+`DescriptiveComplexity.Draw.DrawData.nexProgHanded` is the program a reduction
 into `DescriptiveComplexity.WideRegAccept` emits, and its clock is `2 ^ |Tag|`
 at its own rule names. The clock's one remaining obligation
 (`clock_count_of_tags`) is that those names outnumber a constant of the kernel –
@@ -25,9 +25,9 @@ clock is measured against is unchanged and the count goes up by `n`.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
@@ -35,7 +35,7 @@ open Language Structure
 
 section PadProg
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A G : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A G : Type}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable (zero one : A)
@@ -44,7 +44,7 @@ variable (G) in
 /-- **The rule names of the padded program**: the clocked program's sites, and
 `n` more carrying a rule that never fires. -/
 abbrev NexRIxPad (n : ℕ) : Type :=
-  PfpData.RTagOf (NexSite dt.SEF ⊕ Fin n)
+  DrawData.RTagOf (NexSite dt.SEF ⊕ Fin n)
     (padSh (NexSh dt.SEF (Option dt.KIx) G dt.NexSESh) n)
 
 variable (G) in
@@ -90,7 +90,7 @@ noncomputable def nexProgHandedPad (hzo : zero ≠ one)
   accept := fun p f => p = .acceptP ∧ (args none).accBit f
   blank := fun _ => zero
   mark := regSlotMark zero one dt.dd0Le
-  marked := fun x => (∃ k : dt.KIx, x.1 = PfpTag.arg k) ∨ IsTopNonArg x
+  marked := fun x => (∃ k : dt.KIx, x.1 = DrawTag.arg k) ∨ IsTopNonArg x
 
 variable {dt zero one}
 
@@ -112,7 +112,7 @@ junk rule names. -/
 
 section Interp
 
-variable {L : Language.{0, 0}} {dt : PfpData L}
+variable {L : Language.{0, 0}} {dt : DrawData L}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [Finite dt.KIx] [Nonempty dt.KIx]
 variable [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
@@ -151,7 +151,7 @@ noncomputable def nexInterpHandedPad
       (dt.ITagOf (NexSite dt.SEF ⊕ Fin n)
         (padSh (NexSh dt.SEF (Option dt.KIx) (dt.d.B.ι → Bool) dt.NexSESh) n)
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))) dt.dd :=
-  dt.pfpInterp hpl
+  dt.drawInterp hpl
     (uRulesDefinable_padRules (uRulesDefinable_nexProgHanded (bot := bot) h)
       NexPh.approachP n)
     (uGDefinable_nexAccept (h none)) NexPh.start (regFileMarkArg hpl)
@@ -183,7 +183,7 @@ theorem reads_nexProgHandedPad
 
 section Unique
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A G : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A G : Type}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
@@ -241,7 +241,7 @@ variable {bot : Option dt.KIx}
 
 section Facts
 
-variable {L : Language.{0, 0}} [L.IsRelational] {dt : PfpData L} {A R' : Type}
+variable {L : Language.{0, 0}} [L.IsRelational] {dt : DrawData L} {A R' : Type}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] [L.Structure A]
 variable [LinearOrder A] [Finite A] [Nonempty A] [Nonempty dt.KIx] [Finite dt.KIx]
 variable [LinearOrder R'] [Finite R']
@@ -297,12 +297,12 @@ gets them by the same statement. -/
 theorem regFacts_of_marked
     (hR : PR.table.Reads)
     (hmk : ∀ x : Univ A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
-      dt.KIx dt.dd, PR.marked x ↔ ((∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x)) :
+      dt.KIx dt.dd, PR.marked x ↔ ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)) :
     (∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-        WMHasInp ((PfpTag.arg (toLex b), padTup (dt := dt) zero c) :
+        WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
           Univ A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)) ∧
       (∀ z : Univ A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-        (∃ i : dt.KIx, z.1 = PfpTag.arg i) → WMHasInp z) ∧
+        (∃ i : dt.KIx, z.1 = DrawTag.arg i) → WMHasInp z) ∧
       (∀ z w : Univ A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
         dt.KIx dt.dd, WMLe z w → WMHasInp z → WMHasInp w) ∧
       ∃ botE : Univ A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
@@ -310,7 +310,7 @@ theorem regFacts_of_marked
         WMHasInp botE ∧
           (∀ z : Univ A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
             dt.KIx dt.dd, WMHasInp z → WMLe botE z) ∧
-          (∀ i : dt.KIx, botE.1 ≠ PfpTag.arg i) := by
+          (∀ i : dt.KIx, botE.1 ≠ DrawTag.arg i) := by
   refine ⟨fun b c => hasInp_blkElt hR hmk zero b c,
     fun z hz => hasInp_of_arg hR hmk hz,
     fun z w hzw hz => hasInp_up hR hmk hR.le z w hzw hz, ?_⟩
@@ -360,7 +360,7 @@ structure NexEmitted (bot : Option dt.KIx) where
   /-- The mark the channel writes. -/
   mark : ∀ x, PR.mark x = regSlotMark PR.zero PR.one dt.dd0Le x
   /-- And who it writes for: the argument elements and the one below them. -/
-  marked : ∀ x, PR.marked x ↔ ((∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x)
+  marked : ∀ x, PR.marked x ↔ ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)
   /-- The tape is blank where the channel wrote nothing. -/
   blank : ∀ s, PR.blank s = PR.zero
   /-- The machine starts in the start phase … -/
@@ -552,7 +552,7 @@ theorem reachesIn_openingReg (_hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ d
           (NexPh.homeGuessP (B := Option dt.KIx)
             (PE := EvalPh dt.nv dt.PMF))).rule PR.one ρ)
     (hmark : ∀ x, PR.mark x = regSlotMark PR.zero PR.one dt.dd0Le x)
-    (hmk : ∀ x, PR.marked x ↔ ((∃ k, x.1 = PfpTag.arg k) ∨ IsTopNonArg x))
+    (hmk : ∀ x, PR.marked x ↔ ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x))
     (hblank : ∀ s, PR.blank s = PR.zero)
     (hstartPh : PR.startPh = NexPh.start) (hstartSt : PR.startSt = fun _ => PR.zero)
     (hR : PR.table.Reads)
@@ -565,7 +565,7 @@ theorem reachesIn_openingReg (_hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ d
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hvreg : ∀ z : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      ((∃ k, z.1 = PfpTag.arg k) ∨ IsTopNonArg z) → v ≠ wmRegSeg z)
+      ((∃ k, z.1 = DrawTag.arg k) ∨ IsTopNonArg z) → v ≠ wmRegSeg z)
     (hvi₁ : WMIncr WMLe v v₁) (hwalk : WMSetLe WMLe v₁ x) (hxy : WMIncr WMLe x y)
     (hyy' : WMIncr WMLe y y') (hyv : WMSetLe WMLe v y)
     (hvs₀ : WMIncr WMLe v s₀) (hle : WMSetLe WMLe s₀ s₁) (hne₁ : ∃ z, s₁ z)
@@ -636,8 +636,8 @@ end Interp
 
 end PadProg
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpPack
+import DescriptiveComplexity.Problems.Wide.DrawPack
 import DescriptiveComplexity.Exponential.Kernel
 
 /-!
@@ -12,7 +12,7 @@ import DescriptiveComplexity.Exponential.Kernel
 The source side of the NEXPTIME reduction, in the record the machine layer is
 already written against. A `DescriptiveComplexity.NexKernel` is an expansion, a
 block of relation variables to guess and a first-order sentence to check of the
-guess; a `DescriptiveComplexity.Pfp.PfpData` is an expansion, a
+guess; a `DescriptiveComplexity.Draw.DrawData` is an expansion, a
 `DescriptiveComplexity.StepDef` – a block, a step formula per variable, an
 output sentence – and the packs and layout the program computes with.
 
@@ -20,16 +20,16 @@ output sentence – and the packs and layout the program computes with.
 block where the fixed-point variables go and the kernel where the output
 sentence goes, and the two records are the same record: the tracks a symbol
 carries are indexed by the block either way, the atoms of the sentence classify
-by `DescriptiveComplexity.Pfp.MatAtom` – which reads a *block*, not an
-iteration – and `DescriptiveComplexity.Pfp.StepDef.out_iff_gateMat` is already
+by `DescriptiveComplexity.Draw.MatAtom` – which reads a *block*, not an
+iteration – and `DescriptiveComplexity.Draw.StepDef.out_iff_gateMat` is already
 what the output evaluation of a fixed-point program computes. So the whole
-address, control and evaluation layer above `PfpData` serves a nondeterministic
+address, control and evaluation layer above `DrawData` serves a nondeterministic
 program with nothing added, and what is new is the program alone: it guesses the
 tracks the iteration would have written, then runs the output evaluation once.
 
 The step formulas of a packed kernel are `⊥`, and the only trace they leave is
 in the *sizes*: the derived dimensions of
-`DescriptiveComplexity.Pfp.PfpData` are maxima over the variables, so each of
+`DescriptiveComplexity.Draw.DrawData` are maxima over the variables, so each of
 them is the kernel's own value or the (vacuous) demand of an unread step,
 whichever is larger. A larger inventory costs a wider control and nothing else.
 -/
@@ -55,32 +55,32 @@ theorem NexKernel.toStepDef_B (K : NexKernel L) : K.toStepDef.B = K.B := rfl
 @[simp]
 theorem NexKernel.toStepDef_out (K : NexKernel L) : K.toStepDef.out = K.ker := rfl
 
-namespace Pfp
+namespace Draw
 
-/-- **A kernel packed into a `DescriptiveComplexity.Pfp.PfpData`**: the same
-packing as a source's (`DescriptiveComplexity.Pfp.PfpData.ofSource`), at the
+/-- **A kernel packed into a `DescriptiveComplexity.Draw.DrawData`**: the same
+packing as a source's (`DescriptiveComplexity.Draw.DrawData.ofSource`), at the
 step definition the kernel is. -/
-noncomputable def PfpData.ofKernel (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
-    PfpData L :=
-  PfpData.ofSource K.X K.toStepDef hdd
+noncomputable def DrawData.ofKernel (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
+    DrawData L :=
+  DrawData.ofSource K.X K.toStepDef hdd
 
 @[simp]
-theorem PfpData.ofKernel_X (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
-    (PfpData.ofKernel K hdd).X = K.X := rfl
+theorem DrawData.ofKernel_X (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
+    (DrawData.ofKernel K hdd).X = K.X := rfl
 
 @[simp]
-theorem PfpData.ofKernel_d (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
-    (PfpData.ofKernel K hdd).d = K.toStepDef := rfl
+theorem DrawData.ofKernel_d (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
+    (DrawData.ofKernel K hdd).d = K.toStepDef := rfl
 
 @[simp]
-theorem PfpData.ofKernel_dd (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
-    (PfpData.ofKernel K hdd).dd = dd := rfl
+theorem DrawData.ofKernel_dd (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
+    (DrawData.ofKernel K hdd).dd = dd := rfl
 
 /-- The packed kernel's block index is nonempty, as a packed source's is: the
 output pack was padded by one level. -/
-theorem PfpData.ki_pos_ofKernel (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
-    0 < (PfpData.ofKernel K hdd).ki :=
-  PfpData.ki_pos K.X K.toStepDef hdd
+theorem DrawData.ki_pos_ofKernel (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
+    0 < (DrawData.ofKernel K hdd).ki :=
+  DrawData.ki_pos K.X K.toStepDef hdd
 
 /-! ### What a nondeterministic program has to decide
 
@@ -89,12 +89,12 @@ the guess of an assignment of the block for which the **gated alternating
 prefix** of the output sentence's matrix holds. A fixed-point program computes
 one such prefix per stage and one for its output; a nondeterministic one
 computes only the second, over tracks it guessed rather than iterated, so the
-statement below is `DescriptiveComplexity.Pfp.StepDef.out_iff_gateMat` under an
+statement below is `DescriptiveComplexity.Draw.StepDef.out_iff_gateMat` under an
 existential and nothing else. -/
 
 section Eval
 
-variable (dt : PfpData L)
+variable (dt : DrawData L)
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 variable {zero one : A} [LinearOrder (dt.X.Map A)]
 
@@ -102,7 +102,7 @@ variable {zero one : A} [LinearOrder (dt.X.Map A)]
 the block satisfies it exactly when some assignment passes the gated prefix of
 its matrix. This is the last statement of the source side that mentions no
 machine. -/
-theorem PfpData.exists_out_iff_gateMat (hne : zero ≠ one)
+theorem DrawData.exists_out_iff_gateMat (hne : zero ≠ one)
     (V : Fin dt.pkOut.n → ((Fin dt.dd → A) → Prop)) :
     (∃ σ : dt.d.B.Assignment (dt.X.Map A),
         @Sentence.Realize _ (dt.X.Map A) (dt.d.B.structure₁ σ) dt.d.out) ↔
@@ -121,7 +121,7 @@ the same proposition: `DescriptiveComplexity.NexKernel.Holds` names the expanded
 structure by `DescriptiveComplexity.SOBlock.structure`, and a packed record's
 output evaluation names it by `DescriptiveComplexity.SOBlock.structure₁`, which
 is that structure summed with the base's. This is what carries the source side
-across `DescriptiveComplexity.Pfp.PfpData.exists_out_iff_gateMat`. -/
+across `DescriptiveComplexity.Draw.DrawData.exists_out_iff_gateMat`. -/
 theorem NexKernel.holds_iff_structure₁ (K : NexKernel L) {M : Type}
     [K.X.E.Structure M] [LinearOrder M] :
     K.Holds M ↔ ∃ σ : K.B.Assignment M,
@@ -130,6 +130,6 @@ theorem NexKernel.holds_iff_structure₁ (K : NexKernel L) {M : Type}
           (sumOrderStructure K.X.E M) σ) K.ker :=
   Iff.rfl
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

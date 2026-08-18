@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.RegChannelEnum
 The opening of a handed program leaves the marker, walks up to the file, steps
 onto its first register, turns, comes home, guesses, and enters the evaluation.
 What it asks of the instance is four addresses and five order facts
-(`DescriptiveComplexity.Pfp.PfpData.reachesIn_openingHanded`), and at this
+(`DescriptiveComplexity.Draw.DrawData.reachesIn_openingHanded`), and at this
 channel they are all forced:
 
 * the marker is the **empty address**, and the walk's first step is its
@@ -27,9 +27,9 @@ So the whole geometry follows from the marking, and this file derives it.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
-namespace PfpData
+namespace DrawData
 
 open FirstOrder
 
@@ -37,7 +37,7 @@ open Language Structure
 
 section Walk
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
@@ -96,8 +96,8 @@ theorem exists_openingWalkReg {botE : Univ A R' P' dt.KIx dt.dd}
 
 end Walk
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

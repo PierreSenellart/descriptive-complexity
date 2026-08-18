@@ -25,13 +25,13 @@ The transport is unchanged because it never reads which problem is being asked
 about (`wideRegProblem_wideRegInterp_iff` is `wideProblem_wideInterp_iff` at the
 other interpretation), so this half of the reduction is free. What is not free
 is the machine's correctness, which is the run of
-`DescriptiveComplexity.Pfp.PfpData.wideRegAccept_regLaid_of_rules` on the
-yes-side and `DescriptiveComplexity.Problems.Wide.PfpNo` on the no-side.
+`DescriptiveComplexity.Draw.DrawData.wideRegAccept_regLaid_of_rules` on the
+yes-side and `DescriptiveComplexity.Problems.Wide.DrawNo` on the no-side.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -45,7 +45,7 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 variable (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
 
 /-- **The handed machine of a source, written down over the doubled universe**:
-`DescriptiveComplexity.Pfp.dblWideInterp` with the clocked program that is
+`DescriptiveComplexity.Draw.dblWideInterp` with the clocked program that is
 handed its file, and the channel that writes for the argument elements and the
 element below them. The program carries `n` junk rule names, which is what buys
 its clock the room the count asks for (`PadRules.lean`); at `n = 0` it is the
@@ -57,7 +57,7 @@ noncomputable def dblWideRegInterp (n : ℕ) :
       (G := (srcDt X d).d.B.ι → Bool) n) := finiteLinearOrder _
   letI : LinearOrder (srcDt X d).NexPF := finiteLinearOrder _
   (srcDt X d).nexInterpHandedPad (srcData_payload_le (relExp X) d)
-    (fun v => PfpData.uVarArgsDef_varArgsOf (dt := srcDt X d)
+    (fun v => DrawData.uVarArgsDef_varArgsOf (dt := srcDt X d)
       (boolEnv (newLang L)) v) none n
 
 /-- **The handed machine of a source, written down in the instance**: the
@@ -129,7 +129,7 @@ theorem srcRegReads (n : ℕ) :
         (srcDt X d).NexPF (srcDt X d).KIx (srcDt X d).dd) :=
     (dblWideRegInterp X d n).mapStructure e.α
   (srcDt X d).reads_nexProgHandedPad (srcData_payload_le (relExp X) d)
-    (fun v => PfpData.uVarArgsDef_varArgsOf (dt := srcDt X d)
+    (fun v => DrawData.uVarArgsDef_varArgsOf (dt := srcDt X d)
       (boolEnv (newLang L)) v) none n e rfl
 
 end RegReads
@@ -189,10 +189,10 @@ theorem wideRegAccept_srcEnv_iff (n : ℕ) :
   letI : LinearOrder ((srcDt X d).NexRIx (G := (srcDt X d).d.B.ι → Bool)) :=
     finiteLinearOrder _
   have hR := srcRegReads X d (srcEnv L A) n
-  have hE := PfpData.nexEmitted_nexProgHandedPad (dt := srcDt X d) (n := n)
+  have hE := DrawData.nexEmitted_nexProgHandedPad (dt := srcDt X d) (n := n)
     (srcEnv L A).hzo (srcData_payload_le (relExp X) d) none
   obtain ⟨harg, -, -, -⟩ :=
-    PfpData.regFacts_of_marked (zero := (srcEnv L A).zero) hR hE.marked
+    DrawData.regFacts_of_marked (zero := (srcEnv L A).zero) hR hE.marked
   exact (srcDt X d).wideRegAccept_iff_exists_out_of_tags
     (srcData_payload_le (relExp X) d) hE hR
     (srcData_dd0_lt (relExp X) d) hdd0 harity (fun _ _ => Iff.rfl) harg
@@ -280,7 +280,7 @@ theorem wideRegAccept_wideRegInterp_iff (n : ℕ) {Q₀ : DecisionProblem X.E}
 
 end Correct
 
-end Pfp
+end Draw
 
 open FirstOrder
 
@@ -307,35 +307,35 @@ theorem ExpDefinable.ordered_fo_reduction_wideRegAccept {Q : DecisionProblem L}
   obtain ⟨B, φ, hker⟩ := exists_orderedKernel (P := Q₀) hQ
   classical
   set K : NexKernel L := (⟨X, B, φ⟩ : NexKernel L).withArg with hK
-  set dt := Pfp.srcDt K.X K.toStepDef with hdt
+  set dt := Draw.srcDt K.X K.toStepDef with hdt
   set n : ℕ := 52 * (4 + dt.eDim) * Nat.card dt.KIx + 52 * (4 + dt.eDim) +
     52 * (15 + dt.dimC) + 2 with hn
   refine ⟨{ Tag := (dt.NexITagPad (dt.d.B.ι → Bool) n) × (Fin dt.dd → Bool)
-            tagNonempty := ⟨(Pfp.PfpTag.sym, fun _ => false)⟩
+            tagNonempty := ⟨(Draw.DrawTag.sym, fun _ => false)⟩
             dim := dt.dd * 1
-            toInterpretation := Pfp.wideRegInterp K.X K.toStepDef n
+            toInterpretation := Draw.wideRegInterp K.X K.toStepDef n
             correct := fun A _ _ _ _ => ?_ }⟩
-  haveI : Finite ((Pfp.dblInterp L).Map A) := (Pfp.dblInterp L).map_finite A
-  haveI : Nonempty ((Pfp.dblInterp L).Map A) := (Pfp.dblInterp L).map_nonempty A
-  letI : LinearOrder ((Pfp.relExp K.X).Map ((Pfp.dblInterp L).Map A)) :=
-    Pfp.encOrder dt.ly (Pfp.srcEnv L A).zero (Pfp.srcEnv L A).one
-      (Pfp.srcEnv L A).hzo
-  letI : LinearOrder ((Pfp.relExp X).Map ((Pfp.dblInterp L).Map A)) :=
-    Pfp.encOrder dt.ly (Pfp.srcEnv L A).zero (Pfp.srcEnv L A).one
-      (Pfp.srcEnv L A).hzo
-  letI : X.E.Structure ((Pfp.relExp X).Map ((Pfp.dblInterp L).Map A)) :=
-    ExpExpansion.mapStructure (Pfp.relExp X) ((Pfp.dblInterp L).Map A)
-  letI : X.E.Structure ((Pfp.relExp K.X).Map ((Pfp.dblInterp L).Map A)) :=
-    ExpExpansion.mapStructure (Pfp.relExp X) ((Pfp.dblInterp L).Map A)
-  refine (hspec A).trans (Pfp.wideRegAccept_wideRegInterp_iff K.X _ A n ?_).symm
+  haveI : Finite ((Draw.dblInterp L).Map A) := (Draw.dblInterp L).map_finite A
+  haveI : Nonempty ((Draw.dblInterp L).Map A) := (Draw.dblInterp L).map_nonempty A
+  letI : LinearOrder ((Draw.relExp K.X).Map ((Draw.dblInterp L).Map A)) :=
+    Draw.encOrder dt.ly (Draw.srcEnv L A).zero (Draw.srcEnv L A).one
+      (Draw.srcEnv L A).hzo
+  letI : LinearOrder ((Draw.relExp X).Map ((Draw.dblInterp L).Map A)) :=
+    Draw.encOrder dt.ly (Draw.srcEnv L A).zero (Draw.srcEnv L A).one
+      (Draw.srcEnv L A).hzo
+  letI : X.E.Structure ((Draw.relExp X).Map ((Draw.dblInterp L).Map A)) :=
+    ExpExpansion.mapStructure (Draw.relExp X) ((Draw.dblInterp L).Map A)
+  letI : X.E.Structure ((Draw.relExp K.X).Map ((Draw.dblInterp L).Map A)) :=
+    ExpExpansion.mapStructure (Draw.relExp X) ((Draw.dblInterp L).Map A)
+  refine (hspec A).trans (Draw.wideRegAccept_wideRegInterp_iff K.X _ A n ?_).symm
   -- the machine's correctness at this kernel: every variable has an argument,
   -- and the padded rule names outnumber what the clock is measured against
-  refine (Pfp.wideRegAccept_kernel_iff A K n
+  refine (Draw.wideRegAccept_kernel_iff A K n
     (fun iv => (⟨X, B, φ⟩ : NexKernel L).withArg_arity_pos iv) ?_).trans ?_
-  · rw [hn, Pfp.PfpData.card_nexRIxPad]
+  · rw [hn, Draw.DrawData.card_nexRIxPad]
     exact Nat.le_add_left _ _
   · exact (NexKernel.withArg_holds (⟨X, B, φ⟩ : NexKernel L)).trans
-      (hker ((Pfp.relExp X).Map ((Pfp.dblInterp L).Map A))).symm
+      (hker ((Draw.relExp X).Map ((Draw.dblInterp L).Map A))).symm
 
 /-- **Acceptance on a clock at the register channel is NEXPTIME-hard.** -/
 theorem wideRegAccept_NEXPTIME_hard : NEXPTIME.Hard WideRegAccept := by

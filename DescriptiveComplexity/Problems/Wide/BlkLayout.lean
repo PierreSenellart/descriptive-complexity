@@ -4,14 +4,14 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.BlkFile
-import DescriptiveComplexity.Problems.Wide.PfpName
+import DescriptiveComplexity.Problems.Wide.DrawName
 
 /-!
 # The layout of a clocked program's file
 
 `DescriptiveComplexity.blkFile` gives a program one register per block and
-tuple. This file reads that as a `DescriptiveComplexity.Pfp.LaidFile`, which is
-what the background (`DescriptiveComplexity.Pfp.PfpData.ixBack`) and the loops
+tuple. This file reads that as a `DescriptiveComplexity.Draw.LaidFile`, which is
+what the background (`DescriptiveComplexity.Draw.DrawData.ixBack`) and the loops
 run against, and checks the two properties a navigation *by name* asks of a
 layout.
 
@@ -27,20 +27,20 @@ padding pins – exactly the ones inside it.
 
 The two properties are then:
 
-* `DescriptiveComplexity.Pfp.Layout.NameSep` – a block and the named
+* `DescriptiveComplexity.Draw.Layout.NameSep` – a block and the named
   coordinates spell at most one register: the index *is* the pair, the
   coordinates below `dd₀` are the name's, and those above are `zero` on both
   sides because a scan by name asks its registers to be canonically padded.
-* `DescriptiveComplexity.Pfp.Layout.HasName` – and at least one, for every
+* `DescriptiveComplexity.Draw.Layout.HasName` – and at least one, for every
   block and every name, the register being the name padded.
 
 Together they are the stopping condition of a scan by name
-(`DescriptiveComplexity.Pfp.PfpData.nameGF_unique_addr`).
+(`DescriptiveComplexity.Draw.DrawData.nameGF_unique_addr`).
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -48,13 +48,13 @@ open Language Structure
 
 section BlkLayout
 
-variable {L : Language.{0, 0}} (dt : PfpData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite (Univ A R' P' dt.KIx dt.dd)]
 
-namespace PfpData
+namespace DrawData
 
 /-- **The file a clocked program lays out, with its layout**: the registers of
 `DescriptiveComplexity.blkFile`, in the block-major order, each naming its own
@@ -166,7 +166,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite A] [Finite R']
 element is the element of the register that names it, and that register is one
 of the used ones. This is the `hvh` the legs ask for. -/
 theorem ixHolds_blkLaid {s : Univ A R' P' dt.KIx dt.dd → Prop}
-    (harg : ∀ x, s x → ∃ i : dt.KIx, x.1 = PfpTag.arg i) :
+    (harg : ∀ x, s x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) :
     IxHolds (blkIxElt R' P' dt.dd) (BlkIxUse A dt.KIx dt.dd) s := by
   intro x hx
   obtain ⟨i, hi⟩ := harg x hx
@@ -387,7 +387,7 @@ omit [Nonempty A] in
 /-- **`hwork` in the form the legs ask for it**: an address every element of
 which is *argument*-tagged – a logical address, which is what the stage atom
 proves of the TARGET it builds – lies below every register. The two steps are
-`DescriptiveComplexity.Pfp.wmSetLe_logicalTop` (a logical address is at or below
+`DescriptiveComplexity.Draw.wmSetLe_logicalTop` (a logical address is at or below
 the last one) and `work_blkLaid` (and the last one is below the file, the base
 having been put above it). -/
 theorem workArg_blkLaid
@@ -395,11 +395,11 @@ theorem workArg_blkLaid
     (hlog : wideRank (logicalTop (R := R') (P := P') (K := dt.KIx)
       (V := Fin dt.dd → A)) < base)
     {r : Univ A R' P' dt.KIx dt.dd → Prop}
-    (harg : ∀ x, r x → ∃ i : dt.KIx, x.1 = PfpTag.arg i)
+    (harg : ∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
     (u : Wide.BlkIx dt.KIx A dt.dd) :
     WMSetLt WMLe r ((dt.blkLaid h hpos hbase).cell u) := by
   have hrel : (WMLe : Univ A R' P' dt.KIx dt.dd → Univ A R' P' dt.KIx dt.dd → Prop) =
-      lexRel (· ≤ · : PfpTag R' P' dt.KIx → PfpTag R' P' dt.KIx → Prop)
+      lexRel (· ≤ · : DrawTag R' P' dt.KIx → DrawTag R' P' dt.KIx → Prop)
         (tupLeLex (A := A) (d := dt.dd)) :=
     funext fun x => funext fun y => propext
       ((hord x y).trans (Wide.tagTupleLe_iff_lexRel x y))
@@ -411,10 +411,10 @@ theorem workArg_blkLaid
 
 end Widths
 
-end PfpData
+end DrawData
 
 end BlkLayout
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

@@ -3,10 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpDefAsm
-import DescriptiveComplexity.Problems.Wide.PfpDefLoop
-import DescriptiveComplexity.Problems.Wide.PfpCtl
-import DescriptiveComplexity.Problems.Wide.PfpOrd
+import DescriptiveComplexity.Problems.Wide.DrawDefAsm
+import DescriptiveComplexity.Problems.Wide.DrawDefLoop
+import DescriptiveComplexity.Problems.Wide.DrawCtl
+import DescriptiveComplexity.Problems.Wide.DrawOrd
 import DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!
@@ -14,12 +14,12 @@ import DescriptiveComplexity.Problems.Wide.NexEval
 
 A reduction has to *write its machine down*: the emitted table must be read off
 the interpreted structure, which is what
-`DescriptiveComplexity.Pfp.PfpData.reads_progFrom` asks, and what it asks of the
+`DescriptiveComplexity.Draw.DrawData.reads_progFrom` asks, and what it asks of the
 rules is that each of them be first-order definable in the sense of
-`DescriptiveComplexity.Pfp.URulesDefinable`.
+`DescriptiveComplexity.Draw.URulesDefinable`.
 
 The clocked program shares its whole tower with the space-bounded one, so the
-tower's definability (`DescriptiveComplexity.Pfp.PfpData.uRulesDefinable_varRuleF`)
+tower's definability (`DescriptiveComplexity.Draw.DrawData.uRulesDefinable_varRuleF`)
 serves unchanged; what is new is the **spine**, whose checkpoints have two rules
 instead of three, and the **outer layer**, whose sweeps are specifications
 rather than kits. Both are here, and so are the program's own two
@@ -30,7 +30,7 @@ space-bounded one already meets.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -279,9 +279,9 @@ theorem eq_tupTop_iff [Nonempty A] {one : A} (htop : ∀ a : A, a ≤ one)
 
 end Advance
 
-namespace PfpData
+namespace DrawData
 
-variable {L : Language.{0, 0}} {dt : PfpData L} {Q : Type} [Fintype Q]
+variable {L : Language.{0, 0}} {dt : DrawData L} {Q : Type} [Fintype Q]
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 
 /-! ### The clocked spine -/
@@ -350,7 +350,7 @@ theorem uRulesDefinable_nexEvalRuleF {B : Type}
 
 /-! ### The file-laying sweep's own definability
 
-What `USweepSpecDef` asks of `DescriptiveComplexity.Pfp.PfpData.buildSpec`, one
+What `USweepSpecDef` asks of `DescriptiveComplexity.Draw.DrawData.buildSpec`, one
 field at a time. The two tests are questions about the pointer's coordinates –
 each is the greatest element, or the pointer is at the last register – and the
 `st0` reset writes the least element into them. -/
@@ -480,7 +480,7 @@ omit [DecidableEq dt.SlotIx] in
 /-- **The pointer's next tuple is definable, coordinate by coordinate**: which
 coordinate rolls over is a question about *which coordinates are maximal*, and
 the value at it is the order's own successor. This is
-`DescriptiveComplexity.Pfp.PfpData.uSlotDefinable_tupNext_lvC` at the sweep's
+`DescriptiveComplexity.Draw.DrawData.uSlotDefinable_tupNext_lvC` at the sweep's
 own coordinates. -/
 theorem uSlotDefinable_tupNext_coord (coord : Fin dt.dd → dt.CtlIx) (j : Fin dt.dd) :
     USlotDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
@@ -808,7 +808,7 @@ theorem uRulesDefinable_nexProgRule {B G : Type}
 /-- **The clocked program's own rule set is definable**: the two sweeps it
 actually runs, the tower it shares with the space-bounded program, and the outer
 layer around them. This is what a reduction emitting the clocked machine has to
-hand `DescriptiveComplexity.Pfp.PfpData.reads_progFrom`; what is left to it is
+hand `DescriptiveComplexity.Draw.DrawData.reads_progFrom`; what is left to it is
 its own `VarArgs`, which is the same obligation the space-bounded reduction
 already meets. -/
 theorem uRulesDefinable_nexProg [Nonempty dt.KIx]
@@ -827,7 +827,7 @@ theorem uRulesDefinable_nexProg [Nonempty dt.KIx]
 and needs no coordinate map**: the sweep that would have laid the file is
 `nullSpec`, whose definability is free, so nothing in the program asks for an
 injective `Fin dd → CtlIx` – which is the map no wide machine's control can hold
-(`DescriptiveComplexity.Pfp.card_ctl_lt_card_univ`). This is the rule set a
+(`DescriptiveComplexity.Draw.card_ctl_lt_card_univ`). This is the rule set a
 reduction into `DescriptiveComplexity.WideRegAccept` emits. -/
 theorem uRulesDefinable_nexProgHanded
     {args : ∀ (e : Env L) (v : dt.VarIx),
@@ -853,8 +853,8 @@ theorem uGDefinable_nexAccept {B PE : Type}
       p = NexPh.acceptP ∧ (args e none).accBit f :=
   (uGDefinable_const (p = NexPh.acceptP)).and h.accBit
 
-end PfpData
+end DrawData
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

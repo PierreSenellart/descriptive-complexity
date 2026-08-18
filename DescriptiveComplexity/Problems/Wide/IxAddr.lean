@@ -31,7 +31,7 @@ that it carries the order, under three conditions:
   between that the file could not have represented.
 
 For a clocked program's file all three hold of the argument registers, because
-the argument tags are the *last* ones (`DescriptiveComplexity.Pfp.lt_arg`) and
+the argument tags are the *last* ones (`DescriptiveComplexity.Draw.lt_arg`) and
 therefore the least significant: the addresses over them are the logical ones.
 -/
 

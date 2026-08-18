@@ -41,22 +41,22 @@ variable {A : Type} [LinearOrder A] {d dd : ℕ} {zero : A}
 omit [LinearOrder A] in
 /-- **A padded tuple at an encoded coordinate is that coordinate.** -/
 theorem pad_apply (hle : d ≤ dd) (w : Fin d → A) (i : Fin d) :
-    Pfp.pad (dd := dd) zero w ⟨(i : ℕ), lt_of_lt_of_le i.isLt hle⟩ = w i := by
-  have h := Pfp.pad_of_lt (c := d) (zero := zero) (w := w)
+    Draw.pad (dd := dd) zero w ⟨(i : ℕ), lt_of_lt_of_le i.isLt hle⟩ = w i := by
+  have h := Draw.pad_of_lt (c := d) (zero := zero) (w := w)
     (⟨(i : ℕ), lt_of_lt_of_le i.isLt hle⟩ : Fin dd) i.isLt
   rw [h]
 
 omit [LinearOrder A] in
 /-- **A padded tuple beyond the encoded width is clear.** -/
 theorem pad_apply_ge (w : Fin d → A) (j : Fin dd) (h : ¬((j : ℕ) < d)) :
-    Pfp.pad (dd := dd) zero w j = zero :=
-  Pfp.pad_of_ge (c := d) j (Nat.le_of_not_lt h)
+    Draw.pad (dd := dd) zero w j = zero :=
+  Draw.pad_of_ge (c := d) j (Nat.le_of_not_lt h)
 
 /-- **Padding preserves the lexicographic order**: beyond the encoded width the
 two tuples agree, so the position that decides the comparison is one of the
 encoded coordinates. -/
 theorem tupLeLex_pad_iff (hle : d ≤ dd) (w w' : Fin d → A) :
-    tupLeLex (Pfp.pad (dd := dd) zero w) (Pfp.pad (dd := dd) zero w') ↔
+    tupLeLex (Draw.pad (dd := dd) zero w) (Draw.pad (dd := dd) zero w') ↔
       tupLeLex w w' := by
   constructor
   · rintro (heq | ⟨j, hagree, hlt⟩)
@@ -71,13 +71,13 @@ theorem tupLeLex_pad_iff (hle : d ≤ dd) (w w' : Fin d → A) :
       · have h := hagree ⟨(i : ℕ), lt_of_lt_of_le i.isLt hle⟩ hi
         rwa [pad_apply hle w i, pad_apply hle w' i] at h
       · have h := hlt
-        rwa [Pfp.pad_of_lt (c := d) j hjd, Pfp.pad_of_lt (c := d) j hjd] at h
+        rwa [Draw.pad_of_lt (c := d) j hjd, Draw.pad_of_lt (c := d) j hjd] at h
   · rintro (rfl | ⟨j, hagree, hlt⟩)
     · exact Or.inl rfl
     · refine Or.inr ⟨⟨(j : ℕ), lt_of_lt_of_le j.isLt hle⟩, fun i hi => ?_, ?_⟩
       · by_cases hid : (i : ℕ) < d
         · have h := hagree ⟨(i : ℕ), hid⟩ hi
-          rw [Pfp.pad_of_lt (c := d) i hid, Pfp.pad_of_lt (c := d) i hid]
+          rw [Draw.pad_of_lt (c := d) i hid, Draw.pad_of_lt (c := d) i hid]
           simpa using h
         · rw [pad_apply_ge w i hid, pad_apply_ge w' i hid]
       · rw [pad_apply hle w j, pad_apply hle w' j]
@@ -86,7 +86,7 @@ theorem tupLeLex_pad_iff (hle : d ≤ dd) (w w' : Fin d → A) :
 omit [LinearOrder A] in
 /-- **Padding is injective**, the encoded coordinates being kept. -/
 theorem pad_injective (hle : d ≤ dd) :
-    Function.Injective (Pfp.pad (dd := dd) (c := d) zero) := by
+    Function.Injective (Draw.pad (dd := dd) (c := d) zero) := by
   intro w w' h
   funext i
   have h' := congrFun h ⟨(i : ℕ), lt_of_lt_of_le i.isLt hle⟩
@@ -98,18 +98,18 @@ section PadFile
 
 variable {A R P K : Type} [LinearOrder A] [Finite A] [Finite R] [Finite P]
 variable [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite K] {d dd : ℕ}
-variable [Language.wide.Structure (Pfp.Univ A R P K dd)]
+variable [Language.wide.Structure (Draw.Univ A R P K dd)]
 
 variable (R P dd) in
 /-- **The element a register of a padded file holds the bit of**: its block's
 tag, and its encoded tuple padded to the universe's width. -/
 noncomputable def blkIxEltPad (zero : A) (u : Wide.BlkIx K A d) :
-    Pfp.Univ A R P K dd :=
-  (blkTag R P K u.1, Pfp.pad zero u.2)
+    Draw.Univ A R P K dd :=
+  (blkTag R P K u.1, Draw.pad zero u.2)
 
 omit [Finite R] [Finite P] [Finite A] [Finite K] [LinearOrder A] [LinearOrder R]
   [LinearOrder P] [LinearOrder K]
-  [Language.wide.Structure (Pfp.Univ A R P K dd)] in
+  [Language.wide.Structure (Draw.Univ A R P K dd)] in
 /-- **Distinct registers of a padded file hold the bits of distinct
 elements.** -/
 theorem blkIxEltPad_injective {zero : A} (hle : d ≤ dd) :
@@ -119,7 +119,7 @@ theorem blkIxEltPad_injective {zero : A} (hle : d ≤ dd) :
   exact Prod.ext (blkTag_injective R P K h1) (pad_injective hle h2)
 
 omit [Finite R] [Finite P] [Finite A] [Finite K]
-  [Language.wide.Structure (Pfp.Univ A R P K dd)] in
+  [Language.wide.Structure (Draw.Univ A R P K dd)] in
 /-- **The padded register order is the element order.** -/
 theorem blkLePad_iff_tagTupleLe {zero : A} (hle : d ≤ dd)
     (u u' : Wide.BlkIx K A d) :
@@ -136,7 +136,7 @@ omit [Finite R] [Finite P] [Finite A] [Finite K] in
 clocked program lays is laid out in the order of the addresses it stands
 for. -/
 theorem blkIxEltPad_mono {zero : A} (hle : d ≤ dd)
-    (hord : ∀ x y : Pfp.Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
+    (hord : ∀ x y : Draw.Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
     (u u' : Wide.BlkIx K A d) :
     WMLt (Wide.blkLe K A d) u u' ↔
       WMLt WMLe (blkIxEltPad (K := K) R P dd zero u)
