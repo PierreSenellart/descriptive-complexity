@@ -161,7 +161,7 @@ theorem realize_blkAtom (ρ : B.Assignment A) {n : ℕ}
     (@BoundedFormula.Realize _ A
         (B.structure₁ (L := L.sum Language.order) ρ) _ _ φ default w ↔
       κ.holds ρ w) := by
-  letI inst := B.structure₁ (L := L.sum Language.order) ρ
+  let inst := B.structure₁ (L := L.sum Language.order) ρ
   match φ with
   | .falsum => simp [blkAtom?] at h
   | .imp _ _ => simp [blkAtom?] at h
@@ -226,7 +226,7 @@ theorem realize_iff_qfValue_blkHolds {n : ℕ}
     (@BoundedFormula.Realize _ A
         (B.structure₁ (L := L.sum Language.order) ρ) _ _ mat default w ↔
       qfValue mat fun a => (blkAtom? a).elim False (BlkAtom.holds ρ w)) := by
-  letI inst := B.structure₁ (L := L.sum Language.order) ρ
+  let inst := B.structure₁ (L := L.sum Language.order) ρ
   refine (realize_qfValue hqf default w).trans (qfValue_congr _ _ _ fun a ha => ?_)
   obtain ⟨κ, hκ⟩ :=
     Option.isSome_iff_exists.mp (isSome_blkAtom?_of_mem_qfAtoms mat a ha)

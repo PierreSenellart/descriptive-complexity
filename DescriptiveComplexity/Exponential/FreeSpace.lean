@@ -66,7 +66,7 @@ theorem SOTCDefinable.and_sentence {F : Language.{0, 0}} [F.IsRelational]
             ((F.sum Language.order).sum spec.B.lang)).onSentence γ ⊓ spec.src) ↔
         (@Sentence.Realize _ M (sumOrderStructure F M) γ ∧ spec.IsSrc ρ) := by
     intro ρ
-    letI := spec.B.structure ρ
+    let := spec.B.structure ρ
     refine Iff.trans Formula.realize_inf (and_congr ?_ Iff.rfl)
     exact LHom.realize_onSentence (M := M)
       (LHom.sumInl : (F.sum Language.order) →ᴸ ((F.sum Language.order).sum spec.B.lang)) γ
@@ -171,9 +171,9 @@ def effProblem (Q : DecisionProblem X.E) : DecisionProblem X.markLangOf where
     Q (X.clsPart (effSet X.orderFree.E M))
   iso_invariant := by
     intro M N _ _ e
-    letI := X.markReduct M
-    letI := X.markReduct N
-    letI e' := reductEquiv (LHom.sumInl : X.orderFree.E →ᴸ X.markLangOf) e
+    let := X.markReduct M
+    let := X.markReduct N
+    let e' := reductEquiv (LHom.sumInl : X.orderFree.E →ᴸ X.markLangOf) e
     have himg : (⇑e' '' effSet X.orderFree.E M) = effSet X.orderFree.E N := image_effSet e
     refine Iff.trans (Q.iso_invariant (clsPartEquiv X e' (effSet X.orderFree.E M))) ?_
     exact himg ▸ Iff.rfl
@@ -184,9 +184,9 @@ def clsProblem (Q : DecisionProblem X.E) : DecisionProblem X.markLangOf where
     (letI := X.markReduct M; IsCls X (markSet X.orderFree.E M)) ∧ X.effProblem Q M
   iso_invariant := by
     intro M N _ _ e
-    letI := X.markReduct M
-    letI := X.markReduct N
-    letI e' := reductEquiv (LHom.sumInl : X.orderFree.E →ᴸ X.markLangOf) e
+    let := X.markReduct M
+    let := X.markReduct N
+    let e' := reductEquiv (LHom.sumInl : X.orderFree.E →ᴸ X.markLangOf) e
     have hm : (⇑e' '' markSet X.orderFree.E M) = markSet X.orderFree.E N := image_markSet e
     have hm' : (⇑e'.symm '' markSet X.orderFree.E N) = markSet X.orderFree.E M :=
       image_markSet e.symm
@@ -340,7 +340,7 @@ theorem realize_isClsS :
     @Sentence.Realize _ M (sumOrderStructure X.markLangOf M) X.isClsS ↔
       letI := X.markReduct M
       IsCls X (markSet X.orderFree.E M) := by
-  letI := X.markReduct M
+  let := X.markReduct M
   have hmark : ∀ x : M, (RelMap (X.markSymO) ![x] ↔ x ∈ markSet X.orderFree.E M) :=
     fun _ => Iff.rfl
   have hsame : ∀ x y : M,
@@ -388,7 +388,7 @@ theorem someCls_iff_exists_mark {Q : DecisionProblem X.E} (N : Type)
   constructor
   · rintro ⟨S, hS, hQS⟩
     refine ⟨fun _ (w : Fin 1 → N) => w 0 ∈ S, ?_⟩
-    letI := markBlock.structure₁ (L := X.orderFree.E) fun _ (w : Fin 1 → N) => w 0 ∈ S
+    let := markBlock.structure₁ (L := X.orderFree.E) fun _ (w : Fin 1 → N) => w 0 ∈ S
     have hset : markSet X.orderFree.E N = S := rfl
     obtain ⟨x₀, hx₀⟩ := hS.1
     have heff : effSet X.orderFree.E N = S := by
@@ -397,7 +397,7 @@ theorem someCls_iff_exists_mark {Q : DecisionProblem X.E} (N : Type)
     change Q (X.clsPart (effSet X.orderFree.E N))
     exact heff ▸ hQS
   · rintro ⟨ρ, hcls, heff⟩
-    letI := markBlock.structure₁ (L := X.orderFree.E) ρ
+    let := markBlock.structure₁ (L := X.orderFree.E) ρ
     obtain ⟨x₀, hx₀⟩ := hcls.1
     have heff' : Q (X.clsPart (effSet X.orderFree.E N)) := heff
     exact ⟨markSet X.orderFree.E N, hcls, effSet_eq_markSet hx₀ ▸ heff'⟩
@@ -434,10 +434,10 @@ theorem expDefinable_PSPACE_iff_free (P : DecisionProblem L) :
     rw [ExpExpansion.someCls_map_iff]
     constructor
     · intro hP
-      letI lo := finiteLinearOrder A
+      let lo := finiteLinearOrder A
       exact ⟨lo, (hX A).mp hP⟩
     · rintro ⟨lo, h⟩
-      letI := lo
+      let := lo
       exact (hX A).mpr h
   · exact fun h => h.expDefinable
 

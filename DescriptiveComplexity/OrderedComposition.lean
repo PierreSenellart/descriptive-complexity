@@ -262,9 +262,9 @@ noncomputable def OrderedFOReduction.trans (g : P ≤ᶠᵒ[≤] Q) (f : Q ≤�
     dim := f.dim * g.dim
     toInterpretation := f.toInterpretation.comp g.toInterpretation.ordExtend
     correct := fun A _ _ _ _ => by
-      letI := g.toInterpretation.mapLinearOrder A
-      haveI : Finite (g.toInterpretation.Map A) := g.toInterpretation.map_finite A
-      haveI : Nonempty (g.toInterpretation.Map A) := g.toInterpretation.map_nonempty A
+      let := g.toInterpretation.mapLinearOrder A
+      have : Finite (g.toInterpretation.Map A) := g.toInterpretation.map_finite A
+      have : Nonempty (g.toInterpretation.Map A) := g.toInterpretation.map_nonempty A
       have h1 := g.correct A
       have h2 := f.correct (g.toInterpretation.Map A)
       have e1 := g.toInterpretation.ordExtendLEquiv A

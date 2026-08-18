@@ -248,13 +248,13 @@ theorem someCls_map_iff :
   constructor
   · rintro ⟨S, hS, hQ⟩
     obtain ⟨p, hp⟩ := hS.1
-    letI lo := guessedLinearOrder p
+    let lo := guessedLinearOrder p
     refine ⟨lo, ?_⟩
     have hord : ∀ w : Fin 2 → A, pointOrd p w ↔ loRel (A := A) w :=
       fun w => (le_guessedLinearOrder p w).symm
     exact (Q.iso_invariant (clsEquiv (eq_range_copyIn hS hp hord))).mpr hQ
   · rintro ⟨lo, hQ⟩
-    letI := lo
+    let := lo
     refine ⟨Set.range (copyIn (X := X) (A := A)), ⟨?_, ?_⟩, ?_⟩
     · obtain ⟨u⟩ := (inferInstance : Nonempty (X.Map A))
       exact ⟨copyIn u, Set.mem_range_self u⟩

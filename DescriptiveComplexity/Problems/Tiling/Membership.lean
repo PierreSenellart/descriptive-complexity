@@ -167,7 +167,7 @@ variable {γ : Type} (ρ : tileGuessBlock.Assignment A) {v : γ → A}
 theorem realize_tlPosnF (x : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlPosnF x) v ↔ TLPosn (v x)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlPosnF, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -176,7 +176,7 @@ theorem realize_tlPosnF (x : γ) :
 theorem realize_tlTileF (t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlTileF t) v ↔ TLTile (v t)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlTileF, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -185,7 +185,7 @@ theorem realize_tlTileF (t : γ) :
 theorem realize_tlAccF (t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlAccF t) v ↔ TLAcc (v t)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlAccF, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -194,7 +194,7 @@ theorem realize_tlAccF (t : γ) :
 theorem realize_tlLeF (x y : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlLeF x y) v ↔ TLLe (v x) (v y)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlLeF, Formula.realize_rel₂, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -203,7 +203,7 @@ theorem realize_tlLeF (x y : γ) :
 theorem realize_tlHorizF (t t' : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlHorizF t t') v ↔ TLHoriz (v t) (v t')) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlHorizF, Formula.realize_rel₂, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -212,7 +212,7 @@ theorem realize_tlHorizF (t t' : γ) :
 theorem realize_tlVertF (t t' : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlVertF t t') v ↔ TLVert (v t) (v t')) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlVertF, Formula.realize_rel₂, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -221,7 +221,7 @@ theorem realize_tlVertF (t t' : γ) :
 theorem realize_tlFirstF (x t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlFirstF x t) v ↔ TLFirst (v x) (v t)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlFirstF, Formula.realize_rel₂, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -230,7 +230,7 @@ theorem realize_tlFirstF (x t : γ) :
 theorem realize_tlBaseF (t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlBaseF t) v ↔ TLBase (v t)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlBaseF, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -239,7 +239,7 @@ theorem realize_tlBaseF (t : γ) :
 theorem realize_tlStartF (t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlStartF t) v ↔ TLStart (v t)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlStartF, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -248,7 +248,7 @@ theorem realize_tlStartF (t : γ) :
 theorem realize_tlEdgeLF (t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlEdgeLF t) v ↔ TLEdgeL (v t)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlEdgeLF, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -257,7 +257,7 @@ theorem realize_tlEdgeLF (t : γ) :
 theorem realize_tlEdgeRF (t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlEdgeRF t) v ↔ TLEdgeR (v t)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlEdgeRF, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
   rfl
@@ -266,7 +266,7 @@ theorem realize_tlEdgeRF (t : γ) :
 theorem realize_tlRelF (x y t : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlRelF x y t) v ↔ ρ () ![v x, v y, v t]) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlRelF, realize_rel₃]
   simp only [Term.realize_var]
   rfl
@@ -275,7 +275,7 @@ theorem realize_tlRelF (x y t : γ) :
 theorem realize_tlEqF (x y : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlEqF x y) v ↔ v x = v y) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlEqF, Formula.realize_equal, Term.realize_var, Term.realize_var]
 
 end Realize
@@ -307,7 +307,7 @@ variable {A : Type} [Language.tiling.Structure A] (ρ : tileGuessBlock.Assignmen
 theorem realize_tlMinPosF (y : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlMinPosF y) v ↔ MinPos (tileData A).Le (tileData A).Posn (v y)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlMinPosF, MinPos]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     realize_tlPosnF, realize_tlLeF, Sum.elim_inl, Sum.elim_inr]
@@ -317,7 +317,7 @@ theorem realize_tlMinPosF (y : γ) :
 theorem realize_tlMaxPosF (y : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlMaxPosF y) v ↔ MaxPos (tileData A).Le (tileData A).Posn (v y)) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlMaxPosF, MaxPos]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     realize_tlPosnF, realize_tlLeF, Sum.elim_inl, Sum.elim_inr]
@@ -327,7 +327,7 @@ theorem realize_tlMaxPosF (y : γ) :
 theorem realize_tlSuccPosF (x x' : γ) :
     (@Formula.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ)) _
       (tlSuccPosF x x') v ↔ SuccPos (tileData A).Le (tileData A).Posn (v x) (v x')) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tlSuccPosF, SuccPos]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_not, Formula.realize_sup, realize_tlPosnF, realize_tlLeF, realize_tlEqF,
@@ -428,7 +428,7 @@ variable {A : Type} [Language.tiling.Structure A] (ρ : tileGuessBlock.Assignmen
 theorem realize_tileWfC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileWfC ↔ (tileData A).WellFormed) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileWfC, TileData.WellFormed, IsLinOrd]
   simp only [Sentence.Realize, Formula.realize_inf, Formula.realize_iAlls,
     Formula.realize_iExs, Formula.realize_imp, Formula.realize_sup, realize_tlLeF,
@@ -445,7 +445,7 @@ theorem realize_tileTotalC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileTotalC ↔
       ∀ x y : A, TLPosn x → TLPosn y → ∃ t, ρ () ![x, y, t] ∧ TLTile t) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileTotalC]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_iExs,
     Formula.realize_imp, Formula.realize_inf, realize_tlPosnF, realize_tlRelF, realize_tlTileF,
@@ -460,7 +460,7 @@ theorem realize_tlTileFuncC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileFuncC ↔
       ∀ x y t t' : A, ρ () ![x, y, t] → ρ () ![x, y, t'] → t = t') := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileFuncC]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tlRelF, realize_tlEqF, Sum.elim_inr]
@@ -475,7 +475,7 @@ theorem realize_tlTileFirstC :
         ((MinPos (tileData A).Le (tileData A).Posn x → TLStart t) ∧
           (¬MinPos (tileData A).Le (tileData A).Posn x →
             (tileData A).FirstTile x t))) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileFirstC]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_sup, Formula.realize_not, realize_tlPosnF,
@@ -500,7 +500,7 @@ theorem realize_tileEdgeLC :
       tileEdgeLC ↔
       ∀ x y t : A, TLPosn y → MinPos (tileData A).Le (tileData A).Posn x →
         ρ () ![x, y, t] → TLEdgeL t) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileEdgeLC]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tlPosnF, realize_tlMinPosF, realize_tlRelF, realize_tlEdgeLF,
@@ -513,7 +513,7 @@ theorem realize_tileEdgeRC :
       tileEdgeRC ↔
       ∀ x y t : A, TLPosn y → MaxPos (tileData A).Le (tileData A).Posn x →
         ρ () ![x, y, t] → TLEdgeR t) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileEdgeRC]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tlPosnF, realize_tlMaxPosF, realize_tlRelF, realize_tlEdgeRF,
@@ -526,7 +526,7 @@ theorem realize_tileHorizC :
       tileHorizC ↔
       ∀ x x' y t t' : A, SuccPos (tileData A).Le (tileData A).Posn x x' → TLPosn y →
         ρ () ![x, y, t] → ρ () ![x', y, t'] → TLHoriz t t') := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileHorizC]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tlPosnF, realize_tlSuccPosF, realize_tlRelF, realize_tlHorizF,
@@ -539,7 +539,7 @@ theorem realize_tileVertC :
       tileVertC ↔
       ∀ x y y' t t' : A, TLPosn x → SuccPos (tileData A).Le (tileData A).Posn y y' →
         ρ () ![x, y, t] → ρ () ![x, y', t'] → TLVert t t') := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileVertC]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tlPosnF, realize_tlSuccPosF, realize_tlRelF, realize_tlVertF,
@@ -551,7 +551,7 @@ theorem realize_tileAccC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileAccC ↔
       ∃ x y t : A, TLPosn x ∧ TLPosn y ∧ ρ () ![x, y, t] ∧ TLAcc t) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileAccC]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_tlPosnF, realize_tlRelF, realize_tlAccF, Sum.elim_inr]
@@ -588,7 +588,7 @@ theorem realize_tileKernel (ρ : tileGuessBlock.Assignment A) :
         (∀ x y y' t t' : A, TLPosn x → SuccPos (tileData A).Le (tileData A).Posn y y' →
           ρ () ![x, y, t] → ρ () ![x, y', t'] → TLVert t t') ∧
         ∃ x y t : A, TLPosn x ∧ TLPosn y ∧ ρ () ![x, y, t] ∧ TLAcc t) := by
-  letI := tileGuessBlock.structure ρ
+  let := tileGuessBlock.structure ρ
   rw [tileKernel]
   simp only [Sentence.Realize, Formula.realize_inf]
   exact and_congr (realize_tileWfC ρ) (and_congr (realize_tileTotalC ρ)

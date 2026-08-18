@@ -600,7 +600,7 @@ theorem realize_dtAccOut :
     (@Sentence.Realize (tmOrd.sum dtBlock.lang) A
         (@sumStructure _ _ A _ (dtBlock.structure ρ)) dtAccOut) ↔
       ∃ t q : A, ρ (some true) ![t, q] ∧ TMAcc q := by
-  letI := dtBlock.structure ρ
+  let := dtBlock.structure ρ
   rw [dtAccOut]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_atomF, realize_guardOutF, realize_accG, Sum.elim_inr]
@@ -615,7 +615,7 @@ theorem realize_dtOut :
         (@sumStructure _ _ A _ (dtBlock.structure ρ)) dtOut) ↔
       ((tmData A).WellFormed ∧ (tmData A).Deterministic ∧
         ∃ t q : A, ρ (some true) ![t, q] ∧ TMAcc q) := by
-  letI := dtBlock.structure ρ
+  let := dtBlock.structure ρ
   rw [dtOut]
   simp only [Sentence.Realize, Formula.realize_inf]
   rw [and_assoc]
@@ -707,7 +707,7 @@ theorem exists_pos_bitRank (hlin : IsLinOrd (TMLe (A := A))) :
     have hne : ∃ p : A, TMPosn p := by
       by_contra hcon
       push Not at hcon
-      haveI : IsEmpty {p : A // TMPosn p} := ⟨fun x => hcon x.1 x.2⟩
+      have : IsEmpty {p : A // TMPosn p} := ⟨fun x => hcon x.1 x.2⟩
       rw [Nat.card_of_isEmpty] at hj
       omega
     obtain ⟨t, ht⟩ := exists_minPos hlin hne

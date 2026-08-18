@@ -126,7 +126,7 @@ theorem ifpDefinableFree_of_pfpDefinableFree_of_ptime_eq_pspace
   refine ⟨(ordStepDef L k S hSfin).stratify (e'.backStepDef S), ?_⟩
   intro A instL hFin hNe
   -- the canonical order on classes, and the frozen order variable
-  letI lo : LinearOrder (InvMap S k A) :=
+  let lo : LinearOrder (InvMap S k A) :=
     letI := bitVecLinearOrder L k S hSfin
     invLinearOrder (S := S) (colorAgree_atomColor L k S)
   have htp : toPebble ((ordStepDef L k S hSfin).inflLimit A) =
@@ -136,7 +136,7 @@ theorem ifpDefinableFree_of_pfpDefinableFree_of_ptime_eq_pspace
   have h1 : IncompRel (toPebble ((ordStepDef L k S hSfin).inflLimit A)) =
       EquivK (atomicAgreeOn S A k) := by
     rw [htp]
-    letI := bitVecLinearOrder L k S hSfin
+    let := bitVecLinearOrder L k S hSfin
     rw [incompRel_ordK_eq, colorAgree_atomColor]
   have h2 : ∀ u v : Fin k → A,
       (toPebble ((ordStepDef L k S hSfin).inflLimit A) u v ∨
@@ -144,7 +144,7 @@ theorem ifpDefinableFree_of_pfpDefinableFree_of_ptime_eq_pspace
       (letI := lo; InvMap.mk S u ≤ InvMap.mk S v) := by
     intro u v
     rw [htp]
-    letI := bitVecLinearOrder L k S hSfin
+    let := bitVecLinearOrder L k S hSfin
     exact (invLinearOrder_le_iff (S := S) (colorAgree_atomColor L k S) u v).symm
   -- the chain: stratified value = pulled-back value = value on `Iᵏ A`
   --   = the original partial value = `P A`

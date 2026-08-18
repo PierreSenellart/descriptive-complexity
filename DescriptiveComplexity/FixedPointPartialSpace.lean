@@ -69,7 +69,7 @@ noncomputable def SOBlock.idxList (B : SOBlock) : List B.ι :=
 
 open Classical in
 theorem SOBlock.mem_idxList (B : SOBlock) (i : B.ι) : i ∈ B.idxList := by
-  letI : Fintype B.ι := Fintype.ofFinite B.ι
+  let : Fintype B.ι := Fintype.ofFinite B.ι
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
 namespace StepDef
@@ -120,8 +120,8 @@ variable {A : Type} [L.Structure A]
 theorem realize_nextSentence (ρ σ : d.B.Assignment A) :
     (@Sentence.Realize _ A (d.B.structure₂ (L := L) ρ σ) d.nextSentence) ↔
       σ = d.next ρ := by
-  letI := d.B.structure σ
-  letI := d.B.structure₁ (L := L) ρ
+  let := d.B.structure σ
+  let := d.B.structure₁ (L := L) ρ
   rw [nextSentence]
   simp only [Sentence.Realize, realize_listInf]
   constructor
@@ -144,7 +144,7 @@ theorem realize_nextSentence (ρ σ : d.B.Assignment A) :
 theorem realize_botSentence (ρ : d.B.Assignment A) :
     (@Sentence.Realize _ A (d.B.structure₁ (L := L) ρ) d.botSentence) ↔
       ρ = d.B.botAssign A := by
-  letI := d.B.structure ρ
+  let := d.B.structure ρ
   rw [botSentence]
   simp only [Sentence.Realize, realize_listInf]
   constructor
@@ -165,7 +165,7 @@ theorem realize_botSentence (ρ : d.B.Assignment A) :
 theorem realize_isFixedPtF (ρ : d.B.Assignment A) :
     (@Sentence.Realize _ A (d.B.structure₁ (L := L) ρ) d.isFixedPtF) ↔
       IsFixedPt d.next ρ := by
-  letI := d.B.structure ρ
+  let := d.B.structure ρ
   rw [isFixedPtF]
   simp only [Sentence.Realize, realize_listInf]
   constructor
@@ -215,7 +215,7 @@ theorem StepDef.toSOTCSpec_isSrc_iff (ρ : d.B.Assignment A) :
 theorem StepDef.toSOTCSpec_isTgt_iff (ρ : d.B.Assignment A) :
     d.toSOTCSpec.IsTgt ρ ↔ IsFixedPt d.next ρ ∧
       @Sentence.Realize _ A (d.B.structure₁ (L := L.sum Language.order) ρ) d.out := by
-  letI := d.B.structure ρ
+  let := d.B.structure ρ
   have h : (@Sentence.Realize _ A (d.B.structure₁ (L := L.sum Language.order) ρ)
         (d.isFixedPtF ⊓ d.out)) ↔
       (@Sentence.Realize _ A (d.B.structure₁ (L := L.sum Language.order) ρ)

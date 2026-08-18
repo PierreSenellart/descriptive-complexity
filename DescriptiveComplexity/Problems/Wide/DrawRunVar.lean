@@ -795,7 +795,7 @@ theorem var_run
         wideTape (PR.trackTapeAt RF.cell Slot.val (restO aT) (mV aT))
           (PR.syElt PR.blank)⟩ := by
   classical
-  letI := Fintype.ofFinite ιV
+  let := Fintype.ofFinite ιV
   obtain ⟨wG, hwG⟩ := TMData.exists_reachesIn_of_reflTransGen hGatesR
   choose wOf hwOf using fun a : ιV =>
     TMData.exists_reachesIn_of_reflTransGen (hMatrixR a)

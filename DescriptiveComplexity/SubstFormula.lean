@@ -103,7 +103,7 @@ theorem realize_substTo [L₁.IsRelational] (hinj : Function.Injective e)
     (φ : L₁.BoundedFormula β n) (v : β → Pt) (xs : Fin n → Pt) :
     (substTo F D φ).Realize (fun b => e (v b)) (fun i => e (xs i)) ↔
       @BoundedFormula.Realize _ Pt (F.strucOn e) _ _ φ v xs := by
-  letI := F.strucOn e
+  let := F.strucOn e
   induction φ with
   | falsum => exact Iff.rfl
   | equal t₁ t₂ =>

@@ -185,7 +185,7 @@ private abbrev SFRealize (φ : setFamilySOLang.Sentence) : Prop :=
 
 private theorem realize_sfFamClause :
     SFRealize ρ sfFamClause ↔ ∀ s : A, ρ true ![s] → SSFam s := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
   rw [sfFamClause]
@@ -195,7 +195,7 @@ private theorem realize_sfFamClause :
 
 private theorem realize_sfCoverClause :
     SFRealize ρ sfCoverClause ↔ ∀ x : A, SSElem x → ∃ s : A, ρ true ![s] ∧ SSMem x s := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
   rw [sfCoverClause]
@@ -213,7 +213,7 @@ private theorem realize_sfCoverClause :
 private theorem realize_sfDisjClause :
     SFRealize ρ sfDisjClause ↔ ∀ s s' x : A, ρ true ![s] → ρ true ![s'] → s ≠ s' →
       SSElem x → ¬(SSMem x s ∧ SSMem x s') := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
   rw [sfDisjClause]
@@ -226,7 +226,7 @@ private theorem realize_sfDisjClause :
 private theorem realize_sfGuessToMarkedClause :
     SFRealize ρ sfGuessToMarkedClause ↔
       ∀ s : A, ρ true ![s] → ∃ y : A, ρ false ![s, y] ∧ SSMarked y := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsubG : ∀ (w : Fin 1 → A),
       RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 2 → A),
@@ -246,7 +246,7 @@ private theorem realize_sfGuessToMarkedClause :
 private theorem realize_sfMarkedToGuessClause :
     SFRealize ρ sfMarkedToGuessClause ↔
       ∀ y : A, SSMarked y → ∃ s : A, ρ false ![y, s] ∧ ρ true ![s] := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsubG : ∀ (w : Fin 1 → A),
       RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 2 → A),
@@ -265,7 +265,7 @@ private theorem realize_sfMarkedToGuessClause :
 
 private theorem realize_sfInjClause :
     SFRealize ρ sfInjClause ↔ ∀ x x' y : A, ρ false ![x, y] → ρ false ![x', y] → x = x' := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsubI : ∀ (w : Fin 2 → A),
       RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ false w := fun _ => Iff.rfl
   rw [sfInjClause]
@@ -323,7 +323,7 @@ private theorem realize_exactCoverKernel :
 private theorem realize_sfSplitInClause :
     SFRealize ρ sfSplitInClause ↔
       ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ true ![x] := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
   rw [sfSplitInClause]
@@ -341,7 +341,7 @@ private theorem realize_sfSplitInClause :
 private theorem realize_sfSplitOutClause :
     SFRealize ρ sfSplitOutClause ↔
       ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ true ![x] := by
-  letI := familyGuessBlock.structure ρ
+  let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
   rw [sfSplitOutClause]

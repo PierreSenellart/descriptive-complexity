@@ -52,7 +52,7 @@ site's rule names are indexed by assignments of the block. -/
 theorem SOBlock.card_pad_ι (B : SOBlock) (n a : ℕ) :
     Nat.card (B.pad n a).ι = Nat.card B.ι + n := by
   classical
-  haveI : Fintype B.ι := Fintype.ofFinite _
+  have : Fintype B.ι := Fintype.ofFinite _
   simp [SOBlock.pad, Nat.card_eq_fintype_card]
 
 /-- **What a padded block's assignment says about the original's**: forget the
@@ -91,9 +91,9 @@ theorem blockPadLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (n a : �
     @LHom.IsExpansionOn _ _ (blockPadLHom L B n a) M
       (@sumStructure L B.lang M instM (B.structure (B.unpadAssign ρ)))
       (@sumStructure L (B.pad n a).lang M instM ((B.pad n a).structure ρ)) := by
-  letI := instM
-  letI := B.structure (B.unpadAssign ρ)
-  letI := (B.pad n a).structure ρ
+  let := instM
+  let := B.structure (B.unpadAssign ρ)
+  let := (B.pad n a).structure ρ
   exact
     { map_onFunction := fun {_m} f _x => by
         match f with

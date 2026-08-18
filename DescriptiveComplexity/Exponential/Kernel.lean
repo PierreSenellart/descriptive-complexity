@@ -77,9 +77,9 @@ theorem orderAddLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type
       (@sumStructure L B.lang A instA (B.structure ρ))
       (@sumStructure (L.sum Language.order) B.lang A
         (letI := instA; letI := lo; sumOrderStructure L A) (B.structure ρ)) := by
-  letI := instA
-  letI := lo
-  letI := B.structure ρ
+  let := instA
+  let := lo
+  let := B.structure ρ
   exact
     { map_onFunction := fun {_n} f _x => by
         match f with
@@ -169,8 +169,8 @@ theorem exists_nexKernel [L.IsRelational] {P : DecisionProblem L}
   obtain ⟨X, Q, hQ, hspec⟩ := h
   obtain ⟨B, φ, hker⟩ := exists_orderedKernel (P := Q) hQ
   refine ⟨⟨X, B, φ⟩, fun A _ _ _ _ _ => ?_⟩
-  haveI := X.mapFinite A
-  haveI := X.mapNonempty A
+  have := X.mapFinite A
+  have := X.mapNonempty A
   exact (hspec A).trans (hker (X.Map A))
 
 end Kernel

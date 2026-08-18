@@ -167,14 +167,14 @@ variable {γ : Type} {v : γ → A}
 @[simp]
 theorem realize_stF (ρ : cfgBlock.Assignment A) (x : γ) :
     (@Formula.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) _ (stF x) v ↔ St ρ (v x)) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) ρ
+  let := cfgBlock.structure₁ (L := tmaOrd) ρ
   rw [stF, Formula.realize_rel₁]
   exact apply₁ _ _
 
 @[simp]
 theorem realize_hdF (ρ : cfgBlock.Assignment A) (x : γ) :
     (@Formula.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) _ (hdF x) v ↔ Hd ρ (v x)) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) ρ
+  let := cfgBlock.structure₁ (L := tmaOrd) ρ
   rw [hdF, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -182,7 +182,7 @@ theorem realize_hdF (ρ : cfgBlock.Assignment A) (x : γ) :
 theorem realize_tpF (ρ : cfgBlock.Assignment A) (x y : γ) :
     (@Formula.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) _ (tpF x y) v ↔
       Tp ρ (v x) (v y)) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) ρ
+  let := cfgBlock.structure₁ (L := tmaOrd) ρ
   rw [tpF, Formula.realize_rel₂]
   exact apply₂ _ _
 
@@ -190,7 +190,7 @@ theorem realize_tpF (ρ : cfgBlock.Assignment A) (x y : γ) :
 theorem realize_stAF (ρ σ : cfgBlock.Assignment A) (x : γ) :
     (@Formula.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) _ (stAF x) v ↔
       St ρ (v x)) := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [stAF, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -198,7 +198,7 @@ theorem realize_stAF (ρ σ : cfgBlock.Assignment A) (x : γ) :
 theorem realize_hdAF (ρ σ : cfgBlock.Assignment A) (x : γ) :
     (@Formula.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) _ (hdAF x) v ↔
       Hd ρ (v x)) := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [hdAF, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -206,7 +206,7 @@ theorem realize_hdAF (ρ σ : cfgBlock.Assignment A) (x : γ) :
 theorem realize_tpAF (ρ σ : cfgBlock.Assignment A) (x y : γ) :
     (@Formula.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) _ (tpAF x y) v ↔
       Tp ρ (v x) (v y)) := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [tpAF, Formula.realize_rel₂]
   exact apply₂ _ _
 
@@ -214,7 +214,7 @@ theorem realize_tpAF (ρ σ : cfgBlock.Assignment A) (x y : γ) :
 theorem realize_stBF (ρ σ : cfgBlock.Assignment A) (x : γ) :
     (@Formula.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) _ (stBF x) v ↔
       St σ (v x)) := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [stBF, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -222,7 +222,7 @@ theorem realize_stBF (ρ σ : cfgBlock.Assignment A) (x : γ) :
 theorem realize_hdBF (ρ σ : cfgBlock.Assignment A) (x : γ) :
     (@Formula.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) _ (hdBF x) v ↔
       Hd σ (v x)) := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [hdBF, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -230,7 +230,7 @@ theorem realize_hdBF (ρ σ : cfgBlock.Assignment A) (x : γ) :
 theorem realize_tpBF (ρ σ : cfgBlock.Assignment A) (x y : γ) :
     (@Formula.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) _ (tpBF x y) v ↔
       Tp σ (v x) (v y)) := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [tpBF, Formula.realize_rel₂]
   exact apply₂ _ _
 
@@ -238,7 +238,7 @@ theorem realize_tpBF (ρ σ : cfgBlock.Assignment A) (x y : γ) :
 theorem realize_lift1 (ρ : cfgBlock.Assignment A) (φ : tmaOrd.Formula γ) :
     (@Formula.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) _ (lift1 φ) v ↔
       φ.Realize v) := by
-  letI := cfgBlock.structure ρ
+  let := cfgBlock.structure ρ
   rw [lift1]
   exact LHom.realize_onFormula _ φ
 
@@ -246,9 +246,9 @@ theorem realize_lift1 (ρ : cfgBlock.Assignment A) (φ : tmaOrd.Formula γ) :
 theorem realize_lift2 (ρ σ : cfgBlock.Assignment A) (φ : tmaOrd.Formula γ) :
     (@Formula.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) _ (lift2 φ) v ↔
       φ.Realize v) := by
-  letI := cfgBlock.structure ρ
-  letI := cfgBlock.structure σ
-  letI := cfgBlock.structure₁ (L := tmaOrd) ρ
+  let := cfgBlock.structure ρ
+  let := cfgBlock.structure σ
+  let := cfgBlock.structure₁ (L := tmaOrd) ρ
   rw [lift2]
   exact (LHom.realize_onFormula _ (LHom.sumInl.onFormula φ)).trans
     (LHom.realize_onFormula _ φ)
@@ -362,7 +362,7 @@ variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A]
 
 theorem realize_isCfgS (ρ : cfgBlock.Assignment A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) isCfgS ↔ IsCfg ρ) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) ρ
+  let := cfgBlock.structure₁ (L := tmaOrd) ρ
   rw [isCfgS, IsCfg, Sentence.Realize]
   simp only [Formula.realize_inf, Formula.realize_iExs, Formula.realize_iAlls,
     Formula.realize_imp, realize_stF, realize_hdF, realize_tpF, realize_lift1, realize_eqG,
@@ -380,7 +380,7 @@ theorem realize_isCfgS (ρ : cfgBlock.Assignment A) :
 
 theorem realize_isCfgBS (ρ σ : cfgBlock.Assignment A) :
     (@Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) isCfgBS ↔ IsCfg σ) := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [isCfgBS, IsCfg, Sentence.Realize]
   simp only [Formula.realize_inf, Formula.realize_iExs, Formula.realize_iAlls,
     Formula.realize_imp, realize_stBF, realize_hdBF, realize_tpBF, realize_lift2, realize_eqG,
@@ -399,7 +399,7 @@ theorem realize_isCfgBS (ρ σ : cfgBlock.Assignment A) :
 theorem realize_univS (c : Config A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)) univS ↔
       RelMap (atmBlk (1 : Fin 2)) ![c.state]) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
+  let := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
   rw [univS, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_inf, realize_stF, realize_lift1,
     realize_blkG, st_cfgOf, Sum.elim_inr]
@@ -408,7 +408,7 @@ theorem realize_univS (c : Config A) :
 theorem realize_wonS (c : Config A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)) wonS ↔
       ATMAcc (k := 2) c.state) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
+  let := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
   rw [wonS, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_inf, realize_stF, realize_lift1,
     realize_accG, st_cfgOf, Sum.elim_inr]
@@ -467,7 +467,7 @@ variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A]
 theorem realize_stepS (c c' : Config A) :
     (@Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')) stepS ↔
       (atmData 2 A).toTMData.Step c c') := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')
+  let := cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')
   rw [stepS, TMData.Step, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
     Formula.realize_not, Formula.realize_imp, Formula.realize_iAlls, Formula.realize_iff,
@@ -493,7 +493,7 @@ theorem realize_stepS (c c' : Config A) :
 theorem realize_isInitS (c : Config A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)) isInitS ↔
       (atmData 2 A).toTMData.IsInit c) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
+  let := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
   rw [isInitS, TMData.IsInit, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_inf, Formula.realize_imp,
     Formula.realize_iAlls, realize_stF, realize_hdF, realize_tpF, realize_lift1,
@@ -507,7 +507,7 @@ theorem realize_startS (ρ : cfgBlock.Assignment A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) startS ↔
       ((atmData 2 A).toTMData.WellFormed ∧ (atmData 2 A).BlocksSplit ∧
         ∃ c : Config A, ρ = cfgOf c ∧ (atmData 2 A).toTMData.IsInit c)) := by
-  letI := cfgBlock.structure₁ (L := tmaOrd) ρ
+  let := cfgBlock.structure₁ (L := tmaOrd) ρ
   rw [startS, Sentence.Realize]
   simp only [Formula.realize_inf, realize_lift1]
   refine and_congr realize_wfS (and_congr realize_blocksSplitS ?_)

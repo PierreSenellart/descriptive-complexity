@@ -214,11 +214,11 @@ they mark, and the four relations become functions by choice. -/
 theorem acceptsU_of_runRel [Finite D] (hb : ∃ b, M.Blank b) {c : RunRel A D}
     (h : RunRelOK M c) : M.AcceptsU := by
   classical
-  letI ordT : LinearOrder {d : D // c.Time d} := (isLinOrd_subtype h.tle_lin).toLinearOrder
-  letI ordP : LinearOrder {d : D // c.Page d} := (isLinOrd_subtype h.ple_lin).toLinearOrder
+  let ordT : LinearOrder {d : D // c.Time d} := (isLinOrd_subtype h.tle_lin).toLinearOrder
+  let ordP : LinearOrder {d : D // c.Page d} := (isLinOrd_subtype h.ple_lin).toLinearOrder
   have hleT : ∀ a b : {d : D // c.Time d}, a ≤ b ↔ c.TLe a.val b.val := fun _ _ => Iff.rfl
   have hleP : ∀ a b : {d : D // c.Page d}, a ≤ b ↔ c.PLe a.val b.val := fun _ _ => Iff.rfl
-  haveI : Nonempty {d : D // c.Time d} := ⟨⟨h.time_ne.choose, h.time_ne.choose_spec⟩⟩
+  have : Nonempty {d : D // c.Time d} := ⟨⟨h.time_ne.choose, h.time_ne.choose_spec⟩⟩
   -- the four functions
   have hstT : ∀ t : {d : D // c.Time d}, ∃ q, c.St t.val q := fun t => h.st_tot t.val t.2
   have hhdPT : ∀ t : {d : D // c.Time d}, ∃ z, c.Page z ∧ c.HdP t.val z :=

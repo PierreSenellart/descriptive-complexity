@@ -190,8 +190,8 @@ theorem connectedOn_iff_exists_root_order [Finite A] (Adjp : A → A → Prop) (
     exact ⟨z, link_symm hzx, hlt⟩
   · intro h x y hx hy
     obtain ⟨Lt, htrans, hirr, hstep⟩ := h x hx
-    haveI : IsTrans A Lt := ⟨htrans⟩
-    haveI : Std.Irrefl Lt := ⟨hirr⟩
+    have : IsTrans A Lt := ⟨htrans⟩
+    have : Std.Irrefl Lt := ⟨hirr⟩
     have hwf : WellFounded Lt := Finite.wellFounded_of_trans_of_irrefl Lt
     have hreach : ∀ z, S z → Relation.ReflTransGen (Link Adjp S) z x := by
       intro z
@@ -224,8 +224,8 @@ theorem connectedOn_iff_exists_root [Finite A] (Adjp : A → A → Prop) (S : A 
         fun _ _ => False, fun _ _ _ h => h.elim, fun _ h => h,
         fun x hx _ => absurd ⟨x, hx⟩ hempty⟩
   · rintro ⟨Rt, hRtS, huniq, Lt, htrans, hirr, hstep⟩
-    haveI : IsTrans A Lt := ⟨htrans⟩
-    haveI : Std.Irrefl Lt := ⟨hirr⟩
+    have : IsTrans A Lt := ⟨htrans⟩
+    have : Std.Irrefl Lt := ⟨hirr⟩
     have hwf : WellFounded Lt := Finite.wellFounded_of_trans_of_irrefl Lt
     have hroot : ∀ z, S z → ∃ r, Rt r ∧ Relation.ReflTransGen (Link Adjp S) z r := by
       intro z

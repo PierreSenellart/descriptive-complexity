@@ -172,16 +172,16 @@ sentence pulls back through the extended interpretation. -/
 theorem IFPDefinableFree.of_foReduction (f : P ≤ᶠᵒ Q) (h : IFPDefinableFree Q) :
     IFPDefinableFree P := by
   obtain ⟨d, hd⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine ⟨d.pull f.toInterpretation, ?_⟩
   intro A _ _ _
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   refine (f.correct A).trans ((hd (f.toInterpretation.Map A)).trans ?_)
   rw [StepDef.IFPHolds, StepDef.IFPHolds,
     StepDef.inflLimit_pull f.toInterpretation d A]
-  letI := (d.B.pull f.Tag f.dim).structure
+  let := (d.B.pull f.Tag f.dim).structure
     (d.B.pullAssign (d.inflLimit (f.toInterpretation.Map A)))
   have htrans := realize_sentence_of_equiv
     (f.toInterpretation.extendSOEquiv d.B A (d.inflLimit (f.toInterpretation.Map A))) d.out
@@ -197,33 +197,33 @@ which the inflationary limit transports
 theorem IFPDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : IFPDefinable Q) :
     IFPDefinable P := by
   obtain ⟨d, hd⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨d.pull f.toInterpretation.ordExtend, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   refine (f.correct A).trans ((hd (f.toInterpretation.Map A)).trans ?_)
   rw [StepDef.IFPHolds, StepDef.IFPHolds,
     StepDef.inflLimit_pull f.toInterpretation.ordExtend d A]
-  letI := (d.B.pull f.Tag f.dim).structure
+  let := (d.B.pull f.Tag f.dim).structure
     (d.B.pullAssign (d.inflLimit (f.toInterpretation.ordExtend.Map A)))
   have e₁ := f.toInterpretation.ordExtend.extendSOEquiv d.B A
     (d.inflLimit (f.toInterpretation.ordExtend.Map A))
   have e₂ := d.B.extendEquiv (f.toInterpretation.ordExtendLEquiv A)
     (d.inflLimit (f.toInterpretation.ordExtend.Map A))
   rw [← d.inflLimit_map (f.toInterpretation.ordExtendLEquiv A)] at e₂
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure
       ((f.toInterpretation.ordExtend.extendSO d.B).Map A) :=
     FOInterpretation.mapStructure (f.toInterpretation.ordExtend.extendSO d.B) A
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure
       (f.toInterpretation.ordExtend.Map A) :=
     @sumStructure (L₂.sum Language.order) d.B.lang (f.toInterpretation.ordExtend.Map A)
       (FOInterpretation.mapStructure f.toInterpretation.ordExtend A)
       (d.B.structure (d.inflLimit (f.toInterpretation.ordExtend.Map A)))
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure (f.toInterpretation.Map A) :=
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure (f.toInterpretation.Map A) :=
     @sumStructure (L₂.sum Language.order) d.B.lang (f.toInterpretation.Map A) _
       (d.B.structure (d.inflLimit (f.toInterpretation.Map A)))
   have hout := StrongHomClass.realize_sentence
@@ -300,14 +300,14 @@ variable {A : Type} [L.Structure A] (ρ : B.Assignment A)
 theorem realize_bodyAtomF (b : SOAtom B k) {n : ℕ} (w : Fin n ⊕ Fin k → A) :
     (@Formula.Realize _ A (B.structure₁ (L := L) ρ) _ (bodyAtomF b) w) ↔
       b.Holds ρ fun q => w (Sum.inr q) := by
-  letI := B.structure₁ (L := L) ρ
+  let := B.structure₁ (L := L) ρ
   rw [bodyAtomF, Formula.realize_rel]
   exact Iff.rfl
 
 theorem realize_guardStepF (φ : L.Formula (Fin k)) {n : ℕ} (w : Fin n ⊕ Fin k → A) :
     (@Formula.Realize _ A (B.structure₁ (L := L) ρ) _ (guardStepF (B := B) φ) w) ↔
       φ.Realize fun q => w (Sum.inr q) := by
-  letI := B.structure₁ (L := L) ρ
+  let := B.structure₁ (L := L) ρ
   rw [guardStepF, Formula.realize_relabel, LHom.realize_onFormula]
   rfl
 
@@ -318,7 +318,7 @@ theorem realize_hornStepF (rules : List (HornClause L B k)) (i : B.ι)
     (@Formula.Realize _ A (B.structure₁ (L := L) ρ) _ (hornStepF rules i) x) ↔
       stepDerives rules (fun q => ρ q.1 q.2) (⟨i, x⟩ : BAtom B A) := by
   classical
-  letI := B.structure₁ (L := L) ρ
+  let := B.structure₁ (L := L) ρ
   rw [hornStepF, Formula.realize_iExs]
   constructor
   · rintro ⟨v, hv⟩

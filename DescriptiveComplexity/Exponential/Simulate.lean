@@ -281,7 +281,7 @@ theorem realize_eqPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁ 
     (h₀ : s₀.At σ p₀) (h₁ : s₁.At σ p₁) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (eqPtF s₀ s₁) ↔
       p₀ = p₁) := by
-  letI := H.structure₁ (L := L.sum Language.order) σ
+  let := H.structure₁ (L := L.sum Language.order) σ
   have hass : (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ)
       ((pairLHom s₀ s₁).onSentence (X.B.eqAssignF (L := L))) ↔ p₀.2 = p₁.2) := by
     refine (realize_pairLHom h₀ h₁ _).trans ?_
@@ -308,9 +308,9 @@ theorem realize_covPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁
         ∀ r : X.Point A,
           ¬((X.pointLinearOrder A).lt p₀ r ∧ (X.pointLinearOrder A).lt r p₁))) := by
   classical
-  letI := H.structure₁ (L := L.sum Language.order) σ
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.realIxLinearOrder A
+  let := H.structure₁ (L := L.sum Language.order) σ
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.realIxLinearOrder A
   have hsucc : (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ)
       ((pairLHom s₀ s₁).onSentence (X.B.succAssignF L)) ↔
         SetSucc (X.B.realSet p₀.2) (X.B.realSet p₁.2)) :=
@@ -318,7 +318,7 @@ theorem realize_covPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁
   have htb : (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ)
       ((pairLHom s₀ s₁).onSentence (X.B.topAssignF L 0 ⊓ X.B.botAssignF L 1)) ↔
         (X.B.atomSet p₀.2 = fun _ => True) ∧ (X.B.atomSet p₁.2 = fun _ => False)) := by
-    letI := (X.B.replicate 2).structure₁ (L := L.sum Language.order)
+    let := (X.B.replicate 2).structure₁ (L := L.sum Language.order)
       (X.B.replicateAssign ![p₀.2, p₁.2])
     refine (realize_pairLHom h₀ h₁ _).trans (Iff.trans Formula.realize_inf ?_)
     exact and_congr (X.B.realize_topAssignF ![p₀.2, p₁.2] 0)
@@ -360,7 +360,7 @@ theorem realize_minPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (minPtF s) ↔
       ∀ q : X.Point A, (X.pointLinearOrder A).le p q) := by
   classical
-  letI := H.structure₁ (L := L.sum Language.order) σ
+  let := H.structure₁ (L := L.sum Language.order) σ
   have hbot : (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ)
       ((pairLHom s s).onSentence (X.B.botAssignF L 0)) ↔
         X.B.atomSet p.2 = fun _ => False) :=
@@ -389,7 +389,7 @@ theorem realize_maxPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (maxPtF s) ↔
       ∀ q : X.Point A, (X.pointLinearOrder A).le q p) := by
   classical
-  letI := H.structure₁ (L := L.sum Language.order) σ
+  let := H.structure₁ (L := L.sum Language.order) σ
   have htop : (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ)
       ((pairLHom s s).onSentence (X.B.topAssignF L 0)) ↔
         X.B.atomSet p.2 = fun _ => True) :=
@@ -513,7 +513,7 @@ theorem realize_cfgGuardF (σ : (cfgBlock X k S).Assignment A) :
     (@Sentence.Realize _ A
         ((cfgBlock X k S).structure₁ (L := L.sum Language.order) σ) (cfgGuardF X k S) ↔
       ∃ (s : S) (pts : Fin k → X.Map A), σ = cfgAssign X k S s pts) := by
-  letI := (cfgBlock X k S).structure₁ (L := L.sum Language.order) σ
+  let := (cfgBlock X k S).structure₁ (L := L.sum Language.order) σ
   rw [cfgGuardF, Sentence.Realize, Formula.realize_inf, realize_listInf]
   constructor
   · rintro ⟨htag, hrounds⟩
@@ -621,7 +621,7 @@ theorem realize_testF (s : M.State) (pts : Fin k → X.Map A)
         ((cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
           (cfgAssign X k M.State s pts)) (testF M φ) ↔
       φ.Realize (M := X.Map A) pts) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   refine (realize_withTagLHom (cfgAssign X k M.State s pts) _).trans ?_
   exact realize_translQF pts hqf
 
@@ -631,8 +631,8 @@ theorem realize_readingF (s : M.State) (pts : Fin k → X.Map A) (r : M.TestIx �
         ((cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
           (cfgAssign X k M.State s pts)) (readingF M r) ↔ M.reading pts = r) := by
   classical
-  letI := X.mapLinearOrder A
-  letI := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
+  let := X.mapLinearOrder A
+  let := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
     (cfgAssign X k M.State s pts)
   have key : ∀ i : M.TestIx,
       (@Sentence.Realize _ A
@@ -664,7 +664,7 @@ theorem realize_moveF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
         (((cfgBlock X k M.State).replicate 2).structure₁ (L := L.sum Language.order)
           ((cfgBlock X k M.State).replicateAssign σs)) (moveF M mv j) ↔
       mv.Holds x j (y j)) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   have hx : ∀ i : Fin k, (stepSlot X k M.State 0 i).At
       ((cfgBlock X k M.State).replicateAssign σs) (x i).1 := by
     intro i
@@ -709,8 +709,8 @@ theorem realize_transF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
           ((cfgBlock X k M.State).replicateAssign σs)) (transF M s₀ r p) ↔
       (s₀ = s ∧ M.reading x = r ∧ ∃ y : Fin k → X.Map A,
         σs 1 = cfgAssign X k M.State p.1 y ∧ ∀ j, (p.2 j).Holds x j (y j))) := by
-  letI := X.mapLinearOrder A
-  letI := ((cfgBlock X k M.State).replicate 2).structure₁ (L := L.sum Language.order)
+  let := X.mapLinearOrder A
+  let := ((cfgBlock X k M.State).replicate 2).structure₁ (L := L.sum Language.order)
     ((cfgBlock X k M.State).replicateAssign σs)
   have hctrl0 : (@Sentence.Realize _ A _
       ((copyLHom X k M.State 0).onSentence (ctrlF X k M.State s₀)) ↔ s₀ = s) := by
@@ -753,8 +753,8 @@ theorem step_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     ((autoSpec M).Step σ τ ↔ ∃ (s' : M.State) (y : Fin k → X.Map A),
       τ = cfgAssign X k M.State s' y ∧ M.Step (s, x) (s', y)) := by
   classical
-  letI := X.mapLinearOrder A
-  letI := ((cfgBlock X k M.State).replicate 2).structure₁ (L := L.sum Language.order)
+  let := X.mapLinearOrder A
+  let := ((cfgBlock X k M.State).replicate 2).structure₁ (L := L.sum Language.order)
     ((cfgBlock X k M.State).replicateAssign ![σ, τ])
   have hstep : (autoSpec M).Step σ τ ↔ @Sentence.Realize _ A
       (((cfgBlock X k M.State).replicate 2).structure₁ (L := L.sum Language.order)
@@ -793,7 +793,7 @@ theorem isSrc_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     letI := X.mapLinearOrder A
     ((autoSpec M).IsSrc σ ↔ ∃ x : Fin k → X.Map A,
       σ = cfgAssign X k M.State M.start x ∧ ∀ j, ∀ b : X.Map A, x j ≤ b) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   have hmins : ∀ (s : M.State) (x : Fin k → X.Map A),
       ((@Formula.Realize _ A
           ((cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
@@ -801,7 +801,7 @@ theorem isSrc_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
           (listInf ((List.finRange k).map fun i => minPtF (cfgSlot X k M.State i))) default) ↔
         ∀ j, ∀ b : X.Map A, x j ≤ b) := by
     intro s x
-    letI := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
+    let := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
       (cfgAssign X k M.State s x)
     rw [realize_listInf]
     constructor
@@ -813,7 +813,7 @@ theorem isSrc_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
       obtain ⟨j, -, rfl⟩ := List.mem_map.mp hψ
       exact (realize_minPtF (cfgSlot_at X k M.State s x j)).mpr
         ((forall_point_of_total htot fun q => (X.pointLinearOrder A).le (x j).1 q).mp (h j))
-  letI := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order) σ
+  let := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order) σ
   change (@Formula.Realize _ A _ _
     ((ctrlF X k M.State M.start ⊓ cfgGuardF X k M.State) ⊓
       listInf ((List.finRange k).map fun i => minPtF (cfgSlot X k M.State i))) default ↔ _)
@@ -833,7 +833,7 @@ theorem isTgt_autoSpec (σ : (cfgBlock X k M.State).Assignment A) (s : M.State)
     (autoSpec M).IsTgt σ ↔ M.accept s = true := by
   classical
   subst hσ
-  letI := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
+  let := (cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
     (cfgAssign X k M.State s x)
   change (@Formula.Realize _ A _ _
     (listSup ((finEnum M.State).map fun s' => if M.accept s' then ctrlF X k M.State s' else ⊥))
@@ -863,7 +863,7 @@ theorem reach_autoSpec_of (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (Relation.ReflTransGen (autoSpec M).Step σ τ →
       ∃ (s' : M.State) (y : Fin k → X.Map A), τ = cfgAssign X k M.State s' y ∧
         Relation.ReflTransGen M.Step (s, x) (s', y)) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   intro h
   induction h with
   | refl => exact ⟨s, x, hσ, Relation.ReflTransGen.refl⟩
@@ -879,7 +879,7 @@ theorem reach_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (Relation.ReflTransGen M.Step a b →
       Relation.ReflTransGen (autoSpec M).Step (cfgAssign X k M.State a.1 a.2)
         (cfgAssign X k M.State b.1 b.2)) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   intro h
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -892,7 +892,7 @@ the machine accepts the expanded structure. -/
 theorem accepts_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p) :
     letI := X.mapLinearOrder A
     ((autoSpec M).Accepts A ↔ M.Accepts (X.Map A)) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   constructor
   · rintro ⟨σ, τ, hs, ht, hreach⟩
     obtain ⟨x, hσ, hmin⟩ := (isSrc_autoSpec M htot σ).mp hs

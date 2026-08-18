@@ -330,7 +330,7 @@ theorem uGDefinable_forall {ι : Type*} [Finite ι]
     {R : ι → ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     (h : ∀ i, UGDefinable (R i)) :
     UGDefinable fun e f g => ∀ i, R i e f g := by
-  letI := Fintype.ofFinite ι
+  let := Fintype.ofFinite ι
   choose φ hφ using h
   refine ⟨listInf ((Finset.univ : Finset ι).toList.map φ), fun e w => ?_⟩
   rw [realize_listInf]
@@ -348,7 +348,7 @@ theorem uGDefinable_exists {ι : Type*} [Finite ι]
     {R : ι → ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     (h : ∀ i, UGDefinable (R i)) :
     UGDefinable fun e f g => ∃ i, R i e f g := by
-  letI := Fintype.ofFinite ι
+  let := Fintype.ofFinite ι
   choose φ hφ using h
   refine ⟨listSup ((Finset.univ : Finset ι).toList.map φ), fun e w => ?_⟩
   rw [realize_listSup]
@@ -474,7 +474,7 @@ theorem uSlotDefinable_cases {ι : Type*} [Finite ι]
     (hpos : ∀ e f g i, R i e f g → V e f g = U i e f g)
     (hneg : ∀ e f g, (∀ i, ¬R i e f g) → V e f g = V' e f g) :
     USlotDefinable V := by
-  letI := Fintype.ofFinite ι
+  let := Fintype.ofFinite ι
   choose φ hφ using hR
   choose ψ hψ using hU
   obtain ⟨ψ₀, hψ₀⟩ := h₀

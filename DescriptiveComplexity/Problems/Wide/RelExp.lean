@@ -198,9 +198,9 @@ theorem realize_relOldBlock (σ : ((L.sum Language.order).sum B.lang).Sentence) 
     @Sentence.Realize _ ((dblInterp L).Map A) (B.structure₁ (extAssign ρ₀))
         (relativizeTo (oldGuard (L := L) B) ((newBlockLHom B).onSentence σ)) ↔
       @Sentence.Realize _ A (B.structure₁ ρ₀) σ := by
-  letI := B.structure₁ (L := (newLang L).sum Language.order) (extAssign (L := L) ρ₀)
-  letI := (newBlockLHom (L := L) B).reduct (oldSubD L B A ρ₀)
-  letI := B.structure₁ (L := L.sum Language.order) ρ₀
+  let := B.structure₁ (L := (newLang L).sum Language.order) (extAssign (L := L) ρ₀)
+  let := (newBlockLHom (L := L) B).reduct (oldSubD L B A ρ₀)
+  let := B.structure₁ (L := L.sum Language.order) ρ₀
   have hS : ∀ x : (dblInterp L).Map A,
       x ∈ oldSubD L B A ρ₀ ↔ RelMap (oldGuard (L := L) B) ![x] := by
     intro x
@@ -352,9 +352,9 @@ theorem realize_relOldMark (ρ₀ : B.Assignment (MarkPart L M))
     @Sentence.Realize _ M (B.structure₁ (extAssignM B ρ₀))
         (relativizeTo (oldGuard (L := L) B) ((newBlockLHom B).onSentence σ)) ↔
       @Sentence.Realize _ (MarkPart L M) (B.structure₁ ρ₀) σ := by
-  letI := B.structure₁ (L := (newLang L).sum Language.order) (extAssignM (L := L) B ρ₀)
-  letI := (newBlockLHom (L := L) B).reduct (markSub (L := L) B (extAssignM B ρ₀))
-  letI := B.structure₁ (L := L.sum Language.order) ρ₀
+  let := B.structure₁ (L := (newLang L).sum Language.order) (extAssignM (L := L) B ρ₀)
+  let := (newBlockLHom (L := L) B).reduct (markSub (L := L) B (extAssignM B ρ₀))
+  let := B.structure₁ (L := L.sum Language.order) ρ₀
   have hS : ∀ x : M, x ∈ markSub (L := L) B (extAssignM B ρ₀) ↔ RelMap (oldGuard (L := L) B) ![x] :=
     fun _ => Iff.rfl
   have h1 := realize_relativizeTo (R := oldGuard (L := L) B)
@@ -383,7 +383,7 @@ sentence exactly when it never holds of an unmarked entry. -/
 theorem realize_suppAt (ρ : B.Assignment M) (i : B.ι) :
     @Sentence.Realize _ M (B.structure₁ ρ) (suppAt L B i) ↔
       ∀ w : Fin (B.arity i) → M, ρ i w → ∀ j, RelMap (oldNewSym L) ![w j] := by
-  letI := B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := B.structure₁ (L := (newLang L).sum Language.order) ρ
   rw [suppAt]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_rel, Term.realize_var, Sum.elim_inr, realize_listInf,
@@ -403,8 +403,8 @@ theorem realize_suppSentence (ρ : B.Assignment M) :
     @Sentence.Realize _ M (B.structure₁ ρ) (suppSentence L B) ↔
       ∀ (i : B.ι) (w : Fin (B.arity i) → M), ρ i w → ∀ j, RelMap (oldNewSym L) ![w j] := by
   classical
-  letI := Fintype.ofFinite B.ι
-  letI := B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := Fintype.ofFinite B.ι
+  let := B.structure₁ (L := (newLang L).sum Language.order) ρ
   rw [suppSentence]
   simp only [Sentence.Realize, realize_listInf, List.mem_map, Finset.mem_toList,
     Finset.mem_univ, true_and, forall_exists_index]

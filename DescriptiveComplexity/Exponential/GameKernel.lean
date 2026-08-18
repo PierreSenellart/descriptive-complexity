@@ -91,8 +91,8 @@ theorem realize_argsFreed {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 
       φ.Realize (M := X.Map A) fun p => xs ⟨(p.1 : ℕ) * d + (p.2 : ℕ), by
         have ha : (p.1 : ℕ) * d ≤ 1 * d := Nat.mul_le_mul_right d (Nat.lt_succ_iff.mp p.1.isLt)
         omega⟩) := by
-  letI := X.mapLinearOrder A
-  haveI := X.mapNonempty A
+  let := X.mapLinearOrder A
+  have := X.mapNonempty A
   rw [argsFreed, BoundedFormula.realize_toPrenex, BoundedFormula.realize_relabel]
   refine iff_of_eq (congrArg₂ _ (funext fun p => ?_) (Subsingleton.elim _ _))
   rfl
@@ -124,7 +124,7 @@ theorem exists_paramKernel (X : ExpExpansion L) {d : ℕ}
   obtain ⟨K, hK⟩ := hD n c D _hcn rfl
     (fun i => ⟨(i : ℕ), by omega⟩) (fun i => by exact i.isLt.trans_le (by omega))
   refine ⟨K, fun A _ _ _ _ pts ext hfix hemb => ?_⟩
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   refine (hK A pts ext hfix hemb).trans ?_
   refine (realize_argsFreed φ fun i => pts ⟨(i : ℕ), by omega⟩).trans ?_
   exact Iff.rfl

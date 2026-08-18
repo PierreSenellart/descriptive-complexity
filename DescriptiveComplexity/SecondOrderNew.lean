@@ -321,25 +321,25 @@ theorem sorealize_guardNoNew_iff [L.IsRelational] {B : SOBlock}
       ((soLangEmbed [B] (newLang L)).onSentence (noNewSentence L) ⊓
         (soLangLift [B] L (newLang L) LHom.sumInl).onSentence φ) true ↔
       (IsEmpty (Fin m) ∧ SORealize L A [B] φ true) := by
-  letI instAll := allOldStructure L A
+  let instAll := allOldStructure L A
   rw [sorealize_inf_embed [B] (newLang L) (A ⊕ Fin m) _ (noNewSentence L) _ true,
     realize_noNewSentence L A m]
   constructor
   · rintro ⟨hno, hrest⟩
-    haveI : IsEmpty (Fin m) := ⟨fun i => not_isOld_inr i (hno (Sum.inr i))⟩
+    have : IsEmpty (Fin m) := ⟨fun i => not_isOld_inr i (hno (Sum.inr i))⟩
     refine ⟨inferInstance, ?_⟩
     have h1 := (@sorealize_iso (newLang L) A (A ⊕ Fin m) instAll _
       (extEquivNoNew L A m) [B] _ true).mpr hrest
     exact (sorealize_soLangLift [B] L (newLang L) LHom.sumInl A instA instAll
-      (by letI := allOldMarkStructure A; infer_instance) φ true).mp h1
+      (by let := allOldMarkStructure A; infer_instance) φ true).mp h1
   · rintro ⟨hempty, hφA⟩
-    haveI := hempty
+    have := hempty
     refine ⟨fun x => ?_, ?_⟩
     · cases x with
       | inl a => exact isOld_inl a
       | inr i => exact (hempty.false i).elim
     · have h1 := (sorealize_soLangLift [B] L (newLang L) LHom.sumInl A instA instAll
-        (by letI := allOldMarkStructure A; infer_instance) φ true).mpr hφA
+        (by let := allOldMarkStructure A; infer_instance) φ true).mpr hφA
       exact (@sorealize_iso (newLang L) A (A ⊕ Fin m) instAll _
         (extEquivNoNew L A m) [B] _ true).mp h1
 

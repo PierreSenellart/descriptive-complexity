@@ -971,7 +971,7 @@ theorem holds_haltMap_iff {P : DecisionProblem L}
     (hP : ∀ N n : ℕ, (cP.eval [N, n]).Dom ↔ P.toPred V (structOfBits V (n - 1) N)) :
     HALT ((haltTuringInterp V cF cP).Map A) ↔ P A := by
   classical
-  haveI : Finite ((haltTuringInterp V cF cP).Map A) :=
+  have : Finite ((haltTuringInterp V cF cP).Map A) :=
     FOInterpretation.map_finite _ _
   rw [halt_holds_iff]
   rw [and_iff_right wellFormed_halt]

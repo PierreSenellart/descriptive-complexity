@@ -376,7 +376,7 @@ symbol and no head is always a tile of the emitted instance. -/
 theorem wtHasFirst_tileStr (p : TilePt A) :
     letI := tileStr A
     (WTHasFirst p ↔ TPDig p ∧ WMHasInp (p.2 0)) := by
-  letI := tileStr A
+  let := tileStr A
   constructor
   · rintro ⟨t, a, hdig, -, hinp, -⟩
     exact ⟨hdig, a, hinp⟩
@@ -390,7 +390,7 @@ machine's cell of `x`. -/
 theorem wmFileSeg_tpCol (s : A → Prop) (x : A) :
     letI := tileStr A
     (WMFileSeg WTLe WTHasFirst (tpCol s) (tpDig x) ↔ WMRegSeg s x) := by
-  letI := tileStr A
+  let := tileStr A
   have hdig : ∀ y : A, (tpCol s (tpDig y) ↔
       (WTLe (tpDig (A := A) y) (tpDig x) ∧ WTHasFirst (tpDig (A := A) y))) ↔
       (s y ↔ (WMLe y x ∧ WMHasInp y)) := by
@@ -417,7 +417,7 @@ theorem wtpFirst_tpCol (s : A → Prop) (t : TilePt A) :
     letI := tileStr A
     ((wideTileData (TilePt A)).First (Sum.inl (tpCol s)) (Sum.inr t) ↔
       ∃ x a, WMRegSeg s x ∧ WMInp x a ∧ TPNoHead t ∧ tpSym t = a) := by
-  letI := tileStr A
+  let := tileStr A
   constructor
   · rintro ⟨x', hseg, a, hdig, hnohead, hinp, hsym⟩
     have hx' : tpDig (A := A) (x'.2 0) = x' := tpDig_eq_self hdig
@@ -448,7 +448,7 @@ theorem first_tableTiling (hwf : WideWF A)
         (wideTileData (TilePt A)).Start (tableTiling g tr n x y)) ∧
       (¬MinPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn x →
         (wideTileData (TilePt A)).FirstTile x (tableTiling g tr n x y))) := by
-  letI := tileStr A
+  let := tileStr A
   obtain ⟨s, rfl⟩ := exists_tpCol_of_posn hx
   obtain rfl : y = Sum.inl (tpCol (fun _ : A => False)) := eq_bot_of_minPos hwf.1 hy
   have hhead : (g 0).head = (Sum.inl fun _ : A => False) :=
@@ -586,7 +586,7 @@ theorem isTiling_tableTiling (hwf : WideWF A)
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i)) :
     letI := tileStr A
     (wideTileData (TilePt A)).IsTiling (tableTiling g tr n) := by
-  letI := tileStr A
+  let := tileStr A
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · -- every cell carries a tile
     intro x y hx hy
@@ -642,7 +642,7 @@ half of the hardness: the table the run draws is a tiling. -/
 theorem tileable_of_accepts (hwf : WideWF A) (h : (wideRegData A).Accepts) :
     letI := tileStr A
     (wideTileData (TilePt A)).WellFormed ∧ (wideTileData (TilePt A)).Tileable := by
-  letI := tileStr A
+  let := tileStr A
   obtain ⟨g, tr, n, hinit, hlt, hfreeze, hacc, hstep⟩ := exists_runData h
   exact ⟨wideTileData_wellFormed (isLinOrd_tpLe hwf.1),
     ⟨tableTiling g tr n, isTiling_tableTiling hwf hinit hlt hfreeze hacc hstep⟩⟩

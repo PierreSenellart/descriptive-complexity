@@ -58,10 +58,10 @@ has a strictly increasing enumeration: sort the elements satisfying it. -/
 theorem exists_isEnum [Finite α] {Le : α → α → Prop} (h : IsLinOrd Le) (S : α → Prop) :
     ∃ ps : List α, IsEnum (fun a b => Le a b ∧ a ≠ b) S ps := by
   classical
-  haveI : Fintype α := Fintype.ofFinite α
-  haveI : IsTrans α Le := ⟨h.2.1⟩
-  haveI : Std.Antisymm Le := ⟨h.2.2.1⟩
-  haveI : Std.Total Le := ⟨h.2.2.2⟩
+  have : Fintype α := Fintype.ofFinite α
+  have : IsTrans α Le := ⟨h.2.1⟩
+  have : Std.Antisymm Le := ⟨h.2.2.1⟩
+  have : Std.Total Le := ⟨h.2.2.2⟩
   refine ⟨(Finset.univ.filter S).sort Le, (Finset.pairwise_sort _ Le).and ?_, fun p => ?_⟩
   · exact Finset.sort_nodup _ Le
   · rw [Finset.mem_sort]

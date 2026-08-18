@@ -83,7 +83,7 @@ noncomputable def blockArityBound (B : SOBlock) : ℕ :=
 
 theorem arity_le_blockArityBound (B : SOBlock) (i : B.ι) :
     B.arity i ≤ blockArityBound B := by
-  letI := Fintype.ofFinite B.ι
+  let := Fintype.ofFinite B.ι
   exact Finset.le_sup (Finset.mem_univ i)
 
 /-- An assignment of actual relations (on a universe `A`) to the relation

@@ -387,7 +387,7 @@ theorem realize_gameOut {A : Type} [Language.andOrGraph.Structure A] [LinearOrde
     (@Sentence.Realize (agOrd.sum gameBlock.lang) A
         (@sumStructure _ _ A _ (gameBlock.structure ρ)) gameOut) ↔
       ∃ s : A, ρ GIx.win (fun _ => s) ∧ AGStart s := by
-  letI := gameBlock.structure ρ
+  let := gameBlock.structure ρ
   rw [gameOut]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_atomF, realize_guardOutF, realize_startG, Sum.elim_inr]

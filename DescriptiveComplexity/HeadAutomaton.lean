@@ -263,7 +263,7 @@ noncomputable def allReadings (T : Type) [Finite T] : List (T → Bool) :=
 
 theorem mem_allReadings {T : Type} [Finite T] (r : T → Bool) : r ∈ allReadings T := by
   classical
-  letI := Fintype.ofFinite T
+  let := Fintype.ofFinite T
   exact Finset.mem_toList.mpr (Finset.mem_univ r)
 
 open Classical in
@@ -274,7 +274,7 @@ noncomputable def allTests : List M.TestIx :=
 
 theorem mem_allTests (i : M.TestIx) : i ∈ M.allTests := by
   classical
-  letI := Fintype.ofFinite M.TestIx
+  let := Fintype.ofFinite M.TestIx
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
 /-- The formula saying that the tests come out as `r` does. -/

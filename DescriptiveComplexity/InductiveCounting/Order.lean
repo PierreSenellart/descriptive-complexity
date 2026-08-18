@@ -91,7 +91,7 @@ theorem notMem_predSet_self (x : V) : x ∉ predSet (↑x : WithBot V) := by
 /-- At the least node, nothing has been scanned. -/
 theorem predSet_of_isMin {x : V} (h : ∀ z : V, x ≤ z) : predSet (↑x : WithBot V) = ∅ := by
   ext y
-  simp only [predSet, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_lt]
+  simp only [predSet, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_lt]
   exact_mod_cast h y
 
 /-- Past the greatest node, everything has been scanned. -/

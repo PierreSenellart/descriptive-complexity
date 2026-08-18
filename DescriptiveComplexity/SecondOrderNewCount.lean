@@ -80,7 +80,7 @@ theorem bijective_of_flipClosedP [Finite α] (f : ι → α → Prop)
     (hflip : ∀ (i : ι) (a : α), ∃ j, ∀ x, f j x ↔ Xor (f i x) (x = a)) :
     Function.Bijective f := by
   classical
-  letI := Fintype.ofFinite α
+  let := Fintype.ofFinite α
   have hfin : Function.Bijective (toFinsetOf f) := by
     refine bijective_of_flipClosed _ ?_ ?_ ?_
     · intro i j h

@@ -81,7 +81,7 @@ theorem isZ_iff {d : D} : IsZ Le d ↔ numOf Le d = 0 := by
   · intro h
     have hset : {q : D | (fun _ => True) q ∧ Le q d ∧ q ≠ d} = ∅ := by
       ext q
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, true_and, not_and, not_not]
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, true_and, not_and, not_not]
       exact fun hq => hlin.2.2.1 q d hq (h q)
     rw [numOf, bitRank, hset, Set.ncard_empty]
   · intro h e
@@ -96,7 +96,7 @@ theorem isS_iff {d d' : D} : IsS Le d d' ↔ numOf Le d' = numOf Le d + 1 := by
     have hset : {q : D | (fun _ => True) q ∧ Le q d' ∧ q ≠ d'} =
         insert d {q : D | (fun _ => True) q ∧ Le q d ∧ q ≠ d} := by
       ext q
-      simp only [Set.mem_setOf_eq, Set.mem_insert_iff, true_and]
+      simp only [Set.mem_ofPred_eq, Set.mem_insert_iff, true_and]
       constructor
       · rintro ⟨hqd', hqne⟩
         rcases hlin.2.2.2 d q with hdq | hqd

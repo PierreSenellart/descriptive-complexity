@@ -158,9 +158,9 @@ noncomputable def wideRegAccept_ordered_fo_reduction_wideTiling :
   dim := 3
   toInterpretation := tileInterp
   correct := fun A _ _ _ _ => by
-    letI := tileStr A
-    haveI : Finite (TilePt A) := inferInstance
-    haveI : Nonempty (TilePt A) := ⟨(TileTag.dig, fun _ => Classical.arbitrary A)⟩
+    let := tileStr A
+    have : Finite (TilePt A) := inferInstance
+    have : Nonempty (TilePt A) := ⟨(TileTag.dig, fun _ => Classical.arbitrary A)⟩
     refine Iff.trans ?_ (wideTiling_map_iff A).symm
     constructor
     · rintro ⟨hwf, hacc⟩

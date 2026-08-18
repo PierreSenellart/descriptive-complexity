@@ -356,7 +356,7 @@ private theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
       ∀ c : A, RelMap satIsClause ![c] → ∃ x : A,
         (RelMap satPosIn ![c, x] ∧ ¬ρ satNuSym.1 fun _ => x) ∨
           (RelMap satNegIn ![c, x] ∧ ρ satNuSym.1 fun _ => x) := by
-  letI := satAssignBlock.structure ρ
+  let := satAssignBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := satSOLang) (M := A) kNuSym w ↔ ρ satNuSym.1 fun _ => w 0 := by
     intro w

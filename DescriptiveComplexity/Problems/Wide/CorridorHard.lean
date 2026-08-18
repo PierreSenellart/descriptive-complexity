@@ -46,7 +46,7 @@ blank. That is what makes the drawing's file the machine's whole ruler. -/
 theorem wtHasFirst_tileStrR (hblank : ∃ b : A, WMBlank b) (p : TilePt A) :
     letI := tileStrR A
     (WTHasFirst p ↔ TPDig p) := by
-  letI := tileStrR A
+  let := tileStrR A
   refine ⟨fun h => h.choose_spec.1, fun hdig => ?_⟩
   by_cases hinp : ∃ a, WMInp (p.2 0) a
   · obtain ⟨a, ha⟩ := hinp
@@ -62,7 +62,7 @@ initial segment `x` cuts. -/
 theorem wmFileSeg_tpColR (hblank : ∃ b : A, WMBlank b) (s : A → Prop) (x : A) :
     letI := tileStrR A
     (WMFileSeg WTLe WTHasFirst (tpCol s) (tpDig x) ↔ WMDown WMLe s x) := by
-  letI := tileStrR A
+  let := tileStrR A
   have hdig : ∀ y : A, (tpCol s (tpDig y) ↔
       (WTLe (tpDig (A := A) y) (tpDig x) ∧ WTHasFirst (tpDig (A := A) y))) ↔
       (s y ↔ WMLe y x) := by
@@ -88,7 +88,7 @@ theorem wtpFirst_tpColR (hblank : ∃ b : A, WMBlank b) (s : A → Prop) (t : Ti
     letI := tileStrR A
     ((wideTileData (TilePt A)).First (Sum.inl (tpCol s)) (Sum.inr t) ↔
       ∃ x, WMDown WMLe s x ∧ TPFirstR (tpDig x) t) := by
-  letI := tileStrR A
+  let := tileStrR A
   constructor
   · rintro ⟨x', hseg, hfirst⟩
     have hx' : tpDig (A := A) (x'.2 0) = x' := tpDig_eq_self hfirst.1
@@ -139,7 +139,7 @@ theorem first_tableCorridor (hwf : WideWF A)
         (wideTileData (TilePt A)).Start (tableCorridor g tr n 0 x)) ∧
       (¬MinPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn x →
         (wideTileData (TilePt A)).FirstTile x (tableCorridor g tr n 0 x))) := by
-  letI := tileStrR A
+  let := tileStrR A
   obtain ⟨s, rfl⟩ := exists_tpCol_of_posn hx
   have hhead : (g 0).head = (Sum.inl fun _ : A => False) :=
     (minPos_wpLe_iff hwf.1 _).mp hinit.2.1
@@ -236,7 +236,7 @@ theorem isCorridor_tableCorridor (hwf : WideWF A)
     (hstep : ∀ i, i < n → StepWith (wideData A) (g i) (g (i + 1)) (tr i)) :
     letI := tileStrR A
     (wideTileData (TilePt A)).IsCorridor n (tableCorridor g tr n) := by
-  letI := tileStrR A
+  let := tileStrR A
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · -- every cell carries a tile
     intro k x _ hx
@@ -285,7 +285,7 @@ theorem corridorTileable_of_acceptsSpace (hwf : WideWF A) (h : (wideData A).Acce
     letI := tileStrR A
     (wideTileData (TilePt A)).WellFormed ∧
       (wideTileData (TilePt A)).CorridorTileable := by
-  letI := tileStrR A
+  let := tileStrR A
   obtain ⟨g, tr, n, hinit, hfreeze, hacc, hstep⟩ := exists_runDataSpace h
   exact ⟨wideTileData_wellFormed (isLinOrd_tpLe hwf.1),
     n, tableCorridor g tr n, isCorridor_tableCorridor hwf hinit hfreeze hacc hstep⟩
@@ -305,7 +305,7 @@ theorem wideAcceptSpace_of_corridorTileable
     (hwf0 : letI := tileStrR A; (wideTileData (TilePt A)).WellFormed)
     (h : letI := tileStrR A; (wideTileData (TilePt A)).CorridorTileable) :
     WideWF A ∧ (wideData A).AcceptsSpace := by
-  letI := tileStrR A
+  let := tileStrR A
   classical
   obtain ⟨hgt, τ, htiles, hfst, hel, her, hhor, hver, xa, hxa, hacc⟩ := h
   have hlin : IsLinOrd (WMLe (A := A)) := isLinOrd_of_tileWF hwf0.1
@@ -313,7 +313,7 @@ theorem wideAcceptSpace_of_corridorTileable
     fun s q hq => tpCol_dig_of_mem hq
   have hcorner : (wideTileData (TilePt A)).Start (τ 0 (Sum.inl (tpCol (fun _ : A => False)))) :=
     (hfst _ (hposn _)).1 (minPos_tpCol_bot hlin)
-  haveI : Nonempty (TilePt A) := by
+  have : Nonempty (TilePt A) := by
     rcases hp : τ 0 (Sum.inl (tpCol (fun _ : A => False))) with u | t
     · rw [hp] at hcorner
       exact hcorner.elim
@@ -411,9 +411,9 @@ noncomputable def wideAcceptSpace_ordered_fo_reduction_wideCorridor :
   dim := 3
   toInterpretation := tileInterpR
   correct := fun A _ _ _ _ => by
-    letI := tileStrR A
-    haveI : Finite (TilePt A) := inferInstance
-    haveI : Nonempty (TilePt A) := ⟨(TileTag.dig, fun _ => Classical.arbitrary A)⟩
+    let := tileStrR A
+    have : Finite (TilePt A) := inferInstance
+    have : Nonempty (TilePt A) := ⟨(TileTag.dig, fun _ => Classical.arbitrary A)⟩
     refine Iff.trans ?_ (wideCorridor_map_iff A).symm
     constructor
     · rintro ⟨hwf, hacc⟩

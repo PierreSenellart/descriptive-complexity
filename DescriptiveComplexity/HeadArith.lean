@@ -492,7 +492,7 @@ theorem exists_walk_test (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
           (∀ p : Fin K, p ≠ a → p ≠ b → p ≠ mk → z p = x p) ∧
             orank (z a) = orank (x i) + t ∧ orank (z b) = t := by
   classical
-  haveI : Nonempty A := ⟨x i⟩
+  have : Nonempty A := ⟨x i⟩
   intro t
   induction t with
   | zero =>
@@ -1446,7 +1446,7 @@ theorem exists_walk_outer (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x
           (∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → q ≠ cand → q ≠ tmk → z q = x q) ∧
             orank (z acc) = orank (x i) * r ∧ orank (z cnt) = r ∧ ∀ e : A, e ≤ z tmk := by
   classical
-  haveI : Nonempty A := ⟨x i⟩
+  have : Nonempty A := ⟨x i⟩
   have hjm : (j : ℕ) < m := by
     have := hh.hj
     have := hh.hcnt.1
@@ -1752,7 +1752,7 @@ theorem decides_timesP (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK 
   · -- completeness
     rintro x c y ⟨hc, hag⟩
     change c = true ↔ orank (x i) * orank (x j) = orank (x k) at hc
-    haveI : Nonempty A := ⟨x i⟩
+    have : Nonempty A := ⟨x i⟩
     have hkk : orank (x k) < Nat.card A := orank_lt_card _
     have hpos : 0 < Nat.card A := Nat.card_pos
     have hxy : ∀ z : Fin K → A,

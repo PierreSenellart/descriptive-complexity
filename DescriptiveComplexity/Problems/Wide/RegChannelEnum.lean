@@ -174,7 +174,7 @@ theorem exists_regValEnum
     have hcard := Nat.card_le_card_of_injective mV hinj
     rw [Nat.card_eq_fintype_card, Fintype.card_fin] at hcard
     refine le_trans hcard (le_of_eq ?_)
-    haveI : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
+    have : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
     simp
 
@@ -195,8 +195,8 @@ theorem card_univ :
     Nat.card (Univ A R' P' dt.KIx dt.dd) =
       Nat.card (Tag R' P' dt.KIx) * Nat.card A ^ dt.dd := by
   classical
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype (Tag R' P' dt.KIx) := Fintype.ofFinite _
+  have : Fintype A := Fintype.ofFinite A
+  have : Fintype (Tag R' P' dt.KIx) := Fintype.ofFinite _
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
   simp [Fintype.card_prod]
 
@@ -208,10 +208,10 @@ theorem card_drawTag :
     Nat.card (Tag R' P' dt.KIx) =
       Nat.card R' + 1 + Nat.card P' + Nat.card dt.KIx := by
   classical
-  haveI : Fintype R' := Fintype.ofFinite R'
-  haveI : Fintype P' := Fintype.ofFinite P'
-  haveI : Fintype dt.KIx := Fintype.ofFinite _
-  haveI : Fintype (Tag R' P' dt.KIx) := Fintype.ofFinite _
+  have : Fintype R' := Fintype.ofFinite R'
+  have : Fintype P' := Fintype.ofFinite P'
+  have : Fintype dt.KIx := Fintype.ofFinite _
+  have : Fintype (Tag R' P' dt.KIx) := Fintype.ofFinite _
   have hequiv : Tag R' P' dt.KIx ≃ R' ⊕ Unit ⊕ P' ⊕ dt.KIx :=
     { toFun := fun t => match t with
         | .ctrl r => Sum.inl r
@@ -241,9 +241,9 @@ theorem card_regIx_le
     Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) ≤
       Nat.card dt.KIx * Nat.card A ^ dt.dd + 1 := by
   classical
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype dt.KIx := Fintype.ofFinite _
-  haveI : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
+  have : Fintype A := Fintype.ofFinite A
+  have : Fintype dt.KIx := Fintype.ofFinite _
+  have : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
   refine le_trans (Nat.card_le_card_of_injective
     (f := fun u : dt.RegIx (A := A) (R' := R') (P' := P') =>
       (match (u.1).1, (u.1).2 with
@@ -282,7 +282,7 @@ theorem card_regIx_le
         | Tag.sym => subst htx'; exact absurd hEq (by simp)
         | Tag.phase p => subst htx'; exact absurd hEq (by simp)
       · exact Subtype.ext (htx.unique hty)
-  · haveI : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
+  · have : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,
       Fintype.card_option, Fintype.card_prod, Fintype.card_fun, Fintype.card_fin]
 
@@ -299,9 +299,9 @@ theorem card_regIx_ge {zero : A}
     Nat.card dt.KIx * Nat.card A ^ dt.dd0 ≤
       Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) := by
   classical
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype dt.KIx := Fintype.ofFinite _
-  haveI : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
+  have : Fintype A := Fintype.ofFinite A
+  have : Fintype dt.KIx := Fintype.ofFinite _
+  have : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
   have hinj : Function.Injective
       (fun p : dt.KIx × (Fin dt.dd0 → A) =>
         (⟨(Tag.arg p.1, padTup (dt := dt) zero p.2), harg (ofLex p.1) p.2⟩ :
@@ -340,7 +340,7 @@ theorem two_pow_card_le_card_nexRIx [Finite dt.d.B.ι]
     [Finite (dt.NexRIx (G := dt.d.B.ι → Bool))] :
     2 ^ Nat.card dt.d.B.ι ≤ Nat.card (dt.NexRIx (G := dt.d.B.ι → Bool)) := by
   classical
-  haveI : Fintype dt.d.B.ι := Fintype.ofFinite _
+  have : Fintype dt.d.B.ι := Fintype.ofFinite _
   have hinj : Function.Injective
       (fun x : dt.d.B.ι → Bool =>
         (⟨NexSite.guess, Sum.inl ((none : Option dt.KIx), x)⟩ :
@@ -375,7 +375,7 @@ theorem evalQ_le_two_pow [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
       2 ^ (4 * Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) + 14 +
         dt.eDim * Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) + dt.dimC) := by
   classical
-  haveI : Fintype A := Fintype.ofFinite A
+  have : Fintype A := Fintype.ofFinite A
   set N := Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) with hN
   -- the padded cells are registers, so the universe is no bigger than the file
   have hcell : Nat.card A ^ dt.dd0 ≤ N := by

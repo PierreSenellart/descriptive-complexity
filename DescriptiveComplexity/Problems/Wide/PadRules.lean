@@ -181,9 +181,9 @@ theorem card_rTagOf_pad [Finite S] [∀ i, Finite (Sh i)] (n : ℕ) :
     Nat.card (Data.RTagOf (S ⊕ Fin n) (padSh Sh n)) =
       Nat.card (Data.RTagOf S Sh) + n := by
   classical
-  haveI : Fintype S := Fintype.ofFinite S
-  haveI : ∀ i, Fintype (Sh i) := fun i => Fintype.ofFinite _
-  haveI : ∀ i : S ⊕ Fin n, Fintype (padSh Sh n i) := fun i => Fintype.ofFinite _
+  have : Fintype S := Fintype.ofFinite S
+  have : ∀ i, Fintype (Sh i) := fun i => Fintype.ofFinite _
+  have : ∀ i : S ⊕ Fin n, Fintype (padSh Sh n i) := fun i => Fintype.ofFinite _
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
   rw [show Fintype.card (Data.RTagOf (S ⊕ Fin n) (padSh Sh n)) =
       ∑ i : S ⊕ Fin n, Fintype.card (padSh Sh n i) from Fintype.card_sigma,

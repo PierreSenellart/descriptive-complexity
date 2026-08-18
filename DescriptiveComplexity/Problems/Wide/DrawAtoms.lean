@@ -148,7 +148,7 @@ theorem realize_matAtom (σ : B.Assignment (X.Map A)) {n : ℕ}
     (@BoundedFormula.Realize _ (X.Map A)
         (B.structure₁ (L := X.E.sum Language.order) σ) _ _ φ default w ↔
       κ.holds σ w) := by
-  letI inst := B.structure₁ (L := X.E.sum Language.order) σ
+  let inst := B.structure₁ (L := X.E.sum Language.order) σ
   match φ with
   | .falsum => simp [matAtom?] at h
   | .imp _ _ => simp [matAtom?] at h
@@ -180,7 +180,7 @@ theorem realize_iff_qfValue_holds {n : ℕ}
     (@BoundedFormula.Realize _ (X.Map A)
         (B.structure₁ (L := X.E.sum Language.order) σ) _ _ mat default w ↔
       qfValue mat fun a => (matAtom? a).elim False (MatAtom.holds σ w)) := by
-  letI inst := B.structure₁ (L := X.E.sum Language.order) σ
+  let inst := B.structure₁ (L := X.E.sum Language.order) σ
   refine (realize_qfValue hqf default w).trans (qfValue_congr _ _ _ fun a ha => ?_)
   obtain ⟨κ, hκ⟩ :=
     Option.isSome_iff_exists.mp (isSome_matAtom?_of_mem_qfAtoms mat a ha)

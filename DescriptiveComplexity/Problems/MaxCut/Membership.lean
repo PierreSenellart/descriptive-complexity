@@ -89,7 +89,7 @@ private theorem realize_maxCutKernel {A : Type} [Language.markedArcGraph.Structu
           ρ true ![a, b, c, d] ∧ MAGAdj c d ∧ ρ false ![c] ∧ ¬ρ false ![d]) ∧
         ∀ a b a' b' c d : A, ρ true ![a, b, c, d] → ρ true ![a', b', c, d] →
           a = a' ∧ b = b' := by
-  letI := maxCutGuessBlock.structure ρ
+  let := maxCutGuessBlock.structure ρ
   have hsubS : ∀ (w : Fin 1 → A),
       RelMap (L := mcSOLang) (M := A) mcSideSym w ↔ ρ false w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 4 → A),

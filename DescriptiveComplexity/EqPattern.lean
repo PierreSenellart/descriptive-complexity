@@ -135,7 +135,7 @@ variable {A : Type}
 theorem exists_covBy_of_not_isTop [LinearOrder A] [Finite A] {a : A}
     (h : ¬IsTop a) : ∃ b : A, a ⋖ b := by
   classical
-  letI := Fintype.ofFinite A
+  let := Fintype.ofFinite A
   have hne : (Finset.univ.filter fun b : A => a < b).Nonempty := by
     obtain ⟨b, hb⟩ : ∃ b : A, ¬b ≤ a := by
       by_contra hc

@@ -48,7 +48,7 @@ noncomputable def finEnum (T : Type) [Finite T] : List T :=
 
 open Classical in
 theorem mem_finEnum {T : Type} [Finite T] (t : T) : t ∈ finEnum T := by
-  letI : Fintype T := Fintype.ofFinite T
+  let : Fintype T := Fintype.ofFinite T
   exact Finset.mem_toList.mpr (Finset.mem_univ t)
 
 namespace SOBlock
@@ -114,14 +114,14 @@ variable [L.Structure A]
 theorem realize_tagBitF (σ : (B.withTag T).Assignment A) (t : T) :
     (@Formula.Realize _ A ((B.withTag T).structure₁ (L := L) σ) _ (tagBitF B T t) default ↔
       σ (Sum.inl t) default) := by
-  letI := (B.withTag T).structure₁ (L := L) σ
+  let := (B.withTag T).structure₁ (L := L) σ
   exact iff_of_eq (congrArg (σ (Sum.inl t)) (Subsingleton.elim _ _))
 
 /-- **The guard says the assignment is a tagged one.** -/
 theorem realize_tagGuardF (σ : (B.withTag T).Assignment A) :
     (@Sentence.Realize _ A ((B.withTag T).structure₁ (L := L) σ) (tagGuardF B T) ↔
       ∃ (t : T) (ρ : B.Assignment A), σ = tagAssign t ρ) := by
-  letI := (B.withTag T).structure₁ (L := L) σ
+  let := (B.withTag T).structure₁ (L := L) σ
   rw [tagGuardF, Sentence.Realize, realize_listSup]
   constructor
   · rintro ⟨ψ, hψ, hr⟩

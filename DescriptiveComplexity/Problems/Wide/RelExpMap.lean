@@ -49,7 +49,7 @@ theorem not_domHolds_none (ρ : X.B.Assignment ((dblInterp L).Map A)) :
     ¬ExpExpansion.DomHolds (X := relExp X)
       ((none, ρ) : (relExp X).Point ((dblInterp L).Map A)) := by
   intro h
-  letI := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
   have h1 := (Formula.realize_inf.mp h).1
   have h2 := (realize_noOldSentence (L := L) ρ).mp h1
   exact h2 (dblPt false (Classical.arbitrary A))
@@ -61,7 +61,7 @@ second conjunct says. -/
 theorem supported_of_domHolds {t : X.Tag} {ρ : X.B.Assignment ((dblInterp L).Map A)}
     (h : ExpExpansion.DomHolds (X := relExp X)
       ((some t, ρ) : (relExp X).Point ((dblInterp L).Map A))) : Supported ρ := by
-  letI := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
   intro i w hw j
   exact (relMap_dbl_old (L := L) _).mp
     ((realize_suppSentence X.B ρ).mp (Formula.realize_inf.mp h).2 i w hw j)
@@ -73,7 +73,7 @@ theorem domHolds_relExp_iff (t : X.Tag) (ρ₀ : X.B.Assignment A) :
     ExpExpansion.DomHolds (X := relExp X)
         ((some t, extAssign ρ₀) : (relExp X).Point ((dblInterp L).Map A)) ↔
       ExpExpansion.DomHolds (X := X) ((t, ρ₀) : X.Point A) := by
-  letI := (relExp X).B.structure₁ (L := (newLang L).sum Language.order)
+  let := (relExp X).B.structure₁ (L := (newLang L).sum Language.order)
     (extAssign (L := L) ρ₀)
   constructor
   · intro h

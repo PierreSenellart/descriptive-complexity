@@ -229,7 +229,7 @@ theorem parCount_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Mark
     parCount z = 1 := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = {z} := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
     exact ⟨fun h => le_antisymm h.1 (hz y), fun h => ⟨h.le, by rw [h]; exact hm⟩⟩
   rw [parCount, hset, Set.ncard_singleton]
 
@@ -238,7 +238,7 @@ theorem parCount_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ 
     parCount z = 0 := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = ∅ := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_and]
+    simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_and]
     intro hy
     rw [le_antisymm hy (hz y)]
     exact hm
@@ -248,11 +248,11 @@ theorem parCount_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ 
 theorem parCount_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
     parCount z = parCount w + 1 := by
   have hnot : z ∉ {y : A | y ≤ w ∧ y ∈ Marked A} := by
-    simp only [Set.mem_setOf_eq, not_and]
+    simp only [Set.mem_ofPred_eq, not_and]
     exact fun hzw => absurd hzw (not_le_of_gt h.lt)
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = insert z {y : A | y ≤ w ∧ y ∈ Marked A} := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     constructor
     · rintro ⟨hle, hy⟩
       rcases covBy_le_cases h hle with hw | he
@@ -269,7 +269,7 @@ theorem parCount_covBy_not_marked {w z : A} (h : w ⋖ z) (hm : z ∉ Marked A) 
     parCount z = parCount w := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = {y : A | y ≤ w ∧ y ∈ Marked A} := by
     ext y
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     constructor
     · rintro ⟨hle, hy⟩
       rcases covBy_le_cases h hle with hw | he
@@ -352,7 +352,7 @@ theorem accepts_parSpec_iff : parSpec.Accepts A ↔ Even (Marked A).ncard := by
     rw [parCount]
     congr 1
     ext y
-    simp only [Set.mem_setOf_eq, and_iff_right_iff_imp]
+    simp only [Set.mem_ofPred_eq, and_iff_right_iff_imp]
     exact fun _ => h₁ y
   constructor
   · rintro ⟨u, v, hu, hv, huv⟩

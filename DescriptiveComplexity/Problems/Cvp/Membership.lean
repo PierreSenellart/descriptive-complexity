@@ -304,7 +304,7 @@ theorem realize_cvpOut :
     (@Sentence.Realize (cvLang.sum valBlock.lang) A
         (@sumStructure _ _ A _ (valBlock.structure (lfpAssign (A := A) cvpRules))) cvpOut) ↔
       CircuitAccepts A := by
-  letI := valBlock.structure (lfpAssign (A := A) cvpRules)
+  let := valBlock.structure (lfpAssign (A := A) cvpRules)
   rw [cvpOut]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_guardOutF, realize_atomF, Formula.realize_rel₁]

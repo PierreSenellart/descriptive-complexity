@@ -66,8 +66,8 @@ theorem NL_exp_subset_PSPACE : NL.exp ⊆ PSPACE := by
   obtain ⟨spec, hspec⟩ := (tcDefinable_iff_mem_NL Q).mpr hQ
   refine ⟨ExpExpansion.autoSpec ((drvP (ExpExpansion.relSpec X spec)).compile false), ?_⟩
   intro A _ _ _ _
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   refine (hX A).trans ((hspec (X.Map A)).trans ?_)
   refine (ExpExpansion.accepts_relSpec (X := X) (spec := spec)).symm.trans ?_
   refine (accepts_drvP (ExpExpansion.relSpec X spec) (X.trivialize.Map A)).symm.trans ?_

@@ -310,7 +310,7 @@ private theorem realize_zeroOneIPKernel :
         (∀ r j p : A, IPRow r → MaxPos IPLe IPCol j → IPPosn p →
           (ZPS ρ r j p ↔ IPRhs r p)) ∧
         ((∀ j : A, ¬IPCol j) → ∀ r p : A, IPRow r → IPPosn p → ¬IPRhs r p) := by
-  letI := zeroOneIPGuessBlock.structure ρ
+  let := zeroOneIPGuessBlock.structure ρ
   have hsubX : ∀ w : Fin 1 → A,
       RelMap (L := zoSOLang) (M := A) zoXSym w ↔ ρ none w := fun _ => Iff.rfl
   have hsubP : ∀ w : Fin 3 → A,
@@ -429,7 +429,7 @@ theorem zeroOneIP_sigmaSODefinable : SigmaSODefinable 1 ZeroOneIP := by
       intro hno r p hr hp
       have hSempty : {j : A | S j} = (∅ : Set A) := by
         ext j
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun hj => hno j (hScol j hj)
       have hzero : binNum (IPLe (A := A)) IPPosn (IPRhs r) = 0 := by
         rw [show binNum (IPLe (A := A)) IPPosn (IPRhs r) = IPRhsVal r from rfl,
@@ -458,11 +458,11 @@ theorem zeroOneIP_sigmaSODefinable : SigmaSODefinable 1 ZeroOneIP := by
     · have hno : ∀ j : A, ¬IPCol j := fun j hj => hcols ⟨j, hj⟩
       have hSempty : {j : A | ZX ρ j} = (∅ : Set A) := by
         ext j
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun hj => hno j (hx j hj)
       have hrhs : {p : A | IPPosn p ∧ IPRhs r p} = (∅ : Set A) := by
         ext p
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun h => hemp hno r p hr h.1 h.2
       rw [hSempty, finsum_mem_empty, IPRhsVal, binNum, hrhs, finsum_mem_empty]
 

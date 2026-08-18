@@ -265,7 +265,7 @@ theorem binNum_peel_min {Le : A → A → Prop} {Posn b : A → Prop} {p₀ : A}
   have hrank₀ : bitRank Le Posn p₀ = 0 := by
     have : {q : A | Posn q ∧ Le q p₀ ∧ q ≠ p₀} = (∅ : Set A) := by
       ext q
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       rintro ⟨hq, hle, hne⟩
       exact hne (hlin.2.2.1 q p₀ hle (hmin q hq))
     rw [bitRank, this, Set.ncard_empty]
@@ -291,12 +291,12 @@ theorem binNum_peel_min {Le : A → A → Prop} {Posn b : A → Prop} {p₀ : A}
     by_cases hb : b p₀
     · have : {p : A | p = p₀ ∧ b p} = {p₀} := by
         ext p
-        simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+        simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
         exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hb⟩⟩
       rw [this, finsum_mem_singleton, hrank₀, if_pos hb, pow_zero]
     · have : {p : A | p = p₀ ∧ b p} = (∅ : Set A) := by
         ext p
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         rintro ⟨rfl, hcon⟩
         exact hb hcon
       rw [this, finsum_mem_empty, if_neg hb]
@@ -511,13 +511,13 @@ theorem binNum_ripple (hlin : IsLinOrd Le) {a b s : A → Prop} :
         intro x
         have hset : {p : A | Posn p ∧ x p} = (∅ : Set A) := by
           ext p
-          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
           exact fun h => hempty p h.1
         rw [binNum, hset, finsum_mem_empty]
       have hn0 : n = 0 := by
         rw [← hn, Set.ncard_eq_zero (Set.toFinite _)]
         ext p
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact hempty p
       rw [hzero s, hzero a, hzero b, hn0, if_congr (hemp hempty) rfl rfl]
       simp
@@ -553,7 +553,7 @@ theorem binNum_lt_two_pow (hlin : IsLinOrd Le) :
       have hzero : binNum Le Posn b = 0 := by
         have hset : {p : A | Posn p ∧ b p} = (∅ : Set A) := by
           ext p
-          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
           exact fun h => hempty p h.1
         rw [binNum, hset, finsum_mem_empty]
       rw [hzero]
@@ -642,7 +642,7 @@ theorem exists_ripple (hlin : IsLinOrd Le) :
           have hzero : ({p : A | Posn p ∧ p ≠ p₀} : Set A).ncard = 0 := by
             rw [Set.ncard_eq_zero (Set.toFinite _)]
             ext r
-            simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+            simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
             rintro ⟨hr, hrne⟩
             exact hrne (hlin.2.2.1 r p₀ (hpp₀ ▸ hpmax r hr) (hminp r hr))
           rw [hzero] at hbound
@@ -669,13 +669,13 @@ theorem exists_ripple (hlin : IsLinOrd Le) :
         intro x
         have hset : {p : A | Posn p ∧ x p} = (∅ : Set A) := by
           ext p
-          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
           exact fun h => hempty p h.1
         rw [binNum, hset, finsum_mem_empty]
       have hn0 : n = 0 := by
         rw [← hn, Set.ncard_eq_zero (Set.toFinite _)]
         ext p
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact hempty p
       rw [hzero a, hzero b, hn0] at hlt
       have hcin : ¬cin := by
@@ -733,7 +733,7 @@ theorem exists_binNum (hlin : IsLinOrd Le) :
       have hn0 : n = 0 := by
         rw [← hn, Set.ncard_eq_zero (Set.toFinite _)]
         ext p
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact hempty p
       subst hn0
       have hk0 : k = 0 := by simpa using hk
@@ -844,7 +844,7 @@ theorem binNum_lt_iff (hlin : IsLinOrd Le) :
         intro c
         have hset : {p : A | Posn p ∧ c p} = (∅ : Set A) := by
           ext p
-          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
           exact fun h => hempty p h.1
         rw [binNum, hset, finsum_mem_empty]
       rw [hzero b, hzero b']

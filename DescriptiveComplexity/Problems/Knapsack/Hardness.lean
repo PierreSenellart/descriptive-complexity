@@ -503,7 +503,7 @@ theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : kInterp.Map A → P
   classical
   have hset : {q : kInterp.Map A | BWPosn q ∧ p q} = kLow a₀ '' {e | sub e} := by
     ext q
-    rw [Set.mem_setOf_eq, hp q]
+    rw [Set.mem_ofPred_eq, hp q]
     exact ⟨fun ⟨e, he, hq⟩ => ⟨e, he, hq.symm⟩, fun ⟨e, he, hq⟩ => ⟨e, he, hq.symm⟩⟩
   rw [binNum, hset, finsum_mem_image (kLow_injective a₀).injOn]
   refine (finsum_mem_congr rfl fun e _ => ?_).trans (finsum_pow_eq_digitNum hsub)
@@ -579,7 +579,7 @@ theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) {S : kInterp.Map A → Pr
       digitNum (· ≤ · : A → A → Prop) SSElem (base A)
         (fun e => ({i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} : Set _).ncard) := by
   classical
-  haveI : Finite (kInterp.Map A) := kInterp.map_finite A
+  have : Finite (kInterp.Map A) := kInterp.map_finite A
   have h₁ : (∑ᶠ i ∈ {i | S i}, BWWeight i) =
       ∑ᶠ i ∈ {i | S i}, digitNum (· ≤ · : A → A → Prop) SSElem (base A)
         (fun e => if SSElem e ∧ SSMem e (i.2 0) then 1 else 0) :=
@@ -594,7 +594,7 @@ digits of the sum stay below the base. -/
 theorem count_lt_base {S : kInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i)
     {a₀ : A} (ha₀ : IsBot a₀) (e : A) :
     ({i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} : Set _).ncard < base A := by
-  haveI : Finite (kInterp.Map A) := kInterp.map_finite A
+  have : Finite (kInterp.Map A) := kInterp.map_finite A
   have hsub : {i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} ⊆
       kItem a₀ '' (Set.univ : Set A) := by
     rintro i ⟨hi, -, -⟩
@@ -620,7 +620,7 @@ theorem hasExactCover_iff_hasSubsetSum :
     HasExactCover A ↔ HasSubsetSum (kInterp.Map A) := by
   classical
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  haveI : Finite (kInterp.Map A) := kInterp.map_finite A
+  have : Finite (kInterp.Map A) := kInterp.map_finite A
   constructor
   · rintro ⟨G, hGfam, hcov, hdisj⟩
     have hS : ∀ i : kInterp.Map A, (∃ s, G s ∧ i = kItem a₀ s) → BWItem i := by

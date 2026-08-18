@@ -136,7 +136,7 @@ private theorem realize_rearrBody (σ : Fin k → Fin k) (i : B.ι)
           fun _ => Term.var (Sum.inr 0))
       (Sum.elim val c)) ↔
       (InvMap.rearrRel σ (val 0) (c 0) ∧ X i fun _ => c 0) := by
-  letI := (classBlock B).structure₁ (L := invLang L k) X
+  let := (classBlock B).structure₁ (L := invLang L k) X
   rw [Formula.realize_inf, Formula.realize_rel, Formula.realize_rel]
   exact Iff.rfl
 
@@ -147,7 +147,7 @@ private theorem realize_subAtom (p : Fin k) (val c : Fin 1 → InvMap S k A) :
       (Relations.formula (invRelSym L k B (.sub p))
         ![Term.var (Sum.inl 0), Term.var (Sum.inr 0)])
       (Sum.elim val c)) ↔ InvMap.subRel p (val 0) (c 0) := by
-  letI := (classBlock B).structure₁ (L := invLang L k) X
+  let := (classBlock B).structure₁ (L := invLang L k) X
   rw [Formula.realize_rel]
   exact Iff.rfl
 
@@ -241,7 +241,7 @@ theorem realize_pebbleCompile {m : ℕ} {ρ : B.Assignment A}
             (InvMap.rearrRel (blockSel fun p => Sum.elim g h (x p))
               (InvMap.mk S v) (c 0) ∧ X rv.1 fun _ => c 0) := by
         rw [he]
-        letI := (classBlock B).structure₁ (L := invLang L k) X
+        let := (classBlock B).structure₁ (L := invLang L k) X
         rw [Formula.realize_iExs]
         exact exists_congr fun c =>
           realize_rearrBody (blockSel fun p => Sum.elim g h (x p)) rv.1
@@ -285,7 +285,7 @@ theorem realize_pebbleCompile {m : ℕ} {ρ : B.Assignment A}
           exact (iff_of_eq (congrArg (ρ rv.1) harg)).mpr hρv
   | @imp n f₁ f₂ ih₁ ih₂ =>
     intro g h hinj hdisj hroom hS v
-    letI := B.structure₁ (L := L) ρ
+    let := B.structure₁ (L := L) ρ
     rw [BoundedFormula.realize_imp]
     have hL : (@Formula.Realize _ (InvMap S k A)
         ((classBlock B).structure₁ (L := invLang L k) X) _
@@ -308,7 +308,7 @@ theorem realize_pebbleCompile {m : ℕ} {ρ : B.Assignment A}
     exact imp_congr h₁ h₂
   | @all n ψ ih =>
     intro g h hinj hdisj hroom hS v
-    letI := B.structure₁ (L := L) ρ
+    let := B.structure₁ (L := L) ρ
     -- a fresh pebble exists within the budget
     have hcard : (Finset.image g Finset.univ ∪ Finset.image h Finset.univ).card <
         (Finset.univ : Finset (Fin k)).card := by
@@ -376,7 +376,7 @@ theorem realize_pebbleCompile {m : ℕ} {ρ : B.Assignment A}
           (@Formula.Realize _ (InvMap S k A)
             ((classBlock B).structure₁ (L := invLang L k) X) _
             (pebbleCompile g ψ (Fin.snoc h hfresh.choose)) fun _ => c 0) := by
-      letI := (classBlock B).structure₁ (L := invLang L k) X
+      let := (classBlock B).structure₁ (L := invLang L k) X
       have he : pebbleCompile (B := B) g ψ.all h =
           Formula.iAlls (Fin 1)
             (Relations.formula (invRelSym L k B (.sub hfresh.choose))
@@ -474,7 +474,7 @@ theorem realize_sentenceFin0 {L' : Language.{0, 0}} {M : Type}
     {instM : L'.Structure M} (φ : L'.Sentence) (v : Fin 0 → M) :
     (@Formula.Realize L' M instM _ (sentenceFin0 φ) v) ↔
       @Sentence.Realize L' M instM φ := by
-  letI := instM
+  let := instM
   have h := BoundedFormula.realize_mapTermRel_id (L' := L')
     (φ := φ) (v := fun e => Empty.elim e) (v' := v) (xs := (default : Fin 0 → M))
     (ft := fun _ t => t.relabel (Sum.map (fun e => Empty.elim e) id))
@@ -704,7 +704,7 @@ theorem pfpHolds_invStepDef [Nonempty A] (hbound : d.VarBound k)
           (pebbleCompile (B := d.B) Fin.elim0 (sentenceFin0 d.out) Fin.elim0)
             fun _ => c 0) := by
     rw [d.partStage_invStepDef hbound hrels n]
-    letI := (classBlock d.B).structure₁ (L := invLang L k)
+    let := (classBlock d.B).structure₁ (L := invLang L k)
       (invAssign S harity (d.partStage A n))
     have h0 : (@Sentence.Realize _ (InvMap S k A)
         ((classBlock d.B).structure₁ (L := invLang L k)

@@ -54,7 +54,7 @@ noncomputable def ivars : List B.ι :=
 
 open Classical in
 theorem mem_ivars (i : B.ι) : i ∈ B.ivars := by
-  letI : Fintype B.ι := Fintype.ofFinite B.ι
+  let : Fintype B.ι := Fintype.ofFinite B.ι
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
 /-! ### The atom of one copy -/
@@ -77,7 +77,7 @@ theorem realize_atomF {A : Type} [L.Structure A] [LinearOrder A]
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)) _
         (B.atomF L c i sel) v ↔
       B.atomSet (ρs c) (i, fun k => v (sel k)) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   exact Iff.rfl
 
 /-- The relation variables strictly below `i`, in the arbitrary order on the
@@ -92,7 +92,7 @@ noncomputable def ivarsBelow (i : B.ι) : List B.ι :=
 theorem mem_ivarsBelow (i j : B.ι) :
     letI : LinearOrder B.ι := finiteLinearOrder B.ι
     (j ∈ B.ivarsBelow i ↔ j < i) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   rw [ivarsBelow, List.mem_filter]
   simp [B.mem_ivars j]
 
@@ -130,7 +130,7 @@ theorem agree_below_iff (ρs : Fin 2 → B.Assignment A) (i : B.ι)
     ((∀ j ∈ B.ivarsBelow i, ∀ y, (B.atomSet (ρs 0) (j, y) ↔ B.atomSet (ρs 1) (j, y))) ∧
         ∀ y, toLex y < toLex x → (B.atomSet (ρs 0) (i, y) ↔ B.atomSet (ρs 1) (i, y))) ↔
       ∀ q, B.atomLt q (i, x) → (B.atomSet (ρs 0) q ↔ B.atomSet (ρs 1) q) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   constructor
   · rintro ⟨hb, hs⟩ ⟨j, y⟩ hq
     rcases hq with hji | ⟨rfl, hy⟩
@@ -150,8 +150,8 @@ theorem realize_ordLtF [Finite A] (ρs : Fin 2 → B.Assignment A) :
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.ordLtF L) ↔
       (setLinearOrder (B.AtomIx A)).lt (B.atomSet (ρs 0)) (B.atomSet (ρs 1))) := by
-  letI := B.atomIxLinearOrder A
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := B.atomIxLinearOrder A
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [B.atomSet_lt_iff (ρs 0) (ρs 1), ordLtF, Sentence.Realize, realize_listSup]
   constructor
   · rintro ⟨φ, hφ, hr⟩
@@ -202,7 +202,7 @@ theorem realize_eqAssignF (ρs : Fin 2 → B.Assignment A) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.eqAssignF L) ↔ B.atomSet (ρs 0) = B.atomSet (ρs 1)) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [eqAssignF, Sentence.Realize, realize_listInf]
   constructor
   · intro h
@@ -230,9 +230,9 @@ theorem realize_ordLeF [Finite A] (ρs : Fin 2 → B.Assignment A) :
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.ordLeF L) ↔
       (setLinearOrder (B.AtomIx A)).le (B.atomSet (ρs 0)) (B.atomSet (ρs 1))) := by
-  letI := B.atomIxLinearOrder A
-  letI := setLinearOrder (B.AtomIx A)
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := B.atomIxLinearOrder A
+  let := setLinearOrder (B.AtomIx A)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [ordLeF, Sentence.Realize, Formula.realize_sup]
   rw [show (Formula.Realize (B.ordLtF L) default ↔ _) from B.realize_ordLtF ρs,
     show (Formula.Realize (B.eqAssignF L) default ↔ _) from B.realize_eqAssignF ρs]

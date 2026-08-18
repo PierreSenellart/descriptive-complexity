@@ -56,7 +56,7 @@ theorem mem_PH_of_fo_on_expansion
       letI := lo
       (P A ↔ SORealize (L.sum Language.order) A Bs ψ pol) := by
     intro A _ _ _ lo
-    letI := lo
+    let := lo
     exact (h A).trans (hB A)
   cases pol with
   | true =>
@@ -66,12 +66,12 @@ theorem mem_PH_of_fo_on_expansion
     intro A _ _ _
     constructor
     · intro hP
-      letI := finiteLinearOrder A
+      let := finiteLinearOrder A
       exact ⟨finiteLinearOrder A,
         (sorealize_append_trivial Bs (L.sum Language.order) A inferInstance ψ true).mpr
           ((hkey A (finiteLinearOrder A)).mp hP)⟩
     · rintro ⟨lo, hlo⟩
-      letI := lo
+      let := lo
       exact (hkey A lo).mpr
         ((sorealize_append_trivial Bs (L.sum Language.order) A inferInstance ψ true).mp hlo)
   | false =>
@@ -81,11 +81,11 @@ theorem mem_PH_of_fo_on_expansion
     intro A _ _ _
     constructor
     · intro hP lo
-      letI := lo
+      let := lo
       exact (sorealize_append_trivial Bs (L.sum Language.order) A inferInstance ψ false).mpr
         ((hkey A lo).mp hP)
     · intro hall
-      letI := finiteLinearOrder A
+      let := finiteLinearOrder A
       exact (hkey A (finiteLinearOrder A)).mpr
         ((sorealize_append_trivial Bs (L.sum Language.order) A inferInstance ψ false).mp
           (hall (finiteLinearOrder A)))

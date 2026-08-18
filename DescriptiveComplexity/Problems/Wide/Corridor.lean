@@ -65,7 +65,7 @@ field; only the question differs. -/
 theorem wideCorridor_iff_expansion (A : Type) [Language.wtile.Structure A] [LinearOrder A] :
     letI := wtileStructure A
     (WideCorridor A ↔ CORRIDOR (wtileExp.Map A)) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   obtain ⟨hposn, hle, htile, hacc, hhoriz, hvert, hfirst, hbase, hstart, hel, her⟩ :=
     wtileAgree (A := A)
   constructor
@@ -95,7 +95,7 @@ theorem wideCorridor_iff_expansion (A : Type) [Language.wtile.Structure A] [Line
 turns it into `DescriptiveComplexity.CORRIDOR`, and that problem is in PSPACE.
 This is the second natural member the class has, beside the wide machine. -/
 theorem wideCorridor_mem_EXPSPACE : WideCorridor ∈ EXPSPACE := by
-  letI hinst : ∀ (A : Type) [Language.wtile.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [Language.wtile.Structure A] [LinearOrder A],
       Language.tiling.Structure (wtileExp.Map A) := fun A => wtileStructure A
   rw [EXPSPACE_eq_PSPACE_exp]
   refine ⟨wtileExp, CORRIDOR, corridor_mem_PSPACE, ?_⟩

@@ -92,7 +92,7 @@ private theorem realize_cliqueKernel {A : Type} [Language.markedGraph.Structure 
         (∀ a : A, RelMap mgMarked ![a] →
           ∃ b : A, ρ false ![a, b] ∧ ρ true ![b]) ∧
         ∀ a a' b : A, ρ false ![a, b] → ρ false ![a', b] → a = a' := by
-  letI := cliqueGuessBlock.structure ρ
+  let := cliqueGuessBlock.structure ρ
   have hsubC : ∀ (w : Fin 1 → A),
       RelMap (L := cliqueSOLang) (M := A) kCliqueSym w ↔ ρ true w :=
     fun _ => Iff.rfl

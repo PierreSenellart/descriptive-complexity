@@ -357,8 +357,8 @@ variable {vars pol a₀}
 theorem isLinOrd_gameLe :
     letI := machTagOrder (B := B) (C := GameCtrlTag B V M)
     IsLinOrd (tagTupleLe (Tag := GameTag B V M) (d := gameDim B V) (A := A)) := by
-  letI := machTagOrder (B := B) (C := GameCtrlTag B V M)
-  letI := tagTupleOrder (Tag := GameTag B V M) (d := gameDim B V) (A := A)
+  let := machTagOrder (B := B) (C := GameCtrlTag B V M)
+  let := tagTupleOrder (Tag := GameTag B V M) (d := gameDim B V) (A := A)
   have heq : (tagTupleLe (Tag := GameTag B V M) (d := gameDim B V) (A := A)) =
       (tagTupleOrder : LinearOrder (GameTag B V M × (Fin (gameDim B V) → A))).le := by
     funext p q

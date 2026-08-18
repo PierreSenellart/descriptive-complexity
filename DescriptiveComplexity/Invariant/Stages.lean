@@ -107,7 +107,7 @@ def StepDef.VarBound (d : StepDef L) (k : ℕ) : Prop :=
 
 /-- Every induction has a variable budget: the block is finite. -/
 theorem StepDef.exists_varBound (d : StepDef L) : ∃ k, d.VarBound k := by
-  letI := Fintype.ofFinite d.B.ι
+  let := Fintype.ofFinite d.B.ι
   exact ⟨Finset.univ.sup fun i => d.B.arity i + qdepth (d.step i),
     fun i => Finset.le_sup (f := fun i => d.B.arity i + qdepth (d.step i))
       (Finset.mem_univ i)⟩
@@ -138,7 +138,7 @@ refinement is definable. -/
 theorem StepDef.exists_usesRels (d : StepDef L) :
     ∃ S : Set (Σ n, L.Relations n), S.Finite ∧ d.UsesRels S := by
   classical
-  letI := Fintype.ofFinite d.B.ι
+  let := Fintype.ofFinite d.B.ι
   -- the base-symbol part of the symbols of a formula over the expansion
   let base : Set (Σ n, (L.sum d.B.lang).Relations n) → Set (Σ n, L.Relations n) :=
     fun T => {x | (⟨x.1, Sum.inl x.2⟩ : Σ n, (L.sum d.B.lang).Relations n) ∈ T}
@@ -176,7 +176,7 @@ theorem StepDef.next_invariant (d : StepDef L) (hd : d.VarBound k)
     (hrels : d.UsesRels S) {ρ : d.B.Assignment A} (hρ : AssignInvariant S A k ρ) :
     AssignInvariant S A k (d.next ρ) := by
   intro i g v w hvw
-  letI := d.B.structure₁ (L := L) ρ
+  let := d.B.structure₁ (L := L) ρ
   have hroom : (Finset.image g Finset.univ).card + qdepth (d.step i) ≤ k := by
     have h1 : (Finset.image g Finset.univ).card ≤ d.B.arity i := by
       refine Finset.card_image_le.trans ?_

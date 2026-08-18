@@ -77,7 +77,7 @@ theorem uRulesDefinable_gateBlockRule {emb : dt.GateBlockPh → P}
       dt.gateBlockRule (one := e.one) (emb := emb) (args := args e)
         (wellG := wellG e) (setFail := setFail e) (failPh := failPh)
         (exitPh := exitPh) := by
-  letI := Fintype.ofFinite dt.X.Tag
+  let := Fintype.ofFinite dt.X.Tag
   rintro (- | s) ρ
   · match ρ with
     | Sum.inl σ => exact TestKit.uRuleDefinable hwell σ

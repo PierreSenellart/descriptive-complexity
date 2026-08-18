@@ -126,7 +126,7 @@ at one existential block the alternating semantics is the nondeterministic
 one. -/
 theorem correct (A : Type) [Language.turing.Structure A] [Finite A] [Nonempty A] :
     NTMAccept A ↔ ATMAccept 1 true (markInterp.Map A) := by
-  haveI : Finite (markInterp.Map A) := markInterp.map_finite A
+  have : Finite (markInterp.Map A) := markInterp.map_finite A
   have h := agree A
   have hbwf : (atmData 1 (markInterp.Map A)).BlocksWellFormed 1 :=
     blocksWellFormed_one_iff.mpr blk_map
@@ -259,7 +259,7 @@ end Reading
 that carry the promise, and the guard turns the others into no-instances. -/
 theorem correct (A : Type) [(Language.turingAlt 1).Structure A] [Finite A] [Nonempty A] :
     ATMAccept 1 true A ↔ NTMAccept (forgetInterp.Map A) := by
-  haveI : Finite (forgetInterp.Map A) := forgetInterp.map_finite A
+  have : Finite (forgetInterp.Map A) := forgetInterp.map_finite A
   by_cases hm : ∀ q : A, ATMBlk (k := 1) 0 q
   · have h := agree_of_marked hm
     have hbwf : (atmData 1 A).BlocksWellFormed 1 := blocksWellFormed_one_iff.mpr hm

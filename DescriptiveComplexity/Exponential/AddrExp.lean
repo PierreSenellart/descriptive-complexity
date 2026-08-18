@@ -282,7 +282,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 theorem realize_bit1F (ρ : addrBlock.Assignment A) (x : γ) :
     (@Formula.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) _ (bit1F x) v ↔
       aeBits ρ (v x)) := by
-  letI := addrBlock.structure₁ (L := aeOrd L) ρ
+  let := addrBlock.structure₁ (L := aeOrd L) ρ
   rw [bit1F, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -290,7 +290,7 @@ theorem realize_bit1F (ρ : addrBlock.Assignment A) (x : γ) :
 theorem realize_bitAF (ρ σ : addrBlock.Assignment A) (x : γ) :
     (@Formula.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) _ (bitAF x) v ↔
       aeBits ρ (v x)) := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   rw [bitAF, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -298,7 +298,7 @@ theorem realize_bitAF (ρ σ : addrBlock.Assignment A) (x : γ) :
 theorem realize_bitBF (ρ σ : addrBlock.Assignment A) (x : γ) :
     (@Formula.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) _ (bitBF x) v ↔
       aeBits σ (v x)) := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   rw [bitBF, Formula.realize_rel₁]
   exact apply₁ _ _
 
@@ -306,7 +306,7 @@ theorem realize_bitBF (ρ σ : addrBlock.Assignment A) (x : γ) :
 theorem realize_lift1 (ρ : addrBlock.Assignment A) (φ : (aeOrd L).Formula γ) :
     (@Formula.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) _ (lift1 φ) v ↔
       φ.Realize v) := by
-  letI := addrBlock.structure ρ
+  let := addrBlock.structure ρ
   rw [lift1]
   exact LHom.realize_onFormula _ φ
 
@@ -314,9 +314,9 @@ theorem realize_lift1 (ρ : addrBlock.Assignment A) (φ : (aeOrd L).Formula γ) 
 theorem realize_lift2 (ρ σ : addrBlock.Assignment A) (φ : (aeOrd L).Formula γ) :
     (@Formula.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) _ (lift2 φ) v ↔
       φ.Realize v) := by
-  letI := addrBlock.structure ρ
-  letI := addrBlock.structure σ
-  letI := addrBlock.structure₁ (L := aeOrd L) ρ
+  let := addrBlock.structure ρ
+  let := addrBlock.structure σ
+  let := addrBlock.structure₁ (L := aeOrd L) ρ
   rw [lift2]
   exact (LHom.realize_onFormula _ (LHom.sumInl.onFormula φ)).trans
     (LHom.realize_onFormula _ φ)
@@ -409,31 +409,31 @@ theorem wmSingle_eq (x : A) : WMSingle (fun y => y = x) :=
 /-- The trivially true sentence, at one copy of the block. -/
 theorem realize_topS (ρ : addrBlock.Assignment A) :
     @Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) ⊤ := by
-  letI := addrBlock.structure₁ (L := aeOrd L) ρ
+  let := addrBlock.structure₁ (L := aeOrd L) ρ
   exact Formula.realize_top.mpr trivial
 
 /-- The trivially false sentence, at one copy of the block. -/
 theorem not_realize_botS (ρ : addrBlock.Assignment A) :
     ¬@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) ⊥ := by
-  letI := addrBlock.structure₁ (L := aeOrd L) ρ
+  let := addrBlock.structure₁ (L := aeOrd L) ρ
   exact fun h => Formula.realize_bot.mp h
 
 /-- The trivially true sentence, at two copies of the block. -/
 theorem realize_topS₂ (ρ σ : addrBlock.Assignment A) :
     @Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) ⊤ := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   exact Formula.realize_top.mpr trivial
 
 /-- The trivially false sentence, at two copies of the block. -/
 theorem not_realize_botS₂ (ρ σ : addrBlock.Assignment A) :
     ¬@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) ⊥ := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   exact fun h => Formula.realize_bot.mp h
 
 theorem realize_markS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) (markS r) ↔
       ∃ x, aeBits ρ x ∧ RelMap r ![x]) := by
-  letI := addrBlock.structure₁ (L := aeOrd L) ρ
+  let := addrBlock.structure₁ (L := aeOrd L) ρ
   rw [markS, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_inf, realize_bit1F, realize_lift1,
     realize_markG, Sum.elim_inr]
@@ -442,7 +442,7 @@ theorem realize_markS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
 theorem realize_binS (r : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) (binS r) ↔
       ∃ x y, aeBits ρ x ∧ aeBits σ y ∧ RelMap r ![x, y]) := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   rw [binS, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_inf, realize_bitAF, realize_bitBF,
     realize_lift2, realize_attrG, Sum.elim_inr]
@@ -452,7 +452,7 @@ theorem realize_binS (r : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
 theorem realize_singleS (ρ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) singleS ↔
       WMSingle (aeBits ρ)) := by
-  letI := addrBlock.structure₁ (L := aeOrd L) ρ
+  let := addrBlock.structure₁ (L := aeOrd L) ρ
   rw [singleS, WMSingle, Sentence.Realize]
   simp only [Formula.realize_inf, Formula.realize_iExs, Formula.realize_iAlls,
     Formula.realize_imp, realize_bit1F, realize_lift1, realize_eqG, Sum.elim_inr]
@@ -463,7 +463,7 @@ theorem realize_addrLeS (leSym : L.Relations 2) (ρ σ : addrBlock.Assignment A)
     (@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ)
         (addrLeS leSym) ↔
       WMSetLe (aeRel₂ leSym) (aeBits ρ) (aeBits σ)) := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   rw [addrLeS, WMSetLe, Sentence.Realize]
   simp only [Formula.realize_sup, Formula.realize_iAlls, Formula.realize_iExs,
     Formula.realize_inf, Formula.realize_imp, Formula.realize_iff, Formula.realize_not,
@@ -477,7 +477,7 @@ theorem realize_inpS (leSym inpSym : L.Relations 2) (ρ σ : addrBlock.Assignmen
         (inpS leSym inpSym) ↔
       ∃ x y, WMDown (aeRel₂ leSym) (aeBits ρ) x ∧ aeBits σ y ∧
         aeRel₂ inpSym x y) := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   rw [inpS, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_iAlls, Formula.realize_inf,
     Formula.realize_iff, realize_bitAF, realize_bitBF, realize_lift2, realize_attrG,
@@ -496,7 +496,7 @@ theorem realize_subsetS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ)
         (subsetS r) ↔
       ∀ x, aeBits ρ x → aeRel₁ r x) := by
-  letI := addrBlock.structure₁ (L := aeOrd L) ρ
+  let := addrBlock.structure₁ (L := aeOrd L) ρ
   rw [subsetS, Sentence.Realize]
   simp only [Formula.realize_iAlls, Formula.realize_imp, realize_bit1F, realize_lift1,
     realize_markG, Sum.elim_inr]
@@ -507,7 +507,7 @@ theorem realize_regS (leSym inpSym : L.Relations 2) (ρ σ : addrBlock.Assignmen
         (regS leSym inpSym) ↔
       ∃ x y, WMFileSeg (aeRel₂ leSym) (fun z => ∃ w, aeRel₂ inpSym z w) (aeBits ρ) x ∧
         aeBits σ y ∧ aeRel₂ inpSym x y) := by
-  letI := addrBlock.structure₂ (L := aeOrd L) ρ σ
+  let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   rw [regS, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_iAlls, Formula.realize_inf,
     Formula.realize_iff, realize_bitAF, realize_bitBF, realize_lift2, realize_attrG,
@@ -575,7 +575,7 @@ noncomputable def addrExp (E : Language.{0, 0}) [E.IsRelational]
   dom_nonempty := by
     intro A _ _ _ _
     refine ⟨.addr, addrBlock.botAssign A, ?_⟩
-    letI := addrBlock.structure₁ (L := aeOrd L) (addrBlock.botAssign A)
+    let := addrBlock.structure₁ (L := aeOrd L) (addrBlock.botAssign A)
     exact Formula.realize_top.mpr trivial
 
 end Skeleton
@@ -592,7 +592,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 /-- An address satisfies the domain sentence of its tag, which is `⊤`. -/
 theorem domHolds_addr (s : A → Prop) :
     ExpExpansion.DomHolds (X := addrExp L E relS) (WTag.addr, aeAssign s) := by
-  letI := (addrExp L E relS).B.structure₁ (L := aeOrd L) (aeAssign s)
+  let := (addrExp L E relS).B.structure₁ (L := aeOrd L) (aeAssign s)
   exact Formula.realize_top.mpr trivial
 
 /-- The singleton address of an element satisfies the domain sentence of the
@@ -697,7 +697,7 @@ theorem realize_one (rt : E.Relations 1) (φ : WTag → (aeLang1 L).Sentence)
     (RelMap rt ![x] ↔
       @Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) x.1.2)
         (φ x.1.1)) := by
-  letI := addrStructure (L := L) (relS := relS) A
+  let := addrStructure (L := L) (relS := relS) A
   have h1 := (addrExp L E relS).relMap_map rt ![x]
   rw [show (addrExp L E relS).relSentence rt (fun i => (![x] i).1.1) =
     onS1 (φ ((![x] : Fin 1 → (addrExp L E relS).Map A) 0).1.1) from h _] at h1
@@ -711,7 +711,7 @@ theorem realize_two (rt : E.Relations 2) (φ : WTag → WTag → (aeLang2 L).Sen
     (RelMap rt ![x, y] ↔
       @Sentence.Realize (aeLang2 L) A
         (addrBlock.structure₂ (L := aeOrd L) x.1.2 y.1.2) (φ x.1.1 y.1.1)) := by
-  letI := addrStructure (L := L) (relS := relS) A
+  let := addrStructure (L := L) (relS := relS) A
   have h1 := (addrExp L E relS).relMap_map rt ![x, y]
   rw [show (addrExp L E relS).relSentence rt (fun i => (![x, y] i).1.1) =
     onS2 (φ ((![x, y] : Fin 2 → (addrExp L E relS).Map A) 0).1.1

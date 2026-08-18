@@ -243,7 +243,7 @@ theorem build_le_iff (a b : A) : pullLe (buildAssign (C := C) σ enum) a b ↔ a
 theorem build_ordGuard :
     letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
     ((A ⊕ Fin m) ⊨ extLinearGuard L (guessBlock X C)) := by
-  letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
+  let := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
   have hold : ∀ x : A ⊕ Fin m, IsOld x → ∃ a : A, x = Sum.inl a := by
     intro x hx
     cases x with
@@ -275,9 +275,9 @@ theorem build_ordGuard :
 theorem build_meanGuard [Finite A] :
     letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
     ((A ⊕ Fin m) ⊨ pullMeanGuard X C) := by
-  letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
+  let := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
   refine (realize_pullMeanGuard (buildAssign σ enum)).mpr ?_
-  letI := meanStrucB (L := L) (pullMeanPart (buildAssign σ enum))
+  let := meanStrucB (L := L) (pullMeanPart (buildAssign σ enum))
   refine (Sentence.realize_inf (A ⊕ Fin m)).mpr ⟨(Sentence.realize_inf (A ⊕ Fin m)).mpr
     ⟨(Sentence.realize_inf (A ⊕ Fin m)).mpr ⟨?_, ?_⟩, ?_⟩, ?_⟩
   · exact (realize_meanShapedB _).mpr fun i v w hM => build_shaped σ enum i v w hM
@@ -331,7 +331,7 @@ theorem pullSentence_forward (φ : (X.E.sum C.lang).Sentence)
     (hφ : @Sentence.Realize _ (X.Map A) (C.structure₁ (L := X.E) σ) φ) :
     letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
     ((A ⊕ Fin m) ⊨ pullSentence X C φ) := by
-  letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
+  let := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
   have hpt := pullPointOn (buildAssign σ enum) fun a b => (build_le_iff σ enum a b).symm
   have hrep := pullPointRep (buildAssign σ enum) (bijective_meanAtB_build σ enum)
     fun i v w hM => build_shaped σ enum i v w hM
@@ -358,8 +358,8 @@ theorem card_taggedAssign_le [Finite A] [Nonempty A] :
       2 ^ (Nat.card (taggedBlock X).ι *
         Nat.card (Fin (blockArityBound (taggedBlock X)) → A)) := by
   classical
-  letI := Fintype.ofFinite (taggedBlock X).ι
-  letI := Fintype.ofFinite A
+  let := Fintype.ofFinite (taggedBlock X).ι
+  let := Fintype.ofFinite A
   set d := blockArityBound (taggedBlock X) with hd
   set c := Nat.card (taggedBlock X).ι with hc
   obtain ⟨a₀⟩ := ‹Nonempty A›

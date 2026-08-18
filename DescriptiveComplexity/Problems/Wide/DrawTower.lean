@@ -451,7 +451,7 @@ noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d.B n) :
   cases κ with
   | stage i ts => exact inferInstanceAs (Finite (StagePh _))
   | exp e ts =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     exact inferInstanceAs (Finite (TagPh _ _ _))
   | eq j₁ j₂ => exact inferInstanceAs (Finite (ElemPh 2))
   | ord j₁ j₂ => exact inferInstanceAs (Finite (ElemPh 2))
@@ -461,7 +461,7 @@ noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d.B n) :
   cases κ with
   | stage i ts => exact inferInstanceAs (Finite (StageSite _))
   | exp e ts =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     exact inferInstanceAs (Finite (TagSite _ _ _))
   | eq j₁ j₂ => exact inferInstanceAs (Finite (ElemSite 2))
   | ord j₁ j₂ => exact inferInstanceAs (Finite (ElemSite 2))

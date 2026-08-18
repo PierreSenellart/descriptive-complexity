@@ -167,26 +167,26 @@ theorem wideRegAccept_srcEnv_iff (n : ℕ) :
         ∃ σ : (srcDt X d).d.B.Assignment ((srcDt X d).X.Map (srcEnv L A).α),
           @Sentence.Realize _ ((srcDt X d).X.Map (srcEnv L A).α)
             ((srcDt X d).d.B.structure₁ σ) (srcDt X d).d.out) := by
-  letI := srcNexRTagOrder X d n
-  letI := srcNexPFOrder X d
-  letI : Language.wide.Structure
+  let := srcNexRTagOrder X d n
+  let := srcNexPFOrder X d
+  let : Language.wide.Structure
       (Univ (srcEnv L A).α
         ((srcDt X d).NexRIxPad (G := (srcDt X d).d.B.ι → Bool) n)
         (srcDt X d).NexPF (srcDt X d).KIx (srcDt X d).dd) :=
     (dblWideRegInterp X d n).mapStructure (srcEnv L A).α
-  letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
+  let : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
-  haveI : Nonempty (srcDt X d).KIx := ⟨srcKIx (relExp X) d⟩
+  have : Nonempty (srcDt X d).KIx := ⟨srcKIx (relExp X) d⟩
   intro harity htags
   -- the encoding's own dimension is at least one: a point's code names a tag
   obtain ⟨t, -, -⟩ := (relExp X).dom_nonempty (srcEnv L A).α
-  haveI : Nonempty (PtCode (relExp X)) := ⟨Sum.inl t⟩
+  have : Nonempty (PtCode (relExp X)) := ⟨Sum.inl t⟩
   have hdd0 : 1 ≤ (srcDt X d).dd0 := by
     have h1 : 0 < Nat.card (PtCode (relExp X)) := Nat.card_pos
     have h2 : (srcDt X d).dd0 = encDim (relExp X) := srcData_dd0 (relExp X) d
     rw [h2, encDim]
     omega
-  letI : LinearOrder ((srcDt X d).NexRIx (G := (srcDt X d).d.B.ι → Bool)) :=
+  let : LinearOrder ((srcDt X d).NexRIx (G := (srcDt X d).d.B.ι → Bool)) :=
     finiteLinearOrder _
   have hR := srcRegReads X d (srcEnv L A) n
   have hE := Data.nexEmitted_nexProgHandedPad (dt := srcDt X d) (n := n)
@@ -251,13 +251,13 @@ theorem wideRegProblem_wideRegInterp_iff (PW : DecisionProblem Language.wide)
       PW ((dblWideRegInterp X d n).Map (srcEnv L A).α) ↔
         Q₀ ((relExp X).Map ((dblInterp L).Map A))) :
     PW ((wideRegInterp X d n).Map A) ↔ Q₀ (X.Map A) := by
-  letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
+  let : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
-  haveI : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
-  haveI : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
-  letI : LinearOrder ((relExp X).Map ((dblInterp L).Map A)) :=
+  have : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
+  have : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
+  let : LinearOrder ((relExp X).Map ((dblInterp L).Map A)) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
-  letI : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
+  let : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
     ExpExpansion.mapStructure (relExp X) ((dblInterp L).Map A)
   refine (PW.iso_invariant (wideRegInterpEquiv X d A n)).trans ?_
   exact hmach.trans (Q₀.iso_invariant (relExpMapEquiv (X := X) (A := A))).symm
@@ -315,17 +315,17 @@ theorem ExpDefinable.ordered_fo_reduction_wideRegAccept {Q : DecisionProblem L}
             dim := dt.dd * 1
             toInterpretation := Draw.wideRegInterp K.X K.toStepDef n
             correct := fun A _ _ _ _ => ?_ }⟩
-  haveI : Finite ((Draw.dblInterp L).Map A) := (Draw.dblInterp L).map_finite A
-  haveI : Nonempty ((Draw.dblInterp L).Map A) := (Draw.dblInterp L).map_nonempty A
-  letI : LinearOrder ((Draw.relExp K.X).Map ((Draw.dblInterp L).Map A)) :=
+  have : Finite ((Draw.dblInterp L).Map A) := (Draw.dblInterp L).map_finite A
+  have : Nonempty ((Draw.dblInterp L).Map A) := (Draw.dblInterp L).map_nonempty A
+  let : LinearOrder ((Draw.relExp K.X).Map ((Draw.dblInterp L).Map A)) :=
     Draw.encOrder dt.ly (Draw.srcEnv L A).zero (Draw.srcEnv L A).one
       (Draw.srcEnv L A).hzo
-  letI : LinearOrder ((Draw.relExp X).Map ((Draw.dblInterp L).Map A)) :=
+  let : LinearOrder ((Draw.relExp X).Map ((Draw.dblInterp L).Map A)) :=
     Draw.encOrder dt.ly (Draw.srcEnv L A).zero (Draw.srcEnv L A).one
       (Draw.srcEnv L A).hzo
-  letI : X.E.Structure ((Draw.relExp X).Map ((Draw.dblInterp L).Map A)) :=
+  let : X.E.Structure ((Draw.relExp X).Map ((Draw.dblInterp L).Map A)) :=
     ExpExpansion.mapStructure (Draw.relExp X) ((Draw.dblInterp L).Map A)
-  letI : X.E.Structure ((Draw.relExp K.X).Map ((Draw.dblInterp L).Map A)) :=
+  let : X.E.Structure ((Draw.relExp K.X).Map ((Draw.dblInterp L).Map A)) :=
     ExpExpansion.mapStructure (Draw.relExp X) ((Draw.dblInterp L).Map A)
   refine (hspec A).trans (Draw.wideRegAccept_wideRegInterp_iff K.X _ A n ?_).symm
   -- the machine's correctness at this kernel: every variable has an argument,

@@ -101,7 +101,7 @@ noncomputable def hX : ℕ :=
   (Finset.univ.sup fun i => ctxB (stepB d i) : ℕ)
 
 theorem ctxB_le_hX (i : d.B.ι) : ctxB (stepB d i) ≤ hX d := by
-  letI := Fintype.ofFinite d.B.ι
+  let := Fintype.ofFinite d.B.ι
   have h : ctxB (stepB d i) ≤ (Finset.univ.sup fun i => ctxB (stepB d i) : ℕ) :=
     Finset.le_sup (f := fun i => ctxB (stepB d i)) (Finset.mem_univ i)
   exact h
@@ -809,7 +809,7 @@ theorem evalT_rel_inr {r n l : ℕ} {rl : d.B.lang.Relations l}
 theorem evalT_stepB {r : ℕ} {i : d.B.ι} {v : Fin (d.B.arity i + 0) → A} :
     evalT d A r (stepB d i) v ↔
       d.next (d.inflStage A r) i fun q => v (Fin.castAdd 0 q) := by
-  letI := stageStr d A r
+  let := stageStr d A r
   rw [evalT, stepB, BoundedFormula.realize_relabel]
   exact iff_of_eq (congrArg₂
     (fun a b => @BoundedFormula.Realize ((L.sum Language.order).sum d.B.lang) A

@@ -160,8 +160,8 @@ theorem subset_of_derivClosed [Finite A] (hhorn : AtMostOnePositive A)
     (hν : ∀ c : A, RelMap satIsClause ![c] →
       ∃ x : A, (RelMap satPosIn ![c, x] ∧ ν x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν x))
     (x : A) (hx : T x) : ν x := by
-  haveI : IsTrans A R := ⟨htr⟩
-  haveI : Std.Irrefl R := ⟨hirr⟩
+  have : IsTrans A R := ⟨htr⟩
+  have : Std.Irrefl R := ⟨hirr⟩
   have hwf : WellFounded R := Finite.wellFounded_of_trans_of_irrefl R
   induction x using hwf.induction with
   | _ x ih =>
@@ -388,7 +388,7 @@ private theorem realize_notHornF :
         (@sumStructure _ _ A _ (unsatBlock.structure ρ)) notHornF) ↔
       ∃ c x y : A, RelMap satIsClause ![c] ∧ RelMap satPosIn ![c, x] ∧
         RelMap satPosIn ![c, y] ∧ x ≠ y := by
-  letI := unsatBlock.structure ρ
+  let := unsatBlock.structure ρ
   rw [notHornF]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     Formula.realize_not, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -404,7 +404,7 @@ private theorem realize_strictF :
         (@sumStructure _ _ A _ (unsatBlock.structure ρ)) strictF) ↔
       (∀ x : A, ¬ρ false ![x, x]) ∧
         ∀ x y z : A, ρ false ![x, y] → ρ false ![y, z] → ρ false ![x, z] := by
-  letI := unsatBlock.structure ρ
+  let := unsatBlock.structure ρ
   have hsubR : ∀ w : Fin 2 → A,
       RelMap (L := unsatSOLang) (M := A) uRSym w ↔ ρ false w := fun _ => Iff.rfl
   rw [strictF]
@@ -422,7 +422,7 @@ private theorem realize_derivF :
         (@sumStructure _ _ A _ (unsatBlock.structure ρ)) derivF) ↔
       ∀ x : A, ρ true ![x] → ∃ c : A, RelMap satIsClause ![c] ∧ RelMap satPosIn ![c, x] ∧
         ∀ y : A, RelMap satNegIn ![c, y] → ρ true ![y] ∧ ρ false ![y, x] := by
-  letI := unsatBlock.structure ρ
+  let := unsatBlock.structure ρ
   have hsubT : ∀ w : Fin 1 → A,
       RelMap (L := unsatSOLang) (M := A) uTSym w ↔ ρ true w := fun _ => Iff.rfl
   have hsubR : ∀ w : Fin 2 → A,
@@ -444,7 +444,7 @@ private theorem realize_goalF :
         (@sumStructure _ _ A _ (unsatBlock.structure ρ)) goalF) ↔
       ∃ c : A, RelMap satIsClause ![c] ∧ (∀ y : A, RelMap satNegIn ![c, y] → ρ true ![y]) ∧
         ∀ x : A, ¬RelMap satPosIn ![c, x] := by
-  letI := unsatBlock.structure ρ
+  let := unsatBlock.structure ρ
   have hsubT : ∀ w : Fin 1 → A,
       RelMap (L := unsatSOLang) (M := A) uTSym w ↔ ρ true w := fun _ => Iff.rfl
   rw [goalF]
@@ -470,7 +470,7 @@ private theorem realize_unsatKernel :
           ∃ c : A, RelMap satIsClause ![c] ∧
             (∀ y : A, RelMap satNegIn ![c, y] → ρ true ![y]) ∧
             ∀ x : A, ¬RelMap satPosIn ![c, x]) := by
-  letI := unsatBlock.structure ρ
+  let := unsatBlock.structure ρ
   have hsup : (@Sentence.Realize unsatSOLang A _ unsatKernel) ↔
       (@Sentence.Realize unsatSOLang A _ notHornF) ∨
         ((@Sentence.Realize unsatSOLang A _ strictF) ∧

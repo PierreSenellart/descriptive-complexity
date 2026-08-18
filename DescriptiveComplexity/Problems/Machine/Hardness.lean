@@ -1246,7 +1246,7 @@ theorem bitRank_posEnd_le :
       rw [eq_posCell_of_posn hr (hcell r hr hle hne hs),
         eq_posCell_of_posn hr' (hcell r' hr' hle' hne' hs'), h0]
   · rw [Set.ncard_univ]
-    haveI := Fintype.ofFinite A
+    have := Fintype.ofFinite A
     simp [Nat.card_eq_fintype_card]
 
 omit [Nonempty A] in
@@ -1272,7 +1272,7 @@ theorem ncard_clauses_next {c c' : A} (hnext : SatNextCl c c') :
   obtain ⟨hc, hc', hlt, hmin⟩ := hnext
   have hset : {e : A | SatCl e ∧ c ≤ e} = insert c {e : A | SatCl e ∧ c' ≤ e} := by
     ext e
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     constructor
     · rintro ⟨he, hce⟩
       rcases eq_or_lt_of_le hce with rfl | hlt'

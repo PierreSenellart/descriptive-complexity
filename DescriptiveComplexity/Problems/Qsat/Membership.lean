@@ -942,8 +942,8 @@ omit [LinearOrder A] in
 variable. -/
 theorem exists_qLeast (hwf : QsatWf A) {D : A → Prop} (h : ∃ z : A, IsQVar z ∧ ¬D z) :
     ∃ x : A, QLeast D x := by
-  haveI : IsTrans A (QPrec (A := A)) := ⟨fun a b c => hwf.trans a b c⟩
-  haveI : Std.Irrefl (QPrec (A := A)) := ⟨hwf.irrefl⟩
+  have : IsTrans A (QPrec (A := A)) := ⟨fun a b c => hwf.trans a b c⟩
+  have : Std.Irrefl (QPrec (A := A)) := ⟨hwf.irrefl⟩
   obtain ⟨x, hx, hmin⟩ :=
     (Finite.wellFounded_of_trans_of_irrefl (QPrec (A := A))).has_min {z : A | IsQVar z ∧ ¬D z} h
   exact ⟨x, hx.1, hx.2, fun y hy hd => hmin y ⟨hy, hd⟩⟩

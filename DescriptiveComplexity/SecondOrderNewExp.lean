@@ -138,20 +138,20 @@ def valOf : Fin c → (Fin d → A) → Prop := fun i w => ρ (some i) w
 theorem realize_eltAtom {α : Type} (x : α) (v : α → A) :
     letI := (powBlock c d).structure₁ (L := L) ρ
     (eltAtom L c d x).Realize v ↔ eltOf ρ (v x) := by
-  letI := (powBlock c d).structure₁ (L := L) ρ
+  let := (powBlock c d).structure₁ (L := L) ρ
   exact Iff.rfl
 
 theorem realize_valAtom (i : Fin c) {α : Type} (w : Fin d → α) (v : α → A) :
     letI := (powBlock c d).structure₁ (L := L) ρ
     (valAtom L c d i w).Realize v ↔ valOf ρ i (fun j => v (w j)) := by
-  letI := (powBlock c d).structure₁ (L := L) ρ
+  let := (powBlock c d).structure₁ (L := L) ρ
   exact Iff.rfl
 
 theorem realize_eltEmpty :
     letI := (powBlock c d).structure₁ (L := L) ρ
     A ⊨ (eltEmpty L c d) ↔
       ∀ x : A, ¬eltOf ρ x := by
-  letI := (powBlock c d).structure₁ (L := L) ρ
+  let := (powBlock c d).structure₁ (L := L) ρ
   rw [eltEmpty, Sentence.Realize, Formula.realize_iAlls]
   constructor
   · intro h x
@@ -163,7 +163,7 @@ theorem realize_valEmpty :
     letI := (powBlock c d).structure₁ (L := L) ρ
     A ⊨ (valEmpty L c d) ↔
       ∀ (i : Fin c) (w : Fin d → A), ¬valOf ρ i w := by
-  letI := (powBlock c d).structure₁ (L := L) ρ
+  let := (powBlock c d).structure₁ (L := L) ρ
   rw [valEmpty, Sentence.Realize, Formula.realize_iInf]
   refine forall_congr' fun i => ?_
   rw [Formula.realize_iAlls]
@@ -177,7 +177,7 @@ theorem realize_eltUnique :
     letI := (powBlock c d).structure₁ (L := L) ρ
     A ⊨ (eltUnique L c d) ↔
       ∃! x : A, eltOf ρ x := by
-  letI := (powBlock c d).structure₁ (L := L) ρ
+  let := (powBlock c d).structure₁ (L := L) ρ
   rw [eltUnique, Sentence.Realize, Formula.realize_iExsUnique]
   constructor
   · rintro ⟨i, hi, huniq⟩
@@ -230,7 +230,7 @@ theorem domHolds_false (ρ : (powBlock c d).Assignment A) :
     ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, ρ) ↔
       (∃! x : A, eltOf ρ x) ∧ ∀ (i : Fin c) (w : Fin d → A), ¬valOf ρ i w := by
   refine Iff.trans ?_ (and_congr (realize_eltUnique (L := L) ρ) (realize_valEmpty (L := L) ρ))
-  letI := (powBlock c d).structure₁ (L := L) ρ
+  let := (powBlock c d).structure₁ (L := L) ρ
   exact Sentence.realize_inf A
 
 theorem domHolds_true (ρ : (powBlock c d).Assignment A) :
@@ -391,7 +391,7 @@ theorem realize_eltAtomAt (k : Fin n) {α : Type} (x : α) (v : α → A) :
     letI := ((powBlock c d).replicate n).structure₁ (L := L)
       ((powBlock c d).replicateAssign ρs)
     (eltAtomAt L c d k x).Realize v ↔ eltOf (ρs k) (v x) := by
-  letI := ((powBlock c d).replicate n).structure₁ (L := L) ((powBlock c d).replicateAssign ρs)
+  let := ((powBlock c d).replicate n).structure₁ (L := L) ((powBlock c d).replicateAssign ρs)
   exact Iff.rfl
 
 omit [L.IsRelational] in
@@ -404,7 +404,7 @@ theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → Bool)
       ((powBlock c d).replicateAssign ρs)
     A ⊨ powRelSentence L c d (Sum.inl R) τ ↔
       ∃ x : Fin n → A, (∀ i, eltOf (ρs i) (x i)) ∧ RelMap R x := by
-  letI := ((powBlock c d).replicate n).structure₁ (L := L) ((powBlock c d).replicateAssign ρs)
+  let := ((powBlock c d).replicate n).structure₁ (L := L) ((powBlock c d).replicateAssign ρs)
   rw [powRelSentence, if_pos hτ, Sentence.Realize, Formula.realize_iExs]
   refine exists_congr fun x => ?_
   rw [Formula.realize_inf, Formula.realize_iInf]
@@ -426,7 +426,7 @@ theorem realize_powRelSentence_old (σs : Fin 1 → (powBlock c d).Assignment A)
     letI := ((powBlock c d).replicate 1).structure₁ (L := L)
       ((powBlock c d).replicateAssign σs)
     A ⊨ powRelSentence L c d (Sum.inr Language.oldSym) τ ↔ τ 0 = false := by
-  letI := ((powBlock c d).replicate 1).structure₁ (L := L) ((powBlock c d).replicateAssign σs)
+  let := ((powBlock c d).replicate 1).structure₁ (L := L) ((powBlock c d).replicateAssign σs)
   rw [powRelSentence]
   by_cases h : τ 0 = false
   · rw [if_pos h]; simp [h]
@@ -744,7 +744,7 @@ instance : Subsingleton (Fin ((usedBlock B).arity (Sum.inr ()))) :=
 theorem markerOf_iff (ρ' : (usedBlock B).Assignment (A ⊕ N)) (z : A ⊕ N) :
     letI := extOnB (L := L) ρ'
     RelMap (markerHostSym L B) ![z] ↔ markerOf ρ' z := by
-  letI := extOnB (L := L) ρ'
+  let := extOnB (L := L) ρ'
   refine iff_of_eq (congrArg (ρ' (Sum.inr ())) (funext fun j => ?_))
   rw [Subsingleton.elim j ⟨0, Nat.zero_lt_one⟩]
   rfl
@@ -794,18 +794,18 @@ theorem realize_usedKernelHom {N' : Type} (σ : (usedBlock B).Assignment (A ⊕ 
     ((A ⊕ N') ⊨ (usedKernelHom L B).onSentence φ) ↔
       letI := extOnB (L := L) (fun i => σ (Sum.inl i))
       ((A ⊕ N') ⊨ φ) := by
-  letI M := A ⊕ N'
-  letI instM := extOn L A N'
-  letI instB := extOnB (L := L) (fun i => σ (Sum.inl i))
-  letI instM' := markerBlock.structure fun i => σ (Sum.inr i)
-  letI instBig := @sumStructure ((newLang L).sum B.lang) markerBlock.lang M instB instM'
-  letI instU := extOnB (L := L) σ
+  let M := A ⊕ N'
+  let instM := extOn L A N'
+  let instB := extOnB (L := L) (fun i => σ (Sum.inl i))
+  let instM' := markerBlock.structure fun i => σ (Sum.inr i)
+  let instBig := @sumStructure ((newLang L).sum B.lang) markerBlock.lang M instB instM'
+  let instU := extOnB (L := L) σ
   have hσ : consAssign (fun i => σ (Sum.inl i)) (fun i => σ (Sum.inr i)) = σ := by
     funext i
     cases i with
     | inl _ => rfl
     | inr _ => rfl
-  haveI hexp : @LHom.IsExpansionOn _ _ (mergeStep (newLang L) B markerBlock) M instBig instU := by
+  have hexp : @LHom.IsExpansionOn _ _ (mergeStep (newLang L) B markerBlock) M instBig instU := by
     have := mergeStep_isExpansionOn (newLang L) instM B markerBlock
       (fun i => σ (Sum.inl i)) (fun i => σ (Sum.inr i))
     rwa [hσ] at this
@@ -827,8 +827,8 @@ theorem realize_relativized (U : N → Prop) (ρ' : (usedBlock B).Assignment (A 
     ((A ⊕ N) ⊨ relativizeTo (markerHostSym L B) ((usedKernelHom L B).onSentence φ)) ↔
       letI := extOnB (L := L) (usedRestrict U ρ')
       ((A ⊕ {y : N // U y}) ⊨ (usedKernelHom L B).onSentence φ) := by
-  letI := extOnB (L := L) ρ'
-  letI := extOnB (L := L) (usedRestrict U ρ')
+  let := extOnB (L := L) ρ'
+  let := extOnB (L := L) (usedRestrict U ρ')
   have hS : ∀ x : A ⊕ N, x ∈ usedSubB (L := L) (B := usedBlock B) U ρ' ↔
       RelMap (markerHostSym L B) ![x] := fun x => (hU x).trans (markerOf_iff ρ' x).symm
   have h1 := realize_relativizeTo (R := markerHostSym L B)
@@ -845,7 +845,7 @@ theorem realize_relativized (U : N → Prop) (ρ' : (usedBlock B).Assignment (A 
 theorem realize_oldMarked (ρ' : (usedBlock B).Assignment (A ⊕ N)) :
     letI := extOnB (L := L) ρ'
     ((A ⊕ N) ⊨ oldMarked L B) ↔ ∀ a : A, markerOf ρ' (Sum.inl a) := by
-  letI := extOnB (L := L) ρ'
+  let := extOnB (L := L) ρ'
   rw [oldMarked, Sentence.Realize, Formula.realize_iAlls]
   constructor
   · intro h a
@@ -870,13 +870,13 @@ theorem sorealize_usedSentence (φ : ((newLang L).sum B.lang).Sentence) :
       ∃ U : N → Prop,
         letI := extOn L A {y : N // U y}
         SORealize (newLang L) (A ⊕ {y : N // U y}) [B] φ true := by
-  letI := extOn L A N
+  let := extOn L A N
   constructor
   · rintro ⟨ρ', hρ'⟩
-    letI := extOnB (L := L) ρ'
+    let := extOnB (L := L) ρ'
     obtain ⟨hguard, hrel⟩ := (Sentence.realize_inf (A ⊕ N)).mp hρ'
     have hg := (realize_oldMarked (L := L) ρ').mp hguard
-    letI := extOn L A {y : N // markerOf ρ' (Sum.inr y)}
+    let := extOn L A {y : N // markerOf ρ' (Sum.inr y)}
     refine ⟨fun y => markerOf ρ' (Sum.inr y),
       usedRestrict (fun y => markerOf ρ' (Sum.inr y)) (kernelOf ρ'), ?_⟩
     have hU : ∀ x : A ⊕ N,
@@ -887,9 +887,9 @@ theorem sorealize_usedSentence (φ : ((newLang L).sum B.lang).Sentence) :
     have h1 := (realize_relativized (L := L) _ ρ' hU φ).mp hrel
     exact (realize_usedKernelHom _ φ).mp h1
   · rintro ⟨U, ρ, hρ⟩
-    letI := extOn L A {y : N // U y}
+    let := extOn L A {y : N // U y}
     refine ⟨usedJoin U ρ, ?_⟩
-    letI := extOnB (L := L) (usedJoin U ρ)
+    let := extOnB (L := L) (usedJoin U ρ)
     have hU : ∀ x : A ⊕ N,
         Sum.elim (fun _ => True) U x ↔ markerOf (usedJoin U ρ) x := fun _ => Iff.rfl
     refine (Sentence.realize_inf (A ⊕ N)).mpr ⟨?_, ?_⟩
@@ -946,7 +946,7 @@ def extOnCongr {A N N' : Type} [L.Structure A] (e : N ≃ N') :
 theorem card_pow {c : ℕ} (α : Type) [Finite α] :
     Nat.card (Fin c → α → Prop) = 2 ^ (c * Nat.card α) := by
   classical
-  letI := Fintype.ofFinite α
+  let := Fintype.ofFinite α
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_fun, Fintype.card_fun,
     Fintype.card_prop, Fintype.card_fin, mul_comm c, pow_mul]
 
@@ -971,9 +971,9 @@ theorem SigmaSONewExpDefinable.toExpDefinable {P : DecisionProblem L}
   refine ExpDefinableFree.expDefinable
     ⟨powExpFree L c d, usedProblem φ, usedProblem_mem_NP φ, ?_⟩
   intro A _ _ _
-  letI : Fintype (Fin c → (Fin d → A) → Prop) := Fintype.ofFinite _
-  letI := extOn L A (Fin c → (Fin d → A) → Prop)
-  letI := ExpExpansionFree.mapStructure (X := powExpFree L c d) A
+  let : Fintype (Fin c → (Fin d → A) → Prop) := Fintype.ofFinite _
+  let := extOn L A (Fin c → (Fin d → A) → Prop)
+  let := ExpExpansionFree.mapStructure (X := powExpFree L c d) A
   have hiso : SORealize (newLang L) (A ⊕ (Fin c → (Fin d → A) → Prop)) [usedBlock B]
         (usedSentence L B φ) true ↔
       usedProblem (L := L) (B := B) φ ((powExpFree L c d).Map A) :=
@@ -987,7 +987,7 @@ theorem SigmaSONewExpDefinable.toExpDefinable {P : DecisionProblem L}
       refine Function.Embedding.nonempty_of_card_le ?_
       rw [Fintype.card_fin, ← Nat.card_eq_fintype_card, card_pow]
       exact hm
-    letI := extOn L A {S : Fin c → (Fin d → A) → Prop // ∃ i, e i = S}
+    let := extOn L A {S : Fin c → (Fin d → A) → Prop // ∃ i, e i = S}
     refine ⟨fun S => ∃ i, e i = S, ?_⟩
     have hq : Fin m ≃ {S : Fin c → (Fin d → A) → Prop // ∃ i, e i = S} :=
       Equiv.ofBijective (fun i => ⟨e i, ⟨i, rfl⟩⟩)
@@ -995,8 +995,8 @@ theorem SigmaSONewExpDefinable.toExpDefinable {P : DecisionProblem L}
           fun z => by obtain ⟨i, hi⟩ := z.2; exact ⟨i, Subtype.ext hi⟩⟩
     exact (sorealize_iso (extOnCongr (L := L) (A := A) hq) [B] φ true).mp hρ
   · rintro ⟨U, hU⟩
-    letI : Fintype {S : Fin c → (Fin d → A) → Prop // U S} := Fintype.ofFinite _
-    letI := extOn L A {S : Fin c → (Fin d → A) → Prop // U S}
+    let : Fintype {S : Fin c → (Fin d → A) → Prop // U S} := Fintype.ofFinite _
+    let := extOn L A {S : Fin c → (Fin d → A) → Prop // U S}
     refine ⟨Fintype.card {S : Fin c → (Fin d → A) → Prop // U S}, ?_, ?_⟩
     · rw [← card_pow (c := c) (Fin d → A), Nat.card_eq_fintype_card]
       exact Fintype.card_le_of_injective _ Subtype.val_injective

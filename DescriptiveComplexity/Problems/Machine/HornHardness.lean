@@ -1534,7 +1534,7 @@ theorem bitRank_posHEnd_le :
       rw [eq_posHCell_of_posn hr (hcell r hr hle hne hs),
         eq_posHCell_of_posn hr' (hcell r' hr' hle' hne' hs'), h0]
   · rw [Set.ncard_univ]
-    haveI := Fintype.ofFinite A
+    have := Fintype.ofFinite A
     simp [Nat.card_eq_fintype_card]
 
 omit [Language.sat.Structure A] in
@@ -1714,7 +1714,7 @@ theorem RoundFold.forcedIn_subset {c₀ : A} (hmin : SatMinCl c₀) {r : A}
     have hcard : {e : A | r ≤ e}.ncard = 1 := by
       have hset : {e : A | r ≤ e} = {r} := by
         ext e
-        simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+        simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
         exact ⟨fun hle => le_antisymm (hmax e) hle, fun he => he ▸ le_refl r⟩
       rw [hset, Set.ncard_singleton]
     rw [hcard] at hx
@@ -1725,7 +1725,7 @@ theorem RoundFold.forcedIn_subset {c₀ : A} (hmin : SatMinCl c₀) {r : A}
     have hcard : {e : A | r ≤ e}.ncard = {e : A | r' ≤ e}.ncard + 1 := by
       have hset : {e : A | r ≤ e} = insert r {e : A | r' ≤ e} := by
         ext e
-        simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+        simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
         constructor
         · intro hle
           rcases eq_or_lt_of_le hle with heq | hlt
@@ -1764,7 +1764,7 @@ theorem ncard_ge_succElt {r r' : A} (hsucc : SuccElt r r') :
     {e : A | r ≤ e}.ncard = {e : A | r' ≤ e}.ncard + 1 := by
   have hset : {e : A | r ≤ e} = insert r {e : A | r' ≤ e} := by
     ext e
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     constructor
     · intro hle
       rcases eq_or_lt_of_le hle with heq | hlt
@@ -1960,7 +1960,7 @@ theorem roundFold_marks_eq_forced {c₀ : A} (hmin : SatMinCl c₀) {M' : A → 
     have hcard : {e : A | botA (A := A) ≤ e}.ncard = Nat.card A := by
       have hset : {e : A | botA (A := A) ≤ e} = Set.univ := by
         ext e
-        simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
         exact botA_le e
       rw [hset, Set.ncard_univ]
     refine h.forcedIn_subset hmin 0 (fun y hy => hy.elim) x ?_

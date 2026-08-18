@@ -95,7 +95,7 @@ theorem deterministic : (wideData (Fin 2)).Deterministic :=
 blank tape in the state `0`, which is accepting. -/
 theorem accepts : (wideData (Fin 2)).Accepts := by
   have hpos : 0 < Nat.card {p : WPoint (Fin 2) // (wideData (Fin 2)).Posn p} := by
-    haveI : Nonempty {p : WPoint (Fin 2) // (wideData (Fin 2)).Posn p} :=
+    have : Nonempty {p : WPoint (Fin 2) // (wideData (Fin 2)).Posn p} :=
       ⟨⟨Sum.inl fun _ => False, trivial⟩⟩
     exact Nat.card_pos
   exact ⟨⟨Sum.inr 0, Sum.inl fun _ => False, fun _ => Sum.inr 1⟩,

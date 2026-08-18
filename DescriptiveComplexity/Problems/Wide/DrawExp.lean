@@ -69,7 +69,7 @@ theorem relMap_iff_altQuantFrom_expLeaf {k : ℕ} (e : dt.X.E.Relations k)
     RelMap (M := dt.X.Map A) e p ↔
       altQuantFrom (dt.relPk e fun ℓ => (p ℓ).1.1).pol
         (dt.expLeaf e (fun ℓ => (p ℓ).1.1) fun ℓ => (p ℓ).1.2) 0 v := by
-  letI inst := (dt.X.B.replicate k).structure₁ (L := L.sum Language.order)
+  let inst := (dt.X.B.replicate k).structure₁ (L := L.sum Language.order)
     (dt.X.B.replicateAssign fun ℓ => (p ℓ).1.2)
   have hspec := (dt.relPk e fun ℓ => (p ℓ).1.1).spec A v default fun i => i.elim0
   have hrel : (((dt.X.relSentence e fun ℓ => (p ℓ).1.1).relabel
@@ -119,7 +119,7 @@ theorem domHolds_iff_altQuantFrom_domLeaf (t : dt.X.Tag)
     (ρ : dt.X.B.Assignment A) (v : Fin (dt.domPk t).n → A) :
     ExpExpansion.DomHolds (X := dt.X) (t, ρ) ↔
       altQuantFrom (dt.domPk t).pol (dt.domLeaf t ρ) 0 v := by
-  letI inst := dt.X.B.structure₁ (L := L.sum Language.order) ρ
+  let inst := dt.X.B.structure₁ (L := L.sum Language.order) ρ
   have hspec := (dt.domPk t).spec A v default fun i => i.elim0
   have hrel : ((((dt.X.dom t).relabel (Empty.elim : Empty → Fin 0)).Realize
         (default : Fin 0 → A))) ↔ @Sentence.Realize _ A inst (dt.X.dom t) := by

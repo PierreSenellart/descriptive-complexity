@@ -213,7 +213,7 @@ def IsPowIx (i p : A) : Prop := ∀ j : A, (BitIx j p ↔ j = i)
 /-- **What a place value is worth.** -/
 theorem orank_of_isPowIx {i p : A} (hi : orank i < posCount A) (h : IsPowIx i p) :
     orank p = 2 ^ orank i := by
-  haveI : Nonempty A := ⟨i⟩
+  have : Nonempty A := ⟨i⟩
   refine Nat.eq_of_testBit_eq fun j => ?_
   rw [Nat.testBit_two_pow]
   by_cases hj : j < Nat.card A

@@ -269,7 +269,7 @@ witnesses the source condition. -/
 theorem srSpec_isSrc_iff (ρ : srBlock.Assignment A) :
     srSpec.IsSrc ρ ↔
       ClausesHold A (srPred ρ srW₁) tsSrcCl ∧ ReadsCur A (srPred ρ srW₁) (srPred ρ srX) := by
-  letI := srBlock.structure₁ (L := srBase) ρ
+  let := srBlock.structure₁ (L := srBase) ρ
   have h : srSpec.IsSrc ρ ↔
       ((A ⊨ clausesHoldS (srIn₁ tsSrcCl) (srIn₁ tsPosIn) (srIn₁ tsNegIn) (srVar₁ srW₁)) ∧
         (A ⊨ agreeOnS (srIn₁ tsStateVar) (srVar₁ srW₁) (srVar₁ srX))) :=
@@ -283,7 +283,7 @@ witnesses the target condition. -/
 theorem srSpec_isTgt_iff (ρ : srBlock.Assignment A) :
     srSpec.IsTgt ρ ↔
       ClausesHold A (srPred ρ srW₂) tsTgtCl ∧ ReadsCur A (srPred ρ srW₂) (srPred ρ srX) := by
-  letI := srBlock.structure₁ (L := srBase) ρ
+  let := srBlock.structure₁ (L := srBase) ρ
   have h : srSpec.IsTgt ρ ↔
       ((A ⊨ clausesHoldS (srIn₁ tsTgtCl) (srIn₁ tsPosIn) (srIn₁ tsNegIn) (srVar₁ srW₂)) ∧
         (A ⊨ agreeOnS (srIn₁ tsStateVar) (srVar₁ srW₂) (srVar₁ srX))) :=
@@ -298,7 +298,7 @@ theorem srSpec_step_iff (ρ σ : srBlock.Assignment A) :
     srSpec.Step ρ σ ↔
       (ClausesHold A (srPred σ srV) tsStepCl ∧ ReadsCur A (srPred σ srV) (srPred ρ srX) ∧
         WritesNext A (srPred σ srV) (srPred σ srX)) := by
-  letI := srBlock.structure₂ (L := srBase) ρ σ
+  let := srBlock.structure₂ (L := srBase) ρ σ
   have h : srSpec.Step ρ σ ↔
       ((A ⊨ clausesHoldS (srIn₂ tsStepCl) (srIn₂ tsPosIn) (srIn₂ tsNegIn) (srNext₂ srV)) ∧
         ((A ⊨ agreeOnS (srIn₂ tsStateVar) (srNext₂ srV) (srCur₂ srX)) ∧

@@ -80,7 +80,7 @@ private theorem realize_kColKernel {k : ℕ} {V : Type} [Language.graph.Structur
         (@sumStructure _ _ V _ ((colorGuessBlock k).structure ρ)) (kColKernel k)) ↔
       (∀ x : V, ∃ i : Fin k, ρ i ![x]) ∧
         ∀ x y : V, RelMap adj ![x, y] → ∀ i : Fin k, ¬(ρ i ![x] ∧ ρ i ![y]) := by
-  letI := (colorGuessBlock k).structure ρ
+  let := (colorGuessBlock k).structure ρ
   have hsub : ∀ (i : Fin k) (w : Fin 1 → V),
       RelMap (L := kColSOLang k) (M := V) (kcColorSym i) w ↔ ρ i w :=
     fun _ _ => Iff.rfl
@@ -175,7 +175,7 @@ private theorem realize_paletteKernel {A : Type} [Language.markedGraph.Structure
       (∀ x : A, ∃ y : A, ρ () ![x, y] ∧ MGMarked y) ∧
         ∀ x x' y : A, x ≠ x' → (if positive then MGAdj x x' else ¬MGAdj x x') →
           ρ () ![x, y] → ρ () ![x', y] → False := by
-  letI := paletteGuessBlock.structure ρ
+  let := paletteGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
       RelMap (L := paletteSOLang) (M := A) pcColSym w ↔ ρ () w := fun _ => Iff.rfl
   rw [paletteKernel]

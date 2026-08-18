@@ -671,7 +671,7 @@ theorem computablePred_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q)
     (V : FinVocab L) (V' : FinVocab L') (hQ : ComputablePred (Q.toPred V')) :
     ComputablePred (P.toPred V) := by
   classical
-  letI := f.tagFinite
+  let := f.tagFinite
   obtain ⟨t0, -, -⟩ := f.dom_nonempty (⟨0, []⟩ : FinStruct V).Univ
   obtain ⟨k, ⟨e⟩⟩ := Finite.exists_equiv_fin f.Tag
   obtain ⟨T, rfl⟩ : ∃ T, k = T + 1 := by

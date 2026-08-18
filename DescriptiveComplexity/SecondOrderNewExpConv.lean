@@ -47,18 +47,18 @@ theorem ExpDefinable.toSigmaSONewExp (h : ExpDefinable NP P) :
   intro A _ _ _
   constructor
   · intro hPA
-    letI := finiteLinearOrder A
+    let := finiteLinearOrder A
     obtain ⟨σ, hσ⟩ := (hφ (X.Map A)).mp ((hX A).mp hPA)
     obtain ⟨enum⟩ : Nonempty (Fin (Nat.card ((taggedBlock X).Assignment A)) ≃
         (taggedBlock X).Assignment A) := by
-      letI := Fintype.ofFinite ((taggedBlock X).Assignment A)
+      let := Fintype.ofFinite ((taggedBlock X).Assignment A)
       rw [Nat.card_eq_fintype_card]
       exact ⟨(Fintype.equivFin _).symm⟩
     exact ⟨_, card_taggedAssign_le X, buildAssign σ enum,
       pullSentence_forward σ enum φ hσ⟩
   · rintro ⟨m, -, ρ, hρ⟩
     obtain ⟨inst, σ, hσ⟩ := pullSentence_back φ ρ hρ
-    letI := inst
+    let := inst
     exact (hX A).mpr ((hφ (X.Map A)).mpr ⟨σ, hσ⟩)
 
 /-- **`∃SO[new, exp] = NEXPTIME`**: a problem is decided one exponential up in NP

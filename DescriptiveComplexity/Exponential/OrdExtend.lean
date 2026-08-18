@@ -56,10 +56,10 @@ theorem realize_ordSentence (t₁ t₂ : X.Tag) (ρs : Fin 2 → X.B.Assignment 
         ((X.B.replicate 2).structure₁ (L := L.sum Language.order) (X.B.replicateAssign ρs))
         (X.ordSentence t₁ t₂) ↔
       (X.pointLinearOrder A).le (t₁, ρs 0) (t₂, ρs 1)) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := setLinearOrder (X.B.AtomIx A)
-  letI := (X.B.replicate 2).structure₁ (L := L.sum Language.order) (X.B.replicateAssign ρs)
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := setLinearOrder (X.B.AtomIx A)
+  let := (X.B.replicate 2).structure₁ (L := L.sum Language.order) (X.B.replicateAssign ρs)
   have hle : (X.pointLinearOrder A).le (t₁, ρs 0) (t₂, ρs 1) ↔
       t₁ < t₂ ∨ (t₁ = t₂ ∧
         (setLinearOrder (X.B.AtomIx A)).le (X.B.atomSet (ρs 0)) (X.B.atomSet (ρs 1))) :=

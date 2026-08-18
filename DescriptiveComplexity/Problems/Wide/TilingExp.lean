@@ -147,7 +147,7 @@ variable {A : Type} [Language.wtile.Structure A] [LinearOrder A]
 theorem relMap_posn (p : WPoint A) :
     letI := wtileStructure A
     (RelMap tlPosn ![wtileEmbed p] ↔ (wideTileData A).Posn p) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   rw [realize_one tlPosn posnT (fun _ => rfl) (wtileEmbed p)]
   match p with
   | Sum.inl s => exact realize_subsetS wtDig _
@@ -160,7 +160,7 @@ theorem relMap_mark (rt : Language.tiling.Relations 1) (r : Language.wtile.Relat
     (p : WPoint A) :
     letI := wtileStructure A
     (RelMap rt ![wtileEmbed p] ↔ wpMark (fun x => RelMap r ![x]) p) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   rw [realize_one rt (markT r) h (wtileEmbed p)]
   match p with
   | Sum.inl s => exact iff_of_false (not_realize_botS _) (fun h => h)
@@ -175,7 +175,7 @@ theorem relMap_attr (rt : Language.tiling.Relations 2) (r : Language.wtile.Relat
     (p q : WPoint A) :
     letI := wtileStructure A
     (RelMap rt ![wtileEmbed p, wtileEmbed q] ↔ wpAttr (fun x y => RelMap r ![x, y]) p q) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   rw [realize_two rt (binT r) h (wtileEmbed p) (wtileEmbed q)]
   match p, q with
   | Sum.inl s, Sum.inl t => exact iff_of_false (not_realize_botS₂ _ _) (fun h => h)
@@ -190,7 +190,7 @@ the instance's own order induces, then the tiles in that order. -/
 theorem relMap_le (p q : WPoint A) :
     letI := wtileStructure A
     (RelMap tlLe ![wtileEmbed p, wtileEmbed q] ↔ (wideTileData A).Le p q) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   rw [realize_two tlLe leT (fun _ => rfl) (wtileEmbed p) (wtileEmbed q)]
   match p, q with
   | Sum.inl s, Sum.inl t => exact realize_addrLeS wtLe _ _
@@ -205,7 +205,7 @@ segment of an element may carry that element's tiles. -/
 theorem relMap_first (p q : WPoint A) :
     letI := wtileStructure A
     (RelMap tlFirst ![wtileEmbed p, wtileEmbed q] ↔ (wideTileData A).First p q) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   rw [realize_two tlFirst firstT (fun _ => rfl) (wtileEmbed p) (wtileEmbed q)]
   match p, q with
   | Sum.inl s, Sum.inl t => exact iff_of_false (not_realize_botS₂ _ _) (fun h => h)
@@ -248,7 +248,7 @@ theorem wtileAgree :
         (tileData (wtileExp.Map A)).EdgeL (wtileEquiv p)) ∧
       ∀ p : WPoint A, (wideTileData A).EdgeR p ↔
         (tileData (wtileExp.Map A)).EdgeR (wtileEquiv p) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   exact ⟨fun p => (relMap_posn p).symm, fun p q => (relMap_le p q).symm,
     fun p => (relMap_mark tlTile wtTile (fun _ => rfl) p).symm,
     fun p => (relMap_mark tlAcc wtAcc (fun _ => rfl) p).symm,
@@ -264,7 +264,7 @@ theorem wtileAgree :
 theorem wideTiling_iff_expansion (A : Type) [Language.wtile.Structure A] [LinearOrder A] :
     letI := wtileStructure A
     (WideTiling A ↔ TILING (wtileExp.Map A)) := by
-  letI := wtileStructure A
+  let := wtileStructure A
   obtain ⟨hposn, hle, htile, hacc, hhoriz, hvert, hfirst, hbase, hstart, hel, her⟩ :=
     wtileAgree (A := A)
   constructor
@@ -352,7 +352,7 @@ end WideTile
 into `DescriptiveComplexity.TILING`, and that problem is in NP. This is the
 second natural member the class has, beside the wide machine. -/
 theorem wideTiling_mem_NEXPTIME : WideTiling ∈ NEXPTIME := by
-  letI hinst : ∀ (A : Type) [Language.wtile.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [Language.wtile.Structure A] [LinearOrder A],
       Language.tiling.Structure (WideTile.wtileExp.Map A) := fun A => WideTile.wtileStructure A
   refine ⟨WideTile.wtileExp, TILING, tiling_mem_NP, ?_⟩
   intro A _ _ _ _

@@ -127,7 +127,7 @@ noncomputable def ki : ℕ :=
   Finset.univ.sup dt.nOf
 
 theorem nOf_le_ki (v : dt.VarIx) : dt.nOf v ≤ dt.ki := by
-  letI := Fintype.ofFinite dt.VarIx
+  let := Fintype.ofFinite dt.VarIx
   exact Finset.le_sup (Finset.mem_univ v)
 
 /-! ### The classified atoms -/
@@ -147,7 +147,7 @@ noncomputable def natMax : ℕ :=
   Finset.univ.sup dt.natOf
 
 theorem natOf_le_natMax (v : dt.VarIx) : dt.natOf v ≤ dt.natMax := by
-  letI := Fintype.ofFinite dt.VarIx
+  let := Fintype.ofFinite dt.VarIx
   exact Finset.le_sup (Finset.mem_univ v)
 
 /-- **The kind of an atom**, read off the syntax: the index data of the
@@ -241,7 +241,7 @@ theorem domDepth_le_eDim : dt.domDepth ≤ dt.eDim :=
 
 theorem kindDepth_le_eDim (v : dt.VarIx) (a : Fin (dt.natOf v)) :
     dt.kindDepth (dt.kindOf v a) ≤ dt.eDim := by
-  letI := Fintype.ofFinite dt.VarIx
+  let := Fintype.ofFinite dt.VarIx
   refine le_trans ?_ (le_max_right _ _)
   exact le_trans
     (Finset.le_sup (f := fun a : Fin (dt.natOf v) => dt.kindDepth (dt.kindOf v a))
@@ -257,8 +257,8 @@ tag. -/
 theorem kindArgs_mul_card_le_ntgDim (v : dt.VarIx) (a : Fin (dt.natOf v)) :
     letI := Fintype.ofFinite dt.X.Tag
     dt.kindArgs (dt.kindOf v a) * Fintype.card dt.X.Tag ≤ dt.ntgDim := by
-  letI := Fintype.ofFinite dt.VarIx
-  letI := Fintype.ofFinite dt.X.Tag
+  let := Fintype.ofFinite dt.VarIx
+  let := Fintype.ofFinite dt.X.Tag
   refine Nat.mul_le_mul_right _ (le_trans ?_ (Nat.le_succ _))
   exact le_trans
     (Finset.le_sup (f := fun a : Fin (dt.natOf v) => dt.kindArgs (dt.kindOf v a))
@@ -271,13 +271,13 @@ theorem kindArgs_mul_card_le_ntgDim (v : dt.VarIx) (a : Fin (dt.natOf v)) :
 theorem card_le_ntgDim :
     letI := Fintype.ofFinite dt.X.Tag
     Fintype.card dt.X.Tag ≤ dt.ntgDim := by
-  letI := Fintype.ofFinite dt.VarIx
-  letI := Fintype.ofFinite dt.X.Tag
+  let := Fintype.ofFinite dt.VarIx
+  let := Fintype.ofFinite dt.X.Tag
   exact Nat.le_mul_of_pos_left _ (Nat.succ_pos _)
 
 theorem kindReads_le_nfDim (v : dt.VarIx) (a : Fin (dt.natOf v)) :
     dt.kindReads (dt.kindOf v a) ≤ dt.nfDim := by
-  letI := Fintype.ofFinite dt.VarIx
+  let := Fintype.ofFinite dt.VarIx
   refine le_trans ?_ (le_max_right _ _)
   exact le_trans
     (Finset.le_sup (f := fun a : Fin (dt.natOf v) => dt.kindReads (dt.kindOf v a))

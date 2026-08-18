@@ -116,7 +116,7 @@ theorem exists_altAcc_of_altWin [Finite A] {start : Bool} {c : Config A}
     obtain ⟨n, hn⟩ := ih
     exact ⟨n + 1, Or.inr (Or.inr ⟨hu, _, ‹M.Step _ _›, hn⟩)⟩
   | @all c hu hex _ ih =>
-    letI := Fintype.ofFinite (Config A)
+    let := Fintype.ofFinite (Config A)
     choose f hf using ih
     refine ⟨(Finset.univ.sup fun d => if h : M.Step c d then f d h else 0) + 1,
       Or.inr (Or.inl ⟨hu, hex, fun c' hc' => ?_⟩)⟩

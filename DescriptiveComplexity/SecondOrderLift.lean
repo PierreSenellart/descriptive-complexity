@@ -72,9 +72,9 @@ theorem sorealize_soLangLift :
   induction Bs with
   | nil =>
     intro L L' Φ A instL instL' hexp φ pol
-    letI := instL
-    letI := instL'
-    haveI := hexp
+    let := instL
+    let := instL'
+    have := hexp
     exact Φ.realize_onSentence A φ
   | cons B Bs ih =>
     intro L L' Φ A instL instL' hexp φ pol
@@ -89,7 +89,7 @@ theorem sorealize_soLangLift :
             φ false
       refine exists_congr fun ρ => ?_
       exact ih (L.sum B.lang) (L'.sum B.lang) (Φ.sumMap (LHom.id B.lang)) A _ _
-        (by letI := instL; letI := instL'; letI := B.structure ρ; haveI := hexp
+        (by let := instL; let := instL'; let := B.structure ρ; have := hexp
             infer_instance) φ false
     | false =>
       change (∀ ρ : B.Assignment A,
@@ -101,7 +101,7 @@ theorem sorealize_soLangLift :
             φ true
       refine forall_congr' fun ρ => ?_
       exact ih (L.sum B.lang) (L'.sum B.lang) (Φ.sumMap (LHom.id B.lang)) A _ _
-        (by letI := instL; letI := instL'; letI := B.structure ρ; haveI := hexp
+        (by let := instL; let := instL'; let := B.structure ρ; have := hexp
             infer_instance) φ true
 
 /-! ### Embedding the base language into a block expansion -/
@@ -128,8 +128,8 @@ theorem sorealize_inf_embed :
   induction Bs with
   | nil =>
     intro L A instL χ φ pol
-    letI := instL
-    letI : (soLang L []).Structure A := instL
+    let := instL
+    let : (soLang L []).Structure A := instL
     refine Iff.trans (Sentence.realize_inf (L := soLang L []) (M := A)) ?_
     exact and_congr_left' ((LHom.id L).realize_onSentence A χ)
   | cons B Bs ih =>
@@ -143,8 +143,8 @@ theorem sorealize_inf_embed :
             @SORealize (L.sum B.lang) A (@sumStructure L B.lang A instL (B.structure ρ)) Bs
               φ (!pol) := by
       intro ρ
-      letI := instL
-      letI := B.structure ρ
+      let := instL
+      let := B.structure ρ
       refine (ih (L.sum B.lang) A _ (LHom.sumInl.onSentence χ) φ (!pol)).trans ?_
       exact and_congr_left' (LHom.sumInl.realize_onSentence A χ)
     cases pol with
@@ -178,8 +178,8 @@ theorem sorealize_imp_embed :
   induction Bs with
   | nil =>
     intro L A instL χ φ pol
-    letI := instL
-    letI : (soLang L []).Structure A := instL
+    let := instL
+    let : (soLang L []).Structure A := instL
     refine Iff.trans (Sentence.realize_imp (L := soLang L []) (M := A)) ?_
     exact imp_congr ((LHom.id L).realize_onSentence A χ) Iff.rfl
   | cons B Bs ih =>
@@ -193,8 +193,8 @@ theorem sorealize_imp_embed :
             @SORealize (L.sum B.lang) A (@sumStructure L B.lang A instL (B.structure ρ)) Bs
               φ (!pol)) := by
       intro ρ
-      letI := instL
-      letI := B.structure ρ
+      let := instL
+      let := B.structure ρ
       refine (ih (L.sum B.lang) A _ (LHom.sumInl.onSentence χ) φ (!pol)).trans ?_
       exact imp_congr (LHom.sumInl.realize_onSentence A χ) Iff.rfl
     cases pol with
@@ -254,8 +254,8 @@ theorem sorealize_append_trivial :
             ((LHom.sumInl : L →ᴸ L.sum SOBlock.trivial.lang).onSentence φ) (!pol) ↔
           @SORealize L A instL [] φ pol := by
       intro ρ
-      letI := instL
-      letI := SOBlock.trivial.structure ρ
+      let := instL
+      let := SOBlock.trivial.structure ρ
       exact (LHom.sumInl : L →ᴸ L.sum SOBlock.trivial.lang).realize_onSentence A φ
     cases pol with
     | true =>
@@ -322,7 +322,7 @@ theorem SigmaSODefinable.piSucc (h : SigmaSODefinable k P) : PiSODefinable (k + 
           true ↔ P A := by
     intro ρ
     refine (sorealize_soLangLift Bs L (L.sum SOBlock.trivial.lang) LHom.sumInl A instA _
-      (by letI := instA; letI := SOBlock.trivial.structure ρ; infer_instance)
+      (by let := instA; let := SOBlock.trivial.structure ρ; infer_instance)
       φ true).trans (hφ A).symm
   change P A ↔ ∀ ρ : SOBlock.trivial.Assignment A, _
   exact ⟨fun hP ρ => (key ρ).mpr hP, fun h => (key (Classical.arbitrary _)).mp (h _)⟩
@@ -340,7 +340,7 @@ theorem PiSODefinable.sigmaSucc (h : PiSODefinable k P) : SigmaSODefinable (k + 
           false ↔ P A := by
     intro ρ
     refine (sorealize_soLangLift Bs L (L.sum SOBlock.trivial.lang) LHom.sumInl A instA _
-      (by letI := instA; letI := SOBlock.trivial.structure ρ; infer_instance)
+      (by let := instA; let := SOBlock.trivial.structure ρ; infer_instance)
       φ false).trans (hφ A).symm
   change P A ↔ ∃ ρ : SOBlock.trivial.Assignment A, _
   exact ⟨fun hP => ⟨Classical.arbitrary _, (key _).mpr hP⟩, fun ⟨ρ, h⟩ => (key ρ).mp h⟩

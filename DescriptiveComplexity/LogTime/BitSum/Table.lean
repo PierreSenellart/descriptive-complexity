@@ -114,7 +114,7 @@ theorem table_sound {g B D l : A} (hgpos : 0 < orank g)
           simp [onesBelow]
         omega
     · -- otherwise the recursion on the value applies
-      haveI : Nonempty A := ⟨b⟩
+      have : Nonempty A := ⟨b⟩
       obtain ⟨v', hv'⟩ := exists_clearLow (A := A) (x := v) (by omega)
       have hone := onesBelow_of_clearLow hv' (hvbits v hv)
       have hvv' : orank v' < orank v := orank_lt_of_clearLow hv'

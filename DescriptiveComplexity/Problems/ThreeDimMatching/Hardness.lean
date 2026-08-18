@@ -1024,7 +1024,7 @@ theorem satisfiable_iff_hasThreeDimMatching (A : Type) [Language.sat.Structure A
     Satisfiable A ↔ HasThreeDimMatching (tdmInterp.Map A) := by
   classical
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  haveI : Finite (tdmInterp.Map A) := tdmInterp.map_finite A
+  have : Finite (tdmInterp.Map A) := tdmInterp.map_finite A
   constructor
   · rintro ⟨ν, hν⟩
     have hsat := satClauses_occ hν

@@ -241,7 +241,7 @@ theorem exists_satisfies_of_no_bad_cycle
       Reach Cl (neg ((x, s) : Lit V)) (x, s))) :
     ∃ ν : V → Prop, Satisfies Cl ν := by
   classical
-  letI : Fintype V := Fintype.ofFinite V
+  let : Fintype V := Fintype.ofFinite V
   obtain ⟨T, hclosed, hcons, hdec⟩ :=
     exists_closed_consistent_deciding hcyc (Finset.univ : Finset V)
   have hdec' : ∀ x : V, Decides T x := fun x => hdec x (Finset.mem_univ x)

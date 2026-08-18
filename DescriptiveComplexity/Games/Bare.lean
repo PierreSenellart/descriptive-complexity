@@ -38,7 +38,7 @@ open Language
 theorem exists_notMem_range {N : Type} [Finite N] {j : ℕ} (b : Fin j → N)
     (h : j < Nat.card N) : ∃ d : N, ∀ i, b i ≠ d := by
   classical
-  letI := Fintype.ofFinite N
+  let := Fintype.ofFinite N
   have hcard : (Finset.image b Finset.univ).card < (Finset.univ : Finset N).card := by
     calc (Finset.image b Finset.univ).card
         ≤ (Finset.univ : Finset (Fin j)).card := Finset.card_image_le

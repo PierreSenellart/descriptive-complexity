@@ -83,20 +83,20 @@ reduction, followed by the expansion witnessing `Q`, is again an expansion. -/
 theorem ExpDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : ExpDefinable C Q) :
     ExpDefinable C P := by
   obtain ⟨X, R, hR, hX⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   -- The pulled expansion has the same expanded vocabulary as `X`, but
   -- `pullOrdered` is not reducible, so the expanded structure has to be offered
   -- to instance search by hand.
-  letI hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
       X.E.Structure ((X.pullOrdered f.toInterpretation).Map A) :=
     fun A => X.pullOrderedStructure f.toInterpretation A
   refine ⟨X.pullOrdered f.toInterpretation, R, hR, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   exact (f.correct A).trans ((hX (f.toInterpretation.Map A)).trans
     (R.iso_invariant (X.pullOrderedLEquiv f.toInterpretation A)))
 

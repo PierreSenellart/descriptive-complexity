@@ -473,7 +473,7 @@ NAE-3SAT iff its gadget graph has a cut at least as large as its marked
 relation. -/
 theorem naeThreeSatisfiable_iff_hasLargeCut :
     NAEThreeSatisfiable A ↔ HasLargeCut (mcInterp.Map A) := by
-  haveI : Finite (mcInterp.Map A) := mcInterp.map_finite A
+  have : Finite (mcInterp.Map A) := mcInterp.map_finite A
   by_cases hw : ThreeSatToSat.Wide A
   · -- a wide input has no edge at all, but a nonempty threshold
     refine iff_of_false
@@ -483,7 +483,7 @@ theorem naeThreeSatisfiable_iff_hasLargeCut :
     have hempty : {p : mcInterp.Map A × mcInterp.Map A |
         CutRel MAGAdj S p.1 p.2} = ∅ := by
       ext ⟨p, q⟩
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       exact fun h => (adj_cases h.1).1 hw
     have hmk : (0 : ℕ) < {p : mcInterp.Map A × mcInterp.Map A | MAGMarked p.1 p.2}.ncard := by
       rw [Set.ncard_pos (Set.toFinite _)]

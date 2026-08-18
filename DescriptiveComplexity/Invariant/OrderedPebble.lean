@@ -175,8 +175,8 @@ theorem setLess_or [Finite A] {j : Fin k} {u v : Fin k → A}
     (h : ¬MovesEq O j u v) : SetLess O j u v ∨ SetLess O j v u := by
   classical
   have hwf : WellFounded O := by
-    letI : IsTrans (Fin k → A) O := ⟨htrans⟩
-    letI : Std.Irrefl O := ⟨fun a ha => hasymm a a ha ha⟩
+    let : IsTrans (Fin k → A) O := ⟨htrans⟩
+    let : Std.Irrefl O := ⟨fun a ha => hasymm a a ha ha⟩
     exact Finite.wellFounded_of_trans_of_irrefl O
   have hne : {y : Fin k → A | MovesDiff O j u v y}.Nonempty := not_forall.mp h
   obtain ⟨m, hm, hmin⟩ := hwf.has_min _ hne

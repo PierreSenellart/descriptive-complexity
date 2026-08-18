@@ -117,7 +117,7 @@ axioms. Stated at an arbitrary order relation, since everything the address
 layer says is independent of where the order comes from. -/
 theorem isLinOrd_wmSetLe {α : Type} [Finite α] {Le : α → α → Prop} (h : IsLinOrd Le) :
     IsLinOrd (WMSetLe Le) := by
-  letI := h.toLinearOrder
+  let := h.toLinearOrder
   have hkey : ∀ s t : α → Prop, WMSetLe Le s t ↔ (setLinearOrder α).le s t := by
     intro s t
     rw [show ((setLinearOrder α).le s t ↔ _) from

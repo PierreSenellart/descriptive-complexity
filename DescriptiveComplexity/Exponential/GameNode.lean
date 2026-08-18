@@ -119,7 +119,7 @@ theorem realize_nodeGuardF (σ : (nodeBlock X T d).Assignment A) :
     (@Sentence.Realize _ A
         ((nodeBlock X T d).structure₁ (L := L.sum Language.order) σ) (nodeGuardF X T d) ↔
       ∃ n : T × (Fin d → X.Map A), σ = nodeAssign n) := by
-  letI := (nodeBlock X T d).structure₁ (L := L.sum Language.order) σ
+  let := (nodeBlock X T d).structure₁ (L := L.sum Language.order) σ
   rw [nodeGuardF, Sentence.Realize, Formula.realize_inf, realize_listInf]
   constructor
   · rintro ⟨hguard, hrounds⟩

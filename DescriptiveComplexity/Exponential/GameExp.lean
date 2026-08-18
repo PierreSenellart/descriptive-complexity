@@ -70,9 +70,9 @@ theorem graphGame_accepts_iff :
     letI := X.mapLinearOrder A
     letI := I.mapStructure (X.Map A)
     ((graphGame X hn D hD K).Accepts A ↔ GameWon (I.Map (X.Map A))) := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
-  haveI := X.mapNonempty A
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
+  have := X.mapNonempty A
   constructor
   · rintro ⟨τ, hstart, hwins⟩
     obtain ⟨tx, pts, rfl⟩ := (graphGame_isStart τ).mp hstart
@@ -117,15 +117,15 @@ Chandra–Kozen–Stockmeyer that has content. -/
 theorem SOLFPDefinable.soGameDefinable (h : SOLFPDefinable P) : SOGameDefinable P := by
   obtain ⟨X, Q, hQ, hX⟩ := (solfpDefinable_iff_expDefinable P).mp h
   obtain ⟨f⟩ := game_hard_ordered Q hQ
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   obtain ⟨Dm, D, hD, K, hK⟩ :=
     ExpExpansion.exists_graphKernels X f.Tag f.dim f.toInterpretation
   refine ⟨ExpExpansion.graphGame X (n := 2 * f.dim + Dm) rfl D hD K, fun A _ _ _ _ => ?_⟩
-  letI := X.mapLinearOrder A
-  haveI := X.mapFinite A
-  haveI := X.mapNonempty A
-  letI := f.toInterpretation.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  have := X.mapFinite A
+  have := X.mapNonempty A
+  let := f.toInterpretation.mapStructure (X.Map A)
   refine (hX A).trans ?_
   refine Iff.trans (f.correct (X.Map A)) ?_
   exact (ExpExpansion.graphGame_accepts_iff f.toInterpretation (by omega) hK).symm

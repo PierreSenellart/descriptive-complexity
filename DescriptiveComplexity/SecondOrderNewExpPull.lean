@@ -129,7 +129,7 @@ instance carries is the caller's to fix. -/
 theorem pullPointOn [LinearOrder A] (hle : ∀ a b : A, a ≤ b ↔ pullLe ρ a b) :
     letI := (pullBlock X C).structure₁ (L := newLang L) ρ
     PointOn (pullPointSyms X C) (Sum.inl : A → A ⊕ Fin m) (pullMeans ρ) (pullTags ρ) := by
-  letI := (pullBlock X C).structure₁ (L := newLang L) ρ
+  let := (pullBlock X C).structure₁ (L := newLang L) ρ
   refine ⟨⟨fun r ts => ?_, fun ts => ?_, fun v i ts => ?_⟩, fun x => ?_, fun v t => Iff.rfl⟩
   · exact relMap_ext_inl (m := m) r ts
   · refine Iff.trans (iff_of_eq (congrArg (ρ (Sum.inl ()))
@@ -196,7 +196,7 @@ theorem pullSubst_rel {n : ℕ} (r : (X.E.sum C.lang).Relations n) (ts : Fin n �
     letI := (pullBlock X C).structure₁ (L := newLang L) ρ
     (@RelMap _ (X.Map A) ((pullSubst X C).strucOn e) n r ts ↔
       @RelMap _ (X.Map A) (C.structure₁ (L := X.E) (pullCert ρ e)) n r ts) := by
-  letI := (pullBlock X C).structure₁ (L := newLang L) ρ
+  let := (pullBlock X C).structure₁ (L := newLang L) ρ
   cases r with
   | inl s =>
     refine Iff.trans (realize_pointRelF Sum.inl_injective h s id fun i => e (ts i)) ?_
@@ -242,7 +242,7 @@ theorem realize_pullKernel (φ : (X.E.sum C.lang).Sentence) :
     letI := (pullBlock X C).structure₁ (L := newLang L) ρ
     (((A ⊕ Fin m) ⊨ (pullSubst X C).substSentence (pullDom X C) φ) ↔
       @Sentence.Realize _ (X.Map A) (C.structure₁ (L := X.E) (pullCert ρ e)) φ) := by
-  letI := (pullBlock X C).structure₁ (L := newLang L) ρ
+  let := (pullBlock X C).structure₁ (L := newLang L) ρ
   have hD : ∀ x : A ⊕ Fin m, (pullDom X C).Realize ![x] ↔ ∃ p : X.Map A, e p = x := by
     intro x
     rw [pullDom, realize_isPointF Sum.inl_injective h 0 (![x])]
@@ -427,19 +427,19 @@ theorem pullSentence_back (φ : (X.E.sum C.lang).Sentence)
       @Sentence.Realize _ (@ExpExpansion.Map L X A _ inst)
         (@SOBlock.structure₁ X.E C (@ExpExpansion.Map L X A _ inst)
           (@ExpExpansion.mapStructure L X A _ inst) σ) φ := by
-  letI := (pullBlock X C).structure₁ (L := newLang L) ρ
+  let := (pullBlock X C).structure₁ (L := newLang L) ρ
   obtain ⟨⟨hord, hmg⟩, hker⟩ :=
     (Sentence.realize_inf (A ⊕ Fin m)).mp hψ |>.imp
       (fun h' => (Sentence.realize_inf (A ⊕ Fin m)).mp h') id
   obtain ⟨-, hrefl, htrans, hanti, htotal⟩ := (realize_extLinearGuard A m ρ).mp hord
-  letI : LinearOrder A :=
+  let : LinearOrder A :=
     pullLinearOrder ρ (fun a => hrefl _ (isOld_inl (m := m) a))
       (fun a b c hab hbc => htrans _ _ _ hab hbc) (fun a b hab hba => Sum.inl_injective
         (hanti _ _ hab hba))
       fun a b => htotal _ _ (isOld_inl (m := m) a) (isOld_inl (m := m) b)
   have hpt := pullPointOn ρ fun a b => Iff.rfl
   have hmg' := (realize_pullMeanGuard ρ).mp hmg
-  letI := meanStrucB (L := L) (pullMeanPart ρ)
+  let := meanStrucB (L := L) (pullMeanPart ρ)
   have hbij := bijective_meanAtB_of_guard (pullMeanPart ρ) hmg'
   have hshaped : ∀ (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
       (w : Fin ((taggedBlock X).arity i) → A ⊕ Fin m),

@@ -94,7 +94,7 @@ noncomputable def allModes : List spec.Mode :=
 
 open Classical in
 theorem mem_allModes (m : spec.Mode) : m ∈ allModes spec := by
-  letI : Fintype spec.Mode := Fintype.ofFinite spec.Mode
+  let : Fintype spec.Mode := Fintype.ofFinite spec.Mode
   exact Finset.mem_toList.mpr (Finset.mem_univ m)
 
 /-! ### The clauses -/

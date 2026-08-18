@@ -257,13 +257,13 @@ tree of the same budget. -/
 theorem hasSmallVertexCover_iff_steiner_map :
     HasSmallVertexCover A ↔ HasSmallSteinerTree (steinerInterp.Map A) := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
-  haveI : Finite (steinerInterp.Map A) := steinerInterp.map_finite A
+  have : Finite (steinerInterp.Map A) := steinerInterp.map_finite A
   have hmarked : {p : steinerInterp.Map A | STMarked p}.ncard = {v : A | MGMarked v}.ncard :=
     ncard_vPt_eq MGMarked _ (fun _ hp => steiner_marked_shape hp) fun v => steiner_marked_v v
   have hroot : STTerminal (rPt m (A := A)) := (steiner_terminal_r m).mpr hm
   constructor
   · rintro ⟨hfin, C, hcov, hcard⟩
-    haveI := hfin
+    have := hfin
     refine ⟨inferInstance,
       fun p => STTerminal p ∨ ∃ v, C v ∧ p = vPt v, fun x hx => Or.inl hx, ?_, ?_⟩
     · -- connectivity: every member reaches the root
@@ -312,7 +312,7 @@ theorem hasSmallVertexCover_iff_steiner_map :
       exact hcard
   · rintro ⟨hfin, S, hterms, hconn, hcard⟩
     have hA : Finite A := Finite.of_injective _ (vPt_injective (A := A))
-    haveI := hA
+    have := hA
     refine ⟨hA, fun v => S (vPt v), fun x y hxy hadj => ?_, ?_⟩
     · -- the path from the edge terminal to the root starts at an endpoint
       have hex : S (ePt x y) := hterms _ ((steiner_terminal_e x y).mpr ⟨hadj, hxy⟩)
@@ -522,7 +522,7 @@ plus the marked vertices. -/
 theorem ncard_marked_edge [Finite A] :
     {p : steinerEdgeInterp.Map A | STMarked p}.ncard
       = {v : A | MGMarked v}.ncard + (EdgePtSet A).ncard := by
-  haveI : Finite (steinerEdgeInterp.Map A) := steinerEdgeInterp.map_finite A
+  have : Finite (steinerEdgeInterp.Map A) := steinerEdgeInterp.map_finite A
   have hdisj : Disjoint (veePt '' {v : A | MGMarked v}) (EdgePtSet A) := by
     rw [Set.disjoint_left]
     rintro p ⟨v, -, rfl⟩ ⟨u, w, -, hp⟩
@@ -583,7 +583,7 @@ theorem hasSmallVertexCover_iff_edgeSteiner_map (A : Type)
     HasSmallVertexCover A ↔ HasSmallEdgeSteinerTree (steinerEdgeInterp.Map A) := by
   classical
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
-  haveI : Finite (steinerEdgeInterp.Map A) := steinerEdgeInterp.map_finite A
+  have : Finite (steinerEdgeInterp.Map A) := steinerEdgeInterp.map_finite A
   have hroot : STTerminal (reePt m (A := A)) := (steinerE_terminal_r m).mpr hm
   have hedgeS : ∀ p ∈ EdgePtSet A, STTerminal p := by
     rintro p ⟨u, w, hedge, rfl⟩
@@ -595,7 +595,7 @@ theorem hasSmallVertexCover_iff_edgeSteiner_map (A : Type)
     exact absurd htag (by decide)
   constructor
   · rintro ⟨hfin, C, hcov, hcard⟩
-    haveI := hfin
+    have := hfin
     set Tset : steinerEdgeInterp.Map A → steinerEdgeInterp.Map A → Prop :=
       fun p q => (∃ v, C v ∧ p = reePt m ∧ q = veePt v) ∨
         (q ∈ EdgePtSet A ∧ p = veePt (coverPick C (q.2 0) (q.2 1))) with hTdef
@@ -661,7 +661,7 @@ theorem hasSmallVertexCover_iff_edgeSteiner_map (A : Type)
       omega
   · rintro ⟨hfin, T, S, hsub, hterms, hconn, hcard⟩
     have hA : Finite A := Finite.of_injective _ (veePt_injective (A := A))
-    haveI := hA
+    have := hA
     have hlinkmono : ∀ p q, Link T S p q → Link STAdj S p q :=
       fun _ _ h => ⟨h.1, h.2.1, h.2.2.imp (hsub _ _) (hsub _ _)⟩
     refine ⟨hA, fun v => S (veePt v), fun x y hxy hadj => ?_, ?_⟩

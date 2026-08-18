@@ -103,9 +103,9 @@ theorem realize_ptF₁ (r : Language.eprPt.Relations 1) (x : γ) :
         (eprSOStructure ρ) _ (ptF₁ r x) v ↔
       letI := eprPtStructure A
       RelMap r ![v x]) := by
-  letI := eprPtStructure A
-  letI := ivBlock.structure ρ
-  letI := eprSOStructure ρ
+  let := eprPtStructure A
+  let := ivBlock.structure ρ
+  let := eprSOStructure ρ
   rw [ptF₁, Formula.realize_rel₁, Language.relMap_sumInl]
   simp only [Term.realize_var]
 
@@ -115,9 +115,9 @@ theorem realize_ptF₂ (r : Language.eprPt.Relations 2) (x y : γ) :
         (eprSOStructure ρ) _ (ptF₂ r x y) v ↔
       letI := eprPtStructure A
       RelMap r ![v x, v y]) := by
-  letI := eprPtStructure A
-  letI := ivBlock.structure ρ
-  letI := eprSOStructure ρ
+  let := eprPtStructure A
+  let := ivBlock.structure ρ
+  let := eprSOStructure ρ
   rw [ptF₂, Formula.realize_rel₂, Language.relMap_sumInl]
   simp only [Term.realize_var]
 
@@ -126,9 +126,9 @@ theorem realize_ivF (s w : γ) :
     (@Formula.Realize eprSOLang (eprExp.Map A)
         (eprSOStructure ρ) _ (ivF s w) v ↔
       ρ () ![v s, v w]) := by
-  letI := eprPtStructure A
-  letI := ivBlock.structure ρ
-  letI := eprSOStructure ρ
+  let := eprPtStructure A
+  let := ivBlock.structure ρ
+  let := eprSOStructure ρ
   rw [ivF, Formula.realize_rel₂]
   simp only [Term.realize_var]
   rfl
@@ -138,9 +138,9 @@ theorem realize_ptEqF (x y : γ) :
     (@Formula.Realize eprSOLang (eprExp.Map A)
         (eprSOStructure ρ) _ (ptEqF x y) v ↔
       v x = v y) := by
-  letI := eprPtStructure A
-  letI := ivBlock.structure ρ
-  letI := eprSOStructure ρ
+  let := eprPtStructure A
+  let := ivBlock.structure ρ
+  let := eprSOStructure ρ
   rw [ptEqF, Formula.realize_equal, Term.realize_var, Term.realize_var]
 
 end Atoms
@@ -851,7 +851,7 @@ instance, so an assignment of the universal variables is one of them and the
 one relation between the symbols and the assignments, which is one `Σ₁`
 block. -/
 theorem epr_mem_NEXPTIME : EPR ∈ NEXPTIME := by
-  letI hinst : ∀ (A : Type) [Language.epr.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [Language.epr.Structure A] [LinearOrder A],
       Language.eprPt.Structure (eprExp.Map A) := fun A => eprPtStructure A
   refine ⟨eprExp, soProblem Language.eprPt [ivBlock] eprKernel true,
     ⟨[ivBlock], rfl, eprKernel, fun A _ _ _ => Iff.rfl⟩, ?_⟩

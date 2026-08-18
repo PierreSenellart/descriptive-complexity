@@ -168,7 +168,7 @@ theorem realize_domGateF (I : RelFOInterpretation L₁ L₂ Tag dm) (B : SOBlock
     (σ : (B.pull Tag dm).Assignment A) (x : Fin (B.arity p.1 * dm) → A) :
     (@Formula.Realize _ A ((B.pull Tag dm).structure₁ (L := L₁) σ) _ (domGateF I B p) x) ↔
       ∀ k, (I.domFormula (p.2 k)).Realize fun j => x (finProdFinEquiv (k, j)) := by
-  letI := (B.pull Tag dm).structure σ
+  let := (B.pull Tag dm).structure σ
   rw [domGateF, Formula.realize_iInf]
   refine forall_congr' fun k => ?_
   rw [LHom.realize_onFormula, Formula.realize_relabel]
@@ -213,7 +213,7 @@ theorem realize_extendSORel_domFormula (I : RelFOInterpretation L₁ L₂ Tag dm
     (t : Tag) (w : Fin dm → A) :
     (@Formula.Realize _ A ((B.pull Tag dm).structure₁ (L := L₁) σ) _
       ((I.extendSORel B).domFormula t) w) ↔ (I.domFormula t).Realize w := by
-  letI := (B.pull Tag dm).structure σ
+  let := (B.pull Tag dm).structure σ
   exact LHom.realize_onFormula LHom.sumInl (I.domFormula t)
 
 /-- Points of the extended relativized universe are points of the original
@@ -297,7 +297,7 @@ theorem next_pullRel (ρ : dd.B.Assignment (I.MapRel A)) :
     (dd.pullRel I).next (dd.B.pullAssignRel I ρ) =
       dd.B.pullAssignRel I (dd.next (A := I.MapRel A) ρ) := by
   funext p x
-  letI := (dd.B.pull Tag dm).structure (dd.B.pullAssignRel I ρ)
+  let := (dd.B.pull Tag dm).structure (dd.B.pullAssignRel I ρ)
   have hsplit : (@Formula.Realize _ A ((dd.B.pull Tag dm).structure₁ (L := L₁)
         (dd.B.pullAssignRel I ρ)) _
         (domGateF I dd.B p ⊓ guardPullRel (I.extendSORel dd.B) (dd.step p.1) p.2) x) ↔
@@ -401,7 +401,7 @@ theorem isFixedPt_next_pullRel_iff (ρ : dd.B.Assignment (I.MapRel A)) :
 original one on the definable universe. -/
 theorem ifpHolds_pullRel : (dd.pullRel I).IFPHolds A ↔ dd.IFPHolds (I.MapRel A) := by
   rw [IFPHolds, IFPHolds, inflLimit_pullRel dd I]
-  letI := (dd.B.pull Tag dm).structure (dd.B.pullAssignRel I (dd.inflLimit (I.MapRel A)))
+  let := (dd.B.pull Tag dm).structure (dd.B.pullAssignRel I (dd.inflLimit (I.MapRel A)))
   have hpull := (I.extendSORel dd.B).realize_pullRelSentence dd.out A
   have htrans := realize_sentence_of_equiv
     (I.extendSORelEquiv dd.B A (dd.inflLimit (I.MapRel A))) dd.out
@@ -414,7 +414,7 @@ theorem pfpHolds_pullRel : (dd.pullRel I).PFPHolds A ↔ dd.PFPHolds (I.MapRel A
   refine exists_congr fun n => ?_
   rw [partStage_pullRel dd I n]
   refine and_congr (isFixedPt_next_pullRel_iff dd I _) ?_
-  letI := (dd.B.pull Tag dm).structure
+  let := (dd.B.pull Tag dm).structure
     (dd.B.pullAssignRel I (dd.partStage (I.MapRel A) n))
   have hpull := (I.extendSORel dd.B).realize_pullRelSentence dd.out A
   have htrans := realize_sentence_of_equiv
@@ -437,13 +437,13 @@ lexicographic order – is identified with the ordered domain by
 theorem IFPDefinable.of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : IFPDefinable Q) :
     IFPDefinable P := by
   obtain ⟨d, hd⟩ := h
-  letI := f.tagFinite
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨d.pullRel f.toRelInterpretation.ordExtendRel, ?_⟩
   intro A _ _ _ _
-  letI := f.toRelInterpretation.mapRelLinearOrder A
-  haveI : Finite (f.toRelInterpretation.MapRel A) := f.toRelInterpretation.mapRel_finite A
-  haveI : Nonempty (f.toRelInterpretation.MapRel A) := f.mapRel_nonempty A
+  let := f.toRelInterpretation.mapRelLinearOrder A
+  have : Finite (f.toRelInterpretation.MapRel A) := f.toRelInterpretation.mapRel_finite A
+  have : Nonempty (f.toRelInterpretation.MapRel A) := f.mapRel_nonempty A
   refine (f.correct A).trans ((hd (f.toRelInterpretation.MapRel A)).trans ?_)
   refine Iff.trans ?_
     (StepDef.ifpHolds_pullRel d f.toRelInterpretation.ordExtendRel).symm
@@ -459,13 +459,13 @@ reductions.** -/
 theorem PFPDefinable.of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : PFPDefinable Q) :
     PFPDefinable P := by
   obtain ⟨d, hd⟩ := h
-  letI := f.tagFinite
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨d.pullRel f.toRelInterpretation.ordExtendRel, ?_⟩
   intro A _ _ _ _
-  letI := f.toRelInterpretation.mapRelLinearOrder A
-  haveI : Finite (f.toRelInterpretation.MapRel A) := f.toRelInterpretation.mapRel_finite A
-  haveI : Nonempty (f.toRelInterpretation.MapRel A) := f.mapRel_nonempty A
+  let := f.toRelInterpretation.mapRelLinearOrder A
+  have : Finite (f.toRelInterpretation.MapRel A) := f.toRelInterpretation.mapRel_finite A
+  have : Nonempty (f.toRelInterpretation.MapRel A) := f.mapRel_nonempty A
   refine (f.correct A).trans ((hd (f.toRelInterpretation.MapRel A)).trans ?_)
   refine Iff.trans ?_
     (StepDef.pfpHolds_pullRel d f.toRelInterpretation.ordExtendRel).symm

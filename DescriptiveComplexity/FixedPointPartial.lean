@@ -210,18 +210,18 @@ sentence pulls back through the extended interpretation. -/
 theorem PFPDefinableFree.of_foReduction (f : P ≤ᶠᵒ Q) (h : PFPDefinableFree Q) :
     PFPDefinableFree P := by
   obtain ⟨d, hd⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine ⟨d.pull f.toInterpretation, ?_⟩
   intro A _ _ _
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   refine (f.correct A).trans ((hd (f.toInterpretation.Map A)).trans ?_)
   rw [StepDef.PFPHolds, StepDef.PFPHolds]
   refine exists_congr fun n => ?_
   rw [StepDef.partStage_pull f.toInterpretation d A n]
   refine and_congr (StepDef.isFixedPt_next_pull_iff f.toInterpretation d _).symm ?_
-  letI := (d.B.pull f.Tag f.dim).structure
+  let := (d.B.pull f.Tag f.dim).structure
     (d.B.pullAssign (d.partStage (f.toInterpretation.Map A) n))
   have htrans := realize_sentence_of_equiv
     (f.toInterpretation.extendSOEquiv d.B A (d.partStage (f.toInterpretation.Map A) n))
@@ -236,14 +236,14 @@ stage. -/
 theorem PFPDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : PFPDefinable Q) :
     PFPDefinable P := by
   obtain ⟨d, hd⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨d.pull f.toInterpretation.ordExtend, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   refine (f.correct A).trans ((hd (f.toInterpretation.Map A)).trans ?_)
   rw [StepDef.PFPHolds, StepDef.PFPHolds]
   refine exists_congr fun n => ?_
@@ -251,21 +251,21 @@ theorem PFPDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : PFPDefina
     StepDef.partStage_pull f.toInterpretation.ordExtend d A n]
   refine and_congr ((d.isFixedPt_next_map_iff (f.toInterpretation.ordExtendLEquiv A)
     _).trans (StepDef.isFixedPt_next_pull_iff f.toInterpretation.ordExtend d _).symm) ?_
-  letI := (d.B.pull f.Tag f.dim).structure
+  let := (d.B.pull f.Tag f.dim).structure
     (d.B.pullAssign (d.partStage (f.toInterpretation.ordExtend.Map A) n))
   have e₁ := f.toInterpretation.ordExtend.extendSOEquiv d.B A
     (d.partStage (f.toInterpretation.ordExtend.Map A) n)
   have e₂ := d.B.extendEquiv (f.toInterpretation.ordExtendLEquiv A)
     (d.partStage (f.toInterpretation.ordExtend.Map A) n)
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure
       ((f.toInterpretation.ordExtend.extendSO d.B).Map A) :=
     FOInterpretation.mapStructure (f.toInterpretation.ordExtend.extendSO d.B) A
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure
       (f.toInterpretation.ordExtend.Map A) :=
     @sumStructure (L₂.sum Language.order) d.B.lang (f.toInterpretation.ordExtend.Map A)
       (FOInterpretation.mapStructure f.toInterpretation.ordExtend A)
       (d.B.structure (d.partStage (f.toInterpretation.ordExtend.Map A) n))
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure (f.toInterpretation.Map A) :=
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure (f.toInterpretation.Map A) :=
     @sumStructure (L₂.sum Language.order) d.B.lang (f.toInterpretation.Map A) _
       (d.B.structure (d.B.mapAssign (f.toInterpretation.ordExtendLEquiv A).toEquiv
         (d.partStage (f.toInterpretation.ordExtend.Map A) n)))
@@ -302,7 +302,7 @@ private theorem realize_inflate_step (d : StepDef L) {A : Type} [L.Structure A]
     (@Formula.Realize _ A (d.B.structure₁ (L := L) ρ) _
       (((varInSym L d.B i).formula fun j => Term.var j) ⊔ d.step i) x) ↔
       ρ i x ∨ d.next ρ i x := by
-  letI := d.B.structure₁ (L := L) ρ
+  let := d.B.structure₁ (L := L) ρ
   rw [Formula.realize_sup, Formula.realize_rel]
   exact Iff.rfl
 

@@ -120,7 +120,7 @@ private theorem setCovBy_of_setSucc {S T : I → Prop} (h : SetSucc S T) : SetCo
 subsets. -/
 theorem setSucc_iff (S T : I → Prop) : SetSucc S T ↔ SetCovBy S T := by
   classical
-  letI : Fintype I := Fintype.ofFinite I
+  let : Fintype I := Fintype.ofFinite I
   refine ⟨setCovBy_of_setSucc, fun hcov => ?_⟩
   -- the increment position: the greatest atom `S` misses
   have hmiss : (Finset.univ.filter fun q => ¬S q).Nonempty := by
@@ -279,7 +279,7 @@ theorem padMin_lt_iff (i : B.ι) (u v : Fin (B.arity i) → A) :
 real atom is below it. -/
 theorem keyIx_realOf_le (p : B.AtomIx A) :
     (B.atomIxLinearOrder A).le (B.keyIx (B.realOf p)) p := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   refine (@not_lt _ (B.atomIxLinearOrder A) _ _).mp fun h => ?_
   rcases (B.atomIx_lt_iff p (B.keyIx (B.realOf p))).mp h with h1 | ⟨-, h2⟩
   · exact absurd h1 (lt_irrefl _)
@@ -299,8 +299,8 @@ theorem atomSet_lt_iff_realSet (ρ σ : B.Assignment A) :
     letI := B.realIxLinearOrder A
     ((setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet σ) ↔
       (setLinearOrder (B.RealIx A)).lt (B.realSet ρ) (B.realSet σ)) := by
-  letI := B.realIxLinearOrder A
-  letI := B.atomIxLinearOrder A
+  let := B.realIxLinearOrder A
+  let := B.atomIxLinearOrder A
   rw [B.atomSet_lt_iff ρ σ, setLinearOrder_lt_iff]
   constructor
   · rintro ⟨p, hbelow, hnp, hp⟩
@@ -329,7 +329,7 @@ theorem assignSucc_iff (ρ σ : B.Assignment A) :
       ((setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet σ) ∧
         ∀ τ : B.Assignment A, (setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet τ) →
           ¬(setLinearOrder (B.AtomIx A)).lt (B.atomSet τ) (B.atomSet σ))) := by
-  letI := B.realIxLinearOrder A
+  let := B.realIxLinearOrder A
   rw [setSucc_iff, SetCovBy]
   refine and_congr (B.atomSet_lt_iff_realSet ρ σ).symm ?_
   constructor
@@ -360,7 +360,7 @@ noncomputable def ivarsAbove (i : B.ι) : List B.ι :=
 theorem mem_ivarsAbove (i j : B.ι) :
     letI : LinearOrder B.ι := finiteLinearOrder B.ι
     (j ∈ B.ivarsAbove i ↔ i < j) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   rw [ivarsAbove, List.mem_filter]
   simp [B.mem_ivars j]
 
@@ -420,7 +420,7 @@ theorem agree_below_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B
         ∀ v : Fin (B.arity i) → A, toLex v < toLex u → (ρs 0 i v ↔ ρs 1 i v)) ↔
       ∀ Q : B.RealIx A, B.atomLt (B.keyIx Q) (B.keyIx ⟨i, u⟩) →
         (B.realSet (ρs 0) Q ↔ B.realSet (ρs 1) Q)) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   constructor
   · rintro ⟨hb, hs⟩ ⟨j, v⟩ hq
     rcases hq with hji | ⟨rfl, hv⟩
@@ -438,7 +438,7 @@ theorem clear_above_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B
         ∀ v : Fin (B.arity i) → A, toLex u < toLex v → (ρs 0 i v ∧ ¬ρs 1 i v)) ↔
       ∀ Q : B.RealIx A, B.atomLt (B.keyIx ⟨i, u⟩) (B.keyIx Q) →
         (B.realSet (ρs 0) Q ∧ ¬B.realSet (ρs 1) Q)) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   constructor
   · rintro ⟨hb, hs⟩ ⟨j, v⟩ hq
     rcases hq with hij | ⟨rfl, hv⟩
@@ -460,7 +460,7 @@ theorem realize_succAssignF_aux (ρs : Fin 2 → B.Assignment A) :
           ¬ρs 0 i u ∧ ρs 1 i u ∧
           ((∀ j ∈ B.ivarsAbove i, ∀ v : Fin (B.arity j) → A, (ρs 0 j v ∧ ¬ρs 1 j v)) ∧
             ∀ v : Fin (B.arity i) → A, toLex u < toLex v → (ρs 0 i v ∧ ¬ρs 1 i v))) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [succAssignF, Sentence.Realize, realize_listSup]
   constructor
   · rintro ⟨φ, hφ, hr⟩
@@ -545,7 +545,7 @@ theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.succAssignF L) ↔
       SetSucc (B.realSet (ρs 0)) (B.realSet (ρs 1))) := by
-  letI := B.realIxLinearOrder A
+  let := B.realIxLinearOrder A
   rw [B.realize_succAssignF_aux ρs]
   constructor
   · rintro ⟨i, u, hbelow, h0, h1, habove⟩
@@ -580,7 +580,7 @@ theorem realize_botAssignF (ρs : Fin 2 → B.Assignment A) (c : Fin 2) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.botAssignF L c) ↔ B.atomSet (ρs c) = fun _ => False) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [botAssignF, Sentence.Realize, realize_listInf]
   constructor
   · intro h
@@ -600,7 +600,7 @@ theorem realize_topAssignF (ρs : Fin 2 → B.Assignment A) (c : Fin 2) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.topAssignF L c) ↔ B.atomSet (ρs c) = fun _ => True) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [topAssignF, Sentence.Realize, realize_listInf]
   constructor
   · intro h
@@ -645,9 +645,9 @@ theorem pointLe_iff (p q : X.Point A) :
     ((X.pointLinearOrder A).le p q ↔
       p.1 < q.1 ∨ (p.1 = q.1 ∧
         (setLinearOrder (X.B.AtomIx A)).le (X.B.atomSet p.2) (X.B.atomSet q.2))) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := setLinearOrder (X.B.AtomIx A)
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := setLinearOrder (X.B.AtomIx A)
   exact prodLex_le_iff
 
 omit [L.Structure A] in
@@ -657,9 +657,9 @@ theorem pointLt_iff (p q : X.Point A) :
     ((X.pointLinearOrder A).lt p q ↔
       p.1 < q.1 ∨ (p.1 = q.1 ∧
         (setLinearOrder (X.B.AtomIx A)).lt (X.B.atomSet p.2) (X.B.atomSet q.2))) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := setLinearOrder (X.B.AtomIx A)
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := setLinearOrder (X.B.AtomIx A)
   exact prodLex_lt_iff
 
 omit [L.Structure A] in
@@ -668,8 +668,8 @@ theorem pointIsBot_iff (p : X.Point A) :
     letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
     ((∀ q : X.Point A, (X.pointLinearOrder A).le p q) ↔
       ((∀ t : X.Tag, p.1 ≤ t) ∧ X.B.atomSet p.2 = fun _ => False)) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
   have hbot : X.B.atomSet (X.B.botAssign A) = fun _ => False := rfl
   constructor
   · intro h
@@ -694,8 +694,8 @@ theorem pointIsTop_iff (p : X.Point A) :
     letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
     ((∀ q : X.Point A, (X.pointLinearOrder A).le q p) ↔
       ((∀ t : X.Tag, t ≤ p.1) ∧ X.B.atomSet p.2 = fun _ => True)) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
   have htop : X.B.atomSet (X.B.topAssign A) = fun _ => True := rfl
   constructor
   · intro h
@@ -726,9 +726,9 @@ theorem pointCovBy_iff (p q : X.Point A) :
       ((p.1 = q.1 ∧ SetSucc (X.B.realSet p.2) (X.B.realSet q.2)) ∨
         (p.1 < q.1 ∧ (∀ t : X.Tag, ¬(p.1 < t ∧ t < q.1)) ∧
           X.B.atomSet p.2 = (fun _ => True) ∧ X.B.atomSet q.2 = fun _ => False))) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := X.B.realIxLinearOrder A
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := X.B.realIxLinearOrder A
   have hbot : X.B.atomSet (X.B.botAssign A) = fun _ => False := rfl
   have htop : X.B.atomSet (X.B.topAssign A) = fun _ => True := rfl
   constructor

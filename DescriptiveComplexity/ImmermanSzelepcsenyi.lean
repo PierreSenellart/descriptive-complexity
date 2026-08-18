@@ -53,7 +53,7 @@ theorem TCDefinable.compl [L.IsRelational] {P : DecisionProblem L} (h : TCDefina
     TCDefinable Pᶜ := by
   classical
   obtain ⟨spec, hspec⟩ := h
-  letI : LinearOrder (spec.pad).Mode :=
+  let : LinearOrder (spec.pad).Mode :=
     LinearOrder.lift' (Finite.equivFin (spec.pad).Mode) (Equiv.injective _)
   refine ⟨TCCompl.complSpec (spec.pad), ?_⟩
   intro A _ _ _ _

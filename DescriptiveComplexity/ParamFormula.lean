@@ -129,7 +129,7 @@ theorem realize_onBoundedFormula [L₁.IsRelational] {n : ℕ} (φ : L₁.Bounde
     (v : β → M) (xs : Fin n → M) :
     (onBoundedFormula F φ).Realize (Sum.elim v w) xs ↔
       @BoundedFormula.Realize _ M (F.struc M w) _ _ φ v xs := by
-  letI := F.struc M w
+  let := F.struc M w
   induction φ with
   | falsum => exact Iff.rfl
   | equal t₁ t₂ =>
@@ -206,7 +206,7 @@ theorem realize_relOnBoundedFormula (hinj : Function.Injective e)
     (relativizeTo R (onBoundedFormula F φ)).Realize (Sum.elim (fun b => e (v b)) w)
         (fun i => e (xs i)) ↔
       @BoundedFormula.Realize _ A (F.strucOn e w) _ _ φ v xs := by
-  letI := F.strucOn e w
+  let := F.strucOn e w
   have helim : ∀ {k : ℕ} (ys : Fin k → A) (x : β ⊕ Fin k),
       Sum.elim (fun b => e (v b)) (fun i => e (ys i)) x = e (Sum.elim v ys x) := by
     intro k ys x

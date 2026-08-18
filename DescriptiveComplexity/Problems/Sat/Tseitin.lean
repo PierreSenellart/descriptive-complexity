@@ -340,14 +340,14 @@ theorem realizeWith_falsum {n : ℕ} (w : Fin n → A) :
 
 theorem realizeWith_equal {n : ℕ} (t₁ t₂ : (L.sum B.lang).Term (Empty ⊕ Fin n))
     (w : Fin n → A) : RealizeWith μ (.equal t₁ t₂) w ↔ eqGuard t₁ t₂ w := by
-  letI := B.structure μ
+  let := B.structure μ
   change t₁.realize (Sum.elim isEmptyElim w) = t₂.realize (Sum.elim isEmptyElim w) ↔ _
   rw [eqGuard, realize_termToL t₁, realize_termToL t₂]
 
 theorem realizeWith_rel {n l : ℕ} (R : (L.sum B.lang).Relations l)
     (ts : Fin l → (L.sum B.lang).Term (Empty ⊕ Fin n)) (w : Fin n → A) :
     RealizeWith μ (.rel R ts) w ↔ atomHolds μ R ts w := by
-  letI := B.structure μ
+  let := B.structure μ
   cases R with
   | inl r =>
       change RelMap r (fun k => (ts k).realize (Sum.elim isEmptyElim w)) ↔

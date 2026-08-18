@@ -280,7 +280,7 @@ private theorem realize_knapsackKernel :
           ¬maj (PSum ρ i p) (Add ρ j p) (Cy ρ j p)) ∧
         (∀ i p : A, MaxPos BWLe BWItem i → BWPosn p → (PSum ρ i p ↔ BWTgt p)) ∧
         ((∀ i : A, ¬BWItem i) → ∀ p : A, BWPosn p → ¬BWTgt p) := by
-  letI := knapsackGuessBlock.structure ρ
+  let := knapsackGuessBlock.structure ρ
   have hsubS : ∀ w : Fin 1 → A,
       RelMap (L := ksSOLang) (M := A) ksSelSym w ↔ ρ none w := fun _ => Iff.rfl
   have hsubP : ∀ w : Fin 2 → A,
@@ -379,7 +379,7 @@ theorem knapsack_sigmaSODefinable : SigmaSODefinable 1 Knapsack := by
       intro hno p hp
       have hSempty : {j : A | S j} = (∅ : Set A) := by
         ext j
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun hj => hno j (hSitem j hj)
       have hzero : binNum (BWLe (A := A)) BWPosn BWTgt = 0 := by
         have htarget : BWTarget A = 0 := by
@@ -406,11 +406,11 @@ theorem knapsack_sigmaSODefinable : SigmaSODefinable 1 Knapsack := by
     · have hno : ∀ i, ¬BWItem i := fun i hi => hitems ⟨i, hi⟩
       have hSempty : {i : A | Sel ρ i} = (∅ : Set A) := by
         ext i
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun hi => hno i (hsel i hi)
       have htgt : {p : A | BWPosn p ∧ BWTgt p} = (∅ : Set A) := by
         ext p
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun h => hempty hno p h.1 h.2
       rw [hSempty, finsum_mem_empty, BWTarget, binNum, htgt, finsum_mem_empty]
 

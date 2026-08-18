@@ -204,7 +204,7 @@ variable {A : Type} [L'.Structure A]
 private theorem realize_guardOut_out (ρ : d.B.Assignment A) :
     (@Sentence.Realize _ A (d.B.structure₁ (L := L') ρ) (d.guardOut χ).out) ↔
       (A ⊨ χ ∧ @Sentence.Realize _ A (d.B.structure₁ (L := L') ρ) d.out) := by
-  letI := d.B.structure₁ (L := L') ρ
+  let := d.B.structure₁ (L := L') ρ
   refine Formula.realize_inf.trans (and_congr ?_ Iff.rfl)
   exact (LHom.sumInl : L' →ᴸ L'.sum d.B.lang).realize_onSentence (M := A) χ
 
@@ -271,8 +271,8 @@ theorem ifpDefinable_iff_ifpDefinableFree_withOrder :
     intro A inst _ _
     rw [d.ifpHolds_guardOut (leLinearS L) A, realize_leLinearS L A]
     refine and_congr_right fun h => ?_
-    letI := (LHom.sumInl : L →ᴸ L.sum Language.order).reduct A
-    letI := h.linearOrder
+    let := (LHom.sumInl : L →ᴸ L.sum Language.order).reduct A
+    let := h.linearOrder
     exact (hd A).trans
       (@StepDef.ifpHolds_equiv (L.sum Language.order) d A A (sumOrderStructure L A)
         inst (rebuildEquiv h))
@@ -301,8 +301,8 @@ theorem pfpDefinable_iff_pfpDefinableFree_withOrder :
     intro A inst _ _
     rw [d.pfpHolds_guardOut (leLinearS L) A, realize_leLinearS L A]
     refine and_congr_right fun h => ?_
-    letI := (LHom.sumInl : L →ᴸ L.sum Language.order).reduct A
-    letI := h.linearOrder
+    let := (LHom.sumInl : L →ᴸ L.sum Language.order).reduct A
+    let := h.linearOrder
     exact (hd A).trans
       (@StepDef.pfpHolds_equiv (L.sum Language.order) d A A (sumOrderStructure L A)
         inst (rebuildEquiv h))
@@ -348,8 +348,8 @@ private theorem realize_liftOrder {α : Type} (ρ : d.B.Assignment A)
       ((LHom.sumMap (LHom.sumInl (L' := Language.order))
         (LHom.id d.B.lang)).onFormula φ) v) ↔
       @Formula.Realize _ A (d.B.structure₁ (L := L) ρ) _ φ v := by
-  letI := d.B.structure₁ (L := L) ρ
-  letI := @SOBlock.structure₁ (L.sum Language.order) d.B A
+  let := d.B.structure₁ (L := L) ρ
+  let := @SOBlock.structure₁ (L.sum Language.order) d.B A
     (sumOrderStructure L A) ρ
   exact LHom.realize_onFormula
     (φ := LHom.sumMap (LHom.sumInl (L' := Language.order)) (LHom.id d.B.lang)) φ

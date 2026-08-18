@@ -130,7 +130,7 @@ theorem StepDef.next_iff_gateMat (hne : zero ≠ one) {i : d.B.ι}
           fun w => @BoundedFormula.Realize _ (X.Map A)
             (d.B.structure₁ σ) _ _ pk.mat default w)
         (d.B.arity i) V := by
-  letI inst : (X.E.sum Language.order).sum d.B.lang |>.Structure (X.Map A) :=
+  let inst : (X.E.sum Language.order).sum d.B.lang |>.Structure (X.Map A) :=
     d.B.structure₁ σ
   -- the valuation over points: the argument tuple, padded with an arbitrary point
   set vB : Fin pk.n → X.Map A := fun j =>
@@ -185,7 +185,7 @@ theorem sentence_iff_gateMat (hne : zero ≠ one) {B : SOBlock}
           fun w => @BoundedFormula.Realize _ (X.Map A)
             (B.structure₁ σ) _ _ pk.mat default w)
         0 V := by
-  letI inst : (X.E.sum Language.order).sum B.lang |>.Structure (X.Map A) :=
+  let inst : (X.E.sum Language.order).sum B.lang |>.Structure (X.Map A) :=
     B.structure₁ σ
   -- the sentence, as its own pack's prefix over an arbitrary valuation
   set vB : Fin pk.n → X.Map A := fun _ => Classical.arbitrary (X.Map A) with hvB

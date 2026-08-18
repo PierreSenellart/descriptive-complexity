@@ -192,8 +192,8 @@ private theorem realize_bPrecF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
       (backBlock B' k) A ((ordBlock k).structure₁ (L := L) σ) Y) _
       (bPrecF L k f g) W) ↔
       toPebble σ (fun i => W (f i)) fun i => W (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
-  letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang) (backBlock B' k) A _ Y
+  let := (ordBlock k).structure₁ (L := L) σ
+  let := @SOBlock.structure₁ (L.sum (ordBlock k).lang) (backBlock B' k) A _ Y
   rw [bPrecF, Formula.realize_rel]
   rw [toPebble, addCases_comp]
   exact Iff.rfl
@@ -204,8 +204,8 @@ private theorem realize_bEquivF {γ : Type} (f g : Fin k → γ) (W : γ → A) 
       (backBlock B' k) A ((ordBlock k).structure₁ (L := L) σ) Y) _
       (bEquivF L k f g) W) ↔
       IncompRel (toPebble σ) (fun i => W (f i)) fun i => W (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
-  letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang) (backBlock B' k) A _ Y
+  let := (ordBlock k).structure₁ (L := L) σ
+  let := @SOBlock.structure₁ (L.sum (ordBlock k).lang) (backBlock B' k) A _ Y
   rw [bEquivF, Formula.realize_inf, Formula.realize_not, Formula.realize_not,
     realize_bPrecF, realize_bPrecF]
   exact Iff.rfl
@@ -217,8 +217,8 @@ private theorem realize_bLeF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
       (bLeF L k f g) W) ↔
       (toPebble σ (fun i => W (f i)) (fun i => W (g i)) ∨
         IncompRel (toPebble σ) (fun i => W (f i)) fun i => W (g i)) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
-  letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang) (backBlock B' k) A _ Y
+  let := (ordBlock k).structure₁ (L := L) σ
+  let := @SOBlock.structure₁ (L.sum (ordBlock k).lang) (backBlock B' k) A _ Y
   rw [bLeF, Formula.realize_sup, realize_bPrecF, realize_bEquivF]
 
 /-- **Exactness of the class compiler**: over an order variable whose
@@ -313,8 +313,8 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
           simp only [backCompile, Language.Term.varOf]
         rw [he]
         refine Iff.trans ?_ hR.symm
-        letI := (ordBlock k).structure₁ (L := L) σ
-        letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
+        let := (ordBlock k).structure₁ (L := L) σ
+        let := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
           (backBlock B' k) A _ Y
         exact Formula.realize_equal (M := A)
       | relBit R' g =>
@@ -341,8 +341,8 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
                 fun p => Term.var (Sum.elim E H (x 0) (g p)) := by
             simp only [backCompile, Language.Term.varOf, dif_pos hmem]
           rw [he]
-          letI := (ordBlock k).structure₁ (L := L) σ
-          letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
+          let := (ordBlock k).structure₁ (L := L) σ
+          let := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
             (backBlock B' k) A _ Y
           rw [Formula.realize_rel]
           exact (and_iff_right hmem).symm
@@ -380,8 +380,8 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
           simp only [backCompile, Language.Term.varOf]
         rw [he]
         refine Iff.trans ?_ hR.symm
-        letI := (ordBlock k).structure₁ (L := L) σ
-        letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
+        let := (ordBlock k).structure₁ (L := L) σ
+        let := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
           (backBlock B' k) A _ Y
         rw [Formula.realize_iExs]
         have hupd : ∀ c : Fin 1 → A, (fun i => Sum.elim W c
@@ -459,7 +459,7 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
           (Sum.elim E H (x 1)) W
         rw [h1] at hb
         refine hb.trans ((h2 _ _).trans ?_)
-        letI := lo
+        let := lo
         constructor
         · intro h
           have h' : (Sum.elim (fun a => InvMap.mk S fun q => W (E a q))
@@ -499,8 +499,8 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
                 (finProdFinEquiv.symm p).2)) W) ↔
           Y rv.1 (backFlatten fun a q =>
             W (Sum.elim E H (x (Fin.cast rv.2 a)) q)) := by
-        letI := (ordBlock k).structure₁ (L := L) σ
-        letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
+        let := (ordBlock k).structure₁ (L := L) σ
+        let := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
           (backBlock B' k) A _ Y
         rw [Formula.realize_rel]
         exact Iff.rfl
@@ -535,8 +535,8 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
         (@Formula.Realize _ A (@SOBlock.structure₁ (L.sum (ordBlock k).lang)
           (backBlock B' k) A ((ordBlock k).structure₁ (L := L) σ) Y) _
           (backCompile L k S f₂ E H) W)) := by
-      letI := (ordBlock k).structure₁ (L := L) σ
-      letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
+      let := (ordBlock k).structure₁ (L := L) σ
+      let := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
         (backBlock B' k) A _ Y
       exact Formula.realize_imp
     have hR : (@BoundedFormula.Realize _ (InvMap S k A)
@@ -557,10 +557,10 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
             (letI := lo; sumOrderStructure (invLang L k) (InvMap S k A)) X') _ _
           f₂ (fun a => InvMap.mk S fun q => W (E a q))
           fun j => InvMap.mk S fun q => W (H j q))) := by
-      letI := lo
-      letI : ((invLang L k).sum Language.order).Structure (InvMap S k A) :=
+      let := lo
+      let : ((invLang L k).sum Language.order).Structure (InvMap S k A) :=
         sumOrderStructure (invLang L k) (InvMap S k A)
-      letI := @SOBlock.structure₁ ((invLang L k).sum Language.order) B'
+      let := @SOBlock.structure₁ ((invLang L k).sum Language.order) B'
         (InvMap S k A) _ X'
       exact BoundedFormula.realize_imp
     rw [hR]
@@ -585,8 +585,8 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
             (backCompile L k S ψ (fun a q => Sum.inl (E a q))
               (Fin.snoc (fun j q => Sum.inl (H j q)) fun q => Sum.inr q))
             (Sum.elim W c)) := by
-      letI := (ordBlock k).structure₁ (L := L) σ
-      letI := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
+      let := (ordBlock k).structure₁ (L := L) σ
+      let := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
         (backBlock B' k) A _ Y
       exact Formula.realize_iAlls
     have hR : (@BoundedFormula.Realize _ (InvMap S k A)
@@ -602,10 +602,10 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
               (letI := lo; sumOrderStructure (invLang L k) (InvMap S k A)) X') _ _
             ψ (fun a => InvMap.mk S fun q => W (E a q))
             (Fin.snoc (fun j => InvMap.mk S fun q => W (H j q)) cl)) := by
-      letI := lo
-      letI : ((invLang L k).sum Language.order).Structure (InvMap S k A) :=
+      let := lo
+      let : ((invLang L k).sum Language.order).Structure (InvMap S k A) :=
         sumOrderStructure (invLang L k) (InvMap S k A)
-      letI := @SOBlock.structure₁ ((invLang L k).sum Language.order) B'
+      let := @SOBlock.structure₁ ((invLang L k).sum Language.order) B'
         (InvMap S k A) _ X'
       exact BoundedFormula.realize_all
     rw [hL, hR]

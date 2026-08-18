@@ -178,7 +178,7 @@ theorem kindDstIn {S : P → Prop} {n : ℕ}
       args.dstBlk args.coord args.bitFlag args.setBit args.initLv args.advLv
       args.IsMaxLv args.oldSlot args.setAv exitPh hemb hexit s ρ
   | @MatAtom.exp _ _ _ _ _k _e _ =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     exact fun s ρ => tagRule_dstIn one Slot.wk Slot.reg args.rdTrackT args.MatchT
       args.setTagFlag args.TagsAre args.rdTrackE args.MatchE args.setFlagE
       args.initEl args.advEl args.exitSt args.IsMaxEl exitPh hemb hexit s ρ
@@ -206,7 +206,7 @@ theorem kindHosrc {n : ℕ}
       args.coord args.bitFlag args.setBit args.initLv args.advLv
       args.IsMaxLv args.oldSlot args.setAv exitPh
   | @MatAtom.exp _ _ _ _ _k _e _ =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     exact tagHosrc one Slot.wk Slot.reg args.rdTrackT args.MatchT
       args.setTagFlag args.TagsAre args.rdTrackE args.MatchE args.setFlagE
       args.initEl args.advEl args.exitSt args.IsMaxEl exitPh
@@ -234,7 +234,7 @@ theorem kindSep (hzo : zero ≠ one) {n : ℕ}
       args.coord args.bitFlag args.setBit args.initLv args.advLv
       args.IsMaxLv args.oldSlot args.setAv exitPh hzo hemb
   | @MatAtom.exp _ _ _ _ _k _e _ =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     exact tagSep one Slot.wk Slot.reg args.rdTrackT args.MatchT
       args.setTagFlag args.TagsAre args.rdTrackE args.MatchE args.setFlagE
       args.initEl args.advEl args.exitSt args.IsMaxEl exitPh hemb args.hTags

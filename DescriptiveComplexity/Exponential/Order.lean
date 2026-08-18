@@ -160,7 +160,7 @@ def atomLt [LinearOrder A] (p q : B.AtomIx A) : Prop :=
 /-- **What the order on padded atoms is**: the plain relation above. -/
 theorem atomIx_lt_iff [LinearOrder A] (p q : B.AtomIx A) :
     (B.atomIxLinearOrder A).lt p q ↔ B.atomLt p q := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   exact prodLex_lt_iff (B := Lex (Fin (blockArityBound B) → A))
 
 /-- **An assignment is determined by the padded atoms it makes true**: every
@@ -182,7 +182,7 @@ theorem atomSet_lt_iff [LinearOrder A] [Finite A] (ρ σ : B.Assignment A) :
     ((setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet σ) ↔
       ∃ p : B.AtomIx A, (∀ q, B.atomLt q p → (B.atomSet ρ q ↔ B.atomSet σ q)) ∧
         ¬B.atomSet ρ p ∧ B.atomSet σ p) := by
-  letI := B.atomIxLinearOrder A
+  let := B.atomIxLinearOrder A
   rw [setLinearOrder_lt_iff]
   refine exists_congr fun p => and_congr_left' (forall_congr' fun q => ?_)
   exact imp_congr_left (B.atomIx_lt_iff q p)

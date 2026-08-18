@@ -214,7 +214,7 @@ noncomputable def mtF (s p s' p' : γ) : certLang.Formula γ :=
 theorem realize_instF₁ (R : Language.pcp.Relations 1) (x : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (instF₁ R x) v ↔
       RelMap (L := Language.pcp) R ![v x] := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [instF₁, Formula.realize_rel₁]
   exact Iff.rfl
 
@@ -222,7 +222,7 @@ theorem realize_instF₁ (R : Language.pcp.Relations 1) (x : γ) (v : γ → A �
 theorem realize_instF₂ (R : Language.pcp.Relations 2) (x y : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (instF₂ R x y) v ↔
       RelMap (L := Language.pcp) R ![v x, v y] := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [instF₂, Formula.realize_rel₂]
   exact Iff.rfl
 
@@ -230,35 +230,35 @@ theorem realize_instF₂ (R : Language.pcp.Relations 2) (x y : γ) (v : γ → A
 theorem realize_instF₃ (R : Language.pcp.Relations 3) (x y z : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (instF₃ R x y z) v ↔
       RelMap (L := Language.pcp) R ![v x, v y, v z] := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [instF₃, realize_rel₃]
   exact Iff.rfl
 
 @[simp]
 theorem realize_oldF (x : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (oldF x) v ↔ IsOld (v x) := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [oldF, Formula.realize_rel₁]
   exact Iff.rfl
 
 @[simp]
 theorem realize_eqF (x y : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (eqF x y) v ↔ v x = v y := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [eqF, Formula.realize_equal]
   exact Iff.rfl
 
 @[simp]
 theorem realize_sleF (s t : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (sleF s t) v ↔ ρ CertIx.sle ![v s, v t] := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [sleF, Formula.realize_rel₂]
   exact Iff.rfl
 
 @[simp]
 theorem realize_dmF (s d : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (dmF s d) v ↔ ρ CertIx.dm ![v s, v d] := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [dmF, Formula.realize_rel₂]
   exact Iff.rfl
 
@@ -266,7 +266,7 @@ theorem realize_dmF (s d : γ) (v : γ → A ⊕ Fin m) :
 theorem realize_mtF (s p s' p' : γ) (v : γ → A ⊕ Fin m) :
     @Formula.Realize certLang _ (certStr ρ) γ (mtF s p s' p') v ↔
       ρ CertIx.mt ![v s, v p, v s', v p'] := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   rw [mtF, realize_rel₄]
   exact Iff.rfl
 
@@ -347,7 +347,7 @@ theorem realize_exOldF (φ : certLang.Formula (γ ⊕ Unit)) (v : γ → A ⊕ F
     @Formula.Realize certLang _ (certStr ρ) γ (exOldF φ) v ↔
       ∃ a : A, @Formula.Realize certLang _ (certStr ρ) (γ ⊕ Unit) φ
         (Sum.elim v fun _ => Sum.inl a) := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [exOldF, Formula.realize_iExs, Formula.realize_inf, realize_oldF, Sum.elim_inr]
   constructor
   · rintro ⟨i, hi, hφ⟩
@@ -363,7 +363,7 @@ theorem realize_allOldF (φ : certLang.Formula (γ ⊕ Unit)) (v : γ → A ⊕ 
     @Formula.Realize certLang _ (certStr ρ) γ (allOldF φ) v ↔
       ∀ a : A, @Formula.Realize certLang _ (certStr ρ) (γ ⊕ Unit) φ
         (Sum.elim v fun _ => Sum.inl a) := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [allOldF, Formula.realize_iAlls, Formula.realize_imp, realize_oldF, Sum.elim_inr]
   constructor
   · exact fun h a => h (fun _ => Sum.inl a) (isOld_inl a)
@@ -378,7 +378,7 @@ theorem realize_exNewF (φ : certLang.Formula (γ ⊕ Unit)) (v : γ → A ⊕ F
     @Formula.Realize certLang _ (certStr ρ) γ (exNewF φ) v ↔
       ∃ j : Fin m, @Formula.Realize certLang _ (certStr ρ) (γ ⊕ Unit) φ
         (Sum.elim v fun _ => Sum.inr j) := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [exNewF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_not,
     realize_oldF, Sum.elim_inr]
   constructor
@@ -395,7 +395,7 @@ theorem realize_allNewF (φ : certLang.Formula (γ ⊕ Unit)) (v : γ → A ⊕ 
     @Formula.Realize certLang _ (certStr ρ) γ (allNewF φ) v ↔
       ∀ j : Fin m, @Formula.Realize certLang _ (certStr ρ) (γ ⊕ Unit) φ
         (Sum.elim v fun _ => Sum.inr j) := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [allNewF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_not,
     realize_oldF, Sum.elim_inr]
   constructor
@@ -547,7 +547,7 @@ private theorem realize_inf_sentence (φ ψ : certLang.Sentence) :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) (φ ⊓ ψ) ↔
       (@Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) φ ∧
         @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) ψ) := by
-  letI : certLang.Structure (A ⊕ Fin m) := certStr ρ
+  let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   exact Formula.realize_inf
 
 private theorem realize_wfS :

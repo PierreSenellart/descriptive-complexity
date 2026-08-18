@@ -1271,8 +1271,8 @@ noncomputable def sotcReduction {L : Language.{0, 0}} [L.IsRelational] (Q : Deci
   toInterpretation := srInterp spec.B spec.step spec.src spec.tgt
   correct A _ _ _ _ := by
     obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-    haveI := (srInterp spec.B spec.step spec.src spec.tgt).map_finite A
-    haveI := (srInterp spec.B spec.step spec.src spec.tgt).map_nonempty A
+    have := (srInterp spec.B spec.step spec.src spec.tgt).map_finite A
+    have := (srInterp spec.B spec.step spec.src spec.tgt).map_nonempty A
     exact (hspec A).trans (srInterp_correct ha₀).symm
 
 /-- **Hardness**: every SO(TC) definable problem admits an ordered first-order

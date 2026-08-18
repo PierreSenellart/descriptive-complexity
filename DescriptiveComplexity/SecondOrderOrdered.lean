@@ -121,8 +121,8 @@ theorem realize_linearGuard (instA : L.Structure A) (ρ : B.withOrder.Assignment
             ρ (Sum.inl ()) ![a, c]) ∧
           ((∀ a b : A, ρ (Sum.inl ()) ![a, b] → ρ (Sum.inl ()) ![b, a] → a = b) ∧
             (∀ a b : A, ρ (Sum.inl ()) ![a, b] ∨ ρ (Sum.inl ()) ![b, a])))) := by
-  letI := instA
-  letI := B.withOrder.structure ρ
+  let := instA
+  let := B.withOrder.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
       RelMap (L := L.sum B.withOrder.lang) (M := A) (ordVarSym L B) w ↔
         ρ (Sum.inl ()) w := fun w => Iff.rfl
@@ -189,10 +189,10 @@ theorem orderElimLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Typ
         (letI := instA; letI := lo; sumOrderStructure L A)
         (B.structure (B.restPart ρ)))
       (@sumStructure L B.withOrder.lang A instA (B.withOrder.structure ρ)) := by
-  letI := instA
-  letI := lo
-  letI := B.structure (B.restPart ρ)
-  letI := B.withOrder.structure ρ
+  let := instA
+  let := lo
+  let := B.structure (B.restPart ρ)
+  let := B.withOrder.structure ρ
   exact
     { map_onFunction := fun {n} f x => by
         match f with
@@ -247,7 +247,7 @@ theorem sigmaSODefinable_of_orderPull (Cs : List SOBlock) (hk : Cs.length = k + 
     constructor
     · intro hP
       obtain ⟨lo, ρ₀, hρ₀⟩ := (h A).mp hP
-      letI := lo
+      let := lo
       refine ⟨C₀.joinOrder (fun w => w 0 ≤ w 1) ρ₀, ?_⟩
       refine (sorealize_inf_embed Cs' (L₁.sum C₀.withOrder.lang) A _
         (linearGuard L₁ C₀) _ false).mpr ⟨?_, ?_⟩
@@ -262,7 +262,7 @@ theorem sigmaSODefinable_of_orderPull (Cs : List SOBlock) (hk : Cs.length = k + 
       obtain ⟨hguard, hrest⟩ := (sorealize_inf_embed Cs' (L₁.sum C₀.withOrder.lang) A _
         (linearGuard L₁ C₀) _ false).mp hρ''
       obtain ⟨h1, h2, h3, h4⟩ := (realize_linearGuard L₁ C₀ instA ρ'').mp hguard
-      letI lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
+      let lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
       refine (h A).mpr ⟨lo, C₀.restPart ρ'', ?_⟩
       exact (sorealize_soLangLift Cs' _ _ (orderElimLHom L₁ C₀) A _ _
         (orderElimLHom_isExpansionOn L₁ C₀ A instA lo ρ''
@@ -293,7 +293,7 @@ theorem piSODefinable_of_orderPull (Cs : List SOBlock) (hk : Cs.length = k + 1)
       refine (sorealize_imp_embed Cs' (L₁.sum C₀.withOrder.lang) A _
         (linearGuard L₁ C₀) _ true).mpr fun hguard => ?_
       obtain ⟨h1, h2, h3, h4⟩ := (realize_linearGuard L₁ C₀ instA ρ'').mp hguard
-      letI lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
+      let lo := linearOrderOfGuard (ρ'' (Sum.inl ())) h1 h2 h3 h4
       have hinner := (h A).mp hP lo (C₀.restPart ρ'')
       exact (sorealize_soLangLift Cs' _ _ (orderElimLHom L₁ C₀) A _ _
         (orderElimLHom_isExpansionOn L₁ C₀ A instA lo ρ''
@@ -301,7 +301,7 @@ theorem piSODefinable_of_orderPull (Cs : List SOBlock) (hk : Cs.length = k + 1)
         _ true).mpr hinner
     · intro hall
       refine (h A).mpr fun lo ρ₀ => ?_
-      letI := lo
+      let := lo
       have hguard := (realize_linearGuard L₁ C₀ instA
           (C₀.joinOrder (fun w => w 0 ≤ w 1) ρ₀)).mpr
         ⟨fun a => le_refl a, fun a b c hab hbc => le_trans hab hbc,
@@ -331,8 +331,8 @@ sentence is correct not merely for *some* order but for every one. -/
 theorem SigmaSODefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
     (h : SigmaSODefinable (k + 1) Q) : SigmaSODefinable (k + 1) P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine sigmaSODefinable_of_orderPull (pullBlocks f.Tag f.dim Bs)
     (by simpa [pullBlocks] using hk)
     (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) ?_
@@ -342,9 +342,9 @@ theorem SigmaSODefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
       (P A ↔ SORealize (L₁.sum Language.order) A (pullBlocks f.Tag f.dim Bs)
         (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) true) := by
     intro lo
-    letI := lo
-    haveI := f.toInterpretation.map_finite A
-    haveI := f.toInterpretation.map_nonempty A
+    let := lo
+    have := f.toInterpretation.map_finite A
+    have := f.toInterpretation.map_nonempty A
     exact (f.correct A).trans ((hφ (f.toInterpretation.Map A)).trans
       (sorealize_pullSO f.toInterpretation A Bs φ true))
   exact ⟨fun hP => ⟨finiteLinearOrder A, (hpull _).mp hP⟩,
@@ -356,8 +356,8 @@ an implication. -/
 theorem PiSODefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
     (h : PiSODefinable (k + 1) Q) : PiSODefinable (k + 1) P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine piSODefinable_of_orderPull (pullBlocks f.Tag f.dim Bs)
     (by simpa [pullBlocks] using hk)
     (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) ?_
@@ -367,9 +367,9 @@ theorem PiSODefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
       (P A ↔ SORealize (L₁.sum Language.order) A (pullBlocks f.Tag f.dim Bs)
         (pullSO Bs (L₁.sum Language.order) L₂ f.toInterpretation φ) false) := by
     intro lo
-    letI := lo
-    haveI := f.toInterpretation.map_finite A
-    haveI := f.toInterpretation.map_nonempty A
+    let := lo
+    have := f.toInterpretation.map_finite A
+    have := f.toInterpretation.map_nonempty A
     exact (f.correct A).trans ((hφ (f.toInterpretation.Map A)).trans
       (sorealize_pullSO f.toInterpretation A Bs φ false))
   exact ⟨fun hP lo => (hpull lo).mp hP,

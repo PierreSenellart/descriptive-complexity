@@ -162,7 +162,7 @@ omit [L.IsRelational] in
 theorem realize_bddDom_false (w : Fin d → A) :
     letI := bddHostStruc (L := L) A ρ
     (bddDom L d B false).Realize w ↔ ∀ j : Fin d, w j = w 0 := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   rw [bddDom, Formula.realize_iInf]
   exact forall_congr' fun j => by rw [Formula.realize_equal]; exact Iff.rfl
 
@@ -170,7 +170,7 @@ omit [L.IsRelational] in
 theorem realize_bddDom_true (w : Fin d → A) :
     letI := bddHostStruc (L := L) A ρ
     (bddDom L d B true).Realize w ↔ newSet ρ w := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   rw [bddDom, Formula.realize_rel]
   exact Iff.rfl
 
@@ -216,7 +216,7 @@ theorem bddPoint_mem_dom {e : Fin m → Fin d → A}
     (he : ∀ i, newSet ρ (e i)) (x : A ⊕ Fin m) :
     letI := bddHostStruc (L := L) A ρ
     (bddDom L d B (bddPoint e x).1).Realize (bddPoint e x).2 := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   cases x with
   | inl a => exact (realize_bddDom_false (B := B) _).mpr fun _ => rfl
   | inr i => exact (realize_bddDom_true (B := B) _).mpr (he i)
@@ -227,7 +227,7 @@ theorem bddPoint_surjective {e : Fin m → Fin d → A}
     (t : Bool) (w : Fin d → A) :
     letI := bddHostStruc (L := L) A ρ
     (bddDom L d B t).Realize w → ∃ x : A ⊕ Fin m, bddPoint e x = (t, w) := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   cases t with
   | false =>
     intro hw
@@ -262,7 +262,7 @@ theorem realize_bddRelF_base {k : ℕ} (R : L.Relations k) (a : Fin k → A)
     (w : Fin k × Fin d → A) (hw : ∀ (i : Fin k) (j : Fin d), w (i, j) = a i) :
     letI := bddHostStruc (L := L) A ρ
     (bddRelF L d B (Sum.inl (Sum.inl R)) (fun _ => false)).Realize w ↔ RelMap R a := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   rw [bddRelF, if_pos (fun _ => rfl), LHom.realize_onFormula, Formula.realize_rel]
   exact iff_of_eq (congrArg _ (funext fun i => hw i 0))
 
@@ -277,7 +277,7 @@ omit [L.IsRelational] in
 theorem realize_bddRelF_old (τ : Fin 1 → Bool) (w : Fin 1 × Fin d → A) :
     letI := bddHostStruc (L := L) A ρ
     (bddRelF L d B (Sum.inl (Sum.inr .old)) τ).Realize w ↔ τ 0 = false := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   rw [bddRelF]
   by_cases h : τ 0 = false
   · rw [if_pos h]; simp [h]
@@ -293,7 +293,7 @@ theorem realize_bddRelF_block {k : ℕ} (r : B.lang.Relations k) (τ : Fin k →
       ρ (Sum.inr ⟨r.1, fun j => τ (Fin.cast r.2 j)⟩)
         (fun mm => w (Fin.cast r.2 (finProdFinEquiv.symm mm).1,
           (finProdFinEquiv.symm mm).2)) := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   rw [bddRelF, Formula.realize_rel]
   exact Iff.rfl
 
@@ -460,10 +460,10 @@ theorem realize_bddTransfer {e : Fin m → Fin d → A} (he : Function.Injective
     (@Sentence.Realize (bddTarget L B) (A ⊕ Fin m)
         (@sumStructure (newLang L) B.lang (A ⊕ Fin m) (extStructure L A m)
           (B.structure σ)) φ) ↔ ((bddInterp L d B).MapRel A ⊨ φ) := by
-  letI := bddHostStruc (L := L) A ρ
+  let := bddHostStruc (L := L) A ρ
   subst hσ
-  letI := extStructure L A m
-  letI := B.structure (bddTargetAssign e ρ)
+  let := extStructure L A m
+  let := B.structure (bddTargetAssign e ρ)
   exact StrongHomClass.realize_sentence (bddTargetEquiv e he ρ hN) φ
 
 /-- **A bounded extension is a guess on the instance**: the kernel holds in
@@ -477,7 +477,7 @@ theorem sorealize_bddPull (φ : (bddTarget L B).Sentence) (A : Type) [L.Structur
     (∃ m ≤ Nat.card (Fin d → A), SORealize (newLang L) (A ⊕ Fin m) [B] φ true) ↔
       SORealize L A [bddBlock d B] ((bddInterp L d B).pullRelSentence φ) true := by
   classical
-  letI : Fintype (Fin d → A) := Fintype.ofFinite _
+  let : Fintype (Fin d → A) := Fintype.ofFinite _
   constructor
   · rintro ⟨m, hm, σ, hσ⟩
     obtain ⟨e⟩ : Nonempty (Fin m ↪ (Fin d → A)) := by
@@ -485,13 +485,13 @@ theorem sorealize_bddPull (φ : (bddTarget L B).Sentence) (A : Type) [L.Structur
       rw [Fintype.card_fin, ← Nat.card_eq_fintype_card]
       exact hm
     refine ⟨bddSourceAssign e σ, ?_⟩
-    letI := bddHostStruc (L := L) A (bddSourceAssign e σ)
+    let := bddHostStruc (L := L) A (bddSourceAssign e σ)
     refine ((bddInterp L d B).realize_pullRelSentence φ A).mpr ?_
     exact (realize_bddTransfer e.injective (bddSourceAssign e σ)
       (newSet_bddSourceAssign e σ) σ (bddTargetAssign_bddSourceAssign e.injective σ) φ).mp hσ
   · rintro ⟨ρ, hρ⟩
-    letI := bddHostStruc (L := L) A ρ
-    letI : Fintype {v : Fin d → A // newSet ρ v} := Fintype.ofFinite _
+    let := bddHostStruc (L := L) A ρ
+    let : Fintype {v : Fin d → A // newSet ρ v} := Fintype.ofFinite _
     set S := {v : Fin d → A // newSet ρ v} with hS
     set eq := Fintype.equivFin S with heq
     refine ⟨Fintype.card S, ?_, bddTargetAssign (fun i => (eq.symm i).val) ρ, ?_⟩

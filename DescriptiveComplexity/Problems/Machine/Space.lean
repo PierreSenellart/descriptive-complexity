@@ -783,7 +783,7 @@ theorem mSpecDet_isSrc_iff (ρ : mBlock.Assignment A) :
     mRealize_inf₁ ρ _ _
   rw [h]
   refine and_congr ?_ Iff.rfl
-  letI := mBlock.structure₁ (L := mBase) ρ
+  let := mBlock.structure₁ (L := mBase) ρ
   change Formula.Realize _ default ↔ _
   simp only [realize_detF, relMap_mIn₁]
   exact Iff.rfl

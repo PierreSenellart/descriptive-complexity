@@ -71,7 +71,7 @@ variable {A : Type} [Language.wide.Structure A] [LinearOrder A]
 theorem realize_inpRegS (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize wide2 A (addrBlock.structure₂ (L := wOrd) ρ σ) inpRegS ↔
       ∃ x y, WMRegSeg (wbits ρ) x ∧ wbits σ y ∧ WMInp x y) := by
-  letI := addrBlock.structure₂ (L := wOrd) ρ σ
+  let := addrBlock.structure₂ (L := wOrd) ρ σ
   rw [inpRegS, Sentence.Realize]
   simp only [Formula.realize_iExs, Formula.realize_iAlls, Formula.realize_inf,
     Formula.realize_iff, realize_bitAF, realize_bitBF, realize_lift2, realize_attrG,
@@ -113,7 +113,7 @@ noncomputable def wideRegExp : ExpExpansion Language.wide where
   dom_nonempty := by
     intro A _ _ _ _
     refine ⟨.addr, addrBlock.botAssign A, ?_⟩
-    letI := addrBlock.structure₁ (L := wOrd) (addrBlock.botAssign A)
+    let := addrBlock.structure₁ (L := wOrd) (addrBlock.botAssign A)
     exact Formula.realize_top.mpr trivial
 
 section Structure
@@ -137,7 +137,7 @@ theorem realize_twoReg (rt : Language.turing.Relations 2) (φ : WTag → WTag �
     (RelMap rt ![x, y] ↔
       @Sentence.Realize wide2 A (addrBlock.structure₂ (L := wOrd) x.1.2 y.1.2)
         (φ x.1.1 y.1.1)) := by
-  letI := wideRegStructure A
+  let := wideRegStructure A
   have h1 := wideRegExp.relMap_map rt ![x, y]
   rw [h] at h1
   exact h1.trans (realize_onS2 _ x y)
@@ -148,7 +148,7 @@ input symbol. -/
 theorem relMap_inpReg (p q : WPoint A) :
     letI := wideRegStructure A
     (RelMap tmInp ![wideEmbed p, wideEmbed q] ↔ (wideRegData A).Inp p q) := by
-  letI := wideRegStructure A
+  let := wideRegStructure A
   rw [realize_twoReg tmInp inpRegT (fun _ => rfl) (wideEmbed p) (wideEmbed q)]
   match p, q with
   | Sum.inl s, Sum.inl t => exact iff_of_false (not_realize_botS₂ _ _) (fun h => h)
@@ -167,7 +167,7 @@ readings, and the twelfth is `relMap_inpReg`. -/
 theorem wideRegAgree :
     letI := wideRegStructure A
     TMData.Agree (wideEquiv (A := A)) (wideRegData A) (tmData (wideExp.Map A)) := by
-  letI := wideRegStructure A
+  let := wideRegStructure A
   exact ⟨fun p => (relMap_posn p).symm, fun p q => (relMap_le p q).symm,
     fun p => (relMap_mark tmTr wmTr (fun _ => rfl) p).symm,
     fun p => (relMap_mark tmStart wmStart (fun _ => rfl) p).symm,
@@ -196,7 +196,7 @@ theorem wideRegAccept_iff_expansion (A : Type) [Language.wide.Structure A]
     [LinearOrder A] :
     letI := wideRegStructure A
     (WideRegAccept A ↔ NTMAccept (wideExp.Map A)) := by
-  letI := wideRegStructure A
+  let := wideRegStructure A
   have h := wideRegAgree A
   exact and_congr h.wellFormed h.accepts
 
@@ -206,7 +206,7 @@ ordinary machine, and `DescriptiveComplexity.NTMAccept` is in NP. The two
 problems are therefore in the same class, and a reduction may choose whichever
 channel puts its input where it can reach it. -/
 theorem wideRegAccept_mem_NEXPTIME : WideRegAccept ∈ NEXPTIME := by
-  letI hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
       Language.turing.Structure (wideExp.Map A) := fun A => wideRegStructure A
   refine ⟨wideRegExp, NTMAccept, ntmAccept_mem_NP, ?_⟩
   intro A _ _ _ _

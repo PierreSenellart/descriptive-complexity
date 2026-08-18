@@ -143,7 +143,7 @@ the unrestricted problem to the simple-graph one. -/
 theorem twoCopiesIso_iff_graphIso_map :
     (TwoCopiesIso Language.graph).Holds Z ↔
       GraphIso.Holds (DigraphBridge.ofTC.Map (gadget.double.Map Z)) := by
-  haveI : Finite (gadget.double.Map Z) := gadget.double.map_finite Z
+  have : Finite (gadget.double.Map Z) := gadget.double.map_finite Z
   rw [twoCopiesIso_double_iff gadget gadget_isoReflecting ‹Finite Z›,
     DigraphBridge.ofTC_correct (gadget.double.Map Z)]
   constructor

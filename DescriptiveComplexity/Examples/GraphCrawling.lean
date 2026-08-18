@@ -318,8 +318,8 @@ theorem reachesAllOn_iff_exists_order [Finite A] (Adjp : A → A → Prop) (r : 
     obtain ⟨z, hzx, hlt⟩ := rdist_step (hreach x hx) hne
     exact ⟨z, hzx.1, hzx.2.2, hlt⟩
   · rintro ⟨Lt, htrans, hirr, hstep⟩
-    haveI : IsTrans A Lt := ⟨htrans⟩
-    haveI : Std.Irrefl Lt := ⟨hirr⟩
+    have : IsTrans A Lt := ⟨htrans⟩
+    have : Std.Irrefl Lt := ⟨hirr⟩
     have hwf : WellFounded Lt := Finite.wellFounded_of_trans_of_irrefl Lt
     intro x
     induction x using hwf.induction with
@@ -1028,7 +1028,7 @@ private abbrev CRealize (φ : crawlSOLang.Sentence) : Prop :=
 
 private theorem realize_crTargetClause :
     CRealize ρ crTargetClause ↔ ∀ x : A, WSTarget x → ρ .set ![x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   rw [crTargetClause]
@@ -1038,7 +1038,7 @@ private theorem realize_crTargetClause :
 
 private theorem realize_crRootExistsClause :
     CRealize ρ crRootExistsClause ↔ ∃ x : A, ρ .root ![x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hR : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
   rw [crRootExistsClause]
@@ -1048,7 +1048,7 @@ private theorem realize_crRootExistsClause :
 
 private theorem realize_crRootClause :
     CRealize ρ crRootClause ↔ ∀ x : A, ρ .root ![x] → WSRoot x ∧ ρ .set ![x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
@@ -1061,7 +1061,7 @@ private theorem realize_crRootClause :
 
 private theorem realize_crRootUniqueClause :
     CRealize ρ crRootUniqueClause ↔ ∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hR : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
   rw [crRootUniqueClause]
@@ -1073,7 +1073,7 @@ private theorem realize_crRootUniqueClause :
 private theorem realize_crTransClause :
     CRealize ρ crTransClause ↔
       ∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
       RelMap (L := crawlSOLang) (M := A) kCrLtSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [crTransClause]
@@ -1084,7 +1084,7 @@ private theorem realize_crTransClause :
 
 private theorem realize_crIrreflClause :
     CRealize ρ crIrreflClause ↔ ∀ x : A, ¬ρ .order ![x, x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
       RelMap (L := crawlSOLang) (M := A) kCrLtSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [crIrreflClause]
@@ -1095,7 +1095,7 @@ private theorem realize_crIrreflClause :
 private theorem realize_crStepClause :
     CRealize ρ crStepClause ↔ ∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
       ∃ y : A, (ρ .set ![y] ∧ WSEdge y x) ∧ ρ .order ![y, x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
@@ -1118,7 +1118,7 @@ private theorem realize_crStepClause :
 private theorem realize_crTotalClause :
     CRealize ρ crTotalClause ↔ ∀ x : A, ρ .set ![x] →
       ∃ y : A, ρ .inj ![x, y] ∧ WSMarked y := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hI : ∀ (w : Fin 2 → A),
@@ -1137,7 +1137,7 @@ private theorem realize_crTotalClause :
 
 private theorem realize_crInjClause :
     CRealize ρ crInjClause ↔ ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hI : ∀ (w : Fin 2 → A),
       RelMap (L := crawlSOLang) (M := A) kCrInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [crInjClause]
@@ -1428,7 +1428,7 @@ the interpreted website has a cheap crawl. -/
 theorem hasSmallSetCover_iff_crawl_map (A : Type) [Language.setSystem.Structure A]
     [LinearOrder A] [Finite A] [Nonempty A] :
     HasSmallSetCover A ↔ HasCheapCrawl (crawlInterp.Map A) := by
-  haveI hfin : Finite (crawlInterp.Map A) := crawlInterp.map_finite A
+  have hfin : Finite (crawlInterp.Map A) := crawlInterp.map_finite A
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   constructor
   · -- a cover of at most `B` sets becomes a crawl: root, chosen sets, all

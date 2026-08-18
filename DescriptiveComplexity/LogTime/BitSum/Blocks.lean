@@ -79,7 +79,7 @@ def WindowAt (b e x m : A) : Prop :=
 `w` bits of `x` above the index `b`. -/
 theorem windowAt_iff {b e x m : A} {w : ℕ} (hw : orank b + w = orank e) :
     WindowAt b e x m ↔ orank m = orank x / 2 ^ orank b % 2 ^ w := by
-  haveI : Nonempty A := ⟨b⟩
+  have : Nonempty A := ⟨b⟩
   constructor
   · rintro ⟨h1, h2⟩
     refine Nat.eq_of_testBit_eq fun i => ?_

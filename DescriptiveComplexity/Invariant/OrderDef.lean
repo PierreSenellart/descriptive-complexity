@@ -146,7 +146,7 @@ theorem realize_ordPrecF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (ordPrecF L k f g) w) ↔
       toPebble σ (fun i => w (f i)) fun i => w (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [ordPrecF, Formula.realize_rel]
   rw [toPebble, addCases_comp]
   exact Iff.rfl
@@ -155,7 +155,7 @@ theorem realize_incompF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (incompF L k f g) w) ↔
       IncompRel (toPebble σ) (fun i => w (f i)) fun i => w (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [incompF, Formula.realize_inf, Formula.realize_not, Formula.realize_not,
     realize_ordPrecF, realize_ordPrecF]
   exact Iff.rfl
@@ -165,7 +165,7 @@ theorem realize_inMovesF {γ : Type} [DecidableEq γ] (j : Fin k)
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (inMovesF L k j f x) w) ↔
       InMoves (toPebble σ) j (fun i => w (f i)) fun i => w (x i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [inMovesF, Formula.realize_iExs]
   constructor
   · rintro ⟨c, hc⟩
@@ -203,7 +203,7 @@ theorem realize_movesDiffF {γ : Type} [DecidableEq γ] (j : Fin k)
       (movesDiffF L k j f g x) w) ↔
       MovesDiff (toPebble σ) j (fun i => w (f i)) (fun i => w (g i))
         fun i => w (x i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [movesDiffF, Formula.realize_not, Formula.realize_iff,
     realize_inMovesF, realize_inMovesF]
   exact Iff.rfl
@@ -213,7 +213,7 @@ theorem realize_setLessF {γ : Type} [DecidableEq γ] (j : Fin k)
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (setLessF L k j f g) w) ↔
       SetLess (toPebble σ) j (fun i => w (f i)) fun i => w (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [setLessF, Formula.realize_iExs]
   refine exists_congr fun c => ?_
   rw [Formula.realize_inf, Formula.realize_inf, Formula.realize_not,
@@ -236,7 +236,7 @@ theorem realize_movesEqF {γ : Type} [DecidableEq γ] (j : Fin k)
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (movesEqF L k j f g) w) ↔
       MovesEq (toPebble σ) j (fun i => w (f i)) fun i => w (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [movesEqF, Formula.realize_iAlls]
   refine forall_congr' fun c => ?_
   rw [Formula.realize_iff, realize_inMovesF, realize_inMovesF]
@@ -247,7 +247,7 @@ theorem realize_movesLessF {γ : Type} [DecidableEq γ] (f g : Fin k → γ)
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (movesLessF L k f g) w) ↔
       MovesLess (toPebble σ) (fun i => w (f i)) fun i => w (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [movesLessF, Formula.realize_iSup]
   refine exists_congr fun j => ?_
   rw [Formula.realize_inf, Formula.realize_iInf, realize_setLessF]
@@ -374,7 +374,7 @@ theorem realize_atomBitF {γ : Type} (b : BitIdx L k S) (f : Fin k → γ) (w : 
       (atomBitF L k S b f) w) ↔
       atomBits L k S (fun i => w (f i)) b = true := by
   classical
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rcases b with ⟨i, j⟩ | ⟨R, gsel⟩
   · simp only [atomBits, decide_eq_true_eq]
     exact Formula.realize_equal
@@ -395,7 +395,7 @@ theorem realize_atomBitEqF {γ : Type} (b : BitIdx L k S) (f g : Fin k → γ)
       (atomBitEqF L k S b f g) w) ↔
       atomBits L k S (fun i => w (f i)) b =
         atomBits L k S (fun i => w (g i)) b := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [atomBitEqF, Formula.realize_iff, realize_atomBitF, realize_atomBitF]
   exact Bool.eq_iff_iff.symm
 
@@ -406,9 +406,9 @@ theorem realize_atomLessF (hS : S.Finite) {γ : Type} (f g : Fin k → γ)
       (letI := bitVecLinearOrder L k S hS;
         atomColor L k S (fun i => w (f i)) <
           atomColor L k S fun i => w (g i)) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
-  letI := hS.to_subtype
-  letI := bitIdxLinearOrder L k S hS
+  let := (ordBlock k).structure₁ (L := L) σ
+  let := hS.to_subtype
+  let := bitIdxLinearOrder L k S hS
   rw [atomLessF, Formula.realize_iSup]
   refine exists_congr fun b => ?_
   rw [Formula.realize_inf, Formula.realize_iInf, Formula.realize_inf,
@@ -437,8 +437,8 @@ theorem realize_atomEqF (hS : S.Finite) {γ : Type} (f g : Fin k → γ)
       (atomEqF L k S hS f g) w) ↔
       atomColor L k S (fun i => w (f i)) =
         atomColor L k S fun i => w (g i) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
-  letI := hS.to_subtype
+  let := (ordBlock k).structure₁ (L := L) σ
+  let := hS.to_subtype
   rw [atomEqF, Formula.realize_iInf]
   constructor
   · intro h
@@ -490,7 +490,7 @@ theorem realize_ordStepF (hS : S.Finite) {σ : (ordBlock k).Assignment A}
               atomColor L k S (fun i => w (Fin.natAdd k i)) ∧
             MovesLess (toPebble σ) (fun i => w (Fin.castAdd k i))
               fun i => w (Fin.natAdd k i)))) := by
-  letI := (ordBlock k).structure₁ (L := L) σ
+  let := (ordBlock k).structure₁ (L := L) σ
   rw [ordStepF, Formula.realize_inf, Formula.realize_sup, Formula.realize_inf,
     realize_incompF, realize_atomLessF, realize_atomEqF, realize_movesLessF]
 
@@ -501,7 +501,7 @@ theorem inflStage_ordStepDef (hS : S.Finite) (n : ℕ) :
       (letI := bitVecLinearOrder L k S hS;
         ordStage (atomColor L k S (A := A)) n
           (fun i => w (Fin.castAdd k i)) fun i => w (Fin.natAdd k i)) := by
-  letI := bitVecLinearOrder L k S hS
+  let := bitVecLinearOrder L k S hS
   induction n with
   | zero => rfl
   | succ n ih =>
@@ -541,7 +541,7 @@ theorem toPebble_inflLimit_ordStepDef (hS : S.Finite) :
     toPebble ((ordStepDef L k S hS).inflLimit A) =
       (letI := bitVecLinearOrder L k S hS;
         OrdK (atomColor L k S (A := A))) := by
-  letI := bitVecLinearOrder L k S hS
+  let := bitVecLinearOrder L k S hS
   funext u v
   have h1 : toPebble ((ordStepDef L k S hS).inflLimit A) u v ↔
       ∃ n, (ordStepDef L k S hS).inflStage A n () (Fin.addCases u v) :=

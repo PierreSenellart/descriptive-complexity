@@ -278,7 +278,7 @@ theorem altAccepts_true_iff_accepts [Finite A] (hex : ∀ q : A, ¬M.IsUniv true
     (hne : ∃ p, M.Posn p) : M.AltAccepts true ↔ M.Accepts := by
   have hpos : 0 < Nat.card {p : A // M.Posn p} := by
     obtain ⟨p, hp⟩ := hne
-    haveI : Nonempty {p : A // M.Posn p} := ⟨⟨p, hp⟩⟩
+    have : Nonempty {p : A // M.Posn p} := ⟨⟨p, hp⟩⟩
     exact Nat.card_pos
   constructor
   · rintro ⟨c₀, hinit, hacc⟩

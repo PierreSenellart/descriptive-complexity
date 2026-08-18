@@ -168,7 +168,7 @@ theorem exists_answer {ι : Type} [Finite ι] {U V : ι → ℤ}
     {c : ℤ} {i₀ i₁ : ι} (h₀ : U i₀ ≤ c) (h₁ : c ≤ U i₁) :
     ∃ d : ℤ, ∀ i, truncAt n (U i - c) = truncAt n (V i - d) := by
   classical
-  letI := Fintype.ofFinite ι
+  let := Fintype.ofFinite ι
   have hpos := two_pow_pos n
   by_cases hmem : ∃ i, U i = c
   · obtain ⟨i₂, hi₂⟩ := hmem

@@ -51,14 +51,14 @@ variable {α : Type} [Finite α] {Le : α → α → Prop}
 /-- A nonempty set has a `Le`-least element. -/
 theorem exists_least (h : IsLinOrd Le) {P : α → Prop} (hne : ∃ x, P x) :
     ∃ x, P x ∧ ∀ y, P y → Le x y := by
-  letI := h.toLinearOrder
+  let := h.toLinearOrder
   obtain ⟨x, hx, hmin⟩ := Set.exists_min_image {x : α | P x} id (Set.toFinite _) hne
   exact ⟨x, hx, fun y hy => hmin y hy⟩
 
 /-- A nonempty set has a `Le`-greatest element. -/
 theorem exists_greatest (h : IsLinOrd Le) {P : α → Prop} (hne : ∃ x, P x) :
     ∃ x, P x ∧ ∀ y, P y → Le y x := by
-  letI := h.toLinearOrder
+  let := h.toLinearOrder
   obtain ⟨x, hx, hmax⟩ := Set.exists_max_image {x : α | P x} id (Set.toFinite _) hne
   exact ⟨x, hx, fun y hy => hmax y hy⟩
 

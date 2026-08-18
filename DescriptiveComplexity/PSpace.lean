@@ -124,8 +124,8 @@ variable {A : Type} [L.Structure A] [LinearOrder A] (B : SOBlock) (ρ : B.Assign
 theorem blockOrderLift_isExpansionOn :
     @LHom.IsExpansionOn _ _ (blockOrderLift L B) A
       (B.structure₁ (L := L) ρ) (B.structure₁ (L := L.sum Language.order) ρ) := by
-  letI := B.structure₁ (L := L) ρ
-  letI := B.structure₁ (L := L.sum Language.order) ρ
+  let := B.structure₁ (L := L) ρ
+  let := B.structure₁ (L := L.sum Language.order) ρ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · cases f with
     | inl g => rfl

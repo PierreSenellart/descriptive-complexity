@@ -104,7 +104,7 @@ theorem realize_matrixF {n j : ℕ} (pts : Fin n → X.Map A) (hv : Fin j → Fi
     letI := X.mapLinearOrder A
     (@Sentence.Realize _ A (roundStructure X (roundAssign pts)) (matrixF X hv ψ) ↔
       ψ.Realize (M := X.Map A) default fun i => pts (hv i)) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   refine (realize_translQF pts ((isQF_toFormula hqf).relabel _)).trans ?_
   refine Iff.trans (Formula.realize_relabel (g := Sum.elim Empty.elim hv) (v := pts)) ?_
   refine Iff.trans (BoundedFormula.realize_toFormula ψ _) ?_
@@ -145,7 +145,7 @@ theorem altBlockQuant_peel_step {n r : ℕ} (i₀ i₁ : Fin n)
             @Sentence.Realize _ A
               (roundStructure X (ext (Fin.cons (τs 0) (Fin.tail τs)))) K)) := by
     intro τs
-    letI := roundStructure X (ext τs)
+    let := roundStructure X (ext τs)
     have hguard : ∀ i : Fin n, (@Sentence.Realize _ A (roundStructure X (ext τs))
         (roundPointGuardF X n i) ↔ IsPointAssign (X := X) (ext τs i)) :=
       fun i => realize_roundPointGuardF (ext τs) i
@@ -201,7 +201,7 @@ theorem transl_step {n j c d : ℕ} (hc0 : c < n) (hc1 : c + 1 < n)
       ψ.Realize (M := X.Map A) default
         (Fin.snoc (fun i => pts (hv i))
           (Function.update (Function.update pts ⟨c, hc0⟩ p) ⟨c + 1, hc1⟩ q iv))) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   have hv0 : ((⟨c, hc0⟩ : Fin n) : ℕ) = c := rfl
   have hv1 : ((⟨c + 1, hc1⟩ : Fin n) : ℕ) = c + 1 := rfl
   set pts' := Function.update (Function.update pts ⟨c, hc0⟩ p) ⟨c + 1, hc1⟩ q with hpts'
@@ -276,7 +276,7 @@ theorem exists_transl {j : ℕ} {ψ : (X.E.sum Language.order).BoundedFormula Em
       (fun i => Fin.lastCases (by rw [Fin.snoc_last]; exact Nat.lt_succ_self _)
         (fun i => by rw [Fin.snoc_castSucc]; exact lt_trans (hlt i) (by omega)) i)
     refine ⟨stepF X ⟨c, hc0⟩ ⟨c + 1, hc1⟩ K, fun A _ _ _ _ pts ext hfix hemb => ?_⟩
-    letI := X.mapLinearOrder A
+    let := X.mapLinearOrder A
     rw [altBlockQuant_peel_step ⟨c, hc0⟩ ⟨c + 1, hc1⟩ K ext
       (fun τs => hemb τs 0 _ (by simp)) (fun τs => hemb τs (Fin.succ 0) _ (by simp)),
       BoundedFormula.realize_all]
@@ -300,7 +300,7 @@ theorem exists_transl {j : ℕ} {ψ : (X.E.sum Language.order).BoundedFormula Em
       (fun i => Fin.lastCases (by rw [Fin.snoc_last]; exact Nat.lt_succ_of_lt (Nat.lt_succ_self _))
         (fun i => by rw [Fin.snoc_castSucc]; exact lt_trans (hlt i) (by omega)) i)
     refine ⟨stepF X ⟨c, hc0⟩ ⟨c + 1, hc1⟩ K, fun A _ _ _ _ pts ext hfix hemb => ?_⟩
-    letI := X.mapLinearOrder A
+    let := X.mapLinearOrder A
     rw [altBlockQuant_peel_step ⟨c, hc0⟩ ⟨c + 1, hc1⟩ K ext
       (fun τs => hemb τs 0 _ (by simp)) (fun τs => hemb τs (Fin.succ 0) _ (by simp)),
       BoundedFormula.realize_ex]
@@ -335,7 +335,7 @@ theorem exists_translate (X : ExpExpansion L) (φ : (X.E.sum Language.order).Sen
   refine ⟨repBlocks X.pointBlock d,
     (unmergeHom (repBlocks X.pointBlock d) (L.sum Language.order)).onSentence K, true, ?_⟩
   intro A _ _ _ _
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   rw [sorealize_repBlocks X.pointBlock (L.sum Language.order) A inferInstance d K true]
   refine Iff.trans ?_ (hK A (fun _ => Classical.arbitrary _) id
     (fun _ k hk => absurd hk (Nat.not_lt_zero _)) (fun τs i k hk => by

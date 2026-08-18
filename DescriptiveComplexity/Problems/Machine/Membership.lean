@@ -285,92 +285,92 @@ variable {α : Type} (v : α → A)
 
 @[simp] theorem realize_tqPosnF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqPosnF x) v) ↔ TMPosn (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqPosnF, TMPosn, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqTrF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqTrF x) v) ↔ TMTr (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqTrF, TMTr, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqStartF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqStartF x) v) ↔ TMStart (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqStartF, TMStart, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqAccF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqAccF x) v) ↔ TMAcc (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqAccF, TMAcc, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqBlankF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqBlankF x) v) ↔ TMBlank (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqBlankF, TMBlank, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqRightF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqRightF x) v) ↔ TMRight (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqRightF, TMRight, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqLeF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqLeF x y) v) ↔ TMLe (v x) (v y) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqLeF, TMLe, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqEqF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqEqF x y) v) ↔ v x = v y := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqEqF]
 
 @[simp] theorem realize_tqSrcF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqSrcF x y) v) ↔ TMSrc (v x) (v y) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqSrcF, TMSrc, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqReadF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqReadF x y) v) ↔ TMRead (v x) (v y) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqReadF, TMRead, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqDstF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqDstF x y) v) ↔ TMDst (v x) (v y) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqDstF, TMDst, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqWriteF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqWriteF x y) v) ↔ TMWrite (v x) (v y) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqWriteF, TMWrite, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqInpF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqInpF x y) v) ↔ TMInp (v x) (v y) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp [tqInpF, TMInp, Language.relMap_sumInl]
 
 @[simp] theorem realize_tqStateF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqStateF x y) v) ↔ ρ .state ![v x, v y] := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqStateF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_tqHeadF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqHeadF x y) v) ↔ ρ .head ![v x, v y] := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqHeadF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_tqTapeF (x y z : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqTapeF x y z) v) ↔
       ρ .tape ![v x, v y, v z] := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqTapeF, Formula.realize_rel, Language.relMap_sumInr]
   exact iff_of_eq (congrArg (ρ TMIdx.tape) (funext fun i => by fin_cases i <;> rfl))
 
 @[simp] theorem realize_tqMinPosF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqMinPosF x) v) ↔
       MinPos TMLe TMPosn (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqMinPosF, Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     realize_tqPosnF, realize_tqLeF, Sum.elim_inl, Sum.elim_inr, MinPos]
   exact and_congr Iff.rfl ⟨fun h a => h (fun _ => a), fun h i => h (i 0)⟩
@@ -378,7 +378,7 @@ variable {α : Type} (v : α → A)
 @[simp] theorem realize_tqMaxPosF (x : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqMaxPosF x) v) ↔
       MaxPos TMLe TMPosn (v x) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqMaxPosF, Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     realize_tqPosnF, realize_tqLeF, Sum.elim_inl, Sum.elim_inr, MaxPos]
   exact and_congr Iff.rfl ⟨fun h a => h (fun _ => a), fun h i => h (i 0)⟩
@@ -386,7 +386,7 @@ variable {α : Type} (v : α → A)
 @[simp] theorem realize_tqSuccPosF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqSuccPosF x y) v) ↔
       SuccPos TMLe TMPosn (v x) (v y) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqSuccPosF, Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_not, Formula.realize_sup, realize_tqPosnF, realize_tqLeF, realize_tqEqF,
     Sum.elim_inl, Sum.elim_inr, SuccPos, ne_eq]
@@ -397,7 +397,7 @@ variable {α : Type} (v : α → A)
 @[simp] theorem realize_tqInitTapeF (x y : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqInitTapeF x y) v) ↔
       TMInp (v x) (v y) ∨ ((∀ b, ¬ TMInp (v x) b) ∧ TMBlank (v y)) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqInitTapeF, Formula.realize_sup, Formula.realize_inf, Formula.realize_iAlls,
     Formula.realize_not, realize_tqInpF, realize_tqBlankF, Sum.elim_inl, Sum.elim_inr]
   exact or_congr Iff.rfl (and_congr ⟨fun h b => h fun _ => b, fun h i => h (i 0)⟩ Iff.rfl)
@@ -406,7 +406,7 @@ variable {α : Type} (v : α → A)
     (@Formula.Realize tqSOLang A SOStruc _ (tqMoveF t t' dir) v) ↔
       ∀ p p', ρ .head ![v t, p] → ρ .head ![v t', p'] →
         (if dir then SuccPos TMLe TMPosn p p' else SuccPos TMLe TMPosn p' p) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   cases dir <;>
     simp only [tqMoveF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
       realize_tqHeadF, realize_tqSuccPosF, Sum.elim_inl, Sum.elim_inr, if_true, if_false,
@@ -424,7 +424,7 @@ theorem realize_tqStepBodyF (t t' τ : α) :
             SuccPos TMLe TMPosn p p') ∨
           (¬ TMRight (v τ) ∧ ∀ p p', ρ .head ![v t, p] → ρ .head ![v t', p'] →
             SuccPos TMLe TMPosn p' p)) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqStepBodyF, Formula.realize_inf, Formula.realize_sup, Formula.realize_imp,
     Formula.realize_not, Formula.realize_iff, Formula.realize_iAlls, realize_tqTrF,
     realize_tqStateF, realize_tqSrcF, realize_tqHeadF, realize_tqTapeF, realize_tqReadF,
@@ -444,7 +444,7 @@ theorem realize_tqStutterBodyF (t t' : α) :
         (∀ q, ρ .state ![v t', q] ↔ ρ .state ![v t, q]) ∧
         (∀ p, ρ .head ![v t', p] ↔ ρ .head ![v t, p]) ∧
         ∀ p a, ρ .tape ![v t', p, a] ↔ ρ .tape ![v t, p, a] := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   simp only [tqStutterBodyF, Formula.realize_inf, Formula.realize_imp, Formula.realize_iff,
     Formula.realize_iAlls, realize_tqStateF, realize_tqAccF, realize_tqHeadF, realize_tqTapeF,
     Sum.elim_inl, Sum.elim_inr]
@@ -751,7 +751,7 @@ theorem realize_tqStepClause :
 private theorem realize_inf_sentence (φ ψ : tqSOLang.Sentence) :
     (@Sentence.Realize tqSOLang A SOStruc (φ ⊓ ψ)) ↔
       (@Sentence.Realize tqSOLang A SOStruc φ) ∧ (@Sentence.Realize tqSOLang A SOStruc ψ) := by
-  letI := tmGuessBlock.structure ρ
+  let := tmGuessBlock.structure ρ
   exact Formula.realize_inf
 
 /-- **The kernel says exactly what it should**: the instance is well formed and

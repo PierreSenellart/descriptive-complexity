@@ -150,7 +150,7 @@ variable {A : Type} [Language.epr.Structure A] [LinearOrder A] {v : γ → A}
 theorem realize_peF1 (ρ : pairBlock.Assignment A) (x y : γ) :
     (@Formula.Realize peLang1 A (pairBlock.structure₁ (L := peOrd) ρ) _ (peF1 x y) v ↔
       peRel ρ (v x) (v y)) := by
-  letI := pairBlock.structure₁ (L := peOrd) ρ
+  let := pairBlock.structure₁ (L := peOrd) ρ
   simp only [peF1, Formula.realize_rel₂]
   rfl
 
@@ -158,7 +158,7 @@ theorem realize_peF1 (ρ : pairBlock.Assignment A) (x y : γ) :
 theorem realize_peFA (ρ σ : pairBlock.Assignment A) (x y : γ) :
     (@Formula.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) _ (peFA x y) v ↔
       peRel ρ (v x) (v y)) := by
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   simp only [peFA, Formula.realize_rel₂]
   rfl
 
@@ -166,7 +166,7 @@ theorem realize_peFA (ρ σ : pairBlock.Assignment A) (x y : γ) :
 theorem realize_peFB (ρ σ : pairBlock.Assignment A) (x y : γ) :
     (@Formula.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) _ (peFB x y) v ↔
       peRel σ (v x) (v y)) := by
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   simp only [peFB, Formula.realize_rel₂]
   rfl
 
@@ -196,15 +196,15 @@ theorem realize_peEqG (x y : γ) : ((peEqG x y).Realize v ↔ v x = v y) := by
 theorem realize_peLift1 (ρ : pairBlock.Assignment A) (φ : peOrd.Formula γ) :
     (@Formula.Realize peLang1 A (pairBlock.structure₁ (L := peOrd) ρ) _ (peLift1 φ) v ↔
       φ.Realize v) := by
-  letI := pairBlock.structure₁ (L := peOrd) ρ
+  let := pairBlock.structure₁ (L := peOrd) ρ
   exact LHom.realize_onFormula LHom.sumInl φ
 
 @[simp]
 theorem realize_peLift2 (ρ σ : pairBlock.Assignment A) (φ : peOrd.Formula γ) :
     (@Formula.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) _ (peLift2 φ) v ↔
       φ.Realize v) := by
-  letI := pairBlock.structure₁ (L := peOrd) ρ
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₁ (L := peOrd) ρ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   exact (LHom.realize_onFormula LHom.sumInl (LHom.sumInl.onFormula φ)).trans
     (LHom.realize_onFormula LHom.sumInl φ)
 
@@ -269,7 +269,7 @@ variable [Language.epr.Structure A] [LinearOrder A]
 theorem realize_diagS (ρ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang1 A (pairBlock.structure₁ (L := peOrd) ρ) diagS ↔
       PEDiag (peRel ρ)) := by
-  letI := pairBlock.structure₁ (L := peOrd) ρ
+  let := pairBlock.structure₁ (L := peOrd) ρ
   simp only [diagS, PEDiag, Sentence.Realize, Formula.realize_iExs, Formula.realize_iAlls,
     Formula.realize_iff, Formula.realize_inf, realize_peF1, realize_peLift1, realize_peEqG,
     Sum.elim_inl, Sum.elim_inr]
@@ -280,7 +280,7 @@ theorem realize_diagS (ρ : pairBlock.Assignment A) :
 theorem realize_pairS (ρ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang1 A (pairBlock.structure₁ (L := peOrd) ρ) pairS ↔
       PEPairRel (peRel ρ)) := by
-  letI := pairBlock.structure₁ (L := peOrd) ρ
+  let := pairBlock.structure₁ (L := peOrd) ρ
   simp only [pairS, PEPairRel, Sentence.Realize, Formula.realize_iExs, Formula.realize_iAlls,
     Formula.realize_iff, Formula.realize_inf, realize_peF1, realize_peLift1, realize_peEqG,
     Sum.elim_inl, Sum.elim_inr]
@@ -489,7 +489,7 @@ noncomputable def eprExp : ExpExpansion Language.epr where
   dom_nonempty := by
     intro A _ _ _ _
     refine ⟨ETag.asg, pairBlock.botAssign A, ?_⟩
-    letI := pairBlock.structure₁ (L := peOrd) (pairBlock.botAssign A)
+    let := pairBlock.structure₁ (L := peOrd) (pairBlock.botAssign A)
     exact Formula.realize_top.mpr trivial
 
 end Sentences
@@ -515,7 +515,7 @@ theorem realize_one (rt : Language.eprPt.Relations 1) (φ : ETag → peLang1.Sen
     letI := eprPtStructure A
     (RelMap rt ![x] ↔
       @Sentence.Realize peLang1 A (pairBlock.structure₁ (L := peOrd) x.1.2) (φ x.1.1)) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   have h1 := eprExp.relMap_map rt ![x]
   rw [show eprExp.relSentence rt (fun i => (![x] i).1.1) =
     onS1 (φ ((![x] : Fin 1 → eprExp.Map A) 0).1.1) from h _] at h1
@@ -529,7 +529,7 @@ theorem realize_two (rt : Language.eprPt.Relations 2) (φ : ETag → ETag → pe
     (RelMap rt ![x, y] ↔
       @Sentence.Realize peLang2 A
         (pairBlock.structure₂ (L := peOrd) x.1.2 y.1.2) (φ x.1.1 y.1.1)) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   have h1 := eprExp.relMap_map rt ![x, y]
   rw [show eprExp.relSentence rt (fun i => (![x, y] i).1.1) =
     onS2 (φ ((![x, y] : Fin 2 → eprExp.Map A) 0).1.1
@@ -550,7 +550,7 @@ theorem domHolds_pair (x y : A) :
 
 theorem domHolds_asg (R : A → A → Prop) :
     ExpExpansion.DomHolds (X := eprExp) (ETag.asg, peAssign R) := by
-  letI := eprExp.B.structure₁ (L := peOrd) (peAssign R)
+  let := eprExp.B.structure₁ (L := peOrd) (peAssign R)
   exact Formula.realize_top.mpr trivial
 
 /-- **The point an element is**: the diagonal singleton, tagged `elt`. -/
@@ -613,7 +613,7 @@ variable {A : Type} [Language.epr.Structure A] [LinearOrder A]
 @[simp]
 theorem realize_tagS1 (b : Prop) (ρ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang1 A (pairBlock.structure₁ (L := peOrd) ρ) (tagS1 b) ↔ b) := by
-  letI := pairBlock.structure₁ (L := peOrd) ρ
+  let := pairBlock.structure₁ (L := peOrd) ρ
   classical
   by_cases hb : b
   · rw [tagS1, if_pos hb]
@@ -625,7 +625,7 @@ theorem realize_tagS1 (b : Prop) (ρ : pairBlock.Assignment A) :
 theorem realize_markS (r : Language.epr.Relations 1) (ρ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang1 A (pairBlock.structure₁ (L := peOrd) ρ) (markS r) ↔
       ∃ x, peRel ρ x x ∧ RelMap r ![x]) := by
-  letI := pairBlock.structure₁ (L := peOrd) ρ
+  let := pairBlock.structure₁ (L := peOrd) ρ
   simp only [markS, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_peF1, realize_peLift1, realize_peMarkG, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, hw⟩, fun ⟨x, hx⟩ => ⟨fun _ => x, hx⟩⟩
@@ -634,7 +634,7 @@ theorem realize_markS (r : Language.epr.Relations 1) (ρ : pairBlock.Assignment 
 theorem realize_binS (r : Language.epr.Relations 2) (ρ σ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) (binS r) ↔
       ∃ x y, peRel ρ x x ∧ peRel σ y y ∧ RelMap r ![x, y]) := by
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   simp only [binS, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_peFA, realize_peFB, realize_peLift2, realize_peBinG, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, w 1, hw⟩, fun ⟨x, y, hx⟩ => ⟨![x, y], hx⟩⟩
@@ -643,7 +643,7 @@ theorem realize_binS (r : Language.epr.Relations 2) (ρ σ : pairBlock.Assignmen
 theorem realize_fstS (ρ σ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) fstS ↔
       ∃ x y, peRel ρ x y ∧ peRel σ x x) := by
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   simp only [fstS, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_peFA, realize_peFB, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, w 1, hw⟩, fun ⟨x, y, hx⟩ => ⟨![x, y], hx⟩⟩
@@ -652,7 +652,7 @@ theorem realize_fstS (ρ σ : pairBlock.Assignment A) :
 theorem realize_sndS (ρ σ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) sndS ↔
       ∃ x y, peRel ρ x y ∧ peRel σ y y) := by
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   simp only [sndS, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_peFA, realize_peFB, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, w 1, hw⟩, fun ⟨x, y, hx⟩ => ⟨![x, y], hx⟩⟩
@@ -661,7 +661,7 @@ theorem realize_sndS (ρ σ : pairBlock.Assignment A) :
 theorem realize_argS (ρ σ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) argS ↔
       ∃ l p x, peRel ρ l p ∧ peRel σ x x ∧ ArgG l p x) := by
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   simp only [argS, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_peFA, realize_peFB, realize_peLift2, realize_peTerG, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, w 1, w 2, hw⟩, fun ⟨l, p, x, hx⟩ => ⟨![l, p, x], hx⟩⟩
@@ -670,7 +670,7 @@ theorem realize_argS (ρ σ : pairBlock.Assignment A) :
 theorem realize_memS (ρ σ : pairBlock.Assignment A) :
     (@Sentence.Realize peLang2 A (pairBlock.structure₂ (L := peOrd) ρ σ) memS ↔
       ∃ x y, peRel σ x y ∧ peRel ρ x y) := by
-  letI := pairBlock.structure₂ (L := peOrd) ρ σ
+  let := pairBlock.structure₂ (L := peOrd) ρ σ
   simp only [memS, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_peFA, realize_peFB, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, w 1, hw⟩, fun ⟨x, y, hx⟩ => ⟨![x, y], hx⟩⟩
@@ -695,21 +695,21 @@ theorem peRel_asgPt (R : A → A → Prop) (x y : A) : peRel (asgPt R).1.2 x y �
 theorem realize_isElt (p : eprExp.Map A) :
     letI := eprPtStructure A
     (RelMap Language.peIsEltSym ![p] ↔ p.1.1 = ETag.elt) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   exact (realize_one Language.peIsEltSym (fun t => tagS1 (t = ETag.elt))
     (fun _ => rfl) p).trans (realize_tagS1 _ _)
 
 theorem realize_isPair (p : eprExp.Map A) :
     letI := eprPtStructure A
     (RelMap Language.peIsPairSym ![p] ↔ p.1.1 = ETag.pair) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   exact (realize_one Language.peIsPairSym (fun t => tagS1 (t = ETag.pair))
     (fun _ => rfl) p).trans (realize_tagS1 _ _)
 
 theorem realize_isAsg (p : eprExp.Map A) :
     letI := eprPtStructure A
     (RelMap Language.peIsAsgSym ![p] ↔ p.1.1 = ETag.asg) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   exact (realize_one Language.peIsAsgSym (fun t => tagS1 (t = ETag.asg))
     (fun _ => rfl) p).trans (realize_tagS1 _ _)
 
@@ -718,7 +718,7 @@ theorem realize_un (rt : Language.eprPt.Relations 1) (r : Language.epr.Relations
     (h : ∀ τ : Fin 1 → ETag, eprExp.relSentence rt τ = onS1 (unT r (τ 0))) (x : A) :
     letI := eprPtStructure A
     (RelMap rt ![eltPt x] ↔ RelMap r ![x]) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   refine (realize_one rt (unT r) h (eltPt x)).trans ?_
   rw [show (eltPt x).1.1 = ETag.elt from rfl, unT]
   refine (realize_markS r _).trans ⟨fun ⟨y, hy, hr⟩ => ?_, fun hr => ⟨x, ⟨rfl, rfl⟩, hr⟩⟩
@@ -729,7 +729,7 @@ theorem realize_bin (rt : Language.eprPt.Relations 2) (r : Language.epr.Relation
     (h : ∀ τ : Fin 2 → ETag, eprExp.relSentence rt τ = onS2 (binT r (τ 0) (τ 1))) (x y : A) :
     letI := eprPtStructure A
     (RelMap rt ![eltPt x, eltPt y] ↔ RelMap r ![x, y]) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   refine (realize_two rt (binT r) h (eltPt x) (eltPt y)).trans ?_
   rw [show (eltPt x).1.1 = ETag.elt from rfl, show (eltPt y).1.1 = ETag.elt from rfl, binT]
   refine (realize_binS r _ _).trans ⟨fun ⟨a, b, ha, hb, hr⟩ => ?_,
@@ -770,7 +770,7 @@ theorem realize_sigE (s p : A) :
 theorem realize_fstP (x y z : A) :
     letI := eprPtStructure A
     (RelMap Language.peFstSym ![pairPt x y, eltPt z] ↔ z = x) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   refine (realize_two Language.peFstSym (compT fstS) (fun _ => rfl) (pairPt x y) (eltPt z)).trans ?_
   rw [show (pairPt x y).1.1 = ETag.pair from rfl, show (eltPt z).1.1 = ETag.elt from rfl, compT]
   refine (realize_fstS _ _).trans ⟨fun ⟨a, b, hab, ha⟩ => ?_, fun hz => ⟨x, y, ⟨rfl, rfl⟩, ?_⟩⟩
@@ -781,7 +781,7 @@ theorem realize_fstP (x y z : A) :
 theorem realize_sndP (x y z : A) :
     letI := eprPtStructure A
     (RelMap Language.peSndSym ![pairPt x y, eltPt z] ↔ z = y) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   refine (realize_two Language.peSndSym (compT sndS) (fun _ => rfl) (pairPt x y) (eltPt z)).trans ?_
   rw [show (pairPt x y).1.1 = ETag.pair from rfl, show (eltPt z).1.1 = ETag.elt from rfl, compT]
   refine (realize_sndS _ _).trans ⟨fun ⟨a, b, hab, hb⟩ => ?_, fun hz => ⟨x, y, ⟨rfl, rfl⟩, ?_⟩⟩
@@ -792,7 +792,7 @@ theorem realize_sndP (x y z : A) :
 theorem realize_argP (l p x : A) :
     letI := eprPtStructure A
     (RelMap Language.peArgSym ![pairPt l p, eltPt x] ↔ ArgG l p x) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   refine (realize_two Language.peArgSym (compT argS) (fun _ => rfl) (pairPt l p) (eltPt x)).trans ?_
   rw [show (pairPt l p).1.1 = ETag.pair from rfl, show (eltPt x).1.1 = ETag.elt from rfl, compT]
   refine (realize_argS _ _).trans ⟨fun ⟨a, b, c, hab, hc, harg⟩ => ?_,
@@ -803,7 +803,7 @@ theorem realize_argP (l p x : A) :
 theorem realize_memP (R : A → A → Prop) (x y : A) :
     letI := eprPtStructure A
     (RelMap Language.peMemSym ![asgPt R, pairPt x y] ↔ R x y) := by
-  letI := eprPtStructure A
+  let := eprPtStructure A
   refine (realize_two Language.peMemSym memT (fun _ => rfl) (asgPt R) (pairPt x y)).trans ?_
   rw [show (asgPt R).1.1 = ETag.asg from rfl, show (pairPt x y).1.1 = ETag.pair from rfl, memT]
   refine (realize_memS _ _).trans ⟨fun ⟨a, b, hab, hr⟩ => ?_, fun hr => ⟨x, y, ⟨rfl, rfl⟩, hr⟩⟩

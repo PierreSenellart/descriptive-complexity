@@ -220,7 +220,7 @@ theorem uRulesDefinable_kindRule {n : ℕ} (κ : MatAtom dt.X dt.d.B n)
   match κ with
   | .stage _i _ts => exact uRulesDefinable_stageArgs h
   | @MatAtom.exp _ _ _ _ _k _e _ =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     exact uRulesDefinable_tagArgs h
   | .eq _j₁ _j₂ => exact uRulesDefinable_elemArgs h
   | .ord _j₁ _j₂ => exact uRulesDefinable_elemArgs h

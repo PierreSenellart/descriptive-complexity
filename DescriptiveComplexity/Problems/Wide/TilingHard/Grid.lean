@@ -132,7 +132,7 @@ machine. -/
 theorem exists_tpCol_of_posn {p : WPoint (TilePt A)}
     (hp : letI := tileStr A; (wideTileData (TilePt A)).Posn p) :
     ∃ s : A → Prop, p = Sum.inl (tpCol s) := by
-  letI := tileStr A
+  let := tileStr A
   rcases p with u | t
   · obtain ⟨s, hs⟩ := exists_tpCol (u := u) fun q hq => hp q hq
     exact ⟨s, congrArg Sum.inl hs⟩
@@ -144,7 +144,7 @@ theorem minPos_tpCol_bot :
     letI := tileStr A
     MinPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn
       (Sum.inl (tpCol (fun _ : A => False))) := by
-  letI := tileStr A
+  let := tileStr A
   refine ⟨fun q hq => (not_tpCol_bot q hq).elim, fun q hq => ?_⟩
   obtain ⟨r, rfl⟩ := exists_tpCol_of_posn hq
   exact wmSetLe_of_empty (isLinOrd_tpLe hlin) not_tpCol_bot (tpCol r)
@@ -154,7 +154,7 @@ theorem eq_bot_of_minPos {p : WPoint (TilePt A)}
     (h : letI := tileStr A
       MinPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn p) :
     p = Sum.inl (tpCol (fun _ : A => False)) := by
-  letI := tileStr A
+  let := tileStr A
   obtain ⟨s, rfl⟩ := exists_tpCol_of_posn h.1
   have h1 : WMSetLe (tpLe (A := A)) (tpCol s) (tpCol (fun _ : A => False)) :=
     h.2 (Sum.inl (tpCol (fun _ : A => False)))
@@ -170,7 +170,7 @@ theorem maxPos_tpCol_top :
     letI := tileStr A
     MaxPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn
       (Sum.inl (tpCol (fun _ : A => True))) := by
-  letI := tileStr A
+  let := tileStr A
   refine ⟨fun q hq => tpCol_dig_of_mem hq, fun q hq => ?_⟩
   obtain ⟨r, rfl⟩ := exists_tpCol_of_posn hq
   exact (tpCol_setLe r _).mpr (wmSetLe_of_full hlin (fun _ => trivial) r)
@@ -180,7 +180,7 @@ theorem eq_top_of_maxPos {p : WPoint (TilePt A)}
     (h : letI := tileStr A
       MaxPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn p) :
     p = Sum.inl (tpCol (fun _ : A => True)) := by
-  letI := tileStr A
+  let := tileStr A
   obtain ⟨s, rfl⟩ := exists_tpCol_of_posn h.1
   have h1 : WMSetLe (tpLe (A := A)) (tpCol (fun _ : A => True)) (tpCol s) :=
     h.2 (Sum.inl (tpCol (fun _ : A => True))) (maxPos_tpCol_top hlin).1
@@ -197,7 +197,7 @@ theorem succPos_tpCol (s t : A → Prop) :
     (SuccPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn
         (Sum.inl (tpCol s)) (Sum.inl (tpCol t)) ↔
       WMIncr (WMLe (A := A)) s t) := by
-  letI := tileStr A
+  let := tileStr A
   constructor
   · rintro ⟨-, -, hle, hne, hbetween⟩
     have hsle : WMSetLe (WMLe (A := A)) s t := (tpCol_setLe s t).mp hle

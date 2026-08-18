@@ -375,14 +375,14 @@ theorem dwideAcceptSpace_srcEnv_iff :
       encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
     (DWideAcceptSpace ((dblWideInterp X d).Map (srcEnv L A).α) ↔
       (srcDt X d).d.PFPHolds ((srcDt X d).X.Map (srcEnv L A).α)) := by
-  letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
+  let : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
-  letI := srcRTagOrder X d
-  letI := srcPFOrder X d
-  letI : LinearOrder ((srcDt X d).RIx (srcEnv L A).zero (srcEnv L A).one
+  let := srcRTagOrder X d
+  let := srcPFOrder X d
+  let : LinearOrder ((srcDt X d).RIx (srcEnv L A).zero (srcEnv L A).one
       (srcEnv L A).hzo fun w => (srcDt X d).varArgsOf (srcEnv L A).zero
         (srcEnv L A).one w) := srcRTagOrder X d
-  letI : Language.wide.Structure
+  let : Language.wide.Structure
       (Univ (srcEnv L A).α ((srcDt X d).RIx (srcEnv L A).zero (srcEnv L A).one
         (srcEnv L A).hzo fun w => (srcDt X d).varArgsOf (srcEnv L A).zero
           (srcEnv L A).one w) (srcDt X d).PF (srcDt X d).KIx (srcDt X d).dd) :=
@@ -409,13 +409,13 @@ theorem wideProblem_wideInterp_iff (PW : DecisionProblem Language.wide)
       PW ((dblWideInterp X d).Map (srcEnv L A).α) ↔
         Q₀ ((relExp X).Map ((dblInterp L).Map A))) :
     PW ((wideInterp X d).Map A) ↔ Q₀ (X.Map A) := by
-  letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
+  let : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
-  haveI : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
-  haveI : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
-  letI : LinearOrder ((relExp X).Map ((dblInterp L).Map A)) :=
+  have : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
+  have : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
+  let : LinearOrder ((relExp X).Map ((dblInterp L).Map A)) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
-  letI : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
+  let : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
     ExpExpansion.mapStructure (relExp X) ((dblInterp L).Map A)
   refine (PW.iso_invariant (wideInterpEquiv X d A)).trans ?_
   exact hmach.trans (Q₀.iso_invariant (relExpMapEquiv (X := X) (A := A))).symm
@@ -447,11 +447,11 @@ theorem dwideAcceptSpace_wideInterp_iff {Q₀ : DecisionProblem X.E}
     (hd : ∀ (M : Type) [X.E.Structure M] [LinearOrder M] [Finite M] [Nonempty M],
       Q₀ M ↔ d.PFPHolds M) :
     DWideAcceptSpace ((wideInterp X d).Map A) ↔ Q₀ (X.Map A) := by
-  haveI : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
-  haveI : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
-  letI : LinearOrder ((relExp X).Map ((dblInterp L).Map A)) :=
+  have : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
+  have : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
+  let : LinearOrder ((relExp X).Map ((dblInterp L).Map A)) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
-  letI : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
+  let : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
     ExpExpansion.mapStructure (relExp X) ((dblInterp L).Map A)
   refine wideProblem_wideInterp_iff X d A DWideAcceptSpace ?_
   exact (dwideAcceptSpace_srcEnv_iff X d A).trans

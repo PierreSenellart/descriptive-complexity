@@ -226,7 +226,7 @@ private theorem hasGoodSchedule_of_iso (e : A ≃[Language.jobSeq] B)
     rw [JSCompletion, JSCompletion,
       htransport JSTimeVal JSTimeVal htv fun x => JSJob x ∧ sched x a]
     refine finsum_mem_congr (Set.ext fun b => ?_) fun _ _ => rfl
-    simp only [Set.mem_setOf_eq, hσ, hsymm' a]
+    simp only [Set.mem_ofPred_eq, hσ, hsymm' a]
     exact and_congr_left fun _ => hjob' b
   have hlate : ∀ a : A, JSLate σ (e a) ↔ JSLate sched a := by
     intro a
@@ -242,7 +242,7 @@ private theorem hasGoodSchedule_of_iso (e : A ≃[Language.jobSeq] B)
   rw [JSPenalty, JSPenalty,
     htransport JSPenVal JSPenVal hpv fun x => JSJob x ∧ JSLate sched x]
   refine finsum_mem_congr (Set.ext fun b => ?_) fun _ _ => rfl
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   exact and_congr (hjob' b) (hlate' b)
 
 /-- Being a yes-instance of job sequencing is isomorphism-invariant. -/

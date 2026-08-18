@@ -529,7 +529,7 @@ instance's. -/
 theorem isLinOrd_of_tileWF
     (h : letI := tileStr A; IsLinOrd (wideTileData (TilePt A)).Le) :
     IsLinOrd (WMLe (A := A)) := by
-  letI := tileStr A
+  let := tileStr A
   have key : ∀ x y : A, WMLe x y ↔
       (wideTileData (TilePt A)).Le (Sum.inr (tpDig x)) (Sum.inr (tpDig y)) :=
     fun x y => (tpLe_dig x y).symm
@@ -604,7 +604,7 @@ theorem wideRegAccept_of_tileable
     (hwf0 : letI := tileStr A; (wideTileData (TilePt A)).WellFormed)
     (h : letI := tileStr A; (wideTileData (TilePt A)).Tileable) :
     WideWF A ∧ (wideRegData A).Accepts := by
-  letI := tileStr A
+  let := tileStr A
   classical
   obtain ⟨τ, htiles, hfst, hel, her, hhor, hver, x₀, y₀, hx₀, hy₀, hacc⟩ := h
   have hlin : IsLinOrd (WMLe (A := A)) := isLinOrd_of_tileWF hwf0.1
@@ -616,7 +616,7 @@ theorem wideRegAccept_of_tileable
   have hcorner : (wideTileData (TilePt A)).Start
       (τ (Sum.inl (tpCol (fun _ : A => False))) (Sum.inl (tpCol (fun _ : A => False)))) :=
     (hfst _ _ (hposn _) (minPos_tpCol_bot hlin)).1 (minPos_tpCol_bot hlin)
-  haveI : Nonempty (TilePt A) := by
+  have : Nonempty (TilePt A) := by
     rcases hp : τ (Sum.inl (tpCol (fun _ : A => False)))
       (Sum.inl (tpCol (fun _ : A => False))) with u | t
     · rw [hp] at hcorner

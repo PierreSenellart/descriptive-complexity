@@ -571,7 +571,7 @@ theorem realize_atomF (a : SOAtom B k) (v : (Empty ⊕ Fin k) → A) :
     (@Formula.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure _ _ A _ (B.structure ρ)) _ (atomF a) v) ↔
       a.Holds ρ fun j => v (Sum.inr j) := by
-  letI := B.structure ρ
+  let := B.structure ρ
   rw [atomF, Formula.realize_rel]
   exact Iff.rfl
 
@@ -580,7 +580,7 @@ theorem realize_guardOutF (φ : (L.sum Language.order).Formula (Fin k))
     (@Formula.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure _ _ A _ (B.structure ρ)) _ (guardOutF φ) v) ↔
       φ.Realize fun j => v (Sum.inr j) := by
-  letI := B.structure ρ
+  let := B.structure ρ
   rw [guardOutF, Formula.realize_relabel, LHom.realize_onFormula]
   rfl
 
@@ -588,7 +588,7 @@ theorem realize_goalOutF (c : HornClause (L.sum Language.order) B k) :
     (@Sentence.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure _ _ A _ (B.structure ρ)) (goalOutF c)) ↔
       ∀ v : Fin k → A, ¬(c.guard.Realize v ∧ ∀ b ∈ c.body, b.Holds ρ v) := by
-  letI := B.structure ρ
+  let := B.structure ρ
   rw [goalOutF]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
     Formula.realize_inf, realize_guardOutF ρ, realize_listInf]
@@ -603,7 +603,7 @@ theorem realize_hornOutF (prog : HornProgram (L.sum Language.order) B k) :
         (@sumStructure _ _ A _ (B.structure ρ)) (hornOutF prog)) ↔
       ∀ c ∈ prog, c.head = none →
         ∀ v : Fin k → A, ¬(c.guard.Realize v ∧ ∀ b ∈ c.body, b.Holds ρ v) := by
-  letI := B.structure ρ
+  let := B.structure ρ
   rw [hornOutF]
   simp only [Sentence.Realize, realize_listInf]
   constructor
@@ -666,34 +666,34 @@ structure being identified by
 theorem LFPDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : LFPDefinable Q) :
     LFPDefinable P := by
   obtain ⟨d, hd⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨⟨d.B.pull f.Tag f.dim, d.k * f.dim,
     HornProgram.pull f.toInterpretation.ordExtend d.rules,
     (f.toInterpretation.ordExtend.extendSO d.B).pullSentence d.out⟩, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   refine (f.correct A).trans ((hd (f.toInterpretation.Map A)).trans ?_)
   rw [LFPDef.Holds, LFPDef.Holds, lfpAssign_pull f.toInterpretation.ordExtend d.rules]
-  letI := (d.B.pull f.Tag f.dim).structure
+  let := (d.B.pull f.Tag f.dim).structure
     (d.B.pullAssign (lfpAssign (A := f.toInterpretation.ordExtend.Map A) d.rules))
   have e₁ := f.toInterpretation.ordExtend.extendSOEquiv d.B A
     (lfpAssign (A := f.toInterpretation.ordExtend.Map A) d.rules)
   have e₂ := d.B.extendEquiv (f.toInterpretation.ordExtendLEquiv A)
     (lfpAssign (A := f.toInterpretation.ordExtend.Map A) d.rules)
   rw [← lfpAssign_map (f.toInterpretation.ordExtendLEquiv A) d.rules] at e₂
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure
       ((f.toInterpretation.ordExtend.extendSO d.B).Map A) :=
     FOInterpretation.mapStructure (f.toInterpretation.ordExtend.extendSO d.B) A
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure
       (f.toInterpretation.ordExtend.Map A) :=
     @sumStructure (L₂.sum Language.order) d.B.lang (f.toInterpretation.ordExtend.Map A)
       (FOInterpretation.mapStructure f.toInterpretation.ordExtend A)
       (d.B.structure (lfpAssign d.rules))
-  letI : ((L₂.sum Language.order).sum d.B.lang).Structure (f.toInterpretation.Map A) :=
+  let : ((L₂.sum Language.order).sum d.B.lang).Structure (f.toInterpretation.Map A) :=
     @sumStructure (L₂.sum Language.order) d.B.lang (f.toInterpretation.Map A) _
       (d.B.structure (lfpAssign d.rules))
   have hout := StrongHomClass.realize_sentence

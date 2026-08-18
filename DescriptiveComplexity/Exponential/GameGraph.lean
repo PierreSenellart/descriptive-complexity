@@ -146,7 +146,7 @@ private theorem realize_widen (φ : (X.E.sum Language.order).Formula (Fin 1 × F
     letI := X.mapLinearOrder A
     ((widen φ).Realize (M := X.Map A) v ↔
       φ.Realize (M := X.Map A) fun p => v (0, p.2)) := by
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   exact Formula.realize_relabel
 
 private theorem relMap_nodeAt₁ (h : 2 * d ≤ n) (r : Language.andOrGraph.Relations 1)
@@ -155,8 +155,8 @@ private theorem relMap_nodeAt₁ (h : 2 * d ≤ n) (r : Language.andOrGraph.Rela
     letI := I.mapStructure (X.Map A)
     (RelMap r ![nodeAt I h t 0 pts] ↔
       (I.relFormula r ![t]).Realize (M := X.Map A) fun p => pts (paramIx d n h 0 p.2)) := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
   refine Iff.trans (I.relMap_map (X.Map A) r _) ?_
   have htag : (fun i => (![nodeAt I h t 0 pts] i).1) = ![t] := by
     funext i
@@ -177,8 +177,8 @@ private theorem relMap_nodeAt₂ (h : 2 * d ≤ n) (r : Language.andOrGraph.Rela
     (RelMap r ![nodeAt I h tx 0 pts, nodeAt I h ty 1 pts] ↔
       (I.relFormula r ![tx, ty]).Realize (M := X.Map A)
         fun p => pts (paramIx d n h p.1 p.2)) := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
   refine Iff.trans (I.relMap_map (X.Map A) r _) ?_
   have htag : (fun i => (![nodeAt I h tx 0 pts, nodeAt I h ty 1 pts] i).1) = ![tx, ty] := by
     funext i
@@ -196,8 +196,8 @@ theorem realize_subFormula (h : 2 * d ≤ n) (s : Sub) (tx ty : T) (pts : Fin n 
     letI := X.mapLinearOrder A
     ((subFormula I s tx ty).Realize (M := X.Map A)
         (fun p => pts (paramIx d n h p.1 p.2)) ↔ SubHolds I h s tx ty pts) := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
   have hw : ∀ r : Language.andOrGraph.Relations 1,
       ((widen (I.relFormula r ![tx])).Realize (M := X.Map A)
           (fun p => pts (paramIx d n h p.1 p.2)) ↔ RelMap r ![nodeAt I h tx 0 pts]) :=
@@ -249,7 +249,7 @@ theorem exists_graphKernels [Finite T]
           KernelSpec I (n := 2 * d + Dm) (by omega)
             (2 * d + Dm - D s tx ty) (D s tx ty) s tx ty (K s tx ty) := by
   classical
-  letI : Fintype T := Fintype.ofFinite T
+  let : Fintype T := Fintype.ofFinite T
   have hex : ∀ (s : Sub) (tx ty : T), ∃ D : ℕ, ∀ (n c : ℕ) (_hcn : c + D = n) (_h2d : 2 * d ≤ c),
       ∃ K : ((L.sum Language.order).sum (repMerged X.pointBlock n).lang).Sentence,
         ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

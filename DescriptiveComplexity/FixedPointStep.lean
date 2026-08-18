@@ -366,7 +366,7 @@ theorem next_pull (ρ : dd.B.Assignment (I.Map A)) :
     (dd.pull I).next (dd.B.pullAssign ρ) = dd.B.pullAssign (dd.next (A := I.Map A) ρ) := by
   funext p x
   refine propext ?_
-  letI := (dd.B.pull Tag dm).structure₁ (L := L₁) (dd.B.pullAssign ρ)
+  let := (dd.B.pull Tag dm).structure₁ (L := L₁) (dd.B.pullAssign ρ)
   have h1 := realize_guardPull (I.extendSO dd.B) (dd.step p.1) p.2 x
   have h2 := realize_formula_of_equiv (I.extendSOEquiv dd.B A ρ) (dd.step p.1)
     (tagVal (I.extendSO dd.B) p.2 x)

@@ -93,7 +93,7 @@ theorem realize_atTagF (p q : T) (ν : C.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) (SOBlock.tagAssign q ν)) (atTagF L C T p) ↔ p = q) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) (SOBlock.tagAssign q ν)
   refine Iff.trans Formula.realize_inf (and_iff_right ?_)
   exact (SOBlock.realize_tagGuardF (L := L.sum Language.order) _).mpr ⟨q, ν, rfl⟩
@@ -103,9 +103,9 @@ theorem realize_tagTwoF' (p : T) (σ τ : (C.withTag T).Assignment A)
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ τ) (tagTwoF L C T p) ↔ τ (Sum.inl p) x) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
-  haveI : IsEmpty (Fin ((C.withTag T).arity (Sum.inl p))) := inferInstanceAs (IsEmpty (Fin 0))
+  have : IsEmpty (Fin ((C.withTag T).arity (Sum.inl p))) := inferInstanceAs (IsEmpty (Fin 0))
   exact iff_of_eq (congrArg (τ (Sum.inl p)) (funext fun i => isEmptyElim i))
 
 theorem realize_tagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.Assignment A) :
@@ -120,7 +120,7 @@ theorem realize_atTagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.As
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ (SOBlock.tagAssign q ν))
       (atTagTwoF L C T p) ↔ p = q) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ (SOBlock.tagAssign q ν)
   refine Iff.trans Formula.realize_inf ?_
   constructor
@@ -144,7 +144,7 @@ theorem exists_tagAssign_two (p : T) (σ τ : (C.withTag T).Assignment A)
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ τ) (atTagTwoF L C T p)) :
     τ = SOBlock.tagAssign p (SOBlock.dropTag τ) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
   obtain ⟨hset, hrest⟩ := Formula.realize_inf.mp h
   rw [realize_listInf] at hrest

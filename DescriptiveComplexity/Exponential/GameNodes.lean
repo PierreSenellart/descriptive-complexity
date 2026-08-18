@@ -286,8 +286,8 @@ include hK in
 theorem target_of_wins :
     ∀ τ, (graphGame X hn D hD K).Wins τ →
       ∀ (p : Ph T Dm) (pts : Fin n → X.Map A), τ = nodeState p pts → Target I hdn p pts := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
   intro τ h
   induction h with
   | @won a hw =>
@@ -402,8 +402,8 @@ theorem wins_of_winsOn :
     ∀ x : I.Map (X.Map A), WinsOn (I.Map (X.Map A)) x →
       ∀ (tx : T) (pts : Fin n → X.Map A), x = nodeAt I hdn tx 0 pts →
         (graphGame X hn D hD K).Wins (nodeState (.main tx) pts) := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
   intro x h
   induction h with
   | @won a hw =>

@@ -232,7 +232,7 @@ theorem realize_ordExtend_iff {β : Type} (φ : (L'.sum Language.order).Formula 
         (FOInterpretation.mapStructure I.ordExtend A) β φ v ↔
       @Formula.Realize (L'.sum Language.order) (I.Map A)
         (letI := I.mapLinearOrder A; sumOrderStructure L' (I.Map A)) β φ v := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   exact (StrongHomClass.realize_formula (M := I.ordExtend.Map A)
     (I.ordExtendLEquiv A) (φ := φ) (v := v)).symm
 
@@ -242,7 +242,7 @@ theorem TCSpec.comap_step_iff (a b : (spec.comap I).Node A) :
     letI := I.mapLinearOrder A
     (spec.comap I).Step a b ↔
       spec.Step (comapNodeEquiv spec I a) (comapNodeEquiv spec I b) := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   have h1 := (Formula.realize_relabel
       (φ := I.ordExtend.pullF (spec.step a.1.1 b.1.1) (Sum.elim a.1.2 b.1.2))
       (g := comapStepIx spec.k d) (v := Sum.elim a.2 b.2)).trans
@@ -263,7 +263,7 @@ theorem TCSpec.comap_step_iff (a b : (spec.comap I).Node A) :
 theorem TCSpec.comap_isSrc_iff (a : (spec.comap I).Node A) :
     letI := I.mapLinearOrder A
     (spec.comap I).IsSrc a ↔ spec.IsSrc (comapNodeEquiv spec I a) := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   have h1 := (Formula.realize_relabel
       (φ := I.ordExtend.pullF (spec.src a.1.1) a.1.2)
       (g := comapEndIx spec.k d) (v := a.2)).trans
@@ -274,7 +274,7 @@ theorem TCSpec.comap_isSrc_iff (a : (spec.comap I).Node A) :
 theorem TCSpec.comap_isTgt_iff (a : (spec.comap I).Node A) :
     letI := I.mapLinearOrder A
     (spec.comap I).IsTgt a ↔ spec.IsTgt (comapNodeEquiv spec I a) := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   have h1 := (Formula.realize_relabel
       (φ := I.ordExtend.pullF (spec.tgt a.1.1) a.1.2)
       (g := comapEndIx spec.k d) (v := a.2)).trans
@@ -286,7 +286,7 @@ specification accepts the interpreted one. -/
 theorem TCSpec.comap_accepts_iff :
     letI := I.mapLinearOrder A
     (spec.comap I).Accepts A ↔ spec.Accepts (I.Map A) := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   exact TCSpec.accepts_congr (comapNodeEquiv spec I) (spec.comap_step_iff I)
     (spec.comap_isSrc_iff I) (spec.comap_isTgt_iff I)
 
@@ -295,7 +295,7 @@ node bijection: determinism is a property of the walk. -/
 theorem TCSpec.comap_det_accepts_iff :
     letI := I.mapLinearOrder A
     (spec.comap I).det.Accepts A ↔ spec.det.Accepts (I.Map A) := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   exact TCSpec.accepts_congr (comapNodeEquiv spec I)
     (TCSpec.det_step_congr (comapNodeEquiv spec I) (spec.comap_step_iff I))
     (spec.comap_isSrc_iff I) (spec.comap_isTgt_iff I)
@@ -315,14 +315,14 @@ structure, its tags carried in the mode and its coordinates flattened. -/
 theorem TCDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : TCDefinable Q) :
     TCDefinable P := by
   obtain ⟨spec, hspec⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨spec.comap f.toInterpretation, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   exact (f.correct A).trans ((hspec (f.toInterpretation.Map A)).trans
     (spec.comap_accepts_iff f.toInterpretation).symm)
 
@@ -336,14 +336,14 @@ determinized walk. -/
 theorem DTCDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : DTCDefinable Q) :
     DTCDefinable P := by
   obtain ⟨spec, hspec⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨spec.comap f.toInterpretation, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   exact (f.correct A).trans ((hspec (f.toInterpretation.Map A)).trans
     (spec.comap_det_accepts_iff f.toInterpretation).symm)
 

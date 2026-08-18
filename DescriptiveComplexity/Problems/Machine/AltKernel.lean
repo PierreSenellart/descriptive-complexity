@@ -305,17 +305,17 @@ def akStructure : (akLang k).Structure A :=
 
 theorem relMap_akSt (i : Fin k) (v : Fin 2 → A) :
     @RelMap (akLang k) A (akStructure ρs) 2 (akSt i) v ↔ ρs i .state v := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact relMap_repSym tmGuessBlock TMIdx.state rfl k ρs i v
 
 theorem relMap_akHd (i : Fin k) (v : Fin 2 → A) :
     @RelMap (akLang k) A (akStructure ρs) 2 (akHd i) v ↔ ρs i .head v := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact relMap_repSym tmGuessBlock TMIdx.head rfl k ρs i v
 
 theorem relMap_akTp (i : Fin k) (v : Fin 3 → A) :
     @RelMap (akLang k) A (akStructure ρs) 3 (akTp i) v ↔ ρs i .tape v := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact relMap_repSym tmGuessBlock TMIdx.tape rfl k ρs i v
 
 variable {α : Type} (v : α → A)
@@ -344,94 +344,94 @@ variable {α : Type} (v : α → A)
 @[simp] theorem realize_akPosnF (x : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akPosnF x) v)
         ↔ (atmData k A).Posn (v x) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akPosnF, Formula.realize_rel₁, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akTrF (x : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akTrF x) v) ↔ (atmData k A).Tr (v x) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akTrF, Formula.realize_rel₁, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akStartF (x : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akStartF x) v)
       ↔ (atmData k A).Start (v x) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akStartF, Formula.realize_rel₁, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akAccF (x : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akAccF x) v) ↔ (atmData k A).Acc (v x) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akAccF, Formula.realize_rel₁, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akBlankF (x : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akBlankF x) v)
       ↔ (atmData k A).Blank (v x) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akBlankF, Formula.realize_rel₁, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akRightF (x : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akRightF x) v)
       ↔ (atmData k A).Right (v x) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akRightF, Formula.realize_rel₁, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akBlkF (j : Fin k) (x : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akBlkF j x) v)
       ↔ (atmData k A).Blk j (v x) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akBlkF, Formula.realize_rel₁, Term.realize_var]
   exact (atmBlk_iff j.isLt (v x)).symm
 
 @[simp] theorem realize_akLeF (x y : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akLeF x y) v)
       ↔ (atmData k A).Le (v x) (v y) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akLeF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akEqF (x y : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akEqF x y) v) ↔ v x = v y := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp [akEqF]
 
 @[simp] theorem realize_akSrcF (x y : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akSrcF x y) v)
       ↔ (atmData k A).Src (v x) (v y) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akSrcF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akReadF (x y : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akReadF x y) v)
       ↔ (atmData k A).Read (v x) (v y) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akReadF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akDstF (x y : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akDstF x y) v)
       ↔ (atmData k A).Dst (v x) (v y) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akDstF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akWriteF (x y : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akWriteF x y) v)
       ↔ (atmData k A).Write (v x) (v y) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akWriteF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
 @[simp] theorem realize_akInpF (x y : α) :
     (@Formula.Realize (akLang k) A (akStructure ρs) _ (akInpF x y) v)
       ↔ (atmData k A).Inp (v x) (v y) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   simp only [akInpF, Formula.realize_rel₂, Term.realize_var]
   exact Iff.rfl
 
@@ -770,7 +770,7 @@ private theorem realize_inf_sentence (φ ψ : (akLang k).Sentence) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (φ ⊓ ψ)) ↔
       (@Sentence.Realize (akLang k) A (akStructure ρs) φ) ∧
         (@Sentence.Realize (akLang k) A (akStructure ρs) ψ) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact Formula.realize_inf
 
 theorem realize_akStateExClause (i : Fin k) :
@@ -997,7 +997,7 @@ theorem realize_polForm (pol : Bool) (φ ψ : (akLang k).Sentence) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (polForm pol φ ψ)) ↔
       polConn pol (@Sentence.Realize (akLang k) A (akStructure ρs) φ)
         (@Sentence.Realize (akLang k) A (akStructure ρs) ψ) := by
-  letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+  let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   cases pol
   · exact Formula.realize_imp
   · exact Formula.realize_inf
@@ -1027,7 +1027,7 @@ theorem realize_akLadderF (start : Bool) :
     intro i h prev _ νs _
     cases prev with
     | none =>
-      letI := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
+      let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
       exact Formula.realize_bot
     | some j => exact realize_akAccClause ρs j
   | succ m ih =>

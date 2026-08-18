@@ -421,7 +421,7 @@ theorem ixGatedAt_iff_isEnc (RF : RegFile (Univ A R P dt.KIx dt.dd))
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)) := by
   classical
-  haveI := Fintype.ofFinite A
+  have := Fintype.ofFinite A
   have hcellinj : Function.Injective F.cell := F.toIxFile.injective hix
   have hpass : ∀ (u : I),
       PR.passTracksAt F.cell Slot.mir

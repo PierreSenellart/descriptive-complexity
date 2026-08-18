@@ -202,7 +202,7 @@ under the tour successor is the whole universe. (`tourSucc` is conjugate to the
 `N`-cycle `finRotate N`, so it has no proper invariant subset.) -/
 theorem tourSucc_closed_univ (f : Fin N ≃ H) {P : H → Prop} {x : H} (hx : P x)
     (hclosed : ∀ y, P y → P (tourSucc f y)) : ∀ z, P z := by
-  haveI : NeZero N := ⟨by rintro rfl; exact (f.symm x).elim0⟩
+  have : NeZero N := ⟨by rintro rfl; exact (f.symm x).elim0⟩
   have hP' : ∀ i, P (f i) → P (f (i + 1)) := by
     intro i hi
     have h := hclosed _ hi
@@ -345,7 +345,7 @@ length `≥ 3` – enough to run `tour_forced`. -/
 theorem three_le_of_edge {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) {a b : A} (h : HEdge a b) :
     3 ≤ N := by
   classical
-  haveI : Fintype (hamInterp.MapRel A) := Fintype.ofEquiv _ f
+  have : Fintype (hamInterp.MapRel A) := Fintype.ofEquiv _ f
   have hcard : Fintype.card (hamInterp.MapRel A) = N := by
     rw [← Fintype.card_fin N]; exact (Fintype.card_congr f).symm
   have h2 : 2 < (Finset.univ : Finset (hamInterp.MapRel A)).card :=

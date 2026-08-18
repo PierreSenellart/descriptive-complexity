@@ -53,8 +53,8 @@ structures. -/
 theorem homLHom_isExpansionOn (σ : B'.Assignment A) :
     @LHom.IsExpansionOn _ _ (homLHom f hf (B := B)) A
       (B.structure (B.homAssign f hf σ)) (B'.structure σ) := by
-  letI := B.structure (B.homAssign f hf σ)
-  letI := B'.structure σ
+  let := B.structure (B.homAssign f hf σ)
+  let := B'.structure σ
   refine ⟨fun {n} g => isEmptyElim g, fun {n} r x => ?_⟩
   rfl
 
@@ -66,9 +66,9 @@ theorem realize_homFormula {α : Type} (σ : B'.Assignment A)
     (@Formula.Realize _ A (B'.structure₁ (L := L) σ) _
       ((LHom.sumMap (LHom.id L) (homLHom f hf (B := B))).onFormula φ) v) ↔
       @Formula.Realize _ A (B.structure₁ (L := L) (B.homAssign f hf σ)) _ φ v := by
-  letI := B.structure (B.homAssign f hf σ)
-  letI := B'.structure σ
-  haveI := homLHom_isExpansionOn f hf (A := A) σ
+  let := B.structure (B.homAssign f hf σ)
+  let := B'.structure σ
+  have := homLHom_isExpansionOn f hf (A := A) σ
   exact LHom.realize_onFormula
     (φ := LHom.sumMap (LHom.id L) (homLHom f hf (B := B))) φ
 
@@ -79,9 +79,9 @@ theorem realize_homSentence (σ : B'.Assignment A) (φ : (L.sum B.lang).Sentence
     (@Sentence.Realize _ A (B'.structure₁ (L := L) σ)
       ((LHom.sumMap (LHom.id L) (homLHom f hf (B := B))).onSentence φ)) ↔
       @Sentence.Realize _ A (B.structure₁ (L := L) (B.homAssign f hf σ)) φ := by
-  letI := B.structure (B.homAssign f hf σ)
-  letI := B'.structure σ
-  haveI := homLHom_isExpansionOn f hf (A := A) σ
+  let := B.structure (B.homAssign f hf σ)
+  let := B'.structure σ
+  have := homLHom_isExpansionOn f hf (A := A) σ
   exact LHom.realize_onSentence (M := A)
     (φ := LHom.sumMap (LHom.id L) (homLHom f hf (B := B))) (ψ := φ)
 

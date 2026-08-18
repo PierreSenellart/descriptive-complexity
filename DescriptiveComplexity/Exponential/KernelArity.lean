@@ -84,8 +84,8 @@ theorem realize_arityLift (ρ : B.withParam.Assignment N) (v : α → N) :
       letI := @sumStructure Lb B.withParam.lang N instN (B.withParam.structure ρ)
       letI := @sumStructure Lb B.lang N instN (B.structure (B.atParam ρ (v p)))
       ((arityLift B p φ).Realize v xs ↔ φ.Realize v xs) := by
-  letI := @sumStructure Lb B.withParam.lang N instN (B.withParam.structure ρ)
-  letI := @sumStructure Lb B.lang N instN (B.structure (B.atParam ρ (v p)))
+  let := @sumStructure Lb B.withParam.lang N instN (B.withParam.structure ρ)
+  let := @sumStructure Lb B.lang N instN (B.structure (B.atParam ρ (v p)))
   intro n φ
   induction φ with
   | falsum => exact fun _ => Iff.rfl
@@ -182,11 +182,11 @@ theorem NexKernel.withArg_holds (K : NexKernel L) {M : Type}
         (arityLift K.B (Sum.inr 0) (K.ker.relabel Sum.inl)))) ↔ _
   constructor
   · rintro ⟨ρ, hρ⟩
-    letI := @sumStructure (K.X.E.sum Language.order) K.B.withParam.lang M
+    let := @sumStructure (K.X.E.sum Language.order) K.B.withParam.lang M
       (sumOrderStructure K.X.E M) (K.B.withParam.structure ρ)
     obtain ⟨w, hw⟩ := Formula.realize_iExs.mp hρ
     refine ⟨K.B.atParam ρ (w 0), ?_⟩
-    letI := @sumStructure (K.X.E.sum Language.order) K.B.lang M
+    let := @sumStructure (K.X.E.sum Language.order) K.B.lang M
       (sumOrderStructure K.X.E M) (K.B.structure (K.B.atParam ρ (w 0)))
     have h := (realize_arityLift (B := K.B) (p := (Sum.inr 0 : Empty ⊕ Fin 1))
       (Lb := K.X.E.sum Language.order) ρ (Sum.elim default w)
@@ -194,9 +194,9 @@ theorem NexKernel.withArg_holds (K : NexKernel L) {M : Type}
     have h2 := Formula.realize_relabel.mp h
     exact h2
   · rintro ⟨ρ, hρ⟩
-    letI := @sumStructure (K.X.E.sum Language.order) K.B.withParam.lang M
+    let := @sumStructure (K.X.E.sum Language.order) K.B.withParam.lang M
       (sumOrderStructure K.X.E M) (K.B.withParam.structure (K.B.ofParam ρ))
-    letI := @sumStructure (K.X.E.sum Language.order) K.B.lang M
+    let := @sumStructure (K.X.E.sum Language.order) K.B.lang M
       (sumOrderStructure K.X.E M) (K.B.structure ρ)
     refine ⟨K.B.ofParam ρ, ?_⟩
     refine Formula.realize_iExs.mpr ⟨fun _ => Classical.arbitrary M, ?_⟩

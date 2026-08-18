@@ -206,7 +206,7 @@ private theorem sorealize_soLift_inf :
         @Sentence.Realize (L.sum B.lang) A (@sumStructure L B.lang A inst (B.structure ρ))
             (LHom.sumInl.onSentence ψ) ↔
           @Sentence.Realize L A inst ψ := fun ρ => by
-      letI := B.structure ρ
+      let := B.structure ρ
       exact LHom.sumInl.realize_onSentence (M := A) ψ
     cases pol with
     | true =>
@@ -327,7 +327,7 @@ theorem Decoding.exists_conc_iff [L.IsRelational] {ι : Type*} {W : DecisionProb
     {Conc : ι → Prop} {P : DecisionProblem L} (d : Decoding L W Conc P)
     (A : Type) [L.Structure A] [Finite A] [Nonempty A] (hW : W A) :
     ∃ i, Conc i ↔ P A := by
-  haveI : Fintype A := Fintype.ofFinite A
+  have : Fintype A := Fintype.ofFinite A
   have g := FinPresentation.equivOfStructure (L := L) A
   have hW' : W (Fin (FinPresentation.ofStructure (L := L) A).card) :=
     (W.iso_invariant g).mp hW

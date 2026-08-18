@@ -261,7 +261,7 @@ a `0-1` solution. -/
 theorem hasSubsetSum_iff_hasZeroOneSolution :
     HasSubsetSum A ↔ HasZeroOneSolution (ipInterp.Map A) := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  haveI : Finite (ipInterp.Map A) := ipInterp.map_finite A
+  have : Finite (ipInterp.Map A) := ipInterp.map_finite A
   constructor
   · rintro ⟨-, hlin, S, hSi, hsum⟩
     refine ⟨inferInstance, isLinOrd_ipLe hlin, fun q => S (q.2 0), fun q hq => ?_, ?_⟩

@@ -155,7 +155,7 @@ theorem gateBlockRule_dstPh (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
     (dt.gateBlockRule (one := one) (emb := emb) (args := args) (wellG := wellG)
       (setFail := setFail) (failPh := failPh) (exitPh := exitPh) i ρ).dstPh =
       exitPh := by
-  letI := Fintype.ofFinite dt.X.Tag
+  let := Fintype.ofFinite dt.X.Tag
   have hdom : ∃ p : dt.GateBlockPh, dt.gateDomEntry emb = emb p := by
     change ∃ p : dt.GateBlockPh, tagFirstRd (fun p => emb (Sum.inr p)) = emb p
     by_cases h : 0 < Fintype.card dt.X.Tag
@@ -207,7 +207,7 @@ theorem gateBlockHosrc :
   | Sum.inl _, Sum.inl σ => cases σ <;> exact ⟨_, rfl, rfl⟩
   | Sum.inl _, Sum.inr b => cases b <;> exact ⟨_, rfl, rfl⟩
   | Sum.inr s, ρ =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     obtain ⟨p, hp, ho⟩ :=
       tagHosrc one Slot.wk Slot.reg args.rdTrackT args.MatchT args.setTagFlag
         args.TagsAre args.rdTrackE args.MatchE args.setFlagE args.initEl
@@ -257,7 +257,7 @@ theorem gateBlockSep (hemb : Function.Injective emb) :
       cases b <;> cases b' <;> simp_all
     rw [hbb]
   | Sum.inr s, ρ, ρ' =>
-    letI := Fintype.ofFinite dt.X.Tag
+    let := Fintype.ofFinite dt.X.Tag
     exact tagSep one Slot.wk Slot.reg args.rdTrackT args.MatchT
       args.setTagFlag args.TagsAre args.rdTrackE args.MatchE args.setFlagE
       args.initEl args.advEl args.exitSt args.IsMaxEl exitPh

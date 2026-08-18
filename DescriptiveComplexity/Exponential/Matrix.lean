@@ -112,8 +112,8 @@ theorem realize_translQF (pts : Fin m → X.Map A)
     letI := X.mapLinearOrder A
     (@Sentence.Realize _ A (prefixStructure pts) (translQF X m finZeroElim φ) ↔
       φ.Realize (M := X.Map A) pts) := by
-  letI := X.mapLinearOrder A
-  letI := prefixStructure pts
+  let := X.mapLinearOrder A
+  let := prefixStructure pts
   induction hqf with
   | falsum => exact Iff.rfl
   | of_isAtomic hat =>

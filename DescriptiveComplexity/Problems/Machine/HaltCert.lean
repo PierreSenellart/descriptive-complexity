@@ -464,11 +464,11 @@ theorem acceptsU_iff_runCert (hb : ∃ b, M.Blank b) :
     exact ⟨Fin (n + 1), Fin (2 * n + 1), inferInstance, inferInstance, inferInstance,
       inferInstance, inferInstance, zero, r, hr⟩
   · rintro ⟨T, P, iT, fT, nT, iP, fP, zero, r, hr⟩
-    letI := iT
-    letI := fT
-    letI := nT
-    letI := iP
-    letI := fP
+    let := iT
+    let := fT
+    let := nT
+    let := iP
+    let := fP
     exact acceptsU_of_runCert hb hr
 
 end Bridge

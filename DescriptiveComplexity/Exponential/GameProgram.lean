@@ -139,11 +139,11 @@ theorem realize_question (q : GameQuestion) (ρ σ : spec.State A) :
   | won => exact realize_sumInl_two ρ σ spec.won
   | univ => exact realize_sumInl_two ρ σ spec.univ
   | notUniv =>
-    letI := spec.B.structure₂ (L := L.sum Language.order) ρ σ
+    let := spec.B.structure₂ (L := L.sum Language.order) ρ σ
     exact realize_not.trans (not_congr (realize_sumInl_two ρ σ spec.univ))
   | move => exact Iff.rfl
   | notMove =>
-    letI := spec.B.structure₂ (L := L.sum Language.order) ρ σ
+    let := spec.B.structure₂ (L := L.sum Language.order) ρ σ
     exact realize_not
   | start => exact realize_sumInl_two ρ σ spec.start
 

@@ -921,8 +921,8 @@ the gadget graph has a Hamilton circuit – the cycle of selectors and chains. -
 theorem blockCycle_tourOn [Finite A] (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
     (hcover : ∀ a b : A, HEdge a b → C a ∨ C b) (hmarks : ∃ m : A, MGMarked m) :
     TourOn (DGEdge (A := hamInterp.MapRel A)) := by
-  haveI := Fintype.ofFinite A
-  haveI : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
+  have := Fintype.ofFinite A
+  have : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
   exact tourOn_of_blocks (blockList C) blockList_ne_nil_mem
     (blockList_flatten_ne_nil hcard hmarks) blockList_flatten_nodup
     (blockList_covers hcard hcover hmarks) (fun _ hl => blockList_isChain_mem hl)
@@ -934,8 +934,8 @@ the interpreted graph is the single self-looped hub, a one-element Hamilton
 circuit. -/
 theorem degenerate_tourOn [Finite A] [Nonempty A] (hnm : ∀ y : A, ¬MGMarked y)
     (hne : ∀ y z : A, ¬HEdge y z) : TourOn (DGEdge (A := hamInterp.MapRel A)) := by
-  haveI := Fintype.ofFinite A
-  haveI : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
+  have := Fintype.ofFinite A
+  have : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
   obtain ⟨m, hmin⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   refine tourOn_of_cycleList [hubPt hmin hnm hne] (by simp) (by simp) ?_
     (List.isChain_singleton _) ((dgEdge_iff _ _).mpr trivial)

@@ -152,7 +152,7 @@ omit [LinearOrder K] [LinearOrder A] in
 /-- **How many registers the file has**: one per block, one more for the
 blockless ones, times the tuples. -/
 theorem card_blkIx : Nat.card (BlkIx K A dd) = (Nat.card K + 1) * Nat.card (Fin dd → A) := by
-  letI := Fintype.ofFinite K
+  let := Fintype.ofFinite K
   rw [Nat.card_prod, Nat.card_eq_fintype_card (α := Option K), Nat.card_eq_fintype_card (α := K),
     Fintype.card_option]
 

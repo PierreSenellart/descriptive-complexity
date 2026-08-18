@@ -78,7 +78,7 @@ theorem realize_pointGuardF (σ : (X.B.withTag X.Tag).Assignment A) :
         ((X.B.withTag X.Tag).structure₁ (L := L.sum Language.order) σ) X.pointGuardF ↔
       ∃ (t : X.Tag) (ρ : X.B.Assignment A),
         σ = SOBlock.tagAssign t ρ ∧ DomHolds (X := X) (t, ρ)) := by
-  letI := (X.B.withTag X.Tag).structure₁ (L := L.sum Language.order) σ
+  let := (X.B.withTag X.Tag).structure₁ (L := L.sum Language.order) σ
   rw [pointGuardF, Sentence.Realize, Formula.realize_inf, realize_listInf]
   constructor
   · rintro ⟨hguard, hdom⟩

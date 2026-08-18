@@ -156,7 +156,7 @@ theorem realize_oldAtomM {α : Type} (x : α) (v : α → A ⊕ Fin m) :
 theorem realize_meanAtom {α : Type} (x : α) (w : Fin a → α) (v : α → A ⊕ Fin m) :
     letI := meanStruc (L := L) ρ
     (meanAtom L a x w).Realize v ↔ meaningOf ρ (v x) fun i => v (w i) := by
-  letI := meanStruc (L := L) ρ
+  let := meanStruc (L := L) ρ
   refine iff_of_eq (congrArg (ρ ()) (funext fun j => ?_))
   induction j using Fin.cases <;> rfl
 
@@ -165,7 +165,7 @@ theorem realize_meanShaped :
     ((A ⊕ Fin m) ⊨ meanShaped L a) ↔
       ∀ (v : A ⊕ Fin m) (w : Fin a → A ⊕ Fin m),
         meaningOf ρ v w → ¬IsOld v ∧ ∀ i, IsOld (w i) := by
-  letI := meanStruc (L := L) ρ
+  let := meanStruc (L := L) ρ
   rw [meanShaped, Sentence.Realize, Formula.realize_iAlls]
   constructor
   · intro h v w hM
@@ -188,7 +188,7 @@ theorem realize_meanEmpty :
     letI := meanStruc (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanEmpty L a) ↔
       ∃ v : A ⊕ Fin m, ¬IsOld v ∧ ∀ w : Fin a → A ⊕ Fin m, ¬meaningOf ρ v w := by
-  letI := meanStruc (L := L) ρ
+  let := meanStruc (L := L) ρ
   rw [meanEmpty, Sentence.Realize, Formula.realize_iExs]
   constructor
   · rintro ⟨u, hu⟩
@@ -209,7 +209,7 @@ theorem realize_meanInj :
     ((A ⊕ Fin m) ⊨ meanInj L a) ↔
       ∀ v u : A ⊕ Fin m, ¬IsOld v → ¬IsOld u →
         (∀ w : Fin a → A ⊕ Fin m, meaningOf ρ v w ↔ meaningOf ρ u w) → v = u := by
-  letI := meanStruc (L := L) ρ
+  let := meanStruc (L := L) ρ
   rw [meanInj, Sentence.Realize, Formula.realize_iAlls]
   simp only [Formula.realize_imp, Formula.realize_inf, Formula.realize_not,
     Formula.realize_iAlls, Formula.realize_iff, Formula.realize_equal,
@@ -227,7 +227,7 @@ theorem realize_meanFlip :
         ∃ u : A ⊕ Fin m, ¬IsOld u ∧
           ∀ w : Fin a → A ⊕ Fin m,
             meaningOf ρ u w ↔ (meaningOf ρ v w ↔ ¬∀ i, w i = y i) := by
-  letI := meanStruc (L := L) ρ
+  let := meanStruc (L := L) ρ
   rw [meanFlip, Sentence.Realize, Formula.realize_iAlls]
   simp only [Formula.realize_imp, Formula.realize_inf, Formula.realize_not,
     Formula.realize_iAlls, Formula.realize_iExs, Formula.realize_iff, Formula.realize_iInf,
@@ -306,7 +306,7 @@ every `a`-ary relation of the instance, each exactly once. -/
 theorem bijective_meanAt_of_guard [Finite A] :
     letI := meanStruc (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanGuard L a) → Function.Bijective (meanAt ρ) := by
-  letI := meanStruc (L := L) ρ
+  let := meanStruc (L := L) ρ
   intro h
   obtain ⟨⟨⟨hshaped, hempty⟩, hinj⟩, hflip⟩ :=
     (Sentence.realize_inf (A ⊕ Fin m)).mp h |>.imp

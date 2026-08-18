@@ -95,9 +95,9 @@ theorem consOneLHom_isExpansionOn (ρ₀ : B.Assignment A) (ρ₁ : M.Assignment
         (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁)
       (@SOBlock.structure₁ (L.sum Language.order) (SOBlock.cons B M) A
         (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁)) := by
-  letI := @SOBlock.structure₁ ((L.sum B.lang).sum Language.order) M A
+  let := @SOBlock.structure₁ ((L.sum B.lang).sum Language.order) M A
     (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁
-  letI := @SOBlock.structure₁ (L.sum Language.order) (SOBlock.cons B M) A
+  let := @SOBlock.structure₁ (L.sum Language.order) (SOBlock.cons B M) A
     (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁)
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
@@ -117,9 +117,9 @@ theorem consTwoLHom_isExpansionOn (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : 
         (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁ σ₁)
       (@SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
         (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁)) := by
-  letI := @SOBlock.structure₂ ((L.sum B.lang).sum Language.order) M A
+  let := @SOBlock.structure₂ ((L.sum B.lang).sum Language.order) M A
     (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁ σ₁
-  letI := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
     (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁)
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
@@ -183,7 +183,7 @@ theorem realize_fixedAtS (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignm
           (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁))
         (fixedAtS L B M i) ↔
       ∀ x : Fin (B.arity i) → A, ρ₀ i x ↔ σ₀ i x := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
     (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁)
   rw [fixedAtS, Sentence.Realize, Formula.realize_iAlls]
   refine forall_congr' fun x => ?_
@@ -197,9 +197,9 @@ theorem realize_fixedS (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignmen
           (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁))
         (fixedS L B M) ↔ ρ₀ = σ₀ := by
   classical
-  letI := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
     (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁)
-  letI := Fintype.ofFinite B.ι
+  let := Fintype.ofFinite B.ι
   rw [fixedS, Sentence.Realize, realize_listInf]
   constructor
   · intro h
@@ -233,36 +233,36 @@ variable {B spec} {A : Type} [instL : L.Structure A] [LinearOrder A]
 theorem exBlock_isSrc_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A) :
     (spec.exBlock B).IsSrc (consAssign ρ₀ ρ₁) ↔
       @SOTCSpec.IsSrc (L.sum B.lang) spec A (B.structure₁ ρ₀) _ ρ₁ := by
-  letI := B.structure₁ (L := L) ρ₀
-  letI := @SOBlock.structure₁ ((L.sum B.lang).sum Language.order) spec.B A
+  let := B.structure₁ (L := L) ρ₀
+  let := @SOBlock.structure₁ ((L.sum B.lang).sum Language.order) spec.B A
     (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁
-  letI := @SOBlock.structure₁ (L.sum Language.order) (SOBlock.cons B spec.B) A
+  let := @SOBlock.structure₁ (L.sum Language.order) (SOBlock.cons B spec.B) A
     (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁)
-  haveI := consOneLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ ρ₁
+  have := consOneLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ ρ₁
   exact LHom.realize_onSentence (M := A) (consOneLHom L B spec.B) spec.src
 
 theorem exBlock_isTgt_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A) :
     (spec.exBlock B).IsTgt (consAssign ρ₀ ρ₁) ↔
       @SOTCSpec.IsTgt (L.sum B.lang) spec A (B.structure₁ ρ₀) _ ρ₁ := by
-  letI := B.structure₁ (L := L) ρ₀
-  letI := @SOBlock.structure₁ ((L.sum B.lang).sum Language.order) spec.B A
+  let := B.structure₁ (L := L) ρ₀
+  let := @SOBlock.structure₁ ((L.sum B.lang).sum Language.order) spec.B A
     (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁
-  letI := @SOBlock.structure₁ (L.sum Language.order) (SOBlock.cons B spec.B) A
+  let := @SOBlock.structure₁ (L.sum Language.order) (SOBlock.cons B spec.B) A
     (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁)
-  haveI := consOneLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ ρ₁
+  have := consOneLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ ρ₁
   exact LHom.realize_onSentence (M := A) (consOneLHom L B spec.B) spec.tgt
 
 theorem exBlock_step_iff (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : spec.B.Assignment A) :
     (spec.exBlock B).Step (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁) ↔
       (ρ₀ = σ₀ ∧ @SOTCSpec.Step (L.sum B.lang) spec A (B.structure₁ ρ₀) _ ρ₁ σ₁) := by
-  letI := B.structure₁ (L := L) ρ₀
-  letI := @SOBlock.structure₂ ((L.sum B.lang).sum Language.order) spec.B A
+  let := B.structure₁ (L := L) ρ₀
+  let := @SOBlock.structure₂ ((L.sum B.lang).sum Language.order) spec.B A
     (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁ σ₁
-  letI inst₂ := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B spec.B) A
+  let inst₂ := @SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B spec.B) A
     (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁)
-  letI : (((L.sum Language.order).sum (SOTCSpec.exBlock B spec).B.lang).sum
+  let : (((L.sum Language.order).sum (SOTCSpec.exBlock B spec).B.lang).sum
       (SOTCSpec.exBlock B spec).B.lang).Structure A := inst₂
-  haveI := consTwoLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ σ₀ ρ₁ σ₁
+  have := consTwoLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ σ₀ ρ₁ σ₁
   refine Iff.trans (b := _ ∧ _) Formula.realize_inf (and_congr (realize_fixedS ρ₀ σ₀ ρ₁ σ₁) ?_)
   exact LHom.realize_onSentence (M := A) (consTwoLHom L B spec.B) spec.step
 
@@ -358,10 +358,10 @@ theorem sotcDefinable_soProblem_nil (L : Language.{0, 0}) [L.IsRelational]
   constructor
   · intro h
     refine ⟨nilAssign A, ?_⟩
-    letI := SOBlock.trivial.structure (nilAssign A)
+    let := SOBlock.trivial.structure (nilAssign A)
     exact ((LHom.sumInl : L →ᴸ L.sum SOBlock.trivial.lang).realize_onSentence A φ).mpr h
   · rintro ⟨ρ, hρ⟩
-    letI := SOBlock.trivial.structure ρ
+    let := SOBlock.trivial.structure ρ
     exact ((LHom.sumInl : L →ᴸ L.sum SOBlock.trivial.lang).realize_onSentence A φ).mp hρ
 
 /-- **Every second-order sentence defines an SO(TC) condition**: peel the prefix

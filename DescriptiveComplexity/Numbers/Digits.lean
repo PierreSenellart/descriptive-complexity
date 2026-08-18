@@ -70,7 +70,7 @@ theorem digitNum_peel_min {Le : A → A → Prop} {Blk : A → Prop} {B : ℕ} {
   have hrank₀ : bitRank Le Blk e₀ = 0 := by
     have hset : {q : A | Blk q ∧ Le q e₀ ∧ q ≠ e₀} = (∅ : Set A) := by
       ext q
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       rintro ⟨hq, hle, hne⟩
       exact hne (hlin.2.2.1 q e₀ hle (hmin q hq))
     rw [bitRank, hset, Set.ncard_empty]
@@ -160,9 +160,9 @@ theorem finsum_coeff_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} 
   rw [h1, digitNum, finsum_mem_eq_finite_toFinset_sum _ (Set.toFinite _),
     finsum_mem_eq_finite_toFinset_sum _ (Set.toFinite _)]
   refine Finset.sum_subset (fun e he => ?_) (fun e he he' => ?_)
-  · simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at he ⊢
+  · simp only [Set.Finite.mem_toFinset, Set.mem_ofPred_eq] at he ⊢
     exact h e he
-  · simp only [Set.Finite.mem_toFinset, Set.mem_setOf_eq] at he he'
+  · simp only [Set.Finite.mem_toFinset, Set.mem_ofPred_eq] at he he'
     simp [he']
 
 open Classical in

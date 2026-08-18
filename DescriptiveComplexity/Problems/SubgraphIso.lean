@@ -318,7 +318,7 @@ theorem hasLargeClique_iff_subgraphIso_map (A : Type) [Language.markedGraph.Stru
     HasLargeClique A ↔ HasSubgraphIso (cliquePatternInterp.Map A) := by
   constructor
   · rintro ⟨hfin, hcl⟩
-    haveI := hfin
+    have := hfin
     obtain ⟨S, hS, ⟨e⟩⟩ := (cliqueOn_iff_embedding _ _).mp hcl
     refine ⟨cliquePatternInterp.map_finite A,
       fun p => hostPt (cliqueVertex e (p.2 0)), fun p _ => clPat_hostV _, ?_, ?_⟩
@@ -343,7 +343,7 @@ theorem hasLargeClique_iff_subgraphIso_map (A : Type) [Language.markedGraph.Stru
       exact (clPat_hostE _ _).mpr ⟨hne', hS _ _ (e ⟨u, hu⟩).2 (e ⟨v, hv⟩).2 hne'⟩
   · rintro ⟨hfin, f, hmaps, hinj, hedge⟩
     have hA : Finite A := Finite.of_injective _ (hostPt_injective (A := A))
-    haveI := hA
+    have := hA
     have hval : ∀ m : {x : A // MGMarked x}, ∃ w : A, f (patPt m.1) = hostPt w := fun m =>
       hostV_eq_hostPt (hmaps _ ((clPat_patV m.1).mpr m.2))
     choose g hg using hval
@@ -443,7 +443,7 @@ private theorem realize_subgraphKernel {A : Type} [Language.twoGraphs.Structure 
         (∀ x x' y : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y] → x = x') ∧
         ∀ x x' y y' : A, TGPatV x → TGPatV x' → TGPatE x x' → ρ () ![x, y] →
           ρ () ![x', y'] → TGHostE y y' := by
-  letI := isoGuessBlock.structure ρ
+  let := isoGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
       RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ () w := fun _ => Iff.rfl
   rw [subgraphKernel]

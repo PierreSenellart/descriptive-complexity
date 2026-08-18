@@ -78,9 +78,9 @@ theorem moveFstLHom_isExpansionOn (σ τ : (C.withTag T).Assignment A) :
         (@sumOrderStructure L A instL _) (SOBlock.dropTag σ))
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ τ) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) C A
+  let := @SOBlock.structure₁ (L.sum Language.order) C A
     (@sumOrderStructure L A instL _) (SOBlock.dropTag σ)
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
@@ -96,9 +96,9 @@ theorem moveSndLHom_isExpansionOn (σ τ : (C.withTag T).Assignment A) :
         (@sumOrderStructure L A instL _) (SOBlock.dropTag τ))
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ τ) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) C A
+  let := @SOBlock.structure₁ (L.sum Language.order) C A
     (@sumOrderStructure L A instL _) (SOBlock.dropTag τ)
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
@@ -117,11 +117,11 @@ theorem realize_moveFstLHom (σ τ : (C.withTag T).Assignment A)
       @Sentence.Realize _ A
         (@SOBlock.structure₁ (L.sum Language.order) C A
           (@sumOrderStructure L A instL _) (SOBlock.dropTag σ)) ψ) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) C A
+  let := @SOBlock.structure₁ (L.sum Language.order) C A
     (@sumOrderStructure L A instL _) (SOBlock.dropTag σ)
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
-  haveI := moveFstLHom_isExpansionOn (L := L) (C := C) (T := T) σ τ
+  have := moveFstLHom_isExpansionOn (L := L) (C := C) (T := T) σ τ
   exact LHom.realize_onSentence (M := A) (moveFstLHom L C T) ψ
 
 /-- **The second copy of a move is the state it enters.** -/
@@ -133,11 +133,11 @@ theorem realize_moveSndLHom (σ τ : (C.withTag T).Assignment A)
       @Sentence.Realize _ A
         (@SOBlock.structure₁ (L.sum Language.order) C A
           (@sumOrderStructure L A instL _) (SOBlock.dropTag τ)) ψ) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) C A
+  let := @SOBlock.structure₁ (L.sum Language.order) C A
     (@sumOrderStructure L A instL _) (SOBlock.dropTag τ)
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
-  haveI := moveSndLHom_isExpansionOn (L := L) (C := C) (T := T) σ τ
+  have := moveSndLHom_isExpansionOn (L := L) (C := C) (T := T) σ τ
   exact LHom.realize_onSentence (M := A) (moveSndLHom L C T) ψ
 
 /-- **A sentence about the state a move leaves, tag bits included.** Unlike
@@ -152,9 +152,9 @@ theorem realize_tagFst (σ τ : (C.withTag T).Assignment A)
       @Sentence.Realize _ A
         (@SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
           (@sumOrderStructure L A instL _) σ) ψ) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ
-  letI := (C.withTag T).structure τ
+  let := (C.withTag T).structure τ
   exact LHom.realize_onSentence (M := A) LHom.sumInl ψ
 
 /-- **A state at a phase is a tagged one.** `DescriptiveComplexity.atTagF` is
@@ -166,7 +166,7 @@ theorem eq_tagAssign_of_atTagF (p : T) (σ : (C.withTag T).Assignment A)
       (@SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ) (atTagF L C T p)) :
     σ = SOBlock.tagAssign p (SOBlock.dropTag σ) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ
   obtain ⟨hguard, -⟩ := Formula.realize_inf.mp h
   obtain ⟨q, ν, rfl⟩ := (SOBlock.realize_tagGuardF (L := L.sum Language.order) σ).mp hguard
@@ -203,7 +203,7 @@ theorem realize_varPairAgreeS (σ τ : (C.withTag T).Assignment A) (i j : C.ι)
           (@sumOrderStructure L A instL _) σ τ) (varPairAgreeS L C T i j h) ↔
       ∀ x : Fin (C.arity i) → A,
         σ (Sum.inr i) x ↔ τ (Sum.inr j) fun k => x (Fin.cast h k)) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
   rw [varPairAgreeS, Sentence.Realize, Formula.realize_iAlls]
   refine forall_congr' fun x => ?_
@@ -218,7 +218,7 @@ theorem realize_varsPairAgreeS (σ τ : (C.withTag T).Assignment A)
           (@sumOrderStructure L A instL _) σ τ) (varsPairAgreeS L C T ps) ↔
       ∀ p ∈ ps, ∀ x : Fin (C.arity p.1.1) → A,
         σ (Sum.inr p.1.1) x ↔ τ (Sum.inr p.1.2) fun k => x (Fin.cast p.2 k)) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
   rw [varsPairAgreeS, Sentence.Realize, realize_listInf]
   constructor

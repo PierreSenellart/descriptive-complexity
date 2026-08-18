@@ -175,7 +175,7 @@ universe at original arguments, the relativized formula says what the original
 formula says in the instance. -/
 theorem realize_relOld {γ : Type} (φ : L.Formula γ) (v : γ → A) :
     (relOld φ).Realize (M := A ⊕ Fin m) (fun g => Sum.inl (v g)) ↔ φ.Realize v := by
-  letI := allOldStructure L A
+  let := allOldStructure L A
   let w : γ → oldSub L A m := fun g => ⟨Sum.inl (v g), isOld_inl (m := m) (v g)⟩
   have hsub : ∀ x : A ⊕ Fin m, x ∈ oldSub L A m ↔
       RelMap (L := newLang L) (Sum.inr Language.oldSym) ![x] := fun _ => Iff.rfl

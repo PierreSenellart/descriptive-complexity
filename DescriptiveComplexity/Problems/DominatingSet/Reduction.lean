@@ -258,14 +258,14 @@ theorem hasSmallSetCover_iff_hasSmallDominatingSet :
   · -- no ground element at all: the empty cover works, and everything is marked
     constructor
     · rintro ⟨hfin, -⟩
-      haveI := hfin
-      haveI : Finite (dsInterp.Map A) := dsInterp.map_finite A
+      have := hfin
+      have : Finite (dsInterp.Map A) := dsInterp.map_finite A
       refine ⟨inferInstance, fun _ => True, fun v => Or.inl trivial,
         Set.ncard_le_ncard (fun v _ => ?_) (Set.toFinite _)⟩
       obtain ⟨t, x, rfl⟩ := dsPt_surj v
       exact (mgMarked_pt t x).mpr (Or.inr hno)
     · rintro ⟨hfin, -⟩
-      haveI := finite_of_map hfin
+      have := finite_of_map hfin
       exact ⟨inferInstance, fun _ => False, fun s hs => hs.elim,
         fun x hx => absurd hx (hno x), by simp⟩
   · by_cases hunc : Uncoverable A
@@ -276,7 +276,7 @@ theorem hasSmallSetCover_iff_hasSmallDominatingSet :
         obtain ⟨s, hs, hms⟩ := hcov x hx
         exact hx' s ⟨hGfam s hs, hms⟩
       · rintro ⟨hfin, D, hdom, hcard⟩
-        haveI := hfin
+        have := hfin
         have hall : ∀ v : dsInterp.Map A, D v := by
           intro v
           refine (hdom v).resolve_right ?_
@@ -286,7 +286,7 @@ theorem hasSmallSetCover_iff_hasSmallDominatingSet :
           exact ((mgAdj_pt t t' x y).mp hadj).1 (Or.inl hunc)
         have hmk : {v : dsInterp.Map A | MGMarked v} = ∅ := by
           ext v
-          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
           obtain ⟨t, x, rfl⟩ := dsPt_surj v
           intro h
           rcases (mgMarked_pt t x).mp h with ⟨-, -, hg⟩ | hg
@@ -318,8 +318,8 @@ theorem hasSmallSetCover_iff_hasSmallDominatingSet :
       constructor
       · -- a cover dominates: its set-vertices reach every vertex
         rintro ⟨hfin, G, hGfam, hcov, hcard⟩
-        haveI := hfin
-        haveI : Finite (dsInterp.Map A) := dsInterp.map_finite A
+        have := hfin
+        have : Finite (dsInterp.Map A) := dsInterp.map_finite A
         obtain ⟨s₀, hs₀, -⟩ := hcov x₀ hx₀
         refine ⟨inferInstance, fun v => ∃ s, G s ∧ v = dsPt .set s, fun v => ?_, ?_⟩
         · obtain ⟨t, y, rfl⟩ := dsPt_surj v
@@ -343,8 +343,8 @@ theorem hasSmallSetCover_iff_hasSmallDominatingSet :
           · exact ⟨fun ⟨s, hs, he⟩ => (dsPt_eq_iff.mp he).2 ▸ hs, fun h => ⟨x, h, rfl⟩⟩
       · -- a dominating set covers: replace each vertex by a set
         rintro ⟨hfin, D, hdom, hcard⟩
-        haveI := hfin
-        haveI := finite_of_map hfin
+        have := hfin
+        have := finite_of_map hfin
         classical
         have hcov : ∀ a : A, SSElem a → ∃ s, SSFam s ∧ SSMem a s := by
           intro a ha

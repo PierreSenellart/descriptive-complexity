@@ -218,14 +218,14 @@ theorem hasSmallVertexCover_iff_map :
     HasSmallVertexCover A ↔ HasLargeIndependentSet (complMarkInterp.Map A) := by
   constructor
   · rintro ⟨hfin, hcov⟩
-    haveI := hfin
+    have := hfin
     refine ⟨(complMarkInterp.mapEquivSelf A).finite_iff.mpr hfin, ?_⟩
     rw [coverOn_iff_indepOn_not] at hcov
     exact (IndepOn.equiv_iff (complMarkInterp.mapEquivSelf A) (complMark_hadj A)
       (complMark_hK A)).mpr hcov
   · rintro ⟨hfin, hind⟩
     have hA : Finite A := (complMarkInterp.mapEquivSelf A).finite_iff.mp hfin
-    haveI := hA
+    have := hA
     refine ⟨hA, ?_⟩
     rw [coverOn_iff_indepOn_not]
     exact (IndepOn.equiv_iff (complMarkInterp.mapEquivSelf A) (complMark_hadj A)
@@ -237,14 +237,14 @@ theorem hasLargeIndependentSet_iff_cover_map :
     HasLargeIndependentSet A ↔ HasSmallVertexCover (complMarkInterp.Map A) := by
   constructor
   · rintro ⟨hfin, hind⟩
-    haveI := hfin
+    have := hfin
     refine ⟨(complMarkInterp.mapEquivSelf A).finite_iff.mpr hfin, ?_⟩
     rw [indepOn_iff_coverOn_not] at hind
     exact (CoverOn.equiv_iff (complMarkInterp.mapEquivSelf A) (complMark_hadj A)
       (complMark_hK A)).mpr hind
   · rintro ⟨hfin, hcov⟩
     have hA : Finite A := (complMarkInterp.mapEquivSelf A).finite_iff.mp hfin
-    haveI := hA
+    have := hA
     refine ⟨hA, ?_⟩
     rw [indepOn_iff_coverOn_not]
     exact (CoverOn.equiv_iff (complMarkInterp.mapEquivSelf A) (complMark_hadj A)

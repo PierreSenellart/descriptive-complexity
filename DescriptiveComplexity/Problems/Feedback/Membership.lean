@@ -131,7 +131,7 @@ private theorem realize_feedbackKernel {A : Type} [Language.markedGraph.Structur
         (∀ x y : A, MGAdj x y → ¬ρ none ![x] → ¬ρ none ![y] → ρ (some true) ![x, y]) ∧
         (∀ x : A, ρ none ![x] → ∃ y : A, ρ (some false) ![x, y] ∧ MGMarked y) ∧
         ∀ x x' y : A, ρ (some false) ![x, y] → ρ (some false) ![x', y] → x = x' := by
-  letI := feedbackGuessBlock.structure ρ
+  let := feedbackGuessBlock.structure ρ
   have hsubS : ∀ (w : Fin 1 → A),
       RelMap (L := fvsSOLang) (M := A) fSetSym w ↔ ρ none w := fun _ => Iff.rfl
   have hsubL : ∀ (w : Fin 2 → A),
@@ -296,7 +296,7 @@ private theorem realize_feedbackArcKernel {A : Type} [Language.markedArcGraph.St
           ∃ c d : A, ρ (some false) ![a, b, c, d] ∧ MAGMarked c d) ∧
         ∀ a b a' b' c d : A, ρ (some false) ![a, b, c, d] → ρ (some false) ![a', b', c, d] →
           a = a' ∧ b = b' := by
-  letI := feedbackArcGuessBlock.structure ρ
+  let := feedbackArcGuessBlock.structure ρ
   have hsubC : ∀ (w : Fin 2 → A),
       RelMap (L := fasSOLang) (M := A) fasCutSym w ↔ ρ none w := fun _ => Iff.rfl
   have hsubL : ∀ (w : Fin 2 → A),

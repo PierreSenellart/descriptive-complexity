@@ -431,7 +431,7 @@ theorem RE_subset_rePred {L : Language.{0, 0}} [L.IsRelational] (V : FinVocab L)
           (@sumStructure (newLang L) B.lang (s.Univ ⊕ Fin m) (extStructure L s.Univ m)
             (B.structure (tabAssign B s m tab))) φ := by
     intro m tab
-    letI : ((newLang L).sum B.lang).Structure (s.Univ ⊕ Fin m) :=
+    let : ((newLang L).sum B.lang).Structure (s.Univ ⊕ Fin m) :=
       @sumStructure (newLang L) B.lang (s.Univ ⊕ Fin m) (extStructure L s.Univ m)
         (B.structure (tabAssign B s m tab))
     exact (FinStruct.evalSentence_iff (soVocab V B) φ (extStruct V B s m tab)).trans

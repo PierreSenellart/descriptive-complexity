@@ -114,7 +114,7 @@ private theorem realize_adjF (dir : Bool) (ρ : hamGuessBlock.Assignment A) {α 
     (v : α → A) (x y : α) :
     (@Formula.Realize hamSOLang A (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) _
         (adjF dir x y) v) ↔ (if dir then DGArc (v x) (v y) else DGEdge (v x) (v y)) := by
-  letI := hamGuessBlock.structure ρ
+  let := hamGuessBlock.structure ρ
   cases dir <;>
     simp [adjF, DGArc, DGEdge, Language.relMap_sumInl, Formula.realize_rel₂]
 
@@ -127,7 +127,7 @@ private theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A)
           (if dir then DGArc x y else DGEdge x y)) ∧
         ∀ x y : A, (∀ z, ρ () ![x, z]) → (∀ z, ρ () ![z, y]) →
           (if dir then DGArc y x else DGEdge y x) := by
-  letI := hamGuessBlock.structure ρ
+  let := hamGuessBlock.structure ρ
   have hsub : ∀ w : Fin 2 → A, RelMap (L := hamSOLang) (M := A) hLeSym w ↔ ρ () w :=
     fun _ => Iff.rfl
   rw [hamKernel]

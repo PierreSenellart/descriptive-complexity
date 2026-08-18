@@ -180,7 +180,7 @@ updating one variable, and the instance has finitely many of them. -/
 theorem represents_exists [Finite A] (v : A → {d : D // Elt d}) :
     ∃ e, Env e ∧ Represents Val e v := by
   classical
-  letI := Fintype.ofFinite A
+  let := Fintype.ofFinite A
   suffices h : ∀ S : Finset A, ∃ e, Env e ∧ ∀ x ∈ S, Val e x (v x : D) by
     obtain ⟨e, he, hS⟩ := h Finset.univ
     exact ⟨e, he, fun x => hS x (Finset.mem_univ x)⟩
@@ -338,7 +338,7 @@ its coherent atom values the interpretation, and its node values satisfaction �
 by uniqueness of the fixed point of the truth definition. -/
 theorem finSatOn_of_cert [Finite A] [Finite D] (hwf : IsWF A) : FinSatOn A := by
   obtain ⟨d₀, hd₀⟩ := hc.elt_nonempty
-  haveI : Nonempty {d : D // Elt d} := ⟨⟨d₀, hd₀⟩⟩
+  have : Nonempty {d : D // Elt d} := ⟨⟨d₀, hd₀⟩⟩
   refine ⟨hwf, {d : D // Elt d}, inferInstance, inferInstance, CertI Env Val H,
     certI_local hwf, fun v g hg => ?_⟩
   obtain ⟨e, he, hv⟩ := represents_exists hc v

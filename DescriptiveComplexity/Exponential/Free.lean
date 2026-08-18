@@ -211,7 +211,7 @@ expanded structure is the same, so the same `Q` witnesses both. -/
 theorem ExpDefinableFree.expDefinable {C : ComplexityClass} {P : DecisionProblem L}
     (h : ExpDefinableFree C P) : ExpDefinable C P := by
   obtain ⟨X, Q, hQ, hX⟩ := h
-  letI hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
       X.E.Structure (X.toExp.Map A) := fun A => X.toExpStructure A
   refine ⟨X.toExp, Q, hQ, ?_⟩
   intro A _ _ _ _
@@ -260,11 +260,11 @@ theorem orderElimRepLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder
         (B.replicateAssign fun j => B.restPart (ρs j)))
       (@SOBlock.structure₁ L (B.withOrder.replicate n) A instA
         (B.withOrder.replicateAssign ρs)) := by
-  letI := instA
-  letI := lo
-  letI := @SOBlock.structure₁ (L.sum Language.order) (B.replicate n) A (sumOrderStructure L A)
+  let := instA
+  let := lo
+  let := @SOBlock.structure₁ (L.sum Language.order) (B.replicate n) A (sumOrderStructure L A)
     (B.replicateAssign fun j => B.restPart (ρs j))
-  letI := @SOBlock.structure₁ L (B.withOrder.replicate n) A instA
+  let := @SOBlock.structure₁ L (B.withOrder.replicate n) A instA
     (B.withOrder.replicateAssign ρs)
   refine ⟨fun {m} f x => ?_, fun {m} r x => ?_⟩
   · match f with
@@ -292,13 +292,13 @@ theorem realize_orderElimRep (instA : L.Structure A) (lo : LinearOrder A)
         (@SOBlock.structure₁ (L.sum Language.order) (B.replicate n) A
           (letI := instA; letI := lo; sumOrderStructure L A)
           (B.replicateAssign fun j => B.restPart (ρs j))) φ := by
-  letI := instA
-  letI := lo
-  letI := @SOBlock.structure₁ (L.sum Language.order) (B.replicate n) A (sumOrderStructure L A)
+  let := instA
+  let := lo
+  let := @SOBlock.structure₁ (L.sum Language.order) (B.replicate n) A (sumOrderStructure L A)
     (B.replicateAssign fun j => B.restPart (ρs j))
-  letI := @SOBlock.structure₁ L (B.withOrder.replicate n) A instA
+  let := @SOBlock.structure₁ L (B.withOrder.replicate n) A instA
     (B.withOrder.replicateAssign ρs)
-  haveI := orderElimRepLHom_isExpansionOn (L := L) (B := B) (k := k) instA lo ρs hord
+  have := orderElimRepLHom_isExpansionOn (L := L) (B := B) (k := k) instA lo ρs hord
   exact LHom.realize_onSentence (M := A) (orderElimRepLHom L B k) φ
 
 end OrderElimRep
@@ -425,7 +425,7 @@ theorem realize_allSameOrdS {n : ℕ} (ρs : Fin (n + 1) → B.withOrder.Assignm
         (@SOBlock.structure₁ L (B.withOrder.replicate (n + 1)) A ‹_›
           (B.withOrder.replicateAssign ρs)) (allSameOrdS L B n) ↔
       ∀ (j : Fin (n + 1)) (w : Fin 2 → A), ρs 0 (Sum.inl ()) w ↔ ρs j (Sum.inl ()) w) := by
-  letI := @SOBlock.structure₁ L (B.withOrder.replicate (n + 1)) A ‹_›
+  let := @SOBlock.structure₁ L (B.withOrder.replicate (n + 1)) A ‹_›
     (B.withOrder.replicateAssign ρs)
   have hvec : ∀ w : Fin 2 → A, (![w 0, w 1] : Fin 2 → A) = w := by
     intro w
@@ -485,10 +485,10 @@ noncomputable def orderFree : ExpExpansionFree L where
     | _, Sum.inr .same => allSameOrdS L X.B 1
   dom_nonempty := by
     intro A _ _ _
-    letI := finiteLinearOrder A
+    let := finiteLinearOrder A
     obtain ⟨t, ρ₀, h⟩ := X.dom_nonempty A
     refine ⟨t, X.B.joinOrder (fun w : Fin 2 → A => w 0 ≤ w 1) ρ₀, ?_⟩
-    letI := @SOBlock.structure₁ L X.B.withOrder A ‹_›
+    let := @SOBlock.structure₁ L X.B.withOrder A ‹_›
       (X.B.joinOrder (fun w : Fin 2 → A => w 0 ≤ w 1) ρ₀)
     refine Formula.realize_inf.mpr ⟨?_, ?_⟩
     · exact (realize_linearGuard L X.B ‹L.Structure A›
@@ -545,7 +545,7 @@ theorem pointOrd_linear (p : X.orderFree.Map A) :
       ((∀ a b c : A, pointOrd p ![a, b] → pointOrd p ![b, c] → pointOrd p ![a, c]) ∧
         ((∀ a b : A, pointOrd p ![a, b] → pointOrd p ![b, a] → a = b) ∧
           ∀ a b : A, pointOrd p ![a, b] ∨ pointOrd p ![b, a])) := by
-  letI := @SOBlock.structure₁ L X.B.withOrder A ‹_› p.1.2
+  let := @SOBlock.structure₁ L X.B.withOrder A ‹_› p.1.2
   have hdom : @Sentence.Realize _ A (@SOBlock.structure₁ L X.B.withOrder A ‹_› p.1.2)
       (linearGuard L X.B ⊓ (orderElimLHom L X.B).onSentence (X.dom p.1.1)) := p.2
   refine (realize_linearGuard L X.B ‹L.Structure A› p.1.2).mp ?_
@@ -576,7 +576,7 @@ def loRel : (Fin 2 → A) → Prop := fun w => w 0 ≤ w 1
 theorem domHolds_copyIn (x : X.Map A) :
     ExpExpansionFree.DomHolds (X := X.orderFree)
       (x.1.1, X.B.joinOrder (loRel (A := A)) x.1.2) := by
-  letI := @SOBlock.structure₁ L X.B.withOrder A ‹_› (X.B.joinOrder (loRel (A := A)) x.1.2)
+  let := @SOBlock.structure₁ L X.B.withOrder A ‹_› (X.B.joinOrder (loRel (A := A)) x.1.2)
   change @Sentence.Realize _ A
     (@SOBlock.structure₁ L X.B.withOrder A ‹_› (X.B.joinOrder (loRel (A := A)) x.1.2))
     (linearGuard L X.B ⊓ (orderElimLHom L X.B).onSentence (X.dom x.1.1))
@@ -615,7 +615,7 @@ theorem relMap_copyIn {m : ℕ} (r : X.E.Relations (m + 1)) (xs : Fin (m + 1) �
     (@RelMap (X.orderFree.E) (X.orderFree.Map A) (X.orderFree.mapStructure A) (m + 1)
         (X.origSym r) (fun i => copyIn (xs i)) ↔
       @RelMap X.E (X.Map A) (X.mapStructure A) (m + 1) r xs) := by
-  letI := @SOBlock.structure₁ L (X.B.withOrder.replicate (m + 1)) A ‹_›
+  let := @SOBlock.structure₁ L (X.B.withOrder.replicate (m + 1)) A ‹_›
     (X.B.withOrder.replicateAssign fun i => (copyIn (xs i)).1.2)
   change (@Sentence.Realize _ A
     (@SOBlock.structure₁ L (X.B.withOrder.replicate (m + 1)) A ‹_›
@@ -637,7 +637,7 @@ theorem relMap_nullCopyIn (s : X.E.Relations 0) (xs : Fin 1 → X.Map A)
     (@RelMap (X.orderFree.E) (X.orderFree.Map A) (X.orderFree.mapStructure A) 1
         (X.nullSym s) (fun i => copyIn (xs i)) ↔
       @RelMap X.E (X.Map A) (X.mapStructure A) 0 s ys) := by
-  letI := sumOrderStructure L A
+  let := sumOrderStructure L A
   have htag : (fun i : Fin 0 => (ys i).1.1) = fun i => i.elim0 := funext fun i => i.elim0
   have h1 := realize_orderElimRep (L := L) (B := X.B) (k := (0 : Fin 1)) ‹L.Structure A›
     ‹LinearOrder A› (fun i => (copyIn (xs i)).1.2) (fun _ => Iff.rfl)
@@ -676,7 +676,7 @@ carries. -/
 theorem domHolds_of_pointOrd {p : X.orderFree.Map A}
     (hord : ∀ w : Fin 2 → A, pointOrd p w ↔ loRel w) :
     DomHolds (X := X) (p.1.1, X.B.restPart p.1.2) := by
-  letI := @SOBlock.structure₁ L X.B.withOrder A ‹L.Structure A› p.1.2
+  let := @SOBlock.structure₁ L X.B.withOrder A ‹L.Structure A› p.1.2
   have hdom : @Sentence.Realize _ A
       (@SOBlock.structure₁ L X.B.withOrder A ‹L.Structure A› p.1.2)
       (linearGuard L X.B ⊓ (orderElimLHom L X.B).onSentence (X.dom p.1.1)) := p.2

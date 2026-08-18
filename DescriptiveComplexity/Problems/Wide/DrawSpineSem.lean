@@ -132,7 +132,7 @@ noncomputable def addrIter (h : IsLinOrd (WMSetLe Le)) (init : Q')
 theorem addrIter_bot (hL : IsLinOrd Le) (h : IsLinOrd (WMSetLe Le))
     (init : Q') (step : (α → Prop) → Q' → Q') :
     addrIter h init step (fun _ => False) = init := by
-  letI := h.toLinearOrder
+  let := h.toLinearOrder
   exact iterOrd_bot (a₀ := (fun _ => False : α → Prop))
     (fun b => wmSetLe_of_empty hL (fun _ hc => hc) b)
 
@@ -142,7 +142,7 @@ theorem addrIter_incr (hL : IsLinOrd Le) (h : IsLinOrd (WMSetLe Le))
     {w w' : α → Prop} (hi : WMIncr Le w w') (init : Q')
     (step : (α → Prop) → Q' → Q') :
     addrIter h init step w' = step w (addrIter h init step w) := by
-  letI := h.toLinearOrder
+  let := h.toLinearOrder
   refine iterOrd_covers ?_ ?_
   · exact ⟨wmSetLe_of_wmIncr hi, fun hc =>
       ne_of_wmIncr hi (h.2.2.1 w w' (wmSetLe_of_wmIncr hi) hc)⟩
@@ -162,7 +162,7 @@ variable {L : Language.{0, 0}} (dt : Data L)
 /-- The enumeration lists every variable. -/
 theorem exists_varList_get (i : dt.d.B.ι) :
     ∃ j : Fin dt.nv, dt.varList.get j = i := by
-  letI := Fintype.ofFinite dt.d.B.ι
+  let := Fintype.ofFinite dt.d.B.ι
   have hmem : i ∈ dt.varList := by
     rw [varList]
     exact Finset.mem_toList.mpr (Finset.mem_univ i)
@@ -171,7 +171,7 @@ theorem exists_varList_get (i : dt.d.B.ι) :
 
 /-- The enumeration lists each variable once. -/
 theorem varList_nodup : dt.varList.Nodup := by
-  letI := Fintype.ofFinite dt.d.B.ι
+  let := Fintype.ofFinite dt.d.B.ι
   rw [varList]
   exact Finset.nodup_toList _
 

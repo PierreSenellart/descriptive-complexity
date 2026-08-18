@@ -87,7 +87,7 @@ private theorem realize_dominatingKernel :
       (∀ v : A, ρ false ![v] ∨ ∃ u : A, ρ false ![u] ∧ MGAdj u v) ∧
         (∀ x : A, ρ false ![x] → ∃ y : A, ρ true ![x, y] ∧ MGMarked y) ∧
         ∀ x x' y : A, ρ true ![x, y] → ρ true ![x', y] → x = x' := by
-  letI := dominatingGuessBlock.structure ρ
+  let := dominatingGuessBlock.structure ρ
   have hsubS : ∀ (w : Fin 1 → A),
       RelMap (L := dsSOLang) (M := A) dsSetSym w ↔ ρ false w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 2 → A),

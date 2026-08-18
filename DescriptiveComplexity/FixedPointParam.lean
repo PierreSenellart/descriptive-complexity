@@ -134,8 +134,8 @@ theorem realize_paramLift (ρ : B.withParam.Assignment N) (v : α → N) :
       letI := @SOBlock.structure₁ ((newLang L).sum Language.order) B N
         (@sumOrderStructure (newLang L) N (markOne L (v p)) _) (B.atParam ρ (v p))
       ((paramLift B p φ).Realize v xs ↔ φ.Realize v xs) := by
-  letI := (B.withParam.structure₁ (L := L.sum Language.order) ρ)
-  letI := @SOBlock.structure₁ ((newLang L).sum Language.order) B N
+  let := (B.withParam.structure₁ (L := L.sum Language.order) ρ)
+  let := @SOBlock.structure₁ ((newLang L).sum Language.order) B N
     (@sumOrderStructure (newLang L) N (markOne L (v p)) _) (B.atParam ρ (v p))
   intro n φ
   induction φ with
@@ -224,10 +224,10 @@ of the original in the instance that parameter marks. -/
 theorem next_param (ρ : d.param.B.Assignment N) (c : N) :
     d.B.atParam (d.param.next ρ) c = @StepDef.next _ d N (markOneOrd L c) (d.B.atParam ρ c) := by
   funext i x
-  letI := markOneOrd L c
-  letI := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
+  let := markOneOrd L c
+  let := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
     (d.B.atParam ρ c)
-  letI := d.param.B.structure₁ (L := L.sum Language.order) ρ
+  let := d.param.B.structure₁ (L := L.sum Language.order) ρ
   have hcomp : ((Fin.cons c x : Fin (d.B.arity i + 1) → N) ∘ Fin.succ) = x := by
     funext j
     simp
@@ -274,7 +274,7 @@ theorem inflLimit_param (c : N) :
 element of the instance. -/
 theorem ifpHolds_param :
     d.param.IFPHolds N ↔ ∃ c : N, @StepDef.IFPHolds _ d N (markOneOrd L c) := by
-  letI := d.param.B.structure₁ (L := L.sum Language.order) (d.param.inflLimit N)
+  let := d.param.B.structure₁ (L := L.sum Language.order) (d.param.inflLimit N)
   have hcongr : ∀ (c : N) (σ τ : d.B.Assignment N), σ = τ →
       (@Sentence.Realize _ N (@SOBlock.structure₁ ((newLang L).sum Language.order) d.B N
           (markOneOrd L c) σ) d.out ↔
@@ -286,8 +286,8 @@ theorem ifpHolds_param :
   constructor
   · rintro ⟨w, hw⟩
     refine ⟨w 0, ?_⟩
-    letI := markOneOrd L (w 0)
-    letI := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L (w 0))
+    let := markOneOrd L (w 0)
+    let := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L (w 0))
       (d.B.atParam (d.param.inflLimit N) (w 0))
     have h := (realize_paramLift (B := d.B) (p := (Sum.inr 0 : Empty ⊕ Fin 1))
       (d.param.inflLimit N) (Sum.elim default w) (d.out.relabel Sum.inl)
@@ -296,8 +296,8 @@ theorem ifpHolds_param :
     exact (hcongr (w 0) _ _ (inflLimit_param (d := d) (w 0))).mp h2
   · rintro ⟨c, hc⟩
     refine ⟨fun _ => c, ?_⟩
-    letI := markOneOrd L c
-    letI := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
+    let := markOneOrd L c
+    let := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
       (d.B.atParam (d.param.inflLimit N) c)
     refine (realize_paramLift (B := d.B) (p := (Sum.inr 0 : Empty ⊕ Fin 1))
       (d.param.inflLimit N) (Sum.elim default fun _ => c) (d.out.relabel Sum.inl)

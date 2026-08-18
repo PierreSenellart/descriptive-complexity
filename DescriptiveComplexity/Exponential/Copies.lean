@@ -84,8 +84,8 @@ against. -/
 theorem twoLHom_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
     @LHom.IsExpansionOn _ _ (B.twoLHom L) A (B.structure₂ (L := L) (ρs 0) (ρs 1))
       ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)) := by
-  letI := B.structure₂ (L := L) (ρs 0) (ρs 1)
-  letI := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
+  let := B.structure₂ (L := L) (ρs 0) (ρs 1)
+  let := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
   refine ⟨fun {_} f _ => ?_, fun {_} r _ => ?_⟩
   · match f with
     | Sum.inl (Sum.inl _) => rfl
@@ -136,8 +136,8 @@ theorem twoLHom'_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
     @LHom.IsExpansionOn _ _ (B.twoLHom' L) A
       ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs))
       (B.structure₂ (L := L) (ρs 0) (ρs 1)) := by
-  letI := B.structure₂ (L := L) (ρs 0) (ρs 1)
-  letI := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
+  let := B.structure₂ (L := L) (ρs 0) (ρs 1)
+  let := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
   refine ⟨fun {_} f _ => ?_, fun {_} r x => ?_⟩
   · match f with
     | Sum.inl _ => rfl

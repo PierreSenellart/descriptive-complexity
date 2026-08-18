@@ -385,8 +385,8 @@ theorem hasSmallFeedbackSet_iff_feedbackArc_map (A : Type)
     · exact fun h => split_marked_internal h
   constructor
   · rintro ⟨hfin, hfvs⟩
-    haveI := hfin
-    haveI : Finite (splitInterp.Map A) := splitInterp.map_finite A
+    have := hfin
+    have : Finite (splitInterp.Map A) := splitInterp.map_finite A
     obtain ⟨C, ⟨Lt, htrans, hirr, hmono⟩, ⟨e⟩⟩ := (feedbackOn_iff_certificate _ _).mp hfvs
     have hforward : ∀ p q : splitInterp.Map A,
         UncutArc MAGAdj (cutArcs C) p q → splitLt C Lt p q := by
@@ -419,9 +419,9 @@ theorem hasSmallFeedbackSet_iff_feedbackArc_map (A : Type)
     rw [hcut, hmarked]
     exact (nonempty_embedding_iff_ncard_le C MGMarked).mp ⟨e⟩
   · rintro ⟨hfin, hfas⟩
-    haveI := hfin
+    have := hfin
     have hA : Finite A := Finite.of_injective _ (inPt_injective (A := A))
-    haveI := hA
+    have := hA
     obtain ⟨F, ⟨Lt', htrans, hirr, hmono⟩, ⟨e⟩⟩ := (feedbackArcOn_iff_certificate _ _).mp hfas
     -- the removed set is the set of source vertices of the cut arcs
     set C : A → Prop := fun v => ∃ p q, F p q ∧ (p = inPt v ∨ p = outPt v) with hC

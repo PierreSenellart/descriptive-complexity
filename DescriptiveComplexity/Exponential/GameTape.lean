@@ -235,7 +235,7 @@ noncomputable def finiteIdx (T : Type) [Finite T] (t : T) : ℕ :=
   (Fintype.equivFin T t : ℕ)
 
 theorem finiteIdx_injective (T : Type) [Finite T] : Function.Injective (finiteIdx T) := by
-  letI := Fintype.ofFinite T
+  let := Fintype.ofFinite T
   intro a b h
   exact (Fintype.equivFin T).injective (Fin.ext h)
 
@@ -439,7 +439,7 @@ theorem minPos_leftPt :
     letI := machTagOrder (B := B) (C := C)
     MinPos (tagTupleLe (Tag := MachTag B C) (d := dim) (A := A))
       (fun p => machPosn p ∧ machDom carity p) (leftPt a₀ false) := by
-  letI := machTagOrder (B := B) (C := C)
+  let := machTagOrder (B := B) (C := C)
   refine ⟨⟨trivial, fun j _ => h₀⟩, fun q hq => ?_⟩
   rcases Nat.eq_zero_or_pos (MachTag.fam q.1) with hf | hf
   · obtain ⟨s, hs, _⟩ := MachTag.exists_tapeTag_of_isPos hq.1
@@ -455,7 +455,7 @@ theorem eq_leftPt_of_le {q : Pt B C dim A} (hq : machPosn q ∧ machDom carity q
     (hle : letI := machTagOrder (B := B) (C := C)
       tagTupleLe (Tag := MachTag B C) (d := dim) (A := A) q (leftPt a₀ true)) :
     q = leftPt a₀ false ∨ q = leftPt a₀ true := by
-  letI := machTagOrder (B := B) (C := C)
+  let := machTagOrder (B := B) (C := C)
   have hfam : MachTag.fam q.1 ≤ 1 := by
     rcases hle with h | ⟨h, -⟩
     · exact machTag_fam_le_of_le h.le
@@ -475,7 +475,7 @@ omit h₀ in
 theorem leftPt_le_leftPt_true (b : Bool) :
     letI := machTagOrder (B := B) (C := C)
     tagTupleLe (Tag := MachTag B C) (d := dim) (A := A) (leftPt a₀ b) (leftPt a₀ true) := by
-  letI := machTagOrder (B := B) (C := C)
+  let := machTagOrder (B := B) (C := C)
   cases b with
   | false =>
     exact Or.inl (machTag_lt_of_fam_lt (by simp [leftPt, MachTag.fam, TapeTag.fam]))
@@ -489,7 +489,7 @@ theorem succPos_leftPt :
     letI := machTagOrder (B := B) (C := C)
     SuccPos (tagTupleLe (Tag := MachTag B C) (d := dim) (A := A))
       (fun p => machPosn p ∧ machDom carity p) (leftPt a₀ false) (leftPt a₀ true) := by
-  letI := machTagOrder (B := B) (C := C)
+  let := machTagOrder (B := B) (C := C)
   have hlt : (leftPt (B := B) (C := C) (dim := dim) a₀ false).1 <
       (leftPt (B := B) (C := C) (dim := dim) a₀ true).1 :=
     machTag_lt_of_fam_lt (by simp [leftPt, MachTag.fam, TapeTag.fam])
@@ -506,7 +506,7 @@ theorem succPos_ne_leftPt {p q : Pt B C dim A} (hfam : 1 < MachTag.fam q.1)
       SuccPos (tagTupleLe (Tag := MachTag B C) (d := dim) (A := A))
         (fun x => machPosn x ∧ machDom carity x) p q) :
     p ≠ leftPt a₀ false := by
-  letI := machTagOrder (B := B) (C := C)
+  let := machTagOrder (B := B) (C := C)
   rintro rfl
   rcases hs.2.2.2.2 (leftPt a₀ true) ⟨trivial, fun j _ => h₀⟩
     (succPos_leftPt h₀ (carity := carity)).2.2.1
@@ -558,7 +558,7 @@ theorem maxPos_rightPt :
     letI := machTagOrder (B := B) (C := C)
     MaxPos (tagTupleLe (Tag := MachTag B C) (d := dim) (A := A))
       (fun p => machPosn p ∧ machDom carity p) (rightPt a₀) := by
-  letI := machTagOrder (B := B) (C := C)
+  let := machTagOrder (B := B) (C := C)
   refine ⟨⟨trivial, fun j _ => h₀⟩, fun q hq => ?_⟩
   obtain ⟨s, hs, hsp⟩ := MachTag.exists_tapeTag_of_isPos hq.1
   rcases Nat.lt_or_ge (MachTag.fam q.1) 4 with hf | hf

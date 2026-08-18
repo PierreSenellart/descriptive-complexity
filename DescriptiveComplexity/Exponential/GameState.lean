@@ -161,7 +161,7 @@ theorem realize_allRoundsPointF (ρs : Fin n → X.pointBlock.Assignment A) :
         ((repMerged X.pointBlock n).structure₁ (L := L.sum Language.order)
           (repBlockAssign X.pointBlock A n ρs)) (allRoundsPointF X n) ↔
       ∀ i, IsPointAssign (X := X) (ρs i)) := by
-  letI := (repMerged X.pointBlock n).structure₁ (L := L.sum Language.order)
+  let := (repMerged X.pointBlock n).structure₁ (L := L.sum Language.order)
     (repBlockAssign X.pointBlock A n ρs)
   rw [allRoundsPointF, Sentence.Realize, realize_listInf]
   constructor

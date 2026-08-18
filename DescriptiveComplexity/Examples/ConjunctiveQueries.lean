@@ -499,7 +499,7 @@ on the concrete database. -/
 theorem concreteQueryHolds_iff_queryHolds [Nonempty C]
     (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
     ConcreteQueryHolds q D ↔ @QueryHolds (V ⊕ C) (queryDbStructure q D) := by
-  letI := queryDbStructure q D
+  let := queryDbStructure q D
   constructor
   · -- an assignment becomes a valuation, sending `Sum.inl x` to
     -- `Sum.inr (v x)` and fixing the constants
@@ -947,7 +947,7 @@ private theorem realize_cqKernel (ρ : cqHomBlock.Assignment A) :
       (∀ x y u v : A, QAtom x y → PossibleImage ρ x u → PossibleImage ρ y v →
           DbEdge u v) ∧
         ∀ x : A, QVar x → ∃ u : A, ρ () ![x, u] := by
-  letI := cqHomBlock.structure ρ
+  let := cqHomBlock.structure ρ
   have hsub : ∀ w : Fin 2 → A,
       RelMap (L := cqSOLang) (M := A) kHom w ↔ ρ () ![w 0, w 1] := by
     intro w

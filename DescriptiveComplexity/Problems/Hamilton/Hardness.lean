@@ -72,7 +72,7 @@ cover vertices' chains; otherwise (no marks, hence no edges) it is the single
 self-looped hub (`DescriptiveComplexity.degenerate_tourOn`). -/
 theorem cover_to_tour (hcov : CoverOn (MGAdj (A := A)) (MGMarked (A := A))) :
     TourOn (DGEdge (A := hamInterp.MapRel A)) := by
-  haveI : Fintype A := Fintype.ofFinite A
+  have : Fintype A := Fintype.ofFinite A
   obtain ⟨C, hcp, hcard⟩ := hcov
   have hcover : ∀ a b : A, HEdge a b → C a ∨ C b := by
     intro a b h
@@ -103,17 +103,17 @@ the marked set; the cover property `DescriptiveComplexity.cover_property` (the l
 traversal analysis) shows every edge has an active endpoint. -/
 theorem tour_to_cover (htour : TourOn (DGEdge (A := hamInterp.MapRel A))) :
     CoverOn (MGAdj (A := A)) (MGMarked (A := A)) := by
-  haveI : Fintype A := Fintype.ofFinite A
-  haveI : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
+  have : Fintype A := Fintype.ofFinite A
+  have : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
   obtain ⟨N, f, hf⟩ := enum_of_tourOn htour
   by_cases hedge : ∃ a b : A, HEdge a b
   · obtain ⟨a0, b0, he0⟩ := hedge
-    haveI : Nonempty (hamInterp.MapRel A) := ⟨gPt .g0 ⟨by decide, by decide⟩ he0⟩
+    have : Nonempty (hamInterp.MapRel A) := ⟨gPt .g0 ⟨by decide, by decide⟩ he0⟩
     exact ⟨Active f, fun x y hxy hadj => cover_property f hf ⟨Or.inl hadj, hxy⟩,
       active_ncard_le f⟩
   · refine ⟨fun _ => False, fun x y hxy hadj => absurd (⟨Or.inl hadj, hxy⟩ : HEdge x y)
       (fun he => hedge ⟨x, y, he⟩), ?_⟩
-    simp only [Set.setOf_false, Set.ncard_empty, Nat.zero_le]
+    simp only [Set.ofPred_false, Set.ncard_empty, Nat.zero_le]
 
 /-- **Correctness of the gadget interpretation**: a marked graph has a vertex
 cover at most as large as its marked set iff its gadget graph has a Hamilton
@@ -122,7 +122,7 @@ directions are `DescriptiveComplexity.cover_to_tour` and
 `DescriptiveComplexity.tour_to_cover`. -/
 theorem hasSmallVertexCover_iff_hamCircuit_mapRel :
     HasSmallVertexCover A ↔ HasHamCircuit (hamInterp.MapRel A) := by
-  haveI : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
+  have : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
   rw [HasSmallVertexCover, HasHamCircuit, and_iff_right ‹Finite A›, and_iff_right this]
   exact ⟨cover_to_tour A, tour_to_cover A⟩
 

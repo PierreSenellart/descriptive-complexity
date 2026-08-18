@@ -219,7 +219,7 @@ theorem realize_meanAtomB (i : B.ι) {α : Type} (x : α) (w : Fin (B.arity i) �
     (v : α → A ⊕ Fin m) :
     letI := meanStrucB (L := L) ρ
     (meanAtomB L B i x w).Realize v ↔ meaningOfB ρ i (v x) fun j => v (w j) := by
-  letI := meanStrucB (L := L) ρ
+  let := meanStrucB (L := L) ρ
   refine iff_of_eq (congrArg (ρ i) (funext fun j => ?_))
   induction j using Fin.cases <;> rfl
 
@@ -228,7 +228,7 @@ theorem realize_meanShapedB :
     ((A ⊕ Fin m) ⊨ meanShapedB L B) ↔
       ∀ (i : B.ι) (v : A ⊕ Fin m) (w : Fin (B.arity i) → A ⊕ Fin m),
         meaningOfB ρ i v w → ¬IsOld v ∧ ∀ j, IsOld (w j) := by
-  letI := meanStrucB (L := L) ρ
+  let := meanStrucB (L := L) ρ
   rw [meanShapedB, Sentence.Realize, Formula.realize_iInf]
   simp only [Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
     Formula.realize_not, Formula.realize_iInf, realize_oldAtomB, realize_meanAtomB]
@@ -240,7 +240,7 @@ theorem realize_meanEmptyB :
     ((A ⊕ Fin m) ⊨ meanEmptyB L B) ↔
       ∃ v : A ⊕ Fin m, ¬IsOld v ∧
         ∀ (i : B.ι) (w : Fin (B.arity i) → A ⊕ Fin m), ¬meaningOfB ρ i v w := by
-  letI := meanStrucB (L := L) ρ
+  let := meanStrucB (L := L) ρ
   rw [meanEmptyB, Sentence.Realize, Formula.realize_iExs]
   simp only [Formula.realize_inf, Formula.realize_not, Formula.realize_iInf,
     Formula.realize_iAlls, realize_oldAtomB, realize_meanAtomB]
@@ -252,7 +252,7 @@ theorem realize_meanInjB :
       ∀ v u : A ⊕ Fin m, ¬IsOld v → ¬IsOld u →
         (∀ (i : B.ι) (w : Fin (B.arity i) → A ⊕ Fin m),
           meaningOfB ρ i v w ↔ meaningOfB ρ i u w) → v = u := by
-  letI := meanStrucB (L := L) ρ
+  let := meanStrucB (L := L) ρ
   rw [meanInjB, Sentence.Realize, Formula.realize_iAlls]
   simp only [Formula.realize_imp, Formula.realize_inf, Formula.realize_not,
     Formula.realize_iInf, Formula.realize_iAlls, Formula.realize_iff,
@@ -271,7 +271,7 @@ theorem realize_meanFlipB :
             meaningOfB ρ i u w ↔ (meaningOfB ρ i v w ↔ ¬∀ j, w j = y j)) ∧
           ∀ i' : B.ι, i' ≠ i → ∀ w : Fin (B.arity i') → A ⊕ Fin m,
             meaningOfB ρ i' u w ↔ meaningOfB ρ i' v w := by
-  letI := meanStrucB (L := L) ρ
+  let := meanStrucB (L := L) ρ
   classical
   rw [meanFlipB, Sentence.Realize, Formula.realize_iInf]
   refine forall_congr' fun i => ?_
@@ -316,9 +316,9 @@ theorem bijective_meanAtB [Finite A]
           meaningOfB ρ i' u w ↔ meaningOfB ρ i' v w) :
     Function.Bijective (meanAtB ρ) := by
   classical
-  letI := Fintype.ofFinite B.ι
-  letI := Fintype.ofFinite A
-  haveI : Finite ((i : B.ι) × (Fin (B.arity i) → A)) := inferInstance
+  let := Fintype.ofFinite B.ι
+  let := Fintype.ofFinite A
+  have : Finite ((i : B.ι) × (Fin (B.arity i) → A)) := inferInstance
   have hnew : ∀ k : Fin m, ¬IsOld (Sum.inr k : A ⊕ Fin m) := fun _ h => h
   refine bijective_of_flipClosedP _ ?_ ?_ ?_
   · intro k l h
@@ -372,7 +372,7 @@ assignment of the block, each exactly once. -/
 theorem bijective_meanAtB_of_guard [Finite A] :
     letI := meanStrucB (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanGuardB L B) → Function.Bijective (meanAtB ρ) := by
-  letI := meanStrucB (L := L) ρ
+  let := meanStrucB (L := L) ρ
   intro h
   obtain ⟨⟨⟨hshaped, hempty⟩, hinj⟩, hflip⟩ :=
     (Sentence.realize_inf (A ⊕ Fin m)).mp h |>.imp
