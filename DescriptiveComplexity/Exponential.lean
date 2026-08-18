@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Exponential.Block
 import DescriptiveComplexity.Exponential.Copies
 import DescriptiveComplexity.Exponential.Expansion
+import DescriptiveComplexity.Exponential.AddrExp
 import DescriptiveComplexity.Exponential.Pull
 import DescriptiveComplexity.Exponential.Order
 import DescriptiveComplexity.Exponential.OrdFormula
@@ -20,6 +21,9 @@ import DescriptiveComplexity.Exponential.Translate
 import DescriptiveComplexity.Exponential.Increment
 import DescriptiveComplexity.Exponential.Trivialize
 import DescriptiveComplexity.Exponential.Class
+import DescriptiveComplexity.Exponential.Kernel
+import DescriptiveComplexity.Exponential.KernelPad
+import DescriptiveComplexity.Exponential.KernelArity
 import DescriptiveComplexity.Exponential.Free
 import DescriptiveComplexity.Exponential.FreeCopy
 import DescriptiveComplexity.Exponential.SecondOrderFixedPoint

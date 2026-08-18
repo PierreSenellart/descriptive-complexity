@@ -16,7 +16,7 @@ advance, the convergence test, the copy-back, the output dispatch – around a
 subroutines) are an order of magnitude larger. This file is the outer loop,
 with the evaluation abstract: its phase type `PE`, its site family and its
 boundary rules are parameters, exactly as
-`DescriptiveComplexity.Pfp.Prog.reaches_roundTrip` abstracts the middle of a
+`DescriptiveComplexity.Pfp.Prog.reaches_fileRoundTrip` abstracts the middle of a
 trip.
 
 The control flow:

@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Machines
 import DescriptiveComplexity.Interpretation
+import DescriptiveComplexity.Exponential.AddrExp
 
 /-!
 # The wide machine: a machine addressed by the subsets of its instance
@@ -189,67 +190,6 @@ def WMWrite (a b : A) : Prop := RelMap wmWrite ![a, b]
 def WMInp (a b : A) : Prop := RelMap wmInp ![a, b]
 
 end Shorthands
-
-/-! ### Addresses
-
-The two things said about an address – how it compares with another, and which
-initial segment it is – stated for an arbitrary order relation, so that they
-transport along an equivalence without mentioning a structure. -/
-
-section Addresses
-
-variable {α : Type}
-
-/-- **The binary-number order on addresses**: the two subsets agree, or, at some
-element where the first is out and the second in, they agree at every strictly
-smaller element. Written with the strict order spelled out as
-`Le y x ∧ ¬ Le x y`, which is the shape the defining sentence of the expansion
-realizes to. -/
-def WMSetLe (Le : α → α → Prop) (s t : α → Prop) : Prop :=
-  (∀ x, s x ↔ t x) ∨
-    ∃ x, (∀ y, (Le y x ∧ ¬Le x y) → (s y ↔ t y)) ∧ ¬s x ∧ t x
-
-/-- **The address of an element**: the initial segment it cuts, which is where
-the element's input symbol is written. -/
-def WMDown (Le : α → α → Prop) (s : α → Prop) (x : α) : Prop := ∀ y, s y ↔ Le y x
-
-/-- The order on addresses transports along an equivalence of the index type. -/
-theorem wmSetLe_congr {β : Type} (u : α ≃ β) {LeA : α → α → Prop} {LeB : β → β → Prop}
-    (hle : ∀ x y, LeA x y ↔ LeB (u x) (u y)) (s t : α → Prop) :
-    WMSetLe LeA s t ↔
-      WMSetLe LeB (fun y => s (u.symm y)) (fun y => t (u.symm y)) := by
-  have hagree : (∀ x, s x ↔ t x) ↔ ∀ y, s (u.symm y) ↔ t (u.symm y) :=
-    ⟨fun h y => h _, fun h x => by simpa using h (u x)⟩
-  refine or_congr hagree ⟨fun ⟨x, hbelow, hs, ht⟩ => ⟨u x, fun y hy => ?_, ?_, ?_⟩,
-    fun ⟨x, hbelow, hs, ht⟩ => ⟨u.symm x, fun y hy => ?_, hs, ht⟩⟩
-  · have h1 : LeA (u.symm y) x := (hle (u.symm y) x).mpr (by
-      rw [Equiv.apply_symm_apply]; exact hy.1)
-    have h2 : ¬LeA x (u.symm y) := fun hc => hy.2 (by
-      have h3 := (hle x (u.symm y)).mp hc
-      rwa [Equiv.apply_symm_apply] at h3)
-    exact hbelow (u.symm y) ⟨h1, h2⟩
-  · simpa using hs
-  · simpa using ht
-  · have h1 : LeB (u y) x := by
-      have h3 := (hle y (u.symm x)).mp hy.1
-      rwa [Equiv.apply_symm_apply] at h3
-    have h2 : ¬LeB x (u y) := fun hc => hy.2 ((hle (u.symm x) y).mpr (by
-      rwa [Equiv.apply_symm_apply]))
-    simpa using hbelow (u y) ⟨h1, h2⟩
-
-/-- The initial segment of an element transports along an equivalence. -/
-theorem wmDown_congr {β : Type} (u : α ≃ β) {LeA : α → α → Prop} {LeB : β → β → Prop}
-    (hle : ∀ x y, LeA x y ↔ LeB (u x) (u y)) (s : α → Prop) (x : α) :
-    WMDown LeA s x ↔ WMDown LeB (fun y => s (u.symm y)) (u x) := by
-  refine ⟨fun h y => ?_, fun h y => ?_⟩
-  · change s (u.symm y) ↔ LeB y (u x)
-    rw [h (u.symm y), hle (u.symm y) x, Equiv.apply_symm_apply]
-  · have h1 : s (u.symm (u y)) ↔ LeB (u y) (u x) := h (u y)
-    rw [Equiv.symm_apply_apply] at h1
-    rw [h1]
-    exact (hle y x).symm
-
-end Addresses
 
 /-! ### The universe and the machine -/
 

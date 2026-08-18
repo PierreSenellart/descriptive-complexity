@@ -15,7 +15,7 @@ import DescriptiveComplexity.Problems.Wide.Test
 comes in – write with an accumulator, write without one, read with one – stated
 about an abstract tape and an abstract supply of transitions. This file joins
 them to a `DescriptiveComplexity.Pfp.Prog`: the tape is
-`DescriptiveComplexity.Pfp.Prog.trackTape`, the transitions come from the
+`DescriptiveComplexity.Pfp.Prog.trackTapeAt`, the transitions come from the
 program's rules, and what is left for the program to supply is a **rule per case**
 and nothing else.
 
@@ -36,10 +36,22 @@ deterministic table can serve; their corrected forms are in
 
 Each pass needs to tell a register cell from a cell of the working area, because
 its rules act at the first and merely walk over the second. One track slot `rg`
-carries that (`hrest` below: the slot is set exactly at the cells the input
-channel marked), and the guards read it. That is also what separates the acting
-rules from the walking one, so it is what
-`DescriptiveComplexity.Pfp.Prog.sep_of` is discharged from in these phases.
+carries that (`hrest` below: the slot is set exactly at the cells of the file),
+and the guards read it. That is also what separates the acting rules from the
+walking one, so it is what `DescriptiveComplexity.Pfp.Prog.sep_of` is discharged
+from in these phases.
+
+## Which file
+
+Nothing here is about *where* the registers are. The passes that need only the
+cells take the family (`DescriptiveComplexity.Pfp.Prog.passTracksAt`, and the
+lemmas whose `cell` is inferred from the statement); the passes that need a file
+to be a file – the two walks up and down to a marked register, and the mirror
+increment – take a `DescriptiveComplexity.RegFile` and are named `file…`. The
+`wmSeg` statements below them are those at
+`DescriptiveComplexity.wmSegFile`, which is the file a space-bounded program gets
+free from the input channel; a clocked program builds its own low on the tape and
+calls the same lemmas at it.
 
 ## One restriction, and where it bites
 
@@ -116,73 +128,113 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 section Reading
 
 variable (PR)
+variable {I : Type} {ile : I → I → Prop} (cell : I → (Univ A R P K dd → Prop))
 variable (t rg : W) (rest : (Univ A R P K dd → Prop) → W → A)
 
-/-- **The tracks the tape carries at a cell**: the walked track's digit in the slot
-`t`, the program's own bits elsewhere. Everything a rule of a register pass reads
-is this, at a register cell or at a cell of the working area. -/
-noncomputable def passTracks (m : Univ A R P K dd → Prop) (r : Univ A R P K dd → Prop) : W → A :=
-  fun s => if s = t then bitVal PR.zero PR.one (regBit m r) else rest r s
+/-- **The tracks the tape carries at a cell**: the walked track's digit in the
+slot `t`, the program's own bits elsewhere. Everything a rule of a register pass
+reads is this, at a register cell or at a cell of the working area.
+
+The register file enters as its *cells* and not as a
+`DescriptiveComplexity.RegFile`, for the reason
+`DescriptiveComplexity.Pfp.Prog.trackTapeAt` does: this is a definition, and a
+file carries proofs. What indexes those cells is a parameter, as it is
+throughout the address layer: a program on a clock cannot give every element of
+the universe a register, and the tracks do not care which does. -/
+noncomputable def passTracksAt
+    (m : I → Prop) (r : Univ A R P K dd → Prop) : W → A :=
+  fun s => if s = t then bitVal PR.zero PR.one (bitAtOf cell m r) else rest r s
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
+  [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
+theorem trackTapeAt_eq (m : I → Prop) (r : Univ A R P K dd → Prop) :
+    PR.trackTapeAt cell t rest m r = PR.syElt (PR.passTracksAt cell t rest m r) := rfl
+
+variable {PR cell t rg rest}
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
-theorem trackTape_eq (m r : Univ A R P K dd → Prop) :
-    PR.trackTape t rest m r = PR.syElt (PR.passTracks t rest m r) := rfl
-
-variable {PR t rg rest}
-
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
 /-- At a register cell the walked slot holds the track's digit there. -/
-theorem passTracks_wmSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-    (m : Univ A R P K dd → Prop) (u : Univ A R P K dd) :
-    PR.passTracks t rest m (wmSeg u) =
-      fun s => if s = t then bitVal PR.zero PR.one (m u) else rest (wmSeg u) s := by
+theorem passTracks_cell (F : IxFile (Univ A R P K dd) I ile)
+    (hix : IsLinOrd ile)
+    (m : I → Prop) (u : I) :
+    PR.passTracksAt F.cell t rest m (F.cell u) =
+      fun s => if s = t then bitVal PR.zero PR.one (m u) else rest (F.cell u) s := by
   refine funext fun s => ?_
   by_cases hs : s = t
-  · rw [passTracks, if_pos hs, if_pos hs]
-    exact bitVal_congr (regBit_wmSeg hlin m u)
-  · rw [passTracks, if_neg hs, if_neg hs]
-
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-/-- **The walked slot at a register cell**: the track's digit there, which is what
-the acting rules of a pass are guarded by. -/
-theorem passTracks_wmSeg_apply (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-    (m : Univ A R P K dd → Prop) (u : Univ A R P K dd) :
-    PR.passTracks t rest m (wmSeg u) t = bitVal PR.zero PR.one (m u) := by
-  rw [passTracks, if_pos rfl]
-  exact bitVal_congr (regBit_wmSeg hlin m u)
+  · simp only [passTracksAt, if_pos hs]
+    exact bitVal_congr (F.bitAt_cell hix m u)
+  · simp only [passTracksAt, if_neg hs]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
+/-- **The walked slot at a register cell**: the track's digit there, which is what
+the acting rules of a pass are guarded by. -/
+theorem passTracks_cell_apply (F : IxFile (Univ A R P K dd) I ile)
+    (hix : IsLinOrd ile)
+    (m : I → Prop) (u : I) :
+    PR.passTracksAt F.cell t rest m (F.cell u) t = bitVal PR.zero PR.one (m u) := by
+  simp only [passTracksAt]
+  exact bitVal_congr (F.bitAt_cell hix m u)
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
+/-- The same at the file the input channel marks. -/
+theorem passTracks_wmSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+    (m : Univ A R P K dd → Prop) (u : Univ A R P K dd) :
+    PR.passTracksAt wmSeg t rest m (wmSeg u) =
+      fun s => if s = t then bitVal PR.zero PR.one (m u) else rest (wmSeg u) s :=
+  passTracks_cell (wmSegFile hlin).toIx hlin m u
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
+/-- **The walked slot at a marked cell**: the track's digit there. -/
+theorem passTracks_wmSeg_apply (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+    (m : Univ A R P K dd → Prop) (u : Univ A R P K dd) :
+    PR.passTracksAt wmSeg t rest m (wmSeg u) t = bitVal PR.zero PR.one (m u) :=
+  passTracks_cell_apply (wmSegFile hlin).toIx hlin m u
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
+  [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
 /-- Away from the register file the walked slot is clear. -/
-theorem passTracks_of_not_reg (m : Univ A R P K dd → Prop) {r : Univ A R P K dd → Prop}
-    (hno : ∀ u : Univ A R P K dd, r ≠ wmSeg u) :
-    PR.passTracks t rest m r =
+theorem passTracks_of_not_reg (m : I → Prop) {r : Univ A R P K dd → Prop}
+    (hno : ∀ u : I, r ≠ cell u) :
+    PR.passTracksAt cell t rest m r =
       fun s => if s = t then PR.zero else rest r s := by
   refine funext fun s => ?_
   by_cases hs : s = t
-  · rw [passTracks, if_pos hs, if_pos hs]
-    exact bitVal_neg (regBit_of_not_reg hno)
-  · rw [passTracks, if_neg hs, if_neg hs]
+  · simp only [passTracksAt, if_pos hs]
+    exact bitVal_neg (bitAtOf_of_not_reg hno)
+  · simp only [passTracksAt, if_neg hs]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
+  [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
 /-- **A slot other than the walked one** shows what the program keeps there. Every
 guard of a register pass that is not about the track itself reads through this. -/
-theorem passTracks_of_ne {sl : W} (hne : sl ≠ t) (m r : Univ A R P K dd → Prop) :
-    PR.passTracks t rest m r sl = rest r sl := by
-  rw [passTracks, if_neg hne]
+theorem passTracks_of_ne {sl : W} (hne : sl ≠ t) (m : I → Prop) (r : Univ A R P K dd → Prop) :
+    PR.passTracksAt cell t rest m r sl = rest r sl := by
+  simp only [passTracksAt, if_neg hne]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
-/-- **The register mark, read**: the slot `rg` is set exactly at the cells the
-input channel marked, which is what tells the acting rules of a pass from its
-walking one. -/
+  [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
+/-- **The tracks at a cell read the background there and nowhere else.** Two
+backgrounds agreeing at one address present the same tracks there, whatever they
+do elsewhere – which is what lets a sweep describe its progress by a frontier
+rather than by an induction. -/
+theorem passTracks_congr {bgA bgB : (Univ A R P K dd → Prop) → W → A}
+    {r : Univ A R P K dd → Prop} (hbg : bgA r = bgB r) (m : I → Prop) :
+    PR.passTracksAt cell t bgA m r = PR.passTracksAt cell t bgB m r := by
+  refine funext fun sl => ?_
+  simp only [passTracksAt, hbg]
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
+  [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
+/-- **The register mark, read**: the slot `rg` is set exactly at the cells of the
+file, which is what tells the acting rules of a pass from its walking one. -/
 theorem passTracks_rg (hne : t ≠ rg)
     (hrest : ∀ r : Univ A R P K dd → Prop,
-      rest r rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
-    (m : Univ A R P K dd → Prop) (r : Univ A R P K dd → Prop) :
-    PR.passTracks t rest m r rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u) := by
+      rest r rg = bitVal PR.zero PR.one (∃ u : I, r = cell u))
+    (m : I → Prop) (r : Univ A R P K dd → Prop) :
+    PR.passTracksAt cell t rest m r rg =
+      bitVal PR.zero PR.one (∃ u : I, r = cell u) := by
   rw [passTracks_of_ne (Ne.symm hne)]
   exact hrest r
 
@@ -195,45 +247,50 @@ the other way round – the track is untouched and the **background** changes, a
 the one cell the head is on. That is one step, and it is the only place a
 program's own data is written. -/
 
+variable {I : Type} {ile : I → I → Prop} {cell : I → (Univ A R P K dd → Prop)}
+
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
+  [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
 /-- **Backgrounds agreeing off a cell present tapes agreeing off it.** -/
 theorem trackTape_frame {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A}
-    {m : Univ A R P K dd → Prop} {v : Univ A R P K dd → Prop}
+    {m : I → Prop} {v : Univ A R P K dd → Prop}
     (hframe : ∀ r, r ≠ v → rest' r = rest r) :
-    ∀ r, r ≠ v → PR.trackTape t rest' m r = PR.trackTape t rest m r := fun r hr => by
-  rw [trackTape, trackTape, hframe r hr]
+    ∀ r, r ≠ v →
+      PR.trackTapeAt cell t rest' m r = PR.trackTapeAt cell t rest m r := fun r hr => by
+  simp only [trackTapeAt, hframe r hr]
 
 /-- **One step of the program to the right**, writing its own data at the cell it
 leaves. The track is carried along untouched, so a step and a register pass compose
 without either having to know what the other keeps on the tape. -/
 theorem step_move (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {v v' : Univ A R P K dd → Prop} (hi : WMIncr WMLe v v')
-    {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
+    {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
     (hframe : ∀ r, r ≠ v → rest' r = rest r) {p p' : P} {f f' : Q → A}
-    (hrule : PR.HasRight p f (PR.passTracks t rest m v) p' f' (PR.passTracks t rest' m v)) :
+    (hrule : PR.HasRight p f (PR.passTracksAt cell t rest m v) p' f' (PR.passTracksAt cell t
+      rest' m v)) :
     (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt p f), Sum.inl v,
-        wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt p' f'), Sum.inl v',
-        wideTape (PR.trackTape t rest' m) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt cell t rest' m) (PR.syElt PR.blank)⟩ := by
   obtain ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩ := step_of_hasRight hR hrule
-  rw [← trackTape_eq] at hread hwrite
+  rw [← trackTapeAt_eq] at hread hwrite
   exact step_wideTape_right hlin hi htr hsrc hread hdst hwrite hright (PR.trackTape_frame hframe)
 
 /-- **One step of the program to the left.** -/
 theorem step_moveBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {v v' : Univ A R P K dd → Prop} (hi : WMIncr WMLe v' v)
-    {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
+    {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
     (hframe : ∀ r, r ≠ v → rest' r = rest r) {p p' : P} {f f' : Q → A}
-    (hrule : PR.HasLeft p f (PR.passTracks t rest m v) p' f' (PR.passTracks t rest' m v)) :
+    (hrule : PR.HasLeft p f (PR.passTracksAt cell t rest m v) p' f' (PR.passTracksAt cell t
+      rest' m v)) :
     (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt p f), Sum.inl v,
-        wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt p' f'), Sum.inl v',
-        wideTape (PR.trackTape t rest' m) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt cell t rest' m) (PR.syElt PR.blank)⟩ := by
   obtain ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩ := step_of_hasLeft hR hrule
-  rw [← trackTape_eq] at hread hwrite
+  rw [← trackTapeAt_eq] at hread hwrite
   exact step_wideTape_left hlin hi htr hsrc hread hdst hwrite hright (PR.trackTape_frame hframe)
 
 /-! ### Getting to a marked register
@@ -245,52 +302,84 @@ and the same theorem serves both ends by taking the target as a parameter. -/
 
 /-- **Walking up to a marked register.** From any cell at or below the register of
 `u`, the machine scans right to it, stopped by the slot `sl` that marks that cell
-and no other. -/
-theorem reaches_toMark (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+and no other. The cost is the stretch of addresses it crosses. -/
+theorem reachesIn_fileToMark (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
-    {u : Univ A R P K dd}
-    (hsl : ∀ r : Univ A R P K dd → Prop, rest r sl = bitVal PR.zero PR.one (r = wmSeg u))
-    {p : P} {f : Q → A} {m : Univ A R P K dd → Prop}
+    {u : I}
+    (hsl : ∀ r : Univ A R P K dd → Prop, rest r sl = bitVal PR.zero PR.one (r = F.cell u))
+    {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, g sl = PR.zero → PR.HasRight p f g p f g)
-    {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s (wmSeg u)) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+    {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s (F.cell u)) :
+    (wideData (Univ A R P K dd)).ReachesIn (wideRank (F.cell u) - wideRank s)
       ⟨Sum.inr (PR.stElt p f), Sum.inl s,
-        wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt p f), Sum.inl (wmSeg u),
-        wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩ := by
-  have hclear : ∀ r : Univ A R P K dd → Prop, r ≠ wmSeg u →
-      PR.passTracks t rest m r sl = PR.zero := fun r hr => by
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt p f), Sum.inl (F.cell u),
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩ := by
+  have hclear : ∀ r : Univ A R P K dd → Prop, r ≠ F.cell u →
+      PR.passTracksAt F.cell t rest m r sl = PR.zero := fun r hr => by
     rw [passTracks_of_ne hne, hsl r]
     exact bitVal_neg hr
-  refine reaches_toReg hlin hle (fun x hx => ?_) (fun r _ hno => ?_)
-  · rw [trackTape_eq]
-    exact step_of_hasRight hR (hgo _ (hclear _ fun hc => hx (wmSeg_injective hlin hc)))
-  · rw [trackTape_eq]
+  refine F.reachesIn_toReg hlin hle (fun x hx => ?_) (fun r _ hno => ?_)
+  · rw [trackTapeAt_eq]
+    exact step_of_hasRight hR (hgo _ (hclear _ fun hc => hx (F.injective hix hc)))
+  · rw [trackTapeAt_eq]
     exact step_of_hasRight hR (hgo _ (hclear _ (hno u)))
 
-/-- **Walking back down to a marked register**, the same reading downwards. -/
-theorem reaches_toMarkBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+/-- **Walking up to a marked register**, the budget forgotten. -/
+theorem reaches_fileToMark (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
-    {u : Univ A R P K dd}
-    (hsl : ∀ r : Univ A R P K dd → Prop, rest r sl = bitVal PR.zero PR.one (r = wmSeg u))
-    {p : P} {f : Q → A} {m : Univ A R P K dd → Prop}
-    (hgo : ∀ g : W → A, g sl = PR.zero → PR.HasLeft p f g p f g)
-    {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe (wmSeg u) s) :
+    {u : I}
+    (hsl : ∀ r : Univ A R P K dd → Prop, rest r sl = bitVal PR.zero PR.one (r = F.cell u))
+    {p : P} {f : Q → A} {m : I → Prop}
+    (hgo : ∀ g : W → A, g sl = PR.zero → PR.HasRight p f g p f g)
+    {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s (F.cell u)) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt p f), Sum.inl s,
-        wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt p f), Sum.inl (wmSeg u),
-        wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩ := by
-  have hclear : ∀ r : Univ A R P K dd → Prop, r ≠ wmSeg u →
-      PR.passTracks t rest m r sl = PR.zero := fun r hr => by
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt p f), Sum.inl (F.cell u),
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn_fileToMark F hR hlin hix hne hsl hgo hle).reflTransGen
+/-- **Walking back down to a marked register**, the same reading downwards. -/
+theorem reachesIn_fileToMarkBack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
+    {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
+    {u : I}
+    (hsl : ∀ r : Univ A R P K dd → Prop, rest r sl = bitVal PR.zero PR.one (r = F.cell u))
+    {p : P} {f : Q → A} {m : I → Prop}
+    (hgo : ∀ g : W → A, g sl = PR.zero → PR.HasLeft p f g p f g)
+    {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe (F.cell u) s) :
+    (wideData (Univ A R P K dd)).ReachesIn (wideRank s - wideRank (F.cell u))
+      ⟨Sum.inr (PR.stElt p f), Sum.inl s,
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt p f), Sum.inl (F.cell u),
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩ := by
+  have hclear : ∀ r : Univ A R P K dd → Prop, r ≠ F.cell u →
+      PR.passTracksAt F.cell t rest m r sl = PR.zero := fun r hr => by
     rw [passTracks_of_ne hne, hsl r]
     exact bitVal_neg hr
-  refine reaches_toRegBack hlin hle (fun x hx => ?_) (fun r _ hno => ?_)
-  · rw [trackTape_eq]
-    exact step_of_hasLeft hR (hgo _ (hclear _ fun hc => hx (wmSeg_injective hlin hc)))
-  · rw [trackTape_eq]
+  refine F.reachesIn_toRegBack hlin hle (fun x hx => ?_) (fun r _ hno => ?_)
+  · rw [trackTapeAt_eq]
+    exact step_of_hasLeft hR (hgo _ (hclear _ fun hc => hx (F.injective hix hc)))
+  · rw [trackTapeAt_eq]
     exact step_of_hasLeft hR (hgo _ (hclear _ (hno u)))
 
+/-- **Walking back down to a marked register**, the budget forgotten. -/
+theorem reaches_fileToMarkBack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
+    {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
+    {u : I}
+    (hsl : ∀ r : Univ A R P K dd → Prop, rest r sl = bitVal PR.zero PR.one (r = F.cell u))
+    {p : P} {f : Q → A} {m : I → Prop}
+    (hgo : ∀ g : W → A, g sl = PR.zero → PR.HasLeft p f g p f g)
+    {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe (F.cell u) s) :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt p f), Sum.inl s,
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt p f), Sum.inl (F.cell u),
+        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn_fileToMarkBack F hR hlin hix hne hsl hgo hle).reflTransGen
 /-! ### Seeking a marked cell
 
 The other navigation a program does, and the one it does in the working area: walk
@@ -300,9 +389,31 @@ rounds ago – so the arrival comes with the promise that nothing passed was mar
 which is where the extremum is taken. -/
 
 /-- **Seeking right to the nearest marked cell.** -/
+theorem reachesIn_seek (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+    {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
+    {p : P} {f : Q → A} {m : I → Prop}
+    (hgo : ∀ g : W → A, g sl ≠ PR.one → PR.HasRight p f g p f g)
+    {s : Univ A R P K dd → Prop}
+    (hex : ∃ r : Univ A R P K dd → Prop, rest r sl = PR.one ∧ WMSetLe WMLe s r) :
+    ∃ r : Univ A R P K dd → Prop, rest r sl = PR.one ∧ WMSetLe WMLe s r ∧
+      (∀ r' : Univ A R P K dd → Prop, WMSetLe WMLe s r' → WMSetLt WMLe r' r →
+        rest r' sl ≠ PR.one) ∧
+      (wideData (Univ A R P K dd)).ReachesIn (wideRank r - wideRank s)
+        ⟨Sum.inr (PR.stElt p f), Sum.inl s,
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩
+        ⟨Sum.inr (PR.stElt p f), Sum.inl r,
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩ :=
+  reachesIn_scan_tape (Stop := fun r => rest r sl = PR.one) hlin hex fun r _ _ hstop => by
+    obtain ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩ :=
+      step_of_hasRight hR (hgo (PR.passTracksAt cell t rest m r)
+        (by rw [passTracks_of_ne hne]; exact hstop))
+    rw [← trackTapeAt_eq] at hread hwrite
+    exact ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩
+
+/-- **Seeking right to the nearest marked cell**, the budget forgotten. -/
 theorem reaches_seek (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
-    {p : P} {f : Q → A} {m : Univ A R P K dd → Prop}
+    {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, g sl ≠ PR.one → PR.HasRight p f g p f g)
     {s : Univ A R P K dd → Prop}
     (hex : ∃ r : Univ A R P K dd → Prop, rest r sl = PR.one ∧ WMSetLe WMLe s r) :
@@ -311,20 +422,37 @@ theorem reaches_seek (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R
         rest r' sl ≠ PR.one) ∧
       Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
         ⟨Sum.inr (PR.stElt p f), Sum.inl s,
-          wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩
         ⟨Sum.inr (PR.stElt p f), Sum.inl r,
-          wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩ :=
-  reaches_scan_tape (Stop := fun r => rest r sl = PR.one) hlin hex fun r _ _ hstop => by
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩ := by
+  obtain ⟨r, hr, hge, hfirst, hrun⟩ := reachesIn_seek hR hlin hne hgo hex
+  exact ⟨r, hr, hge, hfirst, hrun.reflTransGen⟩
+/-- **Seeking left to the nearest marked cell.** -/
+theorem reachesIn_seekBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+    {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
+    {p : P} {f : Q → A} {m : I → Prop}
+    (hgo : ∀ g : W → A, g sl ≠ PR.one → PR.HasLeft p f g p f g)
+    {s : Univ A R P K dd → Prop}
+    (hex : ∃ r : Univ A R P K dd → Prop, rest r sl = PR.one ∧ WMSetLe WMLe r s) :
+    ∃ r : Univ A R P K dd → Prop, rest r sl = PR.one ∧ WMSetLe WMLe r s ∧
+      (∀ r' : Univ A R P K dd → Prop, WMSetLt WMLe r r' → WMSetLe WMLe r' s →
+        rest r' sl ≠ PR.one) ∧
+      (wideData (Univ A R P K dd)).ReachesIn (wideRank s - wideRank r)
+        ⟨Sum.inr (PR.stElt p f), Sum.inl s,
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩
+        ⟨Sum.inr (PR.stElt p f), Sum.inl r,
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩ :=
+  reachesIn_scanBack_tape (Stop := fun r => rest r sl = PR.one) hlin hex fun r _ _ hstop => by
     obtain ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩ :=
-      step_of_hasRight hR (hgo (PR.passTracks t rest m r)
+      step_of_hasLeft hR (hgo (PR.passTracksAt cell t rest m r)
         (by rw [passTracks_of_ne hne]; exact hstop))
-    rw [← trackTape_eq] at hread hwrite
+    rw [← trackTapeAt_eq] at hread hwrite
     exact ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩
 
-/-- **Seeking left to the nearest marked cell.** -/
+/-- **Seeking left to the nearest marked cell**, the budget forgotten. -/
 theorem reaches_seekBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
-    {p : P} {f : Q → A} {m : Univ A R P K dd → Prop}
+    {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, g sl ≠ PR.one → PR.HasLeft p f g p f g)
     {s : Univ A R P K dd → Prop}
     (hex : ∃ r : Univ A R P K dd → Prop, rest r sl = PR.one ∧ WMSetLe WMLe r s) :
@@ -333,16 +461,11 @@ theorem reaches_seekBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ
         rest r' sl ≠ PR.one) ∧
       Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
         ⟨Sum.inr (PR.stElt p f), Sum.inl s,
-          wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩
         ⟨Sum.inr (PR.stElt p f), Sum.inl r,
-          wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩ :=
-  reaches_scanBack_tape (Stop := fun r => rest r sl = PR.one) hlin hex fun r _ _ hstop => by
-    obtain ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩ :=
-      step_of_hasLeft hR (hgo (PR.passTracks t rest m r)
-        (by rw [passTracks_of_ne hne]; exact hstop))
-    rw [← trackTape_eq] at hread hwrite
-    exact ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩
-
+          wideTape (PR.trackTapeAt cell t rest m) (PR.syElt PR.blank)⟩ := by
+  obtain ⟨r, hr, hge, hfirst, hrun⟩ := reachesIn_seekBack hR hlin hne hgo hex
+  exact ⟨r, hr, hge, hfirst, hrun.reflTransGen⟩
 /-! ### The mirror increment
 
 The stopped phase may depend on the register the increment carried at – on the
@@ -362,14 +485,16 @@ position.
 
 The four families of rules are the whole of what the program supplies, and each is
 a statement about the tracks a symbol carries, not about the tape. -/
-theorem reaches_incrAt (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-    {m m' : Univ A R P K dd → Prop} (hi : WMIncr WMLe m m')
+theorem reachesIn_fileIncrBlk [Finite I] (F : IxFile (Univ A R P K dd) I ile)
+    (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
+    {m m' : I → Prop} (hi : WMIncr ile m m')
     {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
     (hrest : ∀ r : Univ A R P K dd → Prop,
-      rest r rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
-    {B : Type} {bs : B → W} (hbs : ∀ b, bs b ≠ t) {blkOf : Univ A R P K dd → B}
-    (hblk : ∀ (u : Univ A R P K dd) (b : B),
-      rest (wmSeg u) (bs b) = bitVal PR.zero PR.one (blkOf u = b))
+      rest r rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
+    {B : Type} {bs : B → W} (hbs : ∀ b, bs b ≠ t) {blkOf : I → B}
+    (hblk : ∀ (u : I) (b : B),
+      rest (F.cell u) (bs b) = bitVal PR.zero PR.one (blkOf u = b))
     {pc : P} {pd : B → P} {fc : Q → A}
     (hclear : ∀ g : W → A, g t = PR.one → g rg = PR.one →
       PR.HasLeft pc fc g pc fc (Function.update g t PR.zero))
@@ -377,116 +502,211 @@ theorem reaches_incrAt (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A
       (∀ b' : B, g (bs b') = PR.one → b' = b) →
       PR.HasLeft pc fc g (pd b) fc (Function.update g t PR.one))
     (hhold : ∀ (b : B) (g : W → A), g rg = PR.one → PR.HasLeft (pd b) fc g (pd b) fc g)
-    (hwalk : ∀ k r : Univ A R P K dd → Prop,
-      (∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) →
-      (∀ x : Univ A R P K dd, r ≠ wmSeg x) →
-      PR.HasLeft pc fc (PR.passTracks t rest k r) pc fc (PR.passTracks t rest k r))
-    (hwalkD : ∀ (b : B) (k r : Univ A R P K dd → Prop),
-      (∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) →
-      (∀ x : Univ A R P K dd, r ≠ wmSeg x) →
-      PR.HasLeft (pd b) fc (PR.passTracks t rest k r) (pd b) fc (PR.passTracks t rest k r))
-    {top bot : Univ A R P K dd} (htop : ∀ v, WMLe v top) (hbot : ∀ v, WMLe bot v) :
-    ∃ (u₀ : Univ A R P K dd) (p : Univ A R P K dd → Prop),
-      (¬m u₀ ∧ ∀ v, WMLt WMLe u₀ v → m v) ∧ WMIncr WMLe p (wmSeg bot) ∧
-      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-        ⟨Sum.inr (PR.stElt pc fc), Sum.inl (wmSeg top),
-          wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
+    (hwalk : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft pc fc (PR.passTracksAt F.cell t rest k r) pc fc
+        (PR.passTracksAt F.cell t rest k r))
+    (hwalkD : ∀ (b : B) (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft (pd b) fc (PR.passTracksAt F.cell t rest k r) (pd b) fc (PR.passTracksAt F.cell t
+        rest k r))
+    {w : ℕ} (hgap : ∀ u u' : I, IxSucc ile u u' →
+      wideRank (F.cell u') - wideRank (F.cell u) ≤ w)
+    {top bot : I} (htop : ∀ v, ile v top) (hbot : ∀ v, ile bot v) :
+    ∃ (u₀ : I) (p : Univ A R P K dd → Prop),
+      (¬m u₀ ∧ ∀ v, WMLt ile u₀ v → m v) ∧ WMIncr WMLe p (F.cell bot) ∧
+      (wideData (Univ A R P K dd)).ReachesIn ((ixRank ile top - ixRank ile bot) * w + 1)
+        ⟨Sum.inr (PR.stElt pc fc), Sum.inl (F.cell top),
+          wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
         ⟨Sum.inr (PR.stElt (pd (blkOf u₀)) fc), Sum.inl p,
-          wideTape (PR.trackTape t rest m') (PR.syElt PR.blank)⟩ := by
+          wideTape (PR.trackTapeAt F.cell t rest m') (PR.syElt PR.blank)⟩ := by
   -- The mark of a register cell is set, and of no other cell.
-  have hrgSeg : ∀ (k : Univ A R P K dd → Prop) (u : Univ A R P K dd),
-      PR.passTracks t rest k (wmSeg u) rg = PR.one := fun k u => by
+  have hrgSeg : ∀ (k : I → Prop) (u : I),
+      PR.passTracksAt F.cell t rest k (F.cell u) rg = PR.one := fun k u => by
     rw [passTracks_rg hne hrest]
     exact bitVal_pos ⟨u, rfl⟩
-  have hrgOff : ∀ (k : Univ A R P K dd → Prop) (r : Univ A R P K dd → Prop),
-      (∀ x : Univ A R P K dd, r ≠ wmSeg x) → PR.passTracks t rest k r rg = PR.zero :=
+  have hrgOff : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∀ x : I, r ≠ F.cell x) → PR.passTracksAt F.cell t rest k r rg = PR.zero :=
     fun k r hno => by
       rw [passTracks_rg hne hrest]
       exact bitVal_neg fun hc => hc.elim fun x hx => hno x hx
   -- The block slot of a register cell names that register's block.
-  have hbsSeg : ∀ (k : Univ A R P K dd → Prop) (u : Univ A R P K dd),
-      PR.passTracks t rest k (wmSeg u) (bs (blkOf u)) = PR.one := fun k u => by
+  have hbsSeg : ∀ (k : I → Prop) (u : I),
+      PR.passTracksAt F.cell t rest k (F.cell u) (bs (blkOf u)) = PR.one := fun k u => by
     rw [passTracks_of_ne (hbs _), hblk u (blkOf u)]
     exact bitVal_pos rfl
-  refine reaches_mirrorIncr hlin hi (b := PR.syElt PR.blank)
-    (tapeOf := PR.trackTape t rest) (qc := PR.stElt pc fc)
+  refine F.reachesIn_mirrorIncr hix hlin hi (b := PR.syElt PR.blank) (w := w) hgap
+    (tapeOf := PR.trackTapeAt F.cell t rest) (qc := PR.stElt pc fc)
     (qd := fun u => PR.stElt (pd (blkOf u)) fc)
-    (PR.trackTape_coh t rest) (fun k u hk => ?_) (fun k u hk => ?_) (fun u k w => ?_)
+    (PR.trackTapeAt_coh F.cell t rest) (fun k u hk => ?_) (fun k u hk => ?_) (fun u k w => ?_)
     (fun q hq k r hbnd hno => ?_) htop hbot
   · -- a set digit: clear it and carry on
-    have hwrite : PR.passTracks t rest (fun v => k v ∧ v ≠ u) (wmSeg u) =
-        Function.update (PR.passTracks t rest k (wmSeg u)) t PR.zero := by
-      rw [passTracks_wmSeg hlin, passTracks_wmSeg hlin]
+    have hwrite : PR.passTracksAt F.cell t rest (fun v => k v ∧ v ≠ u) (F.cell u) =
+        Function.update (PR.passTracksAt F.cell t rest k (F.cell u)) t PR.zero := by
+      rw [passTracks_cell F hix, passTracks_cell F hix]
       refine funext fun s => ?_
       by_cases hs : s = t
       · subst hs
         rw [Function.update_self, if_pos rfl]
         exact bitVal_neg fun hc => hc.2 rfl
       · rw [Function.update_of_ne hs, if_neg hs, if_neg hs]
-    rw [trackTape_eq, trackTape_eq, hwrite]
+    rw [trackTapeAt_eq, trackTapeAt_eq, hwrite]
     refine step_of_hasLeft hR (hclear _ ?_ (hrgSeg k u))
-    rw [passTracks_wmSeg_apply hlin]
+    rw [passTracks_cell_apply F hix]
     exact bitVal_pos hk
   · -- a clear digit: set it, and stop in the phase of this register's block
-    have hwrite : PR.passTracks t rest (fun v => k v ∨ v = u) (wmSeg u) =
-        Function.update (PR.passTracks t rest k (wmSeg u)) t PR.one := by
-      rw [passTracks_wmSeg hlin, passTracks_wmSeg hlin]
+    have hwrite : PR.passTracksAt F.cell t rest (fun v => k v ∨ v = u) (F.cell u) =
+        Function.update (PR.passTracksAt F.cell t rest k (F.cell u)) t PR.one := by
+      rw [passTracks_cell F hix, passTracks_cell F hix]
       refine funext fun s => ?_
       by_cases hs : s = t
       · subst hs
         rw [Function.update_self, if_pos rfl]
         exact bitVal_pos (Or.inr rfl)
       · rw [Function.update_of_ne hs, if_neg hs, if_neg hs]
-    rw [trackTape_eq, trackTape_eq, hwrite]
+    rw [trackTapeAt_eq, trackTapeAt_eq, hwrite]
     refine step_of_hasLeft hR
       (hset (blkOf u) _ ?_ (hrgSeg k u) (hbsSeg k u) fun b' hb' => ?_)
-    · rw [passTracks_wmSeg_apply hlin]
+    · rw [passTracks_cell_apply F hix]
       exact bitVal_neg hk
     · rw [passTracks_of_ne (hbs b'), hblk u b'] at hb'
       by_contra hne'
       rw [bitVal_neg fun hc => hne' hc.symm] at hb'
       exact PR.zero_ne_one hb'
   · -- already stopped: rewrite the register's symbol and walk on
-    rw [trackTape_eq]
+    rw [trackTapeAt_eq]
     exact step_of_hasLeft hR (hhold (blkOf u) _ (hrgSeg k w))
   · -- an unmarked cell of the file: walk over it, in whichever phase
-    rw [trackTape_eq]
+    rw [trackTapeAt_eq]
     rcases hq with rfl | ⟨u, rfl⟩
     · exact step_of_hasLeft hR (hwalk k r hbnd hno)
     · exact step_of_hasLeft hR (hwalkD (blkOf u) k r hbnd hno)
 
 /-- **A program increments its mirror**, stopping in one phase whatever carried:
-`DescriptiveComplexity.Pfp.Prog.reaches_incrAt` with a single block, the register
+`DescriptiveComplexity.Pfp.Prog.reachesIn_fileIncrBlk` with a single block, the register
 mark serving as its indicator. This is the form every use that only has to *move*
 an address takes – advancing the working cell, seeking. -/
-theorem reaches_incr (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-    {m m' : Univ A R P K dd → Prop} (hi : WMIncr WMLe m m')
+theorem reachesIn_fileIncr [Finite I] (F : IxFile (Univ A R P K dd) I ile)
+    (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
+    {m m' : I → Prop} (hi : WMIncr ile m m')
     {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
     (hrest : ∀ r : Univ A R P K dd → Prop,
-      rest r rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+      rest r rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
     {pc pd : P} {fc : Q → A}
     (hclear : ∀ g : W → A, g t = PR.one → g rg = PR.one →
       PR.HasLeft pc fc g pc fc (Function.update g t PR.zero))
     (hset : ∀ g : W → A, g t = PR.zero → g rg = PR.one →
       PR.HasLeft pc fc g pd fc (Function.update g t PR.one))
     (hhold : ∀ g : W → A, g rg = PR.one → PR.HasLeft pd fc g pd fc g)
-    (hwalk : ∀ k r : Univ A R P K dd → Prop,
-      (∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) →
-      (∀ x : Univ A R P K dd, r ≠ wmSeg x) →
-      PR.HasLeft pc fc (PR.passTracks t rest k r) pc fc (PR.passTracks t rest k r))
-    (hwalkD : ∀ k r : Univ A R P K dd → Prop,
-      (∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) →
-      (∀ x : Univ A R P K dd, r ≠ wmSeg x) →
-      PR.HasLeft pd fc (PR.passTracks t rest k r) pd fc (PR.passTracks t rest k r))
-    {top bot : Univ A R P K dd} (htop : ∀ v, WMLe v top) (hbot : ∀ v, WMLe bot v) :
-    ∃ (u₀ : Univ A R P K dd) (p : Univ A R P K dd → Prop),
-      (¬m u₀ ∧ ∀ v, WMLt WMLe u₀ v → m v) ∧ WMIncr WMLe p (wmSeg bot) ∧
-      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-        ⟨Sum.inr (PR.stElt pc fc), Sum.inl (wmSeg top),
-          wideTape (PR.trackTape t rest m) (PR.syElt PR.blank)⟩
+    (hwalk : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft pc fc (PR.passTracksAt F.cell t rest k r) pc fc
+        (PR.passTracksAt F.cell t rest k r))
+    (hwalkD : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft pd fc (PR.passTracksAt F.cell t rest k r) pd fc
+        (PR.passTracksAt F.cell t rest k r))
+    {w : ℕ} (hgap : ∀ u u' : I, IxSucc ile u u' →
+      wideRank (F.cell u') - wideRank (F.cell u) ≤ w)
+    {top bot : I} (htop : ∀ v, ile v top) (hbot : ∀ v, ile bot v) :
+    ∃ (u₀ : I) (p : Univ A R P K dd → Prop),
+      (¬m u₀ ∧ ∀ v, WMLt ile u₀ v → m v) ∧ WMIncr WMLe p (F.cell bot) ∧
+      (wideData (Univ A R P K dd)).ReachesIn ((ixRank ile top - ixRank ile bot) * w + 1)
+        ⟨Sum.inr (PR.stElt pc fc), Sum.inl (F.cell top),
+          wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
         ⟨Sum.inr (PR.stElt pd fc), Sum.inl p,
-          wideTape (PR.trackTape t rest m') (PR.syElt PR.blank)⟩ :=
-  reaches_incrAt hR hlin hi hne hrest (B := Unit) (bs := fun _ => rg) (fun _ => Ne.symm hne)
+          wideTape (PR.trackTapeAt F.cell t rest m') (PR.syElt PR.blank)⟩ :=
+  reachesIn_fileIncrBlk F hR hlin hix hi hne hrest (B := Unit) (bs := fun _ => rg)
+    (fun _ => Ne.symm hne)
+    (blkOf := fun _ => ())
+    (fun u b => by
+      cases b
+      exact (hrest _).trans (bitVal_congr (iff_of_true ⟨u, rfl⟩ rfl)))
+    (pd := fun _ => pd) hclear (fun _ g h1 h2 _ _ => hset g h1 h2) (fun _ g h => hhold g h)
+    hwalk (fun _ => hwalkD) hgap htop hbot
+
+/-- **A program increments its mirror**, landing in the phase of the block that
+carried, the budget forgotten. -/
+theorem reaches_fileIncrBlk [Finite I] (F : IxFile (Univ A R P K dd) I ile)
+    (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
+    {m m' : I → Prop} (hi : WMIncr ile m m')
+    {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
+    (hrest : ∀ r : Univ A R P K dd → Prop,
+      rest r rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
+    {B : Type} {bs : B → W} (hbs : ∀ b, bs b ≠ t) {blkOf : I → B}
+    (hblk : ∀ (u : I) (b : B),
+      rest (F.cell u) (bs b) = bitVal PR.zero PR.one (blkOf u = b))
+    {pc : P} {pd : B → P} {fc : Q → A}
+    (hclear : ∀ g : W → A, g t = PR.one → g rg = PR.one →
+      PR.HasLeft pc fc g pc fc (Function.update g t PR.zero))
+    (hset : ∀ (b : B) (g : W → A), g t = PR.zero → g rg = PR.one → g (bs b) = PR.one →
+      (∀ b' : B, g (bs b') = PR.one → b' = b) →
+      PR.HasLeft pc fc g (pd b) fc (Function.update g t PR.one))
+    (hhold : ∀ (b : B) (g : W → A), g rg = PR.one → PR.HasLeft (pd b) fc g (pd b) fc g)
+    (hwalk : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft pc fc (PR.passTracksAt F.cell t rest k r) pc fc
+        (PR.passTracksAt F.cell t rest k r))
+    (hwalkD : ∀ (b : B) (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft (pd b) fc (PR.passTracksAt F.cell t rest k r) (pd b) fc (PR.passTracksAt F.cell t
+        rest k r))
+    {top bot : I} (htop : ∀ v, ile v top) (hbot : ∀ v, ile bot v) :
+    ∃ (u₀ : I) (p : Univ A R P K dd → Prop),
+      (¬m u₀ ∧ ∀ v, WMLt ile u₀ v → m v) ∧ WMIncr WMLe p (F.cell bot) ∧
+      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+        ⟨Sum.inr (PR.stElt pc fc), Sum.inl (F.cell top),
+          wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
+        ⟨Sum.inr (PR.stElt (pd (blkOf u₀)) fc), Sum.inl p,
+          wideTape (PR.trackTapeAt F.cell t rest m') (PR.syElt PR.blank)⟩ := by
+  obtain ⟨u₀, p, hu₀, hp, hrun⟩ := reachesIn_fileIncrBlk F hR hlin hix hi hne hrest hbs hblk
+    hclear hset hhold hwalk hwalkD
+    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
+    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _))) htop hbot
+  exact ⟨u₀, p, hu₀, hp, hrun.reflTransGen⟩
+/-- **A program increments its mirror**, stopping in one phase whatever carried,
+the budget forgotten. -/
+theorem reaches_fileIncr [Finite I] (F : IxFile (Univ A R P K dd) I ile)
+    (hR : PR.table.Reads)
+    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
+    {m m' : I → Prop} (hi : WMIncr ile m m')
+    {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
+    (hrest : ∀ r : Univ A R P K dd → Prop,
+      rest r rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
+    {pc pd : P} {fc : Q → A}
+    (hclear : ∀ g : W → A, g t = PR.one → g rg = PR.one →
+      PR.HasLeft pc fc g pc fc (Function.update g t PR.zero))
+    (hset : ∀ g : W → A, g t = PR.zero → g rg = PR.one →
+      PR.HasLeft pc fc g pd fc (Function.update g t PR.one))
+    (hhold : ∀ g : W → A, g rg = PR.one → PR.HasLeft pd fc g pd fc g)
+    (hwalk : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft pc fc (PR.passTracksAt F.cell t rest k r) pc fc
+        (PR.passTracksAt F.cell t rest k r))
+    (hwalkD : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
+      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
+      (∀ x : I, r ≠ F.cell x) →
+      PR.HasLeft pd fc (PR.passTracksAt F.cell t rest k r) pd fc
+        (PR.passTracksAt F.cell t rest k r))
+    {top bot : I} (htop : ∀ v, ile v top) (hbot : ∀ v, ile bot v) :
+    ∃ (u₀ : I) (p : Univ A R P K dd → Prop),
+      (¬m u₀ ∧ ∀ v, WMLt ile u₀ v → m v) ∧ WMIncr WMLe p (F.cell bot) ∧
+      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+        ⟨Sum.inr (PR.stElt pc fc), Sum.inl (F.cell top),
+          wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
+        ⟨Sum.inr (PR.stElt pd fc), Sum.inl p,
+          wideTape (PR.trackTapeAt F.cell t rest m') (PR.syElt PR.blank)⟩ :=
+  reaches_fileIncrBlk F hR hlin hix hi hne hrest (B := Unit) (bs := fun _ => rg)
+    (fun _ => Ne.symm hne)
     (blkOf := fun _ => ())
     (fun u b => by
       cases b

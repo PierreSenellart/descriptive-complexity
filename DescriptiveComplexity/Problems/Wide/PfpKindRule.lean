@@ -114,7 +114,7 @@ namespace PfpData
 variable {L : Language.{0, 0}} (dt : PfpData L) {A Q P : Type}
 
 /-- **The parameter pack of an atom kind's machinery.** -/
-noncomputable def KindArgs {n : ℕ} : MatAtom dt.X dt.d n → Type
+noncomputable def KindArgs {n : ℕ} : MatAtom dt.X dt.d.B n → Type
   | .stage i _ =>
     StageArgs A Q dt.SlotIx (Fin dt.ko ⊕ Fin dt.ki) dt.dd0 (dt.d.B.arity i)
   | @MatAtom.exp _ _ _ _ k e _ =>
@@ -129,7 +129,7 @@ first phase – for an expansion atom the *first witness read*, so the tag
 chain is entered, not skipped (the branch checkpoint only when there is no
 read at all). -/
 noncomputable def kindEntry {n : ℕ} :
-    ∀ κ : MatAtom dt.X dt.d n, dt.KindPh κ
+    ∀ κ : MatAtom dt.X dt.d.B n, dt.KindPh κ
   | .stage _ _ => .savP .up
   | @MatAtom.exp _ _ _ _ k _ _ =>
     letI := Fintype.ofFinite dt.X.Tag
@@ -141,7 +141,7 @@ variable (zero one : A)
 
 /-- **The rules of an atom kind's machinery**, at its parameter pack. -/
 noncomputable def kindRule {n : ℕ} :
-    ∀ (κ : MatAtom dt.X dt.d n) (_args : dt.KindArgs (A := A) (Q := Q) κ)
+    ∀ (κ : MatAtom dt.X dt.d.B n) (_args : dt.KindArgs (A := A) (Q := Q) κ)
       (_emb : dt.KindPh κ → P) (_exitPh : P)
       (s : dt.KindSite κ), dt.KindSh κ s → Rule A Q dt.SlotIx P
   | .stage _i _, args, emb, exitPh =>
@@ -162,10 +162,39 @@ noncomputable def kindRule {n : ℕ} :
 
 variable {dt}
 
+/-- **A property of an atom kind's phases and its exit holds of every phase it
+can move to**: whichever kind it is, its machinery stays inside its own phases
+and only its verdict leaves. This is what a determinism-after-the-guess argument
+asks of an atom (`DescriptiveComplexity.Pfp.PfpData.nexProg_uniqueFrom`). -/
+theorem kindDstIn {S : P → Prop} {n : ℕ}
+    (κ : MatAtom dt.X dt.d.B n) (args : dt.KindArgs (A := A) (Q := Q) κ)
+    {emb : dt.KindPh κ → P} (exitPh : P)
+    (hemb : ∀ p : dt.KindPh κ, S (emb p)) (hexit : S exitPh) :
+    ∀ (s : dt.KindSite κ) (ρ : dt.KindSh κ s),
+      S (dt.kindRule zero one κ args emb exitPh s ρ).dstPh := by
+  match κ with
+  | .stage _i _ts =>
+    exact fun s ρ => dt.stageRule_dstIn zero one args.srcTrack args.srcBlk
+      args.dstBlk args.coord args.bitFlag args.setBit args.initLv args.advLv
+      args.IsMaxLv args.oldSlot args.setAv exitPh hemb hexit s ρ
+  | @MatAtom.exp _ _ _ _ _k _e _ =>
+    letI := Fintype.ofFinite dt.X.Tag
+    exact fun s ρ => tagRule_dstIn one Slot.wk Slot.reg args.rdTrackT args.MatchT
+      args.setTagFlag args.TagsAre args.rdTrackE args.MatchE args.setFlagE
+      args.initEl args.advEl args.exitSt args.IsMaxEl exitPh hemb hexit s ρ
+  | .eq _j₁ _j₂ =>
+    exact fun s ρ => elemRule_dstIn one Slot.wk Slot.reg args.rdTrack args.MatchOf
+      args.setFlag args.initEl args.advEl args.exitSt args.IsMaxEl exitPh hemb
+      hexit s ρ
+  | .ord _j₁ _j₂ =>
+    exact fun s ρ => elemRule_dstIn one Slot.wk Slot.reg args.rdTrack args.MatchOf
+      args.setFlag args.initEl args.advEl args.exitSt args.IsMaxEl exitPh hemb
+      hexit s ρ
+
 /-- **Every rule of an atom kind's machinery fires from a phase its site
 owns.** -/
 theorem kindHosrc {n : ℕ}
-    (κ : MatAtom dt.X dt.d n) (args : dt.KindArgs (A := A) (Q := Q) κ)
+    (κ : MatAtom dt.X dt.d.B n) (args : dt.KindArgs (A := A) (Q := Q) κ)
     {emb : dt.KindPh κ → P} (exitPh : P) :
     ∀ (s : dt.KindSite κ) (ρ : dt.KindSh κ s),
       ∃ p : dt.KindPh κ,
@@ -190,7 +219,7 @@ theorem kindHosrc {n : ℕ}
 
 /-- **An atom kind's machinery separates in-shape.** -/
 theorem kindSep (hzo : zero ≠ one) {n : ℕ}
-    (κ : MatAtom dt.X dt.d n) (args : dt.KindArgs (A := A) (Q := Q) κ)
+    (κ : MatAtom dt.X dt.d.B n) (args : dt.KindArgs (A := A) (Q := Q) κ)
     {emb : dt.KindPh κ → P} (hemb : Function.Injective emb) (exitPh : P) :
     ∀ (s : dt.KindSite κ) (ρ ρ' : dt.KindSh κ s) (f : Q → A)
       (g : dt.SlotIx → A),

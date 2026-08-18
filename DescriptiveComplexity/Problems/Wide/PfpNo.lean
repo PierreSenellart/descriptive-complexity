@@ -101,7 +101,7 @@ theorem not_dwideAcceptSpace_of_converges
     ((dt.progOf zero one hzo hpl).table.wellFormed hR)
     ((dt.progOf zero one hzo hpl).table.deterministic hR
       (dt.prog_sep zero one hzo (fun w => dt.varArgsOf zero one w) hpl))
-    (Prog.isInit_prog hR hlin (fun x => prog_mark_mir hpl x)
+    (Prog.isInit_prog hR hlin (fun _ => trivial) (fun x => prog_mark_mir hpl x)
       (prog_blank_mir hpl)) hrun
     (stuck_of_srcPh_ne hR (srcPh_ne_acceptP (hpl := hpl)) hstate) ?_
     (fun e => stuck_acc hR e) hacc
@@ -174,7 +174,7 @@ theorem not_dwideAcceptSpace_of_diverges
   -- every address the dictionary is read at lies in the logical interval
   have hbelow : ∀ (j : Fin dt.nv) (a : Fin (nV + 1)) (iv : dt.d.B.ι)
       (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf (dt.varAt j)))
-      (st : TapeSt dt A
+      (st : TapeStD dt A
         (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
       (w : Univ A (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx dt.dd → Prop),
@@ -218,7 +218,7 @@ theorem not_dwideAcceptSpace_of_diverges
     (htopV := fun a : Fin (nV + 1) => Fin.le_last a) (mV := mV)
     (hmV0 := hmV0) (hIncr := hIncr) (hTestT := hTestT) (hTestF := hTestF)
     (semAt := fun w j st hg => dt.gatedSem
-      (PR := dt.progOf zero one hzo hpl) hzo hlin mV (v := w) j st hg)
+      (PR := dt.progOf zero one hzo hpl) (wmSegFile hlin) hzo hlin mV (v := w) j st hg)
     (st₀ := dt.startupSt) (f₀ := fun _ => zero) (ltpAddr := logicalTop)
     (hlt := hlt) (hneT := hneT) (hwk₀ := startupSt_wk)
     (hmir₀ := startupSt_mir) (hbot₀ := startupSt_bot)
@@ -229,7 +229,7 @@ theorem not_dwideAcceptSpace_of_diverges
     ((dt.progOf zero one hzo hpl).table.wellFormed hR)
     ((dt.progOf zero one hzo hpl).table.deterministic hR
       (dt.prog_sep zero one hzo (fun w => dt.varArgsOf zero one w) hpl))
-    (Prog.isInit_prog hR hlin (fun x => prog_mark_mir hpl x)
+    (Prog.isInit_prog hR hlin (fun _ => trivial) (fun x => prog_mark_mir hpl x)
       (prog_blank_mir hpl)) ?_ hchain (fun e => stuck_acc hR e) hacc
   rw [dt.initBack_eq_back zero one hzo (fun w => dt.varArgsOf zero one w) hpl
     hlin]

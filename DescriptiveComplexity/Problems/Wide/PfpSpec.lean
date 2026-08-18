@@ -29,6 +29,13 @@ Two pieces:
   `DescriptiveComplexity.Pfp.altQuantFrom_gateMat`, whose gate is
   `DescriptiveComplexity.Pfp.IsEnc`.
 
+The nullary case – a *sentence*, whose prefix is played from level `0` – is
+`DescriptiveComplexity.Pfp.sentence_iff_gateMat`, stated at an arbitrary block
+and sentence rather than at a fixed-point definition, because two programs need
+it: the output evaluation of a fixed-point program
+(`DescriptiveComplexity.Pfp.StepDef.out_iff_gateMat`) and the whole evaluation of
+a nondeterministic one, whose block is guessed rather than iterated.
+
 The valuation's deeper coordinates are arbitrary – the machine's inner register
 starts them at whatever is left on its tracks – because a prefix only reads the
 coordinates below its level (`DescriptiveComplexity.altQuantFrom_congr_val`).
@@ -161,25 +168,28 @@ theorem StepDef.next_iff_gateMat (hne : zero ≠ one) {i : d.B.ι}
   exact h1.trans (h2.symm.trans (iff_of_eq h3))
 
 open Classical in
-/-- **The output sentence is the gated prefix over block values**, the nullary
-case of `DescriptiveComplexity.Pfp.StepDef.next_iff_gateMat`: a sentence has no
-free level, so the prefix is played from level `0` and the valuation it starts
-from is arbitrary. This is what the *output* evaluation's machinery computes,
-where the fixed-point variables' computes `DescriptiveComplexity.StepDef.next`. -/
-theorem StepDef.out_iff_gateMat (hne : zero ≠ one)
-    (pk : PrenexPack (d.out.relabel (Empty.elim : Empty → Fin 0)))
-    (σ : d.B.Assignment (X.Map A)) (V : Fin pk.n → ((Fin dd → A) → Prop)) :
-    @Sentence.Realize _ (X.Map A) (d.B.structure₁ σ) d.out ↔
+/-- **A sentence is the gated prefix over block values.** A sentence has no free
+level, so the prefix is played from level `0` and the valuation it starts from is
+arbitrary. This is the nullary case of
+`DescriptiveComplexity.Pfp.StepDef.next_iff_gateMat`, and it is stated at an
+arbitrary block and sentence because two programs need it: the *output*
+evaluation of a fixed-point program, and the whole evaluation of a
+nondeterministic one, whose block is guessed rather than iterated. -/
+theorem sentence_iff_gateMat (hne : zero ≠ one) {B : SOBlock}
+    {φ : ((X.E.sum Language.order).sum B.lang).Sentence}
+    (pk : PrenexPack (φ.relabel (Empty.elim : Empty → Fin 0)))
+    (σ : B.Assignment (X.Map A)) (V : Fin pk.n → ((Fin dd → A) → Prop)) :
+    @Sentence.Realize _ (X.Map A) (B.structure₁ σ) φ ↔
       altQuantFrom pk.pol
         (gateMat (encMap ly zero one) (IsEnc ly zero one) pk.pol
           fun w => @BoundedFormula.Realize _ (X.Map A)
-            (d.B.structure₁ σ) _ _ pk.mat default w)
+            (B.structure₁ σ) _ _ pk.mat default w)
         0 V := by
-  letI inst : (X.E.sum Language.order).sum d.B.lang |>.Structure (X.Map A) :=
-    d.B.structure₁ σ
+  letI inst : (X.E.sum Language.order).sum B.lang |>.Structure (X.Map A) :=
+    B.structure₁ σ
   -- the sentence, as its own pack's prefix over an arbitrary valuation
   set vB : Fin pk.n → X.Map A := fun _ => Classical.arbitrary (X.Map A) with hvB
-  have h1 : @Sentence.Realize _ (X.Map A) inst d.out ↔
+  have h1 : @Sentence.Realize _ (X.Map A) inst φ ↔
       altQuantFrom pk.pol (fun w => @BoundedFormula.Realize _ (X.Map A) inst _ _ pk.mat
         default w) 0 vB := by
     refine Iff.trans ?_ (pk.spec (X.Map A) vB default fun i => i.elim0)
@@ -201,6 +211,21 @@ theorem StepDef.out_iff_gateMat (hne : zero ≠ one)
         0 V :=
     altQuantFrom_congr_val _ _ fun _ hj => absurd hj (Nat.not_lt_zero _)
   exact h1.trans (h2.symm.trans (iff_of_eq h3))
+
+/-- **The output sentence is the gated prefix over block values**: the previous
+statement at the fixed-point definition's own block, which is what the *output*
+evaluation's machinery computes where the fixed-point variables' computes
+`DescriptiveComplexity.StepDef.next`. -/
+theorem StepDef.out_iff_gateMat (hne : zero ≠ one)
+    (pk : PrenexPack (d.out.relabel (Empty.elim : Empty → Fin 0)))
+    (σ : d.B.Assignment (X.Map A)) (V : Fin pk.n → ((Fin dd → A) → Prop)) :
+    @Sentence.Realize _ (X.Map A) (d.B.structure₁ σ) d.out ↔
+      altQuantFrom pk.pol
+        (gateMat (encMap ly zero one) (IsEnc ly zero one) pk.pol
+          fun w => @BoundedFormula.Realize _ (X.Map A)
+            (d.B.structure₁ σ) _ _ pk.mat default w)
+        0 V :=
+  sentence_iff_gateMat ly hne pk σ V
 
 end Chain
 

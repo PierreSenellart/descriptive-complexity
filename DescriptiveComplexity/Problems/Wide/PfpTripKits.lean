@@ -21,7 +21,7 @@ return to the marker).
 The verdict phases double as return phases, which is where the cell-coupled
 forms of the layer earn their keep: the walking rule of the passing phase is
 guarded `rg ≠ one ∧ wk ≠ one`, disjoint from the register rules, and the
-coupled hypotheses of `DescriptiveComplexity.Pfp.Prog.reaches_roundTrip` are
+coupled hypotheses of `DescriptiveComplexity.Pfp.Prog.reaches_fileRoundTrip` are
 exactly what shows it fires wherever the composite needs it. The failing
 phase hosts no register rule, so its single rule takes the disjunction
 `rg = one ∨ wk ≠ one` and serves hold, walk and return at once.
@@ -191,6 +191,12 @@ theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     | exact hg.elim (fun h1 => hrg h1) (fun h2 => h2 hwk)
     | (have hbb := hemb hph; cases hbb)
 
+/-- **The trip stays inside its own phases**: every rule lands in one the kit
+was given, which is what a caller that must know a property of the phases the
+machine can be in reads off a sub-machinery. -/
+theorem dstPh_emb (ρ : TestRule) : ∃ p, (κ.rule one ρ).dstPh = κ.emb p := by
+  cases ρ <;> exact ⟨_, rfl⟩
+
 /-! ### The discharge -/
 
 section Discharge
@@ -202,21 +208,27 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {κ : TestKit A Q W P}
 variable {rEmb : TestRule → R}
 variable (hrules : ∀ ρ : TestRule, PR.rules (rEmb ρ) = κ.rule PR.one ρ)
+variable {I : Type} [Finite I] {ile : I → I → Prop}
+variable (F : IxFile (Univ A R P K dd) I ile)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+variable (hix : IsLinOrd ile)
 variable (hnerg : κ.t ≠ κ.rg) (hnerl : κ.rl ≠ κ.t) (hnewk : κ.wk ≠ κ.t)
-variable {gtop gbot : Univ A R P K dd} (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
-variable {rest : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
-variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (wmSeg gbot))
+variable {gtop gbot : I} (htop : ∀ y, ile y gtop) (hbot : ∀ y, ile gbot y)
+variable {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
+variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (F.cell gbot))
 variable (hrg : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+  rest r κ.rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
 variable (hrl : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rl = bitVal PR.zero PR.one (r = wmSeg gtop))
+  rest r κ.rl = bitVal PR.zero PR.one (r = F.cell gtop))
 variable (hwkS : ∀ r : Univ A R P K dd → Prop,
   rest r κ.wk = bitVal PR.zero PR.one (r = wkAddr))
-variable {Test : Univ A R P K dd → Prop}
-variable (hcompat : ∀ u : Univ A R P K dd,
-  κ.TestG (PR.passTracks κ.t rest m (wmSeg u)) ↔ Test u)
+variable {Test : I → Prop}
+variable (hcompat : ∀ u : I,
+  κ.TestG (PR.passTracksAt F.cell κ.t rest m (F.cell u)) ↔ Test u)
 variable {fc : Q → A} {s : Univ A R P K dd → Prop}
+variable (hsle : WMSetLe WMLe s (F.cell gtop))
+variable {w : ℕ} (hgap : ∀ u u' : I, IxSucc ile u u' →
+  wideRank (F.cell u') - wideRank (F.cell u) ≤ w)
 
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Language.wide.Structure (Univ A R P K dd)]
@@ -243,19 +255,19 @@ private theorem has_of_rule {ρ : TestRule} {f : Q → A} {g : W → A}
       by rw [hrules]; exact hkeepSt, by rw [hrules]; exact hkeepWr,
       fun hc => hml (by rw [hrules] at hc; exact hc)⟩
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-include hlin hnewk hbot hwkLt hwkS in
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
+include F hlin hix hnewk hbot hwkLt hwkS in
 /-- The marker slot is clear at or above the register file. -/
-private theorem wkOff (k r : Univ A R P K dd → Prop)
-    (hbnd : ∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) :
-    PR.passTracks κ.t rest k r κ.wk ≠ PR.one := by
+private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
+    PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
   obtain ⟨x, hx⟩ := hbnd
-  have hgx : WMSetLe WMLe (wmSeg gbot) (wmSeg x) := by
+  have hgx : WMSetLe WMLe (F.cell gbot) (F.cell x) := by
     rcases eq_or_ne gbot x with rfl | hne
     · exact hlinSet.1 _
-    · exact ((wmSetLt_iff _ _).mp ((wmSetLt_wmSeg_iff hlin gbot x).mpr
-        ⟨hbot x, fun hc => hne (hlin.2.2.1 gbot x (hbot x) hc)⟩)).1
+    · exact ((wmSetLt_iff _ _).mp ((F.lt_iff hix gbot x).mpr
+        ⟨hbot x, fun hc => hne (hix.2.2.1 gbot x (hbot x) hc)⟩)).1
   have hne : r ≠ wkAddr := by
     rintro rfl
     exact ((wmSetLt_iff _ _).mp hwkLt).2
@@ -264,28 +276,28 @@ private theorem wkOff (k r : Univ A R P K dd → Prop)
   exact PR.zero_ne_one
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
-include hnerg hrg in
+  [Finite A] [Finite R] [Finite P] [Finite K] [Finite I] in
+include F hnerg hrg in
 /-- The register mark is clear at unmarked cells. -/
-private theorem rgOff (k r : Univ A R P K dd → Prop)
-    (hno : ∀ x : Univ A R P K dd, r ≠ wmSeg x) :
-    PR.passTracks κ.t rest k r κ.rg ≠ PR.one := by
+private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hno : ∀ x : I, r ≠ F.cell x) :
+    PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
     bitVal_neg fun hc => hc.elim fun x hx => hno x hx]
   exact PR.zero_ne_one
 
-include hrules hR hlin hnerg hnewk htop hbot hwkLt hrg hwkS hcompat in
+include hrules F hR hlin hix hnerg hnewk htop hbot hwkLt hrg hwkS hcompat hgap in
 /-- The pass down the file, verdict in the state. -/
-private theorem test_part :
-    ∃ q : Univ A R P K dd → Prop, WMIncr WMLe q (wmSeg gbot) ∧
-      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-        ⟨Sum.inr (PR.stElt (κ.emb .ty) fc), Sum.inl (wmSeg gtop),
-          wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
-        ⟨Sum.inr (accStateAfter Test (PR.stElt (κ.emb .ty) fc)
+private theorem test_partIn :
+    ∃ q : Univ A R P K dd → Prop, WMIncr WMLe q (F.cell gbot) ∧
+      (wideData (Univ A R P K dd)).ReachesIn ((ixRank ile gtop - ixRank ile gbot) * w + 1)
+        ⟨Sum.inr (PR.stElt (κ.emb .ty) fc), Sum.inl (F.cell gtop),
+          wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+        ⟨Sum.inr (accStateAfter ile Test (PR.stElt (κ.emb .ty) fc)
             (PR.stElt (κ.emb .tn) fc) gbot), Sum.inl q,
-          wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩ :=
-  Prog.reaches_testG (Test := Test) (TestG := κ.TestG)
-    hR hlin (m := m) (t := κ.t) (rg := κ.rg) hnerg (rest := rest) hrg hcompat
+          wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ :=
+  Prog.reachesIn_fileTestG F (Test := Test) (TestG := κ.TestG)
+    hR hlin hix (m := m) (t := κ.t) (rg := κ.rg) hnerg (rest := rest) hrg hcompat
     (py := κ.emb .ty) (pn := κ.emb .tn) (f := fc)
     (fun _g hT hg1 =>
       (has_of_rule hrules (ρ := .pass) ⟨hT, hg1⟩ rfl rfl).2 not_false)
@@ -295,66 +307,118 @@ private theorem test_part :
       (has_of_rule hrules (ρ := .stayN) (Or.inl hg1) rfl rfl).2 not_false)
     (fun r hbnd hno =>
       (has_of_rule hrules (ρ := .walkY)
-        ⟨rgOff hnerg hrg m r hno, wkOff hlin hnewk hbot hwkLt hwkS m r hbnd⟩
+        ⟨rgOff F hnerg hrg m r hno, wkOff F hlin hix hnewk hbot hwkLt hwkS m r hbnd⟩
         rfl rfl).2 not_false)
     (fun r hbnd _hno =>
       (has_of_rule hrules (ρ := .stayN)
-        (Or.inr (wkOff hlin hnewk hbot hwkLt hwkS m r hbnd)) rfl rfl).2 not_false)
-    (top := gtop) (bot := gbot) htop hbot
+        (Or.inr (wkOff F hlin hix hnewk hbot hwkLt hwkS m r hbnd)) rfl rfl).2 not_false)
+    (w := w) hgap (top := gtop) (bot := gbot) htop hbot
 
-include hrules hR hlin hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat in
+include hrules F hR hlin hix hnerg hnewk htop hbot hwkLt hrg hwkS hcompat hgap in
+/-- The pass down the file, verdict in the state, the budget forgotten. -/
+private theorem test_part :
+    ∃ q : Univ A R P K dd → Prop, WMIncr WMLe q (F.cell gbot) ∧
+      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+        ⟨Sum.inr (PR.stElt (κ.emb .ty) fc), Sum.inl (F.cell gtop),
+          wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+        ⟨Sum.inr (accStateAfter ile Test (PR.stElt (κ.emb .ty) fc)
+            (PR.stElt (κ.emb .tn) fc) gbot), Sum.inl q,
+          wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ := by
+  obtain ⟨q, hq, hrun⟩ := test_partIn hrules F hR hlin hix hnerg hnewk htop hbot hwkLt hrg hwkS
+    hcompat hgap
+  exact ⟨q, hq, hrun.reflTransGen⟩
+
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle hgap in
 /-- **The kit runs a passing file test**: from the scan phase anywhere, up to
 the file top, down the file – every register passing – and back to the marker
 in the passing phase. -/
-theorem reaches_pos (hTest : ∀ u, Test u) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+theorem reachesIn_pos (hTest : ∀ u, Test u) :
+    (wideData (Univ A R P K dd)).ReachesIn
+      (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
+        wideRank (F.cell gbot))
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .ty) fc), Sum.inl wkAddr,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, htest⟩ := test_part hrules hR hlin hnerg hnewk htop hbot
-    hwkLt hrg hwkS hcompat (fc := fc)
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ := by
+  obtain ⟨q, hq, htest⟩ := test_partIn hrules F hR hlin hix hnerg hnewk htop hbot
+    hwkLt hrg hwkS hcompat hgap (fc := fc)
   rw [accStateAfter_bot_pos hTest] at htest
-  exact Prog.reaches_roundTrip hR hlin hnerl hnewk htop hbot (rest := rest)
+  refine (Prog.reachesIn_fileRoundTrip F hR hlin hix hnerl hnewk hbot (rest := rest)
     (m := m) (m₂ := m) (wkAddr := wkAddr) hrl hwkS (p₁ := κ.emb .up)
     (p₂b := κ.emb .b2) (pIn := κ.emb .ty) (pOut := κ.emb .ty) (fc := fc)
     (fun _g hg => (has_of_rule hrules (ρ := .up) hg rfl rfl).1 trivial)
     ((has_of_rule hrules (ρ := .b1)
-      (show PR.passTracks κ.t rest m (wmSeg gtop) κ.rl = PR.one by
+      (show PR.passTracksAt F.cell κ.t rest m (F.cell gtop) κ.rl = PR.one by
         rw [Prog.passTracks_of_ne hnerl, hrl]; exact bitVal_pos rfl)
       rfl rfl).2 not_false)
     (fun _g => (has_of_rule hrules (ρ := .b2go) trivial rfl rfl).1 trivial)
     hq htest
     (fun r hno hwk =>
       (has_of_rule hrules (ρ := .walkY)
-        ⟨rgOff hnerg hrg m r hno, hwk⟩ rfl rfl).2 not_false)
-    hwkLt
+        ⟨rgOff F hnerg hrg m r hno, hwk⟩ rfl rfl).2 not_false)
+    hwkLt hsle).mono (by
+    have h₁ : wideRank (F.cell gtop) - wideRank s ≤ wideRank (F.cell gtop) := Nat.sub_le _ _
+    have h₂ : wideRank q - wideRank wkAddr ≤ wideRank (F.cell gbot) :=
+      le_trans (Nat.sub_le _ _) (wideRank_mono hlin (wmSetLe_of_wmIncr hq))
+    omega)
 
-include hrules hR hlin hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat in
-/-- **The kit runs a failing file test**: some register fails, and the trip
-ends at the marker in the failing phase. -/
-theorem reaches_neg {u : Univ A R P K dd} (hTest : ¬Test u) :
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle in
+/-- **The kit runs a passing file test**, the budget forgotten. -/
+theorem reaches_pos (hTest : ∀ u, Test u) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .ty) fc), Sum.inl wkAddr,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn_pos hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle
+    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
+    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _)))
+    hTest).reflTransGen
+
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle hgap in
+/-- **The kit runs a failing file test**: some register fails, and the trip
+ends at the marker in the failing phase. -/
+theorem reachesIn_neg {u : I} (hTest : ¬Test u) :
+    (wideData (Univ A R P K dd)).ReachesIn
+      (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
+        wideRank (F.cell gbot))
+      ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .tn) fc), Sum.inl wkAddr,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, htest⟩ := test_part hrules hR hlin hnerg hnewk htop hbot
-    hwkLt hrg hwkS hcompat (fc := fc)
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ := by
+  obtain ⟨q, hq, htest⟩ := test_partIn hrules F hR hlin hix hnerg hnewk htop hbot
+    hwkLt hrg hwkS hcompat hgap (fc := fc)
   rw [accStateAfter_bot_neg hbot hTest] at htest
-  exact Prog.reaches_roundTrip hR hlin hnerl hnewk htop hbot (rest := rest)
+  refine (Prog.reachesIn_fileRoundTrip F hR hlin hix hnerl hnewk hbot (rest := rest)
     (m := m) (m₂ := m) (wkAddr := wkAddr) hrl hwkS (p₁ := κ.emb .up)
     (p₂b := κ.emb .b2) (pIn := κ.emb .ty) (pOut := κ.emb .tn) (fc := fc)
     (fun _g hg => (has_of_rule hrules (ρ := .up) hg rfl rfl).1 trivial)
     ((has_of_rule hrules (ρ := .b1)
-      (show PR.passTracks κ.t rest m (wmSeg gtop) κ.rl = PR.one by
+      (show PR.passTracksAt F.cell κ.t rest m (F.cell gtop) κ.rl = PR.one by
         rw [Prog.passTracks_of_ne hnerl, hrl]; exact bitVal_pos rfl)
       rfl rfl).2 not_false)
     (fun _g => (has_of_rule hrules (ρ := .b2go) trivial rfl rfl).1 trivial)
     hq htest
     (fun r _hno hwk =>
       (has_of_rule hrules (ρ := .stayN) (Or.inr hwk) rfl rfl).2 not_false)
-    hwkLt
+    hwkLt hsle).mono (by
+    have h₁ : wideRank (F.cell gtop) - wideRank s ≤ wideRank (F.cell gtop) := Nat.sub_le _ _
+    have h₂ : wideRank q - wideRank wkAddr ≤ wideRank (F.cell gbot) :=
+      le_trans (Nat.sub_le _ _) (wideRank_mono hlin (wmSetLe_of_wmIncr hq))
+    omega)
+
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle in
+/-- **The kit runs a failing file test**, the budget forgotten. -/
+theorem reaches_neg {u : I} (hTest : ¬Test u) :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .tn) fc), Sum.inl wkAddr,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn_neg hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle
+    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
+    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _)))
+    hTest).reflTransGen
 
 end Discharge
 
@@ -459,6 +523,12 @@ def rule : TrackRule → Rule A Q W P
       wr := fun _ g => g
       moveRight := False }
 
+/-- **The trip stays inside its own phases**: every rule lands in one the kit
+was given, which is what a caller that must know a property of the phases the
+machine can be in reads off a sub-machinery. -/
+theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
+  cases ρ <;> exact ⟨_, rfl⟩
+
 /-- **In-shape separation.** -/
 theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : TrackRule) (f : Q → A) (g : W → A),
@@ -493,18 +563,24 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {κ : ClearKit A Q W P}
 variable {rEmb : TrackRule → R}
 variable (hrules : ∀ ρ : TrackRule, PR.rules (rEmb ρ) = κ.rule PR.zero PR.one ρ)
+variable {I : Type} [Finite I] {ile : I → I → Prop}
+variable (F : IxFile (Univ A R P K dd) I ile)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+variable (hix : IsLinOrd ile)
 variable (hnerg : κ.t ≠ κ.rg) (hnerl : κ.rl ≠ κ.t) (hnewk : κ.wk ≠ κ.t)
-variable {gtop gbot : Univ A R P K dd} (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
-variable {rest : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
-variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (wmSeg gbot))
+variable {gtop gbot : I} (htop : ∀ y, ile y gtop) (hbot : ∀ y, ile gbot y)
+variable {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
+variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (F.cell gbot))
 variable (hrg : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+  rest r κ.rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
 variable (hrl : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rl = bitVal PR.zero PR.one (r = wmSeg gtop))
+  rest r κ.rl = bitVal PR.zero PR.one (r = F.cell gtop))
 variable (hwkS : ∀ r : Univ A R P K dd → Prop,
   rest r κ.wk = bitVal PR.zero PR.one (r = wkAddr))
 variable {fc : Q → A} {s : Univ A R P K dd → Prop}
+variable (hsle : WMSetLe WMLe s (F.cell gtop))
+variable {w : ℕ} (hgap : ∀ u u' : I, IxSucc ile u u' →
+  wideRank (F.cell u') - wideRank (F.cell u) ≤ w)
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Language.wide.Structure (Univ A R P K dd)]
@@ -530,18 +606,18 @@ private theorem has_of_rule {ρ : TrackRule} {f : Q → A} {g : W → A}
     exact ⟨rEmb ρ, by rw [hrules]; exact hg, by rw [hrules], by rw [hrules],
       by rw [hrules], by rw [hrules], fun hc => hml (by rw [hrules] at hc; exact hc)⟩
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-include hlin hnewk hbot hwkLt hwkS in
-private theorem wkOff (k r : Univ A R P K dd → Prop)
-    (hbnd : ∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) :
-    PR.passTracks κ.t rest k r κ.wk ≠ PR.one := by
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
+include F hlin hix hnewk hbot hwkLt hwkS in
+private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
+    PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
   obtain ⟨x, hx⟩ := hbnd
-  have hgx : WMSetLe WMLe (wmSeg gbot) (wmSeg x) := by
+  have hgx : WMSetLe WMLe (F.cell gbot) (F.cell x) := by
     rcases eq_or_ne gbot x with rfl | hne
     · exact hlinSet.1 _
-    · exact ((wmSetLt_iff _ _).mp ((wmSetLt_wmSeg_iff hlin gbot x).mpr
-        ⟨hbot x, fun hc => hne (hlin.2.2.1 gbot x (hbot x) hc)⟩)).1
+    · exact ((wmSetLt_iff _ _).mp ((F.lt_iff hix gbot x).mpr
+        ⟨hbot x, fun hc => hne (hix.2.2.1 gbot x (hbot x) hc)⟩)).1
   have hne : r ≠ wkAddr := by
     rintro rfl
     exact ((wmSetLt_iff _ _).mp hwkLt).2
@@ -550,45 +626,63 @@ private theorem wkOff (k r : Univ A R P K dd → Prop)
   exact PR.zero_ne_one
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
-include hnerg hrg in
-private theorem rgOff (k r : Univ A R P K dd → Prop)
-    (hno : ∀ x : Univ A R P K dd, r ≠ wmSeg x) :
-    PR.passTracks κ.t rest k r κ.rg ≠ PR.one := by
+  [Finite A] [Finite R] [Finite P] [Finite K] [Finite I] in
+include F hnerg hrg in
+private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hno : ∀ x : I, r ≠ F.cell x) :
+    PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
     bitVal_neg fun hc => hc.elim fun x hx => hno x hx]
   exact PR.zero_ne_one
 
-include hrules hR hlin hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS in
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hsle hgap in
 /-- **The kit clears its track**: from the scan phase anywhere, up to the file
 top, one pass writing the clear digit at every register, and back to the
 marker. -/
-theorem reaches :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+theorem reachesIn :
+    (wideData (Univ A R P K dd)).ReachesIn
+      (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
+        wideRank (F.cell gbot))
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .run) fc), Sum.inl wkAddr,
-        wideTape (PR.trackTape κ.t rest fun _ => False) (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, hpass⟩ := Prog.reaches_clearTrack hR hlin (t := κ.t) (rg := κ.rg)
+        wideTape (PR.trackTapeAt F.cell κ.t rest fun _ => False) (PR.syElt PR.blank)⟩ := by
+  obtain ⟨q, hq, hpass⟩ := Prog.reachesIn_fileClearTrack F hR hlin hix (t := κ.t) (rg := κ.rg)
     hnerg (rest := rest) hrg (m := m) (p := κ.emb .run) (f := fc)
     (fun _g hg1 => (has_of_rule hrules (ρ := .put) hg1).2 not_false)
     (fun k r hbnd hno =>
       (has_of_rule hrules (ρ := .walk)
-        ⟨rgOff hnerg hrg k r hno, wkOff hlin hnewk hbot hwkLt hwkS k r hbnd⟩).2
+        ⟨rgOff F hnerg hrg k r hno, wkOff F hlin hix hnewk hbot hwkLt hwkS k r hbnd⟩).2
         not_false)
-    (top := gtop) (bot := gbot) htop hbot
-  exact Prog.reaches_roundTrip hR hlin hnerl hnewk htop hbot (rest := rest)
+    (w := w) hgap (top := gtop) (bot := gbot) htop hbot
+  refine (Prog.reachesIn_fileRoundTrip F hR hlin hix hnerl hnewk hbot (rest := rest)
     (m := m) (m₂ := fun _ => False) (wkAddr := wkAddr) hrl hwkS (p₁ := κ.emb .up)
     (p₂b := κ.emb .b2) (pIn := κ.emb .run) (pOut := κ.emb .run) (fc := fc)
     (fun _g hg => (has_of_rule hrules (ρ := .up) hg).1 trivial)
     ((has_of_rule hrules (ρ := .b1)
-      (show PR.passTracks κ.t rest m (wmSeg gtop) κ.rl = PR.one by
+      (show PR.passTracksAt F.cell κ.t rest m (F.cell gtop) κ.rl = PR.one by
         rw [Prog.passTracks_of_ne hnerl, hrl]; exact bitVal_pos rfl)).2 not_false)
     (fun _g => (has_of_rule hrules (ρ := .b2go) trivial).1 trivial)
     hq hpass
     (fun r hno hwk =>
-      (has_of_rule hrules (ρ := .walk) ⟨rgOff hnerg hrg _ r hno, hwk⟩).2 not_false)
-    hwkLt
+      (has_of_rule hrules (ρ := .walk) ⟨rgOff F hnerg hrg _ r hno, hwk⟩).2 not_false)
+    hwkLt hsle).mono (by
+    have h₁ : wideRank (F.cell gtop) - wideRank s ≤ wideRank (F.cell gtop) := Nat.sub_le _ _
+    have h₂ : wideRank q - wideRank wkAddr ≤ wideRank (F.cell gbot) :=
+      le_trans (Nat.sub_le _ _) (wideRank_mono hlin (wmSetLe_of_wmIncr hq))
+    omega)
+
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hsle in
+/-- **The kit clears a track**, the budget forgotten. -/
+theorem reaches :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .run) fc), Sum.inl wkAddr,
+        wideTape (PR.trackTapeAt F.cell κ.t rest fun _ => False) (PR.syElt PR.blank)⟩ :=
+  (reachesIn hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hsle
+    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
+    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _)))).reflTransGen
 
 end Discharge
 
@@ -652,6 +746,12 @@ def rule : TrackRule → Rule A Q W P
       wr := fun _ g => g
       moveRight := False }
 
+/-- **The trip stays inside its own phases**: every rule lands in one the kit
+was given, which is what a caller that must know a property of the phases the
+machine can be in reads off a sub-machinery. -/
+theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule one ρ).dstPh = κ.emb p := by
+  cases ρ <;> exact ⟨_, rfl⟩
+
 /-- **In-shape separation.** -/
 theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : TrackRule) (f : Q → A) (g : W → A),
@@ -686,21 +786,27 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {κ : CopyKit A Q W P}
 variable {rEmb : TrackRule → R}
 variable (hrules : ∀ ρ : TrackRule, PR.rules (rEmb ρ) = κ.rule PR.one ρ)
+variable {I : Type} [Finite I] {ile : I → I → Prop}
+variable (F : IxFile (Univ A R P K dd) I ile)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+variable (hix : IsLinOrd ile)
 variable (hnerg : κ.t ≠ κ.rg) (hnerl : κ.rl ≠ κ.t) (hnewk : κ.wk ≠ κ.t)
 variable (hnesrc : κ.src ≠ κ.t)
-variable {gtop gbot : Univ A R P K dd} (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
-variable {rest : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
-variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (wmSeg gbot))
+variable {gtop gbot : I} (htop : ∀ y, ile y gtop) (hbot : ∀ y, ile gbot y)
+variable {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
+variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (F.cell gbot))
 variable (hrg : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+  rest r κ.rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
 variable (hrl : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rl = bitVal PR.zero PR.one (r = wmSeg gtop))
+  rest r κ.rl = bitVal PR.zero PR.one (r = F.cell gtop))
 variable (hwkS : ∀ r : Univ A R P K dd → Prop,
   rest r κ.wk = bitVal PR.zero PR.one (r = wkAddr))
-variable (hsrcBit : ∀ u : Univ A R P K dd,
-  rest (wmSeg u) κ.src = PR.zero ∨ rest (wmSeg u) κ.src = PR.one)
+variable (hsrcBit : ∀ u : I,
+  rest (F.cell u) κ.src = PR.zero ∨ rest (F.cell u) κ.src = PR.one)
 variable {fc : Q → A} {s : Univ A R P K dd → Prop}
+variable (hsle : WMSetLe WMLe s (F.cell gtop))
+variable {w : ℕ} (hgap : ∀ u u' : I, IxSucc ile u u' →
+  wideRank (F.cell u') - wideRank (F.cell u) ≤ w)
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Language.wide.Structure (Univ A R P K dd)]
@@ -726,18 +832,18 @@ private theorem has_of_rule {ρ : TrackRule} {f : Q → A} {g : W → A}
     exact ⟨rEmb ρ, by rw [hrules]; exact hg, by rw [hrules], by rw [hrules],
       by rw [hrules], by rw [hrules], fun hc => hml (by rw [hrules] at hc; exact hc)⟩
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-include hlin hnewk hbot hwkLt hwkS in
-private theorem wkOff (k r : Univ A R P K dd → Prop)
-    (hbnd : ∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) :
-    PR.passTracks κ.t rest k r κ.wk ≠ PR.one := by
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
+include F hlin hix hnewk hbot hwkLt hwkS in
+private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
+    PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
   obtain ⟨x, hx⟩ := hbnd
-  have hgx : WMSetLe WMLe (wmSeg gbot) (wmSeg x) := by
+  have hgx : WMSetLe WMLe (F.cell gbot) (F.cell x) := by
     rcases eq_or_ne gbot x with rfl | hne
     · exact hlinSet.1 _
-    · exact ((wmSetLt_iff _ _).mp ((wmSetLt_wmSeg_iff hlin gbot x).mpr
-        ⟨hbot x, fun hc => hne (hlin.2.2.1 gbot x (hbot x) hc)⟩)).1
+    · exact ((wmSetLt_iff _ _).mp ((F.lt_iff hix gbot x).mpr
+        ⟨hbot x, fun hc => hne (hix.2.2.1 gbot x (hbot x) hc)⟩)).1
   have hne : r ≠ wkAddr := by
     rintro rfl
     exact ((wmSetLt_iff _ _).mp hwkLt).2
@@ -746,48 +852,70 @@ private theorem wkOff (k r : Univ A R P K dd → Prop)
   exact PR.zero_ne_one
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
-include hnerg hrg in
-private theorem rgOff (k r : Univ A R P K dd → Prop)
-    (hno : ∀ x : Univ A R P K dd, r ≠ wmSeg x) :
-    PR.passTracks κ.t rest k r κ.rg ≠ PR.one := by
+  [Finite A] [Finite R] [Finite P] [Finite K] [Finite I] in
+include F hnerg hrg in
+private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hno : ∀ x : I, r ≠ F.cell x) :
+    PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
     bitVal_neg fun hc => hc.elim fun x hx => hno x hx]
   exact PR.zero_ne_one
 
-include hrules hR hlin hnerg hnerl hnewk hnesrc htop hbot hwkLt hrg hrl hwkS hsrcBit in
+include hrules F hR hlin hix hnerg hnerl hnewk hnesrc htop hbot hwkLt hrg hrl hwkS hsrcBit hsle
+  hgap in
 /-- **The kit copies the source slot into its track**: from the scan phase
 anywhere, up to the file top, one pass replacing every register's walked digit
 by its source digit, and back to the marker. -/
-theorem reaches :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+theorem reachesIn :
+    (wideData (Univ A R P K dd)).ReachesIn
+      (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
+        wideRank (F.cell gbot))
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .run) fc), Sum.inl wkAddr,
-        wideTape (PR.trackTape κ.t rest fun u => rest (wmSeg u) κ.src = PR.one)
+        wideTape (PR.trackTapeAt F.cell κ.t rest fun u => rest (F.cell u) κ.src = PR.one)
           (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, hpass⟩ := Prog.reaches_copyTrack hR hlin (t := κ.t) (rg := κ.rg)
+  obtain ⟨q, hq, hpass⟩ := Prog.reachesIn_fileCopyTrack F hR hlin hix (t := κ.t) (rg := κ.rg)
     (src := κ.src) hnerg hnesrc (rest := rest) hrg hsrcBit (m := m)
     (p := κ.emb .run) (f := fc)
     (fun _g hg1 => (has_of_rule hrules (ρ := .put) hg1).2 not_false)
     (fun k r hbnd hno =>
       (has_of_rule hrules (ρ := .walk)
-        ⟨rgOff hnerg hrg k r hno, wkOff hlin hnewk hbot hwkLt hwkS k r hbnd⟩).2
+        ⟨rgOff F hnerg hrg k r hno, wkOff F hlin hix hnewk hbot hwkLt hwkS k r hbnd⟩).2
         not_false)
-    (top := gtop) (bot := gbot) htop hbot
-  exact Prog.reaches_roundTrip hR hlin hnerl hnewk htop hbot (rest := rest)
-    (m := m) (m₂ := fun u => rest (wmSeg u) κ.src = PR.one) (wkAddr := wkAddr)
+    (w := w) hgap (top := gtop) (bot := gbot) htop hbot
+  refine (Prog.reachesIn_fileRoundTrip F hR hlin hix hnerl hnewk hbot (rest := rest)
+    (m := m) (m₂ := fun u => rest (F.cell u) κ.src = PR.one) (wkAddr := wkAddr)
     hrl hwkS (p₁ := κ.emb .up)
     (p₂b := κ.emb .b2) (pIn := κ.emb .run) (pOut := κ.emb .run) (fc := fc)
     (fun _g hg => (has_of_rule hrules (ρ := .up) hg).1 trivial)
     ((has_of_rule hrules (ρ := .b1)
-      (show PR.passTracks κ.t rest m (wmSeg gtop) κ.rl = PR.one by
+      (show PR.passTracksAt F.cell κ.t rest m (F.cell gtop) κ.rl = PR.one by
         rw [Prog.passTracks_of_ne hnerl, hrl]; exact bitVal_pos rfl)).2 not_false)
     (fun _g => (has_of_rule hrules (ρ := .b2go) trivial).1 trivial)
     hq hpass
     (fun r hno hwk =>
-      (has_of_rule hrules (ρ := .walk) ⟨rgOff hnerg hrg _ r hno, hwk⟩).2 not_false)
-    hwkLt
+      (has_of_rule hrules (ρ := .walk) ⟨rgOff F hnerg hrg _ r hno, hwk⟩).2 not_false)
+    hwkLt hsle).mono (by
+    have h₁ : wideRank (F.cell gtop) - wideRank s ≤ wideRank (F.cell gtop) := Nat.sub_le _ _
+    have h₂ : wideRank q - wideRank wkAddr ≤ wideRank (F.cell gbot) :=
+      le_trans (Nat.sub_le _ _) (wideRank_mono hlin (wmSetLe_of_wmIncr hq))
+    omega)
+
+include hrules F hR hlin hix hnerg hnerl hnewk hnesrc htop hbot hwkLt hrg hrl hwkS hsrcBit
+  hsle in
+/-- **The kit copies a track**, the budget forgotten. -/
+theorem reaches :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .run) fc), Sum.inl wkAddr,
+        wideTape (PR.trackTapeAt F.cell κ.t rest fun u => rest (F.cell u) κ.src = PR.one)
+          (PR.syElt PR.blank)⟩ :=
+  (reachesIn hrules F hR hlin hix hnerg hnerl hnewk hnesrc htop hbot hwkLt hrg hrl hwkS hsrcBit
+    hsle
+    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
+    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _)))).reflTransGen
 
 end Discharge
 
@@ -853,6 +981,12 @@ noncomputable def rule : TrackRule → Rule A Q W P
       wr := fun _ g => g
       moveRight := False }
 
+/-- **The trip stays inside its own phases**: every rule lands in one the kit
+was given, which is what a caller that must know a property of the phases the
+machine can be in reads off a sub-machinery. -/
+theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
+  cases ρ <;> exact ⟨_, rfl⟩
+
 /-- **In-shape separation.** -/
 theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : TrackRule) (f : Q → A) (g : W → A),
@@ -887,19 +1021,25 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {κ : MapKit A Q W P}
 variable {rEmb : TrackRule → R}
 variable (hrules : ∀ ρ : TrackRule, PR.rules (rEmb ρ) = κ.rule PR.zero PR.one ρ)
+variable {I : Type} [Finite I] {ile : I → I → Prop}
+variable (F : IxFile (Univ A R P K dd) I ile)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+variable (hix : IsLinOrd ile)
 variable (hnerg : κ.t ≠ κ.rg) (hnerl : κ.rl ≠ κ.t) (hnewk : κ.wk ≠ κ.t)
-variable {gtop gbot : Univ A R P K dd} (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
-variable {rest : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
-variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (wmSeg gbot))
+variable {gtop gbot : I} (htop : ∀ y, ile y gtop) (hbot : ∀ y, ile gbot y)
+variable {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
+variable {wkAddr : Univ A R P K dd → Prop} (hwkLt : WMSetLt WMLe wkAddr (F.cell gbot))
 variable (hrg : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rg = bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+  rest r κ.rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
 variable (hrl : ∀ r : Univ A R P K dd → Prop,
-  rest r κ.rl = bitVal PR.zero PR.one (r = wmSeg gtop))
+  rest r κ.rl = bitVal PR.zero PR.one (r = F.cell gtop))
 variable (hwkS : ∀ r : Univ A R P K dd → Prop,
   rest r κ.wk = bitVal PR.zero PR.one (r = wkAddr))
 variable (hFb : ∀ g g' : W → A, (∀ s : W, s ≠ κ.t → g s = g' s) → (κ.Fb g ↔ κ.Fb g'))
 variable {fc : Q → A} {s : Univ A R P K dd → Prop}
+variable (hsle : WMSetLe WMLe s (F.cell gtop))
+variable {w : ℕ} (hgap : ∀ u u' : I, IxSucc ile u u' →
+  wideRank (F.cell u') - wideRank (F.cell u) ≤ w)
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Language.wide.Structure (Univ A R P K dd)]
@@ -925,18 +1065,18 @@ private theorem has_of_rule {ρ : TrackRule} {f : Q → A} {g : W → A}
     exact ⟨rEmb ρ, by rw [hrules]; exact hg, by rw [hrules], by rw [hrules],
       by rw [hrules], by rw [hrules], fun hc => hml (by rw [hrules] at hc; exact hc)⟩
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-include hlin hnewk hbot hwkLt hwkS in
-private theorem wkOff (k r : Univ A R P K dd → Prop)
-    (hbnd : ∃ x : Univ A R P K dd, WMSetLe WMLe (wmSeg x) r) :
-    PR.passTracks κ.t rest k r κ.wk ≠ PR.one := by
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
+include F hlin hix hnewk hbot hwkLt hwkS in
+private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
+    PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
   obtain ⟨x, hx⟩ := hbnd
-  have hgx : WMSetLe WMLe (wmSeg gbot) (wmSeg x) := by
+  have hgx : WMSetLe WMLe (F.cell gbot) (F.cell x) := by
     rcases eq_or_ne gbot x with rfl | hne
     · exact hlinSet.1 _
-    · exact ((wmSetLt_iff _ _).mp ((wmSetLt_wmSeg_iff hlin gbot x).mpr
-        ⟨hbot x, fun hc => hne (hlin.2.2.1 gbot x (hbot x) hc)⟩)).1
+    · exact ((wmSetLt_iff _ _).mp ((F.lt_iff hix gbot x).mpr
+        ⟨hbot x, fun hc => hne (hix.2.2.1 gbot x (hbot x) hc)⟩)).1
   have hne : r ≠ wkAddr := by
     rintro rfl
     exact ((wmSetLt_iff _ _).mp hwkLt).2
@@ -945,47 +1085,66 @@ private theorem wkOff (k r : Univ A R P K dd → Prop)
   exact PR.zero_ne_one
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
-include hnerg hrg in
-private theorem rgOff (k r : Univ A R P K dd → Prop)
-    (hno : ∀ x : Univ A R P K dd, r ≠ wmSeg x) :
-    PR.passTracks κ.t rest k r κ.rg ≠ PR.one := by
+  [Finite A] [Finite R] [Finite P] [Finite K] [Finite I] in
+include F hnerg hrg in
+private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+    (hno : ∀ x : I, r ≠ F.cell x) :
+    PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
     bitVal_neg fun hc => hc.elim fun x hx => hno x hx]
   exact PR.zero_ne_one
 
-include hrules hR hlin hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hFb in
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hFb hsle hgap in
 /-- **The kit rewrites its track by the function**: from the scan phase
 anywhere, up to the file top, one pass writing the computed bit at every
 register, and back to the marker. -/
-theorem reaches :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+theorem reachesIn :
+    (wideData (Univ A R P K dd)).ReachesIn
+      (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
+        wideRank (F.cell gbot))
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .run) fc), Sum.inl wkAddr,
-        wideTape (PR.trackTape κ.t rest
-          fun u => κ.Fb (PR.passTracks κ.t rest m (wmSeg u))) (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, hpass⟩ := Prog.reaches_mapTrack hR hlin (t := κ.t) (rg := κ.rg)
+        wideTape (PR.trackTapeAt F.cell κ.t rest
+          fun u => κ.Fb (PR.passTracksAt F.cell κ.t rest m (F.cell u))) (PR.syElt PR.blank)⟩ := by
+  obtain ⟨q, hq, hpass⟩ := Prog.reachesIn_fileMapTrack F hR hlin hix (t := κ.t) (rg := κ.rg)
     hnerg (rest := rest) hrg (Fb := κ.Fb) hFb (m := m) (p := κ.emb .run) (f := fc)
     (fun _g hg1 => (has_of_rule hrules (ρ := .put) hg1).2 not_false)
     (fun k r hbnd hno =>
       (has_of_rule hrules (ρ := .walk)
-        ⟨rgOff hnerg hrg k r hno, wkOff hlin hnewk hbot hwkLt hwkS k r hbnd⟩).2
+        ⟨rgOff F hnerg hrg k r hno, wkOff F hlin hix hnewk hbot hwkLt hwkS k r hbnd⟩).2
         not_false)
-    (top := gtop) (bot := gbot) htop hbot
-  exact Prog.reaches_roundTrip hR hlin hnerl hnewk htop hbot (rest := rest)
-    (m := m) (m₂ := fun u => κ.Fb (PR.passTracks κ.t rest m (wmSeg u)))
+    (w := w) hgap (top := gtop) (bot := gbot) htop hbot
+  refine (Prog.reachesIn_fileRoundTrip F hR hlin hix hnerl hnewk hbot (rest := rest)
+    (m := m) (m₂ := fun u => κ.Fb (PR.passTracksAt F.cell κ.t rest m (F.cell u)))
     (wkAddr := wkAddr) hrl hwkS (p₁ := κ.emb .up)
     (p₂b := κ.emb .b2) (pIn := κ.emb .run) (pOut := κ.emb .run) (fc := fc)
     (fun _g hg => (has_of_rule hrules (ρ := .up) hg).1 trivial)
     ((has_of_rule hrules (ρ := .b1)
-      (show PR.passTracks κ.t rest m (wmSeg gtop) κ.rl = PR.one by
+      (show PR.passTracksAt F.cell κ.t rest m (F.cell gtop) κ.rl = PR.one by
         rw [Prog.passTracks_of_ne hnerl, hrl]; exact bitVal_pos rfl)).2 not_false)
     (fun _g => (has_of_rule hrules (ρ := .b2go) trivial).1 trivial)
     hq hpass
     (fun r hno hwk =>
-      (has_of_rule hrules (ρ := .walk) ⟨rgOff hnerg hrg _ r hno, hwk⟩).2 not_false)
-    hwkLt
+      (has_of_rule hrules (ρ := .walk) ⟨rgOff F hnerg hrg _ r hno, hwk⟩).2 not_false)
+    hwkLt hsle).mono (by
+    have h₁ : wideRank (F.cell gtop) - wideRank s ≤ wideRank (F.cell gtop) := Nat.sub_le _ _
+    have h₂ : wideRank q - wideRank wkAddr ≤ wideRank (F.cell gbot) :=
+      le_trans (Nat.sub_le _ _) (wideRank_mono hlin (wmSetLe_of_wmIncr hq))
+    omega)
+
+include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hFb hsle in
+/-- **The kit rewrites a track**, the budget forgotten. -/
+theorem reaches :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .run) fc), Sum.inl wkAddr,
+        wideTape (PR.trackTapeAt F.cell κ.t rest
+          fun u => κ.Fb (PR.passTracksAt F.cell κ.t rest m (F.cell u))) (PR.syElt PR.blank)⟩ :=
+  (reachesIn hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hFb hsle
+    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
+    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _)))).reflTransGen
 
 end Discharge
 

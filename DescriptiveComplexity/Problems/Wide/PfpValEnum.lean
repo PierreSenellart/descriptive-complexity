@@ -173,8 +173,8 @@ theorem exists_valEnum
       mV 0 = (fun _ => False) ∧
       (∀ a a' : Fin (n + 1), a < a' → (∀ b, ¬(a < b ∧ b < a')) →
         WMIncr WMLe (mV a) (mV a')) ∧
-      (∀ u, dt.InnerFull (mV (Fin.last n)) u) ∧
-      (∀ a, a < Fin.last n → ∃ u, ¬dt.InnerFull (mV a) u) ∧
+      (∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV (Fin.last n)) u) ∧
+      (∀ a, a < Fin.last n → ∃ u, ¬dt.InnerFull (fun u => tagBlk u.1) (mV a) u) ∧
       (∀ (a : Fin (n + 1)) (t : PfpTag R P dt.KIx) (w : Fin dt.dd → A),
         mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j) := by
   classical
@@ -224,7 +224,7 @@ theorem exists_valEnum
   · -- every earlier register fails it somewhere
     intro a ha
     by_contra hc
-    have hfull : ∀ u, dt.InnerFull (mV a) u :=
+    have hfull : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV a) u :=
       fun u => Classical.byContradiction fun hu => hc ⟨u, hu⟩
     have heq : mV a = dt.kinTop (A := A) (R := R) (P := P) :=
       funext fun u => propext (hfull u)

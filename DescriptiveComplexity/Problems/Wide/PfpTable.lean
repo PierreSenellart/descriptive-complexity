@@ -117,6 +117,12 @@ structure Table (A R P K : Type) (c dd : ℕ) where
   /-- The tracks of the symbol the input channel writes in the cell of an
   element. -/
   markPl : Univ A R P K dd → (Fin c → A)
+  /-- **Which elements the channel writes for.** Every one of them by default,
+  which is what `DescriptiveComplexity.WideAccept`'s channel does; a program
+  emitted into the *register* channel of
+  `DescriptiveComplexity.WideRegAccept` restricts it, and the elements it leaves
+  out have no register in the file the channel hands over. -/
+  Marked : Univ A R P K dd → Prop := fun _ => True
 
 namespace Table
 
@@ -175,10 +181,11 @@ def IsAcc : Univ A R P K dd → Prop := fun q =>
 /-- **The blank.** -/
 def IsBlank : Univ A R P K dd → Prop := fun a => a = symElt T.zero T.blankPl
 
-/-- **The input channel**: the cell of an element holds the mark the table gives
-it. Total, hence functional on the nose. -/
+/-- **The input channel**: the cell of an element the table writes for holds the
+mark the table gives it. Functional on the nose, and total exactly on the
+elements the table marks. -/
 def Inp : Univ A R P K dd → Univ A R P K dd → Prop :=
-  fun x a => a = symElt T.zero (T.markPl x)
+  fun x a => T.Marked x ∧ a = symElt T.zero (T.markPl x)
 
 /-! ### What a rule does
 
@@ -324,7 +331,7 @@ the blank are equations. -/
 theorem wellFormed (hR : T.Reads) : (wideData (Univ A R P K dd)).WellFormed :=
   wideData_wellFormed_iff.mpr
     ⟨T.isLinOrd_wmLe hR,
-      fun _x _a _b ha hb => ((hR.inp _ _).mp ha).trans ((hR.inp _ _).mp hb).symm,
+      fun _x _a _b ha hb => (((hR.inp _ _).mp ha).2).trans (((hR.inp _ _).mp hb).2).symm,
       ⟨symElt T.zero T.blankPl, (hR.blank _).mpr rfl⟩,
       fun _a _b ha hb => ((hR.blank _).mp ha).trans ((hR.blank _).mp hb).symm⟩
 
@@ -336,6 +343,70 @@ def Sep : Prop :=
   ∀ (r r' : R) (w w' : Fin c → A), T.guard r w → T.guard r' w' →
     T.srcPh r = T.srcPh r' → T.srcPl r w = T.srcPl r' w' →
     T.readPl r w = T.readPl r' w' → r = r' ∧ w = w'
+
+/-- **The separation condition, asked at some phases only**: two guarded rules
+that apply in the same state and read the same symbol are the same rule with the
+same data, provided the phase they apply in is one `Ph` names.
+
+A program that guesses does not separate everywhere – that is what guessing is –
+but it separates at every phase it can be in once the guess is over, and
+`DescriptiveComplexity.TMData.uniqueFrom_of_invariant` asks for no more. -/
+def SepOn (Ph : P → Prop) : Prop :=
+  ∀ (r r' : R) (w w' : Fin c → A), Ph (T.srcPh r) → T.guard r w → T.guard r' w' →
+    T.srcPh r = T.srcPh r' → T.srcPl r w = T.srcPl r' w' →
+    T.readPl r w = T.readPl r' w' → r = r' ∧ w = w'
+
+omit [LinearOrder R] [LinearOrder P] [LinearOrder K] [LinearOrder A]
+  [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R] [Finite P] [Finite K] in
+/-- Separating everywhere is separating at every phase. -/
+theorem sepOn_of_sep (hsep : T.Sep) (Ph : P → Prop) : T.SepOn Ph :=
+  fun r r' w w' _ hg hg' => hsep r r' w w' hg hg'
+
+omit [Finite A] [Finite R] [Finite P] [Finite K] in
+/-- **The transition is pinned wherever the phases separate**: at a state whose
+phase satisfies `Ph`, the state and the symbol read name the transition. This is
+the hypothesis of `DescriptiveComplexity.TMData.step_functional_at`, and with it
+a guessing program is functional off its guess. -/
+theorem tr_unique_of_sepOn (hR : T.Reads) {Ph : P → Prop} (hsep : T.SepOn Ph)
+    {q a : Univ A R P K dd}
+    (hq : ∀ (p : P) (f : Fin c → A), q = stateElt T.zero p f → Ph p) :
+    ∀ τ σ : Univ A R P K dd, WMTr τ → WMTr σ → WMSrc τ q → WMSrc σ q →
+      WMRead τ a → WMRead σ a → τ = σ := by
+  rintro ⟨t, v⟩ ⟨t', v'⟩ htr htr' hsrc hsrc' hread hread'
+  rw [hR.tr] at htr htr'
+  rw [hR.src] at hsrc hsrc'
+  rw [hR.read] at hread hread'
+  match t, t' with
+  | .ctrl r, .ctrl r' =>
+    obtain ⟨hpad, hg⟩ := htr
+    obtain ⟨hpad', hg'⟩ := htr'
+    have hst := stateElt_inj T.payload_le (hsrc.symm.trans hsrc')
+    have hsy := symElt_inj T.payload_le (hread.symm.trans hread')
+    obtain ⟨rfl, hw⟩ := hsep r r' _ _ (hq _ _ hsrc) hg hg' hst.1 hst.2 hsy
+    have hpv : IsPad c T.zero v := hpad
+    have hpv' : IsPad c T.zero v' := hpad'
+    have hu : unpad T.payload_le v = unpad T.payload_le v' := hw
+    have hvv : v = v' := by
+      rw [← pad_unpad T.payload_le hpv, ← pad_unpad T.payload_le hpv', hu]
+    exact congrArg (fun u => ((PfpTag.ctrl r : PfpTag R P K), u)) hvv
+
+omit [Finite A] [Finite R] [Finite P] [Finite K] in
+/-- **A transition has one destination**: it is an equation in the rule. -/
+theorem dst_functional (hR : T.Reads) :
+    ∀ τ q q' : Univ A R P K dd, WMDst τ q → WMDst τ q' → q = q' := by
+  rintro ⟨t, v⟩ q q' hq hq'
+  rw [hR.dst] at hq hq'
+  match t with
+  | .ctrl _ => exact hq.trans hq'.symm
+
+omit [Finite A] [Finite R] [Finite P] [Finite K] in
+/-- **A transition writes one symbol**: it is an equation in the rule. -/
+theorem write_functional (hR : T.Reads) :
+    ∀ τ a a' : Univ A R P K dd, WMWrite τ a → WMWrite τ a' → a = a' := by
+  rintro ⟨t, v⟩ a a' ha ha'
+  rw [hR.write] at ha ha'
+  match t with
+  | .ctrl _ => exact ha.trans ha'.symm
 
 omit [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **The emitted instance is deterministic**, given the separation condition.
@@ -415,7 +486,8 @@ Between them and `DescriptiveComplexity.Pfp.Table.fire_right` /
 /-- **The initial configuration of the emitted machine**: the start state, the
 head on the empty address, the mark of each element in that element's cell and the
 blank everywhere else. -/
-theorem isInit (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
+theorem isInit (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
+    {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
     (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
     (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →
       f s = symElt T.zero T.blankPl) :
@@ -423,12 +495,13 @@ theorem isInit (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R P K d
       ⟨Sum.inr (stateElt T.zero T.startPh T.startPl), Sum.inl fun _ => False,
         wideTape f (symElt T.zero T.blankPl)⟩ :=
   isInit_wideTape (T.isLinOrd_wmLe hR) ((hR.blank _).mpr rfl)
-    (fun x => (hR.inp x _).mpr rfl) hmark hrest ((hR.start _).mpr rfl)
+    (fun x => (hR.inp x _).mpr ⟨hmk x, rfl⟩) hmark hrest ((hR.start _).mpr rfl)
 
 /-- **The emitted machine accepts in bounded space**: it starts as
 `DescriptiveComplexity.Pfp.Table.isInit` says, roams, and ends in a state the
 table accepts. -/
-theorem acceptsSpace (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
+theorem acceptsSpace (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
+    {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
     (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
     (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →
       f s = symElt T.zero T.blankPl)
@@ -440,13 +513,57 @@ theorem acceptsSpace (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R
     (ha : T.accept p w) :
     (wideData (Univ A R P K dd)).AcceptsSpace :=
   acceptsSpace_of_wideTape (T.isLinOrd_wmLe hR) ((hR.blank _).mpr rfl)
-    (fun x => (hR.inp x _).mpr rfl) hmark hrest ((hR.start _).mpr rfl) hreach hstate
+    (fun x => (hR.inp x _).mpr ⟨hmk x, rfl⟩) hmark hrest ((hR.start _).mpr rfl) hreach hstate
     ((hR.acc _).mpr (T.isAcc_stateElt ha))
+
+/-- **The emitted machine accepts on the clock**: it starts as
+`DescriptiveComplexity.Pfp.Table.isInit` says, runs for fewer steps than there
+are addresses – `2 ^ n` of them, `n` the size of the drawn universe – and ends in
+a state the table accepts. This is the reading a *time*-bounded reduction needs,
+where `DescriptiveComplexity.Pfp.Table.acceptsSpace` is the space-bounded one. -/
+theorem accepts (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
+    {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
+    (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
+    (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →
+      f s = symElt T.zero T.blankPl)
+    {n : ℕ} {cfg : Config (WPoint (Univ A R P K dd))}
+    (hreach : (wideData (Univ A R P K dd)).ReachesIn n
+      ⟨Sum.inr (stateElt T.zero T.startPh T.startPl), Sum.inl fun _ => False,
+        wideTape f (symElt T.zero T.blankPl)⟩ cfg)
+    (hlt : n < 2 ^ Nat.card (Univ A R P K dd))
+    {p : P} {w : Fin c → A} (hstate : cfg.state = Sum.inr (stateElt T.zero p w))
+    (ha : T.accept p w) :
+    (wideData (Univ A R P K dd)).Accepts :=
+  accepts_of_wideTape_lt_two_pow (T.isLinOrd_wmLe hR) ((hR.blank _).mpr rfl)
+    (fun x => (hR.inp x _).mpr ⟨hmk x, rfl⟩) hmark hrest ((hR.start _).mpr rfl) hreach hlt hstate
+    ((hR.acc _).mpr (T.isAcc_stateElt ha))
+
+/-- **The emitted instance is a yes-instance of
+`DescriptiveComplexity.WideAccept`**, which is what a *nondeterministic*
+time-bounded reduction has to produce: well-formedness and an accepting run
+within the clock. Determinism is not asked for, so a program that guesses is
+served by this and not by
+`DescriptiveComplexity.Pfp.Table.dwideAcceptSpace`. -/
+theorem wideAccept (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
+    {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
+    (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
+    (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →
+      f s = symElt T.zero T.blankPl)
+    {n : ℕ} {cfg : Config (WPoint (Univ A R P K dd))}
+    (hreach : (wideData (Univ A R P K dd)).ReachesIn n
+      ⟨Sum.inr (stateElt T.zero T.startPh T.startPl), Sum.inl fun _ => False,
+        wideTape f (symElt T.zero T.blankPl)⟩ cfg)
+    (hlt : n < 2 ^ Nat.card (Univ A R P K dd))
+    {p : P} {w : Fin c → A} (hstate : cfg.state = Sum.inr (stateElt T.zero p w))
+    (ha : T.accept p w) :
+    WideAccept (Univ A R P K dd) :=
+  ⟨T.wellFormed hR, T.accepts hR hmk hmark hrest hreach hlt hstate ha⟩
 
 /-- **The emitted instance is a yes-instance of
 `DescriptiveComplexity.DWideAcceptSpace`**, which is what a reduction has to
 produce: the two promises and an accepting run. -/
 theorem dwideAcceptSpace (hR : T.Reads) (hsep : T.Sep)
+    (hmk : ∀ x : Univ A R P K dd, T.Marked x)
     {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
     (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
     (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →
@@ -458,7 +575,8 @@ theorem dwideAcceptSpace (hR : T.Reads) (hsep : T.Sep)
     {p : P} {w : Fin c → A} (hstate : cfg.state = Sum.inr (stateElt T.zero p w))
     (ha : T.accept p w) :
     DWideAcceptSpace (Univ A R P K dd) :=
-  ⟨T.wellFormed hR, T.deterministic hR hsep, T.acceptsSpace hR hmark hrest hreach hstate ha⟩
+  ⟨T.wellFormed hR, T.deterministic hR hsep,
+    T.acceptsSpace hR hmk hmark hrest hreach hstate ha⟩
 
 end Table
 

@@ -158,6 +158,52 @@ theorem varHosrcF (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
         (emb := fun p => emb (.matrixP (.matP p))) (argsA := args.argsA)
         (enterSt := args.enterAtomSt) (exitPh := emb .mchk1)))
 
+/-- **A property of one variable machinery's phases and its exit holds of every
+phase it can move to**: the gates, the round and the matrix all stay inside, and
+only the two verdict dispatches leave. This is the fact a
+determinism-after-the-guess argument asks of the evaluation
+(`DescriptiveComplexity.Pfp.PfpData.nexProg_uniqueFrom`). -/
+theorem varRuleF_dstIn (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
+    {emb : dt.VarPhF v → P} (exitPh : P) {S : P → Prop}
+    (hemb : ∀ p : dt.VarPhF v, S (emb p)) (hexit : S exitPh)
+    (i : dt.VarSiteF v) (ρ : dt.VarShF v i) :
+    S (dt.varRuleF zero one v args emb exitPh i ρ).dstPh :=
+  dt.varRule_dstIn zero one (emb := emb)
+    (pgEntry := emb (.gatesP (.chk 0)))
+    (pxEntry := emb (.matrixP (.igP (.chk 0)))) (exitPh := exitPh)
+    (newSlot := args.newSlot) (gateFlag := args.gateFlag) (accBit := args.accBit)
+    (enterSt := args.enterSt) (initSt := args.initSt) (postFold := args.postFold)
+    (storeCarry := args.storeCarry)
+    (S := S) hemb hexit
+    (fun s ρ => dt.gatesRule_dstIn (one := one) (v := v)
+      (emb := fun p => emb (.gatesP p)) (argsG := args.argsG)
+      (wellGOf := args.wellGOf) (setFail := args.setFail)
+      (enterSt := args.enterBlockSt) (failPh := emb .vchk1) (exitPh := emb .vchk1)
+      (fun p => hemb (.gatesP p)) (hemb .vchk1) (hemb .vchk1) s ρ)
+    (fun s ρ => dt.roundRule_dstIn (one := one)
+      (emb := fun p => emb (.matrixP p))
+      (ruleG := dt.igatesRule (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.igP p))) (argsG := args.argsIG)
+        (wellGOf := args.wellIGOf) (setFailOf := args.setFailIGOf)
+        (enterSt := args.enterIGSt) (exitPh := emb (.matrixP .rchk)))
+      (ruleX := dt.matrixRule (zero := zero) (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.matP p))) (argsA := args.argsA)
+        (enterSt := args.enterAtomSt) (exitPh := emb .mchk1))
+      (pxEntry := emb (.matrixP (.matP (.chk 0)))) (exitPh := emb .mchk1)
+      (existFlag := args.existFlag) (allFlag := args.allFlag)
+      (fun p => hemb (.matrixP p)) (hemb .mchk1)
+      (fun s ρ => dt.igatesRule_dstIn (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.igP p))) (argsG := args.argsIG)
+        (wellGOf := args.wellIGOf) (setFailOf := args.setFailIGOf)
+        (enterSt := args.enterIGSt) (exitPh := emb (.matrixP .rchk))
+        (fun p => hemb (.matrixP (.igP p))) (hemb (.matrixP .rchk)) s ρ)
+      (fun s ρ => dt.matrixRule_dstIn (zero := zero) (one := one) (v := v)
+        (emb := fun p => emb (.matrixP (.matP p))) (argsA := args.argsA)
+        (enterSt := args.enterAtomSt) (exitPh := emb .mchk1)
+        (fun p => hemb (.matrixP (.matP p))) (hemb .mchk1) s ρ)
+      (hemb (.matrixP (.matP (.chk 0)))) s ρ)
+    (hemb (.gatesP (.chk 0))) (hemb (.matrixP (.igP (.chk 0)))) i ρ
+
 /-- **One variable's machinery separates in-shape.** -/
 theorem varSepF (hzo : zero ≠ one) (v : dt.VarIx)
     (args : dt.VarArgs (A := A) (Q := Q) v)

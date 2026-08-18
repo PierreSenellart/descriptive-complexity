@@ -130,6 +130,30 @@ theorem wmBlk_outAddr (V : Fin ko → (Fin dd → A) → Prop) (k : Fin ko) :
   · intro hv
     exact ⟨k, rfl, hv⟩
 
+/-- **An address that marks outer argument blocks alone is `outAddr` of its
+blocks.** This is the uniqueness that turns a reading of the blocks into a
+reading of the address, and with it a set of marked addresses into a stage. -/
+theorem outAddr_of_blocks {V : Fin ko → (Fin dd → A) → Prop}
+    {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop}
+    (hblk : ∀ k : Fin ko, wmBlk s (argOut ki k) = V k)
+    (hsupp : ∀ u, s u → ∃ k : Fin ko, u.1 = argOut ki k) :
+    s = outAddr (R := R) (P := P) (ki := ki) V := by
+  funext u
+  refine propext ⟨fun hu => ?_, ?_⟩
+  · obtain ⟨k, hk⟩ := hsupp u hu
+    refine ⟨k, hk, ?_⟩
+    have hu' : wmBlk s (argOut ki k) u.2 := by
+      rw [← hk]
+      exact hu
+    rw [hblk k] at hu'
+    exact hu'
+  · rintro ⟨k, hk, hv⟩
+    have hv' : wmBlk s (argOut ki k) u.2 := by
+      rw [hblk k]
+      exact hv
+    rw [← hk] at hv'
+    exact hv'
+
 /-- Every other block of `outAddr` is empty. -/
 theorem wmBlk_outAddr_of_ne (V : Fin ko → (Fin dd → A) → Prop)
     {t : PfpTag R P (Fin ko ⊕ₗ Fin ki)} (ht : ∀ k : Fin ko, t ≠ argOut ki k) :
@@ -199,6 +223,21 @@ theorem not_trackOf_of_notEnc {i : d.B.ι} (ha : d.B.arity i ≤ ko)
   rintro ⟨x, hx, -⟩
   exact hℓ (x ℓ₀) (hx ℓ₀)
 
+/-- **A track marks no empty address**: a variable of positive arity has a
+block below its arity encoding a point, and an encoding always holds its tag's
+own tuple, so an address the track marks has an element in that block. This is
+what puts a dictionary entry inside a clocked program's *guessed* stretch, whose
+bottom is the file's first register and not the empty address. -/
+theorem nonempty_of_trackOf {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    {σ : d.B.Assignment (X.Map A)}
+    {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop} (ℓ₀ : Fin (d.B.arity i))
+    (h : trackOf ly zero one ha σ s) : ∃ y, s y := by
+  obtain ⟨x, hx, -⟩ := h
+  have hmem : encMap ly zero one (x ℓ₀)
+      (encTagTup ly zero one (x ℓ₀).1.1) := Or.inl rfl
+  rw [← hx ℓ₀] at hmem
+  exact ⟨_, hmem⟩
+
 variable (ly zero one) in
 /-- **The address of a tuple of points**: its outer blocks are the tuple's
 encodings, everything else empty — where the dictionary of a variable at that
@@ -218,6 +257,55 @@ theorem wmBlk_tupAddr {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
         (argOut ki (Fin.castLE ha ℓ)) = encMap ly zero one (x ℓ) := by
   rw [tupAddr, wmBlk_outAddr]
   exact dif_pos ℓ.isLt
+
+/-- **An address whose blocks below the arity are the encodings, and which
+marks nothing else, *is* the tuple's address.** The addresses a stage atom
+builds are of that kind – written block by block from named registers – so the
+dictionary a backward reading needs is asked exactly where
+`trackOf_assignOfTrack` answers it. -/
+theorem tupAddr_of_blocks {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
+    {zero one : A} {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+    {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop}
+    {x : Fin (d.B.arity i) → X.Map A}
+    (hblk : ∀ ℓ : Fin (d.B.arity i),
+      wmBlk s (argOut ki (Fin.castLE ha ℓ)) = encMap ly zero one (x ℓ))
+    (hbeyond : ∀ k : Fin ko, d.B.arity i ≤ (k : ℕ) →
+      ∀ v : Fin dd → A, ¬wmBlk s (argOut ki k) v)
+    (hsupp : ∀ u, s u → ∃ k : Fin ko, u.1 = argOut ki k) :
+    s = tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x := by
+  refine (outAddr_of_blocks (fun k => ?_) hsupp).trans rfl
+  by_cases hk : (k : ℕ) < d.B.arity i
+  · rw [dif_pos hk]
+    have hcast : k = Fin.castLE ha ⟨(k : ℕ), hk⟩ := Fin.ext rfl
+    exact (congrArg (fun k' => wmBlk s (argOut ki k')) hcast).trans
+      (hblk ⟨(k : ℕ), hk⟩)
+  · rw [dif_neg hk]
+    exact funext fun v =>
+      propext ⟨fun hv => (hbeyond k (not_lt.mp hk) v hv).elim, False.elim⟩
+
+variable (ly zero one) in
+/-- **The assignment a track carries**: a tuple is in the relation exactly when
+the address that names it is marked. This is the inverse the forward direction
+never needs – it *writes* `trackOf` of an assignment – and the one a backward
+reading is built on. -/
+def assignOfTrack (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
+    (T : d.B.ι → (Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop) → Prop) :
+    d.B.Assignment (X.Map A) :=
+  fun i x => T i (tupAddr (R := R) (P := P) (ki := ki) ly zero one (ha i) x)
+
+/-- **And it reads back**: at the address a tuple names, the track of the
+assignment a track carries is that track. So a run that left an arbitrary set
+of addresses marked has left the stage of a definite assignment, as far as the
+evaluation ever looks. -/
+theorem trackOf_assignOfTrack (hne : zero ≠ one)
+    (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
+    (T : d.B.ι → (Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop) → Prop)
+    {i : d.B.ι} (x : Fin (d.B.arity i) → X.Map A) :
+    trackOf (R := R) (P := P) (ki := ki) ly zero one (ha i)
+        (assignOfTrack (R := R) (P := P) (ki := ki) ly zero one ha T)
+        (tupAddr (R := R) (P := P) (ki := ki) ly zero one (ha i) x) ↔
+      T i (tupAddr (R := R) (P := P) (ki := ki) ly zero one (ha i) x) :=
+  trackOf_of_blocks hne (ha i) _ (fun ℓ => wmBlk_tupAddr (ha i) x ℓ)
 
 /-- **A tuple's address lies in the logical interval**: its non-argument
 blocks are empty, which is exactly `wmSetLe_logicalTop`'s hypothesis. What is

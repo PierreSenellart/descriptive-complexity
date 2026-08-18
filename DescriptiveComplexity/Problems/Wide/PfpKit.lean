@@ -205,6 +205,14 @@ theorem sep (hemb : Function.Injective κ.emb) :
     | exact absurd hg'.2 hg.2
     | exact absurd hg.2 hg'.2
 
+/-- **A trip stays inside its own phases**: every rule of the kit lands in one
+of the four the kit was given, so a caller that knows a property of those
+knows it of every phase the trip can be in. This is what a determinism-after-
+the-guess argument needs of a sub-machinery
+(`DescriptiveComplexity.Pfp.PfpData.nexProg_uniqueFrom`). -/
+theorem dstPh_emb (ρ : ReadRule) : ∃ p : ReadPh, (κ.rule one ρ).dstPh = κ.emb p := by
+  cases ρ <;> exact ⟨_, rfl⟩
+
 /-- **Exit disjointness** at the kit's two verdict phases: no kit rule fires
 there on a symbol with the marker set. -/
 theorem exit_disjoint (hemb : Function.Injective κ.emb) :
@@ -252,50 +260,73 @@ private theorem has_of_rule {ρ : ReadRule} {f : Q → A} {g : W → A}
       by rw [hrules]; exact hkeepSt, by rw [hrules]; exact hkeepWr,
       fun hc => hml (by rw [hrules] at hc; exact hc)⟩
 
+variable {I : Type} {ile : I → I → Prop}
+variable (F : IxFile (Univ A R P K dd) I ile)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+variable (hix : IsLinOrd ile)
 variable (hnewk : κ.wk ≠ κ.t)
-variable {gbot : Univ A R P K dd} (hbot : ∀ y, WMLe gbot y)
-variable {rest : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
-variable {v : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (wmSeg gbot))
+variable {gbot : I} (hbot : ∀ y, ile gbot y)
+variable {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
+variable {v : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (F.cell gbot))
 variable (hwkS : ∀ r : Univ A R P K dd → Prop,
   rest r κ.wk = bitVal PR.zero PR.one (r = v))
-variable {fc : Q → A} {x₀ : Univ A R P K dd}
-variable (hname : κ.Match fc (PR.passTracks κ.t rest m (wmSeg x₀)))
+variable {fc : Q → A} {x₀ : I}
+variable (hname : κ.Match fc (PR.passTracksAt F.cell κ.t rest m (F.cell x₀)))
 variable (huniq : ∀ r : Univ A R P K dd → Prop,
-  κ.Match fc (PR.passTracks κ.t rest m r) → r = wmSeg x₀)
+  κ.Match fc (PR.passTracksAt F.cell κ.t rest m r) → r = F.cell x₀)
 
-include hrules hR hlin hnewk hbot hv hwkS hname huniq in
+include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
 /-- **The kit reads a set bit**: the composite's run theorem, with every rule
 hypothesis discharged from the kit's rules. -/
-theorem reaches_pos (hm : m x₀) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+theorem reachesIn_pos (hm : m x₀) :
+    (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .ry) fc), Sum.inl v,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩ := by
-  refine Prog.reaches_readBit_pos (NameG := κ.Match fc) (pUp := κ.emb .up)
-    hR hlin hnewk hbot hv hwkS hname huniq
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ := by
+  refine Prog.reachesIn_readBit_pos (F := F) (NameG := κ.Match fc) (pUp := κ.emb .up)
+    hR hlin hix hnewk hbot hv hwkS hname huniq
     (fun g hg => ?_) (fun g hg => ?_) (fun g hg hb => ?_) (fun g hg => ?_) hm
   · exact ((has_of_rule hrules (ρ := .turn) hg rfl rfl).1 trivial)
   · exact ((has_of_rule hrules (ρ := .up) hg rfl rfl).1 trivial)
   · exact ((has_of_rule hrules (ρ := .rd1) ⟨hg, hb⟩ rfl rfl).2 not_false)
   · exact ((has_of_rule hrules (ρ := .backY) hg rfl rfl).2 not_false)
 
-include hrules hR hlin hnewk hbot hv hwkS hname huniq in
-/-- **The kit reads a clear bit.** -/
-theorem reaches_neg (hm : ¬m x₀) :
+include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
+/-- **The kit reads a set bit**, the budget forgotten. -/
+theorem reaches_pos (hm : m x₀) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .ry) fc), Sum.inl v,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn_pos hrules F hR hlin hix hnewk hbot hv hwkS hname huniq hm).reflTransGen
+
+include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
+/-- **The kit reads a clear bit.** -/
+theorem reachesIn_neg (hm : ¬m x₀) :
+    (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
+      ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .rn) fc), Sum.inl v,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩ := by
-  refine Prog.reaches_readBit_neg (NameG := κ.Match fc) (pUp := κ.emb .up)
-    hR hlin hnewk hbot hv hwkS hname huniq
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ := by
+  refine Prog.reachesIn_readBit_neg (F := F) (NameG := κ.Match fc) (pUp := κ.emb .up)
+    hR hlin hix hnewk hbot hv hwkS hname huniq
     (fun g hg => ?_) (fun g hg => ?_) (fun g hg hb => ?_) (fun g hg => ?_) hm
   · exact ((has_of_rule hrules (ρ := .turn) hg rfl rfl).1 trivial)
   · exact ((has_of_rule hrules (ρ := .up) hg rfl rfl).1 trivial)
   · exact ((has_of_rule hrules (ρ := .rd0) ⟨hg, hb⟩ rfl rfl).2 not_false)
   · exact ((has_of_rule hrules (ρ := .backN) hg rfl rfl).2 not_false)
+
+include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
+/-- **The kit reads a clear bit**, the budget forgotten. -/
+theorem reaches_neg (hm : ¬m x₀) :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .rn) fc), Sum.inl v,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn_neg hrules F hR hlin hix hnewk hbot hv hwkS hname huniq hm).reflTransGen
 
 end ReadKit
 
@@ -396,6 +427,14 @@ noncomputable def rule : WriteRule → Rule A Q W P
       wr := fun _ g => g
       moveRight := False }
 
+/-- **A write trip stays inside its own phases**: every rule of the kit lands
+in one of the phases the kit was given, which is what a
+determinism-after-the-guess argument needs of a sub-machinery
+(`DescriptiveComplexity.Pfp.PfpData.nexProg_uniqueFrom`). -/
+theorem dstPh_emb (ρ : WriteRule) :
+    ∃ p : WritePh, (κ.rule zero one ρ).dstPh = κ.emb p := by
+  cases ρ <;> exact ⟨_, rfl⟩
+
 /-- **In-shape separation.** -/
 theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : WriteRule) (f : Q → A) (g : W → A),
@@ -427,29 +466,32 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {κ : WriteKit A Q W P}
 variable {rEmb : WriteRule → R}
 variable (hrules : ∀ ρ : WriteRule, PR.rules (rEmb ρ) = κ.rule PR.zero PR.one ρ)
+variable {I : Type} {ile : I → I → Prop}
+variable (F : IxFile (Univ A R P K dd) I ile)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+variable (hix : IsLinOrd ile)
 variable (hnewk : κ.wk ≠ κ.t)
-variable {gbot : Univ A R P K dd} (hbot : ∀ y, WMLe gbot y)
-variable {rest : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
-variable {v : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (wmSeg gbot))
+variable {gbot : I} (hbot : ∀ y, ile gbot y)
+variable {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
+variable {v : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (F.cell gbot))
 variable (hwkS : ∀ r : Univ A R P K dd → Prop,
   rest r κ.wk = bitVal PR.zero PR.one (r = v))
-variable {fc : Q → A} {x₀ : Univ A R P K dd}
-variable (hname : κ.Match fc (PR.passTracks κ.t rest m (wmSeg x₀)))
+variable {fc : Q → A} {x₀ : I}
+variable (hname : κ.Match fc (PR.passTracksAt F.cell κ.t rest m (F.cell x₀)))
 variable (huniq : ∀ r : Univ A R P K dd → Prop,
-  κ.Match fc (PR.passTracks κ.t rest m r) → r = wmSeg x₀)
+  κ.Match fc (PR.passTracksAt F.cell κ.t rest m r) → r = F.cell x₀)
 
-include hrules hR hlin hnewk hbot hv hwkS hname huniq in
+include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
 /-- **The kit writes its bit at the named cell** and returns to the marker. -/
-theorem reaches :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+theorem reachesIn :
+    (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
-        wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (κ.emb .back) fc), Sum.inl v,
-        wideTape (PR.trackTape κ.t rest
+        wideTape (PR.trackTapeAt F.cell κ.t rest
           fun y => (y = x₀ ∧ κ.bVal fc) ∨ (y ≠ x₀ ∧ m y)) (PR.syElt PR.blank)⟩ := by
-  refine Prog.reaches_writeBit (NameG := κ.Match fc) (pUp := κ.emb .up)
-    hR hlin hnewk hbot hv hwkS hname huniq
+  refine Prog.reachesIn_writeBit (F := F) (NameG := κ.Match fc) (pUp := κ.emb .up)
+    hR hlin hix hnewk hbot hv hwkS hname huniq
     (fun g hg => ?_) (fun g hg => ?_) (b := κ.bVal fc) ?_ (fun g hg => ?_)
   · exact ⟨rEmb .turn, by rw [hrules]; exact hg, by rw [hrules]; rfl, by rw [hrules]; rfl,
       by rw [hrules]; rfl, by rw [hrules]; rfl, by rw [hrules]; trivial⟩
@@ -461,6 +503,17 @@ theorem reaches :
   · exact ⟨rEmb .back, by rw [hrules]; exact hg, by rw [hrules]; rfl, by rw [hrules]; rfl,
       by rw [hrules]; rfl, by rw [hrules]; rfl,
       fun hc => by rw [hrules] at hc; exact hc⟩
+
+include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
+/-- **The kit writes a named bit**, the budget forgotten. -/
+theorem reaches :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
+        wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt (κ.emb .back) fc), Sum.inl v,
+        wideTape (PR.trackTapeAt F.cell κ.t rest
+          fun y => (y = x₀ ∧ κ.bVal fc) ∨ (y ≠ x₀ ∧ m y)) (PR.syElt PR.blank)⟩ :=
+  (reachesIn hrules F hR hlin hix hnewk hbot hv hwkS hname huniq ).reflTransGen
 
 end Discharge
 

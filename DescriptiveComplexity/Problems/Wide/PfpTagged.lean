@@ -131,6 +131,48 @@ def tagRule : ∀ i : TagSite m T nrOf, TagSh m T nrOf i → Rule A Q W P
 
 variable {emb}
 
+/-- **A tag-branched machinery leaves only into its own phases or its exit**:
+the witness reads' trips stay inside it, the branch lands in the decoded tag's
+loop, and only the loop's last dispatch leaves. -/
+theorem tagRule_dstPh (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i) :
+    (∃ p : TagPh m T nrOf,
+      (tagRule one wk rg emb rdTrackT MatchT setTagFlag TagsAre rdTrackE MatchE
+        setFlagE initEl advEl exitSt IsMaxEl exitPh i ρ).dstPh = emb p) ∨
+    (tagRule one wk rg emb rdTrackT MatchT setTagFlag TagsAre rdTrackE MatchE
+      setFlagE initEl advEl exitSt IsMaxEl exitPh i ρ).dstPh = exitPh := by
+  have hnext : ∀ i : Fin m, ∃ p : TagPh m T nrOf, tagNextRd emb i = emb p := by
+    intro i
+    by_cases h : (i : ℕ) + 1 < m
+    · exact ⟨_, dif_pos h⟩
+    · exact ⟨_, dif_neg h⟩
+  match i, ρ with
+  | .tagRd i, Sum.inl σ =>
+    obtain ⟨p, hp⟩ := (ReadKit.mk (rdTrackT i) wk (MatchT i)
+      (fun rp => emb (.tagRdP i rp))).dstPh_emb one σ
+    exact Or.inl ⟨.tagRdP i p, hp⟩
+  | .tagRd i, Sum.inr b => exact Or.inl (hnext i)
+  | .br, .stay => exact Or.inl ⟨_, rfl⟩
+  | .br, .dsp τ => exact Or.inl ⟨_, rfl⟩
+  | .loop τ s, ρ =>
+    rcases elemRule_dstPh (nr := nrOf τ) (one := one) (wk := wk) (rg := rg)
+      (emb := fun p => emb (.loopP τ p)) (rdTrack := rdTrackE τ)
+      (MatchOf := MatchE τ) (setFlag := setFlagE τ) (initEl := initEl τ)
+      (advEl := advEl τ) (exitSt := exitSt τ) (IsMaxEl := IsMaxEl τ)
+      (exitPh := exitPh) s ρ with ⟨p, hp⟩ | hp
+    · exact Or.inl ⟨.loopP τ p, hp⟩
+    · exact Or.inr hp
+
+/-- **A property of the machinery's phases and its exit holds of every phase it
+can move to.** -/
+theorem tagRule_dstIn {S : P → Prop} (hemb : ∀ p : TagPh m T nrOf, S (emb p))
+    (hexit : S exitPh) (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i) :
+    S (tagRule one wk rg emb rdTrackT MatchT setTagFlag TagsAre rdTrackE MatchE
+      setFlagE initEl advEl exitSt IsMaxEl exitPh i ρ).dstPh := by
+  rcases tagRule_dstPh one wk rg rdTrackT MatchT setTagFlag TagsAre rdTrackE
+    MatchE setFlagE initEl advEl exitSt IsMaxEl exitPh i ρ with ⟨p, hp⟩ | hp
+  · rw [hp]; exact hemb p
+  · rw [hp]; exact hexit
+
 /-- **Every rule of a tag-branched machinery fires from a phase its site
 owns**; the loops' obligation is the element loop's. -/
 theorem tagHosrc :

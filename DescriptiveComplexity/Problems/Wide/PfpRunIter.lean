@@ -148,6 +148,8 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 variable [Language.wide.Structure (Univ A R P K dd)]
 variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {nr : ℕ}
+variable {I : Type} {ile : I → I → Prop}
+variable (RF : IxFile (Univ A R P K dd) I ile)
 variable {wk rg : W} {emb : ElemPh nr → P}
 variable {rdTrack : Fin nr → W}
 variable {MatchOf : Fin nr → (Q → A) → (W → A) → Prop}
@@ -159,12 +161,12 @@ variable {rEmb : ∀ i : ElemSite nr, ElemSh nr i → R}
 variable {ι : Type} [LinearOrder ι] [Finite ι]
 variable {rest : (Univ A R P K dd → Prop) → W → A}
 variable {v : Univ A R P K dd → Prop}
-variable {m : Fin nr → Univ A R P K dd → Prop}
+variable {m : Fin nr → I → Prop}
 
 variable (setFlag initEl advEl rest v m) in
 /-- **The generated round-entry state**: the loop's `initEl` at the bottom,
 each cover the previous round's reads folded and advanced. -/
-noncomputable def elemIter (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A)
+noncomputable def elemIter (xOf : ι → Fin nr → I) (f₀ : Q → A)
     (a : ι) : Q → A :=
   iterOrd (initEl f₀ (rest v))
     (fun a q =>
@@ -174,7 +176,7 @@ noncomputable def elemIter (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q �
 variable (setFlag initEl advEl rest v m) in
 /-- **The generated within-round family**: the read chain of round `a`
 applied to its entry state. -/
-noncomputable def elemFam (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A)
+noncomputable def elemFam (xOf : ι → Fin nr → I) (f₀ : Q → A)
     (a : ι) (j : Fin (nr + 1)) : Q → A :=
   chainSt (fun j' => m j' (xOf a j'))
     (fun j' b q' => setFlag j' b q' (rest v))
@@ -197,7 +199,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
 /-- Two backgrounds agreeing at the working cell give one round-entry
 family. -/
 theorem elemIter_congr_rest (h : rest v = rest' v)
-    (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A) (a : ι) :
+    (xOf : ι → Fin nr → I) (f₀ : Q → A) (a : ι) :
     elemIter setFlag initEl advEl rest v m xOf f₀ a =
       elemIter setFlag initEl advEl rest' v m xOf f₀ a := by
   simp only [elemIter, h]
@@ -209,7 +211,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
 /-- Two backgrounds agreeing at the working cell give one within-round
 family. -/
 theorem elemFam_congr_rest (h : rest v = rest' v)
-    (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A) (a : ι)
+    (xOf : ι → Fin nr → I) (f₀ : Q → A) (a : ι)
     (j : Fin (nr + 1)) :
     elemFam setFlag initEl advEl rest v m xOf f₀ a j =
       elemFam setFlag initEl advEl rest' v m xOf f₀ a j := by
@@ -221,50 +223,53 @@ variable (hrules : ∀ (i : ElemSite nr) (ρ : ElemSh nr i),
   PR.rules (rEmb i ρ) = elemRule PR.one wk rg emb rdTrack MatchOf setFlag
     initEl advEl exitSt IsMaxEl exitPh i ρ)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-variable {gbot : Univ A R P K dd} (hbot : ∀ y, WMLe gbot y)
-variable {v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (wmSeg gbot))
+variable (hix : IsLinOrd ile)
+variable {gbot : I} (hbot : ∀ y, ile gbot y)
+variable {v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (RF.cell gbot))
 variable (hvi : WMIncr WMLe v v')
 variable (hwkS : ∀ r, rest r wk = bitVal PR.zero PR.one (r = v))
 variable (hrg : ∀ r, rest r rg =
-  bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+  bitVal PR.zero PR.one (∃ u : I, r = RF.cell u))
 variable (hm : ∀ (j : Fin nr) (r : Univ A R P K dd → Prop),
-  rest r (rdTrack j) = bitVal PR.zero PR.one (regBit (m j) r))
+  rest r (rdTrack j) = bitVal PR.zero PR.one (bitAtOf RF.cell (m j) r))
 variable (hnewk : ∀ j, wk ≠ rdTrack j) (hnerg : ∀ j, rg ≠ rdTrack j)
-variable {t₀ : W} {m₀ : Univ A R P K dd → Prop}
-variable (hm₀ : ∀ r, rest r t₀ = bitVal PR.zero PR.one (regBit m₀ r))
+variable {t₀ : W} {m₀ : I → Prop}
+variable (hm₀ : ∀ r, rest r t₀ = bitVal PR.zero PR.one (bitAtOf RF.cell m₀ r))
 variable (hwkt₀ : wk ≠ t₀) (hrgt₀ : rg ≠ t₀)
 variable {a₀ aT : ι}
 variable (hbotI : ∀ a, a₀ ≤ a) (htopI : ∀ a, a ≤ aT)
-variable (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A)
+variable (xOf : ι → Fin nr → I) (f₀ : Q → A)
 variable (hname : ∀ (a : ι) (j : Fin nr),
   MatchOf j (elemFam setFlag initEl advEl rest v m xOf f₀ a j.castSucc)
-    (PR.passTracks (rdTrack j) rest (m j) (wmSeg (xOf a j))))
+    (PR.passTracksAt RF.cell (rdTrack j) rest (m j) (RF.cell (xOf a j))))
 variable (huniq : ∀ (a : ι) (j : Fin nr) (r : Univ A R P K dd → Prop),
   MatchOf j (elemFam setFlag initEl advEl rest v m xOf f₀ a j.castSucc)
-    (PR.passTracks (rdTrack j) rest (m j) r) → r = wmSeg (xOf a j))
+    (PR.passTracksAt RF.cell (rdTrack j) rest (m j) r) → r = RF.cell (xOf a j))
 variable (hmaxT : IsMaxEl (elemFam setFlag initEl advEl rest v m xOf f₀ aT (Fin.last nr)))
 variable (hmaxF : ∀ a, a < aT →
   ¬IsMaxEl (elemFam setFlag initEl advEl rest v m xOf f₀ a (Fin.last nr)))
 
-include hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ hrgt₀
+include RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ hrgt₀
   hbotI htopI hname huniq hmaxT hmaxF in
-/-- **The element loop's run at the generated family**: only the name guards
-at the generated states, the exhaustion conditions and the geometry are
-owed; the family equations hold by construction. -/
-theorem elem_run_iter :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+/-- **The element loop's run at the generated family, on a clock**: only the
+name guards at the generated states, the exhaustion conditions and the geometry
+are owed; the family equations hold by construction. -/
+theorem elem_reachesIn_iter (c : ℕ)
+    (hcost : ∀ (a : ι) (j : Fin nr),
+      2 * (wideRank (RF.cell (xOf a j)) - wideRank v) + 2 ≤ c) :
+    (wideData (Univ A R P K dd)).ReachesIn ((2 + (c + 2) * nr) * (Nat.card ι + 1) + 1)
       ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           (exitSt (elemFam setFlag initEl advEl rest v m xOf f₀ aT (Fin.last nr))
             (rest v))), Sum.inl v',
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
   classical
-  refine elem_run hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg hm₀
+  refine elem_reachesIn RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀
     hwkt₀ hrgt₀ hbotI htopI
     (fun a => elemFam setFlag initEl advEl rest v m xOf f₀ a (Fin.last nr))
     (elemFam setFlag initEl advEl rest v m xOf f₀) (fun _ => rfl) xOf hname huniq
-    ?_ ?_ ?_ hmaxT hmaxF ?_
+    ?_ ?_ ?_ hmaxT hmaxF c hcost ?_
   · intro a j hbit
     exact chainSt_succ_pos j.isLt (by
       exact (show m j (xOf a j) from hbit))
@@ -280,6 +285,31 @@ theorem elem_run_iter :
         (fun j b q' => setFlag j b q' (rest v)) q nr) (rest v))
       hbotI).symm
 
+
+
+
+include RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ hrgt₀
+  hbotI htopI hname huniq hmaxT hmaxF in
+/-- **The element loop's run at the generated family**, the budget forgotten. -/
+theorem elem_run_iter :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt exitPh
+          (exitSt (elemFam setFlag initEl advEl rest v m xOf f₀ aT (Fin.last nr))
+            (rest v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ :=
+  (elem_reachesIn_iter (RF := RF) (hrules := hrules) (hR := hR) (hlin := hlin)
+    (hix := hix) (hbot := hbot) (hv := hv) (hvi := hvi) (hwkS := hwkS) (hrg := hrg)
+    (hm := hm) (hnewk := hnewk) (hnerg := hnerg) (hm₀ := hm₀) (hwkt₀ := hwkt₀)
+    (hrgt₀ := hrgt₀) (hbotI := hbotI) (htopI := htopI) (hname := hname)
+    (huniq := huniq) (hmaxT := hmaxT) (hmaxF := hmaxF)
+    (c := 2 * Nat.card {q : WPoint (Univ A R P K dd) //
+      (wideData (Univ A R P K dd)).Posn q} + 2)
+    (hcost := fun a j => by
+      have := wideRank_lt_card (A := Univ A R P K dd) (RF.cell (xOf a j))
+      omega)).reflTransGen
+
 end ElemIter
 
 /-! ### The tag-branched machinery's run, at the generated families -/
@@ -291,6 +321,8 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 variable [Language.wide.Structure (Univ A R P K dd)]
 variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {m : ℕ} {nrOf : T → ℕ}
+variable {I : Type} {ile : I → I → Prop}
+variable (RF : IxFile (Univ A R P K dd) I ile)
 variable {wk rg : W} {emb : TagPh m T nrOf → P}
 variable {rdTrackT : Fin m → W}
 variable {MatchT : Fin m → (Q → A) → (W → A) → Prop}
@@ -304,12 +336,12 @@ variable {IsMaxEl : T → (Q → A) → Prop}
 variable {exitPh : P}
 variable {rest : (Univ A R P K dd → Prop) → W → A}
 variable {v : Univ A R P K dd → Prop}
-variable {mT : Fin m → Univ A R P K dd → Prop}
+variable {mT : Fin m → I → Prop}
 
 variable (setTagFlag rest v mT) in
 /-- **The generated witness chain**: the `i`-th prefix of the witness reads
 applied to the entry control, each one-hot bit the read's. -/
-noncomputable def tagFam (xT : Fin m → Univ A R P K dd) (f₀ : Q → A)
+noncomputable def tagFam (xT : Fin m → I) (f₀ : Q → A)
     (i : Fin (m + 1)) : Q → A :=
   chainSt (fun i' => mT i' (xT i'))
     (fun i' b q => setTagFlag i' b q (rest v)) f₀ (i : ℕ)
@@ -320,7 +352,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
   [Finite P] [Finite K] in
 /-- **The witness chain reads its background at the working cell alone.** -/
 theorem tagFam_congr_rest {rest' : (Univ A R P K dd → Prop) → W → A}
-    (h : rest v = rest' v) (xT : Fin m → Univ A R P K dd) (f₀ : Q → A)
+    (h : rest v = rest' v) (xT : Fin m → I) (f₀ : Q → A)
     (i : Fin (m + 1)) :
     tagFam setTagFlag rest v mT xT f₀ i =
       tagFam setTagFlag rest' v mT xT f₀ i := by
@@ -331,42 +363,43 @@ variable (hrules : ∀ (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i),
   PR.rules (rEmb i ρ) = tagRule PR.one wk rg emb rdTrackT MatchT setTagFlag
     TagsAre rdTrackE MatchE setFlagE initEl advEl exitSt IsMaxEl exitPh i ρ)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-variable {gbot : Univ A R P K dd} (hbot : ∀ y, WMLe gbot y)
-variable {v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (wmSeg gbot))
+variable (hix : IsLinOrd ile)
+variable {gbot : I} (hbot : ∀ y, ile gbot y)
+variable {v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (RF.cell gbot))
 variable (hvi : WMIncr WMLe v v')
 variable (hwkS : ∀ r, rest r wk = bitVal PR.zero PR.one (r = v))
 variable (hrg : ∀ r, rest r rg =
-  bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+  bitVal PR.zero PR.one (∃ u : I, r = RF.cell u))
 variable (hmT : ∀ (i : Fin m) (r : Univ A R P K dd → Prop),
-  rest r (rdTrackT i) = bitVal PR.zero PR.one (regBit (mT i) r))
+  rest r (rdTrackT i) = bitVal PR.zero PR.one (bitAtOf RF.cell (mT i) r))
 variable (hnewkT : ∀ i, wk ≠ rdTrackT i) (hnergT : ∀ i, rg ≠ rdTrackT i)
-variable {t₀ : W} {m₀ : Univ A R P K dd → Prop}
-variable (hm₀ : ∀ r, rest r t₀ = bitVal PR.zero PR.one (regBit m₀ r))
+variable {t₀ : W} {m₀ : I → Prop}
+variable (hm₀ : ∀ r, rest r t₀ = bitVal PR.zero PR.one (bitAtOf RF.cell m₀ r))
 variable (hwkt₀ : wk ≠ t₀) (hrgt₀ : rg ≠ t₀)
-variable (xT : Fin m → Univ A R P K dd) (f₀ : Q → A)
+variable (xT : Fin m → I) (f₀ : Q → A)
 variable (hnameT : ∀ i : Fin m,
   MatchT i (tagFam setTagFlag rest v mT xT f₀ i.castSucc)
-    (PR.passTracks (rdTrackT i) rest (mT i) (wmSeg (xT i))))
+    (PR.passTracksAt RF.cell (rdTrackT i) rest (mT i) (RF.cell (xT i))))
 variable (huniqT : ∀ (i : Fin m) (r : Univ A R P K dd → Prop),
   MatchT i (tagFam setTagFlag rest v mT xT f₀ i.castSucc)
-    (PR.passTracks (rdTrackT i) rest (mT i) r) → r = wmSeg (xT i))
+    (PR.passTracksAt RF.cell (rdTrackT i) rest (mT i) r) → r = RF.cell (xT i))
 variable {τ : T}
 variable (hτ : TagsAre τ (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)))
-variable {mE : Fin (nrOf τ) → Univ A R P K dd → Prop}
+variable {mE : Fin (nrOf τ) → I → Prop}
 variable (hmE : ∀ (j : Fin (nrOf τ)) (r : Univ A R P K dd → Prop),
-  rest r (rdTrackE τ j) = bitVal PR.zero PR.one (regBit (mE j) r))
+  rest r (rdTrackE τ j) = bitVal PR.zero PR.one (bitAtOf RF.cell (mE j) r))
 variable (hnewkE : ∀ j, wk ≠ rdTrackE τ j) (hnergE : ∀ j, rg ≠ rdTrackE τ j)
 variable {ι : Type} [LinearOrder ι] [Finite ι] {a₀ aT : ι}
 variable (hbotI : ∀ a, a₀ ≤ a) (htopI : ∀ a, a ≤ aT)
-variable (xE : ι → Fin (nrOf τ) → Univ A R P K dd)
+variable (xE : ι → Fin (nrOf τ) → I)
 variable (hnameE : ∀ (a : ι) (j : Fin (nrOf τ)),
   MatchE τ j (elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
       (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)) a j.castSucc)
-    (PR.passTracks (rdTrackE τ j) rest (mE j) (wmSeg (xE a j))))
+    (PR.passTracksAt RF.cell (rdTrackE τ j) rest (mE j) (RF.cell (xE a j))))
 variable (huniqE : ∀ (a : ι) (j : Fin (nrOf τ)) (r : Univ A R P K dd → Prop),
   MatchE τ j (elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
       (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)) a j.castSucc)
-    (PR.passTracks (rdTrackE τ j) rest (mE j) r) → r = wmSeg (xE a j))
+    (PR.passTracksAt RF.cell (rdTrackE τ j) rest (mE j) r) → r = RF.cell (xE a j))
 variable (hmaxT : IsMaxEl τ
   (elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
     (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)) aT (Fin.last (nrOf τ))))
@@ -374,29 +407,34 @@ variable (hmaxF : ∀ a, a < aT → ¬IsMaxEl τ
   (elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
     (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)) a (Fin.last (nrOf τ))))
 
-include hrules hR hlin hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt₀ hrgt₀
+include RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt₀ hrgt₀
   hnameT huniqT hτ hmE hnewkE hnergE hbotI htopI hnameE huniqE hmaxT hmaxF in
-/-- **The tag-branched machinery's run at the generated families**: the
-witness chain and the branch's element loop are both generated, so only the
-name guards, the branch decode and the exhaustion conditions are owed. -/
-theorem tag_run_iter :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+/-- **The tag-branched machinery's run at the generated families, on a
+clock**: the witness chain and the branch's element loop are both generated, so
+only the name guards, the branch decode and the exhaustion conditions are owed,
+and the cost is the chain's reads plus the branch's whole loop. -/
+theorem tag_reachesIn_iter (c : ℕ)
+    (hcostT : ∀ i : Fin m, 2 * (wideRank (RF.cell (xT i)) - wideRank v) + 2 ≤ c)
+    (hcostE : ∀ (a : ι) (j : Fin (nrOf τ)),
+      2 * (wideRank (RF.cell (xE a j)) - wideRank v) + 2 ≤ c) :
+    (wideData (Univ A R P K dd)).ReachesIn
+      ((c + 2) * m + 2 + ((2 + (c + 2) * nrOf τ) * (Nat.card ι + 1) + 1))
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) f₀), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           (exitSt τ (elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
             (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)) aT
             (Fin.last (nrOf τ))) (rest v))), Sum.inl v',
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
   classical
-  refine tag_run hrules hR hlin hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀
+  refine tag_reachesIn RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀
     hwkt₀ hrgt₀ (tagFam setTagFlag rest v mT xT f₀) xT hnameT huniqT
-    ?_ ?_ hτ hmE hnewkE hnergE hbotI htopI
+    ?_ ?_ c hcostT hτ hmE hnewkE hnergE hbotI htopI
     (fun a => elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
       (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)) a (Fin.last (nrOf τ)))
     (elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
       (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)))
-    (fun _ => rfl) xE hnameE huniqE ?_ ?_ ?_ hmaxT hmaxF ?_
+    (fun _ => rfl) xE hnameE huniqE ?_ ?_ ?_ hmaxT hmaxF ?_ hcostE
   · intro i hbit
     exact chainSt_succ_pos i.isLt (show mT i (xT i) from hbit)
   · intro i hbit
@@ -419,6 +457,36 @@ theorem tag_run_iter :
         (fun j b q' => setFlagE τ j b q' (rest v)) q (nrOf τ)) (rest v))
       hbotI).symm
 
+
+include RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt₀ hrgt₀
+  hnameT huniqT hτ hmE hnewkE hnergE hbotI htopI hnameE huniqE hmaxT hmaxF in
+/-- **The tag-branched machinery's run at the generated families**, the budget
+forgotten. -/
+theorem tag_run_iter :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (tagFirstRd emb) f₀), Sum.inl v,
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt exitPh
+          (exitSt τ (elemFam (setFlagE τ) (initEl τ) (advEl τ) rest v mE xE
+            (tagFam setTagFlag rest v mT xT f₀ (Fin.last m)) aT
+            (Fin.last (nrOf τ))) (rest v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ :=
+  (tag_reachesIn_iter (RF := RF) (hrules := hrules) (hR := hR) (hlin := hlin)
+    (hix := hix) (hbot := hbot) (hv := hv) (hvi := hvi) (hwkS := hwkS) (hrg := hrg)
+    (hmT := hmT) (hnewkT := hnewkT) (hnergT := hnergT) (hm₀ := hm₀)
+    (hwkt₀ := hwkt₀) (hrgt₀ := hrgt₀) (hnameT := hnameT) (huniqT := huniqT)
+    (hτ := hτ) (hmE := hmE) (hnewkE := hnewkE) (hnergE := hnergE)
+    (hbotI := hbotI) (htopI := htopI) (hnameE := hnameE) (huniqE := huniqE)
+    (hmaxT := hmaxT) (hmaxF := hmaxF)
+    (c := 2 * Nat.card {q : WPoint (Univ A R P K dd) //
+      (wideData (Univ A R P K dd)).Posn q} + 2)
+    (hcostT := fun i => by
+      have := wideRank_lt_card (A := Univ A R P K dd) (RF.cell (xT i))
+      omega)
+    (hcostE := fun a j => by
+      have := wideRank_lt_card (A := Univ A R P K dd) (RF.cell (xE a j))
+      omega)).reflTransGen
+
 end TagIter
 
 /-! ### The tuple loop's run, at the generated families -/
@@ -430,6 +498,8 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 variable [Language.wide.Structure (Univ A R P K dd)]
 variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd}
+variable {I : Type} {ile : I → I → Prop}
+variable (RF : IxFile (Univ A R P K dd) I ile)
 variable {wk rg : W} {emb : ChainPh 3 TuplePS → P}
 variable {tSrc tDst : W}
 variable {MatchS MatchD : (Q → A) → (W → A) → Prop}
@@ -439,16 +509,16 @@ variable {initLv advLv : (Q → A) → (W → A) → (Q → A)}
 variable {IsMaxLv : (Q → A) → Prop}
 variable {exitPh : P}
 variable {ι : Type} [LinearOrder ι] [Finite ι]
-variable {mSrc : Univ A R P K dd → Prop}
+variable {mSrc : I → Prop}
 variable {v : Univ A R P K dd → Prop}
-variable {restF : (Univ A R P K dd → Prop) →
+variable {restF : (I → Prop) →
   (Univ A R P K dd → Prop) → W → A}
 
 variable (mSrc) in
 /-- **The generated destination track**: empty of the loop's bits at the
 bottom, each cover the round's copy applied. -/
-noncomputable def tupleIterD (xS xD : ι → Univ A R P K dd)
-    (mD₀ : Univ A R P K dd → Prop) (a : ι) : Univ A R P K dd → Prop :=
+noncomputable def tupleIterD (xS xD : ι → I)
+    (mD₀ : I → Prop) (a : ι) : I → Prop :=
   iterOrd mD₀
     (fun a' m => fun y => (y = xD a' ∧ mSrc (xS a')) ∨ (y ≠ xD a' ∧ m y)) a
 
@@ -457,8 +527,8 @@ open Classical in
 /-- **The generated pre-store control**: the loop's `initLv` at the bottom,
 each cover the previous round folded and advanced, the round's symbol read
 from the destination-dependent background. -/
-noncomputable def tupleIter0 (xS xD : ι → Univ A R P K dd)
-    (mD₀ : Univ A R P K dd → Prop) (f₀ : Q → A) (a : ι) : Q → A :=
+noncomputable def tupleIter0 (xS xD : ι → I)
+    (mD₀ : I → Prop) (f₀ : Q → A) (a : ι) : Q → A :=
   iterOrd (initLv f₀ (restF mD₀ v))
     (fun a' q =>
       advLv (if mSrc (xS a') then setBit true q (restF
@@ -469,8 +539,8 @@ noncomputable def tupleIter0 (xS xD : ι → Univ A R P K dd)
 variable (setBit initLv advLv restF mSrc v) in
 open Classical in
 /-- **The generated post-store control**: the round's bit stored. -/
-noncomputable def tupleIter1 (xS xD : ι → Univ A R P K dd)
-    (mD₀ : Univ A R P K dd → Prop) (f₀ : Q → A) (a : ι) : Q → A :=
+noncomputable def tupleIter1 (xS xD : ι → I)
+    (mD₀ : I → Prop) (f₀ : Q → A) (a : ι) : Q → A :=
   if mSrc (xS a) then
     setBit true (tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a)
       (restF (tupleIterD mSrc xS xD mD₀ a) v)
@@ -480,7 +550,7 @@ noncomputable def tupleIter1 (xS xD : ι → Univ A R P K dd)
 
 section CongrRestF
 
-variable {restF' : (Univ A R P K dd → Prop) →
+variable {restF' : (I → Prop) →
   (Univ A R P K dd → Prop) → W → A}
 
 omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
@@ -490,7 +560,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
 /-- **The copy loop reads its background at the working cell alone** — at
 every destination content, the cell being the same one. -/
 theorem tupleIter0_congr_restF (h : ∀ m', restF m' v = restF' m' v)
-    (xS xD : ι → Univ A R P K dd) (mD₀ : Univ A R P K dd → Prop)
+    (xS xD : ι → I) (mD₀ : I → Prop)
     (f₀ : Q → A) (a : ι) :
     tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a =
       tupleIter0 setBit initLv advLv mSrc v restF' xS xD mD₀ f₀ a := by
@@ -502,7 +572,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
   [Finite P] [Finite K] [Finite ι] in
 /-- The same, after the round's store. -/
 theorem tupleIter1_congr_restF (h : ∀ m', restF m' v = restF' m' v)
-    (xS xD : ι → Univ A R P K dd) (mD₀ : Univ A R P K dd → Prop)
+    (xS xD : ι → I) (mD₀ : I → Prop)
     (f₀ : Q → A) (a : ι) :
     tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a =
       tupleIter1 setBit initLv advLv mSrc v restF' xS xD mD₀ f₀ a := by
@@ -515,39 +585,40 @@ variable (hrules : ∀ (i : ChainSite 3 TupleSS) (ρ : ChainSh 3 TupleSS TupleSh
   PR.rules (rEmb i ρ) = tupleRule PR.zero PR.one wk rg emb tSrc tDst MatchS
     MatchD bitFlag setBit initLv advLv IsMaxLv exitPh i ρ)
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-variable {gbot : Univ A R P K dd} (hbot : ∀ y, WMLe gbot y)
-variable {v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (wmSeg gbot))
+variable (hix : IsLinOrd ile)
+variable {gbot : I} (hbot : ∀ y, ile gbot y)
+variable {v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (RF.cell gbot))
 variable (hvi : WMIncr WMLe v v')
 variable {a₀ aT : ι}
 variable (hbotI : ∀ a, a₀ ≤ a) (htopI : ∀ a, a ≤ aT)
-variable (xS xD : ι → Univ A R P K dd)
-variable (mD₀ : Univ A R P K dd → Prop) (f₀ : Q → A)
+variable (xS xD : ι → I)
+variable (mD₀ : I → Prop) (f₀ : Q → A)
 variable (hwkS : ∀ m' r, restF m' r wk = bitVal PR.zero PR.one (r = v))
 variable (hrg : ∀ m' r, restF m' r rg =
-  bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
+  bitVal PR.zero PR.one (∃ u : I, r = RF.cell u))
 variable (hsrc : ∀ m' r, restF m' r tSrc =
-  bitVal PR.zero PR.one (regBit mSrc r))
+  bitVal PR.zero PR.one (bitAtOf RF.cell mSrc r))
 variable (hdst : ∀ m' r, restF m' r tDst =
-  bitVal PR.zero PR.one (regBit m' r))
+  bitVal PR.zero PR.one (bitAtOf RF.cell m' r))
 variable (hoff : ∀ m₁ m₂ r s, s ≠ tDst → restF m₁ r s = restF m₂ r s)
 variable (hwkSrc : wk ≠ tSrc) (hwkDst : wk ≠ tDst)
 variable (hrgSrc : rg ≠ tSrc) (hrgDst : rg ≠ tDst)
 variable (hnameS : ∀ a, MatchS
   (tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a)
-  (PR.passTracks tSrc (restF (tupleIterD mSrc xS xD mD₀ a)) mSrc
-    (wmSeg (xS a))))
+  (PR.passTracksAt RF.cell tSrc (restF (tupleIterD mSrc xS xD mD₀ a)) mSrc
+    (RF.cell (xS a))))
 variable (huniqS : ∀ (a : ι) (r : Univ A R P K dd → Prop),
   MatchS (tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a)
-    (PR.passTracks tSrc (restF (tupleIterD mSrc xS xD mD₀ a)) mSrc r) →
-      r = wmSeg (xS a))
+    (PR.passTracksAt RF.cell tSrc (restF (tupleIterD mSrc xS xD mD₀ a)) mSrc r) →
+      r = RF.cell (xS a))
 variable (hnameD : ∀ a, MatchD
   (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a)
-  (PR.passTracks tDst (restF (tupleIterD mSrc xS xD mD₀ a))
-    (tupleIterD mSrc xS xD mD₀ a) (wmSeg (xD a))))
+  (PR.passTracksAt RF.cell tDst (restF (tupleIterD mSrc xS xD mD₀ a))
+    (tupleIterD mSrc xS xD mD₀ a) (RF.cell (xD a))))
 variable (huniqD : ∀ (a : ι) (r : Univ A R P K dd → Prop),
   MatchD (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a)
-    (PR.passTracks tDst (restF (tupleIterD mSrc xS xD mD₀ a))
-      (tupleIterD mSrc xS xD mD₀ a) r) → r = wmSeg (xD a))
+    (PR.passTracksAt RF.cell tDst (restF (tupleIterD mSrc xS xD mD₀ a))
+      (tupleIterD mSrc xS xD mD₀ a) r) → r = RF.cell (xD a))
 variable (hbitFlag : ∀ a,
   bitFlag (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a) ↔
     mSrc (xS a))
@@ -556,31 +627,34 @@ variable (hmaxT : IsMaxLv
 variable (hmaxF : ∀ a, a < aT →
   ¬IsMaxLv (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a))
 
-include hrules hR hlin hbot hv hvi hbotI htopI hwkS hrg hsrc hdst hoff
+include RF hrules hR hlin hix hbot hv hvi hbotI htopI hwkS hrg hsrc hdst hoff
   hwkSrc hwkDst hrgSrc hrgDst hnameS huniqS hnameD huniqD hbitFlag
   hmaxT hmaxF in
-/-- **The tuple loop's run at the generated families**: only the name
-guards, the copied-bit read-back and the exhaustion conditions are owed. -/
-theorem tuple_run_iter :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+/-- **The tuple loop's run at the generated families, on a clock**: only the
+name guards, the copied-bit read-back and the exhaustion conditions are owed,
+and the cost is a round's width once per tuple of the enumeration. -/
+theorem tuple_reachesIn_iter (w : ℕ)
+    (hcost : ∀ a : ι, 2 * (wideRank (RF.cell (xS a)) - wideRank v) + 2 ≤ w ∧
+      2 * (wideRank (RF.cell (xD a)) - wideRank v) + 2 ≤ w) :
+    (wideData (Univ A R P K dd)).ReachesIn ((2 * w + 8) * (Nat.card ι + 1) + 1)
       ⟨Sum.inr (PR.stElt (emb (.chk ⟨0, by omega⟩)) f₀), Sum.inl v,
-        wideTape (PR.trackTape tSrc (restF (tupleIterD mSrc xS xD mD₀ a₀))
+        wideTape (PR.trackTapeAt RF.cell tSrc (restF (tupleIterD mSrc xS xD mD₀ a₀))
           mSrc) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ aT)),
         Sum.inl v',
-        wideTape (PR.trackTape tDst (restF (tupleIterD mSrc xS xD mD₀ aT))
+        wideTape (PR.trackTapeAt RF.cell tDst (restF (tupleIterD mSrc xS xD mD₀ aT))
           (tuplePost mSrc (tupleIterD mSrc xS xD mD₀) xS xD aT))
           (PR.syElt PR.blank)⟩ := by
   classical
-  refine tuple_run hrules hR hlin hbot hv hvi hbotI htopI
+  refine tuple_reachesIn RF hrules hR hlin hix hbot hv hvi hbotI htopI
     (restOf := fun a => restF (tupleIterD mSrc xS xD mD₀ a))
     (mD := tupleIterD mSrc xS xD mD₀)
     (fun a r => hwkS _ r) (fun a r => hrg _ r) (fun a r => hsrc _ r)
     (fun a r => hdst _ r) hwkSrc hwkDst hrgSrc hrgDst xS xD
     (tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀)
     (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀)
-    hnameS huniqS hnameD huniqD ?_ ?_ hbitFlag ?_ ?_ ?_ hmaxT hmaxF ?_
+    hnameS huniqS hnameD huniqD ?_ ?_ hbitFlag ?_ ?_ ?_ hmaxT hmaxF w hcost ?_
   · intro a hb
     rw [tupleIter1, if_pos hb]
   · intro a hb
@@ -608,6 +682,36 @@ theorem tuple_run_iter :
       iterOrd_bot hbotI
     rw [hD0, hI0]
 
+
+include RF hrules hR hlin hix hbot hv hvi hbotI htopI hwkS hrg hsrc hdst hoff
+  hwkSrc hwkDst hrgSrc hrgDst hnameS huniqS hnameD huniqD hbitFlag
+  hmaxT hmaxF in
+/-- **The tuple loop's run at the generated families**, the budget forgotten. -/
+theorem tuple_run_iter :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (emb (.chk ⟨0, by omega⟩)) f₀), Sum.inl v,
+        wideTape (PR.trackTapeAt RF.cell tSrc (restF (tupleIterD mSrc xS xD mD₀ a₀))
+          mSrc) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt exitPh
+          (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ aT)),
+        Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell tDst (restF (tupleIterD mSrc xS xD mD₀ aT))
+          (tuplePost mSrc (tupleIterD mSrc xS xD mD₀) xS xD aT))
+          (PR.syElt PR.blank)⟩ :=
+  (tuple_reachesIn_iter (RF := RF) (hrules := hrules) (hR := hR) (hlin := hlin)
+    (hix := hix) (hbot := hbot) (hv := hv) (hvi := hvi) (hbotI := hbotI)
+    (htopI := htopI) (hwkS := hwkS) (hrg := hrg) (hsrc := hsrc) (hdst := hdst)
+    (hoff := hoff) (hwkSrc := hwkSrc) (hwkDst := hwkDst) (hrgSrc := hrgSrc)
+    (hrgDst := hrgDst) (hnameS := hnameS) (huniqS := huniqS) (hnameD := hnameD)
+    (huniqD := huniqD) (hbitFlag := hbitFlag) (hmaxT := hmaxT) (hmaxF := hmaxF)
+    (w := 2 * Nat.card {q : WPoint (Univ A R P K dd) //
+      (wideData (Univ A R P K dd)).Posn q} + 2)
+    (hcost := fun a => ⟨by
+        have := wideRank_lt_card (A := Univ A R P K dd) (RF.cell (xS a))
+        omega, by
+        have := wideRank_lt_card (A := Univ A R P K dd) (RF.cell (xD a))
+        omega⟩)).reflTransGen
+
 /-! ### The destination track, in closed form -/
 
 section TupleContent
@@ -620,10 +724,10 @@ either one the loop wrote — a destination cell of some round — or one it
 started with. A property of cells closed under both is therefore closed
 under the whole loop; that is how the target of a random access is known to
 be an address of argument cells alone. -/
-theorem tupleIterD_of_mem {mSrc : Univ A R P K dd → Prop}
-    {xS xD : ι → Univ A R P K dd} {mD₀ : Univ A R P K dd → Prop}
-    (Q : Univ A R P K dd → Prop) (hxD : ∀ a : ι, Q (xD a))
-    (h₀ : ∀ y, mD₀ y → Q y) (b : ι) {y : Univ A R P K dd}
+theorem tupleIterD_of_mem {mSrc : I → Prop}
+    {xS xD : ι → I} {mD₀ : I → Prop}
+    (Q : I → Prop) (hxD : ∀ a : ι, Q (xD a))
+    (h₀ : ∀ y, mD₀ y → Q y) (b : ι) {y : I}
     (hy : tupleIterD mSrc xS xD mD₀ b y) : Q y := by
   induction b using order_induction with
   | hmin z hz =>
@@ -641,10 +745,10 @@ theorem tupleIterD_of_mem {mSrc : Univ A R P K dd → Prop}
 earlier round wrote it – that round's source bit – or it held one from the
 start and no round has touched it. The destination cells being distinct is
 what makes the disjunction honest: a cell is written at most once. -/
-theorem tupleIterD_iff {mSrc : Univ A R P K dd → Prop}
-    {xS xD : ι → Univ A R P K dd}
+theorem tupleIterD_iff {mSrc : I → Prop}
+    {xS xD : ι → I}
     (hinj : ∀ u u' : ι, xD u = xD u' → u = u')
-    {mD₀ : Univ A R P K dd → Prop} (b : ι) (y : Univ A R P K dd) :
+    {mD₀ : I → Prop} (b : ι) (y : I) :
     tupleIterD mSrc xS xD mD₀ b y ↔
       ((∃ u < b, y = xD u ∧ mSrc (xS u)) ∨
         ((∀ u < b, y ≠ xD u) ∧ mD₀ y)) := by

@@ -139,6 +139,53 @@ variable {ruleX : ∀ s : SX, ShX s → Rule A Q dt.SlotIx P}
 variable (pxEntry exitPh : P) (existFlag allFlag : Q)
 variable {ownG : PG → SG} {ownX : PX → SX}
 
+/-- **A round leaves only into its own phases or its exit**: the inner gates'
+and the matrix's rules are the parameters' business, and the branch checkpoint
+either enters the matrix or leaves. -/
+theorem roundRule_dstPh
+    (hdstG : ∀ (s : SG) (ρ : ShG s),
+      (∃ p : PG, (ruleG s ρ).dstPh = emb (.igP p)) ∨ (ruleG s ρ).dstPh = emb .rchk)
+    (hdstX : ∀ (s : SX) (ρ : ShX s),
+      (∃ p : PX, (ruleX s ρ).dstPh = emb (.matP p)) ∨ (ruleX s ρ).dstPh = exitPh)
+    (hpx : ∃ p : PX, pxEntry = emb (.matP p))
+    (i : RoundSite SG SX) (ρ : RoundSh SG SX ShG ShX i) :
+    (∃ p : RoundPh PG PX,
+      (dt.roundRule one emb ruleG ruleX pxEntry exitPh existFlag allFlag
+        i ρ).dstPh = emb p) ∨
+    (dt.roundRule one emb ruleG ruleX pxEntry exitPh existFlag allFlag
+      i ρ).dstPh = exitPh := by
+  match i, ρ with
+  | .ig s, ρ =>
+    rcases hdstG s ρ with ⟨p, hp⟩ | hp
+    · exact Or.inl ⟨.igP p, hp⟩
+    · exact Or.inl ⟨.rchk, hp⟩
+  | .rchk, .stay => exact Or.inl ⟨_, rfl⟩
+  | .rchk, .dspA =>
+    obtain ⟨p, hp⟩ := hpx
+    exact Or.inl ⟨.matP p, hp⟩
+  | .rchk, .dspB => exact Or.inr rfl
+  | .mat s, ρ =>
+    rcases hdstX s ρ with ⟨p, hp⟩ | hp
+    · exact Or.inl ⟨.matP p, hp⟩
+    · exact Or.inr hp
+
+/-- **A property of a round's phases and its exit holds of every phase it can
+move to**, given it holds of the two sub-machineries'. -/
+theorem roundRule_dstIn {S : P → Prop} (hemb : ∀ p : RoundPh PG PX, S (emb p))
+    (hexit : S exitPh)
+    (hG : ∀ (s : SG) (ρ : ShG s), S (ruleG s ρ).dstPh)
+    (hX : ∀ (s : SX) (ρ : ShX s), S (ruleX s ρ).dstPh)
+    (hpx : S pxEntry)
+    (i : RoundSite SG SX) (ρ : RoundSh SG SX ShG ShX i) :
+    S (dt.roundRule one emb ruleG ruleX pxEntry exitPh existFlag allFlag
+      i ρ).dstPh := by
+  match i, ρ with
+  | .ig s, ρ => exact hG s ρ
+  | .rchk, .stay => exact hemb _
+  | .rchk, .dspA => exact hpx
+  | .rchk, .dspB => exact hexit
+  | .mat s, ρ => exact hX s ρ
+
 /-- **Every rule of one round's machinery fires from a phase its site
 owns**; the two sub-machineries' obligations are parameters. -/
 theorem roundHosrc

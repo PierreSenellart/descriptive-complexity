@@ -42,6 +42,11 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 variable {PR : Prog A R P dt.CtlIx dt.SlotIx dt.KIx dt.dd}
+variable (RF : RegFile (Univ A R P dt.KIx dt.dd))
+-- The channel writes its marks in the tags' own order, the machine walks the
+-- tape in the addresses'; the two agree, and that is the bridge every statement
+-- about the elementwise layout crosses.
+variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
 
 /-! ### The wide loop element through the machinery's operations -/
@@ -115,7 +120,7 @@ section ExpInst
 variable (zero one : A)
 variable (vi : dt.VarIx) {k : ℕ} (ts : Fin k → Fin (dt.nOf vi))
 variable (e : dt.X.E.Relations k) (av : Fin dt.natMax)
-variable (st : TapeSt dt A R P) (τ : Fin k → dt.X.Tag)
+variable (st : TapeStD dt A R P) (τ : Fin k → dt.X.Tag)
 
 /-- **The register behind the `i`-th witness read**: the copy's level's
 register. -/
@@ -163,7 +168,7 @@ noncomputable def expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
   elemFam ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
     ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
     ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-    (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+    (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
     (dt.expECell zero one vi ts e τ (hn τ)) f₀ a j
 
 variable {dt zero one vi ts e av st τ hnτ hk hn hrd}
@@ -207,7 +212,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 family. -/
 theorem readLvE_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) :
-    dt.readLvE (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a j) =
+    dt.readLvE (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a j) =
       ofLex a := by
   classical
   have hchain : ∀ (b : Lex (Fin dt.eDim → A)) (q : dt.CtlIx → A) (n : ℕ),
@@ -216,7 +221,7 @@ theorem readLvE_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
           (dt.expECell zero one vi ts e τ (hn τ) b j'))
         (fun j' bb q' =>
           (dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr)) q n) = dt.readLvE q :=
+            (dt.back RF.cell zero one dt.dd0Le st vAdr)) q n) = dt.readLvE q :=
     fun b q n => readLvE_chainSt _ _
       (fun i bb f => readLvE_exp_setFlag i bb f _) q n
   have hiter : ∀ b : Lex (Fin dt.eDim → A),
@@ -224,7 +229,7 @@ theorem readLvE_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
         ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
         ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
         ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-        (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
         (dt.expECell zero one vi ts e τ (hn τ)) f₀ b) = ofLex b := by
     intro b
     induction b using order_induction with
@@ -236,7 +241,7 @@ theorem readLvE_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
           ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
           ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
           ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-          (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+          (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
           (dt.expECell zero one vi ts e τ (hn τ)) f₀ z =
         (dt.expArgs zero one vi ts e av hk hn hrd).advEl τ
           (chainSt
@@ -244,13 +249,13 @@ theorem readLvE_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
               (dt.expECell zero one vi ts e τ (hn τ) w j'))
             (fun j' bb q' =>
               (dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ j' bb q'
-                (dt.back zero one dt.dd0Le st vAdr))
+                (dt.back RF.cell zero one dt.dd0Le st vAdr))
             (elemIter ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
               ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
               ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-              (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+              (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
               (dt.expECell zero one vi ts e τ (hn τ)) f₀ w) (dt.relNr e τ))
-          (dt.back zero one dt.dd0Le st vAdr) :=
+          (dt.back RF.cell zero one dt.dd0Le st vAdr) :=
         iterOrd_covers hwz hnb
       rw [hz2, readLvE_exp_adv, hchain, ih,
         ofLex_eq_tupNext_of_covers hwz hnb]
@@ -261,13 +266,13 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An expansion atom's element loop is blind to the two scratch
 registers**: it reads the levels' register sets — the mirror and VAL — and
 its background at the working cell alone. -/
-theorem expFam_congr_scratch {st' : TapeSt dt A R P}
+theorem expFam_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st')
-    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = RF.cell u)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) :
-    dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a j =
-      dt.expFam zero one vi ts e av st' τ hk hn hrd vAdr f₀ a j := by
+    dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a j =
+      dt.expFam RF zero one vi ts e av st' τ hk hn hrd vAdr f₀ a j := by
   have hset : dt.expESet vi ts e st τ = dt.expESet vi ts e st' τ := by
     funext r
     simp only [expESet, lvSet, h.2.1, h.2.2.1]
@@ -281,17 +286,17 @@ variable (zero one vi ts e av st hk hn hrd vAdr) in
 noncomputable def expTagFam (f₀ : dt.CtlIx → A)
     (i : Fin (k * Fintype.card dt.X.Tag + 1)) : dt.CtlIx → A :=
   tagFam ((dt.expArgs zero one vi ts e av hk hn hrd).setTagFlag)
-    (dt.back zero one dt.dd0Le st) vAdr (dt.expTagSet vi ts st)
+    (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expTagSet vi ts st)
     (dt.expTagCell zero one vi ts) f₀ i
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness chain is blind to the two scratch registers too.** -/
-theorem expTagFam_congr_scratch {st' : TapeSt dt A R P}
+theorem expTagFam_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st')
-    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = RF.cell u)
     (f₀ : dt.CtlIx → A) (i : Fin (k * Fintype.card dt.X.Tag + 1)) :
-    dt.expTagFam zero one vi ts e av st hk hn hrd vAdr f₀ i =
-      dt.expTagFam zero one vi ts e av st' hk hn hrd vAdr f₀ i := by
+    dt.expTagFam RF zero one vi ts e av st hk hn hrd vAdr f₀ i =
+      dt.expTagFam RF zero one vi ts e av st' hk hn hrd vAdr f₀ i := by
   have hset : dt.expTagSet vi ts st = dt.expTagSet vi ts st' := by
     funext i'
     simp only [expTagSet, lvSet, h.2.1, h.2.2.1]
@@ -332,7 +337,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 theorem ctlBit_expTagFam_last (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (ℓ : Fin k) (t : dt.X.Tag) :
     dt.ctlBit one
-      (dt.expTagFam zero one vi ts e av st hk hn hrd vAdr f₀
+      (dt.expTagFam RF zero one vi ts e av st hk hn hrd vAdr f₀
         (Fin.last (k * Fintype.card dt.X.Tag))) (dt.tagIx hk ℓ t) ↔
       dt.expTagSet vi ts st (dt.tagIxOf ℓ t)
         (dt.expTagCell zero one vi ts (dt.tagIxOf ℓ t)) := by
@@ -367,10 +372,10 @@ theorem tagsAre_expTagFam (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) :
     (dt.expArgs zero one vi ts e av hk hn hrd).TagsAre
       (fun ℓ => (pts ℓ).1.1)
-      (dt.expTagFam zero one vi ts e av st hk hn hrd vAdr f₀
+      (dt.expTagFam RF zero one vi ts e av st hk hn hrd vAdr f₀
         (Fin.last (k * Fintype.card dt.X.Tag))) := by
   intro ℓ t
-  rw [dt.ctlBit_expTagFam_last hzo f₀ ℓ t]
+  rw [dt.ctlBit_expTagFam_last RF hzo f₀ ℓ t]
   have hcell : dt.expTagSet vi ts st (dt.tagIxOf ℓ t)
       (dt.expTagCell zero one vi ts (dt.tagIxOf ℓ t)) ↔ (pts ℓ).1.1 = t := by
     rw [expTagSet, expTagCell, dt.wIx_tagIxOf]
@@ -388,14 +393,14 @@ tuple's: the guard's computed coordinates are the cell of
 theorem expPay_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) (r : Fin (dt.relNr e τ)) :
     dt.expPay (zero := zero) (e := e) (τ := τ) (r := r) (hn := hn τ)
-      (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a j) =
+      (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a j) =
       dt.expPayTup zero e τ (hn τ) a r := by
   refine congrArg (pad zero) (funext fun q => ?_)
-  exact congrFun (readLvE_expFam f₀ a j) _
+  exact congrFun (readLvE_expFam RF f₀ a j) _
 
 /-! ### The leaf guards, at the generated states -/
 
-omit [Fintype dt.SlotIx] in
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A leaf read's guard holds at its cell**: the computed coordinates are
 the round's payload, so the trip stops at the member tuple's cell. -/
 theorem expMatch_expFam (hzo : zero ≠ one)
@@ -403,13 +408,13 @@ theorem expMatch_expFam (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) (r : Fin (dt.relNr e τ)) :
     dt.expMatch zero one vi ts e τ r (hn τ)
-      (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a j)
-      (dt.back zero one dt.dd0Le st
-        (wmSeg (dt.expECell zero one vi ts e τ (hn τ) a r))) := by
-  refine (dt.encG_iff hzo hlin _ _ _ _ _).mpr ?_
-  rw [expECell, dt.expPay_expFam f₀ a j r]
+      (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a j)
+      (dt.back RF.cell zero one dt.dd0Le st
+        (RF.cell (dt.expECell zero one vi ts e τ (hn τ) a r))) := by
+  refine (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ _).mpr ?_
+  rw [expECell, dt.expPay_expFam RF f₀ a j r]
 
-omit [Fintype dt.SlotIx] in
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A leaf read's guard identifies its cell.** -/
 theorem expMatch_expFam_uniq (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -417,13 +422,13 @@ theorem expMatch_expFam_uniq (hzo : zero ≠ one)
     (j : Fin (dt.relNr e τ + 1)) (r : Fin (dt.relNr e τ))
     {y : Univ A R P dt.KIx dt.dd → Prop}
     (hM : dt.expMatch zero one vi ts e τ r (hn τ)
-      (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a j)
-      (dt.back zero one dt.dd0Le st y)) :
-    y = wmSeg (dt.expECell zero one vi ts e τ (hn τ) a r) := by
-  by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, y = wmSeg u
+      (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a j)
+      (dt.back RF.cell zero one dt.dd0Le st y)) :
+    y = RF.cell (dt.expECell zero one vi ts e τ (hn τ) a r) := by
+  by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, y = RF.cell u
   · obtain ⟨u, rfl⟩ := hreg
-    have hu := (dt.encG_iff hzo hlin _ _ _ _ u).mp hM
-    rw [hu, expECell, dt.expPay_expFam f₀ a j r]
+    have hu := (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ u).mp hM
+    rw [hu, expECell, dt.expPay_expFam RF f₀ a j r]
   · exact absurd hM (dt.not_nameGF_of_not_reg hzo
       (fun u hc => hreg ⟨u, hc⟩))
 
@@ -489,11 +494,11 @@ variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable {gbot : Univ A R P dt.KIx dt.dd} (hbot : ∀ y, WMLe gbot y)
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v)
 variable {t₀ : dt.SlotIx} {m₀ : Univ A R P dt.KIx dt.dd → Prop}
-variable (hm₀ : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r t₀ =
-  bitVal PR.zero PR.one (regBit m₀ r))
+variable (hm₀ : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r t₀ =
+  bitVal PR.zero PR.one (bitAtOf RF.cell m₀ r))
 variable (hwkt₀ : (Slot.wk : dt.SlotIx) ≠ t₀)
 variable (hrgt₀ : (Slot.reg : dt.SlotIx) ≠ t₀)
 variable (pts : Fin k → dt.X.Map A)
@@ -503,7 +508,7 @@ variable (hENC : ∀ ℓ : Fin k,
     encMap dt.ly PR.zero PR.one (pts ℓ))
 variable (f₀ : dt.CtlIx → A)
 
-include hrules hR hlin hbot hv hvi hwkSt hm₀ hwkt₀ hrgt₀ hENC in
+include hrules hR hlin hord hbot hv hvi hwkSt hm₀ hwkt₀ hrgt₀ hENC in
 /-- **The expansion atom's machine run**: from the machinery's first phase
 at the marker – the witness chain decoding the argument points' tags, the
 dispatch onto their branch, and that branch's wide element loop, one leaf
@@ -511,38 +516,38 @@ trip per block atom – to the exit phase one cell to the marker's right. -/
 theorem exp_run :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) f₀), Sum.inl v,
-        wideTape (PR.trackTape t₀ (dt.back PR.zero PR.one dt.dd0Le st) m₀)
+        wideTape (PR.trackTapeAt RF.cell t₀ (dt.back RF.cell PR.zero PR.one dt.dd0Le st) m₀)
           (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).exitSt
             (fun ℓ => (pts ℓ).1.1)
-            (dt.expFam PR.zero PR.one vi ts e av st (fun ℓ => (pts ℓ).1.1)
+            (dt.expFam RF PR.zero PR.one vi ts e av st (fun ℓ => (pts ℓ).1.1)
               hk hn hrd v
-              (dt.expTagFam PR.zero PR.one vi ts e av st hk hn hrd v f₀
+              (dt.expTagFam RF PR.zero PR.one vi ts e av st hk hn hrd v f₀
                 (Fin.last (k * Fintype.card dt.X.Tag)))
               (toLex topTup)
               (Fin.last (dt.relNr e (fun ℓ => (pts ℓ).1.1))))
-            (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape t₀ (dt.back PR.zero PR.one dt.dd0Le st) m₀)
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell t₀ (dt.back RF.cell PR.zero PR.one dt.dd0Le st) m₀)
           (PR.syElt PR.blank)⟩ := by
   classical
   have hzo := PR.zero_ne_one
-  refine tag_run_iter hrules hR hlin hbot hv hvi
+  refine tag_run_iter RF.toIx hrules hR hlin hlin hbot hv hvi
     (fun r => by
-      rw [show dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+      rw [show dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
         bitVal PR.zero PR.one (st.wk r) from rfl, hwkSt])
     (fun r => rfl)
     (mT := dt.expTagSet vi ts st)
-    (fun i r => dt.back_lvTrack PR.zero PR.one st vi (ts (dt.wIx i).1) r)
+    (fun i r => dt.back_lvTrackD RF hord PR.zero PR.one st vi (ts (dt.wIx i).1) r)
     (fun i => dt.wk_ne_lvTrack vi (ts (dt.wIx i).1))
     (fun i => dt.reg_ne_lvTrack vi (ts (dt.wIx i).1))
     hm₀ hwkt₀ hrgt₀
     (xT := dt.expTagCell PR.zero PR.one vi ts) (f₀ := f₀)
     ?_ ?_
     (τ := fun ℓ => (pts ℓ).1.1)
-    (dt.tagsAre_expTagFam hzo hlin pts hENC f₀)
+    (dt.tagsAre_expTagFam RF hzo hlin pts hENC f₀)
     (mE := dt.expESet vi ts e st (fun ℓ => (pts ℓ).1.1))
-    (fun j r => dt.back_lvTrack PR.zero PR.one st vi
+    (fun j r => dt.back_lvTrackD RF hord PR.zero PR.one st vi
       (ts (relLeafData e (fun ℓ => (pts ℓ).1.1) j).1.1) r)
     (fun j => dt.wk_ne_lvTrack vi
       (ts (relLeafData e (fun ℓ => (pts ℓ).1.1) j).1.1))
@@ -558,21 +563,21 @@ theorem exp_run :
     intro i
     rw [passTracks_of_back
       (t := (dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).rdTrackT i)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
       (m := dt.expTagSet vi ts st i)
-      (fun r => dt.back_lvTrack PR.zero PR.one st vi (ts (dt.wIx i).1) r) _]
-    exact (dt.encG_iff hzo hlin _ _ _ _ _).mpr rfl
+      RF.toIx (fun r => dt.back_lvTrackD RF hord PR.zero PR.one st vi (ts (dt.wIx i).1) r) _]
+    exact (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ _).mpr rfl
   · -- the witness guards identify their cells
     intro i r hM
     rw [passTracks_of_back
       (t := (dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).rdTrackT i)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
       (m := dt.expTagSet vi ts st i)
-      (fun r' => dt.back_lvTrack PR.zero PR.one st vi (ts (dt.wIx i).1) r') _]
+      RF.toIx (fun r' => dt.back_lvTrackD RF hord PR.zero PR.one st vi (ts (dt.wIx i).1) r') _]
       at hM
-    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = wmSeg u
+    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = RF.cell u
     · obtain ⟨u, rfl⟩ := hreg
-      have hu := (dt.encG_iff hzo hlin _ _ _ _ u).mp hM
+      have hu := (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ u).mp hM
       rw [hu]
       rfl
     · exact absurd hM (dt.not_nameGF_of_not_reg hzo
@@ -582,21 +587,21 @@ theorem exp_run :
     rw [passTracks_of_back
       (t := (dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).rdTrackE
         (fun ℓ => (pts ℓ).1.1) j)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
       (m := dt.expESet vi ts e st (fun ℓ => (pts ℓ).1.1) j)
-      (fun r => dt.back_lvTrack PR.zero PR.one st vi
+      RF.toIx (fun r => dt.back_lvTrackD RF hord PR.zero PR.one st vi
         (ts (relLeafData e (fun ℓ => (pts ℓ).1.1) j).1.1) r) _]
-    exact dt.expMatch_expFam hzo hlin _ a j.castSucc j
+    exact dt.expMatch_expFam RF hzo hlin _ a j.castSucc j
   · -- the leaf guards identify their cells
     intro a j r hM
     rw [passTracks_of_back
       (t := (dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).rdTrackE
         (fun ℓ => (pts ℓ).1.1) j)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
       (m := dt.expESet vi ts e st (fun ℓ => (pts ℓ).1.1) j)
-      (fun r' => dt.back_lvTrack PR.zero PR.one st vi
+      RF.toIx (fun r' => dt.back_lvTrackD RF hord PR.zero PR.one st vi
         (ts (relLeafData e (fun ℓ => (pts ℓ).1.1) j).1.1) r') _] at hM
-    exact dt.expMatch_expFam_uniq hzo hlin _ a j.castSucc j hM
+    exact dt.expMatch_expFam_uniq RF hzo hlin _ a j.castSucc j hM
   · -- exhausted at the top
     change dt.IsMaxLvE _
     change IsMaxTup (dt.readLvE _)
@@ -607,17 +612,17 @@ theorem exp_run :
           (fun ℓ => (pts ℓ).1.1))
         ((dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).advEl
           (fun ℓ => (pts ℓ).1.1))
-        (dt.back PR.zero PR.one dt.dd0Le st) v
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v
         (dt.expESet vi ts e st (fun ℓ => (pts ℓ).1.1))
         (dt.expECell PR.zero PR.one vi ts e (fun ℓ => (pts ℓ).1.1)
           (hn (fun ℓ => (pts ℓ).1.1)))
         (tagFam (dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).setTagFlag
-          (dt.back PR.zero PR.one dt.dd0Le st) v (dt.expTagSet vi ts st)
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (dt.expTagSet vi ts st)
           (dt.expTagCell PR.zero PR.one vi ts) f₀
           (Fin.last (k * Fintype.card dt.X.Tag)))
         (toLex topTup)
         (Fin.last (dt.relNr e (fun ℓ => (pts ℓ).1.1)))) =
-      ofLex (toLex topTup) from readLvE_expFam _ _ _]
+      ofLex (toLex topTup) from readLvE_expFam RF _ _ _]
     exact isMaxTup_topTup
   · -- not exhausted below the top
     intro a ha hc
@@ -628,12 +633,12 @@ theorem exp_run :
           (fun ℓ => (pts ℓ).1.1))
         ((dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).advEl
           (fun ℓ => (pts ℓ).1.1))
-        (dt.back PR.zero PR.one dt.dd0Le st) v
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v
         (dt.expESet vi ts e st (fun ℓ => (pts ℓ).1.1))
         (dt.expECell PR.zero PR.one vi ts e (fun ℓ => (pts ℓ).1.1)
           (hn (fun ℓ => (pts ℓ).1.1)))
         (tagFam (dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).setTagFlag
-          (dt.back PR.zero PR.one dt.dd0Le st) v (dt.expTagSet vi ts st)
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (dt.expTagSet vi ts st)
           (dt.expTagCell PR.zero PR.one vi ts) f₀
           (Fin.last (k * Fintype.card dt.X.Tag)))
         a (Fin.last (dt.relNr e (fun ℓ => (pts ℓ).1.1))))) := hc
@@ -644,16 +649,16 @@ theorem exp_run :
           (fun ℓ => (pts ℓ).1.1))
         ((dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).advEl
           (fun ℓ => (pts ℓ).1.1))
-        (dt.back PR.zero PR.one dt.dd0Le st) v
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v
         (dt.expESet vi ts e st (fun ℓ => (pts ℓ).1.1))
         (dt.expECell PR.zero PR.one vi ts e (fun ℓ => (pts ℓ).1.1)
           (hn (fun ℓ => (pts ℓ).1.1)))
         (tagFam (dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).setTagFlag
-          (dt.back PR.zero PR.one dt.dd0Le st) v (dt.expTagSet vi ts st)
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (dt.expTagSet vi ts st)
           (dt.expTagCell PR.zero PR.one vi ts) f₀
           (Fin.last (k * Fintype.card dt.X.Tag)))
         a (Fin.last (dt.relNr e (fun ℓ => (pts ℓ).1.1)))) =
-      ofLex a from readLvE_expFam _ _ _] at hc2
+      ofLex a from readLvE_expFam RF _ _ _] at hc2
     exact absurd (tup_isTop_iff.mpr hc2 (toLex topTup)) (not_le_of_gt ha)
 
 end ExpRun
@@ -740,7 +745,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 theorem ctlBit_rdf_expFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (r : Fin (dt.relNr e τ)) :
     dt.ctlBit one
-        (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a
+        (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a
           (Fin.last (dt.relNr e τ)))
         (dt.rdfC (Fin.castLE (hrd τ) r)) ↔
       dt.expESet vi ts e st τ r
@@ -756,7 +761,7 @@ theorem ctlBit_rdf_expFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (elemIter ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
       ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
       ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-      (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+      (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
       (dt.expECell zero one vi ts e τ (hn τ)) f₀ a)
     (dt.relNr e τ) r r.isLt
 
@@ -774,20 +779,20 @@ theorem expLeafVal_expFam (hzo : zero ≠ one)
         encMap dt.ly zero one (pts ℓ))
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A)) :
     dt.expLeafVal one e τ (hn τ) (hrd τ)
-        (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a
+        (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a
           (Fin.last (dt.relNr e τ))) ↔
       dt.expLeafP e τ (hn τ) pts (ofLex a) := by
   have hval := dt.expLeafVal_iff one e τ (hn τ) (hrd τ)
     (fun ℓ => (pts ℓ).1.2)
-    (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ a
+    (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ a
       (Fin.last (dt.relNr e τ)))
-    (fun r => (dt.ctlBit_rdf_expFam hzo f₀ a r).trans
+    (fun r => (dt.ctlBit_rdf_expFam RF hzo f₀ a r).trans
       (dt.expESet_expECell_iff hzo hlin pts hENC a r
-        (readLvE_expFam f₀ a (Fin.last (dt.relNr e τ)))))
+        (readLvE_expFam RF f₀ a (Fin.last (dt.relNr e τ)))))
   refine hval.trans ?_
   rw [expLeafP]
   refine iff_of_eq (congrArg _ (funext fun j => ?_))
-  exact congrFun (readLvE_expFam f₀ a (Fin.last (dt.relNr e τ))) _
+  exact congrFun (readLvE_expFam RF f₀ a (Fin.last (dt.relNr e τ))) _
 
 omit [Fintype dt.SlotIx] in
 /-- **The sub-fold's accumulators fold the strict prefix**: at every round's
@@ -806,7 +811,7 @@ theorem readSac_expIter (hzo : zero ≠ one)
         ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
         ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
         ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-        (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
         (dt.expECell zero one vi ts e τ (hn τ)) f₀ a) j ↔
       accCVal (dt.relPk e τ).pol (dt.expLeafP e τ (hn τ) pts)
         (· ≤ · : A → A → Prop) j (ofLex a) := by
@@ -816,7 +821,7 @@ theorem readSac_expIter (hzo : zero ≠ one)
     rw [elemIter, iterOrd_bot hz]
     have hread : dt.readSac one
         ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ f₀
-          (dt.back zero one dt.dd0Le st vAdr)) j ↔
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)) j ↔
         ((dt.relPk e τ).pol j = false) := by
       change dt.readSac one (dt.expInit zero one e τ f₀) j ↔ _
       rw [expInit, initSac]
@@ -835,7 +840,7 @@ theorem readSac_expIter (hzo : zero ≠ one)
     set F := elemFam ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
       ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
       ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-      (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+      (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
       (dt.expECell zero one vi ts e τ (hn τ)) f₀ w
       (Fin.last (dt.relNr e τ)) with hF
     have hreadF : ∀ j' : ℕ, dt.readSac one F j' ↔
@@ -843,23 +848,23 @@ theorem readSac_expIter (hzo : zero ≠ one)
           ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
           ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
           ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-          (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+          (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
           (dt.expECell zero one vi ts e τ (hn τ)) f₀ w) j' := by
       intro j'
       rw [hF]
       exact readSac_chainSt _ _
         (fun i bb f j'' => readSac_exp_setFlag i bb f _ j'') _ _ j'
     have hlvF : dt.readLvE F = ofLex w :=
-      readLvE_expFam f₀ w (Fin.last (dt.relNr e τ))
+      readLvE_expFam RF f₀ w (Fin.last (dt.relNr e τ))
     -- one round of the machine's fold
     have hstepEq : elemIter
         ((dt.expArgs zero one vi ts e av hk hn hrd).setFlagE τ)
         ((dt.expArgs zero one vi ts e av hk hn hrd).initEl τ)
         ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ)
-        (dt.back zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (dt.expESet vi ts e st τ)
         (dt.expECell zero one vi ts e τ (hn τ)) f₀ z =
         (dt.expArgs zero one vi ts e av hk hn hrd).advEl τ F
-          (dt.back zero one dt.dd0Le st vAdr) := by
+          (dt.back RF.cell zero one dt.dd0Le st vAdr) := by
       rw [elemIter, iterOrd_covers hwz hnb]
       rfl
     rw [hstepEq]
@@ -867,7 +872,7 @@ theorem readSac_expIter (hzo : zero ≠ one)
     have hadv : ∀ j' : ℕ, j' < dt.eDim →
         (dt.readSac one
           ((dt.expArgs zero one vi ts e av hk hn hrd).advEl τ F
-            (dt.back zero one dt.dd0Le st vAdr)) j' ↔
+            (dt.back RF.cell zero one dt.dd0Le st vAdr)) j' ↔
         dt.readSac one
           (dt.carrySac zero one (dt.relPk e τ).pol (tupCarry (dt.readLvE F))
             (dt.setSubLeaf zero one
@@ -931,7 +936,7 @@ theorem readSac_expIter (hzo : zero ≠ one)
       exact ih i hi
     · -- the old leaf flag is the leaf at the old tuple
       rw [ctlBit_setSubLeaf hzo]
-      exact expLeafVal_expFam hzo hlin pts hENC f₀ w
+      exact expLeafVal_expFam RF hzo hlin pts hENC f₀ w
     · -- the new readings are the carry write's
       intro i hi
       exact readSac_carrySac hzo (dt.relPk e τ).pol (tupCarry (ofLex w))
@@ -954,42 +959,42 @@ theorem ctlBit_avC_exp_exit (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
         ((dt.expArgs zero one vi ts e av hk hn hrd).exitSt τ
-          (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀
+          (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀
             (toLex topTup) (Fin.last (dt.relNr e τ)))
-          (dt.back zero one dt.dd0Le st vAdr))
+          (dt.back RF.cell zero one dt.dd0Le st vAdr))
         (dt.avC av) ↔
       foldFrom (dt.relPk e τ).pol (dt.expLeafP e τ (hn τ) pts)
         (· ≤ · : A → A → Prop) 0 topTup := by
   classical
   change dt.ctlBit one (dt.expExit zero one e τ (hn τ) (hrd τ) av
-    (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀ (toLex topTup)
+    (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀ (toLex topTup)
       (Fin.last (dt.relNr e τ)))) (dt.avC av) ↔ _
   rw [expExit, ctlBit_setCtl_self hzo]
   have hacc : ∀ j : ℕ, j < dt.eDim →
       (dt.readSac one (dt.setSubLeaf zero one
         (dt.expLeafVal one e τ (hn τ) (hrd τ)
-          (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀
+          (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀
             (toLex topTup) (Fin.last (dt.relNr e τ))))
-        (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀
+        (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀
           (toLex topTup) (Fin.last (dt.relNr e τ)))) j ↔
       accCVal (dt.relPk e τ).pol (dt.expLeafP e τ (hn τ) pts)
         (· ≤ · : A → A → Prop) j (ofLex (toLex topTup))) := by
     intro j hj
     rw [readSac_setSubLeaf]
     refine Iff.trans ?_ (dt.readSac_expIter (av := av) (hk := hk)
-      (hrd := hrd) (vAdr := vAdr) hzo hlin pts hENC f₀ (toLex topTup) j hj)
+      (hrd := hrd) (vAdr := vAdr) RF hzo hlin pts hENC f₀ (toLex topTup) j hj)
     rw [expFam, elemFam]
     exact readSac_chainSt _ _
       (fun i bb f j'' => readSac_exp_setFlag i bb f _ j'') _ _ j
   have hleaf : dt.ctlBit one (dt.setSubLeaf zero one
       (dt.expLeafVal one e τ (hn τ) (hrd τ)
-        (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀
+        (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀
           (toLex topTup) (Fin.last (dt.relNr e τ))))
-      (dt.expFam zero one vi ts e av st τ hk hn hrd vAdr f₀
+      (dt.expFam RF zero one vi ts e av st τ hk hn hrd vAdr f₀
         (toLex topTup) (Fin.last (dt.relNr e τ)))) dt.subLeafC ↔
       dt.expLeafP e τ (hn τ) pts (ofLex (toLex topTup)) := by
     rw [ctlBit_setSubLeaf hzo]
-    exact expLeafVal_expFam hzo hlin pts hENC f₀ (toLex topTup)
+    exact expLeafVal_expFam RF hzo hlin pts hENC f₀ (toLex topTup)
   exact sacVerdict_iff_foldFrom hacc hleaf
 
 omit [Fintype dt.SlotIx] in
@@ -1008,13 +1013,13 @@ theorem ctlBit_avC_exp_relMap (hzo : zero ≠ one)
     dt.ctlBit one
         ((dt.expArgs zero one vi ts e av hk hn hrd).exitSt
           (fun ℓ => (pts ℓ).1.1)
-          (dt.expFam zero one vi ts e av st (fun ℓ => (pts ℓ).1.1) hk hn hrd
+          (dt.expFam RF zero one vi ts e av st (fun ℓ => (pts ℓ).1.1) hk hn hrd
             vAdr f₀ (toLex topTup)
             (Fin.last (dt.relNr e (fun ℓ => (pts ℓ).1.1))))
-          (dt.back zero one dt.dd0Le st vAdr))
+          (dt.back RF.cell zero one dt.dd0Le st vAdr))
         (dt.avC av) ↔
       RelMap (M := dt.X.Map A) e pts := by
-  refine (dt.ctlBit_avC_exp_exit (τ := fun ℓ => (pts ℓ).1.1) hzo hlin pts
+  refine (dt.ctlBit_avC_exp_exit (τ := fun ℓ => (pts ℓ).1.1) RF hzo hlin pts
     hENC f₀).trans ?_
   refine (foldFrom_top (j₀ := 0)
     ⟨fun x => le_refl x, fun x y z hxy hyz => le_trans hxy hyz,

@@ -802,7 +802,7 @@ variable (dt zero one)
 hypotheses about that kind – so the match is on the kind itself and the
 stuck `DescriptiveComplexity.Pfp.PfpData.kindOf` never has to be unfolded. -/
 noncomputable def kindArgsOf (v : dt.VarIx) (a : Fin dt.natMax) :
-    ∀ κ : MatAtom dt.X dt.d (dt.nOf v),
+    ∀ κ : MatAtom dt.X dt.d.B (dt.nOf v),
       dt.kindArgs κ * @Fintype.card dt.X.Tag (Fintype.ofFinite _) ≤ dt.ntgDim →
       dt.kindDepth κ ≤ dt.eDim → dt.kindReads κ ≤ dt.nfDim →
       dt.KindArgs (A := A) (Q := dt.CtlIx) κ

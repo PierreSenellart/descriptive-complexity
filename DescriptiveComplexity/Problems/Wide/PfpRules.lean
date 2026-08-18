@@ -144,6 +144,12 @@ structure Prog (A R P Q W K : Type) (dd : ℕ) [Fintype Q] [Fintype W] where
   blank : W → A
   /-- The tracks of the mark in the cell of an element. -/
   mark : Univ A R P K dd → W → A
+  /-- **Which elements the channel writes for.** Every one of them by default –
+  the channel of `DescriptiveComplexity.WideAccept` writes for all – and a
+  program emitted into the *register* channel of
+  `DescriptiveComplexity.WideRegAccept` restricts it, the elements it leaves out
+  having no register in the file it is handed. -/
+  marked : Univ A R P K dd → Prop := fun _ => True
 
 namespace Prog
 
@@ -180,6 +186,7 @@ noncomputable def table : Table A R P K (Fintype.card (Q ⊕ W)) dd where
   accept p v := PR.accept p fun q => unslot v (Sum.inl q)
   blankPl := syPl (Q := Q) PR.zero PR.blank
   markPl x := syPl (Q := Q) PR.zero (PR.mark x)
+  Marked := PR.marked
 
 /-! ### Firing a rule
 
@@ -271,6 +278,31 @@ theorem sep_of (h : ∀ (r r' : R) (f : Q → A) (g : W → A), (PR.rules r).gua
   subst hww
   exact ⟨h r r' _ _ hg hg' hph, rfl⟩
 
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] in
+/-- **Separation at some phases only**, the same reading of a rule set at a
+program that guesses: the two halves of the data are recovered from the
+injections exactly as above, and the phase restriction is carried through
+untouched. -/
+theorem sepOn_of {Ph : P → Prop}
+    (h : ∀ (r r' : R) (f : Q → A) (g : W → A), Ph (PR.rules r).srcPh →
+      (PR.rules r).guard f g → (PR.rules r').guard f g →
+      (PR.rules r).srcPh = (PR.rules r').srcPh → r = r') :
+    PR.table.SepOn Ph := by
+  intro r r' w w' hph0 hg hg' hph hst hread
+  have hf : (fun q => unslot w (Sum.inl q)) = fun q => unslot w' (Sum.inl q) :=
+    stPl_injective hst
+  have hs : (fun s => unslot w (Sum.inr s)) = fun s => unslot w' (Sum.inr s) :=
+    syPl_injective hread
+  have hww : w = w' := by
+    rw [← slotPl_unslot w, ← slotPl_unslot w']
+    refine congrArg slotPl (funext fun d => ?_)
+    match d with
+    | Sum.inl q => exact congrFun hf q
+    | Sum.inr s => exact congrFun hs s
+  subst hww
+  exact ⟨h r r' _ _ hph0 hg hg' hph, rfl⟩
+
 /-! ### The tape of a register pass
 
 The tape all three passes of `DescriptiveComplexity.Problems.Wide.Mirror` and
@@ -281,60 +313,102 @@ slot holds whatever **element** the program keeps at that cell – the marks of
 the register file carry elements, not bits – and rides along untouched. -/
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-/-- **The tape a program presents while it walks a track.** The walked slot
-holds the track's digit as a bit; the background is **element-valued**, so it
-can carry the name marks of the register file, which are elements and not
-bits. -/
-noncomputable def trackTape [DecidableEq W] (t : W)
-    (rest : (Univ A R P K dd → Prop) → W → A) (m : Univ A R P K dd → Prop)
+/-- **The tape a program presents while it walks a track**, over an arbitrary
+register file. The walked slot holds the track's digit as a bit; the background
+is **element-valued**, so it can carry the name marks of a file whose cells are
+recognized by an element rather than by a bit.
+
+The file enters as its *cells* and not as a `DescriptiveComplexity.RegFile`,
+since a tape is a definition and a file carries proofs; the proofs are wanted
+only in the three lemmas below. What indexes the cells is a parameter for the
+same reason it is one in `DescriptiveComplexity.IxFile`: a program on a clock
+cannot give every element of the universe a register, and a tape does not care
+which does. -/
+noncomputable def trackTapeAt [DecidableEq W] {I : Type}
+    (cell : I → (Univ A R P K dd → Prop)) (t : W)
+    (rest : (Univ A R P K dd → Prop) → W → A) (m : I → Prop)
     (r : Univ A R P K dd → Prop) : Univ A R P K dd :=
-  PR.syElt fun s => if s = t then bitVal PR.zero PR.one (regBit m r) else rest r s
+  PR.syElt fun s => if s = t then bitVal PR.zero PR.one (bitAtOf cell m r) else rest r s
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-/-- **The coherence condition of the three register passes, discharged.** Two
-tracks agreeing off one element present the same symbol at every cell but that
-element's register: the track enters the tape only through
-`DescriptiveComplexity.regBit`, and `DescriptiveComplexity.regBit_congr` says that
-does not move. Every caller of `DescriptiveComplexity.reaches_mirrorIncr`,
-`DescriptiveComplexity.reaches_fileWrite` and
-`DescriptiveComplexity.reaches_fileTest` is given this and owes nothing. -/
-theorem trackTape_coh [DecidableEq W] (t : W)
-    (rest : (Univ A R P K dd → Prop) → W → A) (m m' : Univ A R P K dd → Prop)
-    (u : Univ A R P K dd) (hag : ∀ v, v ≠ u → (m v ↔ m' v))
-    (r : Univ A R P K dd → Prop) (hr : r ≠ wmSeg u) :
-    PR.trackTape t rest m r = PR.trackTape t rest m' r := by
-  rw [trackTape, trackTape, regBit_congr hag hr]
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] in
+/-- **The coherence condition of the three register passes, discharged**, at an
+arbitrary file: two tracks agreeing off one element present the same symbol at
+every cell but that element's register. The track enters the tape only through
+`DescriptiveComplexity.bitAtOf`, and `DescriptiveComplexity.bitAtOf_congr` says
+that does not move. Every caller of the register passes is given this and owes
+nothing. -/
+theorem trackTapeAt_coh [DecidableEq W] {I : Type}
+    (cell : I → (Univ A R P K dd → Prop)) (t : W)
+    (rest : (Univ A R P K dd → Prop) → W → A) (m m' : I → Prop)
+    (u : I) (hag : ∀ v, v ≠ u → (m v ↔ m' v))
+    (r : Univ A R P K dd → Prop) (hr : r ≠ cell u) :
+    PR.trackTapeAt cell t rest m r = PR.trackTapeAt cell t rest m' r := by
+  rw [trackTapeAt, trackTapeAt, bitAtOf_congr hag hr]
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-/-- **What a track shows away from the register file**: the walked slot is clear
-at every cell that is nobody's register, whatever the track holds. So a register
-pass leaves the working area alone by construction. -/
-theorem trackTape_of_not_reg [DecidableEq W] (t : W)
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
+  [Language.wide.Structure (Univ A R P K dd)] in
+/-- **What a track shows away from a file**: the walked slot is clear at every
+cell that is nobody's register, whatever the track holds. So a register pass
+leaves the rest of the tape alone by construction. -/
+theorem trackTapeAt_of_not_reg [DecidableEq W]
+    (cell : Univ A R P K dd → (Univ A R P K dd → Prop)) (t : W)
     (rest : (Univ A R P K dd → Prop) → W → A) (m : Univ A R P K dd → Prop)
-    {r : Univ A R P K dd → Prop} (hno : ∀ u : Univ A R P K dd, r ≠ wmSeg u) :
-    PR.trackTape t rest m r =
+    {r : Univ A R P K dd → Prop} (hno : ∀ u : Univ A R P K dd, r ≠ cell u) :
+    PR.trackTapeAt cell t rest m r =
       PR.syElt fun s => if s = t then PR.zero else rest r s := by
   refine congrArg _ (congrArg _ (funext fun s => ?_))
   by_cases hs : s = t
   · rw [if_pos hs, if_pos hs]
-    exact bitVal_neg (regBit_of_not_reg hno)
+    exact bitVal_neg (bitAtOf_of_not_reg hno)
   · rw [if_neg hs, if_neg hs]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
+/-- **What a track shows at a register of a file**: the track's digit at that
+element, in the slot being walked. This is what a rule's guard reads, and the one
+statement of the three that needs the file rather than its cells – a cell must
+name at most one element. -/
+theorem trackTapeAt_cell [DecidableEq W] [Finite (Univ A R P K dd)] {I : Type} {ile : I → I → Prop}
+    (F : IxFile (Univ A R P K dd) I ile) (hix : IsLinOrd ile) (t : W)
+    (rest : (Univ A R P K dd → Prop) → W → A) (m : I → Prop) (u : I) :
+    PR.trackTapeAt F.cell t rest m (F.cell u) =
+      PR.syElt fun s =>
+        if s = t then bitVal PR.zero PR.one (m u) else rest (F.cell u) s := by
+  refine congrArg _ (congrArg _ (funext fun s => ?_))
+  by_cases hs : s = t
+  · rw [if_pos hs, if_pos hs]
+    exact bitVal_congr (F.bitAt_cell hix m u)
+  · rw [if_neg hs, if_neg hs]
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
+/-- **The coherence condition of the three register passes, discharged.** -/
+theorem trackTape_coh [DecidableEq W] (t : W)
+    (rest : (Univ A R P K dd → Prop) → W → A) (m m' : Univ A R P K dd → Prop)
+    (u : Univ A R P K dd) (hag : ∀ v, v ≠ u → (m v ↔ m' v))
+    (r : Univ A R P K dd → Prop) (hr : r ≠ wmSeg u) :
+    PR.trackTapeAt wmSeg t rest m r = PR.trackTapeAt wmSeg t rest m' r :=
+  PR.trackTapeAt_coh wmSeg t rest m m' u hag r hr
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
+/-- **What a track shows away from the register file.** -/
+theorem trackTape_of_not_reg [DecidableEq W] (t : W)
+    (rest : (Univ A R P K dd → Prop) → W → A) (m : Univ A R P K dd → Prop)
+    {r : Univ A R P K dd → Prop} (hno : ∀ u : Univ A R P K dd, r ≠ wmSeg u) :
+    PR.trackTapeAt wmSeg t rest m r =
+      PR.syElt fun s => if s = t then PR.zero else rest r s :=
+  PR.trackTapeAt_of_not_reg wmSeg t rest m hno
+
+omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
 /-- **What a track shows at a register**: the track's digit at that element, in
-the slot being walked. This is what a rule's guard reads. -/
+the slot being walked. -/
 theorem trackTape_wmSeg [DecidableEq W] [Finite (Univ A R P K dd)]
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (t : W)
     (rest : (Univ A R P K dd → Prop) → W → A) (m : Univ A R P K dd → Prop)
     (u : Univ A R P K dd) :
-    PR.trackTape t rest m (wmSeg u) =
+    PR.trackTapeAt wmSeg t rest m (wmSeg u) =
       PR.syElt fun s =>
-        if s = t then bitVal PR.zero PR.one (m u) else rest (wmSeg u) s := by
-  refine congrArg _ (congrArg _ (funext fun s => ?_))
-  by_cases hs : s = t
-  · rw [if_pos hs, if_pos hs]
-    exact bitVal_congr (regBit_wmSeg hlin m u)
-  · rw [if_neg hs, if_neg hs]
+        if s = t then bitVal PR.zero PR.one (m u) else rest (wmSeg u) s :=
+  PR.trackTapeAt_cell (wmSegFile hlin).toIx hlin t rest m u
 
 end Prog
 

@@ -125,6 +125,22 @@ variable {one : A} {wk : W} {emb : ChainPh n PS → P}
 variable {ruleS : ∀ s : SS, ShS s → Rule A Q W P}
 variable {dsp : Fin n → Bool → PreRule A Q W P}
 
+/-- **A property of a chain's phases and its dispatches' destinations holds of
+every phase it can move to**: the checkpoints stay where they are, the
+dispatches go where their descriptors say, and the stages are the parameter.
+This is what a determinism-after-the-guess argument asks of a sequenced
+machinery (`DescriptiveComplexity.Pfp.PfpData.nexProg_uniqueFrom`). -/
+theorem chainRule_dstIn {S : P → Prop} (hemb : ∀ p : ChainPh n PS, S (emb p))
+    (hdsp : ∀ (k : Fin n) (b : Bool), S (dsp k b).dstPh)
+    (hS : ∀ (s : SS) (ρ : ShS s), S (ruleS s ρ).dstPh)
+    (i : ChainSite n SS) (ρ : ChainSh n SS ShS i) :
+    S (chainRule one wk emb ruleS dsp i ρ).dstPh := by
+  match i, ρ with
+  | .chk k, .stay => exact hemb _
+  | .chk k, .dspA => exact hdsp k false
+  | .chk k, .dspB => exact hdsp k true
+  | .sub s, ρ => exact hS s ρ
+
 /-- **A chain separates in-shape**: the stay's guard is disjoint from the
 dispatches' – they only fire at the marker – and the two dispatches of a
 checkpoint never fire together; the stages' separation is the parameter. -/

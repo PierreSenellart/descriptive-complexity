@@ -41,6 +41,7 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 variable [Language.wide.Structure (Univ A R P K dd)]
 variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {nr : ℕ}
+variable {I : Type} {ile : I → I → Prop} (RF : IxFile (Univ A R P K dd) I ile)
 variable {wk rg : W} {emb : ElemPh nr → P}
 variable {rdTrack : Fin nr → W}
 variable {MatchOf : Fin nr → (Q → A) → (W → A) → Prop}
@@ -53,7 +54,7 @@ variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
 variable {v v' : Univ A R P K dd → Prop} (hvi : WMIncr WMLe v v')
 variable {rest : (Univ A R P K dd → Prop) → W → A}
 variable (hwkS : ∀ r, rest r wk = bitVal PR.zero PR.one (r = v))
-variable {t₀ : W} {m₀ : Univ A R P K dd → Prop}
+variable {t₀ : W} {m₀ : I → Prop}
 variable (hwkt₀ : wk ≠ t₀)
 
 include hlin hvi hwkS hwkt₀ in
@@ -66,11 +67,11 @@ theorem elem_back (hR : PR.table.Reads)
     {f : Q → A} :
     (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (emb .e0) f), Sum.inl v',
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (emb .e0) f), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
   have hvv' : v ≠ v' := ne_of_wmIncr hvi
-  have hwkv' : PR.passTracks t₀ rest m₀ v' wk ≠ PR.one := by
+  have hwkv' : PR.passTracksAt RF.cell t₀ rest m₀ v' wk ≠ PR.one := by
     rw [Prog.passTracks_of_ne hwkt₀, hwkS, bitVal_neg (Ne.symm hvv')]
     exact PR.zero_ne_one
   refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
@@ -89,6 +90,10 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 variable {PR : Prog A R P dt.CtlIx dt.SlotIx dt.KIx dt.dd}
+variable (RF : RegFile (Univ A R P dt.KIx dt.dd))
+-- The channel writes its marks in the tags' own order, the machine walks the
+-- tape in the addresses'; the two agree.
+variable (hordM : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
 
 /-! ### The boundary discipline -/
@@ -102,26 +107,31 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **A stage atom entered at the boundary leaves the state unchanged**:
 with SAV and TARGET already at the home address, the restore restores what
 was there. -/
-theorem stageEndSt_eq {st : TapeSt dt A R P}
+theorem stageEndSt_eq {st : TapeStD dt A R P}
     {v : Univ A R P dt.KIx dt.dd → Prop}
     (hs : st.sav = v) (ht : st.tgt = v) : dt.stageEndSt st v = st := by
-  rw [stageEndSt]
-  nth_rewrite 1 [← ht]
-  rw [← hs]
+  rw [stageEndSt, ixStageEndSt]
+  change { st with sav := v, tgt := v } = st
+  obtain ⟨mir, tgt, sav, val, old, new, wk, bot, ltp⟩ := st
+  change sav = v at hs
+  change tgt = v at ht
+  subst hs
+  subst ht
+  rfl
 
 omit [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- The `val`-walked and the `mir`-walked presentations of one state
 coincide: both are the naked background. -/
-theorem trackTape_val_eq_mir (st : TapeSt dt A R P) :
-    PR.trackTape Slot.val (dt.back PR.zero PR.one dt.dd0Le st) st.val =
-      PR.trackTape Slot.mir (dt.back PR.zero PR.one dt.dd0Le st) st.mir := by
+theorem trackTape_val_eq_mir (st : TapeStD dt A R P) :
+    PR.trackTapeAt RF.cell Slot.val (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val =
+      PR.trackTapeAt RF.cell Slot.mir (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.mir := by
   refine (trackTape_of_back (t := Slot.val)
-    (rest := dt.back PR.zero PR.one dt.dd0Le st) (m := st.val)
-    fun _ => rfl).trans
+    (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st) (m := st.val)
+    RF.toIx fun _ => rfl).trans
     (trackTape_of_back (t := Slot.mir)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st) (m := st.mir)
-      fun _ => rfl).symm
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st) (m := st.mir)
+      RF.toIx fun _ => rfl).symm
 
 /-! ### The comparison atom, in the sequencer's shape -/
 
@@ -144,39 +154,50 @@ variable (hrules : ∀ (i : ElemSite 2) (ρ : ElemSh 2 i),
 variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable {gbot : Univ A R P dt.KIx dt.dd} (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
-variable {st : TapeSt dt A R P}
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
+variable {st : TapeStD dt A R P}
 variable (hwkSt : st.wk = fun r => r = v)
 
 omit [L.IsRelational] [L.Structure A] in
-include hrules hR hlin hbot hv hvi hwkSt in
+include hrules hR hlin hordM hbot hv hvi hwkSt in
 /-- **The comparison atom, entered by a dispatch**: from its entry
 checkpoint one cell to the marker's right, at the `Slot.val`-walked
 presentation, to the exit phase back at the same cell. -/
 theorem cmp_hStage (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb .e0) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).exitSt
-            (dt.cmpFam PR.zero PR.one vi av hnf isEq j₁ j₂ st v f
+            (dt.cmpFam (laidFile RF hordM) PR.zero PR.one (dt.hasName_diagLayout (cell := RF.cell)
+                (zero := PR.zero)) vi av hnf isEq j₁ j₂ st v f
               (toLex topTup) (Fin.last 2))
-            (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
-  have hwkS : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkS : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
     rw [back_wk, hwkSt]
   have hne_wk_mir : (Slot.wk : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
-  rw [trackTape_val_eq_mir st]
+  rw [trackTape_val_eq_mir RF st]
   refine Relation.ReflTransGen.trans
     (Relation.ReflTransGen.single
-      (elem_back hlin hvi hwkS hne_wk_mir hR hrules)) ?_
-  exact dt.cmp_run vi av hnf isEq j₁ j₂ hrules hR hlin hbot hv hvi hwkSt f
+      (elem_back RF.toIx hlin hvi hwkS hne_wk_mir hR hrules)) ?_
+  exact dt.cmp_run (laidFile RF hordM)
+    (dt.hasName_diagLayout (cell := RF.cell) (zero := PR.zero))
+    (dt.nameSep_diagLayout (cell := RF.cell) (zero := PR.zero) (hdd := dt.dd0Le))
+    vi av hnf isEq j₁ j₂ hrules hR hlin (isLinOrd_laidFile_le hlin)
+    (fun y => (hordM _ y).mp (hbot y)) hv hvi hwkSt f
 
 end CmpStage
 
@@ -216,9 +237,15 @@ variable (hrules : ∀ (i : TagSite (k * Fintype.card dt.X.Tag)
 variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable {gbot : Univ A R P dt.KIx dt.dd} (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
-variable {st : TapeSt dt A R P}
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
+variable {st : TapeStD dt A R P}
 variable (hwkSt : st.wk = fun r => r = v)
 variable (pts : Fin k → dt.X.Map A)
 variable (hENC : ∀ ℓ : Fin k,
@@ -226,29 +253,29 @@ variable (hENC : ∀ ℓ : Fin k,
     (PfpTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : PfpTag R P dt.KIx) =
     encMap dt.ly PR.zero PR.one (pts ℓ))
 
-include hrules hR hlin hbot hv hvi hwkSt hENC in
+include hrules hR hlin hordM hbot hv hvi hwkSt hENC in
 /-- **The expansion atom, entered by a dispatch**: from its first phase one
 cell to the marker's right, at the `Slot.val`-walked presentation, to the
 exit phase back at the same cell. -/
 theorem exp_hStage (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.expArgs PR.zero PR.one vi ts e av hk hn hrd).exitSt
             (fun ℓ => (pts ℓ).1.1)
-            (dt.expFam PR.zero PR.one vi ts e av st (fun ℓ => (pts ℓ).1.1)
+            (dt.expFam RF PR.zero PR.one vi ts e av st (fun ℓ => (pts ℓ).1.1)
               hk hn hrd v
-              (dt.expTagFam PR.zero PR.one vi ts e av st hk hn hrd v f
+              (dt.expTagFam RF PR.zero PR.one vi ts e av st hk hn hrd v f
                 (Fin.last (k * Fintype.card dt.X.Tag)))
               (toLex topTup)
               (Fin.last (dt.relNr e (fun ℓ => (pts ℓ).1.1))))
-            (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
-  have hwkS : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkS : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
     rw [back_wk, hwkSt]
@@ -256,8 +283,8 @@ theorem exp_hStage (f : dt.CtlIx → A) :
   have hne_rg_val : (Slot.reg : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   refine Relation.ReflTransGen.trans
     (Relation.ReflTransGen.single
-      (tag_back hlin hvi hwkS hne_wk_val hR hrules)) ?_
-  exact dt.exp_run hrules hR hlin hbot hv hvi hwkSt (fun r => rfl)
+      (tag_back RF.toIx hlin hvi hwkS hne_wk_val hR hrules)) ?_
+  exact dt.exp_run RF hordM hrules hR hlin hbot hv hvi hwkSt (fun r => rfl)
     hne_wk_val hne_rg_val pts hENC f
 
 end ExpStage
@@ -293,15 +320,21 @@ variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable {gtop gbot : Univ A R P dt.KIx dt.dd}
 variable (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
-variable {st : TapeSt dt A R P}
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
+variable {st : TapeStD dt A R P}
 variable (hwkSt : st.wk = fun r => r = v) (hmirSt : st.mir = v)
 variable (hbotSt : st.bot = fun r => r = (fun _ => False))
 variable (hsav : st.sav = v) (htgt : st.tgt = v)
 
 omit [L.IsRelational] [L.Structure A] in
-include hrules hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt hsav htgt in
+include hrules hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hsav htgt in
 /-- **The stage atom, entered by a dispatch**: at the boundary discipline –
 SAV and TARGET at the home address – the random access runs and restores
 the state, so the sequencer's background is untouched. -/
@@ -311,28 +344,28 @@ theorem stage_hStage (b : Bool)
     (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.savP .up)) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.stageArgs PR.zero PR.one vi iv ts av).setAv b
-            (dt.stageFAt PR.zero PR.one vi iv ts av st v f
+            (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f
               (dt.d.B.arity iv))
-            (dt.back PR.zero PR.one dt.dd0Le
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le
               (dt.stageAtSt st v
                 (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv)))
               (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv))))),
         Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
-  rw [trackTape_val_eq_mir st]
-  have h := dt.stageAtom_run hrules hR hlin hord htop hbot hv hvi hwkSt
+  rw [trackTape_val_eq_mir RF st]
+  have h := dt.stageAtom_run RF hord hrules hR hlin htop hbot hwork hv hvi hwkSt
     hmirSt hbotSt f b hb
   rw [stageEndSt_eq hsav htgt] at h
   exact h
 
 omit [L.IsRelational] [L.Structure A] in
-include hrules hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt in
+include hrules hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt in
 /-- **The stage atom, threaded**: the same run as
 `DescriptiveComplexity.Pfp.PfpData.stage_hStage` with *no* boundary
 discipline assumed — the random access writes the home address into SAV and
@@ -349,23 +382,23 @@ theorem stage_hStage_thread (b : Bool)
     (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.savP .up)) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.stageArgs PR.zero PR.one vi iv ts av).setAv b
-            (dt.stageFAt PR.zero PR.one vi iv ts av st v f
+            (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f
               (dt.d.B.arity iv))
-            (dt.back PR.zero PR.one dt.dd0Le
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le
               (dt.stageAtSt st v
                 (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv)))
               (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv))))),
         Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le (dt.stageEndSt st v))
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.stageEndSt st v))
           (dt.stageEndSt st v).val)
           (PR.syElt PR.blank)⟩ := by
-  rw [trackTape_val_eq_mir st, trackTape_val_eq_mir (dt.stageEndSt st v)]
-  exact dt.stageAtom_run hrules hR hlin hord htop hbot hv hvi hwkSt
+  rw [trackTape_val_eq_mir RF st, trackTape_val_eq_mir RF (dt.stageEndSt st v)]
+  exact dt.stageAtom_run RF hord hrules hR hlin htop hbot hwork hv hvi hwkSt
     hmirSt hbotSt f b hb
 
 end StageStage
@@ -393,14 +426,20 @@ variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable {gtop gbot : Univ A R P dt.KIx dt.dd}
 variable (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
-variable {st : TapeSt dt A R P}
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
+variable {st : TapeStD dt A R P}
 variable (hwkSt : st.wk = fun r => r = v)
 variable (Test : Univ A R P dt.KIx dt.dd → Prop)
 variable (hcompat : ∀ u : Univ A R P dt.KIx dt.dd,
-  wellG (PR.passTracks Slot.mir (dt.back PR.zero PR.one dt.dd0Le st)
-    st.mir (wmSeg u)) ↔ Test u)
+  wellG (PR.passTracksAt RF.cell Slot.mir (dt.back RF.cell PR.zero PR.one dt.dd0Le st)
+    st.mir (RF.cell u)) ↔ Test u)
 
 include hrules hR hlin hord htop hbot hv hvi hwkSt hcompat in
 /-- **A passing gate block, entered by a dispatch**: every register is
@@ -412,35 +451,39 @@ theorem gateBlock_hStage_pos (t : dt.X.Tag)
     (hTest : ∀ u, Test u) (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (Sum.inl .up)) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.gateArgs PR.zero PR.one b hc hn hrd).exitSt t
-            (dt.gateFam PR.zero PR.one b st t hc hn hrd v
-              (dt.gateTagFam PR.zero PR.one b st hc hn hrd v f
+            (dt.gateFam RF PR.zero PR.one b st t hc hn hrd v
+              (dt.gateTagFam RF PR.zero PR.one b st hc hn hrd v f
                 (Fin.last (Fintype.card dt.X.Tag)))
               (toLex topTup) (Fin.last (dt.domNr t)))
-            (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
   classical
-  have hvnr := not_reg_of_lt_bot hlin hbot hv
+  have hvnr := not_reg_of_lt_bot RF.toIx hlin hlin hbot hv
   have hne_wk_mir : (Slot.wk : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_rg_mir : (Slot.reg : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_mir_rg : (Slot.mir : dt.SlotIx) ≠ Slot.reg := fun h => nomatch h
   have hne_rl_mir : (Slot.regLast : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
-  have hwkS : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkS : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
     rw [back_wk, hwkSt]
-  rw [trackTape_val_eq_mir st]
+  rw [trackTape_val_eq_mir RF st]
   -- the file test, passing
   have hkrules : ∀ ρ : TestRule, PR.rules (rEmb (Sum.inl ()) (Sum.inl ρ)) =
       (TestKit.mk (A := A) (Q := dt.CtlIx) Slot.mir Slot.reg Slot.regLast
         Slot.wk wellG (fun tp => emb (Sum.inl tp))).rule PR.one ρ :=
     fun ρ => hrules (Sum.inl ()) (Sum.inl ρ)
-  have htest := TestKit.reaches_pos hkrules hR hlin hne_mir_rg hne_rl_mir
+  have htest := TestKit.reaches_pos
+    (F := RF.toIx)
+    (hsle := RF.le_cell_top_of_le hlin hbot
+      (wmSetLe_of_wmIncr_of_lt hlin hvi hv))
+    hkrules hR hlin hlin hne_mir_rg hne_rl_mir
     hne_wk_mir htop hbot hv (fun r => rfl)
     (fun r => dt.back_regLast hlin htop hord r) hwkS hcompat hTest
     (fc := f) (s := v')
@@ -448,11 +491,11 @@ theorem gateBlock_hStage_pos (t : dt.X.Tag)
   -- the passing exit, into the domain evaluation
   have hexit : (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (Sum.inl .ty)) f), Sum.inl v,
-        wideTape (PR.trackTape Slot.mir
-          (dt.back PR.zero PR.one dt.dd0Le st) st.mir) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.mir) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (dt.gateDomEntry emb) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.mir
-          (dt.back PR.zero PR.one dt.dd0Le st) st.mir) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.mir) (PR.syElt PR.blank)⟩ := by
     refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
     have h := hrules (Sum.inl ()) (Sum.inr true)
     refine ⟨rEmb (Sum.inl ()) (Sum.inr true), ?_, by rw [h]; rfl,
@@ -462,9 +505,9 @@ theorem gateBlock_hStage_pos (t : dt.X.Tag)
     · rw [Prog.passTracks_of_ne hne_wk_mir, hwkS]
       exact bitVal_pos rfl
     · rw [Prog.passTracks_of_ne hne_rg_mir,
-        show dt.back PR.zero PR.one dt.dd0Le st v Slot.reg =
+        show dt.back RF.cell PR.zero PR.one dt.dd0Le st v Slot.reg =
           bitVal PR.zero PR.one
-            (∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u) from rfl,
+            (∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u) from rfl,
         bitVal_neg (fun hcx => hvnr hcx.choose hcx.choose_spec)]
       exact PR.zero_ne_one
   refine (Relation.ReflTransGen.single hexit).trans ?_
@@ -488,8 +531,8 @@ theorem gateBlock_hStage_pos (t : dt.X.Tag)
     fun i ρ => hrules (Sum.inr i) ρ
   refine Relation.ReflTransGen.trans
     (Relation.ReflTransGen.single
-      (tag_back hlin hvi hwkS hne_wk_mir hR hdomrules)) ?_
-  exact dt.gate_run hdomrules hR hlin hbot hv hvi hwkSt
+      (tag_back RF.toIx hlin hvi hwkS hne_wk_mir hR hdomrules)) ?_
+  exact dt.gate_run RF hdomrules hR hlin hbot hv hvi hwkSt
     (t₀ := Slot.mir) (m₀ := st.mir) (fun r => rfl)
     hne_wk_mir hne_rg_mir htag f
 
@@ -501,29 +544,33 @@ theorem gateBlock_hStage_neg {u : Univ A R P dt.KIx dt.dd}
     (hTest : ¬Test u) (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (Sum.inl .up)) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt failPh
-          (setFail f (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+          (setFail f (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
   classical
-  have hvnr := not_reg_of_lt_bot hlin hbot hv
+  have hvnr := not_reg_of_lt_bot RF.toIx hlin hlin hbot hv
   have hne_wk_mir : (Slot.wk : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_rg_mir : (Slot.reg : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_mir_rg : (Slot.mir : dt.SlotIx) ≠ Slot.reg := fun h => nomatch h
   have hne_rl_mir : (Slot.regLast : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
-  have hwkS : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkS : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
     rw [back_wk, hwkSt]
-  rw [trackTape_val_eq_mir st]
+  rw [trackTape_val_eq_mir RF st]
   have hkrules : ∀ ρ : TestRule, PR.rules (rEmb (Sum.inl ()) (Sum.inl ρ)) =
       (TestKit.mk (A := A) (Q := dt.CtlIx) Slot.mir Slot.reg Slot.regLast
         Slot.wk wellG (fun tp => emb (Sum.inl tp))).rule PR.one ρ :=
     fun ρ => hrules (Sum.inl ()) (Sum.inl ρ)
-  have htest := TestKit.reaches_neg hkrules hR hlin hne_mir_rg hne_rl_mir
+  have htest := TestKit.reaches_neg
+    (F := RF.toIx)
+    (hsle := RF.le_cell_top_of_le hlin hbot
+      (wmSetLe_of_wmIncr_of_lt hlin hvi hv))
+    hkrules hR hlin hlin hne_mir_rg hne_rl_mir
     hne_wk_mir htop hbot hv (fun r => rfl)
     (fun r => dt.back_regLast hlin htop hord r) hwkS hcompat hTest
     (fc := f) (s := v')
@@ -537,17 +584,17 @@ theorem gateBlock_hStage_neg {u : Univ A R P dt.KIx dt.dd}
     · rw [Prog.passTracks_of_ne hne_wk_mir, hwkS]
       exact bitVal_pos rfl
     · rw [Prog.passTracks_of_ne hne_rg_mir,
-        show dt.back PR.zero PR.one dt.dd0Le st v Slot.reg =
+        show dt.back RF.cell PR.zero PR.one dt.dd0Le st v Slot.reg =
           bitVal PR.zero PR.one
-            (∃ u' : Univ A R P dt.KIx dt.dd, v = wmSeg u') from rfl,
+            (∃ u' : Univ A R P dt.KIx dt.dd, v = RF.cell u') from rfl,
         bitVal_neg (fun hcx => hvnr hcx.choose hcx.choose_spec)]
       exact PR.zero_ne_one
   · rw [h]
-    change setFail f (PR.passTracks Slot.mir
-      (dt.back PR.zero PR.one dt.dd0Le st) st.mir v) = _
+    change setFail f (PR.passTracksAt RF.cell Slot.mir
+      (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.mir v) = _
     rw [passTracks_of_back (t := Slot.mir)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st) (m := st.mir)
-      (fun r => rfl) v]
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st) (m := st.mir)
+      RF.toIx (fun r => rfl) v]
 
 end GateBlockStage
 

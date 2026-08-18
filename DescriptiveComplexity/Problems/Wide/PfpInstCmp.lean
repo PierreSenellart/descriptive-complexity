@@ -49,22 +49,24 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 variable {PR : Prog A R P dt.CtlIx dt.SlotIx dt.KIx dt.dd}
+variable {I : Type}
+variable (RF : LaidFile dt A R P I)
 
 /-! ### The register a level reads, and its backing -/
 
 /-- **The register set a level's track holds**: the working address for a
 free level, the VAL register for a quantified one – the contents behind
 `DescriptiveComplexity.Pfp.PfpData.lvTrack`. -/
-noncomputable def lvSet (st : TapeSt dt A R P) (v : dt.VarIx)
-    (j : Fin (dt.nOf v)) : Univ A R P dt.KIx dt.dd → Prop :=
+noncomputable def lvSet (st : TapeSt dt A R P I) (v : dt.VarIx)
+    (j : Fin (dt.nOf v)) : I → Prop :=
   if (j : ℕ) < dt.arOf v then st.mir else st.val
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] in
 /-- A level's track is backed by its register set. -/
-theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P) (v : dt.VarIx)
+theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P I) (v : dt.VarIx)
     (j : Fin (dt.nOf v)) (r : Univ A R P dt.KIx dt.dd → Prop) :
-    dt.back zero one dt.dd0Le st r (dt.lvTrack v j) =
-      bitVal zero one (regBit (dt.lvSet st v j) r) := by
+    dt.ixBack RF.toLayout zero one dt.dd0Le st r (dt.lvTrack v j) =
+      bitVal zero one (bitAtOf RF.cell (dt.lvSet st v j) r) := by
   rw [lvTrack, lvSet]
   by_cases h : (j : ℕ) < dt.arOf v
   · rw [if_pos h, if_pos h]
@@ -72,13 +74,25 @@ theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P) (v : dt.VarIx)
   · rw [if_neg h, if_neg h]
     rfl
 
+omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] in
+/-- **A level's track is backed by its register set, at the elementwise file**:
+the same statement read at `DescriptiveComplexity.Pfp.PfpData.back`, which is
+what a space-bounded program's files say. -/
+theorem back_lvTrackD (F : RegFile (Univ A R P dt.KIx dt.dd))
+    (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
+    (zero one : A) (st : TapeStD dt A R P) (v : dt.VarIx)
+    (j : Fin (dt.nOf v)) (r : Univ A R P dt.KIx dt.dd → Prop) :
+    dt.back F.cell zero one dt.dd0Le st r (dt.lvTrack v j) =
+      bitVal zero one (bitAtOf F.cell (dt.lvSet st v j) r) :=
+  dt.back_lvTrack (laidFile F hord) zero one st v j r
+
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
 /-- **A level's register set depends on the mirror and VAL alone** — which
 is what lets everything read through it be transported between states that
 share those two registers. -/
-theorem lvSet_congr (vi : dt.VarIx) {st st' : TapeSt dt A R P}
+theorem lvSet_congr (vi : dt.VarIx) {st st' : TapeSt dt A R P I}
     (hmir : st.mir = st'.mir) (hval : st.val = st'.val)
     (j : Fin (dt.nOf vi)) : dt.lvSet st vi j = dt.lvSet st' vi j := by
   rw [lvSet, lvSet, hmir, hval]
@@ -149,22 +163,22 @@ section CmpFam
 
 variable [Nonempty A]
 variable (zero one : A)
+variable (hhas : RF.toLayout.HasName zero)
 variable (vi : dt.VarIx) (av : Fin dt.natMax) (hnf : 2 ≤ dt.nfDim)
 variable (isEq : Bool) (j₁ j₂ : Fin (dt.nOf vi))
-variable (st : TapeSt dt A R P)
+variable (st : TapeSt dt A R P I)
 variable (vAdr : Univ A R P dt.KIx dt.dd → Prop)
 
 /-- **The two register sets a comparison reads**: the level's register per
 paired read. -/
-noncomputable def cmpSet : Fin 2 → Univ A R P dt.KIx dt.dd → Prop :=
+noncomputable def cmpSet : Fin 2 → I → Prop :=
   fun k => if k = 0 then dt.lvSet st vi j₁ else dt.lvSet st vi j₂
 
 /-- **The cell of a comparison's round**: the padded cell of the round's
 tuple, in the read's block. -/
-noncomputable def cmpCell (b : Lex (Fin dt.dd0 → A)) (k : Fin 2) :
-    Univ A R P dt.KIx dt.dd :=
-  dt.blkElt (if k = 0 then dt.lvBlk vi j₁ else dt.lvBlk vi j₂)
-    (pad zero (ofLex b))
+noncomputable def cmpCell (b : Lex (Fin dt.dd0 → A)) (k : Fin 2) : I :=
+  RF.toLayout.reg hhas (if k = 0 then dt.lvBlk vi j₁ else dt.lvBlk vi j₂)
+    (ofLex b)
 
 /-- **The comparison's generated family**, at its pack. -/
 noncomputable def cmpFam (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A))
@@ -172,43 +186,43 @@ noncomputable def cmpFam (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A))
   elemFam (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag
     (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).initEl
     (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl
-    (dt.back zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
-    (dt.cmpCell zero vi j₁ j₂) f₀ b j
+    (dt.ixBack RF.toLayout zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
+    (dt.cmpCell RF zero hhas vi j₁ j₂) f₀ b j
 
-variable {zero one vi av isEq j₁ j₂ st vAdr}
+variable {zero one hhas vi av isEq j₁ j₂ st vAdr}
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A comparison is blind to the two scratch registers**: it reads the
 levels' register sets, which are the mirror and VAL
 (`DescriptiveComplexity.Pfp.PfpData.lvSet`), and its background at the
 working cell alone. -/
-theorem cmpFam_congr_scratch {st' : TapeSt dt A R P}
+theorem cmpFam_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st')
-    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = wmSeg u)
+    (hreg : ¬∃ u : I, vAdr = RF.cell u)
     (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A)) (j : Fin 3) :
-    dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ b j =
-      dt.cmpFam zero one vi av hnf isEq j₁ j₂ st' vAdr f₀ b j := by
+    dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ b j =
+      dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st' vAdr f₀ b j := by
   have hset : dt.cmpSet vi j₁ j₂ st = dt.cmpSet vi j₁ j₂ st' := by
     funext k
     simp only [cmpSet, lvSet, h.2.1, h.2.2.1]
   rw [cmpFam, cmpFam, hset]
-  exact elemFam_congr_rest (h.back hreg) _ _ _ _
+  exact elemFam_congr_rest (h.ixBack (lay := RF.toLayout) hreg) _ _ _ _
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- The read tracks are backed by the register sets. -/
 theorem back_cmpSet (k : Fin 2) (r : Univ A R P dt.KIx dt.dd → Prop) :
-    dt.back zero one dt.dd0Le st r
+    dt.ixBack RF.toLayout zero one dt.dd0Le st r
         ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k) =
-      bitVal zero one (regBit (dt.cmpSet vi j₁ j₂ st k) r) := by
+      bitVal zero one (bitAtOf RF.cell (dt.cmpSet vi j₁ j₂ st k) r) := by
   by_cases hk : k = 0
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
       dt.lvTrack vi j₁ from by rw [cmpArgs]; exact if_pos hk,
       show dt.cmpSet vi j₁ j₂ st k = dt.lvSet st vi j₁ from if_pos hk]
-    exact dt.back_lvTrack zero one st vi j₁ r
+    exact dt.back_lvTrack RF zero one st vi j₁ r
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
       dt.lvTrack vi j₂ from by rw [cmpArgs]; exact if_neg hk,
       show dt.cmpSet vi j₁ j₂ st k = dt.lvSet st vi j₂ from if_neg hk]
-    exact dt.back_lvTrack zero one st vi j₂ r
+    exact dt.back_lvTrack RF zero one st vi j₂ r
 
 omit [Fintype dt.SlotIx] in
 /-- The marker slot is no read track. -/
@@ -327,15 +341,15 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 family. -/
 theorem readLv_cmpFam (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A))
     (j : Fin 3) :
-    dt.readLv (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ b j) =
+    dt.readLv (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ b j) =
       ofLex b := by
   have hiter : ∀ b' : Lex (Fin dt.dd0 → A),
       dt.readLv (elemIter
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).initEl
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl
-        (dt.back zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
-        (dt.cmpCell zero vi j₁ j₂) f₀ b') = ofLex b' := by
+        (dt.ixBack RF.toLayout zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
+        (dt.cmpCell RF zero hhas vi j₁ j₂) f₀ b') = ofLex b' := by
     intro b'
     induction b' using order_induction with
     | hmin z hz =>
@@ -346,20 +360,20 @@ theorem readLv_cmpFam (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A))
           (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag
           (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).initEl
           (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl
-          (dt.back zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
-          (dt.cmpCell zero vi j₁ j₂) f₀ z =
+          (dt.ixBack RF.toLayout zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
+          (dt.cmpCell RF zero hhas vi j₁ j₂) f₀ z =
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl
           (chainSt
-            (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ w j'))
+            (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ w j'))
             (fun j' bb q' =>
               (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-                (dt.back zero one dt.dd0Le st vAdr))
+                (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
             (elemIter (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag
               (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).initEl
               (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl
-              (dt.back zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
-              (dt.cmpCell zero vi j₁ j₂) f₀ w) 2)
-          (dt.back zero one dt.dd0Le st vAdr) :=
+              (dt.ixBack RF.toLayout zero one dt.dd0Le st) vAdr (dt.cmpSet vi j₁ j₂ st)
+              (dt.cmpCell RF zero hhas vi j₁ j₂) f₀ w) 2)
+          (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr) :=
         iterOrd_covers hwz hnb
       rw [hz2, readLv_cmp_adv, readLv_cmp_chain, ih,
         ofLex_eq_tupNext_of_covers hwz hnb]
@@ -368,19 +382,19 @@ theorem readLv_cmpFam (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A))
 
 /-! ### The flags fold the strict prefix -/
 
-variable (zero vi j₁ j₂ st) in
+variable (zero hhas vi j₁ j₂ st) in
 /-- **The two blocks agree at a tuple**: the two reads' bits coincide. -/
 def CmpAgr (b : Lex (Fin dt.dd0 → A)) : Prop :=
-  dt.cmpSet vi j₁ j₂ st 0 (dt.cmpCell zero vi j₁ j₂ b 0) ↔
-    dt.cmpSet vi j₁ j₂ st 1 (dt.cmpCell zero vi j₁ j₂ b 1)
+  dt.cmpSet vi j₁ j₂ st 0 (dt.cmpCell RF zero hhas vi j₁ j₂ b 0) ↔
+    dt.cmpSet vi j₁ j₂ st 1 (dt.cmpCell RF zero hhas vi j₁ j₂ b 1)
 
-variable (zero vi j₁ j₂ st) in
+variable (zero hhas vi j₁ j₂ st) in
 /-- **The first difference is at this tuple, the second block holding it**:
 everything below agrees, and here only the second block holds the cell. -/
 def CmpFst (b : Lex (Fin dt.dd0 → A)) : Prop :=
-  (¬dt.cmpSet vi j₁ j₂ st 0 (dt.cmpCell zero vi j₁ j₂ b 0) ∧
-    dt.cmpSet vi j₁ j₂ st 1 (dt.cmpCell zero vi j₁ j₂ b 1)) ∧
-  ∀ u < b, dt.CmpAgr zero vi j₁ j₂ st u
+  (¬dt.cmpSet vi j₁ j₂ st 0 (dt.cmpCell RF zero hhas vi j₁ j₂ b 0) ∧
+    dt.cmpSet vi j₁ j₂ st 1 (dt.cmpCell RF zero hhas vi j₁ j₂ b 1)) ∧
+  ∀ u < b, dt.CmpAgr RF zero hhas vi j₁ j₂ st u
 
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -520,15 +534,15 @@ bookkeeping bits are agreement everywhere below, a difference seen below,
 and a first difference below with the second block holding it. -/
 theorem cmpFlags_cmpFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (b : Lex (Fin dt.dd0 → A)) :
-    (dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ b 0)
-        dt.cmpAccC ↔ ∀ u < b, dt.CmpAgr zero vi j₁ j₂ st u) ∧
-    (dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ b 0)
-        dt.cmpDecC ↔ ∃ u < b, ¬dt.CmpAgr zero vi j₁ j₂ st u) ∧
-    (dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ b 0)
-        dt.cmpValC ↔ ∃ u < b, dt.CmpFst zero vi j₁ j₂ st u) := by
+    (dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ b 0)
+        dt.cmpAccC ↔ ∀ u < b, dt.CmpAgr RF zero hhas vi j₁ j₂ st u) ∧
+    (dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ b 0)
+        dt.cmpDecC ↔ ∃ u < b, ¬dt.CmpAgr RF zero hhas vi j₁ j₂ st u) ∧
+    (dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ b 0)
+        dt.cmpValC ↔ ∃ u < b, dt.CmpFst RF zero hhas vi j₁ j₂ st u) := by
   induction b using order_induction with
   | hmin z hz =>
-    have hz0 : dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ z 0 =
+    have hz0 : dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ z 0 =
         dt.cmpInit zero one (dt.initLvN f₀) :=
       iterOrd_bot hz
     rw [hz0]
@@ -543,15 +557,15 @@ theorem cmpFlags_cmpFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     · rintro ⟨u, hu, -⟩
       exact absurd hu (hnou u)
   | hstep w z hwz hnb ih =>
-    have hz2 : dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ z 0 =
+    have hz2 : dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ z 0 =
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl
           (chainSt
-            (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ w j'))
+            (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ w j'))
             (fun j' bb q' =>
               (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-                (dt.back zero one dt.dd0Le st vAdr))
-            (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
-          (dt.back zero one dt.dd0Le st vAdr) :=
+                (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+            (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
+          (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr) :=
       iterOrd_covers hwz hnb
     rw [hz2]
     obtain ⟨ihA, ihD, ihV⟩ := ih
@@ -561,49 +575,49 @@ theorem cmpFlags_cmpFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
         fun h => lt_of_le_of_lt h hwz⟩
     -- the flags through the chain
     have hchA : dt.ctlBit one (chainSt
-        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ w j'))
+        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ w j'))
         (fun j' bb q' =>
           (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr))
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
+            (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
         dt.cmpAccC ↔
-        dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
+        dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
           dt.cmpAccC := by
       rw [ctlBit, ctlBit, cmp_chain_apply_ne hnf
         (fun k => (cmpRdC_ne_cmpAccC hnf k).symm) 2]
     have hchD : dt.ctlBit one (chainSt
-        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ w j'))
+        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ w j'))
         (fun j' bb q' =>
           (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr))
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
+            (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
         dt.cmpDecC ↔
-        dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
+        dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
           dt.cmpDecC := by
       rw [ctlBit, ctlBit, cmp_chain_apply_ne hnf
         (fun k => (cmpRdC_ne_cmpDecC hnf k).symm) 2]
     have hchV : dt.ctlBit one (chainSt
-        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ w j'))
+        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ w j'))
         (fun j' bb q' =>
           (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr))
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
+            (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0) 2)
         dt.cmpValC ↔
-        dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
+        dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
           dt.cmpValC := by
       rw [ctlBit, ctlBit, cmp_chain_apply_ne hnf
         (fun k => (cmpRdC_ne_cmpValC hnf k).symm) 2]
     -- the round's two bits
     have hrd0 := ctlBit_cmp_chain_rd (vi := vi) (av := av) (isEq := isEq)
       (j₁ := j₁) (j₂ := j₂) hnf hzo
-      (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ w j'))
-      (base := dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
-      (g := dt.back zero one dt.dd0Le st vAdr) 0
+      (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ w j'))
+      (base := dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
+      (g := dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr) 0
     have hrd1 := ctlBit_cmp_chain_rd (vi := vi) (av := av) (isEq := isEq)
       (j₁ := j₁) (j₂ := j₂) hnf hzo
-      (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ w j'))
-      (base := dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
-      (g := dt.back zero one dt.dd0Le st vAdr) 1
+      (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ w j'))
+      (base := dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ w 0)
+      (g := dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr) 1
     -- the flags off the loop variables
     have hqA : ∀ j : Fin dt.dd0, dt.cmpAccC ≠ dt.lvC j :=
       fun j => (lvC_ne_cmpAccC j).symm
@@ -680,6 +694,8 @@ end TopTup
 section CmpRun
 
 variable [Nonempty A]
+variable (hhasP : RF.toLayout.HasName PR.zero)
+variable (hsepP : RF.toLayout.NameSep PR.zero dt.dd0Le)
 variable (vi : dt.VarIx) (av : Fin dt.natMax) (hnf : 2 ≤ dt.nfDim)
 variable (isEq : Bool) (j₁ j₂ : Fin (dt.nOf vi))
 variable {emb : ElemPh 2 → P} {exitPh : P}
@@ -696,37 +712,42 @@ variable (hrules : ∀ (i : ElemSite 2) (ρ : ElemSh 2 i),
     (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).IsMaxEl exitPh i ρ)
 variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-variable {gbot : Univ A R P dt.KIx dt.dd} (hbot : ∀ y, WMLe gbot y)
+variable (hix : IsLinOrd RF.le)
+variable {gbot : I} (hbot : ∀ y, RF.le gbot y)
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
-variable {st : TapeSt dt A R P}
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
+variable {st : TapeSt dt A R P I}
 variable (hwkSt : st.wk = fun r => r = v)
 
-include hrules hR hlin hbot hv hvi hwkSt in
-/-- **The comparison atom's machine run**: from the loop's entry checkpoint
-at the marker to the exit phase one cell to its right, the control carrying
-the whole enumeration's fold. -/
-theorem cmp_run (f₀ : dt.CtlIx → A) :
-    Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
+include hrules hR hlin hix hbot hv hvi hwkSt hhasP hsepP in
+/-- **The comparison atom's machine run, on a clock**: from the loop's entry
+checkpoint at the marker to the exit phase one cell to its right, the control
+carrying the whole enumeration's fold, two read trips paid per tuple. -/
+theorem cmp_reachesIn (f₀ : dt.CtlIx → A) (w : ℕ)
+    (hcost : ∀ (b : Lex (Fin dt.dd0 → A)) (k : Fin 2),
+      2 * (wideRank (RF.cell (dt.cmpCell RF PR.zero hhasP vi j₁ j₂ b k)) -
+        wideRank v) + 2 ≤ w) :
+    (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
+      ((2 + (w + 2) * 2) * (Nat.card (Lex (Fin dt.dd0 → A)) + 1) + 1)
       ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,
-        wideTape (PR.trackTape Slot.mir
-          (dt.back PR.zero PR.one dt.dd0Le st) st.mir) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) st.mir) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).exitSt
-            (dt.cmpFam PR.zero PR.one vi av hnf isEq j₁ j₂ st v f₀
+            (dt.cmpFam RF PR.zero PR.one hhasP vi av hnf isEq j₁ j₂ st v f₀
               (toLex topTup) (Fin.last 2))
-            (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape Slot.mir
-          (dt.back PR.zero PR.one dt.dd0Le st) st.mir)
+            (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) st.mir)
           (PR.syElt PR.blank)⟩ := by
   classical
   have hzo := PR.zero_ne_one
-  have hwkS : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkS : ∀ r, dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
-    rw [back_wk, hwkSt]
-  refine elem_run_iter hrules hR hlin hbot hv hvi hwkS (fun _ => rfl)
-    (fun k r => dt.back_cmpSet hnf k r)
+    rw [ixBack_wk, hwkSt]
+  refine elem_reachesIn_iter RF.toIxFile hrules hR hlin hix hbot hv hvi hwkS (fun _ => rfl)
+    (fun k r => dt.back_cmpSet RF hnf k r)
     (fun k => dt.wk_ne_cmp_rdTrack hnf k)
     (fun k => dt.reg_ne_cmp_rdTrack hnf k)
     (t₀ := Slot.mir) (m₀ := st.mir) (fun _ => rfl)
@@ -734,38 +755,39 @@ theorem cmp_run (f₀ : dt.CtlIx → A) :
     (a₀ := toLex botTup) (aT := toLex topTup)
     (tup_isBot_iff.mpr botTup_le)
     (tup_isTop_iff.mpr fun p a => le_topTup p a)
-    (dt.cmpCell PR.zero vi j₁ j₂) f₀ ?_ ?_ ?_ ?_
+    (dt.cmpCell RF PR.zero hhasP vi j₁ j₂) f₀ ?_ ?_ ?_ ?_ w hcost
   · -- the name guards, at the generated states
     intro b k
-    rw [passTracks_of_back (fun r => dt.back_cmpSet hnf k r) _]
+    rw [passTracks_of_back RF.toIxFile (fun r => dt.back_cmpSet RF hnf k r) _]
     have hrd : (fun j => elemFam
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).setFlag
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).initEl
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).advEl
-        (dt.back PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
-        (dt.cmpCell PR.zero vi j₁ j₂) f₀ b k.castSucc (dt.lvC j)) =
+        (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
+        (dt.cmpCell RF PR.zero hhasP vi j₁ j₂) f₀ b k.castSucc (dt.lvC j)) =
         ofLex b :=
-      readLv_cmpFam hnf f₀ b k.castSucc
-    refine (dt.nameG_iff hzo hlin _ dt.lvC _ (dt.cmpCell PR.zero vi j₁ j₂ b k)).mpr ?_
+      readLv_cmpFam RF hnf f₀ b k.castSucc
+    refine (dt.ixNameG_iff hzo (RF.toIxFile.injective hix) hsepP hhasP _ dt.lvC _
+      (dt.cmpCell RF PR.zero hhasP vi j₁ j₂ b k)).mpr ?_
     rw [cmpCell, hrd]
   · -- the guard identifies the cell
     intro b k r hM
-    rw [passTracks_of_back (fun r' => dt.back_cmpSet hnf k r') _] at hM
-    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = wmSeg u
+    rw [passTracks_of_back RF.toIxFile (fun r' => dt.back_cmpSet RF hnf k r') _] at hM
+    by_cases hreg : ∃ u : I, r = RF.cell u
     · obtain ⟨u, rfl⟩ := hreg
-      have hu := (dt.nameG_iff hzo hlin _ dt.lvC _ u).mp hM
+      have hu := (dt.ixNameG_iff hzo (RF.toIxFile.injective hix) hsepP hhasP _ dt.lvC _ u).mp hM
       have hrd : (fun j => elemFam
           (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).setFlag
           (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).initEl
           (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).advEl
-          (dt.back PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
-          (dt.cmpCell PR.zero vi j₁ j₂) f₀ b k.castSucc (dt.lvC j)) =
+          (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
+          (dt.cmpCell RF PR.zero hhasP vi j₁ j₂) f₀ b k.castSucc (dt.lvC j)) =
           ofLex b :=
-        readLv_cmpFam hnf f₀ b k.castSucc
+        readLv_cmpFam RF hnf f₀ b k.castSucc
       rw [hrd] at hu
       rw [hu]
       rfl
-    · exact absurd hM (dt.not_nameG_of_not_reg hzo
+    · exact absurd hM (dt.ixNot_nameG_of_not_reg (lay := RF.toLayout) (stI := st) hzo
         (fun u hc => hreg ⟨u, hc⟩))
   · -- exhausted at the top
     change dt.IsMaxLvN (elemFam _ _ _ _ _ _ _ f₀ (toLex topTup) (Fin.last 2))
@@ -773,16 +795,16 @@ theorem cmp_run (f₀ : dt.CtlIx → A) :
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).setFlag
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).initEl
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).advEl
-        (dt.back PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
-        (dt.cmpCell PR.zero vi j₁ j₂) f₀ (toLex topTup) (Fin.last 2)) =
+        (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
+        (dt.cmpCell RF PR.zero hhasP vi j₁ j₂) f₀ (toLex topTup) (Fin.last 2)) =
         ofLex (toLex topTup) :=
-      readLv_cmpFam hnf f₀ (toLex topTup) (Fin.last 2)
+      readLv_cmpFam RF hnf f₀ (toLex topTup) (Fin.last 2)
     change IsMaxTup (dt.readLv (elemFam
       (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).setFlag
       (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).initEl
       (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).advEl
-      (dt.back PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
-      (dt.cmpCell PR.zero vi j₁ j₂) f₀ (toLex topTup) (Fin.last 2)))
+      (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
+      (dt.cmpCell RF PR.zero hhasP vi j₁ j₂) f₀ (toLex topTup) (Fin.last 2)))
     rw [hrd]
     exact isMaxTup_topTup
   · -- not exhausted below the top
@@ -791,19 +813,44 @@ theorem cmp_run (f₀ : dt.CtlIx → A) :
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).setFlag
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).initEl
         (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).advEl
-        (dt.back PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
-        (dt.cmpCell PR.zero vi j₁ j₂) f₀ b (Fin.last 2)) = ofLex b :=
-      readLv_cmpFam hnf f₀ b (Fin.last 2)
+        (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
+        (dt.cmpCell RF PR.zero hhasP vi j₁ j₂) f₀ b (Fin.last 2)) = ofLex b :=
+      readLv_cmpFam RF hnf f₀ b (Fin.last 2)
     have hmax : IsMaxTup (ofLex b) := by
       have hc2 : IsMaxTup (dt.readLv (elemFam
           (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).setFlag
           (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).initEl
           (dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).advEl
-          (dt.back PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
-          (dt.cmpCell PR.zero vi j₁ j₂) f₀ b (Fin.last 2))) := hc
+          (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) v (dt.cmpSet vi j₁ j₂ st)
+          (dt.cmpCell RF PR.zero hhasP vi j₁ j₂) f₀ b (Fin.last 2))) := hc
       rw [hrd] at hc2
       exact hc2
     exact absurd (tup_isTop_iff.mpr hmax (toLex topTup)) (not_le_of_gt hb)
+
+include hrules hR hlin hix hbot hv hvi hwkSt hhasP hsepP in
+/-- **The comparison atom's machine run**, the budget forgotten. -/
+theorem cmp_run (f₀ : dt.CtlIx → A) :
+    Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
+      ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) st.mir) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt exitPh
+          ((dt.cmpArgs PR.zero PR.one vi av hnf isEq j₁ j₂).exitSt
+            (dt.cmpFam RF PR.zero PR.one hhasP vi av hnf isEq j₁ j₂ st v f₀
+              (toLex topTup) (Fin.last 2))
+            (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.ixBack RF.toLayout PR.zero PR.one dt.dd0Le st) st.mir)
+          (PR.syElt PR.blank)⟩ :=
+  (dt.cmp_reachesIn RF hhasP hsepP vi av hnf isEq j₁ j₂ hrules hR hlin hix hbot hv
+    hvi hwkSt f₀
+    (2 * Nat.card {q : WPoint (Univ A R P dt.KIx dt.dd) //
+      (wideData (Univ A R P dt.KIx dt.dd)).Posn q} + 2)
+    (fun b k => by
+      have := wideRank_lt_card (A := Univ A R P dt.KIx dt.dd)
+        (RF.cell (dt.cmpCell RF PR.zero hhasP vi j₁ j₂ b k))
+      omega)).reflTransGen
+
 
 end CmpRun
 
@@ -814,9 +861,10 @@ section CmpVerdict
 variable [Nonempty A]
 variable {vi : dt.VarIx} {av : Fin dt.natMax} (hnf : 2 ≤ dt.nfDim)
 variable {isEq : Bool} {j₁ j₂ : Fin (dt.nOf vi)}
-variable {st : TapeSt dt A R P}
+variable {st : TapeSt dt A R P I}
 variable {vAdr : Univ A R P dt.KIx dt.dd → Prop}
 variable {zero one : A}
+variable {hhas : RF.toLayout.HasName zero}
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The verdict the exit control carries**: agreement everywhere for an
@@ -829,96 +877,96 @@ theorem ctlBit_avC_cmp_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (g : dt.SlotIx → A) :
     dt.ctlBit one
       ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).exitSt
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀
           (toLex topTup) (Fin.last 2)) g) (dt.avC av) ↔
-      (if isEq = true then ∀ u, dt.CmpAgr zero vi j₁ j₂ st u
-        else ((∀ u, dt.CmpAgr zero vi j₁ j₂ st u) ∨
-          ∃ u, dt.CmpFst zero vi j₁ j₂ st u)) := by
+      (if isEq = true then ∀ u, dt.CmpAgr RF zero hhas vi j₁ j₂ st u
+        else ((∀ u, dt.CmpAgr RF zero hhas vi j₁ j₂ st u) ∨
+          ∃ u, dt.CmpFst RF zero hhas vi j₁ j₂ st u)) := by
   classical
   set aT : Lex (Fin dt.dd0 → A) := toLex topTup with haT
   -- the exit's stored verdict
   have hself : dt.ctlBit one
       ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).exitSt
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT
           (Fin.last 2)) g) (dt.avC av) ↔
       dt.cmpVerdict one isEq (dt.cmpFold zero one hnf
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT
           (Fin.last 2))) := by
     change dt.ctlBit one (dt.setCtl zero one (dt.avC av)
       (dt.cmpVerdict one isEq (dt.cmpFold zero one hnf
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT
           (Fin.last 2))))
       (dt.cmpFold zero one hnf
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT
           (Fin.last 2)))) (dt.avC av) ↔ _
     exact ctlBit_setCtl_self hzo _ _ _
   rw [hself]
   -- the last round's family is the chain over its entry
-  have hlast : dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT
+  have hlast : dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT
       (Fin.last 2) =
       chainSt
-        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ aT j'))
+        (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ aT j'))
         (fun j' bb q' =>
           (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr))
-        (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2 := rfl
+            (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+        (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2 := rfl
   -- the flags and reads feeding the final fold
   obtain ⟨ihA, ihD, ihV⟩ := cmpFlags_cmpFam (vi := vi) (av := av)
     (isEq := isEq) (j₁ := j₁) (j₂ := j₂) (st := st) (vAdr := vAdr)
-    hnf hzo f₀ aT
+    RF hnf hzo f₀ aT
   have hchA : dt.ctlBit one (chainSt
-      (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ aT j'))
+      (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ aT j'))
       (fun j' bb q' =>
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-          (dt.back zero one dt.dd0Le st vAdr))
-      (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2)
+          (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+      (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2)
       dt.cmpAccC ↔
-      dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
+      dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
         dt.cmpAccC := by
     rw [ctlBit, ctlBit, cmp_chain_apply_ne hnf
       (fun k => (cmpRdC_ne_cmpAccC hnf k).symm) 2]
   have hchD : dt.ctlBit one (chainSt
-      (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ aT j'))
+      (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ aT j'))
       (fun j' bb q' =>
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-          (dt.back zero one dt.dd0Le st vAdr))
-      (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2)
+          (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+      (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2)
       dt.cmpDecC ↔
-      dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
+      dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
         dt.cmpDecC := by
     rw [ctlBit, ctlBit, cmp_chain_apply_ne hnf
       (fun k => (cmpRdC_ne_cmpDecC hnf k).symm) 2]
   have hchV : dt.ctlBit one (chainSt
-      (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ aT j'))
+      (fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ aT j'))
       (fun j' bb q' =>
         (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' bb q'
-          (dt.back zero one dt.dd0Le st vAdr))
-      (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2)
+          (dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr))
+      (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0) 2)
       dt.cmpValC ↔
-      dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
+      dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
         dt.cmpValC := by
     rw [ctlBit, ctlBit, cmp_chain_apply_ne hnf
       (fun k => (cmpRdC_ne_cmpValC hnf k).symm) 2]
   have hrd0 := ctlBit_cmp_chain_rd (vi := vi) (av := av) (isEq := isEq)
     (j₁ := j₁) (j₂ := j₂) hnf hzo
-    (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ aT j'))
-    (base := dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
-    (g := dt.back zero one dt.dd0Le st vAdr) 0
+    (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ aT j'))
+    (base := dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
+    (g := dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr) 0
   have hrd1 := ctlBit_cmp_chain_rd (vi := vi) (av := av) (isEq := isEq)
     (j₁ := j₁) (j₂ := j₂) hnf hzo
-    (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell zero vi j₁ j₂ aT j'))
-    (base := dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
-    (g := dt.back zero one dt.dd0Le st vAdr) 1
+    (bit := fun j' => dt.cmpSet vi j₁ j₂ st j' (dt.cmpCell RF zero hhas vi j₁ j₂ aT j'))
+    (base := dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
+    (g := dt.ixBack RF.toLayout zero one dt.dd0Le st vAdr) 1
   -- every tuple is at or below the top
   have hleT : ∀ u : Lex (Fin dt.dd0 → A), u ≤ aT :=
     tup_isTop_iff.mpr fun p a => le_topTup p a
   have hcase : ∀ u : Lex (Fin dt.dd0 → A), u < aT ∨ u = aT := fun u =>
     lt_or_eq_of_le (hleT u)
   -- the folded flags, against the whole enumeration
-  have hAccAll : (dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st
+  have hAccAll : (dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st
         vAdr f₀ aT 0) dt.cmpAccC ∧
-      dt.CmpAgr zero vi j₁ j₂ st aT) ↔
-      ∀ u, dt.CmpAgr zero vi j₁ j₂ st u := by
+      dt.CmpAgr RF zero hhas vi j₁ j₂ st aT) ↔
+      ∀ u, dt.CmpAgr RF zero hhas vi j₁ j₂ st u := by
     rw [ihA]
     constructor
     · rintro ⟨hall, hAgr⟩ u
@@ -928,15 +976,15 @@ theorem ctlBit_avC_cmp_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
         exact hAgr
     · intro hall
       exact ⟨fun u _ => hall u, hall aT⟩
-  have hValAll : ((dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st
+  have hValAll : ((dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st
           vAdr f₀ aT 0) dt.cmpDecC ∧
-        dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
+        dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
           dt.cmpValC) ∨
-      (¬dt.ctlBit one (dt.cmpFam zero one vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
+      (¬dt.ctlBit one (dt.cmpFam RF zero one hhas vi av hnf isEq j₁ j₂ st vAdr f₀ aT 0)
           dt.cmpDecC ∧
-        ¬dt.cmpSet vi j₁ j₂ st 0 (dt.cmpCell zero vi j₁ j₂ aT 0) ∧
-        dt.cmpSet vi j₁ j₂ st 1 (dt.cmpCell zero vi j₁ j₂ aT 1))) ↔
-      ∃ u, dt.CmpFst zero vi j₁ j₂ st u := by
+        ¬dt.cmpSet vi j₁ j₂ st 0 (dt.cmpCell RF zero hhas vi j₁ j₂ aT 0) ∧
+        dt.cmpSet vi j₁ j₂ st 1 (dt.cmpCell RF zero hhas vi j₁ j₂ aT 1))) ↔
+      ∃ u, dt.CmpFst RF zero hhas vi j₁ j₂ st u := by
     rw [ihD, ihV]
     constructor
     · rintro (⟨-, u, -, hF⟩ | ⟨hnd, hb0, hb1⟩)

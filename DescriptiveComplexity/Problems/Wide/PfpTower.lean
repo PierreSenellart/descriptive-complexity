@@ -60,7 +60,7 @@ noncomputable def domNr (t : dt.X.Tag) : ℕ :=
 
 /-- **The machinery phases of an atom kind**: a stage atom's random access,
 an expansion atom's tag-branched loops, a comparison's coordinate loop. -/
-noncomputable def KindPh {n : ℕ} : MatAtom dt.X dt.d n → Type
+noncomputable def KindPh {n : ℕ} : MatAtom dt.X dt.d.B n → Type
   | .stage i _ => StagePh (dt.d.B.arity i)
   | @MatAtom.exp _ _ _ _ k e _ =>
     letI := Fintype.ofFinite dt.X.Tag
@@ -69,7 +69,7 @@ noncomputable def KindPh {n : ℕ} : MatAtom dt.X dt.d n → Type
   | .ord _ _ => ElemPh 2
 
 /-- **The machinery sites of an atom kind.** -/
-noncomputable def KindSite {n : ℕ} : MatAtom dt.X dt.d n → Type
+noncomputable def KindSite {n : ℕ} : MatAtom dt.X dt.d.B n → Type
   | .stage i _ => StageSite (dt.d.B.arity i)
   | @MatAtom.exp _ _ _ _ k e _ =>
     letI := Fintype.ofFinite dt.X.Tag
@@ -79,7 +79,7 @@ noncomputable def KindSite {n : ℕ} : MatAtom dt.X dt.d n → Type
 
 /-- **The rule shape of an atom kind's sites.** -/
 noncomputable def KindSh {n : ℕ} :
-    ∀ κ : MatAtom dt.X dt.d n, dt.KindSite κ → Type
+    ∀ κ : MatAtom dt.X dt.d.B n, dt.KindSite κ → Type
   | .stage i _ => StageSh (dt.d.B.arity i)
   | @MatAtom.exp _ _ _ _ k e _ =>
     letI := Fintype.ofFinite dt.X.Tag
@@ -250,7 +250,7 @@ variable {L : Language.{0, 0}} (dt : PfpData L)
 
 /-- The owner map of an atom kind's machinery. -/
 noncomputable def kindOwn {n : ℕ} :
-    ∀ κ : MatAtom dt.X dt.d n, dt.KindPh κ → dt.KindSite κ
+    ∀ κ : MatAtom dt.X dt.d.B n, dt.KindPh κ → dt.KindSite κ
   | .stage _ _ => stageOwn
   | @MatAtom.exp _ _ _ _ _ _ _ => tagOwn
   | .eq _ _ => elemOwn
@@ -446,7 +446,7 @@ namespace PfpData
 
 variable {L : Language.{0, 0}} (dt : PfpData L)
 
-noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d n) :
+noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d.B n) :
     Finite (dt.KindPh κ) := by
   cases κ with
   | stage i ts => exact inferInstanceAs (Finite (StagePh _))
@@ -456,7 +456,7 @@ noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d n) :
   | eq j₁ j₂ => exact inferInstanceAs (Finite (ElemPh 2))
   | ord j₁ j₂ => exact inferInstanceAs (Finite (ElemPh 2))
 
-noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d n) :
+noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d.B n) :
     Finite (dt.KindSite κ) := by
   cases κ with
   | stage i ts => exact inferInstanceAs (Finite (StageSite _))

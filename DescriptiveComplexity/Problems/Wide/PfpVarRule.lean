@@ -68,6 +68,18 @@ theorem matrixHosrc :
     (fun a s ρ =>
       kindHosrc zero one (dt.kindOf v a) (argsA a) (emb (.chk a.succ)) s ρ)
 
+/-- **A property of the matrix's phases and its exit holds of every phase it can
+move to**: each atom's machinery stays inside its own and its verdict goes to
+the next checkpoint. -/
+theorem matrixRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.MatrixPh v, S (emb p))
+    (hexit : S exitPh) (i : dt.MatrixSite v) (ρ : dt.MatrixSh v i) :
+    S (dt.matrixRule zero one v emb argsA enterSt exitPh i ρ).dstPh :=
+  seqRule_dstIn (emb := emb) one Slot.wk Slot.reg _
+    (fun a => dt.kindEntry (dt.kindOf v a)) enterSt exitPh hemb hexit
+    (fun a s ρ => kindDstIn zero one (dt.kindOf v a) (argsA a)
+      (emb := fun p => emb (.sub a p)) (emb (.chk a.succ))
+      (fun p => hemb (.sub a p)) (hemb (.chk a.succ)) s ρ) i ρ
+
 /-- **The matrix separates in-shape.** -/
 theorem matrixSep (hzo : zero ≠ one) (hemb : Function.Injective emb) :
     ∀ (i : dt.MatrixSite v) (ρ ρ' : dt.MatrixSh v i) (f : Q → A)
@@ -128,6 +140,60 @@ noncomputable def gateBlockRule :
       args.setFlagE args.initEl args.advEl args.exitSt args.IsMaxEl exitPh s ρ
 
 variable {emb}
+
+/-- **A gate block leaves only into its own phases, its failing exit or its
+exit**: the file test's trip stays inside it, its passing exit enters the domain
+evaluation, and the tag machinery's rules leave only where it leaves. -/
+theorem gateBlockRule_dstPh (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
+    (∃ p : dt.GateBlockPh,
+      (dt.gateBlockRule (one := one) (emb := emb) (args := args) (wellG := wellG)
+        (setFail := setFail) (failPh := failPh) (exitPh := exitPh) i ρ).dstPh =
+        emb p) ∨
+    (dt.gateBlockRule (one := one) (emb := emb) (args := args) (wellG := wellG)
+      (setFail := setFail) (failPh := failPh) (exitPh := exitPh) i ρ).dstPh =
+      failPh ∨
+    (dt.gateBlockRule (one := one) (emb := emb) (args := args) (wellG := wellG)
+      (setFail := setFail) (failPh := failPh) (exitPh := exitPh) i ρ).dstPh =
+      exitPh := by
+  letI := Fintype.ofFinite dt.X.Tag
+  have hdom : ∃ p : dt.GateBlockPh, dt.gateDomEntry emb = emb p := by
+    change ∃ p : dt.GateBlockPh, tagFirstRd (fun p => emb (Sum.inr p)) = emb p
+    by_cases h : 0 < Fintype.card dt.X.Tag
+    · exact ⟨_, dif_pos h⟩
+    · exact ⟨_, dif_neg h⟩
+  match i, ρ with
+  | Sum.inl _, Sum.inl σ =>
+    obtain ⟨t, ht⟩ := (TestKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir
+      Slot.reg Slot.regLast Slot.wk wellG (fun t => emb (Sum.inl t))).dstPh_emb
+      one σ
+    exact Or.inl ⟨Sum.inl t, ht⟩
+  | Sum.inl _, Sum.inr b =>
+    cases b with
+    | true =>
+      obtain ⟨p, hp⟩ := hdom
+      exact Or.inl ⟨p, hp⟩
+    | false => exact Or.inr (Or.inl rfl)
+  | Sum.inr s, ρ =>
+    rcases tagRule_dstPh one Slot.wk Slot.reg (emb := fun p => emb (Sum.inr p))
+      args.rdTrackT args.MatchT args.setTagFlag args.TagsAre args.rdTrackE
+      args.MatchE args.setFlagE args.initEl args.advEl args.exitSt args.IsMaxEl
+      exitPh s ρ with ⟨p, hp⟩ | hp
+    · exact Or.inl ⟨Sum.inr p, hp⟩
+    · exact Or.inr (Or.inr hp)
+
+/-- **A property of a gate block's phases, its failing exit and its exit holds
+of every phase it can move to.** -/
+theorem gateBlockRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.GateBlockPh, S (emb p))
+    (hfail : S failPh) (hexit : S exitPh)
+    (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
+    S (dt.gateBlockRule (one := one) (emb := emb) (args := args) (wellG := wellG)
+      (setFail := setFail) (failPh := failPh) (exitPh := exitPh) i ρ).dstPh := by
+  rcases dt.gateBlockRule_dstPh (one := one) (emb := emb) (args := args)
+    (wellG := wellG) (setFail := setFail) (failPh := failPh) (exitPh := exitPh)
+    i ρ with ⟨p, hp⟩ | hp | hp
+  · rw [hp]; exact hemb p
+  · rw [hp]; exact hfail
+  · rw [hp]; exact hexit
 
 /-- **Every rule of a gate block fires from a phase its site owns.** -/
 theorem gateBlockHosrc :
@@ -225,6 +291,21 @@ noncomputable def gatesRule :
 
 variable {emb}
 
+/-- **A property of the gates' phases, their failing exit and their exit holds
+of every phase they can move to.** -/
+theorem gatesRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.GatesPh v, S (emb p))
+    (hfail : S failPh) (hexit : S exitPh)
+    (i : dt.GatesSite v) (ρ : dt.GatesSh v i) :
+    S (dt.gatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
+      (wellGOf := wellGOf) (setFail := setFail) (enterSt := enterSt)
+      (failPh := failPh) (exitPh := exitPh) i ρ).dstPh :=
+  seqRule_dstIn (emb := emb) one Slot.wk Slot.reg _ (fun _ => Sum.inl .up) enterSt
+    exitPh hemb hexit
+    (fun b s ρ => dt.gateBlockRule_dstIn (one := one)
+      (emb := fun p => emb (.sub b p)) (args := argsG b) (wellG := wellGOf b)
+      (setFail := setFail) (failPh := failPh) (exitPh := emb (.chk b.succ))
+      (fun p => hemb (.sub b p)) hfail (hemb (.chk b.succ)) s ρ) i ρ
+
 /-- **Every rule of the gates fires from a phase its site owns.** -/
 theorem gatesHosrc :
     ∀ (i : dt.GatesSite v) (ρ : dt.GatesSh v i),
@@ -311,6 +392,22 @@ noncomputable def igatesRule :
     enterSt exitPh
 
 variable {emb}
+
+/-- **A property of the inner gates' phases and their exit holds of every phase
+they can move to**: a failing inner gate leaves into the next checkpoint, which
+is one of their own. -/
+theorem igatesRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.IGatesPh v, S (emb p))
+    (hexit : S exitPh) (i : dt.IGatesSite v) (ρ : dt.IGatesSh v i) :
+    S (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
+      (wellGOf := wellGOf) (setFailOf := setFailOf) (enterSt := enterSt)
+      (exitPh := exitPh) i ρ).dstPh :=
+  seqRule_dstIn (emb := emb) one Slot.wk Slot.reg _ (fun _ => Sum.inl .up) enterSt
+    exitPh hemb hexit
+    (fun b s ρ => dt.gateBlockRule_dstIn (one := one)
+      (emb := fun p => emb (.sub b p)) (args := argsG b) (wellG := wellGOf b)
+      (setFail := setFailOf b) (failPh := emb (.chk b.succ))
+      (exitPh := emb (.chk b.succ))
+      (fun p => hemb (.sub b p)) (hemb (.chk b.succ)) (hemb (.chk b.succ)) s ρ) i ρ
 
 /-- **Every rule of the inner gates fires from a phase its site owns.** -/
 theorem igatesHosrc :

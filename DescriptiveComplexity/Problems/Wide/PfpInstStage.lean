@@ -45,6 +45,11 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 variable {PR : Prog A R P dt.CtlIx dt.SlotIx dt.KIx dt.dd}
+variable (RF : RegFile (Univ A R P dt.KIx dt.dd))
+-- The channel writes its marks in the tags' own order, the machine walks the
+-- tape in the addresses'; the two agree, and that is the bridge every
+-- statement about the elementwise layout crosses.
+variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 
 section StageLoop
 
@@ -53,7 +58,7 @@ variable (zero one : A)
 variable (vi : dt.VarIx) (iv : dt.d.B.ι)
 variable (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi))
 variable (av : Fin dt.natMax) (ℓ : Fin (dt.d.B.arity iv))
-variable (st : TapeSt dt A R P)
+variable (st : TapeStD dt A R P)
 
 /-- **The source cell of a copy round**: the padded cell of the round's tuple
 in the position's source block. -/
@@ -72,7 +77,7 @@ noncomputable def stageXD (b : Lex (Fin dt.dd0 → A)) :
 content**: the state with the TARGET register at the given track. -/
 noncomputable def stageRestF (m' : Univ A R P dt.KIx dt.dd → Prop) :
     (Univ A R P dt.KIx dt.dd → Prop) → dt.SlotIx → A :=
-  dt.back zero one dt.dd0Le { st with tgt := m' }
+  dt.back RF.cell zero one dt.dd0Le { st with tgt := m' }
 
 variable {dt zero one vi iv ts av ℓ st}
 
@@ -81,7 +86,7 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A] in
 theorem stageRestF_off (m₁ m₂ : Univ A R P dt.KIx dt.dd → Prop)
     (r : Univ A R P dt.KIx dt.dd → Prop) (s : dt.SlotIx)
     (hs : s ≠ Slot.tgt) :
-    dt.stageRestF zero one st m₁ r s = dt.stageRestF zero one st m₂ r s := by
+    dt.stageRestF RF zero one st m₁ r s = dt.stageRestF RF zero one st m₂ r s := by
   match s with
   | .tgt => exact absurd rfl hs
   | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .mir | .sav
@@ -112,7 +117,7 @@ theorem readLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
       (dt.stageArgs zero one vi iv ts av).setBit
       (dt.stageArgs zero one vi iv ts av).initLv
       (dt.stageArgs zero one vi iv ts av).advLv
-      (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF zero one st)
+      (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF RF zero one st)
       (dt.stageXS zero vi iv ts ℓ) (dt.stageXD zero iv ℓ) mD₀ f₀ b) =
       ofLex b := by
   induction b using order_induction with
@@ -121,14 +126,14 @@ theorem readLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
         (dt.stageArgs zero one vi iv ts av).setBit
         (dt.stageArgs zero one vi iv ts av).initLv
         (dt.stageArgs zero one vi iv ts av).advLv
-        (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF zero one st)
+        (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF RF zero one st)
         (dt.stageXS zero vi iv ts ℓ) (dt.stageXD zero iv ℓ) mD₀ f₀ z =
         (dt.stageArgs zero one vi iv ts av).initLv f₀
-          (dt.stageRestF zero one st mD₀ vAdr) :=
+          (dt.stageRestF RF zero one st mD₀ vAdr) :=
       iterOrd_bot hz
     rw [hz0]
     have hinit : dt.readLv ((dt.stageArgs zero one vi iv ts av).initLv f₀
-        (dt.stageRestF zero one st mD₀ vAdr)) = botTup := by
+        (dt.stageRestF RF zero one st mD₀ vAdr)) = botTup := by
       change dt.readLv (dt.initLvN f₀) = botTup
       rw [initLvN, readLv_putLv]
     rw [hinit, ofLex_eq_botTup_of_bot hz]
@@ -138,7 +143,7 @@ theorem readLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
         (dt.stageArgs zero one vi iv ts av).setBit
         (dt.stageArgs zero one vi iv ts av).initLv
         (dt.stageArgs zero one vi iv ts av).advLv
-        (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF zero one st)
+        (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF RF zero one st)
         (dt.stageXS zero vi iv ts ℓ) (dt.stageXD zero iv ℓ) mD₀ f₀ z =
         (dt.stageArgs zero one vi iv ts av).advLv
           (if dt.lvSet st vi (ts ℓ) (dt.stageXS zero vi iv ts ℓ w) then
@@ -146,9 +151,9 @@ theorem readLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
               (tupleIter0 (dt.stageArgs zero one vi iv ts av).setBit
                 (dt.stageArgs zero one vi iv ts av).initLv
                 (dt.stageArgs zero one vi iv ts av).advLv
-                (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF zero one st)
+                (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF RF zero one st)
                 (dt.stageXS zero vi iv ts ℓ) (dt.stageXD zero iv ℓ) mD₀ f₀ w)
-              (dt.stageRestF zero one st
+              (dt.stageRestF RF zero one st
                 (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS zero vi iv ts ℓ)
                   (dt.stageXD zero iv ℓ) mD₀ w) vAdr)
           else
@@ -156,12 +161,12 @@ theorem readLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
               (tupleIter0 (dt.stageArgs zero one vi iv ts av).setBit
                 (dt.stageArgs zero one vi iv ts av).initLv
                 (dt.stageArgs zero one vi iv ts av).advLv
-                (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF zero one st)
+                (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF RF zero one st)
                 (dt.stageXS zero vi iv ts ℓ) (dt.stageXD zero iv ℓ) mD₀ f₀ w)
-              (dt.stageRestF zero one st
+              (dt.stageRestF RF zero one st
                 (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS zero vi iv ts ℓ)
                   (dt.stageXD zero iv ℓ) mD₀ w) vAdr))
-          (dt.stageRestF zero one st
+          (dt.stageRestF RF zero one st
             (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS zero vi iv ts ℓ)
               (dt.stageXD zero iv ℓ) mD₀ w) vAdr) :=
       iterOrd_covers hwz hnb
@@ -190,7 +195,7 @@ theorem readLv_stageIter1 (b : Lex (Fin dt.dd0 → A)) :
       (dt.stageArgs zero one vi iv ts av).setBit
       (dt.stageArgs zero one vi iv ts av).initLv
       (dt.stageArgs zero one vi iv ts av).advLv
-      (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF zero one st)
+      (dt.lvSet st vi (ts ℓ)) vAdr (dt.stageRestF RF zero one st)
       (dt.stageXS zero vi iv ts ℓ) (dt.stageXD zero iv ℓ) mD₀ f₀ b) =
       ofLex b := by
   classical
@@ -203,9 +208,9 @@ theorem readLv_stageIter1 (b : Lex (Fin dt.dd0 → A)) :
   rw [tupleIter1]
   by_cases hb : dt.lvSet st vi (ts ℓ) (dt.stageXS zero vi iv ts ℓ b)
   · rw [if_pos hb, hset]
-    exact readLv_stageIter0 b
+    exact readLv_stageIter0 RF b
   · rw [if_neg hb, hset]
-    exact readLv_stageIter0 b
+    exact readLv_stageIter0 RF b
 
 end Iter
 
@@ -284,20 +289,20 @@ variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable {gbot : Univ A R P dt.KIx dt.dd} (hbot : ∀ y, WMLe gbot y)
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v)
 variable (mD₀ : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A)
 
-include hrules hR hlin hbot hv hvi hwkSt in
+include hrules hR hlin hord hbot hv hvi hwkSt in
 /-- **One copy loop's run**: from its entry checkpoint at the marker to the
 exit phase one cell to its right, the TARGET block of the position holding
 the source block's bits at every tuple's cell. -/
 theorem stageTuple_run :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk ⟨0, by omega⟩)) f₀), Sum.inl v,
-        wideTape (PR.trackTape
+        wideTape (PR.trackTapeAt RF.cell
           ((dt.stageArgs PR.zero PR.one vi iv ts av).srcTrack ℓ)
-          (dt.stageRestF PR.zero PR.one st
+          (dt.stageRestF RF PR.zero PR.one st
             (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
               (dt.stageXD PR.zero iv ℓ) mD₀ (toLex botTup)))
           (dt.lvSet st vi (ts ℓ))) (PR.syElt PR.blank)⟩
@@ -305,11 +310,11 @@ theorem stageTuple_run :
           (tupleIter1 (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
             (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
             (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-            (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+            (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
             (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀
             (toLex topTup))), Sum.inl v',
-        wideTape (PR.trackTape Slot.tgt
-          (dt.stageRestF PR.zero PR.one st
+        wideTape (PR.trackTapeAt RF.cell Slot.tgt
+          (dt.stageRestF RF PR.zero PR.one st
             (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
               (dt.stageXD PR.zero iv ℓ) mD₀ (toLex topTup)))
           (tuplePost (dt.lvSet st vi (ts ℓ))
@@ -321,61 +326,62 @@ theorem stageTuple_run :
   have hzo := PR.zero_ne_one
   have hne_wk_tgt : (Slot.wk : dt.SlotIx) ≠ Slot.tgt := fun h => nomatch h
   have hne_reg_tgt : (Slot.reg : dt.SlotIx) ≠ Slot.tgt := fun h => nomatch h
-  refine tuple_run_iter hrules hR hlin hbot hv hvi
+  refine tuple_run_iter RF.toIx hrules hR hlin hlin hbot hv hvi
     (tup_isBot_iff.mpr botTup_le)
     (tup_isTop_iff.mpr fun p a => le_topTup p a)
     (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀
     (fun m' r => by
-      rw [show dt.stageRestF PR.zero PR.one st m' r Slot.wk =
+      rw [show dt.stageRestF RF PR.zero PR.one st m' r Slot.wk =
         bitVal PR.zero PR.one (st.wk r) from rfl, hwkSt])
     (fun m' r => rfl)
-    (fun m' r => dt.back_lvTrack PR.zero PR.one { st with tgt := m' } vi
+    (fun m' r => dt.back_lvTrackD RF hord PR.zero PR.one { st with tgt := m' } vi
       (ts ℓ) r)
     (fun m' r => rfl)
-    (fun m₁ m₂ r s hs => stageRestF_off m₁ m₂ r s hs)
+    (fun m₁ m₂ r s hs => stageRestF_off RF m₁ m₂ r s hs)
     (dt.wk_ne_lvTrack vi (ts ℓ)) hne_wk_tgt
     (dt.reg_ne_lvTrack vi (ts ℓ)) hne_reg_tgt
     ?_ ?_ ?_ ?_ ?_ ?_ ?_
   · -- the source read's name guard
     intro a
-    rw [passTracks_of_back
+    rw [passTracks_of_back RF.toIx
       (t := (dt.stageArgs PR.zero PR.one vi iv ts av).srcTrack ℓ)
-      (rest := dt.stageRestF PR.zero PR.one st
+      (rest := dt.stageRestF RF PR.zero PR.one st
         (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
           (dt.stageXD PR.zero iv ℓ) mD₀ a))
       (m := dt.lvSet st vi (ts ℓ))
-      (fun r => dt.back_lvTrack PR.zero PR.one _ vi (ts ℓ) r) _]
+      (fun r => dt.back_lvTrackD RF hord PR.zero PR.one _ vi (ts ℓ) r) _]
     have hrd : (fun j => tupleIter0
         (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
         (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
         (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
         (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀ a
         (dt.lvC j)) = ofLex a :=
-      readLv_stageIter0 a
-    refine (dt.nameG_iff hzo hlin _ dt.lvC _ (dt.stageXS PR.zero vi iv ts ℓ a)).mpr ?_
+      readLv_stageIter0 RF a
+    refine (dt.nameG_iff hzo (RF.injective hlin) _ dt.lvC _
+      (dt.stageXS PR.zero vi iv ts ℓ a)).mpr ?_
     rw [stageXS, hrd]
     rfl
   · -- the source guard identifies the cell
     intro a r hM
-    rw [passTracks_of_back
+    rw [passTracks_of_back RF.toIx
       (t := (dt.stageArgs PR.zero PR.one vi iv ts av).srcTrack ℓ)
-      (rest := dt.stageRestF PR.zero PR.one st
+      (rest := dt.stageRestF RF PR.zero PR.one st
         (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
           (dt.stageXD PR.zero iv ℓ) mD₀ a))
       (m := dt.lvSet st vi (ts ℓ))
-      (fun r' => dt.back_lvTrack PR.zero PR.one _ vi (ts ℓ) r') _] at hM
-    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = wmSeg u
+      (fun r' => dt.back_lvTrackD RF hord PR.zero PR.one _ vi (ts ℓ) r') _] at hM
+    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = RF.cell u
     · obtain ⟨u, rfl⟩ := hreg
-      have hu := (dt.nameG_iff hzo hlin _ dt.lvC _ u).mp hM
+      have hu := (dt.nameG_iff hzo (RF.injective hlin) _ dt.lvC _ u).mp hM
       have hrd : (fun j => tupleIter0
           (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
           (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
           (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀ a
           (dt.lvC j)) = ofLex a :=
-        readLv_stageIter0 a
+        readLv_stageIter0 RF a
       rw [hrd] at hu
       rw [hu]
       rfl
@@ -383,8 +389,8 @@ theorem stageTuple_run :
         (fun u hc => hreg ⟨u, hc⟩))
   · -- the destination write's name guard
     intro a
-    rw [passTracks_of_back (t := Slot.tgt)
-      (rest := dt.stageRestF PR.zero PR.one st
+    rw [passTracks_of_back RF.toIx (t := Slot.tgt)
+      (rest := dt.stageRestF RF PR.zero PR.one st
         (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
           (dt.stageXD PR.zero iv ℓ) mD₀ a))
       (m := tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
@@ -394,33 +400,33 @@ theorem stageTuple_run :
         (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
         (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
         (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
         (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀ a
         (dt.lvC j)) = ofLex a :=
-      readLv_stageIter1 a
-    refine (dt.nameG_iff hzo hlin _ dt.lvC _ (dt.stageXD PR.zero iv ℓ a)).mpr ?_
+      readLv_stageIter1 RF a
+    refine (dt.nameG_iff hzo (RF.injective hlin) _ dt.lvC _ (dt.stageXD PR.zero iv ℓ a)).mpr ?_
     rw [stageXD, hrd]
     rfl
   · -- the destination guard identifies the cell
     intro a r hM
-    rw [passTracks_of_back (t := Slot.tgt)
-      (rest := dt.stageRestF PR.zero PR.one st
+    rw [passTracks_of_back RF.toIx (t := Slot.tgt)
+      (rest := dt.stageRestF RF PR.zero PR.one st
         (tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
           (dt.stageXD PR.zero iv ℓ) mD₀ a))
       (m := tupleIterD (dt.lvSet st vi (ts ℓ)) (dt.stageXS PR.zero vi iv ts ℓ)
         (dt.stageXD PR.zero iv ℓ) mD₀ a)
       (fun r' => rfl) _] at hM
-    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = wmSeg u
+    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = RF.cell u
     · obtain ⟨u, rfl⟩ := hreg
-      have hu := (dt.nameG_iff hzo hlin _ dt.lvC _ u).mp hM
+      have hu := (dt.nameG_iff hzo (RF.injective hlin) _ dt.lvC _ u).mp hM
       have hrd : (fun j => tupleIter1
           (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
           (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
           (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀ a
           (dt.lvC j)) = ofLex a :=
-        readLv_stageIter1 a
+        readLv_stageIter1 RF a
       rw [hrd] at hu
       rw [hu]
       rfl
@@ -436,7 +442,7 @@ theorem stageTuple_run :
         (tupleIter0 (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
           (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
           (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀ a))
         dt.bitFlagC ↔ _
       rw [ctlBit_setCtl_self hzo]
@@ -447,7 +453,7 @@ theorem stageTuple_run :
         (tupleIter0 (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
           (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
           (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀ a))
         dt.bitFlagC ↔ _
       rw [ctlBit_setCtl_self hzo]
@@ -458,15 +464,15 @@ theorem stageTuple_run :
         (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
         (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
         (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
         (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀
         (toLex topTup)) = ofLex (toLex topTup) :=
-      readLv_stageIter1 (toLex topTup)
+      readLv_stageIter1 RF (toLex topTup)
     change IsMaxTup (dt.readLv (tupleIter1
       (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
       (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
       (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-      (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+      (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
       (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀
       (toLex topTup)))
     rw [hrd]
@@ -477,16 +483,16 @@ theorem stageTuple_run :
         (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
         (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
         (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+        (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
         (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀ a) =
         ofLex a :=
-      readLv_stageIter1 a
+      readLv_stageIter1 RF a
     have hmax : IsMaxTup (ofLex a) := by
       have hc2 : IsMaxTup (dt.readLv (tupleIter1
           (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
           (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
           (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
-          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF PR.zero PR.one st)
+          (dt.lvSet st vi (ts ℓ)) v (dt.stageRestF RF PR.zero PR.one st)
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ) mD₀ f₀
           a)) := hc
       rw [hrd] at hc2
@@ -592,14 +598,14 @@ variable (dt zero one vi iv ts av st v) in
 noncomputable def stageFAt (f₀ : dt.CtlIx → A) : ℕ → dt.CtlIx → A
   | 0 =>
     (dt.stageArgs zero one vi iv ts av).initLv f₀
-      (dt.back zero one dt.dd0Le { st with sav := v, tgt := fun _ => False } v)
+      (dt.back RF.cell zero one dt.dd0Le { st with sav := v, tgt := fun _ => False } v)
   | n + 1 =>
     if h : n < dt.d.B.arity iv then
       tupleIter1 (dt.stageArgs zero one vi iv ts av).setBit
         (dt.stageArgs zero one vi iv ts av).initLv
         (dt.stageArgs zero one vi iv ts av).advLv
         (dt.lvSet { st with sav := v } vi (ts ⟨n, h⟩)) v
-        (dt.stageRestF zero one { st with sav := v })
+        (dt.stageRestF RF zero one { st with sav := v })
         (dt.stageXS zero vi iv ts ⟨n, h⟩) (dt.stageXD zero iv ⟨n, h⟩)
         (dt.stageTgtD zero vi iv ts st v n) (stageFAt f₀ n) (toLex topTup)
     else stageFAt f₀ n
@@ -609,7 +615,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 /-- **The TARGET a random access builds is blind to the two scratch
 registers**: every copy round reads a level's register set, and the loop
 pins SAV at the home address itself. -/
-theorem stageTgtD_congr_scratch {st' : TapeSt dt A R P}
+theorem stageTgtD_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st') (n : ℕ) :
     dt.stageTgtD zero vi iv ts st v n = dt.stageTgtD zero vi iv ts st' v n := by
   have hlv : ∀ j : Fin (dt.nOf vi),
@@ -628,19 +634,19 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The control of the copy loops is blind to them too** — the
 destination-dependent background overwrites TARGET, and the loop reads it
 at the home cell alone. -/
-theorem stageFAt_congr_scratch {st' : TapeSt dt A R P}
+theorem stageFAt_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st')
-    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u)
     (f₀ : dt.CtlIx → A) (n : ℕ) :
-    dt.stageFAt zero one vi iv ts av st v f₀ n =
-      dt.stageFAt zero one vi iv ts av st' v f₀ n := by
+    dt.stageFAt RF zero one vi iv ts av st v f₀ n =
+      dt.stageFAt RF zero one vi iv ts av st' v f₀ n := by
   have hlv : ∀ j : Fin (dt.nOf vi),
       dt.lvSet { st with sav := v } vi j = dt.lvSet { st' with sav := v } vi j := by
     intro j
     simp only [lvSet, h.2.1, h.2.2.1]
   have hrest : ∀ m' : Univ A R P dt.KIx dt.dd → Prop,
-      dt.stageRestF zero one { st with sav := v } m' v =
-        dt.stageRestF zero one { st' with sav := v } m' v :=
+      dt.stageRestF RF zero one { st with sav := v } m' v =
+        dt.stageRestF RF zero one { st' with sav := v } m' v :=
     fun m' => (h.scratch v m').back hreg
   induction n with
   | zero => exact congrArg _ ((h.scratch v (fun _ => False)).back hreg)
@@ -778,11 +784,11 @@ variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable {gbot : Univ A R P dt.KIx dt.dd} (hbot : ∀ y, WMLe gbot y)
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v) (hmirSt : st.mir = v)
 variable (f₀ : dt.CtlIx → A)
 
-include hrules hR hlin hbot hv hvi hwkSt hmirSt in
+include hrules hR hlin hord hbot hv hvi hwkSt hmirSt in
 /-- **The copy loops of a stage atom, chained and instantiated**: from the
 phase entering the first loop to the first reset's checkpoint, the TARGET
 holding the composed content of every position – exactly the `hLoops` leg
@@ -791,17 +797,17 @@ theorem stageChain_run :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (stageFirstTup emb)
           ((dt.stageArgs PR.zero PR.one vi iv ts av).initLv f₀
-            (dt.back PR.zero PR.one dt.dd0Le
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le
               { st with sav := v, tgt := fun _ => False } v))), Sum.inl v',
-        wideTape (PR.trackTape Slot.mir
-          (dt.back PR.zero PR.one dt.dd0Le
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le
             { st with sav := v, tgt := fun _ => False }) v)
           (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (emb .cR1)
-          (dt.stageFAt PR.zero PR.one vi iv ts av st v f₀
+          (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀
             (dt.d.B.arity iv))), Sum.inl v',
-        wideTape (PR.trackTape Slot.mir
-          (dt.back PR.zero PR.one dt.dd0Le
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le
             { st with sav := v,
                       tgt := dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv) })
           v) (PR.syElt PR.blank)⟩ := by
@@ -809,18 +815,18 @@ theorem stageChain_run :
   have hLoop : ∀ ℓ : Fin (dt.d.B.arity iv),
       Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
         ⟨Sum.inr (PR.stElt (emb (.tupP ℓ (.chk ⟨0, by omega⟩)))
-            (dt.stageFAt PR.zero PR.one vi iv ts av st v f₀ (ℓ : ℕ))),
+            (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀ (ℓ : ℕ))),
           Sum.inl v,
-          wideTape (PR.trackTape Slot.mir
-            (dt.back PR.zero PR.one dt.dd0Le
+          wideTape (PR.trackTapeAt RF.cell Slot.mir
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le
               { st with sav := v,
                         tgt := dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ) }) v)
             (PR.syElt PR.blank)⟩
         ⟨Sum.inr (PR.stElt (stageNextTup emb ℓ)
-            (dt.stageFAt PR.zero PR.one vi iv ts av st v f₀ ((ℓ : ℕ) + 1))),
+            (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀ ((ℓ : ℕ) + 1))),
           Sum.inl v',
-          wideTape (PR.trackTape Slot.mir
-            (dt.back PR.zero PR.one dt.dd0Le
+          wideTape (PR.trackTapeAt RF.cell Slot.mir
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le
               { st with sav := v,
                         tgt := dt.stageTgtD PR.zero vi iv ts st v ((ℓ : ℕ) + 1) })
             v) (PR.syElt PR.blank)⟩ := by
@@ -835,26 +841,26 @@ theorem stageChain_run :
           (toLex topTup) := by
       simp only [stageTgtD]
       rw [dif_pos ℓ.isLt]
-    have hFa1 : dt.stageFAt PR.zero PR.one vi iv ts av st v f₀
+    have hFa1 : dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀
         ((ℓ : ℕ) + 1) =
         tupleIter1 (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
           (dt.stageArgs PR.zero PR.one vi iv ts av).initLv
           (dt.stageArgs PR.zero PR.one vi iv ts av).advLv
           (dt.lvSet { st with sav := v } vi (ts ℓ)) v
-          (dt.stageRestF PR.zero PR.one { st with sav := v })
+          (dt.stageRestF RF PR.zero PR.one { st with sav := v })
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ)
           (dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ))
-          (dt.stageFAt PR.zero PR.one vi iv ts av st v f₀ (ℓ : ℕ))
+          (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀ (ℓ : ℕ))
           (toLex topTup) := by
       simp only [stageFAt]
       rw [dif_pos ℓ.isLt]
     -- the entry tape, re-walked at the source track
-    have htin : PR.trackTape Slot.mir
-        (dt.back PR.zero PR.one dt.dd0Le
+    have htin : PR.trackTapeAt RF.cell Slot.mir
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le
           { st with sav := v,
                     tgt := dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ) }) v =
-      PR.trackTape ((dt.stageArgs PR.zero PR.one vi iv ts av).srcTrack ℓ)
-        (dt.stageRestF PR.zero PR.one { st with sav := v }
+      PR.trackTapeAt RF.cell ((dt.stageArgs PR.zero PR.one vi iv ts av).srcTrack ℓ)
+        (dt.stageRestF RF PR.zero PR.one { st with sav := v }
           (tupleIterD (dt.lvSet { st with sav := v } vi (ts ℓ))
             (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ)
             (dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ)) (toLex botTup)))
@@ -865,21 +871,21 @@ theorem stageChain_run :
           dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ) :=
         iterOrd_bot (fun b => tup_isBot_iff.mpr (fun p a => botTup_le p a) b)
       rw [hb0]
-      refine (trackTape_of_back (t := Slot.mir) (m := v) ?_).trans
-        (trackTape_of_back
+      refine (trackTape_of_back RF.toIx (t := Slot.mir) (m := v) ?_).trans
+        (trackTape_of_back RF.toIx
           (t := (dt.stageArgs PR.zero PR.one vi iv ts av).srcTrack ℓ)
           (m := dt.lvSet { st with sav := v } vi (ts ℓ)) ?_).symm
       · intro r
-        rw [show dt.back PR.zero PR.one dt.dd0Le
+        rw [show dt.back RF.cell PR.zero PR.one dt.dd0Le
             { st with sav := v,
                       tgt := dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ) } r
-            Slot.mir = bitVal PR.zero PR.one (regBit st.mir r) from rfl,
+            Slot.mir = bitVal PR.zero PR.one (bitAtOf RF.cell st.mir r) from rfl,
           hmirSt]
       · intro r
-        exact dt.back_lvTrack PR.zero PR.one _ vi (ts ℓ) r
+        exact dt.back_lvTrackD RF hord PR.zero PR.one _ vi (ts ℓ) r
     -- the exit tape, walked back to the mirror
-    have htout : PR.trackTape Slot.tgt
-        (dt.stageRestF PR.zero PR.one { st with sav := v }
+    have htout : PR.trackTapeAt RF.cell Slot.tgt
+        (dt.stageRestF RF PR.zero PR.one { st with sav := v }
           (tupleIterD (dt.lvSet { st with sav := v } vi (ts ℓ))
             (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ)
             (dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ)) (toLex topTup)))
@@ -889,11 +895,11 @@ theorem stageChain_run :
             (dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ)))
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ)
           (toLex topTup)) =
-      PR.trackTape Slot.mir
-        (dt.back PR.zero PR.one dt.dd0Le
+      PR.trackTapeAt RF.cell Slot.mir
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le
           { st with sav := v,
                     tgt := dt.stageTgtD PR.zero vi iv ts st v ((ℓ : ℕ) + 1) }) v := by
-      refine (dt.trackTape_back_gen
+      refine (dt.trackTape_back_gen_diag RF hord
         (stA := { st with sav := v,
                           tgt := tupleIterD (dt.lvSet { st with sav := v } vi (ts ℓ))
                                    (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ)
@@ -901,41 +907,41 @@ theorem stageChain_run :
         (stB := { st with sav := v,
                           tgt := dt.stageTgtD PR.zero vi iv ts st v ((ℓ : ℕ) + 1) })
         ?_ ?_).trans
-        (trackTape_of_back (t := Slot.mir) (m := v) ?_).symm
+        (trackTape_of_back RF.toIx (t := Slot.mir) (m := v) ?_).symm
       · intro r s hs
-        exact stageRestF_off (st := { st with sav := v }) _ _ r s hs
+        exact stageRestF_off RF (st := { st with sav := v }) _ _ r s hs
       · intro r
-        rw [show dt.back PR.zero PR.one dt.dd0Le
+        rw [show dt.back RF.cell PR.zero PR.one dt.dd0Le
             { st with sav := v,
                       tgt := dt.stageTgtD PR.zero vi iv ts st v ((ℓ : ℕ) + 1) } r
             Slot.tgt = bitVal PR.zero PR.one
-              (regBit (dt.stageTgtD PR.zero vi iv ts st v ((ℓ : ℕ) + 1)) r)
+              (bitAtOf RF.cell (dt.stageTgtD PR.zero vi iv ts st v ((ℓ : ℕ) + 1)) r)
             from rfl, hD1]
       · intro r
-        rw [show dt.back PR.zero PR.one dt.dd0Le
+        rw [show dt.back RF.cell PR.zero PR.one dt.dd0Le
             { st with sav := v,
                       tgt := dt.stageTgtD PR.zero vi iv ts st v ((ℓ : ℕ) + 1) } r
-            Slot.mir = bitVal PR.zero PR.one (regBit st.mir r) from rfl,
+            Slot.mir = bitVal PR.zero PR.one (bitAtOf RF.cell st.mir r) from rfl,
           hmirSt]
     rw [htin, hFa1, ← htout]
     exact dt.stageTuple_run (st := { st with sav := v })
       (emb := fun p => emb (.tupP ℓ p)) (exitPh := stageNextTup emb ℓ)
       (rEmb := fun i ρ => rEmb (.tup ℓ i) ρ)
-      (fun i ρ => hrules (.tup ℓ i) ρ) hR hlin hbot hv hvi hwkSt
+      RF hord (fun i ρ => hrules (.tup ℓ i) ρ) hR hlin hbot hv hvi hwkSt
       (dt.stageTgtD PR.zero vi iv ts st v (ℓ : ℕ))
-      (dt.stageFAt PR.zero PR.one vi iv ts av st v f₀ (ℓ : ℕ))
-  have hchain := dt.stage_loops_run hrules hR hlin hvi
+      (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀ (ℓ : ℕ))
+  have hchain := dt.stage_loops_run (dt.diagLaid RF hord) hrules hR hlin hvi
     (fun _ => Slot.mir)
-    (fun j => dt.back PR.zero PR.one dt.dd0Le
+    (fun j => dt.back RF.cell PR.zero PR.one dt.dd0Le
       { st with sav := v, tgt := dt.stageTgtD PR.zero vi iv ts st v (j : ℕ) })
     (fun _ => v)
     (fun j r => by
-      rw [show dt.back PR.zero PR.one dt.dd0Le
+      rw [show dt.back RF.cell PR.zero PR.one dt.dd0Le
           { st with sav := v,
                     tgt := dt.stageTgtD PR.zero vi iv ts st v (j : ℕ) } r Slot.wk =
         bitVal PR.zero PR.one (st.wk r) from rfl, hwkSt])
     (fun _ h => nomatch h)
-    (fun j => dt.stageFAt PR.zero PR.one vi iv ts av st v f₀ (j : ℕ))
+    (fun j => dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀ (j : ℕ))
     hLoop
   exact hchain
 
@@ -964,16 +970,21 @@ variable (hrules : ∀ (i : StageSite (dt.d.B.arity iv))
     exitPh i ρ)
 variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable {gtop gbot : Univ A R P dt.KIx dt.dd}
 variable (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v) (hmirSt : st.mir = v)
 variable (hbotSt : st.bot = fun r => r = (fun _ => False))
 variable (f₀ : dt.CtlIx → A)
 
-include hrules hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt in
+include hrules hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt in
 /-- **The stage atom's run, fully instantiated**: from its entry phase to
 the exit phase, the verdict – the `old` track's bit at the cell the built
 TARGET addresses – stored in the atom's control slot, the marker, mirror
@@ -985,19 +996,19 @@ theorem stageAtom_run (b : Bool)
       b = true) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.savP .up)) f₀), Sum.inl v',
-        wideTape (PR.trackTape Slot.mir (dt.back PR.zero PR.one dt.dd0Le st)
+        wideTape (PR.trackTapeAt RF.cell Slot.mir (dt.back RF.cell PR.zero PR.one dt.dd0Le st)
           st.mir) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.stageArgs PR.zero PR.one vi iv ts av).setAv b
-            (dt.stageFAt PR.zero PR.one vi iv ts av st v f₀
+            (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀
               (dt.d.B.arity iv))
-            (dt.back PR.zero PR.one dt.dd0Le
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le
               (dt.stageAtSt st v
                 (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv)))
               (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv))))),
         Sum.inl v',
-        wideTape (PR.trackTape Slot.mir
-          (dt.back PR.zero PR.one dt.dd0Le (dt.stageEndSt st v))
+        wideTape (PR.trackTapeAt RF.cell Slot.mir
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.stageEndSt st v))
           (dt.stageEndSt st v).mir) (PR.syElt PR.blank)⟩ := by
   classical
   have hzo := PR.zero_ne_one
@@ -1010,12 +1021,16 @@ theorem stageAtom_run (b : Bool)
     simp only [stageXD, tagBlk_blkElt] at hblk
     exact nomatch hblk
   have hT : WMSetLt WMLe
-      (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv)) (wmSeg gbot) :=
-    wmSetLt_wmSeg_of_not_bot hbot hmTb gbot
+      (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv)) (RF.cell gbot) :=
+    hwork hmTb gbot
   obtain ⟨T', hTi⟩ := exists_wmIncr hlin ⟨gbot, hmTb⟩
-  refine dt.stage_run hrules hR hlin hord htop hbot hv hvi hwkSt hmirSt
-    hbotSt hT hTi ?_ ?_ ?_
-  · exact dt.stageChain_run hrules hR hlin hbot hv hvi hwkSt hmirSt f₀
+  refine dt.stage_run (dt.diagLaid RF hord) (elt := id) (Use := fun _ => True)
+    (fun _ _ h => h) (dt.wmLt_diagLaid_le RF hord) (fun _ x _ _ => ⟨x, trivial, rfl⟩)
+    hrules hR hlin (dt.isLinOrd_diagLaid_le RF hord hlin)
+    (fun y => (hord y gtop).mp (htop y)) (fun y => (hord gbot y).mp (hbot y))
+    hv hvi hwkSt hmirSt
+    hbotSt (fun x _ => ⟨x, trivial, rfl⟩) (fun x _ => ⟨x, trivial, rfl⟩) hT hTi ?_ ?_ ?_
+  · exact dt.stageChain_run RF hord hrules hR hlin hbot hv hvi hwkSt hmirSt f₀
   · change bitVal PR.zero PR.one
       (st.old iv (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv))) =
       PR.one ↔ b = true

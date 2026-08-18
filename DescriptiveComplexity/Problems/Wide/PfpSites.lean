@@ -189,27 +189,6 @@ def nameG (one : A) (b : Fin dt.ko ⊕ Fin dt.ki) (coord : Fin dt.dd0 → Q) :
     (Q → A) → (dt.SlotIx → A) → Prop :=
   dt.nameGF one b fun fc j => fc (coord j)
 
-/-- **A named single-bit read**: the leaf trip of the element loops, on any
-track, at the cell the name guard identifies. -/
-def readBitKit (t : dt.SlotIx) (b : Fin dt.ko ⊕ Fin dt.ki)
-    (coord : Fin dt.dd0 → Q) (one : A) (emb : ReadPh → P) :
-    ReadKit A Q dt.SlotIx P where
-  t := t
-  wk := .wk
-  Match := dt.nameG one b coord
-  emb := emb
-
-/-- **A named single-bit write**: the same trip writing the digit, the bit a
-function of the control. -/
-def writeBitKit (t : dt.SlotIx) (b : Fin dt.ko ⊕ Fin dt.ki)
-    (coord : Fin dt.dd0 → Q) (bVal : (Q → A) → Prop) (one : A)
-    (emb : WritePh → P) : WriteKit A Q dt.SlotIx P where
-  t := t
-  wk := .wk
-  Match := dt.nameG one b coord
-  bVal := bVal
-  emb := emb
-
 end PfpData
 
 end Pfp

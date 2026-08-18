@@ -181,6 +181,27 @@ def tagBlk : PfpTag R P (Fin ko ⊕ₗ Fin ki) → Option (Fin ko ⊕ Fin ki)
   | .arg i => some (ofLex i)
   | _ => none
 
+omit [LinearOrder R] [LinearOrder P] in
+/-- **The block mark decodes the tag**: only an argument tag has a block, and it
+has its own. -/
+theorem tagBlk_eq_some_iff (τ : PfpTag R P (Fin ko ⊕ₗ Fin ki))
+    (b' : Fin ko ⊕ Fin ki) :
+    tagBlk τ = some b' ↔ τ = PfpTag.arg (toLex b') := by
+  cases τ with
+  | ctrl r => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
+  | sym => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
+  | phase p => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
+  | arg i =>
+    constructor
+    · intro h
+      have h' : ofLex i = b' := Option.some.inj h
+      subst h'
+      rfl
+    · intro h
+      have h' : i = toLex b' := by injection h
+      subst h'
+      rfl
+
 variable [LinearOrder A]
 
 open Classical in
@@ -240,6 +261,84 @@ theorem slotMark_regFirst_iff (hne : zero ≠ one) (x : Univ A R P (Fin ko ⊕�
     slotMark (ι := ι) zero one hdd x .regFirst = one ↔
       ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, tagTupleLe x y :=
   bitVal_iff hne
+
+/-- **Being the greatest element that carries no argument block**: the element
+the *register* channel marks below its file, so that every logical address stays
+clear of it and the file lies above the working area
+(`DescriptiveComplexity.wmSetLt_wmRegSeg_of_above`). -/
+def IsTopNonArg (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) : Prop :=
+  (∀ i, x.1 ≠ PfpTag.arg i) ∧
+    ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, (∀ i, y.1 ≠ PfpTag.arg i) → tagTupleLe y x
+
+/-- **There is only one greatest element carrying no argument block**: two of
+them bound each other. -/
+theorem IsTopNonArg.unique {x y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd}
+    (hx : IsTopNonArg x) (hy : IsTopNonArg y) : x = y :=
+  (Wide.isLinOrd_tagTupleLe (Tag := PfpTag R P (Fin ko ⊕ₗ Fin ki)) (A := A)
+    (d := dd)).2.2.1 x y (hy.2 x hx.1) (hx.2 y hy.1)
+
+open Classical in
+/-- **The mark of the cell of an element, at the register channel**: the mark
+above with one slot changed. The channel writes for the argument elements and
+for one element below them, so the file's *first* register is not the least
+element of the universe but the greatest element carrying no argument block –
+and that is what the `regFirst` slot has to say, the walks reading the file's
+ends off these two slots. The `regLast` slot needs no change: the argument tags
+being the greatest, the last register is the last element. -/
+noncomputable def regSlotMark (zero one : A) (hdd : dd0 ≤ dd)
+    (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) (s : Slot ι ko ki dd0) : A :=
+  match s with
+  | .regFirst => bitVal zero one (IsTopNonArg x)
+  | s => slotMark zero one hdd x s
+
+@[simp]
+theorem regSlotMark_regFirst (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
+    regSlotMark (ι := ι) zero one hdd x .regFirst = bitVal zero one (IsTopNonArg x) := rfl
+
+@[simp]
+theorem regSlotMark_reg (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
+    regSlotMark (ι := ι) zero one hdd x .reg = one := rfl
+
+@[simp]
+theorem regSlotMark_name (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) (j : Fin dd0) :
+    regSlotMark (ι := ι) zero one hdd x (.name j) = x.2 (Fin.castLE hdd j) := rfl
+
+@[simp]
+theorem regSlotMark_regLast (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
+    regSlotMark (ι := ι) zero one hdd x .regLast =
+      bitVal zero one (∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, tagTupleLe y x) := rfl
+
+@[simp]
+theorem regSlotMark_blk (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd)
+    (b : Option (Fin ko ⊕ Fin ki)) :
+    regSlotMark (ι := ι) zero one hdd x (.blk b) = bitVal zero one (tagBlk x.1 = b) := rfl
+
+@[simp]
+theorem regSlotMark_pdd (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
+    regSlotMark (ι := ι) zero one hdd x .pdd =
+      bitVal zero one (∀ j : Fin dd, dd0 ≤ (j : ℕ) → x.2 j = zero) := rfl
+
+/-- Off the two ends and the names, the register channel's mark is clear. -/
+theorem regSlotMark_track (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd)
+    (s : Slot ι ko ki dd0) (hs : ∀ b, s ≠ .blk b) (hs' : ∀ j, s ≠ .name j)
+    (h1 : s ≠ .reg) (h2 : s ≠ .regFirst) (h3 : s ≠ .regLast) (h4 : s ≠ .pdd) :
+    regSlotMark (ι := ι) zero one hdd x s = zero := by
+  match s with
+  | .reg => exact absurd rfl h1
+  | .regFirst => exact absurd rfl h2
+  | .regLast => exact absurd rfl h3
+  | .blk b => exact absurd rfl (hs b)
+  | .name j => exact absurd rfl (hs' j)
+  | .pdd => exact absurd rfl h4
+  | .mir => rfl
+  | .tgt => rfl
+  | .sav => rfl
+  | .val => rfl
+  | .wk => rfl
+  | .bot => rfl
+  | .ltp => rfl
+  | .old _ => rfl
+  | .new _ => rfl
 
 /-- **The least element carries no argument block**: the argument tags are the
 greatest ones (`DescriptiveComplexity.Pfp.lt_arg`), so the minimum of the

@@ -306,7 +306,7 @@ theorem uTagArgsDef_igateArgs (e₀ : Env L) (b : Fin dt.ko ⊕ Fin dt.ki)
 /-- **Every atom kind's pack meets its obligation**, one constructor at a
 time. -/
 theorem uKindArgsDef_kindArgsOf (v : dt.VarIx) (a : Fin dt.natMax) :
-    ∀ (κ : MatAtom dt.X dt.d (dt.nOf v))
+    ∀ (κ : MatAtom dt.X dt.d.B (dt.nOf v))
       (hk : dt.kindArgs κ * @Fintype.card dt.X.Tag (Fintype.ofFinite _) ≤ dt.ntgDim)
       (hn : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim),
       UKindArgsDef (L := L) (Q := dt.CtlIx) κ

@@ -297,6 +297,81 @@ noncomputable def stageRule :
 
 variable {emb}
 
+/-- **A property of a stage atom's phases and its exit holds of every phase it
+can move to**: the save, the clear, the tuple loops, the two resets, the two
+mirror clears and the two seeks all stay inside the machinery's own phases, and
+only the last seek's verdict leaves. This is what a determinism-after-the-guess
+argument asks of the random access
+(`DescriptiveComplexity.Pfp.PfpData.nexProg_uniqueFrom`). -/
+theorem stageRule_dstIn {S : P → Prop} (hemb : ∀ p : StagePh k, S (emb p))
+    (hexit : S exitPh) (i : StageSite k) (ρ : StageSh k i) :
+    S (dt.stageRule zero one emb srcTrack srcBlk dstBlk coord bitFlag setBit
+      initLv advLv IsMaxLv oldSlot setAv exitPh i ρ).dstPh := by
+  have hfirst : S (stageFirstTup (k := k) emb) := by
+    rw [stageFirstTup]; split <;> exact hemb _
+  have hnext : ∀ ℓ : Fin k, S (stageNextTup emb ℓ) := by
+    intro ℓ; rw [stageNextTup]; split <;> exact hemb _
+  match i, ρ with
+  | .sav, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (CopyKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.sav Slot.mir Slot.reg
+      Slot.regLast Slot.wk (fun t => emb (.savP t))).dstPh_emb one ρ
+    exact hp ▸ hemb _
+  | .sav, Sum.inr _ => exact hemb _
+  | .clr, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (ClearKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.tgt Slot.reg
+      Slot.regLast Slot.wk (fun t => emb (.clrP t))).dstPh_emb zero one ρ
+    exact hp ▸ hemb _
+  | .clr, Sum.inr _ => exact hfirst
+  | .tup ℓ c, ρ =>
+    exact tupleRule_dstIn (zero := zero) (one := one) (wk := Slot.wk)
+      (rg := Slot.reg) (emb := fun p => emb (.tupP ℓ p)) (tSrc := srcTrack ℓ)
+      (tDst := Slot.tgt) (MatchS := dt.nameG one (srcBlk ℓ) coord)
+      (MatchD := dt.nameG one (dstBlk ℓ) coord) (bitFlag := bitFlag)
+      (setBit := setBit) (initLv := initLv) (advLv := advLv)
+      (IsMaxLv := IsMaxLv) (exitPh := stageNextTup emb ℓ)
+      (fun p => hemb _) (hnext ℓ) c ρ
+  | .cR1, .stay => exact hemb _
+  | .cR1, .dspA => exact hemb _
+  | .cR1, .dspB => exact hemb _
+  | .rst1, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (ResetKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir Slot.bot Slot.wk
+      (fun t => emb (.rst1P t))).dstPh_emb one ρ
+    exact hp ▸ hemb _
+  | .rst1, Sum.inr _ => exact hemb _
+  | .cm1, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (ClearKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir Slot.reg
+      Slot.regLast Slot.wk (fun t => emb (.cm1P t))).dstPh_emb zero one ρ
+    exact hp ▸ hemb _
+  | .cm1, Sum.inr _ => exact hemb _
+  | .sk, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (SeekKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir Slot.tgt Slot.reg
+      Slot.regLast Slot.wk (fun p => emb (.skP p))).dstPh_emb zero one ρ
+    exact hp ▸ hemb _
+  | .sk, Sum.inr _ => exact hemb _
+  | .res, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (CopyKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.tgt Slot.sav Slot.reg
+      Slot.regLast Slot.wk (fun t => emb (.resP t))).dstPh_emb one ρ
+    exact hp ▸ hemb _
+  | .res, Sum.inr _ => exact hemb _
+  | .cR2, .stay => exact hemb _
+  | .cR2, .dspA => exact hemb _
+  | .cR2, .dspB => exact hemb _
+  | .rst2, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (ResetKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir Slot.bot Slot.wk
+      (fun t => emb (.rst2P t))).dstPh_emb one ρ
+    exact hp ▸ hemb _
+  | .rst2, Sum.inr _ => exact hemb _
+  | .cm2, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (ClearKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir Slot.reg
+      Slot.regLast Slot.wk (fun t => emb (.cm2P t))).dstPh_emb zero one ρ
+    exact hp ▸ hemb _
+  | .cm2, Sum.inr _ => exact hemb _
+  | .sk2, Sum.inl ρ =>
+    obtain ⟨p, hp⟩ := (SeekKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir Slot.tgt Slot.reg
+      Slot.regLast Slot.wk (fun p => emb (.sk2P p))).dstPh_emb zero one ρ
+    exact hp ▸ hemb _
+  | .sk2, Sum.inr _ => exact hexit
+
 /-- **Every rule of a stage atom's machinery fires from a phase its site
 owns**; the tuple loops' obligation is their own. -/
 theorem stageHosrc :

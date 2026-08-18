@@ -34,6 +34,12 @@ What makes the scans stop at the encodings' cells at all is that an encoded
 tuple is *canonically padded* (`encTup_isPad`): the layout inhabits the first
 `dd₀` coordinates only, which is the budget
 `DescriptiveComplexity.Pfp.PfpData.lyLt` fixes.
+
+The same padding is what carries all of this to a **coarse** file, where a
+register is not an element: `DescriptiveComplexity.Pfp.PfpData.ixEncG_iff` says
+the read stops at the register the layout names by the encoded tuple's
+coordinates, and `elt_reg_encCoord` says that register's address is the cell the
+elementwise read would have gone to.
 -/
 
 namespace DescriptiveComplexity
@@ -117,22 +123,25 @@ end Enc
 section Guard
 
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
-variable {st : TapeSt dt A R' P'}
+variable {st : TapeStD dt A R' P'}
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 
+omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
+  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- **A leaf read stops at exactly the encoded tuple's cell.** The guard of
 the trip – the block one-hot, the padding mark and the name slots against the
 coordinates the control computes – holds at a register cell precisely when
 that cell is the cell of the encoded tuple. -/
 theorem encG_iff (hzo : zero ≠ one)
-    (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
+    {cell : Univ A R' P' dt.KIx dt.dd → (Univ A R' P' dt.KIx dt.dd → Prop)}
+    (hinj : Function.Injective cell)
     {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (c : PtCode dt.X)
     (pay : (Q → A) → Fin (blockArityBound dt.X.B) → A) (fc : Q → A)
     (u : Univ A R' P' dt.KIx dt.dd) :
     dt.nameGF one b (dt.encCoord zero one c pay) fc
-        (dt.back zero one dt.dd0Le st (wmSeg u)) ↔
+        (dt.back cell zero one dt.dd0Le st (cell u)) ↔
       u = dt.blkElt b (encTup dt.ly zero one c (pay fc)) := by
-  rw [dt.nameGF_wmSeg hzo hlin]
+  rw [dt.nameGF_cell hzo hinj]
   constructor
   · rintro ⟨hb, hp, hn⟩
     refine eq_of_slotMark_name (hdd := dt.dd0Le) (hb.trans (dt.tagBlk_blkElt b _).symm)
@@ -141,17 +150,20 @@ theorem encG_iff (hzo : zero ≠ one)
     exact ⟨dt.tagBlk_blkElt b _, fun j hj => encTup_isPad c (pay fc) j hj,
       fun _ => rfl⟩
 
+omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
+  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- **A coordinate-loop trip stops at exactly the padded cell of the tuple
 the control holds.** The comparison and copy loops enumerate tuples of `dd₀`
 coordinates and visit the canonically padded cell of each, in whichever block
 they are reading. -/
 theorem nameG_iff (hzo : zero ≠ one)
-    (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
+    {cell : Univ A R' P' dt.KIx dt.dd → (Univ A R' P' dt.KIx dt.dd → Prop)}
+    (hinj : Function.Injective cell)
     {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (coord : Fin dt.dd0 → Q) (fc : Q → A)
     (u : Univ A R' P' dt.KIx dt.dd) :
-    dt.nameG one b coord fc (dt.back zero one dt.dd0Le st (wmSeg u)) ↔
+    dt.nameG one b coord fc (dt.back cell zero one dt.dd0Le st (cell u)) ↔
       u = dt.blkElt b (pad zero fun j => fc (coord j)) := by
-  rw [dt.nameG_wmSeg hzo hlin]
+  rw [dt.nameG_cell hzo hinj]
   constructor
   · rintro ⟨hb, hp, hn⟩
     refine eq_of_slotMark_name (hdd := dt.dd0Le)
@@ -169,19 +181,77 @@ theorem nameG_iff (hzo : zero ≠ one)
       exact pad_of_lt (c := dt.dd0) (zero := zero) (w := fun j' => fc (coord j'))
         (Fin.castLE dt.dd0Le j) j.isLt
 
+omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
+  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- The guard does hold at the encoded tuple's cell – the arrival of the
 trip. -/
 theorem encG_holds (hzo : zero ≠ one)
-    (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
+    {cell : Univ A R' P' dt.KIx dt.dd → (Univ A R' P' dt.KIx dt.dd → Prop)}
+    (hinj : Function.Injective cell)
     {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (c : PtCode dt.X)
     (pay : (Q → A) → Fin (blockArityBound dt.X.B) → A) (fc : Q → A) :
     dt.nameGF one b (dt.encCoord zero one c pay) fc
-      (dt.back zero one dt.dd0Le st
-        (wmSeg (dt.blkElt (R' := R') (P' := P') b
+      (dt.back cell zero one dt.dd0Le st
+        (cell (dt.blkElt (R' := R') (P' := P') b
           (encTup dt.ly zero one c (pay fc))))) :=
-  (dt.encG_iff hzo hlin b c pay fc _).mpr rfl
+  (dt.encG_iff hzo hinj b c pay fc _).mpr rfl
 
 end Guard
+
+
+/-! ### The register an encoded tuple is, at an arbitrary file -/
+
+section IxEnc
+
+variable {I : Type} {lay : Layout dt A R' P' I} {stI : TapeSt dt A R' P' I}
+variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
+variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
+  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
+/-- **A leaf read at a coarse file stops at exactly one register**: the one the
+layout names by the encoded tuple's coordinates. The elementwise
+`DescriptiveComplexity.Pfp.PfpData.encG_iff` read at a file whose registers are
+not elements – the trips of an expansion atom ask which register they stopped
+at, and the answer is a name the layout knows. -/
+theorem ixEncG_iff (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
+    (hsep : lay.NameSep zero dt.dd0Le) (hhas : lay.HasName zero)
+    {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (c : PtCode dt.X)
+    (pay : (Q → A) → Fin (blockArityBound dt.X.B) → A) (fc : Q → A) (u : I) :
+    dt.nameGF one b (dt.encCoord zero one c pay) fc
+        (dt.ixBack lay zero one dt.dd0Le stI (lay.cell u)) ↔
+      u = lay.reg hhas b (dt.encCoord zero one c pay fc) :=
+  dt.ixNameGF_iff hzo hinj hsep hhas b _ fc u
+
+omit [LinearOrder A] [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
+  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
+/-- **The coordinates of an encoded tuple are the tuple, cut down**: what the
+control computes for a leaf read is the payload the layout stores, so padding it
+back gives the encoded tuple itself. -/
+theorem pad_encCoord {Q : Type} (c : PtCode dt.X)
+    (pay : (Q → A) → Fin (blockArityBound dt.X.B) → A) (fc : Q → A) :
+    pad zero (dt.encCoord zero one c pay fc) = encTup dt.ly zero one c (pay fc) :=
+  pad_unpad dt.dd0Le fun j hj => encTup_isPad c (pay fc) j hj
+
+omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
+  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
+  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
+/-- **The register a leaf read names holds the encoded tuple**: with the file's
+names coherent with the encoding, the address of that register is the
+elementwise cell the same read would have gone to. This is the one place the
+coarse file and the encoding have to agree, and
+`DescriptiveComplexity.Pfp.PfpData.pad_encCoord` is why they do. -/
+theorem elt_reg_encCoord {elt : I → Univ A R' P' dt.KIx dt.dd} (hhas : lay.HasName zero)
+    (helt : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (w : Fin dt.dd0 → A),
+      elt (lay.reg hhas b w) = dt.blkElt b (pad zero w))
+    {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (c : PtCode dt.X)
+    (pay : (Q → A) → Fin (blockArityBound dt.X.B) → A) (fc : Q → A) :
+    elt (lay.reg hhas b (dt.encCoord zero one c pay fc)) =
+      dt.blkElt b (encTup dt.ly zero one c (pay fc)) := by
+  rw [helt, dt.pad_encCoord c pay fc]
+
+end IxEnc
 
 /-! ### What the trip finds there -/
 

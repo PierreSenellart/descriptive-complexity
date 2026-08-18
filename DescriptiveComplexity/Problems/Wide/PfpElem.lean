@@ -147,6 +147,51 @@ def elemRule : ∀ i : ElemSite nr, ElemSh nr i → Rule A Q W P
 
 variable {emb}
 
+/-- **An element loop leaves only into its own phases or its exit**: the reads'
+trips stay inside the loop's phases (`DescriptiveComplexity.Pfp.ReadKit.dstPh_emb`),
+the dispatches land at the next read or the fold checkpoint, and the last one
+leaves. This is what a caller reads off a stage to know the phases the machine
+can be in. -/
+theorem elemRule_dstPh (i : ElemSite nr) (ρ : ElemSh nr i) :
+    (∃ p : ElemPh nr,
+      (elemRule one wk rg emb rdTrack MatchOf setFlag initEl advEl exitSt IsMaxEl
+        exitPh i ρ).dstPh = emb p) ∨
+    (elemRule one wk rg emb rdTrack MatchOf setFlag initEl advEl exitSt IsMaxEl
+      exitPh i ρ).dstPh = exitPh := by
+  have hfirst : ∃ p : ElemPh nr, elemFirstRd emb = emb p := by
+    by_cases h : 0 < nr
+    · exact ⟨_, dif_pos h⟩
+    · exact ⟨_, dif_neg h⟩
+  have hnext : ∀ j : Fin nr, ∃ p : ElemPh nr, elemNextRd emb j = emb p := by
+    intro j
+    by_cases h : (j : ℕ) + 1 < nr
+    · exact ⟨_, dif_pos h⟩
+    · exact ⟨_, dif_neg h⟩
+  match i, ρ with
+  | .e0, .stay => exact Or.inl ⟨_, rfl⟩
+  | .e0, .dspA => exact Or.inl hfirst
+  | .e0, .dspB => exact Or.inl ⟨_, rfl⟩
+  | .rd j, Sum.inl ρ' =>
+    obtain ⟨p, hp⟩ := (ReadKit.mk (rdTrack j) wk (MatchOf j)
+      (fun rp => emb (.rdP j rp))).dstPh_emb one ρ'
+    exact Or.inl ⟨.rdP j p, hp⟩
+  | .rd j, Sum.inr b => exact Or.inl (hnext j)
+  | .e1, .stay => exact Or.inl ⟨_, rfl⟩
+  | .e1, .dspA => exact Or.inl hfirst
+  | .e1, .dspB => exact Or.inr rfl
+
+/-- **A property of a loop's phases and its exit holds of every phase it can
+move to.** This is the form a caller uses: give the property, check it of the
+loop's own phases and of the exit, and every rule respects it. -/
+theorem elemRule_dstIn {S : P → Prop} (hemb : ∀ p : ElemPh nr, S (emb p))
+    (hexit : S exitPh) (i : ElemSite nr) (ρ : ElemSh nr i) :
+    S (elemRule one wk rg emb rdTrack MatchOf setFlag initEl advEl exitSt IsMaxEl
+      exitPh i ρ).dstPh := by
+  rcases elemRule_dstPh one wk rg rdTrack MatchOf setFlag initEl advEl exitSt
+    IsMaxEl exitPh i ρ with ⟨p, hp⟩ | hp
+  · rw [hp]; exact hemb p
+  · rw [hp]; exact hexit
+
 /-- **Every rule of an element loop fires from a phase its site owns.** -/
 theorem elemHosrc :
     ∀ (i : ElemSite nr) (ρ : ElemSh nr i),

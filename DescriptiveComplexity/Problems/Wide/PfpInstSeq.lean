@@ -62,14 +62,14 @@ generated element family.** -/
 theorem elemFam_apply_of (q : Q) {nr : ℕ}
     {setFlag : Fin nr → Bool → (Q → A) → (W → A) → Q → A}
     {initEl advEl : (Q → A) → (W → A) → Q → A}
-    {rest : (Univ A R P K dd → Prop) → W → A}
+    {I : Type} {rest : (Univ A R P K dd → Prop) → W → A}
     {v : Univ A R P K dd → Prop}
-    {m : Fin nr → Univ A R P K dd → Prop}
+    {m : Fin nr → I → Prop}
     (hSet : ∀ (k : Fin nr) (bb : Bool) (f : Q → A) (g : W → A),
       setFlag k bb f g q = f q)
     (hInit : ∀ (f : Q → A) (g : W → A), initEl f g q = f q)
     (hAdv : ∀ (f : Q → A) (g : W → A), advEl f g q = f q)
-    (xOf : ι → Fin nr → Univ A R P K dd) (f₀ : Q → A) (a : ι)
+    (xOf : ι → Fin nr → I) (f₀ : Q → A) (a : ι)
     (j : Fin (nr + 1)) :
     elemFam setFlag initEl advEl rest v m xOf f₀ a j q = f₀ q := by
   classical
@@ -100,13 +100,13 @@ generated tuple family.** -/
 theorem tupleIter1_apply_of (q : Q)
     {setBit : Bool → (Q → A) → (W → A) → Q → A}
     {initLv advLv : (Q → A) → (W → A) → Q → A}
-    {mSrc : Univ A R P K dd → Prop}
+    {I : Type} {mSrc : I → Prop}
     {v : Univ A R P K dd → Prop}
-    {restF : (Univ A R P K dd → Prop) → (Univ A R P K dd → Prop) → W → A}
+    {restF : (I → Prop) → (Univ A R P K dd → Prop) → W → A}
     (hSet : ∀ (bb : Bool) (f : Q → A) (g : W → A), setBit bb f g q = f q)
     (hInit : ∀ (f : Q → A) (g : W → A), initLv f g q = f q)
     (hAdv : ∀ (f : Q → A) (g : W → A), advLv f g q = f q)
-    (xS xD : ι → Univ A R P K dd) (mD₀ : Univ A R P K dd → Prop)
+    (xS xD : ι → I) (mD₀ : I → Prop)
     (f₀ : Q → A) (a : ι) :
     tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a q = f₀ q := by
   classical
@@ -150,17 +150,21 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 variable {PR : Prog A R P dt.CtlIx dt.SlotIx dt.KIx dt.dd}
+variable (RF : RegFile (Univ A R P dt.KIx dt.dd))
+-- The channel writes its marks in the tags' own order, the machine walks the
+-- tape in the addresses'; the two agree.
+variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
 
 section KindStage
 
 variable (zero one : A)
 variable (vi : dt.VarIx) (av : Fin dt.natMax)
-variable (st : TapeSt dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
+variable (st : TapeStD dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
 
 /-- **The semantic data of one atom's run**: an expansion atom needs the
 points its levels' registers encode; the other kinds need nothing. -/
-noncomputable def KindSem : MatAtom dt.X dt.d (dt.nOf vi) → Type
+noncomputable def KindSem : MatAtom dt.X dt.d.B (dt.nOf vi) → Type
   | .eq _ _ => PUnit
   | .ord _ _ => PUnit
   | .stage _ _ => PUnit
@@ -179,9 +183,9 @@ built at an address's entry state — serve every position of the spine and
 every round of the VAL loop, whose states differ from it in the tracks
 they have written and in the two scratch registers. -/
 noncomputable def kindSemCast (zero one : A) (vi : dt.VarIx)
-    {st st' : TapeSt dt A R P}
+    {st st' : TapeStD dt A R P}
     (hmir : st.mir = st'.mir) (hval : st.val = st'.val)
-    (κ : MatAtom dt.X dt.d (dt.nOf vi))
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (s : dt.KindSem zero one vi st κ) : dt.KindSem zero one vi st' κ :=
   match κ, s with
   | .eq _ _, s => s
@@ -198,10 +202,10 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 /-- **Transporting twice is transporting once**: the pack's content is its
 points, and the proof it carries is irrelevant. -/
 theorem kindSemCast_kindSemCast (zero one : A) (vi : dt.VarIx)
-    {st st' st'' : TapeSt dt A R P}
+    {st st' st'' : TapeStD dt A R P}
     (h1 : st.mir = st'.mir) (h2 : st.val = st'.val)
     (h3 : st'.mir = st''.mir) (h4 : st'.val = st''.val)
-    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (s : dt.KindSem zero one vi st κ) :
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (s : dt.KindSem zero one vi st κ) :
     dt.kindSemCast zero one vi h3 h4 κ (dt.kindSemCast zero one vi h1 h2 κ s) =
       dt.kindSemCast zero one vi (h1.trans h3) (h2.trans h4) κ s := by
   cases κ <;> rfl
@@ -213,11 +217,11 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 loop's bridge closes with: the pack leaves the round state, travels to the
 round's own state and to the state its matrix threads, and comes back. -/
 theorem kindSemCast_triple (zero one : A) (vi : dt.VarIx)
-    {st₁ st₂ st₃ : TapeSt dt A R P}
+    {st₁ st₂ st₃ : TapeStD dt A R P}
     (h1 : st₁.mir = st₂.mir) (h2 : st₁.val = st₂.val)
     (h3 : st₂.mir = st₃.mir) (h4 : st₂.val = st₃.val)
     (h5 : st₃.mir = st₁.mir) (h6 : st₃.val = st₁.val)
-    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (s : dt.KindSem zero one vi st₁ κ) :
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (s : dt.KindSem zero one vi st₁ κ) :
     dt.kindSemCast zero one vi h5 h6 κ
         (dt.kindSemCast zero one vi h3 h4 κ
           (dt.kindSemCast zero one vi h1 h2 κ s)) = s := by
@@ -228,8 +232,8 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Finite P] [Nonempty A] [L.IsRelational] in
 /-- **Transporting to the same state is doing nothing.** -/
 theorem kindSemCast_self (zero one : A) (vi : dt.VarIx)
-    {st : TapeSt dt A R P} (h1 : st.mir = st.mir) (h2 : st.val = st.val)
-    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (s : dt.KindSem zero one vi st κ) :
+    {st : TapeStD dt A R P} (h1 : st.mir = st.mir) (h2 : st.val = st.val)
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (s : dt.KindSem zero one vi st κ) :
     dt.kindSemCast zero one vi h1 h2 κ s = s := by
   cases κ <;> rfl
 
@@ -238,27 +242,29 @@ open Classical in
 exit at the comparison's or the expansion atom's family, the verdict store
 at the stage atom's read bit. -/
 noncomputable def kindExitCtl :
-    ∀ κ : MatAtom dt.X dt.d (dt.nOf vi),
+    ∀ κ : MatAtom dt.X dt.d.B (dt.nOf vi),
       dt.KindSem zero one vi st κ →
       dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim →
       dt.kindDepth κ ≤ dt.eDim → dt.kindReads κ ≤ dt.nfDim →
       (dt.CtlIx → A) → dt.CtlIx → A
   | .eq j₁ j₂, _, _, _, hrd, f =>
     (dt.cmpArgs zero one vi av hrd true j₁ j₂).exitSt
-      (dt.cmpFam zero one vi av hrd true j₁ j₂ st v f (toLex topTup)
+      (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero :=
+          zero)) vi av hrd true j₁ j₂ st v f (toLex topTup)
         (Fin.last 2))
-      (dt.back zero one dt.dd0Le st v)
+      (dt.back RF.cell zero one dt.dd0Le st v)
   | .ord j₁ j₂, _, _, _, hrd, f =>
     (dt.cmpArgs zero one vi av hrd false j₁ j₂).exitSt
-      (dt.cmpFam zero one vi av hrd false j₁ j₂ st v f (toLex topTup)
+      (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero :=
+          zero)) vi av hrd false j₁ j₂ st v f (toLex topTup)
         (Fin.last 2))
-      (dt.back zero one dt.dd0Le st v)
+      (dt.back RF.cell zero one dt.dd0Le st v)
   | .stage i ts, _, _, _, _, f =>
     (dt.stageArgs zero one vi i ts av).setAv
       (if st.old i (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i))
         then true else false)
-      (dt.stageFAt zero one vi i ts av st v f (dt.d.B.arity i))
-      (dt.back zero one dt.dd0Le
+      (dt.stageFAt RF zero one vi i ts av st v f (dt.d.B.arity i))
+      (dt.back RF.cell zero one dt.dd0Le
         (dt.stageAtSt st v
           (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i)))
         (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i)))
@@ -270,12 +276,12 @@ noncomputable def kindExitCtl :
       (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
         (blkAtoms (dt.relPk e τ').mat).length) (Finset.mem_univ τ)) hrd)).exitSt
       (fun ℓ => (sem.1 ℓ).1.1)
-      (dt.expFam zero one vi ts e av st (fun ℓ => (sem.1 ℓ).1.1) hk
+      (dt.expFam RF zero one vi ts e av st (fun ℓ => (sem.1 ℓ).1.1) hk
         (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
           (dt.relPk e τ').n) (Finset.mem_univ τ)) hn)
         (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
           (blkAtoms (dt.relPk e τ').mat).length) (Finset.mem_univ τ)) hrd) v
-        (dt.expTagFam zero one vi ts e av st hk
+        (dt.expTagFam RF zero one vi ts e av st hk
           (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
             (dt.relPk e τ').n) (Finset.mem_univ τ)) hn)
           (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
@@ -283,7 +289,7 @@ noncomputable def kindExitCtl :
           v f (Fin.last (k * Fintype.card dt.X.Tag)))
         (toLex topTup)
         (Fin.last (dt.relNr e (fun ℓ => (sem.1 ℓ).1.1))))
-      (dt.back zero one dt.dd0Le st v)
+      (dt.back RF.cell zero one dt.dd0Le st v)
 
 variable {dt zero one vi av st v}
 
@@ -296,27 +302,27 @@ siblings). The pack travels by
 `DescriptiveComplexity.Pfp.PfpData.kindSemCast`, which keeps its points.
 This is the brick the whole threaded-versus-unthreaded bridge is built
 from. -/
-theorem kindExitCtl_congr_scratch {st' : TapeSt dt A R P}
+theorem kindExitCtl_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st')
-    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
-    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (sem : dt.KindSem zero one vi st κ)
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u)
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (sem : dt.KindSem zero one vi st κ)
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hn : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
     (f : dt.CtlIx → A) :
-    dt.kindExitCtl zero one vi av st v κ sem hk hn hrd f =
-      dt.kindExitCtl zero one vi av st' v κ
+    dt.kindExitCtl RF hord zero one vi av st v κ sem hk hn hrd f =
+      dt.kindExitCtl RF hord zero one vi av st' v κ
         (dt.kindSemCast zero one vi h.2.1 h.2.2.1 κ sem) hk hn hrd f := by
   classical
   cases κ with
   | eq j₁ j₂ =>
     refine Eq.trans (dt.cmpArgs_exitSt_congr zero one vi av hrd true j₁ j₂ _ _
-      (dt.back zero one dt.dd0Le st' v)) ?_
-    rw [dt.cmpFam_congr_scratch hrd h hreg]
+      (dt.back RF.cell zero one dt.dd0Le st' v)) ?_
+    rw [dt.cmpFam_congr_scratch (laidFile RF hord) hrd h hreg]
     rfl
   | ord j₁ j₂ =>
     refine Eq.trans (dt.cmpArgs_exitSt_congr zero one vi av hrd false j₁ j₂ _ _
-      (dt.back zero one dt.dd0Le st' v)) ?_
-    rw [dt.cmpFam_congr_scratch hrd h hreg]
+      (dt.back RF.cell zero one dt.dd0Le st' v)) ?_
+    rw [dt.cmpFam_congr_scratch (laidFile RF hord) hrd h hreg]
     rfl
   | stage i ts =>
     have hold : st.old i (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i)) =
@@ -324,18 +330,18 @@ theorem kindExitCtl_congr_scratch {st' : TapeSt dt A R P}
       rw [← dt.stageTgtD_congr_scratch (v := v) h (dt.d.B.arity i)]
       exact congrFun (congrFun h.2.2.2.1 i) _
     refine Eq.trans (dt.stageArgs_setAv_congr zero one vi i ts av _ _ _
-      (dt.back zero one dt.dd0Le
+      (dt.back RF.cell zero one dt.dd0Le
         (dt.stageAtSt st' v
           (dt.stageTgtD zero vi i ts st' v (dt.d.B.arity i)))
         (dt.stageTgtD zero vi i ts st' v (dt.d.B.arity i)))) ?_
     rw [if_congr (iff_of_eq hold) rfl rfl,
-      dt.stageFAt_congr_scratch h hreg f (dt.d.B.arity i)]
+      dt.stageFAt_congr_scratch RF h hreg f (dt.d.B.arity i)]
     rfl
   | @exp k e ts =>
     refine Eq.trans (dt.expArgs_exitSt_congr zero one vi ts e av hk _ _ _ _ _
-      (dt.back zero one dt.dd0Le st' v)) ?_
-    rw [dt.expTagFam_congr_scratch (k := k) (hk := hk) h hreg,
-      dt.expFam_congr_scratch (k := k) (hk := hk) h hreg]
+      (dt.back RF.cell zero one dt.dd0Le st' v)) ?_
+    rw [dt.expTagFam_congr_scratch (k := k) (hk := hk) RF h hreg,
+      dt.expFam_congr_scratch (k := k) (hk := hk) RF h hreg]
     rfl
 
 section Run
@@ -343,11 +349,16 @@ section Run
 variable [Finite dt.KIx]
 variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable {gtop gbot : Univ A R P dt.KIx dt.dd}
 variable (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v) (hmirSt : st.mir = v)
 variable (hbotSt : st.bot = fun r => r = (fun _ => False))
 variable (hsav : st.sav = v) (htgt : st.tgt = v)
@@ -357,20 +368,20 @@ the home address (its random access writes them whatever they held), every
 other kind leaves the state alone. -/
 noncomputable def kindEndSt (dt : PfpData L) {A R P : Type}
     (vi : dt.VarIx) (v : Univ A R P dt.KIx dt.dd → Prop)
-    (κ : MatAtom dt.X dt.d (dt.nOf vi)) (st : TapeSt dt A R P) :
-    TapeSt dt A R P :=
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (st : TapeStD dt A R P) :
+    TapeStD dt A R P :=
   match κ with
   | .stage _ _ => dt.stageEndSt st v
   | _ => st
 
-include hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt in
+include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt in
 /-- **The uniform stage discharge, threaded**: as
 `DescriptiveComplexity.Pfp.PfpData.kind_hStage` but with no boundary
 discipline assumed — the atom's exit state is
 `DescriptiveComplexity.Pfp.PfpData.kindEndSt`, which normalizes SAV and
 TARGET exactly when the atom is a stage atom. -/
 theorem kind_hStage_thread
-    (κ : MatAtom dt.X dt.d (dt.nOf vi))
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
     (sem : dt.KindSem PR.zero PR.one vi st κ)
@@ -382,26 +393,26 @@ theorem kind_hStage_thread
     (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (dt.kindEntry κ)) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
-          (dt.kindExitCtl PR.zero PR.one vi av st v κ sem hk hnd hrd f)),
+          (dt.kindExitCtl RF hord PR.zero PR.one vi av st v κ sem hk hnd hrd f)),
         Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le (dt.kindEndSt vi v κ st))
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.kindEndSt vi v κ st))
           (dt.kindEndSt vi v κ st).val)
           (PR.syElt PR.blank)⟩ := by
   classical
   cases κ with
   | eq j₁ j₂ =>
-    exact dt.cmp_hStage vi av hrd true j₁ j₂ hrules hR hlin hbot hv hvi
+    exact dt.cmp_hStage RF hord vi av hrd true j₁ j₂ hrules hR hlin hbot hv hvi
       hwkSt f
   | ord j₁ j₂ =>
-    exact dt.cmp_hStage vi av hrd false j₁ j₂ hrules hR hlin hbot hv hvi
+    exact dt.cmp_hStage RF hord vi av hrd false j₁ j₂ hrules hR hlin hbot hv hvi
       hwkSt f
   | stage i ts =>
-    refine dt.stage_hStage_thread vi i ts av hrules hR hlin hord htop hbot
-      hv hvi hwkSt hmirSt hbotSt _ ?_ f
+    refine dt.stage_hStage_thread RF vi i ts av hrules hR hlin hord htop hbot
+      hwork hv hvi hwkSt hmirSt hbotSt _ ?_ f
     by_cases hbb : st.old i
       (dt.stageTgtD PR.zero vi i ts st v (dt.d.B.arity i))
     · rw [if_pos hbb]
@@ -421,20 +432,20 @@ theorem kind_hStage_thread
             rw [kindEntry]; exact dif_neg h,
           show (tagFirstRd emb : P) = emb TagPh.brP from dif_neg h]
     rw [hent]
-    exact dt.exp_hStage vi ts e av hk
+    exact dt.exp_hStage RF hord vi ts e av hk
       (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
         (dt.relPk e τ').n) (Finset.mem_univ τ)) hnd)
       (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
         (blkAtoms (dt.relPk e τ').mat).length) (Finset.mem_univ τ)) hrd)
       hrules hR hlin hbot hv hvi hwkSt pts hENC f
 
-include hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt hsav htgt in
+include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hsav htgt in
 /-- **The uniform stage discharge**: whatever the kind, the atom's machinery
 runs from its entry phase one cell right of the marker to the exit phase
 back there, leaving `DescriptiveComplexity.Pfp.PfpData.kindExitCtl` in the
 control and the tape untouched. -/
 theorem kind_hStage
-    (κ : MatAtom dt.X dt.d (dt.nOf vi))
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
     (sem : dt.KindSem PR.zero PR.one vi st κ)
@@ -446,24 +457,24 @@ theorem kind_hStage
     (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (dt.kindEntry κ)) f), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
-          (dt.kindExitCtl PR.zero PR.one vi av st v κ sem hk hnd hrd f)),
+          (dt.kindExitCtl RF hord PR.zero PR.one vi av st v κ sem hk hnd hrd f)),
         Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
   classical
   cases κ with
   | eq j₁ j₂ =>
-    exact dt.cmp_hStage vi av hrd true j₁ j₂ hrules hR hlin hbot hv hvi
+    exact dt.cmp_hStage RF hord vi av hrd true j₁ j₂ hrules hR hlin hbot hv hvi
       hwkSt f
   | ord j₁ j₂ =>
-    exact dt.cmp_hStage vi av hrd false j₁ j₂ hrules hR hlin hbot hv hvi
+    exact dt.cmp_hStage RF hord vi av hrd false j₁ j₂ hrules hR hlin hbot hv hvi
       hwkSt f
   | stage i ts =>
-    refine dt.stage_hStage vi i ts av hrules hR hlin hord htop hbot hv hvi
+    refine dt.stage_hStage RF vi i ts av hrules hR hlin hord htop hbot hwork hv hvi
       hwkSt hmirSt hbotSt hsav htgt _ ?_ f
     by_cases hbb : st.old i
       (dt.stageTgtD PR.zero vi i ts st v (dt.d.B.arity i))
@@ -484,7 +495,7 @@ theorem kind_hStage
             rw [kindEntry]; exact dif_neg h,
           show (tagFirstRd emb : P) = emb TagPh.brP from dif_neg h]
     rw [hent]
-    exact dt.exp_hStage vi ts e av hk
+    exact dt.exp_hStage RF hord vi ts e av hk
       (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
         (dt.relPk e τ').n) (Finset.mem_univ τ)) hnd)
       (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
@@ -508,14 +519,14 @@ noncomputable def matFs
   | 0 => f₀
   | n + 1 =>
     if h : n < dt.natOf vi then
-      dt.kindExitCtl zero one vi
+      dt.kindExitCtl RF hord zero one vi
         (Fin.castLE (dt.natOf_le_natMax vi) ⟨n, h⟩) st v
         (dt.kindOf vi ⟨n, h⟩) (sem ⟨n, h⟩)
         (dt.kindArgs_mul_card_le_ntgDim vi ⟨n, h⟩)
         (dt.kindDepth_le_eDim vi ⟨n, h⟩)
         (dt.kindReads_le_nfDim vi ⟨n, h⟩)
         (enterSt ⟨n, h⟩ (matFs enterSt sem f₀ n)
-          (dt.back zero one dt.dd0Le st v))
+          (dt.back RF.cell zero one dt.dd0Le st v))
     else matFs enterSt sem f₀ n
 
 /-! ### The threaded states of the matrix -/
@@ -526,8 +537,8 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [L.Structure A] in
 /-- An atom's exit state keeps the marker, the mirror, the bottom mark and
 the VAL register: only SAV and TARGET can move. -/
-theorem kindEndSt_fields (κ : MatAtom dt.X dt.d (dt.nOf vi))
-    (st : TapeSt dt A R P) :
+theorem kindEndSt_fields (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
+    (st : TapeStD dt A R P) :
     (dt.kindEndSt vi v κ st).wk = st.wk ∧
       (dt.kindEndSt vi v κ st).mir = st.mir ∧
       (dt.kindEndSt vi v κ st).bot = st.bot ∧
@@ -538,7 +549,7 @@ theorem kindEndSt_fields (κ : MatAtom dt.X dt.d (dt.nOf vi))
 variable (dt vi st v) in
 /-- **The state after the matrix's first `n` atoms**: each stage atom
 normalizes SAV and TARGET, the other kinds change nothing. -/
-noncomputable def matSt : ℕ → TapeSt dt A R P
+noncomputable def matSt : ℕ → TapeStD dt A R P
   | 0 => st
   | n + 1 =>
     if h : n < dt.natOf vi then
@@ -575,7 +586,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **A tape state is determined by its two scratch registers**, given the
 other seven — the shape every threaded state of the machinery has against
 the state it started from. -/
-theorem tapeSt_eq_savTgt {X Y : TapeSt dt A R P} (hmir : X.mir = Y.mir)
+theorem tapeSt_eq_savTgt {X Y : TapeStD dt A R P} (hmir : X.mir = Y.mir)
     (hval : X.val = Y.val) (hold : X.old = Y.old) (hnew : X.new = Y.new)
     (hwk : X.wk = Y.wk) (hbot : X.bot = Y.bot) (hltp : X.ltp = Y.ltp) :
     X = { Y with sav := X.sav, tgt := X.tgt } := by
@@ -593,8 +604,8 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **The remaining registers an atom leaves alone** — the three
 `DescriptiveComplexity.Pfp.PfpData.kindEndSt_fields` does not list, so
 that the seven together pin the state down to its SAV and TARGET. -/
-theorem kindEndSt_fields' (κ : MatAtom dt.X dt.d (dt.nOf vi))
-    (st : TapeSt dt A R P) :
+theorem kindEndSt_fields' (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
+    (st : TapeStD dt A R P) :
     (dt.kindEndSt vi v κ st).new = st.new ∧
       (dt.kindEndSt vi v κ st).ltp = st.ltp := by
   cases κ <;> exact ⟨rfl, rfl⟩
@@ -645,13 +656,13 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 kind, its exit control writes its own verdict slot and scratch, never
 another atom's. -/
 theorem kindExitCtl_apply_avC
-    (κ : MatAtom dt.X dt.d (dt.nOf vi))
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (sem : dt.KindSem zero one vi st κ)
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
     (f : dt.CtlIx → A) {a' : Fin dt.natMax}
     (hne : dt.avC a' ≠ dt.avC av) :
-    dt.kindExitCtl zero one vi av st v κ sem hk hnd hrd f (dt.avC a') =
+    dt.kindExitCtl RF hord zero one vi av st v κ sem hk hnd hrd f (dt.avC a') =
       f (dt.avC a') := by
   classical
   have hAcc : dt.avC a' ≠ dt.cmpAccC := fun h => nomatch h
@@ -667,7 +678,8 @@ theorem kindExitCtl_apply_avC
     rw [cmpFold, setCtl_of_ne hAcc, setCtl_of_ne hDec, setCtl_of_ne hVal]
   have hcmpFam : ∀ (hnf : 2 ≤ dt.nfDim) (isEq : Bool)
       (j₁ j₂ : Fin (dt.nOf vi)) (fc : dt.CtlIx → A),
-      dt.cmpFam zero one vi av hnf isEq j₁ j₂ st v fc (toLex topTup)
+      dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero :=
+          zero)) vi av hnf isEq j₁ j₂ st v fc (toLex topTup)
         (Fin.last 2) (dt.avC a') = fc (dt.avC a') := by
     intro hnf isEq j₁ j₂ fc
     rw [cmpFam]
@@ -689,24 +701,26 @@ theorem kindExitCtl_apply_avC
   | eq j₁ j₂ =>
     change dt.setCtl zero one (dt.avC av) _
       (dt.cmpFold zero one hrd
-        (dt.cmpFam zero one vi av hrd true j₁ j₂ st v f (toLex topTup)
+        (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero :=
+            zero)) vi av hrd true j₁ j₂ st v f (toLex topTup)
           (Fin.last 2))) (dt.avC a') = _
     rw [setCtl_of_ne hne]
     exact (hcmpFold hrd _).trans (hcmpFam hrd true j₁ j₂ f)
   | ord j₁ j₂ =>
     change dt.setCtl zero one (dt.avC av) _
       (dt.cmpFold zero one hrd
-        (dt.cmpFam zero one vi av hrd false j₁ j₂ st v f (toLex topTup)
+        (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero :=
+            zero)) vi av hrd false j₁ j₂ st v f (toLex topTup)
           (Fin.last 2))) (dt.avC a') = _
     rw [setCtl_of_ne hne]
     exact (hcmpFold hrd _).trans (hcmpFam hrd false j₁ j₂ f)
   | stage i ts =>
     change dt.setCtl zero one (dt.avC av) _
-      (dt.stageFAt zero one vi i ts av st v f (dt.d.B.arity i))
+      (dt.stageFAt RF zero one vi i ts av st v f (dt.d.B.arity i))
       (dt.avC a') = _
     rw [setCtl_of_ne hne]
     have hstage : ∀ n : ℕ,
-        dt.stageFAt zero one vi i ts av st v f n (dt.avC a') =
+        dt.stageFAt RF zero one vi i ts av st v f n (dt.avC a') =
           f (dt.avC a') := by
       intro n
       induction n with
@@ -715,15 +729,15 @@ theorem kindExitCtl_apply_avC
         rw [initLvN, putLv_av]
       | succ n ih =>
         by_cases h : n < dt.d.B.arity i
-        · have hstep : dt.stageFAt zero one vi i ts av st v f (n + 1) =
+        · have hstep : dt.stageFAt RF zero one vi i ts av st v f (n + 1) =
               tupleIter1 (dt.stageArgs zero one vi i ts av).setBit
                 (dt.stageArgs zero one vi i ts av).initLv
                 (dt.stageArgs zero one vi i ts av).advLv
                 (dt.lvSet { st with sav := v } vi (ts ⟨n, h⟩)) v
-                (dt.stageRestF zero one { st with sav := v })
+                (dt.stageRestF RF zero one { st with sav := v })
                 (dt.stageXS zero vi i ts ⟨n, h⟩) (dt.stageXD zero i ⟨n, h⟩)
                 (dt.stageTgtD zero vi i ts st v n)
-                (dt.stageFAt zero one vi i ts av st v f n)
+                (dt.stageFAt RF zero one vi i ts av st v f n)
                 (toLex topTup) := by
             simp only [stageFAt]
             rw [dif_pos h]
@@ -739,8 +753,8 @@ theorem kindExitCtl_apply_avC
           · intro fd g
             change dt.advLvN fd (dt.avC a') = _
             rw [advLvN, putLv_av]
-        · have hstep : dt.stageFAt zero one vi i ts av st v f (n + 1) =
-              dt.stageFAt zero one vi i ts av st v f n := by
+        · have hstep : dt.stageFAt RF zero one vi i ts av st v f (n + 1) =
+              dt.stageFAt RF zero one vi i ts av st v f n := by
             simp only [stageFAt]
             rw [dif_neg h]
           rw [hstep]
@@ -749,8 +763,8 @@ theorem kindExitCtl_apply_avC
   | @exp k e ts =>
     change dt.setCtl zero one (dt.avC av) _
       (dt.setSubLeaf zero one _
-        (dt.expFam zero one vi ts e av st (fun ℓ => (sem.1 ℓ).1.1) hk _ _ v
-          (dt.expTagFam zero one vi ts e av st hk _ _ v f
+        (dt.expFam RF zero one vi ts e av st (fun ℓ => (sem.1 ℓ).1.1) hk _ _ v
+          (dt.expTagFam RF zero one vi ts e av st hk _ _ v f
             (Fin.last (k * Fintype.card dt.X.Tag)))
           (toLex topTup)
           (Fin.last (dt.relNr e (fun ℓ => (sem.1 ℓ).1.1)))))
@@ -761,7 +775,7 @@ theorem kindExitCtl_apply_avC
         (le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
           (dt.relPk e τ').n)
           (Finset.mem_univ (fun ℓ => (sem.1 ℓ).1.1))) hnd))
-      (dt.expTagFam zero one vi ts e av st hk
+      (dt.expTagFam RF zero one vi ts e av st hk
         (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
           (dt.relPk e τ').n) (Finset.mem_univ τ)) hnd)
         (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
@@ -812,12 +826,12 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An accumulator slot survives one atom's machinery**: no atom's exit
 control ever writes the inner fold's vector. -/
 theorem kindExitCtl_apply_accC
-    (κ : MatAtom dt.X dt.d (dt.nOf vi))
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (sem : dt.KindSem zero one vi st κ)
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
     (f : dt.CtlIx → A) (jj : Fin dt.naDim) :
-    dt.kindExitCtl zero one vi av st v κ sem hk hnd hrd f (dt.accC jj) =
+    dt.kindExitCtl RF hord zero one vi av st v κ sem hk hnd hrd f (dt.accC jj) =
       f (dt.accC jj) := by
   classical
   have hne : dt.accC jj ≠ dt.avC av := fun h => nomatch h
@@ -834,7 +848,8 @@ theorem kindExitCtl_apply_accC
     rw [cmpFold, setCtl_of_ne hAcc, setCtl_of_ne hDec, setCtl_of_ne hVal]
   have hcmpFam : ∀ (hnf : 2 ≤ dt.nfDim) (isEq : Bool)
       (j₁ j₂ : Fin (dt.nOf vi)) (fc : dt.CtlIx → A),
-      dt.cmpFam zero one vi av hnf isEq j₁ j₂ st v fc (toLex topTup)
+      dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero :=
+          zero)) vi av hnf isEq j₁ j₂ st v fc (toLex topTup)
         (Fin.last 2) (dt.accC jj) = fc (dt.accC jj) := by
     intro hnf isEq j₁ j₂ fc
     rw [cmpFam]
@@ -854,32 +869,36 @@ theorem kindExitCtl_apply_accC
       exact hcmpFold hnf fd
   cases κ with
   | eq j₁ j₂ =>
-    have hK : dt.kindExitCtl zero one vi av st v (.eq j₁ j₂) sem hk hnd hrd
+    have hK : dt.kindExitCtl RF hord zero one vi av st v (.eq j₁ j₂) sem hk hnd hrd
         f =
         dt.setCtl zero one (dt.avC av)
           (dt.cmpVerdict one true (dt.cmpFold zero one hrd
-            (dt.cmpFam zero one vi av hrd true j₁ j₂ st v f (toLex topTup)
+            (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero
+                := zero)) vi av hrd true j₁ j₂ st v f (toLex topTup)
               (Fin.last 2))))
           (dt.cmpFold zero one hrd
-            (dt.cmpFam zero one vi av hrd true j₁ j₂ st v f (toLex topTup)
+            (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero
+                := zero)) vi av hrd true j₁ j₂ st v f (toLex topTup)
               (Fin.last 2))) := rfl
     rw [hK, setCtl_of_ne hne]
     exact (hcmpFold hrd _).trans (hcmpFam hrd true j₁ j₂ f)
   | ord j₁ j₂ =>
-    have hK : dt.kindExitCtl zero one vi av st v (.ord j₁ j₂) sem hk hnd hrd
+    have hK : dt.kindExitCtl RF hord zero one vi av st v (.ord j₁ j₂) sem hk hnd hrd
         f =
         dt.setCtl zero one (dt.avC av)
           (dt.cmpVerdict one false (dt.cmpFold zero one hrd
-            (dt.cmpFam zero one vi av hrd false j₁ j₂ st v f (toLex topTup)
+            (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero
+                := zero)) vi av hrd false j₁ j₂ st v f (toLex topTup)
               (Fin.last 2))))
           (dt.cmpFold zero one hrd
-            (dt.cmpFam zero one vi av hrd false j₁ j₂ st v f (toLex topTup)
+            (dt.cmpFam (laidFile RF hord) zero one (dt.hasName_diagLayout (cell := RF.cell) (zero
+                := zero)) vi av hrd false j₁ j₂ st v f (toLex topTup)
               (Fin.last 2))) := rfl
     rw [hK, setCtl_of_ne hne]
     exact (hcmpFold hrd _).trans (hcmpFam hrd false j₁ j₂ f)
   | stage i ts =>
     have hstage : ∀ n : ℕ,
-        dt.stageFAt zero one vi i ts av st v f n (dt.accC jj) =
+        dt.stageFAt RF zero one vi i ts av st v f n (dt.accC jj) =
           f (dt.accC jj) := by
       intro n
       induction n with
@@ -888,15 +907,15 @@ theorem kindExitCtl_apply_accC
         rw [initLvN, putLv_acc]
       | succ n ih =>
         by_cases h : n < dt.d.B.arity i
-        · have hstep : dt.stageFAt zero one vi i ts av st v f (n + 1) =
+        · have hstep : dt.stageFAt RF zero one vi i ts av st v f (n + 1) =
               tupleIter1 (dt.stageArgs zero one vi i ts av).setBit
                 (dt.stageArgs zero one vi i ts av).initLv
                 (dt.stageArgs zero one vi i ts av).advLv
                 (dt.lvSet { st with sav := v } vi (ts ⟨n, h⟩)) v
-                (dt.stageRestF zero one { st with sav := v })
+                (dt.stageRestF RF zero one { st with sav := v })
                 (dt.stageXS zero vi i ts ⟨n, h⟩) (dt.stageXD zero i ⟨n, h⟩)
                 (dt.stageTgtD zero vi i ts st v n)
-                (dt.stageFAt zero one vi i ts av st v f n)
+                (dt.stageFAt RF zero one vi i ts av st v f n)
                 (toLex topTup) := by
             simp only [stageFAt]
             rw [dif_pos h]
@@ -912,22 +931,22 @@ theorem kindExitCtl_apply_accC
           · intro fd g
             change dt.advLvN fd (dt.accC jj) = _
             rw [advLvN, putLv_acc]
-        · have hstep : dt.stageFAt zero one vi i ts av st v f (n + 1) =
-              dt.stageFAt zero one vi i ts av st v f n := by
+        · have hstep : dt.stageFAt RF zero one vi i ts av st v f (n + 1) =
+              dt.stageFAt RF zero one vi i ts av st v f n := by
             simp only [stageFAt]
             rw [dif_neg h]
           rw [hstep]
           exact ih
-    have hK : dt.kindExitCtl zero one vi av st v (.stage i ts) sem hk hnd
+    have hK : dt.kindExitCtl RF hord zero one vi av st v (.stage i ts) sem hk hnd
         hrd f =
         dt.setCtl zero one (dt.avC av)
           ((if st.old i (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i))
             then true else false) = true)
-          (dt.stageFAt zero one vi i ts av st v f (dt.d.B.arity i)) := rfl
+          (dt.stageFAt RF zero one vi i ts av st v f (dt.d.B.arity i)) := rfl
     rw [hK, setCtl_of_ne hne]
     exact hstage _
   | @exp k e ts =>
-    have hK : dt.kindExitCtl zero one vi av st v (.exp e ts) sem hk hnd hrd
+    have hK : dt.kindExitCtl RF hord zero one vi av st v (.exp e ts) sem hk hnd hrd
         f =
         dt.expExit zero one e (fun ℓ => (sem.1 ℓ).1.1)
           (le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
@@ -937,7 +956,7 @@ theorem kindExitCtl_apply_accC
             (blkAtoms (dt.relPk e τ').mat).length)
             (Finset.mem_univ (fun ℓ => (sem.1 ℓ).1.1))) hrd)
           av
-          (dt.expFam zero one vi ts e av st (fun ℓ => (sem.1 ℓ).1.1) hk
+          (dt.expFam RF zero one vi ts e av st (fun ℓ => (sem.1 ℓ).1.1) hk
             (fun τ' => le_trans (Finset.le_sup
               (f := fun τ'' : Fin k → dt.X.Tag => (dt.relPk e τ'').n)
               (Finset.mem_univ τ')) hnd)
@@ -945,7 +964,7 @@ theorem kindExitCtl_apply_accC
               (f := fun τ'' : Fin k → dt.X.Tag =>
                 (blkAtoms (dt.relPk e τ'').mat).length)
               (Finset.mem_univ τ')) hrd) v
-            (dt.expTagFam zero one vi ts e av st hk
+            (dt.expTagFam RF zero one vi ts e av st hk
               (fun τ' => le_trans (Finset.le_sup
                 (f := fun τ'' : Fin k → dt.X.Tag => (dt.relPk e τ'').n)
                 (Finset.mem_univ τ')) hnd)
@@ -962,7 +981,7 @@ theorem kindExitCtl_apply_accC
         (le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
           (dt.relPk e τ').n)
           (Finset.mem_univ (fun ℓ => (sem.1 ℓ).1.1))) hnd))
-      (dt.expTagFam zero one vi ts e av st hk
+      (dt.expTagFam RF zero one vi ts e av st hk
         (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
           (dt.relPk e τ').n) (Finset.mem_univ τ)) hnd)
         (fun τ => le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
@@ -1011,29 +1030,29 @@ theorem matFs_apply_accC
     (sem : ∀ b : Fin (dt.natOf vi),
       dt.KindSem zero one vi st (dt.kindOf vi b))
     (f₀ : dt.CtlIx → A) (jj : Fin dt.naDim) (n : ℕ) :
-    dt.matFs zero one vi st v enterSt sem f₀ n (dt.accC jj) =
+    dt.matFs RF hord zero one vi st v enterSt sem f₀ n (dt.accC jj) =
       f₀ (dt.accC jj) := by
   classical
   induction n with
   | zero => rfl
   | succ n ih =>
     by_cases hn : n < dt.natOf vi
-    · have hFa : dt.matFs zero one vi st v enterSt sem f₀ (n + 1) =
-          dt.kindExitCtl zero one vi
+    · have hFa : dt.matFs RF hord zero one vi st v enterSt sem f₀ (n + 1) =
+          dt.kindExitCtl RF hord zero one vi
             (Fin.castLE (dt.natOf_le_natMax vi) ⟨n, hn⟩) st v
             (dt.kindOf vi ⟨n, hn⟩) (sem ⟨n, hn⟩)
             (dt.kindArgs_mul_card_le_ntgDim vi ⟨n, hn⟩)
             (dt.kindDepth_le_eDim vi ⟨n, hn⟩)
             (dt.kindReads_le_nfDim vi ⟨n, hn⟩)
             (enterSt ⟨n, hn⟩
-              (dt.matFs zero one vi st v enterSt sem f₀ n)
-              (dt.back zero one dt.dd0Le st v)) := by
+              (dt.matFs RF hord zero one vi st v enterSt sem f₀ n)
+              (dt.back RF.cell zero one dt.dd0Le st v)) := by
         simp only [matFs]
         rw [dif_pos hn]
-      rw [hFa, kindExitCtl_apply_accC _ _ _ _ _ _ jj, hEnterAcc]
+      rw [hFa, kindExitCtl_apply_accC RF hord _ _ _ _ _ _ jj, hEnterAcc]
       exact ih
-    · have hFa : dt.matFs zero one vi st v enterSt sem f₀ (n + 1) =
-          dt.matFs zero one vi st v enterSt sem f₀ n := by
+    · have hFa : dt.matFs RF hord zero one vi st v enterSt sem f₀ (n + 1) =
+          dt.matFs RF hord zero one vi st v enterSt sem f₀ n := by
         simp only [matFs]
         rw [dif_neg hn]
       rw [hFa]
@@ -1053,22 +1072,22 @@ theorem matFs_apply_avC
     (sem : ∀ b : Fin (dt.natOf vi),
       dt.KindSem zero one vi st (dt.kindOf vi b))
     (f₀ : dt.CtlIx → A) (a : Fin (dt.natOf vi)) :
-    dt.matFs zero one vi st v enterSt sem f₀ (dt.natOf vi)
+    dt.matFs RF hord zero one vi st v enterSt sem f₀ (dt.natOf vi)
         (dt.avC (Fin.castLE (dt.natOf_le_natMax vi) a)) =
-      dt.kindExitCtl zero one vi
+      dt.kindExitCtl RF hord zero one vi
         (Fin.castLE (dt.natOf_le_natMax vi) a) st v
         (dt.kindOf vi a) (sem a)
         (dt.kindArgs_mul_card_le_ntgDim vi a)
         (dt.kindDepth_le_eDim vi a)
         (dt.kindReads_le_nfDim vi a)
-        (enterSt a (dt.matFs zero one vi st v enterSt sem f₀ (a : ℕ))
-          (dt.back zero one dt.dd0Le st v))
+        (enterSt a (dt.matFs RF hord zero one vi st v enterSt sem f₀ (a : ℕ))
+          (dt.back RF.cell zero one dt.dd0Le st v))
         (dt.avC (Fin.castLE (dt.natOf_le_natMax vi) a)) := by
   classical
   suffices h : ∀ n : ℕ, (a : ℕ) + 1 ≤ n → n ≤ dt.natOf vi →
-      dt.matFs zero one vi st v enterSt sem f₀ n
+      dt.matFs RF hord zero one vi st v enterSt sem f₀ n
         (dt.avC (Fin.castLE (dt.natOf_le_natMax vi) a)) =
-      dt.matFs zero one vi st v enterSt sem f₀ ((a : ℕ) + 1)
+      dt.matFs RF hord zero one vi st v enterSt sem f₀ ((a : ℕ) + 1)
         (dt.avC (Fin.castLE (dt.natOf_le_natMax vi) a)) by
     rw [h (dt.natOf vi) a.isLt le_rfl]
     simp only [matFs]
@@ -1088,19 +1107,19 @@ theorem matFs_apply_avC
         have hval := congrArg Fin.val hcast
         simp only [Fin.val_castLE] at hval
         omega
-      have hFa : dt.matFs zero one vi st v enterSt sem f₀ (n + 1) =
-          dt.kindExitCtl zero one vi
+      have hFa : dt.matFs RF hord zero one vi st v enterSt sem f₀ (n + 1) =
+          dt.kindExitCtl RF hord zero one vi
             (Fin.castLE (dt.natOf_le_natMax vi) ⟨n, hn⟩) st v
             (dt.kindOf vi ⟨n, hn⟩) (sem ⟨n, hn⟩)
             (dt.kindArgs_mul_card_le_ntgDim vi ⟨n, hn⟩)
             (dt.kindDepth_le_eDim vi ⟨n, hn⟩)
             (dt.kindReads_le_nfDim vi ⟨n, hn⟩)
             (enterSt ⟨n, hn⟩
-              (dt.matFs zero one vi st v enterSt sem f₀ n)
-              (dt.back zero one dt.dd0Le st v)) := by
+              (dt.matFs RF hord zero one vi st v enterSt sem f₀ n)
+              (dt.back RF.cell zero one dt.dd0Le st v)) := by
         simp only [matFs]
         rw [dif_pos hn]
-      rw [hFa, kindExitCtl_apply_avC _ _ _ _ _ _ hne, hEnterAv]
+      rw [hFa, kindExitCtl_apply_avC RF hord _ _ _ _ _ _ hne, hEnterAv]
       exact ih hstep (by omega)
     · have hn : n = (a : ℕ) := by omega
       subst hn
@@ -1119,7 +1138,7 @@ noncomputable def mkKindSem (w : Fin (dt.nOf vi) → dt.X.Map A)
       wmBlk (dt.lvSet st vi j)
         (PfpTag.arg (toLex (dt.lvBlk vi j)) : PfpTag R P dt.KIx) =
         encMap dt.ly zero one (w j)) :
-    ∀ κ : MatAtom dt.X dt.d (dt.nOf vi), dt.KindSem zero one vi st κ
+    ∀ κ : MatAtom dt.X dt.d.B (dt.nOf vi), dt.KindSem zero one vi st κ
   | .eq _ _ => PUnit.unit
   | .ord _ _ => PUnit.unit
   | .stage _ _ => PUnit.unit
@@ -1132,7 +1151,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 the valuation's points in and nothing else, and the proof components are
 irrelevant. -/
 theorem kindSemCast_mkKindSem (zero one : A) (vi : dt.VarIx)
-    {st st' : TapeSt dt A R P}
+    {st st' : TapeStD dt A R P}
     (hmir : st.mir = st'.mir) (hval : st.val = st'.val)
     {w w' : Fin (dt.nOf vi) → dt.X.Map A} (hww : w = w')
     (hENC : ∀ j : Fin (dt.nOf vi),
@@ -1143,16 +1162,15 @@ theorem kindSemCast_mkKindSem (zero one : A) (vi : dt.VarIx)
       wmBlk (dt.lvSet st' vi j)
         (PfpTag.arg (toLex (dt.lvBlk vi j)) : PfpTag R P dt.KIx) =
         encMap dt.ly zero one (w' j))
-    (κ : MatAtom dt.X dt.d (dt.nOf vi)) :
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) :
     dt.kindSemCast zero one vi hmir hval κ
         (dt.mkKindSem zero one vi st w hENC κ) =
       dt.mkKindSem zero one vi st' w' hENC' κ := by
   subst hww
   cases κ <;> rfl
 
-omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
-  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
+omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
+  [L.IsRelational] in
 /-- **One round's agreement is the padded bits'**: given the two registers
 hold encodings, the machine's per-tuple question is the encodings'. -/
 theorem cmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
@@ -1163,15 +1181,19 @@ theorem cmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
       (PfpTag.arg (toLex (dt.lvBlk vi j₂)) : PfpTag R P dt.KIx) =
       encMap dt.ly zero one q)
     (u : Lex (Fin dt.dd0 → A)) :
-    dt.CmpAgr zero vi j₁ j₂ st u ↔
+    dt.CmpAgr (laidFile RF hord) zero (dt.hasName_diagLayout (cell := RF.cell) (zero := zero)) vi
+        j₁ j₂ st u ↔
       (dt.padBits zero (encMap dt.ly zero one p) (ofLex u) ↔
         dt.padBits zero (encMap dt.ly zero one q) (ofLex u)) :=
-  iff_congr (iff_of_eq (congrFun h1 (pad zero (ofLex u))))
+  by
+  rw [CmpAgr, cmpSet, cmpSet, cmpCell, cmpCell,
+    dt.reg_diagLayout (cell := RF.cell) dt.dd0Le, padTup_eq_pad,
+    dt.reg_diagLayout (cell := RF.cell) dt.dd0Le, padTup_eq_pad]
+  exact iff_congr (iff_of_eq (congrFun h1 (pad zero (ofLex u))))
     (iff_of_eq (congrFun h2 (pad zero (ofLex u))))
 
-omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
-  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
+omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
+  [L.IsRelational] in
 /-- **The equality atom's verdict is point equality**: agreement at every
 tuple decides the two encoded points. -/
 theorem cmpAgr_all_iff (hzo : zero ≠ one)
@@ -1182,14 +1204,15 @@ theorem cmpAgr_all_iff (hzo : zero ≠ one)
     (h2 : wmBlk (dt.lvSet st vi j₂)
       (PfpTag.arg (toLex (dt.lvBlk vi j₂)) : PfpTag R P dt.KIx) =
       encMap dt.ly zero one q) :
-    (∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr zero vi j₁ j₂ st u) ↔ p = q := by
+    (∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr (laidFile RF hord) zero
+      (dt.hasName_diagLayout (cell := RF.cell) (zero := zero)) vi j₁ j₂ st u) ↔
+      p = q := by
   rw [dt.encMap_eq_iff_padBits (zero := zero) (one := one) hzo]
-  exact ⟨fun h w' => (dt.cmpAgr_iff_padBits h1 h2 (toLex w')).mp (h _),
-    fun h u => (dt.cmpAgr_iff_padBits h1 h2 u).mpr (h _)⟩
+  exact ⟨fun h w' => (cmpAgr_iff_padBits RF hord h1 h2 (toLex w')).mp (h _),
+    fun h u => (cmpAgr_iff_padBits RF hord h1 h2 u).mpr (h _)⟩
 
-omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
-  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
-  [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Nonempty A]
+  [L.IsRelational] in
 /-- **The order atom's verdict is the chosen order**: agreement everywhere,
 or a first difference with the second block holding the cell, is exactly
 the binary order of the two encodings – the order the reduction puts on the
@@ -1202,18 +1225,22 @@ theorem cmp_ord_iff (hzo : zero ≠ one)
     (h2 : wmBlk (dt.lvSet st vi j₂)
       (PfpTag.arg (toLex (dt.lvBlk vi j₂)) : PfpTag R P dt.KIx) =
       encMap dt.ly zero one q) :
-    ((∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr zero vi j₁ j₂ st u) ∨
-      ∃ u : Lex (Fin dt.dd0 → A), dt.CmpFst zero vi j₁ j₂ st u) ↔
+    ((∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr (laidFile RF hord) zero (dt.hasName_diagLayout (cell :=
+        RF.cell) (zero := zero)) vi j₁ j₂ st u) ∨
+      ∃ u : Lex (Fin dt.dd0 → A), dt.CmpFst (laidFile RF hord) zero
+        (dt.hasName_diagLayout (cell := RF.cell) (zero := zero)) vi j₁ j₂ st u) ↔
       (encOrder dt.ly zero one hzo).le p q := by
   rw [dt.encOrder_le_iff_padBits hzo]
+  simp only [CmpFst, cmpSet, cmpCell, dt.reg_diagLayout (cell := RF.cell) dt.dd0Le,
+    padTup_eq_pad]
   refine or_congr
-    ⟨fun h w' => (dt.cmpAgr_iff_padBits h1 h2 (toLex w')).mp (h _),
-      fun h u => (dt.cmpAgr_iff_padBits h1 h2 u).mpr (h _)⟩ ?_
+    ⟨fun h w' => (cmpAgr_iff_padBits RF hord h1 h2 (toLex w')).mp (h _),
+      fun h u => (cmpAgr_iff_padBits RF hord h1 h2 u).mpr (h _)⟩ ?_
   constructor
   · rintro ⟨u, ⟨hne, hlt⟩, hall⟩
     refine ⟨ofLex u, fun w' hw' => ?_, ?_, ?_⟩
     · have hlex : toLex w' < u := lex_lt_iff.mpr hw'
-      exact (dt.cmpAgr_iff_padBits h1 h2 (toLex w')).mp (hall _ hlex)
+      exact (cmpAgr_iff_padBits RF hord h1 h2 (toLex w')).mp (hall _ hlex)
     · exact fun hc => hne ((iff_of_eq
         (congrFun h1 (pad zero (ofLex u)))).mpr hc)
     · exact (iff_of_eq (congrFun h2 (pad zero (ofLex u)))).mp hlt
@@ -1222,7 +1249,7 @@ theorem cmp_ord_iff (hzo : zero ≠ one)
     · exact fun hc => hnp ((iff_of_eq
         (congrFun h1 (pad zero w'))).mp hc)
     · exact (iff_of_eq (congrFun h2 (pad zero w'))).mpr hq
-    · exact (dt.cmpAgr_iff_padBits h1 h2 u').mpr
+    · exact (cmpAgr_iff_padBits RF hord h1 h2 u').mpr
         (hall (ofLex u') (lex_lt_iff.mp hu'))
 
 section SelfRead
@@ -1248,29 +1275,29 @@ theorem ctlBit_kindExitCtl_self (hzo : zero ≠ one)
         σ i fun q => w (ts q))
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
-    (κ : MatAtom dt.X dt.d (dt.nOf vi))
+    (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
     (f : dt.CtlIx → A) :
     dt.ctlBit one
-        (dt.kindExitCtl zero one vi av st v κ
+        (dt.kindExitCtl RF hord zero one vi av st v κ
           (dt.mkKindSem zero one vi st w hENC κ) hk hnd hrd f)
         (dt.avC av) ↔
       κ.holds σ w := by
   classical
   cases κ with
   | eq j₁ j₂ =>
-    exact (dt.ctlBit_avC_cmp_exit hrd hzo f _).trans
-      (dt.cmpAgr_all_iff hzo (hENC j₁) (hENC j₂))
+    exact (dt.ctlBit_avC_cmp_exit (laidFile RF hord) hrd hzo f _).trans
+      (cmpAgr_all_iff RF hord hzo (hENC j₁) (hENC j₂))
   | ord j₁ j₂ =>
-    refine (dt.ctlBit_avC_cmp_exit hrd hzo f _).trans ?_
-    exact (cmp_ord_iff (dt := dt) hzo (hENC j₁) (hENC j₂)).trans
+    refine (dt.ctlBit_avC_cmp_exit (laidFile RF hord) hrd hzo f _).trans ?_
+    exact (cmp_ord_iff RF hord hzo (hENC j₁) (hENC j₂)).trans
       (hordP (w j₁) (w j₂)).symm
   | stage i ts =>
     change dt.ctlBit one (dt.setCtl zero one (dt.avC av)
       ((if st.old i (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i))
         then true else false) = true)
-      (dt.stageFAt zero one vi i ts av st v f (dt.d.B.arity i)))
+      (dt.stageFAt RF zero one vi i ts av st v f (dt.d.B.arity i)))
       (dt.avC av) ↔ _
     rw [ctlBit_setCtl_self hzo]
     refine Iff.trans ?_ (hOld i ts)
@@ -1290,9 +1317,9 @@ theorem ctlBit_kindExitCtl_self (hzo : zero ≠ one)
         (f := fun τ' : Fin k → dt.X.Tag =>
           (blkAtoms (dt.relPk e τ').mat).length)
         (Finset.mem_univ τ)) hrd)
-      (vAdr := v) hzo hlin (fun ℓ => w (ts ℓ))
+      (vAdr := v) RF hzo hlin (fun ℓ => w (ts ℓ))
       (fun ℓ => hENC (ts ℓ))
-      (dt.expTagFam zero one vi ts e av st hk
+      (dt.expTagFam RF zero one vi ts e av st hk
         (fun τ => le_trans (Finset.le_sup
           (f := fun τ' : Fin k → dt.X.Tag => (dt.relPk e τ').n)
           (Finset.mem_univ τ)) hnd)
@@ -1327,22 +1354,22 @@ theorem ctlBit_avC_matFs_holds (hzo : zero ≠ one)
       enterSt b f g (dt.avC a') = f (dt.avC a'))
     (f₀ : dt.CtlIx → A) (a : Fin (dt.natOf vi)) :
     dt.ctlBit one
-        (dt.matFs zero one vi st v enterSt
+        (dt.matFs RF hord zero one vi st v enterSt
           (fun b => dt.mkKindSem zero one vi st w hENC (dt.kindOf vi b))
           f₀ (dt.natOf vi))
         (dt.avC (Fin.castLE (dt.natOf_le_natMax vi) a)) ↔
       (dt.kindOf vi a).holds σ w := by
-  rw [ctlBit, matFs_apply_avC enterSt hEnterAv
+  rw [ctlBit, matFs_apply_avC RF hord enterSt hEnterAv
     (fun b => dt.mkKindSem zero one vi st w hENC (dt.kindOf vi b)) f₀ a]
-  exact dt.ctlBit_kindExitCtl_self hzo hlin σ w hENC hOld hordP
+  exact dt.ctlBit_kindExitCtl_self RF hord hzo hlin σ w hENC hOld hordP
     (dt.kindOf vi a)
     (dt.kindArgs_mul_card_le_ntgDim vi a)
     (dt.kindDepth_le_eDim vi a)
     (dt.kindReads_le_nfDim vi a)
-    (enterSt a (dt.matFs zero one vi st v enterSt
+    (enterSt a (dt.matFs RF hord zero one vi st v enterSt
       (fun b => dt.mkKindSem zero one vi st w hENC (dt.kindOf vi b))
       f₀ (a : ℕ))
-      (dt.back zero one dt.dd0Le st v))
+      (dt.back RF.cell zero one dt.dd0Le st v))
 
 end SelfRead
 
@@ -1353,11 +1380,16 @@ section MatrixRun
 variable [Finite dt.KIx]
 variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable {gtop gbot : Univ A R P dt.KIx dt.dd}
 variable (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v) (hmirSt : st.mir = v)
 variable (hbotSt : st.bot = fun r => r = (fun _ => False))
 variable (hsav : st.sav = v) (htgt : st.tgt = v)
@@ -1384,7 +1416,7 @@ noncomputable def matFsT
   | 0 => f₀
   | n + 1 =>
     if h : n < dt.natOf vi then
-      dt.kindExitCtl zero one vi
+      dt.kindExitCtl RF hord zero one vi
         (Fin.castLE (dt.natOf_le_natMax vi) ⟨n, h⟩)
         (dt.matSt vi st v n) v
         (dt.kindOf vi ⟨n, h⟩) (sem ⟨n, h⟩)
@@ -1392,7 +1424,7 @@ noncomputable def matFsT
         (dt.kindDepth_le_eDim vi ⟨n, h⟩)
         (dt.kindReads_le_nfDim vi ⟨n, h⟩)
         (enterSt ⟨n, h⟩ (matFsT enterSt sem f₀ n)
-          (dt.back zero one dt.dd0Le (dt.matSt vi st v n) v))
+          (dt.back RF.cell zero one dt.dd0Le (dt.matSt vi st v n) v))
     else matFsT enterSt sem f₀ n
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -1412,14 +1444,14 @@ theorem scratchEq_matSt (n : ℕ) : dt.ScratchEq (dt.matSt vi st v n) st :=
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite dt.KIx] in
 /-- **The matrix is blind to the two scratch registers**: atom by atom,
 `kindExitCtl_congr_scratch`. -/
-theorem matFs_congr_scratch {st' : TapeSt dt A R P} (h : dt.ScratchEq st st')
-    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+theorem matFs_congr_scratch {st' : TapeStD dt A R P} (h : dt.ScratchEq st st')
+    (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u)
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
       dt.CtlIx → A)
     (sem : ∀ a : Fin (dt.natOf vi), dt.KindSem zero one vi st (dt.kindOf vi a))
     (f₀ : dt.CtlIx → A) (n : ℕ) :
-    dt.matFs zero one vi st v enterSt sem f₀ n =
-      dt.matFs zero one vi st' v enterSt
+    dt.matFs RF hord zero one vi st v enterSt sem f₀ n =
+      dt.matFs RF hord zero one vi st' v enterSt
         (fun a => dt.kindSemCast zero one vi h.2.1 h.2.2.1 (dt.kindOf vi a)
           (sem a)) f₀ n := by
   classical
@@ -1429,7 +1461,7 @@ theorem matFs_congr_scratch {st' : TapeSt dt A R P} (h : dt.ScratchEq st st')
     rw [matFs, matFs]
     by_cases hn : n < dt.natOf vi
     · rw [dif_pos hn, dif_pos hn, ih, h.back hreg]
-      exact dt.kindExitCtl_congr_scratch h hreg (dt.kindOf vi ⟨n, hn⟩)
+      exact dt.kindExitCtl_congr_scratch RF hord h hreg (dt.kindOf vi ⟨n, hn⟩)
         (sem ⟨n, hn⟩) _ _ _ _
     · rw [dif_neg hn, dif_neg hn, ih]
 
@@ -1439,14 +1471,14 @@ reads the levels' registers and its background at the working cell
 (`kindExitCtl_congr_scratch`), and the threading rewrites SAV and TARGET
 alone. This is the bridge between the control the *run* produces and the
 control the *semantics* is stated at. -/
-theorem matFsT_eq_matFs (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
+theorem matFsT_eq_matFs (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u)
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
       dt.CtlIx → A)
     (semT : ∀ a : Fin (dt.natOf vi),
       dt.KindSem zero one vi (dt.matSt vi st v (a : ℕ)) (dt.kindOf vi a))
     (f₀ : dt.CtlIx → A) (n : ℕ) :
-    dt.matFsT zero one vi st v enterSt semT f₀ n =
-      dt.matFs zero one vi st v enterSt
+    dt.matFsT RF hord zero one vi st v enterSt semT f₀ n =
+      dt.matFs RF hord zero one vi st v enterSt
         (fun a => dt.kindSemCast zero one vi
           (dt.scratchEq_matSt (a : ℕ)).2.1
           (dt.scratchEq_matSt (a : ℕ)).2.2.1
@@ -1459,11 +1491,11 @@ theorem matFsT_eq_matFs (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u)
     by_cases hn : n < dt.natOf vi
     · rw [dif_pos hn, dif_pos hn, ih,
         (dt.scratchEq_matSt n).back hreg]
-      exact dt.kindExitCtl_congr_scratch (dt.scratchEq_matSt n) hreg
+      exact dt.kindExitCtl_congr_scratch RF hord (dt.scratchEq_matSt n) hreg
         (dt.kindOf vi ⟨n, hn⟩) (semT ⟨n, hn⟩) _ _ _ _
     · rw [dif_neg hn, dif_neg hn, ih]
 
-include hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt hrules in
+include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hrules in
 /-- **The matrix's run, threaded**: as
 `DescriptiveComplexity.Pfp.PfpData.matrix_run` with no boundary discipline
 assumed — the tape ends in the threaded state
@@ -1476,13 +1508,13 @@ theorem matrix_run_thread
     (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
-          (dt.matFsT PR.zero PR.one vi st v enterSt semT f₀ (dt.natOf vi))),
+          (dt.matFsT RF hord PR.zero PR.one vi st v enterSt semT f₀ (dt.natOf vi))),
         Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le
             (dt.matSt vi st v (dt.natOf vi)))
           (dt.matSt vi st v (dt.natOf vi)).val)
           (PR.syElt PR.blank)⟩ := by
@@ -1490,34 +1522,34 @@ theorem matrix_run_thread
   have hne_wk_val : (Slot.wk : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   have hne_rg_val : (Slot.reg : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   have hwkOf : ∀ (n : ℕ) r,
-      dt.back PR.zero PR.one dt.dd0Le (dt.matSt vi st v n) r Slot.wk =
+      dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.matSt vi st v n) r Slot.wk =
         bitVal PR.zero PR.one (r = v) := by
     intro n r
     rw [back_wk, (dt.matSt_fields (v := v) (st := st) n).1, hwkSt]
-  have hchain := seq_run hrules hR hlin hbot hv hvi
+  have hchain := seq_run RF.toIx hrules hR hlin hlin hbot hv hvi
     (t₀ := Slot.val)
-    (restOf := fun k => dt.back PR.zero PR.one dt.dd0Le
+    (restOf := fun k => dt.back RF.cell PR.zero PR.one dt.dd0Le
       (dt.matSt vi st v (k : ℕ)))
     (mOf := fun k => (dt.matSt vi st v (k : ℕ)).val)
     (fun k r => hwkOf (k : ℕ) r) (fun _ r => rfl) (fun _ r => rfl)
     hne_wk_val hne_rg_val
-    (fun j => dt.matFsT PR.zero PR.one vi st v enterSt semT f₀ (j : ℕ))
+    (fun j => dt.matFsT RF hord PR.zero PR.one vi st v enterSt semT f₀ (j : ℕ))
     ?_
   · exact hchain
   · intro a
     simp only [Fin.val_castSucc, Fin.val_succ]
-    have hFa : dt.matFsT PR.zero PR.one vi st v enterSt semT f₀
+    have hFa : dt.matFsT RF hord PR.zero PR.one vi st v enterSt semT f₀
           ((a : ℕ) + 1) =
-        dt.kindExitCtl PR.zero PR.one vi
+        dt.kindExitCtl RF hord PR.zero PR.one vi
           (Fin.castLE (dt.natOf_le_natMax vi) a)
           (dt.matSt vi st v (a : ℕ)) v
           (dt.kindOf vi a) (semT a)
           (dt.kindArgs_mul_card_le_ntgDim vi a)
           (dt.kindDepth_le_eDim vi a)
           (dt.kindReads_le_nfDim vi a)
-          (enterSt a (dt.matFsT PR.zero PR.one vi st v enterSt semT f₀
+          (enterSt a (dt.matFsT RF hord PR.zero PR.one vi st v enterSt semT f₀
               (a : ℕ))
-            (dt.back PR.zero PR.one dt.dd0Le (dt.matSt vi st v (a : ℕ)) v)) := by
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.matSt vi st v (a : ℕ)) v)) := by
       simp only [matFsT]
       rw [dif_pos a.isLt]
     have hSt : dt.matSt vi st v ((a : ℕ) + 1) =
@@ -1526,69 +1558,69 @@ theorem matrix_run_thread
       rw [dif_pos a.isLt]
     rw [hFa, hSt]
     obtain ⟨hw, hm, hb, -, -⟩ := dt.matSt_fields (v := v) (st := st) (a : ℕ)
-    exact dt.kind_hStage_thread hR hlin hord htop hbot hv hvi
+    exact dt.kind_hStage_thread RF hord hR hlin htop hbot hwork hv hvi
       (hw.trans hwkSt) (hm.trans hmirSt) (hb.trans hbotSt)
       (dt.kindOf vi a)
       (dt.kindArgs_mul_card_le_ntgDim vi a)
       (dt.kindDepth_le_eDim vi a)
       (dt.kindReads_le_nfDim vi a) (semT a)
       (fun s ρ => hrules (.sub a s) ρ)
-      (enterSt a (dt.matFsT PR.zero PR.one vi st v enterSt semT f₀ (a : ℕ))
-        (dt.back PR.zero PR.one dt.dd0Le (dt.matSt vi st v (a : ℕ)) v))
+      (enterSt a (dt.matFsT RF hord PR.zero PR.one vi st v enterSt semT f₀ (a : ℕ))
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.matSt vi st v (a : ℕ)) v))
 
-include hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt hsav htgt hrules in
+include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hsav htgt hrules in
 /-- **The matrix's run**: from the checkpoint before the first atom at the
 marker to the exit phase one cell to its right after the last, the verdict
 slots holding each atom's fold, the tape untouched. -/
 theorem matrix_run (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
-          (dt.matFs PR.zero PR.one vi st v enterSt sem f₀ (dt.natOf vi))),
+          (dt.matFs RF hord PR.zero PR.one vi st v enterSt sem f₀ (dt.natOf vi))),
         Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
   classical
   have hne_wk_val : (Slot.wk : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   have hne_rg_val : (Slot.reg : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
-  have hwkOf : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkOf : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
     rw [back_wk, hwkSt]
-  have hchain := seq_run hrules hR hlin hbot hv hvi
+  have hchain := seq_run RF.toIx hrules hR hlin hlin hbot hv hvi
     (t₀ := Slot.val)
-    (restOf := fun _ => dt.back PR.zero PR.one dt.dd0Le st)
+    (restOf := fun _ => dt.back RF.cell PR.zero PR.one dt.dd0Le st)
     (mOf := fun _ => st.val)
     (fun _ r => hwkOf r) (fun _ r => rfl) (fun _ r => rfl)
     hne_wk_val hne_rg_val
-    (fun j => dt.matFs PR.zero PR.one vi st v enterSt sem f₀ (j : ℕ))
+    (fun j => dt.matFs RF hord PR.zero PR.one vi st v enterSt sem f₀ (j : ℕ))
     ?_
   · exact hchain
   · intro a
     simp only [Fin.val_castSucc, Fin.val_succ]
-    have hFa : dt.matFs PR.zero PR.one vi st v enterSt sem f₀ ((a : ℕ) + 1) =
-        dt.kindExitCtl PR.zero PR.one vi
+    have hFa : dt.matFs RF hord PR.zero PR.one vi st v enterSt sem f₀ ((a : ℕ) + 1) =
+        dt.kindExitCtl RF hord PR.zero PR.one vi
           (Fin.castLE (dt.natOf_le_natMax vi) a) st v
           (dt.kindOf vi a) (sem a)
           (dt.kindArgs_mul_card_le_ntgDim vi a)
           (dt.kindDepth_le_eDim vi a)
           (dt.kindReads_le_nfDim vi a)
-          (enterSt a (dt.matFs PR.zero PR.one vi st v enterSt sem f₀ (a : ℕ))
-            (dt.back PR.zero PR.one dt.dd0Le st v)) := by
+          (enterSt a (dt.matFs RF hord PR.zero PR.one vi st v enterSt sem f₀ (a : ℕ))
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v)) := by
       simp only [matFs]
       rw [dif_pos a.isLt]
     rw [hFa]
-    exact dt.kind_hStage hR hlin hord htop hbot hv hvi hwkSt hmirSt hbotSt
+    exact dt.kind_hStage RF hord hR hlin htop hbot hwork hv hvi hwkSt hmirSt hbotSt
       hsav htgt (dt.kindOf vi a)
       (dt.kindArgs_mul_card_le_ntgDim vi a)
       (dt.kindDepth_le_eDim vi a)
       (dt.kindReads_le_nfDim vi a) (sem a)
       (fun s ρ => hrules (.sub a s) ρ)
-      (enterSt a (dt.matFs PR.zero PR.one vi st v enterSt sem f₀ (a : ℕ))
-        (dt.back PR.zero PR.one dt.dd0Le st v))
+      (enterSt a (dt.matFs RF hord PR.zero PR.one vi st v enterSt sem f₀ (a : ℕ))
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
 
 end MatrixRun
 
@@ -1613,13 +1645,13 @@ noncomputable def gatesFs
   | n + 1 =>
     if h : n < dt.arOf vi then
       (dt.gateArgs zero one (bOf ⟨n, h⟩) hc hnG hrdG).exitSt (tOf ⟨n, h⟩)
-        (dt.gateFam zero one (bOf ⟨n, h⟩) st (tOf ⟨n, h⟩) hc hnG hrdG v
-          (dt.gateTagFam zero one (bOf ⟨n, h⟩) st hc hnG hrdG v
+        (dt.gateFam RF zero one (bOf ⟨n, h⟩) st (tOf ⟨n, h⟩) hc hnG hrdG v
+          (dt.gateTagFam RF zero one (bOf ⟨n, h⟩) st hc hnG hrdG v
             (enterSt ⟨n, h⟩ (gatesFs bOf hc hnG hrdG tOf enterSt f₀ n)
-              (dt.back zero one dt.dd0Le st v))
+              (dt.back RF.cell zero one dt.dd0Le st v))
             (Fin.last (Fintype.card dt.X.Tag)))
           (toLex topTup) (Fin.last (dt.domNr (tOf ⟨n, h⟩))))
-        (dt.back zero one dt.dd0Le st v)
+        (dt.back RF.cell zero one dt.dd0Le st v)
     else gatesFs bOf hc hnG hrdG tOf enterSt f₀ n
 
 variable [Finite dt.KIx]
@@ -1640,16 +1672,21 @@ variable (hrules : ∀ (i : dt.GatesSite vi) (ρ : dt.GatesSh vi i),
     (failPh := failPh) (exitPh := exitPh) i ρ)
 variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable {gtop gbot : Univ A R P dt.KIx dt.dd}
 variable (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
+-- The program's working area lies below its file: an address missing the least
+-- element is below every register. Free at the input channel's ladder
+-- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
+-- by choosing where to put it.
+variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop}, ¬r gbot →
+  ∀ u, WMSetLt WMLe r (RF.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v)
 variable (TestOf : Fin (dt.arOf vi) → Univ A R P dt.KIx dt.dd → Prop)
 variable (hcompatOf : ∀ (ℓ : Fin (dt.arOf vi)) (u : Univ A R P dt.KIx dt.dd),
-  wellGOf ℓ (PR.passTracks Slot.mir (dt.back PR.zero PR.one dt.dd0Le st)
-    st.mir (wmSeg u)) ↔ TestOf ℓ u)
+  wellGOf ℓ (PR.passTracksAt RF.cell Slot.mir (dt.back RF.cell PR.zero PR.one dt.dd0Le st)
+    st.mir (RF.cell u)) ↔ TestOf ℓ u)
 variable (tOf : Fin (dt.arOf vi) → dt.X.Tag)
 variable (htagOf : ∀ ℓ : Fin (dt.arOf vi),
   dt.dspTagOf PR.zero PR.one
@@ -1663,44 +1700,44 @@ sequence exits with the conjoined verdict in the flag. -/
 theorem gates_run (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
-          (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt f₀
+          (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt f₀
             (dt.arOf vi))), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
   classical
   have hne_wk_val : (Slot.wk : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   have hne_rg_val : (Slot.reg : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
-  have hwkOf : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkOf : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
     rw [back_wk, hwkSt]
-  have hchain := seq_run hrules hR hlin hbot hv hvi
+  have hchain := seq_run RF.toIx hrules hR hlin hlin hbot hv hvi
     (t₀ := Slot.val)
-    (restOf := fun _ => dt.back PR.zero PR.one dt.dd0Le st)
+    (restOf := fun _ => dt.back RF.cell PR.zero PR.one dt.dd0Le st)
     (mOf := fun _ => st.val)
     (fun _ r => hwkOf r) (fun _ r => rfl) (fun _ r => rfl)
     hne_wk_val hne_rg_val
-    (fun j => dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
+    (fun j => dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
       f₀ (j : ℕ))
     ?_
   · exact hchain
   · intro ℓ
     simp only [Fin.val_castSucc, Fin.val_succ]
-    have hFa : dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
+    have hFa : dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
         f₀ ((ℓ : ℕ) + 1) =
         (dt.gateArgs PR.zero PR.one (bOf ℓ) hc hnG hrdG).exitSt (tOf ℓ)
-          (dt.gateFam PR.zero PR.one (bOf ℓ) st (tOf ℓ) hc hnG hrdG v
-            (dt.gateTagFam PR.zero PR.one (bOf ℓ) st hc hnG hrdG v
-              (enterSt ℓ (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG
+          (dt.gateFam RF PR.zero PR.one (bOf ℓ) st (tOf ℓ) hc hnG hrdG v
+            (dt.gateTagFam RF PR.zero PR.one (bOf ℓ) st hc hnG hrdG v
+              (enterSt ℓ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG
                 tOf enterSt f₀ (ℓ : ℕ))
-                (dt.back PR.zero PR.one dt.dd0Le st v))
+                (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
               (Fin.last (Fintype.card dt.X.Tag)))
             (toLex topTup) (Fin.last (dt.domNr (tOf ℓ))))
-          (dt.back PR.zero PR.one dt.dd0Le st v) := by
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st v) := by
       simp only [gatesFs]
       rw [dif_pos ℓ.isLt]
     rw [hFa]
@@ -1712,11 +1749,11 @@ theorem gates_run (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
             (wellG := wellGOf ℓ) (setFail := setFail)
             (failPh := failPh) (exitPh := emb (.chk ℓ.succ)) i ρ :=
       fun i ρ => hrules (.sub ℓ i) ρ
-    exact dt.gateBlock_hStage_pos (bOf ℓ) hc hnG hrdG (wellGOf ℓ) setFail
+    exact dt.gateBlock_hStage_pos RF (bOf ℓ) hc hnG hrdG (wellGOf ℓ) setFail
       hrules' hR hlin hord htop hbot hv hvi hwkSt
       (TestOf ℓ) (hcompatOf ℓ) (tOf ℓ) (htagOf ℓ) (hTestOf ℓ)
-      (enterSt ℓ (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf
-        enterSt f₀ (ℓ : ℕ)) (dt.back PR.zero PR.one dt.dd0Le st v))
+      (enterSt ℓ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf
+        enterSt f₀ (ℓ : ℕ)) (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
 
 include hrules hR hlin hord htop hbot hv hvi hwkSt hcompatOf htagOf in
 /-- **The gates' run at a junk address**: the blocks below `ℓ₀` pass, block
@@ -1728,50 +1765,50 @@ theorem gates_run_fail (ℓ₀ : Fin (dt.arOf vi))
     (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt failPh
           (setFail
-            (enterSt ℓ₀ (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG
+            (enterSt ℓ₀ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG
               tOf enterSt f₀ (ℓ₀ : ℕ))
-              (dt.back PR.zero PR.one dt.dd0Le st v))
-            (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape Slot.val
-          (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+              (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell Slot.val
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
           (PR.syElt PR.blank)⟩ := by
   classical
-  have hvnr := not_reg_of_lt_bot hlin hbot hv
+  have hvnr := not_reg_of_lt_bot RF.toIx hlin hlin hbot hv
   have hne_wk_val : (Slot.wk : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   have hne_rg_val : (Slot.reg : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
-  have hwkOf : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+  have hwkOf : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
       bitVal PR.zero PR.one (r = v) := by
     intro r
     rw [back_wk, hwkSt]
   -- the passing prefix, up to the failing block's checkpoint
-  have hpre := seq_run_prefix hrules hR hlin hbot hv hvi
+  have hpre := seq_run_prefix RF.toIx hrules hR hlin hlin hbot hv hvi
     (t₀ := Slot.val)
-    (restOf := fun _ => dt.back PR.zero PR.one dt.dd0Le st)
+    (restOf := fun _ => dt.back RF.cell PR.zero PR.one dt.dd0Le st)
     (mOf := fun _ => st.val)
     (fun _ r => hwkOf r) (fun _ r => rfl) (fun _ r => rfl)
     hne_wk_val hne_rg_val
-    (fun j => dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
+    (fun j => dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
       f₀ (j : ℕ))
     ℓ₀.castSucc ?_
   · refine hpre.trans ?_
     -- the dispatch into the failing block
     have hdsp : (wideData (Univ A R P dt.KIx dt.dd)).Step
         ⟨Sum.inr (PR.stElt (emb (.chk ℓ₀.castSucc))
-            (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
+            (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
               f₀ ((ℓ₀.castSucc : Fin (dt.arOf vi + 1)) : ℕ))), Sum.inl v,
-          wideTape (PR.trackTape Slot.val
-            (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+          wideTape (PR.trackTapeAt RF.cell Slot.val
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
             (PR.syElt PR.blank)⟩
         ⟨Sum.inr (PR.stElt (emb (.sub ℓ₀ (Sum.inl .up)))
-            (enterSt ℓ₀ (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG
+            (enterSt ℓ₀ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG
               tOf enterSt f₀ (ℓ₀ : ℕ))
-              (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-          wideTape (PR.trackTape Slot.val
-            (dt.back PR.zero PR.one dt.dd0Le st) st.val)
+              (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+          wideTape (PR.trackTapeAt RF.cell Slot.val
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val)
             (PR.syElt PR.blank)⟩ := by
       refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
       have h := hrules (.chk ℓ₀.castSucc) .dspA
@@ -1798,18 +1835,18 @@ theorem gates_run_fail (ℓ₀ : Fin (dt.arOf vi))
         · rw [Prog.passTracks_of_ne hne_wk_val, hwkOf]
           exact bitVal_pos rfl
         · rw [Prog.passTracks_of_ne hne_rg_val,
-            show dt.back PR.zero PR.one dt.dd0Le st v Slot.reg =
+            show dt.back RF.cell PR.zero PR.one dt.dd0Le st v Slot.reg =
               bitVal PR.zero PR.one
-                (∃ u : Univ A R P dt.KIx dt.dd, v = wmSeg u) from rfl,
+                (∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u) from rfl,
             bitVal_neg (fun hcx => hvnr hcx.choose hcx.choose_spec)]
           exact PR.zero_ne_one
       · rw [h]
         change enterSt ⟨((ℓ₀.castSucc : Fin (dt.arOf vi + 1)) : ℕ), hlt⟩ _
-          (PR.passTracks Slot.val
-            (dt.back PR.zero PR.one dt.dd0Le st) st.val v) = _
+          (PR.passTracksAt RF.cell Slot.val
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.val v) = _
         rw [passTracks_of_back (t := Slot.val)
-          (rest := dt.back PR.zero PR.one dt.dd0Le st) (m := st.val)
-          (fun r => rfl) v]
+          (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st) (m := st.val)
+          RF.toIx (fun r => rfl) v]
         rfl
     refine (Relation.ReflTransGen.single hdsp).trans ?_
     have hrules' : ∀ (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i),
@@ -1820,25 +1857,25 @@ theorem gates_run_fail (ℓ₀ : Fin (dt.arOf vi))
             (wellG := wellGOf ℓ₀) (setFail := setFail)
             (failPh := failPh) (exitPh := emb (.chk ℓ₀.succ)) i ρ :=
       fun i ρ => hrules (.sub ℓ₀ i) ρ
-    exact dt.gateBlock_hStage_neg (bOf ℓ₀) hc hnG hrdG (wellGOf ℓ₀) setFail
+    exact dt.gateBlock_hStage_neg RF (bOf ℓ₀) hc hnG hrdG (wellGOf ℓ₀) setFail
       hrules' hR hlin hord htop hbot hv hvi hwkSt
       (TestOf ℓ₀) (hcompatOf ℓ₀) hfail
-      (enterSt ℓ₀ (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf
-        enterSt f₀ (ℓ₀ : ℕ)) (dt.back PR.zero PR.one dt.dd0Le st v))
+      (enterSt ℓ₀ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf
+        enterSt f₀ (ℓ₀ : ℕ)) (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
   · -- the passing stages strictly below the failing block
     intro ℓ hℓ
     simp only [Fin.val_castSucc, Fin.val_succ]
-    have hFa : dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
+    have hFa : dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
         f₀ ((ℓ : ℕ) + 1) =
         (dt.gateArgs PR.zero PR.one (bOf ℓ) hc hnG hrdG).exitSt (tOf ℓ)
-          (dt.gateFam PR.zero PR.one (bOf ℓ) st (tOf ℓ) hc hnG hrdG v
-            (dt.gateTagFam PR.zero PR.one (bOf ℓ) st hc hnG hrdG v
-              (enterSt ℓ (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG
+          (dt.gateFam RF PR.zero PR.one (bOf ℓ) st (tOf ℓ) hc hnG hrdG v
+            (dt.gateTagFam RF PR.zero PR.one (bOf ℓ) st hc hnG hrdG v
+              (enterSt ℓ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG
                 tOf enterSt f₀ (ℓ : ℕ))
-                (dt.back PR.zero PR.one dt.dd0Le st v))
+                (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
               (Fin.last (Fintype.card dt.X.Tag)))
             (toLex topTup) (Fin.last (dt.domNr (tOf ℓ))))
-          (dt.back PR.zero PR.one dt.dd0Le st v) := by
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st v) := by
       simp only [gatesFs]
       rw [dif_pos ℓ.isLt]
     rw [hFa]
@@ -1850,11 +1887,11 @@ theorem gates_run_fail (ℓ₀ : Fin (dt.arOf vi))
             (wellG := wellGOf ℓ) (setFail := setFail)
             (failPh := failPh) (exitPh := emb (.chk ℓ.succ)) i ρ :=
       fun i ρ => hrules (.sub ℓ i) ρ
-    exact dt.gateBlock_hStage_pos (bOf ℓ) hc hnG hrdG (wellGOf ℓ) setFail
+    exact dt.gateBlock_hStage_pos RF (bOf ℓ) hc hnG hrdG (wellGOf ℓ) setFail
       hrules' hR hlin hord htop hbot hv hvi hwkSt
       (TestOf ℓ) (hcompatOf ℓ) (tOf ℓ) (htagOf ℓ) (hTestLt ℓ hℓ)
-      (enterSt ℓ (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf
-        enterSt f₀ (ℓ : ℕ)) (dt.back PR.zero PR.one dt.dd0Le st v))
+      (enterSt ℓ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf
+        enterSt f₀ (ℓ : ℕ)) (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
 
 omit [Finite dt.KIx] [Finite R] [Finite P] hrules hR hlin hord htop hbot hv
   hvi hwkSt hcompatOf htagOf in
@@ -1868,7 +1905,7 @@ theorem ctlBit_gateFlagC_gatesFs (hzo : PR.zero ≠ PR.one)
         dt.ctlBit PR.one f dt.gateFlagC)
     (f₀ : dt.CtlIx → A) (n : ℕ) :
     dt.ctlBit PR.one
-        (dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt f₀ n)
+        (dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt f₀ n)
         dt.gateFlagC ↔
       (dt.ctlBit PR.one f₀ dt.gateFlagC ∧
         ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < n →
@@ -1885,22 +1922,22 @@ theorem ctlBit_gateFlagC_gatesFs (hzo : PR.zero ≠ PR.one)
       fun h => h.1⟩
   | succ n ih =>
     by_cases hlt : n < dt.arOf vi
-    · have hstep : dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf
+    · have hstep : dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf
           enterSt f₀ (n + 1) =
           (dt.gateArgs PR.zero PR.one (bOf ⟨n, hlt⟩) hc hnG hrdG).exitSt
             (tOf ⟨n, hlt⟩)
-            (dt.gateFam PR.zero PR.one (bOf ⟨n, hlt⟩) st (tOf ⟨n, hlt⟩) hc
+            (dt.gateFam RF PR.zero PR.one (bOf ⟨n, hlt⟩) st (tOf ⟨n, hlt⟩) hc
               hnG hrdG v
-              (dt.gateTagFam PR.zero PR.one (bOf ⟨n, hlt⟩) st hc hnG hrdG v
-                (enterSt ⟨n, hlt⟩ (dt.gatesFs PR.zero PR.one vi st v bOf hc
+              (dt.gateTagFam RF PR.zero PR.one (bOf ⟨n, hlt⟩) st hc hnG hrdG v
+                (enterSt ⟨n, hlt⟩ (dt.gatesFs RF PR.zero PR.one vi st v bOf hc
                   hnG hrdG tOf enterSt f₀ n)
-                  (dt.back PR.zero PR.one dt.dd0Le st v))
+                  (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
                 (Fin.last (Fintype.card dt.X.Tag)))
               (toLex topTup) (Fin.last (dt.domNr (tOf ⟨n, hlt⟩))))
-            (dt.back PR.zero PR.one dt.dd0Le st v) := by
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v) := by
         simp only [gatesFs]
         rw [dif_pos hlt]
-      rw [hstep, dt.ctlBit_gateFlagC_gate_domHolds hzo _, hEnter, ih]
+      rw [hstep, dt.ctlBit_gateFlagC_gate_domHolds RF hzo _, hEnter, ih]
       constructor
       · rintro ⟨⟨h0, hall⟩, hn⟩
         refine ⟨h0, fun ℓ hℓ => ?_⟩
@@ -1912,9 +1949,9 @@ theorem ctlBit_gateFlagC_gatesFs (hzo : PR.zero ≠ PR.one)
       · rintro ⟨h0, hall⟩
         exact ⟨⟨h0, fun ℓ hℓ => hall ℓ (Nat.lt_succ_of_lt hℓ)⟩,
           hall ⟨n, hlt⟩ (Nat.lt_succ_self n)⟩
-    · have hstep : dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf
+    · have hstep : dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf
           enterSt f₀ (n + 1) =
-          dt.gatesFs PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
+          dt.gatesFs RF PR.zero PR.one vi st v bOf hc hnG hrdG tOf enterSt
             f₀ n := by
         simp only [gatesFs]
         rw [dif_neg hlt]

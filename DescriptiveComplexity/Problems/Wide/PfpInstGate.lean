@@ -38,13 +38,14 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 variable {PR : Prog A R P dt.CtlIx dt.SlotIx dt.KIx dt.dd}
+variable (RF : RegFile (Univ A R P dt.KIx dt.dd))
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
 
 section GateInst
 
 variable (zero one : A)
 variable (b : Fin dt.ko ⊕ Fin dt.ki)
-variable (st : TapeSt dt A R P) (t : dt.X.Tag)
+variable (st : TapeStD dt A R P) (t : dt.X.Tag)
 
 /-- **The cell of one tag's witness read**: the tag's witness tuple in the
 gated block. -/
@@ -72,7 +73,7 @@ variable (vAdr) in
 noncomputable def gateTagFam (f₀ : dt.CtlIx → A)
     (i : Fin (Fintype.card dt.X.Tag + 1)) : dt.CtlIx → A :=
   tagFam ((dt.gateArgs zero one b hc hn hrd).setTagFlag)
-    (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+    (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
     (dt.gateTagCell zero one b) f₀ i
 
 variable (vAdr) in
@@ -82,7 +83,7 @@ noncomputable def gateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
   elemFam ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
     ((dt.gateArgs zero one b hc hn hrd).initEl t)
     ((dt.gateArgs zero one b hc hn hrd).advEl t)
-    (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+    (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
     (dt.gateECell zero one b t (hn t)) f₀ a j
 
 variable {dt zero one b st t hnt hc hn hrd}
@@ -125,7 +126,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 gate's family. -/
 theorem readLvE_gateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.domNr t + 1)) :
-    dt.readLvE (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a j) =
+    dt.readLvE (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a j) =
       ofLex a := by
   classical
   have hchain : ∀ (b' : Lex (Fin dt.eDim → A)) (q : dt.CtlIx → A) (n : ℕ),
@@ -133,7 +134,7 @@ theorem readLvE_gateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
         (fun j' => st.mir (dt.gateECell zero one b t (hn t) b' j'))
         (fun j' bb q' =>
           (dt.gateArgs zero one b hc hn hrd).setFlagE t j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr)) q n) = dt.readLvE q :=
+            (dt.back RF.cell zero one dt.dd0Le st vAdr)) q n) = dt.readLvE q :=
     fun b' q n => readLvE_chainSt _ _
       (fun i bb f => readLvE_gate_setFlag i bb f _) q n
   have hiter : ∀ b' : Lex (Fin dt.eDim → A),
@@ -141,7 +142,7 @@ theorem readLvE_gateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
         ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
         ((dt.gateArgs zero one b hc hn hrd).initEl t)
         ((dt.gateArgs zero one b hc hn hrd).advEl t)
-        (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
         (dt.gateECell zero one b t (hn t)) f₀ b') = ofLex b' := by
     intro b'
     induction b' using order_induction with
@@ -153,20 +154,20 @@ theorem readLvE_gateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
           ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
           ((dt.gateArgs zero one b hc hn hrd).initEl t)
           ((dt.gateArgs zero one b hc hn hrd).advEl t)
-          (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+          (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
           (dt.gateECell zero one b t (hn t)) f₀ z =
         (dt.gateArgs zero one b hc hn hrd).advEl t
           (chainSt
             (fun j' => st.mir (dt.gateECell zero one b t (hn t) w j'))
             (fun j' bb q' =>
               (dt.gateArgs zero one b hc hn hrd).setFlagE t j' bb q'
-                (dt.back zero one dt.dd0Le st vAdr))
+                (dt.back RF.cell zero one dt.dd0Le st vAdr))
             (elemIter ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
               ((dt.gateArgs zero one b hc hn hrd).initEl t)
               ((dt.gateArgs zero one b hc hn hrd).advEl t)
-              (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+              (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
               (dt.gateECell zero one b t (hn t)) f₀ w) (dt.domNr t))
-          (dt.back zero one dt.dd0Le st vAdr) :=
+          (dt.back RF.cell zero one dt.dd0Le st vAdr) :=
         iterOrd_covers hwz hnb
       rw [hz2, readLvE_gate_adv, hchain, ih,
         ofLex_eq_tupNext_of_covers hwz hnb]
@@ -181,7 +182,7 @@ holds the digit of `t'`'s witness cell in the gated block. -/
 theorem ctlBit_gateTagFam_last (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (t' : dt.X.Tag) :
     dt.ctlBit one
-        (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+        (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
           (Fin.last (Fintype.card dt.X.Tag))) (dt.gateTagC hc t') ↔
       st.mir (dt.gateTagCell zero one b (Fintype.equivFin dt.X.Tag t')) := by
   classical
@@ -213,11 +214,11 @@ block. -/
 theorem ctlBit_gateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (t' : dt.X.Tag) :
     dt.ctlBit one
-        (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+        (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
           (Fin.last (Fintype.card dt.X.Tag))) (dt.gateTagC hc t') ↔
       wmBlk st.mir (PfpTag.arg (toLex b) : PfpTag R P dt.KIx)
         (encTagTup dt.ly zero one t') := by
-  rw [dt.ctlBit_gateTagFam_last hzo f₀ t']
+  rw [dt.ctlBit_gateTagFam_last RF hzo f₀ t']
   have hcell : dt.gateTagCell (R := R) (P := P) zero one b
       ((Fintype.equivFin dt.X.Tag) t') =
       dt.blkElt b (encTagTup dt.ly zero one t') := by
@@ -235,7 +236,7 @@ theorem dspTagsAre_gateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
       (dt.dspTagOf zero one
         (wmBlk st.mir (PfpTag.arg (toLex b) : PfpTag R P dt.KIx)))
-      (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+      (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
         (Fin.last (Fintype.card dt.X.Tag))) := by
   classical
   by_cases h : ∃ t₁ : dt.X.Tag, ∀ t' : dt.X.Tag,
@@ -244,12 +245,12 @@ theorem dspTagsAre_gateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
   · left
     rw [dspTagOf, dif_pos h]
     intro t'
-    rw [dt.ctlBit_gateTagFam_wit hzo f₀ t']
+    rw [dt.ctlBit_gateTagFam_wit RF hzo f₀ t']
     exact h.choose_spec t'
   · right
     refine ⟨by rw [dspTagOf, dif_neg h], fun t₁ hc1 => h ⟨t₁, fun t' => ?_⟩⟩
     rw [← dt.ctlBit_gateTagFam_wit (b := b) (st := st) (vAdr := vAdr)
-      hzo f₀ t']
+      RF hzo f₀ t']
     exact hc1 t'
 
 /-! ### The domain payload at a generated state, and the leaf guards -/
@@ -260,25 +261,25 @@ tuple's. -/
 theorem domPay_gateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.domNr t + 1)) (r : Fin (dt.domNr t)) :
     dt.domPay (zero := zero) (t := t) (r := r) (hn := hn t)
-      (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a j) =
+      (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a j) =
       pad zero fun q => ofLex a (Fin.castLE (hn t) ((domLeafData t r).2 q)) := by
   refine congrArg (pad zero) (funext fun q => ?_)
-  exact congrFun (readLvE_gateFam f₀ a j) _
+  exact congrFun (readLvE_gateFam RF f₀ a j) _
 
-omit [Fintype dt.SlotIx] in
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A domain leaf read's guard holds at its cell.** -/
 theorem domMatch_gateFam (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.domNr t + 1)) (r : Fin (dt.domNr t)) :
     dt.domMatch zero one b t r (hn t)
-      (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a j)
-      (dt.back zero one dt.dd0Le st
-        (wmSeg (dt.gateECell zero one b t (hn t) a r))) := by
-  refine (dt.encG_iff hzo hlin _ _ _ _ _).mpr ?_
-  rw [gateECell, dt.domPay_gateFam f₀ a j r]
+      (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a j)
+      (dt.back RF.cell zero one dt.dd0Le st
+        (RF.cell (dt.gateECell zero one b t (hn t) a r))) := by
+  refine (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ _).mpr ?_
+  rw [gateECell, dt.domPay_gateFam RF f₀ a j r]
 
-omit [Fintype dt.SlotIx] in
+omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A domain leaf read's guard identifies its cell.** -/
 theorem domMatch_gateFam_uniq (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -286,13 +287,13 @@ theorem domMatch_gateFam_uniq (hzo : zero ≠ one)
     (j : Fin (dt.domNr t + 1)) (r : Fin (dt.domNr t))
     {y : Univ A R P dt.KIx dt.dd → Prop}
     (hM : dt.domMatch zero one b t r (hn t)
-      (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a j)
-      (dt.back zero one dt.dd0Le st y)) :
-    y = wmSeg (dt.gateECell zero one b t (hn t) a r) := by
-  by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, y = wmSeg u
+      (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a j)
+      (dt.back RF.cell zero one dt.dd0Le st y)) :
+    y = RF.cell (dt.gateECell zero one b t (hn t) a r) := by
+  by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, y = RF.cell u
   · obtain ⟨u, rfl⟩ := hreg
-    have hu := (dt.encG_iff hzo hlin _ _ _ _ u).mp hM
-    rw [hu, gateECell, dt.domPay_gateFam f₀ a j r]
+    have hu := (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ u).mp hM
+    rw [hu, gateECell, dt.domPay_gateFam RF f₀ a j r]
   · exact absurd hM (dt.not_nameGF_of_not_reg hzo
       (fun u hc' => hreg ⟨u, hc'⟩))
 
@@ -324,11 +325,11 @@ variable (hR : PR.table.Reads)
 variable (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
 variable {gbot : Univ A R P dt.KIx dt.dd} (hbot : ∀ y, WMLe gbot y)
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
-variable (hv : WMSetLt WMLe v (wmSeg gbot)) (hvi : WMIncr WMLe v v')
+variable (hv : WMSetLt WMLe v (RF.cell gbot)) (hvi : WMIncr WMLe v v')
 variable (hwkSt : st.wk = fun r => r = v)
 variable {t₀ : dt.SlotIx} {m₀ : Univ A R P dt.KIx dt.dd → Prop}
-variable (hm₀ : ∀ r, dt.back PR.zero PR.one dt.dd0Le st r t₀ =
-  bitVal PR.zero PR.one (regBit m₀ r))
+variable (hm₀ : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r t₀ =
+  bitVal PR.zero PR.one (bitAtOf RF.cell m₀ r))
 variable (hwkt₀ : (Slot.wk : dt.SlotIx) ≠ t₀)
 variable (hrgt₀ : (Slot.reg : dt.SlotIx) ≠ t₀)
 variable (htag : dt.dspTagOf PR.zero PR.one
@@ -344,29 +345,29 @@ phase one cell to the marker's right. -/
 theorem gate_run :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) f₀), Sum.inl v,
-        wideTape (PR.trackTape t₀ (dt.back PR.zero PR.one dt.dd0Le st) m₀)
+        wideTape (PR.trackTapeAt RF.cell t₀ (dt.back RF.cell PR.zero PR.one dt.dd0Le st) m₀)
           (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.gateArgs PR.zero PR.one b hc hn hrd).exitSt t
-            (dt.gateFam PR.zero PR.one b st t hc hn hrd v
-              (dt.gateTagFam PR.zero PR.one b st hc hn hrd v f₀
+            (dt.gateFam RF PR.zero PR.one b st t hc hn hrd v
+              (dt.gateTagFam RF PR.zero PR.one b st hc hn hrd v f₀
                 (Fin.last (Fintype.card dt.X.Tag)))
               (toLex topTup) (Fin.last (dt.domNr t)))
-            (dt.back PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
-        wideTape (PR.trackTape t₀ (dt.back PR.zero PR.one dt.dd0Le st) m₀)
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell t₀ (dt.back RF.cell PR.zero PR.one dt.dd0Le st) m₀)
           (PR.syElt PR.blank)⟩ := by
   classical
   have hzo := PR.zero_ne_one
   have hwk_ne_mir : (Slot.wk : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hrg_ne_mir : (Slot.reg : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hTA : dt.DspTagsAre PR.one hc t
-      (dt.gateTagFam PR.zero PR.one b st hc hn hrd v f₀
+      (dt.gateTagFam RF PR.zero PR.one b st hc hn hrd v f₀
         (Fin.last (Fintype.card dt.X.Tag))) := by
     rw [← htag]
-    exact dt.dspTagsAre_gateFam (b := b) (st := st) (vAdr := v) hzo f₀
-  refine tag_run_iter hrules hR hlin hbot hv hvi
+    exact dt.dspTagsAre_gateFam (b := b) (st := st) (vAdr := v) RF hzo f₀
+  refine tag_run_iter RF.toIx hrules hR hlin hlin hbot hv hvi
     (fun r => by
-      rw [show dt.back PR.zero PR.one dt.dd0Le st r Slot.wk =
+      rw [show dt.back RF.cell PR.zero PR.one dt.dd0Le st r Slot.wk =
         bitVal PR.zero PR.one (st.wk r) from rfl, hwkSt])
     (fun r => rfl)
     (mT := fun _ => st.mir)
@@ -391,18 +392,18 @@ theorem gate_run :
     intro i
     rw [passTracks_of_back
       (t := (dt.gateArgs PR.zero PR.one b hc hn hrd).rdTrackT i)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
-      (m := st.mir) (fun r => rfl) _]
-    exact (dt.encG_iff hzo hlin _ _ _ _ _).mpr rfl
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
+      (m := st.mir) RF.toIx (fun r => rfl) _]
+    exact (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ _).mpr rfl
   · -- the witness guards identify their cells
     intro i r hM
     rw [passTracks_of_back
       (t := (dt.gateArgs PR.zero PR.one b hc hn hrd).rdTrackT i)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
-      (m := st.mir) (fun r' => rfl) _] at hM
-    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = wmSeg u
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
+      (m := st.mir) RF.toIx (fun r' => rfl) _] at hM
+    by_cases hreg : ∃ u : Univ A R P dt.KIx dt.dd, r = RF.cell u
     · obtain ⟨u, rfl⟩ := hreg
-      have hu := (dt.encG_iff hzo hlin _ _ _ _ u).mp hM
+      have hu := (dt.encG_iff hzo (RF.injective hlin) _ _ _ _ u).mp hM
       rw [hu]
       rfl
     · exact absurd hM (dt.not_nameGF_of_not_reg hzo
@@ -411,30 +412,30 @@ theorem gate_run :
     intro a j
     rw [passTracks_of_back
       (t := (dt.gateArgs PR.zero PR.one b hc hn hrd).rdTrackE t j)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
-      (m := st.mir) (fun r => rfl) _]
-    exact dt.domMatch_gateFam hzo hlin _ a j.castSucc j
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
+      (m := st.mir) RF.toIx (fun r => rfl) _]
+    exact dt.domMatch_gateFam RF hzo hlin _ a j.castSucc j
   · -- the domain leaf guards identify their cells
     intro a j r hM
     rw [passTracks_of_back
       (t := (dt.gateArgs PR.zero PR.one b hc hn hrd).rdTrackE t j)
-      (rest := dt.back PR.zero PR.one dt.dd0Le st)
-      (m := st.mir) (fun r' => rfl) _] at hM
-    exact dt.domMatch_gateFam_uniq hzo hlin _ a j.castSucc j hM
+      (rest := dt.back RF.cell PR.zero PR.one dt.dd0Le st)
+      (m := st.mir) RF.toIx (fun r' => rfl) _] at hM
+    exact dt.domMatch_gateFam_uniq RF hzo hlin _ a j.castSucc j hM
   · -- exhausted at the top
     change IsMaxTup (dt.readLvE _)
     rw [show dt.readLvE (elemFam
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).setFlagE t)
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).initEl t)
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).advEl t)
-        (dt.back PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
         (dt.gateECell PR.zero PR.one b t (hn t))
         (tagFam (dt.gateArgs PR.zero PR.one b hc hn hrd).setTagFlag
-          (dt.back PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
           (dt.gateTagCell PR.zero PR.one b) f₀
           (Fin.last (Fintype.card dt.X.Tag)))
         (toLex topTup) (Fin.last (dt.domNr t))) =
-      ofLex (toLex topTup) from readLvE_gateFam _ _ _]
+      ofLex (toLex topTup) from readLvE_gateFam RF _ _ _]
     exact isMaxTup_topTup
   · -- not exhausted below the top
     intro a ha hcx
@@ -442,10 +443,10 @@ theorem gate_run :
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).setFlagE t)
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).initEl t)
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).advEl t)
-        (dt.back PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
         (dt.gateECell PR.zero PR.one b t (hn t))
         (tagFam (dt.gateArgs PR.zero PR.one b hc hn hrd).setTagFlag
-          (dt.back PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
           (dt.gateTagCell PR.zero PR.one b) f₀
           (Fin.last (Fintype.card dt.X.Tag)))
         a (Fin.last (dt.domNr t)))) := hcx
@@ -453,14 +454,14 @@ theorem gate_run :
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).setFlagE t)
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).initEl t)
         ((dt.gateArgs PR.zero PR.one b hc hn hrd).advEl t)
-        (dt.back PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
         (dt.gateECell PR.zero PR.one b t (hn t))
         (tagFam (dt.gateArgs PR.zero PR.one b hc hn hrd).setTagFlag
-          (dt.back PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le st) v (fun _ => st.mir)
           (dt.gateTagCell PR.zero PR.one b) f₀
           (Fin.last (Fintype.card dt.X.Tag)))
         a (Fin.last (dt.domNr t))) =
-      ofLex a from readLvE_gateFam _ _ _] at hc2
+      ofLex a from readLvE_gateFam RF _ _ _] at hc2
     exact absurd (tup_isTop_iff.mpr hc2 (toLex topTup)) (not_le_of_gt ha)
 
 end GateRun
@@ -483,7 +484,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 theorem ctlBit_rdf_gateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (r : Fin (dt.domNr t)) :
     dt.ctlBit one
-        (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a
+        (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a
           (Fin.last (dt.domNr t)))
         (dt.rdfC (Fin.castLE (hrd t) r)) ↔
       st.mir (dt.gateECell zero one b t (hn t) a r) := by
@@ -497,7 +498,7 @@ theorem ctlBit_rdf_gateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (elemIter ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
       ((dt.gateArgs zero one b hc hn hrd).initEl t)
       ((dt.gateArgs zero one b hc hn hrd).advEl t)
-      (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+      (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
       (dt.gateECell zero one b t (hn t)) f₀ a)
     (dt.domNr t) r r.isLt
 
@@ -508,28 +509,28 @@ tuple. -/
 theorem domLeafVal_gateFam (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A)) :
     dt.domLeafVal one t (hn t) (hrd t)
-        (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a
+        (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a
           (Fin.last (dt.domNr t))) ↔
       dt.gateLeafP b st t (hn t) zero one (ofLex a) := by
   have hval := dt.domLeafVal_iff t (hn t) (hrd t)
     (decRho dt.ly zero one
       (wmBlk st.mir (PfpTag.arg (toLex b) : PfpTag R P dt.KIx)))
-    (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a (Fin.last (dt.domNr t)))
+    (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a (Fin.last (dt.domNr t)))
     (fun r => by
-      refine (dt.ctlBit_rdf_gateFam hzo f₀ a r).trans ?_
+      refine (dt.ctlBit_rdf_gateFam RF hzo f₀ a r).trans ?_
       have hpay : (fun q => ofLex a
           (Fin.castLE (hn t) ((domLeafData t r).2 q))) =
-          fun q => dt.gateFam zero one b st t hc hn hrd vAdr f₀ a
+          fun q => dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a
             (Fin.last (dt.domNr t))
             (dt.lvE (Fin.castLE (hn t) ((domLeafData t r).2 q))) :=
         funext fun q =>
-          (congrFun (readLvE_gateFam f₀ a (Fin.last (dt.domNr t))) _).symm
+          (congrFun (readLvE_gateFam RF f₀ a (Fin.last (dt.domNr t))) _).symm
       rw [gateECell, hpay]
       exact Iff.rfl)
   refine hval.trans ?_
   rw [gateLeafP]
   refine iff_of_eq (congrArg _ (funext fun j => ?_))
-  exact congrFun (readLvE_gateFam f₀ a (Fin.last (dt.domNr t))) _
+  exact congrFun (readLvE_gateFam RF f₀ a (Fin.last (dt.domNr t))) _
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A gate's accumulators fold the strict prefix**: at every round's
@@ -542,7 +543,7 @@ theorem readSac_gateIter (hzo : zero ≠ one)
         ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
         ((dt.gateArgs zero one b hc hn hrd).initEl t)
         ((dt.gateArgs zero one b hc hn hrd).advEl t)
-        (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
         (dt.gateECell zero one b t (hn t)) f₀ a) j ↔
       accCVal (dt.domPk t).pol (dt.gateLeafP b st t (hn t) zero one)
         (· ≤ · : A → A → Prop) j (ofLex a) := by
@@ -552,7 +553,7 @@ theorem readSac_gateIter (hzo : zero ≠ one)
     rw [elemIter, iterOrd_bot hz]
     have hread : dt.readSac one
         ((dt.gateArgs zero one b hc hn hrd).initEl t f₀
-          (dt.back zero one dt.dd0Le st vAdr)) j ↔
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)) j ↔
         ((dt.domPk t).pol j = false) := by
       change dt.readSac one (dt.gateInit zero one t f₀) j ↔ _
       rw [gateInit, initSac]
@@ -569,7 +570,7 @@ theorem readSac_gateIter (hzo : zero ≠ one)
     set F := elemFam ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
       ((dt.gateArgs zero one b hc hn hrd).initEl t)
       ((dt.gateArgs zero one b hc hn hrd).advEl t)
-      (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+      (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
       (dt.gateECell zero one b t (hn t)) f₀ w
       (Fin.last (dt.domNr t)) with hF
     have hreadF : ∀ j' : ℕ, dt.readSac one F j' ↔
@@ -577,7 +578,7 @@ theorem readSac_gateIter (hzo : zero ≠ one)
           ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
           ((dt.gateArgs zero one b hc hn hrd).initEl t)
           ((dt.gateArgs zero one b hc hn hrd).advEl t)
-          (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+          (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
           (dt.gateECell zero one b t (hn t)) f₀ w) j' := by
       intro j'
       rw [hF]
@@ -590,22 +591,22 @@ theorem readSac_gateIter (hzo : zero ≠ one)
             fun j₃ h => nomatch h
           exact readSac_setCtl hne _ f j'') _ _ j'
     have hlvF : dt.readLvE F = ofLex w :=
-      readLvE_gateFam f₀ w (Fin.last (dt.domNr t))
+      readLvE_gateFam RF f₀ w (Fin.last (dt.domNr t))
     have hstepEq : elemIter
         ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
         ((dt.gateArgs zero one b hc hn hrd).initEl t)
         ((dt.gateArgs zero one b hc hn hrd).advEl t)
-        (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
         (dt.gateECell zero one b t (hn t)) f₀ z =
         (dt.gateArgs zero one b hc hn hrd).advEl t F
-          (dt.back zero one dt.dd0Le st vAdr) := by
+          (dt.back RF.cell zero one dt.dd0Le st vAdr) := by
       rw [elemIter, iterOrd_covers hwz hnb]
       rfl
     rw [hstepEq]
     have hadv : ∀ j' : ℕ, j' < dt.eDim →
         (dt.readSac one
           ((dt.gateArgs zero one b hc hn hrd).advEl t F
-            (dt.back zero one dt.dd0Le st vAdr)) j' ↔
+            (dt.back RF.cell zero one dt.dd0Le st vAdr)) j' ↔
         dt.readSac one
           (dt.carrySac zero one (dt.domPk t).pol (tupCarry (dt.readLvE F))
             (dt.setSubLeaf zero one
@@ -662,7 +663,7 @@ theorem readSac_gateIter (hzo : zero ≠ one)
       rw [readSac_setSubLeaf, hreadF i]
       exact ih i hi
     · rw [ctlBit_setSubLeaf hzo]
-      exact domLeafVal_gateFam hzo f₀ w
+      exact domLeafVal_gateFam RF hzo f₀ w
     · intro i hi
       exact readSac_carrySac hzo (dt.domPk t).pol (tupCarry (ofLex w))
         (dt.setSubLeaf zero one
@@ -740,14 +741,14 @@ chain's decoding. -/
 theorem ctlBit_tgf_gateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (j : Fin (dt.domNr t + 1)) :
     dt.ctlBit one
-        (dt.gateFam zero one b st t hc hn hrd vAdr f₀ a j)
+        (dt.gateFam RF zero one b st t hc hn hrd vAdr f₀ a j)
         (dt.gateTagC hc t₂) ↔
       dt.ctlBit one f₀ (dt.gateTagC hc t₂) := by
   classical
   have hupdE : ∀ (i : Fin (dt.domNr t)) (bb : Bool) (f : dt.CtlIx → A),
       dt.ctlBit one
         ((dt.gateArgs zero one b hc hn hrd).setFlagE t i bb f
-          (dt.back zero one dt.dd0Le st vAdr)) (dt.gateTagC hc t₂) ↔
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)) (dt.gateTagC hc t₂) ↔
       dt.ctlBit one f (dt.gateTagC hc t₂) := by
     intro i bb f
     change dt.ctlBit one (dt.setCtl zero one
@@ -760,7 +761,7 @@ theorem ctlBit_tgf_gateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
         (fun j' => st.mir (dt.gateECell zero one b t (hn t) b' j'))
         (fun j' bb q' =>
           (dt.gateArgs zero one b hc hn hrd).setFlagE t j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr)) q n) (dt.gateTagC hc t₂) ↔
+            (dt.back RF.cell zero one dt.dd0Le st vAdr)) q n) (dt.gateTagC hc t₂) ↔
       dt.ctlBit one q (dt.gateTagC hc t₂) :=
     fun b' q n => ctlBit_chainSt_of _ _ _
       (fun i bb f => hupdE i bb f) q n
@@ -769,7 +770,7 @@ theorem ctlBit_tgf_gateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
         ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
         ((dt.gateArgs zero one b hc hn hrd).initEl t)
         ((dt.gateArgs zero one b hc hn hrd).advEl t)
-        (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
         (dt.gateECell zero one b t (hn t)) f₀ b') (dt.gateTagC hc t₂) ↔
       dt.ctlBit one f₀ (dt.gateTagC hc t₂) := by
     intro b'
@@ -780,14 +781,14 @@ theorem ctlBit_tgf_gateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
     | hstep w z hwz hnb ih =>
       have hz2 := iterOrd_covers
         (init := ((dt.gateArgs zero one b hc hn hrd).initEl t f₀
-          (dt.back zero one dt.dd0Le st vAdr)))
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)))
         (step := fun a' q => (dt.gateArgs zero one b hc hn hrd).advEl t
           (chainSt
             (fun j' => st.mir (dt.gateECell zero one b t (hn t) a' j'))
             (fun j' bb q' =>
               (dt.gateArgs zero one b hc hn hrd).setFlagE t j' bb q'
-                (dt.back zero one dt.dd0Le st vAdr)) q (dt.domNr t))
-          (dt.back zero one dt.dd0Le st vAdr))
+                (dt.back RF.cell zero one dt.dd0Le st vAdr)) q (dt.domNr t))
+          (dt.back RF.cell zero one dt.dd0Le st vAdr))
         hwz hnb
       rw [elemIter] at ih ⊢
       rw [hz2, ctlBit_tgf_gate_adv t₂, hchain]
@@ -834,15 +835,15 @@ chain nor the branch's domain loop writes it. -/
 theorem ctlBit_gateFlagC_gateFam (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (j : Fin (dt.domNr t + 1)) :
     dt.ctlBit one
-        (dt.gateFam zero one b st t hc hn hrd vAdr
-          (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+        (dt.gateFam RF zero one b st t hc hn hrd vAdr
+          (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
             (Fin.last (Fintype.card dt.X.Tag))) a j) dt.gateFlagC ↔
       dt.ctlBit one f₀ dt.gateFlagC := by
   classical
   have hupdE : ∀ (i : Fin (dt.domNr t)) (bb : Bool) (f : dt.CtlIx → A),
       dt.ctlBit one
         ((dt.gateArgs zero one b hc hn hrd).setFlagE t i bb f
-          (dt.back zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
       dt.ctlBit one f dt.gateFlagC := by
     intro i bb f
     change dt.ctlBit one (dt.setCtl zero one
@@ -855,7 +856,7 @@ theorem ctlBit_gateFlagC_gateFam (f₀ : dt.CtlIx → A)
         (fun j' => st.mir (dt.gateECell zero one b t (hn t) b' j'))
         (fun j' bb q' =>
           (dt.gateArgs zero one b hc hn hrd).setFlagE t j' bb q'
-            (dt.back zero one dt.dd0Le st vAdr)) q n) dt.gateFlagC ↔
+            (dt.back RF.cell zero one dt.dd0Le st vAdr)) q n) dt.gateFlagC ↔
       dt.ctlBit one q dt.gateFlagC :=
     fun b' q n => ctlBit_chainSt_of _ _ _
       (fun i bb f => hupdE i bb f) q n
@@ -864,11 +865,11 @@ theorem ctlBit_gateFlagC_gateFam (f₀ : dt.CtlIx → A)
         ((dt.gateArgs zero one b hc hn hrd).setFlagE t)
         ((dt.gateArgs zero one b hc hn hrd).initEl t)
         ((dt.gateArgs zero one b hc hn hrd).advEl t)
-        (dt.back zero one dt.dd0Le st) vAdr (fun _ => st.mir)
+        (dt.back RF.cell zero one dt.dd0Le st) vAdr (fun _ => st.mir)
         (dt.gateECell zero one b t (hn t))
-        (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+        (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
           (Fin.last (Fintype.card dt.X.Tag))) b') dt.gateFlagC ↔
-      dt.ctlBit one (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+      dt.ctlBit one (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
         (Fin.last (Fintype.card dt.X.Tag))) dt.gateFlagC := by
     intro b'
     induction b' using order_induction with
@@ -878,21 +879,21 @@ theorem ctlBit_gateFlagC_gateFam (f₀ : dt.CtlIx → A)
     | hstep w z hwz hnb ih =>
       have hz2 := iterOrd_covers
         (init := ((dt.gateArgs zero one b hc hn hrd).initEl t
-          (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+          (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
             (Fin.last (Fintype.card dt.X.Tag)))
-          (dt.back zero one dt.dd0Le st vAdr)))
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)))
         (step := fun a' q => (dt.gateArgs zero one b hc hn hrd).advEl t
           (chainSt
             (fun j' => st.mir (dt.gateECell zero one b t (hn t) a' j'))
             (fun j' bb q' =>
               (dt.gateArgs zero one b hc hn hrd).setFlagE t j' bb q'
-                (dt.back zero one dt.dd0Le st vAdr)) q (dt.domNr t))
-          (dt.back zero one dt.dd0Le st vAdr))
+                (dt.back RF.cell zero one dt.dd0Le st vAdr)) q (dt.domNr t))
+          (dt.back RF.cell zero one dt.dd0Le st vAdr))
         hwz hnb
       rw [elemIter] at ih ⊢
       rw [hz2, ctlBit_gateFlagC_gate_adv, hchain]
       exact ih
-  have htag : dt.ctlBit one (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+  have htag : dt.ctlBit one (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
       (Fin.last (Fintype.card dt.X.Tag))) dt.gateFlagC ↔
       dt.ctlBit one f₀ dt.gateFlagC := by
     rw [gateTagFam, tagFam]
@@ -917,11 +918,11 @@ the decoded assignment. -/
 theorem ctlBit_gateFlagC_gate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
         ((dt.gateArgs zero one b hc hn hrd).exitSt t
-          (dt.gateFam zero one b st t hc hn hrd vAdr
-            (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+          (dt.gateFam RF zero one b st t hc hn hrd vAdr
+            (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
               (Fin.last (Fintype.card dt.X.Tag)))
             (toLex topTup) (Fin.last (dt.domNr t)))
-          (dt.back zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
       (dt.ctlBit one f₀ dt.gateFlagC ∧
         (∀ t' : dt.X.Tag,
           wmBlk st.mir (PfpTag.arg (toLex b) : PfpTag R P dt.KIx)
@@ -930,43 +931,43 @@ theorem ctlBit_gateFlagC_gate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) 
           (· ≤ · : A → A → Prop) 0 topTup) := by
   classical
   change dt.ctlBit one (dt.gateExit zero one t hc (hn t) (hrd t)
-    (dt.gateFam zero one b st t hc hn hrd vAdr
-      (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+    (dt.gateFam RF zero one b st t hc hn hrd vAdr
+      (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
         (Fin.last (Fintype.card dt.X.Tag)))
       (toLex topTup) (Fin.last (dt.domNr t)))) dt.gateFlagC ↔ _
   rw [gateExit, ctlBit_setCtl_self hzo]
-  refine and_congr (ctlBit_gateFlagC_gateFam f₀ (toLex topTup)
+  refine and_congr (ctlBit_gateFlagC_gateFam RF f₀ (toLex topTup)
     (Fin.last (dt.domNr t))) (and_congr ?_ ?_)
   · -- the one-hotness conjunct reads the block value off the surviving
     -- witness flags
     constructor
     · intro hg t'
       rw [← dt.ctlBit_gateTagFam_wit (b := b) (st := st)
-          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) hzo f₀ t',
+          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) RF hzo f₀ t',
         ← dt.ctlBit_tgf_gateFam (b := b) (st := st) (t := t)
-          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) t'
-          (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) RF t'
+          (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
             (Fin.last (Fintype.card dt.X.Tag)))
           (toLex topTup) (Fin.last (dt.domNr t))]
       exact hg t'
     · intro hone t'
       rw [dt.ctlBit_tgf_gateFam (b := b) (st := st) (t := t)
-          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) t'
-          (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) RF t'
+          (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
             (Fin.last (Fintype.card dt.X.Tag)))
           (toLex topTup) (Fin.last (dt.domNr t)),
         dt.ctlBit_gateTagFam_wit (b := b) (st := st)
-          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) hzo f₀ t']
+          (hc := hc) (hn := hn) (hrd := hrd) (vAdr := vAdr) RF hzo f₀ t']
       exact hone t'
   have hacc : ∀ j : ℕ, j < dt.eDim →
       (dt.readSac one (dt.setSubLeaf zero one
         (dt.domLeafVal one t (hn t) (hrd t)
-          (dt.gateFam zero one b st t hc hn hrd vAdr
-            (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+          (dt.gateFam RF zero one b st t hc hn hrd vAdr
+            (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
               (Fin.last (Fintype.card dt.X.Tag)))
             (toLex topTup) (Fin.last (dt.domNr t))))
-        (dt.gateFam zero one b st t hc hn hrd vAdr
-          (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+        (dt.gateFam RF zero one b st t hc hn hrd vAdr
+          (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
             (Fin.last (Fintype.card dt.X.Tag)))
           (toLex topTup) (Fin.last (dt.domNr t)))) j ↔
       accCVal (dt.domPk t).pol (dt.gateLeafP b st t (hn t) zero one)
@@ -974,8 +975,8 @@ theorem ctlBit_gateFlagC_gate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) 
     intro j hj
     rw [readSac_setSubLeaf]
     refine Iff.trans ?_ (dt.readSac_gateIter (b := b) (hc := hc)
-      (hrd := hrd) (vAdr := vAdr) hzo
-      (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+      (hrd := hrd) (vAdr := vAdr) RF hzo
+      (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
         (Fin.last (Fintype.card dt.X.Tag))) (toLex topTup) j hj)
     rw [gateFam, elemFam]
     refine readSac_chainSt _ _ (fun i bb f j'' => ?_) _ _ j
@@ -986,17 +987,17 @@ theorem ctlBit_gateFlagC_gate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) 
     exact readSac_setCtl hne _ f j''
   have hleaf : dt.ctlBit one (dt.setSubLeaf zero one
       (dt.domLeafVal one t (hn t) (hrd t)
-        (dt.gateFam zero one b st t hc hn hrd vAdr
-          (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+        (dt.gateFam RF zero one b st t hc hn hrd vAdr
+          (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
             (Fin.last (Fintype.card dt.X.Tag)))
           (toLex topTup) (Fin.last (dt.domNr t))))
-      (dt.gateFam zero one b st t hc hn hrd vAdr
-        (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+      (dt.gateFam RF zero one b st t hc hn hrd vAdr
+        (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
           (Fin.last (Fintype.card dt.X.Tag)))
         (toLex topTup) (Fin.last (dt.domNr t)))) dt.subLeafC ↔
       dt.gateLeafP b st t (hn t) zero one (ofLex (toLex topTup)) := by
     rw [ctlBit_setSubLeaf hzo]
-    exact domLeafVal_gateFam hzo _ (toLex topTup)
+    exact domLeafVal_gateFam RF hzo _ (toLex topTup)
   exact sacVerdict_iff_foldFrom hacc hleaf
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
@@ -1008,11 +1009,11 @@ theorem ctlBit_gateFlagC_gate_domHolds (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
         ((dt.gateArgs zero one b hc hn hrd).exitSt t
-          (dt.gateFam zero one b st t hc hn hrd vAdr
-            (dt.gateTagFam zero one b st hc hn hrd vAdr f₀
+          (dt.gateFam RF zero one b st t hc hn hrd vAdr
+            (dt.gateTagFam RF zero one b st hc hn hrd vAdr f₀
               (Fin.last (Fintype.card dt.X.Tag)))
             (toLex topTup) (Fin.last (dt.domNr t)))
-          (dt.back zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
+          (dt.back RF.cell zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
       (dt.ctlBit one f₀ dt.gateFlagC ∧
         (∀ t' : dt.X.Tag,
           wmBlk st.mir (PfpTag.arg (toLex b) : PfpTag R P dt.KIx)
@@ -1020,7 +1021,7 @@ theorem ctlBit_gateFlagC_gate_domHolds (hzo : zero ≠ one)
         ExpExpansion.DomHolds (X := dt.X)
           (t, decRho dt.ly zero one
             (wmBlk st.mir (PfpTag.arg (toLex b) : PfpTag R P dt.KIx)))) := by
-  refine (ctlBit_gateFlagC_gate_exit hzo f₀).trans
+  refine (ctlBit_gateFlagC_gate_exit RF hzo f₀).trans
     (and_congr Iff.rfl (and_congr Iff.rfl ?_))
   refine (foldFrom_top (j₀ := 0)
     ⟨fun x => le_refl x, fun x y z hxy hyz => le_trans hxy hyz,

@@ -160,6 +160,34 @@ theorem tupleHosrc :
       | true, Sum.inl σ => cases σ <;> exact ⟨_, rfl, rfl⟩
       | true, Sum.inr _ => exact ⟨_, rfl, rfl⟩)
 
+/-- **A property of a tuple loop's phases and its exit holds of every phase it
+can move to**: the two trips stay inside their own, the checkpoints stay where
+they are, and only the last dispatch leaves. -/
+theorem tupleRule_dstIn {S : P → Prop} (hemb : ∀ p : ChainPh 3 TuplePS, S (emb p))
+    (hexit : S exitPh) (i : ChainSite 3 TupleSS)
+    (ρ : ChainSh 3 TupleSS TupleSh i) :
+    S (tupleRule zero one wk rg emb tSrc tDst MatchS MatchD bitFlag setBit
+      initLv advLv IsMaxLv exitPh i ρ).dstPh := by
+  refine chainRule_dstIn hemb (fun k b => ?_) (fun s ρ => ?_) i ρ
+  · match k, b with
+    | ⟨0, _⟩, false => exact hemb _
+    | ⟨0, _⟩, true => exact hemb _
+    | ⟨1, _⟩, false => exact hemb _
+    | ⟨1, _⟩, true => exact hemb _
+    | ⟨2, _⟩, false => exact hemb _
+    | ⟨2, _⟩, true => exact hexit
+  · match s, ρ with
+    | false, Sum.inl σ =>
+      obtain ⟨p, hp⟩ := (ReadKit.mk tSrc wk MatchS
+        (fun rp => emb (.sub (Sum.inl rp)))).dstPh_emb one σ
+      exact hp ▸ hemb _
+    | false, Sum.inr b => exact hemb _
+    | true, Sum.inl σ =>
+      obtain ⟨p, hp⟩ := (WriteKit.mk tDst wk MatchD bitFlag
+        (fun wp => emb (.sub (Sum.inr wp)))).dstPh_emb zero one σ
+      exact hp ▸ hemb _
+    | true, Sum.inr _ => exact hemb _
+
 variable (hemb : Function.Injective emb)
 
 include hemb in

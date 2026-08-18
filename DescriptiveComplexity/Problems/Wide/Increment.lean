@@ -214,6 +214,20 @@ theorem wmSetLe_of_empty (h : IsLinOrd Le) {s : α → Prop} (hs : ∀ x, ¬s x)
     exact Or.inr ⟨x, fun y hy => iff_of_false (hs y) fun hc => hy.2 (hmin y hc), hs x, hx⟩
   · exact Or.inl fun z => iff_of_false (hs z) fun hc => hno ⟨z, hc⟩
 
+/-- **A sub-address is below the address containing it.** The least element where
+two addresses differ decides the comparison, and if one is contained in the other
+that element is in the larger – so a program that only ever *clears* cells moves
+its address down the tape, and one that only sets them moves it up. -/
+theorem wmSetLe_of_subset (h : IsLinOrd Le) {s t : α → Prop} (hsub : ∀ x, s x → t x) :
+    WMSetLe Le s t := by
+  rcases Classical.em (∃ x, ¬(s x ↔ t x)) with hne | hno
+  · obtain ⟨x, hx, hmin⟩ := exists_least h hne
+    refine Or.inr ⟨x, fun y hy => not_not.mp fun hc => hy.2 (hmin y hc), fun hc => ?_, ?_⟩
+    · exact hx (iff_of_true hc (hsub x hc))
+    · by_contra hc
+      exact hx (iff_of_false (fun hs => hc (hsub x hs)) hc)
+  · exact Or.inl fun z => not_not.mp fun hc => hno ⟨z, hc⟩
+
 /-- **An address holding everything is above every address.** -/
 theorem wmSetLe_of_full (h : IsLinOrd Le) {t : α → Prop} (ht : ∀ x, t x) (s : α → Prop) :
     WMSetLe Le s t := by
@@ -319,6 +333,150 @@ theorem wmSetLt_iff_of_wmIncr (h : IsLinOrd Le) {t t' : α → Prop} (hi : WMInc
   · intro hle
     refine (wmSetLt_iff s t').mpr ⟨hlin.2.1 s t t' hle htt', fun hc => ?_⟩
     exact hne (hlin.2.2.1 t t' htt' (hc ▸ hle))
+
+/-- **The empty address's successor is at or below every nonempty address**: an
+address strictly below it is at or below the empty one, hence empty. This is
+what puts a program's data – every address it marks anything at – inside a
+stretch that starts one step above the cell its head began on. -/
+theorem wmSetLe_succ_bot_of_nonempty (h : IsLinOrd Le) {s₀ s : α → Prop}
+    (hs₀ : WMIncr Le (fun _ => False) s₀) (hne : ∃ x, s x) : WMSetLe Le s₀ s := by
+  have hlin := isLinOrd_wmSetLe h
+  by_contra hc
+  have hlt : WMSetLt Le s s₀ :=
+    (wmSetLt_iff _ _).mpr ⟨(hlin.2.2.2 s s₀).resolve_right hc, fun hEq => hc (hEq ▸ hlin.1 s)⟩
+  have hle : WMSetLe Le s (fun _ => False) := (wmSetLt_iff_of_wmIncr h hs₀ s).mp hlt
+  obtain ⟨x, hx⟩ := hne
+  have hEq : s = fun _ => False :=
+    hlin.2.2.1 s (fun _ => False) hle (wmSetLe_of_empty h (fun _ => not_false) s)
+  exact (hEq ▸ hx : (fun _ : α => False) x)
+
+/-- **An increment cannot overshoot**: the successor of an address strictly below
+another is still at or below it. A walk that stops at the first address a marker
+sits on reads this at every round. -/
+theorem wmSetLe_of_wmIncr_of_lt (h : IsLinOrd Le) {t t' s : α → Prop} (hi : WMIncr Le t t')
+    (hlt : WMSetLt Le t s) : WMSetLe Le t' s := by
+  have hlin := isLinOrd_wmSetLe h
+  rcases hlin.2.2.2 t' s with hc | hc
+  · exact hc
+  · rcases eq_or_ne s t' with rfl | hne
+    · exact hlin.1 _
+    · exact absurd ((wmSetLt_iff_of_wmIncr h hi s).mp ((wmSetLt_iff s t').mpr ⟨hc, hne⟩))
+        fun hst => ((wmSetLt_iff t s).mp hlt).2
+          (hlin.2.2.1 t s ((wmSetLt_iff t s).mp hlt).1 hst)
+
+/-! ### Every address is reached from the empty one by increments
+
+The chain and its monotonicity, over an arbitrary linearly ordered index. The
+universe of a wide machine is one such index and so is the index of a *file*,
+which is what a program handed its file counts its rounds over. -/
+
+section Chain
+
+/-- The addresses strictly below a given one, as a measure to induct on. -/
+private noncomputable def belowCount (Le : α → α → Prop) (s : α → Prop) : ℕ :=
+  {t : α → Prop | WMSetLt Le t s}.ncard
+
+private theorem belowCount_lt (h : IsLinOrd Le) {s t : α → Prop} (hi : WMIncr Le s t) :
+    belowCount Le s < belowCount Le t := by
+  classical
+  have hlin := isLinOrd_wmSetLe h
+  have hst : WMSetLt Le s t :=
+    (wmSetLt_iff _ _).mpr ⟨wmSetLe_of_wmIncr hi, ne_of_wmIncr hi⟩
+  refine Set.ncard_lt_ncard ⟨fun r hr => ?_, fun hsub => ?_⟩ (Set.toFinite _)
+  · refine (wmSetLt_iff _ _).mpr ⟨hlin.2.1 r s t ((wmSetLt_iff _ _).mp hr).1
+      ((wmSetLt_iff _ _).mp hst).1, fun hEq => ?_⟩
+    exact ((wmSetLt_iff _ _).mp hst).2
+      (hlin.2.2.1 s t ((wmSetLt_iff _ _).mp hst).1 (hEq ▸ ((wmSetLt_iff _ _).mp hr).1))
+  · exact ((wmSetLt_iff _ _).mp (hsub hst : WMSetLt Le s s)).2 rfl
+
+/-- **Every address is reached from the empty one by increments**: a finite
+chain, each step the binary increment, ending at the target. This is
+`DescriptiveComplexity.Pfp.exists_wmChain` over an arbitrary index. -/
+theorem exists_wmChainOf (h : IsLinOrd Le) (target : α → Prop) :
+    ∃ (n : ℕ) (mV : Fin (n + 1) → (α → Prop)),
+      mV 0 = (fun _ => False) ∧ mV (Fin.last n) = target ∧
+      ∀ k : Fin n, WMIncr Le (mV k.castSucc) (mV k.succ) := by
+  classical
+  suffices key : ∀ (k : ℕ) (s : α → Prop), belowCount Le s = k →
+      ∃ (n : ℕ) (mV : Fin (n + 1) → (α → Prop)),
+        mV 0 = (fun _ => False) ∧ mV (Fin.last n) = s ∧
+        ∀ j : Fin n, WMIncr Le (mV j.castSucc) (mV j.succ) from
+    key _ target rfl
+  intro k
+  induction k using Nat.strong_induction_on with
+  | _ k ih =>
+    intro s hrank
+    rcases Classical.em (∃ x, s x) with hne | hemp
+    · obtain ⟨t, hi⟩ := exists_wmPred h hne
+      obtain ⟨n, mV, h0, hlast, hchain⟩ :=
+        ih (belowCount Le t) (hrank ▸ belowCount_lt h hi) t rfl
+      refine ⟨n + 1, Fin.snoc mV s, ?_, ?_, ?_⟩
+      · rw [show (0 : Fin (n + 2)) = (0 : Fin (n + 1)).castSucc from rfl,
+          Fin.snoc_castSucc]
+        exact h0
+      · exact Fin.snoc_last _ _
+      · intro j
+        rcases Nat.lt_or_ge (j : ℕ) n with hj | hj
+        · have e1 : (Fin.castSucc j : Fin (n + 2)) =
+              Fin.castSucc (Fin.castSucc (⟨(j : ℕ), hj⟩ : Fin n)) := Fin.ext rfl
+          have e2 : (Fin.succ j : Fin (n + 2)) =
+              Fin.castSucc (Fin.succ (⟨(j : ℕ), hj⟩ : Fin n)) := Fin.ext rfl
+          rw [e1, e2, Fin.snoc_castSucc, Fin.snoc_castSucc]
+          exact hchain _
+        · have hjn : (j : ℕ) = n := by have := j.isLt; omega
+          have e1 : (Fin.castSucc j : Fin (n + 2)) = (Fin.last n).castSucc :=
+            Fin.ext hjn
+          have e2 : (Fin.succ j : Fin (n + 2)) = Fin.last (n + 1) :=
+            Fin.ext (by rw [Fin.val_succ, Fin.val_last, hjn])
+          rw [e1, e2, Fin.snoc_castSucc, Fin.snoc_last, hlast]
+          exact hi
+    · have hs : s = fun _ => False :=
+        funext fun x => propext ⟨fun hx => hemp ⟨x, hx⟩, False.elim⟩
+      exact ⟨0, fun _ => fun _ => False, rfl, hs.symm, fun j => j.elim0⟩
+
+/-- **The chain is strictly increasing**: two positions compare as their
+addresses do, by induction on the distance. -/
+theorem wmChainOf_lt (h : IsLinOrd Le) {n : ℕ}
+    {mV : Fin (n + 1) → (α → Prop)}
+    (hchain : ∀ k : Fin n, WMIncr Le (mV k.castSucc) (mV k.succ))
+    {a a' : Fin (n + 1)} (hlt : a < a') :
+    WMSetLt Le (mV a) (mV a') := by
+  have hset := isLinOrd_wmSetLe h
+  have hstep : ∀ (d : ℕ) (b b' : Fin (n + 1)), (b' : ℕ) = (b : ℕ) + d + 1 →
+      WMSetLt Le (mV b) (mV b') := by
+    intro d
+    induction d with
+    | zero =>
+      intro b b' hb
+      have hbn : (b : ℕ) < n := by have := b'.isLt; omega
+      have e1 : mV b = mV (Fin.castSucc (⟨(b : ℕ), hbn⟩ : Fin n)) :=
+        congrArg mV (Fin.ext rfl)
+      have e2 : mV b' = mV (Fin.succ (⟨(b : ℕ), hbn⟩ : Fin n)) :=
+        congrArg mV (Fin.ext hb)
+      rw [e1, e2]
+      have hi := hchain ⟨(b : ℕ), hbn⟩
+      exact (wmSetLt_iff _ _).mpr ⟨wmSetLe_of_wmIncr hi, ne_of_wmIncr hi⟩
+    | succ d ihd =>
+      intro b b' hb
+      have hmn : (b : ℕ) + d + 1 < n + 1 := by have := b'.isLt; omega
+      set m : Fin (n + 1) := ⟨(b : ℕ) + d + 1, hmn⟩ with hm
+      have hmval : (m : ℕ) = (b : ℕ) + d + 1 := rfl
+      have hbm := ihd b m rfl
+      have hmb' : WMSetLt Le (mV m) (mV b') := by
+        have hmn' : (m : ℕ) < n := by have := b'.isLt; omega
+        have e1 : mV m = mV (Fin.castSucc (⟨(m : ℕ), hmn'⟩ : Fin n)) :=
+          congrArg mV (Fin.ext rfl)
+        have e2 : mV b' = mV (Fin.succ (⟨(m : ℕ), hmn'⟩ : Fin n)) :=
+          congrArg mV (Fin.ext (show (b' : ℕ) = (m : ℕ) + 1 by omega))
+        rw [e1, e2]
+        have hi := hchain ⟨(m : ℕ), hmn'⟩
+        exact (wmSetLt_iff _ _).mpr ⟨wmSetLe_of_wmIncr hi, ne_of_wmIncr hi⟩
+      rw [wmSetLt_iff] at hbm hmb' ⊢
+      refine ⟨hset.2.1 _ _ _ hbm.1 hmb'.1, fun hc => ?_⟩
+      exact hmb'.2 (hset.2.2.1 _ _ hmb'.1 (hc ▸ hbm.1))
+  exact hstep ((a' : ℕ) - (a : ℕ) - 1) a a' (by omega)
+
+end Chain
 
 end Incr
 

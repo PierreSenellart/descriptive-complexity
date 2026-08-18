@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Wide.RelExpMap
 import DescriptiveComplexity.Problems.Wide.ShFinite
 import DescriptiveComplexity.Problems.Wide.PfpNo
+import DescriptiveComplexity.Problems.Wide.NexPack
 import DescriptiveComplexity.Problems.Wide.PfpPack
 import DescriptiveComplexity.Problems.Wide.Membership
 import DescriptiveComplexity.Problems.Wide.Det
@@ -105,7 +106,7 @@ theorem ofSource_natOf (v : (PfpData.ofSource X d h).VarIx) :
   | some i => rfl
 
 omit [L.IsRelational] in
-theorem ofSource_kindDepth {n : ℕ} (κ : MatAtom X d n) :
+theorem ofSource_kindDepth {n : ℕ} (κ : MatAtom X d.B n) :
     (PfpData.ofSource X d h).kindDepth κ = (PfpData.ofSource X d h').kindDepth κ := by
   match κ with
   | .stage _ _ => rfl
@@ -114,7 +115,7 @@ theorem ofSource_kindDepth {n : ℕ} (κ : MatAtom X d n) :
   | .ord _ _ => rfl
 
 omit [L.IsRelational] in
-theorem ofSource_kindReads {n : ℕ} (κ : MatAtom X d n) :
+theorem ofSource_kindReads {n : ℕ} (κ : MatAtom X d.B n) :
     (PfpData.ofSource X d h).kindReads κ = (PfpData.ofSource X d h').kindReads κ := by
   match κ with
   | .stage _ _ => rfl
@@ -123,7 +124,7 @@ theorem ofSource_kindReads {n : ℕ} (κ : MatAtom X d n) :
   | .ord _ _ => rfl
 
 omit [L.IsRelational] in
-theorem ofSource_kindArgs {n : ℕ} (κ : MatAtom X d n) :
+theorem ofSource_kindArgs {n : ℕ} (κ : MatAtom X d.B n) :
     (PfpData.ofSource X d h).kindArgs κ = (PfpData.ofSource X d h').kindArgs κ := by
   match κ with
   | .stage _ _ => rfl
@@ -276,6 +277,7 @@ noncomputable def dblWideInterp :
   (srcDt X d).pfpInterp (srcData_payload_le (relExp X) d)
     (PfpData.uRulesDefinable_progOf (dt := srcDt X d) (boolEnv (newLang L)))
     (uGDefinable_srcAccept X d) OuterPh.start
+    (PfpData.regFileMark (srcData_payload_le (relExp X) d))
 
 /-- **The machine of a source, written down in the instance**: the machine over
 the doubled universe, composed with the doubling. The dimension is unchanged –
@@ -341,7 +343,8 @@ theorem srcReads :
     (dblWideInterp X d).mapStructure e.α
   (srcDt X d).reads_progFrom (srcData_payload_le (relExp X) d)
     (PfpData.uRulesDefinable_progOf (dt := srcDt X d) (boolEnv (newLang L)))
-    (uGDefinable_srcAccept X d) OuterPh.start e rfl
+    (uGDefinable_srcAccept X d) OuterPh.start
+    (PfpData.regFileMark (srcData_payload_le (relExp X) d)) e rfl
 
 end Reads
 
@@ -392,14 +395,25 @@ theorem dwideAcceptSpace_srcEnv_iff :
 
 
 
-/-- **The emitted instance is a yes-instance exactly when the source is**: the
-composite's universe is the machine's over the doubled universe, the machine
-decides the fixed point there, the fixed point is the problem of the relativized
-expansion, and that expansion's points are the original's. -/
-theorem dwideAcceptSpace_wideInterp_iff {Q₀ : DecisionProblem X.E}
-    (hd : ∀ (M : Type) [X.E.Structure M] [LinearOrder M] [Finite M] [Nonempty M],
-      Q₀ M ↔ d.PFPHolds M) :
-    DWideAcceptSpace ((wideInterp X d).Map A) ↔ Q₀ (X.Map A) := by
+/-- **The transport from the doubled universe to the instance**, for *any*
+question asked of the emitted machine. Three isomorphisms and nothing else: the
+composite's universe is the machine's (`wideInterpEquiv`), the caller says what
+the machine decides over the doubled universe, and the relativized expansion's
+points are the original's (`relExpMapEquiv`). Which problem `PW` is – acceptance
+in bounded space, acceptance on a clock, deterministic or not – the transport
+never asks. -/
+theorem wideProblem_wideInterp_iff (PW : DecisionProblem Language.wide)
+    {Q₀ : DecisionProblem X.E}
+    (hmach :
+      letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
+        encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
+      letI : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
+        ExpExpansion.mapStructure (relExp X) ((dblInterp L).Map A)
+      haveI : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
+      haveI : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
+      PW ((dblWideInterp X d).Map (srcEnv L A).α) ↔
+        Q₀ ((relExp X).Map ((dblInterp L).Map A))) :
+    PW ((wideInterp X d).Map A) ↔ Q₀ (X.Map A) := by
   letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
   haveI : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
@@ -408,10 +422,45 @@ theorem dwideAcceptSpace_wideInterp_iff {Q₀ : DecisionProblem X.E}
     encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
   letI : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
     ExpExpansion.mapStructure (relExp X) ((dblInterp L).Map A)
-  refine (DWideAcceptSpace.iso_invariant (wideInterpEquiv X d A)).trans ?_
-  refine (dwideAcceptSpace_srcEnv_iff X d A).trans ?_
-  refine Iff.trans ?_ (Q₀.iso_invariant (relExpMapEquiv (X := X) (A := A))).symm
-  exact (hd ((relExp X).Map ((dblInterp L).Map A))).symm
+  refine (PW.iso_invariant (wideInterpEquiv X d A)).trans ?_
+  exact hmach.trans (Q₀.iso_invariant (relExpMapEquiv (X := X) (A := A))).symm
+
+/-- **The emitted instance is a yes-instance of acceptance *on a clock* exactly
+when the source is**, given the clocked machine's own correctness at the doubled
+universe. The transport is `wideProblem_wideInterp_iff`'s and nothing else –
+which problem the machine is asked about it never reads – so this half of the
+NEXPTIME reduction is free: what is not is the hypothesis, the clocked program's
+run against the kernel. -/
+theorem wideAccept_wideInterp_iff {Q₀ : DecisionProblem X.E}
+    (hmach :
+      letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
+        encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
+      letI : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
+        ExpExpansion.mapStructure (relExp X) ((dblInterp L).Map A)
+      haveI : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
+      haveI : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
+      WideAccept ((dblWideInterp X d).Map (srcEnv L A).α) ↔
+        Q₀ ((relExp X).Map ((dblInterp L).Map A))) :
+    WideAccept ((wideInterp X d).Map A) ↔ Q₀ (X.Map A) :=
+  wideProblem_wideInterp_iff X d A WideAccept hmach
+
+/-- **The emitted instance is a yes-instance exactly when the source is**: the
+composite's universe is the machine's over the doubled universe, the machine
+decides the fixed point there, the fixed point is the problem of the relativized
+expansion, and that expansion's points are the original's. -/
+theorem dwideAcceptSpace_wideInterp_iff {Q₀ : DecisionProblem X.E}
+    (hd : ∀ (M : Type) [X.E.Structure M] [LinearOrder M] [Finite M] [Nonempty M],
+      Q₀ M ↔ d.PFPHolds M) :
+    DWideAcceptSpace ((wideInterp X d).Map A) ↔ Q₀ (X.Map A) := by
+  haveI : Finite ((dblInterp L).Map A) := (dblInterp L).map_finite A
+  haveI : Nonempty ((dblInterp L).Map A) := (dblInterp L).map_nonempty A
+  letI : LinearOrder ((relExp X).Map ((dblInterp L).Map A)) :=
+    encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
+  letI : X.E.Structure ((relExp X).Map ((dblInterp L).Map A)) :=
+    ExpExpansion.mapStructure (relExp X) ((dblInterp L).Map A)
+  refine wideProblem_wideInterp_iff X d A DWideAcceptSpace ?_
+  exact (dwideAcceptSpace_srcEnv_iff X d A).trans
+    (hd ((relExp X).Map ((dblInterp L).Map A))).symm
 
 end Correct
 
@@ -441,6 +490,41 @@ theorem SOPFPDefinable.ordered_fo_reduction_dwideAcceptSpace {Q : DecisionProble
            correct := fun A _ _ _ _ =>
              (hspec A).trans (Pfp.dwideAcceptSpace_wideInterp_iff X d A hd).symm }⟩
 
+/-- **Every NEXPTIME source problem reduces to acceptance on a clock**, given
+the clocked machine's correctness at each doubled universe. The reduction is the
+EXPSPACE one's drawing at the kernel's own step definition – the record is the
+same one (`DescriptiveComplexity.Pfp.PfpData.ofKernel` is
+`ofSource` at `NexKernel.toStepDef`), so the dimension, the tags and the
+transport are all as they were, and only what the machine decides changes. -/
+theorem ExpDefinable.ordered_fo_reduction_wideAccept {Q : DecisionProblem L}
+    (h : ExpDefinable NP Q)
+    (hmach : ∀ (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
+      (Q₀ : DecisionProblem X.E) (A : Type) [L.Structure A] [LinearOrder A]
+      [Finite A] [Nonempty A],
+      letI : LinearOrder ((Pfp.srcDt X d).X.Map (Pfp.srcEnv L A).α) :=
+        Pfp.encOrder (Pfp.srcDt X d).ly (Pfp.srcEnv L A).zero (Pfp.srcEnv L A).one
+          (Pfp.srcEnv L A).hzo
+      letI : X.E.Structure ((Pfp.relExp X).Map ((Pfp.dblInterp L).Map A)) :=
+        ExpExpansion.mapStructure (Pfp.relExp X) ((Pfp.dblInterp L).Map A)
+      haveI : Finite ((Pfp.dblInterp L).Map A) := (Pfp.dblInterp L).map_finite A
+      haveI : Nonempty ((Pfp.dblInterp L).Map A) :=
+        (Pfp.dblInterp L).map_nonempty A
+      WideAccept ((Pfp.dblWideInterp X d).Map (Pfp.srcEnv L A).α) ↔
+        Q₀ ((Pfp.relExp X).Map ((Pfp.dblInterp L).Map A))) :
+    Nonempty (Q ≤ᶠᵒ[≤] WideAccept) := by
+  obtain ⟨X, Q₀, hQ, hspec⟩ := h
+  obtain ⟨B, φ, hker⟩ := exists_orderedKernel (P := Q₀) hQ
+  classical
+  refine ⟨{ Tag := (Pfp.srcDt X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)).ITag ×
+              (Fin (Pfp.srcDt X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)).dd → Bool)
+            tagNonempty := ⟨(Pfp.PfpTag.sym, fun _ => false)⟩
+            dim := (Pfp.srcDt X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)).dd * 1
+            toInterpretation :=
+              Pfp.wideInterp X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)
+            correct := fun A _ _ _ _ => ?_ }⟩
+  exact (hspec A).trans (Pfp.wideAccept_wideInterp_iff X _ A
+    (hmach X ((⟨X, B, φ⟩ : NexKernel L).toStepDef) Q₀ A)).symm
+
 /-- **Deterministic acceptance in bounded space on a wide machine is
 EXPSPACE-hard.** -/
 theorem dwideAcceptSpace_EXPSPACE_hard : EXPSPACE.Hard DWideAcceptSpace := by
@@ -455,6 +539,50 @@ reduction above, run at the doubled universe so that the machine always has two
 elements to write bits with. -/
 theorem dwideAcceptSpace_EXPSPACE_complete : EXPSPACE.Complete DWideAcceptSpace :=
   ⟨dwideAcceptSpace_mem_EXPSPACE, dwideAcceptSpace_EXPSPACE_hard⟩
+
+/-- **Acceptance on a clock on a wide machine is NEXPTIME-hard**, given the
+clocked machine's correctness. Everything but that hypothesis is the EXPSPACE
+route's: the same drawing, the same transport, the same discharge – which is why
+the estimate for this half was «no design». -/
+theorem wideAccept_NEXPTIME_hard
+    (hmach : ∀ {L' : Language.{0, 0}} [L'.IsRelational] (X : ExpExpansion L')
+      (d : StepDef (X.E.sum Language.order)) (Q₀ : DecisionProblem X.E) (A : Type)
+      [L'.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
+      letI : LinearOrder ((Pfp.srcDt X d).X.Map (Pfp.srcEnv L' A).α) :=
+        Pfp.encOrder (Pfp.srcDt X d).ly (Pfp.srcEnv L' A).zero
+          (Pfp.srcEnv L' A).one (Pfp.srcEnv L' A).hzo
+      letI : X.E.Structure ((Pfp.relExp X).Map ((Pfp.dblInterp L').Map A)) :=
+        ExpExpansion.mapStructure (Pfp.relExp X) ((Pfp.dblInterp L').Map A)
+      haveI : Finite ((Pfp.dblInterp L').Map A) := (Pfp.dblInterp L').map_finite A
+      haveI : Nonempty ((Pfp.dblInterp L').Map A) :=
+        (Pfp.dblInterp L').map_nonempty A
+      WideAccept ((Pfp.dblWideInterp X d).Map (Pfp.srcEnv L' A).α) ↔
+        Q₀ ((Pfp.relExp X).Map ((Pfp.dblInterp L').Map A))) :
+    NEXPTIME.Hard WideAccept := by
+  refine NEXPTIME_hard_of_expDefinable _ fun {_} _ Q hQ => ?_
+  exact (ExpDefinable.ordered_fo_reduction_wideAccept hQ
+    (fun X d Q₀ A => hmach X d Q₀ A)).map OrderedFOReduction.toRel
+
+/-- **Acceptance on a clock on a wide machine is NEXPTIME-complete**, given the
+clocked machine's correctness. The membership half is
+`DescriptiveComplexity.wideAccept_mem_NEXPTIME` and is unconditional; the
+hardness half is the reduction above. -/
+theorem wideAccept_NEXPTIME_complete
+    (hmach : ∀ {L' : Language.{0, 0}} [L'.IsRelational] (X : ExpExpansion L')
+      (d : StepDef (X.E.sum Language.order)) (Q₀ : DecisionProblem X.E) (A : Type)
+      [L'.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
+      letI : LinearOrder ((Pfp.srcDt X d).X.Map (Pfp.srcEnv L' A).α) :=
+        Pfp.encOrder (Pfp.srcDt X d).ly (Pfp.srcEnv L' A).zero
+          (Pfp.srcEnv L' A).one (Pfp.srcEnv L' A).hzo
+      letI : X.E.Structure ((Pfp.relExp X).Map ((Pfp.dblInterp L').Map A)) :=
+        ExpExpansion.mapStructure (Pfp.relExp X) ((Pfp.dblInterp L').Map A)
+      haveI : Finite ((Pfp.dblInterp L').Map A) := (Pfp.dblInterp L').map_finite A
+      haveI : Nonempty ((Pfp.dblInterp L').Map A) :=
+        (Pfp.dblInterp L').map_nonempty A
+      WideAccept ((Pfp.dblWideInterp X d).Map (Pfp.srcEnv L' A).α) ↔
+        Q₀ ((Pfp.relExp X).Map ((Pfp.dblInterp L').Map A))) :
+    NEXPTIME.Complete WideAccept :=
+  ⟨wideAccept_mem_NEXPTIME, wideAccept_NEXPTIME_hard hmach⟩
 
 /-- **Acceptance in bounded space on a wide machine is EXPSPACE-hard**: hardness
 travels forward along the reduction that adds the determinism promise. -/

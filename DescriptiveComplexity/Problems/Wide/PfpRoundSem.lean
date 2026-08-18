@@ -47,17 +47,21 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 variable {PR : Prog A R P dt.CtlIx dt.SlotIx dt.KIx dt.dd}
+variable (RF : RegFile (Univ A R P dt.KIx dt.dd))
+-- The channel writes its marks in the tags' own order, the machine walks the
+-- tape in the addresses'; the two agree.
+variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
 
 section RoundSem
 
-variable (vi : dt.VarIx) (st : TapeSt dt A R P)
+variable (vi : dt.VarIx) (st : TapeStD dt A R P)
 variable {v : Univ A R P dt.KIx dt.dd → Prop}
 variable {ιV : Type} [LinearOrder ιV] [Finite ιV]
 variable (mV : ιV → Univ A R P dt.KIx dt.dd → Prop)
 variable (semOf : ∀ a : ιV,
   (∀ ℓ : Fin (dt.nIn vi),
-    dt.igPassP PR.zero PR.one vi (dt.roundSt st (mV a)) ℓ) →
+    dt.igPassP RF PR.zero PR.one vi (dt.roundSt st (mV a)) ℓ) →
   ∀ b : Fin (dt.natOf vi),
     dt.KindSem PR.zero PR.one vi (dt.roundSt st (mV a)) (dt.kindOf vi b))
 
@@ -72,16 +76,16 @@ theorem ctlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
     (hn0 : dt.nIn vi = 0) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (v : Univ A R P dt.KIx dt.dd → Prop) (fG : dt.CtlIx → A) (a : ιV) :
-    dt.ctlBit PR.one (dt.varFM vi st v mV semOf fG a) q := by
+    dt.ctlBit PR.one (dt.varFM RF hord vi st v mV semOf fG a) q := by
   classical
   have hleaf : q ≠ dt.leafC := by
     rcases hq with rfl | rfl <;>
       exact fun h => by injection h with h'; exact absurd h' (by decide)
   induction a using order_induction with
   | hmin z hz =>
-    rw [show dt.varFM vi st v mV semOf fG z =
+    rw [show dt.varFM RF hord vi st v mV semOf fG z =
       (dt.varArgsOf PR.zero PR.one vi).initSt fG
-        (dt.back PR.zero PR.one dt.dd0Le
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le
           (dt.roundSt st (fun _ => False)) v) from iterOrd_bot hz]
     change dt.ctlBit PR.one
       (dt.setCtl PR.zero PR.one dt.existGateC True
@@ -97,17 +101,17 @@ theorem ctlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
   | hstep w z hwz hnb ih =>
     have hcov := iterOrd_covers
       (init := (dt.varArgsOf PR.zero PR.one vi).initSt fG
-        (dt.back PR.zero PR.one dt.dd0Le
+        (dt.back RF.cell PR.zero PR.one dt.dd0Le
           (dt.roundSt st (fun _ => False)) v))
       (step := fun a q' =>
         (dt.varArgsOf PR.zero PR.one vi).storeCarry
           (tagBlk (dt.valCarry (mV a)).1)
           ((dt.varArgsOf PR.zero PR.one vi).postFold
-            (dt.roundFX vi st v mV semOf q' a)
-            (dt.back PR.zero PR.one dt.dd0Le (dt.roundSt st (mV a)) v))
-          (dt.back PR.zero PR.one dt.dd0Le (dt.roundSt st (mV a)) v))
+            (dt.roundFX RF hord vi st v mV semOf q' a)
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.roundSt st (mV a)) v))
+          (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.roundSt st (mV a)) v))
       hwz hnb
-    rw [show dt.varFM vi st v mV semOf fG z = _ from hcov]
+    rw [show dt.varFM RF hord vi st v mV semOf fG z = _ from hcov]
     have hne : ∀ j : Fin dt.naDim, q ≠ dt.accC j := fun j => by
       rcases hq with rfl | rfl <;> exact fun h => nomatch h
     -- the store rides
@@ -129,10 +133,10 @@ theorem ctlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
     have hfold : ∀ f : dt.CtlIx → A,
         dt.ctlBit PR.one
           ((dt.varArgsOf PR.zero PR.one vi).postFold
-            (dt.roundFX vi st v mV semOf f w)
-            (dt.back PR.zero PR.one dt.dd0Le (dt.roundSt st (mV w)) v))
+            (dt.roundFX RF hord vi st v mV semOf f w)
+            (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.roundSt st (mV w)) v))
           q ↔
-        dt.ctlBit PR.one (dt.roundFX vi st v mV semOf f w) q := by
+        dt.ctlBit PR.one (dt.roundFX RF hord vi st v mV semOf f w) q := by
       intro f
       change dt.ctlBit PR.one (dt.setLeaf PR.zero PR.one _ _) q ↔ _
       rw [setLeaf]
@@ -140,18 +144,18 @@ theorem ctlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
     rw [hfold]
     -- the round's exit reads the flags off the (empty) inner gates
     have hround : ∀ f : dt.CtlIx → A,
-        dt.ctlBit PR.one (dt.roundFX vi st v mV semOf f w) q ↔
+        dt.ctlBit PR.one (dt.roundFX RF hord vi st v mV semOf f w) q ↔
         dt.ctlBit PR.one f q := by
       intro f
-      have h0 : dt.igFs PR.zero PR.one vi (dt.roundSt st (mV w)) v f
+      have h0 : dt.igFs RF PR.zero PR.one vi (dt.roundSt st (mV w)) v f
           (dt.nIn vi) = f := by
         rw [hn0]
         rfl
-      rw [show dt.roundFX vi st v mV semOf f w =
-        dt.roundCtl PR.zero_ne_one vi (dt.roundSt st (mV w)) v (semOf w)
+      rw [show dt.roundFX RF hord vi st v mV semOf f w =
+        dt.roundCtl RF hord PR.zero_ne_one vi (dt.roundSt st (mV w)) v (semOf w)
           f from rfl,
         ctlBit, ctlBit,
-        dt.roundCtl_apply_roundFlag hq vi (dt.roundSt st (mV w)) v
+        dt.roundCtl_apply_roundFlag RF hord hq vi (dt.roundSt st (mV w)) v
           (semOf w) f, h0]
     rw [hround]
     exact ih
@@ -165,51 +169,51 @@ theorem ctlBit_roundFX_pass_iff (hzo : PR.zero ≠ PR.one) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (v : Univ A R P dt.KIx dt.dd → Prop) (fG : dt.CtlIx → A) (a : ιV) :
     dt.ctlBit PR.one
-        (dt.roundFX vi st v mV semOf (dt.varFM vi st v mV semOf fG a) a)
+        (dt.roundFX RF hord vi st v mV semOf (dt.varFM RF hord vi st v mV semOf fG a) a)
         q ↔
       ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = q →
-        dt.igPassP PR.zero PR.one vi (dt.roundSt st (mV a)) ℓ := by
+        dt.igPassP RF PR.zero PR.one vi (dt.roundSt st (mV a)) ℓ := by
   classical
   have hIG : dt.ctlBit PR.one
-      (dt.roundFX vi st v mV semOf (dt.varFM vi st v mV semOf fG a) a)
+      (dt.roundFX RF hord vi st v mV semOf (dt.varFM RF hord vi st v mV semOf fG a) a)
       q ↔
       dt.ctlBit PR.one
-        (dt.igFs PR.zero PR.one vi (dt.roundSt st (mV a)) v
-          (dt.varFM vi st v mV semOf fG a) (dt.nIn vi)) q := by
-    rw [show dt.roundFX vi st v mV semOf
-        (dt.varFM vi st v mV semOf fG a) a =
-      dt.roundCtl PR.zero_ne_one vi (dt.roundSt st (mV a)) v (semOf a)
-        (dt.varFM vi st v mV semOf fG a) from rfl,
+        (dt.igFs RF PR.zero PR.one vi (dt.roundSt st (mV a)) v
+          (dt.varFM RF hord vi st v mV semOf fG a) (dt.nIn vi)) q := by
+    rw [show dt.roundFX RF hord vi st v mV semOf
+        (dt.varFM RF hord vi st v mV semOf fG a) a =
+      dt.roundCtl RF hord PR.zero_ne_one vi (dt.roundSt st (mV a)) v (semOf a)
+        (dt.varFM RF hord vi st v mV semOf fG a) from rfl,
       ctlBit, ctlBit,
-      dt.roundCtl_apply_roundFlag hq vi (dt.roundSt st (mV a)) v
-        (semOf a) (dt.varFM vi st v mV semOf fG a)]
+      dt.roundCtl_apply_roundFlag RF hord hq vi (dt.roundSt st (mV a)) v
+        (semOf a) (dt.varFM RF hord vi st v mV semOf fG a)]
   rcases Nat.eq_zero_or_pos (dt.nIn vi) with hn0 | hpos
   · have hL : dt.ctlBit PR.one
-        (dt.roundFX vi st v mV semOf (dt.varFM vi st v mV semOf fG a) a)
+        (dt.roundFX RF hord vi st v mV semOf (dt.varFM RF hord vi st v mV semOf fG a) a)
         q := by
       rw [hIG]
-      have h0 : dt.igFs PR.zero PR.one vi (dt.roundSt st (mV a)) v
-          (dt.varFM vi st v mV semOf fG a) (dt.nIn vi) =
-          dt.varFM vi st v mV semOf fG a := by
+      have h0 : dt.igFs RF PR.zero PR.one vi (dt.roundSt st (mV a)) v
+          (dt.varFM RF hord vi st v mV semOf fG a) (dt.nIn vi) =
+          dt.varFM RF hord vi st v mV semOf fG a := by
         rw [hn0]
         rfl
       rw [h0]
-      exact dt.ctlBit_flag_varFM_of_nIn_zero hzo hn0 hq v fG a
+      exact dt.ctlBit_flag_varFM_of_nIn_zero RF hord hzo hn0 hq v fG a
     exact iff_of_true hL (fun ℓ => absurd ℓ.isLt (by omega))
-  · rw [hIG, dt.ctlBit_flag_igFs hzo hq vi (dt.roundSt st (mV a)) v
-      (dt.varFM vi st v mV semOf fG a) hpos (le_refl _)]
+  · rw [hIG, dt.ctlBit_flag_igFs RF hzo hq vi (dt.roundSt st (mV a)) v
+      (dt.varFM RF hord vi st v mV semOf fG a) hpos (le_refl _)]
     exact ⟨fun h ℓ => h ℓ ℓ.isLt, fun h ℓ _ => h ℓ⟩
 
 variable {vi} in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational] in
 /-- **The two polarity readings deliver the full pass**: every level's
 flag is one of the two. The capstone's `hPass`. -/
-theorem roundPass_of_polarities {zero one : A} {stV : TapeSt dt A R P}
+theorem roundPass_of_polarities {zero one : A} {stV : TapeStD dt A R P}
     (hEx : ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.existGateC →
-      dt.igPassP zero one vi stV ℓ)
+      dt.igPassP RF zero one vi stV ℓ)
     (hAl : ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.allGateC →
-      dt.igPassP zero one vi stV ℓ) :
-    ∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ := by
+      dt.igPassP RF zero one vi stV ℓ) :
+    ∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ := by
   intro ℓ
   have hflagn : dt.igFlag vi ℓ = dt.existGateC ∨
       dt.igFlag vi ℓ = dt.allGateC := by
@@ -235,12 +239,12 @@ the free levels, the points the pass's encodings choose at the quantified
 ones. -/
 noncomputable def passW (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P)
-    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ)
+    (vi : dt.VarIx) (stV : TapeStD dt A R P)
+    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A) (j : Fin (dt.nOf vi)) :
     dt.X.Map A :=
   if h : (j : ℕ) < dt.arOf vi then mbW ⟨(j : ℕ), h⟩
-  else ((dt.igPassP_iff_isEnc zero one hzo hlin vi stV
+  else ((dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV
     ⟨(j : ℕ) - dt.arOf vi, by
       have h1 := j.isLt
       simp only [nIn]
@@ -248,15 +252,15 @@ noncomputable def passW (hzo : zero ≠ one)
 
 variable {zero one}
 
-omit [Fintype dt.SlotIx] [L.IsRelational] in
+omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The master encoding fact of a passing round**: every level's block —
 the working address's at the free levels, the round register's at the
 quantified ones — encodes the valuation's point. The capstone's `hENC`,
 and `DescriptiveComplexity.Pfp.PfpData.mkKindSem`'s input. -/
 theorem passW_hENC (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P)
-    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ)
+    (vi : dt.VarIx) (stV : TapeStD dt A R P)
+    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk stV.mir
@@ -266,13 +270,13 @@ theorem passW_hENC (hzo : zero ≠ one)
     (j : Fin (dt.nOf vi)) :
     wmBlk (dt.lvSet stV vi j)
         (PfpTag.arg (toLex (dt.lvBlk vi j)) : PfpTag R P dt.KIx) =
-      encMap dt.ly zero one (dt.passW zero one hzo hlin vi stV hp mbW j) := by
+      encMap dt.ly zero one (dt.passW RF zero one hzo hlin vi stV hp mbW j) := by
   rw [lvSet, lvBlk, passW]
   by_cases h : (j : ℕ) < dt.arOf vi
   · rw [if_pos h, dif_pos h, dif_pos h]
     exact hmb ⟨(j : ℕ), h⟩
   · rw [if_neg h, dif_neg h, dif_neg h]
-    have hspec := ((dt.igPassP_iff_isEnc zero one hzo hlin vi stV
+    have hspec := ((dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV
       ⟨(j : ℕ) - dt.arOf vi, by
         have h1 := j.isLt
         simp only [nIn]
@@ -296,8 +300,8 @@ theorem passW_hENC (hzo : zero ≠ one)
 `semOf`, with `hsem` definitional. -/
 noncomputable def passSem (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P)
-    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ)
+    (vi : dt.VarIx) (stV : TapeStD dt A R P)
+    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk stV.mir
@@ -306,8 +310,8 @@ noncomputable def passSem (hzo : zero ≠ one)
         encMap dt.ly zero one (mbW ℓ)) :
     ∀ b : Fin (dt.natOf vi), dt.KindSem zero one vi stV (dt.kindOf vi b) :=
   fun b => dt.mkKindSem zero one vi stV
-    (dt.passW zero one hzo hlin vi stV hp mbW)
-    (dt.passW_hENC hzo hlin vi stV hp mbW hmb) (dt.kindOf vi b)
+    (dt.passW RF zero one hzo hlin vi stV hp mbW)
+    (dt.passW_hENC RF hzo hlin vi stV hp mbW hmb) (dt.kindOf vi b)
 
 end PassPack
 
@@ -327,7 +331,7 @@ is faithful on the padded cells, and an encoding holds no others. -/
 theorem wmBlk_stageTgtD_eq_encMap
     (vi : dt.VarIx) (iv : dt.d.B.ι)
     (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi))
-    (stV : TapeSt dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
+    (stV : TapeStD dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
     {p : Fin (dt.d.B.arity iv) → dt.X.Map A}
     (hsrc : ∀ ℓ : Fin (dt.d.B.arity iv),
       wmBlk (dt.lvSet stV vi (ts ℓ))
@@ -399,7 +403,7 @@ random access's bit is the stage at those points — the capstone's
 theorem old_trackOf_stageTgtD (hzo : zero ≠ one)
     (vi : dt.VarIx) (iv : dt.d.B.ι) (ha : dt.d.B.arity iv ≤ dt.ko)
     (σ : dt.d.B.Assignment (dt.X.Map A))
-    (stV : TapeSt dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
+    (stV : TapeStD dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
     {Below : (Univ A R P dt.KIx dt.dd → Prop) → Prop}
     (hdict : ∀ s, Below s →
       (stV.old iv s ↔ trackOf dt.ly zero one ha σ s))
@@ -460,16 +464,16 @@ theorem igFlag_eq_allGateC_iff (vi : dt.VarIx) (ℓ : Fin (dt.nIn vi)) :
     exact iff_of_true rfl (Bool.eq_false_iff.mpr hb)
 
 variable {zero one} in
-omit [Fintype dt.SlotIx] [L.IsRelational] in
+omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **A per-polarity pass is the split's gate clause**, reindexed from the
 quantified levels to the pack's indices. -/
 theorem roundPass_iff_split_gen (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P) {q : dt.CtlIx} {bpol : Bool}
+    (vi : dt.VarIx) (stV : TapeStD dt A R P) {q : dt.CtlIx} {bpol : Bool}
     (hqiff : ∀ ℓ : Fin (dt.nIn vi),
       dt.igFlag vi ℓ = q ↔ dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = bpol) :
     (∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = q →
-        dt.igPassP zero one vi stV ℓ) ↔
+        dt.igPassP RF zero one vi stV ℓ) ↔
       ∀ j : Fin (dt.nOf vi), dt.arOf vi ≤ (j : ℕ) →
         dt.polOf vi (j : ℕ) = bpol →
         IsEnc dt.ly zero one
@@ -487,7 +491,7 @@ theorem roundPass_iff_split_gen (hzo : zero ≠ one)
       rw [hqiff ℓj]
       rw [show dt.arOf vi + (ℓj : ℕ) = (j : ℕ) from hnat]
       exact hpol
-    have hIE := (dt.igPassP_iff_isEnc zero one hzo hlin vi stV ℓj).mp
+    have hIE := (dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV ℓj).mp
       (h ℓj hflag)
     have hblk : (PfpTag.arg (toLex (dt.igBlk vi ℓj)) : PfpTag R P dt.KIx) =
         argIn dt.ko ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki vi)⟩ := by
@@ -508,7 +512,7 @@ theorem roundPass_iff_split_gen (hzo : zero ≠ one)
       omega
     have hIE := h ⟨dt.arOf vi + (ℓ : ℕ), hjlt⟩ (Nat.le_add_right _ _)
       ((hqiff ℓ).mp hflag)
-    refine (dt.igPassP_iff_isEnc zero one hzo hlin vi stV ℓ).mpr ?_
+    refine (dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV ℓ).mpr ?_
     have hblk : (PfpTag.arg (toLex (dt.igBlk vi ℓ)) : PfpTag R P dt.KIx) =
         argIn dt.ko
           ⟨dt.arOf vi + (ℓ : ℕ),
@@ -527,13 +531,13 @@ theorem roundPass_iff_split_gen (hzo : zero ≠ one)
 variable [LinearOrder (dt.X.Map A)]
 
 variable {zero one} in
-omit [Fintype dt.SlotIx] [L.IsRelational] [LinearOrder (dt.X.Map A)] in
+omit [Fintype dt.SlotIx] [L.IsRelational] [LinearOrder (dt.X.Map A)] [Finite R] [Finite P] in
 /-- **The valuation the leaf decodes is the pass's**: every level's block
 of the leaf's reading encodes `passW`'s point. -/
 theorem levelVal_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P)
-    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ)
+    (vi : dt.VarIx) (stV : TapeStD dt A R P)
+    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ)
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
@@ -542,13 +546,13 @@ theorem levelVal_encMap (hzo : zero ≠ one)
     (j : Fin (dt.nOf vi)) :
     dt.levelVal vi mb (ixBlk (argIn dt.ko) stV.val) j =
       encMap dt.ly zero one
-        (dt.passW zero one hzo hlin vi stV hp mbW j) := by
+        (dt.passW RF zero one hzo hlin vi stV hp mbW j) := by
   rw [levelVal, passW]
   by_cases h : (j : ℕ) < dt.arOf vi
   · rw [dif_pos h, dif_pos h]
     exact hmb ⟨(j : ℕ), h⟩
   · rw [dif_neg h, dif_neg h]
-    have hspec := ((dt.igPassP_iff_isEnc zero one hzo hlin vi stV
+    have hspec := ((dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV
       ⟨(j : ℕ) - dt.arOf vi, by
         have h1 := j.isLt
         simp only [nIn]
@@ -573,25 +577,25 @@ theorem levelVal_encMap (hzo : zero ≠ one)
     exact hspec
 
 variable {zero one} in
-omit [Fintype dt.SlotIx] [L.IsRelational] in
+omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The leaf at a passing round is the matrix's value at the pass's
 points** — the capstone's `hPsPass`, with `Ps` the gated matrix
 `DescriptiveComplexity.Pfp.PfpData.leafP`. -/
 theorem leafP_pass_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P)
+    (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       mb (Fin.castLE (dt.arOf_le_ko vi) ℓ) =
         encMap dt.ly zero one (mbW ℓ))
-    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP zero one vi stV ℓ) :
+    (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ) :
     dt.leafP zero one vi σ mb (ixBlk (argIn dt.ko) stV.val) ↔
       qfValue (dt.matOf vi)
         (fun atm => (matAtom? atm).elim False
           (MatAtom.holds σ
-            (dt.passW zero one hzo hlin vi stV hp mbW))) := by
+            (dt.passW RF zero one hzo hlin vi stV hp mbW))) := by
   have houter : ∀ k : Fin dt.ko, (k : ℕ) < dt.arOf vi →
       IsEnc dt.ly zero one (mb k) := by
     intro k hk
@@ -606,7 +610,7 @@ theorem leafP_pass_iff (hzo : zero ≠ one)
       have h1 := j.isLt
       simp only [nIn]
       omega
-    have hIE := (dt.igPassP_iff_isEnc zero one hzo hlin vi stV
+    have hIE := (dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV
       ⟨(j : ℕ) - dt.arOf vi, hℓlt⟩).mp (hp _)
     have hblk : (PfpTag.arg (toLex (dt.igBlk vi
         ⟨(j : ℕ) - dt.arOf vi, hℓlt⟩)) : PfpTag R P dt.KIx) =
@@ -625,9 +629,9 @@ theorem leafP_pass_iff (hzo : zero ≠ one)
     exact hIE
   have hval : (fun j => Function.invFun (encMap dt.ly zero one)
       (dt.levelVal vi mb (ixBlk (argIn dt.ko) stV.val) j)) =
-      dt.passW zero one hzo hlin vi stV hp mbW := by
+      dt.passW RF zero one hzo hlin vi stV hp mbW := by
     funext j
-    rw [dt.levelVal_encMap hzo hlin vi stV hp mb mbW hmb j]
+    rw [dt.levelVal_encMap RF hzo hlin vi stV hp mb mbW hmb j]
     exact Function.leftInverse_invFun (encMap_injective dt.ly hzo) _
   constructor
   · rintro ⟨-, hM⟩
@@ -638,17 +642,17 @@ theorem leafP_pass_iff (hzo : zero ≠ one)
     refine ⟨fun j hj _ => hgate j hj, fun _ => ?_⟩
     rw [show (fun j => Function.invFun (encMap dt.ly zero one)
         (dt.levelVal vi mb (ixBlk (argIn dt.ko) stV.val) j)) =
-      dt.passW zero one hzo hlin vi stV hp mbW from hval]
+      dt.passW RF zero one hzo hlin vi stV hp mbW from hval]
     exact (realize_iff_qfValue_holds (dt.matOf_isQF vi) σ _).mpr hq
 
 variable {zero one} in
-omit [Fintype dt.SlotIx] [L.IsRelational] in
+omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The leaf at a failing round is the ∃-clause alone** — the capstone's
 `hPsFail`: the ∀-clause's implication is vacuous when the two readings do
 not both hold. -/
 theorem leafP_fail_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P)
+    (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
@@ -656,20 +660,20 @@ theorem leafP_fail_iff (hzo : zero ≠ one)
       mb (Fin.castLE (dt.arOf_le_ko vi) ℓ) =
         encMap dt.ly zero one (mbW ℓ))
     (hEA : ¬((∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.existGateC →
-        dt.igPassP zero one vi stV ℓ) ∧
+        dt.igPassP RF zero one vi stV ℓ) ∧
       (∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.allGateC →
-        dt.igPassP zero one vi stV ℓ))) :
+        dt.igPassP RF zero one vi stV ℓ))) :
     (∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.existGateC →
-        dt.igPassP zero one vi stV ℓ) ↔
+        dt.igPassP RF zero one vi stV ℓ) ↔
       dt.leafP zero one vi σ mb (ixBlk (argIn dt.ko) stV.val) := by
   have houter : ∀ k : Fin dt.ko, (k : ℕ) < dt.arOf vi →
       IsEnc dt.ly zero one (mb k) := by
     intro k hk
     exact ⟨mbW ⟨(k : ℕ), hk⟩, hmb ⟨(k : ℕ), hk⟩⟩
   rw [leafP_iff_split vi σ mb _ houter]
-  have hExIff := dt.roundPass_iff_split_gen hzo hlin vi stV
+  have hExIff := dt.roundPass_iff_split_gen RF hzo hlin vi stV
     (q := dt.existGateC) (bpol := true) (dt.igFlag_eq_existGateC_iff vi)
-  have hAlIff := dt.roundPass_iff_split_gen hzo hlin vi stV
+  have hAlIff := dt.roundPass_iff_split_gen RF hzo hlin vi stV
     (q := dt.allGateC) (bpol := false) (dt.igFlag_eq_allGateC_iff vi)
   constructor
   · intro hEx

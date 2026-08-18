@@ -263,6 +263,131 @@ variable (enterSt initSt postFold : (Q → A) → (dt.SlotIx → A) → Q → A)
 variable (storeCarry : dt.CarryB → (Q → A) → (dt.SlotIx → A) → Q → A)
 variable {ownG : PG → SG} {ownX : PX → SX}
 
+/-- **A variable's machinery leaves only into its own phases or its exit**: the
+gates' and the matrix's rules are the parameters' business, the three trips stay
+inside their own phases, and only the two verdict dispatches leave. -/
+theorem varRule_dstPh
+    (hdstG : ∀ (s : SG) (ρ : ShG s),
+      (∃ p : PG, (ruleG s ρ).dstPh = emb (.gatesP p)) ∨
+        (ruleG s ρ).dstPh = emb .vchk1)
+    (hdstX : ∀ (s : SX) (ρ : ShX s),
+      (∃ p : PX, (ruleX s ρ).dstPh = emb (.matrixP p)) ∨
+        (ruleX s ρ).dstPh = emb .mchk1)
+    (hpg : ∃ p : PG, pgEntry = emb (.gatesP p))
+    (hpx : ∃ p : PX, pxEntry = emb (.matrixP p))
+    (i : VarSite SG SX) (ρ : VarSh SG SX ShG ShX dt.CarryB i) :
+    (∃ p : VarPh dt.CarryB PG PX,
+      (dt.varRule zero one emb ruleG ruleX pgEntry pxEntry exitPh newSlot gateFlag
+        accBit enterSt initSt postFold storeCarry i ρ).dstPh = emb p) ∨
+    (dt.varRule zero one emb ruleG ruleX pgEntry pxEntry exitPh newSlot gateFlag
+      accBit enterSt initSt postFold storeCarry i ρ).dstPh = exitPh := by
+  match i, ρ with
+  | .vchk0, .stay => exact Or.inl ⟨_, rfl⟩
+  | .vchk0, .dspA =>
+    obtain ⟨p, hp⟩ := hpg
+    exact Or.inl ⟨.gatesP p, hp⟩
+  | .vchk0, .dspB => exact Or.inl ⟨_, rfl⟩
+  | .gates s, ρ =>
+    rcases hdstG s ρ with ⟨p, hp⟩ | hp
+    · exact Or.inl ⟨.gatesP p, hp⟩
+    · exact Or.inl ⟨.vchk1, hp⟩
+  | .vchk1, .stay => exact Or.inl ⟨_, rfl⟩
+  | .vchk1, .dspA => exact Or.inl ⟨_, rfl⟩
+  | .vchk1, .dspB => exact Or.inr rfl
+  | .clearVal, Sum.inl ρ' =>
+    obtain ⟨t, ht⟩ := (ClearKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.val
+      Slot.reg Slot.regLast Slot.wk (fun t => emb (.clearValP t))).dstPh_emb zero
+      one ρ'
+    exact Or.inl ⟨.clearValP t, ht⟩
+  | .clearVal, Sum.inr _ =>
+    obtain ⟨p, hp⟩ := hpx
+    exact Or.inl ⟨.matrixP p, hp⟩
+  | .matrix s, ρ =>
+    rcases hdstX s ρ with ⟨p, hp⟩ | hp
+    · exact Or.inl ⟨.matrixP p, hp⟩
+    · exact Or.inl ⟨.mchk1, hp⟩
+  | .mchk1, .stay => exact Or.inl ⟨_, rfl⟩
+  | .mchk1, .dspA => exact Or.inl ⟨_, rfl⟩
+  | .mchk1, .dspB => exact Or.inl ⟨_, rfl⟩
+  | .valTest, Sum.inl ρ' =>
+    obtain ⟨t, ht⟩ := (TestKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.val
+      Slot.reg Slot.regLast Slot.wk (fun g => (g Slot.val = one ↔
+        ∃ j : Fin dt.ki, g (.blk (some (Sum.inr j))) = one))
+      (fun t => emb (.valTestP t))).dstPh_emb one ρ'
+    exact Or.inl ⟨.valTestP t, ht⟩
+  | .valTest, Sum.inr b =>
+    cases b with
+    | true => exact Or.inl ⟨.vchk2, rfl⟩
+    | false => exact Or.inl ⟨.valIncrP .up, rfl⟩
+  | .valIncr, Sum.inl ρ' =>
+    obtain ⟨t, ht⟩ := (IncrKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.val
+      Slot.reg Slot.regLast Slot.wk (fun b => Slot.blk b)
+      (fun t => emb (.valIncrP t))).dstPh_emb zero one ρ'
+    exact Or.inl ⟨.valIncrP t, ht⟩
+  | .valIncr, Sum.inr b =>
+    obtain ⟨p, hp⟩ := hpx
+    exact Or.inl ⟨.matrixP p, hp⟩
+  | .vchk2, .stay => exact Or.inl ⟨_, rfl⟩
+  | .vchk2, .dspA => exact Or.inr rfl
+  | .vchk2, .dspB => exact Or.inl ⟨_, rfl⟩
+
+/-- **A property of a variable machinery's phases and its exit holds of every
+phase it can move to**, given it holds of the gates' and the matrix's. -/
+theorem varRule_dstIn {S : P → Prop} (hemb : ∀ p : VarPh dt.CarryB PG PX, S (emb p))
+    (hexit : S exitPh)
+    (hG : ∀ (s : SG) (ρ : ShG s), S (ruleG s ρ).dstPh)
+    (hX : ∀ (s : SX) (ρ : ShX s), S (ruleX s ρ).dstPh)
+    (hpg : S pgEntry) (hpx : S pxEntry)
+    (i : VarSite SG SX) (ρ : VarSh SG SX ShG ShX dt.CarryB i) :
+    S (dt.varRule zero one emb ruleG ruleX pgEntry pxEntry exitPh newSlot gateFlag
+      accBit enterSt initSt postFold storeCarry i ρ).dstPh := by
+  match i, ρ with
+  | .vchk0, .stay => exact hemb _
+  | .vchk0, .dspA => exact hpg
+  | .vchk0, .dspB => exact hemb _
+  | .gates s, ρ => exact hG s ρ
+  | .vchk1, .stay => exact hemb _
+  | .vchk1, .dspA => exact hemb _
+  | .vchk1, .dspB => exact hexit
+  | .clearVal, Sum.inl ρ' =>
+    obtain ⟨t, ht⟩ := (ClearKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.val
+      Slot.reg Slot.regLast Slot.wk (fun t => emb (.clearValP t))).dstPh_emb zero
+      one ρ'
+    rw [show (dt.varRule zero one emb ruleG ruleX pgEntry pxEntry exitPh newSlot
+        gateFlag accBit enterSt initSt postFold storeCarry .clearVal
+        (Sum.inl ρ')).dstPh = _ from ht]
+    exact hemb _
+  | .clearVal, Sum.inr _ => exact hpx
+  | .matrix s, ρ => exact hX s ρ
+  | .mchk1, .stay => exact hemb _
+  | .mchk1, .dspA => exact hemb _
+  | .mchk1, .dspB => exact hemb _
+  | .valTest, Sum.inl ρ' =>
+    obtain ⟨t, ht⟩ := (TestKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.val
+      Slot.reg Slot.regLast Slot.wk (fun g => (g Slot.val = one ↔
+        ∃ j : Fin dt.ki, g (.blk (some (Sum.inr j))) = one))
+      (fun t => emb (.valTestP t))).dstPh_emb one ρ'
+    rw [show (dt.varRule zero one emb ruleG ruleX pgEntry pxEntry exitPh newSlot
+        gateFlag accBit enterSt initSt postFold storeCarry .valTest
+        (Sum.inl ρ')).dstPh = _ from ht]
+    exact hemb _
+  | .valTest, Sum.inr b =>
+    cases b with
+    | true => exact hemb .vchk2
+    | false => exact hemb (.valIncrP .up)
+  | .valIncr, Sum.inl ρ' =>
+    obtain ⟨t, ht⟩ := (IncrKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.val
+      Slot.reg Slot.regLast Slot.wk (fun b => Slot.blk b)
+      (fun t => emb (.valIncrP t))).dstPh_emb zero one ρ'
+    rw [show (dt.varRule zero one emb ruleG ruleX pgEntry pxEntry exitPh newSlot
+        gateFlag accBit enterSt initSt postFold storeCarry .valIncr
+        (Sum.inl ρ')).dstPh = _ from ht]
+    exact hemb _
+  | .valIncr, Sum.inr b => exact hpx
+  | .vchk2, .stay => exact hemb _
+  | .vchk2, .dspA => exact hexit
+  | .vchk2, .dspB => exact hemb _
+
 /-- **Every rule of one variable's machinery fires from a phase its site
 owns**; the two abstract machineries' obligations are parameters. -/
 theorem varHosrc

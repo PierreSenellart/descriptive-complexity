@@ -104,6 +104,45 @@ def seqRule : ∀ i : SeqSite n SA, SeqSh n ShA i → Rule A Q W P
       moveRight := False }
   | .sub a s, ρ => ruleA a s ρ
 
+/-- **A sequence leaves only into its own phases or its exit**: the checkpoints
+dispatch into the next stage or out, and a stage's own rules are the parameter's
+business. -/
+theorem seqRule_dstPh
+    (hdstA : ∀ (a : Fin n) (s : SA a) (ρ : ShA a s),
+      (∃ p : PA a, (ruleA a s ρ).dstPh = emb (.sub a p)) ∨
+        (ruleA a s ρ).dstPh = emb (.chk a.succ))
+    (i : SeqSite n SA) (ρ : SeqSh n ShA i) :
+    (∃ p : SeqPh n PA,
+      (seqRule one wk rg emb ruleA entry enterSt exitPh i ρ).dstPh = emb p) ∨
+    (seqRule one wk rg emb ruleA entry enterSt exitPh i ρ).dstPh = exitPh := by
+  match i, ρ with
+  | .chk k, .stay => exact Or.inl ⟨_, rfl⟩
+  | .chk k, .dspA =>
+    by_cases hk : (k : ℕ) < n
+    · exact Or.inl ⟨_, by rw [seqRule, dif_pos hk]⟩
+    · exact Or.inr (by rw [seqRule, dif_neg hk])
+  | .chk k, .dspB => exact Or.inl ⟨_, rfl⟩
+  | .sub a s, ρ =>
+    rcases hdstA a s ρ with ⟨p, hp⟩ | hp
+    · exact Or.inl ⟨.sub a p, hp⟩
+    · exact Or.inl ⟨.chk a.succ, hp⟩
+
+/-- **A property of a sequence's phases and its exit holds of every phase it can
+move to**, given it holds of every phase a stage can move to. -/
+theorem seqRule_dstIn {S : P → Prop} (hemb : ∀ p : SeqPh n PA, S (emb p))
+    (hexit : S exitPh)
+    (hA : ∀ (a : Fin n) (s : SA a) (ρ : ShA a s), S (ruleA a s ρ).dstPh)
+    (i : SeqSite n SA) (ρ : SeqSh n ShA i) :
+    S (seqRule one wk rg emb ruleA entry enterSt exitPh i ρ).dstPh := by
+  match i, ρ with
+  | .chk k, .stay => exact hemb _
+  | .chk k, .dspA =>
+    by_cases hk : (k : ℕ) < n
+    · rw [seqRule, dif_pos hk]; exact hemb _
+    · rw [seqRule, dif_neg hk]; exact hexit
+  | .chk k, .dspB => exact hemb _
+  | .sub a s, ρ => exact hA a s ρ
+
 /-- **Every rule of a sequence fires from a phase its site owns**; the
 stages' obligation is the parameter. -/
 theorem seqHosrc (ownA : ∀ a : Fin n, PA a → SA a)

@@ -200,7 +200,7 @@ theorem uRulesDefinable_stageArgs {k : ℕ} {emb : StagePh k → P} {exitPh : P}
 
 /-- **What an atom kind's pack owes**, one constructor at a time. -/
 noncomputable def UKindArgsDef {n : ℕ} :
-    ∀ κ : MatAtom dt.X dt.d n,
+    ∀ κ : MatAtom dt.X dt.d.B n,
       (∀ e : Env L, dt.KindArgs (A := e.α) (Q := Q) κ) → Prop
   | .stage _ _, args => UStageArgsDef args
   | @MatAtom.exp _ _ _ _ _ _ _, args =>
@@ -212,7 +212,7 @@ noncomputable def UKindArgsDef {n : ℕ} :
 /-- **An atom kind's machinery is definable**, given its pack: the stage
 atom's by its own statement, an expansion atom's by the tag-branched one, an
 equality's and an order atom's by the element loop's. -/
-theorem uRulesDefinable_kindRule {n : ℕ} (κ : MatAtom dt.X dt.d n)
+theorem uRulesDefinable_kindRule {n : ℕ} (κ : MatAtom dt.X dt.d.B n)
     {args : ∀ e : Env L, dt.KindArgs (A := e.α) (Q := Q) κ}
     {emb : dt.KindPh κ → P} {exitPh : P} (h : UKindArgsDef κ args) :
     URulesDefinable (L := L) (Q := Q) fun e =>

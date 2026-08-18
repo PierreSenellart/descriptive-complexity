@@ -59,27 +59,28 @@ theorem realize_matVar {LM : Language.{0, 0}} [LM.IsRelational] {n : ℕ}
 /-! ### The four kinds of atoms -/
 
 variable {L : Language.{0, 0}} {X : ExpExpansion L}
-variable {d : StepDef (X.E.sum Language.order)}
+variable {B : SOBlock}
 
 /-- **An atom of a step matrix, classified**: a point equality, an order
 comparison, a relation of the expansion, or a stage atom of the iteration –
 each with the prefix levels its arguments read. This is the index data of the
 program's per-atom call sites. -/
-inductive MatAtom (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
-    (n : ℕ) : Type
+inductive MatAtom (X : ExpExpansion L) (B : SOBlock) (n : ℕ) : Type
   /-- A point equality between two prefix levels. -/
-  | eq : Fin n → Fin n → MatAtom X d n
+  | eq : Fin n → Fin n → MatAtom X B n
   /-- An order comparison between two prefix levels. -/
-  | ord : Fin n → Fin n → MatAtom X d n
+  | ord : Fin n → Fin n → MatAtom X B n
   /-- A relation of the expansion, at the given prefix levels. -/
-  | exp : ∀ {k : ℕ}, X.E.Relations k → (Fin k → Fin n) → MatAtom X d n
-  /-- A stage atom of the iteration, at the given prefix levels. -/
-  | stage : (i : d.B.ι) → (Fin (d.B.arity i) → Fin n) → MatAtom X d n
+  | exp : ∀ {k : ℕ}, X.E.Relations k → (Fin k → Fin n) → MatAtom X B n
+  /-- An atom of the block's relation variables, at the given prefix levels: a
+  *stage* of the iteration for a fixed-point program, a guessed relation for a
+  nondeterministic one. -/
+  | stage : (i : B.ι) → (Fin (B.arity i) → Fin n) → MatAtom X B n
 
 /-- The classification of a relation atom, by its symbol's summand. -/
-def relAtom : ∀ {n k : ℕ}, ((X.E.sum Language.order).sum d.B.lang).Relations k →
-    (Fin k → ((X.E.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)) →
-    MatAtom X d n
+def relAtom : ∀ {n k : ℕ}, ((X.E.sum Language.order).sum B.lang).Relations k →
+    (Fin k → ((X.E.sum Language.order).sum B.lang).Term (Empty ⊕ Fin n)) →
+    MatAtom X B n
   | _, _, Sum.inl (Sum.inl e), ts => .exp e fun j => matVar (ts j)
   | _, _, Sum.inl (Sum.inr .le), ts => .ord (matVar (ts 0)) (matVar (ts 1))
   | _, _, Sum.inr b, ts => .stage b.1 fun j => matVar (ts (Fin.cast b.2 j))
@@ -87,8 +88,8 @@ def relAtom : ∀ {n k : ℕ}, ((X.E.sum Language.order).sum d.B.lang).Relations
 /-- **The classifier**: the kind of an atom, read off the syntax; `none` only
 on non-atoms. -/
 def matAtom? : ∀ {n : ℕ},
-    ((X.E.sum Language.order).sum d.B.lang).BoundedFormula Empty n →
-      Option (MatAtom X d n)
+    ((X.E.sum Language.order).sum B.lang).BoundedFormula Empty n →
+      Option (MatAtom X B n)
   | _, .equal t₁ t₂ => some (.eq (matVar t₁) (matVar t₂))
   | _, .rel r ts => some (relAtom r ts)
   | _, .falsum => none
@@ -99,7 +100,7 @@ def matAtom? : ∀ {n : ℕ},
 `DescriptiveComplexity.Pfp.qfAtoms` are equality and relation atoms, on which
 the classifier is total. -/
 theorem isSome_matAtom?_of_mem_qfAtoms :
-    ∀ {n : ℕ} (ψ φ : ((X.E.sum Language.order).sum d.B.lang).BoundedFormula Empty n),
+    ∀ {n : ℕ} (ψ φ : ((X.E.sum Language.order).sum B.lang).BoundedFormula Empty n),
       φ ∈ qfAtoms ψ → (matAtom? φ).isSome := by
   intro n ψ
   induction ψ with
@@ -131,8 +132,8 @@ variable [LinearOrder (X.Map A)]
 
 /-- **What an atom says**, at a stage of the iteration and a valuation of the
 prefix: the machine subroutine of the atom computes exactly this. -/
-def MatAtom.holds (σ : d.B.Assignment (X.Map A)) {n : ℕ} (w : Fin n → X.Map A) :
-    MatAtom X d n → Prop
+def MatAtom.holds (σ : B.Assignment (X.Map A)) {n : ℕ} (w : Fin n → X.Map A) :
+    MatAtom X B n → Prop
   | .eq j₁ j₂ => w j₁ = w j₂
   | .ord j₁ j₂ => w j₁ ≤ w j₂
   | .exp e ts => RelMap (M := X.Map A) e fun j => w (ts j)
@@ -141,19 +142,19 @@ def MatAtom.holds (σ : d.B.Assignment (X.Map A)) {n : ℕ} (w : Fin n → X.Map
 omit [Finite A] [Nonempty A] in
 /-- **The reading is correct**: a classified atom realizes at a valuation of
 the prefix exactly as its kind says. -/
-theorem realize_matAtom (σ : d.B.Assignment (X.Map A)) {n : ℕ}
-    {φ : ((X.E.sum Language.order).sum d.B.lang).BoundedFormula Empty n}
-    {κ : MatAtom X d n} (h : matAtom? φ = some κ) (w : Fin n → X.Map A) :
+theorem realize_matAtom (σ : B.Assignment (X.Map A)) {n : ℕ}
+    {φ : ((X.E.sum Language.order).sum B.lang).BoundedFormula Empty n}
+    {κ : MatAtom X B n} (h : matAtom? φ = some κ) (w : Fin n → X.Map A) :
     (@BoundedFormula.Realize _ (X.Map A)
-        (d.B.structure₁ (L := X.E.sum Language.order) σ) _ _ φ default w ↔
+        (B.structure₁ (L := X.E.sum Language.order) σ) _ _ φ default w ↔
       κ.holds σ w) := by
-  letI inst := d.B.structure₁ (L := X.E.sum Language.order) σ
+  letI inst := B.structure₁ (L := X.E.sum Language.order) σ
   match φ with
   | .falsum => simp [matAtom?] at h
   | .imp _ _ => simp [matAtom?] at h
   | .all _ => simp [matAtom?] at h
   | .equal t₁ t₂ =>
-    obtain rfl : MatAtom.eq (X := X) (d := d) (matVar t₁) (matVar t₂) = κ :=
+    obtain rfl : MatAtom.eq (X := X) (B := B) (matVar t₁) (matVar t₂) = κ :=
       Option.some.inj h
     change t₁.realize (Sum.elim default w) = t₂.realize (Sum.elim default w) ↔ _
     rw [realize_matVar, realize_matVar]
@@ -174,12 +175,12 @@ realizes exactly as its Boolean function at the kinds' readings – which is
 what the machine computes once its per-atom subroutines have filled the
 verdict slots. -/
 theorem realize_iff_qfValue_holds {n : ℕ}
-    {mat : ((X.E.sum Language.order).sum d.B.lang).BoundedFormula Empty n}
-    (hqf : mat.IsQF) (σ : d.B.Assignment (X.Map A)) (w : Fin n → X.Map A) :
+    {mat : ((X.E.sum Language.order).sum B.lang).BoundedFormula Empty n}
+    (hqf : mat.IsQF) (σ : B.Assignment (X.Map A)) (w : Fin n → X.Map A) :
     (@BoundedFormula.Realize _ (X.Map A)
-        (d.B.structure₁ (L := X.E.sum Language.order) σ) _ _ mat default w ↔
+        (B.structure₁ (L := X.E.sum Language.order) σ) _ _ mat default w ↔
       qfValue mat fun a => (matAtom? a).elim False (MatAtom.holds σ w)) := by
-  letI inst := d.B.structure₁ (L := X.E.sum Language.order) σ
+  letI inst := B.structure₁ (L := X.E.sum Language.order) σ
   refine (realize_qfValue hqf default w).trans (qfValue_congr _ _ _ fun a ha => ?_)
   obtain ⟨κ, hκ⟩ :=
     Option.isSome_iff_exists.mp (isSome_matAtom?_of_mem_qfAtoms mat a ha)

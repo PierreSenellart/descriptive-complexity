@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.PfpProg
+import DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!
 # The rule names of the EXPSPACE program are finitely many
@@ -132,7 +133,7 @@ namespace PfpData
 variable {L : Language.{0, 0}} (dt : PfpData L)
 
 noncomputable instance instFiniteKindSh {n : ℕ} :
-    ∀ (κ : MatAtom dt.X dt.d n) (s : dt.KindSite κ), Finite (dt.KindSh κ s)
+    ∀ (κ : MatAtom dt.X dt.d.B n) (s : dt.KindSite κ), Finite (dt.KindSh κ s)
   | .stage i _, s => instFiniteStageSh (k := dt.d.B.arity i) s
   | @MatAtom.exp _ _ _ _ k e _, s =>
     letI := Fintype.ofFinite dt.X.Tag
@@ -181,6 +182,16 @@ noncomputable instance instFiniteSESh (s : dt.SEF) : Finite (dt.SESh s) :=
 
 noncomputable instance instFiniteSFSh (s : dt.SF) : Finite (dt.SFSh s) :=
   instFiniteOuterSh (ShE := dt.SESh) s
+
+/-- **The rule shapes of the *clocked* evaluation are finite too**: two rules at
+a checkpoint, the shared tower's at a machinery site. -/
+noncomputable instance instFiniteNexEvalSh {nv : ℕ} {SM : Type} {ShM : SM → Type}
+    [∀ s, Finite (ShM s)] : ∀ s : EvalSite nv SM, Finite (NexEvalSh nv SM ShM s)
+  | .chk _ => inferInstanceAs (Finite NexEvalChkRule)
+  | .sub s => inferInstanceAs (Finite (ShM s))
+
+noncomputable instance instFiniteNexSESh (s : dt.SEF) : Finite (dt.NexSESh s) :=
+  instFiniteNexEvalSh (nv := dt.nv) (ShM := dt.SMSh) s
 
 /-! ### The rule names -/
 

@@ -48,6 +48,7 @@ variable {L : Language.{0, 0}} (dt : PfpData L) {A R P : Type}
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
+variable (RF : RegFile (Univ A R P dt.KIx dt.dd))
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
 
 section GateFacts
@@ -57,8 +58,8 @@ variable (zero one : A)
 /-! ### Encoded tuples against the marks -/
 
 variable {zero one} in
-omit [LinearOrder A] [Finite A] [Nonempty A] [L.IsRelational]
-  [L.Structure A] in
+omit [LinearOrder A] [Finite A] [Nonempty A] [L.IsRelational] [L.Structure A]
+  [Finite R] [Finite P] in
 /-- **An encoded tuple is canonically padded**: the layout inhabits the
 first `dd₀` coordinates, so everything above them is the designated
 zero. -/
@@ -90,57 +91,35 @@ theorem eq_encTup_of_marks {u2 : Fin dt.dd → A} {d : PtCode dt.X}
     rwa [hcast] at h
   · rw [hpdd j (Nat.le_of_not_lt hj), dt.encTup_pdd d pay (Nat.le_of_not_lt hj)]
 
-variable {zero one} in
-omit [LinearOrder R] [LinearOrder P] [Finite R] [Finite P]
-  [L.IsRelational] in
-/-- The block mark decodes the tag. -/
-theorem tagBlk_eq_some_iff (τ : PfpTag R P dt.KIx)
-    (b' : Fin dt.ko ⊕ Fin dt.ki) :
-    tagBlk τ = some b' ↔ τ = PfpTag.arg (toLex b') := by
-  cases τ with
-  | ctrl r => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
-  | sym => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
-  | phase p => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
-  | arg i =>
-    constructor
-    · intro h
-      have h' : ofLex i = b' := Option.some.inj h
-      subst h'
-      rfl
-    · intro h
-      have h' : i = toLex b' := by injection h
-      subst h'
-      rfl
-
 /-! ### The per-cell questions, read -/
 
 variable {zero one} in
-omit [Nonempty A] [L.IsRelational] [L.Structure A] in
+omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite P] in
 /-- **The shape clause of the marks is the shape of the cell's tuple**:
 the padding mark together with a name-coordinate match is full equality
 with the encoded tuple. -/
 theorem shape_marks_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (st : TapeSt dt A R P) (u : Univ A R P dt.KIx dt.dd) :
-    (dt.back zero one dt.dd0Le st (wmSeg u) .pdd = one ∧
+    (st : TapeStD dt A R P) (u : Univ A R P dt.KIx dt.dd) :
+    (dt.back RF.cell zero one dt.dd0Le st (RF.cell u) .pdd = one ∧
       ((∃ t : dt.X.Tag, ∀ j : Fin dt.dd0,
-          dt.back zero one dt.dd0Le st (wmSeg u) (.name j) =
+          dt.back RF.cell zero one dt.dd0Le st (RF.cell u) (.name j) =
             encTagTup dt.ly zero one t (Fin.castLE dt.dd0Le j)) ∨
         ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A),
           ∀ j : Fin dt.dd0,
-            dt.back zero one dt.dd0Le st (wmSeg u) (.name j) =
+            dt.back RF.cell zero one dt.dd0Le st (RF.cell u) (.name j) =
               encAsgTup dt.ly zero one i w (Fin.castLE dt.dd0Le j))) ↔
       ((∃ t : dt.X.Tag, u.2 = encTagTup dt.ly zero one t) ∨
         ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A),
           u.2 = encAsgTup dt.ly zero one i w) := by
-  rw [dt.back_pdd_wmSeg hlin, bitVal_iff hzo]
+  rw [dt.back_pdd_cell (RF.injective hlin), bitVal_iff hzo]
   constructor
   · rintro ⟨hpdd, ⟨t, hn⟩ | ⟨i, w, hn⟩⟩
     · exact Or.inl ⟨t, dt.eq_encTup_of_marks hpdd (fun j => by
-        rw [← dt.back_name_wmSeg hlin]
+        rw [← dt.back_name_cell (RF.injective hlin)]
         exact hn j)⟩
     · exact Or.inr ⟨i, w, dt.eq_encTup_of_marks hpdd (fun j => by
-        rw [← dt.back_name_wmSeg hlin]
+        rw [← dt.back_name_cell (RF.injective hlin)]
         exact hn j)⟩
   · intro hsh
     have hpdd : ∀ j : Fin dt.dd, dt.dd0 ≤ (j : ℕ) → u.2 j = zero := by
@@ -152,71 +131,71 @@ theorem shape_marks_iff (hzo : zero ≠ one)
     refine ⟨hpdd, ?_⟩
     rcases hsh with ⟨t, ht⟩ | ⟨i, w, hw⟩
     · exact Or.inl ⟨t, fun j => by
-        rw [dt.back_name_wmSeg hlin, ht]⟩
+        rw [dt.back_name_cell (RF.injective hlin), ht]⟩
     · exact Or.inr ⟨i, w, fun j => by
-        rw [dt.back_name_wmSeg hlin, hw]⟩
+        rw [dt.back_name_cell (RF.injective hlin), hw]⟩
 
 variable {zero one} in
-omit [Nonempty A] [L.IsRelational] [L.Structure A] in
+omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite P] in
 /-- **The outer file test's question, read off the marks**: if the cell is
 of the gated block and belongs to MIRROR, its tuple is a witness or a
 member shape. -/
 theorem wellShapedG_back_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (st : TapeSt dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki)
+    (st : TapeStD dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki)
     (u : Univ A R P dt.KIx dt.dd) :
     dt.wellShapedG zero one b'
-        (dt.back zero one dt.dd0Le st (wmSeg u)) ↔
+        (dt.back RF.cell zero one dt.dd0Le st (RF.cell u)) ↔
       (u.1 = (PfpTag.arg (toLex b') : PfpTag R P dt.KIx) → st.mir u →
         ((∃ t : dt.X.Tag, u.2 = encTagTup dt.ly zero one t) ∨
           ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A),
             u.2 = encAsgTup dt.ly zero one i w)) := by
   rw [wellShapedG]
-  have hblk : dt.back zero one dt.dd0Le st (wmSeg u) (.blk (some b')) =
+  have hblk : dt.back RF.cell zero one dt.dd0Le st (RF.cell u) (.blk (some b')) =
       one ↔ u.1 = PfpTag.arg (toLex b') := by
-    rw [dt.back_blk_wmSeg hlin, bitVal_iff hzo, dt.tagBlk_eq_some_iff]
-  have hmir : dt.back zero one dt.dd0Le st (wmSeg u) Slot.mir = one ↔
+    rw [dt.back_blk_cell (RF.injective hlin), bitVal_iff hzo, tagBlk_eq_some_iff]
+  have hmir : dt.back RF.cell zero one dt.dd0Le st (RF.cell u) Slot.mir = one ↔
       st.mir u := by
-    rw [show dt.back zero one dt.dd0Le st (wmSeg u) Slot.mir =
-        bitVal zero one (regBit st.mir (wmSeg u)) from rfl,
+    rw [show dt.back RF.cell zero one dt.dd0Le st (RF.cell u) Slot.mir =
+        bitVal zero one (bitAtOf RF.cell st.mir (RF.cell u)) from rfl,
       bitVal_iff hzo]
     constructor
     · rintro ⟨u', hu', hm⟩
-      rwa [wmSeg_injective hlin hu']
+      rwa [RF.injective hlin hu']
     · exact fun h => ⟨u, rfl, h⟩
   rw [hblk, hmir]
   exact imp_congr Iff.rfl (imp_congr Iff.rfl
-    (dt.shape_marks_iff hzo hlin st u))
+    (dt.shape_marks_iff RF hzo hlin st u))
 
 variable {zero one} in
-omit [Nonempty A] [L.IsRelational] [L.Structure A] in
+omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite P] in
 /-- **The inner file test's question, read off the marks**: the same at the
 VAL register. -/
 theorem igTest_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (stV : TapeSt dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki)
+    (stV : TapeStD dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki)
     (u : Univ A R P dt.KIx dt.dd) :
-    dt.igTest zero one stV b' u ↔
+    dt.igTest RF zero one stV b' u ↔
       (u.1 = (PfpTag.arg (toLex b') : PfpTag R P dt.KIx) → stV.val u →
         ((∃ t : dt.X.Tag, u.2 = encTagTup dt.ly zero one t) ∨
           ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A),
             u.2 = encAsgTup dt.ly zero one i w)) := by
   rw [igTest, wellShapedIG]
-  have hblk : dt.back zero one dt.dd0Le stV (wmSeg u) (.blk (some b')) =
+  have hblk : dt.back RF.cell zero one dt.dd0Le stV (RF.cell u) (.blk (some b')) =
       one ↔ u.1 = PfpTag.arg (toLex b') := by
-    rw [dt.back_blk_wmSeg hlin, bitVal_iff hzo, dt.tagBlk_eq_some_iff]
-  have hval : dt.back zero one dt.dd0Le stV (wmSeg u) Slot.val = one ↔
+    rw [dt.back_blk_cell (RF.injective hlin), bitVal_iff hzo, tagBlk_eq_some_iff]
+  have hval : dt.back RF.cell zero one dt.dd0Le stV (RF.cell u) Slot.val = one ↔
       stV.val u := by
-    rw [show dt.back zero one dt.dd0Le stV (wmSeg u) Slot.val =
-        bitVal zero one (regBit stV.val (wmSeg u)) from rfl,
+    rw [show dt.back RF.cell zero one dt.dd0Le stV (RF.cell u) Slot.val =
+        bitVal zero one (bitAtOf RF.cell stV.val (RF.cell u)) from rfl,
       bitVal_iff hzo]
     constructor
     · rintro ⟨u', hu', hm⟩
-      rwa [wmSeg_injective hlin hu']
+      rwa [RF.injective hlin hu']
     · exact fun h => ⟨u, rfl, h⟩
   rw [hblk, hval]
   exact imp_congr Iff.rfl (imp_congr Iff.rfl
-    (dt.shape_marks_iff hzo hlin stV u))
+    (dt.shape_marks_iff RF hzo hlin stV u))
 
 /-! ### The shape clause of a block value -/
 
@@ -246,17 +225,17 @@ theorem forall_shape_iff_of_cells
 /-! ### The gated facts: at a block value that is an encoding -/
 
 variable {zero one} in
-omit [Nonempty A] [L.IsRelational] in
+omit [Nonempty A] [L.IsRelational] [Finite A] [Finite R] [Finite P] in
 /-- **At an encoding every cell passes the outer file test.** -/
 theorem testOf_of_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    {st : TapeSt dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
+    {st : TapeStD dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
     (hS : wmBlk st.mir (PfpTag.arg (toLex b') : PfpTag R P dt.KIx) =
       encMap dt.ly zero one p)
     (u : Univ A R P dt.KIx dt.dd) :
     dt.wellShapedG zero one b'
-      (dt.back zero one dt.dd0Le st (wmSeg u)) := by
-  rw [dt.wellShapedG_back_iff hzo hlin]
+      (dt.back RF.cell zero one dt.dd0Le st (RF.cell u)) := by
+  rw [dt.wellShapedG_back_iff RF hzo hlin]
   intro h1 hm
   have hmem : encMap dt.ly zero one p u.2 := by
     rw [← hS]
@@ -317,7 +296,7 @@ theorem domHolds_of_encMap (hzo : zero ≠ one)
 /-! ### The trichotomy: the three legs are exhaustive -/
 
 variable {zero one} in
-omit [L.IsRelational] in
+omit [L.IsRelational] [Finite R] [Finite P] in
 /-- **Every block value makes one of three landings**: it is an encoding
 (the gated leg), some register cell of its block is ill-shaped (the
 shape-failing leg), or every cell is well-shaped and the
@@ -325,15 +304,15 @@ one-hot-and-domain conjunct fails at the dispatched tag (the ungated
 leg). -/
 theorem gate_trichotomy (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (st : TapeSt dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki) :
+    (st : TapeStD dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki) :
     IsEnc dt.ly zero one
         (wmBlk st.mir (PfpTag.arg (toLex b') : PfpTag R P dt.KIx)) ∨
       (∃ u₀ : Univ A R P dt.KIx dt.dd,
         ¬dt.wellShapedG zero one b'
-          (dt.back zero one dt.dd0Le st (wmSeg u₀))) ∨
+          (dt.back RF.cell zero one dt.dd0Le st (RF.cell u₀))) ∨
       ((∀ u : Univ A R P dt.KIx dt.dd,
           dt.wellShapedG zero one b'
-            (dt.back zero one dt.dd0Le st (wmSeg u))) ∧
+            (dt.back RF.cell zero one dt.dd0Le st (RF.cell u))) ∧
         ¬((∀ t' : dt.X.Tag,
             wmBlk st.mir (PfpTag.arg (toLex b') : PfpTag R P dt.KIx)
               (encTagTup dt.ly zero one t') ↔
@@ -353,27 +332,27 @@ theorem gate_trichotomy (hzo : zero ≠ one)
   · exact Or.inl hE
   by_cases hsh : ∀ u : Univ A R P dt.KIx dt.dd,
       dt.wellShapedG zero one b'
-        (dt.back zero one dt.dd0Le st (wmSeg u))
+        (dt.back RF.cell zero one dt.dd0Le st (RF.cell u))
   · refine Or.inr (Or.inr ⟨hsh, fun hc => hE ?_⟩)
     have hshape := dt.forall_shape_iff_of_cells
       (m := st.mir) (b' := b')
-      (fun u => (dt.wellShapedG_back_iff hzo hlin st b' u).mp (hsh u))
+      (fun u => (dt.wellShapedG_back_iff RF hzo hlin st b' u).mp (hsh u))
     exact (dt.igVerdict_iff_isEnc hzo hshape).mp hc
   · exact Or.inr (Or.inl (not_forall.mp hsh))
 
 /-! ### The inner loop's bridge: the per-level verdict is the gate -/
 
 variable {zero one} in
-omit [Nonempty A] [L.IsRelational] in
+omit [Nonempty A] [L.IsRelational] [Finite A] [Finite R] [Finite P] in
 /-- **Every cell of an encoded VAL block passes the inner file test.** -/
 theorem igTest_of_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    {stV : TapeSt dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
+    {stV : TapeStD dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
     (hS : wmBlk stV.val (PfpTag.arg (toLex b') : PfpTag R P dt.KIx) =
       encMap dt.ly zero one p)
     (u : Univ A R P dt.KIx dt.dd) :
-    dt.igTest zero one stV b' u := by
-  rw [dt.igTest_iff hzo hlin]
+    dt.igTest RF zero one stV b' u := by
+  rw [dt.igTest_iff RF hzo hlin]
   intro h1 hm
   have hmem : encMap dt.ly zero one p u.2 := by
     rw [← hS]
@@ -383,15 +362,15 @@ theorem igTest_of_encMap (hzo : zero ≠ one)
   · exact Or.inl ⟨p.1.1, h⟩
   · exact Or.inr ⟨i, w, h⟩
 
-omit [L.IsRelational] in
+omit [L.IsRelational] [Finite R] [Finite P] in
 /-- **The inner loop's per-level verdict is the gate**: a level passes —
 its file test, the one-hot witness at the dispatched tag and the domain
 condition there — exactly when its block value **is** an encoding. The
 marks-to-shapes bridge of the two-flag characterization. -/
 theorem igPassP_iff_isEnc (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (vi : dt.VarIx) (stV : TapeSt dt A R P) (ℓ : Fin (dt.nIn vi)) :
-    dt.igPassP zero one vi stV ℓ ↔
+    (vi : dt.VarIx) (stV : TapeStD dt A R P) (ℓ : Fin (dt.nIn vi)) :
+    dt.igPassP RF zero one vi stV ℓ ↔
       IsEnc dt.ly zero one
         (wmBlk stV.val
           (PfpTag.arg (toLex (dt.igBlk vi ℓ)) : PfpTag R P dt.KIx)) := by
@@ -400,14 +379,14 @@ theorem igPassP_iff_isEnc (hzo : zero ≠ one)
   · rintro ⟨htest, hone, hdom⟩
     have hshape := dt.forall_shape_iff_of_cells
       (m := stV.val) (b' := dt.igBlk vi ℓ)
-      (fun u => (dt.igTest_iff hzo hlin stV (dt.igBlk vi ℓ) u).mp (htest u))
+      (fun u => (dt.igTest_iff RF hzo hlin stV (dt.igBlk vi ℓ) u).mp (htest u))
     exact (dt.igVerdict_iff_isEnc hzo hshape).mp ⟨hone, hdom⟩
   · rintro ⟨p, hS⟩
-    refine ⟨fun u => dt.igTest_of_encMap hzo hlin hS u, ?_⟩
+    refine ⟨fun u => dt.igTest_of_encMap RF hzo hlin hS u, ?_⟩
     have hshape := dt.forall_shape_iff_of_cells
       (m := stV.val) (b' := dt.igBlk vi ℓ)
-      (fun u => (dt.igTest_iff hzo hlin stV (dt.igBlk vi ℓ) u).mp
-        (dt.igTest_of_encMap hzo hlin hS u))
+      (fun u => (dt.igTest_iff RF hzo hlin stV (dt.igBlk vi ℓ) u).mp
+        (dt.igTest_of_encMap RF hzo hlin hS u))
     exact (dt.igVerdict_iff_isEnc hzo hshape).mpr ⟨p, hS⟩
 
 end GateFacts

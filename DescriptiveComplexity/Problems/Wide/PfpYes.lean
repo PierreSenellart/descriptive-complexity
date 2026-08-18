@@ -160,14 +160,14 @@ theorem outLeg_verdict
     (hmV0 : mV 0 = fun _ => False)
     (hIncr : ∀ a a' : Fin (nV + 1), a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
-    (hTestT : ∀ u, dt.InnerFull (mV (Fin.last nV)) u)
-    (hTestF : ∀ a, a < Fin.last nV → ∃ u, ¬dt.InnerFull (mV a) u)
+    (hTestT : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV (Fin.last nV)) u)
+    (hTestF : ∀ a, a < Fin.last nV → ∃ u, ¬dt.InnerFull (fun u => tagBlk u.1) (mV a) u)
     (hKin : ∀ (a : Fin (nV + 1)) (t : PfpTag
         (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
-    (st : TapeSt dt A
+    (st : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
     (hwkSt : st.wk = fun r => r = fun _ => False)
     (hmirSt : st.mir = fun _ => False)
@@ -191,8 +191,8 @@ theorem outLeg_verdict
         dt.dd)).Step
         ⟨Sum.inr ((dt.progOf zero one hzo hpl).stElt
             (.evalP (.sub (dt.smEntryOut))) f₀), Sum.inl v₁,
-          wideTape ((dt.progOf zero one hzo hpl).trackTape Slot.val
-            (dt.back zero one dt.dd0Le st) st.val)
+          wideTape ((dt.progOf zero one hzo hpl).trackTapeAt wmSeg Slot.val
+            (dt.back wmSeg zero one dt.dd0Le st) st.val)
             ((dt.progOf zero one hzo hpl).syElt
               (dt.progOf zero one hzo hpl).blank)⟩ cfg ∧
       cfg.state = Sum.inr ((dt.progOf zero one hzo hpl).stElt .acceptP f) ∧
@@ -215,29 +215,30 @@ theorem outLeg_verdict
   -- the semantic pack: no gate to condition it on, the variable being nullary
   set sem₀ := fun (a : Fin (nV + 1))
       (hp : ∀ ℓ : Fin (dt.nIn (none : dt.VarIx)),
-        dt.igPassP zero one none (dt.roundSt st (mV a)) ℓ)
+        dt.igPassP (wmSegFile hlin) zero one none (dt.roundSt st (mV a)) ℓ)
       (b : Fin (dt.natOf (none : dt.VarIx))) =>
-    dt.passSem hzo hlin none (dt.roundSt st (mV a)) hp
+    dt.passSem (wmSegFile hlin) hzo hlin none (dt.roundSt st (mV a)) hp
       (fun ℓ => ℓ.elim0) (fun ℓ => ℓ.elim0) b with hsem₀
   -- the verdict the machinery computes is the output sentence
   have hacc : (dt.varArgsOf zero one (none : dt.VarIx)).accBit
       (dt.outCtlT (PR := dt.progOf zero one hzo hpl) (v := fun _ => False)
-        (aT := Fin.last nV) mV st (Fin.elim0)
-        (dt.semCastT none st (fun _ => False) mV sem₀) f₀) ↔
+        (aT := Fin.last nV) (wmSegFile hlin) hord mV st (Fin.elim0)
+        (dt.semCastT (wmSegFile hlin) none st (fun _ => False) mV sem₀) f₀) ↔
       @Sentence.Realize _ (dt.X.Map A) (dt.d.B.structure₁ σ) dt.d.out := by
     rw [dt.outCtlT_eq_outCtl (PR := dt.progOf zero one hzo hpl) (hreg := hreg)
       (st := st) (tOf := Fin.elim0) (sem₀ := sem₀) (f₀ := f₀)]
-    exact dt.accVerdict_out (PR := dt.progOf zero one hzo hpl) st mV sem₀
+    exact dt.accVerdict_out (PR := dt.progOf zero one hzo hpl) (wmSegFile hlin) st mV sem₀
       hlin hord (fun a : Fin (nV + 1) => Fin.zero_le a) hmV0 hIncr hKin
       hTestT σ hdict (fun a iv ts => hbelow a iv ts) hordP
       (fun _ _ _ => rfl) _
-  refine ⟨_, _, dt.outLeg_run_verdict
-    (fun i ρ => dt.prog_rules_eval zero one hzo _ hpl i ρ) hR hlin hord htop
-    hbot hv hiE (fun a : Fin (nV + 1) => Fin.zero_le a)
+  refine ⟨_, _, dt.outLeg_run_verdict (wmSegFile hlin) hord (fun i ρ => dt.prog_rules_eval zero one
+      hzo _ hpl i ρ) hR hlin htop
+    hbot (fun hr u => wmSetLt_wmSeg_of_not_bot hbot hr u) hv hiE (fun a : Fin (nV + 1) =>
+      Fin.zero_le a)
     (fun a : Fin (nV + 1) => Fin.le_last a) mV hmV0 hIncr hTestT hTestF st
     hwkSt (Fin.elim0) (fun ℓ => ℓ.elim0) (Fin.elim0)
     (fun ℓ => ℓ.elim0) hmirSt hbotSt
-    (dt.semCastT none st (fun _ => False) mV sem₀) (fun ℓ => ℓ.elim0)
+    (dt.semCastT (wmSegFile hlin) none st (fun _ => False) mV sem₀) (fun ℓ => ℓ.elim0)
     (fun ℓ => ℓ.elim0) f₀, rfl, and_iff_right rfl |>.trans hacc⟩
 
 /-- **The whole run, from the initial configuration to the accepting phase**,
@@ -264,7 +265,7 @@ theorem reaches_outVerdict
             (dt.progOf zero one hzo hpl).startPh
             (dt.progOf zero one hzo hpl).startSt),
           Sum.inl (fun _ => False),
-          wideTape ((dt.progOf zero one hzo hpl).trackTape Slot.mir
+          wideTape ((dt.progOf zero one hzo hpl).trackTapeAt wmSeg Slot.mir
             (dt.progOf zero one hzo hpl).initBack (fun _ => False))
             ((dt.progOf zero one hzo hpl).syElt
               (dt.progOf zero one hzo hpl).blank)⟩ cfg ∧
@@ -319,7 +320,7 @@ theorem reaches_outVerdict
   -- every address the dictionary is read at lies in the logical interval
   have hbelow : ∀ (j : Fin dt.nv) (a : Fin (nV + 1)) (iv : dt.d.B.ι)
       (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf (dt.varAt j)))
-      (st : TapeSt dt A
+      (st : TapeStD dt A
         (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
       (w : Univ A (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx dt.dd → Prop),
@@ -362,18 +363,18 @@ theorem reaches_outVerdict
   set semG : ∀ (w : Univ A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
       dt.dd → Prop) (j : Fin dt.nv)
-    (st : TapeSt dt A
+    (st : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF),
-    dt.gatedAt (PR := dt.progOf zero one hzo hpl) j st → _ :=
-    fun w j st hg => dt.gatedSem (PR := dt.progOf zero one hzo hpl) hzo hlin
+    dt.gatedAt (PR := dt.progOf zero one hzo hpl) (wmSegFile hlin) j st → _ :=
+    fun w j st hg => dt.gatedSem (PR := dt.progOf zero one hzo hpl) (wmSegFile hlin) hzo hlin
       mV (v := w) j st hg with hsemG
-  set stX : TapeSt dt A
+  set stX : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF :=
-    { dt.atSt (dt.offSt (dt.stageEnd hpl hlin (aT := Fin.last nV) mV semG
+    { dt.atSt (dt.offSt (dt.stageEnd hpl hlin hord (aT := Fin.last nV) mV semG
         logicalTop
-        (dt.stageSt hpl hlin (aT := Fin.last nV) mV semG logicalTop
+        (dt.stageSt hpl hlin hord (aT := Fin.last nV) mV semG logicalTop
           dt.startupSt (fun _ => zero) N)
-        (dt.stageFs hpl hlin (aT := Fin.last nV) mV semG logicalTop
+        (dt.stageFs hpl hlin hord (aT := Fin.last nV) mV semG logicalTop
           dt.startupSt (fun _ => zero) N))) (fun _ => False) with
       mir := fun _ => False } with hstX
   -- MAIN, from the first stage's entry to the out machinery's
@@ -391,16 +392,17 @@ theorem reaches_outVerdict
   have hentry := dt.reaches_evalEntry (hpl := hpl) (hR := hR) (hlin := hlin)
     (hord := hord) (htop := htop) (hbot := hbot)
   -- the markers MAIN leaves behind
-  have hfields := fun n => dt.stageSt_fields (hpl := hpl) (hlin := hlin)
+  have hfields := fun n => dt.stageSt_fields (hpl := hpl) (hlin := hlin) (hord := hord)
     (aT := Fin.last nV) (mV := mV) (semAt := semG) (st₀ := dt.startupSt)
     (f₀ := fun _ => zero) (ltpAddr := logicalTop) (hwk₀ := startupSt_wk)
     (hmir₀ := startupSt_mir) (hbot₀ := startupSt_bot)
     (hltp₀ := startupSt_ltp) (n := n)
   have hbotX : stX.bot = fun r => r = fun _ => False :=
-    Eq.trans (dt.stageEnd_ride hlin mV semG logicalTop (fun st => st.bot)
+    Eq.trans (dt.stageEnd_ride hlin hord mV semG logicalTop (fun st => st.bot)
       (fun _ _ => rfl) (fun _ _ => rfl)
       (fun _ _ _ _ _ => (dt.legStB_fields
-        (PR := dt.progOf zero one hzo hpl) (aT := Fin.last nV) mV _ _ _ _).2.2.1)
+        (PR := dt.progOf zero one hzo hpl) (aT := Fin.last nV) (wmSegFile hlin) hord mV _ _ _
+            _).2.2.1)
       _ _) (hfields N).2.2.1
   -- the tracks hold the stable stage, and the output sentence holds of it
   have hdictX : ∀ (iv : dt.d.B.ι) (s : Univ A
@@ -437,7 +439,7 @@ theorem reaches_outVerdict
     (hwkSt := rfl) (hmirSt := rfl) (hbotSt := hbotX)
     (σ := dt.d.partStage (dt.X.Map A) N) (hdict := hdictX)
     (hbelow := hbelowOut)
-    (f₀ := dt.stageFs hpl hlin (aT := Fin.last nV) mV semG logicalTop
+    (f₀ := dt.stageFs hpl hlin hord (aT := Fin.last nV) mV semG logicalTop
       dt.startupSt (fun _ => zero) (N + 1))
   refine ⟨cfg, f, ?_, hstate, hiff.trans hpfpN⟩
   rw [dt.initBack_eq_back zero one hzo (fun w => dt.varArgsOf zero one w) hpl
@@ -464,7 +466,7 @@ theorem dwideAcceptSpace_of_pfpHolds
     (dt.progOf zero one hzo hpl).table.deterministic hR
       (dt.prog_sep zero one hzo (fun w => dt.varArgsOf zero one w) hpl),
     Prog.acceptsSpace_prog hR
-      ((dt.progOf zero one hzo hpl).table.isLinOrd_wmLe hR)
+      ((dt.progOf zero one hzo hpl).table.isLinOrd_wmLe hR) (fun _ => trivial)
       (fun x => prog_mark_mir hpl x) (prog_blank_mir hpl) hrun hstate
       (hiff.mpr hpfp)⟩
 

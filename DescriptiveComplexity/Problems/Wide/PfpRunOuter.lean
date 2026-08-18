@@ -116,26 +116,26 @@ theorem step_evalChk_back
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {k : Fin (dt.nv + 1)} {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {mval v v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hwk : st.wk = fun r => r = v) (hvi : WMIncr WMLe v v') :
     (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.evalP (.chk k)) fc),
         Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st) mval)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st) mval)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.evalP (.chk k)) fc),
         Sum.inl v,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st) mval)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st) mval)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   have hvv' : v ≠ v' := ne_of_wmIncr hvi
   have hne_wk_val : (Slot.wk : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
-  have hwkv' : (dt.prog zero one hzo args hpl).passTracks Slot.val
-      (dt.back zero one dt.dd0Le st) mval v' Slot.wk ≠
+  have hwkv' : (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.val
+      (dt.back wmSeg zero one dt.dd0Le st) mval v' Slot.wk ≠
       (dt.prog zero one hzo args hpl).one := by
     rw [Prog.passTracks_of_ne hne_wk_val, back_wk, hwk,
       bitVal_neg (Ne.symm hvv')]
@@ -150,13 +150,13 @@ omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
 symbol of both boundary dispatches out of the last checkpoint, at the
 MIRROR-walked presentation. -/
 private theorem update_wk_offSt
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {v : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop} :
     Function.update
-      ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le st) st.mir v) Slot.wk zero =
-      (dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le (dt.offSt st)) st.mir v := by
+      ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le st) st.mir v) Slot.wk zero =
+      (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le (dt.offSt st)) st.mir v := by
   classical
   have hne_wk_mir : (Slot.wk : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   funext s
@@ -188,17 +188,17 @@ theorem hasRight_evalAdv
     {v : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v (wmSeg gbot))
     {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = v) (hltp : ¬st.ltp v) :
     (dt.prog zero one hzo args hpl).HasRight
       (.evalP (.chk (Fin.last dt.nv))) fc
-      ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le st) st.mir v)
+      ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le st) st.mir v)
       (.advP .a1) fc
-      ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le (dt.offSt st)) st.mir v) := by
+      ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le (dt.offSt st)) st.mir v) := by
   classical
-  have hvnr := not_reg_of_lt_bot hlin hbot hv
+  have hvnr := not_reg_of_lt_bot (wmSegFile hlin).toIx hlin hlin hbot hv
   have hne_wk_mir : (Slot.wk : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_reg_mir : (Slot.reg : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_ltp_mir : (Slot.ltp : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
@@ -242,17 +242,17 @@ theorem hasRight_evalReset
     {v : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v (wmSeg gbot))
     {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = v) (hltp : st.ltp v) :
     (dt.prog zero one hzo args hpl).HasRight
       (.evalP (.chk (Fin.last dt.nv))) fc
-      ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le st) st.mir v)
+      ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le st) st.mir v)
       (.reset2P .scan) fc
-      ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le (dt.offSt st)) st.mir v) := by
+      ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le (dt.offSt st)) st.mir v) := by
   classical
-  have hvnr := not_reg_of_lt_bot hlin hbot hv
+  have hvnr := not_reg_of_lt_bot (wmSegFile hlin).toIx hlin hlin hbot hv
   have hne_wk_mir : (Slot.wk : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_reg_mir : (Slot.reg : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
   have hne_ltp_mir : (Slot.ltp : dt.SlotIx) ≠ Slot.mir := fun h => nomatch h
@@ -300,21 +300,21 @@ theorem reaches_reset2
     {vT : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hvT : WMSetLt WMLe vT (wmSeg gbot))
     {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = vT) (hltp : st.ltp vT)
     (hbotSt : st.bot = fun r => r = (fun _ => False)) :
     Relation.ReflTransGen
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk (Fin.last dt.nv))) fc), Sum.inl vT,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.reset2P .done) fc),
         Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le
             (dt.atSt (dt.offSt st) (fun _ => False))) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
@@ -332,11 +332,11 @@ theorem reaches_reset2
     (κ := ResetKit.mk (A := A) (Q := dt.CtlIx) (P := dt.PF) Slot.mir Slot.bot
       Slot.wk OuterPh.reset2P)
     (rEmb := fun ρ => ⟨OuterSite.reset2, Sum.inl ρ⟩)
-    (fun ρ => dt.prog_rules_reset2 zero one hzo args hpl ρ)
+    (wmSegFile hlin).toIx (fun ρ => dt.prog_rules_reset2 zero one hzo args hpl ρ)
     hR hlin dt.bot_ne_mir dt.wk_ne_mir (v := vT) hnotfull (m := st.mir)
-    (restA := dt.back zero one dt.dd0Le st)
-    (restN := dt.back zero one dt.dd0Le (dt.offSt st))
-    (restB := dt.back zero one dt.dd0Le
+    (restA := dt.back wmSeg zero one dt.dd0Le st)
+    (restN := dt.back wmSeg zero one dt.dd0Le (dt.offSt st))
+    (restB := dt.back wmSeg zero one dt.dd0Le
       (dt.atSt (dt.offSt st) (fun _ => False)))
     ?_ ?_ ?_ (fun _ => rfl) ?_ (fc := fc)
     (hasRight_evalReset hlin hbot hvT hwk hltp)
@@ -374,27 +374,27 @@ theorem step_reset2_exit
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe (fun _ => False) v') {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = fun _ => False)
     (hreg : ¬∃ u, (fun _ => False) =
       wmSeg (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd) u) :
     (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.reset2P .done) fc),
         Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.clearMir2P .up) fc),
         Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   refine Prog.step_move hR hlin hi (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.reset2
-      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) := by
+      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) := by
     refine ⟨?_, ?_⟩
     · rw [Prog.passTracks_of_ne dt.wk_ne_mir, back_wk, hwk]
       exact bitVal_pos rfl
@@ -412,32 +412,34 @@ theorem reaches_clearMir2
       WMLe x y ↔ tagTupleLe x y)
     {gtop gbot : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd}
     (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y) {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = fun _ => False)
     {s : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop} :
     Relation.ReflTransGen
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.clearMir2P .up) fc),
         Sum.inl s,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.clearMir2P .run) fc),
         Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le { st with mir := fun _ => False })
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le { st with mir := fun _ => False })
           (fun _ => False))
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
-  have htrip := ClearKit.reaches (PR := dt.prog zero one hzo args hpl)
+  have htrip := ClearKit.reaches
+    (F := (wmSegFile hlin).toIx)
+    (hsle := wmSetLe_of_full hlin (fun y => htop y) _) (PR := dt.prog zero one hzo args hpl)
     (κ := dt.clearMirKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
       OuterPh.clearMir2P)
     (rEmb := fun ρ => ⟨OuterSite.clearMir2, Sum.inl ρ⟩)
     (fun ρ => dt.prog_rules_clearMir2 zero one hzo args hpl ρ)
-    hR hlin dt.mir_ne_reg dt.regLast_ne_mir dt.wk_ne_mir htop hbot
-    (rest := dt.back zero one dt.dd0Le st) (m := st.mir)
+    hR hlin hlin dt.mir_ne_reg dt.regLast_ne_mir dt.wk_ne_mir htop hbot
+    (rest := dt.back wmSeg zero one dt.dd0Le st) (m := st.mir)
     (wkAddr := fun _ => False) (wmSetLt_empty_wmSeg hlin gbot)
     (dt.back_reg (zero := zero) (one := one) (hdd := dt.dd0Le) (st := st))
     (dt.back_regLast (zero := zero) (one := one) (hdd := dt.dd0Le) (st := st)
@@ -451,14 +453,14 @@ theorem reaches_clearMir2
   refine htrip.trans ?_
   have hagree : ∀ (r : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx
       dt.dd → Prop) (sl : dt.SlotIx), sl ≠ Slot.mir →
-      dt.back zero one dt.dd0Le st r sl =
-        dt.back zero one dt.dd0Le { st with mir := fun _ => False } r sl := by
+      dt.back wmSeg zero one dt.dd0Le st r sl =
+        dt.back wmSeg zero one dt.dd0Le { st with mir := fun _ => False } r sl := by
     intro r sl hsl
     match sl with
     | .mir => exact absurd rfl hsl
     | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .tgt
     | .sav | .val | .wk | .bot | .ltp | .old _ | .new _ => rfl
-  have hmir : ∀ r, dt.back zero one dt.dd0Le
+  have hmir : ∀ r, dt.back wmSeg zero one dt.dd0Le
       { st with mir := fun _ => False } r Slot.mir =
       bitVal zero one (regBit (fun _ => False) r) := fun _ => rfl
   rw [dt.trackTape_back zero one hzo args hpl hagree hmir,
@@ -485,20 +487,20 @@ theorem sweepRound
     {v v' v'' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v v') (hvi' : WMIncr WMLe v' v'')
     (hv : WMSetLt WMLe v (wmSeg gbot)) (hv' : WMSetLt WMLe v' (wmSeg gbot))
-    {st₀ stE : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st₀ stE : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {fs₀ fsE : dt.CtlIx → A}
     (hspine : Relation.ReflTransGen
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fs₀), Sum.inl v,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st₀) st₀.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st₀) st₀.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk (Fin.last dt.nv))) fsE), Sum.inl v,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le stE) stE.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le stE) stE.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩)
     (hwkE : stE.wk = fun r => r = v) (hmirE : stE.mir = v)
@@ -507,19 +509,19 @@ theorem sweepRound
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fs₀), Sum.inl v,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st₀) st₀.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st₀) st₀.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fsE), Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le { dt.atSt stE v' with mir := v' })
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le { dt.atSt stE v' with mir := v' })
           stE.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
-  have hvnr' := not_reg_of_lt_bot hlin hbot hv'
+  have hvnr' := not_reg_of_lt_bot (wmSegFile hlin).toIx hlin hlin hbot hv'
   have hne_wk_val : (Slot.wk : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   have hne_reg_val : (Slot.reg : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
   -- the evaluation
@@ -540,15 +542,15 @@ theorem sweepRound
       dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.advP .a4) fsE),
         Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le { dt.atSt stE v' with mir := v' })
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le { dt.atSt stE v' with mir := v' })
           stE.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fsE), Sum.inl v'',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le { dt.atSt stE v' with mir := v' })
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le { dt.atSt stE v' with mir := v' })
           stE.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
@@ -586,7 +588,7 @@ theorem reaches_sweep
     {s₀ s₁ : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hs₀ : WMSetLe WMLe s₀ s₁) (hs₁ : WMSetLt WMLe s₁ (wmSeg gbot))
     {SW stE : (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop) →
-      TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+      TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {FS fsE : (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop) →
       dt.CtlIx → A}
     (hspine : ∀ v, WMSetLe WMLe s₀ v → WMSetLt WMLe v s₁ →
@@ -595,14 +597,14 @@ theorem reaches_sweep
           dt.dd)).Step
         ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
             (.evalP (.chk 0)) (FS v)), Sum.inl v,
-          wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-            (dt.back zero one dt.dd0Le (SW v)) (SW v).val)
+          wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+            (dt.back wmSeg zero one dt.dd0Le (SW v)) (SW v).val)
             ((dt.prog zero one hzo args hpl).syElt
               (dt.prog zero one hzo args hpl).blank)⟩
         ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
             (.evalP (.chk (Fin.last dt.nv))) (fsE v)), Sum.inl v,
-          wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-            (dt.back zero one dt.dd0Le (stE v)) (stE v).val)
+          wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+            (dt.back wmSeg zero one dt.dd0Le (stE v)) (stE v).val)
             ((dt.prog zero one hzo args hpl).syElt
               (dt.prog zero one hzo args hpl).blank)⟩)
     (hwkE : ∀ v, WMSetLe WMLe s₀ v → WMSetLt WMLe v s₁ →
@@ -617,14 +619,14 @@ theorem reaches_sweep
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (FS s₀)), Sum.inl s₀,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (SW s₀)) (SW s₀).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (SW s₀)) (SW s₀).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (FS s₁)), Sum.inl s₁,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (SW s₁)) (SW s₁).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (SW s₁)) (SW s₁).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
@@ -642,8 +644,8 @@ theorem reaches_sweep
     (conf := fun v =>
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (FS v)), Sum.inl v,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (SW v)) (SW v).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (SW v)) (SW v).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩)
     (s₀ := s₀) (s₁ := s₁) ?_ s₁ hs₀ (hset.1 s₁)
@@ -691,7 +693,7 @@ theorem reaches_compareFrom
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
-    {fc : dt.CtlIx → A} {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {fc : dt.CtlIx → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {ltpAddr : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hltp : st.ltp = fun r => r = ltpAddr)
     {s₀ : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
@@ -702,16 +704,16 @@ theorem reaches_compareFrom
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .py) fc)
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .pn) fc) s₀),
         Sum.inl s₀,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr (sweepState (fun r => ∀ i, (st.old i r ↔ st.new i r))
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .py) fc)
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .pn) fc) ltpAddr),
         Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
@@ -719,7 +721,7 @@ theorem reaches_compareFrom
     (κ := dt.compareKit (Q := dt.CtlIx) (P := dt.PF) one OuterPh.cmpP)
     (rEmb := fun ρ => ⟨OuterSite.compare, Sum.inl ρ⟩)
     (fun ρ => dt.prog_rules_compare zero one hzo args hpl ρ)
-    hR hlin dt.ltp_ne_mir (rest := dt.back zero one dt.dd0Le st)
+    hR hlin dt.ltp_ne_mir (rest := dt.back wmSeg zero one dt.dd0Le st)
     (m := st.mir) (ltpAddr := ltpAddr)
     (fun r => by
       simp only [compareKit]
@@ -745,23 +747,23 @@ theorem step_clearMir2_exit
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe (fun _ => False) v') {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = fun _ => False)
     (hreg : ¬∃ u, (fun _ => False) =
       wmSeg (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd) u) :
     (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt (.clearMir2P .run) fc),
         Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr (sweepState (fun r => ∀ i, (st.old i r ↔ st.new i r))
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .py) fc)
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .pn) fc) v'),
         Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
@@ -793,8 +795,8 @@ theorem step_clearMir2_exit
   rw [hsw]
   refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.clearMir2
-      (Sum.inr b)).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) := by
+      (Sum.inr b)).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) := by
     refine ⟨⟨?_, ?_⟩, ?_⟩
     · rw [Prog.passTracks_of_ne dt.wk_ne_mir, back_wk, hwk]
       exact bitVal_pos rfl
@@ -836,7 +838,7 @@ theorem step_compare_exit_pos
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
-    {fc : dt.CtlIx → A} {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {fc : dt.CtlIx → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {ltpAddr vp : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hltp : st.ltp = fun r => r = ltpAddr) (hvp : WMIncr WMLe vp ltpAddr)
     (hyes : ∀ r, WMSetLt WMLe r ltpAddr → ∀ i, (st.old i r ↔ st.new i r)) :
@@ -845,24 +847,24 @@ theorem step_compare_exit_pos
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .py) fc)
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .pn) fc) ltpAddr),
         Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .homeOutP fc),
         Sum.inl vp,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
   rw [sweepState, if_pos hyes]
   refine Prog.step_moveBack hR hlin hvp (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.compare
-      (Sum.inr true)).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir ltpAddr) := by
-    change (dt.prog zero one hzo args hpl).passTracks Slot.mir
-      (dt.back zero one dt.dd0Le st) st.mir ltpAddr Slot.ltp = one
+      (Sum.inr true)).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir ltpAddr) := by
+    change (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+      (dt.back wmSeg zero one dt.dd0Le st) st.mir ltpAddr Slot.ltp = one
     rw [Prog.passTracks_of_ne dt.ltp_ne_mir, back_ltp, hltp]
     exact bitVal_pos rfl
   exact dt.prog_hasLeft zero one hzo args hpl .compare (Sum.inr true) hg
@@ -874,7 +876,7 @@ theorem step_compare_exit_neg
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
-    {fc : dt.CtlIx → A} {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {fc : dt.CtlIx → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {ltpAddr vp : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hltp : st.ltp = fun r => r = ltpAddr) (hvp : WMIncr WMLe vp ltpAddr)
     (hno : ¬∀ r, WMSetLt WMLe r ltpAddr →
@@ -884,24 +886,24 @@ theorem step_compare_exit_neg
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .py) fc)
           ((dt.prog zero one hzo args hpl).stElt (.cmpP .pn) fc) ltpAddr),
         Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .homeCmpP fc),
         Sum.inl vp,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
   rw [sweepState, if_neg hno]
   refine Prog.step_moveBack hR hlin hvp (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.compare
-      (Sum.inr false)).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir ltpAddr) := by
-    change (dt.prog zero one hzo args hpl).passTracks Slot.mir
-      (dt.back zero one dt.dd0Le st) st.mir ltpAddr Slot.ltp = one
+      (Sum.inr false)).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir ltpAddr) := by
+    change (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+      (dt.back wmSeg zero one dt.dd0Le st) st.mir ltpAddr Slot.ltp = one
     rw [Prog.passTracks_of_ne dt.ltp_ne_mir, back_ltp, hltp]
     exact bitVal_pos rfl
   exact dt.prog_hasLeft zero one hzo args hpl .compare (Sum.inr false) hg
@@ -916,21 +918,21 @@ theorem step_homeCmp_exit
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe (fun _ => False) v') {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = fun _ => False)
     (hreg : ¬∃ u, (fun _ => False) =
       wmSeg (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd) u) :
     (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .homeCmpP fc),
         Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .copyP fc),
         Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le
             (dt.copySt zero one hzo args st v')) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
@@ -940,8 +942,8 @@ theorem step_homeCmp_exit
   -- the frontier's presentation differs from the state's only at the cell
   have hframe : ∀ r : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx
       dt.dd → Prop, r ≠ (fun _ => False) →
-      dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st v') r =
-        dt.back zero one dt.dd0Le st r := by
+      dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st v') r =
+        dt.back wmSeg zero one dt.dd0Le st r := by
     intro r hr
     funext sl
     match sl with
@@ -960,21 +962,21 @@ theorem step_homeCmp_exit
   -- the written symbol is the frontier's presentation at the cell
   have hwr : (dt.copyKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
         OuterPh.copyP).wrG
-      ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) =
-      (dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st v'))
+      ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) =
+      (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st v'))
         st.mir (fun _ => False) := by
     funext sl
     by_cases ho : ∃ i, sl = Slot.old i
     · obtain ⟨i, rfl⟩ := ho
       have hL : (dt.copyKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
             OuterPh.copyP).wrG
-          ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le st) st.mir (fun _ => False))
+          ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False))
             (Slot.old i) =
-          (dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)
+          (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)
             (Slot.new i) := rfl
       rw [hL, Prog.passTracks_of_ne (show (Slot.new i : dt.SlotIx) ≠ Slot.mir
           from fun h => nomatch h),
@@ -987,10 +989,10 @@ theorem step_homeCmp_exit
       rw [if_pos h0v']
     · have hL : (dt.copyKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
             OuterPh.copyP).wrG
-          ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) sl =
-          (dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le st) st.mir (fun _ => False) sl := by
+          ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) sl =
+          (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False) sl := by
         match sl with
         | .old i => exact absurd ⟨i, rfl⟩ ho
         | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .mir | .tgt
@@ -1009,8 +1011,8 @@ theorem step_homeCmp_exit
         | .sav | .val | .wk | .bot | .ltp | .new _ => rfl
   refine Prog.step_move hR hlin hvi hframe ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.homeCmp
-      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) := by
+      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) := by
     refine ⟨?_, ?_⟩
     · rw [Prog.passTracks_of_ne dt.wk_ne_mir, back_wk, hwk]
       exact bitVal_pos rfl
@@ -1019,10 +1021,10 @@ theorem step_homeCmp_exit
   have h := dt.prog_hasRight zero one hzo args hpl .homeCmp (Sum.inr ()) hg
     trivial
   rw [show ((dt.progAsm zero one hzo args).rule OuterSite.homeCmp
-      (Sum.inr ())).wr fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) =
-      (dt.prog zero one hzo args hpl).passTracks Slot.mir
-        (dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st v'))
+      (Sum.inr ())).wr fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) =
+      (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+        (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st v'))
         st.mir (fun _ => False) from hwr] at h
   exact h
 
@@ -1033,7 +1035,7 @@ theorem reaches_copyFrom
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
-    {fc : dt.CtlIx → A} {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {fc : dt.CtlIx → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {ltpAddr : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hltp : st.ltp = fun r => r = ltpAddr)
     {s₀ : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
@@ -1042,15 +1044,15 @@ theorem reaches_copyFrom
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .copyP fc),
         Sum.inl s₀,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le
             (dt.copySt zero one hzo args st s₀)) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .copyP fc),
         Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le
             (dt.copySt zero one hzo args st ltpAddr)) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
@@ -1060,7 +1062,7 @@ theorem reaches_copyFrom
     (rEmb := fun ρ => ⟨OuterSite.copy, Sum.inl ρ⟩)
     (fun ρ => dt.prog_rules_copy zero one hzo args hpl ρ)
     hR hlin dt.ltp_ne_mir (m := st.mir)
-    (restAt := fun s => dt.back zero one dt.dd0Le
+    (restAt := fun s => dt.back wmSeg zero one dt.dd0Le
       (dt.copySt zero one hzo args st s))
     (ltpAddr := ltpAddr)
     (fun k r => by
@@ -1094,11 +1096,11 @@ theorem reaches_copyFrom
     · obtain ⟨i, rfl⟩ := ho
       have hL : (dt.copyKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
             OuterPh.copyP).wrG
-          ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st s))
+          ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st s))
             st.mir s) (Slot.old i) =
-          (dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st s))
+          (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st s))
             st.mir s (Slot.new i) := rfl
       rw [hL, Prog.passTracks_of_ne (show (Slot.new i : dt.SlotIx) ≠ Slot.mir
           from fun h => nomatch h),
@@ -1109,11 +1111,11 @@ theorem reaches_copyFrom
       simp only [copySt, if_pos hsu]
     · have hL : (dt.copyKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
             OuterPh.copyP).wrG
-          ((dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st s))
+          ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st s))
             st.mir s) sl =
-          (dt.prog zero one hzo args hpl).passTracks Slot.mir
-            (dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st s))
+          (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+            (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st s))
             st.mir s sl := by
         match sl with
         | .old i => exact absurd ⟨i, rfl⟩ ho
@@ -1138,32 +1140,32 @@ theorem step_copy_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
-    {fc : dt.CtlIx → A} {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {fc : dt.CtlIx → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {ltpAddr vp : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hltp : st.ltp = fun r => r = ltpAddr) (hvp : WMIncr WMLe vp ltpAddr) :
     (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .copyP fc),
         Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le
             (dt.copySt zero one hzo args st ltpAddr)) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .homeCopyP fc),
         Sum.inl vp,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le
             (dt.copySt zero one hzo args st ltpAddr)) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
   refine Prog.step_moveBack hR hlin hvp (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.copy
-      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le
+      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le
           (dt.copySt zero one hzo args st ltpAddr)) st.mir ltpAddr) := by
-    change (dt.prog zero one hzo args hpl).passTracks Slot.mir
-      (dt.back zero one dt.dd0Le (dt.copySt zero one hzo args st ltpAddr))
+    change (dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
+      (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st ltpAddr))
       st.mir ltpAddr Slot.ltp = one
     rw [Prog.passTracks_of_ne dt.ltp_ne_mir, back_ltp]
     change bitVal zero one (st.ltp ltpAddr) = one
@@ -1179,27 +1181,27 @@ theorem step_homeCopy_exit
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe (fun _ => False) v') {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = fun _ => False)
     (hreg : ¬∃ u, (fun _ => False) =
       wmSeg (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd) u) :
     (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .homeCopyP fc),
         Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fc), Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.homeCopy
-      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) := by
+      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) := by
     refine ⟨?_, ?_⟩
     · rw [Prog.passTracks_of_ne dt.wk_ne_mir, back_wk, hwk]
       exact bitVal_pos rfl
@@ -1216,27 +1218,27 @@ theorem step_homeOut_exit
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe (fun _ => False) v') {fc : dt.CtlIx → A}
-    {st : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     (hwk : st.wk = fun r => r = fun _ => False)
     (hreg : ¬∃ u, (fun _ => False) =
       wmSeg (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd) u) :
     (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt .homeOutP fc),
         Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.sub (dt.smEntryOut))) fc), Sum.inl v',
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.mir
-          (dt.back zero one dt.dd0Le st) st.mir)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.mir
+          (dt.back wmSeg zero one dt.dd0Le st) st.mir)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.homeOut
-      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracks
-        Slot.mir (dt.back zero one dt.dd0Le st) st.mir (fun _ => False)) := by
+      (Sum.inr ())).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
+        Slot.mir (dt.back wmSeg zero one dt.dd0Le st) st.mir (fun _ => False)) := by
     refine ⟨?_, ?_⟩
     · rw [Prog.passTracks_of_ne dt.wk_ne_mir, back_wk, hwk]
       exact bitVal_pos rfl
@@ -1269,20 +1271,20 @@ theorem stageClose_neg
     (htop : ∀ y, WMLe y gtop) (hbot : ∀ y, WMLe gbot y)
     {ltpAddr : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot)) (hneT : ∃ x, ltpAddr x)
-    {st0 stT : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st0 stT : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {fs0 fsT : dt.CtlIx → A}
     (hspineT : Relation.ReflTransGen
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fs0), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st0) st0.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st0) st0.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk (Fin.last dt.nv))) fsT), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le stT) stT.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le stT) stT.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩)
     (hwkT : stT.wk = fun r => r = ltpAddr)
@@ -1294,14 +1296,14 @@ theorem stageClose_neg
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fs0), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st0) st0.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st0) st0.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fsT), Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le
             (dt.copySt zero one hzo args
               { dt.atSt (dt.offSt stT) (fun _ => False) with
                 mir := fun _ => False } ltpAddr))
@@ -1341,9 +1343,9 @@ theorem stageClose_neg
       rcases Classical.em (ltpAddr = v₁) with heq | hne
       · exact heq ▸ hset.1 v₁
       · exact absurd ⟨hc, hne⟩ hlt'
-  set stR : TapeSt dt A (dt.RIx zero one hzo args) dt.PF :=
+  set stR : TapeStD dt A (dt.RIx zero one hzo args) dt.PF :=
     dt.atSt (dt.offSt stT) (fun _ => False) with hstR
-  set stC : TapeSt dt A (dt.RIx zero one hzo args) dt.PF :=
+  set stC : TapeStD dt A (dt.RIx zero one hzo args) dt.PF :=
     { stR with mir := fun _ => False } with hstC
   -- the evaluation at the top address
   refine hspineT.trans ?_
@@ -1394,20 +1396,20 @@ theorem stageClose_pos
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot)) (hneT : ∃ x, ltpAddr x)
     {v₁ : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hiE : WMIncr WMLe (fun _ => False) v₁)
-    {st0 stT : TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {st0 stT : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {fs0 fsT : dt.CtlIx → A}
     (hspineT : Relation.ReflTransGen
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fs0), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st0) st0.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st0) st0.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk (Fin.last dt.nv))) fsT), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le stT) stT.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le stT) stT.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩)
     (hwkT : stT.wk = fun r => r = ltpAddr)
@@ -1419,14 +1421,14 @@ theorem stageClose_pos
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) fs0), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le st0) st0.val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le st0) st0.val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.sub (dt.smEntryOut))) fsT), Sum.inl v₁,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le
             { dt.atSt (dt.offSt stT) (fun _ => False) with
               mir := fun _ => False })
           { dt.atSt (dt.offSt stT) (fun _ => False) with
@@ -1460,9 +1462,9 @@ theorem stageClose_pos
       rcases Classical.em (ltpAddr = v₁) with heq | hne
       · exact heq ▸ hset.1 v₁
       · exact absurd ⟨hc, hne⟩ hlt'
-  set stR : TapeSt dt A (dt.RIx zero one hzo args) dt.PF :=
+  set stR : TapeStD dt A (dt.RIx zero one hzo args) dt.PF :=
     dt.atSt (dt.offSt stT) (fun _ => False) with hstR
-  set stC : TapeSt dt A (dt.RIx zero one hzo args) dt.PF :=
+  set stC : TapeStD dt A (dt.RIx zero one hzo args) dt.PF :=
     { stR with mir := fun _ => False } with hstC
   refine hspineT.trans ?_
   rw [dt.trackTape_back_swap zero one hzo args hpl
@@ -1507,34 +1509,34 @@ theorem reaches_main
     {v₁ : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hiE : WMIncr WMLe (fun _ => False) v₁)
     {N : ℕ}
-    {entrySt topSt stT : ℕ → TapeSt dt A (dt.RIx zero one hzo args) dt.PF}
+    {entrySt topSt stT : ℕ → TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {entryFs topFs fsT : ℕ → dt.CtlIx → A}
     (hsweep : ∀ n, n ≤ N → Relation.ReflTransGen
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (entryFs n)), Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (entrySt n)) (entrySt n).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (entrySt n)) (entrySt n).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (topFs n)), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (topSt n)) (topSt n).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (topSt n)) (topSt n).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩)
     (hspineT : ∀ n, n ≤ N → Relation.ReflTransGen
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (topFs n)), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (topSt n)) (topSt n).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (topSt n)) (topSt n).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk (Fin.last dt.nv))) (fsT n)), Sum.inl ltpAddr,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (stT n)) (stT n).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (stT n)) (stT n).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩)
     (hwkT : ∀ n, n ≤ N → (stT n).wk = fun r => r = ltpAddr)
@@ -1553,14 +1555,14 @@ theorem reaches_main
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (entryFs 0)), Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (entrySt 0)) (entrySt 0).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (entrySt 0)) (entrySt 0).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.sub (dt.smEntryOut))) (fsT N)), Sum.inl v₁,
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le
             { dt.atSt (dt.offSt (stT N)) (fun _ => False) with
               mir := fun _ => False })
           { dt.atSt (dt.offSt (stT N)) (fun _ => False) with
@@ -1573,14 +1575,14 @@ theorem reaches_main
       (wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (entryFs 0)), Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (entrySt 0)) (entrySt 0).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (entrySt 0)) (entrySt 0).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩
       ⟨Sum.inr ((dt.prog zero one hzo args hpl).stElt
           (.evalP (.chk 0)) (entryFs n)), Sum.inl (fun _ => False),
-        wideTape ((dt.prog zero one hzo args hpl).trackTape Slot.val
-          (dt.back zero one dt.dd0Le (entrySt n)) (entrySt n).val)
+        wideTape ((dt.prog zero one hzo args hpl).trackTapeAt wmSeg Slot.val
+          (dt.back wmSeg zero one dt.dd0Le (entrySt n)) (entrySt n).val)
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
     intro n

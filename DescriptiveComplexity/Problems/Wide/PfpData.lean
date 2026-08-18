@@ -153,7 +153,7 @@ theorem natOf_le_natMax (v : dt.VarIx) : dt.natOf v ≤ dt.natMax := by
 /-- **The kind of an atom**, read off the syntax: the index data of the
 per-atom call sites. -/
 noncomputable def kindOf (v : dt.VarIx) (a : Fin (dt.natOf v)) :
-    MatAtom dt.X dt.d (dt.nOf v) :=
+    MatAtom dt.X dt.d.B (dt.nOf v) :=
   (matAtom? ((dt.atomsOf v).get a)).get
     (isSome_matAtom?_of_mem_qfAtoms (dt.matOf v) _ ((dt.atomsOf v).get_mem a))
 
@@ -169,7 +169,7 @@ theorem matAtom?_get (v : dt.VarIx) (a : Fin (dt.natOf v)) :
 /-- The prefix depth of an expansion atom's defining sentences, maximized
 over the tag tuples; `0` for the other kinds, whose loops are the
 coordinate ones. -/
-noncomputable def kindDepth {n : ℕ} : MatAtom dt.X dt.d n → ℕ
+noncomputable def kindDepth {n : ℕ} : MatAtom dt.X dt.d.B n → ℕ
   | @MatAtom.exp _ _ _ _ k e _ =>
     letI := Fintype.ofFinite dt.X.Tag
     (Finset.univ : Finset (Fin k → dt.X.Tag)).sup fun τ => (dt.relPk e τ).n
@@ -179,7 +179,7 @@ noncomputable def kindDepth {n : ℕ} : MatAtom dt.X dt.d n → ℕ
 sentences' matrices – the base-vocabulary atoms are guards and take no trip –
 `2` for the coordinate loops of an equality or order atom, `0` for a stage
 atom. -/
-noncomputable def kindReads {n : ℕ} : MatAtom dt.X dt.d n → ℕ
+noncomputable def kindReads {n : ℕ} : MatAtom dt.X dt.d.B n → ℕ
   | @MatAtom.exp _ _ _ _ k e _ =>
     letI := Fintype.ofFinite dt.X.Tag
     (Finset.univ : Finset (Fin k → dt.X.Tag)).sup fun τ =>
@@ -215,7 +215,7 @@ noncomputable def nfDim : ℕ :=
 
 /-- The number of argument points an atom's kind reads the tags of: the arity
 of an expansion atom, `0` for the other kinds. -/
-noncomputable def kindArgs {n : ℕ} : MatAtom dt.X dt.d n → ℕ
+noncomputable def kindArgs {n : ℕ} : MatAtom dt.X dt.d.B n → ℕ
   | @MatAtom.exp _ _ _ _ k _ _ => k
   | _ => 0
 

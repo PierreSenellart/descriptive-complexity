@@ -25,7 +25,15 @@ the exhaustion guard). Every read trip is one
 `DescriptiveComplexity.Pfp.ReadKit` discharge; the store, dispatch and
 walk-back steps are single `DescriptiveComplexity.Pfp.Prog.step_move` /
 `step_moveBack` steps; the loop closes by
-`DescriptiveComplexity.Pfp.reflTransGen_of_ordLoop`.
+`DescriptiveComplexity.Pfp.reachesIn_of_ordLoop_card`.
+
+The run is proved **with its cost** (`elem_reachesIn`): given a width `c` for
+one read trip, a round costs `2 + (c + 2) · nr` – the dispatch, the walk back,
+and per read the trip, the store and the walk back – and the whole loop that
+once per element of the enumeration, plus the round that opens it and the step
+that leaves. `elem_run` is the same run with the budget forgotten, at the width
+every trip has anyway: twice the number of addresses. A space-bounded caller
+reads that one; a clocked program compares the count with its clock.
 
 Every track the loop touches – the read tracks and a reference track `t₀` the
 tape is presented along – is **backed**: its digits are carried by the
@@ -33,6 +41,10 @@ background at its own slot, which is what
 `DescriptiveComplexity.Pfp.PfpData.back` provides and what lets consecutive
 trips walking different tracks share one tape term
 (`DescriptiveComplexity.Pfp.trackTape_of_back`).
+
+**What indexes the file is a parameter** (`DescriptiveComplexity.IxFile`): a
+track is a set of registers and the cells the reads stop at are registers, so
+nothing here asks the file to have one register per element of the universe.
 -/
 
 namespace DescriptiveComplexity
@@ -48,17 +60,19 @@ section Backed
 variable {A R P Q W K : Type} {dd : ℕ} [Fintype Q] [Fintype W] [DecidableEq W]
 variable [Language.wide.Structure (Univ A R P K dd)]
 variable {PR : Prog A R P Q W K dd}
+variable {I : Type} {ile : I → I → Prop}
+variable (RF : IxFile (Univ A R P K dd) I ile)
 
 /-- **A backed track presents the naked background**: a walked track whose
 digits the background already carries at its own slot adds nothing to the
 tape. This is what lets one leg's conclusion be the next leg's hypothesis
 when the two walk different tracks. -/
 theorem trackTape_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A}
-    {m : Univ A R P K dd → Prop}
-    (hm : ∀ r, rest r t = bitVal PR.zero PR.one (regBit m r)) :
-    PR.trackTape t rest m = fun r => PR.syElt (rest r) := by
+    {m : I → Prop}
+    (hm : ∀ r, rest r t = bitVal PR.zero PR.one (bitAtOf RF.cell m r)) :
+    PR.trackTapeAt RF.cell t rest m = fun r => PR.syElt (rest r) := by
   refine funext fun r => ?_
-  change PR.syElt (fun s => if s = t then bitVal PR.zero PR.one (regBit m r)
+  change PR.syElt (fun s => if s = t then bitVal PR.zero PR.one (bitAtOf RF.cell m r)
     else rest r s) = PR.syElt (rest r)
   refine congrArg _ (funext fun s => ?_)
   by_cases hs : s = t
@@ -68,12 +82,12 @@ theorem trackTape_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A
 
 /-- A backed track's pass presentation is the background itself. -/
 theorem passTracks_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A}
-    {m : Univ A R P K dd → Prop}
-    (hm : ∀ r, rest r t = bitVal PR.zero PR.one (regBit m r))
+    {m : I → Prop}
+    (hm : ∀ r, rest r t = bitVal PR.zero PR.one (bitAtOf RF.cell m r))
     (r : Univ A R P K dd → Prop) :
-    PR.passTracks t rest m r = rest r := by
+    PR.passTracksAt RF.cell t rest m r = rest r := by
   refine funext fun s => ?_
-  change (if s = t then bitVal PR.zero PR.one (regBit m r) else rest r s) =
+  change (if s = t then bitVal PR.zero PR.one (bitAtOf RF.cell m r) else rest r s) =
     rest r s
   by_cases hs : s = t
   · subst hs
@@ -89,6 +103,8 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 variable [Language.wide.Structure (Univ A R P K dd)]
 variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {nr : ℕ}
+variable {I : Type} {ile : I → I → Prop}
+variable (RF : IxFile (Univ A R P K dd) I ile)
 variable {wk rg : W} {emb : ElemPh nr → P}
 variable {rdTrack : Fin nr → W}
 variable {MatchOf : Fin nr → (Q → A) → (W → A) → Prop}
@@ -156,55 +172,61 @@ private theorem hasLeft_of_rule {i : ElemSite nr} {ρ : ElemSh nr i}
     fun hc => hml (by rw [hrules] at hc; exact hc)⟩
 
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-variable {gbot : Univ A R P K dd} (hbot : ∀ y, WMLe gbot y)
-variable {v v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (wmSeg gbot))
+variable (hix : IsLinOrd ile)
+variable {gbot : I} (hbot : ∀ y, ile gbot y)
+variable {v v' : Univ A R P K dd → Prop} (hv : WMSetLt WMLe v (RF.cell gbot))
 variable (hvi : WMIncr WMLe v v')
 variable {rest : (Univ A R P K dd → Prop) → W → A}
 variable (hwkS : ∀ r, rest r wk = bitVal PR.zero PR.one (r = v))
 variable (hrg : ∀ r, rest r rg =
-  bitVal PR.zero PR.one (∃ u : Univ A R P K dd, r = wmSeg u))
-variable {m : Fin nr → Univ A R P K dd → Prop}
+  bitVal PR.zero PR.one (∃ u : I, r = RF.cell u))
+variable {m : Fin nr → I → Prop}
 variable (hm : ∀ (j : Fin nr) (r : Univ A R P K dd → Prop),
-  rest r (rdTrack j) = bitVal PR.zero PR.one (regBit (m j) r))
+  rest r (rdTrack j) = bitVal PR.zero PR.one (bitAtOf RF.cell (m j) r))
 variable (hnewk : ∀ j, wk ≠ rdTrack j) (hnerg : ∀ j, rg ≠ rdTrack j)
-variable {t₀ : W} {m₀ : Univ A R P K dd → Prop}
-variable (hm₀ : ∀ r, rest r t₀ = bitVal PR.zero PR.one (regBit m₀ r))
+variable {t₀ : W} {m₀ : I → Prop}
+variable (hm₀ : ∀ r, rest r t₀ = bitVal PR.zero PR.one (bitAtOf RF.cell m₀ r))
 variable (hwkt₀ : wk ≠ t₀) (hrgt₀ : rg ≠ t₀)
 
 omit hrules [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-include hlin hbot hv in
+include hlin hix hbot hv in
 /-- The working cell is nobody's register. -/
-theorem not_reg_of_lt_bot : ∀ u : Univ A R P K dd, v ≠ wmSeg u := by
+theorem not_reg_of_lt_bot : ∀ u : I, v ≠ RF.cell u := by
   intro u hvu
   rw [hvu] at hv
-  exact ((wmSetLt_wmSeg_iff hlin u gbot).mp hv).2 (hbot u)
+  exact ((RF.lt_iff hix u gbot).mp hv).2 (hbot u)
 
 section Reads
 
-variable (fs : Fin (nr + 1) → Q → A) (x : Fin nr → Univ A R P K dd)
+variable (fs : Fin (nr + 1) → Q → A) (x : Fin nr → I)
 variable (hname : ∀ j : Fin nr, MatchOf j (fs j.castSucc)
-  (PR.passTracks (rdTrack j) rest (m j) (wmSeg (x j))))
+  (PR.passTracksAt RF.cell (rdTrack j) rest (m j) (RF.cell (x j))))
 variable (huniq : ∀ (j : Fin nr) (r : Univ A R P K dd → Prop),
-  MatchOf j (fs j.castSucc) (PR.passTracks (rdTrack j) rest (m j) r) →
-    r = wmSeg (x j))
+  MatchOf j (fs j.castSucc) (PR.passTracksAt RF.cell (rdTrack j) rest (m j) r) →
+    r = RF.cell (x j))
 variable (hfsT : ∀ j : Fin nr, m j (x j) →
   fs j.succ = setFlag j true (fs j.castSucc) (rest v))
 variable (hfsF : ∀ j : Fin nr, ¬m j (x j) →
   fs j.succ = setFlag j false (fs j.castSucc) (rest v))
+-- The width of one read trip: a clocked caller supplies a bound, a
+-- space-bounded one the maximum over the finitely many reads.
+variable (c : ℕ) (hcost : ∀ j : Fin nr,
+  2 * (wideRank (RF.cell (x j)) - wideRank v) + 2 ≤ c)
 
-include hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg hm₀
-  hname huniq hfsT hfsF in
+include hrules RF hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀
+  hname huniq hfsT hfsF hcost in
 /-- **One round of reads**: from the phase before the `k`-th read to the fold
-checkpoint, each read trip storing its bit into the control. -/
+checkpoint, each read trip storing its bit into the control – and each costing
+the trip, the store and the walk back. -/
 private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+    (wideData (Univ A R P K dd)).ReachesIn ((c + 2) * (nr - k))
       ⟨Sum.inr (PR.stElt (elemPhaseAt emb k) (fs ⟨k, Nat.lt_succ_of_le hk⟩)),
         Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (emb .e1) (fs (Fin.last nr))), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
   classical
-  have hvnr := not_reg_of_lt_bot hlin hbot hv
+  have hvnr := not_reg_of_lt_bot RF hlin hix hbot hv
   have hvv' : v ≠ v' := ne_of_wmIncr hvi
   intro k hk
   induction hd : nr - k generalizing k with
@@ -214,7 +236,8 @@ private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
     have hph : elemPhaseAt emb k = emb .e1 := dif_neg (lt_irrefl k)
     have hfk : (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (k + 1)) = Fin.last k :=
       Fin.ext rfl
-    rw [hph, hfk]
+    rw [hph, hfk, Nat.mul_zero]
+    exact TMData.reachesIn_refl
   | succ n ih =>
     have hkl : k < nr := by omega
     set j : Fin nr := ⟨k, hkl⟩ with hj
@@ -228,22 +251,22 @@ private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
             (fun rp => emb (.rdP j rp))).rule PR.one ρ :=
       fun ρ => hrules (.rd j) (Sum.inl ρ)
     -- the shared tape, in the read track's presentation and the reference's
-    have hTj : PR.trackTape (rdTrack j) rest (m j) =
-        PR.trackTape t₀ rest m₀ :=
-      (trackTape_of_back (hm j)).trans (trackTape_of_back hm₀).symm
+    have hTj : PR.trackTapeAt RF.cell (rdTrack j) rest (m j) =
+        PR.trackTapeAt RF.cell t₀ rest m₀ :=
+      (trackTape_of_back RF (hm j)).trans (trackTape_of_back RF hm₀).symm
     -- the symbol under the head at the marker, in the read track's presentation
-    have hsymv : PR.passTracks (rdTrack j) rest (m j) v = rest v :=
-      passTracks_of_back (hm j) v
+    have hsymv : PR.passTracksAt RF.cell (rdTrack j) rest (m j) v = rest v :=
+      passTracks_of_back RF (hm j) v
     -- the store step: at the marker, rightwards, folding the bit
     have hstore : ∀ b : Bool,
         (fs j.succ = setFlag j b (fs j.castSucc) (rest v)) →
         (wideData (Univ A R P K dd)).Step
           ⟨Sum.inr (PR.stElt (emb (.rdP j (if b then .ry else .rn)))
               (fs j.castSucc)), Sum.inl v,
-            wideTape (PR.trackTape (rdTrack j) rest (m j))
+            wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
               (PR.syElt PR.blank)⟩
           ⟨Sum.inr (PR.stElt (elemNextRd emb j) (fs j.succ)), Sum.inl v',
-            wideTape (PR.trackTape (rdTrack j) rest (m j))
+            wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
               (PR.syElt PR.blank)⟩ := by
       intro b hb
       refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
@@ -256,18 +279,18 @@ private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
             bitVal_neg (fun hc => hvnr hc.choose hc.choose_spec)]
           exact PR.zero_ne_one
       · change setFlag j b (fs j.castSucc)
-          (PR.passTracks (rdTrack j) rest (m j) v) = fs j.succ
+          (PR.passTracksAt RF.cell (rdTrack j) rest (m j) v) = fs j.succ
         rw [hsymv, hb]
     -- the walk back to the marker, in the next phase
     have hback :
         (wideData (Univ A R P K dd)).Step
           ⟨Sum.inr (PR.stElt (elemNextRd emb j) (fs j.succ)), Sum.inl v',
-            wideTape (PR.trackTape (rdTrack j) rest (m j))
+            wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
               (PR.syElt PR.blank)⟩
           ⟨Sum.inr (PR.stElt (elemNextRd emb j) (fs j.succ)), Sum.inl v,
-            wideTape (PR.trackTape (rdTrack j) rest (m j))
+            wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
               (PR.syElt PR.blank)⟩ := by
-      have hwkv' : PR.passTracks (rdTrack j) rest (m j) v' wk ≠ PR.one := by
+      have hwkv' : PR.passTracksAt RF.cell (rdTrack j) rest (m j) v' wk ≠ PR.one := by
         rw [Prog.passTracks_of_ne (hnewk j), hwkS,
           bitVal_neg (Ne.symm hvv')]
         exact PR.zero_ne_one
@@ -284,38 +307,37 @@ private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
         exact hasLeft_of_rule hrules (i := .e1) (ρ := .stay)
           hwkv' rfl rfl rfl rfl not_false
     -- the read trip, by the kit, then store, walk back, and the tail
-    rw [hph, hcast, show wideTape (PR.trackTape t₀ rest m₀)
-      (PR.syElt PR.blank) = wideTape (PR.trackTape (rdTrack j) rest (m j))
+    rw [hph, hcast, show wideTape (PR.trackTapeAt RF.cell t₀ rest m₀)
+      (PR.syElt PR.blank) = wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
       (PR.syElt PR.blank) from congrArg (wideTape · (PR.syElt PR.blank))
         hTj.symm]
     have htail :
-        Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+        (wideData (Univ A R P K dd)).ReachesIn ((c + 2) * n)
           ⟨Sum.inr (PR.stElt (elemNextRd emb j) (fs j.succ)), Sum.inl v,
-            wideTape (PR.trackTape (rdTrack j) rest (m j))
+            wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
               (PR.syElt PR.blank)⟩
           ⟨Sum.inr (PR.stElt (emb .e1) (fs (Fin.last nr))), Sum.inl v,
-            wideTape (PR.trackTape (rdTrack j) rest (m j))
+            wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
               (PR.syElt PR.blank)⟩ := by
       have hnx : elemNextRd emb j = elemPhaseAt emb (k + 1) := rfl
       have hsucc : j.succ = ⟨k + 1, Nat.lt_succ_of_le (by omega)⟩ :=
         Fin.ext rfl
-      rw [hnx, hsucc, show wideTape (PR.trackTape (rdTrack j) rest (m j))
-        (PR.syElt PR.blank) = wideTape (PR.trackTape t₀ rest m₀)
+      rw [hnx, hsucc, show wideTape (PR.trackTapeAt RF.cell (rdTrack j) rest (m j))
+        (PR.syElt PR.blank) = wideTape (PR.trackTapeAt RF.cell t₀ rest m₀)
         (PR.syElt PR.blank) from congrArg (wideTape · (PR.syElt PR.blank)) hTj]
       exact ih (k + 1) (by omega) (by omega)
+    have hbudget : c + 1 + 1 + (c + 2) * n ≤ (c + 2) * (n + 1) := by
+      rw [Nat.mul_succ]
+      omega
     by_cases hbit : m j (x j)
-    · refine Relation.ReflTransGen.trans
-        (ReadKit.reaches_pos hrulesK hR hlin (hnewk j) hbot hv
-          hwkS (hname j) (huniq j) hbit) ?_
-      exact ((Relation.ReflTransGen.single
-        (hstore true (hfsT j hbit))).trans
-        (Relation.ReflTransGen.single hback)).trans htail
-    · refine Relation.ReflTransGen.trans
-        (ReadKit.reaches_neg hrulesK hR hlin (hnewk j) hbot hv
-          hwkS (hname j) (huniq j) hbit) ?_
-      exact ((Relation.ReflTransGen.single
-        (hstore false (hfsF j hbit))).trans
-        (Relation.ReflTransGen.single hback)).trans htail
+    · refine TMData.ReachesIn.mono hbudget ?_
+      refine ((((ReadKit.reachesIn_pos (F := RF) hrulesK hR hlin hix (hnewk j)
+        hbot hv hwkS (hname j) (huniq j) hbit).mono (hcost j)).tail
+        (hstore true (hfsT j hbit))).tail hback).trans htail
+    · refine TMData.ReachesIn.mono hbudget ?_
+      refine ((((ReadKit.reachesIn_neg (F := RF) hrulesK hR hlin hix (hnewk j)
+        hbot hv hwkS (hname j) (huniq j) hbit).mono (hcost j)).tail
+        (hstore false (hfsF j hbit))).tail hback).trans htail
 
 end Reads
 
@@ -325,12 +347,12 @@ variable {ι : Type} [LinearOrder ι] [Finite ι] {a₀ aT : ι}
 variable (hbotI : ∀ a, a₀ ≤ a) (htopI : ∀ a, a ≤ aT)
 variable (F : ι → Q → A) (fsOf : ι → Fin (nr + 1) → Q → A)
 variable (hlastF : ∀ a, fsOf a (Fin.last nr) = F a)
-variable (x : ι → Fin nr → Univ A R P K dd)
+variable (x : ι → Fin nr → I)
 variable (hname : ∀ (a : ι) (j : Fin nr), MatchOf j (fsOf a j.castSucc)
-  (PR.passTracks (rdTrack j) rest (m j) (wmSeg (x a j))))
+  (PR.passTracksAt RF.cell (rdTrack j) rest (m j) (RF.cell (x a j))))
 variable (huniq : ∀ (a : ι) (j : Fin nr) (r : Univ A R P K dd → Prop),
-  MatchOf j (fsOf a j.castSucc) (PR.passTracks (rdTrack j) rest (m j) r) →
-    r = wmSeg (x a j))
+  MatchOf j (fsOf a j.castSucc) (PR.passTracksAt RF.cell (rdTrack j) rest (m j) r) →
+    r = RF.cell (x a j))
 variable (hfsT : ∀ (a : ι) (j : Fin nr), m j (x a j) →
   fsOf a j.succ = setFlag j true (fsOf a j.castSucc) (rest v))
 variable (hfsF : ∀ (a : ι) (j : Fin nr), ¬m j (x a j) →
@@ -339,33 +361,36 @@ variable (hadv : ∀ a a' : ι, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
   advEl (F a) (rest v) = fsOf a' 0)
 variable (hmaxT : IsMaxEl (F aT))
 variable (hmaxF : ∀ a, a < aT → ¬IsMaxEl (F a))
+-- The width of one read trip, as in the reads above.
+variable (c : ℕ) (hcost : ∀ (a : ι) (j : Fin nr),
+  2 * (wideRank (RF.cell (x a j)) - wideRank v) + 2 ≤ c)
 
 omit hrgt₀ [LinearOrder ι] [Finite ι] in
-include hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀
-  hlastF hname huniq hfsT hfsF in
+include hrules RF hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀
+  hlastF hname huniq hfsT hfsF hcost in
 /-- **A round is opened from the marker**: the step off it into the first
 read, the walk back, and the reads – from any phase and pointer whose
-dispatch enters the round. -/
+dispatch enters the round, at the dispatch, the walk back and the reads. -/
 private theorem elem_round {p : P} {f : Q → A} {a : ι}
     (hstep : (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt p f), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (elemFirstRd emb) (fsOf a 0)), Sum.inl v',
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩) :
+    (wideData (Univ A R P K dd)).ReachesIn (2 + (c + 2) * nr)
       ⟨Sum.inr (PR.stElt p f), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (emb .e1) (F a)), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
   have hvv' : v ≠ v' := ne_of_wmIncr hvi
   -- the walk back into the first read's phase (or the fold checkpoint)
   have hback :
       (wideData (Univ A R P K dd)).Step
         ⟨Sum.inr (PR.stElt (elemFirstRd emb) (fsOf a 0)), Sum.inl v',
-          wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+          wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
         ⟨Sum.inr (PR.stElt (elemFirstRd emb) (fsOf a 0)), Sum.inl v,
-          wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
-    have hwkv' : PR.passTracks t₀ rest m₀ v' wk ≠ PR.one := by
+          wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+    have hwkv' : PR.passTracksAt RF.cell t₀ rest m₀ v' wk ≠ PR.one := by
       rw [Prog.passTracks_of_ne hwkt₀, hwkS, bitVal_neg (Ne.symm hvv')]
       exact PR.zero_ne_one
     refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
@@ -378,89 +403,116 @@ private theorem elem_round {p : P} {f : Q → A} {a : ι}
       rw [hfr]
       exact hasLeft_of_rule hrules (i := .e1) (ρ := .stay)
         hwkv' rfl rfl rfl rfl not_false
-  have hreads := elem_reads hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg
-    hm₀ (fsOf a) (x a) (hname a) (huniq a) (hfsT a) (hfsF a) 0 (Nat.zero_le nr)
+  have hreads := elem_reads RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg
+    hm₀ (fsOf a) (x a) (hname a) (huniq a) (hfsT a) (hfsF a) c (hcost a) 0
+    (Nat.zero_le nr)
   have hf0 : (⟨0, Nat.lt_succ_of_le (Nat.zero_le nr)⟩ : Fin (nr + 1)) = 0 :=
     Fin.ext rfl
   rw [hf0] at hreads
   have hfirst : elemPhaseAt emb 0 = elemFirstRd emb := rfl
   rw [hfirst] at hreads
-  rw [hlastF a] at hreads
-  exact ((Relation.ReflTransGen.single hstep).trans
-    (Relation.ReflTransGen.single hback)).trans hreads
+  rw [hlastF a, Nat.sub_zero] at hreads
+  exact TMData.ReachesIn.mono (by omega)
+    (((TMData.reachesIn_of_step hstep).tail hback).trans hreads)
 
-include hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ hrgt₀
-  hbotI htopI hlastF hname huniq hfsT hfsF hadv hmaxT hmaxF in
-/-- **The element loop's run**: from the entry checkpoint at the marker to
-the exit phase one cell to its right, the control folded over the whole
-enumeration – entered with `initEl`, each round's reads stored by `setFlag`,
-each advance by `advEl`, the verdict handed to `exitSt` at the top index. -/
-theorem elem_run {f₀ : Q → A}
+include hrules RF hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ hrgt₀
+  hbotI htopI hlastF hname huniq hfsT hfsF hadv hmaxT hmaxF hcost in
+/-- **The element loop's run, on a clock**: from the entry checkpoint at the
+marker to the exit phase one cell to its right, the control folded over the
+whole enumeration – entered with `initEl`, each round's reads stored by
+`setFlag`, each advance by `advEl`, the verdict handed to `exitSt` at the top
+index – and the cost is one round's width once per element of the enumeration,
+plus the round that opens it and the step that leaves. -/
+theorem elem_reachesIn {f₀ : Q → A}
     (hinit : initEl f₀ (rest v) = fsOf a₀ 0) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+    (wideData (Univ A R P K dd)).ReachesIn
+      ((2 + (c + 2) * nr) * (Nat.card ι + 1) + 1)
       ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh (exitSt (F aT) (rest v))), Sum.inl v',
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
   classical
-  have hvnr := not_reg_of_lt_bot hlin hbot hv
-  have hsymv : PR.passTracks t₀ rest m₀ v = rest v :=
-    passTracks_of_back hm₀ v
+  have hvnr := not_reg_of_lt_bot RF hlin hix hbot hv
+  have hsymv : PR.passTracksAt RF.cell t₀ rest m₀ v = rest v :=
+    passTracks_of_back RF hm₀ v
   -- the two marker-side guard facts every dispatch reads
-  have hgwk : PR.passTracks t₀ rest m₀ v wk = PR.one := by
+  have hgwk : PR.passTracksAt RF.cell t₀ rest m₀ v wk = PR.one := by
     rw [Prog.passTracks_of_ne hwkt₀, hwkS]
     exact bitVal_pos rfl
-  have hgrg : PR.passTracks t₀ rest m₀ v rg ≠ PR.one := by
+  have hgrg : PR.passTracksAt RF.cell t₀ rest m₀ v rg ≠ PR.one := by
     rw [Prog.passTracks_of_ne hrgt₀, hrg,
       bitVal_neg (fun hc => hvnr hc.choose hc.choose_spec)]
     exact PR.zero_ne_one
   -- the entry dispatch
   have hentry : (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (elemFirstRd emb) (fsOf a₀ 0)), Sum.inl v',
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
     refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
     refine hasRight_of_rule hrules (i := .e0) (ρ := .dspA)
       ⟨hgwk, hgrg⟩ rfl rfl ?_ rfl trivial
-    change initEl f₀ (PR.passTracks t₀ rest m₀ v) = fsOf a₀ 0
+    change initEl f₀ (PR.passTracksAt RF.cell t₀ rest m₀ v) = fsOf a₀ 0
     rw [hsymv]
     exact hinit
   -- the loop over the enumeration
-  have hloop : Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+  have hloop : (wideData (Univ A R P K dd)).ReachesIn
+      ((2 + (c + 2) * nr) * Nat.card ι)
       ⟨Sum.inr (PR.stElt (emb .e1) (F a₀)), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt (emb .e1) (F aT)), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
-    refine reflTransGen_of_ordLoop (conf := fun a =>
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+    refine reachesIn_of_ordLoop_card (conf := fun a =>
       (⟨Sum.inr (PR.stElt (emb .e1) (F a)), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ :
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ :
           Config (WPoint (Univ A R P K dd)))) ?_ hbotI aT
     intro a a' hlt hnb
     have hmax : ¬IsMaxEl (F a) := hmaxF a (lt_of_lt_of_le hlt (htopI a'))
-    refine elem_round hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg hm₀
-      hwkt₀ F fsOf hlastF x hname huniq hfsT hfsF ?_
+    refine elem_round RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀
+      hwkt₀ F fsOf hlastF x hname huniq hfsT hfsF c hcost ?_
     refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
     refine hasRight_of_rule hrules (i := .e1) (ρ := .dspA)
       ⟨⟨hgwk, hgrg⟩, hmax⟩ rfl rfl ?_ rfl trivial
-    change advEl (F a) (PR.passTracks t₀ rest m₀ v) = fsOf a' 0
+    change advEl (F a) (PR.passTracksAt RF.cell t₀ rest m₀ v) = fsOf a' 0
     rw [hsymv]
     exact hadv a a' hlt hnb
   -- the exit dispatch
   have hexit : (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (emb .e1) (F aT)), Sum.inl v,
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt exitPh (exitSt (F aT) (rest v))), Sum.inl v',
-        wideTape (PR.trackTape t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
     refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
     refine hasRight_of_rule hrules (i := .e1) (ρ := .dspB)
       ⟨⟨hgwk, hgrg⟩, hmaxT⟩ rfl rfl ?_ rfl trivial
-    change exitSt (F aT) (PR.passTracks t₀ rest m₀ v) =
+    change exitSt (F aT) (PR.passTracksAt RF.cell t₀ rest m₀ v) =
       exitSt (F aT) (rest v)
     rw [hsymv]
-  have hopen := elem_round hrules hR hlin hbot hv hvi hwkS hrg hm hnewk hnerg
-    hm₀ hwkt₀ F fsOf hlastF x hname huniq hfsT hfsF (a := a₀) hentry
-  exact (hopen.trans hloop).trans (Relation.ReflTransGen.single hexit)
+  have hopen := elem_round RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg
+    hm₀ hwkt₀ F fsOf hlastF x hname huniq hfsT hfsF c hcost (a := a₀) hentry
+  refine TMData.ReachesIn.mono ?_ ((hopen.trans hloop).tail hexit)
+  rw [Nat.mul_succ]
+  omega
+
+include hrules RF hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ hrgt₀
+  hbotI htopI hlastF hname huniq hfsT hfsF hadv hmaxT hmaxF in
+/-- **The element loop's run**, the budget forgotten: what a space-bounded
+caller reads. The width of a trip is then the largest of the finitely many the
+loop takes. -/
+theorem elem_run {f₀ : Q → A}
+    (hinit : initEl f₀ (rest v) = fsOf a₀ 0) :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt exitPh (exitSt (F aT) (rest v))), Sum.inl v',
+        wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩ := by
+  exact (elem_reachesIn RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg
+    hm₀ hwkt₀ hrgt₀ hbotI htopI F fsOf hlastF x hname huniq hfsT hfsF hadv hmaxT
+    hmaxF (2 * Nat.card {p : WPoint (Univ A R P K dd) //
+        (wideData (Univ A R P K dd)).Posn p} + 2)
+    (fun a j => by
+      have := wideRank_lt_card (A := Univ A R P K dd) (RF.cell (x a j))
+      omega) hinit).reflTransGen
 
 end Loop
 

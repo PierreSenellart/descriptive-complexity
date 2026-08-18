@@ -127,6 +127,20 @@ theorem lt_arg (τ : PfpTag R P K) (i : K) (h : ∀ j : K, τ ≠ PfpTag.arg j) 
   | phase p => simp [tagKey]
   | arg j => exact absurd rfl (h j)
 
+/-- **The argument tags are ordered like their blocks**: the tag order is the
+key's, and the key of an argument tag is its block. -/
+theorem lt_arg_arg (i j : K) :
+    (PfpTag.arg i : PfpTag R P K) < PfpTag.arg j ↔ i < j := by
+  have hle : ∀ a b : K, ((PfpTag.arg a : PfpTag R P K) ≤ PfpTag.arg b) ↔ a ≤ b := by
+    intro a b
+    rw [le_iff_tagKey]
+    change (Sum.inrₗ (Sum.inrₗ (Sum.inrₗ a)) : R ⊕ₗ (Unit ⊕ₗ (P ⊕ₗ K))) ≤
+      Sum.inrₗ (Sum.inrₗ (Sum.inrₗ b)) ↔ a ≤ b
+    simp [Sum.inrₗ, Sum.Lex.toLex_le_toLex]
+  rw [lt_iff_le_and_ne, lt_iff_le_and_ne, hle]
+  exact and_congr Iff.rfl ⟨fun h hc => h (congrArg _ hc),
+    fun h hc => h (by injection hc)⟩
+
 end Order
 
 instance [Finite R] [Finite P] [Finite K] : Finite (PfpTag R P K) :=
@@ -143,7 +157,15 @@ instance [Finite R] [Finite P] [Finite K] : Finite (PfpTag R P K) :=
 A *logical* address is one whose non-argument blocks are empty: those are the
 valuations of the fixed-point variable, and the cells that hold its stage. They
 are exactly the addresses at or below the one whose argument blocks are full,
-because the blocks they are required to empty are the most significant ones.
+because the blocks they are required to empty are the most significant ones –
+both directions, since being logical is avoiding an initial segment of the tag
+order (`DescriptiveComplexity.wmAvoids`), and avoiding blocks is downward closed
+(`DescriptiveComplexity.wmAvoids_of_wmSetLe`).
+
+The converse direction is the one a program **on a clock** runs on: a sweep that
+stops at the last logical address has stayed among the logical ones throughout,
+so the tags a program never writes in cost it nothing while multiplying the
+number of addresses its clock counts.
 -/
 
 variable {V : Type} {LeV : V → V → Prop}
@@ -164,6 +186,32 @@ theorem not_logicalTop {τ : PfpTag R P K} (h : ∀ i : K, τ ≠ PfpTag.arg i) 
   rintro ⟨i, hi⟩
   exact h i hi
 
+/-- **Being logical is avoiding the non-argument blocks**, which is what the
+generic reading of the layout calls it
+(`DescriptiveComplexity.wmAvoids`). -/
+theorem logical_iff_wmAvoids {s : PfpTag R P K × V → Prop} :
+    (∀ τ : PfpTag R P K, (∀ i : K, τ ≠ PfpTag.arg i) → ∀ v : V, ¬s (τ, v)) ↔
+      wmAvoids (fun τ : PfpTag R P K => ∀ i : K, τ ≠ PfpTag.arg i) s :=
+  Iff.rfl
+
+open Classical in
+/-- **The last logical address is the top of the region** the non-argument blocks
+cut out. -/
+theorem logicalTop_eq :
+    logicalTop (R := R) (P := P) (K := K) (V := V) =
+      wmAvoidTop fun τ : PfpTag R P K => ∀ i : K, τ ≠ PfpTag.arg i :=
+  funext fun _p => propext
+    ⟨fun ⟨i, hi⟩ hc => hc i hi, fun hc => not_forall.mp hc |>.imp fun _ h => not_not.mp h⟩
+
+/-- **A tag that is not an argument is below no argument tag**: the non-argument
+tags are an initial segment of the tag order, which is what makes the logical
+addresses an initial stretch of the tape rather than a scattered set. -/
+theorem nonArg_downward [LinearOrder R] [LinearOrder P] [LinearOrder K]
+    (τ σ : PfpTag R P K) (hle : τ ≤ σ) (hσ : ∀ i : K, σ ≠ PfpTag.arg i) :
+    ∀ i : K, τ ≠ PfpTag.arg i := by
+  rintro i rfl
+  exact absurd (lt_of_lt_of_le (lt_arg σ i hσ) hle) (lt_irrefl _)
+
 /-- **A logical address is at or below the last one.** The blocks it is required
 to empty are the most significant ones – every tag that is not an argument – so
 the comparison is settled in the argument blocks, where the full block is above
@@ -177,26 +225,22 @@ theorem wmSetLe_logicalTop [LinearOrder R] [LinearOrder P] [LinearOrder K]
     (hjunk : ∀ τ : PfpTag R P K, (∀ i : K, τ ≠ PfpTag.arg i) → ∀ v : V, ¬s (τ, v)) :
     WMSetLe (lexRel (· ≤ · : PfpTag R P K → PfpTag R P K → Prop) LeV)
       s logicalTop := by
-  classical
-  by_cases hall : ∀ τ : PfpTag R P K, ∀ v : V, (s (τ, v) ↔ logicalTop (τ, v))
-  · exact Or.inl fun p => hall p.1 p.2
-  -- Some block differs; take the first, which cannot be `ctrl` or `sym`.
-  refine Or.inr ((wmSetLt_lexRel_iff isLinOrd_le s logicalTop).mpr ?_)
-  obtain ⟨τ, hτ, hmin⟩ :=
-    exists_least (Le := (· ≤ · : PfpTag R P K → PfpTag R P K → Prop)) isLinOrd_le
-    (P := fun τ => ¬∀ v : V, (wmBlk s τ v ↔ wmBlk logicalTop τ v))
-    (by
-      by_contra hc
-      exact hall fun τ v => not_not.mp (fun hcon => hc ⟨τ, fun hall' => hcon (hall' v)⟩) )
-  refine ⟨τ, fun σ hσ v => not_not.mp fun hc => ?_, ?_⟩
-  · exact hσ.2 (hmin σ fun hall' => hc (hall' v))
-  -- At the first differing block the address is strictly below a full block.
-  obtain ⟨i, rfl⟩ : ∃ i : K, τ = PfpTag.arg i := by
-    by_contra hc
-    have hne : ∀ i : K, τ ≠ PfpTag.arg i := fun i hi => hc ⟨i, hi⟩
-    exact hτ fun v => iff_of_false (hjunk τ hne v) (not_logicalTop hne v)
-  refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_of_full hV (fun v => logicalTop_arg i v) _, fun hc => ?_⟩
-  exact hτ fun v => iff_of_eq (congrFun hc v)
+  rw [logicalTop_eq]
+  exact wmSetLe_wmAvoidTop isLinOrd_le hV (logical_iff_wmAvoids.mp hjunk)
+
+/-- **Everything at or below the last logical address is logical**, which is the
+converse of the bound above and the fact a program *on a clock* runs on: a sweep
+that stops at `logicalTop` has stayed among the logical addresses throughout, so
+the surplus blocks it never writes in cost it nothing while multiplying the
+number of addresses its clock counts. -/
+theorem logical_of_wmSetLe_logicalTop [LinearOrder R] [LinearOrder P] [LinearOrder K]
+    [Finite R] [Finite P] [Finite K] [Finite V]
+    (hV : IsLinOrd LeV) {s : PfpTag R P K × V → Prop}
+    (hle : WMSetLe (lexRel (· ≤ · : PfpTag R P K → PfpTag R P K → Prop) LeV) s logicalTop) :
+    ∀ τ : PfpTag R P K, (∀ i : K, τ ≠ PfpTag.arg i) → ∀ v : V, ¬s (τ, v) := by
+  rw [logicalTop_eq] at hle
+  exact logical_iff_wmAvoids.mpr
+    (wmAvoids_of_wmSetLe isLinOrd_le hV nonArg_downward hle (wmAvoids_wmAvoidTop _))
 
 end Pfp
 

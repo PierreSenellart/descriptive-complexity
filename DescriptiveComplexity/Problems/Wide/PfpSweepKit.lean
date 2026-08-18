@@ -134,6 +134,7 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {κ : FlagSweepKit A Q W P}
 variable {rEmb : SweepRule → R}
 variable (hrules : ∀ ρ : SweepRule, PR.rules (rEmb ρ) = κ.rule PR.one ρ)
+variable {cell : Univ A R P K dd → (Univ A R P K dd → Prop)}
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
 variable (hneltp : κ.ltp ≠ κ.t)
 variable {rest : (Univ A R P K dd → Prop) → W → A} {m : Univ A R P K dd → Prop}
@@ -142,7 +143,7 @@ variable (hltp : ∀ r : Univ A R P K dd → Prop,
   rest r κ.ltp = bitVal PR.zero PR.one (r = ltpAddr))
 variable {Test : (Univ A R P K dd → Prop) → Prop}
 variable (hcompat : ∀ r : Univ A R P K dd → Prop,
-  κ.TestG (PR.passTracks κ.t rest m r) ↔ Test r)
+  κ.TestG (PR.passTracksAt cell κ.t rest m r) ↔ Test r)
 variable {fc : Q → A}
 
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
@@ -163,17 +164,17 @@ include hrules hR hlin hneltp hltp hcompat in
 /-- **The kit runs its sweep**: one step per address of the stretch, the
 verdict in the phase via `DescriptiveComplexity.sweepState`. The stretch's
 top must sit at or below the end marker's address. -/
-theorem reaches {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
+theorem reachesIn {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
     (htp : WMSetLe WMLe s₁ ltpAddr) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+    (wideData (Univ A R P K dd)).ReachesIn (wideRank s₁ - wideRank s₀)
       ⟨Sum.inr (sweepState Test (PR.stElt (κ.emb .py) fc) (PR.stElt (κ.emb .pn) fc) s₀),
-        Sum.inl s₀, wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩
+        Sum.inl s₀, wideTape (PR.trackTapeAt cell κ.t rest m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (sweepState Test (PR.stElt (κ.emb .py) fc) (PR.stElt (κ.emb .pn) fc) s₁),
-        Sum.inl s₁, wideTape (PR.trackTape κ.t rest m) (PR.syElt PR.blank)⟩ := by
+        Sum.inl s₁, wideTape (PR.trackTapeAt cell κ.t rest m) (PR.syElt PR.blank)⟩ := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
   -- a cell strictly inside the stretch is not the end marker's
   have hoff : ∀ r r' : Univ A R P K dd → Prop, WMIncr WMLe r r' → WMSetLe WMLe r' s₁ →
-      PR.passTracks κ.t rest m r κ.ltp ≠ PR.one := by
+      PR.passTracksAt cell κ.t rest m r κ.ltp ≠ PR.one := by
     intro r r' hi hub
     have hlt : WMSetLt WMLe r ltpAddr := by
       refine (wmSetLt_iff _ _).mpr
@@ -185,7 +186,7 @@ theorem reaches {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ 
         (hlinSet.2.2.1 _ _ ((wmSetLt_iff _ _).mp hlt').1 (hlinSet.2.1 _ _ _ hub htp))
     rw [Prog.passTracks_of_ne hneltp, hltp, bitVal_neg ((wmSetLt_iff _ _).mp hlt).2]
     exact PR.zero_ne_one
-  exact Prog.reaches_flagSweep hR hlin (t := κ.t) (rest := rest) (m := m)
+  exact Prog.reachesIn_flagSweep hR hlin (t := κ.t) (rest := rest) (m := m)
     (Test := Test) (py := κ.emb .py) (pn := κ.emb .pn) (f := fc) hle
     (fun r r' hi _hlb hub hTest =>
       has_of_rule hrules (ρ := .yGo)
@@ -195,6 +196,17 @@ theorem reaches {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ 
         ⟨fun hc => hTest ((hcompat r).mp hc), hoff r r' hi hub⟩ trivial)
     (fun r r' hi _hlb hub =>
       has_of_rule hrules (ρ := .nGo) (hoff r r' hi hub) trivial)
+
+include hrules hR hlin hneltp hltp hcompat in
+/-- **The kit runs its sweep**, the budget forgotten. -/
+theorem reaches {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
+    (htp : WMSetLe WMLe s₁ ltpAddr) :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (sweepState Test (PR.stElt (κ.emb .py) fc) (PR.stElt (κ.emb .pn) fc) s₀),
+        Sum.inl s₀, wideTape (PR.trackTapeAt cell κ.t rest m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (sweepState Test (PR.stElt (κ.emb .py) fc) (PR.stElt (κ.emb .pn) fc) s₁),
+        Sum.inl s₁, wideTape (PR.trackTapeAt cell κ.t rest m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn hrules hR hlin hneltp hltp hcompat hle htp).reflTransGen
 
 end Discharge
 
@@ -264,6 +276,7 @@ variable [Finite A] [Finite R] [Finite P] [Finite K]
 variable {PR : Prog A R P Q W K dd} {κ : WriteSweepKit A Q W P}
 variable {rEmb : WSweepRule → R}
 variable (hrules : ∀ ρ : WSweepRule, PR.rules (rEmb ρ) = κ.rule PR.one ρ)
+variable {cell : Univ A R P K dd → (Univ A R P K dd → Prop)}
 variable (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
 variable (hneltp : κ.ltp ≠ κ.t)
 variable {m : Univ A R P K dd → Prop}
@@ -277,22 +290,22 @@ include hrules hR hlin hneltp hltp in
 /-- **The kit runs its sweep**: one rewrite per address, the background a
 function of the frontier. The rewrite the kit's rule computes must match the
 background's change at each cell, which is the one semantic hypothesis. -/
-theorem reaches {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
+theorem reachesIn {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
     (htp : WMSetLe WMLe s₁ ltpAddr)
     (hframe : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
       WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
       ∀ r : Univ A R P K dd → Prop, r ≠ s → restAt u r = restAt s r)
     (hwr : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
       WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
-      κ.wrG (PR.passTracks κ.t (restAt s) m s) = PR.passTracks κ.t (restAt u) m s) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      κ.wrG (PR.passTracksAt cell κ.t (restAt s) m s) = PR.passTracksAt cell κ.t (restAt u) m s) :
+    (wideData (Univ A R P K dd)).ReachesIn (wideRank s₁ - wideRank s₀)
       ⟨Sum.inr (PR.stElt κ.ph fc), Sum.inl s₀,
-        wideTape (PR.trackTape κ.t (restAt s₀) m) (PR.syElt PR.blank)⟩
+        wideTape (PR.trackTapeAt cell κ.t (restAt s₀) m) (PR.syElt PR.blank)⟩
       ⟨Sum.inr (PR.stElt κ.ph fc), Sum.inl s₁,
-        wideTape (PR.trackTape κ.t (restAt s₁) m) (PR.syElt PR.blank)⟩ := by
+        wideTape (PR.trackTapeAt cell κ.t (restAt s₁) m) (PR.syElt PR.blank)⟩ := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
   have hoff : ∀ r r' : Univ A R P K dd → Prop, WMIncr WMLe r r' → WMSetLe WMLe r' s₁ →
-      PR.passTracks κ.t (restAt r) m r κ.ltp ≠ PR.one := by
+      PR.passTracksAt cell κ.t (restAt r) m r κ.ltp ≠ PR.one := by
     intro r r' hi hub
     have hlt : WMSetLt WMLe r ltpAddr := by
       refine (wmSetLt_iff _ _).mpr
@@ -304,19 +317,36 @@ theorem reaches {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ 
         (hlinSet.2.2.1 _ _ ((wmSetLt_iff _ _).mp hlt').1 (hlinSet.2.1 _ _ _ hub htp))
     rw [Prog.passTracks_of_ne hneltp, hltp, bitVal_neg ((wmSetLt_iff _ _).mp hlt).2]
     exact PR.zero_ne_one
-  refine Prog.reaches_writeSweep hR hlin (t := κ.t) (m := m) (restAt := restAt)
+  refine Prog.reachesIn_writeSweep hR hlin (t := κ.t) (m := m) (restAt := restAt)
     (p := κ.ph) (f := fc) hle hframe fun s u hi hlb hub => ?_
   have hput := (show ∀ _hmr : (κ.rule PR.one .put).moveRight,
-      PR.HasRight (κ.rule PR.one .put).srcPh fc (PR.passTracks κ.t (restAt s) m s)
+      PR.HasRight (κ.rule PR.one .put).srcPh fc (PR.passTracksAt cell κ.t (restAt s) m s)
         (κ.rule PR.one .put).dstPh
-        ((κ.rule PR.one .put).dstSt fc (PR.passTracks κ.t (restAt s) m s))
-        ((κ.rule PR.one .put).wr fc (PR.passTracks κ.t (restAt s) m s)) from
+        ((κ.rule PR.one .put).dstSt fc (PR.passTracksAt cell κ.t (restAt s) m s))
+        ((κ.rule PR.one .put).wr fc (PR.passTracksAt cell κ.t (restAt s) m s)) from
     fun hmr => ⟨rEmb .put, by rw [hrules]; exact hoff s u hi hub,
       by rw [hrules], by rw [hrules], by rw [hrules], by rw [hrules],
       by rw [hrules]; exact hmr⟩) trivial
-  rw [show (κ.rule PR.one .put).wr fc (PR.passTracks κ.t (restAt s) m s) =
-      PR.passTracks κ.t (restAt u) m s from hwr s u hi hlb hub] at hput
+  rw [show (κ.rule PR.one .put).wr fc (PR.passTracksAt cell κ.t (restAt s) m s) =
+      PR.passTracksAt cell κ.t (restAt u) m s from hwr s u hi hlb hub] at hput
   exact hput
+
+include hrules hR hlin hneltp hltp in
+/-- **The kit runs its sweep**, the budget forgotten. -/
+theorem reaches {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
+    (htp : WMSetLe WMLe s₁ ltpAddr)
+    (hframe : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
+      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
+      ∀ r : Univ A R P K dd → Prop, r ≠ s → restAt u r = restAt s r)
+    (hwr : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
+      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
+      κ.wrG (PR.passTracksAt cell κ.t (restAt s) m s) = PR.passTracksAt cell κ.t (restAt u) m s) :
+    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
+      ⟨Sum.inr (PR.stElt κ.ph fc), Sum.inl s₀,
+        wideTape (PR.trackTapeAt cell κ.t (restAt s₀) m) (PR.syElt PR.blank)⟩
+      ⟨Sum.inr (PR.stElt κ.ph fc), Sum.inl s₁,
+        wideTape (PR.trackTapeAt cell κ.t (restAt s₁) m) (PR.syElt PR.blank)⟩ :=
+  (reachesIn hrules hR hlin hneltp hltp hle htp hframe hwr).reflTransGen
 
 end Discharge
 
