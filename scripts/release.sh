@@ -231,6 +231,9 @@ cmd_prepare() {
   sed -i "s|^date-released: \".*\"|date-released: \"$today\"|" CITATION.cff
   sed -i "s|descriptive-complexity\" @ \"v$old\"|descriptive-complexity\" @ \"v$version\"|" README.md
   sed -i "s|^rev = \"v$old\"|rev = \"v$version\"|" README.md
+  # The Reservoir form carries a `~` range rather than a tag, in both syntaxes.
+  sed -i "s|^version = \"~$old\"|version = \"~$version\"|" README.md
+  sed -i "s|descriptive-complexity\" @ \"~$old\"|descriptive-complexity\" @ \"~$version\"|" README.md
   # Newest release first, directly under the table header.
   sed -i "/^| --- | --- | --- |$/a | \`v$version\` | \`$pin\` | \`leanprover/lean4:$pin\` |" README.md
   # Badge tracks the pin; shields.io wants a literal hyphen doubled.

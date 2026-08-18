@@ -168,7 +168,27 @@ authoritative for the pin. A **patch** release keeps the Mathlib pin it was cut
 against, and **a new pin always takes at least a minor bump** – so depend on
 `~1.0.0`, which stays within a single pin, rather than on `^1.0.0`.
 
-In a `lakefile.toml`:
+The package is indexed on
+[Reservoir](https://reservoir.lean-lang.org/@PierreSenellart/descriptive-complexity),
+so it can be required by name. In a `lakefile.toml`:
+
+```toml
+[[require]]
+name = "descriptive-complexity"
+scope = "PierreSenellart"
+version = "~1.1.0"
+```
+
+or, in a `lakefile.lean`:
+
+```lean
+require "PierreSenellart" / "descriptive-complexity" @ "~1.1.0"
+```
+
+What follows `@` is a version *range*, not a version: Lake rejects a bare
+number there.
+
+To pin a commit, or to follow `master`, require it from git instead:
 
 ```toml
 [[require]]
@@ -176,8 +196,6 @@ name = "descriptive-complexity"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
 rev = "v1.1.0"
 ```
-
-or, in a `lakefile.lean`:
 
 ```lean
 require "descriptive-complexity" from git
