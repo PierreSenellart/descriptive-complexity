@@ -16,7 +16,7 @@ package "descriptive-complexity" where
     ⟨`weak.linter.mathlibStandardSet, true⟩,
   ]
 
-require "leanprover-community" / "mathlib" @ git "v4.33.0-rc1"
+require "leanprover-community" / "mathlib" @ git "v4.33.0"
 
 @[default_target]
 lean_lib «DescriptiveComplexity» where
