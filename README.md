@@ -79,7 +79,7 @@ for it under FO reductions.
 | **L** = LOGSPACE | FO(≤, DTC) | deterministic two-way `k`-head automaton, walking a linear order of the universe | REACHd · UNREACHd |
 | **NL** | SO-Krom(≤); equivalently FO(≤, TC) | two-way `k`-head automaton, walking a linear order of the universe | REACH · UNREACH · 2SAT |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn(≤); equivalently FO(≤, LFP) or FO(≤, IFP) | deterministic polynomial-time Turing machine | HORN-SAT · CVP (circuit value) · GAME (alternating reachability) · acceptance by a deterministic polynomial-time Turing machine |
-| **NP** = Σ₁ᵖ | ∃SO | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
+| **NP** = Σ₁ᵖ | ∃SO; equivalently ∃SO[new, d], value invention bounded by the instance's `d`-tuples | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
 | **coNP** = Π₁ᵖ | ∀SO | nondeterministic polynomial-time Turing machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT · acceptance by such a machine |
 | **DP** | a Σ₁ and a Π₁ sentence conjoined | – | SAT-UNSAT |
 | **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine with `k` blocks, existential first | `QBF k` (quantified Boolean formulas, `k` blocks) · acceptance by such a machine |
@@ -87,18 +87,15 @@ for it under FO reductions.
 | **PH** | SO | – | – |
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
 | **EXPTIME** | SO(LFP), i.e. PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating Turing machine, its tape indexed by the input's positions and no bound on the length of a play | acceptance by such a machine (`APSPACE = EXPTIME`) |
-| **NEXPTIME** | ∃SO over an exponential expansion (NP read there) | – | – |
-| **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | wide machine, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine in bounded space (deterministic & not) |
-| **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| **NEXPTIME** | ∃SO over an exponential expansion (NP read there); equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine on a clock, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
+| **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | wide machine, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
+| **RE** | ∃SO[new] (∃SO with value invention, unbounded) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 | **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Each entry of the machine column is an equivalence proved here between the
-logical definition and acceptance by that model. For NEXPTIME only half of it is
-proved: the wide machine – control in the instance, tape addressed by the subsets
-of the instance – is a member of the class (`wideAccept_mem_NEXPTIME`), but its
-hardness is not formalized. The classes are also matched against Mathlib's computability
-layer: RE is recursive enumerability, every RE-hard problem is undecidable, and
-RE ≠ co-RE.
+logical definition and acceptance by that model. The classes are also matched
+against Mathlib's computability layer: RE is recursive enumerability, every
+RE-hard problem is undecidable, and RE ≠ co-RE.
 
 The last row states completeness against a problem instead of a logic, which is
 what “GI-complete” means. It agrees with the logical definitions where both

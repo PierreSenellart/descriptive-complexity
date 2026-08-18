@@ -33,23 +33,56 @@ pattern is instantiated for every fragment the library defines: ∃SO → SAT,
 SO-alternation-level-`k` → QBF_k, SO-Horn → HORN-SAT, SO-Krom → 2SAT (the last
 two sharing their scaffolding in `ClauseDischarge.lean`), SO(TC) →
 SUCCINCT-REACH and ∃SO[new] → FINSAT, so no discharge is outstanding; what
-remains below are ordinary catalog reductions and machine bridges.
+remains below are ordinary catalog reductions, drawings out of a machine, and
+machine bridges.
 
 - **Monotone CVP** [M]: the unit-propagation circuit is monotone as drawn, so
   this is a matter of restricting the vocabulary rather than of a new gadget.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
   (Generalized Geography…), the only PSPACE entries still missing.
-- **NEXPTIME and EXPSPACE, complete problems** [XL]: both exist as logics, with
-  their complement equalities and inclusions
-  (`DescriptiveComplexity/Exponential.lean`), but neither has a complete
-  problem. The generic succinctness theorem that would supply them at one
-  stroke – the succinct version of a `C`-complete problem is `C.exp`-complete –
-  needs the outer composition of §3, whose three-piece fix is described there;
-  the quantifier-free-completeness audit inside it is where the risk sits. The
-  alternative is the route EXPTIME took: a machine written by the reduction out
-  of the class's own logic (`Exponential/GameInterp.lean`), which for NEXPTIME
-  means a nondeterministic machine over an expanded universe and for EXPSPACE an
-  alternating one with no space bound at all.
+- **Succinct problems, drawn out of the wide machine** [L each]: the classical
+  second complete problems of the exponential classes are the succinct forms of
+  polynomial ones, and the route to them is the machine, not the logic. A
+  problem carrying its own locality is *drawn* by a reduction from a wide
+  machine's run – which is how both tilings were reached
+  (`Problems/Wide/TilingHard.lean`, `Problems/Wide/CorridorHard.lean`) – whereas
+  proving it hard from the class's logic directly is a second construction of
+  the same size. The generic succinctness theorem is **not** available as a
+  route (§3), so each succinct problem is its own drawing.
+  - **Succinct GAME** [L]: `GAME` is complete for PTIME already
+    (`game_PTIME_complete`), and its succinct form is the classical
+    EXPTIME-complete game problem. Bibliography to fetch from DBLP when the item
+    is built – nothing from memory, nothing from a search snippet:
+    `veith1997formulas` (Veith, *Languages represented by Boolean formulas*,
+    IPL 1997), `gottlob1999succinctness` (Gottlob, Leone, Veith, *Succinctness
+    as a source of complexity in logical formalisms*, APAL 97, 1999) and
+    `balcazar1992succinct` (Balcázar, Lozano, Torán, *The complexity of
+    algorithmic problems on succinct instances*, 1992, a survey).
+- **EPR's hardness** [XL, low confidence]: `∃*∀*` satisfiability is
+  NEXPTIME-hard ([Lewis 1980][lewis1980complexity]). The problem, its
+  small-model property and its membership are built (`Problems/Epr/`); what is
+  left is Lewis's simulation, and it is the real cost. Three things settle its
+  shape, each paid for by the membership. **Reduce from a machine, not from a
+  tiling**: a universally quantified matrix cannot say "*some* cell carries an
+  accepting tile", an existential over exponentially many cells, while a
+  machine's acceptance pads the run to the clock and reads the *last* row, whose
+  coordinates are a fixed bit-vector, so the condition is a guarded clause.
+  **Coordinates are bit-vectors indexed by the instance**, one universal
+  variable per element per coordinate, so an emitted symbol has arity `2n+1` –
+  unbounded arity is what the encoding is for, and `sig` already carries it.
+  **The increment of a coordinate needs auxiliary relations**, defined by
+  clauses along the order of the instance: a carry chain is a disjunction of
+  conjunctions and no single clause is that, whereas "agree above `k`" and "all
+  ones below `k`" are forced upward by implications of fixed width, and upward
+  is the direction the reduction needs.
+- **Ruled out for these classes, and why** – do not re-propose: Datalog combined
+  complexity (EXPTIME) is too domain-specific for a catalog meant to read as
+  general complexity theory; regular-expression inequivalence with squaring
+  (EXPSPACE, Meyer–Stockmeyer) needs an automata-and-regex layer that does not
+  exist; Petri net coverability (Rackoff) and the commutative semigroup word
+  problem (Mayr–Meyer) are counter machines, and unbounded counters fail the
+  "numbers must be bitwise definable" rule; generalized chess, checkers and Go
+  (EXPTIME) are tiling-scale simulations with a board layer on top.
 - Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
 
@@ -69,8 +102,8 @@ remains below are ordinary catalog reductions and machine bridges.
   special case of `SecondOrderReplicate.lean` and should be folded into it –
   noticed while building the PH bridge, left alone because it touches a working
   file and bought that bridge nothing.
-- **Composing an expansion with an interpretation, the outer way** [XL, design
-  work first]: `DescriptiveComplexity.ExpExpansion.pullOrdered` composes an
+- **Composing an expansion with an interpretation, the outer way** [settled –
+  do not reopen]: `DescriptiveComplexity.ExpExpansion.pullOrdered` composes an
   interpretation *before* an expansion (`A ↦ X.Map (I.Map A)`) and is what makes
   `ComplexityClass.exp` a class. The **other** order — an interpretation applied
   to an expanded structure, `A ↦ J.MapRel (X.Map A)` — is what a complete
@@ -90,13 +123,30 @@ remains below are ordinary catalog reductions and machine bridges.
   *projection* reductions) — though quantifier-freeness alone suffices here,
   projections being a strictly stronger property this framework does not need.
   The order on the expanded universe, the translation lemma and the gate
-  `PSPACE = NL.exp` are **built**, so what remains is
-  **quantifier-free composition and quantifier-free hardness** [XL]: restrict
-  the outer composition to `IsQuantifierFree` interpretations, where it does
-  exist, and add a `HardQF` predicate *beside* `Hard` rather than a field of
-  `ComplexityClass` (a field would touch `Complexity.lean` and force a full
-  rebuild). The risk is not the definitions but re-proving one complete
-  problem per class under quantifier-free reductions — HORN-SAT first.
+  `PSPACE = NL.exp` are **built**. Restricting *hardness* to match is
+  nevertheless **abandoned**, and the reason is structural rather than
+  incidental: every hardness discharge in this library is a Tseitin-style
+  translation of a *logic* into the problem's vocabulary, so its defining
+  formulas inherit that logic's quantifiers – `hornInterp`'s `guardF` relabels
+  an arbitrary carried `L.Formula`, and no engineering removes it. So do not
+  build `compQF`, `HardQF`, or the generic succinctness theorem. The honest
+  framing: in the literature SAT is complete under first-order projections
+  because Cook–Levin is a **machine** simulation, each output bit one cell of a
+  tableau at an address computed from the position alone; this library
+  discharges from logics and is machine-free by design, which is what costs it
+  the succinctness upgrade – a coherent trade, not a defect. §2's succinct
+  problems take the machine route instead.
+- **`SigmaExpExpansion`, an expansion described by `Σₖ` sentences** [XL,
+  optional]: an expansion whose defining sentences are `Σₖ` over the base is
+  still computable within polynomial space, so `PSPACE.expΣ = EXPSPACE` and the
+  outer composition exists unconditionally *there* – succinct QSAT becomes
+  EXPSPACE-complete and the Tseitin discharge above applies, at EXPSPACE and
+  nowhere else. §2 reaches the classes without it, so build it only if the
+  succinct family is wanted for its own sake. **Never widen `ExpExpansion`
+  itself**: `PTIME.exp = EXPTIME` depends on the defining sentences being
+  first-order, a `Σₖ`-described instance not being readable in polynomial time,
+  so the relaxation is a *second* notion beside the first and not a
+  generalization of it.
 - **`LOGSPACE.exp = PSPACE`** [M–L]: `LOGSPACE.exp ⊆ PSPACE` is monotonicity,
   but the converse is not the `Exponential/Reach.lean` argument, which asks
   REACH of the graph a walk draws and so lands in NL. It wants that graph read
@@ -251,6 +301,23 @@ X"), and the two formula compilers along a definable quotient
   closes it.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
+- **`PTIME ≠ EXPTIME` by diagonalization** [R, 5–10k lines, with a real chance of
+  being larger]: the sketch, for the record. Let `HORNEVAL` be "the SO-Horn
+  program encoded in this instance holds of the structure encoded in this
+  instance". It is in EXPTIME (evaluating a Horn program of arity `a` on `n`
+  elements is `n^{O(a)}`, i.e., polynomial *on the expansion*);
+  `D A := ¬ HORNEVAL A A` is iso-invariant and in EXPTIME by
+  `EXPTIME = coEXPTIME`; if `D ∈ PTIME` it is SO-Horn definable by some `π₀`,
+  and `A := ⟨π₀⟩` contradicts. Steps 1 and 3 need **compiling the logic** – a
+  Gödel numbering of the syntax as finite structures, a definable satisfaction
+  predicate written as an SO-Horn program over the expansion with its
+  correctness theorem, and surjectivity of the encoding. Two notes for whoever
+  picks it up: that evaluator would *also* discharge the machine bridge's
+  simulator and the AC⁰ item of §3, so its cost is shared across three items;
+  and the same diagonal separates PSPACE from EXPSPACE verbatim (SO(TC) for
+  SO-Horn, `PSPACE = coPSPACE`), so one construction yields two separations.
+  Bibliography when built: `hartmanis1965computational` (Hartmanis, Stearns,
+  1965), for the classical time hierarchy this is the descriptive form of.
 
 ## 5. Inexpressibility toolkit (unconditional results)
 
@@ -510,12 +577,12 @@ count of the query's lineage.
 
 ## 7. Machine bridges beyond NP and PTIME
 
-Design analysis for extending the machine bridge past the classes it reaches
-today – to EXPTIME and EXPSPACE, and to the string-encoding layer – with the
-class-defining logic assumed to exist (§3 work). The bridges already in the
-library are documented in the `Problems/Machine.lean` and
-`Problems/MachineAlt.lean` docstrings, which is where their shape should be
-read off before building another.
+Design analysis for the one direction the machine bridge does not reach – the
+string-encoding layer – and pricing rules for any machine problem added later.
+The bridges already in the library are documented in the `Problems/Machine.lean`
+and `Problems/MachineAlt.lean` docstrings, and the exponential ones in
+`Problems/Wide.lean`; that is where their shape should be read off before
+building another.
 
 **Standing scope limit.** Textbook `NP = NTIME(nᵏ)` over string encodings
 needs the converse compilation — that an FO interpretation or a `Σ₁` kernel is
@@ -552,14 +619,7 @@ side condition on both, closing the last gap in reading completeness theorems
 as statements about concrete data. [R], and only worthwhile after the
 compilation direction above exists.
 
-**Cost of a bridge, given the logic:**
-
-| class | logic | membership | hardness | total |
-|---|---|---|---|---|
-| EXPTIME | SO(LFP) | L | XL | ~4–7k |
-| EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
-
-Four rules price such a bridge:
+Four rules price a bridge, and with it any machine problem added later:
 
 1. **Membership is cheap when the logic is a reachability/fixpoint logic, dear
    when it quantifies.** For DTC/TC/LFP/SO(TC) the machine problem is the
@@ -587,8 +647,7 @@ Four rules price such a bridge:
    converse of every existence statement: that whatever the machine does during
    a round is the intended run of *some* assignment (the read-off), that it
    always has a move, that it terminates, and that its checking phase proves
-   the matrix rather than merely being able to. Budget the same asymmetry for
-   EXPTIME and EXPSPACE.
+   the matrix rather than merely being able to.
 4. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
    (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
    `Relation.ReflTransGen`, strictly cheaper — and buys the converse half free,
@@ -613,13 +672,6 @@ The concrete items:
   never compile the logic; pick a target whose programs already exist – a fixed
   algorithm named by the source problem, or a code model like
   `Nat.Partrec.Code` where Mathlib's `exists_code` hands over the program.
-- **The exponential classes are not blocked by the framework**: the machine
-  description stays polynomial (a reduction can write it) and only the run is
-  exponential, living in Lean just as `SigmaSODefinable` quantifies over
-  exponential-size assignment types; tape cells indexed by subsets of the
-  positions, budget `2 ^ |pos|`, a legitimate iso-invariant problem. The
-  expensive pair: the exponential-order walk (feasible) and the
-  exponential-address evaluator (the real cost).
 - **Limits that survive every variant**: the string-encoding layer (above);
   oracle and `Δₖᵖ` classes — the bridge would make them definable, but by a machine,
   against the library's classes-are-logic principle (a decision, not a
@@ -762,11 +814,11 @@ provable rather than merely reasonable.
   in the README stay an honest, documented gap, being about string encodings
   (§7), which no bridge inside this framework closes. What is worth doing
   next in that area is, on demand, class-hood (§3, not [R]).
-- Complete problems for the exponential classes, and with them the generic
-  succinctness theorem. The design work is done (§3, the outer composition):
-  the order on the expanded universe, the translation lemma and the gate
-  `PSPACE = NL.exp` are built, so what is left is either the quantifier-free
-  track for succinct problems or a natural problem whose membership is direct.
+- The succinct problems of §2 and EPR's hardness. Both are drawings out of the
+  wide machine, each about the size of the tilings that are built, and neither
+  inhabits a class that is empty: the three exponential classes have complete
+  problems already. `PTIME ≠ EXPTIME` (§4) is deferred harder still, being
+  research-level and sharing its evaluator with two other items.
 
 This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §8, the cookbook and catalog

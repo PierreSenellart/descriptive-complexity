@@ -5,6 +5,10 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.Defs
 import DescriptiveComplexity.Problems.Wide.Expansion
+import DescriptiveComplexity.Problems.Wide.Tiling
+import DescriptiveComplexity.Problems.Wide.TilingExp
+import DescriptiveComplexity.Problems.Wide.TilingHard
+import DescriptiveComplexity.Problems.Wide.CorridorHard
 import DescriptiveComplexity.Problems.Wide.WellFormed
 import DescriptiveComplexity.Problems.Wide.Increment
 import DescriptiveComplexity.Problems.Wide.Blocks
@@ -14,6 +18,22 @@ import DescriptiveComplexity.Problems.Wide.Step
 import DescriptiveComplexity.Problems.Wide.Roam
 import DescriptiveComplexity.Problems.Wide.Marks
 import DescriptiveComplexity.Problems.Wide.Tape
+import DescriptiveComplexity.Problems.Wide.RegFile
+import DescriptiveComplexity.Problems.Wide.LowFile
+import DescriptiveComplexity.Problems.Wide.IxAddr
+import DescriptiveComplexity.Problems.Wide.BlkFile
+import DescriptiveComplexity.Problems.Wide.BlkLayout
+import DescriptiveComplexity.Problems.Wide.NexSpec
+import DescriptiveComplexity.Problems.Wide.NexBuild
+import DescriptiveComplexity.Problems.Wide.NexGuess
+import DescriptiveComplexity.Problems.Wide.NexEval
+import DescriptiveComplexity.Problems.Wide.NexSpine
+import DescriptiveComplexity.Problems.Wide.NexLaid
+import DescriptiveComplexity.Problems.Wide.NexDef
+import DescriptiveComplexity.Problems.Wide.NexInterp
+import DescriptiveComplexity.Problems.Wide.NexAccept
+import DescriptiveComplexity.Problems.Wide.NexData
+import DescriptiveComplexity.Problems.Wide.NexRun
 import DescriptiveComplexity.Problems.Wide.Walk
 import DescriptiveComplexity.Problems.Wide.Mirror
 import DescriptiveComplexity.Problems.Wide.Det
@@ -24,6 +44,7 @@ import DescriptiveComplexity.Problems.Wide.PfpMatrix
 import DescriptiveComplexity.Problems.Wide.PfpGeom
 import DescriptiveComplexity.Problems.Wide.PfpShape
 import DescriptiveComplexity.Problems.Wide.PfpTable
+import DescriptiveComplexity.Problems.Wide.PfpRegion
 import DescriptiveComplexity.Problems.Wide.PfpTracks
 import DescriptiveComplexity.Problems.Wide.PfpRules
 import DescriptiveComplexity.Problems.Wide.PfpPass
@@ -47,6 +68,7 @@ import DescriptiveComplexity.Problems.Wide.PfpRead
 import DescriptiveComplexity.Problems.Wide.PfpAcc
 import DescriptiveComplexity.Problems.Wide.PfpAtoms
 import DescriptiveComplexity.Problems.Wide.PfpData
+import DescriptiveComplexity.Problems.Wide.NexPack
 import DescriptiveComplexity.Problems.Wide.PfpKit
 import DescriptiveComplexity.Problems.Wide.PfpFactor
 import DescriptiveComplexity.Problems.Wide.PfpDefKit
@@ -80,7 +102,10 @@ import DescriptiveComplexity.Problems.Wide.PfpSeekKit
 import DescriptiveComplexity.Problems.Wide.PfpReset
 import DescriptiveComplexity.Problems.Wide.PfpSites
 import DescriptiveComplexity.Problems.Wide.PfpBack
+import DescriptiveComplexity.Problems.Wide.PfpBuild
 import DescriptiveComplexity.Problems.Wide.PfpOuter
+import DescriptiveComplexity.Problems.Wide.NexOuter
+import DescriptiveComplexity.Problems.Wide.NexDet
 import DescriptiveComplexity.Problems.Wide.PfpEval
 import DescriptiveComplexity.Problems.Wide.PfpVar
 import DescriptiveComplexity.Problems.Wide.PfpChain
@@ -114,6 +139,47 @@ import DescriptiveComplexity.Problems.Wide.PfpRunStage
 import DescriptiveComplexity.Problems.Wide.PfpRunIter
 import DescriptiveComplexity.Problems.Wide.PfpInstCmp
 import DescriptiveComplexity.Problems.Wide.PfpInstStage
+import DescriptiveComplexity.Problems.Wide.PfpIxStage
+import DescriptiveComplexity.Problems.Wide.PfpIxExp
+import DescriptiveComplexity.Problems.Wide.PfpIxGate
+import DescriptiveComplexity.Problems.Wide.PfpIxIGate
+import DescriptiveComplexity.Problems.Wide.PfpIxMat
+import DescriptiveComplexity.Problems.Wide.PfpIxSeq
+import DescriptiveComplexity.Problems.Wide.PfpIxRound
+import DescriptiveComplexity.Problems.Wide.PfpIxVar
+import DescriptiveComplexity.Problems.Wide.PfpIxEval
+import DescriptiveComplexity.Problems.Wide.PfpIxWidth
+import DescriptiveComplexity.Problems.Wide.PfpIxValEnum
+import DescriptiveComplexity.Problems.Wide.PfpIxBridge
+import DescriptiveComplexity.Problems.Wide.PfpIxPack
+import DescriptiveComplexity.Problems.Wide.BlkBridge
+import DescriptiveComplexity.Problems.Wide.BlkPad
+import DescriptiveComplexity.Problems.Wide.Limits
+import DescriptiveComplexity.Problems.Wide.PadRules
+import DescriptiveComplexity.Problems.Wide.RegChannelPad
+import DescriptiveComplexity.Problems.Wide.RegChannelJoin
+import DescriptiveComplexity.Problems.Wide.TrackWrites
+import DescriptiveComplexity.Problems.Wide.RegChannelBack
+import DescriptiveComplexity.Problems.Wide.RegChannel
+import DescriptiveComplexity.Problems.Wide.RegChannelTape
+import DescriptiveComplexity.Problems.Wide.RegChannelInit
+import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
+import DescriptiveComplexity.Problems.Wide.RegChannelLaid
+import DescriptiveComplexity.Problems.Wide.RegChannelEval
+import DescriptiveComplexity.Problems.Wide.RegChannelProg
+import DescriptiveComplexity.Problems.Wide.RegChannelEntry
+import DescriptiveComplexity.Problems.Wide.RegChannelEnum
+import DescriptiveComplexity.Problems.Wide.SpineSav
+import DescriptiveComplexity.Problems.Wide.RegChannelWalk
+import DescriptiveComplexity.Problems.Wide.RegChannelAccept
+import DescriptiveComplexity.Problems.Wide.RegChannelYes
+import DescriptiveComplexity.Problems.Wide.RegChannelNo
+import DescriptiveComplexity.Problems.Wide.RegChannelReduce
+import DescriptiveComplexity.Problems.Wide.PfpIxSpine
+import DescriptiveComplexity.Problems.Wide.PfpIxRoundSem
+import DescriptiveComplexity.Problems.Wide.PfpIxVerdict
+import DescriptiveComplexity.Problems.Wide.PfpIxSpineSem
+import DescriptiveComplexity.Problems.Wide.PfpIxSweepSem
 import DescriptiveComplexity.Problems.Wide.PfpInstExp
 import DescriptiveComplexity.Problems.Wide.PfpInstGate
 import DescriptiveComplexity.Problems.Wide.PfpInstIGate
@@ -241,19 +307,34 @@ interpretation can put on a tagged tuple universe is
 
 ## The two programming models
 
-Everything above is written for `DescriptiveComplexity.WideAccept`, whose clock
-counts the addresses: its programs are **one monotone sweep** and nothing more.
-The two space-bounded problems have *no* clock – acceptance is
-`Relation.ReflTransGen` of the step relation – so their programs may **roam**,
-sweeping up and back down as often as they like, and that is a strictly larger
-model with a cheaper interface.
-`DescriptiveComplexity.Problems.Wide.Roam` is that interface: a phase up
-(`DescriptiveComplexity.reaches_of_wideUp`), a phase down
-(`DescriptiveComplexity.reaches_of_wideDown`), the **scan** they are almost
-always used for (`DescriptiveComplexity.reaches_scanRight`,
-`DescriptiveComplexity.reaches_scanLeft` – hold the state, rewrite each symbol by
-itself, walk until the scanning transition is withheld), and the run shape
-`DescriptiveComplexity.acceptsSpace_of_wideRoam`. No count occurs in any of them.
+`DescriptiveComplexity.WideAccept` counts its steps against the number of
+addresses; the two space-bounded problems have *no* clock, acceptance being
+`Relation.ReflTransGen` of the step relation. Programs for either may **roam** –
+sweep up, sweep back down and start again – and the difference is only whether
+the lengths are added up.
+`DescriptiveComplexity.Problems.Wide.Roam` is that interface, and it states every
+phase **twice**: once with a budget
+(`DescriptiveComplexity.TMData.ReachesIn`, a run of at most `n` steps, which
+composes by adding and may be raised) and once without, the second being the
+first with the count forgotten. A phase up
+(`DescriptiveComplexity.reachesIn_of_wideUp`,
+`DescriptiveComplexity.reaches_of_wideUp`), a phase down
+(`DescriptiveComplexity.reachesIn_of_wideDown`), the **scan** they are almost
+always used for (`DescriptiveComplexity.reachesIn_scanRight`,
+`DescriptiveComplexity.reachesIn_scanLeft` – hold the state, rewrite each symbol
+by itself, walk until the scanning transition is withheld), and the two run
+shapes `DescriptiveComplexity.accepts_of_wideRoam` and
+`DescriptiveComplexity.acceptsSpace_of_wideRoam`. Every budget is a difference of
+`DescriptiveComplexity.wideRank`s – of the number of addresses below one address
+and below another – so consecutive phases telescope and no phase has to know where
+the next one starts.
+
+What the sum is compared against is `DescriptiveComplexity.card_wideAddr`: the
+addresses **are** the subsets of the instance, so a wide machine's clock is
+`2 ^ n` on the nose, and a reduction buys itself `2 ^ (|Tag| · nᵈ)` steps by
+choosing the tags and the dimension of its interpretation.
+`DescriptiveComplexity.accepts_of_wideRoam_lt_two_pow` is the acceptance
+statement in that form, which is the one a program's arithmetic produces.
 
 Roaming is what dissolves the difficulty the model is built around – *a head
 cannot read the digits of its own address* – without the lockstep mirror a
@@ -269,6 +350,48 @@ is an `n`-bit **register**, a register is a mirror of an address, and a roaming
 machine may walk to it and back as often as it likes. That is the register file a
 space-bounded program computes with.
 
+What a walk asks of a file is only that its cells be **strictly monotone** in the
+address order, and that none of them be the empty address:
+`DescriptiveComplexity.RegFile` is that interface, and distinctness
+(`DescriptiveComplexity.RegFile.injective`), the converse comparison
+(`DescriptiveComplexity.RegFile.lt_iff`) and the fact that nothing is a register
+between two consecutive ones (`DescriptiveComplexity.RegFile.gap`) are all
+derived from it. The interface does not care what indexes the cells:
+`DescriptiveComplexity.IxFile` is it at an arbitrary ordered index, of which
+`DescriptiveComplexity.RegFile` – one register per element – is the diagonal
+case, and the general form is what a program too tightly clocked to lay a
+register out per element will need. The input channel's ladder is one such file
+(`DescriptiveComplexity.wmSegFile`) and it is the one a space-bounded program
+uses; but it is a geometric ruler in the top half of the tape, so a program on a
+clock cannot walk it twice. `DescriptiveComplexity.Problems.Wide.LowFile` builds
+the other one: the registers are `n` **consecutive addresses**
+(`DescriptiveComplexity.segFile`), so consecutive registers are consecutive cells
+(`DescriptiveComplexity.segFile_gap`) and a pass over the file costs one step per
+element. Where the stretch sits is the caller's choice and is not a free one – the
+subroutines written for the ruler assume the file lies *above* the data, so a
+program that wants them unchanged puts its own file above its data too, while
+`DescriptiveComplexity.lowFile` takes the first `n` nonempty addresses and lies
+below everything (`DescriptiveComplexity.wideRank_lowCell_le`). The same
+construction at a *coarser* index is `DescriptiveComplexity.blkFile`, one
+register per block and tuple
+(`DescriptiveComplexity.Problems.Wide.BlkFile`): what a program too tightly
+clocked to give every element a register can afford, and all a register's
+contents ever depend on. What such a file can still do is hold an **address**,
+which is what a random access needs: `DescriptiveComplexity.ixAddr`
+(`DescriptiveComplexity.Problems.Wide.IxAddr`) is the address a mark on the
+registers stands for, and it carries the order – comparison
+(`DescriptiveComplexity.wmSetLe_ixAddr`) and increment
+(`DescriptiveComplexity.wmIncr_ixAddr`) – as soon as the elements the registers
+name are upward closed. For a clocked program's file they are, the argument tags
+being the last ones (`DescriptiveComplexity.blkIxElt_mono`,
+`DescriptiveComplexity.blkIxElt_up`), so the addresses it can hold are exactly the
+logical ones. A program with that file writes its
+own names into those cells as it walks past them – it knows which is whose by
+`DescriptiveComplexity.exists_lowCell_eq`, the registers being exactly the
+addresses of rank between `1` and `n` and a rank determining its address
+(`DescriptiveComplexity.wideRank_injective`) – and that there is room for it is
+`DescriptiveComplexity.card_lt_card_wideAddr`.
+
 Two files finish the model. `DescriptiveComplexity.Problems.Wide.Tape` observes
 that a program's tape is never a general `WPoint A → WPoint A` but a function of
 the *address* – the control points are not cells and keep their blank for ever –
@@ -279,7 +402,13 @@ and restates the step, the scans and the initial configuration in that form
 `DescriptiveComplexity.isInit_wideTape`,
 `DescriptiveComplexity.acceptsSpace_of_wideTape`), which removes the frame
 condition, the symbol equation and the control-point case from every step of
-every phase. `DescriptiveComplexity.Problems.Wide.Walk` is then the phase a
+every phase. It also has the phase a program lays anything out with – the
+**writing sweep** `DescriptiveComplexity.reachesIn_of_wideWrite`: sweep up,
+writing one symbol per cell, holding the tape
+`DescriptiveComplexity.midTape` that is rewritten below the head and untouched
+above it. The new symbols are a parameter, so the same statement is a
+deterministic layout phase and a **guessing** one: whatever the certificate, the
+run that writes it exists. `DescriptiveComplexity.Problems.Wide.Walk` is then the phase a
 space-bounded machine spends its life in: **stand on the cell of `u`, write
 there, scan right to the cell of the next element, repeat**
 (`DescriptiveComplexity.reaches_regStep`), and the traversal of the whole file
@@ -324,11 +453,13 @@ most significant digit, so the register file sits in the **upper half** of the
 tape and the addresses missing it – the **working area**, still exponentially many
 cells – lie below every register
 (`DescriptiveComplexity.wmSetLt_wmSeg_of_not_bot`). And an outer loop over that
-working area is `DescriptiveComplexity.reaches_of_wideRounds`: the same shape as a
-sweep, but with a whole *run* between an address and its increment rather than a
-single step. That is what a program's loops are written with, and what a clock
-would forbid – each round costs exponentially many steps and there are
-exponentially many rounds. Its semantic twin
+working area is `DescriptiveComplexity.reachesIn_of_wideRounds` and its erasure
+`DescriptiveComplexity.reaches_of_wideRounds`: the same shape as a sweep, but with
+a whole *run* between an address and its increment rather than a single step. That
+is what a program's loops are written with. The budgeted form charges a round `w`
+steps and the loop the product of `w` with the addresses crossed; the erased form
+charges nothing, which is what lets a space-bounded program iterate a fixed point
+through exponentially many stages and what a clock forbids. Its semantic twin
 `DescriptiveComplexity.holds_of_wideRounds` walks the same stretch at the same
 measure to say what is *true* when the machine gets there: a property of the
 addresses established at the bottom and carried across each increment holds
@@ -594,6 +725,25 @@ is the encoding layout at the budget `encDim X` (the one-hot code first, the
 payload after it) and `DescriptiveComplexity.Pfp.PfpData.ofSource` is the record,
 with `PfpData.ki_pos` for the block index.
 
+`DescriptiveComplexity.Problems.Wide.NexPack` packs the source a
+*nondeterministic* program is built from into the **same** record. That source is
+a `DescriptiveComplexity.NexKernel` – an expansion, a block of relation variables
+to guess, a first-order sentence to check of the guess – which is what
+`DescriptiveComplexity.ExpDefinable` `DescriptiveComplexity.NP` unfolds to
+(`DescriptiveComplexity.exists_nexKernel`). Put the guessed block where the
+fixed-point variables go and the kernel where the output sentence goes
+(`DescriptiveComplexity.NexKernel.toStepDef`) and there is nothing left to
+define: the tracks a symbol carries are indexed by the block either way,
+`DescriptiveComplexity.Pfp.MatAtom` classifies the atoms of a matrix over a
+**block** rather than over a fixed-point definition, so a stage atom and an atom
+of a guess are the same thing, and
+`DescriptiveComplexity.Pfp.StepDef.out_iff_gateMat` – the output evaluation of a
+fixed-point program – is already the whole evaluation of a nondeterministic one
+(`DescriptiveComplexity.Pfp.PfpData.exists_out_iff_gateMat`). The step formulas
+of a packed kernel are `⊥` and no program reads them; their only trace is that
+the derived dimensions, being maxima over the variables, are the kernel's own
+values or an unread step's vacuous demand, whichever is larger.
+
 `DescriptiveComplexity.Problems.Wide.Double` fixes the one thing the reduction
 cannot arrange after the fact. Every track of the machine is an *element* of the
 base universe, so the construction needs two of them, and a reduction has to be
@@ -705,8 +855,11 @@ instance's minimum and the junk copy of its maximum as designated elements, and
 with the expanded universe's order *chosen* to be `encOrder`, which makes the run
 layer's `hordP` an `Iff.rfl`; `wideInterpEquiv` carries that back along the
 composition; and `relExpMapEquiv` plus the source problem's own
-`iso_invariant` turn the fixed point into the source. That is
-`DescriptiveComplexity.Pfp.dwideAcceptSpace_wideInterp_iff`, and with it
+`iso_invariant` turn the fixed point into the source. The last two are the whole
+of `DescriptiveComplexity.Pfp.wideProblem_wideInterp_iff`, which never asks
+*what* the machine decides – three isomorphisms, one wide problem, one source
+problem – so `DescriptiveComplexity.Pfp.dwideAcceptSpace_wideInterp_iff` is that
+theorem with the run layer's answer supplied, and with it
 `DescriptiveComplexity.dwideAcceptSpace_EXPSPACE_complete` and
 `DescriptiveComplexity.wideAcceptSpace_EXPSPACE_complete`.
 
@@ -734,7 +887,7 @@ its six attributes at the elements it named. And determinism becomes a check on
 from the same state are the same rule.
 
 The same file carries the tape a register pass runs over,
-`DescriptiveComplexity.Pfp.Prog.trackTape`: the track slot being walked holds the
+`DescriptiveComplexity.Pfp.Prog.trackTapeAt`: the track slot being walked holds the
 digit of the track at this cell and the others hold whatever the program keeps
 there. Its coherence condition – changing the track at one element moves the tape
 only at that element's cell – is
@@ -748,8 +901,8 @@ reading these tracks, a rule of mine goes to that phase and that pointer, writes
 those tracks and moves left* – and nothing else: the symbols are computed for it,
 so it never sees `DescriptiveComplexity.regBit`, never writes a tape equation and
 never mentions `FirstOrder.Language.wide`. With four such families
-`DescriptiveComplexity.Pfp.Prog.reaches_incr` is the mirror increment, and with
-four `DescriptiveComplexity.Pfp.Prog.reaches_testG`
+`DescriptiveComplexity.Pfp.Prog.reaches_fileIncr` is the mirror increment, and with
+four `DescriptiveComplexity.Pfp.Prog.reaches_fileTestG`
 (`DescriptiveComplexity.Problems.Wide.PfpSub`) asks one question of every
 register – a question the *tracks* decide – and brings the verdict back in the
 phase. One track slot carries *this cell is a register*, which is both what
@@ -760,12 +913,12 @@ equations.
 
 The increment comes in two forms, and the difference is the one thing the
 anonymity of the registers costs.
-`DescriptiveComplexity.Pfp.Prog.reaches_incrAt` stops in the phase of the **block**
+`DescriptiveComplexity.Pfp.Prog.reaches_fileIncrBlk` stops in the phase of the **block**
 that carried – which is what the fold of `DescriptiveComplexity.Problems.Wide.Fold`
 has to know, and which the machine learns not by naming the register (it cannot: a
 state's payload holds elements of the source structure) but by reading the block
 off that cell's *mark*, one stopping rule per block.
-`DescriptiveComplexity.Pfp.Prog.reaches_incr` is the single-block case, the register
+`DescriptiveComplexity.Pfp.Prog.reaches_fileIncr` is the single-block case, the register
 mark serving as its own indicator, and is the form every use that only has to
 *move* an address takes.
 
@@ -776,7 +929,7 @@ untouched, so a step and a register pass compose without either knowing what the
 other keeps on the tape.
 
 Navigation is there too, and it is two theorems rather than four:
-`DescriptiveComplexity.Pfp.Prog.reaches_toMark` and its downward twin get the head
+`DescriptiveComplexity.Pfp.Prog.reaches_fileToMark` and its downward twin get the head
 to a register the caller has *marked* – the two ends of the file, which are the
 only cells that have to be recognized on sight – taking the target as a parameter
 rather than naming it; and `DescriptiveComplexity.Pfp.Prog.reaches_seek` and
@@ -841,10 +994,10 @@ navigation-by-name scans at exactly one cell.
 `DescriptiveComplexity.Problems.Wide.PfpSub` holds two corrections the
 interface needed once its discharge was attempted: a single-cell write is a
 navigation plus **one step**
-(`DescriptiveComplexity.Pfp.Prog.step_writeReg`), not a pass – a pass's rules
+(`DescriptiveComplexity.Pfp.Prog.step_writeCell`), not a pass – a pass's rules
 compute their written symbol from the tracks they read, which say nothing
 about an independently quantified cell – and a file test must be decided by
-the tracks (`DescriptiveComplexity.Pfp.Prog.reaches_testG`, the question a
+the tracks (`DescriptiveComplexity.Pfp.Prog.reaches_fileTestG`, the question a
 predicate of the symbol, tied to the per-cell question by one compatibility
 hypothesis). And `DescriptiveComplexity.Problems.Wide.PfpInit` joins the two
 ends of a run to the pass-layer presentation: the initial tape *is* the
@@ -858,7 +1011,7 @@ plus the separation argument into a yes-instance of
 `DescriptiveComplexity.DWideAcceptSpace`.
 
 `DescriptiveComplexity.Problems.Wide.PfpAdv` is the first composite, and the
-round every sweep repeats: `DescriptiveComplexity.Pfp.Prog.reaches_advance`
+round every sweep repeats: `DescriptiveComplexity.Pfp.Prog.reaches_fileAdvance`
 moves the working-cell marker one address with the mirror in tow – two marker
 steps, the scan to the file top, the **bounce** turnaround (the scan cannot
 overshoot the maximal cell, so entering the downward pass costs two steps
@@ -882,12 +1035,12 @@ a permanent end marker planted at the top of the logical interval once, at
 startup, a cell of the working area being otherwise unrecognizable. And
 `DescriptiveComplexity.Problems.Wide.PfpTrip` factors the itinerary of every
 visit to the register file – scan up, bounce, one pass down, scan back to the
-marker – into `DescriptiveComplexity.Pfp.Prog.reaches_roundTrip`, the middle
+marker – into `DescriptiveComplexity.Pfp.Prog.reaches_fileRoundTrip`, the middle
 pass a hypothesis: the seek loop, the test rounds of a random access and the
 gate checks are all this composite around their respective passes.
 
 On top of them, `DescriptiveComplexity.Problems.Wide.PfpSeek` is **random
-access**: `DescriptiveComplexity.Pfp.Prog.reaches_seekTo` carries the
+access**: `DescriptiveComplexity.Pfp.Prog.reaches_fileSeekTo` carries the
 working-cell marker from the empty address to any target strictly below the
 register file – rounds of a turnaround step, a round trip around the file test
 *mirror = target*, and an ADVANCE, driven by
@@ -936,11 +1089,11 @@ seventeen rule families). Their disjoint guards forced three further
 hardenings of the pass layer, each making a demanded rule and a supplyable
 guard coincide: the return scans of the verdict phases are cell-coupled
 (`DescriptiveComplexity.Pfp.Prog.reaches_toCellBackC`, threaded through
-`DescriptiveComplexity.Pfp.Prog.reaches_roundTrip`), the block-indexed
+`DescriptiveComplexity.Pfp.Prog.reaches_fileRoundTrip`), the block-indexed
 increment's stopping rule takes a one-hot clause
-(`DescriptiveComplexity.Pfp.Prog.reaches_incrAt`), and the seek's turnaround
+(`DescriptiveComplexity.Pfp.Prog.reaches_fileIncrBlk`), and the seek's turnaround
 and walking hypotheses are stated at exactly the guards' slot conditions
-(`DescriptiveComplexity.Pfp.Prog.reaches_seekTo`). The program itself is then
+(`DescriptiveComplexity.Pfp.Prog.reaches_fileSeekTo`). The program itself is then
 **assembled from call sites** (`DescriptiveComplexity.Problems.Wide.PfpAsm`):
 `DescriptiveComplexity.Pfp.Assembly` packages per-site rule shapes with an
 ownership map from phases to sites, `DescriptiveComplexity.Pfp.Assembly.prog`
@@ -968,7 +1121,7 @@ kinds), so every site file takes one record and nothing else. The kit
 seek, the advance, the block-indexed VAL increment, the clears and copies of
 the registers, the pattern write of startup
 (`DescriptiveComplexity.Pfp.MapKit`, wrapping the generalizing composite
-`DescriptiveComplexity.Pfp.Prog.reaches_mapTrack`), the VAL-exhausted file
+`DescriptiveComplexity.Pfp.Prog.reaches_fileMapTrack`), the VAL-exhausted file
 test, and the navigation-by-name read/write trips with their
 `DescriptiveComplexity.Pfp.PfpData.nameG` guard. The one itinerary running
 *down* the working area – resetting the marker to the bottom before a random
@@ -983,9 +1136,41 @@ state – registers per element, stage tracks and markers per cell – and
 family the pass layer walks, with the slot equations every kit discharge
 takes proved once over it – including the one that says what a symbol does
 *not* depend on: the four register slots read
-`DescriptiveComplexity.regBit`, set at a register cell alone, so off the
+`DescriptiveComplexity.bitAtOf`, set at a register cell alone, so off the
 register file the background is blind to the mirror, the target, the saved
-mirror and VAL alike (`DescriptiveComplexity.Pfp.PfpData.back_congr_off_reg`). That blindness is
+mirror and VAL alike (`DescriptiveComplexity.Pfp.PfpData.back_congr_off_reg`).
+Which cells those are is the caller's: `back` reads the permanent marks at
+whatever family of cells it is given, so a program that *builds* its own file
+runs the same background at it. That phase is
+`DescriptiveComplexity.Pfp.Prog.reachesIn_buildFile`
+(`DescriptiveComplexity.Problems.Wide.PfpBuild`): a sweep of the file's stretch
+that turns the blank background into `back`, the mark of each cell written from
+the **pointer**, which holds the element and moves along by the order successor
+(`DescriptiveComplexity.Pfp.Prog.reachesIn_installSweep`). The sweep is the
+stretch and no more, because off the file the background to install is already
+the blank (`DescriptiveComplexity.Pfp.PfpData.back_of_not_reg`). The same file
+holds the other opening phase, `DescriptiveComplexity.Pfp.Prog.reachesIn_guessTracks`:
+the same sweep with the background on both sides, the stage tracks the only
+thing that changes (`DescriptiveComplexity.Pfp.PfpData.back_old_congr`) and the
+assignment a *parameter* – which is what makes it a guess, the run existing for
+every certificate. What those two phases sit inside is
+`DescriptiveComplexity.Pfp.NexPh`
+(`DescriptiveComplexity.Problems.Wide.NexOuter`), the clocked program's outer
+layer: the file-laying sweep, a walk home, the guess, a walk home, the
+evaluation, and the accepting phase, with the evaluation's rules and the two
+sweeps' writes as parameters. It does not separate in-shape at the guess and must
+not – that is the program's whole nondeterminism – so what it proves instead is
+`DescriptiveComplexity.Pfp.PfpData.nexSep_postGuess`, separation at the phases no
+rule returns to the guess from
+(`DescriptiveComplexity.Pfp.PfpData.postGuess_nexRule`). What turns that into
+determinism where it is used is
+`DescriptiveComplexity.Pfp.Table.uniqueFrom_of_sepOn`
+(`DescriptiveComplexity.Problems.Wide.NexDet`), by way of
+`DescriptiveComplexity.Pfp.Table.SepOn` and
+`DescriptiveComplexity.TMData.uniqueFrom_of_invariant`: the machine is unique
+from any configuration whose phase the program separates at, which is all the
+read-off lemmas of `DescriptiveComplexity.Problems.Machine.DetRun` ask for. That
+blindness is
 what separates the machine's *threaded* states from the *unthreaded* ones
 the semantics is stated at: a VAL round rewrites SAV and
 TARGET and nothing else
@@ -1187,7 +1372,7 @@ The **outer program is assembled**
 outer loop – startup, the sweep's advance, the convergence test, the
 copy-back, the output dispatch – around a per-address **evaluation** that
 stays abstract (its phase type, site family and boundary rules are
-parameters, the same move `Prog.reaches_roundTrip` makes for the middle of a
+parameters, the same move `Prog.reaches_fileRoundTrip` makes for the middle of a
 trip). `DescriptiveComplexity.Pfp.OuterPh`/`OuterSite`/`OuterSh` are the
 phases, sites and rule shapes; `DescriptiveComplexity.Pfp.PfpData.outerRule`
 the rules (each site its kit's rules plus its exit rules, a sweep's first
@@ -1334,7 +1519,7 @@ per-address evaluation between two rounds. Its first brick is in
 `DescriptiveComplexity.Problems.Wide.PfpBack`: the permanent marks read back
 at a register cell (the existential collapses by injectivity of
 `DescriptiveComplexity.wmSeg`), and with them the **navigation by name** –
-`DescriptiveComplexity.Pfp.PfpData.nameG_wmSeg` says what the guard sees,
+`DescriptiveComplexity.Pfp.PfpData.nameG_cell` says what the guard sees,
 `nameG_unique` that it stops at one cell, `not_nameG_of_not_reg` that it
 never stops in the working area. The other half of that instantiation is the
 control's **dictionary**, `DescriptiveComplexity.Problems.Wide.PfpCtl`:
@@ -1471,12 +1656,113 @@ matrix through is now stated at an **arbitrary block**
 the replicated block of a defining sentence and the plain block of a domain
 sentence.
 
-**Not proved**: hardness. Completeness for these two classes needs the machine
-written in logic, as `DescriptiveComplexity.ATMAcceptSpace` needed for EXPTIME:
-a reduction cannot be routed through the outer composition of an interpretation
-with an expansion, which does not exist in general. The plan – for EXPSPACE, a
-roaming program with the register file above that
-iterates a partial fixed point over the expansion until it stabilizes; for
-NEXPTIME, the harder one-pass sweep that folds a fixed prenex kernel with the
-valuation as its head position.
+## What a clocked program is bound by
+
+The EXPSPACE program above roams; the NEXPTIME one
+(`DescriptiveComplexity.wideRegAccept_NEXPTIME_complete`) runs against a clock,
+its file handed to it by a register channel, and the clock is what its design
+answers to. What follows is what that cost, i.e. the questions a construction
+that moves the file, the atom or the index has to answer again. They are
+constraints on the *design* rather than on the proof: each rules out the
+arrangement that would otherwise be the obvious one.
+
+**Time is bought with tags, so an exponentially long program is affordable.**
+The drawn universe is `Tag × Aᵈ`, so the clock is `2 ^ (|Tag| · nᵈ)` and `|Tag|`
+is the reduction's to choose: any `2 ^ (O(nᵈ))`-step program fits, and one extra
+tag multiplies the budget by `2 ^ (nᵈ)`. What the clock rules out is the
+*iteration* – a partial fixed point may run through `2 ^ (2 ^ …)` stages, and no
+choice of tags pays for that – and **not** the round trip. The EXPSPACE
+program's shape survives it: rounds, sweeps up and back, a mirror, a seek per
+atom, with the inner evaluation run **once** over the working region costing
+`2 ^ (2k · nᵈ)`, which fits at `|Tag| = 2k + 2`.
+
+**A wide machine cannot name its own elements, so it cannot lay a register
+file.** A state's payload holds one element per control flag *and* one per slot
+inside a `dd`-tuple, so the control takes `|A| ^ #flags` values with
+`#flags < dd`, while the universe has `|Tag| · |A| ^ dd` elements
+(`card_ctl_lt_card_univ`, `not_injective_ctl_name`). A file that records
+addresses faithfully needs one register per element and names that separate
+them, and a sweep can only write a name it holds in its control; widening the
+dimension moves both sides together. **A program's file therefore comes from the
+input channel or not at all**, which is why the clocked machine is handed one
+(`DescriptiveComplexity.Problems.Wide.RegChannel`) and lays none.
+
+**The mark ladder is a space-only device, at every scale.** `wmSeg x` is the
+address `{y | y ≤ x}`, and `DescriptiveComplexity.WMSetLe` reads the `wmLe`-least
+element as the most significant digit, so the mark of the `j`-th element sits at
+address `2 ^ m − 2 ^ (m − j − 1)`, with `m` the size of the drawn universe: the
+file is a geometric ruler lying entirely in the **top half** of the tape, at
+1/2, 3/4, 7/8 … Reaching the stretch carrying its top `t` marks costs
+`2 ^ m − 2 ^ (t − 1)` steps out of a budget below `2 ^ m`, which leaves less than
+one traversal of that stretch, and adding tags scales both sides, so the reading
+is scale invariant. **A clocked run may walk such a file once, and there is no
+second time**; that, and not roaming, is what fails to transfer from the
+space-bounded programs.
+
+**A working region at the *bottom* of the tape is free.** Put the surplus tags in
+the most significant blocks: the addresses whose high blocks are empty are an
+initial stretch of `2 ^ (k · nᵈ)` cells, where the head already stands, while the
+clock stays `2 ^ ((k + j) · nᵈ)`. A seek across the region costs the region, so
+one seek per round is affordable, and so is a full sweep of the region per round.
+
+**A clocked program has exactly one landmark, and it is where its head starts.**
+A rule sees the control and the cell under the head and nothing else, so no rule
+can tell the head its address: what a program can locate is the address it starts
+on, the ones a fixed number of **tuple roll-overs** away from it (the control
+counts a tuple with `tupNext` and knows it is exhausted by `IsMaxTup`), and the
+ones it has itself marked. Positively, **a stretch a clocked program can walk is
+one whose length is a fixed number of tuple roll-overs** – the evaluation's own
+walks, the working region and the certificate guess all are. A file indexed by
+*universe elements* is not, so the file is indexed by `(block, tuple)` pairs
+(`DescriptiveComplexity.Wide.BlkIx`, `Option K × (Fin dd → A)`) and the laying
+sweep is `|K| + 1` runs. That is also exactly what a background reads at a
+register: the block one-hot goes through `tagBlk` alone and the name slots are
+the tuple, so nothing of the tag beyond its block is ever used.
+
+**A block-indexed file can still carry a seek**, and which addresses a seek
+passes through is why. The tag order puts `ctrl` and `sym` in the most
+significant blocks and the `arg` blocks in the least, so the **logical**
+addresses – those whose non-argument blocks are empty – are an initial interval
+(`wmSetLe_logicalTop`, `nonArg_downward`), and every address a seek to a logical
+target passes through is logical; a file with a register per `(block, tuple)`
+therefore carries every bit such a seek reads or writes. The same fact makes the
+working region an initial stretch and gives it its size
+(`wideRank_lt_two_pow_logical`). The index sits at the **full** width `dd` and
+not at `dd₀`: a file at `dd₀` would name exactly the canonically padded elements,
+enough for a copy loop that walks by name but not for a mirror, whose
+intermediate logical addresses mark argument elements of every tuple.
+
+**The file goes above the data, and the approach is what it costs.** A stage atom
+seeks to a dictionary entry, an entry is a logical address, and what the atom is
+given is that every logical address lies below every register – so the file has
+to be laid *above* the whole logical region, which is not where a machine with
+one landmark would naturally put it. The program pays for that in its opening:
+the opening step plants the marker and moves right into an **approach walk**
+(`NexPh.approachP`), which writes nothing and stops wherever the program likes –
+one more nondeterministic choice, like the guess's stop, and for the same reason,
+nothing on the tape telling the head where it is. The base is where it stops, the
+file is laid from there, and the guess then sweeps the data region *below* the
+file, entered from the marker's own neighbour (`reachesIn_openingRegion`,
+`openingRegion_le_two_pow`). The arrangement a reader thinks of first – leave the
+file at the bottom and teach the atom to seek upward past it – moves the cost
+from the opening, which runs once, into the seek, which every atom runs.
+
+**Every fixed-point variable must have an argument**, and the reduction pads the
+one that does not: a nullary variable's dictionary entry is the *empty* address,
+the marker's own cell, below every stretch the machine writes and the one address
+an encoding can never be. The guess's range, the atom's target and the track's
+own shape all come down to that, and `0 < d.B.arity` discharges the three at once
+(`NexKernel.withArg` is the padding, and padding a `Σ₁` relation with a dummy
+argument costs nothing).
+
+**How a guessed relation's atoms are served.**
+`DescriptiveComplexity.Problems.Wide.Blocks` serves an atom on the *leading*
+blocks with one state bit, addresses sharing a prefix of blocks being a
+contiguous stretch; an occurrence on any other tuple is a union of stretches, and
+one bit no longer keeps it consistent. The answer taken is a **seek per
+occurrence per address** – what the EXPSPACE program already does for its stage
+store – rather than a normal form putting every occurrence on a prefix
+(unproved) or one guessed copy per occurrence checked against the others (the
+same problem again). That is why the clocked program keeps the EXPSPACE atom
+machinery instead of asking the control to hold the valuation.
 -/
