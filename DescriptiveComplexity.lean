@@ -1886,6 +1886,9 @@ reduction and certificate in full.
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` – at `k = 1`, coNP · `ATMAccept k false` |
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
+| `EXPTIME` | SO(LFP): PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating Turing machine, its tape indexed by the input's positions and no bound on the length of a play | acceptance by such a machine (`APSPACE = EXPTIME`) |
+| `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine on a clock, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
+| `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
@@ -1895,7 +1898,10 @@ between the logical definition of the class and acceptance by that model:
 `DescriptiveComplexity.mem_NL_iff_automaton` (†), and, through the completeness
 of an acceptance problem, `DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`,
 `DescriptiveComplexity.mem_NP_iff_le_ntmAccept`,
-`DescriptiveComplexity.le_dtmAcceptSpace_of_mem_PSPACE` and
+`DescriptiveComplexity.le_dtmAcceptSpace_of_mem_PSPACE`,
+`DescriptiveComplexity.atmAcceptSpace_EXPTIME_complete`,
+`DescriptiveComplexity.wideRegAccept_NEXPTIME_complete`,
+`DescriptiveComplexity.wideAcceptSpace_EXPSPACE_complete` and
 `DescriptiveComplexity.mem_RE_iff_rePred`. A dash marks a class for which no
 such equivalence is proved here.
 

@@ -3,18 +3,18 @@
 Catalog of work **not yet done**, and of nothing else: an item is deleted when
 it is built, never annotated as finished, the record of what the library
 contains being `git log` together with the module docstrings. Organized by
-theme; each item carries a
-rough scale of effort ([S] short, [M] medium, [L] long, [R] research-level,
-i.e., the Lean proof would itself be a contribution) and its prerequisites.
-Main source: Immerman, "Descriptive Complexity" (DC below); also Garey–Johnson
+theme; each item carries a rough scale of effort ([S] short, [M] medium, [L]
+long, [R] research-level, i.e., the Lean proof would itself be a contribution)
+and its prerequisites.
+Main source: Immerman, *Descriptive Complexity* (DC below); also Garey–Johnson
 and Karp's 21 problems for the catalog.
 
 ## 1. NP-complete problems (catalog growth)
 
 Beyond Karp's 21:
 
-- **X3C** [M–L]: exact cover by 3-sets, from 3-Dimensional Matching (now hard)
-  or from Exact Cover; local gadgets, probably ordered.
+- **X3C** [M–L]: exact cover by 3-sets, from 3-Dimensional Matching or from
+  Exact Cover; local gadgets, probably ordered.
 - **3-Partition** [L]: strongly NP-complete, so the unary representation
   suffices and the hardness claim is honest; the classical source for
   packing/scheduling reductions. Warning: the 3DM → 3-Partition reduction is
@@ -63,8 +63,8 @@ machine bridges.
   small-model property and its membership are built (`Problems/Epr/`); what is
   left is Lewis's simulation, and it is the real cost. Three things settle its
   shape, each paid for by the membership. **Reduce from a machine, not from a
-  tiling**: a universally quantified matrix cannot say "*some* cell carries an
-  accepting tile", an existential over exponentially many cells, while a
+  tiling**: a universally quantified matrix cannot say “*some* cell carries an
+  accepting tile”, an existential over exponentially many cells, while a
   machine's acceptance pads the run to the clock and reads the *last* row, whose
   coordinates are a fixed bit-vector, so the condition is a guarded clause.
   **Coordinates are bit-vectors indexed by the instance**, one universal
@@ -72,8 +72,8 @@ machine bridges.
   unbounded arity is what the encoding is for, and `sig` already carries it.
   **The increment of a coordinate needs auxiliary relations**, defined by
   clauses along the order of the instance: a carry chain is a disjunction of
-  conjunctions and no single clause is that, whereas "agree above `k`" and "all
-  ones below `k`" are forced upward by implications of fixed width, and upward
+  conjunctions and no single clause is that, whereas “agree above `k`” and “all
+  ones below `k`” are forced upward by implications of fixed width, and upward
   is the direction the reduction needs.
 - **Ruled out for these classes, and why** – do not re-propose: Datalog combined
   complexity (EXPTIME) is too domain-specific for a catalog meant to read as
@@ -81,7 +81,7 @@ machine bridges.
   (EXPSPACE, Meyer–Stockmeyer) needs an automata-and-regex layer that does not
   exist; Petri net coverability (Rackoff) and the commutative semigroup word
   problem (Mayr–Meyer) are counter machines, and unbounded counters fail the
-  "numbers must be bitwise definable" rule; generalized chess, checkers and Go
+  “numbers must be bitwise definable” rule; generalized chess, checkers and Go
   (EXPTIME) are tiling-scale simulations with a board layer on top.
 - Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
@@ -182,8 +182,8 @@ machine bridges.
       an appendix precisely because she knows of no complete published one), but
       it also wants a semantic layer for `2d`-digit vectors – values with no
       `orank` meaning – that the library does not have. Before transcribing,
-      check whether `FO(+, Squares) = FO(+, ×)` (Thm. 3.2(f), "not so
-      difficult") lets `arithExtend` define only tuple *squaring*, the product
+      check whether `FO(+, Squares) = FO(+, ×)` (Thm. 3.2(f), “not so
+      difficult”) lets `arithExtend` define only tuple *squaring*, the product
       following by polarization: half a day, large payoff, if it survives
       truncated arithmetic on tuples.
     - *Bit side*, **preferred**: prove closure for `LTDecidable` at the machine
@@ -195,13 +195,13 @@ machine bridges.
       guessed) while the interpretation's `FO(≤)` queries are evaluated on the
       component side through `Translate.lean`. All that is new is **`Conv`**,
       the agreement of the two representations, which by Horner is `d` rounds of
-      "accumulator times `n` plus a digit" – the exact shape of `Times.lean`'s
-      column sum at `d`-fold width, certificates widening from one element to a
-      constant family. Preferred because every hard piece re-instantiates an
-      in-house device whose estimate-vs-actual is calibrated, because it
-      consumes the machine model just built, and because its `d`-chunk element
-      families are the "big number as a family of elements" layer FO(COUNT) /
-      TC⁰ would want anyway.
+      “accumulator times `n` plus a digit” – the exact shape of
+      `BitSum/Times.lean`'s column sum at `d`-fold width, certificates widening
+      from one element to a constant family. Preferred because every hard piece
+      re-instantiates an in-house device whose estimate-vs-actual is calibrated,
+      because it consumes the machine model just built, and because its
+      `d`-chunk element families are the “big number as a family of elements”
+      layer FO(COUNT) / TC⁰ would want anyway.
 
     Two unknowns to burn down first, half a day each: fields tiled across a
     *family* of elements, the one variation of the packing devices never
@@ -213,8 +213,8 @@ machine bridges.
     `LogTime/Small.lean`'s `ArithDef.of_large` already covers the degenerate
     sizes the splitting excludes. The one place this could be *unsound* rather
     than merely incomplete is `arithExtendLEquiv`, the proof that the formulas
-    realize the **canonical** arithmetic of that order: "the formula obviously
-    says addition" is not an argument, and `ordExtendLEquiv` is the template.
+    realize the **canonical** arithmetic of that order: “the formula obviously
+    says addition” is not an argument, and `ordExtendLEquiv` is the template.
     Note what class-hood does *not* gate: a problem reducing to an AC⁰ problem
     is already in PTIME – indeed in LOGSPACE, by that class's own closure – so
     build it for a consumer and not before. Until then AC⁰ gets **no row** in
@@ -224,8 +224,8 @@ machine bridges.
   for almost all completeness results); SAT complete under first-order
   projections.
 - **Reduction-notion refinements** [M]: track quantifier-free / projection /
-  dimension-1 status through composition (currently only `IsQuantifierFree`
-  exists); "problem X is complete under qfps" is the DC-faithful statement.
+  dimension-1 status through composition (`IsQuantifierFree` is the only status
+  tracked); “problem X is complete under qfps” is the DC-faithful statement.
 - **FO(COUNT) / counting quantifiers** [L]: with BIT, captures uniform TC⁰;
   relevant to the arithmetic boundary of the binary representation
   (multiplication is TC⁰, not FO). Its inclusion in LOGSPACE would follow the
@@ -289,8 +289,8 @@ Three pieces built for Abiteboul–Vianu are the ones to reach for in any captur
 attempted here: the order-relativization transfer
 (`FixedPointOrderTransfer.lean`, for every statement that moves an order
 between instance and vocabulary), stratification of inflationary inductions
-(`FixedPointStratify.lean`, for any "define X by induction, then induct over
-X"), and the two formula compilers along a definable quotient
+(`FixedPointStratify.lean`, for any “define X by induction, then induct over
+X”), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
@@ -302,9 +302,9 @@ X"), and the two formula compilers along a definable quotient
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
 - **`PTIME ≠ EXPTIME` by diagonalization** [R, 5–10k lines, with a real chance of
-  being larger]: the sketch, for the record. Let `HORNEVAL` be "the SO-Horn
+  being larger]: the sketch, for the record. Let `HORNEVAL` be “the SO-Horn
   program encoded in this instance holds of the structure encoded in this
-  instance". It is in EXPTIME (evaluating a Horn program of arity `a` on `n`
+  instance”. It is in EXPTIME (evaluating a Horn program of arity `a` on `n`
   elements is `n^{O(a)}`, i.e., polynomial *on the expansion*);
   `D A := ¬ HORNEVAL A A` is iso-invariant and in EXPTIME by
   `EXPTIME = coEXPTIME`; if `D ∈ PTIME` it is SO-Horn definable by some `π₀`,
@@ -378,8 +378,8 @@ has a two-layer syntax: the Boolean layer is an ordinary SO formula evaluating
 to 1 or 0 (Mathlib's `BoundedFormula` untouched), the quantitative layer is
 built from `+`, `·` and the quantifiers `Σx`, `Πx`, `ΣX`, `ΠX` (`Σx` sums a
 subformula's value over domain elements, `ΣX` over all relations of the
-relevant arity). That is exactly "kernel as data rather than a shape carved out
-of `BoundedFormula`", the way SO-Horn is a `HornProgram` clause list and
+relevant arity). That is exactly “kernel as data rather than a shape carved out
+of `BoundedFormula`”, the way SO-Horn is a `HornProgram` clause list and
 FO(LFP) a rule system. Formulas transcribe the mathematics directly; the
 permanent of a 0-1 matrix is
 
@@ -449,7 +449,8 @@ The concrete items, in dependency order:
     interpolation-based `#P`-hardness proof. *Adaptive* Turing reductions,
     where a later query depends on an earlier answer, stay out: that is the
     honest boundary of a machine-free framework, and `FP^#P` lives beyond it.
-- **The coefficient budget** [S, but load-bearing]: coefficients must come from
+- **The coefficient budget** [S, but the notion is vacuous without it]:
+  coefficients must come from
   a class *strictly weaker* than the one being defined, exactly as the
   classical definition asks its post-processing to be polynomial-time.
   Otherwise the notion is vacuous: with arbitrary `#P` coefficients, take `Q`
@@ -511,10 +512,10 @@ The concrete items, in dependency order:
   delicate than parsimonious ones, which is also why PCP-based hardness of
   approximation stays out of scope.
 
-### Probabilistic query evaluation, and what "`#P`-hard" should mean
+### Probabilistic query evaluation, and what “`#P`-hard” should mean
 
 The intended consumer of this track is probability computation, where the
-field's own "`#P`-hard" is an abuse: computing a probability is a map into ℚ,
+field's own “`#P`-hard” is an abuse: computing a probability is a map into ℚ,
 so the honest classical statement is `FP^#P`-completeness under Turing
 reductions, which the ladder above deliberately does not reach. The abuse is an
 artifact of the *output type*, and it disappears by counting worlds instead:
@@ -537,17 +538,17 @@ unweighted setting at a `k`-fold blow-up, if ever needed.
 - **Membership** [S]: `ΣX̄. φ_Q(X̄)` is #FO, and for a UCQ it lands at the very
   bottom, `#Σ₁` / `ΣQSO(Σ₁)`. Worth noting that the FPRAS story of that level –
   approximable, not closed under sum – *is* the probabilistic-database
-  approximability story (Karp–Luby on the lineage DNF), so "structure inside
-  `#P`" above is not an unrelated research item but this application's own
+  approximability story (Karp–Luby on the lineage DNF), so “structure inside
+  `#P`” above is not an unrelated research item but this application's own
   fine print.
 - **Tier 1, an FO query with negation** [S]: put the assignment in a
   probabilistic unary relation, the clauses in deterministic ones, and let `Q`
-  say "this assignment satisfies the formula"; worlds satisfying `Q` are the
-  satisfying assignments, on the nose. The reduction from #SAT is a dimension-1
+  say “this assignment satisfies the formula”; worlds satisfying `Q` are the
+  satisfying assignments, exactly. The reduction from #SAT is a dimension-1
   interpretation re-reading a SAT instance as a PQE instance, parsimonious
   because the correspondence is a bijection. Nearly free once #SAT is complete
-  for ΣQSO(FO), and enough to state "probabilistic query evaluation is
-  `#P`-complete" with no abuse at all. It says nothing about the queries the
+  for ΣQSO(FO), and enough to state “probabilistic query evaluation is
+  `#P`-complete” with no abuse at all. It says nothing about the queries the
   field cares about.
 - **Tier 2, a UCQ** [L, gated on a literature check]: for
   `h₀ = ∃x∃y. R(x) ∧ S(x,y) ∧ T(y)` with `R`, `T` probabilistic, `#PQE(h₀)`
@@ -612,9 +613,9 @@ A further application of the same machinery, once step-counted machines can
 run over string encodings: bounding the *encoders and decoders* of the
 concrete-instance layer. The `Encoding`/`Decoding` bundles enforce that
 `relBool` and `dec` are computations, but not that they are cheap (a decoder
-may brute-force the answer; see the "what this does not buy" notes in
+may brute-force the answer; see the “what this does not buy” notes in
 `DescriptiveComplexity/Encoding.lean` and `DescriptiveComplexity/Decoding.lean`).
-With the bridge, "computed by a polynomial-time machine" becomes a statable
+With the bridge, “computed by a polynomial-time machine” becomes a statable
 side condition on both, closing the last gap in reading completeness theorems
 as statements about concrete data. [R], and only worthwhile after the
 compilation direction above exists.
@@ -629,7 +630,7 @@ Four rules price a bridge, and with it any machine problem added later:
    an `SOTCSpec`-style interface wants *sentences*, not formulas with
    parameters, and that gap is what a naive estimate misses.
 2. **Hardness is cheap when the class has a one-loop complete problem** (REACH
-   "guess a neighbor", HORN-SAT "propagate", SAT "guess then sweep").
+   “guess a neighbor”, HORN-SAT “propagate”, SAT “guess then sweep”).
    Otherwise the discharge must compile arbitrary formulas of the logic into a
    machine – the **evaluator** (static quantifier nesting → nested loops), in
    three variants of increasing cost: *state-registers* (loop counters as
@@ -651,9 +652,9 @@ Four rules price a bridge, and with it any machine problem added later:
 4. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
    (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
    `Relation.ReflTransGen`, strictly cheaper – and buys the converse half free,
-   since a deterministic machine's reachable configurations are linearly
-   ordered (`Problems/Machine/DetRun.lean`), so one run ending stuck and
-   non-accepting settles a no-instance with no second induction; exponential (EXPTIME) needs a
+   since a deterministic machine's reachable configurations are linearly ordered
+   (`Problems/Machine/DetRun.lean`), so one run ending stuck and non-accepting
+   settles a no-instance with no second induction; exponential (EXPTIME) needs a
    walk along the lexicographic order of subsets, whose successor is
    FO-definable by ripple-carry (`Numbers/Binary.lean`,
    `Problems/Knapsack/Chain.lean` supply most of it).
@@ -675,7 +676,7 @@ The concrete items:
 - **Limits that survive every variant**: the string-encoding layer (above);
   oracle and `Δₖᵖ` classes – the bridge would make them definable, but by a machine,
   against the library's classes-are-logic principle (a decision, not a
-  drift); `#P` as "number of accepting runs" is easy to state but needs the
+  drift); `#P` as “number of accepting runs” is easy to state but needs the
   parsimonious-reduction notion the framework still lacks (§6, first item);
   the classes-are-logic principle points at `ΣQSO(FO)` for the definition
   either way, with the machine count as a bridge statement.
@@ -703,8 +704,8 @@ class.
   (`relMap_equiv₁/₂`). An *ordered* reduction destroys that: order-invariance
   makes the yes/no answer order-independent, not the constructed structure
   independent up to isomorphism, so every gadget would owe a structure-level
-  argument. Order-free is available because `twoGraphs` carries its own "this
-  element is real" marks: run `F` relativized to `patV` and to `hostV` in
+  argument. Order-free is available because `twoGraphs` carries its own “this
+  element is real” marks: run `F` relativized to `patV` and to `hostV` in
   parallel inside one order-free interpretation, leaving junk unmarked. Side
   benefit – both sides are built by the same gadget out of the same universe,
   so they come out size-balanced and the padding step most textbook GI
@@ -721,17 +722,17 @@ class.
   set systems from graphs and the incidence construction is order-free; then
   colored-graph isomorphism (colored → plain is the content – the *directed*
   case needs no entry, `twoGraphs` carrying two arbitrary binary relations);
-  then
-  bipartite-graph isomorphism, the first entry with a real rigidity argument
-  (incidence graph, dimension 2, tags `{V, E}`, and the isomorphism must be
-  prevented from swapping the two sides); finite-automaton isomorphism as a
-  re-reading of `Machines.lean`. Excluded: line graphs (Whitney's theorem, with
-  its K₃/K₁,₃ exception) and Latin-square isotopy / Steiner-system isomorphism
-  (Miller's reductions are arithmetic-heavy and would fail the bitwise-
-  definability check the binary representation imposes). Companions that populate the degree without
-  completing it: Graph Automorphism and Group Isomorphism (multiplication
-  tables, one ternary relation), both below GI with the converse open – though
-  `GA ≤ᶠᵒ GI` is not free, the classical reduction being genuinely clever.
+  then bipartite-graph isomorphism, the first entry with a real rigidity
+  argument (incidence graph, dimension 2, tags `{V, E}`, and the isomorphism
+  must be prevented from swapping the two sides); finite-automaton isomorphism
+  as a re-reading of `Machines.lean`. Excluded: line graphs (Whitney's theorem,
+  with its K₃/K₁,₃ exception) and Latin-square isotopy / Steiner-system
+  isomorphism (Miller's reductions are arithmetic-heavy and would fail the
+  bitwise-definability check the binary representation imposes). Companions that
+  populate the degree without completing it: Graph Automorphism and Group
+  Isomorphism (multiplication tables, one ternary relation), both below GI with
+  the converse open – though `GA ≤ᶠᵒ GI` is not free, the classical reduction
+  being genuinely clever.
   **Caution for the docstrings**: classical GI-completeness is stated under
   polynomial-time reductions, so no result here may be cited, only re-proved;
   under `≤ᶠᵒ` the degree is finer, which makes each statement *stronger* than
@@ -743,8 +744,8 @@ class.
   primitive-positive interpretations – *is* a first-order interpretation
   restricted to the existential-conjunctive fragment, so `FOInterpretation` is
   already the right object and `IsQuantifierFree` shows how a fragment gets
-  tracked (§3, reduction-notion refinements). "`B'` pp-interprets `B` implies
-  `CSP(B) ≤ᶠᵒ CSP(B')`" is directly formalizable. What makes it worth doing is
+  tracked (§3, reduction-notion refinements). “`B'` pp-interprets `B` implies
+  `CSP(B) ≤ᶠᵒ CSP(B')`” is directly formalizable. What makes it worth doing is
   **Schaefer's dichotomy**, a finite case analysis over Boolean templates whose
   tractable cases are already in the catalog – 2SAT, HORN-SAT and dual-Horn,
   1-in-3-SAT, NAE-SAT – with affine the only one missing. Also the item in this
@@ -754,7 +755,7 @@ class.
   non-reducibility is provable, and Ehrenfeucht–Fraïssé games are exactly that.
   The two together give an *unconditional* degree structure at the FO level,
   where every machine-world degree statement is conjectural – a better framing
-  for §5 than "inexpressibility results" standing alone.
+  for §5 than “inexpressibility results” standing alone.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
@@ -793,7 +794,7 @@ provable rather than merely reasonable.
 - **The rest of the sharpening pass** (each [M], no prerequisites, no new
   surface): **quantifier-free / projection / dimension tracking through
   composition** (§3's reduction-notion refinements), which upgrades catalog
-  statements to the DC-faithful "complete under qfps", and **Spectra** (§4).
+  statements to the DC-faithful “complete under qfps”, and **Spectra** (§4).
   The lesson 3-DNF-TAUT taught about the first of these: a discharge that needs
   an *image* invariant the `≤ᶠᵒ` interface hides does not force a general
   invariant-tracking layer, because building the reduction from the complement
