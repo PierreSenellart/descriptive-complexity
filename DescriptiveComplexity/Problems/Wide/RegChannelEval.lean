@@ -3,8 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexLaid
 import DescriptiveComplexity.Problems.Wide.RegChannelLaid
+import DescriptiveComplexity.Problems.Wide.NexSpine
+import DescriptiveComplexity.Problems.Wide.DrawIxPack
+import DescriptiveComplexity.Problems.Wide.BlkLayout
+import DescriptiveComplexity.Problems.Wide.DrawIxWidth
+import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
 
 /-!
 # The clocked evaluation at the file the channel hands over

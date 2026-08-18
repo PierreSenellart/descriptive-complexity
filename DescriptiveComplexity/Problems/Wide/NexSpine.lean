@@ -3,8 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxSpine
 import DescriptiveComplexity.Problems.Wide.NexEval
+import DescriptiveComplexity.Problems.Wide.DrawIxEval
 
 /-!
 # The clocked spine at an arbitrary file

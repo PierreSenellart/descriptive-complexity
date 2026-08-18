@@ -28,18 +28,14 @@ import DescriptiveComplexity.Problems.Wide.NexBuild
 import DescriptiveComplexity.Problems.Wide.NexGuess
 import DescriptiveComplexity.Problems.Wide.NexEval
 import DescriptiveComplexity.Problems.Wide.NexSpine
-import DescriptiveComplexity.Problems.Wide.NexLaid
 import DescriptiveComplexity.Problems.Wide.NexDef
 import DescriptiveComplexity.Problems.Wide.NexInterp
-import DescriptiveComplexity.Problems.Wide.NexAccept
-import DescriptiveComplexity.Problems.Wide.NexData
 import DescriptiveComplexity.Problems.Wide.NexRun
 import DescriptiveComplexity.Problems.Wide.Walk
 import DescriptiveComplexity.Problems.Wide.Mirror
 import DescriptiveComplexity.Problems.Wide.Det
 import DescriptiveComplexity.Problems.Wide.Test
 import DescriptiveComplexity.Problems.Wide.DrawTags
-import DescriptiveComplexity.Problems.Wide.DrawAlphabet
 import DescriptiveComplexity.Problems.Wide.DrawMatrix
 import DescriptiveComplexity.Problems.Wide.DrawGeom
 import DescriptiveComplexity.Problems.Wide.DrawShape
@@ -149,11 +145,8 @@ import DescriptiveComplexity.Problems.Wide.DrawIxRound
 import DescriptiveComplexity.Problems.Wide.DrawIxVar
 import DescriptiveComplexity.Problems.Wide.DrawIxEval
 import DescriptiveComplexity.Problems.Wide.DrawIxWidth
-import DescriptiveComplexity.Problems.Wide.DrawIxValEnum
 import DescriptiveComplexity.Problems.Wide.DrawIxBridge
 import DescriptiveComplexity.Problems.Wide.DrawIxPack
-import DescriptiveComplexity.Problems.Wide.BlkBridge
-import DescriptiveComplexity.Problems.Wide.BlkPad
 import DescriptiveComplexity.Problems.Wide.Limits
 import DescriptiveComplexity.Problems.Wide.PadRules
 import DescriptiveComplexity.Problems.Wide.RegChannelPad
@@ -175,11 +168,9 @@ import DescriptiveComplexity.Problems.Wide.RegChannelAccept
 import DescriptiveComplexity.Problems.Wide.RegChannelYes
 import DescriptiveComplexity.Problems.Wide.RegChannelNo
 import DescriptiveComplexity.Problems.Wide.RegChannelReduce
-import DescriptiveComplexity.Problems.Wide.DrawIxSpine
 import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
 import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
 import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
-import DescriptiveComplexity.Problems.Wide.DrawIxSweepSem
 import DescriptiveComplexity.Problems.Wide.DrawInstExp
 import DescriptiveComplexity.Problems.Wide.DrawInstGate
 import DescriptiveComplexity.Problems.Wide.DrawInstIGate
@@ -509,23 +500,6 @@ bound `DescriptiveComplexity.reaches_of_wideRounds` asks for; and the least elem
 the universe lies in the `ctrl` block, so the register file – every cell of which
 contains it – sits above every logical address, and data and registers cannot
 collide.
-
-`DescriptiveComplexity.Problems.Wide.DrawAlphabet` fixes the alphabet by the only
-discipline available – a symbol is an element, hence a tagged tuple, so one
-**coordinate** of the tuple is one **track**, holding one of two designated
-elements of the source structure (its least and its greatest, both definable,
-which is why the one-element structure is gated). `DescriptiveComplexity.Draw.withBit`
-writes a track and `DescriptiveComplexity.Draw.bitAt` reads one; a track reads back
-what was written (`DescriptiveComplexity.Draw.bitAt_withBit`, whose only hypothesis
-is that the two elements differ) and writing one leaves the others alone
-(`DescriptiveComplexity.Draw.withBit_of_ne`). Together with
-`DescriptiveComplexity.regBit_congr` this is what discharges the coherence
-condition of every register pass: a program's tape is
-`fun r => (sym, withBit … (regBit m r))`, and the condition is `congrArg` through
-`DescriptiveComplexity.Draw.withBit_congr`. Distinctness comes from the same place
-(`DescriptiveComplexity.Draw.withBit_inj`): symbols carrying different bits are
-different elements, which a transition table needs both to read a track and to be
-deterministic.
 
 One structural note, since it is what the transition table will hang on: the
 subroutines above take **their states as parameters**, so a program with several

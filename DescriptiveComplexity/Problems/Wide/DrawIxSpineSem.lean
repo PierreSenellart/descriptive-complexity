@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
-import DescriptiveComplexity.Problems.Wide.DrawIxSpine
 import DescriptiveComplexity.Problems.Wide.DrawIxPack
 import DescriptiveComplexity.Problems.Wide.DrawSpineSem
+import DescriptiveComplexity.Problems.Wide.DrawIxEval
 
 /-!
 # What the spine does to the tape, at an arbitrary file

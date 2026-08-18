@@ -25,7 +25,7 @@ What distinguishes the three is the **tag**, which is also what carries everythi
 about a transition except its data: its rule index. So
 
 * a state is `(phase p, pad w)` – the call site in the tag, the pointer in `w`;
-* a symbol is `(sym, pad w)` – the tracks in `w` (`DrawAlphabet`);
+* a symbol is `(sym, pad w)` – the tracks in `w` (`DrawTracks`);
 * a transition is `(ctrl r, pad w)` – the rule in the tag, its data in `w`.
 
 Two elements with different tags are different, and two with the same tag differ

@@ -1,9 +1,9 @@
+import DescriptiveComplexity.Problems.Wide.DrawTags
 /-
 Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawAlphabet
 
 /-!
 # A quantifier-free matrix is a Boolean function of its atoms
@@ -11,8 +11,8 @@ import DescriptiveComplexity.Problems.Wide.DrawAlphabet
 The machine evaluates the matrix of its step formula **atom by atom**: a
 subroutine per atom, each ending in a state that records whether that atom holds,
 the accumulating assignment kept in the *coordinates* of the state – one
-coordinate per atom, holding one of the two designated elements of
-`DescriptiveComplexity.Problems.Wide.DrawAlphabet`. When every atom has been
+coordinate per atom, holding one of the two designated elements the tracks of
+`DescriptiveComplexity.Problems.Wide.DrawTracks` carry. When every atom has been
 evaluated, one transition reads off the answer.
 
 For that to be correct the matrix must be a function of its atoms' truths, and

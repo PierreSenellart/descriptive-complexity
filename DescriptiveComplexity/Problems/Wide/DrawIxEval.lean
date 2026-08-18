@@ -16,8 +16,7 @@ legs' runs with their costs.
 The legs are generic in the **outer phase**: what they read of it is the
 evaluation's own phases, embedded by `ep`, and the machineries' rules – never
 the spine's, whose rule shape the space-bounded and the clocked programs do not
-share. The two folds of these legs are
-`DescriptiveComplexity.Problems.Wide.DrawIxSpine` and
+share. The fold of these legs is
 `DescriptiveComplexity.Problems.Wide.NexSpine`.
 -/
 
