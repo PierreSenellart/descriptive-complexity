@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.FinSat.Fixpoint
 /-!
 # Reading the encoded sentence off the image
 
-`DescriptiveComplexity.FinSat.Interp` builds the sentence `σ_A` and proves it
+`DescriptiveComplexity.Problems.FinSat.Interp` builds the sentence `σ_A` and proves it
 well formed (`DescriptiveComplexity.FinSat.image_isWF`); this file reads it back
 as a *sentence* – what its nodes are, and which of them are children, binders and
 literals of which – which is what the correctness of the reduction is then

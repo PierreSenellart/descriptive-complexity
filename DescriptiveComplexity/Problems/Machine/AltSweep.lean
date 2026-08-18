@@ -9,19 +9,19 @@ import DescriptiveComplexity.Problems.Machine.AltPos
 # The intended run: the guessing sweeps
 
 The `k` sweeps of the machine, run against a tuple of block assignments. The
-whole point is `DescriptiveComplexity.valAfter`: the truth value the cell of a
+whole point is `DescriptiveComplexity.AltQbf.valAfter`: the truth value the cell of a
 variable holds once the sweeps below `i` have run is the disjunction, over the
 blocks *below `i`* marking it, of what they assigned it. At `i = k` that is
 `DescriptiveComplexity.qbfVal` exactly
-(`DescriptiveComplexity.valAfter_top`), which is why one bit per cell suffices
+(`DescriptiveComplexity.AltQbf.valAfter_top`), which is why one bit per cell suffices
 even though a variable may carry several block marks.
 
 A sweep runs rightwards writing, turns at `⊣`, runs back leftwards unchanged,
 and hands over at `⊢`. The tape during the rightward pass is
-`DescriptiveComplexity.sweepTape`: cells strictly below the head already hold
+`DescriptiveComplexity.AltQbf.sweepTape`: cells strictly below the head already hold
 the new value, cells at or above still hold the old one. Junk cells – a cell's
 tag on a tuple that is not a position – are frozen at `false`, which is what
-`DescriptiveComplexity.AltInp` gives them and what the frame condition of every
+`DescriptiveComplexity.AltQbf.AltInp` gives them and what the frame condition of every
 step then preserves.
 -/
 
@@ -47,7 +47,7 @@ noncomputable def valAfter (νs : Fin k → A → Prop) (i : ℕ) (x : A) : Bool
 variable {νs : Fin k → A → Prop} {x : A}
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
-/-- Reading `DescriptiveComplexity.valAfter` back. -/
+/-- Reading `DescriptiveComplexity.AltQbf.valAfter` back. -/
 theorem valAfter_eq_true {i : ℕ} :
     valAfter νs i x = true ↔ ∃ j : Fin k, (j : ℕ) < i ∧ QbfBlk j x ∧ νs j x := by
   classical

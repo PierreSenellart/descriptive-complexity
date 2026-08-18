@@ -117,9 +117,8 @@ variable (hTestF : ∀ a, a < aT → ∃ u : I, ¬dt.InnerFull F.blk (mV a) u)
 include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv hvi
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
-/-- **The clocked evaluation's spine at an arbitrary address**: as
-`DescriptiveComplexity.Draw.Data.ixEvalSpine_run_thread` with the gates no
-longer assumed to pass. Each position takes whichever of the three legs
+/-- **The clocked evaluation's spine at an arbitrary address**: the threaded
+spine, with the gates no longer assumed to pass. Each position takes whichever of the three legs
 its own gates call for, and what the caller owes is only the marker, the
 mirror and the bottom mark – all of which the advance sets and every leg
 leaves alone. This is the form a sweep can use, since it visits junk

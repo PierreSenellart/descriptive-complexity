@@ -263,7 +263,7 @@ end Marks
 At `k = 1` the vocabulary has a single mark, the only block is `0` and its
 polarity is that of `start`; so for `start = true` no state is universal, and
 the alternating model is the nondeterministic one
-(`DescriptiveComplexity.ATMData.altAccepts_iff_accepts`). -/
+(`DescriptiveComplexity.ATMData.altAccepts_true_iff_accepts`). -/
 
 section OneBlock
 

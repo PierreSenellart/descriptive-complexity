@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Machine.SpaceHard
 
 The hard half of the capture theorem FO(≤, PFP) = PSPACE, by iterating the
 PSPACE-complete deterministic machine problem: a partial fixed-point
-definition `DescriptiveComplexity.mPfp` whose block holds one machine
+definition `DescriptiveComplexity.SpaceTM.mPfp` whose block holds one machine
 configuration – the block of the SO(TC) membership proof of
 `DescriptiveComplexity.Problems.Machine.Space` – and whose step formulas
 advance it:

@@ -24,8 +24,8 @@ Three things make the formulas short.
   `DescriptiveComplexity.ProgTag.used` coordinates and the rest are minima
   (`DescriptiveComplexity.canonF` of `DescriptiveComplexity.Padding`), so
   every defining formula is a conjunction of the two guards with a small
-  *body* (`DescriptiveComplexity.arg1Body`,
-  `DescriptiveComplexity.arg2Body`).
+  *body* (`DescriptiveComplexity.CodeProgRed.arg1Body`,
+  `DescriptiveComplexity.CodeProgRed.arg2Body`).
 * **Every body is a walk of the input order**: the immediate successor of a
   coordinate (`DescriptiveComplexity.succF`), its being a maximum, and
   equality of the other coordinates. No lexicographic order and no arithmetic

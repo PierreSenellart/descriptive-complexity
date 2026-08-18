@@ -14,11 +14,11 @@ the outermost, and the type shrinks as the recursion goes. That is the right
 shape for a *definition* and the wrong one for a run, which fixes the blocks in
 place and rewrites them one at a time with `Function.update`.
 
-`DescriptiveComplexity.AltTail` is the second shape: `AltTail P r m νs pol`
+`DescriptiveComplexity.AltQbf.AltTail` is the second shape: `AltTail P r m νs pol`
 quantifies the `r` blocks from `m` up, leaving the blocks below `m` at whatever
-`νs` says. The two agree (`DescriptiveComplexity.altTail_iff_altQuant`), by an
+`νs` says. The two agree (`DescriptiveComplexity.AltQbf.altTail_iff_altQuant`), by an
 induction that pushes one block from the tail into the prefix at a time. The
-gluing map `DescriptiveComplexity.glueTail` is what translates between them,
+gluing map `DescriptiveComplexity.AltQbf.glueTail` is what translates between them,
 and the whole content of the bridge is that pushing a block past it is
 `Function.update`.
 -/

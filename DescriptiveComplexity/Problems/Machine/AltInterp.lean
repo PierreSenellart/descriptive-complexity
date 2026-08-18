@@ -10,11 +10,11 @@ import DescriptiveComplexity.OrderedComposition
 /-!
 # The machine of a formula, written in first-order logic
 
-`DescriptiveComplexity.altAccepts_iff_qbf` says that the alternating machine
+`DescriptiveComplexity.AltQbf.altAccepts_iff_qbf` says that the alternating machine
 built in an ordered QBF instance accepts exactly when the formula is true. This
 file writes that machine down: an `FOInterpretation` of the alternating-machine
 vocabulary in the ordered QBF vocabulary, dimension two, tagged by
-`DescriptiveComplexity.AltTag`.
+`DescriptiveComplexity.AltQbf.AltTag`.
 
 The shape is the one of `DescriptiveComplexity.SatTM.satTuringInterp`:
 
@@ -22,15 +22,15 @@ The shape is the one of `DescriptiveComplexity.SatTM.satTuringInterp`:
   sweep index being a static number – so a side condition like “this is a real
   sweep” is `⊤` or `⊥`, decided when the formula is built, not a subformula;
 * the payload conditions are the three shapes a tag can have: both coordinates
-  least (`DescriptiveComplexity.AltTM.acstF`), one element carried
-  (`DescriptiveComplexity.AltTM.aoneF`), or a clause condition read off the
+  least (`DescriptiveComplexity.AltQbf.acstF`), one element carried
+  (`DescriptiveComplexity.AltQbf.aoneF`), or a clause condition read off the
   instance;
 * the order is `DescriptiveComplexity.lexLeF`, whose linearity is inherited
-  from the `LinearOrder` on `DescriptiveComplexity.AltTag`, which is the very
+  from the `LinearOrder` on `DescriptiveComplexity.AltQbf.AltTag`, which is the very
   order the machine runs on.
 
 The block marks are new here: `blk i` holds of a state exactly when
-`DescriptiveComplexity.altBlockOf` returns `i`, which is a function of the tag
+`DescriptiveComplexity.AltQbf.altBlockOf` returns `i`, which is a function of the tag
 alone, so those formulas are `⊤` or `⊥` too.
 -/
 
@@ -312,7 +312,7 @@ noncomputable def posnF : AltTag k → (qbfOrd k).Formula (Fin 1 × Fin 2) := fu
   | _ => ⊥
 
 /-- Defining formula for `tr`: the payload promises of
-`DescriptiveComplexity.AltTr`, the index conditions decided statically. -/
+`DescriptiveComplexity.AltQbf.AltTr`, the index conditions decided statically. -/
 noncomputable def trF : AltTag k → (qbfOrd k).Formula (Fin 1 × Fin 2) := fun t =>
   match t.1 with
   | .tGStart => (minF (0, 0) ⊓ minF (0, 1)) ⊓ sideF _ ((t.2 : ℕ) = 0 ∧ 0 < k)
@@ -406,7 +406,7 @@ noncomputable def treadF : AltTag k → AltTag k → (qbfOrd k).Formula (Fin 2 �
   | _ => ⊥
 
 /-- Defining formula for `tdst`: the one place the instance is consulted, in
-the check clause, through `DescriptiveComplexity.AltTM.litF`. -/
+the check clause, through `DescriptiveComplexity.AltQbf.litF`. -/
 noncomputable def tdstF : AltTag k → AltTag k → (qbfOrd k).Formula (Fin 2 × Fin 2) := fun t t' =>
   match t.1 with
   | .tGStart => acstF (.qG true, t.2) t'
@@ -473,7 +473,7 @@ end Formulas
 /-! ### The realization lemmas
 
 One per symbol, each saying that its defining formula defines the
-corresponding predicate of `DescriptiveComplexity.altMachine`. The universe of
+corresponding predicate of `DescriptiveComplexity.AltQbf.altMachine`. The universe of
 the interpreted structure is definitionally `DescriptiveComplexity.AltV k A`.
 -/
 
@@ -744,7 +744,7 @@ theorem relMap_blk (hk : 0 < k) (j : ℕ) (p : AltV k A) :
 
 /-- **The interpreted structure describes the machine of the instance**: every
 field of `DescriptiveComplexity.atmData` on the interpreted structure agrees,
-along the identity equivalence, with `DescriptiveComplexity.altMachine`. -/
+along the identity equivalence, with `DescriptiveComplexity.AltQbf.altMachine`. -/
 theorem altAgree_altMachine (hk : 0 < k) :
     ATMData.AltAgree (altMapEquiv (A := A) cnf) (altMachine k A cnf)
       (atmData k ((altTuringInterp k cnf).Map A)) where
@@ -766,7 +766,7 @@ theorem altAgree_altMachine (hk : 0 < k) :
 /-- **Correctness of the interpretation**: the interpreted structure is a
 yes-instance of alternating acceptance exactly when the quantified formula is
 true. Both promises hold unconditionally, and acceptance is
-`DescriptiveComplexity.altAccepts_iff_qbf`, transported along the
+`DescriptiveComplexity.AltQbf.altAccepts_iff_qbf`, transported along the
 agreement. -/
 theorem atmAccept_map_iff (hk : 0 < k) (start : Bool) :
     (ATMAccept k start).Holds ((altTuringInterp k cnf).Map A) ↔

@@ -39,7 +39,7 @@ accumulation is what makes one bit per cell enough.
 
 The SAT machine numbers its tags by hand. Here the families are indexed by `k`,
 so the numbering is a *pair* – a family index and an offset inside the family –
-ordered lexicographically (`DescriptiveComplexity.altTagKey`). The position
+ordered lexicographically (`DescriptiveComplexity.AltQbf.altTagKey`). The position
 families come first, so the order of the positions is undisturbed by the
 program's tags, exactly as `DescriptiveComplexity.satTagIdx` arranges.
 
@@ -48,7 +48,7 @@ the alternative is worth recording because it looks cheaper and is not: a
 *single* sweep, with the cells ordered by (block of the variable, variable), so
 that the state's block is read off the variable under the head. It removes the
 `Fin (k + 1)` from the tags and puts a bespoke linear order on the interpreted
-universe in its place – `DescriptiveComplexity.isLinOrd_altTagTupleLe` no
+universe in its place – `DescriptiveComplexity.AltQbf.isLinOrd_altTagTupleLe` no
 longer applies – and `DescriptiveComplexity.QBF` promises nothing about its
 marks, so the sort key must still invent a `k`-th class for the unmarked
 variables. Not taken.
@@ -58,7 +58,7 @@ variables. Not taken.
 Each of the `k` sweeps goes right and comes back, so `2k(n + 2)` steps, and the
 check costs `(m + 1)(n + 2)` for `m ≤ n` clauses: at most `(2k + n + 1)(n + 2)`.
 The `8(k + 1)` filler tags at dimension two supply `8(k + 1)n²` positions on
-their own, and `DescriptiveComplexity.alt_budget` says that is always more –
+their own, and `DescriptiveComplexity.AltQbf.alt_budget` says that is always more –
 the filler is over-provisioned rather than the bound tightened, as in
 `DescriptiveComplexity.sat_budget`.
 -/
@@ -157,7 +157,7 @@ theorem altBaseIdx_injective : Function.Injective altBaseIdx := by decide
 /-- The tags of the tape: a base tag together with a sweep index. The index is
 the sweep a guessing state or transition belongs to, and the second coordinate
 of a filler cell; everywhere else it is pinned to `0` by
-`DescriptiveComplexity.AltPosn` and the machine's own definitions. -/
+`DescriptiveComplexity.AltQbf.AltPosn` and the machine's own definitions. -/
 abbrev AltTag (k : ℕ) : Type := AltBase × Fin (k + 1)
 
 /-- The sort key of a tag: the base tag, then the sweep index. -/

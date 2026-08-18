@@ -22,7 +22,7 @@ padding is what makes the two the same cell
 
 This file is that reading: the named registers, the generated families over
 them, the guards' arrival and uniqueness, and the atom's run
-(`DescriptiveComplexity.Draw.Data.ixExp_run`). As in
+(`DescriptiveComplexity.Draw.Data.ixExp_reachesIn`). As in
 `DescriptiveComplexity.Draw.Data.ixStageAtom_reachesIn` the file is carried by
 one **coherence** hypothesis – the element a register holds the bit of is the
 element its name spells – and everything the semantics says of an elementwise

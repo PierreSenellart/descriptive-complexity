@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.FinSat.Fixpoint
 The mathematical content of `FINSAT ∈ RE`, ahead of any second-order syntax:
 an encoded sentence has a finite model exactly when a *finite set of invented
 values* carries one (`DescriptiveComplexity.FinSat.finSatOn_iff_cert`). The
-`∃SO[new]` sentence of `DescriptiveComplexity.FinSat.Membership` is then this
+`∃SO[new]` sentence of `DescriptiveComplexity.Problems.FinSat.Membership` is then this
 statement written out, the invented values being the extension `A ⊕ Fin m` of
 the universe and the five relations below the guessed relation variables.
 
@@ -84,7 +84,7 @@ values: a nonempty model `Elt`, environments `Env` with their graph `Val`,
 truth values `G` of the nodes and `H` of the atoms, subject to the conditions
 of the module docstring. Every condition is first-order in the vocabulary of
 the instance together with the five relations, which is what makes the
-`∃SO[new]` sentence of `DescriptiveComplexity.FinSat.Membership` possible. -/
+`∃SO[new]` sentence of `DescriptiveComplexity.Problems.FinSat.Membership` possible. -/
 structure CertOK (Elt Env : D → Prop) (Val : D → A → D → Prop) (G H : A → D → Prop) :
     Prop where
   /-- The model is nonempty. -/
@@ -506,7 +506,7 @@ end ToCert
 
 /-! ### Relabelling the invented values
 
-The `∃SO[new]` sentence of `DescriptiveComplexity.FinSat.Membership` guesses its
+The `∃SO[new]` sentence of `DescriptiveComplexity.Problems.FinSat.Membership` guesses its
 relations over `A ⊕ Fin m`, so it needs the invented values *indexed*. Nothing
 in `DescriptiveComplexity.FinSat.CertOK` looks at the set of invented values
 beyond its elements, so a bijection carries a certificate over one such set to a
@@ -603,7 +603,7 @@ end Transport
 /-- **An encoded sentence has a finite model exactly when a finite set of
 invented values carries one.** The right-hand side is first-order in the
 instance together with five guessed relations, which is what
-`DescriptiveComplexity.FinSat.Membership` turns into an `∃SO[new]`
+`DescriptiveComplexity.Problems.FinSat.Membership` turns into an `∃SO[new]`
 sentence. -/
 theorem finSatOn_iff_cert (A : Type) [Language.finsat.Structure A] [Finite A] [Nonempty A] :
     FinSatOn A ↔ IsWF A ∧ ∃ (D : Type) (_ : Finite D) (Elt Env : D → Prop)
@@ -616,7 +616,7 @@ theorem finSatOn_iff_cert (A : Type) [Language.finsat.Structure A] [Finite A] [N
     exact finSatOn_of_cert hc hwf
 
 /-- The same, with the invented values **indexed**: exactly the form the
-`∃SO[new]` sentence of `DescriptiveComplexity.FinSat.Membership` needs, its
+`∃SO[new]` sentence of `DescriptiveComplexity.Problems.FinSat.Membership` needs, its
 relation variables ranging over the extension `A ⊕ Fin m` of the universe. -/
 theorem finSatOn_iff_certFin (A : Type) [Language.finsat.Structure A] [Finite A] [Nonempty A] :
     FinSatOn A ↔ IsWF A ∧ ∃ (m : ℕ) (Elt Env : Fin m → Prop)

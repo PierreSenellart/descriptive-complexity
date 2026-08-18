@@ -23,7 +23,7 @@ chain `DescriptiveComplexity.pebbleStage`, that is, the *greatest* fixed point
 of the refinement:
 
 * the chain plateaus within the number of pairs of tuples
-  (`DescriptiveComplexity.pebbleStage_eq_stage_card`, the antitone half of
+  (`DescriptiveComplexity.exists_pebbleStage_succ_eq`, the antitone half of
   `DescriptiveComplexity.exists_succ_eq_of_antitone_subset`), so on a finite
   type the limit is a stage and is itself a fixed point
   (`DescriptiveComplexity.equivK_iff`, the interface characterization);

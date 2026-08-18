@@ -29,7 +29,7 @@ The choices, once:
   a definition whose value is read converges.
 
 The two constraints on the layout the assembly needs are the ones
-`DescriptiveComplexity.Draw.wmSetLt_stageTgtD_logicalTop` asks for: one
+`DescriptiveComplexity.Draw.Data.wmSetLt_stageTgtD_logicalTop` asks for: one
 coordinate of slack beyond the encoding budget (`dd0 < dd`) and one argument
 block to name (`dt.KIx` nonempty).
 -/
@@ -445,7 +445,7 @@ theorem reaches_outVerdict
 yes-instance**: the two promises of `DescriptiveComplexity.DWideAcceptSpace` –
 well-formedness for free, determinism from the program's separation argument –
 together with the run of
-`DescriptiveComplexity.Draw.Data.reaches_accept`. -/
+`DescriptiveComplexity.Draw.Data.reaches_outVerdict`. -/
 theorem dwideAcceptSpace_of_pfpHolds
     (hR : (dt.progOf zero one hzo hpl).table.Reads)
     (hdd : dt.dd0 < dt.dd) (i₀ : dt.KIx)

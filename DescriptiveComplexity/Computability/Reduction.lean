@@ -43,8 +43,8 @@ Three things, in this order.
 
 The defining formulas have free variables indexed by `Fin n × Fin dim`, while
 the evaluator of `DescriptiveComplexity.Computability.Eval` is written for
-sentences; `DescriptiveComplexity.flatFormula` flattens the former into the
-latter through `Fin.finProdFinEquiv` and
+sentences; `DescriptiveComplexity.flatRel` and `DescriptiveComplexity.flatDom` flatten
+the former into the latter through `Fin.finProdFinEquiv` and
 `FirstOrder.Language.BoundedFormula.relabel`.
 -/
 

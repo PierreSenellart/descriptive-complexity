@@ -8,14 +8,14 @@ import DescriptiveComplexity.Problems.Machine.AltGuess
 /-!
 # The check phase decides the matrix
 
-`DescriptiveComplexity.accepts_from_chk_cnf` and its disjunctive twin build an
+`DescriptiveComplexity.AltQbf.accepts_from_chk_cnf` and its disjunctive twin build an
 accepting run when the matrix holds. This is the converse: if the check phase
 accepts, the matrix holds. Together they say that the tape the sweeps leave
 behind is tested exactly.
 
 The check phase is deterministic, so no read-off is needed: acceptance descends
 along its unique run whatever the polarity of the block it sits in
-(`DescriptiveComplexity.StepForced`), and each sweep can only end in one of the
+(`DescriptiveComplexity.AltQbf.StepForced`), and each sweep can only end in one of the
 two turns. The turn that accepts fires at the flag `cnf` – set for a
 conjunctive matrix, where it means the clause is satisfied, clear for a
 disjunctive one, where it means no literal of the term is violated – and that
@@ -23,7 +23,7 @@ is precisely the semantic conclusion. The turn that moves on fires at the flag
 `true`, and hands the argument to the next clause.
 
 The induction is therefore over the clauses, upwards, exactly as in the two
-forward lemmas: `DescriptiveComplexity.ChkOk` is what the run from a clause
+forward lemmas: `DescriptiveComplexity.AltQbf.ChkOk` is what the run from a clause
 proves about that clause and every clause above it.
 -/
 

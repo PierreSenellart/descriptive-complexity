@@ -11,12 +11,12 @@ import DescriptiveComplexity.Problems.Machine.AltRead
 What a sweep amounts to, whichever player owns its block. Its moves are exactly
 the truth assignments of the block: for an existential block the machine picks
 one, for a universal block it must survive all of them, and
-`DescriptiveComplexity.inSweepR_step` / `DescriptiveComplexity.inSweepL_step`
+`DescriptiveComplexity.AltQbf.inSweepR_step` / `DescriptiveComplexity.AltQbf.inSweepL_step`
 say that *every* play is the run of some assignment.
 
 The universal half needs two things beyond the read-off. The sweep is never
-stuck (`DescriptiveComplexity.exists_step_of_inSweepR`,
-`DescriptiveComplexity.exists_step_of_inSweepL`) – at a cell it may keep or set
+stuck (`DescriptiveComplexity.AltQbf.exists_step_of_inSweepR`,
+`DescriptiveComplexity.AltQbf.exists_step_of_inSweepL`) – at a cell it may keep or set
 the value, at the markers it turns or hands over – and it terminates, the head
 moving up until the turn and down afterwards. Both are needed because a
 universal configuration accepts only when it *has* a successor and all of them
@@ -25,7 +25,7 @@ accept, so an induction on the budget alone would never reach its base case.
 The one place the handover can genuinely be stuck is the left marker of the
 last sweep, where the machine passes to the check phase: a disjunctive matrix
 with no term at all has nothing to check and nothing to accept. That is
-`DescriptiveComplexity.CanHandOver`, and it is exactly the case where the
+`DescriptiveComplexity.AltQbf.CanHandOver`, and it is exactly the case where the
 formula is false.
 -/
 
@@ -577,7 +577,7 @@ theorem altAcc_along_segment_up_down {M : ATMData (AltV k A)} {start : Bool}
   exact fun n p hp hlb hub hacc => key _ n p hp hlb hub rfl hacc
 
 /-- **An existential round, played along the run of the assignment it picks.**
-The mirror of `DescriptiveComplexity.altAcc_passes_down`: acceptance at the
+The mirror of `DescriptiveComplexity.AltQbf.altAcc_passes_down`: acceptance at the
 left marker, where the round hands over, climbs back to its entry. -/
 theorem altAcc_passes_up {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop}
     (hex : blockPol start (i : ℕ) = true) {n : ℕ}

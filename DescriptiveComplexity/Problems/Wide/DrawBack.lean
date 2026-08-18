@@ -259,7 +259,7 @@ What the file is indexed by is a parameter, because a clocked program cannot
 give every element of the universe a register and
 nothing here needs it to: a register's contents depend on its **block**, on the
 **tuple** it names, and on where it sits in the layout order, and on nothing
-else about the index. `DescriptiveComplexity.Data.back` is this at the
+else about the index. `DescriptiveComplexity.Draw.Data.back` is this at the
 diagonal, which is what a space-bounded program uses. -/
 noncomputable def ixBack {I : Type} (lay : Layout dt A R' P' I)
     (zero one : A) (hdd : dt.dd0 ≤ dt.dd)
@@ -334,7 +334,7 @@ theorem wmLt_diagLaid_le (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
   ⟨fun h => ⟨(hord u u').mpr h.1, fun hc => h.2 ((hord u' u).mp hc)⟩,
     fun h => ⟨(hord u u').mp h.1, fun hc => h.2 ((hord u' u).mpr hc)⟩⟩
 
-/-- **The state, presented as a background**: `DescriptiveComplexity.Data.ixBack`
+/-- **The state, presented as a background**: `DescriptiveComplexity.Draw.Data.ixBack`
 at the layout a space-bounded program's file has. -/
 noncomputable def back (cell : Univ A R' P' dt.KIx dt.dd → (Univ A R' P' dt.KIx dt.dd → Prop))
     (zero one : A) (hdd : dt.dd0 ≤ dt.dd)

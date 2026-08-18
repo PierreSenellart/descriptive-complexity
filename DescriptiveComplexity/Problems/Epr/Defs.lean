@@ -203,7 +203,7 @@ variables satisfies every clause.
 
 Finiteness of the model costs nothing: a satisfiable `∃*∀*` sentence has a
 model with one element per existential variable, which is what
-`DescriptiveComplexity.Epr.Membership` proves and uses. -/
+`DescriptiveComplexity.Problems.Epr.Membership` proves and uses. -/
 def EprSatOn (A : Type) [Language.epr.Structure A] : Prop :=
   ∃ (M : Type) (_ : Finite M) (_ : Nonempty M) (I : A → (A → M) → Prop) (e : A → M),
     Local I ∧ ∀ u : A → M, MatrixTrue I (eprVal e u)

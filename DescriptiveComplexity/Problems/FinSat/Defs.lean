@@ -302,7 +302,7 @@ node, with the values of the children supplied by the parameter `rec`. It is
 monotone in `rec` – this is what negation normal form buys – so iterating it
 from the everywhere-false valuation gives an increasing sequence whose union
 `Gval` is the least fixed point, and on a well-formed instance the fixed point
-is unique (`DescriptiveComplexity.FinSat.Membership`). -/
+is unique (`DescriptiveComplexity.Problems.FinSat.Membership`). -/
 
 section Semantics
 

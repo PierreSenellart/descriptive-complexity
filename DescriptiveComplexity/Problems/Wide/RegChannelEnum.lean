@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Wide.DrawValEnum
 /-!
 # The rounds of the evaluation, counted over the handed file
 
-`DescriptiveComplexity.Draw.exists_valEnum` builds the VAL loop's enumeration over
+`DescriptiveComplexity.Draw.Data.exists_valEnum` builds the VAL loop's enumeration over
 the *universe*, where a space-bounded machine's registers are the elements
 themselves. A clocked machine counts the same rounds over the **index of its
 file**, so this file rebuilds the enumeration there: a chain of increments in the

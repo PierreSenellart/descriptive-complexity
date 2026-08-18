@@ -21,7 +21,7 @@ one variable's machinery around them, the evaluation's spine over the
 variable list, and the outer program around everything.
 
 The kind-dependent types are indexed by the **kind itself**
-(`DescriptiveComplexity.Draw.KindPh` and friends match on a
+(`DescriptiveComplexity.Draw.Data.KindPh` and friends match on a
 `DescriptiveComplexity.Draw.MatAtom`), so every downstream definition
 reduces per constructor; the stuck `DescriptiveComplexity.Draw.Data.kindOf`
 application appears only at the instantiation

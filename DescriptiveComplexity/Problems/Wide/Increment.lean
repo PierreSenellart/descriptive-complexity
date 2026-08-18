@@ -391,7 +391,7 @@ private theorem belowCount_lt (h : IsLinOrd Le) {s t : α → Prop} (hi : WMIncr
 
 /-- **Every address is reached from the empty one by increments**: a finite
 chain, each step the binary increment, ending at the target. This is
-`DescriptiveComplexity.Draw.exists_wmChain` over an arbitrary index. -/
+`DescriptiveComplexity.exists_wmChain` over an arbitrary index. -/
 theorem exists_wmChainOf (h : IsLinOrd Le) (target : α → Prop) :
     ∃ (n : ℕ) (mV : Fin (n + 1) → (α → Prop)),
       mV 0 = (fun _ => False) ∧ mV (Fin.last n) = target ∧

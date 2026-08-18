@@ -38,9 +38,8 @@ The choice of `W` is self-policing: chosen too narrow, the hardness reduction
 cannot land in it; chosen too wide, the decoding below cannot handle it.
 Both failure modes are proofs that do not close, never silent unsoundness.
 
-**Decodings are computations.** The lesson of
-`DescriptiveComplexity.Encoding.CoversUpTo`'s removal is that an *existential*
-decoding statement (`∀ A, ∃ i, Conc i ↔ P A`) is classically near-vacuous:
+**Decodings are computations.** An *existential* decoding statement
+(`∀ A, ∃ i, Conc i ↔ P A`) is classically near-vacuous:
 casing on `P A` discharges it with no decoding whatsoever, whenever the
 concrete type has one yes- and one no-instance. The honest content is a
 *function*, so `DescriptiveComplexity.Decoding` bundles one, with the same

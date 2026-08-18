@@ -50,12 +50,13 @@ groups rather than folded into the transition.
 ## Junk
 
 Only the *canonically padded* tuples carry meaning, as in the SAT discharge:
-tuples of length `DescriptiveComplexity.srDim` are padded with minimal elements of
-the order, and a clause mentions no variable at a non-canonical tuple. But
-`stateVar` and `next` are declared at *every* tuple, canonical or not. Junk
-state variables are then free-running copies whose values no clause constrains
-and no reading of a state ever looks at (`DescriptiveComplexity.srPredOf` reads the
-canonical padding only), so they cost nothing and save the canonicity guards.
+tuples of length `DescriptiveComplexity.SuccinctReachHard.srDim` are padded
+with minimal elements of the order, and a clause mentions no variable at a
+non-canonical tuple. But `stateVar` and `next` are declared at *every* tuple,
+canonical or not. Junk state variables are then free-running copies whose
+values no clause constrains and no reading of a state ever looks at
+(`DescriptiveComplexity.SuccinctReachHard.srStateOf` reads the canonical
+padding only), so they cost nothing and save the canonicity guards.
 -/
 
 namespace DescriptiveComplexity

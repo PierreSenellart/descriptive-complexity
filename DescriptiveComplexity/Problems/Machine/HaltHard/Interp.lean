@@ -20,7 +20,7 @@ constant cells for the markers and the spelled initial value `[0, n]`.
 The one order key of the whole universe, junk included: the block index of
 the tag, then the tuple in **descending** lexicographic order with the last
 coordinate most significant – matching the little-endian significance of
-`DescriptiveComplexity.tupleIdx`, so that position-ascending order reads the
+`FirstOrder.Language.tupleIdx`, so that position-ascending order reads the
 flattened relation table reversed, which is the order the chain folds – and
 a static sub-index that interleaves each bit cell with its fold cell.
 Unused coordinates are pinned to the minimum
@@ -184,7 +184,7 @@ variable {A : Type} [LinearOrder A] {D : ℕ}
 
 /-- `u` is below `w` in the reversed lexicographic order: they differ, and at
 the highest differing coordinate `u` is smaller. Matching the little-endian
-significance of `DescriptiveComplexity.tupleIdx`, this is comparison of
+significance of `FirstOrder.Language.tupleIdx`, this is comparison of
 tuple numbers. -/
 def RevLexLt (u w : Fin D → A) : Prop :=
   ∃ j, u j < w j ∧ ∀ j', j < j' → u j' = w j'

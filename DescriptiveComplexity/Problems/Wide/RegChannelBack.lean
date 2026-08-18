@@ -17,7 +17,7 @@ recognizes its tape.
 Two facts do it. The phases before it are all the outer layer's, so the rules
 fired up to that point keep the file, keep the addressed tracks and write bits
 (`nexRule_keepsFile_of_ne_eval` and its two siblings) – which is exactly what
-`DescriptiveComplexity.Draw.ShapedAt` propagates along a run. And an accepting
+`DescriptiveComplexity.Draw.Data.ShapedAt` propagates along a run. And an accepting
 configuration is in a post-guess phase, so the search has something to find.
 
 What comes out is a configuration whose tape is an `ixBack` of *some* tape state

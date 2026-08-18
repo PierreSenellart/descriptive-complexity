@@ -13,7 +13,7 @@ import DescriptiveComplexity.Exponential.PSpaceOn
 
 **The theorem**: every second-order sentence – an alternating prefix of block
 quantifiers over a first-order kernel – defines a second-order alternating game
-(`DescriptiveComplexity.soGameDefinable_soProblem`), whence
+(`DescriptiveComplexity.SOGameSpec.accepts_gameOfSO`), whence
 `DescriptiveComplexity.SigmaSODefinable.soGameDefinable` and `SO ⊆ SO-GAME`.
 
 It is the game counterpart of

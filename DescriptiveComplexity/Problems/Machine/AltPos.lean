@@ -12,14 +12,14 @@ Where the head is, and what follows what: the left marker is the lowest
 position, the cell of the least element follows it, the right marker follows
 the cell of the greatest element, and cells are ordered as their elements are.
 
-Every fact about the *tags* here is a `decide`: `DescriptiveComplexity.AltBase`
+Every fact about the *tags* here is a `decide`: `DescriptiveComplexity.AltQbf.AltBase`
 does not depend on `k`, and a tag's sweep index only ever refines the order
-inside a family (`DescriptiveComplexity.altTag_lt_of_base_lt`). That is what the
+inside a family (`DescriptiveComplexity.AltQbf.altTag_lt_of_base_lt`). That is what the
 pair-shaped tag of `DescriptiveComplexity.Problems.Machine.AltTape` buys.
 
 The file ends with the determinism of the machine away from the guessing
 choice, which is what makes the `⇐` half of correctness a corollary of
-`DescriptiveComplexity.altTr_unique` rather than a second induction.
+`DescriptiveComplexity.AltQbf.altTr_unique` rather than a second induction.
 -/
 
 namespace DescriptiveComplexity
@@ -226,7 +226,7 @@ theorem succPos_posCell_posEnd :
 /-! ### Determinism away from the guess -/
 
 /-- **The machine is deterministic away from the guessing choice.** Once the
-transition is pinned (`DescriptiveComplexity.altTr_unique`), the successor
+transition is pinned (`DescriptiveComplexity.AltQbf.altTr_unique`), the successor
 configuration is too: its state by `altDst_functional`, the cell under the head
 by `altWrite_functional`, every other cell by the frame condition, and the head
 itself by uniqueness of the neighbor in the direction the transition names. -/

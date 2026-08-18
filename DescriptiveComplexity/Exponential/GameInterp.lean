@@ -853,7 +853,7 @@ omit [L.IsRelational] in
 /-- **The interpreted structure is a yes-instance exactly when the game is
 won.** The machine is well formed and its marks split its states by
 construction, so the only content is the simulation
-`DescriptiveComplexity.GameProg.altAcceptsSpace_iff_accepts`, carried across the
+`DescriptiveComplexity.altAcceptsSpace_iff_accepts`, carried across the
 identity by `DescriptiveComplexity.ATMData.AltAgree`. The bottom element the
 machine is built over is the structure's own minimum, which exists because the
 universe is finite and nonempty. -/

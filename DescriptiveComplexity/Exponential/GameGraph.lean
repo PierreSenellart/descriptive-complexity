@@ -24,7 +24,7 @@ has to decide about one or two nodes is one of six first-order questions:
 
 `DescriptiveComplexity.Sub` names the six. None of them is a *sentence* over the
 base – a quantifier of `I`'s defining formula ranges over points, so it is
-second-order over the base (`DescriptiveComplexity.exists_translate`) – and that
+second-order over the base (`DescriptiveComplexity.ExpExpansion.exists_translate`) – and that
 is exactly why they become **phases** rather than conjuncts:
 `DescriptiveComplexity.ExpExpansion.exists_paramKernel` turns each into an
 alternating prefix over rounds of the point block, which a game plays one move
@@ -43,7 +43,7 @@ c  ‥ n-1    the play rounds of this prefix
 with `n = 2 * d + Dm` fixed by the *longest* prefix and `c = n - D` chosen per
 question, so that every prefix ends at the same round `n - 1` and the move that
 fills round `n - j` is the same for all six
-(`DescriptiveComplexity.exists_graphKernels`). Padding at the bottom rather than
+(`DescriptiveComplexity.ExpExpansion.exists_graphKernels`). Padding at the bottom rather than
 at the top is what keeps every kernel a sentence over *one* block: no morphism
 between merged blocks of different lengths is ever needed.
 -/

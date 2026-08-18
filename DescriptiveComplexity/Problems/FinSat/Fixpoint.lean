@@ -15,11 +15,11 @@ the order of the syntax) the least fixed point
 `DescriptiveComplexity.FinSat.Gval` of the truth definition is its *only*
 fixed point (`DescriptiveComplexity.FinSat.IsEval.iff_Gval`).
 
-* the membership proof (`DescriptiveComplexity.FinSat.Membership`) guesses a
+* the membership proof (`DescriptiveComplexity.Problems.FinSat.Membership`) guesses a
   relation and constrains it by the truth definition read as an equivalence;
   uniqueness is what forces the guess to *be* satisfaction, and is therefore
   what makes the `∃SO[new]` sentence say what it should;
-* the hardness proof (`DescriptiveComplexity.FinSat.Hardness`) has to evaluate
+* the hardness proof (`DescriptiveComplexity.Problems.FinSat.Hardness`) has to evaluate
   the sentence it builds; it exhibits its intended valuation and concludes by
   the same uniqueness, never touching the fuel counter.
 

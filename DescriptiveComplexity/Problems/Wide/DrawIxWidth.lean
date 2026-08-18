@@ -11,10 +11,9 @@ import DescriptiveComplexity.Problems.Wide.DrawIxEval
 The clock of the wide machines compares a *product*: the evaluation is charged
 `a * b` with `a` a width and `b` a number of rounds, and
 `DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'` asks for each factor
-below `2 ^ (k * m)`. The rounds are bounded elsewhere
-(`DescriptiveComplexity.Draw.Data.chain_length_le_two_pow`: the VAL loop is an
+below `2 ^ (k * m)`. The rounds are bounded elsewhere: the VAL loop is an
 increment chain, injective into the subsets of the registers it is supported
-on). This file bounds the other factor, the width
+on. This file bounds the other factor, the width
 `DescriptiveComplexity.Draw.Data.ixLegWidth` times the number of spine
 positions.
 
@@ -369,8 +368,7 @@ arities.
 
 This is the first of the two factors the clocked evaluation is charged
 (`DescriptiveComplexity.Draw.Data.ixSpineCost_le_mul`); the second is the
-number of VAL rounds, bounded by
-`DescriptiveComplexity.Draw.Data.chain_length_le_two_pow`. -/
+number of VAL rounds. -/
 theorem ixLegWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
     dt.ixLegWidth A w wP wR wK * dt.nv ≤ q ^ 25 := by
   classical
@@ -387,8 +385,7 @@ theorem ixLegWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
 /-- **The clocked evaluation's whole width is polynomial too**: the spine's,
 the output machinery's and the four joining steps, all below `q ^ 26`. What an
 instantiation owes of the clock's first factor is therefore
-`q ^ 26 ≤ 2 ^ (k · m)`, and of the second the number of VAL rounds
-(`DescriptiveComplexity.Draw.Data.chain_length_le_two_pow`). -/
+`q ^ 26 ≤ 2 ^ (k · m)`, and of the second the number of VAL rounds. -/
 theorem ixEvalWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
     dt.ixEvalWidth A w wP wR wK ≤ q ^ 26 := by
   have hq2 : 2 ≤ q := by have := h.cst; omega

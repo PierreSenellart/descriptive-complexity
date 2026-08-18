@@ -26,9 +26,8 @@ time `k`, and a cell of that row is the tile the configuration puts there.
 
 The states, the symbols and the transitions of the machine are control elements
 of its universe – `Sum.inr` points – and a tile stores the *element*, so the
-reading `DescriptiveComplexity.TilingHard.wpElt` is used throughout; that it
-loses nothing is `wpElt_mark` and `wpElt_attr`, since a mark or an attribute of
-the instance holds of no address.
+reading `DescriptiveComplexity.TilingHard.wpElt` is used throughout, and loses
+nothing: a mark or an attribute of the instance holds of no address.
 -/
 
 namespace DescriptiveComplexity

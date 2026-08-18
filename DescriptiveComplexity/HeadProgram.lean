@@ -23,9 +23,10 @@ model with the transitions presented individually –
 * a **target**: another state of the program, or one of two *exits*, `true` and
   `false`
 
-– and two compilations back into the finished form: `toAutomaton`, which enables
-every transition whose guard holds, and `toAutomatonPri`, which enables the
-*first* one, so that the compiled table has at most one entry per reading and
+– and a compilation back into the finished form,
+`DescriptiveComplexity.HeadProgram.compile`: it enables every transition whose
+guard holds, or, priority on, the *first* one, so that the compiled table has at
+most one entry per reading and
 `DescriptiveComplexity.HeadAutomaton.IsDeterministic` holds outright. Programs whose
 guards are mutually exclusive (`DescriptiveComplexity.HeadProgram.Deterministic`) run the
 same way under both.

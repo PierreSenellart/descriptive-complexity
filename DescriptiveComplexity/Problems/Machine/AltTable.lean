@@ -25,7 +25,7 @@ Unlike the SAT machine there are *three* such places, not two:
   different flags and so never compete;
 * at a cell holding `false` in a rightward sweep, `tGSet` and `tGKeep false`
   *are* both applicable. That is the guessing choice, and it is the one
-  ambiguity `DescriptiveComplexity.altTr_unique` does not resolve: it is the
+  ambiguity `DescriptiveComplexity.AltQbf.altTr_unique` does not resolve: it is the
   round's move.
 -/
 
@@ -85,7 +85,7 @@ theorem altWrite_functional {τ a a' : AltV k A} (h : AltWrite τ a) (h' : AltWr
 
 /-- A transition moves to exactly one state. The only case with a choice is the
 check clause, whose two branches are separated by the flag and by
-`DescriptiveComplexity.QbfLit`. -/
+`DescriptiveComplexity.AltQbf.QbfLit`. -/
 theorem altDst_functional {cnf : Bool} {τ q q' : AltV k A} (h : AltDst cnf τ q)
     (h' : AltDst cnf τ q') : q = q' := by
   unfold AltDst at h h'
@@ -259,7 +259,7 @@ theorem isSweepBase_congr (cnf : Bool) : ∀ t t' : AltBase, isTrBase t → isTr
 
 /-- **Equal base tags force equal transitions**: the state and the symbol pin
 one coordinate and the sweep index, and the promises in
-`DescriptiveComplexity.AltTr` pin the other. -/
+`DescriptiveComplexity.AltQbf.AltTr` pin the other. -/
 theorem altTr_payload {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) (hτ' : AltTr cnf τ')
     (hs : AltSrc cnf τ q) (hs' : AltSrc cnf τ' q) (hr : AltRead τ a) (hr' : AltRead τ' a)
     (hb : τ.1.1 = τ'.1.1) : τ = τ' := by
@@ -294,7 +294,7 @@ theorem altTr_payload {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) 
 
 omit [(Language.qbf k).Structure A] in
 /-- At a guessing choice, the state and the symbol read are what
-`DescriptiveComplexity.altTr_unique`'s hypothesis excludes. -/
+`DescriptiveComplexity.AltQbf.altTr_unique`'s hypothesis excludes. -/
 theorem altSrc_read_guess {cnf : Bool} {τ q a : AltV k A}
     (hb : τ.1.1 = AltBase.tGKeep false ∨ τ.1.1 = AltBase.tGSet) (hs : AltSrc cnf τ q)
     (hr : AltRead τ a) : q = stG τ.1.2 true ∧ a = symV false (τ.2 0) := by
@@ -326,8 +326,8 @@ theorem altTr_turn_pair {cnf : Bool} {τ τ' q : AltV k A} (hτ : AltTr cnf τ) 
 
 /-- **At most one transition applies**, away from the one nondeterministic
 choice of a guessing sweep: the state and the symbol read pin the base tag
-(`DescriptiveComplexity.base_cases`), the base tag pins the rest
-(`DescriptiveComplexity.altTr_payload`), and the two remaining ambiguities are
+(`DescriptiveComplexity.AltQbf.base_cases`), the base tag pins the rest
+(`DescriptiveComplexity.AltQbf.altTr_payload`), and the two remaining ambiguities are
 the exclusive branch points. -/
 theorem altTr_unique {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) (hτ' : AltTr cnf τ')
     (hs : AltSrc cnf τ q) (hs' : AltSrc cnf τ' q) (hr : AltRead τ a) (hr' : AltRead τ' a)

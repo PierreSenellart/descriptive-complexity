@@ -1790,7 +1790,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi
   hwkSt hcompatOf hbotV
   htopV hmV0 hIncr hTestT hTestF hmir hbotSt hDom in
 /-- **One variable's machinery, fully instantiated – threaded**: as
-`DescriptiveComplexity.Draw.Data.ixVarMachine_run` with no boundary
+`DescriptiveComplexity.Draw.Data.ixVarMachine_reachesIn` with no boundary
 discipline assumed, so it applies at every address of a sweep and not
 only at the one whose SAV and TARGET the advance happens to have left
 behind. The rounds run at the states the thread produces, and the loop

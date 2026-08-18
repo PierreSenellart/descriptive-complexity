@@ -345,7 +345,7 @@ theorem plusSweep_ok (x : Fin 3 → A) :
 
 /-- **The addition sweep decides addition**: the machine model computes the
 numeric predicate `plus`, from bits alone – the bit-level analogue of the head
-program `DescriptiveComplexity.plusP`. -/
+program `DescriptiveComplexity.HeadProgram.plusP`. -/
 theorem plusSweep_accepts (x : Fin 3 → A) :
     plusSweep.Accepts x ↔ orank (x 0) + orank (x 1) = orank (x 2) := by
   have hok := plusSweep_ok x (posCount A)

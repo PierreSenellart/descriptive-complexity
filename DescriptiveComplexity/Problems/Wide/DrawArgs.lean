@@ -297,7 +297,7 @@ of the defining sentence's matrix: the atom names a copy – which argument
 point – a relation variable of that point's block, and the levels its payload
 reads. The trip goes to the cell of that member tuple, in the block the copy's
 level occupies, and its digit is the assignment bit
-(`DescriptiveComplexity.Draw.Data.blk_encAsgTup_self`). -/
+(`DescriptiveComplexity.Draw.Data.blk_encAsgTup_iff`). -/
 
 section Exp
 

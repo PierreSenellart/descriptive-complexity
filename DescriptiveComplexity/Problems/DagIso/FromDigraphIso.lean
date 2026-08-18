@@ -35,7 +35,7 @@ interpretation, junk staying unmarked.
 The three levels are recovered from the arcs alone, without any counting:
 a vertex node is one with no incoming arc, an end node one with an incoming but
 no outgoing arc, and a middle node has both
-(`DescriptiveComplexity.DagIso.patV_no_in_iff` and its siblings). An
+(`DescriptiveComplexity.DagIso.pat_no_in_vPt` and its siblings). An
 isomorphism of the two DAGs therefore preserves the levels, and reading it on
 level 0 gives the isomorphism of the graphs.
 -/

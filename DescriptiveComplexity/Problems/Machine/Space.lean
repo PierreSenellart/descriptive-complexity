@@ -14,7 +14,7 @@ machine is a state, a head position and a tape, and each of the three *is* a
 relation on the universe: the tape is a binary relation (the graph of a
 function), the state and the head are unary marks (singletons). So a
 configuration is an assignment of a three-variable block
-(`DescriptiveComplexity.mBlock`), one step of the machine is a first-order
+(`DescriptiveComplexity.SpaceTM.mBlock`), one step of the machine is a first-order
 condition on two consecutive assignments, and acceptance – reachability in the
 configuration graph, since `DescriptiveComplexity.TMData.AcceptsSpace` has no step
 bound – is a transitive closure over those assignments. That is an SO(TC)
@@ -30,7 +30,7 @@ the space-bounded problems are SO(TC) rather than `Σ₁`.
 
 The one wrinkle is that an assignment of the block is an arbitrary triple of
 relations, while a configuration is a *functional total* tape and two
-*singletons*. That is a first-order condition (`DescriptiveComplexity.cfgS`), it
+*singletons*. That is a first-order condition (`DescriptiveComplexity.SpaceTM.cfgF`), it
 holds of every assignment coming from a configuration, and the transition
 sentence demands it of the state it moves to, so every state along an accepting
 walk is a configuration.

@@ -69,7 +69,7 @@ theorem unpad_eq_pref (hc : c ≤ dd) (v : Fin dd → A) :
 variable [PartialOrder A]
 
 /-- **Being canonically padded is being canonical**, once the designated
-element is a least one: `DescriptiveComplexity.IsBot` and “equal to `zero`”
+element is a least one: `IsBot` and “equal to `zero`”
 are the same condition on a coordinate, by antisymmetry. -/
 theorem isPad_iff_canon {zero : A} (h₀ : IsBot zero) (v : Fin dd → A) :
     IsPad c zero v ↔ _root_.DescriptiveComplexity.Canon c v := by

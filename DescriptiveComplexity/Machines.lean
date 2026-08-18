@@ -50,7 +50,7 @@ kernel of the membership proof can check it literally.
 ## Transport
 
 `DescriptiveComplexity.TMData.Agree` records that two machines over different universes
-correspond along an equivalence, fieldwise; `DescriptiveComplexity.TMData.accepts_congr`
+correspond along an equivalence, fieldwise; `DescriptiveComplexity.TMData.Agree.accepts`
 transports acceptance along it. This is all the isomorphism-invariance proof of
 the decision problems needs.
 -/

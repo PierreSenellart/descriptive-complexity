@@ -268,7 +268,7 @@ variable (hTestT : ∀ u : I, dt.InnerFull F.blk (mV aT) u)
 variable (hTestF : ∀ a, a < aT → ∃ u : I, ¬dt.InnerFull F.blk (mV a) u)
 
 /-- **The control after one position's leg**: the machinery's exit fold –
-`DescriptiveComplexity.Draw.Data.ixVarMachine_run`'s final control, at the
+`DescriptiveComplexity.Draw.Data.ixVarMachine_reachesIn`'s final control, at the
 position's variable. -/
 noncomputable def ixLegCtl (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -509,8 +509,7 @@ theorem ixEvalCost_le_mul (w wP wR wK n : ℕ) :
 include hrulesM hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv hvi
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
-/-- **One spine position's leg – threaded**: as
-`DescriptiveComplexity.Draw.Data.ixVarLeg_run` without the boundary
+/-- **One spine position's leg – threaded**: the leg without the boundary
 hypotheses `hsav`/`htgt`, which the sweep cannot supply at more than one
 address. The leg ends in
 `DescriptiveComplexity.Draw.Data.ixLegStT`, the machinery's own exit state
@@ -805,8 +804,8 @@ walk-back, the whole gate sequence – every file test passing, the total
 dispatch carrying every block through – the clear flag at the verdict
 checkpoint, and the erased stage slot at the marker: the verdict `False`,
 the VAL register untouched. With
-`DescriptiveComplexity.Draw.Data.ixVarLeg_run` and
-`DescriptiveComplexity.Draw.Data.ixVarLegFail_run` this covers **every**
+`DescriptiveComplexity.Draw.Data.ixVarLeg_run_thread_reachesIn` and
+`DescriptiveComplexity.Draw.Data.ixVarLegFail_reachesIn` this covers **every**
 address the sweep visits. -/
 theorem ixVarLegUngated_reachesIn (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -1368,11 +1367,11 @@ noncomputable def ixOutStA
 /-! ### Which leg a position takes
 
 A position's machinery has three runs, by what its gates do:
-`DescriptiveComplexity.Draw.Data.ixVarLeg_run_thread` when every block is
+`DescriptiveComplexity.Draw.Data.ixVarLeg_run_thread_reachesIn` when every block is
 well shaped *and* the tags and the domain sentence agree,
-`DescriptiveComplexity.Draw.Data.ixVarLegUngated_run` when the blocks are
+`DescriptiveComplexity.Draw.Data.ixVarLegUngated_reachesIn` when the blocks are
 well shaped but the verdict flag is cleared, and
-`DescriptiveComplexity.Draw.Data.ixVarLegFail_run` when a block fails the
+`DescriptiveComplexity.Draw.Data.ixVarLegFail_reachesIn` when a block fails the
 shape test – which is the one that needs a witness, and a *least* one, so
 that the blocks before it have run. -/
 

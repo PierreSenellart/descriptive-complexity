@@ -109,7 +109,7 @@ theorem step_writeCell (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads
 /-! ### A file test the tracks decide -/
 
 /-- **A program tests its register file by a question of the tracks.** As
-`DescriptiveComplexity.Draw.Prog.reaches_test`, but the question is a predicate
+`DescriptiveComplexity.Draw.Prog.reaches_fileTestG`, but the question is a predicate
 of the *symbol* – which is what a deterministic rule can branch on – tied to
 the per-cell question by the compatibility hypothesis. The verdict comes back
 in the phase: the passing one exactly when every register passed. -/

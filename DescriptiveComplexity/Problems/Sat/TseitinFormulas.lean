@@ -22,7 +22,7 @@ All builders are parameterized by maps `Fin D → γ` selecting the free
 variables holding the clause and literal tuples, so that they can be
 instantiated at the variable types of the defining formulas of an
 interpretation (`Fin 1 × Fin D`, `Fin 2 × Fin D`). The order is used in a
-single place: the formula `DescriptiveComplexity.Tseitin.botF` expressing that a
+single place: the formula `DescriptiveComplexity.botF` expressing that a
 coordinate is a minimum, which pins down the canonical padding of tuples.
 -/
 

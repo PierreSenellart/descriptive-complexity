@@ -17,7 +17,7 @@ is `rfl`.
 case.** For a conjunctive matrix it records that some literal of the clause is
 *satisfied*; for a disjunctive one, that some literal of the term is
 *violated*. The two are the same test at the flipped truth value
-(`DescriptiveComplexity.xorB`), so one transition family serves both, and the
+(`DescriptiveComplexity.AltQbf.xorB`), so one transition family serves both, and the
 accepting turn fires at the flag `cnf`: set for a conjunctive matrix, where it
 means the clause is satisfied, clear for a disjunctive one, where it means no
 literal of the term is violated.
@@ -25,7 +25,7 @@ literal of the term is violated.
 A sweep alternates direction with each clause, as in
 `DescriptiveComplexity.Problems.Machine.Hardness`: the first runs rightwards
 from the first cell, having been entered by
-`DescriptiveComplexity.step_toChk`.
+`DescriptiveComplexity.AltQbf.step_toChk`.
 -/
 
 namespace DescriptiveComplexity

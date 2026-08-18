@@ -231,8 +231,8 @@ omit [Finite I] in
 include hstN in
 /-- **At an address every position rejects, the marker's `new` cells are
 all clear** – the junk legs
-(`DescriptiveComplexity.Draw.Data.ixVarLegFail_run`,
-`DescriptiveComplexity.Draw.Data.ixVarLegUngated_run`) store `False`, which
+(`DescriptiveComplexity.Draw.Data.ixVarLegFail_reachesIn`,
+`DescriptiveComplexity.Draw.Data.ixVarLegUngated_reachesIn`) store `False`, which
 is what the stage dictionary holds at an address that encodes no tuple. -/
 theorem ixNew_last_of_false (hbOf : ∀ j : Fin dt.nv, ¬bOf j)
     (i : dt.d.B.ι) : ¬(stOf (Fin.last dt.nv)).new i v := by
@@ -572,9 +572,8 @@ Its semantic parameter is **not** the entry state's pack transported: it is
 the *conditioned* family `DescriptiveComplexity.Draw.Data.ixGatedSem`
 inhabits – a pack at every gated position of every state, at every address.
 Conditioned, because at a junk position no pack exists (the argument blocks
-encode nothing there); quantified over the address as well, because
-`DescriptiveComplexity.Draw.Data.ixStEndB` runs this spine at `v := w` for
-an address `w` its own binders are fixed before. With that type the
+encode nothing there); quantified over the address as well, because the sweep runs this spine at
+`v := w` for an address `w` its own binders are fixed before. With that type the
 parameter is supplied outright at the top – `fun w => dt.ixGatedSem hzo hlin
 mV` – and no semantic assumption about a position survives in the run
 layer. -/
@@ -720,8 +719,8 @@ noncomputable def ixSpineSemOfB (j : Fin dt.nv)
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
-/-- **The branched control's cover equation** – `ixEvalSpineB_run`'s
-`hfs`. -/
+/-- **The branched control's cover equation** –
+`DescriptiveComplexity.Draw.Data.nexIxSpineB_reachesIn`'s `hfs`. -/
 theorem ixSpineFsOfB_succ (j : Fin dt.nv) :
     dt.ixSpineFsOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.succ =
       dt.ixLegCtlB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
@@ -738,7 +737,8 @@ theorem ixSpineFsOfB_succ (j : Fin dt.nv) :
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
-/-- **The branched tape's cover equation** – `ixEvalSpineB_run`'s `hst`. -/
+/-- **The branched tape's cover equation** –
+`DescriptiveComplexity.Draw.Data.nexIxSpineB_reachesIn`'s `hst`. -/
 theorem ixSpineStOfB_succ (j : Fin dt.nv) :
     dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.succ =
       dt.ixLegStB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j

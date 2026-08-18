@@ -1444,18 +1444,19 @@ The bottom of the ordered world, and the only vocabulary here that is a
   expansion until it stabilises – no clock, and a diverging fixed point diverges,
   which is a correct *no*. Three things make it fit in a first-order
   interpretation. Every rule of the emitted machine is written down by **one
-  formula for every instance** (`DescriptiveComplexity.Pfp.uRulesDefinable_progOf`),
-  which is what an interpretation needs and what the guard interface
-  (`DescriptiveComplexity.Pfp.UGDefinable`) is shaped for. The eleven relations
-  are read off those (`DescriptiveComplexity.Pfp.PfpData.reads_progFrom`), the
+  formula for every instance**
+  (`DescriptiveComplexity.Draw.Data.uRulesDefinable_progOf`), which is what an
+  interpretation needs and what the guard interface
+  (`DescriptiveComplexity.Draw.UGDefinable`) is shaped for. The eleven relations
+  are read off those (`DescriptiveComplexity.Draw.Data.reads_progFrom`), the
   input channel's mark being a register file whose two extremes are tag decisions
   rather than quantifiers. And the base is not the instance but a **doubled**
-  universe (`DescriptiveComplexity.Pfp.dblInterp`), which is never a singleton –
+  universe (`DescriptiveComplexity.Draw.dblInterp`), which is never a singleton –
   a track is an element, so the machine needs two of them, and a reduction must
   be correct at one-element structures too. The price of the doubling is paid on
   the expansion's side, by relativizing it to the marked half
-  (`DescriptiveComplexity.Pfp.relExp`,
-  `DescriptiveComplexity.Pfp.relExpMapEquiv`), and the doubling being a plain
+  (`DescriptiveComplexity.Draw.relExp`,
+  `DescriptiveComplexity.Draw.relExpMapEquiv`), and the doubling being a plain
   one-dimensional interpretation the composite keeps the dimension and only
   multiplies the tags by `Bool ^ dd`. Hardness for the nondeterministic variant
   is the deterministic one carried along
@@ -1466,28 +1467,29 @@ The bottom of the ordered world, and the only vocabulary here that is a
   (`DescriptiveComplexity.wideRegAccept_NEXPTIME_complete`), at the same drawing
   read one resource across: `DescriptiveComplexity.WideRegAccept` is acceptance
   by a wide machine **within its clock**, `2 ^ |Univ|` steps, its tape handed to
-  it by the input channel rather than laid by a sweep of its own. That last point
-  is what the time bound forces: a clocked machine cannot afford to write its own
-  register file, and no wide machine can lay one anyway – laying it needs an
-  injective map from the tuple coordinates into the control
-  (`DescriptiveComplexity.Pfp.Limits`), which the control has no room for. So the
-  file arrives as a *register channel*, one cell per element the program marks,
-  and the program is the same clocked one with its file-laying sweep replaced by
-  a sweep that lays nothing (`DescriptiveComplexity.Pfp.PfpData.nexProgHanded`).
-  Its run is proved both ways: a guess making the kernel true is run into the
-  accepting phase on the clock, and an accepting run is *read backwards* – the
-  tape of any reachable configuration is recognized as the machine's own tape
-  state (`DescriptiveComplexity.Pfp.PfpData.exists_entry_state`), the assignment
-  the guess left is read off its stage tracks
-  (`DescriptiveComplexity.Pfp.assignOfTrack`), and the machine is deterministic
+  it by the input channel rather than laid by a sweep of its own. That last
+  point is what the time bound forces: a clocked machine cannot afford to write
+  its own register file, and no wide machine can lay one anyway – laying it
+  needs an injective map from the tuple coordinates into the control
+  (`DescriptiveComplexity.Draw.not_injective_ctl_name`), which the control has
+  no room for. So the file arrives as a *register channel*, one cell per element
+  the program marks, and the program is the same clocked one with its
+  file-laying sweep replaced by a sweep that lays nothing
+  (`DescriptiveComplexity.Draw.Data.nexProgHanded`). Its run is proved both
+  ways: a guess making the kernel true is run into the accepting phase on the
+  clock, and an accepting run is *read backwards* – the tape of any reachable
+  configuration is recognized as the machine's own tape state
+  (`DescriptiveComplexity.Draw.Data.exists_entry_state`), the assignment the
+  guess left is read off its stage tracks
+  (`DescriptiveComplexity.Draw.assignOfTrack`), and the machine is deterministic
   after the guess, so a false verdict cannot stand beside an accepting run. The
   clock's arithmetic comes down to one inequality between the drawing's rule
   names and a constant of the kernel, and a reduction meets it by giving its
   program that many rules that never fire
-  (`DescriptiveComplexity.Pfp.PfpData.nexProgHandedPad`) – junk names change no
+  (`DescriptiveComplexity.Draw.Data.nexProgHandedPad`) – junk names change no
   run, no separation and no constant, and every layer of the proof is stated at
   whatever program provides the record
-  `DescriptiveComplexity.Pfp.PfpData.NexEmitted`. The kernel is padded too, each
+  `DescriptiveComplexity.Draw.Data.NexEmitted`. The kernel is padded too, each
   guessed variable gaining an argument
   (`DescriptiveComplexity.NexKernel.withArg`), because a variable of arity zero
   would have the empty address for its entry – the marker's own cell.

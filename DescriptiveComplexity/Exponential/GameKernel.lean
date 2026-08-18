@@ -16,7 +16,7 @@ interpretation hands over is not that: it is a
 of each argument tuple.
 
 This file closes the gap once and for all, for the two-argument case that covers
-every relation symbol of `DescriptiveComplexity.Language.andOrGraph` (a unary
+every relation symbol of `FirstOrder.Language.andOrGraph` (a unary
 symbol simply ignores the second argument):
 
 > **`DescriptiveComplexity.ExpExpansion.exists_paramKernel`** – for every

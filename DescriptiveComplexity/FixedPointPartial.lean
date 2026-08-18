@@ -32,7 +32,7 @@ convergence-requiring convention is chosen deliberately:
   assignment means the same thing here, and conversely a definition of this
   file is read in the textbook semantics by guarding its output with «the
   state is a fixed point of the step» – the guard is first-order
-  (`DescriptiveComplexity.isFixedPtF` in
+  (`DescriptiveComplexity.StepDef.isFixedPtF` in
   `DescriptiveComplexity.FixedPointPartialSpace`), and it fails at the empty
   assignment of a diverging iteration, since a diverging iteration's empty
   *start* is not a fixed point.

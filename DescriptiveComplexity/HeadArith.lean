@@ -13,7 +13,7 @@ A head holds an element of the universe, that is – through
 `DescriptiveComplexity.orank` – a number below `Nat.card A`. This file teaches a
 `DescriptiveComplexity.HeadProgram` to *add* two of them, which is the first of
 the fragments the inclusion `AC⁰ ⊆ LOGSPACE` needs: the numeric predicates of
-`DescriptiveComplexity.Language.arith` have to be decided by a machine whose
+`FirstOrder.Language.arith` have to be decided by a machine whose
 guards are quantifier-free, and “these two heads are equal” is all such a guard
 can say.
 

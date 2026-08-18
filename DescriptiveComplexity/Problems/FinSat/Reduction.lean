@@ -9,7 +9,7 @@ import DescriptiveComplexity.RecursivelyEnumerable
 /-!
 # The reduction to FINSAT, and its correctness
 
-`DescriptiveComplexity.FinSat.Hardness` evaluates the encoded sentence `σ_A`
+`DescriptiveComplexity.Problems.FinSat.Hardness` evaluates the encoded sentence `σ_A`
 node by node; this file closes the two directions and assembles the ordered
 first-order reduction.
 
@@ -514,11 +514,10 @@ theorem finsat_image_iff :
 an instance to the encoded sentence `σ_A`, from any problem defined, on nonempty
 finite structures, by an `∃SO[new]` sentence with a single block.
 
-Stated for relational sources: `DescriptiveComplexity.CofinalHard` admits source languages
-with function symbols, whose junk interpretation on invented arguments the
-sentence would have to guess: the term layer, which
-`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable` removes from the
-source instead. -/
+Stated for relational sources: a language with function symbols would leave the
+sentence guessing their junk interpretation on invented arguments, and every
+vocabulary the catalog states a `DescriptiveComplexity.DecisionProblem` over is
+relational. -/
 noncomputable def finsatReduction (Q : DecisionProblem L)
     (hφ : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
       Q A ↔ ∃ m : ℕ, SORealize (newLang L) (A ⊕ Fin m) [B] φ true) :
@@ -534,13 +533,11 @@ end Reduction
 every `∃SO[new]`-definable problem over a relational vocabulary admits an
 ordered first-order reduction to finite satisfiability.
 
-Membership is `DescriptiveComplexity.FinSat.finsat_mem_RE`; together they say
-that finite satisfiability is complete for `∃SO[new]` among relational
-vocabularies. Lifting the restriction is the term layer, which is what
-`DescriptiveComplexity.RE.Hard` – cofinal hardness, quantified over *every*
-source vocabulary – additionally asks for;
-`DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable` supplies it, and
-the umbrella composes the two. -/
+Membership is `DescriptiveComplexity.finsat_mem_RE`; together they say
+that finite satisfiability is complete for `∃SO[new]`. Cofinal hardness
+(`DescriptiveComplexity.RE.Hard`) quantifies over every *relational* source
+vocabulary (`DescriptiveComplexity.hard_RE_iff`), which is exactly what this
+supplies. -/
 theorem finsat_hard_of_sigmaSONewDefinable :
     ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSONewDefinable Q → Nonempty (Q ≤ᶠᵒ[≤] FINSAT) := by

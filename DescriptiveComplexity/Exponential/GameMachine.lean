@@ -1211,7 +1211,7 @@ the lowest position and hands over to
 and closing it needs the two order facts of the layout: the two left sentinels
 are adjacent (`DescriptiveComplexity.succPos_leftPt`), so the handover really
 does land on the lowest position; and a cell is never next to the first
-sentinel (`DescriptiveComplexity.succPos_cellPt_ne_leftPt`), so the walk cannot
+sentinel (`DescriptiveComplexity.succPos_ne_leftPt`), so the walk cannot
 reach the lowest position without reading the mark first. -/
 
 section Rewind

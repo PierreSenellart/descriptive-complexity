@@ -160,7 +160,7 @@ theorem wellFormed_halt :
 /-! ### Tuple numbers
 
 The reversed lexicographic order on tuples is comparison of their numbers –
-the little-endian `DescriptiveComplexity.tupleIdx` of the coordinates read
+the little-endian `FirstOrder.Language.tupleIdx` of the coordinates read
 through the numbering. One direction is proved arithmetically; the other
 falls out of trichotomy and injectivity. -/
 

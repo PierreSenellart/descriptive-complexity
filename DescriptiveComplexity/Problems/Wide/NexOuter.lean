@@ -25,7 +25,7 @@ than the clock allows. What it does instead is four things once:
 
 This file is that outer layer, with the evaluation abstract – its phase type
 `PE`, its site family and its boundary rules are parameters, as in
-`DescriptiveComplexity.Draw.outerRule` – and with the two sweeps' *writes*
+`DescriptiveComplexity.Draw.Data.outerRule` – and with the two sweeps' *writes*
 abstract too, because what a cell of the file holds is a fact about the layout
 the caller chose and not about the shape of the loop. The runs the two sweeps
 discharge against are `DescriptiveComplexity.Draw.Prog.reachesIn_buildFile` and

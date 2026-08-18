@@ -23,7 +23,7 @@ skip leaves behind are harmless: the leaf is
 did not run.
 
 This composite is slotted into the **matrix parameter** of
-`DescriptiveComplexity.Draw.varRule` – which is generic in its `PX`/`SX`
+`DescriptiveComplexity.Draw.Data.varRule` – which is generic in its `PX`/`SX`
 types and enters them only through `pxEntry` – so the variable machinery,
 its run theorem and everything above them are untouched.
 

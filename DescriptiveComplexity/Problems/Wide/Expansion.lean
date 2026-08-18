@@ -27,7 +27,7 @@ Three things fix the whole design.
   can be written directly rather than through
   `DescriptiveComplexity.SOBlock.ordLeF`, which would compare padded atoms
   against the *ambient* order rather than against the instance's own.
-* **Two tags** (`DescriptiveComplexity.Wide.WTag`): `addr`, whose domain
+* **Two tags** (`DescriptiveComplexity.AddrExp.WTag`): `addr`, whose domain
   sentence is `⊤`, so those points are all the addresses; and `ctrl`, whose
   domain sentence says the variable is a **singleton**, so those points are the
   elements of the instance. This is the standard way of keeping the base
@@ -173,7 +173,7 @@ section Structure
 
 variable (A : Type) [Language.wide.Structure A] [LinearOrder A]
 
-/-- The expanded structure of `DescriptiveComplexity.Wide.wideExp`, at the
+/-- The expanded structure of `DescriptiveComplexity.wideExp`, at the
 vocabulary of machines – equal to the expansion's own by definition, but not
 syntactically, so instance search has to be handed it. -/
 @[instance_reducible]

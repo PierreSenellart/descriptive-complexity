@@ -90,7 +90,7 @@ noncomputable def inpRegT : WTag → WTag → wide2.Sentence
 
 /-- **The expansion of a wide-machine instance at the register channel**: the
 tags, the block, the domain and eleven of the twelve symbols are
-`DescriptiveComplexity.Wide.wideExp`'s; the input is the register channel's. -/
+`DescriptiveComplexity.wideExp`'s; the input is the register channel's. -/
 noncomputable def wideRegExp : ExpExpansion Language.wide where
   Tag := WTag
   B := addrBlock

@@ -29,7 +29,7 @@ PTIME-hard under ordinary ordered reductions
 (`DescriptiveComplexity.game_hard_ordered`), so that property is `GameWon` of the
 AND/OR graph an interpretation `I` draws **on the expanded universe**. Its four
 defining relations are first-order over the expansion, hence *alternating block
-prefixes* over the base (`DescriptiveComplexity.exists_translate`), and a prefix
+prefixes* over the base (`DescriptiveComplexity.ExpExpansion.exists_translate`), and a prefix
 is a sequence of moves. `DescriptiveComplexity.ExpExpansion.graphGame` plays that graph:
 
 * `DescriptiveComplexity.ExpExpansion.wins_pre` – the prefix phases evaluate the

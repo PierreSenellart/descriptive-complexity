@@ -18,14 +18,14 @@ Every relation of `FirstOrder.Language.qsat` is defined by a formula that only
 depends on the *tags* of its arguments, and each of those formulas is read off
 the tables of `DescriptiveComplexity.Problems.Qsat.Tags`:
 
-* `DescriptiveComplexity.varF` and `DescriptiveComplexity.clF` are the marks
+* `DescriptiveComplexity.QsatRed.varF` and `DescriptiveComplexity.QsatRed.clF` are the marks
   `DescriptiveComplexity.QVarOn` and `DescriptiveComplexity.QClOn`;
-* `DescriptiveComplexity.occF` collects, from the fixed literal list
+* `DescriptiveComplexity.QsatRed.occF` collects, from the fixed literal list
   `DescriptiveComplexity.qLits` of a clause tag, those literals that are on the
   variable tag and sign asked for – so a single generic realization lemma
-  (`DescriptiveComplexity.realize_occF`) replaces a case analysis on all pairs of
+  (`DescriptiveComplexity.QsatRed.realize_occF`) replaces a case analysis on all pairs of
   tags;
-* `DescriptiveComplexity.prefF` is the lexicographic comparison
+* `DescriptiveComplexity.QsatRed.prefF` is the lexicographic comparison
   `DescriptiveComplexity.KeyLt` of the two keys, built from static numerals and
   two order atoms.
 

@@ -10,7 +10,8 @@ import DescriptiveComplexity.Exponential.GamePrefix
 
 The second correctness half: from `main tx`, the graph game wins exactly when
 the existential player wins the interpreted AND/OR graph at the node the state
-carries (`DescriptiveComplexity.ExpExpansion.wins_main_iff`). Both directions are
+carries (`DescriptiveComplexity.ExpExpansion.target_of_wins` and
+`DescriptiveComplexity.ExpExpansion.wins_of_winsOn`). Both directions are
 inductions – on `DescriptiveComplexity.SOGameSpec.Wins` one way, on
 `DescriptiveComplexity.WinsOn` the other – and the first goes through
 `DescriptiveComplexity.ExpExpansion.Target`, which says what each of the five

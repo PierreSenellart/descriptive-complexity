@@ -25,7 +25,7 @@ So the doubled universe is the extended universe of value invention
 (`DescriptiveComplexity.SecondOrderNew`) with `|A|` invented values, and
 `DescriptiveComplexity.relativizeTo` is what reads a formula about the instance
 inside it. What the reduction then has to do – and what
-`DescriptiveComplexity.Problems.Wide.DrawRelExp` does – is relativize the
+`DescriptiveComplexity.Problems.Wide.RelExpansion` does – is relativize the
 *expansion* the same way, so that its points are still the instance's.
 
 The interpretation is plain (not relativized) and one-dimensional, so composing
@@ -112,7 +112,7 @@ end Dbl
 
 /-! ### An environment to name constants in
 
-The rule-definability discharge (`DescriptiveComplexity.Draw.uRulesDefinable_progOf`)
+The rule-definability discharge (`DescriptiveComplexity.Draw.Data.uRulesDefinable_progOf`)
 asks for one `DescriptiveComplexity.Draw.Env`, and only to name the gate
 dispatch's default tag – a *nonemptiness* of a type the instance does not
 mention, so any environment will do. The two-element one below is the cheapest:

@@ -102,7 +102,7 @@ noncomputable def stateElt (zero : A) (p : P) (w : Fin c → A) :
     Tag R P K × (Fin dd → A) :=
   (Tag.phase p, pad zero w)
 
-/-- **A symbol**: the tracks in the payload (`DescriptiveComplexity.Draw.withBit`). -/
+/-- **A symbol**: the tracks in the payload. -/
 noncomputable def symElt (zero : A) (w : Fin c → A) : Tag R P K × (Fin dd → A) :=
   (Tag.sym, pad zero w)
 

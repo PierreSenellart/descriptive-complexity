@@ -13,19 +13,17 @@ import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
 /-!
 # The clocked evaluation at the file the channel hands over
 
-`DescriptiveComplexity.Draw.Data.nexIxEvalB_blkLaid_reachesIn` runs the clocked
-evaluation at the file a program *lays* – a stretch of consecutive addresses,
-each register one bit above the last. This file prices the same evaluation at the
-file the **register channel** hands over, where the registers are the cells the
+A program that *lays* its file puts the registers at consecutive addresses, each
+one bit above the last. This file prices the clocked evaluation at the file the
+**register channel** hands over instead, where the registers are the cells the
 channel writes and a step of a walk across the file can cost as much as the whole
-file.
+file (`DescriptiveComplexity.Draw.Data.nexIxEvalB_regLaid_reachesIn`).
 
 The four widths are `regW`, `regWP`, `regWR`, `regWK`
 (`DescriptiveComplexity.Draw.Data.regW` and its neighbors), each bounded by
-one number – `regWidthBound` – as the laid file's are by `blkWidthBound`. The
-shape is the same and so is the reason: three of the four are linear in the
-file's own bound, and the seek is quadratic, being a pass of the file per bit of
-its target.
+one number, `regWidthBound`: three of the four are linear in the file's own
+bound, and the seek is quadratic, being a pass of the file per bit of its
+target.
 -/
 
 namespace DescriptiveComplexity
@@ -162,10 +160,8 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Fini
   [Finite dt.KIx] in
 /-- **The tower's costs at the handed file are polynomial in one number**: the
 `IxWidthBd` of `DescriptiveComplexity.Draw.Data.ixLegWidth_le`, at the four
-widths the register channel's file is charged. This is
-`DescriptiveComplexity.Draw.Data.ixWidthBd_blkLaid` with the laid file's
-numbers replaced by the handed one's; what an instantiation owes of the clock is
-again `q ^ 25 ≤ 2 ^ (k · m)`. -/
+widths the register channel's file is charged; what an instantiation owes of
+the clock is again `q ^ 25 ≤ 2 ^ (k · m)`. -/
 theorem ixWidthBd_regLaid {q : ℕ} (hq : 16 ≤ q)
     (hwidth : dt.regWidthBd A R' P' ≤ q)
     (hd0 : Nat.card (Lex (Fin dt.dd0 → A)) + 1 ≤ q)
@@ -341,11 +337,11 @@ end Laid
 
 /-! ### The two bridges at the handed file
 
-`DescriptiveComplexity.Draw.Data.passEnc_blkLaid` and `gateEnc_blkLaid`
-discharge the gates' bridges at the file a program lays. The generic lemmas they
-come from ask only that the registers stand for distinct elements, that the
-layout order is linear, that a register's block and tuple are its element's –
-all of which the handed file has – so the same two statements hold here. -/
+`DescriptiveComplexity.Draw.Data.passEnc_regLaid` and `gateEnc_regLaid`
+discharge the gates' bridges at the file the channel hands over. The generic
+lemmas they come from ask only that the registers stand for distinct elements,
+that the layout order is linear, and that a register's block and tuple are its
+element's – all of which the handed file has. -/
 
 section Bridges
 

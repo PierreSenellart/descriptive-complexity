@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Machine.AltPrefix
 # The rounds, one block at a time
 
 The induction that turns the machine into the quantifier prefix. Round `m`
-starts at `DescriptiveComplexity.AtRound`: the head at the first cell, the tape
+starts at `DescriptiveComplexity.AltQbf.AtRound`: the head at the first cell, the tape
 holding what the blocks below `m` have written, and the state the entry of
 sweep `m` – or, when every block has played, the entry of the check phase.
 
@@ -24,7 +24,7 @@ were built in `AltGuess`: an existential round picks an assignment
 The read-off returns *some* assignment, not a chosen one, which is what an
 existential round wants and a universal one does not. So a universal round does
 not follow the read-off at all: it names the configuration it wants to hand
-over (`DescriptiveComplexity.exists_atRound`) and appeals to the fact that
+over (`DescriptiveComplexity.AltQbf.exists_atRound`) and appeals to the fact that
 every successor of a universal configuration accepts.
 -/
 
@@ -360,7 +360,7 @@ theorem altAcc_init_iff {cnf start : Bool} (hk : 0 < k) (νs : Fin k → A → P
 /-- **The machine plays the formula.** Acceptance of the alternating machine is
 the alternating quantification of the matrix over the `k` blocks – provided the
 tape is long enough to hold the run, which
-`DescriptiveComplexity.alt_budget` guarantees. -/
+`DescriptiveComplexity.AltQbf.alt_budget` guarantees. -/
 theorem altAccepts_iff_altQuant {cnf start : Bool} (hk : 0 < k)
     (hbudget : roundBound k A k + 1 ≤ Nat.card {p : AltV k A // AltPosn p} - 1) :
     (altMachine k A cnf).AltAccepts start ↔ altQuant A k (QbfMatrix cnf) start := by
@@ -401,7 +401,7 @@ theorem altAccepts_iff_altQuant {cnf start : Bool} (hk : 0 < k)
 /-! ### The tape is long enough
 
 The `k` rounds cost one sweep each and the check one sweep per clause, which is
-what `DescriptiveComplexity.alt_budget` was proved for: the filler positions
+what `DescriptiveComplexity.AltQbf.alt_budget` was proved for: the filler positions
 alone outnumber them. -/
 
 omit [(Language.qbf k).Structure A] in

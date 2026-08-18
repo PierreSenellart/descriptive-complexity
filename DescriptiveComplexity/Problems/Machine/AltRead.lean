@@ -8,23 +8,23 @@ import DescriptiveComplexity.Problems.Machine.AltCheck
 /-!
 # Reading a block's assignment off an arbitrary run
 
-The direction a universal round needs. `DescriptiveComplexity.steps_sweep`
+The direction a universal round needs. `DescriptiveComplexity.AltQbf.steps_sweep`
 exhibits *the* run of a sweep against a given assignment; a universal player
 must be answered for **every** play of its block, so the converse is needed:
 whatever the machine does during sweep `i`, it is the intended run of *some*
 assignment of block `i`.
 
-The invariant is `DescriptiveComplexity.InSweepR`: at every moment of the
+The invariant is `DescriptiveComplexity.AltQbf.InSweepR`: at every moment of the
 rightward pass the tape is `tapeAfter (Function.update νs i ν') (i+1)` for the
 `ν'` the sweep has written *so far*, which is supported strictly below the
 head. Cells at or above the head are therefore untouched – `ν'` is false there,
-and `DescriptiveComplexity.valAfter_update_succ` collapses the disjunction back
+and `DescriptiveComplexity.AltQbf.valAfter_update_succ` collapses the disjunction back
 to the old value – so one statement covers the whole pass rather than needing a
 separate “below the head” clause.
 
 The only two transitions that can fire at a cell are `tGKeep`, which changes
 nothing, and `tGSet`, which adds the cell's variable to `ν'`. That the machine
-has no other choice is `DescriptiveComplexity.altTr_unique`.
+has no other choice is `DescriptiveComplexity.AltQbf.altTr_unique`.
 -/
 
 namespace DescriptiveComplexity

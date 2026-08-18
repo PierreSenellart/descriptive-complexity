@@ -1266,7 +1266,7 @@ holds makes the emitted instance a yes-instance of
 promises coming for free – well-formedness from the layout, determinism from
 `prog_sep` – and the run being `reaches_evalEntry`, `reaches_mainB` and the
 output leg in sequence
-(`DescriptiveComplexity.Draw.Data.reaches_accept`). Everything semantic the
+(`DescriptiveComplexity.Draw.Data.reaches_outVerdict`). Everything semantic the
 loop asks for is a choice made once here: the end marker is
 `DescriptiveComplexity.Draw.logicalTop`, which is *what the startup writes*
 (`DescriptiveComplexity.Draw.Data.tgtTopSt_tgt` – a tag has a block exactly
@@ -1277,7 +1277,7 @@ is `exists_valEnum`'s chain over `Fin (n + 1)`, whose bottom and top are `0`
 and `Fin.last n`; and the stage the machine stops at is the *first stable*
 one (`DescriptiveComplexity.StepDef.exists_least_stable`), whose two sides
 are `stageEnd_conv_of_eq` and `stageEnd_not_conv_of_ne`. The output leg
-(`DescriptiveComplexity.Draw.Data.outLeg_accept`) is the one place a
+(`DescriptiveComplexity.Draw.Data.outLeg_verdict`) is the one place a
 verdict is *read*: the output variable is nullary, so every hypothesis the
 machinery asks about the working address's blocks is a function on `Fin 0`,
 its pack is `passSem` transported by `semCastT`, and what is left is
@@ -1419,7 +1419,7 @@ complete: what remains is instantiation and the runs. The instantiation has
 begun: `DescriptiveComplexity.Problems.Wide.DrawRepAtoms` classifies the
 atoms of the defining sentences' replicated-block language – base-vocabulary
 kinds are guards, the replicated-block kind the read leaves – with the same
-capstone (`DescriptiveComplexity.Draw.realize_iff_qfValue_repHolds`), and
+capstone (`DescriptiveComplexity.Draw.realize_iff_qfValue_blkHolds`), and
 `DescriptiveComplexity.Problems.Wide.DrawTower` assembles the **phase tower**:
 per-kind machinery types indexed by the `DescriptiveComplexity.Draw.MatAtom`
 itself (so everything reduces per constructor, the stuck `kindOf`

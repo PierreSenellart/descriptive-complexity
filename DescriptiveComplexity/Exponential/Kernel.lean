@@ -161,7 +161,7 @@ a first-order sentence*, which is what a program can be written for.
 
 The equivalence is stated at every linear order on the expanded universe, so the
 reduction that consumes it is free to impose the order its encoding induces
-(compare `DescriptiveComplexity.encOrder`). -/
+(compare `DescriptiveComplexity.Draw.encOrder`). -/
 theorem exists_nexKernel [L.IsRelational] {P : DecisionProblem L}
     (h : ExpDefinable NP P) :
     ∃ K : NexKernel L, ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]

@@ -169,7 +169,7 @@ holds of. -/
 def aeBits (ρ : addrBlock.Assignment A) : A → Prop := fun x => ρ () fun _ => x
 
 /-- **The assignment an address is**, the inverse of
-`DescriptiveComplexity.Wide.aeBits`. -/
+`DescriptiveComplexity.AddrExp.aeBits`. -/
 def aeAssign (s : A → Prop) : addrBlock.Assignment A := fun _ v => s (v 0)
 
 @[simp]

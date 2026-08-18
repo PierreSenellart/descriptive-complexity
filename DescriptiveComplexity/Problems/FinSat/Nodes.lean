@@ -48,10 +48,10 @@ elements are of three kinds:
 
 **The order.** Well-formedness of the image demands a linear order in which
 every child comes strictly earlier, so the tags are ranked
-(`DescriptiveComplexity.FinSat.tagRank`) by the layer they sit in – leaves
+(`DescriptiveComplexity.FinSat.Tag.tagRank`) by the layer they sit in – leaves
 lowest, the prefix highest, the translated kernel ordered by the size of its
 subformula – and ties are broken by an arbitrary enumeration of the (finite)
-tag type. The resulting key `DescriptiveComplexity.FinSat.tagKey` is injective,
+tag type. The resulting key `DescriptiveComplexity.FinSat.Tag.tagKey` is injective,
 so the reduction may compare two tags by trichotomy and emit `⊤`, `⊥` or a
 comparison of the tuples. That last comparison is
 `DescriptiveComplexity.lexSelLeF`, which lives in

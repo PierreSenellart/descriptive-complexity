@@ -20,7 +20,7 @@ naming guard the interpretation can write down too.
 The reason is the layout, not the data: at each coordinate an encoded tuple
 holds a component of the one-hot code – one of the two designated elements – or
 a payload position, or the clear element, and *which* it holds is decided by
-`DescriptiveComplexity.EncLayout` when the formula is built. So an encoded
+`DescriptiveComplexity.Draw.EncLayout` when the formula is built. So an encoded
 coordinate is `DescriptiveComplexity.Draw.UReadable` as soon as the payload is,
 and every payload the program spells is a control slot or the clear element.
 -/

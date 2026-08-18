@@ -16,7 +16,7 @@ program's gate subroutine actually asks:
 * **exactly one tag's witness is present** – one membership question per tag,
   finitely many, and the answers are the control's tag flags;
 * **every member is well-shaped** – a witness tuple or a member tuple: one
-  `fileTest`, the per-cell question read off the name marks, and *tag-free*,
+  file test, the per-cell question read off the name marks, and *tag-free*,
   which is why the code of a member carries no tag
   (`DescriptiveComplexity.Draw.PtCode`);
 * **the domain sentence holds of the decoded assignment** – where

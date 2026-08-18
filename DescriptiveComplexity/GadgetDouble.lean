@@ -18,7 +18,7 @@ mapping `FirstOrder.Language.twoCopies L₀`-instances to
 `FirstOrder.Language.twoCopies L₁`-instances by running `F` on each marked
 side, and identifies the sides of the result: the pattern side of `F.double`
 applied to `A` is `F` applied to the pattern side of `A`
-(`DescriptiveComplexity.patSide_double_equiv`).
+(`DescriptiveComplexity.patSideDoubleEquiv`).
 
 Each side's defining formulas are those of `F` with every atom renamed to its
 copy for that side (`DescriptiveComplexity.patLHom`) and every quantifier

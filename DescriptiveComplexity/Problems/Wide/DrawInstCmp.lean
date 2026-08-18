@@ -22,13 +22,13 @@ loop's two invariants:
   stop at the padded cell of the enumerated tuple and the read bits are the
   two block values' membership bits there;
 * **the flags fold the strict prefix**
-  (`DescriptiveComplexity.Draw.Data.cmpFlags_cmpIter`): agreement so far,
+  (`DescriptiveComplexity.Draw.Data.cmpFlags_cmpFam`): agreement so far,
   a difference seen, and the first difference's verdict, over the tuples
   strictly below the round's.
 
 `DescriptiveComplexity.Draw.Data.cmp_run` is the machine run; the final
 control's verdict bit is characterized against the two tracks' padded bits
-(`DescriptiveComplexity.Draw.Data.ctlBit_avC_cmp_run`), which is the form
+(`DescriptiveComplexity.Draw.Data.ctlBit_avC_cmp_exit`), which is the form
 `DescriptiveComplexity.Problems.Wide.DrawCmp` turns into the equality and
 order atoms.
 -/
@@ -858,8 +858,8 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The verdict the exit control carries**: agreement everywhere for an
 equality atom; agreement everywhere or a first difference the second
 block's, for an order atom. This is exactly the shape
-`DescriptiveComplexity.Draw.encMap_eq_iff_padBits` and
-`DescriptiveComplexity.Draw.encOrder_le_iff_padBits` decide against the two
+`DescriptiveComplexity.Draw.Data.encMap_eq_iff_padBits` and
+`DescriptiveComplexity.Draw.Data.encOrder_le_iff_padBits` decide against the two
 registers' contents. -/
 theorem ctlBit_avC_cmp_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (g : dt.SlotIx → A) :

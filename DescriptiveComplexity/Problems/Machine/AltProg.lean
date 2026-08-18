@@ -48,7 +48,7 @@ records that some literal of the clause is *satisfied*, and a clause is settled
 when the flag is set; for a disjunctive one it records that some literal is
 *violated*, and a term is settled – by accepting – when the flag is *clear*.
 The two are the same clause with the truth value flipped
-(`DescriptiveComplexity.xorB`), which is why one table serves both.
+(`DescriptiveComplexity.AltQbf.xorB`), which is why one table serves both.
 
 ## Semantics first
 
@@ -239,7 +239,7 @@ def AltRead (τ a : AltV k A) : Prop :=
 
 /-- The state a transition moves to. The only place the instance is consulted
 is the check clause, where the new flag depends on
-`DescriptiveComplexity.QbfLit`. -/
+`DescriptiveComplexity.AltQbf.QbfLit`. -/
 def AltDst (cnf : Bool) (τ q : AltV k A) : Prop :=
   match τ.1.1 with
   | .tGStart => q = stG τ.1.2 true
