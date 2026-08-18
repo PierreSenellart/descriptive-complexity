@@ -550,19 +550,19 @@ variable (spec : TCSpec L)
 
 open Classical in
 theorem qdepth_src_le (m : spec.Mode) : qdepth (spec.src m) ≤ specDepth spec := by
-  letI := Fintype.ofFinite spec.Mode
+  let := Fintype.ofFinite spec.Mode
   exact le_trans (Finset.le_sup (f := fun m => qdepth (spec.src m)) (Finset.mem_univ m))
     (le_trans (le_max_left _ _) (le_max_right _ _))
 
 open Classical in
 theorem qdepth_tgt_le (m : spec.Mode) : qdepth (spec.tgt m) ≤ specDepth spec := by
-  letI := Fintype.ofFinite spec.Mode
+  let := Fintype.ofFinite spec.Mode
   exact le_trans (Finset.le_sup (f := fun m => qdepth (spec.tgt m)) (Finset.mem_univ m))
     (le_trans (le_max_right _ _) (le_max_right _ _))
 
 open Classical in
 theorem qdepth_step_le (m m' : spec.Mode) : qdepth (spec.step m m') ≤ specDepth spec := by
-  letI := Fintype.ofFinite spec.Mode
+  let := Fintype.ofFinite spec.Mode
   exact le_trans (Finset.le_sup (f := fun p : spec.Mode × spec.Mode => qdepth (spec.step p.1 p.2))
     (Finset.mem_univ (m, m'))) (le_max_left _ _)
 

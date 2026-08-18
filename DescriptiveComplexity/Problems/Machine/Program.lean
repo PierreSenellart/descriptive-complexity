@@ -56,7 +56,7 @@ private theorem not_minPos_of_lt (hlin : IsLinOrd M.Le) {p₀ p : A} (hp₀ : M.
 omit [Finite A] in
 /-- **The successor of a position is unique.** `DescriptiveComplexity.succPos_left_unique`
 gives the predecessor; a step of a machine needs this direction, since the head
-moves to *the* neighbour in the direction the transition names. -/
+moves to *the* neighbor in the direction the transition names. -/
 theorem succPos_right_unique (hlin : IsLinOrd M.Le) {p q q' : A}
     (h : SuccPos M.Le M.Posn p q) (h' : SuccPos M.Le M.Posn p q') : q = q' := by
   rcases hlin.2.2.2 q q' with hle | hle
@@ -68,16 +68,24 @@ theorem succPos_right_unique (hlin : IsLinOrd M.Le) {p q q' : A}
     · exact hcon.symm
 
 omit [Finite A] in
-/-- **A deterministic machine takes at most one step** from any configuration:
-the transition is pinned by the state and the symbol read, its effect by the
-functionality of `Dst` and `Write`, and the new head by uniqueness of the
-neighbour in the direction the transition names. -/
-theorem step_functional (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
-    {c c₁ c₂ : Config A} (h₁ : M.Step c c₁) (h₂ : M.Step c c₂) : c₁ = c₂ := by
+/-- **A machine takes at most one step wherever its transition is pinned.** The
+same proof as `DescriptiveComplexity.TMData.step_functional`, with the clause
+that names the transition asked for at *this* configuration only.
+
+That is what a program which guesses in one phase has: everywhere but the guess,
+the state and the symbol read name the transition, and the two remaining clauses
+– that a transition has one destination and writes one symbol – hold outright.
+Feed it to `DescriptiveComplexity.TMData.uniqueFrom_of_invariant`. -/
+theorem step_functional_at (hlin : IsLinOrd M.Le)
+    (hdstf : ∀ (τ q q' : A), M.Dst τ q → M.Dst τ q' → q = q')
+    (hwritef : ∀ (τ a a' : A), M.Write τ a → M.Write τ a' → a = a')
+    {c : Config A}
+    (huniq : ∀ τ σ : A, M.Tr τ → M.Tr σ → M.Src τ c.state → M.Src σ c.state →
+      M.Read τ (c.tape c.head) → M.Read σ (c.tape c.head) → τ = σ)
+    {c₁ c₂ : Config A} (h₁ : M.Step c c₁) (h₂ : M.Step c c₂) : c₁ = c₂ := by
   obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := h₁
   obtain ⟨σ, hσ, hsrc', hread', hdst', hwrite', hframe', hmove'⟩ := h₂
-  obtain ⟨-, huniq, hdstf, hwritef⟩ := hdet
-  obtain rfl := huniq τ σ c.state (c.tape c.head) hτ hσ hsrc hsrc' hread hread'
+  obtain rfl := huniq τ σ hτ hσ hsrc hsrc' hread hread'
   refine Config.ext (hdstf τ _ _ hdst hdst') ?_ (funext fun p => ?_)
   · rcases hmove with ⟨hr, hs⟩ | ⟨hr, hs⟩ <;> rcases hmove' with ⟨hr', hs'⟩ | ⟨hr', hs'⟩
     · exact succPos_right_unique hlin hs hs'
@@ -87,6 +95,17 @@ theorem step_functional (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
   · rcases eq_or_ne p c.head with rfl | hne
     · exact hwritef τ _ _ hwrite hwrite'
     · rw [hframe p hne, hframe' p hne]
+
+omit [Finite A] in
+/-- **A deterministic machine takes at most one step** from any configuration:
+the transition is pinned by the state and the symbol read, its effect by the
+functionality of `Dst` and `Write`, and the new head by uniqueness of the
+neighbor in the direction the transition names. -/
+theorem step_functional (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
+    {c c₁ c₂ : Config A} (h₁ : M.Step c c₁) (h₂ : M.Step c c₂) : c₁ = c₂ :=
+  step_functional_at hlin hdet.2.2.1 hdet.2.2.2
+    (fun τ σ hτ hσ hsrc hsrc' hread hread' =>
+      hdet.2.1 τ σ _ _ hτ hσ hsrc hsrc' hread hread') h₁ h₂
 
 omit [Finite A] in
 /-- **Deterministic runs of equal length agree**: the run is unique, which is

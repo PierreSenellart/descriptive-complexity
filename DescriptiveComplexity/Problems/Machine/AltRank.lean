@@ -83,12 +83,6 @@ theorem maxPos_iff_rank {x p₁ : A} (hx : M.Posn x) (hmax : MaxPos M.Le M.Posn 
   · intro h
     exact bitRank_inj hlin hx hmax.1 h ▸ hmax
 
-/-- The rank of a position other than the highest is below the highest rank. -/
-theorem bitRank_lt_of_not_maxPos {x p₁ : A} (hx : M.Posn x) (hmax : MaxPos M.Le M.Posn p₁)
-    (h : ¬MaxPos M.Le M.Posn x) : bitRank M.Le M.Posn x < bitRank M.Le M.Posn p₁ := by
-  refine bitRank_lt hlin hx (hmax.2 x hx) fun hcon => h ?_
-  exact hcon ▸ hmax
-
 /-- **Iterating `nextPos` enumerates the positions above `t` in order**: the
 `j`-th one is a position of rank `rank t + j`, as long as the budget
 `rank p₁ - rank t` has not run out. -/

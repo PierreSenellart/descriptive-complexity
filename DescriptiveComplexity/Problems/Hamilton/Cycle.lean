@@ -114,8 +114,8 @@ theorem enum_of_tourOn {R : A → A → Prop} (h : TourOn R) :
     ∃ (n : ℕ) (f : Fin n ≃ A), ∀ i : Fin n, R (f i) (f (nextIdx i)) := by
   classical
   obtain ⟨Le, hlin, hsucc, hwrap⟩ := h
-  letI : LinearOrder A := IsLinOrd.toLinearOrder hlin
-  haveI : Fintype A := Fintype.ofFinite A
+  let : LinearOrder A := IsLinOrd.toLinearOrder hlin
+  have : Fintype A := Fintype.ofFinite A
   refine ⟨Fintype.card A, (monoEquivOfFin A rfl).toEquiv, fun i => ?_⟩
   set f := (monoEquivOfFin A rfl).toEquiv with hf
   have hle : ∀ a b : A, a ≤ b ↔ Le a b := fun _ _ => Iff.rfl

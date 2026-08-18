@@ -315,9 +315,9 @@ def IsoReflecting (F : FOInterpretation L₀ L₁ Tag d) : Prop :=
 isomorphic exactly when the two sides of its image are. -/
 theorem twoCopiesIso_double_iff [Finite Tag] (hrefl : IsoReflecting F) (hA : Finite A) :
     (TwoCopiesIso L₀).Holds A ↔ (TwoCopiesIso L₁).Holds (F.double.Map A) := by
-  haveI := hA
-  haveI : Finite {x : A // TCPatMark (L₁ := L₀) x} := Subtype.finite
-  haveI : Finite {x : A // TCHostMark (L₁ := L₀) x} := Subtype.finite
+  have := hA
+  have : Finite {x : A // TCPatMark (L₁ := L₀) x} := Subtype.finite
+  have : Finite {x : A // TCHostMark (L₁ := L₀) x} := Subtype.finite
   constructor
   · rintro ⟨-, ⟨i⟩⟩
     exact ⟨F.double.map_finite A, (nonempty_double_sides_iff F).mpr ⟨F.mapLEquiv i⟩⟩

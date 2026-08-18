@@ -79,7 +79,7 @@ def WindowAt (b e x m : A) : Prop :=
 `w` bits of `x` above the index `b`. -/
 theorem windowAt_iff {b e x m : A} {w : ℕ} (hw : orank b + w = orank e) :
     WindowAt b e x m ↔ orank m = orank x / 2 ^ orank b % 2 ^ w := by
-  haveI : Nonempty A := ⟨b⟩
+  have : Nonempty A := ⟨b⟩
   constructor
   · rintro ⟨h1, h2⟩
     refine Nat.eq_of_testBit_eq fun i => ?_
@@ -126,11 +126,6 @@ theorem windowAt_iff {b e x m : A} {w : ℕ} (hw : orank b + w = orank e) :
       rw [decide_eq_false (by omega), Bool.false_and]
       simp
 
-/-- **A window is a function of its two ends.** -/
-theorem windowAt_unique {b e x m m' : A} {w : ℕ} (hw : orank b + w = orank e)
-    (h : WindowAt b e x m) (h' : WindowAt b e x m') : m = m' :=
-  orank_inj (((windowAt_iff hw).mp h).trans ((windowAt_iff hw).mp h').symm)
-
 /-- **A window is always there to be read**: what it reads is at most `x`, hence
 a rank of the universe. -/
 theorem exists_windowAt {b e x : A} {w : ℕ} (hw : orank b + w = orank e) :
@@ -150,7 +145,7 @@ variable {A : Type} [LinearOrder A] [Finite A]
 /-- **A set of boundaries at a constant gap `g`**: the least position is one,
 every boundary is below the top position, a boundary `g` further on is one, and
 every boundary other than the least has one `g` below it. The last condition is
-the load-bearing one – without it the set could start anywhere. -/
+what pins the set down – without it it could start anywhere. -/
 def IsBlockSet (g B : A) : Prop :=
   (∀ z : A, orank z = 0 → BitIx z B) ∧
     (∀ b : A, BitIx b B → IsLowIx b) ∧

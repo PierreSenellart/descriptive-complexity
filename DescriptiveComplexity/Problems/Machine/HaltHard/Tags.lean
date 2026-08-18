@@ -414,16 +414,6 @@ its digits – so that the head block ends at the movable marker `endR` and
 every operation on it has the blank half-tape to grow into. -/
 def encVal (v : List ℕ) : List (SimSym c) := v.flatMap encNum
 
-/-- The word of one continuation frame: its header, then its stored value –
-straight in a `cons₁` frame (what the marked copy loop writes), mirrored in a
-`cons₂` frame (what the destructive move of the exchange writes). -/
-def encFrame : PCont c → List (SimSym c)
-  | .halt => []
-  | .cons₁ p as _ => .hCons₁ p :: encVal as
-  | .cons₂ ns _ => .hCons₂ :: (encVal ns).reverse
-  | .comp p _ => [.hComp p]
-  | .fix p _ => [.hFix p]
-
 @[simp] theorem encNum_ne_nil (n : ℕ) : encNum (c := c) n ≠ [] := by
   simp [encNum]
 
@@ -434,14 +424,6 @@ def encFrame : PCont c → List (SimSym c)
 
 @[simp] theorem encVal_cons (n : ℕ) (v : List ℕ) :
     encVal (c := c) (n :: v) = encNum n ++ encVal v := rfl
-
-theorem length_encVal (v : List ℕ) :
-    (encVal (c := c) v).length = v.sum + v.length := by
-  induction v with
-  | nil => rfl
-  | cons n v ih =>
-    rw [encVal_cons, List.length_append, ih, length_encNum, List.sum_cons, List.length_cons]
-    omega
 
 end HaltHard
 

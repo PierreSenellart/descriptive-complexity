@@ -8,7 +8,7 @@ import DescriptiveComplexity.Padding
 /-!
 # Data read only through its equality pattern is first-order definable
 
-The keystone of every "write the program down as an interpretation" step, and
+The keystone of every “write the program down as an interpretation” step, and
 the one a machine emitted rule by rule needs.
 
 A transition table's attributes – when a rule applies, what state it moves to,
@@ -33,7 +33,7 @@ admits, of the conjunction of equalities and disequalities that pins a pattern
 copy, a designated element or a successor. It is not the whole guard language of
 a program that evaluates a *logic*: such a program eventually compares two of
 its slots in the order, or asks a relation of the source vocabulary of them, and
-neither is a function of the pattern. `DescriptiveComplexity.Pfp.UGDefinable`
+neither is a function of the pattern. `DescriptiveComplexity.Draw.UGDefinable`
 therefore carries a formula, with the disjunction below as one way of building
 it.
 
@@ -135,7 +135,7 @@ variable {A : Type}
 theorem exists_covBy_of_not_isTop [LinearOrder A] [Finite A] {a : A}
     (h : ¬IsTop a) : ∃ b : A, a ⋖ b := by
   classical
-  letI := Fintype.ofFinite A
+  let := Fintype.ofFinite A
   have hne : (Finset.univ.filter fun b : A => a < b).Nonempty := by
     obtain ⟨b, hb⟩ : ∃ b : A, ¬b ≤ a := by
       by_contra hc
@@ -158,7 +158,7 @@ theorem covBy_unique [LinearOrder A] {a b b' : A} (h : a ⋖ b) (h' : a ⋖ b') 
 open Classical in
 /-- **The next element**: the cover, where there is one, and the element
 itself at the top – so that a loop variable at the end of its range simply
-stands still, which is what `DescriptiveComplexity.Pfp.tupNext` does. -/
+stands still, which is what `DescriptiveComplexity.Draw.tupNext` does. -/
 noncomputable def ordSucc [Preorder A] (a : A) : A :=
   if h : ∃ b : A, a ⋖ b then h.choose else a
 
@@ -351,7 +351,7 @@ end Realize
 The other half of what a machine's rules do: a rule not only *fires* on its
 data, it also *writes*. Everything the EXPSPACE program writes is a copy of one
 of its input slots or one of the two designated elements, chosen by the input's
-pattern — so one more builder finishes the toolbox. -/
+pattern – so one more builder finishes the toolbox. -/
 
 section Write
 
@@ -442,32 +442,6 @@ theorem realize_slotValF [Finite A] (hb : IsBot bot) (ht : IsTop top) (u : Fin c
       rw [ordSucc_of_not_covBy hex]
       exact ⟨fun h => h.elim (fun hc => absurd (hnt _) (not_le.mpr hc.1)) fun h => h.2,
         fun h => Or.inr ⟨hnt, h⟩⟩
-
-open Classical in
-/-- **The written tuple is the one the sources name.** -/
-theorem realize_writeTupF [Finite A] (hb : IsBot bot) (ht : IsTop top)
-    (G : EqPat c → Fin c → SlotVal c) (u y : Fin c → γ) :
-    (writeTupF (L := L) G u y).Realize v ↔
-      (fun k => v (y k)) =
-        fun k => (G (patOf bot top fun i => v (u i)) k).eval bot top
-          fun i => v (u i) := by
-  rw [writeTupF, realize_listSup]
-  constructor
-  · rintro ⟨ψ, hψ, hr⟩
-    obtain ⟨p, -, rfl⟩ := List.mem_map.mp hψ
-    rw [Formula.realize_inf] at hr
-    obtain rfl := eq_patOf_of_hasPat ((realize_patF hb ht p u).mp hr.1)
-    refine funext fun k => ?_
-    exact (realize_slotValF hb ht u (y k) _).mp
-      ((realize_listInf _).mp hr.2 _ (List.mem_map.mpr ⟨k, List.mem_finRange k, rfl⟩))
-  · intro h
-    refine ⟨_, List.mem_map.mpr ⟨patOf bot top fun i => v (u i),
-      Finset.mem_toList.mpr (Finset.mem_univ _), rfl⟩, ?_⟩
-    rw [Formula.realize_inf]
-    refine ⟨(realize_patF hb ht _ u).mpr (hasPat_patOf bot top _), ?_⟩
-    refine (realize_listInf _).mpr fun ψ hψ => ?_
-    obtain ⟨k, -, rfl⟩ := List.mem_map.mp hψ
-    exact (realize_slotValF hb ht u (y k) _).mpr (congrFun h k)
 
 end RealizeWrite
 

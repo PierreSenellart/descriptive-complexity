@@ -20,7 +20,7 @@ The interesting one is connectivity, which is a transitive-closure condition
 and hence not first-order. What is guessed instead is a *root* – as a relation
 constrained to hold of at most one element, since the empty set is connected
 and has no root – together with an order in which every other chosen vertex
-has a chosen neighbour strictly below it. Walking down the order reaches the
+has a chosen neighbor strictly below it. Walking down the order reaches the
 root; that is the same certificate idea as for acyclicity in
 `DescriptiveComplexity.Problems.Feedback`, run in the opposite direction.
 -/
@@ -124,7 +124,7 @@ private noncomputable def stIrreflClause : steinerSOLang.Sentence :=
   Formula.iAlls (Fin 1)
     (∼(Relations.formula₂ kStLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
 
-/-- Kernel clause: every chosen non-root has a chosen neighbour strictly below
+/-- Kernel clause: every chosen non-root has a chosen neighbor strictly below
 it. -/
 private noncomputable def stStepClause : steinerSOLang.Sentence :=
   Formula.iAlls (Fin 1)
@@ -173,7 +173,7 @@ private abbrev SRealize (φ : steinerSOLang.Sentence) : Prop :=
 
 private theorem realize_stTermClause :
     SRealize ρ stTermClause ↔ ∀ x : A, STTerminal x → ρ .set ![x] := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   rw [stTermClause]
@@ -183,7 +183,7 @@ private theorem realize_stTermClause :
 
 private theorem realize_stRootInClause :
     SRealize ρ stRootInClause ↔ ∀ x : A, ρ .root ![x] → ρ .set ![x] := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
@@ -195,7 +195,7 @@ private theorem realize_stRootInClause :
 
 private theorem realize_stRootUniqueClause :
     SRealize ρ stRootUniqueClause ↔ ∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hR : ∀ (w : Fin 1 → A),
       RelMap (L := steinerSOLang) (M := A) kStRootSym w ↔ ρ .root w := fun _ => Iff.rfl
   rw [stRootUniqueClause]
@@ -207,7 +207,7 @@ private theorem realize_stRootUniqueClause :
 private theorem realize_stTransClause :
     SRealize ρ stTransClause ↔
       ∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z] := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
       RelMap (L := steinerSOLang) (M := A) kStLtSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [stTransClause]
@@ -218,7 +218,7 @@ private theorem realize_stTransClause :
 
 private theorem realize_stIrreflClause :
     SRealize ρ stIrreflClause ↔ ∀ x : A, ¬ρ .order ![x, x] := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
       RelMap (L := steinerSOLang) (M := A) kStLtSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [stIrreflClause]
@@ -229,7 +229,7 @@ private theorem realize_stIrreflClause :
 private theorem realize_stStepClause :
     SRealize ρ stStepClause ↔ ∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
       ∃ y : A, (ρ .set ![y] ∧ (STAdj x y ∨ STAdj y x)) ∧ ρ .order ![y, x] := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
@@ -252,7 +252,7 @@ private theorem realize_stStepClause :
 private theorem realize_stTotalClause :
     SRealize ρ stTotalClause ↔ ∀ x : A, ρ .set ![x] → ¬STTerminal x →
       ∃ y : A, ρ .inj ![x, y] ∧ STMarked y := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hI : ∀ (w : Fin 2 → A),
@@ -272,7 +272,7 @@ private theorem realize_stTotalClause :
 
 private theorem realize_stInjClause :
     SRealize ρ stInjClause ↔ ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
-  letI := steinerGuessBlock.structure ρ
+  let := steinerGuessBlock.structure ρ
   have hI : ∀ (w : Fin 2 → A),
       RelMap (L := steinerSOLang) (M := A) kStInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [stInjClause]
@@ -511,7 +511,7 @@ private theorem realize_edgeSteinerKernel {A : Type} [Language.steinerGraph.Stru
         ∃ y : A, (ρ .set ![y] ∧ (ρ .tree ![x, y] ∨ ρ .tree ![y, x])) ∧ ρ .order ![y, x]) ∧
       (∀ a b : A, ρ .tree ![a, b] → ∃ y : A, ρ .inj ![a, b, y] ∧ STMarked y) ∧
       (∀ a b a' b' y : A, ρ .inj ![a, b, y] → ρ .inj ![a', b', y] → a = a' ∧ b = b') := by
-  letI := edgeSteinerGuessBlock.structure ρ
+  let := edgeSteinerGuessBlock.structure ρ
   have hT : ∀ (w : Fin 2 → A),
       RelMap (L := edgeSteinerSOLang) (M := A) kEsTreeSym w ↔ ρ .tree w := fun _ => Iff.rfl
   have hS : ∀ (w : Fin 1 → A),

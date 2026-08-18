@@ -179,7 +179,7 @@ def qbfSOStructure : (qbfSOLang k).Structure A :=
 /-- The truth-assignment variables are read as the truth assignments. -/
 theorem relMap_qNuSym (i : Fin k) (w : Fin 1 → A) :
     @RelMap (qbfSOLang k) A (qbfSOStructure νs) 1 (qNuSym i) w ↔ νs i (w 0) := by
-  letI := (qbfMergedBlock k).structure (repAssign A k νs)
+  let := (qbfMergedBlock k).structure (repAssign A k νs)
   have hw : w = ![w 0] := funext fun j => by rw [Subsingleton.elim j 0]; rfl
   calc @RelMap (qbfSOLang k) A (qbfSOStructure νs) 1 (qNuSym i) w
       ↔ @RelMap (qbfSOLang k) A (qbfSOStructure νs) 1 (qNuSym i) ![w 0] := by rw [← hw]
@@ -188,7 +188,7 @@ theorem relMap_qNuSym (i : Fin k) (w : Fin 1 → A) :
 theorem realize_qbfValF {γ : Type} (x : γ) (v : γ → A) :
     @Formula.Realize (qbfSOLang k) A (qbfSOStructure νs) γ (qbfValF k x) v ↔
       qbfVal νs (v x) := by
-  letI := (qbfMergedBlock k).structure (repAssign A k νs)
+  let := (qbfMergedBlock k).structure (repAssign A k νs)
   rw [qbfValF, realize_listSup, qbfVal]
   simp only [List.mem_map, List.mem_finRange, true_and, exists_exists_eq_and,
     Formula.realize_inf, Formula.realize_rel₁, Term.realize_var]
@@ -228,7 +228,7 @@ theorem realize_qbfKernel (k : ℕ) (cnf : Bool) {A : Type} [(Language.qbf k).St
     (νs : Fin k → A → Prop) :
     @Sentence.Realize (qbfSOLang k) A (qbfSOStructure νs) (qbfKernel k cnf) ↔
       QbfMatrix cnf νs := by
-  letI := (qbfMergedBlock k).structure (repAssign A k νs)
+  let := (qbfMergedBlock k).structure (repAssign A k νs)
   cases cnf
   · rw [qbfKernel, qbfDnfKernel, QbfMatrix, DnfSat]
     simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_iAlls,

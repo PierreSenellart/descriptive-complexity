@@ -139,7 +139,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] (ρ : arithBlock.Assignment 
 theorem realize_arithOrdF (φ : (L.sum Language.order).Formula α) (v : α → A) :
     (@Formula.Realize ((L.sum Language.order).sum arithBlock.lang) A
         (arithBlock.structure₁ ρ) _ (arithOrdF φ) v) ↔ φ.Realize v := by
-  letI := arithBlock.structure ρ
+  let := arithBlock.structure ρ
   rw [arithOrdF, LHom.realize_onFormula]
 
 @[simp]
@@ -147,7 +147,7 @@ theorem realize_arithVarF (i : Bool) (a b c : α) (v : α → A) :
     (@Formula.Realize ((L.sum Language.order).sum arithBlock.lang) A
         (arithBlock.structure₁ ρ) _ (arithVarF (L := L) i a b c) v) ↔
       ρ i ![v a, v b, v c] := by
-  letI := arithBlock.structure ρ
+  let := arithBlock.structure ρ
   rw [arithVarF, Formula.realize_rel]
   exact iff_of_eq (congrArg (ρ i) (funext fun j => by fin_cases j <;> rfl))
 
@@ -192,7 +192,7 @@ theorem next_plus_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
       ((∀ a : A, v 1 ≤ a) ∧ v 0 = v 2) ∨
         ∃ y' z' : A, (y' < v 1 ∧ ∀ a : A, ¬(y' < a ∧ a < v 1)) ∧
           (z' < v 2 ∧ ∀ a : A, ¬(z' < a ∧ a < v 2)) ∧ ρ false ![v 0, y', z'] := by
-  letI := arithBlock.structure ρ
+  let := arithBlock.structure ρ
   rw [next_arithStepDef_iff, arithStep, plusStepF, Formula.realize_sup]
   constructor
   · rintro (hb | hs)
@@ -224,7 +224,7 @@ theorem next_times_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
       ((∀ a : A, v 1 ≤ a) ∧ ∀ a : A, v 2 ≤ a) ∨
         ∃ y' w : A, (y' < v 1 ∧ ∀ a : A, ¬(y' < a ∧ a < v 1)) ∧
           ρ true ![v 0, y', w] ∧ ρ false ![w, v 0, v 2] := by
-  letI := arithBlock.structure ρ
+  let := arithBlock.structure ρ
   rw [next_arithStepDef_iff, arithStep, timesStepF, Formula.realize_sup]
   constructor
   · rintro (hb | hs)
@@ -399,7 +399,6 @@ def arithToBlock : L.sum Language.arith →ᴸ (L.sum Language.order).sum arithB
 
 end Transport
 
-
 /-! ### The inclusion -/
 
 section Inclusion
@@ -413,11 +412,11 @@ theorem AC0Definable.ifpDefinable (h : AC0Definable P) : IFPDefinable P := by
   obtain ⟨φ, hφ⟩ := h
   refine ⟨arithStepDef ((arithToBlock L).onSentence φ), ?_⟩
   intro A _ _ _ _
-  letI := arithBlock.structure
+  let := arithBlock.structure
     ((arithStepDef (L := L) ((arithToBlock L).onSentence φ)).inflLimit A)
   -- the translation is an expansion **at the limit**: this is the whole content of
   -- `DescriptiveComplexity.inflLimit_arith_iff`, read as an agreement of two structures
-  haveI hexp : (arithToBlock L).IsExpansionOn A := by
+  have hexp : (arithToBlock L).IsExpansionOn A := by
     refine ⟨fun {_} f _ => isEmptyElim f, fun {_} R x => ?_⟩
     cases R with
     | inl r => rfl

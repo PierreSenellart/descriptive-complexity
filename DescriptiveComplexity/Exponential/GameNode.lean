@@ -13,7 +13,7 @@ import DescriptiveComplexity.Problems.Game
 The road from `DescriptiveComplexity.EXPTIME` to `SO-GAME` reads a `PTIME` inner
 problem as the **AND/OR graph an interpretation draws on the expanded
 universe**, and plays that graph. A node of the graph is a
-tagged tuple of points, so a node is a *state* of a second-order game — that
+tagged tuple of points, so a node is a *state* of a second-order game – that
 correspondence is what this file builds.
 
 Two things are settled here.
@@ -23,7 +23,7 @@ ordinary ordered reductions (`DescriptiveComplexity.game_hard_ordered`): the
 composite of the Horn discharge with the unit-propagation game is a plain
 `≤ᶠᵒ[≤]`, and `DescriptiveComplexity.game_PTIME_hard` only widens it to `≤ʳᶠᵒ[≤]`
 at the very end. That matters here: a *definable domain* would have to be
-checked by a formula over the expansion, i.e. by a whole sub-game, whereas a
+checked by a formula over the expansion, i.e., by a whole sub-game, whereas a
 non-relativized interpretation leaves the nodes guarded by nothing but “each
 slot is a point”.
 
@@ -119,7 +119,7 @@ theorem realize_nodeGuardF (σ : (nodeBlock X T d).Assignment A) :
     (@Sentence.Realize _ A
         ((nodeBlock X T d).structure₁ (L := L.sum Language.order) σ) (nodeGuardF X T d) ↔
       ∃ n : T × (Fin d → X.Map A), σ = nodeAssign n) := by
-  letI := (nodeBlock X T d).structure₁ (L := L.sum Language.order) σ
+  let := (nodeBlock X T d).structure₁ (L := L.sum Language.order) σ
   rw [nodeGuardF, Sentence.Realize, Formula.realize_inf, realize_listInf]
   constructor
   · rintro ⟨hguard, hrounds⟩

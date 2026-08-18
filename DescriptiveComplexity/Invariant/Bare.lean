@@ -75,7 +75,7 @@ one of its pebbles is freed. -/
 theorem exists_notMem_image_erase [Finite A] (w : Fin k → A) (i : Fin k)
     (hA : k ≤ Nat.card A) : ∃ d : A, ∀ j, j ≠ i → w j ≠ d := by
   classical
-  letI := Fintype.ofFinite A
+  let := Fintype.ofFinite A
   have hcard : ((Finset.univ.erase i).image w).card < (Finset.univ : Finset A).card := by
     calc ((Finset.univ.erase i).image w).card
         ≤ (Finset.univ.erase i).card := Finset.card_image_le
@@ -207,8 +207,8 @@ theorem not_isLinearOrder_inflLimit (hd : d.VarBound k) (harity : d.B.arity i = 
     ¬IsLinearOrder A fun x y => d.inflLimit A i (fun p => ![x, y] (Fin.cast harity p)) := by
   intro hlin
   have hk2 : 2 ≤ k := by have := hd i; omega
-  letI := Fintype.ofFinite A
-  haveI : Nontrivial A := Fintype.one_lt_card_iff_nontrivial.mp (by
+  let := Fintype.ofFinite A
+  have : Nontrivial A := Fintype.one_lt_card_iff_nontrivial.mp (by
     rw [← Nat.card_eq_fintype_card]
     omega)
   obtain ⟨x, y, hxy⟩ := exists_pair_ne A

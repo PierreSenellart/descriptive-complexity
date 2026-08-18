@@ -81,10 +81,6 @@ theorem IsMaxSV.le {ℓ z : A} (h : IsMaxSV ℓ) (hz : IsSV z) : z ≤ ℓ :=
   not_lt.mp (h.2 z hz)
 
 omit [Finite A] in
-theorem isMinSV_unique {ℓ ℓ' : A} (h : IsMinSV ℓ) (h' : IsMinSV ℓ') : ℓ = ℓ' :=
-  le_antisymm (h.le h'.isSV) (h'.le h.isSV)
-
-omit [Finite A] in
 theorem isMaxSV_unique {ℓ ℓ' : A} (h : IsMaxSV ℓ) (h' : IsMaxSV ℓ') : ℓ = ℓ' :=
   le_antisymm (h'.le h.isSV) (h.le h'.isSV)
 
@@ -96,12 +92,12 @@ theorem isPredSV_unique {d d' ℓ : A} (h : IsPredSV d ℓ) (h' : IsPredSV d' �
   · exact absurd ⟨hlt, h.2.2.1⟩ (h'.2.2.2 d h.1)
 
 theorem exists_isMinSV {x : A} (hx : IsSV x) : ∃ ℓ : A, IsMinSV ℓ := by
-  haveI : Nonempty {z : A // IsSV z} := ⟨⟨x, hx⟩⟩
+  have : Nonempty {z : A // IsSV z} := ⟨⟨x, hx⟩⟩
   obtain ⟨m, hm⟩ := Finite.exists_min (fun z : {z : A // IsSV z} => (z : A))
   exact ⟨m, m.2, fun z hz hlt => absurd (hm ⟨z, hz⟩) (not_le.mpr hlt)⟩
 
 theorem exists_isMaxSV {x : A} (hx : IsSV x) : ∃ ℓ : A, IsMaxSV ℓ := by
-  haveI : Nonempty {z : A // IsSV z} := ⟨⟨x, hx⟩⟩
+  have : Nonempty {z : A // IsSV z} := ⟨⟨x, hx⟩⟩
   obtain ⟨m, hm⟩ := Finite.exists_max (fun z : {z : A // IsSV z} => (z : A))
   exact ⟨m, m.2, fun z hz hlt => absurd (hm ⟨z, hz⟩) (not_le.mpr hlt)⟩
 
@@ -109,7 +105,7 @@ theorem exists_isPredSV {ℓ : A} (hℓ : IsSV ℓ) (hmin : ¬IsMinSV ℓ) : ∃
   obtain ⟨x, hx, hlt⟩ : ∃ x : A, IsSV x ∧ x < ℓ := by
     by_contra hcon
     exact hmin ⟨hℓ, fun z hz hzl => hcon ⟨z, hz, hzl⟩⟩
-  haveI : Nonempty {z : A // IsSV z ∧ z < ℓ} := ⟨⟨x, hx, hlt⟩⟩
+  have : Nonempty {z : A // IsSV z ∧ z < ℓ} := ⟨⟨x, hx, hlt⟩⟩
   obtain ⟨d, hd⟩ := Finite.exists_max (fun z : {z : A // IsSV z ∧ z < ℓ} => (z : A))
   refine ⟨d, d.2.1, hℓ, d.2.2, fun z hz hzz => ?_⟩
   exact absurd (hd ⟨z, hz, hzz.2⟩) (not_le.mpr hzz.1)
@@ -159,7 +155,7 @@ theorem exists_isSuccSV {ℓ : A} (hℓ : IsSV ℓ) (hmax : ¬IsMaxSV ℓ) : ∃
   obtain ⟨x, hx, hlt⟩ : ∃ x : A, IsSV x ∧ ℓ < x := by
     by_contra hcon
     exact hmax ⟨hℓ, fun z hz hzl => hcon ⟨z, hz, hzl⟩⟩
-  haveI : Nonempty {z : A // IsSV z ∧ ℓ < z} := ⟨⟨x, hx, hlt⟩⟩
+  have : Nonempty {z : A // IsSV z ∧ ℓ < z} := ⟨⟨x, hx, hlt⟩⟩
   obtain ⟨e, he⟩ := Finite.exists_min (fun z : {z : A // IsSV z ∧ ℓ < z} => (z : A))
   refine ⟨e, hℓ, e.2.1, e.2.2, fun z hz hzz => ?_⟩
   exact absurd (he ⟨z, hz, hzz.1⟩) (not_le.mpr hzz.2)

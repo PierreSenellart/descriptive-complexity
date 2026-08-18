@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.FixedPointInflationaryLFP
 import DescriptiveComplexity.SecondOrderNew
+import DescriptiveComplexity.SecondOrderParam
 
 /-!
 # An element, quantified in front of a fixed point
@@ -61,57 +62,17 @@ def markOne (L : Language.{0, 0}) {N : Type} [inst : L.Structure N] (c : N) :
     (newLang L).Structure N :=
   @sumStructure L Language.oldMark N inst (oneMark c)
 
-omit [L.IsRelational] in
-theorem relMap_markOne_inl {N : Type} [L.Structure N] (c : N) {n : ℕ} (r : L.Relations n)
-    (x : Fin n → N) :
-    @RelMap (newLang L) N (markOne L c) n (Sum.inl r) x ↔ RelMap r x :=
-  Iff.rfl
+/-! ### The block, with a parameter argument
 
-omit [L.IsRelational] in
-theorem relMap_markOne_inr {N : Type} [L.Structure N] (c : N) (x : Fin 1 → N) :
-    @RelMap (newLang L) N (markOne L c) 1 (Sum.inr Language.oldSym) x ↔ x 0 = c :=
-  Iff.rfl
-
-/-! ### The block, with a parameter argument -/
-
-/-- The block `B` with one extra argument on every relation variable: the
-parameter the iteration is run at. -/
-def SOBlock.withParam (B : SOBlock) : SOBlock where
-  ι := B.ι
-  arity i := B.arity i + 1
-
-/-- A relation variable of the block, read at the extended block: one argument
-more. -/
-def SOBlock.paramSym (B : SOBlock) {m : ℕ} (r : B.lang.Relations m) :
-    B.withParam.lang.Relations (m + 1) :=
-  ⟨r.1, congrArg (· + 1) r.2⟩
+`DescriptiveComplexity.SOBlock.withParam` and its reading at a parameter are
+`SecondOrderParam.lean`'s; what is here is the one statement that mentions the
+empty assignment. -/
 
 variable {N : Type}
-
-/-- An assignment of the extended block, read at one parameter. -/
-def SOBlock.atParam (B : SOBlock) (ρ : B.withParam.Assignment N) (c : N) : B.Assignment N :=
-  fun i x => ρ i (Fin.cons c x)
 
 theorem SOBlock.atParam_bot (B : SOBlock) (c : N) :
     B.atParam (B.withParam.botAssign N) c = B.botAssign N :=
   rfl
-
-/-- **Reading a parameterized relation variable**: the extended variable at a
-tuple whose first argument is the parameter is the original variable, read at
-the assignment taken at that parameter. -/
-theorem SOBlock.relMap_paramSym (B : SOBlock) (ρ : B.withParam.Assignment N) (c : N) {m : ℕ}
-    (b : B.lang.Relations m) (w : Fin (m + 1) → N) (hw : w 0 = c) :
-    (@RelMap B.withParam.lang N (B.withParam.structure ρ) (m + 1) (B.paramSym b) w ↔
-      @RelMap B.lang N (B.structure (B.atParam ρ c)) m b fun i => w i.succ) := by
-  have hvec : (fun j => w (Fin.cast (congrArg (· + 1) b.2) j)) =
-      Fin.cons c fun j => w (Fin.cast b.2 j).succ := by
-    funext j
-    refine Fin.cases ?_ (fun k => ?_) j
-    · rw [Fin.cons_zero]
-      exact (congrArg w (Fin.ext rfl)).trans hw
-    · rw [Fin.cons_succ]
-      exact congrArg w (Fin.ext rfl)
-  exact iff_of_eq (congrArg (ρ b.1) hvec)
 
 /-! ### The parameter substitution -/
 
@@ -173,8 +134,8 @@ theorem realize_paramLift (ρ : B.withParam.Assignment N) (v : α → N) :
       letI := @SOBlock.structure₁ ((newLang L).sum Language.order) B N
         (@sumOrderStructure (newLang L) N (markOne L (v p)) _) (B.atParam ρ (v p))
       ((paramLift B p φ).Realize v xs ↔ φ.Realize v xs) := by
-  letI := (B.withParam.structure₁ (L := L.sum Language.order) ρ)
-  letI := @SOBlock.structure₁ ((newLang L).sum Language.order) B N
+  let := (B.withParam.structure₁ (L := L.sum Language.order) ρ)
+  let := @SOBlock.structure₁ ((newLang L).sum Language.order) B N
     (@sumOrderStructure (newLang L) N (markOne L (v p)) _) (B.atParam ρ (v p))
   intro n φ
   induction φ with
@@ -263,10 +224,10 @@ of the original in the instance that parameter marks. -/
 theorem next_param (ρ : d.param.B.Assignment N) (c : N) :
     d.B.atParam (d.param.next ρ) c = @StepDef.next _ d N (markOneOrd L c) (d.B.atParam ρ c) := by
   funext i x
-  letI := markOneOrd L c
-  letI := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
+  let := markOneOrd L c
+  let := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
     (d.B.atParam ρ c)
-  letI := d.param.B.structure₁ (L := L.sum Language.order) ρ
+  let := d.param.B.structure₁ (L := L.sum Language.order) ρ
   have hcomp : ((Fin.cons c x : Fin (d.B.arity i + 1) → N) ∘ Fin.succ) = x := by
     funext j
     simp
@@ -313,7 +274,7 @@ theorem inflLimit_param (c : N) :
 element of the instance. -/
 theorem ifpHolds_param :
     d.param.IFPHolds N ↔ ∃ c : N, @StepDef.IFPHolds _ d N (markOneOrd L c) := by
-  letI := d.param.B.structure₁ (L := L.sum Language.order) (d.param.inflLimit N)
+  let := d.param.B.structure₁ (L := L.sum Language.order) (d.param.inflLimit N)
   have hcongr : ∀ (c : N) (σ τ : d.B.Assignment N), σ = τ →
       (@Sentence.Realize _ N (@SOBlock.structure₁ ((newLang L).sum Language.order) d.B N
           (markOneOrd L c) σ) d.out ↔
@@ -325,8 +286,8 @@ theorem ifpHolds_param :
   constructor
   · rintro ⟨w, hw⟩
     refine ⟨w 0, ?_⟩
-    letI := markOneOrd L (w 0)
-    letI := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L (w 0))
+    let := markOneOrd L (w 0)
+    let := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L (w 0))
       (d.B.atParam (d.param.inflLimit N) (w 0))
     have h := (realize_paramLift (B := d.B) (p := (Sum.inr 0 : Empty ⊕ Fin 1))
       (d.param.inflLimit N) (Sum.elim default w) (d.out.relabel Sum.inl)
@@ -335,8 +296,8 @@ theorem ifpHolds_param :
     exact (hcongr (w 0) _ _ (inflLimit_param (d := d) (w 0))).mp h2
   · rintro ⟨c, hc⟩
     refine ⟨fun _ => c, ?_⟩
-    letI := markOneOrd L c
-    letI := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
+    let := markOneOrd L c
+    let := @SOBlock.structure₁ ((newLang L).sum Language.order) d.B N (markOneOrd L c)
       (d.B.atParam (d.param.inflLimit N) c)
     refine (realize_paramLift (B := d.B) (p := (Sum.inr 0 : Empty ⊕ Fin 1))
       (d.param.inflLimit N) (Sum.elim default fun _ => c) (d.out.relabel Sum.inl)

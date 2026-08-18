@@ -43,66 +43,25 @@ section Embed
 
 variable {A : Type} [Language.wide.Structure A] [LinearOrder A]
 
-/-- An address satisfies the domain sentence of its tag, which is `⊤`. -/
-theorem domHolds_addr (s : A → Prop) :
-    ExpExpansion.DomHolds (X := wideExp) (WTag.addr, wassign s) := by
-  letI := wideExp.B.structure₁ (L := wOrd) (wassign s)
-  exact Formula.realize_top.mpr trivial
-
-/-- The singleton address of an element satisfies the domain sentence of the
-control tag. -/
-theorem domHolds_ctrl (x : A) :
-    ExpExpansion.DomHolds (X := wideExp) (WTag.ctrl, wassign fun y => y = x) :=
-  (realize_singleS _).mpr (wmSingle_eq x)
-
 /-- **The universe of the wide machine sits inside the expansion**: an address
 becomes the point tagged `addr` carrying it, a control element the point tagged
-`ctrl` carrying its singleton. -/
-noncomputable def wideEmbed : WPoint A → wideExp.Map A
-  | Sum.inl s => ⟨(WTag.addr, wassign s), domHolds_addr s⟩
-  | Sum.inr x => ⟨(WTag.ctrl, wassign fun y => y = x), domHolds_ctrl x⟩
-
-@[simp]
-theorem wideEmbed_addr_tag (s : A → Prop) : (wideEmbed (Sum.inl s) : wideExp.Map A).1.1 =
-    WTag.addr :=
-  rfl
-
-@[simp]
-theorem wideEmbed_ctrl_tag (x : A) : (wideEmbed (Sum.inr x) : wideExp.Map A).1.1 =
-    WTag.ctrl :=
-  rfl
-
-/-- **The embedding is onto the whole expanded universe**: every point tagged
-`addr` is an address, and every point tagged `ctrl` is a control element,
-because its domain sentence made its assignment a singleton. -/
-theorem wideEmbed_bijective : Function.Bijective (wideEmbed (A := A)) := by
-  constructor
-  · rintro (s | x) (t | y) h
-    · have h1 : wassign s = wassign t := congrArg (fun p => p.1.2) h
-      exact congrArg Sum.inl (by
-        rw [← wbits_wassign s, ← wbits_wassign t, h1])
-    · exact absurd (congrArg (fun p => p.1.1) h) (by simp)
-    · exact absurd (congrArg (fun p => p.1.1) h) (by simp)
-    · have h1 : (fun z => z = x) = fun z => z = y := by
-        rw [← wbits_wassign fun z => z = x, ← wbits_wassign fun z => z = y]
-        exact congrArg wbits (congrArg (fun p => p.1.2) h)
-      exact congrArg Sum.inr (by simpa using congrFun h1 x)
-  · rintro ⟨⟨t, ρ⟩, hdom⟩
-    match t with
-    | WTag.addr => exact ⟨Sum.inl (wbits ρ), ExpExpansion.map_ext rfl (wassign_wbits ρ)⟩
-    | WTag.ctrl =>
-      obtain ⟨x, hx⟩ := exists_eq_of_wmSingle ((realize_singleS ρ).mp hdom)
-      have h1 : (wassign fun z => z = x) = ρ := by
-        rw [show (fun z => z = x) = wbits ρ from (funext fun z => propext (hx z)).symm]
-        exact wassign_wbits ρ
-      exact ⟨Sum.inr x, ExpExpansion.map_ext rfl h1⟩
+`ctrl` carrying its singleton. It is the address expansion's own embedding
+(`DescriptiveComplexity.AddrExp.addrEmbed`), at this expansion. -/
+noncomputable def wideEmbed : WPoint A → wideExp.Map A := AddrExp.addrEmbed
 
 /-- **The points of the expansion are the universe of the wide machine.** -/
-noncomputable def wideEquiv : WPoint A ≃ wideExp.Map A :=
-  Equiv.ofBijective _ wideEmbed_bijective
+noncomputable def wideEquiv : WPoint A ≃ wideExp.Map A := AddrExp.addrEquiv
 
 @[simp]
 theorem wideEquiv_apply (p : WPoint A) : wideEquiv p = wideEmbed p := rfl
+
+@[simp]
+theorem wideEmbed_addr_tag (s : A → Prop) :
+    (wideEmbed (Sum.inl s) : wideExp.Map A).1.1 = AddrExp.WTag.addr := rfl
+
+@[simp]
+theorem wideEmbed_ctrl_tag (x : A) :
+    (wideEmbed (Sum.inr x) : wideExp.Map A).1.1 = AddrExp.WTag.ctrl := rfl
 
 end Embed
 
@@ -117,36 +76,33 @@ section Symbols
 
 variable {A : Type} [Language.wide.Structure A] [LinearOrder A]
 
-/-- Reading a unary symbol of the expanded vocabulary at one point. -/
-theorem realize_one (rt : Language.turing.Relations 1) (φ : WTag → wide1.Sentence)
+/-- Reading a unary symbol of the expanded vocabulary at one point: the address
+expansion's own reading (`DescriptiveComplexity.AddrExp.realize_one`), at this
+expansion. -/
+theorem realize_one (rt : Language.turing.Relations 1) (φ : AddrExp.WTag → wide1.Sentence)
     (h : ∀ τ : Fin 1 → wideExp.Tag, wideExp.relSentence rt τ = onS1 (φ (τ 0)))
     (x : wideExp.Map A) :
     letI := wideStructure A
     (RelMap rt ![x] ↔
-      @Sentence.Realize wide1 A (addrBlock.structure₁ (L := wOrd) x.1.2) (φ x.1.1)) := by
-  letI := wideStructure A
-  have h1 := wideExp.relMap_map rt ![x]
-  rw [h] at h1
-  exact h1.trans (realize_onS1 _ x)
+      @Sentence.Realize wide1 A (addrBlock.structure₁ (L := wOrd) x.1.2) (φ x.1.1)) :=
+  AddrExp.realize_one rt φ h x
 
 /-- Reading a binary symbol of the expanded vocabulary at two points. -/
-theorem realize_two (rt : Language.turing.Relations 2) (φ : WTag → WTag → wide2.Sentence)
+theorem realize_two (rt : Language.turing.Relations 2)
+    (φ : AddrExp.WTag → AddrExp.WTag → wide2.Sentence)
     (h : ∀ τ : Fin 2 → wideExp.Tag, wideExp.relSentence rt τ = onS2 (φ (τ 0) (τ 1)))
     (x y : wideExp.Map A) :
     letI := wideStructure A
     (RelMap rt ![x, y] ↔
       @Sentence.Realize wide2 A (addrBlock.structure₂ (L := wOrd) x.1.2 y.1.2)
-        (φ x.1.1 y.1.1)) := by
-  letI := wideStructure A
-  have h1 := wideExp.relMap_map rt ![x, y]
-  rw [h] at h1
-  exact h1.trans (realize_onS2 _ x y)
+        (φ x.1.1 y.1.1)) :=
+  AddrExp.realize_two rt φ h x y
 
 /-- **The positions of the expanded machine are the addresses.** -/
 theorem relMap_posn (p : WPoint A) :
     letI := wideStructure A
     (RelMap tmPosn ![wideEmbed p] ↔ (wideData A).Posn p) := by
-  letI := wideStructure A
+  let := wideStructure A
   rw [realize_one tmPosn posnT (fun _ => rfl) (wideEmbed p)]
   match p with
   | Sum.inl s => exact iff_of_true (realize_topS _) trivial
@@ -159,7 +115,7 @@ theorem relMap_mark (rt : Language.turing.Relations 1) (r : Language.wide.Relati
     (p : WPoint A) :
     letI := wideStructure A
     (RelMap rt ![wideEmbed p] ↔ wpMark (fun x => RelMap r ![x]) p) := by
-  letI := wideStructure A
+  let := wideStructure A
   rw [realize_one rt (markT r) h (wideEmbed p)]
   match p with
   | Sum.inl s => exact iff_of_false (not_realize_botS _) (fun h => h)
@@ -174,7 +130,7 @@ theorem relMap_attr (rt : Language.turing.Relations 2) (r : Language.wide.Relati
     (p q : WPoint A) :
     letI := wideStructure A
     (RelMap rt ![wideEmbed p, wideEmbed q] ↔ wpAttr (fun x y => RelMap r ![x, y]) p q) := by
-  letI := wideStructure A
+  let := wideStructure A
   rw [realize_two rt (binT r) h (wideEmbed p) (wideEmbed q)]
   match p, q with
   | Sum.inl s, Sum.inl t => exact iff_of_false (not_realize_botS₂ _ _) (fun h => h)
@@ -189,7 +145,7 @@ the instance's own order induces, then the control elements in that order. -/
 theorem relMap_le (p q : WPoint A) :
     letI := wideStructure A
     (RelMap tmLe ![wideEmbed p, wideEmbed q] ↔ (wideData A).Le p q) := by
-  letI := wideStructure A
+  let := wideStructure A
   rw [realize_two tmLe leT (fun _ => rfl) (wideEmbed p) (wideEmbed q)]
   match p, q with
   | Sum.inl s, Sum.inl t => exact realize_addrLeS _ _
@@ -204,7 +160,7 @@ initial segment of an element holds that element's input symbol. -/
 theorem relMap_inp (p q : WPoint A) :
     letI := wideStructure A
     (RelMap tmInp ![wideEmbed p, wideEmbed q] ↔ (wideData A).Inp p q) := by
-  letI := wideStructure A
+  let := wideStructure A
   rw [realize_two tmInp inpT (fun _ => rfl) (wideEmbed p) (wideEmbed q)]
   match p, q with
   | Sum.inl s, Sum.inl t => exact iff_of_false (not_realize_botS₂ _ _) (fun h => h)
@@ -227,7 +183,7 @@ expansion**, fieldwise along `DescriptiveComplexity.Wide.wideEquiv`. -/
 theorem wideAgree :
     letI := wideStructure A
     TMData.Agree (wideEquiv (A := A)) (wideData A) (tmData (wideExp.Map A)) := by
-  letI := wideStructure A
+  let := wideStructure A
   exact ⟨fun p => (relMap_posn p).symm, fun p q => (relMap_le p q).symm,
     fun p => (relMap_mark tmTr wmTr (fun _ => rfl) p).symm,
     fun p => (relMap_mark tmStart wmStart (fun _ => rfl) p).symm,
@@ -255,7 +211,7 @@ the one is acceptance of the other. -/
 theorem wideAccept_iff_expansion (A : Type) [Language.wide.Structure A] [LinearOrder A] :
     letI := wideStructure A
     (WideAccept A ↔ NTMAccept (wideExp.Map A)) := by
-  letI := wideStructure A
+  let := wideStructure A
   have h := wideAgree A
   exact and_congr h.wellFormed h.accepts
 
@@ -263,7 +219,7 @@ theorem wideAccept_iff_expansion (A : Type) [Language.wide.Structure A] [LinearO
 theorem wideAcceptSpace_iff_expansion (A : Type) [Language.wide.Structure A] [LinearOrder A] :
     letI := wideStructure A
     (WideAcceptSpace A ↔ NTMAcceptSpace (wideExp.Map A)) := by
-  letI := wideStructure A
+  let := wideStructure A
   have h := wideAgree A
   exact and_congr h.wellFormed h.acceptsSpace
 
@@ -272,7 +228,7 @@ theorem wideAcceptSpace_iff_expansion (A : Type) [Language.wide.Structure A] [Li
 theorem dwideAcceptSpace_iff_expansion (A : Type) [Language.wide.Structure A] [LinearOrder A] :
     letI := wideStructure A
     (DWideAcceptSpace A ↔ DTMAcceptSpace (wideExp.Map A)) := by
-  letI := wideStructure A
+  let := wideStructure A
   have h := wideAgree A
   exact and_congr h.wellFormed (and_congr h.deterministic h.acceptsSpace)
 
@@ -280,7 +236,7 @@ theorem dwideAcceptSpace_iff_expansion (A : Type) [Language.wide.Structure A] [L
 it into `DescriptiveComplexity.NTMAccept`, and that problem is in NP. This is
 the first natural member the class has. -/
 theorem wideAccept_mem_NEXPTIME : WideAccept ∈ NEXPTIME := by
-  letI hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
       Language.turing.Structure (wideExp.Map A) := fun A => wideStructure A
   refine ⟨wideExp, NTMAccept, ntmAccept_mem_NP, ?_⟩
   intro A _ _ _ _
@@ -289,7 +245,7 @@ theorem wideAccept_mem_NEXPTIME : WideAccept ∈ NEXPTIME := by
 /-- **The space-bounded wide machine is in EXPSPACE**: the expansion turns it
 into `DescriptiveComplexity.NTMAcceptSpace`, and that problem is in PSPACE. -/
 theorem wideAcceptSpace_mem_EXPSPACE : WideAcceptSpace ∈ EXPSPACE := by
-  letI hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
       Language.turing.Structure (wideExp.Map A) := fun A => wideStructure A
   rw [EXPSPACE_eq_PSPACE_exp]
   refine ⟨wideExp, NTMAcceptSpace, ntmAcceptSpace_mem_PSPACE, ?_⟩
@@ -299,7 +255,7 @@ theorem wideAcceptSpace_mem_EXPSPACE : WideAcceptSpace ∈ EXPSPACE := by
 /-- **The deterministic space-bounded wide machine is in EXPSPACE**, through
 `DescriptiveComplexity.DTMAcceptSpace`. -/
 theorem dwideAcceptSpace_mem_EXPSPACE : DWideAcceptSpace ∈ EXPSPACE := by
-  letI hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
       Language.turing.Structure (wideExp.Map A) := fun A => wideStructure A
   rw [EXPSPACE_eq_PSPACE_exp]
   refine ⟨wideExp, DTMAcceptSpace, dtmAcceptSpace_mem_PSPACE, ?_⟩

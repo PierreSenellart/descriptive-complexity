@@ -18,8 +18,8 @@ Two points of technique.
 
 **The recursion is total, the correctness is not.** `IsQF` is a `Prop`, so a
 definition cannot recurse on it. `DescriptiveComplexity.ExpExpansion.translQF`
-is therefore defined on *every* bounded formula, sending a quantifier node — and
-an atom mentioning a bound variable — to `⊥`; correctness is then proved by
+is therefore defined on *every* bounded formula, sending a quantifier node – and
+an atom mentioning a bound variable – to `⊥`; correctness is then proved by
 induction on `FirstOrder.Language.BoundedFormula.IsQF` at `n = 0`, where no such
 node is reachable. This is the shape the abandoned quantifier-free-reduction
 track would have used too, and it is the standard way to recurse on a syntactic
@@ -72,7 +72,7 @@ noncomputable def atomOf {k : ℕ} (r : (X.E.sum Language.order).Relations k)
 
 The recursion carries a map `bv` sending each *bound* variable to a round. A
 quantifier node is sent to `⊥`, so `bv` is never extended and never consulted at
-the depth the correctness proof works at — where it is `finZeroElim`, the empty
+the depth the correctness proof works at – where it is `finZeroElim`, the empty
 map. Carrying it is what keeps the definition total without an `Option` in every
 atom. -/
 
@@ -112,8 +112,8 @@ theorem realize_translQF (pts : Fin m → X.Map A)
     letI := X.mapLinearOrder A
     (@Sentence.Realize _ A (prefixStructure pts) (translQF X m finZeroElim φ) ↔
       φ.Realize (M := X.Map A) pts) := by
-  letI := X.mapLinearOrder A
-  letI := prefixStructure pts
+  let := X.mapLinearOrder A
+  let := prefixStructure pts
   induction hqf with
   | falsum => exact Iff.rfl
   | of_isAtomic hat =>

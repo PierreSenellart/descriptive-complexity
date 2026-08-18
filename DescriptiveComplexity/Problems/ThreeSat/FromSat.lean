@@ -502,7 +502,6 @@ theorem satisfiable_iff_map :
     | true => exact ⟨x, Or.inl ⟨hocc.2, hT⟩⟩
     | false => exact ⟨x, Or.inr ⟨hocc.2, hT⟩⟩
 
-
 end Satisfiability
 
 /-- Correctness of the reduction: an ordered CNF structure is satisfiable iff

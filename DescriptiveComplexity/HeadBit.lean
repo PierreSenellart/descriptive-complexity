@@ -80,7 +80,7 @@ inductive BitNode
   /-- Is the candidate twice itself the value, that is, is the value even with
   this half? -/
   | probeE : BitNode
-  /-- It is not: is the candidate at the marker, i.e. is the scan over? -/
+  /-- It is not: is the candidate at the marker, i.e., is the scan over? -/
   | scanOver : BitNode
   /-- It is not: put `w` on the successor of the candidate. -/
   | mkW : BitNode
@@ -1208,7 +1208,7 @@ theorem walk_outer (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin 
         ∀ q : Fin K, (q : ℕ) < m → q ≠ y → q ≠ cnt → q ≠ cand → q ≠ w → q ≠ tmk →
           z q = x q := by
   classical
-  haveI : Nonempty A := ⟨x xh⟩
+  have : Nonempty A := ⟨x xh⟩
   intro t
   induction t with
   | zero =>
@@ -1525,7 +1525,7 @@ theorem decides_bitP (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : 
         · exact (hprotect u.2 hi.1.1).trans (hag.mono hpm)
   · -- completeness: run the rounds, then the parity scan
     rintro x c z ⟨hc, hag⟩
-    haveI : Nonempty A := ⟨x xh⟩
+    have : Nonempty A := ⟨x xh⟩
     change c = true ↔ (orank (x xh)).testBit (orank (x ih)) = true at hc
     obtain ⟨v, hwalk, hvcnt, hvy, hvtop, hvrest⟩ := walk_outer hh x (orank (x ih)) le_rfl
     obtain ⟨hn1, hn2, hn3, hn4, hn5⟩ := hh.ne_int hh.hih

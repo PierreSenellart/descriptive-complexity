@@ -8,16 +8,16 @@ import DescriptiveComplexity.Exponential.GameNode
 /-!
 # The sentences a phased game is made of
 
-Every game this development builds over a tag-extended block —
+Every game this development builds over a tag-extended block –
 `DescriptiveComplexity.SOGameSpec.exBlock` in
 `DescriptiveComplexity.Exponential.GameSO`, and the graph game that carries
-`DescriptiveComplexity.EXPTIME` to SO-GAME — says the same three things and
+`DescriptiveComplexity.EXPTIME` to SO-GAME – says the same three things and
 nothing else:
 
 * **which phase a state is in**, in one copy or in the second one of a move
   (`DescriptiveComplexity.atTagF`, `DescriptiveComplexity.atTagTwoF`);
 * **that the phase of the state a move enters is exactly one phase**, so that a
-  junk state — two tag bits set — is never reachable
+  junk state – two tag bits set – is never reachable
   (`DescriptiveComplexity.exists_tagAssign_two`);
 * **that the listed relation variables do not change**, which is how a move
   freezes the part of the state it must not touch
@@ -26,7 +26,7 @@ nothing else:
 `Exponential.GameSO` proves these for its own block; here they are stated once
 for an **arbitrary** block and an arbitrary finite tag type, which is what the
 graph game needs, its states being the nodes of
-`DescriptiveComplexity.ExpExpansion.nodeBlock` — a merged tuple of rounds rather
+`DescriptiveComplexity.ExpExpansion.nodeBlock` – a merged tuple of rounds rather
 than a `DescriptiveComplexity.SOBlock.cons`.
 -/
 
@@ -93,7 +93,7 @@ theorem realize_atTagF (p q : T) (ν : C.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) (SOBlock.tagAssign q ν)) (atTagF L C T p) ↔ p = q) := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) (SOBlock.tagAssign q ν)
   refine Iff.trans Formula.realize_inf (and_iff_right ?_)
   exact (SOBlock.realize_tagGuardF (L := L.sum Language.order) _).mpr ⟨q, ν, rfl⟩
@@ -103,9 +103,9 @@ theorem realize_tagTwoF' (p : T) (σ τ : (C.withTag T).Assignment A)
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ τ) (tagTwoF L C T p) ↔ τ (Sum.inl p) x) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
-  haveI : IsEmpty (Fin ((C.withTag T).arity (Sum.inl p))) := inferInstanceAs (IsEmpty (Fin 0))
+  have : IsEmpty (Fin ((C.withTag T).arity (Sum.inl p))) := inferInstanceAs (IsEmpty (Fin 0))
   exact iff_of_eq (congrArg (τ (Sum.inl p)) (funext fun i => isEmptyElim i))
 
 theorem realize_tagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.Assignment A) :
@@ -120,7 +120,7 @@ theorem realize_atTagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.As
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ (SOBlock.tagAssign q ν))
       (atTagTwoF L C T p) ↔ p = q) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ (SOBlock.tagAssign q ν)
   refine Iff.trans Formula.realize_inf ?_
   constructor
@@ -144,7 +144,7 @@ theorem exists_tagAssign_two (p : T) (σ τ : (C.withTag T).Assignment A)
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ τ) (atTagTwoF L C T p)) :
     τ = SOBlock.tagAssign p (SOBlock.dropTag τ) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
     (@sumOrderStructure L A instL _) σ τ
   obtain ⟨hset, hrest⟩ := Formula.realize_inf.mp h
   rw [realize_listInf] at hrest
@@ -162,47 +162,5 @@ theorem exists_tagAssign_two (p : T) (σ τ : (C.withTag T).Assignment A)
       rw [hrp] at *
       exact (realize_tagTwoF' p σ τ x).mp hset
   | Sum.inr _ => rfl
-
-theorem realize_varAgreeS (σ τ : (C.withTag T).Assignment A) (i : C.ι) :
-    (@Sentence.Realize _ A
-        (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-          (@sumOrderStructure L A instL _) σ τ) (varAgreeS L C T i) ↔
-      ∀ x : Fin (C.arity i) → A, σ (Sum.inr i) x ↔ τ (Sum.inr i) x) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-    (@sumOrderStructure L A instL _) σ τ
-  rw [varAgreeS, Sentence.Realize, Formula.realize_iAlls]
-  refine forall_congr' fun x => ?_
-  simp only [Formula.realize_inf, Formula.realize_imp, Formula.realize_rel, Term.realize_var,
-    Sum.elim_inr]
-  exact ⟨fun h => ⟨h.1, h.2⟩, fun h => ⟨h.1, h.2⟩⟩
-
-theorem realize_varsFrozenS (σ τ : (C.withTag T).Assignment A) (vs : List C.ι) :
-    (@Sentence.Realize _ A
-        (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-          (@sumOrderStructure L A instL _) σ τ) (varsFrozenS L C T vs) ↔
-      ∀ i ∈ vs, ∀ x : Fin (C.arity i) → A, σ (Sum.inr i) x ↔ τ (Sum.inr i) x) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-    (@sumOrderStructure L A instL _) σ τ
-  rw [varsFrozenS, Sentence.Realize, realize_listInf]
-  constructor
-  · intro h i hi
-    exact (realize_varAgreeS σ τ i).mp (h _ (List.mem_map.mpr ⟨i, hi, rfl⟩))
-  · intro h ψ hψ
-    obtain ⟨i, hi, rfl⟩ := List.mem_map.mp hψ
-    exact (realize_varAgreeS σ τ i).mpr (h i hi)
-
-open Classical in
-/-- **Freezing every variable is keeping the whole block**: the two states of a
-move then differ only in their tag. -/
-theorem dropTag_eq_of_varsFrozen (σ τ : (C.withTag T).Assignment A)
-    (h : @Sentence.Realize _ A
-      (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-        (@sumOrderStructure L A instL _) σ τ)
-      (varsFrozenS L C T (letI := Fintype.ofFinite C.ι; (Finset.univ : Finset C.ι).toList))) :
-    SOBlock.dropTag σ = SOBlock.dropTag τ := by
-  letI := Fintype.ofFinite C.ι
-  funext i x
-  refine propext ((realize_varsFrozenS σ τ _).mp h i ?_ x)
-  exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
 end DescriptiveComplexity

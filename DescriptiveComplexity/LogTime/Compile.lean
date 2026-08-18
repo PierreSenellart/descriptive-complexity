@@ -82,7 +82,7 @@ direction:
   (`DescriptiveComplexity.LogTime.Pow`), so
   `DescriptiveComplexity.BitDefinable.ac0Definable` is unconditional;
 * `FO(≤, +, ×) ⊆ FO(≤, +, BIT)` is the Bit Sum Lemma, the counting argument that
-  eliminates `×` in favour of the bit atom, and it is **not** built.
+  eliminates `×` in favor of the bit atom, and it is **not** built.
 
 Neither is a defect of the machine: they are statements about two vocabularies,
 and the machine is exactly the one of them that a machine can be.

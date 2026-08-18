@@ -14,9 +14,9 @@ existential second-order logic whose relation variables range over a universe
 object-creating query languages of ([Abiteboul–Hull–Vianu 1995]
 [abiteboul1995foundations], ch. 18).
 
-Every class defined so far in this library bounds its certificate by the
-instance: a `Σ₁` sentence guesses relations over `A` itself, so the search
-space is exponential in `|A|` and the class sits inside NP. Value invention
+Bounding the certificate by the instance is what keeps a second-order class
+inside NP: a `Σ₁` sentence guesses relations over `A` itself, so the search
+space is exponential in `|A|`. Value invention
 removes exactly that bound and nothing else: the certificate is a finite
 extension `A ⊕ Fin m` of the universe – with `m` *unbounded* – together with
 relations over it, checked by a fixed first-order kernel. The witness is still
@@ -74,7 +74,7 @@ namespace Language
 /-- Relation symbols of the language marking the original elements inside an
 extended universe. -/
 inductive oldRel : ℕ → Type
-  /-- `old x`: the element `x` comes from the original structure, i.e. it is
+  /-- `old x`: the element `x` comes from the original structure, i.e., it is
   not an invented value. -/
   | old : oldRel 1
   deriving DecidableEq
@@ -106,8 +106,10 @@ abbrev newLang (L : Language.{0, 0}) : Language := L.sum Language.oldMark
 
 section Extended
 
-/-- The original elements of a universe extended by invented values. -/
-def IsOld {A : Type} {m : ℕ} : A ⊕ Fin m → Prop
+/-- The original elements of a universe extended by invented values. The
+invented values are an arbitrary type, so that the same predicate reads an
+extension by a *set* of them and not only by an initial segment. -/
+def IsOld {A N : Type} : A ⊕ N → Prop
   | Sum.inl _ => True
   | Sum.inr _ => False
 
@@ -250,15 +252,6 @@ theorem sigmaSONewDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
   · exact (h A).symm.trans (hφ A)
   · exact (h A).trans (hφ A)
 
-/-- An `∃SO[new]` sentence expresses an isomorphism-invariant property: what
-it says of an instance is transported by `DescriptiveComplexity.extEquiv`. -/
-theorem sorealize_new_iso [L.IsRelational] {A A' : Type} [L.Structure A] [L.Structure A']
-    (e : A ≃[L] A') (B : SOBlock)
-    (φ : (soLang (newLang L) [B]).Sentence) (m : ℕ) :
-    SORealize (newLang L) (A ⊕ Fin m) [B] φ true ↔
-      SORealize (newLang L) (A' ⊕ Fin m) [B] φ true :=
-  sorealize_iso (extEquiv e (Equiv.refl (Fin m))) [B] φ true
-
 end Definability
 
 /-! ### Inventing nothing
@@ -318,6 +311,38 @@ end NoNew
 
 variable {L : Language.{0, 0}}
 
+/-- **The guarded sentence, read over an extended universe**: it holds exactly
+when nothing was invented and the original sentence holds over the instance
+itself. This is the whole content of inventing nothing, and it is what both
+`DescriptiveComplexity.SigmaSODefinable.toNew` and its bounded twin read. -/
+theorem sorealize_guardNoNew_iff [L.IsRelational] {B : SOBlock}
+    (φ : (soLang L [B]).Sentence) (A : Type) [instA : L.Structure A] (m : ℕ) :
+    SORealize (newLang L) (A ⊕ Fin m) [B]
+      ((soLangEmbed [B] (newLang L)).onSentence (noNewSentence L) ⊓
+        (soLangLift [B] L (newLang L) LHom.sumInl).onSentence φ) true ↔
+      (IsEmpty (Fin m) ∧ SORealize L A [B] φ true) := by
+  let instAll := allOldStructure L A
+  rw [sorealize_inf_embed [B] (newLang L) (A ⊕ Fin m) _ (noNewSentence L) _ true,
+    realize_noNewSentence L A m]
+  constructor
+  · rintro ⟨hno, hrest⟩
+    have : IsEmpty (Fin m) := ⟨fun i => not_isOld_inr i (hno (Sum.inr i))⟩
+    refine ⟨inferInstance, ?_⟩
+    have h1 := (@sorealize_iso (newLang L) A (A ⊕ Fin m) instAll _
+      (extEquivNoNew L A m) [B] _ true).mpr hrest
+    exact (sorealize_soLangLift [B] L (newLang L) LHom.sumInl A instA instAll
+      (by let := allOldMarkStructure A; infer_instance) φ true).mp h1
+  · rintro ⟨hempty, hφA⟩
+    have := hempty
+    refine ⟨fun x => ?_, ?_⟩
+    · cases x with
+      | inl a => exact isOld_inl a
+      | inr i => exact (hempty.false i).elim
+    · have h1 := (sorealize_soLangLift [B] L (newLang L) LHom.sumInl A instA instAll
+        (by let := allOldMarkStructure A; infer_instance) φ true).mpr hφA
+      exact (@sorealize_iso (newLang L) A (A ⊕ Fin m) instAll _
+        (extEquivNoNew L A m) [B] _ true).mp h1
+
 /-- **Existential second-order definability implies `∃SO[new]`-definability**:
 an `∃SO` sentence becomes an `∃SO[new]` sentence when guarded by “nothing was
 invented”. Once RE is a complexity class, this is the inclusion `NP ⊆ RE`. -/
@@ -330,38 +355,10 @@ theorem SigmaSODefinable.toNew [L.IsRelational] {P : DecisionProblem L}
   refine ⟨B, (soLangEmbed [B] (newLang L)).onSentence (noNewSentence L) ⊓
     (soLangLift [B] L (newLang L) LHom.sumInl).onSentence φ, ?_⟩
   intro A instA _ _
-  letI instAll := allOldStructure L A
-  -- the guarded sentence holds over `A ⊕ Fin m` exactly when `m` invents
-  -- nothing and the original sentence holds over `A`
-  have key : ∀ m : ℕ, SORealize (newLang L) (A ⊕ Fin m) [B]
-      ((soLangEmbed [B] (newLang L)).onSentence (noNewSentence L) ⊓
-        (soLangLift [B] L (newLang L) LHom.sumInl).onSentence φ) true ↔
-      (IsEmpty (Fin m) ∧ SORealize L A [B] φ true) := by
-    intro m
-    rw [sorealize_inf_embed [B] (newLang L) (A ⊕ Fin m) _ (noNewSentence L) _ true,
-      realize_noNewSentence L A m]
-    constructor
-    · rintro ⟨hno, hrest⟩
-      haveI : IsEmpty (Fin m) := ⟨fun i => not_isOld_inr i (hno (Sum.inr i))⟩
-      refine ⟨inferInstance, ?_⟩
-      have h1 := (@sorealize_iso (newLang L) A (A ⊕ Fin m) instAll _
-        (extEquivNoNew L A m) [B] _ true).mpr hrest
-      exact (sorealize_soLangLift [B] L (newLang L) LHom.sumInl A instA instAll
-        (by letI := allOldMarkStructure A; infer_instance) φ true).mp h1
-    · rintro ⟨hempty, hφA⟩
-      haveI := hempty
-      refine ⟨fun x => ?_, ?_⟩
-      · cases x with
-        | inl a => exact isOld_inl a
-        | inr i => exact (hempty.false i).elim
-      · have h1 := (sorealize_soLangLift [B] L (newLang L) LHom.sumInl A instA instAll
-          (by letI := allOldMarkStructure A; infer_instance) φ true).mpr hφA
-        exact (@sorealize_iso (newLang L) A (A ⊕ Fin m) instAll _
-          (extEquivNoNew L A m) [B] _ true).mp h1
   constructor
   · intro hP
-    exact ⟨0, (key 0).mpr ⟨inferInstance, (hφ A).mp hP⟩⟩
+    exact ⟨0, (sorealize_guardNoNew_iff φ A 0).mpr ⟨inferInstance, (hφ A).mp hP⟩⟩
   · rintro ⟨m, hm⟩
-    exact (hφ A).mpr ((key m).mp hm).2
+    exact (hφ A).mpr ((sorealize_guardNoNew_iff φ A m).mp hm).2
 
 end DescriptiveComplexity

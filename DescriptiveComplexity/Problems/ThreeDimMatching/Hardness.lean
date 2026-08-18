@@ -626,7 +626,7 @@ theorem wheel_other {x c : A} {s : Bool} (hocc : OccIn c x s) (hn : ¬WheelTrue 
   · exact ⟨c', t, hnext, hpq⟩
 
 omit [Finite A] in
-/-- **The gadget is consistent**: neighbouring occurrences of a variable make
+/-- **The gadget is consistent**: neighboring occurrences of a variable make
 the same choice. -/
 theorem wheel_step {x c₀ c : A} {s₀ s : Bool} (hnext : VarNext x c₀ s₀ c s) :
     (WheelTrue M x c s ↔ WheelTrue M x c₀ s₀) := by
@@ -1024,7 +1024,7 @@ theorem satisfiable_iff_hasThreeDimMatching (A : Type) [Language.sat.Structure A
     Satisfiable A ↔ HasThreeDimMatching (tdmInterp.Map A) := by
   classical
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  haveI : Finite (tdmInterp.Map A) := tdmInterp.map_finite A
+  have : Finite (tdmInterp.Map A) := tdmInterp.map_finite A
   constructor
   · rintro ⟨ν, hν⟩
     have hsat := satClauses_occ hν

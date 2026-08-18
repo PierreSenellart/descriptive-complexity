@@ -60,7 +60,7 @@ def ThreeCol : DecisionProblem Language.graph where
 `ThreeColorable` coincides with Mathlib's `SimpleGraph.Colorable 3`. -/
 theorem threeColorable_iff_colorable {V : Type} (G : SimpleGraph V) :
     @ThreeColorable V G.structure ↔ G.Colorable 3 := by
-  letI := G.structure
+  let := G.structure
   constructor
   · rintro ⟨c, hc⟩
     exact ⟨SimpleGraph.Coloring.mk c fun {u v} h => hc u v h⟩

@@ -34,7 +34,7 @@ has no bad cycle, so correctness is the classical criterion
 `DescriptiveComplexity.TwoSatImpl.no_bad_cycle_of_satisfiable` in the other.
 
 Note the shape of the argument: the *acceptance* condition of 2SAT is negative
-("no bad cycle"), which a Horn program can state because a goal clause is
+(“no bad cycle”), which a Horn program can state because a goal clause is
 exactly a negative constraint on the guessed relation.
 -/
 

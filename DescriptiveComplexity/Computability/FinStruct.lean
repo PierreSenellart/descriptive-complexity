@@ -383,13 +383,4 @@ theorem toPred_ofEquiv (P : DecisionProblem L) (V : FinVocab L) {A : Type} [L.St
     P.toPred V (FinStruct.ofEquiv V k e) ↔ P A :=
   P.iso_invariant (FinStruct.equivOfEquiv V k e)
 
-/-- Every finite nonempty structure is isomorphic to a concrete one. -/
-theorem exists_finStruct (V : FinVocab L) (A : Type) [L.Structure A] [Finite A] [Nonempty A] :
-    ∃ s : FinStruct V, Nonempty (s.Univ ≃[L] A) := by
-  classical
-  obtain ⟨k, ⟨e⟩⟩ := Finite.exists_equiv_fin A
-  match k, e with
-  | 0, e => exact ((e (Classical.arbitrary A)).elim0)
-  | k + 1, e => exact ⟨FinStruct.ofEquiv V k e.symm, ⟨FinStruct.equivOfEquiv V k e.symm⟩⟩
-
 end DescriptiveComplexity

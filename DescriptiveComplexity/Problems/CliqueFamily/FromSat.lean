@@ -278,7 +278,7 @@ theorem satisfiable_iff_hasLargeClique [Finite A] [Nonempty A] :
       have emb : satToClique.Map A ↪ {v // S v} :=
         ⟨fun v => e ⟨v, hmark v⟩,
           fun v v' h => congrArg Subtype.val (e.injective h)⟩
-      haveI := Fintype.ofFinite (satToClique.Map A)
+      have := Fintype.ofFinite (satToClique.Map A)
       have hall : ∀ v, S v := by
         by_contra h
         push Not at h
@@ -380,8 +380,8 @@ theorem satisfiable_iff_hasLargeClique [Finite A] [Nonempty A] :
         -- in distinct clauses, so by counting the clique covers every
         -- clause, and its literals form a consistent assignment.
         push Not at hjunk
-        haveI := Fintype.ofFinite A
-        haveI := Fintype.ofFinite (satToClique.Map A)
+        have := Fintype.ofFinite A
+        have := Fintype.ofFinite (satToClique.Map A)
         have hφinj : Function.Injective (fun v : {v // S v} =>
             (⟨v.1.2 0, (hjunk v.1 v.2).isCl⟩ : {c : A // IsCl c})) := by
           rintro ⟨v, hv⟩ ⟨v', hv'⟩ h

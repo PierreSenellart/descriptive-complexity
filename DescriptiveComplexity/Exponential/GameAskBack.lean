@@ -138,7 +138,7 @@ theorem ask_of_altWin (h₀ : IsBot a₀) (q : GameQuestion)
     (h : CtrlCfg a₀ hdim prog.vars ρ σ (MachPh.prePh q r jj par) vv c)
     (hw : (𝕄).AltWin true c) :
     @Sentence.Realize _ A (B.structure₂ (cond r σ ρ) (cond (!r) σ ρ)) φ := by
-  letI : Nonempty A := ⟨a₀⟩
+  let : Nonempty A := ⟨a₀⟩
   refine (hplays A (cond r σ ρ) (cond (!r) σ ρ) (qval prog.vars_le q vv)).mpr ?_
   exact pre_of_altWin (natoms := prog.natoms) h₀ prog.vars_le
     (fun _ vv' c' h' hw' => matrixHolds_of_altWin h₀ h' hw')

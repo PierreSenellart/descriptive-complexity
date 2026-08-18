@@ -82,9 +82,6 @@ def predSet (r : WithBot V) : Set V := {y : V | (↑y : WithBot V) < r}
 @[simp] theorem predSet_bot : predSet (⊥ : WithBot V) = ∅ := by
   ext y; simp [predSet]
 
-theorem predSet_coe (x : V) : predSet (↑x : WithBot V) = {y : V | y < x} := by
-  ext y; simp [predSet]
-
 theorem mem_predSet_coe {x y : V} : y ∈ predSet (↑x : WithBot V) ↔ y < x := by
   simp [predSet]
 
@@ -94,7 +91,7 @@ theorem notMem_predSet_self (x : V) : x ∉ predSet (↑x : WithBot V) := by
 /-- At the least node, nothing has been scanned. -/
 theorem predSet_of_isMin {x : V} (h : ∀ z : V, x ≤ z) : predSet (↑x : WithBot V) = ∅ := by
   ext y
-  simp only [predSet, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_lt]
+  simp only [predSet, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_lt]
   exact_mod_cast h y
 
 /-- Past the greatest node, everything has been scanned. -/
@@ -127,16 +124,6 @@ theorem exists_coe_of_covBy {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ 
   | bot => exact absurd h.lt (by simp)
   | coe x' => exact ⟨x', rfl, WithBot.coe_covBy_coe.mp h⟩
 
-/-- The value covering `⊥` is the least node. -/
-theorem isMin_of_bot_covBy {r : WithBot V} (h : (⊥ : WithBot V) ⋖ r) :
-    ∃ x : V, r = ↑x ∧ ∀ z : V, x ≤ z := by
-  cases r with
-  | bot => exact absurd h.lt (lt_irrefl _)
-  | coe x =>
-    refine ⟨x, rfl, fun z => ?_⟩
-    have : IsMin x := WithBot.bot_covBy_coe.mp h
-    exact (le_total z x).elim (fun hz => this hz) id
-
 end Positions
 
 /-! ### Counting the scanned part of a set -/
@@ -144,9 +131,6 @@ end Positions
 section Counting
 
 variable {V : Type} [LinearOrder V] [Finite V] {P : Set V}
-
-theorem ncard_inter_predSet_le (r : WithBot V) : (P ∩ predSet r).ncard ≤ P.ncard :=
-  Set.ncard_le_ncard Set.inter_subset_left P.toFinite
 
 omit [LinearOrder V] in
 theorem ncard_le_card (P : Set V) : P.ncard ≤ Nat.card V := by
@@ -159,12 +143,6 @@ theorem ncard_inter_insert_of_mem {Q P : Set V} {uu : V} (huP : uu ∉ P) (h : u
     (Q ∩ insert uu P).ncard = (Q ∩ P).ncard + 1 := by
   rw [Set.inter_insert_of_mem h,
     Set.ncard_insert_of_notMem (fun hm => huP hm.2) (Set.toFinite _)]
-
-omit [LinearOrder V] [Finite V] in
-/-- Scanning one more node, outside the set: its scanned count is unchanged. -/
-theorem ncard_inter_insert_of_notMem {Q P : Set V} {uu : V} (h : uu ∉ Q) :
-    (Q ∩ insert uu P).ncard = (Q ∩ P).ncard := by
-  rw [Set.inter_insert_of_notMem h]
 
 omit [LinearOrder V] in
 /-- Scanning one more node can only grow the scanned part of a set. -/

@@ -680,7 +680,7 @@ noncomputable def gameInterp :
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {a₀ : A}
 
-/-- The interpreted universe is the machine's own, on the nose. -/
+/-- The interpreted universe is the machine's own, with nothing added. -/
 def gameMapEquiv : GamePt B V M A ≃ (gameInterp prog).Map A := Equiv.refl _
 
 omit [L.Structure A] [LinearOrder A] in
@@ -748,7 +748,7 @@ theorem relMap_right (p : GamePt B V M A) :
 theorem relMap_le (p q : GamePt B V M A) :
     ATMLe (k := 2) (gameMapEquiv prog p) (gameMapEquiv prog q) ↔
       (prog.machine a₀ hdim).Le p q := by
-  letI := machTagOrder (B := B) (C := GameCtrlTag B V M)
+  let := machTagOrder (B := B) (C := GameCtrlTag B V M)
   rw [ATMLe, relMap_two prog
       (φ := fun t t' => @lexLeF L (GameTag B V M) machTagOrder (gameDim B V) t t') rfl,
     realize_lexLeF (L := L) (A := A) (Tag := GameTag B V M) (d := gameDim B V)]

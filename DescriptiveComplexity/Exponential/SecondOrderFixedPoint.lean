@@ -29,8 +29,8 @@ the first-order elements of a new sort, so the syntax is the ordinary
 `FirstOrder.Language.BoundedFormula` layer and the fixpoint is the ordinary
 `DescriptiveComplexity.LFPDefinable`. This is the standard type-lowering
 translation of higher-order logic into many-sorted first-order logic over the
-power type ([Henkin 1950][henkin1950completeness]), which is why "SO(LFP) over
-`A`" and "FO(LFP) over the expansion of `A`" are two presentations of one
+power type ([Henkin 1950][henkin1950completeness]), which is why “SO(LFP) over
+`A`” and “FO(LFP) over the expansion of `A`” are two presentations of one
 object.
 
 ## The bridge theorems

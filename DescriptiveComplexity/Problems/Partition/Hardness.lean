@@ -635,7 +635,7 @@ theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : pInterp.Map A → P
   classical
   have hset : {q : pInterp.Map A | BWPosn q ∧ p q} = pLow a₀ '' {b | sub b} := by
     ext q
-    rw [Set.mem_setOf_eq, hp q]
+    rw [Set.mem_ofPred_eq, hp q]
     exact ⟨fun ⟨b, hb, hq⟩ => ⟨b, hb, hq.symm⟩, fun ⟨b, hb, hq⟩ => ⟨b, hb, hq.symm⟩⟩
   rw [binNum, hset, finsum_mem_image (pLow_injective a₀).injOn]
   refine (finsum_mem_congr rfl fun b _ => ?_).trans (finsum_pow_eq_digitNum fun _ _ => trivial)
@@ -664,7 +664,7 @@ theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Pr
       digitNum (blkLe (A := A)) (fun _ => True) (pbase A)
         (fun b => ({i : pInterp.Map A | S i ∧ BWBit i (pLow a₀ b)} : Set _).ncard) := by
   classical
-  haveI : Finite (pInterp.Map A) := pInterp.map_finite A
+  have : Finite (pInterp.Map A) := pInterp.map_finite A
   have h₁ : (∑ᶠ i ∈ {i | S i}, BWWeight i) =
       ∑ᶠ i ∈ {i | S i}, digitNum (blkLe (A := A)) (fun _ => True) (pbase A)
         (fun b => if BWBit i (pLow a₀ b) then 1 else 0) :=
@@ -696,11 +696,11 @@ theorem sum_weights_eq_cnt {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A �
 theorem cnt_add_cnt (a₀ : A) {S : pInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i)
     (b : Bool × A) :
     cnt a₀ S b + cnt a₀ (fun i => BWItem i ∧ ¬S i) b = cnt a₀ BWItem b := by
-  haveI : Finite (pInterp.Map A) := pInterp.map_finite A
+  have : Finite (pInterp.Map A) := pInterp.map_finite A
   rw [cnt, cnt, cnt, ← Set.ncard_union_eq _ (Set.toFinite _) (Set.toFinite _)]
   · congr 1
     ext i
-    simp only [Set.mem_union, Set.mem_setOf_eq]
+    simp only [Set.mem_union, Set.mem_ofPred_eq]
     constructor
     · rintro (⟨hi, hb⟩ | ⟨⟨hi, -⟩, hb⟩)
       · exact ⟨hS i hi, hb⟩
@@ -864,7 +864,7 @@ theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (x 
   have hset : {i : pInterp.Map A | S i ∧ BWBit i (pLow a₀ (false, x))} =
       (fun s : Bool => pLit a₀ s x) '' {s | S (pLit a₀ s x)} := by
     ext i
-    simp only [Set.mem_setOf_eq, Set.mem_image]
+    simp only [Set.mem_ofPred_eq, Set.mem_image]
     constructor
     · rintro ⟨hi, hb⟩
       obtain ⟨s, rfl⟩ := (bit_pLow_var ha₀ x i).mp hb
@@ -882,13 +882,13 @@ theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (c 
         ({p ∈ MidSet c | S (pSlk p.2 c p.1)} : Set (A × Bool)).ncard +
         (if EmptyCl c ∧ S (pEmp a₀ c) then 1 else 0) := by
   classical
-  haveI : Finite (pInterp.Map A) := pInterp.map_finite A
+  have : Finite (pInterp.Map A) := pInterp.map_finite A
   have hset : {i : pInterp.Map A | S i ∧ BWBit i (pLow a₀ (true, c))} =
       (((fun p : A × Bool => pLit a₀ p.2 p.1) '' {p ∈ OccSet c | S (pLit a₀ p.2 p.1)}) ∪
         ((fun p : A × Bool => pSlk p.2 c p.1) '' {p ∈ MidSet c | S (pSlk p.2 c p.1)})) ∪
         {i : pInterp.Map A | (EmptyCl c ∧ S (pEmp a₀ c)) ∧ i = pEmp a₀ c} := by
     ext i
-    simp only [Set.mem_setOf_eq, Set.mem_union, Set.mem_image]
+    simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_image]
     constructor
     · rintro ⟨hi, hb⟩
       rcases (bit_pLow_cls ha₀ c i).mp hb with ⟨p, hocc, rfl⟩ | ⟨p, hmid, rfl⟩ | ⟨hemp, rfl⟩
@@ -977,7 +977,7 @@ theorem ncard_le_two_card (X : Set (A × Bool)) : X.ncard ≤ 2 * Nat.card A := 
 /-- A selection weighs at most as much as all the items, digit by digit. -/
 theorem cnt_le (a₀ : A) {S : pInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i) (b : Bool × A) :
     cnt a₀ S b ≤ cnt a₀ BWItem b := by
-  haveI : Finite (pInterp.Map A) := pInterp.map_finite A
+  have : Finite (pInterp.Map A) := pInterp.map_finite A
   exact Set.ncard_le_ncard (fun i hi => ⟨hS i hi.1, hi.2⟩) (Set.toFinite _)
 
 variable [Nonempty A]
@@ -1214,7 +1214,7 @@ theorem naeSatisfiable_iff_hasEqualSplit (A : Type) [Language.sat.Structure A] [
     [Finite A] [Nonempty A] : NAESatisfiable A ↔ HasEqualSplit (pInterp.Map A) := by
   classical
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  haveI : Finite (pInterp.Map A) := pInterp.map_finite A
+  have : Finite (pInterp.Map A) := pInterp.map_finite A
   constructor
   · rintro ⟨ν, hν⟩
     -- a clause has a true occurrence, and at least one more occurrence
@@ -1230,7 +1230,7 @@ theorem naeSatisfiable_iff_hasEqualSplit (A : Type) [Language.sat.Structure A] [
     have hOccEmpty : ∀ c : A, ¬IsCl c → OccSet c = ∅ := by
       intro c hc
       ext p
-      simp only [OccSet, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      simp only [OccSet, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       exact fun h => hc h.1
     -- enough slack to balance every clause block
     have hsub : ∀ c : A,
@@ -1261,7 +1261,7 @@ theorem naeSatisfiable_iff_hasEqualSplit (A : Type) [Language.sat.Structure A] [
       rw [cnt_var ha₀, cnt_item_var ha₀]
       have hset : {s : Bool | splitSet a₀ ν M (pLit a₀ s e)} = {s | LitTrue ν e s} := by
         ext s
-        rw [Set.mem_setOf_eq, Set.mem_setOf_eq, splitSet_pLit]
+        rw [Set.mem_ofPred_eq, Set.mem_ofPred_eq, splitSet_pLit]
       rw [hset]
       have hone : ({s : Bool | LitTrue ν e s} : Set Bool).ncard = 1 := by
         by_cases hv : ν e

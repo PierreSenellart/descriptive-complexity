@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Wide.Bridge
 import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # The order key a reduction writes is the block-major one
@@ -79,14 +80,83 @@ theorem tagTupleLe_iff_lexRel (p q : Tag × (Fin d → A)) :
   rw [tagTupleLe, lexRel]
   exact or_congr lt_iff_le_and_ne Iff.rfl
 
-/-- The block-major order on a tagged tuple universe is a linear order – either
-by `DescriptiveComplexity.isLinOrd_lexRel` from its two factors, or by transport
-along the previous theorem. -/
-theorem isLinOrd_lexRel_tagTuple :
-    IsLinOrd (lexRel (· ≤ · : Tag → Tag → Prop) (tupLeLex (A := A) (d := d))) :=
-  isLinOrd_lexRel isLinOrd_le isLinOrd_tupLeLex
-
 end Key
+
+/-! ### The index a clocked program lays its file out by
+
+A program with no clock gives every element of the universe a register; a
+clocked one cannot, since the only stretches it can walk are a fixed number of
+tuple roll-overs long and the universe is `|Tag|` of those. What it can afford
+is one register per **block and tuple**, which is also all that a register's
+contents ever depend on. Its order is the lexicographic product of the block
+order and the tuples' (`DescriptiveComplexity.lexRel`), and the block order is
+written down rather than borrowed: it has to be the one under which a block's
+tag is monotone, so that a mark on the file counts in the same order as the
+address it stands for (`DescriptiveComplexity.ixAddr`). -/
+
+section Blk
+
+variable (K A : Type) [LinearOrder K] [Finite K] [LinearOrder A] (dd : ℕ)
+
+/-- **The index of the file a clocked program lays out**: a block of the
+argument inventory – or none, for the registers that belong to no block – and a
+tuple of the instance. -/
+abbrev BlkIx : Type := Option K × (Fin dd → A)
+
+/-- **The order of the blocks**: the blockless registers first, then the blocks
+in their own order. Which order this is matters: it is the one under which the
+tag of a block (`DescriptiveComplexity.blkTag`) is monotone, so that the marks a
+program keeps on its file count in the same order as the addresses they stand
+for (`DescriptiveComplexity.ixAddr`). It is a relation and not an instance,
+because `Option` carries an order of its own and two paths to one notation are
+worse than none. -/
+def blkTagLe : Option K → Option K → Prop
+  | none, _ => True
+  | some _, none => False
+  | some k, some k' => k ≤ k'
+
+omit [Finite K] [LinearOrder A] in
+/-- **The block order is linear.** -/
+theorem isLinOrd_blkTagLe : IsLinOrd (blkTagLe K) := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rintro (_ | a)
+    · exact trivial
+    · exact le_refl a
+  · rintro (_ | a) (_ | b) (_ | c) h₁ h₂ <;> first
+      | exact trivial
+      | exact h₁.elim
+      | exact h₂.elim
+      | exact le_trans h₁ h₂
+  · rintro (_ | a) (_ | b) h₁ h₂ <;> first
+      | rfl
+      | exact h₁.elim
+      | exact h₂.elim
+      | exact congrArg some (le_antisymm h₁ h₂)
+  · rintro (_ | a) (_ | b) <;> first
+      | exact Or.inl trivial
+      | exact Or.inr trivial
+      | exact (le_total a b).imp id id
+
+/-- The order the registers are laid out in: block-major, then the tuple's own
+lexicographic order. -/
+noncomputable def blkLe : BlkIx K A dd → BlkIx K A dd → Prop :=
+  lexRel (blkTagLe K) tupLeLex
+
+omit [Finite K] in
+/-- **The layout order is linear**, by the same lemma the universe's own order
+is proved from. -/
+theorem isLinOrd_blkLe : IsLinOrd (blkLe K A dd) :=
+  isLinOrd_lexRel (isLinOrd_blkTagLe K) isLinOrd_tupLeLex
+
+omit [LinearOrder K] [LinearOrder A] in
+/-- **How many registers the file has**: one per block, one more for the
+blockless ones, times the tuples. -/
+theorem card_blkIx : Nat.card (BlkIx K A dd) = (Nat.card K + 1) * Nat.card (Fin dd → A) := by
+  let := Fintype.ofFinite K
+  rw [Nat.card_prod, Nat.card_eq_fintype_card (α := Option K), Nat.card_eq_fintype_card (α := K),
+    Fintype.card_option]
+
+end Blk
 
 end Wide
 

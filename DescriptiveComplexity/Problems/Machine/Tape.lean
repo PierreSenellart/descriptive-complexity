@@ -45,10 +45,9 @@ The machine needs one sweep to guess an assignment and one sweep per clause to
 check it, so `(m + 1) · (n + 2)` steps for `n` elements and `m ≤ n` clauses.
 Eight filler tags at dimension two give `8n²` positions on their own – no need
 to count the markers and cells – and `DescriptiveComplexity.sat_budget` says that is
-always more than the machine needs. Following the plan's advice
-on risk #3, the filler is over-provisioned rather than the bound tightened:
-nothing downstream depends on the constant, and an off-by-one here would only
-surface at the very end of the correctness proof.
+always more than the machine needs. The filler is over-provisioned rather than
+the bound tightened: nothing downstream depends on the constant, and an
+off-by-one here would only surface at the very end of the correctness proof.
 -/
 
 namespace DescriptiveComplexity
@@ -61,8 +60,8 @@ open FirstOrder
 constructors is the order of the tape; `DescriptiveComplexity.satTagIdx` is what makes
 that official.
 
-The program's tags (symbols, states, transitions) will be added after these
-with higher indices, which does not disturb the order of the positions. -/
+The program's tags (symbols, states, transitions) come after these with higher
+indices, which does not disturb the order of the positions. -/
 inductive SatTag : Type
   /-- The left marker cell. -/
   | pStart

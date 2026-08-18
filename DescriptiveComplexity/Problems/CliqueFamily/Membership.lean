@@ -17,7 +17,7 @@ injection of the marked set into the clique – and the first-order kernel
 checks that the unary relation is a clique and that the binary relation is
 total on the marked set, lands in the clique, and is injective. On (finite)
 structures this is equivalent to the existence of an embedding of the marked
-set into a clique, i.e. to `DescriptiveComplexity.HasLargeClique`.
+set into a clique, i.e., to `DescriptiveComplexity.HasLargeClique`.
 
 Since NP is *defined* as `Σ₁`-definability, this is the statement
 `Clique ∈ NP`; see `DescriptiveComplexity.Problems.CliqueFamily` for the
@@ -92,7 +92,7 @@ private theorem realize_cliqueKernel {A : Type} [Language.markedGraph.Structure 
         (∀ a : A, RelMap mgMarked ![a] →
           ∃ b : A, ρ false ![a, b] ∧ ρ true ![b]) ∧
         ∀ a a' b : A, ρ false ![a, b] → ρ false ![a', b] → a = a' := by
-  letI := cliqueGuessBlock.structure ρ
+  let := cliqueGuessBlock.structure ρ
   have hsubC : ∀ (w : Fin 1 → A),
       RelMap (L := cliqueSOLang) (M := A) kCliqueSym w ↔ ρ true w :=
     fun _ => Iff.rfl

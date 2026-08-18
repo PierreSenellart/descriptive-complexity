@@ -67,8 +67,8 @@ block through a first-order interpretation
 `DescriptiveComplexity.StepDef.partStage_pull`, for the pulled definition
 `DescriptiveComplexity.StepDef.pull`). Each is one commuting lemma about
 `DescriptiveComplexity.StepDef.next` (`next_map`, `next_pull`) propagated along
-the orbit; these are the load-bearing lemmas for isomorphism-invariance and
-closure under reductions of every logic built on this skeleton.
+the orbit; these are the lemmas isomorphism-invariance and closure under
+reductions rest on, for every logic built on this skeleton.
 -/
 
 namespace DescriptiveComplexity
@@ -188,11 +188,6 @@ theorem inflStage_le_of_le {m n : ℕ} (hmn : m ≤ n) (i : d.B.ι)
     rcases Nat.lt_succ_iff_lt_or_eq.mp (Nat.lt_succ_of_le hmn) with hlt | heq
     · exact d.inflStage_le_succ n i x (ih (Nat.lt_succ_iff.mp hlt))
     · rwa [heq] at h
-
-/-- Every stage is contained in the value of the inflationary iteration. -/
-theorem inflStage_le_inflLimit (n : ℕ) (i : d.B.ι) (x : Fin (d.B.arity i) → A)
-    (h : d.inflStage A n i x) : d.inflLimit A i x :=
-  ⟨n, h⟩
 
 /-- Two partial stages that are both fixed points of the step are equal: the
 value of a converging partial iteration does not depend on which stable stage
@@ -371,7 +366,7 @@ theorem next_pull (ρ : dd.B.Assignment (I.Map A)) :
     (dd.pull I).next (dd.B.pullAssign ρ) = dd.B.pullAssign (dd.next (A := I.Map A) ρ) := by
   funext p x
   refine propext ?_
-  letI := (dd.B.pull Tag dm).structure₁ (L := L₁) (dd.B.pullAssign ρ)
+  let := (dd.B.pull Tag dm).structure₁ (L := L₁) (dd.B.pullAssign ρ)
   have h1 := realize_guardPull (I.extendSO dd.B) (dd.step p.1) p.2 x
   have h2 := realize_formula_of_equiv (I.extendSOEquiv dd.B A ρ) (dd.step p.1)
     (tagVal (I.extendSO dd.B) p.2 x)

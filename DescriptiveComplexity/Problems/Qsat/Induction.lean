@@ -297,7 +297,6 @@ theorem levSat_ftt {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ false true true ℓ x ↔ (bitB σ ℓ ∨ ¬stV σ ℓ x ∨ inSnd ℓ σ x) := by
   simp [levSat_iff hℓ]
 
-
 /-- **What the eight clauses of a level say**: the pair passed below is the first
 half of the level when its universal bit holds, the second half otherwise. -/
 theorem levSat_all_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) :

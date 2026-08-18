@@ -8,23 +8,23 @@ import DescriptiveComplexity.Problems.Wide.RelExpansion
 /-!
 # The relativized expansion over the doubled universe is the expansion
 
-The point of `DescriptiveComplexity.Pfp.relExp`, discharged: over the doubled
-universe of `DescriptiveComplexity.Pfp.dblInterp` its points are the original
+The point of `DescriptiveComplexity.Draw.relExp`, discharged: over the doubled
+universe of `DescriptiveComplexity.Draw.dblInterp` its points are the original
 expansion's points over the instance, and its relations are the original's
-(`DescriptiveComplexity.Pfp.relExpMapEquiv`).
+(`DescriptiveComplexity.Draw.relExpMapEquiv`).
 
 Three things make that work, and each was arranged for it. A doubled universe
 always has a marked part, so the fallback tag contributes no point. A point's
 assignment is *supported*, so it is the extension of a unique assignment of the
 instance. And every sentence the expansion is made of transports by
-`DescriptiveComplexity.Pfp.realize_relOldBlock` – the domain sentence at one copy
+`DescriptiveComplexity.Draw.realize_relOldBlock` – the domain sentence at one copy
 of the block, and each defining sentence at `n` copies, where the extension
-commutes with replication on the nose.
+commutes with replication exactly.
 -/
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -36,7 +36,7 @@ variable {L : Language.{0, 0}} [L.IsRelational] {X : ExpExpansion L}
 variable {A : Type} [L.Structure A] [LinearOrder A] [Nonempty A]
 
 omit [L.IsRelational] [L.Structure A] [LinearOrder A] [Nonempty A] in
-/-- **Extending commutes with replication**, on the nose: the index type of a
+/-- **Extending commutes with replication**, exactly: the index type of a
 replicated block is a plain product and the extension acts coordinate by
 coordinate. -/
 theorem extAssign_replicateAssign {n : ℕ} (ρs : Fin n → X.B.Assignment A) :
@@ -49,7 +49,7 @@ theorem not_domHolds_none (ρ : X.B.Assignment ((dblInterp L).Map A)) :
     ¬ExpExpansion.DomHolds (X := relExp X)
       ((none, ρ) : (relExp X).Point ((dblInterp L).Map A)) := by
   intro h
-  letI := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
   have h1 := (Formula.realize_inf.mp h).1
   have h2 := (realize_noOldSentence (L := L) ρ).mp h1
   exact h2 (dblPt false (Classical.arbitrary A))
@@ -61,7 +61,7 @@ second conjunct says. -/
 theorem supported_of_domHolds {t : X.Tag} {ρ : X.B.Assignment ((dblInterp L).Map A)}
     (h : ExpExpansion.DomHolds (X := relExp X)
       ((some t, ρ) : (relExp X).Point ((dblInterp L).Map A))) : Supported ρ := by
-  letI := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ
   intro i w hw j
   exact (relMap_dbl_old (L := L) _).mp
     ((realize_suppSentence X.B ρ).mp (Formula.realize_inf.mp h).2 i w hw j)
@@ -73,7 +73,7 @@ theorem domHolds_relExp_iff (t : X.Tag) (ρ₀ : X.B.Assignment A) :
     ExpExpansion.DomHolds (X := relExp X)
         ((some t, extAssign ρ₀) : (relExp X).Point ((dblInterp L).Map A)) ↔
       ExpExpansion.DomHolds (X := X) ((t, ρ₀) : X.Point A) := by
-  letI := (relExp X).B.structure₁ (L := (newLang L).sum Language.order)
+  let := (relExp X).B.structure₁ (L := (newLang L).sum Language.order)
     (extAssign (L := L) ρ₀)
   constructor
   · intro h
@@ -140,6 +140,6 @@ noncomputable def relExpMapEquiv :
 
 end MapEquiv
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

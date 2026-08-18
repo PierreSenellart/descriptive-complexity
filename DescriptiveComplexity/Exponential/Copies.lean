@@ -84,8 +84,8 @@ against. -/
 theorem twoLHom_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
     @LHom.IsExpansionOn _ _ (B.twoLHom L) A (B.structure₂ (L := L) (ρs 0) (ρs 1))
       ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)) := by
-  letI := B.structure₂ (L := L) (ρs 0) (ρs 1)
-  letI := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
+  let := B.structure₂ (L := L) (ρs 0) (ρs 1)
+  let := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
   refine ⟨fun {_} f _ => ?_, fun {_} r _ => ?_⟩
   · match f with
     | Sum.inl (Sum.inl _) => rfl
@@ -115,7 +115,7 @@ replicated one, which is what an expansion's defining sentence needs. A walk
 over an expanded universe needs the converse: an
 `DescriptiveComplexity.SOTCSpec` states its transition over two stacked copies
 of its state block, while everything said about two points of an expanded
-universe — their order, their equality, one being the successor of the other —
+universe – their order, their equality, one being the successor of the other –
 is written over the block replicated twice. -/
 
 variable (L) in
@@ -136,8 +136,8 @@ theorem twoLHom'_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
     @LHom.IsExpansionOn _ _ (B.twoLHom' L) A
       ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs))
       (B.structure₂ (L := L) (ρs 0) (ρs 1)) := by
-  letI := B.structure₂ (L := L) (ρs 0) (ρs 1)
-  letI := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
+  let := B.structure₂ (L := L) (ρs 0) (ρs 1)
+  let := (B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)
   refine ⟨fun {_} f _ => ?_, fun {_} r x => ?_⟩
   · match f with
     | Sum.inl _ => rfl

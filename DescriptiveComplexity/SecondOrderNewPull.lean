@@ -49,7 +49,8 @@ Everything else is machinery that already exists:
   `DescriptiveComplexity.targetAssign` reads a guessed assignment back on the
   target's universe, `DescriptiveComplexity.sourceAssign` extends an assignment
   of the target's block by junk off the interpreted points, and the composite
-  `targetAssign ∘ sourceAssign` is the identity on the nose
+  `targetAssign ∘ sourceAssign` is the identity, not merely the identity on the
+  interpreted points
   (`DescriptiveComplexity.targetAssign_sourceAssign`) – which is all an
   *existential* block needs;
 * the interpretation's own defining formulas quantify over `A`, so they are
@@ -108,14 +109,6 @@ def joinParts (c : (Fin 1 → M) → Prop) (σ : (B.pull (Tag ⊕ Unit) (dim + 1
   fun i => match i with
     | Sum.inl _ => c
     | Sum.inr p => σ p
-
-theorem canonPart_joinParts (c : (Fin 1 → M) → Prop)
-    (σ : (B.pull (Tag ⊕ Unit) (dim + 1)).Assignment M) (x : M) :
-    canonPart (joinParts c σ) x ↔ c ![x] := Iff.rfl
-
-theorem pullPart_joinParts (c : (Fin 1 → M) → Prop)
-    (σ : (B.pull (Tag ⊕ Unit) (dim + 1)).Assignment M) :
-    pullPart (joinParts c σ) = σ := rfl
 
 end Parts
 
@@ -241,14 +234,14 @@ variable {A n ρ}
 theorem realize_oldHostF {α : Type} (x : α) (v : α → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (oldHostF L₁ Tag dim B x).Realize v ↔ IsOld (v x) := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   rw [oldHostF, Formula.realize_rel₁]
   exact Iff.rfl
 
 theorem realize_canonHostF {α : Type} (x : α) (v : α → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (canonHostF L₁ Tag dim B x).Realize v ↔ canonPart ρ (v x) := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   rw [canonHostF, Formula.realize_rel₁]
   exact Iff.rfl
 
@@ -256,7 +249,7 @@ theorem realize_newDom_inl (t : Tag) (w : Fin (dim + 1) → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newDom L₁ Tag dim B (Sum.inl t)).Realize w ↔
       (∀ j : Fin dim, IsOld (w (Fin.castSucc j))) ∧ canonPart ρ (w (Fin.last dim)) := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   rw [newDom, Formula.realize_inf, Formula.realize_iInf]
   exact and_congr (forall_congr' fun j => realize_oldHostF _ w) (realize_canonHostF _ w)
 
@@ -264,7 +257,7 @@ theorem realize_newDom_inr (u : Unit) (w : Fin (dim + 1) → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newDom L₁ Tag dim B (Sum.inr u)).Realize w ↔
       ¬IsOld (w (Fin.last dim)) ∧ ∀ j : Fin dim, w (Fin.castSucc j) = w (Fin.last dim) := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   rw [newDom, Formula.realize_inf, Formula.realize_not, Formula.realize_iInf]
   refine and_congr (not_congr (realize_oldHostF _ w)) (forall_congr' fun j => ?_)
   rw [Formula.realize_equal]
@@ -273,7 +266,7 @@ theorem realize_newDom_inr (u : Unit) (w : Fin (dim + 1) → A ⊕ Fin n) :
 theorem realize_canonGuard :
     letI := hostStruc (L₁ := L₁) A n ρ
     (A ⊕ Fin n) ⊨ canonGuard L₁ Tag dim B ↔ ∃! c : A ⊕ Fin n, canonPart ρ c := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   rw [canonGuard, Sentence.Realize, Formula.realize_iExsUnique]
   constructor
   · rintro ⟨i, hi, huniq⟩
@@ -302,7 +295,7 @@ theorem realize_newRelF_base {k : ℕ} (R : L₂.Relations k) (t : Fin k → Tag
     letI := hostStruc (L₁ := L₁) A n ρ
     (newRelF L₁ Tag dim B I (tgtBaseSym L₂ B R) (fun i => Sum.inl (t i))).Realize w ↔
       (I.relFormula R t).Realize fun p => a p.1 p.2 := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   have hex : ∃ t' : Fin k → Tag, ∀ i, (Sum.inl (t i) : Tag ⊕ Unit) = Sum.inl (t' i) :=
     ⟨t, fun _ => rfl⟩
   rw [newRelF, dif_pos hex]
@@ -326,7 +319,7 @@ theorem newRelF_base_eq_bot {k : ℕ} (R : L₂.Relations k) (τ : Fin k → Tag
 theorem realize_newRelF_old (τ : Fin 1 → Tag ⊕ Unit) (w : Fin 1 × Fin (dim + 1) → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newRelF L₁ Tag dim B I (tgtOldSym L₂ B) τ).Realize w ↔ (τ 0).isLeft = true := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   rw [newRelF]
   by_cases h : (τ 0).isLeft = true
   · rw [if_pos h]
@@ -343,7 +336,7 @@ theorem realize_newRelF_block {k : ℕ} (r : B.lang.Relations k) (τ : Fin k →
       pullPart ρ ⟨r.1, fun j => τ (Fin.cast r.2 j)⟩
         (fun mm => w (Fin.cast r.2 (finProdFinEquiv.symm mm).1,
           (finProdFinEquiv.symm mm).2)) := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   rw [newRelF, Formula.realize_rel]
   exact Iff.rfl
 
@@ -395,7 +388,7 @@ omit [L₂.IsRelational] in
 theorem newPoint_mem_dom (hc₀ : canonPart ρ c₀) (x : (I.Map A) ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newDom L₁ Tag dim B (newPoint I c₀ x).1).Realize (newPoint I c₀ x).2 := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   cases x with
   | inl p =>
     refine (realize_newDom_inl (L₁ := L₁) (B := B) p.1 _).mpr ⟨fun j => ?_, ?_⟩
@@ -415,7 +408,7 @@ theorem newPoint_surjective (hc : ∀ y : A ⊕ Fin n, canonPart ρ y ↔ y = c�
     (hz : letI := hostStruc (L₁ := L₁) A n ρ
       (newDom L₁ Tag dim B z.1).Realize z.2) :
     ∃ x : (I.Map A) ⊕ Fin n, newPoint I c₀ x = z := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   obtain ⟨tag, w⟩ := z
   cases tag with
   | inl t =>
@@ -575,9 +568,9 @@ theorem realize_transfer (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ 
         (@sumStructure (newLang L₂) B.lang ((I.Map A) ⊕ Fin n) (extStructure L₂ (I.Map A) n)
           (B.structure ρT)) φ) ↔
       ((newInterp L₁ Tag dim B I).MapRel (A ⊕ Fin n) ⊨ φ)) := by
-  letI := hostStruc (L₁ := L₁) A n ρ
+  let := hostStruc (L₁ := L₁) A n ρ
   subst hT
-  letI := B.structure (targetAssign I c₀ ρ)
+  let := B.structure (targetAssign I c₀ ρ)
   exact StrongHomClass.realize_sentence (newTargetEquiv I c₀ ρ hc) φ
 
 end Transfer
@@ -670,7 +663,7 @@ theorem sorealize_newPull {Tag : Type} [Finite Tag] [Nonempty Tag] {dim : ℕ}
     SORealize (newLang L₂) ((I.Map A) ⊕ Fin n) [B] φ true ↔
       SORealize (newLang L₁) (A ⊕ Fin n) [newBlock Tag dim B]
         (canonGuard L₁ Tag dim B ⊓ (newInterp L₁ Tag dim B I).pullRelSentence φ) true := by
-  haveI := I.map_nonempty A
+  have := I.map_nonempty A
   constructor
   · rintro ⟨ρT, hρT⟩
     have hc : ∀ y : A ⊕ Fin n,
@@ -679,7 +672,7 @@ theorem sorealize_newPull {Tag : Type} [Finite Tag] [Nonempty Tag] {dim : ℕ}
         y = (Sum.inl (Classical.arbitrary A) : A ⊕ Fin n) := fun _ => Iff.rfl
     refine ⟨joinParts (fun z => z 0 = (Sum.inl (Classical.arbitrary A) : A ⊕ Fin n))
       (sourceAssign I (Sum.inl (Classical.arbitrary A)) ρT), ?_⟩
-    letI := hostStruc (L₁ := L₁) A n
+    let := hostStruc (L₁ := L₁) A n
       (joinParts (fun z => z 0 = (Sum.inl (Classical.arbitrary A) : A ⊕ Fin n))
         (sourceAssign I (Sum.inl (Classical.arbitrary A)) ρT))
     refine (Sentence.realize_inf (M := A ⊕ Fin n)).mpr ⟨?_, ?_⟩
@@ -688,7 +681,7 @@ theorem sorealize_newPull {Tag : Type} [Finite Tag] [Nonempty Tag] {dim : ℕ}
     · refine ((newInterp L₁ Tag dim B I).realize_pullRelSentence φ (A ⊕ Fin n)).mpr ?_
       exact (realize_transfer I _ _ hc ρT (targetAssign_sourceAssign I _ ρT) φ).mp hρT
   · rintro ⟨ρ, hρ⟩
-    letI := hostStruc (L₁ := L₁) A n ρ
+    let := hostStruc (L₁ := L₁) A n ρ
     obtain ⟨hguard, hpull⟩ := (Sentence.realize_inf (M := A ⊕ Fin n)).mp hρ
     obtain ⟨c₀, hc₀, huniq⟩ := (realize_canonGuard (L₁ := L₁) (B := B)).mp hguard
     have hc : ∀ y : A ⊕ Fin n, canonPart ρ y ↔ y = c₀ :=
@@ -706,17 +699,16 @@ is pulled back through that interpretation. -/
 theorem SigmaSONewDefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : SigmaSONewDefinable Q) :
     SigmaSONewDefinable P := by
   obtain ⟨B, φ, hφ⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine ⟨newBlock f.Tag f.dim B, canonGuard L₁ f.Tag f.dim B ⊓
     (newInterp L₁ f.Tag f.dim B f.toInterpretation).pullRelSentence φ, ?_⟩
   intro A _ _ _
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   rw [f.correct A, hφ (f.toInterpretation.Map A)]
   exact exists_congr fun n => sorealize_newPull f.toInterpretation B φ A n
 
 end Closure
-
 
 end DescriptiveComplexity

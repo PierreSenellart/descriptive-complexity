@@ -116,7 +116,7 @@ theorem exists_altAcc_of_altWin [Finite A] {start : Bool} {c : Config A}
     obtain ⟨n, hn⟩ := ih
     exact ⟨n + 1, Or.inr (Or.inr ⟨hu, _, ‹M.Step _ _›, hn⟩)⟩
   | @all c hu hex _ ih =>
-    letI := Fintype.ofFinite (Config A)
+    let := Fintype.ofFinite (Config A)
     choose f hf using ih
     refine ⟨(Finset.univ.sup fun d => if h : M.Step c d then f d h else 0) + 1,
       Or.inr (Or.inl ⟨hu, hex, fun c' hc' => ?_⟩)⟩
@@ -251,13 +251,6 @@ theorem AltAgree.blocksSplit_mp (h : AltAgree u N M) : N.BlocksSplit → M.Block
     exact hj'
 
 variable [Finite A]
-
-/-- Winning transports along an equivalence, as an equivalence. -/
-theorem AltAgree.altWin (h : AltAgree u N M) (start : Bool) (c : Config B) :
-    N.AltWin start c ↔ M.AltWin start (c.map u) := by
-  haveI : Finite B := Finite.of_equiv A u.symm
-  rw [altWin_iff_exists_altAcc, altWin_iff_exists_altAcc]
-  exact exists_congr fun n => h.altAcc start n c
 
 end Transport
 

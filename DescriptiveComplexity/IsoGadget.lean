@@ -175,8 +175,8 @@ the language of graphs. This is the form a gadget's correctness is stated
 against: on single graphs, where no pattern/host distinction exists. -/
 theorem relIsoOn_iff_nonempty_sideEquiv (PV HV : A → Prop) (PE HE : A → A → Prop) :
     RelIsoOn PV HV PE HE ↔ Nonempty (SideEquiv PV HV PE HE) := by
-  letI := sideStructure PV PE
-  letI := sideStructure HV HE
+  let := sideStructure PV PE
+  let := sideStructure HV HE
   rw [relIsoOn_iff_equiv]
   constructor
   · rintro ⟨e, hedge⟩

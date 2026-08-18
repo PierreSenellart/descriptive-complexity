@@ -54,32 +54,6 @@ def WideWF (A : Type) [Language.wide.Structure A] : Prop :=
   IsLinOrd (WMLe (A := A)) ∧ (∀ x a b : A, WMInp x a → WMInp x b → a = b) ∧
     (∃ b : A, WMBlank b) ∧ ∀ a b : A, WMBlank a → WMBlank b → a = b
 
-omit [Language.wide.Structure A] in
-/-- **The machine has `2ⁿ` positions.** The step bound of
-`DescriptiveComplexity.WideAccept` counts the positions, as every bound in this
-library does, and the positions are the addresses – the subsets of the instance.
-So the bound is exponential by construction and no arithmetic appears in the
-definition, exactly as `DescriptiveComplexity.NTMAccept`'s bound is `n` by
-construction. -/
-theorem card_wpPosn [Finite A] :
-    Nat.card {p : WPoint A // wpPosn p} = 2 ^ Nat.card A := by
-  classical
-  have he : {p : WPoint A // wpPosn p} ≃ (A → Prop) :=
-    { toFun := fun p =>
-        match p with
-        | ⟨Sum.inl s, _⟩ => s
-        | ⟨Sum.inr _, h⟩ => False.elim h
-      invFun := fun s => ⟨Sum.inl s, trivial⟩
-      left_inv := by
-        rintro ⟨s | x, h⟩
-        · rfl
-        · exact False.elim h
-      right_inv := fun _ => rfl }
-  rw [Nat.card_congr he, Nat.card_fun]
-  congr 1
-  refine Nat.card_eq_two_iff.mpr ⟨True, False, by simp, Set.eq_univ_of_forall fun p => ?_⟩
-  by_cases h : p <;> simp [h, eq_true, eq_false]
-
 /-- **Determinism of a wide-machine instance**: one start state, at most one
 transition per state and symbol read, and functional destination and written
 symbol. Every conjunct is first-order over the instance, exactly as for
@@ -143,7 +117,7 @@ axioms. Stated at an arbitrary order relation, since everything the address
 layer says is independent of where the order comes from. -/
 theorem isLinOrd_wmSetLe {α : Type} [Finite α] {Le : α → α → Prop} (h : IsLinOrd Le) :
     IsLinOrd (WMSetLe Le) := by
-  letI := h.toLinearOrder
+  let := h.toLinearOrder
   have hkey : ∀ s t : α → Prop, WMSetLe Le s t ↔ (setLinearOrder α).le s t := by
     intro s t
     rw [show ((setLinearOrder α).le s t ↔ _) from

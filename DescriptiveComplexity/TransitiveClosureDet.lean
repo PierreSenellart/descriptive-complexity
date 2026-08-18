@@ -17,7 +17,7 @@ step available. `DescriptiveComplexity.LOGSPACE` is defined by it, exactly as
 
 ## Determinism as a formula, not as a side condition
 
-There are two ways to say "the walk is deterministic". One is to carry a
+There are two ways to say “the walk is deterministic”. One is to carry a
 proof: a specification together with the hypothesis that its `Step` relation is
 functional on every structure. That is the wrong choice here – the hypothesis is
 not first-order data, and it would have to be re-established after every
@@ -40,7 +40,7 @@ functional the determinization is equivalent to it
 
 The one wrinkle the textbook formula does not show is **modes**. A node of a
 `DescriptiveComplexity.TCSpec` is a mode together with a tuple
-(`DescriptiveComplexity.TCSpec.Node`), so "the only step available" has to quantify
+(`DescriptiveComplexity.TCSpec.Node`), so “the only step available” has to quantify
 over successor *nodes*, not successor tuples: the uniqueness clause is a finite
 conjunction over the modes, in which the mode comparison is resolved at
 formula-construction time (`⊥` for a mode other than the intended target, so
@@ -192,7 +192,7 @@ section Functional
 variable (spec : TCSpec L) (A : Type) [L.Structure A] [LinearOrder A]
 
 /-- A specification is *functional* on a structure when every node has at most
-one successor: the walk it describes is deterministic on the nose. -/
+one successor: the walk it describes is deterministic outright. -/
 def Functional : Prop :=
   ∀ a b c : spec.Node A, spec.Step a b → spec.Step a c → b = c
 

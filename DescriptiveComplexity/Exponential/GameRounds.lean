@@ -11,7 +11,7 @@ import DescriptiveComplexity.Exponential.Translate
 
 The state of the game that carries `DescriptiveComplexity.EXPTIME` to SO-GAME
 is a tuple of **rounds**
-— `DescriptiveComplexity.repMerged` of the point block — carrying a phase in its
+– `DescriptiveComplexity.repMerged` of the point block – carrying a phase in its
 tag bits. Its moves never touch one relation variable at a time: they *keep* a
 round, *overwrite* a round, or *shift* a round onto another one (the points of
 the node just chosen become the points the next position reads). This file
@@ -19,7 +19,7 @@ states those three at the level of rounds, on top of the variable-level gadgets
 of `DescriptiveComplexity.Exponential.GameMove`.
 
 * `DescriptiveComplexity.repIx` names round `i`'s copy of a variable inside the
-  merged block, and `DescriptiveComplexity.repBlockAssign_repIx` reads it back —
+  merged block, and `DescriptiveComplexity.repBlockAssign_repIx` reads it back –
   `DescriptiveComplexity.relMap_repSym` stated about assignments rather than
   about `RelMap`, as `DescriptiveComplexity.ExpExpansion.homAssign_roundOneIx`
   is for a whole round.

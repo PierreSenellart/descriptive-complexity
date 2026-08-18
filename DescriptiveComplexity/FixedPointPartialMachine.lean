@@ -20,7 +20,7 @@ advance it:
   configuration has), one step *loads the initial configuration* – start
   state, head on the lowest position, initial tape;
 * from a configuration that can move – some applicable transition with a
-  destination, a written symbol and a neighbouring position to move to
+  destination, a written symbol and a neighboring position to move to
   (`DescriptiveComplexity.SpaceTM.GoOn`) – and is not yet accepting, one step
   is **the** machine step, determinism making the step formulas functional;
 * from an accepting or stuck configuration, the step *stutters*, so that a
@@ -412,21 +412,21 @@ variable {A : Type} [Language.turing.Structure A] [LinearOrder A]
 theorem realize_emptyF (ρ : mBlock.Assignment A) {γ : Type} (v : γ → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ (emptyF (γ := γ)) v) ↔
       StateEmptyOn ρ := by
-  letI := mBlock.structure₁ (L := mBase) ρ
+  let := mBlock.structure₁ (L := mBase) ρ
   rw [emptyF, Formula.realize_not, realize_someF]
   exact Iff.rfl
 
 theorem realize_mGoF (ρ : mBlock.Assignment A) {γ : Type} (v : γ → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ (mGoF (γ := γ)) v) ↔
       GoOn ρ := by
-  letI := mBlock.structure₁ (L := mBase) ρ
+  let := mBlock.structure₁ (L := mBase) ρ
   rw [mGoF, realize_goF]
   exact Iff.rfl
 
 theorem realize_stepTapeF (ρ : mBlock.Assignment A) (x : Fin 2 → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ stepTapeF x) ↔
       mNextAssign ρ none x := by
-  letI := mBlock.structure₁ (L := mBase) ρ
+  let := mBlock.structure₁ (L := mBase) ρ
   rw [stepTapeF]
   simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
     realize_emptyF, realize_mGoF, realize_initTapeAtF, realize_writeNewF,
@@ -436,7 +436,7 @@ theorem realize_stepTapeF (ρ : mBlock.Assignment A) (x : Fin 2 → A) :
 theorem realize_stepStateF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ stepStateF x) ↔
       mNextAssign ρ (some false) x := by
-  letI := mBlock.structure₁ (L := mBase) ρ
+  let := mBlock.structure₁ (L := mBase) ρ
   rw [stepStateF]
   simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
     realize_emptyF, realize_mGoF, realize_dstNewF, Formula.realize_rel₁,
@@ -446,7 +446,7 @@ theorem realize_stepStateF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
 theorem realize_stepHeadF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ stepHeadF x) ↔
       mNextAssign ρ (some true) x := by
-  letI := mBlock.structure₁ (L := mBase) ρ
+  let := mBlock.structure₁ (L := mBase) ρ
   rw [stepHeadF]
   simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
     realize_emptyF, realize_mGoF, realize_minPosAtF, realize_headNewF,
@@ -686,7 +686,7 @@ theorem realize_mOut (ρ : mBlock.Assignment A) :
     (@Sentence.Realize _ A (mBlock.structure₁ (L := mBase) ρ) mPfp.out) ↔
       ((tmData A).WellFormed ∧ ((tmData A).Deterministic ∧
         ∃ q : A, mState ρ q ∧ TMAcc q)) := by
-  letI := mBlock.structure₁ (L := mBase) ρ
+  let := mBlock.structure₁ (L := mBase) ρ
   simp only [mPfp, Sentence.Realize, Formula.realize_inf, realize_wfF, realize_detF,
     realize_markMeetF, relMap_mIn₁, relMap_mS₁]
   exact Iff.rfl

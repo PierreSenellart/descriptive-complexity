@@ -16,7 +16,7 @@ problem, and one that needs no succinctness argument.
 The correspondence is a **bisimulation between two inductive predicates of the
 same shape**: `DescriptiveComplexity.SOGameSpec.Wins` on assignments of the
 configuration block and `DescriptiveComplexity.ATMData.AltWin` on
-configurations. It needs exactly two lemmas beyond the four realization ones —
+configurations. It needs exactly two lemmas beyond the four realization ones –
 *a move lands on a configuration* and *a start is a configuration* – so junk
 assignments, which the block has plenty of, are never reached and never have to
 be reasoned about.
@@ -55,7 +55,7 @@ variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A]
 /-- **A move is a step**, between configurations. -/
 theorem move_cfgOf (c c' : Config A) :
     atmSpec.Move (cfgOf c) (cfgOf c') ↔ (atmData 2 A).toTMData.Step c c' := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')
+  let := cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')
   change (@Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c'))
     (isCfgBS ⊓ stepS)) ↔ _
   refine Iff.trans Formula.realize_inf ?_
@@ -66,7 +66,7 @@ theorem move_cfgOf (c c' : Config A) :
 which is what keeps the walk out of the junk assignments. -/
 theorem move_isCfg {ρ σ : atmSpec.State A} (h : atmSpec.Move ρ σ) :
     ∃ c' : Config A, σ = cfgOf c' := by
-  letI := cfgBlock.structure₂ (L := tmaOrd) ρ σ
+  let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   have h' : @Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ)
     (isCfgBS ⊓ stepS) := h
   exact exists_cfgOf ((realize_isCfgBS ρ σ).mp (Formula.realize_inf.mp h').1)

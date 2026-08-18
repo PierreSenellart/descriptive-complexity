@@ -4,11 +4,20 @@
 # release keeps the Mathlib pin it was cut against, and a new pin always takes
 # at least a minor bump, so that `~x.y.z` means "stay on my Mathlib".
 #
-# One Mathlib version is pinned in four places, which move together and are what
-# `pins` rewrites and `check` compares:
+# One Mathlib version is pinned in four *declared* places, which move together
+# and are what `pins` rewrites:
 #
 #   /lean-toolchain            /lakefile.lean          (the Mathlib `require`)
 #   /docbuild/lean-toolchain   /docbuild/lakefile.toml (the doc-gen4 `rev`)
+#
+# Two manifests then *record* what those declarations resolved to, and a fresh
+# clone builds against them, so `check` compares all six:
+#
+#   /lake-manifest.json        (mathlib)
+#   /docbuild/lake-manifest.json (mathlib, and doc-gen4)
+#
+# `pins` cannot write them – only `lake update` can, in each workspace – so
+# `check` stays red between the two steps, by design.
 #
 #   release.sh check              verify every version/pin location agrees
 #   release.sh next-pin           print the Mathlib tag to move to, if any
@@ -45,6 +54,16 @@ pin_toolchain()  { grep -oP '(?<=leanprover/lean4:)\S+' lean-toolchain; }
 pin_docbuild()   { grep -oP '(?<=leanprover/lean4:)\S+' docbuild/lean-toolchain; }
 pin_mathlib()    { grep -oP '(?<=/ "mathlib" @ git ")[^"]+' lakefile.lean; }
 pin_docgen()     { grep -oP '(?<=^rev = ")[^"]+' docbuild/lakefile.toml; }
+# The manifests are what a fresh clone resolves against, so a stale one ships a
+# pin nobody declared. Read the `inputRev` recorded for a dependency by matching
+# its repository url, which is unique in the file and, unlike the package name,
+# is not wrapped in guillemets.
+manifest_rev()   { # manifest url
+  grep -A11 -F "$2" "$1" | grep -oP '(?<="inputRev": ")[^"]+' | head -1 || true
+}
+pin_manifest()          { manifest_rev lake-manifest.json          github.com/leanprover-community/mathlib4; }
+pin_docbuild_mathlib()  { manifest_rev docbuild/lake-manifest.json github.com/leanprover-community/mathlib4; }
+pin_docbuild_docgen()   { manifest_rev docbuild/lake-manifest.json github.com/leanprover/doc-gen4; }
 pin_readme_row() { sed -n '/^| --- | --- | --- |$/{n;s/^| `[^`]*` | `\([^`]*\)`.*/\1/p;q;}' README.md; }
 # The concept DOI: minted once, then the same for every later version.
 doi_citation()   { grep -oP '(?<=value: ")10\.5281/zenodo\.[0-9]+' CITATION.cff | head -1; }
@@ -80,6 +99,9 @@ cmd_check() {
   report "docbuild/lean-toolchain"      "$pin" "$(pin_docbuild)"
   report "lakefile.lean mathlib require" "$pin" "$(pin_mathlib)"
   report "docbuild doc-gen4 rev"        "$pin" "$(pin_docgen)"
+  report "lake-manifest mathlib"        "$pin" "$(pin_manifest)"
+  report "docbuild manifest mathlib"    "$pin" "$(pin_docbuild_mathlib)"
+  report "docbuild manifest doc-gen4"   "$pin" "$(pin_docbuild_docgen)"
   report "README table, toolchain col"  "$pin" "$(pin_readme_row)"
   report "README Mathlib badge"         "$pin" "$(pin_readme_badge)"
 
@@ -202,7 +224,8 @@ cmd_pins() {
   sed -i "s|^rev = \"[^\"]*\"|rev = \"$ver\"|" docbuild/lakefile.toml
 
   printf 'Moved the pin %s -> %s in the four pinned places.\n\n' "$old" "$ver"
-  printf 'Next: `lake update` (the manifest still records the old Mathlib), let the\n'
+  printf 'Next: `lake update` here and `lake update doc-gen4` in `docbuild/` (both\n'
+  printf 'manifests still record the old Mathlib, and `check` reads them), let the\n'
   printf 'build go green, then `%s prepare %s`. The README badge and table\n' "$0" "$(cmd_next_minor)"
   printf 'follow the pin from there, so `check` stays red until that runs.\n'
 }
@@ -231,6 +254,9 @@ cmd_prepare() {
   sed -i "s|^date-released: \".*\"|date-released: \"$today\"|" CITATION.cff
   sed -i "s|descriptive-complexity\" @ \"v$old\"|descriptive-complexity\" @ \"v$version\"|" README.md
   sed -i "s|^rev = \"v$old\"|rev = \"v$version\"|" README.md
+  # The Reservoir form carries a `~` range rather than a tag, in both syntaxes.
+  sed -i "s|^version = \"~$old\"|version = \"~$version\"|" README.md
+  sed -i "s|descriptive-complexity\" @ \"~$old\"|descriptive-complexity\" @ \"~$version\"|" README.md
   # Newest release first, directly under the table header.
   sed -i "/^| --- | --- | --- |$/a | \`v$version\` | \`$pin\` | \`leanprover/lean4:$pin\` |" README.md
   # Badge tracks the pin; shields.io wants a literal hyphen doubled.

@@ -25,7 +25,7 @@ in the table:
 | `exStep tx ty` | ∀ | prove `¬AGUniv x`; prove `AGMove x y`; and win from `y` |
 | `allCert tx ty` | ∀ | prove `AGUniv x`; prove `AGMove x y`; and answer every `y'` |
 | `allStep tx ty` | ∃ | refute `AGMove x y`; or win from `y` |
-| `pre s tx ty j pol` | `pol` | fill round `n - j`, or — at `j = 0` — be decided by the kernel |
+| `pre s tx ty j pol` | `pol` | fill round `n - j`, or – at `j = 0` – be decided by the kernel |
 
 Two of the six families are there for reasons that are easy to get wrong and
 expensive to discover late.
@@ -48,9 +48,9 @@ existential player is forced to tell the truth about `AGUniv x`.
 ## The states
 
 A state is `DescriptiveComplexity.ExpExpansion.stateAssign`: a phase and one
-assignment per round. Rounds are *not* guarded to be points in general — the play
+assignment per round. Rounds are *not* guarded to be points in general – the play
 rounds of a prefix range over all assignments, the guards living inside the
-kernel (`DescriptiveComplexity.ExpExpansion.stepF`) — but the rounds of every
+kernel (`DescriptiveComplexity.ExpExpansion.stepF`) – but the rounds of every
 node-carrying phase are, which is what
 `DescriptiveComplexity.ExpExpansion.allRoundsPointF` asserts at the start and
 every node move preserves.
@@ -142,18 +142,6 @@ theorem dropTag_stateAssign (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignme
     SOBlock.dropTag (stateAssign p ρs) = repBlockAssign X.pointBlock A n ρs :=
   rfl
 
-/-- **Every state whose tag bits name a phase is one of these.** The junk
-assignments — two tag bits set, or none — are the ones no move enters and no
-start sentence admits. -/
-theorem exists_stateAssign (τ : (gameBlock X n T Dm).Assignment A)
-    (h : @Sentence.Realize _ A
-      ((gameBlock X n T Dm).structure₁ (L := L.sum Language.order) τ)
-      (SOBlock.tagGuardF (L := L.sum Language.order) (repMerged X.pointBlock n) (Ph T Dm))) :
-    ∃ (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A), τ = stateAssign p ρs := by
-  obtain ⟨p, ν, rfl⟩ := (SOBlock.realize_tagGuardF (L := L.sum Language.order) τ).mp h
-  obtain ⟨ρs, rfl⟩ := repBlockAssign_split X.pointBlock A n ν
-  exact ⟨p, ρs, rfl⟩
-
 /-! ### Every round holds a point -/
 
 variable (X n)
@@ -173,7 +161,7 @@ theorem realize_allRoundsPointF (ρs : Fin n → X.pointBlock.Assignment A) :
         ((repMerged X.pointBlock n).structure₁ (L := L.sum Language.order)
           (repBlockAssign X.pointBlock A n ρs)) (allRoundsPointF X n) ↔
       ∀ i, IsPointAssign (X := X) (ρs i)) := by
-  letI := (repMerged X.pointBlock n).structure₁ (L := L.sum Language.order)
+  let := (repMerged X.pointBlock n).structure₁ (L := L.sum Language.order)
     (repBlockAssign X.pointBlock A n ρs)
   rw [allRoundsPointF, Sentence.Realize, realize_listInf]
   constructor

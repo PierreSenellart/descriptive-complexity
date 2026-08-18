@@ -45,7 +45,7 @@ theorem realize_hornCondKernel {A : Type} [Language.sat.Structure A]
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) hornCondKernel) ↔
       AtMostOnePositive A := by
-  letI := satAssignBlock.structure ρ
+  let := satAssignBlock.structure ρ
   rw [hornCondKernel]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -65,7 +65,7 @@ private theorem realize_hornSatKernel {A : Type} [Language.sat.Structure A]
         ∀ c : A, RelMap satIsClause ![c] → ∃ x : A,
           (RelMap satPosIn ![c, x] ∧ ρ satNuSym.1 fun _ => x) ∨
             (RelMap satNegIn ![c, x] ∧ ¬ρ satNuSym.1 fun _ => x) := by
-  letI := satAssignBlock.structure ρ
+  let := satAssignBlock.structure ρ
   exact Formula.realize_inf.trans
     (and_congr (realize_hornCondKernel ρ) (realize_satKernel ρ))
 

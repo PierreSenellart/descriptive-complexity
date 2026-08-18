@@ -35,7 +35,7 @@ two `log n`-bit numbers accumulates a column count that grows with the number of
 positions. That boundary is the honest limit of a *sweep*, and it is why the
 model has a second primitive that is not one: `DescriptiveComplexity.BaseTest.bit`
 reads a bit at an address instead of computing anything. Eliminating `×` in
-favour of that read is the classical theorem the model waits on, not a widening
+favor of that read is the classical theorem the model waits on, not a widening
 of this file; see `DescriptiveComplexity.LogTime`.
 -/
 
@@ -378,7 +378,6 @@ theorem plusSweep_accepts (x : Fin 3 → A) :
 
 end Addition
 
-
 /-! ### The trivial sweep -/
 
 /-- **The trivial sweep**: no state, no register, always accepting. It is what a
@@ -389,9 +388,5 @@ needs no dummy variable. -/
   init := Fin.elim0
   step := Fin.elim0
   acc := .tt
-
-/-- The trivial sweep accepts everything. -/
-theorem trueSweep_accepts {A : Type} [LinearOrder A] [Finite A] (x : Fin 0 → A) :
-    trueSweep.Accepts x := rfl
 
 end DescriptiveComplexity

@@ -123,7 +123,7 @@ private theorem realize_tdmKernel (ρ : tdmGuessBlock.Assignment A) :
         (@sumStructure _ _ A _ (tdmGuessBlock.structure ρ)) tdmKernel) ↔
       IsMatchingOn (TSXEl (A := A)) TSYEl TSZEl TSTrip
         (fun x y z => ρ () ![x, y, z]) := by
-  letI := tdmGuessBlock.structure ρ
+  let := tdmGuessBlock.structure ρ
   have hsub : ∀ w : Fin 3 → A, RelMap (L := tdmSOLang) (M := A) tMatchSym w ↔ ρ () w :=
     fun _ => Iff.rfl
   rw [tdmKernel, IsMatchingOn]

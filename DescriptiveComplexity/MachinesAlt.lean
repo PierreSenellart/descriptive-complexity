@@ -238,16 +238,6 @@ theorem altAcc_of_acc {start : Bool} {n : ℕ} {c : Config A} (h : M.Acc c.state
   | zero => exact h
   | succ n => exact Or.inl h
 
-/-- **Unfolding one step**, in the form the proofs use: with a positive budget
-an accepting configuration either is accepting outright, or hands the choice to
-the player owning its state. -/
-theorem altAcc_succ_iff {start : Bool} {n : ℕ} {c : Config A} :
-    M.AltAcc start (n + 1) c ↔ M.Acc c.state ∨
-      (M.IsUniv start c.state ∧ (∃ c', M.Step c c') ∧
-        ∀ c', M.Step c c' → M.AltAcc start n c') ∨
-      (¬M.IsUniv start c.state ∧ ∃ c', M.Step c c' ∧ M.AltAcc start n c') :=
-  Iff.rfl
-
 /-- **With no universal state the model is the nondeterministic one**: the
 recursion unfolds to “some run of at most `n` steps reaches an accepting
 state”. This is what makes the one-block problem the machine problem of
@@ -288,7 +278,7 @@ theorem altAccepts_true_iff_accepts [Finite A] (hex : ∀ q : A, ¬M.IsUniv true
     (hne : ∃ p, M.Posn p) : M.AltAccepts true ↔ M.Accepts := by
   have hpos : 0 < Nat.card {p : A // M.Posn p} := by
     obtain ⟨p, hp⟩ := hne
-    haveI : Nonempty {p : A // M.Posn p} := ⟨⟨p, hp⟩⟩
+    have : Nonempty {p : A // M.Posn p} := ⟨⟨p, hp⟩⟩
     exact Nat.card_pos
   constructor
   · rintro ⟨c₀, hinit, hacc⟩

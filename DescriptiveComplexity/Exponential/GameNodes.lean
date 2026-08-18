@@ -11,8 +11,8 @@ import DescriptiveComplexity.Exponential.GamePrefix
 The second correctness half: from `main tx`, the graph game wins exactly when
 the existential player wins the interpreted AND/OR graph at the node the state
 carries (`DescriptiveComplexity.ExpExpansion.wins_main_iff`). Both directions are
-inductions — on `DescriptiveComplexity.SOGameSpec.Wins` one way, on
-`DescriptiveComplexity.WinsOn` the other — and the first goes through
+inductions – on `DescriptiveComplexity.SOGameSpec.Wins` one way, on
+`DescriptiveComplexity.WinsOn` the other – and the first goes through
 `DescriptiveComplexity.ExpExpansion.Target`, which says what each of the five
 node phases is *for*.
 
@@ -20,10 +20,10 @@ The two places the simulation could have gone wrong, and how it does not:
 
 * a **universal node with no successor loses** (`WinsOn.all` demands a move), so
   the existential player must certify a successor before the universal player
-  chooses one — that is what `allCert` does, and its witness lives in the same
+  chooses one – that is what `allCert` does, and its witness lives in the same
   rounds the chosen successor will;
 * an **illegal proposal must not count**, so `allStep` is existential and lets
-  the player refute `AGMove` instead of the move being filtered out — which no
+  the player refute `AGMove` instead of the move being filtered out – which no
   sentence over the base could do.
 -/
 
@@ -286,8 +286,8 @@ include hK in
 theorem target_of_wins :
     ∀ τ, (graphGame X hn D hD K).Wins τ →
       ∀ (p : Ph T Dm) (pts : Fin n → X.Map A), τ = nodeState p pts → Target I hdn p pts := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
   intro τ h
   induction h with
   | @won a hw =>
@@ -402,8 +402,8 @@ theorem wins_of_winsOn :
     ∀ x : I.Map (X.Map A), WinsOn (I.Map (X.Map A)) x →
       ∀ (tx : T) (pts : Fin n → X.Map A), x = nodeAt I hdn tx 0 pts →
         (graphGame X hn D hD K).Wins (nodeState (.main tx) pts) := by
-  letI := X.mapLinearOrder A
-  letI := I.mapStructure (X.Map A)
+  let := X.mapLinearOrder A
+  let := I.mapStructure (X.Map A)
   intro x h
   induction h with
   | @won a hw =>

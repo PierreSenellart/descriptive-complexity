@@ -54,6 +54,8 @@ import DescriptiveComplexity.Problems.MachineAlt
 import DescriptiveComplexity.Problems.MachineAltSpace
 import DescriptiveComplexity.Problems.MachineAltSpace.Membership
 import DescriptiveComplexity.Problems.Wide
+import DescriptiveComplexity.Problems.Tiling
+import DescriptiveComplexity.Problems.Epr
 import DescriptiveComplexity.Problems.Machine.Halt
 import DescriptiveComplexity.Problems.Machine.HaltCert
 import DescriptiveComplexity.Problems.Machine.HaltFin
@@ -72,19 +74,17 @@ containing its vocabulary, its semantic definition, the bundled
 `DescriptiveComplexity.DecisionProblem`, its first-order reductions, and its
 completeness theorems.
 
-Job sequencing is in NP but not yet proved NP-hard, so its umbrella carries
-only the membership half. Digraph Isomorphism
-(`DescriptiveComplexity.DigraphIso`) carries the membership half on purpose: it
-is in NP (`DescriptiveComplexity.digraphIso_mem_NP`) and conjecturally neither in
-P nor NP-complete, so what it is complete for is its *own* degree
+Job sequencing carries only the membership half of a completeness statement.
+Digraph Isomorphism (`DescriptiveComplexity.DigraphIso`) carries the membership
+half on purpose: it is in NP (`DescriptiveComplexity.digraphIso_mem_NP`) and
+conjecturally neither in P nor NP-complete, so what it is complete for is its *own* degree
 (`DescriptiveComplexity.GI`, from `DescriptiveComplexity.Degree`). DAG
 Isomorphism (`DescriptiveComplexity.DagIso`) is the first other problem of that
 degree: **GI-complete** (`DescriptiveComplexity.dagIso_GI_complete`), by
 subdividing every arc twice in one direction and forgetting the carried
 topological order in the other. Graph Isomorphism
 (`DescriptiveComplexity.GraphIso`) is the same question restricted to *simple*
-graphs – what the literature means by GI – and carries only its membership half
-so far
+graphs – what the literature means by GI – and carries its membership half
 (`DescriptiveComplexity.graphIso_mem_GI`): simplicity is first-order, so the
 reduction into `DigraphIso` only has to test it, while the converse needs the
 classical digraph-to-graph gadget. Alternating machine acceptance

@@ -153,15 +153,15 @@ are merely re-indexed. -/
 theorem SigmaSOHornDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
     (h : SigmaSOHornDefinable Q) : SigmaSOHornDefinable P := by
   obtain ⟨B, k, prog, hprog⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨B.pull f.Tag f.dim, k * f.dim,
     HornProgram.pull f.toInterpretation.ordExtend prog, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   refine (f.correct A).trans ((hprog (f.toInterpretation.Map A)).trans ?_)
   refine Iff.trans ?_ (exists_holds_pull f.toInterpretation.ordExtend prog)
   exact (exists_holds_equiv (f.toInterpretation.ordExtendLEquiv A) prog).symm

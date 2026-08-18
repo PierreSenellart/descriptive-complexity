@@ -16,6 +16,7 @@ import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.SecondOrderParam
 import DescriptiveComplexity.SecondOrderMerge
 import DescriptiveComplexity.SecondOrderHorn
 import DescriptiveComplexity.SecondOrderHornPull
@@ -24,6 +25,19 @@ import DescriptiveComplexity.SecondOrderKrom
 import DescriptiveComplexity.SecondOrderKromPull
 import DescriptiveComplexity.SecondOrderNew
 import DescriptiveComplexity.Relativize
+import DescriptiveComplexity.SecondOrderNewBdd
+import DescriptiveComplexity.SecondOrderNewBddPull
+import DescriptiveComplexity.ParamFormula
+import DescriptiveComplexity.SubstFormula
+import DescriptiveComplexity.SecondOrderNewCount
+import DescriptiveComplexity.SecondOrderNewMeans
+import DescriptiveComplexity.SecondOrderNewMeansB
+import DescriptiveComplexity.SecondOrderNewExp
+import DescriptiveComplexity.SecondOrderNewRead
+import DescriptiveComplexity.SecondOrderNewPoint
+import DescriptiveComplexity.SecondOrderNewExpPull
+import DescriptiveComplexity.SecondOrderNewExpBuild
+import DescriptiveComplexity.SecondOrderNewExpConv
 import DescriptiveComplexity.SecondOrderNewPull
 import DescriptiveComplexity.SecondOrderNewOrdered
 import DescriptiveComplexity.RecursivelyEnumerable
@@ -474,7 +488,7 @@ development has no counterpart for.
   with the two ends of the order joined to the position as sentinels so that
   distances to them are distances like any other – and a round is one
   application of the answer lemma `DescriptiveComplexity.exists_answer`, where
-  the budget halves: copy the distance to the nearer neighbour, or, when both
+  the budget halves: copy the distance to the nearer neighbor, or, when both
   are far, land in the middle of a gap the invariant makes twice as wide on
   the other side.
 * `DescriptiveComplexity.Invariant.Bare` – **the order no induction defines**:
@@ -525,7 +539,7 @@ development has no counterpart for.
   (`DescriptiveComplexity.even_ac0Definable`), the greatest element having rank
   `Nat.card A - 1`, whence **`FO(≤) ⊊ AC⁰`**
   (`DescriptiveComplexity.exists_ac0Definable_not_foDefinable`). That is the
-  parity of the *universe*, i.e. of the input's length; the parity of a marked
+  parity of the *universe*, i.e., of the input's length; the parity of a marked
   *subset* is PARITY, the problem outside AC⁰, about which nothing here is
   claimed – no AC⁰ lower bound is proved in this library. EVEN also settles the
   *unordered* fixed-point question:
@@ -540,7 +554,7 @@ development has no counterpart for.
   in the catalog so that the distinction from EVEN is a definition and not a
   warning. It is **in LOGSPACE** (`DescriptiveComplexity.parity_mem_LOGSPACE`) by
   one deterministic walk – carry a bit, flip it at each marked element, a walk
-  functional on the nose so that determinizing is free – and **not first-order
+  functional outright so that determinizing is free – and **not first-order
   definable** (`DescriptiveComplexity.parity_not_foDefinable`), EVEN being the
   instance where everything is marked
   (`DescriptiveComplexity.even_fo_reduction_parity`). With
@@ -626,8 +640,8 @@ development has no counterpart for.
   first-order layer stores a register as one `k`-tuple beside a mode kept in
   the control, so a configuration *is* a mode with an `8k`-tuple, and compiles
   every atomic constraint of the machine into a formula once the modes are
-  known – mode-level conditions ("the least mode", "this mode covers that
-  one") being decided outside the formula.
+  known – mode-level conditions (“the least mode”, “this mode covers that
+  one”) being decided outside the formula.
 * `DescriptiveComplexity.ImmermanSzelepcsenyi` – **`NL = coNL`**
   (`DescriptiveComplexity.NL_eq_coNL`), assembled from the complementation of FO(TC)
   and the two translations against the Krom fragment. It also gives what those
@@ -660,8 +674,8 @@ development has no counterpart for.
   (`DescriptiveComplexity.TCSpec.comap`) walks the interpreted structure while
   writing everything on the base one: `k` tags ride along in the mode, the
   coordinates flatten to a `k · d`-tuple, and the resulting bijection of nodes
-  carries steps to steps – whence determinism travels for free, "no competing
-  successor" being invariant under a bijection.
+  carries steps to steps – whence determinism travels for free, “no competing
+  successor” being invariant under a bijection.
 * `DescriptiveComplexity.DetLogSpace` – the class `DescriptiveComplexity.LOGSPACE`
   (named in full, `L` being a vocabulary everywhere in this development),
   defined by FO(DTC) definability. It is the first class here defined by an
@@ -689,7 +703,7 @@ development has no counterpart for.
   variables are existential nodes, clauses universal ones, a clause with no
   negative literal wins outright, and the goal clauses are the marked starts, so
   the existential player wins exactly when the Horn formula is
-  *un*satisfiable — hardness of the complement, carried back by
+  *un*satisfiable – hardness of the complement, carried back by
   `DescriptiveComplexity.piP_zero_eq`, the same last step CVP's hardness takes.
   Whence `DescriptiveComplexity.game_PTIME_complete`.
 * `DescriptiveComplexity.MachinesAltSpace` and
@@ -715,7 +729,7 @@ development has no counterpart for.
   problem and the half of `APSPACE = EXPTIME` ([Chandra–Kozen–Stockmeyer
   1981][chandra1981alternation]) that this design reaches. The machine is a
   `DescriptiveComplexity.SOGameSpec` at the block with one variable for the
-  state, one for the head and one — binary — for the tape; its `move` sentence
+  state, one for the head and one – binary – for the tape; its `move` sentence
   is `DescriptiveComplexity.TMData.Step` with seven elements of the *base*
   quantified (the transition, the two states, the two head positions, the symbol
   read and the symbol written) and one universal pair for the cells the head
@@ -730,7 +744,7 @@ development has no counterpart for.
   nowhere else to put a condition on `A` alone.
 * `DescriptiveComplexity.Exponential.GameInterp` – **`ATMAcceptSpace` is
   EXPTIME-complete** (`DescriptiveComplexity.atmAcceptSpace_EXPTIME_complete`),
-  i.e. **`APSPACE = EXPTIME`** ([Chandra–Kozen–Stockmeyer
+  i.e., **`APSPACE = EXPTIME`** ([Chandra–Kozen–Stockmeyer
   1981][chandra1981alternation]): an alternating machine given as much space as
   its input has positions decides exactly the problems of deterministic
   exponential time. Hardness is a machine *written* by the reduction, from
@@ -760,7 +774,7 @@ development has no counterpart for.
   Immerman–Szelepcsényi – the fragment asymmetry that forces it does not arise
   for an operator-based logic.
 * `DescriptiveComplexity.HeadAutomaton` – **the machine model of the
-  logarithmic-space level**, and the containment "machine ⊆ logic" for it. The
+  logarithmic-space level**, and the containment “machine ⊆ logic” for it. The
   model is a *two-way `k`-head automaton over the structure*: a finite control,
   `k` heads each holding an element of the universe, **no work tape**; a step
   reads the truth values of a fixed finite list of **quantifier-free** tests of
@@ -801,8 +815,8 @@ development has no counterpart for.
   formula of its head positions** (`DescriptiveComplexity.HeadProgram.decides_evalP`),
   by structural recursion on the formula: atoms are guards, implication is a
   branch, and a quantifier is a *sweep* of two fresh heads – one walking the
-  order from the least element, one parked at the greatest so that "the sweep is
-  over" is the atom "these two heads are equal". Quantifiers are thus not read
+  order from the least element, one parked at the greatest so that “the sweep is
+  over” is the atom “these two heads are equal”. Quantifiers are thus not read
   but walked, which is why quantifier-free guards cost nothing in expressive
   power, and the sweep is deterministic
   (`DescriptiveComplexity.HeadProgram.deterministic_evalP`).
@@ -962,7 +976,8 @@ The bottom of the ordered world, and the only vocabulary here that is a
   `FO(≤) ⊊ AC⁰ ⊆ LOGSPACE ⊆ NL ⊆ PTIME`, the first inclusion strict and the
   strictness of the second exactly the switching lemma.
 * `DescriptiveComplexity.LogTime` – **a machine model for the bottom of the
-  ladder**, in the shape the logarithmic-time hierarchy prescribes (Sipser 1983;
+  ladder**, in the shape the logarithmic-time hierarchy prescribes
+  ([Sipser 1983][sipser1983borel];
   [Barrington, Immerman & Straubing 1990][barrington1990uniformity]) rather than
   that of circuit families. A `DescriptiveComplexity.LTMachine` fills a list of
   registers, each by one of the two players – a register is an address of
@@ -998,7 +1013,7 @@ The bottom of the ordered world, and the only vocabulary here that is a
   vectors over the positions*, and such a vector **is** an element of the
   universe – the sentence guesses those elements and pins them with the
   transition, determinism making the guess unique. The identification of that
-  logic with `FO(≤, +, ×)`, i.e. with `DescriptiveComplexity.AC0Definable`, is
+  logic with `FO(≤, +, ×)`, i.e., with `DescriptiveComplexity.AC0Definable`, is
   Immerman's Thm 1.17 and is an **equality here too**
   (`DescriptiveComplexity.ac0Definable_iff_ltDecidable`): **the machine model is
   exactly AC⁰**. One half is `DescriptiveComplexity.LTDecidable.ac0Definable`,
@@ -1035,15 +1050,15 @@ The bottom of the ordered world, and the only vocabulary here that is a
   outright, by evaluating the bit logic with a deterministic multi-head automaton
   of `2 * vars + 8` heads whose bit atom is the halving loop
   `DescriptiveComplexity.HeadProgram.bitP`
-  (`DescriptiveComplexity.HeadBit`, `DescriptiveComplexity.HeadEvalBit`). The naming of positions is what
-  decides this: with the *place-value* naming (`DescriptiveComplexity.BitAt`,
-  `DescriptiveComplexity.IsPos`, which is what makes a bit first-order in
-  `FO(≤, +, ×)`) every atom would be a regular relation of the registers' bit
-  tracks, alternation would be projection, and the model would collapse to what a
-  finite automaton reading the size of the universe in binary can decide – too
-  weak for AC⁰, which decides for instance whether that size is prime. Reading a
-  bit at a *guessed index* is what escapes that, and it is what a random-access
-  machine does.
+  (`DescriptiveComplexity.HeadBit`, `DescriptiveComplexity.HeadEvalBit`). The
+  naming of positions is what decides this: with the *place-value* naming
+  (`DescriptiveComplexity.BitAt`, `DescriptiveComplexity.IsPos`, which is what
+  makes a bit first-order in `FO(≤, +, ×)`) every atom would be a regular
+  relation of the registers' bit tracks, alternation would be projection, and
+  the model would collapse to what a finite automaton reading the size of the
+  universe in binary can decide – too weak for AC⁰, which decides for instance
+  whether that size is prime. Reading a bit at a *guessed index* is what escapes
+  that, and it is what a random-access machine does.
 
 ## Polynomial space, by second-order transitive closure
 
@@ -1257,7 +1272,11 @@ The bottom of the ordered world, and the only vocabulary here that is a
   [Hella–Turull-Torres 2006][hella2006higher]) and the library does not state
   that equivalence, having no third-order syntax – an honest and narrow gap,
   since NEXPTIME still gets its logical reading, guess a relation over the
-  expanded universe and check a first-order condition there.
+  expanded universe and check a first-order condition there. It gets a second
+  one, in a first-order syntax, from
+  `DescriptiveComplexity.mem_NEXPTIME_iff_sigmaSONewExpDefinable`: `∃SO[new,
+  exp]`, existential second-order logic that may invent exponentially many new
+  values.
 * `DescriptiveComplexity.Exponential.Inclusions` – **`EXPTIME = coEXPTIME`**
   and **`EXPSPACE = coEXPSPACE`**, inherited from
   `DescriptiveComplexity.piP_zero_eq` (Grädel's capture theorem at level 0) and
@@ -1299,16 +1318,16 @@ The bottom of the ordered world, and the only vocabulary here that is a
   the AND/OR graph an interpretation draws *on the expanded universe*
   (`DescriptiveComplexity.game_hard_ordered`); its four defining relations are
   first-order there, so by the translation lemma they are alternating block
-  prefixes over the base — and a prefix is a sequence of **moves**, which is
+  prefixes over the base – and a prefix is a sequence of **moves**, which is
   precisely what the obstruction of `Exponential.Translate` does not forbid.
   `DescriptiveComplexity.ExpExpansion.graphGame` plays that graph, in six
   phases: the four node phases (`main`, `exStep`, `allCert`, `allStep`) and the
   prefix phases that decide the six questions
-  (`DescriptiveComplexity.Sub`) about one or two nodes. Two conventions are
-  load-bearing: a leaf whose kernel fails is existential and moveless, so an
-  unprovable claim loses; and `allCert` certifies a successor *before* the
-  universal player chooses one, since `DescriptiveComplexity.WinsOn.all` makes a
-  stuck universal node lose.
+  (`DescriptiveComplexity.Sub`) about one or two nodes. Two conventions are what
+  makes the game match the logic: a leaf whose kernel fails is existential and
+  moveless, so an unprovable claim loses; and `allCert` certifies a successor
+  *before* the universal player chooses one, since
+  `DescriptiveComplexity.WinsOn.all` makes a stuck universal node lose.
 * `DescriptiveComplexity.Exponential.Translate` – **the translation lemma**
   (`DescriptiveComplexity.ExpExpansion.exists_translate`): a first-order
   sentence *over an expansion* is a second-order sentence over the base, since
@@ -1345,7 +1364,7 @@ The bottom of the ordered world, and the only vocabulary here that is a
   (`DescriptiveComplexity.ExpExpansion.autoSpec`,
   `DescriptiveComplexity.ExpExpansion.accepts_autoSpec`). A configuration of a
   two-way `k`-head automaton over an expansion is a control state and `k`
-  points, i.e. one assignment of the block
+  points, i.e., one assignment of the block
   `(repMerged X.pointBlock k).withTag M.State` – a state of an
   `DescriptiveComplexity.SOTCSpec`. The automaton's tests are quantifier-free
   *by fiat* (`DescriptiveComplexity.HeadAutomaton.test_qf`), so
@@ -1396,8 +1415,8 @@ The bottom of the ordered world, and the only vocabulary here that is a
   **unary shift** whose argument names the copy – which is what lets the
   construction carry no hypothesis on the arities.
 * `DescriptiveComplexity.Problems.Wide` – the **wide machine**, the catalog
-  side of the same construction and the first natural *member* NEXPTIME and
-  EXPSPACE have. Its control – transitions, states, symbols – is an ordinary
+  side of the same construction and the complete problem NEXPTIME and EXPSPACE
+  have. Its control – transitions, states, symbols – is an ordinary
   part of the instance, while its tape is addressed by the **subsets** of the
   instance, so an instance of size `n` describes a machine with `2^n` cells and
   `2^n` steps and the two resource variants land one exponential above
@@ -1443,6 +1462,103 @@ The bottom of the ordered world, and the only vocabulary here that is a
   `DescriptiveComplexity.dwideAcceptSpace_fo_reduction_wideAcceptSpace`, which is
   the library's standing rule that the deterministic side is the one to prove.
 
+  **Hardness for NEXPTIME is proved too**
+  (`DescriptiveComplexity.wideRegAccept_NEXPTIME_complete`), at the same drawing
+  read one resource across: `DescriptiveComplexity.WideRegAccept` is acceptance
+  by a wide machine **within its clock**, `2 ^ |Univ|` steps, its tape handed to
+  it by the input channel rather than laid by a sweep of its own. That last point
+  is what the time bound forces: a clocked machine cannot afford to write its own
+  register file, and no wide machine can lay one anyway – laying it needs an
+  injective map from the tuple coordinates into the control
+  (`DescriptiveComplexity.Pfp.Limits`), which the control has no room for. So the
+  file arrives as a *register channel*, one cell per element the program marks,
+  and the program is the same clocked one with its file-laying sweep replaced by
+  a sweep that lays nothing (`DescriptiveComplexity.Pfp.PfpData.nexProgHanded`).
+  Its run is proved both ways: a guess making the kernel true is run into the
+  accepting phase on the clock, and an accepting run is *read backwards* – the
+  tape of any reachable configuration is recognized as the machine's own tape
+  state (`DescriptiveComplexity.Pfp.PfpData.exists_entry_state`), the assignment
+  the guess left is read off its stage tracks
+  (`DescriptiveComplexity.Pfp.assignOfTrack`), and the machine is deterministic
+  after the guess, so a false verdict cannot stand beside an accepting run. The
+  clock's arithmetic comes down to one inequality between the drawing's rule
+  names and a constant of the kernel, and a reduction meets it by giving its
+  program that many rules that never fire
+  (`DescriptiveComplexity.Pfp.PfpData.nexProgHandedPad`) – junk names change no
+  run, no separation and no constant, and every layer of the proof is stated at
+  whatever program provides the record
+  `DescriptiveComplexity.Pfp.PfpData.NexEmitted`. The kernel is padded too, each
+  guessed variable gaining an argument
+  (`DescriptiveComplexity.NexKernel.withArg`), because a variable of arity zero
+  would have the empty address for its entry – the marker's own cell.
+
+* `DescriptiveComplexity.Problems.Tiling` and
+  `DescriptiveComplexity.Problems.Wide.Tiling` – the **tiling** ([Fürer
+  1983][furer1983domino]), the same construction with the machine replaced by a
+  drawing. A tile system is a set of
+  tiles with a horizontal and a vertical compatibility, a description of the
+  bottom row and an accepting mark, and the question is whether the square whose
+  sides are the *positions* can be tiled. Read on the instance itself that is an
+  `n × n` square and the problem is in NP
+  (`DescriptiveComplexity.tiling_mem_NP`, a `Σ₁` definition guessing the tiling
+  as one ternary relation); read over the address expansion the same definition
+  asks about a `2ⁿ × 2ⁿ` square and is NEXPTIME-complete
+  (`DescriptiveComplexity.wideTiling_NEXPTIME_complete`). The point of the
+  problem is that its conditions are *local* in two dimensions – no head, no
+  clock, no mirror – so it is the cheap second complete problem of a class whose
+  first one is a machine. Its bottom row is described at the **cells of a
+  file**, with a base tile where the description is silent and a start tile at
+  the corner, which is the same device as the register channel's input and for
+  the same reason: the hardness is the clocked machine drawn as a table
+  (`DescriptiveComplexity.Problems.Wide.TilingHard`), a row per configuration
+  and a column per address, so the two tapes have to be described the same way.
+  A tile carries the transition its head fires and an **arrival** is a tile of
+  its own – the handshake that keeps a row to one head with rules seeing two
+  cells at most – and the two **edge columns** carry marks of their own
+  (`ledge`, `redge`, the classical border colors): an arrival at the leftmost
+  column is sent by no neighbor, so without them a head would appear there out
+  of nowhere and a no-instance would be tileable.
+
+* `DescriptiveComplexity.CORRIDOR` and `DescriptiveComplexity.WideCorridor` –
+  the same tile system asked the **other** question: tiling the corridor of that
+  width and unbounded height. A corridor *is* a walk whose states are its rows,
+  so its membership is a transcription into
+  `DescriptiveComplexity.SOTCSpec` (`DescriptiveComplexity.corridor_mem_PSPACE`)
+  and, read over the address expansion, it is EXPSPACE-complete
+  (`DescriptiveComplexity.wideCorridor_EXPSPACE_complete`). Its hardness is the
+  square's drawing with the clock taken out – the rows are the configurations of
+  a machine bounded in *space* – and the only thing that changes is the bottom
+  row, the two machines describing their tapes differently: that row is
+  therefore a parameter of both the drawing
+  (`DescriptiveComplexity.TilingHard.tileStrOf`) and the interpretation that
+  writes it down.
+* `DescriptiveComplexity.EPR` – **satisfiability of an `∃*∀*` sentence**, the
+  Bernays–Schönfinkel–Ramsey class ([Lewis 1980][lewis1980complexity]). The
+  instance is the sentence itself, flat: the existential variables are marked,
+  the matrix is a set of clauses of literals over relation symbols of the
+  instance's own making, and there is no parse tree and no order – a prenex form
+  with a quantifier-free matrix needs neither. Satisfiability is defined on the
+  encoding, as for `DescriptiveComplexity.FINSAT`, a model being a universe with
+  a *local* interpretation of the symbols and a witness for the existential
+  variables. It is in NEXPTIME (`DescriptiveComplexity.epr_mem_NEXPTIME`) by the
+  two halves of the classical argument: the **small-model property**
+  (`DescriptiveComplexity.Epr.selfModel_of_eprSatOn` – collapse the model onto
+  the instance by sending each existential variable to its witness), and one
+  `Σ₁` sentence read over an expansion whose points are the *relations* on the
+  instance (`DescriptiveComplexity.Epr.eprExp`), an assignment of the universal
+  variables being one of those points. Its hardness is not formalized yet.
+
+* `DescriptiveComplexity.AddrExp` – the **address expansion**, written once for
+  an arbitrary relational vocabulary with a designated order symbol: the block is
+  one unary relation variable, so an assignment *is* a subset of the instance and
+  the expanded universe is its power set; two tags keep the base universe visible
+  inside it; and five sentences – a mark, a binary attribute, being a singleton,
+  the binary-number order on addresses, and a relation read at the cells of a
+  file – are everything a problem drawn on it has to say. Both the wide machine
+  and the wide tiling are `DescriptiveComplexity.AddrExp.addrExp` at their own
+  vocabulary, and the embedding of the problem's universe into the expansion is
+  proved there once.
+
 ## Value invention, towards the recursively enumerable
 
 * `DescriptiveComplexity.SecondOrderNew` – `∃SO[new]`, existential second-order
@@ -1459,6 +1575,165 @@ The bottom of the ordered world, and the only vocabulary here that is a
   logic is a machine-model-free reading of *recursive enumerability*.
   `DescriptiveComplexity.SigmaSODefinable.toNew` is `Σ₁ ⊆ ∃SO[new]`, by
   inventing nothing.
+* `DescriptiveComplexity.SecondOrderNewBdd` – **value invention, bounded**:
+  `DescriptiveComplexity.SigmaSONewBddDefinable` is the same logic with the
+  number of invented values held to `Nat.card (Fin d → A)`, as many as the
+  instance has `d`-tuples. The point of the parameter is that the bound hands
+  the search space back to the instance, so the family reads *invent nothing*
+  (`Σ₁`), *invent polynomially many*, *invent exponentially many* and *invent
+  unboundedly many* (RE) as one definition. Note that the notions are not
+  weakenings of one another – a definability statement is an equivalence, so
+  moving the bound costs the sentence a re-guarding, not merely a relaxation;
+  `DescriptiveComplexity.SigmaSODefinable.toNewBdd` is the inclusion `Σ₁ ⊆
+  ∃SO[new, d]`, again by inventing nothing.
+* `DescriptiveComplexity.SecondOrderNewBddPull` – the converse, and with it
+  **`∃SO[new, d] = NP`**
+  (`DescriptiveComplexity.sigmaSONewBddDefinable_iff_sigmaSODefinable`). A
+  bounded extension is the universe of a *relativized* interpretation of the
+  instance: two tags and dimension `d`, an original element on the diagonal and
+  an invented value wherever a **guessed** `d`-ary relation puts it. Their number
+  is then at most the number of `d`-tuples whatever the guess, and reaches every
+  value the bound allows for a suitable one, so the `∃ m` of the definition
+  becomes the block's `∃ N`. This is what the bound is for: an interpretation
+  cannot invent, so the values have to come from the instance.
+* `DescriptiveComplexity.SecondOrderNewExp` – the expansion a bounded invention
+  lives in, and the library's first concrete
+  `DescriptiveComplexity.ExpExpansion`: two tags over a block of one `d`-ary and
+  one unary variable, an *original* point naming one element and inventing
+  nothing, a *new* point naming none. Its universe is the instance's elements
+  together with its `d`-ary relations
+  (`DescriptiveComplexity.powPointEquiv`), so it holds `n + 2 ^ nᵈ` points –
+  enough for any extension `DescriptiveComplexity.SigmaSONewExpDefinable`
+  allows – its block is `c` variables of arity `d`, so its new points number
+  `2 ^ (c · nᵈ)`, two constants and not one because at a one-element instance
+  `nᵈ` is `1` whatever `d` is. Its vocabulary is
+  `DescriptiveComplexity.newLang L`, so what the
+  expanded structure is, is the extended structure with every invented value
+  present: `DescriptiveComplexity.powExtEquiv` is that isomorphism, carried by
+  `DescriptiveComplexity.extOn`, the extended structure over an arbitrary set of
+  invented values (`DescriptiveComplexity.extStructure` being its `Fin m` case).
+  A sentence that wants fewer values marks the ones it uses, which is a guess
+  and so stays inside `Σ₁`, and `DescriptiveComplexity.usedSubEquiv` says what
+  the marking buys: the substructure on the original elements together with the
+  marked values *is* the extension by those values alone. What comes out is
+  `DescriptiveComplexity.SigmaSONewExpDefinable.toExpDefinable`, **`∃SO[new,
+  exp c d] ⊆ NEXPTIME`**: a definition that invents at most as many values as
+  the instance has tuples of `c` relations of arity `d` is a `Σ₁` definition
+  over the expansion, the `∃ m` of the bound becoming the guess of a unary
+  marker.
+* `DescriptiveComplexity.SecondOrderNewCount` – **surjectivity from a flip**.
+  A sentence can say that a guessed family of sets contains the empty one, is
+  closed under flipping a single element, and is injectively indexed; it cannot
+  say that the family is *onto*, quantifying over all sets being second order.
+  `DescriptiveComplexity.eq_of_flipClosed` buys that anyway, in Lean rather than
+  in the logic: a flip-closed family containing the empty set is everything, so
+  an injective guess into it is a bijection
+  (`DescriptiveComplexity.bijective_of_flipClosedP`). This is where the bound of
+  an exponentially-bounded invention is spent.
+* `DescriptiveComplexity.SecondOrderNewMeans` – **what the invented values
+  mean**. To read a problem over an exponential expansion as one with value
+  invention, the invented values have to *be* the expansion's points, and a
+  point is a relation over the instance; so the sentence guesses a *meaning
+  relation* with one more argument, `M v x⃗` saying that `v` names a relation
+  holding of `x⃗`. Three of its four guards are ordinary first-order statements –
+  the relation is shaped (invented value to original elements), injective, and
+  the empty relation is named – and the fourth,
+  `DescriptiveComplexity.meanFlip`, is what makes the guess *onto*: every named
+  relation with one tuple flipped is named too.
+  `DescriptiveComplexity.bijective_meanAt_of_guard` cashes them, through the
+  counting of `DescriptiveComplexity.SecondOrderNewCount`, into a bijection
+  between the invented values and the relations of the instance.
+* `DescriptiveComplexity.SecondOrderNewMeansB` – the same for a whole **block**,
+  which is what a point of an expansion actually is: one meaning relation per
+  variable, of that variable's arity plus one, with the four guards taken
+  variable by variable and the flip leaving the other variables alone. An
+  assignment of a block is a set of `Σ i, Fin (B.arity i) → A` – a tuple tagged
+  by the variable it belongs to – so flips of that one sigma type are exactly
+  flips of one tuple of one variable, and
+  `DescriptiveComplexity.bijective_meanAtB_of_guard` reads the guards as a
+  bijection between the invented values and *all* assignments of the block. A
+  value carries its **tag** the same way, with no machinery of its own: add one
+  nullary variable per tag to the block, and the meaning relation of a nullary
+  variable is unary, `M v`, read as “the value `v` carries this tag”
+  (`DescriptiveComplexity.consTagAssignEquiv`).
+* `DescriptiveComplexity.ParamFormula` – **vocabulary maps with parameters**.
+  An `FirstOrder.Language.LHom` keeps a symbol's arity, so it cannot say “read
+  this symbol at a value the formula holds in a variable” – which is what a
+  translation through the meaning relations has to do, a meaning being one
+  relation of arity one more indexed by the value it belongs to. A
+  `DescriptiveComplexity.ParamHom` gives each source symbol a number of
+  parameter variables and a target symbol of that much larger arity, and
+  `DescriptiveComplexity.ParamHom.realize_onSentenceF` reads the image in the
+  target structure as the source read in the structure the parameters' values
+  induce. Symbols with no parameter are the ordinary renaming, so one map can
+  carry the base vocabulary through untouched while the block symbols pick up
+  an index. The parameters are values the *marked part* of the target need not
+  contain, so `DescriptiveComplexity.relativizeTo` cannot be applied on its own
+  – its correctness moves the whole formula into a substructure, where an atom
+  holding a parameter has no reading at all;
+  `DescriptiveComplexity.ParamHom.realize_relOnSentenceF` is the two steps
+  taken together, the quantifiers guarded by the marker and the symbols still
+  mentioning the parameters.
+* `DescriptiveComplexity.SubstFormula` – **interpreting a vocabulary by
+  formulas on a definable part**. An `DescriptiveComplexity.FOInterpretation`
+  builds its universe out of tagged `d`-tuples, which a translation reading one
+  element per point pays for without using;
+  `DescriptiveComplexity.FormulaSubst` gives one formula per relation symbol
+  instead, and `DescriptiveComplexity.FormulaSubst.substTo` substitutes them
+  while guarding every quantifier by a domain formula
+  (`DescriptiveComplexity.FormulaSubst.realize_substTo`). The definable part is
+  an arbitrary type with an injection into the target whose range the domain
+  formula defines, not a subtype, so a caller can take it to be the object it
+  already has – the universe of an expansion, say.
+* `DescriptiveComplexity.SecondOrderNewRead` – **reading an expansion's
+  defining sentences through the meanings**. A sentence defining a relation of
+  an expanded vocabulary is written over the ordered base vocabulary expanded by
+  one copy of the block per argument; value invention holds those arguments as
+  invented values of one extended universe. So the sentence is read with its
+  base symbols passing through but among the original elements only, its order
+  symbol at a *guessed* order, and the block symbol of copy `i` at the meaning
+  relation of its variable, applied to the value copy `i` holds
+  (`DescriptiveComplexity.readHom`, a `DescriptiveComplexity.ParamHom`).
+  `DescriptiveComplexity.realize_readHom` is what that is worth: the structure
+  the map induces on the original elements *is* the base structure expanded by
+  the copies of the block, interpreted by the assignments the values mean. The
+  target vocabulary stays abstract – a `DescriptiveComplexity.ReadSyms` names
+  only the symbols used – so the assembly is free to place them.
+* `DescriptiveComplexity.SecondOrderNewPoint` – **which invented values are
+  points**, and what the expanded relations say of them. An invented value
+  carries an assignment (through the meanings) and a tag (through the nullary
+  variables); it is a *point* when it carries exactly one tag and its assignment
+  satisfies that tag's domain sentence, which is
+  `DescriptiveComplexity.isPointF`. `DescriptiveComplexity.pointRelF` is the
+  atom of the expanded vocabulary: one disjunct per tuple of tags, guarded by
+  the tag symbols of the values, whose body is the defining sentence at that
+  tuple read through the meanings. Everywhere else in the library a tag is
+  chosen when the formula is built; here they are guessed, so the formula
+  carries a disjunct for each of the finitely many tuples.
+* `DescriptiveComplexity.SecondOrderNewExpPull` – **the block a problem over an
+  expansion is guessed in**. Everything the rewritten sentence guesses goes into
+  one second-order block: the order on the original elements (so the block is a
+  `DescriptiveComplexity.SOBlock.withOrder`, guarded by
+  `DescriptiveComplexity.extLinearGuard`), the meanings of the expansion's block
+  and of the tags, and the source problem's own `Σ₁` block, whose variables
+  range over the points and so are guessed over the extended universe.
+  `DescriptiveComplexity.pullPointOn` reads an assignment of that block as the
+  data the translations ask for, and `DescriptiveComplexity.realize_pullKernel`
+  is the kernel: the source problem's first-order kernel, with
+  `DescriptiveComplexity.pointRelF` for the atoms of the expanded vocabulary and
+  “is a point” as the domain formula, holds in the extended universe exactly
+  when it holds over the expansion.
+* `DescriptiveComplexity.SecondOrderNewExpBuild` – **the guess the forward
+  direction makes**: one invented value per assignment of the tagged block, the
+  meaning variables saying which tuples belong to it, the order variable the
+  instance's order, and the source problem's variables the certificate read at
+  the values naming the points. Every guard is checked against it, and
+  `DescriptiveComplexity.card_taggedAssign_le` counts what it invents.
+* `DescriptiveComplexity.SecondOrderNewExpConv` – **`∃SO[new, exp] = NEXPTIME`**
+  (`DescriptiveComplexity.mem_NEXPTIME_iff_sigmaSONewExpDefinable`). The two
+  constants are the expansion's – how many variables its block has once one
+  nullary variable per tag is added, and how wide they are – so no single pair
+  serves every problem and they are quantified.
 * `DescriptiveComplexity.Relativize` – relativization of a formula to a unary
   predicate (`DescriptiveComplexity.relativizeTo`), with its correctness against
   the substructure the predicate defines. Its instance here is
@@ -1606,18 +1881,26 @@ reduction and certificate in full.
 
 | Complexity class | Logical characterization | Machine model | Problems proved complete |
 | --- | --- | --- | --- |
-| `LOGSPACE` (`L`) | FO(≤, DTC): first-order logic with a deterministic transitive closure, over a linearly ordered universe | deterministic two-way `k`-head automaton, walking a linear order of the universe † | REACHd · UNREACHd |
-| `NL` | SO-Krom(≤): ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(≤, TC), first-order logic with a transitive closure – both over a linearly ordered universe | two-way `k`-head automaton, walking a linear order of the universe † | REACH · UNREACH · 2SAT |
+| `LOGSPACE` (`L`) | FO(≤, DTC): first-order logic with a deterministic transitive closure, over a linearly ordered universe | deterministic two-way `k`-head automaton † | REACHd · UNREACHd |
+| `NL` | SO-Krom(≤): ∃SO with a Krom kernel, at most two second-order literals per clause; equivalently FO(≤, TC), first-order logic with a transitive closure – both over a linearly ordered universe | two-way `k`-head automaton † | REACH · UNREACH · 2SAT |
 | `PTIME` = `Σ₀ᵖ` = `Π₀ᵖ` | SO-Horn(≤): ∃SO with a Horn kernel; equivalently FO(≤, LFP), first-order logic with a least fixed point – both over a linearly ordered universe | deterministic polynomial-time Turing machine | HORN-SAT · CVP |
 | `NP` = `Σ₁ᵖ` | ∃SO: existential second-order logic | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | nondeterministic polynomial-time Turing machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) · `ATMAccept 1 false` |
+| `coNP` = `Π₁ᵖ` | ∀SO: universal second-order logic | the same machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT (and QBF∀ at one block) · `ATMAccept 1 false` |
 | `DP` | a `Σ₁` and a `Π₁` sentence conjoined | — | SAT-UNSAT |
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine, `k` blocks, existential first | `QBF k` – at `k = 1`, NP · `ATMAccept k true` |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` – at `k = 1`, coNP · `ATMAccept k false` |
 | `PH` | full second-order logic | — | — |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
-| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g. `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
+| `EXPTIME` | SO(LFP): PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating polynomial-space Turing machine | acceptance by such a machine (`APSPACE = EXPTIME`) |
+| `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
+| `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
+| `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
+
+Two of the models are named rather than described: both head automata walk a
+linear order of the universe, and a *wide* machine carries its control in the
+instance while its tape is addressed by an exponential expansion of it
+(`DescriptiveComplexity.Problems.Wide`).
 
 Each entry of the **machine model** column is an equivalence *proved here*
 between the logical definition of the class and acceptance by that model:
@@ -1625,7 +1908,10 @@ between the logical definition of the class and acceptance by that model:
 `DescriptiveComplexity.mem_NL_iff_automaton` (†), and, through the completeness
 of an acceptance problem, `DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`,
 `DescriptiveComplexity.mem_NP_iff_le_ntmAccept`,
-`DescriptiveComplexity.le_dtmAcceptSpace_of_mem_PSPACE` and
+`DescriptiveComplexity.le_dtmAcceptSpace_of_mem_PSPACE`,
+`DescriptiveComplexity.atmAcceptSpace_EXPTIME_complete`,
+`DescriptiveComplexity.wideRegAccept_NEXPTIME_complete`,
+`DescriptiveComplexity.wideAcceptSpace_EXPSPACE_complete` and
 `DescriptiveComplexity.mem_RE_iff_rePred`. A dash marks a class for which no
 such equivalence is proved here.
 
@@ -1670,7 +1956,8 @@ Headline results and cross-references:
   1981][chandra1981alternation]. At one block the two are the nondeterministic
   model and its dual, which is where coNP gets its machine
   (`DescriptiveComplexity.atmAccept_one_complete`,
-  `DescriptiveComplexity.atmAccept_one_coNP_complete`) (`DescriptiveComplexity.mem_sigmaP_iff_le_atmAccept`,
+  `DescriptiveComplexity.atmAccept_one_coNP_complete`,
+  `DescriptiveComplexity.mem_sigmaP_iff_le_atmAccept`,
   `DescriptiveComplexity.mem_piP_iff_le_atmAccept`). Membership reads a run as
   a `k`-round game, each round guessing one walk; hardness builds the machine
   `M_φ` of a quantified Boolean formula inside the instance – one sweep of the
@@ -1980,7 +2267,8 @@ Headline results and cross-references:
 
 * `DescriptiveComplexity.Examples` – tutorial-style, domain-specific
   walkthroughs of the full recipe (vocabulary → semantics → invariance →
-  membership → hardness → completeness). Currently Boolean conjunctive
-  queries – evaluation and containment, both NP-complete via Chandra–Merlin
-  ([Chandra & Merlin 1977][chandra1977optimal]).
+  membership → hardness → completeness): Boolean conjunctive queries –
+  evaluation and containment, both NP-complete via Chandra–Merlin
+  ([Chandra & Merlin 1977][chandra1977optimal]) – and crawling a graph under a
+  budget.
 -/

@@ -81,7 +81,7 @@ namespace Language
 
 /-- Relation symbols of the arithmetic vocabulary. -/
 inductive arithRel : ℕ → Type
-  /-- `le x y`: the rank of `x` is at most the rank of `y`, i.e. `x ≤ y`. -/
+  /-- `le x y`: the rank of `x` is at most the rank of `y`, i.e., `x ≤ y`. -/
   | le : arithRel 2
   /-- `plus x y z`: the ranks satisfy `orank x + orank y = orank z`. -/
   | plus : arithRel 3
@@ -363,17 +363,6 @@ theorem no_plus_iff_card_le (x y : A) :
   · intro h
     by_contra hlt
     obtain ⟨z, hz⟩ := exists_orank_eq (A := A) (m := orank x + orank y) (by omega)
-    exact h ⟨z, hz.symm⟩
-  · rintro hle ⟨z, hz⟩
-    exact absurd (orank_lt_card z) (by omega)
-
-/-- **Multiplication is truncated at the size of the universe**, likewise. -/
-theorem no_times_iff_card_le (x y : A) :
-    (¬∃ z : A, orank x * orank y = orank z) ↔ Nat.card A ≤ orank x * orank y := by
-  constructor
-  · intro h
-    by_contra hlt
-    obtain ⟨z, hz⟩ := exists_orank_eq (A := A) (m := orank x * orank y) (by omega)
     exact h ⟨z, hz.symm⟩
   · rintro hle ⟨z, hz⟩
     exact absurd (orank_lt_card z) (by omega)

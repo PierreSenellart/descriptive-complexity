@@ -132,7 +132,7 @@ evaluators, odometers and moves, all deterministic, so the program is
 `DescriptiveComplexity.HeadProgram.compile true` – at most one enabled transition per
 reading whatever the guards, and agreeing with the program where they are
 exclusive – gives a machine that `DescriptiveComplexity.HeadAutomaton.IsDeterministic`
-holds of on the nose. `DescriptiveComplexity.dtcDefinable_of_automaton` closes the
+holds of with no side condition. `DescriptiveComplexity.dtcDefinable_of_automaton` closes the
 loop.
 
 -/
@@ -244,10 +244,6 @@ noncomputable def dHeads : ℕ := 4 * spec.k + specDepth spec.det + 2
 
 /-- The heads the machine's fragments must give back untouched. -/
 noncomputable def dprot : ℕ := 4 * spec.k + 1
-
-theorem dprot_lt_dHeads : dprot spec < dHeads spec := by
-  rw [dprot, dHeads]
-  omega
 
 /-- Block `t` of the machine's heads: `0` the current tuple, `1` the candidate,
 `2` the source, `3` the counter. -/
@@ -1892,7 +1888,7 @@ theorem dTick (ms m cm : spec.Mode) (x : Fin (dHeads spec) → A)
         ((.tgtTest ms w'.1 cm' : DetNode spec.Mode _), x') ∧
       (∀ a : A, a ≤ x' (dmk spec)) ∧ dTup spec 0 x' = w'.2 ∧
       dTup spec 2 x' = dTup spec 2 x ∧ dcount spec cm' (dTup spec 3 x') = z := by
-  haveI : Nonempty A := ⟨x (dmk spec)⟩
+  have : Nonempty A := ⟨x (dmk spec)⟩
   by_cases htop : ∀ (i : Fin spec.k) (a : A), a ≤ x (dblk spec 3 i)
   · obtain ⟨x₁, hreach₁, hmk₁, h0₁, h2₁, h3₁⟩ := walkToTickReset ms m cm x hmk hntgt hstep htop
     have htop₁ : ∀ (i : Fin spec.k) (a : A), a ≤ x₁ (dblk spec 3 i) := by
@@ -2083,7 +2079,7 @@ theorem srcEnum {u₀ : spec.det.Node A} (hsrc : spec.IsSrc u₀) {n : ℕ}
     exact hhit ms x hmk h1 h2
   | hstep z z' hlt hnb ih =>
     intro ms x hmk hz hle
-    haveI : Nonempty A := ⟨x (dmk spec)⟩
+    have : Nonempty A := ⟨x (dmk spec)⟩
     by_cases hhitq : dcount spec ms (dTup spec 2 x) = dcount spec u₀.1 u₀.2
     · obtain ⟨h1, h2⟩ := dcount_inj hhitq
       exact hhit ms x hmk h1 h2

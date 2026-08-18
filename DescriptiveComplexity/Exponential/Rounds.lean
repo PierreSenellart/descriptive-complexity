@@ -11,11 +11,11 @@ import DescriptiveComplexity.SecondOrderReplicate
 
 The translation lemma quantifies `m` points of the expanded universe, one per
 quantifier of the sentence being translated. Its kernel then has to *talk about*
-those points — and everything it can say about them is already written, in
+those points – and everything it can say about them is already written, in
 `DescriptiveComplexity.ExpExpansion.relSentence`,
 `DescriptiveComplexity.ExpExpansion.ordSentence` and
 `DescriptiveComplexity.SOBlock.eqAssignF`. All three are sentences over the
-ordered base expanded by `DescriptiveComplexity.SOBlock.replicate n` — `n`
+ordered base expanded by `DescriptiveComplexity.SOBlock.replicate n` – `n`
 copies of the expansion's block, one per argument.
 
 What this file supplies is the **renaming** that reads such a sentence inside
@@ -29,7 +29,7 @@ round's variables (`DescriptiveComplexity.repSym`) and identifies the
 alternating quantification over the merged assignment with one assignment per
 round (`DescriptiveComplexity.sorealize_repBlocks`). So the kernel is a sentence
 over *one* merged block, and the renaming below is a
-`DescriptiveComplexity.SOBlock.homLHom` between two blocks — no bespoke
+`DescriptiveComplexity.SOBlock.homLHom` between two blocks – no bespoke
 `m`-block expansion is needed anywhere.
 
 The one fact with content is
@@ -113,9 +113,9 @@ theorem realize_roundLHom (X : ExpExpansion L) (ρs : Fin m → X.pointBlock.Ass
 /-! ### Reading one whole round
 
 The selection above places a sentence about `n` *arguments* of the expansion's
-block. A sentence about a whole guessed point — its tag bits included, so
+block. A sentence about a whole guessed point – its tag bits included, so
 `DescriptiveComplexity.SOBlock.tagBitF` and
-`DescriptiveComplexity.ExpExpansion.pointGuardF` — needs the same renaming at
+`DescriptiveComplexity.ExpExpansion.pointGuardF` – needs the same renaming at
 `X.pointBlock` rather than at `X.B`. It is the same construction with `sel`
 replaced by a single round. -/
 

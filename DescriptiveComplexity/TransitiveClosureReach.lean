@@ -215,7 +215,7 @@ theorem reach_hard_of_tcDefinable [L.IsRelational] (P : DecisionProblem L) (hP :
   exact ⟨tcReduction spec.pad P fun A => (hspec A).trans (spec.pad_accepts_iff A).symm⟩
 
 /-- **REACH is NL-hard**: an SO-Krom definable problem is FO(TC) definable
-(`DescriptiveComplexity.tcDefinable_iff_mem_NL`, i.e. Immerman–Szelepcsényi through the
+(`DescriptiveComplexity.tcDefinable_iff_mem_NL`, i.e., Immerman–Szelepcsényi through the
 two translations), and an FO(TC) definition reduces to reachability in the
 graph of its walk. -/
 theorem reach_NL_hard : NL.Hard REACH :=

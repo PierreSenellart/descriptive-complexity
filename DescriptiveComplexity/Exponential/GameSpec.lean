@@ -13,18 +13,18 @@ each of them says. Every one is a **static disjunction over the phase type**,
 which is finite: the phases carry the tags of the two nodes a state holds, so
 naming a tag costs a disjunct rather than a quantifier.
 
-* `univ` — the phases `DescriptiveComplexity.Ph.IsUniv` selects, and nothing
+* `univ` – the phases `DescriptiveComplexity.Ph.IsUniv` selects, and nothing
   else;
-* `won` — a leaf `pre s tx ty 0 pol`, conjoined with that question's kernel. The
+* `won` – a leaf `pre s tx ty 0 pol`, conjoined with that question's kernel. The
   leaf is existential and has **no move**, so a false kernel loses: a player who
   asked for a proof he cannot give is stuck there;
-* `start` — a `startPick` phase whose rounds all hold points
+* `start` – a `startPick` phase whose rounds all hold points
   (`DescriptiveComplexity.ExpExpansion.allRoundsPointF`), which is the invariant
   every node move preserves and every prefix consumes;
-* `move` — one disjunct per pair of a phase and one of the moves
+* `move` – one disjunct per pair of a phase and one of the moves
   `DescriptiveComplexity.ExpExpansion.movesFrom` allows out of it. A move names
   its target phase exactly (`DescriptiveComplexity.atTagTwoF`, so no junk state
-  is reachable), lists the rounds it carries over — kept, shifted, or neither —
+  is reachable), lists the rounds it carries over – kept, shifted, or neither –
   and lists the rounds of the state it enters that it guards to be points.
 
 The one asymmetry worth naming: the move that fills a **play** round guards
@@ -114,8 +114,8 @@ end Rounds
 /-! ### The moves out of a phase -/
 
 /-- A move of the graph game, seen from the phase it leaves: where it goes,
-which rounds it carries over — as pairs (round of the state left, round of the
-state entered) — and which rounds of the state entered it guards to hold a
+which rounds it carries over – as pairs (round of the state left, round of the
+state entered) – and which rounds of the state entered it guards to hold a
 point. -/
 structure MoveTo (T : Type) (Dm n : ℕ) where
   /-- The phase the move enters. -/
@@ -209,7 +209,7 @@ theorem realize_moveOf (p' p q : Ph T Dm) (m : MoveTo T Dm n)
         (moveOf X p' m) ↔
       p' = p ∧ m.tgt = q ∧ (∀ e ∈ m.keep, ρs e.1 = σs e.2) ∧
         (∀ i ∈ m.guard, IsPointAssign (X := X) (σs i))) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (gameBlock X n T Dm) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (gameBlock X n T Dm) A
     (@sumOrderStructure L A instL _) (stateAssign p ρs) (stateAssign q σs)
   rw [moveOf, Sentence.Realize, Formula.realize_inf]
   refine and_congr ?_ ?_
@@ -238,7 +238,7 @@ private theorem realize_listSup_atTagF (p : Ph T Dm)
     (ρs : Fin n → X.pointBlock.Assignment A) (l : List (Ph T Dm)) :
     (@Sentence.Realize _ A (stateStructure (stateAssign p ρs))
         (listSup (l.map (atTagF L (repMerged X.pointBlock n) (Ph T Dm)))) ↔ p ∈ l) := by
-  letI := stateStructure (X := X) (stateAssign p ρs)
+  let := stateStructure (X := X) (stateAssign p ρs)
   rw [Sentence.Realize, realize_listSup]
   constructor
   · rintro ⟨ψ, hψ, hr⟩
@@ -264,7 +264,7 @@ theorem graphGame_isWon (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A
         @Sentence.Realize _ A
           ((repMerged X.pointBlock n).structure₁ (L := L.sum Language.order)
             (repBlockAssign X.pointBlock A n ρs)) (K s tx ty)) := by
-  letI := stateStructure (X := X) (stateAssign p ρs)
+  let := stateStructure (X := X) (stateAssign p ρs)
   have hrw : (graphGame X hn D hD K).IsWon (stateAssign p ρs) ↔
       @Sentence.Realize _ A (stateStructure (stateAssign p ρs))
         (listSup ((finEnum (Sub × T × T × Bool)).map fun e =>
@@ -290,7 +290,7 @@ theorem graphGame_isStart (τ : (gameBlock X n T Dm).Assignment A) :
     ((graphGame X hn D hD K).IsStart τ ↔
       ∃ (tx : T) (pts : Fin n → X.Map A),
         τ = stateAssign (.startPick tx) fun i => pointAssign (pts i)) := by
-  letI := stateStructure (X := X) τ
+  let := stateStructure (X := X) τ
   have hrw : (graphGame X hn D hD K).IsStart τ ↔
       @Sentence.Realize _ A (stateStructure τ)
         (listSup ((finEnum T).map fun tx =>
@@ -322,7 +322,7 @@ theorem graphGame_move (p q : Ph T Dm) (ρs σs : Fin n → X.pointBlock.Assignm
     ((graphGame X hn D hD K).Move (stateAssign p ρs) (stateAssign q σs) ↔
       ∃ m ∈ movesFrom hn D hD p, m.tgt = q ∧ (∀ e ∈ m.keep, ρs e.1 = σs e.2) ∧
         (∀ i ∈ m.guard, IsPointAssign (X := X) (σs i))) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (gameBlock X n T Dm) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (gameBlock X n T Dm) A
     (@sumOrderStructure L A instL _) (stateAssign p ρs) (stateAssign q σs)
   have hrw : (graphGame X hn D hD K).Move (stateAssign p ρs) (stateAssign q σs) ↔
       @Sentence.Realize _ A
@@ -348,7 +348,7 @@ theorem graphGame_move_shape {p : Ph T Dm} {ρs : Fin n → X.pointBlock.Assignm
     {τ : (gameBlock X n T Dm).Assignment A}
     (h : (graphGame X hn D hD K).Move (stateAssign p ρs) τ) :
     ∃ (q : Ph T Dm) (σs : Fin n → X.pointBlock.Assignment A), τ = stateAssign q σs := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (gameBlock X n T Dm) A
+  let := @SOBlock.structure₂ (L.sum Language.order) (gameBlock X n T Dm) A
     (@sumOrderStructure L A instL _) (stateAssign p ρs) τ
   have hrw : (graphGame X hn D hD K).Move (stateAssign p ρs) τ ↔
       @Sentence.Realize _ A

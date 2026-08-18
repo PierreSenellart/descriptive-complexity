@@ -66,12 +66,12 @@ theorem partSum_min {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
   by_cases hSi : S i
   · have hsingle : {j : A | j = i ∧ S j} = {i} := by
       ext j
-      simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
       exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hSi⟩⟩
     rw [PartSum, hset, hsingle, finsum_mem_singleton, if_pos hSi]
   · have hempty : {j : A | j = i ∧ S j} = (∅ : Set A) := by
       ext j
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       rintro ⟨rfl, hj⟩
       exact hSi hj
     rw [PartSum, hset, hempty, finsum_mem_empty, if_neg hSi]
@@ -105,13 +105,13 @@ theorem partSum_succ {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
   by_cases hSi : S i
   · have hsingle : {j : A | j = i ∧ S j} = {i} := by
       ext j
-      simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
       exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hSi⟩⟩
     rw [hsingle, finsum_mem_singleton, if_pos hSi]
     rfl
   · have hempty : {j : A | j = i ∧ S j} = (∅ : Set A) := by
       ext j
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       rintro ⟨rfl, hj⟩
       exact hSi hj
     rw [hempty, finsum_mem_empty, if_neg hSi]

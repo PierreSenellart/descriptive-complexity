@@ -81,12 +81,6 @@ abbrev atomicAgree (L : Language.{0, 0}) (A : Type) [L.Structure A] (k : ℕ) :
     PebbleRel A k :=
   atomicAgreeOn (Set.univ : Set (Σ n, L.Relations n)) A k
 
-/-- Agreement on the atomic type is monotone (antitone in the family): fewer
-symbols, coarser agreement. -/
-theorem atomicAgreeOn_mono [L.Structure A] {S S' : Set (Σ n, L.Relations n)}
-    (h : S ⊆ S') : (atomicAgreeOn S' A k).Le (atomicAgreeOn S A k) :=
-  fun _ _ hvw => ⟨hvw.1, fun R hR g => hvw.2 R (h hR) g⟩
-
 /-- Agreement on the atomic type is an equivalence. -/
 theorem atomicAgreeOn_equivalence [L.Structure A] {S : Set (Σ n, L.Relations n)} :
     Equivalence (atomicAgreeOn S A k) where

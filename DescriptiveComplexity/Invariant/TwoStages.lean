@@ -81,8 +81,8 @@ theorem StepDef.next_invariant₂ (d : StepDef L) (hd : d.VarBound k) (hrels : d
     {ρ : d.B.Assignment M} {σ : d.B.Assignment N} (hρσ : AssignInvariant₂ S M N k ρ σ) :
     AssignInvariant₂ S M N k (d.next ρ) (d.next σ) := by
   intro i g v w hvw
-  letI := d.B.structure₁ (L := L) ρ
-  letI := d.B.structure₁ (L := L) σ
+  let := d.B.structure₁ (L := L) ρ
+  let := d.B.structure₁ (L := L) σ
   have hroom : (Finset.image g Finset.univ).card + qdepth (d.step i) ≤ k := by
     have h1 : (Finset.image g Finset.univ).card ≤ d.B.arity i := by
       refine Finset.card_image_le.trans ?_
@@ -118,8 +118,8 @@ the value of the induction is the same on both sides. -/
 theorem StepDef.ifpHolds_equivK₂ (d : StepDef L) (hd : d.VarBound k) (hrels : d.UsesRels S)
     (hout : qdepth d.out ≤ k) {v : Fin k → M} {w : Fin k → N}
     (hvw : EquivK₂ (atomicAgreeOn₂ S M N k) v w) : d.IFPHolds M ↔ d.IFPHolds N := by
-  letI instM := d.B.structure₁ (L := L) (d.inflLimit M)
-  letI instN := d.B.structure₁ (L := L) (d.inflLimit N)
+  let instM := d.B.structure₁ (L := L) (d.inflLimit M)
+  let instN := d.B.structure₁ (L := L) (d.inflLimit N)
   have hvw' : EquivK₂ (@atomicAgreeOn₂ (L.sum d.B.lang) (blockRelsExtend S d.B) M N
       instM instN k) v w := by
     rw [equivK₂_structure₁_eq (d.inflLimit_invariant₂ hd hrels)]

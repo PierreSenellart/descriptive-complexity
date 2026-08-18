@@ -845,7 +845,7 @@ theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : jInterp.Map A → P
   have hset : {q : jInterp.Map A | JSPosn q ∧ p q} =
       (fun b : Bool × A => jPos (g b) b a₀) '' {b | sub b} := by
     ext q
-    rw [Set.mem_setOf_eq, hp q]
+    rw [Set.mem_ofPred_eq, hp q]
     exact ⟨fun ⟨b, hb, hq⟩ => ⟨b, hb, hq.symm⟩, fun ⟨b, hb, hq⟩ => ⟨b, hb, hq.symm⟩⟩
   rw [binNum, hset, finsum_mem_image hinj]
   refine (finsum_mem_congr rfl fun b _ => ?_).trans
@@ -878,7 +878,7 @@ theorem sum_times_eq {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop
       digitNum (blkLe (A := A)) (fun _ => True) (jbase A)
         (fun b => ({i : jInterp.Map A | S i ∧ JSTime i (jLow a₀ b)} : Set _).ncard) := by
   classical
-  haveI : Finite (jInterp.Map A) := jInterp.map_finite A
+  have : Finite (jInterp.Map A) := jInterp.map_finite A
   have h₁ : (∑ᶠ i ∈ {i | S i}, JSTimeVal i) =
       ∑ᶠ i ∈ {i | S i}, digitNum (blkLe (A := A)) (fun _ => True) (jbase A)
         (fun b => if JSTime i (jLow a₀ b) then 1 else 0) :=
@@ -910,11 +910,11 @@ theorem sum_times_eq_cnt {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → 
 theorem cnt_add_cnt (a₀ : A) {S : jInterp.Map A → Prop} (hS : ∀ i, S i → JSJob i)
     (b : Bool × A) :
     cnt a₀ S b + cnt a₀ (fun i => JSJob i ∧ ¬S i) b = cnt a₀ JSJob b := by
-  haveI : Finite (jInterp.Map A) := jInterp.map_finite A
+  have : Finite (jInterp.Map A) := jInterp.map_finite A
   rw [cnt, cnt, cnt, ← Set.ncard_union_eq _ (Set.toFinite _) (Set.toFinite _)]
   · congr 1
     ext i
-    simp only [Set.mem_union, Set.mem_setOf_eq]
+    simp only [Set.mem_union, Set.mem_ofPred_eq]
     constructor
     · rintro (⟨hi, hb⟩ | ⟨⟨hi, -⟩, hb⟩)
       · exact ⟨hS i hi, hb⟩
@@ -1032,7 +1032,7 @@ theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (x 
   have hset : {i : jInterp.Map A | S i ∧ JSTime i (jLow a₀ (false, x))} =
       (fun s : Bool => jLit a₀ s x) '' {s | S (jLit a₀ s x)} := by
     ext i
-    simp only [Set.mem_setOf_eq, Set.mem_image]
+    simp only [Set.mem_ofPred_eq, Set.mem_image]
     constructor
     · rintro ⟨hi, hb⟩
       obtain ⟨s, rfl⟩ := (time_jLow_var ha₀ x i).mp hb
@@ -1049,12 +1049,12 @@ theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (c 
       ({p ∈ OccSet c | S (jLit a₀ p.2 p.1)} : Set (A × Bool)).ncard +
         ({p ∈ MidSet c | S (jSlk p.2 c p.1)} : Set (A × Bool)).ncard := by
   classical
-  haveI : Finite (jInterp.Map A) := jInterp.map_finite A
+  have : Finite (jInterp.Map A) := jInterp.map_finite A
   have hset : {i : jInterp.Map A | S i ∧ JSTime i (jLow a₀ (true, c))} =
       ((fun p : A × Bool => jLit a₀ p.2 p.1) '' {p ∈ OccSet c | S (jLit a₀ p.2 p.1)}) ∪
         ((fun p : A × Bool => jSlk p.2 c p.1) '' {p ∈ MidSet c | S (jSlk p.2 c p.1)}) := by
     ext i
-    simp only [Set.mem_setOf_eq, Set.mem_union, Set.mem_image]
+    simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_image]
     constructor
     · rintro ⟨hi, hb⟩
       rcases (time_jLow_cls ha₀ c i).mp hb with ⟨p, hocc, rfl⟩ | ⟨p, hmid, rfl⟩
@@ -1116,7 +1116,7 @@ theorem ncard_le_two_card (X : Set (A × Bool)) : X.ncard ≤ 2 * Nat.card A := 
 /-- A selection weighs at most as much as all the jobs, digit by digit. -/
 theorem cnt_le (a₀ : A) {S : jInterp.Map A → Prop} (hS : ∀ i, S i → JSJob i) (b : Bool × A) :
     cnt a₀ S b ≤ cnt a₀ JSJob b := by
-  haveI : Finite (jInterp.Map A) := jInterp.map_finite A
+  have : Finite (jInterp.Map A) := jInterp.map_finite A
   exact Set.ncard_le_ncard (fun i hi => ⟨hS i hi.1, hi.2⟩) (Set.toFinite _)
 
 variable [Nonempty A]
@@ -1404,7 +1404,7 @@ theorem two_mul_dd {a₀ : A} (ha₀ : IsBot a₀) (hd : ¬Deg A) (hwidth : Widt
     · rw [dd_not_cls _ hc]
       have ho : OccSet c = ∅ := by
         ext p
-        simp only [OccSet, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [OccSet, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun h => hc h.1
       have hm : MidSet c = ∅ := Set.subset_empty_iff.mp (ho ▸ midSet_subset)
       rw [ho, hm, Set.ncard_empty]
@@ -1567,8 +1567,8 @@ theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structu
     NAEThreeSatisfiable A ↔ HasGoodSchedule (jInterp.Map A) := by
   classical
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  haveI : Finite (jInterp.Map A) := jInterp.map_finite A
-  haveI : LinearOrder (jInterp.Map A) := finiteLinearOrder _
+  have : Finite (jInterp.Map A) := jInterp.map_finite A
+  have : LinearOrder (jInterp.Map A) := finiteLinearOrder _
   have hpt : ∀ j : jInterp.Map A, JSJob j → JSPenVal j = JSTimeVal j := fun j _ => jsPenVal_eq
   by_cases hdeg : Deg A
   · -- a degenerate input: no assignment, and no schedule either
@@ -1630,7 +1630,7 @@ theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structu
       have hOccEmpty : ∀ c : A, ¬IsCl c → OccSet c = ∅ := by
         intro c hc
         ext p
-        simp only [OccSet, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [OccSet, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun h => hc h.1
       -- enough slack to balance every clause block
       have hsub : ∀ c : A,
@@ -1657,7 +1657,7 @@ theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structu
         rw [cnt_var ha₀, dd_var hdeg]
         have hset : {s : Bool | splitSet a₀ ν M (jLit a₀ s e)} = {s | LitTrue ν e s} := by
           ext s
-          rw [Set.mem_setOf_eq, Set.mem_setOf_eq, splitSet_jLit]
+          rw [Set.mem_ofPred_eq, Set.mem_ofPred_eq, splitSet_jLit]
         rw [hset]
         by_cases hv : ν e
         · have : {s : Bool | LitTrue ν e s} = {true} := by

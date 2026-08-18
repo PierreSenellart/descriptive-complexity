@@ -165,7 +165,7 @@ theorem lstep_acc {x : LCfg c} (hx : x.q = SimQ.acc) : lstep x = none := by
 /-- **The counted machine cycle**: from the resting configuration of a
 nonempty continuation, a counted run to the resting configuration of the pop
 target. The count is zero only if the pop was silent, in which case the
-continuation shrank – the escape hatch both lexicographic inductions use. -/
+continuation shrank – the decrease both lexicographic inductions fall back on. -/
 theorem cycle_counted {k : PCont c} (hk : k ≠ PCont.halt) {fr : List (SimSym c)}
     (hfr : FrameSeg k fr) (g : ℕ) (v : List ℕ) (j t : ℕ) :
     ∃ m g' fr' j' t', FrameSeg (popTarget k v).1 fr' ∧

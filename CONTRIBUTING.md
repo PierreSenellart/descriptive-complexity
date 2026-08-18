@@ -89,7 +89,8 @@ Every problem in the catalog follows the same arc, walked end to end by
 `Examples/ConjunctiveQueries.lean`:
 
 1. **Vocabulary** – a `Language` for the instances; reuse an existing one where
-   possible.
+   possible. It has to be relational: `DecisionProblem` takes an
+   `L.IsRelational` instance argument, the standing convention of the field.
 2. **Semantics** – the yes-instance predicate, as a Lean predicate on the
    structure.
 3. **Invariance** – the proof that it is isomorphism-invariant, via the shared
@@ -149,9 +150,9 @@ appears in neither is invisible.
 
 CI must pass: the `Build` job compiles the library, and the `Release metadata`
 job checks that the version and Mathlib pin agree across every file that
-records them. Each runs only when the change can affect it – a documentation-only
-or prose-only pull request will show one of them, or neither, and that is not a
-sign that something failed to start.
+records them. Each runs only when the change can affect it – a
+documentation-only or prose-only pull request will show one of them, or
+neither, and that is not a sign that something failed to start.
 
 ## License
 

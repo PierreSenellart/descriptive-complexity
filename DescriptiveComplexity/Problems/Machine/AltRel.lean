@@ -250,9 +250,6 @@ variable {M} {ρ ρ'} {w w' : A → Config A}
 theorem runAcc_iff (h : Graphs ρ w) (t : A) : M.RunAcc ρ t ↔ M.Acc (w t).state :=
   ⟨fun hacc => hacc _ ((h.1 t _).mpr rfl), fun hacc q hq => (h.1 t q).mp hq ▸ hacc⟩
 
-theorem runBlk_iff (h : Graphs ρ w) (j : ℕ) (t : A) : M.RunBlk ρ j t ↔ M.Blk j (w t).state :=
-  ⟨fun hb => hb _ ((h.1 t _).mpr rfl), fun hb q hq => (h.1 t q).mp hq ▸ hb⟩
-
 theorem runBlkLt_iff (h : Graphs ρ w) (i : ℕ) (t : A) :
     M.RunBlkLt ρ i t ↔ M.BlkLt i (w t).state :=
   ⟨fun hb => hb _ ((h.1 t _).mpr rfl), fun hb q hq => (h.1 t q).mp hq ▸ hb⟩

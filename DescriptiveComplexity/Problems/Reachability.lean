@@ -58,7 +58,7 @@ fragment states closure and rejection, so it defines UNREACH head-on
 *contained* in the true reachable set – a minimality condition no clause can
 impose. At the Horn level the way out was the equivalence with FO(LFP), a full
 logic closed under negation; at the Krom level the corresponding statement is
-`NL = coNL`, i.e. Immerman–Szelepcsényi, and it is what carries
+`NL = coNL`, i.e., Immerman–Szelepcsényi, and it is what carries
 `DescriptiveComplexity.unreach_mem_NL` over to `REACH ∈ NL`
 (`DescriptiveComplexity.reach_mem_NL`, in
 `DescriptiveComplexity.ImmermanSzelepcsenyi`).

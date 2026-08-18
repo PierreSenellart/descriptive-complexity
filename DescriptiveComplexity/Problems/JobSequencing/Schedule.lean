@@ -130,7 +130,7 @@ theorem finsum_onTime_le {sched : A → A → Prop} (hs : IsLinOrd sched)
     exact hnl
   · have hempty : {j : A | JSJob j ∧ ¬JSLate sched j} = (∅ : Set A) := by
       ext j
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       exact fun hj => hne ⟨j, hj⟩
     rw [hempty, finsum_mem_empty]
     exact Nat.zero_le _
@@ -187,7 +187,7 @@ theorem hasGoodSchedule_iff_exists_subset (hlin : IsLinOrd (JSLe (A := A)))
     have hset : {j : A | JSJob j ∧ ¬(JSJob j ∧ ¬JSLate sched j)} =
         {j : A | JSJob j ∧ JSLate sched j} := by
       ext j
-      simp only [Set.mem_setOf_eq, not_and, not_not]
+      simp only [Set.mem_ofPred_eq, not_and, not_not]
       exact and_congr_right fun hj => ⟨fun h => h hj, fun h _ => h⟩
     rw [hset]
     refine le_trans (le_of_eq ?_) hpen

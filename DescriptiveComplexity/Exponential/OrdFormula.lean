@@ -8,23 +8,23 @@ import DescriptiveComplexity.Exponential.Order
 /-!
 # The defining sentence of the order on an expanded universe
 
-`DescriptiveComplexity.Exponential.Order` orders the points of an expansion —
+`DescriptiveComplexity.Exponential.Order` orders the points of an expansion –
 tag first, then the assignment read as a binary number. This file writes that
 order down as a **first-order sentence over the base vocabulary and two copies
 of the block**, and proves it defines exactly that order
 (`DescriptiveComplexity.SOBlock.realize_ordLtF`).
 
-Everything is first-order because a padded atom is a relation variable — of
-which there are finitely many, so the choice is a static disjunction — together
+Everything is first-order because a padded atom is a relation variable – of
+which there are finitely many, so the choice is a static disjunction – together
 with a tuple of *base* elements, which an ordinary quantifier can range over.
 The sentence says:
 
 > at some atom, the first copy is false and the second true, while the two
 > copies agree at every strictly smaller atom
 
-and "strictly smaller" splits into the two ways
+and “strictly smaller” splits into the two ways
 `DescriptiveComplexity.SOBlock.atomIx_lt_iff` allows: a strictly earlier
-relation variable — a static condition, so a finite conjunction — or the same
+relation variable – a static condition, so a finite conjunction – or the same
 variable at a lexicographically earlier tuple, which is
 `DescriptiveComplexity.lexSelLtF`.
 
@@ -54,7 +54,7 @@ noncomputable def ivars : List B.ι :=
 
 open Classical in
 theorem mem_ivars (i : B.ι) : i ∈ B.ivars := by
-  letI : Fintype B.ι := Fintype.ofFinite B.ι
+  let : Fintype B.ι := Fintype.ofFinite B.ι
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
 /-! ### The atom of one copy -/
@@ -77,12 +77,12 @@ theorem realize_atomF {A : Type} [L.Structure A] [LinearOrder A]
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)) _
         (B.atomF L c i sel) v ↔
       B.atomSet (ρs c) (i, fun k => v (sel k)) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   exact Iff.rfl
 
 /-- The relation variables strictly below `i`, in the arbitrary order on the
-block's index type. Factored out so that the order on `B.ι` — the one thing in
-the comparison sentence that is resolved statically — is confined to this
+block's index type. Factored out so that the order on `B.ι` – the one thing in
+the comparison sentence that is resolved statically – is confined to this
 definition and its characterization, and the sentence itself never has to be
 unfolded past them. -/
 noncomputable def ivarsBelow (i : B.ι) : List B.ι :=
@@ -92,7 +92,7 @@ noncomputable def ivarsBelow (i : B.ι) : List B.ι :=
 theorem mem_ivarsBelow (i j : B.ι) :
     letI : LinearOrder B.ι := finiteLinearOrder B.ι
     (j ∈ B.ivarsBelow i ↔ j < i) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   rw [ivarsBelow, List.mem_filter]
   simp [B.mem_ivars j]
 
@@ -102,7 +102,7 @@ open Classical in
 variable (L) in
 /-- **The defining sentence of the order on an expanded universe**: at some
 padded atom the first copy is false and the second true, and the two copies
-agree at every strictly smaller atom — at every earlier relation variable
+agree at every strictly smaller atom – at every earlier relation variable
 (statically many), and at the same variable on every lexicographically earlier
 tuple. -/
 noncomputable def ordLtF : ((L.sum Language.order).sum (B.replicate 2).lang).Sentence :=
@@ -130,7 +130,7 @@ theorem agree_below_iff (ρs : Fin 2 → B.Assignment A) (i : B.ι)
     ((∀ j ∈ B.ivarsBelow i, ∀ y, (B.atomSet (ρs 0) (j, y) ↔ B.atomSet (ρs 1) (j, y))) ∧
         ∀ y, toLex y < toLex x → (B.atomSet (ρs 0) (i, y) ↔ B.atomSet (ρs 1) (i, y))) ↔
       ∀ q, B.atomLt q (i, x) → (B.atomSet (ρs 0) q ↔ B.atomSet (ρs 1) q) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   constructor
   · rintro ⟨hb, hs⟩ ⟨j, y⟩ hq
     rcases hq with hji | ⟨rfl, hy⟩
@@ -150,8 +150,8 @@ theorem realize_ordLtF [Finite A] (ρs : Fin 2 → B.Assignment A) :
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.ordLtF L) ↔
       (setLinearOrder (B.AtomIx A)).lt (B.atomSet (ρs 0)) (B.atomSet (ρs 1))) := by
-  letI := B.atomIxLinearOrder A
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := B.atomIxLinearOrder A
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [B.atomSet_lt_iff (ρs 0) (ρs 1), ordLtF, Sentence.Realize, realize_listSup]
   constructor
   · rintro ⟨φ, hφ, hr⟩
@@ -189,8 +189,8 @@ theorem realize_ordLtF [Finite A] (ρs : Fin 2 → B.Assignment A) :
 
 An expansion defines its order by the symbol `leSymb`, so what
 `DescriptiveComplexity.ExpExpansion.ordExtend` needs is the reflexive
-comparison. Equality of assignments is definable in the same breath — the two
-copies hold of exactly the same padded atoms — and `≤` is the disjunction. -/
+comparison. Equality of assignments is definable in the same breath – the two
+copies hold of exactly the same padded atoms – and `≤` is the disjunction. -/
 
 variable (L) in
 /-- The two copies of the block hold of exactly the same padded atoms. -/
@@ -202,7 +202,7 @@ theorem realize_eqAssignF (ρs : Fin 2 → B.Assignment A) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.eqAssignF L) ↔ B.atomSet (ρs 0) = B.atomSet (ρs 1)) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [eqAssignF, Sentence.Realize, realize_listInf]
   constructor
   · intro h
@@ -230,9 +230,9 @@ theorem realize_ordLeF [Finite A] (ρs : Fin 2 → B.Assignment A) :
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.ordLeF L) ↔
       (setLinearOrder (B.AtomIx A)).le (B.atomSet (ρs 0)) (B.atomSet (ρs 1))) := by
-  letI := B.atomIxLinearOrder A
-  letI := setLinearOrder (B.AtomIx A)
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := B.atomIxLinearOrder A
+  let := setLinearOrder (B.AtomIx A)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [ordLeF, Sentence.Realize, Formula.realize_sup]
   rw [show (Formula.Realize (B.ordLtF L) default ↔ _) from B.realize_ordLtF ρs,
     show (Formula.Realize (B.eqAssignF L) default ↔ _) from B.realize_eqAssignF ρs]

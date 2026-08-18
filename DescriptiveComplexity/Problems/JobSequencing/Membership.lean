@@ -60,7 +60,7 @@ theorem realize_jobSequencingKernel :
           JPS ρ false j (x, p) ∧ ∀ y q : A, JSPosn q →
             (((JSLe x y ∧ ¬x = y) ∨ (x = y ∧ JSLe p q)) ∧ (¬y = x ∨ ¬q = p)) →
             (JBndW (y, q) ↔ JPS ρ false j (y, q))) := by
-  letI := jobSeqGuessBlock.structure ρ
+  let := jobSeqGuessBlock.structure ρ
   have hsubS : ∀ w : Fin 2 → A,
       RelMap (L := jqSOLang) (M := A) jqSchedSym w ↔ ρ .sched w := fun _ => Iff.rfl
   have hsubL : ∀ w : Fin 1 → A,
@@ -366,7 +366,7 @@ theorem jobSequencing_sigmaSODefinable : SigmaSODefinable 1 JobSequencing := by
     · have hno : ∀ j : A, ¬JSJob j := fun j hj => hjobs ⟨j, hj⟩
       have hempty : {j : A | JSJob j ∧ JSLate (JSched ρ) j} = (∅ : Set A) := by
         ext j
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun h => hno j h.1
       rw [JSPenalty, hempty, finsum_mem_empty]
       exact Nat.zero_le _

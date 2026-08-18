@@ -9,7 +9,7 @@ import DescriptiveComplexity.Exponential.Reach
 import DescriptiveComplexity.HeadCapture
 
 /-!
-# The gate: `PSPACE = NL.exp`
+# The operator pinned: `PSPACE = NL.exp`
 
 The check on `DescriptiveComplexity.ComplexityClass.exp` at the one level where
 this library independently knows the answer, in **both** directions.
@@ -27,7 +27,7 @@ two-way heads, each holding one point of the expansion. Three steps:
 
 1. the walk witnessing `Q ∈ NL` is carried to the **trivialized** expansion
    (`DescriptiveComplexity.ExpExpansion.relSpec`), where every tagged assignment
-   is a point and the old universe survives as a mark — so that a head's
+   is a point and the old universe survives as a mark – so that a head's
    `succ` is the plain binary increment and never has to skip anything;
 2. that walk is compiled into a two-way multi-head automaton
    (`DescriptiveComplexity.accepts_drvP`), whose tests are **quantifier-free by
@@ -45,8 +45,8 @@ which is exactly the obstruction the translation lemma names.
 **not**: `DescriptiveComplexity.SOTCDefinable.expDefinable` draws the graph of a
 walk and then asks REACH of it, and REACH is not known to this library to be in
 `DescriptiveComplexity.LOGSPACE`. `LOGSPACE.exp = PSPACE` would need the walk of
-the expansion to be *functional* — a deterministic reachability argument, i.e.
-Savitch read one exponential up — and is not claimed here.
+the expansion to be *functional* – a deterministic reachability argument, i.e.,
+Savitch read one exponential up – and is not claimed here.
 -/
 
 namespace DescriptiveComplexity
@@ -66,8 +66,8 @@ theorem NL_exp_subset_PSPACE : NL.exp ⊆ PSPACE := by
   obtain ⟨spec, hspec⟩ := (tcDefinable_iff_mem_NL Q).mpr hQ
   refine ⟨ExpExpansion.autoSpec ((drvP (ExpExpansion.relSpec X spec)).compile false), ?_⟩
   intro A _ _ _ _
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   refine (hX A).trans ((hspec (X.Map A)).trans ?_)
   refine (ExpExpansion.accepts_relSpec (X := X) (spec := spec)).symm.trans ?_
   refine (accepts_drvP (ExpExpansion.relSpec X spec) (X.trivialize.Map A)).symm.trans ?_

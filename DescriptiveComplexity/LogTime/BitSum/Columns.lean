@@ -22,8 +22,8 @@ block**. Cut the columns into blocks of `g` with `2 ^ g > P`; the sum of one
 block is `Σ_{t<g} c_{a+t} 2 ^ t`, and adding it column by column keeps a running
 remainder below `P` – so the whole chain of a block is `g` remainders of `g`
 bits, which fits in **one element** and is laid out with the boundary-set
-device. That is exactly the "guess the carries" route the design notes rule out
-for the *whole* product (there it is `P` remainders, one element cannot hold
+device. That is exactly the “guess the carries” route that is ruled out for the
+*whole* product (there it is `P` remainders, one element cannot hold
 them); confined to a block it is affordable, and no further descent is needed.
 
 This file is the `ℕ` side of that construction, with no structure in sight:
@@ -172,7 +172,7 @@ theorem intervalSum_lt {h : ℕ → ℕ} {a m H : ℕ} (hH : 0 < H)
 /-! ### The carry chain of one range -/
 
 /-- **The remainder after adding the columns up to `a + t`**: what has been
-accumulated and not yet written, i.e. the partial sum shifted below its first
+accumulated and not yet written, i.e., the partial sum shifted below its first
 unwritten position. The certificate stores these, one field per column. -/
 def carryChain (h : ℕ → ℕ) (a t : ℕ) : ℕ := intervalSum h a (t + 1) / 2 ^ (t + 1)
 

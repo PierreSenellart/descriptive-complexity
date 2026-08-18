@@ -9,7 +9,7 @@ import DescriptiveComplexity.SecondOrder
 /-!
 # The coloring family is existential second-order definable
 
-Membership for the three problems, in two flavours dictated by where the
+Membership for the three problems, in two flavors dictated by where the
 number of colors lives.
 
 * For `DescriptiveComplexity.KCol k`, the number `k` is fixed by the problem, so the
@@ -20,8 +20,8 @@ number of colors lives.
 * For `DescriptiveComplexity.ChromaticNumber` and `DescriptiveComplexity.CliqueCover`, the
   number is the size of the marked set, so it is *not* available to the
   formulas – there is no “`k` classes” to write down. The palette form
-  (`DescriptiveComplexity.paletteColorableOn_iff`) removes the problem: colouring with
-  as many colors as the marked set has elements is colouring *by* the marked
+  (`DescriptiveComplexity.paletteColorableOn_iff`) removes the problem: coloring with
+  as many colors as the marked set has elements is coloring *by* the marked
   set, which a single binary relation variable `Col x y`, read as “`x` has
   color `y`”, expresses. The kernel then has two clauses: every vertex gets
   some marked color, and two conflicting vertices never share a color. Note
@@ -80,7 +80,7 @@ private theorem realize_kColKernel {k : ℕ} {V : Type} [Language.graph.Structur
         (@sumStructure _ _ V _ ((colorGuessBlock k).structure ρ)) (kColKernel k)) ↔
       (∀ x : V, ∃ i : Fin k, ρ i ![x]) ∧
         ∀ x y : V, RelMap adj ![x, y] → ∀ i : Fin k, ¬(ρ i ![x] ∧ ρ i ![y]) := by
-  letI := (colorGuessBlock k).structure ρ
+  let := (colorGuessBlock k).structure ρ
   have hsub : ∀ (i : Fin k) (w : Fin 1 → V),
       RelMap (L := kColSOLang k) (M := V) (kcColorSym i) w ↔ ρ i w :=
     fun _ _ => Iff.rfl
@@ -116,7 +116,6 @@ theorem kCol_sigmaSODefinable (k : ℕ) : SigmaSODefinable 1 (KCol k) := by
       hproper x y hxy (c x) ⟨hcolor x, hcxy ▸ hcolor y⟩⟩
 
 end SigmaOne
-
 
 /-! ### Chromatic Number and Clique Cover: the palette as a binary relation -/
 
@@ -176,7 +175,7 @@ private theorem realize_paletteKernel {A : Type} [Language.markedGraph.Structure
       (∀ x : A, ∃ y : A, ρ () ![x, y] ∧ MGMarked y) ∧
         ∀ x x' y : A, x ≠ x' → (if positive then MGAdj x x' else ¬MGAdj x x') →
           ρ () ![x, y] → ρ () ![x', y] → False := by
-  letI := paletteGuessBlock.structure ρ
+  let := paletteGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
       RelMap (L := paletteSOLang) (M := A) pcColSym w ↔ ρ () w := fun _ => Iff.rfl
   rw [paletteKernel]
@@ -229,8 +228,8 @@ private theorem palette_sigmaSODefinable (positive : Bool)
   · rintro ⟨ρ, hρ⟩
     obtain ⟨htot, hproper⟩ := (realize_paletteKernel _ ρ).mp hρ
     choose col hcol1 hcol2 using htot
-    exact ⟨col, hcol2, fun x x' hcfl hcolour =>
-      hproper x x' (col x) hcfl.1 hcfl.2 (hcol1 x) (hcolour ▸ hcol1 x')⟩
+    exact ⟨col, hcol2, fun x x' hcfl hcolor =>
+      hproper x x' (col x) hcfl.1 hcfl.2 (hcol1 x) (hcolor ▸ hcol1 x')⟩
 
 /-- **Chromatic Number is `Σ₁`-definable**: guess a coloring of the vertices
 by the marked elements, and check first-order that every vertex has a marked

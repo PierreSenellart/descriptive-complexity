@@ -32,7 +32,7 @@ only digit arithmetic, and it is primitive recursive
 (`DescriptiveComplexity.HaltHard.primrec_structOfBits`) – which is what lets
 the `Part.assert` trick of `orderedReduction_codehalt` run behind
 `Nat.Partrec'.part_iff₂`. The bits enter the chain most significant first,
-i.e. the flattened table reversed
+i.e., the flattened table reversed
 (`DescriptiveComplexity.HaltHard.foldl_two_reverse`).
 
 The chain is pure `comp` frames, so its frame region is a run of bare

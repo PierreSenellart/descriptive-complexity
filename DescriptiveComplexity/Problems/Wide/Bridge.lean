@@ -58,24 +58,7 @@ omit [Finite V] in
 @[simp]
 theorem mkAddr_wmBlk (s : Fin n × V → Prop) : mkAddr (wmBlk s) = s := rfl
 
-/-- **An address is its family of blocks**, and nothing else. -/
-def addrBlkEquiv : (Fin n × V → Prop) ≃ (Fin n → V → Prop) where
-  toFun := wmBlk
-  invFun := mkAddr
-  left_inv := mkAddr_wmBlk
-  right_inv := wmBlk_mkAddr
-
 variable {s s' : Fin n × V → Prop} {τ : Fin n}
-
-omit [Finite V] in
-/-- **The blocks before the carry index agree**, which is what the fold asks above
-the carry. -/
-theorem blocks_agree_le (hbefore : ∀ σ, WMLt (α := Fin n) (· ≤ ·) σ τ → ∀ v,
-      (wmBlk s' σ v ↔ wmBlk s σ v)) {j : ℕ} (hj : j < (τ : ℕ)) :
-    ∀ i : Fin n, (i : ℕ) ≤ j → wmBlk s i = wmBlk s' i := by
-  intro i hi
-  refine funext fun v => propext (hbefore i ((wmLt_fin_iff i τ).mpr ?_) v).symm
-  exact Fin.lt_def.mpr (by omega)
 
 omit [Finite V] in
 /-- The same, at the carry index itself: every strictly earlier block agrees. -/
@@ -90,13 +73,6 @@ theorem blocks_top_after (hV : IsLinOrd LeV)
     (hfull : ∀ σ, WMLt (α := Fin n) (· ≤ ·) τ σ → ∀ v, wmBlk s σ v) :
     ∀ i : Fin n, (τ : ℕ) < (i : ℕ) → ∀ a : V → Prop, WMSetLe LeV a (wmBlk s i) := fun i hi a =>
   wmSetLe_of_full hV (hfull i ((wmLt_fin_iff τ i).mpr (Fin.lt_def.mpr hi))) a
-
-/-- **The blocks after the carry index are minimal after the step**: they have
-been emptied, and an empty block is below every block. -/
-theorem blocks_bot_after (hV : IsLinOrd LeV)
-    (hafter : ∀ σ, WMLt (α := Fin n) (· ≤ ·) τ σ → ∀ v, ¬wmBlk s' σ v) :
-    ∀ i : Fin n, (τ : ℕ) < (i : ℕ) → ∀ a : V → Prop, WMSetLe LeV (wmBlk s' i) a := fun i hi a =>
-  wmSetLe_of_empty hV (hafter i ((wmLt_fin_iff τ i).mpr (Fin.lt_def.mpr hi))) a
 
 /-- **At the carry index the new block is the successor of the old one**, which is
 the successor hypothesis the fold asks for. -/
@@ -126,30 +102,6 @@ theorem foldFrom_carry_of_wmIncr (hV : IsLinOrd LeV)
             foldFrom pol P (WMSetLe LeV) ((τ : ℕ) + 1) (wmBlk s'))) :=
   foldFrom_carry (isLinOrd_wmSetLe hV) τ.isLt (blocks_agree_lt hbefore)
     (blocks_top_after hV hfull) (blocks_succ_at hV hincr)
-
-/-- **Below the carry index the accumulators reset to the new leaf**, the blocks
-there having been emptied. -/
-theorem foldFrom_below_of_wmIncr (hV : IsLinOrd LeV)
-    (hafter : ∀ σ, WMLt (α := Fin n) (· ≤ ·) τ σ → ∀ v, ¬wmBlk s' σ v) {j : ℕ}
-    (hj : (τ : ℕ) < j) : foldFrom pol P (WMSetLe LeV) j (wmBlk s') ↔ P (wmBlk s') :=
-  foldFrom_below (c := (τ : ℕ)) (blocks_bot_after hV hafter) hj
-
-omit [Finite V] in
-/-- **Above the carry index only the deeper accumulator changes**, the blocks up to
-there being untouched. -/
-theorem foldFrom_above_of_wmIncr
-    (hbefore : ∀ σ, WMLt (α := Fin n) (· ≤ ·) σ τ → ∀ v, (wmBlk s' σ v ↔ wmBlk s σ v))
-    {j : ℕ} (hjn : j < n) (hj : j < (τ : ℕ)) :
-    (foldFrom pol P (WMSetLe LeV) j (wmBlk s') ↔
-      (if pol j = true then
-          (∃ a : V → Prop, WMLt (WMSetLe LeV) a (wmBlk s ⟨j, hjn⟩) ∧
-            altQuantFrom pol P (j + 1) (Function.update (wmBlk s) ⟨j, hjn⟩ a)) ∨
-            foldFrom pol P (WMSetLe LeV) (j + 1) (wmBlk s')
-        else
-          (∀ a : V → Prop, WMLt (WMSetLe LeV) a (wmBlk s ⟨j, hjn⟩) →
-            altQuantFrom pol P (j + 1) (Function.update (wmBlk s) ⟨j, hjn⟩ a)) ∧
-            foldFrom pol P (WMSetLe LeV) (j + 1) (wmBlk s'))) :=
-  foldFrom_above hjn (blocks_agree_le hbefore hj)
 
 end Bridge
 

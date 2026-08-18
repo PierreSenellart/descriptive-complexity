@@ -40,7 +40,6 @@ namespace AltQbf
 
 open FirstOrder
 
-
 open Language Structure
 
 /-! ### The ordered vocabulary of the source -/
@@ -792,7 +791,6 @@ noncomputable def qbf_ordered_fo_reduction_atmAccept (hk : 0 < k) (start cnf : B
   dim := 2
   toInterpretation := altTuringInterp k cnf
   correct _ _ _ _ _ := (atmAccept_map_iff cnf hk start).symm
-
 
 end AltQbf
 

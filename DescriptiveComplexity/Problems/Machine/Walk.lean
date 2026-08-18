@@ -43,7 +43,7 @@ theorem bitRank_eq_zero_of_minPos (hlin : IsLinOrd Le) {p : A} (h : MinPos Le Po
     bitRank Le Posn p = 0 := by
   have hempty : {r : A | Posn r ∧ Le r p ∧ r ≠ p} = ∅ := by
     ext r
-    simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_and]
+    simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_and]
     rintro hr hrp
     simp only [ne_eq, not_not]
     exact hlin.2.2.1 r p hrp (h.2 r hr)
@@ -56,7 +56,7 @@ theorem bitRank_succPos (hlin : IsLinOrd Le) {p q : A} (h : SuccPos Le Posn p q)
   have hset : {r : A | Posn r ∧ Le r q ∧ r ≠ q} =
       insert p {r : A | Posn r ∧ Le r p ∧ r ≠ p} := by
     ext r
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     constructor
     · rintro ⟨hr, hrq, hrne⟩
       rcases hlin.2.2.2 r p with hrp | hpr
@@ -89,7 +89,7 @@ theorem bitRank_maxPos {p : A} (h : MaxPos Le Posn p) :
     (Nat.card_coe_set_eq _)
   have hset : ({x : A | Posn x} : Set A) = insert p {r : A | Posn r ∧ Le r p ∧ r ≠ p} := by
     ext r
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     constructor
     · intro hr
       rcases eq_or_ne r p with rfl | hrne

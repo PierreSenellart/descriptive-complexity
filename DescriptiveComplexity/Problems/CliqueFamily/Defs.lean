@@ -130,21 +130,6 @@ theorem cliqueOn_iff_embedding (Adjp : A → A → Prop) (Kp : A → Prop) :
   exists_congr fun S =>
     and_congr_right fun _ => (nonempty_embedding_iff_ncard_le Kp S).symm
 
-/-- The independent-set threshold as an injection of the marked set into the
-independent set. -/
-theorem indepOn_iff_embedding (Adjp : A → A → Prop) (Kp : A → Prop) :
-    IndepOn Adjp Kp ↔ ∃ S : A → Prop, (∀ x y, S x → S y → x ≠ y → ¬Adjp x y) ∧
-      Nonempty ({x // Kp x} ↪ {x // S x}) :=
-  cliqueOn_iff_embedding _ Kp
-
-/-- The vertex-cover threshold as an injection of the cover into the marked
-set. -/
-theorem coverOn_iff_embedding (Adjp : A → A → Prop) (Kp : A → Prop) :
-    CoverOn Adjp Kp ↔ ∃ C : A → Prop, (∀ x y, x ≠ y → Adjp x y → C x ∨ C y) ∧
-      Nonempty ({x // C x} ↪ {x // Kp x}) :=
-  exists_congr fun C =>
-    and_congr_right fun _ => (nonempty_embedding_iff_ncard_le C Kp).symm
-
 end Embedding
 
 variable {B : Type}

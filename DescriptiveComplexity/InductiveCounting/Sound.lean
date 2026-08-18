@@ -194,7 +194,6 @@ theorem innerInv_certify {s s' : Cfg V} {uu : V} {P : Set V}
     have := hdef y ⟨hyR, hyP'⟩ hcond'
     omega
 
-
 /-! ### Preservation, phase by phase -/
 
 omit [Finite V] in
@@ -402,7 +401,6 @@ theorem inv_step_walk {s s' : Cfg V} (hp : s.phase = Phase.walk)
   · exact absurd hl List.not_mem_nil
   · exact absurd hl List.not_mem_nil
 
-
 /-- The end of a stage: either the counts agree, and the reachable set is the
 current layer, or the machine moves on to the next layer. -/
 theorem inv_step_stageEnd {s s' : Cfg V} (hp : s.phase = Phase.stageEnd)
@@ -450,7 +448,6 @@ theorem inv_step_stageEnd {s s' : Cfg V} (hp : s.phase = Phase.stageEnd)
     have hstab : Rset E S (stage s + 1) = Rset E S (stage s) :=
       (Set.eq_of_subset_of_ncard_le Rset.subset_succ hcard (Set.toFinite _)).symm
     exact not_reach_target_of_stable hstab hnoT
-
 
 omit [Finite V] in
 /-- At the end of the inner scan the count check leaves no room: the certified

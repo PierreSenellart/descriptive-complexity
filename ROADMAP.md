@@ -3,18 +3,18 @@
 Catalog of work **not yet done**, and of nothing else: an item is deleted when
 it is built, never annotated as finished, the record of what the library
 contains being `git log` together with the module docstrings. Organized by
-theme; each item carries a
-rough scale of effort ([S] short, [M] medium, [L] long, [R] research-level,
-i.e., the Lean proof would itself be a contribution) and its prerequisites.
-Main source: Immerman, "Descriptive Complexity" (DC below); also Garey–Johnson
+theme; each item carries a rough scale of effort ([S] short, [M] medium, [L]
+long, [R] research-level, i.e., the Lean proof would itself be a contribution)
+and its prerequisites.
+Main source: Immerman, *Descriptive Complexity* (DC below); also Garey–Johnson
 and Karp's 21 problems for the catalog.
 
 ## 1. NP-complete problems (catalog growth)
 
 Beyond Karp's 21:
 
-- **X3C** [M–L]: exact cover by 3-sets, from 3-Dimensional Matching (now hard)
-  or from Exact Cover; local gadgets, probably ordered.
+- **X3C** [M–L]: exact cover by 3-sets, from 3-Dimensional Matching or from
+  Exact Cover; local gadgets, probably ordered.
 - **3-Partition** [L]: strongly NP-complete, so the unary representation
   suffices and the hardness claim is honest; the classical source for
   packing/scheduling reductions. Warning: the 3DM → 3-Partition reduction is
@@ -27,29 +27,62 @@ Beyond Karp's 21:
 **Discharge symmetry** (guiding principle): each class-defining fragment (§3)
 has a canonical complete problem that is essentially its *syntactic image*, so
 each hardness discharge is a Tseitin-style translation of the defining logic
-into the problem's vocabulary, i.e. a variation on
+into the problem's vocabulary, i.e., a variation on
 `sat_hard_of_sigmaSODefinable` with a shape invariant carried through. The
 pattern is instantiated for every fragment the library defines: ∃SO → SAT,
 SO-alternation-level-`k` → QBF_k, SO-Horn → HORN-SAT, SO-Krom → 2SAT (the last
 two sharing their scaffolding in `ClauseDischarge.lean`), SO(TC) →
 SUCCINCT-REACH and ∃SO[new] → FINSAT, so no discharge is outstanding; what
-remains below are ordinary catalog reductions and machine bridges.
+remains below are ordinary catalog reductions, drawings out of a machine, and
+machine bridges.
 
 - **Monotone CVP** [M]: the unit-propagation circuit is monotone as drawn, so
   this is a matter of restricting the vocabulary rather than of a new gadget.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
   (Generalized Geography…), the only PSPACE entries still missing.
-- **NEXPTIME and EXPSPACE, complete problems** [XL]: both exist as logics, with
-  their complement equalities and inclusions
-  (`DescriptiveComplexity/Exponential.lean`), but neither has a complete
-  problem. The generic succinctness theorem that would supply them at one
-  stroke – the succinct version of a `C`-complete problem is `C.exp`-complete –
-  needs the outer composition of §3, whose three-piece fix is described there;
-  the quantifier-free-completeness audit inside it is where the risk sits. The
-  alternative is the route EXPTIME took: a machine written by the reduction out
-  of the class's own logic (`Exponential/GameInterp.lean`), which for NEXPTIME
-  means a nondeterministic machine over an expanded universe and for EXPSPACE an
-  alternating one with no space bound at all.
+- **Succinct problems, drawn out of the wide machine** [L each]: the classical
+  second complete problems of the exponential classes are the succinct forms of
+  polynomial ones, and the route to them is the machine, not the logic. A
+  problem carrying its own locality is *drawn* by a reduction from a wide
+  machine's run – which is how both tilings were reached
+  (`Problems/Wide/TilingHard.lean`, `Problems/Wide/CorridorHard.lean`) – whereas
+  proving it hard from the class's logic directly is a second construction of
+  the same size. The generic succinctness theorem is **not** available as a
+  route (§3), so each succinct problem is its own drawing.
+  - **Succinct GAME** [L]: `GAME` is complete for PTIME already
+    (`game_PTIME_complete`), and its succinct form is the classical
+    EXPTIME-complete game problem. Bibliography to fetch from DBLP when the item
+    is built – nothing from memory, nothing from a search snippet:
+    `veith1997formulas` (Veith, *Languages represented by Boolean formulas*,
+    IPL 1997), `gottlob1999succinctness` (Gottlob, Leone, Veith, *Succinctness
+    as a source of complexity in logical formalisms*, APAL 97, 1999) and
+    `balcazar1992succinct` (Balcázar, Lozano, Torán, *The complexity of
+    algorithmic problems on succinct instances*, 1992, a survey).
+- **EPR's hardness** [XL, low confidence]: `∃*∀*` satisfiability is
+  NEXPTIME-hard ([Lewis 1980][lewis1980complexity]). The problem, its
+  small-model property and its membership are built (`Problems/Epr/`); what is
+  left is Lewis's simulation, and it is the real cost. Three things settle its
+  shape, each paid for by the membership. **Reduce from a machine, not from a
+  tiling**: a universally quantified matrix cannot say “*some* cell carries an
+  accepting tile”, an existential over exponentially many cells, while a
+  machine's acceptance pads the run to the clock and reads the *last* row, whose
+  coordinates are a fixed bit-vector, so the condition is a guarded clause.
+  **Coordinates are bit-vectors indexed by the instance**, one universal
+  variable per element per coordinate, so an emitted symbol has arity `2n+1` –
+  unbounded arity is what the encoding is for, and `sig` already carries it.
+  **The increment of a coordinate needs auxiliary relations**, defined by
+  clauses along the order of the instance: a carry chain is a disjunction of
+  conjunctions and no single clause is that, whereas “agree above `k`” and “all
+  ones below `k`” are forced upward by implications of fixed width, and upward
+  is the direction the reduction needs.
+- **Ruled out for these classes, and why** – do not re-propose: Datalog combined
+  complexity (EXPTIME) is too domain-specific for a catalog meant to read as
+  general complexity theory; regular-expression inequivalence with squaring
+  (EXPSPACE, Meyer–Stockmeyer) needs an automata-and-regex layer that does not
+  exist; Petri net coverability (Rackoff) and the commutative semigroup word
+  problem (Mayr–Meyer) are counter machines, and unbounded counters fail the
+  “numbers must be bitwise definable” rule; generalized chess, checkers and Go
+  (EXPTIME) are tiling-scale simulations with a board layer on top.
 - Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
   of scope (§7 refines both judgments).
 
@@ -57,9 +90,9 @@ remains below are ordinary catalog reductions and machine bridges.
 
 - **FO(LFP) ⊆ NP, directly** [M]: by guessing the fixed point and the derivation
   order and checking both first-order against the certificate interface
-  (`derives_eq_of_closed_of_wf`). No new mathematics — the inclusion already
+  (`derives_eq_of_closed_of_wf`). No new mathematics – the inclusion already
   follows by composing the FO(LFP) → SO-Horn translation with the Horn discharge
-  — but the direct `Σ₁` definition would be textbook-faithful; the work is
+  – but the direct `Σ₁` definition would be textbook-faithful; the work is
   formula building, made tedious by the varying arities of a block's atoms.
 - **Housekeeping in the shared machinery** [S]:
   `Problems/FinSat/Nodes.lean` imports `Sat/Tseitin.lean` for `NodeAt`, so if that
@@ -69,15 +102,15 @@ remains below are ordinary catalog reductions and machine bridges.
   special case of `SecondOrderReplicate.lean` and should be folded into it –
   noticed while building the PH bridge, left alone because it touches a working
   file and bought that bridge nothing.
-- **Composing an expansion with an interpretation, the outer way** [XL, design
-  work first]: `DescriptiveComplexity.ExpExpansion.pullOrdered` composes an
+- **Composing an expansion with an interpretation, the outer way** [settled –
+  do not reopen]: `DescriptiveComplexity.ExpExpansion.pullOrdered` composes an
   interpretation *before* an expansion (`A ↦ X.Map (I.Map A)`) and is what makes
-  `ComplexityClass.exp` a class. The **other** order — an interpretation applied
-  to an expanded structure, `A ↦ J.MapRel (X.Map A)` — is what a complete
+  `ComplexityClass.exp` a class. The **other** order – an interpretation applied
+  to an expanded structure, `A ↦ J.MapRel (X.Map A)` – is what a complete
   problem for an exponential class would need, and it is *not* an expansion:
   an expansion's defining sentences are first-order over the base with the block
   copies as parameters, while a quantifier of `J` ranges over the *points* of
-  `X.Map A`, i.e. over block assignments, which is a second-order quantifier
+  `X.Map A`, i.e., over block assignments, which is a second-order quantifier
   over the base. So the composite's relations are `Σₖ` over the base, not FO,
   and neither the plain composition nor a Tseitin description of the composite
   exists.
@@ -87,20 +120,37 @@ remains below are ordinary catalog reductions and machine bridges.
   Boolean combinations compose. So the fix is quantifier-freeness, and it is the
   library's version of the side condition the succinctness literature has always
   attached ([Veith 1998][veith1998succinct] states the upgrade theorem for
-  *projection* reductions) — though quantifier-freeness alone suffices here,
+  *projection* reductions) – though quantifier-freeness alone suffices here,
   projections being a strictly stronger property this framework does not need.
   The order on the expanded universe, the translation lemma and the gate
-  `PSPACE = NL.exp` are **built**, so what remains is
-  **quantifier-free composition and quantifier-free hardness** [XL]: restrict
-  the outer composition to `IsQuantifierFree` interpretations, where it does
-  exist, and add a `HardQF` predicate *beside* `Hard` rather than a field of
-  `ComplexityClass` (a field would touch `Complexity.lean` and force a full
-  rebuild). The risk is not the definitions but re-proving one complete
-  problem per class under quantifier-free reductions — HORN-SAT first.
+  `PSPACE = NL.exp` are **built**. Restricting *hardness* to match is
+  nevertheless **abandoned**, and the reason is structural rather than
+  incidental: every hardness discharge in this library is a Tseitin-style
+  translation of a *logic* into the problem's vocabulary, so its defining
+  formulas inherit that logic's quantifiers – `hornInterp`'s `guardF` relabels
+  an arbitrary carried `L.Formula`, and no engineering removes it. So do not
+  build `compQF`, `HardQF`, or the generic succinctness theorem. The honest
+  framing: in the literature SAT is complete under first-order projections
+  because Cook–Levin is a **machine** simulation, each output bit one cell of a
+  tableau at an address computed from the position alone; this library
+  discharges from logics and is machine-free by design, which is what costs it
+  the succinctness upgrade – a coherent trade, not a defect. §2's succinct
+  problems take the machine route instead.
+- **`SigmaExpExpansion`, an expansion described by `Σₖ` sentences** [XL,
+  optional]: an expansion whose defining sentences are `Σₖ` over the base is
+  still computable within polynomial space, so `PSPACE.expΣ = EXPSPACE` and the
+  outer composition exists unconditionally *there* – succinct QSAT becomes
+  EXPSPACE-complete and the Tseitin discharge above applies, at EXPSPACE and
+  nowhere else. §2 reaches the classes without it, so build it only if the
+  succinct family is wanted for its own sake. **Never widen `ExpExpansion`
+  itself**: `PTIME.exp = EXPTIME` depends on the defining sentences being
+  first-order, a `Σₖ`-described instance not being readable in polynomial time,
+  so the relaxation is a *second* notion beside the first and not a
+  generalization of it.
 - **`LOGSPACE.exp = PSPACE`** [M–L]: `LOGSPACE.exp ⊆ PSPACE` is monotonicity,
   but the converse is not the `Exponential/Reach.lean` argument, which asks
   REACH of the graph a walk draws and so lands in NL. It wants that graph read
-  *deterministically* — Savitch, or the determinization of the QSAT walk, one
+  *deterministically* – Savitch, or the determinization of the QSAT walk, one
   exponential up.
 - **What is left of the BIT layer** [L]: the arithmetic vocabulary and the class
   it defines are **built** (`Arithmetic.lean`, `ArithmeticDefinable.lean`,
@@ -132,8 +182,8 @@ remains below are ordinary catalog reductions and machine bridges.
       an appendix precisely because she knows of no complete published one), but
       it also wants a semantic layer for `2d`-digit vectors – values with no
       `orank` meaning – that the library does not have. Before transcribing,
-      check whether `FO(+, Squares) = FO(+, ×)` (Thm. 3.2(f), "not so
-      difficult") lets `arithExtend` define only tuple *squaring*, the product
+      check whether `FO(+, Squares) = FO(+, ×)` (Thm. 3.2(f), “not so
+      difficult”) lets `arithExtend` define only tuple *squaring*, the product
       following by polarization: half a day, large payoff, if it survives
       truncated arithmetic on tuples.
     - *Bit side*, **preferred**: prove closure for `LTDecidable` at the machine
@@ -145,13 +195,13 @@ remains below are ordinary catalog reductions and machine bridges.
       guessed) while the interpretation's `FO(≤)` queries are evaluated on the
       component side through `Translate.lean`. All that is new is **`Conv`**,
       the agreement of the two representations, which by Horner is `d` rounds of
-      "accumulator times `n` plus a digit" – the exact shape of `Times.lean`'s
-      column sum at `d`-fold width, certificates widening from one element to a
-      constant family. Preferred because every hard piece re-instantiates an
-      in-house device whose estimate-vs-actual is calibrated, because it
-      consumes the machine model just built, and because its `d`-chunk element
-      families are the "big number as a family of elements" layer FO(COUNT) /
-      TC⁰ would want anyway.
+      “accumulator times `n` plus a digit” – the exact shape of
+      `BitSum/Times.lean`'s column sum at `d`-fold width, certificates widening
+      from one element to a constant family. Preferred because every hard piece
+      re-instantiates an in-house device whose estimate-vs-actual is calibrated,
+      because it consumes the machine model just built, and because its
+      `d`-chunk element families are the “big number as a family of elements”
+      layer FO(COUNT) / TC⁰ would want anyway.
 
     Two unknowns to burn down first, half a day each: fields tiled across a
     *family* of elements, the one variation of the packing devices never
@@ -163,8 +213,8 @@ remains below are ordinary catalog reductions and machine bridges.
     `LogTime/Small.lean`'s `ArithDef.of_large` already covers the degenerate
     sizes the splitting excludes. The one place this could be *unsound* rather
     than merely incomplete is `arithExtendLEquiv`, the proof that the formulas
-    realize the **canonical** arithmetic of that order: "the formula obviously
-    says addition" is not an argument, and `ordExtendLEquiv` is the template.
+    realize the **canonical** arithmetic of that order: “the formula obviously
+    says addition” is not an argument, and `ordExtendLEquiv` is the template.
     Note what class-hood does *not* gate: a problem reducing to an AC⁰ problem
     is already in PTIME – indeed in LOGSPACE, by that class's own closure – so
     build it for a consumer and not before. Until then AC⁰ gets **no row** in
@@ -174,8 +224,8 @@ remains below are ordinary catalog reductions and machine bridges.
   for almost all completeness results); SAT complete under first-order
   projections.
 - **Reduction-notion refinements** [M]: track quantifier-free / projection /
-  dimension-1 status through composition (currently only `IsQuantifierFree`
-  exists); "problem X is complete under qfps" is the DC-faithful statement.
+  dimension-1 status through composition (`IsQuantifierFree` is the only status
+  tracked); “problem X is complete under qfps” is the DC-faithful statement.
 - **FO(COUNT) / counting quantifiers** [L]: with BIT, captures uniform TC⁰;
   relevant to the arithmetic boundary of the binary representation
   (multiplication is TC⁰, not FO). Its inclusion in LOGSPACE would follow the
@@ -193,7 +243,7 @@ remains below are ordinary catalog reductions and machine bridges.
   so `ac0Definable_mem_LOGSPACE` need not be reproved, and plan for the full
   downstream rebuild rather than discovering it: `HeadCapture`, `HeadCaptureDet`
   and every consumer of `Runs` re-elaborate.
-- **Relativized (domain-formula) reductions — membership closure** [M]:
+- **Relativized (domain-formula) reductions – membership closure** [M]:
   Immerman's textbook FO reduction restricts the target universe to a definable
   subset via a **domain formula**, needed for *spanning* problems (Hamilton
   circuit: a tour visits every element, so junk points with no valid incident
@@ -203,7 +253,7 @@ remains below are ordinary catalog reductions and machine bridges.
   with notation `≤ʳᶠᵒ[≤]`, wired into `Complexity`/`Hierarchy` as the
   `hard_of_relOrderedReduction` field), which is all a spanning problem's
   NP-hardness needs while its membership is a direct second-order sentence.
-  Remaining — the symmetric **membership** closure `mem_of_relOrderedReduction`,
+  Remaining – the symmetric **membership** closure `mem_of_relOrderedReduction`,
   with two consumers: it would turn `le_dtmAcceptSpace_of_mem_PSPACE` into the
   missing `iff` (`Problems/Machine/SpaceHard.lean` records why PSPACE's machine
   characterization stops short of `mem_NP_iff_le_ntmAccept`'s shape), and the
@@ -214,7 +264,7 @@ remains below are ordinary catalog reductions and machine bridges.
   `≤ʳᶠᵒ[≤]`:
   - `RelSecondOrderPull.lean` (~700 lines): `SOBlock.pull` is reused verbatim
     (a relation variable on the subtype pulls to one `(n·d)`-ary variable per
-    tag tuple), but the assignment-transfer layer is rewritten **flipped** — on
+    tag tuple), but the assignment-transfer layer is rewritten **flipped** – on
     subtypes `pullAssign (mergeAssign σ) = σ` fails (extend-then-restrict loses
     off-domain data) while `mergeAssignRel (pullAssignRel ρ) = ρ` is exact, so
     stating the `sorealize_pullSO_aux` transfer in the flipped direction closes
@@ -239,8 +289,8 @@ Three pieces built for Abiteboul–Vianu are the ones to reach for in any captur
 attempted here: the order-relativization transfer
 (`FixedPointOrderTransfer.lean`, for every statement that moves an order
 between instance and vocabulary), stratification of inflationary inductions
-(`FixedPointStratify.lean`, for any "define X by induction, then induct over
-X"), and the two formula compilers along a definable quotient
+(`FixedPointStratify.lean`, for any “define X by induction, then induct over
+X”), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
@@ -251,6 +301,23 @@ X"), and the two formula compilers along a definable quotient
   closes it.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
+- **`PTIME ≠ EXPTIME` by diagonalization** [R, 5–10k lines, with a real chance of
+  being larger]: the sketch, for the record. Let `HORNEVAL` be “the SO-Horn
+  program encoded in this instance holds of the structure encoded in this
+  instance”. It is in EXPTIME (evaluating a Horn program of arity `a` on `n`
+  elements is `n^{O(a)}`, i.e., polynomial *on the expansion*);
+  `D A := ¬ HORNEVAL A A` is iso-invariant and in EXPTIME by
+  `EXPTIME = coEXPTIME`; if `D ∈ PTIME` it is SO-Horn definable by some `π₀`,
+  and `A := ⟨π₀⟩` contradicts. Steps 1 and 3 need **compiling the logic** – a
+  Gödel numbering of the syntax as finite structures, a definable satisfaction
+  predicate written as an SO-Horn program over the expansion with its
+  correctness theorem, and surjectivity of the encoding. Two notes for whoever
+  picks it up: that evaluator would *also* discharge the machine bridge's
+  simulator and the AC⁰ item of §3, so its cost is shared across three items;
+  and the same diagonal separates PSPACE from EXPSPACE verbatim (SO(TC) for
+  SO-Horn, `PSPACE = coPSPACE`), so one construction yields two separations.
+  Bibliography when built: `hartmanis1965computational` (Hartmanis, Stearns,
+  1965), for the classical time hierarchy this is the descriptive form of.
 
 ## 5. Inexpressibility toolkit (unconditional results)
 
@@ -265,7 +332,7 @@ non-reducibility, impossible in the machine world.
 - **0-1 laws (Glebskii et al., Fagin)** [L]: FO 0-1 law on random structures;
   Mathlib's probability is ample. Fun, self-contained, good student project.
 - **Order-necessity results** [R]: candidate research question the framework
-  makes precise: show some catalog reduction (e.g. SAT → 3COL) provably has no
+  makes precise: show some catalog reduction (e.g., SAT → 3COL) provably has no
   order-free FO counterpart, separating `≤ᶠᵒ` from `≤ᶠᵒ[≤]` on concrete
   problems.
 - Horizon: **PARITY not in AC⁰** ([Ajtai 1983][ajtai1983sigma11];
@@ -311,8 +378,8 @@ has a two-layer syntax: the Boolean layer is an ordinary SO formula evaluating
 to 1 or 0 (Mathlib's `BoundedFormula` untouched), the quantitative layer is
 built from `+`, `·` and the quantifiers `Σx`, `Πx`, `ΣX`, `ΠX` (`Σx` sums a
 subformula's value over domain elements, `ΣX` over all relations of the
-relevant arity). That is exactly "kernel as data rather than a shape carved out
-of `BoundedFormula`", the way SO-Horn is a `HornProgram` clause list and
+relevant arity). That is exactly “kernel as data rather than a shape carved out
+of `BoundedFormula`”, the way SO-Horn is a `HornProgram` clause list and
 FO(LFP) a rule system. Formulas transcribe the mathematics directly; the
 permanent of a 0-1 matrix is
 
@@ -373,7 +440,7 @@ The concrete items, in dependency order:
     the same `comp`/`compLEquiv` argument again, plus iso-invariance.
   - *Non-adaptive linear combinations* [L]:
     `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
-    i.e. polynomially many oracle calls at definable parameters, combined
+    i.e., polynomially many oracle calls at definable parameters, combined
     definably. It needs *parameterized* interpretations (thread `k` extra free
     variables through every defining formula and through `Map`), which is the
     level's main cost; the divisor on the left keeps Lagrange denominators out
@@ -382,7 +449,8 @@ The concrete items, in dependency order:
     interpolation-based `#P`-hardness proof. *Adaptive* Turing reductions,
     where a later query depends on an earlier answer, stay out: that is the
     honest boundary of a machine-free framework, and `FP^#P` lives beyond it.
-- **The coefficient budget** [S, but load-bearing]: coefficients must come from
+- **The coefficient budget** [S, but the notion is vacuous without it]:
+  coefficients must come from
   a class *strictly weaker* than the one being defined, exactly as the
   classical definition asks its post-processing to be polynomial-time.
   Otherwise the notion is vacuous: with arbitrary `#P` coefficients, take `Q`
@@ -444,10 +512,10 @@ The concrete items, in dependency order:
   delicate than parsimonious ones, which is also why PCP-based hardness of
   approximation stays out of scope.
 
-### Probabilistic query evaluation, and what "`#P`-hard" should mean
+### Probabilistic query evaluation, and what “`#P`-hard” should mean
 
 The intended consumer of this track is probability computation, where the
-field's own "`#P`-hard" is an abuse: computing a probability is a map into ℚ,
+field's own “`#P`-hard” is an abuse: computing a probability is a map into ℚ,
 so the honest classical statement is `FP^#P`-completeness under Turing
 reductions, which the ladder above deliberately does not reach. The abuse is an
 artifact of the *output type*, and it disappears by counting worlds instead:
@@ -470,17 +538,17 @@ unweighted setting at a `k`-fold blow-up, if ever needed.
 - **Membership** [S]: `ΣX̄. φ_Q(X̄)` is #FO, and for a UCQ it lands at the very
   bottom, `#Σ₁` / `ΣQSO(Σ₁)`. Worth noting that the FPRAS story of that level –
   approximable, not closed under sum – *is* the probabilistic-database
-  approximability story (Karp–Luby on the lineage DNF), so "structure inside
-  `#P`" above is not an unrelated research item but this application's own
+  approximability story (Karp–Luby on the lineage DNF), so “structure inside
+  `#P`” above is not an unrelated research item but this application's own
   fine print.
 - **Tier 1, an FO query with negation** [S]: put the assignment in a
   probabilistic unary relation, the clauses in deterministic ones, and let `Q`
-  say "this assignment satisfies the formula"; worlds satisfying `Q` are the
-  satisfying assignments, on the nose. The reduction from #SAT is a dimension-1
+  say “this assignment satisfies the formula”; worlds satisfying `Q` are the
+  satisfying assignments, exactly. The reduction from #SAT is a dimension-1
   interpretation re-reading a SAT instance as a PQE instance, parsimonious
   because the correspondence is a bijection. Nearly free once #SAT is complete
-  for ΣQSO(FO), and enough to state "probabilistic query evaluation is
-  `#P`-complete" with no abuse at all. It says nothing about the queries the
+  for ΣQSO(FO), and enough to state “probabilistic query evaluation is
+  `#P`-complete” with no abuse at all. It says nothing about the queries the
   field cares about.
 - **Tier 2, a UCQ** [L, gated on a literature check]: for
   `h₀ = ∃x∃y. R(x) ∧ S(x,y) ∧ T(y)` with `R`, `T` probabilistic, `#PQE(h₀)`
@@ -489,8 +557,8 @@ unweighted setting at a `k`-fold blow-up, if ever needed.
   Provan–Ball, which would have to be formalized. Tier 1's trick cannot help,
   because the query is monotone: fix one edge and let the other `|T| − 2`
   tuples vary, and the count is either 0 or `≥ 2^{|T|}/4`, so a parsimonious
-  reduction from a formula with three models would force `|T| ≤ 3`, i.e. a
-  logarithmic-size output instance, i.e. a reduction that counted by itself.
+  reduction from a formula with three models would force `|T| ≤ 3`, i.e., a
+  logarithmic-size output instance, i.e., a reduction that counted by itself.
   This holds for every monotone query, which is why the field's own statements
   here are Turing-flavored. **Check before committing**: whether the classical
   proof is one oracle call plus arithmetic (level 1) or genuinely interpolates
@@ -510,22 +578,22 @@ count of the query's lineage.
 
 ## 7. Machine bridges beyond NP and PTIME
 
-Design analysis for extending the machine bridge past the classes it reaches
-today – to EXPTIME and EXPSPACE, and to the string-encoding layer – with the
-class-defining logic assumed to exist (§3 work). The bridges already in the
-library are documented in the `Problems/Machine.lean` and
-`Problems/MachineAlt.lean` docstrings, which is where their shape should be
-read off before building another.
+Design analysis for the one direction the machine bridge does not reach – the
+string-encoding layer – and pricing rules for any machine problem added later.
+The bridges already in the library are documented in the `Problems/Machine.lean`
+and `Problems/MachineAlt.lean` docstrings, and the exponential ones in
+`Problems/Wide.lean`; that is where their shape should be read off before
+building another.
 
 **Standing scope limit.** Textbook `NP = NTIME(nᵏ)` over string encodings
-needs the converse compilation — that an FO interpretation or a `Σ₁` kernel is
+needs the converse compilation – that an FO interpretation or a `Σ₁` kernel is
 *evaluated* by a polynomial-time machine: a verified compiler with a step
 count, plus string encodings of structures [R]. Nothing in the bridge claims
 it; the residual gap – two classical facts taken by inspection: that FO
 reductions are AC⁰-computable, and that a definability witness is evaluated
 within its class's bound – is documented in the README. Instances carry their
 own transition table, so reduction-built machines have polynomially many
-states — standard for an acceptance problem; the constant-alphabet simulation
+states – standard for an acceptance problem; the constant-alphabet simulation
 is never needed.
 
 **And it is an interface obligation, not a soundness debt** – which is what
@@ -545,21 +613,14 @@ A further application of the same machinery, once step-counted machines can
 run over string encodings: bounding the *encoders and decoders* of the
 concrete-instance layer. The `Encoding`/`Decoding` bundles enforce that
 `relBool` and `dec` are computations, but not that they are cheap (a decoder
-may brute-force the answer; see the "what this does not buy" notes in
+may brute-force the answer; see the “what this does not buy” notes in
 `DescriptiveComplexity/Encoding.lean` and `DescriptiveComplexity/Decoding.lean`).
-With the bridge, "computed by a polynomial-time machine" becomes a statable
+With the bridge, “computed by a polynomial-time machine” becomes a statable
 side condition on both, closing the last gap in reading completeness theorems
 as statements about concrete data. [R], and only worthwhile after the
 compilation direction above exists.
 
-**Cost of a bridge, given the logic:**
-
-| class | logic | membership | hardness | total |
-|---|---|---|---|---|
-| EXPTIME | SO(LFP) | L | XL | ~4–7k |
-| EXPSPACE | SO(PFP) | M | XL (shared) | ~3–6k |
-
-Four rules price such a bridge:
+Four rules price a bridge, and with it any machine problem added later:
 
 1. **Membership is cheap when the logic is a reachability/fixpoint logic, dear
    when it quantifies.** For DTC/TC/LFP/SO(TC) the machine problem is the
@@ -569,9 +630,9 @@ Four rules price such a bridge:
    an `SOTCSpec`-style interface wants *sentences*, not formulas with
    parameters, and that gap is what a naive estimate misses.
 2. **Hardness is cheap when the class has a one-loop complete problem** (REACH
-   "guess a neighbour", HORN-SAT "propagate", SAT "guess then sweep").
+   “guess a neighbor”, HORN-SAT “propagate”, SAT “guess then sweep”).
    Otherwise the discharge must compile arbitrary formulas of the logic into a
-   machine — the **evaluator** (static quantifier nesting → nested loops), in
+   machine – the **evaluator** (static quantifier nesting → nested loops), in
    three variants of increasing cost: *state-registers* (loop counters as
    elements in the state), *tape-registers with logarithmic addresses* (honest
    fixed-control logspace), *tape-registers with exponential addresses*
@@ -587,14 +648,13 @@ Four rules price such a bridge:
    converse of every existence statement: that whatever the machine does during
    a round is the intended run of *some* assignment (the read-off), that it
    always has a move, that it terminates, and that its checking phase proves
-   the matrix rather than merely being able to. Budget the same asymmetry for
-   EXPTIME and EXPSPACE.
+   the matrix rather than merely being able to.
 4. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
    (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
-   `Relation.ReflTransGen`, strictly cheaper — and buys the converse half free,
-   since a deterministic machine's reachable configurations are linearly
-   ordered (`Problems/Machine/DetRun.lean`), so one run ending stuck and
-   non-accepting settles a no-instance with no second induction; exponential (EXPTIME) needs a
+   `Relation.ReflTransGen`, strictly cheaper – and buys the converse half free,
+   since a deterministic machine's reachable configurations are linearly ordered
+   (`Problems/Machine/DetRun.lean`), so one run ending stuck and non-accepting
+   settles a no-instance with no second induction; exponential (EXPTIME) needs a
    walk along the lexicographic order of subsets, whose successor is
    FO-definable by ripple-carry (`Numbers/Binary.lean`,
    `Problems/Knapsack/Chain.lean` supply most of it).
@@ -604,7 +664,7 @@ The concrete items:
 - **Capture vs. completeness, the choice forced by the evaluator.** A capture
   theorem is available at NP (fixed control, input heads, poly work tape) but
   is not worth taking: logic → machine there needs the evaluator *with* tape
-  addressing (lockstep address computation to test a guessed relation) —
+  addressing (lockstep address computation to test a guessed relation) –
   exactly the cost routing hardness through SAT/HORN-SAT avoids. So: capture
   where the evaluator is cheap and the model first-order (as at L/NL, where a
   `k`-head automaton walking the order mirrors FO(DTC) vs. FO(TC) and rules out
@@ -613,17 +673,10 @@ The concrete items:
   never compile the logic; pick a target whose programs already exist – a fixed
   algorithm named by the source problem, or a code model like
   `Nat.Partrec.Code` where Mathlib's `exists_code` hands over the program.
-- **The exponential classes are not blocked by the framework**: the machine
-  description stays polynomial (a reduction can write it) and only the run is
-  exponential, living in Lean just as `SigmaSODefinable` quantifies over
-  exponential-size assignment types; tape cells indexed by subsets of the
-  positions, budget `2 ^ |pos|`, a legitimate iso-invariant problem. The
-  expensive pair: the exponential-order walk (feasible) and the
-  exponential-address evaluator (the real cost).
 - **Limits that survive every variant**: the string-encoding layer (above);
-  oracle and `Δₖᵖ` classes — the bridge would make them definable, but by a machine,
+  oracle and `Δₖᵖ` classes – the bridge would make them definable, but by a machine,
   against the library's classes-are-logic principle (a decision, not a
-  drift); `#P` as "number of accepting runs" is easy to state but needs the
+  drift); `#P` as “number of accepting runs” is easy to state but needs the
   parsimonious-reduction notion the framework still lacks (§6, first item);
   the classes-are-logic principle points at `ΣQSO(FO)` for the definition
   either way, with the machine count as a bridge statement.
@@ -647,12 +700,12 @@ class.
   rule, beside the choice of number encoding
   (`DescriptiveComplexity/Numbers.lean`). The classical arc is a gadget `F` on
   single graphs with `G ≅ H ↔ F G ≅ F H`, and the forward half is *free* here
-  because an interpretation is functorial, i.e. commutes with isomorphisms
+  because an interpretation is functorial, i.e., commutes with isomorphisms
   (`relMap_equiv₁/₂`). An *ordered* reduction destroys that: order-invariance
   makes the yes/no answer order-independent, not the constructed structure
   independent up to isomorphism, so every gadget would owe a structure-level
-  argument. Order-free is available because `twoGraphs` carries its own "this
-  element is real" marks: run `F` relativized to `patV` and to `hostV` in
+  argument. Order-free is available because `twoGraphs` carries its own “this
+  element is real” marks: run `F` relativized to `patV` and to `hostV` in
   parallel inside one order-free interpretation, leaving junk unmarked. Side
   benefit – both sides are built by the same gadget out of the same universe,
   so they come out size-balanced and the padding step most textbook GI
@@ -669,17 +722,17 @@ class.
   set systems from graphs and the incidence construction is order-free; then
   colored-graph isomorphism (colored → plain is the content – the *directed*
   case needs no entry, `twoGraphs` carrying two arbitrary binary relations);
-  then
-  bipartite-graph isomorphism, the first entry with a real rigidity argument
-  (incidence graph, dimension 2, tags `{V, E}`, and the isomorphism must be
-  prevented from swapping the two sides); finite-automaton isomorphism as a
-  re-reading of `Machines.lean`. Excluded: line graphs (Whitney's theorem, with
-  its K₃/K₁,₃ exception) and Latin-square isotopy / Steiner-system isomorphism
-  (Miller's reductions are arithmetic-heavy and would fail the bitwise-
-  definability check the binary representation imposes). Companions that populate the degree without
-  completing it: Graph Automorphism and Group Isomorphism (multiplication
-  tables, one ternary relation), both below GI with the converse open – though
-  `GA ≤ᶠᵒ GI` is not free, the classical reduction being genuinely clever.
+  then bipartite-graph isomorphism, the first entry with a real rigidity
+  argument (incidence graph, dimension 2, tags `{V, E}`, and the isomorphism
+  must be prevented from swapping the two sides); finite-automaton isomorphism
+  as a re-reading of `Machines.lean`. Excluded: line graphs (Whitney's theorem,
+  with its K₃/K₁,₃ exception) and Latin-square isotopy / Steiner-system
+  isomorphism (Miller's reductions are arithmetic-heavy and would fail the
+  bitwise-definability check the binary representation imposes). Companions that
+  populate the degree without completing it: Graph Automorphism and Group
+  Isomorphism (multiplication tables, one ternary relation), both below GI with
+  the converse open – though `GA ≤ᶠᵒ GI` is not free, the classical reduction
+  being genuinely clever.
   **Caution for the docstrings**: classical GI-completeness is stated under
   polynomial-time reductions, so no result here may be cited, only re-proved;
   under `≤ᶠᵒ` the degree is finer, which makes each statement *stronger* than
@@ -691,8 +744,8 @@ class.
   primitive-positive interpretations – *is* a first-order interpretation
   restricted to the existential-conjunctive fragment, so `FOInterpretation` is
   already the right object and `IsQuantifierFree` shows how a fragment gets
-  tracked (§3, reduction-notion refinements). "`B'` pp-interprets `B` implies
-  `CSP(B) ≤ᶠᵒ CSP(B')`" is directly formalizable. What makes it worth doing is
+  tracked (§3, reduction-notion refinements). “`B'` pp-interprets `B` implies
+  `CSP(B) ≤ᶠᵒ CSP(B')`” is directly formalizable. What makes it worth doing is
   **Schaefer's dichotomy**, a finite case analysis over Boolean templates whose
   tractable cases are already in the catalog – 2SAT, HORN-SAT and dual-Horn,
   1-in-3-SAT, NAE-SAT – with affine the only one missing. Also the item in this
@@ -702,7 +755,7 @@ class.
   non-reducibility is provable, and Ehrenfeucht–Fraïssé games are exactly that.
   The two together give an *unconditional* degree structure at the FO level,
   where every machine-world degree statement is conjectural – a better framing
-  for §5 than "inexpressibility results" standing alone.
+  for §5 than “inexpressibility results” standing alone.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
@@ -717,7 +770,7 @@ provable rather than merely reasonable.
 1. **Locality (Hanf, Gaifman)** (§5) [L]: with the two games in place, the
    next substantial piece of the inexpressibility track, and the one that
    gives connectivity and acyclicity without bespoke strategies. The 0-1 laws
-   are its independent neighbour.
+   are its independent neighbor.
 2. **Populating the GI degree** (§9) [M each]: with `below` and Graph
    Isomorphism in place, the degree has one inhabitant and no companions.
    Hypergraph / set-system isomorphism first, and `gi_hard_of_isoReflecting`
@@ -741,7 +794,7 @@ provable rather than merely reasonable.
 - **The rest of the sharpening pass** (each [M], no prerequisites, no new
   surface): **quantifier-free / projection / dimension tracking through
   composition** (§3's reduction-notion refinements), which upgrades catalog
-  statements to the DC-faithful "complete under qfps", and **Spectra** (§4).
+  statements to the DC-faithful “complete under qfps”, and **Spectra** (§4).
   The lesson 3-DNF-TAUT taught about the first of these: a discharge that needs
   an *image* invariant the `≤ᶠᵒ` interface hides does not force a general
   invariant-tracking layer, because building the reduction from the complement
@@ -762,11 +815,11 @@ provable rather than merely reasonable.
   in the README stay an honest, documented gap, being about string encodings
   (§7), which no bridge inside this framework closes. What is worth doing
   next in that area is, on demand, class-hood (§3, not [R]).
-- Complete problems for the exponential classes, and with them the generic
-  succinctness theorem. The design work is done (§3, the outer composition):
-  the order on the expanded universe, the translation lemma and the gate
-  `PSPACE = NL.exp` are built, so what is left is either the quantifier-free
-  track for succinct problems or a natural problem whose membership is direct.
+- The succinct problems of §2 and EPR's hardness. Both are drawings out of the
+  wide machine, each about the size of the tilings that are built, and neither
+  inhabits a class that is empty: the three exponential classes have complete
+  problems already. `PTIME ≠ EXPTIME` (§4) is deferred harder still, being
+  research-level and sharing its evaluator with two other items.
 
 This weighting assumes the goal is research output and formalization firsts. If
 the near-term goal is the course companion of §8, the cookbook and catalog

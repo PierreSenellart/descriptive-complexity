@@ -19,9 +19,8 @@ This is the analogue, one level up, of
 `DescriptiveComplexity.FOInterpretation.ordExtend` and its `ordExtendLEquiv`,
 and it plays the same role: an interpretation whose formulas mention the order
 of the structure they read can only be composed with an expansion once that
-expansion *defines* its order. It is the missing prerequisite of the outer
-composition (`ROADMAP.md` §3), and the only piece of it that is about the order
-rather than about quantifiers.
+expansion *defines* its order. It is the prerequisite of the outer composition
+that is about the order rather than about quantifiers.
 
 The tag comparison is **static**, exactly as in
 `DescriptiveComplexity.lexLeF`: two points with different tags are ordered by
@@ -57,10 +56,10 @@ theorem realize_ordSentence (t₁ t₂ : X.Tag) (ρs : Fin 2 → X.B.Assignment 
         ((X.B.replicate 2).structure₁ (L := L.sum Language.order) (X.B.replicateAssign ρs))
         (X.ordSentence t₁ t₂) ↔
       (X.pointLinearOrder A).le (t₁, ρs 0) (t₂, ρs 1)) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := setLinearOrder (X.B.AtomIx A)
-  letI := (X.B.replicate 2).structure₁ (L := L.sum Language.order) (X.B.replicateAssign ρs)
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := setLinearOrder (X.B.AtomIx A)
+  let := (X.B.replicate 2).structure₁ (L := L.sum Language.order) (X.B.replicateAssign ρs)
   have hle : (X.pointLinearOrder A).le (t₁, ρs 0) (t₂, ρs 1) ↔
       t₁ < t₂ ∨ (t₁ = t₂ ∧
         (setLinearOrder (X.B.AtomIx A)).le (X.B.atomSet (ρs 0)) (X.B.atomSet (ρs 1))) :=
@@ -100,13 +99,8 @@ noncomputable def ordExtend : ExpExpansion L where
 variable (X)
 
 omit [Finite A] [Nonempty A] in
-/-- The extended expansion has the same universe as the original: same tags,
-same block, same domain sentence. -/
-theorem ordExtend_map_eq : (ordExtend (X := X)).Map A = X.Map A := rfl
-
-omit [Finite A] [Nonempty A] in
 /-- The expanded structure of the order extension, at the vocabulary written as
-a sum — equal to the extension's own by definition, but not syntactically, so
+a sum – equal to the extension's own by definition, but not syntactically, so
 instance search has to be handed it. -/
 @[instance_reducible]
 noncomputable def ordExtendStructure :

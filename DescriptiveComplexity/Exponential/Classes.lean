@@ -32,7 +32,7 @@ Its literature spelling is existential *third*-order logic ([Leivant
 2006][hella2006higher]), and this development deliberately builds no
 third-order syntax layer: the two fixpoint logics need none, since an expansion
 has already lowered the type of the objects a second-order fixpoint ranges
-over. A "Σ¹₁ over the expansion" definition would be no more informative than
+over. A “Σ¹₁ over the expansion” definition would be no more informative than
 `NP.exp`, since that is what `NP.exp` unfolds to. So NEXPTIME is *defined* as
 the succinct-instance form of NP, and this is an honest and narrow gap: the
 library does not prove `NEXPTIME = Σ²₁`, because it does not have the syntax to

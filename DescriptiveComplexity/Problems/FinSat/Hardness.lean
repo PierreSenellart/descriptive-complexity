@@ -1011,7 +1011,7 @@ theorem gval_prePt [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
       (∀ b : A, v (pvarPt B φ a₀ b) = ι b) → Gval I v (bodyPt B φ a₀)) (a : A) :
     ∀ v : (finsatInterp B φ).Map A → M,
       (∀ b : A, b < a → v (pvarPt B φ a₀ b) = ι b) → Gval I v (prePt B φ a₀ a) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   induction a using order_induction_down with
   | hmax z hz =>
@@ -1062,7 +1062,7 @@ theorem gval_rootG [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
       (∀ b : A, v (pvarPt B φ a₀ b) = ι b) → Gval I v (bodyPt B φ a₀))
     (v : (finsatInterp B φ).Map A → M) (g : (finsatInterp B φ).Map A) (hg : RootG g) :
     Gval I v g := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   obtain ⟨t, w, rfl⟩ := exists_ptOf B φ ha₀
     (((realize_rootFml B φ (fun i => ((![g] : Fin 1 → (finsatInterp B φ).Map A) i).1)
       (val₁ B φ g)).mp hg).1 0)
@@ -1089,7 +1089,7 @@ theorem gval_bodyPt [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀
     (hdiag : ∀ a b : A, a ≠ b → v (pvarPt B φ a₀ a) ≠ v (pvarPt B φ a₀ b))
     (hker : Gval I v (ndPt B φ a₀ (rootPos B φ) true)) :
     Gval I v (bodyPt B φ a₀) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   refine (Gval_isEval hwf I v _).mpr ?_
   simp only [gstep]
@@ -1777,7 +1777,7 @@ theorem gval_nd_falsum [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
     (E : SubEmb φ (BoundedFormula.falsum : ((newLang L).sum B.lang).BoundedFormula Empty n)) :
     ¬Gval I v (ndPt B φ a₀ ⟨n, E.emb (Tseitin.rootAt _)⟩ true) ∧
       Gval I v (ndPt B φ a₀ ⟨n, E.emb (Tseitin.rootAt _)⟩ false) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   set p : Pos B φ := ⟨n, E.emb (Tseitin.rootAt _)⟩ with hp
   have hk : kernelNode φ p.2 = .fls := E.node _
@@ -1819,7 +1819,7 @@ theorem gval_nd_impl [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a�
         Gval I v (ndPt B φ a₀ p₁ false) ∨ Gval I v (ndPt B φ a₀ p₂ true)) ∧
       (Gval I v (ndPt B φ a₀ p false) ↔
         Gval I v (ndPt B φ a₀ p₁ true) ∧ Gval I v (ndPt B φ a₀ p₂ false)) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   have hq : qLevel B φ p = none := by rw [qLevel, hk]
   have he : eqArgs B φ p = none := by rw [eqArgs, hk]
@@ -1877,7 +1877,7 @@ theorem gval_nd_quant [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a�
         ∀ d : M, Gval I (upd v (dbvarPt B φ a₀ l) d) (ndPt B φ a₀ p' true)) ∧
       (Gval I v (ndPt B φ a₀ p false) ↔
         ∃ d : M, Gval I (upd v (dbvarPt B φ a₀ l) d) (ndPt B φ a₀ p' false)) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   have hq : qLevel B φ p = some (l : ℕ) := by rw [qLevel, hk]
   have he : eqArgs B φ p = none := by rw [eqArgs, hk]
@@ -1916,7 +1916,7 @@ theorem gval_nd_eqLit [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a�
     (hk : kernelNode φ p.2 = .eqLit (some (l₁ : ℕ)) (some (l₂ : ℕ))) :
     (Gval I v (ndPt B φ a₀ p true) ↔ v (dbvarPt B φ a₀ l₁) = v (dbvarPt B φ a₀ l₂)) ∧
       (Gval I v (ndPt B φ a₀ p false) ↔ v (dbvarPt B φ a₀ l₁) ≠ v (dbvarPt B φ a₀ l₂)) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   have hq : qLevel B φ p = none := by rw [qLevel, hk]
   have he : eqArgs B φ p = some ((l₁ : ℕ), (l₂ : ℕ)) := by rw [eqArgs, hk]
@@ -1937,7 +1937,7 @@ theorem gval_nd_blockAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBo
         μ i (argTup B φ a₀ i (argAssign B φ v (ndPt B φ a₀ p true) junk))) ∧
       (Gval (blockI B φ a₀ μ) v (ndPt B φ a₀ p false) ↔
         ¬μ i (argTup B φ a₀ i (argAssign B φ v (ndPt B φ a₀ p false) junk))) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   exact ⟨(Gval_isEval hwf _ v _).trans
       (gstep_blockAtom_true B φ ha₀ μ (Gval (blockI B φ a₀ μ)) v p i junk hq he hs hcn),
@@ -2059,7 +2059,7 @@ theorem gval_atup_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
     Gval I v (atupPt B φ a₀ p true w) ↔
       ∀ j : Fin (finsatDim B φ), (j : ℕ) < inArity B φ p →
         Gval I v (alitPt B φ a₀ p true j (pad a₀ w j)) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   rw [Gval_isEval hwf I v _, gstep_atup_true B φ ha₀ I (Gval I) v p w hin]
   constructor
@@ -2078,7 +2078,7 @@ theorem gval_atup_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot 
     Gval I v (atupPt B φ a₀ p false w) ↔
       ∃ j : Fin (finsatDim B φ), (j : ℕ) < inArity B φ p ∧
         Gval I v (alitPt B φ a₀ p false j (pad a₀ w j)) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   rw [Gval_isEval hwf I v _, gstep_atup_false B φ ha₀ I (Gval I) v p w hin]
   constructor
@@ -2111,7 +2111,7 @@ theorem gval_nd_inAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
             (val₂ B φ (ptOf B φ a₀ (Tag.nd p false) fun _ => a₀)
               (ptOf B φ a₀ (Tag.atup p false) w)) →
             Gval I v (atupPt B φ a₀ p false w)) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   have hchild : ∀ (pol : Bool) (c : (finsatInterp B φ).Map A),
       ChildG (ndPt B φ a₀ p pol) c ↔
@@ -2151,7 +2151,7 @@ theorem gval_alit_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
     (l : Fin (Tseitin.maxCtx φ)) (hl : inArg B φ p (j : ℕ) = some (l : ℕ)) :
     Gval I v (alitPt B φ a₀ p true j a) ↔
       v (dbvarPt B φ a₀ l) = v (pvarPt B φ a₀ a) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   exact (Gval_isEval hwf I v _).trans (gstep_alit_true B φ ha₀ I (Gval I) v p j a l hl)
 
@@ -2161,7 +2161,7 @@ theorem gval_alit_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot 
     (l : Fin (Tseitin.maxCtx φ)) (hl : inArg B φ p (j : ℕ) = some (l : ℕ)) :
     Gval I v (alitPt B φ a₀ p false j a) ↔
       v (dbvarPt B φ a₀ l) ≠ v (pvarPt B φ a₀ a) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   have hwf := image_isWF B φ (A := A)
   exact (Gval_isEval hwf I v _).trans (gstep_alit_false B φ ha₀ I (Gval I) v p j a l hl)
 
@@ -2201,11 +2201,6 @@ theorem argTup_argAssign (ha₀ : IsBot a₀) (v : (finsatInterp B φ).Map A →
   exact argAssign_spec B φ v _ junk _ _
     ((argG_ptOf B φ ha₀ (Tag.nd p pol) (Tag.apos ⟨(j : ℕ), hlt⟩) (Tag.dbvar l)
       _ _ _).mpr hl)
-
-omit [L.Structure A] [LinearOrder A] in
-/-- The second point a binary defining formula of the image is read at. -/
-theorem val₂_one (x y : (finsatInterp B φ).Map A) (c : Fin (finsatDim B φ)) :
-    val₂ B φ x y (1, c) = y.2 c := rfl
 
 omit [L.Structure A] [LinearOrder A] in
 /-- **The de Bruijn levels of the arguments of a translated atom**, and the

@@ -178,9 +178,6 @@ omit [Language.qsat.Structure A] in
 theorem qAdd_self (D : A → Prop) (x : A) : qAdd D x x := Or.inl rfl
 
 omit [Language.qsat.Structure A] in
-theorem qAdd_of (D : A → Prop) {x y : A} (h : D y) : qAdd D x y := Or.inr h
-
-omit [Language.qsat.Structure A] in
 @[simp]
 theorem qUpd_self (τ : A → Prop) (x : A) (b : Bool) : qUpd τ x b x ↔ b = true := by
   refine ⟨fun h => ?_, fun h => Or.inl ⟨rfl, h⟩⟩
@@ -414,7 +411,7 @@ variable {A : Type} [Language.qsat.Structure A]
 
 variable (A) in
 /-- **The yes-instances of QSAT**: a well-formed instance whose quantified
-formula is true, i.e. whose initial position – nothing quantified yet, the
+formula is true, i.e., whose initial position – nothing quantified yet, the
 empty valuation – is won by the existential player. -/
 def QsatHolds : Prop :=
   QsatWf A ∧ QsatWins (fun _ : A => False) (fun _ : A => False)

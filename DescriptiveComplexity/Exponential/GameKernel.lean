@@ -19,12 +19,12 @@ This file closes the gap once and for all, for the two-argument case that covers
 every relation symbol of `DescriptiveComplexity.Language.andOrGraph` (a unary
 symbol simply ignores the second argument):
 
-> **`DescriptiveComplexity.ExpExpansion.exists_paramKernel`** — for every
+> **`DescriptiveComplexity.ExpExpansion.exists_paramKernel`** – for every
 > `φ : (X.E + ≤).Formula (Fin 2 × Fin d)` there is a round count `D` such that,
 > at *any* layout with at least `2 * d` parameter rounds and exactly `D` play
 > rounds, a kernel `K` exists whose alternating value over the play rounds is
 > `φ`, its argument `(a, b)` read at the round
-> `DescriptiveComplexity.ExpExpansion.paramIx a b` — that is, at round
+> `DescriptiveComplexity.ExpExpansion.paramIx a b` – that is, at round
 > `a * d + b`, so that the first argument occupies the rounds below `d` and the
 > second the rounds below `2 * d`.
 
@@ -91,8 +91,8 @@ theorem realize_argsFreed {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 
       φ.Realize (M := X.Map A) fun p => xs ⟨(p.1 : ℕ) * d + (p.2 : ℕ), by
         have ha : (p.1 : ℕ) * d ≤ 1 * d := Nat.mul_le_mul_right d (Nat.lt_succ_iff.mp p.1.isLt)
         omega⟩) := by
-  letI := X.mapLinearOrder A
-  haveI := X.mapNonempty A
+  let := X.mapLinearOrder A
+  have := X.mapNonempty A
   rw [argsFreed, BoundedFormula.realize_toPrenex, BoundedFormula.realize_relabel]
   refine iff_of_eq (congrArg₂ _ (funext fun p => ?_) (Subsingleton.elim _ _))
   rfl
@@ -100,8 +100,8 @@ theorem realize_argsFreed {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 
 /-! ### The kernel -/
 
 /-- **A defining formula, played as an alternating prefix.** The round count `D`
-depends on the formula alone; the layout — how many parameter rounds sit below
-the play rounds — is free, so that finitely many formulas can share one block by
+depends on the formula alone; the layout – how many parameter rounds sit below
+the play rounds – is free, so that finitely many formulas can share one block by
 padding the short ones. -/
 theorem exists_paramKernel (X : ExpExpansion L) {d : ℕ}
     (φ : (X.E.sum Language.order).Formula (Fin 2 × Fin d)) :
@@ -124,7 +124,7 @@ theorem exists_paramKernel (X : ExpExpansion L) {d : ℕ}
   obtain ⟨K, hK⟩ := hD n c D _hcn rfl
     (fun i => ⟨(i : ℕ), by omega⟩) (fun i => by exact i.isLt.trans_le (by omega))
   refine ⟨K, fun A _ _ _ _ pts ext hfix hemb => ?_⟩
-  letI := X.mapLinearOrder A
+  let := X.mapLinearOrder A
   refine (hK A pts ext hfix hemb).trans ?_
   refine (realize_argsFreed φ fun i => pts ⟨(i : ℕ), by omega⟩).trans ?_
   exact Iff.rfl

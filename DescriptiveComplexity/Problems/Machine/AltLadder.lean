@@ -45,12 +45,6 @@ def bareQ (pol : Bool) {α : Type} (C P : α → Prop) : Prop :=
   | true => ∃ a, C a ∧ P a
   | false => ∀ a, C a → P a
 
-theorem bareQ_true {α : Type} (C P : α → Prop) :
-    bareQ true C P ↔ ∃ a, C a ∧ P a := Iff.rfl
-
-theorem bareQ_false {α : Type} (C P : α → Prop) :
-    bareQ false C P ↔ ∀ a, C a → P a := Iff.rfl
-
 /-- Unguarded quantification only depends on its two predicates up to pointwise
 equivalence. -/
 theorem bareQ_congr (pol : Bool) {α : Type} {C C' P P' : α → Prop}

@@ -87,10 +87,10 @@ theorem mergeStep_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Stru
         (@sumStructure L B.lang A instL (B.structure ρ)) (M.structure μ))
       (@sumStructure L (SOBlock.cons B M).lang A instL
         ((SOBlock.cons B M).structure (consAssign ρ μ))) := by
-  letI := instL
-  letI := B.structure ρ
-  letI := M.structure μ
-  letI := (SOBlock.cons B M).structure (consAssign ρ μ)
+  let := instL
+  let := B.structure ρ
+  let := M.structure μ
+  let := (SOBlock.cons B M).structure (consAssign ρ μ)
   refine ⟨?_, ?_⟩
   · intro n f x
     rcases f with f | f
@@ -166,8 +166,8 @@ theorem sorealize_iff_altAssign :
   induction Bs with
   | nil =>
     intro L A instL φ pol
-    letI := instL
-    letI := SOBlock.trivial.structure (nilAssign A)
+    let := instL
+    let := SOBlock.trivial.structure (nilAssign A)
     exact ((LHom.sumInl : L →ᴸ L.sum SOBlock.trivial.lang).realize_onSentence A φ).symm
   | cons B Bs ih =>
     intro L A instL φ pol
@@ -182,12 +182,12 @@ theorem sorealize_iff_altAssign :
               ((mergeBlocks (B :: Bs)).structure (consAssign ρ μ)))
             ((mergeHom (B :: Bs) L).onSentence φ) := by
       intro ρ μ
-      letI := instL
-      letI := B.structure ρ
-      letI := (mergeBlocks Bs).structure μ
-      letI := (SOBlock.cons B (mergeBlocks Bs)).structure (consAssign ρ μ)
+      let := instL
+      let := B.structure ρ
+      let := (mergeBlocks Bs).structure μ
+      let := (SOBlock.cons B (mergeBlocks Bs)).structure (consAssign ρ μ)
       rw [mergeHom_cons]
-      haveI := mergeStep_isExpansionOn L instL B (mergeBlocks Bs) ρ μ
+      have := mergeStep_isExpansionOn L instL B (mergeBlocks Bs) ρ μ
       exact ((mergeStep L B (mergeBlocks Bs)).realize_onSentence A _).symm
     cases pol with
     | true =>
@@ -426,10 +426,10 @@ theorem unmergeStep_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.St
         ((SOBlock.cons B M).structure (consAssign ρ μ)))
       (@sumStructure (L.sum B.lang) M.lang A
         (@sumStructure L B.lang A instL (B.structure ρ)) (M.structure μ)) := by
-  letI := instL
-  letI := B.structure ρ
-  letI := M.structure μ
-  letI := (SOBlock.cons B M).structure (consAssign ρ μ)
+  let := instL
+  let := B.structure ρ
+  let := M.structure μ
+  let := (SOBlock.cons B M).structure (consAssign ρ μ)
   refine ⟨?_, ?_⟩
   · intro n f x
     rcases f with f | f
@@ -457,8 +457,8 @@ theorem unmergeNil_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Str
     (μ : SOBlock.trivial.Assignment A) :
     @LHom.IsExpansionOn _ _ (unmergeNil L) A
       (@sumStructure L SOBlock.trivial.lang A instL (SOBlock.trivial.structure μ)) instL := by
-  letI := instL
-  letI := SOBlock.trivial.structure μ
+  let := instL
+  let := SOBlock.trivial.structure μ
   refine ⟨?_, ?_⟩
   · intro n f x
     rcases f with f | f
@@ -499,9 +499,9 @@ theorem sorealize_unmerge :
   induction Bs with
   | nil =>
     intro L A instL ψ pol
-    letI := instL
-    letI := SOBlock.trivial.structure (nilAssign A)
-    haveI := unmergeNil_isExpansionOn L instL (nilAssign A)
+    let := instL
+    let := SOBlock.trivial.structure (nilAssign A)
+    have := unmergeNil_isExpansionOn L instL (nilAssign A)
     exact (unmergeNil L).realize_onSentence A ψ
   | cons B Bs ih =>
     intro L A instL ψ pol
@@ -516,11 +516,11 @@ theorem sorealize_unmerge :
               ((mergeBlocks (B :: Bs)).structure (consAssign ρ μ)))
             ψ := by
       intro ρ μ
-      letI := instL
-      letI := B.structure ρ
-      letI := (mergeBlocks Bs).structure μ
-      letI := (SOBlock.cons B (mergeBlocks Bs)).structure (consAssign ρ μ)
-      haveI := unmergeStep_isExpansionOn L instL B (mergeBlocks Bs) ρ μ
+      let := instL
+      let := B.structure ρ
+      let := (mergeBlocks Bs).structure μ
+      let := (SOBlock.cons B (mergeBlocks Bs)).structure (consAssign ρ μ)
+      have := unmergeStep_isExpansionOn L instL B (mergeBlocks Bs) ρ μ
       exact (unmergeStep L B (mergeBlocks Bs)).realize_onSentence A ψ
     have hcons : ∀ ρ : B.Assignment A,
         @SORealize (L.sum B.lang) A (@sumStructure L B.lang A instL (B.structure ρ)) Bs

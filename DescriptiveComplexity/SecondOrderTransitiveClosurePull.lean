@@ -134,8 +134,8 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 theorem SOTCSpec.comap_isSrc_iff (ρ : spec.B.Assignment (I.Map A)) :
     letI := I.mapLinearOrder A
     spec.IsSrc ρ ↔ (spec.comap I).IsSrc (spec.B.pullAssign ρ) := by
-  letI := I.mapLinearOrder A
-  letI := (spec.B.pull Tag d).structure₁ (L := L.sum Language.order) (spec.B.pullAssign ρ)
+  let := I.mapLinearOrder A
+  let := (spec.B.pull Tag d).structure₁ (L := L.sum Language.order) (spec.B.pullAssign ρ)
   exact Iff.symm (((I.ordExtendSO spec.B).realize_pullSentence spec.src A).trans
     ((realize_sentence_of_equiv (I.ordExtend.extendSOEquiv spec.B A ρ) spec.src).trans
       (realize_sentence_of_equiv (spec.B.extendEquiv (I.ordExtendLEquiv A) ρ) spec.src)))
@@ -144,8 +144,8 @@ theorem SOTCSpec.comap_isSrc_iff (ρ : spec.B.Assignment (I.Map A)) :
 theorem SOTCSpec.comap_isTgt_iff (ρ : spec.B.Assignment (I.Map A)) :
     letI := I.mapLinearOrder A
     spec.IsTgt ρ ↔ (spec.comap I).IsTgt (spec.B.pullAssign ρ) := by
-  letI := I.mapLinearOrder A
-  letI := (spec.B.pull Tag d).structure₁ (L := L.sum Language.order) (spec.B.pullAssign ρ)
+  let := I.mapLinearOrder A
+  let := (spec.B.pull Tag d).structure₁ (L := L.sum Language.order) (spec.B.pullAssign ρ)
   exact Iff.symm (((I.ordExtendSO spec.B).realize_pullSentence spec.tgt A).trans
     ((realize_sentence_of_equiv (I.ordExtend.extendSOEquiv spec.B A ρ) spec.tgt).trans
       (realize_sentence_of_equiv (spec.B.extendEquiv (I.ordExtendLEquiv A) ρ) spec.tgt)))
@@ -155,9 +155,9 @@ structure is a step of the pullback on the base structure. -/
 theorem SOTCSpec.comap_step_iff (ρ σ : spec.B.Assignment (I.Map A)) :
     letI := I.mapLinearOrder A
     spec.Step ρ σ ↔ (spec.comap I).Step (spec.B.pullAssign ρ) (spec.B.pullAssign σ) := by
-  letI := I.mapLinearOrder A
-  letI := (spec.B.pull Tag d).structure₁ (L := L.sum Language.order) (spec.B.pullAssign ρ)
-  letI := (spec.B.pull Tag d).structure₂ (L := L.sum Language.order) (spec.B.pullAssign ρ)
+  let := I.mapLinearOrder A
+  let := (spec.B.pull Tag d).structure₁ (L := L.sum Language.order) (spec.B.pullAssign ρ)
+  let := (spec.B.pull Tag d).structure₂ (L := L.sum Language.order) (spec.B.pullAssign ρ)
     (spec.B.pullAssign σ)
   exact Iff.symm ((((I.ordExtendSO spec.B).extendSO spec.B).realize_pullSentence
       spec.step A).trans
@@ -173,7 +173,7 @@ specification accepts the interpreted one. -/
 theorem SOTCSpec.comap_accepts_iff :
     letI := I.mapLinearOrder A
     spec.Accepts (I.Map A) ↔ (spec.comap I).Accepts A := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   exact SOTCSpec.accepts_congr (spec.B.pullAssignEquiv Tag d A) (spec.comap_step_iff I)
     (spec.comap_isSrc_iff I) (spec.comap_isTgt_iff I)
 
@@ -192,14 +192,14 @@ structure, its states the assignments of the pulled block. -/
 theorem SOTCDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : SOTCDefinable Q) :
     SOTCDefinable P := by
   obtain ⟨spec, hspec⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   refine ⟨spec.comap f.toInterpretation, ?_⟩
   intro A _ _ _ _
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   exact (f.correct A).trans ((hspec (f.toInterpretation.Map A)).trans
     (spec.comap_accepts_iff f.toInterpretation))
 

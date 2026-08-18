@@ -14,9 +14,9 @@ The catalog's weighted problems – Knapsack and everything reduced from it –
 live on `FirstOrder.Language.binWeights` structures, whose numbers are *sets
 of bit positions* read by `DescriptiveComplexity.binNum`. A user does not
 start there: they start from a list of weights and a target. This file is the
-bridge, and it is where the size discipline of `DescriptiveComplexity.Encoding`
-earns its keep, since for these problems the representation is part of the
-statement – in unary they are solvable in polynomial time.
+bridge, and it is what the size discipline of `DescriptiveComplexity.Encoding`
+is for, since for these problems the representation is part of the statement –
+in unary they are solvable in polynomial time.
 
 * `DescriptiveComplexity.binarySubsetSumEncoding` is the honest binary encoding
   of `DescriptiveComplexity.SubsetSumInstance = List ℕ × ℕ`: one element per
@@ -242,7 +242,7 @@ theorem bitRank_posnPt (p : Fin (ssSize i + 1)) :
     ext q
     rcases pt_cases q with ⟨j, rfl⟩ | ⟨p', rfl⟩
     · simp
-    · simp only [Set.mem_setOf_eq, posn_posnPt, le_posnPt_posnPt, true_and, ne_eq,
+    · simp only [Set.mem_ofPred_eq, posn_posnPt, le_posnPt_posnPt, true_and, ne_eq,
         posnPt_inj, Set.mem_image, Finset.coe_Iio, Set.mem_Iio]
       constructor
       · rintro ⟨hle, hne⟩
@@ -349,7 +349,7 @@ theorem selection_toIndex (hf : Function.Injective f)
   refine ⟨Finset.univ.filter fun j => S (f j), ?_, ?_⟩
   · have hset : {a : A | S a} = f '' ↑(Finset.univ.filter fun j => S (f j)) := by
       ext a
-      simp only [Set.mem_setOf_eq, Set.mem_image, Finset.coe_filter, Finset.mem_univ, true_and]
+      simp only [Set.mem_ofPred_eq, Set.mem_image, Finset.coe_filter, Finset.mem_univ, true_and]
       constructor
       · intro ha
         obtain ⟨j, rfl⟩ := (hrange a).mp (hS a ha)
@@ -377,7 +377,7 @@ theorem selection_ofIndex (hf : Function.Injective f) (hitem : ∀ j, BWItem (f 
     exact hitem j
   · have hset : {a : A | ∃ j ∈ J, a = f j} = f '' ↑J := by
       ext a
-      simp only [Set.mem_setOf_eq, Set.mem_image, Finset.mem_coe]
+      simp only [Set.mem_ofPred_eq, Set.mem_image, Finset.mem_coe]
       exact ⟨fun ⟨j, hj, h⟩ => ⟨j, hj, h.symm⟩, fun ⟨j, hj, h⟩ => ⟨j, hj, h.symm⟩⟩
     rw [hset, finsum_mem_image hf.injOn, finsum_mem_coe_finset]
   · constructor

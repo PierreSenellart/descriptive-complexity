@@ -24,7 +24,7 @@ two theorems that are *not* free here:
 
 * **`NL ⊆ PTIME`** has no syntactic route: a Krom kernel is not a Horn kernel
   (Horn clauses may be wide, Krom clauses may have two positive literals), so
-  the inclusion is not an instance of "restrict the kernel further". It goes
+  the inclusion is not an instance of “restrict the kernel further”. It goes
   through the complete problem instead, and is proved downstream with 2SAT
   (`DescriptiveComplexity.NL_subset_PTIME`, with `DescriptiveComplexity.NL_subset_NP` in its
   wake): 2SAT is in PTIME by a Horn program that guesses reachability in the

@@ -54,7 +54,7 @@ open Language Structure
 
 /-- A second-order quantifier block: finitely many relation variables, with
 given arities. (The index type is arbitrary rather than an initial segment of
-`ℕ`, so that constructions on blocks – e.g. pulling a block back through an
+`ℕ`, so that constructions on blocks – e.g., pulling a block back through an
 interpretation – can build their natural index types directly.) -/
 structure SOBlock : Type 1 where
   /-- The index type of the relation variables of the block. -/
@@ -83,7 +83,7 @@ noncomputable def blockArityBound (B : SOBlock) : ℕ :=
 
 theorem arity_le_blockArityBound (B : SOBlock) (i : B.ι) :
     B.arity i ≤ blockArityBound B := by
-  letI := Fintype.ofFinite B.ι
+  let := Fintype.ofFinite B.ι
   exact Finset.le_sup (Finset.mem_univ i)
 
 /-- An assignment of actual relations (on a universe `A`) to the relation

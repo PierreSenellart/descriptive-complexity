@@ -184,16 +184,6 @@ noncomputable def tupN (w : Fin (dimOf V) → A) : ℕ :=
   tupleIdx (k + 1) (List.ofFn fun j => (e.symm (w j) : ℕ))
 
 omit [L.Structure A] [Finite A] [Nonempty A] in
-theorem tupN_lt (w : Fin (dimOf V) → A) : tupN k e w < (k + 1) ^ dimOf V := by
-  have h := tupleIdx_lt (c := k + 1)
-    (l := List.ofFn fun j => (e.symm (w j) : ℕ)) (by
-      intro a ha
-      obtain ⟨j, rfl⟩ := List.mem_ofFn.mp ha
-      exact (e.symm (w j)).isLt)
-  rw [tupN]
-  simpa using h
-
-omit [L.Structure A] [Finite A] [Nonempty A] in
 /-- **Reversed lexicographic comparison is comparison of the numbers.** -/
 theorem tupN_lt_of_revLexLt {u w : Fin (dimOf V) → A} (h : RevLexLt u w) :
     tupN k e u < tupN k e w := by
@@ -981,7 +971,7 @@ theorem holds_haltMap_iff {P : DecisionProblem L}
     (hP : ∀ N n : ℕ, (cP.eval [N, n]).Dom ↔ P.toPred V (structOfBits V (n - 1) N)) :
     HALT ((haltTuringInterp V cF cP).Map A) ↔ P A := by
   classical
-  haveI : Finite ((haltTuringInterp V cF cP).Map A) :=
+  have : Finite ((haltTuringInterp V cF cP).Map A) :=
     FOInterpretation.map_finite _ _
   rw [halt_holds_iff]
   rw [and_iff_right wellFormed_halt]

@@ -139,8 +139,8 @@ private theorem exOrd_iso {A B : Type} [L.Structure A] [L.Structure B] (e : A �
       letI := lo
       Q (I.Map B) := by
   obtain ⟨lo, hQ⟩ := h
-  letI := lo
-  letI := transportOrder e lo
+  let := lo
+  let := transportOrder e lo
   exact ⟨transportOrder e lo,
     (Q.iso_invariant (I.mapLEquiv (orderedEquivOfTransport e lo))).mp hQ⟩
 
@@ -163,12 +163,12 @@ def DecisionProblem.comapAllOrd [L.IsRelational] : DecisionProblem L where
   iso_invariant e := by
     constructor
     · intro h lo
-      letI := lo
-      letI := transportOrder e.symm lo
+      let := lo
+      let := transportOrder e.symm lo
       exact (Q.iso_invariant (I.mapLEquiv (orderedEquivOfTransport e.symm lo))).mpr (h _)
     · intro h lo
-      letI := lo
-      letI := transportOrder e lo
+      let := lo
+      let := transportOrder e lo
       exact (Q.iso_invariant (I.mapLEquiv (orderedEquivOfTransport e lo))).mpr (h _)
 
 end OrderedComap
@@ -200,14 +200,14 @@ pulled back along the interpretation. -/
 theorem DPDefinable.of_foReduction [L'.IsRelational] {P : DecisionProblem L}
     {Q : DecisionProblem L'} (f : P ≤ᶠᵒ Q) (h : DPDefinable Q) : DPDefinable P := by
   obtain ⟨S, T, hS, hT, hST⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine ⟨S.comap f.toInterpretation, T.comap f.toInterpretation,
     hS.of_foReduction (f.toInterpretation.comapReduction S),
     hT.of_foReduction (f.toInterpretation.comapReduction T), ?_⟩
   intro A _ _ _
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   exact (f.correct A).trans (hST _)
 
 /-- DP definability is closed under *ordered* first-order reductions. This is
@@ -217,8 +217,8 @@ conjunction is again the pullback. -/
 theorem DPDefinable.of_orderedReduction [L'.IsRelational] {P : DecisionProblem L}
     {Q : DecisionProblem L'} (f : P ≤ᶠᵒ[≤] Q) (h : DPDefinable Q) : DPDefinable P := by
   obtain ⟨S, T, hS, hT, hST⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine ⟨DecisionProblem.comapExOrd f.toInterpretation S,
     DecisionProblem.comapAllOrd f.toInterpretation T, ?_, ?_, ?_⟩
   · obtain ⟨Bs, hk, φ, hφ⟩ := hS
@@ -227,9 +227,9 @@ theorem DPDefinable.of_orderedReduction [L'.IsRelational] {P : DecisionProblem L
       (pullSO Bs (L.sum Language.order) L' f.toInterpretation φ) ?_
     intro A _ _ _
     refine exists_congr fun lo => ?_
-    letI := lo
-    haveI := f.toInterpretation.map_finite A
-    haveI := f.toInterpretation.map_nonempty A
+    let := lo
+    have := f.toInterpretation.map_finite A
+    have := f.toInterpretation.map_nonempty A
     exact (hφ (f.toInterpretation.Map A)).trans
       (sorealize_pullSO f.toInterpretation A Bs φ true)
   · obtain ⟨Bs, hk, φ, hφ⟩ := hT
@@ -238,27 +238,27 @@ theorem DPDefinable.of_orderedReduction [L'.IsRelational] {P : DecisionProblem L
       (pullSO Bs (L.sum Language.order) L' f.toInterpretation φ) ?_
     intro A _ _ _
     refine forall_congr' fun lo => ?_
-    letI := lo
-    haveI := f.toInterpretation.map_finite A
-    haveI := f.toInterpretation.map_nonempty A
+    let := lo
+    have := f.toInterpretation.map_finite A
+    have := f.toInterpretation.map_nonempty A
     exact (hφ (f.toInterpretation.Map A)).trans
       (sorealize_pullSO f.toInterpretation A Bs φ false)
   · intro A _ _ _
     constructor
     · intro hP
       refine ⟨⟨finiteLinearOrder A, ?_⟩, fun lo => ?_⟩
-      · letI := finiteLinearOrder A
-        haveI := f.toInterpretation.map_finite A
-        haveI := f.toInterpretation.map_nonempty A
+      · let := finiteLinearOrder A
+        have := f.toInterpretation.map_finite A
+        have := f.toInterpretation.map_nonempty A
         exact ((hST _).mp ((f.correct A).mp hP)).1
-      · letI := lo
-        haveI := f.toInterpretation.map_finite A
-        haveI := f.toInterpretation.map_nonempty A
+      · let := lo
+        have := f.toInterpretation.map_finite A
+        have := f.toInterpretation.map_nonempty A
         exact ((hST _).mp ((f.correct A).mp hP)).2
     · rintro ⟨⟨lo, hS'⟩, hT'⟩
-      letI := lo
-      haveI := f.toInterpretation.map_finite A
-      haveI := f.toInterpretation.map_nonempty A
+      let := lo
+      have := f.toInterpretation.map_finite A
+      have := f.toInterpretation.map_nonempty A
       exact (f.correct A).mpr ((hST _).mpr ⟨hS', hT' lo⟩)
 
 /-! ### DP inside the second level
@@ -301,12 +301,12 @@ theorem DPDefinable.sigmaSODefinable_two (h : DPDefinable P) : SigmaSODefinable 
   constructor
   · rintro ⟨hs, ht⟩
     obtain ⟨ρ₁, hρ₁⟩ := (hφ A).mp hs
-    letI := B₁.structure ρ₁
+    let := B₁.structure ρ₁
     refine ⟨ρ₁, (sorealize_inf_embed [B₂] (L.sum B₁.lang) A _ φ _ false).mpr ⟨hρ₁, ?_⟩⟩
     exact (sorealize_soLangLift [B₂] L (L.sum B₁.lang) LHom.sumInl A instA _
       (LHom.sumInl_isExpansionOn A) ψ false).mpr ((hψ A).mp ht)
   · rintro ⟨ρ₁, hρ₁⟩
-    letI := B₁.structure ρ₁
+    let := B₁.structure ρ₁
     obtain ⟨hf, hg⟩ := (sorealize_inf_embed [B₂] (L.sum B₁.lang) A _ φ _ false).mp hρ₁
     refine ⟨(hφ A).mpr ⟨ρ₁, hf⟩, (hψ A).mpr ?_⟩
     exact (sorealize_soLangLift [B₂] L (L.sum B₁.lang) LHom.sumInl A instA _
@@ -328,13 +328,13 @@ theorem DPDefinable.piSODefinable_two (h : DPDefinable P) : PiSODefinable 2 P :=
   refine (hST A).trans ?_
   constructor
   · rintro ⟨hs, ht⟩ ρ₂
-    letI := B₂.structure ρ₂
+    let := B₂.structure ρ₂
     refine (sorealize_inf_embed [B₁] (L.sum B₂.lang) A _ ψ _ true).mpr ⟨(hψ A).mp ht ρ₂, ?_⟩
     exact (sorealize_soLangLift [B₁] L (L.sum B₂.lang) LHom.sumInl A instA _
       (LHom.sumInl_isExpansionOn A) φ true).mpr ((hφ A).mp hs)
   · intro hall
     have hs : S A := by
-      letI := B₂.structure (fun _ _ => True : B₂.Assignment A)
+      let := B₂.structure (fun _ _ => True : B₂.Assignment A)
       obtain ⟨-, hg⟩ := (sorealize_inf_embed [B₁] (L.sum B₂.lang) A _ ψ _ true).mp
         (hall (fun _ _ => True))
       exact (hφ A).mpr ((sorealize_soLangLift [B₁] L (L.sum B₂.lang) LHom.sumInl A instA _

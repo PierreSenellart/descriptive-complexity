@@ -10,10 +10,10 @@ import DescriptiveComplexity.Problems.HornSat
 /-!
 # The unit-propagation machine of a Horn formula
 
-The program half of `HORNSAT ≤ᶠᵒ[≤] DTMAccept`, stage 4 of the machine bridge:
-the states, symbols and transitions of the deterministic machine computing the
-unit-propagation closure of a CNF instance and verifying it, on the tape laid
-out in `DescriptiveComplexity.Problems.Machine.HornTape`.
+The program half of `HORNSAT ≤ᶠᵒ[≤] DTMAccept`, the deterministic machine
+bridge: the states, symbols and transitions of the deterministic machine
+computing the unit-propagation closure of a CNF instance and verifying it, on
+the tape laid out in `DescriptiveComplexity.Problems.Machine.HornTape`.
 
 ## The program
 
@@ -37,11 +37,11 @@ satisfiability itself (`DescriptiveComplexity.satisfiable_iff_forced_model`).
 The machine is **deterministic everywhere** – there is no guess phase – and
 `DescriptiveComplexity.TMData.Deterministic` for the constructed machine is part of
 the statement, not bookkeeping: it is what makes the image a potential
-yes-instance of `DTMAccept` at all. The instance is read exactly as in stage 3
-(`DescriptiveComplexity.SatCl`, `DescriptiveComplexity.SatPos`, …, imported from
-`DescriptiveComplexity.Problems.Machine.Hardness` together with the clause-order
-machinery), and the only two additions are the element order (rounds walk it)
-and the Horn gate on the accept transition.
+yes-instance of `DTMAccept` at all. The instance is read exactly as by the SAT
+machine (`DescriptiveComplexity.SatCl`, `DescriptiveComplexity.SatPos`, …,
+imported from `DescriptiveComplexity.Problems.Machine.Hardness` together with
+the clause-order machinery), and the only two additions are the element order
+(rounds walk it) and the Horn gate on the accept transition.
 -/
 
 namespace DescriptiveComplexity
@@ -278,12 +278,12 @@ theorem hornMachine_wellFormed : (hornMachine A).WellFormed :=
 
 /-! ### The machine is deterministic
 
-There is no guess phase, so – unlike stage 3 – the whole table is functional:
-the state and the symbol read pin the transition's tag up to promise-exclusive
-alternatives, the tag pins the payload, and the branching destinations and
-writes are separated by their first-order tests. This discharges the
-`DescriptiveComplexity.TMData.Deterministic` promise of the constructed instance,
-which is part of the correctness of the reduction. -/
+There is no guess phase, so – unlike the SAT machine – the whole table is
+functional: the state and the symbol read pin the transition's tag up to
+promise-exclusive alternatives, the tag pins the payload, and the branching
+destinations and writes are separated by their first-order tests. This
+discharges the `DescriptiveComplexity.TMData.Deterministic` promise of the
+constructed instance, which is part of the correctness of the reduction. -/
 
 section Deterministic
 
@@ -417,11 +417,6 @@ omit [Finite A] [Nonempty A] in
 /-- The lowest clause is unique. -/
 theorem satMinCl_unique {c c' : A} (h : SatMinCl c) (h' : SatMinCl c') : c = c' :=
   le_antisymm (h.2 c' h'.1) (h'.2 c h.1)
-
-omit [Finite A] [Nonempty A] in
-/-- The highest clause is unique. -/
-theorem satMaxCl_unique {c c' : A} (h : SatMaxCl c) (h' : SatMaxCl c') : c = c' :=
-  le_antisymm (h'.2 c h.1) (h.2 c' h'.1)
 
 omit [Finite A] [Nonempty A] in
 /-- The next clause is unique. -/
@@ -743,9 +738,9 @@ end Deterministic
 
 /-! ### The positions of the tape, concretely
 
-The dimension-3 mirror of stage 3's marker and cell lemmas: the left marker is
-the lowest position, cells follow in the order of their elements, the right
-marker closes the chain, and ranks are what the budget compares. -/
+The dimension-3 mirror of the SAT machine's marker and cell lemmas: the left
+marker is the lowest position, cells follow in the order of their elements, the
+right marker closes the chain, and ranks are what the budget compares. -/
 
 section Order
 
@@ -823,10 +818,6 @@ theorem posHCell_le_posHEnd (x : A) : tagTupleLe (posHCell x : HV A) posHEnd :=
   hTagTupleLe_of_tag_lt (show UPTag.pCell < UPTag.pEnd by decide)
 
 omit [Language.sat.Structure A] in
-theorem posHStart_le_posHEnd : tagTupleLe (posHStart : HV A) posHEnd :=
-  hTagTupleLe_of_tag_lt (show UPTag.pStart < UPTag.pEnd by decide)
-
-omit [Language.sat.Structure A] in
 /-- **Cells are ordered as their elements are.** -/
 theorem posHCell_le_iff {x y : A} : tagTupleLe (posHCell x : HV A) (posHCell y) ↔ x ≤ y := by
   constructor
@@ -873,24 +864,6 @@ theorem succPos_posHStart_posHCell :
       have hcell := eq_posHCell_of_posn hr h
       have hle : r.2 0 ≤ botA := posHCell_le_iff.mp (hcell ▸ h2)
       rw [hcell, le_antisymm hle (botA_le _)]
-
-omit [Language.sat.Structure A] in
-/-- The head moves from cell to cell along the instance. -/
-theorem succPos_posHCell_posHCell {x x' : A} (hsucc : SuccElt x x') :
-    SuccPos tagTupleLe HPosn (posHCell x : HV A) (posHCell x') := by
-  refine ⟨hPosn_posHCell _, hPosn_posHCell _, posHCell_le_iff.mpr hsucc.1.le, ?_, ?_⟩
-  · intro h
-    exact absurd (by simpa [oneH] using congrFun (congrArg Prod.snd h) 0 : x = x')
-      (ne_of_lt hsucc.1)
-  · intro r hr h1 h2
-    have ht : r.1 = UPTag.pCell :=
-      le_antisymm (hTagTupleLe_tag_le h2) (hTagTupleLe_tag_le h1)
-    have hcell := eq_posHCell_of_posn hr ht
-    have hx : x ≤ r.2 0 := posHCell_le_iff.mp (hcell ▸ h1)
-    have hx' : r.2 0 ≤ x' := posHCell_le_iff.mp (hcell ▸ h2)
-    rcases eq_or_lt_of_le hx with heq | hlt
-    · exact Or.inl (by rw [hcell, ← heq])
-    · exact Or.inr (by rw [hcell, le_antisymm hx' (hsucc.2 _ hlt)])
 
 omit [Language.sat.Structure A] in
 /-- The head's last move of a sweep: `⊣` follows the last cell. -/
@@ -944,13 +917,6 @@ noncomputable def hTape (M : A → Bool) : HV A → HV A := fun r =>
   | _ => symHBlank
 
 omit [Language.sat.Structure A] in
-/-- The markers hold their symbols on every marked tape. -/
-theorem hTape_posHStart (M : A → Bool) : hTape M (posHStart : HV A) = symHStart := rfl
-
-omit [Language.sat.Structure A] in
-theorem hTape_posHEnd (M : A → Bool) : hTape M (posHEnd : HV A) = symHEnd := rfl
-
-omit [Language.sat.Structure A] in
 /-- A real cell reads its element's mark. -/
 theorem hTape_posHCell (M : A → Bool) (y : A) :
     hTape M (posHCell y : HV A) = symCell (M y) y := by
@@ -986,12 +952,6 @@ noncomputable def markTape (M : A → Bool) (c : A) (p : HV A) : HV A → HV A :
       else symCell false (r.2 0)
   | _ => symHBlank
 
-theorem markTape_posHStart (M : A → Bool) (c : A) (p : HV A) :
-    markTape M c p (posHStart : HV A) = symHStart := rfl
-
-theorem markTape_posHEnd (M : A → Bool) (c : A) (p : HV A) :
-    markTape M c p (posHEnd : HV A) = symHEnd := rfl
-
 /-! ### The intended run: configurations -/
 
 open Classical in
@@ -1016,7 +976,7 @@ noncomputable def confHMark (M : A → Bool) (m : Bool) (r c : A) (p : HV A) :
 
 open Classical in
 /-- The flag of a verification sweep, leftwards, with the head at `p`: some
-cell strictly above the head satisfies `c` under the marks – stage 3's
+cell strictly above the head satisfies `c` under the marks – the SAT machine's
 `DescriptiveComplexity.chkFlagL` with the marks as valuation. -/
 noncomputable def verFlagL (M : A → Bool) (c : A) (p : HV A) : Bool :=
   decide (∃ y : A, tagTupleLe p (posHCell y) ∧ p ≠ posHCell y ∧ MLit c y (M y))
@@ -1251,7 +1211,7 @@ theorem markTape_posHStart_eq (M : A → Bool) (c : A) (r : HV A) :
     · rw [if_neg hcond, if_neg hcond]
 
 /-- **The return sweep only ever changes the cell under the head**, exactly as
-stage 3's guess sweep: moving the head down brings its own cell into the
+the SAT machine's guess sweep: moving the head down brings its own cell into the
 processed region and nothing else. -/
 theorem markTape_frame' (M : A → Bool) (c : A) {p q r : HV A}
     (hsucc : SuccPos tagTupleLe HPosn q p) (hrne : r ≠ p) :
@@ -1574,7 +1534,7 @@ theorem bitRank_posHEnd_le :
       rw [eq_posHCell_of_posn hr (hcell r hr hle hne hs),
         eq_posHCell_of_posn hr' (hcell r' hr' hle' hne' hs'), h0]
   · rw [Set.ncard_univ]
-    haveI := Fintype.ofFinite A
+    have := Fintype.ofFinite A
     simp [Nat.card_eq_fintype_card]
 
 omit [Language.sat.Structure A] in
@@ -1754,7 +1714,7 @@ theorem RoundFold.forcedIn_subset {c₀ : A} (hmin : SatMinCl c₀) {r : A}
     have hcard : {e : A | r ≤ e}.ncard = 1 := by
       have hset : {e : A | r ≤ e} = {r} := by
         ext e
-        simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+        simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
         exact ⟨fun hle => le_antisymm (hmax e) hle, fun he => he ▸ le_refl r⟩
       rw [hset, Set.ncard_singleton]
     rw [hcard] at hx
@@ -1765,7 +1725,7 @@ theorem RoundFold.forcedIn_subset {c₀ : A} (hmin : SatMinCl c₀) {r : A}
     have hcard : {e : A | r ≤ e}.ncard = {e : A | r' ≤ e}.ncard + 1 := by
       have hset : {e : A | r ≤ e} = insert r {e : A | r' ≤ e} := by
         ext e
-        simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+        simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
         constructor
         · intro hle
           rcases eq_or_lt_of_le hle with heq | hlt
@@ -1804,7 +1764,7 @@ theorem ncard_ge_succElt {r r' : A} (hsucc : SuccElt r r') :
     {e : A | r ≤ e}.ncard = {e : A | r' ≤ e}.ncard + 1 := by
   have hset : {e : A | r ≤ e} = insert r {e : A | r' ≤ e} := by
     ext e
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     constructor
     · intro hle
       rcases eq_or_lt_of_le hle with heq | hlt
@@ -1948,7 +1908,8 @@ theorem steps_hVerClauseAccL (M : A → Bool) {c : A} (hc : SatCl c)
 
 /-- **The verification phase accepts**: every remaining clause is satisfied by
 the marks, so the sweeps run through and the machine accepts after the last
-one – stage 3's clause induction, verbatim, with the marks as valuation. -/
+one – the SAT machine's clause induction, verbatim, with the marks as
+valuation. -/
 theorem hVer_accepts (M : A → Bool) (hhorn : AtMostOnePositive A)
     (hsat : ∀ e : A, SatCl e → ∃ y : A, MLit e y (M y)) :
     ∀ c : A, SatCl c →
@@ -1999,7 +1960,7 @@ theorem roundFold_marks_eq_forced {c₀ : A} (hmin : SatMinCl c₀) {M' : A → 
     have hcard : {e : A | botA (A := A) ≤ e}.ncard = Nat.card A := by
       have hset : {e : A | botA (A := A) ≤ e} = Set.univ := by
         ext e
-        simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
         exact botA_le e
       rw [hset, Set.ncard_univ]
     refine h.forcedIn_subset hmin 0 (fun y hy => hy.elim) x ?_
@@ -2075,10 +2036,10 @@ theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable
 
 /-! ### The machine accepts only Horn-satisfiable instances
 
-Determinism replaces stage 3's run-analysis induction: the run from the unique
-initial configuration *is* the intended trajectory, so it suffices that on a
-non-Horn-satisfiable instance the trajectory never carries an accepting state
-– either because no accept transition exists at all (the Horn gate), or
+Determinism replaces the SAT machine's run-analysis induction: the run from the
+unique initial configuration *is* the intended trajectory, so it suffices that
+on a non-Horn-satisfiable instance the trajectory never carries an accepting
+state – either because no accept transition exists at all (the Horn gate), or
 because the trajectory gets stuck at the first failing verification sweep. -/
 
 /-- No transition applies in an accepting state: once accepted, the machine

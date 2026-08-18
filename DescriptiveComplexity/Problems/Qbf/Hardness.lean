@@ -74,7 +74,7 @@ noncomputable def gateBlock : SOBlock where
 /-- The Tseitin interpretation with block marks: the CNF instance of the
 encoding of `ψ`, with each propositional variable marked by the quantifier
 block it belongs to. The signs of the literals are swapped when `sw` is
-`true`, i.e. when the innermost quantifier of the prefix is universal. -/
+`true`, i.e., when the innermost quantifier of the prefix is universal. -/
 noncomputable def qbfTseitinInterp :
     FOInterpretation (L.sum Language.order) (Language.qbf k) (TseitinTag M ψ)
       (tseitinDim M ψ) where

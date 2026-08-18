@@ -12,14 +12,14 @@ The first of the two correctness halves of the graph game: from a phase
 `pre s tx ty j pol`, the game plays exactly `j` more rounds, alternating from
 `pol`, and is then decided by the kernel of the question `s`
 (`DescriptiveComplexity.ExpExpansion.wins_pre`). The proof is a plain induction
-on `j` against `DescriptiveComplexity.altBlockQuant`'s own recursion — which is
+on `j` against `DescriptiveComplexity.altBlockQuant`'s own recursion – which is
 what carrying the polarity in the phase buys.
 
 Two things make the base and the step line up.
 
 * **A leaf is existential and moveless.** `movesFrom` returns `[]` at `j = 0`
   and `Ph.IsUniv` is false there, so the position wins exactly when it wins
-  outright, i.e. exactly when the kernel holds. A question the player cannot
+  outright, i.e., exactly when the kernel holds. A question the player cannot
   prove therefore *loses*, which is the whole point of asking it as a move.
 * **Filling a round is changing one round.** The move out of `pre … (j+1) …`
   freezes every round but `n - (j + 1)`, and

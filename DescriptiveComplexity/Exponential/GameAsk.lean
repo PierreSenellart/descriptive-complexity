@@ -160,7 +160,7 @@ theorem altWin_ask (h₀ : IsBot a₀) (q : GameQuestion)
     (hφ : @Sentence.Realize _ A (B.structure₂ (cond r σ ρ) (cond (!r) σ ρ)) φ)
     (h : CtrlCfg a₀ hdim prog.vars ρ σ (MachPh.prePh q r jj par) vv c) :
     (𝕄).AltWin true c := by
-  letI : Nonempty A := ⟨a₀⟩
+  let : Nonempty A := ⟨a₀⟩
   refine altWin_pre h₀ prog.vars_le
     (fun par' vv' c' hP h' => altWin_matrix h₀ q hP h') (prog.vars q) 0
     (le_of_eq (Nat.sub_zero _)) (Nat.zero_le _) par jj hjj vv c ?_ h

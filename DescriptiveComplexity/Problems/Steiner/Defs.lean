@@ -32,7 +32,7 @@ Connectivity (`DescriptiveComplexity.ConnectedOn`) is stated with
 chosen set, so it is the usual undirected notion and is not first-order. As
 for acyclicity in `DescriptiveComplexity.Problems.Feedback`, what saves the
 membership proof is a certificate: a root of the chosen set together with a
-strict partial order in which every other chosen vertex has a chosen neighbour
+strict partial order in which every other chosen vertex has a chosen neighbor
 strictly below it (`DescriptiveComplexity.connectedOn_iff_exists_root_order`). Walking
 down that order reaches the root, and the root joins any two vertices.
 
@@ -176,7 +176,7 @@ private theorem rdist_step {R : A → A → Prop} {r x : A} (hx : Relation.ReflT
 
 /-- **Connectivity is first-order certifiable**: a set is connected exactly
 when, from any of its members chosen as root, some strict partial order makes
-every other member have a neighbour strictly below it. Walking down the order
+every other member have a neighbor strictly below it. Walking down the order
 reaches the root, and the root joins any two members. -/
 theorem connectedOn_iff_exists_root_order [Finite A] (Adjp : A → A → Prop) (S : A → Prop) :
     ConnectedOn Adjp S ↔ ∀ r, S r → ∃ Lt : A → A → Prop,
@@ -190,8 +190,8 @@ theorem connectedOn_iff_exists_root_order [Finite A] (Adjp : A → A → Prop) (
     exact ⟨z, link_symm hzx, hlt⟩
   · intro h x y hx hy
     obtain ⟨Lt, htrans, hirr, hstep⟩ := h x hx
-    haveI : IsTrans A Lt := ⟨htrans⟩
-    haveI : Std.Irrefl Lt := ⟨hirr⟩
+    have : IsTrans A Lt := ⟨htrans⟩
+    have : Std.Irrefl Lt := ⟨hirr⟩
     have hwf : WellFounded Lt := Finite.wellFounded_of_trans_of_irrefl Lt
     have hreach : ∀ z, S z → Relation.ReflTransGen (Link Adjp S) z x := by
       intro z
@@ -224,8 +224,8 @@ theorem connectedOn_iff_exists_root [Finite A] (Adjp : A → A → Prop) (S : A 
         fun _ _ => False, fun _ _ _ h => h.elim, fun _ h => h,
         fun x hx _ => absurd ⟨x, hx⟩ hempty⟩
   · rintro ⟨Rt, hRtS, huniq, Lt, htrans, hirr, hstep⟩
-    haveI : IsTrans A Lt := ⟨htrans⟩
-    haveI : Std.Irrefl Lt := ⟨hirr⟩
+    have : IsTrans A Lt := ⟨htrans⟩
+    have : Std.Irrefl Lt := ⟨hirr⟩
     have hwf : WellFounded Lt := Finite.wellFounded_of_trans_of_irrefl Lt
     have hroot : ∀ z, S z → ∃ r, Rt r ∧ Relation.ReflTransGen (Link Adjp S) z r := by
       intro z

@@ -123,29 +123,6 @@ theorem StepsInU.trans_step : ∀ {n : ℕ} {c d e : ConfigU A},
     rintro c d e ⟨m, hstep, hrest⟩ hde
     exact ⟨m, hstep, ih hrest hde⟩
 
-/-- **A run decomposed at its far end**: `n + 1` steps are `n` steps and then
-one. `DescriptiveComplexity.TMData.StepsInU` recurses at the near end, while an
-induction along the time order needs this reading. -/
-theorem stepsInU_succ_iff : ∀ {n : ℕ} {c e : ConfigU A},
-    M.StepsInU (n + 1) c e ↔ ∃ d, M.StepsInU n c d ∧ M.StepU d e := by
-  intro n
-  induction n with
-  | zero =>
-    intro c e
-    constructor
-    · rintro ⟨d, hstep, hde⟩
-      exact ⟨c, rfl, (show d = e from hde) ▸ hstep⟩
-    · rintro ⟨d, hcd, hstep⟩
-      exact ⟨e, (show c = d from hcd) ▸ hstep, rfl⟩
-  | succ n ih =>
-    intro c e
-    constructor
-    · rintro ⟨d, hstep, hrest⟩
-      obtain ⟨d', h1, h2⟩ := ih.mp hrest
-      exact ⟨d', ⟨d, hstep, h1⟩, h2⟩
-    · rintro ⟨d', ⟨d, hstep, h1⟩, h2⟩
-      exact ⟨d, hstep, ih.mpr ⟨d', h1, h2⟩⟩
-
 /-- Runs compose; the step counts add. -/
 theorem StepsInU.trans : ∀ {n m : ℕ} {c d e : ConfigU A},
     M.StepsInU n c d → M.StepsInU m d e → M.StepsInU (n + m) c e := by

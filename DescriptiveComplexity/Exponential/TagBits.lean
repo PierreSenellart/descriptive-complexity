@@ -8,8 +8,9 @@ import DescriptiveComplexity.Exponential.OrdExtend
 /-!
 # Guessing a point of an expanded universe
 
-The translation lemma of `ROADMAP.md` §3 — *an FO sentence over an expansion is
-a second-order sentence over the base* — peels one quantifier at a time into one
+The translation lemma (`DescriptiveComplexity.ExpExpansion.exists_translate`) –
+*an FO sentence over an expansion is a second-order sentence over the base* –
+peels one quantifier at a time into one
 second-order block. What that block has to hold is a **point** of the expanded
 universe: a tag together with an assignment of the expansion's block.
 
@@ -20,9 +21,9 @@ formula-construction time (`relSentence` is indexed by a tuple of tags,
 tag at *evaluation* time, so the tag has to become part of the guessed object.
 
 The encoding: extend the block by **one arity-0 relation variable per tag**
-(`DescriptiveComplexity.SOBlock.withTag`). An arity-0 variable is a bit — the
+(`DescriptiveComplexity.SOBlock.withTag`). An arity-0 variable is a bit – the
 same observation `DescriptiveComplexity.PSpace`'s docstring makes about finite
-control in an SO(TC) walk — so a tag is a bit vector, and
+control in an SO(TC) walk – so a tag is a bit vector, and
 `DescriptiveComplexity.SOBlock.tagGuardF` is the sentence saying exactly one bit
 is set. Its correctness
 (`DescriptiveComplexity.SOBlock.realize_tagGuardF`) says the guard holds of an
@@ -47,7 +48,7 @@ noncomputable def finEnum (T : Type) [Finite T] : List T :=
 
 open Classical in
 theorem mem_finEnum {T : Type} [Finite T] (t : T) : t ∈ finEnum T := by
-  letI : Fintype T := Fintype.ofFinite T
+  let : Fintype T := Fintype.ofFinite T
   exact Finset.mem_toList.mpr (Finset.mem_univ t)
 
 namespace SOBlock
@@ -62,7 +63,7 @@ together with a bit vector naming a tag.
 
 An `abbrev` deliberately: with a semireducible `def` in between, instance
 search cannot see that the arity of a tag variable is `0`, and `Fin 0 → A`
-stops being recognised as a subsingleton. -/
+stops being recognized as a subsingleton. -/
 abbrev withTag : SOBlock where
   ι := T ⊕ B.ι
   arity := Sum.elim (fun _ => 0) B.arity
@@ -113,14 +114,14 @@ variable [L.Structure A]
 theorem realize_tagBitF (σ : (B.withTag T).Assignment A) (t : T) :
     (@Formula.Realize _ A ((B.withTag T).structure₁ (L := L) σ) _ (tagBitF B T t) default ↔
       σ (Sum.inl t) default) := by
-  letI := (B.withTag T).structure₁ (L := L) σ
+  let := (B.withTag T).structure₁ (L := L) σ
   exact iff_of_eq (congrArg (σ (Sum.inl t)) (Subsingleton.elim _ _))
 
 /-- **The guard says the assignment is a tagged one.** -/
 theorem realize_tagGuardF (σ : (B.withTag T).Assignment A) :
     (@Sentence.Realize _ A ((B.withTag T).structure₁ (L := L) σ) (tagGuardF B T) ↔
       ∃ (t : T) (ρ : B.Assignment A), σ = tagAssign t ρ) := by
-  letI := (B.withTag T).structure₁ (L := L) σ
+  let := (B.withTag T).structure₁ (L := L) σ
   rw [tagGuardF, Sentence.Realize, realize_listSup]
   constructor
   · rintro ⟨ψ, hψ, hr⟩

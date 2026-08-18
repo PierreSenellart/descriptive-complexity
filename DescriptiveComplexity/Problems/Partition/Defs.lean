@@ -78,7 +78,7 @@ private theorem hasEqualSplit_of_iso (e : A ≃[Language.binWeights] B)
     exact (hitem _).mp (hSi _ hb)
   · rw [← htransport S, hsum, htransport fun a => BWItem a ∧ ¬S a]
     refine finsum_mem_congr (Set.ext fun b => ?_) fun _ _ => rfl
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     exact and_congr_left fun _ => key b
 
 /-- Being a yes-instance of Partition is isomorphism-invariant. -/

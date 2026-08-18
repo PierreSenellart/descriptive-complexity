@@ -13,10 +13,10 @@ points its variables hold: that a relation of the expanded vocabulary holds of
 them, that two of them are equal, or that one is below another. This file writes
 each of those as a sentence of the quantifier prefix, and proves it right.
 
-All three follow one pattern. The corresponding sentence of the expansion —
+All three follow one pattern. The corresponding sentence of the expansion –
 `DescriptiveComplexity.ExpExpansion.relSentence`,
 `DescriptiveComplexity.SOBlock.eqAssignF`,
-`DescriptiveComplexity.ExpExpansion.ordSentence` — is indexed by a **static**
+`DescriptiveComplexity.ExpExpansion.ordSentence` – is indexed by a **static**
 tuple of tags, because everywhere else in this development a tag is chosen at
 formula-construction time. Here the tags are *guessed*, so the sentence appears
 once per tuple of tags, guarded by the tag bits of the rounds involved
@@ -96,7 +96,7 @@ noncomputable def pointEqF (i₀ i₁ : Fin m) :
 omit [Finite A] in
 theorem realize_pointEqF (pts : Fin m → X.Map A) (i₀ i₁ : Fin m) :
     (@Sentence.Realize _ A (prefixStructure pts) (pointEqF X m i₀ i₁) ↔ pts i₀ = pts i₁) := by
-  letI := prefixStructure pts
+  let := prefixStructure pts
   rw [pointEqF, Sentence.Realize, Formula.realize_inf, realize_listInf]
   have hassign :
       (@Sentence.Realize _ A (prefixStructure pts)
@@ -136,7 +136,7 @@ theorem realize_pointRelF (pts : Fin m → X.Map A) {k : ℕ} (r : X.E.Relations
     (idx : Fin k → Fin m) :
     (@Sentence.Realize _ A (prefixStructure pts) (pointRelF X m r idx) ↔
       RelMap r fun j => pts (idx j)) := by
-  letI := prefixStructure pts
+  let := prefixStructure pts
   have hbody : ∀ τ : Fin k → X.Tag,
       (@Sentence.Realize _ A (prefixStructure pts)
           ((roundLHom idx X).onSentence (X.relSentence r τ)) ↔
@@ -177,7 +177,7 @@ noncomputable def pointLeF (i₀ i₁ : Fin m) :
 theorem realize_pointLeF (pts : Fin m → X.Map A) (i₀ i₁ : Fin m) :
     (@Sentence.Realize _ A (prefixStructure pts) (pointLeF X m i₀ i₁) ↔
       (X.mapLinearOrder A).le (pts i₀) (pts i₁)) := by
-  letI := prefixStructure pts
+  let := prefixStructure pts
   have hbody : ∀ t₁ t₂ : X.Tag,
       (@Sentence.Realize _ A (prefixStructure pts)
           ((roundLHom ![i₀, i₁] X).onSentence (X.ordSentence t₁ t₂)) ↔

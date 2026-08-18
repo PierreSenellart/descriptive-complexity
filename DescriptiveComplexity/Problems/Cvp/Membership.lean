@@ -16,7 +16,7 @@ least fixed point (`DescriptiveComplexity.GateVal`), so the rule system
 of the inductive definition, and the output sentence is the one first-order
 statement the Horn fragment could not make head-on: “some output gate is in the
 true rail”. A Horn program accepts when its least model satisfies its *goal*
-clauses, i.e. when something is **not** derived, so the same definition in the
+clauses, i.e., when something is **not** derived, so the same definition in the
 fragment would have to be written on the false rail and would need the circuit
 to be well-formed for the two rails to be complementary. Reading the value at
 an unrestricted first-order output formula avoids the detour, and
@@ -149,12 +149,6 @@ theorem realize_wireF (r : cvLang.Relations 2) (i j : Fin nvars)
     (wireF r i j).Realize v ↔ RelMap r ![v i, v j] := by
   rw [wireF, Formula.realize_rel₂]
   rfl
-
-omit [Language.circuit.Structure A] [LinearOrder A] in
-/-- The rail atoms hold exactly of the value at the variable they name. -/
-theorem rail_holds {b : Bool} {i : Fin nvars} (ρ : valBlock.Assignment A)
-    (v : Fin nvars → A) : (rail b i).Holds ρ v ↔ ρ b (fun _ => v i) :=
-  Iff.rfl
 
 /-- The assignment cut out by the inductive semantics: a gate is in the rail
 `b` when it derives the value `b`. -/
@@ -310,7 +304,7 @@ theorem realize_cvpOut :
     (@Sentence.Realize (cvLang.sum valBlock.lang) A
         (@sumStructure _ _ A _ (valBlock.structure (lfpAssign (A := A) cvpRules))) cvpOut) ↔
       CircuitAccepts A := by
-  letI := valBlock.structure (lfpAssign (A := A) cvpRules)
+  let := valBlock.structure (lfpAssign (A := A) cvpRules)
   rw [cvpOut]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_guardOutF, realize_atomF, Formula.realize_rel₁]

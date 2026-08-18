@@ -72,16 +72,6 @@ def edgeIncidenceInterp :
         Term.equal (Term.var (0, 0)) (Term.var (0, 1)) ⊓
           mgMarked.formula₁ (Term.var (0, 0))
 
-/-- The edge-incidence interpretation is quantifier-free. -/
-theorem edgeIncidenceInterp_isQuantifierFree : edgeIncidenceInterp.IsQuantifierFree := by
-  intro n R t
-  cases R with
-  | elem => exact (IsAtomic.rel _ _).isQF.inf ((IsAtomic.equal _ _).isQF.imp isQF_bot)
-  | fam => exact (IsAtomic.equal _ _).isQF
-  | mem =>
-    exact (IsAtomic.equal _ _).isQF.inf ((IsAtomic.equal _ _).isQF.sup (IsAtomic.equal _ _).isQF)
-  | marked => exact (IsAtomic.equal _ _).isQF.inf (IsAtomic.rel _ _).isQF
-
 section EdgeIncidenceCharacterizations
 
 variable {A : Type} [Language.markedGraph.Structure A]
@@ -203,7 +193,7 @@ theorem hasSmallVertexCover_iff_setCover_map :
     HasSmallVertexCover A ↔ HasSmallSetCover (edgeIncidenceInterp.Map A) := by
   constructor
   · rintro ⟨hfin, C, hcov, hcard⟩
-    haveI := hfin
+    have := hfin
     refine ⟨edgeIncidenceInterp.map_finite A, vertexFamily C, ?_, ?_, ?_⟩
     · rintro s ⟨v, -, rfl⟩
       exact (edgeIncidence_fam ![v, v]).mpr (by simp)
@@ -216,9 +206,9 @@ theorem hasSmallVertexCover_iff_setCover_map :
           (edgeIncidence_mem w ![w 1, w 1]).mpr ⟨by simp, Or.inr (by simp)⟩⟩
     · exact (ncard_vertexFamily C).trans_le (hcard.trans (ncard_marked A).ge)
   · rintro ⟨hfin, G, hGfam, hcov, hcard⟩
-    haveI := hfin
+    have := hfin
     have hA : Finite A := Finite.of_injective _ (diagPt_injective (A := A))
-    haveI := hA
+    have := hA
     have hdiag : ∀ p : edgeIncidenceInterp.Map A, G p → ∃ v, p = diagPt v := by
       rintro ⟨⟨⟩, w⟩ hw
       exact ⟨w 0, (eq_diagPt_iff () w (w 0)).mpr
@@ -256,7 +246,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 
 /-- Two distinct vertices have intersecting sets of incident edges exactly
 when they are adjacent (in either direction). This is the whole content of
-the reduction; note that only *ground elements*, i.e. genuine edges, count as
+the reduction; note that only *ground elements*, i.e., genuine edges, count as
 witnesses of an intersection. -/
 theorem exists_elem_mem_both_iff {u v : A} (huv : u ≠ v) :
     (∃ x : edgeIncidenceInterp.Map A, SSElem x ∧ SSMem x (diagPt u) ∧ SSMem x (diagPt v)) ↔
@@ -290,7 +280,7 @@ theorem hasLargeIndependentSet_iff_setPacking_map (A : Type)
     HasLargeIndependentSet A ↔ HasLargeSetPacking (edgeIncidenceInterp.Map A) := by
   constructor
   · rintro ⟨hfin, S, hS, hcard⟩
-    haveI := hfin
+    have := hfin
     refine ⟨edgeIncidenceInterp.map_finite A, vertexFamily S, ?_, ?_, ?_⟩
     · rintro s ⟨v, -, rfl⟩
       exact (edgeIncidence_fam ![v, v]).mpr (by simp)
@@ -301,9 +291,9 @@ theorem hasLargeIndependentSet_iff_setPacking_map (A : Type)
       · exact hS v u hv hu huv.symm h
     · exact ((ncard_marked A).trans_le hcard).trans (ncard_vertexFamily S).ge
   · rintro ⟨hfin, G, hGfam, hdisj, hcard⟩
-    haveI := hfin
+    have := hfin
     have hA : Finite A := Finite.of_injective _ (diagPt_injective (A := A))
-    haveI := hA
+    have := hA
     have hdiag : ∀ p : edgeIncidenceInterp.Map A, G p → ∃ v, p = diagPt v := by
       rintro ⟨⟨⟩, w⟩ hw
       exact ⟨w 0, (eq_diagPt_iff () w (w 0)).mpr

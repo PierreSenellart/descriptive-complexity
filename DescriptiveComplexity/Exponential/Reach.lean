@@ -66,7 +66,7 @@ def toExp : ExpExpansion L where
   dom_nonempty := by
     intro A _ _ _ _
     refine ⟨(), spec.B.botAssign A, ?_⟩
-    letI := spec.B.structure₁ (L := L.sum Language.order) (spec.B.botAssign A)
+    let := spec.B.structure₁ (L := L.sum Language.order) (spec.B.botAssign A)
     exact Formula.realize_top.mpr trivial
 
 variable (A : Type) [L.Structure A] [LinearOrder A]
@@ -81,7 +81,7 @@ def toExpStructure : Language.stGraph.Structure (spec.toExp.Map A) :=
 /-- The domain of `DescriptiveComplexity.SOTCSpec.toExp` is the whole space of
 tagged assignments: its domain sentence is `⊤`. -/
 theorem domHolds_toExp (p : spec.toExp.Point A) : ExpExpansion.DomHolds p := by
-  letI := spec.toExp.B.structure₁ (L := L.sum Language.order) p.2
+  let := spec.toExp.B.structure₁ (L := L.sum Language.order) p.2
   exact Formula.realize_top.mpr trivial
 
 /-- **The points of the expansion are the states of the walk.** -/
@@ -121,7 +121,7 @@ theorem sgTarget_toExp (x : spec.toExp.Map A) :
 private theorem reach_of_reflTransGen :
     letI := spec.toExpStructure A
     ∀ {s t : spec.toExp.Map A}, Relation.ReflTransGen SGEdge s t → spec.Reach s.1.2 t.1.2 := by
-  letI := spec.toExpStructure A
+  let := spec.toExpStructure A
   intro s t h
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -131,7 +131,7 @@ private theorem reflTransGen_of_reach :
     letI := spec.toExpStructure A
     ∀ {ρ σ : spec.State A}, spec.Reach ρ σ →
       Relation.ReflTransGen SGEdge ((spec.toExpEquiv A).symm ρ) ((spec.toExpEquiv A).symm σ) := by
-  letI := spec.toExpStructure A
+  let := spec.toExpStructure A
   intro ρ σ h
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -143,7 +143,7 @@ variable (A)
 theorem reachable_toExp_iff :
     letI := spec.toExpStructure A
     Reachable (spec.toExp.Map A) ↔ spec.Accepts A := by
-  letI := spec.toExpStructure A
+  let := spec.toExpStructure A
   constructor
   · rintro ⟨s, t, hs, ht, hpath⟩
     exact ⟨s.1.2, t.1.2, (spec.sgSource_toExp s).mp hs, (spec.sgTarget_toExp t).mp ht,
@@ -165,7 +165,7 @@ REACH contains the problem one exponential up. -/
 theorem SOTCDefinable.expDefinable {C : ComplexityClass} (hreach : REACH ∈ C)
     {P : DecisionProblem L} (h : SOTCDefinable P) : ExpDefinable C P := by
   obtain ⟨spec, hspec⟩ := h
-  letI hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
       Language.stGraph.Structure (spec.toExp.Map A) := fun A => spec.toExpStructure A
   refine ⟨spec.toExp, REACH, hreach, ?_⟩
   intro A _ _ _ _
@@ -179,7 +179,7 @@ intended class. -/
 theorem PSPACE_subset_NL_exp : PSPACE ⊆ NL.exp :=
   fun _ _ P h => SOTCDefinable.expDefinable reach_mem_NL ((mem_PSPACE_iff P).mp h)
 
-/-- **`PSPACE ⊆ PTIME.exp`**, i.e. `PSPACE ⊆ EXPTIME` once the class is named
+/-- **`PSPACE ⊆ PTIME.exp`**, i.e., `PSPACE ⊆ EXPTIME` once the class is named
 (`DescriptiveComplexity.PSPACE_subset_EXPTIME`). Read on the definitions it is
 **SO(TC) ⊆ SO(LFP)**, the second-order shadow of `NL ⊆ PTIME`. -/
 theorem PSPACE_subset_PTIME_exp : PSPACE ⊆ PTIME.exp :=

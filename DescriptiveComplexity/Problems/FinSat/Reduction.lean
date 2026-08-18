@@ -247,14 +247,14 @@ theorem gval_pre_iff (ha₀ : IsBot a₀)
     Gval I v (prePt B φ a₀ a) ↔
       ∃ d : M, ∃ c, ChildG (prePt B φ a₀ a) c ∧
         Gval I (upd v (pvarPt B φ a₀ a) d) c := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   exact (Gval_isEval (image_isWF B φ) I v _).trans (gstep_pre B φ ha₀ I (Gval I) v a)
 
 theorem gval_body_iff (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) :
     Gval I v (bodyPt B φ a₀) ↔ ∀ c, ChildG (bodyPt B φ a₀) c → Gval I v c := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   exact (Gval_isEval (image_isWF B φ) I v _).trans (gstep_body B φ ha₀ I (Gval I) v)
 
 theorem gval_neq_iff (ha₀ : IsBot a₀)
@@ -262,7 +262,7 @@ theorem gval_neq_iff (ha₀ : IsBot a₀)
     (v : (finsatInterp B φ).Map A → M) (a b : A) :
     Gval I v (neqPt B φ a₀ a b) ↔
       a ≠ b ∧ v (pvarPt B φ a₀ a) ≠ v (pvarPt B φ a₀ b) := by
-  haveI : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
+  have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   exact (Gval_isEval (image_isWF B φ) I v _).trans (gstep_neq B φ ha₀ I (Gval I) v a b)
 
 /-- **The witnesses of the prefix, read off a model**: from the node of `a` the
@@ -413,8 +413,8 @@ theorem realizeWith_of_finSatOn (hfs : FinSatOn ((finsatInterp B φ).Map A)) :
     ∃ m : ℕ, SORealize (newLang L) (A ⊕ Fin m) [B] φ true := by
   classical
   obtain ⟨-, M, hMfin, hMne, I, hloc, hroot⟩ := hfs
-  haveI := hMfin
-  haveI := hMne
+  have := hMfin
+  have := hMne
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   -- the prefix, walked to read off the witnesses
   have hpre : Gval I (fun _ => Classical.arbitrary M) (prePt B φ a₀ a₀) :=
@@ -430,7 +430,7 @@ theorem realizeWith_of_finSatOn (hfs : FinSatOn ((finsatInterp B φ).Map A)) :
   have hker : Gval I v (ndPt B φ a₀ (rootPos B φ) true) :=
     hchild _ ((childG_body_iff B φ ha₀ _).mpr (Or.inr rfl))
   -- the block assignment the interpretation carries
-  letI : (newLang L).Structure M := viaIota ι
+  let : (newLang L).Structure M := viaIota ι
   set μ : B.Assignment M := blockOf B φ a₀ I (Classical.arbitrary M) with hμ
   have hagree : ∀ (s : (finsatInterp B φ).Map A) (w : (finsatInterp B φ).Map A → M),
       (∃ g, PosG g s ∨ NegG g s) → (I s w ↔ blockI B φ a₀ μ s w) := by
@@ -514,7 +514,7 @@ theorem finsat_image_iff :
 an instance to the encoded sentence `σ_A`, from any problem defined, on nonempty
 finite structures, by an `∃SO[new]` sentence with a single block.
 
-Relational for now: `DescriptiveComplexity.CofinalHard` admits source languages
+Stated for relational sources: `DescriptiveComplexity.CofinalHard` admits source languages
 with function symbols, whose junk interpretation on invented arguments the
 sentence would have to guess: the term layer, which
 `DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable` removes from the

@@ -603,13 +603,6 @@ theorem realize_lexSelLeF (sel sel' : Fin D → γ) :
     rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
     exact congrFun h j
 
-/-- The comparison is total, so a reduction may define the order of its image
-by emitting `DescriptiveComplexity.lexSelLeF` at equal tags. -/
-theorem lexSelLeF_total (sel sel' : Fin D → γ) :
-    (lexSelLeF (L := L) sel sel').Realize v ∨ (lexSelLeF (L := L) sel' sel).Realize v := by
-  rw [realize_lexSelLeF, realize_lexSelLeF]
-  exact le_total _ _
-
 end LexDecide
 
 /-! ### Reaching an element from below a cover -/
@@ -644,7 +637,7 @@ theorem orank_eq_zero {z : A} (hz : ∀ a : A, z ≤ a) : orank z = 0 := by
   rw [orank]
   have : {y : A | y < z} = ∅ := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_lt]
+    simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_lt]
     exact hz y
   simp [this]
 
@@ -655,7 +648,7 @@ theorem orank_covBy {w z : A} (h : w ⋖ z) : orank z = orank w + 1 := by
   rw [orank, orank]
   have hset : {y : A | y < z} = insert w {y : A | y < w} := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     rw [covBy_iff_lt_iff_le_left.mp h]
     exact le_iff_eq_or_lt
   rw [hset, Set.ncard_insert_of_notMem (by simp)]
@@ -699,7 +692,7 @@ theorem orank_lt_card (x : A) : orank x < Nat.card A := by
 initial segment, by injectivity between two finite types of the same size. -/
 theorem exists_orank_eq {m : ℕ} (h : m < Nat.card A) : ∃ x : A, orank x = m := by
   classical
-  letI := Fintype.ofFinite A
+  let := Fintype.ofFinite A
   have hcard : Fintype.card A = Fintype.card (Fin (Nat.card A)) := by
     rw [Fintype.card_fin, Nat.card_eq_fintype_card]
   have hbij : Function.Bijective
@@ -714,7 +707,7 @@ theorem orank_isTop {z : A} (hz : ∀ a : A, a ≤ z) : orank z = Nat.card A - 1
   rw [orank]
   have hset : {y : A | y < z} = {z}ᶜ := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_compl_iff, Set.mem_singleton_iff]
     exact ⟨ne_of_lt, fun h => lt_of_le_of_ne (hz y) h⟩
   rw [hset, Set.ncard_compl, Set.ncard_singleton]
 

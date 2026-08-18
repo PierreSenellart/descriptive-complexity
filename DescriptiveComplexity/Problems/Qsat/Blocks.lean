@@ -305,21 +305,6 @@ theorem qsatWins_block_all (hwf : QsatWf A) {D B τ : A → Prop} (hdc : QDownCl
     QsatWins D τ ↔ ∀ ν : A → Prop, QsatWins (qUnion D B) (qOver B τ ν) :=
   (qsatWins_block_aux hwf _ D B τ hdc hB le_rfl).2 hpol
 
-omit [Finite A] in
-/-- The union of the played variables and a block is downward closed again, so
-the peeling lemmas can be iterated along the blocks of a prefix. -/
-theorem QBlock.qDownClosed_qUnion (hwf : QsatWf A) {D B : A → Prop} (hB : QBlock D B)
-    (hdc : QDownClosed D) : QDownClosed (qUnion D B) := by
-  classical
-  intro y w hy hyw hw
-  by_cases hBy : B y
-  · exact Or.inr hBy
-  by_cases hDy : D y
-  · exact Or.inl hDy
-  rcases hw with hDw | hBw
-  · exact Or.inl (hdc y w hy hyw hDw)
-  · exact absurd (hwf.trans y w y hyw (hB.first w y hBw hy hDy hBy)) (hwf.irrefl y)
-
 end Blocks
 
 end DescriptiveComplexity

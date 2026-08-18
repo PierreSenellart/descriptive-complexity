@@ -12,7 +12,7 @@ import DescriptiveComplexity.FixedPointHorn
 /-!
 # Deterministic machine acceptance is in PTIME
 
-Stage 2b of the machine bridge: a *deterministic* run is exactly
+The PTIME half of the machine bridge: a *deterministic* run is exactly
 a least fixed point, so `DescriptiveComplexity.DTMAccept` is FO(LFP) definable –
 `DescriptiveComplexity.dtmAccept_lfpDefinable` – and hence, through the formalized
 translation `DescriptiveComplexity.lfpDefinable_iff_sigmaSOHornDefinable`, SO-Horn
@@ -29,7 +29,7 @@ relation read as an inductive definition:
   lowest position, and the tape is the input (`DescriptiveComplexity.TMData.InitTape`);
 * along each `SuccPos t t'`, a transition applicable in the current state to
   the symbol under the head – *and able to fire*: a destination, a written
-  symbol and a neighbour in its direction must exist, else the machine halts
+  symbol and a neighbor in its direction must exist, else the machine halts
   and nothing is derived at `t'` – advances the state, moves the head, writes
   its symbol, and leaves every other cell unchanged.
 
@@ -37,7 +37,7 @@ All the conditions are first-order over the input vocabulary, so they sit in
 the *guards* of the Horn clauses; the body atoms are the three variables read
 at time `t`, at most four per rule.
 
-The output sentence is where FO(LFP) earns its keep over bare SO-Horn: it
+The output sentence is what FO(LFP) buys over bare SO-Horn: it
 states positively that an accepting state occurs in the fixed point – a thing
 no goal clause can say – conjoined with the first-order promises
 (`DescriptiveComplexity.TMData.WellFormed`, `DescriptiveComplexity.TMData.Deterministic`)
@@ -189,7 +189,7 @@ noncomputable def existsDstG (x : α) : tmOrd.Formula α :=
 noncomputable def existsWriteG (x : α) : tmOrd.Formula α :=
   Formula.iExs (Fin 1) (writeG (Sum.inl x) (Sum.inr 0))
 
-/-- The transition `x`, with the head at `h`, can move: there is a neighbour
+/-- The transition `x`, with the head at `h`, can move: there is a neighbor
 in its direction. Without this in every step rule the fixed point would run
 past a halt. -/
 noncomputable def canMoveG (x h : α) : tmOrd.Formula α :=
@@ -600,7 +600,7 @@ theorem realize_dtAccOut :
     (@Sentence.Realize (tmOrd.sum dtBlock.lang) A
         (@sumStructure _ _ A _ (dtBlock.structure ρ)) dtAccOut) ↔
       ∃ t q : A, ρ (some true) ![t, q] ∧ TMAcc q := by
-  letI := dtBlock.structure ρ
+  let := dtBlock.structure ρ
   rw [dtAccOut]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_atomF, realize_guardOutF, realize_accG, Sum.elim_inr]
@@ -615,7 +615,7 @@ theorem realize_dtOut :
         (@sumStructure _ _ A _ (dtBlock.structure ρ)) dtOut) ↔
       ((tmData A).WellFormed ∧ (tmData A).Deterministic ∧
         ∃ t q : A, ρ (some true) ![t, q] ∧ TMAcc q) := by
-  letI := dtBlock.structure ρ
+  let := dtBlock.structure ρ
   rw [dtOut]
   simp only [Sentence.Realize, Formula.realize_inf]
   rw [and_assoc]
@@ -630,7 +630,7 @@ end OutRealize
 Soundness – everything derived is true of the (unique) run – is one induction
 on derivations; completeness – everything true of the run is derived – one
 induction along the rank of the time position. Determinism enters exactly
-where the plan said it would: a derived state atom carries *some* run to its
+where it must: a derived state atom carries *some* run to its
 time, the head and tape atoms hold of *every* run to theirs, and uniqueness of
 the run (`DescriptiveComplexity.TMData.stepsIn_functional`) is what lets the two
 readings meet in the step cases. -/
@@ -707,7 +707,7 @@ theorem exists_pos_bitRank (hlin : IsLinOrd (TMLe (A := A))) :
     have hne : ∃ p : A, TMPosn p := by
       by_contra hcon
       push Not at hcon
-      haveI : IsEmpty {p : A // TMPosn p} := ⟨fun x => hcon x.1 x.2⟩
+      have : IsEmpty {p : A // TMPosn p} := ⟨fun x => hcon x.1 x.2⟩
       rw [Nat.card_of_isEmpty] at hj
       omega
     obtain ⟨t, ht⟩ := exists_minPos hlin hne

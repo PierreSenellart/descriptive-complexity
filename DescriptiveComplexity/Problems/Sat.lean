@@ -26,7 +26,7 @@ making every clause true” – and its hardness half is the machine-free,
 Dahlhaus-style ([Dahlhaus 1983][dahlhaus1983reduction]) generic reduction
 `DescriptiveComplexity.sat_hard_of_sigmaSODefinable`
 of `DescriptiveComplexity.Problems.Sat.Hardness`. Other problems' NP-completeness
-proofs derive from it through first-order reductions; see e.g.
+proofs derive from it through first-order reductions; see e.g.,
 `DescriptiveComplexity.Problems.ThreeColorability`.
 -/
 
@@ -174,7 +174,7 @@ theorem realize_satKernel {A : Type} [Language.sat.Structure A]
       ∀ c : A, RelMap satIsClause ![c] → ∃ x : A,
         (RelMap satPosIn ![c, x] ∧ ρ satNuSym.1 fun _ => x) ∨
           (RelMap satNegIn ![c, x] ∧ ¬ρ satNuSym.1 fun _ => x) := by
-  letI := satAssignBlock.structure ρ
+  let := satAssignBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := satSOLang) (M := A) kNuSym w ↔ ρ satNuSym.1 fun _ => w 0 := by
     intro w

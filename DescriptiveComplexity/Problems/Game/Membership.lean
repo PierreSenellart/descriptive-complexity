@@ -18,14 +18,14 @@ already carries.
 ## Why a second relation variable is needed
 
 The winning set *is* a least fixed point, and two of its three clauses are
-Horn rules on the nose. The third is not:
+Horn rules already. The third is not:
 
 > a universal node wins when it has a successor and **every** successor wins
 
 has a universally quantified body, and a `DescriptiveComplexity.HornClause`
 carries a *list* of atoms, not a quantified one. The standard repair is to walk
-the order: a second variable `allge x y` — “every successor of `x` that is
-`≥ y` wins” — is computed by a **downward** induction along the linear order,
+the order: a second variable `allge x y` – “every successor of `x` that is
+`≥ y` wins” – is computed by a **downward** induction along the linear order,
 from the greatest element to the least, one immediate predecessor at a time
 (`DescriptiveComplexity.order_induction_down`). At the least element it says
 “every successor of `x` wins”, which is the body the third clause wanted.
@@ -387,7 +387,7 @@ theorem realize_gameOut {A : Type} [Language.andOrGraph.Structure A] [LinearOrde
     (@Sentence.Realize (agOrd.sum gameBlock.lang) A
         (@sumStructure _ _ A _ (gameBlock.structure ρ)) gameOut) ↔
       ∃ s : A, ρ GIx.win (fun _ => s) ∧ AGStart s := by
-  letI := gameBlock.structure ρ
+  let := gameBlock.structure ρ
   rw [gameOut]
   simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     realize_atomF, realize_guardOutF, realize_startG, Sum.elim_inr]

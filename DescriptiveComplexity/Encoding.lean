@@ -28,7 +28,7 @@ bundles the concrete instance type, its declared size, the encoding map, and
 polynomial bounds in **both** directions between the declared size and the
 cardinality of the encoded universe – so that an encoding cannot be constructed
 without discharging them. `card_le` forbids padding (protecting membership
-claims: pad the universe to `2 ^ size` and "in NP over structures" becomes a
+claims: pad the universe to `2 ^ size` and “in NP over structures” becomes a
 much weaker statement about the concrete problem); `le_card` forbids
 compression (protecting hardness claims), and also defends the definition
 against inflating `size` to make `card_le` vacuous. Obligation 1 remains a
@@ -46,8 +46,8 @@ The relations of an encoding are `Bool`-valued (`relBool`), and the
 them, not supplied: an encoder is a computation, not an arbitrary `Prop`. This
 is enforced by the compiler rather than by convention – a definition whose
 *data* decides an undecidable predicate must be marked `noncomputable`, so the
-check to run on an encoder is simply **"its `relBool` elaborates as a plain
-`def`, with no `noncomputable` marker"**. Together with the `DecidableEq` and
+check to run on an encoder is simply **“its `relBool` elaborates as a plain
+`def`, with no `noncomputable` marker”**. Together with the `DecidableEq` and
 `Fintype` fields this makes an encoding genuinely executable: an encoded
 structure can be `#eval`-ed on a small instance and *tested* before anything is
 proved about it.
@@ -56,7 +56,7 @@ Do not run `#print axioms` on a bundled `Encoding` to check its encoder:
 proof fields are erased by the compiler but not by `#print axioms`, so the
 bound proofs (which typically use classical axioms through `Nat.card`) mask
 the report. The axiom report is only informative on a standalone `relBool`
-definition – and even there "no axioms" is the expected answer only for
+definition – and even there “no axioms” is the expected answer only for
 quotient-free data: an encoder deciding `Finset` membership goes through
 `Multiset` quotients, whose `Decidable` instances cite the classical axioms
 in proof positions without affecting executability. The reliable checks are
@@ -67,14 +67,14 @@ the two the compiler and evaluator give: no `noncomputable` marker, and a
 
 Nothing here rules out an encoder that *computes the answer*: encode a SAT
 instance on a universe of the right size with one unary predicate marking an
-element iff the formula is satisfiable, and take the problem "some element is
-marked". Both bounds hold, `Faithful` is provable, and the problem is even
+element iff the formula is satisfiable, and take the problem “some element is
+marked”. Both bounds hold, `Faithful` is provable, and the problem is even
 FO-definable; the illegitimacy is entirely in the computational power the
 encoder used. Computability of the encoder is enforced, a *complexity bound*
-on it is not – that would need the machine bridge (`ROADMAP.md` §7), on top of
-which "the encoder is computed by a polynomial-time machine" becomes
-expressible. Until then the reader of an encoding is told exactly which of the
-two obligations is machine-checked and which still requires reading `relBool`.
+on it is not: stating one means measuring the encoder against a machine model,
+which this interface does not do. The reader of an encoding is therefore told
+exactly which of the two obligations is machine-checked and which requires
+reading `relBool`.
 
 ## The decoding direction
 
@@ -163,11 +163,6 @@ case; every honest encoding in the catalog's reach is linear or nearly so. -/
 theorem linear_bound {f s : ι → ℕ} {c : ℕ} (h : ∀ i, f i ≤ c * (s i + 1)) :
     ∃ c' d : ℕ, ∀ i, f i ≤ c' * (s i + 1) ^ d :=
   ⟨c, 1, fun i => by rw [pow_one]; exact h i⟩
-
-/-- Discharge a `card_le`/`le_card` field from a degree-`d` estimate. -/
-theorem poly_bound {f s : ι → ℕ} {c d : ℕ} (h : ∀ i, f i ≤ c * (s i + 1) ^ d) :
-    ∃ c' d' : ℕ, ∀ i, f i ≤ c' * (s i + 1) ^ d' :=
-  ⟨c, d, h⟩
 
 /-- The `L`-structure an encoding puts on the universe of an instance: the
 relations are the encoder's computations, read as propositions. Derived from

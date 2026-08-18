@@ -226,19 +226,6 @@ theorem altRead_base {cnf : Bool} {τ a : AltV k A} (hτ : AltTr cnf τ) (hr : A
 
 /-! ### At most one transition applies, away from the guess -/
 
-/-- The base tags at which a sweep ends. -/
-def isEndBase : AltBase → Bool
-  | .tGNext => true
-  | .tGEndAcc => true
-  | .tGEndChk => true
-  | _ => false
-
-/-- The base tags of a turn in the check phase. -/
-def isTurnBase : AltBase → Bool
-  | .tTurnNext _ => true
-  | .tTurnAcc _ => true
-  | _ => false
-
 /-- **The state and the symbol pin the tag**, up to the three branch points:
 the guessing choice, the end of a sweep and the turn. -/
 theorem base_cases (cnf : Bool) : ∀ t t' : AltBase, isTrBase t → isTrBase t' →
@@ -375,7 +362,6 @@ theorem altTr_unique {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) (
   · exact (altTr_end_excl hτ' hτ hb' hb).elim
   · exact (altTr_turn_pair hτ hτ' hs hs' hb hb').elim
   · exact (altTr_turn_pair hτ' hτ hs' hs hb' hb).elim
-
 
 end Table
 

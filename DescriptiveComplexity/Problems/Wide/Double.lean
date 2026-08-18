@@ -3,20 +3,20 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.PfpInterp
+import DescriptiveComplexity.Problems.Wide.DrawInterp
 import DescriptiveComplexity.Relativize
 
 /-!
 # A base that is never a singleton
 
 Every track of the EXPSPACE machine is an *element* of the base universe, so the
-whole construction needs two of them (`DescriptiveComplexity.Pfp.Env.hzo`,
-`DescriptiveComplexity.Pfp.Table.zero_ne_one`) – and a reduction has to be
+whole construction needs two of them (`DescriptiveComplexity.Draw.Env.hzo`,
+`DescriptiveComplexity.Draw.Table.zero_ne_one`) – and a reduction has to be
 correct at one-element structures too. The fix is to run the machinery not at the
 instance but at a **doubled** universe, which is never a singleton, and which is
 an ordinary first-order interpretation of the instance so that nothing is lost:
 
-* the universe is `Bool × (Fin 1 → A)`, i.e. two copies of `A`;
+* the universe is `Bool × (Fin 1 → A)`, i.e., two copies of `A`;
 * the copy tagged `false` carries the instance's own relations, and is marked by
   the `old` symbol of `DescriptiveComplexity.newLang`;
 * the copy tagged `true` is **junk**: no relation of the vocabulary touches it.
@@ -25,7 +25,7 @@ So the doubled universe is the extended universe of value invention
 (`DescriptiveComplexity.SecondOrderNew`) with `|A|` invented values, and
 `DescriptiveComplexity.relativizeTo` is what reads a formula about the instance
 inside it. What the reduction then has to do – and what
-`DescriptiveComplexity.Problems.Wide.PfpRelExp` does – is relativize the
+`DescriptiveComplexity.Problems.Wide.DrawRelExp` does – is relativize the
 *expansion* the same way, so that its points are still the instance's.
 
 The interpretation is plain (not relativized) and one-dimensional, so composing
@@ -36,7 +36,7 @@ instance, with the same dimension.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -49,7 +49,7 @@ section Dbl
 variable (L : Language.{0, 0}) [L.IsRelational]
 
 /-- **A relation of the instance's vocabulary, inside the extended one**: named,
-because a raw `Sum.inl` is not recognised at the transparency `rw` matches at. -/
+because a raw `Sum.inl` is not recognized at the transparency `rw` matches at. -/
 abbrev newSym {L : Language.{0, 0}} {n : ℕ} (r : L.Relations n) :
     (newLang L).Relations n := Sum.inl r
 
@@ -112,8 +112,8 @@ end Dbl
 
 /-! ### An environment to name constants in
 
-The rule-definability discharge (`DescriptiveComplexity.Pfp.uRulesDefinable_progOf`)
-asks for one `DescriptiveComplexity.Pfp.Env`, and only to name the gate
+The rule-definability discharge (`DescriptiveComplexity.Draw.uRulesDefinable_progOf`)
+asks for one `DescriptiveComplexity.Draw.Env`, and only to name the gate
 dispatch's default tag – a *nonemptiness* of a type the instance does not
 mention, so any environment will do. The two-element one below is the cheapest:
 the structure in which nothing holds. -/
@@ -135,6 +135,6 @@ noncomputable def boolEnv : Env L where
 
 end BoolEnv
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

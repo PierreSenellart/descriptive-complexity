@@ -26,7 +26,7 @@ model with the transitions presented individually –
 – and two compilations back into the finished form: `toAutomaton`, which enables
 every transition whose guard holds, and `toAutomatonPri`, which enables the
 *first* one, so that the compiled table has at most one entry per reading and
-`DescriptiveComplexity.HeadAutomaton.IsDeterministic` holds on the nose. Programs whose
+`DescriptiveComplexity.HeadAutomaton.IsDeterministic` holds outright. Programs whose
 guards are mutually exclusive (`DescriptiveComplexity.HeadProgram.Deterministic`) run the
 same way under both.
 
@@ -44,8 +44,8 @@ positions `x`. It has two halves, and they are not symmetric –
 
 The scratch heads are the point of the number `m` carried by `Runs`: heads below
 `m` are the fragment's *protected* interface, heads from `m` on are workspace.
-`DescriptiveComplexity.HeadAgree` and `DescriptiveComplexity.HeadLocal2` say "agrees on the
-interface" and "depends only on the interface".
+`DescriptiveComplexity.HeadAgree` and `DescriptiveComplexity.HeadLocal2` say “agrees on the
+interface” and “depends only on the interface”.
 
 ## Composition
 
@@ -337,16 +337,6 @@ theorem Embeds.reach_cases (h : Embeds F P e xt) {s : F.St} {u : Fin K → A} {d
         rw [← Prod.mk.eta (p := d), htar, HeadTrans.retarget_target, hts]
         exact Relation.ReflTransGen.refl
     · exact Or.inr ⟨b, w, hF, hP.tail hcd⟩
-
-/-- A run of the program from the fragment's entry to an exit *of the program*
-must leave the fragment through one of its own exits. -/
-theorem Embeds.exit_cases (h : Embeds F P e xt) {s : F.St} {u : Fin K → A} {b' : Bool}
-    {y : Fin K → A} (hd : P.Reach ((Sum.inl (e s) : P.Site), u) ((Sum.inr b' : P.Site), y)) :
-    ∃ b w, F.Reach ((Sum.inl s : F.Site), u) ((Sum.inr b : F.Site), w) ∧
-      P.Reach (xt b, w) ((Sum.inr b' : P.Site), y) := by
-  rcases h.reach_cases hd with ⟨s', w, hcontra, -⟩ | hgood
-  · exact absurd (congrArg Prod.fst hcontra) (by simp)
-  · exact hgood
 
 end Embeds
 

@@ -31,7 +31,7 @@ map into `Fin k` separating the pairs related by a *conflict* relation.
 ## Loops, and why the two threshold problems ignore them
 
 The two marked-graph problems take their conflict relation *off the diagonal*
-(`x ≠ y ∧ …`), i.e. they are about the underlying loopless graph, which is the
+(`x ≠ y ∧ …`), i.e., they are about the underlying loopless graph, which is the
 convention of the clique family on this vocabulary. It is also what makes them
 interreducible by edge complementation: complementing off the diagonal is an
 involution on loopless graphs, but forgets loops. The price is paid once, in

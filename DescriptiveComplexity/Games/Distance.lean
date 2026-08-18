@@ -29,7 +29,7 @@ The theorem of the file is `DescriptiveComplexity.exists_answer`: from an
 invariant with `n + 1` rounds to spare, any point the spoiler picks between
 two existing points can be answered so that the invariant holds with `n`
 rounds. Its proof is the textbook case analysis – copy the distance to the
-left neighbour, or to the right one, or, when both are large, land in the
+left neighbor, or to the right one, or, when both are large, land in the
 middle of a gap that the invariant guarantees is twice as large on the other
 side – with the halving of the budget appearing exactly there.
 -/
@@ -124,15 +124,6 @@ theorem eq_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x = 0 ↔ y =
   have hpos := two_pow_pos n
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩ <;> constructor <;> intro <;> omega
 
-/-- A truncated distance keeps the sign of the distance. -/
-theorem truncAt_le_zero_iff : truncAt n x ≤ 0 ↔ x ≤ 0 := by
-  have hpos := two_pow_pos n
-  rcases le_or_gt (2 ^ n) x with hx | hx
-  · rw [truncAt_of_le hx]; omega
-  · rcases le_or_gt x (-(2 ^ n)) with hx' | hx'
-    · rw [truncAt_of_le_neg hx']; omega
-    · rw [truncAt_of_abs_le (by omega) (by omega)]
-
 /-- **Truncating further is coarser**: an equation between distances
 truncated at `2 ^ n` survives truncation at any smaller bound. This is how a
 round is spent – the budget halves, and the invariant still holds. -/
@@ -149,7 +140,7 @@ equal up to truncation at `2 ^ (n + 1)` stay equal up to truncation at
 `2 ^ n` after a common shift of at most `2 ^ n`. This single lemma answers
 the spoiler in the two easy cases of
 `DescriptiveComplexity.exists_answer` – the shift being the distance from the
-new point to the neighbour the duplicator copies. -/
+new point to the neighbor the duplicator copies. -/
 theorem truncAt_sub_shift {s : ℤ} (h : truncAt (n + 1) x = truncAt (n + 1) y)
     (hs₁ : -(2 ^ n) ≤ s) (hs₂ : s ≤ 2 ^ n) : truncAt n (x - s) = truncAt n (y - s) := by
   have hpow : (2 : ℤ) ^ (n + 1) = 2 ^ n * 2 := pow_succ 2 n
@@ -168,23 +159,23 @@ answering it, whose distances to the second family agree, up to truncation at
 
 The three cases are the classical ones: if `c` is one of the existing points,
 copy the corresponding one; if `c` is closer than `2 ^ n` to its left or right
-neighbour, copy that distance (`DescriptiveComplexity.truncAt_sub_shift`);
+neighbor, copy that distance (`DescriptiveComplexity.truncAt_sub_shift`);
 and if it is far from both, the gap it sits in is at least `2 ^ (n + 1)` wide,
 hence so is the corresponding gap, and there is room to land at exactly
-`2 ^ n` from the left neighbour. -/
+`2 ^ n` from the left neighbor. -/
 theorem exists_answer {ι : Type} [Finite ι] {U V : ι → ℤ}
     (hinv : ∀ i i', truncAt (n + 1) (U i - U i') = truncAt (n + 1) (V i - V i'))
     {c : ℤ} {i₀ i₁ : ι} (h₀ : U i₀ ≤ c) (h₁ : c ≤ U i₁) :
     ∃ d : ℤ, ∀ i, truncAt n (U i - c) = truncAt n (V i - d) := by
   classical
-  letI := Fintype.ofFinite ι
+  let := Fintype.ofFinite ι
   have hpos := two_pow_pos n
   by_cases hmem : ∃ i, U i = c
   · obtain ⟨i₂, hi₂⟩ := hmem
     refine ⟨V i₂, fun i => ?_⟩
     rw [← hi₂]
     exact truncAt_eq_of_le (Nat.le_succ n) (hinv i i₂)
-  -- `c` is inside a gap: take its two neighbours
+  -- `c` is inside a gap: take its two neighbors
   have hne : ∀ i, U i ≠ c := fun i hi => hmem ⟨i, hi⟩
   have hlo : (Finset.univ.filter fun i => U i < c).Nonempty :=
     ⟨i₀, Finset.mem_filter.mpr ⟨Finset.mem_univ _, lt_of_le_of_ne h₀ (hne i₀)⟩⟩
@@ -202,14 +193,14 @@ theorem exists_answer {ι : Type} [Finite ι] {U V : ι → ℤ}
     · exact absurd hi (hne i)
     · exact Or.inr (hmin i (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hi⟩))
   rcases lt_or_ge (c - U im) (2 ^ n) with hleft | hleft
-  · -- close to the left neighbour: copy the distance
+  · -- close to the left neighbor: copy the distance
     refine ⟨V im + (c - U im), fun i => ?_⟩
     have := truncAt_sub_shift (hinv i im) (s := c - U im) (by omega) (by omega)
     have heq₁ : U i - U im - (c - U im) = U i - c := by omega
     have heq₂ : V i - V im - (c - U im) = V i - (V im + (c - U im)) := by omega
     rwa [heq₁, heq₂] at this
   rcases lt_or_ge (U ip - c) (2 ^ n) with hright | hright
-  · -- close to the right neighbour: copy the distance
+  · -- close to the right neighbor: copy the distance
     refine ⟨V ip - (U ip - c), fun i => ?_⟩
     have := truncAt_sub_shift (hinv i ip) (s := -(U ip - c)) (by omega) (by omega)
     have heq₁ : U i - U ip - -(U ip - c) = U i - c := by omega

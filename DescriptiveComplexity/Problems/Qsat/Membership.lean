@@ -17,7 +17,7 @@ where the polynomial space of PSPACE is spent: the stack is a *set* of
 variables, and a set is one monadic relation variable. Four relation variables
 make up a state:
 
-* `D` (unary) – the variables already given a value, i.e. the current branch of
+* `D` (unary) – the variables already given a value, i.e., the current branch of
   the game tree; the variable played next is the `prefixLt`-least one outside
   `D` (`DescriptiveComplexity.QLeast`) and the one returned to is the greatest one inside
   it;
@@ -493,7 +493,7 @@ section Spec
 
 /-- The block of the SO(TC) specification of QSAT: two unary relation
 variables – the quantified set and the values it gave – and two relation
-variables of arity `0`, i.e. two bits – the mode and the value being
+variables of arity `0`, i.e., two bits – the mode and the value being
 returned. -/
 abbrev qsBlock : SOBlock where
   ι := Bool ⊕ Bool
@@ -829,14 +829,6 @@ theorem qUpd_true_eq_qAdd (D : A → Prop) (x : A) : qUpd D x true = qAdd D x :=
       · exact Or.inl ⟨hyx, rfl⟩
       · exact Or.inr ⟨hyx, hy⟩
 
-/-- Setting a variable to `false` is removing it. -/
-theorem qUpd_false_eq_qRem (D : A → Prop) (x : A) : qUpd D x false = qRem D x := by
-  funext y
-  refine propext ⟨fun h => ?_, fun h => Or.inr h⟩
-  rcases h with ⟨-, hb⟩ | h
-  · exact absurd hb (by simp)
-  · exact h
-
 theorem qsLift_congr {D D' T T' : A → Prop} {u u' r r' : Prop}
     (hD : ∀ y : A, D y ↔ D' y) (hT : ∀ y : A, T y ↔ T' y) (hu : u ↔ u') (hr : r ↔ r') :
     qsLift D T u r = qsLift D' T' u' r' :=
@@ -950,22 +942,11 @@ omit [LinearOrder A] in
 variable. -/
 theorem exists_qLeast (hwf : QsatWf A) {D : A → Prop} (h : ∃ z : A, IsQVar z ∧ ¬D z) :
     ∃ x : A, QLeast D x := by
-  haveI : IsTrans A (QPrec (A := A)) := ⟨fun a b c => hwf.trans a b c⟩
-  haveI : Std.Irrefl (QPrec (A := A)) := ⟨hwf.irrefl⟩
+  have : IsTrans A (QPrec (A := A)) := ⟨fun a b c => hwf.trans a b c⟩
+  have : Std.Irrefl (QPrec (A := A)) := ⟨hwf.irrefl⟩
   obtain ⟨x, hx, hmin⟩ :=
     (Finite.wellFounded_of_trans_of_irrefl (QPrec (A := A))).has_min {z : A | IsQVar z ∧ ¬D z} h
   exact ⟨x, hx.1, hx.2, fun y hy hd => hmin y ⟨hy, hd⟩⟩
-
-omit [LinearOrder A] in
-/-- On a finite well-formed instance a nonempty branch has a last variable. -/
-theorem exists_qGreatest (hwf : QsatWf A) {D : A → Prop} (h : ∃ z : A, IsQVar z ∧ D z) :
-    ∃ x : A, QGreatest D x := by
-  haveI : IsTrans A (fun a b : A => QPrec b a) := ⟨fun a b c hab hbc => hwf.trans c b a hbc hab⟩
-  haveI : Std.Irrefl (fun a b : A => QPrec b a) := ⟨hwf.irrefl⟩
-  obtain ⟨x, hx, hmax⟩ :=
-    (Finite.wellFounded_of_trans_of_irrefl (fun a b : A => QPrec b a)).has_min
-      {z : A | IsQVar z ∧ D z} h
-  exact ⟨x, hx.1, hx.2, fun y hy hd => hmax y ⟨hy, hd⟩⟩
 
 /-! #### The walk is deterministic -/
 

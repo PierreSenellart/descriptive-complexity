@@ -442,9 +442,9 @@ noncomputable def RelOrderedFOReduction.trans (g : P ≤ʳᶠᵒ[≤] Q) (f : Q 
     dim := f.dim * g.dim
     toRelInterpretation := f.toRelInterpretation.compRel g.toRelInterpretation.ordExtendRel
     dom_nonempty := fun A _ _ _ _ => by
-      letI := g.toRelInterpretation.mapRelLinearOrder A
-      haveI : Finite (g.toRelInterpretation.MapRel A) := g.toRelInterpretation.mapRel_finite A
-      haveI : Nonempty (g.toRelInterpretation.MapRel A) := g.mapRel_nonempty A
+      let := g.toRelInterpretation.mapRelLinearOrder A
+      have : Finite (g.toRelInterpretation.MapRel A) := g.toRelInterpretation.mapRel_finite A
+      have : Nonempty (g.toRelInterpretation.MapRel A) := g.mapRel_nonempty A
       have e1 := g.toRelInterpretation.ordExtendRelLEquiv A
       have e2 := f.toRelInterpretation.mapRelLEquiv e1
       have e3 := f.toRelInterpretation.compLEquivRel g.toRelInterpretation.ordExtendRel (A := A)
@@ -452,9 +452,9 @@ noncomputable def RelOrderedFOReduction.trans (g : P ≤ʳᶠᵒ[≤] Q) (f : Q 
       obtain ⟨⟨t, w⟩, hw⟩ := (e2.comp e3).symm y
       exact ⟨t, w, hw⟩
     correct := fun A _ _ _ _ => by
-      letI := g.toRelInterpretation.mapRelLinearOrder A
-      haveI : Finite (g.toRelInterpretation.MapRel A) := g.toRelInterpretation.mapRel_finite A
-      haveI : Nonempty (g.toRelInterpretation.MapRel A) := g.mapRel_nonempty A
+      let := g.toRelInterpretation.mapRelLinearOrder A
+      have : Finite (g.toRelInterpretation.MapRel A) := g.toRelInterpretation.mapRel_finite A
+      have : Nonempty (g.toRelInterpretation.MapRel A) := g.mapRel_nonempty A
       have h1 := g.correct A
       have h2 := f.correct (g.toRelInterpretation.MapRel A)
       have e1 := g.toRelInterpretation.ordExtendRelLEquiv A

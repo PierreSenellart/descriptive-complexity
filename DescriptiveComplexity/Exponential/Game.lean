@@ -22,7 +22,7 @@ GameWon            M = ∃ s, AGStart s   ∧ WinsOn M s
 A `DescriptiveComplexity.SOGameSpec` is the game
 `DescriptiveComplexity.GAME` reads on *assignments of a second-order block*:
 four first-order sentences say which assignments the existential player owns,
-which win outright, which start the game, and which moves are legal — the
+which win outright, which start the game, and which moves are legal – the
 transition seeing two copies of the block, as an
 `DescriptiveComplexity.SOTCSpec` does. Its expansion
 (`DescriptiveComplexity.SOGameSpec.toExp`) therefore takes `Tag := Unit`, no
@@ -36,7 +36,7 @@ gives at once
 * `DescriptiveComplexity.SOGameDefinable.mem_EXPTIME`: **a second-order
   alternating game is in EXPTIME**,
 
-which read on the definitions is **SO-GAME ⊆ SO(LFP)** — the second-order
+which read on the definitions is **SO-GAME ⊆ SO(LFP)** – the second-order
 shadow of `GAME ∈ PTIME`, exactly as
 `DescriptiveComplexity.PSPACE_subset_EXPTIME` is the second-order shadow of
 `REACH ∈ PTIME`.
@@ -64,8 +64,8 @@ open Language Structure
 assignments of a block `B`, and four first-order sentences over the base
 vocabulary expanded by the order and by copies of the block say which states are
 universal, which win outright, which start the game, and which moves are legal.
-The move sentence sees two copies of the block — the current state and the next
-one — exactly as `DescriptiveComplexity.SOTCSpec.step` does.
+The move sentence sees two copies of the block – the current state and the next
+one – exactly as `DescriptiveComplexity.SOTCSpec.step` does.
 
 The order is visible to all four sentences, as the ordered setting of the
 capture theorems allows; the problem itself does not see it. -/
@@ -148,7 +148,7 @@ def toExp : ExpExpansion L where
   dom_nonempty := by
     intro A _ _ _ _
     refine ⟨(), spec.B.botAssign A, ?_⟩
-    letI := spec.B.structure₁ (L := L.sum Language.order) (spec.B.botAssign A)
+    let := spec.B.structure₁ (L := L.sum Language.order) (spec.B.botAssign A)
     exact Formula.realize_top.mpr trivial
 
 variable (A : Type) [L.Structure A] [LinearOrder A]
@@ -163,7 +163,7 @@ def toExpStructure : Language.andOrGraph.Structure (spec.toExp.Map A) :=
 /-- The domain of `DescriptiveComplexity.SOGameSpec.toExp` is the whole space of
 tagged assignments: its domain sentence is `⊤`. -/
 theorem domHolds_toExp (p : spec.toExp.Point A) : ExpExpansion.DomHolds p := by
-  letI := spec.toExp.B.structure₁ (L := L.sum Language.order) p.2
+  let := spec.toExp.B.structure₁ (L := L.sum Language.order) p.2
   exact Formula.realize_top.mpr trivial
 
 /-- **The points of the expansion are the states of the game.** -/
@@ -210,7 +210,7 @@ theorem agStart_toExp (x : spec.toExp.Map A) :
 private theorem wins_of_winsOn :
     letI := spec.toExpStructure A
     ∀ {x : spec.toExp.Map A}, WinsOn (spec.toExp.Map A) x → spec.Wins x.1.2 := by
-  letI := spec.toExpStructure A
+  let := spec.toExpStructure A
   intro x h
   induction h with
   | won hw => exact .won ((spec.agWon_toExp _).mp hw)
@@ -227,7 +227,7 @@ private theorem winsOn_of_wins :
     letI := spec.toExpStructure A
     ∀ {ρ : spec.State A}, spec.Wins ρ →
       WinsOn (spec.toExp.Map A) ((spec.toExpEquiv A).symm ρ) := by
-  letI := spec.toExpStructure A
+  let := spec.toExpStructure A
   intro ρ h
   induction h with
   | won hw => exact .won ((spec.agWon_toExp _).mpr hw)
@@ -250,7 +250,7 @@ variable (A)
 theorem gameWon_toExp_iff :
     letI := spec.toExpStructure A
     GameWon (spec.toExp.Map A) ↔ spec.Accepts A := by
-  letI := spec.toExpStructure A
+  let := spec.toExpStructure A
   constructor
   · rintro ⟨s, hs, hw⟩
     exact ⟨s.1.2, (spec.agStart_toExp s).mp hs, spec.wins_of_winsOn hw⟩
@@ -276,7 +276,7 @@ contains the problem one exponential up. -/
 theorem SOGameDefinable.expDefinable {C : ComplexityClass} (hgame : GAME ∈ C)
     {P : DecisionProblem L} (h : SOGameDefinable P) : ExpDefinable C P := by
   obtain ⟨spec, hspec⟩ := h
-  letI hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
+  let hinst : ∀ (A : Type) [L.Structure A] [LinearOrder A],
       Language.andOrGraph.Structure (spec.toExp.Map A) := fun A => spec.toExpStructure A
   refine ⟨spec.toExp, GAME, hgame, ?_⟩
   intro A _ _ _ _

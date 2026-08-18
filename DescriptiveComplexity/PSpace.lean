@@ -22,7 +22,7 @@ sentences all survive the pullback, see
 
 ## Why the states are relations
 
-An SO(TC) walk remembers an assignment of relations, i.e. `n^a` bits on a
+An SO(TC) walk remembers an assignment of relations, i.e., `n^a` bits on a
 universe of size `n`, and may take exponentially many steps to reach its
 target. That is precisely a polynomially space-bounded computation: the
 configuration is the remembered assignment, and the (first-order) transition
@@ -124,8 +124,8 @@ variable {A : Type} [L.Structure A] [LinearOrder A] (B : SOBlock) (ρ : B.Assign
 theorem blockOrderLift_isExpansionOn :
     @LHom.IsExpansionOn _ _ (blockOrderLift L B) A
       (B.structure₁ (L := L) ρ) (B.structure₁ (L := L.sum Language.order) ρ) := by
-  letI := B.structure₁ (L := L) ρ
-  letI := B.structure₁ (L := L.sum Language.order) ρ
+  let := B.structure₁ (L := L) ρ
+  let := B.structure₁ (L := L.sum Language.order) ρ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · cases f with
     | inl g => rfl

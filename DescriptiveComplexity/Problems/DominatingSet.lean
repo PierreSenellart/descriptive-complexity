@@ -23,7 +23,7 @@ Umbrella file for `DescriptiveComplexity.DominatingSet`, deriving NP-completenes
 The reduction is **order-free**, which is worth recording: domination
 constrains every element of the universe, junk tuples included, and the two
 degenerate cases (an element in no set, and no element at all) look at first
-sight as if they needed a canonical extra vertex – i.e. an order. They do not:
+sight as if they needed a canonical extra vertex – i.e., an order. They do not:
 both are first-order conditions, so gating on them is enough.
 -/
 

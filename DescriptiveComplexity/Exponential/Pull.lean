@@ -81,8 +81,8 @@ theorem realize_extendSO_pullSentence (Bk : SOBlock)
         ((Bk.pull T d).structure₁ (L := L.sum Language.order) (Bk.pullAssign ρ))
         ((I.ordExtendSO Bk).pullSentence φ) ↔
       @Sentence.Realize _ (I.Map A) (Bk.structure₁ (L := L'.sum Language.order) ρ) φ := by
-  letI := I.mapLinearOrder A
-  letI := (Bk.pull T d).structure₁ (L := L.sum Language.order) (Bk.pullAssign ρ)
+  let := I.mapLinearOrder A
+  let := (Bk.pull T d).structure₁ (L := L.sum Language.order) (Bk.pullAssign ρ)
   exact ((I.ordExtendSO Bk).realize_pullSentence φ A).trans
     ((realize_sentence_of_equiv (I.ordExtend.extendSOEquiv Bk A ρ) φ).trans
       (realize_sentence_of_equiv (Bk.extendEquiv (I.ordExtendLEquiv A) ρ) φ))
@@ -107,9 +107,9 @@ noncomputable def pullOrdered : ExpExpansion L where
       ((I.ordExtendSO (X.B.replicate n)).pullSentence (X.relSentence r τ))
   dom_nonempty := by
     intro A _ _ _ _
-    letI := I.mapLinearOrder A
-    haveI : Finite (I.Map A) := I.map_finite A
-    haveI : Nonempty (I.Map A) := I.map_nonempty A
+    let := I.mapLinearOrder A
+    have : Finite (I.Map A) := I.map_finite A
+    have : Nonempty (I.Map A) := I.map_nonempty A
     obtain ⟨t, ρ, h⟩ := X.dom_nonempty (I.Map A)
     exact ⟨t, X.B.pullAssign ρ,
       (realize_extendSO_pullSentence I A X.B (X.dom t) ρ).mpr h⟩
@@ -146,7 +146,7 @@ theorem domHolds_pullOrdered_merge (t : X.Tag) (σ : (X.B.pull T d).Assignment A
     letI := I.mapLinearOrder A
     DomHolds (X := X.pullOrdered I) (t, σ) ↔
       DomHolds (X := X) (A := I.Map A) (t, X.B.mergeAssign σ) := by
-  letI := I.mapLinearOrder A
+  let := I.mapLinearOrder A
   have h := X.domHolds_pullOrdered I A t (X.B.mergeAssign σ)
   rwa [SOBlock.pullAssign_mergeAssign] at h
 
@@ -160,8 +160,8 @@ theorem relMap_pullOrdered {n : ℕ} (r : X.E.Relations n)
     letI := X.pullOrderedStructure I A
     RelMap r (fun i => pt (X := X.pullOrdered I) (ys i).1.1
         (X.B.pullAssign (ys i).1.2) (h i)) ↔ RelMap r ys := by
-  letI := I.mapLinearOrder A
-  letI := X.pullOrderedStructure I A
+  let := I.mapLinearOrder A
+  let := X.pullOrderedStructure I A
   refine Iff.trans ?_ (realize_extendSO_pullSentence I A (X.B.replicate n)
     (X.relSentence r fun i => (ys i).1.1) (X.B.replicateAssign fun i => (ys i).1.2))
   exact SOBlock.realize_homSentence (X.B.replicatePullHom T d n)

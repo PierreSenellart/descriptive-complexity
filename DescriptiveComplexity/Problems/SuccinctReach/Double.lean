@@ -87,11 +87,6 @@ theorem SOBlock.sndAssign_joinAssign (B : SOBlock) (ρ σ : B.Assignment A) :
     B.sndAssign (B.joinAssign ρ σ) = σ :=
   rfl
 
-theorem SOBlock.joinAssign_fst_snd (B : SOBlock) (μ : B.double.Assignment A) :
-    B.joinAssign (B.fstAssign μ) (B.sndAssign μ) = μ := by
-  funext i
-  cases i <;> rfl
-
 end Double
 
 /-! ### Renaming two successive expansions into the doubled one -/
@@ -134,8 +129,8 @@ two components of a joined assignment. -/
 theorem blockPairLHom_isExpansionOn (ρ σ : B.Assignment A) :
     @LHom.IsExpansionOn _ _ (blockPairLHom (L₀ := L₀) B) A
       (B.structure₂ ρ σ) (B.double.structure₁ (B.joinAssign ρ σ)) := by
-  letI := B.structure₂ (L := L₀) ρ σ
-  letI := B.double.structure₁ (L := L₀) (B.joinAssign ρ σ)
+  let := B.structure₂ (L := L₀) ρ σ
+  let := B.double.structure₁ (L := L₀) (B.joinAssign ρ σ)
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
     | Sum.inl (Sum.inl g) => rfl
@@ -150,8 +145,8 @@ theorem blockPairLHom_isExpansionOn (ρ σ : B.Assignment A) :
 theorem blockFstLHom_isExpansionOn (μ : B.double.Assignment A) :
     @LHom.IsExpansionOn _ _ (blockFstLHom (L₀ := L₀) B) A
       (B.structure₁ (B.fstAssign μ)) (B.double.structure₁ μ) := by
-  letI := B.structure₁ (L := L₀) (B.fstAssign μ)
-  letI := B.double.structure₁ (L := L₀) μ
+  let := B.structure₁ (L := L₀) (B.fstAssign μ)
+  let := B.double.structure₁ (L := L₀) μ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
     | Sum.inl g => rfl

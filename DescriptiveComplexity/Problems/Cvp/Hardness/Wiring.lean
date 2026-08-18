@@ -71,14 +71,6 @@ theorem isTrue_iff (t : CvpTag) (w : Fin 3 → A) :
   cases t <;>
     simp [cvpInterp, allMinF, realize_minF, and_assoc]
 
-/-- Only the canonical `ff` point is a constant `0`. -/
-theorem isFalse_iff (t : CvpTag) (w : Fin 3 → A) :
-    RelMap (M := cvpInterp.Map A) circIsFalse ![(t, w)] ↔
-      t = .ff ∧ (∀ a : A, w 0 ≤ a) ∧ (∀ a : A, w 1 ≤ a) ∧ (∀ a : A, w 2 ≤ a) := by
-  rw [FOInterpretation.relMap_map]
-  cases t <;>
-    simp [cvpInterp, allMinF, realize_minF, and_assoc]
-
 /-- The conjunction gates are the two conjunction chains. -/
 theorem isAnd_iff (t : CvpTag) (w : Fin 3 → A) :
     RelMap (M := cvpInterp.Map A) circIsAnd ![(t, w)] ↔
@@ -118,18 +110,6 @@ section Wires
 
 variable {m : A}
 
-/-- `succF`'s between-form, as a cover. -/
-theorem realize_succF_covBy {α : Type} {v : α → A} (x y : α) :
-    (succF (L := Language.sat) x y).Realize v ↔ v x ⋖ v y := by
-  rw [realize_succF]
-  refine and_congr Iff.rfl ⟨fun h z hz hz' => h z ⟨hz, hz'⟩, fun h z hz => h hz.1 hz.2⟩
-
-omit [Language.sat.Structure A] [LinearOrder A] in
-/-- A point of the interpreted universe is its two components. -/
-theorem tup3 (w : Fin 3 → A) : w = ![w 0, w 1, w 2] := by
-  funext j
-  fin_cases j <;> rfl
-
 omit [Language.sat.Structure A] in
 /-- Being pinned to the minimum at every coordinate identifies a padded
 point. -/
@@ -146,34 +126,6 @@ omit [Language.sat.Structure A] in
 `m`: the rewrite that turns the padding conditions into equations. -/
 theorem isBot_iff_eq (hm : ∀ a : A, m ≤ a) (x : A) : (∀ a : A, x ≤ a) ↔ x = m :=
   ⟨fun h => le_antisymm (h m) (hm x), fun h a => h ▸ hm a⟩
-
-/-- The constant `1` gate has no left input. -/
-theorem not_left_tt (w : Fin 3 → A) (q : cvpInterp.Map A) :
-    ¬RelMap (M := cvpInterp.Map A) circLeft ![(CvpTag.tt, w), q] := by
-  obtain ⟨t', w'⟩ := q
-  rw [FOInterpretation.relMap_map]
-  cases t' <;> simp [cvpInterp]
-
-/-- The constant `1` gate has no right input. -/
-theorem not_right_tt (w : Fin 3 → A) (q : cvpInterp.Map A) :
-    ¬RelMap (M := cvpInterp.Map A) circRight ![(CvpTag.tt, w), q] := by
-  obtain ⟨t', w'⟩ := q
-  rw [FOInterpretation.relMap_map]
-  cases t' <;> simp [cvpInterp]
-
-/-- The constant `0` gate has no left input. -/
-theorem not_left_ff (w : Fin 3 → A) (q : cvpInterp.Map A) :
-    ¬RelMap (M := cvpInterp.Map A) circLeft ![(CvpTag.ff, w), q] := by
-  obtain ⟨t', w'⟩ := q
-  rw [FOInterpretation.relMap_map]
-  cases t' <;> simp [cvpInterp]
-
-/-- The constant `0` gate has no right input. -/
-theorem not_right_ff (w : Fin 3 → A) (q : cvpInterp.Map A) :
-    ¬RelMap (M := cvpInterp.Map A) circRight ![(CvpTag.ff, w), q] := by
-  obtain ⟨t', w'⟩ := q
-  rw [FOInterpretation.relMap_map]
-  cases t' <;> simp [cvpInterp]
 
 /-- The left input of a conjunction chain: the constant `1` at the bottom of
 the walk, the previous link otherwise. -/

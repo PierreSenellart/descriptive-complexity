@@ -60,7 +60,6 @@ open FirstOrder
 
 open Language Structure SOBlock
 
-
 /-! ### The problem -/
 
 section Problem
@@ -170,7 +169,7 @@ private theorem realize_digraphIsoKernel {A : Type} [Language.twoGraphs.Structur
           ρ () ![x', y'] → TGHostE y y') ∧
         ∀ x x' y y' : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y'] →
           TGHostE y y' → TGPatE x x' := by
-  letI := isoGuessBlock.structure ρ
+  let := isoGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
       RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ () w := fun _ => Iff.rfl
   rw [digraphIsoKernel]

@@ -27,9 +27,9 @@ The one thing the translation must supply is the *formulas*: each atomic
 constraint of `DescriptiveComplexity.InductiveCounting.VAtom` becomes, given the modes recorded
 by the two control states, either a first-order formula over the two tuples or
 the information that no tuples can satisfy it (`compileAtom`). Since the modes
-are finite control data, every mode-level condition – "these two registers hold
-the same mode", "this mode is the least one", "this mode is covered by that
-one" – is decided *outside* the formula, and what remains for the formula is a
+are finite control data, every mode-level condition – “these two registers hold
+the same mode”, “this mode is the least one”, “this mode is covered by that
+one” – is decided *outside* the formula, and what remains for the formula is a
 condition on tuples of elements: equality, the lexicographic minimum, maximum
 or successor (`DescriptiveComplexity.OrderWalk`), or one of the given spec's own
 formulas.
@@ -182,7 +182,6 @@ theorem exists_reach_iff :
   · rintro ⟨u, v, hu, hv, huv⟩
     exact ⟨ofNode u, ofNode v, hu, hv, edge_of_reach huv⟩
 
-
 /-! ### Registers inside one tuple -/
 
 section Compile
@@ -320,7 +319,6 @@ theorem realize_succTup (x y : Fin (dim spec) → A) (a b : Slot) :
 
 end Compile
 
-
 /-! ### Register values -/
 
 section Values
@@ -453,7 +451,6 @@ theorem pW_fuse_isMax {m : spec.Mode} {t : Fin spec.k → A} :
 
 end Values
 
-
 /-! ### Compiling an atomic constraint -/
 
 section CompileAtom
@@ -540,16 +537,6 @@ theorem slotVal_regsOf (pm qm : Reg → Option spec.Mode) (x y : Fin (dim spec) 
     slotVal (regsOf pm x) (regsOf qm y) a = fuse spec (slotMode spec pm qm a) (slotTup x y a) := by
   obtain ⟨s, r⟩ := a
   cases s <;> rfl
-
-omit [LinearOrder spec.Mode] [L.Structure A] [LinearOrder A] in
-theorem ofNode_eq_iff {m m' : spec.Mode} {t t' : Fin spec.k → A} :
-    ofNode ((m, t) : spec.Node A) = ofNode (m', t') ↔ m = m' ∧ t = t' := by
-  constructor
-  · intro h
-    have h' : ((m, t) : spec.Node A) = (m', t') := congrArg toNode h
-    exact ⟨congrArg Prod.fst h', congrArg Prod.snd h'⟩
-  · rintro ⟨rfl, rfl⟩
-    rfl
 
 private theorem iff_none {P : Prop} {γ : Type} {v : γ → A} (h : ¬P) :
     P ↔ ∃ f : (L.sum Language.order).Formula γ,
@@ -717,7 +704,6 @@ theorem holds_iff_compileAtom [Nonempty A] (pm qm : Reg → Option spec.Mode)
 
 end CompileAtom
 
-
 /-! ### Compiling a table entry -/
 
 section CompileList
@@ -860,13 +846,6 @@ theorem reach_of_cfgReach {n : (complSpec spec).Node A} {s : Cfg (NodeOrd spec A
     refine ⟨ofCfg c, toCfg_ofCfg c, hreach.tail ?_⟩
     rw [step_iff, hn1, toCfg_ofCfg]
     exact hbc
-
-omit [LinearOrder spec.Mode] [L.Structure A] [LinearOrder A] [Nonempty A] in
-theorem regsOf_eq_bot_iff (pm : Reg → Option spec.Mode) (x : Fin (dim spec) → A) (r : Reg) :
-    regsOf pm x r = ⊥ ↔ pm r = none := by
-  cases h : pm r with
-  | none => simp [regsOf, h, fuse_none]
-  | some m => simp [regsOf, h, fuse_ne_bot]
 
 omit [Nonempty A] in
 theorem realize_srcFormula (p : Ctrl spec) (x : Fin (dim spec) → A) :

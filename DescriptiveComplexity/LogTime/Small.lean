@@ -11,8 +11,8 @@ import DescriptiveComplexity.LogTime.BitLogic
 Every packing argument of Immerman's mutual definability needs the universe to
 be above a concrete size – there is no room to lay a certificate out in a
 universe of three elements – and a statement gated by `n ≥ N` is a statement
-that has to carry `n ≥ N` for ever after. This file is the escape hatch, and it
-is stated once for both logics:
+that has to carry `n ≥ N` for ever after. This file is what discharges such a
+hypothesis, and it is stated once for both logics:
 
 > A **numeric** relation – one that depends only on the size of the universe and
 > on the ranks of its arguments – is definable on universes of at most `k`

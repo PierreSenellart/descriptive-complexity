@@ -27,7 +27,7 @@ interpretation, reduction or problem file changes:
 * `DescriptiveComplexity.RelOrderedFOReduction` (notation `≤ʳᶠᵒ[≤]`) is the ordered reduction
   through such an interpretation, carrying the extra obligation
   `dom_nonempty` – a definable domain can be empty on a nonempty structure, so
-  `Nonempty Tag` no longer guarantees a nonempty output;
+  `Nonempty Tag` does not by itself guarantee a nonempty output;
 * `DescriptiveComplexity.OrderedFOReduction.toRel` embeds an ordinary ordered reduction as a
   relativized one with `domFormula := ⊤`, the transparency of the whole-universe
   case being an isomorphism (`DescriptiveComplexity.FOInterpretation.toRelLEquiv`) rather than
@@ -35,8 +35,8 @@ interpretation, reduction or problem file changes:
 
 This is the hardness-side machinery of relativized reductions; it is what a
 hardness proof for a spanning problem needs. Membership closure under
-relativized reductions is deferred, and not needed when membership is a direct
-second-order sentence.
+relativized reductions lives in `DescriptiveComplexity.FixedPointStepRel`, and is
+not needed when membership is a direct second-order sentence.
 -/
 
 namespace DescriptiveComplexity
@@ -119,7 +119,7 @@ def FOInterpretation.toRel (I : FOInterpretation L L' Tag dim) :
 
 /-- The transparency of the `⊤` domain: the relativized universe of `I.toRel`
 is `L'`-isomorphic to the ordinary universe of `I`. (Not a definitional
-equality – a subtype over `⊤` is not the product on the nose.) -/
+equality – a subtype over `⊤` is not literally the product.) -/
 def FOInterpretation.toRelLEquiv [L'.IsRelational] (I : FOInterpretation L L' Tag dim)
     (A : Type) [L.Structure A] : I.Map A ≃[L'] I.toRel.MapRel A where
   toFun a := ⟨a, Formula.realize_top.mpr trivial⟩
@@ -147,7 +147,8 @@ structure RelOrderedFOReduction [L.IsRelational] [L'.IsRelational]
   /-- The underlying relativized interpretation, over the ordered expansion. -/
   toRelInterpretation : RelFOInterpretation (L.sum Language.order) L' Tag dim
   /-- The definable domain is inhabited: some tagged tuple satisfies its tag's
-  domain formula. This replaces `Nonempty Tag`, which no longer suffices. -/
+  domain formula. The relativized counterpart of `Nonempty Tag`, which does not
+  suffice once the domain is cut out by a formula. -/
   dom_nonempty : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
     ∃ (t : Tag) (w : Fin dim → A), (toRelInterpretation.domFormula t).Realize w
   /-- Yes-instances map exactly to yes-instances, whatever the linear order. -/

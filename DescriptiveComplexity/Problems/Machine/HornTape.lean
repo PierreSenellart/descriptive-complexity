@@ -10,14 +10,14 @@ import Mathlib.Data.Fintype.Lattice
 /-!
 # The tape of the unit-propagation machine
 
-The layout half of `HORNSAT ≤ᶠᵒ[≤] DTMAccept`, stage 4 of the machine bridge:
-which tagged tuples are positions, in what order, and why there are enough of
-them. The program that runs on this tape is in
+The layout half of `HORNSAT ≤ᶠᵒ[≤] DTMAccept`, the deterministic machine
+bridge: which tagged tuples are positions, in what order, and why there are
+enough of them. The program that runs on this tape is in
 `DescriptiveComplexity.Problems.Machine.HornHardness`.
 
 ## The layout
 
-As for the SAT machine of stage 3: one cell per element of the instance,
+As for the SAT machine: one cell per element of the instance,
 bracketed by two markers, followed by filler cells supplying time. The
 difference is the **dimension**: this machine does `n` propagation rounds of
 one check-and-mark pass per clause, `O(n³)` steps in all, so the interpreted
@@ -29,11 +29,11 @@ propagation closure `DescriptiveComplexity.Forced`.
 
 ## The program's tags
 
-All the machine's tags are declared here, as for stage 3: symbols, states and
-transitions get indices above the position tags, which leaves the order of the
-positions undisturbed. The states carry up to two elements – the current round
-and the current clause – which is what the third dimension of the payload
-accommodates.
+All the machine's tags are declared here, as for the SAT machine: symbols,
+states and transitions get indices above the position tags, which leaves the
+order of the positions undisturbed. The states carry up to two elements – the
+current round and the current clause – which is what the third dimension of the
+payload accommodates.
 -/
 
 namespace DescriptiveComplexity
@@ -223,7 +223,7 @@ private theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOr
 
 omit [Finite A] [Nonempty A] in
 /-- **The interpreted order is linear**, from `DescriptiveComplexity.tagTupleOrder` –
-no tag-pair case analysis, exactly as for stage 3. -/
+no tag-pair case analysis, exactly as for the SAT machine. -/
 theorem isLinOrd_hTagTupleLe :
     IsLinOrd (tagTupleLe (Tag := UPTag) (d := 3) (A := A)) := by
   have heq : (tagTupleLe (Tag := UPTag) (d := 3) (A := A)) =

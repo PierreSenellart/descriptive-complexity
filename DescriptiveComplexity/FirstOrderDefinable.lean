@@ -71,7 +71,7 @@ theorem FODefinableFree.foDefinable {P : DecisionProblem L} (h : FODefinableFree
   obtain ⟨φ, hφ⟩ := h
   refine ⟨(LHom.sumInl : L →ᴸ L.sum Language.order).onSentence φ, ?_⟩
   intro A _ _ _ _
-  letI := orderStructure (M := A)
+  let := orderStructure (M := A)
   rw [hφ A]
   exact (LHom.realize_onSentence A LHom.sumInl φ).symm
 

@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.Sweep
 
 `DescriptiveComplexity.TMData.Step` asks for eight things at once – a transition,
 its source, its read symbol, its destination, its written symbol, the frame
-condition on the untouched cells, the direction, and the neighbour relation on the
+condition on the untouched cells, the direction, and the neighbor relation on the
 head. A program of a hardness reduction discharges them at *every* phase, so they
 are packaged here once:
 
@@ -108,7 +108,7 @@ within its clock.
 
 This is the shape of the whole NEXPTIME hardness program: the guess of the
 certificate and the fold of the kernel are what the transitions say, and nothing
-about runs, ranks or neighbours appears again. -/
+about runs, ranks or neighbors appears again. -/
 theorem accepts_of_rightSweep (h : IsLinOrd (WMLe (A := A)))
     (hno : ∀ x y : A, ¬WMInp x y) {st : (A → Prop) → A}
     {tp : (A → Prop) → WPoint A → WPoint A}

@@ -63,8 +63,8 @@ carries, and no children. -/
 def nodeNone : ℕ × ℕ × ℕ := (8, 0, 0)
 
 /-- **The nodes of a code, in preorder.** Each node carries its constructor
-tag and the offsets of its children *relative to itself*, `0` meaning "no such
-child". Relative offsets are what make the flattening of a subterm a segment
+tag and the offsets of its children *relative to itself*, `0` meaning “no such
+child”. Relative offsets are what make the flattening of a subterm a segment
 of the flattening of the whole. -/
 def codeNodes : Nat.Partrec.Code → List (ℕ × ℕ × ℕ)
   | .zero => [(0, 0, 0)]

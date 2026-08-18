@@ -100,8 +100,8 @@ forbids. -/
 theorem even_not_foDefinableFree : ¬FODefinableFree EVEN := by
   intro h
   obtain ⟨N, hN⟩ := exists_card_bound_of_foDefinableFree h
-  letI : Language.empty.Structure (Fin (2 * N + 2)) := Language.emptyStructure
-  letI : Language.empty.Structure (Fin (2 * N + 3)) := Language.emptyStructure
+  let : Language.empty.Structure (Fin (2 * N + 2)) := Language.emptyStructure
+  let : Language.empty.Structure (Fin (2 * N + 3)) := Language.emptyStructure
   have hcard₁ : Nat.card (Fin (2 * N + 2)) = 2 * N + 2 := by simp
   have hcard₂ : Nat.card (Fin (2 * N + 3)) = 2 * N + 3 := by simp
   have hiff := hN (Fin (2 * N + 2)) (Fin (2 * N + 3)) (by omega) (by omega)
@@ -136,10 +136,10 @@ theorem even_not_foDefinable : ¬FODefinable EVEN := by
   rintro ⟨φ, hφ⟩
   set n := qdepth φ with hn
   have hpow : 0 < 2 ^ n := Nat.two_pow_pos n
-  letI : Language.empty.Structure (Fin (2 ^ n * 2)) := Language.emptyStructure
-  letI : Language.empty.Structure (Fin (2 ^ n * 2 + 1)) := Language.emptyStructure
-  haveI : Nonempty (Fin (2 ^ n * 2)) := ⟨⟨0, by omega⟩⟩
-  haveI : Nonempty (Fin (2 ^ n * 2 + 1)) := ⟨⟨0, by omega⟩⟩
+  let : Language.empty.Structure (Fin (2 ^ n * 2)) := Language.emptyStructure
+  let : Language.empty.Structure (Fin (2 ^ n * 2 + 1)) := Language.emptyStructure
+  have : Nonempty (Fin (2 ^ n * 2)) := ⟨⟨0, by omega⟩⟩
+  have : Nonempty (Fin (2 ^ n * 2 + 1)) := ⟨⟨0, by omega⟩⟩
   have hcard₁ : Nat.card (Fin (2 ^ n * 2)) = 2 ^ n * 2 := by simp
   have hcard₂ : Nat.card (Fin (2 ^ n * 2 + 1)) = 2 ^ n * 2 + 1 := by simp
   have hEF : EFEquiv (Language.empty.sum Language.order)
@@ -393,10 +393,10 @@ theorem even_not_ifpDefinableFree : ¬IFPDefinableFree EVEN := by
   set k := max k₀ (qdepth d.out) with hkdef
   have hbound : d.VarBound k := hk₀.mono (le_max_left _ _)
   have hout : qdepth d.out ≤ k := le_max_right _ _
-  letI : Language.empty.Structure (Fin (2 * k + 2)) := Language.emptyStructure
-  letI : Language.empty.Structure (Fin (2 * k + 3)) := Language.emptyStructure
-  haveI : Nonempty (Fin (2 * k + 2)) := ⟨⟨0, by omega⟩⟩
-  haveI : Nonempty (Fin (2 * k + 3)) := ⟨⟨0, by omega⟩⟩
+  let : Language.empty.Structure (Fin (2 * k + 2)) := Language.emptyStructure
+  let : Language.empty.Structure (Fin (2 * k + 3)) := Language.emptyStructure
+  have : Nonempty (Fin (2 * k + 2)) := ⟨⟨0, by omega⟩⟩
+  have : Nonempty (Fin (2 * k + 3)) := ⟨⟨0, by omega⟩⟩
   have hcard₁ : Nat.card (Fin (2 * k + 2)) = 2 * k + 2 := by simp
   have hcard₂ : Nat.card (Fin (2 * k + 3)) = 2 * k + 3 := by simp
   -- the constant tuples have the same (trivial) equality pattern

@@ -364,7 +364,7 @@ private theorem realize_partitionKernel :
               (PCy ρ b j (x, p)))) ∧
         (∀ i x p : A, MaxPos BWLe BWItem i → BWPosn p →
           (PPS ρ true i (x, p) ↔ PPS ρ false i (x, p))) := by
-  letI := partitionGuessBlock.structure ρ
+  let := partitionGuessBlock.structure ρ
   have hsubS : ∀ w : Fin 1 → A,
       RelMap (L := ptSOLang) (M := A) ptSelSym w ↔ ρ .sel w := fun _ => Iff.rfl
   have hsubP : ∀ (b : Bool) (w : Fin 3 → A),
@@ -590,11 +590,11 @@ theorem partition_sigmaSODefinable : SigmaSODefinable 1 Partition := by
     · have hno : ∀ i : A, ¬BWItem i := fun i hi => hitems ⟨i, hi⟩
       have hS : {i : A | PSel ρ i} = (∅ : Set A) := by
         ext i
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun hi => hno i (hsel i hi)
       have hS' : {i : A | BWItem i ∧ ¬PSel ρ i} = (∅ : Set A) := by
         ext i
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         exact fun hi => hno i hi.1
       rw [hS, hS', finsum_mem_empty]
 

@@ -20,7 +20,7 @@ machines rather than read them, can reason about runs without unfolding any
 A machine is `DescriptiveComplexity.TMData`: the sorts (`Posn`, `Tr`), the marks
 (`Start`, `Acc`, `Blank`, `Right`), the binary attributes of a transition
 (`Src`, `Read`, `Dst`, `Write`), the initial tape `Inp`, and a linear order
-`Le`. Two decisions from the plan are visible in the types.
+`Le`. Two decisions are visible in the types.
 
 * **Transitions are elements.** A transition is an element `τ` of the universe
   with four binary attributes, rather than a 5-ary relation; every relation
@@ -31,6 +31,15 @@ A machine is `DescriptiveComplexity.TMData`: the sorts (`Posn`, `Tr`), the marks
   of positions – a unary bound by construction, with no arithmetic. A head at
   the last position moving right has no successor
   (`DescriptiveComplexity.SuccPos` fails), and the run simply stops.
+
+A run is read in three ways, and which one a construction uses is what its
+resource bound can see. `DescriptiveComplexity.TMData.StepsIn` counts exactly, so
+two phases of unknown length do not compose; `Relation.ReflTransGen` composes but
+carries no count, so `DescriptiveComplexity.TMData.Accepts` cannot read it; and
+`DescriptiveComplexity.TMData.ReachesIn` – a run of *at most* `n` steps – does
+both, composing by adding budgets and weakening upwards. A clocked program is
+written with the third and a space-bounded one with its erasure, which is how the
+two share their phase lemmas.
 
 The tape is a total function `A → A`, so the semantics is total: reading a cell
 never fails. Which functions count as *initial* tapes is
@@ -103,9 +112,9 @@ def IsInit (c : Config A) : Prop :=
 
 /-- **One step.** Some transition applies in the current state to the symbol
 under the head: it writes in that cell, changes state, and moves the head to
-the neighbouring position in the direction it names. Cells other than the one
+the neighboring position in the direction it names. Cells other than the one
 under the head are unchanged, and a move off the end of the tape is impossible
-– there being no such neighbour, no step is available and the run stops. -/
+– there being no such neighbor, no step is available and the run stops. -/
 def Step (c c' : Config A) : Prop :=
   ∃ τ, M.Tr τ ∧ M.Src τ c.state ∧ M.Read τ (c.tape c.head) ∧
     M.Dst τ c'.state ∧ M.Write τ (c'.tape c.head) ∧
@@ -128,7 +137,8 @@ anywhere. A reduction buys itself `|Tag| · nᵈ` steps by choosing the dimensio
 
 The bound is *strict* because the positions index the time points of the run:
 `N` of them leave `N - 1` steps between them, which is what makes
-`DescriptiveComplexity.TMData.accepts_iff_exists_walk` an equivalence on the nose. -/
+`DescriptiveComplexity.TMData.accepts_iff_exists_walk` an equivalence and not
+merely an implication. -/
 def Accepts : Prop :=
   ∃ (c₀ c : Config A) (n : ℕ), M.IsInit c₀ ∧ n < Nat.card {p : A // M.Posn p} ∧
     M.StepsIn n c₀ c ∧ M.Acc c.state
@@ -147,6 +157,22 @@ positions, which is why the membership proof for the space-bounded problems is
 an SO(TC) specification rather than a `Σ₁` definition. -/
 def AcceptsSpace : Prop :=
   ∃ c₀ c : Config A, M.IsInit c₀ ∧ Relation.ReflTransGen M.Step c₀ c ∧ M.Acc c.state
+
+/-- **Reaching one configuration from another within a budget**: some run of at
+most `n` steps.
+
+This is the form in which a program's phases are stated when the machine is on a
+clock. `DescriptiveComplexity.TMData.StepsIn` counts exactly, so two phases whose
+lengths are not known separately do not compose; `Relation.ReflTransGen` composes
+but carries no count, and `DescriptiveComplexity.TMData.Accepts` cannot read it.
+A budget is what does both: it composes by adding
+(`DescriptiveComplexity.TMData.ReachesIn.trans`), it weakens upwards
+(`DescriptiveComplexity.TMData.ReachesIn.mono`), so a phase may be charged more
+than it spends and the arithmetic done once at the end, and it still gives the
+witness `Accepts` asks for. The space-bounded reading is its erasure
+(`DescriptiveComplexity.TMData.ReachesIn.reflTransGen`). -/
+def ReachesIn (n : ℕ) (c c' : Config A) : Prop :=
+  ∃ k ≤ n, M.StepsIn k c c'
 
 section Steps
 
@@ -219,6 +245,107 @@ theorem StepsIn.trans : ∀ {n m : ℕ} {c d e : Config A},
     rintro m c d e ⟨f, hstep, hrest⟩ hde
     rw [Nat.succ_add]
     exact ⟨f, hstep, ih hrest hde⟩
+
+/-- **A budgeted run is a run**: the space-bounded reading of acceptance forgets
+the count, so every lemma stated with `DescriptiveComplexity.TMData.StepsIn` – the
+sweep primitives of `DescriptiveComplexity.Problems.Machine.Program`, in
+particular – feeds straight into it. -/
+theorem reflTransGen_of_stepsIn : ∀ {n : ℕ} {c d : Config A},
+    M.StepsIn n c d → Relation.ReflTransGen M.Step c d := by
+  intro n
+  induction n with
+  | zero => intro c d h; exact (show c = d from h) ▸ Relation.ReflTransGen.refl
+  | succ n ih => rintro c d ⟨e, he, hrest⟩; exact Relation.ReflTransGen.head he (ih hrest)
+
+/-- **Every run has a length**: the converse of
+`DescriptiveComplexity.TMData.reflTransGen_of_stepsIn`. A reachability claim
+carries no count, but a chain of steps has one, so a phase proved without a
+budget can still be handed to a caller that needs one – the count is whatever
+the chain happens to be. -/
+theorem exists_stepsIn_of_reflTransGen {c d : Config A}
+    (h : Relation.ReflTransGen M.Step c d) : ∃ n : ℕ, M.StepsIn n c d := by
+  induction h with
+  | refl => exact ⟨0, rfl⟩
+  | tail _ hde ih =>
+    obtain ⟨n, hn⟩ := ih
+    exact ⟨n + 1, hn.trans_step hde⟩
+
+/-! ### The algebra of budgets -/
+
+/-- A run of exactly `n` steps is a run within `n`. -/
+theorem StepsIn.reachesIn {n : ℕ} {c d : Config A} (h : M.StepsIn n c d) :
+    M.ReachesIn n c d :=
+  ⟨n, Nat.le_refl n, h⟩
+
+/-- **Every run has a budget**, the same fact stated for
+`DescriptiveComplexity.TMData.ReachesIn`. -/
+theorem exists_reachesIn_of_reflTransGen {c d : Config A}
+    (h : Relation.ReflTransGen M.Step c d) : ∃ n : ℕ, M.ReachesIn n c d := by
+  obtain ⟨n, hn⟩ := exists_stepsIn_of_reflTransGen h
+  exact ⟨n, hn.reachesIn⟩
+
+/-- **A budget may be raised**, which is what makes phases of different lengths
+composable: each is charged a bound it need not meet. -/
+theorem ReachesIn.mono {n m : ℕ} {c d : Config A} (hnm : n ≤ m) (h : M.ReachesIn n c d) :
+    M.ReachesIn m c d := by
+  obtain ⟨k, hk, hrun⟩ := h
+  exact ⟨k, hk.trans hnm, hrun⟩
+
+/-- Standing still costs nothing. -/
+theorem reachesIn_refl {n : ℕ} {c : Config A} : M.ReachesIn n c c :=
+  ⟨0, Nat.zero_le n, rfl⟩
+
+/-- One step costs one. -/
+theorem reachesIn_of_step {c d : Config A} (h : M.Step c d) : M.ReachesIn 1 c d :=
+  ⟨1, Nat.le_refl 1, ⟨d, h, rfl⟩⟩
+
+/-- **Budgeted runs compose, and their budgets add.** This is the whole reason
+for the notion: a program's cost is read off its phases as a sum, and compared
+with the clock once. -/
+theorem ReachesIn.trans {n m : ℕ} {c d e : Config A}
+    (hcd : M.ReachesIn n c d) (hde : M.ReachesIn m d e) : M.ReachesIn (n + m) c e := by
+  obtain ⟨k, hk, hrun⟩ := hcd
+  obtain ⟨l, hl, hrun'⟩ := hde
+  exact ⟨k + l, Nat.add_le_add hk hl, hrun.trans hrun'⟩
+
+/-- A budgeted run extended by one step at its end. -/
+theorem ReachesIn.tail {n : ℕ} {c d e : Config A} (h : M.ReachesIn n c d) (hstep : M.Step d e) :
+    M.ReachesIn (n + 1) c e :=
+  h.trans (reachesIn_of_step hstep)
+
+/-- A budgeted run extended by one step at its start. -/
+theorem ReachesIn.head {n : ℕ} {c d e : Config A} (hstep : M.Step c d) (h : M.ReachesIn n d e) :
+    M.ReachesIn (n + 1) c e :=
+  (Nat.add_comm 1 n) ▸ (reachesIn_of_step hstep).trans h
+
+/-- **Five legs, added up**: two runs of the same length with a step before,
+between and after them. This is the shape a program's opening has – enter, a
+sweep, turn round, a sweep, enter the next phase – and the addition is all there
+is to its cost. -/
+theorem reachesIn_five {n : ℕ} {c₀ c₁ c₂ c₃ c₄ c₅ : Config A}
+    (h₁ : M.Step c₀ c₁) (h₂ : M.ReachesIn n c₁ c₂) (h₃ : M.Step c₂ c₃)
+    (h₄ : M.ReachesIn n c₃ c₄) (h₅ : M.Step c₄ c₅) :
+    M.ReachesIn (2 * n + 3) c₀ c₅ :=
+  (((reachesIn_of_step h₁).trans h₂).trans
+    ((reachesIn_of_step h₃).trans
+      (h₄.trans (reachesIn_of_step h₅)))).mono (by omega)
+
+/-- **A budgeted run is a run.** The erasure that turns every statement of a
+clocked program into the corresponding statement of a space-bounded one, which is
+why the two models share their phase lemmas. -/
+theorem ReachesIn.reflTransGen {n : ℕ} {c d : Config A} (h : M.ReachesIn n c d) :
+    Relation.ReflTransGen M.Step c d := by
+  obtain ⟨_, -, hrun⟩ := h
+  exact reflTransGen_of_stepsIn hrun
+
+/-- **A budgeted run that ends accepting makes the machine accept**, provided the
+budget is below the clock. The one place a program's arithmetic meets
+`DescriptiveComplexity.TMData.Accepts`. -/
+theorem accepts_of_reachesIn {n : ℕ} {c₀ c : Config A} (hinit : M.IsInit c₀)
+    (hrun : M.ReachesIn n c₀ c) (hlt : n < Nat.card {p : A // M.Posn p})
+    (hacc : M.Acc c.state) : M.Accepts := by
+  obtain ⟨k, hk, hrun⟩ := hrun
+  exact ⟨c₀, c, k, hinit, Nat.lt_of_le_of_lt hk hlt, hrun, hacc⟩
 
 end Steps
 

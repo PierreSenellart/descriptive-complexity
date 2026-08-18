@@ -216,7 +216,7 @@ private theorem sorealize_pullSO_aux :
     exact (I.realize_pullSentence φ A).symm
   | cons B Bs ih =>
     intro L₁ L₂ instRel I A instA φ pol
-    letI := instA
+    let := instA
     have key : ∀ ρ : B.Assignment (I.Map A),
         (@SORealize (L₂.sum B.lang) (I.Map A)
             (@sumStructure L₂ B.lang (I.Map A) (I.mapStructure A) (B.structure ρ)) Bs φ
@@ -228,7 +228,7 @@ private theorem sorealize_pullSO_aux :
             (@pullSO Tag d _ Bs (L₁.sum (B.pull Tag d).lang) (L₂.sum B.lang) _
               (I.extendSO B) φ) (!pol)) := by
       intro ρ
-      letI := (B.pull Tag d).structure (B.pullAssign ρ)
+      let := (B.pull Tag d).structure (B.pullAssign ρ)
       refine Iff.trans (Iff.symm (@sorealize_iso (L₂.sum B.lang) ((I.extendSO B).Map A)
         (I.Map A) (FOInterpretation.mapStructure (I.extendSO B) A)
         (@sumStructure L₂ B.lang (I.Map A) (I.mapStructure A) (B.structure ρ))
@@ -296,13 +296,13 @@ variable {k : ℕ}
 theorem SigmaSODefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : SigmaSODefinable k Q) :
     SigmaSODefinable k P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine ⟨pullBlocks f.Tag f.dim Bs, by simp [pullBlocks, hk],
     pullSO Bs L₁ L₂ f.toInterpretation φ, ?_⟩
   intro A _ _ _
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   exact (f.correct A).trans ((hφ (f.toInterpretation.Map A)).trans
     (sorealize_pullSO f.toInterpretation A Bs φ true))
 
@@ -310,13 +310,13 @@ theorem SigmaSODefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : SigmaSODefinabl
 theorem PiSODefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : PiSODefinable k Q) :
     PiSODefinable k P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine ⟨pullBlocks f.Tag f.dim Bs, by simp [pullBlocks, hk],
     pullSO Bs L₁ L₂ f.toInterpretation φ, ?_⟩
   intro A _ _ _
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   exact (f.correct A).trans ((hφ (f.toInterpretation.Map A)).trans
     (sorealize_pullSO f.toInterpretation A Bs φ false))
 
@@ -404,7 +404,7 @@ noncomputable def allTagAssign (Tag : Type) [Finite Tag] (k : ℕ) : List (Fin k
 
 open Classical in
 theorem mem_allTagAssign (t : Fin k → Tag) : t ∈ allTagAssign Tag k := by
-  letI : Fintype Tag := Fintype.ofFinite Tag
+  let : Fintype Tag := Fintype.ofFinite Tag
   exact Finset.mem_toList.mpr (Finset.mem_univ t)
 
 end Clausal

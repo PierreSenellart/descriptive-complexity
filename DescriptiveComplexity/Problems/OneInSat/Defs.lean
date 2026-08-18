@@ -141,7 +141,7 @@ private theorem realize_oiPPClause :
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) oiPPClause) ↔
       ∀ c x y : A, IsCl c → PosIn c x → (ρ satNuSym.1 fun _ => x) → PosIn c y →
         (ρ satNuSym.1 fun _ => y) → x = y := by
-  letI := satAssignBlock.structure ρ
+  let := satAssignBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := satSOLang) (M := A) kNuSym w ↔ ρ satNuSym.1 fun _ => w 0 := by
     intro w
@@ -160,7 +160,7 @@ private theorem realize_oiNNClause :
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) oiNNClause) ↔
       ∀ c x y : A, IsCl c → NegIn c x → ¬(ρ satNuSym.1 fun _ => x) → NegIn c y →
         ¬(ρ satNuSym.1 fun _ => y) → x = y := by
-  letI := satAssignBlock.structure ρ
+  let := satAssignBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := satSOLang) (M := A) kNuSym w ↔ ρ satNuSym.1 fun _ => w 0 := by
     intro w
@@ -179,7 +179,7 @@ private theorem realize_oiPNClause :
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) oiPNClause) ↔
       ∀ c x y : A, IsCl c → PosIn c x → (ρ satNuSym.1 fun _ => x) → NegIn c y →
         (ρ satNuSym.1 fun _ => y) := by
-  letI := satAssignBlock.structure ρ
+  let := satAssignBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := satSOLang) (M := A) kNuSym w ↔ ρ satNuSym.1 fun _ => w 0 := by
     intro w

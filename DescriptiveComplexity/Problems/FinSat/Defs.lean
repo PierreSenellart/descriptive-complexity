@@ -373,10 +373,6 @@ theorem gval_of_le (I : A → (A → M) → Prop) {k k' : ℕ} (hk : k ≤ k') (
   | refl => exact h
   | step _ ih => exact gval_mono I _ _ _ ih
 
-theorem gval_le_Gval (I : A → (A → M) → Prop) {k : ℕ} {v : A → M} {g : A}
-    (h : gval I k v g) : Gval I v g :=
-  ⟨k, h⟩
-
 /-- An interpretation is **local** when the value of a symbol depends only on
 the arguments its signature declares. -/
 def Local (I : A → (A → M) → Prop) : Prop :=

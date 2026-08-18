@@ -114,9 +114,6 @@ noncomputable def blockVocab (B : SOBlock) : FinVocab B.lang :=
   FinVocab.ofEquivSigma (blockNum B)
     ((blockEq B).trans (Equiv.sigmaFiberEquiv B.arity).symm)
 
-theorem index_blockVocab (B : SOBlock) {n : ℕ} (r : B.lang.Relations n) :
-    (blockVocab B).index r = (blockEq B).symm r.1 := rfl
-
 /-- The vocabulary an `∃SO[new]` kernel is read over: the instance's, the mark
 of the original elements, and the block's. -/
 noncomputable def soVocab {L : Language.{0, 0}} (V : FinVocab L) (B : SOBlock) :
@@ -434,7 +431,7 @@ theorem RE_subset_rePred {L : Language.{0, 0}} [L.IsRelational] (V : FinVocab L)
           (@sumStructure (newLang L) B.lang (s.Univ ⊕ Fin m) (extStructure L s.Univ m)
             (B.structure (tabAssign B s m tab))) φ := by
     intro m tab
-    letI : ((newLang L).sum B.lang).Structure (s.Univ ⊕ Fin m) :=
+    let : ((newLang L).sum B.lang).Structure (s.Univ ⊕ Fin m) :=
       @sumStructure (newLang L) B.lang (s.Univ ⊕ Fin m) (extStructure L s.Univ m)
         (B.structure (tabAssign B s m tab))
     exact (FinStruct.evalSentence_iff (soVocab V B) φ (extStruct V B s m tab)).trans

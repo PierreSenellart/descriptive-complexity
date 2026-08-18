@@ -11,7 +11,7 @@ name: Update Mathlib
 # Why this drives `scripts/release.sh` rather than an update action:
 # `oliver-butterley/lean-update` (used here until 2026-07-30) rewrites
 # `lean-toolchain` to the newest Lean *release*, prereleases included, and then
-# runs `lake update` — which cannot move a Mathlib `require` fixed to a tag. The
+# runs `lake update` – which cannot move a Mathlib `require` fixed to a tag. The
 # toolchain therefore ran ahead of the pin, and from the day each new rc appears
 # every monthly run ended in a failed build against a Mathlib the toolchain was
 # not cut for, with no usable Mathlib cache. Its maintained successor,

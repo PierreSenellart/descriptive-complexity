@@ -1,7 +1,7 @@
 # DescriptiveComplexity
 
 [![CI](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml)
-[![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0--rc1-blue)](https://github.com/leanprover-community/mathlib4/releases/tag/v4.33.0-rc1)
+[![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0-blue)](https://github.com/leanprover-community/mathlib4/releases/tag/v4.33.0)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21678423-007ec6)](https://doi.org/10.5281/zenodo.21678423)
 [![Archived in Software Heritage](https://archive.softwareheritage.org/badge/origin/https://github.com/PierreSenellart/descriptive-complexity/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/PierreSenellart/descriptive-complexity)
 
@@ -77,29 +77,29 @@ for it under FO reductions.
 
 | Complexity class | Logical characterization | Machine model | Problems proved complete |
 | --- | --- | --- | --- |
-| **L** = LOGSPACE | FO(≤, DTC) | deterministic two-way `k`-head automaton, walking a linear order of the universe | REACHd · UNREACHd |
-| **NL** | SO-Krom(≤); equivalently FO(≤, TC) | two-way `k`-head automaton, walking a linear order of the universe | REACH · UNREACH · 2SAT |
+| **L** = LOGSPACE | FO(≤, DTC) | deterministic two-way `k`-head automaton | REACHd · UNREACHd |
+| **NL** | SO-Krom(≤); equivalently FO(≤, TC) | two-way `k`-head automaton | REACH · UNREACH · 2SAT |
 | **PTIME** = Σ₀ᵖ = Π₀ᵖ | SO-Horn(≤); equivalently FO(≤, LFP) or FO(≤, IFP) | deterministic polynomial-time Turing machine | HORN-SAT · CVP (circuit value) · GAME (alternating reachability) · acceptance by a deterministic polynomial-time Turing machine |
-| **NP** = Σ₁ᵖ | ∃SO | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
-| **coNP** = Π₁ᵖ | ∀SO | nondeterministic polynomial-time Turing machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT · acceptance by such a machine |
+| **NP** = Σ₁ᵖ | ∃SO; equivalently ∃SO[new, d], value invention bounded by the instance's `d`-tuples | nondeterministic polynomial-time Turing machine | **SAT-family:** SAT · 3SAT · NAE-SAT · NAE-3SAT · 1-in-SAT<br>**Coloring:** 3-Colorability · `k`-Colorability (`k ≥ 3`) · Chromatic Number · Clique Cover<br>**Cliques & subgraphs:** Clique · Independent Set · Vertex Cover · Subgraph Isomorphism<br>**Sets & hypergraphs:** Set Cover · Hitting Set · Set Packing · Exact Cover · Set Splitting · Dominating Set · 3-Dimensional Matching<br>**Graphs:** Feedback Vertex Set · Feedback Arc Set · Steiner Tree (node- & edge-weighted) · Max Cut · Hamilton Circuit (directed & undirected)<br>**Numbers (in binary):** Knapsack · Partition · 0-1 Integer Programming · Job Sequencing<br>**Machines:** acceptance by a nondeterministic polynomial-time Turing machine |
+| **coNP** = Π₁ᵖ | ∀SO | the same machine, accepting when *every* run does | TAUT · 3-DNF-TAUT · 3-UNSAT · acceptance by such a machine |
 | **DP** | a Σ₁ and a Π₁ sentence conjoined | – | SAT-UNSAT |
-| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine with `k` blocks, existential first | `QBF k` (quantified Boolean formulas, `k` blocks) · acceptance by such a machine |
+| **Σₖᵖ** (`k ≥ 1`) | Σₖ¹: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine, `k` blocks, existential first | `QBF k` (quantified Boolean formulas, `k` blocks) · acceptance by such a machine |
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` (universal-first, `k` blocks) · acceptance by such a machine |
 | **PH** | SO | – | – |
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
-| **EXPTIME** | SO(LFP), i.e. PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating Turing machine, its tape indexed by the input's positions and no bound on the length of a play | acceptance by such a machine (`APSPACE = EXPTIME`) |
-| **NEXPTIME** | ∃SO over an exponential expansion (NP read there) | – | – |
-| **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | wide machine, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine in bounded space (deterministic & not) |
-| **RE** | ∃SO[new] (∃SO with value invention) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
+| **EXPTIME** | SO(LFP), i.e., PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating polynomial-space Turing machine | acceptance by such a machine (`APSPACE = EXPTIME`) |
+| **NEXPTIME** | ∃SO over an exponential expansion (NP read there); equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
+| **EXPSPACE** | SO(PFP), i.e., PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
+| **RE** | ∃SO[new] (∃SO with value invention, unbounded) | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| **the degree of a problem** – `below Q₀`, e.g., **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
-Each entry of the machine column is an equivalence proved here between the
-logical definition and acceptance by that model. For NEXPTIME only half of it is
-proved: the wide machine – control in the instance, tape addressed by the subsets
-of the instance – is a member of the class (`wideAccept_mem_NEXPTIME`), but its
-hardness is not formalized. The classes are also matched against Mathlib's computability
-layer: RE is recursive enumerability, every RE-hard problem is undecidable, and
-RE ≠ co-RE.
+Two of the models are named rather than described: both head automata walk a
+linear order of the universe, and a *wide* machine carries its control in the
+instance while its tape is addressed by an exponential expansion of it. Each
+entry of the machine column is an equivalence proved here between the logical
+definition and acceptance by that model. The classes are also matched against
+Mathlib's computability layer: RE is recursive enumerability, every RE-hard
+problem is undecidable, and RE ≠ co-RE.
 
 The last row states completeness against a problem instead of a logic, which is
 what “GI-complete” means. It agrees with the logical definitions where both
@@ -162,6 +162,7 @@ pin is the *same* as your project's, not merely a compatible one.
 
 | DescriptiveComplexity | Mathlib | Toolchain |
 | --- | --- | --- |
+| `v1.2.0` | `v4.33.0` | `leanprover/lean4:v4.33.0` |
 | `v1.1.0` | `v4.33.0-rc1` | `leanprover/lean4:v4.33.0-rc1` |
 | `v1.0.0` | `v4.33.0-rc1` | `leanprover/lean4:v4.33.0-rc1` |
 | `master` | latest pin, moves | see `lean-toolchain` |
@@ -172,20 +173,38 @@ authoritative for the pin. A **patch** release keeps the Mathlib pin it was cut
 against, and **a new pin always takes at least a minor bump** – so depend on
 `~1.0.0`, which stays within a single pin, rather than on `^1.0.0`.
 
-In a `lakefile.toml`:
+The package is indexed on
+[Reservoir](https://reservoir.lean-lang.org/@PierreSenellart/descriptive-complexity),
+so it can be required by name. In a `lakefile.toml`:
 
 ```toml
 [[require]]
 name = "descriptive-complexity"
-git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "v1.1.0"
+scope = "PierreSenellart"
+version = "~1.2.0"
 ```
 
 or, in a `lakefile.lean`:
 
 ```lean
+require "PierreSenellart" / "descriptive-complexity" @ "~1.2.0"
+```
+
+What follows `@` is a version *range*, not a version: Lake rejects a bare
+number there.
+
+To pin a commit, or to follow `master`, require it from git instead:
+
+```toml
+[[require]]
+name = "descriptive-complexity"
+git = "https://github.com/PierreSenellart/descriptive-complexity"
+rev = "v1.2.0"
+```
+
+```lean
 require "descriptive-complexity" from git
-  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.1.0"
+  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.2.0"
 ```
 
 Pin a version tag or a commit hash rather than `master`, for reproducible

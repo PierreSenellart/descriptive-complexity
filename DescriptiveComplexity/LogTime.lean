@@ -28,9 +28,9 @@ import DescriptiveComplexity.HeadEvalBit
 
 Every class of this library above the bottom has its machine model *proved*
 equal to the logic that defines it – `LOGSPACE` its multi-head automaton, `NL`
-its nondeterministic one, `PTIME` its program. AC⁰ had nothing. This module
-gives it a machine, in the shape the classical theory prescribes for the
-logarithmic-time hierarchy (Sipser 1983; [Barrington, Immerman & Straubing
+its nondeterministic one, `PTIME` its program. This module gives AC⁰ one too,
+in the shape the classical theory prescribes for the logarithmic-time hierarchy
+([Sipser 1983][sipser1983borel]; [Barrington, Immerman & Straubing
 1990][barrington1990uniformity]), and proves it equal to a logic – to
 `FO(≤, BIT)`, which is the classical logic for AC⁰ – and, through both halves
 of Immerman's Thm 1.17, to `DescriptiveComplexity.AC0Definable` itself: the
@@ -108,9 +108,8 @@ PARITY lies in it and not in AC⁰ ([Furst, Saxe & Sipser 1984][furst1984parity]
 The bit atom is `DescriptiveComplexity.BitIx`: `BIT(x, i)` with the position
 named by the element whose *rank* is the exponent. The alternative – naming a
 position by its place value, the element of rank `2 ^ i` – makes the bit atom
-first-order in `FO(≤, +, ×)` outright (`DescriptiveComplexity.arithDef_bit`), and
-was the earlier design here. It cannot be used for a machine, and the reason is
-worth keeping:
+first-order in `FO(≤, +, ×)` outright (`DescriptiveComplexity.arithDef_bit`), but
+it cannot be used for a machine, and the reason is worth keeping:
 
 > With a base of sweeps and a place-value bit atom, every atom is a **regular**
 > relation of the registers' bit tracks read in parallel, alternating registers

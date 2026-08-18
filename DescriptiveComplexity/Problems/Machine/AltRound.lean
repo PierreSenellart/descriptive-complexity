@@ -13,14 +13,14 @@ game. Round `i` starts at the position `t`, in the configuration the previous
 round handed over; whatever walk it plays describes a *play of block `i`*
 (`DescriptiveComplexity.Problems.Machine.AltRank`), and
 `DescriptiveComplexity.ATMData.game_iff_end` says that the rest of the game is
-decided by how that play ends — which is exactly the shape
+decided by how that play ends – which is exactly the shape
 `DescriptiveComplexity.ATMData.PlayEnds` and
 `DescriptiveComplexity.ATMData.UnivPlayOk` of the two collapse lemmas.
 
 Two things end a play. Either it hands over to block `i + 1`, and then the rest
 of the game is the game from round `i + 1`, by the induction hypothesis; or it
-stops inside block `i`, and then — because acceptance is absorbing and a stuck
-configuration cannot move — the walk stands still from there to the highest
+stops inside block `i`, and then – because acceptance is absorbing and a stuck
+configuration cannot move – the walk stands still from there to the highest
 position, every block is low, and
 `DescriptiveComplexity.ATMData.gameFrom_of_blkLt` reduces the rest of the game
 to whether that configuration accepts.
@@ -106,7 +106,7 @@ theorem posSeq_eq_of_le {t s : A} (ht : M.Posn t) (hs : M.Posn s) (hle : M.Le t 
   exact bitRank_inj hlin hs hp (by omega)
 
 /-- **What the rest of the game decides**: the game from round `i + 1` holds
-exactly when the play of block `i` that round `i`'s walk describes ends well —
+exactly when the play of block `i` that round `i`'s walk describes ends well –
 in either of the two readings the collapse lemmas use. -/
 theorem game_iff_end (start : Bool) {i m : ℕ}
     (hIH : ∀ (v : A → Config A) (t' : A), M.LegalBelow (i + 1) v → M.Posn t' →
@@ -224,8 +224,8 @@ theorem game_iff_end (start : Bool) {i m : ℕ}
 
 /-! ### One round, against an abstract admissibility condition
 
-Both the induction step and its base — the first round, which has nothing to
-inherit — are this one lemma, differing only in what makes a walk admissible.
+Both the induction step and its base – the first round, which has nothing to
+inherit – are this one lemma, differing only in what makes a walk admissible.
 `C` is that condition; the four hypotheses say it forces a walk to be legal
 below `i + 1`, to start the round at `c`, to keep the past in low blocks, and
 to be met by the walk `DescriptiveComplexity.ATMData.splice` builds out of any

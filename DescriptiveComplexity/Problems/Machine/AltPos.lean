@@ -229,7 +229,7 @@ theorem succPos_posCell_posEnd :
 transition is pinned (`DescriptiveComplexity.altTr_unique`), the successor
 configuration is too: its state by `altDst_functional`, the cell under the head
 by `altWrite_functional`, every other cell by the frame condition, and the head
-itself by uniqueness of the neighbour in the direction the transition names. -/
+itself by uniqueness of the neighbor in the direction the transition names. -/
 theorem step_functional_off_guess {cnf : Bool} {c c₁ c₂ : Config (AltV k A)}
     (hguess : ¬∃ (i : Fin (k + 1)) (x : A), c.state = stG i true ∧ c.tape c.head = symV false x)
     (h₁ : (altMachine k A cnf).Step c c₁) (h₂ : (altMachine k A cnf).Step c c₂) : c₁ = c₂ := by

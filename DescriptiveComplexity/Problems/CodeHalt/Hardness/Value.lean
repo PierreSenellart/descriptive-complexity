@@ -157,10 +157,6 @@ section Eval
 
 open Nat.Partrec.Code
 
-theorem eval_zero_zero : eval Code.zero 0 = Part.some 0 := rfl
-
-theorem eval_succ_zero : eval Code.succ 0 = Part.some 1 := rfl
-
 theorem eval_pair_zero {cf cg : Code} {a b : ℕ} (hf : eval cf 0 = Part.some a)
     (hg : eval cg 0 = Part.some b) : eval (Code.pair cf cg) 0 = Part.some (Nat.pair a b) := by
   simp [eval, hf, hg, Seq.seq]
@@ -224,15 +220,6 @@ variable {L : Language.{0, 0}} [L.IsRelational] (V : FinVocab L) {A : Type} [L.S
 /-- Overwriting one coordinate of a tuple. -/
 def setCo (j : ℕ) (a : A) (t : Fin (dimOf V) → A) : Fin (dimOf V) → A :=
   fun j' => if (j' : ℕ) = j then a else t j'
-
-omit [L.IsRelational] [L.Structure A] in
-theorem setCo_self {j : ℕ} (hj : j < dimOf V) (t : Fin (dimOf V) → A) :
-    setCo V j (t ⟨j, hj⟩) t = t := by
-  funext j'
-  rw [setCo]
-  split_ifs with h
-  · exact congrArg t (Fin.ext h.symm : (⟨j, hj⟩ : Fin (dimOf V)) = j')
-  · rfl
 
 omit [L.IsRelational] [L.Structure A] in
 theorem setCo_apply_self (j : ℕ) (hj : j < dimOf V) (a : A) (t : Fin (dimOf V) → A) :

@@ -12,8 +12,8 @@ import DescriptiveComplexity.TransitiveClosure
 An expansion carves its universe out of the tagged assignments by a **domain
 sentence**, and that is what makes walking it hard over the base: the immediate
 successor of a point is the least *point* above it, and skipping the tagged
-assignments that fail the domain sentence is not a first-order condition — "no
-point in between" quantifies over block assignments.
+assignments that fail the domain sentence is not a first-order condition – “no
+point in between” quantifies over block assignments.
 
 This file removes the difficulty at the source. `X.trivialize` is the same
 expansion with the same tags and the same block, its domain sentence replaced
@@ -30,7 +30,7 @@ insertion of `DescriptiveComplexity.relativizeTo` together with the renaming of
 the vocabulary. The two are done by one recursion here
 (`DescriptiveComplexity.ExpExpansion.relLift`) rather than composed, so that its
 correctness is a single induction stated directly at the inclusion of the old
-universe into the new — which is what the walk correspondence consumes.
+universe into the new – which is what the walk correspondence consumes.
 
 The inclusion is *definitional*: the trivialized expansion has the same tags and
 the same block, so its points are the same pairs, its order is the same order,
@@ -98,7 +98,7 @@ noncomputable def trivialize : ExpExpansion L where
     | _, Sum.inr .real => X.rep1LHom.onSentence (X.dom (τ 0))
   dom_nonempty := fun A _ _ _ _ => by
     obtain ⟨t, ρ, -⟩ := X.dom_nonempty A
-    letI := X.B.structure₁ (L := L.sum Language.order) ρ
+    let := X.B.structure₁ (L := L.sum Language.order) ρ
     exact ⟨t, ρ, Formula.realize_top.mpr trivial⟩
 
 /-- The marking symbol of the trivialized vocabulary. -/
@@ -108,7 +108,7 @@ variable {X}
 
 /-- **Every candidate point is a point** of the trivialized expansion. -/
 theorem trivialize_domHolds (p : X.trivialize.Point A) : DomHolds (X := X.trivialize) p := by
-  letI := X.trivialize.B.structure₁ (L := L.sum Language.order) p.2
+  let := X.trivialize.B.structure₁ (L := L.sum Language.order) p.2
   exact Formula.realize_top.mpr trivial
 
 /-- A point of the trivialized expansion, from a candidate point. -/
@@ -223,7 +223,7 @@ theorem realize_termLift_elim {β : Type} {n : ℕ} (v : β → X.Map A) (xs : F
 theorem realize_markF {β : Type} (v : β → X.trivialize.Map A) (x : β) :
     letI := X.trivialize.mapLinearOrder A
     ((markF X x).Realize v ↔ ∃ p : X.Map A, trivIncl p = v x) := by
-  letI := X.trivialize.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   exact Iff.trans BoundedFormula.realize_rel₁ (exists_trivIncl_iff (v x)).symm
 
 /-- **The relativized formula says of the marked points what the original said
@@ -235,8 +235,8 @@ theorem realize_relLift {β : Type} :
       letI := X.trivialize.mapLinearOrder A
       ((relLift X φ).Realize (fun b => trivIncl (v b)) (fun i => trivIncl (xs i)) ↔
         φ.Realize v xs) := by
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   intro n φ
   induction φ with
   | falsum => exact fun _ _ => Iff.rfl
@@ -292,8 +292,8 @@ theorem realize_relLift_formula {β : Type} (φ : (X.E.sum Language.order).Formu
     letI := X.mapLinearOrder A
     letI := X.trivialize.mapLinearOrder A
     (Formula.Realize (relLift X φ) (fun b => trivIncl (v b)) ↔ Formula.Realize φ v) := by
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   refine Iff.trans ?_ (realize_relLift φ v default)
   exact iff_of_eq (congrArg (fun w : Fin 0 → X.trivialize.Map A =>
     BoundedFormula.Realize (relLift X φ) (fun b => trivIncl (v b)) w)
@@ -305,7 +305,7 @@ variable (X)
 
 /-- **The walk of a specification, carried to the trivialized expansion**: every
 formula relativized to the mark, and the mark of the tuple required wherever the
-walk enters a node — at a source, and at the target of a step. -/
+walk enters a node – at a source, and at the target of a step. -/
 noncomputable def relSpec (spec : TCSpec X.E) : TCSpec X.trivialize.E where
   Mode := spec.Mode
   k := spec.k
@@ -321,19 +321,12 @@ variable {X} {spec : TCSpec X.E}
 def relNode (a : spec.Node (X.Map A)) : (relSpec X spec).Node (X.trivialize.Map A) :=
   (a.1, fun i => trivIncl (a.2 i))
 
-omit [Finite A] [Nonempty A] in
-theorem relNode_injective : Function.Injective (relNode (X := X) (A := A) (spec := spec)) := by
-  rintro ⟨m, x⟩ ⟨m', x'⟩ h
-  have h1 : m = m' := congrArg Prod.fst h
-  have h2 : (fun i => trivIncl (x i)) = fun i => trivIncl (x' i) := congrArg Prod.snd h
-  exact Prod.ext h1 (funext fun i => trivIncl_injective (congrFun h2 i))
-
 /-- The conjoined marks hold exactly of a tuple of included points. -/
 theorem realize_marks {β : Type} (sel : Fin spec.k → β) (v : β → X.trivialize.Map A) :
     letI := X.trivialize.mapLinearOrder A
     (Formula.Realize (listInf ((List.finRange spec.k).map fun i => markF X (sel i))) v ↔
       ∀ i, ∃ p : X.Map A, trivIncl p = v (sel i)) := by
-  letI := X.trivialize.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   rw [realize_listInf]
   constructor
   · intro h i
@@ -346,8 +339,8 @@ theorem isSrc_relNode (a : spec.Node (X.Map A)) :
     letI := X.mapLinearOrder A
     letI := X.trivialize.mapLinearOrder A
     ((relSpec X spec).IsSrc (relNode a) ↔ spec.IsSrc a) := by
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   have hmarks : Formula.Realize
       (listInf ((List.finRange spec.k).map fun i => markF X i))
       (fun i => trivIncl (a.2 i)) :=
@@ -368,8 +361,8 @@ theorem step_relNode (a b : spec.Node (X.Map A)) :
     letI := X.mapLinearOrder A
     letI := X.trivialize.mapLinearOrder A
     ((relSpec X spec).Step (relNode a) (relNode b) ↔ spec.Step a b) := by
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   have hv : (Sum.elim (fun i => trivIncl (a.2 i)) fun i => trivIncl (b.2 i)) =
       fun x => trivIncl (Sum.elim a.2 b.2 x) := by
     funext x; cases x <;> rfl
@@ -395,7 +388,7 @@ theorem exists_relNode {u : (relSpec X spec).Node (X.trivialize.Map A)}
 theorem exists_relNode_of_isSrc {u : (relSpec X spec).Node (X.trivialize.Map A)}
     (h : letI := X.trivialize.mapLinearOrder A; (relSpec X spec).IsSrc u) :
     ∃ a : spec.Node (X.Map A), relNode a = u := by
-  letI := X.trivialize.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   exact exists_relNode ((realize_marks (X := X) (spec := spec) id u.2).mp
     (Formula.realize_inf.mp h).2)
 
@@ -403,7 +396,7 @@ theorem exists_relNode_of_step {u v : (relSpec X spec).Node (X.trivialize.Map A)
     (h : letI := X.mapLinearOrder A; letI := X.trivialize.mapLinearOrder A;
       (relSpec X spec).Step u v) :
     ∃ b : spec.Node (X.Map A), relNode b = v := by
-  letI := X.trivialize.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   exact exists_relNode ((realize_marks (X := X) (spec := spec) Sum.inr
     (Sum.elim u.2 v.2)).mp (Formula.realize_inf.mp h).2)
 
@@ -415,8 +408,8 @@ theorem reach_relSpec (a : spec.Node (X.Map A))
     letI := X.trivialize.mapLinearOrder A
     ((relSpec X spec).Reach (relNode a) v →
       ∃ b : spec.Node (X.Map A), relNode b = v ∧ spec.Reach a b) := by
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   intro h
   induction h with
   | refl => exact ⟨a, rfl, Relation.ReflTransGen.refl⟩
@@ -429,8 +422,8 @@ theorem reach_relNode {a b : spec.Node (X.Map A)} :
     letI := X.mapLinearOrder A
     letI := X.trivialize.mapLinearOrder A
     (spec.Reach a b → (relSpec X spec).Reach (relNode a) (relNode b)) := by
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   intro h
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -441,8 +434,8 @@ theorem accepts_relSpec :
     letI := X.mapLinearOrder A
     letI := X.trivialize.mapLinearOrder A
     ((relSpec X spec).Accepts (X.trivialize.Map A) ↔ spec.Accepts (X.Map A)) := by
-  letI := X.mapLinearOrder A
-  letI := X.trivialize.mapLinearOrder A
+  let := X.mapLinearOrder A
+  let := X.trivialize.mapLinearOrder A
   constructor
   · rintro ⟨u, w, hu, hw, huw⟩
     obtain ⟨a, rfl⟩ := exists_relNode_of_isSrc hu

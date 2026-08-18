@@ -11,8 +11,8 @@ import DescriptiveComplexity.Exponential.OrdFormula
 `DescriptiveComplexity.Exponential.OrdFormula` writes the *order* on an
 expanded universe as a first-order sentence over the base. Walking that universe
 needs one thing more: its **covering relation**, and the two endpoints of the
-order. An assignment is read as a binary number — the set of atoms it makes
-true, most significant at the smallest atom — so the immediate successor is the
+order. An assignment is read as a binary number – the set of atoms it makes
+true, most significant at the smallest atom – so the immediate successor is the
 schoolchild's increment: find the greatest atom the assignment misses, put it
 in, and take out every atom above it.
 
@@ -30,22 +30,22 @@ positions that `DescriptiveComplexity.SOBlock.ordLtF` already uses.
 A padded atom (`DescriptiveComplexity.SOBlock.AtomIx`) is a relation variable
 with a tuple of the block's *maximal* arity, of which
 `DescriptiveComplexity.SOBlock.atomSet` reads only the first `B.arity i`
-coordinates — so the sets in the image of `atomSet` are exactly the
+coordinates – so the sets in the image of `atomSet` are exactly the
 **padding-invariant** ones, and the binary increment of such a set is in general
 not one: it flips a single padded atom, while padding-invariance forces every
 padded atom with the same truncation to move together. **The successor of an
 assignment is therefore not the increment of its padded atom set.**
 
-The order is unaffected — two assignments differ first at a padded atom exactly
+The order is unaffected – two assignments differ first at a padded atom exactly
 when they differ first at the *real* atom `Σ i, Fin (B.arity i) → A` it
-truncates to — and the honest atoms are what this file works with. Over them an
+truncates to – and the honest atoms are what this file works with. Over them an
 assignment is an arbitrary subset (`DescriptiveComplexity.SOBlock.realSet` is a
 bijection), so the set-level increment applies unchanged, and
 `DescriptiveComplexity.SOBlock.assignSucc_iff` reads it back as *the immediate
 successor in the order the expanded universe carries*. The two indices are
 matched by `DescriptiveComplexity.SOBlock.atomSet_lt_iff_realSet`, whose whole
-content is that a real atom has a **least** padded representative — the tuple
-padded with the least element of `A` — so that comparing representatives is
+content is that a real atom has a **least** padded representative – the tuple
+padded with the least element of `A` – so that comparing representatives is
 comparing real atoms.
 
 Accordingly the sentence takes its lexicographic comparisons on the
@@ -77,10 +77,6 @@ function type `I → Prop` carries a competing pointwise order of its own, so `�
 would resolve to the wrong one. -/
 def SetCovBy (S T : I → Prop) : Prop :=
   (setLinearOrder I).lt S T ∧ ∀ U, (setLinearOrder I).lt S U → ¬(setLinearOrder I).lt U T
-
-theorem setCovBy_iff_covBy (S T : I → Prop) :
-    SetCovBy S T ↔ @CovBy _ (@Preorder.toLT _ (setLinearOrder I).toPreorder) S T :=
-  ⟨fun h => ⟨h.1, fun _ hc => h.2 _ hc⟩, fun h => ⟨h.1, fun _ hc => h.2 hc⟩⟩
 
 /-- Nothing is below the empty set: the order compares at the least differing
 index, where being out is being smaller. -/
@@ -124,7 +120,7 @@ private theorem setCovBy_of_setSucc {S T : I → Prop} (h : SetSucc S T) : SetCo
 subsets. -/
 theorem setSucc_iff (S T : I → Prop) : SetSucc S T ↔ SetCovBy S T := by
   classical
-  letI : Fintype I := Fintype.ofFinite I
+  let : Fintype I := Fintype.ofFinite I
   refine ⟨setCovBy_of_setSucc, fun hcov => ?_⟩
   -- the increment position: the greatest atom `S` misses
   have hmiss : (Finset.univ.filter fun q => ¬S q).Nonempty := by
@@ -159,7 +155,7 @@ end SetOrder
 /-! ### The honest atom index
 
 An assignment is an arbitrary subset of the **real** atoms `Σ i, Fin (arity i) → A`
-— unlike the padded atoms, where only the padding-invariant subsets occur — so
+– unlike the padded atoms, where only the padding-invariant subsets occur – so
 the increment of §the module docstring applies to the real ones unchanged. The
 two index types order assignments the same way, which is
 `DescriptiveComplexity.SOBlock.atomSet_lt_iff_realSet`: a real atom has a
@@ -185,7 +181,7 @@ variable (A) in
 *its own* arity. An assignment is an arbitrary subset of these. -/
 abbrev RealIx : Type := (i : B.ι) × (Fin (B.arity i) → A)
 
-/-- The real atoms an assignment makes true — the assignment itself, uncurried,
+/-- The real atoms an assignment makes true – the assignment itself, uncurried,
 so this is a bijection onto the subsets. -/
 def realSet (ρ : B.Assignment A) : B.RealIx A → Prop := fun P => ρ P.1 P.2
 
@@ -193,7 +189,7 @@ def realSet (ρ : B.Assignment A) : B.RealIx A → Prop := fun P => ρ P.1 P.2
 noncomputable def realOf (p : B.AtomIx A) : B.RealIx A :=
   ⟨p.1, fun j => p.2 (Fin.castLE (arity_le_blockArityBound B p.1) j)⟩
 
-/-- A tuple of the arity of `i`, padded out with the least element — the
+/-- A tuple of the arity of `i`, padded out with the least element – the
 *least* padded representative of a real atom. -/
 noncomputable def padMin (i : B.ι) (u : Fin (B.arity i) → A) :
     Fin (blockArityBound B) → A :=
@@ -283,7 +279,7 @@ theorem padMin_lt_iff (i : B.ι) (u v : Fin (B.arity i) → A) :
 real atom is below it. -/
 theorem keyIx_realOf_le (p : B.AtomIx A) :
     (B.atomIxLinearOrder A).le (B.keyIx (B.realOf p)) p := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   refine (@not_lt _ (B.atomIxLinearOrder A) _ _).mp fun h => ?_
   rcases (B.atomIx_lt_iff p (B.keyIx (B.realOf p))).mp h with h1 | ⟨-, h2⟩
   · exact absurd h1 (lt_irrefl _)
@@ -303,8 +299,8 @@ theorem atomSet_lt_iff_realSet (ρ σ : B.Assignment A) :
     letI := B.realIxLinearOrder A
     ((setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet σ) ↔
       (setLinearOrder (B.RealIx A)).lt (B.realSet ρ) (B.realSet σ)) := by
-  letI := B.realIxLinearOrder A
-  letI := B.atomIxLinearOrder A
+  let := B.realIxLinearOrder A
+  let := B.atomIxLinearOrder A
   rw [B.atomSet_lt_iff ρ σ, setLinearOrder_lt_iff]
   constructor
   · rintro ⟨p, hbelow, hnp, hp⟩
@@ -333,7 +329,7 @@ theorem assignSucc_iff (ρ σ : B.Assignment A) :
       ((setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet σ) ∧
         ∀ τ : B.Assignment A, (setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet τ) →
           ¬(setLinearOrder (B.AtomIx A)).lt (B.atomSet τ) (B.atomSet σ))) := by
-  letI := B.realIxLinearOrder A
+  let := B.realIxLinearOrder A
   rw [setSucc_iff, SetCovBy]
   refine and_congr (B.atomSet_lt_iff_realSet ρ σ).symm ?_
   constructor
@@ -355,7 +351,7 @@ namespace SOBlock
 variable {L : Language.{0, 0}} (B : SOBlock)
 
 /-- The relation variables strictly above `i`, in the arbitrary order on the
-block's index type — the mirror of
+block's index type – the mirror of
 `DescriptiveComplexity.SOBlock.ivarsBelow`, and the atoms the increment clears. -/
 noncomputable def ivarsAbove (i : B.ι) : List B.ι :=
   letI : LinearOrder B.ι := finiteLinearOrder B.ι
@@ -364,7 +360,7 @@ noncomputable def ivarsAbove (i : B.ι) : List B.ι :=
 theorem mem_ivarsAbove (i j : B.ι) :
     letI : LinearOrder B.ι := finiteLinearOrder B.ι
     (j ∈ B.ivarsAbove i ↔ i < j) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   rw [ivarsAbove, List.mem_filter]
   simp [B.mem_ivars j]
 
@@ -375,7 +371,7 @@ the second true; the copies agree strictly below it; and strictly above it the
 first is true and the second false. Each of the two conditions on the other
 atoms splits, as in `DescriptiveComplexity.SOBlock.ordLtF`, into a static part
 over the earlier (or later) relation variables and a lexicographic part at the
-same variable — taken on the **truncated** tuples, so that it compares *real*
+same variable – taken on the **truncated** tuples, so that it compares *real*
 atoms and not their padded representatives (see the padding trap above). -/
 noncomputable def succAssignF : ((L.sum Language.order).sum (B.replicate 2).lang).Sentence :=
   listSup (B.ivars.map fun i =>
@@ -424,7 +420,7 @@ theorem agree_below_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B
         ∀ v : Fin (B.arity i) → A, toLex v < toLex u → (ρs 0 i v ↔ ρs 1 i v)) ↔
       ∀ Q : B.RealIx A, B.atomLt (B.keyIx Q) (B.keyIx ⟨i, u⟩) →
         (B.realSet (ρs 0) Q ↔ B.realSet (ρs 1) Q)) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   constructor
   · rintro ⟨hb, hs⟩ ⟨j, v⟩ hq
     rcases hq with hji | ⟨rfl, hv⟩
@@ -442,7 +438,7 @@ theorem clear_above_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B
         ∀ v : Fin (B.arity i) → A, toLex u < toLex v → (ρs 0 i v ∧ ¬ρs 1 i v)) ↔
       ∀ Q : B.RealIx A, B.atomLt (B.keyIx ⟨i, u⟩) (B.keyIx Q) →
         (B.realSet (ρs 0) Q ∧ ¬B.realSet (ρs 1) Q)) := by
-  letI : LinearOrder B.ι := finiteLinearOrder B.ι
+  let : LinearOrder B.ι := finiteLinearOrder B.ι
   constructor
   · rintro ⟨hb, hs⟩ ⟨j, v⟩ hq
     rcases hq with hij | ⟨rfl, hv⟩
@@ -464,7 +460,7 @@ theorem realize_succAssignF_aux (ρs : Fin 2 → B.Assignment A) :
           ¬ρs 0 i u ∧ ρs 1 i u ∧
           ((∀ j ∈ B.ivarsAbove i, ∀ v : Fin (B.arity j) → A, (ρs 0 j v ∧ ¬ρs 1 j v)) ∧
             ∀ v : Fin (B.arity i) → A, toLex u < toLex v → (ρs 0 i v ∧ ¬ρs 1 i v))) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [succAssignF, Sentence.Realize, realize_listSup]
   constructor
   · rintro ⟨φ, hφ, hr⟩
@@ -540,7 +536,7 @@ theorem realize_succAssignF_aux (ρs : Fin 2 → B.Assignment A) :
 
 /-- **The increment sentence is the successor of an assignment**: it holds of
 two assignments exactly when the second is the increment of the first at their
-real atoms — which, by
+real atoms – which, by
 `DescriptiveComplexity.SOBlock.assignSucc_iff`, is exactly the immediate
 successor in the order the expanded universe carries. -/
 theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
@@ -549,7 +545,7 @@ theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.succAssignF L) ↔
       SetSucc (B.realSet (ρs 0)) (B.realSet (ρs 1))) := by
-  letI := B.realIxLinearOrder A
+  let := B.realIxLinearOrder A
   rw [B.realize_succAssignF_aux ρs]
   constructor
   · rintro ⟨i, u, hbelow, h0, h1, habove⟩
@@ -560,21 +556,6 @@ theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
     exact ⟨i, u, (B.agree_below_real ρs i u).mpr
         (fun Q hQ => hbelow Q ((B.realIx_lt_iff _ _).mpr hQ)), h0, h1,
       (B.clear_above_real ρs i u).mpr fun Q hQ => habove Q ((B.realIx_lt_iff _ _).mpr hQ)⟩
-
-/-- **The increment sentence is the covering relation of the assignment
-order**: read at the two copies, it says that the second assignment is the
-immediate successor of the first — nothing lies strictly between. This is the
-form `DescriptiveComplexity.HeadMove.succ` consumes once carried to the points
-of an expansion. -/
-theorem realize_succAssignF_covBy (ρs : Fin 2 → B.Assignment A) :
-    letI := B.atomIxLinearOrder A
-    (@Sentence.Realize _ A
-        ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
-        (B.succAssignF L) ↔
-      ((setLinearOrder (B.AtomIx A)).lt (B.atomSet (ρs 0)) (B.atomSet (ρs 1)) ∧
-        ∀ τ : B.Assignment A, (setLinearOrder (B.AtomIx A)).lt (B.atomSet (ρs 0)) (B.atomSet τ) →
-          ¬(setLinearOrder (B.AtomIx A)).lt (B.atomSet τ) (B.atomSet (ρs 1)))) :=
-  (B.realize_succAssignF ρs).trans (B.assignSucc_iff (ρs 0) (ρs 1))
 
 /-! ### The two endpoints -/
 
@@ -599,7 +580,7 @@ theorem realize_botAssignF (ρs : Fin 2 → B.Assignment A) (c : Fin 2) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.botAssignF L c) ↔ B.atomSet (ρs c) = fun _ => False) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [botAssignF, Sentence.Realize, realize_listInf]
   constructor
   · intro h
@@ -619,7 +600,7 @@ theorem realize_topAssignF (ρs : Fin 2 → B.Assignment A) (c : Fin 2) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.topAssignF L c) ↔ B.atomSet (ρs c) = fun _ => True) := by
-  letI := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
+  let := (B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs)
   rw [topAssignF, Sentence.Realize, realize_listInf]
   constructor
   · intro h
@@ -635,7 +616,7 @@ theorem realize_topAssignF (ρs : Fin 2 → B.Assignment A) (c : Fin 2) :
     exact (h ▸ trivial : B.atomSet (ρs c) (i, x))
 
 variable (A) in
-/-- The assignment holding of everything — the greatest one. -/
+/-- The assignment holding of everything – the greatest one. -/
 def topAssign : B.Assignment A := fun _ _ => True
 
 end SOBlock
@@ -645,11 +626,11 @@ end SOBlock
 What a machine walking an expanded universe asks of its order
 (`DescriptiveComplexity.HeadMove`): which point is least, which is greatest, and
 which is the immediate successor of which. Tag first and then the assignment, so
-each answer splits: the tag part is *static* — finitely many tags, compared at
-formula-construction time — and the assignment part is the increment above. The
+each answer splits: the tag part is *static* – finitely many tags, compared at
+formula-construction time – and the assignment part is the increment above. The
 lexicographic bookkeeping is `DescriptiveComplexity.prodLex_le_iff` and its
 siblings, with one caveat: a point's second component is an *assignment*, not an
-arbitrary set, so the witnesses put between two points must be assignments too —
+arbitrary set, so the witnesses put between two points must be assignments too –
 the empty one, the full one, and the ones the walk itself carries. -/
 
 namespace ExpExpansion
@@ -664,9 +645,9 @@ theorem pointLe_iff (p q : X.Point A) :
     ((X.pointLinearOrder A).le p q ↔
       p.1 < q.1 ∨ (p.1 = q.1 ∧
         (setLinearOrder (X.B.AtomIx A)).le (X.B.atomSet p.2) (X.B.atomSet q.2))) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := setLinearOrder (X.B.AtomIx A)
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := setLinearOrder (X.B.AtomIx A)
   exact prodLex_le_iff
 
 omit [L.Structure A] in
@@ -676,9 +657,9 @@ theorem pointLt_iff (p q : X.Point A) :
     ((X.pointLinearOrder A).lt p q ↔
       p.1 < q.1 ∨ (p.1 = q.1 ∧
         (setLinearOrder (X.B.AtomIx A)).lt (X.B.atomSet p.2) (X.B.atomSet q.2))) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := setLinearOrder (X.B.AtomIx A)
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := setLinearOrder (X.B.AtomIx A)
   exact prodLex_lt_iff
 
 omit [L.Structure A] in
@@ -687,8 +668,8 @@ theorem pointIsBot_iff (p : X.Point A) :
     letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
     ((∀ q : X.Point A, (X.pointLinearOrder A).le p q) ↔
       ((∀ t : X.Tag, p.1 ≤ t) ∧ X.B.atomSet p.2 = fun _ => False)) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
   have hbot : X.B.atomSet (X.B.botAssign A) = fun _ => False := rfl
   constructor
   · intro h
@@ -713,8 +694,8 @@ theorem pointIsTop_iff (p : X.Point A) :
     letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
     ((∀ q : X.Point A, (X.pointLinearOrder A).le q p) ↔
       ((∀ t : X.Tag, t ≤ p.1) ∧ X.B.atomSet p.2 = fun _ => True)) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
   have htop : X.B.atomSet (X.B.topAssign A) = fun _ => True := rfl
   constructor
   · intro h
@@ -745,9 +726,9 @@ theorem pointCovBy_iff (p q : X.Point A) :
       ((p.1 = q.1 ∧ SetSucc (X.B.realSet p.2) (X.B.realSet q.2)) ∨
         (p.1 < q.1 ∧ (∀ t : X.Tag, ¬(p.1 < t ∧ t < q.1)) ∧
           X.B.atomSet p.2 = (fun _ => True) ∧ X.B.atomSet q.2 = fun _ => False))) := by
-  letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
-  letI := X.B.atomIxLinearOrder A
-  letI := X.B.realIxLinearOrder A
+  let : LinearOrder X.Tag := finiteLinearOrder X.Tag
+  let := X.B.atomIxLinearOrder A
+  let := X.B.realIxLinearOrder A
   have hbot : X.B.atomSet (X.B.botAssign A) = fun _ => False := rfl
   have htop : X.B.atomSet (X.B.topAssign A) = fun _ => True := rfl
   constructor

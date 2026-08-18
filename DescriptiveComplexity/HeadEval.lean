@@ -28,9 +28,9 @@ handles, so a single sweep serves both.
   depending on its answer. This is branching, sequencing and negation at once.
 * `DescriptiveComplexity.HeadProgram.scanP` – the sweep just described, on a pair of
   heads: `h` walks, `hm` marks the greatest element. **Why two heads and not
-  one**: the sweep must know when to stop, and "this head is at the greatest
-  element" is not a quantifier-free fact of one head – while "these two heads are
-  equal" is, being an atom. A single parked head buys the test. The step off the
+  one**: the sweep must know when to stop, and “this head is at the greatest
+  element” is not a quantifier-free fact of one head – while “these two heads are
+  equal” is, being an atom. A single parked head buys the test. The step off the
   end is not needed as a guard: `DescriptiveComplexity.HeadMove.succ` is simply
   disabled there.
 

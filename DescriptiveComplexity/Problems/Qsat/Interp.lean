@@ -481,10 +481,6 @@ theorem qsat_isAll (v : QVarTag) (w : Fin 2 → A) :
     IsQAll (A := QM A) (Sum.inl v, w) ↔ (v = .sB ∧ QVarOn v (w 0) (w 1)) :=
   Iff.trans (FOInterpretation.relMap_map qsatInterp A qsAllVar ![(Sum.inl v, w)]) realize_allF
 
-/-- Every variable tag other than `sB` is existential. -/
-theorem qsat_not_isAll {v : QVarTag} (hv : v ≠ .sB) (w : Fin 2 → A) :
-    ¬IsQAll (A := QM A) (Sum.inl v, w) := fun h => hv ((qsat_isAll v w).mp h).1
-
 /-- Elements carrying a clause tag are not universal. -/
 theorem qsat_not_isAll_cl (c : QClTag) (w : Fin 2 → A) :
     ¬IsQAll (A := QM A) (Sum.inr c, w) :=
@@ -539,30 +535,6 @@ theorem qsat_negIn (c : QClTag) (v : QVarTag) (w y : Fin 2 → A) :
           LinkOn l.link (w 0) (w 1) (y 0) (y 1) :=
   Iff.trans (FOInterpretation.relMap_map qsatInterp A qsNegIn
     ![(Sum.inr c, w), (Sum.inl v, y)]) realize_occF
-
-/-- No literal is on an element carrying a clause tag. -/
-theorem qsat_not_posIn_cl (x : QM A) (c : QClTag) (y : Fin 2 → A) :
-    ¬RelMap (M := QM A) qsPosIn ![x, (Sum.inr c, y)] := by
-  obtain ⟨t, u⟩ := x
-  cases t <;> exact id
-
-/-- No literal is on an element carrying a clause tag, negatively. -/
-theorem qsat_not_negIn_cl (x : QM A) (c : QClTag) (y : Fin 2 → A) :
-    ¬RelMap (M := QM A) qsNegIn ![x, (Sum.inr c, y)] := by
-  obtain ⟨t, u⟩ := x
-  cases t <;> exact id
-
-/-- An element carrying a variable tag has no literals. -/
-theorem qsat_not_posIn_var (v : QVarTag) (w : Fin 2 → A) (x : QM A) :
-    ¬RelMap (M := QM A) qsPosIn ![(Sum.inl v, w), x] := by
-  obtain ⟨t, u⟩ := x
-  cases t <;> exact id
-
-/-- An element carrying a variable tag has no negative literals. -/
-theorem qsat_not_negIn_var (v : QVarTag) (w : Fin 2 → A) (x : QM A) :
-    ¬RelMap (M := QM A) qsNegIn ![(Sum.inl v, w), x] := by
-  obtain ⟨t, u⟩ := x
-  cases t <;> exact id
 
 end Characterizations
 

@@ -32,8 +32,8 @@ is exactly relativization to the predicate `old`. The specialization
 `A ⊕ Fin m` is a substructure isomorphic to `A`
 (`DescriptiveComplexity.oldSubEquiv`).
 
-The same machinery is what a relativized *membership* pullback – the
-domain-formula item of `ROADMAP.md` §3 – would want.
+The same machinery is what a relativized *membership* pullback – one through
+an interpretation whose domain is cut out by a formula – would want.
 -/
 
 namespace DescriptiveComplexity
@@ -62,17 +62,6 @@ def relativizeTo (R : L.Relations 1) :
   | _, .rel r ts => .rel r ts
   | _, .imp φ ψ => .imp (relativizeTo R φ) (relativizeTo R ψ)
   | n, .all φ => .all ((lastGuard R n).imp (relativizeTo R φ))
-
-/-- Guards are inserted at quantifiers only, so relativization is the identity
-on a quantifier-free formula. Not a `simp` lemma: `simp` has no way to
-discharge the `IsQF` side condition on its own, so it would only ever fire when
-passed the hypothesis explicitly. -/
-theorem relativizeTo_of_isQF {R : L.Relations 1} {n : ℕ} {φ : L.BoundedFormula α n}
-    (h : φ.IsQF) : relativizeTo R φ = φ := by
-  induction h with
-  | falsum => rfl
-  | of_isAtomic h => cases h <;> rfl
-  | imp _ _ ih₁ ih₂ => rw [relativizeTo, ih₁, ih₂]
 
 variable {M : Type} [L.Structure M] {R : L.Relations 1}
 
@@ -149,8 +138,6 @@ def oldSub : (newLang L).Substructure (A ⊕ Fin m) where
   carrier := {x | IsOld x}
   fun_mem := fun {_n} f _ _ => isEmptyElim f
 
-theorem mem_oldSub_iff (x : A ⊕ Fin m) : x ∈ oldSub L A m ↔ IsOld x := Iff.rfl
-
 /-- The instance is the substructure of original elements, over the extended
 vocabulary (where every element is marked as original). -/
 def oldSubEquiv :
@@ -188,7 +175,7 @@ universe at original arguments, the relativized formula says what the original
 formula says in the instance. -/
 theorem realize_relOld {γ : Type} (φ : L.Formula γ) (v : γ → A) :
     (relOld φ).Realize (M := A ⊕ Fin m) (fun g => Sum.inl (v g)) ↔ φ.Realize v := by
-  letI := allOldStructure L A
+  let := allOldStructure L A
   let w : γ → oldSub L A m := fun g => ⟨Sum.inl (v g), isOld_inl (m := m) (v g)⟩
   have hsub : ∀ x : A ⊕ Fin m, x ∈ oldSub L A m ↔
       RelMap (L := newLang L) (Sum.inr Language.oldSym) ![x] := fun _ => Iff.rfl

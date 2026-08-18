@@ -88,11 +88,7 @@ variable {V : Type} {ph : Phase} {fl : Bool} {rd rc rc2 rv rcnt ru rw rj : WithB
 
 @[simp] theorem mkCfg_j : (mkCfg ph fl rd rc rc2 rv rcnt ru rw rj).regs Reg.j = rj := rfl
 
-theorem stage_mkCfg [LinearOrder V] :
-    stage (mkCfg ph fl rd rc rc2 rv rcnt ru rw rj) = orank rd := rfl
-
 end Build
-
 
 /-! ### The transitions, one lemma each -/
 
@@ -312,7 +308,6 @@ theorem step_nextStage (hd : rd ⋖ rd')
 
 end Steps
 
-
 /-! ### The certifying walk -/
 
 section Runs
@@ -470,7 +465,6 @@ theorem reach_check {rd rc rc2 : WithBot V} {vv : V}
       obtain ⟨rcnt2, rw3, rj3, ru3, fl3, hrun, hres1, hres2⟩ := ih rcnt rw rj fl hcnt' hfl'
       exact ⟨rcnt2, rw3, rj3, ru3, fl3,
         Relation.ReflTransGen.head (step_skip hcovW) hrun, hres1, hres2⟩
-
 
 /-! ### The outer scan, the source count, and the stages -/
 
@@ -675,7 +669,6 @@ theorem machineAccepts_iff [Nonempty V] :
   ⟨not_reach_of_machineAccepts, machineAccepts_of_not_reach⟩
 
 end Runs
-
 
 end InductiveCounting
 

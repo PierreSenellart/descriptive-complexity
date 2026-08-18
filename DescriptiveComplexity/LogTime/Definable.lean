@@ -30,7 +30,7 @@ quantifier binds the variables of `Fin 1` in `α ⊕ Fin 1`
 the layout of `FirstOrder.Language.Formula.iExs`, so that no relabelling is
 needed at the quantifier step. Moving between variable layouts is
 `DescriptiveComplexity.ArithDef.relabel`, and a relation with *no* free
-variables (`α = Empty`) is a sentence on the nose, which is what
+variables (`α = Empty`) is literally a sentence, which is what
 `DescriptiveComplexity.ArithDef.ac0Definable` reads.
 
 ## The three groups of lemmas

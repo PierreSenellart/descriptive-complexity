@@ -485,16 +485,6 @@ theorem decode_of_tag_start {x : PV A} (hx : x.1 = PTag.dStart) :
   subst ht
   rfl
 
-omit [LinearOrder A] [Finite A] [Nonempty A] in
-/-- Only the start domino decodes to the abstract start domino. -/
-theorem tag_of_decode_start {x : PV A} (hx : PDom x)
-    (hd : decodeDom x = Pcp.History.Dom.start) : x.1 = .dStart := by
-  obtain ⟨t, w⟩ := x
-  cases t <;> first
-    | rfl
-    | exact hx.2.elim
-    | (exfalso; simp [decodeDom] at hd)
-
 end Words
 
 /-- The start layout is functional in the position. -/

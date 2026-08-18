@@ -26,6 +26,15 @@ accepting, and if accepting configurations are themselves stuck, then the
 machine does not accept. Both side conditions are properties of the transition
 table, so a reduction discharges them by inspection of its own program.
 
+The hypothesis is not determinism but
+`DescriptiveComplexity.TMData.UniqueFrom`: every configuration reachable from a
+given one has at most one successor. That is what a program which **guesses in
+one phase** and is deterministic after it has, and it is all the read-off lemmas
+need – a reduction into a nondeterministic problem has to read its certificate
+off an arbitrary accepting run, and this is what makes that a case analysis on
+the guess rather than a second induction. Global determinism is the special case
+(`DescriptiveComplexity.TMData.uniqueFrom_of_deterministic`).
+
 Nothing here is about space: the statements hold for any `TMData` whose runs
 are read with `Relation.ReflTransGen`.
 -/
@@ -36,19 +45,66 @@ namespace TMData
 
 variable {A : Type} [Finite A] {M : TMData A}
 
+variable (M) in
+/-- **Determinism where it is used**: every configuration reachable from `c` has
+at most one successor.
+
+This is weaker than `DescriptiveComplexity.TMData.Deterministic` in exactly the
+way a *guessing* program needs. A reduction into a nondeterministic problem has
+to read its certificate off an arbitrary accepting run, and the way to survive
+that is to guess in one phase and be deterministic everywhere after it: the
+machine is then not deterministic at all, but it is unique from the
+configuration the guess ends at, and every read-off below asks for no more. -/
+def UniqueFrom (c : Config A) : Prop :=
+  ∀ x y z : Config A, Relation.ReflTransGen M.Step c x → M.Step x y → M.Step x z → y = z
+
 omit [Finite A] in
-/-- **A budgeted run is a run**: the space-bounded reading of acceptance forgets
-the step count, so every lemma stated with `DescriptiveComplexity.TMData.StepsIn` –
-the sweep primitives of `DescriptiveComplexity.Problems.Machine.Program`, in
-particular – feeds straight into it. -/
-theorem reflTransGen_of_stepsIn : ∀ {n : ℕ} {c d : Config A}, M.StepsIn n c d →
-    Relation.ReflTransGen M.Step c d := by
-  intro n
-  induction n with
-  | zero => intro c d h; exact (show c = d from h) ▸ Relation.ReflTransGen.refl
-  | succ n ih =>
-    rintro c d ⟨e, he, hrest⟩
-    exact Relation.ReflTransGen.head he (ih hrest)
+/-- A deterministic machine is unique from anywhere. -/
+theorem uniqueFrom_of_deterministic (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
+    (c : Config A) : M.UniqueFrom c :=
+  fun _ _ _ _ h₁ h₂ => step_functional hlin hdet h₁ h₂
+
+omit [Finite A] in
+/-- **Uniqueness from an invariant**: a property the step relation preserves, and
+under which the step is functional, makes the machine unique from any
+configuration having it.
+
+This is how a program that guesses in one phase pays for the rest of its run.
+The property is “the phase is one the guess is not reachable from”; the step
+preserves it because the program's phases only go forward, and at those phases
+its rules separate. Global determinism is the case where the property is
+`True`. -/
+theorem uniqueFrom_of_invariant {Inv : Config A → Prop}
+    (hclosed : ∀ x y : Config A, Inv x → M.Step x y → Inv y)
+    (hfun : ∀ x y z : Config A, Inv x → M.Step x y → M.Step x z → y = z)
+    {c : Config A} (hc : Inv c) : M.UniqueFrom c := by
+  intro x y z hcx
+  have hx : Inv x := by
+    induction hcx with
+    | refl => exact hc
+    | tail _ hstep ih => exact hclosed _ _ ih hstep
+  exact hfun x y z hx
+
+omit [Finite A] in
+/-- Uniqueness travels forward along the run. -/
+theorem UniqueFrom.mono {c d : Config A} (h : M.UniqueFrom c)
+    (hcd : Relation.ReflTransGen M.Step c d) : M.UniqueFrom d :=
+  fun x y z hx => h x y z (hcd.trans hx)
+
+omit [Finite A] in
+/-- **A machine unique from `c` has one run out of `c`**: two configurations
+reachable from it are reachable from one another. -/
+theorem reach_total_of_uniqueFrom {c x y : Config A} (huniq : M.UniqueFrom c)
+    (hx : Relation.ReflTransGen M.Step c x) (hy : Relation.ReflTransGen M.Step c y) :
+    Relation.ReflTransGen M.Step x y ∨ Relation.ReflTransGen M.Step y x := by
+  induction hx with
+  | refl => exact Or.inl hy
+  | @tail x' x hcx' hstep ih =>
+    rcases ih with h | h
+    · rcases Relation.ReflTransGen.cases_head h with rfl | ⟨e, he, hey⟩
+      · exact Or.inr (Relation.ReflTransGen.single hstep)
+      · exact Or.inl ((huniq x' e x hcx' he hstep) ▸ hey)
+    · exact Or.inr (h.tail hstep)
 
 omit [Finite A] in
 /-- **A deterministic machine has one run**: two configurations reachable from
@@ -56,8 +112,7 @@ the same starting point are reachable from one another. -/
 theorem reach_total (hlin : IsLinOrd M.Le) (hdet : M.Deterministic) {c x y : Config A}
     (hx : Relation.ReflTransGen M.Step c x) (hy : Relation.ReflTransGen M.Step c y) :
     Relation.ReflTransGen M.Step x y ∨ Relation.ReflTransGen M.Step y x :=
-  Relation.ReflTransGen.total_of_right_unique
-    (fun _ _ _ h₁ h₂ => step_functional hlin hdet h₁ h₂) hx hy
+  reach_total_of_uniqueFrom (uniqueFrom_of_deterministic hlin hdet c) hx hy
 
 omit [Finite A] in
 /-- Nothing is reachable from a stuck configuration but itself. -/
@@ -66,6 +121,25 @@ theorem eq_of_reach_stuck {c d : Config A} (hstuck : ∀ e, ¬M.Step c e)
   rcases Relation.ReflTransGen.cases_head h with heq | ⟨e, he, -⟩
   · exact heq
   · exact absurd he (hstuck e)
+
+omit [Finite A] in
+/-- **A run into a dead end is not an accepting one**, at a machine unique from
+where the run starts. This is the form a guessing program uses: the guess phase
+is the only nondeterministic one, so what has to be ruled out is an accepting run
+*of the same guess*, and that is a statement about one deterministic remainder.
+
+`DescriptiveComplexity.TMData.not_acceptsSpace_of_reaches_dead` is this with the
+uniqueness supplied by global determinism and the initial configuration matched
+up. -/
+theorem not_acc_of_reaches_dead_of_uniqueFrom {c₀ d : Config A} (huniq : M.UniqueFrom c₀)
+    (hreach : Relation.ReflTransGen M.Step c₀ d)
+    (hdead : ∀ e, ¬M.Step d e) (hnacc : ¬M.Acc d.state)
+    (hsink : ∀ e : Config A, M.Acc e.state → ∀ e', ¬M.Step e e')
+    {c : Config A} (hr : Relation.ReflTransGen M.Step c₀ c) (hacc : M.Acc c.state) :
+    False := by
+  rcases reach_total_of_uniqueFrom huniq hreach hr with h | h
+  · exact hnacc ((eq_of_reach_stuck hdead h) ▸ hacc)
+  · exact hnacc ((eq_of_reach_stuck (hsink c hacc) h) ▸ hacc)
 
 omit [Finite A] in
 /-- **A deterministic machine that runs into a dead end does not accept.**
@@ -82,9 +156,8 @@ theorem not_acceptsSpace_of_reaches_dead (hwf : M.WellFormed) (hdet : M.Determin
     ¬M.AcceptsSpace := by
   rintro ⟨c₀', c, hinit', hr, hacc⟩
   obtain rfl : c₀' = c₀ := isInit_unique hwf hdet.1 hinit' hinit
-  rcases reach_total hwf.1 hdet hreach hr with h | h
-  · exact hnacc ((eq_of_reach_stuck hdead h) ▸ hacc)
-  · exact hnacc ((eq_of_reach_stuck (hsink c hacc) h) ▸ hacc)
+  exact not_acc_of_reaches_dead_of_uniqueFrom
+    (uniqueFrom_of_deterministic hwf.1 hdet _) hreach hdead hnacc hsink hr hacc
 
 /-! ### A machine that never halts
 

@@ -44,7 +44,7 @@ does not, which is why this example is worth reading second:
   (`DescriptiveComplexity.nonempty_embedding_iff_ncard_le`);
 * the semantics contains a *reachability* condition, which is not
   first-order; the membership proof replaces it by a certificate (an order in
-  which every crawled page has a crawled in-neighbour strictly below it),
+  which every crawled page has a crawled in-neighbor strictly below it),
   the directed, single-root sibling of the Steiner-tree certificate;
 * the hardness reduction is an *ordered* FO reduction (`≤ᶠᵒ[≤]`): the
   paper's budget `|U| + B + 1` needs a marked set with exactly one extra
@@ -173,7 +173,6 @@ open FirstOrder
 
 open Language Structure
 
-
 /-!
 ### Step 3: the encoding, size bounds discharged at construction
 
@@ -243,11 +242,11 @@ def crawlEncoding : Encoding Language.siteGraph CrawlInstance where
 ### Step 4: abstract semantics – rooted reachability, crawls, and their certificates
 
 The paper defines a crawl as an `r`-rooted subtree of the website; the
-semantics below phrases "some `r`-rooted subtree with node set `S`" as
-"every node of `S` is reachable from `r` by edges inside `S`" – equivalent,
+semantics below phrases “some `r`-rooted subtree with node set `S`” as
+“every node of `S` is reachable from `r` by edges inside `S`” – equivalent,
 since the parent pointers of a breadth-first traversal assemble any such
 reachable set into a tree, and it is precisely those parent pointers that
-the first-order certificate recovers (each non-root node has an in-neighbour
+the first-order certificate recovers (each non-root node has an in-neighbor
 strictly closer to the root). Reachability itself is a transitive-closure
 condition, not first-order; as for connectivity in the Steiner-tree problem,
 the certificate is what makes the membership proof possible, and it reuses
@@ -303,9 +302,9 @@ private theorem rdist_step {R : A → A → Prop} {r x : A}
 
 /-- **Rooted reachability is first-order certifiable**: every member of `S` is
 reachable from `r` inside `S` exactly when some strict partial order makes
-every non-root member of `S` have a chosen in-neighbour strictly below it.
+every non-root member of `S` have a chosen in-neighbor strictly below it.
 Walking down the order reaches the root; the order “distance to the root”
-witnesses the converse. The in-neighbours below are the parent pointers of an
+witnesses the converse. The in-neighbors below are the parent pointers of an
 `r`-rooted spanning subtree of `S`. -/
 theorem reachesAllOn_iff_exists_order [Finite A] (Adjp : A → A → Prop) (r : A)
     (S : A → Prop) :
@@ -319,8 +318,8 @@ theorem reachesAllOn_iff_exists_order [Finite A] (Adjp : A → A → Prop) (r : 
     obtain ⟨z, hzx, hlt⟩ := rdist_step (hreach x hx) hne
     exact ⟨z, hzx.1, hzx.2.2, hlt⟩
   · rintro ⟨Lt, htrans, hirr, hstep⟩
-    haveI : IsTrans A Lt := ⟨htrans⟩
-    haveI : Std.Irrefl Lt := ⟨hirr⟩
+    have : IsTrans A Lt := ⟨htrans⟩
+    have : Std.Irrefl Lt := ⟨hirr⟩
     have hwf : WellFounded Lt := Finite.wellFounded_of_trans_of_irrefl Lt
     intro x
     induction x using hwf.induction with
@@ -477,7 +476,6 @@ def GraphCrawling : DecisionProblem Language.siteGraph where
   Holds := fun A inst => @HasCheapCrawl A inst
   iso_invariant := fun e => hasCheapCrawl_iso e
 
-
 /-!
 ### Step 6: faithfulness – the encoded problem is the concrete one
 
@@ -488,11 +486,11 @@ bounds already discharged by the bundle of step 3, this equivalence is the
 `GraphCrawling` reads back to the concrete instances. The worked instance
 and the `#guard`s then *run* the encoder against a hand computation.
 
-The decoding direction is where well-formedness earns its keep. An abstract
+The decoding direction is what well-formedness is for. An abstract
 structure may mark several roots (read disjunctively by the semantics), and
 no packaged instance – carrying a single root – transcribes such a structure
 without *deciding* which root works, a computation a decoder should not
-contain. The well-formedness sentence `crawlWFSentence` ("exactly one root")
+contain. The well-formedness sentence `crawlWFSentence` (“exactly one root”)
 removes these, and on well-formed structures a computable decoder
 `crawlDecode` exists: find the root, read the links, targets and clamped
 budget off the tables. It assembles into
@@ -1030,7 +1028,7 @@ private abbrev CRealize (φ : crawlSOLang.Sentence) : Prop :=
 
 private theorem realize_crTargetClause :
     CRealize ρ crTargetClause ↔ ∀ x : A, WSTarget x → ρ .set ![x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   rw [crTargetClause]
@@ -1040,7 +1038,7 @@ private theorem realize_crTargetClause :
 
 private theorem realize_crRootExistsClause :
     CRealize ρ crRootExistsClause ↔ ∃ x : A, ρ .root ![x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hR : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
   rw [crRootExistsClause]
@@ -1050,7 +1048,7 @@ private theorem realize_crRootExistsClause :
 
 private theorem realize_crRootClause :
     CRealize ρ crRootClause ↔ ∀ x : A, ρ .root ![x] → WSRoot x ∧ ρ .set ![x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
@@ -1063,7 +1061,7 @@ private theorem realize_crRootClause :
 
 private theorem realize_crRootUniqueClause :
     CRealize ρ crRootUniqueClause ↔ ∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hR : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
   rw [crRootUniqueClause]
@@ -1075,7 +1073,7 @@ private theorem realize_crRootUniqueClause :
 private theorem realize_crTransClause :
     CRealize ρ crTransClause ↔
       ∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
       RelMap (L := crawlSOLang) (M := A) kCrLtSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [crTransClause]
@@ -1086,7 +1084,7 @@ private theorem realize_crTransClause :
 
 private theorem realize_crIrreflClause :
     CRealize ρ crIrreflClause ↔ ∀ x : A, ¬ρ .order ![x, x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
       RelMap (L := crawlSOLang) (M := A) kCrLtSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [crIrreflClause]
@@ -1097,7 +1095,7 @@ private theorem realize_crIrreflClause :
 private theorem realize_crStepClause :
     CRealize ρ crStepClause ↔ ∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
       ∃ y : A, (ρ .set ![y] ∧ WSEdge y x) ∧ ρ .order ![y, x] := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
@@ -1120,7 +1118,7 @@ private theorem realize_crStepClause :
 private theorem realize_crTotalClause :
     CRealize ρ crTotalClause ↔ ∀ x : A, ρ .set ![x] →
       ∃ y : A, ρ .inj ![x, y] ∧ WSMarked y := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hI : ∀ (w : Fin 2 → A),
@@ -1139,7 +1137,7 @@ private theorem realize_crTotalClause :
 
 private theorem realize_crInjClause :
     CRealize ρ crInjClause ↔ ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
-  letI := crawlGuessBlock.structure ρ
+  let := crawlGuessBlock.structure ρ
   have hI : ∀ (w : Fin 2 → A),
       RelMap (L := crawlSOLang) (M := A) kCrInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [crInjClause]
@@ -1245,7 +1243,6 @@ produced from a cover and the marked set decompose this way, so both
 directions of the correctness proof reduce to arithmetic on three slice
 sizes.
 -/
-
 
 /-- Tags for the interpretation of website graphs in set systems. -/
 inductive CrawlTag : Type
@@ -1431,7 +1428,7 @@ the interpreted website has a cheap crawl. -/
 theorem hasSmallSetCover_iff_crawl_map (A : Type) [Language.setSystem.Structure A]
     [LinearOrder A] [Finite A] [Nonempty A] :
     HasSmallSetCover A ↔ HasCheapCrawl (crawlInterp.Map A) := by
-  haveI hfin : Finite (crawlInterp.Map A) := crawlInterp.map_finite A
+  have hfin : Finite (crawlInterp.Map A) := crawlInterp.map_finite A
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   constructor
   · -- a cover of at most `B` sets becomes a crawl: root, chosen sets, all

@@ -58,13 +58,6 @@ def ptClsSet (c : N) : Set N :=
 
 variable {X}
 
-theorem ptClsSet_nonempty [Nonempty N] (c : N) : (X.ptClsSet c).Nonempty := by
-  by_cases h : ∃ y : N, RelMap X.sameSym ![c, y]
-  · obtain ⟨y, hy⟩ := h
-    exact ⟨y, Or.inl hy⟩
-  · obtain ⟨y⟩ := ‹Nonempty N›
-    exact ⟨y, Or.inr fun w hw => h ⟨w, hw⟩⟩
-
 /-- At a point that carries an order – every point of an order-guessing
 expansion does – the copy it names is its class. -/
 theorem ptClsSet_eq_of_refl {c : N} (h : RelMap X.sameSym ![c, c]) :
@@ -182,9 +175,9 @@ def ptProblem (Q : DecisionProblem X.E) : DecisionProblem X.ptLangOf where
     Q (X.clsPart (X.markPtSet M))
   iso_invariant := by
     intro M M' _ _ e
-    letI := X.ptReduct M
-    letI := X.ptReduct M'
-    letI e' := reductEquiv (LHom.sumInl : X.orderFree.E →ᴸ X.ptLangOf) e
+    let := X.ptReduct M
+    let := X.ptReduct M'
+    let e' := reductEquiv (LHom.sumInl : X.orderFree.E →ᴸ X.ptLangOf) e
     have hold : ∀ x : M, RelMap (L := X.ptLangOf) (Sum.inr Language.oldSym) ![x] ↔
         RelMap (L := X.ptLangOf) (Sum.inr Language.oldSym) ![e x] :=
       fun x => relMap_equiv₁ e (Sum.inr Language.oldSym) x
@@ -220,7 +213,6 @@ def ptProblem (Q : DecisionProblem X.E) : DecisionProblem X.ptLangOf where
     exact himg ▸ Iff.rfl
 
 /-! ### The reduction reading the copy of the marked point -/
-
 
 /-- The mark, as a symbol of the source vocabulary of the reduction. -/
 noncomputable abbrev oldSymO : (X.ptLangOf.sum Language.order).Relations 1 :=
@@ -394,7 +386,7 @@ theorem somePtCls_map_iff :
       ∃ lo : LinearOrder A, letI := lo; Q (X.Map A) := by
   constructor
   · rintro ⟨c, hQ⟩
-    letI lo := guessedLinearOrder c
+    let lo := guessedLinearOrder c
     refine ⟨lo, ?_⟩
     have hrefl : RelMap X.sameSym ![c, c] := (relMap_sameSym ![c, c]).mpr fun _ => Iff.rfl
     have hord : ∀ w : Fin 2 → A, pointOrd c w ↔ loRel (A := A) w :=
@@ -403,7 +395,7 @@ theorem somePtCls_map_iff :
     exact (Q.iso_invariant
       (clsEquiv (eq_range_copyIn (isCls_ptClsSet c) hmem hord))).mpr hQ
   · rintro ⟨lo, hQ⟩
-    letI := lo
+    let := lo
     obtain ⟨u⟩ := (inferInstance : Nonempty (X.Map A))
     refine ⟨copyIn u, ?_⟩
     have hrange : X.ptClsSet (copyIn u) = Set.range (copyIn (X := X) (A := A)) := by
@@ -434,10 +426,10 @@ theorem expDefinable_PTIME_iff_free (P : DecisionProblem L) :
     rw [ExpExpansion.somePtCls_map_iff]
     constructor
     · intro hP
-      letI lo := finiteLinearOrder A
+      let lo := finiteLinearOrder A
       exact ⟨lo, (hX A).mp hP⟩
     · rintro ⟨lo, h⟩
-      letI := lo
+      let := lo
       exact (hX A).mpr h
   · exact fun h => h.expDefinable
 

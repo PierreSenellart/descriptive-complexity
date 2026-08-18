@@ -155,8 +155,8 @@ theorem addOrderOne_isExpansionOn (ρ : B.Assignment A) :
     @LHom.IsExpansionOn _ _ (addOrderOne L B) A
       (B.structure₁ (L := L) ρ)
       (@SOBlock.structure₁ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ) := by
-  letI := B.structure₁ (L := L) ρ
-  letI := @SOBlock.structure₁ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ
+  let := B.structure₁ (L := L) ρ
+  let := @SOBlock.structure₁ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
     | Sum.inl g => rfl
@@ -169,8 +169,8 @@ theorem addOrderTwo_isExpansionOn (ρ σ : B.Assignment A) :
     @LHom.IsExpansionOn _ _ (addOrderTwo L B) A
       (B.structure₂ (L := L) ρ σ)
       (@SOBlock.structure₂ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ σ) := by
-  letI := B.structure₂ (L := L) ρ σ
-  letI := @SOBlock.structure₂ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ σ
+  let := B.structure₂ (L := L) ρ σ
+  let := @SOBlock.structure₂ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ σ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
     | Sum.inl (Sum.inl g) => rfl
@@ -198,21 +198,21 @@ def toSpec (spec : SOTCSpecFree L) : SOTCSpec L where
 variable {spec : SOTCSpecFree L} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
 theorem toSpec_step_iff (ρ σ : spec.State A) : spec.toSpec.Step ρ σ ↔ spec.Step ρ σ := by
-  letI := spec.B.structure₂ (L := L) ρ σ
-  letI := @SOBlock.structure₂ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ σ
-  haveI := addOrderTwo_isExpansionOn (L := L) (B := spec.B) ρ σ
+  let := spec.B.structure₂ (L := L) ρ σ
+  let := @SOBlock.structure₂ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ σ
+  have := addOrderTwo_isExpansionOn (L := L) (B := spec.B) ρ σ
   exact LHom.realize_onSentence (M := A) (addOrderTwo L spec.B) spec.step
 
 theorem toSpec_isSrc_iff (ρ : spec.State A) : spec.toSpec.IsSrc ρ ↔ spec.IsSrc ρ := by
-  letI := spec.B.structure₁ (L := L) ρ
-  letI := @SOBlock.structure₁ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ
-  haveI := addOrderOne_isExpansionOn (L := L) (B := spec.B) ρ
+  let := spec.B.structure₁ (L := L) ρ
+  let := @SOBlock.structure₁ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ
+  have := addOrderOne_isExpansionOn (L := L) (B := spec.B) ρ
   exact LHom.realize_onSentence (M := A) (addOrderOne L spec.B) spec.src
 
 theorem toSpec_isTgt_iff (ρ : spec.State A) : spec.toSpec.IsTgt ρ ↔ spec.IsTgt ρ := by
-  letI := spec.B.structure₁ (L := L) ρ
-  letI := @SOBlock.structure₁ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ
-  haveI := addOrderOne_isExpansionOn (L := L) (B := spec.B) ρ
+  let := spec.B.structure₁ (L := L) ρ
+  let := @SOBlock.structure₁ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ
+  have := addOrderOne_isExpansionOn (L := L) (B := spec.B) ρ
   exact LHom.realize_onSentence (M := A) (addOrderOne L spec.B) spec.tgt
 
 /-- **Acceptance does not depend on the order**, for a specification that does
@@ -234,7 +234,7 @@ theorem accepts_toSpec_iff : spec.toSpec.Accepts A ↔ spec.Accepts A := by
 
 end SOTCSpecFree
 
-/-! ### The order symbol, eliminated in favour of a state component
+/-! ### The order symbol, eliminated in favor of a state component
 
 The hard direction. The block of the walk is extended by one binary relation
 variable (`DescriptiveComplexity.SOBlock.withOrder`, shared with the
@@ -304,8 +304,8 @@ same relation to the order variable. -/
 theorem realize_fixedOrdS (instA : L.Structure A) (ρ σ : B.withOrder.Assignment A) :
     @Sentence.Realize _ A (@SOBlock.structure₂ L B.withOrder A instA ρ σ) (fixedOrdS L B) ↔
       ∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ σ (Sum.inl ()) w := by
-  letI := instA
-  letI := @SOBlock.structure₂ L B.withOrder A instA ρ σ
+  let := instA
+  let := @SOBlock.structure₂ L B.withOrder A instA ρ σ
   have hfst : ∀ w : Fin 2 → A,
       RelMap (L := (L.sum B.withOrder.lang).sum B.withOrder.lang) (M := A) (ordFstSym L B) w ↔
         ρ (Sum.inl ()) w := fun _ => Iff.rfl
@@ -335,11 +335,11 @@ theorem orderElimTwoLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : 
       (@SOBlock.structure₂ (L.sum Language.order) B A
         (letI := instA; letI := lo; sumOrderStructure L A) (B.restPart ρ) (B.restPart σ))
       (@SOBlock.structure₂ L B.withOrder A instA ρ σ) := by
-  letI := instA
-  letI := lo
-  letI := @SOBlock.structure₂ (L.sum Language.order) B A (sumOrderStructure L A)
+  let := instA
+  let := lo
+  let := @SOBlock.structure₂ (L.sum Language.order) B A (sumOrderStructure L A)
     (B.restPart ρ) (B.restPart σ)
-  letI := @SOBlock.structure₂ L B.withOrder A instA ρ σ
+  let := @SOBlock.structure₂ L B.withOrder A instA ρ σ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
     | Sum.inl (Sum.inl (Sum.inl g)) => rfl
@@ -372,12 +372,6 @@ noncomputable def SOTCSpec.orderFree : SOTCSpecFree L where
 
 variable {spec} {A : Type} [instL : L.Structure A]
 
-/-- Reading the order variable back off a state leaves the other variables
-untouched. -/
-theorem SOBlock.restPart_joinOrder (B : SOBlock) (R : (Fin 2 → A) → Prop)
-    (ρ : B.Assignment A) : B.restPart (B.joinOrder R ρ) = ρ :=
-  rfl
-
 section Transport
 
 variable [lo : LinearOrder A] {B : SOBlock} (ρ σ : B.withOrder.Assignment A)
@@ -394,9 +388,9 @@ theorem realize_orderElim_one (φ : ((L.sum Language.order).sum B.lang).Sentence
       @Sentence.Realize _ A
         (@SOBlock.structure₁ (L.sum Language.order) B A (sumOrderStructure L A) (B.restPart ρ))
         φ := by
-  letI := @SOBlock.structure₁ (L.sum Language.order) B A (sumOrderStructure L A) (B.restPart ρ)
-  letI := @SOBlock.structure₁ L B.withOrder A instL ρ
-  haveI : @LHom.IsExpansionOn _ _ (orderElimLHom L B) A
+  let := @SOBlock.structure₁ (L.sum Language.order) B A (sumOrderStructure L A) (B.restPart ρ)
+  let := @SOBlock.structure₁ L B.withOrder A instL ρ
+  have : @LHom.IsExpansionOn _ _ (orderElimLHom L B) A
       (@SOBlock.structure₁ (L.sum Language.order) B A (sumOrderStructure L A) (B.restPart ρ))
       (@SOBlock.structure₁ L B.withOrder A instL ρ) :=
     orderElimLHom_isExpansionOn L B A instL lo ρ hord
@@ -410,10 +404,10 @@ theorem realize_orderElim_two (φ : (((L.sum Language.order).sum B.lang).sum B.l
       @Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) B A (sumOrderStructure L A)
           (B.restPart ρ) (B.restPart σ)) φ := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) B A (sumOrderStructure L A)
+  let := @SOBlock.structure₂ (L.sum Language.order) B A (sumOrderStructure L A)
     (B.restPart ρ) (B.restPart σ)
-  letI := @SOBlock.structure₂ L B.withOrder A instL ρ σ
-  haveI : @LHom.IsExpansionOn _ _ (orderElimTwoLHom L B) A
+  let := @SOBlock.structure₂ L B.withOrder A instL ρ σ
+  have : @LHom.IsExpansionOn _ _ (orderElimTwoLHom L B) A
       (@SOBlock.structure₂ (L.sum Language.order) B A (sumOrderStructure L A)
         (B.restPart ρ) (B.restPart σ))
       (@SOBlock.structure₂ L B.withOrder A instL ρ σ) :=
@@ -450,7 +444,7 @@ theorem realize_linearGuard_of_hord :
 
 theorem SOTCSpec.orderFree_isSrc_iff :
     spec.orderFree.IsSrc ρ ↔ spec.IsSrc (spec.B.restPart ρ) := by
-  letI := @SOBlock.structure₁ L spec.orderFree.B A instL ρ
+  let := @SOBlock.structure₁ L spec.orderFree.B A instL ρ
   have hinf : spec.orderFree.IsSrc ρ ↔
       (@Sentence.Realize _ A (@SOBlock.structure₁ L spec.B.withOrder A instL ρ)
           (linearGuard L spec.B) ∧
@@ -471,7 +465,7 @@ theorem SOTCSpec.orderFree_step_iff :
     spec.orderFree.Step ρ σ ↔
       ((∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ σ (Sum.inl ()) w) ∧
         spec.Step (spec.B.restPart ρ) (spec.B.restPart σ)) := by
-  letI := @SOBlock.structure₂ L spec.orderFree.B A instL ρ σ
+  let := @SOBlock.structure₂ L spec.orderFree.B A instL ρ σ
   have hinf : spec.orderFree.Step ρ σ ↔
       (@Sentence.Realize _ A (@SOBlock.structure₂ L spec.B.withOrder A instL ρ σ)
           (fixedOrdS L spec.B) ∧
@@ -521,7 +515,7 @@ theorem SOTCSpec.orderFree_accepts_iff :
     spec.orderFree.Accepts A ↔ ∃ lo : LinearOrder A, @SOTCSpec.Accepts L spec A instL lo := by
   constructor
   · rintro ⟨ρ, σ, hsrc, htgt, hreach⟩
-    letI := @SOBlock.structure₁ L spec.orderFree.B A instL ρ
+    let := @SOBlock.structure₁ L spec.orderFree.B A instL ρ
     have hinf : spec.orderFree.IsSrc ρ ↔
         (@Sentence.Realize _ A (@SOBlock.structure₁ L spec.B.withOrder A instL ρ)
             (linearGuard L spec.B) ∧
@@ -529,7 +523,7 @@ theorem SOTCSpec.orderFree_accepts_iff :
             ((orderElimLHom L spec.B).onSentence spec.src)) := Formula.realize_inf
     obtain ⟨hrefl, htrans, hantisymm, htotal⟩ :=
       (realize_linearGuard L spec.B instL ρ).mp (hinf.mp hsrc).1
-    letI lo : LinearOrder A :=
+    let lo : LinearOrder A :=
       linearOrderOfGuard (ρ (Sum.inl ())) hrefl htrans hantisymm htotal
     have hord : ∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ w 0 ≤ w 1 := by
       intro w
@@ -542,7 +536,7 @@ theorem SOTCSpec.orderFree_accepts_iff :
       (SOTCSpec.orderFree_isSrc_iff (spec := spec) hord).mp hsrc,
       (SOTCSpec.orderFree_isTgt_iff (spec := spec) hordσ).mp htgt, hreach'⟩
   · rintro ⟨lo, ρ₁, σ₁, hsrc, htgt, hreach⟩
-    letI := lo
+    let := lo
     have hord : ∀ w : Fin 2 → A,
         spec.B.joinOrder (fun w : Fin 2 → A => w 0 ≤ w 1) ρ₁ (Sum.inl ()) w ↔ w 0 ≤ w 1 :=
       fun _ => Iff.rfl
@@ -582,12 +576,12 @@ theorem sotcDefinable_iff_free [L.IsRelational] {P : DecisionProblem L} :
     rw [SOTCSpec.orderFree_accepts_iff]
     constructor
     · intro hP
-      letI := Fintype.ofFinite A
-      letI lo : LinearOrder A :=
+      let := Fintype.ofFinite A
+      let lo : LinearOrder A :=
         LinearOrder.lift' (Fintype.equivFin A) (Fintype.equivFin A).injective
       exact ⟨lo, (hspec A).mp hP⟩
     · rintro ⟨lo, h⟩
-      letI := lo
+      let := lo
       exact (hspec A).mpr h
   · rintro ⟨spec, hspec⟩
     refine ⟨spec.toSpec, fun A _ _ _ _ => ?_⟩

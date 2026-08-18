@@ -67,12 +67,6 @@ theorem extLeRel_inl (a b : A) : extLeRel A n ![Sum.inl a, Sum.inl b] ↔ a ≤ 
   rw [h0, h1]
   exact hle
 
-theorem relMap_ext_le (L : Language.{0, 0}) [L.IsRelational] [L.Structure A]
-    (w : Fin 2 → A ⊕ Fin n) :
-    RelMap (L := newLang (L.sum Language.order)) (Sum.inl (Sum.inr Language.leSymb)) w ↔
-      extLeRel A n w :=
-  Iff.rfl
-
 end ExtLe
 
 /-! ### Eliminating the order symbol -/
@@ -87,7 +81,7 @@ abbrev extOldSym : ((newLang L).sum C.withOrder.lang).Relations 1 :=
   Sum.inl (Sum.inr Language.oldSym)
 
 /-- The language morphism eliminating the order symbol of the extended ordered
-vocabulary in favour of the order variable of the extended block. -/
+vocabulary in favor of the order variable of the extended block. -/
 def extOrderElim :
     (newLang (L.sum Language.order)).sum C.lang →ᴸ (newLang L).sum C.withOrder.lang where
   onFunction {_n} f :=
@@ -117,8 +111,8 @@ theorem extOrderElim_isExpansionOn [lo : LinearOrder A]
     letI := C.withOrder.structure ρ
     @LHom.IsExpansionOn _ _ (extOrderElim L C) (A ⊕ Fin n) _ _ := by
   subst hrest
-  letI := C.structure (C.restPart ρ)
-  letI := C.withOrder.structure ρ
+  let := C.structure (C.restPart ρ)
+  let := C.withOrder.structure ρ
   exact
     { map_onFunction := fun {n} f x => by
         match f with
@@ -196,7 +190,7 @@ theorem realize_extLinearGuard (ρ : C.withOrder.Assignment (A ⊕ Fin n)) :
             ((∀ x y : A ⊕ Fin n, ρ (Sum.inl ()) ![x, y] → ρ (Sum.inl ()) ![y, x] → x = y) ∧
               (∀ x y : A ⊕ Fin n, IsOld x → IsOld y →
                 ρ (Sum.inl ()) ![x, y] ∨ ρ (Sum.inl ()) ![y, x]))))) := by
-  letI := C.withOrder.structure ρ
+  let := C.withOrder.structure ρ
   have hle : ∀ w : Fin 2 → A ⊕ Fin n,
       RelMap (L := (newLang L).sum C.withOrder.lang) (ordVarSym (newLang L) C) w ↔
         ρ (Sum.inl ()) w := fun _ => Iff.rfl
@@ -245,10 +239,10 @@ theorem sigmaSONewDefinable_of_orderPull (C : SOBlock)
   rw [h A]
   constructor
   · rintro ⟨lo, n, ρ', hρ'⟩
-    letI := lo
-    letI := C.structure ρ'
+    let := lo
+    let := C.structure ρ'
     refine ⟨n, C.joinOrder (extLeRel A n) ρ', ?_⟩
-    letI := C.withOrder.structure (C.joinOrder (extLeRel A n) ρ')
+    let := C.withOrder.structure (C.joinOrder (extLeRel A n) ρ')
     have hord : ∀ w : Fin 2 → A ⊕ Fin n,
         C.joinOrder (extLeRel A n) ρ' (Sum.inl ()) w ↔ extLeRel A n w := fun _ => Iff.rfl
     refine (Sentence.realize_inf (M := A ⊕ Fin n)).mpr ⟨?_, ?_⟩
@@ -293,14 +287,14 @@ theorem sigmaSONewDefinable_of_orderPull (C : SOBlock)
           fin_cases i
           · simpa using hb
           · simpa using ha
-    · haveI := extOrderElim_isExpansionOn (L := L) (C := C)
+    · have := extOrderElim_isExpansionOn (L := L) (C := C)
         (C.joinOrder (extLeRel A n) ρ') ρ' rfl hord
       exact (LHom.realize_onSentence (A ⊕ Fin n) (extOrderElim L C) ψ).mpr hρ'
   · rintro ⟨n, ρ, hρ⟩
-    letI := C.withOrder.structure ρ
+    let := C.withOrder.structure ρ
     obtain ⟨hguard, hsent⟩ := (Sentence.realize_inf (M := A ⊕ Fin n)).mp hρ
     obtain ⟨honly, hrefl, htrans, hanti, htotal⟩ := (realize_extLinearGuard A n ρ).mp hguard
-    letI lo : LinearOrder A := linearOrderOfGuard
+    let lo : LinearOrder A := linearOrderOfGuard
       (fun v => ρ (Sum.inl ()) ![Sum.inl (v 0), Sum.inl (v 1)])
       (fun a => hrefl (Sum.inl a) (isOld_inl a))
       (fun a b c hab hbc => htrans _ _ _ hab hbc)
@@ -326,8 +320,8 @@ theorem sigmaSONewDefinable_of_orderPull (C : SOBlock)
         rw [← hy 0, ← hy 1, vec_eta₂' w] at hle'
         exact hle'
     refine ⟨lo, n, C.restPart ρ, ?_⟩
-    letI := C.structure (C.restPart ρ)
-    haveI := extOrderElim_isExpansionOn (L := L) (C := C) ρ (C.restPart ρ) rfl hord
+    let := C.structure (C.restPart ρ)
+    have := extOrderElim_isExpansionOn (L := L) (C := C) ρ (C.restPart ρ) rfl hord
     exact (LHom.realize_onSentence (A ⊕ Fin n) (extOrderElim L C) ψ).mp hsent
 
 end OrderPull
@@ -346,8 +340,8 @@ guard. -/
 theorem SigmaSONewDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
     (h : SigmaSONewDefinable Q) : SigmaSONewDefinable P := by
   obtain ⟨B, φ, hφ⟩ := h
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   refine sigmaSONewDefinable_of_orderPull (newBlock f.Tag f.dim B)
     (canonGuard (L₁.sum Language.order) f.Tag f.dim B ⊓
       (newInterp (L₁.sum Language.order) f.Tag f.dim B f.toInterpretation).pullRelSentence φ) ?_
@@ -360,9 +354,9 @@ theorem SigmaSONewDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
           (newInterp (L₁.sum Language.order) f.Tag f.dim B
             f.toInterpretation).pullRelSentence φ) true) := by
     intro lo
-    letI := lo
-    haveI := f.toInterpretation.map_finite A
-    haveI := f.toInterpretation.map_nonempty A
+    let := lo
+    have := f.toInterpretation.map_finite A
+    have := f.toInterpretation.map_nonempty A
     rw [f.correct A, hφ (f.toInterpretation.Map A)]
     exact exists_congr fun n => sorealize_newPull f.toInterpretation B φ A n
   exact ⟨fun hP => ⟨finiteLinearOrder A, (key _).mp hP⟩,

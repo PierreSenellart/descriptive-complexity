@@ -13,13 +13,13 @@ import DescriptiveComplexity.SecondOrderTransitiveClosure
 that is never a singleton, at the price of a universe that is no longer the
 instance. This file pays that price for **one sentence at a time**: a sentence
 about the instance's ordered vocabulary, expanded by a block, is renamed into the
-extended vocabulary (`DescriptiveComplexity.Pfp.newBlockLHom`) and relativized to
+extended vocabulary (`DescriptiveComplexity.Draw.newBlockLHom`) and relativized to
 the mark (`DescriptiveComplexity.relativizeTo`), and then says in the doubled
 universe exactly what it said in the instance
-(`DescriptiveComplexity.Pfp.realize_relOldBlock`).
+(`DescriptiveComplexity.Draw.realize_relOldBlock`).
 
 The block assignment travels with it. An assignment of the instance is extended
-to the doubled universe by `DescriptiveComplexity.Pfp.extAssign` – it holds of a
+to the doubled universe by `DescriptiveComplexity.Draw.extAssign` – it holds of a
 tuple exactly when every entry is marked and the entries' elements satisfy it –
 and that is the shape the *support* condition of the relativized expansion will
 pin down: an assignment over the doubled universe that only ever holds of marked
@@ -28,7 +28,7 @@ tuples is an assignment of the instance and nothing more.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -198,9 +198,9 @@ theorem realize_relOldBlock (σ : ((L.sum Language.order).sum B.lang).Sentence) 
     @Sentence.Realize _ ((dblInterp L).Map A) (B.structure₁ (extAssign ρ₀))
         (relativizeTo (oldGuard (L := L) B) ((newBlockLHom B).onSentence σ)) ↔
       @Sentence.Realize _ A (B.structure₁ ρ₀) σ := by
-  letI := B.structure₁ (L := (newLang L).sum Language.order) (extAssign (L := L) ρ₀)
-  letI := (newBlockLHom (L := L) B).reduct (oldSubD L B A ρ₀)
-  letI := B.structure₁ (L := L.sum Language.order) ρ₀
+  let := B.structure₁ (L := (newLang L).sum Language.order) (extAssign (L := L) ρ₀)
+  let := (newBlockLHom (L := L) B).reduct (oldSubD L B A ρ₀)
+  let := B.structure₁ (L := L.sum Language.order) ρ₀
   have hS : ∀ x : (dblInterp L).Map A,
       x ∈ oldSubD L B A ρ₀ ↔ RelMap (oldGuard (L := L) B) ![x] := by
     intro x
@@ -232,7 +232,7 @@ section Support
 variable (L B)
 
 /-- A relation variable of the block, as a symbol of the expanded extended
-vocabulary: named, because a raw `Sum.inr` is not recognised at the transparency
+vocabulary: named, because a raw `Sum.inr` is not recognized at the transparency
 `rw` matches at. -/
 abbrev blkSym (i : B.ι) :
     (((newLang L).sum Language.order).sum B.lang).Relations (B.arity i) :=
@@ -301,11 +301,6 @@ instance markStructure : L.Structure (MarkPart L M) where
   funMap f := isEmptyElim f
   RelMap {_} r x := RelMap (newSym r) fun i => (x i).val
 
-theorem relMap_markPart {n : ℕ} (r : L.Relations n) (x : Fin n → MarkPart L M) :
-    RelMap r x ↔ RelMap (newSym r) fun i => (x i).val := Iff.rfl
-
-theorem le_markPart [LinearOrder M] (x y : MarkPart L M) : x ≤ y ↔ x.val ≤ y.val := Iff.rfl
-
 variable (B : SOBlock)
 
 /-- **An assignment of the marked part, extended to the whole structure**: it
@@ -357,9 +352,9 @@ theorem realize_relOldMark (ρ₀ : B.Assignment (MarkPart L M))
     @Sentence.Realize _ M (B.structure₁ (extAssignM B ρ₀))
         (relativizeTo (oldGuard (L := L) B) ((newBlockLHom B).onSentence σ)) ↔
       @Sentence.Realize _ (MarkPart L M) (B.structure₁ ρ₀) σ := by
-  letI := B.structure₁ (L := (newLang L).sum Language.order) (extAssignM (L := L) B ρ₀)
-  letI := (newBlockLHom (L := L) B).reduct (markSub (L := L) B (extAssignM B ρ₀))
-  letI := B.structure₁ (L := L.sum Language.order) ρ₀
+  let := B.structure₁ (L := (newLang L).sum Language.order) (extAssignM (L := L) B ρ₀)
+  let := (newBlockLHom (L := L) B).reduct (markSub (L := L) B (extAssignM B ρ₀))
+  let := B.structure₁ (L := L.sum Language.order) ρ₀
   have hS : ∀ x : M, x ∈ markSub (L := L) B (extAssignM B ρ₀) ↔ RelMap (oldGuard (L := L) B) ![x] :=
     fun _ => Iff.rfl
   have h1 := realize_relativizeTo (R := oldGuard (L := L) B)
@@ -388,7 +383,7 @@ sentence exactly when it never holds of an unmarked entry. -/
 theorem realize_suppAt (ρ : B.Assignment M) (i : B.ι) :
     @Sentence.Realize _ M (B.structure₁ ρ) (suppAt L B i) ↔
       ∀ w : Fin (B.arity i) → M, ρ i w → ∀ j, RelMap (oldNewSym L) ![w j] := by
-  letI := B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := B.structure₁ (L := (newLang L).sum Language.order) ρ
   rw [suppAt]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_rel, Term.realize_var, Sum.elim_inr, realize_listInf,
@@ -408,8 +403,8 @@ theorem realize_suppSentence (ρ : B.Assignment M) :
     @Sentence.Realize _ M (B.structure₁ ρ) (suppSentence L B) ↔
       ∀ (i : B.ι) (w : Fin (B.arity i) → M), ρ i w → ∀ j, RelMap (oldNewSym L) ![w j] := by
   classical
-  letI := Fintype.ofFinite B.ι
-  letI := B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := Fintype.ofFinite B.ι
+  let := B.structure₁ (L := (newLang L).sum Language.order) ρ
   rw [suppSentence]
   simp only [Sentence.Realize, realize_listInf, List.mem_map, Finset.mem_toList,
     Finset.mem_univ, true_and, forall_exists_index]
@@ -421,6 +416,6 @@ theorem realize_suppSentence (ρ : B.Assignment M) :
 
 end MarkPart
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

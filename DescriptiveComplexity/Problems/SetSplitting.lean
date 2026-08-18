@@ -10,12 +10,12 @@ import DescriptiveComplexity.Problems.ThreeSat.ToSat
 /-!
 # Set Splitting is NP-complete
 
-SET SPLITTING, also known as hypergraph 2-colourability: can the ground
-elements of a set system be coloured with two colours so that no set of the
+SET SPLITTING, also known as hypergraph 2-colorability: can the ground
+elements of a set system be colored with two colors so that no set of the
 family is monochromatic? Like Exact Cover it lives on
 `FirstOrder.Language.setSystem` unchanged (`DescriptiveComplexity.SetSplitting`,
 `DescriptiveComplexity.Problems.SetFamily.Defs`) and carries no threshold – the
-colouring, not a cardinality, is the whole question.
+coloring, not a cardinality, is the whole question.
 
 Hardness comes from NAE-SAT (`DescriptiveComplexity.Problems.NaeSat`) by a reduction
 with **no gadget and no counting**, order-free and of dimension 1:
@@ -24,12 +24,12 @@ with **no gadget and no counting**, order-free and of dimension 1:
 * the family has one set `{x, ¬x}` per variable, and one set per clause,
   holding its literals.
 
-A two-colouring splits the pair `{x, ¬x}` exactly when it gives the two
-literals of `x` opposite colours – that *is* a truth assignment – and it
+A two-coloring splits the pair `{x, ¬x}` exactly when it gives the two
+literals of `x` opposite colors – that *is* a truth assignment – and it
 splits a clause set exactly when the clause has both a true and a false
 literal, which is not-all-equal satisfaction. The correspondence is so direct
 that the reduction is essentially the identity on clauses; only the pair sets
-are new, and they are what turns an arbitrary colouring into an assignment.
+are new, and they are what turns an arbitrary coloring into an assignment.
 -/
 
 namespace DescriptiveComplexity
@@ -193,7 +193,7 @@ iff its literal set system can be split. -/
 theorem naeSatisfiable_iff_hasSetSplitting :
     NAESatisfiable A ↔ HasSetSplitting (splInterp.Map A) := by
   constructor
-  · -- the true literals of a not-all-equal assignment are a splitting colour
+  · -- the true literals of a not-all-equal assignment are a splitting color
     rintro ⟨ν, hν⟩
     refine ⟨fun p => ∃ s x, p = splPt (.lit s) x ∧ LitTrue ν x s, fun f hf => ?_⟩
     have hcol : ∀ (s : Bool) (x : A),
@@ -223,9 +223,9 @@ theorem naeSatisfiable_iff_hasSetSplitting :
           (hcol t y).mpr hTy⟩,
         splPt (.lit u) z, ssElem_lit u z, (ssMem_lit_clSet u z c).mpr hz,
           fun h => hFz ((hcol u z).mp h)⟩
-  · -- a splitting colour reads off a not-all-equal assignment
+  · -- a splitting color reads off a not-all-equal assignment
     rintro ⟨S, hS⟩
-    -- the two literals of a variable get opposite colours
+    -- the two literals of a variable get opposite colors
     have hkey : ∀ (x : A) (s : Bool),
         S (splPt (.lit s) x) ↔ LitTrue (fun z => S (splPt (.lit true) z)) x s := by
       intro x s

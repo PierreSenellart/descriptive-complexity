@@ -114,7 +114,7 @@ def ColWord (x y j w : A) : Prop :=
 `DescriptiveComplexity.BitSum.colWordN` of the ranks. -/
 theorem colWord_iff {x y j w : A} :
     ColWord x y j w ↔ orank w = colWordN (orank x) (orank y) (orank j) := by
-  haveI : Nonempty A := ⟨w⟩
+  have : Nonempty A := ⟨w⟩
   have hylt : ∀ k, Nat.card A ≤ k → (orank y).testBit k = false := fun k hk =>
     testBit_orank_eq_false (le_trans (le_of_lt posCount_lt_card) hk)
   constructor
@@ -219,7 +219,7 @@ theorem stepEq_intro {n r r' t V : A} (hs : orank r + orank n < Nat.card A)
     (hd : orank r' + orank r' < Nat.card A)
     (h : orank r + orank n = 2 * orank r' + ((orank V).testBit (orank t)).toNat) :
     StepEq n r r' t V := by
-  haveI : Nonempty A := ⟨t⟩
+  have : Nonempty A := ⟨t⟩
   obtain ⟨s, hsr⟩ := exists_orank_eq (A := A) hs
   obtain ⟨d, hdr⟩ := exists_orank_eq (A := A) hd
   refine ⟨s, d, by omega, by omega, ?_⟩
@@ -267,7 +267,7 @@ of the range – with no size hypothesis at all. -/
 theorem rangeSum_sound {x y a e V : A} (h : RangeSum x y a e V) :
     ∃ m : ℕ, 0 < m ∧ orank a + m = orank e ∧
       orank V = intervalSum (colCountN (orank x) (orank y) (posCount A)) (orank a) m := by
-  haveI : Nonempty A := ⟨a⟩
+  have : Nonempty A := ⟨a⟩
   obtain ⟨g, B, C, R, hg0, hB, hC, hbase, hstep, ptop, ptop', ttop, rtop, mtop, qtop,
     hptopB, hptopsum, hptop'low, hctop, hrtop, htsucc, hae, hmq, hVwin, hVhigh⟩ := h
   have hgpos : 0 < orank g := by omega

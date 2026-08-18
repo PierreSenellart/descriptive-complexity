@@ -28,7 +28,7 @@ defining formulas are quantifier-free (`DescriptiveComplexity.threeColToSat_isQu
 so this is even a quantifier-free reduction, the weakest reduction notion in
 common use in descriptive complexity.
 
-Elements of the interpreted universe not of the shapes above (“junk”, e.g.
+Elements of the interpreted universe not of the shapes above (“junk”, e.g.,
 `(varC i, ![u, v])` with `u ≠ v`, or `(edgClause i, ![u, v])` with `(u, v)` not
 an edge) are neither clauses nor occur in any clause, so they do not affect
 satisfiability.
@@ -262,14 +262,5 @@ theorem threeColToSat_isQuantifierFree : threeColToSat.IsQuantifierFree := by
     · exact (((IsAtomic.rel _ _).isQF.inf (IsAtomic.equal _ _).isQF).inf
         ((IsAtomic.equal _ _).isQF.sup (IsAtomic.equal _ _).isQF))
     · exact isQF_bot
-
-/-- Corollary in terms of Mathlib's `SimpleGraph`: a simple graph is
-3-colorable iff the CNF instance interpreted in it is satisfiable. -/
-theorem SimpleGraph.colorable_iff_satisfiable {V : Type} (G : SimpleGraph V) :
-    haveI := G.structure
-    G.Colorable 3 ↔ Satisfiable (threeColToSat.Map V) := by
-  letI := G.structure
-  rw [← threeColorable_iff_colorable G,
-    threeColorable_iff_satisfiable V]
 
 end DescriptiveComplexity

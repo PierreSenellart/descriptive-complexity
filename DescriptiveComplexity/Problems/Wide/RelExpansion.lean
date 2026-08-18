@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.RelExp
 
 The doubled universe of `DescriptiveComplexity.Problems.Wide.Double` is never a
 singleton, which is what the machine needs, but it is no longer the instance.
-`DescriptiveComplexity.Pfp.relExp` repairs that on the expansion's side: every
+`DescriptiveComplexity.Draw.relExp` repairs that on the expansion's side: every
 sentence of the expansion is renamed and relativized to the mark, and every
 block assignment is required to be **supported** – to hold only of marked tuples
 – so that a point of the relativized expansion over the doubled universe is a
@@ -25,7 +25,7 @@ that always has a marked part – it contributes nothing.
 
 namespace DescriptiveComplexity
 
-namespace Pfp
+namespace Draw
 
 open FirstOrder
 
@@ -57,7 +57,7 @@ omit [L.IsRelational] in
 theorem realize_noOldSentence (ρ : B.Assignment M) :
     @Sentence.Realize _ M (B.structure₁ ρ) (noOldSentence L B) ↔
       ∀ x : M, ¬RelMap (oldNewSym L) ![x] := by
-  letI := B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := B.structure₁ (L := (newLang L).sum Language.order) ρ
   rw [noOldSentence]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
     Formula.realize_rel₁, Term.realize_var, Sum.elim_inr]
@@ -68,8 +68,8 @@ theorem realize_emptyBlocksSentence (ρ : B.Assignment M) :
     @Sentence.Realize _ M (B.structure₁ ρ) (emptyBlocksSentence L B) ↔
       ∀ (i : B.ι) (w : Fin (B.arity i) → M), ¬ρ i w := by
   classical
-  letI := Fintype.ofFinite B.ι
-  letI := B.structure₁ (L := (newLang L).sum Language.order) ρ
+  let := Fintype.ofFinite B.ι
+  let := B.structure₁ (L := (newLang L).sum Language.order) ρ
   rw [emptyBlocksSentence]
   simp only [Sentence.Realize, realize_listInf, List.mem_map, Finset.mem_toList,
     Finset.mem_univ, true_and, forall_exists_index]
@@ -120,13 +120,13 @@ noncomputable def relExp (X : ExpExpansion L) : ExpExpansion (newLang L) where
     by_cases hne : Nonempty (MarkPart L M)
     · obtain ⟨t, ρ₀, h⟩ := X.dom_nonempty (MarkPart L M)
       refine ⟨some t, extAssignM X.B ρ₀, ?_⟩
-      letI := X.B.structure₁ (L := (newLang L).sum Language.order) (extAssignM X.B ρ₀)
+      let := X.B.structure₁ (L := (newLang L).sum Language.order) (extAssignM X.B ρ₀)
       refine Formula.realize_inf.mpr ⟨?_, ?_⟩
       · exact (realize_relOldMark X.B ρ₀ (X.dom t)).mpr h
       · exact (realize_suppSentence X.B (extAssignM X.B ρ₀)).mpr
           (supported_extAssignM X.B ρ₀)
     · refine ⟨none, (fun _ _ => False), ?_⟩
-      letI := X.B.structure₁ (L := (newLang L).sum Language.order)
+      let := X.B.structure₁ (L := (newLang L).sum Language.order)
         (show X.B.Assignment M from fun _ _ => False)
       refine Formula.realize_inf.mpr ⟨?_, ?_⟩
       · exact (realize_noOldSentence (fun _ _ => False)).mpr fun x hx =>
@@ -135,6 +135,6 @@ noncomputable def relExp (X : ExpExpansion L) : ExpExpansion (newLang L) where
 
 end RelExpansion
 
-end Pfp
+end Draw
 
 end DescriptiveComplexity

@@ -47,7 +47,7 @@ increasing list enumerates exactly the positions used by the top word of `d`
 and that `w` carries the letters at them. Such a list is unique when it exists
 (two sorted duplicate-free lists with the same members are equal), so
 `IsWordU d` holds of at most one list, and it holds of one as soon as the used
-positions are finite. The problem is then Post's on the nose
+positions are finite. The problem is then exactly Post's
 (`DescriptiveComplexity.Pcp.PcpOn`): a nonempty sequence of marked dominoes
 whose top words and bottom words have the same concatenation.
 

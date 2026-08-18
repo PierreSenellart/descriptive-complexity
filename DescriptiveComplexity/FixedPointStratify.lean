@@ -64,11 +64,6 @@ abbrev stratGateSym (L : Language.{0, 0}) (B₁ B₂ : SOBlock) :
     (L.sum (stratBlock B₁ B₂).lang).Relations 0 :=
   Sum.inr ⟨.inl (.inr ()), rfl⟩
 
-/-- The relation symbol of a second-stratum variable. -/
-abbrev strat2Sym (L : Language.{0, 0}) (B₁ B₂ : SOBlock) (i : B₂.ι) :
-    (L.sum (stratBlock B₁ B₂).lang).Relations (B₂.arity i) :=
-  Sum.inr ⟨.inr i, rfl⟩
-
 section Parts
 
 variable {B₁ B₂ : SOBlock} {A : Type}
@@ -138,9 +133,9 @@ theorem strat2LHom_isExpansionOn (σ : (stratBlock B₁ B₂).Assignment A) :
       (@SOBlock.structure₁ (L.sum B₁.lang) B₂ A
         (B₁.structure₁ (L := L) (strat1Assign σ)) (strat2Assign σ))
       ((stratBlock B₁ B₂).structure₁ (L := L) σ) := by
-  letI := B₁.structure₁ (L := L) (strat1Assign σ)
-  letI := @SOBlock.structure₁ (L.sum B₁.lang) B₂ A _ (strat2Assign σ)
-  letI := (stratBlock B₁ B₂).structure₁ (L := L) σ
+  let := B₁.structure₁ (L := L) (strat1Assign σ)
+  let := @SOBlock.structure₁ (L.sum B₁.lang) B₂ A _ (strat2Assign σ)
+  let := (stratBlock B₁ B₂).structure₁ (L := L) σ
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · rcases f with (g | g) | g
     · rfl
@@ -160,10 +155,10 @@ theorem realize_strat2Formula {α : Type} (σ : (stratBlock B₁ B₂).Assignmen
       ((strat2LHom L B₁ B₂).onFormula φ) v) ↔
       @Formula.Realize _ A (@SOBlock.structure₁ (L.sum B₁.lang) B₂ A
         (B₁.structure₁ (L := L) (strat1Assign σ)) (strat2Assign σ)) _ φ v := by
-  letI := B₁.structure₁ (L := L) (strat1Assign σ)
-  letI := @SOBlock.structure₁ (L.sum B₁.lang) B₂ A _ (strat2Assign σ)
-  letI := (stratBlock B₁ B₂).structure₁ (L := L) σ
-  haveI := strat2LHom_isExpansionOn (L := L) σ
+  let := B₁.structure₁ (L := L) (strat1Assign σ)
+  let := @SOBlock.structure₁ (L.sum B₁.lang) B₂ A _ (strat2Assign σ)
+  let := (stratBlock B₁ B₂).structure₁ (L := L) σ
+  have := strat2LHom_isExpansionOn (L := L) σ
   exact LHom.realize_onFormula (φ := strat2LHom L B₁ B₂) φ
 
 /-- Realization of the gate atom: the gate bit of the assignment, whatever
@@ -172,7 +167,7 @@ theorem realize_gateAtom {B₁ B₂ : SOBlock} (σ : (stratBlock B₁ B₂).Assi
     {α : Type} (v : α → A) :
     (@Formula.Realize _ A ((stratBlock B₁ B₂).structure₁ (L := L) σ) _
       (Relations.formula (stratGateSym L B₁ B₂) Fin.elim0) v) ↔ StratGate σ := by
-  letI := (stratBlock B₁ B₂).structure₁ (L := L) σ
+  let := (stratBlock B₁ B₂).structure₁ (L := L) σ
   rw [Formula.realize_rel]
   exact iff_of_eq (congrArg (σ (.inl (.inr ()))) (funext fun j => j.elim0))
 
@@ -200,8 +195,8 @@ theorem realize_stratGateF {B₂ : SOBlock} {A : Type} [L.Structure A]
       (stratGateF d₁ B₂) v) ↔
       ∀ (i : d₁.B.ι) (x : Fin (d₁.B.arity i) → A),
         d₁.next (strat1Assign σ) i x → strat1Assign σ i x := by
-  letI := Fintype.ofFinite d₁.B.ι
-  letI := (stratBlock d₁.B B₂).structure₁ (L := L) σ
+  let := Fintype.ofFinite d₁.B.ι
+  let := (stratBlock d₁.B B₂).structure₁ (L := L) σ
   rw [stratGateF, Formula.realize_iInf]
   refine forall_congr' fun i => ?_
   rw [Formula.realize_iAlls]

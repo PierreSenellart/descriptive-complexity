@@ -49,7 +49,7 @@ abbrev dsSetSym : dsSOLang.Relations 1 := Sum.inr dsSetRel
 /-- The injection symbol in the kernel's vocabulary. -/
 abbrev dsInjSym : dsSOLang.Relations 2 := Sum.inr dsInjRel
 
-/-- Kernel conjunct: every vertex is in the guessed set or has a neighbour in
+/-- Kernel conjunct: every vertex is in the guessed set or has a neighbor in
 it. -/
 private noncomputable def dsDomClause : dsSOLang.Sentence :=
   (Relations.formula₁ dsSetSym (Term.var (Sum.inr 0)) ⊔
@@ -87,7 +87,7 @@ private theorem realize_dominatingKernel :
       (∀ v : A, ρ false ![v] ∨ ∃ u : A, ρ false ![u] ∧ MGAdj u v) ∧
         (∀ x : A, ρ false ![x] → ∃ y : A, ρ true ![x, y] ∧ MGMarked y) ∧
         ∀ x x' y : A, ρ true ![x, y] → ρ true ![x', y] → x = x' := by
-  letI := dominatingGuessBlock.structure ρ
+  let := dominatingGuessBlock.structure ρ
   have hsubS : ∀ (w : Fin 1 → A),
       RelMap (L := dsSOLang) (M := A) dsSetSym w ↔ ρ false w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 2 → A),

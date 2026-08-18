@@ -117,7 +117,7 @@ theorem card_midSet_add_two (h2 : 2 ≤ (OccSet c).ncard) :
     subst ht
     have hsingle : OccSet c = {(y, t)} := by
       ext ⟨v, r⟩
-      simp only [OccSet, Set.mem_setOf_eq, Set.mem_singleton_iff, Prod.mk.injEq]
+      simp only [OccSet, Set.mem_ofPred_eq, Set.mem_singleton_iff, Prod.mk.injEq]
       refine ⟨fun hv => eq_of_minOcc_of_maxOcc hmin hmax hv, ?_⟩
       rintro ⟨rfl, rfl⟩
       exact hmin.1
@@ -131,7 +131,7 @@ theorem card_midSet_add_two (h2 : 2 ≤ (OccSet c).ncard) :
     · exact hmax.1
   have hdiff : MidSet c = OccSet c \ {(y, t), (z, u)} := by
     ext ⟨v, r⟩
-    simp only [MidSet, OccSet, Set.mem_setOf_eq, Set.mem_sdiff, Set.mem_insert_iff,
+    simp only [MidSet, OccSet, Set.mem_ofPred_eq, Set.mem_sdiff, Set.mem_insert_iff,
       Set.mem_singleton_iff, Prod.mk.injEq, not_or]
     constructor
     · rintro ⟨⟨hocc, hmin'⟩, hmax'⟩

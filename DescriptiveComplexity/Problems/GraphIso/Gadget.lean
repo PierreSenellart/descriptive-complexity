@@ -39,9 +39,9 @@ Two design points, both forced:
   is adjacent to a triangle and no other node is.
 
 The levels are then recovered from adjacency alone, with no counting beyond
-"has exactly one neighbour": the triangle nodes are those lying on a triangle,
+“has exactly one neighbor”: the triangle nodes are those lying on a triangle,
 the vertices those adjacent to one without lying on one, `A` the nodes with a
-leaf neighbour, and so on. Points of the tagged power that no clause makes
+leaf neighbor, and so on. Points of the tagged power that no clause makes
 adjacent to anything – an arc node for a pair that is not an arc – are isolated,
 hence harmless: an isomorphism matches them by degree.
 -/
@@ -184,10 +184,6 @@ theorem pt_eta (q : gadget.Map G) : q = pt q.1 (q.2 0) (q.2 1) :=
 
 theorem pt_tag (t : GTag) (u v : G) : (pt t u v).1 = t := rfl
 
-theorem pt_fst (t : GTag) (u v : G) : (pt t u v).2 0 = u := rfl
-
-theorem pt_snd (t : GTag) (u v : G) : (pt t u v).2 1 = v := rfl
-
 end Points
 
 /-! ### Which pairs are edges -/
@@ -203,7 +199,7 @@ def GAdj (u v : G) : Prop := RelMap Language.adj ![u, v]
 def GEdge (p q : gadget.Map G) : Prop := RelMap Language.adj ![p, q]
 
 /-! Every clause of `DescriptiveComplexity.GraphGadget.edgeF`, read on general
-points. The coordinates of a neighbour are not known to be diagonal before the
+points. The coordinates of a neighbor are not known to be diagonal before the
 clause is read, so these are the forms the case analysis needs; the diagonal
 corollaries follow. -/
 
@@ -343,11 +339,6 @@ theorem edge_tagAdj {p q : gadget.Map G} (h : GEdge p q) : TagAdj p.1 q.1 := by
   obtain ⟨s, x⟩ := q
   cases t <;> cases s <;> first | exact h.elim | trivial
 
-/-- Nothing joins two vertex nodes, two `m₂`s, and so on: a shorthand for
-reading `DescriptiveComplexity.GraphGadget.edge_tagAdj` off a named pair. -/
-theorem not_edge_of_not_tagAdj {t s : GTag} (h : ¬TagAdj t s) (u v u' v' : G) :
-    ¬GEdge (pt t u v) (pt s u' v') := fun he => h (edge_tagAdj he)
-
 /-- No clause relates a tag to itself, so the construction has no loops. -/
 theorem edge_irrefl_pt (t : GTag) (u v : G) : ¬GEdge (pt t u v) (pt t u v) := by
   rw [GEdge, FOInterpretation.relMap_map]
@@ -381,11 +372,11 @@ theorem edge_irrefl (p : gadget.Map G) : ¬GEdge p p := by
   rw [pt_eta ((t, w) : gadget.Map G)]
   exact edge_irrefl_pt _ _ _
 
-/-! ### The neighbours of each kind of node -/
+/-! ### The neighbors of each kind of node -/
 
-section Neighbours
+section Neighbors
 
-/-- The neighbours of a vertex node: its lollipop, the tail-side subdivision of
+/-- The neighbors of a vertex node: its lollipop, the tail-side subdivision of
 each arc out of it, and the head-side subdivision of each arc into it. -/
 theorem nbr_of_vPt {u : G} {q : gadget.Map G} (h : GEdge (vPt u) q) :
     q = m₁Pt u ∨ (∃ v, GAdj u v ∧ q = aPt u v) ∨ ∃ w, GAdj w u ∧ q = cPt w u := by
@@ -427,47 +418,6 @@ theorem nbr_of_m₁Pt {u : G} {q : gadget.Map G} (h : GEdge (m₁Pt u) q) :
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
 
-
-theorem nbr_of_m₂Pt {u : G} {q : gadget.Map G} (h : GEdge (m₂Pt u) q) :
-    q = m₁Pt u ∨ q = m₃Pt u := by
-  obtain ⟨s, x⟩ := q
-  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
-  have h' : GEdge (m₂Pt u) (pt s (x 0) (x 1)) :=
-    Eq.mp (congrArg (fun z => GEdge (m₂Pt u) z) hq) h
-  rw [hq]
-  cases s
-  · exact (edge_tagAdj h).elim
-  · obtain ⟨-, hx, hu⟩ := (edge_m₂_m₁ u u (x 0) (x 1)).mp h'
-    exact Or.inl (by rw [m₁Pt, ← hu, ← hx, ← hu])
-  · exact (edge_tagAdj h).elim
-  · obtain ⟨-, hx, hu⟩ := (edge_m₂_m₃ u u (x 0) (x 1)).mp h'
-    exact Or.inr (by rw [m₃Pt, ← hu, ← hx, ← hu])
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-
-
-theorem nbr_of_m₃Pt {u : G} {q : gadget.Map G} (h : GEdge (m₃Pt u) q) :
-    q = m₁Pt u ∨ q = m₂Pt u := by
-  obtain ⟨s, x⟩ := q
-  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
-  have h' : GEdge (m₃Pt u) (pt s (x 0) (x 1)) :=
-    Eq.mp (congrArg (fun z => GEdge (m₃Pt u) z) hq) h
-  rw [hq]
-  cases s
-  · exact (edge_tagAdj h).elim
-  · obtain ⟨-, hx, hu⟩ := (edge_m₃_m₁ u u (x 0) (x 1)).mp h'
-    exact Or.inl (by rw [m₁Pt, ← hu, ← hx, ← hu])
-  · obtain ⟨-, hx, hu⟩ := (edge_m₃_m₂ u u (x 0) (x 1)).mp h'
-    exact Or.inr (by rw [m₂Pt, ← hu, ← hx, ← hu])
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-
-
 theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
     q = vPt u ∨ q = bPt u v ∨ q = pPt u v := by
   obtain ⟨s, x⟩ := q
@@ -488,7 +438,6 @@ theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
   · obtain ⟨-, -, h0, h1⟩ := (edge_a_p u v (x 0) (x 1)).mp h'
     exact Or.inr (Or.inr (by rw [pPt, h0, h1]))
 
-
 theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
     q = aPt u v ∨ q = cPt u v := by
   obtain ⟨s, x⟩ := q
@@ -507,7 +456,6 @@ theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
   · obtain ⟨-, -, h0, h1⟩ := (edge_b_c u v (x 0) (x 1)).mp h'
     exact Or.inr (by rw [cPt, h0, h1])
   · exact (edge_tagAdj h).elim
-
 
 theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
     q = bPt u v ∨ q = vPt v := by
@@ -528,7 +476,6 @@ theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
 
-
 theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
     q = aPt u v := by
   obtain ⟨s, x⟩ := q
@@ -547,7 +494,7 @@ theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
 
-end Neighbours
+end Neighbors
 
 /-! ### The structural predicates that recover the levels -/
 
@@ -559,10 +506,10 @@ def OnTri (p : gadget.Map G) : Prop := ∃ q r, GEdge p q ∧ GEdge q r ∧ GEdg
 /-- Being adjacent to a node that lies on a triangle. -/
 def AdjTri (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ OnTri q
 
-/-- Having exactly one neighbour. -/
+/-- Having exactly one neighbor. -/
 def Leaf (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ ∀ r, GEdge p r → r = q
 
-/-- Having a neighbour with exactly one neighbour. -/
+/-- Having a neighbor with exactly one neighbor. -/
 def HasLeafNbr (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ Leaf q
 
 /-- The lollipop triangle is a triangle. -/
@@ -570,7 +517,7 @@ theorem onTri_m₁Pt (u : G) : OnTri (m₁Pt u) :=
   ⟨m₂Pt u, m₃Pt u, (edge_m₁_m₂ u u u u).mpr ⟨rfl, rfl, rfl⟩,
     (edge_m₂_m₃ u u u u).mpr ⟨rfl, rfl, rfl⟩, (edge_m₃_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩⟩
 
-/-- A vertex node lies on no triangle: no two of its neighbours are joined. -/
+/-- A vertex node lies on no triangle: no two of its neighbors are joined. -/
 theorem not_onTri_vPt (u : G) : ¬OnTri (vPt u) := by
   rintro ⟨q, r, hpq, hqr, hrp⟩
   rcases nbr_of_vPt hpq with rfl | ⟨v, -, rfl⟩ | ⟨w, -, rfl⟩
@@ -880,7 +827,7 @@ theorem leaf_pPt {u v : G} (h : GAdj u v) : Leaf (pPt u v) :=
   ⟨aPt u v, (edge_p_a u v u v).mpr ⟨h, h, rfl, rfl⟩, fun _ hr => nbr_of_pPt hr⟩
 
 /-- A middle subdivision node is not a leaf: it has both an `a` and a `c`
-neighbour, and those have different tags. -/
+neighbor, and those have different tags. -/
 theorem not_leaf_bPt {u v : G} (h : GAdj u v) : ¬Leaf (bPt u v) := by
   rintro ⟨q, -, huniq⟩
   have h₁ := huniq (aPt u v) ((edge_b_a u v u v).mpr ⟨h, h, rfl, rfl⟩)
@@ -905,13 +852,13 @@ theorem not_leaf_vPt_of_in {w u : G} (h : GAdj w u) : ¬Leaf (vPt u) := by
   have : (m₁Pt u).1 = (cPt w u).1 := by rw [h₁, h₂]
   exact absurd this (by simp [m₁Pt, cPt, pt])
 
-/-! ### Which nodes have a leaf neighbour: the tail side -/
+/-! ### Which nodes have a leaf neighbor: the tail side -/
 
-/-- The tail-side subdivision node has the pendant as a neighbour. -/
+/-- The tail-side subdivision node has the pendant as a neighbor. -/
 theorem hasLeafNbr_aPt {u v : G} (h : GAdj u v) : HasLeafNbr (aPt u v) :=
   ⟨pPt u v, (edge_a_p u v u v).mpr ⟨h, h, rfl, rfl⟩, leaf_pPt h⟩
 
-/-- The head-side subdivision node has none: its neighbours are the middle node
+/-- The head-side subdivision node has none: its neighbors are the middle node
 and the head, and the head is incident to this very arc. -/
 theorem not_hasLeafNbr_cPt {u v : G} (h : GAdj u v) : ¬HasLeafNbr (cPt u v) := by
   rintro ⟨q, hq, hleaf⟩
@@ -1003,7 +950,7 @@ theorem adjTri_map (p : gadget.Map G) : AdjTri (φ p) ↔ AdjTri p := by
     exact ⟨φ q, (edge_map φ _ _).mpr h₁, (onTri_map φ q).mpr h₂⟩
 
 /-- Being a leaf is preserved: the uniqueness clause transfers because every
-neighbour of the image is the image of a neighbour. -/
+neighbor of the image is the image of a neighbor. -/
 theorem leaf_map (p : gadget.Map G) : Leaf (φ p) ↔ Leaf p := by
   constructor
   · rintro ⟨q, h₁, h₂⟩
@@ -1017,7 +964,7 @@ theorem leaf_map (p : gadget.Map G) : Leaf (φ p) ↔ Leaf p := by
       rw [← edge_map_symm φ, φ.symm_apply_apply] at hr; exact hr
     rw [← h₂ (φ.symm r) hr', φ.apply_symm_apply]
 
-/-- Having a leaf neighbour is preserved. -/
+/-- Having a leaf neighbor is preserved. -/
 theorem hasLeafNbr_map (p : gadget.Map G) : HasLeafNbr (φ p) ↔ HasLeafNbr p := by
   constructor
   · rintro ⟨q, h₁, h₂⟩

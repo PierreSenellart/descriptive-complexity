@@ -23,8 +23,8 @@ The point of these lemmas is their **contrapositive**
 problem that is not first-order definable reduces to no problem that is. This
 is what turns an inexpressibility result into a *non-reducibility* result, and
 so the only route this library has to a negative statement about the reduction
-order – everything else it proves is the existence of a reduction. The one
-inexpressibility result currently available is `DescriptiveComplexity.EVEN`
+order – everything else it proves is the existence of a reduction. It is
+applied to `DescriptiveComplexity.EVEN`
 (`DescriptiveComplexity.even_not_foDefinable`), whence
 `DescriptiveComplexity.even_not_le_of_foDefinable`.
 -/
@@ -45,12 +45,12 @@ reductions**: the defining sentence of the target, pulled back through the
 interpretation, defines the source. -/
 theorem FODefinableFree.of_foReduction (h : FODefinableFree Q) (f : P ≤ᶠᵒ Q) :
     FODefinableFree P := by
-  letI := f.tagFinite
-  letI := f.tagNonempty
+  let := f.tagFinite
+  let := f.tagNonempty
   obtain ⟨φ, hφ⟩ := h
   refine ⟨f.toInterpretation.pullSentence φ, fun A _ _ _ => ?_⟩
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   rw [f.toInterpretation.realize_pullSentence φ A]
   exact (f.correct A).trans (hφ _)
 
@@ -61,14 +61,14 @@ extension is definable from the order of the input, which is what keeps the
 result inside FO(≤). -/
 theorem FODefinable.of_orderedReduction (h : FODefinable Q) (f : P ≤ᶠᵒ[≤] Q) :
     FODefinable P := by
-  letI := f.tagFinite
-  letI := f.tagNonempty
-  letI : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
   obtain ⟨φ, hφ⟩ := h
   refine ⟨f.toInterpretation.ordExtend.pullSentence φ, fun A _ _ _ _ => ?_⟩
-  letI := f.toInterpretation.mapLinearOrder A
-  haveI := f.toInterpretation.map_finite A
-  haveI := f.toInterpretation.map_nonempty A
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
   rw [f.toInterpretation.ordExtend.realize_pullSentence φ A,
     StrongHomClass.realize_sentence (f.toInterpretation.ordExtendLEquiv A) φ]
   exact (f.correct A).trans (hφ _)

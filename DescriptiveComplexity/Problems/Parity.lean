@@ -32,7 +32,7 @@ having on its own:
 * **PARITY is in LOGSPACE** (`DescriptiveComplexity.parity_mem_LOGSPACE`), by one
   deterministic walk along the order: carry a bit, flip it at each marked
   element. The walk is `DescriptiveComplexity.parSpec`, its mode is the parity of
-  the marked elements seen so far, and it is *functional* on the nose
+  the marked elements seen so far, and it is *functional* outright
   (`DescriptiveComplexity.functional_parSpec`), so determinizing changes nothing
   (`DescriptiveComplexity.TCSpec.det_accepts_iff`).
 * **PARITY is not first-order definable**, even order-invariantly
@@ -224,16 +224,12 @@ theorem isTgt_parSpec_iff (m : Bool) (x : Fin 1 → A) :
 
 variable [Finite A]
 
-/-- A Boolean is not its own negation: what makes the “not marked” branch of the
-step formula pin the mode. -/
-private theorem bool_ne_not_self (b : Bool) : ¬(b = !b) := by cases b <;> simp
-
 /-- The prefix of a minimum is the minimum itself, when it is marked. -/
 theorem parCount_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Marked A) :
     parCount z = 1 := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = {z} := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
     exact ⟨fun h => le_antisymm h.1 (hz y), fun h => ⟨h.le, by rw [h]; exact hm⟩⟩
   rw [parCount, hset, Set.ncard_singleton]
 
@@ -242,7 +238,7 @@ theorem parCount_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ 
     parCount z = 0 := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = ∅ := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_and]
+    simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_and]
     intro hy
     rw [le_antisymm hy (hz y)]
     exact hm
@@ -252,11 +248,11 @@ theorem parCount_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ 
 theorem parCount_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
     parCount z = parCount w + 1 := by
   have hnot : z ∉ {y : A | y ≤ w ∧ y ∈ Marked A} := by
-    simp only [Set.mem_setOf_eq, not_and]
+    simp only [Set.mem_ofPred_eq, not_and]
     exact fun hzw => absurd hzw (not_le_of_gt h.lt)
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = insert z {y : A | y ≤ w ∧ y ∈ Marked A} := by
     ext y
-    simp only [Set.mem_setOf_eq, Set.mem_insert_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_insert_iff]
     constructor
     · rintro ⟨hle, hy⟩
       rcases covBy_le_cases h hle with hw | he
@@ -273,7 +269,7 @@ theorem parCount_covBy_not_marked {w z : A} (h : w ⋖ z) (hm : z ∉ Marked A) 
     parCount z = parCount w := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = {y : A | y ≤ w ∧ y ∈ Marked A} := by
     ext y
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     constructor
     · rintro ⟨hle, hy⟩
       rcases covBy_le_cases h hle with hw | he
@@ -356,7 +352,7 @@ theorem accepts_parSpec_iff : parSpec.Accepts A ↔ Even (Marked A).ncard := by
     rw [parCount]
     congr 1
     ext y
-    simp only [Set.mem_setOf_eq, and_iff_right_iff_imp]
+    simp only [Set.mem_ofPred_eq, and_iff_right_iff_imp]
     exact fun _ => h₁ y
   constructor
   · rintro ⟨u, v, hu, hv, huv⟩

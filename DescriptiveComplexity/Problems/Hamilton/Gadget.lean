@@ -56,7 +56,7 @@ abbrev hAdjSym : hamL.Relations 2 := Sum.inl mgAdj
 /-- The mark symbol over the ordered expansion of marked graphs. -/
 abbrev hMarkedSym : hamL.Relations 1 := Sum.inl mgMarked
 
-/-! ### Edge and neighbour-order formulas -/
+/-! ### Edge and neighbor-order formulas -/
 
 section Formulas
 
@@ -71,18 +71,18 @@ distinct. -/
 private noncomputable def edgeF (s t : hamL.Term α) : hamL.Formula α :=
   adjOrF s t ⊓ ∼(Term.equal s t)
 
-/-- `b` is the least neighbour of `a`: it is `≤` every neighbour of `a`. -/
+/-- `b` is the least neighbor of `a`: it is `≤` every neighbor of `a`. -/
 private noncomputable def minNbrF (a b : α) : hamL.Formula α :=
   ((edgeF (Term.var (Sum.inl a)) (Term.var (Sum.inr 0))).imp
     (leF (Term.var (Sum.inl b)) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
 
-/-- `b` is the greatest neighbour of `a`. -/
+/-- `b` is the greatest neighbor of `a`. -/
 private noncomputable def maxNbrF (a b : α) : hamL.Formula α :=
   ((edgeF (Term.var (Sum.inl a)) (Term.var (Sum.inr 0))).imp
     (leF (Term.var (Sum.inr 0)) (Term.var (Sum.inl b)))).iAlls (Fin 1)
 
-/-- `c` is the immediate neighbour-successor of `b` in `a`'s neighbour list: `c`
-is a neighbour of `a`, `b < c`, and no neighbour of `a` lies strictly between
+/-- `c` is the immediate neighbor-successor of `b` in `a`'s neighbor list: `c`
+is a neighbor of `a`, `b < c`, and no neighbor of `a` lies strictly between
 `b` and `c`. -/
 private noncomputable def succNbrF (a b c : α) : hamL.Formula α :=
   edgeF (Term.var a) (Term.var c) ⊓ ltF (Term.var b) (Term.var c) ⊓
@@ -107,7 +107,7 @@ theorem hEdge_symm {a b : A} (h : HEdge a b) : HEdge b a :=
 
 end EdgePred
 
-/-! ### Realization of the edge and neighbour formulas -/
+/-! ### Realization of the edge and neighbor formulas -/
 
 section Realize
 
@@ -191,7 +191,7 @@ private noncomputable def hSwapTupF : hamL.Formula (Fin 2 × Fin 2) :=
   Term.equal (Term.var (0, 0)) (Term.var (1, 1)) ⊓ Term.equal (Term.var (0, 1)) (Term.var (1, 0))
 
 /-- The chain edge from an exit `⟨g5, (a, b)⟩` to the next entrance
-`⟨g0, (a, c)⟩`: same owner, and `c` the neighbour-successor of `b`. -/
+`⟨g0, (a, c)⟩`: same owner, and `c` the neighbor-successor of `b`. -/
 private noncomputable def hChain50F : hamL.Formula (Fin 2 × Fin 2) :=
   Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊓ succNbrF (0, 0) (0, 1) (1, 1)
 
@@ -210,7 +210,7 @@ private noncomputable def noEdgesF : hamL.Formula (Fin 2) :=
     (∼(edgeF (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))) : hamL.Formula (Fin 2 ⊕ Fin 2))
 
 /-- **The reduction of Vertex Cover into Hamilton Circuit**: the twelve-vertex
-cover-testing gadget of each edge, chained along every vertex's neighbour list,
+cover-testing gadget of each edge, chained along every vertex's neighbor list,
 with the marked vertices as selectors. -/
 noncomputable def hamInterp : RelFOInterpretation hamL Language.digraph HTag 2 where
   toFOInterpretation :=

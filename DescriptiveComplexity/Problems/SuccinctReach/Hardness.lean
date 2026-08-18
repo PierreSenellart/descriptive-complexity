@@ -40,7 +40,7 @@ the state variables the walk carries. So
 * the gates of each encoding are auxiliary variables, private to their group.
 
 A state of the interpreted transition system is then a set of atoms of the
-first copy, i.e. an assignment of `B` – the state of the SO(TC) walk – and the
+first copy, i.e., an assignment of `B` – the state of the SO(TC) walk – and the
 transition clauses hold of a valuation exactly when the transition sentence
 holds of the pair it reads and writes. The correspondence between the two walks
 is a bijection at every step, with no initialization or finalization steps to
@@ -358,7 +358,6 @@ noncomputable def srInterp :
     | .tgtCl => fun t => srTgtClFml B stepS srcS tgtS (t 0)
     | .posIn => fun t => srLitFml B stepS srcS tgtS true (t 0) (t 1)
     | .negIn => fun t => srLitFml B stepS srcS tgtS false (t 0) (t 1)
-
 
 /-! ### Characterization of the interpreted relations
 
@@ -910,7 +909,7 @@ end Semantic
 /-! ### The two walks correspond
 
 A state of the interpreted transition system is a set of atoms of the first
-copy of the doubled block, i.e. an assignment of `B`; a valuation witnessing a
+copy of the doubled block, i.e., an assignment of `B`; a valuation witnessing a
 transition or an endpoint condition is the canonical Tseitin valuation of the
 corresponding kernel. The two directions use the two translations between
 states and assignments, so no round trip is ever needed. -/
@@ -1272,8 +1271,8 @@ noncomputable def sotcReduction {L : Language.{0, 0}} [L.IsRelational] (Q : Deci
   toInterpretation := srInterp spec.B spec.step spec.src spec.tgt
   correct A _ _ _ _ := by
     obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-    haveI := (srInterp spec.B spec.step spec.src spec.tgt).map_finite A
-    haveI := (srInterp spec.B spec.step spec.src spec.tgt).map_nonempty A
+    have := (srInterp spec.B spec.step spec.src spec.tgt).map_finite A
+    have := (srInterp spec.B spec.step spec.src spec.tgt).map_nonempty A
     exact (hspec A).trans (srInterp_correct ha₀).symm
 
 /-- **Hardness**: every SO(TC) definable problem admits an ordered first-order
@@ -1293,6 +1292,5 @@ theorem SUCCINCTREACH_PSPACE_complete : PSPACE.Complete SUCCINCTREACH :=
   ⟨succinctReach_mem_PSPACE,
     PSPACE_hard_of_sotcDefinable SUCCINCTREACH fun Q hQ =>
       (succinctReach_hard_of_sotcDefinable Q hQ).map OrderedFOReduction.toRel⟩
-
 
 end DescriptiveComplexity
