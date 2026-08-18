@@ -631,7 +631,7 @@ theorem stageTgtD_congr_scratch {st' : TapeStD dt A R P}
     · rw [dif_neg hn, dif_neg hn, ih]
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
-/-- **The control of the copy loops is blind to them too** — the
+/-- **The control of the copy loops is blind to them too** – the
 destination-dependent background overwrites TARGET, and the loop reads it
 at the home cell alone. -/
 theorem stageFAt_congr_scratch {st' : TapeStD dt A R P}

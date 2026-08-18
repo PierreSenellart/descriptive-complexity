@@ -26,11 +26,11 @@ complements: the same interpretation reduces `Pᶜ` to `Qᶜ`
 
 The polynomial hierarchy itself – `DescriptiveComplexity.SigmaP`/`DescriptiveComplexity.PiP`, with
 levels `k ≥ 1` *defined* by second-order quantifier alternation and level 0
-left as an empty placeholder – lives in `DescriptiveComplexity.Hierarchy`; the Cook–Levin
+polynomial time – lives in `DescriptiveComplexity.Hierarchy`; the Cook–Levin
 theorem ([Cook 1971][cook1971complexity]; [Levin 1973][levin1973universal]) lives
 with the problem SAT in `DescriptiveComplexity.Problems.Sat`, and
 completeness theorems for other problems in their files under
-`DescriptiveComplexity/Problems/` (e.g. `DescriptiveComplexity.threeCol_NP_complete` in
+`DescriptiveComplexity/Problems/` (e.g., `DescriptiveComplexity.threeCol_NP_complete` in
 `DescriptiveComplexity.Problems.ThreeColorability`).
 -/
 
@@ -111,8 +111,8 @@ theorem ext {C₁ C₂ : ComplexityClass}
   rfl
 
 /-- The empty complexity class: no members, and every problem vacuously hard
-(there is nothing that would have to reduce to it). It is a placeholder for
-levels of a hierarchy that are not (yet) characterized logically. -/
+(there is nothing that would have to reduce to it). It stands for a level of a
+hierarchy that has no logical characterization. -/
 def empty : ComplexityClass where
   Mem _ := False
   Hard _ := True

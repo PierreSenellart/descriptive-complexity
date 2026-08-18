@@ -57,7 +57,7 @@ specification would have to be stated by the marker's *value*, as `lexRel` is.
 Parking it internally collapses all of that: the marker is the maximum, so a sum
 that does not fit is detected exactly when it does not fit, and a sum that does
 not fit is not the rank of anything either. What the fragment runs is therefore
-just `DescriptiveComplexity.HeadProgram.Decides`, on the nose
+just `DescriptiveComplexity.HeadProgram.Decides`, with no side condition
 (`DescriptiveComplexity.HeadProgram.decides_plusP`).
 
 ## Where the levels go
@@ -112,7 +112,7 @@ inductive PlusNode
   | test : PlusNode
   /-- It has: is `a` the claimed sum? -/
   | check : PlusNode
-  /-- It has not: is `a` at the marker, i.e. would the next step overflow? -/
+  /-- It has not: is `a` at the marker, i.e., would the next step overflow? -/
   | over : PlusNode
   /-- Step both scratch heads. -/
   | step : PlusNode
@@ -756,7 +756,7 @@ inductive TimesNode
   | scanInit : TimesNode
   /-- Does the candidate carry the accumulator plus the first factor? -/
   | probe : TimesNode
-  /-- It does not: is the candidate at the marker, i.e. would the product
+  /-- It does not: is the candidate at the marker, i.e., would the product
   overflow? -/
   | scanOver : TimesNode
   /-- Step the candidate. -/

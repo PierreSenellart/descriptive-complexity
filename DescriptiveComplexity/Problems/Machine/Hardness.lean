@@ -670,7 +670,7 @@ theorem succPos_posCell_posEnd :
 is pinned (`DescriptiveComplexity.satTr_unique`), the successor configuration is too: its
 state by `satDst_functional`, the cell under the head by `satWrite_functional`,
 every other cell by the frame condition, and the head itself by uniqueness of
-the neighbour in the direction the transition names.
+the neighbor in the direction the transition names.
 
 This is a deliberate design decision: with only the guess phase
 branching, the `⇒` half of correctness becomes a corollary of uniqueness rather

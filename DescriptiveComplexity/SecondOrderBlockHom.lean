@@ -21,8 +21,8 @@ This is the bookkeeping that reads a formula written for one block inside a
 → FO(LFP) translation (`DescriptiveComplexity.FixedPointInflationaryLFP`),
 whose output sentence mentions the original relation variables while the
 translated program computes them as one group of a larger block; the
-invariant-structure simulations of the Abiteboul–Vianu plan (`ROADMAP.md` §4)
-will want it for the same reason.
+invariant-structure simulations of `DescriptiveComplexity.Invariant.Simulation`
+want it for the same reason.
 -/
 
 namespace DescriptiveComplexity

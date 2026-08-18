@@ -23,7 +23,7 @@ formalize on top of Mathlib's `ModelTheory` library.
 
 This file defines:
 
-* `DescriptiveComplexity.DecisionProblem L`: a “problem” over the vocabulary `L`, i.e. a
+* `DescriptiveComplexity.DecisionProblem L`: a “problem” over the vocabulary `L`, i.e., a
   property of `L`-structures;
 * `DescriptiveComplexity.FOInterpretation L L' Tag dim`: a tagged, `dim`-dimensional
   first-order interpretation of a relational language `L'` in a language `L`,
@@ -32,7 +32,7 @@ This file defines:
 * `DescriptiveComplexity.FOInterpretation.IsQuantifierFree`: interpretations all of whose
   defining formulas are quantifier-free (an even weaker reduction notion);
 * `DescriptiveComplexity.FOReduction P Q`: an FO reduction from problem `P` to problem
-  `Q`, i.e. an interpretation mapping yes-instances of `P` exactly to
+  `Q`, i.e., an interpretation mapping yes-instances of `P` exactly to
   yes-instances of `Q`.
 
 ## Design notes
@@ -56,7 +56,7 @@ Following the usual convention of finite model theory, reductions are only
 required to be correct on *nonempty* structures (and their tag types are
 required to be nonempty, so that nonempty structures map to nonempty
 structures). Empty structures are degenerate: no fixed-dimension
-interpretation can produce a nonempty structure from an empty one, so e.g. no
+interpretation can produce a nonempty structure from an empty one, so e.g., no
 problem that is false on an empty structure could reduce to SAT (whose empty
 instance is trivially satisfiable), and hardness results would fail for
 spurious reasons.

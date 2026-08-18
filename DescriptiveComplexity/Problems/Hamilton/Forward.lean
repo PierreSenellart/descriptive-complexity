@@ -199,7 +199,7 @@ theorem mem_snakeThrough_far {a b : A} (hba : HEdge b a) (i : HTag) (hi : i ≠ 
 
 end Snake
 
-/-! ### The sorted neighbour list of a vertex -/
+/-! ### The sorted neighbor list of a vertex -/
 
 section Neighbours
 
@@ -208,7 +208,7 @@ open Language Structure
 variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] [Fintype A]
 
 open Classical in
-/-- The neighbours of `a` in the input, listed in increasing order. -/
+/-- The neighbors of `a` in the input, listed in increasing order. -/
 noncomputable def nbrList (a : A) : List A :=
   (Finset.univ.filter (fun b => HEdge a b)).sort (· ≤ ·)
 
@@ -216,7 +216,7 @@ theorem mem_nbrList {a b : A} : b ∈ nbrList a ↔ HEdge a b := by
   classical
   simp only [nbrList, Finset.mem_sort, Finset.mem_filter, Finset.mem_univ, true_and]
 
-/-- The neighbour list is strictly increasing. -/
+/-- The neighbor list is strictly increasing. -/
 theorem nbrList_sortedLT (a : A) : (nbrList a).SortedLT := by
   simp only [nbrList]; exact Finset.sortedLT_sort _
 
@@ -225,7 +225,7 @@ theorem nbrList_nodup (a : A) : (nbrList a).Nodup := by
 
 omit [Fintype A] in
 /-- **The gadget chain edge**: the exit `⟨g5,(a,b)⟩` of one gadget is adjacent to
-the entrance `⟨g0,(a,c)⟩` of the next, given the neighbour-successor conditions
+the entrance `⟨g0,(a,c)⟩` of the next, given the neighbor-successor conditions
 (`DescriptiveComplexity.IAdjRaw`, the `.g5,.g0` case). This is what glues consecutive
 snakes into a vertex's chain. -/
 theorem chain_edge {a : A} {b c : A} (hb : HEdge a b) (hc : HEdge a c)
@@ -235,8 +235,8 @@ theorem chain_edge {a : A} {b c : A} (hb : HEdge a b) (hc : HEdge a c)
   simp only [IAdjRaw, Matrix.cons_val_zero, Matrix.cons_val_one]
   exact ⟨trivial, hc, hbc, hbtw⟩
 
-/-- **The neighbour list is a connection-chain**: consecutive neighbours `b`, `c`
-of `a` satisfy the gadget chain edge, so the per-neighbour snakes concatenate
+/-- **The neighbor list is a connection-chain**: consecutive neighbors `b`, `c`
+of `a` satisfy the gadget chain edge, so the per-neighbor snakes concatenate
 into `a`'s chain. -/
 theorem nbrList_isChain (a : A) :
     (nbrList a).IsChain
@@ -271,7 +271,7 @@ variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] [Fintype 
 open Classical in
 /-- The snake of gadget `{a, b}` in a chain of `a`: the `a`-side-only path if `b`
 is in the cover `C`, the through-path otherwise (empty if `a, b` is not an edge,
-which never happens on the neighbour list). -/
+which never happens on the neighbor list). -/
 noncomputable def snakeOf (C : A → Prop) (a b : A) : List (hamInterp.MapRel A) :=
   if h : HEdge a b then (if C b then snakeBoth h else snakeThrough h) else []
 
@@ -310,7 +310,7 @@ theorem snakeOf_getLast? {C : A → Prop} {a b : A} (h : HEdge a b) :
 
 open Classical in
 /-- The chain of the cover vertex `a`: its gadgets' snakes, concatenated in
-neighbour order. -/
+neighbor order. -/
 noncomputable def chain (C : A → Prop) (a : A) : List (hamInterp.MapRel A) :=
   (nbrList a).flatMap (snakeOf C a)
 
@@ -334,9 +334,9 @@ theorem chain_isChain (C : A → Prop) (a : A) : (chain C a).IsChain DGEdge := b
     subst hx; subst hy
     exact hR (mem_nbrList.mp hb) (mem_nbrList.mp hc)
 
-/-! #### Minima and maxima of the neighbour list -/
+/-! #### Minima and maxima of the neighbor list -/
 
-/-- The head of the neighbour list is the least neighbour. -/
+/-- The head of the neighbor list is the least neighbor. -/
 theorem head_nbrList_le {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
     (nbrList a).head hne ≤ d := by
   have hmono : StrictMono (nbrList a).get := nbrList_sortedLT a
@@ -347,7 +347,7 @@ theorem head_nbrList_le {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d
   rw [hhead]
   exact hmono.le_iff_le.mpr (by simp only [Fin.le_def]; omega)
 
-/-- The last of the neighbour list is the greatest neighbour. -/
+/-- The last of the neighbor list is the greatest neighbor. -/
 theorem le_getLast_nbrList {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
     d ≤ (nbrList a).getLast hne := by
   have hmono : StrictMono (nbrList a).get := nbrList_sortedLT a
@@ -361,7 +361,7 @@ theorem le_getLast_nbrList {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge 
 
 omit [Fintype A] in
 /-- A selector is adjacent to a chain entrance `⟨g0,(a,b)⟩` when `b` is the least
-neighbour of `a`. -/
+neighbor of `a`. -/
 theorem sel_entrance_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
     (hmin : ∀ d, HEdge a d → b ≤ d) : DGEdge (selPt hm) (gv0 h) := by
   rw [dgEdge_iff]
@@ -370,7 +370,7 @@ theorem sel_entrance_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
 
 omit [Fintype A] in
 /-- A selector is adjacent to a chain exit `⟨g5,(a,b)⟩` when `b` is the greatest
-neighbour of `a`. -/
+neighbor of `a`. -/
 theorem exit_sel_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
     (hmax : ∀ d, HEdge a d → d ≤ b) : DGEdge (gv5 h) (selPt hm) := by
   rw [dgEdge_iff]
@@ -412,7 +412,7 @@ theorem gadget_mem_chain_far {C : A → Prop} {a b : A} (hab : HEdge a b) (i : H
 
 /-! #### The endpoints of a chain -/
 
-/-- **A chain's first vertex is the entrance `⟨g0,(a,b)⟩` of the least-neighbour
+/-- **A chain's first vertex is the entrance `⟨g0,(a,b)⟩` of the least-neighbor
 gadget** – which a selector is adjacent to. -/
 theorem chain_head? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
     ∃ (b : A) (h : HEdge a b), (∀ d, HEdge a d → b ≤ d) ∧ (chain C a).head? = some (gv0 h) := by
@@ -424,7 +424,7 @@ theorem chain_head? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
   rw [chain, hbt, List.flatMap_cons,
     List.head?_append_of_ne_nil _ (snakeOf_ne_nil hb), snakeOf_head? hb]
 
-/-- **A chain's last vertex is the exit `⟨g5,(a,b)⟩` of the greatest-neighbour
+/-- **A chain's last vertex is the exit `⟨g5,(a,b)⟩` of the greatest-neighbor
 gadget** – which a selector is adjacent to. -/
 theorem chain_getLast? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
     ∃ (b : A) (h : HEdge a b), (∀ d, HEdge a d → d ≤ b) ∧ (chain C a).getLast? = some (gv5 h) := by
@@ -454,7 +454,7 @@ theorem snakeThrough_tuple {a b : A} (h : HEdge a b) {p : hamInterp.MapRel A}
     first | exact Or.inl ⟨rfl, rfl⟩ | exact Or.inr ⟨rfl, rfl⟩
 
 /-- **The owner invariant of a chain**: a vertex of `w`'s chain is either owned
-by `w` (`w`-side) or owned by an *uncovered* neighbour of `w` (the far side of a
+by `w` (`w`-side) or owned by an *uncovered* neighbor of `w` (the far side of a
 through-traversal). -/
 theorem chain_tuple {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p ∈ chain C w) :
     p.1.2 0 = w ∨ (p.1.2 1 = w ∧ ¬C (p.1.2 0)) := by
@@ -491,7 +491,7 @@ theorem snakeOf_tuple {C : A → Prop} {w b : A} (hwb : HEdge w b) {p : hamInter
   · rw [if_neg hCb] at hp; exact snakeThrough_tuple hwb hp
 
 omit [Fintype A] in
-/-- Snakes of distinct neighbours of `w` are disjoint. -/
+/-- Snakes of distinct neighbors of `w` are disjoint. -/
 theorem snakeOf_disjoint {C : A → Prop} {w b b' : A} (hwb : HEdge w b) (hwb' : HEdge w b')
     (hbb : b ≠ b') : (snakeOf C w b).Disjoint (snakeOf C w b') := by
   intro p hp hp'
@@ -504,7 +504,7 @@ theorem snakeOf_disjoint {C : A → Prop} {w b b' : A} (hwb : HEdge w b) (hwb' :
 
 open Classical in
 /-- **A single chain is duplicate-free**: its snakes are internally nodup and
-pairwise disjoint (distinct neighbours ⇒ distinct gadgets). -/
+pairwise disjoint (distinct neighbors ⇒ distinct gadgets). -/
 theorem chain_nodup (C : A → Prop) (w : A) : (chain C w).Nodup := by
   rw [chain, List.nodup_flatMap]
   refine ⟨fun b hb => ?_,
@@ -538,7 +538,7 @@ open Language Structure
 
 variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] [Fintype A] {C : A → Prop}
 
-/-- A chain over a nonempty neighbour list is nonempty. -/
+/-- A chain over a nonempty neighbor list is nonempty. -/
 theorem chain_ne_nil {w : A} (hne : nbrList w ≠ []) : chain C w ≠ [] := by
   obtain ⟨b, _, _, hhead⟩ := chain_head? C w hne
   intro h; rw [h] at hhead; simp at hhead
@@ -819,7 +819,7 @@ theorem selPt_mem_flatten (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.
 
 /-- **Covering**: every vertex of the interpreted graph is in the cycle. A
 selector heads a block; a gadget vertex sits in a covered endpoint's chain (its
-owner's if covered, the neighbour's otherwise); the hub cannot occur, since
+owner's if covered, the neighbor's otherwise); the hub cannot occur, since
 there is a selector. -/
 theorem blockList_covers (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
     (hcover : ∀ a b : A, HEdge a b → C a ∨ C b) (hmarks : ∃ m : A, MGMarked m)

@@ -37,7 +37,7 @@ does with a clause that has no body.
 
 ## Winning as an inductive predicate
 
-`DescriptiveComplexity.WinsOn` is an inductive predicate, i.e. the least fixed
+`DescriptiveComplexity.WinsOn` is an inductive predicate, i.e., the least fixed
 point of the game operator, so an infinite play is a loss for the existential
 player. That is also the presentation the FO(LFP) membership proof mirrors
 clause by clause – with one twist, since a Horn rule cannot carry a universally

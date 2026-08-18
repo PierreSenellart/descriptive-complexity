@@ -9,11 +9,11 @@ import DescriptiveComplexity.Problems.Wide.WellFormed
 # The address primitives of a wide machine
 
 What a wide machine can do to its head, and nothing else: start it on the least
-position, move it to a neighbour, recognize the last one. Every step of every
+position, move it to a neighbor, recognize the last one. Every step of every
 program a hardness reduction will write is one of these, so they are settled
 first, at an arbitrary order relation and from finiteness alone.
 
-The one thing to know about them is what an address's neighbour *is*. An address
+The one thing to know about them is what an address's neighbor *is*. An address
 is a subset read as a binary number whose **most** significant digit is the
 `Le`-least element (`DescriptiveComplexity.WMSetLe` compares at the least element
 where two addresses differ), so incrementing flips a run of trailing digits: the
@@ -28,7 +28,7 @@ the increment is first-order describable as it stands.
 | the last cell | the whole universe | `DescriptiveComplexity.maxPos_wpLe` |
 | one step | the binary increment | `DescriptiveComplexity.succPos_wpLe_iff` |
 
-The last of these is the load-bearing one: `DescriptiveComplexity.TMData.Step`
+The last of these is the one the programs use: `DescriptiveComplexity.TMData.Step`
 moves the head by `DescriptiveComplexity.SuccPos`, an *order-theoretic* notion
 (“no position strictly between”), while a program reasons with the increment. The
 two agree, which is what lets a machine maintain a mirror of its own head
@@ -190,7 +190,7 @@ theorem wmSetLt_iff (s t : α → Prop) : WMSetLt Le s t ↔ (WMSetLe Le s t ∧
 omit [Finite α] in
 /-- **A set below an upward-closed address is contained in it**: at the element
 where they first differ the smaller one says no, and everything above that
-element is in the larger by closure — so nothing the smaller holds escapes.
+element is in the larger by closure – so nothing the smaller holds escapes.
 This is what says a register enumerated up to a *region* (the address whose
 elements are exactly a final segment's cells) never holds a cell outside it. -/
 theorem subset_of_wmSetLe (h : IsLinOrd Le) {s t : α → Prop}

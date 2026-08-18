@@ -29,7 +29,7 @@ symbols as elements, leaving none to be the blank – and the blank must differ 
 every mark, or a blank cell of the working area would stop a scan looking for a
 register. What a program actually needs is far less: the walks of
 `DescriptiveComplexity.Problems.Wide.Walk` carry their pointer in the *control*
-and only ever ask "is this cell a register?", so one generic mark serves them all.
+and only ever ask “is this cell a register?”, so one generic mark serves them all.
 Only the two ends of the file have to be recognized on sight – to begin a downward
 pass and to come back from one – and two distinguished symbols pay for that.
 

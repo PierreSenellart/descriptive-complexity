@@ -78,7 +78,7 @@ def VarBg (zero one : A) (v : Univ A R P dt.KIx dt.dd → Prop)
 
 /-- **The exhaustion condition of a VAL-loop round**: the register's bit at
 an element is set exactly when the element lies in an inner block – the
-"VAL = Kin-top" pattern the exhaustion test decides. -/
+“VAL = Kin-top” pattern the exhaustion test decides. -/
 def InnerFull {I : Type} (blkOf : I → Option dt.KIx) (mv : I → Prop) (u : I) : Prop :=
   mv u ↔ ∃ j : Fin dt.ki, blkOf u = some (Sum.inr j)
 
@@ -724,7 +724,7 @@ theorem step_var_failExit
 omit [Finite I] in
 include hrules hR hlin hix hbot hv hvi hbg hGates in
 /-- **The machinery on a failing address**: through the gates to the
-verdict checkpoint, whose clear flag routes straight to the exit — the
+verdict checkpoint, whose clear flag routes straight to the exit – the
 stage slot erased, the VAL loop never entered. -/
 theorem var_reachesIn_fail (hflagF : fG gateFlag ≠ PR.one)
     (hns : newSlot ≠ Slot.val)

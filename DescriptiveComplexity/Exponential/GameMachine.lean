@@ -699,7 +699,7 @@ variable {B : SOBlock} {V M : ℕ} {A : Type} [LinearOrder A]
 
 open Classical in
 /-- **One step, built from a rule.** The destination configuration is forced:
-the state is whatever `Dst` allows, the head is the neighbour, and the tape is
+the state is whatever `Dst` allows, the head is the neighbor, and the tape is
 the old one with the written symbol at the head. Every case of every walk goes
 through this, so the frame condition is discharged once. -/
 theorem step_of_rule {t : TrTag B V M} {w : Fin (gameDim B V) → A} (hrule : rule t w)
@@ -910,7 +910,7 @@ end Sweep
 /-! ### A walk along the positions
 
 The induction the three walks run on, stated for an arbitrary machine: each
-step moves the head to the neighbouring position and preserves an invariant, so
+step moves the head to the neighboring position and preserves an invariant, so
 the walk reaches the end of the tape. The measure is
 `DescriptiveComplexity.bitRank`, which increases by one along
 `DescriptiveComplexity.SuccPos`

@@ -78,7 +78,7 @@ theorem iterOrd_covers {init : Q'} {step : ι → Q' → Q'} {a a' : ι}
 omit [Finite ι] in
 /-- **An invariant of the step is an invariant of the iteration**: what the
 base satisfies and every step preserves holds at every element. This is what
-a threaded tape family's field lemmas are proved by — the fields a round
+a threaded tape family's field lemmas are proved by – the fields a round
 leaves alone are preserved by each step, hence along the whole loop. -/
 theorem iterOrd_invariant {init : Q'} {step : ι → Q' → Q'} {Inv : Q' → Prop}
     (hinit : Inv init) (hstep : ∀ a q, Inv q → Inv (step a q)) (a : ι) :
@@ -184,7 +184,7 @@ noncomputable def elemFam (xOf : ι → Fin nr → I) (f₀ : Q → A)
 
 /-! **The background is read at the working cell alone.** Both generated
 families mention `rest` only as `rest v`, so a background that moves
-elsewhere — at a register cell, say, where the four register slots live —
+elsewhere – at a register cell, say, where the four register slots live –
 generates the same control. This is what makes a loop blind to the two
 scratch registers of the state it is run at. -/
 
@@ -553,7 +553,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
   [LinearOrder P] [LinearOrder K]
   [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
   [Finite P] [Finite K] [Finite ι] in
-/-- **The copy loop reads its background at the working cell alone** — at
+/-- **The copy loop reads its background at the working cell alone** – at
 every destination content, the cell being the same one. -/
 theorem tupleIter0_congr_restF (h : ∀ m', restF m' v = restF' m' v)
     (xS xD : ι → I) (mD₀ : I → Prop)
@@ -715,7 +715,7 @@ variable {A R P K : Type} {dd : ℕ}
 variable {ι : Type} [LinearOrder ι] [Finite ι]
 
 /-- **What the copy loop can hold**: every cell of the destination track is
-either one the loop wrote — a destination cell of some round — or one it
+either one the loop wrote – a destination cell of some round – or one it
 started with. A property of cells closed under both is therefore closed
 under the whole loop; that is how the target of a random access is known to
 be an address of argument cells alone. -/

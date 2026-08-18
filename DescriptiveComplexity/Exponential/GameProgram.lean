@@ -25,7 +25,7 @@ existential branch that *proves* it and gets stuck otherwise, so refuting one
 means proving another (`DescriptiveComplexity.GameQuestion`).
 
 `DescriptiveComplexity.SOGameSpec.question` reads all six in the *same*
-language, the two-copy one, the one-copy sentences travelling along
+language, the two-copy one, the one-copy sentences traveling along
 `FirstOrder.Language.LHom.sumInl`; that uniformity is what lets the machine's
 tag be a plain product rather than a dependent sum.
 

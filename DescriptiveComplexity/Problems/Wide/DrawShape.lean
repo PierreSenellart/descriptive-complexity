@@ -38,7 +38,7 @@ names (`DescriptiveComplexity.Draw.pad`, `DescriptiveComplexity.Draw.unpad`,
 So the *shape* half of the interpretation is already written. What is not, and
 what the remaining work is, is the **rule** half: a transition's guard and what
 it writes are arbitrary functions in
-`DescriptiveComplexity.Draw.Rule`, and each kit owes a syntactic counterpart —
+`DescriptiveComplexity.Draw.Rule`, and each kit owes a syntactic counterpart –
 a quantifier-free formula over the payload slots for the guard, and per-slot
 “copy this slot or write this constant” for the destination and the written
 symbol.
@@ -91,7 +91,7 @@ variable {γ : Type} {dd : ℕ} {v : γ → A}
 /-- **A tuple of the interpreted universe is canonically padded**, as a
 formula: `DescriptiveComplexity.canonF` read at the layout's `IsPad`, with
 the least element for `zero`. This is what the defining formula of a
-transition, of an accepting state and of the blank all begin with — the
+transition, of an accepting state and of the blank all begin with – the
 condition that gives an element one spelling, and so the emitted machine its
 determinism. -/
 theorem realize_canonF_isPad {zero : A} (h₀ : IsBot zero) {c : ℕ}
@@ -102,7 +102,7 @@ theorem realize_canonF_isPad {zero : A} (h₀ : IsBot zero) {c : ℕ}
 
 /-- **A tuple of the interpreted universe is a padded payload read off another
 one**, as a formula: `DescriptiveComplexity.padTupF` at the layout's `pad` and
-`unpad`. This is the shape of `Src`, `Dst`, `Read` and `Write` — the tag of the
+`unpad`. This is the shape of `Src`, `Dst`, `Read` and `Write` – the tag of the
 target is decided when the formula is built, and what is left of each is that
 its coordinates are the padded reading of the transition's. -/
 theorem realize_padTupF_pad {zero : A} (h₀ : IsBot zero) {c : ℕ}

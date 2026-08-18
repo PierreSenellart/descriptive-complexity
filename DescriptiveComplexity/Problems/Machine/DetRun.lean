@@ -70,7 +70,7 @@ under which the step is functional, makes the machine unique from any
 configuration having it.
 
 This is how a program that guesses in one phase pays for the rest of its run.
-The property is "the phase is one the guess is not reachable from"; the step
+The property is “the phase is one the guess is not reachable from”; the step
 preserves it because the program's phases only go forward, and at those phases
 its rules separate. Global determinism is the case where the property is
 `True`. -/

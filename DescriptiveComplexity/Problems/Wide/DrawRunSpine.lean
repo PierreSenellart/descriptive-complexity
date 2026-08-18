@@ -10,19 +10,19 @@ import DescriptiveComplexity.Problems.Wide.DrawSpineSem
 # The sweep and MAIN, at the concrete program
 
 `DescriptiveComplexity.Draw.Data.reaches_sweep` takes the per-address
-evaluation as four hypothesis families — the run itself (`hspine`) and
-three facts about the state it ends in — beside the two cover equations of
+evaluation as four hypothesis families – the run itself (`hspine`) and
+three facts about the state it ends in – beside the two cover equations of
 the tape and control families. All six are now theorems about the branched
 evaluation, and this file feeds them in
 (`DescriptiveComplexity.Draw.Data.reaches_sweepB`); then it does the same
 one scale up, defining the stage families the machine iterates and feeding
 `DescriptiveComplexity.Draw.Data.reaches_main`
 (`DescriptiveComplexity.Draw.Data.reaches_mainB`), after which the only
-hypotheses left about the run are *semantic* — which stage converges.
+hypotheses left about the run are *semantic* – which stage converges.
 
 Two joints are crossed here. The evaluation layer is stated at an
 arbitrary program and names the phases `OuterPh (EvalPh dt.nv dt.PMF)`,
-which is `DescriptiveComplexity.Draw.Data.PF` up to unfolding — hence
+which is `DescriptiveComplexity.Draw.Data.PF` up to unfolding – hence
 the `@[reducible]` on `PF` and `PEF`, without which instance search does
 not connect the two spellings. And the program's `zero`/`one` are its own
 arguments only up to unfolding, so the program is named once
@@ -233,7 +233,7 @@ theorem reaches_sweepB
 top address's evaluation *per stage*, beside the two equations that say how
 one stage's exit becomes the next one's entry. Those equations are what the
 families below are defined by, so they hold by `rfl`; and the four registers
-the stages must keep — the marker, the mirror, the bottom and end marks —
+the stages must keep – the marker, the mirror, the bottom and end marks –
 ride, because the sweep, the spine, and the copy-back all leave them alone
 (`atSt`, `offSt` and `copySt` write `wk` and `old`, nothing else). -/
 
@@ -244,7 +244,7 @@ variable (ltpAddr : Univ A
   dt.dd → Prop)
 
 variable (hpl) in
-/-- **The state one stage's top-address evaluation ends in** — what its
+/-- **The state one stage's top-address evaluation ends in** – what its
 convergence test reads. -/
 noncomputable def stageEnd
     (st : TapeStD dt A
@@ -270,7 +270,7 @@ noncomputable def stageEndFs
 
 variable (hpl) in
 /-- **The pair the machine enters each stage with**: the reduction's own at
-stage zero, and at every later stage the previous stage's exit — its
+stage zero, and at every later stage the previous stage's exit – its
 marker and mirror back at the empty address and its stage tracks copied
 back, which is `reaches_main`'s `hnextSt`/`hnextFs` by construction. -/
 noncomputable def stagePair
@@ -290,7 +290,7 @@ noncomputable def stagePair
       dt.stageEndFs hpl hlin hord (aT := aT) mV semAt ltpAddr p.1 p.2)
 
 variable (hpl) in
-/-- The tape family of the stages — `reaches_main`'s `entrySt`. -/
+/-- The tape family of the stages – `reaches_main`'s `entrySt`. -/
 noncomputable def stageSt
     (st₀ : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
@@ -300,7 +300,7 @@ noncomputable def stageSt
   (dt.stagePair hpl hlin hord (aT := aT) mV semAt ltpAddr st₀ f₀ n).1
 
 variable (hpl) in
-/-- The control family of the stages — `reaches_main`'s `entryFs`. -/
+/-- The control family of the stages – `reaches_main`'s `entryFs`. -/
 noncomputable def stageFs
     (st₀ : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
@@ -308,7 +308,7 @@ noncomputable def stageFs
   (dt.stagePair hpl hlin hord (aT := aT) mV semAt ltpAddr st₀ f₀ n).2
 
 omit [Finite ιV] in
-/-- **`reaches_main`'s `hnextSt`** — by construction. -/
+/-- **`reaches_main`'s `hnextSt`** – by construction. -/
 theorem stageSt_succ (st₀ : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
     (f₀ : dt.CtlIx → A) (n : ℕ) :
@@ -324,7 +324,7 @@ theorem stageSt_succ (st₀ : TapeStD dt A
           mir := fun _ => False } ltpAddr := rfl
 
 omit [Finite ιV] in
-/-- **`reaches_main`'s `hnextFs`** — by construction. -/
+/-- **`reaches_main`'s `hnextFs`** – by construction. -/
 theorem stageFs_succ (st₀ : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
     (f₀ : dt.CtlIx → A) (n : ℕ) :
@@ -336,7 +336,7 @@ theorem stageFs_succ (st₀ : TapeStD dt A
           n) := rfl
 
 omit [Finite ιV] in
-/-- **A register no leg and no advance writes rides a whole stage** — the
+/-- **A register no leg and no advance writes rides a whole stage** – the
 sweep by `sweepSWG_ride`, the top address's own evaluation by
 `stEndB_ride`. -/
 theorem stageEnd_ride {β : Sort _}
@@ -422,7 +422,7 @@ a stage's `old` tracks hold that stage *over the logical interval*, its
 sweep writes the next stage into the `new` ones (`sweep_new_trackOf`), and
 the copy-back moves those into `old`. The restriction to the interval is
 not a convenience: outside it the tracks say nothing, an address there
-being able to read a stage all the same — a tuple's address with one
+being able to read a stage all the same – a tuple's address with one
 non-argument cell added lies *above* the interval, non-argument tags being
 the most significant. -/
 
@@ -437,7 +437,7 @@ omit [Finite dt.KIx]
   [Finite dt.PF] in
 /-- **A blank tape is stage `0`**: the empty stage writes an empty track
 (`trackOf_botAssign`), so a tape whose stage tracks hold nothing holds stage
-`0` — everywhere, the interval included. This is `stageSt_old`'s `hold₀` at
+`0` – everywhere, the interval included. This is `stageSt_old`'s `hold₀` at
 the initial configuration. -/
 theorem old_trackOf_zero_of_blank
     {st : TapeStD dt A (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
@@ -647,7 +647,7 @@ theorem stageEnd_new_trackOf
 
 include hord hbot hbotV hmV0 hIncr hTestT in
 /-- **The convergence test, semantically**: a stage's test passes exactly
-when its stage and the next agree at every address of the logical interval —
+when its stage and the next agree at every address of the logical interval –
 `reaches_main`'s `hconv`/`hnotconv` as statements about
 `DescriptiveComplexity.StepDef.partStage` and nothing else. -/
 theorem stageEnd_conv_iff
@@ -818,8 +818,8 @@ include hR hord htop hbot hbotV htopV hmV0 hIncr hTestT hTestF in
 /-- **MAIN, at the concrete program**: from the first stage's entry at the
 empty address to the out machinery's entry, one sweep and one convergence
 test per stage, the stage families the reduction's own. Everything the
-machine does is now discharged; what is left of the theorem is *semantic* —
-which stage converges (`hnotconv`, `hconv`) — plus the geometry of the
+machine does is now discharged; what is left of the theorem is *semantic* –
+which stage converges (`hnotconv`, `hconv`) – plus the geometry of the
 logical interval. -/
 theorem reaches_mainB
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot)) (hneT : ∃ x, ltpAddr x)
@@ -982,7 +982,7 @@ include hR hord htop hbot hbotV htopV hmV0 hIncr hTestT hTestF in
 /-- **One stage of MAIN, when its convergence test fails**: from a stage's
 entry at the empty address to the next stage's, in at least one step. The
 strictness is the sweep's: it leaves the head at the end-marked address, which
-is not the empty one — and it is what
+is not the empty one – and it is what
 `DescriptiveComplexity.TMData.not_acceptsSpace_of_chain` asks of a link, so
 that a *diverging* iteration keeps the machine off every halting
 configuration. -/
@@ -1105,7 +1105,7 @@ end Stages
 `DescriptiveComplexity.Draw.Data.reaches_startup` stops one rule short of
 `reaches_mainB`: the mirror clear leaves the head on the marker at the empty
 address in `clearMir1P .run`, and two steps join that to the evaluation's
-first checkpoint — the exit rule, which steps *right* off the marker, and one
+first checkpoint – the exit rule, which steps *right* off the marker, and one
 `stay` step of the checkpoint, which walks back *left* onto it. The two
 presentations of the tape are one term (`trackTape_val_eq_mir`), so no
 conversion is needed beyond naming it. -/
@@ -1199,9 +1199,9 @@ theorem step_chk0_back
 include hR hlin in
 /-- **From the initial configuration to MAIN's starting configuration**: the
 startup, its exit, and the walk back onto the marker. The state is
-`DescriptiveComplexity.Draw.Data.startupSt` — the bottom mark at the empty
+`DescriptiveComplexity.Draw.Data.startupSt` – the bottom mark at the empty
 address, the end marker at the logical top, both registers home and every
-stage track still clear — which is what `reaches_mainB` asks of its `st₀`. -/
+stage track still clear – which is what `reaches_mainB` asks of its `st₀`. -/
 theorem reaches_evalEntry
     (hord : ∀ x y : Univ A
         (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx

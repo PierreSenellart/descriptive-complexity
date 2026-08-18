@@ -43,7 +43,7 @@ variable {A : Type} (T : TileData A)
 
 /-- **A tiling of the corridor up to a given height**: every cell of the strip
 carries a tile, the bottom row is one the description allows, the two edge
-columns carry tiles allowed there, neighbours in a row and rows one above the
+columns carry tiles allowed there, neighbors in a row and rows one above the
 other are compatible, and the top row carries an accepting tile.
 
 The height is where a corridor differs from

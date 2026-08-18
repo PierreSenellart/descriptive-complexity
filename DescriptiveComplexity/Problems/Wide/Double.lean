@@ -16,7 +16,7 @@ correct at one-element structures too. The fix is to run the machinery not at th
 instance but at a **doubled** universe, which is never a singleton, and which is
 an ordinary first-order interpretation of the instance so that nothing is lost:
 
-* the universe is `Bool × (Fin 1 → A)`, i.e. two copies of `A`;
+* the universe is `Bool × (Fin 1 → A)`, i.e., two copies of `A`;
 * the copy tagged `false` carries the instance's own relations, and is marked by
   the `old` symbol of `DescriptiveComplexity.newLang`;
 * the copy tagged `true` is **junk**: no relation of the vocabulary touches it.
@@ -49,7 +49,7 @@ section Dbl
 variable (L : Language.{0, 0}) [L.IsRelational]
 
 /-- **A relation of the instance's vocabulary, inside the extended one**: named,
-because a raw `Sum.inl` is not recognised at the transparency `rw` matches at. -/
+because a raw `Sum.inl` is not recognized at the transparency `rw` matches at. -/
 abbrev newSym {L : Language.{0, 0}} {n : ℕ} (r : L.Relations n) :
     (newLang L).Relations n := Sum.inl r
 

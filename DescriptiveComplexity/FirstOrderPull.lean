@@ -23,8 +23,8 @@ The point of these lemmas is their **contrapositive**
 problem that is not first-order definable reduces to no problem that is. This
 is what turns an inexpressibility result into a *non-reducibility* result, and
 so the only route this library has to a negative statement about the reduction
-order – everything else it proves is the existence of a reduction. The one
-inexpressibility result currently available is `DescriptiveComplexity.EVEN`
+order – everything else it proves is the existence of a reduction. It is
+applied to `DescriptiveComplexity.EVEN`
 (`DescriptiveComplexity.even_not_foDefinable`), whence
 `DescriptiveComplexity.even_not_le_of_foDefinable`.
 -/

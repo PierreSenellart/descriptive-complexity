@@ -21,7 +21,7 @@ channel writes and a step of a walk across the file can cost as much as the whol
 file.
 
 The four widths are `regW`, `regWP`, `regWR`, `regWK`
-(`DescriptiveComplexity.Draw.Data.regW` and its neighbours), each bounded by
+(`DescriptiveComplexity.Draw.Data.regW` and its neighbors), each bounded by
 one number – `regWidthBound` – as the laid file's are by `blkWidthBound`. The
 shape is the same and so is the reason: three of the four are linear in the
 file's own bound, and the seek is quadratic, being a pass of the file per bit of

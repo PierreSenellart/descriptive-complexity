@@ -114,8 +114,8 @@ theorem uStDefinable_putLvE_comp
 
 /-! ### The three shapes a fold has
 
-A gate block and an expansion atom fold the same way — only the prefix and the
-leaf differ — so the three shapes are stated at an arbitrary polarity and an
+A gate block and an expansion atom fold the same way – only the prefix and the
+leaf differ – so the three shapes are stated at an arbitrary polarity and an
 arbitrary definable leaf, and each machinery instantiates them. -/
 
 section Folds

@@ -818,7 +818,7 @@ open KromTC in
 Krom program instantiated in a structure is a 2-CNF on the atoms of its block,
 so it is unsatisfiable exactly when a goal clause fires or some literal reaches
 its own negation and back, and the second condition is a single walk of the
-cycle-witnessing graph – whose nodes are a pair of literals and a flag, i.e. a
+cycle-witnessing graph – whose nodes are a pair of literals and a flag, i.e., a
 mode and two canonically padded tuples. Together with
 `DescriptiveComplexity.SigmaSOKromDefinable.compl_of_tcDefinable` this gives
 `co-NL(Krom) = NL(TC)`; it is upgraded to `NL = coNL` by Immerman–Szelepcsényi

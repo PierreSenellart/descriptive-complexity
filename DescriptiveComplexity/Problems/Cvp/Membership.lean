@@ -16,7 +16,7 @@ least fixed point (`DescriptiveComplexity.GateVal`), so the rule system
 of the inductive definition, and the output sentence is the one first-order
 statement the Horn fragment could not make head-on: “some output gate is in the
 true rail”. A Horn program accepts when its least model satisfies its *goal*
-clauses, i.e. when something is **not** derived, so the same definition in the
+clauses, i.e., when something is **not** derived, so the same definition in the
 fragment would have to be written on the false rail and would need the circuit
 to be well-formed for the two rails to be complementary. Reading the value at
 an unrestricted first-order output formula avoids the detour, and

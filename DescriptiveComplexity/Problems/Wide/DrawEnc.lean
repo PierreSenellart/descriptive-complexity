@@ -31,7 +31,7 @@ The discrete code is one-hot in the two designated elements, so
 `DescriptiveComplexity.Draw.mem_encPt_asg` reads one bit of the assignment off
 one membership question, which is the form the machine's register lookups take.
 `DescriptiveComplexity.Draw.IsEnc` – *being* the encoding of a point of the
-expanded universe – is the gate the relativization lemma of
+expanded universe – is the condition the relativization lemma of
 `DescriptiveComplexity.Problems.Wide.DrawRel` asks for
 (`DescriptiveComplexity.Draw.isEnc_iff`).
 -/
@@ -157,7 +157,7 @@ variable {zero one}
 
 /-- **An encoding is never everything**: every member of it carries a one-hot
 code, so the all-`zero` tuple is not one. This is what puts a tuple's address
-*strictly* below the logical top — the top's blocks are full. -/
+*strictly* below the logical top – the top's blocks are full. -/
 theorem not_encPt_zeroTup (hne : zero ≠ one) (p : X.Point A) :
     ¬encPt ly zero one p (fun _ => zero) := by
   rintro (h | ⟨i, w, -, h⟩)

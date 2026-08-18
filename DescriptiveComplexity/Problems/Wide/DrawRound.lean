@@ -13,8 +13,8 @@ The leaf the VAL loop folds is the **gated** matrix
 (`DescriptiveComplexity.Draw.Data.leafP`): every ∃-level of the register
 must hold an encoding, and only if every ∀-level does is the matrix read.
 The machinery of a round therefore runs, before the matrix pass, one gate
-block per quantified level of the variable's pack — at the `Sum.inr` blocks
-of the VAL register — conjoining each level's verdict into one of two flags
+block per quantified level of the variable's pack – at the `Sum.inr` blocks
+of the VAL register – conjoining each level's verdict into one of two flags
 by the level's polarity, and a branch checkpoint then either enters the
 matrix (both flags set: every block the atoms read is an encoding, which is
 what their semantic packs require) or skips it. The stale verdict slots a
@@ -23,8 +23,8 @@ skip leaves behind are harmless: the leaf is
 did not run.
 
 This composite is slotted into the **matrix parameter** of
-`DescriptiveComplexity.Draw.varRule` — which is generic in its `PX`/`SX`
-types and enters them only through `pxEntry` — so the variable machinery,
+`DescriptiveComplexity.Draw.varRule` – which is generic in its `PX`/`SX`
+types and enters them only through `pxEntry` – so the variable machinery,
 its run theorem and everything above them are untouched.
 
 Shapes only; the runs are the instantiation files'.
@@ -97,7 +97,7 @@ variable (zero one : A) {ShG : SG → Type} {ShX : SX → Type}
 
 /-- **The rules of one round's machinery.** Parameters: the phase
 embedding, the two sub-machineries, the matrix's entry, the exit phase
-(the variable's post-matrix checkpoint — reached through the matrix or by
+(the variable's post-matrix checkpoint – reached through the matrix or by
 the skip), and the two gate flags. -/
 noncomputable def roundRule
     (emb : RoundPh PG PX → P)

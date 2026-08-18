@@ -8,23 +8,23 @@ import DescriptiveComplexity.Exponential.Order
 /-!
 # The defining sentence of the order on an expanded universe
 
-`DescriptiveComplexity.Exponential.Order` orders the points of an expansion —
+`DescriptiveComplexity.Exponential.Order` orders the points of an expansion –
 tag first, then the assignment read as a binary number. This file writes that
 order down as a **first-order sentence over the base vocabulary and two copies
 of the block**, and proves it defines exactly that order
 (`DescriptiveComplexity.SOBlock.realize_ordLtF`).
 
-Everything is first-order because a padded atom is a relation variable — of
-which there are finitely many, so the choice is a static disjunction — together
+Everything is first-order because a padded atom is a relation variable – of
+which there are finitely many, so the choice is a static disjunction – together
 with a tuple of *base* elements, which an ordinary quantifier can range over.
 The sentence says:
 
 > at some atom, the first copy is false and the second true, while the two
 > copies agree at every strictly smaller atom
 
-and "strictly smaller" splits into the two ways
+and “strictly smaller” splits into the two ways
 `DescriptiveComplexity.SOBlock.atomIx_lt_iff` allows: a strictly earlier
-relation variable — a static condition, so a finite conjunction — or the same
+relation variable – a static condition, so a finite conjunction – or the same
 variable at a lexicographically earlier tuple, which is
 `DescriptiveComplexity.lexSelLtF`.
 
@@ -81,8 +81,8 @@ theorem realize_atomF {A : Type} [L.Structure A] [LinearOrder A]
   exact Iff.rfl
 
 /-- The relation variables strictly below `i`, in the arbitrary order on the
-block's index type. Factored out so that the order on `B.ι` — the one thing in
-the comparison sentence that is resolved statically — is confined to this
+block's index type. Factored out so that the order on `B.ι` – the one thing in
+the comparison sentence that is resolved statically – is confined to this
 definition and its characterization, and the sentence itself never has to be
 unfolded past them. -/
 noncomputable def ivarsBelow (i : B.ι) : List B.ι :=
@@ -102,7 +102,7 @@ open Classical in
 variable (L) in
 /-- **The defining sentence of the order on an expanded universe**: at some
 padded atom the first copy is false and the second true, and the two copies
-agree at every strictly smaller atom — at every earlier relation variable
+agree at every strictly smaller atom – at every earlier relation variable
 (statically many), and at the same variable on every lexicographically earlier
 tuple. -/
 noncomputable def ordLtF : ((L.sum Language.order).sum (B.replicate 2).lang).Sentence :=
@@ -189,8 +189,8 @@ theorem realize_ordLtF [Finite A] (ρs : Fin 2 → B.Assignment A) :
 
 An expansion defines its order by the symbol `leSymb`, so what
 `DescriptiveComplexity.ExpExpansion.ordExtend` needs is the reflexive
-comparison. Equality of assignments is definable in the same breath — the two
-copies hold of exactly the same padded atoms — and `≤` is the disjunction. -/
+comparison. Equality of assignments is definable in the same breath – the two
+copies hold of exactly the same padded atoms – and `≤` is the disjunction. -/
 
 variable (L) in
 /-- The two copies of the block hold of exactly the same padded atoms. -/

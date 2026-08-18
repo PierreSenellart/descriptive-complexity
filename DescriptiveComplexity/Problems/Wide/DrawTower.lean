@@ -30,7 +30,7 @@ application appears only at the instantiation
 The element loops of an atom run one read trip per atom of the defining
 matrix – the guard atoms' trips read a harmless witness cell and their
 flags are ignored by the folds – so the loop lengths match the
-`DescriptiveComplexity.Draw.Data.kindReads` budgets on the nose.
+`DescriptiveComplexity.Draw.Data.kindReads` budgets exactly.
 -/
 
 namespace DescriptiveComplexity

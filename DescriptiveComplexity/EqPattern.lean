@@ -8,7 +8,7 @@ import DescriptiveComplexity.Padding
 /-!
 # Data read only through its equality pattern is first-order definable
 
-The keystone of every "write the program down as an interpretation" step, and
+The keystone of every “write the program down as an interpretation” step, and
 the one a machine emitted rule by rule needs.
 
 A transition table's attributes – when a rule applies, what state it moves to,
@@ -351,7 +351,7 @@ end Realize
 The other half of what a machine's rules do: a rule not only *fires* on its
 data, it also *writes*. Everything the EXPSPACE program writes is a copy of one
 of its input slots or one of the two designated elements, chosen by the input's
-pattern — so one more builder finishes the toolbox. -/
+pattern – so one more builder finishes the toolbox. -/
 
 section Write
 

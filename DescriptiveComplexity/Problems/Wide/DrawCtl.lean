@@ -82,13 +82,13 @@ loops' accumulator and their two verdict bits, and two spare. -/
 noncomputable def scratchC (k : Fin 6) : dt.CtlIx := .flag (k.addNat 2)
 
 /-- **The ∃-levels' gate flag of a VAL round**: the conjunction, over the
-existentially quantified levels of the variable's pack, of "this level's
-inner block is an encoding". The last free scratch flag. -/
+existentially quantified levels of the variable's pack, of “this level's
+inner block is an encoding”. The last free scratch flag. -/
 noncomputable def existGateC : dt.CtlIx := .flag 7
 
 /-- **The ∀-levels' gate flag of a VAL round**: the same conjunction over
 the universally quantified levels. Reuses the outer gates' flag, which is
-dead once the verdict checkpoint has dispatched on it — nothing inside the
+dead once the verdict checkpoint has dispatched on it – nothing inside the
 VAL loop reads it again. -/
 noncomputable def allGateC : dt.CtlIx := .flag 0
 
@@ -181,7 +181,7 @@ section Tuple
 
 variable {D : ℕ} {A : Type} [LinearOrder A] [Finite A]
 
-/-- **The tuple is exhausted**: every coordinate is maximal, i.e. it is the
+/-- **The tuple is exhausted**: every coordinate is maximal, i.e., it is the
 lexicographic top. -/
 def IsMaxTup (t : Fin D → A) : Prop := ∀ (p : Fin D) (a : A), a ≤ t p
 

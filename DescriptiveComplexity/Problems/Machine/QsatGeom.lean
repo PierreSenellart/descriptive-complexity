@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Machine.QsatProgram
 # The geometry of the QBF machine's tape
 
 Where the cells sit: which tagged tuples are positions, which is the lowest and
-which the highest, and what the immediate neighbour of each one is. Everything
+which the highest, and what the immediate neighbor of each one is. Everything
 the run needs to know about *movement*, proved once, before any transition is
 taken.
 
@@ -24,7 +24,7 @@ is `DescriptiveComplexity.MinPos`, the right marker is `DescriptiveComplexity.Ma
 and `DescriptiveComplexity.SuccPos` steps from the left marker to the outermost
 variable, from a variable to the next one the prefix binds, and from the
 innermost variable to the right marker. The degenerate instance – no quantified
-variable at all – is the case where the two markers are neighbours.
+variable at all – is the case where the two markers are neighbors.
 
 All of it needs the instance to be well formed, since that is exactly when the
 prefix order is a linear order on the variables and `QLe` is a linear order at
@@ -169,7 +169,7 @@ theorem maxPos_posEnd (hwf : QsatWf A) : MaxPos (QLe (A := A)) QPosn posEnd := b
   · exact qLe_cell_end x
   · exact qLe_refl hwf _
 
-/-! ### Neighbours -/
+/-! ### Neighbors -/
 
 end Geometry
 

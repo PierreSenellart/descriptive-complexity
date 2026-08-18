@@ -37,10 +37,10 @@ system whose two rules disagree describes no run at all.
 
 ## Why an arrival is a tile of its own
 
-A vertical rule sees one column, so it cannot know that the neighbouring head is
+A vertical rule sees one column, so it cannot know that the neighboring head is
 about to step into it; a horizontal rule sees one row, so it cannot know what the
 next row holds. The arrival tile is the handshake between them: the horizontal
-rule *justifies* it against the neighbouring head, and the vertical rule *turns
+rule *justifies* it against the neighboring head, and the vertical rule *turns
 it into* the head of the next row. That is what keeps a row to exactly one head
 with rules that never see more than two cells.
 -/
@@ -130,7 +130,7 @@ def TPAcc (p : TilePt A) : Prop :=
 
 /-- **A cell with no head**: it holds a symbol, and it may be expecting one –
 the bottom row's description allows an arrival, since the machine's first step
-announces itself in a neighbour of the corner. -/
+announces itself in a neighbor of the corner. -/
 def TPNoHead (p : TilePt A) : Prop :=
   p.1 = TileTag.sym ∨ p.1 = TileTag.arrL ∨ p.1 = TileTag.arrR
 
@@ -196,9 +196,9 @@ def TPVert (p q : TilePt A) : Prop :=
       tpState q = tpState p)
 
 /-- **What may stand immediately to the right of a cell**: a head that moves
-right announces itself in the right neighbour's arrival and nowhere else, and a
-head that moves left in the left neighbour's – so an arrival is *justified* by a
-neighbouring head, which is what keeps a row to one head. -/
+right announces itself in the right neighbor's arrival and nowhere else, and a
+head that moves left in the left neighbor's – so an arrival is *justified* by a
+neighboring head, which is what keeps a row to one head. -/
 def TPHoriz (p q : TilePt A) : Prop :=
   -- neither is a digit
   TPTile p ∧ TPTile q ∧
@@ -208,10 +208,10 @@ def TPHoriz (p q : TilePt A) : Prop :=
     -- a head at the right that moves left hands the state to the left cell
     (q.1 = TileTag.head → ¬WMRight (tpTr q) →
       p.1 = TileTag.arrR ∧ WMDst (tpTr q) (tpState p)) ∧
-    -- an arrival from the left is the left neighbour's head, moving right
+    -- an arrival from the left is the left neighbor's head, moving right
     (q.1 = TileTag.arrL →
       p.1 = TileTag.head ∧ WMRight (tpTr p) ∧ WMDst (tpTr p) (tpState q)) ∧
-    -- an arrival from the right is the right neighbour's head, moving left
+    -- an arrival from the right is the right neighbor's head, moving left
     (p.1 = TileTag.arrR →
       q.1 = TileTag.head ∧ ¬WMRight (tpTr q) ∧ WMDst (tpTr q) (tpState p)) ∧
     -- two heads never stand side by side

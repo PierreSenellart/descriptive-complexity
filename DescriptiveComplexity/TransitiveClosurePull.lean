@@ -49,7 +49,7 @@ is required *for every* linear order, the lexicographic one is available.
 ## Determinism travels for free
 
 Everything about determinism reduces to one observation: the node
-correspondence is a *bijection*, and "this step has no competitor" is preserved
+correspondence is a *bijection*, and “this step has no competitor” is preserved
 by a bijection of node sets (`DescriptiveComplexity.TCSpec.det_step_congr`). So the
 pullback of the determinization and the determinization of the pullback have
 the same walk, and `DescriptiveComplexity.DTCDefinable` is closed under reductions by

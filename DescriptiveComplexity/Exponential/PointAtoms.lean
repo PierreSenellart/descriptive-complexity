@@ -13,10 +13,10 @@ points its variables hold: that a relation of the expanded vocabulary holds of
 them, that two of them are equal, or that one is below another. This file writes
 each of those as a sentence of the quantifier prefix, and proves it right.
 
-All three follow one pattern. The corresponding sentence of the expansion —
+All three follow one pattern. The corresponding sentence of the expansion –
 `DescriptiveComplexity.ExpExpansion.relSentence`,
 `DescriptiveComplexity.SOBlock.eqAssignF`,
-`DescriptiveComplexity.ExpExpansion.ordSentence` — is indexed by a **static**
+`DescriptiveComplexity.ExpExpansion.ordSentence` – is indexed by a **static**
 tuple of tags, because everywhere else in this development a tag is chosen at
 formula-construction time. Here the tags are *guessed*, so the sentence appears
 once per tuple of tags, guarded by the tag bits of the rounds involved

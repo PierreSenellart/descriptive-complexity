@@ -132,7 +132,7 @@ evaluators, odometers and moves, all deterministic, so the program is
 `DescriptiveComplexity.HeadProgram.compile true` – at most one enabled transition per
 reading whatever the guards, and agreeing with the program where they are
 exclusive – gives a machine that `DescriptiveComplexity.HeadAutomaton.IsDeterministic`
-holds of on the nose. `DescriptiveComplexity.dtcDefinable_of_automaton` closes the
+holds of with no side condition. `DescriptiveComplexity.dtcDefinable_of_automaton` closes the
 loop.
 
 -/

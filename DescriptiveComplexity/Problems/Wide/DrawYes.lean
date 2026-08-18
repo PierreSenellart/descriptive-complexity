@@ -132,7 +132,7 @@ its verdict**, at any state whose tracks hold a stage. The output variable is
 nullary, so its argument block is empty and every hypothesis the machinery
 asks about the working address's blocks is a function on `Fin 0`; what is left
 is the verdict, which is
-`DescriptiveComplexity.Draw.Data.accVerdict_out` — an *equivalence*, so this
+`DescriptiveComplexity.Draw.Data.accVerdict_out` – an *equivalence*, so this
 one leg settles both the accepting and the rejecting case. -/
 theorem outLeg_verdict
     (hR : (dt.progOf zero one hzo hpl).table.Reads)

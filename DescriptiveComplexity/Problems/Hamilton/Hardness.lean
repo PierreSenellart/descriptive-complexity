@@ -130,7 +130,7 @@ end Correct
 
 /-- **Vertex Cover relativized-ordered-FO-reduces to Hamilton Circuit**: the
 twelve-vertex cover-testing gadget of each edge, chained along every vertex's
-neighbour list, with the marked vertices as selectors and a degenerate-case
+neighbor list, with the marked vertices as selectors and a degenerate-case
 hub. The domain formula cuts the target universe down to the real gadget,
 selector and hub vertices – Immerman's definable-subset reduction, needed
 because HAMILTON CIRCUIT is a spanning problem. -/

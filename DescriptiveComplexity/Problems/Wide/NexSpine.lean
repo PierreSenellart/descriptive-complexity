@@ -121,7 +121,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv 
 `DescriptiveComplexity.Draw.Data.ixEvalSpine_run_thread` with the gates no
 longer assumed to pass. Each position takes whichever of the three legs
 its own gates call for, and what the caller owes is only the marker, the
-mirror and the bottom mark — all of which the advance sets and every leg
+mirror and the bottom mark – all of which the advance sets and every leg
 leaves alone. This is the form a sweep can use, since it visits junk
 addresses and gated ones alike. -/
 theorem nexIxSpineB_reachesIn

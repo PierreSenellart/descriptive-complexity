@@ -24,7 +24,7 @@ every vertex.
   never in a chosen set.
 
 A connected set containing all terminals must join every edge-terminal to the
-root, and an edge's only neighbours are its two endpoints, so the vertices it
+root, and an edge's only neighbors are its two endpoints, so the vertices it
 uses form a vertex cover; conversely a vertex cover joins every edge to the
 root through one of its endpoints. Since vertices are the only non-terminals,
 the budget counts exactly the cover, and the marked diagonal transports the
@@ -202,7 +202,7 @@ theorem steiner_terminal_shape {p : steinerInterp.Map A} (h : STTerminal p) :
   · refine Or.inr ⟨w 0, ?_, hmin⟩
     exact Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> simp [rPt, hdiag]⟩
 
-/-- The neighbours of an edge point are the points of its two endpoints. -/
+/-- The neighbors of an edge point are the points of its two endpoints. -/
 theorem steiner_link_ePt {S : steinerInterp.Map A → Prop} {u v : A}
     {q : steinerInterp.Map A} (h : Link STAdj S (ePt u v) q) :
     (q = vPt u ∨ q = vPt v) ∧ S q := by
@@ -467,7 +467,7 @@ theorem steinerE_marked_v (v : A) : STMarked (veePt v) ↔ MGMarked v := by
 theorem steinerE_marked_e (u v : A) : STMarked (eeePt u v) ↔ MGAdj u v ∧ u ≠ v := by
   simpa [eeePt] using steinerE_marked_iff (A := A) .edge ![u, v]
 
-/-- The neighbours of an edge point are the points of its two endpoints. -/
+/-- The neighbors of an edge point are the points of its two endpoints. -/
 theorem steinerE_link_ePt {S : steinerEdgeInterp.Map A → Prop} {u v : A}
     {q : steinerEdgeInterp.Map A} (h : Link STAdj S (eeePt u v) q) :
     (q = veePt u ∨ q = veePt v) ∧ S q := by

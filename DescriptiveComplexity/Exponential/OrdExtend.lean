@@ -19,9 +19,8 @@ This is the analogue, one level up, of
 `DescriptiveComplexity.FOInterpretation.ordExtend` and its `ordExtendLEquiv`,
 and it plays the same role: an interpretation whose formulas mention the order
 of the structure they read can only be composed with an expansion once that
-expansion *defines* its order. It is the missing prerequisite of the outer
-composition (`ROADMAP.md` §3), and the only piece of it that is about the order
-rather than about quantifiers.
+expansion *defines* its order. It is the prerequisite of the outer composition
+that is about the order rather than about quantifiers.
 
 The tag comparison is **static**, exactly as in
 `DescriptiveComplexity.lexLeF`: two points with different tags are ordered by
@@ -101,7 +100,7 @@ variable (X)
 
 omit [Finite A] [Nonempty A] in
 /-- The expanded structure of the order extension, at the vocabulary written as
-a sum — equal to the extension's own by definition, but not syntactically, so
+a sum – equal to the extension's own by definition, but not syntactically, so
 instance search has to be handed it. -/
 @[instance_reducible]
 noncomputable def ordExtendStructure :

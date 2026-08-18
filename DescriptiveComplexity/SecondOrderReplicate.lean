@@ -10,7 +10,7 @@ import DescriptiveComplexity.SecondOrderMerge
 
 The shape every `Σₖ` definition in this library has: `k` alternating blocks
 that are all *the same* block, one per round of whatever the definition
-describes — one truth assignment per quantifier block for
+describes – one truth assignment per quantifier block for
 `DescriptiveComplexity.QBF`, one run per round of the game for the machine
 bridge of the polynomial hierarchy.
 

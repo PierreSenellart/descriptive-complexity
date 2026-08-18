@@ -267,7 +267,7 @@ variable (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
 variable (hTestT : ∀ u : I, dt.InnerFull F.blk (mV aT) u)
 variable (hTestF : ∀ a, a < aT → ∃ u : I, ¬dt.InnerFull F.blk (mV a) u)
 
-/-- **The control after one position's leg**: the machinery's exit fold —
+/-- **The control after one position's leg**: the machinery's exit fold –
 `DescriptiveComplexity.Draw.Data.ixVarMachine_run`'s final control, at the
 position's variable. -/
 noncomputable def ixLegCtl (j : Fin dt.nv)
@@ -299,7 +299,7 @@ noncomputable def ixLegCtl (j : Fin dt.nv)
           (dt.arOf (dt.varAt j))) aT) aT)
     (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le (dt.ixRoundSt st (mV aT)) v)
 
-/-- **The control after one position's leg, threaded** — the twin of
+/-- **The control after one position's leg, threaded** – the twin of
 `DescriptiveComplexity.Draw.Data.ixLegCtl`, with the VAL loop's rounds run
 at the states the thread produces for them. -/
 noncomputable def ixLegCtlT (j : Fin dt.nv)
@@ -322,8 +322,8 @@ noncomputable def ixLegCtlT (j : Fin dt.nv)
         (dt.ixVarFG (PR := PR) F hhasP (dt.varAt j) st v tOf f₀) aT) v)
 
 /-- **The tape state after one position's leg, threaded**: the VAL loop's
-exit state — the entry state's SAV and TARGET normalized if any of its
-rounds ran a stage atom — with the variable's `new` track written at the
+exit state – the entry state's SAV and TARGET normalized if any of its
+rounds ran a stage atom – with the variable's `new` track written at the
 marker. -/
 noncomputable def ixLegStT (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -350,7 +350,7 @@ omit [Finite R] [Finite P] [Finite dt.KIx]
 omit [Finite I] hord in
 /-- **What a leg leaves alone**: the machinery writes its own two scratch
 registers and its stage bit, so the mirror, the marker, the bottom and end
-marks and the stage dictionary all ride — which is what carries the next
+marks and the stage dictionary all ride – which is what carries the next
 position's pack and, one scale up, the sweep's own invariants. -/
 theorem ixLegStT_fields (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -509,7 +509,7 @@ theorem ixEvalCost_le_mul (w wP wR wK n : ℕ) :
 include hrulesM hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv hvi
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
-/-- **One spine position's leg — threaded**: as
+/-- **One spine position's leg – threaded**: as
 `DescriptiveComplexity.Draw.Data.ixVarLeg_run` without the boundary
 hypotheses `hsav`/`htgt`, which the sweep cannot supply at more than one
 address. The leg ends in
@@ -672,7 +672,7 @@ include hrulesM hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hgap hwP
   hcostR in
 omit [LinearOrder ιV] [Finite ιV] in
 /-- **One spine position's leg at a junk address**: the walk-back, the
-machinery's failing gates, and the erased stage slot at the marker — the
+machinery's failing gates, and the erased stage slot at the marker – the
 verdict `False`, the VAL register untouched. -/
 theorem ixVarLegFail_reachesIn (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -801,8 +801,8 @@ include hrulesM hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hgap hwP
   hcostR in
 omit [LinearOrder ιV] [Finite ιV] in
 /-- **One spine position's leg at a shaped but ungated address**: the
-walk-back, the whole gate sequence — every file test passing, the total
-dispatch carrying every block through — the clear flag at the verdict
+walk-back, the whole gate sequence – every file test passing, the total
+dispatch carrying every block through – the clear flag at the verdict
 checkpoint, and the erased stage slot at the marker: the verdict `False`,
 the VAL register untouched. With
 `DescriptiveComplexity.Draw.Data.ixVarLeg_run` and
@@ -948,7 +948,7 @@ theorem ixVarLegUngated_reachesIn (j : Fin dt.nv)
 The out machinery is the same shape at `vi := none`, entered by the walk
 home after a passed convergence sweep, its exit the accepting phase. Its
 stage slot is the working-cell marker itself, so an accepting verdict's
-write is idempotent — the tape after the leg is the machinery's own end
+write is idempotent – the tape after the leg is the machinery's own end
 tape. -/
 
 /-- **The VAL-loop thread of the output's leg**, at the entry-wrapped
@@ -1014,8 +1014,8 @@ include hrulesOut hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork 
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The output's leg**: from the walk home's landing one cell right of
-the marker, back to it, through the out machinery, and — the verdict
-holding — out into the accepting phase, the marker rewritten with the
+the marker, back to it, through the out machinery, and – the verdict
+holding – out into the accepting phase, the marker rewritten with the
 value it already carries. -/
 theorem ixOutLeg_run
     (st : TapeSt dt A R P I)
@@ -1310,7 +1310,7 @@ theorem ixOutLeg_run_any
     (((TMData.reachesIn_of_step hback).trans hmach).tail hexit)
   rw [ixOutLegCost]
 
-/-- **The state the output's leg ends at — threaded**: the machinery's own
+/-- **The state the output's leg ends at – threaded**: the machinery's own
 exit state, the accepting write at the marker being idempotent. -/
 noncomputable def ixOutStE
     (st : TapeSt dt A R P I)
@@ -1326,7 +1326,7 @@ noncomputable def ixOutStE
   dt.ixVarStE (elt := elt) F hinj hhasP heltP
     none st v mV semT (dt.ixVarFG (PR := PR) F hhasP none st v tOf f₀) aT
 
-/-- **The control after the output's leg — threaded**: the out machinery's
+/-- **The control after the output's leg – threaded**: the out machinery's
 exit fold, at the states its own thread produces. -/
 noncomputable def ixOutCtlT
     (st : TapeSt dt A R P I)
@@ -1347,7 +1347,7 @@ noncomputable def ixOutCtlT
 
 open Classical in
 /-- **The state the output's leg leaves, whatever its verdict**: the
-machinery's exit state with the marker rewritten by the accepting bit — so
+machinery's exit state with the marker rewritten by the accepting bit – so
 the marker survives a *true* verdict and is cleared by a false one, which is
 what makes a false output halt and reject. -/
 noncomputable def ixOutStA
@@ -1373,7 +1373,7 @@ well shaped *and* the tags and the domain sentence agree,
 `DescriptiveComplexity.Draw.Data.ixVarLegUngated_run` when the blocks are
 well shaped but the verdict flag is cleared, and
 `DescriptiveComplexity.Draw.Data.ixVarLegFail_run` when a block fails the
-shape test — which is the one that needs a witness, and a *least* one, so
+shape test – which is the one that needs a witness, and a *least* one, so
 that the blocks before it have run. -/
 
 /-- **The shape test the gates run**, at a position and a state: the
@@ -1387,7 +1387,7 @@ def ixShapeAt (j : Fin dt.nv)
     (PR.passTracksAt F.cell Slot.mir (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st) st.mir
       (F.cell u))
 
-/-- **The tag a block's witness cells name**, as the machine reads it —
+/-- **The tag a block's witness cells name**, as the machine reads it –
 so `htagOf` is `rfl` at this choice. -/
 noncomputable def ixTagAt (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -1429,7 +1429,7 @@ def ixGatedAt (j : Fin dt.nv)
 open Classical in
 /-- **The state one position's leg leaves, whichever leg it takes**: the
 machinery's own exit at a gated position, and the entry state with the
-stage bit erased at the two ungated ones — which agree on the tape and
+stage bit erased at the two ungated ones – which agree on the tape and
 differ only in their control. -/
 noncomputable def ixLegStB (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -1450,8 +1450,8 @@ noncomputable def ixLegStB (j : Fin dt.nv)
 open Classical in
 /-- **The control one position's leg leaves**: the machinery's fold at a
 gated position, the ungated exit when the blocks are well shaped but a tag
-or the domain fails, and the failing gates' exit — at the *least* badly
-shaped block — otherwise. -/
+or the domain fails, and the failing gates' exit – at the *least* badly
+shaped block – otherwise. -/
 noncomputable def ixLegCtlB (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
     (semT : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st →
@@ -1484,7 +1484,7 @@ omit [Finite R] [Finite P] [Finite dt.KIx]
 /-- **What a leg leaves alone, whichever leg it takes**: the ungated legs
 never enter the VAL loop, so they touch nothing but the stage bit, and the
 gated one is `DescriptiveComplexity.Draw.Data.ixLegStT_fields`. The `val`
-register is left out on purpose — it is the loop's top at a gated
+register is left out on purpose – it is the loop's top at a gated
 position and the entry state's at the other two. -/
 theorem ixLegStB_fields (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -1541,7 +1541,7 @@ omit [Finite R] [Finite P] [Finite dt.KIx]
 omit [Finite I] in
 open Classical in
 /-- **What a leg writes**: its variable's cell at the marker, and nothing
-else — the same equation whichever leg it takes, since the VAL loop
+else – the same equation whichever leg it takes, since the VAL loop
 threads the two scratch registers alone
 (`DescriptiveComplexity.Draw.Data.ixVarStE_new`) and the ungated legs
 write the stage bit directly. This is the branched twin of

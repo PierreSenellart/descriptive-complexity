@@ -12,7 +12,7 @@ An expansion atom runs the same machinery a gate does, one exponent along: it
 reads the **tags** of its argument points, branches on the tuple they decode,
 and folds the defining sentence of that branch. So every piece it needs is one
 already discharged for the gates, at the branch's prefix rather than the
-domain's — the naming guards through `DescriptiveComplexity.Draw.Data.encCoord`,
+domain's – the naming guards through `DescriptiveComplexity.Draw.Data.encCoord`,
 the leaf from the control, and the three shapes of a fold.
 
 With them, `DescriptiveComplexity.Draw.UTagArgsDef` of
@@ -144,7 +144,7 @@ theorem uTagArgsDef_expArgs {k : ℕ} (v : dt.VarIx) (ts : Fin k → Fin (dt.nOf
 
 The equality and order atoms of a matrix compare two *points*, and the machine
 does it by walking their two registers in step. What it keeps between rounds is
-three scratch flags — agreement so far, a difference seen, and its direction —
+three scratch flags – agreement so far, a difference seen, and its direction –
 so its folds are nested single-slot writes over the narrow loop element. -/
 
 open Classical in

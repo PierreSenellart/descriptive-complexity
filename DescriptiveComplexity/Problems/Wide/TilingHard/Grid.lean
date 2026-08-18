@@ -165,7 +165,7 @@ theorem eq_bot_of_minPos {p : WPoint (TilePt A)}
     ((isLinOrd_wmSetLe (isLinOrd_tpLe hlin)).2.2.1 _ _ h1 h2)
 
 /-- **The full coordinate is the last position**, which is the other column with
-a neighbour missing. -/
+a neighbor missing. -/
 theorem maxPos_tpCol_top :
     letI := tileStr A
     MaxPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn

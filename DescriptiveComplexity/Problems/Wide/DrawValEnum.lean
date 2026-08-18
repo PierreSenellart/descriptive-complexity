@@ -11,17 +11,17 @@ import DescriptiveComplexity.Problems.Wide.Roam
 
 The variable machinery's VAL loop starts at the empty register, increments
 one address at a time, and stops at the first register content its
-exhaustion test accepts — the *Kin top*, the set of the inner-block
+exhaustion test accepts – the *Kin top*, the set of the inner-block
 elements. The enumeration
 `DescriptiveComplexity.Draw.Data.var_run` consumes is therefore an
 initial segment of the binary-counter order on subsets, indexed by
-`Fin (n + 1)` — which carries the `LinearOrder` and `Finite` instances the
+`Fin (n + 1)` – which carries the `LinearOrder` and `Finite` instances the
 run theorem demands, with no subtype order in sight.
 
-This file builds it: `DescriptiveComplexity.exists_wmChain` — every subset
+This file builds it: `DescriptiveComplexity.exists_wmChain` – every subset
 is reachable from the empty one by a finite chain of increments, by strong
 induction on the address rank (`DescriptiveComplexity.bitRank`, the same
-measure `DescriptiveComplexity.reaches_of_wideRounds` walks) —
+measure `DescriptiveComplexity.reaches_of_wideRounds` walks) –
 `DescriptiveComplexity.wmChain_lt`, the chain's strict monotonicity, and
 `DescriptiveComplexity.Draw.Data.exists_valEnum`, the package in exactly
 the run theorem's hypothesis forms.
@@ -151,7 +151,7 @@ variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
 
-/-- **The Kin top**: the register content the exhaustion test accepts —
+/-- **The Kin top**: the register content the exhaustion test accepts –
 the set of the inner-block elements. -/
 def kinTop : Univ A R P dt.KIx dt.dd → Prop :=
   fun u => ∃ j : Fin dt.ki, tagBlk u.1 = some (Sum.inr j)
@@ -160,7 +160,7 @@ variable {dt}
 
 /-- **The VAL loop's enumeration exists**: an increment chain over
 `Fin (n + 1)` from the empty register to the Kin top, in exactly the forms
-`DescriptiveComplexity.Draw.Data.var_run` demands — the covers are
+`DescriptiveComplexity.Draw.Data.var_run` demands – the covers are
 machine increments, the top passes the exhaustion test everywhere, every
 earlier register fails it somewhere, and every register of the chain holds
 inner cells alone, the Kin blocks being a final segment of the universe

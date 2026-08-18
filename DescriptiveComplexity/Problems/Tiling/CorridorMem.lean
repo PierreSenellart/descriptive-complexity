@@ -143,7 +143,7 @@ noncomputable def rowFuncS (row : L.Relations 2) : L.Sentence :=
     ((atom₂ row (Sum.inr 0) (Sum.inr 1) ⊓ atom₂ row (Sum.inr 0) (Sum.inr 2)) ⟹
       atomEq (Sum.inr 1) (Sum.inr 2))
 
-/-- Neighbouring columns of this row are compatible. -/
+/-- Neighboring columns of this row are compatible. -/
 noncomputable def rowHorizS (posn : L.Relations 1) (le horiz row : L.Relations 2) :
     L.Sentence :=
   Formula.iAlls (Fin 4)

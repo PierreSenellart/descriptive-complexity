@@ -368,7 +368,7 @@ omit [L.IsRelational] [L.Structure A] in
 include hrules hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt in
 /-- **The stage atom, threaded**: the same run as
 `DescriptiveComplexity.Draw.Data.stage_hStage` with *no* boundary
-discipline assumed — the random access writes the home address into SAV and
+discipline assumed – the random access writes the home address into SAV and
 TARGET whatever they held, so its exit state is the normalized
 `DescriptiveComplexity.Draw.Data.stageEndSt st v` rather than `st`.
 

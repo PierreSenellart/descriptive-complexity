@@ -680,7 +680,7 @@ noncomputable def gameInterp :
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {a₀ : A}
 
-/-- The interpreted universe is the machine's own, on the nose. -/
+/-- The interpreted universe is the machine's own, with nothing added. -/
 def gameMapEquiv : GamePt B V M A ≃ (gameInterp prog).Map A := Equiv.refl _
 
 omit [L.Structure A] [LinearOrder A] in

@@ -259,9 +259,9 @@ noncomputable def ixPassW (vi : dt.VarIx) (stV : TapeSt dt A R P I)
 variable {zero one}
 
 omit [Finite I] [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
-/-- **The master encoding fact of a passing round**: every level's block —
+/-- **The master encoding fact of a passing round**: every level's block –
 the working address's at the free levels, the round register's at the
-quantified ones — encodes the valuation's point. The capstone's `hENC`,
+quantified ones – encodes the valuation's point. The capstone's `hENC`,
 and `DescriptiveComplexity.Draw.Data.ixMkKindSem`'s input. -/
 theorem ixPassW_hENC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (hp : ∀ ℓ : Fin (dt.nIn vi), dt.ixIGPassP (elt := elt) F zero one vi stV ℓ)
@@ -372,7 +372,7 @@ variable {zero one} in
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational] in
 include hinj helt in
 /-- **The composed TARGET's argument blocks are the sources'**: after all
-copy loops, block `ℓ` of TARGET is the position's source block — the copy
+copy loops, block `ℓ` of TARGET is the position's source block – the copy
 is faithful on the padded cells, and an encoding holds no others. -/
 theorem ixWmBlk_stageTgtD_eq_encMap
     (vi : dt.VarIx) (iv : dt.d.B.ι)
@@ -458,7 +458,7 @@ theorem ixAddr_ixStageTgt_eq_tupAddr
     ixAddr elt (dt.ixStageTgt F hhas vi ts stV (dt.d.B.arity iv)) =
       tupAddr dt.ly zero one (R := R) (P := P) (ki := dt.ki) ha p := by
   -- every marked point is a destination cell, whose tag is the block of its
-  -- position — so the address marks argument blocks below the arity alone
+  -- position – so the address marks argument blocks below the arity alone
   have hpt : ∀ u : Univ A R P dt.KIx dt.dd,
       ixAddr elt (dt.ixStageTgt F hhas vi ts stV (dt.d.B.arity iv)) u →
       ∃ ℓ : Fin (dt.d.B.arity iv), u.1 = argOut dt.ki
@@ -657,7 +657,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite I] [L.IsRelational] in
 variable {zero one} in
 include hpassEnc in
 /-- **The leaf at a passing round is the matrix's value at the pass's
-points** — the capstone's `hPsPass`, with `Ps` the gated matrix
+points** – the capstone's `hPsPass`, with `Ps` the gated matrix
 `DescriptiveComplexity.Draw.Data.leafP`. -/
 theorem ixLeafP_pass_iff (hzo : zero ≠ one) (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -731,7 +731,7 @@ theorem ixLeafP_pass_iff (hzo : zero ≠ one) (vi : dt.VarIx) (stV : TapeSt dt A
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite I] [L.IsRelational] in
 variable {zero one} in
 include hpassEnc in
-/-- **The leaf at a failing round is the ∃-clause alone** — the capstone's
+/-- **The leaf at a failing round is the ∃-clause alone** – the capstone's
 `hPsFail`: the ∀-clause's implication is vacuous when the two readings do
 not both hold. -/
 theorem ixLeafP_fail_iff (vi : dt.VarIx) (stV : TapeSt dt A R P I)

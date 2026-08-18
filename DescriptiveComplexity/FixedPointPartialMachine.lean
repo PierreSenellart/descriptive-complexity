@@ -20,7 +20,7 @@ advance it:
   configuration has), one step *loads the initial configuration* – start
   state, head on the lowest position, initial tape;
 * from a configuration that can move – some applicable transition with a
-  destination, a written symbol and a neighbouring position to move to
+  destination, a written symbol and a neighboring position to move to
   (`DescriptiveComplexity.SpaceTM.GoOn`) – and is not yet accepting, one step
   is **the** machine step, determinism making the step formulas functional;
 * from an accepting or stuck configuration, the step *stutters*, so that a

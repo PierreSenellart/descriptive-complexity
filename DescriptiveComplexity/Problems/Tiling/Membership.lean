@@ -19,7 +19,7 @@ variable `R x y t`, read as “the cell in column `x` and row `y` carries the ti
   instance's;
 * the bottom row is one the description allows, and the two edge columns carry
   tiles allowed there;
-* horizontal and vertical neighbours are compatible;
+* horizontal and vertical neighbors are compatible;
 * some cell carries an accepting tile;
 
 together with the well-formedness the yes-instances fold in – the order is
@@ -391,14 +391,14 @@ noncomputable def tileEdgeRC : tileSOLang.Sentence :=
     ((tlPosnF (Sum.inr 1) ⊓ (tlMaxPosF (Sum.inr 0) ⊓
       tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))) ⟹ tlEdgeRF (Sum.inr 2))
 
-/-- Horizontal neighbours are compatible. -/
+/-- Horizontal neighbors are compatible. -/
 noncomputable def tileHorizC : tileSOLang.Sentence :=
   Formula.iAlls (Fin 5)
     ((tlSuccPosF (Sum.inr 0) (Sum.inr 1) ⊓ (tlPosnF (Sum.inr 2) ⊓
       (tlRelF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3) ⊓
         tlRelF (Sum.inr 1) (Sum.inr 2) (Sum.inr 4)))) ⟹ tlHorizF (Sum.inr 3) (Sum.inr 4))
 
-/-- Vertical neighbours are compatible. -/
+/-- Vertical neighbors are compatible. -/
 noncomputable def tileVertC : tileSOLang.Sentence :=
   Formula.iAlls (Fin 5)
     ((tlPosnF (Sum.inr 0) ⊓ (tlSuccPosF (Sum.inr 1) (Sum.inr 2) ⊓

@@ -12,7 +12,7 @@ The `k` sweeps of the machine, run against a tuple of block assignments. The
 whole point is `DescriptiveComplexity.valAfter`: the truth value the cell of a
 variable holds once the sweeps below `i` have run is the disjunction, over the
 blocks *below `i`* marking it, of what they assigned it. At `i = k` that is
-`DescriptiveComplexity.qbfVal` on the nose
+`DescriptiveComplexity.qbfVal` exactly
 (`DescriptiveComplexity.valAfter_top`), which is why one bit per cell suffices
 even though a variable may carry several block marks.
 

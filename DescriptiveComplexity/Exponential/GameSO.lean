@@ -11,8 +11,8 @@ import DescriptiveComplexity.Exponential.PSpaceOn
 /-!
 # A second-order quantifier prefix, played as a game
 
-**The theorem**: every second-order sentence — an alternating prefix of block
-quantifiers over a first-order kernel — defines a second-order alternating game
+**The theorem**: every second-order sentence – an alternating prefix of block
+quantifiers over a first-order kernel – defines a second-order alternating game
 (`DescriptiveComplexity.soGameDefinable_soProblem`), whence
 `DescriptiveComplexity.SigmaSODefinable.soGameDefinable` and `SO ⊆ SO-GAME`.
 
@@ -30,13 +30,13 @@ block. Its states are the assignments of `SOBlock.cons B spec.B` extended by a
 **phase** (`DescriptiveComplexity.SOGameSpec.Phase`, three arity-0 tag bits, as
 `DescriptiveComplexity.SOBlock.withTag` supplies them):
 
-* `pick` — the quantified block is chosen, by the existential or the universal
+* `pick` – the quantified block is chosen, by the existential or the universal
   player according to the polarity;
-* `start` — the existential player chooses a starting state of the inner game.
+* `start` – the existential player chooses a starting state of the inner game.
   This phase is *always* existential and it is what a stuck position means:
   a specification with no starting state loses here, which is exactly
   `DescriptiveComplexity.SOGameSpec.Accepts` being false;
-* `play` — the inner game is played, the chosen block frozen by every move
+* `play` – the inner game is played, the chosen block frozen by every move
   (`DescriptiveComplexity.SOGameSpec.frozenS`).
 
 Splitting `pick` from `start` is what makes the universal case correct: were the
@@ -113,7 +113,7 @@ def preOneLHom :
     | Sum.inr s => Sum.inr ⟨Sum.inr (Sum.inr s.1), s.2⟩
 
 /-- The inner game's one-copy vocabulary, read in the **second** copy of a
-prefixed state — what the move into the playing phase needs, the inner game's
+prefixed state – what the move into the playing phase needs, the inner game's
 starting condition being about the state the move enters. -/
 def preSndLHom :
     (((L.sum B.lang).sum Language.order).sum M.lang) →ᴸ

@@ -58,8 +58,9 @@ Because `dec` is `Option`-valued and computable, it can be *run*: `#guard`s
 can test a decoder on small presentations exactly as they test encoders, and
 the compiler rejects a decoder whose data decides an undecidable predicate.
 The residual gap is also the same as for encoders: computability is enforced,
-a *complexity bound* is not (a decoder may brute-force the answer); that
-would need the machine bridge (`ROADMAP.md` §7).
+a *complexity bound* is not (a decoder may brute-force the answer), since
+stating one means measuring the decoder against a machine model, which this
+interface does not do.
 
 The `Prop`-level consequence – every well-formed finite structure is
 semantically a concrete instance – is

@@ -232,7 +232,7 @@ section Support
 variable (L B)
 
 /-- A relation variable of the block, as a symbol of the expanded extended
-vocabulary: named, because a raw `Sum.inr` is not recognised at the transparency
+vocabulary: named, because a raw `Sum.inr` is not recognized at the transparency
 `rw` matches at. -/
 abbrev blkSym (i : B.ι) :
     (((newLang L).sum Language.order).sum B.lang).Relations (B.arity i) :=

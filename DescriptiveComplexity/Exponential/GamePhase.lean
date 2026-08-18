@@ -8,16 +8,16 @@ import DescriptiveComplexity.Exponential.GameNode
 /-!
 # The sentences a phased game is made of
 
-Every game this development builds over a tag-extended block —
+Every game this development builds over a tag-extended block –
 `DescriptiveComplexity.SOGameSpec.exBlock` in
 `DescriptiveComplexity.Exponential.GameSO`, and the graph game that carries
-`DescriptiveComplexity.EXPTIME` to SO-GAME — says the same three things and
+`DescriptiveComplexity.EXPTIME` to SO-GAME – says the same three things and
 nothing else:
 
 * **which phase a state is in**, in one copy or in the second one of a move
   (`DescriptiveComplexity.atTagF`, `DescriptiveComplexity.atTagTwoF`);
 * **that the phase of the state a move enters is exactly one phase**, so that a
-  junk state — two tag bits set — is never reachable
+  junk state – two tag bits set – is never reachable
   (`DescriptiveComplexity.exists_tagAssign_two`);
 * **that the listed relation variables do not change**, which is how a move
   freezes the part of the state it must not touch
@@ -26,7 +26,7 @@ nothing else:
 `Exponential.GameSO` proves these for its own block; here they are stated once
 for an **arbitrary** block and an arbitrary finite tag type, which is what the
 graph game needs, its states being the nodes of
-`DescriptiveComplexity.ExpExpansion.nodeBlock` — a merged tuple of rounds rather
+`DescriptiveComplexity.ExpExpansion.nodeBlock` – a merged tuple of rounds rather
 than a `DescriptiveComplexity.SOBlock.cons`.
 -/
 

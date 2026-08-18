@@ -22,7 +22,7 @@ GameWon            M = ∃ s, AGStart s   ∧ WinsOn M s
 A `DescriptiveComplexity.SOGameSpec` is the game
 `DescriptiveComplexity.GAME` reads on *assignments of a second-order block*:
 four first-order sentences say which assignments the existential player owns,
-which win outright, which start the game, and which moves are legal — the
+which win outright, which start the game, and which moves are legal – the
 transition seeing two copies of the block, as an
 `DescriptiveComplexity.SOTCSpec` does. Its expansion
 (`DescriptiveComplexity.SOGameSpec.toExp`) therefore takes `Tag := Unit`, no
@@ -36,7 +36,7 @@ gives at once
 * `DescriptiveComplexity.SOGameDefinable.mem_EXPTIME`: **a second-order
   alternating game is in EXPTIME**,
 
-which read on the definitions is **SO-GAME ⊆ SO(LFP)** — the second-order
+which read on the definitions is **SO-GAME ⊆ SO(LFP)** – the second-order
 shadow of `GAME ∈ PTIME`, exactly as
 `DescriptiveComplexity.PSPACE_subset_EXPTIME` is the second-order shadow of
 `REACH ∈ PTIME`.
@@ -64,8 +64,8 @@ open Language Structure
 assignments of a block `B`, and four first-order sentences over the base
 vocabulary expanded by the order and by copies of the block say which states are
 universal, which win outright, which start the game, and which moves are legal.
-The move sentence sees two copies of the block — the current state and the next
-one — exactly as `DescriptiveComplexity.SOTCSpec.step` does.
+The move sentence sees two copies of the block – the current state and the next
+one – exactly as `DescriptiveComplexity.SOTCSpec.step` does.
 
 The order is visible to all four sentences, as the ordered setting of the
 capture theorems allows; the problem itself does not see it. -/

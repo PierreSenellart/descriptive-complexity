@@ -33,8 +33,8 @@ into its state. Here they must *not* be conflated – an inflationary induction
 cannot manufacture an order (its stages are isomorphism-invariant, so on a
 bare set of `n` elements nothing asymmetric is ever derived), and the gap
 between the two notions is precisely what makes the unordered
-Abiteboul–Vianu theorem (`ROADMAP.md` §4) a theorem about `P = PSPACE` rather
-than a triviality.
+Abiteboul–Vianu theorem (`DescriptiveComplexity.AbiteboulVianu`) a theorem
+about `P = PSPACE` rather than a triviality.
 
 ## Relation to FO(LFP), and why Gurevich–Shelah is not needed
 

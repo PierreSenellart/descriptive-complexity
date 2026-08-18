@@ -514,7 +514,7 @@ theorem finsat_image_iff :
 an instance to the encoded sentence `σ_A`, from any problem defined, on nonempty
 finite structures, by an `∃SO[new]` sentence with a single block.
 
-Relational for now: `DescriptiveComplexity.CofinalHard` admits source languages
+Stated for relational sources: `DescriptiveComplexity.CofinalHard` admits source languages
 with function symbols, whose junk interpretation on invented arguments the
 sentence would have to guess: the term layer, which
 `DescriptiveComplexity.exists_relational_of_sigmaSONewDefinable` removes from the

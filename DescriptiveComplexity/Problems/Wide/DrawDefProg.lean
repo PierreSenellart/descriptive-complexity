@@ -15,7 +15,7 @@ are the four remaining combinators, and each is checkpoints over machineries
 that are already discharged. What is new here is small and concrete: the
 program's own kits (`DescriptiveComplexity.Draw.Data.compareKit`,
 `copyKit`, `seekKit`, `advKit`, `clearMirKit`, `tgtTopKit`) and the two
-questions they are written from — every stage track agrees with its next
+questions they are written from – every stage track agrees with its next
 (`DescriptiveComplexity.Draw.Data.cmpG`), and the working cell is at an
 argument-tagged block. Each is a conjunction, a disjunction or an equivalence
 of the three atoms, indexed by a finite type.

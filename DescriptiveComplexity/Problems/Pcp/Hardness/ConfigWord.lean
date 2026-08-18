@@ -49,7 +49,7 @@ derivation is a plain case analysis on the rule applied.
 * **halting**: a rule per accepting state replaces the state letter by the
   halting letter, and two-letter erasers then melt the rest of the word away.
   Both sides of every rule are nonempty, as the domino construction requires –
-  erasure consumes a neighbouring letter instead of producing the empty word.
+  erasure consumes a neighboring letter instead of producing the empty word.
 
 No letter of a configuration word is a boot or halting letter, so the boot
 rule fires only on the start word and the erasers only after an accepting

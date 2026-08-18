@@ -43,8 +43,8 @@ position**, the digit the increment set, and the conclusion says so along with i
 characterization. A state may hold an element, so reporting the carry costs
 nothing in the control, and it is what the fold of
 `DescriptiveComplexity.Problems.Wide.Fold` needs: which block rolled over decides
-which accumulators reset. So the caller reads both "the increment is finished" and
-"here is where it carried" off the state, and neither off the tape.
+which accumulators reset. So the caller reads both “the increment is finished” and
+“here is where it carried” off the state, and neither off the tape.
 
 ## The other writing pass
 

@@ -27,7 +27,7 @@ structure, not guessed. They ration the guessed relations differently:
   propagation, which is what makes the guess deterministic and the class P.
 * SO-Krom: **at most two second-order atoms**, of either sign. A 2-CNF has no
   least model, so the guess stays a genuine guess; what keeps it below NP is
-  that binary clauses propagate one implication at a time, i.e. along a *path*.
+  that binary clauses propagate one implication at a time, i.e., along a *path*.
   Satisfiability of the instantiated kernel is 2-SAT, decided by reachability
   in the implication graph.
 

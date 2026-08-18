@@ -115,7 +115,7 @@ replicated one, which is what an expansion's defining sentence needs. A walk
 over an expanded universe needs the converse: an
 `DescriptiveComplexity.SOTCSpec` states its transition over two stacked copies
 of its state block, while everything said about two points of an expanded
-universe — their order, their equality, one being the successor of the other —
+universe – their order, their equality, one being the successor of the other –
 is written over the block replicated twice. -/
 
 variable (L) in

@@ -35,7 +35,7 @@ Three design points, each paying for itself downstream.
 **The tags are part of the data, not a separate dimension.** A `d`-tuple of
 points is a tag tuple together with an assignment of the replicated block, so
 composing an expansion with a first-order interpretation gives an expansion
-again, on the nose rather than up to an embedding
+again, exactly rather than up to an embedding
 (`DescriptiveComplexity.Exponential.Pull`). Without the tag factor every
 hardness discharge would owe a relativization argument.
 

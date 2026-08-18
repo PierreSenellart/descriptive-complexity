@@ -11,9 +11,8 @@ import DescriptiveComplexity.SecondOrderNewPull
 
 The transport lemmas of `DescriptiveComplexity.FixedPointStep`, redone for
 interpretations with a *definable domain*
-(`DescriptiveComplexity.RelFOInterpretation`) – and with them, what no
-definability notion of this library had so far: **closure of membership under
-relativized ordered reductions** `≤ʳᶠᵒ[≤]`
+(`DescriptiveComplexity.RelFOInterpretation`) – and with them, **closure of
+membership under relativized ordered reductions** `≤ʳᶠᵒ[≤]`
 (`DescriptiveComplexity.IFPDefinable.of_relOrderedReduction`,
 `DescriptiveComplexity.PFPDefinable.of_relOrderedReduction`).
 

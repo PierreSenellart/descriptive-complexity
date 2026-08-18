@@ -44,7 +44,7 @@ does not, which is why this example is worth reading second:
   (`DescriptiveComplexity.nonempty_embedding_iff_ncard_le`);
 * the semantics contains a *reachability* condition, which is not
   first-order; the membership proof replaces it by a certificate (an order in
-  which every crawled page has a crawled in-neighbour strictly below it),
+  which every crawled page has a crawled in-neighbor strictly below it),
   the directed, single-root sibling of the Steiner-tree certificate;
 * the hardness reduction is an *ordered* FO reduction (`≤ᶠᵒ[≤]`): the
   paper's budget `|U| + B + 1` needs a marked set with exactly one extra
@@ -242,11 +242,11 @@ def crawlEncoding : Encoding Language.siteGraph CrawlInstance where
 ### Step 4: abstract semantics – rooted reachability, crawls, and their certificates
 
 The paper defines a crawl as an `r`-rooted subtree of the website; the
-semantics below phrases "some `r`-rooted subtree with node set `S`" as
-"every node of `S` is reachable from `r` by edges inside `S`" – equivalent,
+semantics below phrases “some `r`-rooted subtree with node set `S`” as
+“every node of `S` is reachable from `r` by edges inside `S`” – equivalent,
 since the parent pointers of a breadth-first traversal assemble any such
 reachable set into a tree, and it is precisely those parent pointers that
-the first-order certificate recovers (each non-root node has an in-neighbour
+the first-order certificate recovers (each non-root node has an in-neighbor
 strictly closer to the root). Reachability itself is a transitive-closure
 condition, not first-order; as for connectivity in the Steiner-tree problem,
 the certificate is what makes the membership proof possible, and it reuses
@@ -302,9 +302,9 @@ private theorem rdist_step {R : A → A → Prop} {r x : A}
 
 /-- **Rooted reachability is first-order certifiable**: every member of `S` is
 reachable from `r` inside `S` exactly when some strict partial order makes
-every non-root member of `S` have a chosen in-neighbour strictly below it.
+every non-root member of `S` have a chosen in-neighbor strictly below it.
 Walking down the order reaches the root; the order “distance to the root”
-witnesses the converse. The in-neighbours below are the parent pointers of an
+witnesses the converse. The in-neighbors below are the parent pointers of an
 `r`-rooted spanning subtree of `S`. -/
 theorem reachesAllOn_iff_exists_order [Finite A] (Adjp : A → A → Prop) (r : A)
     (S : A → Prop) :
@@ -486,11 +486,11 @@ bounds already discharged by the bundle of step 3, this equivalence is the
 `GraphCrawling` reads back to the concrete instances. The worked instance
 and the `#guard`s then *run* the encoder against a hand computation.
 
-The decoding direction is where well-formedness earns its keep. An abstract
+The decoding direction is what well-formedness is for. An abstract
 structure may mark several roots (read disjunctively by the semantics), and
 no packaged instance – carrying a single root – transcribes such a structure
 without *deciding* which root works, a computation a decoder should not
-contain. The well-formedness sentence `crawlWFSentence` ("exactly one root")
+contain. The well-formedness sentence `crawlWFSentence` (“exactly one root”)
 removes these, and on well-formed structures a computable decoder
 `crawlDecode` exists: find the root, read the links, targets and clamped
 budget off the tables. It assembles into

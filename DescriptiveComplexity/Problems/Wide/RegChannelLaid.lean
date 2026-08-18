@@ -106,7 +106,7 @@ unchanged.
 This is the one thing the reduction owes its own marking, and the reason the
 marks are «the argument elements **and one element below them**» rather than the
 argument elements alone: with the latter the least marked element would itself be
-an argument element, and an address holding it would be a register's neighbour
+an argument element, and an address holding it would be a register's neighbor
 instead of lying under the file. -/
 theorem work_regLaid {bot : Univ A R' P' dt.KIx dt.dd} (hbot : WMHasInp bot)
     (hleast : ∀ y : Univ A R' P' dt.KIx dt.dd, WMHasInp y → WMLe bot y)

@@ -233,7 +233,7 @@ theorem nonempty_of_trackOf {i : d.B.ι} (ha : d.B.arity i ≤ ko)
 
 variable (ly zero one) in
 /-- **The address of a tuple of points**: its outer blocks are the tuple's
-encodings, everything else empty — where the dictionary of a variable at that
+encodings, everything else empty – where the dictionary of a variable at that
 tuple is read. -/
 def tupAddr {i : d.B.ι} (_ha : d.B.arity i ≤ ko)
     (x : Fin (d.B.arity i) → X.Map A) :
@@ -302,7 +302,7 @@ theorem trackOf_assignOfTrack (hne : zero ≠ one)
 
 /-- **A tuple's address lies in the logical interval**: its non-argument
 blocks are empty, which is exactly `wmSetLe_logicalTop`'s hypothesis. What is
-*not* automatic is that it lies strictly below the top — the reduction owes
+*not* automatic is that it lies strictly below the top – the reduction owes
 that where it plants the end marker. -/
 theorem wmSetLe_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
     [Finite R] [Finite P] [Finite A]
@@ -342,11 +342,11 @@ theorem wmSetLt_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
 /-- **A padded address of argument cells alone is strictly below the logical
 top**: it is at or below it because its non-argument blocks are empty
 (`wmSetLe_logicalTop`), and it is not the top itself because the top's blocks
-are *full* — they hold the cells whose coordinates beyond the payload are not
+are *full* – they hold the cells whose coordinates beyond the payload are not
 `zero`, and a padded address holds none of those. This is what an address a
 program *builds* out of padded cells (rather than reads from a register) has
 to offer, and it needs one coordinate of slack (`c < dd`) and one argument
-block to name (`i`) — the same nonemptiness the interval is given anyway. -/
+block to name (`i`) – the same nonemptiness the interval is given anyway. -/
 theorem wmSetLt_logicalTop_of_isPad [LinearOrder R] [LinearOrder P]
     [Finite R] [Finite P] [Finite A] {c : ℕ} {zero one : A} (hne : zero ≠ one)
     (hV : IsLinOrd (tupLeLex (A := A) (d := dd))) (hc : c < dd)
@@ -367,7 +367,7 @@ theorem wmSetLt_logicalTop_of_isPad [LinearOrder R] [LinearOrder P]
 
 /-- **A tuple's address is strictly below the logical top, at every arity**:
 `wmSetLt_tupAddr_logicalTop` at a variable of arity ≥ 1, and at a **nullary**
-one the address is the empty one, which is strictly below any nonempty top —
+one the address is the empty one, which is strictly below any nonempty top –
 so what the nullary case asks for is an argument block to name, the same
 nonemptiness of the interval the run layer is given anyway. This is the form
 `assignment_ext_of_trackOf`'s `hS` is discharged in. -/
@@ -393,8 +393,8 @@ theorem wmSetLt_tupAddr_logicalTop' [LinearOrder R] [LinearOrder P]
 
 /-- **The dictionary determines the stage**: two assignments whose tracks agree
 at every address of a family that carries every tuple's own address are equal.
-This is what turns the machine's convergence test — the tracks of one stage and
-the next agreeing over the logical interval — back into «the stages are
+This is what turns the machine's convergence test – the tracks of one stage and
+the next agreeing over the logical interval – back into «the stages are
 equal», which is what `hnotconv` needs. -/
 theorem assignment_ext_of_trackOf (hne : zero ≠ one)
     (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)

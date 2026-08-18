@@ -15,7 +15,7 @@ block `C` and finite tag type `T`.
 * **A one-copy sentence, read in a copy of a move.** The four sentences of a
   `DescriptiveComplexity.SOGameSpec` live at three different vocabularies, and
   everything a move says about *one* of its two states is a sentence over
-  `(L + ≤) + C.lang` — the leaf kernel of a quantifier prefix, a guard, the
+  `(L + ≤) + C.lang` – the leaf kernel of a quantifier prefix, a guard, the
   order. `DescriptiveComplexity.moveFstLHom` and
   `DescriptiveComplexity.moveSndLHom` read such a sentence in the first and in
   the second copy, dropping the tag bits, and
@@ -26,8 +26,8 @@ block `C` and finite tag type `T`.
   `DescriptiveComplexity.varsFrozenS` freezes a variable *in place*, which is
   what a move that must not disturb the state says.
   `DescriptiveComplexity.varPairAgreeS` is the same statement between two
-  *different* variables of equal arity — the first copy's `i` and the second
-  copy's `j` — which is what a move that **shifts** part of the state says:
+  *different* variables of equal arity – the first copy's `i` and the second
+  copy's `j` – which is what a move that **shifts** part of the state says:
   copying the points of the node just chosen onto the slots the next position
   reads them from. Freezing is the diagonal case `j = i`.
 -/
@@ -57,7 +57,7 @@ def moveFstLHom :
     | Sum.inr s => Sum.inl (Sum.inr ⟨Sum.inr s.1, s.2⟩)
 
 /-- A sentence about one assignment of `C`, read in the **second** copy of a
-move — the state the move enters. -/
+move – the state the move enters. -/
 def moveSndLHom :
     ((L.sum Language.order).sum C.lang) →ᴸ
       (((L.sum Language.order).sum (C.withTag T).lang).sum (C.withTag T).lang) where
@@ -179,7 +179,7 @@ variable (L C T)
 
 /-- **The move copies the variable `i` of the state it leaves onto the variable
 `j` of the state it enters.** With `j = i` this is
-`DescriptiveComplexity.varAgreeS`, i.e. freezing. -/
+`DescriptiveComplexity.varAgreeS`, i.e., freezing. -/
 noncomputable def varPairAgreeS (i j : C.ι) (h : C.arity j = C.arity i) :
     (((L.sum Language.order).sum (C.withTag T).lang).sum (C.withTag T).lang).Sentence :=
   Formula.iAlls (Fin (C.arity i))

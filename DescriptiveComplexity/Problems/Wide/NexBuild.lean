@@ -950,7 +950,7 @@ theorem reachesIn_guessPhase (hcoord : Function.Injective coord)
 omit hrules in
 /-- **The opening step**: from the empty address the machine plants the marker
 and moves right, into the walk that takes it to the file's base. The base is
-*above* the program's data, so it is not the marker's neighbour and the walk is
+*above* the program's data, so it is not the marker's neighbor and the walk is
 not a step. -/
 theorem step_startBuild (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
@@ -1047,7 +1047,7 @@ theorem step_approachEnter (hR : PR.table.Reads)
 omit hrules in
 /-- **The dispatch out of the walk home**: at the marker, the machine turns
 round and moves right into the guessing phase – the step between the file-laying
-phase and the guess. Where it lands is the marker's neighbour, which is where
+phase and the guess. Where it lands is the marker's neighbor, which is where
 the guess begins: the certificate lives in the data region, *below* the file. It
 writes nothing. -/
 theorem step_homeBuildExit (hR : PR.table.Reads)

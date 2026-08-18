@@ -14,14 +14,14 @@ import DescriptiveComplexity.OccurrenceOrder
 The hardness half of `DescriptiveComplexity.GAME`. The AND/OR graph drawn
 inside a `Language.sat`-instance is unit propagation read as a game:
 
-* a **variable** `x` is an existential node — to win at it, name a clause that
+* a **variable** `x` is an existential node – to win at it, name a clause that
   forces it;
-* a **clause** `c` is a universal node — the opponent challenges one of its
+* a **clause** `c` is a universal node – the opponent challenges one of its
   negative literals, and the game continues there;
 * a clause with **no** negative literal wins outright, which is what the
   `won` mark of `FirstOrder.Language.andOrGraph` is for and why a stuck
   universal node had to *lose* (`DescriptiveComplexity.Problems.Game.Defs`);
-* the **goal** clauses — those with no positive literal — are the marked
+* the **goal** clauses – those with no positive literal – are the marked
   starts.
 
 So the existential player wins exactly when some goal clause has all its

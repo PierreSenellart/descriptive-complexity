@@ -49,7 +49,7 @@ abbrev dsSetSym : dsSOLang.Relations 1 := Sum.inr dsSetRel
 /-- The injection symbol in the kernel's vocabulary. -/
 abbrev dsInjSym : dsSOLang.Relations 2 := Sum.inr dsInjRel
 
-/-- Kernel conjunct: every vertex is in the guessed set or has a neighbour in
+/-- Kernel conjunct: every vertex is in the guessed set or has a neighbor in
 it. -/
 private noncomputable def dsDomClause : dsSOLang.Sentence :=
   (Relations.formula₁ dsSetSym (Term.var (Sum.inr 0)) ⊔

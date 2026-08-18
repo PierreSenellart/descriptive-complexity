@@ -255,7 +255,7 @@ theorem isCorridor_tableCorridor (hwf : WideWF A)
     obtain rfl : x = Sum.inl (tpCol (fun _ : A => True)) := eq_top_of_maxPos hwf.1 hmax
     rw [tableCorridor_tpCol]
     exact tpEdgeR_tileAt hwf.1 hstep (maxPos_wpLe hwf.1) _
-  · -- neighbours in a row agree
+  · -- neighbors in a row agree
     intro k x x' _ hsucc
     obtain ⟨s, rfl⟩ := exists_tpCol_of_posn hsucc.1
     obtain ⟨t, rfl⟩ := exists_tpCol_of_posn hsucc.2.1

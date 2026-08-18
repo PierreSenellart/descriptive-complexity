@@ -14,9 +14,9 @@ The catalog's weighted problems – Knapsack and everything reduced from it –
 live on `FirstOrder.Language.binWeights` structures, whose numbers are *sets
 of bit positions* read by `DescriptiveComplexity.binNum`. A user does not
 start there: they start from a list of weights and a target. This file is the
-bridge, and it is where the size discipline of `DescriptiveComplexity.Encoding`
-earns its keep, since for these problems the representation is part of the
-statement – in unary they are solvable in polynomial time.
+bridge, and it is what the size discipline of `DescriptiveComplexity.Encoding`
+is for, since for these problems the representation is part of the statement –
+in unary they are solvable in polynomial time.
 
 * `DescriptiveComplexity.binarySubsetSumEncoding` is the honest binary encoding
   of `DescriptiveComplexity.SubsetSumInstance = List ℕ × ℕ`: one element per

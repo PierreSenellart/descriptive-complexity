@@ -63,9 +63,9 @@ provided here – `DescriptiveComplexity.derives_eq_of_closed_of_wf` says that a
 *closed* under the rules and *well-foundedly derivable* is exactly the least
 fixed point, `DescriptiveComplexity.derives_step_of_depth` supplies the witnessing
 order from the stages, and `DescriptiveComplexity.LFPDef.holds_iff_of_certificate`
-packages this – but the formula building remains to be done. (The inclusion
-itself already follows by composing the translation with the Horn membership
-of `DescriptiveComplexity.Problems.HornSat`.)
+packages this; the formulas themselves are not built. (The inclusion itself
+follows by composing the translation with the Horn membership of
+`DescriptiveComplexity.Problems.HornSat`.)
 
 ## The fixed point
 

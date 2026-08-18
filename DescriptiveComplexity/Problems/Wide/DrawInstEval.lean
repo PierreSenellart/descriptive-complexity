@@ -14,13 +14,13 @@ run per spine position; this file discharges each leg at the program's own
 rules. A leg is three pieces: the walk back into the variable's entry
 checkpoint (`DescriptiveComplexity.Draw.Data.step_var_back`), the whole
 machinery (`DescriptiveComplexity.Draw.Data.varMachine_run`), and the
-written exit step (`DescriptiveComplexity.Draw.Data.step_var_exit`) —
+written exit step (`DescriptiveComplexity.Draw.Data.step_var_exit`) –
 whose write is the variable's stage bit, so the tape state after the leg is
 `DescriptiveComplexity.Draw.Data.postVarSt`: the round state at the
 exhausted VAL, the `new` track updated at the marker.
 
-The enumeration of the VAL loop (`ιV`/`mV`) is shared by every position —
-it enumerates the register contents, which do not depend on the variable —
+The enumeration of the VAL loop (`ιV`/`mV`) is shared by every position –
+it enumerates the register contents, which do not depend on the variable –
 and stays abstract here, with the per-position semantic data
 (`DescriptiveComplexity.Draw.Data.KindSem`, the gates' domain facts), to
 be supplied by the encoding layer.
@@ -206,7 +206,7 @@ variable (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
 variable (hTestT : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV aT) u)
 variable (hTestF : ∀ a, a < aT → ∃ u, ¬dt.InnerFull (fun u => tagBlk u.1) (mV a) u)
 
-/-- **The control after one position's leg**: the machinery's exit fold —
+/-- **The control after one position's leg**: the machinery's exit fold –
 `DescriptiveComplexity.Draw.Data.varMachine_run`'s final control, at the
 position's variable. -/
 noncomputable def legCtl (j : Fin dt.nv)
@@ -238,7 +238,7 @@ noncomputable def legCtl (j : Fin dt.nv)
           (dt.arOf (dt.varAt j))) aT) aT)
     (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.roundSt st (mV aT)) v)
 
-/-- **The control after one position's leg, threaded** — the twin of
+/-- **The control after one position's leg, threaded** – the twin of
 `DescriptiveComplexity.Draw.Data.legCtl`, with the VAL loop's rounds run
 at the states the thread produces for them. -/
 noncomputable def legCtlT (j : Fin dt.nv)
@@ -261,8 +261,8 @@ noncomputable def legCtlT (j : Fin dt.nv)
         (dt.varFG (PR := PR) RF (dt.varAt j) st v tOf f₀) aT) v)
 
 /-- **The tape state after one position's leg, threaded**: the VAL loop's
-exit state — the entry state's SAV and TARGET normalized if any of its
-rounds ran a stage atom — with the variable's `new` track written at the
+exit state – the entry state's SAV and TARGET normalized if any of its
+rounds ran a stage atom – with the variable's `new` track written at the
 marker. -/
 noncomputable def legStT (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -288,7 +288,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [Finite ιV] in
 /-- **What a leg leaves alone**: the machinery writes its own two scratch
 registers and its stage bit, so the mirror, the marker, the bottom and end
-marks and the stage dictionary all ride — which is what carries the next
+marks and the stage dictionary all ride – which is what carries the next
 position's pack and, one scale up, the sweep's own invariants. -/
 theorem legStT_fields (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -361,7 +361,7 @@ include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **One spine position's leg**: from the dispatch's landing one cell
 right of the marker, back to it, through the variable's whole machinery,
-and out through the written exit — the stage bit at the marker now the
+and out through the written exit – the stage bit at the marker now the
 machinery's verdict, the phase the next checkpoint. -/
 theorem varLeg_run (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -487,7 +487,7 @@ theorem varLeg_run (j : Fin dt.nv)
 
 include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
-/-- **One spine position's leg — threaded**: as
+/-- **One spine position's leg – threaded**: as
 `DescriptiveComplexity.Draw.Data.varLeg_run` without the boundary
 hypotheses `hsav`/`htgt`, which the sweep cannot supply at more than one
 address. The leg ends in
@@ -633,7 +633,7 @@ theorem varLeg_run_thread (j : Fin dt.nv)
 
 include hrules hR hlin htop hbot hv hvi hord in
 /-- **One spine position's leg at a junk address**: the walk-back, the
-machinery's failing gates, and the erased stage slot at the marker — the
+machinery's failing gates, and the erased stage slot at the marker – the
 verdict `False`, the VAL register untouched. -/
 theorem varLegFail_run (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -742,8 +742,8 @@ theorem varLegFail_run (j : Fin dt.nv)
 
 include hrules hR hlin htop hbot hv hvi hord in
 /-- **One spine position's leg at a shaped but ungated address**: the
-walk-back, the whole gate sequence — every file test passing, the total
-dispatch carrying every block through — the clear flag at the verdict
+walk-back, the whole gate sequence – every file test passing, the total
+dispatch carrying every block through – the clear flag at the verdict
 checkpoint, and the erased stage slot at the marker: the verdict `False`,
 the VAL register untouched. With
 `DescriptiveComplexity.Draw.Data.varLeg_run` and
@@ -872,7 +872,7 @@ theorem varLegUngated_run (j : Fin dt.nv)
 The out machinery is the same shape at `vi := none`, entered by the walk
 home after a passed convergence sweep, its exit the accepting phase. Its
 stage slot is the working-cell marker itself, so an accepting verdict's
-write is idempotent — the tape after the leg is the machinery's own end
+write is idempotent – the tape after the leg is the machinery's own end
 tape. -/
 
 /-- **The VAL-loop thread of the output's leg**, at the entry-wrapped
@@ -937,8 +937,8 @@ noncomputable def outCtl
 include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The output's leg**: from the walk home's landing one cell right of
-the marker, back to it, through the out machinery, and — the verdict
-holding — out into the accepting phase, the marker rewritten with the
+the marker, back to it, through the out machinery, and – the verdict
+holding – out into the accepting phase, the marker rewritten with the
 value it already carries. -/
 theorem outLeg_run
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1073,7 +1073,7 @@ theorem outLeg_run
   exact (Relation.ReflTransGen.single hback).trans
     (hmach.trans (Relation.ReflTransGen.single hexit))
 
-/-- **The state the output's leg ends at — threaded**: the machinery's own
+/-- **The state the output's leg ends at – threaded**: the machinery's own
 exit state, the accepting write at the marker being idempotent. -/
 noncomputable def outStE
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1088,7 +1088,7 @@ noncomputable def outStE
     (f₀ : dt.CtlIx → A) : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
   dt.varStE RF hord none st v mV semT (dt.varFG (PR := PR) RF none st v tOf f₀) aT
 
-/-- **The control after the output's leg — threaded**: the out machinery's
+/-- **The control after the output's leg – threaded**: the out machinery's
 exit fold, at the states its own thread produces. -/
 noncomputable def outCtlT
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1110,7 +1110,7 @@ include hord in
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx] in
 /-- **The output's threaded leg computes the unthreaded fold**: as
 `DescriptiveComplexity.Draw.Data.legCtlT_eq_legCtl` at the output
-variable — the VAL loop is the unthreaded loop, its last round the
+variable – the VAL loop is the unthreaded loop, its last round the
 unthreaded round, and the exit state differs from the round state in SAV and
 TARGET alone, which the background does not see off the register file. This
 is what makes `outLeg_run_thread`'s `hacc` the verdict
@@ -1145,7 +1145,7 @@ theorem outCtlT_eq_outCtl
 
 open Classical in
 /-- **The state the output's leg leaves, whatever its verdict**: the
-machinery's exit state with the marker rewritten by the accepting bit — so
+machinery's exit state with the marker rewritten by the accepting bit – so
 the marker survives a *true* verdict and is cleared by a false one, which is
 what makes a false output halt and reject. -/
 noncomputable def outStA
@@ -1165,10 +1165,10 @@ noncomputable def outStA
 
 include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
-/-- **The output's leg — threaded, whatever the verdict**: as
+/-- **The output's leg – threaded, whatever the verdict**: as
 `DescriptiveComplexity.Draw.Data.outLeg_run` without the boundary
-hypotheses `hsav`/`htgt`, which nothing supplies at the end of a sweep — the
-advance refreshes the marker and the mirror, not the two scratch registers —
+hypotheses `hsav`/`htgt`, which nothing supplies at the end of a sweep – the
+advance refreshes the marker and the mirror, not the two scratch registers –
 and without any assumption on the verdict. The leg ends in the accepting
 phase either way; what the verdict decides is the *bit* the exit writes at
 the marker (`DescriptiveComplexity.Draw.Data.outStA`), and with it whether
@@ -1347,7 +1347,7 @@ theorem outLeg_run_verdict
 
 include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
-/-- **The output's leg — threaded, the verdict holding**: the special case of
+/-- **The output's leg – threaded, the verdict holding**: the special case of
 `DescriptiveComplexity.Draw.Data.outLeg_run_verdict` in which the accepting
 write at the marker is *idempotent*, so the leg ends at the machinery's own
 exit state and nothing of the tape moves. -/
@@ -1426,7 +1426,7 @@ well shaped *and* the tags and the domain sentence agree,
 `DescriptiveComplexity.Draw.Data.varLegUngated_run` when the blocks are
 well shaped but the verdict flag is cleared, and
 `DescriptiveComplexity.Draw.Data.varLegFail_run` when a block fails the
-shape test — which is the one that needs a witness, and a *least* one, so
+shape test – which is the one that needs a witness, and a *least* one, so
 that the blocks before it have run. -/
 
 /-- **The least failing index, with a witness**: from a family that is not
@@ -1462,7 +1462,7 @@ def shapeAt (j : Fin dt.nv)
     (PR.passTracksAt RF.cell Slot.mir (dt.back RF.cell PR.zero PR.one dt.dd0Le st) st.mir
       (RF.cell u))
 
-/-- **The tag a block's witness cells name**, as the machine reads it —
+/-- **The tag a block's witness cells name**, as the machine reads it –
 so `htagOf` is `rfl` at this choice. -/
 noncomputable def tagAt (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1504,7 +1504,7 @@ def gatedAt (j : Fin dt.nv)
 open Classical in
 /-- **The state one position's leg leaves, whichever leg it takes**: the
 machinery's own exit at a gated position, and the entry state with the
-stage bit erased at the two ungated ones — which agree on the tape and
+stage bit erased at the two ungated ones – which agree on the tape and
 differ only in their control. -/
 noncomputable def legStB (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1524,8 +1524,8 @@ noncomputable def legStB (j : Fin dt.nv)
 open Classical in
 /-- **The control one position's leg leaves**: the machinery's fold at a
 gated position, the ungated exit when the blocks are well shaped but a tag
-or the domain fails, and the failing gates' exit — at the *least* badly
-shaped block — otherwise. -/
+or the domain fails, and the failing gates' exit – at the *least* badly
+shaped block – otherwise. -/
 noncomputable def legCtlB (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (semT : dt.gatedAt (PR := PR) RF j st →
@@ -1555,7 +1555,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
 /-- **What a leg leaves alone, whichever leg it takes**: the ungated legs
 never enter the VAL loop, so they touch nothing but the stage bit, and the
 gated one is `DescriptiveComplexity.Draw.Data.legStT_fields`. The `val`
-register is left out on purpose — it is the loop's top at a gated
+register is left out on purpose – it is the loop's top at a gated
 position and the entry state's at the other two. -/
 theorem legStB_fields (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1607,7 +1607,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [Finite ιV] in
 open Classical in
 /-- **What a leg writes**: its variable's cell at the marker, and nothing
-else — the same equation whichever leg it takes, since the VAL loop
+else – the same equation whichever leg it takes, since the VAL loop
 threads the two scratch registers alone
 (`DescriptiveComplexity.Draw.Data.varStE_new`) and the ungated legs
 write the stage bit directly. This is the branched twin of
@@ -1720,7 +1720,7 @@ include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The evaluation's spine, fully instantiated**: from the checkpoint
 before the first variable to the checkpoint after the last, one whole
-machinery per position — each leg
+machinery per position – each leg
 `DescriptiveComplexity.Draw.Data.varLeg_run`, the tape and control
 threads given as families with one cover equation per position. -/
 theorem evalSpine_run
@@ -1802,7 +1802,7 @@ theorem evalSpine_run
 
 include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in
-/-- **The evaluation's spine, fully instantiated — threaded**: as
+/-- **The evaluation's spine, fully instantiated – threaded**: as
 `DescriptiveComplexity.Draw.Data.evalSpine_run` with `hsavOf` and
 `htgtOf` **gone**. That is the point of the whole threading: the advance
 refreshes the marker and the mirror but not SAV and TARGET, so a sweep can
@@ -1890,7 +1890,7 @@ include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
 `DescriptiveComplexity.Draw.Data.evalSpine_run_thread` with the gates no
 longer assumed to pass. Each position takes whichever of the three legs
 its own gates call for, and what the caller owes is only the marker, the
-mirror and the bottom mark — all of which the advance sets and every leg
+mirror and the bottom mark – all of which the advance sets and every leg
 leaves alone. This is the form a sweep can use, since it visits junk
 addresses and gated ones alike. -/
 theorem evalSpineB_run

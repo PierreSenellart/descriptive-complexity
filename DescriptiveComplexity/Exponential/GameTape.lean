@@ -38,8 +38,8 @@ sentinel does the same service for a step that runs off the last cell.
 
 The symbol in the cell of the atom `i ā` of region `r` is not a bit but
 `DescriptiveComplexity.valPt b r i ā`: the bit **together with the address of
-the cell**. That is the one decision of the layout that pays for itself several
-times over, and it is available only because a tape here is a function
+the cell**. That is the one decision of the layout that is repaid several times
+over, and it is available only because a tape here is a function
 `A → A` into the *emitted universe*, so a symbol may carry a tuple.
 
 > The machine never has to know where its head is.

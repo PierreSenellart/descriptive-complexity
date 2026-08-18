@@ -37,8 +37,8 @@ over some bounded extension exactly when its pullback holds over the instance â€
 and from it `DescriptiveComplexity.sigmaSONewBddDefinable_iff_sigmaSODefinable`:
 **`âˆƒSO[new, d] = NP`**. Read beside `DescriptiveComplexity.SecondOrderNewPull`,
 which pulls the *unbounded* logic through an interpretation without ever
-eliminating the invention, this is where the bound earns its keep: an
-interpretation cannot invent, so the values have to come from the instance, and
+eliminating the invention, this is what the bound is for: an interpretation
+cannot invent, so the values have to come from the instance, and
 the bound is exactly the promise that they can.
 -/
 

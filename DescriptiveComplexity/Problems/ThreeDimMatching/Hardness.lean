@@ -626,7 +626,7 @@ theorem wheel_other {x c : A} {s : Bool} (hocc : OccIn c x s) (hn : ¬WheelTrue 
   · exact ⟨c', t, hnext, hpq⟩
 
 omit [Finite A] in
-/-- **The gadget is consistent**: neighbouring occurrences of a variable make
+/-- **The gadget is consistent**: neighboring occurrences of a variable make
 the same choice. -/
 theorem wheel_step {x c₀ c : A} {s₀ s : Bool} (hnext : VarNext x c₀ s₀ c s) :
     (WheelTrue M x c s ↔ WheelTrue M x c₀ s₀) := by

@@ -12,8 +12,8 @@ import DescriptiveComplexity.TransitiveClosure
 An expansion carves its universe out of the tagged assignments by a **domain
 sentence**, and that is what makes walking it hard over the base: the immediate
 successor of a point is the least *point* above it, and skipping the tagged
-assignments that fail the domain sentence is not a first-order condition — "no
-point in between" quantifies over block assignments.
+assignments that fail the domain sentence is not a first-order condition – “no
+point in between” quantifies over block assignments.
 
 This file removes the difficulty at the source. `X.trivialize` is the same
 expansion with the same tags and the same block, its domain sentence replaced
@@ -30,7 +30,7 @@ insertion of `DescriptiveComplexity.relativizeTo` together with the renaming of
 the vocabulary. The two are done by one recursion here
 (`DescriptiveComplexity.ExpExpansion.relLift`) rather than composed, so that its
 correctness is a single induction stated directly at the inclusion of the old
-universe into the new — which is what the walk correspondence consumes.
+universe into the new – which is what the walk correspondence consumes.
 
 The inclusion is *definitional*: the trivialized expansion has the same tags and
 the same block, so its points are the same pairs, its order is the same order,
@@ -305,7 +305,7 @@ variable (X)
 
 /-- **The walk of a specification, carried to the trivialized expansion**: every
 formula relativized to the mark, and the mark of the tuple required wherever the
-walk enters a node — at a source, and at the target of a step. -/
+walk enters a node – at a source, and at the target of a step. -/
 noncomputable def relSpec (spec : TCSpec X.E) : TCSpec X.trivialize.E where
   Mode := spec.Mode
   k := spec.k

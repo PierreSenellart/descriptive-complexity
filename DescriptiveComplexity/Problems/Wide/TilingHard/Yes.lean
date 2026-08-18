@@ -18,9 +18,9 @@ reduction emits. Each of the five conditions is one fact about the run –
 * some cell carries an accepting tile, at the row of the accepting
   configuration;
 * the bottom row is the initial tape, with the head at the corner;
-* horizontal neighbours agree, because the head is unique and an arrival stands
+* horizontal neighbors agree, because the head is unique and an arrival stands
   next to it;
-* vertical neighbours agree, because a step writes under the head and leaves
+* vertical neighbors agree, because a step writes under the head and leaves
   every other cell alone.
 -/
 
@@ -192,7 +192,7 @@ theorem tpVert_tileAt
         tpSym_tileAt, hsame]
       rfl
 
-/-! ### Neighbours in one row -/
+/-! ### Neighbors in one row -/
 
 omit [LinearOrder A] [Finite A] in
 /-- **A head or a halt tile stands where the head stands.** -/
@@ -285,9 +285,9 @@ theorem wmRight_iff_right {p : WPoint A} (htr : (wideRegData A).Tr p) :
   · exact htr.elim
   · exact Iff.rfl
 
-/-- **Neighbouring cells of a row agree**: the head is unique, so no two heads
+/-- **Neighboring cells of a row agree**: the head is unique, so no two heads
 stand side by side; and the arrival next to it is on the side the transition
-moves, since the head moves to *the* neighbour in that direction. -/
+moves, since the head moves to *the* neighbor in that direction. -/
 theorem tpHoriz_tileAt (hlin : IsLinOrd (WMLe (A := A)))
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     {cL cR : WPoint A}
@@ -327,7 +327,7 @@ theorem tpHoriz_tileAt (hlin : IsLinOrd (WMLe (A := A)))
     · rw [tileAt_arr_tag hhL hk hprev, if_neg hleft]
     · rw [tpTr_tileAt_head hhR hk, tpState_tileAt_arr hhL hk hprev]
       exact wpAttr_elt hdst
-  · -- an arrival from the left is the left neighbour's head, moving right
+  · -- an arrival from the left is the left neighbor's head, moving right
     intro harr
     obtain ⟨hhR, hk, hnext, hright⟩ :=
       arr_of_tileAt (right := true) (by rw [harr]; rfl)
@@ -345,7 +345,7 @@ theorem tpHoriz_tileAt (hlin : IsLinOrd (WMLe (A := A)))
       exact hright'
     · rw [tpTr_tileAt_head hhL hk, tpState_tileAt_arr hhR hk hnext]
       exact wpAttr_elt hdst
-  · -- an arrival from the right is the right neighbour's head, moving left
+  · -- an arrival from the right is the right neighbor's head, moving left
     intro harr
     obtain ⟨hhL, hk, hnext, hright⟩ :=
       arr_of_tileAt (right := false) (by rw [harr]; rfl)
@@ -576,7 +576,7 @@ theorem tableTiling_tpCol (s r : A → Prop) :
 /-- **An accepting run draws a tiling of the emitted square.** Each of the five
 conditions is one fact about the run: every cell carries a tile because a head
 tile carries the transition the step fires; the bottom row is the initial tape;
-neighbours in a row agree because the head is unique; one row becomes the next
+neighbors in a row agree because the head is unique; one row becomes the next
 because a step writes under the head and leaves every other cell alone; and the
 accepting configuration's own cell carries an accepting tile. -/
 theorem isTiling_tableTiling (hwf : WideWF A)
@@ -608,7 +608,7 @@ theorem isTiling_tableTiling (hwf : WideWF A)
     obtain rfl : x = Sum.inl (tpCol (fun _ : A => True)) := eq_top_of_maxPos hwf.1 hmax
     rw [tableTiling_tpCol]
     exact tpEdgeR_tileAt hwf.1 hstep (maxPos_wpLe hwf.1) _
-  · -- neighbours in a row agree
+  · -- neighbors in a row agree
     intro x x' y hsucc hy
     obtain ⟨s, rfl⟩ := exists_tpCol_of_posn hsucc.1
     obtain ⟨t, rfl⟩ := exists_tpCol_of_posn hsucc.2.1

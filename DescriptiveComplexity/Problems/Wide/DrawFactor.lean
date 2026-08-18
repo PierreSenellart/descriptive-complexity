@@ -13,7 +13,7 @@ A hardness reduction into `DescriptiveComplexity.DWideAcceptSpace` emits a
 machine, and an interpretation has to *write that machine down*: one formula per
 relation symbol and tag tuple, read at the coordinates a transition's payload
 occupies. So each rule owes, of its guard and of the two things it computes,
-that a formula defines them — **the same formula at every instance**, since an
+that a formula defines them – **the same formula at every instance**, since an
 interpretation carries one.
 
 ## The obligation is quantified over the structure
@@ -21,7 +21,7 @@ interpretation carries one.
 The quantifier therefore sits outside the existential, and what it ranges over
 is `DescriptiveComplexity.Draw.Env`: a finite nonempty linearly ordered structure
 of the source vocabulary together with the two designated elements the reduction
-may name — the order's least and greatest. Bundling them into one record is what
+may name – the order's least and greatest. Bundling them into one record is what
 keeps the algebra readable: every statement below has a single extra binder `e`,
 and instance resolution finds the order, the finiteness and the structure inside
 it.
@@ -30,7 +30,7 @@ it.
 
 A guard may ask anything first-order of its data, and it has to: the program
 evaluates a *logic*, so a guard eventually compares two control slots in the
-**order**, or asks a **relation of the source vocabulary** of them — neither of
+**order**, or asks a **relation of the source vocabulary** of them – neither of
 which is a function of the equality pattern of the data. So
 `DescriptiveComplexity.Draw.UGDefinable` carries a formula over the payload
 coordinates, with `DescriptiveComplexity.patSetF` still available as one way of
@@ -46,7 +46,7 @@ value, and `DescriptiveComplexity.SlotVal` builds all three cases.
 
 A rule is written with its pointer and its tracks apart, so the obligations are
 carried in that shape: `UGDefinable` for the guard, `UStDefinable` for the
-pointer it leaves, `UTrDefinable` for the tracks it writes — with
+pointer it leaves, `UTrDefinable` for the tracks it writes – with
 `DescriptiveComplexity.Draw.URuleDefinable` bundling the three together with the
 staticness of its two phases and its direction. That is what travels through the
 program's tower, one statement per rule, composed site by site, with a kit's
@@ -69,7 +69,7 @@ section Slots
 variable {Q W : Type} [Fintype Q] [Fintype W]
 
 /-- **A relation of the source vocabulary, in the ordered expansion**: named,
-because a raw `Sum.inl` is not recognised at the transparency `rw` matches
+because a raw `Sum.inl` is not recognized at the transparency `rw` matches
 at. -/
 abbrev baseSym {L : Language.{0, 0}} {m : ℕ} (r : L.Relations m) :
     (L.sum Language.order).Relations m := Sum.inl r

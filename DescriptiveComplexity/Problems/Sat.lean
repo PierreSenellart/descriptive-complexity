@@ -26,7 +26,7 @@ making every clause true” – and its hardness half is the machine-free,
 Dahlhaus-style ([Dahlhaus 1983][dahlhaus1983reduction]) generic reduction
 `DescriptiveComplexity.sat_hard_of_sigmaSODefinable`
 of `DescriptiveComplexity.Problems.Sat.Hardness`. Other problems' NP-completeness
-proofs derive from it through first-order reductions; see e.g.
+proofs derive from it through first-order reductions; see e.g.,
 `DescriptiveComplexity.Problems.ThreeColorability`.
 -/
 

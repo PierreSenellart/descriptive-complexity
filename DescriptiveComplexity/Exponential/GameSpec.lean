@@ -13,18 +13,18 @@ each of them says. Every one is a **static disjunction over the phase type**,
 which is finite: the phases carry the tags of the two nodes a state holds, so
 naming a tag costs a disjunct rather than a quantifier.
 
-* `univ` — the phases `DescriptiveComplexity.Ph.IsUniv` selects, and nothing
+* `univ` – the phases `DescriptiveComplexity.Ph.IsUniv` selects, and nothing
   else;
-* `won` — a leaf `pre s tx ty 0 pol`, conjoined with that question's kernel. The
+* `won` – a leaf `pre s tx ty 0 pol`, conjoined with that question's kernel. The
   leaf is existential and has **no move**, so a false kernel loses: a player who
   asked for a proof he cannot give is stuck there;
-* `start` — a `startPick` phase whose rounds all hold points
+* `start` – a `startPick` phase whose rounds all hold points
   (`DescriptiveComplexity.ExpExpansion.allRoundsPointF`), which is the invariant
   every node move preserves and every prefix consumes;
-* `move` — one disjunct per pair of a phase and one of the moves
+* `move` – one disjunct per pair of a phase and one of the moves
   `DescriptiveComplexity.ExpExpansion.movesFrom` allows out of it. A move names
   its target phase exactly (`DescriptiveComplexity.atTagTwoF`, so no junk state
-  is reachable), lists the rounds it carries over — kept, shifted, or neither —
+  is reachable), lists the rounds it carries over – kept, shifted, or neither –
   and lists the rounds of the state it enters that it guards to be points.
 
 The one asymmetry worth naming: the move that fills a **play** round guards
@@ -114,8 +114,8 @@ end Rounds
 /-! ### The moves out of a phase -/
 
 /-- A move of the graph game, seen from the phase it leaves: where it goes,
-which rounds it carries over — as pairs (round of the state left, round of the
-state entered) — and which rounds of the state entered it guards to hold a
+which rounds it carries over – as pairs (round of the state left, round of the
+state entered) – and which rounds of the state entered it guards to hold a
 point. -/
 structure MoveTo (T : Type) (Dm n : ℕ) where
   /-- The phase the move enters. -/

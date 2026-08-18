@@ -8,7 +8,7 @@ import DescriptiveComplexity.Exponential.GameNodes
 /-!
 # EXPTIME is second-order alternating reachability
 
-**The theorem**: `DescriptiveComplexity.exptime_eq_soGame` —
+**The theorem**: `DescriptiveComplexity.exptime_eq_soGame` –
 
 > `P ∈ EXPTIME ↔ SOGameDefinable P`,
 
@@ -32,12 +32,12 @@ defining relations are first-order over the expansion, hence *alternating block
 prefixes* over the base (`DescriptiveComplexity.exists_translate`), and a prefix
 is a sequence of moves. `DescriptiveComplexity.ExpExpansion.graphGame` plays that graph:
 
-* `DescriptiveComplexity.ExpExpansion.wins_pre` — the prefix phases evaluate the
+* `DescriptiveComplexity.ExpExpansion.wins_pre` – the prefix phases evaluate the
   six questions;
 * `DescriptiveComplexity.ExpExpansion.target_of_wins` and
-  `DescriptiveComplexity.ExpExpansion.wins_of_winsOn` — the node phases play the
+  `DescriptiveComplexity.ExpExpansion.wins_of_winsOn` – the node phases play the
   graph;
-* `DescriptiveComplexity.ExpExpansion.graphGame_accepts_iff` — putting them
+* `DescriptiveComplexity.ExpExpansion.graphGame_accepts_iff` – putting them
   together at the starting phase.
 
 The one thing that never happens is a *sentence over the base* that quantifies a

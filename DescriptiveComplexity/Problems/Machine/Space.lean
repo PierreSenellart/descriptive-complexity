@@ -18,7 +18,7 @@ configuration is an assignment of a three-variable block
 condition on two consecutive assignments, and acceptance – reachability in the
 configuration graph, since `DescriptiveComplexity.TMData.AcceptsSpace` has no step
 bound – is a transitive closure over those assignments. That is an SO(TC)
-specification on the nose.
+specification, with nothing left to arrange.
 
 This is the same phenomenon as for SUCCINCT-REACH: the problem is the syntactic
 image of the logic, so membership is a transcription rather than a construction.
@@ -234,7 +234,7 @@ noncomputable def succPosF (le : L'.Relations 2) (posn : L'.Relations 1) (x y : 
           (Term.equal (Term.var (Sum.inr 0)) (x.relabel Sum.inl) ⊔
             Term.equal (Term.var (Sum.inr 0)) (y.relabel Sum.inl))))).iAlls (Fin 1)
 
-/-- The head moves to the neighbouring position in the direction the transition
+/-- The head moves to the neighboring position in the direction the transition
 names. -/
 noncomputable def moveF (right h h' posn : L'.Relations 1) (le : L'.Relations 2)
     (τ : L'.Term γ) : L'.Formula γ :=

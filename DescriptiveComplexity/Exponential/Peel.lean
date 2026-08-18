@@ -25,8 +25,8 @@ sits at nesting depth `i` in the kernel, so peeling round `i` first has to move
 it out past the quantifiers that remain
 (`DescriptiveComplexity.altBlockQuant_and_const`,
 `DescriptiveComplexity.altBlockQuant_const_imp`). Both directions need the block
-assignments to be inhabited, which they are —
-`DescriptiveComplexity.SOBlock.botAssign` — and the existential case of the
+assignments to be inhabited, which they are –
+`DescriptiveComplexity.SOBlock.botAssign` – and the existential case of the
 implication needs excluded middle, as relativized quantification always does.
 -/
 

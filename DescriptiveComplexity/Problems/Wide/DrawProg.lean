@@ -76,7 +76,7 @@ structure VarArgs (v : dt.VarIx) where
   wellIGOf : Fin (dt.nIn v) → (dt.SlotIx → A) → Prop
   /-- Clearing the level's polarity flag on a failed inner gate. -/
   setFailIGOf : Fin (dt.nIn v) → (Q → A) → (dt.SlotIx → A) → Q → A
-  /-- The control update entering each inner gate block — the first one
+  /-- The control update entering each inner gate block – the first one
   resets the round's two flags. -/
   enterIGSt : Fin (dt.nIn v) → (Q → A) → (dt.SlotIx → A) → Q → A
   /-- The ∃-levels' gate flag. -/

@@ -12,7 +12,7 @@ The second layer: the block whose assignments are the configurations, and the
 `DescriptiveComplexity.SOGameSpec` an alternating machine is.
 
 * `DescriptiveComplexity.ATMSpace.cfgBlock` has one variable for the state, one
-  for the head and one — **binary** — for the tape, a
+  for the head and one – **binary** – for the tape, a
   `DescriptiveComplexity.Config` carrying a function `A → A`;
 * `DescriptiveComplexity.ATMSpace.isCfgS` says an assignment is a configuration:
   the two unary variables are singletons and the binary one is a function.
@@ -21,7 +21,7 @@ The second layer: the block whose assignments are the configurations, and the
 * the four sentences follow `DescriptiveComplexity.TMData.Step`,
   `DescriptiveComplexity.ATMData.IsUniv`, `DescriptiveComplexity.TMData.Acc` and
   `DescriptiveComplexity.TMData.IsInit`. Every quantifier in them ranges over
-  the **base** — a transition, a state, a head position, a symbol — which is
+  the **base** – a transition, a state, a head position, a symbol – which is
   what keeps them first-order there.
 
 The two promises `DescriptiveComplexity.TMData.WellFormed` and
@@ -418,8 +418,8 @@ end SentenceRealize
 
 /-! ### The step relation
 
-Seven elements of the base are quantified — the transition, the two states, the
-two head positions, the symbol read and the symbol written — and one pair is
+Seven elements of the base are quantified – the transition, the two states, the
+two head positions, the symbol read and the symbol written – and one pair is
 quantified universally, for the cells the head does not touch. Nothing here
 quantifies over a *configuration*, which is what keeps the sentence first-order
 over the base. -/

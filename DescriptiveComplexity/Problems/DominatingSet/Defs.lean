@@ -35,7 +35,7 @@ section Generic
 variable {A : Type}
 
 /-- Some set of vertices dominating the whole graph – every vertex belongs to
-it or has a neighbour in it – is at most as large as the number encoded by the
+it or has a neighbor in it – is at most as large as the number encoded by the
 `Kp`-marked elements. -/
 def DominatesOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
   ∃ D : A → Prop, (∀ v, D v ∨ ∃ u, D u ∧ Adjp u v) ∧

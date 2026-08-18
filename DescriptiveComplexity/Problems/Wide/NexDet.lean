@@ -41,7 +41,7 @@ variable [Language.wide.Structure (Univ A R P K dd)]
 variable [Finite A] [Finite R] [Finite P] [Finite K]
 
 /-- **A program that separates at the phases it can reach is unique from
-there.** The invariant is "the state's phase satisfies `Ph`": a rule fired from
+there.** The invariant is “the state's phase satisfies `Ph`”: a rule fired from
 such a phase lands in one again by `hclosed`, and at such a state the transition
 is pinned by `DescriptiveComplexity.Draw.Table.tr_unique_of_sepOn`. This is what a
 *guessing* program has in place of determinism. -/

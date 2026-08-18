@@ -224,7 +224,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 include hinj helt in
 /-- **The chain's decoding always dispatches**: at a block value with a
 one-hot witness the flags decode its tag, and at any other the default
-branch fires — the totality of the branch checkpoint on *every* block
+branch fires – the totality of the branch checkpoint on *every* block
 value the VAL enumeration produces. -/
 theorem igTagsAre_ixIGateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
@@ -767,7 +767,7 @@ theorem ctlBit_tgf_ixIGateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
   exact hiter a
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
-/-- **Either round flag survives one gate's machinery** — the other
+/-- **Either round flag survives one gate's machinery** – the other
 polarity's included: neither the witness chain nor the branch's domain
 loop writes any flag at all. -/
 theorem ctlBit_roundFlag_ixIGateFam {q : dt.CtlIx}
@@ -934,7 +934,7 @@ include hinj helt in
 one gate exactly when it held before – every earlier block passed – **and**
 the block value's witness is one-hot at the dispatched tag – so the default
 branch always clears – **and** the fold of this block's domain sentence over
-the whole wide enumeration holds, i.e. the tag's domain condition at the
+the whole wide enumeration holds, i.e., the tag's domain condition at the
 decoded assignment. -/
 theorem ctlBit_flag_ixIGate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.ctlBit one

@@ -20,7 +20,7 @@ its greatest value, step that head and reset the ones after it.
 The one thing a machine cannot do directly is ask whether a head is at the
 greatest element: that is not a quantifier-free fact of one head. So the block
 comes with a **marker head** parked at the greatest element, and the test is the
-atom "these two heads are equal" – the same device the quantifier sweep of
+atom “these two heads are equal” – the same device the quantifier sweep of
 `DescriptiveComplexity.HeadEval` uses, here shared by every position of the block.
 
 Accordingly the relation `DescriptiveComplexity.HeadProgram.lexRel` that the gadget runs

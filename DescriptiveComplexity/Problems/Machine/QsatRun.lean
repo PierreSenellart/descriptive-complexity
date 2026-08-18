@@ -242,8 +242,8 @@ theorem reach_descent (hwf : QsatWf A) (hok : TapeOk σ) (hstart : σ posStart =
 /-! ### The evaluation sweep
 
 One pass over the tape for one clause. The state carries the flag, and the flag
-at a position is exactly "some variable's cell already swept satisfies the
-clause"; the pass therefore ends at the far marker with the flag set iff the
+at a position is exactly “some variable's cell already swept satisfies the
+clause”; the pass therefore ends at the far marker with the flag set iff the
 clause holds of the tape. -/
 
 /-- A variable's cell satisfies the clause `c`. -/
@@ -523,14 +523,14 @@ theorem matrixFrom_succ {σ : QV A → QV A} {c c₂ : A} (hcc : QNextCl c c₂)
   · exact h
   · exact hall e he (hcc.2.2.2 e he hlt)
 
-/-- The left marker has a neighbour: the right marker is above it. -/
+/-- The left marker has a neighbor: the right marker is above it. -/
 theorem exists_afterStart (hwf : QsatWf A) :
     ∃ p : QV A, SuccPos (QLe (A := A)) QPosn posStart p := by
   refine TMData.exists_succPos' (M := qsatMachine A) (isLinOrd_qLe A hwf) qPosn_posStart
     fun hmax => ?_
   exact not_qLe_end_start (hmax.2 posEnd qPosn_posEnd)
 
-/-- The right marker has a neighbour: the left marker is below it. -/
+/-- The right marker has a neighbor: the left marker is below it. -/
 theorem exists_beforeEnd (hwf : QsatWf A) :
     ∃ p : QV A, SuccPos (QLe (A := A)) QPosn p posEnd := by
   refine exists_predPos (isLinOrd_qLe A hwf) qPosn_posEnd fun hmin => ?_
@@ -858,7 +858,7 @@ theorem tapeOk_resetSeg (hok : TapeOk σ) (p₀ p : QV A) :
   · obtain ⟨b, f, hbf⟩ := hok x hx
     exact ⟨b, f, (resetSeg_of_not h).trans hbf⟩
 
-/-- Every variable's cell has a neighbour below it. -/
+/-- Every variable's cell has a neighbor below it. -/
 theorem exists_beforeCell (hwf : QsatWf A) {w : A} (hw : IsQVar w) :
     ∃ r : QV A, SuccPos (QLe (A := A)) QPosn r (posCell w) := by
   refine exists_predPos (isLinOrd_qLe A hwf) (qPosn_posCell hw) fun hmin => ?_

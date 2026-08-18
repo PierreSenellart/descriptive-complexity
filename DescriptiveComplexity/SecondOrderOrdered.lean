@@ -106,7 +106,7 @@ private noncomputable def totalS : (L.sum B.withOrder.lang).Sentence :=
   (leVF L B (Sum.inr 0) (Sum.inr 1) ⊔ leVF L B (Sum.inr 1) (Sum.inr 0)).iAlls (Fin 2)
 
 /-- The guard sentence: the order variable is (reflexive, transitive,
-antisymmetric and total, i.e.) a linear order. -/
+antisymmetric and total, i.e.,) a linear order. -/
 noncomputable def linearGuard : (L.sum B.withOrder.lang).Sentence :=
   reflS L B ⊓ (transS L B ⊓ (antisymmS L B ⊓ totalS L B))
 
@@ -214,7 +214,7 @@ sentence – by a `Σₖ₊₁` sentence *for some* linear order, or by a `Πₖ
 sentence *for every* linear order, is definable at that level over the bare
 vocabulary. The closure theorems of the next section are the case where the
 sentence comes from pulling a definition back through an ordered reduction,
-where order-invariance makes "for some" and "for every" agree.
+where order-invariance makes “for some” and “for every” agree.
 
 Stated this way the construction also applies where no single order-invariant
 problem is in sight – to each half of a `DescriptiveComplexity.DPDefinable`

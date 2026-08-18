@@ -87,7 +87,7 @@ P-level analogue of the Cook–Levin theorem, and like it it is machine-free. -/
 theorem HORNSAT_PTIME_complete : PTIME.Complete HORNSAT :=
   ⟨hornSat_mem_PTIME, hornSat_PTIME_hard⟩
 
-/-- **PTIME ⊆ NP**, i.e. `SigmaP 0 ⊆ SigmaP 1`: every SO-Horn definable problem
+/-- **PTIME ⊆ NP**, i.e., `SigmaP 0 ⊆ SigmaP 1`: every SO-Horn definable problem
 reduces to HORN-SAT, which is in NP. This is the level-0 case of
 `DescriptiveComplexity.sigmaP_subset_sigmaP_succ`; it lives here rather than with the
 hierarchy because it goes through the Horn discharge, needing no separate
@@ -97,14 +97,14 @@ theorem PTIME_subset_NP : PTIME ⊆ NP := by
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP
   exact NP.mem_of_orderedReduction f hornSat_mem_NP
 
-/-- **co-PTIME ⊆ coNP**, i.e. `PiP 0 ⊆ PiP 1`: the mirror of
+/-- **co-PTIME ⊆ coNP**, i.e., `PiP 0 ⊆ PiP 1`: the mirror of
 `DescriptiveComplexity.PTIME_subset_NP` under complementation. -/
 theorem coPTIME_subset_coNP : PiP 0 ⊆ PiP 1 := by
   intro L _ P hP
   rw [mem_piP_iff] at hP ⊢
   exact PTIME_subset_NP hP
 
-/-- **PTIME ⊆ coNP**, i.e. `SigmaP 0 ⊆ PiP 1`: complementing the Horn
+/-- **PTIME ⊆ coNP**, i.e., `SigmaP 0 ⊆ PiP 1`: complementing the Horn
 discharge sends an SO-Horn definable problem to the complement of HORN-SAT,
 which is in NP by the unsatisfiability certificate
 `DescriptiveComplexity.hornSat_compl_mem_NP`. -/
@@ -113,7 +113,7 @@ theorem PTIME_subset_coNP : PTIME ⊆ coNP := by
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP
   exact (mem_piP_iff 1 P).mpr (NP.mem_of_orderedReduction f.compl hornSat_compl_mem_NP)
 
-/-- **co-PTIME ⊆ NP**, i.e. `PiP 0 ⊆ SigmaP 1`: the mirror of
+/-- **co-PTIME ⊆ NP**, i.e., `PiP 0 ⊆ SigmaP 1`: the mirror of
 `DescriptiveComplexity.PTIME_subset_coNP`. -/
 theorem coPTIME_subset_NP : PiP 0 ⊆ NP := by
   intro L _ P hP

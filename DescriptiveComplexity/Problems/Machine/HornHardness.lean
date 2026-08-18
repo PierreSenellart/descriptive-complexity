@@ -10,10 +10,10 @@ import DescriptiveComplexity.Problems.HornSat
 /-!
 # The unit-propagation machine of a Horn formula
 
-The program half of `HORNSAT ≤ᶠᵒ[≤] DTMAccept`, stage 4 of the machine bridge:
-the states, symbols and transitions of the deterministic machine computing the
-unit-propagation closure of a CNF instance and verifying it, on the tape laid
-out in `DescriptiveComplexity.Problems.Machine.HornTape`.
+The program half of `HORNSAT ≤ᶠᵒ[≤] DTMAccept`, the deterministic machine
+bridge: the states, symbols and transitions of the deterministic machine
+computing the unit-propagation closure of a CNF instance and verifying it, on
+the tape laid out in `DescriptiveComplexity.Problems.Machine.HornTape`.
 
 ## The program
 
@@ -37,11 +37,11 @@ satisfiability itself (`DescriptiveComplexity.satisfiable_iff_forced_model`).
 The machine is **deterministic everywhere** – there is no guess phase – and
 `DescriptiveComplexity.TMData.Deterministic` for the constructed machine is part of
 the statement, not bookkeeping: it is what makes the image a potential
-yes-instance of `DTMAccept` at all. The instance is read exactly as in stage 3
-(`DescriptiveComplexity.SatCl`, `DescriptiveComplexity.SatPos`, …, imported from
-`DescriptiveComplexity.Problems.Machine.Hardness` together with the clause-order
-machinery), and the only two additions are the element order (rounds walk it)
-and the Horn gate on the accept transition.
+yes-instance of `DTMAccept` at all. The instance is read exactly as by the SAT
+machine (`DescriptiveComplexity.SatCl`, `DescriptiveComplexity.SatPos`, …,
+imported from `DescriptiveComplexity.Problems.Machine.Hardness` together with
+the clause-order machinery), and the only two additions are the element order
+(rounds walk it) and the Horn gate on the accept transition.
 -/
 
 namespace DescriptiveComplexity
@@ -278,12 +278,12 @@ theorem hornMachine_wellFormed : (hornMachine A).WellFormed :=
 
 /-! ### The machine is deterministic
 
-There is no guess phase, so – unlike stage 3 – the whole table is functional:
-the state and the symbol read pin the transition's tag up to promise-exclusive
-alternatives, the tag pins the payload, and the branching destinations and
-writes are separated by their first-order tests. This discharges the
-`DescriptiveComplexity.TMData.Deterministic` promise of the constructed instance,
-which is part of the correctness of the reduction. -/
+There is no guess phase, so – unlike the SAT machine – the whole table is
+functional: the state and the symbol read pin the transition's tag up to
+promise-exclusive alternatives, the tag pins the payload, and the branching
+destinations and writes are separated by their first-order tests. This
+discharges the `DescriptiveComplexity.TMData.Deterministic` promise of the
+constructed instance, which is part of the correctness of the reduction. -/
 
 section Deterministic
 
@@ -738,9 +738,9 @@ end Deterministic
 
 /-! ### The positions of the tape, concretely
 
-The dimension-3 mirror of stage 3's marker and cell lemmas: the left marker is
-the lowest position, cells follow in the order of their elements, the right
-marker closes the chain, and ranks are what the budget compares. -/
+The dimension-3 mirror of the SAT machine's marker and cell lemmas: the left
+marker is the lowest position, cells follow in the order of their elements, the
+right marker closes the chain, and ranks are what the budget compares. -/
 
 section Order
 
@@ -976,7 +976,7 @@ noncomputable def confHMark (M : A → Bool) (m : Bool) (r c : A) (p : HV A) :
 
 open Classical in
 /-- The flag of a verification sweep, leftwards, with the head at `p`: some
-cell strictly above the head satisfies `c` under the marks – stage 3's
+cell strictly above the head satisfies `c` under the marks – the SAT machine's
 `DescriptiveComplexity.chkFlagL` with the marks as valuation. -/
 noncomputable def verFlagL (M : A → Bool) (c : A) (p : HV A) : Bool :=
   decide (∃ y : A, tagTupleLe p (posHCell y) ∧ p ≠ posHCell y ∧ MLit c y (M y))
@@ -1211,7 +1211,7 @@ theorem markTape_posHStart_eq (M : A → Bool) (c : A) (r : HV A) :
     · rw [if_neg hcond, if_neg hcond]
 
 /-- **The return sweep only ever changes the cell under the head**, exactly as
-stage 3's guess sweep: moving the head down brings its own cell into the
+the SAT machine's guess sweep: moving the head down brings its own cell into the
 processed region and nothing else. -/
 theorem markTape_frame' (M : A → Bool) (c : A) {p q r : HV A}
     (hsucc : SuccPos tagTupleLe HPosn q p) (hrne : r ≠ p) :
@@ -1908,7 +1908,8 @@ theorem steps_hVerClauseAccL (M : A → Bool) {c : A} (hc : SatCl c)
 
 /-- **The verification phase accepts**: every remaining clause is satisfied by
 the marks, so the sweeps run through and the machine accepts after the last
-one – stage 3's clause induction, verbatim, with the marks as valuation. -/
+one – the SAT machine's clause induction, verbatim, with the marks as
+valuation. -/
 theorem hVer_accepts (M : A → Bool) (hhorn : AtMostOnePositive A)
     (hsat : ∀ e : A, SatCl e → ∃ y : A, MLit e y (M y)) :
     ∀ c : A, SatCl c →
@@ -2035,10 +2036,10 @@ theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable
 
 /-! ### The machine accepts only Horn-satisfiable instances
 
-Determinism replaces stage 3's run-analysis induction: the run from the unique
-initial configuration *is* the intended trajectory, so it suffices that on a
-non-Horn-satisfiable instance the trajectory never carries an accepting state
-– either because no accept transition exists at all (the Horn gate), or
+Determinism replaces the SAT machine's run-analysis induction: the run from the
+unique initial configuration *is* the intended trajectory, so it suffices that
+on a non-Horn-satisfiable instance the trajectory never carries an accepting
+state – either because no accept transition exists at all (the Horn gate), or
 because the trajectory gets stuck at the first failing verification sweep. -/
 
 /-- No transition applies in an accepting state: once accepted, the machine

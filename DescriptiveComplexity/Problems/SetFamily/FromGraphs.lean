@@ -246,7 +246,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 
 /-- Two distinct vertices have intersecting sets of incident edges exactly
 when they are adjacent (in either direction). This is the whole content of
-the reduction; note that only *ground elements*, i.e. genuine edges, count as
+the reduction; note that only *ground elements*, i.e., genuine edges, count as
 witnesses of an intersection. -/
 theorem exists_elem_mem_both_iff {u v : A} (huv : u ≠ v) :
     (∃ x : edgeIncidenceInterp.Map A, SSElem x ∧ SSMem x (diagPt u) ∧ SSMem x (diagPt v)) ↔

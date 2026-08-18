@@ -31,7 +31,7 @@ outright.
 
 This is the Lean-level half of the converse translation from the Krom fragment
 to FO(TC): what remains after it is to *express* the implication graph as a
-`DescriptiveComplexity.TCSpec`, i.e. to build the transition formulas that walk it. The
+`DescriptiveComplexity.TCSpec`, i.e., to build the transition formulas that walk it. The
 half proved here is where the mathematics is; the other half is formula
 plumbing.
 -/

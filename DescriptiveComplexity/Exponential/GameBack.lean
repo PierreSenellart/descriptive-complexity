@@ -10,7 +10,7 @@ import DescriptiveComplexity.Exponential.GameRun
 
 The backward simulation, for the phases that settle a question. Where the
 forward direction *builds* a play, this one *reads one back*, so the two players
-change roles: an existential phase now has to be case-analysed (the play chose
+change roles: an existential phase now has to be case-analyzed (the play chose
 one successor, and we must see what that choice proves) and a universal one may
 be instantiated at the successors we care about.
 

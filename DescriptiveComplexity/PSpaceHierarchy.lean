@@ -15,7 +15,7 @@ space (`DescriptiveComplexity.PH_subset_PSPACE`). A `Σₖ` sentence is not a wa
 so this is not a syntactic inclusion; it is two closure properties of SO(TC) put
 together, alternated along the quantifier prefix:
 
-* **complement** (`DescriptiveComplexity.SOTCDefinable.compl`, i.e.
+* **complement** (`DescriptiveComplexity.SOTCDefinable.compl`, i.e.,
   `PSPACE = coPSPACE`, proved in `DescriptiveComplexity.PSpaceCompl`), which turns
   a universal block into an existential one;
 * **prefixing an existential block**

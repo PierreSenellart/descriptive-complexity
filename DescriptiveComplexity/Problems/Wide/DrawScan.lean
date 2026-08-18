@@ -269,7 +269,7 @@ background. Two consecutive passes walk *different* tracks, so the after-tape
 of one has to be read as the before-tape of the other: the walked track moves
 into the background and a background slot becomes the walked track. That is one
 equality of presentations, provable once – the only condition being that the
-slot about to be walked satisfies the register discipline, i.e. is the
+slot about to be walked satisfies the register discipline, i.e., is the
 `DescriptiveComplexity.bitAtOf` of some track (set nowhere off the register
 file). -/
 

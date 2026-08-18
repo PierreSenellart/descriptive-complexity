@@ -137,7 +137,7 @@ end Ix
 
 variable (A) in
 /-- **The successor of an element in the instance's order**: the least element
-strictly above it, i.e. `DescriptiveComplexity.IxSucc` at the diagonal index. -/
+strictly above it, i.e., `DescriptiveComplexity.IxSucc` at the diagonal index. -/
 def WMSucc (u u' : A) : Prop := IxSucc (WMLe (A := A)) u u'
 
 variable [Finite A]

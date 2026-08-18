@@ -23,8 +23,8 @@ it reads and the one it writes, and the direction it moves in.
 rules, and `P`, the phases – which are the two halves of
 `DescriptiveComplexity.Draw.Tag`. A transition is therefore an element
 `(ctrl r, pad w)`: its rule is its **tag** and its tuple carries only the rule's
-*data*, the elements the rule acts at. That is the library's "index rules by
-attribute values, not by the transition" read at the level of the layout, and it
+*data*, the elements the rule acts at. That is the library's “index rules by
+attribute values, not by the transition” read at the level of the layout, and it
 is what will make every defining formula of the interpretation a decision taken
 when the formula is *built* – the source phase, the destination phase and the
 direction of a rule are functions of its tag alone.
@@ -68,7 +68,7 @@ open FirstOrder
 open Language Structure
 
 /-- **The universe the reduction emits**: tagged tuples, one block per tag. An
-`abbrev`, so that it is the interpreted universe on the nose and a pair may be
+`abbrev`, so that it is literally the interpreted universe and a pair may be
 destructured without ceremony. -/
 abbrev Univ (A R P K : Type) (dd : ℕ) : Type := Tag R P K × (Fin dd → A)
 
@@ -182,7 +182,7 @@ def IsAcc : Univ A R P K dd → Prop := fun q =>
 def IsBlank : Univ A R P K dd → Prop := fun a => a = symElt T.zero T.blankPl
 
 /-- **The input channel**: the cell of an element the table writes for holds the
-mark the table gives it. Functional on the nose, and total exactly on the
+mark the table gives it. Functional outright, and total exactly on the
 elements the table marks. -/
 def Inp : Univ A R P K dd → Univ A R P K dd → Prop :=
   fun x a => T.Marked x ∧ a = symElt T.zero (T.markPl x)

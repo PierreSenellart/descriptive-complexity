@@ -145,7 +145,7 @@ variable {A : Type} [LinearOrder A] [Finite A]
 /-- **A set of boundaries at a constant gap `g`**: the least position is one,
 every boundary is below the top position, a boundary `g` further on is one, and
 every boundary other than the least has one `g` below it. The last condition is
-the load-bearing one – without it the set could start anywhere. -/
+what pins the set down – without it it could start anywhere. -/
 def IsBlockSet (g B : A) : Prop :=
   (∀ z : A, orank z = 0 → BitIx z B) ∧
     (∀ b : A, BitIx b B → IsLowIx b) ∧

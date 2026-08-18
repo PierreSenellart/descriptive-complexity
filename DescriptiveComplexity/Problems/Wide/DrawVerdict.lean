@@ -20,7 +20,7 @@ two facts a reduction's tape maintains:
 
 Two statements: `accVerdict_leafP`, at any variable, whose right-hand side
 is the prefix over `DescriptiveComplexity.Draw.Data.leafP` at the
-address's blocks — the form the *output* sentence's leg also needs — and
+address's blocks – the form the *output* sentence's leg also needs – and
 `accVerdict_next`, its specialization at a fixed-point variable, whose
 right-hand side is `d.next` itself.
 
@@ -87,7 +87,7 @@ variable (semOf : ∀ a : ιV,
 omit [Finite dt.KIx] in
 /-- **The machinery's verdict is the prefix over the leaf**: every abstract
 input of `DescriptiveComplexity.Draw.Data.accVerdict_varFM_qfValue`
-discharged — the flags by
+discharged – the flags by
 `DescriptiveComplexity.Draw.Data.ctlBit_roundFX_pass_iff`, the pass by
 `DescriptiveComplexity.Draw.Data.roundPass_of_polarities`, the valuation
 and its pack by `DescriptiveComplexity.Draw.Data.passW`, the stage reads
@@ -251,7 +251,7 @@ at the stage the tracks hold: the prefix of
 `DescriptiveComplexity.Draw.Data.accVerdict_leafP` read through
 `DescriptiveComplexity.Draw.Data.altQuantFrom_leafP_out`. The output
 variable is nullary, so the working address's outer blocks encode the empty
-tuple and there is nothing to ask of them — which is why this is the one
+tuple and there is nothing to ask of them – which is why this is the one
 verdict a reduction can take at the *empty* address. -/
 theorem accVerdict_out
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))

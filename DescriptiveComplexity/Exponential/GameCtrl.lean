@@ -35,7 +35,7 @@ splitAll    ∀ { verify univ
 allStep     ∃ { verify ¬move ; play at !r }
 ```
 
-Three conventions, all forced, and all the ones half A settled:
+Three conventions, all forced:
 
 * **`play` is existential** and chooses which clause of
   `DescriptiveComplexity.SOGameSpec.Wins` it claims; a false claim loses

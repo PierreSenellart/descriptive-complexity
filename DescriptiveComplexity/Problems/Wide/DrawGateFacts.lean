@@ -8,27 +8,27 @@ import DescriptiveComplexity.Problems.Wide.DrawInstRound
 /-!
 # The gates' facts, from the marks
 
-What the gate machinery asks — the file tests' per-cell questions, the
-witness one-hotness, the domain conditions — read off
+What the gate machinery asks – the file tests' per-cell questions, the
+witness one-hotness, the domain conditions – read off
 `DescriptiveComplexity.Draw.Data.back`'s marks and answered by the
 encoding. The marks of a register cell spell the cell's own coordinates
 (`name`), its padding (`pdd`) and its tag's block (`blk`), so a file
 test's question is a statement about the cell, and a block value's
 answers are statements about the value:
 
-* `wellShapedG_back_iff` / `igTest_iff` — the per-cell question **is**
+* `wellShapedG_back_iff` / `igTest_iff` – the per-cell question **is**
   «if the cell is of the gated block and in the register, its tuple is a
   witness or a member shape», at MIRROR and at VAL;
 * `testOf_of_encMap`, `wit_of_encMap`, `domHolds_of_encMap`,
-  `dspTagOf_encMap` — at a block value that **is** an encoding, every
+  `dspTagOf_encMap` – at a block value that **is** an encoding, every
   gated hypothesis of `DescriptiveComplexity.Draw.Data.varMachine_run`
   holds, and the dispatch is the point's tag;
-* `gate_trichotomy` — every block value is an encoding, has an
+* `gate_trichotomy` – every block value is an encoding, has an
   ill-shaped register cell, or is all-shaped with the one-hot-and-domain
   conjunct failing at the dispatched tag: the three legs
   `DescriptiveComplexity.Draw.Data.varLeg_run` /
   `varLegFail_run` / `varLegUngated_run` are exhaustive;
-* `igPassP_iff_isEnc` — the inner loop's per-level verdict **is**
+* `igPassP_iff_isEnc` – the inner loop's per-level verdict **is**
   `DescriptiveComplexity.Draw.IsEnc` of the level's block value, the
   marks-to-shapes bridge the two-flag characterization was stated
   against.
@@ -280,7 +280,7 @@ omit [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
 /-- **At an encoding the domain condition holds of the decoded
-assignment** — the point carries it. -/
+assignment** – the point carries it. -/
 theorem domHolds_of_encMap (hzo : zero ≠ one)
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
@@ -363,9 +363,9 @@ theorem igTest_of_encMap (hzo : zero ≠ one)
   · exact Or.inr ⟨i, w, h⟩
 
 omit [L.IsRelational] [Finite R] [Finite P] in
-/-- **The inner loop's per-level verdict is the gate**: a level passes —
+/-- **The inner loop's per-level verdict is the gate**: a level passes –
 its file test, the one-hot witness at the dispatched tag and the domain
-condition there — exactly when its block value **is** an encoding. The
+condition there – exactly when its block value **is** an encoding. The
 marks-to-shapes bridge of the two-flag characterization. -/
 theorem igPassP_iff_isEnc (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))

@@ -11,8 +11,8 @@ import DescriptiveComplexity.OrderWalk
 
 An exponential expansion's sentences see the order of the structure they expand
 (`DescriptiveComplexity.ExpExpansion`). To compose an expansion with anything
-that reads *its* order — which is what a complete problem for an exponential
-class needs — that order must in turn be **definable by a first-order sentence
+that reads *its* order – which is what a complete problem for an exponential
+class needs – that order must in turn be **definable by a first-order sentence
 over the base**. It is, and this file builds it: the analogue, one level up, of
 `DescriptiveComplexity.tagTupleOrder` and
 `DescriptiveComplexity.FOInterpretation.ordExtend`.
@@ -20,15 +20,15 @@ over the base**. It is, and this file builds it: the analogue, one level up, of
 ## The order
 
 Points of the expanded universe are tagged block assignments. Order them by
-tag first — statically, by an arbitrary linear order on the finite tag type —
+tag first – statically, by an arbitrary linear order on the finite tag type –
 and then by reading an assignment as a **binary number**: `ρ` is below `σ` when,
 at the least atom where they differ, `σ` holds and `ρ` does not.
 
-"Atom" here means a relation variable of the block together with a tuple of
+“Atom” here means a relation variable of the block together with a tuple of
 elements. Arities differ from variable to variable, so the atoms are indexed by
 a dependent sum; this file avoids it by **padding** every tuple to the block's
 maximal arity (`DescriptiveComplexity.blockArityBound`), which turns the index
-type into a plain product `B.ι × (Fin D → A)` — exactly the shape
+type into a plain product `B.ι × (Fin D → A)` – exactly the shape
 `DescriptiveComplexity.tagTupleOrder` already orders. Padding loses nothing:
 an assignment is determined by the atoms it makes true
 (`DescriptiveComplexity.SOBlock.atomSet_injective`), since every tuple of the
@@ -36,13 +36,13 @@ relevant arity is the prefix of some padded tuple.
 
 ## Layers
 
-1. `DescriptiveComplexity.setLinearOrder` — the binary-number order on the
+1. `DescriptiveComplexity.setLinearOrder` – the binary-number order on the
    subsets of any finite linearly ordered index type, obtained from Mathlib's
    `Pi.Lex` on functions to `Bool`, so that transitivity and totality are
    inherited rather than proved.
-2. `DescriptiveComplexity.SOBlock.atomSet` — an assignment read as such a
+2. `DescriptiveComplexity.SOBlock.atomSet` – an assignment read as such a
    subset, and its injectivity.
-3. `DescriptiveComplexity.ExpExpansion.mapLinearOrder` — the two put together
+3. `DescriptiveComplexity.ExpExpansion.mapLinearOrder` – the two put together
    with the tag, and transported to the subtype `X.Map A`.
 
 The defining *formula* and its realization lemma live in

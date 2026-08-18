@@ -17,7 +17,7 @@ A **tile system** is a set of tiles with two compatibility relations – which
 tile may stand immediately to the right of which, and which immediately above
 which – a description of the bottom row, and a set of accepting tiles. The
 question is whether the square whose sides are the *positions* of the instance
-can be tiled: every cell carries a tile, neighbours are compatible, the bottom
+can be tiled: every cell carries a tile, neighbors are compatible, the bottom
 row and the two edge columns are as described, and some cell carries an
 accepting tile.
 
@@ -30,15 +30,15 @@ sits one exponential up (`DescriptiveComplexity.Problems.Wide.Tiling`).
 ## Why the tiling and not the machine
 
 A tile system has no head, no clock and no time: its conditions are *local* in
-two dimensions and quantify over neighbours alone. That is what makes it the
+two dimensions and quantify over neighbors alone. That is what makes it the
 cheap second complete problem of a class whose first one is a machine – the
 work is a drawing, not an evaluator.
 
 ## The shape of the conditions
 
 The two edge columns carry tiles marked `ledge` and `redge`, which is what the
-border colors of a classical tiling problem do: a condition on neighbours says
-nothing about the column at either end, where one neighbour is missing.
+border colors of a classical tiling problem do: a condition on neighbors says
+nothing about the column at either end, where one neighbor is missing.
 
 The bottom row is described by a relation `first p t` rather than listed,
 exactly as a machine's initial tape is described by `inp p a`: a first-order
@@ -146,9 +146,9 @@ structure TileData (A : Type) where
   Tile : A → Prop
   /-- Being an accepting tile. -/
   Acc : A → Prop
-  /-- The right neighbour may carry this tile. -/
+  /-- The right neighbor may carry this tile. -/
   Horiz : A → A → Prop
-  /-- The upper neighbour may carry this tile. -/
+  /-- The upper neighbor may carry this tile. -/
   Vert : A → A → Prop
   /-- The bottom row's cell in this column may carry this tile. -/
   First : A → A → Prop
@@ -175,12 +175,12 @@ def FirstTile (x t : A) : Prop :=
 
 /-- **A tiling of the square**: every cell carries a tile, the bottom row is one
 the description allows, the two edge columns carry tiles allowed there,
-horizontal and vertical neighbours are compatible, and some cell carries an
+horizontal and vertical neighbors are compatible, and some cell carries an
 accepting tile.
 
 The two **edge conditions** are what the classical border colors of a tiling
-problem do. A condition on neighbours says nothing about a column with no
-neighbour on one side, so without them a tile whose meaning is “something is
+problem do. A condition on neighbors says nothing about a column with no
+neighbor on one side, so without them a tile whose meaning is “something is
 arriving from the left” could stand in the leftmost column, justified by nothing;
 a machine drawn as a tiling would then grow a head out of nowhere. -/
 def IsTiling (τ : A → A → A) : Prop :=

@@ -234,7 +234,7 @@ theorem accepts_toSpec_iff : spec.toSpec.Accepts A ↔ spec.Accepts A := by
 
 end SOTCSpecFree
 
-/-! ### The order symbol, eliminated in favour of a state component
+/-! ### The order symbol, eliminated in favor of a state component
 
 The hard direction. The block of the walk is extended by one binary relation
 variable (`DescriptiveComplexity.SOBlock.withOrder`, shared with the

@@ -241,7 +241,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord htop hbot hv hvi hwkSt
   hcompatOf htagOf hgap hwP hcostR in
 omit hord in
 /-- **The gates' leg at a junk address**: the walk-back, the passing
-prefix, the failing block, and the walk-back at the verdict checkpoint —
+prefix, the failing block, and the walk-back at the verdict checkpoint –
 the fail store applied, the flag clear. -/
 theorem ixVarGatesFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
@@ -357,7 +357,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord htop hbot hv hvi hwkSt
 omit hord in
 /-- **The whole machinery at a junk address**: entry, the failing gates,
 and the verdict checkpoint's clear flag routing straight to the exit with
-the stage slot erased — the VAL loop never entered. -/
+the stage slot erased – the VAL loop never entered. -/
 theorem ixVarMachineFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
     {u₀ : I} (hfail : ¬TestOf ℓ₀ u₀)
@@ -423,8 +423,8 @@ theorem ixVarMachineFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
     hflagF hns hoff hupd
 
 /-- **The control after a completed but failing gate sequence**: the whole
-gates' thread — every block's file test passed and every block's machinery
-ran — with the flag clear because some block encoded no point. -/
+gates' thread – every block's file test passed and every block's machinery
+ran – with the flag clear because some block encoded no point. -/
 noncomputable def ixUngatedCtl (f₀ : dt.CtlIx → A) : dt.CtlIx → A :=
   dt.ixGatesFs F PR.zero PR.one hhasP vi st v
     (fun ℓ => Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ))
@@ -441,11 +441,11 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord htop hbot hv hvi hwkSt
   hcompatOf htagOf hgap hwP hcostR in
 omit hord in
 /-- **The whole machinery at a shaped but ungated address**: every block
-passes its file test — the total dispatch carries each block's machinery
-through — but some block encodes no point, its witness not one-hot at the
+passes its file test – the total dispatch carries each block's machinery
+through – but some block encodes no point, its witness not one-hot at the
 dispatched tag or its domain sentence failing. The gates complete with the
 flag clear, and the verdict checkpoint routes straight to the exit with
-the stage slot erased — the VAL loop never entered. The third landing an
+the stage slot erased – the VAL loop never entered. The third landing an
 arbitrary address makes, beside the gated and the shape-failing ones. -/
 theorem ixVarMachineUngated_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (ℓ₀ : Fin (dt.arOf vi))
@@ -633,8 +633,8 @@ variable (semOf : ∀ a : ιV,
 
 variable (v) in
 /-- **The exit control of one VAL round**, at an entry control: the inner
-gates' thread over the round's register, then — at a passing round only,
-both flags set — the matrix thread on its output. -/
+gates' thread over the round's register, then – at a passing round only,
+both flags set – the matrix thread on its output. -/
 noncomputable def ixRoundFX (q : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
   dt.ixRoundCtl (elt := elt) F (hinj := hinj) (hhas := hhasP) (helt := heltP)
     (hzo := PR.zero_ne_one) vi (dt.ixRoundSt st (mV a)) v (semOf a) q
@@ -690,7 +690,7 @@ include hlin hord hinj hix hmono hup hblkP in
 /-- **The VAL loop maintains the fold's contributions**: at every round of
 the enumeration, the accumulator vector of the control thread reads the
 `accCVal` contributions of the inner quantifier prefix at the blocks of the
-register's **address** — the invariant that turns the machinery's exit
+register's **address** – the invariant that turns the machinery's exit
 verdict into the prefix's value. -/
 theorem ixReadAcc_varFM
     {a₀ : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
@@ -956,7 +956,7 @@ theorem ixReadAcc_varFM
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] in
 include hlin hord hinj hix hmono hup hblkP in
 /-- **The machinery's verdict is the inner prefix's value**: at the
-exhausted register — every inner block full — the exit fold's bit is the
+exhausted register – every inner block full – the exit fold's bit is the
 alternating quantifier prefix over the inner blocks, applied to the
 matrix's value. -/
 theorem ixAccVerdict_varFM
@@ -1029,7 +1029,7 @@ include hlin hinj heltP in
 /-- **A round's leaf is the matrix's realization**: with the round's
 semantic pack built by `ixMkKindSem` from the encoded valuation, the fold's
 leaf after the matrix pass is the quantifier-free matrix's value at that
-valuation — the concrete form of the invariant's `hleaf` hypothesis. -/
+valuation – the concrete form of the invariant's `hleaf` hypothesis. -/
 theorem ixPostLeaf_roundFX [LinearOrder (dt.X.Map A)]
     (σ : dt.d.B.Assignment (dt.X.Map A)) (a : ιV)
     (wa : Fin (dt.nOf vi) → dt.X.Map A)
@@ -1065,7 +1065,7 @@ by `ixMkKindSem` from an encoded valuation, the machinery's exit bit at the
 exhausted register is the alternating quantifier prefix over the inner
 blocks, applied to the quantifier-free matrix's realization. The remaining
 interface (`hPs`) is the well-definedness of the matrix's value as a
-function of the blocks alone — the encoding layer's obligation. -/
+function of the blocks alone – the encoding layer's obligation. -/
 theorem ixAccVerdict_varFM_qfValue [LinearOrder (dt.X.Map A)]
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
@@ -1253,15 +1253,15 @@ end Threads
 A round's exit state is its entry state unless the round's matrix ran a
 stage atom, which normalizes SAV and TARGET
 (`DescriptiveComplexity.Draw.Data.ixRoundEndSt`). Whether it ran at all is
-the gates' verdict, read off the control *entering* the round — so the two
+the gates' verdict, read off the control *entering* the round – so the two
 have to be iterated **together**, one pair per round, exactly as the
 spine's nodes are one scale up.
 
 What is threaded is not the state but the **two scratch registers**
 (`DescriptiveComplexity.Draw.Data.ixRoundEndSt_eq`): every other register
 is the machinery's entry state's, definitionally. That is what keeps the
-semantic packs available — a pack reads the tape state through the levels'
-register sets, i.e. through the mirror and VAL alone, so one family
+semantic packs available – a pack reads the tape state through the levels'
+register sets, i.e., through the mirror and VAL alone, so one family
 indexed by the two registers serves every round, and it can actually be
 built, which a family over arbitrary states could not be. -/
 
@@ -1290,7 +1290,7 @@ variable (semT : ∀ (p : IxScratch dt A R P I) (a : ιV),
 variable (v) in
 /-- **The VAL loop's thread**: the two scratch registers beside the
 control, the fold's start at the cleared register, and at each cover the
-round's exit — the store taken against the background the round *ends*
+round's exit – the store taken against the background the round *ends*
 in. -/
 noncomputable def ixVarPairT (fG : dt.CtlIx → A) :
     ιV → IxScratch dt A R P I × (dt.CtlIx → A) :=
@@ -1322,19 +1322,19 @@ noncomputable def ixVarSTT (fG : dt.CtlIx → A) (a : ιV) : IxScratch dt A R P 
   (dt.ixVarPairT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).1
 
 variable (v) in
-/-- The tape family of the VAL loop — the state each round is entered
+/-- The tape family of the VAL loop – the state each round is entered
 in. -/
 noncomputable def ixVarStT (fG : dt.CtlIx → A) (a : ιV) : TapeSt dt A R P I :=
   dt.ixVarRdSt st (dt.ixVarSTT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a) (mV a)
 
 variable (v) in
-/-- The control family of the VAL loop, threaded — the twin of
+/-- The control family of the VAL loop, threaded – the twin of
 `DescriptiveComplexity.Draw.Data.ixVarFM`. -/
 noncomputable def ixVarFMT (fG : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
   (dt.ixVarPairT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).2
 
 variable (v) in
-/-- **The state one round ends in** — the next round's entry state at a
+/-- **The state one round ends in** – the next round's entry state at a
 cover, and the loop's exit state at the top. -/
 noncomputable def ixVarStE (fG : dt.CtlIx → A) (a : ιV) : TapeSt dt A R P I :=
   dt.ixRoundEndSt (elt := elt) F PR.zero PR.one hhasP vi
@@ -1342,7 +1342,7 @@ noncomputable def ixVarStE (fG : dt.CtlIx → A) (a : ιV) : TapeSt dt A R P I :
     (dt.ixVarFMT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a)
 
 variable (v) in
-/-- **The exit control of one VAL round, threaded** — the twin of
+/-- **The exit control of one VAL round, threaded** – the twin of
 `DescriptiveComplexity.Draw.Data.ixRoundFX`, at the state the round's
 atoms actually run at. -/
 noncomputable def ixVarFXT (fG : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
@@ -1352,7 +1352,7 @@ noncomputable def ixVarFXT (fG : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
     (dt.ixVarFMT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a)
 
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
-/-- **The registers a round leaves alone ride the whole loop** — by
+/-- **The registers a round leaves alone ride the whole loop** – by
 construction now, since only the two scratch ones are threaded. -/
 theorem ixVarStT_fields (fG : dt.CtlIx → A) (a : ιV) :
     (dt.ixVarStT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).wk = st.wk ∧
@@ -1503,7 +1503,7 @@ noncomputable def ixSemCastT (p : IxScratch dt A R P I) (a : ιV)
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [LinearOrder ιV] [Finite ιV] in
 /-- **One threaded round is the unthreaded round**: a round's own state is
 the round state up to SAV and TARGET, its matrix threads those two further,
-and the pack rides along — three transports that compose to none. -/
+and the pack rides along – three transports that compose to none. -/
 theorem ixRoundCtlT_semCastT (hreg : ¬∃ u : I, v = F.cell u)
     (p : IxScratch dt A R P I) (a : ιV) (q : dt.CtlIx → A) :
     dt.ixRoundCtlT (elt := elt) F (hinj := hinj) (hhas := hhasP) (helt := heltP)
@@ -1611,7 +1611,7 @@ variable (hDom : ∀ ℓ : Fin (dt.arOf vi),
           Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx))))
 
 variable (v) in
-/-- **The control the gates leave**, at the reduction's own budgets — what
+/-- **The control the gates leave**, at the reduction's own budgets – what
 both forms of the machinery's run start their VAL loop from. -/
 noncomputable def ixVarFG (f₀ : dt.CtlIx → A) : dt.CtlIx → A :=
   dt.ixGatesFs F PR.zero PR.one hhasP vi st v
@@ -1752,7 +1752,7 @@ theorem ixVarMachine_reachesIn
   · -- the thread starts at the fold's start
     exact iterOrd_bot hbotV
   · -- the round, per VAL content: the inner gates, the branch and the
-    -- matrix — no semantic hypothesis, so every register the loop
+    -- matrix – no semantic hypothesis, so every register the loop
     -- enumerates is covered
     intro a
     exact ixRound_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP) (hix := hix)
@@ -1789,7 +1789,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi
   he₀ hmono hup hvh hxdUse hgap hwP hwR hwK hcostR
   hwkSt hcompatOf hbotV
   htopV hmV0 hIncr hTestT hTestF hmir hbotSt hDom in
-/-- **One variable's machinery, fully instantiated — threaded**: as
+/-- **One variable's machinery, fully instantiated – threaded**: as
 `DescriptiveComplexity.Draw.Data.ixVarMachine_run` with no boundary
 discipline assumed, so it applies at every address of a sweep and not
 only at the one whose SAV and TARGET the advance happens to have left

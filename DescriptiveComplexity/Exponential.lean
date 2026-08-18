@@ -94,7 +94,7 @@ removed from both, the expansion guessing it into its block
 equalities on the second line are theorems
 (`DescriptiveComplexity.EXPTIME_eq_PTIME_exp`,
 `DescriptiveComplexity.EXPSPACE_eq_PSPACE_exp`) that hold because the library
-already proves FO(≤, LFP) = PTIME and FO(≤, PFP) = PSPACE: they are those two
+proves FO(≤, LFP) = PTIME and FO(≤, PFP) = PSPACE: they are those two
 capture theorems read on the expanded universe.
 
 No third-order syntax is introduced and none is needed: the expansion has
@@ -119,14 +119,14 @@ instead of being reproved:
   SO(PFP)**).
 
 The same construction one operator up is `DescriptiveComplexity.Exponential.Game`:
-a **second-order alternating game** — four first-order sentences over a block,
+a **second-order alternating game** – four first-order sentences over a block,
 saying which assignments are universal, which win outright, which start and
-which moves are legal — is the AND/OR graph `DescriptiveComplexity.GAME` reads
+which moves are legal – is the AND/OR graph `DescriptiveComplexity.GAME` reads
 on the expansion whose points are its states, whence
 `DescriptiveComplexity.SOGameDefinable.mem_EXPTIME`: **SO-GAME ⊆ SO(LFP)**, the
 second-order shadow of `GAME ∈ PTIME`. It is the way into EXPTIME that needs no
 succinctness argument, and what an alternating space-bounded machine will
-consume — its configurations being the assignments of a block with one variable
+consume – its configurations being the assignments of a block with one variable
 for the state, one for the head and one for the tape.
 
 Two normal forms prepare the machine that will consume it, by giving a
@@ -140,7 +140,7 @@ formula determined by the claimed truth values of finitely many block atoms**
 arguments sit among the matrix's variables). Together they say that a
 specification's sentences need no evaluator: the prefix is moves, the claims
 are one nondeterministic move and finitely many tape lookups, and what is left
-is a condition on the source structure, i.e. a guard of the transition
+is a condition on the source structure, i.e., a guard of the transition
 relation. `DescriptiveComplexity.exists_questionData` packages the composite as
 the interface such a machine consumes, for each of the six questions
 (`DescriptiveComplexity.GameQuestion`) it has to answer – the four sentences of
@@ -186,7 +186,7 @@ state of the game is a winning configuration of the machine
 game does (`DescriptiveComplexity.altAcceptsSpace_of_accepts`) – the starting
 position being *guessed* by the very first sweep, since the initial tape is
 empty. `DescriptiveComplexity.Exponential.GameBack` begins the converse, where
-the two players exchange roles: an existential phase has to be case-analysed
+the two players exchange roles: an existential phase has to be case-analyzed
 and a universal one instantiated, so every step lemma is used in the other
 direction. Its content is the phases that settle a question –
 `DescriptiveComplexity.pre_of_altWin`, `claim_of_altWin`, `check_of_altWin`,
@@ -218,9 +218,9 @@ back by monotonicity.
 
 ## The expanded universe is ordered, definably
 
-An expansion's own universe carries a linear order — tag first, then the
+An expansion's own universe carries a linear order – tag first, then the
 assignment read as a **binary number**, `ρ` below `σ` at the least atom where
-they differ (`DescriptiveComplexity.ExpExpansion.mapLinearOrder`) — and that
+they differ (`DescriptiveComplexity.ExpExpansion.mapLinearOrder`) – and that
 order is itself **first-order definable over the base**
 (`DescriptiveComplexity.SOBlock.realize_ordLtF`), because a padded atom is one
 of finitely many relation variables together with a tuple of *base* elements.
@@ -231,7 +231,7 @@ expanded vocabulary and defines it that way, exactly as
 This is what any composition reading an expansion's order needs. It is not by
 itself enough for such a composition: an interpretation's *quantifiers* range
 over the points of the expanded universe, hence over block assignments, which
-is a second-order condition over the base — see `ROADMAP.md` §3.
+is a second-order condition over the base – see the translation lemma below.
 
 ## The translation lemma
 
@@ -241,7 +241,7 @@ over the points of `X.Map A` ranges over block assignments, which is a
 second-order quantifier over `A`. That is the type-lowering reading of
 [Henkin 1950][henkin1950completeness] made into a theorem, and the honest
 statement of what keeps an interpretation from being composed *after* an
-expansion (`ROADMAP.md` §3).
+expansion.
 
 A quantified point is a block extended by tag bits
 (`DescriptiveComplexity.SOBlock.withTag`) satisfying a guard
@@ -250,7 +250,7 @@ sentences are read at chosen rounds of the prefix
 (`DescriptiveComplexity.ExpExpansion.roundLHom`); the three atoms and the
 quantifier-free matrix translate
 (`DescriptiveComplexity.ExpExpansion.realize_translQF`); and one quantifier
-peels into two blocks — one `∃`, one `∀`, of which one is real and the other
+peels into two blocks – one `∃`, one `∀`, of which one is real and the other
 vacuous, so that the prefix alternates strictly as
 `DescriptiveComplexity.SORealize` requires
 (`DescriptiveComplexity.ExpExpansion.altBlockQuant_peel_step`). The assembly is
@@ -259,7 +259,7 @@ the translated sentence produced *existentially*: the inequalities bounding the
 rounds a subformula needs are then in scope exactly where its round indices are
 built, so no fallback round and no cast appears anywhere.
 
-## The gate: `PSPACE = NL.exp`
+## The operator pinned: `PSPACE = NL.exp`
 
 `DescriptiveComplexity.PSPACE_eq_NL_exp` pins the operator at the one level
 where the library independently knows the answer, in **both** directions:
@@ -275,8 +275,8 @@ where every tagged assignment is a point and a head's `succ` is the plain binary
 increment (`Exponential.Increment`); the carried walk is compiled into a two-way
 multi-head automaton; and that automaton is simulated by an
 `DescriptiveComplexity.SOTCSpec` over the base
-(`DescriptiveComplexity.ExpExpansion.autoSpec`), a configuration — a control
-state and `k` points — being one assignment of one block.
+(`DescriptiveComplexity.ExpExpansion.autoSpec`), a configuration – a control
+state and `k` points – being one assignment of one block.
 
 `LOGSPACE.exp ⊆ PSPACE` follows by monotonicity; the reverse inclusion is not
 claimed, since the graph a walk draws is asked REACH of, and REACH is not known

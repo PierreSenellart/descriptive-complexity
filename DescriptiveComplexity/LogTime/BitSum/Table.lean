@@ -25,7 +25,7 @@ product would cost:
 ## Why this pins the table, and pins it locally
 
 The table is not defined, it is *constrained*, by three conditions that mention
-only neighbouring sections (`DescriptiveComplexity.BitSum.TableOk`):
+only neighboring sections (`DescriptiveComplexity.BitSum.TableOk`):
 
 * section `0` is set exactly at `v = 0` – no ones means no word;
 * no later section is set at `v = 0`;

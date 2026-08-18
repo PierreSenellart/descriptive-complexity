@@ -12,7 +12,7 @@ import DescriptiveComplexity.Problems.Wide.NexSpec
 A forward run *constructs* the tape it walks: every lemma says the machine
 reaches a configuration whose tape is a named function of a named tape state, so
 nothing has to be said about what the rules leave alone. A **backward** reading
-is handed an arbitrary run and has to recognise the tape, and there the missing
+is handed an arbitrary run and has to recognize the tape, and there the missing
 fact bites: a configuration's tape is of the form
 `DescriptiveComplexity.Draw.Data.ixBack` of some tape state only because no
 rule ever writes the slots the *channel* wrote – the register flag, the two ends,
@@ -548,7 +548,7 @@ omit [Fintype dt.SlotIx] in
 open Classical in
 /-- **A tape of the right shape is an `ixBack`**: the file's slots as the layout
 has them, the four addressed tracks clear, every other track a bit – and the tape
-state is read off the tape, bit by bit. This is what turns a *recognised* tape
+state is read off the tape, bit by bit. This is what turns a *recognized* tape
 into the object every run lemma is stated against. -/
 theorem exists_ixBack_of_shape (lay : Layout dt A R' P' I) {zero one : A}
     (hzo : zero ≠ one)
@@ -603,7 +603,7 @@ theorem exists_ixBack_of_shape (lay : Layout dt A R' P' I) {zero one : A}
   | .old i => exact (hbit (Slot.old i) (fun hc => hc)).symm
   | .new i => exact (hbit (Slot.new i) (fun hc => hc)).symm
 
-/-- **A tape the reading recognises**: every cell carries a slot vector, the
+/-- **A tape the reading recognizes**: every cell carries a slot vector, the
 file's slots are the layout's, the four addressed tracks are clear, and every
 other track is a bit. -/
 structure TapeShape (lay : Layout dt A R' P' I) (zero one : A)
@@ -733,7 +733,7 @@ open Classical in
 /-- **What a step does to the tape**: it leaves every cell but the one under the
 head, and there it writes what the fired rule's `wr` makes of the control's
 payload and the cell's own tracks. Read backwards – from an arbitrary step to the
-tape it produces – this is what a recognising argument walks along, and it is the
+tape it produces – this is what a recognizing argument walks along, and it is the
 converse of the run layer's `Prog.step_*` lemmas, which write the cell they
 already know. -/
 theorem step_tape_of_shape_tr (hR : PR.table.Reads)
@@ -819,7 +819,7 @@ variable [Fintype dt.SlotIx]
 variable {PR : Prog A R' P' dt.CtlIx dt.SlotIx dt.KIx dt.dd}
 
 variable (PR) in
-/-- **A configuration the reading recognises**: its tape carries a slot vector
+/-- **A configuration the reading recognizes**: its tape carries a slot vector
 at every cell, of the shape `TapeShape` describes. -/
 def ShapedAt (lay : Layout dt A R' P' I) (st₀ : TapeSt dt A R' P' I)
     (c : Config (WPoint (Univ A R' P' dt.KIx dt.dd))) : Prop :=
@@ -900,7 +900,7 @@ theorem shapedAt_of_reaches_of_phase (hR : PR.table.Reads)
 
 omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- **The reading along a sequence**: the configuration at each time is
-recognised, as long as the phases up to that time are ones the caller vouches
+recognized, as long as the phases up to that time are ones the caller vouches
 for. This is `shapedAt_of_reaches_of_phase` in the form a backward reading
 actually has its run in – time by time, so that «the phases *before* the entry»
 is a statement about indices. -/
@@ -1024,7 +1024,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] [LinearOrder A]
   [LinearOrder R'] [LinearOrder P'] [LinearOrder dt.KIx]
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **A symbol determines its tracks**: the payload is the packed track vector
-and the packing is injective, so two recognised tapes that are equal carry equal
+and the packing is injective, so two recognized tapes that are equal carry equal
 tracks. That is what lets a reading combine facts proved of *different*
 recognitions of the same run – the shape's, and the marker's. -/
 theorem rest_eq_of_tape

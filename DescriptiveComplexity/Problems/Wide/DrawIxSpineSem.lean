@@ -98,7 +98,7 @@ variable (hst : ∀ j : Fin dt.nv, stOf j.succ =
 open Classical in
 /-- **The only thing the `new` tracks need of a position**: its own cell at
 the marker holds its verdict and every other cell rides. Weaker than the
-cover equation `hst`, and weaker on purpose — a *branched* position's leg
+cover equation `hst`, and weaker on purpose – a *branched* position's leg
 is not literally a
 `DescriptiveComplexity.Draw.Data.ixPostVarSt` of the position's entry
 state (its VAL loop may normalize the two scratch registers first), while
@@ -230,7 +230,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
 omit [Finite I] in
 include hstN in
 /-- **At an address every position rejects, the marker's `new` cells are
-all clear** — the junk legs
+all clear** – the junk legs
 (`DescriptiveComplexity.Draw.Data.ixVarLegFail_run`,
 `DescriptiveComplexity.Draw.Data.ixVarLegUngated_run`) store `False`, which
 is what the stage dictionary holds at an address that encodes no tuple. -/
@@ -255,7 +255,7 @@ variable (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc hUse in
 omit [Finite I] [Finite dt.KIx] in
 /-- **After the spine, one variable's `new` cell holds its own step of the
-iteration** — the per-position form: only the position of that variable, its
+iteration** – the per-position form: only the position of that variable, its
 pack and its verdict are named, so an address where *other* positions are
 junk is covered too (which is what a sweep needs, the gates being per
 variable). -/
@@ -493,7 +493,7 @@ variable (sem₀ : ∀ (j : Fin dt.nv) (a : ιV),
 variable (tOf : ∀ j : Fin dt.nv, Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
 
 /-- **One node of the spine**: the tape state, the proof that its mirror is
-still the address's — which is what lets the *next* node build its pack —
+still the address's – which is what lets the *next* node build its pack –
 and the control. The three have to be produced together: the pack a
 position's leg needs is typed at that position's state, and is available
 only because the mirror rode (`ixSpineSem`). -/
@@ -522,7 +522,7 @@ noncomputable def ixSpineStOf (k : Fin (dt.nv + 1)) :
 
 /-- **One node of the spine, threaded**: as
 `DescriptiveComplexity.Draw.Data.ixSpineNode`, with the leg's own exit
-state — SAV and TARGET as its VAL loop left them — instead of the
+state – SAV and TARGET as its VAL loop left them – instead of the
 normalized one. The mirror still rides, which is what makes the next
 position's pack exist. -/
 noncomputable def ixSpineNodeT :
@@ -553,7 +553,7 @@ noncomputable def ixSpineStOfT (k : Fin (dt.nv + 1)) :
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
-/-- **The mirror rides the threaded family too** — by construction. -/
+/-- **The mirror rides the threaded family too** – by construction. -/
 theorem ixSpineStOfT_mir (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
@@ -566,17 +566,17 @@ The threaded family above runs the gated leg at every position, which a
 sweep cannot afford: it visits junk addresses too. The branched family
 takes whichever of the three legs each position's own gates call for
 (`DescriptiveComplexity.Draw.Data.ixLegStB`), and is otherwise the same
-recursion — the mirror still rides, because no leg writes it.
+recursion – the mirror still rides, because no leg writes it.
 
 Its semantic parameter is **not** the entry state's pack transported: it is
 the *conditioned* family `DescriptiveComplexity.Draw.Data.ixGatedSem`
-inhabits — a pack at every gated position of every state, at every address.
+inhabits – a pack at every gated position of every state, at every address.
 Conditioned, because at a junk position no pack exists (the argument blocks
 encode nothing there); quantified over the address as well, because
 `DescriptiveComplexity.Draw.Data.ixStEndB` runs this spine at `v := w` for
 an address `w` its own binders are fixed before. With that type the
-parameter is supplied outright at the top — `fun w => dt.ixGatedSem hzo hlin
-mV` — and no semantic assumption about a position survives in the run
+parameter is supplied outright at the top – `fun w => dt.ixGatedSem hzo hlin
+mV` – and no semantic assumption about a position survives in the run
 layer. -/
 
 variable (semB : ∀ (w : Univ A R (P) dt.KIx
@@ -619,7 +619,7 @@ noncomputable def ixSpineFsOfB (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
-/-- **The mirror rides the branched family** — by construction. -/
+/-- **The mirror rides the branched family** – by construction. -/
 theorem ixSpineStOfB_mir (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ semB k).mir = st₀.mir :=
@@ -649,7 +649,7 @@ theorem ixSpineStOfB_wk (k : Fin (dt.nv + 1)) :
 
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [LinearOrder (dt.X.Map A)]
   [Finite ιV] in
-/-- **The bottom mark rides the branched family** — the `hbotOf` a spine asks
+/-- **The bottom mark rides the branched family** – the `hbotOf` a spine asks
 for. -/
 theorem ixSpineStOfB_bot (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
@@ -695,7 +695,7 @@ theorem ixSpineStOfB_old (k : Fin (dt.nv + 1)) :
   exact hn (k : ℕ)
 
 /-- The packs of the branched family: the parameter's own, at the position's
-state — the gate being what makes them exist. -/
+state – the gate being what makes them exist. -/
 noncomputable def ixSpineSemOfB (j : Fin dt.nv)
     (hg : dt.ixGatedAt (PR := PR) (elt := elt) F j
       (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
@@ -720,7 +720,7 @@ noncomputable def ixSpineSemOfB (j : Fin dt.nv)
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
-/-- **The branched control's cover equation** — `ixEvalSpineB_run`'s
+/-- **The branched control's cover equation** – `ixEvalSpineB_run`'s
 `hfs`. -/
 theorem ixSpineFsOfB_succ (j : Fin dt.nv) :
     dt.ixSpineFsOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.succ =
@@ -738,7 +738,7 @@ theorem ixSpineFsOfB_succ (j : Fin dt.nv) :
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
-/-- **The branched tape's cover equation** — `ixEvalSpineB_run`'s `hst`. -/
+/-- **The branched tape's cover equation** – `ixEvalSpineB_run`'s `hst`. -/
 theorem ixSpineStOfB_succ (j : Fin dt.nv) :
     dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.succ =
       dt.ixLegStB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
@@ -758,7 +758,7 @@ Gating is per variable, and so is the reading: at an address whose blocks
 below a variable's arity all encode points, that variable's cell holds one
 step of the iteration there; where one of them does not, the position takes
 an ungated leg, writes `False`, and the dictionary is `False` too. Nothing
-is assumed of the *other* variables' blocks — which is what a sweep needs,
+is assumed of the *other* variables' blocks – which is what a sweep needs,
 since it passes every address. -/
 
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc hUse in
@@ -814,8 +814,8 @@ end Family
 
 Everything the sweep's families need of an address's evaluation is *what
 state and control it ends in*. Taking those two as parameters makes the
-whole layer — the iteration, its two cover equations, and the ride lemmas
-that discharge `reaches_sweep`'s `hwkE`/`hmirE`/`hltpE` — serve any
+whole layer – the iteration, its two cover equations, and the ride lemmas
+that discharge `reaches_sweep`'s `hwkE`/`hmirE`/`hltpE` – serve any
 evaluation: the spine as first built, its threaded twin, and the branched
 form a junk address will need. -/
 
@@ -833,7 +833,7 @@ variable (f₀ : dt.CtlIx → A)
 
 /-- **The pair the sweep arrives at each address with**: the base at the
 empty address, and at every increment the previous address's evaluation
-exit — its marker moved on and its mirror set to the new address, exactly
+exit – its marker moved on and its mirror set to the new address, exactly
 the shape `DescriptiveComplexity.Draw.Data.reaches_sweep` demands. -/
 noncomputable def ixSweepPairG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
@@ -843,19 +843,19 @@ noncomputable def ixSweepPairG
       ({ dt.atSt (stE u p.1 p.2) (wmNext hlin u) with mir := ixMark elt (wmNext hlin u) },
         fsE u p.1 p.2)) w
 
-/-- The sweep's tape family — `reaches_sweep`'s `SW`. -/
+/-- The sweep's tape family – `reaches_sweep`'s `SW`. -/
 noncomputable def ixSweepSWG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
     TapeSt dt A R (P) I :=
   (dt.ixSweepPairG (elt := elt) stE fsE hlin st₀ f₀ w).1
 
-/-- The sweep's control family — `reaches_sweep`'s `FS`. -/
+/-- The sweep's control family – `reaches_sweep`'s `FS`. -/
 noncomputable def ixSweepFSG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
     dt.CtlIx → A :=
   (dt.ixSweepPairG (elt := elt) stE fsE hlin st₀ f₀ w).2
 
-/-- The state the sweep leaves each address in — `reaches_sweep`'s
+/-- The state the sweep leaves each address in – `reaches_sweep`'s
 `stE`. -/
 noncomputable def ixSweepStEG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
@@ -874,7 +874,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (P)] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 omit [Finite I] in
-/-- **The tape's cover equation** — `reaches_sweep`'s `hSW`, on the nose. -/
+/-- **The tape's cover equation** – `reaches_sweep`'s `hSW`, verbatim. -/
 theorem ixSweepSWG_incr
     {w w' : Univ A R (P) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
@@ -898,10 +898,10 @@ end SweepGen
 `DescriptiveComplexity.Draw.Data.stageEndSt st v = { st with sav := v,
 tgt := v }`: the random access **writes** the home address into SAV and
 TARGET whatever they held, so a stage atom is transparent exactly when they
-held it already — which is what `ixStageEndSt_eq`'s two hypotheses say, and
+held it already – which is what `ixStageEndSt_eq`'s two hypotheses say, and
 why they are not a proof artifact.
 
-Closing the sweep's gap by "reading the mirror" therefore means *threading*
+Closing the sweep's gap by “reading the mirror” therefore means *threading*
 that normalization rather than assuming it away: an atom's exit state is
 `ixStageEndSt st v`, and the layers above carry it. These are the equations
 that threading needs; they are all definitional, which is what makes the

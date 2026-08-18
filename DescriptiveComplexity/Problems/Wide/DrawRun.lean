@@ -12,11 +12,11 @@ import DescriptiveComplexity.Problems.Wide.DrawInit
 
 Every composite of the layer discharges its run theorem from **one**
 hypothesis about the program – `hrules : ∀ ρ, PR.rules (rEmb ρ) = κ.rule …`,
-"my rules are among yours, under this injection of rule names". For a
+“my rules are among yours, under this injection of rule names”. For a
 program assembled from sites
 (`DescriptiveComplexity.Draw.Data.progAsm`) that hypothesis is
 definitional: the rule names are the sigma of the sites' shapes, so a kit's
-rule at site `i` is the program's rule at `⟨i, Sum.inl ρ⟩`, on the nose.
+rule at site `i` is the program's rule at `⟨i, Sum.inl ρ⟩`, verbatim.
 
 This file is that plumbing, one lemma per call site of the outer loop, all
 `rfl`. With it, each composite's run theorem applies to the assembled
@@ -442,7 +442,7 @@ theorem back_val (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
 
 The pattern write of `DescriptiveComplexity.Draw.MapKit`: a round trip up the
 register file writing, at each cell, the digit its *other* tracks decide –
-here "this cell's element carries an argument tag", read off the one-hot
+here “this cell's element carries an argument tag”, read off the one-hot
 `blk` marks. The result is the address of the logical top, which the seek
 that follows takes the working cell to. -/
 

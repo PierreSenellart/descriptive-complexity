@@ -179,7 +179,7 @@ intended class. -/
 theorem PSPACE_subset_NL_exp : PSPACE ⊆ NL.exp :=
   fun _ _ P h => SOTCDefinable.expDefinable reach_mem_NL ((mem_PSPACE_iff P).mp h)
 
-/-- **`PSPACE ⊆ PTIME.exp`**, i.e. `PSPACE ⊆ EXPTIME` once the class is named
+/-- **`PSPACE ⊆ PTIME.exp`**, i.e., `PSPACE ⊆ EXPTIME` once the class is named
 (`DescriptiveComplexity.PSPACE_subset_EXPTIME`). Read on the definitions it is
 **SO(TC) ⊆ SO(LFP)**, the second-order shadow of `NL ⊆ PTIME`. -/
 theorem PSPACE_subset_PTIME_exp : PSPACE ⊆ PTIME.exp :=

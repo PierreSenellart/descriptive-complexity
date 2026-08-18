@@ -19,12 +19,12 @@ This file closes the gap once and for all, for the two-argument case that covers
 every relation symbol of `DescriptiveComplexity.Language.andOrGraph` (a unary
 symbol simply ignores the second argument):
 
-> **`DescriptiveComplexity.ExpExpansion.exists_paramKernel`** — for every
+> **`DescriptiveComplexity.ExpExpansion.exists_paramKernel`** – for every
 > `φ : (X.E + ≤).Formula (Fin 2 × Fin d)` there is a round count `D` such that,
 > at *any* layout with at least `2 * d` parameter rounds and exactly `D` play
 > rounds, a kernel `K` exists whose alternating value over the play rounds is
 > `φ`, its argument `(a, b)` read at the round
-> `DescriptiveComplexity.ExpExpansion.paramIx a b` — that is, at round
+> `DescriptiveComplexity.ExpExpansion.paramIx a b` – that is, at round
 > `a * d + b`, so that the first argument occupies the rounds below `d` and the
 > second the rounds below `2 * d`.
 
@@ -100,8 +100,8 @@ theorem realize_argsFreed {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 
 /-! ### The kernel -/
 
 /-- **A defining formula, played as an alternating prefix.** The round count `D`
-depends on the formula alone; the layout — how many parameter rounds sit below
-the play rounds — is free, so that finitely many formulas can share one block by
+depends on the formula alone; the layout – how many parameter rounds sit below
+the play rounds – is free, so that finitely many formulas can share one block by
 padding the short ones. -/
 theorem exists_paramKernel (X : ExpExpansion L) {d : ℕ}
     (φ : (X.E.sum Language.order).Formula (Fin 2 × Fin d)) :

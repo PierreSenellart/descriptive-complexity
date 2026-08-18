@@ -89,7 +89,7 @@ omit [Finite I] [Finite dt.KIx] in
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc in
 /-- **The machinery's verdict is the prefix over the leaf**: every abstract
 input of `DescriptiveComplexity.Draw.Data.ixAccVerdict_varFM_qfValue`
-discharged — the flags by
+discharged – the flags by
 `DescriptiveComplexity.Draw.Data.ixCtlBit_roundFX_pass_iff`, the pass by
 `DescriptiveComplexity.Draw.Data.ixRoundPass_of_polarities`, the valuation
 and its pack by `DescriptiveComplexity.Draw.Data.ixPassW`, the stage reads
@@ -292,7 +292,7 @@ at the stage the tracks hold: the prefix of
 `DescriptiveComplexity.Draw.Data.ixAccVerdict_leafP` read through
 `DescriptiveComplexity.Draw.Data.altQuantFrom_leafP_out`. The output
 variable is nullary, so the working address's outer blocks encode the empty
-tuple and there is nothing to ask of them — which is why this is the one
+tuple and there is nothing to ask of them – which is why this is the one
 verdict a reduction can take at the *empty* address. -/
 theorem ixAccVerdict_out
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))

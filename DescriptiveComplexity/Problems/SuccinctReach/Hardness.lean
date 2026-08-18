@@ -40,7 +40,7 @@ the state variables the walk carries. So
 * the gates of each encoding are auxiliary variables, private to their group.
 
 A state of the interpreted transition system is then a set of atoms of the
-first copy, i.e. an assignment of `B` – the state of the SO(TC) walk – and the
+first copy, i.e., an assignment of `B` – the state of the SO(TC) walk – and the
 transition clauses hold of a valuation exactly when the transition sentence
 holds of the pair it reads and writes. The correspondence between the two walks
 is a bijection at every step, with no initialization or finalization steps to
@@ -909,7 +909,7 @@ end Semantic
 /-! ### The two walks correspond
 
 A state of the interpreted transition system is a set of atoms of the first
-copy of the doubled block, i.e. an assignment of `B`; a valuation witnessing a
+copy of the doubled block, i.e., an assignment of `B`; a valuation witnessing a
 transition or an endpoint condition is the canonical Tseitin valuation of the
 corresponding kernel. The two directions use the two translations between
 states and assignments, so no round trip is ever needed. -/

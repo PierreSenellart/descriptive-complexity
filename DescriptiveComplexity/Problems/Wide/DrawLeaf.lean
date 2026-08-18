@@ -122,7 +122,7 @@ theorem leafP_irrel (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
     rcases hℓ with hℓ | hℓ <;> omega
 
 /-- **The leaf, machine-shaped**: at an address whose outer blocks encode
-points, the leaf splits into the two flags the machinery conjoins — every
+points, the leaf splits into the two flags the machinery conjoins – every
 ∃-level of the register an encoding, and if every ∀-level is one, the
 matrix at the decoded valuation. The free levels' gates are absorbed by
 the address's. -/

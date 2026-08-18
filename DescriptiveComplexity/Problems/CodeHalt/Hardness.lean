@@ -26,7 +26,7 @@ forward along the reduction). Both readings are drawn in
 
 The reduction has to *produce a program*. For a machine that would mean
 writing a transition table and proving its run correct – the evaluator with
-addressed storage, the expensive object the library has so far always avoided.
+addressed storage, the most expensive object a reduction of this kind can need.
 Here the program is a `Nat.Partrec.Code`, and “a program semi-deciding this
 problem exists” is a theorem of Mathlib
 (`Nat.Partrec.Code.exists_code`): the reduction *names* the procedure `cP`

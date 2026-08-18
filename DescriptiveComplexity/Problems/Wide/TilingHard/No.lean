@@ -14,8 +14,8 @@ holds at most one head, and the row above it is the step that head takes**.
 
 ## Why a row holds at most one head
 
-A head in a row is either a head that halted below it, or one a neighbour sent:
-the vertical rule lets nothing else stand above a symbol. A neighbour that sends
+A head in a row is either a head that halted below it, or one a neighbor sent:
+the vertical rule lets nothing else stand above a symbol. A neighbor that sends
 one is a head *moving that way*, by the horizontal rule, so the head of a row is
 determined by the head of the row below it and the transition that head fires –
 which is why a tile carries the transition and an arrival is a tile of its own.
@@ -81,7 +81,7 @@ structure TileRun (A : Type) [LinearOrder A] [Finite A] [Language.wide.Structure
   edgeL : ∀ k, TPEdgeL (tl k (fun _ : A => False))
   /-- Nor the rightmost one an arrival from the right. -/
   edgeR : ∀ k, TPEdgeR (tl k (fun _ : A => True))
-  /-- Neighbours in a row agree. -/
+  /-- Neighbors in a row agree. -/
   horiz : ∀ k s t, WMIncr WMLe s t → TPHoriz (tl k s) (tl k t)
   /-- And one row becomes the next. -/
   vert : ∀ k s, k + 1 < rows → TPVert (tl k s) (tl (k + 1) s)
@@ -96,7 +96,7 @@ structure TileRun (A : Type) [LinearOrder A] [Finite A] [Language.wide.Structure
 
 end Draw
 
-/-! ### Neighbouring columns -/
+/-! ### Neighboring columns -/
 
 section Columns
 
@@ -209,7 +209,7 @@ variable (hlin : IsLinOrd (WMLe (A := A)))
 include hlin
 
 /-- **Where a head comes from**: either it stood in the same column and halted,
-or the head of a neighbouring column moved into it – and then that head's
+or the head of a neighboring column moved into it – and then that head's
 transition names the state it arrives in and the direction it came from. -/
 theorem head_from {k : ℕ} {s : A → Prop} (hk : k + 1 < R.rows)
     (h : IsHeadTile (R.tl (k + 1) s)) :
@@ -257,7 +257,7 @@ theorem eq_bot_of_head_zero {s : A → Prop} (h : IsHeadTile (R.tl 0 s)) :
   exact not_isHeadTile_of_noHead (R.first s hs).1 h
 
 /-- **A row holds one head at most.** A head is either one that halted below it
-or one a neighbour sent, and the neighbour that sends one is the head of the row
+or one a neighbor sent, and the neighbor that sends one is the head of the row
 below moving that way; so the head of a row is determined by the head of the row
 below and the transition it fires. -/
 theorem head_unique : ∀ {k : ℕ}, k < R.rows → ∀ {s t : A → Prop},

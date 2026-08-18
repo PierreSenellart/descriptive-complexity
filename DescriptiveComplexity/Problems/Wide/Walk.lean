@@ -918,8 +918,8 @@ theorem regBit_congr {m m' : A → Prop} {u : A} (hag : ∀ v : A, v ≠ u → (
 /-! ### The accumulator of a downward pass
 
 A pass down the register file carries one bit of information in its control:
-whether everything it has seen so far behaved. Since it walks downwards, "so far"
-is "at every register above the one it is on", and the two states of the pass are
+whether everything it has seen so far behaved. Since it walks downwards, “so far”
+is “at every register above the one it is on”, and the two states of the pass are
 therefore a *function of the suffix*. Both subroutines built on the walk – the
 mirror increment (`DescriptiveComplexity.Problems.Wide.Mirror`) and the file
 tests (`DescriptiveComplexity.Problems.Wide.Test`) – are that shape, so it is

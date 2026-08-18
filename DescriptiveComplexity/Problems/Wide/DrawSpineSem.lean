@@ -17,40 +17,40 @@ the whole spine leaves on the tape at the address it was run at.
 
 Two halves, both by the same induction along the positions:
 
-* **everything but `val` and the marker's `new` cells rides** — the stage
+* **everything but `val` and the marker's `new` cells rides** – the stage
   dictionary, the mirror and the three markers are the same at every
   position (`spineRide`, and the named corollaries): the spine writes only
   the cell it stands on, which is why the *next* address's leg may assume
   the same dictionary;
 * **the marker's `new` cell of a variable is that variable's verdict**
   (`new_last_get`): the write happens at the position the variable sits at,
-  and no later position touches it — the enumeration
+  and no later position touches it – the enumeration
   `DescriptiveComplexity.Draw.Data.varList` being `Finset.univ.toList`,
   hence duplicate-free and complete (`exists_varList_get`).
 
 Joined with `DescriptiveComplexity.Draw.Data.accVerdict_next`, that is
 **`new_last_next`**: after the spine, the `new` track of every variable
-holds, at the address, one step of the iteration at the address's points —
+holds, at the address, one step of the iteration at the address's points –
 the per-address obligation the sweep's induction carries.
 
 One obstacle sits between this and the instantiation, and the last
 section removes it: a position's semantic pack is *typed* at that
 position's tape state, so a family of packs looks like it has to be built
-position by position — while the pack can only be built once the mirror
+position by position – while the pack can only be built once the mirror
 invariant is known, which is what the family's own defining equations give.
 `KindSem` in fact reads the state only through the levels' register sets
 (`lvSet_congr`) and the pass condition through the VAL register alone
-(`igPassP_congr`, `igPassP_roundSt` — a file test reads the block mark, the
+(`igPassP_congr`, `igPassP_roundSt` – a file test reads the block mark, the
 VAL digit, the padding mark and the names, all of which either ride or are
 the tape's permanent geometry). So **one** pack transports along the whole
 spine (`kindSemCast`, packaged as `spineSem`), and its content survives the
 transport (`kindSemCast_mkKindSem`, `passW_congr`, `kindSemCast_passSem`,
-packaged as `spineSem_passSem`) — which is what discharges each position's
+packaged as `spineSem_passSem`) – which is what discharges each position's
 `hsem`.
 
 With that, the families themselves are **built**, not assumed:
 `spineNode` recurses along the positions producing the tape state, the
-proof that its mirror is still the address's, and the control — the three
+proof that its mirror is still the address's, and the control – the three
 together, because the pack a position's leg needs is typed at that
 position's state and is available only because the mirror rode. Its
 projections `spineStOf`/`spineFsOf`/`spineSemOf` satisfy
@@ -58,19 +58,19 @@ projections `spineStOf`/`spineFsOf`/`spineSemOf` satisfy
 `DescriptiveComplexity.Draw.Data.evalSpine_run` asks for.
 
 One scale up, the same is done for the sweep: `sweepSW`/`sweepFS` are the
-pair the sweep arrives at each address with — with `sweepStE_wk`,
+pair the sweep arrives at each address with – with `sweepStE_wk`,
 `sweepStE_mir` and `sweepStE_ltp` discharging three of the four remaining
 obligations of `DescriptiveComplexity.Draw.Data.reaches_sweep`, and
 `eq_of_sweepSW_sav` recording why the fourth (`hspine`) cannot be met
-until the program refreshes SAV and TARGET at each address — an iteration along the
+until the program refreshes SAV and TARGET at each address – an iteration along the
 addresses (`addrIter`), because the control accumulates even though the
-tape's writes are local — and `sweepSW_incr`/`sweepFS_incr` are exactly
+tape's writes are local – and `sweepSW_incr`/`sweepFS_incr` are exactly
 `DescriptiveComplexity.Draw.Data.reaches_sweep`'s `hSW` and `hFS`.
 
 On top of it, the same statement in the form the *next* sweep reads its
-input in — `new_last_trackOf` at an address whose blocks encode a tuple,
+input in – `new_last_trackOf` at an address whose blocks encode a tuple,
 `new_last_trackOf_of_junk` where they do not, both sides being empty there
-— and the sweep itself: **`sweep_new`**, the address-by-address induction
+– and the sweep itself: **`sweep_new`**, the address-by-address induction
 (`DescriptiveComplexity.holds_of_wideRounds`) saying a sweep rewrites the
 `new` tracks of exactly the addresses it has passed, everything else still
 carrying what it started with.
@@ -87,13 +87,13 @@ open Language Structure
 /-! ### Iterating along the addresses
 
 The sweep's families cannot both be written in closed form: the tape's
-`new` tracks are local to the address a leg stands on — `sweep_new` is
-their closed form — but the **control threads**, a leg's exit control being
+`new` tracks are local to the address a leg stands on – `sweep_new` is
+their closed form – but the **control threads**, a leg's exit control being
 its entry control transformed. So the pair is defined by an iteration along
 the address order, which is `DescriptiveComplexity.Draw.iterOrd` at the
 linear order the addresses already carry
 (`DescriptiveComplexity.isLinOrd_wmSetLe`, turned into an instance *locally*
-— the order must never be an ambient instance on `α → Prop`, which carries
+– the order must never be an ambient instance on `α → Prop`, which carries
 Pi's own).
 
 The successor is named rather than quantified (`wmNext`): a step of
@@ -110,7 +110,7 @@ address itself at the full set (where the sweep has ended). -/
 noncomputable def wmNext (h : IsLinOrd Le) (w : α → Prop) : α → Prop :=
   if hx : ∃ x, ¬w x then (exists_wmIncr h hx).choose else w
 
-/-- At an address with an increment, `wmNext` is it — the increment being
+/-- At an address with an increment, `wmNext` is it – the increment being
 unique. -/
 theorem wmNext_eq (h : IsLinOrd Le) {w w' : α → Prop} (hi : WMIncr Le w w') :
     wmNext h w = w' := by
@@ -233,7 +233,7 @@ variable (hst : ∀ j : Fin dt.nv, stOf j.succ =
 open Classical in
 /-- **The only thing the `new` tracks need of a position**: its own cell at
 the marker holds its verdict and every other cell rides. Weaker than the
-cover equation `hst`, and weaker on purpose — a *branched* position's leg
+cover equation `hst`, and weaker on purpose – a *branched* position's leg
 is not literally a
 `DescriptiveComplexity.Draw.Data.postVarSt` of the position's entry
 state (its VAL loop may normalize the two scratch registers first), while
@@ -360,7 +360,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 include hstN in
 /-- **At an address every position rejects, the marker's `new` cells are
-all clear** — the junk legs
+all clear** – the junk legs
 (`DescriptiveComplexity.Draw.Data.varLegFail_run`,
 `DescriptiveComplexity.Draw.Data.varLegUngated_run`) store `False`, which
 is what the stage dictionary holds at an address that encodes no tuple. -/
@@ -384,7 +384,7 @@ variable (mV : ιV → Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd →
 
 omit [Finite dt.KIx] in
 /-- **After the spine, one variable's `new` cell holds its own step of the
-iteration** — the per-position form: only the position of that variable, its
+iteration** – the per-position form: only the position of that variable, its
 pack and its verdict are named, so an address where *other* positions are
 junk is covered too (which is what a sweep needs, the gates being per
 variable). -/
@@ -571,9 +571,9 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
 /-- **A sweep rewrites the `new` tracks of exactly the addresses it has
 passed.** The address-by-address induction
 (`DescriptiveComplexity.holds_of_wideRounds`) over the two facts one
-address contributes — its own cell now holds the target (`hat`, which
+address contributes – its own cell now holds the target (`hat`, which
 `new_last_next` and `new_last_of_false` supply), every other cell is
-untouched (`hoff`, which `spine_new_off` supplies) — with the entry state
+untouched (`hoff`, which `spine_new_off` supplies) – with the entry state
 of the next address read off the sweep's own tape family (`hSW`, the
 `hSW` of `DescriptiveComplexity.Draw.Data.reaches_sweep`).
 
@@ -861,7 +861,7 @@ variable {ιV : Type}
 
 /-- **One pack, carried to every position of the spine**: the packs of the
 positions are the entry state's, transported. This is what makes the
-per-position family *definable* — the recursion that builds the tape
+per-position family *definable* – the recursion that builds the tape
 family needs a pack at each of its own states, and here it has one as soon
 as the mirror rides. -/
 noncomputable def spineSem (zero one : A) (vi : dt.VarIx)
@@ -882,7 +882,7 @@ noncomputable def spineSem (zero one : A) (vi : dt.VarIx)
     (sem₀ a (fun ℓ =>
       (dt.igPassP_roundSt RF zero one vi st st₀ (mV a) ℓ).mp (hp ℓ)) b)
 
-/-- **One pack, carried to every round of every position — threaded**: as
+/-- **One pack, carried to every round of every position – threaded**: as
 `DescriptiveComplexity.Draw.Data.spineSem`, at the states the VAL loop's
 own thread produces. Those differ from the position's entry state in the
 two scratch registers and the register they enumerate, and a pack reads
@@ -990,7 +990,7 @@ three legs are exhaustive; read in the other direction it says a gated
 position's blocks encode points. -/
 
 omit [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx] [L.IsRelational] [Finite R] in
-/-- **A gated position's argument blocks are encodings** — the converse of
+/-- **A gated position's argument blocks are encodings** – the converse of
 `testOf_of_encMap`/`wit_of_encMap`/`domHolds_of_encMap`, off the
 trichotomy. This is what makes a position's semantic pack *constructible*
 rather than assumed: at a junk position no pack exists, and at a gated one
@@ -1021,12 +1021,12 @@ theorem isEnc_of_gatedAt (hzo : PR.zero ≠ PR.one)
   · exact absurd ⟨(hg.2 ℓ).1, (hg.2 ℓ).2⟩ hbad
 
 omit [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx] [L.IsRelational] [Finite R] in
-/-- **A position whose blocks are encodings is gated** — the converse of
+/-- **A position whose blocks are encodings is gated** – the converse of
 `isEnc_of_gatedAt`, assembled from
 `DescriptiveComplexity.Draw.Data.testOf_of_encMap`,
 `wit_of_encMap` and `domHolds_of_encMap`. With the two directions together,
 gating at a position *is* «the blocks below that variable's arity encode
-points», which is the dichotomy a sweep's dictionary splits on — and it is
+points», which is the dichotomy a sweep's dictionary splits on – and it is
 per variable, since the arities differ. -/
 theorem gatedAt_of_isEnc (hzo : PR.zero ≠ PR.one)
     (hlin : IsLinOrd
@@ -1057,7 +1057,7 @@ theorem gatedAt_of_isEnc (hzo : PR.zero ≠ PR.one)
     · rw [htag]
       exact dt.domHolds_of_encMap hzo hp
 
-/-- **A gated position's semantic pack, built** — not assumed. The blocks
+/-- **A gated position's semantic pack, built** – not assumed. The blocks
 are encodings (`isEnc_of_gatedAt`), so their points are the valuation the
 pass decodes, and `passSem` builds the pack there; `kindSemCast` carries it
 to the state the matrix's atoms run at, which differs from it in the two
@@ -1087,7 +1087,7 @@ noncomputable def gatedSem (hzo : PR.zero ≠ PR.one)
       (fun ℓ => (dt.isEnc_of_gatedAt RF hzo hlin j st hg ℓ).choose)
       (fun ℓ => (dt.isEnc_of_gatedAt RF hzo hlin j st hg ℓ).choose_spec) b)
 
-/-- **The gated position's pack at the round state** — the same points, at
+/-- **The gated position's pack at the round state** – the same points, at
 the state the *semantics* names. `gatedSem` is this pack transported
 (`gatedSem_eq_semCastT`), which is what the VAL loop's bridge asks of a
 threaded family. -/
@@ -1111,7 +1111,7 @@ omit [L.IsRelational] [Finite dt.KIx] [Finite R] [Finite (OuterPh (EvalPh dt.nv 
 /-- **A gated position's pack is one pack transported**: its points are the
 address's blocks, which the scratch registers do not touch, so the family
 the machinery is run with is `semCastT` at
-`DescriptiveComplexity.Draw.Data.gatedSem₀` — the hypothesis the VAL
+`DescriptiveComplexity.Draw.Data.gatedSem₀` – the hypothesis the VAL
 loop's bridge (`varFMT_eq_varFM`) is stated under. -/
 theorem gatedSem_eq_semCastT (hzo : PR.zero ≠ PR.one)
     (hlin : IsLinOrd
@@ -1187,7 +1187,7 @@ variable (sem₀ : ∀ (j : Fin dt.nv) (a : ιV),
 variable (tOf : ∀ j : Fin dt.nv, Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
 
 /-- **One node of the spine**: the tape state, the proof that its mirror is
-still the address's — which is what lets the *next* node build its pack —
+still the address's – which is what lets the *next* node build its pack –
 and the control. The three have to be produced together: the pack a
 position's leg needs is typed at that position's state, and is available
 only because the mirror rode (`spineSem`). -/
@@ -1217,7 +1217,7 @@ noncomputable def spineFsOf (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The mirror rides the built family** — by construction, not by the
+/-- **The mirror rides the built family** – by construction, not by the
 after-the-fact induction of `spine_mir`. -/
 theorem spineStOf_mir (k : Fin (dt.nv + 1)) :
     (dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
@@ -1239,7 +1239,7 @@ noncomputable def spineSemOf (j : Fin dt.nv) (a : ιV)
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The control's cover equation** — `evalSpine_run`'s `hfs`. -/
+/-- **The control's cover equation** – `evalSpine_run`'s `hfs`. -/
 theorem spineFsOf_succ (j : Fin dt.nv) :
     dt.spineFsOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.succ =
       dt.legCtl (v := v) (aT := aT) RF hord mV j
@@ -1254,7 +1254,7 @@ theorem spineFsOf_succ (j : Fin dt.nv) :
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The tape's cover equation** — `evalSpine_run`'s `hst`. -/
+/-- **The tape's cover equation** – `evalSpine_run`'s `hst`. -/
 theorem spineStOf_succ (j : Fin dt.nv) :
     dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.succ =
       dt.postVarSt v
@@ -1276,7 +1276,7 @@ theorem spineStOf_succ (j : Fin dt.nv) :
 
 /-- **One node of the spine, threaded**: as
 `DescriptiveComplexity.Draw.Data.spineNode`, with the leg's own exit
-state — SAV and TARGET as its VAL loop left them — instead of the
+state – SAV and TARGET as its VAL loop left them – instead of the
 normalized one. The mirror still rides, which is what makes the next
 position's pack exist. -/
 noncomputable def spineNodeT :
@@ -1308,7 +1308,7 @@ noncomputable def spineFsOfT (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The mirror rides the threaded family too** — by construction. -/
+/-- **The mirror rides the threaded family too** – by construction. -/
 theorem spineStOfT_mir (k : Fin (dt.nv + 1)) :
     (dt.spineStOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
   (dt.spineNodeT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf (k : ℕ)).2.1
@@ -1337,17 +1337,17 @@ The threaded family above runs the gated leg at every position, which a
 sweep cannot afford: it visits junk addresses too. The branched family
 takes whichever of the three legs each position's own gates call for
 (`DescriptiveComplexity.Draw.Data.legStB`), and is otherwise the same
-recursion — the mirror still rides, because no leg writes it.
+recursion – the mirror still rides, because no leg writes it.
 
 Its semantic parameter is **not** the entry state's pack transported: it is
 the *conditioned* family `DescriptiveComplexity.Draw.Data.gatedSem`
-inhabits — a pack at every gated position of every state, at every address.
+inhabits – a pack at every gated position of every state, at every address.
 Conditioned, because at a junk position no pack exists (the argument blocks
 encode nothing there); quantified over the address as well, because
 `DescriptiveComplexity.Draw.Data.stEndB` runs this spine at `v := w` for
 an address `w` its own binders are fixed before. With that type the
-parameter is supplied outright at the top — `fun w => dt.gatedSem hzo hlin
-mV` — and no semantic assumption about a position survives in the run
+parameter is supplied outright at the top – `fun w => dt.gatedSem hzo hlin
+mV` – and no semantic assumption about a position survives in the run
 layer. -/
 
 variable (semB : ∀ (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx
@@ -1389,13 +1389,13 @@ noncomputable def spineFsOfB (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The mirror rides the branched family** — by construction. -/
+/-- **The mirror rides the branched family** – by construction. -/
 theorem spineStOfB_mir (k : Fin (dt.nv + 1)) :
     (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB k).mir = st₀.mir :=
   (dt.spineNodeB (v := v) (aT := aT) RF hord mV st₀ f₀ semB (k : ℕ)).2.1
 
 /-- The packs of the branched family: the parameter's own, at the position's
-state — the gate being what makes them exist. -/
+state – the gate being what makes them exist. -/
 noncomputable def spineSemOfB (j : Fin dt.nv)
     (hg : dt.gatedAt (PR := PR) RF j
       (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.castSucc))
@@ -1415,7 +1415,7 @@ noncomputable def spineSemOfB (j : Fin dt.nv)
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The branched control's cover equation** — `evalSpineB_run`'s
+/-- **The branched control's cover equation** – `evalSpineB_run`'s
 `hfs`. -/
 theorem spineFsOfB_succ (j : Fin dt.nv) :
     dt.spineFsOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.succ =
@@ -1429,7 +1429,7 @@ theorem spineFsOfB_succ (j : Fin dt.nv) :
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The branched tape's cover equation** — `evalSpineB_run`'s `hst`. -/
+/-- **The branched tape's cover equation** – `evalSpineB_run`'s `hst`. -/
 theorem spineStOfB_succ (j : Fin dt.nv) :
     dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.succ =
       dt.legStB (v := v) (aT := aT) RF hord mV j
@@ -1450,7 +1450,7 @@ noncomputable def spineBitOfB (j : Fin dt.nv) : Prop :=
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The branched family writes what a spine writes** — the projection of
+/-- **The branched family writes what a spine writes** – the projection of
 the cover equation the `new` tracks read, which is all the dictionary
 lemmas ask of a leg (`DescriptiveComplexity.Draw.Data.legStB_new`). -/
 theorem spineStOfB_writesNew :
@@ -1496,7 +1496,7 @@ Gating is per variable, and so is the reading: at an address whose blocks
 below a variable's arity all encode points, that variable's cell holds one
 step of the iteration there; where one of them does not, the position takes
 an ungated leg, writes `False`, and the dictionary is `False` too. Nothing
-is assumed of the *other* variables' blocks — which is what a sweep needs,
+is assumed of the *other* variables' blocks – which is what a sweep needs,
 since it passes every address. -/
 
 omit [Finite dt.KIx] in
@@ -1601,8 +1601,8 @@ end Family
 
 Everything the sweep's families need of an address's evaluation is *what
 state and control it ends in*. Taking those two as parameters makes the
-whole layer — the iteration, its two cover equations, and the ride lemmas
-that discharge `reaches_sweep`'s `hwkE`/`hmirE`/`hltpE` — serve any
+whole layer – the iteration, its two cover equations, and the ride lemmas
+that discharge `reaches_sweep`'s `hwkE`/`hmirE`/`hltpE` – serve any
 evaluation: the spine as first built, its threaded twin, and the branched
 form a junk address will need. -/
 
@@ -1621,7 +1621,7 @@ variable (f₀ : dt.CtlIx → A)
 
 /-- **The pair the sweep arrives at each address with**: the base at the
 empty address, and at every increment the previous address's evaluation
-exit — its marker moved on and its mirror set to the new address, exactly
+exit – its marker moved on and its mirror set to the new address, exactly
 the shape `DescriptiveComplexity.Draw.Data.reaches_sweep` demands. -/
 noncomputable def sweepPairG
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
@@ -1631,26 +1631,26 @@ noncomputable def sweepPairG
       ({ dt.atSt (stE u p.1 p.2) (wmNext hlin u) with mir := wmNext hlin u },
         fsE u p.1 p.2)) w
 
-/-- The sweep's tape family — `reaches_sweep`'s `SW`. -/
+/-- The sweep's tape family – `reaches_sweep`'s `SW`. -/
 noncomputable def sweepSWG
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
   (dt.sweepPairG stE fsE hlin st₀ f₀ w).1
 
-/-- The sweep's control family — `reaches_sweep`'s `FS`. -/
+/-- The sweep's control family – `reaches_sweep`'s `FS`. -/
 noncomputable def sweepFSG
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     dt.CtlIx → A :=
   (dt.sweepPairG stE fsE hlin st₀ f₀ w).2
 
-/-- The state the sweep leaves each address in — `reaches_sweep`'s
+/-- The state the sweep leaves each address in – `reaches_sweep`'s
 `stE`. -/
 noncomputable def sweepStEG
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
   stE w (dt.sweepSWG stE fsE hlin st₀ f₀ w) (dt.sweepFSG stE fsE hlin st₀ f₀ w)
 
-/-- The control the sweep leaves each address in — `reaches_sweep`'s
+/-- The control the sweep leaves each address in – `reaches_sweep`'s
 `fsE`. -/
 noncomputable def sweepFsEG
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
@@ -1674,7 +1674,7 @@ theorem sweepFSG_bot :
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
-/-- **The tape's cover equation** — `reaches_sweep`'s `hSW`, on the nose. -/
+/-- **The tape's cover equation** – `reaches_sweep`'s `hSW`, verbatim. -/
 theorem sweepSWG_incr
     {w w' : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
@@ -1691,7 +1691,7 @@ theorem sweepSWG_incr
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
-/-- **The control's cover equation** — `reaches_sweep`'s `hFS`. -/
+/-- **The control's cover equation** – `reaches_sweep`'s `hFS`. -/
 theorem sweepFSG_incr
     {w w' : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
@@ -1854,7 +1854,7 @@ noncomputable def fsEnd
 /-! ### The threaded per-address evaluation
 
 The mirror is normalized to the address the evaluation is run at. It is
-already there — the advance sets it, and `sweepSWG_mir` proves it — but
+already there – the advance sets it, and `sweepSWG_mir` proves it – but
 writing it makes the equation **definitional**, which is what lets the
 pack family be indexed by the address rather than quantified over
 arbitrary states. That is the same move as `varRdSt` one scale down, and
@@ -1895,7 +1895,7 @@ variable (semAtB : ∀ (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx
 
 /-- **The state one address's evaluation ends in**, with each position
 taking whichever leg its gates call for and the mirror pinned at the
-address — what a sweep over *every* address needs, gated or junk. -/
+address – what a sweep over *every* address needs, gated or junk. -/
 noncomputable def stEndB
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1914,7 +1914,7 @@ noncomputable def fsEndB
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **`reaches_sweep`'s `hmirE`** for the branched evaluation, by
-construction — through `sweepStEG_mir'`. -/
+construction – through `sweepStEG_mir'`. -/
 theorem stEndB_mir
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1925,7 +1925,7 @@ theorem stEndB_mir
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **What the branched evaluation leaves alone** — `reaches_sweep`'s
+/-- **What the branched evaluation leaves alone** – `reaches_sweep`'s
 `hwkE` and `hltpE` through `sweepStEG_wk` and `sweepStEG_ltp`. -/
 theorem stEndB_ride {β : Sort _}
     (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
@@ -1956,7 +1956,7 @@ theorem stEndB_ride {β : Sort _}
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **Off the address it is run at, the branched evaluation leaves the stage
-tracks alone** — a position writes its own cell only
+tracks alone** – a position writes its own cell only
 (`spine_new_off`). -/
 theorem stEndB_new_off
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
@@ -1974,7 +1974,7 @@ variable (st₀ : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
 variable (f₀ : dt.CtlIx → A)
 
 /-- **The pair the sweep arrives at each address with**: the base at the
-empty address, and at every increment the previous address's spine exit —
+empty address, and at every increment the previous address's spine exit –
 its marker moved on and its mirror set to the new address, exactly the
 shape `DescriptiveComplexity.Draw.Data.reaches_sweep` demands. -/
 noncomputable def sweepPair
@@ -1986,19 +1986,19 @@ noncomputable def sweepPair
             (wmNext hlin u) with mir := wmNext hlin u },
         dt.fsEnd (aT := aT) RF hord mV semOf tOf u p.1 p.2)) w
 
-/-- The sweep's tape family — `reaches_sweep`'s `SW`. -/
+/-- The sweep's tape family – `reaches_sweep`'s `SW`. -/
 noncomputable def sweepSW
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
   (dt.sweepPair (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w).1
 
-/-- The sweep's control family — `reaches_sweep`'s `FS`. -/
+/-- The sweep's control family – `reaches_sweep`'s `FS`. -/
 noncomputable def sweepFS
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     dt.CtlIx → A :=
   (dt.sweepPair (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w).2
 
-/-- The state the sweep leaves each address in — `reaches_sweep`'s
+/-- The state the sweep leaves each address in – `reaches_sweep`'s
 `stE`. -/
 noncomputable def sweepStE
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
@@ -2007,7 +2007,7 @@ noncomputable def sweepStE
     (dt.sweepSW (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w)
     (dt.sweepFS (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w)
 
-/-- The control the sweep leaves each address in — `reaches_sweep`'s
+/-- The control the sweep leaves each address in – `reaches_sweep`'s
 `fsE`. -/
 noncomputable def sweepFsE
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
@@ -2023,7 +2023,7 @@ theorem sweepSW_bot :
     (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
 
 omit [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The tape's cover equation** — `reaches_sweep`'s `hSW`, on the nose:
+/-- **The tape's cover equation** – `reaches_sweep`'s `hSW`, verbatim:
 the next address's entry state is this one's spine exit, its marker moved
 on and its mirror at the new address. -/
 theorem sweepSW_incr
@@ -2042,7 +2042,7 @@ theorem sweepSW_incr
   exact h
 
 omit [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The control's cover equation** — `reaches_sweep`'s `hFS`: the next
+/-- **The control's cover equation** – `reaches_sweep`'s `hFS`: the next
 address's entry control is this one's spine exit control. -/
 theorem sweepFS_incr
     {w w' : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
@@ -2179,14 +2179,14 @@ theorem sweepStE_ltp
 /-! ### The SAV/TGT gap
 
 `DescriptiveComplexity.Draw.Data.evalSpine_run` asks, at every address, for
-`hsavOf`/`htgtOf` — the SAV and TARGET registers holding *that address* —
+`hsavOf`/`htgtOf` – the SAV and TARGET registers holding *that address* –
 because `DescriptiveComplexity.Draw.Data.matrix_run` reads them there. But
 the advance refreshes only the marker and the mirror (`reaches_sweep`'s
 `hSW` is `atSt … with mir := …`), so those two registers **ride** the whole
 sweep, and the requirement is met at one address at most. The two lemmas
 below are that statement, not a workaround: whichever way the gap is closed
-— the advance copying the mirror into SAV and TARGET, the evaluation
-refreshing them at its entry, or `matrix_run` reading the mirror instead —
+– the advance copying the mirror into SAV and TARGET, the evaluation
+refreshing them at its entry, or `matrix_run` reading the mirror instead –
 the fix is in the *program*, not here. -/
 
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
@@ -2461,10 +2461,10 @@ end SweepFamily
 `DescriptiveComplexity.Draw.Data.stageEndSt st v = { st with sav := v,
 tgt := v }`: the random access **writes** the home address into SAV and
 TARGET whatever they held, so a stage atom is transparent exactly when they
-held it already — which is what `stageEndSt_eq`'s two hypotheses say, and
+held it already – which is what `stageEndSt_eq`'s two hypotheses say, and
 why they are not a proof artifact.
 
-Closing the sweep's gap by "reading the mirror" therefore means *threading*
+Closing the sweep's gap by “reading the mirror” therefore means *threading*
 that normalization rather than assuming it away: an atom's exit state is
 `stageEndSt st v`, and the layers above carry it. These are the equations
 that threading needs; they are all definitional, which is what makes the

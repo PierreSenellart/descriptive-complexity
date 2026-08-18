@@ -22,7 +22,7 @@ sentences all survive the pullback, see
 
 ## Why the states are relations
 
-An SO(TC) walk remembers an assignment of relations, i.e. `n^a` bits on a
+An SO(TC) walk remembers an assignment of relations, i.e., `n^a` bits on a
 universe of size `n`, and may take exponentially many steps to reach its
 target. That is precisely a polynomially space-bounded computation: the
 configuration is the remembered assignment, and the (first-order) transition

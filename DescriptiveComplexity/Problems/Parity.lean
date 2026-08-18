@@ -32,7 +32,7 @@ having on its own:
 * **PARITY is in LOGSPACE** (`DescriptiveComplexity.parity_mem_LOGSPACE`), by one
   deterministic walk along the order: carry a bit, flip it at each marked
   element. The walk is `DescriptiveComplexity.parSpec`, its mode is the parity of
-  the marked elements seen so far, and it is *functional* on the nose
+  the marked elements seen so far, and it is *functional* outright
   (`DescriptiveComplexity.functional_parSpec`), so determinizing changes nothing
   (`DescriptiveComplexity.TCSpec.det_accepts_iff`).
 * **PARITY is not first-order definable**, even order-invariantly

@@ -175,7 +175,7 @@ complement. -/
 theorem qsatCompl_sotcDefinable : SOTCDefinable QSATᶜ :=
   ⟨qsSpecCo, fun _ _ _ _ _ => not_qsatHolds_iff_accepts⟩
 
-/-- **The complement of QSAT is in PSPACE**, i.e. `QSAT ∈ coPSPACE`. -/
+/-- **The complement of QSAT is in PSPACE**, i.e., `QSAT ∈ coPSPACE`. -/
 theorem qsatCompl_mem_PSPACE : QSATᶜ ∈ PSPACE :=
   qsatCompl_sotcDefinable
 

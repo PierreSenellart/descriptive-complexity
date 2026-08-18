@@ -645,13 +645,13 @@ noncomputable def gateAdv (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
       (dt.setSubLeaf zero one (dt.domLeafVal one t hn hrd f) f))
 
 /-- **The dispatch's default tag**. A gate's branch checkpoint dispatches on
-the decoded tag of its block value; where the witness flags are not one-hot —
-block values the sweeps and the VAL enumeration produce and no point encodes —
+the decoded tag of its block value; where the witness flags are not one-hot –
+block values the sweeps and the VAL enumeration produce and no point encodes –
 the checkpoint fires into *this* tag's branch instead, and the branch's
 conjoining exit reads the non-one-hotness off the surviving witness flags and
 clears the flag. Any tag serves.
 
-That last sentence is load-bearing, and is why the tag is chosen from a
+That last sentence is what permits the choice, and is why the tag is chosen from a
 **nonemptiness of the tags** rather than from a point: an interpretation names
 this tag in a formula, so it must be the same tag at every instance, and by
 proof irrelevance a `Classical.ofNonempty` at a `Prop` is (the structure only
@@ -662,7 +662,7 @@ noncomputable def defTag : dt.X.Tag :=
   @Classical.ofNonempty dt.X.Tag ⟨(Classical.ofNonempty (α := dt.X.Map A)).1.1⟩
 
 /-- **What a gate's branch checkpoint dispatches on**: the decoded tag
-where the witness flags are one-hot, the default tag where they are not —
+where the witness flags are one-hot, the default tag where they are not –
 so some dispatch always fires, on *every* block value. The exit's
 one-hotness conjunct makes the default branch clear the flag, so totality
 costs no wrong verdict. Shared by the outer gates (at MIRROR) and the
@@ -695,7 +695,7 @@ noncomputable def dspTagOf (S : (Fin dt.dd → A) → Prop) : dt.X.Tag :=
 
 variable {dt zero one} in
 omit [L.IsRelational] in
-/-- **At a one-hot block value the dispatch is the decoded tag** — how a
+/-- **At a one-hot block value the dispatch is the decoded tag** – how a
 gated address's per-block tag data pins the dispatch. -/
 theorem dspTagOf_eq_of_onehot {S : (Fin dt.dd → A) → Prop} {t : dt.X.Tag}
     (hone : ∀ t' : dt.X.Tag,
@@ -708,8 +708,8 @@ theorem dspTagOf_eq_of_onehot {S : (Fin dt.dd → A) → Prop} {t : dt.X.Tag}
   exact (hone hex.choose).mp ((hex.choose_spec hex.choose).mpr rfl)
 
 /-- **A gate's conjoining exit**: the flag keeps its value only if the
-block's witness flags are **one-hot at the dispatched tag** — so the
-default branch always clears — and the sub-fold of the tag's domain
+block's witness flags are **one-hot at the dispatched tag** – so the
+default branch always clears – and the sub-fold of the tag's domain
 sentence holds. -/
 noncomputable def gateExit (t : dt.X.Tag)
     (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
@@ -860,11 +860,11 @@ noncomputable def wellShapedIG (b : Fin dt.ko ⊕ Fin dt.ki)
           g (.name j) = encAsgTup dt.ly zero one i w (Fin.castLE dt.dd0Le j)))
 
 /-- **An inner gate's conjoining exit**: as
-`DescriptiveComplexity.Draw.Data.gateExit`, into the given flag — the
-level's polarity chooses which of the round's two flags — with one
+`DescriptiveComplexity.Draw.Data.gateExit`, into the given flag – the
+level's polarity chooses which of the round's two flags – with one
 conjunct more: the witness flags must be **one-hot at the dispatched
 tag**. On the genuine branch the conjunct is what the dispatch already
-knew; on the default branch it is false, so the flag is cleared — which is
+knew; on the default branch it is false, so the flag is cleared – which is
 the right verdict, a block value with no one-hot witness encoding no
 point. -/
 noncomputable def igateExit (flag : dt.CtlIx) (t : dt.X.Tag)

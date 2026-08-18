@@ -145,7 +145,7 @@ noncomputable def exactCoverKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfCoverClause ⊓ sfDisjClause)
 
 /-- Kernel clause (Set Splitting): every set of the family contains a
-coloured ground element. -/
+colored ground element. -/
 noncomputable def sfSplitInClause : setFamilySOLang.Sentence :=
   ((Relations.formula₁ sfFamSym (Term.var (Sum.inr 0))).imp
     ((Relations.formula₁ sfElemSym (Term.var (Sum.inr ())) ⊓
@@ -154,7 +154,7 @@ noncomputable def sfSplitInClause : setFamilySOLang.Sentence :=
       Relations.formula₁ sfGuessSym (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
 
 /-- Kernel clause (Set Splitting): every set of the family contains an
-uncoloured ground element. -/
+uncolored ground element. -/
 noncomputable def sfSplitOutClause : setFamilySOLang.Sentence :=
   ((Relations.formula₁ sfFamSym (Term.var (Sum.inr 0))).imp
     ((Relations.formula₁ sfElemSym (Term.var (Sum.inr ())) ⊓
@@ -163,7 +163,7 @@ noncomputable def sfSplitOutClause : setFamilySOLang.Sentence :=
       ∼(Relations.formula₁ sfGuessSym (Term.var (Sum.inr ())))).iExs Unit)).iAlls (Fin 1)
 
 /-- The first-order kernel of the `Σ₁` definition of Set Splitting: the
-guessed relation is read as one colour class, and every set of the family
+guessed relation is read as one color class, and every set of the family
 meets it and its complement. -/
 noncomputable def setSplittingKernel : setFamilySOLang.Sentence :=
   sfSplitInClause ⊓ sfSplitOutClause
@@ -457,7 +457,7 @@ theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
     exact ⟨fun s => ρ true ![s], hGfam, hcov,
       fun s s' hs hs' hne x hx => hdisj s s' x hs hs' hne hx⟩
 
-/-- **Set Splitting is `Σ₁`-definable**: existentially guess one colour class
+/-- **Set Splitting is `Σ₁`-definable**: existentially guess one color class
 and check first-order that every set of the family meets it and its
 complement. -/
 theorem setSplitting_sigmaSODefinable : SigmaSODefinable 1 SetSplitting := by

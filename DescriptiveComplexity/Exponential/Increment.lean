@@ -11,8 +11,8 @@ import DescriptiveComplexity.Exponential.OrdFormula
 `DescriptiveComplexity.Exponential.OrdFormula` writes the *order* on an
 expanded universe as a first-order sentence over the base. Walking that universe
 needs one thing more: its **covering relation**, and the two endpoints of the
-order. An assignment is read as a binary number — the set of atoms it makes
-true, most significant at the smallest atom — so the immediate successor is the
+order. An assignment is read as a binary number – the set of atoms it makes
+true, most significant at the smallest atom – so the immediate successor is the
 schoolchild's increment: find the greatest atom the assignment misses, put it
 in, and take out every atom above it.
 
@@ -30,22 +30,22 @@ positions that `DescriptiveComplexity.SOBlock.ordLtF` already uses.
 A padded atom (`DescriptiveComplexity.SOBlock.AtomIx`) is a relation variable
 with a tuple of the block's *maximal* arity, of which
 `DescriptiveComplexity.SOBlock.atomSet` reads only the first `B.arity i`
-coordinates — so the sets in the image of `atomSet` are exactly the
+coordinates – so the sets in the image of `atomSet` are exactly the
 **padding-invariant** ones, and the binary increment of such a set is in general
 not one: it flips a single padded atom, while padding-invariance forces every
 padded atom with the same truncation to move together. **The successor of an
 assignment is therefore not the increment of its padded atom set.**
 
-The order is unaffected — two assignments differ first at a padded atom exactly
+The order is unaffected – two assignments differ first at a padded atom exactly
 when they differ first at the *real* atom `Σ i, Fin (B.arity i) → A` it
-truncates to — and the honest atoms are what this file works with. Over them an
+truncates to – and the honest atoms are what this file works with. Over them an
 assignment is an arbitrary subset (`DescriptiveComplexity.SOBlock.realSet` is a
 bijection), so the set-level increment applies unchanged, and
 `DescriptiveComplexity.SOBlock.assignSucc_iff` reads it back as *the immediate
 successor in the order the expanded universe carries*. The two indices are
 matched by `DescriptiveComplexity.SOBlock.atomSet_lt_iff_realSet`, whose whole
-content is that a real atom has a **least** padded representative — the tuple
-padded with the least element of `A` — so that comparing representatives is
+content is that a real atom has a **least** padded representative – the tuple
+padded with the least element of `A` – so that comparing representatives is
 comparing real atoms.
 
 Accordingly the sentence takes its lexicographic comparisons on the
@@ -155,7 +155,7 @@ end SetOrder
 /-! ### The honest atom index
 
 An assignment is an arbitrary subset of the **real** atoms `Σ i, Fin (arity i) → A`
-— unlike the padded atoms, where only the padding-invariant subsets occur — so
+– unlike the padded atoms, where only the padding-invariant subsets occur – so
 the increment of §the module docstring applies to the real ones unchanged. The
 two index types order assignments the same way, which is
 `DescriptiveComplexity.SOBlock.atomSet_lt_iff_realSet`: a real atom has a
@@ -181,7 +181,7 @@ variable (A) in
 *its own* arity. An assignment is an arbitrary subset of these. -/
 abbrev RealIx : Type := (i : B.ι) × (Fin (B.arity i) → A)
 
-/-- The real atoms an assignment makes true — the assignment itself, uncurried,
+/-- The real atoms an assignment makes true – the assignment itself, uncurried,
 so this is a bijection onto the subsets. -/
 def realSet (ρ : B.Assignment A) : B.RealIx A → Prop := fun P => ρ P.1 P.2
 
@@ -189,7 +189,7 @@ def realSet (ρ : B.Assignment A) : B.RealIx A → Prop := fun P => ρ P.1 P.2
 noncomputable def realOf (p : B.AtomIx A) : B.RealIx A :=
   ⟨p.1, fun j => p.2 (Fin.castLE (arity_le_blockArityBound B p.1) j)⟩
 
-/-- A tuple of the arity of `i`, padded out with the least element — the
+/-- A tuple of the arity of `i`, padded out with the least element – the
 *least* padded representative of a real atom. -/
 noncomputable def padMin (i : B.ι) (u : Fin (B.arity i) → A) :
     Fin (blockArityBound B) → A :=
@@ -351,7 +351,7 @@ namespace SOBlock
 variable {L : Language.{0, 0}} (B : SOBlock)
 
 /-- The relation variables strictly above `i`, in the arbitrary order on the
-block's index type — the mirror of
+block's index type – the mirror of
 `DescriptiveComplexity.SOBlock.ivarsBelow`, and the atoms the increment clears. -/
 noncomputable def ivarsAbove (i : B.ι) : List B.ι :=
   letI : LinearOrder B.ι := finiteLinearOrder B.ι
@@ -371,7 +371,7 @@ the second true; the copies agree strictly below it; and strictly above it the
 first is true and the second false. Each of the two conditions on the other
 atoms splits, as in `DescriptiveComplexity.SOBlock.ordLtF`, into a static part
 over the earlier (or later) relation variables and a lexicographic part at the
-same variable — taken on the **truncated** tuples, so that it compares *real*
+same variable – taken on the **truncated** tuples, so that it compares *real*
 atoms and not their padded representatives (see the padding trap above). -/
 noncomputable def succAssignF : ((L.sum Language.order).sum (B.replicate 2).lang).Sentence :=
   listSup (B.ivars.map fun i =>
@@ -536,7 +536,7 @@ theorem realize_succAssignF_aux (ρs : Fin 2 → B.Assignment A) :
 
 /-- **The increment sentence is the successor of an assignment**: it holds of
 two assignments exactly when the second is the increment of the first at their
-real atoms — which, by
+real atoms – which, by
 `DescriptiveComplexity.SOBlock.assignSucc_iff`, is exactly the immediate
 successor in the order the expanded universe carries. -/
 theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
@@ -616,7 +616,7 @@ theorem realize_topAssignF (ρs : Fin 2 → B.Assignment A) (c : Fin 2) :
     exact (h ▸ trivial : B.atomSet (ρs c) (i, x))
 
 variable (A) in
-/-- The assignment holding of everything — the greatest one. -/
+/-- The assignment holding of everything – the greatest one. -/
 def topAssign : B.Assignment A := fun _ _ => True
 
 end SOBlock
@@ -626,11 +626,11 @@ end SOBlock
 What a machine walking an expanded universe asks of its order
 (`DescriptiveComplexity.HeadMove`): which point is least, which is greatest, and
 which is the immediate successor of which. Tag first and then the assignment, so
-each answer splits: the tag part is *static* — finitely many tags, compared at
-formula-construction time — and the assignment part is the increment above. The
+each answer splits: the tag part is *static* – finitely many tags, compared at
+formula-construction time – and the assignment part is the increment above. The
 lexicographic bookkeeping is `DescriptiveComplexity.prodLex_le_iff` and its
 siblings, with one caveat: a point's second component is an *assignment*, not an
-arbitrary set, so the witnesses put between two points must be assignments too —
+arbitrary set, so the witnesses put between two points must be assignments too –
 the empty one, the full one, and the ones the walk itself carries. -/
 
 namespace ExpExpansion

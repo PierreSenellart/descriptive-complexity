@@ -25,7 +25,7 @@ in the table:
 | `exStep tx ty` | ∀ | prove `¬AGUniv x`; prove `AGMove x y`; and win from `y` |
 | `allCert tx ty` | ∀ | prove `AGUniv x`; prove `AGMove x y`; and answer every `y'` |
 | `allStep tx ty` | ∃ | refute `AGMove x y`; or win from `y` |
-| `pre s tx ty j pol` | `pol` | fill round `n - j`, or — at `j = 0` — be decided by the kernel |
+| `pre s tx ty j pol` | `pol` | fill round `n - j`, or – at `j = 0` – be decided by the kernel |
 
 Two of the six families are there for reasons that are easy to get wrong and
 expensive to discover late.
@@ -48,9 +48,9 @@ existential player is forced to tell the truth about `AGUniv x`.
 ## The states
 
 A state is `DescriptiveComplexity.ExpExpansion.stateAssign`: a phase and one
-assignment per round. Rounds are *not* guarded to be points in general — the play
+assignment per round. Rounds are *not* guarded to be points in general – the play
 rounds of a prefix range over all assignments, the guards living inside the
-kernel (`DescriptiveComplexity.ExpExpansion.stepF`) — but the rounds of every
+kernel (`DescriptiveComplexity.ExpExpansion.stepF`) – but the rounds of every
 node-carrying phase are, which is what
 `DescriptiveComplexity.ExpExpansion.allRoundsPointF` asserts at the start and
 every node move preserves.

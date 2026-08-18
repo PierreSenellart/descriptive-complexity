@@ -19,7 +19,7 @@ assignment is *supported*, so it is the extension of a unique assignment of the
 instance. And every sentence the expansion is made of transports by
 `DescriptiveComplexity.Draw.realize_relOldBlock` – the domain sentence at one copy
 of the block, and each defining sentence at `n` copies, where the extension
-commutes with replication on the nose.
+commutes with replication exactly.
 -/
 
 namespace DescriptiveComplexity
@@ -36,7 +36,7 @@ variable {L : Language.{0, 0}} [L.IsRelational] {X : ExpExpansion L}
 variable {A : Type} [L.Structure A] [LinearOrder A] [Nonempty A]
 
 omit [L.IsRelational] [L.Structure A] [LinearOrder A] [Nonempty A] in
-/-- **Extending commutes with replication**, on the nose: the index type of a
+/-- **Extending commutes with replication**, exactly: the index type of a
 replicated block is a plain product and the extension acts coordinate by
 coordinate. -/
 theorem extAssign_replicateAssign {n : ℕ} (ρs : Fin n → X.B.Assignment A) :

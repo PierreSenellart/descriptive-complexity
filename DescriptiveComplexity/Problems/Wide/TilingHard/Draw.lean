@@ -191,7 +191,7 @@ noncomputable def firstRF (t₁ t₂ : TileTag) : wideOrd.Formula (Fin 2 × Fin 
         wdBlankF (argSym 1))))
 
 /-- What may stand immediately to the right of a tile: an announced head is the
-neighbour's arrival and an arrival is a neighbouring head, so a row keeps to one
+neighbor's arrival and an arrival is a neighboring head, so a row keeps to one
 head. -/
 noncomputable def horizF (t₁ t₂ : TileTag) : wideOrd.Formula (Fin 2 × Fin 3) :=
   tileF t₁ 0 ⊓ (tileF t₂ 1 ⊓

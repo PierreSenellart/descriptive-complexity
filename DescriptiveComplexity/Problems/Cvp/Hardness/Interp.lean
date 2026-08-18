@@ -99,7 +99,7 @@ serves the unary marks (variables `(0, j)`) and the binary wires (variables
 
 variable {α : Type}
 
-/-- “`c` is a clause with no positive literal”, i.e. a goal clause: the shape
+/-- “`c` is a clause with no positive literal”, i.e., a goal clause: the shape
 that makes an instance unsatisfiable once its negative literals are forced. -/
 noncomputable def noPosClF (c : α) : satOrd.Formula α :=
   clF c ⊓ ∼((posF (Sum.inl c) (Sum.inr ()) : satOrd.Formula (α ⊕ Unit)).iExs Unit)

@@ -78,7 +78,7 @@ theorem unpad_pad (hc : c ≤ dd) : unpad hc (pad (dd := dd) zero w) = w :=
     rw [unpad, pad_of_lt _ (by exact i.isLt)]
 
 /-- **A canonically padded tuple is the padding of what it carries**, so the two
-descriptions of an element – "it is `pad` of something" and "it is padded" – are
+descriptions of an element – “it is `pad` of something” and “it is padded” – are
 the same. -/
 theorem pad_unpad (hc : c ≤ dd) (hv : IsPad c zero v) : pad zero (unpad hc v) = v := by
   refine funext fun j => ?_

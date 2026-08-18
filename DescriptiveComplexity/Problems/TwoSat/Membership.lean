@@ -19,14 +19,14 @@ fragment buy. Guess the truth assignment as the single unary relation variable
 of `DescriptiveComplexity.satAssignBlock`, universally quantify three first-order
 variables `c, x, y`, and emit:
 
-* for each pair of signs `(s, u)`, the clause whose guard says "`c` is a clause,
+* for each pair of signs `(s, u)`, the clause whose guard says “`c` is a clause,
   `(x, s)` and `(y, u)` are occurrences of `c`, and *every* occurrence of `c` is
-  one of these two", with the 2-clause `ℓ(x, s) ∨ ℓ(y, u)` as its body. A clause
+  one of these two”, with the 2-clause `ℓ(x, s) ∨ ℓ(y, u)` as its body. A clause
   with a single occurrence is covered by instantiating `y := x`, `u := s`, which
   emits `ℓ(x, s) ∨ ℓ(x, s)`: no separate unit clause is needed;
-* the goal clause guarded by "`c` is an empty clause" – an empty clause makes
+* the goal clause guarded by “`c` is an empty clause” – an empty clause makes
   the CNF unsatisfiable;
-* the goal clause guarded by "some clause has three distinct occurrences"
+* the goal clause guarded by “some clause has three distinct occurrences”
   (`DescriptiveComplexity.wideTwoOrdF`) – this is how the *width promise* of 2SAT is
   enforced from inside the fragment: guards are first-order over the input, so a
   promise costs one goal clause and no second-order machinery.
@@ -46,8 +46,8 @@ namespace TwoSatKrom
 
 /-! ### The atoms and the guards -/
 
-/-- The atom "the guessed truth assignment holds of the `p`-th universally
-quantified variable". -/
+/-- The atom “the guessed truth assignment holds of the `p`-th universally
+quantified variable”. -/
 def nuAtom (p : Fin 3) : SOAtom satAssignBlock 3 where
   idx := ()
   args := fun _ => p

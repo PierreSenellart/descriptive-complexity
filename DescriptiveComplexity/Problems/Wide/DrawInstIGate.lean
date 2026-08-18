@@ -11,8 +11,8 @@ import DescriptiveComplexity.Problems.Wide.DrawInstGate
 The mirror of `DescriptiveComplexity.Problems.Wide.DrawInstGate` at the
 **VAL register**: one gate block per quantified level of a variable's
 pack, read off the round's register content instead of the mirror, its
-verdict conjoined into the level's **polarity flag** — one of the round's
-two — instead of the gates' single flag. The witness cells are the same
+verdict conjoined into the level's **polarity flag** – one of the round's
+two – instead of the gates' single flag. The witness cells are the same
 (`gateTagCell`/`gateECell` are register-free), the control families are
 the same operations at the `igateArgs` pack, and the run is the same
 `tag_run_iter` with the read registers pointed at VAL.
@@ -240,7 +240,7 @@ theorem ctlBit_igateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The chain's decoding always dispatches**: at a block value with a
 one-hot witness the flags decode its tag, and at any other the default
-branch fires — the totality of the branch checkpoint on *every* block
+branch fires – the totality of the branch checkpoint on *every* block
 value the VAL enumeration produces. -/
 theorem igTagsAre_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
@@ -830,7 +830,7 @@ theorem ctlBit_flag_igate_init (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
-/-- Either round flag rides along one branch round — the other polarity's
+/-- Either round flag rides along one branch round – the other polarity's
 included, whatever the pack's own flag. -/
 theorem ctlBit_roundFlag_igate_adv {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
@@ -869,7 +869,7 @@ theorem ctlBit_roundFlag_igate_init {q : dt.CtlIx}
     putLvE_of_not_lv hlv]
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
-/-- **Either round flag survives one gate's machinery** — the other
+/-- **Either round flag survives one gate's machinery** – the other
 polarity's included: neither the witness chain nor the branch's domain
 loop writes any flag at all. -/
 theorem ctlBit_roundFlag_igateFam {q : dt.CtlIx}
@@ -1035,7 +1035,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 one gate exactly when it held before – every earlier block passed – **and**
 the block value's witness is one-hot at the dispatched tag – so the default
 branch always clears – **and** the fold of this block's domain sentence over
-the whole wide enumeration holds, i.e. the tag's domain condition at the
+the whole wide enumeration holds, i.e., the tag's domain condition at the
 decoded assignment. -/
 theorem ctlBit_flag_igate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
@@ -1159,7 +1159,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] [L.IsRelational] in
 /-- **The machine's per-level verdict is the gate**: at a block value all of
-whose members are encoding-shaped — the file test's question — the
+whose members are encoding-shaped – the file test's question – the
 dispatch's one-hotness together with the domain condition at the dispatched
 tag is exactly `DescriptiveComplexity.Draw.IsEnc`. -/
 theorem igVerdict_iff_isEnc (hzo : zero ≠ one)

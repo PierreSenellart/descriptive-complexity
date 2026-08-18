@@ -362,7 +362,7 @@ end Gates
 /-! ### The inner gates
 
 The same sequencer-over-gate-blocks as the outer gates, with one
-difference: a failing block does **not** abort the sequence — every
+difference: a failing block does **not** abort the sequence – every
 quantified level's flag must be computed, since the leaf reads both flag
 conjunctions whichever way the branch goes. So each block's fail exit
 continues to the next checkpoint, its `setFail` clearing the level's

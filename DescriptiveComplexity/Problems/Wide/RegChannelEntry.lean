@@ -384,7 +384,7 @@ theorem initBackReg_track_zero
 -- `Function.update` in the start step is what needs the instance.
 set_option linter.unusedDecidableInType false in
 open Classical in
-/-- **The tape the channel hands over is recognisable**: the file's slots are the
+/-- **The tape the channel hands over is recognizable**: the file's slots are the
 layout's (that is `startBack_initBackReg`, read at those slots alone, the start
 step touching only tracks), the four addressed tracks are clear, and every other
 track is a bit – the marks are `regSlotMark`s and the rest is blank. This is the

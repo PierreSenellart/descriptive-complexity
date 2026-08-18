@@ -89,7 +89,7 @@ theorem back_lvTrackD (F : RegFile (Univ A R P dt.KIx dt.dd))
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
-/-- **A level's register set depends on the mirror and VAL alone** — which
+/-- **A level's register set depends on the mirror and VAL alone** – which
 is what lets everything read through it be transported between states that
 share those two registers. -/
 theorem lvSet_congr (vi : dt.VarIx) {st st' : TapeSt dt A R P I}

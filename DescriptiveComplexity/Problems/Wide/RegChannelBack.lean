@@ -12,7 +12,7 @@ import DescriptiveComplexity.Problems.Wide.RegChannelAccept
 A run that accepts ends in `NexPh.acceptP`, which is one of the phases the
 program can never leave (`NexPh.PostGuess`). So somewhere along the run there is
 a **first** configuration in a post-guess phase, and this file finds it and
-recognises its tape.
+recognizes its tape.
 
 Two facts do it. The phases before it are all the outer layer's, so the rules
 fired up to that point keep the file, keep the addressed tracks and write bits
@@ -319,7 +319,7 @@ variable {PR : Prog A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
 omit [Finite A] [Finite dt.KIx] [Nonempty A]
   [Finite (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
   [Finite (R')] in
-/-- **The first post-guess configuration of a run, with its tape recognised.**
+/-- **The first post-guess configuration of a run, with its tape recognized.**
 Every step before it fires a rule of the outer layer, and those keep the file –
 so the shape the channel wrote at time zero is still there, and the tape is an
 `ixBack` of a tape state (`exists_ixBack_of_shape`). The phase at that time is
@@ -465,7 +465,7 @@ omit [LinearOrder (dt.X.Map A)]
   [Finite (Univ A (R')
     (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)] in
 /-- **The entry's tape, read as a tape state.** The channel's tape is
-recognisable (`tapeShape_initBackReg`), the reading survives to the first
+recognizable (`tapeShape_initBackReg`), the reading survives to the first
 post-guess time (`exists_postGuess_shaped`) and there the tape is an `ixBack`
 (`exists_ixBack_of_shape`) whose mirror, target, saved mirror and valuation are
 empty. The marker is the one write of the opening the reading has to *read*: the
@@ -526,7 +526,7 @@ theorem exists_entry_state
       ∃ fm : dt.CtlIx → A, (g m).state = Sum.inr
         (PR.stElt NexPh.homeGuessP fm) := by
   classical
-  -- the channel's tape, in the form a reading recognises
+  -- the channel's tape, in the form a reading recognizes
   have hmir₀ : ∀ r, PR.initBackReg r Slot.mir =
       PR.zero := fun r =>
     initBackReg_track_zero hlin hR hE.mark hE.blank r Slot.mir

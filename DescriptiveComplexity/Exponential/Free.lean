@@ -16,9 +16,9 @@ over the **ordered** expansion of the base vocabulary, and
 order of the instance. That is why `DescriptiveComplexity.EXPTIME` and
 `DescriptiveComplexity.EXPSPACE` are written `SO(≤, LFP)` and `SO(≤, PFP)`.
 
-This file introduces the order-free notion — an expansion whose sentences live
+This file introduces the order-free notion – an expansion whose sentences live
 over the bare vocabulary, so that its universe is defined on a structure
-carrying **no order at all** — and proves the easy half of the comparison: an
+carrying **no order at all** – and proves the easy half of the comparison: an
 order-free expansion *is* an expansion, its sentences simply never mentioning
 the order symbol
 (`DescriptiveComplexity.ExpExpansionFree.toExp`), and its expanded structure is
@@ -199,7 +199,7 @@ variable [L.IsRelational]
 
 /-- **Order-free definability over an expanded universe**: the problem `P`
 holds of `A` exactly when a fixed `Q ∈ C` holds of `X.Map A`, for an expansion
-whose sentences see no order — so the equivalence is asked of structures
+whose sentences see no order – so the equivalence is asked of structures
 carrying no order at all. -/
 def ExpDefinableFree (C : ComplexityClass) (P : DecisionProblem L) : Prop :=
   ∃ (X : ExpExpansionFree L) (Q : DecisionProblem X.E), C.Mem Q ∧
@@ -379,8 +379,8 @@ A *nullary* symbol of the original vocabulary has no copy of the block to read
 an order from, so the guessing expansion cannot define it: it defines its
 **unary shift** instead (`DescriptiveComplexity.nullShiftLang`), whose one
 argument names the copy the value is read in, and leaves the nullary symbol
-itself at `⊥`. Nothing is lost — a reader of the expanded structure finds the
-value of a nullary symbol inside a copy where the shift holds — and the
+itself at `⊥`. Nothing is lost – a reader of the expanded structure finds the
+value of a nullary symbol inside a copy where the shift holds – and the
 construction needs no hypothesis on the arities. -/
 
 section Guess

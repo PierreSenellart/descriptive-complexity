@@ -219,7 +219,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 include hinj helt in
 /-- **The chain's decoding always dispatches**: at a block value with a
 one-hot witness the flags decode its tag, and at any other the default
-branch fires — the totality of the branch checkpoint on *every* block
+branch fires – the totality of the branch checkpoint on *every* block
 value the sweep produces. -/
 theorem ixDspTagsAre_gateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
@@ -847,7 +847,7 @@ include hinj helt in
 one gate exactly when it held before – every earlier block passed – **and**
 the block value's witness is one-hot at the dispatched tag – so the default
 branch always clears – **and** the fold of this block's domain sentence
-over the whole wide enumeration holds, i.e. the tag's domain condition at
+over the whole wide enumeration holds, i.e., the tag's domain condition at
 the decoded assignment. -/
 theorem ctlBit_gateFlagC_ixGate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.ctlBit one

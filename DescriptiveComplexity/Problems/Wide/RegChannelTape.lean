@@ -18,8 +18,8 @@ has to be redone is the pair of statements at the two ends of a run.
 
 They are the segment channel's own with two changes: the cell of `x` is
 `wmRegSeg x`, and only the elements that *carry* input have one. Where the
-segment channel says "every cell holds its element's symbol, every other
-address is blank", the register channel says the same of the elements it writes
+segment channel says “every cell holds its element's symbol, every other
+address is blank”, the register channel says the same of the elements it writes
 for, and an address that is nobody's cell is blank as before.
 -/
 

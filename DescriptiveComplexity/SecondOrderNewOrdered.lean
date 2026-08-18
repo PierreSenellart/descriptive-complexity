@@ -81,7 +81,7 @@ abbrev extOldSym : ((newLang L).sum C.withOrder.lang).Relations 1 :=
   Sum.inl (Sum.inr Language.oldSym)
 
 /-- The language morphism eliminating the order symbol of the extended ordered
-vocabulary in favour of the order variable of the extended block. -/
+vocabulary in favor of the order variable of the extended block. -/
 def extOrderElim :
     (newLang (L.sum Language.order)).sum C.lang →ᴸ (newLang L).sum C.withOrder.lang where
   onFunction {_n} f :=

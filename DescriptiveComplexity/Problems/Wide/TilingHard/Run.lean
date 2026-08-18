@@ -145,7 +145,7 @@ theorem exists_runDataSpace [Nonempty V] (h : M.AcceptsSpace) :
     exact hacc
 
 /-- **The head stands on a position at every time**: it starts on the least one
-and a step moves it to a neighbour. -/
+and a step moves it to a neighbor. -/
 theorem head_posn {g : ℕ → Config V} {tr : ℕ → V} {n : ℕ}
     (hinit : M.IsInit (g 0)) (hfreeze : ∀ i, n ≤ i → g i = g n)
     (hstep : ∀ i, i < n → StepWith M (g i) (g (i + 1)) (tr i)) (k : ℕ) :

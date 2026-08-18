@@ -13,7 +13,7 @@ import DescriptiveComplexity.Problems.Wide.DrawSeekKit
 /-!
 # The call sites' kits, at the concrete slots
 
-The kit instantiations of the EXPSPACE program: each call site of the plan
+The kit instantiations of the EXPSPACE program: each call site of the program
 is one of the kit shapes of the layer, at the slot
 inventory of `DescriptiveComplexity.Problems.Wide.DrawSlots`. This file fixes
 the slots and guards; the phase embeddings stay parameters (each call site

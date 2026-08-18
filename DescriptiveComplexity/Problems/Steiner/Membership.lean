@@ -20,7 +20,7 @@ The interesting one is connectivity, which is a transitive-closure condition
 and hence not first-order. What is guessed instead is a *root* – as a relation
 constrained to hold of at most one element, since the empty set is connected
 and has no root – together with an order in which every other chosen vertex
-has a chosen neighbour strictly below it. Walking down the order reaches the
+has a chosen neighbor strictly below it. Walking down the order reaches the
 root; that is the same certificate idea as for acyclicity in
 `DescriptiveComplexity.Problems.Feedback`, run in the opposite direction.
 -/
@@ -124,7 +124,7 @@ private noncomputable def stIrreflClause : steinerSOLang.Sentence :=
   Formula.iAlls (Fin 1)
     (∼(Relations.formula₂ kStLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
 
-/-- Kernel clause: every chosen non-root has a chosen neighbour strictly below
+/-- Kernel clause: every chosen non-root has a chosen neighbor strictly below
 it. -/
 private noncomputable def stStepClause : steinerSOLang.Sentence :=
   Formula.iAlls (Fin 1)

@@ -32,8 +32,8 @@ is exactly relativization to the predicate `old`. The specialization
 `A ⊕ Fin m` is a substructure isomorphic to `A`
 (`DescriptiveComplexity.oldSubEquiv`).
 
-The same machinery is what a relativized *membership* pullback – the
-domain-formula item of `ROADMAP.md` §3 – would want.
+The same machinery is what a relativized *membership* pullback – one through
+an interpretation whose domain is cut out by a formula – would want.
 -/
 
 namespace DescriptiveComplexity

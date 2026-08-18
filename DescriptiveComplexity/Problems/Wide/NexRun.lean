@@ -114,7 +114,7 @@ theorem trackTape_ixBack_congr {F : LaidFile dt A R' P' I}
 
 /-- **The mirror and VAL presentations agree**: the opening walks the mirror and
 the evaluation walks VAL, and both marks are the state's own, so the two runs
-compose on the nose. -/
+compose with no rewriting in between. -/
 theorem trackTape_ixBack_mir_val {F : LaidFile dt A R' P' I}
     {st : TapeSt dt A R' P' I} :
     PR.trackTapeAt F.cell Slot.mir
@@ -365,7 +365,7 @@ The file is laid **above** the program's data and the certificate is guessed
 **below** it, which is what lets a stage atom seek to a dictionary entry: the
 entry is a logical address and every logical address is below every register.
 The approach is the price of that arrangement – the
-base is not the marker's neighbour, so getting there is a walk and not a step –
+base is not the marker's neighbor, so getting there is a walk and not a step –
 and where it stops is the program's choice, a machine having no landmark but the
 cell it started on. -/
 theorem reachesIn_openingRegion (hcoord : Function.Injective coord)
@@ -392,7 +392,7 @@ theorem reachesIn_openingRegion (hcoord : Function.Injective coord)
     (hvi₁ : WMIncr WMLe v v₁) (hwalk : WMSetLe WMLe v₁ x)
     (hxb : WMIncr WMLe x
       ((dt.blkLaid h hpos (le_of_lt hbase)).cell (blkBot A dt.KIx dt.dd)))
-    -- The guess starts at the marker's neighbour, below the file.
+    -- The guess starts at the marker's neighbor, below the file.
     (hs₀ : WMIncr WMLe v s₀)
     (hvi' : WMIncr WMLe v v')
     {bg bg₀ : (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) →
@@ -519,7 +519,7 @@ def guessTracks (zero one : A) (σ : dt.d.B.Assignment (dt.X.Map A))
   fun iv r => trackOf dt.ly zero one (dt.arOf_le_ko (some iv)) σ r ∧
     WMSetLe WMLe bot r ∧ WMSetLt WMLe r top
 
-/-- **Outside the swept stretch the guess writes nothing** — the opening's
+/-- **Outside the swept stretch the guess writes nothing** – the opening's
 `hout`, at tracks that are an assignment's inside it. -/
 theorem not_guessTracks_out
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
@@ -536,7 +536,7 @@ theorem not_guessTracks_out
 /-- **Below the guess's top the tracks are the assignment's, and nothing has to
 be said about the bottom**: a track marks no empty address
 (`nonempty_of_trackOf`), so an address it marks is at or above the marker's
-neighbour by `wmSetLe_succ_bot_of_nonempty`, which is where the guess begins.
+neighbor by `wmSetLe_succ_bot_of_nonempty`, which is where the guess begins.
 This is the `hdict` an evaluation asks for, and it asks of the *data* only what
 `wmSetLt_ixStageTgt_logicalTop` already proves: that a dictionary address is
 below the last logical one.

@@ -116,7 +116,7 @@ exponential ones are lifted from. -/
 theorem PTIME_subset_PSPACE : PTIME ⊆ PSPACE :=
   fun _ _ _ h => NP_subset_PSPACE (PTIME_subset_NP h)
 
-/-- **`EXPTIME ⊆ EXPSPACE`**, i.e. **SO(LFP) ⊆ SO(PFP)** – the second-order
+/-- **`EXPTIME ⊆ EXPSPACE`**, i.e., **SO(LFP) ⊆ SO(PFP)** – the second-order
 shadow of `PTIME ⊆ PSPACE`. -/
 theorem EXPTIME_subset_EXPSPACE : EXPTIME ⊆ EXPSPACE := by
   rw [EXPTIME_eq_PTIME_exp, EXPSPACE_eq_PSPACE_exp]

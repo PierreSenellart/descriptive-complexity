@@ -9,23 +9,24 @@ import DescriptiveComplexity.Problems.Machine.Interp
 /-!
 # The transcription: `HORNSAT ≤ᶠᵒ[≤] DTMAccept`
 
-The first-order half of stage 4 of the machine bridge: the defining formulas
+The first-order half of the deterministic machine bridge: the defining formulas
 of an interpretation of `Language.turing` in ordered CNF instances describing
 the unit-propagation machine of
 `DescriptiveComplexity.Problems.Machine.HornHardness`, shown to realize exactly its
 predicates, and bundled as the ordered reduction
 `DescriptiveComplexity.HornTM.hornSat_ordered_fo_reduction_dtmAccept`.
 
-The method is stage 3's (`DescriptiveComplexity.Problems.Machine.Interp`), one
-dimension up: three shape helpers – `cstHF`, `oneHF`, `twoHF` – for the three
-payload shapes of the machine's elements, each with one realization lemma
-taking the valuation abstractly, so that every defining formula matches on its
-*first* tag only and every characterization case discharges by `rfl`. The two
-relational destinations (`tMarkEndRound`/`tMarkEndVer` dispatch to the lowest
-clause, which is not in their payload) get bespoke min-clause-pinned helpers.
+The method is the SAT machine's
+(`DescriptiveComplexity.Problems.Machine.Interp`), one dimension up: three shape
+helpers – `cstHF`, `oneHF`, `twoHF` – for the three payload shapes of the
+machine's elements, each with one realization lemma taking the valuation
+abstractly, so that every defining formula matches on its *first* tag only and
+every characterization case discharges by `rfl`. The two relational
+destinations (`tMarkEndRound`/`tMarkEndVer` dispatch to the lowest clause, which
+is not in their payload) get bespoke min-clause-pinned helpers.
 The clause-order formulas (`minClF`, `maxClF`, `nextClF`, `noClF`) are reused
-from stage 3 unchanged; the element-order ones (`minF`, `maxF`, `succF`) come
-from `DescriptiveComplexity.OrderWalk`, with a small bridge from `succF`'s
+from the SAT machine unchanged; the element-order ones (`minF`, `maxF`, `succF`)
+come from `DescriptiveComplexity.OrderWalk`, with a small bridge from `succF`'s
 between-form to `DescriptiveComplexity.SuccElt`.
 -/
 

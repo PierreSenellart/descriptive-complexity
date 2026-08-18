@@ -264,7 +264,7 @@ theorem readLvE_expFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An expansion atom's element loop is blind to the two scratch
-registers**: it reads the levels' register sets — the mirror and VAL — and
+registers**: it reads the levels' register sets – the mirror and VAL – and
 its background at the working cell alone. -/
 theorem expFam_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st')

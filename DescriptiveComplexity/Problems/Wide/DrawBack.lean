@@ -300,7 +300,7 @@ universe, in the universe's own order, each naming its own tag's block and its
 own tuple. This is what a space-bounded program's register file is, read as a
 `DescriptiveComplexity.Draw.LaidFile`, so that the runs stated at an arbitrary
 file apply to it – its layout is `DescriptiveComplexity.Draw.Data.diagLayout`
-on the nose, so its background is `DescriptiveComplexity.Draw.Data.back`. -/
+exactly, so its background is `DescriptiveComplexity.Draw.Data.back`. -/
 noncomputable def diagLaid (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y) :
     LaidFile dt A R' P' (Univ A R' P' dt.KIx dt.dd) where
@@ -565,7 +565,7 @@ The VAL loop threads SAV and TARGET and nothing else
 states that differ from the machinery's entry state in those two registers
 alone. `ScratchEq` names that relation, and the lemmas below say what it
 buys: every per-cell mark and track is shared, hence so is the background
-at every cell of the working area — the four register slots being
+at every cell of the working area – the four register slots being
 `DescriptiveComplexity.regBit`s, set at a register cell only. -/
 
 /-- **Two states differing in the two scratch registers alone**: every mark
@@ -636,7 +636,7 @@ omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **Off the register file the background is blind to every register**: the
 four register slots read `DescriptiveComplexity.bitAtOf`, which is set at a
 register cell only, so at a cell of the working area two states agree as
-soon as their per-cell marks and tracks do — whatever their mirror, their
+soon as their per-cell marks and tracks do – whatever their mirror, their
 target, their saved mirror or their VAL content is. This is what lets the
 control of the VAL loop's *threaded* states be the control of the
 unthreaded ones: threading rewrites the two scratch registers, and the
@@ -871,8 +871,8 @@ variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 
 /-! ### The permanent marks at a register cell, and the navigation by name
 
-The mark slots are stated existentially – "some element's cell, whose tag's
-block is `b`" – because the background is a function of the *address*. At a
+The mark slots are stated existentially – “some element's cell, whose tag's
+block is `b`” – because the background is a function of the *address*. At a
 register cell the existential collapses, by injectivity of the
 cell family, and what is left is the mark of the element
 itself. Those three equations are what the navigation-by-name scans read:

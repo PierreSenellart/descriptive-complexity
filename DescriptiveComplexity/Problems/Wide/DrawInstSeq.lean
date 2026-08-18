@@ -178,8 +178,8 @@ noncomputable def KindSem : MatAtom dt.X dt.d.B (dt.nOf vi) → Type
 /-- **A semantic pack transports along the registers it reads.**
 `DescriptiveComplexity.Draw.Data.KindSem` sees the tape state only
 through the levels' register sets, so a pack at one state is a pack at
-every state with the same mirror and VAL. This is what lets *one* pack —
-built at an address's entry state — serve every position of the spine and
+every state with the same mirror and VAL. This is what lets *one* pack –
+built at an address's entry state – serve every position of the spine and
 every round of the VAL loop, whose states differ from it in the tracks
 they have written and in the two scratch registers. -/
 noncomputable def kindSemCast (zero one : A) (vi : dt.VarIx)
@@ -199,7 +199,7 @@ noncomputable def kindSemCast (zero one : A) (vi : dt.VarIx)
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
   [Finite P] [Nonempty A] [L.IsRelational] in
-/-- **A round trip of transports is the identity** — the shape the VAL
+/-- **A round trip of transports is the identity** – the shape the VAL
 loop's bridge closes with: the pack leaves the round state, travels to the
 round's own state and to the state its matrix threads, and comes back. -/
 theorem kindSemCast_triple (zero one : A) (vi : dt.VarIx)
@@ -353,7 +353,7 @@ noncomputable def kindEndSt (dt : Data L) {A R P : Type}
 include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt in
 /-- **The uniform stage discharge, threaded**: as
 `DescriptiveComplexity.Draw.Data.kind_hStage` but with no boundary
-discipline assumed — the atom's exit state is
+discipline assumed – the atom's exit state is
 `DescriptiveComplexity.Draw.Data.kindEndSt`, which normalizes SAV and
 TARGET exactly when the atom is a stage atom. -/
 theorem kind_hStage_thread
@@ -537,7 +537,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
 /-- **The threaded states differ from the entry state in SAV and TARGET
-alone** — so every hypothesis the atoms need at them is the entry state's.
+alone** – so every hypothesis the atoms need at them is the entry state's.
 -/
 theorem matSt_fields (n : ℕ) :
     (dt.matSt vi st v n).wk = st.wk ∧ (dt.matSt vi st v n).mir = st.mir ∧
@@ -560,7 +560,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
 /-- **A tape state is determined by its two scratch registers**, given the
-other seven — the shape every threaded state of the machinery has against
+other seven – the shape every threaded state of the machinery has against
 the state it started from. -/
 theorem tapeSt_eq_savTgt {X Y : TapeStD dt A R P} (hmir : X.mir = Y.mir)
     (hval : X.val = Y.val) (hold : X.old = Y.old) (hnew : X.new = Y.new)
@@ -577,7 +577,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
-/-- **The remaining registers an atom leaves alone** — the three
+/-- **The remaining registers an atom leaves alone** – the three
 `DescriptiveComplexity.Draw.Data.kindEndSt_fields` does not list, so
 that the seven together pin the state down to its SAV and TARGET. -/
 theorem kindEndSt_fields' (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
@@ -608,7 +608,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
 /-- **The matrix's threaded state is its entry state with the two scratch
-registers rewritten** — the sharpening of
+registers rewritten** – the sharpening of
 `DescriptiveComplexity.Draw.Data.matSt_fields` that lets the loop above
 thread the two registers instead of the whole state, and with them keep
 every semantic pack at the state it was built for. -/
@@ -1307,8 +1307,8 @@ theorem ctlBit_kindExitCtl_self (hzo : zero ≠ one)
 omit [Fintype dt.SlotIx] in
 /-- **The matrix's verdicts, at the points**: after the whole matrix, atom
 `a`'s slot holds `MatAtom.holds` of its kind at the encoded valuation –
-the `hav` input of `DescriptiveComplexity.Draw.Data.postLeaf_iff_qfValue`
-on the nose. -/
+the `hav` input of `DescriptiveComplexity.Draw.Data.postLeaf_iff_qfValue`,
+verbatim. -/
 theorem ctlBit_avC_matFs_holds (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -1406,7 +1406,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
   [Finite P] [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 /-- **A threaded state of the matrix is the entry state up to the two
-scratch registers** — `matSt_eq` in the form the congruences take. -/
+scratch registers** – `matSt_eq` in the form the congruences take. -/
 theorem scratchEq_matSt (n : ℕ) : dt.ScratchEq (dt.matSt vi st v n) st :=
   ⟨(dt.matSt_fields (v := v) (st := st) n).1,
     (dt.matSt_fields (v := v) (st := st) n).2.1,
@@ -1473,7 +1473,7 @@ theorem matFsT_eq_matFs (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u
 include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hrules in
 /-- **The matrix's run, threaded**: as
 `DescriptiveComplexity.Draw.Data.matrix_run` with no boundary discipline
-assumed — the tape ends in the threaded state
+assumed – the tape ends in the threaded state
 `DescriptiveComplexity.Draw.Data.matSt`, which differs from the entry
 state in SAV and TARGET alone, and only if the matrix has a stage atom. -/
 theorem matrix_run_thread

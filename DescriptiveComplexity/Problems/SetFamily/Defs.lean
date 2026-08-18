@@ -163,7 +163,7 @@ theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) 
       obtain ⟨s₀, -, huniq⟩ := h x hx
       exact hne ((huniq s ⟨hs, h1⟩).trans (huniq s' ⟨hs', h2⟩).symm)
 
-/-- Some two-colouring of the ground elements *splits* every set of the
+/-- Some two-coloring of the ground elements *splits* every set of the
 family: no set is monochromatic. Like `DescriptiveComplexity.ExactlyCoversOn` this
 property carries no threshold. -/
 def SplitsOn (Ep Fp : A → Prop) (Mp : A → A → Prop) : Prop :=
@@ -383,7 +383,7 @@ assumption either. -/
 def HasExactCover : Prop :=
   ExactlyCoversOn (SSElem (A := A)) SSFam SSMem
 
-/-- A set system admits a splitting two-colouring: no set of the family is
+/-- A set system admits a splitting two-coloring: no set of the family is
 monochromatic. -/
 def HasSetSplitting : Prop :=
   SplitsOn (SSElem (A := A)) SSFam SSMem
@@ -471,9 +471,9 @@ def ExactCover : DecisionProblem Language.setSystem where
   Holds := fun A inst => @HasExactCover A inst
   iso_invariant := fun e => hasExactCover_iso e
 
-/-- SET SPLITTING, as a problem on set systems: is there a two-colouring of
+/-- SET SPLITTING, as a problem on set systems: is there a two-coloring of
 the ground elements leaving no set of the family monochromatic? (Also known as
-hypergraph 2-colourability.) -/
+hypergraph 2-colorability.) -/
 def SetSplitting : DecisionProblem Language.setSystem where
   Holds := fun A inst => @HasSetSplitting A inst
   iso_invariant := fun e => hasSetSplitting_iso e

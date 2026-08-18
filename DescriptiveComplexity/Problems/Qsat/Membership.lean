@@ -17,7 +17,7 @@ where the polynomial space of PSPACE is spent: the stack is a *set* of
 variables, and a set is one monadic relation variable. Four relation variables
 make up a state:
 
-* `D` (unary) – the variables already given a value, i.e. the current branch of
+* `D` (unary) – the variables already given a value, i.e., the current branch of
   the game tree; the variable played next is the `prefixLt`-least one outside
   `D` (`DescriptiveComplexity.QLeast`) and the one returned to is the greatest one inside
   it;
@@ -493,7 +493,7 @@ section Spec
 
 /-- The block of the SO(TC) specification of QSAT: two unary relation
 variables – the quantified set and the values it gave – and two relation
-variables of arity `0`, i.e. two bits – the mode and the value being
+variables of arity `0`, i.e., two bits – the mode and the value being
 returned. -/
 abbrev qsBlock : SOBlock where
   ι := Bool ⊕ Bool

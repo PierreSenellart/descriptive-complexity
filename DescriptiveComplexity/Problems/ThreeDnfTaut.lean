@@ -21,7 +21,7 @@ occurrences – the very same promise `DescriptiveComplexity.WidthAtMostThree` a
 Plain TAUT is coNP-complete by *complementing* the Cook–Levin discharge
 (`DescriptiveComplexity.taut_hard_of_piSODefinable`): the sign swap
 `DescriptiveComplexity.swapSignInterp` turns `SATᶜ` into TAUT. The same sign swap turns
-`3SATᶜ` into "not a width-three tautology", which is *not* 3-DNF-TAUT: 3SAT
+`3SATᶜ` into “not a width-three tautology”, which is *not* 3-DNF-TAUT: 3SAT
 folds its width bound into the yes-instances
 (`ThreeSatisfiable = WidthAtMostThree ∧ Satisfiable`), so `3SATᶜ` is the
 *disjunction* `¬WidthAtMostThree ∨ ¬Satisfiable` and the sign swap does not

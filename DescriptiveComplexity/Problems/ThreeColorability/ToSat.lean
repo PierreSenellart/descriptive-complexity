@@ -28,7 +28,7 @@ defining formulas are quantifier-free (`DescriptiveComplexity.threeColToSat_isQu
 so this is even a quantifier-free reduction, the weakest reduction notion in
 common use in descriptive complexity.
 
-Elements of the interpreted universe not of the shapes above (“junk”, e.g.
+Elements of the interpreted universe not of the shapes above (“junk”, e.g.,
 `(varC i, ![u, v])` with `u ≠ v`, or `(edgClause i, ![u, v])` with `(u, v)` not
 an edge) are neither clauses nor occur in any clause, so they do not affect
 satisfiability.

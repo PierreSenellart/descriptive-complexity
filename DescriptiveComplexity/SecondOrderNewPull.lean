@@ -49,7 +49,8 @@ Everything else is machinery that already exists:
   `DescriptiveComplexity.targetAssign` reads a guessed assignment back on the
   target's universe, `DescriptiveComplexity.sourceAssign` extends an assignment
   of the target's block by junk off the interpreted points, and the composite
-  `targetAssign ∘ sourceAssign` is the identity on the nose
+  `targetAssign ∘ sourceAssign` is the identity, not merely the identity on the
+  interpreted points
   (`DescriptiveComplexity.targetAssign_sourceAssign`) – which is all an
   *existential* block needs;
 * the interpretation's own defining formulas quantify over `A`, so they are

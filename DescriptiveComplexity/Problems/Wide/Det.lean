@@ -19,7 +19,7 @@ nondeterministic one its hardness as soon as
 
 The two problems differ only in that the deterministic one folds
 `DescriptiveComplexity.WideDet` into its yes-instances, and that condition is
-first-order — `DescriptiveComplexity.SpaceTM.detF` is stated at an arbitrary
+first-order – `DescriptiveComplexity.SpaceTM.detF` is stated at an arbitrary
 vocabulary and arbitrary symbols, so the sentence is the same one the
 polynomial-level bridge uses, read at
 `FirstOrder.Language.wide`'s symbols. The reduction is therefore the *identity*

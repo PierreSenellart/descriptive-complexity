@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Wide.DrawRead
 # Composite kits: how the program instantiates its subroutines
 
 The composites of the layer take their phases and rule families as parameters
-("no continuation labels": a program's phase set is its list of call sites).
+(“no continuation labels”: a program's phase set is its list of call sites).
 The program therefore assembles as a sum of **kits**, one per composite shape:
 
 * a *phase shape* – a small inductive, one constructor per phase the composite

@@ -322,7 +322,7 @@ the next one starts.
 
 What the sum is compared against is `DescriptiveComplexity.card_wideAddr`: the
 addresses **are** the subsets of the instance, so a wide machine's clock is
-`2 ^ n` on the nose, and a reduction buys itself `2 ^ (|Tag| · nᵈ)` steps by
+`2 ^ n` exactly, and a reduction buys itself `2 ^ (|Tag| · nᵈ)` steps by
 choosing the tags and the dimension of its interpretation.
 `DescriptiveComplexity.accepts_of_wideRoam_lt_two_pow` is the acceptance
 statement in that form, which is the one a program's arithmetic produces.
@@ -421,7 +421,7 @@ digit is the `WMLe`-greatest element. The tape is taken as a function *of the
 mirror*, with one coherence condition saying that changing a digit changes that
 digit's cell and nothing else, so whatever else a program keeps on its tape rides
 along untouched and no track discipline is fixed. The machine ends in the stopped
-state whatever the mirror was, so a caller reads "the increment is finished" off
+state whatever the mirror was, so a caller reads “the increment is finished” off
 the state and never off the tape.
 
 `DescriptiveComplexity.Problems.Wide.Test` is the read-only half:
@@ -1176,9 +1176,9 @@ VAL loop and one position's leg
 (`DescriptiveComplexity.Draw.Data.varFXT_eq_roundFX`,
 `DescriptiveComplexity.Draw.Data.varFMT_eq_varFM`,
 `DescriptiveComplexity.Draw.Data.legCtlT_eq_legCtl`, and at the output
-variable `outCtlT_eq_outCtl`, which is what lets `outLeg_run_thread` — the
+variable `outCtlT_eq_outCtl`, which is what lets `outLeg_run_thread` – the
 out machinery's run with `hsav`/`htgt` dropped, since a sweep leaves the two
-scratch registers wherever the last position's evaluation left them — ask
+scratch registers wherever the last position's evaluation left them – ask
 for its accepting verdict in the unthreaded form the semantics reads).
 What the threading
 *can* change is the semantic pack – a family indexed by the scratch
@@ -1251,8 +1251,8 @@ placed with no hypothesis on the machine's state at all.
 
 From the *initial* configuration the run reaches MAIN's starting one by
 `DescriptiveComplexity.Draw.Data.reaches_evalEntry`: the startup, then two
-steps — `step_clearMir1_exit`, which leaves the marker to the right, and
-`step_chk0_back`, the checkpoint's `stay` rule walking back onto it — with
+steps – `step_clearMir1_exit`, which leaves the marker to the right, and
+`step_chk0_back`, the checkpoint's `stay` rule walking back onto it – with
 the two presentations of the tape one term
 (`DescriptiveComplexity.Draw.Data.trackTape_val_eq_mir`). The state it
 arrives with is `startupSt`, which is what `reaches_mainB` asks of its `st₀`,
@@ -1333,7 +1333,7 @@ the empty one). A chain like that reaches no halting configuration at all
 The three cases together are the **correctness of the reduction**,
 `DescriptiveComplexity.Draw.Data.dwideAcceptSpace_iff_pfpHolds`: the emitted
 instance is a yes-instance exactly when the partial fixed point holds. No
-induction over the program's rules appears anywhere in it — the machine's
+induction over the program's rules appears anywhere in it – the machine's
 determinism does that work, and the only side condition is that its accepting
 phase is a dead end.
 
@@ -1562,13 +1562,13 @@ the address the loop stops at, the inner top.
 machine: `DescriptiveComplexity.Draw.Data.accVerdict_next` says the
 machinery's exit bit at a variable's position **is** `StepDef.next` at the
 working address's points, every abstract input of the run layer's capstone
-discharged from the two facts a reduction's tape maintains — the address's
+discharged from the two facts a reduction's tape maintains – the address's
 outer blocks encode the argument tuple, and each stage track holds the
 dictionary. Its sibling `accVerdict_out` is the same reading at the
 **output** variable, where the answer is `d.out` itself at the stage the
 tracks hold: a sentence has no free level, so the prefix starts where the
 machine starts it (`altQuantFrom_leafP_out`, over
-`DescriptiveComplexity.Draw.StepDef.out_iff_gateMat` — the nullary
+`DescriptiveComplexity.Draw.StepDef.out_iff_gateMat` – the nullary
 `next_iff_gateMat`) and the verdict is taken at the *empty* address. That is
 the bit the accepting dispatch reads, so it is the whole of what a yes-answer
 of `DescriptiveComplexity.StepDef.PFPHolds` has to deliver once the stage is
@@ -1584,7 +1584,7 @@ indexed by `Fin (n + 1)` for the instances the run theorems ask for
 delivers the five facts a semantic reading needs, the last of them the one
 the machine could not be trusted for on its own: every register of the chain
 holds inner cells *alone*. That is not a property of the counter but of the
-layout — the Kin blocks are a final segment of the tag order
+layout – the Kin blocks are a final segment of the tag order
 (`DescriptiveComplexity.Draw.kinSeg`), and a set at or below an upward-closed
 one is contained in it (`DescriptiveComplexity.subset_of_wmSetLe`).
 
@@ -1592,7 +1592,7 @@ one is contained in it (`DescriptiveComplexity.subset_of_wmSetLe`).
 along the whole spine: the mirror, the dictionary and the markers ride
 every position's write (`spineRide`), so after the spine each variable's
 `new` cell at the address holds one step of the iteration there
-(`new_last_next`) — or nothing, at an address encoding no tuple
+(`new_last_next`) – or nothing, at an address encoding no tuple
 (`new_last_of_false`). Read in dictionary form (`new_last_trackOf`,
 `new_last_trackOf_of_junk`) and iterated along the addresses by
 `DescriptiveComplexity.holds_of_wideRounds`, that is `sweep_new`: a sweep
@@ -1608,11 +1608,11 @@ its projections satisfy exactly the cover equations `evalSpine_run` asks
 for. One scale up the same file builds the sweep's own families
 (`sweepSW`/`sweepFS`, `sweepSW_incr`/`sweepFS_incr`): an iteration along
 the addresses, because a leg's writes are local to its cell but its
-*control* accumulates — with the order on the addresses installed locally,
+*control* accumulates – with the order on the addresses installed locally,
 never as an ambient instance.
 
-The **branched** family — the one a sweep runs, each position taking
-whichever of its three legs its own gates call for — asks for no pack at
+The **branched** family – the one a sweep runs, each position taking
+whichever of its three legs its own gates call for – asks for no pack at
 all: its semantic parameter is the *conditioned* family
 `DescriptiveComplexity.Draw.Data.gatedSem` inhabits, a pack at every
 gated position of every state and every address, built from
@@ -1624,7 +1624,7 @@ leg is correspondingly weakened to the projection they read
 (`DescriptiveComplexity.Draw.Data.WritesNew`: its variable's cell at the
 marker holds its verdict, every other cell rides), which a branched leg
 satisfies (`legStB_new`, `spineStOfB_writesNew`) while it is not literally
-a `postVarSt` of the position's entry state — its VAL loop may normalize
+a `postVarSt` of the position's entry state – its VAL loop may normalize
 the two scratch registers first.
 
 The **element loops** of the atom subroutines have the same anchor one scale
@@ -1646,7 +1646,7 @@ sentence.
 The EXPSPACE program above roams; the NEXPTIME one
 (`DescriptiveComplexity.wideRegAccept_NEXPTIME_complete`) runs against a clock,
 its file handed to it by a register channel, and the clock is what its design
-answers to. What follows is what that cost, i.e. the questions a construction
+answers to. What follows is what that cost, i.e., the questions a construction
 that moves the file, the atom or the index has to answer again. They are
 constraints on the *design* rather than on the proof: each rules out the
 arrangement that would otherwise be the obvious one.
@@ -1727,7 +1727,7 @@ the opening step plants the marker and moves right into an **approach walk**
 one more nondeterministic choice, like the guess's stop, and for the same reason,
 nothing on the tape telling the head where it is. The base is where it stops, the
 file is laid from there, and the guess then sweeps the data region *below* the
-file, entered from the marker's own neighbour (`reachesIn_openingRegion`,
+file, entered from the marker's own neighbor (`reachesIn_openingRegion`,
 `openingRegion_le_two_pow`). The arrangement a reader thinks of first – leave the
 file at the bottom and teach the atom to seek upward past it – moves the cost
 from the opening, which runs once, into the seek, which every atom runs.

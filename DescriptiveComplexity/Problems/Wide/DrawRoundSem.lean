@@ -12,22 +12,22 @@ import DescriptiveComplexity.Problems.Wide.DrawLeaf
 
 The two inputs the capstone
 `DescriptiveComplexity.Draw.Data.accVerdict_varFM_qfValue` still
-abstracts — the flags' readings `hEx`/`hAll` and the conditional semantic
-pack `semOf` — discharged at the concrete threads:
+abstracts – the flags' readings `hEx`/`hAll` and the conditional semantic
+pack `semOf` – discharged at the concrete threads:
 
-* **`ctlBit_roundFX_pass_iff`** — a round flag at the round's exit reads
+* **`ctlBit_roundFX_pass_iff`** – a round flag at the round's exit reads
   as the per-polarity pass: every quantified level of that polarity holds
   an encoding-shaped, one-hot, domain-satisfying block. For a variable
   with quantified levels this is the two-flag characterization through
   the exit's flag ride; for one without, the flags are the constant
   `True` the VAL loop's entry seeded, riding every fold update
   (`ctlBit_flag_varFM_of_nIn_zero`).
-* **`roundPass_of_polarities`** — the two readings jointly deliver the
-  full pass, level by level — the capstone's `hPass`.
-* **`passW` / `passW_hENC` / `passSem`** — the valuation, its master
+* **`roundPass_of_polarities`** – the two readings jointly deliver the
+  full pass, level by level – the capstone's `hPass`.
+* **`passW` / `passW_hENC` / `passSem`** – the valuation, its master
   encoding fact and the semantic pack **constructed from the pass**: the
   free levels are the gated address's points, the quantified ones are
-  chosen from `DescriptiveComplexity.Draw.Data.igPassP_iff_isEnc` —
+  chosen from `DescriptiveComplexity.Draw.Data.igPassP_iff_isEnc` –
   so the capstone's `hsem` is `rfl`.
 -/
 
@@ -253,9 +253,9 @@ noncomputable def passW (hzo : zero ≠ one)
 variable {zero one}
 
 omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
-/-- **The master encoding fact of a passing round**: every level's block —
+/-- **The master encoding fact of a passing round**: every level's block –
 the working address's at the free levels, the round register's at the
-quantified ones — encodes the valuation's point. The capstone's `hENC`,
+quantified ones – encodes the valuation's point. The capstone's `hENC`,
 and `DescriptiveComplexity.Draw.Data.mkKindSem`'s input. -/
 theorem passW_hENC (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -326,7 +326,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] [L.IsRelational] in
 /-- **The composed TARGET's argument blocks are the sources'**: after all
-copy loops, block `ℓ` of TARGET is the position's source block — the copy
+copy loops, block `ℓ` of TARGET is the position's source block – the copy
 is faithful on the padded cells, and an encoding holds no others. -/
 theorem wmBlk_stageTgtD_eq_encMap
     (vi : dt.VarIx) (iv : dt.d.B.ι)
@@ -398,7 +398,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Finite R] [Finite P] [L.IsRelational] in
 /-- **A stage track reads the dictionary at the composed target**: with the
 track holding the stage dictionary and the sources encoding the points, the
-random access's bit is the stage at those points — the capstone's
+random access's bit is the stage at those points – the capstone's
 `hOld`. -/
 theorem old_trackOf_stageTgtD (hzo : zero ≠ one)
     (vi : dt.VarIx) (iv : dt.d.B.ι) (ha : dt.d.B.arity iv ≤ dt.ko)
@@ -579,7 +579,7 @@ theorem levelVal_encMap (hzo : zero ≠ one)
 variable {zero one} in
 omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The leaf at a passing round is the matrix's value at the pass's
-points** — the capstone's `hPsPass`, with `Ps` the gated matrix
+points** – the capstone's `hPsPass`, with `Ps` the gated matrix
 `DescriptiveComplexity.Draw.Data.leafP`. -/
 theorem leafP_pass_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -647,7 +647,7 @@ theorem leafP_pass_iff (hzo : zero ≠ one)
 
 variable {zero one} in
 omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
-/-- **The leaf at a failing round is the ∃-clause alone** — the capstone's
+/-- **The leaf at a failing round is the ∃-clause alone** – the capstone's
 `hPsFail`: the ∀-clause's implication is vacuous when the two readings do
 not both hold. -/
 theorem leafP_fail_iff (hzo : zero ≠ one)

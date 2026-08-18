@@ -16,7 +16,7 @@ problem, and one that needs no succinctness argument.
 The correspondence is a **bisimulation between two inductive predicates of the
 same shape**: `DescriptiveComplexity.SOGameSpec.Wins` on assignments of the
 configuration block and `DescriptiveComplexity.ATMData.AltWin` on
-configurations. It needs exactly two lemmas beyond the four realization ones —
+configurations. It needs exactly two lemmas beyond the four realization ones –
 *a move lands on a configuration* and *a start is a configuration* – so junk
 assignments, which the block has plenty of, are never reached and never have to
 be reasoned about.

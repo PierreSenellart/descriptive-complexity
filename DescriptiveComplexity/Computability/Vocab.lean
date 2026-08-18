@@ -15,7 +15,7 @@ Ways of exhibiting a `FirstOrder.Language.FinVocab`, the finite presentation
 of a relational vocabulary that `FirstOrder.Language.FinStruct` encodes
 structures over.
 
-A presentation is exactly a numbering of the symbols, i.e. an equivalence
+A presentation is exactly a numbering of the symbols, i.e., an equivalence
 
 ```
 Fin numSyms ≃ ((n : ℕ) × L.Relations n)

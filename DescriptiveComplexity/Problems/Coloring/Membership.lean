@@ -9,7 +9,7 @@ import DescriptiveComplexity.SecondOrder
 /-!
 # The coloring family is existential second-order definable
 
-Membership for the three problems, in two flavours dictated by where the
+Membership for the three problems, in two flavors dictated by where the
 number of colors lives.
 
 * For `DescriptiveComplexity.KCol k`, the number `k` is fixed by the problem, so the
@@ -20,8 +20,8 @@ number of colors lives.
 * For `DescriptiveComplexity.ChromaticNumber` and `DescriptiveComplexity.CliqueCover`, the
   number is the size of the marked set, so it is *not* available to the
   formulas – there is no “`k` classes” to write down. The palette form
-  (`DescriptiveComplexity.paletteColorableOn_iff`) removes the problem: colouring with
-  as many colors as the marked set has elements is colouring *by* the marked
+  (`DescriptiveComplexity.paletteColorableOn_iff`) removes the problem: coloring with
+  as many colors as the marked set has elements is coloring *by* the marked
   set, which a single binary relation variable `Col x y`, read as “`x` has
   color `y`”, expresses. The kernel then has two clauses: every vertex gets
   some marked color, and two conflicting vertices never share a color. Note

@@ -26,7 +26,7 @@ The construction is the standard one, with everything it needs already built.
   genuine constructors.
 * **One quantifier, two rounds.** `DescriptiveComplexity.SORealize` alternates
   strictly, while a prenex prefix has runs of the same quantifier. Each
-  quantifier therefore takes **two** rounds — one `∃`, one `∀` — of which one
+  quantifier therefore takes **two** rounds – one `∃`, one `∀` – of which one
   is real and the other vacuous. Every round is guarded to hold a point
   (`DescriptiveComplexity.ExpExpansion.stepF`), so a vacuous round is
   discharged by `DescriptiveComplexity.ExpExpansion.mapNonempty` rather than by
@@ -115,7 +115,7 @@ theorem realize_matrixF {n j : ℕ} (pts : Fin n → X.Map A) (hv : Fin j → Fi
 
 variable (X) in
 /-- The kernel contributed by one quantifier: its two rounds, each guarded to
-hold a point — the first existentially, as a conjunct, the second universally,
+hold a point – the first existentially, as a conjunct, the second universally,
 as a hypothesis. -/
 noncomputable def stepF {n : ℕ} (i₀ i₁ : Fin n)
     (K : ((L.sum Language.order).sum (repMerged X.pointBlock n).lang).Sentence) :

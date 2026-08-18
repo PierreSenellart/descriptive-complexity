@@ -191,7 +191,7 @@ variable {ιV : Type}
 
 /-- **One pack, carried to every position of the spine**: the packs of the
 positions are the entry state's, transported. This is what makes the
-per-position family *definable* — the recursion that builds the tape
+per-position family *definable* – the recursion that builds the tape
 family needs a pack at each of its own states, and here it has one as soon
 as the mirror rides. -/
 noncomputable def ixSpineSem (zero one : A) (vi : dt.VarIx)
@@ -212,7 +212,7 @@ noncomputable def ixSpineSem (zero one : A) (vi : dt.VarIx)
     (sem₀ a (fun ℓ =>
       (dt.ixIGPassP_roundSt F zero one vi st st₀ (mV a) ℓ).mp (hp ℓ)) b)
 
-/-- **One pack, carried to every round of every position — threaded**: as
+/-- **One pack, carried to every round of every position – threaded**: as
 `DescriptiveComplexity.Draw.Data.ixSpineSem`, at the states the VAL loop's
 own thread produces. Those differ from the position's entry state in the
 two scratch registers and the register they enumerate, and a pack reads
@@ -269,7 +269,7 @@ include hgateEnc in
 omit [Finite I] [LinearOrder (dt.X.Map A)]
   [Finite (P)] [Finite dt.KIx] [L.IsRelational]
   [Finite R] in
-/-- **A gated position's argument blocks are encodings** — the converse of
+/-- **A gated position's argument blocks are encodings** – the converse of
 `testOf_of_encMap`/`wit_of_encMap`/`domHolds_of_encMap`, off the
 trichotomy. This is what makes a position's semantic pack *constructible*
 rather than assumed: at a junk position no pack exists, and at a gated one
@@ -287,7 +287,7 @@ theorem ixIsEnc_of_gatedAt (j : Fin dt.nv)
   (hgateEnc j st).mp hg ℓ
 
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc hgateEnc in
-/-- **A gated position's semantic pack, built** — not assumed. The blocks
+/-- **A gated position's semantic pack, built** – not assumed. The blocks
 are encodings (`ixIsEnc_of_gatedAt`), so their points are the valuation the
 pass decodes, and `ixPassSem` builds the pack there; `ixKindSemCast` carries it
 to the state the matrix's atoms run at, which differs from it in the two
@@ -320,7 +320,7 @@ noncomputable def ixGatedSem (_hzo : PR.zero ≠ PR.one)
         j st hg ℓ).choose_spec) b)
 
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc hgateEnc in
-/-- **The gated position's pack at the round state** — the same points, at
+/-- **The gated position's pack at the round state** – the same points, at
 the state the *semantics* names. `ixGatedSem` is this pack transported
 (`ixGatedSem_eq_semCastT`), which is what the VAL loop's bridge asks of a
 threaded family. -/
@@ -347,7 +347,7 @@ include hpassEnc hgateEnc in
 /-- **A gated position's pack is one pack transported**: its points are the
 address's blocks, which the scratch registers do not touch, so the family
 the machinery is run with is `ixSemCastT` at
-`DescriptiveComplexity.Draw.Data.ixGatedSem₀` — the hypothesis the VAL
+`DescriptiveComplexity.Draw.Data.ixGatedSem₀` – the hypothesis the VAL
 loop's bridge (`ixVarFMT_eq_varFM`) is stated under. -/
 theorem ixGatedSem_eq_semCastT (hzo : PR.zero ≠ PR.one)
     (hlin : IsLinOrd

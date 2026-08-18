@@ -86,11 +86,11 @@ for it under FO reductions.
 | **Πₖᵖ** (`k ≥ 1`) | Πₖ¹: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` (universal-first, `k` blocks) · acceptance by such a machine |
 | **PH** | SO | – | – |
 | **PSPACE** | SO(TC); equivalently FO(≤, PFP) | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · acceptance by a space-bounded Turing machine (deterministic & not) |
-| **EXPTIME** | SO(LFP), i.e. PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating Turing machine, its tape indexed by the input's positions and no bound on the length of a play | acceptance by such a machine (`APSPACE = EXPTIME`) |
+| **EXPTIME** | SO(LFP), i.e., PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating Turing machine, its tape indexed by the input's positions and no bound on the length of a play | acceptance by such a machine (`APSPACE = EXPTIME`) |
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there); equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine on a clock, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
-| **EXPSPACE** | SO(PFP), i.e. PSPACE read over an exponential expansion | wide machine, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
+| **EXPSPACE** | SO(PFP), i.e., PSPACE read over an exponential expansion | wide machine, its control in the instance and its tape addressed by an exponential expansion of it | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | **RE** | ∃SO[new] (∃SO with value invention, unbounded) | Turing machine with no step bound and no space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| **the degree of a problem** – `below Q₀`, e.g. **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
+| **the degree of a problem** – `below Q₀`, e.g., **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Each entry of the machine column is an equivalence proved here between the
 logical definition and acceptance by that model. The classes are also matched

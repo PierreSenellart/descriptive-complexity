@@ -17,7 +17,7 @@ satisfiable (`DescriptiveComplexity.TwoSatisfiable`, bundled as
 
 As for 3SAT, folding the width bound into the yes-instances rather than into
 the vocabulary is what keeps 2SAT a decision problem on arbitrary
-`Language.sat`-structures, and the bound "at most two" is expressed without
+`Language.sat`-structures, and the bound “at most two” is expressed without
 counting: among any three literal occurrences of a clause, two coincide.
 
 Two facts about the bound are needed by the Krom program of

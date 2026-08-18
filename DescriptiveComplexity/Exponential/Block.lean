@@ -18,7 +18,7 @@ as a single block `DescriptiveComplexity.SOBlock.replicate`:
 * its relation variables are pairs `(k, i)` of a copy index and a variable of
   `B`, with the arity of `i`;
 * `DescriptiveComplexity.SOBlock.replicateAssign` assembles one assignment per
-  copy into an assignment of the replicated block – on the nose, since the
+  copy into an assignment of the replicated block – exactly, since the
   index type is a plain product;
 * `DescriptiveComplexity.SOBlock.replicateSym` names the symbol of copy `k`,
   read back by `DescriptiveComplexity.SOBlock.relMap_replicateSym`.
@@ -32,8 +32,8 @@ pullback of a block through an interpretation** definitionally
 (`DescriptiveComplexity.SOBlock.homAssign_replicatePullHom`), because both
 sides re-associate the same `Σ`-type over a product. Pulling an expansion back
 through an interpretation is exactly that re-association, so the commutation is
-the load-bearing lemma of `DescriptiveComplexity.Exponential.Pull` and is
-proved by `rfl`.
+the lemma `DescriptiveComplexity.Exponential.Pull` rests on, and is proved by
+`rfl`.
 -/
 
 namespace DescriptiveComplexity
@@ -105,10 +105,10 @@ replicated block inside the replication of the pulled block. -/
 def replicatePullLHom : ((B.replicate n).pull T d).lang →ᴸ ((B.pull T d).replicate n).lang :=
   homLHom (B.replicatePullHom T d n) (B.replicatePullHom_arity T d n)
 
-/-- **The load-bearing commutation**: replicating the pulled assignments and
-transporting back along the re-association gives the pullback of the replicated
-assignment. Both sides read `ρs k i` at the same decoded arguments, so this is
-definitional. -/
+/-- **The commutation `DescriptiveComplexity.Exponential.Pull` rests on**:
+replicating the pulled assignments and transporting back along the
+re-association gives the pullback of the replicated assignment. Both sides read
+`ρs k i` at the same decoded arguments, so this is definitional. -/
 theorem homAssign_replicatePullHom {A : Type}
     (ρs : Fin n → B.Assignment (T × (Fin d → A))) :
     homAssign (B.replicatePullHom T d n) (B.replicatePullHom_arity T d n)

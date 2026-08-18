@@ -27,9 +27,9 @@ The one thing the translation must supply is the *formulas*: each atomic
 constraint of `DescriptiveComplexity.InductiveCounting.VAtom` becomes, given the modes recorded
 by the two control states, either a first-order formula over the two tuples or
 the information that no tuples can satisfy it (`compileAtom`). Since the modes
-are finite control data, every mode-level condition – "these two registers hold
-the same mode", "this mode is the least one", "this mode is covered by that
-one" – is decided *outside* the formula, and what remains for the formula is a
+are finite control data, every mode-level condition – “these two registers hold
+the same mode”, “this mode is the least one”, “this mode is covered by that
+one” – is decided *outside* the formula, and what remains for the formula is a
 condition on tuples of elements: equality, the lexicographic minimum, maximum
 or successor (`DescriptiveComplexity.OrderWalk`), or one of the given spec's own
 formulas.

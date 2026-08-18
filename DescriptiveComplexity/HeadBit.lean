@@ -80,7 +80,7 @@ inductive BitNode
   /-- Is the candidate twice itself the value, that is, is the value even with
   this half? -/
   | probeE : BitNode
-  /-- It is not: is the candidate at the marker, i.e. is the scan over? -/
+  /-- It is not: is the candidate at the marker, i.e., is the scan over? -/
   | scanOver : BitNode
   /-- It is not: put `w` on the successor of the candidate. -/
   | mkW : BitNode

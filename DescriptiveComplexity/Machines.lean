@@ -20,7 +20,7 @@ machines rather than read them, can reason about runs without unfolding any
 A machine is `DescriptiveComplexity.TMData`: the sorts (`Posn`, `Tr`), the marks
 (`Start`, `Acc`, `Blank`, `Right`), the binary attributes of a transition
 (`Src`, `Read`, `Dst`, `Write`), the initial tape `Inp`, and a linear order
-`Le`. Two decisions from the plan are visible in the types.
+`Le`. Two decisions are visible in the types.
 
 * **Transitions are elements.** A transition is an element `τ` of the universe
   with four binary attributes, rather than a 5-ary relation; every relation
@@ -112,9 +112,9 @@ def IsInit (c : Config A) : Prop :=
 
 /-- **One step.** Some transition applies in the current state to the symbol
 under the head: it writes in that cell, changes state, and moves the head to
-the neighbouring position in the direction it names. Cells other than the one
+the neighboring position in the direction it names. Cells other than the one
 under the head are unchanged, and a move off the end of the tape is impossible
-– there being no such neighbour, no step is available and the run stops. -/
+– there being no such neighbor, no step is available and the run stops. -/
 def Step (c c' : Config A) : Prop :=
   ∃ τ, M.Tr τ ∧ M.Src τ c.state ∧ M.Read τ (c.tape c.head) ∧
     M.Dst τ c'.state ∧ M.Write τ (c'.tape c.head) ∧
@@ -137,7 +137,8 @@ anywhere. A reduction buys itself `|Tag| · nᵈ` steps by choosing the dimensio
 
 The bound is *strict* because the positions index the time points of the run:
 `N` of them leave `N - 1` steps between them, which is what makes
-`DescriptiveComplexity.TMData.accepts_iff_exists_walk` an equivalence on the nose. -/
+`DescriptiveComplexity.TMData.accepts_iff_exists_walk` an equivalence and not
+merely an implication. -/
 def Accepts : Prop :=
   ∃ (c₀ c : Config A) (n : ℕ), M.IsInit c₀ ∧ n < Nat.card {p : A // M.Posn p} ∧
     M.StepsIn n c₀ c ∧ M.Acc c.state

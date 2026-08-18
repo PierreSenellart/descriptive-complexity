@@ -167,7 +167,7 @@ private theorem update_wk_offSt
 
 /-- **The erasing dispatch into the advance**, as the `HasRight` the
 advance's round theorem consumes: at the last checkpoint below the `ltp`
-cell, erase the marker and enter the advance — stated at the MIRROR-walked
+cell, erase the marker and enter the advance – stated at the MIRROR-walked
 presentation the advance runs on. -/
 theorem hasRight_evalAdv
     (hlin : IsLinOrd
@@ -460,7 +460,7 @@ theorem reaches_clearMir2
 
 /-- **One round of the outer sweep, with its evaluation**: from the first
 checkpoint at the marker, through the whole per-address evaluation (given
-as a hypothesis — the caller instantiates it by
+as a hypothesis – the caller instantiates it by
 `DescriptiveComplexity.Draw.Data.evalSpine_run`), out through the erasing
 boundary dispatch, the advance, and back into the first checkpoint at the
 next address. The marker, the mirror and the head all step on in
@@ -560,7 +560,7 @@ theorem sweepRound
 /-! ### The whole sweep -/
 
 /-- **The outer sweep**: from the first checkpoint at the bottom of the
-stretch to the first checkpoint at its top, one round per address — each
+stretch to the first checkpoint at its top, one round per address – each
 round the per-address evaluation and the advance, glued by
 `DescriptiveComplexity.Draw.Data.sweepRound`. The evaluation runs, the
 end-state facts and the two cover equations (the tape and control threads
@@ -899,7 +899,7 @@ theorem step_compare_exit_neg
     not_false
 
 /-- **COPY's folded first step**: `homeCmp`'s exit rewrites the empty
-address's cell — every `old` track taking its `new` digit — and lands at
+address's cell – every `old` track taking its `new` digit – and lands at
 its successor, in the copy-back's frontier presentation there. -/
 theorem step_homeCmp_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
@@ -1243,7 +1243,7 @@ the `ltp` cell. One more evaluation runs there (its writes are junk the
 copy never propagates and nothing reads), then the erasing `.dspB` exit,
 the reset, the mirror clear and the convergence sweep. Its verdict closes
 the stage: failing, the copy-back rewrites every `old` track and the walk
-home re-enters the evaluation — the next stage's entry; passing, the walk
+home re-enters the evaluation – the next stage's entry; passing, the walk
 home enters the out machinery. -/
 
 /-- **A failed stage closes into the next**: from the first checkpoint on
@@ -1478,8 +1478,8 @@ theorem stageClose_pos
 
 The loop: one sweep and one stage-closing ring per stage, iterated while
 the convergence sweep fails, and the passing ring at the first stage that
-stabilizes. Everything semantic — the per-stage tape and control families
-and the runs themselves — is a hypothesis family; the loop is a plain
+stabilizes. Everything semantic – the per-stage tape and control families
+and the runs themselves – is a hypothesis family; the loop is a plain
 induction on the first converged index. -/
 
 /-- **The MAIN loop**: from the first stage's entry at the empty address,

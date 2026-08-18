@@ -12,17 +12,17 @@ import Mathlib.Logic.Equiv.Fin.Rotate
 
 The reverse direction of the reduction reads a vertex cover off a Hamilton
 circuit of the gadget graph. Its foundation is a precise characterization of the
-neighbours of each gadget vertex (`DescriptiveComplexity.dgEdge_iff` /
+neighbors of each gadget vertex (`DescriptiveComplexity.dgEdge_iff` /
 `DescriptiveComplexity.IAdjRaw`).
 
 ## Structure
 
-1. **Neighbour sets.** For each gadget vertex, the exact set of its
-   `DescriptiveComplexity.DGEdge`-neighbours (by cases on the other vertex's tag, via
+1. **Neighbor sets.** For each gadget vertex, the exact set of its
+   `DescriptiveComplexity.DGEdge`-neighbors (by cases on the other vertex's tag, via
    `dgEdge_iff`). The **internal** vertices `⟨g1,(a,b)⟩` and `⟨g4,(a,b)⟩` have
-   exactly two neighbours, `⟨g0/g2⟩` and `⟨g3/g5⟩` respectively.
+   exactly two neighbors, `⟨g0/g2⟩` and `⟨g3/g5⟩` respectively.
 2. **Forced edges.** In a Hamilton circuit each vertex has exactly two
-   tour-neighbours, both adjacent to it. So a degree-two vertex uses *both* its
+   tour-neighbors, both adjacent to it. So a degree-two vertex uses *both* its
    edges, forcing the paths `g0-g1-g2` and `g3-g4-g5` in every gadget
    (`DescriptiveComplexity.forced_g1`, `DescriptiveComplexity.forced_g4`).
 3. **The three traversals.** Propagating through `g2`, `g3` (degree three) shows
@@ -34,7 +34,7 @@ neighbours of each gadget vertex (`DescriptiveComplexity.dgEdge_iff` /
    (`DescriptiveComplexity.g0_other`/`g5_other`); the freed slot is a selector at the
    ends of `a`'s chain, or a chain-link that straightens the walked side in turn
    (`DescriptiveComplexity.straight_of_chain_down`/`up`). Well-founded induction along
-   `a`'s neighbour list puts a selector at both chain ends: `a` is *active*
+   `a`'s neighbor list puts a selector at both chain ends: `a` is *active*
    (`DescriptiveComplexity.active_of_straight`).
 5. **The cover.** `C := {a | Active f a}` covers every edge
    (`DescriptiveComplexity.cover_property`), and `|C| ≤ |marked|` by the
@@ -52,14 +52,14 @@ open Language Structure
 
 variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
 
-/-- A gadget vertex `⟨t,(a,b)⟩` (raw form). Reconstructing a neighbour from its
+/-- A gadget vertex `⟨t,(a,b)⟩` (raw form). Reconstructing a neighbor from its
 tag and coordinates uses this together with `Subtype.ext`. -/
 theorem gPt_val {t : HTag} {ht : t ≠ .sel ∧ t ≠ .hub} {a b : A} (h : HEdge a b) :
     (gPt t ht h).1 = (t, ![a, b]) := rfl
 
 /-- **Reconstruction**: an interpreted vertex with a gadget tag `t` and
 coordinates `(a, b)` is the gadget vertex `gPt t _ h`. This is the workhorse of
-the neighbour characterizations of step 1 (it sidesteps the subtype/`MapRel`
+the neighbor characterizations of step 1 (it sidesteps the subtype/`MapRel`
 definitional mismatch that blocks `simp` on raw destructured vertices). -/
 theorem eq_gPt_of_val {t : HTag} {ht : t ≠ .sel ∧ t ≠ .hub} {a b : A} (h : HEdge a b)
     {q : hamInterp.MapRel A} (hqt : q.1.1 = t) (h0 : q.1.2 0 = a) (h1 : q.1.2 1 = b) :
@@ -116,10 +116,10 @@ noncomputable def tourSucc (f : Fin N ≃ H) : Equiv.Perm H :=
   simp only [tourSucc, Equiv.trans_apply, nextIdx_eq_finRotate]
 
 /-- Two vertices are **tour-adjacent** when one is the tour successor of the
-other. This is symmetric, and every vertex has exactly two tour-neighbours. -/
+other. This is symmetric, and every vertex has exactly two tour-neighbors. -/
 def TAdj (f : Fin N ≃ H) (x y : H) : Prop := tourSucc f x = y ∨ tourSucc f y = x
 
-/-- The **two tour-neighbours of `x` are distinct** once the cycle has length
+/-- The **two tour-neighbors of `x` are distinct** once the cycle has length
 `≥ 3`: the successor is not the predecessor. -/
 theorem tourSucc_ne_symm (f : Fin N ≃ H) (hN : 3 ≤ N) (x : H) :
     tourSucc f x ≠ (tourSucc f).symm x := by
@@ -140,7 +140,7 @@ theorem tadj_succ (f : Fin N ≃ H) (x : H) : TAdj f x (tourSucc f x) := Or.inl 
 theorem tadj_pred (f : Fin N ≃ H) (x : H) : TAdj f x ((tourSucc f).symm x) :=
   Or.inr (Equiv.apply_symm_apply _ x)
 
-/-- Every tour-neighbour of `x` is its successor or its predecessor. -/
+/-- Every tour-neighbor of `x` is its successor or its predecessor. -/
 theorem tadj_eq {f : Fin N ≃ H} {x y : H} (h : TAdj f x y) :
     y = tourSucc f x ∨ y = (tourSucc f).symm x := by
   rcases h with h | h
@@ -156,7 +156,7 @@ theorem tadj_dgEdge {f : Fin N ≃ H} {R : H → H → Prop} (hf : ∀ i, R (f i
     rw [Equiv.apply_symm_apply, ← tourSucc_apply, h] at hy
     exact hsymm _ _ hy
 
-/-- The tour successor of `x` is one of its two known tour-neighbours. -/
+/-- The tour successor of `x` is one of its two known tour-neighbors. -/
 theorem tourSucc_mem_of_tadj {f : Fin N ≃ H} {x p q : H}
     (hp : TAdj f x p) (hq : TAdj f x q) (hpq : p ≠ q) :
     tourSucc f x = p ∨ tourSucc f x = q := by
@@ -166,8 +166,8 @@ theorem tourSucc_mem_of_tadj {f : Fin N ≃ H} {x p q : H}
     · exact Or.inr hq'.symm
     · exact absurd (hp'.trans hq'.symm) hpq
 
-/-- **A vertex has only two tour-neighbours**: once two distinct ones are known,
-every tour-neighbour is one of them. -/
+/-- **A vertex has only two tour-neighbors**: once two distinct ones are known,
+every tour-neighbor is one of them. -/
 theorem tadj_two {f : Fin N ≃ H} {x p q y : H} (hp : TAdj f x p) (hq : TAdj f x q)
     (hpq : p ≠ q) (hy : TAdj f x y) : y = p ∨ y = q := by
   rcases tadj_eq hy with hy' | hy'
@@ -211,10 +211,10 @@ theorem tourSucc_closed_univ (f : Fin N ≃ H) {P : H → Prop} {x : H} (hx : P 
   have := all_of_succ_closed (fun i => P (f i)) (f.symm x) (by rwa [Equiv.apply_symm_apply]) hP'
   simpa using this (f.symm z)
 
-/-- **Forced edges.** If a vertex `x` in a tour has at most two graph-neighbours
-(every neighbour is `p` or `q`), then `p` and `q` are exactly its two
-tour-neighbours: every one of `x`'s edges is used by the tour. (Distinctness of
-the two tour-neighbours, from `3 ≤ N`, forces `p ≠ q` and that both occur.) -/
+/-- **Forced edges.** If a vertex `x` in a tour has at most two graph-neighbors
+(every neighbor is `p` or `q`), then `p` and `q` are exactly its two
+tour-neighbors: every one of `x`'s edges is used by the tour. (Distinctness of
+the two tour-neighbors, from `3 ≤ N`, forces `p ≠ q` and that both occur.) -/
 theorem tour_forced (f : Fin N ≃ H) {R : H → H → Prop}
     (hf : ∀ i, R (f i) (f (nextIdx i))) (hsymm : ∀ a b, R a b → R b a) (hN : 3 ≤ N)
     {x p q : H} (hnb : ∀ y, R x y → y = p ∨ y = q) : TAdj f x p ∧ TAdj f x q := by
@@ -243,7 +243,7 @@ theorem tour_forced (f : Fin N ≃ H) {R : H → H → Prop}
 
 end Tour
 
-/-- **The neighbours of the internal vertex `⟨g1,(a,b)⟩` are exactly `⟨g0,(a,b)⟩`
+/-- **The neighbors of the internal vertex `⟨g1,(a,b)⟩` are exactly `⟨g0,(a,b)⟩`
 and `⟨g2,(a,b)⟩`.** So in a Hamilton circuit both its edges are forced. -/
 theorem nbrs_gPt_g1 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     DGEdge (gPt .g1 ⟨by decide, by decide⟩ h) q ↔
@@ -260,7 +260,7 @@ theorem nbrs_gPt_g1 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
         | exact Or.inr (eq_gPt_of_val h rfl hadj.1.symm hadj.2.symm)
   · rintro (rfl | rfl) <;> rw [dgEdge_iff] <;> simp [IAdjRaw]
 
-/-- **The neighbours of the internal vertex `⟨g4,(a,b)⟩` are exactly `⟨g3,(a,b)⟩`
+/-- **The neighbors of the internal vertex `⟨g4,(a,b)⟩` are exactly `⟨g3,(a,b)⟩`
 and `⟨g5,(a,b)⟩`.** -/
 theorem nbrs_gPt_g4 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     DGEdge (gPt .g4 ⟨by decide, by decide⟩ h) q ↔
@@ -277,8 +277,8 @@ theorem nbrs_gPt_g4 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
         | exact Or.inr (eq_gPt_of_val h rfl hadj.1.symm hadj.2.symm)
   · rintro (rfl | rfl) <;> rw [dgEdge_iff] <;> simp [IAdjRaw]
 
-/-- **The neighbours of `⟨g2,(a,b)⟩` are `⟨g1,(a,b)⟩`, `⟨g3,(a,b)⟩` and the cross
-neighbour `⟨g0,(b,a)⟩`.** -/
+/-- **The neighbors of `⟨g2,(a,b)⟩` are `⟨g1,(a,b)⟩`, `⟨g3,(a,b)⟩` and the cross
+neighbor `⟨g0,(b,a)⟩`.** -/
 theorem nbrs_gPt_g2 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     DGEdge (gPt .g2 ⟨by decide, by decide⟩ h) q ↔
       q = gPt .g1 ⟨by decide, by decide⟩ h ∨ q = gPt .g3 ⟨by decide, by decide⟩ h ∨
@@ -296,8 +296,8 @@ theorem nbrs_gPt_g2 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
         | exact Or.inr (Or.inr (eq_gPt_of_val (hEdge_symm h) rfl hadj.2.symm hadj.1.symm))
   · rintro (rfl | rfl | rfl) <;> rw [dgEdge_iff] <;> simp [IAdjRaw]
 
-/-- **The neighbours of `⟨g3,(a,b)⟩` are `⟨g2,(a,b)⟩`, `⟨g4,(a,b)⟩` and the cross
-neighbour `⟨g5,(b,a)⟩`.** -/
+/-- **The neighbors of `⟨g3,(a,b)⟩` are `⟨g2,(a,b)⟩`, `⟨g4,(a,b)⟩` and the cross
+neighbor `⟨g5,(b,a)⟩`.** -/
 theorem nbrs_gPt_g3 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     DGEdge (gPt .g3 ⟨by decide, by decide⟩ h) q ↔
       q = gPt .g2 ⟨by decide, by decide⟩ h ∨ q = gPt .g4 ⟨by decide, by decide⟩ h ∨
@@ -357,7 +357,7 @@ theorem three_le_of_edge {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) {a b : A} 
   omega
 
 /-- **Forced `u`-path.** The degree-two internal vertex `⟨g1,(a,b)⟩` uses both of
-its edges: `⟨g0⟩` and `⟨g2⟩` are its two tour-neighbours. -/
+its edges: `⟨g0⟩` and `⟨g2⟩` are its two tour-neighbors. -/
 theorem forced_g1 {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b : A} (h : HEdge a b) :
     TAdj f (gPt .g1 ⟨by decide, by decide⟩ h) (gPt .g0 ⟨by decide, by decide⟩ h) ∧
@@ -374,7 +374,7 @@ theorem forced_g4 {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (fun y hy => (nbrs_gPt_g4 h y).mp hy)
 
 /-- **Propagation at `g2`.** With the forced `u`-path, `⟨g1⟩` is one of `⟨g2⟩`'s
-two tour-neighbours; the other, being a graph-neighbour distinct from `⟨g1⟩`, is
+two tour-neighbors; the other, being a graph-neighbor distinct from `⟨g1⟩`, is
 either `⟨g3⟩` (traverse this side straight through) or the cross vertex
 `⟨g0,(b,a)⟩` (hand the tour over to the other side). -/
 theorem prop_g2 {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
@@ -470,9 +470,9 @@ theorem not_both_crossed {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
       | exact absurd h3 (gPt_ne_tag (by decide) h h)
       | exact absurd h3 (gPt_ne_tag (by decide) h h')
 
-/-- **The neighbours of a general `⟨g0,(a,b)⟩`**: `⟨g1,(a,b)⟩`, the cross vertex
-`⟨g2,(b,a)⟩`, the chain link `⟨g5,(a,c)⟩` back to the predecessor neighbour `c < b`
-of `b`, and — when `b` is the least neighbour — every selector. -/
+/-- **The neighbors of a general `⟨g0,(a,b)⟩`**: `⟨g1,(a,b)⟩`, the cross vertex
+`⟨g2,(b,a)⟩`, the chain link `⟨g5,(a,c)⟩` back to the predecessor neighbor `c < b`
+of `b`, and – when `b` is the least neighbor – every selector. -/
 theorem nbrs_gPt_g0 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     DGEdge (gPt .g0 ⟨by decide, by decide⟩ h) q ↔
       q = gPt .g1 ⟨by decide, by decide⟩ h ∨
@@ -502,9 +502,9 @@ theorem nbrs_gPt_g0 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     · exact ⟨rfl, h, hlt, hpred⟩
     · exact hmin
 
-/-- **The neighbours of a general `⟨g5,(a,b)⟩`**: `⟨g4,(a,b)⟩`, the cross vertex
-`⟨g3,(b,a)⟩`, the chain link `⟨g0,(a,c)⟩` on to the successor neighbour `b < c`,
-and — when `b` is the greatest neighbour — every selector. -/
+/-- **The neighbors of a general `⟨g5,(a,b)⟩`**: `⟨g4,(a,b)⟩`, the cross vertex
+`⟨g3,(b,a)⟩`, the chain link `⟨g0,(a,c)⟩` on to the successor neighbor `b < c`,
+and – when `b` is the greatest neighbor – every selector. -/
 theorem nbrs_gPt_g5 {a b : A} (h : HEdge a b) (q : hamInterp.MapRel A) :
     DGEdge (gPt .g5 ⟨by decide, by decide⟩ h) q ↔
       q = gPt .g4 ⟨by decide, by decide⟩ h ∨
@@ -556,8 +556,8 @@ instance : DecidablePred (isSel (A := A)) := fun q => inferInstanceAs (Decidable
 
 /-- **The entrance slot of a straight-opposite side.** When the `b`-side of the
 edge `{a, b}` is straight, both tour-slots of `⟨g2,(b,a)⟩` are known, so the
-cross edge into `⟨g0,(a,b)⟩` is unused: the tour-neighbour of `⟨g0,(a,b)⟩` other
-than the forced `⟨g1,(a,b)⟩` is a selector (and `b` is `a`'s least neighbour) or
+cross edge into `⟨g0,(a,b)⟩` is unused: the tour-neighbor of `⟨g0,(a,b)⟩` other
+than the forced `⟨g1,(a,b)⟩` is a selector (and `b` is `a`'s least neighbor) or
 the chain-link from the predecessor side. -/
 theorem g0_other {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b : A} (h : HEdge a b)
@@ -598,8 +598,8 @@ theorem g0_other {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     · exact Or.inr (by rw [← h1]; rfl)
 
 /-- **The exit slot of a straight-opposite side**, symmetrically: the
-tour-neighbour of `⟨g5,(a,b)⟩` other than the forced `⟨g4,(a,b)⟩` is a selector
-(and `b` is `a`'s greatest neighbour) or the chain-link to the successor side. -/
+tour-neighbor of `⟨g5,(a,b)⟩` other than the forced `⟨g4,(a,b)⟩` is a selector
+(and `b` is `a`'s greatest neighbor) or the chain-link to the successor side. -/
 theorem g5_other {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a b : A} (h : HEdge a b)
     (hS : TAdj f (gPt .g2 ⟨by decide, by decide⟩ (hEdge_symm h))
@@ -683,7 +683,7 @@ section Counting
 variable [Fintype A]
 
 open Classical in
-/-- The neighbours of `a` as a finset. -/
+/-- The neighbors of `a` as a finset. -/
 noncomputable def nbrFinset (a : A) : Finset A := Finset.univ.filter (HEdge a)
 
 omit [LinearOrder A] in
@@ -693,11 +693,11 @@ omit [LinearOrder A] in
 theorem nbrFinset_nonempty {a : A} (h : ∃ b, HEdge a b) : (nbrFinset a).Nonempty := by
   obtain ⟨b, hb⟩ := h; exact ⟨b, mem_nbrFinset.mpr hb⟩
 
-/-- The least neighbour of `a` (the second coordinate of its chain entrance). -/
+/-- The least neighbor of `a` (the second coordinate of its chain entrance). -/
 noncomputable def minNbr {a : A} (h : ∃ b, HEdge a b) : A :=
   (nbrFinset a).min' (nbrFinset_nonempty h)
 
-/-- The greatest neighbour of `a` (the second coordinate of its chain exit). -/
+/-- The greatest neighbor of `a` (the second coordinate of its chain exit). -/
 noncomputable def maxNbr {a : A} (h : ∃ b, HEdge a b) : A :=
   (nbrFinset a).max' (nbrFinset_nonempty h)
 
@@ -738,7 +738,7 @@ theorem entrancePt_ne_exitPt {a a' : A} (h : ∃ b, HEdge a b) (h' : ∃ b, HEdg
   have : (entrancePt h).1.1 ≠ (exitPt h').1.1 := by simp [entrancePt, exitPt]
   exact fun he => this (congrArg (fun p : hamInterp.MapRel A => p.1.1) he)
 
-/-- The selector tour-neighbour of `v` (well-defined when `v` has one): the tour
+/-- The selector tour-neighbor of `v` (well-defined when `v` has one): the tour
 successor if that is the selector, else the predecessor. -/
 noncomputable def selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInterp.MapRel A) :
     hamInterp.MapRel A :=
@@ -748,7 +748,7 @@ noncomputable def selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInt
 noncomputable def bit {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInterp.MapRel A) : Bool :=
   decide (isSel (tourSucc f v))
 
-/-- Recover a vertex from its selector-neighbour and the slot direction. -/
+/-- Recover a vertex from its selector-neighbor and the slot direction. -/
 noncomputable def recover {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (s : hamInterp.MapRel A) (β : Bool) : hamInterp.MapRel A :=
   if β then (tourSucc f).symm s else tourSucc f s
@@ -763,7 +763,7 @@ theorem recover_selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInter
   · rw [if_neg (by rw [decide_eq_true_eq]; exact h), if_neg h, Equiv.apply_symm_apply]
 
 omit [Fintype A] in
-/-- When `v` has a selector tour-neighbour, `selOf v` is that selector. -/
+/-- When `v` has a selector tour-neighbor, `selOf v` is that selector. -/
 theorem isSel_selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) {v : hamInterp.MapRel A}
     (h : isSel (tourSucc f v) ∨ isSel ((tourSucc f).symm v)) : isSel (selOf f v) := by
   unfold selOf
@@ -784,7 +784,7 @@ noncomputable def ptOf [Nonempty (hamInterp.MapRel A)] (a : A) (d : Bool) : hamI
   if ha : ∃ b, HEdge a b then (bif d then exitPt ha else entrancePt ha) else Classical.arbitrary _
 
 /-- For an active vertex, `ptOf` really is the entrance/exit, which has a selector
-tour-neighbour; hence `selOf (ptOf …)` is a selector. -/
+tour-neighbor; hence `selOf (ptOf …)` is a selector. -/
 theorem isSel_selOf_ptOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     [Nonempty (hamInterp.MapRel A)] {a : A} (ha : Active f a) (d : Bool) :
     isSel (selOf f (ptOf a d)) := by
@@ -804,7 +804,7 @@ theorem marked_of_active {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
   rw [hsel]; simpa using hm
 
 /-- **The active vertices inject into the marked ones**: `|C| ≤ |marked|`. The map
-`(a, entrance/exit) ↦ (selector, slot-direction)` is injective — the selector and
+`(a, entrance/exit) ↦ (selector, slot-direction)` is injective – the selector and
 slot pin down the entrance/exit vertex (`recover_selOf`), whose owner and role
 (g0 vs g5) pin down `a`. Two chain-endpoints per active chain, two slots per
 selector, so `2|C| ≤ 2|marked|`. -/
@@ -865,8 +865,8 @@ theorem active_ncard_le {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
 /-- **Straightness reaches the entrance.** If some side `(b,a)` of `a`'s chain
 is straight, the entrance slot of `⟨g0,(a,b)⟩` is a selector or a chain-link
 (`g0_other`); a chain-link keeps the walked side straight
-(`straight_of_chain_down`), so by well-founded descent along `a`'s neighbour
-list the chain entrance has a selector tour-neighbour. -/
+(`straight_of_chain_down`), so by well-founded descent along `a`'s neighbor
+list the chain entrance has a selector tour-neighbor. -/
 theorem entrance_sel_of_straight {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a : A} :
     ∀ b : A, ∀ h : HEdge a b,
@@ -888,7 +888,7 @@ theorem entrance_sel_of_straight {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     · exact IH c hlt hc (straight_of_chain_down f hf h hc hch)
 
 /-- **Straightness reaches the exit**, symmetrically: well-founded ascent along
-`a`'s neighbour list through `g5_other` and `straight_of_chain_up`. -/
+`a`'s neighbor list through `g5_other` and `straight_of_chain_up`. -/
 theorem exit_sel_of_straight {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     (hf : ∀ i, DGEdge (f i) (f (nextIdx i))) {a : A} :
     ∀ b : A, ∀ h : HEdge a b,

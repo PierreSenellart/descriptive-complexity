@@ -313,7 +313,7 @@ def QAtom (x y : A) : Prop := RelMap qdbAtom ![x, y]
 def DbFact (x y : A) : Prop := RelMap qdbFact ![x, y]
 
 /-- A genuine database edge: a fact both of whose endpoints are database
-elements (i.e. not query variables). Facts violating this are representation
+elements (i.e., not query variables). Facts violating this are representation
 junk and are ignored by the semantics. -/
 def DbEdge (x y : A) : Prop := DbFact x y ∧ ¬QVar x ∧ ¬QVar y
 
@@ -636,8 +636,8 @@ only on junk structures the encoding never produces. Following
 *Well-formedness.* The one junk convention that matters for decoding is a
 structure with no constant at all (the abstract semantics can satisfy a
 query on it that no concrete assignment – needing a constant to map
-variables to – satisfies). The sentence `cqWFSentence`, "some element is not
-a variable", cuts these out; read as a `DecisionProblem` (via
+variables to – satisfies). The sentence `cqWFSentence`, “some element is not
+a variable”, cuts these out; read as a `DecisionProblem` (via
 `DecisionProblem.ofSentence`) it restricts evaluation to the well-formed
 problem, whose completeness is step 9's `cqEvalWF_NP_complete`. Junk *facts*
 (touching a variable) need no well-formedness at all: `DbEdge` guards both
@@ -1031,7 +1031,7 @@ end Membership
 The hardness half is a first-order reduction *from* a problem the catalog
 already knows to be NP-hard. The classical source for evaluation is graph
 coloring: a graph `G` is 3-colorable iff there is a graph homomorphism
-`G → K₃`, i.e. iff the *canonical query of `G`* (one variable per vertex, one
+`G → K₃`, i.e., iff the *canonical query of `G`* (one variable per vertex, one
 atom per edge) holds in the database `K₃`.
 
 The interpretation must build both halves of the evaluation instance from the
@@ -1265,7 +1265,7 @@ database* of the left one – the instance universe itself, with the left
 atoms as facts and every element denoting itself. Both directions are short:
 the canonical database trivially satisfies the left query, and conversely a
 homomorphism composes with any satisfying valuation. This theorem is what
-turns the ∀-databases semantics into an ∃-certificate condition, i.e. into
+turns the ∀-databases semantics into an ∃-certificate condition, i.e., into
 something NP-shaped.
 -/
 
@@ -1345,7 +1345,7 @@ def QueryContained (A : Type) [Language.queryPair.Structure A] : Prop :=
 
 /-- **The Chandra–Merlin theorem**: containment holds iff there is a
 homomorphism from the right query to the canonical database of the left one –
-i.e. a map of the universe to itself, fixing the constants, that sends every
+i.e., a map of the universe to itself, fixing the constants, that sends every
 right atom to a left atom. The forward direction instantiates containment at
 the canonical database (which satisfies the left query via the identity
 valuation); the backward direction composes the homomorphism with any
@@ -1734,7 +1734,7 @@ effort:
 
 * *other schemas*: redo the development for a schema with several relations
   of higher arity – the vocabulary grows, the proofs do not change shape
-  (atoms of arity `k` need interpreted elements of dimension `k`, i.e.
+  (atoms of arity `k` need interpreted elements of dimension `k`, i.e.,
   `dim > 1` interpretations as in `Problems/ThreeColorability/ToSat.lean`);
 * *quantifier-free status of the containment reductions*: state and prove
   `IsQuantifierFree` for `containmentToEval` and `evalToContainment`, in the

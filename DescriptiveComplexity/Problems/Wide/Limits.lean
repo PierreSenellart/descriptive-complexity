@@ -12,7 +12,7 @@ import DescriptiveComplexity.Problems.Wide.DrawRules
 A wide machine's *positions* are the addresses of its universe – the sets of
 elements – and the only way a program has of recording one is a **register
 file**: a stretch of consecutive cells, one register per element, each holding
-one bit of the address. A file that is to be *faithful*, i.e. to tell two
+one bit of the address. A file that is to be *faithful*, i.e., to tell two
 addresses apart the way a scan of it does
 (`DescriptiveComplexity.ixAddr_ixMark`), needs one register per element, and its
 registers have to be told apart by the **names** the file records at them
@@ -56,7 +56,7 @@ per slot inside a `dd`-tuple, so the flags are strictly fewer than `dd` as soon
 as there is one slot, and the elements are at least `|A| ^ dd`.
 
 This is the counting behind the rule that a program's register file comes from
-its input channel or not at all (the design notes in
+its input channel or not at all (stated in
 `DescriptiveComplexity.Problems.Wide`): a program that lays a register file has
 to write, at each register, a name that separates it from the others, and the
 only place a name can come from is the control. -/

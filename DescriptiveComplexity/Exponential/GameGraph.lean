@@ -23,8 +23,8 @@ has to decide about one or two nodes is one of six first-order questions:
 | `AGStart x` | the position he starts from is a marked start |
 
 `DescriptiveComplexity.Sub` names the six. None of them is a *sentence* over the
-base — a quantifier of `I`'s defining formula ranges over points, so it is
-second-order over the base (`DescriptiveComplexity.exists_translate`) — and that
+base – a quantifier of `I`'s defining formula ranges over points, so it is
+second-order over the base (`DescriptiveComplexity.exists_translate`) – and that
 is exactly why they become **phases** rather than conjuncts:
 `DescriptiveComplexity.ExpExpansion.exists_paramKernel` turns each into an
 alternating prefix over rounds of the point block, which a game plays one move

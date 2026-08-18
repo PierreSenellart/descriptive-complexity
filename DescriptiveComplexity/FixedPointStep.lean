@@ -67,8 +67,8 @@ block through a first-order interpretation
 `DescriptiveComplexity.StepDef.partStage_pull`, for the pulled definition
 `DescriptiveComplexity.StepDef.pull`). Each is one commuting lemma about
 `DescriptiveComplexity.StepDef.next` (`next_map`, `next_pull`) propagated along
-the orbit; these are the load-bearing lemmas for isomorphism-invariance and
-closure under reductions of every logic built on this skeleton.
+the orbit; these are the lemmas isomorphism-invariance and closure under
+reductions rest on, for every logic built on this skeleton.
 -/
 
 namespace DescriptiveComplexity

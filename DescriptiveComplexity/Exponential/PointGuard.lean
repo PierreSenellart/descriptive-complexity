@@ -13,13 +13,13 @@ tag*. A quantifier of the translation lemma ranges over the points of
 `X.Map A`, which is less: a point must also satisfy its tag's **domain
 sentence**. This file conjoins the two into
 `DescriptiveComplexity.ExpExpansion.pointGuardF`, the guard every peeled
-quantifier carries — existentially as a conjunct, universally as a hypothesis.
+quantifier carries – existentially as a conjunct, universally as a hypothesis.
 
 The only new bookkeeping is reading `X.dom t`, a sentence over the block
 `X.B`, inside the tag-extended block `X.B.withTag X.Tag`. That is
 `DescriptiveComplexity.SOBlock.homLHom` at the inclusion `Sum.inr`, whose
 arity condition is `rfl` and whose transported assignment is
-`DescriptiveComplexity.SOBlock.dropTag` on the nose — so the transport lemma is
+`DescriptiveComplexity.SOBlock.dropTag` exactly – so the transport lemma is
 `DescriptiveComplexity.SOBlock.realize_homSentence` with nothing to prove.
 
 The domain sentence is selected by the tag *bits* rather than statically, so it

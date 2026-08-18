@@ -54,7 +54,7 @@ open Language Structure
 
 /-- A second-order quantifier block: finitely many relation variables, with
 given arities. (The index type is arbitrary rather than an initial segment of
-`ℕ`, so that constructions on blocks – e.g. pulling a block back through an
+`ℕ`, so that constructions on blocks – e.g., pulling a block back through an
 interpretation – can build their natural index types directly.) -/
 structure SOBlock : Type 1 where
   /-- The index type of the relation variables of the block. -/

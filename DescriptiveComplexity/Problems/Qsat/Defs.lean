@@ -411,7 +411,7 @@ variable {A : Type} [Language.qsat.Structure A]
 
 variable (A) in
 /-- **The yes-instances of QSAT**: a well-formed instance whose quantified
-formula is true, i.e. whose initial position – nothing quantified yet, the
+formula is true, i.e., whose initial position – nothing quantified yet, the
 empty valuation – is won by the existential player. -/
 def QsatHolds : Prop :=
   QsatWf A ∧ QsatWins (fun _ : A => False) (fun _ : A => False)

@@ -12,9 +12,9 @@ import DescriptiveComplexity.PSpace
 /-!
 # Simulating a machine that walks an expanded universe
 
-The gate of the exponential hierarchy: a walk over an *expanded* universe,
+What every exponential class rests on: a walk over an *expanded* universe,
 performed by a machine that only ever holds finitely many points of it, is a
-walk over the base — an `DescriptiveComplexity.SOTCSpec`, since a point of the
+walk over the base – an `DescriptiveComplexity.SOTCSpec`, since a point of the
 expansion is an assignment of a block and `k` of them are an assignment of one
 merged block. This file builds that specification out of a
 `DescriptiveComplexity.HeadAutomaton` and proves the two walks step for step
@@ -25,14 +25,14 @@ Why an automaton rather than an FO(TC) specification: the tests a
 (`DescriptiveComplexity.HeadAutomaton.test_qf`), so
 `DescriptiveComplexity.ExpExpansion.translQF` translates them as they stand and
 no quantifier over the expanded universe is ever evaluated. Everything else the
-machine does is an order primitive — stay, copy, jump to an end, step to a
-neighbour — and those are written down in
+machine does is an order primitive – stay, copy, jump to an end, step to a
+neighbor – and those are written down in
 `DescriptiveComplexity.Exponential.Increment`.
 
 ## The one hypothesis
 
 A move to the *immediate successor* is the increment of the assignment only
-when every tagged assignment is a point, i.e. when the expansion's domain
+when every tagged assignment is a point, i.e., when the expansion's domain
 sentence is trivial. That is the hypothesis `htot` the correctness theorems
 carry; `DescriptiveComplexity.ExpExpansion.trivialize` is how a general
 expansion is brought into that shape, and
@@ -44,17 +44,17 @@ discharged.
 Everything the transition sentence says is about *one* or *two* points, sitting
 somewhere inside a bigger block: one of the `k` rounds of the current state, or
 one of the `k` rounds of the next one. A `DescriptiveComplexity.ExpExpansion.PtSlot`
-is that placement — an arity-preserving map of the point block into a host
-block — and each of the five things the machine can ask about points is written
+is that placement – an arity-preserving map of the point block into a host
+block – and each of the five things the machine can ask about points is written
 once, at an arbitrary slot of an arbitrary host:
 
-* `DescriptiveComplexity.ExpExpansion.slotTagF` — the point at a slot carries a
+* `DescriptiveComplexity.ExpExpansion.slotTagF` – the point at a slot carries a
   given tag;
-* `DescriptiveComplexity.ExpExpansion.slotGuardF` — a slot holds a point at all;
+* `DescriptiveComplexity.ExpExpansion.slotGuardF` – a slot holds a point at all;
 * `DescriptiveComplexity.ExpExpansion.eqPtF`,
   `DescriptiveComplexity.ExpExpansion.covPtF`,
   `DescriptiveComplexity.ExpExpansion.minPtF`,
-  `DescriptiveComplexity.ExpExpansion.maxPtF` — equality, the covering relation
+  `DescriptiveComplexity.ExpExpansion.maxPtF` – equality, the covering relation
   and the two endpoints.
 
 The state block is then `(repMerged X.pointBlock k).withTag M.State`, the two
@@ -91,7 +91,7 @@ variable {L : Language.{0, 0}}
 /-! ### Slots -/
 
 /-- A **slot**: where one point of an expanded universe sits inside a host
-block. Both hosts the simulation uses — the state block and two copies of it —
+block. Both hosts the simulation uses – the state block and two copies of it –
 are addressed through this one interface. -/
 structure PtSlot (X : ExpExpansion L) (H : SOBlock) where
   /-- The relation variable of the host carrying each variable of the point

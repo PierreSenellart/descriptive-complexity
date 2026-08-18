@@ -13,7 +13,7 @@ as *invented values*: a finite set with a guessed linear order on it, read as
 the initial segment `0, 1, …, N` of `ℕ`. This file is that reading.
 
 `DescriptiveComplexity.CodeHalt.numOf` is the number a value stands for – the
-count of values below it, i.e. `DescriptiveComplexity.bitRank` at the trivial
+count of values below it, i.e., `DescriptiveComplexity.bitRank` at the trivial
 set of positions. `DescriptiveComplexity.CodeHalt.IsZ` and
 `DescriptiveComplexity.CodeHalt.IsS` are “is the least value” and “is covered
 by”, spelled out so that a first-order kernel can state them verbatim, and the
@@ -39,10 +39,10 @@ lie strictly below it. -/
 noncomputable def numOf (Le : D → D → Prop) (d : D) : ℕ :=
   bitRank Le (fun _ => True) d
 
-/-- `d` is the least value of the segment, i.e. the numeral `0`. -/
+/-- `d` is the least value of the segment, i.e., the numeral `0`. -/
 def IsZ (Le : D → D → Prop) (d : D) : Prop := ∀ e, Le d e
 
-/-- `d'` is the value just above `d`, i.e. its numeral is one more. -/
+/-- `d'` is the value just above `d`, i.e., its numeral is one more. -/
 def IsS (Le : D → D → Prop) (d d' : D) : Prop :=
   Le d d' ∧ d ≠ d' ∧ ∀ e, Le d e → Le e d' → e = d ∨ e = d'
 

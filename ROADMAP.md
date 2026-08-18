@@ -27,7 +27,7 @@ Beyond Karp's 21:
 **Discharge symmetry** (guiding principle): each class-defining fragment (§3)
 has a canonical complete problem that is essentially its *syntactic image*, so
 each hardness discharge is a Tseitin-style translation of the defining logic
-into the problem's vocabulary, i.e. a variation on
+into the problem's vocabulary, i.e., a variation on
 `sat_hard_of_sigmaSODefinable` with a shape invariant carried through. The
 pattern is instantiated for every fragment the library defines: ∃SO → SAT,
 SO-alternation-level-`k` → QBF_k, SO-Horn → HORN-SAT, SO-Krom → 2SAT (the last
@@ -90,9 +90,9 @@ machine bridges.
 
 - **FO(LFP) ⊆ NP, directly** [M]: by guessing the fixed point and the derivation
   order and checking both first-order against the certificate interface
-  (`derives_eq_of_closed_of_wf`). No new mathematics — the inclusion already
+  (`derives_eq_of_closed_of_wf`). No new mathematics – the inclusion already
   follows by composing the FO(LFP) → SO-Horn translation with the Horn discharge
-  — but the direct `Σ₁` definition would be textbook-faithful; the work is
+  – but the direct `Σ₁` definition would be textbook-faithful; the work is
   formula building, made tedious by the varying arities of a block's atoms.
 - **Housekeeping in the shared machinery** [S]:
   `Problems/FinSat/Nodes.lean` imports `Sat/Tseitin.lean` for `NodeAt`, so if that
@@ -105,12 +105,12 @@ machine bridges.
 - **Composing an expansion with an interpretation, the outer way** [settled –
   do not reopen]: `DescriptiveComplexity.ExpExpansion.pullOrdered` composes an
   interpretation *before* an expansion (`A ↦ X.Map (I.Map A)`) and is what makes
-  `ComplexityClass.exp` a class. The **other** order — an interpretation applied
-  to an expanded structure, `A ↦ J.MapRel (X.Map A)` — is what a complete
+  `ComplexityClass.exp` a class. The **other** order – an interpretation applied
+  to an expanded structure, `A ↦ J.MapRel (X.Map A)` – is what a complete
   problem for an exponential class would need, and it is *not* an expansion:
   an expansion's defining sentences are first-order over the base with the block
   copies as parameters, while a quantifier of `J` ranges over the *points* of
-  `X.Map A`, i.e. over block assignments, which is a second-order quantifier
+  `X.Map A`, i.e., over block assignments, which is a second-order quantifier
   over the base. So the composite's relations are `Σₖ` over the base, not FO,
   and neither the plain composition nor a Tseitin description of the composite
   exists.
@@ -120,7 +120,7 @@ machine bridges.
   Boolean combinations compose. So the fix is quantifier-freeness, and it is the
   library's version of the side condition the succinctness literature has always
   attached ([Veith 1998][veith1998succinct] states the upgrade theorem for
-  *projection* reductions) — though quantifier-freeness alone suffices here,
+  *projection* reductions) – though quantifier-freeness alone suffices here,
   projections being a strictly stronger property this framework does not need.
   The order on the expanded universe, the translation lemma and the gate
   `PSPACE = NL.exp` are **built**. Restricting *hardness* to match is
@@ -150,7 +150,7 @@ machine bridges.
 - **`LOGSPACE.exp = PSPACE`** [M–L]: `LOGSPACE.exp ⊆ PSPACE` is monotonicity,
   but the converse is not the `Exponential/Reach.lean` argument, which asks
   REACH of the graph a walk draws and so lands in NL. It wants that graph read
-  *deterministically* — Savitch, or the determinization of the QSAT walk, one
+  *deterministically* – Savitch, or the determinization of the QSAT walk, one
   exponential up.
 - **What is left of the BIT layer** [L]: the arithmetic vocabulary and the class
   it defines are **built** (`Arithmetic.lean`, `ArithmeticDefinable.lean`,
@@ -243,7 +243,7 @@ machine bridges.
   so `ac0Definable_mem_LOGSPACE` need not be reproved, and plan for the full
   downstream rebuild rather than discovering it: `HeadCapture`, `HeadCaptureDet`
   and every consumer of `Runs` re-elaborate.
-- **Relativized (domain-formula) reductions — membership closure** [M]:
+- **Relativized (domain-formula) reductions – membership closure** [M]:
   Immerman's textbook FO reduction restricts the target universe to a definable
   subset via a **domain formula**, needed for *spanning* problems (Hamilton
   circuit: a tour visits every element, so junk points with no valid incident
@@ -253,7 +253,7 @@ machine bridges.
   with notation `≤ʳᶠᵒ[≤]`, wired into `Complexity`/`Hierarchy` as the
   `hard_of_relOrderedReduction` field), which is all a spanning problem's
   NP-hardness needs while its membership is a direct second-order sentence.
-  Remaining — the symmetric **membership** closure `mem_of_relOrderedReduction`,
+  Remaining – the symmetric **membership** closure `mem_of_relOrderedReduction`,
   with two consumers: it would turn `le_dtmAcceptSpace_of_mem_PSPACE` into the
   missing `iff` (`Problems/Machine/SpaceHard.lean` records why PSPACE's machine
   characterization stops short of `mem_NP_iff_le_ntmAccept`'s shape), and the
@@ -264,7 +264,7 @@ machine bridges.
   `≤ʳᶠᵒ[≤]`:
   - `RelSecondOrderPull.lean` (~700 lines): `SOBlock.pull` is reused verbatim
     (a relation variable on the subtype pulls to one `(n·d)`-ary variable per
-    tag tuple), but the assignment-transfer layer is rewritten **flipped** — on
+    tag tuple), but the assignment-transfer layer is rewritten **flipped** – on
     subtypes `pullAssign (mergeAssign σ) = σ` fails (extend-then-restrict loses
     off-domain data) while `mergeAssignRel (pullAssignRel ρ) = ρ` is exact, so
     stating the `sorealize_pullSO_aux` transfer in the flipped direction closes
@@ -332,7 +332,7 @@ non-reducibility, impossible in the machine world.
 - **0-1 laws (Glebskii et al., Fagin)** [L]: FO 0-1 law on random structures;
   Mathlib's probability is ample. Fun, self-contained, good student project.
 - **Order-necessity results** [R]: candidate research question the framework
-  makes precise: show some catalog reduction (e.g. SAT → 3COL) provably has no
+  makes precise: show some catalog reduction (e.g., SAT → 3COL) provably has no
   order-free FO counterpart, separating `≤ᶠᵒ` from `≤ᶠᵒ[≤]` on concrete
   problems.
 - Horizon: **PARITY not in AC⁰** ([Ajtai 1983][ajtai1983sigma11];
@@ -440,7 +440,7 @@ The concrete items, in dependency order:
     the same `comp`/`compLEquiv` argument again, plus iso-invariance.
   - *Non-adaptive linear combinations* [L]:
     `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
-    i.e. polynomially many oracle calls at definable parameters, combined
+    i.e., polynomially many oracle calls at definable parameters, combined
     definably. It needs *parameterized* interpretations (thread `k` extra free
     variables through every defining formula and through `Map`), which is the
     level's main cost; the divisor on the left keeps Lagrange denominators out
@@ -556,8 +556,8 @@ unweighted setting at a `k`-fold blow-up, if ever needed.
   Provan–Ball, which would have to be formalized. Tier 1's trick cannot help,
   because the query is monotone: fix one edge and let the other `|T| − 2`
   tuples vary, and the count is either 0 or `≥ 2^{|T|}/4`, so a parsimonious
-  reduction from a formula with three models would force `|T| ≤ 3`, i.e. a
-  logarithmic-size output instance, i.e. a reduction that counted by itself.
+  reduction from a formula with three models would force `|T| ≤ 3`, i.e., a
+  logarithmic-size output instance, i.e., a reduction that counted by itself.
   This holds for every monotone query, which is why the field's own statements
   here are Turing-flavored. **Check before committing**: whether the classical
   proof is one oracle call plus arithmetic (level 1) or genuinely interpolates
@@ -585,14 +585,14 @@ and `Problems/MachineAlt.lean` docstrings, and the exponential ones in
 building another.
 
 **Standing scope limit.** Textbook `NP = NTIME(nᵏ)` over string encodings
-needs the converse compilation — that an FO interpretation or a `Σ₁` kernel is
+needs the converse compilation – that an FO interpretation or a `Σ₁` kernel is
 *evaluated* by a polynomial-time machine: a verified compiler with a step
 count, plus string encodings of structures [R]. Nothing in the bridge claims
 it; the residual gap – two classical facts taken by inspection: that FO
 reductions are AC⁰-computable, and that a definability witness is evaluated
 within its class's bound – is documented in the README. Instances carry their
 own transition table, so reduction-built machines have polynomially many
-states — standard for an acceptance problem; the constant-alphabet simulation
+states – standard for an acceptance problem; the constant-alphabet simulation
 is never needed.
 
 **And it is an interface obligation, not a soundness debt** – which is what
@@ -629,9 +629,9 @@ Four rules price a bridge, and with it any machine problem added later:
    an `SOTCSpec`-style interface wants *sentences*, not formulas with
    parameters, and that gap is what a naive estimate misses.
 2. **Hardness is cheap when the class has a one-loop complete problem** (REACH
-   "guess a neighbour", HORN-SAT "propagate", SAT "guess then sweep").
+   "guess a neighbor", HORN-SAT "propagate", SAT "guess then sweep").
    Otherwise the discharge must compile arbitrary formulas of the logic into a
-   machine — the **evaluator** (static quantifier nesting → nested loops), in
+   machine – the **evaluator** (static quantifier nesting → nested loops), in
    three variants of increasing cost: *state-registers* (loop counters as
    elements in the state), *tape-registers with logarithmic addresses* (honest
    fixed-control logspace), *tape-registers with exponential addresses*
@@ -650,7 +650,7 @@ Four rules price a bridge, and with it any machine problem added later:
    the matrix rather than merely being able to.
 4. **Budget regimes.** Unary (NP, P, PH) needs the walk lemma
    (`accepts_iff_exists_walk`); no budget (L, NL, PSPACE, EXPSPACE) needs only
-   `Relation.ReflTransGen`, strictly cheaper — and buys the converse half free,
+   `Relation.ReflTransGen`, strictly cheaper – and buys the converse half free,
    since a deterministic machine's reachable configurations are linearly
    ordered (`Problems/Machine/DetRun.lean`), so one run ending stuck and
    non-accepting settles a no-instance with no second induction; exponential (EXPTIME) needs a
@@ -663,7 +663,7 @@ The concrete items:
 - **Capture vs. completeness, the choice forced by the evaluator.** A capture
   theorem is available at NP (fixed control, input heads, poly work tape) but
   is not worth taking: logic → machine there needs the evaluator *with* tape
-  addressing (lockstep address computation to test a guessed relation) —
+  addressing (lockstep address computation to test a guessed relation) –
   exactly the cost routing hardness through SAT/HORN-SAT avoids. So: capture
   where the evaluator is cheap and the model first-order (as at L/NL, where a
   `k`-head automaton walking the order mirrors FO(DTC) vs. FO(TC) and rules out
@@ -673,7 +673,7 @@ The concrete items:
   algorithm named by the source problem, or a code model like
   `Nat.Partrec.Code` where Mathlib's `exists_code` hands over the program.
 - **Limits that survive every variant**: the string-encoding layer (above);
-  oracle and `Δₖᵖ` classes — the bridge would make them definable, but by a machine,
+  oracle and `Δₖᵖ` classes – the bridge would make them definable, but by a machine,
   against the library's classes-are-logic principle (a decision, not a
   drift); `#P` as "number of accepting runs" is easy to state but needs the
   parsimonious-reduction notion the framework still lacks (§6, first item);
@@ -699,7 +699,7 @@ class.
   rule, beside the choice of number encoding
   (`DescriptiveComplexity/Numbers.lean`). The classical arc is a gadget `F` on
   single graphs with `G ≅ H ↔ F G ≅ F H`, and the forward half is *free* here
-  because an interpretation is functorial, i.e. commutes with isomorphisms
+  because an interpretation is functorial, i.e., commutes with isomorphisms
   (`relMap_equiv₁/₂`). An *ordered* reduction destroys that: order-invariance
   makes the yes/no answer order-independent, not the constructed structure
   independent up to isomorphism, so every gadget would owe a structure-level
@@ -769,7 +769,7 @@ provable rather than merely reasonable.
 1. **Locality (Hanf, Gaifman)** (§5) [L]: with the two games in place, the
    next substantial piece of the inexpressibility track, and the one that
    gives connectivity and acyclicity without bespoke strategies. The 0-1 laws
-   are its independent neighbour.
+   are its independent neighbor.
 2. **Populating the GI degree** (§9) [M each]: with `below` and Graph
    Isomorphism in place, the degree has one inhabitant and no companions.
    Hypergraph / set-system isomorphism first, and `gi_hard_of_isoReflecting`

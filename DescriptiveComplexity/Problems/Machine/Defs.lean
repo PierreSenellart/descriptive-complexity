@@ -41,15 +41,14 @@ folded into the yes-instances, together with the other promises of
 `DescriptiveComplexity.TMData.WellFormed`. All of them are first-order, so the `Σ₁`
 kernel of the membership proof can check them.
 
-## A deviation from the plan, recorded
+## Why there are no state and symbol sorts
 
-The original machine design listed `state` and `sym` sorts alongside `posn` and
-`tr`. They are
-omitted here because nothing in the semantics or in the membership proof reads
-them: a junk element is harmless as a state, since it is reachable only through
-a transition, and a reduction controls which elements it marks accepting. If
-stage 3 turns out to want them, adding a unary symbol is a local change to this
-file and to the well-formedness predicate.
+The vocabulary marks positions (`posn`) and transitions (`tr`) and nothing else.
+Sorts of states and of symbols are omitted because nothing in the semantics or
+in the membership proof reads them: a junk element is harmless as a state, since
+it is reachable only through a transition, and a reduction controls which
+elements it marks accepting. Should a construction want them, adding a unary
+symbol is a local change to this file and to the well-formedness predicate.
 -/
 
 /- The language of machine instances lives in Mathlib's `FirstOrder.Language`

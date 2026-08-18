@@ -41,7 +41,7 @@ There is one `ctrl` tag per **rule** of the transition table and one `phase` tag
 per **call site** of the program. Indexing the transitions by their rule is what
 lets a rule's source and destination phases, its direction and the kind of symbol
 it reads be read off the *tag* rather than encoded in coordinates – the library's
-"index rules by attribute values, not by the transition" read at the level of the
+“index rules by attribute values, not by the transition” read at the level of the
 layout. Which is why the
 program's phases are tags rather than an encoding in coordinates: a subroutine
 called from several places uses different states at each, so it needs no

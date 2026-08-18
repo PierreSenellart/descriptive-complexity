@@ -14,9 +14,9 @@ existential second-order logic whose relation variables range over a universe
 object-creating query languages of ([Abiteboul–Hull–Vianu 1995]
 [abiteboul1995foundations], ch. 18).
 
-Every class defined so far in this library bounds its certificate by the
-instance: a `Σ₁` sentence guesses relations over `A` itself, so the search
-space is exponential in `|A|` and the class sits inside NP. Value invention
+Bounding the certificate by the instance is what keeps a second-order class
+inside NP: a `Σ₁` sentence guesses relations over `A` itself, so the search
+space is exponential in `|A|`. Value invention
 removes exactly that bound and nothing else: the certificate is a finite
 extension `A ⊕ Fin m` of the universe – with `m` *unbounded* – together with
 relations over it, checked by a fixed first-order kernel. The witness is still
@@ -74,7 +74,7 @@ namespace Language
 /-- Relation symbols of the language marking the original elements inside an
 extended universe. -/
 inductive oldRel : ℕ → Type
-  /-- `old x`: the element `x` comes from the original structure, i.e. it is
+  /-- `old x`: the element `x` comes from the original structure, i.e., it is
   not an invented value. -/
   | old : oldRel 1
   deriving DecidableEq

@@ -81,7 +81,7 @@ namespace Language
 
 /-- Relation symbols of the arithmetic vocabulary. -/
 inductive arithRel : ℕ → Type
-  /-- `le x y`: the rank of `x` is at most the rank of `y`, i.e. `x ≤ y`. -/
+  /-- `le x y`: the rank of `x` is at most the rank of `y`, i.e., `x ≤ y`. -/
   | le : arithRel 2
   /-- `plus x y z`: the ranks satisfy `orank x + orank y = orank z`. -/
   | plus : arithRel 3
