@@ -228,8 +228,8 @@ private theorem palette_sigmaSODefinable (positive : Bool)
   · rintro ⟨ρ, hρ⟩
     obtain ⟨htot, hproper⟩ := (realize_paletteKernel _ ρ).mp hρ
     choose col hcol1 hcol2 using htot
-    exact ⟨col, hcol2, fun x x' hcfl hcolour =>
-      hproper x x' (col x) hcfl.1 hcfl.2 (hcol1 x) (hcolour ▸ hcol1 x')⟩
+    exact ⟨col, hcol2, fun x x' hcfl hcolor =>
+      hproper x x' (col x) hcfl.1 hcfl.2 (hcol1 x) (hcolor ▸ hcol1 x')⟩
 
 /-- **Chromatic Number is `Σ₁`-definable**: guess a coloring of the vertices
 by the marked elements, and check first-order that every vertex has a marked
