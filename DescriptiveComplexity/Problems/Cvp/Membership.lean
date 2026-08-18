@@ -150,12 +150,6 @@ theorem realize_wireF (r : cvLang.Relations 2) (i j : Fin nvars)
   rw [wireF, Formula.realize_rel₂]
   rfl
 
-omit [Language.circuit.Structure A] [LinearOrder A] in
-/-- The rail atoms hold exactly of the value at the variable they name. -/
-theorem rail_holds {b : Bool} {i : Fin nvars} (ρ : valBlock.Assignment A)
-    (v : Fin nvars → A) : (rail b i).Holds ρ v ↔ ρ b (fun _ => v i) :=
-  Iff.rfl
-
 /-- The assignment cut out by the inductive semantics: a gate is in the rail
 `b` when it derives the value `b`. -/
 abbrev gateAssign : valBlock.Assignment A := fun b x => GateVal b (x 0)

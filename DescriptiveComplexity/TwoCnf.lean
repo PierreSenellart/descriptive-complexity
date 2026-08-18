@@ -288,15 +288,6 @@ theorem exists_satisfies_of_no_bad_cycle
       have hstep : Step Cl (neg p) q := Or.inl (by rwa [neg_neg])
       exact Or.inr (hlit q (hclosed _ hneg _ (Relation.ReflTransGen.single hstep)))
 
-/-- **The criterion, as an equivalence**: a 2-CNF over a finite variable type
-is satisfiable iff no literal reaches its own negation and back. -/
-theorem exists_satisfies_iff_no_bad_cycle :
-    (∃ ν : V → Prop, Satisfies Cl ν) ↔
-      ∀ (x : V) (s : Bool), ¬(Reach Cl ((x, s) : Lit V) (neg (x, s)) ∧
-        Reach Cl (neg ((x, s) : Lit V)) (x, s)) :=
-  ⟨fun ⟨_, hν⟩ x s => no_bad_cycle_of_satisfies Cl hν (x, s),
-    exists_satisfies_of_no_bad_cycle⟩
-
 end Greedy
 
 /-! ### A bad cycle as a single walk

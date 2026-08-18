@@ -106,10 +106,6 @@ theorem ctxB_le_hX (i : d.B.ι) : ctxB (stepB d i) ≤ hX d := by
     Finset.le_sup (f := fun i => ctxB (stepB d i)) (Finset.mem_univ i)
   exact h
 
-/-- The arguments of a variable fit inside the evaluation block. -/
-theorem arity_le_hX (i : d.B.ι) : d.B.arity i ≤ hX d :=
-  le_trans (by simpa using le_ctxB (stepB d i)) (ctxB_le_hX d i)
-
 /-- The universally quantified first-order variables shared by all clauses:
 two stage-tuple blocks (current and next), the atom tuple, the evaluation
 block, and one spare for the accumulators. -/

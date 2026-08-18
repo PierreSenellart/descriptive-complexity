@@ -130,9 +130,6 @@ def wmAvoids (H : T → Prop) (s : T × V → Prop) : Prop := ∀ τ, H τ → �
 /-- The greatest address avoiding a set of blocks: full everywhere else. -/
 def wmAvoidTop (H : T → Prop) : T × V → Prop := fun p => ¬H p.1
 
-theorem wmAvoids_wmAvoidTop (H : T → Prop) : wmAvoids H (wmAvoidTop (V := V) H) :=
-  fun _ hτ _ hc => hc hτ
-
 /-- **Every address avoiding a set of blocks is at or below its top.** -/
 theorem wmSetLe_wmAvoidTop [Finite T] [Finite V] (hT : IsLinOrd LeT) (hV : IsLinOrd LeV)
     {H : T → Prop}
@@ -162,22 +159,6 @@ theorem wmAvoids_of_wmSetLe [Finite T] [Finite V] (hT : IsLinOrd LeT) (hV : IsLi
   -- and that contradicts `s ≤ t`.
   exact ((wmSetLt_iff t s).mp hlt).2
     ((isLinOrd_wmSetLe (isLinOrd_lexRel hT hV)).2.2.1 t s ((wmSetLt_iff t s).mp hlt).1 hle)
-
-/-- **Surplus blocks pay for a quadratic program.** A machine whose whole run
-costs at most the square of its working region – one traversal of the region per
-address of it – fits in its clock as soon as there are more surplus blocks than
-working ones: the region holds `2 ^ (k * m)` addresses, the whole tape
-`2 ^ ((k + j) * m)`, and `2 * (k * m) < (k + j) * m`.
-
-That is what makes the surplus blocks free. They multiply the clock and cost the
-program nothing, since it never writes in them
-(`DescriptiveComplexity.wmAvoids_of_wmSetLe`), so a reduction buys the room for a
-seek per round simply by drawing a few more tags. -/
-theorem mul_lt_two_pow {k j m a b : ℕ} (hkj : k < j) (hm : 0 < m)
-    (ha : a ≤ 2 ^ (k * m)) (hb : b ≤ 2 ^ (k * m)) : a * b < 2 ^ ((k + j) * m) := by
-  refine lt_of_le_of_lt (Nat.mul_le_mul ha hb) ?_
-  rw [← Nat.pow_add]
-  exact Nat.pow_lt_pow_right (by omega) (by nlinarith)
 
 /-- **A product plus an opening fits the clock**: a counted program's cost is
 not «rounds × width» alone – there is the opening before the evaluation and the
@@ -223,15 +204,6 @@ theorem mul_add_lt_two_pow' {k j m a b s : ℕ} (hk : 1 ≤ k) (hkj : k + 1 < j)
     omega
   refine lt_of_le_of_lt (hsum.trans hdouble) (Nat.pow_lt_pow_right (by omega) ?_)
   nlinarith
-
-/-- **A round per address of the region fits the clock**, the two factors the
-same. This is the shape the sweeps come in – one traversal of the region per
-address of it – and `mul_lt_two_pow` the shape a *counted* program's cost comes
-in, where the width of a round and the number of rounds are bounded separately
-and neither is a traversal on the nose. -/
-theorem mul_self_lt_two_pow {k j m n : ℕ} (hkj : k < j) (hm : 0 < m)
-    (hn : n ≤ 2 ^ (k * m)) : n * n < 2 ^ ((k + j) * m) :=
-  mul_lt_two_pow hkj hm hn hn
 
 /-- **The increment of an address carries block by block**: at the last index
 whose block is not full, that block increments; every later block is emptied and

@@ -292,7 +292,6 @@ theorem corridorTileable_of_acceptsSpace (hwf : WideWF A) (h : (wideData A).Acce
 
 end Yes
 
-
 /-! ### A corridor is an accepting run in bounded space -/
 
 section No
@@ -437,6 +436,5 @@ theorem wideCorridor_EXPSPACE_complete : EXPSPACE.Complete WideCorridor :=
   ⟨wideCorridor_mem_EXPSPACE, wideCorridor_EXPSPACE_hard⟩
 
 end Reduction
-
 
 end DescriptiveComplexity

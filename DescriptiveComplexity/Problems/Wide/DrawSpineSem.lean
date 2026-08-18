@@ -248,20 +248,6 @@ abbrev WritesNew
       (if i' = dt.varList.get j ∧ r = v then bOf j
         else (stOf j.castSucc).new i' r)
 
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-include hst in
-/-- The cover equation gives the projection. -/
-theorem writesNew_of_hst : dt.WritesNew (v := v) stOf bOf := by
-  classical
-  intro j i' r
-  rw [hst j]
-  rfl
-
 variable (hstN : dt.WritesNew (v := v) stOf bOf)
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
@@ -293,51 +279,9 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
   [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 include hst in
-/-- The stage dictionary rides the spine. -/
-theorem spine_old (k : Fin (dt.nv + 1)) : (stOf k).old = (stOf 0).old :=
-  dt.spineRide hst (fun st => st.old) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-include hst in
 /-- The working address rides the spine. -/
 theorem spine_mir (k : Fin (dt.nv + 1)) : (stOf k).mir = (stOf 0).mir :=
   dt.spineRide hst (fun st => st.mir) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-include hst in
-/-- The three markers ride the spine. -/
-theorem spine_wk (k : Fin (dt.nv + 1)) : (stOf k).wk = (stOf 0).wk :=
-  dt.spineRide hst (fun st => st.wk) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-include hst in
-theorem spine_bot (k : Fin (dt.nv + 1)) : (stOf k).bot = (stOf 0).bot :=
-  dt.spineRide hst (fun st => st.bot) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-include hst in
-theorem spine_ltp (k : Fin (dt.nv + 1)) : (stOf k).ltp = (stOf 0).ltp :=
-  dt.spineRide hst (fun st => st.ltp) (fun _ _ _ _ => rfl) k
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
@@ -1295,16 +1239,6 @@ noncomputable def spineSemOf (j : Fin dt.nv) (a : ιV)
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem spineStOf_zero :
-    dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf 0 = st₀ := rfl
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem spineFsOf_zero :
-    dt.spineFsOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf 0 = f₀ := rfl
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The control's cover equation** — `evalSpine_run`'s `hfs`. -/
 theorem spineFsOf_succ (j : Fin dt.nv) :
     dt.spineFsOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.succ =
@@ -1397,48 +1331,6 @@ noncomputable def spineSemOfT (j : Fin dt.nv)
     (dt.spineStOfT_mir (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc)
     p a hp b
 
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem spineStOfT_zero :
-    dt.spineStOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf 0 = st₀ := rfl
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem spineFsOfT_zero :
-    dt.spineFsOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf 0 = f₀ := rfl
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The threaded control's cover equation** — `evalSpine_run_thread`'s
-`hfs`. -/
-theorem spineFsOfT_succ (j : Fin dt.nv) :
-    dt.spineFsOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.succ =
-      dt.legCtlT (v := v) (aT := aT) RF hord mV j
-        (dt.spineStOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc)
-        (tOf j)
-        (dt.spineSemOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j)
-        (dt.spineFsOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc) := by
-  change (dt.spineNodeT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf
-    ((j : ℕ) + 1)).2.2 = _
-  rw [spineNodeT, dif_pos j.isLt]
-  rfl
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **The threaded tape's cover equation** — `evalSpine_run_thread`'s
-`hst`. -/
-theorem spineStOfT_succ (j : Fin dt.nv) :
-    dt.spineStOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.succ =
-      dt.legStT (v := v) (aT := aT) RF hord mV j
-        (dt.spineStOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc)
-        (tOf j)
-        (dt.spineSemOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j)
-        (dt.spineFsOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc) := by
-  change (dt.spineNodeT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf
-    ((j : ℕ) + 1)).1 = _
-  rw [spineNodeT, dif_pos j.isLt]
-  rfl
-
 /-! ### The per-position families, branched
 
 The threaded family above runs the gated leg at every position, which a
@@ -1523,16 +1415,6 @@ noncomputable def spineSemOfB (j : Fin dt.nv)
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem spineStOfB_zero :
-    dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB 0 = st₀ := rfl
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem spineFsOfB_zero :
-    dt.spineFsOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB 0 = f₀ := rfl
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The branched control's cover equation** — `evalSpineB_run`'s
 `hfs`. -/
 theorem spineFsOfB_succ (j : Fin dt.nv) :
@@ -1607,38 +1489,6 @@ theorem spineRideB {β : Sort _}
     have hstep := dt.spineStOfB_succ (v := v) (aT := aT) RF hord mV st₀ f₀ semB
       ⟨n, hnv⟩
     exact Eq.trans (congrArg F hstep) (Eq.trans (hF _ _ _ _) (ih _))
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **A field a threaded leg leaves alone rides the whole spine** — the
-twin of `DescriptiveComplexity.Draw.Data.spineRide` at the legs the
-threaded family is built from. -/
-theorem spineRideT {β : Sort _}
-    (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
-    (hF : ∀ (j : Fin dt.nv)
-      (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-      (tOf' : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
-      (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-        (a : ιV),
-        (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-          dt.igPassP RF PR.zero PR.one (dt.varAt j)
-            (dt.varRdSt st p (mV a)) ℓ) →
-        ∀ b : Fin (dt.natOf (dt.varAt j)),
-          dt.KindSem PR.zero PR.one (dt.varAt j)
-            (dt.matSt (dt.varAt j) (dt.varRdSt st p (mV a)) v (b : ℕ))
-            (dt.kindOf (dt.varAt j) b))
-      (f : dt.CtlIx → A),
-      F (dt.legStT (v := v) (aT := aT) RF hord mV j st tOf' semT f) = F st)
-    (k : Fin (dt.nv + 1)) :
-    F (dt.spineStOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf k) = F st₀ := by
-  obtain ⟨n, hn⟩ := k
-  induction n with
-  | zero => rfl
-  | succ n ih =>
-    have hnv : n < dt.nv := Nat.lt_of_succ_lt_succ hn
-    have hstep := dt.spineStOfT_succ (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf
-      ⟨n, hnv⟩
-    exact Eq.trans (congrArg F hstep) (Eq.trans (hF _ _ _ _ _) (ih _))
 
 /-! ### The branched spine's dictionary at one address
 
@@ -2026,67 +1876,6 @@ variable (tAt : ∀ (_w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx
   (_st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (j : Fin dt.nv),
   Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
 
-/-- **The state one address's spine ends in, threaded**, with the mirror
-pinned at the address. -/
-noncomputable def stEndT
-    (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
-    (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-    (f : dt.CtlIx → A) : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
-  dt.spineStOfT (v := w) (aT := aT) RF hord mV { st with mir := w } f (semAt w st)
-    (tAt w st) (Fin.last dt.nv)
-
-/-- **The control one address's spine ends in, threaded.** -/
-noncomputable def fsEndT
-    (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
-    (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-    (f : dt.CtlIx → A) : dt.CtlIx → A :=
-  dt.spineFsOfT (v := w) (aT := aT) RF hord mV { st with mir := w } f (semAt w st)
-    (tAt w st) (Fin.last dt.nv)
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [Finite ιV] [LinearOrder (dt.X.Map A)] in
-/-- **The mirror the threaded evaluation ends at is the address**, by
-construction — `reaches_sweep`'s `hmirE` through `sweepStEG_mir'`. -/
-theorem stEndT_mir
-    (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
-    (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-    (f : dt.CtlIx → A) :
-    (dt.stEndT (aT := aT) RF hord mV semAt tAt w st f).mir = w :=
-  dt.spineStOfT_mir (v := w) (aT := aT) RF hord mV { st with mir := w } f (semAt w st)
-    (tAt w st) (Fin.last dt.nv)
-
-omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-/-- **What the threaded evaluation leaves alone**: the marker, the bottom
-and end marks and the stage dictionary — `reaches_sweep`'s `hwkE` and
-`hltpE` through `sweepStEG_wk` and `sweepStEG_ltp`. -/
-theorem stEndT_ride {β : Sort _}
-    (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
-    (hFmir : ∀ (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF))) m,
-      F { st with mir := m } = F st)
-    (hFleg : ∀ (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx
-        dt.dd → Prop)
-      (j : Fin dt.nv) (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-      (tOf' : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
-      (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-        (a : ιV),
-        (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-          dt.igPassP RF PR.zero PR.one (dt.varAt j)
-            (dt.varRdSt st p (mV a)) ℓ) →
-        ∀ b : Fin (dt.natOf (dt.varAt j)),
-          dt.KindSem PR.zero PR.one (dt.varAt j)
-            (dt.matSt (dt.varAt j) (dt.varRdSt st p (mV a)) w (b : ℕ))
-            (dt.kindOf (dt.varAt j) b))
-      (f : dt.CtlIx → A),
-      F (dt.legStT (v := w) (aT := aT) RF hord mV j st tOf' semT f) = F st)
-    (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
-    (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-    (f : dt.CtlIx → A) :
-    F (dt.stEndT (aT := aT) RF hord mV semAt tAt w st f) = F st :=
-  (dt.spineRideT (v := w) (aT := aT) RF hord mV { st with mir := w } f (semAt w st)
-    (tAt w st) F (fun j st' tOf' semT f' => hFleg w j st' tOf' semT f')
-    (Fin.last dt.nv)).trans (hFmir st w)
-
 /-! The branched evaluation's semantic parameter is the conditioned family
 of `DescriptiveComplexity.Draw.Data.gatedSem`, quantified over the address
 as well: `DescriptiveComplexity.Draw.Data.stEndB` runs the spine at
@@ -2231,12 +2020,6 @@ omit [LinearOrder (dt.X.Map A)] [Finite ιV] in
 theorem sweepSW_bot :
     dt.sweepSW (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ (fun _ => False) = st₀ :=
   congrArg Prod.fst
-    (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
-
-omit [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem sweepFS_bot :
-    dt.sweepFS (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ (fun _ => False) = f₀ :=
-  congrArg Prod.snd
     (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
 
 omit [LinearOrder (dt.X.Map A)] [Finite ιV] in
@@ -2692,59 +2475,6 @@ section StageEnd
 variable {P : Type} [LinearOrder P] [Finite P]
 variable {v : Univ A R P dt.KIx dt.dd → Prop}
 variable (st : TapeStD dt A R P)
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx]
-  [LinearOrder P] [Finite P] in
-/-- Normalizing twice is normalizing once. -/
-theorem stageEndSt_idem : dt.stageEndSt (dt.stageEndSt st v) v =
-    dt.stageEndSt st v := rfl
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx]
-  [LinearOrder P] [Finite P] in
-/-- Normalizing commutes with a round's VAL write. -/
-theorem stageEndSt_roundSt (m : Univ A R P dt.KIx dt.dd → Prop) :
-    dt.stageEndSt (dt.roundSt st m) v = dt.roundSt (dt.stageEndSt st v) m :=
-  rfl
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx]
-  [LinearOrder P] [Finite P] in
-/-- Normalizing leaves the mirror, the markers and the tracks alone — so
-every ride lemma of this file is blind to it. -/
-theorem stageEndSt_fields :
-    (dt.stageEndSt st v).mir = st.mir ∧ (dt.stageEndSt st v).val = st.val ∧
-      (dt.stageEndSt st v).wk = st.wk ∧ (dt.stageEndSt st v).bot = st.bot ∧
-      (dt.stageEndSt st v).ltp = st.ltp ∧
-      (dt.stageEndSt st v).old = st.old ∧
-      (dt.stageEndSt st v).new = st.new :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Language.wide.Structure
-    (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx]
-  [LinearOrder P] [Finite P] in
-/-- **A normalized state meets the stage atom's two hypotheses by
-`rfl`** — which is what makes the threaded form hypothesis-free. -/
-theorem stageEndSt_home :
-    (dt.stageEndSt st v).sav = v ∧ (dt.stageEndSt st v).tgt = v :=
-  ⟨rfl, rfl⟩
 
 end StageEnd
 

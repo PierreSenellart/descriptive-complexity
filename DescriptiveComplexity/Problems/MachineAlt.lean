@@ -112,16 +112,6 @@ theorem atmAccept_mem_sigmaP' (k : ℕ) : ATMAccept (k + 1) true ∈ SigmaP (k +
 theorem atmAccept_mem_piP' (k : ℕ) : ATMAccept (k + 1) false ∈ PiP (k + 1) :=
   atmAccept_mem_piP k
 
-/-- **Alternating acceptance is the `k`-round game**, the semantic content of
-the membership half at every level: an alternating machine accepts exactly when
-the owner of block `0` can choose a run of its block, the owner of block `1`
-cannot avoid one of its own, and so on for `k` rounds. -/
-theorem ATMData.accepts_iff_game {A : Type} [Finite A] {M : ATMData A} {k : ℕ}
-    (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le) (hk : 0 < k)
-    {p₀ p₁ : A} (hmin : MinPos M.Le M.Posn p₀) (hmax : MaxPos M.Le M.Posn p₁)
-    (start : Bool) : M.AltAccepts start ↔ M.AltGame start k :=
-  M.altAccepts_iff_altGame hbwf hlin hmax start hmin hk
-
 /-! ### The hardness half -/
 
 /-- **Alternating acceptance with an existential first block is `Σₖ₊₁ᵖ`-hard**:

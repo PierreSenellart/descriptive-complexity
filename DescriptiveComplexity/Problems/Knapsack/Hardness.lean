@@ -172,7 +172,6 @@ theorem lex2_total (u v : Fin 2 → A) : Lex2 u v ∨ Lex2 v u := by
 
 end Lex
 
-
 /-! ### The interpretation -/
 
 /-- Tags of the reduction: the items (one per set of the family) and the bit

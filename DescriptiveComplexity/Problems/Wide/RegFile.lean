@@ -142,11 +142,6 @@ def WMSucc (u u' : A) : Prop := IxSucc (WMLe (A := A)) u u'
 
 variable [Finite A]
 
-/-- **Every element but the greatest has a successor.** -/
-theorem exists_wmSucc (h : IsLinOrd (WMLe (A := A))) {u : A} (hne : ∃ v : A, WMLt WMLe u v) :
-    ∃ u', WMSucc A u u' :=
-  exists_ixSucc _ h hne
-
 /-! ### The rank of an element -/
 
 /-- **The rank of an element**: the number of elements strictly below it. -/
@@ -162,21 +157,10 @@ theorem wmRank_lt (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hlt : WMLt WMLe u u
     wmRank u < wmRank u' :=
   ixRank_lt _ h hlt
 
-/-- Rank is monotone along the order. -/
-theorem wmRank_le_of_le (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hle : WMLe u u') :
-    wmRank u ≤ wmRank u' :=
-  ixRank_le_of_le _ h hle
-
 /-- **The rank of an element is below the number of elements**, so a walk of the
 file crosses fewer registers than there are elements. -/
 theorem wmRank_lt_card (u : A) : wmRank u < Nat.card A :=
   ixRank_lt_card _ u
-
-/-- **Rank increases by exactly one along a successor**, which is what makes a
-difference of ranks a count of registers. -/
-theorem wmRank_succ (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u') :
-    wmRank u' = wmRank u + 1 :=
-  ixRank_succ _ h hs
 
 /-! ### The interface, at an arbitrary index
 
@@ -456,15 +440,6 @@ unification, and `rw` matches at `instances` transparency, so the projection
 @[simp]
 theorem cell_wmSegFile (h : IsLinOrd (WMLe (A := A))) : (wmSegFile h).cell = wmSeg (A := A) :=
   rfl
-
-/-- **The file of the input channel, sited**: its working area is the addresses
-that do not hold the least element, and every marked cell does hold it, so the
-working area lies below the whole file – exponentially many cells of it. -/
-def wmSegSited (h : IsLinOrd (WMLe (A := A))) {bot : A} (hbot : ∀ v : A, WMLe bot v) :
-    SitedFile A where
-  toRegFile := wmSegFile h
-  Work r := ¬r bot
-  work_lt_cell hr u := wmSetLt_wmSeg_of_not_bot hbot hr u
 
 end Registers
 

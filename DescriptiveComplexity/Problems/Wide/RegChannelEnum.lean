@@ -354,39 +354,6 @@ theorem two_pow_card_le_card_nexRIx [Finite dt.d.B.ι]
   rw [← hcard]
   exact Nat.card_le_card_of_injective _ hinj
 
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite R'] [Finite P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-variable (dt A) in
-/-- **The universe has at least one element per assignment of the guessed
-block.** The tags are at least the rule names, of which there is one per
-assignment (`two_pow_card_le_card_nexRIx`), and every tag has at least the one
-tuple. So padding the kernel's block by one variable doubles the clock, which is
-what the counting hypothesis of `wideRegAccept_iff_exists_out_of_width` is met
-by. -/
-theorem two_pow_card_le_card_univ [Nonempty A] [Finite dt.d.B.ι]
-    [Finite (dt.NexRIx (G := dt.d.B.ι → Bool))]
-    [Finite (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))] :
-    2 ^ Nat.card dt.d.B.ι ≤
-      Nat.card (Univ A (dt.NexRIx (G := dt.d.B.ι → Bool))
-        (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd) := by
-  classical
-  haveI : Fintype A := Fintype.ofFinite A
-  rw [card_univ A (dt.NexRIx (G := dt.d.B.ι → Bool))
-    (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)),
-    card_drawTag (dt := dt) (dt.NexRIx (G := dt.d.B.ι → Bool))
-      (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
-  have h1 : 2 ^ Nat.card dt.d.B.ι ≤ Nat.card (dt.NexRIx (G := dt.d.B.ι → Bool)) :=
-    dt.two_pow_card_le_card_nexRIx
-  have hA : 0 < Nat.card A := Nat.card_pos
-  have h2 : 1 ≤ Nat.card A ^ dt.dd := Nat.one_le_pow _ _ hA
-  calc 2 ^ Nat.card dt.d.B.ι ≤ Nat.card (dt.NexRIx (G := dt.d.B.ι → Bool)) := h1
-    _ ≤ Nat.card (dt.NexRIx (G := dt.d.B.ι → Bool)) + 1 +
-        Nat.card (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) +
-        Nat.card dt.KIx := by omega
-    _ ≤ (Nat.card (dt.NexRIx (G := dt.d.B.ι → Bool)) + 1 +
-        Nat.card (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) +
-        Nat.card dt.KIx) * Nat.card A ^ dt.dd := Nat.le_mul_of_pos_right _ h2
-
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] in
 variable (A R' P') in
 /-- **The clock's exponent, counted**: every dimension the evaluation's width is

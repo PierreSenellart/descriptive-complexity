@@ -76,12 +76,6 @@ theorem Data.ofKernel_d (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
 theorem Data.ofKernel_dd (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
     (Data.ofKernel K hdd).dd = dd := rfl
 
-/-- The packed kernel's block index is nonempty, as a packed source's is: the
-output pack was padded by one level. -/
-theorem Data.ki_pos_ofKernel (K : NexKernel L) {dd : ℕ} (hdd : encDim K.X ≤ dd) :
-    0 < (Data.ofKernel K hdd).ki :=
-  Data.ki_pos K.X K.toStepDef hdd
-
 /-! ### What a nondeterministic program has to decide
 
 The evaluation the machine performs, stated where it can be read off the record:

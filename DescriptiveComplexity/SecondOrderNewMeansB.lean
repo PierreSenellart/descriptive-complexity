@@ -186,7 +186,6 @@ def consTagAssignEquiv (B : SOBlock) (T : Type) [Finite T] (A : Type) :
   (consAssignEquiv B (tagBits T) A).trans
     (Equiv.prodCongr (Equiv.refl _) (tagBitsEquiv T A))
 
-
 end Assign
 
 /-! ### The guards, realized -/
@@ -368,7 +367,6 @@ theorem bijective_meanAtB [Finite A]
         · exact hp
         · exact absurd hq hne
 
-
 /-- **The whole guard, and what it buys**: the invented values name every
 assignment of the block, each exactly once. -/
 theorem bijective_meanAtB_of_guard [Finite A] :
@@ -384,17 +382,12 @@ theorem bijective_meanAtB_of_guard [Finite A] :
     ((realize_meanEmptyB ρ).mp hempty) ((realize_meanInjB ρ).mp hinj)
     ((realize_meanFlipB ρ).mp hflip)
 
-
 /-- **The invented values enumerate the assignments of the block**: the guard's
 bijection, read at assignments rather than at sets of tagged tuples. -/
 noncomputable def meanAssignEquiv [Finite A] (hbij : Function.Bijective (meanAtB ρ)) :
     Fin m ≃ B.Assignment A :=
   (Equiv.ofBijective _ hbij).trans (SOBlock.assignEquivSigma B A).symm
 
-
 end Realize
-
-
-
 
 end DescriptiveComplexity

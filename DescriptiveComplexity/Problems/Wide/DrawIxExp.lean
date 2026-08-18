@@ -641,7 +641,6 @@ theorem ixExp_reachesIn (w : ℕ)
       ofLex a from readLvE_ixExpFam _ _ _] at hc2
     exact absurd (tup_isTop_iff.mpr hc2 (toLex topTup)) (not_le_of_gt ha)
 
-
 end ExpRun
 
 /-! ### The sub-fold: the sac invariant and the exit verdict -/
@@ -668,8 +667,6 @@ coordinates of the wide tuple. -/
 noncomputable def ixExpLeafP (pts : Fin k → dt.X.Map A)
     (v : Fin dt.eDim → A) : Prop :=
   dt.expLeaf e τ (fun ℓ => (pts ℓ).1.2) fun j => v (Fin.castLE hnτ j)
-
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The leaf-read flags read back**: at a round's end, the flag of the
@@ -980,8 +977,6 @@ theorem ctlBit_avC_ixExp_relMap (hzo : zero ≠ one)
     (hn (fun ℓ => (pts ℓ).1.1)) topTup).symm
 
 end ExpVerdict
-
-
 
 end Data
 

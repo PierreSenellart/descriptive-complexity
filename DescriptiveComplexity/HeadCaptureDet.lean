@@ -245,10 +245,6 @@ noncomputable def dHeads : ℕ := 4 * spec.k + specDepth spec.det + 2
 /-- The heads the machine's fragments must give back untouched. -/
 noncomputable def dprot : ℕ := 4 * spec.k + 1
 
-theorem dprot_lt_dHeads : dprot spec < dHeads spec := by
-  rw [dprot, dHeads]
-  omega
-
 /-- Block `t` of the machine's heads: `0` the current tuple, `1` the candidate,
 `2` the source, `3` the counter. -/
 noncomputable def dblk (t : Fin 4) (i : Fin spec.k) : Fin (dHeads spec) :=

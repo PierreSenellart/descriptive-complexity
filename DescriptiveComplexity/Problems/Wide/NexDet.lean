@@ -120,7 +120,6 @@ theorem stuck_of_srcPh (hR : T.Reads) {Ph : P → Prop}
   | .ctrl r =>
     exact hno r ((stateElt_inj T.payload_le hsrc').1 ▸ hp)
 
-
 end Table
 
 end Draw

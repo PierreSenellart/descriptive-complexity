@@ -81,7 +81,6 @@ theorem wpAttr_elt {R : A → A → Prop} {p q : WPoint A} (h : wpAttr R p q) :
 
 end Elements
 
-
 /-! ### A run, with its transitions named -/
 
 section RunData

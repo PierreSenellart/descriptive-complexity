@@ -249,7 +249,6 @@ theorem wtEdgeR_tileStr (p : TilePt A) :
 
 end Structure
 
-
 end TilingHard
 
 end DescriptiveComplexity

@@ -263,13 +263,4 @@ theorem threeColToSat_isQuantifierFree : threeColToSat.IsQuantifierFree := by
         ((IsAtomic.equal _ _).isQF.sup (IsAtomic.equal _ _).isQF))
     · exact isQF_bot
 
-/-- Corollary in terms of Mathlib's `SimpleGraph`: a simple graph is
-3-colorable iff the CNF instance interpreted in it is satisfiable. -/
-theorem SimpleGraph.colorable_iff_satisfiable {V : Type} (G : SimpleGraph V) :
-    haveI := G.structure
-    G.Colorable 3 ↔ Satisfiable (threeColToSat.Map V) := by
-  letI := G.structure
-  rw [← threeColorable_iff_colorable G,
-    threeColorable_iff_satisfiable V]
-
 end DescriptiveComplexity

@@ -71,17 +71,6 @@ theorem exists_altWin_succ_of_ex {c : Config U} (hnacc : ¬ N.Acc c.state)
   | ex _ hs hw => exact ⟨_, hs, hw⟩
   | all hu _ _ => exact absurd hu hnu
 
-/-- **A win survives a chain of universal steps** – which is how the universal
-sweep is followed forward, one candidate at a time. -/
-theorem altWin_of_univChain {Guard : Config U → Prop}
-    (hnacc : ∀ e, Guard e → ¬ N.Acc e.state) (hu : ∀ e, Guard e → N.IsUniv start e.state)
-    {c d : Config U} (h : Relation.ReflTransGen (fun x y => N.toTMData.Step x y ∧ Guard x) c d)
-    (hc : N.AltWin start c) : N.AltWin start d := by
-  induction h using Relation.ReflTransGen.head_induction_on with
-  | refl => exact hc
-  | head hstep _ ih =>
-    exact ih (altWin_succ_of_univ (hnacc _ hstep.2) (hu _ hstep.2) hc hstep.1)
-
 end Plumbing
 
 /-- **The cell a winning seek arrived at**: its symbol answers the test, at a

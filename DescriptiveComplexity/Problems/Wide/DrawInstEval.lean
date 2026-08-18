@@ -238,34 +238,6 @@ noncomputable def legCtl (j : Fin dt.nv)
           (dt.arOf (dt.varAt j))) aT) aT)
     (dt.back RF.cell PR.zero PR.one dt.dd0Le (dt.roundSt st (mV aT)) v)
 
-/-- **The VAL-loop thread of one position's leg**, at the entry-wrapped
-control — the `varFM` iteration the round hypothesis is stated over. -/
-noncomputable def legFM (j : Fin dt.nv)
-    (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-    (tOf : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
-    (semOf : ∀ a : ιV,
-      (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-        dt.igPassP RF PR.zero PR.one (dt.varAt j) (dt.roundSt st (mV a)) ℓ) →
-      ∀ b : Fin (dt.natOf (dt.varAt j)),
-        dt.KindSem PR.zero PR.one (dt.varAt j) (dt.roundSt st (mV a))
-          (dt.kindOf (dt.varAt j) b))
-    (f₀ : dt.CtlIx → A) : ιV → dt.CtlIx → A :=
-  dt.varFM RF hord (dt.varAt j) st v mV semOf
-    (dt.gatesFs RF PR.zero PR.one (dt.varAt j) st v
-      (fun ℓ => Sum.inl (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ))
-      dt.card_le_ntgDim
-      (fun t => le_trans (Finset.le_sup
-        (f := fun t' : dt.X.Tag => (dt.domPk t').n)
-        (Finset.mem_univ t)) dt.domDepth_le_eDim)
-      (fun t => le_trans (Finset.le_sup
-        (f := fun t' : dt.X.Tag =>
-          (blkAtoms (dt.domPk t').mat).length)
-        (Finset.mem_univ t)) dt.domReads_le_nfDim)
-      tOf (dt.varArgsOf PR.zero PR.one (dt.varAt j)).enterBlockSt
-      ((dt.varArgsOf PR.zero PR.one (dt.varAt j)).enterSt f₀
-        (dt.back RF.cell PR.zero PR.one dt.dd0Le st v))
-      (dt.arOf (dt.varAt j)))
-
 /-- **The control after one position's leg, threaded** — the twin of
 `DescriptiveComplexity.Draw.Data.legCtl`, with the VAL loop's rounds run
 at the states the thread produces for them. -/
@@ -1743,46 +1715,6 @@ theorem varLegB_run (j : Fin dt.nv)
         (fun _ => rfl) _ hlt hfail f₀
 
 /-! ### The spine -/
-
-omit [Finite dt.KIx] in
-include hrules hR hlin hbot hv hvi in
-/-- **The spine over given legs**: `eval_run` at the concrete tape
-presentation, each position's machinery an arbitrary run — the caller
-plugs in `DescriptiveComplexity.Draw.Data.varLeg_run` at a gated address
-and `DescriptiveComplexity.Draw.Data.varLegFail_run` at a junk one. -/
-theorem evalSpineLegs_run
-    (stOf : Fin (dt.nv + 1) → TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
-    (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
-    (hwkOf : ∀ k, (stOf k).wk = fun r => r = v)
-    (hVar : ∀ j : Fin dt.nv, Relation.ReflTransGen
-      (wideData (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx
-        dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (.evalP (.sub (dt.smEntry j)))
-          (fsOf j.castSucc)), Sum.inl v',
-        wideTape (PR.trackTapeAt RF.cell Slot.val
-          (dt.back RF.cell PR.zero PR.one dt.dd0Le (stOf j.castSucc))
-          (stOf j.castSucc).val) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (.evalP (.chk j.succ)) (fsOf j.succ)),
-        Sum.inl v',
-        wideTape (PR.trackTapeAt RF.cell Slot.val
-          (dt.back RF.cell PR.zero PR.one dt.dd0Le (stOf j.succ))
-          (stOf j.succ).val) (PR.syElt PR.blank)⟩) :
-    Relation.ReflTransGen
-      (wideData (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (.evalP (.chk 0)) (fsOf 0)), Sum.inl v,
-        wideTape (PR.trackTapeAt RF.cell Slot.val
-          (dt.back RF.cell PR.zero PR.one dt.dd0Le (stOf 0)) (stOf 0).val)
-          (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (.evalP (.chk (Fin.last dt.nv)))
-          (fsOf (Fin.last dt.nv))), Sum.inl v,
-        wideTape (PR.trackTapeAt RF.cell Slot.val
-          (dt.back RF.cell PR.zero PR.one dt.dd0Le (stOf (Fin.last dt.nv)))
-          (stOf (Fin.last dt.nv)).val) (PR.syElt PR.blank)⟩ := by
-  classical
-  exact dt.eval_run RF.toIx (fun i ρ => hrules i ρ) hR hlin hlin hbot hv hvi
-    (restOf := fun k => dt.back RF.cell PR.zero PR.one dt.dd0Le (stOf k))
-    (mvOf := fun k => (stOf k).val)
-    (fun k r => by rw [back_wk, hwkOf k]) (fun k r => rfl) fsOf hVar
 
 include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
   hTestF in

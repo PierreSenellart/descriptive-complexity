@@ -346,40 +346,6 @@ theorem trackTapeAt_coh [DecidableEq W] {I : Type}
     PR.trackTapeAt cell t rest m r = PR.trackTapeAt cell t rest m' r := by
   rw [trackTapeAt, trackTapeAt, bitAtOf_congr hag hr]
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Language.wide.Structure (Univ A R P K dd)] in
-/-- **What a track shows away from a file**: the walked slot is clear at every
-cell that is nobody's register, whatever the track holds. So a register pass
-leaves the rest of the tape alone by construction. -/
-theorem trackTapeAt_of_not_reg [DecidableEq W]
-    (cell : Univ A R P K dd → (Univ A R P K dd → Prop)) (t : W)
-    (rest : (Univ A R P K dd → Prop) → W → A) (m : Univ A R P K dd → Prop)
-    {r : Univ A R P K dd → Prop} (hno : ∀ u : Univ A R P K dd, r ≠ cell u) :
-    PR.trackTapeAt cell t rest m r =
-      PR.syElt fun s => if s = t then PR.zero else rest r s := by
-  refine congrArg _ (congrArg _ (funext fun s => ?_))
-  by_cases hs : s = t
-  · rw [if_pos hs, if_pos hs]
-    exact bitVal_neg (bitAtOf_of_not_reg hno)
-  · rw [if_neg hs, if_neg hs]
-
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-/-- **What a track shows at a register of a file**: the track's digit at that
-element, in the slot being walked. This is what a rule's guard reads, and the one
-statement of the three that needs the file rather than its cells – a cell must
-name at most one element. -/
-theorem trackTapeAt_cell [DecidableEq W] [Finite (Univ A R P K dd)] {I : Type} {ile : I → I → Prop}
-    (F : IxFile (Univ A R P K dd) I ile) (hix : IsLinOrd ile) (t : W)
-    (rest : (Univ A R P K dd → Prop) → W → A) (m : I → Prop) (u : I) :
-    PR.trackTapeAt F.cell t rest m (F.cell u) =
-      PR.syElt fun s =>
-        if s = t then bitVal PR.zero PR.one (m u) else rest (F.cell u) s := by
-  refine congrArg _ (congrArg _ (funext fun s => ?_))
-  by_cases hs : s = t
-  · rw [if_pos hs, if_pos hs]
-    exact bitVal_congr (F.bitAt_cell hix m u)
-  · rw [if_neg hs, if_neg hs]
-
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
 /-- **The coherence condition of the three register passes, discharged.** -/
 theorem trackTape_coh [DecidableEq W] (t : W)
@@ -388,27 +354,6 @@ theorem trackTape_coh [DecidableEq W] (t : W)
     (r : Univ A R P K dd → Prop) (hr : r ≠ wmSeg u) :
     PR.trackTapeAt wmSeg t rest m r = PR.trackTapeAt wmSeg t rest m' r :=
   PR.trackTapeAt_coh wmSeg t rest m m' u hag r hr
-
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-/-- **What a track shows away from the register file.** -/
-theorem trackTape_of_not_reg [DecidableEq W] (t : W)
-    (rest : (Univ A R P K dd → Prop) → W → A) (m : Univ A R P K dd → Prop)
-    {r : Univ A R P K dd → Prop} (hno : ∀ u : Univ A R P K dd, r ≠ wmSeg u) :
-    PR.trackTapeAt wmSeg t rest m r =
-      PR.syElt fun s => if s = t then PR.zero else rest r s :=
-  PR.trackTapeAt_of_not_reg wmSeg t rest m hno
-
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
-/-- **What a track shows at a register**: the track's digit at that element, in
-the slot being walked. -/
-theorem trackTape_wmSeg [DecidableEq W] [Finite (Univ A R P K dd)]
-    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (t : W)
-    (rest : (Univ A R P K dd → Prop) → W → A) (m : Univ A R P K dd → Prop)
-    (u : Univ A R P K dd) :
-    PR.trackTapeAt wmSeg t rest m (wmSeg u) =
-      PR.syElt fun s =>
-        if s = t then bitVal PR.zero PR.one (m u) else rest (wmSeg u) s :=
-  PR.trackTapeAt_cell (wmSegFile hlin).toIx hlin t rest m u
 
 end Prog
 

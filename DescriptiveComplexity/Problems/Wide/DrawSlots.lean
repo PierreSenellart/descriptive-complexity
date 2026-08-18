@@ -238,30 +238,6 @@ theorem slotMark_reg (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
 theorem slotMark_name (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) (j : Fin dd0) :
     slotMark (ι := ι) zero one hdd x (.name j) = x.2 (Fin.castLE hdd j) := rfl
 
-/-- The `blk` slots read back the tag's block. -/
-theorem slotMark_blk_iff (hne : zero ≠ one) (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd)
-    (b : Option (Fin ko ⊕ Fin ki)) :
-    slotMark (ι := ι) zero one hdd x (.blk b) = one ↔ tagBlk x.1 = b :=
-  bitVal_iff hne
-
-/-- The `pdd` slot reads back canonical padding. -/
-theorem slotMark_pdd_iff (hne : zero ≠ one) (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
-    slotMark (ι := ι) zero one hdd x .pdd = one ↔
-      ∀ j : Fin dd, dd0 ≤ (j : ℕ) → x.2 j = zero :=
-  bitVal_iff hne
-
-/-- The `regLast` slot reads back being the greatest element. -/
-theorem slotMark_regLast_iff (hne : zero ≠ one) (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
-    slotMark (ι := ι) zero one hdd x .regLast = one ↔
-      ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, tagTupleLe y x :=
-  bitVal_iff hne
-
-/-- The `regFirst` slot reads back being the least element. -/
-theorem slotMark_regFirst_iff (hne : zero ≠ one) (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
-    slotMark (ι := ι) zero one hdd x .regFirst = one ↔
-      ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, tagTupleLe x y :=
-  bitVal_iff hne
-
 /-- **Being the greatest element that carries no argument block**: the element
 the *register* channel marks below its file, so that every logical address stays
 clear of it and the file lies above the working area
@@ -317,28 +293,6 @@ theorem regSlotMark_blk (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd)
 theorem regSlotMark_pdd (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) :
     regSlotMark (ι := ι) zero one hdd x .pdd =
       bitVal zero one (∀ j : Fin dd, dd0 ≤ (j : ℕ) → x.2 j = zero) := rfl
-
-/-- Off the two ends and the names, the register channel's mark is clear. -/
-theorem regSlotMark_track (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd)
-    (s : Slot ι ko ki dd0) (hs : ∀ b, s ≠ .blk b) (hs' : ∀ j, s ≠ .name j)
-    (h1 : s ≠ .reg) (h2 : s ≠ .regFirst) (h3 : s ≠ .regLast) (h4 : s ≠ .pdd) :
-    regSlotMark (ι := ι) zero one hdd x s = zero := by
-  match s with
-  | .reg => exact absurd rfl h1
-  | .regFirst => exact absurd rfl h2
-  | .regLast => exact absurd rfl h3
-  | .blk b => exact absurd rfl (hs b)
-  | .name j => exact absurd rfl (hs' j)
-  | .pdd => exact absurd rfl h4
-  | .mir => rfl
-  | .tgt => rfl
-  | .sav => rfl
-  | .val => rfl
-  | .wk => rfl
-  | .bot => rfl
-  | .ltp => rfl
-  | .old _ => rfl
-  | .new _ => rfl
 
 /-- **The least element carries no argument block**: the argument tags are the
 greatest ones (`DescriptiveComplexity.Draw.lt_arg`), so the minimum of the

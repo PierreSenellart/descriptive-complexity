@@ -122,14 +122,6 @@ theorem ComplexityClass.mem_exp (C : ComplexityClass) (P : DecisionProblem L) :
     P ∈ C.exp ↔ ExpDefinable C P :=
   Iff.rfl
 
-/-- Over a relational vocabulary, hardness for `C.exp` is the usual notion:
-every problem definable over an expanded universe reduces to `P`. -/
-theorem ComplexityClass.hard_exp_iff (C : ComplexityClass) (P : DecisionProblem L) :
-    C.exp.Hard P ↔
-      ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (R : DecisionProblem L''),
-        ExpDefinable C R → Nonempty (R ≤ʳᶠᵒ[≤] P) :=
-  cofinalHard_iff _ P
-
 /-- The exponential is monotone. -/
 theorem ComplexityClass.exp_mono {C D : ComplexityClass} (h : C ⊆ D) : C.exp ⊆ D.exp := by
   rintro L₀ _ P ⟨X, R, hR, hX⟩

@@ -54,10 +54,6 @@ theorem wideRegData_reachesIn (n : ℕ) (c c' : Config (WPoint A)) :
     (wideRegData A).ReachesIn n c c' ↔ (wideData A).ReachesIn n c c' :=
   exists_congr fun k => and_congr_right fun _ => wideRegData_stepsIn k c c'
 
-/-- **They have the same positions**, so the same clock. -/
-theorem wideRegData_posn (p : WPoint A) :
-    (wideRegData A).Posn p ↔ (wideData A).Posn p := Iff.rfl
-
 /-- **A register cell starts holding its element's symbol.** -/
 theorem initTape_wmRegSeg {x a : A} (hinp : WMInp x a) :
     (wideRegData A).InitTape (Sum.inl (wmRegSeg x)) (Sum.inr a) :=

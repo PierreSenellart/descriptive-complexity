@@ -54,17 +54,6 @@ theorem prog_rules_eval (e : dt.SEF) (ρ : dt.SESh e) :
     (dt.prog zero one hzo args hpl).rules ⟨.eval e, ρ⟩ =
       dt.evalRuleF zero one args e ρ := rfl
 
-omit [LinearOrder A] [LinearOrder (dt.RIx zero one hzo args)]
-  [LinearOrder dt.PF]
-  [Language.wide.Structure
-    (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)]
-  [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
-  [Finite dt.KIx] in
-/-- The assembly's rule at an evaluation site, in projection form. -/
-theorem progAsm_rule_eval (e : dt.SEF) (ρ : dt.SESh e) :
-    (dt.progAsm zero one hzo args).rule (.eval e) ρ =
-      dt.evalRuleF zero one args e ρ := rfl
-
 variable {dt zero one hzo args hpl}
 
 omit [Language.wide.Structure

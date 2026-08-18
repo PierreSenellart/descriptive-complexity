@@ -321,18 +321,6 @@ endpoint witnesses. -/
 private def srLift (S v w₁ w₂ : A → Prop) : srBlock.Assignment A :=
   srAssign fun i => if i = srX then S else if i = srV then v else if i = srW₁ then w₁ else w₂
 
-omit [Language.transSys.Structure A] [LinearOrder A] in
-private theorem srLift_x (S v w₁ w₂ : A → Prop) : srPred (srLift S v w₁ w₂) srX = S := rfl
-
-omit [Language.transSys.Structure A] [LinearOrder A] in
-private theorem srLift_v (S v w₁ w₂ : A → Prop) : srPred (srLift S v w₁ w₂) srV = v := rfl
-
-omit [Language.transSys.Structure A] [LinearOrder A] in
-private theorem srLift_w₁ (S v w₁ w₂ : A → Prop) : srPred (srLift S v w₁ w₂) srW₁ = w₁ := rfl
-
-omit [Language.transSys.Structure A] [LinearOrder A] in
-private theorem srLift_w₂ (S v w₁ w₂ : A → Prop) : srPred (srLift S v w₁ w₂) srW₂ = w₂ := rfl
-
 /-- A walk of the system lifts to a walk of the specification, along which the
 two endpoint witnesses are carried unchanged. -/
 private theorem srReach_lift {S S' : A → Prop}

@@ -288,20 +288,6 @@ theorem reachesIn_readBit_neg (hm : ¬m x₀) :
       rw [passTracks_cell_apply F hix, bitVal_neg hm]
       exact PR.zero_ne_one)) hbackN
 
-include F hR hlin hix hnewk hbot hv hwkS hname huniq hturn hup hrd0 hbackN in
-/-- **Reading a clear bit**: the trip ends at the marker in the negative
-phase. -/
-theorem reaches_readBit_neg (hm : ¬m x₀) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-      ⟨Sum.inr (PR.stElt pStart fc), Sum.inl v,
-        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt pRn fc), Sum.inl v,
-        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩ :=
-  reaches_readBit_aux F hR hlin hix hnewk hbot hv hwkS hname huniq hturn hup
-    (hrd0 _ hname (by
-      rw [passTracks_cell_apply F hix, bitVal_neg hm]
-      exact PR.zero_ne_one)) hbackN
-
 end Read
 
 end Prog

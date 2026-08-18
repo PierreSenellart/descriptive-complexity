@@ -367,17 +367,6 @@ theorem no_plus_iff_card_le (x y : A) :
   · rintro hle ⟨z, hz⟩
     exact absurd (orank_lt_card z) (by omega)
 
-/-- **Multiplication is truncated at the size of the universe**, likewise. -/
-theorem no_times_iff_card_le (x y : A) :
-    (¬∃ z : A, orank x * orank y = orank z) ↔ Nat.card A ≤ orank x * orank y := by
-  constructor
-  · intro h
-    by_contra hlt
-    obtain ⟨z, hz⟩ := exists_orank_eq (A := A) (m := orank x * orank y) (by omega)
-    exact h ⟨z, hz.symm⟩
-  · rintro hle ⟨z, hz⟩
-    exact absurd (orank_lt_card z) (by omega)
-
 variable [Nonempty A]
 
 /-- **The parity of the universe is a numeric predicate.** The greatest element

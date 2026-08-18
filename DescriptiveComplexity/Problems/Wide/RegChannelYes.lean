@@ -92,7 +92,6 @@ theorem exists_above_botElt (hR : PR.table.Reads)
   · exact absurd hb (asymm hlt)
   · exact absurd hb (ne_of_gt hlt)
 
-
 /-! ### The stage addresses lie in the logical interval -/
 
 omit [LinearOrder (dt.X.Map A)] [L.IsRelational] [L.Structure A]

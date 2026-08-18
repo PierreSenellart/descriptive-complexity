@@ -92,11 +92,6 @@ theorem startupSt_ltp :
     fun r => r = (dt.tgtTopSt (A := A) (R' := R') (P' := P')).tgt from rfl,
     tgtTopSt_tgt]
 
-/-- The startup leaves every stage track clear. -/
-theorem startupSt_old (i : dt.d.B.ι) :
-    (dt.startupSt (A := A) (R' := R') (P' := P')).old i = fun _ => False :=
-  rfl
-
 end Startup
 
 /-! ### The forward run -/

@@ -557,7 +557,6 @@ theorem realize_allNewF (φ : runLang.Formula (γ ⊕ Unit)) (v : γ → A ⊕ F
     rw [hie]
     exact h j
 
-
 /-! ### Realization of the named symbols -/
 
 @[simp] theorem realize_posnF (x : γ) (v : γ → A ⊕ Fin m) :
@@ -661,7 +660,6 @@ theorem realize_wfS :
     exact ⟨⟨h1, h2, h3, h4⟩, h5, h6, h7, h8⟩
   · rintro ⟨⟨h1, h2, h3, h4⟩, h5, h6, h7, h8⟩
     exact ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩
-
 
 /-! ### The shapes that repeat
 
@@ -794,7 +792,6 @@ theorem realize_succCellF (z p z' p' : γ) (v : γ → A ⊕ Fin m) :
           @Formula.Realize runLang _ (certStr ρ) γ (maxPosOldF p) v ∧
           @Formula.Realize runLang _ (certStr ρ) γ (minPosOldF p') v) := by
   simp only [succCellF, Formula.realize_sup, Formula.realize_inf, realize_eqF, and_assoc]
-
 
 /-! ### The certificate: the shape conditions
 
@@ -963,7 +960,6 @@ private theorem realize_symFunS :
 
 end ShapeRealize
 
-
 /-! ### The certificate: initial, step, accepting
 
 The three conditions that say the data *is* a run. The step clause is the deep
@@ -1054,7 +1050,6 @@ private theorem realize_stepS :
 
 end RunRealize
 
-
 /-! ### The kernel -/
 
 /-- **The certificate**: the eighteen conditions of
@@ -1141,7 +1136,6 @@ theorem certRun_runAssign (c : TMData.RunRel A (Fin m)) : certRun (runAssign c) 
 end Structures
 
 end Halt
-
 
 /-! ### The theorems -/
 

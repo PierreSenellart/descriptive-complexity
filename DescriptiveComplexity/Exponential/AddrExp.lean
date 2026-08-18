@@ -517,7 +517,6 @@ theorem realize_regS (leSym inpSym : L.Relations 2) (ρ σ : addrBlock.Assignmen
 
 end Realize
 
-
 /-! ### The universe, the tags and the expansion skeleton -/
 
 section Skeleton
@@ -720,7 +719,6 @@ theorem realize_two (rt : E.Relations 2) (φ : WTag → WTag → (aeLang2 L).Sen
   exact h1.trans (realize_onS2 _ x y)
 
 end Reading
-
 
 end AddrExp
 

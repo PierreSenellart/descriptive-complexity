@@ -285,9 +285,6 @@ theorem elem_reachesIn_iter (c : ℕ)
         (fun j b q' => setFlag j b q' (rest v)) q nr) (rest v))
       hbotI).symm
 
-
-
-
 include RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ hrgt₀
   hbotI htopI hname huniq hmaxT hmaxF in
 /-- **The element loop's run at the generated family**, the budget forgotten. -/
@@ -456,7 +453,6 @@ theorem tag_reachesIn_iter (c : ℕ)
       (step := fun a q => advEl τ (chainSt (fun j => mE j (xE a j))
         (fun j b q' => setFlagE τ j b q' (rest v)) q (nrOf τ)) (rest v))
       hbotI).symm
-
 
 include RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt₀ hrgt₀
   hnameT huniqT hτ hmE hnewkE hnergE hbotI htopI hnameE huniqE hmaxT hmaxF in
@@ -681,7 +677,6 @@ theorem tuple_reachesIn_iter (w : ℕ)
         initLv f₀ (restF mD₀ v) :=
       iterOrd_bot hbotI
     rw [hD0, hI0]
-
 
 include RF hrules hR hlin hix hbot hv hvi hbotI htopI hwkS hrg hsrc hdst hoff
   hwkSrc hwkDst hrgSrc hrgDst hnameS huniqS hnameD huniqD hbitFlag

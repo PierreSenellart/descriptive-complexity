@@ -100,11 +100,6 @@ noncomputable def ordExtend : ExpExpansion L where
 variable (X)
 
 omit [Finite A] [Nonempty A] in
-/-- The extended expansion has the same universe as the original: same tags,
-same block, same domain sentence. -/
-theorem ordExtend_map_eq : (ordExtend (X := X)).Map A = X.Map A := rfl
-
-omit [Finite A] [Nonempty A] in
 /-- The expanded structure of the order extension, at the vocabulary written as
 a sum — equal to the extension's own by definition, but not syntactically, so
 instance search has to be handed it. -/

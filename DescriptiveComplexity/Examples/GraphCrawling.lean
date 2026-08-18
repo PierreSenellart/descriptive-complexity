@@ -173,7 +173,6 @@ open FirstOrder
 
 open Language Structure
 
-
 /-!
 ### Step 3: the encoding, size bounds discharged at construction
 
@@ -476,7 +475,6 @@ elements? -/
 def GraphCrawling : DecisionProblem Language.siteGraph where
   Holds := fun A inst => @HasCheapCrawl A inst
   iso_invariant := fun e => hasCheapCrawl_iso e
-
 
 /-!
 ### Step 6: faithfulness – the encoded problem is the concrete one
@@ -1245,7 +1243,6 @@ produced from a cover and the marked set decompose this way, so both
 directions of the correctness proof reduce to arithmetic on three slice
 sizes.
 -/
-
 
 /-- Tags for the interpretation of website graphs in set systems. -/
 inductive CrawlTag : Type

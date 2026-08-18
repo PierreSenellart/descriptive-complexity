@@ -308,20 +308,6 @@ noncomputable def stageFs
   (dt.stagePair hpl hlin hord (aT := aT) mV semAt ltpAddr st₀ f₀ n).2
 
 omit [Finite ιV] in
-/-- The stage families start where the reduction puts them. -/
-theorem stageSt_zero (st₀ : TapeStD dt A
-      (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
-    (f₀ : dt.CtlIx → A) :
-    dt.stageSt hpl hlin hord (aT := aT) mV semAt ltpAddr st₀ f₀ 0 = st₀ := rfl
-
-omit [Finite ιV] in
-/-- The control family of the stages starts at the reduction's pointer. -/
-theorem stageFs_zero (st₀ : TapeStD dt A
-      (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
-    (f₀ : dt.CtlIx → A) :
-    dt.stageFs hpl hlin hord (aT := aT) mV semAt ltpAddr st₀ f₀ 0 = f₀ := rfl
-
-omit [Finite ιV] in
 /-- **`reaches_main`'s `hnextSt`** — by construction. -/
 theorem stageSt_succ (st₀ : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)

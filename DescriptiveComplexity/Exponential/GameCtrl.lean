@@ -439,13 +439,6 @@ theorem arity_of_matrix {p : MachPh V M}
     arity vars p = vars p.q := by
   rcases h with h | h | h | h <;> simp [arity, h]
 
-/-- **No phase declares more coordinates than the machine's tuple has room
-for**, as soon as the phase index bounds every question's prefix – which is
-what `DescriptiveComplexity.GameProg` promises. -/
-theorem arity_le_of_vars_le (hV : ∀ q, vars q ≤ V) (p : MachPh V M) : arity vars p ≤ V := by
-  have h := hV p.q
-  cases hk : p.kind <;> simp only [arity, hk] <;> omega
-
 end Arity
 
 /-! ### Sanity of the control graph -/
@@ -494,15 +487,6 @@ theorem ctrlStep_prePh_last (q : GameQuestion) (r : Bool) (j : Fin (V + 1)) (par
     (h : ¬ ((j : ℕ) < vars q)) (p' : MachPh V M) :
     CtrlStep vars natoms (prePh q r j par) p' ↔ p' = claimPh q r (!par) := by
   simp [CtrlStep, prePh, h]
-
-theorem ctrlStep_acc (p p' : MachPh V M) (h : p.kind = .acc) :
-    ¬ CtrlStep vars natoms p p' := by simp [CtrlStep, h]
-
-theorem ctrlStep_sweep (p p' : MachPh V M) (h : p.kind = .sweep) :
-    ¬ CtrlStep vars natoms p p' := by simp [CtrlStep, h]
-
-theorem ctrlStep_seek (p p' : MachPh V M) (h : p.kind = .seek) :
-    ¬ CtrlStep vars natoms p p' := by simp [CtrlStep, h]
 
 /-- **A control step flips the parity**: the head really does bounce. -/
 theorem par_of_ctrlStep {p p' : MachPh V M} (h : CtrlStep vars natoms p p') :

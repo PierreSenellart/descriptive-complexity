@@ -50,9 +50,6 @@ private theorem tag_nlt_es : ¬qTagIdx QTag.pEnd < qTagIdx QTag.pStart := by dec
 private theorem tag_ne_cs : QTag.pCell ≠ QTag.pStart := by decide
 private theorem tag_ne_ec : QTag.pEnd ≠ QTag.pCell := by decide
 private theorem tag_ne_es : QTag.pEnd ≠ QTag.pStart := by decide
-private theorem tag_ne_sc : QTag.pStart ≠ QTag.pCell := by decide
-private theorem tag_ne_se : QTag.pStart ≠ QTag.pEnd := by decide
-private theorem tag_ne_ce : QTag.pCell ≠ QTag.pEnd := by decide
 
 noncomputable section Geometry
 
@@ -105,13 +102,6 @@ theorem qPosn_iff (p : QV A) :
     · exact qPosn_posEnd
 
 /-! ### Comparing positions -/
-
-omit [Finite A] [Nonempty A] in
-/-- The three cases of the tape order on elements, as a disjunction `rcases`
-can see (`DescriptiveComplexity.QsatTM.PLe` is a `def`). -/
-theorem pLe_cases {x y : A} (h : PLe x y) :
-    (IsQVar x ∧ IsQVar y ∧ (x = y ∨ QPrec x y)) ∨ (IsQVar x ∧ ¬IsQVar y) ∨
-      (¬IsQVar x ∧ ¬IsQVar y ∧ x ≤ y) := h
 
 /-- Between two cells the tape order is the prefix order. -/
 theorem qLe_posCell_iff (hwf : QsatWf A) {x y : A} :
@@ -180,72 +170,6 @@ theorem maxPos_posEnd (hwf : QsatWf A) : MaxPos (QLe (A := A)) QPosn posEnd := b
   · exact qLe_refl hwf _
 
 /-! ### Neighbours -/
-
-/-- **The left marker and the outermost variable are neighbours.** -/
-theorem succPos_start_cell (hwf : QsatWf A) {x : A} (hx : QMinVar x) :
-    SuccPos (QLe (A := A)) QPosn posStart (posCell x) := by
-  refine ⟨qPosn_posStart, qPosn_posCell hx.1, qLe_start_cell x,
-    fun h => tag_ne_sc (congrArg Prod.fst h), fun r hr h₁ h₂ => ?_⟩
-  rcases (qPosn_iff r).mp hr with rfl | ⟨z, hz, rfl⟩ | rfl
-  · exact Or.inl rfl
-  · refine Or.inr (congrArg _ ?_)
-    rcases pLe_cases ((qLe_posCell_iff hwf).mp h₂) with ⟨-, -, hzx⟩ | ⟨-, hnx⟩ | ⟨hnz, -, -⟩
-    · exact hzx.resolve_right (fun h => hx.2 z hz h)
-    · exact absurd hx.1 hnx
-    · exact absurd hz hnz
-  · exact absurd h₂ (not_qLe_end_cell x)
-
-/-- **With no quantified variable the two markers are neighbours.** -/
-theorem succPos_start_end (hno : ∀ x : A, ¬IsQVar x) :
-    SuccPos (QLe (A := A)) QPosn posStart posEnd := by
-  refine ⟨qPosn_posStart, qPosn_posEnd, qLe_start_end,
-    fun h => tag_ne_se (congrArg Prod.fst h), fun r hr h₁ h₂ => ?_⟩
-  rcases (qPosn_iff r).mp hr with rfl | ⟨z, hz, rfl⟩ | rfl
-  · exact Or.inl rfl
-  · exact absurd hz (hno z)
-  · exact Or.inr rfl
-
-/-- **Consecutive variables of the prefix are neighbours on the tape.** -/
-theorem succPos_cell_cell (hwf : QsatWf A) {x y : A} (hxy : QNextVar x y) :
-    SuccPos (QLe (A := A)) QPosn (posCell x) (posCell y) := by
-  have hne : (posCell x : QV A) ≠ posCell y := by
-    intro h
-    exact hwf.irrefl x ((qOne_eq_qOne_iff.mp h).2 ▸ hxy.2.2.1)
-  refine ⟨qPosn_posCell hxy.1, qPosn_posCell hxy.2.1,
-    (qLe_posCell_iff hwf).mpr (Or.inl ⟨hxy.1, hxy.2.1, Or.inr hxy.2.2.1⟩), hne,
-    fun r hr h₁ h₂ => ?_⟩
-  rcases (qPosn_iff r).mp hr with rfl | ⟨z, hz, rfl⟩ | rfl
-  · exact absurd h₁ (not_qLe_cell_start x)
-  · have hxz : x = z ∨ QPrec x z := by
-      rcases pLe_cases ((qLe_posCell_iff hwf).mp h₁) with ⟨-, -, h⟩ | ⟨-, hnz⟩ | ⟨hnx, -, -⟩
-      · exact h
-      · exact absurd hz hnz
-      · exact absurd hxy.1 hnx
-    have hzy : z = y ∨ QPrec z y := by
-      rcases pLe_cases ((qLe_posCell_iff hwf).mp h₂) with ⟨-, -, h⟩ | ⟨-, hny⟩ | ⟨hnz, -, -⟩
-      · exact h
-      · exact absurd hxy.2.1 hny
-      · exact absurd hz hnz
-    rcases hxz with rfl | hxz
-    · exact Or.inl rfl
-    · rcases hzy with rfl | hzy
-      · exact Or.inr rfl
-      · exact absurd (hxy.2.2.2 z hz hxz hzy) not_false
-  · exact absurd h₂ (not_qLe_end_cell y)
-
-/-- **The innermost variable and the right marker are neighbours.** -/
-theorem succPos_cell_end (hwf : QsatWf A) {x : A} (hx : QMaxVar x) :
-    SuccPos (QLe (A := A)) QPosn (posCell x) posEnd := by
-  refine ⟨qPosn_posCell hx.1, qPosn_posEnd, qLe_cell_end x,
-    fun h => tag_ne_ce (congrArg Prod.fst h), fun r hr h₁ h₂ => ?_⟩
-  rcases (qPosn_iff r).mp hr with rfl | ⟨z, hz, rfl⟩ | rfl
-  · exact absurd h₁ (not_qLe_cell_start x)
-  · refine Or.inl (congrArg _ ?_)
-    rcases pLe_cases ((qLe_posCell_iff hwf).mp h₁) with ⟨-, -, hxz⟩ | ⟨-, hnz⟩ | ⟨hnx, -, -⟩
-    · exact (hxz.resolve_right fun h => hx.2 z hz h).symm
-    · exact absurd hz hnz
-    · exact absurd hx.1 hnx
-  · exact Or.inr rfl
 
 end Geometry
 

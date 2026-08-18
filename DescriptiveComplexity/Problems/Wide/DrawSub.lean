@@ -106,30 +106,6 @@ theorem step_writeCell (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads
   exact PR.trackTapeAt_coh F.cell t rest _ m u (fun v hv => ⟨fun hc => (hc.resolve_left
     fun h => absurd h.1 hv).2, fun hm => Or.inr ⟨hv, hm⟩⟩) r hr
 
-omit [Finite I] in
-/-- **One step writing the walked track at a register cell**, moving right. -/
-theorem step_writeCellRight (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
-    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
-    {u : I} {v' : Univ A R P K dd → Prop} (hi : WMIncr WMLe (F.cell u) v')
-    {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
-    {b : Prop} {p p' : P} {f f' : Q → A}
-    (hrule : PR.HasRight p f (PR.passTracksAt F.cell t rest m (F.cell u)) p' f'
-      (Function.update (PR.passTracksAt F.cell t rest m (F.cell u)) t
-        (bitVal PR.zero PR.one b))) :
-    (wideData (Univ A R P K dd)).Step
-      ⟨Sum.inr (PR.stElt p f), Sum.inl (F.cell u),
-        wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt p' f'), Sum.inl v',
-        wideTape (PR.trackTapeAt F.cell t rest fun v => (v = u ∧ b) ∨ (v ≠ u ∧ m v))
-          (PR.syElt PR.blank)⟩ := by
-  obtain ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩ := step_of_hasRight hR hrule
-  rw [← trackTapeAt_eq] at hread
-  rw [← passTracks_update_cell F hix m u] at hwrite
-  rw [← trackTapeAt_eq] at hwrite
-  refine step_wideTape_right hlin hi htr hsrc hread hdst hwrite hright fun r hr => ?_
-  exact PR.trackTapeAt_coh F.cell t rest _ m u (fun v hv => ⟨fun hc => (hc.resolve_left
-    fun h => absurd h.1 hv).2, fun hm => Or.inr ⟨hv, hm⟩⟩) r hr
-
 /-! ### A file test the tracks decide -/
 
 /-- **A program tests its register file by a question of the tracks.** As
@@ -268,31 +244,6 @@ theorem reachesIn_fileClearTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.t
   · rw [trackTapeAt_eq]
     exact step_of_hasLeft hR (hwalk k r hbnd hno)
 
-/-- **Clearing a track**, the budget forgotten. -/
-theorem reaches_fileClearTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
-    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
-    {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
-    (hrest : ∀ r : Univ A R P K dd → Prop,
-      rest r rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
-    {m : I → Prop} {p : P} {f : Q → A}
-    (hput : ∀ g : W → A, g rg = PR.one →
-      PR.HasLeft p f g p f (Function.update g t PR.zero))
-    (hwalk : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
-      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
-      (∀ x : I, r ≠ F.cell x) →
-      PR.HasLeft p f (PR.passTracksAt F.cell t rest k r) p f (PR.passTracksAt F.cell t rest k r))
-    {top bot : I} (htop : ∀ v, ile v top) (hbot : ∀ v, ile bot v) :
-    ∃ q : Univ A R P K dd → Prop, WMIncr WMLe q (F.cell bot) ∧
-      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-        ⟨Sum.inr (PR.stElt p f), Sum.inl (F.cell top),
-          wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
-        ⟨Sum.inr (PR.stElt p f), Sum.inl q,
-          wideTape (PR.trackTapeAt F.cell t rest fun _ => False) (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, hrun⟩ := reachesIn_fileClearTrack F hR hlin hix hne hrest hput hwalk
-    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
-    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _))) htop hbot
-  exact ⟨q, hq, hrun.reflTransGen⟩
-
 /-- **Copying one track into another**: one pass down the file, each register's
 walked digit replaced by its digit on the source slot, which must be a bit
 there. SAV := MIRROR and TARGET := SAV are this pass. -/
@@ -347,35 +298,6 @@ theorem reachesIn_fileCopyTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.ta
     exact step_of_hasLeft hR (hput _ (hrgSeg k u))
   · rw [trackTapeAt_eq]
     exact step_of_hasLeft hR (hwalk k r hbnd hno)
-
-/-- **Copying one track into another**, the budget forgotten. -/
-theorem reaches_fileCopyTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
-    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
-    {t rg src : W} (hne : t ≠ rg) (hnesrc : src ≠ t)
-    {rest : (Univ A R P K dd → Prop) → W → A}
-    (hrest : ∀ r : Univ A R P K dd → Prop,
-      rest r rg = bitVal PR.zero PR.one (∃ u : I, r = F.cell u))
-    (hsrcBit : ∀ u : I,
-      rest (F.cell u) src = PR.zero ∨ rest (F.cell u) src = PR.one)
-    {m : I → Prop} {p : P} {f : Q → A}
-    (hput : ∀ g : W → A, g rg = PR.one →
-      PR.HasLeft p f g p f (Function.update g t (g src)))
-    (hwalk : ∀ (k : I → Prop) (r : Univ A R P K dd → Prop),
-      (∃ x : I, WMSetLe WMLe (F.cell x) r) →
-      (∀ x : I, r ≠ F.cell x) →
-      PR.HasLeft p f (PR.passTracksAt F.cell t rest k r) p f (PR.passTracksAt F.cell t rest k r))
-    {top bot : I} (htop : ∀ v, ile v top) (hbot : ∀ v, ile bot v) :
-    ∃ q : Univ A R P K dd → Prop, WMIncr WMLe q (F.cell bot) ∧
-      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-        ⟨Sum.inr (PR.stElt p f), Sum.inl (F.cell top),
-          wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
-        ⟨Sum.inr (PR.stElt p f), Sum.inl q,
-          wideTape (PR.trackTapeAt F.cell t rest fun u => rest (F.cell u) src = PR.one)
-            (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, hrun⟩ := reachesIn_fileCopyTrack F hR hlin hix hne hnesrc hrest hsrcBit hput hwalk
-    (w := Nat.card {q : WPoint (Univ A R P K dd) // (wideData (Univ A R P K dd)).Posn q})
-    (fun _ _ _ => le_trans (Nat.sub_le _ _) (Nat.le_of_lt (wideRank_lt_card _))) htop hbot
-  exact ⟨q, hq, hrun.reflTransGen⟩
 
 /-- **Rewriting a track by a function of the other tracks**: one pass down
 the file, each register's walked digit replaced by a bit the tracks at that

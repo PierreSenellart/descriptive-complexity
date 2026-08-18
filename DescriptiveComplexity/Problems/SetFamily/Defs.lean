@@ -188,13 +188,6 @@ theorem coversOn_iff_embedding (Ep Fp : A → Prop) (Mp : A → A → Prop) (Kp 
     and_congr_right fun _ =>
       and_congr_right fun _ => (nonempty_embedding_iff_ncard_le G Kp).symm
 
-/-- The hitting-set threshold as an injection of the hitting set into the
-marked set. -/
-theorem hitsOn_iff_embedding (Ep Fp : A → Prop) (Mp : A → A → Prop) (Kp : A → Prop) :
-    HitsOn Ep Fp Mp Kp ↔ ∃ H : A → Prop, (∀ x, H x → Ep x) ∧
-      (∀ s, Fp s → ∃ x, H x ∧ Mp x s) ∧ Nonempty ({x // H x} ↪ {x // Kp x}) :=
-  coversOn_iff_embedding _ _ _ Kp
-
 /-- The packing threshold as an injection of the marked set into the packing:
 a *lower* bound, so the injection runs the other way round. -/
 theorem packsOn_iff_embedding (Ep Fp : A → Prop) (Mp : A → A → Prop) (Kp : A → Prop) :

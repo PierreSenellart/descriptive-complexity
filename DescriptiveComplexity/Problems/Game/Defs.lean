@@ -144,35 +144,6 @@ section Collapse
 
 variable {A : Type} [Language.andOrGraph.Structure A]
 
-/-- **With no universal node, winning is reaching a node that wins
-outright.** So GAME is a conservative extension of
-`DescriptiveComplexity.REACH`: one operator more, and nothing else. -/
-theorem winsOn_iff_reach (hex : ∀ a : A, ¬AGUniv a) (a : A) :
-    WinsOn A a ↔ ∃ b, Relation.ReflTransGen AGMove a b ∧ AGWon b := by
-  constructor
-  · intro hw
-    induction hw with
-    | @won b hb => exact ⟨b, Relation.ReflTransGen.refl, hb⟩
-    | @ex b b' _ hm _ ih =>
-      obtain ⟨e, hreach, hwon⟩ := ih
-      exact ⟨e, Relation.ReflTransGen.head hm hreach, hwon⟩
-    | @all b hu _ _ _ => exact absurd hu (hex b)
-  · rintro ⟨b, hreach, hwon⟩
-    induction hreach using Relation.ReflTransGen.head_induction_on with
-    | refl => exact .won hwon
-    | head hm _ ih => exact .ex (hex _) hm ih
-
-/-- **With no universal node, the game is won exactly when some node that wins
-outright is reachable from a marked start.** -/
-theorem gameWon_iff_reach (hex : ∀ a : A, ¬AGUniv a) :
-    GameWon A ↔ ∃ s b : A, AGStart s ∧ AGWon b ∧ Relation.ReflTransGen AGMove s b := by
-  constructor
-  · rintro ⟨s, hs, hw⟩
-    obtain ⟨b, hreach, hwon⟩ := (winsOn_iff_reach hex s).mp hw
-    exact ⟨s, b, hs, hwon, hreach⟩
-  · rintro ⟨s, b, hs, hwon, hreach⟩
-    exact ⟨s, hs, (winsOn_iff_reach hex s).mpr ⟨b, hreach, hwon⟩⟩
-
 end Collapse
 
 /-! ### Isomorphism-invariance -/

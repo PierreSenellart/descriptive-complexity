@@ -412,24 +412,6 @@ theorem nexProg_rules (hzo : zero ≠ one)
       dt.nexRule one β γ (dt.nexEvalRuleF zero one args) (.chk 0) bot i ρ :=
   rfl
 
-omit [LinearOrder (dt.NexRIx (G := G))]
-  [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))] in
-/-- **The clocked program's evaluation rules**: at an evaluation site the
-program's rule *is* the spine's, which is what discharges the rule hypothesis of
-`DescriptiveComplexity.Draw.Data.nexEval_reachesIn` at the assembled
-program. -/
-theorem nexProg_rules_eval (hzo : zero ≠ one)
-    (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
-    {coord : Fin dt.dd → dt.CtlIx}
-    {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
-    {γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G}
-    {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
-    {bot : Option dt.KIx} (e : dt.SEF) (ρ : dt.NexSESh e) :
-    (dt.nexProg zero one hzo hpl coord β γ args bot).rules ⟨.eval e, ρ⟩ =
-      dt.nexEvalRule one (dt.nexSmRule zero one args) dt.smEntry
-        (NexPh.evalP (.sub dt.smEntryOut)) e ρ :=
-  rfl
-
 end Prog
 
 section NexEvalRun
@@ -446,7 +428,6 @@ variable {ShM : SM → Type}
 variable {PR : Prog A R (NexPh B (EvalPh nv PM)) Q dt.SlotIx dt.KIx dt.dd}
 variable {I : Type} {ile : I → I → Prop}
 variable (RF : IxFile (Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd) I ile)
-
 
 variable {ruleM : ∀ s : SM, ShM s →
   Rule A Q dt.SlotIx (NexPh B (EvalPh nv PM))}
@@ -637,37 +618,6 @@ theorem nexEval_reachesIn :
     refine (TMData.reachesIn_of_step hback).trans ?_
     rw [hsucc]
     exact ih (k + 1) (by omega) (by omega)
-
-omit hVar in
-include hrules hR hlin hix hbot hv hvi hwkOf hrgOf in
-/-- **The spine's run**, the budget forgotten: what a space-bounded caller
-reads, its machineries' runs carrying no count. -/
-theorem nexEval_run
-    (hVarR : ∀ k : Fin nv,
-      Relation.ReflTransGen
-        (wideData (Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd)).Step
-        ⟨Sum.inr (PR.stElt (NexPh.evalP (.sub (subEntry k))) (fs k.castSucc)),
-          Sum.inl v',
-          wideTape (PR.trackTapeAt RF.cell Slot.val (restOf k.castSucc)
-            (mvOf k.castSucc)) (PR.syElt PR.blank)⟩
-        ⟨Sum.inr (PR.stElt (NexPh.evalP (.chk k.succ)) (fs k.succ)), Sum.inl v',
-          wideTape (PR.trackTapeAt RF.cell Slot.val (restOf k.succ) (mvOf k.succ))
-            (PR.syElt PR.blank)⟩) :
-    Relation.ReflTransGen
-      (wideData (Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (NexPh.evalP (.chk 0)) (fs 0)), Sum.inl v,
-        wideTape (PR.trackTapeAt RF.cell Slot.val (restOf 0) (mvOf 0))
-          (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (NexPh.evalP (.chk (Fin.last nv))) (fs (Fin.last nv))),
-        Sum.inl v,
-        wideTape (PR.trackTapeAt RF.cell Slot.val (restOf (Fin.last nv))
-          (mvOf (Fin.last nv))) (PR.syElt PR.blank)⟩ := by
-  classical
-  choose wOf hwOf using fun k : Fin nv =>
-    TMData.exists_reachesIn_of_reflTransGen (hVarR k)
-  exact (nexEval_reachesIn RF hrules hR hlin hix hbot hv hvi hwkOf hrgOf fs
-    (Finset.univ.sup wOf)
-    (fun k => (hwOf k).mono (Finset.le_sup (Finset.mem_univ k)))).reflTransGen
 
 include hrules in
 /-- **The evaluation's entry walk-back**: whatever dispatches into the spine

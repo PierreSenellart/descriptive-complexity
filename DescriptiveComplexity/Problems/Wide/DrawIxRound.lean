@@ -26,7 +26,6 @@ open Language Structure
 
 namespace Data
 
-
 variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -282,16 +281,11 @@ variable (hhas : F.toLayout.HasName zero)
 variable (helt : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
   elt (F.toLayout.reg hhas b c) = dt.blkElt b (pad zero c))
 
-
-
-
-
 /-- **The file-test question of an inner gate**, semantically: every cell of
 the gated block that the round's register holds is encoding-shaped. -/
 noncomputable def ixIGTest (stV : TapeSt dt A R P I)
     (b : Fin dt.ko ⊕ Fin dt.ki) (u : I) : Prop :=
   dt.wellShapedIG zero one b (dt.ixBack F.toLayout zero one dt.dd0Le stV (F.cell u))
-
 
 omit [Finite I] [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
@@ -1183,7 +1177,6 @@ theorem ixScratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v := v) (f₀ := f₀)]
   exact ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
-
 open Classical in
 /-- **The control one round leaves, threaded**: as
 `DescriptiveComplexity.Draw.Data.roundCtl`, with the matrix's thread
@@ -1280,7 +1273,6 @@ theorem ixRoundCtlT_eq_ixRoundCtl (hzo : zero ≠ one)
   · simp only [ixRoundCtlT, ixRoundCtl, dif_pos hc]
     exact ixMatFsT_eq_ixMatFs (F := F) (hhas := hhas) (hreg := hreg) _ _ _ _
   · simp only [ixRoundCtlT, ixRoundCtl, dif_neg hc]
-
 
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The accumulators survive one whole round.** -/
@@ -2038,84 +2030,6 @@ theorem ixRound_run_thread_reachesIn (stV : TapeSt dt A R P I)
       exact ⟨rEmb .mchk1 .stay, by rw [h]; exact hwkv',
         by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl,
         fun hc => (by rw [h] at hc; exact hc)⟩
-
-
-include hrules hR hlin hix hsepP hhasP hinj heltP hgap hord htop hbot hwork hv hvi
-  he₀ hmono hup hvh hxdUse hwP hwR hwK hcostR in
-/-- **One round of the VAL loop, run**: from the dispatch's landing one
-cell right of the marker at the inner gates' first checkpoint, the
-walk-back, every quantified level's gate — pass or fail, the fail
-continuing — the branch checkpoint on the two flags, the matrix pass on
-the passing branch, and the walk-back at the fold checkpoint. No semantic
-hypothesis: the levels' outcomes and the branch are decided classically,
-so the round runs at **every** VAL content the loop enumerates. -/
-theorem ixRound_run (stV : TapeSt dt A R P I)
-    (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = ixMark elt v)
-    (hbotV : stV.bot = fun r => r = (fun _ => False))
-    (hsavV : stV.sav = ixMark elt v) (htgtV : stV.tgt = ixMark elt v)
-    (sem : (∀ ℓ : Fin (dt.nIn vi),
-        dt.ixIGPassP (elt := elt) F PR.zero PR.one vi stV ℓ) →
-      ∀ a : Fin (dt.natOf vi),
-        dt.IxKindSem (elt := elt) PR.zero PR.one vi stV (dt.kindOf vi a))
-    (f : dt.CtlIx → A) :
-    Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (emb (.matrixP (.igP (.chk 0)))) f), Sum.inl v',
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val)
-          (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (emb .mchk1)
-          (dt.ixRoundCtl (elt := elt) F (hhas := hhasP) (hinj := hinj) (helt := heltP)
-          (hzo := PR.zero_ne_one) (vi := vi) (stV := stV)
-        (v := v) sem f)), Sum.inl v,
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val)
-          (PR.syElt PR.blank)⟩ :=
-  (ixRound_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP) (hix := hix)
-    (hinj := hinj) (heltP := heltP) (hord := hord) (hgap := hgap) (hR := hR)
-    (hlin := hlin) (htop := htop) (hbot := hbot) (he₀ := he₀) (hwork := hwork)
-    (hv := hv) (hvi := hvi) (hmono := hmono) (hup := hup) (hvh := hvh)
-    (hxdUse := hxdUse) (hwP := hwP) (hwR := hwR) (hwK := hwK) (hcostR := hcostR)
-    (hrules := hrules) (stV := stV) (hwkV := hwkV) (hmirV := hmirV)
-    (hbotV := hbotV) (hsavV := hsavV) (htgtV := htgtV) (sem := sem)
-    (f := f)).reflTransGen
-
-include hrules hR hlin hix hsepP hhasP hinj heltP hgap hord htop hbot hwork hv hvi
-  he₀ hmono hup hvh hxdUse hwP hwR hwK hcostR in
-/-- **One round of the VAL loop, run — threaded**: as
-`DescriptiveComplexity.Draw.Data.ixRound_run` with no boundary discipline
-assumed, so it applies at every address of the outer sweep. The tape ends
-in `DescriptiveComplexity.Draw.Data.ixRoundEndSt`, which is the entry state
-unless the round's matrix ran and contained a stage atom. -/
-theorem ixRound_run_thread (stV : TapeSt dt A R P I)
-    (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = ixMark elt v)
-    (hbotV : stV.bot = fun r => r = (fun _ => False))
-    (sem : (∀ ℓ : Fin (dt.nIn vi),
-        dt.ixIGPassP (elt := elt) F PR.zero PR.one vi stV ℓ) →
-      ∀ a : Fin (dt.natOf vi),
-        dt.IxKindSem (elt := elt) PR.zero PR.one vi
-          (dt.ixMatSt (elt := elt) vi stV v (a : ℕ)) (dt.kindOf vi a))
-    (f : dt.CtlIx → A) :
-    Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (emb (.matrixP (.igP (.chk 0)))) f), Sum.inl v',
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val)
-          (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (emb .mchk1)
-          (dt.ixRoundCtlT (elt := elt) F (hhas := hhasP) (hinj := hinj) (helt := heltP)
-          (hzo := PR.zero_ne_one) (vi := vi) (stV := stV)
-        (v := v) sem f)), Sum.inl v,
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le
-            (dt.ixRoundEndSt (elt := elt) F PR.zero PR.one hhasP vi stV v f))
-          (dt.ixRoundEndSt (elt := elt) F PR.zero PR.one hhasP vi stV v f).val)
-          (PR.syElt PR.blank)⟩ :=
-  (ixRound_run_thread_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP)
-    (hix := hix) (hinj := hinj) (heltP := heltP) (hord := hord) (hgap := hgap)
-    (hR := hR) (hlin := hlin) (htop := htop) (hbot := hbot) (he₀ := he₀)
-    (hwork := hwork) (hv := hv) (hvi := hvi) (hmono := hmono) (hup := hup)
-    (hvh := hvh) (hxdUse := hxdUse) (hwP := hwP) (hwR := hwR) (hwK := hwK)
-    (hcostR := hcostR) (hrules := hrules) (stV := stV) (hwkV := hwkV)
-    (hmirV := hmirV) (hbotV := hbotV) (sem := sem) (f := f)).reflTransGen
 
 end RoundRun
 

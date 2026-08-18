@@ -115,26 +115,6 @@ theorem exists_reachesIn_of_acceptsReg (hR : T.Reads)
   rw [heq] at hrun
   exact ⟨n, c, hlt, (wideRegData_stepsIn n _ _).mp hrun, hcacc⟩
 
-/-- **The emitted instance is a yes-instance of
-`DescriptiveComplexity.WideRegAccept`**: well-formedness, which the channel does
-not touch, and an accepting run within the clock. -/
-theorem wideRegAccept (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
-    (hmark : ∀ x : Univ A R P K dd, T.Marked x →
-      f (wmRegSeg x) = symElt T.zero (T.markPl x))
-    (hrest : ∀ s : Univ A R P K dd → Prop,
-      (∀ x : Univ A R P K dd, T.Marked x → s ≠ wmRegSeg x) →
-      f s = symElt T.zero T.blankPl)
-    {n : ℕ} {cfg : Config (WPoint (Univ A R P K dd))}
-    (hreach : (wideData (Univ A R P K dd)).ReachesIn n
-      ⟨Sum.inr (stateElt T.zero T.startPh T.startPl), Sum.inl fun _ => False,
-        wideTape f (symElt T.zero T.blankPl)⟩ cfg)
-    (hlt : n < 2 ^ Nat.card (Univ A R P K dd))
-    {p : P} {w : Fin c → A} (hstate : cfg.state = Sum.inr (stateElt T.zero p w))
-    (ha : T.accept p w) :
-    WideRegAccept (Univ A R P K dd) :=
-  ⟨wideRegData_wellFormed_iff.mpr (wideData_wellFormed_iff.mp (T.wellFormed hR)),
-    acceptsReg hR hmark hrest hreach hlt hstate ha⟩
-
 end Table
 
 namespace Prog

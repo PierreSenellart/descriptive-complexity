@@ -252,13 +252,6 @@ theorem AltAgree.blocksSplit_mp (h : AltAgree u N M) : N.BlocksSplit → M.Block
 
 variable [Finite A]
 
-/-- Winning transports along an equivalence, as an equivalence. -/
-theorem AltAgree.altWin (h : AltAgree u N M) (start : Bool) (c : Config B) :
-    N.AltWin start c ↔ M.AltWin start (c.map u) := by
-  haveI : Finite B := Finite.of_equiv A u.symm
-  rw [altWin_iff_exists_altAcc, altWin_iff_exists_altAcc]
-  exact exists_congr fun n => h.altAcc start n c
-
 end Transport
 
 end ATMData

@@ -193,7 +193,6 @@ theorem realize_eltUnique :
 
 end Realize
 
-
 /-! ### The expansion -/
 
 section Expansion
@@ -217,7 +216,6 @@ are stated at. -/
     exact ⟨true, fun _ _ => False, (realize_eltEmpty (L := L) _).mpr fun _ hc => hc⟩
 
 end Expansion
-
 
 /-! ### The points of the expansion -/
 
@@ -280,7 +278,6 @@ theorem domHolds_valAssign (S : Fin c → (Fin d → A) → Prop) :
   (domHolds_true _).mpr fun y => eltOf_valAssign S y
 
 end Points
-
 
 /-! ### The points, counted -/
 
@@ -380,9 +377,7 @@ noncomputable def powPointEquiv :
     A ⊕ (Fin c → (Fin d → A) → Prop) ≃ (powExpFree L c d).Map A :=
   Equiv.ofBijective _ ⟨powPoint_injective, powPoint_surjective⟩
 
-
 end Count
-
 
 /-! ### The defining sentences, realized -/
 
@@ -438,7 +433,6 @@ theorem realize_powRelSentence_old (σs : Fin 1 → (powBlock c d).Assignment A)
   · rw [if_neg h]; simp [h]
 
 end RelRealize
-
 
 /-! ### The expanded structure is the extended structure -/
 
@@ -529,7 +523,6 @@ noncomputable def powExtEquiv :
 
 end Iso
 
-
 /-! ### The marked part of an extended universe -/
 
 section Used
@@ -545,11 +538,6 @@ def usedSub (U : N → Prop) :
   letI := extOn L A N
   { carrier := {x | Sum.elim (fun _ => True) U x}
     fun_mem := fun {_n} f _ _ => isEmptyElim f }
-
-theorem mem_usedSub_iff (U : N → Prop) (x : A ⊕ N) :
-    letI := extOn L A N
-    x ∈ usedSub (L := L) (A := A) U ↔ Sum.elim (fun _ => True) U x :=
-  Iff.rfl
 
 /-- The inclusion of the extension by the marked values into the whole one. -/
 def usedPoint (U : N → Prop) : A ⊕ {y : N // U y} → A ⊕ N :=
@@ -609,7 +597,6 @@ def usedSubEquiv (U : N → Prop) :
 
 end Used
 
-
 /-! ### The sentence read over the expansion -/
 
 section Sentence
@@ -658,7 +645,6 @@ noncomputable def usedSentence (φ : ((newLang L).sum B.lang).Sentence) :
 
 end Sentence
 
-
 /-! ### The marked part, with the kernel's block -/
 
 section UsedB
@@ -684,11 +670,6 @@ def usedSubB (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
   letI := extOnB (L := L) ρ
   { carrier := {x | Sum.elim (fun _ => True) U x}
     fun_mem := fun {_n} f _ _ => isEmptyElim f }
-
-theorem mem_usedSubB_iff (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) (x : A ⊕ N) :
-    letI := extOnB (L := L) ρ
-    x ∈ usedSubB (L := L) U ρ ↔ Sum.elim (fun _ => True) U x :=
-  Iff.rfl
 
 /-- **The marked part is the extension by the marked values**, over the
 vocabulary the kernel is written in: the same identification as
@@ -726,7 +707,6 @@ def usedSubEquivB (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
       | inr R => exact Iff.rfl }
 
 end UsedB
-
 
 /-! ### The sentence over the expansion, realized -/
 
@@ -839,7 +819,6 @@ theorem realize_usedKernelHom {N' : Type} (σ : (usedBlock B).Assignment (A ⊕ 
   rw [usedKernelHom, LHom.onSentence, LHom.onFormula, LHom.comp_onBoundedFormula]
   exact Iff.rfl
 
-
 /-- **The relativized kernel says what the kernel says on the marked part.** -/
 theorem realize_relativized (U : N → Prop) (ρ' : (usedBlock B).Assignment (A ⊕ N))
     (hU : ∀ x : A ⊕ N, Sum.elim (fun _ => True) U x ↔ markerOf ρ' x)
@@ -862,7 +841,6 @@ theorem realize_relativized (U : N → Prop) (ρ' : (usedBlock B).Assignment (A 
   exact iff_of_eq (congrArg₂ (fun a b => BoundedFormula.Realize
     (M := A ⊕ N) (relativizeTo (markerHostSym L B) ((usedKernelHom L B).onSentence φ)) a b)
     (Subsingleton.elim _ _) (Subsingleton.elim _ _))
-
 
 theorem realize_oldMarked (ρ' : (usedBlock B).Assignment (A ⊕ N)) :
     letI := extOnB (L := L) ρ'
@@ -925,9 +903,7 @@ theorem sorealize_usedSentence (φ : ((newLang L).sum B.lang).Sentence) :
       rw [hres]
       exact hρ2
 
-
 end RealizeUsed
-
 
 /-! ### Bounded invention is definability over the expansion -/
 
@@ -966,9 +942,6 @@ def extOnCongr {A N N' : Type} [L.Structure A] (e : N ≃ N') :
       | inr R =>
         cases R with
         | old => exact sumCongr_isOld e (x 0) }
-
-theorem extOn_fin (A : Type) [L.Structure A] (m : ℕ) :
-    extOn L A (Fin m) = extStructure L A m := rfl
 
 theorem card_pow {c : ℕ} (α : Type) [Finite α] :
     Nat.card (Fin c → α → Prop) = 2 ^ (c * Nat.card α) := by
@@ -1030,8 +1003,6 @@ theorem SigmaSONewExpDefinable.toExpDefinable {P : DecisionProblem L}
     · exact (sorealize_iso
         (extOnCongr (L := L) (A := A) (Fintype.equivFin _)) [B] φ true).mp hU
 
-
 end Final
-
 
 end DescriptiveComplexity

@@ -315,7 +315,6 @@ def qsatMachine (A : Type) [Language.qsat.Structure A] [LinearOrder A] [Finite A
   Write := QWrite
   Inp := QInp
 
-
 /-! ### The table is a table
 
 Before any run is considered: each transition has exactly one destination and

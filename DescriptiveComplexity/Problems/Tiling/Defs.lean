@@ -204,7 +204,6 @@ def Tileable : Prop := ∃ τ : A → A → A, T.IsTiling τ
 a position to index the grid by. -/
 def WellFormed : Prop := IsLinOrd T.Le ∧ ∃ p, T.Posn p
 
-
 /-! ### Transport along a bijection -/
 
 section Transport

@@ -372,12 +372,6 @@ noncomputable def SOTCSpec.orderFree : SOTCSpecFree L where
 
 variable {spec} {A : Type} [instL : L.Structure A]
 
-/-- Reading the order variable back off a state leaves the other variables
-untouched. -/
-theorem SOBlock.restPart_joinOrder (B : SOBlock) (R : (Fin 2 → A) → Prop)
-    (ρ : B.Assignment A) : B.restPart (B.joinOrder R ρ) = ρ :=
-  rfl
-
 section Transport
 
 variable [lo : LinearOrder A] {B : SOBlock} (ρ σ : B.withOrder.Assignment A)

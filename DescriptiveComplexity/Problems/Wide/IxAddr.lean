@@ -58,11 +58,6 @@ theorem ixAddr_elt (hinj : Function.Injective elt) (m : I → Prop) (u : I) :
     ixAddr elt m (elt u) ↔ m u :=
   ⟨fun ⟨_u', he, hm⟩ => hinj he ▸ hm, fun h => ⟨u, rfl, h⟩⟩
 
-theorem not_ixAddr_of_not_elt {m : I → Prop} {x : A} (h : ∀ u, m u → elt u ≠ x) :
-    ¬ixAddr elt m x := by
-  rintro ⟨u, he, hm⟩
-  exact h u hm he
-
 /-- **A file's mark of an address stands for that address**, when the file has a
 register for each of its elements. -/
 theorem ixAddr_ixMark {s : A → Prop} (hs : IxHolds elt Use s) :
@@ -80,11 +75,6 @@ theorem ixMark_ixAddr (hinj : Function.Injective elt) (m : I → Prop) :
 /-- **The address of a mark is one the file can hold.** -/
 theorem ixHolds_ixAddr {m : I → Prop} (hm : ∀ u, m u → Use u) :
     IxHolds elt Use (ixAddr elt m) := fun _x ⟨u, he, hmu⟩ => ⟨u, hm u hmu, he⟩
-
-/-- **The empty address is one every file can hold.** -/
-theorem ixHolds_empty : IxHolds elt Use (fun _ => False) := fun _ h => h.elim
-
-theorem ixMark_empty : ixMark elt (fun _ : A => False) = fun _ => False := rfl
 
 theorem ixAddr_empty : ixAddr elt (fun _ : I => False) = fun _ : A => False :=
   funext fun _ => propext ⟨fun ⟨_, _, h⟩ => h, fun h => h.elim⟩

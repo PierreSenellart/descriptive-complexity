@@ -260,24 +260,6 @@ structure PlusHeads (i j k a b mk : Fin K) (prot : ℕ) : Prop where
 
 namespace PlusHeads
 
-/-- `i` and `a` are distinct heads, being on opposite sides of the
-protection level. -/
-theorem ia (h : PlusHeads i j k a b mk prot) : i ≠ a := by
-  intro he
-  have h1 := h.hi
-  have h2 := h.ha
-  rw [he] at h1
-  omega
-
-/-- `i` and `b` are distinct heads, being on opposite sides of the
-protection level. -/
-theorem ib (h : PlusHeads i j k a b mk prot) : i ≠ b := by
-  intro he
-  have h1 := h.hi
-  have h2 := h.hb
-  rw [he] at h1
-  omega
-
 /-- `i` and `mk` are distinct heads, being on opposite sides of the
 protection level. -/
 theorem imk (h : PlusHeads i j k a b mk prot) : i ≠ mk := by

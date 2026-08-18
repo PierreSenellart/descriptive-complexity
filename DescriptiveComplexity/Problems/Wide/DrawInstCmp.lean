@@ -436,17 +436,6 @@ theorem cmp_chain_apply_ne {bit : Fin 2 → Prop} {base : dt.CtlIx → A}
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] [Nonempty A] in
-/-- The paired reads are distinct control slots. -/
-theorem cmpRdC_zero_ne_one :
-    dt.cmpRdC hnf 0 ≠ dt.cmpRdC hnf 1 := by
-  intro h
-  have h2 := dt.rdfC_injective h
-  have h3 : (0 : ℕ) = 1 := congrArg Fin.val h2
-  exact absurd h3 (by decide)
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
-  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite P] [Nonempty A] in
 /-- **A stored-read chain reads back**, slot by slot: the chain writing each
 read into its own control slot delivers every bit already written. -/
 theorem ctlBit_chain_setCtl {zero one : A} (hzo : zero ≠ one) {nr : ℕ}
@@ -850,7 +839,6 @@ theorem cmp_run (f₀ : dt.CtlIx → A) :
       have := wideRank_lt_card (A := Univ A R P dt.KIx dt.dd)
         (RF.cell (dt.cmpCell RF PR.zero hhasP vi j₁ j₂ b k))
       omega)).reflTransGen
-
 
 end CmpRun
 

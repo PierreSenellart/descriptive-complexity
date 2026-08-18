@@ -93,7 +93,6 @@ variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
 variable {st : TapeSt dt A R P I}
 variable (hwkSt : st.wk = fun r => r = v)
 
-
 omit [L.IsRelational] [L.Structure A] in
 omit [Finite I] in
 include hrules hR hlin hix hbot hv hvi hwkSt hhasP hsepP in
@@ -183,7 +182,6 @@ variable (hENC : ∀ ℓ : Fin k,
   wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
     (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
     encMap dt.ly PR.zero PR.one (pts ℓ))
-
 
 omit [Finite I] in
 include hrules hR hlin hix hbot hv hvi hwkSt hinj helt hENC hhasP hsepP in
@@ -278,7 +276,6 @@ variable {st : TapeSt dt A R P I}
 variable (hwkSt : st.wk = fun r => r = v) (hmirSt : st.mir = ixMark elt v)
 variable (hbotSt : st.bot = fun r => r = (fun _ => False))
 variable (hsav : st.sav = ixMark elt v) (htgt : st.tgt = ixMark elt v)
-
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
@@ -471,7 +468,6 @@ variable (hcompat : ∀ u : I,
   wellG (PR.passTracksAt F.cell Slot.mir (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st)
     st.mir (F.cell u)) ↔ Test u)
 
-
 include hrules hR hlin hix htop hbot hv hvi hwkSt hcompat hgap hinj helt hhasP hsepP in
 /-- **A passing gate block, entered by a dispatch**: every register is
 well-shaped, so the file test passes, the domain evaluation runs on the
@@ -580,7 +576,6 @@ theorem ixGateBlock_hStage_pos (t : dt.X.Tag)
     (t₀ := Slot.mir) (m₀ := st.mir) (hm₀ := fun r => rfl)
     (hwkt₀ := hne_wk_mir) (hrgt₀ := hne_rg_mir) (htag := htag) (f₀ := f) (w := w)
     (hcostT := hcostT) (hcostE := hcostE)
-
 
 omit hhasP hsepP hinj helt in
 include hrules hR hlin hix htop hbot hv hvi hwkSt hcompat hgap in

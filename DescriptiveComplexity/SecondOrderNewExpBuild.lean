@@ -219,7 +219,6 @@ theorem build_flip (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
       exact ⟨fun hc => absurd hc (not_meaningOfB_build σ enum i' _ w hall),
         fun hc => absurd hc (not_meaningOfB_build σ enum i' _ w hall)⟩
 
-
 /-! ### The order guard -/
 
 omit [L.IsRelational] in
@@ -285,7 +284,6 @@ theorem build_meanGuard [Finite A] :
   · exact (realize_meanEmptyB _).mpr (build_empty σ enum)
   · exact (realize_meanInjB _).mpr fun v u hv hu hM => build_inj σ enum v u hv hu hM
   · exact (realize_meanFlipB _).mpr fun i v y hv hy => build_flip σ enum i v y hv hy
-
 
 /-! ### The naming, the certificate, and the sentence -/
 
@@ -390,6 +388,5 @@ theorem card_taggedAssign_le [Finite A] [Nonempty A] :
   simpa only [funext hw] using h
 
 end Count
-
 
 end DescriptiveComplexity

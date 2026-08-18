@@ -275,14 +275,6 @@ theorem litTrue_map {I : A → (A → M) → Prop} {v : A → M} {l : A} (h : Li
   · exact Or.inr ⟨e s, (negG_map e l s).mp hs, fun y => w (e.symm y),
       harg w l hwa, fun hc => hI ((hw w s).mpr hc)⟩
 
-theorem eVarG_map' (x : B) : EVarG x ↔ EVarG (e.symm x) := by
-  have h := (eVarG_map e (e.symm x)).symm
-  rwa [e.apply_symm_apply] at h
-
-theorem clauseG_map' (c : B) : ClauseG c ↔ ClauseG (e.symm c) := by
-  have h := (clauseG_map e (e.symm c)).symm
-  rwa [e.apply_symm_apply] at h
-
 theorem posG_map' (l s : B) : PosG l s ↔ PosG (e.symm l) (e.symm s) := by
   have h := (posG_map e (e.symm l) (e.symm s)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
@@ -347,9 +339,6 @@ theorem eprSatOn_map (h : EprSatOn A) : EprSatOn B := by
     rwa [hval] at this
 
 end Transport
-
-
-
 
 end Epr
 

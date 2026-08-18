@@ -100,7 +100,6 @@ theorem nexProgHanded_rules (hzo : zero ≠ one)
 
 end HandedProg
 
-
 /-! ### The two legs, at any program that reads the same rules -/
 
 section Legs
@@ -175,7 +174,6 @@ theorem wideRegAccept_of_legs
   exact hopen.trans ((config_openingEnd_eq_evalStart hmir _ _ _) ▸ heval)
 
 end Legs
-
 
 /-! ### The handed program is deterministic after its guess
 

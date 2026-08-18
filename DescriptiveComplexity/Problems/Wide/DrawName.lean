@@ -181,23 +181,7 @@ theorem nameG_iff (hzo : zero ≠ one)
       exact pad_of_lt (c := dt.dd0) (zero := zero) (w := fun j' => fc (coord j'))
         (Fin.castLE dt.dd0Le j) j.isLt
 
-omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
-  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
-/-- The guard does hold at the encoded tuple's cell – the arrival of the
-trip. -/
-theorem encG_holds (hzo : zero ≠ one)
-    {cell : Univ A R' P' dt.KIx dt.dd → (Univ A R' P' dt.KIx dt.dd → Prop)}
-    (hinj : Function.Injective cell)
-    {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (c : PtCode dt.X)
-    (pay : (Q → A) → Fin (blockArityBound dt.X.B) → A) (fc : Q → A) :
-    dt.nameGF one b (dt.encCoord zero one c pay) fc
-      (dt.back cell zero one dt.dd0Le st
-        (cell (dt.blkElt (R' := R') (P' := P') b
-          (encTup dt.ly zero one c (pay fc))))) :=
-  (dt.encG_iff hzo hinj b c pay fc _).mpr rfl
-
 end Guard
-
 
 /-! ### The register an encoded tuple is, at an arbitrary file -/
 
@@ -289,21 +273,6 @@ theorem blk_encAsgTup_iff (hzo : zero ≠ one)
     regBit m (wmSeg (dt.blkElt b (encAsgTup dt.ly zero one i w))) ↔ p.1.2 i w := by
   rw [dt.regBit_blkElt hlin, hp]
   exact mem_encPt_asg dt.ly hzo p.1 i w
-
-omit [LinearOrder R'] [LinearOrder P'] in
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [L.Structure A] in
-/-- **The gate reads its assignment off the track**: whatever the block
-holds – an encoding or not – the bit the machine finds at a member tuple's
-cell is the corresponding bit of the assignment the gate decodes
-(`DescriptiveComplexity.Draw.decRho`), which is what its domain
-sub-evaluation runs on. -/
-theorem regBit_decRho (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
-    (m : Univ A R' P' dt.KIx dt.dd → Prop) (b : Fin dt.ko ⊕ Fin dt.ki)
-    (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A) :
-    regBit m (wmSeg (dt.blkElt b (encAsgTup dt.ly zero one i w))) ↔
-      decRho dt.ly zero one
-        (wmBlk m (Tag.arg (toLex b) : Tag R' P' dt.KIx)) i w :=
-  dt.regBit_blkElt hlin m b _
 
 omit [LinearOrder R'] [LinearOrder P'] in
 /-- **A tag witness's question is the point's tag test.** -/

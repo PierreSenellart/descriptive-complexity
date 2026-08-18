@@ -413,7 +413,6 @@ theorem ixEvalWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
   simp only [ixEvalWidth]
   omega
 
-
 end Data
 
 end Draw

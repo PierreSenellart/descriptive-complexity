@@ -632,7 +632,6 @@ theorem derives_of_align : ∀ (l : List (Dom Γ)) (z : List (Letter Γ)),
       refine hder.trans ?_
       simpa using hpar.derives.congr [] [halt]
 
-
 /-- **A match gives a derivation.** The first domino of a match can only be
 the one that opens a history, since every top word begins with the decoration
 and no other bottom word does; from there the queue lemma reads the match as a

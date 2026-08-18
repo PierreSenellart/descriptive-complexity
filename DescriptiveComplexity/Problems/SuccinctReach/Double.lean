@@ -87,11 +87,6 @@ theorem SOBlock.sndAssign_joinAssign (B : SOBlock) (ρ σ : B.Assignment A) :
     B.sndAssign (B.joinAssign ρ σ) = σ :=
   rfl
 
-theorem SOBlock.joinAssign_fst_snd (B : SOBlock) (μ : B.double.Assignment A) :
-    B.joinAssign (B.fstAssign μ) (B.sndAssign μ) = μ := by
-  funext i
-  cases i <;> rfl
-
 end Double
 
 /-! ### Renaming two successive expansions into the doubled one -/

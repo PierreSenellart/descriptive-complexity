@@ -399,7 +399,6 @@ def arithToBlock : L.sum Language.arith →ᴸ (L.sum Language.order).sum arithB
 
 end Transport
 
-
 /-! ### The inclusion -/
 
 section Inclusion

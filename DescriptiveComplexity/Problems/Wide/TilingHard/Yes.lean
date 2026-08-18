@@ -91,7 +91,6 @@ theorem tpAcc_tileAt (hacc : (wideRegData A).Acc (g n).state) :
   rw [tileAt_halt rfl (lt_irrefl n)]
   exact ⟨Or.inr rfl, wpMark_elt hacc⟩
 
-
 /-! ### One row becomes the next -/
 
 omit [LinearOrder A] [Finite A] in
@@ -523,7 +522,6 @@ theorem first_tableTiling (hwf : WideWF A)
       · obtain ⟨z, a, hseg, hz, -, -⟩ := (wtpFirst_tpCol s t).mp hu
         exact hno (Sum.inr a) ⟨z, hseg, hz⟩
 
-
 /-! ### The two edge columns -/
 
 omit [LinearOrder A] in
@@ -648,7 +646,6 @@ theorem tileable_of_accepts (hwf : WideWF A) (h : (wideRegData A).Accepts) :
   obtain ⟨g, tr, n, hinit, hlt, hfreeze, hacc, hstep⟩ := exists_runData h
   exact ⟨wideTileData_wellFormed (isLinOrd_tpLe hwf.1),
     ⟨tableTiling g tr n, isTiling_tableTiling hwf hinit hlt hfreeze hacc hstep⟩⟩
-
 
 end Yes
 

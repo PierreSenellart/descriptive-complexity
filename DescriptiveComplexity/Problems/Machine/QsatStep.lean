@@ -207,7 +207,6 @@ theorem step_procAcc (hσ : σ posStart = symStart)
   ⟨qCst .tProcAcc, isMinTup_qBot, rfl, hσ, rfl, hσ, fun _ _ => rfl,
     Or.inl ⟨trivial, hnext⟩⟩
 
-
 /-! ### The initial configuration
 
 Where the machine starts: descending, at the left marker, on the tape the
@@ -265,7 +264,6 @@ omit [Language.qsat.Structure A] in
 /-- The starting tape, read at a variable's cell. -/
 @[simp] theorem initTape_posCell (x : A) :
     initTape (posCell x : QV A) = symV false false x := rfl
-
 
 /-! ### Where the machine stops
 

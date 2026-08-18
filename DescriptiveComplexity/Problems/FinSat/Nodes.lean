@@ -82,13 +82,6 @@ def fmlSize : ∀ {n : ℕ}, L'.BoundedFormula Empty n → ℕ
   | _, .imp f₁ f₂ => fmlSize f₁ + fmlSize f₂ + 1
   | _, .all f => fmlSize f + 1
 
-theorem fmlSize_pos : ∀ {n : ℕ} (f : L'.BoundedFormula Empty n), 0 < fmlSize f
-  | _, .falsum => Nat.one_pos
-  | _, .equal _ _ => Nat.one_pos
-  | _, .rel _ _ => Nat.one_pos
-  | _, .imp _ _ => Nat.succ_pos _
-  | _, .all _ => Nat.succ_pos _
-
 /-- **The size of the subformula at a position.** It is what the order of the
 syntax of the image is built from: a child position carries a strictly smaller
 subformula. -/

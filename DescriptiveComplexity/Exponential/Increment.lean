@@ -78,10 +78,6 @@ would resolve to the wrong one. -/
 def SetCovBy (S T : I → Prop) : Prop :=
   (setLinearOrder I).lt S T ∧ ∀ U, (setLinearOrder I).lt S U → ¬(setLinearOrder I).lt U T
 
-theorem setCovBy_iff_covBy (S T : I → Prop) :
-    SetCovBy S T ↔ @CovBy _ (@Preorder.toLT _ (setLinearOrder I).toPreorder) S T :=
-  ⟨fun h => ⟨h.1, fun _ hc => h.2 _ hc⟩, fun h => ⟨h.1, fun _ hc => h.2 hc⟩⟩
-
 /-- Nothing is below the empty set: the order compares at the least differing
 index, where being out is being smaller. -/
 theorem setLinearOrder_bot_le (S : I → Prop) :
@@ -560,21 +556,6 @@ theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
     exact ⟨i, u, (B.agree_below_real ρs i u).mpr
         (fun Q hQ => hbelow Q ((B.realIx_lt_iff _ _).mpr hQ)), h0, h1,
       (B.clear_above_real ρs i u).mpr fun Q hQ => habove Q ((B.realIx_lt_iff _ _).mpr hQ)⟩
-
-/-- **The increment sentence is the covering relation of the assignment
-order**: read at the two copies, it says that the second assignment is the
-immediate successor of the first — nothing lies strictly between. This is the
-form `DescriptiveComplexity.HeadMove.succ` consumes once carried to the points
-of an expansion. -/
-theorem realize_succAssignF_covBy (ρs : Fin 2 → B.Assignment A) :
-    letI := B.atomIxLinearOrder A
-    (@Sentence.Realize _ A
-        ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
-        (B.succAssignF L) ↔
-      ((setLinearOrder (B.AtomIx A)).lt (B.atomSet (ρs 0)) (B.atomSet (ρs 1)) ∧
-        ∀ τ : B.Assignment A, (setLinearOrder (B.AtomIx A)).lt (B.atomSet (ρs 0)) (B.atomSet τ) →
-          ¬(setLinearOrder (B.AtomIx A)).lt (B.atomSet τ) (B.atomSet (ρs 1)))) :=
-  (B.realize_succAssignF ρs).trans (B.assignSucc_iff (ρs 0) (ρs 1))
 
 /-! ### The two endpoints -/
 

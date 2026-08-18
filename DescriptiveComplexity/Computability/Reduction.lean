@@ -703,18 +703,6 @@ theorem not_computablePred_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q)
     ¬ComputablePred (Q.toPred V') :=
   fun hQ => hP (computablePred_of_relOrderedReduction f V V' hQ)
 
-/-- The same for an ordered reduction. -/
-theorem not_computablePred_of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
-    (V : FinVocab L) (V' : FinVocab L') (hP : ¬ComputablePred (P.toPred V)) :
-    ¬ComputablePred (Q.toPred V') :=
-  not_computablePred_of_relOrderedReduction f.toRel V V' hP
-
-/-- The same for a plain first-order reduction. -/
-theorem not_computablePred_of_foReduction (f : P ≤ᶠᵒ Q)
-    (V : FinVocab L) (V' : FinVocab L') (hP : ¬ComputablePred (P.toPred V)) :
-    ¬ComputablePred (Q.toPred V') :=
-  not_computablePred_of_orderedReduction f.toOrdered V V' hP
-
 end Transfer
 
 end DescriptiveComplexity

@@ -114,9 +114,6 @@ noncomputable def blockVocab (B : SOBlock) : FinVocab B.lang :=
   FinVocab.ofEquivSigma (blockNum B)
     ((blockEq B).trans (Equiv.sigmaFiberEquiv B.arity).symm)
 
-theorem index_blockVocab (B : SOBlock) {n : ℕ} (r : B.lang.Relations n) :
-    (blockVocab B).index r = (blockEq B).symm r.1 := rfl
-
 /-- The vocabulary an `∃SO[new]` kernel is read over: the instance's, the mark
 of the original elements, and the block's. -/
 noncomputable def soVocab {L : Language.{0, 0}} (V : FinVocab L) (B : SOBlock) :

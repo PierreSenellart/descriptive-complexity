@@ -474,15 +474,6 @@ theorem sweepState_bot (h : IsLinOrd (WMLe (A := A))) :
     (wmSetLe_of_empty h (fun _ hc => hc) r)
 
 omit [Finite A] in
-/-- A sweep is in one of its two states, whatever it has seen. -/
-theorem sweepState_cases (w : A → Prop) :
-    sweepState P qy qn w = qy ∨ sweepState P qy qn w = qn := by
-  unfold sweepState
-  split
-  · exact Or.inl rfl
-  · exact Or.inr rfl
-
-omit [Finite A] in
 /-- **A sweep that saw no failure ends in the first state.** -/
 theorem sweepStateAfter_pos {w : A → Prop} (hall : ∀ r : A → Prop, WMSetLe WMLe r w → P r) :
     sweepStateAfter P qy qn w = qy :=

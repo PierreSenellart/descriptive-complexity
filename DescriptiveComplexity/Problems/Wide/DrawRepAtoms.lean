@@ -233,18 +233,6 @@ theorem realize_iff_qfValue_blkHolds {n : ℕ}
   rw [hκ]
   exact realize_blkAtom ρ hκ w
 
-omit [L.IsRelational] in
-/-- At a replicated block, a block atom reads **one argument point's**
-assignment: the copy index says which point, the block's own index which of
-its relation variables. -/
-theorem blkAtom_holds_replicate {k n : ℕ} (ρs : Fin k → B.Assignment A)
-    (i : (B.replicate k).ι) (ts : Fin ((B.replicate k).arity i) → Fin n)
-    (w : Fin n → A) :
-    BlkAtom.holds (L := L) (B := B.replicate k) (B.replicateAssign ρs) w
-        (.blkA i ts) ↔
-      ρs i.1 i.2 fun j => w (ts j) :=
-  Iff.rfl
-
 end Semantics
 
 end Draw

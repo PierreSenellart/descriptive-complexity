@@ -603,13 +603,6 @@ theorem realize_lexSelLeF (sel sel' : Fin D → γ) :
     rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
     exact congrFun h j
 
-/-- The comparison is total, so a reduction may define the order of its image
-by emitting `DescriptiveComplexity.lexSelLeF` at equal tags. -/
-theorem lexSelLeF_total (sel sel' : Fin D → γ) :
-    (lexSelLeF (L := L) sel sel').Realize v ∨ (lexSelLeF (L := L) sel' sel).Realize v := by
-  rw [realize_lexSelLeF, realize_lexSelLeF]
-  exact le_total _ _
-
 end LexDecide
 
 /-! ### Reaching an element from below a cover -/

@@ -80,13 +80,6 @@ theorem tagTupleLe_iff_lexRel (p q : Tag × (Fin d → A)) :
   rw [tagTupleLe, lexRel]
   exact or_congr lt_iff_le_and_ne Iff.rfl
 
-/-- The block-major order on a tagged tuple universe is a linear order – either
-by `DescriptiveComplexity.isLinOrd_lexRel` from its two factors, or by transport
-along the previous theorem. -/
-theorem isLinOrd_lexRel_tagTuple :
-    IsLinOrd (lexRel (· ≤ · : Tag → Tag → Prop) (tupLeLex (A := A) (d := d))) :=
-  isLinOrd_lexRel isLinOrd_le isLinOrd_tupLeLex
-
 end Key
 
 /-! ### The index a clocked program lays its file out by
@@ -144,18 +137,6 @@ theorem isLinOrd_blkTagLe : IsLinOrd (blkTagLe K) := by
       | exact Or.inr trivial
       | exact (le_total a b).imp id id
 
-omit [Finite K] [LinearOrder A] in
-/-- **A block is below another exactly when it is in the blocks' own order.** -/
-theorem blkTagLe_some_some {b b' : K} : blkTagLe K (some b) (some b') ↔ b ≤ b' := Iff.rfl
-
-omit [Finite K] [LinearOrder A] in
-/-- **The blockless registers come first.** -/
-theorem blkTagLe_none (b : Option K) : blkTagLe K none b := trivial
-
-omit [Finite K] [LinearOrder A] in
-/-- **No block is below the blockless registers.** -/
-theorem not_blkTagLe_none (b : K) : ¬blkTagLe K (some b) none := id
-
 /-- The order the registers are laid out in: block-major, then the tuple's own
 lexicographic order. -/
 noncomputable def blkLe : BlkIx K A dd → BlkIx K A dd → Prop :=
@@ -176,7 +157,6 @@ theorem card_blkIx : Nat.card (BlkIx K A dd) = (Nat.card K + 1) * Nat.card (Fin 
     Fintype.card_option]
 
 end Blk
-
 
 end Wide
 

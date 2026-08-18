@@ -64,11 +64,6 @@ abbrev stratGateSym (L : Language.{0, 0}) (B₁ B₂ : SOBlock) :
     (L.sum (stratBlock B₁ B₂).lang).Relations 0 :=
   Sum.inr ⟨.inl (.inr ()), rfl⟩
 
-/-- The relation symbol of a second-stratum variable. -/
-abbrev strat2Sym (L : Language.{0, 0}) (B₁ B₂ : SOBlock) (i : B₂.ι) :
-    (L.sum (stratBlock B₁ B₂).lang).Relations (B₂.arity i) :=
-  Sum.inr ⟨.inr i, rfl⟩
-
 section Parts
 
 variable {B₁ B₂ : SOBlock} {A : Type}

@@ -443,32 +443,6 @@ theorem realize_slotValF [Finite A] (hb : IsBot bot) (ht : IsTop top) (u : Fin c
       exact ⟨fun h => h.elim (fun hc => absurd (hnt _) (not_le.mpr hc.1)) fun h => h.2,
         fun h => Or.inr ⟨hnt, h⟩⟩
 
-open Classical in
-/-- **The written tuple is the one the sources name.** -/
-theorem realize_writeTupF [Finite A] (hb : IsBot bot) (ht : IsTop top)
-    (G : EqPat c → Fin c → SlotVal c) (u y : Fin c → γ) :
-    (writeTupF (L := L) G u y).Realize v ↔
-      (fun k => v (y k)) =
-        fun k => (G (patOf bot top fun i => v (u i)) k).eval bot top
-          fun i => v (u i) := by
-  rw [writeTupF, realize_listSup]
-  constructor
-  · rintro ⟨ψ, hψ, hr⟩
-    obtain ⟨p, -, rfl⟩ := List.mem_map.mp hψ
-    rw [Formula.realize_inf] at hr
-    obtain rfl := eq_patOf_of_hasPat ((realize_patF hb ht p u).mp hr.1)
-    refine funext fun k => ?_
-    exact (realize_slotValF hb ht u (y k) _).mp
-      ((realize_listInf _).mp hr.2 _ (List.mem_map.mpr ⟨k, List.mem_finRange k, rfl⟩))
-  · intro h
-    refine ⟨_, List.mem_map.mpr ⟨patOf bot top fun i => v (u i),
-      Finset.mem_toList.mpr (Finset.mem_univ _), rfl⟩, ?_⟩
-    rw [Formula.realize_inf]
-    refine ⟨(realize_patF hb ht _ u).mpr (hasPat_patOf bot top _), ?_⟩
-    refine (realize_listInf _).mpr fun ψ hψ => ?_
-    obtain ⟨k, -, rfl⟩ := List.mem_map.mp hψ
-    exact (realize_slotValF hb ht u (y k) _).mpr (congrFun h k)
-
 end RealizeWrite
 
 section Realize

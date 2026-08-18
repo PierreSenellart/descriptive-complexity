@@ -163,46 +163,4 @@ theorem exists_tagAssign_two (p : T) (σ τ : (C.withTag T).Assignment A)
       exact (realize_tagTwoF' p σ τ x).mp hset
   | Sum.inr _ => rfl
 
-theorem realize_varAgreeS (σ τ : (C.withTag T).Assignment A) (i : C.ι) :
-    (@Sentence.Realize _ A
-        (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-          (@sumOrderStructure L A instL _) σ τ) (varAgreeS L C T i) ↔
-      ∀ x : Fin (C.arity i) → A, σ (Sum.inr i) x ↔ τ (Sum.inr i) x) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-    (@sumOrderStructure L A instL _) σ τ
-  rw [varAgreeS, Sentence.Realize, Formula.realize_iAlls]
-  refine forall_congr' fun x => ?_
-  simp only [Formula.realize_inf, Formula.realize_imp, Formula.realize_rel, Term.realize_var,
-    Sum.elim_inr]
-  exact ⟨fun h => ⟨h.1, h.2⟩, fun h => ⟨h.1, h.2⟩⟩
-
-theorem realize_varsFrozenS (σ τ : (C.withTag T).Assignment A) (vs : List C.ι) :
-    (@Sentence.Realize _ A
-        (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-          (@sumOrderStructure L A instL _) σ τ) (varsFrozenS L C T vs) ↔
-      ∀ i ∈ vs, ∀ x : Fin (C.arity i) → A, σ (Sum.inr i) x ↔ τ (Sum.inr i) x) := by
-  letI := @SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-    (@sumOrderStructure L A instL _) σ τ
-  rw [varsFrozenS, Sentence.Realize, realize_listInf]
-  constructor
-  · intro h i hi
-    exact (realize_varAgreeS σ τ i).mp (h _ (List.mem_map.mpr ⟨i, hi, rfl⟩))
-  · intro h ψ hψ
-    obtain ⟨i, hi, rfl⟩ := List.mem_map.mp hψ
-    exact (realize_varAgreeS σ τ i).mpr (h i hi)
-
-open Classical in
-/-- **Freezing every variable is keeping the whole block**: the two states of a
-move then differ only in their tag. -/
-theorem dropTag_eq_of_varsFrozen (σ τ : (C.withTag T).Assignment A)
-    (h : @Sentence.Realize _ A
-      (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
-        (@sumOrderStructure L A instL _) σ τ)
-      (varsFrozenS L C T (letI := Fintype.ofFinite C.ι; (Finset.univ : Finset C.ι).toList))) :
-    SOBlock.dropTag σ = SOBlock.dropTag τ := by
-  letI := Fintype.ofFinite C.ι
-  funext i x
-  refine propext ((realize_varsFrozenS σ τ _).mp h i ?_ x)
-  exact Finset.mem_toList.mpr (Finset.mem_univ i)
-
 end DescriptiveComplexity

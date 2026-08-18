@@ -356,12 +356,6 @@ def SepOn (Ph : P → Prop) : Prop :=
     T.srcPh r = T.srcPh r' → T.srcPl r w = T.srcPl r' w' →
     T.readPl r w = T.readPl r' w' → r = r' ∧ w = w'
 
-omit [LinearOrder R] [LinearOrder P] [LinearOrder K] [LinearOrder A]
-  [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R] [Finite P] [Finite K] in
-/-- Separating everywhere is separating at every phase. -/
-theorem sepOn_of_sep (hsep : T.Sep) (Ph : P → Prop) : T.SepOn Ph :=
-  fun r r' w w' _ hg hg' => hsep r r' w w' hg hg'
-
 omit [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **The transition is pinned wherever the phases separate**: at a state whose
 phase satisfies `Ph`, the state and the symbol read name the transition. This is
@@ -470,12 +464,6 @@ theorem wmSetLe_logicalTop_reads (hR : T.Reads) {s : Univ A R P K dd → Prop}
   intro x y
   rw [hR.le, Wide.tagTupleLe_iff_lexRel]
 
-/-- **The empty address is the bottom of the tape**, which is the lower bound of the
-same loop and where the head starts. -/
-theorem wmSetLe_bot (hR : T.Reads) (s : Univ A R P K dd → Prop) :
-    WMSetLe WMLe (fun _ => False) s :=
-  wmSetLe_of_empty (T.isLinOrd_wmLe hR) (fun _ hc => hc) s
-
 /-! ### The two ends of a run
 
 What a program starts from and what it has to reach, in the table's own terms.
@@ -537,46 +525,6 @@ theorem accepts (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
   accepts_of_wideTape_lt_two_pow (T.isLinOrd_wmLe hR) ((hR.blank _).mpr rfl)
     (fun x => (hR.inp x _).mpr ⟨hmk x, rfl⟩) hmark hrest ((hR.start _).mpr rfl) hreach hlt hstate
     ((hR.acc _).mpr (T.isAcc_stateElt ha))
-
-/-- **The emitted instance is a yes-instance of
-`DescriptiveComplexity.WideAccept`**, which is what a *nondeterministic*
-time-bounded reduction has to produce: well-formedness and an accepting run
-within the clock. Determinism is not asked for, so a program that guesses is
-served by this and not by
-`DescriptiveComplexity.Draw.Table.dwideAcceptSpace`. -/
-theorem wideAccept (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
-    {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
-    (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
-    (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →
-      f s = symElt T.zero T.blankPl)
-    {n : ℕ} {cfg : Config (WPoint (Univ A R P K dd))}
-    (hreach : (wideData (Univ A R P K dd)).ReachesIn n
-      ⟨Sum.inr (stateElt T.zero T.startPh T.startPl), Sum.inl fun _ => False,
-        wideTape f (symElt T.zero T.blankPl)⟩ cfg)
-    (hlt : n < 2 ^ Nat.card (Univ A R P K dd))
-    {p : P} {w : Fin c → A} (hstate : cfg.state = Sum.inr (stateElt T.zero p w))
-    (ha : T.accept p w) :
-    WideAccept (Univ A R P K dd) :=
-  ⟨T.wellFormed hR, T.accepts hR hmk hmark hrest hreach hlt hstate ha⟩
-
-/-- **The emitted instance is a yes-instance of
-`DescriptiveComplexity.DWideAcceptSpace`**, which is what a reduction has to
-produce: the two promises and an accepting run. -/
-theorem dwideAcceptSpace (hR : T.Reads) (hsep : T.Sep)
-    (hmk : ∀ x : Univ A R P K dd, T.Marked x)
-    {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
-    (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
-    (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →
-      f s = symElt T.zero T.blankPl)
-    {cfg : Config (WPoint (Univ A R P K dd))}
-    (hreach : Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-      ⟨Sum.inr (stateElt T.zero T.startPh T.startPl), Sum.inl fun _ => False,
-        wideTape f (symElt T.zero T.blankPl)⟩ cfg)
-    {p : P} {w : Fin c → A} (hstate : cfg.state = Sum.inr (stateElt T.zero p w))
-    (ha : T.accept p w) :
-    DWideAcceptSpace (Univ A R P K dd) :=
-  ⟨T.wellFormed hR, T.deterministic hR hsep,
-    T.acceptsSpace hR hmk hmark hrest hreach hstate ha⟩
 
 end Table
 

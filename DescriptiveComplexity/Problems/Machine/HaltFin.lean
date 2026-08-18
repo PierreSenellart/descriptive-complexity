@@ -274,7 +274,6 @@ theorem acceptsU_of_runRel [Finite D] (hb : ∃ b, M.Blank b) {c : RunRel A D}
 
 end OfRel
 
-
 /-! ### From a run to the relations
 
 The time points are the first `n + 1` values of `Fin (2n + 1)` and the pages all
@@ -462,8 +461,6 @@ theorem acceptsU_iff_runRel (hb : ∃ b, M.Blank b) :
   ⟨runRel_of_acceptsU, fun ⟨_, _, hc⟩ => acceptsU_of_runRel hb hc⟩
 
 end ToRel
-
-
 
 end TMData
 

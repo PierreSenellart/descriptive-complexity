@@ -419,11 +419,6 @@ theorem satMinCl_unique {c c' : A} (h : SatMinCl c) (h' : SatMinCl c') : c = c' 
   le_antisymm (h.2 c' h'.1) (h'.2 c h.1)
 
 omit [Finite A] [Nonempty A] in
-/-- The highest clause is unique. -/
-theorem satMaxCl_unique {c c' : A} (h : SatMaxCl c) (h' : SatMaxCl c') : c = c' :=
-  le_antisymm (h'.2 c h.1) (h.2 c' h'.1)
-
-omit [Finite A] [Nonempty A] in
 /-- The next clause is unique. -/
 theorem satNextCl_unique {c c' c'' : A} (h : SatNextCl c c') (h' : SatNextCl c c'') :
     c' = c'' :=
@@ -823,10 +818,6 @@ theorem posHCell_le_posHEnd (x : A) : tagTupleLe (posHCell x : HV A) posHEnd :=
   hTagTupleLe_of_tag_lt (show UPTag.pCell < UPTag.pEnd by decide)
 
 omit [Language.sat.Structure A] in
-theorem posHStart_le_posHEnd : tagTupleLe (posHStart : HV A) posHEnd :=
-  hTagTupleLe_of_tag_lt (show UPTag.pStart < UPTag.pEnd by decide)
-
-omit [Language.sat.Structure A] in
 /-- **Cells are ordered as their elements are.** -/
 theorem posHCell_le_iff {x y : A} : tagTupleLe (posHCell x : HV A) (posHCell y) ↔ x ≤ y := by
   constructor
@@ -873,24 +864,6 @@ theorem succPos_posHStart_posHCell :
       have hcell := eq_posHCell_of_posn hr h
       have hle : r.2 0 ≤ botA := posHCell_le_iff.mp (hcell ▸ h2)
       rw [hcell, le_antisymm hle (botA_le _)]
-
-omit [Language.sat.Structure A] in
-/-- The head moves from cell to cell along the instance. -/
-theorem succPos_posHCell_posHCell {x x' : A} (hsucc : SuccElt x x') :
-    SuccPos tagTupleLe HPosn (posHCell x : HV A) (posHCell x') := by
-  refine ⟨hPosn_posHCell _, hPosn_posHCell _, posHCell_le_iff.mpr hsucc.1.le, ?_, ?_⟩
-  · intro h
-    exact absurd (by simpa [oneH] using congrFun (congrArg Prod.snd h) 0 : x = x')
-      (ne_of_lt hsucc.1)
-  · intro r hr h1 h2
-    have ht : r.1 = UPTag.pCell :=
-      le_antisymm (hTagTupleLe_tag_le h2) (hTagTupleLe_tag_le h1)
-    have hcell := eq_posHCell_of_posn hr ht
-    have hx : x ≤ r.2 0 := posHCell_le_iff.mp (hcell ▸ h1)
-    have hx' : r.2 0 ≤ x' := posHCell_le_iff.mp (hcell ▸ h2)
-    rcases eq_or_lt_of_le hx with heq | hlt
-    · exact Or.inl (by rw [hcell, ← heq])
-    · exact Or.inr (by rw [hcell, le_antisymm hx' (hsucc.2 _ hlt)])
 
 omit [Language.sat.Structure A] in
 /-- The head's last move of a sweep: `⊣` follows the last cell. -/
@@ -944,13 +917,6 @@ noncomputable def hTape (M : A → Bool) : HV A → HV A := fun r =>
   | _ => symHBlank
 
 omit [Language.sat.Structure A] in
-/-- The markers hold their symbols on every marked tape. -/
-theorem hTape_posHStart (M : A → Bool) : hTape M (posHStart : HV A) = symHStart := rfl
-
-omit [Language.sat.Structure A] in
-theorem hTape_posHEnd (M : A → Bool) : hTape M (posHEnd : HV A) = symHEnd := rfl
-
-omit [Language.sat.Structure A] in
 /-- A real cell reads its element's mark. -/
 theorem hTape_posHCell (M : A → Bool) (y : A) :
     hTape M (posHCell y : HV A) = symCell (M y) y := by
@@ -985,12 +951,6 @@ noncomputable def markTape (M : A → Bool) (c : A) (p : HV A) : HV A → HV A :
           else symCell (M (r.2 0)) (r.2 0))
       else symCell false (r.2 0)
   | _ => symHBlank
-
-theorem markTape_posHStart (M : A → Bool) (c : A) (p : HV A) :
-    markTape M c p (posHStart : HV A) = symHStart := rfl
-
-theorem markTape_posHEnd (M : A → Bool) (c : A) (p : HV A) :
-    markTape M c p (posHEnd : HV A) = symHEnd := rfl
 
 /-! ### The intended run: configurations -/
 

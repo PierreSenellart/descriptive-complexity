@@ -64,20 +64,6 @@ def padColorInterp (m : ℕ) :
       | some _, none => ⊤
       | some i, some j => if i = j then ⊥ else ⊤
 
-/-- The padding interpretation is quantifier-free. -/
-theorem padColorInterp_isQuantifierFree (m : ℕ) :
-    (padColorInterp m).IsQuantifierFree := by
-  intro n R t
-  cases R
-  rcases h0 : t 0 with _ | i <;> rcases h1 : t 1 with _ | j <;>
-    simp only [padColorInterp, h0, h1]
-  · exact (IsAtomic.rel _ _).isQF
-  · exact isQF_bot.imp isQF_bot
-  · exact isQF_bot.imp isQF_bot
-  · by_cases hij : i = j <;> simp only [hij, if_true, if_false]
-    · exact isQF_bot
-    · exact isQF_bot.imp isQF_bot
-
 section Characterizations
 
 variable {m : ℕ} {A : Type} [Language.graph.Structure A]
@@ -223,7 +209,6 @@ def threeCol_fo_reduction_kCol (m : ℕ) : ThreeCol ≤ᶠᵒ KCol (3 + m) where
   dim := 1
   toInterpretation := padColorInterp m
   correct _ _ _ _ := threeColorable_iff_kColorable_map
-
 
 /-! ### Chromatic Number and Clique Cover are complements of each other -/
 

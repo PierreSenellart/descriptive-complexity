@@ -56,7 +56,6 @@ variable [Finite dt.KIx]
 
 section Spine
 
-
 variable {v v' : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
 variable {rEmb : ∀ i : dt.SEF, dt.NexSESh i → R}
 -- The whole evaluation's rules: the spine's own checkpoints and, projected,
@@ -114,7 +113,6 @@ variable (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
   WMIncr F.le (mV a) (mV a'))
 variable (hTestT : ∀ u : I, dt.InnerFull F.blk (mV aT) u)
 variable (hTestF : ∀ a, a < aT → ∃ u : I, ¬dt.InnerFull F.blk (mV a) u)
-
 
 include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv hvi
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
@@ -183,7 +181,6 @@ theorem nexIxSpineB_reachesIn
     (hbotSt := hbotOf k) (semT := semTJ k) (f₀ := fsOf k.castSucc)
   rw [hst k, hfs k]
   exact hleg
-
 
 include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv hvi
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
@@ -262,7 +259,6 @@ theorem nexIxEvalB_reachesIn
       (hTestF := hTestF) (stOf := stOf) (fsOf := fsOf) (hwkOf := hwkOf)
       (hmirOf := hmirOf) (hbotOf := hbotOf) (semTJ := semTJ) (hst := hst)
       (hfs := hfs))).tail hexit
-
 
 include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv hvi
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
@@ -502,7 +498,6 @@ theorem nexIxEvalOutB_any_reachesIn
       (hwitOf := hwitOf) (hmir := hmirL) (hbotSt := hbotL) (hsav := hsavL)
       (htgt := htgtL) (semOf := semOf) (hDom := hDom) (hTestOf := hTestOf)
       (f₀ := fsOf (Fin.last dt.nv)))
-
 
 end Spine
 

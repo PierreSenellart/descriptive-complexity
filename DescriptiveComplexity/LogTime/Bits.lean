@@ -230,11 +230,6 @@ theorem orank_eq_two_pow_posExp {p : A} (h : IsPos p) : orank p = 2 ^ posExp p :
   obtain ⟨i, hi⟩ := h
   rw [posExp_eq hi, hi]
 
-/-- The positions are exactly the elements whose exponent is in range. -/
-theorem posExp_lt_posCount {p : A} (h : IsPos p) : posExp p < posCount A := by
-  rw [← two_pow_lt_card_iff_lt_posCount, ← orank_eq_two_pow_posExp h]
-  exact orank_lt_card p
-
 /-- Every exponent in range is the exponent of a position. -/
 theorem exists_isPos {i : ℕ} (hi : i < posCount A) : ∃ p : A, orank p = 2 ^ i :=
   exists_orank_eq (two_pow_lt_card_iff_lt_posCount i |>.mpr hi)
@@ -406,10 +401,6 @@ theorem orank_lt_posCount_of_bitIx {i x : A} (h : BitIx i x) : orank i < posCoun
   by_contra hcon
   rw [bitIx_iff, testBit_orank_eq_false (by omega)] at h
   exact Bool.noConfusion h
-
-/-- Above the bit positions there is nothing to read. -/
-theorem not_bitIx_of_posCount_le {i x : A} (h : posCount A ≤ orank i) : ¬ BitIx i x :=
-  fun hb => absurd (orank_lt_posCount_of_bitIx hb) (by omega)
 
 /-- A finite nonempty order has a greatest element – the one a formula reads
 the top index off. -/

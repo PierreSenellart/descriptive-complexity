@@ -170,22 +170,6 @@ noncomputable def ptrNext (coord : Fin dt.dd → dt.CtlIx) (b : Option dt.KIx)
   fun q => if h : ∃ j : Fin dt.dd, coord j = q then
     (blkNext A dt.KIx dt.dd (b, dt.ptrTup coord f)).2 h.choose else f q
 
-omit [Nonempty A] [Finite R'] [Finite P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
-  [Finite (Univ A R' P' dt.KIx dt.dd)] in
-/-- **The advance advances the tuple**: the pointer reads back the tuple of the
-next register, which is what makes the sweep's step the file's next cell. -/
-theorem ptrTup_ptrNext (coord : Fin dt.dd → dt.CtlIx)
-    (hinj : Function.Injective coord) (b : Option dt.KIx) (f : dt.CtlIx → A) :
-    dt.ptrTup coord (dt.ptrNext coord b f) =
-      (blkNext A dt.KIx dt.dd (b, dt.ptrTup coord f)).2 := by
-  classical
-  funext j
-  change (if h : ∃ i : Fin dt.dd, coord i = coord j then
-    (blkNext A dt.KIx dt.dd (b, dt.ptrTup coord f)).2 h.choose else _) = _
-  rw [dif_pos ⟨j, rfl⟩]
-  exact congrArg _ (hinj (⟨j, rfl⟩ : ∃ i : Fin dt.dd, coord i = coord j).choose_spec)
-
 open Classical in
 variable (dt) in
 /-- **The control holding a register's tuple**: the given control with its

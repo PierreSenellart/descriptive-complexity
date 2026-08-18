@@ -68,11 +68,6 @@ theorem backFlatten_apply {A : Type} {m : ℕ} (t : Fin m → Fin k → A)
     backFlatten t (finProdFinEquiv (a, q)) = t a q := by
   rw [backFlatten, Equiv.symm_apply_apply]
 
-theorem backFlatten_eta {A : Type} {m : ℕ} (flat : Fin (m * k) → A) :
-    backFlatten (fun a q => flat (finProdFinEquiv (a, q))) = flat := by
-  funext p
-  rw [backFlatten, Equiv.apply_symm_apply]
-
 /-- The pullback along the quotient map of an assignment on classes. -/
 def backAssign {S : Set (Σ n, L.Relations n)} {A : Type} [L.Structure A]
     {B' : SOBlock} (X' : B'.Assignment (InvMap S k A)) :

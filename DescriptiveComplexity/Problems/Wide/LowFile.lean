@@ -277,17 +277,6 @@ theorem segFile_gap (h : IsLinOrd (WMLe (A := A))) {base : ℕ} (hpos : 0 < base
     wideRank ((segFile h hpos hbase).cell u') - wideRank ((segFile h hpos hbase).cell u) ≤ 1 :=
   ixSegFile_gap (WMLe (A := A)) h h hpos hbase hs
 
-/-- **The file lies in the stretch of `n` addresses above its base**, so
-everything the machine keeps outside that stretch is out of the file's way and a
-seek across the file costs the stretch and no more. -/
-theorem wideRank_segCell_le (h : IsLinOrd (WMLe (A := A))) {base : ℕ} (hpos : 0 < base)
-    (hbase : base + Nat.card A ≤ Nat.card {p : WPoint A // (wideData A).Posn p}) (u : A) :
-    base ≤ wideRank ((segFile h hpos hbase).cell u) ∧
-      wideRank ((segFile h hpos hbase).cell u) < base + Nat.card A := by
-  rw [cell_segFile, wideRank_segCell h hbase]
-  have := wmRank_lt_card u
-  omega
-
 /-! ### The file at the bottom
 
 The base-`1` case: the registers are the first `n` nonempty addresses, so the
@@ -317,20 +306,6 @@ noncomputable def lowFile (h : IsLinOrd (WMLe (A := A))) : RegFile A :=
 @[simp]
 theorem cell_lowFile (h : IsLinOrd (WMLe (A := A))) : (lowFile h).cell = lowCell h :=
   rfl
-
-/-- **A file above its data.** Siting a stretch file: everything below its base
-is where the program computes, and it lies below every register by rank. A
-program that wants the subroutines written for the input channel's ladder puts
-its own file here – high enough that its data fits below it. -/
-noncomputable def segSited (h : IsLinOrd (WMLe (A := A))) {base : ℕ} (hpos : 0 < base)
-    (hbase : base + Nat.card A ≤ Nat.card {p : WPoint A // (wideData A).Posn p}) :
-    SitedFile A where
-  toRegFile := segFile h hpos hbase
-  Work r := wideRank r < base
-  work_lt_cell {r} hr u := by
-    refine (wideRank_lt_iff h r _).mp ?_
-    have := (wideRank_segCell_le h hpos hbase u).1
-    omega
 
 /-! ### Which addresses the registers are
 
@@ -420,20 +395,6 @@ theorem wmSetLt_ixSegTop {I : Type} [Finite I] (ile : I → I → Prop)
   rw [wideRank_ixSegCell ile h (le_of_lt hbase), wideRank_ixSegTop (I := I) h hbase]
   have := ixRank_lt_card ile u
   omega
-
-/-- **Every register is at or above the least one's cell**, which is the lower
-bound the same sweep is run against. -/
-theorem wmSetLe_ixSegCell_bot {I : Type} [Finite I] (ile : I → I → Prop)
-    (h : IsLinOrd (WMLe (A := A))) (hi : IsLinOrd ile) {base : ℕ}
-    (hbase : base + Nat.card I ≤ Nat.card {p : WPoint A // (wideData A).Posn p})
-    {ubot : I} (hbot : ∀ y : I, ile ubot y) (u : I) :
-    WMSetLe WMLe (ixSegCell ile h base ubot) (ixSegCell ile h base u) := by
-  rcases eq_or_ne ubot u with rfl | hne
-  · exact (isLinOrd_wmSetLe h).1 _
-  · refine Or.inr ((wideRank_lt_iff h _ _).mp ?_)
-    rw [wideRank_ixSegCell ile h hbase, wideRank_ixSegCell ile h hbase]
-    exact Nat.add_lt_add_left (ixRank_lt ile hi ⟨hbot u, fun hc => hne (hi.2.2.1 _ _ (hbot u) hc)⟩)
-      base
 
 /-- **The greatest index has the greatest rank**: every index below it, and the
 ranks running over `0 … card − 1`, leave it the last. So a walk that stops at
@@ -560,11 +521,6 @@ theorem wideRank_lowCell_le (h : IsLinOrd (WMLe (A := A))) (u : A) :
   have h1 : wmRank u < Nat.card A := wmRank_lt_card u
   rw [cell_lowFile, wideRank_lowCell]
   omega
-
-/-- **Consecutive registers of the bottom file are consecutive addresses.** -/
-theorem lowFile_gap (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u') :
-    wideRank ((lowFile h).cell u') - wideRank ((lowFile h).cell u) ≤ 1 :=
-  segFile_gap h Nat.one_pos (one_add_card_le) hs
 
 end LowFile
 

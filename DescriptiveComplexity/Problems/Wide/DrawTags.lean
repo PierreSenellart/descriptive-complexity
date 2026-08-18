@@ -179,13 +179,6 @@ theorem logicalTop_arg (i : K) (v : V) :
     logicalTop (Tag.arg (R := R) (P := P) i, v) :=
   ⟨i, rfl⟩
 
-/-- **A tag that is not an argument holds nothing of the last logical address.**
-Stated for every such tag, so the layout may grow one without disturbing it. -/
-theorem not_logicalTop {τ : Tag R P K} (h : ∀ i : K, τ ≠ Tag.arg i) (v : V) :
-    ¬logicalTop (τ, v) := by
-  rintro ⟨i, hi⟩
-  exact h i hi
-
 /-- **Being logical is avoiding the non-argument blocks**, which is what the
 generic reading of the layout calls it
 (`DescriptiveComplexity.wmAvoids`). -/
@@ -227,20 +220,6 @@ theorem wmSetLe_logicalTop [LinearOrder R] [LinearOrder P] [LinearOrder K]
       s logicalTop := by
   rw [logicalTop_eq]
   exact wmSetLe_wmAvoidTop isLinOrd_le hV (logical_iff_wmAvoids.mp hjunk)
-
-/-- **Everything at or below the last logical address is logical**, which is the
-converse of the bound above and the fact a program *on a clock* runs on: a sweep
-that stops at `logicalTop` has stayed among the logical addresses throughout, so
-the surplus blocks it never writes in cost it nothing while multiplying the
-number of addresses its clock counts. -/
-theorem logical_of_wmSetLe_logicalTop [LinearOrder R] [LinearOrder P] [LinearOrder K]
-    [Finite R] [Finite P] [Finite K] [Finite V]
-    (hV : IsLinOrd LeV) {s : Tag R P K × V → Prop}
-    (hle : WMSetLe (lexRel (· ≤ · : Tag R P K → Tag R P K → Prop) LeV) s logicalTop) :
-    ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) → ∀ v : V, ¬s (τ, v) := by
-  rw [logicalTop_eq] at hle
-  exact logical_iff_wmAvoids.mpr
-    (wmAvoids_of_wmSetLe isLinOrd_le hV nonArg_downward hle (wmAvoids_wmAvoidTop _))
 
 end Draw
 

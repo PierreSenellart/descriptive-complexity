@@ -468,12 +468,6 @@ theorem step_spec_walk_iff {p q : Walk B}
   Iff.rfl
 
 omit [Finite A] [Nonempty A] in
-/-- There is no step out of the goal-reporting mode. -/
-theorem not_step_goal_left {q : Mode B} {x y : Fin (clauseDim B k + clauseDim B k) → A} :
-    ¬(spec prog).Step (Sum.inr (), x) (q, y) := by
-  cases q <;> exact id
-
-omit [Finite A] [Nonempty A] in
 /-- There is no step into the goal-reporting mode. -/
 theorem not_step_goal_right {p : Mode B} {x y : Fin (clauseDim B k + clauseDim B k) → A} :
     ¬(spec prog).Step (p, x) (Sum.inr (), y) := by
@@ -550,16 +544,6 @@ theorem litAt_pad_self (a₀ : A) (p : TwoCnf.Lit (KromImpl.KromAtom B A)) :
     litAt p.1.1 p.2 (pad (D := clauseDim B k) a₀ p.1.2) = p := by
   rw [litAt, pref_pad]
   rfl
-
-omit [LinearOrder A] [Finite A] [Nonempty A] in
-/-- Decoding the encoding gives the carry node back. -/
-theorem decodeNode_tupleOf (a₀ : A) (n : TwoCnf.CarryNode (KromImpl.KromAtom B A)) :
-    decodeNode (k := k) (modeOf n) (tupleOf (k := k) a₀ n) = n := by
-  have h₁ : (fun m => tupleOf a₀ n (fstHalf (clauseDim B k) m)) = pad a₀ n.1.1.2 :=
-    funext fun m => tupleOf_fstHalf a₀ n m
-  have h₂ : (fun m => tupleOf a₀ n (sndHalf (clauseDim B k) m)) = pad a₀ n.2.1.1.2 :=
-    funext fun m => tupleOf_sndHalf a₀ n m
-  rw [decodeNode, modeOf, h₁, h₂, litAt_pad_self, litAt_pad_self]
 
 /-- **A carry step lifts to a step of the specification**, at the canonically
 padded nodes. -/

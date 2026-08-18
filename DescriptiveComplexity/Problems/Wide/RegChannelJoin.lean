@@ -272,7 +272,6 @@ theorem wideRegAccept_regLaid_of_rules
     hrun hk hkj hm hcard ?_ haa hbb hopenle hstate ((hE.accept_iff _ _).mpr ⟨rfl, hacc⟩)
   exact le_trans (dt.ixEvalCost_le_mul _ _ _ _ _) (Nat.mul_le_mul ha hb)
 
-
 end JoinGen
 
 end Data

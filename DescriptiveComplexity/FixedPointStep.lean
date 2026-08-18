@@ -189,11 +189,6 @@ theorem inflStage_le_of_le {m n : ℕ} (hmn : m ≤ n) (i : d.B.ι)
     · exact d.inflStage_le_succ n i x (ih (Nat.lt_succ_iff.mp hlt))
     · rwa [heq] at h
 
-/-- Every stage is contained in the value of the inflationary iteration. -/
-theorem inflStage_le_inflLimit (n : ℕ) (i : d.B.ι) (x : Fin (d.B.arity i) → A)
-    (h : d.inflStage A n i x) : d.inflLimit A i x :=
-  ⟨n, h⟩
-
 /-- Two partial stages that are both fixed points of the step are equal: the
 value of a converging partial iteration does not depend on which stable stage
 witnesses the convergence. -/

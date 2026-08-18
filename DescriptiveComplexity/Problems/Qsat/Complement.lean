@@ -71,15 +71,6 @@ theorem qsRealize_sup₁ (ρ : qsBlock.Assignment A) (φ ψ : qsLang₁.Sentence
   letI := qsBlock.structure₁ (L := qsBase) ρ
   Formula.realize_sup
 
-/-- **The complementary walk is the same walk.** -/
-theorem qsSpecCo_step_iff (ρ σ : qsBlock.Assignment A) :
-    qsSpecCo.Step ρ σ ↔ qsSpec.Step ρ σ :=
-  Iff.rfl
-
-theorem qsSpecCo_reach_iff (ρ σ : qsBlock.Assignment A) :
-    qsSpecCo.Reach ρ σ ↔ qsSpec.Reach ρ σ :=
-  Iff.rfl
-
 theorem realize_qsFalseS (ρ : qsBlock.Assignment A) :
     @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) qsFalseS ↔
       ((∀ y : A, ¬qsSet ρ y) ∧ (qsUp ρ ∧ ¬qsRes ρ)) := by

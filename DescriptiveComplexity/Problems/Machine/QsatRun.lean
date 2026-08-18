@@ -94,7 +94,6 @@ theorem qsatMatrix_iff (hok : TapeOk σ) :
     obtain ⟨x, b, f, hx, hσ, hlit⟩ := h c hc
     exact ⟨x, hx, (qLit_iff_tapeTrue hσ).mp hlit⟩
 
-
 /-! ### Writing a cell
 
 Every transition that changes the tape changes one cell of one variable, so the
@@ -150,7 +149,6 @@ omit [Language.qsat.Structure A] in
 theorem setCell_frame (x : A) (b f : Bool) :
     ∀ r : QV A, r ≠ posCell x → setCell σ x b f r = σ r :=
   fun _ h => setCell_ne h
-
 
 /-! ### The descent
 
@@ -241,7 +239,6 @@ theorem reach_descent (hwf : QsatWf A) (hok : TapeOk σ) (hstart : σ posStart =
   have h' := TMData.reflTransGen_of_stepsIn h
   rwa [resetSeg_bot hwf] at h'
 
-
 /-! ### The evaluation sweep
 
 One pass over the tape for one clause. The state carries the flag, and the flag
@@ -320,7 +317,6 @@ theorem not_satAbove_top (σ : QV A → QV A) (c : A) {p₁ : QV A}
   · exact hne he
   · exact QTag.noConfusion (congrArg Prod.fst he)
 
-
 /-- **A leftward pass decides the clause.** From just below the right marker,
 with the flag down, the machine sweeps to the left marker and arrives with the
 flag set exactly when some cell satisfies the clause. -/
@@ -357,7 +353,6 @@ theorem reach_sweepDown (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) 
     (hlin.1 _) ((minPos_posStart hwf).2 p₁ hs.1)
   rw [hfalse] at h
   exact TMData.reflTransGen_of_stepsIn h
-
 
 /-- Some cell strictly below `p` satisfies the clause: the flag of a rightward
 sweep that has reached `p`. -/
@@ -457,7 +452,6 @@ theorem reach_sweepUp (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {p
   rw [hfalse] at h
   exact TMData.reflTransGen_of_stepsIn h
 
-
 /-! ### The clause loop
 
 One pass per clause, alternating direction, until a clause fails or the last
@@ -528,7 +522,6 @@ theorem matrixFrom_succ {σ : QV A → QV A} {c c₂ : A} (hcc : QNextCl c c₂)
   rcases eq_or_lt_of_le hle with rfl | hlt
   · exact h
   · exact hall e he (hcc.2.2.2 e he hlt)
-
 
 /-- The left marker has a neighbour: the right marker is above it. -/
 theorem exists_afterStart (hwf : QsatWf A) :
@@ -645,7 +638,6 @@ theorem reach_evalLoop (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = sy
         rwa [matrixFrom_succ hcc hsat]
       · exact turn_unsat hwf hok hM hc hsat hp
 
-
 /-! ### Carrying the verdict back -/
 
 /-- **The carry phase** walks to the right marker and turns round, leaving the
@@ -700,7 +692,6 @@ theorem reach_matrix (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symS
     · exact (Relation.ReflTransGen.single (step_descEndEval hminc hE hp₁)).trans
         (hloop.trans (reach_toEnd hwf hok hS hE _ hq hp'))
 
-
 /-! ### The position of the game, read off the tape
 
 The dictionary for the *prefix*, as `DescriptiveComplexity.QsatTM.TapeTrue` was the
@@ -742,21 +733,6 @@ theorem before_succ (hwf : QsatWf A) {v : A} (hv : IsQVar v) {q : QV A}
     · exact ⟨hv, hs.2.2.1, hs.2.2.2.1⟩
     · refine ⟨hx, htrans _ _ _ hle hs.2.2.1, fun he => ?_⟩
       exact hs.2.2.2.1 (hanti _ _ hs.2.2.1 (he ▸ hle))
-
-omit [Language.qsat.Structure A] in
-/-- **Writing a cell is updating the valuation.** -/
-theorem tapeTrue_setCell (v : A) (b f : Bool) :
-    TapeTrue (setCell σ v b f) = qUpd (TapeTrue σ) v b := by
-  classical
-  funext y
-  refine propext ⟨fun h => ?_, fun h => ?_⟩
-  · rcases eq_or_ne y v with rfl | hne
-    · exact Or.inl ⟨rfl, tapeTrue_setCell_self.mp h⟩
-    · exact Or.inr ⟨hne, (tapeTrue_setCell_other hne).mp h⟩
-  · rcases h with ⟨rfl, hb⟩ | ⟨hne, hy⟩
-    · exact tapeTrue_setCell_self.mpr hb
-    · exact (tapeTrue_setCell_other hne).mpr hy
-
 
 /-! ### The two ways a level is decided
 
@@ -803,7 +779,6 @@ theorem qsatWins_of_second (hwf : QsatWf A) {D τ : A → Prop} {w : A} (hw : QL
     · exact absurd (hb1.mpr hb) (by rw [hb1f]; decide)
     · exact hb2.mpr hb
 
-
 /-! ### The game induction
 
 The last step, and the one the whole file was preparing: the machine's descent
@@ -840,7 +815,6 @@ theorem qsatWins_before_congr {p : QV A} {σ τ : QV A → QV A}
   ⟨fun hw => qsatWins_congr hw _ fun y hy => h y hy.1 hy.2.1 hy.2.2,
     fun hw => qsatWins_congr hw _ fun y hy => (h y hy.1 hy.2.1 hy.2.2).symm⟩
 
-
 /-- At the right marker the descent is over and the game is at a leaf. -/
 theorem reach_game_posEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
     (hE : σ posEnd = symEnd) {p' : QV A} (hp' : SuccPos (QLe (A := A)) QPosn p' posEnd) :
@@ -853,7 +827,6 @@ theorem reach_game_posEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart =
 theorem not_succPos_posStart (hwf : QsatWf A) {p' : QV A}
     (hp' : SuccPos (QLe (A := A)) QPosn p' posStart) : False :=
   hp'.2.2.2.1 ((isLinOrd_qLe A hwf).2.2.1 _ _ hp'.2.2.1 ((minPos_posStart hwf).2 p' hp'.1))
-
 
 /-! ### The tape after a descent -/
 
@@ -885,7 +858,6 @@ theorem tapeOk_resetSeg (hok : TapeOk σ) (p₀ p : QV A) :
   · obtain ⟨b, f, hbf⟩ := hok x hx
     exact ⟨b, f, (resetSeg_of_not h).trans hbf⟩
 
-
 /-- Every variable's cell has a neighbour below it. -/
 theorem exists_beforeCell (hwf : QsatWf A) {w : A} (hw : IsQVar w) :
     ∃ r : QV A, SuccPos (QLe (A := A)) QPosn r (posCell w) := by
@@ -904,7 +876,6 @@ theorem cell_of_between {v w : A} {r : QV A} (hr : QPosn r) (h1 : QLe (posCell v
 to be quantified. -/
 theorem mem_restCells {p : QV A} {x : A} (hx : IsQVar x) (hle : QLe p (posCell x)) :
     x ∈ RestCells p := ⟨hx, hle⟩
-
 
 /-- **The machine computes the game.** From the descent at `p` the machine
 comes back, at the position just below `p`, returning the value of the game
@@ -1156,7 +1127,6 @@ omit [Language.qsat.Structure A] in
 theorem not_tapeTrue_initTape (x : A) : ¬TapeTrue (initTape : QV A → QV A) x :=
   fun h => Bool.false_ne_true ((tapeTrue_iff (b := false) (f := false) rfl).mp h)
 
-
 /-! ### The machine decides QSAT -/
 
 /-- **The machine is well formed** on a well-formed instance. -/
@@ -1215,7 +1185,6 @@ theorem qsatMachine_correct :
   · rintro ⟨hwf, hw⟩
     exact ⟨qsatMachine_wellFormed hwf, qsatMachine_deterministic,
       (qsatMachine_acceptsSpace_iff hwf).mpr hw⟩
-
 
 end Run
 

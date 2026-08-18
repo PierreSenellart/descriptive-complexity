@@ -247,11 +247,6 @@ section Marks
 
 variable {k : ℕ} {A : Type} [(Language.turingAlt k).Structure A]
 
-/-- A block index beyond the marks of the vocabulary marks nothing. -/
-theorem not_atmBlk_of_le {j : ℕ} (h : k ≤ j) (a : A) : ¬ATMBlk (k := k) j a := by
-  rintro ⟨h', -⟩
-  omega
-
 /-- A marked state has a block index below `k`. -/
 theorem lt_of_atmBlk {j : ℕ} {a : A} (h : ATMBlk (k := k) j a) : j < k :=
   h.1

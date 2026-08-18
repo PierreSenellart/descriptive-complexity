@@ -529,7 +529,6 @@ theorem nexSep_postGuess
       | Sum.inr _, h => exact h.elim
     · exact nexSep hsepE i hc hca ρ ρ' f g hg hg' hph
 
-
 /-! ### The rules, discharged
 
 Each phase of the outer layer, in the form its run asks for: a rightward or a
@@ -668,7 +667,6 @@ theorem hasRight_homeGuessExit (f : Q → A) (g : dt.SlotIx → A)
     rw [hrules .homeGuess (Sum.inr ())] <;> first | exact hg | rfl | trivial
 
 end Discharge
-
 
 end Data
 

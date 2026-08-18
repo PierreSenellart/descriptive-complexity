@@ -184,10 +184,6 @@ theorem pt_eta (q : gadget.Map G) : q = pt q.1 (q.2 0) (q.2 1) :=
 
 theorem pt_tag (t : GTag) (u v : G) : (pt t u v).1 = t := rfl
 
-theorem pt_fst (t : GTag) (u v : G) : (pt t u v).2 0 = u := rfl
-
-theorem pt_snd (t : GTag) (u v : G) : (pt t u v).2 1 = v := rfl
-
 end Points
 
 /-! ### Which pairs are edges -/
@@ -343,11 +339,6 @@ theorem edge_tagAdj {p q : gadget.Map G} (h : GEdge p q) : TagAdj p.1 q.1 := by
   obtain ⟨s, x⟩ := q
   cases t <;> cases s <;> first | exact h.elim | trivial
 
-/-- Nothing joins two vertex nodes, two `m₂`s, and so on: a shorthand for
-reading `DescriptiveComplexity.GraphGadget.edge_tagAdj` off a named pair. -/
-theorem not_edge_of_not_tagAdj {t s : GTag} (h : ¬TagAdj t s) (u v u' v' : G) :
-    ¬GEdge (pt t u v) (pt s u' v') := fun he => h (edge_tagAdj he)
-
 /-- No clause relates a tag to itself, so the construction has no loops. -/
 theorem edge_irrefl_pt (t : GTag) (u v : G) : ¬GEdge (pt t u v) (pt t u v) := by
   rw [GEdge, FOInterpretation.relMap_map]
@@ -427,47 +418,6 @@ theorem nbr_of_m₁Pt {u : G} {q : gadget.Map G} (h : GEdge (m₁Pt u) q) :
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
 
-
-theorem nbr_of_m₂Pt {u : G} {q : gadget.Map G} (h : GEdge (m₂Pt u) q) :
-    q = m₁Pt u ∨ q = m₃Pt u := by
-  obtain ⟨s, x⟩ := q
-  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
-  have h' : GEdge (m₂Pt u) (pt s (x 0) (x 1)) :=
-    Eq.mp (congrArg (fun z => GEdge (m₂Pt u) z) hq) h
-  rw [hq]
-  cases s
-  · exact (edge_tagAdj h).elim
-  · obtain ⟨-, hx, hu⟩ := (edge_m₂_m₁ u u (x 0) (x 1)).mp h'
-    exact Or.inl (by rw [m₁Pt, ← hu, ← hx, ← hu])
-  · exact (edge_tagAdj h).elim
-  · obtain ⟨-, hx, hu⟩ := (edge_m₂_m₃ u u (x 0) (x 1)).mp h'
-    exact Or.inr (by rw [m₃Pt, ← hu, ← hx, ← hu])
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-
-
-theorem nbr_of_m₃Pt {u : G} {q : gadget.Map G} (h : GEdge (m₃Pt u) q) :
-    q = m₁Pt u ∨ q = m₂Pt u := by
-  obtain ⟨s, x⟩ := q
-  have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
-  have h' : GEdge (m₃Pt u) (pt s (x 0) (x 1)) :=
-    Eq.mp (congrArg (fun z => GEdge (m₃Pt u) z) hq) h
-  rw [hq]
-  cases s
-  · exact (edge_tagAdj h).elim
-  · obtain ⟨-, hx, hu⟩ := (edge_m₃_m₁ u u (x 0) (x 1)).mp h'
-    exact Or.inl (by rw [m₁Pt, ← hu, ← hx, ← hu])
-  · obtain ⟨-, hx, hu⟩ := (edge_m₃_m₂ u u (x 0) (x 1)).mp h'
-    exact Or.inr (by rw [m₂Pt, ← hu, ← hx, ← hu])
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-  · exact (edge_tagAdj h).elim
-
-
 theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
     q = vPt u ∨ q = bPt u v ∨ q = pPt u v := by
   obtain ⟨s, x⟩ := q
@@ -488,7 +438,6 @@ theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
   · obtain ⟨-, -, h0, h1⟩ := (edge_a_p u v (x 0) (x 1)).mp h'
     exact Or.inr (Or.inr (by rw [pPt, h0, h1]))
 
-
 theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
     q = aPt u v ∨ q = cPt u v := by
   obtain ⟨s, x⟩ := q
@@ -508,7 +457,6 @@ theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
     exact Or.inr (by rw [cPt, h0, h1])
   · exact (edge_tagAdj h).elim
 
-
 theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
     q = bPt u v ∨ q = vPt v := by
   obtain ⟨s, x⟩ := q
@@ -527,7 +475,6 @@ theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
     exact Or.inl (by rw [bPt, h0, h1])
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
-
 
 theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
     q = aPt u v := by

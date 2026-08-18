@@ -42,11 +42,6 @@ def transposeInterp :
     | _, .mem => fun _ => ssMem.formula₂ (Term.var (1, 0)) (Term.var (0, 0))
     | _, .marked => fun _ => ssMarked.formula₁ (Term.var (0, 0))
 
-/-- The transposing interpretation is quantifier-free. -/
-theorem transposeInterp_isQuantifierFree : transposeInterp.IsQuantifierFree := by
-  intro n R t
-  cases R <;> exact (IsAtomic.rel _ _).isQF
-
 section TransposeCharacterizations
 
 variable {A : Type} [Language.setSystem.Structure A]

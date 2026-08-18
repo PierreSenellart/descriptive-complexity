@@ -55,17 +55,6 @@ noncomputable def blkFile (dd : ℕ) (h : IsLinOrd (WMLe (A := U))) {base : ℕ}
     IxFile U (Wide.BlkIx K A dd) (Wide.blkLe K A dd) :=
   ixSegFile (Wide.blkLe K A dd) h (Wide.isLinOrd_blkLe K A dd) hpos hbase
 
-variable (A K) in
-/-- **Consecutive registers are consecutive addresses**, so a move of a walk
-over the file is a single step: the `w = 1` the budgeted walks ask for. -/
-theorem blkFile_gap (dd : ℕ) (h : IsLinOrd (WMLe (A := U))) {base : ℕ} (hpos : 0 < base)
-    (hbase : base + Nat.card (Wide.BlkIx K A dd) ≤
-      Nat.card {p : WPoint U // (wideData U).Posn p})
-    {u u' : Wide.BlkIx K A dd} (hs : IxSucc (Wide.blkLe K A dd) u u') :
-    wideRank ((blkFile A K U dd h hpos hbase).cell u') -
-        wideRank ((blkFile A K U dd h hpos hbase).cell u) ≤ 1 :=
-  ixSegFile_gap (Wide.blkLe K A dd) h (Wide.isLinOrd_blkLe K A dd) hpos hbase hs
-
 omit [LinearOrder A] [LinearOrder K] [Finite U] [Language.wide.Structure U] [Finite A] in
 /-- **How many registers the file has**: one per block, one more for the
 blockless ones, times the tuples. This is the number the stretch has to fit, and
@@ -175,14 +164,6 @@ noncomputable def blkNextB [Nonempty A] (b : Option K) : Option K :=
   (blkNext A K dd (b, tupTop A dd)).1
 
 variable (A K) in
-/-- **A roll-over lands in the next block**: at the last tuple of a block the
-advance's block is `DescriptiveComplexity.blkNextB` of it, by definition and
-with nothing to check. -/
-theorem blkNext_fst_of_tupTop [Nonempty A] (b : Option K) :
-    (blkNext A K dd (b, tupTop A dd)).1 = blkNextB A K dd b :=
-  rfl
-
-variable (A K) in
 /-- **Within a block the advance stays in it**: below the last tuple the next
 register is the same block's, so the stepping rule keeps its phase and only the
 roll-over changes it. -/
@@ -248,27 +229,6 @@ theorem blkTag_injective : Function.Injective (blkTag R P K) := by
   · exact absurd h (by simp [blkTag])
   · exact congrArg some (by injection h)
 
-variable (A R P K) in
-omit [LinearOrder A] [LinearOrder K] in
-/-- **The file has no more registers than the universe has elements.** -/
-theorem card_blkIx_le : Nat.card (Wide.BlkIx K A dd) ≤ Nat.card (Draw.Univ A R P K dd) :=
-  Nat.card_le_card_of_injective (fun p => (blkTag R P K p.1, p.2)) (by
-    intro p q h
-    rw [Prod.ext_iff] at h
-    exact Prod.ext (blkTag_injective R P K h.1) h.2)
-
-variable (A R P K) in
-omit [LinearOrder A] [LinearOrder K] in
-/-- **A stretch based at `1` fits below the top of the tape**, so a clocked
-program can always put its file at the bottom. -/
-theorem one_add_card_blkIx_le [Language.wide.Structure (Draw.Univ A R P K dd)] :
-    1 + Nat.card (Wide.BlkIx K A dd) ≤
-      Nat.card {p : WPoint (Draw.Univ A R P K dd) // (wideData (Draw.Univ A R P K dd)).Posn p} := by
-  rw [card_wideAddr]
-  have h1 := card_blkIx_le A R P K dd
-  have h2 := Nat.lt_two_pow_self (n := Nat.card (Draw.Univ A R P K dd))
-  omega
-
 end Fits
 
 section IxAddr
@@ -297,15 +257,6 @@ variable (A K) in
 /-- **The registers an address uses**: the argument blocks, the blockless ones
 standing for the alphabet tag and never entering a logical address. -/
 def BlkIxUse (u : Wide.BlkIx K A dd) : Prop := ∃ k : K, u.1 = some k
-
-omit [Finite R] [Finite P] [LinearOrder K] [Finite K] [LinearOrder A] [Finite A]
-  [Language.wide.Structure (Draw.Univ A R P K dd)] [LinearOrder R] [LinearOrder P] in
-/-- **Distinct registers hold the bits of distinct elements.** -/
-theorem blkIxElt_inj {u u' : Wide.BlkIx K A dd}
-    (h : blkIxElt R P dd u = blkIxElt R P dd u') : u = u' := by
-  have h1 : u.1 = u'.1 := blkTag_injective R P K (congrArg Prod.fst h)
-  have h2 : u.2 = u'.2 := congrArg (fun p : Draw.Univ A R P K dd => p.2) h
-  exact Prod.ext h1 h2
 
 omit [Finite R] [Finite P] [Finite A] [Finite K]
   [Language.wide.Structure (Draw.Univ A R P K dd)] in
@@ -375,6 +326,5 @@ theorem blkIxElt_up
   exact ⟨(some k', x.2), ⟨k', rfl⟩, Prod.ext hk'.symm rfl⟩
 
 end IxAddr
-
 
 end DescriptiveComplexity

@@ -179,16 +179,6 @@ theorem exists_popAll [Nonempty A] {x : A} (hP : 2 ^ 20 ≤ posCount A) :
     hb'low, hs, ⟨t, by rw [IsTopIx, ht]; omega, lt_of_orank_lt (by rw [ht, he]; omega)⟩,
     by omega, hw, hn, by omega⟩
 
-/-- **The Bit Sum Lemma**: the number of ones of an element is bit-definable.
-Both halves, with the one size condition of the whole construction – and
-`DescriptiveComplexity.BitDef.of_large` is what will remove even that. -/
-theorem popAll_iff [Nonempty A] {x y : A} (hP : 2 ^ 20 ≤ posCount A) :
-    PopAll x y ↔ orank y = onesBelow (orank x) (posCount A) := by
-  refine ⟨popAll_sound, fun hy => ?_⟩
-  obtain ⟨y', hy'⟩ := exists_popAll (x := x) hP
-  have : y' = y := orank_inj (by rw [popAll_sound hy', hy])
-  exact this ▸ hy'
-
 end Level1
 
 /-! ### Definability -/

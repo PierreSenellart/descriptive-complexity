@@ -174,49 +174,6 @@ theorem wmLt_le_iff {a b : A} : WMLt (· ≤ ·) a b ↔ a < b :=
 
 variable {v v' : Fin e → A} {c : Fin e}
 
-/-- **The fold rule at the stepped coordinate of a tuple successor**: covering
-at the coordinate is the successor hypothesis, maximality beyond it the
-finished-subtree hypothesis. -/
-theorem foldFrom_carry_of_tupSucc
-    (hagree : ∀ j : Fin e, j < c → v j = v' j)
-    (hcov : v c < v' c ∧ ∀ a : A, ¬(v c < a ∧ a < v' c))
-    (htop : ∀ j : Fin e, c < j → ∀ a : A, a ≤ v j) :
-    (foldFrom pol P (· ≤ ·) (c : ℕ) v' ↔
-      (if pol (c : ℕ) = true then
-          foldFrom pol P (· ≤ ·) (c : ℕ) v ∨ foldFrom pol P (· ≤ ·) ((c : ℕ) + 1) v'
-        else
-          foldFrom pol P (· ≤ ·) (c : ℕ) v ∧ foldFrom pol P (· ≤ ·) ((c : ℕ) + 1) v')) := by
-  refine foldFrom_carry isLinOrd_le c.isLt (fun i hi => hagree i (Fin.lt_def.mpr hi))
-    (fun i hi a => htop i (Fin.lt_def.mpr hi) a) fun a => ?_
-  rw [wmLt_le_iff]
-  constructor
-  · intro hlt
-    by_contra hc
-    exact hcov.2 a ⟨lt_of_not_ge hc, hlt⟩
-  · intro hle
-    exact lt_of_le_of_lt hle hcov.1
-
-/-- **Below the stepped coordinate the accumulators reset**: the successor's
-deeper coordinates are all minimal. -/
-theorem foldFrom_below_of_tupSucc
-    (hbot : ∀ j : Fin e, c < j → ∀ a : A, v' j ≤ a) {j : ℕ} (hj : (c : ℕ) < j) :
-    foldFrom pol P (· ≤ ·) j v' ↔ P v' :=
-  foldFrom_below (c := (c : ℕ)) (fun i hi a => hbot i (Fin.lt_def.mpr hi) a) hj
-
-/-- **Above the stepped coordinate only the deeper accumulator changes.** -/
-theorem foldFrom_above_of_tupSucc
-    (hagree : ∀ j : Fin e, j < c → v j = v' j) {j : ℕ} (hje : j < e) (hj : j < (c : ℕ)) :
-    (foldFrom pol P (· ≤ ·) j v' ↔
-      (if pol j = true then
-          (∃ a : A, WMLt (· ≤ ·) a (v ⟨j, hje⟩) ∧
-            altQuantFrom pol P (j + 1) (Function.update v ⟨j, hje⟩ a)) ∨
-            foldFrom pol P (· ≤ ·) (j + 1) v'
-        else
-          (∀ a : A, WMLt (· ≤ ·) a (v ⟨j, hje⟩) →
-            altQuantFrom pol P (j + 1) (Function.update v ⟨j, hje⟩ a)) ∧
-            foldFrom pol P (· ≤ ·) (j + 1) v')) :=
-  foldFrom_above hje fun i hi => hagree i (Fin.lt_def.mpr (by omega))
-
 end TupLoop
 
 end Draw

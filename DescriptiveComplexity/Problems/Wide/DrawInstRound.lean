@@ -1197,7 +1197,6 @@ theorem scratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeStD dt A R P)
   rw [dt.roundEndSt_eq RF vi stV v f₀]
   exact dt.scratchEq_scratch stV _ _
 
-
 open Classical in
 /-- **The control one round leaves, threaded**: as
 `DescriptiveComplexity.Draw.Data.roundCtl`, with the matrix's thread
@@ -1278,7 +1277,6 @@ theorem roundCtlT_eq_roundCtl (hzo : zero ≠ one)
   · rw [roundCtlT, roundCtl, dif_pos hc, dif_pos hc]
     exact dt.matFsT_eq_matFs RF hord hreg _ _ _ _
   · rw [roundCtlT, roundCtl, dif_neg hc, dif_neg hc]
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The accumulators survive one whole round.** -/
@@ -1892,7 +1890,6 @@ theorem round_run_thread (stV : TapeStD dt A R P)
     exact ⟨rEmb .mchk1 .stay, by rw [h]; exact hwkv',
       by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl,
       fun hc => (by rw [h] at hc; exact hc)⟩
-
 
 end RoundRun
 

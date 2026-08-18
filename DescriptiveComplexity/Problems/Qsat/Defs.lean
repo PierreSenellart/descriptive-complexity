@@ -178,9 +178,6 @@ omit [Language.qsat.Structure A] in
 theorem qAdd_self (D : A → Prop) (x : A) : qAdd D x x := Or.inl rfl
 
 omit [Language.qsat.Structure A] in
-theorem qAdd_of (D : A → Prop) {x y : A} (h : D y) : qAdd D x y := Or.inr h
-
-omit [Language.qsat.Structure A] in
 @[simp]
 theorem qUpd_self (τ : A → Prop) (x : A) (b : Bool) : qUpd τ x b x ↔ b = true := by
   refine ⟨fun h => ?_, fun h => Or.inl ⟨rfl, h⟩⟩

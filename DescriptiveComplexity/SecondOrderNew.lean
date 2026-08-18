@@ -252,15 +252,6 @@ theorem sigmaSONewDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
   · exact (h A).symm.trans (hφ A)
   · exact (h A).trans (hφ A)
 
-/-- An `∃SO[new]` sentence expresses an isomorphism-invariant property: what
-it says of an instance is transported by `DescriptiveComplexity.extEquiv`. -/
-theorem sorealize_new_iso [L.IsRelational] {A A' : Type} [L.Structure A] [L.Structure A']
-    (e : A ≃[L] A') (B : SOBlock)
-    (φ : (soLang (newLang L) [B]).Sentence) (m : ℕ) :
-    SORealize (newLang L) (A ⊕ Fin m) [B] φ true ↔
-      SORealize (newLang L) (A' ⊕ Fin m) [B] φ true :=
-  sorealize_iso (extEquiv e (Equiv.refl (Fin m))) [B] φ true
-
 end Definability
 
 /-! ### Inventing nothing

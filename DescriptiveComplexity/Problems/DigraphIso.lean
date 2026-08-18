@@ -60,7 +60,6 @@ open FirstOrder
 
 open Language Structure SOBlock
 
-
 /-! ### The problem -/
 
 section Problem

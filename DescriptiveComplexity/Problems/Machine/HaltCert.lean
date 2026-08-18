@@ -268,7 +268,6 @@ theorem runCert_of_acceptsU (h : M.AcceptsU) :
 
 end OfRun
 
-
 /-! ### From a certificate to a run
 
 The converse: an abstract certificate is realized by an actual run on the
@@ -444,7 +443,6 @@ theorem acceptsU_of_runCert [LinearOrder T] [Finite T] [Nonempty T] [LinearOrder
   exact ⟨_, _, k, hinit, hk, h.acc t₁ ht₁⟩
 
 end OfCert
-
 
 /-! ### The equivalence -/
 

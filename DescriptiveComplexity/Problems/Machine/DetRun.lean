@@ -115,19 +115,6 @@ theorem reach_total (hlin : IsLinOrd M.Le) (hdet : M.Deterministic) {c x y : Con
   reach_total_of_uniqueFrom (uniqueFrom_of_deterministic hlin hdet c) hx hy
 
 omit [Finite A] in
-/-- **Runs of the same length out of a configuration unique from it end at the
-same place.** -/
-theorem stepsIn_functional_of_uniqueFrom : ∀ {n : ℕ} {c d d' : Config A},
-    M.UniqueFrom c → M.StepsIn n c d → M.StepsIn n c d' → d = d' := by
-  intro n
-  induction n with
-  | zero => intro c d d' _ h h'; exact (show c = d from h).symm.trans h'
-  | succ n ih =>
-    rintro c d d' huniq ⟨e, he, hrest⟩ ⟨e', he', hrest'⟩
-    obtain rfl := huniq c e e' Relation.ReflTransGen.refl he he'
-    exact ih (huniq.mono (Relation.ReflTransGen.single he)) hrest hrest'
-
-omit [Finite A] in
 /-- Nothing is reachable from a stuck configuration but itself. -/
 theorem eq_of_reach_stuck {c d : Config A} (hstuck : ∀ e, ¬M.Step c e)
     (h : Relation.ReflTransGen M.Step c d) : c = d := by

@@ -825,7 +825,6 @@ theorem selfModel_iff_kernel :
 
 end Agreement
 
-
 /-! ### The membership -/
 
 section Membership

@@ -633,13 +633,6 @@ theorem mRealize_inf₁ (ρ : mBlock.Assignment A) (φ ψ : mLang₁.Sentence) :
   letI := mBlock.structure₁ (L := mBase) ρ
   Formula.realize_inf
 
-theorem mRealize_inf₂ (ρ σ : mBlock.Assignment A) (φ ψ : mLang₂.Sentence) :
-    @Sentence.Realize _ A (mBlock.structure₂ (L := mBase) ρ σ) (φ ⊓ ψ) ↔
-      (@Sentence.Realize _ A (mBlock.structure₂ (L := mBase) ρ σ) φ ∧
-        @Sentence.Realize _ A (mBlock.structure₂ (L := mBase) ρ σ) ψ) :=
-  letI := mBlock.structure₂ (L := mBase) ρ σ
-  Formula.realize_inf
-
 /-- A state of the walk *represents* a configuration. -/
 def Represents (ρ : mBlock.Assignment A) (c : Config A) : Prop :=
   (∀ p a : A, mTape ρ p a ↔ c.tape p = a) ∧ (∀ q : A, mState ρ q ↔ q = c.state) ∧
@@ -652,16 +645,6 @@ theorem represents_cfgAssign (c : Config A) : Represents (cfgAssign c) c :=
 omit [Language.turing.Structure A] [LinearOrder A] in
 theorem exists_represents {ρ : mBlock.Assignment A} (h : IsCfgOn ρ) : ∃ c, Represents ρ c :=
   ⟨cfgOf h, fun p a => mTape_cfgOf h p a, fun q => mState_cfgOf h q, fun p => mHead_cfgOf h p⟩
-
-omit [Language.turing.Structure A] [LinearOrder A] in
-theorem isCfgOn_of_represents {ρ : mBlock.Assignment A} {c : Config A} (h : Represents ρ c) :
-    IsCfgOn ρ :=
-  ⟨⟨fun p => ⟨c.tape p, (h.1 p _).mpr rfl⟩,
-      fun p a b ha hb => ((h.1 p a).mp ha).symm.trans ((h.1 p b).mp hb)⟩,
-    ⟨⟨c.state, (h.2.1 _).mpr rfl⟩,
-      fun q q' hq hq' => ((h.2.1 q).mp hq).trans ((h.2.1 q').mp hq').symm⟩,
-      ⟨c.head, (h.2.2 _).mpr rfl⟩,
-        fun p p' hp hp' => ((h.2.2 p).mp hp).trans ((h.2.2 p').mp hp').symm⟩
 
 end Reading
 

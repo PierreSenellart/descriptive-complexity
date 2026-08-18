@@ -80,9 +80,6 @@ abbrev baseSym {L : Language.{0, 0}} {m : ℕ} (r : L.Relations m) :
 
 variable {A : Type}
 
-theorem unslot_eq_slotIx (w : Fin (Fintype.card (Q ⊕ W)) → A) (d : Q ⊕ W) :
-    unslot w d = w (slotIx d) := rfl
-
 /-- **The two halves of a rule's data, put back together**, is the data. -/
 theorem elim_unslot (w : Fin (Fintype.card (Q ⊕ W)) → A) (d : Q ⊕ W) :
     Sum.elim (fun q => unslot w (Sum.inl q)) (fun s => unslot w (Sum.inr s)) d =
@@ -182,17 +179,6 @@ structure URuleDefinable (rl : ∀ e : Env L, Rule e.α Q W P) : Prop where
   dst : UStDefinable fun e => (rl e).dstSt
   /-- And so are the tracks it writes. -/
   wr : UTrDefinable fun e => (rl e).wr
-
-omit [Fintype Q] [Fintype W] in
-/-- **The static half of a rule, when it is written down as a constant**: the
-shape every kit's rule has, its phases and its direction being literals. -/
-theorem uStatic_rfl {rl : ∀ e : Env L, Rule e.α Q W P} {p p' : P} {b : Bool}
-    (hs : ∀ e : Env L, (rl e).srcPh = p) (hd : ∀ e : Env L, (rl e).dstPh = p')
-    (hr : ∀ e : Env L, ((rl e).moveRight ↔ b = true)) :
-    (∃ p : P, ∀ e : Env L, (rl e).srcPh = p) ∧
-      (∃ p : P, ∀ e : Env L, (rl e).dstPh = p) ∧
-      ∃ b : Bool, ∀ e : Env L, ((rl e).moveRight ↔ b = true) :=
-  ⟨⟨p, hs⟩, ⟨p', hd⟩, ⟨b, hr⟩⟩
 
 /-- **A whole site's rules are definable.** -/
 def URulesDefinable {S : Type} {Sh : S → Type}
@@ -548,10 +534,6 @@ theorem uReadable_one :
 theorem uReadable_ctl (q : Q) :
     UReadable (L := L) (W := W) fun _ f _ => f q :=
   fun s => (uGDefinable_mixEq (L := L) q s).congr fun _ _ _ => eq_comm
-
-theorem uReadable_trk (t : W) :
-    UReadable (L := L) (Q := Q) fun _ _ g => g t :=
-  fun s => uGDefinable_trkEq s t
 
 theorem UReadable.congr (h : UReadable V) (he : ∀ e f g, V' e f g = V e f g) :
     UReadable V' :=

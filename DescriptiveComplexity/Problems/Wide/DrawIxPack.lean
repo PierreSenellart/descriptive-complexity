@@ -248,76 +248,6 @@ noncomputable def ixSpineSemT (zero one : A) (vi : dt.VarIx)
           (st := dt.ixVarRdSt st p (mV a))
           (st' := dt.ixRoundSt st₀ (mV a)) rfl ℓ).mp (hp ℓ)) b))
 
-omit [Fintype dt.SlotIx] [Finite R] [Finite (P)]
-  [Finite I] [L.IsRelational] [Finite dt.KIx] [LinearOrder (dt.X.Map A)] in
-/-- **A carried pack is the pass's pack**: so a family defined by
-`ixSpineSem` discharges every position's `hsem`
-(`ixNew_last_next`, `ixNew_last_trackOf`). -/
-theorem ixSpineSem_passSem {zero one : A} (hzo : zero ≠ one)
-    (hpassEnc' : ∀ (vi : dt.VarIx)
-      (stV : TapeSt dt A R P I)
-      (ℓ : Fin (dt.nIn vi)),
-      dt.ixIGPassP (elt := elt) F zero one vi stV ℓ ↔
-        IsEnc dt.ly zero one (wmBlk (ixAddr elt stV.val)
-          (Tag.arg (toLex (dt.igBlk vi ℓ)) :
-            Tag R P dt.KIx)))
-    (hlin : IsLinOrd (WMLe (A := Univ A R (P)
-      dt.KIx dt.dd)))
-    (vi : dt.VarIx)
-    {st₀ st : TapeSt dt A R P I}
-    (mV : ιV → I → Prop)
-    (sem₀ : ∀ a : ιV,
-      (∀ ℓ : Fin (dt.nIn vi),
-        dt.ixIGPassP (elt := elt) F zero one vi (dt.ixRoundSt st₀ (mV a)) ℓ) →
-      ∀ b : Fin (dt.natOf vi),
-        dt.IxKindSem zero one vi (dt.ixRoundSt st₀ (mV a)) elt (dt.kindOf vi b))
-    (hmir : st.mir = st₀.mir)
-    (mbW : Fin (dt.arOf vi) → dt.X.Map A)
-    (hsem₀ : ∀ (a : ιV)
-      (hp₀ : ∀ ℓ : Fin (dt.nIn vi),
-        dt.ixIGPassP (elt := elt) F zero one vi (dt.ixRoundSt st₀ (mV a)) ℓ)
-      (b : Fin (dt.natOf vi))
-      (hm₀ : ∀ ℓ : Fin (dt.arOf vi),
-        wmBlk (ixAddr elt (dt.ixRoundSt st₀ (mV a)).mir)
-          (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-            Fin dt.ko ⊕ Fin dt.ki))) :
-            Tag R P dt.KIx) =
-          encMap dt.ly zero one (mbW ℓ)),
-      sem₀ a hp₀ b =
-        dt.ixPassSem (elt := elt)
-          (F := F) (hpassEnc := hpassEnc') vi (dt.ixRoundSt st₀ (mV a)) hp₀ mbW hm₀ b)
-    (a : ιV)
-    (hp : ∀ ℓ : Fin (dt.nIn vi),
-      dt.ixIGPassP (elt := elt) F zero one vi (dt.ixRoundSt st (mV a)) ℓ)
-    (b : Fin (dt.natOf vi))
-    (hm : ∀ ℓ : Fin (dt.arOf vi),
-      wmBlk (ixAddr elt (dt.ixRoundSt st (mV a)).mir)
-        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) :
-          Tag R P dt.KIx) =
-        encMap dt.ly zero one (mbW ℓ)) :
-    dt.ixSpineSem F zero one vi mV sem₀ hmir a hp b =
-      dt.ixPassSem (elt := elt)
-        (F := F) (hpassEnc := hpassEnc') vi (dt.ixRoundSt st (mV a)) hp mbW hm b := by
-  have hm₀ : ∀ ℓ : Fin (dt.arOf vi),
-      wmBlk (ixAddr elt (dt.ixRoundSt st₀ (mV a)).mir)
-        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) :
-          Tag R P dt.KIx) =
-        encMap dt.ly zero one (mbW ℓ) := by
-    intro ℓ
-    rw [show (dt.ixRoundSt st₀ (mV a)).mir = st₀.mir from rfl, ← hmir]
-    exact hm ℓ
-  refine Eq.trans (congrArg
-    (dt.ixKindSemCast zero one vi (st := dt.ixRoundSt st₀ (mV a))
-      (st' := dt.ixRoundSt st (mV a)) hmir.symm rfl (dt.kindOf vi b))
-    (hsem₀ a _ b hm₀)) ?_
-  exact ixKindSemCast_passSem (dt := dt) (elt := elt) (F := F)
-    (hpassEnc' := hpassEnc') (hzo := hzo) (hlin := hlin) (vi := vi)
-    (st := dt.ixRoundSt st₀ (mV a)) (st' := dt.ixRoundSt st (mV a))
-    (hmir := hmir.symm) (hval := rfl) (hp := _) (hp' := hp) (mbW := mbW)
-    (hmb := hm₀) (hmb' := hm) b
-
 end OnePack
 
 end PackCast
@@ -355,29 +285,6 @@ theorem ixIsEnc_of_gatedAt (j : Fin dt.nv)
           Fin dt.ko ⊕ Fin dt.ki))) :
           Tag R P dt.KIx)) :=
   (hgateEnc j st).mp hg ℓ
-
-include hgateEnc in
-omit [Finite I] [LinearOrder (dt.X.Map A)]
-  [Finite (P)] [Finite dt.KIx] [L.IsRelational]
-  [Finite R] in
-/-- **A position whose blocks are encodings is gated** — the converse of
-`ixIsEnc_of_gatedAt`, assembled from
-`DescriptiveComplexity.Draw.Data.testOf_of_encMap`,
-`wit_of_encMap` and `domHolds_of_encMap`. With the two directions together,
-gating at a position *is* «the blocks below that variable's arity encode
-points», which is the dichotomy a sweep's dictionary splits on — and it is
-per variable, since the arities differ. -/
-theorem ixGatedAt_of_isEnc (j : Fin dt.nv)
-    (st : TapeSt dt A R P I)
-    (henc : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
-      IsEnc dt.ly PR.zero PR.one
-        (wmBlk (ixAddr elt st.mir)
-          (Tag.arg (toLex ((Sum.inl
-            (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
-            Fin dt.ko ⊕ Fin dt.ki))) :
-            Tag R P dt.KIx))) :
-    dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st :=
-  (hgateEnc j st).mpr henc
 
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc hgateEnc in
 /-- **A gated position's semantic pack, built** — not assumed. The blocks
@@ -480,43 +387,6 @@ theorem ixGatedSem_eq_semCastT (hzo : PR.zero ≠ PR.one)
     (hpassEnc' := hpassEnc) (hzo := hzo)
     (hlin := hlin) (vi := dt.varAt j) (hmir := _) (hval := _) (hp := _)
     (hp' := hpA) (mbW := _) (hmb := _) (hmb' := hmbA) (b := b)).symm
-
-omit [Finite R] [Finite (P)] [Finite I]
-  [Finite dt.KIx] [LinearOrder (dt.X.Map A)] in
-include hinj hhasP heltP hpassEnc hgateEnc in
-/-- **A gated position's stage bit is the verdict the semantics reads**:
-the branched leg takes the gated leg there, its threaded fold is the
-unthreaded one (`ixLegCtlT_eq_legCtl`), and its pack is one pack transported
-(`ixGatedSem_eq_semCastT`). This is `ixNew_last_next`'s `hbOf` at the family a
-sweep actually runs. -/
-theorem ixLegBitB_gatedSem (hzo : PR.zero ≠ PR.one)
-    (hlin : IsLinOrd
-      (WMLe (A := Univ A R P dt.KIx dt.dd)))
-    (hreg : ¬∃ u : I, v = F.cell u)
-    {ιV : Type} [LinearOrder ιV] [Finite ιV] {aT : ιV}
-    (mV : ιV → I → Prop)
-    (j : Fin dt.nv) (st : TapeSt dt A R P I)
-    (hg : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st) (f₀ : dt.CtlIx → A) :
-    dt.ixLegBitB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j st
-        (fun hg' => dt.ixGatedSem (elt := elt)
-          F hpassEnc hgateEnc hzo hlin mV (v := v) j st hg') f₀ =
-      (dt.varArgsOf PR.zero PR.one (dt.varAt j)).accBit
-        (dt.ixLegCtl (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV j st (dt.ixTagAt (PR := PR) (elt := elt) j st)
-          (dt.ixGatedSem₀ (elt := elt) F hpassEnc hgateEnc hzo hlin mV j st hg) f₀) := by
-  classical
-  have h1 := ixGatedSem_eq_semCastT (dt := dt) (elt := elt) (F := F)
-    (hpassEnc := hpassEnc) (hgateEnc := hgateEnc) (v := v)
-    (hzo := hzo) (hlin := hlin) (mV := mV) (j := j) (st := st) (hg := hg)
-  have h2 := dt.ixLegCtlT_eq_legCtl (elt := elt) (aT := aT) F hinj hhasP heltP
-    mV hreg j st (dt.ixTagAt (PR := PR) (elt := elt) j st)
-    (dt.ixGatedSem₀ (elt := elt) F hpassEnc hgateEnc hzo hlin mV j st hg) f₀
-  unfold ixLegBitB
-  rw [dif_pos hg]
-  refine congrArg (dt.varArgsOf PR.zero PR.one (dt.varAt j)).accBit ?_
-  refine Eq.trans ?_ h2
-  exact congrArg (fun sem => dt.ixLegCtlT (elt := elt) (v := v) (aT := aT) F
-    hinj hhasP heltP mV j st (dt.ixTagAt (PR := PR) (elt := elt) j st) sem f₀) h1
 
 end GatedPack
 

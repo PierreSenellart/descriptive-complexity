@@ -129,8 +129,6 @@ def Ticks : ℕ → C → Prop
   | 0, _ => True
   | n + 1, z => ∃ z', z ⋖ z' ∧ Ticks n z'
 
-theorem ticks_zero (z : C) : Ticks 0 z := trivial
-
 theorem ticks_succ {n : ℕ} {z z' : C} (h : z ⋖ z') (ht : Ticks n z') : Ticks (n + 1) z :=
   ⟨z', h, ht⟩
 

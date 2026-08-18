@@ -95,7 +95,6 @@ theorem uRulesDefinable_padRules
       ⟨⟨p₀, fun _ => rfl⟩, ⟨p₀, fun _ => rfl⟩, uRight_of_false fun _ => not_false⟩
       uGDefinable_false (fun _ _ _ => rfl) fun _ _ _ => rfl
 
-
 omit [Fintype dt.SlotIx] in
 /-- **A junk rule writes nothing**, so it keeps the file, keeps the addressed
 tracks, keeps every slot and writes bits – the four facts a backward reading

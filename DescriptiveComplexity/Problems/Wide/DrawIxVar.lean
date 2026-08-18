@@ -335,83 +335,6 @@ theorem ixVarGatesFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
       by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl,
       fun hc => (by rw [h] at hc; exact hc)⟩
 
-include hrules hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi
-  he₀ hmono hup hvh hxdUse hgap hwP hwR hwK hcostR in
-/-- **The matrix's leg of one variable's machinery**, per VAL-loop round:
-from the dispatch's landing one cell right of the marker, the walk-back,
-the whole matrix at the round's state, and the walk-back at the fold
-checkpoint. -/
-theorem ixVarMatrix_run (stV : TapeSt dt A R P I)
-    (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = ixMark elt v)
-    (hbotV : stV.bot = fun r => r = (fun _ => False))
-    (hsavV : stV.sav = ixMark elt v) (htgtV : stV.tgt = ixMark elt v)
-    (sem : ∀ a : Fin (dt.natOf vi),
-      dt.IxKindSem PR.zero PR.one vi stV elt (dt.kindOf vi a))
-    (f : dt.CtlIx → A) :
-    Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (emb (.matrixP (.matP (.chk 0)))) f), Sum.inl v',
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val)
-          (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (emb .mchk1)
-          (dt.ixMatFs (elt := elt) F PR.zero PR.one hhasP vi stV v
-            (dt.varArgsOf PR.zero PR.one vi).enterAtomSt sem f
-            (dt.natOf vi))), Sum.inl v,
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val)
-          (PR.syElt PR.blank)⟩ := by
-  classical
-  have hvv' : v ≠ v' := ne_of_wmIncr hvi
-  have hne_wk_val : (Slot.wk : dt.SlotIx) ≠ Slot.val := fun h => nomatch h
-  have hwkS : ∀ r, dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV r Slot.wk =
-      bitVal PR.zero PR.one (r = v) := by
-    intro r
-    rw [ixBack_wk, hwkV]
-  have hwkv' : PR.passTracksAt F.cell Slot.val (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV)
-      stV.val v' Slot.wk ≠ PR.one := by
-    rw [Prog.passTracks_of_ne hne_wk_val, hwkS, bitVal_neg (Ne.symm hvv')]
-    exact PR.zero_ne_one
-  -- the walk-back into the matrix's first checkpoint
-  have hback : (wideData (Univ A R P dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (emb (.matrixP (.matP (.chk 0)))) f), Sum.inl v',
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val)
-          (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (emb (.matrixP (.matP (.chk 0)))) f), Sum.inl v,
-        wideTape (PR.trackTapeAt F.cell Slot.val
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val)
-          (PR.syElt PR.blank)⟩ := by
-    refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
-    have h := hrules (.matrix (.mat (.chk 0))) .stay
-    exact ⟨rEmb (.matrix (.mat (.chk 0))) .stay, by rw [h]; exact hwkv',
-      by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl,
-      fun hc => (by rw [h] at hc; exact hc)⟩
-  refine (Relation.ReflTransGen.single hback).trans ?_
-  -- the matrix
-  have hmrules : ∀ (i : dt.MatrixSite vi) (ρ : dt.MatrixSh vi i),
-      PR.rules (rEmb (.matrix (.mat i)) ρ) = dt.matrixRule PR.zero PR.one vi
-        (emb := fun p => emb (.matrixP (.matP p)))
-        (fun a => dt.atomArgs PR.zero PR.one vi a)
-        ((dt.varArgsOf PR.zero PR.one vi).enterAtomSt) (emb .mchk1) i ρ :=
-    fun i ρ => hrules (.matrix (.mat i)) ρ
-  refine Relation.ReflTransGen.trans
-    (ixMatrix_run (F := F) (hhasP := hhasP) (hsepP := hsepP) (hix := hix)
-      (hinj := hinj) (heltP := heltP) (hord := hord) (hR := hR) (hlin := hlin)
-      (htop := htop) (hbot := hbot) (he₀ := he₀) (hwork := hwork) (hv := hv)
-      (hvi := hvi) (hwkSt := hwkV) (hmirSt := hmirV) (hbotSt := hbotV)
-      (hsav := hsavV) (htgt := htgtV) (hmono := hmono) (hup := hup) (hvh := hvh)
-      (hxdUse := hxdUse) (hgap := hgap) (hwP := hwP) (hwR := hwR) (hwK := hwK)
-      (hcostR := hcostR) (vi := vi) (st := stV)
-      (enterSt := (dt.varArgsOf PR.zero PR.one vi).enterAtomSt) (hrules := hmrules)
-      (sem := sem) (f₀ := f)) ?_
-  -- the walk-back at the fold checkpoint
-  refine Relation.ReflTransGen.single ?_
-  refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
-  have h := hrules .mchk1 .stay
-  exact ⟨rEmb .mchk1 .stay, by rw [h]; exact hwkv',
-    by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl,
-    fun hc => (by rw [h] at hc; exact hc)⟩
-
 omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite P]
   [Finite dt.KIx] hrules hR hv hwkSt in
 omit [Finite I] in
@@ -610,7 +533,6 @@ theorem ixVarMachineUngated_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u)
         (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st v)))
     hflagF hns hoff hupd
 
-
 /-! ### The whole variable machinery, run -/
 
 /-- **What one variable's machinery is charged**: the gates' leg, one round,
@@ -640,7 +562,6 @@ theorem ixIGPassP_roundSt (zero one : A) (vi : dt.VarIx)
     dt.ixIGPassP (elt := elt) F zero one vi (dt.ixRoundSt st m) ℓ ↔
       dt.ixIGPassP (elt := elt) F zero one vi (dt.ixRoundSt st' m) ℓ :=
   dt.ixIGPassP_congr (elt := elt) F zero one vi rfl ℓ
-
 
 variable {dt}
 
@@ -734,7 +655,6 @@ noncomputable def ixVarFM (fG : dt.CtlIx → A) : ιV → dt.CtlIx → A :=
           (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le (dt.ixRoundSt st (mV a)) v))
         (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le (dt.ixRoundSt st (mV a)) v))
 
-
 /-! ### The fold invariant of the VAL loop -/
 
 omit [Fintype dt.SlotIx] [Finite dt.KIx] in
@@ -764,7 +684,6 @@ private theorem ixWmIncr_lexRel_of_wmLe
   exact ⟨u, hu, fun w hw => hab w ((hLt u w).mp hw),
     fun w => (ht w).trans (or_congr Iff.rfl
       (and_congr Iff.rfl (not_congr (hLt u w).symm)))⟩
-
 
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] in
 include hlin hord hinj hix hmono hup hblkP in

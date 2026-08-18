@@ -70,15 +70,6 @@ def symmetrizeInterp :
             mgAdj.formula₂ (Term.var (1, 0)) (Term.var (0, 0)))
     | _, .marked => fun _ => mgMarked.formula₁ (Term.var (0, 0))
 
-/-- The symmetrizing interpretation is quantifier-free. -/
-theorem symmetrizeInterp_isQuantifierFree : symmetrizeInterp.IsQuantifierFree := by
-  intro n R t
-  cases R with
-  | adj =>
-    exact ((IsAtomic.equal _ _).isQF.imp isQF_bot).inf
-      ((IsAtomic.rel _ _).isQF.sup (IsAtomic.rel _ _).isQF)
-  | marked => exact (IsAtomic.rel _ _).isQF
-
 section SymmetrizeCharacterizations
 
 variable {A : Type} [Language.markedGraph.Structure A]
@@ -159,25 +150,6 @@ def splitInterp :
           Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊓
             mgMarked.formula₁ (Term.var (0, 0))
       | _, _ => ⊥
-
-/-- The vertex-splitting interpretation is quantifier-free. -/
-theorem splitInterp_isQuantifierFree : splitInterp.IsQuantifierFree := by
-  intro n R t
-  cases R with
-  | adj =>
-    rcases h0 : t 0 with _ | _ <;> rcases h1 : t 1 with _ | _ <;>
-      simp only [splitInterp, h0, h1]
-    · exact isQF_bot
-    · exact (IsAtomic.rel _ _).isQF
-    · exact (IsAtomic.equal _ _).isQF
-    · exact isQF_bot
-  | markedArc =>
-    rcases h0 : t 0 with _ | _ <;> rcases h1 : t 1 with _ | _ <;>
-      simp only [splitInterp, h0, h1]
-    · exact isQF_bot
-    · exact isQF_bot
-    · exact (IsAtomic.equal _ _).isQF.inf (IsAtomic.rel _ _).isQF
-    · exact isQF_bot
 
 /-! #### The two copies of a vertex -/
 

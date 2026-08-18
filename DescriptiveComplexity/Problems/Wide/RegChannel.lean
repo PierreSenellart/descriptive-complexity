@@ -152,40 +152,11 @@ theorem wmRegSeg_least (h : IsLinOrd (WMLe (A := A))) {bot : A} (hbot : WMHasInp
 
 end RegCell
 
-
 /-! ### The file the channel hands over -/
 
 section RegFile
 
 variable {A : Type} [Language.wide.Structure A] [Finite A]
-
-/-- **The file the register channel hands over**: one register per element that
-carries input, in the elements' own order, the cell of a register being the
-segment it cuts among them. Everything the walk and mirror layers ask of a file
-is here – the registers grow with the elements, and none of them is empty. -/
-noncomputable def wmRegFile (h : IsLinOrd (WMLe (A := A))) :
-    IxFile A {x : A // WMHasInp x} (fun u v => WMLe u.1 v.1) where
-  cell u := wmRegSeg u.1
-  strictMono _ v hlt := wmSetLt_wmRegSeg h ⟨hlt.1, hlt.2⟩ v.2
-  cell_nonempty u := wmRegSeg_nonempty h u.2
-
-omit [Finite A] in
-/-- **The file's order is linear**, being the instance's own on a subtype. -/
-theorem isLinOrd_wmRegFile (h : IsLinOrd (WMLe (A := A))) :
-    IsLinOrd (fun u v : {x : A // WMHasInp x} => WMLe u.1 v.1) :=
-  ⟨fun u => h.1 u.1, fun u v w h1 h2 => h.2.1 u.1 v.1 w.1 h1 h2,
-    fun u v h1 h2 => Subtype.ext (h.2.2.1 u.1 v.1 h1 h2),
-    fun u v => h.2.2.2 u.1 v.1⟩
-
-/-- **The whole file lies inside the working region**: every register's address
-is supported on the elements that carry input, so it is below `2 ^` their
-number. This is the bound a clocked run is charged for walking its file, and it
-is what the segment channel cannot give. -/
-theorem wideRank_wmRegFile_lt (h : IsLinOrd (WMLe (A := A)))
-    (hup : ∀ x y : A, WMLe x y → WMHasInp x → WMHasInp y)
-    (u : {x : A // WMHasInp x}) :
-    wideRank ((wmRegFile h).cell u) < 2 ^ Nat.card {y : A // WMHasInp y} :=
-  wideRank_wmRegSeg_lt h hup u.1
 
 end RegFile
 

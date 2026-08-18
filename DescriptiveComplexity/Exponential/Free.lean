@@ -572,10 +572,6 @@ variable {X} {A : Type} [L.Structure A] [LinearOrder A]
 /-- The ambient order, as a binary relation on tuples. -/
 def loRel : (Fin 2 → A) → Prop := fun w => w 0 ≤ w 1
 
-omit [L.Structure A] in
-theorem joinOrder_ord (ρ : X.B.Assignment A) :
-    (X.B.joinOrder (loRel (A := A)) ρ) (Sum.inl ()) = loRel := rfl
-
 /-- The guessed order of a placed point is the ambient one. -/
 theorem domHolds_copyIn (x : X.Map A) :
     ExpExpansionFree.DomHolds (X := X.orderFree)

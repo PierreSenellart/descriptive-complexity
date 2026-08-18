@@ -70,16 +70,6 @@ theorem FrameSeg.gaps {k : PCont c} {w : List (SimSym c)} (n : ℕ) (h : FrameSe
   | zero => exact h
   | succ n ih => rw [List.replicate_succ, List.cons_append]; exact FrameSeg.gap ih
 
-/-- A top frame is in particular a frame region. -/
-theorem TopSeg.frameSeg {k : PCont c} {w : List (SimSym c)} (h : TopSeg k w) :
-    FrameSeg k w := by
-  cases h with
-  | halt => exact FrameSeg.halt
-  | cons₁ h => exact FrameSeg.cons₁ h
-  | cons₂ h => exact FrameSeg.cons₂ h
-  | comp h => exact FrameSeg.comp h
-  | fix h => exact FrameSeg.fix h
-
 /-! ### Pass lemmas for the pops -/
 
 section Pass

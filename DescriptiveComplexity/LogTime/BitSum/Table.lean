@@ -270,20 +270,6 @@ theorem popShort_of_eq [Nonempty A] {l x y : A}
     by omega, hilow, ?_⟩
   exact (table_sound hgpos hB hT hgval (orank y) b x i hbr hxg (by omega) hilow).mpr hy.symm
 
-/-- **Level 3, done**: the number of ones of a short word is bit-definable, with
-the sizes the construction needs and nothing else. -/
-theorem popShort_iff [Nonempty A] {l x y : A}
-    (hfit : (orank l + 1) * 2 ^ orank l < posCount A - 1)
-    (hcap : posCount A ≤ 2 ^ orank l * 2 ^ 2 ^ orank l)
-    (hxl : orank x < 2 ^ orank l) :
-    PopShort l x y ↔ orank y = onesBelow (orank x) (orank l) := by
-  have hone : 1 ≤ 2 ^ orank l := Nat.one_le_two_pow
-  have hlP : orank l < posCount A := by
-    have hmul : orank l + 1 ≤ (orank l + 1) * 2 ^ orank l :=
-      Nat.le_mul_of_pos_right _ (by omega)
-    omega
-  exact ⟨popShort_sound hlP, popShort_of_eq hfit hcap hxl⟩
-
 end Table
 
 /-! ### Definability -/

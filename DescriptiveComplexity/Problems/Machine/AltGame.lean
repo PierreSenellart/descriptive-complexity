@@ -183,19 +183,6 @@ theorem blkLt_iff (hbwf : M.BlocksWellFormed k) {i j : ℕ} {q : A} (hj : M.Blk 
     rwa [blk_unique hbwf h' hj] at hj'
   · exact fun h => ⟨j, h, hj⟩
 
-/-- Every state is in a block below `k`. -/
-theorem blkLt_top (hbwf : M.BlocksWellFormed k) (q : A) : M.BlkLt k q := by
-  obtain ⟨j, hjk, hj, -⟩ := hbwf.1 q
-  exact ⟨j, hjk, hj⟩
-
-/-- **Below the top block every walk is fully legal**: at `i = k` the
-restriction in `DescriptiveComplexity.ATMData.LegalBelow` is no restriction. -/
-theorem legalBelow_top_step (hbwf : M.BlocksWellFormed k) {w : A → Config A}
-    (hw : M.LegalBelow k w) {p q : A} (hpq : SuccPos M.Le M.Posn p q) :
-    (M.Step (w p) (w q) ∧ ¬M.Acc (w p).state) ∨
-      (w q = w p ∧ (M.Acc (w p).state ∨ M.Stuck (w p))) :=
-  hw.2.2 p q hpq (blkLt_top hbwf _)
-
 /-- **A walk enters the blocks in order**: the first time whose block is not
 below `i` is in block `i` exactly, since the step into it is legal. -/
 theorem blk_eq_of_entry (hbwf : M.BlocksWellFormed k) {w : A → Config A} {i : ℕ}

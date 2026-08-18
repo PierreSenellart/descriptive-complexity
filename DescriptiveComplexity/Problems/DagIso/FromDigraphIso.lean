@@ -164,9 +164,6 @@ theorem vPt_injective : Function.Injective (vPt (A := A)) := fun _ _ h =>
 theorem midPt_inj {u v u' v' : A} (h : midPt u v = midPt u' v') : u = u' ∧ v = v' :=
   ⟨congrArg (fun p : incInterp.Map A => p.2 0) h, congrArg (fun p : incInterp.Map A => p.2 1) h⟩
 
-theorem endPt_inj {u v u' v' : A} (h : endPt u v = endPt u' v') : u = u' ∧ v = v' :=
-  ⟨congrArg (fun p : incInterp.Map A => p.2 0) h, congrArg (fun p : incInterp.Map A => p.2 1) h⟩
-
 end Points
 
 /-! ### What the gadget builds, on the pattern side -/

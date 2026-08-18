@@ -164,11 +164,6 @@ theorem linear_bound {f s : ι → ℕ} {c : ℕ} (h : ∀ i, f i ≤ c * (s i +
     ∃ c' d : ℕ, ∀ i, f i ≤ c' * (s i + 1) ^ d :=
   ⟨c, 1, fun i => by rw [pow_one]; exact h i⟩
 
-/-- Discharge a `card_le`/`le_card` field from a degree-`d` estimate. -/
-theorem poly_bound {f s : ι → ℕ} {c d : ℕ} (h : ∀ i, f i ≤ c * (s i + 1) ^ d) :
-    ∃ c' d' : ℕ, ∀ i, f i ≤ c' * (s i + 1) ^ d' :=
-  ⟨c, d, h⟩
-
 /-- The `L`-structure an encoding puts on the universe of an instance: the
 relations are the encoder's computations, read as propositions. Derived from
 `relBool` rather than supplied, so that the structure of an encoded instance

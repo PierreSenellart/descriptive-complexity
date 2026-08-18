@@ -378,7 +378,6 @@ theorem plusSweep_accepts (x : Fin 3 → A) :
 
 end Addition
 
-
 /-! ### The trivial sweep -/
 
 /-- **The trivial sweep**: no state, no register, always accepting. It is what a
@@ -389,9 +388,5 @@ needs no dummy variable. -/
   init := Fin.elim0
   step := Fin.elim0
   acc := .tt
-
-/-- The trivial sweep accepts everything. -/
-theorem trueSweep_accepts {A : Type} [LinearOrder A] [Finite A] (x : Fin 0 → A) :
-    trueSweep.Accepts x := rfl
 
 end DescriptiveComplexity

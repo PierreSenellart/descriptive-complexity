@@ -224,10 +224,6 @@ theorem isTgt_parSpec_iff (m : Bool) (x : Fin 1 → A) :
 
 variable [Finite A]
 
-/-- A Boolean is not its own negation: what makes the “not marked” branch of the
-step formula pin the mode. -/
-private theorem bool_ne_not_self (b : Bool) : ¬(b = !b) := by cases b <;> simp
-
 /-- The prefix of a minimum is the minimum itself, when it is marked. -/
 theorem parCount_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Marked A) :
     parCount z = 1 := by

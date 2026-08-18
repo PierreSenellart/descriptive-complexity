@@ -119,21 +119,6 @@ theorem trackTapeAt_initBack {J : Type} (cell : J → (Univ A R P K dd → Prop)
     · exact hb.symm
   · rw [if_neg hs]
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] in
-/-- **Two files present the initial tape alike**: both are the marks over the
-blank, read cell by cell. The clocked program's opening is stated at its own
-file and `DescriptiveComplexity.Draw.Prog.isInit_prog` at the channel's, and this
-is the one step between them. -/
-theorem trackTapeAt_initBack_eq {J : Type} (cell : J → (Univ A R P K dd → Prop))
-    {t₀ t₁ : W} (hmk : ∀ x : Univ A R P K dd, PR.mark x t₀ = PR.zero)
-    (hb : PR.blank t₀ = PR.zero)
-    (hmk₁ : ∀ x : Univ A R P K dd, PR.mark x t₁ = PR.zero)
-    (hb₁ : PR.blank t₁ = PR.zero) :
-    PR.trackTapeAt cell t₀ PR.initBack (fun _ => False) =
-      PR.trackTapeAt wmSeg t₁ PR.initBack (fun _ => False) :=
-  (trackTapeAt_initBack cell hmk hb).trans (trackTape_initBack hmk₁ hb₁).symm
-
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **A program may decline the input channel's marks.** What a marked cell

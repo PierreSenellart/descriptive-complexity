@@ -131,17 +131,6 @@ theorem wmSetLt_wmSeg_iff (h : IsLinOrd (WMLe (A := A))) (x y : A) :
   · exact hc ⟨hxy, fun hcon => ((wmSetLt_iff _ _).mp hlt).2
       (congrArg wmSeg (h.2.2.1 x y hxy hcon))⟩
 
-/-- **A cell of the working area is no register**: the first register is the
-cell of the least element, so an address strictly below it is the cell of no
-element at all. This is what tells a program's reads that the four register
-slots of its background do not matter where it stands
-(`DescriptiveComplexity.Draw.Data.back_congr_off_reg`). -/
-theorem not_wmSeg_of_wmSetLt_wmSeg (h : IsLinOrd (WMLe (A := A))) {bot : A}
-    (hbot : ∀ y : A, WMLe bot y) {r : A → Prop}
-    (hr : WMSetLt WMLe r (wmSeg bot)) : ¬∃ u : A, r = wmSeg u := by
-  rintro ⟨u, rfl⟩
-  exact ((wmSetLt_wmSeg_iff h u bot).mp hr).2 (hbot u)
-
 /-- **Consecutive elements mark consecutive cells**: no cell strictly between the
 cell of an element and the cell of its successor is marked. That is what a
 program walking its register file needs – one scan carries it from each register
@@ -152,14 +141,6 @@ theorem not_wmSeg_between (h : IsLinOrd (WMLe (A := A))) {u u' : A}
   rintro rfl
   have hux : WMLt WMLe u x := (wmSetLt_wmSeg_iff h u x).mp h1
   exact ((wmSetLt_wmSeg_iff h x u').mp h2).2 (hsucc x hux)
-
-omit [Finite A] in
-/-- **The cell of the greatest element is the last cell of the tape**, so a
-register walk that runs to the end of the file also runs to the end of the
-tape. -/
-theorem wmSeg_greatest {m : A} (hm : ∀ y : A, WMLe y m) :
-    wmSeg m = fun _ => True :=
-  funext fun y => propext (iff_of_true (hm y) trivial)
 
 /-- **The head does not start on a marked cell**: it starts on the empty address,
 and every marked cell holds the element that marks it. So a program may write its
@@ -213,11 +194,6 @@ theorem wmIncr_wmWorkTop (h : IsLinOrd (WMLe (A := A))) {bot : A} (hbot : ∀ v 
     exact h.1 bot
   · by_contra hc
     exact hnlt ⟨hbot v, hc⟩
-
-/-- **Every address of the working area is at or below its top.** -/
-theorem wmSetLe_wmWorkTop (h : IsLinOrd (WMLe (A := A))) {bot : A} (hbot : ∀ v : A, WMLe bot v)
-    {r : A → Prop} (hr : ¬r bot) : WMSetLe WMLe r (wmWorkTop bot) :=
-  (wmSetLt_iff_of_wmIncr h (wmIncr_wmWorkTop h hbot) r).mp (wmSetLt_wmSeg_of_not_bot hbot hr bot)
 
 /-! ### The initial tape -/
 

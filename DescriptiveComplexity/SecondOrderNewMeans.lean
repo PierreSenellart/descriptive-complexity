@@ -204,7 +204,6 @@ theorem realize_meanEmpty :
     rw [Formula.realize_not]
     exact fun hc => hw w ((realize_meanAtom ρ (Sum.inl (Sum.inr 0)) (fun i => Sum.inr i) _).mp hc)
 
-
 theorem realize_meanInj :
     letI := meanStruc (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanInj L a) ↔
@@ -240,7 +239,6 @@ theorem realize_meanFlip :
   · intro h i hg
     obtain ⟨u, hu, hw⟩ := h (i none) (fun j => i (some j)) hg.1 hg.2
     exact ⟨fun _ => u, hu, hw⟩
-
 
 theorem xor_iff_iff_not (p q : Prop) : Xor p q ↔ (p ↔ ¬q) := by
   by_cases hq : q
@@ -303,7 +301,6 @@ theorem bijective_meanAt [Finite A]
       refine not_congr ⟨fun h => funext fun k => Sum.inl_injective (h k), fun h k => ?_⟩
       rw [h]
 
-
 /-- **The whole guard, realized**, and what it buys: the invented values name
 every `a`-ary relation of the instance, each exactly once. -/
 theorem bijective_meanAt_of_guard [Finite A] :
@@ -319,8 +316,6 @@ theorem bijective_meanAt_of_guard [Finite A] :
     ((realize_meanEmpty ρ).mp hempty) ((realize_meanInj ρ).mp hinj)
     ((realize_meanFlip ρ).mp hflip)
 
-
 end Realize
-
 
 end DescriptiveComplexity

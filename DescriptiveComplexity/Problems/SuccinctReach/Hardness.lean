@@ -359,7 +359,6 @@ noncomputable def srInterp :
     | .posIn => fun t => srLitFml B stepS srcS tgtS true (t 0) (t 1)
     | .negIn => fun t => srLitFml B stepS srcS tgtS false (t 0) (t 1)
 
-
 /-! ### Characterization of the interpreted relations
 
 Each relation of the interpreted instance is characterized by a semantic
@@ -1293,6 +1292,5 @@ theorem SUCCINCTREACH_PSPACE_complete : PSPACE.Complete SUCCINCTREACH :=
   ⟨succinctReach_mem_PSPACE,
     PSPACE_hard_of_sotcDefinable SUCCINCTREACH fun Q hQ =>
       (succinctReach_hard_of_sotcDefinable Q hQ).map OrderedFOReduction.toRel⟩
-
 
 end DescriptiveComplexity

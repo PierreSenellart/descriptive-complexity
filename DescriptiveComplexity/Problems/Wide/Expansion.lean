@@ -69,19 +69,9 @@ abbrev wide1 : Language.{0, 0} := AddrExp.aeLang1 Language.wide
 /-- The base vocabulary expanded by two copies of the block. -/
 abbrev wide2 : Language.{0, 0} := AddrExp.aeLang2 Language.wide
 
-/-- A unary symbol of the instance, in the ordered vocabulary. -/
-abbrev wSym₁ (r : Language.wide.Relations 1) : wOrd.Relations 1 := AddrExp.aeSym₁ r
-
-/-- A binary symbol of the instance, in the ordered vocabulary. -/
-abbrev wSym₂ (r : Language.wide.Relations 2) : wOrd.Relations 2 := AddrExp.aeSym₂ r
-
 /-- **The address an assignment is**: the elements its relation variable
 holds of. -/
 abbrev wbits {A : Type} (ρ : addrBlock.Assignment A) : A → Prop := AddrExp.aeBits ρ
-
-/-- **The assignment an address is**, the inverse of
-`DescriptiveComplexity.Wide.wbits`. -/
-abbrev wassign {A : Type} (s : A → Prop) : addrBlock.Assignment A := AddrExp.aeAssign s
 
 export AddrExp (bit1 bitA bitB apply₁ aeBits_aeAssign aeAssign_aeBits aeAssign_injective
   markG attrG eqG bit1F bitAF bitBF lift1 lift2 markS binS singleS WMSingle

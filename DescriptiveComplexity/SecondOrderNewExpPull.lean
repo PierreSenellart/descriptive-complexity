@@ -221,7 +221,6 @@ theorem pullSubst_rel {n : ℕ} (r : (X.E.sum C.lang).Relations n) (ts : Fin n �
       exact ⟨fun j => (ts j).1.1, fun j => (hr.tag (ts j) _).mpr rfl, (hstr _).mpr hφ⟩
   | inr c => exact Iff.rfl
 
-
 include h hr in
 /-- The structure identification of `DescriptiveComplexity.pullSubst_rel`, as an
 isomorphism. -/
@@ -257,9 +256,7 @@ theorem realize_pullKernel (φ : (X.E.sum C.lang).Sentence) :
   refine Iff.trans (FormulaSubst.realize_substSentence hr.inj hD φ) ?_
   exact realize_sentence_of_equiv (pullSubstEquiv ρ h hr) φ
 
-
 end Kernel
-
 
 /-! ### Naming the points -/
 
@@ -291,12 +288,6 @@ variable (ρ : (pullBlock X C).Assignment (A ⊕ Fin m))
 def pullMeanPart : (meanBlockB (taggedBlock X)).Assignment (A ⊕ Fin m) :=
   fun i => ρ (Sum.inr (Sum.inl i))
 
-omit [L.IsRelational] [L.Structure A] in
-theorem homAssign_meanHom :
-    (meanBlockB (taggedBlock X)).homAssign (meanHom X C) (meanHom_arity X C) ρ =
-      pullMeanPart ρ :=
-  rfl
-
 /-- **The meaning guard, read in the whole block**: it says of the meaning part
 what `DescriptiveComplexity.meanGuardB` says. -/
 theorem realize_pullMeanGuard :
@@ -307,7 +298,6 @@ theorem realize_pullMeanGuard :
   SOBlock.realize_homSentence (meanHom X C) (meanHom_arity X C) ρ _
 
 end Naming
-
 
 section Rep
 
@@ -413,7 +403,6 @@ theorem pullPointRep
 
 end Rep
 
-
 /-! ### The sentence, and what an assignment satisfying it gives -/
 
 section Back
@@ -464,6 +453,5 @@ theorem pullSentence_back (φ : (X.E.sum C.lang).Sentence)
     (realize_pullKernel ρ hpt hrep φ).mp hker⟩
 
 end Back
-
 
 end DescriptiveComplexity

@@ -57,17 +57,6 @@ theorem dtmAcceptSpace_PSPACE_complete : PSPACE.Complete DTMAcceptSpace :=
 theorem ntmAcceptSpace_PSPACE_complete : PSPACE.Complete NTMAcceptSpace :=
   ⟨ntmAcceptSpace_mem_PSPACE, ntmAcceptSpace_PSPACE_hard⟩
 
-/-- **`PSPACE = NPSPACE`**, in the form this framework states it: deterministic
-and nondeterministic space-bounded acceptance are complete for the same class,
-so each reduces to the other. Savitch's theorem is what
-`DescriptiveComplexity.Problems.Qsat` already spent, logically; nothing simulates a
-nondeterministic machine deterministically here. -/
-theorem ntmAcceptSpace_reduces_to_dtmAcceptSpace :
-    Nonempty (NTMAcceptSpace ≤ʳᶠᵒ[≤] DTMAcceptSpace) :=
-  dtmAcceptSpace_PSPACE_hard DTMAcceptSpace
-    ⟨(FOReduction.refl DTMAcceptSpace).toOrdered.toRel⟩ NTMAcceptSpace
-    ntmAcceptSpace_sotcDefinable
-
 /-- **Every problem of PSPACE reduces to space-bounded machine acceptance**:
 the forward half of a machine characterization of the class. (The converse
 direction is membership, `DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`, but a

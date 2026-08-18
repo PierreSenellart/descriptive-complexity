@@ -248,7 +248,6 @@ def bddTargetAssign (e : Fin m → Fin d → A) (ρ : (bddBlock d B).Assignment 
 
 end Point
 
-
 /-! ### The defining formulas, realized -/
 
 section RelRealize
@@ -299,7 +298,6 @@ theorem realize_bddRelF_block {k : ℕ} (r : B.lang.Relations k) (τ : Fin k →
   exact Iff.rfl
 
 end RelRealize
-
 
 /-! ### The interpreted universe *is* the extended universe -/
 
@@ -385,7 +383,6 @@ noncomputable def bddTargetEquiv (e : Fin m → Fin d → A) (he : Function.Inje
 
 end Universe
 
-
 /-! ### The guess, read back -/
 
 section Source
@@ -445,7 +442,6 @@ theorem bddTargetAssign_bddSourceAssign {e : Fin m → Fin d → A}
   exact bddBack_bddPoint he (y k)
 
 end Source
-
 
 /-! ### The kernel, pulled onto the instance -/
 
@@ -536,8 +532,6 @@ theorem sigmaSONewBddDefinable_iff_sigmaSODefinable :
     SigmaSONewBddDefinable d P ↔ SigmaSODefinable 1 P :=
   ⟨SigmaSONewBddDefinable.toSigmaSO, SigmaSODefinable.toNewBdd⟩
 
-
 end Pull
-
 
 end DescriptiveComplexity

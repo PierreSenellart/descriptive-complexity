@@ -144,21 +144,6 @@ come out unchanged. -/
 def Rule.KeepsFile (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A) (s : dt.SlotIx), s.IsFile → ρ.wr f g s = g s
 
-theorem Rule.keepsFile_of_wr_eq {ρ : Rule A Q dt.SlotIx P}
-    (h : ∀ f g, ρ.wr f g = g) : Rule.KeepsFile dt ρ :=
-  fun f g s _ => congrFun (h f g) s
-
-/-- An update of a slot that is not the file's keeps the file. -/
-theorem keepsFile_update {ρ : Rule A Q dt.SlotIx P} {t : dt.SlotIx}
-    (ht : ¬t.IsFile) (h : ∀ f g, ρ.wr f g = Function.update g t (ρ.wr f g t)) :
-    Rule.KeepsFile dt ρ := by
-  classical
-  intro f g s hs
-  have hne : s ≠ t := by
-    rintro rfl
-    exact ht hs
-  rw [h f g, Function.update_of_ne hne]
-
 variable (dt) in
 /-- **A rule writes bits**: every slot it leaves is either untouched or one of
 the two designated elements. This is what keeps a tape readable as an
@@ -182,10 +167,6 @@ built from these: which slot each rule may touch, and hence what a track still
 holds after a stretch of the run. -/
 def Rule.KeepsSlot (t : dt.SlotIx) (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A), ρ.wr f g t = g t
-
-theorem Rule.keepsSlot_of_wr_eq {ρ : Rule A Q dt.SlotIx P} (t : dt.SlotIx)
-    (h : ∀ f g, ρ.wr f g = g) : Rule.KeepsSlot dt t ρ :=
-  fun f g => congrFun (h f g) t
 
 variable (dt) in
 /-- **A rule sets a slot**: whatever it reads, it leaves that slot holding the
@@ -238,11 +219,6 @@ theorem guessWr_keepsFile (zero one : A) (x : dt.d.B.ι → Bool)
   | .ltp => exact hs.elim
   | .old i => exact hs.elim
   | .new i => exact hs.elim
-
-omit [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] in
-/-- **The sweep that lays nothing keeps the file**, having nothing to write. -/
-theorem nullSpec_wr_keepsFile (b : B) (f : dt.CtlIx → A) (g : dt.SlotIx → A) :
-    (dt.nullSpec (A := A) B).wr b f g = g := rfl
 
 -- The two instances are used by the rule set's own `Function.update`s, which
 -- the linter does not see through.
@@ -720,43 +696,6 @@ theorem ixBack_bot_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero �
     rw [bitVal_neg hq, bitVal_pos hp] at h
     exact hzo h
 
-omit [Fintype dt.SlotIx] in
-/-- **The stage tracks, read back.** -/
-theorem ixBack_old_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero ≠ one)
-    (st : TapeSt dt A R' P' I) (i : dt.d.B.ι)
-    {P : (Univ A R' P' dt.KIx dt.dd → Prop) → Prop}
-    (hread : ∀ r, dt.ixBack lay zero one dt.dd0Le st r (Slot.old i) =
-      bitVal zero one (P r)) :
-    st.old i = P := by
-  funext r
-  refine propext ?_
-  have h : bitVal zero one (st.old i r) = bitVal zero one (P r) := hread r
-  constructor
-  · intro hq
-    by_contra hp
-    rw [bitVal_pos hq, bitVal_neg hp] at h
-    exact hzo h.symm
-  · intro hp
-    by_contra hq
-    rw [bitVal_neg hq, bitVal_pos hp] at h
-    exact hzo h
-
-omit [Fintype dt.SlotIx] in
-/-- **A track read at a register, read back**: clear everywhere means clear at
-every register, which is what an entry state's mirror, target, saved mirror and
-valuation say. -/
-theorem ixBack_cell_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero ≠ one)
-    (st : TapeSt dt A R' P' I) {m : I → Prop}
-    (hslot : ∀ r, dt.ixBack lay zero one dt.dd0Le st r Slot.mir =
-      bitVal zero one (bitAtOf lay.cell m r))
-    (hread : ∀ r, dt.ixBack lay zero one dt.dd0Le st r Slot.mir = zero) :
-    m = fun _ => False := by
-  funext u
-  refine propext (iff_of_false (fun hu => ?_) (fun hc => hc))
-  have h := (hslot (lay.cell u)).symm.trans (hread (lay.cell u))
-  rw [bitVal_pos ⟨u, rfl, hu⟩] at h
-  exact hzo h.symm
-
 /-- **A tape whose mirror track is clear is its own pass tape**: the run layer
 writes its tapes as `passTracksAt`, which overwrites the walked track with the
 mark the head carries; where the head carries no mark and the track is clear,
@@ -868,8 +807,6 @@ theorem step_tape_of_shape_tr (hR : PR.table.Reads)
 
 end StepTape
 
-
-
 /-! ### The reading, along a run -/
 
 section Recognising
@@ -888,70 +825,6 @@ def ShapedAt (lay : Layout dt A R' P' I) (st₀ : TapeSt dt A R' P' I)
     (c : Config (WPoint (Univ A R' P' dt.KIx dt.dd))) : Prop :=
   ∃ rest, c.tape = wideTape (fun r => PR.syElt (rest r)) (PR.syElt PR.blank) ∧
     TapeShape (dt := dt) lay PR.zero PR.one st₀ rest
-
-omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
-open Classical in
-/-- **One step of the opening keeps the configuration recognisable**: the tape
-changes at the cell under the head alone (`step_tape_of_shape`), and the rule
-that changed it keeps the file, keeps the addressed tracks and writes bits
-(`tapeShape_update`). -/
-theorem shapedAt_step (hR : PR.table.Reads) {lay : Layout dt A R' P' I}
-    {st₀ : TapeSt dt A R' P' I}
-    {x y : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
-    {v : Univ A R' P' dt.KIx dt.dd → Prop} (hhead : x.head = Sum.inl v)
-    (hfacts : ∀ r : R', Rule.KeepsFile dt (PR.rules r) ∧
-      Rule.KeepsCellTracks dt (PR.rules r) ∧
-      Rule.WritesBits dt PR.zero PR.one (PR.rules r))
-    (hx : ShapedAt PR lay st₀ x)
-    (hstep : (wideData (Univ A R' P' dt.KIx dt.dd)).Step x y) :
-    ShapedAt PR lay st₀ y := by
-  classical
-  obtain ⟨rest, htape, hshape⟩ := hx
-  obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := hstep
-  obtain (sτ | τ) := τ
-  · exact hτ.elim
-  obtain ⟨t, w⟩ := τ
-  match t with
-  | .ctrl r =>
-    obtain ⟨hfile, hcell, hbits⟩ := hfacts r
-    exact ⟨_, step_tape_of_shape_tr hR hhead htape hread hwrite hframe,
-      tapeShape_update hshape hfile hcell hbits _ v⟩
-  | .sym => exact ((hR.tr _).mp hτ).elim
-  | .phase p => exact ((hR.tr _).mp hτ).elim
-  | .arg i => exact ((hR.tr _).mp hτ).elim
-
-omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
-/-- **A run of the opening stays recognisable**: the shape holds at the start and
-every step along the way is one the reading can follow – the head on an address,
-and a rule with the three properties. What the caller owes is exactly that, for
-the configurations *before* the one it is asking about, which is how an opening's
-reading is used: the evaluation's own rules are not among them. -/
-theorem shapedAt_of_reaches (hR : PR.table.Reads) {lay : Layout dt A R' P' I}
-    {st₀ : TapeSt dt A R' P' I}
-    {c₀ : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
-    (hfacts : ∀ r : R', Rule.KeepsFile dt (PR.rules r) ∧
-      Rule.KeepsCellTracks dt (PR.rules r) ∧
-      Rule.WritesBits dt PR.zero PR.one (PR.rules r))
-    (h0 : ShapedAt PR lay st₀ c₀) :
-    ∀ {c : Config (WPoint (Univ A R' P' dt.KIx dt.dd))},
-      Relation.ReflTransGen (wideData (Univ A R' P' dt.KIx dt.dd)).Step c₀ c →
-      ShapedAt PR lay st₀ c := by
-  intro c hreach
-  induction hreach with
-  | refl => exact h0
-  | @tail d e hcd hstep ih =>
-    rcases hd : d.head with v | q
-    · exact shapedAt_step hR hd hfacts ih hstep
-    · -- the head is on the control's side, which is no position at all
-      exfalso
-      obtain ⟨τ, -, -, -, -, -, -, hmove⟩ := hstep
-      have hposn : (wideData (Univ A R' P' dt.KIx dt.dd)).Posn d.head := by
-        rcases hmove with ⟨-, hs⟩ | ⟨-, hs⟩
-        · exact hs.1
-        · exact hs.2.1
-      obtain ⟨s, hs⟩ := wpPosn_iff (A := Univ A R' P' dt.KIx dt.dd) d.head |>.mp hposn
-      rw [hd] at hs
-      exact nomatch hs
 
 omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 open Classical in

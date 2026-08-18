@@ -142,32 +142,6 @@ theorem reachesIn_buildFile (F : LaidFile dt A R' P' I)
     (fun r hc => (hoff r (hbelow r hc)).trans (hout r (Or.inl hc)).symm)
     (fun r hc => (hoff r (habove r hc)).trans (hout r (Or.inr hc)).symm) hstep
 
-/-- **A program lays its register file out**, the budget forgotten. -/
-theorem reaches_buildFile (F : LaidFile dt A R' P' I)
-    (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
-    {t : dt.SlotIx} {m : I → Prop}
-    {bg₀ : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A}
-    {hdd : dt.dd0 ≤ dt.dd} {st : TapeSt dt A R' P' I}
-    (hwk : ∀ r, ¬st.wk r) (hbot : ∀ r, ¬st.bot r) (hltp : ∀ r, ¬st.ltp r)
-    (hold : ∀ (i : dt.d.B.ι) r, ¬st.old i r) (hnew : ∀ (i : dt.d.B.ι) r, ¬st.new i r)
-    {ph : (Univ A R' P' dt.KIx dt.dd → Prop) → P'} {fc : (Univ A R' P' dt.KIx dt.dd → Prop) → Q → A}
-    {s₀ s₁ : Univ A R' P' dt.KIx dt.dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
-    (hlo : ∀ u : I, WMSetLe WMLe s₀ (F.cell u))
-    (hhi : ∀ u : I, WMSetLt WMLe (F.cell u) s₁)
-    (hout : ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
-      WMSetLt WMLe r s₀ ∨ ¬WMSetLt WMLe r s₁ → bg₀ r = fun _ => PR.zero)
-    (hstep : ∀ s u : Univ A R' P' dt.KIx dt.dd → Prop, WMIncr WMLe s u →
-      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
-      PR.HasRight (ph s) (fc s) (PR.passTracksAt F.cell t bg₀ m s) (ph u) (fc u)
-        (PR.passTracksAt F.cell t (dt.ixBack F.toLayout PR.zero PR.one hdd st) m s)) :
-    Relation.ReflTransGen (wideData (Univ A R' P' dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (ph s₀) (fc s₀)), Sum.inl s₀,
-        wideTape (PR.trackTapeAt F.cell t bg₀ m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (ph s₁) (fc s₁)), Sum.inl s₁,
-        wideTape (PR.trackTapeAt F.cell t (dt.ixBack F.toLayout PR.zero PR.one hdd st) m)
-          (PR.syElt PR.blank)⟩ :=
-  (reachesIn_buildFile F hR hlin hwk hbot hltp hold hnew hle hlo hhi hout hstep).reflTransGen
-
 /-! ### Guessing the certificate -/
 
 /-- **A program guesses its certificate onto a stretch.** From the background of
@@ -199,32 +173,6 @@ theorem reachesIn_guessTracks (F : LaidFile dt A R' P' I)
   reachesIn_installOut hR hlin hle
     (fun r hc => dt.ixBack_old_congr σ fun i => hout i r (Or.inl hc))
     (fun r hc => dt.ixBack_old_congr σ fun i => hout i r (Or.inr hc)) hstep
-
-/-- **A program guesses its certificate onto a stretch**, the budget
-forgotten. -/
-theorem reaches_guessTracks (F : LaidFile dt A R' P' I)
-    (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
-    {t : dt.SlotIx} {m : I → Prop}
-    {hdd : dt.dd0 ≤ dt.dd} {st : TapeSt dt A R' P' I}
-    (σ : dt.d.B.ι → (Univ A R' P' dt.KIx dt.dd → Prop) → Prop)
-    {ph : (Univ A R' P' dt.KIx dt.dd → Prop) → P'} {fc : (Univ A R' P' dt.KIx dt.dd → Prop) → Q → A}
-    {s₀ s₁ : Univ A R' P' dt.KIx dt.dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
-    (hout : ∀ (i : dt.d.B.ι) (r : Univ A R' P' dt.KIx dt.dd → Prop),
-      WMSetLt WMLe r s₀ ∨ ¬WMSetLt WMLe r s₁ → (σ i r ↔ st.old i r))
-    (hstep : ∀ s u : Univ A R' P' dt.KIx dt.dd → Prop, WMIncr WMLe s u →
-      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
-      PR.HasRight (ph s) (fc s) (PR.passTracksAt F.cell t
-          (dt.ixBack F.toLayout PR.zero PR.one hdd st) m s) (ph u) (fc u)
-        (PR.passTracksAt F.cell t
-          (dt.ixBack F.toLayout PR.zero PR.one hdd { st with old := σ }) m s)) :
-    Relation.ReflTransGen (wideData (Univ A R' P' dt.KIx dt.dd)).Step
-      ⟨Sum.inr (PR.stElt (ph s₀) (fc s₀)), Sum.inl s₀,
-        wideTape (PR.trackTapeAt F.cell t (dt.ixBack F.toLayout PR.zero PR.one hdd st) m)
-          (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (ph s₁) (fc s₁)), Sum.inl s₁,
-        wideTape (PR.trackTapeAt F.cell t
-          (dt.ixBack F.toLayout PR.zero PR.one hdd { st with old := σ }) m) (PR.syElt PR.blank)⟩ :=
-  (reachesIn_guessTracks F hR hlin σ hle hout hstep).reflTransGen
 
 end Prog
 

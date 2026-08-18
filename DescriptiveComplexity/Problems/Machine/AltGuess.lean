@@ -206,11 +206,6 @@ step count, since a universal player is answered by *all* plays at once and
 there is no single run to count.
 -/
 
-variable (k A) in
-/-- The number of positions on the tape: the yardstick a sweep is measured
-against. -/
-noncomputable def altNumPos : ℕ := Nat.card {p : AltV k A // AltPosn p}
-
 /-- **The leftward pass of a universal round accepts**, given that whatever it
 hands over accepts. -/
 theorem altAcc_of_inSweepL {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop} {n' : ℕ}
@@ -654,14 +649,6 @@ theorem state_of_inSweep {i : Fin k} {νs : Fin k → A → Prop} {c : Config (A
 theorem not_acc_of_inSweep {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
     {c : Config (AltV k A)} (hinv : InSweep i νs c) : ¬(altMachine k A cnf).Acc c.state := by
   rcases state_of_inSweep hinv with h | h <;> rw [h] <;> exact not_acc_stG
-
-/-- **The moves of an existential round belong to the machine.** -/
-theorem not_isUniv_of_inSweep {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop}
-    {c : Config (AltV k A)} (hex : blockPol start (i : ℕ) = true) (hinv : InSweep i νs c) :
-    ¬(altMachine k A cnf).IsUniv start c.state := by
-  intro hu
-  rcases state_of_inSweep hinv with h | h <;> rw [h] at hu <;>
-    exact absurd (isUniv_stG.mp hu) (by rw [hex]; exact Bool.noConfusion)
 
 /-- **Any accepting run of a round hands over an assignment.** Whichever player
 owns the block, an accepting configuration has an accepting successor – the one

@@ -142,18 +142,6 @@ theorem dropTag_stateAssign (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignme
     SOBlock.dropTag (stateAssign p ρs) = repBlockAssign X.pointBlock A n ρs :=
   rfl
 
-/-- **Every state whose tag bits name a phase is one of these.** The junk
-assignments — two tag bits set, or none — are the ones no move enters and no
-start sentence admits. -/
-theorem exists_stateAssign (τ : (gameBlock X n T Dm).Assignment A)
-    (h : @Sentence.Realize _ A
-      ((gameBlock X n T Dm).structure₁ (L := L.sum Language.order) τ)
-      (SOBlock.tagGuardF (L := L.sum Language.order) (repMerged X.pointBlock n) (Ph T Dm))) :
-    ∃ (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A), τ = stateAssign p ρs := by
-  obtain ⟨p, ν, rfl⟩ := (SOBlock.realize_tagGuardF (L := L.sum Language.order) τ).mp h
-  obtain ⟨ρs, rfl⟩ := repBlockAssign_split X.pointBlock A n ν
-  exact ⟨p, ρs, rfl⟩
-
 /-! ### Every round holds a point -/
 
 variable (X n)

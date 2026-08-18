@@ -69,7 +69,6 @@ noncomputable def ixIGateTagFam (f₀ : dt.CtlIx → A)
     (dt.ixBack F.toLayout zero one dt.dd0Le st) vAdr (fun _ => st.val)
     (dt.ixGateTagCell F hhas one b) f₀ i
 
-
 variable (vAdr) in
 /-- **The generated family of branch `t`'s domain loop**, at the pack. -/
 noncomputable def ixIGateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
@@ -87,7 +86,6 @@ variable (helt : ∀ (b' : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
   elt (F.toLayout.reg hhas b' c) = dt.blkElt b' (pad zero c))
 variable (hsepP : F.toLayout.NameSep zero dt.dd0Le) (hix : IsLinOrd F.le)
 
-
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A gate's witness chain is blind to the two scratch registers**: it
 reads the VAL register and its background at the working cell. -/
@@ -100,7 +98,6 @@ theorem ixIGateTagFam_congr_scratch {st' : TapeSt dt A R P I}
   rw [ixIGateTagFam, ixIGateTagFam, h.2.2.1]
   exact tagFam_congr_rest (h.ixBack hreg) _ _ _
 
-
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A gate's domain loop is blind to them too.** -/
 theorem ixIGateFam_congr_scratch {st' : TapeSt dt A R P I}
@@ -112,7 +109,6 @@ theorem ixIGateFam_congr_scratch {st' : TapeSt dt A R P I}
       dt.ixIGateFam F hhas one b st' t flag hc hn hrd vAdr f₀ a j := by
   rw [ixIGateFam, ixIGateFam, h.2.2.1]
   exact elemFam_congr_rest (h.ixBack hreg) _ _ _ _
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The loop element is the round's wide tuple**, at every stage of a
@@ -169,7 +165,6 @@ theorem readLvE_ixIGateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
 
 /-! ### The witness chain: read-back and decode -/
 
-
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness flags read back**: after the chain, the flag of tag `t'`
 holds the digit of `t'`'s witness cell in the gated block. -/
@@ -201,7 +196,6 @@ theorem ctlBit_ixIGateTagFam_last (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
   rw [hslot] at hchain
   exact hchain
 
-
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 include hinj helt in
 /-- **The witness flags after the chain read the block value**: the flag of
@@ -225,7 +219,6 @@ theorem ctlBit_ixIGateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     rfl
   rw [hcell]
   exact Iff.rfl
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 include hinj helt in
@@ -255,7 +248,6 @@ theorem igTagsAre_ixIGateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
 
 /-! ### The domain payload at a generated state, and the leaf guards -/
 
-
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The payload a domain leaf spells at a generated state** is the round's
 tuple's. -/
@@ -266,7 +258,6 @@ theorem domPay_ixIGateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
       pad zero fun q => ofLex a (Fin.castLE (hn t) ((domLeafData t r).2 q)) := by
   refine congrArg (pad zero) (funext fun q => ?_)
   exact congrFun (readLvE_ixIGateFam f₀ a j) _
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A domain leaf read's guard holds at its cell.** -/
@@ -289,7 +280,6 @@ theorem ixDomMatch_igateFam (hzo : zero ≠ one) (hix : IsLinOrd F.le)
     simp only [encCoord]
     rw [domPay_ixIGateFam f₀ a j r]
   rw [ixGateECell, hcoord]
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A domain leaf read's guard identifies its cell.** -/
@@ -370,7 +360,6 @@ variable (hrgt₀ : (Slot.reg : dt.SlotIx) ≠ t₀)
 variable (htag : dt.dspTagOf PR.zero PR.one
   (wmBlk (ixAddr eltR st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)) = t)
 variable (f₀ : dt.CtlIx → A)
-
 
 include hrules hR hlin hixR hsepR hbot hv hvi hwkSt hm₀ hwkt₀ hrgt₀ hinjR heltR htag in
 /-- **The gate's machine run**: from the machinery's first phase at the
@@ -517,7 +506,6 @@ section IGateVerdict
 
 variable (hflag : flag = dt.existGateC ∨ flag = dt.allGateC)
 
-
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The domain leaf-read flags read back** at a round's end. -/
 theorem ctlBit_rdf_ixIGateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
@@ -540,7 +528,6 @@ theorem ctlBit_rdf_ixIGateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
       (dt.ixBack F.toLayout zero one dt.dd0Le st) vAdr (fun _ => st.val)
       (dt.ixGateECell F hhas one b t (hn t)) f₀ a)
     (dt.domNr t) r r.isLt
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 include hinj helt in
@@ -576,7 +563,6 @@ theorem domLeafVal_ixIGateFam (hzo : zero ≠ one)
   rw [ixIGateLeafP]
   refine iff_of_eq (congrArg _ (funext fun j => ?_))
   exact congrFun (readLvE_ixIGateFam f₀ a (Fin.last (dt.domNr t))) _
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 include hinj helt in
@@ -718,7 +704,6 @@ theorem readSac_ixIGateIter (hzo : zero ≠ one)
 
 /-! ### The gates' flag rides, and the conjoining exit -/
 
-
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness flags survive a branch's domain loop**: neither the leaf
 reads nor the fold write them, so the conjoining exit still reads the
@@ -780,7 +765,6 @@ theorem ctlBit_tgf_ixIGateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
       exact ih
   rw [ixIGateFam, elemFam, hchain]
   exact hiter a
-
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **Either round flag survives one gate's machinery** — the other
@@ -863,7 +847,6 @@ theorem ctlBit_roundFlag_ixIGateFam {q : dt.CtlIx}
   rw [ixIGateFam, elemFam, hchain, hiter a]
   exact htag
 
-
 include hflag in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The gates' flag survives one gate's machinery**: neither the witness
@@ -943,7 +926,6 @@ theorem ctlBit_flag_ixIGateFam (f₀ : dt.CtlIx → A)
     exact ctlBit_setCtl_of_ne hne _ _
   rw [ixIGateFam, elemFam, hchain, hiter a]
   exact htag
-
 
 include hflag in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
@@ -1038,7 +1020,6 @@ theorem ctlBit_flag_ixIGate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     rw [ctlBit_setSubLeaf hzo]
     exact domLeafVal_ixIGateFam hinj helt hzo _ (toLex topTup)
   exact sacVerdict_iff_foldFrom hacc hleaf
-
 
 include hflag in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in

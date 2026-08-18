@@ -102,11 +102,6 @@ theorem gateFlagC_ne_scratchC (k : Fin 6) : dt.gateFlagC ≠ dt.scratchC k := by
   have h' : (0 : Fin 8) = k.addNat 2 := by injection h
   exact absurd (congrArg Fin.val h') (by simp)
 
-theorem bitFlagC_ne_scratchC (k : Fin 6) : dt.bitFlagC ≠ dt.scratchC k := by
-  intro h
-  have h' : (1 : Fin 8) = k.addNat 2 := by injection h
-  exact absurd (congrArg Fin.val h') (by simp)
-
 /-! ### Distinctness
 
 The roles are disjoint families of the same inductive, so telling them apart
@@ -124,10 +119,6 @@ theorem accC_injective : Function.Injective dt.accC := by
   intro j j' h
   injection h
 
-theorem avC_injective : Function.Injective dt.avC := by
-  intro a a' h
-  injection h
-
 theorem rdfC_injective : Function.Injective dt.rdfC := by
   intro a a' h
   injection h
@@ -136,40 +127,8 @@ theorem tgfC_injective : Function.Injective dt.tgfC := by
   intro a a' h
   injection h
 
-theorem lvC_ne_accC (j : Fin dt.dd0) (k : Fin dt.naDim) : dt.lvC j ≠ dt.accC k :=
-  fun h => nomatch h
-
-theorem lvC_ne_avC (j : Fin dt.dd0) (a : Fin dt.natMax) : dt.lvC j ≠ dt.avC a :=
-  fun h => nomatch h
-
-theorem lvC_ne_rdfC (j : Fin dt.dd0) (a : Fin dt.nfDim) : dt.lvC j ≠ dt.rdfC a :=
-  fun h => nomatch h
-
-theorem lvC_ne_gateFlagC (j : Fin dt.dd0) : dt.lvC j ≠ dt.gateFlagC :=
-  fun h => nomatch h
-
 theorem lvC_ne_bitFlagC (j : Fin dt.dd0) : dt.lvC j ≠ dt.bitFlagC :=
   fun h => nomatch h
-
-theorem accC_ne_avC (k : Fin dt.naDim) (a : Fin dt.natMax) :
-    dt.accC k ≠ dt.avC a := fun h => nomatch h
-
-theorem accC_ne_gateFlagC (k : Fin dt.naDim) : dt.accC k ≠ dt.gateFlagC :=
-  fun h => nomatch h
-
-theorem avC_ne_rdfC (a : Fin dt.natMax) (a' : Fin dt.nfDim) :
-    dt.avC a ≠ dt.rdfC a' := fun h => nomatch h
-
-theorem avC_ne_gateFlagC (a : Fin dt.natMax) : dt.avC a ≠ dt.gateFlagC :=
-  fun h => nomatch h
-
-theorem rdfC_ne_gateFlagC (a : Fin dt.nfDim) : dt.rdfC a ≠ dt.gateFlagC :=
-  fun h => nomatch h
-
-theorem gateFlagC_ne_bitFlagC : dt.gateFlagC ≠ dt.bitFlagC := by
-  intro h
-  have h' : (0 : Fin 8) = 1 := by injection h
-  exact absurd (congrArg Fin.val h') (by decide)
 
 /-! ### Reading and writing one slot -/
 
@@ -206,16 +165,6 @@ theorem setCtl_of_ne {q q' : dt.CtlIx} (hne : q' ≠ q) (b : Prop)
     (f : dt.CtlIx → A) : dt.setCtl zero one q b f q' = f q' := by
   classical
   exact Function.update_of_ne hne _ _
-
-/-- Two writes to distinct slots commute. -/
-theorem setCtl_comm {q q' : dt.CtlIx} (hne : q ≠ q') (b b' : Prop)
-    (f : dt.CtlIx → A) :
-    dt.setCtl zero one q b (dt.setCtl zero one q' b' f) =
-      dt.setCtl zero one q' b' (dt.setCtl zero one q b f) := by
-  classical
-  change Function.update (Function.update f q' _) q _ =
-    Function.update (Function.update f q _) q' _
-  exact Function.update_comm hne.symm _ _ f
 
 end Data
 
@@ -270,10 +219,6 @@ def TupSuccAt (p : Fin D) (t t' : Fin D → A) : Prop :=
   (∀ j, j < p → t j = t' j) ∧
     (t p < t' p ∧ ∀ a : A, ¬(t p < a ∧ a < t' p)) ∧
     ∀ j, p < j → (∀ a : A, a ≤ t j) ∧ (∀ a : A, t' j ≤ a)
-
-omit [Finite A] in
-theorem tupSucc_iff_exists_at (t t' : Fin D → A) :
-    TupSucc t t' ↔ ∃ p : Fin D, TupSuccAt p t t' := Iff.rfl
 
 omit [Finite A] in
 /-- **The carried coordinate is unique**: above it every coordinate is
@@ -363,11 +308,6 @@ theorem readLv_putLv (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) :
   rw [dif_pos hex]
   exact congrArg w (dt.lvC_injective hex.choose_spec).symm
 
-/-- The other slots ride along a write of the loop element. -/
-theorem putLv_flag (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) :
-    dt.putLv f w dt.gateFlagC = f dt.gateFlagC :=
-  putLv_of_not_lv fun _ => fun h => nomatch h
-
 theorem putLv_acc (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) (k : Fin dt.naDim) :
     dt.putLv f w (dt.accC k) = f (dt.accC k) :=
   putLv_of_not_lv fun _ => fun h => nomatch h
@@ -416,10 +356,6 @@ theorem readLvE_putLvE (f : dt.CtlIx → A) (w : Fin dt.eDim → A) :
   rw [dif_pos hex]
   exact congrArg w (dt.lvE_injective hex.choose_spec).symm
 
-/-- The narrow tuple is the first coordinates of the wide one. -/
-theorem readLv_eq_readLvE (f : dt.CtlIx → A) (j : Fin dt.dd0) :
-    dt.readLv f j = dt.readLvE f (Fin.castLE dt.dd0_le_eDim j) := rfl
-
 /-- The accumulators, the verdicts and the flags ride along a write of the
 wide loop element. -/
 theorem putLvE_acc (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (k : Fin dt.naDim) :
@@ -428,10 +364,6 @@ theorem putLvE_acc (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (k : Fin dt.naDi
 
 theorem putLvE_av (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (a : Fin dt.natMax) :
     dt.putLvE f w (dt.avC a) = f (dt.avC a) :=
-  putLvE_of_not_lv fun _ => fun h => nomatch h
-
-theorem putLvE_flag (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (k : Fin 8) :
-    dt.putLvE f w (Ctl.flag k) = f (Ctl.flag k) :=
   putLvE_of_not_lv fun _ => fun h => nomatch h
 
 variable (dt)
@@ -475,20 +407,6 @@ theorem readLvE_initLvE (f : dt.CtlIx → A) : dt.readLvE (dt.initLvE f) = botTu
 @[simp]
 theorem readLv_initLvN (f : dt.CtlIx → A) : dt.readLv (dt.initLvN f) = botTup :=
   readLv_putLv f _
-
-omit [Nonempty A] in
-/-- **A round of the wide loop steps the tuple**, below the top. -/
-theorem tupSucc_advLvE {f : dt.CtlIx → A} (h : ¬dt.IsMaxLvE f) :
-    TupSucc (dt.readLvE f) (dt.readLvE (dt.advLvE f)) := by
-  rw [advLvE, readLvE_putLvE]
-  exact tupSucc_tupNext h
-
-omit [Nonempty A] in
-/-- **A round of the narrow loop steps the tuple**, below the top. -/
-theorem tupSucc_advLvN {f : dt.CtlIx → A} (h : ¬dt.IsMaxLvN f) :
-    TupSucc (dt.readLv f) (dt.readLv (dt.advLvN f)) := by
-  rw [advLvN, readLv_putLv]
-  exact tupSucc_tupNext h
 
 end Data
 

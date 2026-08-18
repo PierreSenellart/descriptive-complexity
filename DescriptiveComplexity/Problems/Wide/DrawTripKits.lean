@@ -314,20 +314,6 @@ private theorem test_partIn :
         (Or.inr (wkOff F hlin hix hnewk hbot hwkLt hwkS m r hbnd)) rfl rfl).2 not_false)
     (w := w) hgap (top := gtop) (bot := gbot) htop hbot
 
-include hrules F hR hlin hix hnerg hnewk htop hbot hwkLt hrg hwkS hcompat hgap in
-/-- The pass down the file, verdict in the state, the budget forgotten. -/
-private theorem test_part :
-    ∃ q : Univ A R P K dd → Prop, WMIncr WMLe q (F.cell gbot) ∧
-      Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-        ⟨Sum.inr (PR.stElt (κ.emb .ty) fc), Sum.inl (F.cell gtop),
-          wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
-        ⟨Sum.inr (accStateAfter ile Test (PR.stElt (κ.emb .ty) fc)
-            (PR.stElt (κ.emb .tn) fc) gbot), Sum.inl q,
-          wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩ := by
-  obtain ⟨q, hq, hrun⟩ := test_partIn hrules F hR hlin hix hnerg hnewk htop hbot hwkLt hrg hwkS
-    hcompat hgap
-  exact ⟨q, hq, hrun.reflTransGen⟩
-
 include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle hgap in
 /-- **The kit runs a passing file test**: from the scan phase anywhere, up to
 the file top, down the file – every register passing – and back to the marker

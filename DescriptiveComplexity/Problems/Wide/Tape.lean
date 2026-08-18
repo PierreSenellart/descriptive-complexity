@@ -186,14 +186,6 @@ noncomputable def midTape {B : Type} (f₀ f₁ : (A → Prop) → B) (s : A →
     (A → Prop) → B :=
   fun r => if WMSetLt WMLe r s then f₁ r else f₀ r
 
-/-- Nothing has been written when the sweep starts. -/
-theorem midTape_bot {B : Type} (h : IsLinOrd (WMLe (A := A))) (f₀ f₁ : (A → Prop) → B) :
-    midTape f₀ f₁ (fun _ => False) = f₀ := by
-  refine funext fun r => if_neg fun hlt => ?_
-  exact ((wmSetLt_iff _ _).mp hlt).2
-    ((isLinOrd_wmSetLe h).2.2.1 r _ ((wmSetLt_iff _ _).mp hlt).1
-      (wmSetLe_of_empty h (fun _ hc => hc) r))
-
 omit [Finite A] in
 /-- The cell the head stands on still holds its old symbol. -/
 theorem midTape_self {B : Type} (f₀ f₁ : (A → Prop) → B) (s : A → Prop) :
@@ -264,17 +256,6 @@ theorem reachesIn_of_wideWrite (h : IsLinOrd (WMLe (A := A))) {q b : A}
       ⟨Sum.inr q, Sum.inl s₁, wideTape (midTape f₀ f₁ s₁) b⟩ :=
   reachesIn_of_wideWriteSt (st := fun _ => q) h hle
     fun r _r' hi hlb hub => hstep r hlb (wmSetLt_of_wmIncr_le h hi hub)
-
-/-- **A writing sweep**, the budget forgotten. -/
-theorem reaches_of_wideWrite (h : IsLinOrd (WMLe (A := A))) {q b : A}
-    {f₀ f₁ : (A → Prop) → A} {s₀ s₁ : A → Prop} (hle : WMSetLe WMLe s₀ s₁)
-    (hstep : ∀ r : A → Prop, WMSetLe WMLe s₀ r → WMSetLt WMLe r s₁ →
-      ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f₀ r) ∧ WMDst τ q ∧ WMWrite τ (f₁ r) ∧
-        WMRight τ) :
-    Relation.ReflTransGen (wideData A).Step
-      ⟨Sum.inr q, Sum.inl s₀, wideTape (midTape f₀ f₁ s₀) b⟩
-      ⟨Sum.inr q, Sum.inl s₁, wideTape (midTape f₀ f₁ s₁) b⟩ :=
-  (reachesIn_of_wideWrite h hle hstep).reflTransGen
 
 /-! ### The two ends of a run -/
 

@@ -347,7 +347,6 @@ theorem uRulesDefinable_nexEvalRuleF {B : Type}
       dt.nexEvalRuleF (B := B) e.zero e.one (args e) :=
   uRulesDefinable_nexEvalRule (uRulesDefinable_nexSmRule h)
 
-
 /-! ### The file-laying sweep's own definability
 
 What `USweepSpecDef` asks of `DescriptiveComplexity.Draw.Data.buildSpec`, one

@@ -114,11 +114,6 @@ def struc [L₁.IsRelational] : L₁.Structure M where
   funMap f := isEmptyElim f
   RelMap {_} r ts := RelMap (F.sym r) fun i => Sum.elim ts w (F.args r i)
 
-theorem relMap_struc [L₁.IsRelational] {k : ℕ} (r : L₁.Relations k) (ts : Fin k → M) :
-    @RelMap _ M (F.struc M w) _ r ts ↔
-      RelMap (F.sym r) fun i => Sum.elim ts w (F.args r i) :=
-  Iff.rfl
-
 /-! ### Realization -/
 
 variable {M w}
@@ -287,7 +282,6 @@ theorem realize_relOnSentenceF (hinj : Function.Injective e)
   | inr a => rfl
 
 end Marked
-
 
 end ParamHom
 

@@ -107,8 +107,6 @@ def effSet : Set M := {x | x ∈ markSet F M ∨ ∀ y : M, y ∉ markSet F M}
 
 variable {F M}
 
-theorem mem_markSet_iff (x : M) : x ∈ markSet F M ↔ RelMap (markSym F) ![x] := Iff.rfl
-
 theorem effSet_nonempty [Nonempty M] : (effSet F M).Nonempty := by
   by_cases h : ∃ x : M, x ∈ markSet F M
   · obtain ⟨x, hx⟩ := h
@@ -119,12 +117,6 @@ theorem effSet_nonempty [Nonempty M] : (effSet F M).Nonempty := by
 theorem effSet_eq_markSet {x : M} (hx : x ∈ markSet F M) : effSet F M = markSet F M := by
   ext y
   exact ⟨fun h => h.elim id fun h' => (h' x hx).elim, Or.inl⟩
-
-/-- The marked part of a structure carrying an assignment of
-`DescriptiveComplexity.markBlock`. -/
-theorem markSet_structure₁ {N : Type} [F.Structure N] (ρ : markBlock.Assignment N) :
-    @markSet F N (markBlock.structure₁ ρ) = {x | ρ () ![x]} :=
-  rfl
 
 variable {N : Type} [(F.sum markBlock.lang).Structure N] (e : M ≃[F.sum markBlock.lang] N)
 

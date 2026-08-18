@@ -205,7 +205,6 @@ noncomputable def ixStageRestF {I : Type} (F : LaidFile dt A R P I)
     (Univ A R P dt.KIx dt.dd → Prop) → dt.SlotIx → A :=
   dt.ixBack F.toLayout zero one dt.dd0Le { st with tgt := m' }
 
-
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [Finite dt.KIx] in
 /-- The destination-dependent background moves only at the TARGET slot. -/
@@ -560,7 +559,6 @@ theorem ixStageTuple_reachesIn (w : ℕ)
       exact hc2
     exact absurd (tup_isTop_iff.mpr hmax (toLex topTup)) (not_le_of_gt ha)
 
-
 end StageTupleRun
 
 end IxLoop
@@ -597,7 +595,6 @@ noncomputable def ixStageFAt {I : Type} (F : LaidFile dt A R P I) {zero : A}
         (dt.ixStageTgt F hhas vi ts { st with sav := ixMark elt v } n)
           (ixStageFAt F hhas one vi ts av st elt v f₀ n) (toLex topTup)
     else ixStageFAt F hhas one vi ts av st elt v f₀ n
-
 
 variable {emb : StagePh (dt.d.B.arity iv) → P} {exitPh : P}
 variable {rEmb : ∀ i : StageSite (dt.d.B.arity iv),
@@ -804,8 +801,6 @@ theorem ixStageChain_reachesIn (w : ℕ)
     (fun j => dt.ixStageFAt F hhasP PR.one vi ts av st elt v f₀ (j : ℕ))
     _ hLoop
   exact hchain
-
-
 
 end IxChain
 
@@ -1048,68 +1043,6 @@ logical interval – holds of the clocked run with no restatement.
 variable {elt : I → Univ A R P dt.KIx dt.dd}
 variable [L.Structure A]
 
-omit [Finite R] [Finite P] in
-/-- **The composed TARGET's argument blocks are the sources'**: after all copy
-loops, block `ℓ` of the address the marks stand for is the position's source
-block – the copy is faithful on the named registers, and an encoding holds no
-other tuples. -/
-theorem wmBlk_ixStageTgt_eq_encMap {one : A} (hinj : Function.Injective elt)
-    (helt : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      elt (F.toLayout.reg hhas b c) = dt.blkElt b (pad zero c))
-    (st : TapeSt dt A R P I) {p : Fin (dt.d.B.arity iv) → dt.X.Map A}
-    (hsrc : ∀ ℓ : Fin (dt.d.B.arity iv),
-      wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
-        encMap dt.ly zero one (p ℓ))
-    (ℓ : Fin (dt.d.B.arity iv)) :
-    wmBlk (ixAddr elt (dt.ixStageTgt F hhas vi ts st (dt.d.B.arity iv)))
-        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx) =
-      encMap dt.ly zero one (p ℓ) := by
-  classical
-  funext w
-  refine propext ⟨fun h => ?_, fun h => ?_⟩
-  · obtain ⟨u, he, hm⟩ := h
-    obtain ⟨ℓ', b, -, hy, hsrcbit⟩ :=
-      (dt.ixStageTgt_iff F hhas vi ts st (dt.d.B.arity iv) u).mp hm
-    rw [hy, ixStageXD, helt] at he
-    have htag := congrArg Prod.fst he
-    have hsnd := congrArg Prod.snd he
-    have hℓ : ℓ' = ℓ := by
-      have h1 : (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ') :
-          Fin dt.ko ⊕ Fin dt.ki)) : Lex (Fin dt.ko ⊕ Fin dt.ki)) =
-          toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ) :
-            Fin dt.ko ⊕ Fin dt.ki)) := by
-        injection htag
-      exact Fin.castLE_injective _ (Sum.inl.inj (congrArg ofLex h1))
-    subst hℓ
-    rw [show w = pad (dd := dt.dd) zero (ofLex b) from hsnd.symm]
-    have hbit : wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ')))
-        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ'))) : Tag R P dt.KIx)
-        (pad (dd := dt.dd) zero (ofLex b)) :=
-      ⟨dt.ixStageXS F hhas vi ts ℓ' b, by rw [ixStageXS, helt]; rfl, hsrcbit⟩
-    rw [hsrc ℓ'] at hbit
-    exact hbit
-  · have hpadded : w = pad (dd := dt.dd) zero (unpad dt.dd0Le w) :=
-      (pad_unpad dt.dd0Le fun j hj => isPad_of_encMap h j hj).symm
-    have hsrcbit : wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) w := by
-      rw [hsrc ℓ]; exact h
-    obtain ⟨u, he, hm⟩ := hsrcbit
-    have hxs : elt (dt.ixStageXS F hhas vi ts ℓ (toLex (unpad dt.dd0Le w))) =
-        ((Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx), w) := by
-      rw [ixStageXS, helt, ofLex_toLex, ← hpadded]
-      rfl
-    refine ⟨dt.ixStageXD F hhas ℓ (toLex (unpad dt.dd0Le w)), ?_, ?_⟩
-    · rw [ixStageXD, helt, ofLex_toLex, ← hpadded]
-      rfl
-    · refine (dt.ixStageTgt_iff F hhas vi ts st (dt.d.B.arity iv) _).mpr
-        ⟨ℓ, toLex (unpad dt.dd0Le w), ℓ.isLt, rfl, ?_⟩
-      have hu : dt.ixStageXS F hhas vi ts ℓ (toLex (unpad dt.dd0Le w)) = u :=
-        hinj (hxs.trans he.symm)
-      rw [hu]
-      exact hm
-
 /-! ### Blindness to the two scratch registers -/
 
 section IxScratch
@@ -1170,7 +1103,6 @@ theorem ixStageFAt_congr_scratch {st' : TapeSt dt A R P I}
     · rw [dif_neg hn, dif_neg hn, ih]
 
 end IxScratch
-
 
 end Data
 

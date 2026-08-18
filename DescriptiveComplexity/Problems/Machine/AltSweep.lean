@@ -94,13 +94,6 @@ theorem valAfter_succ_of_set {i : ℕ}
   obtain ⟨j, hj, hb, hν⟩ := h
   exact valAfter_eq_true.mpr ⟨j, by omega, hb, hν⟩
 
-omit [LinearOrder A] [Finite A] [Nonempty A] in
-/-- The value of a cell never goes back down. -/
-theorem valAfter_mono {i i' : ℕ} (hle : i ≤ i') (h : valAfter νs i x = true) :
-    valAfter νs i' x = true := by
-  obtain ⟨j, hj, hb, hν⟩ := valAfter_eq_true.mp h
-  exact valAfter_eq_true.mpr ⟨j, by omega, hb, hν⟩
-
 /-! ### Changing one block's assignment
 
 The read-off of a round replaces the assignment of the block that has just
@@ -422,12 +415,6 @@ noncomputable def confBack (i : Fin (k + 1)) (p : AltV k A) : Config (AltV k A) 
 
 variable {νs}
 
-/-- The tape reads its own symbol at each marker. -/
-theorem tapeAfter_posEnd (i : ℕ) : tapeAfter νs i (posEnd : AltV k A) = symEnd := rfl
-
-/-- The tape reads its own symbol at each marker. -/
-theorem tapeAfter_posStart (i : ℕ) : tapeAfter νs i (posStart : AltV k A) = symStart := rfl
-
 /-- The tape reads a real cell as the value its variable has accumulated. -/
 theorem tapeAfter_at_cell {m : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell) :
     tapeAfter νs m p = symV (valAfter νs m (p.2 0)) (p.2 0) := by
@@ -578,15 +565,6 @@ theorem steps_sweep {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) + 1 < k) :
   have h3 := steps_back (νs := νs) (cnf := cnf) (i := i) (by omega)
   have h4 := step_next (νs := νs) (cnf := cnf) (i := i) hi
   exact stepsIn_add (stepsIn_add (stepsIn_add h1 ⟨_, h2, rfl⟩) h3) ⟨_, h4, rfl⟩
-
-/-- **The first sweep**, which begins at the left marker. -/
-theorem steps_sweep_zero {cnf : Bool} (hk : 1 + 1 ≤ k) :
-    (altMachine k A cnf).StepsIn (1 + sweepLen k A)
-      (confSweep νs 0 posStart) (confSweep νs (0 + 1) (posCell qbotA)) :=
-  stepsIn_add ⟨_, step_sweepStart (νs := νs) (cnf := cnf) (by omega), rfl⟩
-    (steps_sweep (show ((0 : Fin (k + 1)) : ℕ) + 1 < k by
-      simp only [Fin.val_zero]
-      omega))
 
 end Sweep
 

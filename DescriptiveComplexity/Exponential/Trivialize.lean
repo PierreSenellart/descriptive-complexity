@@ -321,13 +321,6 @@ variable {X} {spec : TCSpec X.E}
 def relNode (a : spec.Node (X.Map A)) : (relSpec X spec).Node (X.trivialize.Map A) :=
   (a.1, fun i => trivIncl (a.2 i))
 
-omit [Finite A] [Nonempty A] in
-theorem relNode_injective : Function.Injective (relNode (X := X) (A := A) (spec := spec)) := by
-  rintro ⟨m, x⟩ ⟨m', x'⟩ h
-  have h1 : m = m' := congrArg Prod.fst h
-  have h2 : (fun i => trivIncl (x i)) = fun i => trivIncl (x' i) := congrArg Prod.snd h
-  exact Prod.ext h1 (funext fun i => trivIncl_injective (congrFun h2 i))
-
 /-- The conjoined marks hold exactly of a tuple of included points. -/
 theorem realize_marks {β : Type} (sel : Fin spec.k → β) (v : β → X.trivialize.Map A) :
     letI := X.trivialize.mapLinearOrder A

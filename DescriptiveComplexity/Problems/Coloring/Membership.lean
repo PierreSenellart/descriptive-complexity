@@ -117,7 +117,6 @@ theorem kCol_sigmaSODefinable (k : ℕ) : SigmaSODefinable 1 (KCol k) := by
 
 end SigmaOne
 
-
 /-! ### Chromatic Number and Clique Cover: the palette as a binary relation -/
 
 section Palette

@@ -183,19 +183,6 @@ private theorem pebbleStage_eq_of_succ_eq {N : ℕ}
         _ = pebbleStage E₀ N := hN
     · rw [le_antisymm hn h]
 
-/-- On a finite type, the limit is the stage at the number of pairs of
-`k`-tuples. -/
-theorem equivK_eq_stage_card (E₀ : PebbleRel A k) :
-    EquivK E₀ = pebbleStage E₀ (Nat.card ((Fin k → A) × (Fin k → A))) := by
-  obtain ⟨N, hle, hN⟩ := exists_pebbleStage_succ_eq E₀
-  funext a b
-  refine propext ⟨fun h => h _, fun h n => ?_⟩
-  rcases Nat.le_total n (Nat.card ((Fin k → A) × (Fin k → A))) with hn | hn
-  · exact pebbleStage_le_of_le E₀ hn a b h
-  · rw [pebbleStage_eq_of_succ_eq hN (hle.trans hn),
-      ← pebbleStage_eq_of_succ_eq hN hle]
-    exact h
-
 /-- **On a finite type the limit is a fixed point of the refinement** – the
 greatest one, by `DescriptiveComplexity.le_equivK`. -/
 theorem pebbleRefine_equivK (E₀ : PebbleRel A k) :

@@ -290,7 +290,6 @@ noncomputable def wideInterp :
 
 end Interp
 
-
 /-! ### The composite's universe is the machine's -/
 
 section Transport
@@ -307,7 +306,6 @@ noncomputable def wideInterpEquiv :
     ((dblWideInterp X d).compLEquiv (dblInterp L).ordExtend A)
 
 end Transport
-
 
 /-! ### The interpreted structure reads the program's table -/
 
@@ -347,7 +345,6 @@ theorem srcReads :
     (Data.regFileMark (srcData_payload_le (relExp X) d)) e rfl
 
 end Reads
-
 
 /-! ### The machine decides the fixed point -/
 
@@ -392,8 +389,6 @@ theorem dwideAcceptSpace_srcEnv_iff :
     (dblWideInterp X d).mapStructure (srcEnv L A).α
   exact (srcDt X d).dwideAcceptSpace_iff_pfpHolds (srcReads X d (srcEnv L A))
     (srcData_dd0_lt (relExp X) d) (srcKIx (relExp X) d) fun _ _ => Iff.rfl
-
-
 
 /-- **The transport from the doubled universe to the instance**, for *any*
 question asked of the emitted machine. Three isomorphisms and nothing else: the
@@ -463,7 +458,6 @@ theorem dwideAcceptSpace_wideInterp_iff {Q₀ : DecisionProblem X.E}
     (hd ((relExp X).Map ((dblInterp L).Map A))).symm
 
 end Correct
-
 
 end Draw
 
@@ -594,8 +588,6 @@ theorem wideAcceptSpace_EXPSPACE_hard : EXPSPACE.Hard WideAcceptSpace :=
 theorem wideAcceptSpace_EXPSPACE_complete : EXPSPACE.Complete WideAcceptSpace :=
   ⟨wideAcceptSpace_mem_EXPSPACE, wideAcceptSpace_EXPSPACE_hard⟩
 
-
 end Umbrella
-
 
 end DescriptiveComplexity

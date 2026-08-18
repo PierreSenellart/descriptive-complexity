@@ -62,17 +62,6 @@ def markOne (L : Language.{0, 0}) {N : Type} [inst : L.Structure N] (c : N) :
     (newLang L).Structure N :=
   @sumStructure L Language.oldMark N inst (oneMark c)
 
-omit [L.IsRelational] in
-theorem relMap_markOne_inl {N : Type} [L.Structure N] (c : N) {n : ℕ} (r : L.Relations n)
-    (x : Fin n → N) :
-    @RelMap (newLang L) N (markOne L c) n (Sum.inl r) x ↔ RelMap r x :=
-  Iff.rfl
-
-omit [L.IsRelational] in
-theorem relMap_markOne_inr {N : Type} [L.Structure N] (c : N) (x : Fin 1 → N) :
-    @RelMap (newLang L) N (markOne L c) 1 (Sum.inr Language.oldSym) x ↔ x 0 = c :=
-  Iff.rfl
-
 /-! ### The block, with a parameter argument
 
 `DescriptiveComplexity.SOBlock.withParam` and its reading at a parameter are
@@ -84,7 +73,6 @@ variable {N : Type}
 theorem SOBlock.atParam_bot (B : SOBlock) (c : N) :
     B.atParam (B.withParam.botAssign N) c = B.botAssign N :=
   rfl
-
 
 /-! ### The parameter substitution -/
 

@@ -90,21 +90,6 @@ theorem dropTag_preAssign (p : Phase) (ρ : B.Assignment A) (σ : M.Assignment A
     SOBlock.dropTag (preAssign p ρ σ) = consAssign ρ σ :=
   rfl
 
-/-- Every state of a prefixed game that carries a phase is of that shape. -/
-theorem preAssign_eq (τ : (preBlock B M).Assignment A) (p : Phase)
-    (hp : ∀ q : Phase, (τ (Sum.inl q) fun i => i.elim0) ↔ q = p) :
-    τ = preAssign p (fun i => τ (Sum.inr (Sum.inl i))) fun j => τ (Sum.inr (Sum.inr j)) := by
-  funext i
-  match i with
-  | Sum.inl q =>
-    funext x
-    haveI : IsEmpty (Fin ((preBlock B M).arity (Sum.inl q))) := inferInstanceAs (IsEmpty (Fin 0))
-    have hx : x = fun i => i.elim0 := funext fun i => isEmptyElim i
-    rw [hx]
-    exact propext (hp q)
-  | Sum.inr (Sum.inl _) => rfl
-  | Sum.inr (Sum.inr _) => rfl
-
 /-! ### Reading the inner game's sentences -/
 
 variable (B M)

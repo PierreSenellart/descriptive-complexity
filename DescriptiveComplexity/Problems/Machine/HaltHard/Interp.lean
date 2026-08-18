@@ -95,12 +95,6 @@ def used : CellTag V → ℕ
   | .cOne => 1
   | _ => 0
 
-theorem used_le_dimOf : ∀ c : CellTag V, used V c ≤ dimOf V
-  | .cBit i => arity_le_dimOf V i
-  | .cFold i => arity_le_dimOf V i
-  | .cOne => dimOf_pos V
-  | .cEndL | .cProc | .cMid | .cGap | .cComL | .cComR | .cEndR => Nat.zero_le _
-
 end CellTag
 
 /-! ### The tags of the drawn instance -/

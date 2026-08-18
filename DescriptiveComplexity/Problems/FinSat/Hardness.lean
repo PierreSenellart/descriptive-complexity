@@ -2203,11 +2203,6 @@ theorem argTup_argAssign (ha₀ : IsBot a₀) (v : (finsatInterp B φ).Map A →
       _ _ _).mpr hl)
 
 omit [L.Structure A] [LinearOrder A] in
-/-- The second point a binary defining formula of the image is read at. -/
-theorem val₂_one (x y : (finsatInterp B φ).Map A) (c : Fin (finsatDim B φ)) :
-    val₂ B φ x y (1, c) = y.2 c := rfl
-
-omit [L.Structure A] [LinearOrder A] in
 /-- **The de Bruijn levels of the arguments of a translated atom**, and the
 values its terms take: in a relational vocabulary every argument is a variable,
 so it has a level, and the value of the term is the context tuple there. -/

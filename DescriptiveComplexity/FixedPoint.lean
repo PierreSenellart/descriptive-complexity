@@ -649,7 +649,6 @@ theorem SigmaSOHornDefinable.compl_lfpDefinable [L.IsRelational] {P : DecisionPr
 
 end OfHorn
 
-
 /-! ### Closure under reductions -/
 
 section Closure

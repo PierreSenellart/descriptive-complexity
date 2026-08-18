@@ -124,36 +124,6 @@ theorem symElt_inj (hc : c ≤ dd) {w w' : Fin c → A}
     (h : symElt (dd := dd) (R := R) (P := P) (K := K) zero w = symElt zero w') : w = w' :=
   pad_injective hc (congrArg Prod.snd h)
 
-/-- **A transition is determined by its rule and its data.** -/
-theorem trElt_inj (hc : c ≤ dd) {r r' : R} {w w' : Fin c → A}
-    (h : trElt (dd := dd) (P := P) (K := K) zero r w = trElt zero r' w') :
-    r = r' ∧ w = w' := by
-  refine ⟨?_, pad_injective hc (congrArg Prod.snd h)⟩
-  have h1 : (Tag.ctrl r : Tag R P K) = Tag.ctrl r' := congrArg Prod.fst h
-  simpa using h1
-
-/-- **The three kinds are disjoint**, by their tags: no element is both a state
-and a symbol. -/
-theorem stateElt_ne_symElt (p : P) (w w' : Fin c → A) :
-    stateElt (dd := dd) (R := R) (K := K) zero p w ≠ symElt zero w' := by
-  intro h
-  have h1 : (Tag.phase p : Tag R P K) = Tag.sym := congrArg Prod.fst h
-  simp at h1
-
-/-- No element is both a transition and a state. -/
-theorem trElt_ne_stateElt (r : R) (p : P) (w w' : Fin c → A) :
-    trElt (dd := dd) (K := K) zero r w ≠ stateElt zero p w' := by
-  intro h
-  have h1 : (Tag.ctrl r : Tag R P K) = Tag.phase p := congrArg Prod.fst h
-  simp at h1
-
-/-- No element is both a transition and a symbol. -/
-theorem trElt_ne_symElt (r : R) (w w' : Fin c → A) :
-    trElt (dd := dd) (P := P) (K := K) zero r w ≠ symElt zero w' := by
-  intro h
-  have h1 : (Tag.ctrl r : Tag R P K) = Tag.sym := congrArg Prod.fst h
-  simp at h1
-
 end Geom
 
 end Draw

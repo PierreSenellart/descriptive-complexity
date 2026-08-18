@@ -115,22 +115,4 @@ theorem sigmaSONewExpDefinable_congr [L.IsRelational] {c d : ℕ} {P Q : Decisio
   · exact (h A).symm.trans (hφ A)
   · exact (h A).trans (hφ A)
 
-/-- **`Σ₁ ⊆ ∃SO[new, exp c d]`**: the same guard, the bound satisfied by inventing
-nothing at all. -/
-theorem SigmaSODefinable.toNewExp [L.IsRelational] {c d : ℕ} {P : DecisionProblem L}
-    (h : SigmaSODefinable 1 P) : SigmaSONewExpDefinable c d P := by
-  obtain ⟨Bs, hk, φ, hφ⟩ := h
-  obtain ⟨B, rfl⟩ : ∃ B, Bs = [B] := by
-    match Bs, hk with
-    | [B], _ => exact ⟨B, rfl⟩
-  refine ⟨B, (soLangEmbed [B] (newLang L)).onSentence (noNewSentence L) ⊓
-    (soLangLift [B] L (newLang L) LHom.sumInl).onSentence φ, ?_⟩
-  intro A instA _ _
-  constructor
-  · intro hP
-    exact ⟨0, Nat.zero_le _, (sorealize_guardNoNew_iff φ A 0).mpr ⟨inferInstance, (hφ A).mp hP⟩⟩
-  · rintro ⟨m, -, hm⟩
-    exact (hφ A).mpr ((sorealize_guardNoNew_iff φ A m).mp hm).2
-
-
 end DescriptiveComplexity

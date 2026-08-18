@@ -190,7 +190,6 @@ variable [Language.wide.Structure
 variable [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
 variable [Finite dt.KIx]
 
-
 /-- **The initial tape is the empty state's background.** -/
 theorem initBack_eq_back
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd))) :
@@ -431,12 +430,6 @@ omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
   [Finite dt.KIx] in
 theorem back_tgt (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
     ∀ r, dt.back wmSeg zero one dt.dd0Le st r .tgt = bitVal zero one (regBit st.tgt r) :=
-  fun _ => rfl
-
-omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
-  [Finite dt.KIx] in
-theorem back_sav (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
-    ∀ r, dt.back wmSeg zero one dt.dd0Le st r .sav = bitVal zero one (regBit st.sav r) :=
   fun _ => rfl
 
 omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]

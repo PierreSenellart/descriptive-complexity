@@ -548,16 +548,6 @@ theorem tupSucc_of_lexRel (hmax : ∀ a : A, a ≤ x mk) (h : lexRel blk mk prot
         exact hmax a, hafter i hi⟩⟩
   · exact absurd hcon (by simp)
 
-/-- Where the marker holds the greatest element, a failed increment says the
-tuple was the greatest. -/
-theorem isTop_of_lexRel (hmax : ∀ a : A, a ≤ x mk) (h : lexRel blk mk prot x false y) :
-    ∀ (i : Fin n) (a : A), a ≤ x (blk i) := by
-  rcases h with ⟨hcon, -⟩ | ⟨-, hall, -⟩
-  · exact absurd hcon (by simp)
-  · intro i a
-    rw [hall i]
-    exact hmax a
-
 open Classical in
 /-- **The increment can always be taken where the tuple is not the greatest**:
 the outcome the relation describes exists. -/
@@ -605,12 +595,6 @@ everything alone. -/
 theorem lexRel_top (hmax : ∀ a : A, a ≤ x mk) (hall : ∀ (i : Fin n) (a : A), a ≤ x (blk i)) :
     lexRel blk mk prot x false x :=
   Or.inr ⟨rfl, fun i => le_antisymm (hmax _) (hall i _), HeadAgree.refl x⟩
-
-/-- A failed increment leaves the heads where they were. -/
-theorem agree_of_lexRel (h : lexRel blk mk prot x false y) : HeadAgree prot x y := by
-  rcases h with ⟨hcon, -⟩ | ⟨-, -, hag⟩
-  · exact absurd hcon (by simp)
-  · exact hag
 
 end Runs
 

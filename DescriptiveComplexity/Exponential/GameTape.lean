@@ -322,14 +322,6 @@ omit [LinearOrder A] in
 theorem machPosn_rightPt : machPosn (rightPt (B := B) (C := C) (dim := dim) a₀) := trivial
 
 omit [LinearOrder A] in
-theorem not_machPosn_valPt (b r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
-    ¬ machPosn (valPt (C := C) (dim := dim) a₀ b r i ā) := id
-
-omit [LinearOrder A] in
-theorem not_machPosn_markPt (b : Bool) :
-    ¬ machPosn (markPt (B := B) (C := C) (dim := dim) a₀ b) := id
-
-omit [LinearOrder A] in
 /-- The two ends of the tape are different points. -/
 theorem leftPt_ne_rightPt (b : Bool) :
     (leftPt (B := B) (C := C) (dim := dim) a₀ b) ≠ rightPt a₀ := by
@@ -357,26 +349,6 @@ theorem valPt_inj_bit {b b' r : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}
   have h1 := congrArg Prod.fst h
   simp only [valPt, Sum.inl.injEq] at h1
   injection h1
-
-omit [LinearOrder A] in
-/-- A cell and a symbol are never the same point. -/
-theorem cellPt_ne_valPt {b r r' : Bool} {i i' : B.ι} {ā : Fin (B.arity i) → A}
-    {ā' : Fin (B.arity i') → A} :
-    cellPt (C := C) (dim := dim) a₀ r i ā ≠ valPt a₀ b r' i' ā' := by
-  intro h
-  have h1 := congrArg Prod.fst h
-  simp only [cellPt, valPt, Sum.inl.injEq, reduceCtorEq] at h1
-
-omit [LinearOrder A] in
-/-- **A cell determines its atom**: two cells of the same region and relation
-variable at different addresses are different points. -/
-theorem cellPt_inj_args (hdim : blockArityBound B ≤ dim) {r : Bool} {i : B.ι}
-    {ā ā' : Fin (B.arity i) → A}
-    (h : cellPt (C := C) (dim := dim) a₀ r i ā = cellPt a₀ r i ā') : ā = ā' := by
-  have hle : B.arity i ≤ dim := (arity_le_blockArityBound B i).trans hdim
-  have h2 := congrArg Prod.snd h
-  rw [← pref_pad a₀ hle ā, ← pref_pad a₀ hle ā']
-  exact congrArg (pref hle) h2
 
 omit [LinearOrder A] in
 /-- The two marks are different symbols, which is how a walk tells the ends of
@@ -439,34 +411,9 @@ theorem cellPt_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) {b b₂ r r₂ 
     exact congrArg (pref hle) (congrArg Prod.snd h)
   rw [hā]
 
-omit [LinearOrder A] in
-/-- **A cell determines its region and its relation variable.** -/
-theorem cellPt_inj_tag {r r' : Bool} {i i' : B.ι} {ā : Fin (B.arity i) → A}
-    {ā' : Fin (B.arity i') → A}
-    (h : cellPt (C := C) (dim := dim) a₀ r i ā = cellPt a₀ r' i' ā') : r = r' ∧ i = i' := by
-  have h1 := congrArg Prod.fst h
-  simp only [cellPt, Sum.inl.injEq, TapeTag.cell.injEq] at h1
-  exact h1
-
-omit [LinearOrder A] in
-/-- **Two cells that are the same point hold the same symbol**, whatever bit it
-carries – which is what a walk needs when it writes back to the cell it has just
-read. -/
-theorem valPt_eq_of_cellPt_eq (hdim : blockArityBound B ≤ dim) {r r' : Bool} {i i' : B.ι}
-    {ā : Fin (B.arity i) → A} {ā' : Fin (B.arity i') → A} (b : Bool)
-    (h : cellPt (C := C) (dim := dim) a₀ r i ā = cellPt a₀ r' i' ā') :
-    valPt (C := C) (dim := dim) a₀ b r i ā = valPt a₀ b r' i' ā' := by
-  obtain ⟨rfl, rfl⟩ := cellPt_inj_tag a₀ h
-  rw [cellPt_inj_args a₀ hdim h]
-
 /-- A cell is in the domain. -/
 theorem machDom_cellPt {carity : C → ℕ} (h₀ : IsBot a₀) (r : Bool) (i : B.ι)
     (ā : Fin (B.arity i) → A) : machDom (dim := dim) carity (cellPt a₀ r i ā) :=
-  canon_pad h₀ _ ā
-
-/-- The symbol of a cell is in the domain. -/
-theorem machDom_valPt {carity : C → ℕ} (h₀ : IsBot a₀) (b r : Bool) (i : B.ι)
-    (ā : Fin (B.arity i) → A) : machDom (dim := dim) carity (valPt a₀ b r i ā) :=
   canon_pad h₀ _ ā
 
 end Points
@@ -773,14 +720,6 @@ theorem assignOfTape_congr (h₀ : IsBot a₀) {t u : Pt B C dim A → Pt B C di
   rw [assignOfTape, assignOfTape,
     h (cellPt a₀ r i ā) (machPosn_cellPt a₀ r i ā) (machDom_cellPt a₀ h₀ r i ā)]
 
-/-- **A tape agreeing with `tapeOfAssign` at the positions holds its two
-assignments.** -/
-theorem assignOfTape_of_agree (h₀ : IsBot a₀) (hdim : blockArityBound B ≤ dim)
-    {t : Pt B C dim A → Pt B C dim A} {ρ σ : B.Assignment A}
-    (h : ∀ p, machPosn p → machDom carity p → t p = tapeOfAssign a₀ hdim ρ σ p) (r : Bool) :
-    assignOfTape a₀ t r = cond r σ ρ := by
-  rw [assignOfTape_congr a₀ h₀ h r, assignOfTape_tapeOfAssign a₀ hdim]
-
 end Agree
 
 /-! ### The initial tape -/
@@ -814,31 +753,7 @@ variable {a₀ hdim}
 theorem machInp_functional {p x y : Pt B C dim A} (hx : machInp a₀ hdim p x)
     (hy : machInp a₀ hdim p y) : x = y := hx.2.trans hy.2.symm
 
-/-- Every position has an input symbol, so no cell falls back to the blank. -/
-theorem exists_machInp {p : Pt B C dim A} (hp : machPosn p) :
-    ∃ x, machInp a₀ hdim p x := ⟨_, hp, rfl⟩
-
 variable (a₀ hdim)
-
-/-- Every cell starts empty, carrying its own address. -/
-theorem gameInitTape_cellPt (r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
-    gameInitTape (C := C) a₀ hdim (cellPt a₀ r i ā) = valPt a₀ false r i ā := by
-  classical
-  rw [gameInitTape, tapeOfAssign_cellPt a₀ hdim _ _ r i ā]
-  cases r <;> simp [emptyAssign]
-
-theorem gameInitTape_leftPt (b : Bool) :
-    gameInitTape (C := C) a₀ hdim (leftPt a₀ b) = markPt a₀ false :=
-  tapeOfAssign_leftPt a₀ hdim _ _ b
-
-theorem gameInitTape_rightPt : gameInitTape (C := C) a₀ hdim (rightPt a₀) = markPt a₀ true :=
-  tapeOfAssign_rightPt a₀ hdim _ _
-
-/-- **The initial tape holds the two empty assignments.** -/
-theorem assignOfTape_gameInitTape (r : Bool) :
-    assignOfTape (C := C) a₀ (gameInitTape a₀ hdim) r = emptyAssign B A := by
-  rw [gameInitTape, assignOfTape_tapeOfAssign a₀ hdim]
-  cases r <;> rfl
 
 end Init
 

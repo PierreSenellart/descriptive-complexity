@@ -356,76 +356,6 @@ noncomputable def nexEntrySt {I : Type}
   bot := fun r => r = v
   ltp := fun _ => False
 
-omit [Fintype dt.CtlIx] [Fintype dt.SlotIx] [Nonempty A] [Finite A] [Finite R']
-  [Finite dt.KIx] [LinearOrder (NexPh (Option dt.KIx) PE)]
-  [Finite (NexPh (Option dt.KIx) PE)] [LinearOrder A] [LinearOrder R']
-  [Language.wide.Structure (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)]
-  [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] in
-/-- **Off the file, the entry state presents the blank tape with the marker
-planted**: the equality the opening's `hbelow` and `habove` ask for, at the
-initial background of a program whose channel marks are blank. -/
-theorem ixBack_nexEntrySt {I : Type}
-    {lay : Layout dt A R' (NexPh (Option dt.KIx) PE) I} {zero one : A}
-    {v r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
-    (hr : ∀ u : I, r ≠ lay.cell u) :
-    dt.ixBack lay zero one dt.dd0Le (dt.nexEntrySt v) r =
-      dt.startBack (fun _ _ => zero) one v r := by
-  classical
-  by_cases hrv : r = v
-  · subst hrv
-    funext s
-    rw [show dt.startBack (fun _ _ => zero) one r r =
-      Function.update (Function.update (fun _ : dt.SlotIx => zero) Slot.wk one)
-        Slot.bot one from if_pos rfl]
-    have hno : ¬∃ u : I, r = lay.cell u := fun hc => hr hc.choose hc.choose_spec
-    have hne : ∀ b : dt.SlotIx, b ≠ Slot.wk → b ≠ Slot.bot →
-        Function.update (Function.update (fun _ : dt.SlotIx => zero) Slot.wk one)
-          Slot.bot one b = zero :=
-      fun b hb hb' => by
-        rw [Function.update_of_ne hb', Function.update_of_ne hb]
-    cases s with
-    | reg => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg hno
-    | regFirst =>
-      rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]
-      exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
-    | regLast =>
-      rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]
-      exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
-    | blk b =>
-      rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]
-      exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
-    | name j => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact dif_neg hno
-    | pdd =>
-      rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]
-      exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
-    | mir => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg fun hc => hc.choose_spec.2
-    | tgt => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg fun hc => hc.choose_spec.2
-    | sav => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg fun hc => hc.choose_spec.2
-    | val => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg fun hc => hc.choose_spec.2
-    | wk =>
-      rw [Function.update_of_ne (by exact fun hc => nomatch hc), Function.update_self]
-      exact bitVal_pos rfl
-    | bot => rw [Function.update_self]; exact bitVal_pos rfl
-    | ltp => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg not_false
-    | old i => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg not_false
-    | new i => rw [hne _ (by exact fun hc => nomatch hc)
-        (by exact fun hc => nomatch hc)]; exact bitVal_neg not_false
-  · rw [dt.startBack_frame hrv]
-    exact dt.ixBack_of_not_reg hr hrv hrv not_false
-      (fun _ => not_false) (fun _ => not_false)
-
 /-- **The clocked program's opening**: the opening step, the **approach walk**
 up to the file's base, the file-laying phase, the walk home with the turn into
 the guess, the *region*-wide guess with its stop and its own walk home, and the
@@ -563,31 +493,6 @@ theorem reachesIn_openingRegion (hcoord : Function.Injective coord)
   exact ((((((TMData.reachesIn_of_step hstart).trans hwalkR).tail henter).trans
     hbuild).tail hmid).trans hguess).tail hexit |>.mono (by omega)
 
-
-omit [Nonempty A] [Finite A] [Finite R'] [Finite dt.KIx]
-  [Finite (NexPh (Option dt.KIx) PE)]
-  [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] in
-/-- **The two exits of the walks home are free at the marker**: the guard they
-fire under says the working marker is here and this cell is no register, and a
-state that keeps its marker at an address off the file says both. So a program
-that walks home to its own marker owes nothing for the turn. -/
-theorem exitG_ixBack_of_wk {I : Type} {F : LaidFile dt A R' (NexPh (Option dt.KIx) PE) I}
-    {st : TapeSt dt A R' (NexPh (Option dt.KIx) PE) I}
-    {v : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
-    (hwk : st.wk v) (hne : ∀ u : I, v ≠ F.cell u)
-    {t : dt.SlotIx} (htw : (Slot.wk : dt.SlotIx) ≠ t)
-    (htr : (Slot.reg : dt.SlotIx) ≠ t) (m : I → Prop) :
-    dt.exitG PR.one (PR.passTracksAt F.cell t
-      (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st) m v) := by
-  refine ⟨?_, ?_⟩
-  · rw [Prog.passTracks_of_ne htw, ixBack_wk]
-    exact bitVal_pos hwk
-  · rw [Prog.passTracks_of_ne htr,
-      show dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st v Slot.reg =
-        bitVal PR.zero PR.one (∃ u : I, v = F.cell u) from rfl,
-      bitVal_neg (fun hc => hne hc.choose hc.choose_spec)]
-    exact PR.zero_ne_one
-
 /-! ### What the guess writes
 
 The stage tracks a clocked program guesses are an assignment's, **restricted to
@@ -627,17 +532,6 @@ theorem not_guessTracks_out
   · exact ((wmSetLt_iff _ _).mp hr).2
       ((isLinOrd_wmSetLe h).2.2.1 r bot ((wmSetLt_iff _ _).mp hr).1 hlo)
   · exact hr hhi
-
-omit [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] in
-/-- **Inside it they are the assignment's** — the evaluation's `hdict`, at every
-address of the stretch. -/
-theorem guessTracks_iff
-    {zero one : A} {σ : dt.d.B.Assignment (dt.X.Map A)}
-    {bot top s : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
-    (hlo : WMSetLe WMLe bot s) (hhi : WMSetLt WMLe s top) (iv : dt.d.B.ι) :
-    dt.guessTracks zero one σ bot top iv s ↔
-      trackOf dt.ly zero one (dt.arOf_le_ko (some iv)) σ s :=
-  ⟨fun h => h.1, fun h => ⟨h, hlo, hhi⟩⟩
 
 /-- **Below the guess's top the tracks are the assignment's, and nothing has to
 be said about the bottom**: a track marks no empty address
@@ -682,106 +576,7 @@ theorem guessTracks_hdict_of_old {I : Type}
   rw [hst]
   exact dt.guessTracks_iff_of_lt h hs₀ harity hhi iv
 
-omit [LinearOrder A] [L.Structure A] in
-/-- **The guess's stretch is not empty**: the last logical address holds every
-argument block, so it is at or above the marker's neighbour as soon as the
-reduction has a block at all. This is the `htop` and the `htopne` the guessing
-phase asks for, at the stretch the certificate lives on. -/
-theorem wmSetLe_succ_bot_logicalTop [Nonempty A]
-    (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
-    {s₀ : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
-    (hs₀ : WMIncr WMLe (fun _ => False) s₀) (i₀ : dt.KIx) :
-    WMSetLe WMLe s₀ (logicalTop (R := R') (P := NexPh (Option dt.KIx) PE)
-      (K := dt.KIx) (V := Fin dt.dd → A)) :=
-  wmSetLe_succ_bot_of_nonempty h hs₀
-    ⟨(Tag.arg i₀, fun _ => Classical.arbitrary A), i₀, rfl⟩
-
 end Guessed
-
-/-- **The clocked program's opening, from the state it starts in**: the same run
-as `reachesIn_openingRegion` with every frame hypothesis discharged – the entry
-state is clear but for the marker (`nexEntrySt`), its background off the file is
-the blank tape (`ixBack_nexEntrySt`), and below the base and past the stretch
-nothing is a register. What is left is what the *guess* decides: the stage
-tracks `σ` it writes, empty outside the region, and the two exit guards. -/
-theorem reachesIn_openingRegion_entry (hcoord : Function.Injective coord)
-    (hR : PR.table.Reads)
-    (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
-    {base : ℕ} (hpos : 0 < base)
-    (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) <
-      Nat.card {p : WPoint (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd) //
-        (wideData (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)).Posn p})
-    {v v' v₁ x s₀ top : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
-    (hv0 : wideRank v = 0)
-    (hle : WMSetLe WMLe v
-      ((dt.blkLaid h hpos (le_of_lt hbase)).cell (blkTop A dt.KIx dt.dd)))
-    (hvi₁ : WMIncr WMLe v v₁) (hwalk : WMSetLe WMLe v₁ x)
-    (hxb : WMIncr WMLe x
-      ((dt.blkLaid h hpos (le_of_lt hbase)).cell (blkBot A dt.KIx dt.dd)))
-    (hs₀ : WMIncr WMLe v s₀)
-    (hvi' : WMIncr WMLe v v')
-    (σ : dt.d.B.ι →
-      (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → Prop)
-    (htop : WMSetLe WMLe s₀ top)
-    (htopne : ∃ y, top y)
-    (hout : ∀ (i : dt.d.B.ι)
-        (r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop),
-      WMSetLt WMLe r s₀ ∨ ¬WMSetLt WMLe r top → ¬σ i r)
-    (hexB : dt.exitG PR.one (PR.passTracksAt
-      (dt.blkLaid h hpos (le_of_lt hbase)).cell Slot.mir
-      (dt.ixBack (dt.blkLaid h hpos (le_of_lt hbase)).toLayout PR.zero PR.one
-        dt.dd0Le (dt.nexEntrySt v)) (fun _ => False) v))
-    (hexG : dt.exitG PR.one (PR.passTracksAt
-      (dt.blkLaid h hpos (le_of_lt hbase)).cell Slot.mir
-      (dt.ixBack (dt.blkLaid h hpos (le_of_lt hbase)).toLayout PR.zero PR.one
-        dt.dd0Le { dt.nexEntrySt v with old := σ }) (fun _ => False) v))
-    {rEmb0 : ∀ i : NexSite SE,
-      NexSh SE (Option dt.KIx) (dt.d.B.ι → Bool) ShE i → R'}
-    (hrules0 : ∀ (i : NexSite SE)
-        (ρ : NexSh SE (Option dt.KIx) (dt.d.B.ι → Bool) ShE i),
-      PR.rules (rEmb0 i ρ) =
-        dt.nexRule PR.one (dt.buildSpec PR.zero PR.one coord)
-          (dt.regionSpec PR.zero PR.one) ruleE evalEntry
-          (blkBot A dt.KIx dt.dd).1 i ρ) :
-    (wideData (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)).ReachesIn
-      (2 * Nat.card (Wide.BlkIx dt.KIx A dt.dd) + 2 * base +
-        ((wideRank top - wideRank s₀) + wideRank top) + 4)
-      ⟨Sum.inr (PR.stElt NexPh.start
-          (dt.ctlOf coord f₀ (blkBot A dt.KIx dt.dd).2)),
-        Sum.inl v,
-        wideTape (PR.trackTapeAt (dt.blkLaid h hpos (le_of_lt hbase)).cell
-          Slot.mir (fun _ _ => PR.zero) (fun _ => False)) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt (NexPh.evalP evalEntry)
-          (dt.ctlOf coord f₀ (blkBot A dt.KIx dt.dd).2)),
-        Sum.inl v',
-        wideTape (PR.trackTapeAt (dt.blkLaid h hpos (le_of_lt hbase)).cell
-          Slot.mir (dt.ixBack (dt.blkLaid h hpos (le_of_lt hbase)).toLayout
-            PR.zero PR.one dt.dd0Le { dt.nexEntrySt v with old := σ })
-            (fun _ => False)) (PR.syElt PR.blank)⟩ := by
-  have hnotcell : ∀ u : Wide.BlkIx dt.KIx A dt.dd,
-      v ≠ (dt.blkLaid h hpos (le_of_lt hbase)).cell u := by
-    intro u hc
-    have := dt.wideRank_blkLaid_cell h hpos (le_of_lt hbase) u
-    rw [← hc, hv0] at this
-    omega
-  exact dt.reachesIn_openingRegion (f₀ := f₀) hcoord hR h hpos hbase
-    (st := dt.nexEntrySt v)
-    (fun _ => not_false) (fun _ => not_false) (fun _ => not_false)
-    (fun _ => not_false)
-    (fun u hc => hnotcell u hc.symm)
-    (fun u hc => hnotcell u hc.symm) (fun _ => not_false) (fun _ _ => not_false)
-    (fun _ _ => not_false) rfl hv0 hle hvi₁ hwalk hxb hs₀ hvi'
-    (bg := fun _ _ => PR.zero) (bg₀ := dt.startBack (fun _ _ => PR.zero) PR.one v)
-    (fun _ hr => dt.startBack_frame hr)
-    (dt.startBack_wr (dt.blkLaid h hpos (le_of_lt hbase)).cell v)
-    (fun _ hr => dt.ixBack_nexEntrySt
-      (dt.not_reg_blkLaid_of_lt h hpos (le_of_lt hbase) hr))
-    (fun _ hr => dt.ixBack_nexEntrySt
-      (dt.not_reg_blkLaid_of_not_lt_top h hpos (le_of_lt hbase) hbase hr))
-    σ htop htopne
-    (fun i r hr => ⟨fun hc => absurd hc (hout i r hr), fun hc => hc.elim⟩)
-    hexB hexG hrules0
-
 
 /-! ### The opening of a program that is handed its file
 
@@ -1034,27 +829,6 @@ theorem openingRegion_le_two_pow {A : Type} [Finite A] [Language.wide.Structure 
   generalize (2 : ℕ) ^ (k * m) = N at htop hbase hfile hpow
   generalize (2 : ℕ) ^ ((k + 1) * m) = P at hpow ⊢
   omega
-
-/-- **The opening of a program whose region is the logical addresses**: the two
-lemmas above composed, with the guess's top a *logical* address – every
-non-argument block empty, which is what the region is
-(`DescriptiveComplexity.Draw.wideRank_lt_two_pow_logical`). What is left to check
-of an instantiation is one inequality in the program's own numbers: the file and
-its base, below the region. -/
-theorem openingLogical_le_two_pow {A R P K : Type} {dd : ℕ}
-    [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-    [Finite A] [Finite R] [Finite P] [Finite K]
-    [Language.wide.Structure (Univ A R P K dd)]
-    {Rn base : ℕ} {top bot : Univ A R P K dd → Prop}
-    (hord : ∀ x y : Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
-    (hm : 3 ≤ Nat.card (Fin dd → A))
-    (htop : ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) →
-      ∀ v : Fin dd → A, ¬top (τ, v))
-    (hbase : base + 1 ≤ 2 ^ (Nat.card K * Nat.card (Fin dd → A)))
-    (hfile : 2 * Rn + 5 ≤ 2 ^ (Nat.card K * Nat.card (Fin dd → A))) :
-    2 * Rn + 2 * base + ((wideRank top - wideRank bot) + wideRank top) + 4 + 1 ≤
-      2 ^ ((Nat.card K + 1) * Nat.card (Fin dd → A)) :=
-  openingRegion_le_two_pow hm (wideRank_lt_two_pow_logical hord htop) hbase hfile
 
 /-- **The region-guessing opening is bounded by the addresses**: its two sweeps
 are each shorter than the number of addresses, so the whole of it is
@@ -1450,8 +1224,6 @@ theorem nexProg_stuck_acceptP (hzo : zero ≠ one)
     (fun r => nexProg_srcPh_ne_acceptP hzo hpl r) hx rfl
 
 end Unique
-
-
 
 end Data
 

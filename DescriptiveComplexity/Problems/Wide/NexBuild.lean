@@ -237,7 +237,6 @@ theorem fcAt_not_cell {tup : I → Fin dt.dd → A}
 
 end Families
 
-
 /-! ### The written symbol -/
 
 section Written
@@ -1110,7 +1109,6 @@ theorem step_homeGuessExit (hR : PR.table.Reads)
           rest m) (PR.syElt PR.blank)⟩ :=
   Prog.step_move hR h hvi (fun _ _ => rfl) (hasRight_homeGuessExit hrulesS f _ hex)
 
-
 /-! ### The opening's steps, at any file
 
 The five steps above read the file only through the *presentation* of the tape –
@@ -1260,7 +1258,6 @@ theorem step_doneBackAny (hR : PR.table.Reads)
     (hasLeft_buildExit hrulesS f (PR.passTracksAt cell Slot.mir rest m v'))
 
 end AnyFile
-
 
 end Home
 

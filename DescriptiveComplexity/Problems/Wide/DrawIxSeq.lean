@@ -97,21 +97,6 @@ omit [Finite I] in
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
   [Finite P] [Nonempty A] [L.IsRelational] in
-/-- **Transporting twice is transporting once**: the pack's content is its
-points, and the proof it carries is irrelevant. -/
-theorem ixKindSemCast_ixKindSemCast (zero one : A) (vi : dt.VarIx)
-    {st st' st'' : TapeSt dt A R P I}
-    (h1 : st.mir = st'.mir) (h2 : st.val = st'.val)
-    (h3 : st'.mir = st''.mir) (h4 : st'.val = st''.val)
-    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (s : dt.IxKindSem (elt := elt) zero one vi st κ) :
-    dt.ixKindSemCast zero one vi h3 h4 κ (dt.ixKindSemCast zero one vi h1 h2 κ s) =
-      dt.ixKindSemCast zero one vi (h1.trans h3) (h2.trans h4) κ s := by
-  cases κ <;> rfl
-
-omit [Finite I] in
-omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
-  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
-  [Finite P] [Nonempty A] [L.IsRelational] in
 /-- **A round trip of transports is the identity** — the shape the VAL
 loop's bridge closes with: the pack leaves the round state, travels to the
 round's own state and to the state its matrix threads, and comes back. -/
@@ -124,17 +109,6 @@ theorem ixKindSemCast_triple (zero one : A) (vi : dt.VarIx)
     dt.ixKindSemCast zero one vi h5 h6 κ
         (dt.ixKindSemCast zero one vi h3 h4 κ
           (dt.ixKindSemCast zero one vi h1 h2 κ s)) = s := by
-  cases κ <;> rfl
-
-omit [Finite I] in
-omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
-  [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] [Finite A] [Finite R]
-  [Finite P] [Nonempty A] [L.IsRelational] in
-/-- **Transporting to the same state is doing nothing.** -/
-theorem ixKindSemCast_self (zero one : A) (vi : dt.VarIx)
-    {st : TapeSt dt A R P I} (h1 : st.mir = st.mir) (h2 : st.val = st.val)
-    (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (s : dt.IxKindSem (elt := elt) zero one vi st κ) :
-    dt.ixKindSemCast zero one vi h1 h2 κ s = s := by
   cases κ <;> rfl
 
 open Classical in
@@ -1139,7 +1113,6 @@ theorem ixMatFs_apply_accC
         rw [dif_neg hn]
       rw [hFa]
       exact ih
-
 
 omit [Finite I] in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in

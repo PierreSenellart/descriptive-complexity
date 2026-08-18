@@ -123,28 +123,6 @@ theorem putSac_of_not_sac {f : dt.CtlIx → A} {b : Fin dt.eDim → Prop}
     dt.putSac zero one f b q = f q :=
   putVec_of_not_mem h
 
-/-- The loop element, the verdicts and the flags ride along a write of the
-accumulators. -/
-theorem putAcc_of_lv (f : dt.CtlIx → A) (b : Fin dt.naDim → Prop) (j : Fin dt.dd0) :
-    dt.putAcc zero one f b (dt.lvC j) = f (dt.lvC j) :=
-  putAcc_of_not_acc fun _ => fun h => nomatch h
-
-theorem putAcc_of_av (f : dt.CtlIx → A) (b : Fin dt.naDim → Prop) (a : Fin dt.natMax) :
-    dt.putAcc zero one f b (dt.avC a) = f (dt.avC a) :=
-  putAcc_of_not_acc fun _ => fun h => nomatch h
-
-theorem putAcc_of_flag (f : dt.CtlIx → A) (b : Fin dt.naDim → Prop) (k : Fin 8) :
-    dt.putAcc zero one f b (Ctl.flag k) = f (Ctl.flag k) :=
-  putAcc_of_not_acc fun _ => fun h => nomatch h
-
-theorem putSac_of_lv (f : dt.CtlIx → A) (b : Fin dt.eDim → Prop) (j : Fin dt.dd0) :
-    dt.putSac zero one f b (dt.lvC j) = f (dt.lvC j) :=
-  putSac_of_not_sac fun _ => fun h => nomatch h
-
-theorem putSac_of_flag (f : dt.CtlIx → A) (b : Fin dt.eDim → Prop) (k : Fin 8) :
-    dt.putSac zero one f b (Ctl.flag k) = f (Ctl.flag k) :=
-  putSac_of_not_sac fun _ => fun h => nomatch h
-
 /-- The inner fold's vector reads back, level by level. -/
 theorem readAcc_putAcc (hzo : zero ≠ one) (f : dt.CtlIx → A)
     (b : Fin dt.naDim → Prop) {j : ℕ} (hj : j < dt.naDim) :
@@ -156,7 +134,6 @@ theorem readSac_putSac (hzo : zero ≠ one) (f : dt.CtlIx → A)
     (b : Fin dt.eDim → Prop) {j : ℕ} (hj : j < dt.eDim) :
     dt.readSac one (dt.putSac zero one f b) j ↔ b ⟨j, hj⟩ :=
   readVec_putVec hzo dt.sacC_injective f b hj
-
 
 /-! ### The leaf flag -/
 
@@ -180,7 +157,6 @@ noncomputable def setLeaf (b : Prop) (f : dt.CtlIx → A) : dt.CtlIx → A :=
 variable {dt zero one}
 
 theorem accC_ne_leafC (j : Fin dt.naDim) : dt.accC j ≠ dt.leafC := fun h => nomatch h
-
 
 theorem leafC_ne_accC (j : Fin dt.naDim) : dt.leafC ≠ dt.accC j := fun h => nomatch h
 
@@ -255,13 +231,6 @@ theorem readAcc_carryAcc (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
         else (pol j = false)) :=
   readAcc_putAcc hzo f _ hj
 
-/-- The leaf flag rides along a write of the accumulators, so a carry may
-read it and rewrite the vector in one step. -/
-theorem ctlBit_leafC_carryAcc (pol : ℕ → Bool) (c : ℕ) (f : dt.CtlIx → A) :
-    dt.ctlBit one (dt.carryAcc zero one pol c f) dt.leafC ↔ dt.ctlBit one f dt.leafC := by
-  rw [carryAcc, ctlBit, ctlBit,
-    putAcc_of_not_acc (fun j => leafC_ne_accC (dt := dt) j)]
-
 /-! ### The same for a sub-fold
 
 An element loop of an atom subroutine folds its own prefix – the defining
@@ -328,11 +297,6 @@ theorem putSac_of_lvE (f : dt.CtlIx → A) (b : Fin dt.eDim → Prop) (j : Fin d
     dt.putSac zero one f b (dt.lvE j) = f (dt.lvE j) :=
   putSac_of_not_sac fun _ => fun h => nomatch h
 
-theorem readSac_initSac (hzo : zero ≠ one) (pol : ℕ → Bool) (f : dt.CtlIx → A)
-    {j : ℕ} (hj : j < dt.eDim) :
-    dt.readSac one (dt.initSac zero one pol f) j ↔ (pol j = false) :=
-  readSac_putSac hzo f _ hj
-
 theorem readSac_carrySac (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
     (f : dt.CtlIx → A) {j : ℕ} (hj : j < dt.eDim) :
     dt.readSac one (dt.carrySac zero one pol c f) j ↔
@@ -348,13 +312,6 @@ theorem readSac_carrySac (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
                   dt.eDim (c + 1))
         else (pol j = false)) :=
   readSac_putSac hzo f _ hj
-
-/-- The sub-fold's leaf flag rides along a write of its accumulators. -/
-theorem ctlBit_subLeafC_carrySac (pol : ℕ → Bool) (c : ℕ) (f : dt.CtlIx → A) :
-    dt.ctlBit one (dt.carrySac zero one pol c f) dt.subLeafC ↔
-      dt.ctlBit one f dt.subLeafC := by
-  rw [carrySac, ctlBit, ctlBit,
-    putSac_of_not_sac (fun j => subLeafC_ne_sacC (dt := dt) j)]
 
 /-- **A sub-fold's verdict is its fold**, by the same chain. -/
 theorem sacVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}

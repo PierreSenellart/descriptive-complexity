@@ -154,14 +154,6 @@ def swapSignInterp : FOInterpretation Language.sat Language.sat Unit 1 where
     | _, .posIn => fun _ => satNegIn.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
     | _, .negIn => fun _ => satPosIn.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
 
-/-- The sign swap is quantifier-free. -/
-theorem swapSignInterp_isQuantifierFree : swapSignInterp.IsQuantifierFree := by
-  intro n R t
-  cases R with
-  | isClause => exact (IsAtomic.rel _ _).isQF
-  | posIn => exact (IsAtomic.rel _ _).isQF
-  | negIn => exact (IsAtomic.rel _ _).isQF
-
 section Characterizations
 
 variable {A : Type} [Language.sat.Structure A]

@@ -289,11 +289,9 @@ theorem realize_pairS (ρ : pairBlock.Assignment A) :
 
 end Tags
 
-
 end Epr
 
 end DescriptiveComplexity
-
 
 /- The vocabulary the points of the expansion are read in lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.epr`. -/
@@ -582,18 +580,6 @@ theorem eltPt_injective : Function.Injective (eltPt (A := A)) := by
     congrArg (fun p => peRel p.1.2) h
   have h3 := congrFun (congrFun h2 x) x
   exact (h3 ▸ (⟨rfl, rfl⟩ : x = x ∧ x = x)).1
-
-theorem pairPt_injective {x y x' y' : A} (h : pairPt x y = pairPt x' y') : x = x' ∧ y = y' := by
-  have h2 : (fun a b : A => a = x ∧ b = y) = (fun a b : A => a = x' ∧ b = y') :=
-    congrArg (fun p => peRel p.1.2) h
-  have h3 := congrFun (congrFun h2 x) y
-  exact h3 ▸ (⟨rfl, rfl⟩ : x = x ∧ y = y)
-
-theorem asgPt_injective : Function.Injective (asgPt (A := A)) := by
-  intro R S h
-  have h2 : peRel (peAssign R) = peRel (peAssign S) :=
-    congrArg (fun p : eprExp.Map A => peRel p.1.2) h
-  exact h2
 
 /-- **Every point is an element, a pair or an assignment**: what the domain
 sentences say, read back. -/

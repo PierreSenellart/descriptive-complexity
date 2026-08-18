@@ -346,12 +346,6 @@ theorem accepts_of_reachesIn {n : ℕ} {c₀ c : Config A} (hinit : M.IsInit c�
   obtain ⟨k, hk, hrun⟩ := hrun
   exact ⟨c₀, c, k, hinit, Nat.lt_of_le_of_lt hk hlt, hrun, hacc⟩
 
-/-- **A budgeted run that ends accepting makes the machine accept in bounded
-space**, the budget forgotten. -/
-theorem acceptsSpace_of_reachesIn {n : ℕ} {c₀ c : Config A} (hinit : M.IsInit c₀)
-    (hrun : M.ReachesIn n c₀ c) (hacc : M.Acc c.state) : M.AcceptsSpace :=
-  ⟨c₀, c, hinit, hrun.reflTransGen, hacc⟩
-
 end Steps
 
 /-- **Well-formedness**, folded into the yes-instances in the style of

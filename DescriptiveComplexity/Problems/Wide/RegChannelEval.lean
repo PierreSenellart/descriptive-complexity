@@ -895,7 +895,6 @@ noncomputable def regGatedSem
       (fun j' st' => dt.gateEnc_regLaid h hord hzo j' st')
       hzo h mV (v := w) j st hg p a hp b
 
-
 /-- **The clocked evaluation at the handed file, with its thread**: the same run
 as `nexIxEvalB_regLaid_reachesIn` with the tape and control families
 *constructed* – the branched thread at the packs the bridges build – so that a
@@ -1065,7 +1064,6 @@ theorem nexIxEvalB_regLaid_thread_reachesIn
     (tOf := tOf) (hwitOf := hwitOf) (hmirL := hmirL) (hbotL := hbotL)
     (hsavL := hsavL) (htgtL := htgtL) (semOf := semOf) (hDom := hDom)
     (hTestOf := hTestOf) (hacc := hacc)
-
 
 open Classical in
 /-- **The clocked evaluation at the handed file, with its thread, whatever the
@@ -1245,8 +1243,6 @@ theorem nexIxEvalB_regLaid_thread_any_reachesIn
     (tOf := tOf) (hwitOf := hwitOf) (hmirL := hmirL) (hbotL := hbotL)
     (hsavL := hsavL) (htgtL := htgtL) (semOf := semOf) (hDom := hDom)
     (hTestOf := hTestOf)
-
-
 
 section Realize
 

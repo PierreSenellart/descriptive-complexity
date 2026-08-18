@@ -280,7 +280,6 @@ theorem realize_tlEqF (x y : γ) :
 
 end Realize
 
-
 /-! ### The two order guards, as formulas -/
 
 section Guards
@@ -419,7 +418,6 @@ noncomputable def tileKernel : tileSOLang.Sentence :=
     (tileHorizC ⊓ (tileVertC ⊓ tileAccC)))))))
 
 end Clauses
-
 
 /-! ### What each clause says -/
 
@@ -560,7 +558,6 @@ theorem realize_tileAccC :
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, w 1, w 2, hw⟩, fun ⟨x, y, t, hx⟩ => ⟨![x, y, t], hx⟩⟩
 
 end ClauseRealize
-
 
 /-! ### The definition -/
 

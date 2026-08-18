@@ -211,10 +211,6 @@ def atomicAgreeOn₂ (S : Set (Σ n, L.Relations n)) (M N : Type) [L.Structure M
     ∀ {l : ℕ} (R : L.Relations l), ⟨l, R⟩ ∈ S → ∀ g : Fin l → Fin k,
       ((RelMap R fun p => v (g p)) ↔ RelMap R fun p => w (g p))
 
-theorem atomicAgreeOn₂_mono [L.Structure M] [L.Structure N] {S S' : Set (Σ n, L.Relations n)}
-    (h : S ⊆ S') : (atomicAgreeOn₂ S' M N k).Le (atomicAgreeOn₂ S M N k) :=
-  fun _ _ hvw => ⟨hvw.1, fun R hR g => hvw.2 R (h hR) g⟩
-
 /-! ### The bare case -/
 
 /-- **Two bare sets with `k` elements each are indistinguishable by `k`

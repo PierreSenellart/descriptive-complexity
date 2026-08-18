@@ -238,16 +238,6 @@ theorem altAcc_of_acc {start : Bool} {n : ℕ} {c : Config A} (h : M.Acc c.state
   | zero => exact h
   | succ n => exact Or.inl h
 
-/-- **Unfolding one step**, in the form the proofs use: with a positive budget
-an accepting configuration either is accepting outright, or hands the choice to
-the player owning its state. -/
-theorem altAcc_succ_iff {start : Bool} {n : ℕ} {c : Config A} :
-    M.AltAcc start (n + 1) c ↔ M.Acc c.state ∨
-      (M.IsUniv start c.state ∧ (∃ c', M.Step c c') ∧
-        ∀ c', M.Step c c' → M.AltAcc start n c') ∨
-      (¬M.IsUniv start c.state ∧ ∃ c', M.Step c c' ∧ M.AltAcc start n c') :=
-  Iff.rfl
-
 /-- **With no universal state the model is the nondeterministic one**: the
 recursion unfolds to “some run of at most `n` steps reaches an accepting
 state”. This is what makes the one-block problem the machine problem of

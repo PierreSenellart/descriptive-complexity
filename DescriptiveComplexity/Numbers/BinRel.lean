@@ -228,7 +228,6 @@ end Finite
 
 end Decode
 
-
 /-! ### Peeling the lowest position -/
 
 section Peel

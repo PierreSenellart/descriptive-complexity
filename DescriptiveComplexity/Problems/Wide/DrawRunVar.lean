@@ -768,7 +768,6 @@ theorem var_run_fail
   exact (dt.var_reachesIn_fail RF hrules hR hlin hix hbot hv hvi hbg wG hwG hflagF
     hns hoff hupd).reflTransGen
 
-
 omit hbgM in
 include hrules hR hlin hix htop hbot hv hvi hbg hflag hbgC hCoff hbotV htopV
   hmV0 hbgO hM0 hfM0 hIncr hOMagree hStore hTestT hTestF in

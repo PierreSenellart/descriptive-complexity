@@ -332,11 +332,6 @@ theorem wtFileSeg_map (s : A → Prop) (x : A) :
     exact h1.trans ⟨fun ⟨ha, hb⟩ => ⟨(wtLe_map e y x).mpr ha, (wtHasFirst_map e y).mpr hb⟩,
       fun ⟨ha, hb⟩ => ⟨(wtLe_map e y x).mp ha, (wtHasFirst_map e y).mp hb⟩⟩
 
-theorem wtPointEquiv_addr (s : A → Prop) :
-    wtPointEquiv e (Sum.inl s) = Sum.inl fun y => s (e.symm y) := rfl
-
-theorem wtPointEquiv_ctrl (x : A) : wtPointEquiv e (Sum.inr x) = Sum.inr (e x) := rfl
-
 /-- The positions correspond: an address of digits is a position, a tile is
 not. -/
 theorem wtPosn_map (p : WPoint A) :

@@ -160,14 +160,6 @@ theorem CtrlCfg.of_walkCfg {ρ₀ σ₀ : spec.B.Assignment A} {p : MachPh V M}
   ⟨h.1, fun _ _ => h₀, hhead, h.2.2.2⟩
 
 omit [L.Structure A] [Finite A] in
-theorem SweptCfg.walkCfg {ρ₀ σ₀ : spec.B.Assignment A} {tgt : Bool} {p : MachPh V M}
-    {d : Config (GamePt spec.B V M A)}
-    (h : SweptCfg a₀ hdim prog.vars ρ₀ σ₀ tgt p d) :
-    ∃ ρ' σ' : spec.B.Assignment A,
-      (∀ rr : Bool, rr ≠ tgt → cond rr σ' ρ' = cond rr σ₀ ρ₀) ∧
-        WalkCfg a₀ hdim prog.vars ρ' σ' p d := h
-
-omit [L.Structure A] [Finite A] in
 theorem SweptCfg.of_ctrlCfg {ρ₀ σ₀ : spec.B.Assignment A} {tgt : Bool} {p : MachPh V M}
     {d : Config (GamePt spec.B V M A)} (h₀ : IsBot a₀)
     (h : CtrlCfg a₀ hdim prog.vars ρ₀ σ₀ p (fun _ => a₀) d) :
@@ -291,7 +283,6 @@ theorem gameStmt_of_ex (h₀ : IsBot a₀)
     rintro _ _ r tgt par ⟨-, -, -, hst, -⟩ _ _ _ _
     exact (huniv _ _ hst
       (by rw [MachPh.isUniv_sweep prog.pol (p := MachPh.sweepPh r tgt .allMove par) rfl]; rfl)).elim
-
 
 omit [Finite A] in
 /-- The chain a sweep's run produces is guarded by *at a universal sweep*. -/

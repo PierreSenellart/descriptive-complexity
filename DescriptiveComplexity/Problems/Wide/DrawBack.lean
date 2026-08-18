@@ -341,16 +341,6 @@ noncomputable def back (cell : Univ A R' P' dt.KIx dt.dd → (Univ A R' P' dt.KI
     (st : TapeStD dt A R' P') (r : Univ A R' P' dt.KIx dt.dd → Prop) : dt.SlotIx → A :=
   dt.ixBack (dt.diagLayout cell) zero one hdd st r
 
-/-- **The elementwise laid file's background is the elementwise background**: the
-two are the same function, so a statement in either form is a statement in the
-other – but `rw` needs to be told, the layouts being different terms. -/
-theorem ixBack_diagLaid (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
-    (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
-    (zero one : A) (hdd : dt.dd0 ≤ dt.dd) (st : TapeStD dt A R' P') :
-    dt.ixBack (dt.diagLaid RF hord).toLayout zero one hdd st =
-      dt.back RF.cell zero one hdd st := rfl
-
-
 section IxSlots
 
 /-! ### The slot equations, at an arbitrary layout
@@ -366,71 +356,11 @@ variable {zero one : A} {hdd : dt.dd0 ≤ dt.dd} {stI : TapeSt dt A R' P' I}
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- The register mark, at an arbitrary layout. -/
-theorem ixBack_reg :
-    ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
-      dt.ixBack lay zero one hdd stI r .reg =
-        bitVal zero one (∃ u : I, r = lay.cell u) :=
-  fun _ => rfl
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The marker slot, at an arbitrary layout. -/
 theorem ixBack_wk :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.ixBack lay zero one hdd stI r .wk = bitVal zero one (stI.wk r) :=
   fun _ => rfl
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- The bottom mark, at an arbitrary layout. -/
-theorem ixBack_bot :
-    ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
-      dt.ixBack lay zero one hdd stI r .bot = bitVal zero one (stI.bot r) :=
-  fun _ => rfl
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- The end mark, at an arbitrary layout. -/
-theorem ixBack_ltp :
-    ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
-      dt.ixBack lay zero one hdd stI r .ltp = bitVal zero one (stI.ltp r) :=
-  fun _ => rfl
-
-open Classical in
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- A name slot, at an arbitrary layout. -/
-theorem ixBack_name (j : Fin dt.dd0) :
-    ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
-      dt.ixBack lay zero one hdd stI r (.name j) =
-        if h : ∃ u : I, r = lay.cell u then lay.arg h.choose (Fin.castLE hdd j)
-        else zero :=
-  fun _ => rfl
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- A stage track, at an arbitrary layout. -/
-theorem ixBack_old (i : dt.d.B.ι) :
-    ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
-      dt.ixBack lay zero one hdd stI r (.old i) = bitVal zero one (stI.old i r) :=
-  fun _ => rfl
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- The next-stage track, at an arbitrary layout. -/
-theorem ixBack_new (i : dt.d.B.ι) :
-    ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
-      dt.ixBack lay zero one hdd stI r (.new i) = bitVal zero one (stI.new i r) :=
-  fun _ => rfl
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- A machine register's slot, at an arbitrary layout. -/
-theorem ixBack_mir_bit (u : I) :
-    dt.ixBack lay zero one hdd stI (lay.cell u) .mir =
-      bitVal zero one (bitAtOf lay.cell stI.mir (lay.cell u)) :=
-  rfl
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
@@ -596,14 +526,6 @@ theorem back_new (i : dt.d.B.ι) :
   fun _ => rfl
 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- A machine register's slot carries its track's register digits – the
-source-slot condition of the copy kits. -/
-theorem back_mir_bit (u : Univ A R' P' dt.KIx dt.dd) :
-    dt.back cell zero one hdd st (cell u) .mir =
-      bitVal zero one (bitAtOf cell st.mir (cell u)) :=
-  rfl
-
-omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **Off the file, a state with no track set presents the blank.** Every slot
 of the background at a cell that is nobody's register is either a permanent
 mark – existentially quantified over the registers, hence false there – or a
@@ -658,20 +580,6 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 theorem scratchEq_scratch (st : TapeStD dt A R' P')
     (X Y : Univ A R' P' dt.KIx dt.dd → Prop) :
     dt.ScratchEq { st with sav := X, tgt := Y } st :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- Rewriting the target alone is a `ScratchEq`. -/
-theorem scratchEq_tgt (st : TapeStD dt A R' P')
-    (Y : Univ A R' P' dt.KIx dt.dd → Prop) :
-    dt.ScratchEq { st with tgt := Y } st :=
-  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
-/-- `ScratchEq` is reflexive. -/
-theorem scratchEq_refl (st : TapeStD dt A R' P') : dt.ScratchEq st st :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
@@ -774,10 +682,7 @@ theorem ScratchEq.back {st st' : TapeStD dt A R' P'} (h : dt.ScratchEq st st')
   dt.back_congr_off_reg h.1 h.2.2.2.2.2.1 h.2.2.2.2.2.2 h.2.2.2.1
     h.2.2.2.2.1 hr
 
-
 section IxName
-
-
 
 /-! ### The navigation by name, at an arbitrary layout
 
@@ -875,16 +780,6 @@ holds. -/
 variable {I : Type} {lay : Layout dt A R' P' I}
 variable {zero one : A} {hdd : dt.dd0 ≤ dt.dd} {stI : TapeSt dt A R' P' I}
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
-
-omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
-  [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
-  [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
-/-- **The register a name identifies**: on a layout with a register per name,
-the one whose block is `b` and whose tuple is the control's, padded. -/
-theorem exists_named (hhas : lay.HasName zero) (b : Fin dt.ko ⊕ Fin dt.ki)
-    (c : Fin dt.dd0 → A) :
-    ∃ u : I, lay.blk u = some b ∧ lay.arg u = padTup zero c :=
-  hhas b c
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]

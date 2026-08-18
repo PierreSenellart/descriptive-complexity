@@ -115,7 +115,6 @@ theorem bitAtOf_congr {I : Type} {cell : I → (A → Prop)} {m m' : I → Prop}
   · exact (hag v fun hc => hr (hc ▸ hv)).mp hm
   · exact (hag v fun hc => hr (hc ▸ hv)).mpr hm
 
-
 namespace IxFile
 
 variable {I : Type} [Finite I] {ile : I → I → Prop} (F : IxFile A I ile)
@@ -902,20 +901,10 @@ theorem reaches_regWalkBack (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A
 /-- **What a track shows at a cell** of the file the input channel marks. -/
 def regBit (m : A → Prop) (r : A → Prop) : Prop := bitAtOf wmSeg m r
 
-/-- The track a program reads through `DescriptiveComplexity.regBit` is the one it
-reads through the interface, at the file of the input channel. -/
-theorem bitAt_wmSegFile (h : IsLinOrd (WMLe (A := A))) : (wmSegFile h).bitAt = regBit (A := A) :=
-  rfl
-
 @[simp]
 theorem regBit_wmSeg (h : IsLinOrd (WMLe (A := A))) (m : A → Prop) (u : A) :
     regBit m (wmSeg u) ↔ m u :=
   (wmSegFile h).bitAt_cell h m u
-
-omit [Finite A] in
-/-- At a cell that is nobody's register a track shows nothing. -/
-theorem regBit_of_not_reg {m r : A → Prop} (hno : ∀ u : A, r ≠ wmSeg u) : ¬regBit m r :=
-  fun hc => hc.elim fun u hu => hno u hu.1
 
 omit [Finite A] in
 /-- **The coherence condition of the three passes, discharged**, at the file the

@@ -124,15 +124,6 @@ theorem eq_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x = 0 ↔ y =
   have hpos := two_pow_pos n
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩ <;> constructor <;> intro <;> omega
 
-/-- A truncated distance keeps the sign of the distance. -/
-theorem truncAt_le_zero_iff : truncAt n x ≤ 0 ↔ x ≤ 0 := by
-  have hpos := two_pow_pos n
-  rcases le_or_gt (2 ^ n) x with hx | hx
-  · rw [truncAt_of_le hx]; omega
-  · rcases le_or_gt x (-(2 ^ n)) with hx' | hx'
-    · rw [truncAt_of_le_neg hx']; omega
-    · rw [truncAt_of_abs_le (by omega) (by omega)]
-
 /-- **Truncating further is coarser**: an equation between distances
 truncated at `2 ^ n` survives truncation at any smaller bound. This is how a
 round is spent – the budget halves, and the invariant still holds. -/

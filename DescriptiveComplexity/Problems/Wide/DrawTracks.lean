@@ -63,12 +63,6 @@ theorem bitVal_iff (hne : zero ≠ one) : bitVal zero one P = one ↔ P := by
   · exact iff_of_true (bitVal_pos hp) hp
   · exact iff_of_false (by rw [bitVal_neg hp]; exact hne) hp
 
-/-- **Two bits are the same element only if they are the same bit.** This is what
-a distinctness obligation of the transition table is discharged from: two rules
-told apart by a single track read different symbols. -/
-theorem bitVal_inj (hne : zero ≠ one) (h : bitVal zero one P = bitVal zero one Q) : P ↔ Q :=
-  ((bitVal_iff hne).symm.trans (by rw [h])).trans (bitVal_iff hne)
-
 /-- Bits that agree are the same element. -/
 theorem bitVal_congr (h : P ↔ Q) : bitVal zero one P = bitVal zero one Q := by
   by_cases hp : P

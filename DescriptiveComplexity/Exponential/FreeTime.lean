@@ -58,13 +58,6 @@ def ptClsSet (c : N) : Set N :=
 
 variable {X}
 
-theorem ptClsSet_nonempty [Nonempty N] (c : N) : (X.ptClsSet c).Nonempty := by
-  by_cases h : ∃ y : N, RelMap X.sameSym ![c, y]
-  · obtain ⟨y, hy⟩ := h
-    exact ⟨y, Or.inl hy⟩
-  · obtain ⟨y⟩ := ‹Nonempty N›
-    exact ⟨y, Or.inr fun w hw => h ⟨w, hw⟩⟩
-
 /-- At a point that carries an order – every point of an order-guessing
 expansion does – the copy it names is its class. -/
 theorem ptClsSet_eq_of_refl {c : N} (h : RelMap X.sameSym ![c, c]) :
@@ -220,7 +213,6 @@ def ptProblem (Q : DecisionProblem X.E) : DecisionProblem X.ptLangOf where
     exact himg ▸ Iff.rfl
 
 /-! ### The reduction reading the copy of the marked point -/
-
 
 /-- The mark, as a symbol of the source vocabulary of the reduction. -/
 noncomputable abbrev oldSymO : (X.ptLangOf.sum Language.order).Relations 1 :=

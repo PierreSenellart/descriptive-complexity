@@ -47,33 +47,17 @@ pairwise distinct constructors. -/
 
 theorem mir_ne_reg : (Slot.mir : dt.SlotIx) ≠ .reg := fun h => nomatch h
 
-theorem val_ne_reg : (Slot.val : dt.SlotIx) ≠ .reg := fun h => nomatch h
-
 theorem tgt_ne_reg : (Slot.tgt : dt.SlotIx) ≠ .reg := fun h => nomatch h
-
-theorem sav_ne_reg : (Slot.sav : dt.SlotIx) ≠ .reg := fun h => nomatch h
 
 theorem regLast_ne_mir : (Slot.regLast : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
-theorem regLast_ne_val : (Slot.regLast : dt.SlotIx) ≠ .val := fun h => nomatch h
-
 theorem regLast_ne_tgt : (Slot.regLast : dt.SlotIx) ≠ .tgt := fun h => nomatch h
-
-theorem regLast_ne_sav : (Slot.regLast : dt.SlotIx) ≠ .sav := fun h => nomatch h
 
 theorem wk_ne_mir : (Slot.wk : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
-theorem wk_ne_val : (Slot.wk : dt.SlotIx) ≠ .val := fun h => nomatch h
-
 theorem wk_ne_tgt : (Slot.wk : dt.SlotIx) ≠ .tgt := fun h => nomatch h
 
-theorem wk_ne_sav : (Slot.wk : dt.SlotIx) ≠ .sav := fun h => nomatch h
-
 theorem tgt_ne_mir : (Slot.tgt : dt.SlotIx) ≠ .mir := fun h => nomatch h
-
-theorem mir_ne_sav : (Slot.mir : dt.SlotIx) ≠ .sav := fun h => nomatch h
-
-theorem sav_ne_tgt : (Slot.sav : dt.SlotIx) ≠ .tgt := fun h => nomatch h
 
 theorem ltp_ne_mir : (Slot.ltp : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
@@ -115,37 +99,9 @@ MIRROR incremented in tow. -/
 def advKit (emb : AdvPh → P) : AdvKit A Q dt.SlotIx P :=
   ⟨.mir, .reg, .regLast, .wk, emb⟩
 
-/-- **The VAL loop's increment**, landing at the marker in the phase of the
-argument block that carried – read off the one-hot `blk` marks. -/
-def valIncrKit (emb : IncrPh (Option (Fin dt.ko ⊕ Fin dt.ki)) → P) :
-    IncrKit A Q dt.SlotIx P (Option (Fin dt.ko ⊕ Fin dt.ki)) where
-  t := .val
-  rg := .reg
-  rl := .regLast
-  wk := .wk
-  bs := fun b => .blk b
-  emb := emb
-
-/-- Clearing the VAL register. -/
-def clearValKit (emb : TrackPh → P) : ClearKit A Q dt.SlotIx P :=
-  ⟨.val, .reg, .regLast, .wk, emb⟩
-
-/-- Clearing the TARGET register, before its blocks are loaded. -/
-def clearTgtKit (emb : TrackPh → P) : ClearKit A Q dt.SlotIx P :=
-  ⟨.tgt, .reg, .regLast, .wk, emb⟩
-
 /-- Clearing the MIRROR register, at a random access's reset. -/
 def clearMirKit (emb : TrackPh → P) : ClearKit A Q dt.SlotIx P :=
   ⟨.mir, .reg, .regLast, .wk, emb⟩
-
-/-- **SAV := MIRROR**, saving the working cell's address across a random
-access. -/
-def savCopyKit (emb : TrackPh → P) : CopyKit A Q dt.SlotIx P :=
-  ⟨.sav, .mir, .reg, .regLast, .wk, emb⟩
-
-/-- **TARGET := SAV**, restoring the target before the seek home. -/
-def tgtRestoreKit (emb : TrackPh → P) : CopyKit A Q dt.SlotIx P :=
-  ⟨.tgt, .sav, .reg, .regLast, .wk, emb⟩
 
 /-- **TARGET := the logical top**: the pattern write of startup – the digit
 set exactly at the argument-tagged cells, read off the one-hot marks. -/
@@ -155,17 +111,6 @@ def tgtTopKit (one : A) (emb : TrackPh → P) : MapKit A Q dt.SlotIx P where
   rl := .regLast
   wk := .wk
   Fb := fun g => ∃ b : Fin dt.ko ⊕ Fin dt.ki, g (.blk (some b)) = one
-  emb := emb
-
-/-- **The VAL = inner-top file test**: the inner valuation is exhausted when
-every register's VAL digit is set exactly at the inner-block cells. -/
-def valTopTestKit (one : A) (emb : TestPh → P) : TestKit A Q dt.SlotIx P where
-  t := .val
-  rg := .reg
-  rl := .regLast
-  wk := .wk
-  TestG := fun g =>
-    (g .val = one ↔ ∃ j : Fin dt.ki, g (.blk (some (Sum.inr j))) = one)
   emb := emb
 
 /-! ### The navigation-by-name trips -/

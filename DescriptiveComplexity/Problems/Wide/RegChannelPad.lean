@@ -252,7 +252,6 @@ variable {PR : Prog A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
   dt.CtlIx dt.SlotIx dt.KIx dt.dd}
 variable {zero : A}
 
-
 /-! ### What a backward reading needs of the rules -/
 
 variable (PR) in
@@ -626,7 +625,6 @@ theorem reachesIn_openingReg (_hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ d
     (fun i r hr => ⟨fun hc => absurd hc (hout i r hr), fun hc => hc.elim⟩) hexG
     (rEmbS := rEmbS) hrulesS (rHomeB := rHomeB) hrulesHB
     (rHomeG := rHomeG) hrulesHG
-
 
 end Facts
 

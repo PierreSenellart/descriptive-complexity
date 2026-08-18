@@ -162,27 +162,6 @@ theorem reachesIn_writeSweepSt (hR : PR.table.Reads)
     hlin hle fun s u hi hlb hub => ?_
   exact PR.step_move hR hlin hi (hframe s u hi hlb hub) (hstep s u hi hlb hub)
 
-/-- **A writing sweep carrying a pointer**, the budget forgotten. -/
-theorem reaches_writeSweepSt (hR : PR.table.Reads)
-    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-    {t : W} {m : I → Prop}
-    {restAt : (Univ A R P K dd → Prop) → (Univ A R P K dd → Prop) → W → A}
-    {p : P} {fc : (Univ A R P K dd → Prop) → Q → A}
-    {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
-    (hframe : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
-      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
-      ∀ r : Univ A R P K dd → Prop, r ≠ s → restAt u r = restAt s r)
-    (hstep : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
-      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
-      PR.HasRight p (fc s) (PR.passTracksAt cell t (restAt s) m s) p (fc u)
-        (PR.passTracksAt cell t (restAt u) m s)) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-      ⟨Sum.inr (PR.stElt p (fc s₀)), Sum.inl s₀,
-        wideTape (PR.trackTapeAt cell t (restAt s₀) m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt p (fc s₁)), Sum.inl s₁,
-        wideTape (PR.trackTapeAt cell t (restAt s₁) m) (PR.syElt PR.blank)⟩ :=
-  (reachesIn_writeSweepSt hR hlin hle hframe hstep).reflTransGen
-
 /-- **A sweep rewriting each cell once**: the background is a function of the
 frontier – everything strictly below has its new value, everything at or above
 its old one – and one rule per cell writes the change as the head leaves. COPY
@@ -267,24 +246,6 @@ theorem reachesIn_installSweep (hR : PR.table.Reads)
     Prog.passTracks_congr (midTape_incr hlin bg₀ bg₁ hi) m]
   exact hstep s u hi hlb hub
 
-/-- **A phase installing a new background over a stretch**, the budget
-forgotten. -/
-theorem reaches_installSweep (hR : PR.table.Reads)
-    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-    {t : W} {m : I → Prop}
-    {bg₀ bg₁ : (Univ A R P K dd → Prop) → W → A}
-    {p : P} {fc : (Univ A R P K dd → Prop) → Q → A}
-    {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
-    (hstep : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
-      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
-      PR.HasRight p (fc s) (PR.passTracksAt cell t bg₀ m s) p (fc u)
-        (PR.passTracksAt cell t bg₁ m s)) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-      ⟨Sum.inr (PR.stElt p (fc s₀)), Sum.inl s₀,
-        wideTape (PR.trackTapeAt cell t (midTape bg₀ bg₁ s₀) m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt p (fc s₁)), Sum.inl s₁,
-        wideTape (PR.trackTapeAt cell t (midTape bg₀ bg₁ s₁) m) (PR.syElt PR.blank)⟩ :=
-  (reachesIn_installSweep hR hlin hle hstep).reflTransGen
 /-- **A phase installing a background that already agrees outside the stretch.**
 The sweep only ever writes inside the stretch, so if the background it is
 installing is the one already there below the start and at or above the end,
@@ -321,27 +282,6 @@ theorem reachesIn_installOut (hR : PR.table.Reads)
   have hrun := reachesIn_installSweep (cell := cell) (bg₀ := bg₀) (bg₁ := bg₁)
     hR hlin hle hstep
   rwa [hstart, hend] at hrun
-
-/-- **A phase installing a background that already agrees outside the stretch**,
-the budget forgotten. -/
-theorem reaches_installOut (hR : PR.table.Reads)
-    (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
-    {t : W} {m : I → Prop}
-    {bg₀ bg₁ : (Univ A R P K dd → Prop) → W → A}
-    {p : P} {fc : (Univ A R P K dd → Prop) → Q → A}
-    {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
-    (hbelow : ∀ r : Univ A R P K dd → Prop, WMSetLt WMLe r s₀ → bg₁ r = bg₀ r)
-    (habove : ∀ r : Univ A R P K dd → Prop, ¬WMSetLt WMLe r s₁ → bg₁ r = bg₀ r)
-    (hstep : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
-      WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →
-      PR.HasRight p (fc s) (PR.passTracksAt cell t bg₀ m s) p (fc u)
-        (PR.passTracksAt cell t bg₁ m s)) :
-    Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
-      ⟨Sum.inr (PR.stElt p (fc s₀)), Sum.inl s₀,
-        wideTape (PR.trackTapeAt cell t bg₀ m) (PR.syElt PR.blank)⟩
-      ⟨Sum.inr (PR.stElt p (fc s₁)), Sum.inl s₁,
-        wideTape (PR.trackTapeAt cell t bg₁ m) (PR.syElt PR.blank)⟩ :=
-  (reachesIn_installOut hR hlin hle hbelow habove hstep).reflTransGen
 
 end Prog
 

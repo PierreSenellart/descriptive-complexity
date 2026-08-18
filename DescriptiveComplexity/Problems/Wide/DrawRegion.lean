@@ -82,18 +82,6 @@ theorem card_drawTag :
     show Nat.card Unit = 1 from Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨()⟩⟩]
   omega
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite A]
-  [Language.wide.Structure (Univ A R P K dd)] in
-/-- **The number of addresses, in the clock's own terms**: the tags times the
-tuples. What `nexProg_wideAccept_of_legs` asks – `(k + j) · m ≤ #addresses` – is
-therefore an equality at `j = |R| + 1 + |P|`, and its `k + 1 < j` is the one
-thing a reduction has to check about its own program: more rule names and phases
-than argument blocks. -/
-theorem card_univ_eq :
-    Nat.card (Univ A R P K dd) =
-      (Nat.card R + 1 + Nat.card P + Nat.card K) * Nat.card (Fin dd → A) := by
-  rw [Univ, Nat.card_prod, card_drawTag]
-
 /-- **A logical address lies in a region of `2 ^ (k · m)` addresses**: its rank
 is below that number, `k` being the argument blocks and `m` the tuples. This is
 the bound every phase of a clocked program run inside the region is charged

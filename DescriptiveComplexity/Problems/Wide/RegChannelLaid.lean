@@ -96,7 +96,6 @@ theorem hasName_regLaid (zero : A)
     (dt.regLaid (A := A) (R' := R') (P' := P') h hord).toLayout.HasName zero :=
   fun b c => ⟨⟨(Tag.arg (toLex b), padTup zero c), harg b c⟩, rfl, rfl⟩
 
-
 /-- **The evaluation's working area lies below the file.** A logical address is
 made of argument elements; the file's registers all hold the least marked
 element, which the reduction places *below* the argument tags. So no address the

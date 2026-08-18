@@ -126,11 +126,6 @@ theorem windowAt_iff {b e x m : A} {w : ℕ} (hw : orank b + w = orank e) :
       rw [decide_eq_false (by omega), Bool.false_and]
       simp
 
-/-- **A window is a function of its two ends.** -/
-theorem windowAt_unique {b e x m m' : A} {w : ℕ} (hw : orank b + w = orank e)
-    (h : WindowAt b e x m) (h' : WindowAt b e x m') : m = m' :=
-  orank_inj (((windowAt_iff hw).mp h).trans ((windowAt_iff hw).mp h').symm)
-
 /-- **A window is always there to be read**: what it reads is at most `x`, hence
 a rank of the universe. -/
 theorem exists_windowAt {b e x : A} {w : ℕ} (hw : orank b + w = orank e) :

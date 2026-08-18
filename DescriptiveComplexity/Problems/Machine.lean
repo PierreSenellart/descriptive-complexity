@@ -121,12 +121,6 @@ polynomial time the machine one. -/
 theorem dtmAccept_mem_NP : DTMAccept ∈ NP :=
   PTIME_subset_NP dtmAccept_mem_PTIME
 
-/-- **Determinism is a special case of nondeterminism**, as a reduction:
-deterministic acceptance reduces to machine acceptance. (Through SAT, by the
-machine characterization of NP – no bespoke interpretation needed.) -/
-theorem dtmAccept_reduces_to_ntmAccept : Nonempty (DTMAccept ≤ᶠᵒ[≤] NTMAccept) :=
-  (mem_NP_iff_le_ntmAccept DTMAccept).mp dtmAccept_mem_NP
-
 /-- **The textbook Grädel-side discharge**: deterministic machine acceptance
 reduces to HORN-SAT, the P-level analogue of
 `DescriptiveComplexity.ntmAccept_reduces_to_sat`. -/
@@ -190,11 +184,5 @@ deterministic. -/
 theorem ntmAcceptSpace_reduces_to_qsat : Nonempty (NTMAcceptSpace ≤ʳᶠᵒ[≤] QSAT) :=
   qsat_PSPACE_hard QSAT ⟨(FOReduction.refl QSAT).toOrdered.toRel⟩ NTMAcceptSpace
     ntmAcceptSpace_sotcDefinable
-
-/-- **Determinism costs nothing in space**, at the level of reductions:
-deterministic space-bounded acceptance also reduces to QSAT. -/
-theorem dtmAcceptSpace_reduces_to_qsat : Nonempty (DTMAcceptSpace ≤ʳᶠᵒ[≤] QSAT) :=
-  qsat_PSPACE_hard QSAT ⟨(FOReduction.refl QSAT).toOrdered.toRel⟩ DTMAcceptSpace
-    dtmAcceptSpace_sotcDefinable
 
 end DescriptiveComplexity

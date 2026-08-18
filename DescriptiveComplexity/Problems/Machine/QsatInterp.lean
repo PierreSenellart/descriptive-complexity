@@ -253,7 +253,6 @@ variable {v : α → A}
 
 end BuilderRealize
 
-
 /-! ### The two shapes of the machine's elements, as formulas -/
 
 section Shapes
@@ -472,8 +471,6 @@ noncomputable def qsatTuringInterp : FOInterpretation qsatOrd Language.turing QT
     | _, .tdst => tdstF (ts 0) (ts 1)
     | _, .twrite => twriteF (ts 0) (ts 1)
     | _, .inp => inpF (ts 0) (ts 1)
-
-
 
 /-! ### Each formula defines its predicate -/
 
@@ -701,8 +698,6 @@ theorem relMap_twrite (p q : QV A) :
   case tProcAcc => exact realize_qCstF rfl rfl
   all_goals exact Iff.rfl
 
-
-
 omit [Finite A] [Nonempty A] in
 theorem relMap_tr (p : QV A) : TMTr (qsatMapEquiv p) ↔ QTr p := by
   rw [TMTr, FOInterpretation.relMap_map]
@@ -834,7 +829,6 @@ theorem relMap_tdst (p q : QV A) : TMDst (qsatMapEquiv p) (qsatMapEquiv q) ↔ Q
         · exact iff_of_false (by exact fun h => h) (fun h => Bool.noConfusion h.1)
     exact key _ rfl rfl rfl rfl
   all_goals exact Iff.rfl
-
 
 /-! ### The reduction -/
 

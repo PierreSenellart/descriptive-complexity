@@ -301,11 +301,6 @@ instance markStructure : L.Structure (MarkPart L M) where
   funMap f := isEmptyElim f
   RelMap {_} r x := RelMap (newSym r) fun i => (x i).val
 
-theorem relMap_markPart {n : ℕ} (r : L.Relations n) (x : Fin n → MarkPart L M) :
-    RelMap r x ↔ RelMap (newSym r) fun i => (x i).val := Iff.rfl
-
-theorem le_markPart [LinearOrder M] (x y : MarkPart L M) : x ≤ y ↔ x.val ≤ y.val := Iff.rfl
-
 variable (B : SOBlock)
 
 /-- **An assignment of the marked part, extended to the whole structure**: it

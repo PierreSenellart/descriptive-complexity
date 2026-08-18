@@ -407,21 +407,6 @@ theorem gameMachine_isUniv (hdim : blockArityBound B ≤ gameDim B V)
 
 /-! ### The two ends, and what a position is -/
 
-/-- **The head starts at the lowest position**, which is the first left
-sentinel – so `DescriptiveComplexity.TMData.IsInit` puts it there. -/
-theorem machine_minPos (hdim : blockArityBound B ≤ gameDim B V)
-    (rule : TrTag B V M → (Fin (gameDim B V) → A) → Prop) (h₀ : IsBot a₀) :
-    MinPos (gameMachine vars pol a₀ hdim rule).Le (gameMachine vars pol a₀ hdim rule).Posn
-      (leftPt a₀ false) :=
-  minPos_leftPt h₀
-
-/-- **A rightward walk ends at the right sentinel.** -/
-theorem machine_maxPos (hdim : blockArityBound B ≤ gameDim B V)
-    (rule : TrTag B V M → (Fin (gameDim B V) → A) → Prop) (h₀ : IsBot a₀) :
-    MaxPos (gameMachine vars pol a₀ hdim rule).Le (gameMachine vars pol a₀ hdim rule).Posn
-      (rightPt a₀) :=
-  maxPos_rightPt h₀
-
 /-- **What a position is**: a left sentinel, a cell, or the right sentinel.
 This is what a walk's step analysis begins with – the head is one of the three,
 and the symbol it reads follows. -/
@@ -510,13 +495,6 @@ theorem not_ctrlStep_of_walk {t : TrTag B V M}
     (h : t.src.kind = .sweep ∨ t.src.kind = .rewind ∨ t.src.kind = .seek) :
     ¬ MachPh.CtrlStep vars natoms t.src t.dst := by
   rcases h with h | h | h <;> simp [MachPh.CtrlStep, h]
-
-omit [LinearOrder A] in
-/-- **The accepting phase is a dead end**: no rule applies in it. -/
-theorem not_gameRule_acc {t : TrTag B V M} {w : Fin (gameDim B V) → A}
-    (h : t.src.kind = .acc) : ¬ gameRule vars natoms concOk isTarget t w := by
-  simp only [gameRule, h, reduceCtorEq, false_and, and_false, or_self, not_false_eq_true,
-    MachPh.CtrlStep]
 
 end Machine
 
@@ -840,14 +818,6 @@ theorem ctrl_cases (hs : t.src.kind ≠ .sweep) (hr : t.src.kind ≠ .rewind)
   · exact absurd h.1 hk
   · exact absurd h.1 hk
 
-/-- **A seek never changes the tape.** -/
-theorem seek_writes_back (hk : t.src.kind = .seek)
-    (h : gameRule vars natoms concOk isTarget t w) : t.rd = t.wr := by
-  rcases seek_cases hk h with ⟨_, hrd, hwr, _⟩ | ⟨_, hrd, _⟩ | ⟨_, hrd, _⟩
-  · rw [hrd, hwr]
-  · exact hrd
-  · exact hrd
-
 /-- **A rewind never changes the tape.** -/
 theorem rewind_writes_back (hk : t.src.kind = .rewind)
     (h : gameRule vars natoms concOk isTarget t w) : t.rd = t.wr := by
@@ -1078,16 +1048,6 @@ theorem succPos_right_unique (hlin : IsLinOrd Le) {p q q' : U}
   · rcases h.2.2.2.2 q' h'.2.1 h'.2.2.1 hle with h1 | h1
     · exact absurd h1.symm h'.2.2.2.1
     · exact h1.symm
-
-/-- **At the end of the tape everything else is behind.** -/
-theorem below_maxPos {h : U} (hmax : MaxPos Le Posn h) {p : U} (hp : Posn p) (hne : p ≠ h) :
-    Le p h ∧ p ≠ h := ⟨hmax.2 p hp, hne⟩
-
-/-- **At the start of the tape nothing is behind.** -/
-theorem not_below_minPos (hlin : IsLinOrd Le) {h : U} (hmin : MinPos Le Posn h) {p : U}
-    (hp : Posn p) : ¬ (Le p h ∧ p ≠ h) := by
-  rintro ⟨hle, hne⟩
-  exact hne (hlin.2.2.1 p h hle (hmin.2 p hp))
 
 end Below
 

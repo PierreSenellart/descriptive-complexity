@@ -72,16 +72,6 @@ def edgeIncidenceInterp :
         Term.equal (Term.var (0, 0)) (Term.var (0, 1)) ⊓
           mgMarked.formula₁ (Term.var (0, 0))
 
-/-- The edge-incidence interpretation is quantifier-free. -/
-theorem edgeIncidenceInterp_isQuantifierFree : edgeIncidenceInterp.IsQuantifierFree := by
-  intro n R t
-  cases R with
-  | elem => exact (IsAtomic.rel _ _).isQF.inf ((IsAtomic.equal _ _).isQF.imp isQF_bot)
-  | fam => exact (IsAtomic.equal _ _).isQF
-  | mem =>
-    exact (IsAtomic.equal _ _).isQF.inf ((IsAtomic.equal _ _).isQF.sup (IsAtomic.equal _ _).isQF)
-  | marked => exact (IsAtomic.equal _ _).isQF.inf (IsAtomic.rel _ _).isQF
-
 section EdgeIncidenceCharacterizations
 
 variable {A : Type} [Language.markedGraph.Structure A]

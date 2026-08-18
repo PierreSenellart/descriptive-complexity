@@ -84,23 +84,6 @@ variable [Finite dt.KIx]
 
 variable {v : Univ A R (P) dt.KIx dt.dd → Prop}
 
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-omit [Finite I] in
-open Classical in
-/-- **What a position writes**: the variable's cell at the marker, nothing
-else. -/
-theorem ixNew_postVarSt (st : TapeSt dt A R (P) I)
-    (m : I → Prop)
-    (i' i : dt.d.B.ι) (b : Prop)
-    (r : Univ A R (P) dt.KIx dt.dd → Prop) :
-    (dt.ixPostVarSt v st m i b).new i' r =
-      (if i' = i ∧ r = v then b else st.new i' r) := rfl
-
 /-! ### The spine's writes -/
 
 section Spine
@@ -129,21 +112,6 @@ abbrev IxWritesNew
     (stOf j.succ).new i' r =
       (if i' = dt.varList.get j ∧ r = v then bOf j
         else (stOf j.castSucc).new i' r)
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-omit [Finite I] in
-include hst in
-/-- The cover equation gives the projection. -/
-theorem ixWritesNew_of_hst : dt.IxWritesNew (v := v) stOf bOf := by
-  classical
-  intro j i' r
-  rw [hst j]
-  rfl
 
 variable (hstN : dt.IxWritesNew (v := v) stOf bOf)
 
@@ -178,55 +146,9 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 omit [Finite I] in
 include hst in
-/-- The stage dictionary rides the spine. -/
-theorem ixSpine_old (k : Fin (dt.nv + 1)) : (stOf k).old = (stOf 0).old :=
-  dt.ixSpineRide hst (fun st => st.old) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-omit [Finite I] in
-include hst in
 /-- The working address rides the spine. -/
 theorem ixSpine_mir (k : Fin (dt.nv + 1)) : (stOf k).mir = (stOf 0).mir :=
   dt.ixSpineRide hst (fun st => st.mir) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-omit [Finite I] in
-include hst in
-/-- The three markers ride the spine. -/
-theorem ixSpine_wk (k : Fin (dt.nv + 1)) : (stOf k).wk = (stOf 0).wk :=
-  dt.ixSpineRide hst (fun st => st.wk) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-omit [Finite I] in
-include hst in
-theorem ixSpine_bot (k : Fin (dt.nv + 1)) : (stOf k).bot = (stOf 0).bot :=
-  dt.ixSpineRide hst (fun st => st.bot) (fun _ _ _ _ => rfl) k
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-omit [Finite I] in
-include hst in
-theorem ixSpine_ltp (k : Fin (dt.nv + 1)) : (stOf k).ltp = (stOf 0).ltp :=
-  dt.ixSpineRide hst (fun st => st.ltp) (fun _ _ _ _ => rfl) k
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (P)]
@@ -535,93 +457,6 @@ section SweepDict
 
 variable {v : Univ A R (P) dt.KIx dt.dd → Prop}
 
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **A sweep rewrites the `new` tracks of exactly the addresses it has
-passed.** The address-by-address induction
-(`DescriptiveComplexity.holds_of_wideRounds`) over the two facts one
-address contributes — its own cell now holds the target (`hat`, which
-`ixNew_last_next` and `ixNew_last_of_false` supply), every other cell is
-untouched (`hoff`, which `ixSpine_new_off` supplies) — with the entry state
-of the next address read off the sweep's own tape family (`hSW`, the
-`hSW` of `DescriptiveComplexity.Draw.Data.reaches_sweep`).
-
-Below the address reached, the tracks are the target; elsewhere they are
-still the sweep's initial ones. Stated for an arbitrary target family `N`,
-so the same lemma serves the stage sweep (`N` the dictionary of
-`d.next σ`) and any other. -/
-theorem ixSweep_new
-    (hlin : IsLinOrd (WMLe (A := Univ A R (P)
-      dt.KIx dt.dd)))
-    {s₀ s₁ : Univ A R (P) dt.KIx dt.dd → Prop}
-    {SW stE : (Univ A R (P) dt.KIx dt.dd →
-      Prop) → TapeSt dt A R (P) I}
-    {N : dt.d.B.ι →
-      (Univ A R (P) dt.KIx dt.dd → Prop) → Prop}
-    (hat : ∀ w, WMSetLe WMLe s₀ w → WMSetLt WMLe w s₁ →
-      ∀ i, ((stE w).new i w ↔ N i w))
-    (hoff : ∀ w, WMSetLe WMLe s₀ w → WMSetLt WMLe w s₁ →
-      ∀ (i : dt.d.B.ι) (r : Univ A R (P)
-        dt.KIx dt.dd → Prop), r ≠ w → ((stE w).new i r ↔ (SW w).new i r))
-    (hSW : ∀ w w', WMIncr WMLe w w' → WMSetLe WMLe s₀ w →
-      WMSetLe WMLe w' s₁ → SW w' = { dt.atSt (stE w) w' with mir := ixMark elt w' }) :
-    ∀ w, WMSetLe WMLe s₀ w → WMSetLe WMLe w s₁ →
-      (∀ (i : dt.d.B.ι) (r : Univ A R (P)
-          dt.KIx dt.dd → Prop),
-        WMSetLe WMLe s₀ r → WMSetLt WMLe r w → ((SW w).new i r ↔ N i r)) ∧
-      (∀ (i : dt.d.B.ι) (r : Univ A R (P)
-          dt.KIx dt.dd → Prop),
-        ¬(WMSetLe WMLe s₀ r ∧ WMSetLt WMLe r w) →
-          ((SW w).new i r ↔ (SW s₀).new i r)) := by
-  classical
-  have hset := isLinOrd_wmSetLe hlin
-  refine holds_of_wideRounds hlin (Q := fun w =>
-    (∀ (i : dt.d.B.ι) (r : Univ A R (P)
-        dt.KIx dt.dd → Prop),
-      WMSetLe WMLe s₀ r → WMSetLt WMLe r w → ((SW w).new i r ↔ N i r)) ∧
-    (∀ (i : dt.d.B.ι) (r : Univ A R (P)
-        dt.KIx dt.dd → Prop),
-      ¬(WMSetLe WMLe s₀ r ∧ WMSetLt WMLe r w) →
-        ((SW w).new i r ↔ (SW s₀).new i r)))
-    ⟨fun i r hlb hlt => ?_, fun _ _ _ => Iff.rfl⟩ ?_
-  · -- nothing is both above and strictly below the start
-    exact absurd (hset.2.2.1 r s₀ ((wmSetLt_iff _ _).mp hlt).1 hlb)
-      ((wmSetLt_iff _ _).mp hlt).2
-  intro w w' hi hlb hub hQ
-  -- the address just swept is in the stretch
-  have hww' : WMSetLt WMLe w w' :=
-    (wmSetLt_iff _ _).mpr ⟨wmSetLe_of_wmIncr hi, ne_of_wmIncr hi⟩
-  have hwS : WMSetLt WMLe w s₁ :=
-    (wmSetLt_iff _ _).mpr
-      ⟨hset.2.1 w w' s₁ (wmSetLe_of_wmIncr hi) hub, fun hc =>
-        ne_of_wmIncr hi (hset.2.2.1 w w' (wmSetLe_of_wmIncr hi) (hc ▸ hub))⟩
-  -- the next address's entry state carries the swept one's tracks
-  have hnew : ∀ (i : dt.d.B.ι)
-      (r : Univ A R (P) dt.KIx dt.dd → Prop),
-      (SW w').new i r = (stE w).new i r := by
-    intro i r
-    rw [hSW w w' hi hlb hub]
-    rfl
-  refine ⟨fun i r hrlb hrlt => ?_, fun i r hout => ?_⟩
-  · rw [hnew i r]
-    rcases eq_or_ne r w with rfl | hne
-    · exact hat r hlb hwS i
-    · have hrw : WMSetLt WMLe r w :=
-        (wmSetLt_iff _ _).mpr
-          ⟨(wmSetLt_iff_of_wmIncr hlin hi r).mp hrlt, hne⟩
-      exact (hoff w hlb hwS i r hne).trans (hQ.1 i r hrlb hrw)
-  · rw [hnew i r]
-    have hne : r ≠ w := fun hc => hout ⟨hc ▸ hlb, hc ▸ hww'⟩
-    refine (hoff w hlb hwS i r hne).trans (hQ.2 i r fun hc => hout ⟨hc.1, ?_⟩)
-    refine (wmSetLt_iff _ _).mpr ⟨hset.2.1 r w w'
-      ((wmSetLt_iff _ _).mp hc.2).1 (wmSetLe_of_wmIncr hi), fun hrw => ?_⟩
-    have hw'w : WMSetLe WMLe w' w := by
-      rw [← hrw]
-      exact ((wmSetLt_iff _ _).mp hc.2).1
-    exact ne_of_wmIncr hi (hset.2.2.1 w w' (wmSetLe_of_wmIncr hi) hw'w)
-
 end SweepDict
 
 /-! ### The address's cell, in dictionary form -/
@@ -634,138 +469,9 @@ variable {ιV : Type} [LinearOrder ιV] [Finite ιV]
 variable (mV : ιV → I → Prop)
 variable (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
 
-omit [LinearOrder R] [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [Finite dt.KIx] in
-omit [Finite I] in
-/-- **At a junk address the cell and the dictionary are both empty**: the
-legs store `False` (`ixNew_last_of_false`) and a track holds nothing where a
-block below the variable's arity encodes no point
-(`DescriptiveComplexity.Draw.not_trackOf_of_notEnc`), so the two readings
-agree there too. -/
-theorem ixNew_last_trackOf_of_junk
-    {stOf : Fin (dt.nv + 1) →
-      TapeSt dt A R (P) I}
-    {bOf : Fin dt.nv → Prop}
-    (hstN : dt.IxWritesNew (v := v) stOf bOf)
-    (hbOf : ∀ j : Fin dt.nv, ¬bOf j)
-    (σ : dt.d.B.Assignment (dt.X.Map A)) (i : dt.d.B.ι)
-    {ℓ₀ : Fin (dt.d.B.arity i)}
-    (hℓ : ∀ p : dt.X.Map A,
-      wmBlk v (argOut dt.ki (Fin.castLE (dt.arOf_le_ko (some i)) ℓ₀)) ≠
-        encMap dt.ly PR.zero PR.one p) :
-    ((stOf (Fin.last dt.nv)).new i v ↔
-      trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some i))
-        (dt.d.next σ) v) :=
-  iff_of_false (dt.ixNew_last_of_false hstN hbOf i)
-    (not_trackOf_of_notEnc (dt.arOf_le_ko (some i)) (dt.d.next σ) hℓ)
-
-include hinj hhasP heltP hix hblkP hmono hup hpassEnc hUse in
-omit [Finite I] [Finite dt.KIx] in
-/-- **At an encoded address the cell holds the dictionary of the next
-stage**: `ixNew_last_next` read through
-`DescriptiveComplexity.Draw.trackOf_of_blocks`, the sweep's mirror
-invariant (`hmir`) turning the address's blocks into the ones the
-machinery read. This is the form the sweep's induction
-(`ixSweep_new`) consumes, and the form the *next* sweep's `hdict` is in. -/
-theorem ixNew_last_trackOf
-    (hlin : IsLinOrd (WMLe (A := Univ A R (P)
-      dt.KIx dt.dd)))
-    (hord : ∀ x y : Univ A R (P) dt.KIx dt.dd,
-      WMLe x y ↔ tagTupleLe x y)
-    {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
-    (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
-      WMIncr F.le (mV a) (mV a'))
-    (hKin : ∀ (a : ιV)
-      (t : Tag R (P) dt.KIx)
-      (w : Fin dt.dd → A), ixAddr elt (mV a) (t, w) →
-        ∃ j : Fin dt.ki, t = argIn dt.ko j)
-    (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
-    (σ : dt.d.B.Assignment (dt.X.Map A))
-    {stOf : Fin (dt.nv + 1) →
-      TapeSt dt A R (P) I}
-    {bOf : Fin dt.nv → Prop}
-    (semOfJ : ∀ (j : Fin dt.nv) (a : ιV),
-      (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-        dt.ixIGPassP (elt := elt) F PR.zero PR.one (dt.varAt j)
-          (dt.ixRoundSt (stOf j.castSucc) (mV a)) ℓ) →
-      ∀ b : Fin (dt.natOf (dt.varAt j)),
-        dt.IxKindSem PR.zero PR.one (dt.varAt j)
-          (dt.ixRoundSt (stOf j.castSucc) (mV a)) elt (dt.kindOf (dt.varAt j) b))
-    (fGOf : Fin dt.nv → dt.CtlIx → A)
-    (hstN : dt.IxWritesNew (v := v) stOf bOf)
-    (hmirOf : ∀ k : Fin (dt.nv + 1), (stOf k).mir = (stOf 0).mir)
-    (holdOf : ∀ k : Fin (dt.nv + 1), (stOf k).old = (stOf 0).old)
-    (hbOf : ∀ j : Fin dt.nv, bOf j ↔
-      dt.accVerdict PR.one (dt.polOf (dt.varAt j))
-        ((dt.varArgsOf PR.zero PR.one (dt.varAt j)).postFold
-          (dt.ixRoundFX (elt := elt) F hinj hhasP heltP
-            (dt.varAt j) (stOf j.castSucc) v mV (semOfJ j)
-            (dt.ixVarFM (elt := elt) F hinj hhasP heltP
-              (dt.varAt j) (stOf j.castSucc) v mV (semOfJ j)
-              (fGOf j) aT) aT)
-          (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le
-            (dt.ixRoundSt (stOf j.castSucc) (mV aT)) v)))
-    (pt : Fin dt.ko → dt.X.Map A) (hmir : ixAddr elt (stOf 0).mir = v)
-    (hpt : ∀ k : Fin dt.ko,
-      wmBlk v (argOut dt.ki k) = encMap dt.ly PR.zero PR.one (pt k))
-    {Below : (Univ A R (P) dt.KIx dt.dd →
-      Prop) → Prop}
-    (hdict : ∀ (iv : dt.d.B.ι) (x : Fin (dt.d.B.arity iv) → dt.X.Map A),
-      Below (tupAddr dt.ly PR.zero PR.one (R := R) (P := P) (ki := dt.ki)
-        (dt.arOf_le_ko (some iv)) x) →
-      ((stOf 0).old iv (tupAddr dt.ly PR.zero PR.one (R := R) (P := P)
-        (ki := dt.ki) (dt.arOf_le_ko (some iv)) x) ↔ σ iv x))
-    (hbelow : ∀ (j : Fin dt.nv) (a : ιV) (iv : dt.d.B.ι)
-      (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf (dt.varAt j))),
-      Below (ixAddr elt (dt.ixStageTgt F hhasP (dt.varAt j) ts
-        { dt.ixRoundSt (stOf j.castSucc) (mV a) with sav := ixMark elt v }
-        (dt.d.B.arity iv))))
-    (hordP : ∀ p q : dt.X.Map A,
-      p ≤ q ↔ (encOrder dt.ly PR.zero PR.one PR.zero_ne_one).le p q)
-    (hsem : ∀ (j : Fin dt.nv) (a : ιV)
-      (hp : ∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-        dt.ixIGPassP (elt := elt) F PR.zero PR.one (dt.varAt j)
-          (dt.ixRoundSt (stOf j.castSucc) (mV a)) ℓ)
-      (b : Fin (dt.natOf (dt.varAt j)))
-      (hmb' : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
-        wmBlk (ixAddr elt (dt.ixRoundSt (stOf j.castSucc) (mV a)).mir)
-          (Tag.arg (toLex ((Sum.inl
-            (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
-            Fin dt.ko ⊕ Fin dt.ki))) :
-            Tag R (P) dt.KIx) =
-          encMap dt.ly PR.zero PR.one
-            (pt (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ))),
-      semOfJ j a hp b = dt.ixPassSem (elt := elt) (F := F) (hpassEnc := hpassEnc) (dt.varAt j)
-        (dt.ixRoundSt (stOf j.castSucc) (mV a)) hp
-        (fun ℓ => pt (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ)) hmb' b)
-    (i : dt.d.B.ι) :
-    ((stOf (Fin.last dt.nv)).new i v ↔
-      trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some i))
-        (dt.d.next σ) v) := by
-  refine (ixNew_last_next (dt := dt) (elt := elt) (F := F) (hinj := hinj)
-    (hhasP := hhasP) (heltP := heltP) (hix := hix) (hblkP := hblkP)
-    (hmono := hmono) (hup := hup) (hpassEnc := hpassEnc) (mV := mV)
-    (hUse := hUse) (hlin := hlin) (hord := hord) (hbotV := hbotV)
-    (hmV0 := hmV0) (hIncr := hIncr) (hKin := hKin) (hTop := hTop) (σ := σ)
-    (semOfJ := semOfJ) (fGOf := fGOf) (hstN := hstN) (hmirOf := hmirOf)
-    (holdOf := holdOf) (hbOf := hbOf) (pt := pt) (hpt := ?_) (hdict := hdict)
-    (hbelow := hbelow) (hordP := hordP) (hsem := hsem) (i := i)).trans
-    (trackOf_of_blocks PR.zero_ne_one (dt.arOf_le_ko (some i)) (dt.d.next σ)
-      (fun ℓ => hpt _)).symm
-  intro k
-  change wmBlk (ixAddr elt (stOf 0).mir)
-    (Tag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
-      Tag R (P) dt.KIx) = _
-  rw [hmir]
-  exact hpt k
-
 end AddrDict
 
 /-! ### The semantic pack, transported along the spine -/
-
 
 /-! ### The per-position families, built -/
 
@@ -812,93 +518,6 @@ noncomputable def ixSpineStOf (k : Fin (dt.nv + 1)) :
     TapeSt dt A R (P) I :=
   (dt.ixSpineNode (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf (k : ℕ)).1
 
-/-- The control family of the spine. -/
-noncomputable def ixSpineFsOf (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
-  (dt.ixSpineNode (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-    mV st₀ f₀ sem₀ tOf (k : ℕ)).2.2
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **The mirror rides the built family** — by construction, not by the
-after-the-fact induction of `ixSpine_mir`. -/
-theorem ixSpineStOf_mir (k : Fin (dt.nv + 1)) :
-    (dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
-  (dt.ixSpineNode (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-    mV st₀ f₀ sem₀ tOf (k : ℕ)).2.1
-
-/-- The packs of the built family: the entry state's, carried. -/
-noncomputable def ixSpineSemOf (j : Fin dt.nv) (a : ιV)
-    (hp : ∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-      dt.ixIGPassP (elt := elt) F PR.zero PR.one (dt.varAt j)
-        (dt.ixRoundSt (dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf
-          j.castSucc) (mV a)) ℓ)
-    (b : Fin (dt.natOf (dt.varAt j))) :
-    dt.IxKindSem PR.zero PR.one (dt.varAt j)
-      (dt.ixRoundSt (dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-        mV st₀ f₀ sem₀ tOf
-        j.castSucc) (mV a)) elt (dt.kindOf (dt.varAt j) b) :=
-  dt.ixSpineSem F PR.zero PR.one (dt.varAt j) mV (sem₀ j)
-    (dt.ixSpineStOf_mir (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf j.castSucc)
-    a hp b
-
-omit [Finite I] [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem ixSpineStOf_zero :
-    dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf 0 = st₀ := rfl
-
-omit [Finite I] [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem ixSpineFsOf_zero :
-    dt.ixSpineFsOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf 0 = f₀ := rfl
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **The control's cover equation** — `ixEvalSpine_run`'s `hfs`. -/
-theorem ixSpineFsOf_succ (j : Fin dt.nv) :
-    dt.ixSpineFsOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf j.succ =
-      dt.ixLegCtl (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
-        (dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf j.castSucc)
-        (tOf j)
-        (dt.ixSpineSemOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf j)
-        (dt.ixSpineFsOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf j.castSucc) := by
-  change (dt.ixSpineNode (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf
-    ((j : ℕ) + 1)).2.2 = _
-  rw [ixSpineNode, dif_pos j.isLt]
-  rfl
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **The tape's cover equation** — `ixEvalSpine_run`'s `hst`. -/
-theorem ixSpineStOf_succ (j : Fin dt.nv) :
-    dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf j.succ =
-      dt.ixPostVarSt v
-        (dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf j.castSucc)
-        (mV aT) (dt.varList.get j)
-        ((dt.varArgsOf PR.zero PR.one (dt.varAt j)).accBit
-          (dt.ixLegCtl (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
-            (dt.ixSpineStOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-              mV st₀ f₀ sem₀ tOf j.castSucc)
-            (tOf j)
-            (dt.ixSpineSemOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-              mV st₀ f₀ sem₀ tOf j)
-            (dt.ixSpineFsOf (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf
-              j.castSucc))) := by
-  change (dt.ixSpineNode (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf
-    ((j : ℕ) + 1)).1 = _
-  rw [ixSpineNode, dif_pos j.isLt]
-  rfl
-
 /-! ### The per-position families, threaded -/
 
 /-- **One node of the spine, threaded**: as
@@ -931,11 +550,6 @@ noncomputable def ixSpineStOfT (k : Fin (dt.nv + 1)) :
     TapeSt dt A R (P) I :=
   (dt.ixSpineNodeT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf (k : ℕ)).1
 
-/-- The threaded control family of the spine. -/
-noncomputable def ixSpineFsOfT (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
-  (dt.ixSpineNodeT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-    mV st₀ f₀ sem₀ tOf (k : ℕ)).2.2
-
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
@@ -945,77 +559,6 @@ theorem ixSpineStOfT_mir (k : Fin (dt.nv + 1)) :
       mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
   (dt.ixSpineNodeT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
     mV st₀ f₀ sem₀ tOf (k : ℕ)).2.1
-
-/-- The packs of the threaded family: the address's entry state's,
-transported to the loop's own states. -/
-noncomputable def ixSpineSemOfT (j : Fin dt.nv)
-    (p : IxScratch dt A R (P) I) (a : ιV)
-    (hp : ∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-      dt.ixIGPassP (elt := elt) F PR.zero PR.one (dt.varAt j)
-        (dt.ixVarRdSt (dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf
-          j.castSucc) p (mV a)) ℓ)
-    (b : Fin (dt.natOf (dt.varAt j))) :
-    dt.IxKindSem PR.zero PR.one (dt.varAt j)
-      (dt.ixMatSt (elt := elt) (dt.varAt j)
-        (dt.ixVarRdSt (dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf
-          j.castSucc) p (mV a)) v (b : ℕ))
-      elt (dt.kindOf (dt.varAt j) b) :=
-  dt.ixSpineSemT F PR.zero PR.one (dt.varAt j) (v := v) mV (sem₀ j)
-    (dt.ixSpineStOfT_mir (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf j.castSucc)
-    p a hp b
-
-omit [Finite I] [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem ixSpineStOfT_zero :
-    dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf 0 = st₀ := rfl
-
-omit [Finite I] [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem ixSpineFsOfT_zero :
-    dt.ixSpineFsOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf 0 = f₀ := rfl
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **The threaded control's cover equation** — `ixEvalSpine_run_thread`'s
-`hfs`. -/
-theorem ixSpineFsOfT_succ (j : Fin dt.nv) :
-    dt.ixSpineFsOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf j.succ =
-      dt.ixLegCtlT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
-        (dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf j.castSucc)
-        (tOf j)
-        (dt.ixSpineSemOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf j)
-        (dt.ixSpineFsOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf j.castSucc) := by
-  change (dt.ixSpineNodeT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf
-    ((j : ℕ) + 1)).2.2 = _
-  rw [ixSpineNodeT, dif_pos j.isLt]
-  rfl
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **The threaded tape's cover equation** — `ixEvalSpine_run_thread`'s
-`hst`. -/
-theorem ixSpineStOfT_succ (j : Fin dt.nv) :
-    dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf j.succ =
-      dt.ixLegStT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
-        (dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf j.castSucc)
-        (tOf j)
-        (dt.ixSpineSemOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf j)
-        (dt.ixSpineFsOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-          mV st₀ f₀ sem₀ tOf j.castSucc) := by
-  change (dt.ixSpineNodeT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf
-    ((j : ℕ) + 1)).1 = _
-  rw [ixSpineNodeT, dif_pos j.isLt]
-  rfl
 
 /-! ### The per-position families, branched
 
@@ -1174,17 +717,6 @@ noncomputable def ixSpineSemOfB (j : Fin dt.nv)
     mV st₀ f₀ semB j.castSucc) hg p a
     hp b
 
-omit [Finite I] [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem ixSpineStOfB_zero :
-    dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ semB 0 = st₀ := rfl
-
-omit [Finite I] [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-theorem ixSpineFsOfB_zero :
-    dt.ixSpineFsOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB 0 = f₀ := rfl
-
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
@@ -1220,97 +752,6 @@ theorem ixSpineStOfB_succ (j : Fin dt.nv) :
   rw [ixSpineNodeB, dif_pos j.isLt]
   rfl
 
-/-- **The verdicts of the branched family**: at each position, the stage
-bit its own leg writes. -/
-noncomputable def ixSpineBitOfB (j : Fin dt.nv) : Prop :=
-  dt.ixLegBitB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
-    (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.castSucc)
-    (dt.ixSpineSemOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j)
-    (dt.ixSpineFsOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.castSucc)
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **The branched family writes what a spine writes** — the projection of
-the cover equation the `new` tracks read, which is all the dictionary
-lemmas ask of a leg (`DescriptiveComplexity.Draw.Data.ixLegStB_new`). -/
-theorem ixSpineStOfB_writesNew :
-    dt.IxWritesNew (v := v) (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ semB)
-      (dt.ixSpineBitOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB) := by
-  intro j i' r
-  rw [dt.ixSpineStOfB_succ (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j,
-    dt.ixLegStB_new (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j _ _ _ i' r]
-  rfl
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **A field no leg writes rides the branched spine.** -/
-theorem ixSpineRideB {β : Sort _}
-    (G : TapeSt dt A R (P) I → β)
-    (hF : ∀ (j : Fin dt.nv)
-      (st : TapeSt dt A R (P) I)
-      (semT : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st →
-        ∀ (p : IxScratch dt A R (P) I) (a : ιV),
-        (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-          dt.ixIGPassP (elt := elt) F PR.zero PR.one (dt.varAt j)
-            (dt.ixVarRdSt st p (mV a)) ℓ) →
-        ∀ b : Fin (dt.natOf (dt.varAt j)),
-          dt.IxKindSem PR.zero PR.one (dt.varAt j)
-            (dt.ixMatSt (elt := elt) (dt.varAt j) (dt.ixVarRdSt st p (mV a)) v (b : ℕ))
-            elt (dt.kindOf (dt.varAt j) b))
-      (f : dt.CtlIx → A),
-      G (dt.ixLegStB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j st semT f) = G st)
-    (k : Fin (dt.nv + 1)) :
-    G (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ semB k) = G st₀ := by
-  obtain ⟨n, hn⟩ := k
-  induction n with
-  | zero => rfl
-  | succ n ih =>
-    have hnv : n < dt.nv := Nat.lt_of_succ_lt_succ hn
-    have hstep := dt.ixSpineStOfB_succ (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ semB
-      ⟨n, hnv⟩
-    exact Eq.trans (congrArg G hstep) (Eq.trans (hF _ _ _ _) (ih _))
-
-omit [Finite R] [Finite (P)] [Finite dt.KIx]
-  [LinearOrder (dt.X.Map A)] [Finite ιV] in
-omit [Finite I] in
-/-- **A field a threaded leg leaves alone rides the whole spine** — the
-twin of `DescriptiveComplexity.Draw.Data.ixSpineRide` at the legs the
-threaded family is built from. -/
-theorem ixSpineRideT {β : Sort _}
-    (G : TapeSt dt A R (P) I → β)
-    (hF : ∀ (j : Fin dt.nv)
-      (st : TapeSt dt A R (P) I)
-      (tOf' : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
-      (semT : ∀ (p : IxScratch dt A R (P) I)
-        (a : ιV),
-        (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
-          dt.ixIGPassP (elt := elt) F PR.zero PR.one (dt.varAt j)
-            (dt.ixVarRdSt st p (mV a)) ℓ) →
-        ∀ b : Fin (dt.natOf (dt.varAt j)),
-          dt.IxKindSem PR.zero PR.one (dt.varAt j)
-            (dt.ixMatSt (elt := elt) (dt.varAt j) (dt.ixVarRdSt st p (mV a)) v (b : ℕ))
-            elt (dt.kindOf (dt.varAt j) b))
-      (f : dt.CtlIx → A),
-      G (dt.ixLegStT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-        mV j st tOf' semT f) = G st)
-    (k : Fin (dt.nv + 1)) :
-    G (dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf k) = G st₀ := by
-  obtain ⟨n, hn⟩ := k
-  induction n with
-  | zero => rfl
-  | succ n ih =>
-    have hnv : n < dt.nv := Nat.lt_of_succ_lt_succ hn
-    have hstep := dt.ixSpineStOfT_succ (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ sem₀ tOf
-      ⟨n, hnv⟩
-    exact Eq.trans (congrArg G hstep) (Eq.trans (hF _ _ _ _ _) (ih _))
-
 /-! ### The branched spine's dictionary at one address
 
 Gating is per variable, and so is the reading: at an address whose blocks
@@ -1319,128 +760,6 @@ step of the iteration there; where one of them does not, the position takes
 an ungated leg, writes `False`, and the dictionary is `False` too. Nothing
 is assumed of the *other* variables' blocks — which is what a sweep needs,
 since it passes every address. -/
-
-include hinj hhasP heltP hix hblkP hmono hup hpassEnc hgateEnc hUse in
-omit [Finite dt.KIx] [Finite I] in
-/-- **What the branched spine leaves at one address, per variable.** -/
-theorem ixNew_last_trackOf_B
-    (hlin : IsLinOrd (WMLe (A := Univ A R (P)
-      dt.KIx dt.dd)))
-    (hord : ∀ x y : Univ A R (P) dt.KIx dt.dd,
-      WMLe x y ↔ tagTupleLe x y)
-    {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
-    (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
-      WMIncr F.le (mV a) (mV a'))
-    (hKin : ∀ (a : ιV)
-      (t : Tag R (P) dt.KIx)
-      (w : Fin dt.dd → A), ixAddr elt (mV a) (t, w) →
-        ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
-    (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
-    (hreg : ¬∃ u : I, v = F.cell u)
-    (hordP : ∀ p q : dt.X.Map A,
-      p ≤ q ↔ (encOrder dt.ly PR.zero PR.one PR.zero_ne_one).le p q)
-    (σ : dt.d.B.Assignment (dt.X.Map A))
-    (hmir₀ : ixAddr elt st₀.mir = v)
-    {Below : (Univ A R (P) dt.KIx dt.dd →
-      Prop) → Prop}
-    (hdict : ∀ (iv : dt.d.B.ι) (x : Fin (dt.d.B.arity iv) → dt.X.Map A),
-      Below (tupAddr dt.ly PR.zero PR.one (R := R) (P := P) (ki := dt.ki)
-        (dt.arOf_le_ko (some iv)) x) →
-      (st₀.old iv (tupAddr dt.ly PR.zero PR.one (R := R) (P := P)
-        (ki := dt.ki) (dt.arOf_le_ko (some iv)) x) ↔ σ iv x))
-    (hbelow : ∀ (j : Fin dt.nv) (a : ιV) (iv : dt.d.B.ι)
-      (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf (dt.varAt j)))
-      (st : TapeSt dt A R (P) I),
-      Below (ixAddr elt (dt.ixStageTgt F hhasP (dt.varAt j) ts
-        { dt.ixRoundSt st (mV a) with sav := ixMark elt v }
-        (dt.d.B.arity iv))))
-    (i : dt.d.B.ι) :
-    ((dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀
-        (fun w j st hg => dt.ixGatedSem (elt := elt)
-          F hpassEnc hgateEnc PR.zero_ne_one hlin mV (v := w) j st hg)
-        (Fin.last dt.nv)).new i v ↔
-      trackOf dt.ly PR.zero PR.one (dt.arOf_le_ko (some i)) (dt.d.next σ) v) := by
-  classical
-  obtain ⟨j, hj⟩ := dt.exists_varList_get i
-  subst hj
-  set semB : ∀ (w : Univ A R (P) dt.KIx dt.dd →
-      Prop) (j : Fin dt.nv)
-      (st : TapeSt dt A R (P) I),
-      dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st → _ :=
-    fun w j st hg => dt.ixGatedSem (elt := elt)
-      F hpassEnc hgateEnc PR.zero_ne_one hlin mV (v := w) j st hg
-    with hsemB
-  set stj := dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-    mV st₀ f₀ semB j.castSucc
-    with hstj
-  have hmirj : stj.mir = st₀.mir :=
-    dt.ixSpineStOfB_mir (elt := elt) F hinj hhasP heltP mV st₀ f₀ semB j.castSucc
-  have holdj : stj.old = st₀.old :=
-    dt.ixSpineRideB (elt := elt) F hinj hhasP heltP mV st₀ f₀ semB (fun st => st.old)
-      (fun j' st' semT f' =>
-        (dt.ixLegStB_fields (elt := elt) (aT := aT) F hinj hhasP heltP
-          mV j' st' semT f').2.2.2.1) j.castSucc
-  have hwr := dt.ixSpineStOfB_writesNew (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-    mV st₀ f₀ semB
-  by_cases hg : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j stj
-  · -- the blocks below this variable's arity encode: the cell is one step
-    have hmb : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
-        dt.ixMirBlk st₀ (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) =
-          encMap dt.ly PR.zero PR.one
-            ((ixIsEnc_of_gatedAt (dt := dt) (elt := elt) (F := F) (hgateEnc := hgateEnc)
-        j stj hg ℓ).choose) :=
-      fun ℓ => (congrFun (ixMirBlk_of_mir (elt := elt) hmirj) _).symm.trans
-        ((ixIsEnc_of_gatedAt (dt := dt) (elt := elt) (F := F) (hgateEnc := hgateEnc)
-        j stj hg ℓ).choose_spec)
-    refine (ixNew_last_next_at (dt := dt) (elt := elt) (F := F) (hinj := hinj)
-      (hhasP := hhasP) (heltP := heltP) (hix := hix) (hblkP := hblkP)
-      (hmono := hmono) (hup := hup) (hpassEnc := hpassEnc) (mV := mV)
-      (hUse := hUse) (hlin := hlin) (hord := hord) (hbotV := hbotV)
-      (hmV0 := hmV0) (hIncr := hIncr) (hKin := hKin) (hTop := hTop) (σ := σ)
-      (j := j)
-      (semOfJ := dt.ixGatedSem₀ (elt := elt) F hpassEnc hgateEnc PR.zero_ne_one
-        hlin mV j stj hg)
-      (fG := dt.ixVarFG (PR := PR) F hhasP (dt.varAt j) stj v
-        (dt.ixTagAt (PR := PR) (elt := elt) j stj)
-        (dt.ixSpineFsOfB (elt := elt) F hinj hhasP heltP mV st₀ f₀ semB
-          j.castSucc))
-      (hstN := hwr) (hmirOf := hmirj) (holdOf := holdj)
-      (hbj := iff_of_eq (ixLegBitB_gatedSem (dt := dt) (elt := elt) (F := F)
-        (hinj := hinj) (hhasP := hhasP) (heltP := heltP)
-        (hpassEnc := hpassEnc) (hgateEnc := hgateEnc) (hzo := PR.zero_ne_one)
-        (hlin := hlin)
-        (hreg := hreg) (mV := mV) (j := j) (st := stj) (hg := hg) (f₀ :=
-        dt.ixSpineFsOfB (elt := elt) F hinj hhasP heltP mV st₀ f₀ semB
-          j.castSucc)))
-      (hmb := hmb) (hdict := hdict)
-      (hbelow := fun a iv' ts => hbelow j a iv' ts _) (hordP := hordP)
-      (hsem := fun _ _ _ _ => rfl)).trans ?_
-    refine (trackOf_of_blocks PR.zero_ne_one (dt.arOf_le_ko
-      (some (dt.varList.get j))) (dt.d.next σ) (fun ℓ => ?_)).symm
-    rw [← hmir₀]
-    exact hmb ℓ
-  · -- one of them does not: the position writes `False`, and so does the
-    -- dictionary
-    have hbit : ¬dt.ixSpineBitOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
-      mV st₀ f₀ semB j := by
-      rw [ixSpineBitOfB, ixLegBitB, dif_neg hg]
-      exact id
-    refine iff_of_false (fun hc => hbit ((dt.ixNew_last_get hwr j).mp hc)) ?_
-    obtain ⟨ℓ₀, hℓ₀⟩ : ∃ ℓ : Fin (dt.arOf (dt.varAt j)),
-        ¬IsEnc dt.ly PR.zero PR.one
-          (wmBlk (ixAddr elt stj.mir)
-            (Tag.arg (toLex ((Sum.inl
-              (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
-              Fin dt.ko ⊕ Fin dt.ki))) :
-              Tag R (P) dt.KIx)) := by
-      by_contra hc
-      exact hg (ixGatedAt_of_isEnc (dt := dt) (elt := elt) (F := F) (hgateEnc := hgateEnc) j stj
-        (fun ℓ => not_not.mp fun h => hc ⟨ℓ, h⟩))
-    refine not_trackOf_of_notEnc (dt.arOf_le_ko (some (dt.varList.get j)))
-      (dt.d.next σ) (ℓ₀ := ℓ₀) (fun p hp => hℓ₀ ⟨p, ?_⟩)
-    rw [hmirj, hmir₀]
-    exact hp
-
 
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc hUse in
 omit [Finite I] [Finite dt.KIx] in
@@ -1544,27 +863,12 @@ noncomputable def ixSweepStEG
   stE w (dt.ixSweepSWG (elt := elt)
     stE fsE hlin st₀ f₀ w) (dt.ixSweepFSG (elt := elt) stE fsE hlin st₀ f₀ w)
 
-/-- The control the sweep leaves each address in — `reaches_sweep`'s
-`fsE`. -/
-noncomputable def ixSweepFsEG
-    (w : Univ A R (P) dt.KIx dt.dd → Prop) :
-    dt.CtlIx → A :=
-  fsE w (dt.ixSweepSWG (elt := elt)
-    stE fsE hlin st₀ f₀ w) (dt.ixSweepFSG (elt := elt) stE fsE hlin st₀ f₀ w)
-
 omit [Finite I] [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (P)] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 theorem ixSweepSWG_bot :
     dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ (fun _ => False) = st₀ :=
   congrArg Prod.fst (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
-
-omit [Finite I] [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-theorem ixSweepFSG_bot :
-    dt.ixSweepFSG (elt := elt) stE fsE hlin st₀ f₀ (fun _ => False) = f₀ :=
-  congrArg Prod.snd (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (P)] [Nonempty A]
@@ -1585,145 +889,9 @@ theorem ixSweepSWG_incr
   rw [wmNext_eq hlin hi] at h
   exact h
 
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **The control's cover equation** — `reaches_sweep`'s `hFS`. -/
-theorem ixSweepFSG_incr
-    {w w' : Univ A R (P) dt.KIx dt.dd → Prop}
-    (hi : WMIncr WMLe w w') :
-    dt.ixSweepFSG (elt := elt) stE fsE hlin st₀ f₀ w' =
-      dt.ixSweepFsEG (elt := elt) stE fsE hlin st₀ f₀ w :=
-  congrArg Prod.snd
-    (addrIter_incr hlin (isLinOrd_wmSetLe hlin) hi (st₀, f₀)
-      (fun u p =>
-        ({ dt.atSt (stE u p.1 p.2) (wmNext hlin u) with mir := ixMark elt (wmNext hlin u) },
-          fsE u p.1 p.2)))
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **A field neither an address's evaluation nor the advance writes rides
-the whole sweep.** -/
-theorem ixSweepSWG_ride {β : Sort _}
-    (F : TapeSt dt A R (P) I → β)
-    (hFE : ∀ u st f, F (stE u st f) = F st)
-    (hFa : ∀ st u, F { dt.atSt st u with mir := ixMark elt u } = F st)
-    {s₁ : Univ A R (P) dt.KIx dt.dd → Prop}
-    (w : Univ A R (P) dt.KIx dt.dd → Prop)
-    (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
-    F (dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ w) = F st₀ := by
-  refine holds_of_wideRounds hlin
-    (Q := fun u => F (dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ u) = F st₀) ?_ ?_ w
-    hlb hub
-  · rw [dt.ixSweepSWG_bot (elt := elt) stE fsE hlin st₀ f₀]
-  · intro u u' hi _ _ ih
-    rw [dt.ixSweepSWG_incr (elt := elt) stE fsE hlin st₀ f₀ hi, hFa, ixSweepStEG, hFE]
-    exact ih
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **The marker is at the address**, at every entry state of the sweep. -/
-theorem ixSweepSWG_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
-    {s₁ : Univ A R (P) dt.KIx dt.dd → Prop}
-    (w : Univ A R (P) dt.KIx dt.dd → Prop)
-    (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
-    (dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ w).wk = fun r => r = w := by
-  refine holds_of_wideRounds hlin
-    (Q := fun u => (dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ u).wk = fun r => r = u)
-    ?_ ?_ w hlb hub
-  · rw [dt.ixSweepSWG_bot (elt := elt) stE fsE hlin st₀ f₀]
-    exact hwk₀
-  · intro u u' hi _ _ _
-    rw [dt.ixSweepSWG_incr (elt := elt) stE fsE hlin st₀ f₀ hi]
-    rfl
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **The mirror is at the address**, at every entry state of the sweep. -/
-theorem ixSweepSWG_mir (hmir₀ : st₀.mir = fun _ => False)
-    {s₁ : Univ A R (P) dt.KIx dt.dd → Prop}
-    (w : Univ A R (P) dt.KIx dt.dd → Prop)
-    (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
-    (dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ w).mir = ixMark elt w := by
-  refine holds_of_wideRounds hlin
-    (Q := fun u => (dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ u).mir =
-      ixMark elt u) ?_ ?_ w
-    hlb hub
-  · rw [dt.ixSweepSWG_bot (elt := elt) stE fsE hlin st₀ f₀]
-    exact hmir₀
-  · intro u u' hi _ _ _
-    rw [dt.ixSweepSWG_incr (elt := elt) stE fsE hlin st₀ f₀ hi]
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **`reaches_sweep`'s `hwkE`**: the marker is still at the address when
-the address's evaluation ends. -/
-theorem ixSweepStEG_wk (hFE : ∀ u st f, (stE u st f).wk = st.wk)
-    (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
-    {s₁ : Univ A R (P) dt.KIx dt.dd → Prop}
-    (w : Univ A R (P) dt.KIx dt.dd → Prop)
-    (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
-    (dt.ixSweepStEG (elt := elt) stE fsE hlin st₀ f₀ w).wk = fun r => r = w :=
-  (hFE w _ _).trans
-    (dt.ixSweepSWG_wk (elt := elt) stE fsE hlin st₀ f₀ hwk₀ (s₁ := s₁) w hlb hub)
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **`reaches_sweep`'s `hmirE`**: so is the mirror. -/
-theorem ixSweepStEG_mir (hFE : ∀ u st f, (stE u st f).mir = st.mir)
-    (hmir₀ : st₀.mir = fun _ => False)
-    {s₁ : Univ A R (P) dt.KIx dt.dd → Prop}
-    (w : Univ A R (P) dt.KIx dt.dd → Prop)
-    (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
-    (dt.ixSweepStEG (elt := elt) stE fsE hlin st₀ f₀ w).mir = ixMark elt w :=
-  (hFE w _ _).trans
-    (dt.ixSweepSWG_mir (elt := elt) stE fsE hlin st₀ f₀ hmir₀ (s₁ := s₁) w hlb hub)
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **`reaches_sweep`'s `hltpE`**: the address is not the marked end, the
-mark being where the reduction planted it. -/
-theorem ixSweepStEG_ltp (hFE : ∀ u st f, (stE u st f).ltp = st.ltp)
-    {s₁ : Univ A R (P) dt.KIx dt.dd → Prop}
-    (w : Univ A R (P) dt.KIx dt.dd → Prop)
-    (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁)
-    (hltp₀ : ¬st₀.ltp w) :
-    ¬(dt.ixSweepStEG (elt := elt) stE fsE hlin st₀ f₀ w).ltp w := by
-  rw [ixSweepStEG, hFE, dt.ixSweepSWG_ride (elt := elt) stE fsE hlin st₀ f₀ (fun st => st.ltp)
-    hFE (fun _ _ => rfl) (s₁ := s₁) w hlb hub]
-  exact hltp₀
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)] [Nonempty A]
-  [L.IsRelational] [L.Structure A] in
-omit [Finite I] in
-/-- **`reaches_sweep`'s `hmirE` when the evaluation sets the mirror
-itself**: the variant of
-`DescriptiveComplexity.Draw.Data.ixSweepStEG_mir` for an evaluation that
-normalizes the mirror to the address it is run at, which makes the
-invariant definitional instead of inductive. -/
-theorem ixSweepStEG_mir' (hFE : ∀ u st f, (stE u st f).mir = ixMark elt u)
-    (w : Univ A R (P) dt.KIx dt.dd → Prop) :
-    (dt.ixSweepStEG (elt := elt) stE fsE hlin st₀ f₀ w).mir = ixMark elt w :=
-  hFE w _ _
-
 end SweepGen
 
 /-! ### The sweep's families -/
-
 
 /-! ### The stage atom's restore, as an algebra
 
@@ -1743,29 +911,6 @@ section StageEnd
 
 variable {v : Univ A R (P) dt.KIx dt.dd → Prop}
 variable (st : TapeStD dt A R (P))
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-/-- Normalizing commutes with a round's VAL write. -/
-theorem ixStageEndSt_roundSt (m : Univ A R (P) dt.KIx dt.dd → Prop) :
-    dt.stageEndSt (dt.ixRoundSt st m) v = dt.ixRoundSt (dt.stageEndSt st v) m :=
-  rfl
-
-omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
-  [LinearOrder (P)]
-  [Language.wide.Structure
-    (Univ A R (P) dt.KIx dt.dd)]
-  [Finite A] [Finite R] [Finite (P)]
-  [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
-/-- **A normalized state meets the stage atom's two hypotheses by
-`rfl`** — which is what makes the threaded form hypothesis-free. -/
-theorem ixStageEndSt_home :
-    (dt.stageEndSt st v).sav = v ∧ (dt.stageEndSt st v).tgt = v :=
-  ⟨rfl, rfl⟩
 
 end StageEnd
 

@@ -67,12 +67,6 @@ theorem extLeRel_inl (a b : A) : extLeRel A n ![Sum.inl a, Sum.inl b] ↔ a ≤ 
   rw [h0, h1]
   exact hle
 
-theorem relMap_ext_le (L : Language.{0, 0}) [L.IsRelational] [L.Structure A]
-    (w : Fin 2 → A ⊕ Fin n) :
-    RelMap (L := newLang (L.sum Language.order)) (Sum.inl (Sum.inr Language.leSymb)) w ↔
-      extLeRel A n w :=
-  Iff.rfl
-
 end ExtLe
 
 /-! ### Eliminating the order symbol -/

@@ -157,12 +157,6 @@ theorem sum_eq {c B x S : A} {Cnt : A → A → Prop} (hc : 0 < orank c) (hB : I
       omega
     omega
 
-/-- The count only grows with the window it is taken over. -/
-theorem onesBelow_mono {x k k' : ℕ} (h : k ≤ k') : onesBelow x k ≤ onesBelow x k' :=
-  Finset.card_le_card fun i hi => by
-    simp only [mem_filter, mem_range] at hi ⊢
-    exact ⟨by omega, hi.2⟩
-
 /-- **A rank has no more ones than the universe has positions** – so a running
 sum always fits in a field wide enough to hold `posCount`. -/
 theorem onesBelow_orank_le (x : A) (k : ℕ) : onesBelow (orank x) k ≤ posCount A := by

@@ -154,13 +154,6 @@ theorem outAddr_of_blocks {V : Fin ko → (Fin dd → A) → Prop}
     rw [← hk] at hv'
     exact hv'
 
-/-- Every other block of `outAddr` is empty. -/
-theorem wmBlk_outAddr_of_ne (V : Fin ko → (Fin dd → A) → Prop)
-    {t : Tag R P (Fin ko ⊕ₗ Fin ki)} (ht : ∀ k : Fin ko, t ≠ argOut ki k) :
-    ∀ v : Fin dd → A, ¬wmBlk (outAddr V) t v := by
-  rintro v ⟨k, hk, -⟩
-  exact ht k hk
-
 /-- The non-argument blocks of `outAddr` are empty, which is what puts the
 working cell in the logical interval. -/
 theorem outAddr_junk (V : Fin ko → (Fin dd → A) → Prop)

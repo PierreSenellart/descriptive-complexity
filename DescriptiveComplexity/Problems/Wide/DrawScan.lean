@@ -273,28 +273,6 @@ slot about to be walked satisfies the register discipline, i.e. is the
 `DescriptiveComplexity.bitAtOf` of some track (set nowhere off the register
 file). -/
 
-omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
-  [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
-/-- **Handing the walk from one track to another**: the walked track `t` moves
-into the background at its own digits, and the background slot `t'` – which
-holds the register digits of `m₂` – becomes the walked track. -/
-theorem trackTape_swap (PR : Prog A R P Q W K dd) {t t' : W} (hne : t ≠ t')
-    {rest : (Univ A R P K dd → Prop) → W → A} {m m₂ : I → Prop}
-    (ht' : ∀ r : Univ A R P K dd → Prop,
-      rest r t' = bitVal PR.zero PR.one (bitAtOf cell m₂ r)) :
-    PR.trackTapeAt cell t rest m =
-      PR.trackTapeAt cell t'
-        (fun r s => if s = t then bitVal PR.zero PR.one (bitAtOf cell m r) else rest r s) m₂ := by
-  refine funext fun r => congrArg _ (congrArg _ (funext fun s => ?_))
-  change (if s = t then bitVal PR.zero PR.one (bitAtOf cell m r) else rest r s) =
-    if s = t' then bitVal PR.zero PR.one (bitAtOf cell m₂ r)
-      else if s = t then bitVal PR.zero PR.one (bitAtOf cell m r) else rest r s
-  by_cases hs : s = t'
-  · subst hs
-    rw [if_pos rfl, if_neg (Ne.symm hne)]
-    exact ht' r
-  · rw [if_neg hs]
-
 end Prog
 
 end Draw

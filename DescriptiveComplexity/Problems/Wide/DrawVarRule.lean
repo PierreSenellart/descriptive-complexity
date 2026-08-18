@@ -463,7 +463,6 @@ theorem igatesSep (hemb : Function.Injective emb) :
 
 end IGates
 
-
 end Data
 
 end Draw

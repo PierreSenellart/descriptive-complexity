@@ -212,12 +212,6 @@ theorem two_le_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : 2 ≤ lvl2Block P := by
   rw [lvl2Block]
   omega
 
-/-- A sub-block, and the one after it, leave room below the top position. -/
-theorem lvl2Block_succ_lt {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl2Block P + 1 < P := by
-  have h1 := lvl2Block_lt_lvl1Block hP
-  have h2 := lvl1Block_lt hP
-  omega
-
 /-- **A sub-block's worth of values outnumbers the positions' own width**: what
 the level-3 table's capacity condition needs on top of
 `DescriptiveComplexity.BitSum.table_lt`. -/
@@ -249,12 +243,6 @@ the number of positions is below a block's worth of values. -/
 theorem lt_two_pow_lvl1Block (P : ℕ) : P < 2 ^ lvl1Block P :=
   lt_of_lt_of_le (lt_two_pow_lvl1Width P)
     (Nat.pow_le_pow_right (by norm_num) (by rw [lvl1Block]; omega))
-
-/-- A block is shorter than a sub-block's worth of values – what level 2 asks of
-the word it is given. -/
-theorem lvl1Block_lt_two_pow_lvl2Block (P : ℕ) : lvl1Block P < 2 ^ lvl2Block P :=
-  lt_of_lt_of_le (lvl1Block_lt_two_pow_lvl2Width P)
-    (Nat.pow_le_pow_right (by norm_num) (by rw [lvl2Block]; omega))
 
 /-- …and so is a tail of two blocks, which is what level 1 hands to level 2. -/
 theorem two_lvl1Block_lt_two_pow_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) :

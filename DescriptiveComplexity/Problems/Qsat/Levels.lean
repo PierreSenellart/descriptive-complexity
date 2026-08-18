@@ -81,10 +81,6 @@ theorem IsMaxSV.le {ℓ z : A} (h : IsMaxSV ℓ) (hz : IsSV z) : z ≤ ℓ :=
   not_lt.mp (h.2 z hz)
 
 omit [Finite A] in
-theorem isMinSV_unique {ℓ ℓ' : A} (h : IsMinSV ℓ) (h' : IsMinSV ℓ') : ℓ = ℓ' :=
-  le_antisymm (h.le h'.isSV) (h'.le h.isSV)
-
-omit [Finite A] in
 theorem isMaxSV_unique {ℓ ℓ' : A} (h : IsMaxSV ℓ) (h' : IsMaxSV ℓ') : ℓ = ℓ' :=
   le_antisymm (h'.le h.isSV) (h.le h'.isSV)
 

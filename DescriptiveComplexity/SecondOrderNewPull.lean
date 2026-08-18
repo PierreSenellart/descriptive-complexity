@@ -109,14 +109,6 @@ def joinParts (c : (Fin 1 → M) → Prop) (σ : (B.pull (Tag ⊕ Unit) (dim + 1
     | Sum.inl _ => c
     | Sum.inr p => σ p
 
-theorem canonPart_joinParts (c : (Fin 1 → M) → Prop)
-    (σ : (B.pull (Tag ⊕ Unit) (dim + 1)).Assignment M) (x : M) :
-    canonPart (joinParts c σ) x ↔ c ![x] := Iff.rfl
-
-theorem pullPart_joinParts (c : (Fin 1 → M) → Prop)
-    (σ : (B.pull (Tag ⊕ Unit) (dim + 1)).Assignment M) :
-    pullPart (joinParts c σ) = σ := rfl
-
 end Parts
 
 /-! ### The two vocabularies -/
@@ -717,6 +709,5 @@ theorem SigmaSONewDefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : SigmaSONewDe
   exact exists_congr fun n => sorealize_newPull f.toInterpretation B φ A n
 
 end Closure
-
 
 end DescriptiveComplexity

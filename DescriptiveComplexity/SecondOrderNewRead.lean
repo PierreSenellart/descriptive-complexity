@@ -225,7 +225,6 @@ theorem realize_readHom₁ (h : ReadOn S e means) {R : Lt.Relations 1}
   ((readHom₁ S).realize_relOnSentenceF R hinj hR φ).trans
     (realize_sentence_of_equiv (readEquiv₁ h v) φ)
 
-
 end Realize
 
 end DescriptiveComplexity

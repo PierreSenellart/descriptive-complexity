@@ -1119,7 +1119,6 @@ theorem stage_loops_reachesIn :
     rw [hnx, hsucc]
     exact hkm ▸ ih (n + 1) (by omega) hkm
 
-
 end ClockedChain
 
 omit [Finite I] in
@@ -1153,7 +1152,6 @@ The space-bounded program's file is the input channel's ruler, one register per
 element: the runs above are that file at the identity embedding, and these are
 the statements their callers had before the file became a parameter.
 -/
-
 
 end StageRun
 
