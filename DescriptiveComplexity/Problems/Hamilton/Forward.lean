@@ -201,7 +201,7 @@ end Snake
 
 /-! ### The sorted neighbor list of a vertex -/
 
-section Neighbours
+section Neighbors
 
 open Language Structure
 
@@ -258,7 +258,7 @@ theorem nbrList_isChain (a : A) :
   · exact Or.inr le_rfl
   · exact Or.inr (hl2 d hd2).le
 
-end Neighbours
+end Neighbors
 
 /-! ### A cover vertex's chain -/
 

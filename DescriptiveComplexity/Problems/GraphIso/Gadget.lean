@@ -374,7 +374,7 @@ theorem edge_irrefl (p : gadget.Map G) : ¬GEdge p p := by
 
 /-! ### The neighbors of each kind of node -/
 
-section Neighbours
+section Neighbors
 
 /-- The neighbors of a vertex node: its lollipop, the tail-side subdivision of
 each arc out of it, and the head-side subdivision of each arc into it. -/
@@ -494,7 +494,7 @@ theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
 
-end Neighbours
+end Neighbors
 
 /-! ### The structural predicates that recover the levels -/
 

@@ -539,7 +539,7 @@ end Outer
 
 namespace Data
 
-section Recognise
+section Recognize
 
 variable {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
 variable [Fintype dt.SlotIx]
@@ -715,7 +715,7 @@ theorem passTracksAt_of_mir_zero {J : Type}
     rw [if_pos rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc), hz]
   · rw [if_neg hs]
 
-end Recognise
+end Recognize
 
 /-! ### One step of the machine, seen from the tape -/
 
@@ -809,7 +809,7 @@ end StepTape
 
 /-! ### The reading, along a run -/
 
-section Recognising
+section Recognizing
 
 variable {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [LinearOrder dt.KIx]
@@ -1175,7 +1175,7 @@ theorem track_set_of_seq (hR : PR.table.Reads) {Ph Ph₀ : P' → Prop}
   rw [hn1] at hrest
   exact hrest
 
-end Recognising
+end Recognizing
 
 end Data
 
