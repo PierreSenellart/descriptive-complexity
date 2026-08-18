@@ -1,7 +1,7 @@
 # DescriptiveComplexity
 
 [![CI](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml)
-[![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0--rc1-blue)](https://github.com/leanprover-community/mathlib4/releases/tag/v4.33.0-rc1)
+[![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0-blue)](https://github.com/leanprover-community/mathlib4/releases/tag/v4.33.0)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21678423-007ec6)](https://doi.org/10.5281/zenodo.21678423)
 [![Archived in Software Heritage](https://archive.softwareheritage.org/badge/origin/https://github.com/PierreSenellart/descriptive-complexity/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/PierreSenellart/descriptive-complexity)
 
@@ -158,6 +158,7 @@ pin is the *same* as your project's, not merely a compatible one.
 
 | DescriptiveComplexity | Mathlib | Toolchain |
 | --- | --- | --- |
+| `v1.2.0` | `v4.33.0` | `leanprover/lean4:v4.33.0` |
 | `v1.1.0` | `v4.33.0-rc1` | `leanprover/lean4:v4.33.0-rc1` |
 | `v1.0.0` | `v4.33.0-rc1` | `leanprover/lean4:v4.33.0-rc1` |
 | `master` | latest pin, moves | see `lean-toolchain` |
@@ -176,13 +177,13 @@ so it can be required by name. In a `lakefile.toml`:
 [[require]]
 name = "descriptive-complexity"
 scope = "PierreSenellart"
-version = "~1.1.0"
+version = "~1.2.0"
 ```
 
 or, in a `lakefile.lean`:
 
 ```lean
-require "PierreSenellart" / "descriptive-complexity" @ "~1.1.0"
+require "PierreSenellart" / "descriptive-complexity" @ "~1.2.0"
 ```
 
 What follows `@` is a version *range*, not a version: Lake rejects a bare
@@ -194,12 +195,12 @@ To pin a commit, or to follow `master`, require it from git instead:
 [[require]]
 name = "descriptive-complexity"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "v1.1.0"
+rev = "v1.2.0"
 ```
 
 ```lean
 require "descriptive-complexity" from git
-  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.1.0"
+  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.2.0"
 ```
 
 Pin a version tag or a commit hash rather than `master`, for reproducible
