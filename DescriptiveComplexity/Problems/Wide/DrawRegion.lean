@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Wide.Roam
 /-!
 # The region a clocked program works in, and its size
 
-The universe a `DrawData` reduction draws is `DrawTag R P K × (Fin dd → A)`, and a
+The universe a `Draw.Data` reduction draws is `Draw.Tag R P K × (Fin dd → A)`, and a
 **logical** address – one whose non-argument blocks are empty
 (`DescriptiveComplexity.Draw.logicalTop`) – is exactly an address of the working
 region: the non-argument tags are the most significant, so the logical addresses
@@ -20,7 +20,7 @@ runs inside it is charged against it and a bound by the number of addresses is a
 bound by the clock itself. `wideRank_lt_two_pow_logical` is that size: a logical
 address has rank below `2 ^ (k · m)`, with `k` the number of argument blocks and
 `m` the number of tuples – the two numbers the clock's own arithmetic is written
-in (`DescriptiveComplexity.Draw.DrawData.nexTotal_lt_two_pow'`).
+in (`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'`).
 -/
 
 namespace DescriptiveComplexity
@@ -43,17 +43,17 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite A]
 /-- **The argument blocks are as many as the fixed-point's own indices**: the
 `k` of the clock's arithmetic. -/
 theorem card_argTag :
-    Nat.card {τ : DrawTag R P K // ∃ i : K, τ = DrawTag.arg i} = Nat.card K :=
+    Nat.card {τ : Tag R P K // ∃ i : K, τ = Tag.arg i} = Nat.card K :=
   Nat.card_congr
     { toFun := fun τ => τ.2.choose
-      invFun := fun i => ⟨DrawTag.arg i, i, rfl⟩
+      invFun := fun i => ⟨Tag.arg i, i, rfl⟩
       left_inv := by
         rintro ⟨τ, hτ⟩
         exact Subtype.ext hτ.choose_spec.symm
       right_inv := by
         intro i
-        exact DrawTag.arg.inj (Exists.choose_spec (⟨i, rfl⟩ :
-          ∃ i' : K, (DrawTag.arg i : DrawTag R P K) = DrawTag.arg i')).symm }
+        exact Tag.arg.inj (Exists.choose_spec (⟨i, rfl⟩ :
+          ∃ i' : K, (Tag.arg i : Tag R P K) = Tag.arg i')).symm }
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite A]
   [Language.wide.Structure (Univ A R P K dd)] in
@@ -63,9 +63,9 @@ arithmetic reads that as `k` working blocks and `|R| + 1 + |P|` surplus ones –
 the surplus a clocked program has for free, since its rule names and its phases
 are tags whether it writes in them or not. -/
 theorem card_drawTag :
-    Nat.card (DrawTag R P K) = Nat.card R + 1 + Nat.card P + Nat.card K := by
+    Nat.card (Tag R P K) = Nat.card R + 1 + Nat.card P + Nat.card K := by
   classical
-  have e : DrawTag R P K ≃ R ⊕ (Unit ⊕ (P ⊕ K)) :=
+  have e : Tag R P K ≃ R ⊕ (Unit ⊕ (P ⊕ K)) :=
     { toFun := fun τ => match τ with
         | .ctrl r => Sum.inl r
         | .sym => Sum.inr (Sum.inl ())
@@ -102,15 +102,15 @@ against; the counting behind it is
 theorem wideRank_lt_two_pow_logical
     (hord : ∀ x y : Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
     {s : Univ A R P K dd → Prop}
-    (hjunk : ∀ τ : DrawTag R P K, (∀ i : K, τ ≠ DrawTag.arg i) →
+    (hjunk : ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) →
       ∀ v : Fin dd → A, ¬s (τ, v)) :
     wideRank s < 2 ^ (Nat.card K * Nat.card (Fin dd → A)) := by
   classical
   have hcount : Nat.card {p : Univ A R P K dd //
-      ¬(fun τ : DrawTag R P K => ∀ i : K, τ ≠ DrawTag.arg i) p.1} =
+      ¬(fun τ : Tag R P K => ∀ i : K, τ ≠ Tag.arg i) p.1} =
       Nat.card K * Nat.card (Fin dd → A) := by
     rw [card_avoid_positions (V := Fin dd → A)
-      (fun τ : DrawTag R P K => ∀ i : K, τ ≠ DrawTag.arg i)]
+      (fun τ : Tag R P K => ∀ i : K, τ ≠ Tag.arg i)]
     refine congrArg (fun n => n * Nat.card (Fin dd → A)) ?_
     rw [← card_argTag (R := R) (P := P) (K := K)]
     exact Nat.card_congr (Equiv.subtypeEquivRight fun τ => by

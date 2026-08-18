@@ -187,9 +187,9 @@ end TupNext
 
 /-! ### The three obligations of a loop element -/
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 
 /-- **A loop element's coordinate is definable after the advance**: the carry
 is a question about the pattern, and the value at it is the next element. -/
@@ -356,7 +356,7 @@ theorem uGDefinable_isMaxLvN :
     uGDefinable_ctlOne (L := L) (W := dt.SlotIx) (dt.lvC j)).congr
     fun e f _ => (isMaxTup_iff_eq_top e.htop (dt.readLv f)).trans Iff.rfl
 
-end DrawData
+end Data
 
 end Draw
 

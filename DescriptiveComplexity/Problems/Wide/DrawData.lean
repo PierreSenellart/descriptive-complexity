@@ -15,14 +15,14 @@ expansion, the partial-fixed-point definition, one prenex pack per step
 formula and one for the output sentence, and the encoding layout with its
 coordinate budget. On top of it, the **derived dimensions** the slot and
 control inventories of `DescriptiveComplexity.Problems.Wide.DrawSlots` are
-sized by: the variable index `DescriptiveComplexity.Draw.DrawData.VarIx`
+sized by: the variable index `DescriptiveComplexity.Draw.Data.VarIx`
 (`none` is the output), the prefix lengths `nOf` and their maximum `ki`, the
 outer block count `ko`, the classified atoms of each matrix
-(`DescriptiveComplexity.Draw.DrawData.kindOf`) and their counts.
+(`DescriptiveComplexity.Draw.Data.kindOf`) and their counts.
 
 The point of bundling: the program's phase and rule types are indexed by
 this data (one call site per variable, per atom, per argument position), so
-every site file takes one `DrawData` and nothing else, and the dimensions are
+every site file takes one `Draw.Data` and nothing else, and the dimensions are
 *defined* as the exact maxima rather than constrained by inequalities.
 -/
 
@@ -38,7 +38,7 @@ variable {L : Language.{0, 0}}
 
 /-- **The data of the EXPSPACE reduction**: the expansion, the definition,
 the prenex packs, and the encoding layout with its coordinate budget. -/
-structure DrawData (L : Language.{0, 0}) : Type 1 where
+structure Data (L : Language.{0, 0}) : Type 1 where
   /-- The exponential expansion the machine's tape simulates. -/
   X : ExpExpansion L
   /-- The partial-fixed-point definition being iterated. -/
@@ -70,9 +70,9 @@ structure DrawData (L : Language.{0, 0}) : Type 1 where
   /-- The budget fits in the dimension. -/
   dd0Le : dd0 ≤ dd
 
-namespace DrawData
+namespace Data
 
-variable (dt : DrawData L)
+variable (dt : Data L)
 
 /-! ### The variable index -/
 
@@ -301,7 +301,7 @@ noncomputable instance : DecidableEq dt.SlotIx := Classical.decEq _
 /-- The block-index type of the program's addresses. -/
 noncomputable abbrev KIx : Type := Fin dt.ko ⊕ₗ Fin dt.ki
 
-end DrawData
+end Data
 
 end Draw
 

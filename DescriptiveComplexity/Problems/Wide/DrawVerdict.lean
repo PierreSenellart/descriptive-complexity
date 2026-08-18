@@ -8,9 +8,9 @@ import DescriptiveComplexity.Problems.Wide.DrawRoundSem
 /-!
 # One variable's verdict *is* one step of the iteration
 
-The capstone `DescriptiveComplexity.Draw.DrawData.accVerdict_varFM_qfValue`
+The capstone `DescriptiveComplexity.Draw.Data.accVerdict_varFM_qfValue`
 reads the machinery's exit bit as the alternating prefix over an abstract
-leaf `Ps`; `DescriptiveComplexity.Draw.DrawData.altQuantFrom_leafP` reads that
+leaf `Ps`; `DescriptiveComplexity.Draw.Data.altQuantFrom_leafP` reads that
 prefix, at the concrete leaf, as `DescriptiveComplexity.StepDef.next`. This
 file joins them, discharging every abstract input of the capstone from the
 two facts a reduction's tape maintains:
@@ -19,15 +19,15 @@ two facts a reduction's tape maintains:
 * each stage track holds the stage dictionary (`hdict`).
 
 Two statements: `accVerdict_leafP`, at any variable, whose right-hand side
-is the prefix over `DescriptiveComplexity.Draw.DrawData.leafP` at the
+is the prefix over `DescriptiveComplexity.Draw.Data.leafP` at the
 address's blocks — the form the *output* sentence's leg also needs — and
 `accVerdict_next`, its specialization at a fixed-point variable, whose
 right-hand side is `d.next` itself.
 
 The semantic pack is a *hypothesis* in the form the capstone consumes
-(`hsem`, pinning it to `DescriptiveComplexity.Draw.DrawData.passSem`) rather
+(`hsem`, pinning it to `DescriptiveComplexity.Draw.Data.passSem`) rather
 than a fixed choice, because the spine's per-position family
-(`DescriptiveComplexity.Draw.DrawData.evalSpine_run`'s `semOfJ`) is chosen by
+(`DescriptiveComplexity.Draw.Data.evalSpine_run`'s `semOfJ`) is chosen by
 the caller and only has to *agree* with the pass's pack.
 -/
 
@@ -39,9 +39,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -62,8 +62,8 @@ variable (mV : ιV → Univ A R P dt.KIx dt.dd → Prop)
 of a pack read: the mirror's block at each outer index. -/
 noncomputable def mirBlk : Fin dt.ko → (Fin dt.dd → A) → Prop := fun k =>
   wmBlk st.mir
-    (DrawTag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
-      DrawTag R P dt.KIx)
+    (Tag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
+      Tag R P dt.KIx)
 
 variable {dt} in
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -75,8 +75,8 @@ theorem mirBlk_of_mir {st st' : TapeStD dt A R P} (h : st.mir = st'.mir) :
     dt.mirBlk st = dt.mirBlk st' :=
   funext fun k => congrArg
     (fun s => wmBlk s
-      (DrawTag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
-        DrawTag R P dt.KIx)) h
+      (Tag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
+        Tag R P dt.KIx)) h
 
 variable (semOf : ∀ a : ιV,
   (∀ ℓ : Fin (dt.nIn vi),
@@ -86,21 +86,21 @@ variable (semOf : ∀ a : ιV,
 
 omit [Finite dt.KIx] in
 /-- **The machinery's verdict is the prefix over the leaf**: every abstract
-input of `DescriptiveComplexity.Draw.DrawData.accVerdict_varFM_qfValue`
+input of `DescriptiveComplexity.Draw.Data.accVerdict_varFM_qfValue`
 discharged — the flags by
-`DescriptiveComplexity.Draw.DrawData.ctlBit_roundFX_pass_iff`, the pass by
-`DescriptiveComplexity.Draw.DrawData.roundPass_of_polarities`, the valuation
-and its pack by `DescriptiveComplexity.Draw.DrawData.passW`, the stage reads
-by `DescriptiveComplexity.Draw.DrawData.old_trackOf_stageTgtD`, and the two
-leaf readings by `DescriptiveComplexity.Draw.DrawData.leafP_pass_iff` /
-`DescriptiveComplexity.Draw.DrawData.leafP_fail_iff`. -/
+`DescriptiveComplexity.Draw.Data.ctlBit_roundFX_pass_iff`, the pass by
+`DescriptiveComplexity.Draw.Data.roundPass_of_polarities`, the valuation
+and its pack by `DescriptiveComplexity.Draw.Data.passW`, the stage reads
+by `DescriptiveComplexity.Draw.Data.old_trackOf_stageTgtD`, and the two
+leaf readings by `DescriptiveComplexity.Draw.Data.leafP_pass_iff` /
+`DescriptiveComplexity.Draw.Data.leafP_fail_iff`. -/
 theorem accVerdict_leafP
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV aT) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -186,15 +186,15 @@ variable (semOf : ∀ a : ιV,
 omit [Finite dt.KIx] in
 /-- **The machinery's verdict at a fixed-point variable is one step of the
 iteration** at the points the working address's outer blocks encode: the
-prefix of `DescriptiveComplexity.Draw.DrawData.accVerdict_leafP` read through
-`DescriptiveComplexity.Draw.DrawData.altQuantFrom_leafP`. -/
+prefix of `DescriptiveComplexity.Draw.Data.accVerdict_leafP` read through
+`DescriptiveComplexity.Draw.Data.altQuantFrom_leafP`. -/
 theorem accVerdict_next
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV aT) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -248,8 +248,8 @@ variable (semOf : ∀ a : ιV,
 omit [Finite dt.KIx] in
 /-- **The machinery's verdict at the output variable is the output sentence**
 at the stage the tracks hold: the prefix of
-`DescriptiveComplexity.Draw.DrawData.accVerdict_leafP` read through
-`DescriptiveComplexity.Draw.DrawData.altQuantFrom_leafP_out`. The output
+`DescriptiveComplexity.Draw.Data.accVerdict_leafP` read through
+`DescriptiveComplexity.Draw.Data.altQuantFrom_leafP_out`. The output
 variable is nullary, so the working address's outer blocks encode the empty
 tuple and there is nothing to ask of them — which is why this is the one
 verdict a reduction can take at the *empty* address. -/
@@ -259,7 +259,7 @@ theorem accVerdict_out
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV aT) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -294,7 +294,7 @@ theorem accVerdict_out
 
 end VerdictOut
 
-end DrawData
+end Data
 
 end Draw
 

@@ -16,17 +16,17 @@ marks name, one canonically padded tuple at a time, reading one bit from
 each of the two blocks (a **paired** read, which is why these are element
 loops and not file tests). This file says that this is enough.
 
-* `DescriptiveComplexity.Draw.DrawData.encMap_eq_iff_padBits` – two encodings
+* `DescriptiveComplexity.Draw.Data.encMap_eq_iff_padBits` – two encodings
   are equal exactly when they agree at every padded tuple, because an
   encoding is supported on padded tuples
-  (`DescriptiveComplexity.Draw.DrawData.isPad_of_encMap`) and the encoding is
+  (`DescriptiveComplexity.Draw.Data.isPad_of_encMap`) and the encoding is
   injective. So the equality atom is *the loop found no difference*.
-* `DescriptiveComplexity.Draw.DrawData.wmSetLe_encMap_iff_padBits` – the
+* `DescriptiveComplexity.Draw.Data.wmSetLe_encMap_iff_padBits` – the
   binary order of two encodings is decided at the **lexicographically least
   padded tuple where they differ**, the second block containing it. So the
   order atom is *the loop's first difference*, which is why the loop keeps
   the first verdict rather than the last.
-* `DescriptiveComplexity.Draw.DrawData.encOrder_le_iff_padBits` reads the same
+* `DescriptiveComplexity.Draw.Data.encOrder_le_iff_padBits` reads the same
   through the order the reduction puts on the points
   (`DescriptiveComplexity.Draw.encOrder`), which is where an order atom of the
   matrix actually lives.
@@ -44,9 +44,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type}
 variable [L.Structure A] [LinearOrder A] [Finite A]
 
 /-! ### Padding is an order embedding -/
@@ -209,7 +209,7 @@ theorem encOrder_le_iff_padBits {zero one : A} (hzo : zero ≠ one) (p q : dt.X.
             dt.padBits zero (encMap dt.ly zero one q) w) :=
   (encOrder_le_iff dt.ly zero one hzo p q).trans wmSetLe_encMap_iff_padBits
 
-end DrawData
+end Data
 
 end Draw
 

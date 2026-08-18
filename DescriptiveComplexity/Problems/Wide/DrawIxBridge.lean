@@ -19,7 +19,7 @@ element (`ixAddr_elt`).
 
 So a coarse file's shape test at a register **is** the elementwise test at the
 element it stands for, which is the step the two bridges `hpassEnc` and
-`hgateEnc` need: `DescriptiveComplexity.Draw.DrawData.gate_trichotomy` is stated
+`hgateEnc` need: `DescriptiveComplexity.Draw.Data.gate_trichotomy` is stated
 elementwise and reaches a coarse file through this file.
 -/
 
@@ -27,13 +27,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite A] [Finite R'] [Finite P']
@@ -112,7 +112,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 are the register's block, mirror bit, padding and tuple, and each of them is the
 same fact about the element the register stands for. So a program whose
 registers are not the elements asks exactly the question
-`DescriptiveComplexity.Draw.DrawData.gate_trichotomy` answers. -/
+`DescriptiveComplexity.Draw.Data.gate_trichotomy` answers. -/
 theorem wellShapedG_ixBack_iff (hinj : Function.Injective lay.cell)
     (heltInj : Function.Injective elt)
     (hblkP : ∀ u : I, lay.blk u = tagBlk (elt u).1)
@@ -250,7 +250,7 @@ omit [Finite R'] [Finite P'] [L.IsRelational] in
 /-- **The gates' trichotomy at a coarse file**: either the block of the
 mirror's *address* is an encoding, or some register fails the shape test, or
 every register passes it and the tag half fails. This is
-`DescriptiveComplexity.Draw.DrawData.gate_trichotomy` read at a file whose
+`DescriptiveComplexity.Draw.Data.gate_trichotomy` read at a file whose
 registers are not the elements: the shape test is the same question
 (`wellShapedG_ixBack_iff`), and what carries the failing witness across costs
 nothing: an element that fails the shape test is one the *address* holds, so it
@@ -264,25 +264,25 @@ theorem ix_gate_trichotomy (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     (st : TapeSt dt A R' P' I) (b' : Fin dt.ko ⊕ Fin dt.ki) :
     IsEnc dt.ly zero one
-        (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b') : DrawTag R' P' dt.KIx)) ∨
+        (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b') : Tag R' P' dt.KIx)) ∨
       (∃ u₀ : I, ¬dt.wellShapedG zero one b'
         (dt.ixBack lay zero one dt.dd0Le st (lay.cell u₀))) ∨
       ((∀ u : I, dt.wellShapedG zero one b'
           (dt.ixBack lay zero one dt.dd0Le st (lay.cell u))) ∧
         ¬((∀ t' : dt.X.Tag,
             wmBlk (ixAddr elt st.mir)
-                (DrawTag.arg (toLex b') : DrawTag R' P' dt.KIx)
+                (Tag.arg (toLex b') : Tag R' P' dt.KIx)
                 (encTagTup dt.ly zero one t') ↔
               t' = dt.dspTagOf zero one
                 (wmBlk (ixAddr elt st.mir)
-                  (DrawTag.arg (toLex b') : DrawTag R' P' dt.KIx))) ∧
+                  (Tag.arg (toLex b') : Tag R' P' dt.KIx))) ∧
           ExpExpansion.DomHolds (X := dt.X)
             (dt.dspTagOf zero one
                 (wmBlk (ixAddr elt st.mir)
-                  (DrawTag.arg (toLex b') : DrawTag R' P' dt.KIx)),
+                  (Tag.arg (toLex b') : Tag R' P' dt.KIx)),
               decRho dt.ly zero one
                 (wmBlk (ixAddr elt st.mir)
-                  (DrawTag.arg (toLex b') : DrawTag R' P' dt.KIx))))) := by
+                  (Tag.arg (toLex b') : Tag R' P' dt.KIx))))) := by
   classical
   -- the elementwise state the coarse one stands for: only its mirror is read
   set stD : TapeStD dt A R' P' :=
@@ -325,7 +325,7 @@ theorem ix_gate_trichotomy (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     intro hb hm
     exact ((hdiag (elt u)).mp (hall (elt u))) hb ((hmirD (elt u)).mpr hm)
 
-end DrawData
+end Data
 
 end Draw
 

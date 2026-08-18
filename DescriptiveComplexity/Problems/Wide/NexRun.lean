@@ -14,10 +14,10 @@ import DescriptiveComplexity.Problems.Wide.DrawRegion
 # The clocked program's whole run, and its clock
 
 The two halves are counted separately – the opening and the evaluation
-(`DescriptiveComplexity.Draw.DrawData.nexEval_reachesIn`) – and this file puts
+(`DescriptiveComplexity.Draw.Data.nexEval_reachesIn`) – and this file puts
 them together and compares the sum with the clock.
 
-The opening is `DescriptiveComplexity.Draw.DrawData.reachesIn_openingRegion`,
+The opening is `DescriptiveComplexity.Draw.Data.reachesIn_openingRegion`,
 here: the approach walk up to the file's base, the file-laying sweep, and the
 guess along the *region* below the file – one bit per address, which is what the
 guessed relations are – for
@@ -40,7 +40,7 @@ The initial end is here as well, and it is three small facts.
 `DescriptiveComplexity.Draw.Prog.trackTapeAt_initBack` says the all-blank tape is
 the pass-layer presentation at *any* file – which a clocked program needs,
 because its file does not exist at time zero – and
-`DescriptiveComplexity.Draw.DrawData.startBack` with `startBack_frame` /
+`DescriptiveComplexity.Draw.Data.startBack` with `startBack_frame` /
 `startBack_wr` is the background the opening's first step leaves: the one it
 started from with the marker planted, which is the frame condition and the write
 that step asks for.
@@ -67,7 +67,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -90,7 +90,7 @@ end Total
 
 section Bridge
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -127,7 +127,7 @@ theorem trackTape_ixBack_mir_val {F : LaidFile dt A R' P' I}
 walks the mirror at the empty mark, the evaluation walks VAL at the state's own,
 and the state whose mirror is empty presents the same tape either way. This is
 the one rewrite between `reachesIn_openingRegion` and
-`DescriptiveComplexity.Draw.DrawData.nexIxEvalB_reachesIn`. -/
+`DescriptiveComplexity.Draw.Data.nexIxEvalB_reachesIn`. -/
 theorem trackTape_ixBack_mir_empty_val {F : LaidFile dt A R' P' I}
     {st : TapeSt dt A R' P' I} (hmir : st.mir = fun _ => False) :
     PR.trackTapeAt F.cell Slot.mir
@@ -142,7 +142,7 @@ same head, and the same tape – the opening presents it along the mirror at the
 empty mark, the evaluation along VAL at the state's own, and a state whose
 mirror is empty presents both the same way. This is the junction of the two
 legs: with it the whole run is `hopen.trans heval`, and
-`DescriptiveComplexity.Draw.DrawData.nexProg_wideAccept_of_legs` does the clock. -/
+`DescriptiveComplexity.Draw.Data.nexProg_wideAccept_of_legs` does the clock. -/
 theorem config_openingEnd_eq_evalStart {F : LaidFile dt A R' P' I}
     {st : TapeSt dt A R' P' I} (hmir : st.mir = fun _ => False)
     (p : P') (f : dt.CtlIx → A) (w : Univ A R' P' dt.KIx dt.dd → Prop) :
@@ -161,7 +161,7 @@ end Bridge
 
 section Init
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -245,7 +245,7 @@ end Init
 
 section Opening
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' PE SE : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' PE SE : Type}
 variable {ShE : SE → Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [Nonempty A] [Finite A] [Finite R']
@@ -599,7 +599,7 @@ dictionary nothing, since every entry the evaluation reads is inside the stretch
 
 section Guessed
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' PE : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' PE : Type}
 variable [LinearOrder A] [L.Structure A]
 variable [Language.wide.Structure
   (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)]
@@ -694,7 +694,7 @@ theorem wmSetLe_succ_bot_logicalTop [Nonempty A]
     WMSetLe WMLe s₀ (logicalTop (R := R') (P := NexPh (Option dt.KIx) PE)
       (K := dt.KIx) (V := Fin dt.dd → A)) :=
   wmSetLe_succ_bot_of_nonempty h hs₀
-    ⟨(DrawTag.arg i₀, fun _ => Classical.arbitrary A), i₀, rfl⟩
+    ⟨(Tag.arg i₀, fun _ => Classical.arbitrary A), i₀, rfl⟩
 
 end Guessed
 
@@ -923,7 +923,7 @@ omit [Nonempty A] [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] i
 opening is a forward run, but a *backward* reading of an accepting run does not
 get the opening: it gets the first configuration the machine cannot leave, which
 is where the guess stopped and the walk home begins
-(`DescriptiveComplexity.Draw.DrawData.exists_postGuess_shaped`). From there on the
+(`DescriptiveComplexity.Draw.Data.exists_postGuess_shaped`). From there on the
 run is forward again, and this is that piece: walk down to the marker from
 wherever the guess stopped, and step into the evaluation.
 
@@ -1012,7 +1012,7 @@ own stretch and the guess all stay inside the region, so with each of the
 program's numbers below the region's size `2 ^ (k · m)` and a block worth at
 least eight addresses (`3 ≤ m`), the whole opening and the step that follows it
 are below `2 ^ ((k + 1) · m)` – which is what
-`DescriptiveComplexity.Draw.DrawData.nexTotal_lt_two_pow'` asks of it. The region
+`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'` asks of it. The region
 bound on a rank is `wideRank_lt_two_pow_supported`; the base is bounded the same
 way, being an address of the region like any other. -/
 theorem openingRegion_le_two_pow {A : Type} [Finite A] [Language.wide.Structure A]
@@ -1048,7 +1048,7 @@ theorem openingLogical_le_two_pow {A R P K : Type} {dd : ℕ}
     {Rn base : ℕ} {top bot : Univ A R P K dd → Prop}
     (hord : ∀ x y : Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
     (hm : 3 ≤ Nat.card (Fin dd → A))
-    (htop : ∀ τ : DrawTag R P K, (∀ i : K, τ ≠ DrawTag.arg i) →
+    (htop : ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) →
       ∀ v : Fin dd → A, ¬top (τ, v))
     (hbase : base + 1 ≤ 2 ^ (Nat.card K * Nat.card (Fin dd → A)))
     (hfile : 2 * Rn + 5 ≤ 2 ^ (Nat.card K * Nat.card (Fin dd → A))) :
@@ -1073,7 +1073,7 @@ end Clock
 
 section Accept
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A G : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A G : Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
@@ -1161,7 +1161,7 @@ steps with `o + 1` below `2 ^ ((k + 1) · m)` – two sweeps of the region, whic
 is what laying the file and guessing over it costs – an evaluation of at most
 `a · b` with both factors below `2 ^ (k · m)`, and `k + 1 < j` with one working
 block; then the whole run is below `2 ^ ((k + j) · m)`, hence below the number
-of addresses (`DescriptiveComplexity.Draw.DrawData.nexTotal_lt_two_pow'`). -/
+of addresses (`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'`). -/
 theorem nexProg_wideAccept_of_legs (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
@@ -1300,7 +1300,7 @@ end Accept
 
 section Unique
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A G : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A G : Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
@@ -1453,7 +1453,7 @@ end Unique
 
 
 
-end DrawData
+end Data
 
 end Draw
 

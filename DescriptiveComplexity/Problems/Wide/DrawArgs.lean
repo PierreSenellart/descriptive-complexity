@@ -29,7 +29,7 @@ held the cell. An equality atom's verdict is the first bit; an order atom's
 is «agreed throughout, or the first difference went the right way».
 
 Where a level's point lives is fixed here too
-(`DescriptiveComplexity.Draw.DrawData.lvBlk` / `lvTrack`), in the dictionary of
+(`DescriptiveComplexity.Draw.Data.lvBlk` / `lvTrack`), in the dictionary of
 `DescriptiveComplexity.Problems.Wide.DrawLeaf`: the free levels in the outer
 blocks of the MIRROR register – the working address – and the quantified ones
 in the inner blocks of VAL.
@@ -43,9 +43,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type}
 
 /-! ### Where a level's point lives -/
 
@@ -231,7 +231,7 @@ theorem cmpArgs_exitSt_congr [LinearOrder A] [Finite A] [Nonempty A]
 An expansion atom must know the **tags** of its argument points before it can
 pick the defining sentence to run: it reads, for each argument position and
 each tag, whether that tag's witness cell belongs to the position's block
-(`DescriptiveComplexity.Draw.DrawData.blk_encTagTup_iff` – the read is the
+(`DescriptiveComplexity.Draw.Data.blk_encTagTup_iff` – the read is the
 point's tag test), and files the answer in a flag. The branch checkpoint then
 dispatches on the whole tuple, which the flags decode **one-hot**: that is
 what makes its dispatches exclusive, and it is the only hypothesis
@@ -297,7 +297,7 @@ of the defining sentence's matrix: the atom names a copy – which argument
 point – a relation variable of that point's block, and the levels its payload
 reads. The trip goes to the cell of that member tuple, in the block the copy's
 level occupies, and its digit is the assignment bit
-(`DescriptiveComplexity.Draw.DrawData.blk_encAsgTup_self`). -/
+(`DescriptiveComplexity.Draw.Data.blk_encAsgTup_self`). -/
 
 section Exp
 
@@ -382,9 +382,9 @@ noncomputable def expLeafVal {k : ℕ} (e : dt.X.E.Relations k)
 
 /-- **What the control computes is the branch's leaf.** Given that every
 leaf-read flag holds its block atom's value – which
-`DescriptiveComplexity.Draw.DrawData.regBit_expMatch` is what the trip
+`DescriptiveComplexity.Draw.Data.regBit_expMatch` is what the trip
 delivers – the Boolean function of the flags and the guards is the leaf
-predicate `DescriptiveComplexity.Draw.DrawData.expLeaf` of
+predicate `DescriptiveComplexity.Draw.Data.expLeaf` of
 `DescriptiveComplexity.Problems.Wide.DrawExp`. -/
 theorem expLeafVal_iff {k : ℕ} (e : dt.X.E.Relations k) (τ : Fin k → dt.X.Tag)
     (hn : (dt.relPk e τ).n ≤ dt.eDim) (hrd : dt.relNr e τ ≤ dt.nfDim)
@@ -800,7 +800,7 @@ variable (dt zero one)
 
 /-- **The pack of an atom, by its kind**, with the budgets it needs as
 hypotheses about that kind – so the match is on the kind itself and the
-stuck `DescriptiveComplexity.Draw.DrawData.kindOf` never has to be unfolded. -/
+stuck `DescriptiveComplexity.Draw.Data.kindOf` never has to be unfolded. -/
 noncomputable def kindArgsOf (v : dt.VarIx) (a : Fin dt.natMax) :
     ∀ κ : MatAtom dt.X dt.d.B (dt.nOf v),
       dt.kindArgs κ * @Fintype.card dt.X.Tag (Fintype.ofFinite _) ≤ dt.ntgDim →
@@ -848,7 +848,7 @@ noncomputable def wellShapedG (b : Fin dt.ko ⊕ Fin dt.ki) (g : dt.SlotIx → A
           g (.name j) = encAsgTup dt.ly zero one i w (Fin.castLE dt.dd0Le j)))
 
 /-- **The well-shapedness question of an inner gate**, per cell: the same
-question as `DescriptiveComplexity.Draw.DrawData.wellShapedG` with the digit
+question as `DescriptiveComplexity.Draw.Data.wellShapedG` with the digit
 read off the VAL register instead of the mirror. -/
 noncomputable def wellShapedIG (b : Fin dt.ko ⊕ Fin dt.ki)
     (g : dt.SlotIx → A) : Prop :=
@@ -860,7 +860,7 @@ noncomputable def wellShapedIG (b : Fin dt.ko ⊕ Fin dt.ki)
           g (.name j) = encAsgTup dt.ly zero one i w (Fin.castLE dt.dd0Le j)))
 
 /-- **An inner gate's conjoining exit**: as
-`DescriptiveComplexity.Draw.DrawData.gateExit`, into the given flag — the
+`DescriptiveComplexity.Draw.Data.gateExit`, into the given flag — the
 level's polarity chooses which of the round's two flags — with one
 conjunct more: the witness flags must be **one-hot at the dispatched
 tag**. On the genuine branch the conjunct is what the dispatch already
@@ -998,8 +998,8 @@ theorem regBit_expMatch (hzo : zero ≠ one)
     (e : dt.X.E.Relations k) (τ : Fin k → dt.X.Tag) (r : Fin (dt.relNr e τ))
     (hn : (dt.relPk e τ).n ≤ dt.eDim) (points : Fin k → dt.X.Map A)
     {m : Univ A R' P' dt.KIx dt.dd → Prop}
-    (hp : wmBlk m (DrawTag.arg (toLex (dt.lvBlk v (ts (relLeafData e τ r).1.1))) :
-        DrawTag R' P' dt.KIx) =
+    (hp : wmBlk m (Tag.arg (toLex (dt.lvBlk v (ts (relLeafData e τ r).1.1))) :
+        Tag R' P' dt.KIx) =
       encMap dt.ly zero one (points (relLeafData e τ r).1.1))
     (f : dt.CtlIx → A) :
     regBit m (wmSeg (dt.blkElt (dt.lvBlk v (ts (relLeafData e τ r).1.1))
@@ -1016,7 +1016,7 @@ end LeafRead
 
 end Exp
 
-end DrawData
+end Data
 
 end Draw
 

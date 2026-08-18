@@ -11,12 +11,12 @@ import DescriptiveComplexity.Problems.Wide.DrawCmp
 # The atom kinds, dispatched: one stage interface for the matrix
 
 The matrix's sequencer treats every classified atom alike; this file makes
-that literal. `DescriptiveComplexity.Draw.DrawData.KindSem` carries the one
+that literal. `DescriptiveComplexity.Draw.Data.KindSem` carries the one
 piece of semantic data a kind's run needs (the encoded points, for an
 expansion atom – the others need none),
-`DescriptiveComplexity.Draw.DrawData.kindExitCtl` is the control each kind's
+`DescriptiveComplexity.Draw.Data.kindExitCtl` is the control each kind's
 machinery leaves behind, and
-`DescriptiveComplexity.Draw.DrawData.kind_hStage` is the uniform stage
+`DescriptiveComplexity.Draw.Data.kind_hStage` is the uniform stage
 discharge: whatever the kind, from the machinery's entry phase one cell
 right of the marker to the exit phase back there, at the `Slot.val`-walked
 presentation – the shape `DescriptiveComplexity.Draw.seq_run` consumes.
@@ -142,9 +142,9 @@ theorem tupleIter1_apply_of (q : Q)
 
 end FamApply
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -172,11 +172,11 @@ noncomputable def KindSem : MatAtom dt.X dt.d.B (dt.nOf vi) → Type
     { pts : Fin k → dt.X.Map A //
       ∀ ℓ : Fin k,
         wmBlk (dt.lvSet st vi (ts ℓ))
-          (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+          (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
           encMap dt.ly zero one (pts ℓ) }
 
 /-- **A semantic pack transports along the registers it reads.**
-`DescriptiveComplexity.Draw.DrawData.KindSem` sees the tape state only
+`DescriptiveComplexity.Draw.Data.KindSem` sees the tape state only
 through the levels' register sets, so a pack at one state is a pack at
 every state with the same mirror and VAL. This is what lets *one* pack —
 built at an address's entry state — serve every position of the spine and
@@ -297,9 +297,9 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An atom's machinery is blind to the two scratch registers**: each
 kind's loop reads the levels' register sets and its background at the
 working cell, and each kind's exit reads the control alone
-(`DescriptiveComplexity.Draw.DrawData.cmpArgs_exitSt_congr` and its two
+(`DescriptiveComplexity.Draw.Data.cmpArgs_exitSt_congr` and its two
 siblings). The pack travels by
-`DescriptiveComplexity.Draw.DrawData.kindSemCast`, which keeps its points.
+`DescriptiveComplexity.Draw.Data.kindSemCast`, which keeps its points.
 This is the brick the whole threaded-versus-unthreaded bridge is built
 from. -/
 theorem kindExitCtl_congr_scratch {st' : TapeStD dt A R P}
@@ -366,7 +366,7 @@ variable (hsav : st.sav = v) (htgt : st.tgt = v)
 /-- **The state an atom leaves**: a stage atom normalizes SAV and TARGET to
 the home address (its random access writes them whatever they held), every
 other kind leaves the state alone. -/
-noncomputable def kindEndSt (dt : DrawData L) {A R P : Type}
+noncomputable def kindEndSt (dt : Data L) {A R P : Type}
     (vi : dt.VarIx) (v : Univ A R P dt.KIx dt.dd → Prop)
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (st : TapeStD dt A R P) :
     TapeStD dt A R P :=
@@ -376,9 +376,9 @@ noncomputable def kindEndSt (dt : DrawData L) {A R P : Type}
 
 include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt in
 /-- **The uniform stage discharge, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.kind_hStage` but with no boundary
+`DescriptiveComplexity.Draw.Data.kind_hStage` but with no boundary
 discipline assumed — the atom's exit state is
-`DescriptiveComplexity.Draw.DrawData.kindEndSt`, which normalizes SAV and
+`DescriptiveComplexity.Draw.Data.kindEndSt`, which normalizes SAV and
 TARGET exactly when the atom is a stage atom. -/
 theorem kind_hStage_thread
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
@@ -442,7 +442,7 @@ theorem kind_hStage_thread
 include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hsav htgt in
 /-- **The uniform stage discharge**: whatever the kind, the atom's machinery
 runs from its entry phase one cell right of the marker to the exit phase
-back there, leaving `DescriptiveComplexity.Draw.DrawData.kindExitCtl` in the
+back there, leaving `DescriptiveComplexity.Draw.Data.kindExitCtl` in the
 control and the tape untouched. -/
 theorem kind_hStage
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
@@ -602,7 +602,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
 /-- **The remaining registers an atom leaves alone** — the three
-`DescriptiveComplexity.Draw.DrawData.kindEndSt_fields` does not list, so
+`DescriptiveComplexity.Draw.Data.kindEndSt_fields` does not list, so
 that the seven together pin the state down to its SAV and TARGET. -/
 theorem kindEndSt_fields' (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (st : TapeStD dt A R P) :
@@ -633,7 +633,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [L.Structure A] in
 /-- **The matrix's threaded state is its entry state with the two scratch
 registers rewritten** — the sharpening of
-`DescriptiveComplexity.Draw.DrawData.matSt_fields` that lets the loop above
+`DescriptiveComplexity.Draw.Data.matSt_fields` that lets the loop above
 thread the two registers instead of the whole state, and with them keep
 every semantic pack at the state it was built for. -/
 theorem matSt_eq (n : ℕ) :
@@ -1136,7 +1136,7 @@ nothing. -/
 noncomputable def mkKindSem (w : Fin (dt.nOf vi) → dt.X.Map A)
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (dt.lvSet st vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j)) :
     ∀ κ : MatAtom dt.X dt.d.B (dt.nOf vi), dt.KindSem zero one vi st κ
   | .eq _ _ => PUnit.unit
@@ -1156,11 +1156,11 @@ theorem kindSemCast_mkKindSem (zero one : A) (vi : dt.VarIx)
     {w w' : Fin (dt.nOf vi) → dt.X.Map A} (hww : w = w')
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (dt.lvSet st vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j))
     (hENC' : ∀ j : Fin (dt.nOf vi),
       wmBlk (dt.lvSet st' vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w' j))
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) :
     dt.kindSemCast zero one vi hmir hval κ
@@ -1175,10 +1175,10 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
 hold encodings, the machine's per-tuple question is the encodings'. -/
 theorem cmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (dt.lvSet st vi j₁)
-      (DrawTag.arg (toLex (dt.lvBlk vi j₁)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (h2 : wmBlk (dt.lvSet st vi j₂)
-      (DrawTag.arg (toLex (dt.lvBlk vi j₂)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₂)) : Tag R P dt.KIx) =
       encMap dt.ly zero one q)
     (u : Lex (Fin dt.dd0 → A)) :
     dt.CmpAgr (laidFile RF hord) zero (dt.hasName_diagLayout (cell := RF.cell) (zero := zero)) vi
@@ -1199,10 +1199,10 @@ tuple decides the two encoded points. -/
 theorem cmpAgr_all_iff (hzo : zero ≠ one)
     {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (dt.lvSet st vi j₁)
-      (DrawTag.arg (toLex (dt.lvBlk vi j₁)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (h2 : wmBlk (dt.lvSet st vi j₂)
-      (DrawTag.arg (toLex (dt.lvBlk vi j₂)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₂)) : Tag R P dt.KIx) =
       encMap dt.ly zero one q) :
     (∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr (laidFile RF hord) zero
       (dt.hasName_diagLayout (cell := RF.cell) (zero := zero)) vi j₁ j₂ st u) ↔
@@ -1220,10 +1220,10 @@ points. -/
 theorem cmp_ord_iff (hzo : zero ≠ one)
     {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (dt.lvSet st vi j₁)
-      (DrawTag.arg (toLex (dt.lvBlk vi j₁)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (h2 : wmBlk (dt.lvSet st vi j₂)
-      (DrawTag.arg (toLex (dt.lvBlk vi j₂)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₂)) : Tag R P dt.KIx) =
       encMap dt.ly zero one q) :
     ((∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr (laidFile RF hord) zero (dt.hasName_diagLayout (cell :=
         RF.cell) (zero := zero)) vi j₁ j₂ st u) ∨
@@ -1268,7 +1268,7 @@ theorem ctlBit_kindExitCtl_self (hzo : zero ≠ one)
     (w : Fin (dt.nOf vi) → dt.X.Map A)
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (dt.lvSet st vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j))
     (hOld : ∀ (i : dt.d.B.ι) (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf vi)),
       st.old i (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i)) ↔
@@ -1332,7 +1332,7 @@ theorem ctlBit_kindExitCtl_self (hzo : zero ≠ one)
 omit [Fintype dt.SlotIx] in
 /-- **The matrix's verdicts, at the points**: after the whole matrix, atom
 `a`'s slot holds `MatAtom.holds` of its kind at the encoded valuation –
-the `hav` input of `DescriptiveComplexity.Draw.DrawData.postLeaf_iff_qfValue`
+the `hav` input of `DescriptiveComplexity.Draw.Data.postLeaf_iff_qfValue`
 on the nose. -/
 theorem ctlBit_avC_matFs_holds (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -1340,7 +1340,7 @@ theorem ctlBit_avC_matFs_holds (hzo : zero ≠ one)
     (w : Fin (dt.nOf vi) → dt.X.Map A)
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (dt.lvSet st vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j))
     (hOld : ∀ (i : dt.d.B.ι) (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf vi)),
       st.old i (dt.stageTgtD zero vi i ts st v (dt.d.B.arity i)) ↔
@@ -1405,7 +1405,7 @@ variable (sem : ∀ a : Fin (dt.natOf vi),
 
 variable (dt zero one vi st v) in
 /-- **The control thread across the matrix's atoms, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.matFs`, with each atom's exit control
+`DescriptiveComplexity.Draw.Data.matFs`, with each atom's exit control
 computed at the state that atom actually runs at. -/
 noncomputable def matFsT
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
@@ -1497,9 +1497,9 @@ theorem matFsT_eq_matFs (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u
 
 include hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hrules in
 /-- **The matrix's run, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.matrix_run` with no boundary discipline
+`DescriptiveComplexity.Draw.Data.matrix_run` with no boundary discipline
 assumed — the tape ends in the threaded state
-`DescriptiveComplexity.Draw.DrawData.matSt`, which differs from the entry
+`DescriptiveComplexity.Draw.Data.matSt`, which differs from the entry
 state in SAV and TARGET alone, and only if the matrix has a stage atom. -/
 theorem matrix_run_thread
     (semT : ∀ a : Fin (dt.natOf vi),
@@ -1690,7 +1690,7 @@ variable (hcompatOf : ∀ (ℓ : Fin (dt.arOf vi)) (u : Univ A R P dt.KIx dt.dd)
 variable (tOf : Fin (dt.arOf vi) → dt.X.Tag)
 variable (htagOf : ∀ ℓ : Fin (dt.arOf vi),
   dt.dspTagOf PR.zero PR.one
-    (wmBlk st.mir (DrawTag.arg (toLex (bOf ℓ)) : DrawTag R P dt.KIx)) =
+    (wmBlk st.mir (Tag.arg (toLex (bOf ℓ)) : Tag R P dt.KIx)) =
   tOf ℓ)
 
 include hrules hR hlin hord htop hbot hv hvi hwkSt hcompatOf htagOf in
@@ -1910,12 +1910,12 @@ theorem ctlBit_gateFlagC_gatesFs (hzo : PR.zero ≠ PR.one)
       (dt.ctlBit PR.one f₀ dt.gateFlagC ∧
         ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < n →
           ((∀ t' : dt.X.Tag,
-            wmBlk st.mir (DrawTag.arg (toLex (bOf ℓ)) : DrawTag R P dt.KIx)
+            wmBlk st.mir (Tag.arg (toLex (bOf ℓ)) : Tag R P dt.KIx)
               (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ) ∧
           ExpExpansion.DomHolds (X := dt.X)
             (tOf ℓ, decRho dt.ly PR.zero PR.one
               (wmBlk st.mir
-                (DrawTag.arg (toLex (bOf ℓ)) : DrawTag R P dt.KIx))))) := by
+                (Tag.arg (toLex (bOf ℓ)) : Tag R P dt.KIx))))) := by
   induction n with
   | zero =>
     exact ⟨fun h => ⟨h, fun ℓ hℓ => absurd hℓ (Nat.not_lt_zero _)⟩,
@@ -1967,7 +1967,7 @@ end GatesRun
 
 end KindStage
 
-end DrawData
+end Data
 
 end Draw
 

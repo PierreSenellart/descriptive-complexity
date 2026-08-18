@@ -35,9 +35,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q P : Type}
 
 /-! ### Slot distinctness
 
@@ -174,7 +174,7 @@ def valTopTestKit (one : A) (emb : TestPh → P) : TestKit A Q dt.SlotIx P where
 padded cell of the element whose block is `b` and whose first `dd0`
 coordinates are the ones the control *computes* through `cf`. The trips of
 the coordinate loops read the control's slots directly
-(`DescriptiveComplexity.Draw.DrawData.nameG`); the leaf reads of the element
+(`DescriptiveComplexity.Draw.Data.nameG`); the leaf reads of the element
 loops compute an encoded tuple from them
 (`DescriptiveComplexity.Problems.Wide.DrawName`), and both are this guard. -/
 def nameGF (one : A) (b : Fin dt.ko ⊕ Fin dt.ki) (cf : (Q → A) → Fin dt.dd0 → A) :
@@ -189,7 +189,7 @@ def nameG (one : A) (b : Fin dt.ko ⊕ Fin dt.ki) (coord : Fin dt.dd0 → Q) :
     (Q → A) → (dt.SlotIx → A) → Prop :=
   dt.nameGF one b fun fc j => fc (coord j)
 
-end DrawData
+end Data
 
 end Draw
 

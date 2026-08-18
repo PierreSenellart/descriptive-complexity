@@ -13,7 +13,7 @@ The random access of a stage atom copies each argument position's source block
 into the TARGET register and then seeks to the address TARGET spells. At the
 elementwise file that address *is* the register set, and the copy's two cells
 are elements of the universe
-(`DescriptiveComplexity.Draw.DrawData.stageXS`/`stageXD`). At a coarser file they
+(`DescriptiveComplexity.Draw.Data.stageXS`/`stageXD`). At a coarser file they
 are **registers**, named by a block and a tuple
 (`DescriptiveComplexity.Draw.Layout.reg`), what the copy builds is a **mark**,
 and the address is `DescriptiveComplexity.ixAddr` of it.
@@ -43,9 +43,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P] [Nonempty A]
@@ -630,7 +630,7 @@ include hrules hR hlin hix hsepP hhasP hbot hv hvi hwkSt hmirSt in
 /-- **The copy loops of a stage atom, chained and instantiated, on a clock**:
 from the phase entering the first loop to the first reset's checkpoint, the
 TARGET holding the composed content of every position – exactly the `hLoopsIn`
-leg of `DescriptiveComplexity.Draw.DrawData.stage_reachesIn`, at one loop and one
+leg of `DescriptiveComplexity.Draw.Data.stage_reachesIn`, at one loop and one
 walk-back per position. -/
 theorem ixStageChain_reachesIn (w : ℕ)
     (hcost : ∀ (ℓ : Fin (dt.d.B.arity iv)) (a : Lex (Fin dt.dd0 → A)),
@@ -824,7 +824,7 @@ every register it holds was written by a copy round, at that round's
 destination – in an argument block – over the empty mark. -/
 theorem ixStageTgt_arg (st : TapeSt dt A R P I) (n : ℕ) {u : I}
     (hy : dt.ixStageTgt F hhas vi ts st n u) :
-    ∃ i : dt.KIx, (elt u).1 = DrawTag.arg i := by
+    ∃ i : dt.KIx, (elt u).1 = Tag.arg i := by
   classical
   induction n generalizing u with
   | zero => exact hy.elim
@@ -834,7 +834,7 @@ theorem ixStageTgt_arg (st : TapeSt dt A R P I) (n : ℕ) {u : I}
     · simp only [tuplePost] at hy
       rcases hy with ⟨hy1, -⟩ | ⟨-, hw⟩
       · exact ⟨_, by rw [hy1, ixStageXD, helt]; rfl⟩
-      · exact tupleIterD_of_mem (fun u => ∃ i : dt.KIx, (elt u).1 = DrawTag.arg i)
+      · exact tupleIterD_of_mem (fun u => ∃ i : dt.KIx, (elt u).1 = Tag.arg i)
           (fun _ => ⟨_, by rw [ixStageXD, helt]; rfl⟩) (fun _ hy' => ih hy') _ hw
     · exact ih hy
 
@@ -867,7 +867,7 @@ built from padded destination registers in argument blocks alone, which is
 theorem wmSetLt_ixStageTgt_logicalTop {one : A} (hne : zero ≠ one)
     (hV : IsLinOrd (tupLeLex (A := A) (d := dt.dd))) (hd : dt.dd0 < dt.dd)
     (i : dt.KIx) (st : TapeSt dt A R P I) (n : ℕ) :
-    WMSetLt (lexRel (· ≤ · : DrawTag R P dt.KIx → DrawTag R P dt.KIx → Prop)
+    WMSetLt (lexRel (· ≤ · : Tag R P dt.KIx → Tag R P dt.KIx → Prop)
       (tupLeLex (A := A) (d := dt.dd)))
       (ixAddr elt (dt.ixStageTgt F hhas vi ts st n)) logicalTop :=
   wmSetLt_logicalTop_of_isPad hne hV hd i
@@ -887,7 +887,7 @@ end IxWhere
 The random access, end to end: the save, the clear, the copy loops of
 `ixStageChain_reachesIn`, the reset–clear–seek out to the address the marks stand
 for, the read under the head, the restore and the seek home. Everything below
-it is `DescriptiveComplexity.Draw.DrawData.stage_run`, which takes the file as a
+it is `DescriptiveComplexity.Draw.Data.stage_run`, which takes the file as a
 parameter; what this adds is the instantiation – the built target, and the two
 facts that put it in the working area.
 -/
@@ -930,7 +930,7 @@ variable {gtop gbot : I} (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 variable {e₀ : Univ A R P dt.KIx dt.dd} (he₀ : ∀ y, WMLe e₀ y)
 variable (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -998,7 +998,7 @@ theorem ixStageAtom_reachesIn (b : Bool) (w wG wP wR wK : ℕ)
   -- block
   have hargTb : ∀ x, ixAddr elt (dt.ixStageTgt F hhasP vi ts
       { st with sav := ixMark elt v } (dt.d.B.arity iv)) x →
-      ∃ i : dt.KIx, x.1 = DrawTag.arg i := by
+      ∃ i : dt.KIx, x.1 = Tag.arg i := by
     rintro x ⟨u, he, hm⟩
     obtain ⟨i, hi⟩ := dt.ixStageTgt_arg F hhasP vi ts heltP _ _ hm
     rw [he] at hi
@@ -1059,12 +1059,12 @@ theorem wmBlk_ixStageTgt_eq_encMap {one : A} (hinj : Function.Injective elt)
     (st : TapeSt dt A R P I) {p : Fin (dt.d.B.arity iv) → dt.X.Map A}
     (hsrc : ∀ ℓ : Fin (dt.d.B.arity iv),
       wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (p ℓ))
     (ℓ : Fin (dt.d.B.arity iv)) :
     wmBlk (ixAddr elt (dt.ixStageTgt F hhas vi ts st (dt.d.B.arity iv)))
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx) =
       encMap dt.ly zero one (p ℓ) := by
   classical
   funext w
@@ -1085,7 +1085,7 @@ theorem wmBlk_ixStageTgt_eq_encMap {one : A} (hinj : Function.Injective elt)
     subst hℓ
     rw [show w = pad (dd := dt.dd) zero (ofLex b) from hsnd.symm]
     have hbit : wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ')))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ'))) : DrawTag R P dt.KIx)
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ'))) : Tag R P dt.KIx)
         (pad (dd := dt.dd) zero (ofLex b)) :=
       ⟨dt.ixStageXS F hhas vi ts ℓ' b, by rw [ixStageXS, helt]; rfl, hsrcbit⟩
     rw [hsrc ℓ'] at hbit
@@ -1093,11 +1093,11 @@ theorem wmBlk_ixStageTgt_eq_encMap {one : A} (hinj : Function.Injective elt)
   · have hpadded : w = pad (dd := dt.dd) zero (unpad dt.dd0Le w) :=
       (pad_unpad dt.dd0Le fun j hj => isPad_of_encMap h j hj).symm
     have hsrcbit : wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) w := by
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) w := by
       rw [hsrc ℓ]; exact h
     obtain ⟨u, he, hm⟩ := hsrcbit
     have hxs : elt (dt.ixStageXS F hhas vi ts ℓ (toLex (unpad dt.dd0Le w))) =
-        ((DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx), w) := by
+        ((Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx), w) := by
       rw [ixStageXS, helt, ofLex_toLex, ← hpadded]
       rfl
     refine ⟨dt.ixStageXD F hhas ℓ (toLex (unpad dt.dd0Le w)), ?_, ?_⟩
@@ -1172,7 +1172,7 @@ theorem ixStageFAt_congr_scratch {st' : TapeSt dt A R P I}
 end IxScratch
 
 
-end DrawData
+end Data
 
 end Draw
 

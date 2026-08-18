@@ -110,9 +110,9 @@ def varOwn {B PG PX SG SX : Type} (ownG : PG → SG) (ownX : PX → SX) :
   | .valIncrP _ => .valIncr
   | .vchk2 => .vchk2
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q P PG PX SG SX : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q P PG PX SG SX : Type}
 variable (zero one : A) {ShG : SG → Type} {ShX : SX → Type}
 
 /-- The carry-block index of the VAL increment. -/
@@ -556,7 +556,7 @@ theorem varSep
 
 end Sep
 
-end DrawData
+end Data
 
 end Draw
 

@@ -16,14 +16,14 @@ the register cell of the element whose tag is that block and whose
 coordinates spell the tuple – and reading the register's track there. This
 file is the joint between the two descriptions:
 
-* `DescriptiveComplexity.Draw.DrawData.blkElt` – the element an encoded tuple
+* `DescriptiveComplexity.Draw.Data.blkElt` – the element an encoded tuple
   is, in a given argument block, and `encCoord` – its coordinates, computed
   from the control's slots (the `cf` of
-  `DescriptiveComplexity.Draw.DrawData.nameGF`);
-* `DescriptiveComplexity.Draw.DrawData.encG_iff` – the leaf read's guard holds
+  `DescriptiveComplexity.Draw.Data.nameGF`);
+* `DescriptiveComplexity.Draw.Data.encG_iff` – the leaf read's guard holds
   at **exactly** that cell, which is what a navigation-by-name scan needs of
   its stopping condition, and what makes the trip's arrival known;
-* `DescriptiveComplexity.Draw.DrawData.blk_encAsgTup_iff` and
+* `DescriptiveComplexity.Draw.Data.blk_encAsgTup_iff` and
   `blk_encTagTup_iff` – the digit found there: at a block holding the
   encoding of a point, a member tuple's question is **one bit of the point's
   assignment** – with no tag to match, the member codes carrying none – and a
@@ -33,10 +33,10 @@ file is the joint between the two descriptions:
 What makes the scans stop at the encodings' cells at all is that an encoded
 tuple is *canonically padded* (`encTup_isPad`): the layout inhabits the first
 `dd₀` coordinates only, which is the budget
-`DescriptiveComplexity.Draw.DrawData.lyLt` fixes.
+`DescriptiveComplexity.Draw.Data.lyLt` fixes.
 
 The same padding is what carries all of this to a **coarse** file, where a
-register is not an element: `DescriptiveComplexity.Draw.DrawData.ixEncG_iff` says
+register is not an element: `DescriptiveComplexity.Draw.Data.ixEncG_iff` says
 the read stops at the register the layout names by the encoded tuple's
 coordinates, and `elt_reg_encCoord` says that register's address is the cell the
 elementwise read would have gone to.
@@ -50,9 +50,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 
 /-! ### The element an encoded tuple is -/
@@ -62,7 +62,7 @@ tuple as its coordinates. Reading a register's track at this cell is asking
 whether the tuple belongs to the block value the register holds. -/
 def blkElt (b : Fin dt.ko ⊕ Fin dt.ki) (v : Fin dt.dd → A) :
     Univ A R' P' dt.KIx dt.dd :=
-  (DrawTag.arg (toLex b), v)
+  (Tag.arg (toLex b), v)
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] in
 @[simp]
@@ -212,7 +212,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- **A leaf read at a coarse file stops at exactly one register**: the one the
 layout names by the encoded tuple's coordinates. The elementwise
-`DescriptiveComplexity.Draw.DrawData.encG_iff` read at a file whose registers are
+`DescriptiveComplexity.Draw.Data.encG_iff` read at a file whose registers are
 not elements – the trips of an expansion atom ask which register they stopped
 at, and the answer is a name the layout knows. -/
 theorem ixEncG_iff (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
@@ -241,7 +241,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 names coherent with the encoding, the address of that register is the
 elementwise cell the same read would have gone to. This is the one place the
 coarse file and the encoding have to agree, and
-`DescriptiveComplexity.Draw.DrawData.pad_encCoord` is why they do. -/
+`DescriptiveComplexity.Draw.Data.pad_encCoord` is why they do. -/
 theorem elt_reg_encCoord {elt : I → Univ A R' P' dt.KIx dt.dd} (hhas : lay.HasName zero)
     (helt : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (w : Fin dt.dd0 → A),
       elt (lay.reg hhas b w) = dt.blkElt b (pad zero w))
@@ -268,7 +268,7 @@ theorem regBit_blkElt (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     (m : Univ A R' P' dt.KIx dt.dd → Prop) (b : Fin dt.ko ⊕ Fin dt.ki)
     (v : Fin dt.dd → A) :
     regBit m (wmSeg (dt.blkElt b v)) ↔
-      wmBlk m (DrawTag.arg (toLex b) : DrawTag R' P' dt.KIx) v :=
+      wmBlk m (Tag.arg (toLex b) : Tag R' P' dt.KIx) v :=
   regBit_wmSeg hlin m _
 
 variable [L.Structure A]
@@ -283,7 +283,7 @@ theorem blk_encAsgTup_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     {m : Univ A R' P' dt.KIx dt.dd → Prop} {b : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
-    (hp : wmBlk m (DrawTag.arg (toLex b) : DrawTag R' P' dt.KIx) =
+    (hp : wmBlk m (Tag.arg (toLex b) : Tag R' P' dt.KIx) =
       encMap dt.ly zero one p)
     (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A) :
     regBit m (wmSeg (dt.blkElt b (encAsgTup dt.ly zero one i w))) ↔ p.1.2 i w := by
@@ -302,7 +302,7 @@ theorem regBit_decRho (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A) :
     regBit m (wmSeg (dt.blkElt b (encAsgTup dt.ly zero one i w))) ↔
       decRho dt.ly zero one
-        (wmBlk m (DrawTag.arg (toLex b) : DrawTag R' P' dt.KIx)) i w :=
+        (wmBlk m (Tag.arg (toLex b) : Tag R' P' dt.KIx)) i w :=
   dt.regBit_blkElt hlin m b _
 
 omit [LinearOrder R'] [LinearOrder P'] in
@@ -311,7 +311,7 @@ theorem blk_encTagTup_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     {m : Univ A R' P' dt.KIx dt.dd → Prop} {b : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
-    (hp : wmBlk m (DrawTag.arg (toLex b) : DrawTag R' P' dt.KIx) =
+    (hp : wmBlk m (Tag.arg (toLex b) : Tag R' P' dt.KIx) =
       encMap dt.ly zero one p)
     (t : dt.X.Tag) :
     regBit m (wmSeg (dt.blkElt b (encTagTup dt.ly zero one t))) ↔ p.1.1 = t := by
@@ -320,7 +320,7 @@ theorem blk_encTagTup_iff (hzo : zero ≠ one)
 
 end Read
 
-end DrawData
+end Data
 
 end Draw
 

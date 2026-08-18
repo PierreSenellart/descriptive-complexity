@@ -42,7 +42,7 @@ theorem exists_first_of {P : ℕ → Prop} {n : ℕ} (hn : P n) :
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -50,7 +50,7 @@ open Language Structure
 
 section Entry
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A I : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A I : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
@@ -305,7 +305,7 @@ end Entry
 
 section Shape
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A I : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A I : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
@@ -324,7 +324,7 @@ Every step before it fires a rule of the outer layer, and those keep the file �
 so the shape the channel wrote at time zero is still there, and the tape is an
 `ixBack` of a tape state (`exists_ixBack_of_shape`). The phase at that time is
 one the machine never leaves, which is what
-`DescriptiveComplexity.Draw.DrawData.not_acc_of_verdict_false_of` asks of its entry.
+`DescriptiveComplexity.Draw.Data.not_acc_of_verdict_false_of` asks of its entry.
 
 This is where a backward reading starts: the guess is on the tape, the run from
 here on is the evaluation's, and it is deterministic. -/
@@ -375,10 +375,10 @@ theorem exists_postGuess_shaped
   · rintro p f hs
     obtain ⟨p', f', hs', hpg'⟩ := hm
     rw [hs] at hs'
-    have hp : DrawTag.phase (R := R')
-        (K := dt.KIx) p = DrawTag.phase p' :=
+    have hp : Tag.phase (R := R')
+        (K := dt.KIx) p = Tag.phase p' :=
       congrArg Prod.fst (Sum.inr.inj hs')
-    rw [DrawTag.phase.inj hp]
+    rw [Tag.phase.inj hp]
     exact hpg'
 
 end Shape
@@ -387,7 +387,7 @@ end Shape
 
 section Tail
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [Nonempty dt.KIx] [L.IsRelational] [L.Structure A]
@@ -488,7 +488,7 @@ theorem exists_entry_state
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hvreg : ∀ x : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x) → v₀ ≠ wmRegSeg x)
+      ((∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x) → v₀ ≠ wmRegSeg x)
     (g : ℕ → Config (WPoint (Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
     (hhead : ∀ i, ∃ v, (g i).head = Sum.inl v)
@@ -565,7 +565,7 @@ theorem exists_entry_state
     obtain ⟨r, f', hr⟩ := step_state_dst hR (hstep j (by omega))
     rw [hs] at hr
     have hp : p = (PR.rules r).dstPh :=
-      DrawTag.phase.inj (congrArg Prod.fst (Sum.inr.inj hr))
+      Tag.phase.inj (congrArg Prod.fst (Sum.inr.inj hr))
     rw [hp]
     exact nexProgHanded_dstPh_ne_start hE.covered r
   have hm0 : 0 < m := by
@@ -586,7 +586,7 @@ theorem exists_entry_state
           (by rcases ht with rfl | rfl <;> exact fun hc => hc))
         hhead0 m hm0
         (fun i hi => hstep i (by omega))
-        (fun p f hs => DrawTag.phase.inj
+        (fun p f hs => Tag.phase.inj
           (congrArg Prod.fst (Sum.inr.inj (hs.symm.trans hstate0))))
         (fun i hi₀ hi p f hs =>
           ⟨fun hc => hlt i hi p f hs hc, hne_start i hi₀ (by omega) p f hs⟩)
@@ -722,14 +722,14 @@ theorem not_acc_of_entry_verdict
     (fun p f hs => by
       rw [hentrySt] at hs
       have hp : NexPh.homeGuessP = p :=
-        DrawTag.phase.inj (congrArg Prod.fst (Sum.inr.inj hs))
+        Tag.phase.inj (congrArg Prod.fst (Sum.inr.inj hs))
       rw [← hp]
       trivial)
     hjoin hstateT (fun hc => hbit ((hE.accept_iff _ _).mp hc).2) hreach hacc
 
 end Tail
 
-end DrawData
+end Data
 
 end Draw
 

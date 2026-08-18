@@ -15,13 +15,13 @@ instantiated atom runs into that shape:
 
 * `DescriptiveComplexity.Draw.elem_back` – the walk-back a dispatch into an
   element loop owes (the machinery's own `.e0` stay rule);
-* `DescriptiveComplexity.Draw.DrawData.stageEndSt_eq` – the boundary
+* `DescriptiveComplexity.Draw.Data.stageEndSt_eq` – the boundary
   discipline: a stage atom entered with SAV and TARGET at the home address
   leaves the state **unchanged**, so the matrix's background is constant
   across its atoms;
 * the three wrappers `cmp_hStage`/`exp_hStage`/`stage_hStage`, all at the
   `Slot.val`-walked presentation of one boundary state – the presentation
-  `DescriptiveComplexity.Draw.DrawData.var_run` hands the matrix.
+  `DescriptiveComplexity.Draw.Data.var_run` hands the matrix.
 -/
 
 namespace DescriptiveComplexity
@@ -82,9 +82,9 @@ theorem elem_back (hR : PR.table.Reads)
 
 end ElemBack
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -250,7 +250,7 @@ variable (hwkSt : st.wk = fun r => r = v)
 variable (pts : Fin k → dt.X.Map A)
 variable (hENC : ∀ ℓ : Fin k,
   wmBlk (dt.lvSet st vi (ts ℓ))
-    (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+    (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
     encMap dt.ly PR.zero PR.one (pts ℓ))
 
 include hrules hR hlin hordM hbot hv hvi hwkSt hENC in
@@ -367,10 +367,10 @@ theorem stage_hStage (b : Bool)
 omit [L.IsRelational] [L.Structure A] in
 include hrules hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt in
 /-- **The stage atom, threaded**: the same run as
-`DescriptiveComplexity.Draw.DrawData.stage_hStage` with *no* boundary
+`DescriptiveComplexity.Draw.Data.stage_hStage` with *no* boundary
 discipline assumed — the random access writes the home address into SAV and
 TARGET whatever they held, so its exit state is the normalized
-`DescriptiveComplexity.Draw.DrawData.stageEndSt st v` rather than `st`.
+`DescriptiveComplexity.Draw.Data.stageEndSt st v` rather than `st`.
 
 This is the form the outer sweep needs: at a swept address SAV and TARGET
 still hold the *previous* address (the advance refreshes only the marker and
@@ -447,7 +447,7 @@ well-shaped, so the file test passes, the domain evaluation runs on the
 block's decoded tag, and the block exits to the next checkpoint. -/
 theorem gateBlock_hStage_pos (t : dt.X.Tag)
     (htag : dt.dspTagOf PR.zero PR.one
-      (wmBlk st.mir (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)) = t)
+      (wmBlk st.mir (Tag.arg (toLex b) : Tag R P dt.KIx)) = t)
     (hTest : ∀ u, Test u) (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (Sum.inl .up)) f), Sum.inl v',
@@ -598,7 +598,7 @@ theorem gateBlock_hStage_neg {u : Univ A R P dt.KIx dt.dd}
 
 end GateBlockStage
 
-end DrawData
+end Data
 
 end Draw
 

@@ -27,13 +27,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {Q P : Type} [Fintype Q]
+variable {L : Language.{0, 0}} {dt : Data L} {Q P : Type} [Fintype Q]
 variable [Fintype dt.SlotIx]
 
 /-! ### The matrix -/
@@ -147,7 +147,7 @@ theorem uRulesDefinable_igatesRule {v : dt.VarIx} {emb : dt.IGatesPh v → P}
       (exitPh := emb (.chk b.succ)) (hwell b) (hfail b) (hargs b) s ρ)
     hen
 
-end DrawData
+end Data
 
 end Draw
 

@@ -28,7 +28,7 @@ top, and a run that stops earlier has left its remaining bits clear, which is a
 certificate like any other.
 
 The rules are the program's own at
-`DescriptiveComplexity.Draw.DrawData.regionSpec` – a guess specification whose
+`DescriptiveComplexity.Draw.Data.regionSpec` – a guess specification whose
 pointer never moves, so that the site's *roll-over* arm is the walk's every step
 – together with the stopping rule `hasLeft_guessStop`. The sweep is
 `reachesIn_guessRegion`, at the stretch's own length, and the whole phase –
@@ -39,7 +39,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -47,7 +47,7 @@ open Language Structure
 
 section Run
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' I PE : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' I PE : Type}
 variable [Fintype dt.CtlIx] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R']
 variable [LinearOrder (NexPh (Option dt.KIx) PE)]
@@ -197,7 +197,7 @@ theorem reachesIn_guessRegionPhase (hR : PR.table.Reads)
 
 end Run
 
-end DrawData
+end Data
 
 end Draw
 

@@ -13,10 +13,10 @@ import DescriptiveComplexity.Problems.Wide.DrawRound
 One round, one variable's machinery, the evaluation's spine and the outer loop
 are the four remaining combinators, and each is checkpoints over machineries
 that are already discharged. What is new here is small and concrete: the
-program's own kits (`DescriptiveComplexity.Draw.DrawData.compareKit`,
+program's own kits (`DescriptiveComplexity.Draw.Data.compareKit`,
 `copyKit`, `seekKit`, `advKit`, `clearMirKit`, `tgtTopKit`) and the two
 questions they are written from — every stage track agrees with its next
-(`DescriptiveComplexity.Draw.DrawData.cmpG`), and the working cell is at an
+(`DescriptiveComplexity.Draw.Data.cmpG`), and the working cell is at an
 argument-tagged block. Each is a conjunction, a disjunction or an equivalence
 of the three atoms, indexed by a finite type.
 -/
@@ -25,13 +25,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {Q P : Type} [Fintype Q]
+variable {L : Language.{0, 0}} {dt : Data L} {Q P : Type} [Fintype Q]
 variable [Fintype dt.SlotIx]
 
 /-! ### One round -/
@@ -349,7 +349,7 @@ theorem uRulesDefinable_outerRule {PE SE : Type} {ShE : SE → Type}
   · exact ρ.elim
   · exact hE s ρ
 
-end DrawData
+end Data
 
 end Draw
 

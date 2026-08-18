@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.NexRun
 /-!
 # The clocked program of a reduction into the register channel
 
-`DescriptiveComplexity.Draw.DrawData.nexProg` is the clocked program of a
+`DescriptiveComplexity.Draw.Data.nexProg` is the clocked program of a
 reduction that *lays* its own file: it carries a coordinate map, and the sweep
 that lays the file carries a pointer as wide as an address – which no wide
 machine's control can hold (`DescriptiveComplexity.Problems.Wide.Limits`).
@@ -41,7 +41,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -49,7 +49,7 @@ open Language Structure
 
 section HandedProg
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A G : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A G : Type}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable (zero one : A)
@@ -80,7 +80,7 @@ noncomputable def nexProgHanded (hzo : zero ≠ one)
   accept := fun p f => p = .acceptP ∧ (args none).accBit f
   blank := fun _ => zero
   mark := regSlotMark zero one dt.dd0Le
-  marked := fun x => (∃ k : dt.KIx, x.1 = DrawTag.arg k) ∨ IsTopNonArg x
+  marked := fun x => (∃ k : dt.KIx, x.1 = Tag.arg k) ∨ IsTopNonArg x
 
 variable {dt zero one}
 
@@ -105,7 +105,7 @@ end HandedProg
 
 section Legs
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' : Type}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [LinearOrder R'] [Finite R']
@@ -170,7 +170,7 @@ theorem wideRegAccept_of_legs
     (lt_of_lt_of_le (lt_of_lt_of_le (Nat.lt_succ_self _)
       (nexTotal_lt_two_pow' (o := o) (e := e) hk hkj hm he ha hb hopenle).le)
       (Nat.pow_le_pow_right (by omega) hcard)) hstate hacc
-  rw [DrawData.trackTape_empty_congr (PR := PR)
+  rw [Data.trackTape_empty_congr (PR := PR)
     (cell := wmRegSeg) (cell' := F.cell) (rest := PR.initBackReg)]
   exact hopen.trans ((config_openingEnd_eq_evalStart hmir _ _ _) ▸ heval)
 
@@ -189,7 +189,7 @@ three proofs. -/
 
 section Unique
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A G : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A G : Type}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [Finite A] [Finite dt.KIx] [Nonempty A]
 variable [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
@@ -281,7 +281,7 @@ theorem nexProgHanded_srcPh_ne_acceptP (hzo : zero ≠ one)
 
 end Unique
 
-end DrawData
+end Data
 
 end Draw
 

@@ -30,9 +30,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -226,7 +226,7 @@ theorem ctlBit_igateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     dt.ctlBit one
         (dt.igateTagFam RF zero one b st flag hc hn hrd vAdr f₀
           (Fin.last (Fintype.card dt.X.Tag))) (dt.gateTagC hc t') ↔
-      wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+      wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') := by
   rw [dt.ctlBit_igateTagFam_last RF hzo f₀ t']
   have hcell : dt.gateTagCell (R := R) (P := P) zero one b
@@ -245,12 +245,12 @@ value the VAL enumeration produces. -/
 theorem igTagsAre_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
       (dt.dspTagOf zero one
-        (wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+        (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)))
       (dt.igateTagFam RF zero one b st flag hc hn hrd vAdr f₀
         (Fin.last (Fintype.card dt.X.Tag))) := by
   classical
   by_cases h : ∃ t₁ : dt.X.Tag, ∀ t' : dt.X.Tag,
-      wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+      wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') ↔ t' = t₁
   · left
     rw [dspTagOf, dif_pos h]
@@ -348,7 +348,7 @@ variable (hm₀ : ∀ r, dt.back RF.cell PR.zero PR.one dt.dd0Le st r t₀ =
 variable (hwkt₀ : (Slot.wk : dt.SlotIx) ≠ t₀)
 variable (hrgt₀ : (Slot.reg : dt.SlotIx) ≠ t₀)
 variable (htag : dt.dspTagOf PR.zero PR.one
-  (wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)) = t)
+  (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)) = t)
 variable (f₀ : dt.CtlIx → A)
 
 include hrules hR hlin hbot hv hvi hwkSt hm₀ hwkt₀ hrgt₀ htag in
@@ -494,7 +494,7 @@ the *decoded* assignment of the raw block value – no encoding assumed. -/
 noncomputable def igateLeafP (zero one : A) (v : Fin dt.eDim → A) : Prop :=
   dt.domLeaf t
     (decRho dt.ly zero one
-      (wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)))
     fun j => v (Fin.castLE hnt j)
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
@@ -532,7 +532,7 @@ theorem domLeafVal_igateFam (hzo : zero ≠ one)
       dt.igateLeafP b st t (hn t) zero one (ofLex a) := by
   have hval := dt.domLeafVal_iff t (hn t) (hrd t)
     (decRho dt.ly zero one
-      (wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)))
     (dt.igateFam RF zero one b st t flag hc hn hrd vAdr f₀ a (Fin.last (dt.domNr t)))
     (fun r => by
       refine (dt.ctlBit_rdf_igateFam RF hzo f₀ a r).trans ?_
@@ -1047,7 +1047,7 @@ theorem ctlBit_flag_igate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
           (dt.back RF.cell zero one dt.dd0Le st vAdr)) flag ↔
       (dt.ctlBit one f₀ flag ∧
         (∀ t' : dt.X.Tag,
-          wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+          wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)
             (encTagTup dt.ly zero one t') ↔ t' = t) ∧
         foldFrom (dt.domPk t).pol (dt.igateLeafP b st t (hn t) zero one)
           (· ≤ · : A → A → Prop) 0 topTup) := by
@@ -1139,11 +1139,11 @@ theorem ctlBit_flag_igate_domHolds (hzo : zero ≠ one)
           (dt.back RF.cell zero one dt.dd0Le st vAdr)) flag ↔
       (dt.ctlBit one f₀ flag ∧
         (∀ t' : dt.X.Tag,
-          wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+          wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)
             (encTagTup dt.ly zero one t') ↔ t' = t) ∧
         ExpExpansion.DomHolds (X := dt.X)
           (t, decRho dt.ly zero one
-            (wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))) := by
+            (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)))) := by
   refine (ctlBit_flag_igate_exit RF hflag hzo f₀).trans
     (and_congr Iff.rfl (and_congr Iff.rfl ?_))
   refine (foldFrom_top (j₀ := 0)
@@ -1152,7 +1152,7 @@ theorem ctlBit_flag_igate_domHolds (hzo : zero ≠ one)
     (fun i _ a => le_topTup i a) (Nat.le_refl 0)).trans ?_
   exact (dt.domHolds_iff_altQuantFrom_domLeaf_pad t
     (decRho dt.ly zero one
-      (wmBlk st.val (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)))
     (hn t) topTup).symm
 
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
@@ -1195,7 +1195,7 @@ end IGateVerdict
 
 end IGateInst
 
-end DrawData
+end Data
 
 end Draw
 

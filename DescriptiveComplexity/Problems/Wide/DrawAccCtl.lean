@@ -13,16 +13,16 @@ import DescriptiveComplexity.Problems.Wide.DrawAcc
 carry across the inner loop – one **contribution** per level plus the last
 leaf – and how a round rewrites it. This file puts that in the program's own
 slots, which is what the `dstSt` parameters of
-`DescriptiveComplexity.Draw.DrawData.varRule` are:
+`DescriptiveComplexity.Draw.Data.varRule` are:
 
-* `initSt` is `DescriptiveComplexity.Draw.DrawData.initAcc` – every
+* `initSt` is `DescriptiveComplexity.Draw.Data.initAcc` – every
   accumulator the polarity's unit, which is what an empty register's fold is
   (`accCVal_bot`);
-* `postFold` is `DescriptiveComplexity.Draw.DrawData.setLeaf` at `postLeaf` –
+* `postFold` is `DescriptiveComplexity.Draw.Data.setLeaf` at `postLeaf` –
   the matrix's Boolean value at the atoms' verdicts, in the leaf flag;
-* `storeCarry b` is `DescriptiveComplexity.Draw.DrawData.carryAcc` – untouched
+* `storeCarry b` is `DescriptiveComplexity.Draw.Data.carryAcc` – untouched
   below the carry, absorbing the chain at it, reset above (`accCVal_step`);
-* `accBit` is `DescriptiveComplexity.Draw.DrawData.accVerdict` – the chain from
+* `accBit` is `DescriptiveComplexity.Draw.Data.accVerdict` – the chain from
   level `0`, which is the whole prefix once the register is exhausted.
 
 Every one of them is a function of the pointer alone, and each comes with
@@ -38,9 +38,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type}
 
 /-! ### The accumulator vector -/
 
@@ -412,7 +412,7 @@ theorem postLeaf_iff_qfValue {v : dt.VarIx} {f : dt.CtlIx → A}
 
 end Leaf
 
-end DrawData
+end Data
 
 end Draw
 

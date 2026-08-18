@@ -25,7 +25,7 @@ The transport is unchanged because it never reads which problem is being asked
 about (`wideRegProblem_wideRegInterp_iff` is `wideProblem_wideInterp_iff` at the
 other interpretation), so this half of the reduction is free. What is not free
 is the machine's correctness, which is the run of
-`DescriptiveComplexity.Draw.DrawData.wideRegAccept_regLaid_of_rules` on the
+`DescriptiveComplexity.Draw.Data.wideRegAccept_regLaid_of_rules` on the
 yes-side and `DescriptiveComplexity.Problems.Wide.DrawNo` on the no-side.
 -/
 
@@ -57,7 +57,7 @@ noncomputable def dblWideRegInterp (n : ℕ) :
       (G := (srcDt X d).d.B.ι → Bool) n) := finiteLinearOrder _
   letI : LinearOrder (srcDt X d).NexPF := finiteLinearOrder _
   (srcDt X d).nexInterpHandedPad (srcData_payload_le (relExp X) d)
-    (fun v => DrawData.uVarArgsDef_varArgsOf (dt := srcDt X d)
+    (fun v => Data.uVarArgsDef_varArgsOf (dt := srcDt X d)
       (boolEnv (newLang L)) v) none n
 
 /-- **The handed machine of a source, written down in the instance**: the
@@ -129,7 +129,7 @@ theorem srcRegReads (n : ℕ) :
         (srcDt X d).NexPF (srcDt X d).KIx (srcDt X d).dd) :=
     (dblWideRegInterp X d n).mapStructure e.α
   (srcDt X d).reads_nexProgHandedPad (srcData_payload_le (relExp X) d)
-    (fun v => DrawData.uVarArgsDef_varArgsOf (dt := srcDt X d)
+    (fun v => Data.uVarArgsDef_varArgsOf (dt := srcDt X d)
       (boolEnv (newLang L)) v) none n e rfl
 
 end RegReads
@@ -189,10 +189,10 @@ theorem wideRegAccept_srcEnv_iff (n : ℕ) :
   letI : LinearOrder ((srcDt X d).NexRIx (G := (srcDt X d).d.B.ι → Bool)) :=
     finiteLinearOrder _
   have hR := srcRegReads X d (srcEnv L A) n
-  have hE := DrawData.nexEmitted_nexProgHandedPad (dt := srcDt X d) (n := n)
+  have hE := Data.nexEmitted_nexProgHandedPad (dt := srcDt X d) (n := n)
     (srcEnv L A).hzo (srcData_payload_le (relExp X) d) none
   obtain ⟨harg, -, -, -⟩ :=
-    DrawData.regFacts_of_marked (zero := (srcEnv L A).zero) hR hE.marked
+    Data.regFacts_of_marked (zero := (srcEnv L A).zero) hR hE.marked
   exact (srcDt X d).wideRegAccept_iff_exists_out_of_tags
     (srcData_payload_le (relExp X) d) hE hR
     (srcData_dd0_lt (relExp X) d) hdd0 harity (fun _ _ => Iff.rfl) harg
@@ -311,7 +311,7 @@ theorem ExpDefinable.ordered_fo_reduction_wideRegAccept {Q : DecisionProblem L}
   set n : ℕ := 52 * (4 + dt.eDim) * Nat.card dt.KIx + 52 * (4 + dt.eDim) +
     52 * (15 + dt.dimC) + 2 with hn
   refine ⟨{ Tag := (dt.NexITagPad (dt.d.B.ι → Bool) n) × (Fin dt.dd → Bool)
-            tagNonempty := ⟨(Draw.DrawTag.sym, fun _ => false)⟩
+            tagNonempty := ⟨(Draw.Tag.sym, fun _ => false)⟩
             dim := dt.dd * 1
             toInterpretation := Draw.wideRegInterp K.X K.toStepDef n
             correct := fun A _ _ _ _ => ?_ }⟩
@@ -332,7 +332,7 @@ theorem ExpDefinable.ordered_fo_reduction_wideRegAccept {Q : DecisionProblem L}
   -- and the padded rule names outnumber what the clock is measured against
   refine (Draw.wideRegAccept_kernel_iff A K n
     (fun iv => (⟨X, B, φ⟩ : NexKernel L).withArg_arity_pos iv) ?_).trans ?_
-  · rw [hn, Draw.DrawData.card_nexRIxPad]
+  · rw [hn, Draw.Data.card_nexRIxPad]
     exact Nat.le_add_left _ _
   · exact (NexKernel.withArg_holds (⟨X, B, φ⟩ : NexKernel L)).trans
       (hker ((Draw.relExp X).Map ((Draw.dblInterp L).Map A))).symm

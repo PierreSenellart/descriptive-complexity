@@ -9,7 +9,7 @@ import DescriptiveComplexity.Problems.Wide.RegChannelBack
 /-!
 # The handed program on a no-instance
 
-`DescriptiveComplexity.Draw.DrawData.wideRegAccept_of_out_of_rules` is the
+`DescriptiveComplexity.Draw.Data.wideRegAccept_of_out_of_rules` is the
 forward half of the machine's correctness: a sentence true at the guessed stage
 makes the emitted instance a yes-instance. This file is the other half – if the
 sentence is true at *no* stage, the machine does not accept – and it is where the
@@ -32,7 +32,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -40,7 +40,7 @@ open Language Structure
 
 section No
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Nonempty A] [Finite A] [Finite dt.KIx] [Nonempty dt.KIx]
 variable [L.IsRelational] [L.Structure A] [LinearOrder (dt.X.Map A)]
@@ -89,12 +89,12 @@ theorem nexProgHanded_not_wideRegAccept_of_not_out {bot : Option dt.KIx}
   obtain ⟨e₀, -, he₀⟩ := exists_least hlin
     (P := fun _ : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd => True)
-    ⟨(DrawTag.sym, fun _ => Classical.arbitrary A), trivial⟩
+    ⟨(Tag.sym, fun _ => Classical.arbitrary A), trivial⟩
   -- the marker is the empty address, and it has a successor
   obtain ⟨v', hvi'⟩ := exists_wmIncr hlin
     (s := fun _ : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd => False)
-    ⟨(DrawTag.sym, fun _ => Classical.arbitrary A), not_false⟩
+    ⟨(Tag.sym, fun _ => Classical.arbitrary A), not_false⟩
   -- the accepting run, as a sequence
   obtain ⟨n, cfg, hrun, hcacc⟩ :=
     Prog.exists_stepsIn_of_wideRegAccept hR hlin (t₀ := Slot.mir)
@@ -121,7 +121,7 @@ theorem nexProgHanded_not_wideRegAccept_of_not_out {bot : Option dt.KIx}
         PR.blank) := by
     rw [hg0]
     exact congrArg (fun f => wideTape f _)
-      (DrawData.trackTape_empty_congr (PR := PR)
+      (Data.trackTape_empty_congr (PR := PR)
         (cell := wmRegSeg) (cell' := (dt.regLaid hlin hR.le).cell)
         (t := Slot.mir)
         (rest := PR.initBackReg))
@@ -175,7 +175,7 @@ sentence true.** The two directions joined: a stage that works is run into the
 accepting phase on the clock (`wideRegAccept_of_out_of_rules`), and if none
 does, no run accepts (`nexProgHanded_not_wideRegAccept_of_not_out`). This is the
 nondeterministic counterpart of
-`DescriptiveComplexity.Draw.DrawData.dwideAcceptSpace_iff_pfpHolds`, and what a
+`DescriptiveComplexity.Draw.Data.dwideAcceptSpace_iff_pfpHolds`, and what a
 reduction's correctness is read off. -/
 theorem wideRegAccept_iff_exists_out
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) {bot : Option dt.KIx}
@@ -317,12 +317,12 @@ theorem wideRegAccept_iff_exists_out_of_tags
     (harity : ∀ iv : dt.d.B.ι, 0 < dt.d.B.arity iv)
     (hordP : ∀ p q : dt.X.Map A, p ≤ q ↔ (encOrder dt.ly PR.zero PR.one PR.zero_ne_one).le p q)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A (R')
           (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hmk : ∀ x : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      WMHasInp x ↔ ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x))
+      WMHasInp x ↔ ((∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x))
     (htags : 52 * (4 + dt.eDim) * Nat.card dt.KIx + 52 * (4 + dt.eDim) +
         52 * (15 + dt.dimC) + 2 ≤
       Nat.card (R')) :
@@ -335,7 +335,7 @@ theorem wideRegAccept_iff_exists_out_of_tags
 
 end No
 
-end DrawData
+end Data
 
 end Draw
 

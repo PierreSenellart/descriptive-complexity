@@ -11,12 +11,12 @@ import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
 /-!
 # The clocked evaluation at the file the program lays
 
-`DescriptiveComplexity.Draw.DrawData.nexIxEvalB_reachesIn` runs the clocked
+`DescriptiveComplexity.Draw.Data.nexIxEvalB_reachesIn` runs the clocked
 evaluation at an *arbitrary* coarse file, and carries the file's coherences as
 hypotheses: that its registers stand for elements, that their marks tell them
 apart, that a walk to a named register costs `w`, and so on. Every one of those
 is proved of the file a clocked program lays
-(`DescriptiveComplexity.Draw.DrawData.blkLaid`), so this file discharges them all
+(`DescriptiveComplexity.Draw.Data.blkLaid`), so this file discharges them all
 at once: `nexIxEvalB_blkLaid_reachesIn` asks only for what is genuinely the
 *program's* – its rules, its marker, its VAL enumeration and its semantic packs
 – and charges the run the file's own numbers, `blkW`, `blkWP`, `blkWR`, `blkWK`,
@@ -36,11 +36,11 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
 section Laid
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R B : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R B : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
 variable [LinearOrder (NexPh B (EvalPh dt.nv dt.PMF))]
@@ -103,7 +103,7 @@ end WidthBound
 omit [Fintype dt.SlotIx] [LinearOrder A] [Finite A] [Nonempty A] [L.IsRelational]
   [L.Structure A] [Finite dt.KIx] in
 /-- **The tower's costs at the laid file are polynomial in one number**: the
-`IxWidthBd` of `DescriptiveComplexity.Draw.DrawData.ixLegWidth_le`, at the four
+`IxWidthBd` of `DescriptiveComplexity.Draw.Data.ixLegWidth_le`, at the four
 widths the laid file is charged. With it, the spine's width times its positions
 is at most `q ^ 25`, and what an instantiation owes of the clock's first factor
 is `q ^ 25 ≤ 2 ^ (k · m)`. -/
@@ -136,7 +136,7 @@ theorem ixWidthBd_blkLaid {base R q : ℕ} (hq : 16 ≤ q)
 /-- **The clocked evaluation at the laid file**: the walk-back the opening's
 dispatch owes, the branched spine over the spine's positions, and the exit into
 the accepting phase, charged the file's own widths. This is
-`DescriptiveComplexity.Draw.DrawData.nexIxEvalB_reachesIn` with every coherence of
+`DescriptiveComplexity.Draw.Data.nexIxEvalB_reachesIn` with every coherence of
 the file discharged; what is left is the program's own. -/
 theorem nexIxEvalB_blkLaid_reachesIn
     (h : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
@@ -161,7 +161,7 @@ theorem nexIxEvalB_blkLaid_reachesIn
     (hv : WMSetLt WMLe v
       ((dt.blkLaid h hpos hbase).cell (blkBot A dt.KIx dt.dd)))
     -- The marker is a *logical* address, so the registers of the file hold it.
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = Tag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -231,10 +231,10 @@ theorem nexIxEvalB_blkLaid_reachesIn
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd)
           (stOf (Fin.last dt.nv)).mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : (stOf (Fin.last dt.nv)).mir =
       ixMark (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd) v)
@@ -257,10 +257,10 @@ theorem nexIxEvalB_blkLaid_reachesIn
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd)
               (stOf (Fin.last dt.nv)).mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
       (dt.ixOutCtl (elt := blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd)
@@ -330,7 +330,7 @@ theorem nexIxEvalB_blkLaid_reachesIn
 
 What the theorem above still asks of the caller – the tape and control families
 and their cover equations – is a *construction*, not a hypothesis: the generic
-branched thread (`DescriptiveComplexity.Draw.DrawData.ixSpineStOfB`) run with the
+branched thread (`DescriptiveComplexity.Draw.Data.ixSpineStOfB`) run with the
 packs the two bridges build. This section supplies both, so that a clocked
 program has only to name its entry state. -/
 
@@ -398,7 +398,7 @@ theorem nexIxEvalB_blkLaid_thread_reachesIn
     {v v' : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v
       ((dt.blkLaid h hpos hbase).cell (blkBot A dt.KIx dt.dd)))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = Tag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -446,10 +446,10 @@ theorem nexIxEvalB_blkLaid_thread_reachesIn
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd) stL.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : stL.mir = ixMark (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd) v)
     (hbotL : stL.bot = fun r => r = (fun _ => False))
@@ -467,10 +467,10 @@ theorem nexIxEvalB_blkLaid_thread_reachesIn
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd) stL.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
       (dt.ixOutCtl (elt := blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd)
@@ -567,7 +567,7 @@ theorem nexIxEvalOut_blkLaid_realize_reachesIn
     {v v' : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hv : WMSetLt WMLe v
       ((dt.blkLaid h hpos hbase).cell (blkBot A dt.KIx dt.dd)))
-    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
+    (hvlog : ∀ x, v x → ∃ i : dt.KIx, x.1 = Tag.arg i)
     (hvi : WMIncr WMLe v v')
     {ιV : Type} [LinearOrder ιV] [Finite ιV] {a₀ aT : ιV}
     (hbotV : ∀ a : ιV, a₀ ≤ a) (htopV : ∀ a : ιV, a ≤ aT)
@@ -617,7 +617,7 @@ theorem nexIxEvalOut_blkLaid_realize_reachesIn
         (x : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd),
       Use u → WMLt WMLe (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd u) x →
       ∃ u', Use u' ∧ blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd u' = x)
-    (hKin : ∀ (a : ιV) (t : DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+    (hKin : ∀ (a : ιV) (t : Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (w : Fin dt.dd → A),
       ixAddr (blkIxElt R (NexPh B (EvalPh dt.nv dt.PMF)) dt.dd) (mV a) (t, w) →
         ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
@@ -694,7 +694,7 @@ end Thread
 
 end Laid
 
-end DrawData
+end Data
 
 end Draw
 

@@ -20,9 +20,9 @@ The choices, once:
 * the **end marker** is the last logical address
   (`DescriptiveComplexity.Draw.logicalTop`), which is what the startup's
   pattern write leaves in TARGET
-  (`DescriptiveComplexity.Draw.DrawData.tgtTopSt_tgt`);
+  (`DescriptiveComplexity.Draw.Data.tgtTopSt_tgt`);
 * the **VAL enumeration** is the increment chain of
-  `DescriptiveComplexity.Draw.DrawData.exists_valEnum`, indexed by `Fin (n + 1)`
+  `DescriptiveComplexity.Draw.Data.exists_valEnum`, indexed by `Fin (n + 1)`
   so that its bottom and top are `0` and `Fin.last n`;
 * the **stage** the machine stops at is the first stable one
   (`DescriptiveComplexity.StepDef.exists_least_stable`), which exists because
@@ -38,7 +38,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -48,7 +48,7 @@ open Language Structure
 
 section Startup
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R' P' : Type}
 
 /-- **The pattern the startup writes into TARGET is the last logical
 address**: a tag has a block exactly when it is an argument tag. This is what
@@ -118,7 +118,7 @@ end Congr
 
 section Yes
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type} {zero one : A}
+variable {L : Language.{0, 0}} {dt : Data L} {A : Type} {zero one : A}
 variable [LinearOrder A] [Fintype dt.SlotIx]
 variable [Finite A] [Finite dt.KIx]
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
@@ -137,7 +137,7 @@ its verdict**, at any state whose tracks hold a stage. The output variable is
 nullary, so its argument block is empty and every hypothesis the machinery
 asks about the working address's blocks is a function on `Fin 0`; what is left
 is the verdict, which is
-`DescriptiveComplexity.Draw.DrawData.accVerdict_out` — an *equivalence*, so this
+`DescriptiveComplexity.Draw.Data.accVerdict_out` — an *equivalence*, so this
 one leg settles both the accepting and the rejecting case. -/
 theorem outLeg_verdict
     (hR : (dt.progOf zero one hzo hpl).table.Reads)
@@ -162,7 +162,7 @@ theorem outLeg_verdict
       WMIncr WMLe (mV a) (mV a'))
     (hTestT : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV (Fin.last nV)) u)
     (hTestF : ∀ a, a < Fin.last nV → ∃ u, ¬dt.InnerFull (fun u => tagBlk u.1) (mV a) u)
-    (hKin : ∀ (a : Fin (nV + 1)) (t : DrawTag
+    (hKin : ∀ (a : Fin (nV + 1)) (t : Tag
         (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hordP : ∀ p q : dt.X.Map A,
@@ -280,10 +280,10 @@ theorem reaches_outVerdict
   -- the two extremes of the universe
   obtain ⟨gtop, -, htop⟩ := exists_greatest (Le := WMLe (A := Univ A
     (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
-    dt.dd)) hlin (P := fun _ => True) ⟨(DrawTag.arg i₀, fun _ => zero), trivial⟩
+    dt.dd)) hlin (P := fun _ => True) ⟨(Tag.arg i₀, fun _ => zero), trivial⟩
   obtain ⟨gbot, -, hbot⟩ := exists_least (Le := WMLe (A := Univ A
     (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
-    dt.dd)) hlin (P := fun _ => True) ⟨(DrawTag.arg i₀, fun _ => zero), trivial⟩
+    dt.dd)) hlin (P := fun _ => True) ⟨(Tag.arg i₀, fun _ => zero), trivial⟩
   simp only [forall_const] at htop hbot
   -- the logical interval
   have hnotbot : ¬logicalTop gbot := by
@@ -298,16 +298,16 @@ theorem reaches_outVerdict
     wmSetLt_wmSeg_of_not_bot hbot hnotbot gbot
   have hneT : ∃ x, logicalTop (R := dt.RIx zero one hzo
       (fun w => dt.varArgsOf zero one w)) (P := dt.PF) (K := dt.KIx)
-      (V := Fin dt.dd → A) x := ⟨(DrawTag.arg i₀, fun _ => zero), i₀, rfl⟩
+      (V := Fin dt.dd → A) x := ⟨(Tag.arg i₀, fun _ => zero), i₀, rfl⟩
   obtain ⟨v₁, hiE⟩ := exists_wmIncr hlin (s := fun _ : Univ A
     (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
     dt.dd => False) ⟨gbot, not_false⟩
   -- the layout's own placement lemmas, at the instance's order
   have hordL : ∀ x y : Univ A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
-      dt.dd, WMLe x y ↔ lexRel (· ≤ · : DrawTag (dt.RIx zero one hzo
+      dt.dd, WMLe x y ↔ lexRel (· ≤ · : Tag (dt.RIx zero one hzo
         (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx →
-        DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF
+        Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF
           dt.KIx → Prop) (tupLeLex (A := A) (d := dt.dd)) x y :=
     fun x y => (hord x y).trans (Wide.tagTupleLe_iff_lexRel x y)
   -- the VAL enumeration
@@ -450,7 +450,7 @@ theorem reaches_outVerdict
 yes-instance**: the two promises of `DescriptiveComplexity.DWideAcceptSpace` –
 well-formedness for free, determinism from the program's separation argument –
 together with the run of
-`DescriptiveComplexity.Draw.DrawData.reaches_accept`. -/
+`DescriptiveComplexity.Draw.Data.reaches_accept`. -/
 theorem dwideAcceptSpace_of_pfpHolds
     (hR : (dt.progOf zero one hzo hpl).table.Reads)
     (hdd : dt.dd0 < dt.dd) (i₀ : dt.KIx)
@@ -472,7 +472,7 @@ theorem dwideAcceptSpace_of_pfpHolds
 
 end Yes
 
-end DrawData
+end Data
 
 end Draw
 

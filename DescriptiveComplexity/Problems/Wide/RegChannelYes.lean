@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.DrawYes
 /-!
 # The handed program accepts, from the sentence alone
 
-`DescriptiveComplexity.Draw.DrawData.wideRegAccept_regLaid_of_rules` joins the
+`DescriptiveComplexity.Draw.Data.wideRegAccept_regLaid_of_rules` joins the
 two legs of the run at the file the register channel hands over, and asks the
 caller for some thirty facts. Most of them are not about the instance at all:
 they follow from the *marking* (`hasInp_up`, `exists_regBotElt`), from the
@@ -28,7 +28,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -36,7 +36,7 @@ open Language Structure
 
 section Yes
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Nonempty A] [Finite A] [Finite dt.KIx] [Nonempty dt.KIx]
 variable [L.IsRelational] [L.Structure A] [LinearOrder (dt.X.Map A)]
@@ -66,8 +66,8 @@ channel marks below them, which is what the opening's walk needs. -/
 theorem exists_argElt :
     ∃ x : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      ∃ i : dt.KIx, x.1 = DrawTag.arg i :=
-  ⟨(DrawTag.arg (Classical.arbitrary dt.KIx), fun _ => Classical.arbitrary A),
+      ∃ i : dt.KIx, x.1 = Tag.arg i :=
+  ⟨(Tag.arg (Classical.arbitrary dt.KIx), fun _ => Classical.arbitrary A),
     Classical.arbitrary dt.KIx, rfl⟩
 
 omit [Finite dt.KIx] [LinearOrder (dt.X.Map A)] [Finite A] [L.IsRelational]
@@ -82,7 +82,7 @@ opening's walk asks of the instance, and the drawing always has it. -/
 theorem exists_above_botElt (hR : PR.table.Reads)
     {botE : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
-    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ DrawTag.arg i) :
+    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ Tag.arg i) :
     ∃ z : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd, WMLt WMLe botE z := by
   obtain ⟨x, i, hi⟩ := exists_argElt (dt := dt) (A := A)
@@ -109,7 +109,7 @@ theorem belowTop_regLaid (hlin : IsLinOrd (WMLe (A := Univ A (R')
       WMLe x y ↔ tagTupleLe x y)
     (hdd : dt.dd0 < dt.dd)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) PR.zero c) :
         Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     {vi : dt.VarIx} {iv : dt.d.B.ι}
@@ -126,9 +126,9 @@ theorem belowTop_regLaid (hlin : IsLinOrd (WMLe (A := Univ A (R')
       logicalTop := by
   have hordL : ∀ x y : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      WMLe x y ↔ lexRel (· ≤ · : DrawTag (R')
+      WMLe x y ↔ lexRel (· ≤ · : Tag (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx →
-        DrawTag (R')
+        Tag (R')
           (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx → Prop)
         (tupLeLex (A := A) (d := dt.dd)) x y :=
     fun x y => (hord x y).trans (Wide.tagTupleLe_iff_lexRel x y)
@@ -207,7 +207,7 @@ theorem wideRegAccept_of_out_of_rules
   obtain ⟨e₀, -, he₀⟩ := exists_least hlin
     (P := fun _ : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd => True)
-    ⟨(DrawTag.sym, fun _ => Classical.arbitrary A), trivial⟩
+    ⟨(Tag.sym, fun _ => Classical.arbitrary A), trivial⟩
   refine dt.wideRegAccept_regLaid_of_rules (PR := PR) hpl hE hR hlin hR.le
     (v₁ := v₁) (x := xw) (y := wmRegSeg botE) (y' := y') (s₀ := v₁)
     (top := logicalTop) (v' := v₁)
@@ -271,7 +271,7 @@ theorem wideRegAccept_of_out_of_rules
 
 end Yes
 
-end DrawData
+end Data
 
 end Draw
 

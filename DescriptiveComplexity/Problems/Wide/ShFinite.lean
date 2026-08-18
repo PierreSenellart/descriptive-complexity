@@ -21,8 +21,8 @@ kit's rules, a sum of them with a verdict, or the shape one level down, so each
 instance is one line per constructor. They are stated at the abstract
 machineries first (`ChainSh`, `SeqSh`, `ElemSh`, `StageSh`, `TagSh`, `RoundSh`,
 `VarSh`, `EvalSh`, `OuterSh`), then read up the concrete tower to
-`DescriptiveComplexity.Draw.DrawData.SFSh`, and the file ends at
-`DescriptiveComplexity.Draw.DrawData.finite_RIx`.
+`DescriptiveComplexity.Draw.Data.SFSh`, and the file ends at
+`DescriptiveComplexity.Draw.Data.finite_RIx`.
 -/
 
 namespace DescriptiveComplexity
@@ -128,9 +128,9 @@ instance instFiniteOuterSh {SE : Type} {ShE : SE → Type} [∀ s, Finite (ShE s
 
 /-! ### And of the concrete tower -/
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L)
+variable {L : Language.{0, 0}} (dt : Data L)
 
 noncomputable instance instFiniteKindSh {n : ℕ} :
     ∀ (κ : MatAtom dt.X dt.d.B n) (s : dt.KindSite κ), Finite (dt.KindSh κ s)
@@ -204,7 +204,7 @@ noncomputable instance finite_RIx {A Q : Type} [Fintype Q] [Fintype dt.SlotIx]
     Finite (dt.RIx zero one hzo args) :=
   inferInstanceAs (Finite ((i : dt.SF) × dt.SFSh i))
 
-end DrawData
+end Data
 
 end Draw
 

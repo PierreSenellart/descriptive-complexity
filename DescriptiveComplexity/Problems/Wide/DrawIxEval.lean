@@ -29,9 +29,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 -- The legs are generic in the outer phase: what they need of it is the
@@ -226,7 +226,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
 variable {Use : I → Prop}
@@ -269,7 +269,7 @@ variable (hTestT : ∀ u : I, dt.InnerFull F.blk (mV aT) u)
 variable (hTestF : ∀ a, a < aT → ∃ u : I, ¬dt.InnerFull F.blk (mV a) u)
 
 /-- **The control after one position's leg**: the machinery's exit fold —
-`DescriptiveComplexity.Draw.DrawData.ixVarMachine_run`'s final control, at the
+`DescriptiveComplexity.Draw.Data.ixVarMachine_run`'s final control, at the
 position's variable. -/
 noncomputable def ixLegCtl (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -329,7 +329,7 @@ noncomputable def ixLegFM (j : Fin dt.nv)
       (dt.arOf (dt.varAt j)))
 
 /-- **The control after one position's leg, threaded** — the twin of
-`DescriptiveComplexity.Draw.DrawData.ixLegCtl`, with the VAL loop's rounds run
+`DescriptiveComplexity.Draw.Data.ixLegCtl`, with the VAL loop's rounds run
 at the states the thread produces for them. -/
 noncomputable def ixLegCtlT (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -418,8 +418,8 @@ is the unthreaded loop (`ixVarFMT_eq_varFM`), its last round the unthreaded
 round (`ixVarFXT_eq_roundFX`), and the background it folds against is the
 round state's, the loop's exit differing from it in SAV and TARGET alone.
 This is what makes the branched leg's stage bit
-(`DescriptiveComplexity.Draw.DrawData.ixLegBitB`) the verdict
-`DescriptiveComplexity.Draw.DrawData.accVerdict_next` reads. -/
+(`DescriptiveComplexity.Draw.Data.ixLegBitB`) the verdict
+`DescriptiveComplexity.Draw.Data.accVerdict_next` reads. -/
 theorem ixLegCtlT_eq_legCtl
     (hreg : ¬∃ u : I, v = F.cell u)
     (j : Fin dt.nv) (st : TapeSt dt A R P I)
@@ -453,13 +453,13 @@ theorem ixLegCtlT_eq_legCtl
 whole machinery of the position's variable, and the written exit. Uniform over
 the positions – the largest of the variables' costs – so the spine's fold is a
 single width. -/
-noncomputable def ixLegCost (dt : DrawData L) (A : Type) (w wP wR wK n : ℕ) : ℕ :=
+noncomputable def ixLegCost (dt : Data L) (A : Type) (w wP wR wK n : ℕ) : ℕ :=
   1 + (Finset.univ.sup fun j : Fin dt.nv =>
     dt.ixVarCost A (dt.varAt j) w wP wR wK n) + 1
 
 /-- **What the output's leg is charged**: the same shape at the output's own
 machinery, which is the `none` variable's. -/
-noncomputable def ixOutLegCost (dt : DrawData L) (A : Type) (w wP wR wK n : ℕ) : ℕ :=
+noncomputable def ixOutLegCost (dt : Data L) (A : Type) (w wP wR wK n : ℕ) : ℕ :=
   1 + dt.ixVarCost A none w wP wR wK n + 1
 
 /-! ### The costs, factored
@@ -472,14 +472,14 @@ program is used but the shape of the definitions. -/
 
 /-- **A variable's machinery, as one width**: what it pays once and what it pays
 per VAL round, added. -/
-noncomputable def ixVarCD (dt : DrawData L) (A : Type) (vi : dt.VarIx)
+noncomputable def ixVarCD (dt : Data L) (A : Type) (vi : dt.VarIx)
     (w wP wR wK : ℕ) : ℕ :=
   dt.ixVarGatesCost A vi w wP + dt.ixRoundCost A vi w wP wR wK + 3 * wP + 6 +
     (2 * wP + dt.ixRoundCost A vi w wP wR wK + 3)
 
 /-- **The width of a leg of the spine**: the largest variable's, and the leg's
 own two steps. -/
-noncomputable def ixLegWidth (dt : DrawData L) (A : Type) (w wP wR wK : ℕ) : ℕ :=
+noncomputable def ixLegWidth (dt : Data L) (A : Type) (w wP wR wK : ℕ) : ℕ :=
   4 + Finset.univ.sup fun j : Fin dt.nv => dt.ixVarCD A (dt.varAt j) w wP wR wK
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -543,7 +543,7 @@ theorem ixSpineCost_le_mul (w wP wR wK n : ℕ) :
 positions, the output machinery's own, and the four steps that join them – the
 dispatch into the spine, the dispatch into the output's leg and the two the legs
 themselves pay. This is the first factor the clock compares. -/
-noncomputable def ixEvalWidth (dt : DrawData L) (A : Type) (w wP wR wK : ℕ) : ℕ :=
+noncomputable def ixEvalWidth (dt : Data L) (A : Type) (w wP wR wK : ℕ) : ℕ :=
   dt.ixLegWidth A w wP wR wK * dt.nv + dt.ixVarCD A none w wP wR wK + 4
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -564,7 +564,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite dt.KIx] in
 /-- **The clocked evaluation's whole cost, factored**: one width times the VAL
 rounds and one more. This is what
-`DescriptiveComplexity.Draw.DrawData.nexProg_wideAccept_legs` asks of the
+`DescriptiveComplexity.Draw.Data.nexProg_wideAccept_legs` asks of the
 evaluation leg – the run's count is exactly the left-hand side. -/
 theorem ixEvalCost_le_mul (w wP wR wK n : ℕ) :
     1 + (dt.ixLegCost A w wP wR wK n + 2) * dt.nv + 1 +
@@ -592,10 +592,10 @@ theorem ixVarLeg_reachesIn (j : Fin dt.nv)
     (tOf : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (dt.varAt j))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)
+          Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmir : st.mir = ixMark elt v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))
@@ -610,10 +610,10 @@ theorem ixVarLeg_reachesIn (j : Fin dt.nv)
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R P dt.KIx))))
+              Tag R P dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx
       dt.dd)).ReachesIn (dt.ixLegCost A w wP wR wK (Nat.card ιV))
@@ -723,10 +723,10 @@ include hrulesM hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **One spine position's leg — threaded**: as
-`DescriptiveComplexity.Draw.DrawData.ixVarLeg_run` without the boundary
+`DescriptiveComplexity.Draw.Data.ixVarLeg_run` without the boundary
 hypotheses `hsav`/`htgt`, which the sweep cannot supply at more than one
 address. The leg ends in
-`DescriptiveComplexity.Draw.DrawData.ixLegStT`, the machinery's own exit state
+`DescriptiveComplexity.Draw.Data.ixLegStT`, the machinery's own exit state
 with the stage bit written at the marker. -/
 theorem ixVarLeg_run_thread_reachesIn (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -740,10 +740,10 @@ theorem ixVarLeg_run_thread_reachesIn (j : Fin dt.nv)
     (tOf : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (dt.varAt j))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)
+          Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmir : st.mir = ixMark elt v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))
@@ -759,10 +759,10 @@ theorem ixVarLeg_run_thread_reachesIn (j : Fin dt.nv)
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R P dt.KIx))))
+              Tag R P dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx
       dt.dd)).ReachesIn (dt.ixLegCost A w wP wR wK (Nat.card ιV))
@@ -900,10 +900,10 @@ theorem ixVarLegFail_reachesIn (j : Fin dt.nv)
     (htagOf : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
       dt.dspTagOf PR.zero PR.one
         (wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R P dt.KIx)) = tOf ℓ)
+            Tag R P dt.KIx)) = tOf ℓ)
     (ℓ₀ : Fin (dt.arOf (dt.varAt j)))
     (hTestLt : ∀ ℓ : Fin (dt.arOf (dt.varAt j)), (ℓ : ℕ) < (ℓ₀ : ℕ) →
       ∀ u, TestOf ℓ u)
@@ -1018,8 +1018,8 @@ walk-back, the whole gate sequence — every file test passing, the total
 dispatch carrying every block through — the clear flag at the verdict
 checkpoint, and the erased stage slot at the marker: the verdict `False`,
 the VAL register untouched. With
-`DescriptiveComplexity.Draw.DrawData.ixVarLeg_run` and
-`DescriptiveComplexity.Draw.DrawData.ixVarLegFail_run` this covers **every**
+`DescriptiveComplexity.Draw.Data.ixVarLeg_run` and
+`DescriptiveComplexity.Draw.Data.ixVarLegFail_run` this covers **every**
 address the sweep visits. -/
 theorem ixVarLegUngated_reachesIn (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -1034,26 +1034,26 @@ theorem ixVarLegUngated_reachesIn (j : Fin dt.nv)
     (htagOf : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
       dt.dspTagOf PR.zero PR.one
         (wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R P dt.KIx)) = tOf ℓ)
+            Tag R P dt.KIx)) = tOf ℓ)
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (ℓ₀ : Fin (dt.arOf (dt.varAt j)))
     (hbad : ¬((∀ t' : dt.X.Tag,
         wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ₀) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R P dt.KIx)
+            Tag R P dt.KIx)
           (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ₀) ∧
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ₀, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ₀) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R P dt.KIx)))))
+              Tag R P dt.KIx)))))
     (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx
       dt.dd)).ReachesIn (dt.ixLegCost A w wP wR wK (Nat.card ιV))
@@ -1242,10 +1242,10 @@ theorem ixOutLeg_run
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)
+          Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmir : st.mir = ixMark elt v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))
@@ -1260,10 +1260,10 @@ theorem ixOutLeg_run
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R P dt.KIx))))
+              Tag R P dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A)
     (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
       (dt.ixOutCtl (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st tOf semOf f₀)) :
@@ -1393,10 +1393,10 @@ theorem ixOutLeg_run_any
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)
+          Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmir : st.mir = ixMark elt v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))
@@ -1411,10 +1411,10 @@ theorem ixOutLeg_run_any
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R P dt.KIx))))
+              Tag R P dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx
       dt.dd)).ReachesIn (dt.ixOutLegCost A w wP wR wK (Nat.card ιV))
@@ -1561,12 +1561,12 @@ noncomputable def ixOutCtlT
 include hinj hhasP heltP in
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] in
 /-- **The output's threaded leg computes the unthreaded fold**: as
-`DescriptiveComplexity.Draw.DrawData.ixLegCtlT_eq_legCtl` at the output
+`DescriptiveComplexity.Draw.Data.ixLegCtlT_eq_legCtl` at the output
 variable — the VAL loop is the unthreaded loop, its last round the
 unthreaded round, and the exit state differs from the round state in SAV and
 TARGET alone, which the background does not see off the register file. This
 is what makes `ixOutLeg_run_thread`'s `hacc` the verdict
-`DescriptiveComplexity.Draw.DrawData.accVerdict_out` reads. -/
+`DescriptiveComplexity.Draw.Data.accVerdict_out` reads. -/
 theorem ixOutCtlT_eq_outCtl
     (hreg : ¬∃ u : I, v = F.cell u)
     (st : TapeSt dt A R P I)
@@ -1619,12 +1619,12 @@ include hrulesOut hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork 
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The output's leg — threaded, whatever the verdict**: as
-`DescriptiveComplexity.Draw.DrawData.ixOutLeg_run` without the boundary
+`DescriptiveComplexity.Draw.Data.ixOutLeg_run` without the boundary
 hypotheses `hsav`/`htgt`, which nothing supplies at the end of a sweep — the
 advance refreshes the marker and the mirror, not the two scratch registers —
 and without any assumption on the verdict. The leg ends in the accepting
 phase either way; what the verdict decides is the *bit* the exit writes at
-the marker (`DescriptiveComplexity.Draw.DrawData.ixOutStA`), and with it whether
+the marker (`DescriptiveComplexity.Draw.Data.ixOutStA`), and with it whether
 the machine's accepting predicate holds of the state it stops in. -/
 theorem ixOutLeg_run_verdict
     (st : TapeSt dt A R P I)
@@ -1638,10 +1638,10 @@ theorem ixOutLeg_run_verdict
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)
+          Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmir : st.mir = ixMark elt v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))
@@ -1656,10 +1656,10 @@ theorem ixOutLeg_run_verdict
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R P dt.KIx))))
+              Tag R P dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx
       dt.dd)).ReachesIn (dt.ixOutLegCost A w wP wR wK (Nat.card ιV))
@@ -1814,7 +1814,7 @@ include hrulesOut hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork 
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The output's leg — threaded, the verdict holding**: the special case of
-`DescriptiveComplexity.Draw.DrawData.ixOutLeg_run_verdict` in which the accepting
+`DescriptiveComplexity.Draw.Data.ixOutLeg_run_verdict` in which the accepting
 write at the marker is *idempotent*, so the leg ends at the machinery's own
 exit state and nothing of the tape moves. -/
 theorem ixOutLeg_run_thread
@@ -1829,10 +1829,10 @@ theorem ixOutLeg_run_thread
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)
+          Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmir : st.mir = ixMark elt v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))
@@ -1847,10 +1847,10 @@ theorem ixOutLeg_run_thread
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R P dt.KIx))))
+              Tag R P dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A)
     (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
       (dt.ixOutCtlT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st tOf semT f₀)) :
@@ -1896,11 +1896,11 @@ theorem ixOutLeg_run_thread
 /-! ### Which leg a position takes
 
 A position's machinery has three runs, by what its gates do:
-`DescriptiveComplexity.Draw.DrawData.ixVarLeg_run_thread` when every block is
+`DescriptiveComplexity.Draw.Data.ixVarLeg_run_thread` when every block is
 well shaped *and* the tags and the domain sentence agree,
-`DescriptiveComplexity.Draw.DrawData.ixVarLegUngated_run` when the blocks are
+`DescriptiveComplexity.Draw.Data.ixVarLegUngated_run` when the blocks are
 well shaped but the verdict flag is cleared, and
-`DescriptiveComplexity.Draw.DrawData.ixVarLegFail_run` when a block fails the
+`DescriptiveComplexity.Draw.Data.ixVarLegFail_run` when a block fails the
 shape test — which is the one that needs a witness, and a *least* one, so
 that the blocks before it have run. -/
 
@@ -1922,31 +1922,31 @@ noncomputable def ixTagAt (j : Fin dt.nv)
     (ℓ : Fin (dt.arOf (dt.varAt j))) : dt.X.Tag :=
   dt.dspTagOf PR.zero PR.one
     (wmBlk (ixAddr elt st.mir)
-      (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
+      (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
         Fin dt.ko ⊕ Fin dt.ki))) :
-        DrawTag R P dt.KIx))
+        Tag R P dt.KIx))
 
 /-- **The other half of a block's gate**: its tag witnesses are one-hot at
 the tag they name, and the expansion's domain sentence holds of the point
 the block decodes. Together with
-`DescriptiveComplexity.Draw.DrawData.ixShapeAt` this is the gates' verdict. -/
+`DescriptiveComplexity.Draw.Data.ixShapeAt` this is the gates' verdict. -/
 def ixTagDomAt (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
     (ℓ : Fin (dt.arOf (dt.varAt j))) : Prop :=
   (∀ t' : dt.X.Tag,
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)
+          Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = dt.ixTagAt (PR := PR) (elt := elt) j st ℓ) ∧
     ExpExpansion.DomHolds (X := dt.X)
       (dt.ixTagAt (PR := PR) (elt := elt) j st ℓ, decRho dt.ly PR.zero PR.one
         (wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R P dt.KIx)))
+            Tag R P dt.KIx)))
 
 /-- **A position is gated** when every block passes both halves. -/
 def ixGatedAt (j : Fin dt.nv)
@@ -2011,7 +2011,7 @@ omit [Finite R] [Finite P] [Finite dt.KIx]
   [Finite ιV] [Finite I] in
 /-- **What a leg leaves alone, whichever leg it takes**: the ungated legs
 never enter the VAL loop, so they touch nothing but the stage bit, and the
-gated one is `DescriptiveComplexity.Draw.DrawData.ixLegStT_fields`. The `val`
+gated one is `DescriptiveComplexity.Draw.Data.ixLegStT_fields`. The `val`
 register is left out on purpose — it is the loop's top at a gated
 position and the entry state's at the other two. -/
 theorem ixLegStB_fields (j : Fin dt.nv)
@@ -2071,9 +2071,9 @@ open Classical in
 /-- **What a leg writes**: its variable's cell at the marker, and nothing
 else — the same equation whichever leg it takes, since the VAL loop
 threads the two scratch registers alone
-(`DescriptiveComplexity.Draw.DrawData.ixVarStE_new`) and the ungated legs
+(`DescriptiveComplexity.Draw.Data.ixVarStE_new`) and the ungated legs
 write the stage bit directly. This is the branched twin of
-`DescriptiveComplexity.Draw.DrawData.new_postVarSt`, and the only thing the
+`DescriptiveComplexity.Draw.Data.new_postVarSt`, and the only thing the
 spine's dictionary lemmas need of a leg. -/
 theorem ixLegStB_new (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
@@ -2218,7 +2218,7 @@ theorem ixVarLegB_reachesIn (j : Fin dt.nv)
 
 end Leg
 
-end DrawData
+end Data
 
 end Draw
 

@@ -23,14 +23,14 @@ variable list, and the outer program around everything.
 The kind-dependent types are indexed by the **kind itself**
 (`DescriptiveComplexity.Draw.KindPh` and friends match on a
 `DescriptiveComplexity.Draw.MatAtom`), so every downstream definition
-reduces per constructor; the stuck `DescriptiveComplexity.Draw.DrawData.kindOf`
+reduces per constructor; the stuck `DescriptiveComplexity.Draw.Data.kindOf`
 application appears only at the instantiation
-(`DescriptiveComplexity.Draw.DrawData.AtomPh` etc.).
+(`DescriptiveComplexity.Draw.Data.AtomPh` etc.).
 
 The element loops of an atom run one read trip per atom of the defining
 matrix – the guard atoms' trips read a harmless witness cell and their
 flags are ignored by the folds – so the loop lengths match the
-`DescriptiveComplexity.Draw.DrawData.kindReads` budgets on the nose.
+`DescriptiveComplexity.Draw.Data.kindReads` budgets on the nose.
 -/
 
 namespace DescriptiveComplexity
@@ -41,9 +41,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L)
+variable {L : Language.{0, 0}} (dt : Data L)
 
 /-! ### The per-kind machinery types -/
 
@@ -236,7 +236,7 @@ noncomputable def SF : Type := OuterSite dt.SEF
 noncomputable def SFSh : dt.SF → Type :=
   OuterSh dt.SEF dt.SESh
 
-end DrawData
+end Data
 
 /-! ### The owner maps of the tower
 
@@ -244,9 +244,9 @@ Each machinery's phases are owned by its sites – the per-shape maps live
 with their rules (`DescriptiveComplexity.Draw.elemOwn` and friends); the
 maps below compose them up the tower. -/
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L)
+variable {L : Language.{0, 0}} (dt : Data L)
 
 /-- The owner map of an atom kind's machinery. -/
 noncomputable def kindOwn {n : ℕ} :
@@ -283,7 +283,7 @@ noncomputable def seOwn : dt.PEF → dt.SEF :=
 noncomputable def sfOwn : dt.PF → dt.SF :=
   outerOwner (ownE := dt.seOwn)
 
-end DrawData
+end Data
 
 /-! ### Finiteness, up the tower
 
@@ -442,9 +442,9 @@ instance {SE : Type} [Finite SE] : Finite (OuterSite SE) :=
       | .accept => Sum.inr 13)
     (by intro a b h; cases a <;> cases b <;> simp_all)
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L)
+variable {L : Language.{0, 0}} (dt : Data L)
 
 noncomputable instance {n : ℕ} (κ : MatAtom dt.X dt.d.B n) :
     Finite (dt.KindPh κ) := by
@@ -532,7 +532,7 @@ noncomputable instance : Finite dt.PF :=
 noncomputable instance : Finite dt.SF :=
   inferInstanceAs (Finite (OuterSite _))
 
-end DrawData
+end Data
 
 end Draw
 

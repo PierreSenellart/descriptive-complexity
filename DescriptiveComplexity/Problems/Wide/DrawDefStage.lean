@@ -10,16 +10,16 @@ import DescriptiveComplexity.Problems.Wide.DrawStageAtom
 # The two guards the program's own sites are written from, and the stage atom
 
 Above the combinators the program stops being generic: its checkpoints are
-guarded by `DescriptiveComplexity.Draw.DrawData.exitG` – at the marker, which is
+guarded by `DescriptiveComplexity.Draw.Data.exitG` – at the marker, which is
 nobody's register – and its trips are named by
-`DescriptiveComplexity.Draw.DrawData.nameG` – this cell is the canonically padded
+`DescriptiveComplexity.Draw.Data.nameG` – this cell is the canonically padded
 cell of the element whose block is `b` and whose first `dd0` coordinates the
 control holds. Both are conjunctions of the three atoms, so both are definable
 once and for all, and with them the **stage atom's machinery** – the largest
 single subroutine of the program – follows kit by kit.
 
 The naming guard is stated at an arbitrary coordinate function
-(`DescriptiveComplexity.Draw.DrawData.nameGF`), the caller owing the
+(`DescriptiveComplexity.Draw.Data.nameGF`), the caller owing the
 *comparison* `g (name j) = cf f j` rather than the value: the leaf reads of the
 element loops compute an encoded tuple there, and what they owe is the same
 shape as what the coordinate loops owe.
@@ -33,9 +33,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {Q P : Type} [Fintype Q]
+variable {L : Language.{0, 0}} {dt : Data L} {Q P : Type} [Fintype Q]
 variable [Fintype dt.SlotIx]
 
 /-! ### The two guards -/
@@ -179,7 +179,7 @@ theorem uRulesDefinable_stageRule {emb : StagePh k → P}
 
 end Stage
 
-end DrawData
+end Data
 
 end Draw
 

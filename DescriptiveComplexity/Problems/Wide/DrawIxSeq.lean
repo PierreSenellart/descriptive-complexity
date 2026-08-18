@@ -27,9 +27,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -68,11 +68,11 @@ noncomputable def IxKindSem (elt : I → Univ A R P dt.KIx dt.dd) :
     { pts : Fin k → dt.X.Map A //
       ∀ ℓ : Fin k,
         wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-          (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+          (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
           encMap dt.ly zero one (pts ℓ) }
 
 /-- **A semantic pack transports along the registers it reads.**
-`DescriptiveComplexity.Draw.DrawData.KindSem` sees the tape state only
+`DescriptiveComplexity.Draw.Data.KindSem` sees the tape state only
 through the levels' register sets, so a pack at one state is a pack at
 every state with the same mirror and VAL. This is what lets *one* pack —
 built at an address's entry state — serve every position of the spine and
@@ -199,9 +199,9 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An atom's machinery is blind to the two scratch registers**: each
 kind's loop reads the levels' register sets and its background at the
 working cell, and each kind's exit reads the control alone
-(`DescriptiveComplexity.Draw.DrawData.cmpArgs_exitSt_congr` and its two
+(`DescriptiveComplexity.Draw.Data.cmpArgs_exitSt_congr` and its two
 siblings). The pack travels by
-`DescriptiveComplexity.Draw.DrawData.kindSemCast`, which keeps its points.
+`DescriptiveComplexity.Draw.Data.kindSemCast`, which keeps its points.
 This is the brick the whole threaded-versus-unthreaded bridge is built
 from. -/
 theorem ixKindExitCtl_congr_scratch {st' : TapeSt dt A R P I}
@@ -264,7 +264,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -308,7 +308,7 @@ variable (hcostR : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
 /-- **The state an atom leaves**: a stage atom normalizes SAV and TARGET to
 the home address (its random access writes them whatever they held), every
 other kind leaves the state alone. -/
-noncomputable def ixKindEndSt (dt : DrawData L) {A R P I : Type}
+noncomputable def ixKindEndSt (dt : Data L) {A R P I : Type}
     {elt : I → Univ A R P dt.KIx dt.dd}
     (vi : dt.VarIx) (v : Univ A R P dt.KIx dt.dd → Prop)
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (st : TapeSt dt A R P I) :
@@ -325,7 +325,7 @@ dispatches over one copy loop per argument, at the widths the caller supplies.
 The bound is uniform in the atom's data – the expansion's are bounded by
 `ntgDim` and `nfDim` – which is what makes the sequencer's fold a single
 width. -/
-noncomputable def ixKindCost (dt : DrawData L) (A : Type)
+noncomputable def ixKindCost (dt : Data L) (A : Type)
     (vi : dt.VarIx) (w wP wR wK : ℕ) :
     MatAtom dt.X dt.d.B (dt.nOf vi) → ℕ
   | .eq _ _ => 1 + ((2 + (w + 2) * 2) * (Nat.card (Lex (Fin dt.dd0 → A)) + 1) + 1)
@@ -339,8 +339,8 @@ noncomputable def ixKindCost (dt : DrawData L) (A : Type)
 include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmirSt
   hbotSt hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR in
 /-- **The uniform stage discharge, threaded, on a clock**: as
-`DescriptiveComplexity.Draw.DrawData.ixKind_hStage_thread` with the atom's cost
-counted – `DescriptiveComplexity.Draw.DrawData.ixKindCost`, whatever the kind. -/
+`DescriptiveComplexity.Draw.Data.ixKind_hStage_thread` with the atom's cost
+counted – `DescriptiveComplexity.Draw.Data.ixKindCost`, whatever the kind. -/
 theorem ixKind_hStage_thread_reachesIn
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
@@ -419,9 +419,9 @@ theorem ixKind_hStage_thread_reachesIn
 include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmirSt
   hbotSt hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR in
 /-- **The uniform stage discharge, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.kind_hStage` but with no boundary
+`DescriptiveComplexity.Draw.Data.kind_hStage` but with no boundary
 discipline assumed — the atom's exit state is
-`DescriptiveComplexity.Draw.DrawData.kindEndSt`, which normalizes SAV and
+`DescriptiveComplexity.Draw.Data.kindEndSt`, which normalizes SAV and
 TARGET exactly when the atom is a stage atom. -/
 theorem ixKind_hStage_thread
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
@@ -457,8 +457,8 @@ theorem ixKind_hStage_thread
 include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmirSt
   hbotSt hsav htgt hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR in
 /-- **The uniform stage discharge, on a clock**: as
-`DescriptiveComplexity.Draw.DrawData.ixKind_hStage` with the atom's cost counted –
-`DescriptiveComplexity.Draw.DrawData.ixKindCost`, whatever the kind. -/
+`DescriptiveComplexity.Draw.Data.ixKind_hStage` with the atom's cost counted –
+`DescriptiveComplexity.Draw.Data.ixKindCost`, whatever the kind. -/
 theorem ixKind_hStage_reachesIn
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
@@ -537,7 +537,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
   hbotSt hsav htgt hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR in
 /-- **The uniform stage discharge**: whatever the kind, the atom's machinery
 runs from its entry phase one cell right of the marker to the exit phase
-back there, leaving `DescriptiveComplexity.Draw.DrawData.kindExitCtl` in the
+back there, leaving `DescriptiveComplexity.Draw.Data.kindExitCtl` in the
 control and the tape untouched. -/
 theorem ixKind_hStage
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
@@ -577,7 +577,7 @@ end Run
 A clocked caller that has no reason to prefer a coarser width takes this
 one, and the fold's `(w + 2) * natOf vi + 1` is then a closed expression in
 the file's widths. -/
-noncomputable def ixMatCost (dt : DrawData L) (A : Type) (vi : dt.VarIx)
+noncomputable def ixMatCost (dt : Data L) (A : Type) (vi : dt.VarIx)
     (w wP wR wK : ℕ) : ℕ :=
   Finset.univ.sup fun a : Fin (dt.natOf vi) =>
     dt.ixKindCost A vi w wP wR wK (dt.kindOf vi a)
@@ -684,7 +684,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
 /-- **The remaining registers an atom leaves alone** — the three
-`DescriptiveComplexity.Draw.DrawData.kindEndSt_fields` does not list, so
+`DescriptiveComplexity.Draw.Data.kindEndSt_fields` does not list, so
 that the seven together pin the state down to its SAV and TARGET. -/
 theorem ixKindEndSt_fields' (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (st : TapeSt dt A R P I) :
@@ -719,7 +719,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [L.Structure A] in
 /-- **The matrix's threaded state is its entry state with the two scratch
 registers rewritten** — the sharpening of
-`DescriptiveComplexity.Draw.DrawData.matSt_fields` that lets the loop above
+`DescriptiveComplexity.Draw.Data.matSt_fields` that lets the loop above
 thread the two registers instead of the whole state, and with them keep
 every semantic pack at the state it was built for. -/
 theorem ixMatSt_eq (n : ℕ) :
@@ -1220,7 +1220,7 @@ noncomputable def ixMkKindSem {elt : I → Univ A R P dt.KIx dt.dd}
     (w : Fin (dt.nOf vi) → dt.X.Map A)
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (ixAddr elt (dt.lvSet st vi j))
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j)) :
     ∀ κ : MatAtom dt.X dt.d.B (dt.nOf vi), dt.IxKindSem (elt := elt) zero one vi st κ
   | .eq _ _ => PUnit.unit
@@ -1241,11 +1241,11 @@ theorem ixKindSemCast_ixMkKindSem (zero one : A) (vi : dt.VarIx)
     {w w' : Fin (dt.nOf vi) → dt.X.Map A} (hww : w = w')
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (ixAddr elt (dt.lvSet st vi j))
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j))
     (hENC' : ∀ j : Fin (dt.nOf vi),
       wmBlk (ixAddr elt (dt.lvSet st' vi j))
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w' j))
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) :
     dt.ixKindSemCast zero one vi hmir hval κ
@@ -1262,10 +1262,10 @@ include hinj helt in
 hold encodings, the machine's per-tuple question is the encodings'. -/
 theorem ixCmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (ixAddr elt (dt.lvSet st vi j₁))
-      (DrawTag.arg (toLex (dt.lvBlk vi j₁)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (h2 : wmBlk (ixAddr elt (dt.lvSet st vi j₂))
-      (DrawTag.arg (toLex (dt.lvBlk vi j₂)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₂)) : Tag R P dt.KIx) =
       encMap dt.ly zero one q)
     (u : Lex (Fin dt.dd0 → A)) :
     dt.CmpAgr F zero hhas vi
@@ -1292,10 +1292,10 @@ tuple decides the two encoded points. -/
 theorem ixCmpAgr_all_iff (hzo : zero ≠ one)
     {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (ixAddr elt (dt.lvSet st vi j₁))
-      (DrawTag.arg (toLex (dt.lvBlk vi j₁)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (h2 : wmBlk (ixAddr elt (dt.lvSet st vi j₂))
-      (DrawTag.arg (toLex (dt.lvBlk vi j₂)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₂)) : Tag R P dt.KIx) =
       encMap dt.ly zero one q) :
     (∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr F zero hhas vi j₁ j₂ st u) ↔
       p = q := by
@@ -1316,10 +1316,10 @@ points. -/
 theorem ixCmp_ord_iff (hzo : zero ≠ one)
     {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (ixAddr elt (dt.lvSet st vi j₁))
-      (DrawTag.arg (toLex (dt.lvBlk vi j₁)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (h2 : wmBlk (ixAddr elt (dt.lvSet st vi j₂))
-      (DrawTag.arg (toLex (dt.lvBlk vi j₂)) : DrawTag R P dt.KIx) =
+      (Tag.arg (toLex (dt.lvBlk vi j₂)) : Tag R P dt.KIx) =
       encMap dt.ly zero one q) :
     ((∀ u : Lex (Fin dt.dd0 → A), dt.CmpAgr F zero hhas vi j₁ j₂ st u) ∨
       ∃ u : Lex (Fin dt.dd0 → A), dt.CmpFst F zero hhas vi j₁ j₂ st u) ↔
@@ -1368,7 +1368,7 @@ theorem ctlBit_ixKindExitCtl_self (hzo : zero ≠ one)
     (w : Fin (dt.nOf vi) → dt.X.Map A)
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (ixAddr elt (dt.lvSet st vi j))
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j))
     (hOld : ∀ (i : dt.d.B.ι) (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf vi)),
       st.old i (ixAddr elt (dt.ixStageTgt F hhas vi ts
@@ -1439,7 +1439,7 @@ omit [Fintype dt.SlotIx] in
 include hinj helt in
 /-- **The matrix's verdicts, at the points**: after the whole matrix, atom
 `a`'s slot holds `MatAtom.holds` of its kind at the encoded valuation –
-the `hav` input of `DescriptiveComplexity.Draw.DrawData.postLeaf_iff_qfValue`
+the `hav` input of `DescriptiveComplexity.Draw.Data.postLeaf_iff_qfValue`
 on the nose. -/
 theorem ctlBit_avC_ixMatFs_holds (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -1447,7 +1447,7 @@ theorem ctlBit_avC_ixMatFs_holds (hzo : zero ≠ one)
     (w : Fin (dt.nOf vi) → dt.X.Map A)
     (hENC : ∀ j : Fin (dt.nOf vi),
       wmBlk (ixAddr elt (dt.lvSet st vi j))
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly zero one (w j))
     (hOld : ∀ (i : dt.d.B.ι) (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf vi)),
       st.old i (ixAddr elt (dt.ixStageTgt F hhas vi ts
@@ -1496,7 +1496,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -1552,7 +1552,7 @@ variable (hwA : ∀ a : Fin (dt.natOf vi),
 
 variable (dt zero one vi st v) in
 /-- **The control thread across the matrix's atoms, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.matFs`, with each atom's exit control
+`DescriptiveComplexity.Draw.Data.matFs`, with each atom's exit control
 computed at the state that atom actually runs at. -/
 noncomputable def ixMatFsT
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
@@ -1651,7 +1651,7 @@ theorem ixMatFsT_eq_ixMatFs (hreg : ¬∃ u : I, v = F.cell u)
 include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmirSt
   hbotSt hrules hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR hwA in
 /-- **The matrix's run, threaded, on a clock**: as
-`DescriptiveComplexity.Draw.DrawData.ixMatrix_run_thread` with the atoms
+`DescriptiveComplexity.Draw.Data.ixMatrix_run_thread` with the atoms
 counted – one atom's width, one dispatch and one step back per atom, and one
 step to leave. -/
 theorem ixMatrix_run_thread_reachesIn
@@ -1733,9 +1733,9 @@ omit hwA in
 include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmirSt
   hbotSt hrules hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR in
 /-- **The matrix's run, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.ixMatrix_run` with no boundary discipline
+`DescriptiveComplexity.Draw.Data.ixMatrix_run` with no boundary discipline
 assumed — the tape ends in the threaded state
-`DescriptiveComplexity.Draw.DrawData.ixMatSt`, which differs from the entry
+`DescriptiveComplexity.Draw.Data.ixMatSt`, which differs from the entry
 state in SAV and TARGET alone, and only if the matrix has a stage atom. -/
 theorem ixMatrix_run_thread
     (semT : ∀ a : Fin (dt.natOf vi),
@@ -1770,7 +1770,7 @@ theorem ixMatrix_run_thread
 include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmirSt
   hbotSt hsav htgt hrules hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR hwA in
 /-- **The matrix's run, on a clock**: as
-`DescriptiveComplexity.Draw.DrawData.ixMatrix_run` with the atoms counted – one
+`DescriptiveComplexity.Draw.Data.ixMatrix_run` with the atoms counted – one
 atom's width, one dispatch and one step back per atom, and one step to
 leave. -/
 theorem ixMatrix_reachesIn (f₀ : dt.CtlIx → A) :
@@ -1869,7 +1869,7 @@ the registers, the passing dispatch, the walk back and the tag flags, then the
 domain evaluation's leaf reads once per point of the evaluation order. Uniform
 in the block – the tag count and the read count are bounded by `ntgDim` and
 `nfDim` – so the gate sequence's fold is a single width. -/
-noncomputable def ixGateCost (dt : DrawData L) (A : Type) (w wP : ℕ) : ℕ :=
+noncomputable def ixGateCost (dt : Data L) (A : Type) (w wP : ℕ) : ℕ :=
   wP + (1 + (1 + ((w + 2) * dt.ntgDim + 2 +
     ((2 + (w + 2) * dt.nfDim) * (Nat.card (Lex (Fin dt.eDim → A)) + 1) + 1))))
 
@@ -1926,7 +1926,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -1947,14 +1947,14 @@ variable (hcostR : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
 variable (tOf : Fin (dt.arOf vi) → dt.X.Tag)
 variable (htagOf : ∀ ℓ : Fin (dt.arOf vi),
   dt.dspTagOf PR.zero PR.one
-    (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex (bOf ℓ)) : DrawTag R P dt.KIx)) =
+    (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex (bOf ℓ)) : Tag R P dt.KIx)) =
   tOf ℓ)
 
 omit hord in
 include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt
   hcompatOf htagOf hgap hwP hcostR in
 /-- **The gates' run at a gated address, on a clock**: as
-`DescriptiveComplexity.Draw.DrawData.ixGates_run` with the blocks counted – one
+`DescriptiveComplexity.Draw.Data.ixGates_run` with the blocks counted – one
 block's width, its dispatch and the step back per block, and one step to
 leave. -/
 theorem ixGates_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
@@ -2054,7 +2054,7 @@ omit hord in
 include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt
   hcompatOf htagOf hgap hwP hcostR in
 /-- **The gates' run at a junk address, on a clock**: as
-`DescriptiveComplexity.Draw.DrawData.ixGates_run_fail` with the passing prefix
+`DescriptiveComplexity.Draw.Data.ixGates_run_fail` with the passing prefix
 counted, the failing dispatch and the failing block's sweep on top. -/
 theorem ixGates_reachesIn_fail (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
@@ -2255,12 +2255,12 @@ theorem ctlBit_gateFlagC_ixGatesFs (hzo : PR.zero ≠ PR.one)
       (dt.ctlBit PR.one f₀ dt.gateFlagC ∧
         ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < n →
           ((∀ t' : dt.X.Tag,
-            wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex (bOf ℓ)) : DrawTag R P dt.KIx)
+            wmBlk (ixAddr elt st.mir) (Tag.arg (toLex (bOf ℓ)) : Tag R P dt.KIx)
               (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ) ∧
           ExpExpansion.DomHolds (X := dt.X)
             (tOf ℓ, decRho dt.ly PR.zero PR.one
               (wmBlk (ixAddr elt st.mir)
-                (DrawTag.arg (toLex (bOf ℓ)) : DrawTag R P dt.KIx))))) := by
+                (Tag.arg (toLex (bOf ℓ)) : Tag R P dt.KIx))))) := by
   induction n with
   | zero =>
     exact ⟨fun h => ⟨h, fun ℓ hℓ => absurd hℓ (Nat.not_lt_zero _)⟩,
@@ -2314,7 +2314,7 @@ end GatesRun
 
 end KindStage
 
-end DrawData
+end Data
 
 end Draw
 

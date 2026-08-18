@@ -10,15 +10,15 @@ import DescriptiveComplexity.Problems.Wide.DrawProg
 # The whole assembly is definable, given its semantic packs
 
 The last floor: one variable's machinery
-(`DescriptiveComplexity.Draw.DrawData.varRuleF`), the evaluation's machineries
+(`DescriptiveComplexity.Draw.Data.varRuleF`), the evaluation's machineries
 (`smRule`), its spine (`evalRuleF`) and the program's assembly (`progAsm`) are
 definable as soon as the **semantic packs** are – which is what
-`DescriptiveComplexity.Draw.DrawData.UVarArgsDef` says, field by field: the four
+`DescriptiveComplexity.Draw.Data.UVarArgsDef` says, field by field: the four
 control locations a variable's machinery names must be the same at every
 instance, and every guard and control update it carries must be definable.
 
 Nothing above this file reads a rule any more: what is left of the discharge is
-`DescriptiveComplexity.Draw.DrawData.varArgsOf` meeting `UVarArgsDef`, which is a
+`DescriptiveComplexity.Draw.Data.varArgsOf` meeting `UVarArgsDef`, which is a
 statement about `DescriptiveComplexity.Problems.Wide.DrawArgs` alone.
 -/
 
@@ -26,13 +26,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {Q P : Type} [Fintype Q]
+variable {L : Language.{0, 0}} {dt : Data L} {Q P : Type} [Fintype Q]
 variable [Fintype dt.SlotIx]
 
 /-- **What one variable's semantic pack owes.** -/
@@ -147,7 +147,7 @@ theorem uRulesDefinable_evalRuleF
   uRulesDefinable_evalRule (uRulesDefinable_smRule h)
 
 /-- **The whole program's rule set is definable**: the outer loop around the
-evaluation. This is `DescriptiveComplexity.Draw.DrawData.progAsm`'s `rule` field,
+evaluation. This is `DescriptiveComplexity.Draw.Data.progAsm`'s `rule` field,
 so an interpretation may be written down from here. -/
 theorem uRulesDefinable_progAsm
     {args : ∀ (e : Env L) (v : dt.VarIx), dt.VarArgs (A := e.α) (Q := Q) v}
@@ -157,7 +157,7 @@ theorem uRulesDefinable_progAsm
         (.chk 0) (.sub dt.smEntryOut) :=
   uRulesDefinable_outerRule (uRulesDefinable_evalRuleF h)
 
-end DrawData
+end Data
 
 end Draw
 

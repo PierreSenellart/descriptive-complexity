@@ -12,7 +12,7 @@ The program's states carry a pointer `f : dt.CtlIx → A`, and every semantic
 parameter of the machinery – the coordinates a name guard compares against,
 the accumulators the folds update, the flags a verdict is stored in – is a
 *designation* of some of its slots. This file fixes them, once, with the
-casts through the budgets that `DescriptiveComplexity.Draw.DrawData.eDim` and
+casts through the budgets that `DescriptiveComplexity.Draw.Data.eDim` and
 friends were computed for:
 
 | role | slots |
@@ -26,7 +26,7 @@ friends were computed for:
 | the gates' verdict, a copied bit, two scratch | `gateFlagC`, `bitFlagC`, `scratchC` |
 
 and the two operations every parameter is built from: reading a slot as a
-bit, and writing one (`DescriptiveComplexity.Draw.DrawData.ctlBit` and
+bit, and writing one (`DescriptiveComplexity.Draw.Data.ctlBit` and
 `setCtl`), with their read-back equations. Nothing here is about the tape;
 the machinery's `dstSt` parameters are functions of the pointer alone, and
 this is their vocabulary.
@@ -40,9 +40,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type}
 
 /-! ### The designations -/
 
@@ -217,7 +217,7 @@ theorem setCtl_comm {q q' : dt.CtlIx} (hne : q ≠ q') (b b' : Prop)
     Function.update (Function.update f q _) q' _
   exact Function.update_comm hne.symm _ _ f
 
-end DrawData
+end Data
 
 /-! ### The tuple enumeration
 
@@ -320,9 +320,9 @@ theorem botTup_le [Nonempty A] (p : Fin D) (a : A) : (botTup : Fin D → A) p �
 
 end Tuple
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type}
 
 /-! ### The loop element, read and written
 
@@ -490,7 +490,7 @@ theorem tupSucc_advLvN {f : dt.CtlIx → A} (h : ¬dt.IsMaxLvN f) :
   rw [advLvN, readLv_putLv]
   exact tupSucc_tupNext h
 
-end DrawData
+end Data
 
 end Draw
 

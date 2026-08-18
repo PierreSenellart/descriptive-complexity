@@ -9,11 +9,11 @@ import DescriptiveComplexity.Problems.Wide.DrawInterp
 /-!
 # The clocked machine, written down
 
-`DescriptiveComplexity.Draw.DrawData.reads_progFrom` says of a program that the
+`DescriptiveComplexity.Draw.Data.reads_progFrom` says of a program that the
 interpreted structure reads its table, and it says it of
-`DescriptiveComplexity.Draw.DrawData.progFrom` – the program assembled from a
+`DescriptiveComplexity.Draw.Data.progFrom` – the program assembled from a
 definable rule set, a start phase, an accepting predicate and an initial mark.
-The clocked program is written by hand (`DescriptiveComplexity.Draw.DrawData.nexProg`),
+The clocked program is written by hand (`DescriptiveComplexity.Draw.Data.nexProg`),
 so what is needed here is that the two are the *same program*: they differ in
 one field only, the initial pointer, and there the file's first register carries
 the least tuple, which is clear at every coordinate.
@@ -21,7 +21,7 @@ the least tuple, which is clear at every coordinate.
 With that, the clocked machine is written down exactly as the space-bounded one
 is: `nexInterp` is the interpretation and `reads_nexProg` the fact a reduction
 hands the run layer. What is left to a reduction emitting it is its own
-`DescriptiveComplexity.Draw.DrawData.VarArgs`, the obligation the space-bounded
+`DescriptiveComplexity.Draw.Data.VarArgs`, the obligation the space-bounded
 reduction already meets.
 -/
 
@@ -33,21 +33,21 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} {dt : DrawData L}
+variable {L : Language.{0, 0}} {dt : Data L}
 variable [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] [Finite dt.KIx] [Nonempty dt.KIx]
 
 /-- **The clocked program's rule names**, as the interpretation names them: a
 site of the outer layer or of the evaluation, and one of that site's rules. -/
-abbrev NexRTag (dt : DrawData L) (G : Type) : Type :=
+abbrev NexRTag (dt : Data L) (G : Type) : Type :=
   RTagOf (NexSite dt.SEF) (NexSh dt.SEF (Option dt.KIx) G dt.NexSESh)
 
 /-- **The clocked program's phases.** -/
-abbrev NexPF (dt : DrawData L) : Type := NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)
+abbrev NexPF (dt : Data L) : Type := NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)
 
 /-- **The tags of the clocked machine's universe.** -/
-abbrev NexITag (dt : DrawData L) (G : Type) : Type :=
+abbrev NexITag (dt : Data L) (G : Type) : Type :=
   dt.ITagOf (NexSite dt.SEF) (NexSh dt.SEF (Option dt.KIx) G dt.NexSESh) dt.NexPF
 
 variable {G : Type}
@@ -119,7 +119,7 @@ theorem reads_nexProg (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
   exact dt.reads_progFrom hpl (uRulesDefinable_nexProg (bot := bot) hcoord h)
     (uGDefinable_nexAccept (h none)) NexPh.start blankMark e hws
 
-end DrawData
+end Data
 
 end Draw
 

@@ -34,9 +34,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
 variable [LinearOrder (P)]
@@ -71,22 +71,22 @@ variable (hpassEnc : ∀ (vi : dt.VarIx)
     (ℓ : Fin (dt.nIn vi)),
   dt.ixIGPassP (elt := elt) F PR.zero PR.one vi stV ℓ ↔
     IsEnc dt.ly PR.zero PR.one (wmBlk (ixAddr elt stV.val)
-      (DrawTag.arg (toLex (dt.igBlk vi ℓ)) :
-        DrawTag R (P) dt.KIx)))
+      (Tag.arg (toLex (dt.igBlk vi ℓ)) :
+        Tag R (P) dt.KIx)))
 -- The gates' marks-to-shapes bridge at a coarse file: a position is gated
 -- exactly when the blocks of its mirror's **address** below the variable's
 -- arity are encodings. Free at the elementwise file
--- (`DescriptiveComplexity.Draw.DrawData.isEnc_of_gatedAt` and its converse).
+-- (`DescriptiveComplexity.Draw.Data.isEnc_of_gatedAt` and its converse).
 variable (hgateEnc : ∀ (j : Fin dt.nv)
     (st : TapeSt dt A R (P) I),
   dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st ↔
     ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
       IsEnc dt.ly PR.zero PR.one
         (wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R (P) dt.KIx)))
+            Tag R (P) dt.KIx)))
 variable [Finite dt.KIx]
 -- The address the evaluation runs at: the marker, which the packs are stated
 -- against and none of the constructions here reads.
@@ -107,8 +107,8 @@ theorem ixPassW_congr {zero one : A} (hzo : zero ≠ one)
       (ℓ : Fin (dt.nIn vi)),
       dt.ixIGPassP (elt := elt) F zero one vi stV ℓ ↔
         IsEnc dt.ly zero one (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) :
-            DrawTag R P dt.KIx)))
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) :
+            Tag R P dt.KIx)))
     (_hlin : IsLinOrd (WMLe (A := Univ A R (P)
       dt.KIx dt.dd)))
     (vi : dt.VarIx)
@@ -119,15 +119,15 @@ theorem ixPassW_congr {zero one : A} (hzo : zero ≠ one)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx) =
+          Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ))
     (hmb' : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk (ixAddr elt st'.mir)
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx) =
+          Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ)) :
     dt.ixPassW (elt := elt) (F := F) (zero := zero) (one := one)
       (hpassEnc := hpassEnc') vi st hp mbW =
@@ -150,8 +150,8 @@ theorem ixKindSemCast_passSem {zero one : A} (hzo : zero ≠ one)
       (ℓ : Fin (dt.nIn vi)),
       dt.ixIGPassP (elt := elt) F zero one vi stV ℓ ↔
         IsEnc dt.ly zero one (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) :
-            DrawTag R P dt.KIx)))
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) :
+            Tag R P dt.KIx)))
     (hlin : IsLinOrd (WMLe (A := Univ A R (P)
       dt.KIx dt.dd)))
     (vi : dt.VarIx)
@@ -162,15 +162,15 @@ theorem ixKindSemCast_passSem {zero one : A} (hzo : zero ≠ one)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx) =
+          Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ))
     (hmb' : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk (ixAddr elt st'.mir)
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx) =
+          Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ))
     (b : Fin (dt.natOf vi)) :
     dt.ixKindSemCast zero one vi hmir hval (dt.kindOf vi b)
@@ -213,7 +213,7 @@ noncomputable def ixSpineSem (zero one : A) (vi : dt.VarIx)
       (dt.ixIGPassP_roundSt F zero one vi st st₀ (mV a) ℓ).mp (hp ℓ)) b)
 
 /-- **One pack, carried to every round of every position — threaded**: as
-`DescriptiveComplexity.Draw.DrawData.ixSpineSem`, at the states the VAL loop's
+`DescriptiveComplexity.Draw.Data.ixSpineSem`, at the states the VAL loop's
 own thread produces. Those differ from the position's entry state in the
 two scratch registers and the register they enumerate, and a pack reads
 the state through the mirror and VAL alone, so the entry state's pack
@@ -259,8 +259,8 @@ theorem ixSpineSem_passSem {zero one : A} (hzo : zero ≠ one)
       (ℓ : Fin (dt.nIn vi)),
       dt.ixIGPassP (elt := elt) F zero one vi stV ℓ ↔
         IsEnc dt.ly zero one (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) :
-            DrawTag R P dt.KIx)))
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) :
+            Tag R P dt.KIx)))
     (hlin : IsLinOrd (WMLe (A := Univ A R (P)
       dt.KIx dt.dd)))
     (vi : dt.VarIx)
@@ -279,9 +279,9 @@ theorem ixSpineSem_passSem {zero one : A} (hzo : zero ≠ one)
       (b : Fin (dt.natOf vi))
       (hm₀ : ∀ ℓ : Fin (dt.arOf vi),
         wmBlk (ixAddr elt (dt.ixRoundSt st₀ (mV a)).mir)
-          (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+          (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R P dt.KIx) =
+            Tag R P dt.KIx) =
           encMap dt.ly zero one (mbW ℓ)),
       sem₀ a hp₀ b =
         dt.ixPassSem (elt := elt)
@@ -292,18 +292,18 @@ theorem ixSpineSem_passSem {zero one : A} (hzo : zero ≠ one)
     (b : Fin (dt.natOf vi))
     (hm : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk (ixAddr elt (dt.ixRoundSt st (mV a)).mir)
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx) =
+          Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ)) :
     dt.ixSpineSem F zero one vi mV sem₀ hmir a hp b =
       dt.ixPassSem (elt := elt)
         (F := F) (hpassEnc := hpassEnc') vi (dt.ixRoundSt st (mV a)) hp mbW hm b := by
   have hm₀ : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk (ixAddr elt (dt.ixRoundSt st₀ (mV a)).mir)
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx) =
+          Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ) := by
     intro ℓ
     rw [show (dt.ixRoundSt st₀ (mV a)).mir = st₀.mir from rfl, ← hmir]
@@ -328,10 +328,10 @@ variable [LinearOrder (dt.X.Map A)]
 
 /-! ### What a gated position knows
 
-The branch `DescriptiveComplexity.Draw.DrawData.ixGatedAt` takes is not merely
+The branch `DescriptiveComplexity.Draw.Data.ixGatedAt` takes is not merely
 the one where the machine runs the machinery: it is the one where the
 argument blocks **are** encodings, which is what a semantic pack needs to
-exist at all. `DescriptiveComplexity.Draw.DrawData.gate_trichotomy` says the
+exist at all. `DescriptiveComplexity.Draw.Data.gate_trichotomy` says the
 three legs are exhaustive; read in the other direction it says a gated
 position's blocks encode points. -/
 
@@ -350,10 +350,10 @@ theorem ixIsEnc_of_gatedAt (j : Fin dt.nv)
     (ℓ : Fin (dt.arOf (dt.varAt j))) :
     IsEnc dt.ly PR.zero PR.one
       (wmBlk (ixAddr elt st.mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx)) :=
+          Tag R P dt.KIx)) :=
   (hgateEnc j st).mp hg ℓ
 
 include hgateEnc in
@@ -362,7 +362,7 @@ omit [Finite I] [LinearOrder (dt.X.Map A)]
   [Finite R] in
 /-- **A position whose blocks are encodings is gated** — the converse of
 `ixIsEnc_of_gatedAt`, assembled from
-`DescriptiveComplexity.Draw.DrawData.testOf_of_encMap`,
+`DescriptiveComplexity.Draw.Data.testOf_of_encMap`,
 `wit_of_encMap` and `domHolds_of_encMap`. With the two directions together,
 gating at a position *is* «the blocks below that variable's arity encode
 points», which is the dichotomy a sweep's dictionary splits on — and it is
@@ -372,10 +372,10 @@ theorem ixGatedAt_of_isEnc (j : Fin dt.nv)
     (henc : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
       IsEnc dt.ly PR.zero PR.one
         (wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R P dt.KIx))) :
+            Tag R P dt.KIx))) :
     dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st :=
   (hgateEnc j st).mpr henc
 
@@ -440,7 +440,7 @@ include hpassEnc hgateEnc in
 /-- **A gated position's pack is one pack transported**: its points are the
 address's blocks, which the scratch registers do not touch, so the family
 the machinery is run with is `ixSemCastT` at
-`DescriptiveComplexity.Draw.DrawData.ixGatedSem₀` — the hypothesis the VAL
+`DescriptiveComplexity.Draw.Data.ixGatedSem₀` — the hypothesis the VAL
 loop's bridge (`ixVarFMT_eq_varFM`) is stated under. -/
 theorem ixGatedSem_eq_semCastT (hzo : PR.zero ≠ PR.one)
     (hlin : IsLinOrd
@@ -462,9 +462,9 @@ theorem ixGatedSem_eq_semCastT (hzo : PR.zero ≠ PR.one)
   have hmbA : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
       wmBlk (ixAddr elt (dt.ixMatSt (elt := elt)
         (dt.varAt j) (dt.ixVarRdSt st p (mV a)) v (b : ℕ)).mir)
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R P dt.KIx) =
+          Tag R P dt.KIx) =
         encMap dt.ly PR.zero PR.one
           ((ixIsEnc_of_gatedAt (dt := dt) (elt := elt) (F := F) (hgateEnc := hgateEnc)
         j st hg ℓ).choose) := by
@@ -526,7 +526,7 @@ end GatedPack
 not have a register for every element it is asked about. Where it does – any
 file laid by blocks and tuples – the bridge is the elementwise one
 (`gate_trichotomy` and `testOf_of_encMap`) read through
-`DescriptiveComplexity.Draw.DrawData.wellShapedG_ixBack_iff`. -/
+`DescriptiveComplexity.Draw.Data.wellShapedG_ixBack_iff`. -/
 
 section GateBridge
 
@@ -547,9 +547,9 @@ theorem ixGatedAt_iff_isEnc (RF : RegFile (Univ A R P dt.KIx dt.dd))
       ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
         IsEnc dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
-              Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)) := by
+              Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)) := by
   classical
   haveI := Fintype.ofFinite A
   have hcellinj : Function.Injective F.cell := F.toIxFile.injective hix
@@ -606,7 +606,7 @@ and it asks *less* than the gates' bridge did: only that the registers stand for
 elements and that their tuples are their elements'. Nothing has to be said about
 which elements have registers, because the members of the block are the marked
 registers' own tuples. The verdict half is
-`DescriptiveComplexity.Draw.DrawData.igVerdict_iff_isEnc`, which asks only that
+`DescriptiveComplexity.Draw.Data.igVerdict_iff_isEnc`, which asks only that
 the block's members be encoding-shaped, and that is what the shape test says. -/
 theorem ixIGPassP_iff_isEnc
     (hargP : ∀ u : I, F.arg u = (elt u).2)
@@ -615,7 +615,7 @@ theorem ixIGPassP_iff_isEnc
     dt.ixIGPassP (elt := elt) F PR.zero PR.one vi stV ℓ ↔
       IsEnc dt.ly PR.zero PR.one
         (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)) := by
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)) := by
   classical
   have hcellinj : Function.Injective F.cell := F.toIxFile.injective hix
   constructor
@@ -640,12 +640,12 @@ theorem ixIGPassP_iff_isEnc
     · refine (wellShapedIG_ixBack_iff (lay := F.toLayout) (elt := elt) hcellinj
         hinj hblkP hargP hzo stV (dt.igBlk vi ℓ) u).mpr ?_
       intro hblk hval
-      have htag : (elt u).1 = (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx) :=
+      have htag : (elt u).1 = (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx) :=
         (tagBlk_eq_some_iff _ _).mp hblk
       have hmem : encMap dt.ly PR.zero PR.one p ((elt u).2) := by
         rw [← hp]
         change ixAddr elt stV.val
-          ((DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx), (elt u).2)
+          ((Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx), (elt u).2)
         rw [← htag]
         exact (by exact hval : ixAddr elt stV.val (elt u))
       have hshape : (∃ t : dt.X.Tag,
@@ -671,7 +671,7 @@ theorem ixIGPassP_iff_isEnc
 
 end GateBridge
 
-end DrawData
+end Data
 
 end Draw
 

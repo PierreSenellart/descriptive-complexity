@@ -24,9 +24,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
 variable {P : Type}
@@ -62,22 +62,22 @@ variable (hpassEnc : ∀ (vi : dt.VarIx)
     (ℓ : Fin (dt.nIn vi)),
   dt.ixIGPassP (elt := elt) F PR.zero PR.one vi stV ℓ ↔
     IsEnc dt.ly PR.zero PR.one (wmBlk (ixAddr elt stV.val)
-      (DrawTag.arg (toLex (dt.igBlk vi ℓ)) :
-        DrawTag R (P) dt.KIx)))
+      (Tag.arg (toLex (dt.igBlk vi ℓ)) :
+        Tag R (P) dt.KIx)))
 -- The gates' marks-to-shapes bridge at a coarse file: a position is gated
 -- exactly when the blocks of its mirror's **address** below the variable's
 -- arity are encodings. Free at the elementwise file
--- (`DescriptiveComplexity.Draw.DrawData.isEnc_of_gatedAt` and its converse).
+-- (`DescriptiveComplexity.Draw.Data.isEnc_of_gatedAt` and its converse).
 variable (hgateEnc : ∀ (j : Fin dt.nv)
     (st : TapeSt dt A R (P) I),
   dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st ↔
     ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
       IsEnc dt.ly PR.zero PR.one
         (wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R (P) dt.KIx)))
+            Tag R (P) dt.KIx)))
 variable [Finite dt.KIx]
 
 /-! ### One position's write -/
@@ -117,10 +117,10 @@ open Classical in
 the marker holds its verdict and every other cell rides. Weaker than the
 cover equation `hst`, and weaker on purpose — a *branched* position's leg
 is not literally a
-`DescriptiveComplexity.Draw.DrawData.ixPostVarSt` of the position's entry
+`DescriptiveComplexity.Draw.Data.ixPostVarSt` of the position's entry
 state (its VAL loop may normalize the two scratch registers first), while
 this projection of it is
-(`DescriptiveComplexity.Draw.DrawData.ixLegStB_new`). -/
+(`DescriptiveComplexity.Draw.Data.ixLegStB_new`). -/
 abbrev IxWritesNew
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (P) I)
     (bOf : Fin dt.nv → Prop) : Prop :=
@@ -309,8 +309,8 @@ omit [Finite I] in
 include hstN in
 /-- **At an address every position rejects, the marker's `new` cells are
 all clear** — the junk legs
-(`DescriptiveComplexity.Draw.DrawData.ixVarLegFail_run`,
-`DescriptiveComplexity.Draw.DrawData.ixVarLegUngated_run`) store `False`, which
+(`DescriptiveComplexity.Draw.Data.ixVarLegFail_run`,
+`DescriptiveComplexity.Draw.Data.ixVarLegUngated_run`) store `False`, which
 is what the stage dictionary holds at an address that encodes no tuple. -/
 theorem ixNew_last_of_false (hbOf : ∀ j : Fin dt.nv, ¬bOf j)
     (i : dt.d.B.ι) : ¬(stOf (Fin.last dt.nv)).new i v := by
@@ -346,7 +346,7 @@ theorem ixNew_last_next_at
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
     (hKin : ∀ (a : ιV)
-      (t : DrawTag R (P) dt.KIx)
+      (t : Tag R (P) dt.KIx)
       (w : Fin dt.dd → A), ixAddr elt (mV a) (t, w) →
         ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
@@ -398,10 +398,10 @@ theorem ixNew_last_next_at
       (b : Fin (dt.natOf (dt.varAt j)))
       (hmb' : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
         wmBlk (ixAddr elt (dt.ixRoundSt (stOf j.castSucc) (mV a)).mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R (P) dt.KIx) =
+            Tag R (P) dt.KIx) =
           encMap dt.ly PR.zero PR.one (mbW ℓ)),
       semOfJ a hp b = dt.ixPassSem (elt := elt) (F := F) (hpassEnc := hpassEnc) (dt.varAt j)
         (dt.ixRoundSt (stOf j.castSucc) (mV a)) hp mbW hmb' b) :
@@ -434,7 +434,7 @@ include hinj hhasP heltP hix hblkP hmono hup hpassEnc hUse in
 omit [Finite I] [Finite dt.KIx] in
 /-- **After the spine, every `new` track holds the next stage at the
 address's points.** The position of a variable writes its verdict, which
-`DescriptiveComplexity.Draw.DrawData.ixAccVerdict_next` reads as
+`DescriptiveComplexity.Draw.Data.ixAccVerdict_next` reads as
 `DescriptiveComplexity.StepDef.next`; the mirror and the dictionary ride
 the spine, so the semantic hypotheses need only be given at the entry
 state. -/
@@ -447,7 +447,7 @@ theorem ixNew_last_next
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
     (hKin : ∀ (a : ιV)
-      (t : DrawTag R (P) dt.KIx)
+      (t : Tag R (P) dt.KIx)
       (w : Fin dt.dd → A), ixAddr elt (mV a) (t, w) →
         ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
@@ -500,10 +500,10 @@ theorem ixNew_last_next
       (b : Fin (dt.natOf (dt.varAt j)))
       (hmb' : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
         wmBlk (ixAddr elt (dt.ixRoundSt (stOf j.castSucc) (mV a)).mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R (P) dt.KIx) =
+            Tag R (P) dt.KIx) =
           encMap dt.ly PR.zero PR.one
             (pt (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ))),
       semOfJ j a hp b = dt.ixPassSem (elt := elt) (F := F) (hpassEnc := hpassEnc) (dt.varAt j)
@@ -546,7 +546,7 @@ address contributes — its own cell now holds the target (`hat`, which
 `ixNew_last_next` and `ixNew_last_of_false` supply), every other cell is
 untouched (`hoff`, which `ixSpine_new_off` supplies) — with the entry state
 of the next address read off the sweep's own tape family (`hSW`, the
-`hSW` of `DescriptiveComplexity.Draw.DrawData.reaches_sweep`).
+`hSW` of `DescriptiveComplexity.Draw.Data.reaches_sweep`).
 
 Below the address reached, the tracks are the target; elsewhere they are
 still the sweep's initial ones. Stated for an arbitrary target family `N`,
@@ -679,7 +679,7 @@ theorem ixNew_last_trackOf
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
     (hKin : ∀ (a : ιV)
-      (t : DrawTag R (P) dt.KIx)
+      (t : Tag R (P) dt.KIx)
       (w : Fin dt.dd → A), ixAddr elt (mV a) (t, w) →
         ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
@@ -732,10 +732,10 @@ theorem ixNew_last_trackOf
       (b : Fin (dt.natOf (dt.varAt j)))
       (hmb' : ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
         wmBlk (ixAddr elt (dt.ixRoundSt (stOf j.castSucc) (mV a)).mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R (P) dt.KIx) =
+            Tag R (P) dt.KIx) =
           encMap dt.ly PR.zero PR.one
             (pt (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ))),
       semOfJ j a hp b = dt.ixPassSem (elt := elt) (F := F) (hpassEnc := hpassEnc) (dt.varAt j)
@@ -757,8 +757,8 @@ theorem ixNew_last_trackOf
       (fun ℓ => hpt _)).symm
   intro k
   change wmBlk (ixAddr elt (stOf 0).mir)
-    (DrawTag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
-      DrawTag R (P) dt.KIx) = _
+    (Tag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
+      Tag R (P) dt.KIx) = _
   rw [hmir]
   exact hpt k
 
@@ -902,7 +902,7 @@ theorem ixSpineStOf_succ (j : Fin dt.nv) :
 /-! ### The per-position families, threaded -/
 
 /-- **One node of the spine, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.ixSpineNode`, with the leg's own exit
+`DescriptiveComplexity.Draw.Data.ixSpineNode`, with the leg's own exit
 state — SAV and TARGET as its VAL loop left them — instead of the
 normalized one. The mirror still rides, which is what makes the next
 position's pack exist. -/
@@ -1022,15 +1022,15 @@ theorem ixSpineStOfT_succ (j : Fin dt.nv) :
 The threaded family above runs the gated leg at every position, which a
 sweep cannot afford: it visits junk addresses too. The branched family
 takes whichever of the three legs each position's own gates call for
-(`DescriptiveComplexity.Draw.DrawData.ixLegStB`), and is otherwise the same
+(`DescriptiveComplexity.Draw.Data.ixLegStB`), and is otherwise the same
 recursion — the mirror still rides, because no leg writes it.
 
 Its semantic parameter is **not** the entry state's pack transported: it is
-the *conditioned* family `DescriptiveComplexity.Draw.DrawData.ixGatedSem`
+the *conditioned* family `DescriptiveComplexity.Draw.Data.ixGatedSem`
 inhabits — a pack at every gated position of every state, at every address.
 Conditioned, because at a junk position no pack exists (the argument blocks
 encode nothing there); quantified over the address as well, because
-`DescriptiveComplexity.Draw.DrawData.ixStEndB` runs this spine at `v := w` for
+`DescriptiveComplexity.Draw.Data.ixStEndB` runs this spine at `v := w` for
 an address `w` its own binders are fixed before. With that type the
 parameter is supplied outright at the top — `fun w => dt.ixGatedSem hzo hlin
 mV` — and no semantic assumption about a position survives in the run
@@ -1233,7 +1233,7 @@ omit [Finite R] [Finite (P)] [Finite dt.KIx]
 omit [Finite I] in
 /-- **The branched family writes what a spine writes** — the projection of
 the cover equation the `new` tracks read, which is all the dictionary
-lemmas ask of a leg (`DescriptiveComplexity.Draw.DrawData.ixLegStB_new`). -/
+lemmas ask of a leg (`DescriptiveComplexity.Draw.Data.ixLegStB_new`). -/
 theorem ixSpineStOfB_writesNew :
     dt.IxWritesNew (v := v) (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ semB)
@@ -1279,7 +1279,7 @@ omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
 /-- **A field a threaded leg leaves alone rides the whole spine** — the
-twin of `DescriptiveComplexity.Draw.DrawData.ixSpineRide` at the legs the
+twin of `DescriptiveComplexity.Draw.Data.ixSpineRide` at the legs the
 threaded family is built from. -/
 theorem ixSpineRideT {β : Sort _}
     (G : TapeSt dt A R (P) I → β)
@@ -1332,7 +1332,7 @@ theorem ixNew_last_trackOf_B
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
     (hKin : ∀ (a : ιV)
-      (t : DrawTag R (P) dt.KIx)
+      (t : Tag R (P) dt.KIx)
       (w : Fin dt.dd → A), ixAddr elt (mV a) (t, w) →
         ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
@@ -1429,10 +1429,10 @@ theorem ixNew_last_trackOf_B
     obtain ⟨ℓ₀, hℓ₀⟩ : ∃ ℓ : Fin (dt.arOf (dt.varAt j)),
         ¬IsEnc dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt stj.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R (P) dt.KIx)) := by
+              Tag R (P) dt.KIx)) := by
       by_contra hc
       exact hg (ixGatedAt_of_isEnc (dt := dt) (elt := elt) (F := F) (hgateEnc := hgateEnc) j stj
         (fun ℓ => not_not.mp fun h => hc ⟨ℓ, h⟩))
@@ -1449,7 +1449,7 @@ stage the tracks hold. The output variable is nullary, so its blocks encode
 the empty tuple and there is nothing to ask of them – which is why this is the
 one verdict a program can take at the address its head starts on. This is the
 `hacc` a run through the output's machinery
-(`DescriptiveComplexity.Draw.DrawData.nexIxEvalOutB_reachesIn`) asks for, and the
+(`DescriptiveComplexity.Draw.Data.nexIxEvalOutB_reachesIn`) asks for, and the
 reason the accepting bit says anything at all. -/
 theorem ixOutAcc_iff_out
     (hlin : IsLinOrd (WMLe (A := Univ A R (P) dt.KIx dt.dd)))
@@ -1457,7 +1457,7 @@ theorem ixOutAcc_iff_out
     {a₀ aT : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R (P) dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R (P) dt.KIx) (w : Fin dt.dd → A),
       ixAddr elt (mV a) (t, w) → ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -1515,7 +1515,7 @@ variable (f₀ : dt.CtlIx → A)
 /-- **The pair the sweep arrives at each address with**: the base at the
 empty address, and at every increment the previous address's evaluation
 exit — its marker moved on and its mirror set to the new address, exactly
-the shape `DescriptiveComplexity.Draw.DrawData.reaches_sweep` demands. -/
+the shape `DescriptiveComplexity.Draw.Data.reaches_sweep` demands. -/
 noncomputable def ixSweepPairG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
     TapeSt dt A R (P) I × (dt.CtlIx → A) :=
@@ -1712,7 +1712,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
 omit [Finite I] in
 /-- **`reaches_sweep`'s `hmirE` when the evaluation sets the mirror
 itself**: the variant of
-`DescriptiveComplexity.Draw.DrawData.ixSweepStEG_mir` for an evaluation that
+`DescriptiveComplexity.Draw.Data.ixSweepStEG_mir` for an evaluation that
 normalizes the mirror to the address it is run at, which makes the
 invariant definitional instead of inductive. -/
 theorem ixSweepStEG_mir' (hFE : ∀ u st f, (stE u st f).mir = ixMark elt u)
@@ -1727,7 +1727,7 @@ end SweepGen
 
 /-! ### The stage atom's restore, as an algebra
 
-`DescriptiveComplexity.Draw.DrawData.stageEndSt st v = { st with sav := v,
+`DescriptiveComplexity.Draw.Data.stageEndSt st v = { st with sav := v,
 tgt := v }`: the random access **writes** the home address into SAV and
 TARGET whatever they held, so a stage atom is transparent exactly when they
 held it already — which is what `ixStageEndSt_eq`'s two hypotheses say, and
@@ -1769,7 +1769,7 @@ theorem ixStageEndSt_home :
 
 end StageEnd
 
-end DrawData
+end Data
 
 end Draw
 

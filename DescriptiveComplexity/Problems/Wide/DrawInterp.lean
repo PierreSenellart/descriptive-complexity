@@ -347,9 +347,9 @@ end Extremes
 the guard and the two payloads of a rule do not depend on the instance. What an
 interpretation writes down is those, and this is where they are named. -/
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 variable {S : Type} {Sh : S → Type} {P : Type}
 variable {rules : ∀ (e : Env L) (i : S), Sh i →
   Rule e.α dt.CtlIx dt.SlotIx P}
@@ -357,20 +357,20 @@ variable {rules : ∀ (e : Env L) (i : S), Sh i →
 /-- **The rule names of the emitted machine**, as a type the instance does not
 mention: one name per shape of each site. Both the site type and its shapes
 belong to the *program*, so the type is taken at an arbitrary pair; the
-space-bounded program's own are `DrawData.SF` and `DrawData.SFSh`, the clocked
+space-bounded program's own are `Draw.Data.SF` and `Draw.Data.SFSh`, the clocked
 program's are its own. -/
 abbrev RTagOf (S : Type) (Sh : S → Type) : Type := (i : S) × Sh i
 
 /-- **The tags of the interpreted universe**, at an arbitrary site type and an
 arbitrary phase type. -/
-abbrev ITagOf (dt : DrawData L) (S : Type) (Sh : S → Type) (P : Type) : Type :=
-  DrawTag (RTagOf S Sh) P dt.KIx
+abbrev ITagOf (dt : Data L) (S : Type) (Sh : S → Type) (P : Type) : Type :=
+  Tag (RTagOf S Sh) P dt.KIx
 
 /-- **The rule names of the space-bounded program.** -/
-abbrev RTag (dt : DrawData L) : Type := RTagOf dt.SF dt.SFSh
+abbrev RTag (dt : Data L) : Type := RTagOf dt.SF dt.SFSh
 
 /-- **The tags of the space-bounded program's interpreted universe.** -/
-abbrev ITag (dt : DrawData L) : Type := dt.ITagOf dt.SF dt.SFSh dt.PF
+abbrev ITag (dt : Data L) : Type := dt.ITagOf dt.SF dt.SFSh dt.PF
 
 variable (hdef : URulesDefinable rules)
 
@@ -467,7 +467,7 @@ theorem readFOf_spec (e : Env L)
   (uPayloadDefinable_syPl (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
     (G := fun _ _ g => g) uTrDefinable_id).choose_spec e w y
 
-end DrawData
+end Data
 
 /-! ### The transitions, and their five attributes
 
@@ -475,11 +475,11 @@ Each is one of the shapes above at the data the tag names: a transition is a
 guarded padded tuple, its four payload attributes are attributes, and its
 direction is decided outright. -/
 
-namespace DrawData
+namespace Data
 
 section Formulas
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 variable {S : Type} {Sh : S → Type} {P : Type}
 variable {rules : ∀ (e : Env L) (i : S), Sh i →
   Rule e.α dt.CtlIx dt.SlotIx P}
@@ -500,28 +500,28 @@ noncomputable def rightF : (dt.ITagOf S Sh P) → (L.sum Language.order).Formula
 noncomputable def srcF (t t' : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 2 × Fin dt.dd) :=
   match t with
-  | .ctrl r => attrF hpl (t' = DrawTag.phase (dt.srcPhOf hdef r)) dt.srcFOf
+  | .ctrl r => attrF hpl (t' = Tag.phase (dt.srcPhOf hdef r)) dt.srcFOf
   | _ => ⊥
 
 /-- **The symbol it reads.** -/
 noncomputable def readF (t t' : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 2 × Fin dt.dd) :=
   match t with
-  | .ctrl _ => attrF hpl (t' = DrawTag.sym) dt.readFOf
+  | .ctrl _ => attrF hpl (t' = Tag.sym) dt.readFOf
   | _ => ⊥
 
 /-- **The state it moves to.** -/
 noncomputable def dstF (t t' : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 2 × Fin dt.dd) :=
   match t with
-  | .ctrl r => attrF hpl (t' = DrawTag.phase (dt.dstPhOf hdef r)) (dt.dstFOf hdef r)
+  | .ctrl r => attrF hpl (t' = Tag.phase (dt.dstPhOf hdef r)) (dt.dstFOf hdef r)
   | _ => ⊥
 
 /-- **The symbol it writes.** -/
 noncomputable def writeF (t t' : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 2 × Fin dt.dd) :=
   match t with
-  | .ctrl r => attrF hpl (t' = DrawTag.sym) (dt.wrFOf hdef r)
+  | .ctrl r => attrF hpl (t' = Tag.sym) (dt.wrFOf hdef r)
   | _ => ⊥
 
 /-! ### What they say -/
@@ -588,7 +588,7 @@ theorem realize_writeF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
 
 end Formulas
 
-end DrawData
+end Data
 
 /-! ### Two more shapes: a bit, and an all-set tuple -/
 
@@ -637,11 +637,11 @@ theorem realize_topTupF {D : ℕ} {u : Fin D → γ} :
 
 end Bits
 
-namespace DrawData
+namespace Data
 
 section MoreFormulas
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 variable {S : Type} {Sh : S → Type} {P : Type}
 variable (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
 variable {accept : ∀ e : Env L, P → (dt.CtlIx → e.α) → Prop}
@@ -666,12 +666,12 @@ noncomputable def accF : (dt.ITagOf S Sh P) → (L.sum Language.order).Formula (
 /-- **Being the start state**: the start phase and the all-clear tuple. -/
 noncomputable def startF (p₀ : P) (t : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 1 × Fin dt.dd) :=
-  constF (t = DrawTag.phase p₀)
+  constF (t = Tag.phase p₀)
 
 /-- **Being the blank**: the alphabet tag and the all-clear tuple. -/
 noncomputable def blankF (t : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 1 × Fin dt.dd) :=
-  constF (t = DrawTag.sym)
+  constF (t = Tag.sym)
 
 variable (e : Env L)
 
@@ -688,7 +688,7 @@ omit [Fintype dt.SlotIx] in
 theorem realize_startF (p₀ : P) (t : (dt.ITagOf S Sh P)) {v : Fin 1 × Fin dt.dd → e.α} :
     (dt.startF p₀ t).Realize v ↔
       ((t, fun j => v (0, j)) : (dt.ITagOf S Sh P) × (Fin dt.dd → e.α)) =
-        (DrawTag.phase p₀, fun _ => e.zero) := by
+        (Tag.phase p₀, fun _ => e.zero) := by
   rw [startF, realize_constF e.hbot]
   exact ⟨fun h => Prod.ext h.1 h.2, fun h => ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩⟩
 
@@ -696,13 +696,13 @@ omit [Fintype dt.SlotIx] in
 theorem realize_blankF (t : (dt.ITagOf S Sh P)) {v : Fin 1 × Fin dt.dd → e.α} :
     (dt.blankF t).Realize v ↔
       ((t, fun j => v (0, j)) : (dt.ITagOf S Sh P) × (Fin dt.dd → e.α)) =
-        (DrawTag.sym, fun _ => e.zero) := by
+        (Tag.sym, fun _ => e.zero) := by
   rw [blankF, realize_constF e.hbot]
   exact ⟨fun h => Prod.ext h.1 h.2, fun h => ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩⟩
 
 end MoreFormulas
 
-end DrawData
+end Data
 
 /-! ### The input channel
 
@@ -714,11 +714,11 @@ the padding flag says the rest are clear. Every one of those is a tag decision,
 a shape formula, or an equality of variables – the two extremes because of
 `DescriptiveComplexity.Draw.isLeast_tagTupleLe_iff` and its dual. -/
 
-namespace DrawData
+namespace Data
 
 section Mark
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 variable {S : Type} {Sh : S → Type} {P : Type}
 variable [LinearOrder (RTagOf S Sh)] [LinearOrder P]
 variable (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
@@ -756,7 +756,7 @@ noncomputable def markF (t : (dt.ITagOf S Sh P)) :
 /-- **The input channel**: the cell of an element holds that element's mark. -/
 noncomputable def inpF (t t' : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 2 × Fin dt.dd) :=
-  sideF _ (t' = DrawTag.sym) ⊓
+  sideF _ (t' = Tag.sym) ⊓
     canonF (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) (argVar 2 dt.dd 1) ⊓
     dt.markF hpl t
 
@@ -892,8 +892,8 @@ the reading `DescriptiveComplexity.Draw.isGreatest_tagTupleLe_iff` gives for the
 whole universe, restricted to the elements below the argument tags. -/
 theorem isTopNonArg_iff (x : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) :
     IsTopNonArg x ↔
-      ((∀ i, x.1 ≠ DrawTag.arg i) ∧
-        (∀ t : DrawTag (RTagOf S Sh) P dt.KIx, (∀ i, t ≠ DrawTag.arg i) → t ≤ x.1) ∧
+      ((∀ i, x.1 ≠ Tag.arg i) ∧
+        (∀ t : Tag (RTagOf S Sh) P dt.KIx, (∀ i, t ≠ Tag.arg i) → t ≤ x.1) ∧
         ∀ j, IsTop (x.2 j)) := by
   constructor
   · rintro ⟨hna, hall⟩
@@ -915,8 +915,8 @@ above, with `regFirst` reading the file's own first register. -/
 noncomputable def markSlotRegF (t : (dt.ITagOf S Sh P)) (y : Fin 2 × Fin dt.dd) :
     dt.SlotIx → (L.sum Language.order).Formula (Fin 2 × Fin dt.dd)
   | .regFirst =>
-    bitAtF y (sideF _ ((∀ i, t ≠ DrawTag.arg i) ∧
-        ∀ t' : (dt.ITagOf S Sh P), (∀ i, t' ≠ DrawTag.arg i) → t' ≤ t) ⊓
+    bitAtF y (sideF _ ((∀ i, t ≠ Tag.arg i) ∧
+        ∀ t' : (dt.ITagOf S Sh P), (∀ i, t' ≠ Tag.arg i) → t' ≤ t) ⊓
       topTupF (argVar 2 dt.dd 0))
   | s => dt.markSlotF t y s
 
@@ -938,7 +938,7 @@ noncomputable def markRegF (t : (dt.ITagOf S Sh P)) :
 the mark being the register channel's. -/
 noncomputable def inpRegF (t t' : (dt.ITagOf S Sh P)) :
     (L.sum Language.order).Formula (Fin 2 × Fin dt.dd) :=
-  sideF _ (t' = DrawTag.sym) ⊓
+  sideF _ (t' = Tag.sym) ⊓
     canonF (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) (argVar 2 dt.dd 1) ⊓
     dt.markRegF hpl t
 
@@ -950,8 +950,8 @@ theorem realize_markSlotRegF (t : (dt.ITagOf S Sh P)) (y : Fin 2 × Fin dt.dd)
         ((t, fun j => v (0, j)) : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) s := by
   match s with
   | .regFirst =>
-    have hP : ((sideF (L := L) _ ((∀ i, t ≠ DrawTag.arg i) ∧
-          ∀ t' : (dt.ITagOf S Sh P), (∀ i, t' ≠ DrawTag.arg i) → t' ≤ t) ⊓
+    have hP : ((sideF (L := L) _ ((∀ i, t ≠ Tag.arg i) ∧
+          ∀ t' : (dt.ITagOf S Sh P), (∀ i, t' ≠ Tag.arg i) → t' ≤ t) ⊓
         topTupF (argVar 2 dt.dd 0)).Realize v) ↔
         IsTopNonArg ((t, fun j => v (0, j)) :
           Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) := by
@@ -1061,7 +1061,7 @@ theorem syPl_const :
 machine runs, together with the formula that defines the input channel. The
 space-bounded program is handed a register file (`regFileMark`); the clocked
 program starts on a blank tape and builds its own file (`blankMark`). -/
-structure UMarkDef {L : Language.{0, 0}} (dt : DrawData L) [Fintype dt.SlotIx]
+structure UMarkDef {L : Language.{0, 0}} (dt : Data L) [Fintype dt.SlotIx]
     (S : Type) (Sh : S → Type) (P : Type) where
   /-- What each cell holds. -/
   mark : ∀ e : Env L, Univ e.α (RTagOf S Sh) P dt.KIx dt.dd → dt.SlotIx → e.α
@@ -1102,11 +1102,11 @@ address reaches down to it
 (`DescriptiveComplexity.wmSetLt_wmRegSeg_of_above`). -/
 noncomputable def regFileMarkArg : UMarkDef dt S Sh P where
   mark e x := regSlotMark e.zero e.one dt.dd0Le x
-  marked _ x := (∃ k : dt.KIx, x.1 = DrawTag.arg k) ∨ IsTopNonArg x
+  marked _ x := (∃ k : dt.KIx, x.1 = Tag.arg k) ∨ IsTopNonArg x
   form t t' :=
-    (sideF _ (∃ k : dt.KIx, t = DrawTag.arg k) ⊔
-      (sideF _ ((∀ i, t ≠ DrawTag.arg i) ∧
-          ∀ t'' : dt.ITagOf S Sh P, (∀ i, t'' ≠ DrawTag.arg i) → t'' ≤ t) ⊓
+    (sideF _ (∃ k : dt.KIx, t = Tag.arg k) ⊔
+      (sideF _ ((∀ i, t ≠ Tag.arg i) ∧
+          ∀ t'' : dt.ITagOf S Sh P, (∀ i, t'' ≠ Tag.arg i) → t'' ≤ t) ⊓
         topTupF (argVar 2 dt.dd 0))) ⊓ dt.inpRegF hpl t t'
   spec e t t' v := by
     rw [Formula.realize_inf, Formula.realize_sup, Formula.realize_inf,
@@ -1121,12 +1121,12 @@ no more than that the cell is a symbol with a clear payload. -/
 noncomputable def blankMark : UMarkDef dt S Sh P where
   mark _ _ _ := Env.zero _
   marked _ _ := True
-  form _ t' := sideF _ (t' = DrawTag.sym) ⊓ canonF 0 (argVar 2 dt.dd 1)
+  form _ t' := sideF _ (t' = Tag.sym) ⊓ canonF 0 (argVar 2 dt.dd 1)
   spec e t t' v := by
     rw [Formula.realize_inf, realize_sideF, realize_canonF_isPad e.hbot]
     have hs : symElt (R := RTagOf S Sh) (P := P) (K := dt.KIx) (dd := dt.dd) e.zero
         (syPl (Q := dt.CtlIx) e.zero (fun _ : dt.SlotIx => e.zero)) =
-        (DrawTag.sym, fun _ => e.zero) := by
+        (Tag.sym, fun _ => e.zero) := by
       rw [symElt, dt.syPl_const e, dt.pad_const e]
     rw [hs]
     constructor
@@ -1137,7 +1137,7 @@ noncomputable def blankMark : UMarkDef dt S Sh P where
 
 end Mark
 
-end DrawData
+end Data
 
 /-! ### The interpretation
 
@@ -1145,11 +1145,11 @@ Eleven relation symbols, eleven formulas – the ten above and the order, which
 is `DescriptiveComplexity.lexLeF`, the tags compared when the formula is
 built. -/
 
-namespace DrawData
+namespace Data
 
 section Interp
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 variable {S : Type} {Sh : S → Type} {P : Type}
 variable [LinearOrder (RTagOf S Sh)] [LinearOrder P]
 variable {rules : ∀ (e : Env L) (i : S), Sh i →
@@ -1165,7 +1165,7 @@ variable (p₀ : P) (mk : UMarkDef dt S Sh P)
 
 section Prog
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 variable {S : Type} {Sh : S → Type} {P : Type}
 variable [LinearOrder (RTagOf S Sh)] [LinearOrder P]
 variable (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) (e : Env L)
@@ -1255,7 +1255,7 @@ theorem relMap_two {R : Language.wide.Relations 2}
 Eleven definitional unfoldings: each relation of the interpreted structure is
 its formula at the tags of its arguments, and each formula was built to say
 what the table says. The only two rewrites are the two phases of a rule, which
-`DescriptiveComplexity.Draw.DrawData.srcPhOf` and `dstPhOf` name. -/
+`DescriptiveComplexity.Draw.Data.srcPhOf` and `dstPhOf` name. -/
 
 include hws in
 theorem relMap_le (x y : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) :
@@ -1347,7 +1347,7 @@ theorem relMap_start (q : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) :
   rw [WMStart, dt.relMap_one hpl hdef hacc p₀ mk e hws (R := Language.wmStart)
     (φ := fun t => dt.startF p₀ t) rfl, dt.realize_startF e p₀ t]
   change _ ↔ ((t, u) : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) =
-    (DrawTag.phase p₀, pad e.zero (stPl (W := dt.SlotIx) e.zero fun _ => e.zero))
+    (Tag.phase p₀, pad e.zero (stPl (W := dt.SlotIx) e.zero fun _ => e.zero))
   rw [dt.stPl_const e, dt.pad_const e]
 
 include hws in
@@ -1357,7 +1357,7 @@ theorem relMap_blank (a : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) :
   rw [WMBlank, dt.relMap_one hpl hdef hacc p₀ mk e hws (R := Language.wmBlank)
     (φ := fun t => dt.blankF t) rfl, dt.realize_blankF e t]
   change _ ↔ ((t, u) : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) =
-    (DrawTag.sym, pad e.zero (syPl (Q := dt.CtlIx) e.zero fun _ => e.zero))
+    (Tag.sym, pad e.zero (syPl (Q := dt.CtlIx) e.zero fun _ => e.zero))
   rw [dt.syPl_const e, dt.pad_const e]
 
 include hws in
@@ -1399,7 +1399,7 @@ theorem reads_progFrom :
 
 end Interp
 
-end DrawData
+end Data
 
 end Draw
 

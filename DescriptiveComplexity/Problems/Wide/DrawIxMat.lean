@@ -26,9 +26,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -86,7 +86,7 @@ variable {gbot : I} (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -172,7 +172,7 @@ variable {gbot : I} (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -181,7 +181,7 @@ variable (hwkSt : st.wk = fun r => r = v)
 variable (pts : Fin k → dt.X.Map A)
 variable (hENC : ∀ ℓ : Fin k,
   wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-    (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+    (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
     encMap dt.ly PR.zero PR.one (pts ℓ))
 
 
@@ -270,7 +270,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -310,10 +310,10 @@ omit [L.IsRelational] [L.Structure A] hsav htgt in
 include hrules hR hlin hix hhasP hsepP hinj hmono hup helt hord htop hbot he₀
   hwork hv hvi hwkSt hmirSt hbotSt hvh hxdUse in
 /-- **The stage atom, threaded**: the same run as
-`DescriptiveComplexity.Draw.DrawData.ixStage_hStage` with *no* boundary
+`DescriptiveComplexity.Draw.Data.ixStage_hStage` with *no* boundary
 discipline assumed – the random access writes the home address into SAV and
 TARGET whatever they held, so its exit state is the normalized
-`DescriptiveComplexity.Draw.DrawData.ixStageEndSt`. -/
+`DescriptiveComplexity.Draw.Data.ixStageEndSt`. -/
 theorem ixStage_hStage_thread (b : Bool) (w wG wP wR wK : ℕ)
     (hcost : ∀ (ℓ : Fin (dt.d.B.arity iv)) (a : Lex (Fin dt.dd0 → A)),
       2 * (wideRank (F.cell (dt.ixStageXS F hhasP vi ts ℓ a)) - wideRank v) + 2 ≤ w ∧
@@ -458,7 +458,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -478,7 +478,7 @@ well-shaped, so the file test passes, the domain evaluation runs on the
 block's decoded tag, and the block exits to the next checkpoint. -/
 theorem ixGateBlock_hStage_pos (t : dt.X.Tag)
     (htag : dt.dspTagOf PR.zero PR.one
-      (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)) = t)
+      (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)) = t)
     (hTest : ∀ u, Test u) (f : dt.CtlIx → A) (w : ℕ)
     (hcostT : ∀ c : Fin (Fintype.card dt.X.Tag),
       2 * (wideRank (F.cell (dt.ixGateTagCell F hhasP PR.one b c)) -
@@ -647,7 +647,7 @@ theorem ixGateBlock_hStage_neg {u : I}
 
 end GateBlockStage
 
-end DrawData
+end Data
 
 end Draw
 

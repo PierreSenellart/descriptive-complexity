@@ -27,7 +27,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -35,7 +35,7 @@ open Language Structure
 
 section RegEnum
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite A] [instFR : Finite R'] [instFP : Finite P'] [Finite dt.KIx]
@@ -78,7 +78,7 @@ one fails it somewhere, every round holds inner registers alone, and every
 register it marks is one the addresses use. -/
 theorem exists_regValEnum
     (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd,
-      (∃ i : dt.KIx, x.1 = DrawTag.arg i) → WMHasInp x) :
+      (∃ i : dt.KIx, x.1 = Tag.arg i) → WMHasInp x) :
     ∃ (n : ℕ) (mV : Fin (n + 1) → (dt.RegIx (A := A) (R' := R') (P' := P') → Prop)),
       mV 0 = (fun _ => False) ∧
       (∀ a a' : Fin (n + 1), a < a' → (∀ b, ¬(a < b ∧ b < a')) →
@@ -87,7 +87,7 @@ theorem exists_regValEnum
         (mV (Fin.last n)) u) ∧
       (∀ a, a < Fin.last n → ∃ u,
         ¬dt.InnerFull (dt.regLaid (A := A) (R' := R') (P' := P') h hord).blk (mV a) u) ∧
-      (∀ (a : Fin (n + 1)) (t : DrawTag R' P' dt.KIx) (w : Fin dt.dd → A),
+      (∀ (a : Fin (n + 1)) (t : Tag R' P' dt.KIx) (w : Fin dt.dd → A),
         ixAddr (fun u : dt.RegIx (A := A) (R' := R') (P' := P') => (u.1 : _))
           (mV a) (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j) ∧
       (∀ (a : Fin (n + 1)) (u : dt.RegIx (A := A) (R' := R') (P' := P')),
@@ -159,7 +159,7 @@ theorem exists_regValEnum
       rw [hlast] at hv
       exact hv
     · rintro ⟨j, hj⟩
-      have huarg : ∃ i : dt.KIx, u.1 = DrawTag.arg i :=
+      have huarg : ∃ i : dt.KIx, u.1 = Tag.arg i :=
         ⟨Sum.inrₗ j, (tagBlk_eq_some_iff _ _).mp hj⟩
       refine ⟨⟨u, hargall u huarg⟩, rfl, ?_⟩
       rw [hlast]
@@ -193,10 +193,10 @@ variable (A R' P') in
 /-- **The universe's size**: a tag and a tuple. -/
 theorem card_univ :
     Nat.card (Univ A R' P' dt.KIx dt.dd) =
-      Nat.card (DrawTag R' P' dt.KIx) * Nat.card A ^ dt.dd := by
+      Nat.card (Tag R' P' dt.KIx) * Nat.card A ^ dt.dd := by
   classical
   haveI : Fintype A := Fintype.ofFinite A
-  haveI : Fintype (DrawTag R' P' dt.KIx) := Fintype.ofFinite _
+  haveI : Fintype (Tag R' P' dt.KIx) := Fintype.ofFinite _
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
   simp [Fintype.card_prod]
 
@@ -205,14 +205,14 @@ variable (R' P') in
 /-- **The tags**: one per rule name, one per phase, one per argument block, and
 the alphabet's own. -/
 theorem card_drawTag :
-    Nat.card (DrawTag R' P' dt.KIx) =
+    Nat.card (Tag R' P' dt.KIx) =
       Nat.card R' + 1 + Nat.card P' + Nat.card dt.KIx := by
   classical
   haveI : Fintype R' := Fintype.ofFinite R'
   haveI : Fintype P' := Fintype.ofFinite P'
   haveI : Fintype dt.KIx := Fintype.ofFinite _
-  haveI : Fintype (DrawTag R' P' dt.KIx) := Fintype.ofFinite _
-  have hequiv : DrawTag R' P' dt.KIx ≃ R' ⊕ Unit ⊕ P' ⊕ dt.KIx :=
+  haveI : Fintype (Tag R' P' dt.KIx) := Fintype.ofFinite _
+  have hequiv : Tag R' P' dt.KIx ≃ R' ⊕ Unit ⊕ P' ⊕ dt.KIx :=
     { toFun := fun t => match t with
         | .ctrl r => Sum.inl r
         | .sym => Sum.inr (Sum.inl ())
@@ -237,7 +237,7 @@ has at most as many registers as there are argument elements, plus one, and the
 bound the walks are charged against is `2 ^` that. -/
 theorem card_regIx_le
     (hmk : ∀ x : Univ A R' P' dt.KIx dt.dd, WMHasInp x ↔
-      ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x)) :
+      ((∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x)) :
     Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) ≤
       Nat.card dt.KIx * Nat.card A ^ dt.dd + 1 := by
   classical
@@ -247,7 +247,7 @@ theorem card_regIx_le
   refine le_trans (Nat.card_le_card_of_injective
     (f := fun u : dt.RegIx (A := A) (R' := R') (P' := P') =>
       (match (u.1).1, (u.1).2 with
-        | DrawTag.arg k, w => some (k, w)
+        | Tag.arg k, w => some (k, w)
         | _, _ => none : Option (dt.KIx × (Fin dt.dd → A))))
     ?_) (le_of_eq ?_)
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ hEq
@@ -259,17 +259,17 @@ theorem card_regIx_le
         subst hk
         subst hk'
         simp only [Option.some.injEq, Prod.mk.injEq] at hEq
-        exact Subtype.ext (Prod.ext (congrArg DrawTag.arg hEq.1) hEq.2)
+        exact Subtype.ext (Prod.ext (congrArg Tag.arg hEq.1) hEq.2)
       · exfalso
         obtain ⟨tx, wx⟩ := x
         obtain ⟨ty, wy⟩ := y
         simp only at hk
         subst hk
         match hty' : ty with
-        | DrawTag.arg k'' => exact hty.1 k'' rfl
-        | DrawTag.ctrl r => subst hty'; exact absurd hEq (by simp)
-        | DrawTag.sym => subst hty'; exact absurd hEq (by simp)
-        | DrawTag.phase p => subst hty'; exact absurd hEq (by simp)
+        | Tag.arg k'' => exact hty.1 k'' rfl
+        | Tag.ctrl r => subst hty'; exact absurd hEq (by simp)
+        | Tag.sym => subst hty'; exact absurd hEq (by simp)
+        | Tag.phase p => subst hty'; exact absurd hEq (by simp)
     · rcases (hmk y).mp hy with ⟨k', hk'⟩ | hty
       · exfalso
         obtain ⟨tx, wx⟩ := x
@@ -277,10 +277,10 @@ theorem card_regIx_le
         simp only at hk'
         subst hk'
         match htx' : tx with
-        | DrawTag.arg k'' => exact htx.1 k'' rfl
-        | DrawTag.ctrl r => subst htx'; exact absurd hEq (by simp)
-        | DrawTag.sym => subst htx'; exact absurd hEq (by simp)
-        | DrawTag.phase p => subst htx'; exact absurd hEq (by simp)
+        | Tag.arg k'' => exact htx.1 k'' rfl
+        | Tag.ctrl r => subst htx'; exact absurd hEq (by simp)
+        | Tag.sym => subst htx'; exact absurd hEq (by simp)
+        | Tag.phase p => subst htx'; exact absurd hEq (by simp)
       · exact Subtype.ext (htx.unique hty)
   · haveI : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,
@@ -294,7 +294,7 @@ against – the record's tuple counts are below the register count, so they are
 below the file's own bound. -/
 theorem card_regIx_ge {zero : A}
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd)) :
     Nat.card dt.KIx * Nat.card A ^ dt.dd0 ≤
       Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) := by
@@ -304,15 +304,15 @@ theorem card_regIx_ge {zero : A}
   haveI : Fintype (dt.RegIx (A := A) (R' := R') (P' := P')) := Fintype.ofFinite _
   have hinj : Function.Injective
       (fun p : dt.KIx × (Fin dt.dd0 → A) =>
-        (⟨(DrawTag.arg p.1, padTup (dt := dt) zero p.2), harg (ofLex p.1) p.2⟩ :
+        (⟨(Tag.arg p.1, padTup (dt := dt) zero p.2), harg (ofLex p.1) p.2⟩ :
           dt.RegIx (A := A) (R' := R') (P' := P'))) := by
     rintro ⟨k, c⟩ ⟨k', c'⟩ hEq
     have h := congrArg Subtype.val hEq
-    have h1 : (DrawTag.arg k : DrawTag R' P' dt.KIx) = DrawTag.arg k' :=
+    have h1 : (Tag.arg k : Tag R' P' dt.KIx) = Tag.arg k' :=
       congrArg Prod.fst h
     have h2 : padTup (dt := dt) (A := A) zero c = padTup (dt := dt) zero c' :=
       congrArg Prod.snd h
-    refine Prod.ext (DrawTag.arg.inj h1) ?_
+    refine Prod.ext (Tag.arg.inj h1) ?_
     funext j
     have hj := congrFun h2 (Fin.castLE dt.dd0Le j)
     rwa [padTup_coord (dt := dt) (A := A) zero c dt.dd0Le j,
@@ -402,7 +402,7 @@ between two *constants*. -/
 theorem evalQ_le_two_pow [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
     {zero : A}
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd)) :
     dt.evalQ A R' P' ≤
       2 ^ (4 * Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) + 14 +
@@ -458,7 +458,7 @@ theorem evalQ_le_two_pow [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
   have hC : dt.dimC ≤ 2 ^ (4 * N + 14 + dt.eDim * N + dt.dimC) :=
     le_trans (le_of_lt Nat.lt_two_pow_self)
       (Nat.pow_le_pow_right (by omega) (by omega))
-  simp only [DrawData.evalQ, max_le_iff]
+  simp only [Data.evalQ, max_le_iff]
   exact ⟨h16, hW, hD0, hE, hC⟩
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] in
@@ -467,7 +467,7 @@ variable (A R' P') in
 theorem log_evalQ_le [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
     {zero : A}
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd)) :
     Nat.log 2 (dt.evalQ A R' P') ≤
       4 * Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) + 14 +
@@ -482,7 +482,7 @@ theorem log_evalQ_le [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
 variable (dt A R') in
 /-- **The clock's one inequality, met by a constant of the kernel.** The
 exponent is linear in the register count (`log_evalQ_le`), the register count is
-linear in `|A| ^ dd` (`card_regIx_le`), and the universe is `|DrawTag| · |A| ^ dd`
+linear in `|A| ^ dd` (`card_regIx_le`), and the universe is `|Tag| · |A| ^ dd`
 – so the two sides scale together and what is left is a comparison between the
 drawing's rule names and a number built from the kernel alone: its guessed
 variables' arities and counts (`dimC`), its loop budget (`eDim`) and its argument
@@ -498,12 +498,12 @@ theorem clock_count_of_tags [Nonempty dt.KIx] [Nonempty A]
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)]
     (hdd0 : 1 ≤ dt.dd0) {zero : A}
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A (R')
           (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hmk : ∀ x : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      WMHasInp x ↔ ((∃ k, x.1 = DrawTag.arg k) ∨ IsTopNonArg x))
+      WMHasInp x ↔ ((∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x))
     (htags : 52 * (4 + dt.eDim) * Nat.card dt.KIx + 52 * (4 + dt.eDim) +
         52 * (15 + dt.dimC) + 2 ≤
       Nat.card (R')) :
@@ -590,7 +590,7 @@ end Counting
 
 end RegEnum
 
-end DrawData
+end Data
 
 end Draw
 

@@ -14,11 +14,11 @@ The converse half of the EXPSPACE reduction, in the case the iteration
 deterministic, so the configurations reachable from its initial one are
 linearly ordered, and it is enough to exhibit *one* run that ends badly
 (`DescriptiveComplexity.TMData.not_acceptsSpace_of_reaches_dead`). That run is
-the one `DescriptiveComplexity.Draw.DrawData.reaches_outVerdict` already
+the one `DescriptiveComplexity.Draw.Data.reaches_outVerdict` already
 produces: it lands in the accepting phase whatever the verdict, and the
 accepting *predicate* there is equivalent to the value of the fixed point. So
 a fixed point that fails leaves the machine in a phase it cannot leave
-(`DescriptiveComplexity.Draw.DrawData.stuck_acc`) and does not accept in.
+(`DescriptiveComplexity.Draw.Data.stuck_acc`) and does not accept in.
 
 What is left of soundness is the diverging case, where the machine has no
 halting configuration to reach at all and
@@ -29,13 +29,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A : Type} {zero one : A}
+variable {L : Language.{0, 0}} {dt : Data L} {A : Type} {zero one : A}
 variable [LinearOrder A] [Fintype dt.SlotIx]
 variable [Finite A] [Finite dt.KIx]
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
@@ -115,7 +115,7 @@ theorem not_dwideAcceptSpace_of_converges
 /-- **A diverging fixed point makes the emitted instance a no-instance.** The
 machine has no clock: when no stage is stable it keeps sweeping, so its run
 passes an unbounded chain of stage entries
-(`DescriptiveComplexity.Draw.DrawData.transGen_stageB`, each link at least one
+(`DescriptiveComplexity.Draw.Data.transGen_stageB`, each link at least one
 step) and reaches no halting configuration at all – whence
 `DescriptiveComplexity.TMData.not_acceptsSpace_of_chain`. -/
 theorem not_dwideAcceptSpace_of_diverges
@@ -136,10 +136,10 @@ theorem not_dwideAcceptSpace_of_diverges
   -- the two extremes of the universe
   obtain ⟨gtop, -, htop⟩ := exists_greatest (Le := WMLe (A := Univ A
     (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
-    dt.dd)) hlin (P := fun _ => True) ⟨(DrawTag.arg i₀, fun _ => zero), trivial⟩
+    dt.dd)) hlin (P := fun _ => True) ⟨(Tag.arg i₀, fun _ => zero), trivial⟩
   obtain ⟨gbot, -, hbot⟩ := exists_least (Le := WMLe (A := Univ A
     (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
-    dt.dd)) hlin (P := fun _ => True) ⟨(DrawTag.arg i₀, fun _ => zero), trivial⟩
+    dt.dd)) hlin (P := fun _ => True) ⟨(Tag.arg i₀, fun _ => zero), trivial⟩
   simp only [forall_const] at htop hbot
   -- the logical interval
   have hnotbot : ¬logicalTop gbot := by
@@ -154,16 +154,16 @@ theorem not_dwideAcceptSpace_of_diverges
     wmSetLt_wmSeg_of_not_bot hbot hnotbot gbot
   have hneT : ∃ x, logicalTop (R := dt.RIx zero one hzo
       (fun w => dt.varArgsOf zero one w)) (P := dt.PF) (K := dt.KIx)
-      (V := Fin dt.dd → A) x := ⟨(DrawTag.arg i₀, fun _ => zero), i₀, rfl⟩
+      (V := Fin dt.dd → A) x := ⟨(Tag.arg i₀, fun _ => zero), i₀, rfl⟩
   obtain ⟨v₁, hiE⟩ := exists_wmIncr hlin (s := fun _ : Univ A
     (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
     dt.dd => False) ⟨gbot, not_false⟩
   -- the layout's own placement lemmas, at the instance's order
   have hordL : ∀ x y : Univ A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx
-      dt.dd, WMLe x y ↔ lexRel (· ≤ · : DrawTag (dt.RIx zero one hzo
+      dt.dd, WMLe x y ↔ lexRel (· ≤ · : Tag (dt.RIx zero one hzo
         (fun w => dt.varArgsOf zero one w)) dt.PF dt.KIx →
-        DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF
+        Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF
           dt.KIx → Prop) (tupLeLex (A := A) (d := dt.dd)) x y :=
     fun x y => (hord x y).trans (Wide.tagTupleLe_iff_lexRel x y)
   -- the VAL enumeration
@@ -259,7 +259,7 @@ theorem dwideAcceptSpace_iff_pfpHolds
   · exact dt.not_dwideAcceptSpace_of_converges hR hdd i₀ hordP hcv hno h
   · exact dt.not_dwideAcceptSpace_of_diverges hR hdd i₀ hordP hcv h
 
-end DrawData
+end Data
 
 end Draw
 

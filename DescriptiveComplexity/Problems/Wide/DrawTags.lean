@@ -13,7 +13,7 @@ The first piece of the hardness reduction into
 `DescriptiveComplexity.DWideAcceptSpace`: the shape of the instance it emits.
 
 A reduction is an interpretation, so its universe is a **tagged tuple** universe
-`DrawTag K × (Fin dd → A)`, and `DescriptiveComplexity.Wide.tagTupleLe_iff_lexRel`
+`Draw.Tag K × (Fin dd → A)`, and `DescriptiveComplexity.Wide.tagTupleLe_iff_lexRel`
 says the only order it can define on that is the block-major one – one block of
 the address per tag. Which tags there are, and in what order, is therefore the
 layout of the whole tape, and it is fixed here:
@@ -80,25 +80,25 @@ blocks come last. -/
 
 /-- **The tags of the interpreted universe**: the control, the alphabet, and one
 block per argument of the fixed-point variable. -/
-inductive DrawTag (R P K : Type) : Type
+inductive Tag (R P K : Type) : Type
   /-- The transitions of the rule `r` of the table. -/
-  | ctrl : R → DrawTag R P K
+  | ctrl : R → Tag R P K
   /-- The tape alphabet. -/
-  | sym : DrawTag R P K
+  | sym : Tag R P K
   /-- The phase `p` of the program: one per call site, so that a subroutine
   called from several places uses different states at each and needs no
   continuation label. -/
-  | phase : P → DrawTag R P K
+  | phase : P → Tag R P K
   /-- A point-valued block: an argument of the fixed-point variable, or a
   variable of the step formula's quantifier prefix. -/
-  | arg : K → DrawTag R P K
+  | arg : K → Tag R P K
 
 variable {R P K : Type}
 
 /-- The place of a tag in the layout, as a point of a lexicographic sum: the
 control first, the alphabet next, the phases after them and the argument blocks
 last. This is what orders the tags, and so the blocks of an address. -/
-def tagKey : DrawTag R P K → R ⊕ₗ (Unit ⊕ₗ (P ⊕ₗ K))
+def tagKey : Tag R P K → R ⊕ₗ (Unit ⊕ₗ (P ⊕ₗ K))
   | .ctrl r => Sum.inlₗ r
   | .sym => Sum.inrₗ (Sum.inlₗ ())
   | .phase p => Sum.inrₗ (Sum.inrₗ (Sum.inlₗ p))
@@ -112,14 +112,14 @@ section Order
 
 variable [LinearOrder R] [LinearOrder P] [LinearOrder K]
 
-instance : LinearOrder (DrawTag R P K) := LinearOrder.lift' tagKey tagKey_injective
+instance : LinearOrder (Tag R P K) := LinearOrder.lift' tagKey tagKey_injective
 
-theorem le_iff_tagKey (σ τ : DrawTag R P K) : σ ≤ τ ↔ tagKey σ ≤ tagKey τ := Iff.rfl
+theorem le_iff_tagKey (σ τ : Tag R P K) : σ ≤ τ ↔ tagKey σ ≤ tagKey τ := Iff.rfl
 
 /-- The argument blocks come after the control, the alphabet and the phases,
 which is what makes the logical addresses an initial interval. -/
-theorem lt_arg (τ : DrawTag R P K) (i : K) (h : ∀ j : K, τ ≠ DrawTag.arg j) :
-    τ < DrawTag.arg i := by
+theorem lt_arg (τ : Tag R P K) (i : K) (h : ∀ j : K, τ ≠ Tag.arg j) :
+    τ < Tag.arg i := by
   refine lt_of_le_of_ne ((le_iff_tagKey _ _).mpr ?_) (h i)
   cases τ with
   | ctrl r => simp [tagKey]
@@ -130,8 +130,8 @@ theorem lt_arg (τ : DrawTag R P K) (i : K) (h : ∀ j : K, τ ≠ DrawTag.arg j
 /-- **The argument tags are ordered like their blocks**: the tag order is the
 key's, and the key of an argument tag is its block. -/
 theorem lt_arg_arg (i j : K) :
-    (DrawTag.arg i : DrawTag R P K) < DrawTag.arg j ↔ i < j := by
-  have hle : ∀ a b : K, ((DrawTag.arg a : DrawTag R P K) ≤ DrawTag.arg b) ↔ a ≤ b := by
+    (Tag.arg i : Tag R P K) < Tag.arg j ↔ i < j := by
+  have hle : ∀ a b : K, ((Tag.arg a : Tag R P K) ≤ Tag.arg b) ↔ a ≤ b := by
     intro a b
     rw [le_iff_tagKey]
     change (Sum.inrₗ (Sum.inrₗ (Sum.inrₗ a)) : R ⊕ₗ (Unit ⊕ₗ (P ⊕ₗ K))) ≤
@@ -143,7 +143,7 @@ theorem lt_arg_arg (i j : K) :
 
 end Order
 
-instance [Finite R] [Finite P] [Finite K] : Finite (DrawTag R P K) :=
+instance [Finite R] [Finite P] [Finite K] : Finite (Tag R P K) :=
   Finite.of_injective
     (fun t => match t with
       | .ctrl r => (Sum.inl r : R ⊕ Unit ⊕ P ⊕ K)
@@ -171,17 +171,17 @@ number of addresses its clock counts.
 variable {V : Type} {LeV : V → V → Prop}
 
 /-- **The last logical address**: every argument block full, the non-argument blocks empty. -/
-def logicalTop : DrawTag R P K × V → Prop :=
-  fun p => ∃ i : K, p.1 = DrawTag.arg i
+def logicalTop : Tag R P K × V → Prop :=
+  fun p => ∃ i : K, p.1 = Tag.arg i
 
 @[simp]
 theorem logicalTop_arg (i : K) (v : V) :
-    logicalTop (DrawTag.arg (R := R) (P := P) i, v) :=
+    logicalTop (Tag.arg (R := R) (P := P) i, v) :=
   ⟨i, rfl⟩
 
 /-- **A tag that is not an argument holds nothing of the last logical address.**
 Stated for every such tag, so the layout may grow one without disturbing it. -/
-theorem not_logicalTop {τ : DrawTag R P K} (h : ∀ i : K, τ ≠ DrawTag.arg i) (v : V) :
+theorem not_logicalTop {τ : Tag R P K} (h : ∀ i : K, τ ≠ Tag.arg i) (v : V) :
     ¬logicalTop (τ, v) := by
   rintro ⟨i, hi⟩
   exact h i hi
@@ -189,9 +189,9 @@ theorem not_logicalTop {τ : DrawTag R P K} (h : ∀ i : K, τ ≠ DrawTag.arg i
 /-- **Being logical is avoiding the non-argument blocks**, which is what the
 generic reading of the layout calls it
 (`DescriptiveComplexity.wmAvoids`). -/
-theorem logical_iff_wmAvoids {s : DrawTag R P K × V → Prop} :
-    (∀ τ : DrawTag R P K, (∀ i : K, τ ≠ DrawTag.arg i) → ∀ v : V, ¬s (τ, v)) ↔
-      wmAvoids (fun τ : DrawTag R P K => ∀ i : K, τ ≠ DrawTag.arg i) s :=
+theorem logical_iff_wmAvoids {s : Tag R P K × V → Prop} :
+    (∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) → ∀ v : V, ¬s (τ, v)) ↔
+      wmAvoids (fun τ : Tag R P K => ∀ i : K, τ ≠ Tag.arg i) s :=
   Iff.rfl
 
 open Classical in
@@ -199,7 +199,7 @@ open Classical in
 cut out. -/
 theorem logicalTop_eq :
     logicalTop (R := R) (P := P) (K := K) (V := V) =
-      wmAvoidTop fun τ : DrawTag R P K => ∀ i : K, τ ≠ DrawTag.arg i :=
+      wmAvoidTop fun τ : Tag R P K => ∀ i : K, τ ≠ Tag.arg i :=
   funext fun _p => propext
     ⟨fun ⟨i, hi⟩ hc => hc i hi, fun hc => not_forall.mp hc |>.imp fun _ h => not_not.mp h⟩
 
@@ -207,8 +207,8 @@ theorem logicalTop_eq :
 tags are an initial segment of the tag order, which is what makes the logical
 addresses an initial stretch of the tape rather than a scattered set. -/
 theorem nonArg_downward [LinearOrder R] [LinearOrder P] [LinearOrder K]
-    (τ σ : DrawTag R P K) (hle : τ ≤ σ) (hσ : ∀ i : K, σ ≠ DrawTag.arg i) :
-    ∀ i : K, τ ≠ DrawTag.arg i := by
+    (τ σ : Tag R P K) (hle : τ ≤ σ) (hσ : ∀ i : K, σ ≠ Tag.arg i) :
+    ∀ i : K, τ ≠ Tag.arg i := by
   rintro i rfl
   exact absurd (lt_of_lt_of_le (lt_arg σ i hσ) hle) (lt_irrefl _)
 
@@ -221,9 +221,9 @@ name, so that the layout may grow a tag without disturbing this.
 This is the upper bound a program's outer loop is given. -/
 theorem wmSetLe_logicalTop [LinearOrder R] [LinearOrder P] [LinearOrder K]
     [Finite R] [Finite P] [Finite K] [Finite V]
-    (hV : IsLinOrd LeV) {s : DrawTag R P K × V → Prop}
-    (hjunk : ∀ τ : DrawTag R P K, (∀ i : K, τ ≠ DrawTag.arg i) → ∀ v : V, ¬s (τ, v)) :
-    WMSetLe (lexRel (· ≤ · : DrawTag R P K → DrawTag R P K → Prop) LeV)
+    (hV : IsLinOrd LeV) {s : Tag R P K × V → Prop}
+    (hjunk : ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) → ∀ v : V, ¬s (τ, v)) :
+    WMSetLe (lexRel (· ≤ · : Tag R P K → Tag R P K → Prop) LeV)
       s logicalTop := by
   rw [logicalTop_eq]
   exact wmSetLe_wmAvoidTop isLinOrd_le hV (logical_iff_wmAvoids.mp hjunk)
@@ -235,9 +235,9 @@ the surplus blocks it never writes in cost it nothing while multiplying the
 number of addresses its clock counts. -/
 theorem logical_of_wmSetLe_logicalTop [LinearOrder R] [LinearOrder P] [LinearOrder K]
     [Finite R] [Finite P] [Finite K] [Finite V]
-    (hV : IsLinOrd LeV) {s : DrawTag R P K × V → Prop}
-    (hle : WMSetLe (lexRel (· ≤ · : DrawTag R P K → DrawTag R P K → Prop) LeV) s logicalTop) :
-    ∀ τ : DrawTag R P K, (∀ i : K, τ ≠ DrawTag.arg i) → ∀ v : V, ¬s (τ, v) := by
+    (hV : IsLinOrd LeV) {s : Tag R P K × V → Prop}
+    (hle : WMSetLe (lexRel (· ≤ · : Tag R P K → Tag R P K → Prop) LeV) s logicalTop) :
+    ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) → ∀ v : V, ¬s (τ, v) := by
   rw [logicalTop_eq] at hle
   exact logical_iff_wmAvoids.mpr
     (wmAvoids_of_wmSetLe isLinOrd_le hV nonArg_downward hle (wmAvoids_wmAvoidTop _))

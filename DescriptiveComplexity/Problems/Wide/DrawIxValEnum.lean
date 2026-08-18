@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.BlkLayout
 /-!
 # The VAL loop's enumeration at an arbitrary file
 
-`DescriptiveComplexity.Draw.DrawData.exists_valEnum` builds the chain the VAL loop
+`DescriptiveComplexity.Draw.Data.exists_valEnum` builds the chain the VAL loop
 runs through, over the *elements* of the instance. A program whose registers are
 not the elements needs the same chain over its **registers**, and that is this
 file: the elementwise chain pulled back along `elt`
@@ -21,7 +21,7 @@ correspondence carries increments both ways
 What the pull-back asks of the file is one thing, and it is the same thing the
 legs ask: every **inner** element is the element of a used register. At the
 elementwise file it is trivial, and at a laid file it is
-`DescriptiveComplexity.Draw.DrawData.ixHolds_blkLaid`.
+`DescriptiveComplexity.Draw.Data.ixHolds_blkLaid`.
 -/
 
 namespace DescriptiveComplexity
@@ -32,9 +32,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
@@ -119,7 +119,7 @@ theorem chain_length_le_two_pow {n : ℕ} {mV : Fin (n + 1) → I → Prop}
   rwa [htwo] at hcard
 
 /-- **The VAL loop's enumeration at an arbitrary file**: the same chain
-`DescriptiveComplexity.Draw.DrawData.exists_valEnum` gives over the elements, read
+`DescriptiveComplexity.Draw.Data.exists_valEnum` gives over the elements, read
 at the registers – it starts empty, each cover is a machine increment of the
 *index* order, the top passes the exhaustion test at every register and no
 earlier mark does. -/
@@ -186,7 +186,7 @@ theorem exists_ixValEnum
       | .arg i =>
         rcases h' : ofLex i with k | j'
         · exact absurd hj (by rw [hx1, tagBlk, h']; exact fun hc => nomatch hc)
-        · exact ⟨j', congrArg DrawTag.arg (congrArg toLex h')⟩
+        · exact ⟨j', congrArg Tag.arg (congrArg toLex h')⟩
       | .sym => exact absurd hj (by rw [hx1]; exact fun hc => nomatch hc)
       | .ctrl _ => exact absurd hj (by rw [hx1]; exact fun hc => nomatch hc)
       | .phase _ => exact absurd hj (by rw [hx1]; exact fun hc => nomatch hc)
@@ -208,7 +208,7 @@ theorem exists_ixValEnum
     · exact ((wmSetLt_iff _ _).mp (chain_lt_of_covers hix hcov hab)).2 hEq.symm
 
 /-- **The VAL loop's enumeration at the file a clocked program lays**: the
-general chain at `DescriptiveComplexity.Draw.DrawData.blkLaid`, whose four
+general chain at `DescriptiveComplexity.Draw.Data.blkLaid`, whose four
 coherences are the layout's own. -/
 theorem exists_blkValEnum [Finite dt.KIx]
     (h : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -262,8 +262,8 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **The VAL loop's rounds fit the clock**: the chain is supported on the inner
 registers alone, so it has at most `2 ^ (kᵢ · m) ≤ 2 ^ (k · m)` rounds – the
 second of the two factors
-`DescriptiveComplexity.Draw.DrawData.nexTotal_lt_two_pow'` compares, the first
-being the width (`DescriptiveComplexity.Draw.DrawData.ixLegWidth_le`). -/
+`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'` compares, the first
+being the width (`DescriptiveComplexity.Draw.Data.ixLegWidth_le`). -/
 theorem blkValEnum_rounds_le [Finite dt.KIx]
     {n : ℕ} {mV : Fin (n + 1) → (Wide.BlkIx dt.KIx A dt.dd → Prop)}
     (hinjV : Function.Injective mV)
@@ -281,7 +281,7 @@ theorem blkValEnum_rounds_le [Finite dt.KIx]
     (le_trans (card_blkInner_le (dt := dt) (A := A))
       (Nat.mul_le_mul_right _ hki))
 
-end DrawData
+end Data
 
 end Draw
 

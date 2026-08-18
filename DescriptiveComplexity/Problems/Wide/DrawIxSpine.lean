@@ -22,9 +22,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
 variable [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))]
@@ -72,7 +72,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
 variable {Use : I → Prop}
@@ -119,8 +119,8 @@ omit [Finite I] [Finite dt.KIx] in
 include hrules hR hlin hix hbot hv hvi in
 /-- **The spine over given legs**: `eval_run` at the concrete tape
 presentation, each position's machinery an arbitrary run — the caller
-plugs in `DescriptiveComplexity.Draw.DrawData.ixVarLeg_run` at a gated address
-and `DescriptiveComplexity.Draw.DrawData.ixVarLegFail_run` at a junk one. -/
+plugs in `DescriptiveComplexity.Draw.Data.ixVarLeg_run` at a gated address
+and `DescriptiveComplexity.Draw.Data.ixVarLegFail_run` at a junk one. -/
 theorem ixEvalSpineLegs_reachesIn
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)) I)
     (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
@@ -162,7 +162,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv 
 /-- **The evaluation's spine, fully instantiated**: from the checkpoint
 before the first variable to the checkpoint after the last, one whole
 machinery per position — each leg
-`DescriptiveComplexity.Draw.DrawData.ixVarLeg_run`, the tape and control
+`DescriptiveComplexity.Draw.Data.ixVarLeg_run`, the tape and control
 threads given as families with one cover equation per position. -/
 theorem ixEvalSpine_reachesIn
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)) I)
@@ -179,10 +179,10 @@ theorem ixEvalSpine_reachesIn
     (hwitOfJ : ∀ (j : Fin dt.nv) (ℓ : Fin (dt.arOf (dt.varAt j)))
       (t' : dt.X.Tag),
       wmBlk (ixAddr elt (stOf j.castSucc).mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
+          Tag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOfJ j ℓ)
     (hmirOf : ∀ j : Fin dt.nv, (stOf j.castSucc).mir = ixMark elt v)
     (hbotOf : ∀ j : Fin dt.nv,
@@ -200,10 +200,10 @@ theorem ixEvalSpine_reachesIn
       ExpExpansion.DomHolds (X := dt.X)
         (tOfJ j ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt (stOf j.castSucc).mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              Tag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOfJ : ∀ (j : Fin dt.nv) (ℓ : Fin (dt.arOf (dt.varAt j))) u,
       TestOfJ j ℓ u)
     (hst : ∀ j : Fin dt.nv, stOf j.succ =
@@ -257,7 +257,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv 
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The evaluation's spine, fully instantiated — threaded**: as
-`DescriptiveComplexity.Draw.DrawData.ixEvalSpine_run` with `hsavOf` and
+`DescriptiveComplexity.Draw.Data.ixEvalSpine_run` with `hsavOf` and
 `htgtOf` **gone**. That is the point of the whole threading: the advance
 refreshes the marker and the mirror but not SAV and TARGET, so a sweep can
 meet those two hypotheses at one address at most, while every other
@@ -278,10 +278,10 @@ theorem ixEvalSpine_run_thread_reachesIn
     (hwitOfJ : ∀ (j : Fin dt.nv) (ℓ : Fin (dt.arOf (dt.varAt j)))
       (t' : dt.X.Tag),
       wmBlk (ixAddr elt (stOf j.castSucc).mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
+          Tag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOfJ j ℓ)
     (hmirOf : ∀ j : Fin dt.nv, (stOf j.castSucc).mir = ixMark elt v)
     (hbotOf : ∀ j : Fin dt.nv,
@@ -300,10 +300,10 @@ theorem ixEvalSpine_run_thread_reachesIn
       ExpExpansion.DomHolds (X := dt.X)
         (tOfJ j ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt (stOf j.castSucc).mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              Tag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOfJ : ∀ (j : Fin dt.nv) (ℓ : Fin (dt.arOf (dt.varAt j))) u,
       TestOfJ j ℓ u)
     (hst : ∀ j : Fin dt.nv, stOf j.succ =
@@ -354,7 +354,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv 
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The evaluation's spine at an arbitrary address**: as
-`DescriptiveComplexity.Draw.DrawData.ixEvalSpine_run_thread` with the gates no
+`DescriptiveComplexity.Draw.Data.ixEvalSpine_run_thread` with the gates no
 longer assumed to pass. Each position takes whichever of the three legs
 its own gates call for, and what the caller owes is only the marker, the
 mirror and the bottom mark — all of which the advance sets and every leg
@@ -419,7 +419,7 @@ theorem ixEvalSpineB_reachesIn
 
 end Spine
 
-end DrawData
+end Data
 
 end Draw
 

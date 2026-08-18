@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.DrawInstRound
 
 What the gate machinery asks — the file tests' per-cell questions, the
 witness one-hotness, the domain conditions — read off
-`DescriptiveComplexity.Draw.DrawData.back`'s marks and answered by the
+`DescriptiveComplexity.Draw.Data.back`'s marks and answered by the
 encoding. The marks of a register cell spell the cell's own coordinates
 (`name`), its padding (`pdd`) and its tag's block (`blk`), so a file
 test's question is a statement about the cell, and a block value's
@@ -21,12 +21,12 @@ answers are statements about the value:
   witness or a member shape», at MIRROR and at VAL;
 * `testOf_of_encMap`, `wit_of_encMap`, `domHolds_of_encMap`,
   `dspTagOf_encMap` — at a block value that **is** an encoding, every
-  gated hypothesis of `DescriptiveComplexity.Draw.DrawData.varMachine_run`
+  gated hypothesis of `DescriptiveComplexity.Draw.Data.varMachine_run`
   holds, and the dispatch is the point's tag;
 * `gate_trichotomy` — every block value is an encoding, has an
   ill-shaped register cell, or is all-shaped with the one-hot-and-domain
   conjunct failing at the dispatched tag: the three legs
-  `DescriptiveComplexity.Draw.DrawData.varLeg_run` /
+  `DescriptiveComplexity.Draw.Data.varLeg_run` /
   `varLegFail_run` / `varLegUngated_run` are exhaustive;
 * `igPassP_iff_isEnc` — the inner loop's per-level verdict **is**
   `DescriptiveComplexity.Draw.IsEnc` of the level's block value, the
@@ -42,9 +42,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
@@ -146,13 +146,13 @@ theorem wellShapedG_back_iff (hzo : zero ≠ one)
     (u : Univ A R P dt.KIx dt.dd) :
     dt.wellShapedG zero one b'
         (dt.back RF.cell zero one dt.dd0Le st (RF.cell u)) ↔
-      (u.1 = (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) → st.mir u →
+      (u.1 = (Tag.arg (toLex b') : Tag R P dt.KIx) → st.mir u →
         ((∃ t : dt.X.Tag, u.2 = encTagTup dt.ly zero one t) ∨
           ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A),
             u.2 = encAsgTup dt.ly zero one i w)) := by
   rw [wellShapedG]
   have hblk : dt.back RF.cell zero one dt.dd0Le st (RF.cell u) (.blk (some b')) =
-      one ↔ u.1 = DrawTag.arg (toLex b') := by
+      one ↔ u.1 = Tag.arg (toLex b') := by
     rw [dt.back_blk_cell (RF.injective hlin), bitVal_iff hzo, tagBlk_eq_some_iff]
   have hmir : dt.back RF.cell zero one dt.dd0Le st (RF.cell u) Slot.mir = one ↔
       st.mir u := by
@@ -176,13 +176,13 @@ theorem igTest_iff (hzo : zero ≠ one)
     (stV : TapeStD dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki)
     (u : Univ A R P dt.KIx dt.dd) :
     dt.igTest RF zero one stV b' u ↔
-      (u.1 = (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) → stV.val u →
+      (u.1 = (Tag.arg (toLex b') : Tag R P dt.KIx) → stV.val u →
         ((∃ t : dt.X.Tag, u.2 = encTagTup dt.ly zero one t) ∨
           ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A),
             u.2 = encAsgTup dt.ly zero one i w)) := by
   rw [igTest, wellShapedIG]
   have hblk : dt.back RF.cell zero one dt.dd0Le stV (RF.cell u) (.blk (some b')) =
-      one ↔ u.1 = DrawTag.arg (toLex b') := by
+      one ↔ u.1 = Tag.arg (toLex b') := by
     rw [dt.back_blk_cell (RF.injective hlin), bitVal_iff hzo, tagBlk_eq_some_iff]
   have hval : dt.back RF.cell zero one dt.dd0Le stV (RF.cell u) Slot.val = one ↔
       stV.val u := by
@@ -210,17 +210,17 @@ the block value is a witness or a member shape. -/
 theorem forall_shape_iff_of_cells
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     (hcell : ∀ u : Univ A R P dt.KIx dt.dd,
-      (u.1 = (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) → m u →
+      (u.1 = (Tag.arg (toLex b') : Tag R P dt.KIx) → m u →
         ((∃ t : dt.X.Tag, u.2 = encTagTup dt.ly zero one t) ∨
           ∃ (i : dt.X.B.ι) (w : Fin (dt.X.B.arity i) → A),
             u.2 = encAsgTup dt.ly zero one i w))) :
     ∀ w : Fin dt.dd → A,
-      wmBlk m (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) w →
+      wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx) w →
         ((∃ t : dt.X.Tag, w = encTagTup dt.ly zero one t) ∨
           ∃ (i : dt.X.B.ι) (w' : Fin (dt.X.B.arity i) → A),
             w = encAsgTup dt.ly zero one i w') :=
   fun w hw =>
-    hcell ((DrawTag.arg (toLex b') : DrawTag R P dt.KIx), w) rfl hw
+    hcell ((Tag.arg (toLex b') : Tag R P dt.KIx), w) rfl hw
 
 /-! ### The gated facts: at a block value that is an encoding -/
 
@@ -230,7 +230,7 @@ omit [Nonempty A] [L.IsRelational] [Finite A] [Finite R] [Finite P] in
 theorem testOf_of_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     {st : TapeStD dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
-    (hS : wmBlk st.mir (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) =
+    (hS : wmBlk st.mir (Tag.arg (toLex b') : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (u : Univ A R P dt.KIx dt.dd) :
     dt.wellShapedG zero one b'
@@ -239,7 +239,7 @@ theorem testOf_of_encMap (hzo : zero ≠ one)
   intro h1 hm
   have hmem : encMap dt.ly zero one p u.2 := by
     rw [← hS]
-    change st.mir (DrawTag.arg (toLex b'), u.2)
+    change st.mir (Tag.arg (toLex b'), u.2)
     rwa [← h1, Prod.mk.eta]
   rcases hmem with h | ⟨i, w, -, h⟩
   · exact Or.inl ⟨p.1.1, h⟩
@@ -253,10 +253,10 @@ omit [LinearOrder R] [LinearOrder P]
 theorem wit_of_encMap (hzo : zero ≠ one)
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
-    (hS : wmBlk m (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) =
+    (hS : wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (t' : dt.X.Tag) :
-    wmBlk m (DrawTag.arg (toLex b') : DrawTag R P dt.KIx)
+    wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') ↔ t' = p.1.1 := by
   rw [hS]
   exact (mem_encPt_tag dt.ly hzo p.1 t').trans eq_comm
@@ -269,10 +269,10 @@ omit [LinearOrder R] [LinearOrder P]
 theorem dspTagOf_encMap (hzo : zero ≠ one)
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
-    (hS : wmBlk m (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) =
+    (hS : wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx) =
       encMap dt.ly zero one p) :
     dt.dspTagOf zero one
-      (wmBlk m (DrawTag.arg (toLex b') : DrawTag R P dt.KIx)) = p.1.1 :=
+      (wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx)) = p.1.1 :=
   dspTagOf_eq_of_onehot (dt.wit_of_encMap hzo hS)
 
 variable {zero one} in
@@ -284,11 +284,11 @@ assignment** — the point carries it. -/
 theorem domHolds_of_encMap (hzo : zero ≠ one)
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
-    (hS : wmBlk m (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) =
+    (hS : wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx) =
       encMap dt.ly zero one p) :
     ExpExpansion.DomHolds (X := dt.X)
       (p.1.1, decRho dt.ly zero one
-        (wmBlk m (DrawTag.arg (toLex b') : DrawTag R P dt.KIx))) := by
+        (wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx))) := by
   rw [hS, show decRho dt.ly zero one (encMap dt.ly zero one p) = p.1.2 from
     decRho_encPt dt.ly hzo p.1]
   exact p.2
@@ -306,7 +306,7 @@ theorem gate_trichotomy (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (st : TapeStD dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki) :
     IsEnc dt.ly zero one
-        (wmBlk st.mir (DrawTag.arg (toLex b') : DrawTag R P dt.KIx)) ∨
+        (wmBlk st.mir (Tag.arg (toLex b') : Tag R P dt.KIx)) ∨
       (∃ u₀ : Univ A R P dt.KIx dt.dd,
         ¬dt.wellShapedG zero one b'
           (dt.back RF.cell zero one dt.dd0Le st (RF.cell u₀))) ∨
@@ -314,21 +314,21 @@ theorem gate_trichotomy (hzo : zero ≠ one)
           dt.wellShapedG zero one b'
             (dt.back RF.cell zero one dt.dd0Le st (RF.cell u))) ∧
         ¬((∀ t' : dt.X.Tag,
-            wmBlk st.mir (DrawTag.arg (toLex b') : DrawTag R P dt.KIx)
+            wmBlk st.mir (Tag.arg (toLex b') : Tag R P dt.KIx)
               (encTagTup dt.ly zero one t') ↔
             t' = dt.dspTagOf zero one
               (wmBlk st.mir
-                (DrawTag.arg (toLex b') : DrawTag R P dt.KIx))) ∧
+                (Tag.arg (toLex b') : Tag R P dt.KIx))) ∧
           ExpExpansion.DomHolds (X := dt.X)
             (dt.dspTagOf zero one
                 (wmBlk st.mir
-                  (DrawTag.arg (toLex b') : DrawTag R P dt.KIx)),
+                  (Tag.arg (toLex b') : Tag R P dt.KIx)),
               decRho dt.ly zero one
                 (wmBlk st.mir
-                  (DrawTag.arg (toLex b') : DrawTag R P dt.KIx))))) := by
+                  (Tag.arg (toLex b') : Tag R P dt.KIx))))) := by
   classical
   by_cases hE : IsEnc dt.ly zero one
-      (wmBlk st.mir (DrawTag.arg (toLex b') : DrawTag R P dt.KIx))
+      (wmBlk st.mir (Tag.arg (toLex b') : Tag R P dt.KIx))
   · exact Or.inl hE
   by_cases hsh : ∀ u : Univ A R P dt.KIx dt.dd,
       dt.wellShapedG zero one b'
@@ -348,7 +348,7 @@ omit [Nonempty A] [L.IsRelational] [Finite A] [Finite R] [Finite P] in
 theorem igTest_of_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     {stV : TapeStD dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
-    (hS : wmBlk stV.val (DrawTag.arg (toLex b') : DrawTag R P dt.KIx) =
+    (hS : wmBlk stV.val (Tag.arg (toLex b') : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
     (u : Univ A R P dt.KIx dt.dd) :
     dt.igTest RF zero one stV b' u := by
@@ -356,7 +356,7 @@ theorem igTest_of_encMap (hzo : zero ≠ one)
   intro h1 hm
   have hmem : encMap dt.ly zero one p u.2 := by
     rw [← hS]
-    change stV.val (DrawTag.arg (toLex b'), u.2)
+    change stV.val (Tag.arg (toLex b'), u.2)
     rwa [← h1, Prod.mk.eta]
   rcases hmem with h | ⟨i, w, -, h⟩
   · exact Or.inl ⟨p.1.1, h⟩
@@ -373,7 +373,7 @@ theorem igPassP_iff_isEnc (hzo : zero ≠ one)
     dt.igPassP RF zero one vi stV ℓ ↔
       IsEnc dt.ly zero one
         (wmBlk stV.val
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)) := by
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)) := by
   rw [igPassP]
   constructor
   · rintro ⟨htest, hone, hdom⟩
@@ -391,7 +391,7 @@ theorem igPassP_iff_isEnc (hzo : zero ≠ one)
 
 end GateFacts
 
-end DrawData
+end Data
 
 end Draw
 

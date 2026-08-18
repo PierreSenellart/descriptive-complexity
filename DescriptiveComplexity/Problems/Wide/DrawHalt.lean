@@ -22,8 +22,8 @@ the program's rules is needed for either.
 phase whose owning site contributes *no* rules is the source of none
 (`DescriptiveComplexity.Draw.Assembly.srcPh_ne_of_isEmpty`). The accepting
 phase is such a phase – `OuterSh … .accept` is `Empty` – whence
-`DescriptiveComplexity.Draw.DrawData.srcPh_ne_acceptP` and, at the machine,
-`DescriptiveComplexity.Draw.DrawData.stuck_acc`. That is what makes a false
+`DescriptiveComplexity.Draw.Data.srcPh_ne_acceptP` and, at the machine,
+`DescriptiveComplexity.Draw.Data.stuck_acc`. That is what makes a false
 output a *rejection* rather than a detour, and it costs one case analysis on
 the tag of a transition rather than one per rule.
 -/
@@ -56,9 +56,9 @@ end Assembly
 
 /-! ### The emitted machine is stuck in its accepting phase -/
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A Q : Type} {zero one : A}
+variable {L : Language.{0, 0}} {dt : Data L} {A Q : Type} {zero one : A}
 variable [LinearOrder A] [Fintype Q] [Fintype dt.SlotIx]
 variable {hzo : zero ≠ one}
 variable {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v}
@@ -89,7 +89,7 @@ theorem stuck_of_srcPh_ne
     {w : Fin dt.dd → A}
     {e : Config (WPoint (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx
       dt.dd))}
-    (hst : e.state = Sum.inr (DrawTag.phase p, w)) (e' : Config (WPoint (Univ A
+    (hst : e.state = Sum.inr (Tag.phase p, w)) (e' : Config (WPoint (Univ A
       (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd))) :
     ¬(wideData (Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)).Step
       e e' := by
@@ -102,15 +102,15 @@ theorem stuck_of_srcPh_ne
       dt.dd) := htr
     rw [hR.tr] at htr'
     have hsrc' : WMSrc ((t, v) : Univ A (dt.RIx zero one hzo args) dt.PF
-      dt.KIx dt.dd) (DrawTag.phase p, w) := hsrc
+      dt.KIx dt.dd) (Tag.phase p, w) := hsrc
     rw [hR.src] at hsrc'
     match t with
     | .ctrl r =>
-      have htag : (DrawTag.phase p : DrawTag (dt.RIx zero one hzo args) dt.PF
+      have htag : (Tag.phase p : Tag (dt.RIx zero one hzo args) dt.PF
           dt.KIx) =
-          DrawTag.phase ((dt.prog zero one hzo args hpl).rules r).srcPh :=
+          Tag.phase ((dt.prog zero one hzo args hpl).rules r).srcPh :=
         congrArg Prod.fst hsrc'
-      exact hp r (DrawTag.phase.inj htag).symm
+      exact hp r (Tag.phase.inj htag).symm
     | .sym => exact htr'
     | .phase _ => exact htr'
     | .arg _ => exact htr'
@@ -144,7 +144,7 @@ theorem stuck_acc (hR : (dt.prog zero one hzo args hpl).table.Reads)
     | .sym => exact hacc'.elim
     | .arg _ => exact hacc'.elim
 
-end DrawData
+end Data
 
 end Draw
 

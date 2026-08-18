@@ -173,9 +173,9 @@ def OuterSh (SE : Type) (ShE : SE → Type) : OuterSite SE → Type
   | .accept => Empty
   | .eval e => ShE e
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q PE SE : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q PE SE : Type}
 variable (zero one : A) {ShE : SE → Type}
 
 /-- The standard exit guard at a kit end phase: at the marker, which is
@@ -538,7 +538,7 @@ noncomputable def outerAsm (hzo : zero ≠ one)
 
 end Asm
 
-end DrawData
+end Data
 
 end Draw
 

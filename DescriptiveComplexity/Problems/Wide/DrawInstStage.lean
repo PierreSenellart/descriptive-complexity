@@ -9,24 +9,24 @@ import DescriptiveComplexity.Problems.Wide.DrawInstCmp
 # The stage atoms, instantiated: the copy loops
 
 The second semantic instantiation: the tuple loops of a stage atom's
-machinery, at the pack `DescriptiveComplexity.Draw.DrawData.stageArgs`. Each
+machinery, at the pack `DescriptiveComplexity.Draw.Data.stageArgs`. Each
 argument position runs one copy loop – a read at the source block's cell, the
 bit through the control's copy flag, a write at the TARGET block's cell – and
 this file proves its three invariants and its run:
 
-* `DescriptiveComplexity.Draw.DrawData.readLv_stageIter0`/`_stageIter1` – the
+* `DescriptiveComplexity.Draw.Data.readLv_stageIter0`/`_stageIter1` – the
   loop element is the round's tuple, before and after the store;
-* `DescriptiveComplexity.Draw.DrawData.stageIterD_iff` – the **closed form of
+* `DescriptiveComplexity.Draw.Data.stageIterD_iff` – the **closed form of
   the destination track**: a cell holds a bit exactly when some round already
   wrote it – the round's source bit – or it held one from the start and no
   round has touched it;
-* `DescriptiveComplexity.Draw.DrawData.stageTuple_run` – the copy loop's run at
+* `DescriptiveComplexity.Draw.Data.stageTuple_run` – the copy loop's run at
   the generated families, by
   `DescriptiveComplexity.Draw.tuple_run_iter` with the name guards discharged
-  through `DescriptiveComplexity.Draw.DrawData.nameG_iff`.
+  through `DescriptiveComplexity.Draw.Data.nameG_iff`.
 
 The chaining of the `k` loops and the whole stage atom's run assemble on
-top, with `DescriptiveComplexity.Draw.DrawData.stage_run`.
+top, with `DescriptiveComplexity.Draw.Data.stage_run`.
 -/
 
 namespace DescriptiveComplexity
@@ -37,9 +37,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -505,9 +505,9 @@ end StageTupleRun
 
 Position `ℓ`'s loop copies its source block over what the earlier positions
 built. The composed content and the control each thread through by one
-recursion, `DescriptiveComplexity.Draw.DrawData.stage_loops_run` chains the
+recursion, `DescriptiveComplexity.Draw.Data.stage_loops_run` chains the
 runs – every handover a backed-track equality – and
-`DescriptiveComplexity.Draw.DrawData.stage_run` closes the whole random
+`DescriptiveComplexity.Draw.Data.stage_run` closes the whole random
 access over the chain. -/
 
 section StageChain
@@ -539,7 +539,7 @@ every cell it holds was written by a copy round, at that round's destination
 stage atom reads lies in the logical interval». -/
 theorem stageTgtD_arg (n : ℕ) {y : Univ A R P dt.KIx dt.dd}
     (hy : dt.stageTgtD zero vi iv ts st v n y) :
-    ∃ i : dt.KIx, y.1 = DrawTag.arg i := by
+    ∃ i : dt.KIx, y.1 = Tag.arg i := by
   classical
   induction n generalizing y with
   | zero => exact hy.elim
@@ -549,7 +549,7 @@ theorem stageTgtD_arg (n : ℕ) {y : Univ A R P dt.KIx dt.dd}
     · simp only [tuplePost] at hy
       rcases hy with ⟨hy1, -⟩ | ⟨-, hw⟩
       · exact ⟨_, by rw [hy1, stageXD, blkElt]⟩
-      · exact tupleIterD_of_mem (fun u => ∃ i : dt.KIx, u.1 = DrawTag.arg i)
+      · exact tupleIterD_of_mem (fun u => ∃ i : dt.KIx, u.1 = Tag.arg i)
           (fun _ => ⟨_, by rw [stageXD, blkElt]⟩) (fun _ hy' => ih hy') _ hw
     · exact ih hy
 
@@ -580,13 +580,13 @@ omit [Fintype dt.SlotIx] [Language.wide.Structure (Univ A R P dt.KIx dt.dd)] in
 built from padded destination cells in argument blocks alone
 (`stageTgtD_arg`, `stageTgtD_isPad`), which is exactly
 `wmSetLt_logicalTop_of_isPad`. This is the `hbelow` the dictionary invariant
-of `DescriptiveComplexity.Draw.DrawData.stageSt_old` is owed: the invariant is an
+of `DescriptiveComplexity.Draw.Data.stageSt_old` is owed: the invariant is an
 equivalence over the interval and nowhere else, so an address that is read has
 to be shown to lie there. -/
 theorem wmSetLt_stageTgtD_logicalTop (hne : zero ≠ one)
     (hV : IsLinOrd (tupLeLex (A := A) (d := dt.dd))) (hd : dt.dd0 < dt.dd)
     (i : dt.KIx) (n : ℕ) :
-    WMSetLt (lexRel (· ≤ · : DrawTag R P dt.KIx → DrawTag R P dt.KIx → Prop)
+    WMSetLt (lexRel (· ≤ · : Tag R P dt.KIx → Tag R P dt.KIx → Prop)
       (tupLeLex (A := A) (d := dt.dd)))
       (dt.stageTgtD zero vi iv ts st v n) logicalTop :=
   wmSetLt_logicalTop_of_isPad hne hV hd i
@@ -792,7 +792,7 @@ include hrules hR hlin hord hbot hv hvi hwkSt hmirSt in
 /-- **The copy loops of a stage atom, chained and instantiated**: from the
 phase entering the first loop to the first reset's checkpoint, the TARGET
 holding the composed content of every position – exactly the `hLoops` leg
-of `DescriptiveComplexity.Draw.DrawData.stage_run`. -/
+of `DescriptiveComplexity.Draw.Data.stage_run`. -/
 theorem stageChain_run :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (stageFirstTup emb)
@@ -1043,7 +1043,7 @@ end StageChain
 
 end StageLoop
 
-end DrawData
+end Data
 
 end Draw
 

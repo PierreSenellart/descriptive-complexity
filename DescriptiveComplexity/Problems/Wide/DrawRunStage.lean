@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.DrawRunElem
 /-!
 # The stage atom's run
 
-The run theorem of `DescriptiveComplexity.Draw.DrawData.stageRule` – the
+The run theorem of `DescriptiveComplexity.Draw.Data.stageRule` – the
 random access. The tuple loops stay abstract (one hypothesis for the whole
 chain, discharged by `DescriptiveComplexity.Draw.tuple_run` at
 instantiation); this file contributes the itinerary around them: save the
@@ -21,8 +21,8 @@ home the same way.
 The statement is in the `DescriptiveComplexity.Draw.TapeSt` idiom: the
 machine's mutable state is a record, each leg one update, and every slot
 equation a kit asks for is definitional in
-`DescriptiveComplexity.Draw.DrawData.ixBack`; the handoff between legs walking
-different tracks is `DescriptiveComplexity.Draw.DrawData.trackTape_back_gen`.
+`DescriptiveComplexity.Draw.Data.ixBack`; the handoff between legs walking
+different tracks is `DescriptiveComplexity.Draw.Data.trackTape_back_gen`.
 
 **The file is a parameter.** A clocked program has no register per element, so
 the run is stated at an arbitrary `DescriptiveComplexity.Draw.LaidFile` with the
@@ -30,7 +30,7 @@ address correspondence of `DescriptiveComplexity.Problems.Wide.IxAddr`: what the
 mirror, the save and the target hold are the *marks* of their addresses
 (`DescriptiveComplexity.ixMark`), and the seek's verdict is again an equality of
 addresses because the correspondence carries the order. The elementwise file is
-that at the identity (`DescriptiveComplexity.Draw.DrawData.diagLaid`), which is
+that at the identity (`DescriptiveComplexity.Draw.Data.diagLaid`), which is
 what `stageAtSt`, `stageEndSt` and `trackTape_back_gen_diag` are.
 -/
 
@@ -42,9 +42,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L)
+variable {L : Language.{0, 0}} (dt : Data L)
 variable {A R P Q : Type} {k : ℕ}
 variable [Fintype Q] [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -76,7 +76,7 @@ omit [Finite A] [Finite R] [Finite P] [Finite I] in
 /-- **A leg's after-tape, read against the state it produced**: the walked
 track moves into the new state's background, whose other slots agree with
 the old one's. The generic sibling of the concrete
-`DescriptiveComplexity.Draw.DrawData.trackTape_back`. -/
+`DescriptiveComplexity.Draw.Data.trackTape_back`. -/
 theorem trackTape_back_gen {stA stB : TapeSt dt A R P I} {t : dt.SlotIx}
     {m : I → Prop}
     (hagree : ∀ r s, s ≠ t →
@@ -252,7 +252,7 @@ include hrules hR hlin hix hinj hmono hup htop hbot hv hvi hwkSt hmirSt hbotSt
   hTh hvh hT hTi hgap hwP hwR hwK
   hLoopsIn hbT holdmir in
 /-- The atom's itinerary, leg by leg, in the order the assembly composes them:
-what `DescriptiveComplexity.Draw.DrawData.stage_reachesIn` adds up. -/
+what `DescriptiveComplexity.Draw.Data.stage_reachesIn` adds up. -/
 private theorem stage_reachesIn_legs :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
       (wP + (1 + (wP + (1 + (wL + (1 + (wR + (1 + (wP + (1 + (1 + (wK +
@@ -996,7 +996,7 @@ theorem stage_run :
 /-! ### The chain of the copy loops
 
 The `k` tuple loops run head to tail – position `ℓ`'s exit is
-`DescriptiveComplexity.Draw.DrawData.stageNextTup emb ℓ` – so their chain is
+`DescriptiveComplexity.Draw.Data.stageNextTup emb ℓ` – so their chain is
 one induction over the positions, each round an abstract per-position run
 (discharged by the copy loop's instantiation) between the walk-backs this
 file's rules provide. -/
@@ -1159,7 +1159,7 @@ end StageRun
 
 section Diag
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R P Q : Type} {k : ℕ}
+variable {L : Language.{0, 0}} {dt : Data L} {A R P Q : Type} {k : ℕ}
 variable [Fintype Q] [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -1195,7 +1195,7 @@ theorem trackTape_back_gen_diag {stA stB : TapeStD dt A R P} {t : dt.SlotIx}
 
 end Diag
 
-end DrawData
+end Data
 
 end Draw
 

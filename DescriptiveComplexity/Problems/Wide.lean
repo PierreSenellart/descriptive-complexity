@@ -483,7 +483,7 @@ the evaluation of a `DescriptiveComplexity.StepDef` – and not which problem it
 draws it for. The partial fixed point is the first client and the clocked
 machine of `DescriptiveComplexity.Problems.Wide.NexRun` the second, running the
 same drawing with the iteration removed and one field of the record left unread
-(`DescriptiveComplexity.Draw.DrawData.ofKernel`, step formulas `⊥`); the `DrawIx…`
+(`DescriptiveComplexity.Draw.Data.ofKernel`, step formulas `⊥`); the `DrawIx…`
 modules are the same statements at an arbitrary register file, which is what the
 second client needed.
 
@@ -601,19 +601,19 @@ the combinators – the chain, the sequencer, the element loop, the tag-branched
 machinery and the tuple loop – each checkpoint's dispatch being the standard
 exit guard conjoined with the caller's question, with the caller's control
 update as its `dstSt`. Above them the program's own two guards are definable
-once (`DescriptiveComplexity.Draw.DrawData.uGDefinable_exitG` and
+once (`DescriptiveComplexity.Draw.Data.uGDefinable_exitG` and
 `uGDefinable_nameG`) and the tower closes:
 `DescriptiveComplexity.Problems.Wide.DrawDefStage` the stage atom's machinery,
 `DrawDefKind` the three parameter packs
 (`DescriptiveComplexity.Draw.UElemArgsDef`, `UTagArgsDef`,
-`DescriptiveComplexity.Draw.DrawData.UStageArgsDef` – a pack's *static* fields,
+`DescriptiveComplexity.Draw.Data.UStageArgsDef` – a pack's *static* fields,
 which slot a trip walks and which block it names, may not depend on the
 instance, and `DescriptiveComplexity.Draw.UConst` says so) and an atom kind's
 machinery, `DrawDefVar` the matrix and the two runs of gates, `DrawDefProg` one
 round, one variable's machinery, the evaluation's spine and the outer loop,
 and `DrawDefAsm` the assembly – `uRulesDefinable_progAsm`, the whole rule set,
 conditional only on the semantic packs meeting
-`DescriptiveComplexity.Draw.DrawData.UVarArgsDef`.
+`DescriptiveComplexity.Draw.Data.UVarArgsDef`.
 
 Two files pay the packs' recurring debts. The **loop element** is the one write
 that is not a copy (`DescriptiveComplexity.Problems.Wide.DrawDefLoop`):
@@ -625,7 +625,7 @@ itself decided by which coordinates are maximal, hence by the pattern
 (`uStDefinable_advLvE`/`uStDefinable_initLvE`/`uGDefinable_isMaxLvE`, and their
 narrow twins). And the **control** is bits throughout
 (`DescriptiveComplexity.Problems.Wide.DrawDefCtl`): every write is
-`DescriptiveComplexity.Draw.DrawData.putVec` or its one-slot case `setCtl`, and
+`DescriptiveComplexity.Draw.Data.putVec` or its one-slot case `setCtl`, and
 every read an existential over the levels of a slot family, so one lemma per
 shape settles the layer. On top of it the **folds**
 (`DescriptiveComplexity.Problems.Wide.DrawDefAcc`): reading one back is
@@ -637,7 +637,7 @@ its atoms' verdicts is the same shape over the syntax
 (`uGDefinable_qfValue`, `uGDefinable_postLeaf`).
 `DescriptiveComplexity.Problems.Wide.DrawDefTags` settles what a gate's branch
 dispatches on – the decoding outright, and the *total* dispatch because
-`DescriptiveComplexity.Draw.DrawData.defTag` takes its tag from a nonemptiness of
+`DescriptiveComplexity.Draw.Data.defTag` takes its tag from a nonemptiness of
 `X.Tag` rather than from a point, so that no instance can move it
 (`uConst_defTag`). And
 `DescriptiveComplexity.Problems.Wide.DrawDefName` settles the **names** a trip
@@ -663,7 +663,7 @@ expansion atom runs the gates' machinery one exponent along, so its pack is a
 field-by-field check (`uTagArgsDef_expArgs`), and beside it the comparison and
 stage atoms (`uElemArgsDef_cmpArgs`, `uStageArgsDef_stageArgs`) and the two
 gate blocks (`uTagArgsDef_gateArgs`, `uTagArgsDef_igateArgs`). The result is
-`DescriptiveComplexity.Draw.DrawData.uVarArgsDef_varArgsOf` – the semantic packs
+`DescriptiveComplexity.Draw.Data.uVarArgsDef_varArgsOf` – the semantic packs
 the reduction computes meet their obligation – and with it
 `uRulesDefinable_progOf`: **every rule of the emitted machine is written down
 by one formula for every instance**, which is what an interpretation needs.
@@ -690,7 +690,7 @@ greatest exactly when its tag is the greatest and its tuple all-set – a tag
 decision conjoined with a shape formula.
 
 On top of them the **transitions and their five attributes** are written down.
-`DescriptiveComplexity.Draw.DrawData.RTag` is the rule names as a type the
+`DescriptiveComplexity.Draw.Data.RTag` is the rule names as a type the
 instance does not mention and `ITag` the tags of the interpreted universe;
 `srcPhOf`, `dstPhOf`, `rightOf`, `guardFOf`, `dstFOf`, `wrFOf` (and the two
 rule-independent `srcFOf`, `readFOf`) are the static data
@@ -710,14 +710,14 @@ tag, the name slots carry the cell's own first `dd₀` coordinates and the paddi
 flag is `canonF dd0` (`markSlotF`, `markCoordF`, `markF`, `inpF`). Not one of
 them quantifies over the interpreted universe.
 
-`DescriptiveComplexity.Draw.DrawData.drawInterp` is then the interpretation – one
+`DescriptiveComplexity.Draw.Data.drawInterp` is then the interpretation – one
 formula per relation symbol and tuple of tags – and
-`DescriptiveComplexity.Draw.DrawData.reads_progFrom` its point: **the interpreted
+`DescriptiveComplexity.Draw.Data.reads_progFrom` its point: **the interpreted
 structure reads the program's table** (`DescriptiveComplexity.Draw.Table.Reads`),
 so everything the run layer proved under that hypothesis applies to it. The
 eleven obligations are eleven definitional unfoldings through
 `relMap_one`/`relMap_two`; the only two rewrites are a rule's two phases, which
-`srcPhOf` and `dstPhOf` name. `DescriptiveComplexity.Draw.DrawData.progFrom` is the
+`srcPhOf` and `dstPhOf` name. `DescriptiveComplexity.Draw.Data.progFrom` is the
 program at one instance – the rules the definability layer hands over with the
 reduction's constants, an all-clear pointer, an all-clear blank and the register
 file.
@@ -733,8 +733,8 @@ adds one vacuous innermost level, whose whole content is
 that ignores its last coordinate is the prefix without it, in *both* polarities,
 because the universe is nonempty. Beside it `DescriptiveComplexity.Draw.stdLayout`
 is the encoding layout at the budget `encDim X` (the one-hot code first, the
-payload after it) and `DescriptiveComplexity.Draw.DrawData.ofSource` is the record,
-with `DrawData.ki_pos` for the block index.
+payload after it) and `DescriptiveComplexity.Draw.Data.ofSource` is the record,
+with `Draw.Data.ki_pos` for the block index.
 
 `DescriptiveComplexity.Problems.Wide.NexPack` packs the source a
 *nondeterministic* program is built from into the **same** record. That source is
@@ -750,7 +750,7 @@ define: the tracks a symbol carries are indexed by the block either way,
 of a guess are the same thing, and
 `DescriptiveComplexity.Draw.StepDef.out_iff_gateMat` – the output evaluation of a
 fixed-point program – is already the whole evaluation of a nondeterministic one
-(`DescriptiveComplexity.Draw.DrawData.exists_out_iff_gateMat`). The step formulas
+(`DescriptiveComplexity.Draw.Data.exists_out_iff_gateMat`). The step formulas
 of a packed kernel are `⊥` and no program reads them; their only trace is that
 the derived dimensions, being maxima over the variables, are the kernel's own
 values or an unread step's vacuous demand, whichever is larger.
@@ -824,7 +824,7 @@ layer carries that was not yet a theorem. Every **site** type of the tower has a
 what was missing is the tower's **shapes**, one instance per level
 (`ChainSh`, `SeqSh`, `ElemSh`, `StageSh`, `TagSh`, `RoundSh`, `VarSh`, `EvalSh`,
 `OuterSh`, then the concrete `KindSh` … `SFSh`). With them
-`DescriptiveComplexity.Draw.DrawData.finite_RIx` is `Finite (Sigma …)`: **the rule
+`DescriptiveComplexity.Draw.Data.finite_RIx` is `Finite (Sigma …)`: **the rule
 names of the emitted machine are finitely many**, which is what the run layer
 assumed and what an interpretation needs of its tag type. Each instance has to be
 *applied*, not searched for, one level up: a shape's argument has the type of a
@@ -840,8 +840,8 @@ payload, and `srcData` is the record at it, with `srcData_dd0_lt`,
 `srcData_payload_le` and `srcKIx`.
 
 That payload bound is where the one subtlety of the packing sits. It is true
-because no budget of a `DrawData` reads the dimension – but it is **not** `rfl`:
-`DescriptiveComplexity.Draw.DrawData.nOf` and its relatives are defined by a match,
+because no budget of a `Draw.Data` reads the dimension – but it is **not** `rfl`:
+`DescriptiveComplexity.Draw.Data.nOf` and its relatives are defined by a match,
 so their compiled matchers take the whole record as a parameter and two records
 differing in the dimension are opaque to each other (`… .VarIx = … .VarIx` is
 `rfl`; `… .nOf ≍ … .nOf` is not). What closes it is a congruence at every level –
@@ -1121,7 +1121,7 @@ syntax (total on the atoms `DescriptiveComplexity.Draw.qfAtoms` emits), and
 capstone: a quantifier-free matrix realizes as its Boolean function at the
 kinds' readings, which is what the machine computes once its per-atom
 subroutines have filled the verdict slots. And
-`DescriptiveComplexity.Draw.DrawData`
+`DescriptiveComplexity.Draw.Data`
 (`DescriptiveComplexity.Problems.Wide.DrawData`) bundles the reduction's data
 – the expansion, the definition, the prenex packs, the encoding layout with
 its coordinate budget – with the derived dimensions the inventories are
@@ -1134,7 +1134,7 @@ the registers, the pattern write of startup
 (`DescriptiveComplexity.Draw.MapKit`, wrapping the generalizing composite
 `DescriptiveComplexity.Draw.Prog.reaches_fileMapTrack`), the VAL-exhausted file
 test, and the navigation-by-name read/write trips with their
-`DescriptiveComplexity.Draw.DrawData.nameG` guard. The one itinerary running
+`DescriptiveComplexity.Draw.Data.nameG` guard. The one itinerary running
 *down* the working area – resetting the marker to the bottom before a random
 access – is `DescriptiveComplexity.Draw.Prog.reaches_reset` with its
 `DescriptiveComplexity.Draw.ResetKit`
@@ -1143,13 +1143,13 @@ access – is `DescriptiveComplexity.Draw.Prog.reaches_reset` with its
 `DescriptiveComplexity.Draw.TapeSt`
 (`DescriptiveComplexity.Problems.Wide.DrawBack`) is the machine's mutable
 state – registers per element, stage tracks and markers per cell – and
-`DescriptiveComplexity.Draw.DrawData.back` its presentation as the background
+`DescriptiveComplexity.Draw.Data.back` its presentation as the background
 family the pass layer walks, with the slot equations every kit discharge
 takes proved once over it – including the one that says what a symbol does
 *not* depend on: the four register slots read
 `DescriptiveComplexity.bitAtOf`, set at a register cell alone, so off the
 register file the background is blind to the mirror, the target, the saved
-mirror and VAL alike (`DescriptiveComplexity.Draw.DrawData.back_congr_off_reg`).
+mirror and VAL alike (`DescriptiveComplexity.Draw.Data.back_congr_off_reg`).
 Which cells those are is the caller's: `back` reads the permanent marks at
 whatever family of cells it is given, so a program that *builds* its own file
 runs the same background at it. That phase is
@@ -1159,10 +1159,10 @@ that turns the blank background into `back`, the mark of each cell written from
 the **pointer**, which holds the element and moves along by the order successor
 (`DescriptiveComplexity.Draw.Prog.reachesIn_installSweep`). The sweep is the
 stretch and no more, because off the file the background to install is already
-the blank (`DescriptiveComplexity.Draw.DrawData.back_of_not_reg`). The same file
+the blank (`DescriptiveComplexity.Draw.Data.back_of_not_reg`). The same file
 holds the other opening phase, `DescriptiveComplexity.Draw.Prog.reachesIn_guessTracks`:
 the same sweep with the background on both sides, the stage tracks the only
-thing that changes (`DescriptiveComplexity.Draw.DrawData.back_old_congr`) and the
+thing that changes (`DescriptiveComplexity.Draw.Data.back_old_congr`) and the
 assignment a *parameter* – which is what makes it a guess, the run existing for
 every certificate. What those two phases sit inside is
 `DescriptiveComplexity.Draw.NexPh`
@@ -1171,9 +1171,9 @@ layer: the file-laying sweep, a walk home, the guess, a walk home, the
 evaluation, and the accepting phase, with the evaluation's rules and the two
 sweeps' writes as parameters. It does not separate in-shape at the guess and must
 not – that is the program's whole nondeterminism – so what it proves instead is
-`DescriptiveComplexity.Draw.DrawData.nexSep_postGuess`, separation at the phases no
+`DescriptiveComplexity.Draw.Data.nexSep_postGuess`, separation at the phases no
 rule returns to the guess from
-(`DescriptiveComplexity.Draw.DrawData.postGuess_nexRule`). What turns that into
+(`DescriptiveComplexity.Draw.Data.postGuess_nexRule`). What turns that into
 determinism where it is used is
 `DescriptiveComplexity.Draw.Table.uniqueFrom_of_sepOn`
 (`DescriptiveComplexity.Problems.Wide.NexDet`), by way of
@@ -1185,23 +1185,23 @@ blindness is
 what separates the machine's *threaded* states from the *unthreaded* ones
 the semantics is stated at: a VAL round rewrites SAV and
 TARGET and nothing else
-(`DescriptiveComplexity.Draw.DrawData.ScratchEq`,
-`DescriptiveComplexity.Draw.DrawData.roundEndSt_eq`), and every control the
+(`DescriptiveComplexity.Draw.Data.ScratchEq`,
+`DescriptiveComplexity.Draw.Data.roundEndSt_eq`), and every control the
 machinery computes is blind to that difference – the generated families
 read their background at the working cell alone
 (`DescriptiveComplexity.Draw.elemFam_congr_rest` and its two siblings),
 each atom kind's loop and exit follow
-(`DescriptiveComplexity.Draw.DrawData.kindExitCtl_congr_scratch`), and so do
+(`DescriptiveComplexity.Draw.Data.kindExitCtl_congr_scratch`), and so do
 the matrix and the round
-(`DescriptiveComplexity.Draw.DrawData.matFs_congr_scratch`,
-`DescriptiveComplexity.Draw.DrawData.matFsT_eq_matFs`,
-`DescriptiveComplexity.Draw.DrawData.igFs_congr_scratch`,
-`DescriptiveComplexity.Draw.DrawData.roundCtl_congr_scratch`,
-`DescriptiveComplexity.Draw.DrawData.roundCtlT_eq_roundCtl`), and with them the
+(`DescriptiveComplexity.Draw.Data.matFs_congr_scratch`,
+`DescriptiveComplexity.Draw.Data.matFsT_eq_matFs`,
+`DescriptiveComplexity.Draw.Data.igFs_congr_scratch`,
+`DescriptiveComplexity.Draw.Data.roundCtl_congr_scratch`,
+`DescriptiveComplexity.Draw.Data.roundCtlT_eq_roundCtl`), and with them the
 VAL loop and one position's leg
-(`DescriptiveComplexity.Draw.DrawData.varFXT_eq_roundFX`,
-`DescriptiveComplexity.Draw.DrawData.varFMT_eq_varFM`,
-`DescriptiveComplexity.Draw.DrawData.legCtlT_eq_legCtl`, and at the output
+(`DescriptiveComplexity.Draw.Data.varFXT_eq_roundFX`,
+`DescriptiveComplexity.Draw.Data.varFMT_eq_varFM`,
+`DescriptiveComplexity.Draw.Data.legCtlT_eq_legCtl`, and at the output
 variable `outCtlT_eq_outCtl`, which is what lets `outLeg_run_thread` — the
 out machinery's run with `hsav`/`htgt` dropped, since a sweep leaves the two
 scratch registers wherever the last position's evaluation left them — ask
@@ -1210,31 +1210,31 @@ What the threading
 *can* change is the semantic pack – a family indexed by the scratch
 registers may pick different points at different registers – so the loop's
 bridge is stated at a pack that is one pack at the round state transported
-(`DescriptiveComplexity.Draw.DrawData.semCastT`, closed by
-`DescriptiveComplexity.Draw.DrawData.kindSemCast_triple`: the pack leaves the
+(`DescriptiveComplexity.Draw.Data.semCastT`, closed by
+`DescriptiveComplexity.Draw.Data.kindSemCast_triple`: the pack leaves the
 round state, travels to the round's own state and to the state its matrix
 threads, and comes back). A gated position's own pack is of that shape
-(`DescriptiveComplexity.Draw.DrawData.gatedSem_eq_semCastT`, its points being
+(`DescriptiveComplexity.Draw.Data.gatedSem_eq_semCastT`, its points being
 `isEnc_of_gatedAt`'s choices – a function of the mirror alone), so the
 branched leg's stage bit is the verdict the semantics reads
-(`DescriptiveComplexity.Draw.DrawData.legBitB_gatedSem`), which is what
-`DescriptiveComplexity.Draw.DrawData.new_last_next_at` – the per-position form
+(`DescriptiveComplexity.Draw.Data.legBitB_gatedSem`), which is what
+`DescriptiveComplexity.Draw.Data.new_last_next_at` – the per-position form
 of `new_last_next`, gating being per variable – consumes; and gating at a
 position *is* «the blocks below that variable's arity encode points», both
 directions
-(`DescriptiveComplexity.Draw.DrawData.isEnc_of_gatedAt`,
-`DescriptiveComplexity.Draw.DrawData.gatedAt_of_isEnc`). With those, the branched spine's
-own reading at one address is `DescriptiveComplexity.Draw.DrawData.new_last_trackOf_B`
+(`DescriptiveComplexity.Draw.Data.isEnc_of_gatedAt`,
+`DescriptiveComplexity.Draw.Data.gatedAt_of_isEnc`). With those, the branched spine's
+own reading at one address is `DescriptiveComplexity.Draw.Data.new_last_trackOf_B`
 – per variable, nothing assumed of the other variables' blocks – and along a
-whole sweep `DescriptiveComplexity.Draw.DrawData.sweep_new_trackOf`: below the
+whole sweep `DescriptiveComplexity.Draw.Data.sweep_new_trackOf`: below the
 address reached every stage track holds the dictionary of the *next* stage,
 elsewhere what the sweep started with. One scale up again, a stage's `old`
 tracks hold that stage of the iteration
-(`DescriptiveComplexity.Draw.DrawData.stageSt_old`, by induction through the
+(`DescriptiveComplexity.Draw.Data.stageSt_old`, by induction through the
 copy-back), so the machine's convergence test is exactly the semantic one:
-`DescriptiveComplexity.Draw.DrawData.stageEnd_conv_iff` – *this stage and the
+`DescriptiveComplexity.Draw.Data.stageEnd_conv_iff` – *this stage and the
 next agree at every address below the end marker* – which is what
-`DescriptiveComplexity.Draw.DrawData.reaches_main`'s `hconv`/`hnotconv` ask
+`DescriptiveComplexity.Draw.Data.reaches_main`'s `hconv`/`hnotconv` ask
 for, with `DescriptiveComplexity.StepDef.partStage` on both sides. And the dictionary is
 **faithful**: `DescriptiveComplexity.Draw.assignment_ext_of_trackOf` – two
 assignments whose tracks agree over a family of addresses carrying every
@@ -1249,9 +1249,9 @@ variable the address is the empty one and what places it is the interval's
 nonemptiness, the two cases joined in
 `DescriptiveComplexity.Draw.wmSetLt_tupAddr_logicalTop'`). And the induction
 starts on a blank tape, which is stage `0` because the empty stage writes an
-empty track (`DescriptiveComplexity.Draw.DrawData.old_trackOf_zero_of_blank`).
+empty track (`DescriptiveComplexity.Draw.Data.old_trackOf_zero_of_blank`).
 With that,
-`DescriptiveComplexity.Draw.DrawData.stageEnd_conv_of_eq` and
+`DescriptiveComplexity.Draw.Data.stageEnd_conv_of_eq` and
 `stageEnd_not_conv_of_ne` are the loop's two remaining hypotheses at the
 *first* stable stage, which `DescriptiveComplexity.StepDef.exists_least_stable`
 supplies from convergence – so what the machine's rounds test is the stage
@@ -1261,12 +1261,12 @@ outside it an address may read a stage all the same – a tuple's address with
 one `ctrl` cell added lies above the top, non-argument tags being the most
 significant – while the machine's tracks there stay blank. So every
 dictionary hypothesis of the layer, from
-`DescriptiveComplexity.Draw.DrawData.old_trackOf_stageTgtD` up, is an
+`DescriptiveComplexity.Draw.Data.old_trackOf_stageTgtD` up, is an
 equivalence at the addresses that are *read* rather than an equation of
 tracks; what each site owes in exchange is that the address it reads lies in
 the interval, and for a stage atom that address is
-`DescriptiveComplexity.Draw.DrawData.stageTgtD`, which **is** in it
-(`DescriptiveComplexity.Draw.DrawData.wmSetLt_stageTgtD_logicalTop`): every
+`DescriptiveComplexity.Draw.Data.stageTgtD`, which **is** in it
+(`DescriptiveComplexity.Draw.Data.wmSetLt_stageTgtD_logicalTop`): every
 cell it holds was written by a copy round at that round's destination, so it
 carries argument cells alone (`stageTgtD_arg`) and each of them is a padded
 one (`stageTgtD_isPad`) – which is the general
@@ -1276,11 +1276,11 @@ full. Unlike the address a program *reads* from a register, this one is
 placed with no hypothesis on the machine's state at all.
 
 From the *initial* configuration the run reaches MAIN's starting one by
-`DescriptiveComplexity.Draw.DrawData.reaches_evalEntry`: the startup, then two
+`DescriptiveComplexity.Draw.Data.reaches_evalEntry`: the startup, then two
 steps — `step_clearMir1_exit`, which leaves the marker to the right, and
 `step_chk0_back`, the checkpoint's `stay` rule walking back onto it — with
 the two presentations of the tape one term
-(`DescriptiveComplexity.Draw.DrawData.trackTape_val_eq_mir`). The state it
+(`DescriptiveComplexity.Draw.Data.trackTape_val_eq_mir`). The state it
 arrives with is `startupSt`, which is what `reaches_mainB` asks of its `st₀`,
 and whose `ltp` field is what pins the end marker of the whole run.
 
@@ -1288,14 +1288,14 @@ With that the **forward half of the reduction is assembled**
 (`DescriptiveComplexity.Problems.Wide.DrawYes`): a partial fixed point that
 holds makes the emitted instance a yes-instance of
 `DescriptiveComplexity.DWideAcceptSpace`
-(`DescriptiveComplexity.Draw.DrawData.dwideAcceptSpace_of_pfpHolds`), the two
+(`DescriptiveComplexity.Draw.Data.dwideAcceptSpace_of_pfpHolds`), the two
 promises coming for free – well-formedness from the layout, determinism from
 `prog_sep` – and the run being `reaches_evalEntry`, `reaches_mainB` and the
 output leg in sequence
-(`DescriptiveComplexity.Draw.DrawData.reaches_accept`). Everything semantic the
+(`DescriptiveComplexity.Draw.Data.reaches_accept`). Everything semantic the
 loop asks for is a choice made once here: the end marker is
 `DescriptiveComplexity.Draw.logicalTop`, which is *what the startup writes*
-(`DescriptiveComplexity.Draw.DrawData.tgtTopSt_tgt` – a tag has a block exactly
+(`DescriptiveComplexity.Draw.Data.tgtTopSt_tgt` – a tag has a block exactly
 when it is an argument tag), and which lies below every register because the
 least element of the universe is not an argument
 (`tagBlk_eq_none_of_least`, `wmSetLt_wmSeg_of_not_bot`); the VAL enumeration
@@ -1303,7 +1303,7 @@ is `exists_valEnum`'s chain over `Fin (n + 1)`, whose bottom and top are `0`
 and `Fin.last n`; and the stage the machine stops at is the *first stable*
 one (`DescriptiveComplexity.StepDef.exists_least_stable`), whose two sides
 are `stageEnd_conv_of_eq` and `stageEnd_not_conv_of_ne`. The output leg
-(`DescriptiveComplexity.Draw.DrawData.outLeg_accept`) is the one place a
+(`DescriptiveComplexity.Draw.Data.outLeg_accept`) is the one place a
 verdict is *read*: the output variable is nullary, so every hypothesis the
 machinery asks about the working address's blocks is a function on `Fin 0`,
 its pack is `passSem` transported by `semCastT`, and what is left is
@@ -1316,12 +1316,12 @@ from its initial one are linearly ordered
 (`DescriptiveComplexity.TMData.reach_total`), and it is enough to exhibit one
 run of the machine's own choosing that ends badly – provided accepting
 configurations are *stuck*. They are
-(`DescriptiveComplexity.Draw.DrawData.stuck_acc`), and the fact is one the
+(`DescriptiveComplexity.Draw.Data.stuck_acc`), and the fact is one the
 assembly already carries: every rule fires from a phase its own site owns
 (`DescriptiveComplexity.Draw.Assembly.howner`), the accepting phase's site
 contributes no rules at all (`OuterSh … .accept` is `Empty`), so no rule has
 it as a source (`DescriptiveComplexity.Draw.Assembly.srcPh_ne_of_isEmpty`,
-`DescriptiveComplexity.Draw.DrawData.srcPh_ne_acceptP`) and the case analysis is
+`DescriptiveComplexity.Draw.Data.srcPh_ne_acceptP`) and the case analysis is
 on the *tag* of a transition rather than one case per rule. With it,
 `DescriptiveComplexity.Problems.Machine.DetRun` supplies both shapes of
 rejection: a run that ends badly
@@ -1335,29 +1335,29 @@ With that the **converging case is settled both ways at once**
 (`DescriptiveComplexity.Problems.Wide.DrawNo`). The output leg does not need
 its verdict as a hypothesis: it lands in the accepting phase whatever the
 verdict, and what the verdict decides is the *bit* the exit writes at the
-marker (`DescriptiveComplexity.Draw.DrawData.outStA`,
-`DescriptiveComplexity.Draw.DrawData.outLeg_run_verdict` – the current
+marker (`DescriptiveComplexity.Draw.Data.outStA`,
+`DescriptiveComplexity.Draw.Data.outLeg_run_verdict` – the current
 `outLeg_run_thread` is its idempotent special case). So
-`DescriptiveComplexity.Draw.DrawData.reaches_outVerdict` asks only that the
+`DescriptiveComplexity.Draw.Data.reaches_outVerdict` asks only that the
 iteration *converge* and delivers one run with an **equivalence** at its end:
 the machine's accepting predicate at the state it stops in holds exactly when
 the partial fixed point does. One direction is
-`DescriptiveComplexity.Draw.DrawData.dwideAcceptSpace_of_pfpHolds`; the other,
+`DescriptiveComplexity.Draw.Data.dwideAcceptSpace_of_pfpHolds`; the other,
 with the dead end, is
-`DescriptiveComplexity.Draw.DrawData.not_dwideAcceptSpace_of_converges`.
+`DescriptiveComplexity.Draw.Data.not_dwideAcceptSpace_of_converges`.
 
 A **diverging** iteration is the remaining case, and the machine's lack of a
 clock is what makes it correct rather than a bug: when no stage is stable
 every convergence test fails, so MAIN keeps sweeping and its run passes an
 unbounded chain of stage entries
-(`DescriptiveComplexity.Draw.DrawData.transGen_stageB` – each link at least one
+(`DescriptiveComplexity.Draw.Data.transGen_stageB` – each link at least one
 step, because the sweep leaves the head at the end-marked address and not at
 the empty one). A chain like that reaches no halting configuration at all
 (`DescriptiveComplexity.TMData.not_acceptsSpace_of_chain`), whence
-`DescriptiveComplexity.Draw.DrawData.not_dwideAcceptSpace_of_diverges`.
+`DescriptiveComplexity.Draw.Data.not_dwideAcceptSpace_of_diverges`.
 
 The three cases together are the **correctness of the reduction**,
-`DescriptiveComplexity.Draw.DrawData.dwideAcceptSpace_iff_pfpHolds`: the emitted
+`DescriptiveComplexity.Draw.Data.dwideAcceptSpace_iff_pfpHolds`: the emitted
 instance is a yes-instance exactly when the partial fixed point holds. No
 induction over the program's rules appears anywhere in it — the machine's
 determinism does that work, and the only side condition is that its accepting
@@ -1385,17 +1385,17 @@ copy-back, the output dispatch – around a per-address **evaluation** that
 stays abstract (its phase type, site family and boundary rules are
 parameters, the same move `Prog.reaches_fileRoundTrip` makes for the middle of a
 trip). `DescriptiveComplexity.Draw.OuterPh`/`OuterSite`/`OuterSh` are the
-phases, sites and rule shapes; `DescriptiveComplexity.Draw.DrawData.outerRule`
+phases, sites and rule shapes; `DescriptiveComplexity.Draw.Data.outerRule`
 the rules (each site its kit's rules plus its exit rules, a sweep's first
 step folded into the rule that enters it);
-`DescriptiveComplexity.Draw.DrawData.outerSep` the in-shape separation, one
+`DescriptiveComplexity.Draw.Data.outerSep` the in-shape separation, one
 case per site from the kits' `sep` and `exit_disjoint`; and
-`DescriptiveComplexity.Draw.DrawData.outerAsm` the
+`DescriptiveComplexity.Draw.Data.outerAsm` the
 `DescriptiveComplexity.Draw.Assembly`. The evaluation itself factors once
 more (`DescriptiveComplexity.Problems.Wide.DrawEval`): a **spine** of
 checkpoints, one per variable position
 (`DescriptiveComplexity.Draw.EvalPh`/`EvalSite`/`EvalSh`,
-`DescriptiveComplexity.Draw.DrawData.evalRule`/`evalSep`/`evalHosrc`), each
+`DescriptiveComplexity.Draw.Data.evalRule`/`evalSep`/`evalHosrc`), each
 walking back to the marker and dispatching into that variable's machinery –
 the last into the outer boundary pair, erasing the marker towards the
 advance or the post-sweep reset – around per-variable sub-machineries that
@@ -1405,8 +1405,8 @@ stay abstract in turn. One variable's machinery
 directly, and the VAL loop – clear, matrix (abstract), exhaustion test,
 block-indexed increment – with the accumulator folds as `dstSt`
 *parameters* of the dispatching rules
-(`DescriptiveComplexity.Draw.DrawData.varRule`,
-`DescriptiveComplexity.Draw.DrawData.varSep`), since separation never reads
+(`DescriptiveComplexity.Draw.Data.varRule`,
+`DescriptiveComplexity.Draw.Data.varSep`), since separation never reads
 `dstSt`; their content is fixed with the runs. The recurring
 checkpoint-around-stages pattern is a **combinator**
 (`DescriptiveComplexity.Problems.Wide.DrawChain`:
@@ -1422,7 +1422,7 @@ by the standard rightward dispatch off the marker. On top of them, the
 **stage atom's machinery** – the random access, the largest atom
 subroutine – is complete
 (`DescriptiveComplexity.Problems.Wide.DrawStageAtom`:
-`DescriptiveComplexity.Draw.DrawData.stageRule`/`stageSep`): save the mirror,
+`DescriptiveComplexity.Draw.Data.stageRule`/`stageSep`): save the mirror,
 clear and build the target by per-argument tuple loops chained head to
 tail, reset–clear–seek out, read the stage bit under the head in the seek's
 verdict exits, restore, and reset–clear–seek home. The remaining atom
@@ -1451,78 +1451,78 @@ per-kind machinery types indexed by the `DescriptiveComplexity.Draw.MatAtom`
 itself (so everything reduces per constructor, the stuck `kindOf`
 application confined to the last step), the matrix and gates as sequences,
 one variable's machinery, the spine over the enumerated variables, and
-`DescriptiveComplexity.Draw.DrawData.PF` – the program's phase type – with
+`DescriptiveComplexity.Draw.Data.PF` – the program's phase type – with
 its site mirror, the owner maps down the tower
-(`DescriptiveComplexity.Draw.DrawData.sfOwn`) and finiteness throughout. The
+(`DescriptiveComplexity.Draw.Data.sfOwn`) and finiteness throughout. The
 rule tower has begun: `DescriptiveComplexity.Problems.Wide.DrawKindRule`
 dispatches each atom to its kind's machinery behind a **parameter pack**
 (`DescriptiveComplexity.Draw.StageArgs`/`TagArgs`/`ElemArgs` – the matches
 and control updates stay packed until the runs, while
-`DescriptiveComplexity.Draw.DrawData.kindSep` closes separation from the
+`DescriptiveComplexity.Draw.Data.kindSep` closes separation from the
 packs alone), and `DescriptiveComplexity.Problems.Wide.DrawVarRule` builds
-the matrix (`DescriptiveComplexity.Draw.DrawData.matrixRule`/`matrixSep`, the
+the matrix (`DescriptiveComplexity.Draw.Data.matrixRule`/`matrixSep`, the
 sequencer over the classified atoms) and the gates
-(`DescriptiveComplexity.Draw.DrawData.gatesRule`/`gatesSep`, per block a
+(`DescriptiveComplexity.Draw.Data.gatesRule`/`gatesSep`, per block a
 well-shapedness test whose failing exit clears the verdict flag and whose
 passing exit runs the tag-branched domain evaluation). Every layer also
 carries its **ownership** obligation (`DescriptiveComplexity.Draw.elemHosrc`
 and its siblings up to
-`DescriptiveComplexity.Draw.DrawData.gatesHosrc`): a rule fires from a phase
+`DescriptiveComplexity.Draw.Data.gatesHosrc`): a rule fires from a phase
 its own site owns, which is what makes separation compose.
 `DescriptiveComplexity.Problems.Wide.DrawProg` closes the shape layer –
 one variable's machinery with its gates and matrix plugged in
-(`DescriptiveComplexity.Draw.DrawData.varRuleF`), one copy per enumerated
+(`DescriptiveComplexity.Draw.Data.varRuleF`), one copy per enumerated
 variable and one for the output
-(`DescriptiveComplexity.Draw.DrawData.smRule`), the spine over them
-(`DescriptiveComplexity.Draw.DrawData.evalRuleF`) and the outer loop around
+(`DescriptiveComplexity.Draw.Data.smRule`), the spine over them
+(`DescriptiveComplexity.Draw.Data.evalRuleF`) and the outer loop around
 it, delivering **the program's whole rule set** as one
 `DescriptiveComplexity.Draw.Assembly`
-(`DescriptiveComplexity.Draw.DrawData.progAsm`), whose
+(`DescriptiveComplexity.Draw.Data.progAsm`), whose
 `DescriptiveComplexity.Draw.Assembly.prog` and
 `DescriptiveComplexity.Draw.Assembly.sep` are the program and its
 determinism. The semantic content rides in one pack per variable
-(`DescriptiveComplexity.Draw.DrawData.VarArgs`), untouched by separation and
+(`DescriptiveComplexity.Draw.Data.VarArgs`), untouched by separation and
 fixed with the runs.
 `DescriptiveComplexity.Problems.Wide.DrawRun` begins the
 runs: the program's rules **are** its kits' rules (one `rfl` per call site,
-`DescriptiveComplexity.Draw.DrawData.prog_rules_seek1` and its siblings), a rule
+`DescriptiveComplexity.Draw.Data.prog_rules_seek1` and its siblings), a rule
 of the assembly drives a step at its own destination data
-(`DescriptiveComplexity.Draw.DrawData.prog_hasRight`/`prog_hasLeft`), the
+(`DescriptiveComplexity.Draw.Data.prog_hasRight`/`prog_hasLeft`), the
 initial tape is the empty state's background
-(`DescriptiveComplexity.Draw.DrawData.initBack_eq_back`, the joint between the
+(`DescriptiveComplexity.Draw.Data.initBack_eq_back`, the joint between the
 input channel's marks and the presentation every pass walks), and the first
-leg is proved – `DescriptiveComplexity.Draw.DrawData.step_start`, planting the
+leg is proved – `DescriptiveComplexity.Draw.Data.step_start`, planting the
 marker and the bottom mark at the empty address. The glue between legs is
-`DescriptiveComplexity.Draw.DrawData.trackTape_back`: a pass's presentation
+`DescriptiveComplexity.Draw.Data.trackTape_back`: a pass's presentation
 *is* the background it walks, so one leg's conclusion is the next's
 hypothesis whichever track each walks
-(`DescriptiveComplexity.Draw.DrawData.trackTape_back_swap`). With it the
-next legs follow: `DescriptiveComplexity.Draw.DrawData.reaches_tgtTop` (the
+(`DescriptiveComplexity.Draw.Data.trackTape_back_swap`). With it the
+next legs follow: `DescriptiveComplexity.Draw.Data.reaches_tgtTop` (the
 round trip writing the logical top into TARGET) and
-`DescriptiveComplexity.Draw.DrawData.reaches_seek1` (the random access taking
+`DescriptiveComplexity.Draw.Data.reaches_seek1` (the random access taking
 the working cell there, the target address strictly below the file because
 the least element carries no argument block –
 `DescriptiveComplexity.Draw.tagBlk_eq_none_of_least`), with the two single
 steps that bracket a loop head (an exit steps right off the marker, the
 head's stay rule walks back). Then the reset takes the marker home
-(`DescriptiveComplexity.Draw.DrawData.reaches_reset1`, whose one hypothesis
+(`DescriptiveComplexity.Draw.Data.reaches_reset1`, whose one hypothesis
 beyond the slot equations is the seek's own erasing exit – it plants the
 permanent `ltp` end marker there) and a clear empties the mirror
-(`DescriptiveComplexity.Draw.DrawData.reaches_clearMir1`). All of it chains
-into **`DescriptiveComplexity.Draw.DrawData.reaches_startup`**: from the
+(`DescriptiveComplexity.Draw.Data.reaches_clearMir1`). All of it chains
+into **`DescriptiveComplexity.Draw.Data.reaches_startup`**: from the
 initial configuration – the marks over the blank – to the entry of the
 per-address evaluation, with both permanent markers planted and every
 register where the loop expects it. The outer loop's other legs are built
 too: the two **plain sweeps** –
-`DescriptiveComplexity.Draw.DrawData.reaches_compare` (the verdict
+`DescriptiveComplexity.Draw.Data.reaches_compare` (the verdict
 accumulated in the phase by `DescriptiveComplexity.sweepState`, its per-cell
 question read off the stage tracks) and
-`DescriptiveComplexity.Draw.DrawData.reaches_copy` (the background a family
+`DescriptiveComplexity.Draw.Data.reaches_copy` (the background a family
 indexed by the sweep's frontier: the addresses already passed hold the next
 stage) – the three walks home
-(`DescriptiveComplexity.Draw.DrawData.reaches_home` and its three instances)
+(`DescriptiveComplexity.Draw.Data.reaches_home` and its three instances)
 and **one round of the outer sweep**
-(`DescriptiveComplexity.Draw.DrawData.reaches_sweepAdv`: the marker and the
+(`DescriptiveComplexity.Draw.Data.reaches_sweepAdv`: the marker and the
 mirror step on in lockstep, the erasing entry being the caller's rule, as
 the reset's is). Every kit the outer program instantiates has now been
 driven at the program level; what the loop still waits on is the
@@ -1530,7 +1530,7 @@ per-address evaluation between two rounds. Its first brick is in
 `DescriptiveComplexity.Problems.Wide.DrawBack`: the permanent marks read back
 at a register cell (the existential collapses by injectivity of
 `DescriptiveComplexity.wmSeg`), and with them the **navigation by name** –
-`DescriptiveComplexity.Draw.DrawData.nameG_cell` says what the guard sees,
+`DescriptiveComplexity.Draw.Data.nameG_cell` says what the guard sees,
 `nameG_unique` that it stops at one cell, `not_nameG_of_not_reg` that it
 never stops in the working area. The other half of that instantiation is the
 control's **dictionary**, `DescriptiveComplexity.Problems.Wide.DrawCtl`:
@@ -1539,22 +1539,22 @@ element's coordinates, the inner fold's accumulators, a sub-fold's, the
 atoms' verdicts, the leaf-read and tag-witness flags, the gates' verdict –
 with the casts through the computed budgets, their distinctness, and the
 two operations every semantic parameter is built from
-(`DescriptiveComplexity.Draw.DrawData.ctlBit`/`setCtl` and their read-back
+(`DescriptiveComplexity.Draw.Data.ctlBit`/`setCtl` and their read-back
 equations) – together with the **tuple enumeration** the element loops run
 on: `DescriptiveComplexity.Draw.IsMaxTup`,
 `DescriptiveComplexity.Draw.tupNext` and
 `DescriptiveComplexity.Draw.botTup` are the functions behind the relation
 `DescriptiveComplexity.TupSucc` that
 `DescriptiveComplexity.Draw.reflTransGen_of_tupLoop` indexes its rounds by,
-and `DescriptiveComplexity.Draw.DrawData.readLv`/`putLv` are how a round's
+and `DescriptiveComplexity.Draw.Data.readLv`/`putLv` are how a round's
 tuple is read out of the control and written back.
 
 What a leaf of those loops actually reads is fixed in
 `DescriptiveComplexity.Problems.Wide.DrawName`: an encoded tuple is
 canonically padded, so it lives in a cell the marks name
-(`DescriptiveComplexity.Draw.DrawData.encTup_isPad`); the trip's guard – the
+(`DescriptiveComplexity.Draw.Data.encTup_isPad`); the trip's guard – the
 name guard at *computed* coordinates,
-`DescriptiveComplexity.Draw.DrawData.nameGF` – holds at exactly that cell
+`DescriptiveComplexity.Draw.Data.nameGF` – holds at exactly that cell
 (`encG_iff`); and the register digit found there is one membership question
 of the block value, hence **one bit of the assignment** of the point the
 block holds (`blk_encAsgTup_iff`) or its **tag test**
@@ -1576,16 +1576,16 @@ With them, `DescriptiveComplexity.Problems.Wide.DrawLeaf` says **what the
 inner loop computes**. The dictionary is fixed there: level `j` of a
 variable's pack is inner block `j` of the register, the free levels reading
 the working address's outer blocks instead
-(`DescriptiveComplexity.Draw.DrawData.levelVal`), and the leaf is the gated
+(`DescriptiveComplexity.Draw.Data.levelVal`), and the leaf is the gated
 matrix at that valuation (`leafP` – the encodings' gates belong to the leaf,
-not to the loop). `DescriptiveComplexity.Draw.DrawData.altQuantFrom_leafP` is
+not to the loop). `DescriptiveComplexity.Draw.Data.altQuantFrom_leafP` is
 the join: the prefix of the leaf over *every* block, played from level `0`,
 **is** `DescriptiveComplexity.StepDef.next` at the points the working
 address encodes; and `foldFrom_leafP_top` reads that off the accumulators at
 the address the loop stops at, the inner top.
 
 `DescriptiveComplexity.Problems.Wide.DrawVerdict` closes that circle at the
-machine: `DescriptiveComplexity.Draw.DrawData.accVerdict_next` says the
+machine: `DescriptiveComplexity.Draw.Data.accVerdict_next` says the
 machinery's exit bit at a variable's position **is** `StepDef.next` at the
 working address's points, every abstract input of the run layer's capstone
 discharged from the two facts a reduction's tape maintains — the address's
@@ -1605,7 +1605,7 @@ The enumeration both of those read a register through is
 increments, and stops at the **Kin top** – the set of the inner-block cells –
 so what it consumes is an initial segment of the binary-counter order,
 indexed by `Fin (n + 1)` for the instances the run theorems ask for
-(`DescriptiveComplexity.Draw.DrawData.exists_valEnum`, built by
+(`DescriptiveComplexity.Draw.Data.exists_valEnum`, built by
 `exists_wmChain` from repeated `DescriptiveComplexity.exists_wmPred`). It
 delivers the five facts a semantic reading needs, the last of them the one
 the machine could not be trusted for on its own: every register of the chain
@@ -1625,7 +1625,7 @@ every position's write (`spineRide`), so after the spine each variable's
 rewrites the tracks of exactly the addresses it has passed. The same file
 carries the pack's transport (`kindSemCast` and its content lemmas): a
 position's semantic pack is typed at that position's state, but
-`DescriptiveComplexity.Draw.DrawData.KindSem` reads the state only through
+`DescriptiveComplexity.Draw.Data.KindSem` reads the state only through
 the levels' register sets, so one pack built at the address's entry state
 serves every position. That is what makes the per-position families
 *constructible* rather than merely stateable: `spineNode` recurses along
@@ -1640,14 +1640,14 @@ never as an ambient instance.
 The **branched** family — the one a sweep runs, each position taking
 whichever of its three legs its own gates call for — asks for no pack at
 all: its semantic parameter is the *conditioned* family
-`DescriptiveComplexity.Draw.DrawData.gatedSem` inhabits, a pack at every
+`DescriptiveComplexity.Draw.Data.gatedSem` inhabits, a pack at every
 gated position of every state and every address, built from
-`DescriptiveComplexity.Draw.DrawData.isEnc_of_gatedAt` because a gated
+`DescriptiveComplexity.Draw.Data.isEnc_of_gatedAt` because a gated
 position's argument blocks **are** encodings. Supplied at the top as
 `fun w => dt.gatedSem hzo hlin mV`, it leaves no semantic assumption about
 a position anywhere in the run layer. What the dictionary lemmas ask of a
 leg is correspondingly weakened to the projection they read
-(`DescriptiveComplexity.Draw.DrawData.WritesNew`: its variable's cell at the
+(`DescriptiveComplexity.Draw.Data.WritesNew`: its variable's cell at the
 marker holds its verdict, every other cell rides), which a branched leg
 satisfies (`legStB_new`, `spineStOfB_writesNew`) while it is not literally
 a `postVarSt` of the position's entry state — its VAL loop may normalize
@@ -1656,7 +1656,7 @@ the two scratch registers first.
 The **element loops** of the atom subroutines have the same anchor one scale
 down, `DescriptiveComplexity.Problems.Wide.DrawExp`: an atom of the expansion
 holds of a tuple of points exactly when the prefix of
-`DescriptiveComplexity.Draw.DrawData.expLeaf` – the Boolean value of the
+`DescriptiveComplexity.Draw.Data.expLeaf` – the Boolean value of the
 defining sentence's matrix, its block atoms read off the argument points'
 assignments and its base atoms decided by guards – is played from level `0`
 (`relMap_iff_altQuantFrom_expLeaf`, and `_pad` for the loop the machine

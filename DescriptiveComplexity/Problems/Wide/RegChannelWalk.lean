@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.RegChannelEnum
 The opening of a handed program leaves the marker, walks up to the file, steps
 onto its first register, turns, comes home, guesses, and enters the evaluation.
 What it asks of the instance is four addresses and five order facts
-(`DescriptiveComplexity.Draw.DrawData.reachesIn_openingHanded`), and at this
+(`DescriptiveComplexity.Draw.Data.reachesIn_openingHanded`), and at this
 channel they are all forced:
 
 * the marker is the **empty address**, and the walk's first step is its
@@ -29,7 +29,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -37,7 +37,7 @@ open Language Structure
 
 section Walk
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
@@ -96,7 +96,7 @@ theorem exists_openingWalkReg {botE : Univ A R' P' dt.KIx dt.dd}
 
 end Walk
 
-end DrawData
+end Data
 
 end Draw
 

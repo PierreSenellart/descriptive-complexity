@@ -12,15 +12,15 @@ import DescriptiveComplexity.Problems.Wide.NexOuter
 `DescriptiveComplexity.Draw.SweepSpec` leaves the write to the caller, because
 what a cell of the file holds is a fact about the layout and not about the shape
 of the loop. This file is that fact at the layout a clocked program uses
-(`DescriptiveComplexity.Draw.DrawData.blkLaid`): the sweep writes, at the register
+(`DescriptiveComplexity.Draw.Data.blkLaid`): the sweep writes, at the register
 the pointer names, the **mark** of that register – it is a register, whether it
 is the first or the last of the file, its block one-hot, its coordinates, and
 that it is canonically padded – and the blank in every track.
 
 The one theorem is that this *is* the background the file's run installs
-(`DescriptiveComplexity.Draw.DrawData.buildWr_eq_ixBack`): slot by slot, the mark
+(`DescriptiveComplexity.Draw.Data.buildWr_eq_ixBack`): slot by slot, the mark
 the pointer can compute agrees with
-`DescriptiveComplexity.Draw.DrawData.ixBack` at the register's cell, given that
+`DescriptiveComplexity.Draw.Data.ixBack` at the register's cell, given that
 the state's own tracks are clear – which they are, the file being laid before
 anything is written to it.
 
@@ -29,13 +29,13 @@ its block and its named tuple and on nothing else, which is the point the whole
 index parameter was introduced for: the pointer holds exactly those, the block in
 the phase and the tuple in the control.
 
-The pointer's advance is here too: `DescriptiveComplexity.Draw.DrawData.ptrNext`
+The pointer's advance is here too: `DescriptiveComplexity.Draw.Data.ptrNext`
 writes the next register's tuple into the control's coordinate slots and leaves
 every other slot alone, and
-`DescriptiveComplexity.Draw.DrawData.buildSpec` is the whole
+`DescriptiveComplexity.Draw.Data.buildSpec` is the whole
 `DescriptiveComplexity.Draw.SweepSpec` the file-laying phase runs at. The
 guessing phase's write is here as well
-(`DescriptiveComplexity.Draw.DrawData.guessWr`): the cell it read with the stage
+(`DescriptiveComplexity.Draw.Data.guessWr`): the cell it read with the stage
 tracks holding the guessed value, and nothing else touched.
 -/
 
@@ -47,11 +47,11 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
 section BuildSpec
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Nonempty A] [Finite R'] [Finite P'] [Finite dt.KIx]
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -266,7 +266,7 @@ variable (dt) in
 over at once. A program that is *handed* its file – the register channel of
 `DescriptiveComplexity.WideRegAccept` hands one over – has nothing to lay, and
 this is what it puts where a file-laying program puts
-`DescriptiveComplexity.Draw.DrawData.buildSpec`: the site's rules still exist, and
+`DescriptiveComplexity.Draw.Data.buildSpec`: the site's rules still exist, and
 the one that fires is the one whose guard is «rolled over and done», so the
 phase costs a single step.
 
@@ -324,7 +324,7 @@ it read with those tracks set to the guessed value, and the value is a *shape* �
 one rule per assignment of the tracks – which is the program's only
 nondeterminism. -/
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' Q : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' Q : Type}
 variable [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Nonempty A] [Finite dt.KIx]
@@ -406,7 +406,7 @@ noncomputable def regionSpec (zero one : A) :
 
 end GuessSpec
 
-end DrawData
+end Data
 
 end Draw
 

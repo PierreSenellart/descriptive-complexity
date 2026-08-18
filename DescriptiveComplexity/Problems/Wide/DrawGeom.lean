@@ -8,7 +8,7 @@ import DescriptiveComplexity.Problems.Wide.DrawMatrix
 /-!
 # Where the states, the symbols and the transitions sit
 
-The instance the reduction emits has universe `DrawTag R P K × (Fin dd → A)`, and
+The instance the reduction emits has universe `Draw.Tag R P K × (Fin dd → A)`, and
 its states, symbols and transitions are *elements* of it. This file says which
 elements they are.
 
@@ -99,24 +99,24 @@ variable {R P K : Type}
 
 /-- **A state**: the call site in the tag, the pointer in the payload. -/
 noncomputable def stateElt (zero : A) (p : P) (w : Fin c → A) :
-    DrawTag R P K × (Fin dd → A) :=
-  (DrawTag.phase p, pad zero w)
+    Tag R P K × (Fin dd → A) :=
+  (Tag.phase p, pad zero w)
 
 /-- **A symbol**: the tracks in the payload (`DescriptiveComplexity.Draw.withBit`). -/
-noncomputable def symElt (zero : A) (w : Fin c → A) : DrawTag R P K × (Fin dd → A) :=
-  (DrawTag.sym, pad zero w)
+noncomputable def symElt (zero : A) (w : Fin c → A) : Tag R P K × (Fin dd → A) :=
+  (Tag.sym, pad zero w)
 
 /-- **A transition**: the rule in the tag, the rule's data in the payload. -/
 noncomputable def trElt (zero : A) (r : R) (w : Fin c → A) :
-    DrawTag R P K × (Fin dd → A) :=
-  (DrawTag.ctrl r, pad zero w)
+    Tag R P K × (Fin dd → A) :=
+  (Tag.ctrl r, pad zero w)
 
 /-- **A state is determined by its call site and its pointer.** -/
 theorem stateElt_inj (hc : c ≤ dd) {p p' : P} {w w' : Fin c → A}
     (h : stateElt (dd := dd) (R := R) (K := K) zero p w = stateElt zero p' w') :
     p = p' ∧ w = w' := by
   refine ⟨?_, pad_injective hc (congrArg Prod.snd h)⟩
-  have h1 : (DrawTag.phase p : DrawTag R P K) = DrawTag.phase p' := congrArg Prod.fst h
+  have h1 : (Tag.phase p : Tag R P K) = Tag.phase p' := congrArg Prod.fst h
   simpa using h1
 
 /-- **A symbol is determined by its tracks.** -/
@@ -129,7 +129,7 @@ theorem trElt_inj (hc : c ≤ dd) {r r' : R} {w w' : Fin c → A}
     (h : trElt (dd := dd) (P := P) (K := K) zero r w = trElt zero r' w') :
     r = r' ∧ w = w' := by
   refine ⟨?_, pad_injective hc (congrArg Prod.snd h)⟩
-  have h1 : (DrawTag.ctrl r : DrawTag R P K) = DrawTag.ctrl r' := congrArg Prod.fst h
+  have h1 : (Tag.ctrl r : Tag R P K) = Tag.ctrl r' := congrArg Prod.fst h
   simpa using h1
 
 /-- **The three kinds are disjoint**, by their tags: no element is both a state
@@ -137,21 +137,21 @@ and a symbol. -/
 theorem stateElt_ne_symElt (p : P) (w w' : Fin c → A) :
     stateElt (dd := dd) (R := R) (K := K) zero p w ≠ symElt zero w' := by
   intro h
-  have h1 : (DrawTag.phase p : DrawTag R P K) = DrawTag.sym := congrArg Prod.fst h
+  have h1 : (Tag.phase p : Tag R P K) = Tag.sym := congrArg Prod.fst h
   simp at h1
 
 /-- No element is both a transition and a state. -/
 theorem trElt_ne_stateElt (r : R) (p : P) (w w' : Fin c → A) :
     trElt (dd := dd) (K := K) zero r w ≠ stateElt zero p w' := by
   intro h
-  have h1 : (DrawTag.ctrl r : DrawTag R P K) = DrawTag.phase p := congrArg Prod.fst h
+  have h1 : (Tag.ctrl r : Tag R P K) = Tag.phase p := congrArg Prod.fst h
   simp at h1
 
 /-- No element is both a transition and a symbol. -/
 theorem trElt_ne_symElt (r : R) (w w' : Fin c → A) :
     trElt (dd := dd) (P := P) (K := K) zero r w ≠ symElt zero w' := by
   intro h
-  have h1 : (DrawTag.ctrl r : DrawTag R P K) = DrawTag.sym := congrArg Prod.fst h
+  have h1 : (Tag.ctrl r : Tag R P K) = Tag.sym := congrArg Prod.fst h
   simp at h1
 
 end Geom

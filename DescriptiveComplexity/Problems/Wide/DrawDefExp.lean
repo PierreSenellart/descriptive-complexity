@@ -12,24 +12,24 @@ An expansion atom runs the same machinery a gate does, one exponent along: it
 reads the **tags** of its argument points, branches on the tuple they decode,
 and folds the defining sentence of that branch. So every piece it needs is one
 already discharged for the gates, at the branch's prefix rather than the
-domain's — the naming guards through `DescriptiveComplexity.Draw.DrawData.encCoord`,
+domain's — the naming guards through `DescriptiveComplexity.Draw.Data.encCoord`,
 the leaf from the control, and the three shapes of a fold.
 
 With them, `DescriptiveComplexity.Draw.UTagArgsDef` of
-`DescriptiveComplexity.Draw.DrawData.expArgs` is a field-by-field check.
+`DescriptiveComplexity.Draw.Data.expArgs` is a field-by-field check.
 -/
 
 namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} [L.IsRelational] {dt : DrawData L}
+variable {L : Language.{0, 0}} [L.IsRelational] {dt : Data L}
 variable [Fintype dt.SlotIx]
 
 /-! ### What a branch reads -/
@@ -332,7 +332,7 @@ theorem uKindArgsDef_atomArgs (v : dt.VarIx) (a : Fin (dt.natOf v)) :
 
 /-- **The semantic pack of one variable's machinery meets its obligation.**
 This is the last thing the program's rules owe the interpretation: with it,
-`DescriptiveComplexity.Draw.DrawData.uRulesDefinable_progAsm` applies to the
+`DescriptiveComplexity.Draw.Data.uRulesDefinable_progAsm` applies to the
 reduction's own machine. -/
 theorem uVarArgsDef_varArgsOf (e₀ : Env L) (v : dt.VarIx) :
     UVarArgsDef (L := L) (Q := dt.CtlIx) v
@@ -380,7 +380,7 @@ theorem uRulesDefinable_progOf (e₀ : Env L) :
           (.chk 0) (.sub dt.smEntryOut) :=
   uRulesDefinable_progAsm fun v => uVarArgsDef_varArgsOf e₀ v
 
-end DrawData
+end Data
 
 end Draw
 

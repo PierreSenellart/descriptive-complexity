@@ -24,10 +24,10 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -73,7 +73,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -105,7 +105,7 @@ theorem ixIGateBlock_reachesIn_pos (hTest : ∀ u, Test u) (f : dt.CtlIx → A) 
         wideRank (F.cell gbot)) + (1 + (1 +
         ((w + 2) * Fintype.card dt.X.Tag + 2 +
           ((2 + (w + 2) * dt.domNr (dt.dspTagOf PR.zero PR.one
-              (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))) *
+              (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))) *
             (Nat.card (Lex (Fin dt.eDim → A)) + 1) + 1)))))
       ⟨Sum.inr (PR.stElt (emb (Sum.inl .up)) f), Sum.inl v',
         wideTape (PR.trackTapeAt F.cell Slot.val
@@ -113,17 +113,17 @@ theorem ixIGateBlock_reachesIn_pos (hTest : ∀ u, Test u) (f : dt.CtlIx → A) 
       ⟨Sum.inr (PR.stElt exitPh
           ((dt.igateArgs PR.zero PR.one b flag hc hn hrd).exitSt
             (dt.dspTagOf PR.zero PR.one
-              (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+              (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))
             (dt.ixIGateFam F hhasP PR.one b st
               (dt.dspTagOf PR.zero PR.one
-                (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+                (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))
               flag hc hn hrd v
               (dt.ixIGateTagFam F hhasP PR.one b st flag hc hn hrd v f
                 (Fin.last (Fintype.card dt.X.Tag)))
               (toLex topTup)
               (Fin.last (dt.domNr (dt.dspTagOf PR.zero PR.one
                 (wmBlk (ixAddr elt st.val)
-                  (DrawTag.arg (toLex b) : DrawTag R P dt.KIx))))))
+                  (Tag.arg (toLex b) : Tag R P dt.KIx))))))
             (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st v))), Sum.inl v',
         wideTape (PR.trackTapeAt F.cell Slot.val
           (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st) st.val)
@@ -200,7 +200,7 @@ theorem ixIGateBlock_reachesIn_pos (hTest : ∀ u, Test u) (f : dt.CtlIx → A) 
   exact ixIGate_reachesIn (F := F) (hhasP := hhasP) (hsepR := hsepP) (hixR := hix)
     (b := b) (st := st) (flag := flag) (hc := hc) (hn := hn) (hrd := hrd)
     (t := dt.dspTagOf PR.zero PR.one
-      (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))
     (hinjR := hinj) (heltR := heltP) (hrules := hdomrules) (hR := hR) (hlin := hlin)
     (hbot := hbot) (hv := hv) (hvi := hvi) (hwkSt := hwkSt)
     (t₀ := Slot.mir) (m₀ := st.mir) (hm₀ := fun r => rfl)
@@ -321,12 +321,12 @@ noncomputable def ixIGFs (vi : dt.VarIx) (stV : TapeSt dt A R P I)
         ((dt.varArgsOf zero one vi).argsIG ⟨n, h⟩).exitSt
           (dt.dspTagOf zero one
             (wmBlk (ixAddr elt stV.val)
-              (DrawTag.arg (toLex (dt.igBlk vi ⟨n, h⟩)) : DrawTag R P dt.KIx)))
+              (Tag.arg (toLex (dt.igBlk vi ⟨n, h⟩)) : Tag R P dt.KIx)))
           (dt.ixIGateFam F hhas one (dt.igBlk vi ⟨n, h⟩) stV
             (dt.dspTagOf zero one
               (wmBlk (ixAddr elt stV.val)
-                (DrawTag.arg (toLex (dt.igBlk vi ⟨n, h⟩)) :
-                  DrawTag R P dt.KIx)))
+                (Tag.arg (toLex (dt.igBlk vi ⟨n, h⟩)) :
+                  Tag R P dt.KIx)))
             (dt.igFlag vi ⟨n, h⟩) dt.card_le_ntgDim dt.domN dt.domRd v
             (dt.ixIGateTagFam F hhas one (dt.igBlk vi ⟨n, h⟩) stV
               (dt.igFlag vi ⟨n, h⟩) dt.card_le_ntgDim dt.domN dt.domRd v
@@ -336,8 +336,8 @@ noncomputable def ixIGFs (vi : dt.VarIx) (stV : TapeSt dt A R P I)
             (toLex topTup)
             (Fin.last (dt.domNr (dt.dspTagOf zero one
               (wmBlk (ixAddr elt stV.val)
-                (DrawTag.arg (toLex (dt.igBlk vi ⟨n, h⟩)) :
-                  DrawTag R P dt.KIx))))))
+                (Tag.arg (toLex (dt.igBlk vi ⟨n, h⟩)) :
+                  Tag R P dt.KIx))))))
           (dt.ixBack F.toLayout zero one dt.dd0Le stV v)
       else
         (dt.varArgsOf zero one vi).setFailIGOf ⟨n, h⟩
@@ -379,7 +379,7 @@ theorem ixIGFs_congr_scratch {v : Univ A R P dt.KIx dt.dd → Prop}
 
 /-- **What one level's gate is worth**: the file test passed, the block
 value's witness one-hot at the dispatched tag, and the domain condition
-there. By `DescriptiveComplexity.Draw.DrawData.igVerdict_iff_isEnc` this is
+there. By `DescriptiveComplexity.Draw.Data.igVerdict_iff_isEnc` this is
 `IsEnc` of the block value, once the encoding layer relates the test's
 marks to the true shapes. -/
 noncomputable def ixIGPassP (vi : dt.VarIx) (stV : TapeSt dt A R P I)
@@ -387,22 +387,22 @@ noncomputable def ixIGPassP (vi : dt.VarIx) (stV : TapeSt dt A R P I)
   (∀ u, dt.ixIGTest F zero one stV (dt.igBlk vi ℓ) u) ∧
   (∀ t' : dt.X.Tag,
     wmBlk (ixAddr elt stV.val)
-        (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)
+        (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') ↔
       t' = dt.dspTagOf zero one
         (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx))) ∧
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx))) ∧
   ExpExpansion.DomHolds (X := dt.X)
     (dt.dspTagOf zero one
         (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)),
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)),
       decRho dt.ly zero one
         (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)))
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)))
 
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational] in
 /-- **A round's pass depends on the VAL register alone.** Hence at a round
-state (`DescriptiveComplexity.Draw.DrawData.roundSt`, which sets VAL and
+state (`DescriptiveComplexity.Draw.Data.roundSt`, which sets VAL and
 keeps everything else) the pass is the *same proposition* at every
 position of the spine — so a position's `hp` is the entry state's, and
 `kindSemCast` may carry the pack it unlocks. -/
@@ -464,13 +464,13 @@ theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
             ((dt.varArgsOf zero one vi).argsIG ⟨n, hn⟩).exitSt
               (dt.dspTagOf zero one
                 (wmBlk (ixAddr elt stV.val)
-                  (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) :
-                    DrawTag R P dt.KIx)))
+                  (Tag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) :
+                    Tag R P dt.KIx)))
               (dt.ixIGateFam F hhas one (dt.igBlk vi ⟨n, hn⟩) stV
                 (dt.dspTagOf zero one
                   (wmBlk (ixAddr elt stV.val)
-                    (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) :
-                      DrawTag R P dt.KIx)))
+                    (Tag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) :
+                      Tag R P dt.KIx)))
                 (dt.igFlag vi ⟨n, hn⟩) dt.card_le_ntgDim dt.domN dt.domRd v
                 (dt.ixIGateTagFam F hhas one (dt.igBlk vi ⟨n, hn⟩) stV
                   (dt.igFlag vi ⟨n, hn⟩) dt.card_le_ntgDim dt.domN dt.domRd
@@ -482,15 +482,15 @@ theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
                 (toLex topTup)
                 (Fin.last (dt.domNr (dt.dspTagOf zero one
                   (wmBlk (ixAddr elt stV.val)
-                    (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) :
-                      DrawTag R P dt.KIx))))))
+                    (Tag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) :
+                      Tag R P dt.KIx))))))
               (dt.ixBack F.toLayout zero one dt.dd0Le stV v) := by
           simp only [ixIGFs]
           rw [dif_pos hn, if_pos hp]
         rw [hFa]
         set t := dt.dspTagOf zero one
           (wmBlk (ixAddr elt stV.val)
-            (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) : DrawTag R P dt.KIx))
+            (Tag.arg (toLex (dt.igBlk vi ⟨n, hn⟩)) : Tag R P dt.KIx))
           with ht
         change dt.igateExit zero one (dt.igFlag vi ⟨n, hn⟩) t
           dt.card_le_ntgDim (dt.domN t) (dt.domRd t)
@@ -841,13 +841,13 @@ theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
         ((dt.varArgsOf zero one vi).argsIG ⟨n, hℓn⟩).exitSt
           (dt.dspTagOf zero one
             (wmBlk (ixAddr elt stV.val)
-              (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
-                DrawTag R P dt.KIx)))
+              (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
+                Tag R P dt.KIx)))
           (dt.ixIGateFam F hhas one (dt.igBlk vi ⟨n, hℓn⟩) stV
             (dt.dspTagOf zero one
               (wmBlk (ixAddr elt stV.val)
-                (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
-                  DrawTag R P dt.KIx)))
+                (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
+                  Tag R P dt.KIx)))
             (dt.igFlag vi ⟨n, hℓn⟩) dt.card_le_ntgDim dt.domN dt.domRd v
             (dt.ixIGateTagFam F hhas one (dt.igBlk vi ⟨n, hℓn⟩) stV
               (dt.igFlag vi ⟨n, hℓn⟩) dt.card_le_ntgDim dt.domN dt.domRd
@@ -859,8 +859,8 @@ theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
             (toLex topTup)
             (Fin.last (dt.domNr (dt.dspTagOf zero one
               (wmBlk (ixAddr elt stV.val)
-                (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
-                  DrawTag R P dt.KIx))))))
+                (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
+                  Tag R P dt.KIx))))))
           (dt.ixBack F.toLayout zero one dt.dd0Le stV v) := by
       simp only [ixIGFs]
       rw [dif_pos hℓn, if_pos hp]
@@ -871,8 +871,8 @@ theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
         (b := dt.igBlk vi ⟨n, hℓn⟩) (st := stV)
         (t := dt.dspTagOf zero one
           (wmBlk (ixAddr elt stV.val)
-            (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
-              DrawTag R P dt.KIx)))
+            (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
+              Tag R P dt.KIx)))
         (flag := dt.igFlag vi ⟨n, hℓn⟩) (hc := dt.card_le_ntgDim)
         (hn := dt.domN) (hrd := dt.domRd) (vAdr := v) (F := F) (hhas := hhas)
         (hinj := hinj) (helt := helt) (hflag := hflagn) (hzo := hzo)
@@ -890,13 +890,13 @@ theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
           (((dt.varArgsOf zero one vi).argsIG ⟨n, hℓn⟩).exitSt
             (dt.dspTagOf zero one
               (wmBlk (ixAddr elt stV.val)
-                (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
-                  DrawTag R P dt.KIx)))
+                (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
+                  Tag R P dt.KIx)))
             (dt.ixIGateFam F hhas one (dt.igBlk vi ⟨n, hℓn⟩) stV
               (dt.dspTagOf zero one
                 (wmBlk (ixAddr elt stV.val)
-                  (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
-                    DrawTag R P dt.KIx)))
+                  (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
+                    Tag R P dt.KIx)))
               (dt.igFlag vi ⟨n, hℓn⟩) dt.card_le_ntgDim dt.domN dt.domRd v
               (dt.ixIGateTagFam F hhas one (dt.igBlk vi ⟨n, hℓn⟩) stV
                 (dt.igFlag vi ⟨n, hℓn⟩) dt.card_le_ntgDim dt.domN dt.domRd
@@ -908,15 +908,15 @@ theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
               (toLex topTup)
               (Fin.last (dt.domNr (dt.dspTagOf zero one
                 (wmBlk (ixAddr elt stV.val)
-                  (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
-                    DrawTag R P dt.KIx))))))
+                  (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) :
+                    Tag R P dt.KIx))))))
             (dt.ixBack F.toLayout zero one dt.dd0Le stV v)) q ↔
           dt.ctlBit one ((dt.varArgsOf zero one vi).enterIGSt ⟨n, hℓn⟩
             (dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ n)
             (dt.ixBack F.toLayout zero one dt.dd0Le stV v)) q := by
         set t := dt.dspTagOf zero one
           (wmBlk (ixAddr elt stV.val)
-            (DrawTag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) : DrawTag R P dt.KIx))
+            (Tag.arg (toLex (dt.igBlk vi ⟨n, hℓn⟩)) : Tag R P dt.KIx))
           with ht
         change dt.ctlBit one
           (dt.igateExit zero one (dt.igFlag vi ⟨n, hℓn⟩) t
@@ -1106,7 +1106,7 @@ open Classical in
 /-- **The control one round leaves at the fold checkpoint**: the matrix
 thread applied to the inner gates' output at a passing round — both flags
 set, the round's **conditional semantic pack** unlocked by
-`DescriptiveComplexity.Draw.DrawData.roundPass_of_flags` — and the gates'
+`DescriptiveComplexity.Draw.Data.roundPass_of_flags` — and the gates'
 output alone at a skipping one. The pack must be conditional: a garbage
 round holds no encodings to build one from, and its matrix never runs. -/
 noncomputable def ixRoundCtl (hzo : zero ≠ one) (vi : dt.VarIx)
@@ -1142,7 +1142,7 @@ noncomputable def ixRoundEndSt (vi : dt.VarIx) (stV : TapeSt dt A R P I)
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit state differs from its entry in SAV and TARGET
 alone** — the same fact as
-`DescriptiveComplexity.Draw.DrawData.matSt_fields`, through the branch. -/
+`DescriptiveComplexity.Draw.Data.matSt_fields`, through the branch. -/
 theorem ixRoundEndSt_fields (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A) :
     (dt.ixRoundEndSt (elt := elt) F zero one hhas vi stV v f₀).wk = stV.wk ∧
@@ -1159,7 +1159,7 @@ theorem ixRoundEndSt_fields (vi : dt.VarIx) (stV : TapeSt dt A R P I)
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit state is its entry state with the two scratch
 registers rewritten** — the sharpening of
-`DescriptiveComplexity.Draw.DrawData.roundEndSt_fields`, and what lets the
+`DescriptiveComplexity.Draw.Data.roundEndSt_fields`, and what lets the
 VAL loop thread those two registers rather than the whole state. -/
 theorem ixRoundEndSt_eq (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A) :
@@ -1186,7 +1186,7 @@ theorem ixScratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeSt dt A R P I)
 
 open Classical in
 /-- **The control one round leaves, threaded**: as
-`DescriptiveComplexity.Draw.DrawData.roundCtl`, with the matrix's thread
+`DescriptiveComplexity.Draw.Data.roundCtl`, with the matrix's thread
 taken at the states its atoms run at. -/
 noncomputable def ixRoundCtlT (hzo : zero ≠ one) (vi : dt.VarIx)
     (stV : TapeSt dt A R P I) (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -1253,7 +1253,7 @@ omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 branch off the same registers, and on the passing branch the matrix
 threads SAV and TARGET alone (`matFsT_eq_matFs`). With this the control the
 *run* produces is the control the semantic capstone
-(`DescriptiveComplexity.Draw.DrawData.accVerdict_leafP`) is stated at. -/
+(`DescriptiveComplexity.Draw.Data.accVerdict_leafP`) is stated at. -/
 theorem ixRoundCtlT_eq_ixRoundCtl (hzo : zero ≠ one)
     {v : Univ A R P dt.KIx dt.dd → Prop}
     (hreg : ¬∃ u : I, v = F.cell u) (vi : dt.VarIx)
@@ -1372,7 +1372,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -1388,7 +1388,7 @@ variable (hcostR : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
 include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt hgap
   hwP hcostR in
 /-- **The inner gates' run, on a clock**: as
-`DescriptiveComplexity.Draw.DrawData.ixIGs_run` with the levels counted – one
+`DescriptiveComplexity.Draw.Data.ixIGs_run` with the levels counted – one
 level's width, its dispatch and the step back per level, and one step to
 leave. -/
 theorem ixIGs_reachesIn (f₀ : dt.CtlIx → A) :
@@ -1447,11 +1447,11 @@ theorem ixIGs_reachesIn (f₀ : dt.CtlIx → A) :
           ((dt.varArgsOf PR.zero PR.one vi).argsIG ℓ).exitSt
             (dt.dspTagOf PR.zero PR.one
               (wmBlk (ixAddr elt stV.val)
-                (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)))
+                (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)))
             (dt.ixIGateFam F hhasP PR.one (dt.igBlk vi ℓ) stV
               (dt.dspTagOf PR.zero PR.one
                 (wmBlk (ixAddr elt stV.val)
-                  (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)))
+                  (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)))
               (dt.igFlag vi ℓ) dt.card_le_ntgDim dt.domN dt.domRd v
               (dt.ixIGateTagFam F hhasP PR.one (dt.igBlk vi ℓ) stV
                 (dt.igFlag vi ℓ) dt.card_le_ntgDim dt.domN dt.domRd v
@@ -1462,15 +1462,15 @@ theorem ixIGs_reachesIn (f₀ : dt.CtlIx → A) :
               (toLex topTup)
               (Fin.last (dt.domNr (dt.dspTagOf PR.zero PR.one
                 (wmBlk (ixAddr elt stV.val)
-                  (DrawTag.arg (toLex (dt.igBlk vi ℓ)) :
-                    DrawTag R P dt.KIx))))))
+                  (Tag.arg (toLex (dt.igBlk vi ℓ)) :
+                    Tag R P dt.KIx))))))
             (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV v) := by
         simp only [ixIGFs]
         rw [dif_pos ℓ.isLt, if_pos hp]
       rw [hFa]
       have hrdt := dt.domRd (dt.dspTagOf PR.zero PR.one
         (wmBlk (ixAddr elt stV.val)
-          (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)))
+          (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)))
       have hct := dt.card_le_ntgDim
       have hwPt := hwP
       refine TMData.ReachesIn.mono ?_
@@ -1548,7 +1548,7 @@ end IGsRun
 gates, the walk-back at the branch checkpoint, the branching dispatch and its
 walk-back, the matrix, and the walk-back at the fold checkpoint. The skipping
 branch is shorter and is charged the same. -/
-noncomputable def ixRoundCost (dt : DrawData L) (A : Type) (vi : dt.VarIx)
+noncomputable def ixRoundCost (dt : Data L) (A : Type) (vi : dt.VarIx)
     (w wP wR wK : ℕ) : ℕ :=
   1 + ((dt.ixGateCost A w wP + 2) * dt.nIn vi + 1) + 1 + 1 + 1 +
     ((dt.ixMatCost A vi w wP wR wK + 2) * dt.natOf vi + 1) + 1
@@ -1574,7 +1574,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -1822,9 +1822,9 @@ theorem ixRound_reachesIn (stV : TapeSt dt A R P I)
 include hrules hR hlin hix hsepP hhasP hinj heltP hgap hord htop hbot hwork hv hvi
   he₀ hmono hup hvh hxdUse hwP hwR hwK hcostR in
 /-- **One round of the VAL loop, run — threaded**: as
-`DescriptiveComplexity.Draw.DrawData.round_run` with no boundary discipline
+`DescriptiveComplexity.Draw.Data.round_run` with no boundary discipline
 assumed, so it applies at every address of the outer sweep. The tape ends
-in `DescriptiveComplexity.Draw.DrawData.roundEndSt`, which is the entry state
+in `DescriptiveComplexity.Draw.Data.roundEndSt`, which is the entry state
 unless the round's matrix ran and contained a stage atom. -/
 theorem ixRound_run_thread_reachesIn (stV : TapeSt dt A R P I)
     (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = ixMark elt v)
@@ -2082,9 +2082,9 @@ theorem ixRound_run (stV : TapeSt dt A R P I)
 include hrules hR hlin hix hsepP hhasP hinj heltP hgap hord htop hbot hwork hv hvi
   he₀ hmono hup hvh hxdUse hwP hwR hwK hcostR in
 /-- **One round of the VAL loop, run — threaded**: as
-`DescriptiveComplexity.Draw.DrawData.ixRound_run` with no boundary discipline
+`DescriptiveComplexity.Draw.Data.ixRound_run` with no boundary discipline
 assumed, so it applies at every address of the outer sweep. The tape ends
-in `DescriptiveComplexity.Draw.DrawData.ixRoundEndSt`, which is the entry state
+in `DescriptiveComplexity.Draw.Data.ixRoundEndSt`, which is the entry state
 unless the round's matrix ran and contained a stage atom. -/
 theorem ixRound_run_thread (stV : TapeSt dt A R P I)
     (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = ixMark elt v)
@@ -2119,7 +2119,7 @@ theorem ixRound_run_thread (stV : TapeSt dt A R P I)
 
 end RoundRun
 
-end DrawData
+end Data
 
 end Draw
 

@@ -12,13 +12,13 @@ import DescriptiveComplexity.Problems.Wide.DrawAddr
 # One variable's machinery, instantiated: the gates' and the matrix's legs
 
 The two abstract machineries of
-`DescriptiveComplexity.Draw.DrawData.var_run` – the gates' run to the verdict
+`DescriptiveComplexity.Draw.Data.var_run` – the gates' run to the verdict
 checkpoint and the per-round matrix pass – discharged at the program's own
-rules (`DescriptiveComplexity.Draw.DrawData.varRuleF` at
-`DescriptiveComplexity.Draw.DrawData.varArgsOf`): each is a walk-back into
+rules (`DescriptiveComplexity.Draw.Data.varRuleF` at
+`DescriptiveComplexity.Draw.Data.varArgsOf`): each is a walk-back into
 the sub-machinery's first checkpoint, the assembled run
-(`DescriptiveComplexity.Draw.DrawData.gates_run`,
-`DescriptiveComplexity.Draw.DrawData.matrix_run`), and the walk-back at the
+(`DescriptiveComplexity.Draw.Data.gates_run`,
+`DescriptiveComplexity.Draw.Data.matrix_run`), and the walk-back at the
 landing checkpoint.
 -/
 
@@ -30,9 +30,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -77,8 +77,8 @@ variable (tOf : Fin (dt.arOf vi) → dt.X.Tag)
 variable (htagOf : ∀ ℓ : Fin (dt.arOf vi),
   dt.dspTagOf PR.zero PR.one
     (wmBlk st.mir
-      (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-        Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)) =
+      (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+        Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)) =
   tOf ℓ)
 
 include hrules hR hlin hord htop hbot hv hvi hwkSt hcompatOf htagOf in
@@ -345,8 +345,8 @@ omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite
   [Finite dt.KIx] hrules hR hv hwkSt in
 include hlin hord htop in
 /-- **The background bundle, discharged at a boundary state**: the five
-slot equations `DescriptiveComplexity.Draw.DrawData.var_run`'s kits read are
-definitional in `DescriptiveComplexity.Draw.DrawData.back`, given the marker
+slot equations `DescriptiveComplexity.Draw.Data.var_run`'s kits read are
+definitional in `DescriptiveComplexity.Draw.Data.back`, given the marker
 and the order facts. -/
 theorem varBg_back (stV : TapeStD dt A R P)
     (hwkV : stV.wk = fun r => r = v) :
@@ -444,16 +444,16 @@ theorem varMachineUngated_run (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (ℓ₀ : Fin (dt.arOf vi))
     (hbad : ¬((∀ t' : dt.X.Tag,
         wmBlk st.mir
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko vi) ℓ₀) :
-            Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)
+            Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)
           (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ₀) ∧
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ₀, decRho dt.ly PR.zero PR.one
           (wmBlk st.mir
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko vi) ℓ₀) :
-              Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)))))
+              Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)))))
     (f₀ : dt.CtlIx → A)
     {rest' : (Univ A R P dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     (hoff : ∀ r, r ≠ v → rest' r = dt.back RF.cell PR.zero PR.one dt.dd0Le st r)
@@ -574,7 +574,7 @@ noncomputable def valCarry (s : Univ A R P dt.KIx dt.dd → Prop) :
     Univ A R P dt.KIx dt.dd :=
   if h : ∃ u : Univ A R P dt.KIx dt.dd,
       ¬s u ∧ ∀ w, WMLt WMLe u w → s w then h.choose
-  else (DrawTag.sym, fun _ => Classical.ofNonempty)
+  else (Tag.sym, fun _ => Classical.ofNonempty)
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P]
   [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
@@ -643,11 +643,11 @@ order characterization. -/
 private theorem wmIncr_lexRel_of_wmLe
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {s t : Univ A R P dt.KIx dt.dd → Prop} (hi : WMIncr WMLe s t) :
-    WMIncr (lexRel (· ≤ · : DrawTag R P dt.KIx → DrawTag R P dt.KIx → Prop)
+    WMIncr (lexRel (· ≤ · : Tag R P dt.KIx → Tag R P dt.KIx → Prop)
       (tupLeLex (A := A) (d := dt.dd))) s t := by
   obtain ⟨u, hu, hab, ht⟩ := hi
   have hLt : ∀ x y : Univ A R P dt.KIx dt.dd,
-      WMLt (lexRel (· ≤ · : DrawTag R P dt.KIx → DrawTag R P dt.KIx → Prop)
+      WMLt (lexRel (· ≤ · : Tag R P dt.KIx → Tag R P dt.KIx → Prop)
         (tupLeLex (A := A) (d := dt.dd))) x y ↔ WMLt WMLe x y := by
     intro x y
     constructor
@@ -674,7 +674,7 @@ theorem readAcc_varFM
     {a₀ : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (fG : dt.CtlIx → A)
     {Ps : (Fin dt.ki → ((Fin dt.dd → A) → Prop)) → Prop}
@@ -767,8 +767,8 @@ theorem readAcc_varFM
     have hab : ∀ y : Univ A R P dt.KIx dt.dd,
         WMLt WMLe (argIn dt.ko c, u₂) y → mV w y := by
       intro y hy
-      have hyL : WMLt (lexRel (· ≤ · : DrawTag R P dt.KIx →
-          DrawTag R P dt.KIx → Prop) (tupLeLex (A := A) (d := dt.dd)))
+      have hyL : WMLt (lexRel (· ≤ · : Tag R P dt.KIx →
+          Tag R P dt.KIx → Prop) (tupLeLex (A := A) (d := dt.dd)))
           (argIn dt.ko c, u₂) y :=
         ⟨(Wide.tagTupleLe_iff_lexRel _ y).mp ((hord _ y).mp hy.1),
           fun hc => hy.2 ((hord y _).mpr
@@ -814,7 +814,7 @@ theorem readAcc_varFM
     have hnew : ∀ i : ℕ, i < dt.ki →
         (dt.readAcc PR.one
           ((dt.varArgsOf PR.zero PR.one vi).storeCarry
-            (tagBlk (argIn dt.ko c : DrawTag R P dt.KIx))
+            (tagBlk (argIn dt.ko c : Tag R P dt.KIx))
             ((dt.varArgsOf PR.zero PR.one vi).postFold
               (dt.roundFX RF hord vi st v mV semOf
                 (dt.varFM RF hord vi st v mV semOf fG w) w)
@@ -913,7 +913,7 @@ theorem accVerdict_varFM
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV aT) u)
     (fG : dt.CtlIx → A)
@@ -975,7 +975,7 @@ theorem postLeaf_roundFX [LinearOrder (dt.X.Map A)]
     (wa : Fin (dt.nOf vi) → dt.X.Map A)
     (hENCa : ∀ j : Fin (dt.nOf vi),
       wmBlk (dt.lvSet (dt.roundSt st (mV a)) vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly PR.zero PR.one (wa j))
     (hOlda : ∀ (i : dt.d.B.ι) (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf vi)),
       (dt.roundSt st (mV a)).old i
@@ -1007,7 +1007,7 @@ theorem accVerdict_varFM_qfValue [LinearOrder (dt.X.Map A)]
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV aT) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -1020,7 +1020,7 @@ theorem accVerdict_varFM_qfValue [LinearOrder (dt.X.Map A)]
         dt.igPassP RF PR.zero PR.one vi (dt.roundSt st (mV a)) ℓ)
       (j : Fin (dt.nOf vi)),
       wmBlk (dt.lvSet (dt.roundSt st (mV a)) vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
         encMap dt.ly PR.zero PR.one (wOf a hp j))
     (hOld : ∀ (a : ιV)
       (hp : ∀ ℓ : Fin (dt.nIn vi),
@@ -1170,13 +1170,13 @@ end Threads
 
 A round's exit state is its entry state unless the round's matrix ran a
 stage atom, which normalizes SAV and TARGET
-(`DescriptiveComplexity.Draw.DrawData.roundEndSt`). Whether it ran at all is
+(`DescriptiveComplexity.Draw.Data.roundEndSt`). Whether it ran at all is
 the gates' verdict, read off the control *entering* the round — so the two
 have to be iterated **together**, one pair per round, exactly as the
 spine's nodes are one scale up.
 
 What is threaded is not the state but the **two scratch registers**
-(`DescriptiveComplexity.Draw.DrawData.roundEndSt_eq`): every other register
+(`DescriptiveComplexity.Draw.Data.roundEndSt_eq`): every other register
 is the machinery's entry state's, definitionally. That is what keeps the
 semantic packs available — a pack reads the tape state through the levels'
 register sets, i.e. through the mirror and VAL alone, so one family
@@ -1189,7 +1189,7 @@ variable {ιV : Type} [LinearOrder ιV] [Finite ιV]
 variable (mV : ιV → Univ A R P dt.KIx dt.dd → Prop)
 
 /-- The two registers one round of the VAL loop can change. -/
-abbrev Scratch (dt : DrawData L) (A R P : Type) : Type :=
+abbrev Scratch (dt : Data L) (A R P : Type) : Type :=
   (Univ A R P dt.KIx dt.dd → Prop) × (Univ A R P dt.KIx dt.dd → Prop)
 
 /-- **The state a round is entered in**: the machinery's entry state with
@@ -1244,7 +1244,7 @@ noncomputable def varStT (fG : dt.CtlIx → A) (a : ιV) : TapeStD dt A R P :=
 
 variable (v) in
 /-- The control family of the VAL loop, threaded — the twin of
-`DescriptiveComplexity.Draw.DrawData.varFM`. -/
+`DescriptiveComplexity.Draw.Data.varFM`. -/
 noncomputable def varFMT (fG : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
   (dt.varPairT RF hord vi st v mV semT fG a).2
 
@@ -1257,7 +1257,7 @@ noncomputable def varStE (fG : dt.CtlIx → A) (a : ιV) : TapeStD dt A R P :=
 
 variable (v) in
 /-- **The exit control of one VAL round, threaded** — the twin of
-`DescriptiveComplexity.Draw.DrawData.roundFX`, at the state the round's
+`DescriptiveComplexity.Draw.Data.roundFX`, at the state the round's
 atoms actually run at. -/
 noncomputable def varFXT (fG : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
   dt.roundCtlT RF hord PR.zero_ne_one vi (dt.varStT RF hord vi st v mV semT fG a) v
@@ -1360,13 +1360,13 @@ theorem varFMT_covers {a a' : ιV} (hlt : a < a')
 
 The VAL loop's rounds run at states that differ from the machinery's entry
 state in SAV and TARGET alone, and every control they compute is blind to
-that difference (`DescriptiveComplexity.Draw.DrawData.roundCtlT_eq_roundCtl`,
-`DescriptiveComplexity.Draw.DrawData.roundCtl_congr_scratch`). What the
+that difference (`DescriptiveComplexity.Draw.Data.roundCtlT_eq_roundCtl`,
+`DescriptiveComplexity.Draw.Data.roundCtl_congr_scratch`). What the
 threading *can* change is the semantic pack, since a family indexed by the
 scratch registers may pick different points at different registers; so the
 bridge is stated at a pack that is one unthreaded pack transported
 (`semCastT`), which is what a reduction supplies
-(`DescriptiveComplexity.Draw.DrawData.gatedSem`, whose points are the
+(`DescriptiveComplexity.Draw.Data.gatedSem`, whose points are the
 address's blocks and nothing else). -/
 
 section ThreadBridge
@@ -1445,7 +1445,7 @@ omit [Finite R] [Finite P] [Finite dt.KIx] in
 round, `varFXT_eq_roundFX`, the backgrounds agreeing because a round's exit
 state is the round state up to SAV and TARGET. This is the bridge between
 the control the machine's run produces and the control
-`DescriptiveComplexity.Draw.DrawData.accVerdict_leafP` reads. -/
+`DescriptiveComplexity.Draw.Data.accVerdict_leafP` reads. -/
 theorem varFMT_eq_varFM
     (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u)
     (fG : dt.CtlIx → A) (a : ιV) :
@@ -1497,8 +1497,8 @@ variable (hDom : ∀ ℓ : Fin (dt.arOf vi),
   ExpExpansion.DomHolds (X := dt.X)
     (tOf ℓ, decRho dt.ly PR.zero PR.one
       (wmBlk st.mir
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx))))
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx))))
 
 variable (v) in
 /-- **The control the gates leave**, at the reduction's own budgets — what
@@ -1527,8 +1527,8 @@ threads, every leg the assembled runs of the layers below. -/
 theorem varMachine_run
     (hwitOf : ∀ (ℓ : Fin (dt.arOf vi)) (t' : dt.X.Tag),
       wmBlk st.mir
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
@@ -1563,8 +1563,8 @@ theorem varMachine_run
   have htagOf : ∀ ℓ : Fin (dt.arOf vi),
       dt.dspTagOf PR.zero PR.one
         (wmBlk st.mir
-          (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-            Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)) =
+          (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+            Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)) =
       tOf ℓ :=
     fun ℓ => dspTagOf_eq_of_onehot (hwitOf ℓ)
   -- the gates' final control
@@ -1662,17 +1662,17 @@ theorem varMachine_run
 include hrules hR hlin hord htop hbot hwork hv hvi hwkSt hcompatOf hbotV
   htopV hmV0 hIncr hTestT hTestF hmir hbotSt hDom in
 /-- **One variable's machinery, fully instantiated — threaded**: as
-`DescriptiveComplexity.Draw.DrawData.varMachine_run` with no boundary
+`DescriptiveComplexity.Draw.Data.varMachine_run` with no boundary
 discipline assumed, so it applies at every address of a sweep and not
 only at the one whose SAV and TARGET the advance happens to have left
 behind. The rounds run at the states the thread produces, and the loop
-ends in `DescriptiveComplexity.Draw.DrawData.varStE` at the top, which
+ends in `DescriptiveComplexity.Draw.Data.varStE` at the top, which
 differs from the entry state in SAV and TARGET alone. -/
 theorem varMachine_run_thread
     (hwitOf : ∀ (ℓ : Fin (dt.arOf vi)) (t' : dt.X.Tag),
       wmBlk st.mir
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
@@ -1695,8 +1695,8 @@ theorem varMachine_run_thread
   have htagOf : ∀ ℓ : Fin (dt.arOf vi),
       dt.dspTagOf PR.zero PR.one
         (wmBlk st.mir
-          (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-            Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx)) =
+          (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+            Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx)) =
       tOf ℓ :=
     fun ℓ => dspTagOf_eq_of_onehot (hwitOf ℓ)
   set fG := dt.varFG (PR := PR) RF vi st v tOf f₀ with hfG
@@ -1792,7 +1792,7 @@ end VarCapstone
 
 end VarInst
 
-end DrawData
+end Data
 
 end Draw
 

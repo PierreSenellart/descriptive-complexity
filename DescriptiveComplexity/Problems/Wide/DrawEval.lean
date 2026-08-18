@@ -81,9 +81,9 @@ def EvalSh (nv : ℕ) (SM : Type) (ShM : SM → Type) : EvalSite nv SM → Type
   | .chk _ => EvalChkRule
   | .sub s => ShM s
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q PM SM : Type} {nv : ℕ}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q PM SM : Type} {nv : ℕ}
 variable (zero one : A) {ShM : SM → Type}
 
 /-- **The rules of the evaluation's spine**: per checkpoint the walk back
@@ -225,7 +225,7 @@ theorem evalSep
       exact absurd hg.2 hg'.2
   | .sub s, ρ, ρ' => exact hsepM s ρ ρ' f g hg hg' hph
 
-end DrawData
+end Data
 
 end Draw
 

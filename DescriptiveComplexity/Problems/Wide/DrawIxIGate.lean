@@ -13,7 +13,7 @@ The mirror of `DescriptiveComplexity.Problems.Wide.DrawIxGate` at the **VAL
 register**: one gate block per quantified level of a variable's pack, read off
 the round's register content instead of the mirror, its verdict conjoined into
 the level's polarity flag. The registers the trips go to are the gates' own
-(`DescriptiveComplexity.Draw.DrawData.ixGateTagCell`/`ixGateECell`), so only the
+(`DescriptiveComplexity.Draw.Data.ixGateTagCell`/`ixGateECell`), so only the
 families, the guards and the run are restated here.
 -/
 
@@ -25,9 +25,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -52,13 +52,13 @@ variable {vAdr : Univ A R P dt.KIx dt.dd → Prop}
 /-- **An inner gate's leaf at the file, over the wide valuation**: the tag's
 domain sentence at the decoded assignment of the block value the VAL marks'
 address holds. -/
-noncomputable def ixIGateLeafP (dt : DrawData L) {I : Type}
+noncomputable def ixIGateLeafP (dt : Data L) {I : Type}
     (b : Fin dt.ko ⊕ Fin dt.ki) (st : TapeSt dt A R P I) (t : dt.X.Tag)
     (hnt : (dt.domPk t).n ≤ dt.eDim) {elt : I → Univ A R P dt.KIx dt.dd}
     (zero one : A) (v : Fin dt.eDim → A) : Prop :=
   dt.domLeaf t
     (decRho dt.ly zero one
-      (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))
     fun j => v (Fin.castLE hnt j)
 
 variable (vAdr) in
@@ -212,7 +212,7 @@ theorem ctlBit_ixIGateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     dt.ctlBit one
         (dt.ixIGateTagFam F hhas one b st flag hc hn hrd vAdr f₀
           (Fin.last (Fintype.card dt.X.Tag))) (dt.gateTagC hc t') ↔
-      wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+      wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') := by
   rw [ctlBit_ixIGateTagFam_last hzo f₀ t',
     ← ixAddr_elt hinj st.val
@@ -236,12 +236,12 @@ value the VAL enumeration produces. -/
 theorem igTagsAre_ixIGateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
       (dt.dspTagOf zero one
-        (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+        (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))
       (dt.ixIGateTagFam F hhas one b st flag hc hn hrd vAdr f₀
         (Fin.last (Fintype.card dt.X.Tag))) := by
   classical
   by_cases h : ∃ t₁ : dt.X.Tag, ∀ t' : dt.X.Tag,
-      wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+      wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') ↔ t' = t₁
   · left
     rw [dspTagOf, dif_pos h]
@@ -357,7 +357,7 @@ variable {e₀ : Univ A R P dt.KIx dt.dd} (he₀ : ∀ y, WMLe e₀ y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R P dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable {v v' : Univ A R P dt.KIx dt.dd → Prop}
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
@@ -368,7 +368,7 @@ variable (hm₀ : ∀ r, dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st r t₀ 
 variable (hwkt₀ : (Slot.wk : dt.SlotIx) ≠ t₀)
 variable (hrgt₀ : (Slot.reg : dt.SlotIx) ≠ t₀)
 variable (htag : dt.dspTagOf PR.zero PR.one
-  (wmBlk (ixAddr eltR st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)) = t)
+  (wmBlk (ixAddr eltR st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)) = t)
 variable (f₀ : dt.CtlIx → A)
 
 
@@ -555,7 +555,7 @@ theorem domLeafVal_ixIGateFam (hzo : zero ≠ one)
       dt.ixIGateLeafP (elt := elt) b st t (hn t) zero one (ofLex a) := by
   have hval := dt.domLeafVal_iff t (hn t) (hrd t)
     (decRho dt.ly zero one
-      (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))
     (dt.ixIGateFam F hhas one b st t flag hc hn hrd vAdr f₀ a (Fin.last (dt.domNr t)))
     (fun r => by
       refine (ctlBit_rdf_ixIGateFam hzo f₀ a r).trans ?_
@@ -964,7 +964,7 @@ theorem ctlBit_flag_ixIGate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
           (dt.ixBack F.toLayout zero one dt.dd0Le st vAdr)) flag ↔
       (dt.ctlBit one f₀ flag ∧
         (∀ t' : dt.X.Tag,
-          wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+          wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)
             (encTagTup dt.ly zero one t') ↔ t' = t) ∧
         foldFrom (dt.domPk t).pol (dt.ixIGateLeafP (elt := elt) b st t (hn t) zero one)
           (· ≤ · : A → A → Prop) 0 topTup) := by
@@ -1058,11 +1058,11 @@ theorem ctlBit_flag_ixIGate_domHolds (hzo : zero ≠ one)
           (dt.ixBack F.toLayout zero one dt.dd0Le st vAdr)) flag ↔
       (dt.ctlBit one f₀ flag ∧
         (∀ t' : dt.X.Tag,
-          wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+          wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)
             (encTagTup dt.ly zero one t') ↔ t' = t) ∧
         ExpExpansion.DomHolds (X := dt.X)
           (t, decRho dt.ly zero one
-            (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))) := by
+            (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))) := by
   refine (ctlBit_flag_ixIGate_exit hinj helt hflag hzo f₀).trans
     (and_congr Iff.rfl (and_congr Iff.rfl ?_))
   refine (foldFrom_top (j₀ := 0)
@@ -1071,14 +1071,14 @@ theorem ctlBit_flag_ixIGate_domHolds (hzo : zero ≠ one)
     (fun i _ a => le_topTup i a) (Nat.le_refl 0)).trans ?_
   exact (dt.domHolds_iff_altQuantFrom_domLeaf_pad t
     (decRho dt.ly zero one
-      (wmBlk (ixAddr elt st.val) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)))
     (hn t) topTup).symm
 
 end IGateVerdict
 
 end IGateInst
 
-end DrawData
+end Data
 
 end Draw
 

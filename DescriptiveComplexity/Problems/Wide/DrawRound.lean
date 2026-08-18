@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.DrawEval
 # One round of the VAL loop: inner gates, branch, matrix
 
 The leaf the VAL loop folds is the **gated** matrix
-(`DescriptiveComplexity.Draw.DrawData.leafP`): every ∃-level of the register
+(`DescriptiveComplexity.Draw.Data.leafP`): every ∃-level of the register
 must hold an encoding, and only if every ∀-level does is the matrix read.
 The machinery of a round therefore runs, before the matrix pass, one gate
 block per quantified level of the variable's pack — at the `Sum.inr` blocks
@@ -90,9 +90,9 @@ def roundOwn {PG PX SG SX : Type} (ownG : PG → SG) (ownX : PX → SX) :
   | .rchk => .rchk
   | .matP p => .mat (ownX p)
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q P PG PX SG SX : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q P PG PX SG SX : Type}
 variable (zero one : A) {ShG : SG → Type} {ShX : SX → Type}
 
 /-- **The rules of one round's machinery.** Parameters: the phase
@@ -245,7 +245,7 @@ theorem roundSep
 
 end Hosrc
 
-end DrawData
+end Data
 
 end Draw
 

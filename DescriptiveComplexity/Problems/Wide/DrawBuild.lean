@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.DrawBack
 
 A space-bounded program gets its register file free: the input channel marks the
 cell of each element before the machine starts, and
-`DescriptiveComplexity.Draw.DrawData.back` reads those marks off the layout. A
+`DescriptiveComplexity.Draw.Data.back` reads those marks off the layout. A
 program on a **clock** cannot use that file – the marks lie in the top half of
 the tape and reaching them costs more than the clock allows
 (`DescriptiveComplexity.Problems.Wide.Marks`) – so it lays its own out low on the
@@ -47,7 +47,7 @@ element, and the order successor moves it along as the head moves.
 
 The building phase installs `back` at the file it is building, and off the file
 that background is the blank
-(`DescriptiveComplexity.Draw.DrawData.back_of_not_reg`: the marks are existentials
+(`DescriptiveComplexity.Draw.Data.back_of_not_reg`: the marks are existentials
 over the registers, the register digits are set at registers alone, and the five
 per-cell tracks are clear in the state the machine starts in). So the caller has
 only to say that the background it starts from is blank outside the stretch, and
@@ -59,7 +59,7 @@ is not there to be mistaken for a register.
 
 Guessing is the same sweep with `back` on *both* sides: the stage tracks are what
 changes, everything else rides along
-(`DescriptiveComplexity.Draw.DrawData.back_old_congr`), and the assignment is a
+(`DescriptiveComplexity.Draw.Data.back_old_congr`), and the assignment is a
 **parameter** – which is what makes the statement a guess, since the run exists
 for every certificate. It is the only nondeterminism the clocked program has.
 -/
@@ -74,7 +74,7 @@ open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' Q : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' Q : Type}
 variable [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -86,7 +86,7 @@ variable {I : Type}
 
 /-- **A program lays its register file out.** Sweeping the stretch that holds the
 file, with the pointer walking along, the machine turns the background it starts
-with into `DescriptiveComplexity.Draw.DrawData.back` at that file.
+with into `DescriptiveComplexity.Draw.Data.back` at that file.
 
 Three things make the sweep the file's stretch and no more: every register lies
 in it (`hlo`, `hhi`), the state the background is read at has its five per-cell

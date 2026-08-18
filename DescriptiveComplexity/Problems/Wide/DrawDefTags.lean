@@ -11,16 +11,16 @@ import DescriptiveComplexity.Problems.Wide.DrawArgs
 
 A gate block's branch checkpoint dispatches on the tag its witness flags
 decode. The decoding itself
-(`DescriptiveComplexity.Draw.DrawData.GateTagsAre`) is one-hotness of finitely
+(`DescriptiveComplexity.Draw.Data.GateTagsAre`) is one-hotness of finitely
 many control flags, so it is definable outright. The *total* dispatch
 (`DspTagsAre`) adds a default branch for the block values no point encodes, and
 that branch names a tag – which the interpretation may only do if the tag is
 the same at every instance.
 
-`DescriptiveComplexity.Draw.DrawData.defTag` is chosen from a *nonemptiness* of
+`DescriptiveComplexity.Draw.Data.defTag` is chosen from a *nonemptiness* of
 the tags rather than from a point, exactly so that it is – by proof
 irrelevance, the structure that witnessed the tags inhabited does not survive
-into the value – and `DescriptiveComplexity.Draw.DrawData.uConst_defTag` is that
+into the value – and `DescriptiveComplexity.Draw.Data.uConst_defTag` is that
 fact: one environment is all it takes, and every other names the same tag.
 -/
 
@@ -28,13 +28,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 
 /-- **A gate's decoding is definable**: one-hotness of the witness flags. -/
 theorem uGDefinable_gateTagsAre (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
@@ -67,7 +67,7 @@ theorem uGDefinable_dspTagsAre (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
         (uGDefinable_gateTagsAre hc t').not))).congr fun e f g => ?_
   rw [DspTagsAre, hd e]
 
-end DrawData
+end Data
 
 end Draw
 

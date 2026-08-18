@@ -14,7 +14,7 @@ reaches a configuration whose tape is a named function of a named tape state, so
 nothing has to be said about what the rules leave alone. A **backward** reading
 is handed an arbitrary run and has to recognise the tape, and there the missing
 fact bites: a configuration's tape is of the form
-`DescriptiveComplexity.Draw.DrawData.ixBack` of some tape state only because no
+`DescriptiveComplexity.Draw.Data.ixBack` of some tape state only because no
 rule ever writes the slots the *channel* wrote – the register flag, the two ends,
 the block one-hots, the name coordinates and the padding flag.
 
@@ -136,7 +136,7 @@ end FileSlot
 
 section Keeps
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A Q P : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A Q P : Type}
 
 variable (dt) in
 /-- **A rule keeps the file**: whatever it writes, the slots the channel wrote
@@ -162,7 +162,7 @@ theorem keepsFile_update {ρ : Rule A Q dt.SlotIx P} {t : dt.SlotIx}
 variable (dt) in
 /-- **A rule writes bits**: every slot it leaves is either untouched or one of
 the two designated elements. This is what keeps a tape readable as an
-`DescriptiveComplexity.Draw.DrawData.ixBack`, whose tracks are `bitVal`s. -/
+`DescriptiveComplexity.Draw.Data.ixBack`, whose tracks are `bitVal`s. -/
 def Rule.WritesBits (zero one : A) (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A) (s : dt.SlotIx),
     ρ.wr f g s = g s ∨ ρ.wr f g s = zero ∨ ρ.wr f g s = one
@@ -213,7 +213,7 @@ end Keeps
 
 section Outer
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A Q B G : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A Q B G : Type}
 variable [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 
 omit [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] in
@@ -561,11 +561,11 @@ end Outer
 
 /-! ### Reading a tape back as a tape state -/
 
-namespace DrawData
+namespace Data
 
 section Recognise
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
 variable [Fintype dt.SlotIx]
 
 omit [Fintype dt.SlotIx] in
@@ -782,7 +782,7 @@ end Recognise
 
 section StepTape
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R P K : Type} {c dd : ℕ}
+variable {L : Language.{0, 0}} {dt : Data L} {A R P K : Type} {c dd : ℕ}
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 variable [Language.wide.Structure (Univ A R P K dd)]
 variable [Finite A] [Finite R] [Finite P] [Finite K]
@@ -805,9 +805,9 @@ theorem step_tape_of_shape_tr (hR : PR.table.Reads)
     (htape : x.tape = wideTape (fun r => PR.syElt (rest r)) (PR.syElt PR.blank))
     {r : R} {w : Fin dd → A}
     (hread : (wideData (Univ A R P K dd)).Read
-      (Sum.inr ((DrawTag.ctrl r : DrawTag R P K), w)) (x.tape x.head))
+      (Sum.inr ((Tag.ctrl r : Tag R P K), w)) (x.tape x.head))
     (hwrite : (wideData (Univ A R P K dd)).Write
-      (Sum.inr ((DrawTag.ctrl r : DrawTag R P K), w)) (y.tape x.head))
+      (Sum.inr ((Tag.ctrl r : Tag R P K), w)) (y.tape x.head))
     (hframe : ∀ p, p ≠ x.head → y.tape p = x.tape p) :
     y.tape = wideTape (fun s => PR.syElt
       (if s = v then
@@ -821,7 +821,7 @@ theorem step_tape_of_shape_tr (hR : PR.table.Reads)
     rw [hhead, htape]
     rfl
   rw [hxv] at hread
-  have hread' : PR.table.Read (DrawTag.ctrl r, w) (PR.syElt (rest v)) :=
+  have hread' : PR.table.Read (Tag.ctrl r, w) (PR.syElt (rest v)) :=
     (hR.read _ _).mp hread
   have hg : (fun s => unslot (unpad PR.table.payload_le w) (Sum.inr s)) = rest v := by
     have h2 : PR.syElt (rest v) =
@@ -837,7 +837,7 @@ theorem step_tape_of_shape_tr (hR : PR.table.Reads)
   · rw [hy] at hwrite
     exact hwrite.elim
   · rw [hy] at hwrite
-    have hwrite' : PR.table.Write (DrawTag.ctrl r, w) a' := (hR.write _ _).mp hwrite
+    have hwrite' : PR.table.Write (Tag.ctrl r, w) a' := (hR.write _ _).mp hwrite
     have ha' : a' = symElt PR.zero (PR.table.writePl r (unpad PR.table.payload_le w)) :=
       hwrite'
     funext p
@@ -874,7 +874,7 @@ end StepTape
 
 section Recognising
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [LinearOrder dt.KIx]
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
@@ -1304,7 +1304,7 @@ theorem track_set_of_seq (hR : PR.table.Reads) {Ph Ph₀ : P' → Prop}
 
 end Recognising
 
-end DrawData
+end Data
 
 end Draw
 

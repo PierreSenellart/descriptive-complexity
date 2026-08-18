@@ -14,16 +14,16 @@ decoded tags, and runs the branch's wide element loop, one leaf trip per block
 atom. Every one of those trips goes to the cell of an **encoded tuple**
 (`DescriptiveComplexity.Draw.encTup`) in an argument block. At the elementwise
 file that cell is an element of the universe
-(`DescriptiveComplexity.Draw.DrawData.expTagCell`/`expECell`); at a coarser one it
+(`DescriptiveComplexity.Draw.Data.expTagCell`/`expECell`); at a coarser one it
 is a **register**, the one the layout names by the tuple's coordinates
-(`DescriptiveComplexity.Draw.DrawData.ixEncG_iff`), and the encoding's canonical
+(`DescriptiveComplexity.Draw.Data.ixEncG_iff`), and the encoding's canonical
 padding is what makes the two the same cell
-(`DescriptiveComplexity.Draw.DrawData.elt_reg_encCoord`).
+(`DescriptiveComplexity.Draw.Data.elt_reg_encCoord`).
 
 This file is that reading: the named registers, the generated families over
 them, the guards' arrival and uniqueness, and the atom's run
-(`DescriptiveComplexity.Draw.DrawData.ixExp_run`). As in
-`DescriptiveComplexity.Draw.DrawData.ixStageAtom_reachesIn` the file is carried by
+(`DescriptiveComplexity.Draw.Data.ixExp_run`). As in
+`DescriptiveComplexity.Draw.Data.ixStageAtom_reachesIn` the file is carried by
 one **coherence** hypothesis – the element a register holds the bit of is the
 element its name spells – and everything the semantics says of an elementwise
 run then says of this one.
@@ -37,9 +37,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -282,7 +282,7 @@ theorem tagsAre_ixExpTagFam (hzo : zero ≠ one)
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
       wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (pts ℓ))
     (f₀ : dt.CtlIx → A) :
     (dt.expArgs zero one vi ts e av hk hn hrd).TagsAre
@@ -394,7 +394,7 @@ theorem ixExpESet_ixExpECell_iff (hzo : zero ≠ one)
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
       wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (pts ℓ))
     (a : Lex (Fin dt.eDim → A)) (r : Fin (dt.relNr e τ))
     {f : dt.CtlIx → A} (hf : dt.readLvE f = ofLex a) :
@@ -472,7 +472,7 @@ variable (hrgt₀ : (Slot.reg : dt.SlotIx) ≠ t₀)
 variable (pts : Fin k → dt.X.Map A)
 variable (hENC : ∀ ℓ : Fin k,
   wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-    (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+    (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
     encMap dt.ly PR.zero PR.one (pts ℓ))
 variable (f₀ : dt.CtlIx → A)
 
@@ -708,7 +708,7 @@ theorem expLeafVal_ixExpFam (hzo : zero ≠ one)
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
       wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (pts ℓ))
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A)) :
     dt.expLeafVal one e τ (hn τ) (hrd τ)
@@ -740,7 +740,7 @@ theorem readSac_ixExpIter (hzo : zero ≠ one)
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
       wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (pts ℓ))
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A)) (j : ℕ)
     (hj : j < dt.eDim) :
@@ -887,7 +887,7 @@ include hinj helt in
 omit [Fintype dt.SlotIx] in
 /-- **The verdict the exit control carries**: the atom's slot holds the fold
 of the branch's whole prefix at the points' assignments – the value
-`DescriptiveComplexity.Draw.DrawData.expLeaf`'s prefix takes over every wide
+`DescriptiveComplexity.Draw.Data.expLeaf`'s prefix takes over every wide
 tuple, which `DescriptiveComplexity.Problems.Wide.DrawExp` reads as the
 expansion atom's truth. -/
 theorem ctlBit_avC_ixExp_exit (hzo : zero ≠ one)
@@ -895,7 +895,7 @@ theorem ctlBit_avC_ixExp_exit (hzo : zero ≠ one)
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
       wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (pts ℓ))
     (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
@@ -955,7 +955,7 @@ theorem ctlBit_avC_ixExp_relMap (hzo : zero ≠ one)
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
       wmBlk (ixAddr elt (dt.lvSet st vi (ts ℓ)))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (pts ℓ))
     (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
@@ -983,7 +983,7 @@ end ExpVerdict
 
 
 
-end DrawData
+end Data
 
 end Draw
 

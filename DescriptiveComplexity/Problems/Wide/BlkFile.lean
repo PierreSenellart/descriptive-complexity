@@ -22,7 +22,7 @@ What it can afford is one register per **block and tuple**, which is also all
 that a register's contents ever depend on: the block one-hot goes through
 `DescriptiveComplexity.Draw.tagBlk` alone and the name slots are the tuple, so
 nothing of a tag beyond its block is ever read back
-(`DescriptiveComplexity.Draw.DrawData.ixBack`). This file is that file:
+(`DescriptiveComplexity.Draw.Data.ixBack`). This file is that file:
 `DescriptiveComplexity.blkFile`, one register per
 `DescriptiveComplexity.Wide.BlkIx`, laid out on a stretch of consecutive
 addresses in the block-major order `DescriptiveComplexity.Wide.blkLe`.
@@ -30,7 +30,7 @@ addresses in the block-major order `DescriptiveComplexity.Wide.blkLe`.
 Everything it needs is already general – the interface
 (`DescriptiveComplexity.IxFile`), the walks over it, the construction on a
 stretch (`DescriptiveComplexity.ixSegFile`) and the background
-(`DescriptiveComplexity.Draw.DrawData.ixBack`) – so all that is added here is the
+(`DescriptiveComplexity.Draw.Data.ixBack`) – so all that is added here is the
 instantiation and the two numbers a caller has to check: how many registers
 there are, and that the stretch fits.
 -/
@@ -235,7 +235,7 @@ variable [LinearOrder K] [Finite K] (dd : ℕ)
 variable (R P K) in
 /-- The blockless register and each block, as tags: the alphabet tag stands for
 the blockless one. -/
-def blkTag : Option K → Draw.DrawTag R P K
+def blkTag : Option K → Draw.Tag R P K
   | none => .sym
   | some k => .arg k
 
@@ -317,11 +317,11 @@ theorem blkTag_lt_iff {b b' : Option K} :
   match b, b' with
   | none, none => exact ⟨fun h => absurd rfl h.2, fun h => absurd h (lt_irrefl _)⟩
   | none, some k =>
-    exact ⟨fun _ => Draw.lt_arg (Draw.DrawTag.sym) k (by rintro j ⟨⟩),
+    exact ⟨fun _ => Draw.lt_arg (Draw.Tag.sym) k (by rintro j ⟨⟩),
       fun _ => ⟨trivial, by rintro ⟨⟩⟩⟩
   | some k, none =>
     exact ⟨fun h => h.1.elim, fun h =>
-      absurd (h.trans (Draw.lt_arg (Draw.DrawTag.sym) k (by rintro j ⟨⟩))) (lt_irrefl _)⟩
+      absurd (h.trans (Draw.lt_arg (Draw.Tag.sym) k (by rintro j ⟨⟩))) (lt_irrefl _)⟩
   | some k, some k' =>
     refine ⟨fun h => (Draw.lt_arg_arg k k').mpr (lt_of_le_of_ne h.1 fun hc =>
       h.2 (congrArg some hc)), fun h => ⟨le_of_lt ((Draw.lt_arg_arg k k').mp h), ?_⟩⟩
@@ -360,12 +360,12 @@ theorem blkIxElt_up
     ∃ u' : Wide.BlkIx K A dd, BlkIxUse A K dd u' ∧ blkIxElt R P dd u' = x := by
   obtain ⟨k, hk⟩ := hu
   have hle : tagTupleLe (blkIxElt R P dd u) x := (hord _ _).mp hlt.1
-  have hfst : (blkIxElt R P dd u).1 = Draw.DrawTag.arg k := by
+  have hfst : (blkIxElt R P dd u).1 = Draw.Tag.arg k := by
     change blkTag R P K u.1 = _; rw [hk]; rfl
-  have harg : ∃ k' : K, x.1 = Draw.DrawTag.arg k' := by
+  have harg : ∃ k' : K, x.1 = Draw.Tag.arg k' := by
     by_contra hc
     push Not at hc
-    have hlt' : x.1 < Draw.DrawTag.arg k := Draw.lt_arg x.1 k hc
+    have hlt' : x.1 < Draw.Tag.arg k := Draw.lt_arg x.1 k hc
     rcases hle with hb | ⟨hb, -⟩
     · rw [hfst] at hb
       exact absurd (hb.trans hlt') (lt_irrefl _)

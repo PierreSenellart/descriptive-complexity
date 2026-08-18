@@ -22,9 +22,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -48,7 +48,7 @@ variable (hpassEnc : ∀ (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (ℓ : Fin (dt.nIn vi)),
   dt.ixIGPassP (elt := elt) F PR.zero PR.one vi stV ℓ ↔
     IsEnc dt.ly PR.zero PR.one (wmBlk (ixAddr elt stV.val)
-      (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx)))
+      (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx)))
 variable [Finite dt.KIx] [LinearOrder (dt.X.Map A)]
 
 section Verdict
@@ -62,8 +62,8 @@ variable (mV : ιV → I → Prop)
 of a pack read: the mirror's block at each outer index. -/
 noncomputable def ixMirBlk : Fin dt.ko → (Fin dt.dd → A) → Prop := fun k =>
   wmBlk (ixAddr elt st.mir)
-    (DrawTag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
-      DrawTag R P dt.KIx)
+    (Tag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
+      Tag R P dt.KIx)
 
 variable {dt} in
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -76,8 +76,8 @@ theorem ixMirBlk_of_mir {st st' : TapeSt dt A R P I} (h : st.mir = st'.mir) :
     dt.ixMirBlk (elt := elt) st = dt.ixMirBlk (elt := elt) st' :=
   funext fun k => congrArg
     (fun s => wmBlk (ixAddr elt s)
-      (DrawTag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
-        DrawTag R P dt.KIx)) h
+      (Tag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
+        Tag R P dt.KIx)) h
 
 variable (semOf : ∀ a : ιV,
   (∀ ℓ : Fin (dt.nIn vi),
@@ -88,14 +88,14 @@ variable (semOf : ∀ a : ιV,
 omit [Finite I] [Finite dt.KIx] in
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc in
 /-- **The machinery's verdict is the prefix over the leaf**: every abstract
-input of `DescriptiveComplexity.Draw.DrawData.ixAccVerdict_varFM_qfValue`
+input of `DescriptiveComplexity.Draw.Data.ixAccVerdict_varFM_qfValue`
 discharged — the flags by
-`DescriptiveComplexity.Draw.DrawData.ixCtlBit_roundFX_pass_iff`, the pass by
-`DescriptiveComplexity.Draw.DrawData.ixRoundPass_of_polarities`, the valuation
-and its pack by `DescriptiveComplexity.Draw.DrawData.ixPassW`, the stage reads
-by `DescriptiveComplexity.Draw.DrawData.ixOld_stage_of_dict`, and the two
-leaf readings by `DescriptiveComplexity.Draw.DrawData.ixLeafP_pass_iff` /
-`DescriptiveComplexity.Draw.DrawData.ixLeafP_fail_iff`. -/
+`DescriptiveComplexity.Draw.Data.ixCtlBit_roundFX_pass_iff`, the pass by
+`DescriptiveComplexity.Draw.Data.ixRoundPass_of_polarities`, the valuation
+and its pack by `DescriptiveComplexity.Draw.Data.ixPassW`, the stage reads
+by `DescriptiveComplexity.Draw.Data.ixOld_stage_of_dict`, and the two
+leaf readings by `DescriptiveComplexity.Draw.Data.ixLeafP_pass_iff` /
+`DescriptiveComplexity.Draw.Data.ixLeafP_fail_iff`. -/
 theorem ixAccVerdict_leafP
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
@@ -103,7 +103,7 @@ theorem ixAccVerdict_leafP
     (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       ixAddr elt (mV a) (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -216,8 +216,8 @@ omit [Finite I] [Finite dt.KIx] in
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc in
 /-- **The machinery's verdict at a fixed-point variable is one step of the
 iteration** at the points the working address's outer blocks encode: the
-prefix of `DescriptiveComplexity.Draw.DrawData.ixAccVerdict_leafP` read through
-`DescriptiveComplexity.Draw.DrawData.altQuantFrom_leafP`. -/
+prefix of `DescriptiveComplexity.Draw.Data.ixAccVerdict_leafP` read through
+`DescriptiveComplexity.Draw.Data.altQuantFrom_leafP`. -/
 theorem ixAccVerdict_next
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
@@ -225,7 +225,7 @@ theorem ixAccVerdict_next
     (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       ixAddr elt (mV a) (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -289,8 +289,8 @@ omit [Finite I] [Finite dt.KIx] in
 include hinj hhasP heltP hix hblkP hmono hup hpassEnc in
 /-- **The machinery's verdict at the output variable is the output sentence**
 at the stage the tracks hold: the prefix of
-`DescriptiveComplexity.Draw.DrawData.ixAccVerdict_leafP` read through
-`DescriptiveComplexity.Draw.DrawData.altQuantFrom_leafP_out`. The output
+`DescriptiveComplexity.Draw.Data.ixAccVerdict_leafP` read through
+`DescriptiveComplexity.Draw.Data.altQuantFrom_leafP_out`. The output
 variable is nullary, so the working address's outer blocks encode the empty
 tuple and there is nothing to ask of them — which is why this is the one
 verdict a reduction can take at the *empty* address. -/
@@ -301,7 +301,7 @@ theorem ixAccVerdict_out
     (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
-    (hKin : ∀ (a : ιV) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+    (hKin : ∀ (a : ιV) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
       ixAddr elt (mV a) (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -344,7 +344,7 @@ theorem ixAccVerdict_out
 
 end VerdictOut
 
-end DrawData
+end Data
 
 end Draw
 

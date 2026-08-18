@@ -12,9 +12,9 @@ import DescriptiveComplexity.Problems.Wide.DrawName
 Every trip of the program is aimed by a **naming guard**: this cell is the
 canonically padded cell of the element whose block is `b` and whose first `dd₀`
 coordinates spell a given tuple. The coordinate loops spell it from the control
-directly (`DescriptiveComplexity.Draw.DrawData.nameG`); the leaf reads of the
+directly (`DescriptiveComplexity.Draw.Data.nameG`); the leaf reads of the
 element loops spell an *encoded* tuple
-(`DescriptiveComplexity.Draw.DrawData.encCoord`), and this file says that is a
+(`DescriptiveComplexity.Draw.Data.encCoord`), and this file says that is a
 naming guard the interpretation can write down too.
 
 The reason is the layout, not the data: at each coordinate an encoded tuple
@@ -29,13 +29,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} [L.IsRelational] {dt : DrawData L} {Q : Type}
+variable {L : Language.{0, 0}} [L.IsRelational] {dt : Data L} {Q : Type}
 variable [Fintype Q] [Fintype dt.SlotIx]
 
 /-! ### An encoded coordinate -/
@@ -79,7 +79,7 @@ theorem uReadable_encCoord (c : PtCode dt.X)
 
 omit [L.IsRelational] in
 /-- **A naming guard whose coordinates are readable is definable.** This is
-`DescriptiveComplexity.Draw.DrawData.uGDefinable_nameGF` with its hypothesis in
+`DescriptiveComplexity.Draw.Data.uGDefinable_nameGF` with its hypothesis in
 the form the encoded names supply it. -/
 theorem uGDefinable_nameGF_of_readable {b : Fin dt.ko ⊕ Fin dt.ki}
     {cf : ∀ e : Env L, (Q → e.α) → Fin dt.dd0 → e.α}
@@ -276,7 +276,7 @@ theorem uGDefinable_domLeafVal (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
       exact (uGDefinable_blkAtomHolds (fun j => dt.lvE (Fin.castLE hn j)) κ).congr
         fun _ _ _ => Iff.rfl
 
-end DrawData
+end Data
 
 end Draw
 

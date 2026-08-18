@@ -24,9 +24,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R B : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R B : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
 variable [LinearOrder (NexPh B (EvalPh dt.nv dt.PMF))]
@@ -75,7 +75,7 @@ variable (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
 -- (`wmSetLt_wmSeg_of_not_bot`); a program that builds its own file arranges it
 -- by choosing where to put it.
 variable (hwork : ∀ {r : Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop},
-  (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+  (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
   ∀ u : I, WMSetLt WMLe r (F.cell u))
 variable (hv : WMSetLt WMLe v (F.cell gbot)) (hvi : WMIncr WMLe v v')
 variable {Use : I → Prop}
@@ -120,7 +120,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv 
   hmono hup hvh hxdUse hgap hwP hwR hwK hcostR hbotV htopV hmV0 hIncr hTestT
   hTestF in
 /-- **The clocked evaluation's spine at an arbitrary address**: as
-`DescriptiveComplexity.Draw.DrawData.ixEvalSpine_run_thread` with the gates no
+`DescriptiveComplexity.Draw.Data.ixEvalSpine_run_thread` with the gates no
 longer assumed to pass. Each position takes whichever of the three legs
 its own gates call for, and what the caller owes is only the marker, the
 mirror and the bottom mark — all of which the advance sets and every leg
@@ -193,7 +193,7 @@ dispatch owes, the branched spine over the positions, and the dispatch into the
 **output's** machinery, whose own exit is the accepting phase (the verdict bit
 the accepting predicate reads is that machinery's, so the run has to reach
 it). This is the middle leg of
-`DescriptiveComplexity.Draw.DrawData.nexProg_wideAccept_of_legs`, at an arbitrary
+`DescriptiveComplexity.Draw.Data.nexProg_wideAccept_of_legs`, at an arbitrary
 file and on a clock. -/
 theorem nexIxEvalB_reachesIn
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (NexPh B (EvalPh dt.nv dt.PMF)) I)
@@ -312,10 +312,10 @@ theorem nexIxEvalOutB_reachesIn
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt (stOf (Fin.last dt.nv)).mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : (stOf (Fin.last dt.nv)).mir = ixMark elt v)
     (hbotL : (stOf (Fin.last dt.nv)).bot = fun r => r = (fun _ => False))
@@ -332,10 +332,10 @@ theorem nexIxEvalOutB_reachesIn
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt (stOf (Fin.last dt.nv)).mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (hacc : (dt.varArgsOf PR.zero PR.one none).accBit
       (dt.ixOutCtl (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV
@@ -428,10 +428,10 @@ theorem nexIxEvalOutB_any_reachesIn
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (hwitOf : ∀ (ℓ : Fin (dt.arOf (none : dt.VarIx))) (t' : dt.X.Tag),
       wmBlk (ixAddr elt (stOf (Fin.last dt.nv)).mir)
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko none) ℓ) :
           Fin dt.ko ⊕ Fin dt.ki))) :
-          DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
+          Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx)
         (encTagTup dt.ly PR.zero PR.one t') ↔ t' = tOf ℓ)
     (hmirL : (stOf (Fin.last dt.nv)).mir = ixMark elt v)
     (hbotL : (stOf (Fin.last dt.nv)).bot = fun r => r = (fun _ => False))
@@ -448,10 +448,10 @@ theorem nexIxEvalOutB_any_reachesIn
       ExpExpansion.DomHolds (X := dt.X)
         (tOf ℓ, decRho dt.ly PR.zero PR.one
           (wmBlk (ixAddr elt (stOf (Fin.last dt.nv)).mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko none) ℓ) :
               Fin dt.ko ⊕ Fin dt.ki))) :
-              DrawTag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
+              Tag R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx))))
     (hTestOf : ∀ ℓ u, TestOf ℓ u)
     :
     (wideData (Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)).ReachesIn
@@ -506,7 +506,7 @@ theorem nexIxEvalOutB_any_reachesIn
 
 end Spine
 
-end DrawData
+end Data
 
 end Draw
 

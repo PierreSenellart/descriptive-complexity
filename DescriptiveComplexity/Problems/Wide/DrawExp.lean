@@ -24,9 +24,9 @@ table – or *read leaves*, one bit of one argument point's assignment
 
 This file is the semantic anchor of that loop, the control-scale twin of
 `DescriptiveComplexity.Problems.Wide.DrawLeaf`:
-`DescriptiveComplexity.Draw.DrawData.relMap_iff_altQuantFrom_expLeaf` says the
+`DescriptiveComplexity.Draw.Data.relMap_iff_altQuantFrom_expLeaf` says the
 expanded relation **is** the prefix of
-`DescriptiveComplexity.Draw.DrawData.expLeaf` played from level `0`, and the
+`DescriptiveComplexity.Draw.Data.expLeaf` played from level `0`, and the
 `_pad` variant says the same of the loop the machine actually runs, which
 enumerates *every* loop-variable slot – the levels past the sentence's own
 prefix being read by nobody
@@ -41,9 +41,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} [L.IsRelational] (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} [L.IsRelational] (dt : Data L) {A : Type}
 variable [L.Structure A] [LinearOrder A] [Nonempty A]
 
 /-! ### The leaf of the loop -/
@@ -141,7 +141,7 @@ theorem domHolds_iff_altQuantFrom_domLeaf_pad (t : dt.X.Tag)
   rw [altQuantFrom_pad (P := dt.domLeaf t ρ) hn (Nat.zero_le _) u]
   exact dt.domHolds_iff_altQuantFrom_domLeaf t ρ _
 
-end DrawData
+end Data
 
 end Draw
 

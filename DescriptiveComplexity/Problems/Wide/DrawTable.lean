@@ -21,7 +21,7 @@ it reads and the one it writes, and the direction it moves in.
 
 `DescriptiveComplexity.Draw.Table` is indexed by two arbitrary types – `R`, the
 rules, and `P`, the phases – which are the two halves of
-`DescriptiveComplexity.Draw.DrawTag`. A transition is therefore an element
+`DescriptiveComplexity.Draw.Tag`. A transition is therefore an element
 `(ctrl r, pad w)`: its rule is its **tag** and its tuple carries only the rule's
 *data*, the elements the rule acts at. That is the library's "index rules by
 attribute values, not by the transition" read at the level of the layout, and it
@@ -70,7 +70,7 @@ open Language Structure
 /-- **The universe the reduction emits**: tagged tuples, one block per tag. An
 `abbrev`, so that it is the interpreted universe on the nose and a pair may be
 destructured without ceremony. -/
-abbrev Univ (A R P K : Type) (dd : ℕ) : Type := DrawTag R P K × (Fin dd → A)
+abbrev Univ (A R P K : Type) (dd : ℕ) : Type := Tag R P K × (Fin dd → A)
 
 /-- **The transition table of the emitted machine.** The reduction chooses the
 two designated elements of the alphabet, the payload width, and – rule by rule –
@@ -316,7 +316,7 @@ theorem fire_left (hR : T.Reads) {r : R} {w : Fin c → A} (hg : T.guard r w)
 /-- **The order of the emitted instance is linear**, being the definable order on
 tagged tuples. -/
 theorem isLinOrd_wmLe (hR : T.Reads) : IsLinOrd (WMLe (A := Univ A R P K dd)) := by
-  have h := Wide.isLinOrd_tagTupleLe (Tag := DrawTag R P K) (d := dd) (A := A)
+  have h := Wide.isLinOrd_tagTupleLe (Tag := Tag R P K) (d := dd) (A := A)
   exact ⟨fun x => (hR.le x x).mpr (h.1 x),
     fun x y z h1 h2 => (hR.le x z).mpr (h.2.1 x y z ((hR.le x y).mp h1) ((hR.le y z).mp h2)),
     fun x y h1 h2 => h.2.2.1 x y ((hR.le x y).mp h1) ((hR.le y x).mp h2),
@@ -388,7 +388,7 @@ theorem tr_unique_of_sepOn (hR : T.Reads) {Ph : P → Prop} (hsep : T.SepOn Ph)
     have hu : unpad T.payload_le v = unpad T.payload_le v' := hw
     have hvv : v = v' := by
       rw [← pad_unpad T.payload_le hpv, ← pad_unpad T.payload_le hpv', hu]
-    exact congrArg (fun u => ((DrawTag.ctrl r : DrawTag R P K), u)) hvv
+    exact congrArg (fun u => ((Tag.ctrl r : Tag R P K), u)) hvv
 
 omit [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **A transition has one destination**: it is an equation in the rule. -/
@@ -432,7 +432,7 @@ theorem deterministic (hR : T.Reads) (hsep : T.Sep) :
       have hu : unpad T.payload_le v = unpad T.payload_le v' := hw
       have hvv : v = v' := by
         rw [← pad_unpad T.payload_le hpv, ← pad_unpad T.payload_le hpv', hu]
-      exact congrArg (fun u => ((DrawTag.ctrl r : DrawTag R P K), u)) hvv
+      exact congrArg (fun u => ((Tag.ctrl r : Tag R P K), u)) hvv
   · rintro ⟨t, v⟩ q q' hq hq'
     rw [hR.dst] at hq hq'
     match t with
@@ -463,7 +463,7 @@ the addresses whose non-argument blocks are empty – the ones that hold the sta
 the fixed point – are an initial interval of the tape, and this is the upper bound
 `DescriptiveComplexity.reaches_of_wideRounds` is given. -/
 theorem wmSetLe_logicalTop_reads (hR : T.Reads) {s : Univ A R P K dd → Prop}
-    (hjunk : ∀ τ : DrawTag R P K, (∀ i : K, τ ≠ DrawTag.arg i) → ∀ v : Fin dd → A, ¬s (τ, v)) :
+    (hjunk : ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) → ∀ v : Fin dd → A, ¬s (τ, v)) :
     WMSetLe WMLe s logicalTop := by
   refine (wmSetLe_congr_rel ?_ s logicalTop).mpr
     (wmSetLe_logicalTop Wide.isLinOrd_tupLeLex hjunk)

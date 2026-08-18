@@ -9,24 +9,24 @@ import DescriptiveComplexity.Problems.Wide.DrawSpineSem
 /-!
 # The sweep and MAIN, at the concrete program
 
-`DescriptiveComplexity.Draw.DrawData.reaches_sweep` takes the per-address
+`DescriptiveComplexity.Draw.Data.reaches_sweep` takes the per-address
 evaluation as four hypothesis families — the run itself (`hspine`) and
 three facts about the state it ends in — beside the two cover equations of
 the tape and control families. All six are now theorems about the branched
 evaluation, and this file feeds them in
-(`DescriptiveComplexity.Draw.DrawData.reaches_sweepB`); then it does the same
+(`DescriptiveComplexity.Draw.Data.reaches_sweepB`); then it does the same
 one scale up, defining the stage families the machine iterates and feeding
-`DescriptiveComplexity.Draw.DrawData.reaches_main`
-(`DescriptiveComplexity.Draw.DrawData.reaches_mainB`), after which the only
+`DescriptiveComplexity.Draw.Data.reaches_main`
+(`DescriptiveComplexity.Draw.Data.reaches_mainB`), after which the only
 hypotheses left about the run are *semantic* — which stage converges.
 
 Two joints are crossed here. The evaluation layer is stated at an
 arbitrary program and names the phases `OuterPh (EvalPh dt.nv dt.PMF)`,
-which is `DescriptiveComplexity.Draw.DrawData.PF` up to unfolding — hence
+which is `DescriptiveComplexity.Draw.Data.PF` up to unfolding — hence
 the `@[reducible]` on `PF` and `PEF`, without which instance search does
 not connect the two spellings. And the program's `zero`/`one` are its own
 arguments only up to unfolding, so the program is named once
-(`DescriptiveComplexity.Draw.DrawData.progOf`, reducible) and pinned
+(`DescriptiveComplexity.Draw.Data.progOf`, reducible) and pinned
 explicitly wherever a pack's *type* mentions them.
 -/
 
@@ -38,9 +38,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type} (zero one : A)
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type} (zero one : A)
 variable [LinearOrder A] [Fintype dt.SlotIx]
 variable [Finite A] [Finite dt.KIx]
 variable [Nonempty A] [L.IsRelational] [L.Structure A]
@@ -54,7 +54,7 @@ variable [Finite (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))]
 variable [Finite dt.PF]
 
 /-- **The reduction's own machine**: the program at the packs
-`DescriptiveComplexity.Draw.DrawData.varArgsOf` computes. Reducible, so that
+`DescriptiveComplexity.Draw.Data.varArgsOf` computes. Reducible, so that
 its `zero` and `one` are its arguments for unification and its rules are
 the tower's by `rfl`. -/
 @[reducible] noncomputable def progOf :
@@ -112,7 +112,7 @@ include hR hlin hord htop hbot hbotV htopV hmV0 hIncr hTestT hTestF hwk₀
 /-- **One whole sweep of the evaluation, at the concrete program**: from
 the first address of the stretch to the last, one branched evaluation and
 one advance per address, the tape and control families the sweep's own.
-Every hypothesis `DescriptiveComplexity.Draw.DrawData.reaches_sweep` asks
+Every hypothesis `DescriptiveComplexity.Draw.Data.reaches_sweep` asks
 about the evaluation is discharged here; what is left to the caller is the
 geometry of the stretch and the end marker's position. -/
 theorem reaches_sweepB
@@ -229,7 +229,7 @@ theorem reaches_sweepB
 
 /-! ### The stage families
 
-`DescriptiveComplexity.Draw.DrawData.reaches_main` asks for the sweep and the
+`DescriptiveComplexity.Draw.Data.reaches_main` asks for the sweep and the
 top address's evaluation *per stage*, beside the two equations that say how
 one stage's exit becomes the next one's entry. Those equations are what the
 families below are defined by, so they hold by `rfl`; and the four registers
@@ -474,7 +474,7 @@ theorem stageSt_old
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
-      (t : DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
+      (t : Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot))
@@ -549,7 +549,7 @@ theorem stageEnd_old_trackOf
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
-      (t : DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
+      (t : Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot))
@@ -596,7 +596,7 @@ theorem stageEnd_new_trackOf
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
-      (t : DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
+      (t : Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot))
@@ -668,7 +668,7 @@ theorem stageEnd_conv_iff
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
-      (t : DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
+      (t : Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot))
@@ -727,7 +727,7 @@ theorem stageEnd_conv_of_eq
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
-      (t : DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
+      (t : Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot))
@@ -778,7 +778,7 @@ theorem stageEnd_not_conv_of_ne
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
-      (t : DrawTag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
+      (t : Tag (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
         dt.PF dt.KIx)
       (w : Fin dt.dd → A), mV a (t, w) → ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hlt : WMSetLt WMLe ltpAddr (wmSeg gbot))
@@ -1116,7 +1116,7 @@ end Stages
 
 /-! ### From the initial configuration to MAIN
 
-`DescriptiveComplexity.Draw.DrawData.reaches_startup` stops one rule short of
+`DescriptiveComplexity.Draw.Data.reaches_startup` stops one rule short of
 `reaches_mainB`: the mirror clear leaves the head on the marker at the empty
 address in `clearMir1P .run`, and two steps join that to the evaluation's
 first checkpoint — the exit rule, which steps *right* off the marker, and one
@@ -1213,7 +1213,7 @@ theorem step_chk0_back
 include hR hlin in
 /-- **From the initial configuration to MAIN's starting configuration**: the
 startup, its exit, and the walk back onto the marker. The state is
-`DescriptiveComplexity.Draw.DrawData.startupSt` — the bottom mark at the empty
+`DescriptiveComplexity.Draw.Data.startupSt` — the bottom mark at the empty
 address, the end marker at the logical top, both registers home and every
 stage track still clear — which is what `reaches_mainB` asks of its `st₀`. -/
 theorem reaches_evalEntry
@@ -1287,7 +1287,7 @@ end Entry
 
 end Sweep
 
-end DrawData
+end Data
 
 end Draw
 

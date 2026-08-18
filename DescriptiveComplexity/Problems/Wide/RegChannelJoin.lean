@@ -9,9 +9,9 @@ import DescriptiveComplexity.Problems.Wide.RegChannelPad
 /-!
 # The two legs, joined at any program with the clocked rules
 
-`DescriptiveComplexity.Draw.DrawData.wideRegAccept_of_legs` packages an opening and
+`DescriptiveComplexity.Draw.Data.wideRegAccept_of_legs` packages an opening and
 an evaluation as a yes-instance of `DescriptiveComplexity.WideRegAccept`, and
-`DescriptiveComplexity.Draw.DrawData.reachesIn_openingReg` runs the opening – both
+`DescriptiveComplexity.Draw.Data.reachesIn_openingReg` runs the opening – both
 at an arbitrary program. This file joins them, at an arbitrary program too: the
 opening at the file the channel hands over, the evaluation at the same file, the
 guess writing an assignment's tracks inside the region it sweeps, and the clock
@@ -28,7 +28,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -36,7 +36,7 @@ open Language Structure
 
 section JoinGen
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [Nonempty A] [Finite A] [Finite dt.KIx] [Nonempty dt.KIx]
 variable [L.IsRelational] [L.Structure A] [LinearOrder (dt.X.Map A)]
@@ -122,12 +122,12 @@ theorem wideRegAccept_regLaid_of_rules
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
     (he₀ : ∀ y, WMLe e₀ y)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) PR.zero c) : Univ A
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) PR.zero c) : Univ A
         (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))
     (hargall : ∀ z : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
-      (∃ i : dt.KIx, z.1 = DrawTag.arg i) → WMHasInp z)
+      (∃ i : dt.KIx, z.1 = Tag.arg i) → WMHasInp z)
     (hupinp : ∀ z w : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       WMLe z w → WMHasInp z → WMHasInp w)
@@ -136,7 +136,7 @@ theorem wideRegAccept_regLaid_of_rules
     (hbotm : WMHasInp botE)
     (hleast : ∀ z : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd, WMHasInp z → WMLe botE z)
-    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ DrawTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, botE.1 ≠ Tag.arg i)
     (gtop gbot : dt.NexRegIx A (R') (Option dt.KIx))
     (htopF : ∀ u, (dt.regLaid h hord).le u gtop)
     (hbotF : ∀ u, (dt.regLaid h hord).le gbot u)
@@ -195,7 +195,7 @@ theorem wideRegAccept_regLaid_of_rules
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd),
       Use u → WMLt WMLe (dt.regElt A (R') (Option dt.KIx) u) x →
       ∃ u', Use u' ∧ dt.regElt A (R') (Option dt.KIx) u' = x)
-    (hKin : ∀ (a : ιV) (t : DrawTag (R')
+    (hKin : ∀ (a : ιV) (t : Tag (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx)
         (w : Fin dt.dd → A),
       ixAddr (dt.regElt A (R') (Option dt.KIx)) (mV a) (t, w) →
@@ -275,7 +275,7 @@ theorem wideRegAccept_regLaid_of_rules
 
 end JoinGen
 
-end DrawData
+end Data
 
 end Draw
 

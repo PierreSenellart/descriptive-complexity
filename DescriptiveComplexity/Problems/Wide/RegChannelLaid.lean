@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.DrawName
 /-!
 # The file of the register channel, laid out
 
-`DescriptiveComplexity.Draw.DrawData.diagLaid` reads the segment channel's ruler
+`DescriptiveComplexity.Draw.Data.diagLaid` reads the segment channel's ruler
 as a `DescriptiveComplexity.Draw.LaidFile`: one register per element of the
 universe, in the universe's own order, each naming its own tag's block and its
 own tuple. This file does the same for the **register channel**, whose file has
@@ -32,7 +32,7 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
@@ -40,7 +40,7 @@ open Language Structure
 
 section RegLaid
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
@@ -69,12 +69,12 @@ variable {hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x 
 /-- **The file's layout order is linear**, being the universe's own read on a
 subtype. -/
 theorem isLinOrd_regLaid_le : IsLinOrd (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le :=
-  ⟨fun u => (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx) (A := A) (d := dt.dd)).1 u.1,
-    fun u v w h1 h2 => (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx)
+  ⟨fun u => (Wide.isLinOrd_tagTupleLe (Tag := Tag R' P' dt.KIx) (A := A) (d := dt.dd)).1 u.1,
+    fun u v w h1 h2 => (Wide.isLinOrd_tagTupleLe (Tag := Tag R' P' dt.KIx)
       (A := A) (d := dt.dd)).2.1 u.1 v.1 w.1 h1 h2,
-    fun u v h1 h2 => Subtype.ext ((Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx)
+    fun u v h1 h2 => Subtype.ext ((Wide.isLinOrd_tagTupleLe (Tag := Tag R' P' dt.KIx)
       (A := A) (d := dt.dd)).2.2.1 u.1 v.1 h1 h2),
-    fun u v => (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R' P' dt.KIx)
+    fun u v => (Wide.isLinOrd_tagTupleLe (Tag := Tag R' P' dt.KIx)
       (A := A) (d := dt.dd)).2.2.2 u.1 v.1⟩
 
 /-- **The file's marks tell its registers apart**: a register *is* an element, so
@@ -91,17 +91,17 @@ it is what puts the file in the working region – the argument tags are the
 greatest (`DescriptiveComplexity.Draw.lt_arg`). -/
 theorem hasName_regLaid (zero : A)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd)) :
     (dt.regLaid (A := A) (R' := R') (P' := P') h hord).toLayout.HasName zero :=
-  fun b c => ⟨⟨(DrawTag.arg (toLex b), padTup zero c), harg b c⟩, rfl, rfl⟩
+  fun b c => ⟨⟨(Tag.arg (toLex b), padTup zero c), harg b c⟩, rfl, rfl⟩
 
 
 /-- **The evaluation's working area lies below the file.** A logical address is
 made of argument elements; the file's registers all hold the least marked
 element, which the reduction places *below* the argument tags. So no address the
 evaluation manipulates ever reaches into the file, and the walks that assume it
-(`DescriptiveComplexity.Draw.DrawData.nexIxEvalB_reachesIn`'s `hwork`) apply
+(`DescriptiveComplexity.Draw.Data.nexIxEvalB_reachesIn`'s `hwork`) apply
 unchanged.
 
 This is the one thing the reduction owes its own marking, and the reason the
@@ -111,9 +111,9 @@ an argument element, and an address holding it would be a register's neighbour
 instead of lying under the file. -/
 theorem work_regLaid {bot : Univ A R' P' dt.KIx dt.dd} (hbot : WMHasInp bot)
     (hleast : ∀ y : Univ A R' P' dt.KIx dt.dd, WMHasInp y → WMLe bot y)
-    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ DrawTag.arg i)
+    (hbotarg : ∀ i : dt.KIx, bot.1 ≠ Tag.arg i)
     {r : Univ A R' P' dt.KIx dt.dd → Prop}
-    (hr : ∀ x : Univ A R' P' dt.KIx dt.dd, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
+    (hr : ∀ x : Univ A R' P' dt.KIx dt.dd, r x → ∃ i : dt.KIx, x.1 = Tag.arg i)
     (u : dt.RegIx (A := A) (R' := R') (P' := P')) :
     WMSetLt WMLe r ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).cell u) := by
   refine wmSetLt_wmRegSeg_of_above h hbot hleast (fun y hy => ?_) u.2
@@ -131,13 +131,13 @@ variable (dt) in
 The register below them – the one the reduction marks so that the file lies
 above the working area – is never part of a logical address. -/
 def RegUse (u : dt.RegIx (A := A) (R' := R') (P' := P')) : Prop :=
-  ∃ i : dt.KIx, (u.1).1 = DrawTag.arg i
+  ∃ i : dt.KIx, (u.1).1 = Tag.arg i
 
 /-- **A named register stands for the element it names**: the `heltP`
 coherence. -/
 theorem elt_reg_regLaid (zero : A)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd))
     (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
     (((dt.regLaid (A := A) (R' := R') (P' := P') h hord).toLayout.reg
@@ -168,16 +168,16 @@ include hord in
 last, so an element above an argument element is an argument element, and the
 reduction marks all of them. This is the `hup` coherence. -/
 theorem up_regLaid
-    (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd, (∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+    (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd, (∃ i : dt.KIx, x.1 = Tag.arg i) →
       WMHasInp x)
     {u : dt.RegIx (A := A) (R' := R') (P' := P')} (hu : dt.RegUse u)
     {x : Univ A R' P' dt.KIx dt.dd} (hlt : WMLt WMLe (u.1 : Univ A R' P' dt.KIx dt.dd) x) :
     ∃ u' : dt.RegIx (A := A) (R' := R') (P' := P'), dt.RegUse u' ∧ (u'.1 : _) = x := by
   obtain ⟨i, hi⟩ := hu
-  have hx : ∃ i : dt.KIx, x.1 = DrawTag.arg i := by
+  have hx : ∃ i : dt.KIx, x.1 = Tag.arg i := by
     by_contra hc
     push Not at hc
-    have hlt' : x.1 < DrawTag.arg i := lt_arg x.1 i hc
+    have hlt' : x.1 < Tag.arg i := lt_arg x.1 i hc
     rcases (hord _ _).mp hlt.1 with hb | ⟨hb, -⟩
     · rw [hi] at hb; exact absurd hb (asymm hlt')
     · rw [hi] at hb; exact absurd hb.symm (ne_of_lt hlt')
@@ -188,10 +188,10 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite A] [Finite R']
 /-- **A logical address is held by the file's registers**: the `hvh`
 coherence. -/
 theorem ixHolds_regLaid
-    (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd, (∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+    (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd, (∃ i : dt.KIx, x.1 = Tag.arg i) →
       WMHasInp x)
     {s : Univ A R' P' dt.KIx dt.dd → Prop}
-    (hs : ∀ x : Univ A R' P' dt.KIx dt.dd, s x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) :
+    (hs : ∀ x : Univ A R' P' dt.KIx dt.dd, s x → ∃ i : dt.KIx, x.1 = Tag.arg i) :
     IxHolds (fun u : dt.RegIx (A := A) (R' := R') (P' := P') => (u.1 : _))
       (dt.RegUse (A := A) (R' := R') (P' := P')) s :=
   fun x hx => ⟨⟨x, hargall x (hs x hx)⟩, hs x hx, rfl⟩
@@ -200,7 +200,7 @@ theorem ixHolds_regLaid
 is the `hxdUse` the stage atom's destination registers ask for. -/
 theorem regUse_reg_regLaid (zero : A)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd))
     (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
     dt.RegUse ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).toLayout.reg
@@ -352,7 +352,7 @@ include hup in
 /-- **A walk to a register fits `regW`.** -/
 theorem hcostR_regLaid (zero : A)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
-      WMHasInp ((DrawTag.arg (toLex b), padTup (dt := dt) zero c) :
+      WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd))
     (v : Univ A R' P' dt.KIx dt.dd → Prop) (b : Fin dt.ko ⊕ Fin dt.ki)
     (c : Fin dt.dd0 → A) :
@@ -402,7 +402,7 @@ end Ends
 
 end RegLaid
 
-end DrawData
+end Data
 
 end Draw
 

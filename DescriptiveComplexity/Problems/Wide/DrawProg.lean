@@ -18,14 +18,14 @@ outer loop – so that `DescriptiveComplexity.Draw.Assembly.prog` and
 its determinism.
 
 The **semantic** parameters ride in one pack per variable
-(`DescriptiveComplexity.Draw.DrawData.VarArgs`): the per-atom and per-block
+(`DescriptiveComplexity.Draw.Data.VarArgs`): the per-atom and per-block
 parameter packs, the loop and fold updates, the stage slot the variable
 writes and the accumulator its verdict is read from. Separation never reads
 any of them, so the assembly is complete before their content is fixed –
 that happens with the runs.
 
 Where the machinery goes, in one glance (the flow of
-`DescriptiveComplexity.Draw.DrawData.varRuleF`): the entry checkpoint enters
+`DescriptiveComplexity.Draw.Data.varRuleF`): the entry checkpoint enters
 the gates; the gates' failing block clears the verdict flag and lands on the
 verdict checkpoint, which either writes `False` into the stage slot and
 leaves, or clears the VAL register and enters the matrix; the matrix's exit
@@ -42,9 +42,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q P : Type}
 
 /-! ### The semantic parameters, per variable -/
 
@@ -162,7 +162,7 @@ theorem varHosrcF (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
 phase it can move to**: the gates, the round and the matrix all stay inside, and
 only the two verdict dispatches leave. This is the fact a
 determinism-after-the-guess argument asks of the evaluation
-(`DescriptiveComplexity.Draw.DrawData.nexProg_uniqueFrom`). -/
+(`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
 theorem varRuleF_dstIn (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
     {emb : dt.VarPhF v → P} (exitPh : P) {S : P → Prop}
     (hemb : ∀ p : dt.VarPhF v, S (emb p)) (hexit : S exitPh)
@@ -411,7 +411,7 @@ theorem prog_blank_mir (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd) :
 
 end Machine
 
-end DrawData
+end Data
 
 end Draw
 

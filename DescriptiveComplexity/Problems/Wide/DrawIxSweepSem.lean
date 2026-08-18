@@ -24,9 +24,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
 variable {P : Type}
@@ -62,22 +62,22 @@ variable (hpassEnc : ∀ (vi : dt.VarIx)
     (ℓ : Fin (dt.nIn vi)),
   dt.ixIGPassP (elt := elt) F PR.zero PR.one vi stV ℓ ↔
     IsEnc dt.ly PR.zero PR.one (wmBlk (ixAddr elt stV.val)
-      (DrawTag.arg (toLex (dt.igBlk vi ℓ)) :
-        DrawTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)))
+      (Tag.arg (toLex (dt.igBlk vi ℓ)) :
+        Tag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)))
 -- The gates' marks-to-shapes bridge at a coarse file: a position is gated
 -- exactly when the blocks of its mirror's **address** below the variable's
 -- arity are encodings. Free at the elementwise file
--- (`DescriptiveComplexity.Draw.DrawData.isEnc_of_gatedAt` and its converse).
+-- (`DescriptiveComplexity.Draw.Data.isEnc_of_gatedAt` and its converse).
 variable (hgateEnc : ∀ (j : Fin dt.nv)
     (st : TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)) I),
   dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st ↔
     ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
       IsEnc dt.ly PR.zero PR.one
         (wmBlk (ixAddr elt st.mir)
-          (DrawTag.arg (toLex ((Sum.inl
+          (Tag.arg (toLex ((Sum.inl
             (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
             Fin dt.ko ⊕ Fin dt.ki))) :
-            DrawTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)))
+            Tag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)))
 variable [Finite dt.KIx]
 
 
@@ -209,8 +209,8 @@ theorem ixStEndT_ride {β : Sort _}
     (Fin.last dt.nv)).trans (hFmir st w)
 
 /-! The branched evaluation's semantic parameter is the conditioned family
-of `DescriptiveComplexity.Draw.DrawData.ixGatedSem`, quantified over the address
-as well: `DescriptiveComplexity.Draw.DrawData.ixStEndB` runs the spine at
+of `DescriptiveComplexity.Draw.Data.ixGatedSem`, quantified over the address
+as well: `DescriptiveComplexity.Draw.Data.ixStEndB` runs the spine at
 `v := w` for an address bound after it. -/
 
 variable (semAtB : ∀ (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx
@@ -316,7 +316,7 @@ variable (f₀ : dt.CtlIx → A)
 /-- **The pair the sweep arrives at each address with**: the base at the
 empty address, and at every increment the previous address's spine exit —
 its marker moved on and its mirror set to the new address, exactly the
-shape `DescriptiveComplexity.Draw.DrawData.reaches_sweep` demands. -/
+shape `DescriptiveComplexity.Draw.Data.reaches_sweep` demands. -/
 noncomputable def ixSweepPair
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     TapeSt dt A R (OuterPh (EvalPh dt.nv dt.PMF)) I × (dt.CtlIx → A) :=
@@ -484,7 +484,7 @@ theorem ixSweepSW_mir (hmir₀ : st₀.mir = fun _ => False)
     rw [dt.ixSweepSW_incr (elt := elt) (aT := aT) F hinj hhasP heltP mV semOf tOf hlin st₀ f₀ hi]
 
 omit [Finite I] [Finite ιV] [LinearOrder (dt.X.Map A)] in
-/-- **`DescriptiveComplexity.Draw.DrawData.reaches_sweep`'s `hwkE`**: the
+/-- **`DescriptiveComplexity.Draw.Data.reaches_sweep`'s `hwkE`**: the
 marker is still at the address when the address's spine ends. -/
 theorem ixSweepStE_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
@@ -542,9 +542,9 @@ theorem ixSweepStE_ltp
 
 /-! ### The SAV/TGT gap
 
-`DescriptiveComplexity.Draw.DrawData.ixEvalSpine_run` asks, at every address, for
+`DescriptiveComplexity.Draw.Data.ixEvalSpine_run` asks, at every address, for
 `hsavOf`/`htgtOf` — the SAV and TARGET registers holding *that address* —
-because `DescriptiveComplexity.Draw.DrawData.ixMatrix_run` reads them there. But
+because `DescriptiveComplexity.Draw.Data.ixMatrix_run` reads them there. But
 the advance refreshes only the marker and the mirror (`reaches_sweep`'s
 `hSW` is `atSt … with mir := …`), so those two registers **ride** the whole
 sweep, and the requirement is met at one address at most. The two lemmas
@@ -618,7 +618,7 @@ theorem ixSweep_new_trackOf
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr F.le (mV a) (mV a'))
     (hKin : ∀ (a : ιV)
-      (t : DrawTag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
+      (t : Tag R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx)
       (w : Fin dt.dd → A), ixAddr elt (mV a) (t, w) →
         ∃ jj : Fin dt.ki, t = argIn dt.ko jj)
     (hTop : ∀ u, dt.InnerFull (fun u => tagBlk u.1) (ixAddr elt (mV aT)) u)
@@ -755,7 +755,7 @@ set_option maxHeartbeats 4000000 in
 -- and the widths' four bounds are unified against them one by one
 omit [LinearOrder (dt.X.Map A)] in
 include hlin hinj hhasP heltP hsepP hix he₀ hmono hup in
-/-- **`DescriptiveComplexity.Draw.DrawData.reaches_sweep`'s `hspine`, at one
+/-- **`DescriptiveComplexity.Draw.Data.reaches_sweep`'s `hspine`, at one
 address**: the whole per-address evaluation runs, whichever legs each
 position's gates call for. -/
 theorem ixReaches_spineB_reachesIn
@@ -769,7 +769,7 @@ theorem ixReaches_spineB_reachesIn
     {gtop gbot : I}
     (htop : ∀ y, F.le y gtop) (hbot : ∀ y, F.le gbot y)
     (hwork : ∀ {r : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop},
-      (∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) →
+      (∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i) →
       ∀ u : I, WMSetLt WMLe r (F.cell u))
     -- the widths a clocked stage atom of any position is priced at
     {wA wG wP wR wK : ℕ}
@@ -912,7 +912,7 @@ end SweepRun
 
 end SweepFamily
 
-end DrawData
+end Data
 
 end Draw
 

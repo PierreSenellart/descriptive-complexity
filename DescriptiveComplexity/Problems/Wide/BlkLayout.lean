@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.DrawName
 
 `DescriptiveComplexity.blkFile` gives a program one register per block and
 tuple. This file reads that as a `DescriptiveComplexity.Draw.LaidFile`, which is
-what the background (`DescriptiveComplexity.Draw.DrawData.ixBack`) and the loops
+what the background (`DescriptiveComplexity.Draw.Data.ixBack`) and the loops
 run against, and checks the two properties a navigation *by name* asks of a
 layout.
 
@@ -35,7 +35,7 @@ The two properties are then:
   block and every name, the register being the name padded.
 
 Together they are the stopping condition of a scan by name
-(`DescriptiveComplexity.Draw.DrawData.nameGF_unique_addr`).
+(`DescriptiveComplexity.Draw.Data.nameGF_unique_addr`).
 -/
 
 namespace DescriptiveComplexity
@@ -48,13 +48,13 @@ open Language Structure
 
 section BlkLayout
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 variable [Finite (Univ A R' P' dt.KIx dt.dd)]
 
-namespace DrawData
+namespace Data
 
 /-- **The file a clocked program lays out, with its layout**: the registers of
 `DescriptiveComplexity.blkFile`, in the block-major order, each naming its own
@@ -166,7 +166,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite A] [Finite R']
 element is the element of the register that names it, and that register is one
 of the used ones. This is the `hvh` the legs ask for. -/
 theorem ixHolds_blkLaid {s : Univ A R' P' dt.KIx dt.dd → Prop}
-    (harg : ∀ x, s x → ∃ i : dt.KIx, x.1 = DrawTag.arg i) :
+    (harg : ∀ x, s x → ∃ i : dt.KIx, x.1 = Tag.arg i) :
     IxHolds (blkIxElt R' P' dt.dd) (BlkIxUse A dt.KIx dt.dd) s := by
   intro x hx
   obtain ⟨i, hi⟩ := harg x hx
@@ -395,11 +395,11 @@ theorem workArg_blkLaid
     (hlog : wideRank (logicalTop (R := R') (P := P') (K := dt.KIx)
       (V := Fin dt.dd → A)) < base)
     {r : Univ A R' P' dt.KIx dt.dd → Prop}
-    (harg : ∀ x, r x → ∃ i : dt.KIx, x.1 = DrawTag.arg i)
+    (harg : ∀ x, r x → ∃ i : dt.KIx, x.1 = Tag.arg i)
     (u : Wide.BlkIx dt.KIx A dt.dd) :
     WMSetLt WMLe r ((dt.blkLaid h hpos hbase).cell u) := by
   have hrel : (WMLe : Univ A R' P' dt.KIx dt.dd → Univ A R' P' dt.KIx dt.dd → Prop) =
-      lexRel (· ≤ · : DrawTag R' P' dt.KIx → DrawTag R' P' dt.KIx → Prop)
+      lexRel (· ≤ · : Tag R' P' dt.KIx → Tag R' P' dt.KIx → Prop)
         (tupLeLex (A := A) (d := dt.dd)) :=
     funext fun x => funext fun y => propext
       ((hord x y).trans (Wide.tagTupleLe_iff_lexRel x y))
@@ -411,7 +411,7 @@ theorem workArg_blkLaid
 
 end Widths
 
-end DrawData
+end Data
 
 end BlkLayout
 

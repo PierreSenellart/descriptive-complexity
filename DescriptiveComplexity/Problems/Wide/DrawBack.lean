@@ -14,7 +14,7 @@ address, and so on. They are all facts about one object: the machine's
 mutable state – its registers, its stage tracks, its markers – laid over the
 permanent marks of `DescriptiveComplexity.Draw.slotMark`. This file is that
 object, `DescriptiveComplexity.Draw.TapeSt`, its presentation
-`DescriptiveComplexity.Draw.DrawData.back` as the `rest` family the pass layer
+`DescriptiveComplexity.Draw.Data.back` as the `rest` family the pass layer
 walks, and the slot equations, proved once: the discharges of
 `DrawRun` will cite them instead of re-deriving per call site.
 
@@ -28,7 +28,7 @@ hold bits **per cell**, anywhere on the tape. The permanent mark slots
 elsewhere, which is what their read-back equations say.
 
 **What indexes the file is a parameter.**
-`DescriptiveComplexity.Draw.DrawData.ixBack` reads a background at an arbitrary
+`DescriptiveComplexity.Draw.Data.ixBack` reads a background at an arbitrary
 index, because a program on a clock cannot give every element of the universe a
 register and nothing here needs it to: a slot depends on the register's block,
 on the tuple it names, on where it sits in the layout order, and on nothing else
@@ -36,12 +36,12 @@ about the index. The state carries the index with it – the four machine
 registers hold a bit *per register* and the stage tracks and markers a bit *per
 cell*, so `DescriptiveComplexity.Draw.TapeSt` takes the index and
 `DescriptiveComplexity.Draw.TapeStD` is the elementwise case.
-`DescriptiveComplexity.Draw.DrawData.back` is that at the
+`DescriptiveComplexity.Draw.Data.back` is that at the
 diagonal – the index the universe itself, the order its own – which is what a
 space-bounded program uses, and every slot equation below is stated there. The
 two ends are already general
-(`DescriptiveComplexity.Draw.DrawData.ixBack_regFirst`,
-`DescriptiveComplexity.Draw.DrawData.ixBack_regLast`): which cell carries them is
+(`DescriptiveComplexity.Draw.Data.ixBack_regFirst`,
+`DescriptiveComplexity.Draw.Data.ixBack_regLast`): which cell carries them is
 a fact about the layout order and about nothing else.
 -/
 
@@ -58,7 +58,7 @@ variable {L : Language.{0, 0}}
 /-- **The machine's mutable state**: the four registers (bits per element),
 the stage tracks and markers (bits per cell). The permanent marks are not
 here – they never change. -/
-structure TapeSt (dt : DrawData L) (A R' P' I : Type) : Type 1 where
+structure TapeSt (dt : Data L) (A R' P' I : Type) : Type 1 where
   /-- The MIRROR register. -/
   mir : I → Prop
   /-- The TARGET register. -/
@@ -80,13 +80,13 @@ structure TapeSt (dt : DrawData L) (A R' P' I : Type) : Type 1 where
 
 /-- **The machine's state at the elementwise file**: one register per element
 of the universe, which is what a space-bounded program has. -/
-abbrev TapeStD (dt : DrawData L) (A R' P' : Type) : Type 1 :=
+abbrev TapeStD (dt : Data L) (A R' P' : Type) : Type 1 :=
   TapeSt dt A R' P' (Univ A R' P' dt.KIx dt.dd)
 
 /-- **The tuple a control names**: the coordinates it computes below `dd₀`, the
 designated zero above – the canonical padding of every register a scan by name
 stops at. -/
-def padTup {L : Language.{0, 0}} {dt : DrawData L} {A : Type}
+def padTup {L : Language.{0, 0}} {dt : Data L} {A : Type}
     (zero : A) (c : Fin dt.dd0 → A) : Fin dt.dd → A :=
   fun j => if h : (j : ℕ) < dt.dd0 then c ⟨j, h⟩ else zero
 
@@ -98,7 +98,7 @@ index to be the universe.
 Bundled rather than passed one at a time because the whole evaluation layer
 carries it, and because a bare family of cells is what a *definition* can take:
 a register file carries proofs as well, and only the statements need those. -/
-structure Layout (dt : DrawData L) (A R' P' I : Type) : Type where
+structure Layout (dt : Data L) (A R' P' I : Type) : Type where
   /-- The address of the register an index names. -/
   cell : I → (Univ A R' P' dt.KIx dt.dd → Prop)
   /-- The order the registers are laid out in. -/
@@ -118,7 +118,7 @@ This is what a navigation-by-name scan asks of its stopping condition, and it is
 where a layout does real work: the elementwise one has it because a register
 *is* its tag and its tuple, and a clocked program's file has it because its
 index carries the block and the tuple and nothing else. -/
-def NameSep {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+def NameSep {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
     (lay : Layout dt A R' P' I) (zero : A) (hdd : dt.dd0 ≤ dt.dd) : Prop :=
   ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (u u' : I), lay.blk u = some b → lay.blk u' = some b →
     (∀ j : Fin dt.dd, dt.dd0 ≤ (j : ℕ) → lay.arg u j = zero) →
@@ -139,7 +139,7 @@ of what a control holds: a mark carries `dd₀` coordinates and nothing reads a
 register's tuple above them, so a file that has one register per named tuple has
 every register the machine can navigate to, and is smaller than one per tuple by
 the factor the padding accounts for. -/
-def HasName {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+def HasName {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
     (lay : Layout dt A R' P' I) (zero : A) : Prop :=
   ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
     ∃ u : I, lay.blk u = some b ∧ lay.arg u = padTup zero c
@@ -151,20 +151,20 @@ this tuple» is read here.
 
 Chosen rather than a field, because the two properties are what a file has to
 prove and this adds nothing to them. -/
-noncomputable def reg {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+noncomputable def reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
     (lay : Layout dt A R' P' I) {zero : A} (hhas : lay.HasName zero)
     (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) : I :=
   (hhas b c).choose
 
 /-- The named register is in the named block. -/
-theorem blk_reg {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+theorem blk_reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
     {lay : Layout dt A R' P' I} {zero : A} (hhas : lay.HasName zero)
     (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
     lay.blk (lay.reg hhas b c) = some b :=
   (hhas b c).choose_spec.1
 
 /-- The named register carries the named tuple, canonically padded. -/
-theorem arg_reg {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+theorem arg_reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
     {lay : Layout dt A R' P' I} {zero : A} (hhas : lay.HasName zero)
     (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
     lay.arg (lay.reg hhas b c) = padTup zero c :=
@@ -182,7 +182,7 @@ This is what the evaluation layer carries. The kits ask for the file alone
 layout alone (`DescriptiveComplexity.Draw.LaidFile.toLayout`); carrying the two
 together is what lets one parameter stand where
 `DescriptiveComplexity.RegFile` stood. -/
-structure LaidFile (dt : DrawData L) (A R' P' I : Type)
+structure LaidFile (dt : Data L) (A R' P' I : Type)
     [LinearOrder A] [LinearOrder R'] [LinearOrder P']
     [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] : Type where
   /-- The address of the register an index names. -/
@@ -200,7 +200,7 @@ structure LaidFile (dt : DrawData L) (A R' P' I : Type)
 
 namespace LaidFile
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' P' I : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 
@@ -218,7 +218,7 @@ end LaidFile
 /-- **The laid file a space-bounded program uses**: one register per element of
 the universe, in the universe's own order, each naming its own tag's block and
 its own tuple. -/
-@[reducible] noncomputable def laidFile {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
+@[reducible] noncomputable def laidFile {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
     [LinearOrder A] [LinearOrder R'] [LinearOrder P']
     [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
     (F : RegFile (Univ A R' P' dt.KIx dt.dd))
@@ -232,20 +232,20 @@ its own tuple. -/
 /-- **The elementwise file's layout order is linear**, given that the universe's
 is and that the two agree – which is the `hord` every diagonal statement of the
 layer already carries. -/
-theorem isLinOrd_laidFile_le {L : Language.{0, 0}} {dt : DrawData L} {A R' P' : Type}
+theorem isLinOrd_laidFile_le {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
     [LinearOrder A] [LinearOrder R'] [LinearOrder P']
     [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
     {F : RegFile (Univ A R' P' dt.KIx dt.dd)}
     {hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y}
     (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd))) :
     IsLinOrd (laidFile (dt := dt) F hord).le :=
-  show IsLinOrd (tagTupleLe (A := A) (Tag := DrawTag R' P' dt.KIx)) from
+  show IsLinOrd (tagTupleLe (A := A) (Tag := Tag R' P' dt.KIx)) from
     (funext fun x => funext fun y => propext (hord x y) :
       (WMLe (A := Univ A R' P' dt.KIx dt.dd)) = tagTupleLe) ▸ hlin
 
-namespace DrawData
+namespace Data
 
-variable (dt : DrawData L) {A R' P' : Type}
+variable (dt : Data L) {A R' P' : Type}
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 
@@ -259,7 +259,7 @@ What the file is indexed by is a parameter, because a clocked program cannot
 give every element of the universe a register and
 nothing here needs it to: a register's contents depend on its **block**, on the
 **tuple** it names, and on where it sits in the layout order, and on nothing
-else about the index. `DescriptiveComplexity.DrawData.back` is this at the
+else about the index. `DescriptiveComplexity.Data.back` is this at the
 diagonal, which is what a space-bounded program uses. -/
 noncomputable def ixBack {I : Type} (lay : Layout dt A R' P' I)
     (zero one : A) (hdd : dt.dd0 ≤ dt.dd)
@@ -299,8 +299,8 @@ and its own tuple. -/
 universe, in the universe's own order, each naming its own tag's block and its
 own tuple. This is what a space-bounded program's register file is, read as a
 `DescriptiveComplexity.Draw.LaidFile`, so that the runs stated at an arbitrary
-file apply to it – its layout is `DescriptiveComplexity.Draw.DrawData.diagLayout`
-on the nose, so its background is `DescriptiveComplexity.Draw.DrawData.back`. -/
+file apply to it – its layout is `DescriptiveComplexity.Draw.Data.diagLayout`
+on the nose, so its background is `DescriptiveComplexity.Draw.Data.back`. -/
 noncomputable def diagLaid (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y) :
     LaidFile dt A R' P' (Univ A R' P' dt.KIx dt.dd) where
@@ -334,7 +334,7 @@ theorem wmLt_diagLaid_le (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
   ⟨fun h => ⟨(hord u u').mpr h.1, fun hc => h.2 ((hord u' u).mp hc)⟩,
     fun h => ⟨(hord u u').mp h.1, fun hc => h.2 ((hord u' u).mpr hc)⟩⟩
 
-/-- **The state, presented as a background**: `DescriptiveComplexity.DrawData.ixBack`
+/-- **The state, presented as a background**: `DescriptiveComplexity.Data.ixBack`
 at the layout a space-bounded program's file has. -/
 noncomputable def back (cell : Univ A R' P' dt.KIx dt.dd → (Univ A R' P' dt.KIx dt.dd → Prop))
     (zero one : A) (hdd : dt.dd0 ≤ dt.dd)
@@ -357,7 +357,7 @@ section IxSlots
 
 Everything a slot of the background is depends on the layout and nothing else,
 so the equations that read one back are stated there once. The diagonal forms
-below are their instances at `DescriptiveComplexity.Draw.DrawData.diagLayout`,
+below are their instances at `DescriptiveComplexity.Draw.Data.diagLayout`,
 kept under their own names because that is what the whole evaluation layer
 rewrites with. -/
 
@@ -639,7 +639,7 @@ theorem back_old_congr (σ : dt.d.B.ι → (Univ A R' P' dt.KIx dt.dd → Prop) 
 /-! ### What a state's scratch registers do not decide
 
 The VAL loop threads SAV and TARGET and nothing else
-(`DescriptiveComplexity.Draw.DrawData.roundEndSt_eq`), so its rounds run at
+(`DescriptiveComplexity.Draw.Data.roundEndSt_eq`), so its rounds run at
 states that differ from the machinery's entry state in those two registers
 alone. `ScratchEq` names that relation, and the lemmas below say what it
 buys: every per-cell mark and track is shared, hence so is the background
@@ -802,7 +802,7 @@ theorem ixNameGF_cell (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
       (lay.blk u = some b ∧
         (∀ j : Fin dt.dd, dt.dd0 ≤ (j : ℕ) → lay.arg u j = zero) ∧
         ∀ j : Fin dt.dd0, lay.arg u (Fin.castLE hdd j) = cf fc j) := by
-  rw [DrawData.nameGF, dt.ixBack_blk_cell hinj, dt.ixBack_pdd_cell hinj]
+  rw [Data.nameGF, dt.ixBack_blk_cell hinj, dt.ixBack_pdd_cell hinj]
   refine and_congr (bitVal_iff hzo) (and_congr (bitVal_iff hzo) ?_)
   exact forall_congr' fun j => iff_of_eq (congrArg (· = cf fc j)
     (dt.ixBack_name_cell hinj u j))
@@ -945,7 +945,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- **The name guard at a register says which register it is**, the coordinates
-read straight off the control: `DescriptiveComplexity.Draw.DrawData.ixNameGF_iff`
+read straight off the control: `DescriptiveComplexity.Draw.Data.ixNameGF_iff`
 at the coordinate slots the copy loops use. -/
 theorem ixNameG_iff (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
     (hsep : lay.NameSep zero hdd) (hhas : lay.HasName zero)
@@ -981,9 +981,9 @@ block is `b`" – because the background is a function of the *address*. At a
 register cell the existential collapses, by injectivity of the
 cell family, and what is left is the mark of the element
 itself. Those three equations are what the navigation-by-name scans read:
-`DescriptiveComplexity.Draw.DrawData.nameG` holds at exactly one cell, the
+`DescriptiveComplexity.Draw.Data.nameG` holds at exactly one cell, the
 canonically padded cell of the element whose coordinates the control holds
-(`DescriptiveComplexity.Draw.DrawData.nameG_unique`), and nowhere off the
+(`DescriptiveComplexity.Draw.Data.nameG_unique`), and nowhere off the
 register file. -/
 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -1051,8 +1051,8 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 element, and every block and tuple names one. -/
 theorem hasName_diagLayout : (dt.diagLayout cell).HasName zero := by
   intro b c
-  refine ⟨(DrawTag.arg (toLex b), padTup zero c), ?_, rfl⟩
-  exact (tagBlk_eq_some_iff (R := R') (P := P') (DrawTag.arg (toLex b)) b).mpr rfl
+  refine ⟨(Tag.arg (toLex b), padTup zero c), ?_, rfl⟩
+  exact (tagBlk_eq_some_iff (R := R') (P := P') (Tag.arg (toLex b)) b).mpr rfl
 
 omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
@@ -1062,10 +1062,10 @@ element whose tag is the block and whose tuple is the padded name. Chosen by
 theorem reg_diagLayout (hdd : dt.dd0 ≤ dt.dd) (b : Fin dt.ko ⊕ Fin dt.ki)
     (c : Fin dt.dd0 → A) :
     (dt.diagLayout cell).reg (dt.hasName_diagLayout (zero := zero)) b c =
-      (DrawTag.arg (toLex b), padTup zero c) :=
+      (Tag.arg (toLex b), padTup zero c) :=
   dt.nameSep_diagLayout (cell := cell) (zero := zero) (hdd := hdd) b _ _
     (Layout.blk_reg _ b c)
-    ((tagBlk_eq_some_iff (R := R') (P := P') (DrawTag.arg (toLex b)) b).mpr rfl)
+    ((tagBlk_eq_some_iff (R := R') (P := P') (Tag.arg (toLex b)) b).mpr rfl)
     (fun j hj => by rw [Layout.arg_reg]; exact dt.padTup_pad zero c hj)
     (fun j hj => dt.padTup_pad zero c hj)
     (fun j => by rw [Layout.arg_reg])
@@ -1186,7 +1186,7 @@ theorem back_regLast
   exact dt.ixBack_regLast (lay := dt.diagLayout cell)
     (show IsLinOrd tagTupleLe from heq ▸ hlin) fun y => (hord y gtop).mp (htop y)
 
-end DrawData
+end Data
 
 end Draw
 

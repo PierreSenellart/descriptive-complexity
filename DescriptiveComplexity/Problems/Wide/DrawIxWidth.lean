@@ -10,12 +10,12 @@ import DescriptiveComplexity.Problems.Wide.DrawIxEval
 
 The clock of the wide machines compares a *product*: the evaluation is charged
 `a * b` with `a` a width and `b` a number of rounds, and
-`DescriptiveComplexity.Draw.DrawData.nexTotal_lt_two_pow'` asks for each factor
+`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'` asks for each factor
 below `2 ^ (k * m)`. The rounds are bounded elsewhere
-(`DescriptiveComplexity.Draw.DrawData.chain_length_le_two_pow`: the VAL loop is an
+(`DescriptiveComplexity.Draw.Data.chain_length_le_two_pow`: the VAL loop is an
 increment chain, injective into the subsets of the registers it is supported
 on). This file bounds the other factor, the width
-`DescriptiveComplexity.Draw.DrawData.ixLegWidth` times the number of spine
+`DescriptiveComplexity.Draw.Data.ixLegWidth` times the number of spine
 positions.
 
 Every layer's cost – an atom's, a matrix's, a gate block's, a round's, a
@@ -145,9 +145,9 @@ theorem varCD_shape (hq16 : 16 ≤ q) {vg rc p : ℕ} (hvg : vg ≤ q ^ 15)
 
 end Arith
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type}
 
 /-! ### One bound for every number a leg's cost is built from -/
 
@@ -158,7 +158,7 @@ enumerations an atom loops over, and the dimensions and arities of the data. The
 bound is asked to be at least sixteen so that the constants written into the
 costs – the thirteen dispatches of a stage atom, the largest of them – are below
 it too. -/
-structure IxWidthBd (dt : DrawData L) (A : Type) (w wP wR wK q : ℕ) : Prop where
+structure IxWidthBd (dt : Data L) (A : Type) (w wP wR wK q : ℕ) : Prop where
   /-- The bound dominates the constants the costs are written with. -/
   cst : 16 ≤ q
   /-- A walk to a named register. -/
@@ -368,9 +368,9 @@ bounds the four walk widths, the two enumerations, and the data's dimensions and
 arities.
 
 This is the first of the two factors the clocked evaluation is charged
-(`DescriptiveComplexity.Draw.DrawData.ixSpineCost_le_mul`); the second is the
+(`DescriptiveComplexity.Draw.Data.ixSpineCost_le_mul`); the second is the
 number of VAL rounds, bounded by
-`DescriptiveComplexity.Draw.DrawData.chain_length_le_two_pow`. -/
+`DescriptiveComplexity.Draw.Data.chain_length_le_two_pow`. -/
 theorem ixLegWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
     dt.ixLegWidth A w wP wR wK * dt.nv ≤ q ^ 25 := by
   classical
@@ -388,7 +388,7 @@ theorem ixLegWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
 the output machinery's and the four joining steps, all below `q ^ 26`. What an
 instantiation owes of the clock's first factor is therefore
 `q ^ 26 ≤ 2 ^ (k · m)`, and of the second the number of VAL rounds
-(`DescriptiveComplexity.Draw.DrawData.chain_length_le_two_pow`). -/
+(`DescriptiveComplexity.Draw.Data.chain_length_le_two_pow`). -/
 theorem ixEvalWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
     dt.ixEvalWidth A w wP wR wK ≤ q ^ 26 := by
   have hq2 : 2 ≤ q := by have := h.cst; omega
@@ -414,7 +414,7 @@ theorem ixEvalWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
   omega
 
 
-end DrawData
+end Data
 
 end Draw
 

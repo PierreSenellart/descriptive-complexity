@@ -14,7 +14,7 @@ Every composite of the layer discharges its run theorem from **one**
 hypothesis about the program – `hrules : ∀ ρ, PR.rules (rEmb ρ) = κ.rule …`,
 "my rules are among yours, under this injection of rule names". For a
 program assembled from sites
-(`DescriptiveComplexity.Draw.DrawData.progAsm`) that hypothesis is
+(`DescriptiveComplexity.Draw.Data.progAsm`) that hypothesis is
 definitional: the rule names are the sigma of the sites' shapes, so a kit's
 rule at site `i` is the program's rule at `⟨i, Sum.inl ρ⟩`, on the nose.
 
@@ -32,9 +32,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q : Type} (zero one : A)
+variable {L : Language.{0, 0}} (dt : Data L) {A Q : Type} (zero one : A)
 variable [LinearOrder A] [Fintype Q] [Fintype dt.SlotIx]
 variable (hzo : zero ≠ one)
 variable (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v)
@@ -166,7 +166,7 @@ theorem prog_hasLeft (i : dt.SF) (ρ : (dt.progAsm zero one hzo args).Sh i)
 /-! ### Time zero: the initial tape is the empty state's background
 
 The pass layer walks the background of
-`DescriptiveComplexity.Draw.DrawData.back`; the initial tape is
+`DescriptiveComplexity.Draw.Data.back`; the initial tape is
 `DescriptiveComplexity.Draw.Prog.initBack`, the marks over the blank. They are
 the same function, at the state where every register and marker is clear –
 which is why the all-blank start needs no initialisation sweep, and what lets
@@ -371,7 +371,7 @@ theorem step_start (hR : (dt.prog zero one hzo args hpl).table.Reads)
 A pass presents the tape as `DescriptiveComplexity.Draw.Prog.trackTapeAt`: the
 walked track's digits computed from a set, every other slot read off the
 background. Since the background of
-`DescriptiveComplexity.Draw.DrawData.back` already carries each register's
+`DescriptiveComplexity.Draw.Data.back` already carries each register's
 digits at its own slot, that presentation **is** the background – which is
 what lets one leg's conclusion be the next leg's hypothesis, whichever track
 each of them walks. -/
@@ -1151,7 +1151,7 @@ COMPARE is a *plain* sweep – one step per address, no register visit – whose
 verdict rides in the state (`DescriptiveComplexity.sweepState`): the passing
 phase exactly while every address below has agreed. Its per-cell question is
 read off the stage tracks, which is what
-`DescriptiveComplexity.Draw.DrawData.compareKit` fixes. -/
+`DescriptiveComplexity.Draw.Data.compareKit` fixes. -/
 
 /-- **The convergence sweep's leg**: from the empty address to the
 end-marked one, the verdict accumulated in the phase. -/
@@ -1531,7 +1531,7 @@ theorem reaches_sweepAdv (hR : (dt.prog zero one hzo args hpl).table.Reads)
     ← dt.trackTape_back zero one hzo args hpl (fun _ _ _ => rfl)
       (dt.back_mir zero one hzo args { dt.atSt st v' with mir := m' })]
 
-end DrawData
+end Data
 
 end Draw
 

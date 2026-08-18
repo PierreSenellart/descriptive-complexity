@@ -197,7 +197,7 @@ omit [Language.wide.Structure A] [Finite A] in
 /-- **The region's size, in the program's own numbers**: the positions outside a
 set of blocks are one per surviving block and per tuple, so their number is
 `k · m` – which is the shape the clock compares against
-(`DescriptiveComplexity.Draw.DrawData.nexTotal_lt_two_pow'`). -/
+(`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'`). -/
 theorem card_avoid_positions {T V : Type} [Finite T] [Finite V] (H : T → Prop) :
     Nat.card {p : T × V // ¬H p.1} = Nat.card {τ : T // ¬H τ} * Nat.card V := by
   classical

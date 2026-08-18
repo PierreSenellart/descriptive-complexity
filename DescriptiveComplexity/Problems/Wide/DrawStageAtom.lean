@@ -125,9 +125,9 @@ def stageOwn {k : ℕ} : StagePh k → StageSite k
   | .cm2P _ => .cm2
   | .sk2P _ => .sk2
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q P : Type} {k : ℕ}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q P : Type} {k : ℕ}
 variable (zero one : A)
 
 section Rules
@@ -302,7 +302,7 @@ can move to**: the save, the clear, the tuple loops, the two resets, the two
 mirror clears and the two seeks all stay inside the machinery's own phases, and
 only the last seek's verdict leaves. This is what a determinism-after-the-guess
 argument asks of the random access
-(`DescriptiveComplexity.Draw.DrawData.nexProg_uniqueFrom`). -/
+(`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
 theorem stageRule_dstIn {S : P → Prop} (hemb : ∀ p : StagePh k, S (emb p))
     (hexit : S exitPh) (i : StageSite k) (ρ : StageSh k i) :
     S (dt.stageRule zero one emb srcTrack srcBlk dstBlk coord bitFlag setBit
@@ -558,7 +558,7 @@ theorem stageSep :
 
 end Rules
 
-end DrawData
+end Data
 
 end Draw
 

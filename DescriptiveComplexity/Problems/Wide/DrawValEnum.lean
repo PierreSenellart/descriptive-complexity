@@ -13,7 +13,7 @@ The variable machinery's VAL loop starts at the empty register, increments
 one address at a time, and stops at the first register content its
 exhaustion test accepts — the *Kin top*, the set of the inner-block
 elements. The enumeration
-`DescriptiveComplexity.Draw.DrawData.var_run` consumes is therefore an
+`DescriptiveComplexity.Draw.Data.var_run` consumes is therefore an
 initial segment of the binary-counter order on subsets, indexed by
 `Fin (n + 1)` — which carries the `LinearOrder` and `Finite` instances the
 run theorem demands, with no subtype order in sight.
@@ -23,7 +23,7 @@ is reachable from the empty one by a finite chain of increments, by strong
 induction on the address rank (`DescriptiveComplexity.bitRank`, the same
 measure `DescriptiveComplexity.reaches_of_wideRounds` walks) —
 `DescriptiveComplexity.wmChain_lt`, the chain's strict monotonicity, and
-`DescriptiveComplexity.Draw.DrawData.exists_valEnum`, the package in exactly
+`DescriptiveComplexity.Draw.Data.exists_valEnum`, the package in exactly
 the run theorem's hypothesis forms.
 -/
 
@@ -144,9 +144,9 @@ end Chain
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
 variable [Finite A] [Finite R] [Finite P]
@@ -160,7 +160,7 @@ variable {dt}
 
 /-- **The VAL loop's enumeration exists**: an increment chain over
 `Fin (n + 1)` from the empty register to the Kin top, in exactly the forms
-`DescriptiveComplexity.Draw.DrawData.var_run` demands — the covers are
+`DescriptiveComplexity.Draw.Data.var_run` demands — the covers are
 machine increments, the top passes the exhaustion test everywhere, every
 earlier register fails it somewhere, and every register of the chain holds
 inner cells alone, the Kin blocks being a final segment of the universe
@@ -175,20 +175,20 @@ theorem exists_valEnum
         WMIncr WMLe (mV a) (mV a')) ∧
       (∀ u, dt.InnerFull (fun u => tagBlk u.1) (mV (Fin.last n)) u) ∧
       (∀ a, a < Fin.last n → ∃ u, ¬dt.InnerFull (fun u => tagBlk u.1) (mV a) u) ∧
-      (∀ (a : Fin (n + 1)) (t : DrawTag R P dt.KIx) (w : Fin dt.dd → A),
+      (∀ (a : Fin (n + 1)) (t : Tag R P dt.KIx) (w : Fin dt.dd → A),
         mV a (t, w) → ∃ j : Fin dt.ki, t = argIn dt.ko j) := by
   classical
   obtain ⟨n, mV, h0, hlast, hchain⟩ := exists_wmChain hlin (dt.kinTop
     (A := A) (R := R) (P := P))
   -- a Kin cell is an inner tag, and conversely
-  have hcvt : ∀ t : DrawTag R P dt.KIx, (∃ j : Fin dt.ki, tagBlk t = some (Sum.inr j)) →
+  have hcvt : ∀ t : Tag R P dt.KIx, (∃ j : Fin dt.ki, tagBlk t = some (Sum.inr j)) →
       ∃ j : Fin dt.ki, t = argIn dt.ko j := by
     rintro t ⟨j, hj⟩
     match t with
     | .arg i =>
       rcases h' : ofLex i with k | j'
       · exact absurd hj (by rw [tagBlk, h']; exact fun hc => nomatch hc)
-      · exact ⟨j', congrArg DrawTag.arg (congrArg toLex h')⟩
+      · exact ⟨j', congrArg Tag.arg (congrArg toLex h')⟩
   -- the Kin cells are a final segment of the universe, so a register at or
   -- below their address holds nothing else
   have hup : ∀ x y : Univ A R P dt.KIx dt.dd,
@@ -239,7 +239,7 @@ theorem exists_valEnum
       · exact hlast ▸ Or.inr (wmChain_lt hlin hchain hlt)
     exact hcvt t (subset_of_wmSetLe hlin hup hle ha)
 
-end DrawData
+end Data
 
 end Draw
 

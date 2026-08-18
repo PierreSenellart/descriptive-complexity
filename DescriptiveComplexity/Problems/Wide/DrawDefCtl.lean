@@ -11,13 +11,13 @@ import DescriptiveComplexity.Problems.Wide.DrawAccCtl
 
 Everything the program keeps in its control is a **bit** – a flag, an
 accumulator, a verdict – and every write of one is
-`DescriptiveComplexity.Draw.DrawData.putVec` or its one-slot special case
+`DescriptiveComplexity.Draw.Data.putVec` or its one-slot special case
 `setCtl`: the named slots take the bits of a family, and every other slot rides
 along. So one lemma per shape settles the whole control layer, given that the
 questions behind the bits are definable.
 
 Reading is the same statement one step simpler:
-`DescriptiveComplexity.Draw.DrawData.readVec` is an existential over the levels of
+`DescriptiveComplexity.Draw.Data.readVec` is an existential over the levels of
 a slot family, and `ctlBit` is a single atom.
 -/
 
@@ -25,13 +25,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 
 /-! ### Reading -/
 
@@ -118,7 +118,7 @@ theorem uStDefinable_initAcc (pol : ℕ → Bool) :
       dt.initAcc e.zero e.one pol f :=
   uStDefinable_putAcc fun j => uGDefinable_const (pol (j : ℕ) = false)
 
-end DrawData
+end Data
 
 end Draw
 

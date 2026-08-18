@@ -18,7 +18,7 @@ per kind a **parameter pack** (`DescriptiveComplexity.Draw.StageArgs` and
 friends) mirroring the machinery's semantic parameters – the matches, the
 control updates, the loop operations, and for the tag branch its
 exclusivity proof – then
-`DescriptiveComplexity.Draw.DrawData.kindRule`/`kindSep`/`kindEntry`:
+`DescriptiveComplexity.Draw.Data.kindRule`/`kindSep`/`kindEntry`:
 the rules, their separation, and the machinery's entry phase.
 
 The packs keep the semantic content where it belongs – it is fixed with
@@ -37,7 +37,7 @@ open Language Structure
 /-! ### The parameter packs -/
 
 /-- **The parameters of a stage atom's machinery** (see
-`DescriptiveComplexity.Draw.DrawData.stageRule`). -/
+`DescriptiveComplexity.Draw.Data.stageRule`). -/
 structure StageArgs (A Q W KB : Type) (dd0 k : ℕ) : Type where
   /-- The source track of each argument position. -/
   srcTrack : Fin k → W
@@ -109,9 +109,9 @@ structure ElemArgs (A Q W : Type) (nr : ℕ) : Type where
   /-- The loop is exhausted. -/
   IsMaxEl : (Q → A) → Prop
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q P : Type}
 
 /-- **The parameter pack of an atom kind's machinery.** -/
 noncomputable def KindArgs {n : ℕ} : MatAtom dt.X dt.d.B n → Type
@@ -165,7 +165,7 @@ variable {dt}
 /-- **A property of an atom kind's phases and its exit holds of every phase it
 can move to**: whichever kind it is, its machinery stays inside its own phases
 and only its verdict leaves. This is what a determinism-after-the-guess argument
-asks of an atom (`DescriptiveComplexity.Draw.DrawData.nexProg_uniqueFrom`). -/
+asks of an atom (`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
 theorem kindDstIn {S : P → Prop} {n : ℕ}
     (κ : MatAtom dt.X dt.d.B n) (args : dt.KindArgs (A := A) (Q := Q) κ)
     {emb : dt.KindPh κ → P} (exitPh : P)
@@ -245,7 +245,7 @@ theorem kindSep (hzo : zero ≠ one) {n : ℕ}
     exact elemSep one Slot.wk Slot.reg args.rdTrack args.MatchOf args.setFlag
       args.initEl args.advEl args.exitSt args.IsMaxEl exitPh hemb
 
-end DrawData
+end Data
 
 end Draw
 

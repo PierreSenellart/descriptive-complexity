@@ -25,13 +25,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L}
+variable {L : Language.{0, 0}} {dt : Data L}
 
 /-! ### The three registers are disjoint -/
 
@@ -265,7 +265,7 @@ end Folds
 
 end Comp
 
-end DrawData
+end Data
 
 end Draw
 

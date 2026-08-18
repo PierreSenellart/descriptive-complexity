@@ -39,8 +39,8 @@ variable {L : Language.{0, 0}} [L.IsRelational] (K : NexKernel L)
 relativized so that the emitted formulas can name its points, and packed at a
 dimension wide enough for a rule's payload. It is `srcData` at the step
 definition the kernel is, so the whole address, control and evaluation layer
-above `DrawData` reads it with nothing added. -/
-noncomputable abbrev kerDt : DrawData (newLang L) :=
+above `Draw.Data` reads it with nothing added. -/
+noncomputable abbrev kerDt : Data (newLang L) :=
   srcData (relExp K.X) K.toStepDef
 
 /-- **A rule's payload fits the dimension**, at the packed kernel: the
@@ -67,9 +67,9 @@ instance : Nonempty (kerDt K).KIx := ⟨kerKIx K⟩
 family the space-bounded reduction uses – a clocked program's tower *is* the
 space-bounded one. -/
 theorem uVarArgsDef_kerDt (v : (kerDt K).VarIx) :
-    DrawData.UVarArgsDef (dt := kerDt K) (Q := (kerDt K).CtlIx) v
+    Data.UVarArgsDef (dt := kerDt K) (Q := (kerDt K).CtlIx) v
       fun e : Env (newLang L) => (kerDt K).varArgsOf e.zero e.one v :=
-  DrawData.uVarArgsDef_varArgsOf (dt := kerDt K) (boolEnv (newLang L)) v
+  Data.uVarArgsDef_varArgsOf (dt := kerDt K) (boolEnv (newLang L)) v
 
 /-- **The accepting predicate of a clocked program at the packed kernel is
 definable**: the phase is decided when the formula is built and the bit it
@@ -78,7 +78,7 @@ theorem uGDefinable_kerAccept {B PE : Type} (p : NexPh B PE) :
     UGDefinable (L := newLang L) (W := (kerDt K).SlotIx)
       fun (e : Env (newLang L)) f _ =>
         p = NexPh.acceptP ∧ ((kerDt K).varArgsOf e.zero e.one none).accBit f :=
-  DrawData.uGDefinable_nexAccept (dt := kerDt K) (uVarArgsDef_kerDt K none) p
+  Data.uGDefinable_nexAccept (dt := kerDt K) (uVarArgsDef_kerDt K none) p
 
 end KerData
 

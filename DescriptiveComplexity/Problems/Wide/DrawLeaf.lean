@@ -19,13 +19,13 @@ The dictionary, fixed here once and for all:
 
 * level `j` of a variable's pack is inner block `j` of the register – the
   free levels included, although the machine reads *those* off the working
-  address's outer blocks (`DescriptiveComplexity.Draw.DrawData.levelVal`);
+  address's outer blocks (`DescriptiveComplexity.Draw.Data.levelVal`);
 * the leaf is the **gated matrix** of
   `DescriptiveComplexity.Problems.Wide.DrawRel` at that valuation
-  (`DescriptiveComplexity.Draw.DrawData.leafP`), so the encodings' gates are
+  (`DescriptiveComplexity.Draw.Data.leafP`), so the encodings' gates are
   part of the leaf and not of the loop.
 
-`DescriptiveComplexity.Draw.DrawData.altQuantFrom_leafP` is the join: the
+`DescriptiveComplexity.Draw.Data.altQuantFrom_leafP` is the join: the
 prefix of the leaf predicate over *all* `ki` blocks, from level `0`, is
 `DescriptiveComplexity.StepDef.next` at the encoded arguments. The two ends
 of the mismatch are paid for by
@@ -45,9 +45,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type}
 variable [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 variable [LinearOrder (dt.X.Map A)]
 
@@ -317,7 +317,7 @@ theorem foldFrom_leafP_top (hzo : zero ≠ one)
   (foldFrom_top_of_ix hLeV hfull).trans
     (altQuantFrom_leafP hzo i σ mb x hx (ixBlk (argIn dt.ko) s))
 
-end DrawData
+end Data
 
 end Draw
 

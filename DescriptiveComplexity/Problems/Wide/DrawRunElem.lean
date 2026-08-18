@@ -38,7 +38,7 @@ reads that one; a clocked program compares the count with its clock.
 Every track the loop touches – the read tracks and a reference track `t₀` the
 tape is presented along – is **backed**: its digits are carried by the
 background at its own slot, which is what
-`DescriptiveComplexity.Draw.DrawData.back` provides and what lets consecutive
+`DescriptiveComplexity.Draw.Data.back` provides and what lets consecutive
 trips walking different tracks share one tape term
 (`DescriptiveComplexity.Draw.trackTape_of_back`).
 

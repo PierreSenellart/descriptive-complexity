@@ -11,24 +11,24 @@ import DescriptiveComplexity.Problems.Wide.DrawRunStage
 # The comparison atoms, instantiated
 
 The first semantic instantiation: the element loop's run at the comparison
-pack `DescriptiveComplexity.Draw.DrawData.cmpArgs`. The enumeration is the
+pack `DescriptiveComplexity.Draw.Data.cmpArgs`. The enumeration is the
 lexicographic order on the narrow tuples, the generated family of
 `DescriptiveComplexity.Draw.elemFam` carries the loop element and the three
 bookkeeping flags, and the two inductions this file contributes are the
 loop's two invariants:
 
 * **the loop element is the round's tuple**
-  (`DescriptiveComplexity.Draw.DrawData.readLv_cmpFam`), so the name guards
+  (`DescriptiveComplexity.Draw.Data.readLv_cmpFam`), so the name guards
   stop at the padded cell of the enumerated tuple and the read bits are the
   two block values' membership bits there;
 * **the flags fold the strict prefix**
-  (`DescriptiveComplexity.Draw.DrawData.cmpFlags_cmpIter`): agreement so far,
+  (`DescriptiveComplexity.Draw.Data.cmpFlags_cmpIter`): agreement so far,
   a difference seen, and the first difference's verdict, over the tuples
   strictly below the round's.
 
-`DescriptiveComplexity.Draw.DrawData.cmp_run` is the machine run; the final
+`DescriptiveComplexity.Draw.Data.cmp_run` is the machine run; the final
 control's verdict bit is characterized against the two tracks' padded bits
-(`DescriptiveComplexity.Draw.DrawData.ctlBit_avC_cmp_run`), which is the form
+(`DescriptiveComplexity.Draw.Data.ctlBit_avC_cmp_run`), which is the form
 `DescriptiveComplexity.Problems.Wide.DrawCmp` turns into the equality and
 order atoms.
 -/
@@ -41,9 +41,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -56,7 +56,7 @@ variable (RF : LaidFile dt A R P I)
 
 /-- **The register set a level's track holds**: the working address for a
 free level, the VAL register for a quantified one – the contents behind
-`DescriptiveComplexity.Draw.DrawData.lvTrack`. -/
+`DescriptiveComplexity.Draw.Data.lvTrack`. -/
 noncomputable def lvSet (st : TapeSt dt A R P I) (v : dt.VarIx)
     (j : Fin (dt.nOf v)) : I → Prop :=
   if (j : ℕ) < dt.arOf v then st.mir else st.val
@@ -76,7 +76,7 @@ theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P I) (v : dt.VarIx)
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] in
 /-- **A level's track is backed by its register set, at the elementwise file**:
-the same statement read at `DescriptiveComplexity.Draw.DrawData.back`, which is
+the same statement read at `DescriptiveComplexity.Draw.Data.back`, which is
 what a space-bounded program's files say. -/
 theorem back_lvTrackD (F : RegFile (Univ A R P dt.KIx dt.dd))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
@@ -194,7 +194,7 @@ variable {zero one hhas vi av isEq j₁ j₂ st vAdr}
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A comparison is blind to the two scratch registers**: it reads the
 levels' register sets, which are the mirror and VAL
-(`DescriptiveComplexity.Draw.DrawData.lvSet`), and its background at the
+(`DescriptiveComplexity.Draw.Data.lvSet`), and its background at the
 working cell alone. -/
 theorem cmpFam_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st')
@@ -1012,7 +1012,7 @@ theorem ctlBit_avC_cmp_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
 
 end CmpVerdict
 
-end DrawData
+end Data
 
 end Draw
 

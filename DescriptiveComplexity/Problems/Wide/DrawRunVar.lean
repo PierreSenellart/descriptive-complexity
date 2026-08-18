@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Wide.DrawRunElem
 /-!
 # One variable's machinery: the run
 
-The run theorem of `DescriptiveComplexity.Draw.DrawData.varRule` – the spine of
+The run theorem of `DescriptiveComplexity.Draw.Data.varRule` – the spine of
 the per-variable evaluation. The two abstract machineries stay abstract: the
 gates' run and the matrix's runs enter as *hypotheses*, one per VAL-loop
 round, and this file contributes exactly the spine – the entry dispatch, the
@@ -21,7 +21,7 @@ in the dispatches, and the arrival at the exit checkpoint once VAL is
 exhausted.
 
 The background conditions every kit reads are bundled once
-(`DescriptiveComplexity.Draw.DrawData.VarBg`); the VAL register's contents over
+(`DescriptiveComplexity.Draw.Data.VarBg`); the VAL register's contents over
 the rounds are an abstract family `mV` over an abstract enumeration, exactly
 as in the element loop's run.
 
@@ -48,9 +48,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L)
+variable {L : Language.{0, 0}} (dt : Data L)
 variable {A R P Q PG PX SG SX : Type}
 variable [Fintype Q] [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -816,7 +816,7 @@ theorem var_run
 
 end VarRun
 
-end DrawData
+end Data
 
 end Draw
 

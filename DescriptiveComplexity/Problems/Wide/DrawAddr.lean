@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.DrawTable
 # The argument blocks, concretely: outer arguments first, inner variables last
 
 The EXPSPACE program keeps two families of argument blocks
-(`DescriptiveComplexity.Draw.DrawTag`'s `K`): the **outer**
+(`DescriptiveComplexity.Draw.Tag`'s `K`): the **outer**
 ones hold the arguments of the fixed-point variable at the working cell, the
 **inner** ones hold the valuations of the step formula's quantifier prefix,
 enumerated by the VAL register. This file fixes `K := Fin ko ⊕ₗ Fin ki` and
@@ -52,29 +52,29 @@ variable {R P : Type} {ko ki : ℕ}
 
 /-- **An outer argument tag**: one block per argument of the fixed-point
 variable. -/
-def argOut (ki : ℕ) (k : Fin ko) : DrawTag R P (Fin ko ⊕ₗ Fin ki) :=
+def argOut (ki : ℕ) (k : Fin ko) : Tag R P (Fin ko ⊕ₗ Fin ki) :=
   .arg (Sum.inlₗ k)
 
 /-- **An inner argument tag**: one block per variable of the quantifier
 prefix. -/
-def argIn (ko : ℕ) (j : Fin ki) : DrawTag R P (Fin ko ⊕ₗ Fin ki) :=
+def argIn (ko : ℕ) (j : Fin ki) : Tag R P (Fin ko ⊕ₗ Fin ki) :=
   .arg (Sum.inrₗ j)
 
 theorem argOut_injective : Function.Injective (argOut (R := R) (P := P) (ko := ko) ki) := by
   intro k k' h
-  simp only [argOut, DrawTag.arg.injEq] at h
+  simp only [argOut, Tag.arg.injEq] at h
   exact Sum.inl.inj (toLex.injective h)
 
 variable [LinearOrder R] [LinearOrder P]
 
 /-- The strict tag order through the key. -/
-theorem lt_iff_tagKey {K : Type} [LinearOrder K] (σ τ : DrawTag R P K) :
+theorem lt_iff_tagKey {K : Type} [LinearOrder K] (σ τ : Tag R P K) :
     σ < τ ↔ tagKey σ < tagKey τ := by
   rw [lt_iff_le_not_ge, lt_iff_le_not_ge, le_iff_tagKey, le_iff_tagKey]
 
 /-- Argument tags compare by their block index. -/
 theorem arg_lt_arg_iff {K : Type} [LinearOrder K] (i i' : K) :
-    (DrawTag.arg i : DrawTag R P K) < .arg i' ↔ i < i' := by
+    (Tag.arg i : Tag R P K) < .arg i' ↔ i < i' := by
   rw [lt_iff_tagKey]
   simp [tagKey]
 
@@ -83,7 +83,7 @@ and everything strictly above an inner tag is an inner tag – the non-argument
 tags and the outer arguments all come first. This is the hypothesis pack of the
 inner loop's fold rules. -/
 theorem kinSeg :
-    IxSeg (· ≤ · : DrawTag R P (Fin ko ⊕ₗ Fin ki) → DrawTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+    IxSeg (· ≤ · : Tag R P (Fin ko ⊕ₗ Fin ki) → Tag R P (Fin ko ⊕ₗ Fin ki) → Prop)
       (argIn ko) := by
   constructor
   · intro j j'
@@ -156,7 +156,7 @@ theorem outAddr_of_blocks {V : Fin ko → (Fin dd → A) → Prop}
 
 /-- Every other block of `outAddr` is empty. -/
 theorem wmBlk_outAddr_of_ne (V : Fin ko → (Fin dd → A) → Prop)
-    {t : DrawTag R P (Fin ko ⊕ₗ Fin ki)} (ht : ∀ k : Fin ko, t ≠ argOut ki k) :
+    {t : Tag R P (Fin ko ⊕ₗ Fin ki)} (ht : ∀ k : Fin ko, t ≠ argOut ki k) :
     ∀ v : Fin dd → A, ¬wmBlk (outAddr V) t v := by
   rintro v ⟨k, hk, -⟩
   exact ht k hk
@@ -164,7 +164,7 @@ theorem wmBlk_outAddr_of_ne (V : Fin ko → (Fin dd → A) → Prop)
 /-- The non-argument blocks of `outAddr` are empty, which is what puts the
 working cell in the logical interval. -/
 theorem outAddr_junk (V : Fin ko → (Fin dd → A) → Prop)
-    {t : DrawTag R P (Fin ko ⊕ₗ Fin ki)} (ht : ∀ i, t ≠ DrawTag.arg i) :
+    {t : Tag R P (Fin ko ⊕ₗ Fin ki)} (ht : ∀ i, t ≠ Tag.arg i) :
     ∀ v : Fin dd → A, ¬outAddr V (t, v) := by
   rintro v ⟨k, hk, -⟩
   exact ht _ hk
@@ -316,8 +316,8 @@ theorem wmSetLe_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
     (hV : IsLinOrd (tupLeLex (A := A) (d := dd)))
     {i : d.B.ι} (ha : d.B.arity i ≤ ko)
     (x : Fin (d.B.arity i) → X.Map A) :
-    WMSetLe (lexRel (· ≤ · : DrawTag R P (Fin ko ⊕ₗ Fin ki) →
-        DrawTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+    WMSetLe (lexRel (· ≤ · : Tag R P (Fin ko ⊕ₗ Fin ki) →
+        Tag R P (Fin ko ⊕ₗ Fin ki) → Prop)
       (tupLeLex (A := A) (d := dd)))
       (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x) logicalTop :=
   wmSetLe_logicalTop hV (fun _ ht v => outAddr_junk _ ht v)
@@ -331,13 +331,13 @@ theorem wmSetLt_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
     (hV : IsLinOrd (tupLeLex (A := A) (d := dd)))
     {i : d.B.ι} (ha : d.B.arity i ≤ ko)
     (x : Fin (d.B.arity i) → X.Map A) (ℓ : Fin (d.B.arity i)) :
-    WMSetLt (lexRel (· ≤ · : DrawTag R P (Fin ko ⊕ₗ Fin ki) →
-        DrawTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+    WMSetLt (lexRel (· ≤ · : Tag R P (Fin ko ⊕ₗ Fin ki) →
+        Tag R P (Fin ko ⊕ₗ Fin ki) → Prop)
       (tupLeLex (A := A) (d := dd)))
       (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x) logicalTop := by
   refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_tupAddr_logicalTop hV ha x, fun hc => ?_⟩
   have hcell : tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x
-      (DrawTag.arg (Sum.inlₗ (Fin.castLE ha ℓ)), fun _ => zero) := by
+      (Tag.arg (Sum.inlₗ (Fin.castLE ha ℓ)), fun _ => zero) := by
     rw [hc]
     exact logicalTop_arg _ _
   obtain ⟨k, hk, hv⟩ := hcell
@@ -359,15 +359,15 @@ theorem wmSetLt_logicalTop_of_isPad [LinearOrder R] [LinearOrder P]
     (hV : IsLinOrd (tupLeLex (A := A) (d := dd))) (hc : c < dd)
     (i : Fin ko ⊕ₗ Fin ki)
     {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop}
-    (hjunk : ∀ τ : DrawTag R P (Fin ko ⊕ₗ Fin ki),
-      (∀ i : Fin ko ⊕ₗ Fin ki, τ ≠ DrawTag.arg i) → ∀ v : Fin dd → A, ¬s (τ, v))
+    (hjunk : ∀ τ : Tag R P (Fin ko ⊕ₗ Fin ki),
+      (∀ i : Fin ko ⊕ₗ Fin ki, τ ≠ Tag.arg i) → ∀ v : Fin dd → A, ¬s (τ, v))
     (hpad : ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, s y → IsPad c zero y.2) :
-    WMSetLt (lexRel (· ≤ · : DrawTag R P (Fin ko ⊕ₗ Fin ki) →
-        DrawTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+    WMSetLt (lexRel (· ≤ · : Tag R P (Fin ko ⊕ₗ Fin ki) →
+        Tag R P (Fin ko ⊕ₗ Fin ki) → Prop)
       (tupLeLex (A := A) (d := dd)))
       s logicalTop := by
   refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_logicalTop hV hjunk, fun heq => ?_⟩
-  have hcell : s (DrawTag.arg i, fun _ => one) := by
+  have hcell : s (Tag.arg i, fun _ => one) := by
     rw [heq]
     exact logicalTop_arg _ _
   exact hne (hpad _ hcell ⟨c, hc⟩ le_rfl).symm
@@ -383,14 +383,14 @@ theorem wmSetLt_tupAddr_logicalTop' [LinearOrder R] [LinearOrder P]
     (hV : IsLinOrd (tupLeLex (A := A) (d := dd))) (i₀ : Fin ko ⊕ₗ Fin ki)
     {i : d.B.ι} (ha : d.B.arity i ≤ ko)
     (x : Fin (d.B.arity i) → X.Map A) :
-    WMSetLt (lexRel (· ≤ · : DrawTag R P (Fin ko ⊕ₗ Fin ki) →
-        DrawTag R P (Fin ko ⊕ₗ Fin ki) → Prop)
+    WMSetLt (lexRel (· ≤ · : Tag R P (Fin ko ⊕ₗ Fin ki) →
+        Tag R P (Fin ko ⊕ₗ Fin ki) → Prop)
       (tupLeLex (A := A) (d := dd)))
       (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x) logicalTop := by
   rcases Nat.eq_zero_or_pos (d.B.arity i) with h0 | hpos
   · refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_tupAddr_logicalTop hV ha x, fun heq => ?_⟩
     have hcell : tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x
-        (DrawTag.arg i₀, fun _ => zero) := by
+        (Tag.arg i₀, fun _ => zero) := by
       rw [heq]
       exact logicalTop_arg _ _
     obtain ⟨k, -, hv⟩ := hcell

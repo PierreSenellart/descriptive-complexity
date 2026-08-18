@@ -8,7 +8,7 @@ import DescriptiveComplexity.Problems.Wide.DrawRunVar
 /-!
 # The evaluation spine's run
 
-The run theorem of `DescriptiveComplexity.Draw.DrawData.evalRule`: from the
+The run theorem of `DescriptiveComplexity.Draw.Data.evalRule`: from the
 checkpoint before the first variable to the checkpoint after the last, one
 abstract sub-machinery run per position – the spine contributes only its
 dispatches and walk-backs, so it needs to know nothing about a machinery's
@@ -32,9 +32,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L)
+variable {L : Language.{0, 0}} (dt : Data L)
 variable {A R Q PM SM : Type} {nv : ℕ}
 variable [Fintype Q] [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R]
@@ -395,7 +395,7 @@ theorem step_eval_reset {f : Q → A}
 
 end EvalRun
 
-end DrawData
+end Data
 
 end Draw
 

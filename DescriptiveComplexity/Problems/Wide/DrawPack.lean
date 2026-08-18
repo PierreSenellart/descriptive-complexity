@@ -204,13 +204,13 @@ theorem stdLayout_lt {dd : ℕ} (h : encDim X ≤ dd) (j : Fin dd)
     rw [encDim]
     omega
 
-/-- **A source packed into a `DescriptiveComplexity.Draw.DrawData`**: the prenex
+/-- **A source packed into a `DescriptiveComplexity.Draw.Data`**: the prenex
 packs of every formula the program evaluates, each padded by one level so that
 the block index is nonempty, and the standard layout at a dimension the caller
 chooses. -/
-noncomputable def DrawData.ofSource (X : ExpExpansion L)
+noncomputable def Data.ofSource (X : ExpExpansion L)
     (d : StepDef (X.E.sum Language.order)) {dd : ℕ} (hdd : encDim X ≤ dd) :
-    DrawData L where
+    Data L where
   X := X
   d := d
   pk i := (Classical.choice (exists_prenexPack (d.step i))).succ
@@ -227,9 +227,9 @@ noncomputable def DrawData.ofSource (X : ExpExpansion L)
   dd0Le := hdd
 
 /-- The packed record's block index is nonempty: the output pack was padded. -/
-theorem DrawData.ki_pos (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
-    {dd : ℕ} (hdd : encDim X ≤ dd) : 0 < (DrawData.ofSource X d hdd).ki :=
-  lt_of_lt_of_le (Nat.succ_pos _) ((DrawData.ofSource X d hdd).nOf_le_ki none)
+theorem Data.ki_pos (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
+    {dd : ℕ} (hdd : encDim X ≤ dd) : 0 < (Data.ofSource X d hdd).ki :=
+  lt_of_lt_of_le (Nat.succ_pos _) ((Data.ofSource X d hdd).nOf_le_ki none)
 
 end Source
 

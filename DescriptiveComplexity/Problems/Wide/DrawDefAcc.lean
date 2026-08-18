@@ -11,12 +11,12 @@ import DescriptiveComplexity.Problems.Wide.DrawDefCtl
 What the program's control holds between rounds is a **fold**: one accumulator
 per level of a quantifier prefix, closed by a leaf flag. Reading it back is
 `DescriptiveComplexity.Draw.chainFrom`, a recursion down the levels, and writing
-it at a carry is `DescriptiveComplexity.Draw.DrawData.putVec` of a family whose
+it at a carry is `DescriptiveComplexity.Draw.Data.putVec` of a family whose
 entries branch on the carry.
 
 Both are definable, and for the same reason: the recursion is over a *fixed*
 number of levels, so recursing the same way builds the pattern function. The
-atoms are `DescriptiveComplexity.Draw.DrawData.uGDefinable_readVec` and
+atoms are `DescriptiveComplexity.Draw.Data.uGDefinable_readVec` and
 `uGDefinable_ctlBit`; everything else is the connectives.
 
 The matrix's own value at the atoms' verdicts
@@ -28,13 +28,13 @@ namespace DescriptiveComplexity
 
 namespace Draw
 
-namespace DrawData
+namespace Data
 
 open FirstOrder
 
 open Language Structure
 
-variable {L : Language.{0, 0}} {dt : DrawData L} [Fintype dt.SlotIx]
+variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 
 /-! ### The chain -/
 
@@ -196,7 +196,7 @@ theorem uGDefinable_postLeaf (v : dt.VarIx) :
       (uGDefinable_const ((dt.atomsOf v).get k = a)).and
         (uGDefinable_ctlBit (dt.avC (Fin.castLE (dt.natOf_le_natMax v) k)))
 
-end DrawData
+end Data
 
 end Draw
 

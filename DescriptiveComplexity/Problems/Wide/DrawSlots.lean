@@ -177,16 +177,16 @@ variable [LinearOrder R] [LinearOrder P]
 
 /-- The argument block of a tag, `none` off the arguments: what the one-hot
 `blk` slots of a mark record. -/
-def tagBlk : DrawTag R P (Fin ko ⊕ₗ Fin ki) → Option (Fin ko ⊕ Fin ki)
+def tagBlk : Tag R P (Fin ko ⊕ₗ Fin ki) → Option (Fin ko ⊕ Fin ki)
   | .arg i => some (ofLex i)
   | _ => none
 
 omit [LinearOrder R] [LinearOrder P] in
 /-- **The block mark decodes the tag**: only an argument tag has a block, and it
 has its own. -/
-theorem tagBlk_eq_some_iff (τ : DrawTag R P (Fin ko ⊕ₗ Fin ki))
+theorem tagBlk_eq_some_iff (τ : Tag R P (Fin ko ⊕ₗ Fin ki))
     (b' : Fin ko ⊕ Fin ki) :
-    tagBlk τ = some b' ↔ τ = DrawTag.arg (toLex b') := by
+    tagBlk τ = some b' ↔ τ = Tag.arg (toLex b') := by
   cases τ with
   | ctrl r => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
   | sym => exact ⟨(fun h => nomatch h), (fun h => nomatch h)⟩
@@ -267,14 +267,14 @@ the *register* channel marks below its file, so that every logical address stays
 clear of it and the file lies above the working area
 (`DescriptiveComplexity.wmSetLt_wmRegSeg_of_above`). -/
 def IsTopNonArg (x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd) : Prop :=
-  (∀ i, x.1 ≠ DrawTag.arg i) ∧
-    ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, (∀ i, y.1 ≠ DrawTag.arg i) → tagTupleLe y x
+  (∀ i, x.1 ≠ Tag.arg i) ∧
+    ∀ y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd, (∀ i, y.1 ≠ Tag.arg i) → tagTupleLe y x
 
 /-- **There is only one greatest element carrying no argument block**: two of
 them bound each other. -/
 theorem IsTopNonArg.unique {x y : Univ A R P (Fin ko ⊕ₗ Fin ki) dd}
     (hx : IsTopNonArg x) (hy : IsTopNonArg y) : x = y :=
-  (Wide.isLinOrd_tagTupleLe (Tag := DrawTag R P (Fin ko ⊕ₗ Fin ki)) (A := A)
+  (Wide.isLinOrd_tagTupleLe (Tag := Tag R P (Fin ko ⊕ₗ Fin ki)) (A := A)
     (d := dd)).2.2.1 x y (hy.2 x hx.1) (hx.2 y hy.1)
 
 open Classical in
@@ -354,9 +354,9 @@ theorem tagBlk_eq_none_of_least {x : Univ A R P (Fin ko ⊕ₗ Fin ki) dd}
   | .phase p => rfl
   | .arg i =>
     exfalso
-    rcases hleast (DrawTag.sym, x.2) with hlt | ⟨he, -⟩
+    rcases hleast (Tag.sym, x.2) with hlt | ⟨he, -⟩
     · rw [hg] at hlt
-      exact absurd hlt (asymm (lt_arg DrawTag.sym i (fun j => fun h => nomatch h)))
+      exact absurd hlt (asymm (lt_arg Tag.sym i (fun j => fun h => nomatch h)))
     · rw [hg] at he
       exact nomatch he
 
@@ -380,7 +380,7 @@ theorem eq_of_slotMark_name
       have : some (ofLex i) = some (ofLex i') := by
         simpa [tagBlk] using hblk
       have hii : ofLex i = ofLex i' := Option.some.inj this
-      exact congrArg DrawTag.arg (ofLex.injective.eq_iff.mp hii)
+      exact congrArg Tag.arg (ofLex.injective.eq_iff.mp hii)
     | .arg i, .ctrl r => simp [tagBlk] at hblk
     | .arg i, .sym => simp [tagBlk] at hblk
     | .arg i, .phase p => simp [tagBlk] at hblk

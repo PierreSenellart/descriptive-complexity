@@ -27,9 +27,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q P : Type}
 variable (zero one : A)
 
 /-! ### The matrix -/
@@ -464,7 +464,7 @@ theorem igatesSep (hemb : Function.Injective emb) :
 end IGates
 
 
-end DrawData
+end Data
 
 end Draw
 

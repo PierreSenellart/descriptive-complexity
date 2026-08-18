@@ -10,14 +10,14 @@ import DescriptiveComplexity.Problems.Wide.DrawInstEval
 # The outer composition: the sweep's rounds
 
 One round of the outer sweep, at the concrete program: the whole per-address
-evaluation (`DescriptiveComplexity.Draw.DrawData.evalSpine_run`), the boundary
+evaluation (`DescriptiveComplexity.Draw.Data.evalSpine_run`), the boundary
 dispatch into ADVANCE (the last checkpoint's erasing rule, off the `ltp`
 cell), the advance itself
-(`DescriptiveComplexity.Draw.DrawData.reaches_sweepAdv`), the exit dispatch
+(`DescriptiveComplexity.Draw.Data.reaches_sweepAdv`), the exit dispatch
 into the next address's first checkpoint and its walk back. The walk is
 handed between the VAL track (the evaluation's presentation) and the MIRROR
 track (the advance's) by
-`DescriptiveComplexity.Draw.DrawData.trackTape_back_swap`, which costs
+`DescriptiveComplexity.Draw.Data.trackTape_back_swap`, which costs
 nothing because the background carries every register's digits at its own
 slot.
 -/
@@ -30,9 +30,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A : Type} (zero one : A)
+variable {L : Language.{0, 0}} (dt : Data L) {A : Type} (zero one : A)
 variable [LinearOrder A] [Fintype dt.SlotIx]
 variable (hzo : zero ≠ one)
 variable (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v)
@@ -472,7 +472,7 @@ theorem reaches_clearMir2
 /-- **One round of the outer sweep, with its evaluation**: from the first
 checkpoint at the marker, through the whole per-address evaluation (given
 as a hypothesis — the caller instantiates it by
-`DescriptiveComplexity.Draw.DrawData.evalSpine_run`), out through the erasing
+`DescriptiveComplexity.Draw.Data.evalSpine_run`), out through the erasing
 boundary dispatch, the advance, and back into the first checkpoint at the
 next address. The marker, the mirror and the head all step on in
 lockstep. -/
@@ -573,7 +573,7 @@ theorem sweepRound
 /-- **The outer sweep**: from the first checkpoint at the bottom of the
 stretch to the first checkpoint at its top, one round per address — each
 round the per-address evaluation and the advance, glued by
-`DescriptiveComplexity.Draw.DrawData.sweepRound`. The evaluation runs, the
+`DescriptiveComplexity.Draw.Data.sweepRound`. The evaluation runs, the
 end-state facts and the two cover equations (the tape and control threads
 across addresses) are per-address hypotheses; everything else is
 `DescriptiveComplexity.reaches_of_wideRounds`. -/
@@ -687,7 +687,7 @@ there. The sweep then continues from the successor
 stretch, which `reaches_compareFrom` exposes). -/
 
 /-- **The convergence sweep from an arbitrary start**: the generalization
-of `DescriptiveComplexity.Draw.DrawData.reaches_compare` the folded first
+of `DescriptiveComplexity.Draw.Data.reaches_compare` the folded first
 step needs. -/
 theorem reaches_compareFrom
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
@@ -1029,7 +1029,7 @@ theorem step_homeCmp_exit
   exact h
 
 /-- **The copy-back from an arbitrary start**: the generalization of
-`DescriptiveComplexity.Draw.DrawData.reaches_copy` the folded first step
+`DescriptiveComplexity.Draw.Data.reaches_copy` the folded first step
 needs. -/
 theorem reaches_copyFrom
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
@@ -1603,7 +1603,7 @@ theorem reaches_main
     (hspineT N le_rfl) (hwkT N le_rfl) (hltpT N le_rfl) (hbotT N le_rfl)
     hconv
 
-end DrawData
+end Data
 
 end Draw
 

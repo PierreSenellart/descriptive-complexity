@@ -12,7 +12,7 @@ import DescriptiveComplexity.Problems.Wide.BlkLayout
 `DescriptiveComplexity.Problems.Wide.DrawIxPack` proves the gates' bridge and the
 inner gates' at *any* file whose registers stand for elements and whose tuples
 are their elements'. The file a clocked program lays
-(`DescriptiveComplexity.Draw.DrawData.blkLaid`) is such a file – a register **is**
+(`DescriptiveComplexity.Draw.Data.blkLaid`) is such a file – a register **is**
 a block and a tuple, so its tuple is its element's by `rfl` – and this file says
 so: `gateEnc_blkLaid` and `passEnc_blkLaid` are `hgateEnc` and `hpassEnc`
 discharged there, which is what a leg of the spine carries as a hypothesis.
@@ -30,11 +30,11 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
 section BlkBridge
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R' P' : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R' P' : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] [Nonempty A]
@@ -70,7 +70,7 @@ theorem passEnc_blkLaid (hzo : PR.zero ≠ PR.one)
     dt.ixIGPassP (elt := blkIxElt R' P' dt.dd) (dt.blkLaid h hpos hbase)
         PR.zero PR.one vi stV ℓ ↔
       IsEnc dt.ly PR.zero PR.one (wmBlk (ixAddr (blkIxElt R' P' dt.dd) stV.val)
-        (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R' P' dt.KIx)) :=
+        (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R' P' dt.KIx)) :=
   dt.ixIGPassP_iff_isEnc (F := dt.blkLaid h hpos hbase) blkIxElt_injective
     (isLinOrd_blkLaid_le h hpos hbase) (dt.blk_blkLaid_eq_tagBlk h hpos hbase)
     (fun _ => rfl) hzo vi stV ℓ
@@ -85,16 +85,16 @@ theorem gateEnc_blkLaid (hzo : PR.zero ≠ PR.one)
       ∀ ℓ : Fin (dt.arOf (dt.varAt j)),
         IsEnc dt.ly PR.zero PR.one
           (wmBlk (ixAddr (blkIxElt R' P' dt.dd) st.mir)
-            (DrawTag.arg (toLex ((Sum.inl
+            (Tag.arg (toLex ((Sum.inl
               (Fin.castLE (dt.arOf_le_ko (dt.varAt j)) ℓ) :
-              Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R' P' dt.KIx)) :=
+              Fin dt.ko ⊕ Fin dt.ki))) : Tag R' P' dt.KIx)) :=
   dt.ixGatedAt_iff_isEnc (F := dt.blkLaid h hpos hbase) blkIxElt_injective
     (isLinOrd_blkLaid_le h hpos hbase) (dt.blk_blkLaid_eq_tagBlk h hpos hbase)
     (wmSegFile h) (fun _ => rfl) hzo h j st
 
 end BlkBridge
 
-end DrawData
+end Data
 
 end Draw
 

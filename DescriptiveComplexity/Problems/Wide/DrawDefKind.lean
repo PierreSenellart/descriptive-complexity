@@ -19,9 +19,9 @@ is built from; the **dynamic** ones are guards and control updates, and owe the
 usual three obligations.
 
 With the three pack statements, an atom kind's machinery
-(`DescriptiveComplexity.Draw.DrawData.kindRule`) is definable one constructor at
+(`DescriptiveComplexity.Draw.Data.kindRule`) is definable one constructor at
 a time: the stage atom's by
-`DescriptiveComplexity.Draw.DrawData.uRulesDefinable_stageRule`, an expansion
+`DescriptiveComplexity.Draw.Data.uRulesDefinable_stageRule`, an expansion
 atom's by the tag-branched statement, an equality's and an order atom's by the
 element loop's.
 -/
@@ -138,9 +138,9 @@ theorem uRulesDefinable_tagArgs {m : ℕ} {T : Type} {nrOf : T → ℕ} {wk rg :
 
 /-! ### A stage atom's pack, and an atom kind's machinery -/
 
-namespace DrawData
+namespace Data
 
-variable {dt : DrawData L} [Fintype dt.SlotIx]
+variable {dt : Data L} [Fintype dt.SlotIx]
 
 /-- **What a stage atom's pack owes.** -/
 structure UStageArgsDef {k : ℕ}
@@ -225,7 +225,7 @@ theorem uRulesDefinable_kindRule {n : ℕ} (κ : MatAtom dt.X dt.d.B n)
   | .eq _j₁ _j₂ => exact uRulesDefinable_elemArgs h
   | .ord _j₁ _j₂ => exact uRulesDefinable_elemArgs h
 
-end DrawData
+end Data
 
 end Draw
 

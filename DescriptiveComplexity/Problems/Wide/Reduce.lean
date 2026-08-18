@@ -22,14 +22,14 @@ constants and puts them together.
   are the marked copy of the instance's minimum and the junk copy of its maximum
   (`DescriptiveComplexity.Draw.isBot_dblPt`, `isTop_dblPt`);
 * the **data** is the relativized expansion packed by
-  `DescriptiveComplexity.Draw.DrawData.ofSource`, at a dimension wide enough for
+  `DescriptiveComplexity.Draw.Data.ofSource`, at a dimension wide enough for
   both the encoding and the payload (`DescriptiveComplexity.Draw.srcDim`) – the
   knot being that the slot inventory depends on the encoding budget, so the
   budget is chosen first and the record built twice at the same budget.
 
 The payload bound `Fintype.card (CtlIx ⊕ SlotIx) ≤ dd` is *not* here, and the
 reason is worth recording. It is true because no budget of the record reads the
-dimension, but it is not `rfl`: `DescriptiveComplexity.Draw.DrawData.nOf` and every
+dimension, but it is not `rfl`: `DescriptiveComplexity.Draw.Data.nOf` and every
 budget above it is defined by a match on `dt.VarIx`, so the matcher takes the
 whole record as a parameter and two records differing in *any* field are opaque
 to each other. What closes it is `Finset.sup_congr` down the chain, each step
@@ -77,9 +77,9 @@ end Extremes
 
 /-! ### The budgets do not read the dimension
 
-Every budget of a `DescriptiveComplexity.Draw.DrawData` is a function of the
+Every budget of a `DescriptiveComplexity.Draw.Data` is a function of the
 expansion, the step definition and the packs; none reads the dimension. That is
-*not* `rfl`, though: `DescriptiveComplexity.Draw.DrawData.nOf` and its relatives
+*not* `rfl`, though: `DescriptiveComplexity.Draw.Data.nOf` and its relatives
 are defined by a match, so their compiled matchers take the whole record as a
 parameter and two records differing in the dimension are opaque to each other.
 What closes it is a congruence at every level, each instantiated at a
@@ -92,22 +92,22 @@ variable {X : ExpExpansion L} {d : StepDef (X.E.sum Language.order)}
 variable {dd dd' : ℕ} (h : encDim X ≤ dd) (h' : encDim X ≤ dd')
 
 omit [L.IsRelational] in
-theorem ofSource_nOf (v : (DrawData.ofSource X d h).VarIx) :
-    (DrawData.ofSource X d h).nOf v = (DrawData.ofSource X d h').nOf v := by
+theorem ofSource_nOf (v : (Data.ofSource X d h).VarIx) :
+    (Data.ofSource X d h).nOf v = (Data.ofSource X d h').nOf v := by
   match v with
   | none => rfl
   | some i => rfl
 
 omit [L.IsRelational] in
-theorem ofSource_natOf (v : (DrawData.ofSource X d h).VarIx) :
-    (DrawData.ofSource X d h).natOf v = (DrawData.ofSource X d h').natOf v := by
+theorem ofSource_natOf (v : (Data.ofSource X d h).VarIx) :
+    (Data.ofSource X d h).natOf v = (Data.ofSource X d h').natOf v := by
   match v with
   | none => rfl
   | some i => rfl
 
 omit [L.IsRelational] in
 theorem ofSource_kindDepth {n : ℕ} (κ : MatAtom X d.B n) :
-    (DrawData.ofSource X d h).kindDepth κ = (DrawData.ofSource X d h').kindDepth κ := by
+    (Data.ofSource X d h).kindDepth κ = (Data.ofSource X d h').kindDepth κ := by
   match κ with
   | .stage _ _ => rfl
   | .exp _ _ => rfl
@@ -116,7 +116,7 @@ theorem ofSource_kindDepth {n : ℕ} (κ : MatAtom X d.B n) :
 
 omit [L.IsRelational] in
 theorem ofSource_kindReads {n : ℕ} (κ : MatAtom X d.B n) :
-    (DrawData.ofSource X d h).kindReads κ = (DrawData.ofSource X d h').kindReads κ := by
+    (Data.ofSource X d h).kindReads κ = (Data.ofSource X d h').kindReads κ := by
   match κ with
   | .stage _ _ => rfl
   | .exp _ _ => rfl
@@ -125,7 +125,7 @@ theorem ofSource_kindReads {n : ℕ} (κ : MatAtom X d.B n) :
 
 omit [L.IsRelational] in
 theorem ofSource_kindArgs {n : ℕ} (κ : MatAtom X d.B n) :
-    (DrawData.ofSource X d h).kindArgs κ = (DrawData.ofSource X d h').kindArgs κ := by
+    (Data.ofSource X d h).kindArgs κ = (Data.ofSource X d h').kindArgs κ := by
   match κ with
   | .stage _ _ => rfl
   | .exp _ _ => rfl
@@ -133,25 +133,25 @@ theorem ofSource_kindArgs {n : ℕ} (κ : MatAtom X d.B n) :
   | .ord _ _ => rfl
 
 omit [L.IsRelational] in
-theorem ofSource_ki : (DrawData.ofSource X d h).ki = (DrawData.ofSource X d h').ki := by
-  unfold DrawData.ki
+theorem ofSource_ki : (Data.ofSource X d h).ki = (Data.ofSource X d h').ki := by
+  unfold Data.ki
   exact Finset.sup_congr rfl fun v _ => ofSource_nOf h h' v
 
 omit [L.IsRelational] in
 theorem ofSource_naDim :
-    (DrawData.ofSource X d h).naDim = (DrawData.ofSource X d h').naDim := by
-  unfold DrawData.naDim
+    (Data.ofSource X d h).naDim = (Data.ofSource X d h').naDim := by
+  unfold Data.naDim
   rw [ofSource_ki h h']
 
 omit [L.IsRelational] in
 theorem ofSource_natMax :
-    (DrawData.ofSource X d h).natMax = (DrawData.ofSource X d h').natMax := by
-  unfold DrawData.natMax
+    (Data.ofSource X d h).natMax = (Data.ofSource X d h').natMax := by
+  unfold Data.natMax
   exact Finset.sup_congr rfl fun v _ => ofSource_natOf h h' v
 
 omit [L.IsRelational] in
-theorem ofSource_eDim : (DrawData.ofSource X d h).eDim = (DrawData.ofSource X d h').eDim := by
-  unfold DrawData.eDim
+theorem ofSource_eDim : (Data.ofSource X d h).eDim = (Data.ofSource X d h').eDim := by
+  unfold Data.eDim
   refine congrArg₂ max rfl (Finset.sup_congr rfl fun v _ => ?_)
   match v with
   | none => exact Finset.sup_congr rfl fun a _ => ofSource_kindDepth h h' _
@@ -159,8 +159,8 @@ theorem ofSource_eDim : (DrawData.ofSource X d h).eDim = (DrawData.ofSource X d 
 
 omit [L.IsRelational] in
 theorem ofSource_nfDim :
-    (DrawData.ofSource X d h).nfDim = (DrawData.ofSource X d h').nfDim := by
-  unfold DrawData.nfDim
+    (Data.ofSource X d h).nfDim = (Data.ofSource X d h').nfDim := by
+  unfold Data.nfDim
   refine congrArg₂ max rfl (Finset.sup_congr rfl fun v _ => ?_)
   match v with
   | none => exact Finset.sup_congr rfl fun a _ => ofSource_kindReads h h' _
@@ -168,8 +168,8 @@ theorem ofSource_nfDim :
 
 omit [L.IsRelational] in
 theorem ofSource_ntgDim :
-    (DrawData.ofSource X d h).ntgDim = (DrawData.ofSource X d h').ntgDim := by
-  unfold DrawData.ntgDim
+    (Data.ofSource X d h).ntgDim = (Data.ofSource X d h').ntgDim := by
+  unfold Data.ntgDim
   refine congrArg₂ (· * ·) (congrArg₂ (· + ·) (Finset.sup_congr rfl fun v _ => ?_) rfl) rfl
   match v with
   | none => exact Finset.sup_congr rfl fun a _ => ofSource_kindArgs h h' _
@@ -178,16 +178,16 @@ theorem ofSource_ntgDim :
 omit [L.IsRelational] in
 /-- **The control inventory does not read the dimension.** -/
 theorem ofSource_ctlIx :
-    (DrawData.ofSource X d h).CtlIx = (DrawData.ofSource X d h').CtlIx := by
-  unfold DrawData.CtlIx
+    (Data.ofSource X d h).CtlIx = (Data.ofSource X d h').CtlIx := by
+  unfold Data.CtlIx
   rw [ofSource_eDim h h', ofSource_naDim h h', ofSource_natMax h h',
     ofSource_nfDim h h', ofSource_ntgDim h h']
 
 omit [L.IsRelational] in
 /-- **Nor does the track inventory.** -/
 theorem ofSource_slotIx :
-    (DrawData.ofSource X d h).SlotIx = (DrawData.ofSource X d h').SlotIx := by
-  unfold DrawData.SlotIx
+    (Data.ofSource X d h).SlotIx = (Data.ofSource X d h').SlotIx := by
+  unfold Data.SlotIx
   rw [ofSource_ki h h']
   rfl
 
@@ -202,7 +202,7 @@ variable (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
 
 /-- The record at the bare encoding budget: only its slot and control
 inventories are read, and neither depends on the dimension. -/
-noncomputable def srcData0 : DrawData L := DrawData.ofSource X d (le_refl (encDim X))
+noncomputable def srcData0 : Data L := Data.ofSource X d (le_refl (encDim X))
 
 /-- **The dimension the reduction works at**: one coordinate of slack beyond the
 encoding budget, and wide enough for a rule's payload. -/
@@ -214,8 +214,8 @@ theorem encDim_lt_srcDim : encDim X < srcDim X d :=
   lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)
 
 /-- **The record the reduction works at.** -/
-noncomputable def srcData : DrawData L :=
-  DrawData.ofSource X d (le_of_lt (encDim_lt_srcDim X d))
+noncomputable def srcData : Data L :=
+  Data.ofSource X d (le_of_lt (encDim_lt_srcDim X d))
 
 omit [L.IsRelational] in
 theorem srcData_dd0 : (srcData X d).dd0 = encDim X := rfl
@@ -242,7 +242,7 @@ theorem srcData_payload_le :
 /-- The block index of the packed record is nonempty: the output pack was
 padded. -/
 noncomputable def srcKIx : (srcData X d).KIx :=
-  Sum.inrₗ ⟨0, DrawData.ki_pos X d (le_of_lt (encDim_lt_srcDim X d))⟩
+  Sum.inrₗ ⟨0, Data.ki_pos X d (le_of_lt (encDim_lt_srcDim X d))⟩
 
 end Dim
 
@@ -254,7 +254,7 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 variable (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
 
 /-- **The record the reduction runs at**: the relativized expansion, packed. -/
-noncomputable abbrev srcDt : DrawData (newLang L) := srcData (relExp X) d
+noncomputable abbrev srcDt : Data (newLang L) := srcData (relExp X) d
 
 /-- The accepting predicate of the emitted program: the output machinery's exit
 phase, with its verdict read from the control. -/
@@ -266,7 +266,7 @@ theorem uGDefinable_srcAccept (p : (srcDt X d).PF) :
     UGDefinable fun (e : Env (newLang L)) f (_ : (srcDt X d).SlotIx → e.α) =>
       srcAccept X d e p f :=
   (uGDefinable_const (p = OuterPh.acceptP)).and
-    (DrawData.uVarArgsDef_varArgsOf (dt := srcDt X d) (boolEnv (newLang L)) none).accBit
+    (Data.uVarArgsDef_varArgsOf (dt := srcDt X d) (boolEnv (newLang L)) none).accBit
 
 /-- **The machine of a source, written down over the doubled universe.** -/
 noncomputable def dblWideInterp :
@@ -275,9 +275,9 @@ noncomputable def dblWideInterp :
   letI : LinearOrder (srcDt X d).RTag := finiteLinearOrder _
   letI : LinearOrder (srcDt X d).PF := finiteLinearOrder _
   (srcDt X d).drawInterp (srcData_payload_le (relExp X) d)
-    (DrawData.uRulesDefinable_progOf (dt := srcDt X d) (boolEnv (newLang L)))
+    (Data.uRulesDefinable_progOf (dt := srcDt X d) (boolEnv (newLang L)))
     (uGDefinable_srcAccept X d) OuterPh.start
-    (DrawData.regFileMark (srcData_payload_le (relExp X) d))
+    (Data.regFileMark (srcData_payload_le (relExp X) d))
 
 /-- **The machine of a source, written down in the instance**: the machine over
 the doubled universe, composed with the doubling. The dimension is unchanged –
@@ -342,9 +342,9 @@ theorem srcReads :
       (Univ e.α (srcDt X d).RTag (srcDt X d).PF (srcDt X d).KIx (srcDt X d).dd) :=
     (dblWideInterp X d).mapStructure e.α
   (srcDt X d).reads_progFrom (srcData_payload_le (relExp X) d)
-    (DrawData.uRulesDefinable_progOf (dt := srcDt X d) (boolEnv (newLang L)))
+    (Data.uRulesDefinable_progOf (dt := srcDt X d) (boolEnv (newLang L)))
     (uGDefinable_srcAccept X d) OuterPh.start
-    (DrawData.regFileMark (srcData_payload_le (relExp X) d)) e rfl
+    (Data.regFileMark (srcData_payload_le (relExp X) d)) e rfl
 
 end Reads
 
@@ -484,7 +484,7 @@ theorem SOPFPDefinable.ordered_fo_reduction_dwideAcceptSpace {Q : DecisionProble
   obtain ⟨X, Q₀, hpfp, hspec⟩ := h
   obtain ⟨d, hd⟩ := hpfp
   exact ⟨{ Tag := (Draw.srcDt X d).ITag × (Fin (Draw.srcDt X d).dd → Bool)
-           tagNonempty := ⟨(Draw.DrawTag.sym, fun _ => false)⟩
+           tagNonempty := ⟨(Draw.Tag.sym, fun _ => false)⟩
            dim := (Draw.srcDt X d).dd * 1
            toInterpretation := Draw.wideInterp X d
            correct := fun A _ _ _ _ =>
@@ -493,7 +493,7 @@ theorem SOPFPDefinable.ordered_fo_reduction_dwideAcceptSpace {Q : DecisionProble
 /-- **Every NEXPTIME source problem reduces to acceptance on a clock**, given
 the clocked machine's correctness at each doubled universe. The reduction is the
 EXPSPACE one's drawing at the kernel's own step definition – the record is the
-same one (`DescriptiveComplexity.Draw.DrawData.ofKernel` is
+same one (`DescriptiveComplexity.Draw.Data.ofKernel` is
 `ofSource` at `NexKernel.toStepDef`), so the dimension, the tags and the
 transport are all as they were, and only what the machine decides changes. -/
 theorem ExpDefinable.ordered_fo_reduction_wideAccept {Q : DecisionProblem L}
@@ -517,7 +517,7 @@ theorem ExpDefinable.ordered_fo_reduction_wideAccept {Q : DecisionProblem L}
   classical
   refine ⟨{ Tag := (Draw.srcDt X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)).ITag ×
               (Fin (Draw.srcDt X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)).dd → Bool)
-            tagNonempty := ⟨(Draw.DrawTag.sym, fun _ => false)⟩
+            tagNonempty := ⟨(Draw.Tag.sym, fun _ => false)⟩
             dim := (Draw.srcDt X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)).dd * 1
             toInterpretation :=
               Draw.wideInterp X ((⟨X, B, φ⟩ : NexKernel L).toStepDef)

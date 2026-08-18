@@ -230,9 +230,9 @@ def NexPh.PostGuess {B PE : Type} : NexPh B PE → Prop
   | .evalP _ => True
   | _ => False
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A Q B G PE SE : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A Q B G PE SE : Type}
 variable [DecidableEq dt.SlotIx]
 variable (one : A) {ShE : SE → Type}
 
@@ -538,7 +538,7 @@ their own rules are `hrules` specialized and need nothing here. -/
 
 section Discharge
 
-variable {L : Language.{0, 0}} {dt : DrawData L} {A R' Q B PE SE G : Type}
+variable {L : Language.{0, 0}} {dt : Data L} {A R' Q B PE SE G : Type}
 variable [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 variable {ShE : SE → Type}
 variable {PR : Prog A R' (NexPh B PE) Q dt.SlotIx dt.KIx dt.dd}
@@ -670,7 +670,7 @@ theorem hasRight_homeGuessExit (f : Q → A) (g : dt.SlotIx → A)
 end Discharge
 
 
-end DrawData
+end Data
 
 end Draw
 

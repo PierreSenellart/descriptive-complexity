@@ -209,7 +209,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
 of the four the kit was given, so a caller that knows a property of those
 knows it of every phase the trip can be in. This is what a determinism-after-
 the-guess argument needs of a sub-machinery
-(`DescriptiveComplexity.Draw.DrawData.nexProg_uniqueFrom`). -/
+(`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
 theorem dstPh_emb (ρ : ReadRule) : ∃ p : ReadPh, (κ.rule one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
@@ -430,7 +430,7 @@ noncomputable def rule : WriteRule → Rule A Q W P
 /-- **A write trip stays inside its own phases**: every rule of the kit lands
 in one of the phases the kit was given, which is what a
 determinism-after-the-guess argument needs of a sub-machinery
-(`DescriptiveComplexity.Draw.DrawData.nexProg_uniqueFrom`). -/
+(`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
 theorem dstPh_emb (ρ : WriteRule) :
     ∃ p : WritePh, (κ.rule zero one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩

@@ -17,7 +17,7 @@ tuple in the gated block, so this is
 `DescriptiveComplexity.Problems.Wide.DrawInstGate` read at a coarse file exactly
 as `DescriptiveComplexity.Problems.Wide.DrawIxExp` reads the expansion atoms:
 the cells become the registers the layout names
-(`DescriptiveComplexity.Draw.DrawData.ixEncG_iff`), the marks become marks on
+(`DescriptiveComplexity.Draw.Data.ixEncG_iff`), the marks become marks on
 registers, and the block value the gate reads is the one the address the marks
 stand for holds (`DescriptiveComplexity.ixAddr`).
 
@@ -33,9 +33,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -214,7 +214,7 @@ theorem ctlBit_ixGateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     dt.ctlBit one
         (dt.ixGateTagFam F hhas one b st hc hn hrd vAdr f₀
           (Fin.last (Fintype.card dt.X.Tag))) (dt.gateTagC hc t') ↔
-      wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+      wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') := by
   rw [ctlBit_ixGateTagFam_last hzo f₀ t',
     ← ixAddr_elt hinj st.mir
@@ -238,12 +238,12 @@ value the sweep produces. -/
 theorem ixDspTagsAre_gateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
       (dt.dspTagOf zero one
-        (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+        (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)))
       (dt.ixGateTagFam F hhas one b st hc hn hrd vAdr f₀
         (Fin.last (Fintype.card dt.X.Tag))) := by
   classical
   by_cases h : ∃ t₁ : dt.X.Tag, ∀ t' : dt.X.Tag,
-      wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+      wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') ↔ t' = t₁
   · left
     rw [dspTagOf, dif_pos h]
@@ -323,13 +323,13 @@ theorem ixDomMatch_gateFam_uniq (hzo : zero ≠ one) (hix : IsLinOrd F.le)
 /-- **A gate's leaf at the file, over the wide valuation**: the tag's domain
 sentence at the decoded assignment of the block value the marks' address
 holds. -/
-noncomputable def ixGateLeafP (dt : DrawData L) {I : Type}
+noncomputable def ixGateLeafP (dt : Data L) {I : Type}
     (b : Fin dt.ko ⊕ Fin dt.ki) (st : TapeSt dt A R P I) (t : dt.X.Tag)
     (hnt : (dt.domPk t).n ≤ dt.eDim) {elt : I → Univ A R P dt.KIx dt.dd}
     (zero one : A) (v : Fin dt.eDim → A) : Prop :=
   dt.domLeaf t
     (decRho dt.ly zero one
-      (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)))
     fun j => v (Fin.castLE hnt j)
 
 /-! ### The gate's machine run -/
@@ -374,7 +374,7 @@ variable (hm₀ : ∀ r, dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st r t₀ 
 variable (hwkt₀ : (Slot.wk : dt.SlotIx) ≠ t₀)
 variable (hrgt₀ : (Slot.reg : dt.SlotIx) ≠ t₀)
 variable (htag : dt.dspTagOf PR.zero PR.one
-  (wmBlk (ixAddr eltR st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)) = t)
+  (wmBlk (ixAddr eltR st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)) = t)
 variable (f₀ : dt.CtlIx → A)
 
 
@@ -558,7 +558,7 @@ theorem domLeafVal_ixGateFam (hzo : zero ≠ one)
       dt.ixGateLeafP (elt := elt) b st t (hn t) zero one (ofLex a) := by
   have hval := dt.domLeafVal_iff t (hn t) (hrd t)
     (decRho dt.ly zero one
-      (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)))
     (dt.ixGateFam F hhas one b st t hc hn hrd vAdr f₀ a (Fin.last (dt.domNr t)))
     (fun r => by
       refine (ctlBit_rdf_ixGateFam hzo f₀ a r).trans ?_
@@ -883,7 +883,7 @@ theorem ctlBit_gateFlagC_ixGate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A
           (dt.ixBack F.toLayout zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
       (dt.ctlBit one f₀ dt.gateFlagC ∧
         (∀ t' : dt.X.Tag,
-          wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+          wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)
             (encTagTup dt.ly zero one t') ↔ t' = t) ∧
         foldFrom (dt.domPk t).pol (dt.ixGateLeafP (elt := elt) b st t (hn t) zero one)
           (· ≤ · : A → A → Prop) 0 topTup) := by
@@ -976,11 +976,11 @@ theorem ctlBit_gateFlagC_ixGate_domHolds (hzo : zero ≠ one)
           (dt.ixBack F.toLayout zero one dt.dd0Le st vAdr)) dt.gateFlagC ↔
       (dt.ctlBit one f₀ dt.gateFlagC ∧
         (∀ t' : dt.X.Tag,
-          wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)
+          wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)
             (encTagTup dt.ly zero one t') ↔ t' = t) ∧
         ExpExpansion.DomHolds (X := dt.X)
           (t, decRho dt.ly zero one
-            (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))) := by
+            (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)))) := by
   refine (ctlBit_gateFlagC_ixGate_exit hinj helt hzo f₀).trans
     (and_congr Iff.rfl (and_congr Iff.rfl ?_))
   refine (foldFrom_top (j₀ := 0)
@@ -989,14 +989,14 @@ theorem ctlBit_gateFlagC_ixGate_domHolds (hzo : zero ≠ one)
     (fun i _ a => le_topTup i a) (Nat.le_refl 0)).trans ?_
   exact (dt.domHolds_iff_altQuantFrom_domLeaf_pad t
     (decRho dt.ly zero one
-      (wmBlk (ixAddr elt st.mir) (DrawTag.arg (toLex b) : DrawTag R P dt.KIx)))
+      (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)))
     (hn t) topTup).symm
 
 end GateVerdict
 
 end GateInst
 
-end DrawData
+end Data
 
 end Draw
 

@@ -11,7 +11,7 @@ import DescriptiveComplexity.Problems.Wide.DrawLeaf
 # The round flags, read semantically, and the pack built from the pass
 
 The two inputs the capstone
-`DescriptiveComplexity.Draw.DrawData.accVerdict_varFM_qfValue` still
+`DescriptiveComplexity.Draw.Data.accVerdict_varFM_qfValue` still
 abstracts — the flags' readings `hEx`/`hAll` and the conditional semantic
 pack `semOf` — discharged at the concrete threads:
 
@@ -27,7 +27,7 @@ pack `semOf` — discharged at the concrete threads:
 * **`passW` / `passW_hENC` / `passSem`** — the valuation, its master
   encoding fact and the semantic pack **constructed from the pass**: the
   free levels are the gated address's points, the quantified ones are
-  chosen from `DescriptiveComplexity.Draw.DrawData.igPassP_iff_isEnc` —
+  chosen from `DescriptiveComplexity.Draw.Data.igPassP_iff_isEnc` —
   so the capstone's `hsem` is `rfl`.
 -/
 
@@ -39,9 +39,9 @@ open FirstOrder
 
 open Language Structure
 
-namespace DrawData
+namespace Data
 
-variable {L : Language.{0, 0}} (dt : DrawData L) {A R P : Type}
+variable {L : Language.{0, 0}} (dt : Data L) {A R P : Type}
 variable [Fintype dt.SlotIx]
 variable [LinearOrder A] [LinearOrder R] [LinearOrder P]
 variable [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -256,7 +256,7 @@ omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The master encoding fact of a passing round**: every level's block —
 the working address's at the free levels, the round register's at the
 quantified ones — encodes the valuation's point. The capstone's `hENC`,
-and `DescriptiveComplexity.Draw.DrawData.mkKindSem`'s input. -/
+and `DescriptiveComplexity.Draw.Data.mkKindSem`'s input. -/
 theorem passW_hENC (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
@@ -264,12 +264,12 @@ theorem passW_hENC (hzo : zero ≠ one)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk stV.mir
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ))
     (j : Fin (dt.nOf vi)) :
     wmBlk (dt.lvSet stV vi j)
-        (DrawTag.arg (toLex (dt.lvBlk vi j)) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi j)) : Tag R P dt.KIx) =
       encMap dt.ly zero one (dt.passW RF zero one hzo hlin vi stV hp mbW j) := by
   rw [lvSet, lvBlk, passW]
   by_cases h : (j : ℕ) < dt.arOf vi
@@ -305,8 +305,8 @@ noncomputable def passSem (hzo : zero ≠ one)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
     (hmb : ∀ ℓ : Fin (dt.arOf vi),
       wmBlk stV.mir
-        (DrawTag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (mbW ℓ)) :
     ∀ b : Fin (dt.natOf vi), dt.KindSem zero one vi stV (dt.kindOf vi b) :=
   fun b => dt.mkKindSem zero one vi stV
@@ -335,13 +335,13 @@ theorem wmBlk_stageTgtD_eq_encMap
     {p : Fin (dt.d.B.arity iv) → dt.X.Map A}
     (hsrc : ∀ ℓ : Fin (dt.d.B.arity iv),
       wmBlk (dt.lvSet stV vi (ts ℓ))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (p ℓ))
     (ℓ : Fin (dt.d.B.arity iv)) :
     wmBlk (dt.stageTgtD zero vi iv ts stV v (dt.d.B.arity iv))
-        (DrawTag.arg (toLex ((Sum.inl
+        (Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx) =
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx) =
       encMap dt.ly zero one (p ℓ) := by
   classical
   funext w
@@ -349,9 +349,9 @@ theorem wmBlk_stageTgtD_eq_encMap
   · obtain ⟨ℓ', u, -, hy, hsrcbit⟩ :=
       (dt.stageTgtD_iff (zero := zero) (vi := vi) (iv := iv) (ts := ts)
         (st := stV) (v := v) (dt.d.B.arity iv)
-        ((DrawTag.arg (toLex ((Sum.inl
+        ((Tag.arg (toLex ((Sum.inl
           (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ) :
-          Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx), w)).mp h
+          Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx), w)).mp h
     -- the destination cell decodes the position and the tuple
     have htag := congrArg Prod.fst hy
     have hsnd := congrArg Prod.snd hy
@@ -372,7 +372,7 @@ theorem wmBlk_stageTgtD_eq_encMap
     subst hℓ
     rw [show w = pad (dd := dt.dd) zero (ofLex u) from hsnd]
     have hbit : wmBlk (dt.lvSet stV vi (ts ℓ'))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ'))) : DrawTag R P dt.KIx)
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ'))) : Tag R P dt.KIx)
         (pad (dd := dt.dd) zero (ofLex u)) := hsrcbit
     rw [hsrc ℓ'] at hbit
     exact hbit
@@ -380,14 +380,14 @@ theorem wmBlk_stageTgtD_eq_encMap
       (pad_unpad dt.dd0Le fun j hj => isPad_of_encMap h j hj).symm
     refine (dt.stageTgtD_iff (zero := zero) (vi := vi) (iv := iv)
       (ts := ts) (st := stV) (v := v) (dt.d.B.arity iv)
-      ((DrawTag.arg (toLex ((Sum.inl
+      ((Tag.arg (toLex ((Sum.inl
         (Fin.castLE (dt.arOf_le_ko (some iv)) ℓ) :
-        Fin dt.ko ⊕ Fin dt.ki))) : DrawTag R P dt.KIx), w)).mpr
+        Fin dt.ko ⊕ Fin dt.ki))) : Tag R P dt.KIx), w)).mpr
       ⟨ℓ, toLex (unpad dt.dd0Le w), ℓ.isLt, ?_, ?_⟩
     · refine Prod.ext rfl ?_
       exact hpadded
     · change wmBlk (dt.lvSet stV vi (ts ℓ))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx)
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx)
         (pad (dd := dt.dd) zero (unpad dt.dd0Le w))
       rw [hsrc ℓ, ← hpadded]
       exact h
@@ -411,7 +411,7 @@ theorem old_trackOf_stageTgtD (hzo : zero ≠ one)
     {p : Fin (dt.d.B.arity iv) → dt.X.Map A}
     (hsrc : ∀ ℓ : Fin (dt.d.B.arity iv),
       wmBlk (dt.lvSet stV vi (ts ℓ))
-        (DrawTag.arg (toLex (dt.lvBlk vi (ts ℓ))) : DrawTag R P dt.KIx) =
+        (Tag.arg (toLex (dt.lvBlk vi (ts ℓ))) : Tag R P dt.KIx) =
         encMap dt.ly zero one (p ℓ))
     (hbelow : Below (dt.stageTgtD zero vi iv ts stV v (dt.d.B.arity iv))) :
     stV.old iv (dt.stageTgtD zero vi iv ts stV v (dt.d.B.arity iv)) ↔
@@ -493,10 +493,10 @@ theorem roundPass_iff_split_gen (hzo : zero ≠ one)
       exact hpol
     have hIE := (dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV ℓj).mp
       (h ℓj hflag)
-    have hblk : (DrawTag.arg (toLex (dt.igBlk vi ℓj)) : DrawTag R P dt.KIx) =
+    have hblk : (Tag.arg (toLex (dt.igBlk vi ℓj)) : Tag R P dt.KIx) =
         argIn dt.ko ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki vi)⟩ := by
       rw [igBlk]
-      exact congrArg DrawTag.arg (congrArg toLex
+      exact congrArg Tag.arg (congrArg toLex
         (congrArg Sum.inr (Fin.ext hnat)))
     rw [show (ixBlk (argIn dt.ko) stV.val
         ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki vi)⟩ :
@@ -513,15 +513,15 @@ theorem roundPass_iff_split_gen (hzo : zero ≠ one)
     have hIE := h ⟨dt.arOf vi + (ℓ : ℕ), hjlt⟩ (Nat.le_add_right _ _)
       ((hqiff ℓ).mp hflag)
     refine (dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV ℓ).mpr ?_
-    have hblk : (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx) =
+    have hblk : (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx) =
         argIn dt.ko
           ⟨dt.arOf vi + (ℓ : ℕ),
             lt_of_lt_of_le hjlt (dt.nOf_le_ki vi)⟩ := by
       rw [igBlk]
-      exact congrArg DrawTag.arg (congrArg toLex
+      exact congrArg Tag.arg (congrArg toLex
         (congrArg Sum.inr (Fin.ext rfl)))
     rw [show (wmBlk stV.val
-        (DrawTag.arg (toLex (dt.igBlk vi ℓ)) : DrawTag R P dt.KIx) :
+        (Tag.arg (toLex (dt.igBlk vi ℓ)) : Tag R P dt.KIx) :
           (Fin dt.dd → A) → Prop) =
       ixBlk (argIn dt.ko) stV.val
         ⟨dt.arOf vi + (ℓ : ℕ), lt_of_lt_of_le hjlt (dt.nOf_le_ki vi)⟩
@@ -557,14 +557,14 @@ theorem levelVal_encMap (hzo : zero ≠ one)
         have h1 := j.isLt
         simp only [nIn]
         omega⟩).mp (hp _)).choose_spec
-    have hblk : (DrawTag.arg (toLex (dt.igBlk vi
+    have hblk : (Tag.arg (toLex (dt.igBlk vi
         ⟨(j : ℕ) - dt.arOf vi, by
           have h1 := j.isLt
           simp only [nIn]
-          omega⟩)) : DrawTag R P dt.KIx) =
+          omega⟩)) : Tag R P dt.KIx) =
         argIn dt.ko ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki vi)⟩ := by
       rw [igBlk]
-      refine congrArg DrawTag.arg (congrArg toLex
+      refine congrArg Tag.arg (congrArg toLex
         (congrArg Sum.inr (Fin.ext ?_)))
       change dt.arOf vi + ((j : ℕ) - dt.arOf vi) = (j : ℕ)
       omega
@@ -580,7 +580,7 @@ variable {zero one} in
 omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The leaf at a passing round is the matrix's value at the pass's
 points** — the capstone's `hPsPass`, with `Ps` the gated matrix
-`DescriptiveComplexity.Draw.DrawData.leafP`. -/
+`DescriptiveComplexity.Draw.Data.leafP`. -/
 theorem leafP_pass_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
@@ -612,11 +612,11 @@ theorem leafP_pass_iff (hzo : zero ≠ one)
       omega
     have hIE := (dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV
       ⟨(j : ℕ) - dt.arOf vi, hℓlt⟩).mp (hp _)
-    have hblk : (DrawTag.arg (toLex (dt.igBlk vi
-        ⟨(j : ℕ) - dt.arOf vi, hℓlt⟩)) : DrawTag R P dt.KIx) =
+    have hblk : (Tag.arg (toLex (dt.igBlk vi
+        ⟨(j : ℕ) - dt.arOf vi, hℓlt⟩)) : Tag R P dt.KIx) =
         argIn dt.ko ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki vi)⟩ := by
       rw [igBlk]
-      refine congrArg DrawTag.arg (congrArg toLex
+      refine congrArg Tag.arg (congrArg toLex
         (congrArg Sum.inr (Fin.ext ?_)))
       change dt.arOf vi + ((j : ℕ) - dt.arOf vi) = (j : ℕ)
       omega
@@ -684,7 +684,7 @@ theorem leafP_fail_iff (hzo : zero ≠ one)
 
 end LeafSem
 
-end DrawData
+end Data
 
 end Draw
 

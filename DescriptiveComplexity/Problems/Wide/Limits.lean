@@ -74,14 +74,14 @@ theorem card_ctl_lt_card_univ [Nonempty W]
   have hlt : Nat.card A ^ Nat.card Q < Nat.card A ^ dd :=
     Nat.pow_lt_pow_right hA hQW
   have huniv : Nat.card (Univ A R P K dd) =
-      Nat.card (DrawTag R P K) * Nat.card (Fin dd → A) := Nat.card_prod _ _
-  have htag : 1 ≤ Nat.card (DrawTag R P K) := by
-    have : Nonempty (DrawTag R P K) := ⟨DrawTag.sym⟩
-    exact Nat.one_le_iff_ne_zero.mpr (Nat.card_pos (α := DrawTag R P K)).ne'
+      Nat.card (Tag R P K) * Nat.card (Fin dd → A) := Nat.card_prod _ _
+  have htag : 1 ≤ Nat.card (Tag R P K) := by
+    have : Nonempty (Tag R P K) := ⟨Tag.sym⟩
+    exact Nat.one_le_iff_ne_zero.mpr (Nat.card_pos (α := Tag R P K)).ne'
   calc Nat.card (Q → A) = Nat.card A ^ Nat.card Q := hfun
     _ < Nat.card A ^ dd := hlt
     _ = 1 * Nat.card (Fin dd → A) := by rw [htup, one_mul]
-    _ ≤ Nat.card (DrawTag R P K) * Nat.card (Fin dd → A) :=
+    _ ≤ Nat.card (Tag R P K) * Nat.card (Fin dd → A) :=
         Nat.mul_le_mul_right _ htag
     _ = Nat.card (Univ A R P K dd) := huniv.symm
 
