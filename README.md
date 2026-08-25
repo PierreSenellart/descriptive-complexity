@@ -224,7 +224,10 @@ build times down.
   `DescriptiveComplexity/Examples/GraphCrawling.lean`, worked examples read top
   to bottom, each walking through a new problem domain in the order a user meets
   it (concrete problem → encoding → vocabulary and semantics → faithfulness →
-  membership → hardness → completeness).
+  membership → hardness → completeness). The shortest instance of the same
+  loop is `DescriptiveComplexity/Problems/SubgraphIso.lean` with its
+  `SubgraphIso/Encoding.lean`: a catalog problem, then its concrete encoding
+  and a decoder with no well-formedness condition.
 * **Planned work**: `ROADMAP.md` – classes beyond PSPACE, counting and
   optimization problems, more inexpressibility results, finer reduction notions.
 

@@ -243,7 +243,10 @@ individual declarations are documented on their own pages.
   Both tutorials – `DescriptiveComplexity.Examples.ConjunctiveQueries` and
   `DescriptiveComplexity.Examples.GraphCrawling` – open with a concrete
   instance type and its bundled encoding, and close the loop with a decoder
-  and a well-formed completeness theorem.
+  and a well-formed completeness theorem;
+  `DescriptiveComplexity.Problems.SubgraphIso.Encoding` does the same for a
+  problem of the catalog, with a decoder that needs no well-formedness
+  condition at all.
 * `DescriptiveComplexity.Degree` – completeness *without a class*: the downward
   closure `DescriptiveComplexity.ComplexityClass.below Q₀` of a fixed problem
   under ordered FO reductions is itself a `ComplexityClass`, so
