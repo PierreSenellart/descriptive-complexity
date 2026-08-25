@@ -193,23 +193,24 @@ machine bridges.
       the binary side (`le` a comparison sweep, `plus` a ripple carry, `bit` a
       read, a target sweep being `d` chained sweeps with the boundary states
       guessed) while the interpretation's `FO(≤)` queries are evaluated on the
-      component side through `Translate.lean`. All that is new is **`Conv`**,
-      the agreement of the two representations, which by Horner is `d` rounds of
-      “accumulator times `n` plus a digit” – the exact shape of
-      `BitSum/Times.lean`'s column sum at `d`-fold width, certificates widening
-      from one element to a constant family. Preferred because every hard piece
-      re-instantiates an in-house device whose estimate-vs-actual is calibrated,
-      because it consumes the machine model just built, and because its
-      `d`-chunk element families are the “big number as a family of elements”
-      layer FO(COUNT) / TC⁰ would want anyway.
+      component side through `LogTime/Translate.lean`. All that is new is
+      **`Conv`**, the agreement of the two representations, which by Horner is
+      `d` rounds of “accumulator times `n` plus a digit” – the exact shape of
+      `LogTime/BitSum/Times.lean`'s column sum at `d`-fold width, certificates
+      widening from one element to a constant family. Preferred because every
+      hard piece re-instantiates an in-house device whose estimate-vs-actual is
+      calibrated, because it consumes the machine model just built, and because
+      its `d`-chunk element families are the “big number as a family of
+      elements” layer FO(COUNT) / TC⁰ would want anyway.
 
     Two unknowns to burn down first, half a day each: fields tiled across a
     *family* of elements, the one variation of the packing devices never
-    exercised (write `BitSum/Sizes.lean`'s arithmetic at width `d`, check it at
-    `d = 2` on paper), and whether Horner's `d` dependent steps collapse into a
-    single `2d`-column convolution. Either route needs the **`orank` bridge** –
-    that the rank of a tagged tuple in `tagTupleOrder` *is* the mixed-radix
-    value, stated nowhere yet – and both `LEquiv`s are against it;
+    exercised (write `LogTime/BitSum/Sizes.lean`'s arithmetic at width `d`,
+    check it at `d = 2` on paper), and whether Horner's `d` dependent steps
+    collapse into a single `2d`-column convolution. Either route needs the
+    **`orank` bridge** – that the rank of a tagged tuple in `tagTupleOrder`
+    *is* the mixed-radix value, stated nowhere yet – and both `LEquiv`s are
+    against it;
     `LogTime/Small.lean`'s `ArithDef.of_large` already covers the degenerate
     sizes the splitting excludes. The one place this could be *unsound* rather
     than merely incomplete is `arithExtendLEquiv`, the proof that the formulas
@@ -692,9 +693,10 @@ The concrete items:
 The degree machinery itself is built (`DescriptiveComplexity.Degree`:
 `ComplexityClass.below`, completeness for a degree as mutual reducibility, and
 the check that the logically defined classes *are* the degrees of their
-complete problems), and Graph Isomorphism sits in it. What is left is
-populating that degree, and the second reduction theory not organized around a
-class.
+complete problems), and so is the doubling lemma every entry of the degree goes
+through (`DescriptiveComplexity.isoReflecting_fo_reduction`, below). What is
+left is populating the degree, and the second reduction theory not organized
+around a class.
 
 - **Hardness for isomorphism problems must be order-free** – a design-triage
   rule, beside the choice of number encoding
@@ -705,18 +707,18 @@ class.
   makes the yes/no answer order-independent, not the constructed structure
   independent up to isomorphism, so every gadget would owe a structure-level
   argument. Order-free is available because `twoGraphs` carries its own “this
-  element is real” marks: run `F` relativized to `patV` and to `hostV` in
-  parallel inside one order-free interpretation, leaving junk unmarked. Side
-  benefit – both sides are built by the same gadget out of the same universe,
-  so they come out size-balanced and the padding step most textbook GI
-  reductions need disappears. The one reusable lemma, which is what makes each
-  catalog entry short afterwards [M]:
-
-  ```lean
-  theorem gi_hard_of_isoReflecting (F : FOInterpretation Language.graph L' Tag d)
-      (h : ∀ G H, … → Nonempty (F.Map G ≃[L'] F.Map H) → Nonempty (G ≃[Language.graph] H)) :
-      DigraphIso ≤ᶠᵒ DigraphIso'
-  ```
+  element is real” marks, and running `F` relativized to each side's mark
+  inside one order-free interpretation, leaving junk unmarked, is what
+  `DescriptiveComplexity.FOInterpretation.double` does
+  (`DescriptiveComplexity/GadgetDouble.lean`). Side benefit – both sides are
+  built by the same gadget out of the same universe, so they come out
+  size-balanced and the padding step most textbook GI reductions need
+  disappears. What an entry then owes is its gadget and
+  `DescriptiveComplexity.IsoReflecting` of it – isomorphic values come from
+  isomorphic arguments, a statement about *single* structures with no
+  pattern/host distinction in it – which
+  `DescriptiveComplexity.isoReflecting_fo_reduction` turns into the reduction.
+  That is what keeps every entry below short.
 - **The GI degree, in order of cost** [M each]: hypergraph / set-system
   isomorphism first, since `Problems/SetFamily/FromGraphs.lean` already builds
   set systems from graphs and the incidence construction is order-free; then
@@ -771,12 +773,13 @@ provable rather than merely reasonable.
    next substantial piece of the inexpressibility track, and the one that
    gives connectivity and acyclicity without bespoke strategies. The 0-1 laws
    are its independent neighbor.
-2. **Populating the GI degree** (§9) [M each]: with `below` and Graph
-   Isomorphism in place, the degree has one inhabitant and no companions.
-   Hypergraph / set-system isomorphism first, and `gi_hard_of_isoReflecting`
-   with it, since it is what makes every later entry short. Taken after step 1
-   on purpose: a degree structure is worth building where non-reducibility is
-   provable.
+2. **Populating the GI degree** (§9) [M each]: with the degree machinery and
+   the doubling lemma in place, an entry costs its gadget and an
+   `IsoReflecting` proof and nothing besides, which makes this the cheapest
+   result per line on the list. Hypergraph / set-system isomorphism first, its
+   incidence construction being order-free and half-written in
+   `Problems/SetFamily/FromGraphs.lean`. Taken after step 1 on purpose: a
+   degree structure is worth building where non-reducibility is provable.
 
 **Alongside, or after:**
 
