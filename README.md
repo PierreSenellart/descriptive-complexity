@@ -125,7 +125,8 @@ merely not built yet, see `ROADMAP.md`.
 * **The reduction must be expressible in logic.** A poly-time reduction that is
   not FO-expressible cannot be used; gadgets often need a linear order, tags or
   extra dimensions, and arithmetic inside formulas is limited (addition and
-  comparison are FO(≤); multiplication is not FO).
+  comparison are FO(≤); multiplication is not FO, being as hard as majority
+  under constant-depth reductions, Vollmer 1999, Cor. 1.39 and 3.34).
 * **Completeness and structure, not class separations.** Whether P = NP and the
   like is open mathematics the framework does not decide. Separations between
   *logics* are in scope, and proved (see above).
