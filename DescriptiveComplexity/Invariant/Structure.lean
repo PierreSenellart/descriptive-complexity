@@ -10,7 +10,8 @@ import DescriptiveComplexity.Invariant.OrderedPebble
 # The invariant structure `Iᵏ A`
 
 The quotient of the `k`-tuples of a structure by `≡ᵏ`
-(`DescriptiveComplexity.InvMap`), as a structure
+(`DescriptiveComplexity.InvMap`) – the *invariant* of
+[Dawar–Lindell–Weinstein 1995][dawar1995infinitary] – as a structure
 over the *invariant vocabulary* `DescriptiveComplexity.invLang`:
 
 * one unary *bit* per coordinate equality (`DescriptiveComplexity.InvRel.eqBit`)

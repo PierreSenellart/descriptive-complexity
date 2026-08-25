@@ -1159,7 +1159,8 @@ The bottom of the ordered world, and the only vocabulary here that is a
   on ordered structures the inflationary and partial fixed-point logics agree
   exactly when `PTIME = PSPACE` – a corollary of the two capture theorems.
 * `DescriptiveComplexity.AbiteboulVianu` – **the Abiteboul–Vianu theorem**
-  ([Abiteboul–Vianu 1991][abiteboul1991generic];
+  ([Abiteboul–Vianu 1991][abiteboul1991generic]; along the machine-free route
+  of [Dawar–Lindell–Weinstein 1995][dawar1995infinitary] and
   [Ebbinghaus–Flum 1995][ebbinghaus1995finite], ch. 7): the inflationary and
   partial fixed-point logics have the same expressive power **on unordered
   finite structures** exactly when `PTIME = PSPACE`
