@@ -31,27 +31,24 @@ theorem of `DescriptiveComplexity.FixedPointReductionClosure` therefore
 transfers: PTIME, NP and coNP are closed under `≤ᵗᶜ`, and hardness under
 first-order reductions implies hardness under these.
 
-Two things are **not** proved here, and neither is bookkeeping.
+What does not transfer is the closure of NL itself: the membership walk
+pulled back through the reduction is a walk whose steps consult walks, and the
+route the other classes took is unavailable here – there the induction was
+absorbed by a *smaller* class already known to sit inside (PTIME inside NP),
+and NL has no smaller class to lean on. What it needs is its own normal form,
+a `TC` of a formula containing `TC`s being a single `TC`, and that is proved
+as an algebra of walks with two exits (`DescriptiveComplexity.Decider`,
+`DescriptiveComplexity.TransitiveClosureDecide` through
+`DescriptiveComplexity.TransitiveClosureSentenceDecide`): NL is closed under
+`≤ᵗᶜ` (`DescriptiveComplexity.mem_NL_of_tcReduction`, in
+`DescriptiveComplexity.TransitiveClosureReductionClosure`).
 
-* **Transitivity of `≤ᵗᶜ`.** Composing two FO(TC) interpretations pulls the
-  outer walks back through the inner interpretation, whose formulas already
-  consult walks – so the composite's step formulas contain reachability atoms,
-  and flattening them is Immerman's normal form (a `TC` of a formula containing
-  a `TC` is a single `TC`). Positively occurring atoms are cheap – suspend the
-  outer walk, run the inner one, resume – but a negative occurrence needs
-  non-reachability, i.e., inductive counting
-  (`DescriptiveComplexity.InductiveCounting`) as a subroutine rather than at
-  the top level.
-* **Closure of NL itself under `≤ᵗᶜ`**, for the same reason: the membership
-  walk pulled back through the reduction is a walk whose steps consult walks.
-  The route the other classes took is unavailable here – there the induction
-  was absorbed by a *smaller* class already known to sit inside (PTIME inside
-  NP), and NL has no smaller class to lean on: the absorption it needs is its
-  own normal form. `ROADMAP.md` prices both.
-
-So the honest reading of this file: `≤ᵗᶜ` is a reduction *notion*, with the
-closure properties of the classes above NL, and it is not yet a reduction
-*order*.
+Transitivity of `≤ᵗᶜ` (`DescriptiveComplexity.TCReduction.trans`, in
+`DescriptiveComplexity.TransitiveClosureReductionTrans`) composes two FO(TC)
+interpretations by pulling the outer walks back through the inner
+interpretation, flattening them with the same deciders, and extending the
+inner interpretation to the outer walks' vocabulary. So `≤ᵗᶜ` is a reduction
+*order*, with the closure properties of NL and of the classes above it.
 -/
 
 namespace DescriptiveComplexity

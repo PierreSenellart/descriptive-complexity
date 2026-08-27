@@ -75,8 +75,13 @@ requiring only first-order logic, which Mathlib already has.
   is one, and strictly so – EVEN reduces by a single deterministic walk along
   the order to a first-order definable problem, and by no FO reduction
   (`exists_dtcReduction_not_orderedReduction`), so the gap opens already at the
-  many-one reduction of the textbooks. NL's and L's own closure under these is
-  not proved: it needs Immerman's normal form.
+  many-one reduction of the textbooks. NL is closed under `≤ᵗᶜ` and L under
+  `≤ᵈᵗᶜ` (`mem_NL_of_tcReduction`, `mem_LOGSPACE_of_dtcReduction`): Immerman's
+  normal form, proved as an algebra of walks with two exits, with
+  Immerman–Szelepcsényi run with parameters for the nondeterministic atoms and
+  a step budget for the deterministic ones. Both notions are transitive
+  (`TCReduction.trans`, `DTCReduction.trans`), by the same pieces: the outer
+  walks are pulled back, flattened, and added to the inner family.
 * AC⁰ is read here as the logic `FO(≤, +, ×)`; no circuit model is involved. It
   is proved to sit inside L (`ac0Definable_mem_LOGSPACE`), by a deterministic
   multi-head automaton that computes the numeric predicates instead of reading

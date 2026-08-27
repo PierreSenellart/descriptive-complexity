@@ -271,42 +271,6 @@ machine bridges.
   odd one out: its witness is a guess rather than an iteration, so the NP
   argument is the one to copy, with `SecondOrderNewPull.lean` in place of
   `SecondOrderRelPull.lean`.
-- **FO(TC) reductions: transitivity, and closure of NL** [L]: `≤ᵗᶜ` exists
-  (`TransitiveClosureReduction.lean`) and inherits everything the FO(LFP)
-  notion gives it, since a walk is an induction
-  (`TCFamily.inflLimit_toStepDef`). What it does not have is composition with
-  itself, nor the closure of its own class, and both are the *same* missing
-  theorem: pulling a walk back through an FO(TC) interpretation gives a walk
-  whose step formulas contain reachability atoms, and flattening those is
-  Immerman's normal form. Split the work by the sign of the occurrence. A
-  **positive** atom is cheap – suspend the outer walk, run the inner one,
-  resume – so the state is a pair of nodes and a phase, and the construction is
-  a mode-and-tuple bookkeeping exercise; do this half first, since it already
-  closes composition for interpretations whose formulas use the atoms
-  positively. A **negative** atom needs non-reachability, i.e., the inductive
-  counting of `InductiveCounting.lean` run *as a subroutine at parameters*
-  rather than once at the top level: that is the expensive half, and the
-  generalization to price is the counting construction with the source node and
-  the parameters threaded through (the `FixedPointParam.lean` pattern, applied
-  to a much larger construction). The alternative route is the machine one –
-  a head-program fragment per atom, `evalArithP` generalized as the FO(COUNT)
-  item above already asks, then `HeadAutomaton` back to a `TCSpec` – and it
-  shares that generalization with FO(COUNT), so pricing the two together is
-  worthwhile. Note what is *not* needed either way: `TCSpec` already has modes,
-  and `ParamTCSpec` already has parameters, so no new syntax layer is involved.
-- **FO(DTC) reductions: transitivity, and closure of LOGSPACE** [M–L]: the
-  notion exists (`TransitiveClosureReductionDet.lean`, `≤ᵈᵗᶜ`) and inherits the
-  closures of `≤ᵗᶜ`; what it lacks is the same flattening theorem, and this is
-  the version to attempt first. The reason is the negative occurrences: a
-  deterministic walk is witnessed *not* to arrive by a step budget (this is how
-  `LOGSPACE_eq_coLOGSPACE` avoids Immerman–Szelepcsényi), so they cost a budget
-  counter in the composite walk's tuple rather than a counting construction.
-  What remains genuinely to build either way is the evaluator: a walk that
-  decides an arbitrary first-order formula whose atoms are walks, which is the
-  quantifier bookkeeping `HeadEval.evalP` already does for head programs – so
-  price this jointly with the FO(COUNT) substitution item above, whose
-  generalization of `evalArithP` it shares.
-
 ## 4. Capture and structural theorems (DC's greatest hits)
 
 Three pieces built for Abiteboul–Vianu are the ones to reach for in any capture

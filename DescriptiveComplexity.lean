@@ -159,7 +159,18 @@ import DescriptiveComplexity.FixedPointReductionStrict
 import DescriptiveComplexity.TransitiveClosureParam
 import DescriptiveComplexity.TransitiveClosureReduction
 import DescriptiveComplexity.TransitiveClosureReductionDet
+import DescriptiveComplexity.TransitiveClosureParamPull
+import DescriptiveComplexity.TransitiveClosureTower
+import DescriptiveComplexity.TransitiveClosureReductionComposition
 import DescriptiveComplexity.TransitiveClosureReductionStrict
+import DescriptiveComplexity.TransitiveClosureDecide
+import DescriptiveComplexity.TransitiveClosureDecideFormula
+import DescriptiveComplexity.TransitiveClosureDecideReach
+import DescriptiveComplexity.TransitiveClosureDecideReachDet
+import DescriptiveComplexity.TransitiveClosureFlatten
+import DescriptiveComplexity.TransitiveClosureSentenceDecide
+import DescriptiveComplexity.TransitiveClosureReductionClosure
+import DescriptiveComplexity.TransitiveClosureReductionTrans
 import DescriptiveComplexity.FixedPointReductionHierarchy
 import DescriptiveComplexity.FixedPointStratifyPartial
 import DescriptiveComplexity.FixedPointReductionSpace
@@ -559,10 +570,32 @@ the inflationary layers above. They nest,
   `DescriptiveComplexity.TCReduction` (notation `P ≤ᵗᶜ Q`) is an
   interpretation whose formulas may read those relations. It is an FO(LFP)
   reduction (`DescriptiveComplexity.TCReduction.toLFP`), so PTIME, NP and coNP
-  are closed under it as well; **transitivity and closure of NL itself are
-  not proved** – both need Immerman's normal form, a `TC` of a formula
-  containing a `TC` being a single `TC`, whose negative case is inductive
-  counting used as a subroutine (`ROADMAP.md` prices it).
+  are closed under it as well, and so is **NL** – the closure the notion is
+  named for – by Immerman's normal form, proved below as an algebra of walks
+  (`DescriptiveComplexity.mem_NL_of_tcReduction`,
+  `DescriptiveComplexity.TransitiveClosureReductionClosure`). Composition with
+  a first-order reduction on the outside is proved
+  (`DescriptiveComplexity.TCReduction.trans_rel`,
+  `DescriptiveComplexity.TransitiveClosureReductionComposition`): the outer
+  reduction contributes no walks, so the composite consults the same ones.
+  **Transitivity with itself** is `DescriptiveComplexity.TCReduction.trans`
+  (`DescriptiveComplexity.TransitiveClosureReductionTrans`), so `≤ᵗᶜ` is a
+  reduction order.
+* `DescriptiveComplexity.TransitiveClosureParamPull` – a walk on the
+  interpreted structure **is** a walk on the base one
+  (`DescriptiveComplexity.ParamTCSpec.comapRel`), its tuples spread over their
+  coordinates and the tags of its points carried in the mode. Over a definable
+  domain the encoding is no longer a bijection, so the pulled walk is guarded
+  and the correspondence
+  (`DescriptiveComplexity.ParamTCSpec.reachAt_comapRel_iff`) is stated between
+  in-domain nodes – which is where the formulas that read it evaluate it.
+* `DescriptiveComplexity.TransitiveClosureTower` – what those pulled walks
+  are: a `DescriptiveComplexity.TCTower` is a list of families, each over the
+  vocabulary the ones below it expand, so its walks may read the reachability
+  relations of earlier walks. That is FO(TC) *with nesting*, and it costs
+  nothing – `DescriptiveComplexity.TCTower.inflLimit_toStepDef` says a tower's
+  relations are still the value of one inflationary induction, the
+  stratification (`DescriptiveComplexity.StepDef.stratify`) of its families'.
 * `DescriptiveComplexity.TransitiveClosureReductionDet` – the *deterministic*
   reading, `DescriptiveComplexity.DTCReduction` (notation `P ≤ᵈᵗᶜ Q`), which is
   the many-one reduction of the textbooks: every walk is read through its
@@ -570,7 +603,68 @@ the inflationary layers above. They nest,
   formula rather than as a hypothesis, exactly as
   `DescriptiveComplexity.TCSpec.det`), and a walk that is already functional
   loses nothing by it
-  (`DescriptiveComplexity.ParamTCSpec.reachAt_det_of_functional`).
+  (`DescriptiveComplexity.ParamTCSpec.reachAt_det_of_functional`). **LOGSPACE
+  is closed under it** (`DescriptiveComplexity.mem_LOGSPACE_of_dtcReduction`).
+* **Immerman's normal form, as an algebra of walks.** A
+  `DescriptiveComplexity.Decider` (`DescriptiveComplexity.TransitiveClosureDecide`)
+  is a walk with two exits, `yes` and `no`, and parameters; it *decides* a
+  proposition when, from its start mode and any tuple, `yes` is reachable
+  exactly if the proposition holds and `no` exactly if it fails. Negation
+  swaps the exits, conjunction runs one decider after the other, and the
+  universal quantifier iterates a decider along the order with the bound
+  variable frozen into a coordinate – so every first-order formula over an
+  expansion by decided relations is decided
+  (`DescriptiveComplexity.Decider.exists_of_formula`,
+  `DescriptiveComplexity.TransitiveClosureDecideFormula`), and every
+  construction preserves *functionality*, which is what serves the
+  deterministic logic. The atoms are the reachability relations of walks:
+  `DescriptiveComplexity.ParamTCSpec.reachDecider`
+  (`DescriptiveComplexity.TransitiveClosureDecideReach`) runs the walk for
+  `yes` and, for `no`, the inductive-counting walk of
+  `DescriptiveComplexity.TransitiveClosureCompl` – **Immerman–Szelepcsényi with
+  parameters**, obtained from the sentence-level theorem by turning the
+  parameters into constants of the vocabulary
+  (`DescriptiveComplexity.constStructure`, `DescriptiveComplexity.toConst`,
+  `DescriptiveComplexity.fromConst`) rather than by touching the counting
+  machine; `DescriptiveComplexity.ParamTCSpec.detReachDecider`
+  (`DescriptiveComplexity.TransitiveClosureDecideReachDet`) follows the one
+  run of a determinized walk with a step budget counted over the walk's own
+  nodes, and is functional. A walk over an expansion whose steps are decided
+  is then **suspended** into a walk over the base
+  (`DescriptiveComplexity.ParamTCSpec.flat`,
+  `DescriptiveComplexity.TransitiveClosureFlatten`), the candidate successor
+  guessed (`DescriptiveComplexity.ParamTCSpec.reachAt_flat_iff`) or searched in
+  the order of nodes, which is functional and simulates a functional outer
+  walk (`DescriptiveComplexity.ParamTCSpec.reachAt_flat_iff_of_functional`);
+  and a sentence – some source reaches some target – is one decider
+  (`DescriptiveComplexity.ParamTCSpec.sentenceDecider`,
+  `DescriptiveComplexity.TransitiveClosureSentenceDecide`), hence one
+  `DescriptiveComplexity.TCSpec` (`DescriptiveComplexity.Decider.toSpec`).
+  `DescriptiveComplexity.TransitiveClosureReductionClosure` pulls the walk
+  deciding `Q` back through the reduction
+  (`DescriptiveComplexity.TCSpec.pullSpec`) and assembles the two closures,
+  `DescriptiveComplexity.TCDefinable.of_tcReduction` and
+  `DescriptiveComplexity.DTCDefinable.of_dtcReduction`, with coNL and
+  coLOGSPACE in their wake.
+* `DescriptiveComplexity.TransitiveClosureReductionTrans` – **transitivity** of
+  `≤ᵗᶜ` (`DescriptiveComplexity.TCReduction.trans`) and of `≤ᵈᵗᶜ`
+  (`DescriptiveComplexity.DTCReduction.trans`), by the same pieces and no
+  normal form on formulas: the outer reduction's walks are pulled back through
+  the inner interpretation (`DescriptiveComplexity.TCInterpretation.pulled`),
+  flattened (`DescriptiveComplexity.TCInterpretation.flatFamily`) and added to
+  the inner family, and the inner interpretation is *extended* to the outer
+  family's vocabulary (`DescriptiveComplexity.TCInterpretation.CompositeBlock.extendOuter`),
+  a reachability atom of an outer walk being read as “the endpoints have
+  encodings between which the flat walk reaches”; the guarded composition
+  `DescriptiveComplexity.RelFOInterpretation.compRel` then substitutes those
+  formulas for the atoms, and produces exactly the outer reduction's input
+  (`DescriptiveComplexity.TCInterpretation.CompositeBlock.extendOuterLEquiv`).
+  The composite family is kept abstract
+  (`DescriptiveComplexity.TCInterpretation.CompositeBlock`) so that it may be
+  read as it is or through its determinization, which is the deterministic
+  case – where the pullback of a determinized walk is functional
+  (`DescriptiveComplexity.ParamTCSpec.comapRel_functional`), as the searching
+  flat walk requires.
 * `DescriptiveComplexity.TransitiveClosureReductionStrict` – the same
   separation two notions lower: EVEN reduces to
   `DescriptiveComplexity.NONEMPTYMARK` in FO(≤, TC) and by no first-order

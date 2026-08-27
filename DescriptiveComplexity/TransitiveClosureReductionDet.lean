@@ -40,12 +40,17 @@ existing walk – the parity walk, say – is reused at this notion.
 everything `DescriptiveComplexity.TransitiveClosureReduction` proves transfers,
 and PTIME, NP and coNP are closed under `≤ᵈᵗᶜ` as well.
 
-What this notion has that `≤ᵗᶜ` does not is a *cheap* route to its own
-transitivity and to the closure of `DescriptiveComplexity.LOGSPACE`, which is
-why `ROADMAP.md` puts it first of the two: flattening a walk that consults
-walks needs non-reachability at the negative occurrences, and a deterministic
-walk is witnessed not to arrive by a step budget, where a nondeterministic one
-needs inductive counting. Neither is proved here.
+`DescriptiveComplexity.LOGSPACE` is closed under it
+(`DescriptiveComplexity.mem_LOGSPACE_of_dtcReduction`, in
+`DescriptiveComplexity.TransitiveClosureReductionClosure`), by the same normal
+form as NL under `≤ᵗᶜ` with one difference at the atoms: flattening a walk
+that consults walks needs non-reachability at the negative occurrences, and a
+deterministic walk is witnessed not to arrive by a step budget
+(`DescriptiveComplexity.ParamTCSpec.detReachDecider`), where a
+nondeterministic one needs inductive counting. Transitivity is
+`DescriptiveComplexity.DTCReduction.trans`, the composite of
+`DescriptiveComplexity.TransitiveClosureReductionTrans` read through its
+determinization.
 -/
 
 namespace DescriptiveComplexity
