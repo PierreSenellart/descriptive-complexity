@@ -149,6 +149,20 @@ import DescriptiveComplexity.GadgetDouble
 import DescriptiveComplexity.Degree
 import DescriptiveComplexity.Problems
 import DescriptiveComplexity.ClassDegrees
+import DescriptiveComplexity.SecondOrderRelPull
+import DescriptiveComplexity.FixedPointReduction
+import DescriptiveComplexity.FixedPointReductionComposition
+import DescriptiveComplexity.FixedPointExpand
+import DescriptiveComplexity.FixedPointReductionClosure
+import DescriptiveComplexity.FixedPointExpandLevels
+import DescriptiveComplexity.FixedPointReductionStrict
+import DescriptiveComplexity.TransitiveClosureParam
+import DescriptiveComplexity.TransitiveClosureReduction
+import DescriptiveComplexity.TransitiveClosureReductionDet
+import DescriptiveComplexity.TransitiveClosureReductionStrict
+import DescriptiveComplexity.FixedPointReductionHierarchy
+import DescriptiveComplexity.FixedPointStratifyPartial
+import DescriptiveComplexity.FixedPointReductionSpace
 import DescriptiveComplexity.Computability
 import DescriptiveComplexity.Examples
 
@@ -204,6 +218,11 @@ individual declarations are documented on their own pages.
   (notation `P ≤ᶠᵒ[≤] Q`): order-invariant FO(≤) reductions, correct on every
   finite linearly ordered input. This is the standard notion of the field and
   the home of gadget constructions that genuinely need an order.
+* Logarithmic-space and polynomial-time reductions are *stronger* notions, and
+  need a logic capturing those classes to state: they appear below, as
+  `DescriptiveComplexity.TCReduction` (notation `P ≤ᵗᶜ Q`) and
+  `DescriptiveComplexity.LFPReduction` (notation `P ≤ˡᶠᵖ Q`), once the walk
+  and fixed-point layers are in place.
 
 ## The abstract complexity layer
 
@@ -450,6 +469,119 @@ individual declarations are documented on their own pages.
   linear order, and `P` holds on the reduct») over the ordered expansion, and
   order-free definability implies ordered definability
   (`DescriptiveComplexity.StepDef.liftOrder`).
+
+## Reductions with a logic inside: FO(TC) and FO(LFP)
+
+Every reduction above is first-order, hence computable in AC⁰; the textbook
+notions for the classes from logarithmic space up are the *logarithmic-space*
+and the *polynomial-time* reduction. Without machines, those are
+interpretations whose formulas are written in a logic capturing that class –
+Immerman's **FO(TC)** and **FO(LFP) reductions**, built here on the walk and
+the inflationary layers above. They nest,
+`≤ᶠᵒ[≤]` ⊆ `≤ᵈᵗᶜ` ⊆ `≤ᵗᶜ` ⊆ `≤ˡᶠᵖ`, with the first inclusion strict.
+
+* `DescriptiveComplexity.FixedPointReduction` – a
+  `DescriptiveComplexity.LFPInterpretation` is a relativized first-order
+  interpretation whose formulas may read the value of a simultaneous
+  induction over the base structure, and a
+  `DescriptiveComplexity.LFPReduction` (notation `P ≤ˡᶠᵖ Q`) is one mapping
+  yes-instances exactly to yes-instances, for every linear order on the
+  input. Every first-order reduction is one
+  (`DescriptiveComplexity.FOReduction.toLFP`,
+  `DescriptiveComplexity.OrderedFOReduction.toLFP`,
+  `DescriptiveComplexity.RelOrderedFOReduction.toLFP`), which is the statement
+  that an FO reduction is in particular a polynomial-time reduction.
+* `DescriptiveComplexity.FixedPointReductionComposition` – **transitivity**
+  (`DescriptiveComplexity.LFPReduction.trans`), i.e., the substitution
+  property of the logic: the outer induction pulls back through the inner
+  interpretation and the two inductions stratify into one
+  (`DescriptiveComplexity.StepDef.stratify`), while the interpretations
+  compose with the guarded pullback a definable domain requires.
+* `DescriptiveComplexity.SecondOrderRelPull` – second-order definability pulls
+  back through a *relativized* interpretation
+  (`DescriptiveComplexity.SigmaSODefinable.of_relOrderedReduction` and its
+  universal twin), the transfer of assignments being a retraction rather than
+  a bijection: off-domain junk in a guess is never read.
+* `DescriptiveComplexity.FixedPointExpand` – **an induction can be eliminated
+  from a `Σ₁` definition**
+  (`DescriptiveComplexity.sigmaSODefinable_of_ifpExpand`), by making the
+  guessed relations part of the vocabulary – over which the induction defines
+  a PTIME problem, hence a `Σ₁` one with no induction left – and merging the
+  two existential blocks into one.
+* `DescriptiveComplexity.FixedPointReductionClosure` – PTIME, NP and coNP are
+  closed under `≤ˡᶠᵖ` (`DescriptiveComplexity.mem_PTIME_of_lfpReduction`,
+  `DescriptiveComplexity.mem_NP_of_lfpReduction`,
+  `DescriptiveComplexity.mem_coNP_of_lfpReduction`), each by a different
+  argument – stratification, the elimination above, complementation – and
+  `DescriptiveComplexity.CofinalHardLFP` states hardness under these
+  reductions, implied by the library's own
+  (`DescriptiveComplexity.CofinalHard.toLFP`).
+* `DescriptiveComplexity.FixedPointExpandLevels` – the same elimination under a
+  quantifier prefix of **any** length and either polarity
+  (`DescriptiveComplexity.exists_expand_sorealize`): the blocks are peeled from
+  the outside in, each commuting with the expansion, and the recursion ends at
+  one block, where the induction becomes a quantifier of that block's own
+  polarity and merges into it – `DescriptiveComplexity.PTIME_subset_NP`
+  existentially, `DescriptiveComplexity.PTIME_subset_coNP` universally.
+* `DescriptiveComplexity.FixedPointReductionHierarchy` – with it, **every
+  level of the polynomial hierarchy and `PH` itself** are closed under `≤ˡᶠᵖ`,
+  and so under `≤ᵗᶜ` and `≤ᵈᵗᶜ`
+  (`DescriptiveComplexity.mem_sigmaP_of_lfpReduction`,
+  `DescriptiveComplexity.mem_piP_of_lfpReduction`,
+  `DescriptiveComplexity.mem_PH_of_lfpReduction` and their siblings).
+* `DescriptiveComplexity.FixedPointStratifyPartial` – **an inflationary
+  induction followed by a partial iteration is one partial iteration**
+  (`DescriptiveComplexity.StepDef.pfpHolds_stratifyPFP`). What a partial
+  iteration cannot do is gate itself; it does not have to, the gate being an
+  arity-`0` variable of the state that the inflationary stratum sets and the
+  partial stratum is conjoined with. This is the walk-with-a-preliminary-phase
+  of the SO(TC) reading, written as an iteration.
+* `DescriptiveComplexity.FixedPointReductionSpace` – hence **PSPACE is closed
+  under `≤ˡᶠᵖ`** (`DescriptiveComplexity.mem_PSPACE_of_lfpReduction`, and so
+  under `≤ᵗᶜ` and `≤ᵈᵗᶜ`), which closes every class of this library from PTIME
+  to PSPACE under all four reduction notions.
+* `DescriptiveComplexity.FixedPointReductionStrict` – the embedding of the
+  first-order reductions into these is **strict**, unconditionally:
+  `DescriptiveComplexity.EVEN` reduces to
+  `DescriptiveComplexity.NONEMPTYMARK` in FO(LFP) and by no first-order
+  reduction (`DescriptiveComplexity.exists_lfpReduction_not_orderedReduction`),
+  since the target is first-order definable and EVEN is not.
+* `DescriptiveComplexity.TransitiveClosureParam` – the logarithmic-space
+  notion needs walks as *relations*, which
+  `DescriptiveComplexity.TCSpec` (a sentence) is not: a
+  `DescriptiveComplexity.ParamTCSpec` is a walk with parameters, and a finite
+  family of them is a block of relation variables holding their reachability
+  relations. Those relations are the value of one inflationary induction
+  (`DescriptiveComplexity.TCFamily.inflLimit_toStepDef`) – a walk is a fixed
+  point of a very restricted shape – and any existing `TCSpec` becomes a
+  formula over them (`DescriptiveComplexity.TCSpec.acceptsF`).
+* `DescriptiveComplexity.TransitiveClosureReduction` – a
+  `DescriptiveComplexity.TCReduction` (notation `P ≤ᵗᶜ Q`) is an
+  interpretation whose formulas may read those relations. It is an FO(LFP)
+  reduction (`DescriptiveComplexity.TCReduction.toLFP`), so PTIME, NP and coNP
+  are closed under it as well; **transitivity and closure of NL itself are
+  not proved** – both need Immerman's normal form, a `TC` of a formula
+  containing a `TC` being a single `TC`, whose negative case is inductive
+  counting used as a subroutine (`ROADMAP.md` prices it).
+* `DescriptiveComplexity.TransitiveClosureReductionDet` – the *deterministic*
+  reading, `DescriptiveComplexity.DTCReduction` (notation `P ≤ᵈᵗᶜ Q`), which is
+  the many-one reduction of the textbooks: every walk is read through its
+  determinization (`DescriptiveComplexity.ParamTCSpec.det`, determinism as a
+  formula rather than as a hypothesis, exactly as
+  `DescriptiveComplexity.TCSpec.det`), and a walk that is already functional
+  loses nothing by it
+  (`DescriptiveComplexity.ParamTCSpec.reachAt_det_of_functional`).
+* `DescriptiveComplexity.TransitiveClosureReductionStrict` – the same
+  separation two notions lower: EVEN reduces to
+  `DescriptiveComplexity.NONEMPTYMARK` in FO(≤, TC) and by no first-order
+  reduction (`DescriptiveComplexity.exists_tcReduction_not_orderedReduction`),
+  and indeed in FO(≤, DTC)
+  (`DescriptiveComplexity.exists_dtcReduction_not_orderedReduction`), the
+  parity walk never having a choice
+  (`DescriptiveComplexity.evenSpec_functional`) – so the gap opens already at
+  the deterministic logarithmic-space notion, with a walk along the order
+  rather than a fixed point. The same observation gives EVEN its FO(DTC)
+  definition (`DescriptiveComplexity.even_dtcDefinable`).
 
 ## Inexpressibility: Ehrenfeucht–Fraïssé games
 

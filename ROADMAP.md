@@ -243,45 +243,69 @@ machine bridges.
   so `ac0Definable_mem_LOGSPACE` need not be reproved, and plan for the full
   downstream rebuild rather than discovering it: `HeadCapture`, `HeadCaptureDet`
   and every consumer of `Runs` re-elaborate.
-- **Relativized (domain-formula) reductions – membership closure** [M]:
-  Immerman's textbook FO reduction restricts the target universe to a definable
-  subset via a **domain formula**, needed for *spanning* problems (Hamilton
-  circuit: a tour visits every element, so junk points with no valid incident
-  edges must be excluded). The **hardness** side is already in place
-  (`Relativized.lean`, `RelComposition.lean`: `RelFOInterpretation` with a
-  `domFormula` field and its `MapRel` subtype universe, `RelOrderedFOReduction`
-  with notation `≤ʳᶠᵒ[≤]`, wired into `Complexity`/`Hierarchy` as the
-  `hard_of_relOrderedReduction` field), which is all a spanning problem's
-  NP-hardness needs while its membership is a direct second-order sentence.
-  Remaining – the symmetric **membership** closure `mem_of_relOrderedReduction`,
-  with two consumers: it would turn `le_dtmAcceptSpace_of_mem_PSPACE` into the
-  missing `iff` (`Problems/Machine/SpaceHard.lean` records why PSPACE's machine
-  characterization stops short of `mem_NP_iff_le_ntmAccept`'s shape), and the
-  *generic* `C = below Q₀` is blocked on it – the per-class instances are
-  proved in `ClassDegrees.lean`, each from its own non-relativized hardness
-  discharge, but the statement over an arbitrary class and an arbitrary
-  complete problem of it needs the closure, since `cofinalHard_iff` yields only
-  `≤ʳᶠᵒ[≤]`:
-  - `RelSecondOrderPull.lean` (~700 lines): `SOBlock.pull` is reused verbatim
-    (a relation variable on the subtype pulls to one `(n·d)`-ary variable per
-    tag tuple), but the assignment-transfer layer is rewritten **flipped** – on
-    subtypes `pullAssign (mergeAssign σ) = σ` fails (extend-then-restrict loses
-    off-domain data) while `mergeAssignRel (pullAssignRel ρ) = ρ` is exact, so
-    stating the `sorealize_pullSO_aux` transfer in the flipped direction closes
-    all four ∃/∀ alternation cases with only the exact round trip (no
-    off-domain-invariance lemma, no guards on the pulled SO atoms). `extendSORel`
-    extends `extendSO` with `domFormula := LHom.sumInl.onFormula ∘ domFormula`,
-    its equivalence a `Equiv.subtypeEquiv` (the two subtype predicates are
-    propositionally, not definitionally, equal). The order-requantification
-    apparatus (`SOBlock.withOrder`, `linearGuard`, `orderElimLHom`) is reused
-    verbatim; the two ordered closure theorems are near-copies with
-    `pullSO → pullSORel`, `map_nonempty → dom_nonempty`,
-    `map_finite → Subtype.finite`.
-  - `RelSecondOrderHornPull.lean` (~300 lines): domain guards conjoin into each
-    clause's FO guard; domain formulas are pure FO (no SO variables), so the
-    Horn shape survives. Needed only for `PTIME.mem_of_relOrderedReduction`.
-  - Then the `mem_of_relOrderedReduction` field and the six class-literal
-    updates (`empty`, `compl`, `sigmaLevel`, `piLevel`, `PTIME`, `PH`).
+- **Relativized reductions – the class field** [S–M]: membership closure under
+  `≤ʳᶠᵒ[≤]` holds for the classes that have it stated (`SecondOrderRelPull.lean`
+  for the hierarchy levels, `FixedPointStepRel.lean` for the fixed-point logics,
+  the three corollaries in `FixedPointReductionClosure.lean`), but
+  `ComplexityClass` still has no `mem_of_relOrderedReduction` *field*, so nothing
+  generic can consume them. Adding it means the field plus the six class-literal
+  updates (`empty`, `compl`, `sigmaLevel`, `piLevel`, `PTIME`, `PH`) – note
+  `PTIME` no longer needs a Horn-side pullback, the capture theorem routing it
+  through `IFPDefinable.of_relOrderedReduction`. Two consumers wait on it: the
+  *generic* `C = below Q₀` (the per-class instances in `ClassDegrees.lean` each
+  use their own non-relativized hardness discharge, while `cofinalHard_iff`
+  yields only `≤ʳᶠᵒ[≤]`), and turning `le_dtmAcceptSpace_of_mem_PSPACE` into the
+  `iff` that `mem_NP_iff_le_ntmAccept` has (`Problems/Machine/SpaceHard.lean`
+  records why it stops short).
+- **FO(LFP) reductions: the classes above PSPACE** [M–L]: `≤ˡᶠᵖ` closes every
+  class from PTIME to PSPACE, the levels of the polynomial hierarchy included
+  (`FixedPointReductionSpace.lean`, `FixedPointReductionHierarchy.lean`). Above
+  that the question is open per class, and the pattern to look for is the one
+  that worked twice: find the *iteration* the class's own logic runs, pull it
+  back through the interpretation, and gate it on an inflationary stratum that
+  computes the reduction's induction (`StepDef.stratifyPFP`). For the
+  exponential classes that means SO(LFP) and SO(PFP) over an expansion, where
+  the pullback is the part to price – `Exponential/` composes an interpretation
+  with an expansion only in one order (§ “Composing an expansion with an
+  interpretation”), and this is the other. RE, defined by `∃SO[new]`, is the
+  odd one out: its witness is a guess rather than an iteration, so the NP
+  argument is the one to copy, with `SecondOrderNewPull.lean` in place of
+  `SecondOrderRelPull.lean`.
+- **FO(TC) reductions: transitivity, and closure of NL** [L]: `≤ᵗᶜ` exists
+  (`TransitiveClosureReduction.lean`) and inherits everything the FO(LFP)
+  notion gives it, since a walk is an induction
+  (`TCFamily.inflLimit_toStepDef`). What it does not have is composition with
+  itself, nor the closure of its own class, and both are the *same* missing
+  theorem: pulling a walk back through an FO(TC) interpretation gives a walk
+  whose step formulas contain reachability atoms, and flattening those is
+  Immerman's normal form. Split the work by the sign of the occurrence. A
+  **positive** atom is cheap – suspend the outer walk, run the inner one,
+  resume – so the state is a pair of nodes and a phase, and the construction is
+  a mode-and-tuple bookkeeping exercise; do this half first, since it already
+  closes composition for interpretations whose formulas use the atoms
+  positively. A **negative** atom needs non-reachability, i.e., the inductive
+  counting of `InductiveCounting.lean` run *as a subroutine at parameters*
+  rather than once at the top level: that is the expensive half, and the
+  generalization to price is the counting construction with the source node and
+  the parameters threaded through (the `FixedPointParam.lean` pattern, applied
+  to a much larger construction). The alternative route is the machine one –
+  a head-program fragment per atom, `evalArithP` generalized as the FO(COUNT)
+  item above already asks, then `HeadAutomaton` back to a `TCSpec` – and it
+  shares that generalization with FO(COUNT), so pricing the two together is
+  worthwhile. Note what is *not* needed either way: `TCSpec` already has modes,
+  and `ParamTCSpec` already has parameters, so no new syntax layer is involved.
+- **FO(DTC) reductions: transitivity, and closure of LOGSPACE** [M–L]: the
+  notion exists (`TransitiveClosureReductionDet.lean`, `≤ᵈᵗᶜ`) and inherits the
+  closures of `≤ᵗᶜ`; what it lacks is the same flattening theorem, and this is
+  the version to attempt first. The reason is the negative occurrences: a
+  deterministic walk is witnessed *not* to arrive by a step budget (this is how
+  `LOGSPACE_eq_coLOGSPACE` avoids Immerman–Szelepcsényi), so they cost a budget
+  counter in the composite walk's tuple rather than a counting construction.
+  What remains genuinely to build either way is the evaluator: a walk that
+  decides an arbitrary first-order formula whose atoms are walks, which is the
+  quantifier bookkeeping `HeadEval.evalP` already does for head programs – so
+  price this jointly with the FO(COUNT) substitution item above, whose
+  generalization of `evalArithP` it shares.
 
 ## 4. Capture and structural theorems (DC's greatest hits)
 

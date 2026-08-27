@@ -39,8 +39,13 @@ requiring only first-order logic, which Mathlib already has.
   languages give the reduction `≤ᶠᵒ`, with its order-invariant variant `≤ᶠᵒ[≤]`
   for gadgets that genuinely need a linear order and a relativized variant
   `≤ʳᶠᵒ[≤]` for problems whose target domain is definable; all are closed under
-  composition. The problem catalog is one problem per file – vocabulary,
-  reductions, completeness theorem – with tutorial-style worked examples.
+  composition. Above them are the notions with a logic inside: `≤ᵈᵗᶜ` and `≤ᵗᶜ`,
+  whose formulas may read the reachability relations of first-order walks
+  (deterministic or not), and `≤ˡᶠᵖ`, whose formulas may read a fixed point –
+  logarithmic-space and polynomial-time reductions. The problem catalog is one
+  problem per
+  file – vocabulary, reductions, completeness theorem – with tutorial-style
+  worked examples.
 
 ## Results
 
@@ -62,6 +67,16 @@ requiring only first-order logic, which Mathlib already has.
   `k`-pebble game, that order-free FO(IFP) does not capture PTIME
   (`exists_mem_PTIME_not_ifpDefinableFree`), so the linear order in the capture
   theorems cannot be dropped.
+* Reductions with a logic inside, without machines: `≤ᵈᵗᶜ`, `≤ᵗᶜ` and `≤ˡᶠᵖ`,
+  Immerman's FO(DTC), FO(TC) and FO(LFP) reductions. Every class from PTIME to
+  PSPACE – the levels of the polynomial hierarchy and PH included – is closed
+  under all three (`mem_sigmaP_of_lfpReduction`, `mem_PSPACE_of_lfpReduction`,
+  `mem_PH_of_dtcReduction`), every FO reduction
+  is one, and strictly so – EVEN reduces by a single deterministic walk along
+  the order to a first-order definable problem, and by no FO reduction
+  (`exists_dtcReduction_not_orderedReduction`), so the gap opens already at the
+  many-one reduction of the textbooks. NL's and L's own closure under these is
+  not proved: it needs Immerman's normal form.
 * AC⁰ is read here as the logic `FO(≤, +, ×)`; no circuit model is involved. It
   is proved to sit inside L (`ac0Definable_mem_LOGSPACE`), by a deterministic
   multi-head automaton that computes the numeric predicates instead of reading
