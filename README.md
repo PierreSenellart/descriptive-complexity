@@ -39,9 +39,7 @@ requiring only first-order logic, which Mathlib already has.
   languages give the reduction `≤ᶠᵒ`, with its order-invariant variant `≤ᶠᵒ[≤]`
   for gadgets that genuinely need a linear order and a relativized variant
   `≤ʳᶠᵒ[≤]` for problems whose target domain is definable; all are closed under
-  composition, as are the logarithmic-space and polynomial-time notions above
-  them, `≤ᵈᵗᶜ`, `≤ᵗᶜ` and `≤ˡᶠᵖ`, whose formulas may read a walk or a fixed
-  point. The problem catalog is one problem per file – vocabulary,
+  composition. The problem catalog is one problem per file – vocabulary,
   reductions, completeness theorem – with tutorial-style worked examples.
 
 ## Results
@@ -64,10 +62,8 @@ requiring only first-order logic, which Mathlib already has.
   `k`-pebble game, that order-free FO(IFP) does not capture PTIME
   (`exists_mem_PTIME_not_ifpDefinableFree`), so the linear order in the capture
   theorems cannot be dropped.
-* Immerman's FO(DTC), FO(TC) and FO(LFP) reductions, `≤ᵈᵗᶜ`, `≤ᵗᶜ` and `≤ˡᶠᵖ`,
-  without machines: L, NL and every class from PTIME to PSPACE are closed under
-  their own (`mem_LOGSPACE_of_dtcReduction`, `mem_NL_of_tcReduction`,
-  `mem_PSPACE_of_lfpReduction`), and every FO reduction is one, strictly
+* First-order reductions are strictly weaker than the logarithmic-space ones,
+  already at the deterministic many-one notion
   (`exists_dtcReduction_not_orderedReduction`).
 * AC⁰ is read here as the logic `FO(≤, +, ×)`; no circuit model is involved. It
   is proved to sit inside L (`ac0Definable_mem_LOGSPACE`), by a deterministic
