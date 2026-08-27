@@ -70,7 +70,13 @@ alone ([Dawar, Doets, Lindell & Weinstein 1998][dawar1998finiteranks]; not prove
 here) – exactly the logic `FO(≤, BIT)` whose identification with
 `FO(≤, +, ×)` and with (DLOGTIME-uniform) AC⁰ is [Immerman
 1999][immerman1999descriptive] Thm 1.17 and [Barrington, Immerman & Straubing
-1990][barrington1990uniformity].
+1990][barrington1990uniformity]. In textbook form the two halves of the
+characterization are [Vollmer 1999][vollmer1999introduction] Cor 4.32
+(logtime-uniform AC⁰ is logarithmic time with constant alternation) and
+Thm 4.73 (`FO[<, BIT]` is logtime-uniform AC⁰, through Lemma 4.72, the
+simulation of a logarithmic-time machine by a sentence); his Lemma 4.71, the
+bit count of a `log n`-bit number in `FO[<, BIT]`, is what
+`DescriptiveComplexity.LogTime.BitSum` builds.
 
 **Alternation is constant here, and has to be.** A machine fixes its register
 list and the polarity of each register, so the number of alternations is a
@@ -79,7 +85,8 @@ logarithmic-time hierarchy – which is what AC⁰ is. Logarithmic time with
 *unbounded* alternation, the class usually called ALOGTIME, is
 (DLOGTIME-uniform) NC¹ ([Ruzzo 1981][ruzzo1981uniform]) and is strictly larger:
 PARITY lies in it and not in AC⁰ ([Furst, Saxe & Sipser 1984][furst1984parity];
-[Håstad 1986][hastad1986almost]). Nothing in this module bears on that class.
+[Håstad 1986][hastad1986almost]; by the polynomial method, [Vollmer
+1999][vollmer1999introduction] §3.3). Nothing in this module bears on that class.
 
 ## What is proved
 
@@ -141,7 +148,9 @@ definability is used on this route.
 module *equals* `DescriptiveComplexity.AC0Definable` – `FO(≤, +, BIT)` equals
 `FO(≤, +, ×)`, which is the whole of [Immerman
 1999][immerman1999descriptive] Thm 1.17, a statement about two vocabularies and
-not about the machine:
+not about the machine (and one the circuit-complexity literature takes on
+trust: [Vollmer 1999][vollmer1999introduction] p. 163 cites a 1994 e-mail of
+Lindell for it):
 
 * **`⊆`** is `DescriptiveComplexity.powArithDef`, the definability of `i ↦ 2 ^ i`
   in `FO(≤, +, ×)` (Thm 1.17(2)), proved in `DescriptiveComplexity.LogTime.Pow`

@@ -24,6 +24,7 @@ import DescriptiveComplexity.Problems.NaeThreeSat
 import DescriptiveComplexity.Problems.OneInSat
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SubgraphIso
+import DescriptiveComplexity.Problems.SubgraphIso.Encoding
 import DescriptiveComplexity.Problems.DigraphIso
 import DescriptiveComplexity.Problems.DigraphIso.Bridge
 import DescriptiveComplexity.Problems.DagIso

@@ -273,7 +273,10 @@ individual declarations are documented on their own pages.
   Both tutorials – `DescriptiveComplexity.Examples.ConjunctiveQueries` and
   `DescriptiveComplexity.Examples.GraphCrawling` – open with a concrete
   instance type and its bundled encoding, and close the loop with a decoder
-  and a well-formed completeness theorem.
+  and a well-formed completeness theorem;
+  `DescriptiveComplexity.Problems.SubgraphIso.Encoding` does the same for a
+  problem of the catalog, with a decoder that needs no well-formedness
+  condition at all.
 * `DescriptiveComplexity.Degree` – completeness *without a class*: the downward
   closure `DescriptiveComplexity.ComplexityClass.below Q₀` of a fixed problem
   under ordered FO reductions is itself a `ComplexityClass`, so
@@ -1385,7 +1388,8 @@ The bottom of the ordered world, and the only vocabulary here that is a
   on ordered structures the inflationary and partial fixed-point logics agree
   exactly when `PTIME = PSPACE` – a corollary of the two capture theorems.
 * `DescriptiveComplexity.AbiteboulVianu` – **the Abiteboul–Vianu theorem**
-  ([Abiteboul–Vianu 1991][abiteboul1991generic];
+  ([Abiteboul–Vianu 1991][abiteboul1991generic]; along the machine-free route
+  of [Dawar–Lindell–Weinstein 1995][dawar1995infinitary] and
   [Ebbinghaus–Flum 1995][ebbinghaus1995finite], ch. 7): the inflationary and
   partial fixed-point logics have the same expressive power **on unordered
   finite structures** exactly when `PTIME = PSPACE`

@@ -38,6 +38,29 @@ machine bridges.
 
 - **Monotone CVP** [M]: the unit-propagation circuit is monotone as drawn, so
   this is a matter of restricting the vocabulary rather than of a new gadget.
+  The textbook route, [Vollmer 1999][vollmer1999introduction] Thm 4.87, is a
+  dual-rail doubling of CVP (every gate becomes `g⁰, g¹`; dimension 1, two tags,
+  order-free), and CVP's semantics being dual-rail already (`GateVal`), its
+  correctness is nearly the semantics itself. **NAND-CVP / NOR-CVP** (Thm 4.88)
+  are the same kind of vocabulary restriction.
+- **The rest of the classical PTIME catalog** (Vollmer §4.6, Fig. 4.5), each
+  with the shape its textbook reduction takes here:
+  - **GEN** [M] – is `t` in the closure of `S ⊆ X` under a binary operation?
+    Vocabulary: a ternary `∘`, a unary `S`, a marked target. Membership is a
+    direct LFP. Do **not** take the book's `UNIT → GEN` step (Thm 4.93), whose
+    universe is “all subclauses”, exponential in the clause width; reduce from
+    HORN-SAT with binary bodies instead, where `x ∧ y → z` *is* `x ∘ y = z`, so
+    GEN is nearly the syntactic image of the Horn closure.
+  - **UNIT** (unit resolution derives the empty clause) [M]: Tseitin clauses
+    per gate of a CVP instance (Thm 4.92), order-free; the node machinery of
+    `Sat/Tseitin.lean` is what it needs.
+  - **LFMIS** (lexicographically first maximal independent set, the classical
+    “greedy is P-complete” problem) [M–L]: ordered by nature, and the reduction
+    (Thm 4.90, from NOR-CVP) needs a *topological* order of the gates, which the
+    library's CVP carries no trace of – reduce from HORN-SAT's propagation
+    order or from an ordered CVP variant instead.
+  - CFGMEM (context-free membership, Thm 4.94) needs the grammar-and-word layer
+    ruled out below; skip.
 - **PSPACE, downstream of QSAT** [L, gadget-heavy]: the game problems
   (Generalized Geography…), the only PSPACE entries still missing.
 - **Succinct problems, drawn out of the wide machine** [L each]: the classical
@@ -170,9 +193,36 @@ machine bridges.
     `tagTupleOrder` rank is a mixed-radix value – defined from those of the
     base. No choice of definable order escapes that: an order is a bijection
     onto `0 … N-1`, so reading such a rank is a base conversion either way, and
-    trading `×` for `BIT` renames the crux rather than removing it. Two routes,
-    priced against each other from the code at ≈ 4 000–7 000 lines each; a wash
-    on size, so the decision is risk shape.
+    trading `×` for `BIT` renames the crux rather than removing it.
+
+    Why this is not the free closure every class above enjoys, in plain terms.
+    The pullback of a sentence along an interpretation substitutes the
+    interpretation's formulas for the atoms *of the instance* and relativizes
+    the quantifiers; it has nothing to say about `plus`, `times` and `≤`, which
+    are not relations of the instance but functions of the target's order, on a
+    target universe that is a different set. For `≤` the pullback is the
+    lexicographic comparison of tuples, quantifier-free in the base's `≤`, and
+    that one line is the whole reason `FO(≤)`, `SO-Horn(≤)`, `FO(≤, LFP)` and
+    every other ordered class are closed under `≤ᶠᵒ[≤]` for free. For `plus`
+    it is carry propagation over a constant number `d` of base-`n` digits,
+    still a fixed formula. For `times` it is schoolbook multiplication of
+    `d`-digit base-`n` numbers, and a digit product reaches `(n-1)²`, which no
+    element of the base represents: the base's `times` is truncated, so the
+    digits must first be split into half-digits in base `⌊√n⌋` (with `⌊√n⌋`
+    defined as the greatest element with a square) and `2d` of those multiplied
+    – Schweikardt's appendix, below. In one sentence: for the classes above,
+    “the logic is closed under interpretations” reduces to “`FO(≤)` defines the
+    lex order of `n^d`”, a triviality; for AC⁰ it reduces to “`FO(+, ×)` on
+    `n` defines the arithmetic of `n^d`”, a theorem, and one the literature has
+    not written out. Circuit complexity never meets it because its reductions
+    ([Vollmer 1999][vollmer1999introduction] §1.4, §4.6) are constant-depth
+    reductions between *strings*, composed at the circuit level, with the
+    uniformity of the composite left to a DLOGTIME machine doing arithmetic on
+    `log n`-bit indices – cheap for a machine, dear for a formula, which is
+    what recommends the bit-side route below.
+
+    Two routes, priced against each other from the code at ≈ 4 000–7 000 lines
+    each; a wash on size, so the decision is risk shape.
     - *FO side*, with `×`: addition by carry-lookahead on `d` base-`n` digits in
       the truncated `PLUS` (`no_plus_iff_card_le` is exactly `x + y ≥ n`),
       multiplication schoolbook, whose double-width digit product needs a
@@ -193,23 +243,24 @@ machine bridges.
       the binary side (`le` a comparison sweep, `plus` a ripple carry, `bit` a
       read, a target sweep being `d` chained sweeps with the boundary states
       guessed) while the interpretation's `FO(≤)` queries are evaluated on the
-      component side through `Translate.lean`. All that is new is **`Conv`**,
-      the agreement of the two representations, which by Horner is `d` rounds of
-      “accumulator times `n` plus a digit” – the exact shape of
-      `BitSum/Times.lean`'s column sum at `d`-fold width, certificates widening
-      from one element to a constant family. Preferred because every hard piece
-      re-instantiates an in-house device whose estimate-vs-actual is calibrated,
-      because it consumes the machine model just built, and because its
-      `d`-chunk element families are the “big number as a family of elements”
-      layer FO(COUNT) / TC⁰ would want anyway.
+      component side through `LogTime/Translate.lean`. All that is new is
+      **`Conv`**, the agreement of the two representations, which by Horner is
+      `d` rounds of “accumulator times `n` plus a digit” – the exact shape of
+      `LogTime/BitSum/Times.lean`'s column sum at `d`-fold width, certificates
+      widening from one element to a constant family. Preferred because every
+      hard piece re-instantiates an in-house device whose estimate-vs-actual is
+      calibrated, because it consumes the machine model just built, and because
+      its `d`-chunk element families are the “big number as a family of
+      elements” layer FO(COUNT) / TC⁰ would want anyway.
 
     Two unknowns to burn down first, half a day each: fields tiled across a
     *family* of elements, the one variation of the packing devices never
-    exercised (write `BitSum/Sizes.lean`'s arithmetic at width `d`, check it at
-    `d = 2` on paper), and whether Horner's `d` dependent steps collapse into a
-    single `2d`-column convolution. Either route needs the **`orank` bridge** –
-    that the rank of a tagged tuple in `tagTupleOrder` *is* the mixed-radix
-    value, stated nowhere yet – and both `LEquiv`s are against it;
+    exercised (write `LogTime/BitSum/Sizes.lean`'s arithmetic at width `d`,
+    check it at `d = 2` on paper), and whether Horner's `d` dependent steps
+    collapse into a single `2d`-column convolution. Either route needs the
+    **`orank` bridge** – that the rank of a tagged tuple in `tagTupleOrder`
+    *is* the mixed-radix value, stated nowhere yet – and both `LEquiv`s are
+    against it;
     `LogTime/Small.lean`'s `ArithDef.of_large` already covers the degenerate
     sizes the splitting excludes. The one place this could be *unsound* rather
     than merely incomplete is `arithExtendLEquiv`, the proof that the formulas
@@ -228,7 +279,12 @@ machine bridges.
   tracked); “problem X is complete under qfps” is the DC-faithful statement.
 - **FO(COUNT) / counting quantifiers** [L]: with BIT, captures uniform TC⁰;
   relevant to the arithmetic boundary of the binary representation
-  (multiplication is TC⁰, not FO). Its inclusion in LOGSPACE would follow the
+  (multiplication is TC⁰, not FO: [Vollmer 1999][vollmer1999introduction]
+  Cor 1.39 and 3.34). The formulation to adopt is his Cor 4.77: TC⁰ is
+  `FO[MAJ; <, BIT]` with a majority quantifier over `k`-tuples, ACC⁰ is
+  `FO[∃^{=p}; <, BIT]`, and NC¹ would need a group quantifier for a non-solvable
+  group (Cor 4.76) – a Lindström quantifier with no consumer, which settles
+  that NC¹ stays out. Its inclusion in LOGSPACE would follow the
   pattern of `HeadEvalArith.lean`: a counting head fragment, evaluated in place
   of an atom. Better, and [M] on top: build the **substitution lemma** the
   counting fragment then plugs into – if each relation symbol of a language `Lx`
@@ -282,11 +338,33 @@ X”), and the two formula compilers along a definable quotient
 (`Invariant/Simulation.lean`, `Invariant/Backward.lean` – the missing dual of
 `Relativized.lean`).
 
-- **Circuits as a route to AC⁰** [R]: bounded-depth uniform circuit families;
-  take it only if circuits are wanted for their own sake. Note what it does
-  not discharge: the structures-vs-strings bridge of §7 and of the README's
-  *Scope* is about string encodings, and no bridge inside this framework
-  closes it.
+- **Circuits, non-uniform, as the consumer of the AC⁰ lower bound** [L]: the
+  one reason to build a circuit model here is the §5 separation PARITY ∉ AC⁰,
+  and a lower bound holds *non-uniformly*, so the model is a circuit family
+  indexed by the size of the structure – a DAG per `n` with unbounded fan-in
+  gates, polynomial size, constant depth – and no uniformity machinery at all.
+  What it needs from the logic is the **easy** direction only: an
+  `AC0Definable` sentence compiles to such a family by structural induction,
+  quantifiers becoming gates of fan-in `n`, numeric predicates becoming
+  hardwired constants ([Vollmer 1999][vollmer1999introduction] Thm 4.69, `⊆`).
+  If the capture theorem is wanted on top [L], the book also settles its shape:
+  at constant depth the right uniformity is a condition on the *direct
+  connection language* – gate kinds and predecessors decidable in DLOGTIME
+  (Def 4.28, Thm 4.31) – and `ac0Definable_iff_ltDecidable` makes that a
+  definability condition here, so `Uniform` is a predicate on the same
+  `CircuitFamily`: gates are tagged `k`-tuples, the `I.Map` universe of an
+  interpretation, and the kind and predecessor relations are `AC0Definable`.
+  No machine and no gate-numbering scheme. Both directions are then formula
+  plumbing: sentence → family with gates (subformula, assignment) and a
+  quantifier-free predecessor relation; family → sentence by `Acc_d` nested
+  to the constant depth (Thm 4.69, `⊇`), a finite nesting with no fixpoint.
+  Note what neither discharges: the structures-vs-strings bridge of §7 and of
+  the README's *Scope* is about string encodings, and no bridge inside this
+  framework closes it (the input gates are the tuples of the structure's
+  relations, a definition made here rather than transported); and the closure
+  of AC⁰ under `≤ᶠᵒ` (§3), which circuit complexity never meets because its
+  reductions are constant-depth reductions between strings, composed at the
+  circuit level with a machine doing the index arithmetic.
 - **Spectra** [M]: Fagin's connection between generalized spectra and NP; mostly
   definitional given the SO layer, historically resonant.
 - **`PTIME ≠ EXPTIME` by diagonalization** [R, 5–10k lines, with a real chance of
@@ -323,14 +401,27 @@ non-reducibility, impossible in the machine world.
   makes precise: show some catalog reduction (e.g., SAT → 3COL) provably has no
   order-free FO counterpart, separating `≤ᶠᵒ` from `≤ᶠᵒ[≤]` on concrete
   problems.
-- Horizon: **PARITY not in AC⁰** ([Ajtai 1983][ajtai1983sigma11];
+- **PARITY not in AC⁰** ([Ajtai 1983][ajtai1983sigma11];
   [Furst, Saxe & Sipser 1984][furst1984parity];
-  [Håstad 1986][hastad1986almost]) [R]: a switching-lemma formalization is a
-  major standalone project. Everything around it is now in place – PARITY is in
-  the catalog and in LOGSPACE (`parity_mem_LOGSPACE`), AC⁰ is a logic and sits
-  inside PTIME – so this single theorem is what `AC⁰ ⊊ LOGSPACE` waits on. Do
-  not confuse it with EVEN, the parity of the *universe*, which **is** AC⁰
-  (`even_ac0Definable`) and is what separates `FO(≤)` from AC⁰.
+  [Håstad 1986][hastad1986almost]) [XL]: everything around it is in place –
+  PARITY is in the catalog and in LOGSPACE (`parity_mem_LOGSPACE`), AC⁰ is a
+  logic and sits inside PTIME – so this single theorem is what
+  `AC⁰ ⊊ LOGSPACE` waits on. The route is **not** the switching lemma but the
+  polynomial method, as [Vollmer 1999][vollmer1999introduction] §3.3 presents
+  it: depth reduction to probabilistic `MOD_p`-∧ circuits (Thm 3.20, 3.23),
+  their representation by low-degree polynomials over `GF(p)` (Thm 3.25), a
+  count of low-degree multilinear monomials (Lemma 3.27) and Smolensky's
+  theorem (3.31), whence `MOD_p ∉ AC⁰` (Cor 3.32) and PARITY with it. That is
+  algebra Mathlib has – `MvPolynomial` over `ZMod p`, the dimension of the
+  bounded-degree multilinear polynomials, a counting argument – where the
+  switching lemma is bespoke combinatorics. The circuit model it is stated
+  against is the non-uniform one of §4, plus the easy compile direction there;
+  together the two items are one project. The same theorem gives
+  `MOD_q ∉ AC⁰[p]` for coprime `p, q`, hence the strict chain
+  `AC⁰ ⊊ AC⁰[p] ⊊ TC⁰` (Cor 4.35), which is the separation the FO(COUNT) item
+  of §3 would want, mirroring `exists_ac0Definable_not_foDefinable` one level
+  up. Do not confuse PARITY with EVEN, the parity of the *universe*, which
+  **is** AC⁰ (`even_ac0Definable`) and is what separates `FO(≤)` from AC⁰.
 - **`FO(≤, +) ⊊ FO(≤, +, ×)`** [L]: classically true, and *not* out of reach in
   the way PARITY is – primality of the universe is definable in the latter and
   not in the former, by Ginsburg and Spanier's semilinearity of `FO(+)` spectra
@@ -680,9 +771,10 @@ The concrete items:
 The degree machinery itself is built (`DescriptiveComplexity.Degree`:
 `ComplexityClass.below`, completeness for a degree as mutual reducibility, and
 the check that the logically defined classes *are* the degrees of their
-complete problems), and Graph Isomorphism sits in it. What is left is
-populating that degree, and the second reduction theory not organized around a
-class.
+complete problems), and so is the doubling lemma every entry of the degree goes
+through (`DescriptiveComplexity.isoReflecting_fo_reduction`, below). What is
+left is populating the degree, and the second reduction theory not organized
+around a class.
 
 - **Hardness for isomorphism problems must be order-free** – a design-triage
   rule, beside the choice of number encoding
@@ -693,18 +785,18 @@ class.
   makes the yes/no answer order-independent, not the constructed structure
   independent up to isomorphism, so every gadget would owe a structure-level
   argument. Order-free is available because `twoGraphs` carries its own “this
-  element is real” marks: run `F` relativized to `patV` and to `hostV` in
-  parallel inside one order-free interpretation, leaving junk unmarked. Side
-  benefit – both sides are built by the same gadget out of the same universe,
-  so they come out size-balanced and the padding step most textbook GI
-  reductions need disappears. The one reusable lemma, which is what makes each
-  catalog entry short afterwards [M]:
-
-  ```lean
-  theorem gi_hard_of_isoReflecting (F : FOInterpretation Language.graph L' Tag d)
-      (h : ∀ G H, … → Nonempty (F.Map G ≃[L'] F.Map H) → Nonempty (G ≃[Language.graph] H)) :
-      DigraphIso ≤ᶠᵒ DigraphIso'
-  ```
+  element is real” marks, and running `F` relativized to each side's mark
+  inside one order-free interpretation, leaving junk unmarked, is what
+  `DescriptiveComplexity.FOInterpretation.double` does
+  (`DescriptiveComplexity/GadgetDouble.lean`). Side benefit – both sides are
+  built by the same gadget out of the same universe, so they come out
+  size-balanced and the padding step most textbook GI reductions need
+  disappears. What an entry then owes is its gadget and
+  `DescriptiveComplexity.IsoReflecting` of it – isomorphic values come from
+  isomorphic arguments, a statement about *single* structures with no
+  pattern/host distinction in it – which
+  `DescriptiveComplexity.isoReflecting_fo_reduction` turns into the reduction.
+  That is what keeps every entry below short.
 - **The GI degree, in order of cost** [M each]: hypergraph / set-system
   isomorphism first, since `Problems/SetFamily/FromGraphs.lean` already builds
   set systems from graphs and the incidence construction is order-free; then
@@ -759,12 +851,13 @@ provable rather than merely reasonable.
    next substantial piece of the inexpressibility track, and the one that
    gives connectivity and acyclicity without bespoke strategies. The 0-1 laws
    are its independent neighbor.
-2. **Populating the GI degree** (§9) [M each]: with `below` and Graph
-   Isomorphism in place, the degree has one inhabitant and no companions.
-   Hypergraph / set-system isomorphism first, and `gi_hard_of_isoReflecting`
-   with it, since it is what makes every later entry short. Taken after step 1
-   on purpose: a degree structure is worth building where non-reducibility is
-   provable.
+2. **Populating the GI degree** (§9) [M each]: with the degree machinery and
+   the doubling lemma in place, an entry costs its gadget and an
+   `IsoReflecting` proof and nothing besides, which makes this the cheapest
+   result per line on the list. Hypergraph / set-system isomorphism first, its
+   incidence construction being order-free and half-written in
+   `Problems/SetFamily/FromGraphs.lean`. Taken after step 1 on purpose: a
+   degree structure is worth building where non-reducibility is provable.
 
 **Alongside, or after:**
 

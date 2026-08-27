@@ -42,6 +42,10 @@ marked set. The threshold of Clique is thus consumed by the shape of the
 pattern rather than by a counting argument – no `Set.ncard` reasoning appears
 in this file beyond the embedding form
 `DescriptiveComplexity.cliqueOn_iff_embedding` that Clique already provides.
+
+The problem on *concrete* graphs – two edge sets on `Fin p` and `Fin h` – and
+its encoding, faithfulness and decoding are in
+`DescriptiveComplexity.Problems.SubgraphIso.Encoding`.
 -/
 
 /- The language of two-graph structures lives in Mathlib's

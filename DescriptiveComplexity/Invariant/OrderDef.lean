@@ -8,7 +8,10 @@ import DescriptiveComplexity.Invariant.Structure
 /-!
 # The canonical order is inflationary-definable
 
-The first-order definition of the ordered pebble refinement
+That one fixed-point formula orders the `≡ᵏ`-classes uniformly over all
+finite structures is the central lemma of
+[Dawar–Lindell–Weinstein 1995][dawar1995infinitary]; here it is stated as
+the first-order definition of the ordered pebble refinement
 (`DescriptiveComplexity.Invariant.OrderedPebble`): a simultaneous induction
 `DescriptiveComplexity.ordStepDef` over the base vocabulary, with one
 relation variable of arity `k + k` holding the current strict order on

@@ -16,14 +16,20 @@ nonempty finite ordered structures – first-order logic with `≤`, `+` and `×
 the ranks of the elements (`DescriptiveComplexity.AC0Definable`). Classically
 this is `FO(≤, +, ×) = FO(≤, BIT)`, and (DLOGTIME-)uniform AC⁰ ([Immerman
 1999][immerman1999descriptive], Thm 1.17; [Barrington, Immerman & Straubing
-1990][barrington1990uniformity]); here, as everywhere in this library, the logic
-is the *definition*, and the identification with a circuit model is a bridge that
-is not built – see below.
+1990][barrington1990uniformity]; in textbook form, [Vollmer
+1999][vollmer1999introduction] Thm 4.73, with Thm 4.69 for the non-uniform
+class); here, as everywhere in this library, the logic is the *definition*, and
+the identification with a circuit model is a bridge that is not built – see
+below.
 
 ## Why `+` and `×` rather than `BIT`
 
-Expressively it makes no difference (the two are classically interdefinable), so
-the choice is made by a proof obligation elsewhere: the closure of the class
+Expressively it makes no difference (the two are classically interdefinable –
+a fact the literature states rather than proves: [Vollmer
+1999][vollmer1999introduction] p. 163 attributes it to a 1994 e-mail of Lindell
+and to [Immerman 1999][immerman1999descriptive] §1.2.1, and
+`DescriptiveComplexity.LogTime` proves it), so the choice is made by a proof
+obligation elsewhere: the closure of the class
 under first-order reductions must define the numeric predicates of the
 *interpreted* universe – lexicographically ordered tagged tuples, hence base-`n`
 digits – from those of the base. For `+` and `×` that is schoolbook arithmetic

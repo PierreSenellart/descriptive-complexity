@@ -14,8 +14,9 @@ import DescriptiveComplexity.Invariant.Backward
 
 **The inflationary and partial fixed-point logics have the same expressive
 power on unordered finite structures exactly when `PTIME = PSPACE`**
-([Abiteboul–Vianu 1991][abiteboul1991generic];
-[Ebbinghaus–Flum 1995][ebbinghaus1995finite], ch. 7):
+([Abiteboul–Vianu 1991][abiteboul1991generic]; proved here along the
+purely logical route of [Dawar–Lindell–Weinstein 1995][dawar1995infinitary],
+also that of [Ebbinghaus–Flum 1995][ebbinghaus1995finite], ch. 7):
 `DescriptiveComplexity.ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace`.
 The two classes `PTIME` and `PSPACE` are the library's logically defined
 ones; the machine-model reading is supplied beside them by
@@ -30,9 +31,11 @@ order-free FO(IFP) definable, so the problem is FO(≤, IFP) definable and in
 `PTIME` (`DescriptiveComplexity.ifpDefinable_iff_mem_PTIME`).
 
 Left to right, through the invariant structure
-(`DescriptiveComplexity.Invariant`): an order-free FO(PFP) definition has a
-`k`-variable budget, so its stages are `≡ᵏ`-invariant and its whole
-computation runs on the invariant structure `Iᵏ A`
+(`DescriptiveComplexity.Invariant`) – the invariant and its
+inflationary-definable order of [Dawar–Lindell–Weinstein
+1995][dawar1995infinitary], in place of the original's relational machine: an
+order-free FO(PFP) definition has a `k`-variable budget, so its stages are
+`≡ᵏ`-invariant and its whole computation runs on the invariant structure `Iᵏ A`
 (`DescriptiveComplexity.StepDef.pfpHolds_invStepDef`) – a problem over the
 invariant vocabulary, order-free FO(PFP) definable *by construction*, hence
 in `PSPACE`, hence by the hypothesis in `PTIME`, hence FO(≤, IFP) definable.
