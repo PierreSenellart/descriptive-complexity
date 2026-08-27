@@ -27,7 +27,7 @@ inspected again.
 Variables are indexed by an arbitrary type `α`, as `Formula α` is, and a
 quantifier binds the variables of `Fin 1` in `α ⊕ Fin 1`
 (`DescriptiveComplexity.ArithDef.ex`, `DescriptiveComplexity.ArithDef.all`) –
-the layout of `FirstOrder.Language.Formula.iExs`, so that no relabelling is
+the layout of `FirstOrder.Language.Formula.iExs`, so that no relabeling is
 needed at the quantifier step. Moving between variable layouts is
 `DescriptiveComplexity.ArithDef.relabel`, and a relation with *no* free
 variables (`α = Empty`) is literally a sentence, which is what

@@ -23,7 +23,7 @@ A defining formula of an `n`-ary relation has free variables `Fin n × Fin dd`:
 the `i`-th argument's tuple is `fun j => v (i, j)`. A rule's *payload* occupies
 the first `c = card (CtlIx ⊕ SlotIx)` of those, so the guard and payload
 formulas the definability layer hands over – which live over `Fin c` and over
-`Fin c ⊕ Fin c` – are **relabelled** onto `(i, castLE hpl k)` and nothing else
+`Fin c ⊕ Fin c` – are **relabeled** onto `(i, castLE hpl k)` and nothing else
 happens to them.
 
 ## What a tag decides
@@ -82,7 +82,7 @@ abbrev payVar (n : ℕ) (hc : Fintype.card (Q ⊕ W) ≤ dd) (i : Fin n) :
 
 end Coords
 
-/-! ### A guard and a payload, relabelled -/
+/-! ### A guard and a payload, relabeled -/
 
 section Builders
 

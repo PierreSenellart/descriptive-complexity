@@ -49,7 +49,7 @@ noncomputable def sentenceSpec (φ : (L.sum Language.order).Sentence) : TCSpec L
 
 omit [L.IsRelational] in
 /-- A node of the walk is a starting node exactly when the sentence holds: the
-tuple is empty, so there is nothing for the relabelling to carry. -/
+tuple is empty, so there is nothing for the relabeling to carry. -/
 theorem isSrc_sentenceSpec_iff (φ : (L.sum Language.order).Sentence) {A : Type}
     [L.Structure A] [LinearOrder A] (u : (sentenceSpec φ).Node A) :
     (sentenceSpec φ).IsSrc u ↔ A ⊨ φ := by

@@ -49,7 +49,7 @@ variable (X : ExpExpansion L) (d : StepDef (X.E.sum Language.order))
 handed its file, and the channel that writes for the argument elements and the
 element below them. The program carries `n` junk rule names, which is what buys
 its clock the room the count asks for (`PadRules.lean`); at `n = 0` it is the
-plain program with its sites relabelled. -/
+plain program with its sites relabeled. -/
 noncomputable def dblWideRegInterp (n : ℕ) :
     FOInterpretation ((newLang L).sum Language.order) Language.wide
       ((srcDt X d).NexITagPad ((srcDt X d).d.B.ι → Bool) n) (srcDt X d).dd :=

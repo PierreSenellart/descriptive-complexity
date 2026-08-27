@@ -1399,7 +1399,7 @@ theorem bitDef_timesCert (x y z : α) :
 [Immerman 1999][immerman1999descriptive] Thm 1.17(1), assembled: the
 certificate is a formula, it characterizes the products above the threshold,
 and `DescriptiveComplexity.BitDef.of_large` absorbs the threshold, the
-relation being numeric. Stated first on three named variables, then relabelled
+relation being numeric. Stated first on three named variables, then relabeled
 to any layout. -/
 theorem bitDef_times (x y z : α) :
     BitDef (L := L) fun _ _ _ _ _ v => orank (v x) * orank (v y) = orank (v z) := by

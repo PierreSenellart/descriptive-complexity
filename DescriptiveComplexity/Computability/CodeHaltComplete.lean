@@ -24,9 +24,8 @@ reduction of any semi-decidable problem to `DescriptiveComplexity.CODEHALT`.
   forward half evaluates the `∃SO[new]` kernel on a searched-for witness
   (`DescriptiveComplexity.RE_subset_rePred`), the converse draws the
   semi-decision procedure inside the instance.
-* **`DescriptiveComplexity.RE_ne_coRE`** – RE and co-RE differ, which the
-  library used to disclaim twice. Were `CODEHALTᶜ` recursively enumerable, the
-  equivalence above would make `CODEHALT.toPred` and its complement both
+* **`DescriptiveComplexity.RE_ne_coRE`** – RE and co-RE differ. Were `CODEHALTᶜ`
+  recursively enumerable, the equivalence above would make `CODEHALT.toPred` and its complement both
   `REPred`, hence computable by Post's theorem, against
   `DescriptiveComplexity.not_computablePred_codehalt`.
 -/

@@ -26,11 +26,10 @@ pointer, reading these tracks, the program has a rule that goes to that phase an
 that pointer, writes those tracks, and moves left.* Every hypothesis below is a
 family of those, and the symbols are computed for the caller – it never sees
 `DescriptiveComplexity.regBit`, never writes a tape equation, and never mentions
-`FirstOrder.Language.wide`. (Two wrappers that used to live here – a
-whole-track overwrite and a file test with the question asked of the *cell* –
-quantified their per-cell data independently of the symbol, which no
-deterministic table can serve; their corrected forms are in
-`DescriptiveComplexity.Problems.Wide.DrawSub`.)
+`FirstOrder.Language.wide`. (A whole-track overwrite, and a file test with the
+question asked of the *cell*, are in `DescriptiveComplexity.Problems.Wide.DrawSub`:
+a wrapper that quantified its per-cell data independently of the symbol could
+be served by no deterministic table.)
 
 ## The register mark
 

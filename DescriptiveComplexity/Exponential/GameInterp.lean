@@ -196,7 +196,7 @@ def eqIxF {γ : Type} {m : ℕ} (f g : Fin m → Fin (gameDim B V))
     Term.equal (Term.var (u (f l))) (Term.var (u (g l))))
 
 /-- **The guard of a concluding transition**: the residual formula of the
-question, relabelled onto the coordinates the phase declares. This is the one
+question, relabeled onto the coordinates the phase declares. This is the one
 place a defining formula reads the *source structure*. -/
 noncomputable def concOkF (p : MachPh V M) :
     (L.sum Language.order).Formula (Fin 1 × Fin (gameDim B V)) :=

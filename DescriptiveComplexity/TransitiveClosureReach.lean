@@ -39,7 +39,7 @@ nodes that are a mode together with a `k`-tuple
    target((m, x̄))         :=  tgt m x̄
 ```
 
-is nothing but the specification's three formulas, relabelled from their
+is nothing but the specification's three formulas, relabeled from their
 `Fin k ⊕ Fin k` (resp. `Fin k`) variables to the argument-major variables
 `Fin n × Fin k` an interpretation uses. There is no junk to gate away: *every*
 tagged tuple is a genuine node of the walk, so an ordinary (unrelativized)

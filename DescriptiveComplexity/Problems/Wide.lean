@@ -646,7 +646,7 @@ by one formula for every instance**, which is what an interpretation needs.
 the coordinates go is fixed once: a defining formula of an `n`-ary relation has
 free variables `Fin n × Fin dd`, a payload occupies the first
 `card (CtlIx ⊕ SlotIx)` of an argument's, and the guard and payload formulas the
-definability layer hands over are **relabelled** onto them and nothing else
+definability layer hands over are **relabeled** onto them and nothing else
 (`DescriptiveComplexity.Draw.guardAt`, `payAt`). Every one of the eleven
 relations is then one of three shapes: a **guarded padded tuple**
 (`padGuardF` – a transition, an accepting state), an **attribute**
@@ -990,7 +990,7 @@ presentation walking any clear track with the empty track
 (`DescriptiveComplexity.Draw.Prog.trackTape_initBack`, the background
 `DescriptiveComplexity.Draw.Prog.initBack` being the marks over the blank), so
 a program starts from `DescriptiveComplexity.Draw.Prog.isInit_prog` with no
-initialisation sweep, and
+initialization sweep, and
 `DescriptiveComplexity.Draw.Prog.dwideAcceptSpace_prog` turns an accepting run
 plus the separation argument into a yes-instance of
 `DescriptiveComplexity.DWideAcceptSpace`.

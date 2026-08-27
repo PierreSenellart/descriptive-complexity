@@ -34,7 +34,7 @@ which is where the *budget* of a configuration comes from: from the position
 
 `DescriptiveComplexity.ATMData.exists_play_of_legalBelow` is the one theorem
 here: from a walk legal below `i + 1` and a position `t` whose configuration is
-in block `i`, the configurations at `t`, `nextPos t`, … form a play of block
+in block `i`, the configurations at `t`, `nextPos t` … form a play of block
 `i`, stopped at the first moment the walk leaves the block, accepts, gets
 stuck, or runs out of budget. Those four alternatives are exactly the cases the
 two collapse lemmas distinguish, so this is the whole interface the round

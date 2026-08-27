@@ -547,7 +547,7 @@ def concOk (p : MachPh V M) (w : Fin (gameDim B V) → A) : Prop :=
 /-- **The test a seek makes at a cell**: is the symbol I am reading the one the
 challenged atom addresses, carrying the bit that was claimed? The region and
 the relation variable are named by the atom – the copy being read against the
-region the game currently sits in – and the address is the atom's arguments
+region the game sits in – and the address is the atom's arguments
 applied to the valuation. -/
 def isTarget (p : MachPh V M) (s : SymTag B) (w : Fin (gameDim B V) → A) : Prop :=
   ∃ h : (p.k : ℕ) < (prog.data p.q).natoms,

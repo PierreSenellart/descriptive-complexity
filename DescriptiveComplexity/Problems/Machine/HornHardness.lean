@@ -38,7 +38,7 @@ The machine is **deterministic everywhere** – there is no guess phase – and
 `DescriptiveComplexity.TMData.Deterministic` for the constructed machine is part of
 the statement, not bookkeeping: it is what makes the image a potential
 yes-instance of `DTMAccept` at all. The instance is read exactly as by the SAT
-machine (`DescriptiveComplexity.SatCl`, `DescriptiveComplexity.SatPos`, …,
+machine (`DescriptiveComplexity.SatCl`, `DescriptiveComplexity.SatPos` …,
 imported from `DescriptiveComplexity.Problems.Machine.Hardness` together with
 the clause-order machinery), and the only two additions are the element order
 (rounds walk it) and the Horn gate on the accept transition.

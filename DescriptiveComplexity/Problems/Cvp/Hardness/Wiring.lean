@@ -10,7 +10,7 @@ import DescriptiveComplexity.Problems.Cvp.Hardness.Interp
 
 What the interpretation of
 `DescriptiveComplexity.Problems.Cvp.Hardness.Interp` marks and wires, read
-back as statements about *named points* – `bdPt`, `hdPt`, … – rather than
+back as statements about *named points* – `bdPt`, `hdPt` … – rather than
 about raw tagged tuples. Two kinds of lemma are needed downstream and both are
 proved here once:
 

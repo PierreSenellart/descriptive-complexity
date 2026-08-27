@@ -277,7 +277,7 @@ end Points
 The evaluator of `DescriptiveComplexity.Computability.Eval` is written for
 formulas with no free variables, while a defining formula has free variables
 indexed by `Fin n × Fin dim` and a domain formula by `Fin dim`. Both are
-relabelled into bound variables, the pairs through `finProdFinEquiv`. -/
+relabeled into bound variables, the pairs through `finProdFinEquiv`. -/
 
 section Flatten
 

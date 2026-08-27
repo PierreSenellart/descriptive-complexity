@@ -79,7 +79,7 @@ end Semantics
 
 The membership program of `DescriptiveComplexity.Problems.TwoSat.Membership` uses three
 universally quantified variables (`c`, `x`, `y`); this program needs a fourth
-one for transitivity, so its covering-pair guard is that formula relabelled. -/
+one for transitivity, so its covering-pair guard is that formula relabeled. -/
 
 /-- The injection of the three variables of the covering-pair guard into the
 four variables of this program. -/

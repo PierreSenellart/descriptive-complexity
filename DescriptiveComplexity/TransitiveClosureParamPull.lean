@@ -136,7 +136,7 @@ def comapVar :
   | (Sum.inl (Sum.inr i), j) => Sum.inl (Sum.inr (coordIx dim i j))
   | (Sum.inr i, j) => Sum.inr (coordIx dim i j)
 
-/-- The relabelling of a guard on one tuple into the step formula's
+/-- The relabeling of a guard on one tuple into the step formula's
 variables. -/
 def comapSrcVar : Fin (s.k * dim) → ((Fin (s.k * dim) ⊕ Fin (s.k * dim)) ⊕ Fin (s.par * dim)) :=
   fun m => Sum.inl (Sum.inl m)

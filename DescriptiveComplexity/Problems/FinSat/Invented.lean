@@ -504,7 +504,7 @@ theorem cert_of_model [Finite A] [Finite M] [Nonempty M] (hwf : IsWF A) (hloc : 
 
 end ToCert
 
-/-! ### Relabelling the invented values
+/-! ### Relabeling the invented values
 
 The `∃SO[new]` sentence of `DescriptiveComplexity.Problems.FinSat.Membership` guesses its
 relations over `A ⊕ Fin m`, so it needs the invented values *indexed*. Nothing
@@ -526,7 +526,7 @@ private theorem exists_symm (σ : D ≃ D') (p : D → Prop) :
     (∃ d : D', p (σ.symm d)) ↔ ∃ d : D, p d :=
   ⟨fun ⟨_, hd⟩ => ⟨_, hd⟩, fun ⟨d, hd⟩ => ⟨σ d, by simpa using hd⟩⟩
 
-/-- The graph of an environment, relabelled along a bijection of the invented
+/-- The graph of an environment, relabeled along a bijection of the invented
 values. -/
 def mapVal (σ : D ≃ D') (Val : D → A → D → Prop) : D' → A → D' → Prop :=
   fun e x d => Val (σ.symm e) x (σ.symm d)
@@ -538,7 +538,7 @@ theorem updAt_map (σ : D ≃ D') (Val : D → A → D → Prop) (e e' : D') (x 
   refine and_congr Iff.rfl (forall_congr' fun y => imp_congr_right fun _ => ?_)
   exact forall_symm σ fun c => Val (σ.symm e') y c ↔ Val (σ.symm e) y c
 
-/-- The truth definition, read on a relabelled certificate. -/
+/-- The truth definition, read on a relabeled certificate. -/
 theorem certStep_map (σ : D ≃ D') {Elt Env : D → Prop} {Val : D → A → D → Prop}
     {G H : A → D → Prop} (g : A) (e : D') :
     CertStep (fun d => Elt (σ.symm d)) (fun e => Env (σ.symm e)) (mapVal σ Val)

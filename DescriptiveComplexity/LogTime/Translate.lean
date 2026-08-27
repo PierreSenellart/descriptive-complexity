@@ -48,7 +48,7 @@ already paid for elsewhere in the library:
   `plus` and `times`, each bit-definable. It is the same four-way split as
   `DescriptiveComplexity.HeadEvalArith`, at the level of the logic instead of
   the machine.
-* **The quantifier is `peelVar`**, the relabelling that moves the innermost bound
+* **The quantifier is `peelVar`**, the relabeling that moves the innermost bound
   variable out of the block and into the `Fin 1` a `BitDef` quantifier binds,
   with `DescriptiveComplexity.elim_comp_peelVar` saying that this is `Fin.snoc`
   on valuations. `DescriptiveComplexity.arithDef_prefixHolds` does the same thing

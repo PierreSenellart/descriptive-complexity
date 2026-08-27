@@ -19,7 +19,7 @@ with a *transitive-closure* operator. If `φ(x̄, ȳ)` defines a binary relation
 
 As everywhere in this library, the operator is *not* added to Mathlib's
 `FirstOrder.Language.BoundedFormula` as a new constructor – that would mean
-redoing relabelling, substitution and realization for an extended syntax, and
+redoing relabeling, substitution and realization for an extended syntax, and
 losing every existing lemma. It is kept at the Lean level instead: a
 `DescriptiveComplexity.TCSpec` bundles the arity `k`, a *first-order* transition
 formula over the ordered expansion with two `k`-tuples of free variables, and

@@ -147,7 +147,7 @@ abbrev posEnd : QV A := qCst .pEnd
 
 /-! #### States -/
 
-/-- Descending: initialising the cells to the right. -/
+/-- Descending: initializing the cells to the right. -/
 abbrev stDesc : QV A := qCst .qDesc
 
 /-- Evaluating the clause `c`, flag `f`, sweeping in direction `d`. -/

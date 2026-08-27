@@ -44,7 +44,7 @@ open Language Structure
 
 /-! ### The formula builders
 
-Kept in a namespace of their own: the shapes below (`wfF`, `stepF`, …) are the
+Kept in a namespace of their own: the shapes below (`wfF`, `stepF` …) are the
 transcription of one machine model into sentences, and their names are the
 generic ones the other reduction layers of the catalog also use. -/
 

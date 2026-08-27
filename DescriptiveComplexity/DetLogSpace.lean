@@ -25,11 +25,11 @@ development gives to a first-order vocabulary in almost every file.
 `DescriptiveComplexity.NL` by the Krom fragment of existential second-order logic
 ([Grädel 1992][gradel1992capturing]). There is no comparable syntactic fragment
 known for deterministic logarithmic space, so this class breaks the pattern: it
-is the first one here defined by an operator-as-data logic
-(`DescriptiveComplexity.TCSpec` read through
-`DescriptiveComplexity.TCSpec.det`) rather than by the shape of a kernel. That it is
-nonetheless a bona fide `DescriptiveComplexity.ComplexityClass` is the content of
-`DescriptiveComplexity.TransitiveClosurePull`: FO(DTC) definability is closed under
+is defined by an operator-as-data logic (`DescriptiveComplexity.TCSpec` read
+through `DescriptiveComplexity.TCSpec.det`) rather than by the shape of a kernel.
+That it is nonetheless a bona fide `DescriptiveComplexity.ComplexityClass` is the
+content of `DescriptiveComplexity.TransitiveClosurePull`: FO(DTC) definability is
+closed under
 (ordered) first-order reductions, the walk on the interpreted structure being a
 walk on the base structure with the tags carried in the mode.
 

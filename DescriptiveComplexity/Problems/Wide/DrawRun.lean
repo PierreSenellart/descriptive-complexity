@@ -169,7 +169,7 @@ The pass layer walks the background of
 `DescriptiveComplexity.Draw.Data.back`; the initial tape is
 `DescriptiveComplexity.Draw.Prog.initBack`, the marks over the blank. They are
 the same function, at the state where every register and marker is clear –
-which is why the all-blank start needs no initialisation sweep, and what lets
+which is why the all-blank start needs no initialization sweep, and what lets
 the first leg of the run be stated in the presentation all the others use. -/
 
 /-- **The machine's state at time zero**: every register, stage track and

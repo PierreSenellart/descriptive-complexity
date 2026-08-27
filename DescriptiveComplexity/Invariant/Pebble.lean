@@ -98,7 +98,7 @@ theorem pebbleRefine_mono (E₀ : PebbleRel A k) {E E' : PebbleRel A k} (h : E.L
 /-! ### The refinement chain and its limit -/
 
 /-- The descending refinement chain, from the all-relation: what one round
-cannot yet tell apart, twice refined, thrice refined, … -/
+cannot yet tell apart, twice refined, thrice refined … -/
 def pebbleStage (E₀ : PebbleRel A k) : ℕ → PebbleRel A k
   | 0 => fun _ _ => True
   | n + 1 => pebbleRefine E₀ (pebbleStage E₀ n)

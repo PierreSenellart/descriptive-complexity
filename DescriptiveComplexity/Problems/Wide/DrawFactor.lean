@@ -50,7 +50,7 @@ pointer it leaves, `UTrDefinable` for the tracks it writes – with
 `DescriptiveComplexity.Draw.URuleDefinable` bundling the three together with the
 staticness of its two phases and its direction. That is what travels through the
 program's tower, one statement per rule, composed site by site, with a kit's
-abstract parameters (`Match`, `setFlag`, …) contributing hypotheses of the same
+abstract parameters (`Match`, `setFlag` …) contributing hypotheses of the same
 shape.
 -/
 

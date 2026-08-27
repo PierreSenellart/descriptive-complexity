@@ -28,7 +28,7 @@ and the last `k` the tuple `ȳ` of the next one:
                    src_p(x̄) → ¬U_p(x̄)             (one clause per mode `p`)
 ```
 
-All guards are the specification's own first-order formulas, relabelled along
+All guards are the specification's own first-order formulas, relabeled along
 the two halves of `Fin (k + k)`; the middle family is the only one with two
 literals, and it is what makes the program Krom rather than Horn.
 

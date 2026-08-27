@@ -17,7 +17,7 @@ an arbitrary tape function; a program's phases are all stated at the
 mark of the cell's element on the register file, the blank everywhere else –
 and `DescriptiveComplexity.Draw.Prog.trackTape_initBack` says the initial tape
 *is* the presentation walking any track whose mark and blank digits are clear,
-with the empty track: which is why the all-blank start needs no initialisation
+with the empty track: which is why the all-blank start needs no initialization
 sweep. On top of it, `DescriptiveComplexity.Draw.Prog.isInit_prog` is the
 initial configuration a program's first phase starts from, and
 `DescriptiveComplexity.Draw.Prog.acceptsSpace_prog` /
@@ -75,7 +75,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **The initial tape is the pass-layer presentation**, walking any track
 whose mark and blank digits are clear, with the empty track: the all-blank
-start needs no initialisation sweep. -/
+start needs no initialization sweep. -/
 theorem trackTape_initBack {t₀ : W}
     (hmk : ∀ x : Univ A R P K dd, PR.mark x t₀ = PR.zero) (hb : PR.blank t₀ = PR.zero) :
     PR.trackTapeAt wmSeg t₀ PR.initBack (fun _ => False) =

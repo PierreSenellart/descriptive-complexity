@@ -880,7 +880,7 @@ development has no counterpart for.
   graph of the walk of a `DescriptiveComplexity.TCSpec` already *is* a marked graph –
   a node is a mode with a `k`-tuple, which is exactly the universe
   `Tag × A^dim` of a tagged interpretation – so the three defining formulas are
-  the specification's own, relabelled
+  the specification's own, relabeled
   (`DescriptiveComplexity.reach_hard_of_tcDefinable`). No junk arises, so the
   reduction needs no relativization; the one adjustment is
   `DescriptiveComplexity.TCSpec.pad`, adding a spare mode so that the tag type is
@@ -904,8 +904,8 @@ development has no counterpart for.
   successor” being invariant under a bijection.
 * `DescriptiveComplexity.DetLogSpace` – the class `DescriptiveComplexity.LOGSPACE`
   (named in full, `L` being a vocabulary everywhere in this development),
-  defined by FO(DTC) definability. It is the first class here defined by an
-  operator-as-data logic rather than by the shape of a kernel: no fragment of
+  defined by FO(DTC) definability. It is defined by an operator-as-data logic
+  rather than by the shape of a kernel, unlike PTIME and NL: no fragment of
   ∃SO comparable to SO-Horn or SO-Krom is known for deterministic logarithmic
   space. `DescriptiveComplexity.LOGSPACE_subset_NL` is a determinized walk being a
   walk, followed by the FO(TC)/SO-Krom translation.
@@ -1667,7 +1667,7 @@ The bottom of the ordered world, and the only vocabulary here that is a
   `DescriptiveComplexity.dwideAcceptSpace_EXPSPACE_complete` and
   `DescriptiveComplexity.wideAcceptSpace_EXPSPACE_complete`. The program is a
   roaming machine with a register file, iterating a partial fixed point over the
-  expansion until it stabilises – no clock, and a diverging fixed point diverges,
+  expansion until it stabilizes – no clock, and a diverging fixed point diverges,
   which is a correct *no*. Three things make it fit in a first-order
   interpretation. Every rule of the emitted machine is written down by **one
   formula for every instance**

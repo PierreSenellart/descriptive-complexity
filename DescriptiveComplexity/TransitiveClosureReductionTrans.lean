@@ -23,7 +23,8 @@ structure *expanded* by the inner walks' relations; flattened
 structure alone, and they join the inner family
 (`DescriptiveComplexity.TCInterpretation.flatFamily`). The inner interpretation
 is then **extended** to the outer family's vocabulary
-(`DescriptiveComplexity.TCInterpretation.extendOuter`): a reachability atom of
+(`DescriptiveComplexity.TCInterpretation.CompositeBlock.extendOuter`): a
+reachability atom of
 an outer walk is interpreted by “the two endpoints have encodings between
 which the flat walk reaches”, with the encodings pinned by
 `DescriptiveComplexity.ParamTCSpec.encF`. Composing the outer interpretation
@@ -33,7 +34,8 @@ pullback substitutes the extended formulas for the atoms.
 
 The extended interpretation produces exactly the outer reduction's input –
 the inner structure, ordered lexicographically, expanded by the outer walks'
-relations (`DescriptiveComplexity.TCInterpretation.extendOuterLEquiv`) – which
+relations
+(`DescriptiveComplexity.TCInterpretation.CompositeBlock.extendOuterLEquiv`) – which
 is where the two halves of the normal form meet: the pullback's
 correspondence between in-domain nodes and the flat walk's at the encodings.
 

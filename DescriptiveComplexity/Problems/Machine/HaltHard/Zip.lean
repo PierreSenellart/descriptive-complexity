@@ -14,7 +14,7 @@ sequential semantics first: a configuration is a *zipper*
 (`DescriptiveComplexity.HaltHard.LCfg`) – the state, the letters left of the
 head (nearest first), the letter under the head, and the letters right of the
 head (nearest first) – and one step (`DescriptiveComplexity.HaltHard.lstep`)
-applies the table and moves, materialising a blank when the head leaves the
+applies the table and moves, materializing a blank when the head leaves the
 recorded region. This keeps every walk argument a plain list induction; the
 sibling `Bridge` file identifies runs of `lstep` with derivations of the
 rewriting system `DescriptiveComplexity.HaltPcp.MRule` of the drawn machine,
@@ -40,7 +40,7 @@ variable {c : Code}
 /-- A configuration of the simulating machine, as a zipper: the letters left
 of the head are listed nearest-first, the letters right of the head
 nearest-first. Cells outside the recorded region are blank; a move beyond it
-materialises the blank. -/
+materializes the blank. -/
 structure LCfg (c : Code) where
   /-- The current state. -/
   q : SimQ c
@@ -101,7 +101,7 @@ theorem lstep_left_end (h : simStep q σ = some (σ', q', false)) (R : List (Sim
     lstep ⟨q, [], σ, R⟩ = some ⟨q', [], .bk, σ' :: R⟩ := by
   simp [lstep, h]
 
-/-- A right move into a run of blanks – recorded or materialised, the
+/-- A right move into a run of blanks – recorded or materialized, the
 entered cell is blank either way. -/
 theorem lstep_right_pad (h : simStep q σ = some (σ', q', true)) (L : List (SimSym c))
     (t : ℕ) :
@@ -111,7 +111,7 @@ theorem lstep_right_pad (h : simStep q σ = some (σ', q', true)) (L : List (Sim
   · exact lstep_right_end h L
   · exact lstep_right (h := h) L .bk (List.replicate t .bk)
 
-/-- A left move into a run of blanks – recorded or materialised, the entered
+/-- A left move into a run of blanks – recorded or materialized, the entered
 cell is blank either way. -/
 theorem lstep_left_pad (h : simStep q σ = some (σ', q', false)) (g : ℕ)
     (R : List (SimSym c)) :

@@ -74,7 +74,7 @@ inductive QTag : Type
   /-- The symbol of a variable's cell: value `b`, and `f` recording that both
   values have already been tried. -/
   | sVal (b f : Bool)
-  /-- Descending into the subtree: initialise the cells to the right. -/
+  /-- Descending into the subtree: initialize the cells to the right. -/
   | qDesc
   /-- Evaluating the matrix: the clause is carried by the state, `f` is the
   accumulated flag and `d` the sweep direction (`true` = rightwards). -/
@@ -87,7 +87,7 @@ inductive QTag : Type
   | qAcc
   /-- Descend: step over the left marker. -/
   | tDescStart
-  /-- Descend: initialise a variable's cell, reading `(b, f)`. -/
+  /-- Descend: initialize a variable's cell, reading `(b, f)`. -/
   | tDescCell (b f : Bool)
   /-- Descend over, and the matrix has no clause: it is true. -/
   | tDescEndTrue
