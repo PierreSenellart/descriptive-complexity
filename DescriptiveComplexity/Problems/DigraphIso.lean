@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.SubgraphIso
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.IsoGadget
 
 /-!
@@ -98,56 +99,35 @@ section SigmaOne
 
 /-- Kernel clause: every pattern vertex is mapped to some host vertex. -/
 private noncomputable def giTotalClause : subgraphSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0))).imp
-      ((Relations.formula₂ sgMapSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        Relations.formula₁ sgHostVSym (Term.var (Sum.inr ()))).iExs Unit))
+  fo% ∀ x₀, sgPatVSym(x₀) → ∃ y, sgMapSym(x₀, y) ∧ sgHostVSym(y)
 
 /-- Kernel clause: the guessed map is a function on the pattern. -/
 private noncomputable def giFuncClause : subgraphSOLang.Sentence :=
-  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x₀ x₁ x₂,
+    (sgPatVSym(x₀) ∧ sgMapSym(x₀, x₁)) ∧ sgMapSym(x₀, x₂) → x₁ ≐ x₂
 
 /-- Kernel clause: the guessed map is injective on the pattern. -/
 private noncomputable def giInjClause : subgraphSOLang.Sentence :=
-  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+  fo% ∀ x₀ x₁ x₂,
+    ((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₂) → x₀ ≐ x₁
 
 /-- Kernel clause: every host vertex is hit – what makes the map onto, and the
 one clause Subgraph Isomorphism does not have. -/
 private noncomputable def giSurjClause : subgraphSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ sgHostVSym (Term.var (Sum.inr 0))).imp
-      ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr ())) ⊓
-        Relations.formula₂ sgMapSym (Term.var (Sum.inr ()))
-          (Term.var (Sum.inl (Sum.inr 0)))).iExs Unit))
+  fo% ∀ y₀, sgHostVSym(y₀) → ∃ x, sgPatVSym(x) ∧ sgMapSym(x, y₀)
 
 /-- Kernel clause: the guessed map carries pattern edges to host edges. -/
 private noncomputable def giEdgeClause : subgraphSOLang.Sentence :=
-  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgPatESym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3))).imp
-    (Relations.formula₂ sgHostESym (Term.var (Sum.inr 2))
-      (Term.var (Sum.inr 3)))).iAlls (Fin 4)
+  fo% ∀ x₀ x₁ x₂ x₃,
+    (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgPatESym(x₀, x₁)) ∧
+      sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₃) → sgHostESym(x₂, x₃)
 
 /-- Kernel clause: the guessed map reflects host edges to pattern edges – the
 other clause distinguishing isomorphism from an injective homomorphism. -/
 private noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
-  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3)) ⊓
-      Relations.formula₂ sgHostESym (Term.var (Sum.inr 2)) (Term.var (Sum.inr 3))).imp
-    (Relations.formula₂ sgPatESym (Term.var (Sum.inr 0))
-      (Term.var (Sum.inr 1)))).iAlls (Fin 4)
+  fo% ∀ x₀ x₁ x₂ x₃,
+    (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧
+      sgMapSym(x₁, x₃)) ∧ sgHostESym(x₂, x₃) → sgPatESym(x₀, x₁)
 
 /-- The first-order kernel of the `Σ₁` definition of Digraph Isomorphism: the
 guessed relation is a bijection of the pattern vertices onto the host vertices,
@@ -161,17 +141,17 @@ private theorem realize_digraphIsoKernel {A : Type} [Language.twoGraphs.Structur
     (ρ : isoGuessBlock.Assignment A) :
     (@Sentence.Realize subgraphSOLang A
         (@sumStructure _ _ A _ (isoGuessBlock.structure ρ)) digraphIsoKernel) ↔
-      (∀ x : A, TGPatV x → ∃ y : A, ρ () ![x, y] ∧ TGHostV y) ∧
-        (∀ x y y' : A, TGPatV x → ρ () ![x, y] → ρ () ![x, y'] → y = y') ∧
-        (∀ x x' y : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y] → x = x') ∧
-        (∀ y : A, TGHostV y → ∃ x : A, TGPatV x ∧ ρ () ![x, y]) ∧
-        (∀ x x' y y' : A, TGPatV x → TGPatV x' → TGPatE x x' → ρ () ![x, y] →
-          ρ () ![x', y'] → TGHostE y y') ∧
-        ∀ x x' y y' : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y'] →
+      (∀ x : A, TGPatV x → ∃ y : A, ρ .map ![x, y] ∧ TGHostV y) ∧
+        (∀ x y y' : A, TGPatV x → ρ .map ![x, y] → ρ .map ![x, y'] → y = y') ∧
+        (∀ x x' y : A, TGPatV x → TGPatV x' → ρ .map ![x, y] → ρ .map ![x', y] → x = x') ∧
+        (∀ y : A, TGHostV y → ∃ x : A, TGPatV x ∧ ρ .map ![x, y]) ∧
+        (∀ x x' y y' : A, TGPatV x → TGPatV x' → TGPatE x x' → ρ .map ![x, y] →
+          ρ .map ![x', y'] → TGHostE y y') ∧
+        ∀ x x' y y' : A, TGPatV x → TGPatV x' → ρ .map ![x, y] → ρ .map ![x', y'] →
           TGHostE y y' → TGPatE x x' := by
   let := isoGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
-      RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ () w := fun _ => Iff.rfl
+      RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ .map w := fun _ => Iff.rfl
   rw [digraphIsoKernel]
   simp only [giTotalClause, giFuncClause, giInjClause, giSurjClause, giEdgeClause,
     giEdgeBackClause, Sentence.Realize, Formula.realize_inf, Formula.realize_iAlls,
@@ -185,7 +165,7 @@ private theorem realize_digraphIsoKernel {A : Type} [Language.twoGraphs.Structur
           (and_congr ⟨fun h x x' y y' hx hx' hpe h₁ h₂ => ?_, fun h i hi => ?_⟩
             ⟨fun h x x' y y' hx hx' h₁ h₂ hhe => ?_, fun h i hi => ?_⟩))))
   · obtain ⟨y, hy1, hy2⟩ := h (fun _ => x) hx
-    exact ⟨y (), hy1, hy2⟩
+    exact ⟨y 0, hy1, hy2⟩
   · obtain ⟨y, hy1, hy2⟩ := h (i 0) hi
     exact ⟨fun _ => y, hy1, hy2⟩
   · exact h ![x, y, y'] ⟨⟨hx, h₁⟩, h₂⟩
@@ -193,7 +173,7 @@ private theorem realize_digraphIsoKernel {A : Type} [Language.twoGraphs.Structur
   · exact h ![x, x', y] ⟨⟨⟨hx, hx'⟩, h₁⟩, h₂⟩
   · exact h (i 0) (i 1) (i 2) hi.1.1.1 hi.1.1.2 hi.1.2 hi.2
   · obtain ⟨x, hx1, hx2⟩ := h (fun _ => y) hy
-    exact ⟨x (), hx1, hx2⟩
+    exact ⟨x 0, hx1, hx2⟩
   · obtain ⟨x, hx1, hx2⟩ := h (i 0) hi
     exact ⟨fun _ => x, hx1, hx2⟩
   · exact h ![x, x', y, y'] ⟨⟨⟨⟨hx, hx'⟩, hpe⟩, h₁⟩, h₂⟩
@@ -210,7 +190,7 @@ theorem digraphIso_sigmaSODefinable : SigmaSODefinable 1 DigraphIso := by
   intro A _ _ _
   constructor
   · rintro ⟨-, f, hmaps, hinj, hsurj, hedge⟩
-    refine ⟨fun i => match i with | () => fun w : Fin 2 → A => f (w 0) = w 1,
+    refine ⟨fun i => match i with | .map => fun w : Fin 2 → A => f (w 0) = w 1,
       (realize_digraphIsoKernel _).mpr ⟨fun x hx => ⟨f x, rfl, hmaps x hx⟩,
         fun x y y' _ h₁ h₂ => h₁.symm.trans h₂,
         fun x x' y hx hx' h₁ h₂ => hinj x x' hx hx' (h₁.trans h₂.symm),
@@ -230,7 +210,7 @@ theorem digraphIso_sigmaSODefinable : SigmaSODefinable 1 DigraphIso := by
   · rintro ⟨ρ, hρ⟩
     obtain ⟨htot, hfunc, hinj, hsurj, hedge, hedgeBack⟩ := (realize_digraphIsoKernel ρ).mp hρ
     classical
-    have hch : ∀ x : {x : A // TGPatV x}, ∃ y : A, ρ () ![x.1, y] ∧ TGHostV y :=
+    have hch : ∀ x : {x : A // TGPatV x}, ∃ y : A, ρ .map ![x.1, y] ∧ TGHostV y :=
       fun x => htot x.1 x.2
     choose g hg1 hg2 using hch
     refine ⟨‹Finite A›, fun x => if h : TGPatV x then g ⟨x, h⟩ else x, fun x hx => ?_,

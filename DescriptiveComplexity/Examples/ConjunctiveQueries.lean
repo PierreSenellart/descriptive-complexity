@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Encoding
 import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.Problems.ThreeColorability
@@ -190,32 +192,17 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of BCQ evaluation instances. -/
-inductive queryDbRel : ℕ → Type
-  /-- `isVar x`: the element `x` is a variable of the query. -/
-  | isVar : queryDbRel 1
-  /-- `atom x y`: the query contains the atom `E(x, y)` (its arguments are
-  variables or constants). -/
-  | atom : queryDbRel 2
-  /-- `fact a b`: the database contains the fact `E(a, b)`. -/
-  | fact : queryDbRel 2
-  deriving DecidableEq
-
 /-- The relational language of BCQ evaluation instances: a query and a
 database over a shared universe, with a unary predicate singling out the
 query variables and binary predicates for query atoms and database facts. -/
-protected def queryDb : Language :=
-  ⟨fun _ => Empty, queryDbRel⟩
-  deriving IsRelational
-
-/-- The symbol for “is a query variable”. -/
-abbrev qdbIsVar : Language.queryDb.Relations 1 := .isVar
-
-/-- The symbol for “is an atom of the query”. -/
-abbrev qdbAtom : Language.queryDb.Relations 2 := .atom
-
-/-- The symbol for “is a fact of the database”. -/
-abbrev qdbFact : Language.queryDb.Relations 2 := .fact
+fo_language queryDb with qdb where
+  /-- `isVar x`: the element `x` is a variable of the query. -/
+  isVar : 1
+  /-- `atom x y`: the query contains the atom `E(x, y)` (its arguments are
+  variables or constants). -/
+  atom : 2
+  /-- `fact a b`: the database contains the fact `E(a, b)`. -/
+  fact : 2
 
 end Language
 
@@ -660,7 +647,7 @@ mean something – see the module docstring of
 /-- Well-formedness of an evaluation instance: some element is a constant.
 The one condition the decoder needs. -/
 noncomputable def cqWFSentence : Language.queryDb.Sentence :=
-  Formula.iExs (Fin 1) (∼(Relations.formula₁ qdbIsVar (Term.var (Sum.inr 0))))
+  fo% ∃ x, ¬ qdbIsVar(x)
 
 theorem realize_cqWFSentence {A : Type} [Language.queryDb.Structure A] :
     A ⊨ cqWFSentence ↔ ∃ x : A, ¬QVar x := by
@@ -881,28 +868,9 @@ section Membership
 
 /-- The single existential second-order block of the `Σ₁` definition of BCQ
 evaluation: one binary relation variable, the (graph of the) valuation. -/
-def cqHomBlock : SOBlock where
-  ι := Unit
-  arity := fun _ => 2
-
-/-- The symbol of the guessed-valuation relation variable. -/
-def cqHomSym : cqHomBlock.lang.Relations 2 := ⟨(), rfl⟩
-
-/-- The vocabulary of the kernel: evaluation instances together with the
-guessed-valuation relation variable. -/
-abbrev cqSOLang : Language := Language.queryDb.sum cqHomBlock.lang
-
-/-- The symbol for “is a query variable” in the kernel's vocabulary. -/
-abbrev kQVar : cqSOLang.Relations 1 := Sum.inl qdbIsVar
-
-/-- The symbol for “is an atom of the query” in the kernel's vocabulary. -/
-abbrev kQAtom : cqSOLang.Relations 2 := Sum.inl qdbAtom
-
-/-- The symbol for “is a fact of the database” in the kernel's vocabulary. -/
-abbrev kDbFact : cqSOLang.Relations 2 := Sum.inl qdbFact
-
-/-- The guessed-valuation symbol in the kernel's vocabulary. -/
-abbrev kHom : cqSOLang.Relations 2 := Sum.inr cqHomSym
+fo_block cqHomBlock over Language.queryDb qdb into cqSOLang with cq where
+  /-- The guessed valuation, as the graph of a map. -/
+  hom : 2
 
 /-- Shorthand for the `i`-th universally quantified variable of the main
 kernel conjunct. -/
@@ -911,23 +879,21 @@ private def kv (i : Fin 4) : cqSOLang.Term (Empty ⊕ Fin 4) := Term.var (Sum.in
 /-- The kernel formula “`kv j` is a possible image of `kv i`”: an `H`-image
 if `kv i` is a query variable, `kv i` itself otherwise. -/
 def cqImgFormula (i j : Fin 4) : cqSOLang.Formula (Empty ⊕ Fin 4) :=
-  (Relations.formula₁ kQVar (kv i) ⊓ Relations.formula₂ kHom (kv i) (kv j)) ⊔
-    (∼(Relations.formula₁ kQVar (kv i)) ⊓ Term.equal (kv i) (kv j))
+  (Relations.formula₁ cqIsVarSym (kv i) ⊓ Relations.formula₂ cqHomSym (kv i) (kv j)) ⊔
+    (∼(Relations.formula₁ cqIsVarSym (kv i)) ⊓ Term.equal (kv i) (kv j))
 
 /-- First kernel conjunct: for all `x y u v`, if `E(x, y)` is an atom and
 `u`, `v` are possible images of `x`, `y`, then `E(u, v)` is a fact between
 two database elements. -/
 noncomputable def cqKernelAtoms : cqSOLang.Sentence :=
-  ((Relations.formula₂ kQAtom (kv 0) (kv 1) ⊓ (cqImgFormula 0 2 ⊓ cqImgFormula 1 3)).imp
-    ((Relations.formula₂ kDbFact (kv 2) (kv 3) ⊓ ∼(Relations.formula₁ kQVar (kv 2))) ⊓
-      ∼(Relations.formula₁ kQVar (kv 3)))).iAlls (Fin 4)
+  fo% ∀ x y u v,
+    cqAtomSym(x, y) ∧ (!(cqImgFormula 0 2) ∧ !(cqImgFormula 1 3)) →
+      (cqFactSym(u, v) ∧ ¬ cqIsVarSym(u)) ∧ ¬ cqIsVarSym(v)
 
 /-- Second kernel conjunct: every query variable has at least one
 `H`-image. -/
 noncomputable def cqKernelTotal : cqSOLang.Sentence :=
-  ((Relations.formula₁ kQVar (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₂ kHom (Term.var (Sum.inl (Sum.inr 0)))
-      (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ x, cqIsVarSym(x) → ∃ u, cqHomSym(x, u)
 
 /-- The first-order kernel of the `Σ₁` definition of BCQ evaluation. -/
 noncomputable def cqKernel : cqSOLang.Sentence := cqKernelAtoms ⊓ cqKernelTotal
@@ -937,7 +903,7 @@ variable {A : Type} [Language.queryDb.Structure A]
 /-- Lean-level counterpart of `cqImgFormula` under an assignment `ρ` of the
 relation variable. -/
 private def PossibleImage (ρ : cqHomBlock.Assignment A) (x u : A) : Prop :=
-  (QVar x ∧ ρ () ![x, u]) ∨ (¬QVar x ∧ x = u)
+  (QVar x ∧ ρ .hom ![x, u]) ∨ (¬QVar x ∧ x = u)
 
 /-- Realization of the kernel under an assignment of the guessed-valuation
 variable, in Lean-level terms. -/
@@ -946,12 +912,12 @@ private theorem realize_cqKernel (ρ : cqHomBlock.Assignment A) :
         (@sumStructure _ _ A _ (cqHomBlock.structure ρ)) cqKernel) ↔
       (∀ x y u v : A, QAtom x y → PossibleImage ρ x u → PossibleImage ρ y v →
           DbEdge u v) ∧
-        ∀ x : A, QVar x → ∃ u : A, ρ () ![x, u] := by
+        ∀ x : A, QVar x → ∃ u : A, ρ .hom ![x, u] := by
   let := cqHomBlock.structure ρ
   have hsub : ∀ w : Fin 2 → A,
-      RelMap (L := cqSOLang) (M := A) kHom w ↔ ρ () ![w 0, w 1] := by
+      RelMap (L := cqSOLang) (M := A) cqHomSym w ↔ ρ .hom ![w 0, w 1] := by
     intro w
-    change ρ cqHomSym.1 _ ↔ _
+    change ρ cqHomRel.1 _ ↔ _
     refine iff_of_eq (congrArg _ (funext fun j => ?_))
     fin_cases j <;> rfl
   rw [cqKernel]
@@ -979,7 +945,7 @@ private theorem realize_cqKernel (ρ : cqHomBlock.Assignment A) :
     constructor
     · intro h x hx
       obtain ⟨u, hu⟩ := h (fun _ => x) hx
-      exact ⟨u (), hu⟩
+      exact ⟨u 0, hu⟩
     · intro h i hi
       obtain ⟨u, hu⟩ := h (i 0) hi
       exact ⟨fun _ => u, hu⟩
@@ -1273,35 +1239,17 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of query pairs. -/
-inductive queryPairRel : ℕ → Type
-  /-- `leftVar x`: the element `x` is a variable of the left query. -/
-  | leftVar : queryPairRel 1
-  /-- `rightVar x`: the element `x` is a variable of the right query. -/
-  | rightVar : queryPairRel 1
-  /-- `leftAtom x y`: the left query contains the atom `E(x, y)`. -/
-  | leftAtom : queryPairRel 2
-  /-- `rightAtom x y`: the right query contains the atom `E(x, y)`. -/
-  | rightAtom : queryPairRel 2
-  deriving DecidableEq
-
 /-- The relational language of pairs of conjunctive queries over a shared
 universe of variables and constants. -/
-protected def queryPair : Language :=
-  ⟨fun _ => Empty, queryPairRel⟩
-  deriving IsRelational
-
-/-- The symbol for “is a variable of the left query”. -/
-abbrev qpLeftVar : Language.queryPair.Relations 1 := .leftVar
-
-/-- The symbol for “is a variable of the right query”. -/
-abbrev qpRightVar : Language.queryPair.Relations 1 := .rightVar
-
-/-- The symbol for “is an atom of the left query”. -/
-abbrev qpLeftAtom : Language.queryPair.Relations 2 := .leftAtom
-
-/-- The symbol for “is an atom of the right query”. -/
-abbrev qpRightAtom : Language.queryPair.Relations 2 := .rightAtom
+fo_language queryPair with qp where
+  /-- `leftVar x`: the element `x` is a variable of the left query. -/
+  leftVar : 1
+  /-- `rightVar x`: the element `x` is a variable of the right query. -/
+  rightVar : 1
+  /-- `leftAtom x y`: the left query contains the atom `E(x, y)`. -/
+  leftAtom : 2
+  /-- `rightAtom x y`: the right query contains the atom `E(x, y)`. -/
+  rightAtom : 2
 
 end Language
 

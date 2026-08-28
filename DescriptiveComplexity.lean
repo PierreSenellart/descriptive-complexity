@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Ordered
 import DescriptiveComplexity.Composition
@@ -13,6 +15,7 @@ import DescriptiveComplexity.Encoding.BinarySubsetSum
 import DescriptiveComplexity.Encoding.UnaryBlowup
 import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.Block
 import DescriptiveComplexity.SecondOrderLift
 import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.SecondOrderOrdered
@@ -234,6 +237,29 @@ individual declarations are documented on their own pages.
   `DescriptiveComplexity.TCReduction` (notation `P ≤ᵗᶜ Q`) and
   `DescriptiveComplexity.LFPReduction` (notation `P ≤ˡᶠᵖ Q`), once the walk
   and fixed-point layers are in place.
+
+## Writing a problem down
+
+Three authoring aids, used by the tutorials of
+`DescriptiveComplexity.Examples` and by the catalog. They are macros and
+commands: what they elaborate to is what one would have written by hand, so
+they change nothing that reads the declarations they produce.
+
+* `DescriptiveComplexity.Syntax` – a surface syntax for formulas, `fo%`.
+  Mathlib's `FirstOrder.Language.BoundedFormula` is locally nameless, so a
+  variable bound by the `k`-th enclosing block is written `Sum.inr i` under
+  `k - 1` applications of `Sum.inl`; `fo% ∀ x y, R(x, y) → ∃ z, S(y, z)` names
+  the variables instead and elaborates to the same `Formula.iAlls` term.
+* `DescriptiveComplexity.Vocabulary` – `fo_language`, declaring a relational
+  language from a list of `name : arity` lines: the symbol inductive, the
+  `Language`, its `IsRelational` instance and the abbreviation naming each
+  symbol; and `fo_predicates`, the predicates reading those symbols off a
+  structure.
+* `DescriptiveComplexity.Block` – `fo_block`, declaring a
+  `DescriptiveComplexity.SOBlock` and the vocabulary of a kernel: the index
+  type with its `Fintype` instance, the block, the summed language, and one
+  symbol of the sum for each symbol of the base vocabulary and each relation
+  variable.
 
 ## The abstract complexity layer
 

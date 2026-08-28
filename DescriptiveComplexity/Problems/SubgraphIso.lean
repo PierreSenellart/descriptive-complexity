@@ -5,6 +5,8 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 
 /-!
 # Subgraph Isomorphism is NP-complete
@@ -55,35 +57,17 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of pattern-and-host graphs. -/
-inductive twoGraphsRel : ℕ → Type
-  /-- `patV a`: `a` is a vertex of the pattern graph. -/
-  | patV : twoGraphsRel 1
-  /-- `hostV a`: `a` is a vertex of the host graph. -/
-  | hostV : twoGraphsRel 1
-  /-- `patE a b`: there is an edge of the pattern from `a` to `b`. -/
-  | patE : twoGraphsRel 2
-  /-- `hostE a b`: there is an edge of the host from `a` to `b`. -/
-  | hostE : twoGraphsRel 2
-  deriving DecidableEq
-
 /-- The relational language of pattern-and-host graphs: two graphs sharing a
 universe, each with its own vertex mark and adjacency relation. -/
-protected def twoGraphs : Language :=
-  ⟨fun _ => Empty, twoGraphsRel⟩
-  deriving IsRelational
-
-/-- The pattern-vertex symbol. -/
-abbrev tgPatV : Language.twoGraphs.Relations 1 := .patV
-
-/-- The host-vertex symbol. -/
-abbrev tgHostV : Language.twoGraphs.Relations 1 := .hostV
-
-/-- The pattern-adjacency symbol. -/
-abbrev tgPatE : Language.twoGraphs.Relations 2 := .patE
-
-/-- The host-adjacency symbol. -/
-abbrev tgHostE : Language.twoGraphs.Relations 2 := .hostE
+fo_language twoGraphs with tg where
+  /-- `patV a`: `a` is a vertex of the pattern graph. -/
+  patV : 1
+  /-- `hostV a`: `a` is a vertex of the host graph. -/
+  hostV : 1
+  /-- `patE a b`: there is an edge of the pattern from `a` to `b`. -/
+  patE : 2
+  /-- `hostE a b`: there is an edge of the host from `a` to `b`. -/
+  hostE : 2
 
 end Language
 
@@ -151,17 +135,7 @@ section Shorthands
 
 variable {A : Type} [Language.twoGraphs.Structure A]
 
-/-- Being a vertex of the pattern graph. -/
-def TGPatV (a : A) : Prop := RelMap tgPatV ![a]
-
-/-- Being a vertex of the host graph. -/
-def TGHostV (a : A) : Prop := RelMap tgHostV ![a]
-
-/-- Adjacency in the pattern graph. -/
-def TGPatE (a b : A) : Prop := RelMap tgPatE ![a, b]
-
-/-- Adjacency in the host graph. -/
-def TGHostE (a b : A) : Prop := RelMap tgHostE ![a, b]
+fo_predicates Language.twoGraphs tg
 
 end Shorthands
 
@@ -381,57 +355,24 @@ section SigmaOne
 
 /-- The single existential block of the `Σ₁` definition of Subgraph
 Isomorphism: one binary relation variable, the guessed map. -/
-def isoGuessBlock : SOBlock where
-  ι := Unit
-  arity := fun _ => 2
-
-/-- The symbol of the guessed map. -/
-def sgMapRel : isoGuessBlock.lang.Relations 2 := ⟨(), rfl⟩
-
-/-- The vocabulary of the kernel: pattern-and-host structures together with
-the guessed map. -/
-abbrev subgraphSOLang : Language := Language.twoGraphs.sum isoGuessBlock.lang
-
-/-- The pattern-vertex symbol in the kernel's vocabulary. -/
-abbrev sgPatVSym : subgraphSOLang.Relations 1 := Sum.inl tgPatV
-
-/-- The host-vertex symbol in the kernel's vocabulary. -/
-abbrev sgHostVSym : subgraphSOLang.Relations 1 := Sum.inl tgHostV
-
-/-- The pattern-adjacency symbol in the kernel's vocabulary. -/
-abbrev sgPatESym : subgraphSOLang.Relations 2 := Sum.inl tgPatE
-
-/-- The host-adjacency symbol in the kernel's vocabulary. -/
-abbrev sgHostESym : subgraphSOLang.Relations 2 := Sum.inl tgHostE
-
-/-- The guessed-map symbol in the kernel's vocabulary. -/
-abbrev sgMapSym : subgraphSOLang.Relations 2 := Sum.inr sgMapRel
+fo_block isoGuessBlock over Language.twoGraphs tg into subgraphSOLang with sg where
+  /-- The guessed map from the pattern to the host. -/
+  map : 2
 
 /-- Kernel clause: every pattern vertex is mapped to some host vertex. -/
 private noncomputable def sgTotalClause : subgraphSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0))).imp
-      ((Relations.formula₂ sgMapSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        Relations.formula₁ sgHostVSym (Term.var (Sum.inr ()))).iExs Unit))
+  fo% ∀ x₀, sgPatVSym(x₀) → ∃ y, sgMapSym(x₀, y) ∧ sgHostVSym(y)
 
 /-- Kernel clause: the guessed map is injective on the pattern. -/
 private noncomputable def sgInjClause : subgraphSOLang.Sentence :=
-  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+  fo% ∀ x₀ x₁ x₂,
+    ((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₂) → x₀ ≐ x₁
 
 /-- Kernel clause: the guessed map carries pattern edges to host edges. -/
 private noncomputable def sgEdgeClause : subgraphSOLang.Sentence :=
-  ((Relations.formula₁ sgPatVSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ sgPatVSym (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgPatESym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ sgMapSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3))).imp
-    (Relations.formula₂ sgHostESym (Term.var (Sum.inr 2))
-      (Term.var (Sum.inr 3)))).iAlls (Fin 4)
+  fo% ∀ x₀ x₁ x₂ x₃,
+    (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgPatESym(x₀, x₁)) ∧
+      sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₃) → sgHostESym(x₂, x₃)
 
 /-- The first-order kernel of the `Σ₁` definition of Subgraph
 Isomorphism. -/
@@ -443,13 +384,13 @@ private theorem realize_subgraphKernel {A : Type} [Language.twoGraphs.Structure 
     (ρ : isoGuessBlock.Assignment A) :
     (@Sentence.Realize subgraphSOLang A
         (@sumStructure _ _ A _ (isoGuessBlock.structure ρ)) subgraphKernel) ↔
-      (∀ x : A, TGPatV x → ∃ y : A, ρ () ![x, y] ∧ TGHostV y) ∧
-        (∀ x x' y : A, TGPatV x → TGPatV x' → ρ () ![x, y] → ρ () ![x', y] → x = x') ∧
-        ∀ x x' y y' : A, TGPatV x → TGPatV x' → TGPatE x x' → ρ () ![x, y] →
-          ρ () ![x', y'] → TGHostE y y' := by
+      (∀ x : A, TGPatV x → ∃ y : A, ρ .map ![x, y] ∧ TGHostV y) ∧
+        (∀ x x' y : A, TGPatV x → TGPatV x' → ρ .map ![x, y] → ρ .map ![x', y] → x = x') ∧
+        ∀ x x' y y' : A, TGPatV x → TGPatV x' → TGPatE x x' → ρ .map ![x, y] →
+          ρ .map ![x', y'] → TGHostE y y' := by
   let := isoGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
-      RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ () w := fun _ => Iff.rfl
+      RelMap (L := subgraphSOLang) (M := A) sgMapSym w ↔ ρ .map w := fun _ => Iff.rfl
   rw [subgraphKernel]
   simp only [sgTotalClause, sgInjClause, sgEdgeClause, Sentence.Realize, Formula.realize_inf,
     Formula.realize_iAlls, Formula.realize_imp, Formula.realize_iExs, Formula.realize_rel₁,
@@ -459,7 +400,7 @@ private theorem realize_subgraphKernel {A : Type} [Language.twoGraphs.Structure 
     (and_congr ⟨fun h x x' y hx hx' h₁ h₂ => ?_, fun h i hi => ?_⟩
       ⟨fun h x x' y y' hx hx' hpe h₁ h₂ => ?_, fun h i hi => ?_⟩)
   · obtain ⟨y, hy1, hy2⟩ := h (fun _ => x) hx
-    exact ⟨y (), hy1, hy2⟩
+    exact ⟨y 0, hy1, hy2⟩
   · obtain ⟨y, hy1, hy2⟩ := h (i 0) hi
     exact ⟨fun _ => y, hy1, hy2⟩
   · exact h ![x, x', y] ⟨⟨⟨hx, hx'⟩, h₁⟩, h₂⟩
@@ -475,7 +416,7 @@ theorem subgraphIso_sigmaSODefinable : SigmaSODefinable 1 SubgraphIso := by
   intro A _ _ _
   constructor
   · rintro ⟨-, f, hmaps, hinj, hedge⟩
-    refine ⟨fun i => match i with | () => fun w : Fin 2 → A => f (w 0) = w 1,
+    refine ⟨fun i => match i with | .map => fun w : Fin 2 → A => f (w 0) = w 1,
       (realize_subgraphKernel _).mpr ⟨fun x hx => ⟨f x, rfl, hmaps x hx⟩,
         fun x x' y hx hx' h₁ h₂ => hinj x x' hx hx' (h₁.trans h₂.symm), ?_⟩⟩
     intro x x' y y' hx hx' hpe h₁ h₂
@@ -486,7 +427,7 @@ theorem subgraphIso_sigmaSODefinable : SigmaSODefinable 1 SubgraphIso := by
   · rintro ⟨ρ, hρ⟩
     obtain ⟨htot, hinj, hedge⟩ := (realize_subgraphKernel ρ).mp hρ
     classical
-    have hch : ∀ x : {x : A // TGPatV x}, ∃ y : A, ρ () ![x.1, y] ∧ TGHostV y :=
+    have hch : ∀ x : {x : A // TGPatV x}, ∃ y : A, ρ .map ![x.1, y] ∧ TGHostV y :=
       fun x => htot x.1 x.2
     choose g hg1 hg2 using hch
     refine ⟨‹Finite A›, fun x => if h : TGPatV x then g ⟨x, h⟩ else x, fun x hx => ?_,

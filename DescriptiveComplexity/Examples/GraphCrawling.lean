@@ -5,6 +5,8 @@ Authors: Pierre Senellart
 -/
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Encoding
 import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.SecondOrder
@@ -132,36 +134,18 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of website graphs. -/
-inductive siteGraphRel : ℕ → Type
-  /-- `edge a b`: a hyperlink from page `a` to page `b`. -/
-  | edge : siteGraphRel 2
-  /-- `root a`: the page `a` is the crawl's starting point. -/
-  | root : siteGraphRel 1
-  /-- `target a`: the page `a` must be crawled. -/
-  | target : siteGraphRel 1
-  /-- `marked a`: the page `a` belongs to the marked set carrying the
-  budget. -/
-  | marked : siteGraphRel 1
-  deriving DecidableEq
-
 /-- The relational language of website graphs: directed links, a root, a set
 of target pages, and a marked set whose cardinality is the crawling budget. -/
-protected def siteGraph : Language :=
-  ⟨fun _ => Empty, siteGraphRel⟩
-  deriving IsRelational
-
-/-- The edge symbol of website graphs. -/
-abbrev wsEdge : Language.siteGraph.Relations 2 := .edge
-
-/-- The root symbol of website graphs. -/
-abbrev wsRoot : Language.siteGraph.Relations 1 := .root
-
-/-- The target symbol of website graphs. -/
-abbrev wsTarget : Language.siteGraph.Relations 1 := .target
-
-/-- The mark symbol of website graphs. -/
-abbrev wsMarked : Language.siteGraph.Relations 1 := .marked
+fo_language siteGraph with ws where
+  /-- `edge a b`: a hyperlink from page `a` to page `b`. -/
+  edge : 2
+  /-- `root a`: the page `a` is the crawl's starting point. -/
+  root : 1
+  /-- `target a`: the page `a` must be crawled. -/
+  target : 1
+  /-- `marked a`: the page `a` belongs to the marked set carrying the
+  budget. -/
+  marked : 1
 
 end Language
 
@@ -949,65 +933,43 @@ abbrev kCrInjSym : crawlSOLang.Relations 2 := Sum.inr cgInjRel
 
 /-- Kernel clause: every target is crawled. -/
 private noncomputable def crTargetClause : crawlSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kCrTargetSym (Term.var (Sum.inr 0))).imp
-      (Relations.formula₁ kCrSetSym (Term.var (Sum.inr 0))))
+  fo% ∀ x, kCrTargetSym(x) → kCrSetSym(x)
 
 /-- Kernel clause: some root is guessed. -/
 private noncomputable def crRootExistsClause : crawlSOLang.Sentence :=
-  (Relations.formula₁ kCrRootSym (Term.var (Sum.inr 0))).iExs (Fin 1)
+  fo% ∃ x, kCrRootSym(x)
 
 /-- Kernel clause: the guessed root carries the vocabulary's root mark and is
 crawled. -/
 private noncomputable def crRootClause : crawlSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kCrRootSym (Term.var (Sum.inr 0))).imp
-      (Relations.formula₁ kCrRootMarkSym (Term.var (Sum.inr 0)) ⊓
-        Relations.formula₁ kCrSetSym (Term.var (Sum.inr 0))))
+  fo% ∀ x, kCrRootSym(x) → kCrRootMarkSym(x) ∧ kCrSetSym(x)
 
 /-- Kernel clause: there is at most one guessed root. -/
 private noncomputable def crRootUniqueClause : crawlSOLang.Sentence :=
-  ((Relations.formula₁ kCrRootSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ kCrRootSym (Term.var (Sum.inr 1))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, kCrRootSym(x) ∧ kCrRootSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
 private noncomputable def crTransClause : crawlSOLang.Sentence :=
-  ((Relations.formula₂ kCrLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ kCrLtSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Relations.formula₂ kCrLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x y z, kCrLtSym(x, y) ∧ kCrLtSym(y, z) → kCrLtSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
 private noncomputable def crIrreflClause : crawlSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    (∼(Relations.formula₂ kCrLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
+  fo% ∀ x, ¬ kCrLtSym(x, x)
 
 /-- Kernel clause: every crawled non-root page is linked from a crawled page
 strictly below it. -/
 private noncomputable def crStepClause : crawlSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kCrSetSym (Term.var (Sum.inr 0)) ⊓
-        ∼(Relations.formula₁ kCrRootSym (Term.var (Sum.inr 0)))).imp
-      ((Relations.formula₁ kCrSetSym (Term.var (Sum.inr ())) ⊓
-        Relations.formula₂ kCrEdgeSym (Term.var (Sum.inr ()))
-          (Term.var (Sum.inl (Sum.inr 0))) ⊓
-        Relations.formula₂ kCrLtSym (Term.var (Sum.inr ()))
-          (Term.var (Sum.inl (Sum.inr 0)))).iExs Unit))
+  fo% ∀ x, kCrSetSym(x) ∧ ¬ kCrRootSym(x) →
+    ∃ y, (kCrSetSym(y) ∧ kCrEdgeSym(y, x)) ∧ kCrLtSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every crawled page to a marked
 element. -/
 private noncomputable def crTotalClause : crawlSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kCrSetSym (Term.var (Sum.inr 0))).imp
-      ((Relations.formula₂ kCrInjSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        Relations.formula₁ kCrMarkedSym (Term.var (Sum.inr ()))).iExs Unit))
+  fo% ∀ x, kCrSetSym(x) → ∃ y, kCrInjSym(x, y) ∧ kCrMarkedSym(y)
 
 /-- Kernel clause: the guessed injection is injective. -/
 private noncomputable def crInjClause : crawlSOLang.Sentence :=
-  ((Relations.formula₂ kCrInjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ kCrInjSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+  fo% ∀ x y z, kCrInjSym(x, z) ∧ kCrInjSym(y, z) → x ≐ y
 
 /-- The first-order kernel of the `Σ₁` definition of Graph Crawling. -/
 noncomputable def crawlKernel : crawlSOLang.Sentence :=
@@ -1110,7 +1072,7 @@ private theorem realize_crStepClause :
   constructor
   · intro h x hx hnr
     obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnr⟩
-    exact ⟨y (), ⟨hy.1.1, hy.1.2⟩, hy.2⟩
+    exact ⟨y 0, ⟨hy.1.1, hy.1.2⟩, hy.2⟩
   · intro h i hi
     obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
     exact ⟨fun _ => y, ⟨hy.1.1, hy.1.2⟩, hy.2⟩
@@ -1130,7 +1092,7 @@ private theorem realize_crTotalClause :
   constructor
   · intro h x hx
     obtain ⟨y, hy⟩ := h (fun _ => x) hx
-    exact ⟨y (), hy⟩
+    exact ⟨y 0, hy⟩
   · intro h i hi
     obtain ⟨y, hy⟩ := h (i 0) hi
     exact ⟨fun _ => y, hy⟩
