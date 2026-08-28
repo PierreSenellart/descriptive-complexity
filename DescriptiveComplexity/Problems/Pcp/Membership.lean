@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Pcp.Cert
 import DescriptiveComplexity.RecursivelyEnumerable
 import DescriptiveComplexity.Problems.FinSat
@@ -180,35 +181,31 @@ variable {ρ : certBlock.Assignment (A ⊕ Fin m)} {γ : Type}
 
 /-- An atom of a unary relation of the instance. -/
 noncomputable def instF₁ (R : Language.pcp.Relations 1) (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ (instSym R) (Term.var x)
+  fo%[x] (instSym R)(x)
 
 /-- An atom of a binary relation of the instance. -/
 noncomputable def instF₂ (R : Language.pcp.Relations 2) (x y : γ) : certLang.Formula γ :=
-  Relations.formula₂ (instSym R) (Term.var x) (Term.var y)
+  fo%[x, y] (instSym R)(x, y)
 
 /-- An atom of a ternary relation of the instance. -/
 noncomputable def instF₃ (R : Language.pcp.Relations 3) (x y z : γ) : certLang.Formula γ :=
-  (instSym R).formula ![Term.var x, Term.var y, Term.var z]
+  fo%[x, y, z] (instSym R)(x, y, z)
 
 /-- `x` is an original element. -/
-noncomputable def oldF (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ oldSym (Term.var x)
+noncomputable def oldF (x : γ) : certLang.Formula γ := fo%[x] oldSym(x)
 
 /-- Equality of two variables. -/
-noncomputable def eqF (x y : γ) : certLang.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def eqF (x y : γ) : certLang.Formula γ := fo%[x, y] x ≐ y
 
 /-- The slot `s` is at most the slot `t`. -/
-noncomputable def sleF (s t : γ) : certLang.Formula γ :=
-  Relations.formula₂ sleSym (Term.var s) (Term.var t)
+noncomputable def sleF (s t : γ) : certLang.Formula γ := fo%[s, t] sleSym(s, t)
 
 /-- The domino `d` sits at the slot `s`. -/
-noncomputable def dmF (s d : γ) : certLang.Formula γ :=
-  Relations.formula₂ dmSym (Term.var s) (Term.var d)
+noncomputable def dmF (s d : γ) : certLang.Formula γ := fo%[s, d] dmSym(s, d)
 
 /-- The top index `(s, p)` is matched with the bottom index `(s', p')`. -/
 noncomputable def mtF (s p s' p' : γ) : certLang.Formula γ :=
-  mtSym.formula ![Term.var s, Term.var p, Term.var s', Term.var p']
+  fo%[s, p, s', p'] mtSym(s, p, s', p')
 
 @[simp]
 theorem realize_instF₁ (R : Language.pcp.Relations 1) (x : γ) (v : γ → A ⊕ Fin m) :
@@ -439,10 +436,10 @@ noncomputable def wfS : certLang.Sentence :=
 /-! ### The shapes that repeat -/
 
 /-- The position `x` strictly precedes the position `y`. -/
-noncomputable def ordLtF (x y : γ) : certLang.Formula γ := ordF x y ⊓ ∼(eqF x y)
+noncomputable def ordLtF (x y : γ) : certLang.Formula γ := fo%[x, y] ordF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
 
 /-- The slot `s` strictly precedes the slot `t`. -/
-noncomputable def sltF (s t : γ) : certLang.Formula γ := sleF s t ⊓ ∼(eqF s t)
+noncomputable def sltF (s t : γ) : certLang.Formula γ := fo%[s, t] sleF⟨s, t⟩ ∧ ¬ eqF⟨s, t⟩
 
 /-- The position `p` carries a letter of the top word of `d`. -/
 noncomputable def usedUF (d p : γ) : certLang.Formula γ :=
@@ -462,7 +459,7 @@ noncomputable def botIxF (s p : γ) : certLang.Formula γ :=
 
 /-- `(s, p)` precedes `(t, q)` in the lexicographic order of a parse. -/
 noncomputable def lexLtF (s p t q : γ) : certLang.Formula γ :=
-  sltF s t ⊔ (eqF s t ⊓ ordLtF p q)
+  fo%[s, p, t, q] sltF⟨s, t⟩ ∨ (eqF⟨s, t⟩ ∧ ordLtF⟨p, q⟩)
 
 /-! ### The conditions on the certificate -/
 

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Numbers.BinRel
 import DescriptiveComplexity.Interpretation
 import Mathlib.Algebra.BigOperators.Finprod
@@ -43,46 +44,22 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of 0-1 integer programs. -/
-inductive zeroOneIPRel : ℕ → Type
-  /-- `col j`: `j` is a column, that is, a `0-1` variable. -/
-  | col : zeroOneIPRel 1
-  /-- `row r`: `r` is a row, that is, an equation. -/
-  | row : zeroOneIPRel 1
-  /-- `posn p`: `p` is a bit position. -/
-  | posn : zeroOneIPRel 1
-  /-- `coef r j p`: the entry of row `r` in column `j` has bit 1 at `p`. -/
-  | coef : zeroOneIPRel 3
-  /-- `rhs r p`: the right-hand side of row `r` has bit 1 at `p`. -/
-  | rhs : zeroOneIPRel 2
-  /-- `le a b`: the linear order carrying the place values. -/
-  | le : zeroOneIPRel 2
-  deriving DecidableEq
-
 /-- The relational language of 0-1 integer programs: columns, rows and bit
 positions, the bits of each entry and of each right-hand side, and a linear
 order. -/
-protected def zeroOneIP : Language :=
-  ⟨fun _ => Empty, zeroOneIPRel⟩
-  deriving IsRelational
-
-/-- The column symbol. -/
-abbrev ipCol : Language.zeroOneIP.Relations 1 := .col
-
-/-- The row symbol. -/
-abbrev ipRow : Language.zeroOneIP.Relations 1 := .row
-
-/-- The position symbol. -/
-abbrev ipPosn : Language.zeroOneIP.Relations 1 := .posn
-
-/-- The entry symbol. -/
-abbrev ipCoef : Language.zeroOneIP.Relations 3 := .coef
-
-/-- The right-hand side symbol. -/
-abbrev ipRhs : Language.zeroOneIP.Relations 2 := .rhs
-
-/-- The order symbol. -/
-abbrev ipLe : Language.zeroOneIP.Relations 2 := .le
+fo_language zeroOneIP with ip where
+  /-- `col j`: `j` is a column, that is, a `0-1` variable. -/
+  col : 1
+  /-- `row r`: `r` is a row, that is, an equation. -/
+  row : 1
+  /-- `posn p`: `p` is a bit position. -/
+  posn : 1
+  /-- `coef r j p`: the entry of row `r` in column `j` has bit 1 at `p`. -/
+  coef : 3
+  /-- `rhs r p`: the right-hand side of row `r` has bit 1 at `p`. -/
+  rhs : 2
+  /-- `le a b`: the linear order carrying the place values. -/
+  le : 2
 
 end Language
 
@@ -100,23 +77,7 @@ section Shorthands
 
 variable {A : Type} [Language.zeroOneIP.Structure A]
 
-/-- Being a column, that is, a `0-1` variable. -/
-def IPCol (a : A) : Prop := RelMap ipCol ![a]
-
-/-- Being a row, that is, an equation. -/
-def IPRow (a : A) : Prop := RelMap ipRow ![a]
-
-/-- Being a bit position. -/
-def IPPosn (a : A) : Prop := RelMap ipPosn ![a]
-
-/-- The bit of an entry at a position. -/
-def IPCoef (r j p : A) : Prop := RelMap ipCoef ![r, j, p]
-
-/-- The bits of a right-hand side. -/
-def IPRhs (r p : A) : Prop := RelMap ipRhs ![r, p]
-
-/-- The order carrying the place values. -/
-def IPLe (a b : A) : Prop := RelMap ipLe ![a, b]
+fo_predicates Language.zeroOneIP ip
 
 /-- The entry of a row in a column, decoded. -/
 noncomputable def IPCoefVal (r j : A) : ℕ := binNum IPLe IPPosn (IPCoef r j)

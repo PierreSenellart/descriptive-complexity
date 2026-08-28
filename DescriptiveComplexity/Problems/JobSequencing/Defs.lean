@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Numbers.BinRel
 import DescriptiveComplexity.Interpretation
 import Mathlib.Algebra.BigOperators.Finprod
@@ -48,51 +49,24 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of job-sequencing instances. -/
-inductive jobSeqRel : ℕ → Type
-  /-- `job j`: `j` is a job. -/
-  | job : jobSeqRel 1
-  /-- `posn p`: `p` is a bit position. -/
-  | posn : jobSeqRel 1
-  /-- `time j p`: the execution time of `j` has bit 1 at position `p`. -/
-  | time : jobSeqRel 2
-  /-- `dline j p`: the deadline of `j` has bit 1 at position `p`. -/
-  | dline : jobSeqRel 2
-  /-- `pen j p`: the penalty of `j` has bit 1 at position `p`. -/
-  | pen : jobSeqRel 2
-  /-- `bnd p`: the penalty bound has bit 1 at position `p`. -/
-  | bnd : jobSeqRel 1
-  /-- `le a b`: the linear order carrying the place values. -/
-  | le : jobSeqRel 2
-  deriving DecidableEq
-
 /-- The relational language of job-sequencing instances: jobs and bit
 positions, the bits of each job's execution time, deadline and penalty, the
 bits of the penalty bound, and a linear order. -/
-protected def jobSeq : Language :=
-  ⟨fun _ => Empty, jobSeqRel⟩
-  deriving IsRelational
-
-/-- The job symbol. -/
-abbrev jsJob : Language.jobSeq.Relations 1 := .job
-
-/-- The position symbol. -/
-abbrev jsPosn : Language.jobSeq.Relations 1 := .posn
-
-/-- The execution-time symbol. -/
-abbrev jsTime : Language.jobSeq.Relations 2 := .time
-
-/-- The deadline symbol. -/
-abbrev jsDline : Language.jobSeq.Relations 2 := .dline
-
-/-- The penalty symbol. -/
-abbrev jsPen : Language.jobSeq.Relations 2 := .pen
-
-/-- The bound symbol. -/
-abbrev jsBnd : Language.jobSeq.Relations 1 := .bnd
-
-/-- The order symbol. -/
-abbrev jsLe : Language.jobSeq.Relations 2 := .le
+fo_language jobSeq with js where
+  /-- `job j`: `j` is a job. -/
+  job : 1
+  /-- `posn p`: `p` is a bit position. -/
+  posn : 1
+  /-- `time j p`: the execution time of `j` has bit 1 at position `p`. -/
+  time : 2
+  /-- `dline j p`: the deadline of `j` has bit 1 at position `p`. -/
+  dline : 2
+  /-- `pen j p`: the penalty of `j` has bit 1 at position `p`. -/
+  pen : 2
+  /-- `bnd p`: the penalty bound has bit 1 at position `p`. -/
+  bnd : 1
+  /-- `le a b`: the linear order carrying the place values. -/
+  le : 2
 
 end Language
 
@@ -110,26 +84,7 @@ section Shorthands
 
 variable {A : Type} [Language.jobSeq.Structure A]
 
-/-- Being a job. -/
-def JSJob (a : A) : Prop := RelMap jsJob ![a]
-
-/-- Being a bit position. -/
-def JSPosn (a : A) : Prop := RelMap jsPosn ![a]
-
-/-- The bits of a job's execution time. -/
-def JSTime (j p : A) : Prop := RelMap jsTime ![j, p]
-
-/-- The bits of a job's deadline. -/
-def JSDline (j p : A) : Prop := RelMap jsDline ![j, p]
-
-/-- The bits of a job's penalty. -/
-def JSPen (j p : A) : Prop := RelMap jsPen ![j, p]
-
-/-- The bits of the penalty bound. -/
-def JSBnd (p : A) : Prop := RelMap jsBnd ![p]
-
-/-- The order carrying the place values. -/
-def JSLe (a b : A) : Prop := RelMap jsLe ![a, b]
+fo_predicates Language.jobSeq js
 
 /-- The execution time of a job, decoded. -/
 noncomputable def JSTimeVal (j : A) : ℕ := binNum JSLe JSPosn (JSTime j)

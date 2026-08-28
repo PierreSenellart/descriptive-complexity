@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Knapsack.Chain
 import DescriptiveComplexity.SecondOrder
 
@@ -39,47 +41,14 @@ section SigmaOne
 /-- The single existential block of the `Σ₁` definition of Knapsack: the
 chosen items (unary), the running partial sums and the carries (binary, an
 item and a bit position). -/
-def knapsackGuessBlock : SOBlock where
-  ι := Option Bool
-  arity := fun i => match i with
-    | none => 1
-    | some _ => 2
-
-/-- The symbol of the chosen-items relation variable. -/
-def ksSelRel : knapsackGuessBlock.lang.Relations 1 := ⟨none, rfl⟩
-
-/-- The symbol of the partial-sum relation variable. -/
-def ksPSRel : knapsackGuessBlock.lang.Relations 2 := ⟨some true, rfl⟩
-
-/-- The symbol of the carry relation variable. -/
-def ksCarryRel : knapsackGuessBlock.lang.Relations 2 := ⟨some false, rfl⟩
-
-/-- The vocabulary of the kernel. -/
-abbrev ksSOLang : Language := Language.binWeights.sum knapsackGuessBlock.lang
-
-/-- The item symbol in the kernel's vocabulary. -/
-abbrev ksItemSym : ksSOLang.Relations 1 := Sum.inl bwItem
-
-/-- The position symbol in the kernel's vocabulary. -/
-abbrev ksPosnSym : ksSOLang.Relations 1 := Sum.inl bwPosn
-
-/-- The bit symbol in the kernel's vocabulary. -/
-abbrev ksBitSym : ksSOLang.Relations 2 := Sum.inl bwBit
-
-/-- The target symbol in the kernel's vocabulary. -/
-abbrev ksTgtSym : ksSOLang.Relations 1 := Sum.inl bwTgt
-
-/-- The order symbol in the kernel's vocabulary. -/
-abbrev ksLeSym : ksSOLang.Relations 2 := Sum.inl bwLe
-
-/-- The chosen-items symbol in the kernel's vocabulary. -/
-abbrev ksSelSym : ksSOLang.Relations 1 := Sum.inr ksSelRel
-
-/-- The partial-sum symbol in the kernel's vocabulary. -/
-abbrev ksPSSym : ksSOLang.Relations 2 := Sum.inr ksPSRel
-
-/-- The carry symbol in the kernel's vocabulary. -/
-abbrev ksCarrySym : ksSOLang.Relations 2 := Sum.inr ksCarryRel
+fo_block knapsackGuessBlock over Language.binWeights bw into ksSOLang with ks where
+  /-- The chosen items. -/
+  sel : 1
+  /-- The running partial sums: `pS i p` is the bit `p` of the total up to
+  the item `i`. -/
+  pS : 2
+  /-- The carries of the step appending an item. -/
+  carry : 2
 
 /-! ### Formula builders -/
 
@@ -131,39 +100,29 @@ def kMaj3F (x y z : ksSOLang.Formula α) : ksSOLang.Formula α :=
 
 /-- `i` is the first item, as a formula. -/
 noncomputable def kMinItemF (i : α) : ksSOLang.Formula α :=
-  kItemF i ⊓ Formula.iAlls Unit
-    ((kItemF (Sum.inr ())).imp (kLeF (Sum.inl i) (Sum.inr ())))
+  fo%[i] kItemF⟨i⟩ ∧ ∀ y, kItemF⟨y⟩ → kLeF⟨i, y⟩
 
 /-- `i` is the last item, as a formula. -/
 noncomputable def kMaxItemF (i : α) : ksSOLang.Formula α :=
-  kItemF i ⊓ Formula.iAlls Unit
-    ((kItemF (Sum.inr ())).imp (kLeF (Sum.inr ()) (Sum.inl i)))
+  fo%[i] kItemF⟨i⟩ ∧ ∀ y, kItemF⟨y⟩ → kLeF⟨y, i⟩
 
 /-- `j` is the item right after `i`, as a formula. -/
 noncomputable def kSuccItemF (i j : α) : ksSOLang.Formula α :=
-  kItemF i ⊓ (kItemF j ⊓ (kLeF i j ⊓ (∼(kEqF i j) ⊓
-    Formula.iAlls Unit
-      ((kItemF (Sum.inr ())).imp ((kLeF (Sum.inl i) (Sum.inr ())).imp
-        ((kLeF (Sum.inr ()) (Sum.inl j)).imp
-          (kEqF (Sum.inr ()) (Sum.inl i) ⊔ kEqF (Sum.inr ()) (Sum.inl j))))))))
+  fo%[i, j] kItemF⟨i⟩ ∧ kItemF⟨j⟩ ∧ kLeF⟨i, j⟩ ∧ ¬ kEqF⟨i, j⟩ ∧
+    ∀ y, kItemF⟨y⟩ → kLeF⟨i, y⟩ → kLeF⟨y, j⟩ → kEqF⟨y, i⟩ ∨ kEqF⟨y, j⟩
 
 /-- `p` is the lowest position, as a formula. -/
 noncomputable def kMinPosnF (p : α) : ksSOLang.Formula α :=
-  kPosnF p ⊓ Formula.iAlls Unit
-    ((kPosnF (Sum.inr ())).imp (kLeF (Sum.inl p) (Sum.inr ())))
+  fo%[p] kPosnF⟨p⟩ ∧ ∀ q, kPosnF⟨q⟩ → kLeF⟨p, q⟩
 
 /-- `p` is the highest position, as a formula. -/
 noncomputable def kMaxPosnF (p : α) : ksSOLang.Formula α :=
-  kPosnF p ⊓ Formula.iAlls Unit
-    ((kPosnF (Sum.inr ())).imp (kLeF (Sum.inr ()) (Sum.inl p)))
+  fo%[p] kPosnF⟨p⟩ ∧ ∀ q, kPosnF⟨q⟩ → kLeF⟨q, p⟩
 
 /-- `q` is the position right above `p`, as a formula. -/
 noncomputable def kSuccPosnF (p q : α) : ksSOLang.Formula α :=
-  kPosnF p ⊓ (kPosnF q ⊓ (kLeF p q ⊓ (∼(kEqF p q) ⊓
-    Formula.iAlls Unit
-      ((kPosnF (Sum.inr ())).imp ((kLeF (Sum.inl p) (Sum.inr ())).imp
-        ((kLeF (Sum.inr ()) (Sum.inl q)).imp
-          (kEqF (Sum.inr ()) (Sum.inl p) ⊔ kEqF (Sum.inr ()) (Sum.inl q))))))))
+  fo%[p, q] kPosnF⟨p⟩ ∧ kPosnF⟨q⟩ ∧ kLeF⟨p, q⟩ ∧ ¬ kEqF⟨p, q⟩ ∧
+    ∀ r, kPosnF⟨r⟩ → kLeF⟨p, r⟩ → kLeF⟨r, q⟩ → kEqF⟨r, p⟩ ∨ kEqF⟨r, q⟩
 
 end Builders
 
@@ -171,74 +130,55 @@ end Builders
 
 /-- Kernel clause: the order is reflexive. -/
 private noncomputable def ksReflClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (kLeF (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ x, kLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
 private noncomputable def ksTransClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((kLeF (Sum.inr 0) (Sum.inr 1) ⊓ kLeF (Sum.inr 1) (Sum.inr 2)).imp
-      (kLeF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ x y z, kLeF⟨x, y⟩ ∧ kLeF⟨y, z⟩ → kLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
 private noncomputable def ksAntisymmClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((kLeF (Sum.inr 0) (Sum.inr 1) ⊓ kLeF (Sum.inr 1) (Sum.inr 0)).imp
-      (kEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ x y, kLeF⟨x, y⟩ ∧ kLeF⟨y, x⟩ → kEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
 private noncomputable def ksTotalClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 2) (kLeF (Sum.inr 0) (Sum.inr 1) ⊔ kLeF (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ x y, kLeF⟨x, y⟩ ∨ kLeF⟨y, x⟩
 
 /-- Kernel clause: only items are chosen. -/
 private noncomputable def ksSelClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 1) ((kSelF (Sum.inr 0)).imp (kItemF (Sum.inr 0)))
+  fo% ∀ x, kSelF⟨x⟩ → kItemF⟨x⟩
 
 /-- Kernel clause: at the first item the running total is that item's
 contribution. -/
 private noncomputable def ksBaseClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((kMinItemF (Sum.inr 0) ⊓ kPosnF (Sum.inr 1)).imp
-      ((kPSF (Sum.inr 0) (Sum.inr 1)).iff (kAddF (Sum.inr 0) (Sum.inr 1))))
+  fo% ∀ i p, kMinItemF⟨i⟩ ∧ kPosnF⟨p⟩ → (kPSF⟨i, p⟩ ↔ kAddF⟨i, p⟩)
 
 /-- Kernel clause: each step adds a bit. -/
 private noncomputable def ksSumClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((kSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓ kPosnF (Sum.inr 2)).imp
-      ((kPSF (Sum.inr 1) (Sum.inr 2)).iff
-        (kXor3F (kPSF (Sum.inr 0) (Sum.inr 2)) (kAddF (Sum.inr 1) (Sum.inr 2))
-          (kCarryF (Sum.inr 1) (Sum.inr 2)))))
+  fo% ∀ i j p, kSuccItemF⟨i, j⟩ ∧ kPosnF⟨p⟩ →
+    (kPSF⟨j, p⟩ ↔ kXor3F⦃kPSF⟨i, p⟩, kAddF⟨j, p⟩, kCarryF⟨j, p⟩⦄)
 
 /-- Kernel clause: each step propagates its carry. -/
 private noncomputable def ksCarryClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((kSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓ kSuccPosnF (Sum.inr 2) (Sum.inr 3)).imp
-      ((kCarryF (Sum.inr 1) (Sum.inr 3)).iff
-        (kMaj3F (kPSF (Sum.inr 0) (Sum.inr 2)) (kAddF (Sum.inr 1) (Sum.inr 2))
-          (kCarryF (Sum.inr 1) (Sum.inr 2)))))
+  fo% ∀ i j p q, kSuccItemF⟨i, j⟩ ∧ kSuccPosnF⟨p, q⟩ →
+    (kCarryF⟨j, q⟩ ↔ kMaj3F⦃kPSF⟨i, p⟩, kAddF⟨j, p⟩, kCarryF⟨j, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest position. -/
 private noncomputable def ksBottomClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((kSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓ kMinPosnF (Sum.inr 2)).imp
-      ∼(kCarryF (Sum.inr 1) (Sum.inr 2)))
+  fo% ∀ i j p, kSuccItemF⟨i, j⟩ ∧ kMinPosnF⟨p⟩ → ¬ kCarryF⟨j, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest position. -/
 private noncomputable def ksTopClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((kSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓ kMaxPosnF (Sum.inr 2)).imp
-      ∼(kMaj3F (kPSF (Sum.inr 0) (Sum.inr 2)) (kAddF (Sum.inr 1) (Sum.inr 2))
-        (kCarryF (Sum.inr 1) (Sum.inr 2))))
+  fo% ∀ i j p, kSuccItemF⟨i, j⟩ ∧ kMaxPosnF⟨p⟩ →
+    ¬ kMaj3F⦃kPSF⟨i, p⟩, kAddF⟨j, p⟩, kCarryF⟨j, p⟩⦄
 
 /-- Kernel clause: at the last item the running total is the target. -/
 private noncomputable def ksFinalClause : ksSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((kMaxItemF (Sum.inr 0) ⊓ kPosnF (Sum.inr 1)).imp
-      ((kPSF (Sum.inr 0) (Sum.inr 1)).iff (kTgtF (Sum.inr 1))))
+  fo% ∀ i p, kMaxItemF⟨i⟩ ∧ kPosnF⟨p⟩ → (kPSF⟨i, p⟩ ↔ kTgtF⟨p⟩)
 
 /-- Kernel clause: with no item at all, the target must be zero. -/
 private noncomputable def ksEmptyClause : ksSOLang.Sentence :=
-  (Formula.iAlls (Fin 1) ∼(kItemF (Sum.inr 0))).imp
-    (Formula.iAlls (Fin 1) ((kPosnF (Sum.inr 0)).imp ∼(kTgtF (Sum.inr 0))))
+  fo% (∀ x, ¬ kItemF⟨x⟩) → ∀ p, kPosnF⟨p⟩ → ¬ kTgtF⟨p⟩
 
 /-- The first-order kernel of the `Σ₁` definition of Knapsack. -/
 noncomputable def knapsackKernel : ksSOLang.Sentence :=
@@ -253,13 +193,13 @@ section Realize
 variable {A : Type} [Language.binWeights.Structure A] (ρ : knapsackGuessBlock.Assignment A)
 
 /-- The chosen items, read off an assignment of the block. -/
-private def Sel (i : A) : Prop := ρ none ![i]
+private def Sel (i : A) : Prop := ρ .sel ![i]
 
 /-- The running total, read off an assignment of the block. -/
-private def PSum (i p : A) : Prop := ρ (some true) ![i, p]
+private def PSum (i p : A) : Prop := ρ .pS ![i, p]
 
 /-- The carries, read off an assignment of the block. -/
-private def Cy (i p : A) : Prop := ρ (some false) ![i, p]
+private def Cy (i p : A) : Prop := ρ .carry ![i, p]
 
 /-- The bit that an item contributes. -/
 private def Add (i p : A) : Prop := Sel ρ i ∧ BWBit i p
@@ -282,11 +222,11 @@ private theorem realize_knapsackKernel :
         ((∀ i : A, ¬BWItem i) → ∀ p : A, BWPosn p → ¬BWTgt p) := by
   let := knapsackGuessBlock.structure ρ
   have hsubS : ∀ w : Fin 1 → A,
-      RelMap (L := ksSOLang) (M := A) ksSelSym w ↔ ρ none w := fun _ => Iff.rfl
+      RelMap (L := ksSOLang) (M := A) ksSelSym w ↔ ρ .sel w := fun _ => Iff.rfl
   have hsubP : ∀ w : Fin 2 → A,
-      RelMap (L := ksSOLang) (M := A) ksPSSym w ↔ ρ (some true) w := fun _ => Iff.rfl
+      RelMap (L := ksSOLang) (M := A) ksPSSym w ↔ ρ .pS w := fun _ => Iff.rfl
   have hsubC : ∀ w : Fin 2 → A,
-      RelMap (L := ksSOLang) (M := A) ksCarrySym w ↔ ρ (some false) w := fun _ => Iff.rfl
+      RelMap (L := ksSOLang) (M := A) ksCarrySym w ↔ ρ .carry w := fun _ => Iff.rfl
   rw [knapsackKernel]
   simp only [ksReflClause, ksTransClause, ksAntisymmClause, ksTotalClause, ksSelClause,
     ksBaseClause, ksSumClause, ksCarryClause, ksBottomClause, ksTopClause, ksFinalClause,
@@ -299,32 +239,32 @@ private theorem realize_knapsackKernel :
   constructor
   · rintro ⟨⟨hrefl, htrans, hanti, htot⟩, hsel, hbase, hsum, hcarry, hbot, htop, hfin, hemp⟩
     have hmin : ∀ (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → BWLe x (y ())) → MinPos BWLe P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → BWLe x (y 0)) → MinPos BWLe P x :=
       fun P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hmax : ∀ (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → BWLe (y ()) x) → MaxPos BWLe P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → BWLe (y 0) x) → MaxPos BWLe P x :=
       fun P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hsucc : ∀ (P : A → Prop) (x y : A), SuccPos BWLe P x y →
-        (P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → BWLe x (r ()) → BWLe (r ()) y → r () = x ∨ r () = y)))) :=
+        (P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → BWLe x (r 0) → BWLe (r 0) y → r 0 = x ∨ r 0 = y)))) :=
       fun P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
-        fun r hr h1 h2 => h.2.2.2.2 (r ()) hr h1 h2⟩
+        fun r hr h1 h2 => h.2.2.2.2 (r 0) hr h1 h2⟩
     refine ⟨⟨fun a => hrefl (fun _ => a), fun a b c hab hbc => htrans ![a, b, c] ⟨hab, hbc⟩,
       fun a b hab hba => hanti ![a, b] ⟨hab, hba⟩, fun a b => htot ![a, b]⟩,
       fun i hi => hsel (fun _ => i) hi,
-      fun i p hi hp => hbase ![i, p] ⟨⟨hi.1, fun j hj => hi.2 (j ()) hj⟩, hp⟩,
+      fun i p hi hp => hbase ![i, p] ⟨⟨hi.1, fun j hj => hi.2 (j 0) hj⟩, hp⟩,
       fun i j p hij hp => hsum ![i, j, p] ⟨hsucc _ i j hij, hp⟩,
       fun i j p q hij hpq => hcarry ![i, j, p, q] ⟨hsucc _ i j hij, hsucc _ p q hpq⟩,
       fun i j p hij hp => hbot ![i, j, p]
-        ⟨hsucc _ i j hij, ⟨hp.1, fun q hq => hp.2 (q ()) hq⟩⟩,
+        ⟨hsucc _ i j hij, ⟨hp.1, fun q hq => hp.2 (q 0) hq⟩⟩,
       fun i j p hij hp => htop ![i, j, p]
-        ⟨hsucc _ i j hij, ⟨hp.1, fun q hq => hp.2 (q ()) hq⟩⟩,
-      fun i p hi hp => hfin ![i, p] ⟨⟨hi.1, fun j hj => hi.2 (j ()) hj⟩, hp⟩,
+        ⟨hsucc _ i j hij, ⟨hp.1, fun q hq => hp.2 (q 0) hq⟩⟩,
+      fun i p hi hp => hfin ![i, p] ⟨⟨hi.1, fun j hj => hi.2 (j 0) hj⟩, hp⟩,
       fun hno p hp => hemp (fun i => hno (i 0)) (fun _ => p) hp⟩
   · rintro ⟨⟨hrefl, htrans, hanti, htot⟩, hsel, hbase, hsum, hcarry, hbot, htop, hfin, hemp⟩
     have hsucc : ∀ (P : A → Prop) (x y : A),
-        (P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → BWLe x (r ()) → BWLe (r ()) y → r () = x ∨ r () = y)))) →
+        (P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → BWLe x (r 0) → BWLe (r 0) y → r 0 = x ∨ r 0 = y)))) →
         SuccPos BWLe P x y :=
       fun P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
         fun r hr h1 h2 => h.2.2.2.2 (fun _ => r) hr h1 h2⟩
@@ -364,9 +304,9 @@ theorem knapsack_sigmaSODefinable : SigmaSODefinable 1 Knapsack := by
       exact binNum_lt_two_pow hlin _ BWPosn rfl BWTgt
     obtain ⟨PS, Cy, hchain⟩ := exists_chain (wt := BWBit) hlin hlin hSitem htot
     refine ⟨fun idx => match idx with
-      | none => fun w : Fin 1 → A => S (w 0)
-      | some true => fun w : Fin 2 → A => PS (w 0) (w 1)
-      | some false => fun w : Fin 2 → A => Cy (w 0) (w 1), ?_⟩
+      | .sel => fun w : Fin 1 → A => S (w 0)
+      | .pS => fun w : Fin 2 → A => PS (w 0) (w 1)
+      | .carry => fun w : Fin 2 → A => Cy (w 0) (w 1), ?_⟩
     refine (realize_knapsackKernel _).mpr ⟨hlin, hSitem, hchain.1, hchain.2.1,
       hchain.2.2.1, hchain.2.2.2.1, hchain.2.2.2.2, ?_, ?_⟩
     · -- at the last item the running total is the target

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Tiling.Corridor
 import DescriptiveComplexity.PSpace
 
@@ -44,35 +45,27 @@ section Shapes
 variable {L : Language.{0, 0}} {γ : Type}
 
 /-- A unary relation, as a formula. -/
-noncomputable def atom₁ (r : L.Relations 1) (x : γ) : L.Formula γ :=
-  Relations.formula₁ r (Term.var x)
+noncomputable def atom₁ (r : L.Relations 1) (x : γ) : L.Formula γ := fo%[x] r(x)
 
 /-- A binary relation, as a formula. -/
-noncomputable def atom₂ (r : L.Relations 2) (x y : γ) : L.Formula γ :=
-  Relations.formula₂ r (Term.var x) (Term.var y)
+noncomputable def atom₂ (r : L.Relations 2) (x y : γ) : L.Formula γ := fo%[x, y] r(x, y)
 
 /-- Equality of two variables, as a formula. -/
-noncomputable def atomEq (x y : γ) : L.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def atomEq (x y : γ) : L.Formula γ := fo%[x, y] x ≐ y
 
 /-- `x` is the least position. -/
 noncomputable def minPosF (posn : L.Relations 1) (le : L.Relations 2) (x : γ) : L.Formula γ :=
-  atom₁ posn x ⊓
-    Formula.iAlls (Fin 1) (atom₁ posn (Sum.inr 0) ⟹ atom₂ le (Sum.inl x) (Sum.inr 0))
+  fo%[x] (atom₁ posn)⟨x⟩ ∧ ∀ z, (atom₁ posn)⟨z⟩ → (atom₂ le)⟨x, z⟩
 
 /-- `x` is the greatest position. -/
 noncomputable def maxPosF (posn : L.Relations 1) (le : L.Relations 2) (x : γ) : L.Formula γ :=
-  atom₁ posn x ⊓
-    Formula.iAlls (Fin 1) (atom₁ posn (Sum.inr 0) ⟹ atom₂ le (Sum.inr 0) (Sum.inl x))
+  fo%[x] (atom₁ posn)⟨x⟩ ∧ ∀ z, (atom₁ posn)⟨z⟩ → (atom₂ le)⟨z, x⟩
 
 /-- `x'` is the position immediately above `x`. -/
 noncomputable def succPosF (posn : L.Relations 1) (le : L.Relations 2) (x x' : γ) :
     L.Formula γ :=
-  atom₁ posn x ⊓ (atom₁ posn x' ⊓ (atom₂ le x x' ⊓ (∼(atomEq x x') ⊓
-    Formula.iAlls (Fin 1)
-      ((atom₁ posn (Sum.inr 0) ⊓ (atom₂ le (Sum.inl x) (Sum.inr 0) ⊓
-          atom₂ le (Sum.inr 0) (Sum.inl x'))) ⟹
-        (atomEq (Sum.inr 0) (Sum.inl x) ⊔ atomEq (Sum.inr 0) (Sum.inl x'))))))
+  fo%[x, x'] (atom₁ posn)⟨x⟩ ∧ (atom₁ posn)⟨x'⟩ ∧ (atom₂ le)⟨x, x'⟩ ∧ ¬ atomEq⟨x, x'⟩ ∧
+    ∀ z, (atom₁ posn)⟨z⟩ ∧ (atom₂ le)⟨x, z⟩ ∧ (atom₂ le)⟨z, x'⟩ → atomEq⟨z, x⟩ ∨ atomEq⟨z, x'⟩
 
 variable {M : Type} [L.Structure M] {v : γ → M}
 
@@ -133,37 +126,27 @@ variable {L : Language.{0, 0}}
 
 /-- Every column of this row carries a tile of the instance. -/
 noncomputable def rowTotalS (posn tile : L.Relations 1) (row : L.Relations 2) : L.Sentence :=
-  Formula.iAlls (Fin 1) (atom₁ posn (Sum.inr 0) ⟹
-    Formula.iExs (Fin 1)
-      (atom₂ row (Sum.inl (Sum.inr 0)) (Sum.inr 0) ⊓ atom₁ tile (Sum.inr 0)))
+  fo% ∀ x, (atom₁ posn)⟨x⟩ → ∃ t, (atom₂ row)⟨x, t⟩ ∧ (atom₁ tile)⟨t⟩
 
 /-- And it carries only one. -/
 noncomputable def rowFuncS (row : L.Relations 2) : L.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((atom₂ row (Sum.inr 0) (Sum.inr 1) ⊓ atom₂ row (Sum.inr 0) (Sum.inr 2)) ⟹
-      atomEq (Sum.inr 1) (Sum.inr 2))
+  fo% ∀ x t t', (atom₂ row)⟨x, t⟩ ∧ (atom₂ row)⟨x, t'⟩ → atomEq⟨t, t'⟩
 
 /-- Neighboring columns of this row are compatible. -/
 noncomputable def rowHorizS (posn : L.Relations 1) (le horiz row : L.Relations 2) :
     L.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((succPosF posn le (Sum.inr 0) (Sum.inr 1) ⊓
-      (atom₂ row (Sum.inr 0) (Sum.inr 2) ⊓ atom₂ row (Sum.inr 1) (Sum.inr 3))) ⟹
-      atom₂ horiz (Sum.inr 2) (Sum.inr 3))
+  fo% ∀ x x' t t',
+    (succPosF posn le)⟨x, x'⟩ ∧ (atom₂ row)⟨x, t⟩ ∧ (atom₂ row)⟨x', t'⟩ → (atom₂ horiz)⟨t, t'⟩
 
 /-- Its leftmost column carries a tile allowed there. -/
 noncomputable def rowEdgeLS (posn ledge : L.Relations 1) (le row : L.Relations 2) :
     L.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((minPosF posn le (Sum.inr 0) ⊓ atom₂ row (Sum.inr 0) (Sum.inr 1)) ⟹
-      atom₁ ledge (Sum.inr 1))
+  fo% ∀ x t, (minPosF posn le)⟨x⟩ ∧ (atom₂ row)⟨x, t⟩ → (atom₁ ledge)⟨t⟩
 
 /-- And its rightmost column one allowed there. -/
 noncomputable def rowEdgeRS (posn redge : L.Relations 1) (le row : L.Relations 2) :
     L.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((maxPosF posn le (Sum.inr 0) ⊓ atom₂ row (Sum.inr 0) (Sum.inr 1)) ⟹
-      atom₁ redge (Sum.inr 1))
+  fo% ∀ x t, (maxPosF posn le)⟨x⟩ ∧ (atom₂ row)⟨x, t⟩ → (atom₁ redge)⟨t⟩
 
 /-- **Being a row**: one tile per column, horizontally compatible, with the
 tiles the two edge columns allow. -/
@@ -176,26 +159,21 @@ noncomputable def rowLegalS (posn tile ledge redge : L.Relations 1)
 column one the description allows there. -/
 noncomputable def rowFirstS (posn start base : L.Relations 1)
     (le first row : L.Relations 2) : L.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((atom₁ posn (Sum.inr 0) ⊓ atom₂ row (Sum.inr 0) (Sum.inr 1)) ⟹
-      ((minPosF posn le (Sum.inr 0) ⟹ atom₁ start (Sum.inr 1)) ⊓
-        (∼(minPosF posn le (Sum.inr 0)) ⟹
-          (atom₂ first (Sum.inr 0) (Sum.inr 1) ⊔
-            (Formula.iAlls (Fin 1) (∼(atom₂ first (Sum.inl (Sum.inr 0)) (Sum.inr 0))) ⊓
-              atom₁ base (Sum.inr 1))))))
+  fo% ∀ x t, (atom₁ posn)⟨x⟩ ∧ (atom₂ row)⟨x, t⟩ →
+    ((minPosF posn le)⟨x⟩ → (atom₁ start)⟨t⟩) ∧
+      (¬ (minPosF posn le)⟨x⟩ →
+        (atom₂ first)⟨x, t⟩ ∨ (∀ t', ¬ (atom₂ first)⟨x, t'⟩) ∧ (atom₁ base)⟨t⟩)
 
 /-- **Being an accepting row**: some column of it carries an accepting tile. -/
 noncomputable def rowAccS (posn acc : L.Relations 1) (row : L.Relations 2) : L.Sentence :=
-  Formula.iExs (Fin 2)
-    (atom₁ posn (Sum.inr 0) ⊓ (atom₂ row (Sum.inr 0) (Sum.inr 1) ⊓ atom₁ acc (Sum.inr 1)))
+  fo% ∃ x t, (atom₁ posn)⟨x⟩ ∧ (atom₂ row)⟨x, t⟩ ∧ (atom₁ acc)⟨t⟩
 
 /-- **One row above another**: every column's two tiles are vertically
 compatible. -/
 noncomputable def rowsVertS (posn : L.Relations 1) (vert rowCur rowNext : L.Relations 2) :
     L.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((atom₁ posn (Sum.inr 0) ⊓ (atom₂ rowCur (Sum.inr 0) (Sum.inr 1) ⊓
-      atom₂ rowNext (Sum.inr 0) (Sum.inr 2))) ⟹ atom₂ vert (Sum.inr 1) (Sum.inr 2))
+  fo% ∀ x t t',
+    (atom₁ posn)⟨x⟩ ∧ (atom₂ rowCur)⟨x, t⟩ ∧ (atom₂ rowNext)⟨x, t'⟩ → (atom₂ vert)⟨t, t'⟩
 
 end RowClauses
 
@@ -322,16 +300,11 @@ variable {L : Language.{0, 0}}
 /-- The order is linear and there is a position: the promises the yes-instances
 fold in. -/
 noncomputable def orderWfS (posn : L.Relations 1) (le : L.Relations 2) : L.Sentence :=
-  (Formula.iAlls (Fin 1) (atom₂ le (Sum.inr 0) (Sum.inr 0)) ⊓
-      (Formula.iAlls (Fin 3)
-          ((atom₂ le (Sum.inr 0) (Sum.inr 1) ⊓ atom₂ le (Sum.inr 1) (Sum.inr 2)) ⟹
-            atom₂ le (Sum.inr 0) (Sum.inr 2)) ⊓
-        (Formula.iAlls (Fin 2)
-            ((atom₂ le (Sum.inr 0) (Sum.inr 1) ⊓ atom₂ le (Sum.inr 1) (Sum.inr 0)) ⟹
-              atomEq (Sum.inr 0) (Sum.inr 1)) ⊓
-          Formula.iAlls (Fin 2)
-            (atom₂ le (Sum.inr 0) (Sum.inr 1) ⊔ atom₂ le (Sum.inr 1) (Sum.inr 0))))) ⊓
-    Formula.iExs (Fin 1) (atom₁ posn (Sum.inr 0))
+  fo% ((∀ x, (atom₂ le)⟨x, x⟩) ∧
+      (∀ x y z, (atom₂ le)⟨x, y⟩ ∧ (atom₂ le)⟨y, z⟩ → (atom₂ le)⟨x, z⟩) ∧
+      (∀ x y, (atom₂ le)⟨x, y⟩ ∧ (atom₂ le)⟨y, x⟩ → atomEq⟨x, y⟩) ∧
+      ∀ x y, (atom₂ le)⟨x, y⟩ ∨ (atom₂ le)⟨y, x⟩) ∧
+    ∃ x, (atom₁ posn)⟨x⟩
 
 variable {M : Type} [L.Structure M]
 

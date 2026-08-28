@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.ReachabilityDet
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.WalkBudget
@@ -126,14 +127,11 @@ noncomputable def edgeF (u v : γ) : (Language.stGraph.sum Language.order).Formu
 /-- The arc from `u` to `v` is forced, as a formula: it is an arc, and it is
 the only one out of `u`. -/
 noncomputable def detEdgeF (u v : γ) : (Language.stGraph.sum Language.order).Formula γ :=
-  edgeF u v ⊓
-    Formula.iAlls (Fin 1)
-      ((edgeF (Sum.inl u) (Sum.inr 0)).imp
-        (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inl v))))
+  fo%[u, v] edgeF⟨u, v⟩ ∧ ∀ w, edgeF⟨u, w⟩ → w ≐ v
 
 /-- No arc out of `u` is forced, as a formula. -/
 noncomputable def stuckF (u : γ) : (Language.stGraph.sum Language.order).Formula γ :=
-  Formula.iAlls (Fin 1) ∼(detEdgeF (Sum.inl u) (Sum.inr 0))
+  fo%[u] ∀ w, ¬ detEdgeF⟨u, w⟩
 
 /-- Equality of two variables, as a formula. -/
 def eqF (u v : γ) : (Language.stGraph.sum Language.order).Formula γ :=

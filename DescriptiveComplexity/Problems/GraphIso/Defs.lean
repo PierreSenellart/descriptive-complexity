@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.DigraphIso
 import DescriptiveComplexity.Degree
 
@@ -117,11 +118,7 @@ variable type, so that it can be conjoined inside the defining formulas of an
 interpretation. -/
 noncomputable def simpleSentence {α : Type} (V : Language.twoGraphs.Relations 1)
     (E : Language.twoGraphs.Relations 2) : Language.twoGraphs.Formula α :=
-  (((Relations.formula₁ V (Term.var (Sum.inr 0)) ⊓ Relations.formula₁ V (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ E (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    (Relations.formula₂ E (Term.var (Sum.inr 1)) (Term.var (Sum.inr 0)))).iAlls (Fin 2)) ⊓
-    (((Relations.formula₁ V (Term.var (Sum.inr 0))).imp
-      ∼(Relations.formula₂ E (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0)))).iAlls (Fin 1))
+  fo% (∀ x y, (V(x) ∧ V(y)) ∧ E(x, y) → E(y, x)) ∧ ∀ x, V(x) → ¬ E(x, x)
 
 theorem realize_simpleSentence {A : Type} [Language.twoGraphs.Structure A] {α : Type}
     (v : α → A) (V : Language.twoGraphs.Relations 1) (E : Language.twoGraphs.Relations 2) :
@@ -151,13 +148,10 @@ noncomputable def simpleInterp :
     FOInterpretation Language.twoGraphs Language.twoGraphs Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .patV => fun _ => wfSentence ⊓ Relations.formula₁ tgPatV (Term.var (0, 0))
-    | _, .hostV => fun _ =>
-        (wfSentence ⊓ Relations.formula₁ tgHostV (Term.var (0, 0))) ⊔ ∼wfSentence
-    | _, .patE => fun _ =>
-        wfSentence ⊓ Relations.formula₂ tgPatE (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .hostE => fun _ =>
-        wfSentence ⊓ Relations.formula₂ tgHostE (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .patV => fun _ => fo%⟨u⟩ !wfSentence ∧ tgPatV(u)
+    | _, .hostV => fun _ => fo%⟨u⟩ (!wfSentence ∧ tgHostV(u)) ∨ ¬ !wfSentence
+    | _, .patE => fun _ => fo%⟨u, v⟩ !wfSentence ∧ tgPatE(u, v)
+    | _, .hostE => fun _ => fo%⟨u, v⟩ !wfSentence ∧ tgHostE(u, v)
 
 section Points
 

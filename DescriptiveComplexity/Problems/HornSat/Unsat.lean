@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import Mathlib.Order.Lattice.Nat
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.Lattice
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.HornSat.Membership
 import Mathlib.Data.Set.Card
 
@@ -333,44 +334,23 @@ abbrev uRSym : unsatSOLang.Relations 2 := Sum.inr ubRSym
 /-- Failure of the Horn condition: some clause has two distinct positive
 literals. -/
 noncomputable def notHornF : unsatSOLang.Sentence :=
-  (Relations.formula₁ uIsClSym (Term.var (Sum.inr 0)) ⊓
-    Relations.formula₂ uPosSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-    Relations.formula₂ uPosSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-    ∼(Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2)))).iExs (Fin 3)
+  fo% ∃ c x y, ((uIsClSym(c) ∧ uPosSym(c, x)) ∧ uPosSym(c, y)) ∧ ¬ x ≐ y
 
 /-- The guessed order is irreflexive and transitive – on a finite structure,
 enough to make it well-founded. -/
 noncomputable def strictF : unsatSOLang.Sentence :=
-  (show unsatSOLang.Formula (Empty ⊕ Fin 1) from
-    ∼(Relations.formula₂ uRSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0)))).iAlls (Fin 1) ⊓
-    ((Relations.formula₂ uRSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ uRSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-      (Relations.formula₂ uRSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% (∀ x, ¬ uRSym(x, x)) ∧ ∀ x y z, uRSym(x, y) ∧ uRSym(y, z) → uRSym(x, z)
 
 /-- Every element of the guessed set is derived by a clause whose negative
 literals lie in the set and are strictly earlier. -/
 noncomputable def derivF : unsatSOLang.Sentence :=
-  ((Relations.formula₁ uTSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₁ uIsClSym (Term.var (Sum.inr ())) ⊓
-      Relations.formula₂ uPosSym (Term.var (Sum.inr ()))
-        (Term.var (Sum.inl (Sum.inr 0))) ⊓
-      ((Relations.formula₂ uNegSym (Term.var (Sum.inl (Sum.inr ())))
-          (Term.var (Sum.inr ()))).imp
-        (Relations.formula₁ uTSym (Term.var (Sum.inr ())) ⊓
-          Relations.formula₂ uRSym (Term.var (Sum.inr ()))
-            (Term.var (Sum.inl (Sum.inl (Sum.inr 0)))))).iAlls Unit).iExs
-      Unit)).iAlls (Fin 1)
+  fo% ∀ x, uTSym(x) → ∃ c, (uIsClSym(c) ∧ uPosSym(c, x)) ∧
+    ∀ y, uNegSym(c, y) → uTSym(y) ∧ uRSym(y, x)
 
 /-- Some clause has no positive literal and all its negative literals in the
 guessed set. -/
 noncomputable def goalF : unsatSOLang.Sentence :=
-  (Relations.formula₁ uIsClSym (Term.var (Sum.inr ())) ⊓
-    ((Relations.formula₂ uNegSym (Term.var (Sum.inl (Sum.inr ())))
-        (Term.var (Sum.inr ()))).imp
-      (Relations.formula₁ uTSym (Term.var (Sum.inr ())))).iAlls Unit ⊓
-    (show unsatSOLang.Formula ((Empty ⊕ Unit) ⊕ Unit) from
-      ∼(Relations.formula₂ uPosSym (Term.var (Sum.inl (Sum.inr ())))
-        (Term.var (Sum.inr ())))).iAlls Unit).iExs Unit
+  fo% ∃ c, (uIsClSym(c) ∧ ∀ y, uNegSym(c, y) → uTSym(y)) ∧ ∀ x, ¬ uPosSym(c, x)
 
 /-- The first-order kernel of the `Σ₁` definition of Horn unsatisfiability:
 either the Horn condition fails, or the guessed pair is a certificate. -/
@@ -434,10 +414,10 @@ private theorem realize_derivF :
   constructor
   · intro h x hx
     obtain ⟨c, ⟨hc, hp⟩, hneg⟩ := h ![x] hx
-    exact ⟨c (), hc, hp, fun y hy => hneg (fun _ => y) hy⟩
+    exact ⟨c 0, hc, hp, fun y hy => hneg (fun _ => y) hy⟩
   · intro h i hi
     obtain ⟨c, hc, hp, hneg⟩ := h (i 0) hi
-    exact ⟨fun _ => c, ⟨hc, hp⟩, fun k hk => hneg (k ()) hk⟩
+    exact ⟨fun _ => c, ⟨hc, hp⟩, fun k hk => hneg (k 0) hk⟩
 
 private theorem realize_goalF :
     (@Sentence.Realize unsatSOLang A
@@ -454,9 +434,9 @@ private theorem realize_goalF :
     Language.relMap_sumInl, hsubT]
   constructor
   · rintro ⟨c, ⟨hc, hneg⟩, hpos⟩
-    exact ⟨c (), hc, fun y hy => hneg (fun _ => y) hy, fun x hx => hpos (fun _ => x) hx⟩
+    exact ⟨c 0, hc, fun y hy => hneg (fun _ => y) hy, fun x hx => hpos (fun _ => x) hx⟩
   · rintro ⟨c, hc, hneg, hpos⟩
-    exact ⟨fun _ => c, ⟨hc, fun k hk => hneg (k ()) hk⟩, fun k hk => hpos (k ()) hk⟩
+    exact ⟨fun _ => c, ⟨hc, fun k hk => hneg (k 0) hk⟩, fun k hk => hpos (k 0) hk⟩
 
 private theorem realize_unsatKernel :
     (@Sentence.Realize unsatSOLang A

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.AltRounds
 import DescriptiveComplexity.Problems.Machine.AltDefs
 import DescriptiveComplexity.OrderedComposition
@@ -72,51 +73,45 @@ section Builders
 variable {α : Type}
 
 /-- `x` is a clause. -/
-def clF (x : α) : (qbfOrd k).Formula α := Relations.formula₁ isClSym (Term.var x)
+def clF (x : α) : (qbfOrd k).Formula α := fo%[x] isClSym(x)
 
 /-- `x` occurs positively in `c`. -/
-def posF (c x : α) : (qbfOrd k).Formula α :=
-  Relations.formula₂ posInSym (Term.var c) (Term.var x)
+def posF (c x : α) : (qbfOrd k).Formula α := fo%[c, x] posInSym(c, x)
 
 /-- `x` occurs negatively in `c`. -/
-def negF (c x : α) : (qbfOrd k).Formula α :=
-  Relations.formula₂ negInSym (Term.var c) (Term.var x)
+def negF (c x : α) : (qbfOrd k).Formula α := fo%[c, x] negInSym(c, x)
 
 /-- `x` carries the mark of the `i`-th block. -/
-def blkF (i : Fin k) (x : α) : (qbfOrd k).Formula α :=
-  Relations.formula₁ (blkSym i) (Term.var x)
+def blkF (i : Fin k) (x : α) : (qbfOrd k).Formula α := fo%[x] (blkSym i)(x)
 
 /-- `x ≤ y` in the ambient order. -/
-def ordF (x y : α) : (qbfOrd k).Formula α :=
-  Relations.formula₂ ordSym (Term.var x) (Term.var y)
+def ordF (x y : α) : (qbfOrd k).Formula α := fo%[x, y] ordSym(x, y)
 
 /-- `x = y`. -/
-def eqF (x y : α) : (qbfOrd k).Formula α := Term.equal (Term.var x) (Term.var y)
+def eqF (x y : α) : (qbfOrd k).Formula α := fo%[x, y] x ≐ y
 
 /-- `x < y` in the ambient order. -/
 def ordLtF (x y : α) : (qbfOrd k).Formula α := ordF x y ⊓ ∼(eqF x y)
 
 /-- `x` is the least element. -/
 noncomputable def minF (x : α) : (qbfOrd k).Formula α :=
-  Formula.iAlls (Fin 1) (ordF (Sum.inl x) (Sum.inr 0))
+  fo%[x] ∀ y, ordF⟨x, y⟩
 
 /-- `c` is the lowest clause. -/
 noncomputable def minClF (c : α) : (qbfOrd k).Formula α :=
-  clF c ⊓ Formula.iAlls (Fin 1) ((clF (Sum.inr 0)).imp (ordF (Sum.inl c) (Sum.inr 0)))
+  fo%[c] clF⟨c⟩ ∧ ∀ d, clF⟨d⟩ → ordF⟨c, d⟩
 
 /-- `c` is the highest clause. -/
 noncomputable def maxClF (c : α) : (qbfOrd k).Formula α :=
-  clF c ⊓ Formula.iAlls (Fin 1) ((clF (Sum.inr 0)).imp (ordF (Sum.inr 0) (Sum.inl c)))
+  fo%[c] clF⟨c⟩ ∧ ∀ d, clF⟨d⟩ → ordF⟨d, c⟩
 
 /-- `c'` is the clause immediately above `c`. -/
 noncomputable def nextClF (c c' : α) : (qbfOrd k).Formula α :=
-  clF c ⊓ (clF c' ⊓ (ordLtF c c' ⊓ Formula.iAlls (Fin 1)
-    ((clF (Sum.inr 0)).imp
-      ((ordLtF (Sum.inl c) (Sum.inr 0)).imp (ordF (Sum.inl c') (Sum.inr 0))))))
+  fo%[c, c'] clF⟨c⟩ ∧ clF⟨c'⟩ ∧ ordLtF⟨c, c'⟩ ∧ ∀ d, clF⟨d⟩ → ordLtF⟨c, d⟩ → ordF⟨c', d⟩
 
 /-- There is no clause at all. -/
 noncomputable def noClF : (qbfOrd k).Formula α :=
-  Formula.iAlls (Fin 1) (∼(clF (Sum.inr 0)))
+  fo% ∀ c, ¬ clF⟨c⟩
 
 /-- The cell of `x` holding the value `v` satisfies the clause `c`: the literal
 test the check phase performs. -/

@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.ZeroOneIP.Defs
 import DescriptiveComplexity.Problems.Knapsack.Chain
 import DescriptiveComplexity.SecondOrder
@@ -43,50 +45,14 @@ section SigmaOne
 /-- The single existential block of the `Σ₁` definition of 0-1 integer
 programming: the columns set to `1` (unary), and the running partial sums and
 the carries (ternary: a row, a column and a bit position). -/
-def zeroOneIPGuessBlock : SOBlock where
-  ι := Option Bool
-  arity := fun i => match i with
-    | none => 1
-    | some _ => 3
-
-/-- The symbol of the chosen-columns relation variable. -/
-def zoXRel : zeroOneIPGuessBlock.lang.Relations 1 := ⟨none, rfl⟩
-
-/-- The symbol of the partial-sum relation variable. -/
-def zoPSRel : zeroOneIPGuessBlock.lang.Relations 3 := ⟨some true, rfl⟩
-
-/-- The symbol of the carry relation variable. -/
-def zoCyRel : zeroOneIPGuessBlock.lang.Relations 3 := ⟨some false, rfl⟩
-
-/-- The vocabulary of the kernel. -/
-abbrev zoSOLang : Language := Language.zeroOneIP.sum zeroOneIPGuessBlock.lang
-
-/-- The column symbol in the kernel's vocabulary. -/
-abbrev zoColSym : zoSOLang.Relations 1 := Sum.inl ipCol
-
-/-- The row symbol in the kernel's vocabulary. -/
-abbrev zoRowSym : zoSOLang.Relations 1 := Sum.inl ipRow
-
-/-- The position symbol in the kernel's vocabulary. -/
-abbrev zoPosnSym : zoSOLang.Relations 1 := Sum.inl ipPosn
-
-/-- The entry symbol in the kernel's vocabulary. -/
-abbrev zoCoefSym : zoSOLang.Relations 3 := Sum.inl ipCoef
-
-/-- The right-hand-side symbol in the kernel's vocabulary. -/
-abbrev zoRhsSym : zoSOLang.Relations 2 := Sum.inl ipRhs
-
-/-- The order symbol in the kernel's vocabulary. -/
-abbrev zoLeSym : zoSOLang.Relations 2 := Sum.inl ipLe
-
-/-- The chosen-columns symbol in the kernel's vocabulary. -/
-abbrev zoXSym : zoSOLang.Relations 1 := Sum.inr zoXRel
-
-/-- The partial-sum symbol in the kernel's vocabulary. -/
-abbrev zoPSSym : zoSOLang.Relations 3 := Sum.inr zoPSRel
-
-/-- The carry symbol in the kernel's vocabulary. -/
-abbrev zoCySym : zoSOLang.Relations 3 := Sum.inr zoCyRel
+fo_block zeroOneIPGuessBlock over Language.zeroOneIP ip into zoSOLang with zo where
+  /-- The columns set to `1`. -/
+  x : 1
+  /-- The running partial sums: `pS r j p` is the bit `p` of the total of the
+  row `r` up to the column `j`. -/
+  pS : 3
+  /-- The carries of the step appending a column to a row's total. -/
+  cy : 3
 
 /-! ### Formula builders -/
 
@@ -145,39 +111,29 @@ def zoMaj3F (x y z : zoSOLang.Formula α) : zoSOLang.Formula α :=
 
 /-- `j` is the first column, as a formula. -/
 noncomputable def zoMinColF (j : α) : zoSOLang.Formula α :=
-  zoColF j ⊓ Formula.iAlls Unit
-    ((zoColF (Sum.inr ())).imp (zoLeF (Sum.inl j) (Sum.inr ())))
+  fo%[j] zoColF⟨j⟩ ∧ ∀ y, zoColF⟨y⟩ → zoLeF⟨j, y⟩
 
 /-- `j` is the last column, as a formula. -/
 noncomputable def zoMaxColF (j : α) : zoSOLang.Formula α :=
-  zoColF j ⊓ Formula.iAlls Unit
-    ((zoColF (Sum.inr ())).imp (zoLeF (Sum.inr ()) (Sum.inl j)))
+  fo%[j] zoColF⟨j⟩ ∧ ∀ y, zoColF⟨y⟩ → zoLeF⟨y, j⟩
 
 /-- `j` is the column right after `i`, as a formula. -/
 noncomputable def zoSuccColF (i j : α) : zoSOLang.Formula α :=
-  zoColF i ⊓ (zoColF j ⊓ (zoLeF i j ⊓ (∼(zoEqF i j) ⊓
-    Formula.iAlls Unit
-      ((zoColF (Sum.inr ())).imp ((zoLeF (Sum.inl i) (Sum.inr ())).imp
-        ((zoLeF (Sum.inr ()) (Sum.inl j)).imp
-          (zoEqF (Sum.inr ()) (Sum.inl i) ⊔ zoEqF (Sum.inr ()) (Sum.inl j))))))))
+  fo%[i, j] zoColF⟨i⟩ ∧ zoColF⟨j⟩ ∧ zoLeF⟨i, j⟩ ∧ ¬ zoEqF⟨i, j⟩ ∧
+    ∀ y, zoColF⟨y⟩ → zoLeF⟨i, y⟩ → zoLeF⟨y, j⟩ → zoEqF⟨y, i⟩ ∨ zoEqF⟨y, j⟩
 
 /-- `p` is the lowest position, as a formula. -/
 noncomputable def zoMinPosnF (p : α) : zoSOLang.Formula α :=
-  zoPosnF p ⊓ Formula.iAlls Unit
-    ((zoPosnF (Sum.inr ())).imp (zoLeF (Sum.inl p) (Sum.inr ())))
+  fo%[p] zoPosnF⟨p⟩ ∧ ∀ q, zoPosnF⟨q⟩ → zoLeF⟨p, q⟩
 
 /-- `p` is the highest position, as a formula. -/
 noncomputable def zoMaxPosnF (p : α) : zoSOLang.Formula α :=
-  zoPosnF p ⊓ Formula.iAlls Unit
-    ((zoPosnF (Sum.inr ())).imp (zoLeF (Sum.inr ()) (Sum.inl p)))
+  fo%[p] zoPosnF⟨p⟩ ∧ ∀ q, zoPosnF⟨q⟩ → zoLeF⟨q, p⟩
 
 /-- `q` is the position right above `p`, as a formula. -/
 noncomputable def zoSuccPosnF (p q : α) : zoSOLang.Formula α :=
-  zoPosnF p ⊓ (zoPosnF q ⊓ (zoLeF p q ⊓ (∼(zoEqF p q) ⊓
-    Formula.iAlls Unit
-      ((zoPosnF (Sum.inr ())).imp ((zoLeF (Sum.inl p) (Sum.inr ())).imp
-        ((zoLeF (Sum.inr ()) (Sum.inl q)).imp
-          (zoEqF (Sum.inr ()) (Sum.inl p) ⊔ zoEqF (Sum.inr ()) (Sum.inl q))))))))
+  fo%[p, q] zoPosnF⟨p⟩ ∧ zoPosnF⟨q⟩ ∧ zoLeF⟨p, q⟩ ∧ ¬ zoEqF⟨p, q⟩ ∧
+    ∀ r, zoPosnF⟨r⟩ → zoLeF⟨p, r⟩ → zoLeF⟨r, q⟩ → zoEqF⟨r, p⟩ ∨ zoEqF⟨r, q⟩
 
 end Builders
 
@@ -188,84 +144,57 @@ kernel is Knapsack's read once per row. -/
 
 /-- Kernel clause: the order is reflexive. -/
 private noncomputable def zoReflClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (zoLeF (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ x, zoLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
 private noncomputable def zoTransClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((zoLeF (Sum.inr 0) (Sum.inr 1) ⊓ zoLeF (Sum.inr 1) (Sum.inr 2)).imp
-      (zoLeF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ x y z, zoLeF⟨x, y⟩ ∧ zoLeF⟨y, z⟩ → zoLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
 private noncomputable def zoAntisymmClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((zoLeF (Sum.inr 0) (Sum.inr 1) ⊓ zoLeF (Sum.inr 1) (Sum.inr 0)).imp
-      (zoEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ x y, zoLeF⟨x, y⟩ ∧ zoLeF⟨y, x⟩ → zoEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
 private noncomputable def zoTotalClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 2) (zoLeF (Sum.inr 0) (Sum.inr 1) ⊔ zoLeF (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ x y, zoLeF⟨x, y⟩ ∨ zoLeF⟨y, x⟩
 
 /-- Kernel clause: only columns are set to `1`. -/
 private noncomputable def zoXClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 1) ((zoXF (Sum.inr 0)).imp (zoColF (Sum.inr 0)))
+  fo% ∀ x, zoXF⟨x⟩ → zoColF⟨x⟩
 
 /-- Kernel clause: at the first column each row's running total is that
 column's contribution. -/
 private noncomputable def zoBaseClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((zoRowF (Sum.inr 0) ⊓ (zoMinColF (Sum.inr 1) ⊓ zoPosnF (Sum.inr 2))).imp
-      ((zoPSF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2)).iff
-        (zoAddF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))))
+  fo% ∀ r j p, zoRowF⟨r⟩ ∧ zoMinColF⟨j⟩ ∧ zoPosnF⟨p⟩ → (zoPSF⟨r, j, p⟩ ↔ zoAddF⟨r, j, p⟩)
 
 /-- Kernel clause: each step adds a bit. -/
 private noncomputable def zoSumClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((zoRowF (Sum.inr 0) ⊓ (zoSuccColF (Sum.inr 1) (Sum.inr 2) ⊓ zoPosnF (Sum.inr 3))).imp
-      ((zoPSF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3)).iff
-        (zoXor3F (zoPSF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3))
-          (zoAddF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-          (zoCyF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3)))))
+  fo% ∀ r i j p, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoPosnF⟨p⟩ →
+    (zoPSF⟨r, j, p⟩ ↔ zoXor3F⦃zoPSF⟨r, i, p⟩, zoAddF⟨r, j, p⟩, zoCyF⟨r, j, p⟩⦄)
 
 /-- Kernel clause: each step propagates its carry. -/
 private noncomputable def zoCarryClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 5)
-    ((zoRowF (Sum.inr 0) ⊓ (zoSuccColF (Sum.inr 1) (Sum.inr 2) ⊓
-        zoSuccPosnF (Sum.inr 3) (Sum.inr 4))).imp
-      ((zoCyF (Sum.inr 0) (Sum.inr 2) (Sum.inr 4)).iff
-        (zoMaj3F (zoPSF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3))
-          (zoAddF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-          (zoCyF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3)))))
+  fo% ∀ r i j p q, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoSuccPosnF⟨p, q⟩ →
+    (zoCyF⟨r, j, q⟩ ↔ zoMaj3F⦃zoPSF⟨r, i, p⟩, zoAddF⟨r, j, p⟩, zoCyF⟨r, j, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest position. -/
 private noncomputable def zoBottomClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((zoRowF (Sum.inr 0) ⊓ (zoSuccColF (Sum.inr 1) (Sum.inr 2) ⊓
-        zoMinPosnF (Sum.inr 3))).imp
-      ∼(zoCyF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3)))
+  fo% ∀ r i j p, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoMinPosnF⟨p⟩ → ¬ zoCyF⟨r, j, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest position. -/
 private noncomputable def zoTopClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((zoRowF (Sum.inr 0) ⊓ (zoSuccColF (Sum.inr 1) (Sum.inr 2) ⊓
-        zoMaxPosnF (Sum.inr 3))).imp
-      ∼(zoMaj3F (zoPSF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3))
-        (zoAddF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-        (zoCyF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))))
+  fo% ∀ r i j p, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoMaxPosnF⟨p⟩ →
+    ¬ zoMaj3F⦃zoPSF⟨r, i, p⟩, zoAddF⟨r, j, p⟩, zoCyF⟨r, j, p⟩⦄
 
 /-- Kernel clause: at the last column each row's running total is that row's
 right-hand side. -/
 private noncomputable def zoFinalClause : zoSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((zoRowF (Sum.inr 0) ⊓ (zoMaxColF (Sum.inr 1) ⊓ zoPosnF (Sum.inr 2))).imp
-      ((zoPSF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2)).iff (zoRhsF (Sum.inr 0) (Sum.inr 2))))
+  fo% ∀ r j p, zoRowF⟨r⟩ ∧ zoMaxColF⟨j⟩ ∧ zoPosnF⟨p⟩ → (zoPSF⟨r, j, p⟩ ↔ zoRhsF⟨r, p⟩)
 
 /-- Kernel clause: with no column at all, every right-hand side must be
 zero. -/
 private noncomputable def zoEmptyClause : zoSOLang.Sentence :=
-  (Formula.iAlls (Fin 1) ∼(zoColF (Sum.inr 0))).imp
-    (Formula.iAlls (Fin 2)
-      ((zoRowF (Sum.inr 0) ⊓ zoPosnF (Sum.inr 1)).imp ∼(zoRhsF (Sum.inr 0) (Sum.inr 1))))
+  fo% (∀ x, ¬ zoColF⟨x⟩) → ∀ r p, zoRowF⟨r⟩ ∧ zoPosnF⟨p⟩ → ¬ zoRhsF⟨r, p⟩
 
 /-- The first-order kernel of the `Σ₁` definition of 0-1 integer
 programming. -/
@@ -282,13 +211,13 @@ variable {A : Type} [Language.zeroOneIP.Structure A]
 variable (ρ : zeroOneIPGuessBlock.Assignment A)
 
 /-- The columns set to `1`, read off an assignment of the block. -/
-def ZX (j : A) : Prop := ρ none ![j]
+def ZX (j : A) : Prop := ρ .x ![j]
 
 /-- The running total of a row, read off an assignment of the block. -/
-def ZPS (r j p : A) : Prop := ρ (some true) ![r, j, p]
+def ZPS (r j p : A) : Prop := ρ .pS ![r, j, p]
 
 /-- The carries of a row, read off an assignment of the block. -/
-def ZCy (r j p : A) : Prop := ρ (some false) ![r, j, p]
+def ZCy (r j p : A) : Prop := ρ .cy ![r, j, p]
 
 private theorem realize_zeroOneIPKernel :
     (@Sentence.Realize zoSOLang A
@@ -312,11 +241,11 @@ private theorem realize_zeroOneIPKernel :
         ((∀ j : A, ¬IPCol j) → ∀ r p : A, IPRow r → IPPosn p → ¬IPRhs r p) := by
   let := zeroOneIPGuessBlock.structure ρ
   have hsubX : ∀ w : Fin 1 → A,
-      RelMap (L := zoSOLang) (M := A) zoXSym w ↔ ρ none w := fun _ => Iff.rfl
+      RelMap (L := zoSOLang) (M := A) zoXSym w ↔ ρ .x w := fun _ => Iff.rfl
   have hsubP : ∀ w : Fin 3 → A,
-      RelMap (L := zoSOLang) (M := A) zoPSSym w ↔ ρ (some true) w := fun _ => Iff.rfl
+      RelMap (L := zoSOLang) (M := A) zoPSSym w ↔ ρ .pS w := fun _ => Iff.rfl
   have hsubC : ∀ w : Fin 3 → A,
-      RelMap (L := zoSOLang) (M := A) zoCySym w ↔ ρ (some false) w := fun _ => Iff.rfl
+      RelMap (L := zoSOLang) (M := A) zoCySym w ↔ ρ .cy w := fun _ => Iff.rfl
   rw [zeroOneIPKernel]
   simp only [zoReflClause, zoTransClause, zoAntisymmClause, zoTotalClause, zoXClause,
     zoBaseClause, zoSumClause, zoCarryClause, zoBottomClause, zoTopClause, zoFinalClause,
@@ -330,16 +259,16 @@ private theorem realize_zeroOneIPKernel :
   constructor
   · rintro ⟨⟨hrefl, htrans, hanti, htot⟩, hx, hbase, hsum, hcarry, hbot, htop, hfin, hemp⟩
     have hminU : ∀ (P : A → Prop) (x : A), MinPos IPLe P x →
-        P x ∧ ∀ y : Unit → A, P (y ()) → IPLe x (y ()) :=
-      fun P x h => ⟨h.1, fun y hy => h.2 (y ()) hy⟩
+        P x ∧ ∀ y : Fin 1 → A, P (y 0) → IPLe x (y 0) :=
+      fun P x h => ⟨h.1, fun y hy => h.2 (y 0) hy⟩
     have hmaxU : ∀ (P : A → Prop) (x : A), MaxPos IPLe P x →
-        P x ∧ ∀ y : Unit → A, P (y ()) → IPLe (y ()) x :=
-      fun P x h => ⟨h.1, fun y hy => h.2 (y ()) hy⟩
+        P x ∧ ∀ y : Fin 1 → A, P (y 0) → IPLe (y 0) x :=
+      fun P x h => ⟨h.1, fun y hy => h.2 (y 0) hy⟩
     have hsuccU : ∀ (P : A → Prop) (x y : A), SuccPos IPLe P x y →
-        P x ∧ (P y ∧ (IPLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → IPLe x (r ()) → IPLe (r ()) y → r () = x ∨ r () = y))) :=
+        P x ∧ (P y ∧ (IPLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → IPLe x (r 0) → IPLe (r 0) y → r 0 = x ∨ r 0 = y))) :=
       fun P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
-        fun r hr h1 h2 => h.2.2.2.2 (r ()) hr h1 h2⟩
+        fun r hr h1 h2 => h.2.2.2.2 (r 0) hr h1 h2⟩
     exact ⟨⟨fun a => hrefl (fun _ => a), fun a b c hab hbc => htrans ![a, b, c] ⟨hab, hbc⟩,
         fun a b hab hba => hanti ![a, b] ⟨hab, hba⟩, fun a b => htot ![a, b]⟩,
       fun j hj => hx (fun _ => j) hj,
@@ -353,14 +282,14 @@ private theorem realize_zeroOneIPKernel :
       fun hno r p hr hp => hemp (fun j => hno (j 0)) ![r, p] ⟨hr, hp⟩⟩
   · rintro ⟨⟨hrefl, htrans, hanti, htot⟩, hx, hbase, hsum, hcarry, hbot, htop, hfin, hemp⟩
     have hminM : ∀ (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → IPLe x (y ())) → MinPos IPLe P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → IPLe x (y 0)) → MinPos IPLe P x :=
       fun P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hmaxM : ∀ (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → IPLe (y ()) x) → MaxPos IPLe P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → IPLe (y 0) x) → MaxPos IPLe P x :=
       fun P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hsuccM : ∀ (P : A → Prop) (x y : A),
-        (P x ∧ (P y ∧ (IPLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → IPLe x (r ()) → IPLe (r ()) y → r () = x ∨ r () = y)))) →
+        (P x ∧ (P y ∧ (IPLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → IPLe x (r 0) → IPLe (r 0) y → r 0 = x ∨ r 0 = y)))) →
         SuccPos IPLe P x y :=
       fun P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
         fun r hr h1 h2 => h.2.2.2.2 (fun _ => r) hr h1 h2⟩
@@ -410,9 +339,9 @@ theorem zeroOneIP_sigmaSODefinable : SigmaSODefinable 1 ZeroOneIP := by
       · exact ⟨fun _ _ => False, fun _ _ => False, fun h => absurd h hr⟩
     choose PS Cy hchain using hex
     refine ⟨fun idx => match idx with
-      | none => fun w : Fin 1 → A => S (w 0)
-      | some true => fun w : Fin 3 → A => PS (w 0) (w 1) (w 2)
-      | some false => fun w : Fin 3 → A => Cy (w 0) (w 1) (w 2), ?_⟩
+      | .x => fun w : Fin 1 → A => S (w 0)
+      | .pS => fun w : Fin 3 → A => PS (w 0) (w 1) (w 2)
+      | .cy => fun w : Fin 3 → A => Cy (w 0) (w 1) (w 2), ?_⟩
     refine (realize_zeroOneIPKernel _).mpr ⟨hlin, hScol,
       fun r j p hr => (hchain r hr).1 j p,
       fun r i j p hr => (hchain r hr).2.1 i j p,

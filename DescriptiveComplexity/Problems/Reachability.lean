@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Problems.HornSat.Hardness
 import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.FixedPointHorn
@@ -71,31 +72,15 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the vocabulary of graphs with marked sources and
-targets. -/
-inductive stGraphRel : ℕ → Type
-  /-- `edge a b`: there is an edge from `a` to `b`. -/
-  | edge : stGraphRel 2
-  /-- `source a`: the vertex `a` is a marked source. -/
-  | source : stGraphRel 1
-  /-- `target a`: the vertex `a` is a marked target. -/
-  | target : stGraphRel 1
-  deriving DecidableEq
-
 /-- The relational vocabulary of directed graphs with marked sources and
 targets. -/
-protected def stGraph : Language :=
-  ⟨fun _ => Empty, stGraphRel⟩
-  deriving IsRelational
-
-/-- The edge symbol. -/
-abbrev sgEdge : Language.stGraph.Relations 2 := .edge
-
-/-- The marked-source symbol. -/
-abbrev sgSource : Language.stGraph.Relations 1 := .source
-
-/-- The marked-target symbol. -/
-abbrev sgTarget : Language.stGraph.Relations 1 := .target
+fo_language stGraph with sg where
+  /-- `edge a b`: there is an edge from `a` to `b`. -/
+  edge : 2
+  /-- `source a`: the vertex `a` is a marked source. -/
+  source : 1
+  /-- `target a`: the vertex `a` is a marked target. -/
+  target : 1
 
 /-- The edge symbol in the ordered expansion. -/
 abbrev sgEdgeO : (Language.stGraph.sum Language.order).Relations 2 := Sum.inl sgEdge
@@ -122,14 +107,7 @@ section Defs
 
 variable {A : Type} [Language.stGraph.Structure A]
 
-/-- The edge relation of a marked graph. -/
-def SGEdge (a b : A) : Prop := RelMap sgEdge ![a, b]
-
-/-- Being a marked source. -/
-def SGSource (a : A) : Prop := RelMap sgSource ![a]
-
-/-- Being a marked target. -/
-def SGTarget (a : A) : Prop := RelMap sgTarget ![a]
+fo_predicates Language.stGraph sg
 
 variable (A) in
 /-- Some marked target is reachable from some marked source, along a

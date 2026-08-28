@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.OccurrenceOrder
 
@@ -101,31 +102,19 @@ section SigmaOne
 
 /-- Kernel conjunct: a clause has at most one true *positive* literal. -/
 private noncomputable def oiPPClause : satSOLang.Sentence :=
-  ((Relations.formula₁ kIsClSym (Term.var (Sum.inr 0)) ⊓
-      ((Relations.formula₂ kPosSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-          Relations.formula₁ kNuSym (Term.var (Sum.inr 1))) ⊓
-        (Relations.formula₂ kPosSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-          Relations.formula₁ kNuSym (Term.var (Sum.inr 2))))).imp
-    (Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ c x y,
+    kIsClSym(c) ∧ (kPosSym(c, x) ∧ kNuSym(x)) ∧ (kPosSym(c, y) ∧ kNuSym(y)) → x ≐ y
 
 /-- Kernel conjunct: a clause has at most one true *negative* literal. -/
 private noncomputable def oiNNClause : satSOLang.Sentence :=
-  ((Relations.formula₁ kIsClSym (Term.var (Sum.inr 0)) ⊓
-      ((Relations.formula₂ kNegSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-          ∼(Relations.formula₁ kNuSym (Term.var (Sum.inr 1)))) ⊓
-        (Relations.formula₂ kNegSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-          ∼(Relations.formula₁ kNuSym (Term.var (Sum.inr 2)))))).imp
-    (Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ c x y,
+    kIsClSym(c) ∧ (kNegSym(c, x) ∧ ¬ kNuSym(x)) ∧ (kNegSym(c, y) ∧ ¬ kNuSym(y)) → x ≐ y
 
 /-- Kernel conjunct: a clause has no true positive *and* true negative
 literal. -/
 private noncomputable def oiPNClause : satSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    (∼(Relations.formula₁ kIsClSym (Term.var (Sum.inr 0)) ⊓
-      ((Relations.formula₂ kPosSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-          Relations.formula₁ kNuSym (Term.var (Sum.inr 1))) ⊓
-        (Relations.formula₂ kNegSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-          ∼(Relations.formula₁ kNuSym (Term.var (Sum.inr 2)))))))
+  fo% ∀ c x y,
+    ¬ (kIsClSym(c) ∧ (kPosSym(c, x) ∧ kNuSym(x)) ∧ (kNegSym(c, y) ∧ ¬ kNuSym(y)))
 
 /-- The first-order kernel of the `Σ₁` definition of 1-in-SAT: SAT's kernel
 together with the three uniqueness clauses. -/

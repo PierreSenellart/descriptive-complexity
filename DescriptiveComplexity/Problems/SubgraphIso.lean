@@ -178,23 +178,12 @@ def cliquePatternInterp :
     FOInterpretation Language.markedGraph Language.twoGraphs Bool 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .patV => fun t =>
-        if t 0 then mgMarked.formula₁ (Term.var (0, 0)) else ⊥
+    | _, .patV => fun t => fo%⟨u⟩ if t 0 then mgMarked(u) else ⊥ᶠ
     | _, .hostV => fun t => if t 0 then ⊥ else ⊤
-    | _, .patE => fun t =>
-        if t 0 then
-          (if t 1 then
-            ∼(Term.equal (Term.var (0, 0)) (Term.var (1, 0))) ⊓
-              (mgMarked.formula₁ (Term.var (0, 0)) ⊓ mgMarked.formula₁ (Term.var (1, 0)))
-          else ⊥)
-        else ⊥
-    | _, .hostE => fun t =>
-        if t 0 then ⊥
-        else
-          (if t 1 then ⊥
-          else
-            ∼(Term.equal (Term.var (0, 0)) (Term.var (1, 0))) ⊓
-              mgAdj.formula₂ (Term.var (0, 0)) (Term.var (1, 0)))
+    | _, .patE => fun t => fo%⟨u, v⟩
+        if t 0 then (if t 1 then ¬ u ≐ v ∧ (mgMarked(u) ∧ mgMarked(v)) else ⊥ᶠ) else ⊥ᶠ
+    | _, .hostE => fun t => fo%⟨u, v⟩
+        if t 0 then ⊥ᶠ else (if t 1 then ⊥ᶠ else ¬ u ≐ v ∧ mgAdj(u, v))
 
 section Points
 

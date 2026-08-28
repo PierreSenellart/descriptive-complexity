@@ -58,55 +58,50 @@ section Guards
 
 variable {L : Language.{0, 0}} {α : Type}
 
-/-- `t₁ ≤ t₂`, as a formula over the ordered expansion. -/
-noncomputable def leF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (L.sum Language.order).Formula α :=
-  Relations.formula₂ leSymb t₁ t₂
+/-- `x ≤ y`, as a formula over the ordered expansion. -/
+noncomputable def leF (x y : α) : (L.sum Language.order).Formula α :=
+  Relations.formula₂ leSymb (Term.var x) (Term.var y)
 
-/-- `t₁ < t₂`, as a formula over the ordered expansion. -/
-noncomputable def ltF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (L.sum Language.order).Formula α :=
-  leF t₁ t₂ ⊓ ∼(leF t₂ t₁)
+/-- `x < y`, as a formula over the ordered expansion. -/
+noncomputable def ltF (x y : α) : (L.sum Language.order).Formula α :=
+  leF x y ⊓ ∼(leF y x)
 
 /-- The variable `x` holds a minimum. -/
 noncomputable def minF (x : α) : (L.sum Language.order).Formula α :=
-  (leF (Term.var (Sum.inl x)) (Term.var (Sum.inr 0))).iAlls (Fin 1)
+  (leF (Sum.inl x) (Sum.inr 0)).iAlls (Fin 1)
 
 /-- The variable `x` holds a maximum. -/
 noncomputable def maxF (x : α) : (L.sum Language.order).Formula α :=
-  (leF (Term.var (Sum.inr 0)) (Term.var (Sum.inl x))).iAlls (Fin 1)
+  (leF (Sum.inr 0) (Sum.inl x)).iAlls (Fin 1)
 
 /-- `w` holds the immediate predecessor of `z`. -/
 noncomputable def succF (w z : α) : (L.sum Language.order).Formula α :=
-  ltF (Term.var w) (Term.var z) ⊓
+  ltF w z ⊓
     (show (L.sum Language.order).Formula (α ⊕ Fin 1) from
-      ∼(ltF (Term.var (Sum.inl w)) (Term.var (Sum.inr 0)) ⊓
-        ltF (Term.var (Sum.inr 0)) (Term.var (Sum.inl z)))).iAlls (Fin 1)
+      ∼(ltF (Sum.inl w) (Sum.inr 0) ⊓ ltF (Sum.inr 0) (Sum.inl z))).iAlls (Fin 1)
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : α → A}
 
 @[simp]
-theorem realize_leF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (leF t₁ t₂).Realize v ↔ t₁.realize v ≤ t₂.realize v := by
+theorem realize_leF (x y : α) : (leF (L := L) x y).Realize v ↔ v x ≤ v y := by
   rw [leF, Formula.realize_rel₂, relMap_leSymb]
   exact Iff.rfl
 
 @[simp]
-theorem realize_ltF (t₁ t₂ : (L.sum Language.order).Term α) :
-    (ltF t₁ t₂).Realize v ↔ t₁.realize v < t₂.realize v := by
+theorem realize_ltF (x y : α) : (ltF (L := L) x y).Realize v ↔ v x < v y := by
   rw [ltF, Formula.realize_inf, Formula.realize_not, realize_leF, realize_leF]
   exact lt_iff_le_not_ge.symm
 
 @[simp]
 theorem realize_minF (x : α) : (minF (L := L) x).Realize v ↔ ∀ a : A, v x ≤ a := by
   rw [minF]
-  simp only [Formula.realize_iAlls, realize_leF, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+  simp only [Formula.realize_iAlls, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
 
 @[simp]
 theorem realize_maxF (x : α) : (maxF (L := L) x).Realize v ↔ ∀ a : A, a ≤ v x := by
   rw [maxF]
-  simp only [Formula.realize_iAlls, realize_leF, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+  simp only [Formula.realize_iAlls, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
 
 @[simp]
@@ -114,7 +109,7 @@ theorem realize_succF (w z : α) :
     (succF (L := L) w z).Realize v ↔ v w < v z ∧ ∀ a : A, ¬(v w < a ∧ a < v z) := by
   rw [succF]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_not, realize_ltF,
-    Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+    Sum.elim_inl, Sum.elim_inr]
   exact and_congr Iff.rfl ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
 
 end Guards
@@ -557,7 +552,7 @@ noncomputable def lexSelLtF (sel sel' : Fin D → γ) : (L.sum Language.order).F
   listSup ((List.finRange D).map fun p =>
     listInf (((List.finRange D).filter fun j => j < p).map fun j =>
       Term.equal (Term.var (sel j)) (Term.var (sel' j))) ⊓
-    ltF (Term.var (sel p)) (Term.var (sel' p)))
+    ltF (sel p) (sel' p))
 
 /-- The tuple held by `sel` is lexicographically below or equal to the one held
 by `sel'`. -/

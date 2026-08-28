@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.Difference
 
@@ -180,9 +181,9 @@ def sideInterp (isCl : Language.satPair.Relations 1)
     FOInterpretation Language.satPair Language.sat Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .isClause => fun _ => Relations.formula₁ isCl (Term.var (0, 0))
-    | _, .posIn => fun _ => Relations.formula₂ pos (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .negIn => fun _ => Relations.formula₂ neg (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .isClause => fun _ => fo%⟨c⟩ isCl(c)
+    | _, .posIn => fun _ => fo%⟨c, x⟩ pos(c, x)
+    | _, .negIn => fun _ => fo%⟨c, x⟩ neg(c, x)
 
 variable {A : Type} [Language.satPair.Structure A]
 variable (isCl : Language.satPair.Relations 1) (pos neg : Language.satPair.Relations 2)

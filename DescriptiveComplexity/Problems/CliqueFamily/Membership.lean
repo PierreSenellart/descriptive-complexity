@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.CliqueFamily.Defs
 import DescriptiveComplexity.SecondOrder
 
@@ -33,53 +35,22 @@ open Language Structure SOBlock
 section SigmaOne
 
 /-- The single existential block of the `Σ₁` definition of Clique: a unary
-relation variable (`true`: the clique) and a binary one (`false`: an
-injection of the marked set into the clique). -/
-def cliqueGuessBlock : SOBlock where
-  ι := Bool
-  arity := fun i => cond i 1 2
-
-/-- The symbol of the clique relation variable. -/
-def cgCliqueSym : cliqueGuessBlock.lang.Relations 1 := ⟨true, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def cgInjSym : cliqueGuessBlock.lang.Relations 2 := ⟨false, rfl⟩
-
-/-- The vocabulary of the kernel: marked graphs together with the two guessed
-relation variables. -/
-abbrev cliqueSOLang : Language := Language.markedGraph.sum cliqueGuessBlock.lang
-
-/-- The adjacency symbol in the kernel's vocabulary. -/
-abbrev kAdjSym : cliqueSOLang.Relations 2 := Sum.inl mgAdj
-
-/-- The mark symbol in the kernel's vocabulary. -/
-abbrev kMarkedSym : cliqueSOLang.Relations 1 := Sum.inl mgMarked
-
-/-- The clique symbol in the kernel's vocabulary. -/
-abbrev kCliqueSym : cliqueSOLang.Relations 1 := Sum.inr cgCliqueSym
-
-/-- The injection symbol in the kernel's vocabulary. -/
-abbrev kInjSym : cliqueSOLang.Relations 2 := Sum.inr cgInjSym
+relation variable, the clique, and a binary one, an injection of the marked
+set into the clique. -/
+fo_block cliqueGuessBlock over Language.markedGraph mg into cliqueSOLang with k where
+  /-- The guessed clique. -/
+  clique : 1
+  /-- The guessed injection of the marked set into the clique. -/
+  inj : 2
 
 /-- The first-order kernel of the `Σ₁` definition of Clique: the guessed
 unary relation is a clique – any two distinct members are adjacent – and the
 guessed binary relation maps every marked element to some clique member,
 injectively. -/
 noncomputable def cliqueKernel : cliqueSOLang.Sentence :=
-  ((Relations.formula₁ kCliqueSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ kCliqueSym (Term.var (Sum.inr 1)) ⊓
-      ∼(Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).imp
-    (Relations.formula₂ kAdjSym (Term.var (Sum.inr 0))
-      (Term.var (Sum.inr 1)))).iAlls (Fin 2) ⊓
-  (((Relations.formula₁ kMarkedSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₂ kInjSym (Term.var (Sum.inl (Sum.inr 0)))
-        (Term.var (Sum.inr ())) ⊓
-      Relations.formula₁ kCliqueSym (Term.var (Sum.inr ()))).iExs
-        Unit)).iAlls (Fin 1) ⊓
-  ((Relations.formula₂ kInjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ kInjSym (Term.var (Sum.inr 1))
-        (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3))
+  fo% (∀ x y, (kCliqueSym(x) ∧ kCliqueSym(y)) ∧ ¬ x ≐ y → kAdjSym(x, y)) ∧
+    (∀ x, kMarkedSym(x) → ∃ y, kInjSym(x, y) ∧ kCliqueSym(y)) ∧
+    ∀ x x' y, kInjSym(x, y) ∧ kInjSym(x', y) → x ≐ x'
 
 /-- Realization of the kernel under an assignment of the two relation
 variables: the guessed set is a clique, and the guessed binary relation maps
@@ -88,16 +59,16 @@ private theorem realize_cliqueKernel {A : Type} [Language.markedGraph.Structure 
     (ρ : cliqueGuessBlock.Assignment A) :
     (@Sentence.Realize cliqueSOLang A
         (@sumStructure _ _ A _ (cliqueGuessBlock.structure ρ)) cliqueKernel) ↔
-      (∀ a b : A, ρ true ![a] → ρ true ![b] → a ≠ b → RelMap mgAdj ![a, b]) ∧
+      (∀ a b : A, ρ .clique ![a] → ρ .clique ![b] → a ≠ b → RelMap mgAdj ![a, b]) ∧
         (∀ a : A, RelMap mgMarked ![a] →
-          ∃ b : A, ρ false ![a, b] ∧ ρ true ![b]) ∧
-        ∀ a a' b : A, ρ false ![a, b] → ρ false ![a', b] → a = a' := by
+          ∃ b : A, ρ .inj ![a, b] ∧ ρ .clique ![b]) ∧
+        ∀ a a' b : A, ρ .inj ![a, b] → ρ .inj ![a', b] → a = a' := by
   let := cliqueGuessBlock.structure ρ
   have hsubC : ∀ (w : Fin 1 → A),
-      RelMap (L := cliqueSOLang) (M := A) kCliqueSym w ↔ ρ true w :=
+      RelMap (L := cliqueSOLang) (M := A) kCliqueSym w ↔ ρ .clique w :=
     fun _ => Iff.rfl
   have hsubF : ∀ (w : Fin 2 → A),
-      RelMap (L := cliqueSOLang) (M := A) kInjSym w ↔ ρ false w :=
+      RelMap (L := cliqueSOLang) (M := A) kInjSym w ↔ ρ .inj w :=
     fun _ => Iff.rfl
   rw [cliqueKernel]
   simp only [Sentence.Realize, Formula.realize_inf, Formula.realize_iAlls,
@@ -111,7 +82,7 @@ private theorem realize_cliqueKernel {A : Type} [Language.markedGraph.Structure 
   · exact h ![a, b] ⟨⟨ha, hb⟩, hab⟩
   · exact h (i 0) (i 1) hi.1.1 hi.1.2 hi.2
   · obtain ⟨b, hb1, hb2⟩ := h (fun _ => a) ha
-    exact ⟨b (), hb1, hb2⟩
+    exact ⟨b 0, hb1, hb2⟩
   · obtain ⟨b, hb1, hb2⟩ := h (i 0) hi
     exact ⟨fun _ => b, hb1, hb2⟩
   · exact h ![a, a', b] ⟨hab, hab'⟩
@@ -128,8 +99,8 @@ theorem clique_sigmaSODefinable : SigmaSODefinable 1 Clique := by
   · rintro ⟨-, hcl⟩
     obtain ⟨S, hS, ⟨e⟩⟩ := (cliqueOn_iff_embedding _ _).mp hcl
     refine ⟨fun i => match i with
-      | true => fun w : Fin 1 → A => S (w 0)
-      | false => fun w : Fin 2 → A =>
+      | .clique => fun w : Fin 1 → A => S (w 0)
+      | .inj => fun w : Fin 2 → A =>
           ∃ h : RelMap mgMarked ![w 0], (e ⟨w 0, h⟩ : {x // S x}).1 = w 1, ?_⟩
     refine (realize_cliqueKernel _).mpr
       ⟨fun a b ha hb hab => hS a b ha hb hab,
@@ -139,10 +110,10 @@ theorem clique_sigmaSODefinable : SigmaSODefinable 1 Clique := by
   · rintro ⟨ρ, hρ⟩
     obtain ⟨h1, h2, h3⟩ := (realize_cliqueKernel ρ).mp hρ
     have hch : ∀ m : {x : A // MGMarked x},
-        ∃ b : A, ρ false ![m.1, b] ∧ ρ true ![b] := fun m => h2 m.1 m.2
+        ∃ b : A, ρ .inj ![m.1, b] ∧ ρ .clique ![b] := fun m => h2 m.1 m.2
     choose f hf1 hf2 using hch
     refine ⟨‹Finite A›, (cliqueOn_iff_embedding _ _).mpr
-      ⟨fun a => ρ true ![a], fun x y hx hy hxy => h1 x y hx hy hxy,
+      ⟨fun a => ρ .clique ![a], fun x y hx hy hxy => h1 x y hx hy hxy,
         ⟨⟨fun m => ⟨f m, hf2 m⟩, fun m m' hmm' => ?_⟩⟩⟩⟩
     have hval : f m = f m' := congrArg Subtype.val hmm'
     refine Subtype.ext (h3 m.1 m'.1 (f m) (hf1 m) ?_)

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.Problems.Machine.Walk
 import DescriptiveComplexity.Problems.Machine.Program
@@ -109,56 +110,43 @@ abbrev dInpSym : tmOrd.Relations 2 := Sum.inl tmInp
 variable {α : Type}
 
 /-- `x` is a position, as a guard. -/
-noncomputable def posnG (x : α) : tmOrd.Formula α :=
-  Relations.formula₁ dPosnSym (Term.var x)
+noncomputable def posnG (x : α) : tmOrd.Formula α := fo%[x] dPosnSym(x)
 
 /-- `x` is a transition, as a guard. -/
-noncomputable def trG (x : α) : tmOrd.Formula α :=
-  Relations.formula₁ dTrSym (Term.var x)
+noncomputable def trG (x : α) : tmOrd.Formula α := fo%[x] dTrSym(x)
 
 /-- `x` is a start state, as a guard. -/
-noncomputable def startG (x : α) : tmOrd.Formula α :=
-  Relations.formula₁ dStartSym (Term.var x)
+noncomputable def startG (x : α) : tmOrd.Formula α := fo%[x] dStartSym(x)
 
 /-- `x` is an accepting state, as a guard. -/
-noncomputable def accG (x : α) : tmOrd.Formula α :=
-  Relations.formula₁ dAccSym (Term.var x)
+noncomputable def accG (x : α) : tmOrd.Formula α := fo%[x] dAccSym(x)
 
 /-- `x` is the blank symbol, as a guard. -/
-noncomputable def blankG (x : α) : tmOrd.Formula α :=
-  Relations.formula₁ dBlankSym (Term.var x)
+noncomputable def blankG (x : α) : tmOrd.Formula α := fo%[x] dBlankSym(x)
 
 /-- The transition `x` moves the head right, as a guard. -/
-noncomputable def rightG (x : α) : tmOrd.Formula α :=
-  Relations.formula₁ dRightSym (Term.var x)
+noncomputable def rightG (x : α) : tmOrd.Formula α := fo%[x] dRightSym(x)
 
 /-- `x ≤ y` in the machine's own order, as a guard. -/
-noncomputable def leG (x y : α) : tmOrd.Formula α :=
-  Relations.formula₂ dLeSym (Term.var x) (Term.var y)
+noncomputable def leG (x y : α) : tmOrd.Formula α := fo%[x, y] dLeSym(x, y)
 
 /-- The transition `x` applies in the state `y`, as a guard. -/
-noncomputable def srcG (x y : α) : tmOrd.Formula α :=
-  Relations.formula₂ dSrcSym (Term.var x) (Term.var y)
+noncomputable def srcG (x y : α) : tmOrd.Formula α := fo%[x, y] dSrcSym(x, y)
 
 /-- The transition `x` reads the symbol `y`, as a guard. -/
-noncomputable def readG (x y : α) : tmOrd.Formula α :=
-  Relations.formula₂ dReadSym (Term.var x) (Term.var y)
+noncomputable def readG (x y : α) : tmOrd.Formula α := fo%[x, y] dReadSym(x, y)
 
 /-- The transition `x` moves to the state `y`, as a guard. -/
-noncomputable def dstG (x y : α) : tmOrd.Formula α :=
-  Relations.formula₂ dDstSym (Term.var x) (Term.var y)
+noncomputable def dstG (x y : α) : tmOrd.Formula α := fo%[x, y] dDstSym(x, y)
 
 /-- The transition `x` writes the symbol `y`, as a guard. -/
-noncomputable def writeG (x y : α) : tmOrd.Formula α :=
-  Relations.formula₂ dWriteSym (Term.var x) (Term.var y)
+noncomputable def writeG (x y : α) : tmOrd.Formula α := fo%[x, y] dWriteSym(x, y)
 
 /-- The cell `x` initially holds the symbol `y`, as a guard. -/
-noncomputable def inpG (x y : α) : tmOrd.Formula α :=
-  Relations.formula₂ dInpSym (Term.var x) (Term.var y)
+noncomputable def inpG (x y : α) : tmOrd.Formula α := fo%[x, y] dInpSym(x, y)
 
 /-- `x = y`, as a guard. -/
-noncomputable def eqG (x y : α) : tmOrd.Formula α :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def eqG (x y : α) : tmOrd.Formula α := fo%[x, y] x ≐ y
 
 /-- `x ≠ y`, as a guard. -/
 noncomputable def neG (x y : α) : tmOrd.Formula α :=
@@ -166,35 +154,31 @@ noncomputable def neG (x y : α) : tmOrd.Formula α :=
 
 /-- `x` is the lowest position, as a guard. -/
 noncomputable def minPosG (x : α) : tmOrd.Formula α :=
-  posnG x ⊓ Formula.iAlls (Fin 1)
-    (posnG (Sum.inr 0) ⟹ leG (Sum.inl x) (Sum.inr 0))
+  fo%[x] posnG⟨x⟩ ∧ ∀ y, posnG⟨y⟩ → leG⟨x, y⟩
 
 /-- `y` is the position immediately above `x`, as a guard. -/
 noncomputable def succPosG (x y : α) : tmOrd.Formula α :=
-  posnG x ⊓ posnG y ⊓ leG x y ⊓ neG x y ⊓
-    Formula.iAlls (Fin 1)
-      ((posnG (Sum.inr 0) ⊓ leG (Sum.inl x) (Sum.inr 0) ⊓ leG (Sum.inr 0) (Sum.inl y)) ⟹
-        (eqG (Sum.inr 0) (Sum.inl x) ⊔ eqG (Sum.inr 0) (Sum.inl y)))
+  fo%[x, y] (((posnG⟨x⟩ ∧ posnG⟨y⟩) ∧ leG⟨x, y⟩) ∧ neG⟨x, y⟩) ∧
+    ∀ z, (posnG⟨z⟩ ∧ leG⟨x, z⟩) ∧ leG⟨z, y⟩ → eqG⟨z, x⟩ ∨ eqG⟨z, y⟩
 
 /-- The cell `x` initially holds the symbol `y`: the input where defined, the
 blank elsewhere. -/
 noncomputable def initTapeG (x y : α) : tmOrd.Formula α :=
-  inpG x y ⊔ (Formula.iAlls (Fin 1) (∼(inpG (Sum.inl x) (Sum.inr 0))) ⊓ blankG y)
+  fo%[x, y] inpG⟨x, y⟩ ∨ (∀ z, ¬ inpG⟨x, z⟩) ∧ blankG⟨y⟩
 
 /-- The transition `x` has a destination, as a guard. -/
 noncomputable def existsDstG (x : α) : tmOrd.Formula α :=
-  Formula.iExs (Fin 1) (dstG (Sum.inl x) (Sum.inr 0))
+  fo%[x] ∃ y, dstG⟨x, y⟩
 
 /-- The transition `x` has a written symbol, as a guard. -/
 noncomputable def existsWriteG (x : α) : tmOrd.Formula α :=
-  Formula.iExs (Fin 1) (writeG (Sum.inl x) (Sum.inr 0))
+  fo%[x] ∃ y, writeG⟨x, y⟩
 
 /-- The transition `x`, with the head at `h`, can move: there is a neighbor
 in its direction. Without this in every step rule the fixed point would run
 past a halt. -/
 noncomputable def canMoveG (x h : α) : tmOrd.Formula α :=
-  (rightG x ⊓ Formula.iExs (Fin 1) (succPosG (Sum.inl h) (Sum.inr 0))) ⊔
-    (∼(rightG x) ⊓ Formula.iExs (Fin 1) (succPosG (Sum.inr 0) (Sum.inl h)))
+  fo%[x, h] (rightG⟨x⟩ ∧ ∃ y, succPosG⟨h, y⟩) ∨ (¬ rightG⟨x⟩ ∧ ∃ y, succPosG⟨y, h⟩)
 
 end Guards
 
@@ -335,67 +319,53 @@ section Promises
 
 /-- Reflexivity of the machine's order. -/
 noncomputable def linReflS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 1) (leG (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ a, leG⟨a, a⟩
 
 /-- Transitivity of the machine's order. -/
 noncomputable def linTransS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((leG (Sum.inr 0) (Sum.inr 1) ⊓ leG (Sum.inr 1) (Sum.inr 2)) ⟹
-      leG (Sum.inr 0) (Sum.inr 2))
+  fo% ∀ a b c, leG⟨a, b⟩ ∧ leG⟨b, c⟩ → leG⟨a, c⟩
 
 /-- Antisymmetry of the machine's order. -/
 noncomputable def linAntisymmS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((leG (Sum.inr 0) (Sum.inr 1) ⊓ leG (Sum.inr 1) (Sum.inr 0)) ⟹
-      eqG (Sum.inr 0) (Sum.inr 1))
+  fo% ∀ a b, leG⟨a, b⟩ ∧ leG⟨b, a⟩ → eqG⟨a, b⟩
 
 /-- Totality of the machine's order. -/
 noncomputable def linTotalS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 2) (leG (Sum.inr 0) (Sum.inr 1) ⊔ leG (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ a b, leG⟨a, b⟩ ∨ leG⟨b, a⟩
 
 /-- There is a position. -/
 noncomputable def exPosnS : tmOrd.Sentence :=
-  Formula.iExs (Fin 1) (posnG (Sum.inr 0))
+  fo% ∃ p, posnG⟨p⟩
 
 /-- The input is functional. -/
 noncomputable def inpFunS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((inpG (Sum.inr 0) (Sum.inr 1) ⊓ inpG (Sum.inr 0) (Sum.inr 2)) ⟹
-      eqG (Sum.inr 1) (Sum.inr 2))
+  fo% ∀ p a b, inpG⟨p, a⟩ ∧ inpG⟨p, b⟩ → eqG⟨a, b⟩
 
 /-- There is a blank symbol. -/
 noncomputable def exBlankS : tmOrd.Sentence :=
-  Formula.iExs (Fin 1) (blankG (Sum.inr 0))
+  fo% ∃ b, blankG⟨b⟩
 
 /-- The blank symbol is unique. -/
 noncomputable def blankUniqS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((blankG (Sum.inr 0) ⊓ blankG (Sum.inr 1)) ⟹ eqG (Sum.inr 0) (Sum.inr 1))
+  fo% ∀ a b, blankG⟨a⟩ ∧ blankG⟨b⟩ → eqG⟨a, b⟩
 
 /-- The start state is unique. -/
 noncomputable def startUniqS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((startG (Sum.inr 0) ⊓ startG (Sum.inr 1)) ⟹ eqG (Sum.inr 0) (Sum.inr 1))
+  fo% ∀ q q', startG⟨q⟩ ∧ startG⟨q'⟩ → eqG⟨q, q'⟩
 
 /-- At most one transition applies in a given state on a given symbol. -/
 noncomputable def trUniqS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((trG (Sum.inr 0) ⊓ trG (Sum.inr 1) ⊓ srcG (Sum.inr 0) (Sum.inr 2) ⊓
-        srcG (Sum.inr 1) (Sum.inr 2) ⊓ readG (Sum.inr 0) (Sum.inr 3) ⊓
-        readG (Sum.inr 1) (Sum.inr 3)) ⟹
-      eqG (Sum.inr 0) (Sum.inr 1))
+  fo% ∀ τ τ' q a,
+    ((((trG⟨τ⟩ ∧ trG⟨τ'⟩) ∧ srcG⟨τ, q⟩) ∧ srcG⟨τ', q⟩) ∧ readG⟨τ, a⟩) ∧ readG⟨τ', a⟩ →
+      eqG⟨τ, τ'⟩
 
 /-- The destination of a transition is unique. -/
 noncomputable def dstFunS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((dstG (Sum.inr 0) (Sum.inr 1) ⊓ dstG (Sum.inr 0) (Sum.inr 2)) ⟹
-      eqG (Sum.inr 1) (Sum.inr 2))
+  fo% ∀ τ q q', dstG⟨τ, q⟩ ∧ dstG⟨τ, q'⟩ → eqG⟨q, q'⟩
 
 /-- The written symbol of a transition is unique. -/
 noncomputable def writeFunS : tmOrd.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((writeG (Sum.inr 0) (Sum.inr 1) ⊓ writeG (Sum.inr 0) (Sum.inr 2)) ⟹
-      eqG (Sum.inr 1) (Sum.inr 2))
+  fo% ∀ τ a a', writeG⟨τ, a⟩ ∧ writeG⟨τ, a'⟩ → eqG⟨a, a'⟩
 
 /-- Well-formedness, as a sentence. -/
 noncomputable def wfS : tmOrd.Sentence :=

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.Walk
 import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.SecondOrder
@@ -149,125 +150,94 @@ section Builders
 variable {α : Type}
 
 /-- `x` is a position, as a formula. -/
-def tqPosnF (x : α) : tqSOLang.Formula α := Relations.formula₁ tqPosnSym (Term.var x)
+def tqPosnF (x : α) : tqSOLang.Formula α := fo%[x] tqPosnSym(x)
 
 /-- `x` is a transition, as a formula. -/
-def tqTrF (x : α) : tqSOLang.Formula α := Relations.formula₁ tqTrSym (Term.var x)
+def tqTrF (x : α) : tqSOLang.Formula α := fo%[x] tqTrSym(x)
 
 /-- `x` is a start state, as a formula. -/
-def tqStartF (x : α) : tqSOLang.Formula α := Relations.formula₁ tqStartSym (Term.var x)
+def tqStartF (x : α) : tqSOLang.Formula α := fo%[x] tqStartSym(x)
 
 /-- `x` is an accepting state, as a formula. -/
-def tqAccF (x : α) : tqSOLang.Formula α := Relations.formula₁ tqAccSym (Term.var x)
+def tqAccF (x : α) : tqSOLang.Formula α := fo%[x] tqAccSym(x)
 
 /-- `x` is the blank symbol, as a formula. -/
-def tqBlankF (x : α) : tqSOLang.Formula α := Relations.formula₁ tqBlankSym (Term.var x)
+def tqBlankF (x : α) : tqSOLang.Formula α := fo%[x] tqBlankSym(x)
 
 /-- `x` moves the head right, as a formula. -/
-def tqRightF (x : α) : tqSOLang.Formula α := Relations.formula₁ tqRightSym (Term.var x)
+def tqRightF (x : α) : tqSOLang.Formula α := fo%[x] tqRightSym(x)
 
 /-- `x ≤ y`, as a formula. -/
-def tqLeF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqLeSym (Term.var x) (Term.var y)
+def tqLeF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqLeSym(x, y)
 
 /-- `x = y`, as a formula. -/
-def tqEqF (x y : α) : tqSOLang.Formula α := Term.equal (Term.var x) (Term.var y)
+def tqEqF (x y : α) : tqSOLang.Formula α := fo%[x, y] x ≐ y
 
 /-- The transition `x` applies in the state `y`, as a formula. -/
-def tqSrcF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqSrcSym (Term.var x) (Term.var y)
+def tqSrcF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqSrcSym(x, y)
 
 /-- The transition `x` reads the symbol `y`, as a formula. -/
-def tqReadF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqReadSym (Term.var x) (Term.var y)
+def tqReadF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqReadSym(x, y)
 
 /-- The transition `x` moves to the state `y`, as a formula. -/
-def tqDstF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqDstSym (Term.var x) (Term.var y)
+def tqDstF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqDstSym(x, y)
 
 /-- The transition `x` writes the symbol `y`, as a formula. -/
-def tqWriteF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqWriteSym (Term.var x) (Term.var y)
+def tqWriteF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqWriteSym(x, y)
 
 /-- The cell `x` initially holds `y`, as a formula. -/
-def tqInpF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqInpSym (Term.var x) (Term.var y)
+def tqInpF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqInpSym(x, y)
 
 /-- The state at time `x` is `y`, as a formula. -/
-def tqStateF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqStateSym (Term.var x) (Term.var y)
+def tqStateF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqStateSym(x, y)
 
 /-- The head at time `x` is on `y`, as a formula. -/
-def tqHeadF (x y : α) : tqSOLang.Formula α :=
-  Relations.formula₂ tqHeadSym (Term.var x) (Term.var y)
+def tqHeadF (x y : α) : tqSOLang.Formula α := fo%[x, y] tqHeadSym(x, y)
 
 /-- At time `x` the cell `y` holds `z`, as a formula. -/
-def tqTapeF (x y z : α) : tqSOLang.Formula α :=
-  tqTapeSym.formula ![Term.var x, Term.var y, Term.var z]
+def tqTapeF (x y z : α) : tqSOLang.Formula α := fo%[x, y, z] tqTapeSym(x, y, z)
 
 /-- `x` is the lowest position, as a formula. -/
 noncomputable def tqMinPosF (x : α) : tqSOLang.Formula α :=
-  tqPosnF x ⊓ Formula.iAlls (Fin 1)
-    ((tqPosnF (Sum.inr 0)).imp (tqLeF (Sum.inl x) (Sum.inr 0)))
+  fo%[x] tqPosnF⟨x⟩ ∧ ∀ y, tqPosnF⟨y⟩ → tqLeF⟨x, y⟩
 
 /-- `x` is the highest position, as a formula. -/
 noncomputable def tqMaxPosF (x : α) : tqSOLang.Formula α :=
-  tqPosnF x ⊓ Formula.iAlls (Fin 1)
-    ((tqPosnF (Sum.inr 0)).imp (tqLeF (Sum.inr 0) (Sum.inl x)))
+  fo%[x] tqPosnF⟨x⟩ ∧ ∀ y, tqPosnF⟨y⟩ → tqLeF⟨y, x⟩
 
 /-- `y` is the position immediately above `x`, as a formula. -/
 noncomputable def tqSuccPosF (x y : α) : tqSOLang.Formula α :=
-  tqPosnF x ⊓ (tqPosnF y ⊓ (tqLeF x y ⊓ (∼(tqEqF x y) ⊓
-    Formula.iAlls (Fin 1)
-      ((tqPosnF (Sum.inr 0) ⊓ (tqLeF (Sum.inl x) (Sum.inr 0) ⊓
-          tqLeF (Sum.inr 0) (Sum.inl y))).imp
-        (tqEqF (Sum.inr 0) (Sum.inl x) ⊔ tqEqF (Sum.inr 0) (Sum.inl y))))))
+  fo%[x, y] tqPosnF⟨x⟩ ∧ tqPosnF⟨y⟩ ∧ tqLeF⟨x, y⟩ ∧ ¬ tqEqF⟨x, y⟩ ∧
+    ∀ z, tqPosnF⟨z⟩ ∧ tqLeF⟨x, z⟩ ∧ tqLeF⟨z, y⟩ → tqEqF⟨z, x⟩ ∨ tqEqF⟨z, y⟩
 
 /-- The head moves from its cell at `t` to its cell at `t'`, in the direction
 `dir`. -/
 noncomputable def tqMoveF (t t' : α) (dir : Bool) : tqSOLang.Formula α :=
-  Formula.iAlls (Fin 2)
-    ((tqHeadF (Sum.inl t) (Sum.inr 0) ⊓ tqHeadF (Sum.inl t') (Sum.inr 1)).imp
-      (if dir then tqSuccPosF (Sum.inr 0) (Sum.inr 1) else tqSuccPosF (Sum.inr 1) (Sum.inr 0)))
+  fo%[t, t'] ∀ p p', tqHeadF⟨t, p⟩ ∧ tqHeadF⟨t', p'⟩ →
+    if dir then tqSuccPosF⟨p, p'⟩ else tqSuccPosF⟨p', p⟩
 
 /-- **The step body**: the transition `τ` takes the configuration at `t` to the
 one at `t'`. Its seven conjuncts are those of `DescriptiveComplexity.TMData.RelStep`. -/
 noncomputable def tqStepBodyF (t t' τ : α) : tqSOLang.Formula α :=
-  tqTrF τ ⊓
-    (Formula.iAlls (Fin 1)
-        ((tqStateF (Sum.inl t) (Sum.inr 0)).imp (tqSrcF (Sum.inl τ) (Sum.inr 0))) ⊓
-      (Formula.iAlls (Fin 2)
-          ((tqHeadF (Sum.inl t) (Sum.inr 0) ⊓
-              tqTapeF (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).imp
-            (tqReadF (Sum.inl τ) (Sum.inr 1))) ⊓
-        (Formula.iAlls (Fin 1)
-            ((tqStateF (Sum.inl t') (Sum.inr 0)).imp (tqDstF (Sum.inl τ) (Sum.inr 0))) ⊓
-          (Formula.iAlls (Fin 2)
-              ((tqHeadF (Sum.inl t) (Sum.inr 0) ⊓
-                  tqTapeF (Sum.inl t') (Sum.inr 0) (Sum.inr 1)).imp
-                (tqWriteF (Sum.inl τ) (Sum.inr 1))) ⊓
-            (Formula.iAlls (Fin 2)
-                ((∼(tqHeadF (Sum.inl t) (Sum.inr 0))).imp
-                  ((tqTapeF (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).iff
-                    (tqTapeF (Sum.inl t') (Sum.inr 0) (Sum.inr 1)))) ⊓
-              ((tqRightF τ ⊓ tqMoveF t t' true) ⊔
-                (∼(tqRightF τ) ⊓ tqMoveF t t' false)))))))
+  fo%[t, t', τ] tqTrF⟨τ⟩ ∧
+    (∀ q, tqStateF⟨t, q⟩ → tqSrcF⟨τ, q⟩) ∧
+    (∀ p a, tqHeadF⟨t, p⟩ ∧ tqTapeF⟨t, p, a⟩ → tqReadF⟨τ, a⟩) ∧
+    (∀ q, tqStateF⟨t', q⟩ → tqDstF⟨τ, q⟩) ∧
+    (∀ p a, tqHeadF⟨t, p⟩ ∧ tqTapeF⟨t', p, a⟩ → tqWriteF⟨τ, a⟩) ∧
+    (∀ p a, ¬ tqHeadF⟨t, p⟩ → (tqTapeF⟨t, p, a⟩ ↔ tqTapeF⟨t', p, a⟩)) ∧
+    ((tqRightF⟨τ⟩ ∧ !(tqMoveF t t' true)) ∨ (¬ tqRightF⟨τ⟩ ∧ !(tqMoveF t t' false)))
 
 /-- **The stutter body**: an accepting configuration repeated. -/
 noncomputable def tqStutterBodyF (t t' : α) : tqSOLang.Formula α :=
-  Formula.iAlls (Fin 1) ((tqStateF (Sum.inl t) (Sum.inr 0)).imp (tqAccF (Sum.inr 0))) ⊓
-    (Formula.iAlls (Fin 1)
-        ((tqStateF (Sum.inl t') (Sum.inr 0)).iff (tqStateF (Sum.inl t) (Sum.inr 0))) ⊓
-      (Formula.iAlls (Fin 1)
-          ((tqHeadF (Sum.inl t') (Sum.inr 0)).iff (tqHeadF (Sum.inl t) (Sum.inr 0))) ⊓
-        Formula.iAlls (Fin 2)
-          ((tqTapeF (Sum.inl t') (Sum.inr 0) (Sum.inr 1)).iff
-            (tqTapeF (Sum.inl t) (Sum.inr 0) (Sum.inr 1)))))
+  fo%[t, t'] (∀ q, tqStateF⟨t, q⟩ → tqAccF⟨q⟩) ∧
+    (∀ q, tqStateF⟨t', q⟩ ↔ tqStateF⟨t, q⟩) ∧
+    (∀ p, tqHeadF⟨t', p⟩ ↔ tqHeadF⟨t, p⟩) ∧
+    ∀ p a, tqTapeF⟨t', p, a⟩ ↔ tqTapeF⟨t, p, a⟩
 
 /-- The cell `x` may initially hold `y`: the input where it is defined, the
 blank elsewhere. -/
 noncomputable def tqInitTapeF (x y : α) : tqSOLang.Formula α :=
-  tqInpF x y ⊔ (Formula.iAlls (Fin 1) (∼(tqInpF (Sum.inl x) (Sum.inr 0))) ⊓ tqBlankF y)
+  fo%[x, y] tqInpF⟨x, y⟩ ∨ (∀ z, ¬ tqInpF⟨x, z⟩) ∧ tqBlankF⟨y⟩
 
 end Builders
 
@@ -464,100 +434,74 @@ section Clauses
 
 /-- There is a state at each time. -/
 noncomputable def tqStateExClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (Formula.iExs (Fin 1) (tqStateF (Sum.inl (Sum.inr 0)) (Sum.inr 0)))
+  fo% ∀ t, ∃ q, tqStateF⟨t, q⟩
 
 /-- There is only one state at each time. -/
 noncomputable def tqStateUniqClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((tqStateF (Sum.inr 0) (Sum.inr 1) ⊓ tqStateF (Sum.inr 0) (Sum.inr 2)).imp
-      (tqEqF (Sum.inr 1) (Sum.inr 2)))
+  fo% ∀ t q q', tqStateF⟨t, q⟩ ∧ tqStateF⟨t, q'⟩ → tqEqF⟨q, q'⟩
 
 /-- The head is somewhere at each time. -/
 noncomputable def tqHeadExClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (Formula.iExs (Fin 1) (tqHeadF (Sum.inl (Sum.inr 0)) (Sum.inr 0)))
+  fo% ∀ t, ∃ p, tqHeadF⟨t, p⟩
 
 /-- The head is in only one place at each time. -/
 noncomputable def tqHeadUniqClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((tqHeadF (Sum.inr 0) (Sum.inr 1) ⊓ tqHeadF (Sum.inr 0) (Sum.inr 2)).imp
-      (tqEqF (Sum.inr 1) (Sum.inr 2)))
+  fo% ∀ t p p', tqHeadF⟨t, p⟩ ∧ tqHeadF⟨t, p'⟩ → tqEqF⟨p, p'⟩
 
 /-- Every cell holds a symbol at each time. -/
 noncomputable def tqTapeExClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    (Formula.iExs (Fin 1)
-      (tqTapeF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1)) (Sum.inr 0)))
+  fo% ∀ t p, ∃ a, tqTapeF⟨t, p, a⟩
 
 /-- Every cell holds only one symbol at each time. -/
 noncomputable def tqTapeUniqClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((tqTapeF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2) ⊓
-        tqTapeF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3)).imp
-      (tqEqF (Sum.inr 2) (Sum.inr 3)))
+  fo% ∀ t p a a', tqTapeF⟨t, p, a⟩ ∧ tqTapeF⟨t, p, a'⟩ → tqEqF⟨a, a'⟩
 
 /-- Consecutive times are related by a step or by an accepting stutter. -/
 noncomputable def tqStepClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((tqSuccPosF (Sum.inr 0) (Sum.inr 1)).imp
-      (Formula.iExs (Fin 1)
-          (tqStepBodyF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1)) (Sum.inr 0)) ⊔
-        tqStutterBodyF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ t t', tqSuccPosF⟨t, t'⟩ → (∃ τ, tqStepBodyF⟨t, t', τ⟩) ∨ tqStutterBodyF⟨t, t'⟩
 
 /-- At the lowest time the configuration is initial. -/
 noncomputable def tqInitClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((tqMinPosF (Sum.inr 0)).imp
-      (Formula.iAlls (Fin 1)
-          ((tqStateF (Sum.inl (Sum.inr 0)) (Sum.inr 0)).imp (tqStartF (Sum.inr 0))) ⊓
-        (Formula.iAlls (Fin 1)
-            ((tqHeadF (Sum.inl (Sum.inr 0)) (Sum.inr 0)).imp (tqMinPosF (Sum.inr 0))) ⊓
-          Formula.iAlls (Fin 2)
-            ((tqTapeF (Sum.inl (Sum.inr 0)) (Sum.inr 0) (Sum.inr 1)).imp
-              (tqInitTapeF (Sum.inr 0) (Sum.inr 1))))))
+  fo% ∀ t, tqMinPosF⟨t⟩ →
+    (∀ q, tqStateF⟨t, q⟩ → tqStartF⟨q⟩) ∧
+    (∀ p, tqHeadF⟨t, p⟩ → tqMinPosF⟨p⟩) ∧
+    ∀ p a, tqTapeF⟨t, p, a⟩ → tqInitTapeF⟨p, a⟩
 
 /-- The order is reflexive. -/
 noncomputable def tqReflClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (tqLeF (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ a, tqLeF⟨a, a⟩
 
 /-- The order is transitive. -/
 noncomputable def tqTransClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((tqLeF (Sum.inr 0) (Sum.inr 1) ⊓ tqLeF (Sum.inr 1) (Sum.inr 2)).imp
-      (tqLeF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ a b c, tqLeF⟨a, b⟩ ∧ tqLeF⟨b, c⟩ → tqLeF⟨a, c⟩
 
 /-- The order is antisymmetric. -/
 noncomputable def tqAntisymClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((tqLeF (Sum.inr 0) (Sum.inr 1) ⊓ tqLeF (Sum.inr 1) (Sum.inr 0)).imp
-      (tqEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ a b, tqLeF⟨a, b⟩ ∧ tqLeF⟨b, a⟩ → tqEqF⟨a, b⟩
 
 /-- The order is total. -/
 noncomputable def tqTotalClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 2) (tqLeF (Sum.inr 0) (Sum.inr 1) ⊔ tqLeF (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ a b, tqLeF⟨a, b⟩ ∨ tqLeF⟨b, a⟩
 
 /-- There is a position. -/
 noncomputable def tqPosnExClause : tqSOLang.Sentence :=
-  Formula.iExs (Fin 1) (tqPosnF (Sum.inr 0))
+  fo% ∃ p, tqPosnF⟨p⟩
 
 /-- The input is functional. -/
 noncomputable def tqInpFunClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((tqInpF (Sum.inr 0) (Sum.inr 1) ⊓ tqInpF (Sum.inr 0) (Sum.inr 2)).imp
-      (tqEqF (Sum.inr 1) (Sum.inr 2)))
+  fo% ∀ p a b, tqInpF⟨p, a⟩ ∧ tqInpF⟨p, b⟩ → tqEqF⟨a, b⟩
 
 /-- There is a blank symbol. -/
 noncomputable def tqBlankExClause : tqSOLang.Sentence :=
-  Formula.iExs (Fin 1) (tqBlankF (Sum.inr 0))
+  fo% ∃ b, tqBlankF⟨b⟩
 
 /-- There is only one blank symbol. -/
 noncomputable def tqBlankUniqClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((tqBlankF (Sum.inr 0) ⊓ tqBlankF (Sum.inr 1)).imp (tqEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ a b, tqBlankF⟨a⟩ ∧ tqBlankF⟨b⟩ → tqEqF⟨a, b⟩
 
 /-- At the highest time the state is accepting. -/
 noncomputable def tqAccClause : tqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    (((tqMaxPosF (Sum.inr 0)) ⊓ tqStateF (Sum.inr 0) (Sum.inr 1)).imp (tqAccF (Sum.inr 1)))
+  fo% ∀ t q, tqMaxPosF⟨t⟩ ∧ tqStateF⟨t, q⟩ → tqAccF⟨q⟩
 
 /-- **The kernel**: well-formedness of the instance, then that the guess is a
 run – the six functionality clauses, the initial clause, the step clause and

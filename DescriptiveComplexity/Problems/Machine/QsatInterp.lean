@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.QsatRun
 import DescriptiveComplexity.Problems.Machine.Defs
 
@@ -70,65 +71,57 @@ section Builders
 variable {α : Type}
 
 /-- `x` is a quantified variable. -/
-def vF (x : α) : qsatOrd.Formula α := Relations.formula₁ isVarSym (Term.var x)
+def vF (x : α) : qsatOrd.Formula α := fo%[x] isVarSym(x)
 
 /-- `x` is universally quantified. -/
-def aF (x : α) : qsatOrd.Formula α := Relations.formula₁ allVarSym (Term.var x)
+def aF (x : α) : qsatOrd.Formula α := fo%[x] allVarSym(x)
 
 /-- `x` is quantified outside `y`. -/
-def precF (x y : α) : qsatOrd.Formula α :=
-  Relations.formula₂ precSym (Term.var x) (Term.var y)
+def precF (x y : α) : qsatOrd.Formula α := fo%[x, y] precSym(x, y)
 
 /-- `x` is a clause. -/
-def clF (x : α) : qsatOrd.Formula α := Relations.formula₁ isClSym (Term.var x)
+def clF (x : α) : qsatOrd.Formula α := fo%[x] isClSym(x)
 
 /-- `x` occurs positively in `c`. -/
-def posF (c x : α) : qsatOrd.Formula α :=
-  Relations.formula₂ posInSym (Term.var c) (Term.var x)
+def posF (c x : α) : qsatOrd.Formula α := fo%[c, x] posInSym(c, x)
 
 /-- `x` occurs negatively in `c`. -/
-def negF (c x : α) : qsatOrd.Formula α :=
-  Relations.formula₂ negInSym (Term.var c) (Term.var x)
+def negF (c x : α) : qsatOrd.Formula α := fo%[c, x] negInSym(c, x)
 
 /-- `x ≤ y` in the ambient order. -/
-def ordF (x y : α) : qsatOrd.Formula α :=
-  Relations.formula₂ ordSym (Term.var x) (Term.var y)
+def ordF (x y : α) : qsatOrd.Formula α := fo%[x, y] ordSym(x, y)
 
 /-- `x = y`. -/
-def eqF (x y : α) : qsatOrd.Formula α := Term.equal (Term.var x) (Term.var y)
+def eqF (x y : α) : qsatOrd.Formula α := fo%[x, y] x ≐ y
 
 /-- `x < y` in the ambient order. -/
 def ordLtF (x y : α) : qsatOrd.Formula α := ordF x y ⊓ ∼(eqF x y)
 
 /-- `x` is the least element of the ambient order. -/
 noncomputable def minF (x : α) : qsatOrd.Formula α :=
-  Formula.iAlls (Fin 1) (ordF (Sum.inl x) (Sum.inr 0))
+  fo%[x] ∀ y, ordF⟨x, y⟩
 
 /-- The tape order on elements: quantified variables first in prefix order,
 everything else after them in the ambient order. -/
 def pLeF (x y : α) : qsatOrd.Formula α :=
-  (vF x ⊓ (vF y ⊓ (eqF x y ⊔ precF x y))) ⊔
-    ((vF x ⊓ ∼(vF y)) ⊔ (∼(vF x) ⊓ (∼(vF y) ⊓ ordF x y)))
+  fo%[x, y] (vF⟨x⟩ ∧ vF⟨y⟩ ∧ (eqF⟨x, y⟩ ∨ precF⟨x, y⟩)) ∨
+    (vF⟨x⟩ ∧ ¬ vF⟨y⟩) ∨ (¬ vF⟨x⟩ ∧ ¬ vF⟨y⟩ ∧ ordF⟨x, y⟩)
 
 /-- `c` is the lowest clause. -/
 noncomputable def minClF (c : α) : qsatOrd.Formula α :=
-  clF c ⊓ Formula.iAlls (Fin 1)
-    ((clF (Sum.inr 0)).imp (ordF (Sum.inl c) (Sum.inr 0)))
+  fo%[c] clF⟨c⟩ ∧ ∀ d, clF⟨d⟩ → ordF⟨c, d⟩
 
 /-- `c` is the highest clause. -/
 noncomputable def maxClF (c : α) : qsatOrd.Formula α :=
-  clF c ⊓ Formula.iAlls (Fin 1)
-    ((clF (Sum.inr 0)).imp (ordF (Sum.inr 0) (Sum.inl c)))
+  fo%[c] clF⟨c⟩ ∧ ∀ d, clF⟨d⟩ → ordF⟨d, c⟩
 
 /-- `c'` is the clause immediately above `c`. -/
 noncomputable def nextClF (c c' : α) : qsatOrd.Formula α :=
-  clF c ⊓ (clF c' ⊓ (ordLtF c c' ⊓ Formula.iAlls (Fin 1)
-    ((clF (Sum.inr 0)).imp
-      ((ordLtF (Sum.inl c) (Sum.inr 0)).imp (ordF (Sum.inl c') (Sum.inr 0))))))
+  fo%[c, c'] clF⟨c⟩ ∧ clF⟨c'⟩ ∧ ordLtF⟨c, c'⟩ ∧ ∀ d, clF⟨d⟩ → ordLtF⟨c, d⟩ → ordF⟨c', d⟩
 
 /-- There is no clause at all. -/
 noncomputable def noClF : qsatOrd.Formula α :=
-  Formula.iAlls (Fin 1) (∼(clF (Sum.inr 0)))
+  fo% ∀ c, ¬ clF⟨c⟩
 
 /-- The cell of `x`, holding the value `b`, satisfies the clause `c`. -/
 def litF (b : Bool) (c x : α) : qsatOrd.Formula α :=
@@ -140,15 +133,9 @@ def shortF (v : Bool) (x : α) : qsatOrd.Formula α := if v then ∼(aF x) else 
 /-- Well-formedness of the instance, as a sentence with unused free
 variables. -/
 noncomputable def wfF : qsatOrd.Formula α :=
-  Formula.iAlls (Fin 3)
-    (((precF (Sum.inr 0) (Sum.inr 1)).imp
-        (vF (Sum.inr 0) ⊓ vF (Sum.inr 1))) ⊓
-      ((∼(precF (Sum.inr 0) (Sum.inr 0))) ⊓
-        (((precF (Sum.inr 0) (Sum.inr 1)).imp
-            ((precF (Sum.inr 1) (Sum.inr 2)).imp (precF (Sum.inr 0) (Sum.inr 2)))) ⊓
-          ((vF (Sum.inr 0)).imp ((vF (Sum.inr 1)).imp
-            ((∼(eqF (Sum.inr 0) (Sum.inr 1))).imp
-              (precF (Sum.inr 0) (Sum.inr 1) ⊔ precF (Sum.inr 1) (Sum.inr 0))))))))
+  fo% ∀ x y z, (precF⟨x, y⟩ → vF⟨x⟩ ∧ vF⟨y⟩) ∧ ¬ precF⟨x, x⟩ ∧
+    (precF⟨x, y⟩ → precF⟨y, z⟩ → precF⟨x, z⟩) ∧
+    (vF⟨x⟩ → vF⟨y⟩ → ¬ eqF⟨x, y⟩ → precF⟨x, y⟩ ∨ precF⟨y, x⟩)
 
 end Builders
 

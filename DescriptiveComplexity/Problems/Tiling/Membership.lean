@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Tiling.Defs
 import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.Hierarchy
@@ -102,56 +103,43 @@ section Atoms
 variable {γ : Type}
 
 /-- `x` is a position. -/
-noncomputable def tlPosnF (x : γ) : tileSOLang.Formula γ :=
-  Relations.formula₁ tsPosn (Term.var x)
+noncomputable def tlPosnF (x : γ) : tileSOLang.Formula γ := fo%[x] tsPosn(x)
 
 /-- `t` is a tile. -/
-noncomputable def tlTileF (t : γ) : tileSOLang.Formula γ :=
-  Relations.formula₁ tsTile (Term.var t)
+noncomputable def tlTileF (t : γ) : tileSOLang.Formula γ := fo%[t] tsTile(t)
 
 /-- `t` is an accepting tile. -/
-noncomputable def tlAccF (t : γ) : tileSOLang.Formula γ :=
-  Relations.formula₁ tsAcc (Term.var t)
+noncomputable def tlAccF (t : γ) : tileSOLang.Formula γ := fo%[t] tsAcc(t)
 
 /-- `x` is at most `y`. -/
-noncomputable def tlLeF (x y : γ) : tileSOLang.Formula γ :=
-  Relations.formula₂ tsLe (Term.var x) (Term.var y)
+noncomputable def tlLeF (x y : γ) : tileSOLang.Formula γ := fo%[x, y] tsLe(x, y)
 
 /-- `t'` may stand immediately to the right of `t`. -/
-noncomputable def tlHorizF (t t' : γ) : tileSOLang.Formula γ :=
-  Relations.formula₂ tsHoriz (Term.var t) (Term.var t')
+noncomputable def tlHorizF (t t' : γ) : tileSOLang.Formula γ := fo%[t, t'] tsHoriz(t, t')
 
 /-- `t'` may stand immediately above `t`. -/
-noncomputable def tlVertF (t t' : γ) : tileSOLang.Formula γ :=
-  Relations.formula₂ tsVert (Term.var t) (Term.var t')
+noncomputable def tlVertF (t t' : γ) : tileSOLang.Formula γ := fo%[t, t'] tsVert(t, t')
 
 /-- The bottom row's cell in column `x` may carry `t`. -/
-noncomputable def tlFirstF (x t : γ) : tileSOLang.Formula γ :=
-  Relations.formula₂ tsFirst (Term.var x) (Term.var t)
+noncomputable def tlFirstF (x t : γ) : tileSOLang.Formula γ := fo%[x, t] tsFirst(x, t)
 
 /-- `t` is a base tile. -/
-noncomputable def tlBaseF (t : γ) : tileSOLang.Formula γ :=
-  Relations.formula₁ tsBase (Term.var t)
+noncomputable def tlBaseF (t : γ) : tileSOLang.Formula γ := fo%[t] tsBase(t)
 
 /-- `t` is a start tile. -/
-noncomputable def tlStartF (t : γ) : tileSOLang.Formula γ :=
-  Relations.formula₁ tsStart (Term.var t)
+noncomputable def tlStartF (t : γ) : tileSOLang.Formula γ := fo%[t] tsStart(t)
 
 /-- `t` may stand in the leftmost column. -/
-noncomputable def tlEdgeLF (t : γ) : tileSOLang.Formula γ :=
-  Relations.formula₁ tsEdgeL (Term.var t)
+noncomputable def tlEdgeLF (t : γ) : tileSOLang.Formula γ := fo%[t] tsEdgeL(t)
 
 /-- `t` may stand in the rightmost column. -/
-noncomputable def tlEdgeRF (t : γ) : tileSOLang.Formula γ :=
-  Relations.formula₁ tsEdgeR (Term.var t)
+noncomputable def tlEdgeRF (t : γ) : tileSOLang.Formula γ := fo%[t] tsEdgeR(t)
 
 /-- The cell in column `x` and row `y` carries the tile `t`. -/
-noncomputable def tlRelF (x y t : γ) : tileSOLang.Formula γ :=
-  Relations.formula tsRel ![Term.var x, Term.var y, Term.var t]
+noncomputable def tlRelF (x y t : γ) : tileSOLang.Formula γ := fo%[x, y, t] tsRel(x, y, t)
 
 /-- `x` and `y` are the same element. -/
-noncomputable def tlEqF (x y : γ) : tileSOLang.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def tlEqF (x y : γ) : tileSOLang.Formula γ := fo%[x, y] x ≐ y
 
 end Atoms
 
@@ -288,18 +276,16 @@ variable {γ : Type}
 
 /-- `y` is the least position. -/
 noncomputable def tlMinPosF (y : γ) : tileSOLang.Formula γ :=
-  tlPosnF y ⊓ Formula.iAlls (Fin 1) (tlPosnF (Sum.inr 0) ⟹ tlLeF (Sum.inl y) (Sum.inr 0))
+  fo%[y] tlPosnF⟨y⟩ ∧ ∀ z, tlPosnF⟨z⟩ → tlLeF⟨y, z⟩
 
 /-- `y` is the greatest position. -/
 noncomputable def tlMaxPosF (y : γ) : tileSOLang.Formula γ :=
-  tlPosnF y ⊓ Formula.iAlls (Fin 1) (tlPosnF (Sum.inr 0) ⟹ tlLeF (Sum.inr 0) (Sum.inl y))
+  fo%[y] tlPosnF⟨y⟩ ∧ ∀ z, tlPosnF⟨z⟩ → tlLeF⟨z, y⟩
 
 /-- `x'` is the position immediately above `x`. -/
 noncomputable def tlSuccPosF (x x' : γ) : tileSOLang.Formula γ :=
-  tlPosnF x ⊓ (tlPosnF x' ⊓ (tlLeF x x' ⊓ (∼(tlEqF x x') ⊓
-    Formula.iAlls (Fin 1)
-      ((tlPosnF (Sum.inr 0) ⊓ (tlLeF (Sum.inl x) (Sum.inr 0) ⊓ tlLeF (Sum.inr 0) (Sum.inl x'))) ⟹
-        (tlEqF (Sum.inr 0) (Sum.inl x) ⊔ tlEqF (Sum.inr 0) (Sum.inl x'))))))
+  fo%[x, x'] tlPosnF⟨x⟩ ∧ tlPosnF⟨x'⟩ ∧ tlLeF⟨x, x'⟩ ∧ ¬ tlEqF⟨x, x'⟩ ∧
+    ∀ z, tlPosnF⟨z⟩ ∧ tlLeF⟨x, z⟩ ∧ tlLeF⟨z, x'⟩ → tlEqF⟨z, x⟩ ∨ tlEqF⟨z, x'⟩
 
 variable {A : Type} [Language.tiling.Structure A] (ρ : tileGuessBlock.Assignment A) {v : γ → A}
 
@@ -345,71 +331,46 @@ section Clauses
 /-- The order is linear and there is a position: the well-formedness the
 yes-instances fold in. -/
 noncomputable def tileWfC : tileSOLang.Sentence :=
-  (Formula.iAlls (Fin 1) (tlLeF (Sum.inr 0) (Sum.inr 0)) ⊓
-      (Formula.iAlls (Fin 3)
-          ((tlLeF (Sum.inr 0) (Sum.inr 1) ⊓ tlLeF (Sum.inr 1) (Sum.inr 2)) ⟹
-            tlLeF (Sum.inr 0) (Sum.inr 2)) ⊓
-        (Formula.iAlls (Fin 2)
-            ((tlLeF (Sum.inr 0) (Sum.inr 1) ⊓ tlLeF (Sum.inr 1) (Sum.inr 0)) ⟹
-              tlEqF (Sum.inr 0) (Sum.inr 1)) ⊓
-          Formula.iAlls (Fin 2) (tlLeF (Sum.inr 0) (Sum.inr 1) ⊔ tlLeF (Sum.inr 1) (Sum.inr 0))))) ⊓
-    Formula.iExs (Fin 1) (tlPosnF (Sum.inr 0))
+  fo% ((∀ x, tlLeF⟨x, x⟩) ∧ (∀ x y z, tlLeF⟨x, y⟩ ∧ tlLeF⟨y, z⟩ → tlLeF⟨x, z⟩) ∧
+      (∀ x y, tlLeF⟨x, y⟩ ∧ tlLeF⟨y, x⟩ → tlEqF⟨x, y⟩) ∧ ∀ x y, tlLeF⟨x, y⟩ ∨ tlLeF⟨y, x⟩) ∧
+    ∃ x, tlPosnF⟨x⟩
 
 /-- Every cell of the grid carries a tile of the instance. -/
 noncomputable def tileTotalC : tileSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((tlPosnF (Sum.inr 0) ⊓ tlPosnF (Sum.inr 1)) ⟹
-      Formula.iExs (Fin 1)
-        (tlRelF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1)) (Sum.inr 0) ⊓ tlTileF (Sum.inr 0)))
+  fo% ∀ x y, tlPosnF⟨x⟩ ∧ tlPosnF⟨y⟩ → ∃ t, tlRelF⟨x, y, t⟩ ∧ tlTileF⟨t⟩
 
 /-- A cell carries at most one tile. -/
 noncomputable def tileFuncC : tileSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2) ⊓ tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3)) ⟹
-      tlEqF (Sum.inr 2) (Sum.inr 3))
+  fo% ∀ x y t t', tlRelF⟨x, y, t⟩ ∧ tlRelF⟨x, y, t'⟩ → tlEqF⟨t, t'⟩
 
 /-- The bottom row is one the description allows: the tiles it names in that
 column, or a base tile where it names none. -/
 noncomputable def tileFirstC : tileSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((tlPosnF (Sum.inr 0) ⊓ (tlMinPosF (Sum.inr 1) ⊓ tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))) ⟹
-      ((tlMinPosF (Sum.inr 0) ⟹ tlStartF (Sum.inr 2)) ⊓
-        (∼(tlMinPosF (Sum.inr 0)) ⟹
-          (tlFirstF (Sum.inr 0) (Sum.inr 2) ⊔
-            (Formula.iAlls (Fin 1) (∼(tlFirstF (Sum.inl (Sum.inr 0)) (Sum.inr 0))) ⊓
-              tlBaseF (Sum.inr 2))))))
+  fo% ∀ x y t, tlPosnF⟨x⟩ ∧ tlMinPosF⟨y⟩ ∧ tlRelF⟨x, y, t⟩ →
+    (tlMinPosF⟨x⟩ → tlStartF⟨t⟩) ∧
+      (¬ tlMinPosF⟨x⟩ → tlFirstF⟨x, t⟩ ∨ (∀ t', ¬ tlFirstF⟨x, t'⟩) ∧ tlBaseF⟨t⟩)
 
 /-- The leftmost column carries tiles allowed there. -/
 noncomputable def tileEdgeLC : tileSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((tlPosnF (Sum.inr 1) ⊓ (tlMinPosF (Sum.inr 0) ⊓
-      tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))) ⟹ tlEdgeLF (Sum.inr 2))
+  fo% ∀ x y t, tlPosnF⟨y⟩ ∧ tlMinPosF⟨x⟩ ∧ tlRelF⟨x, y, t⟩ → tlEdgeLF⟨t⟩
 
 /-- And the rightmost column those allowed there. -/
 noncomputable def tileEdgeRC : tileSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((tlPosnF (Sum.inr 1) ⊓ (tlMaxPosF (Sum.inr 0) ⊓
-      tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))) ⟹ tlEdgeRF (Sum.inr 2))
+  fo% ∀ x y t, tlPosnF⟨y⟩ ∧ tlMaxPosF⟨x⟩ ∧ tlRelF⟨x, y, t⟩ → tlEdgeRF⟨t⟩
 
 /-- Horizontal neighbors are compatible. -/
 noncomputable def tileHorizC : tileSOLang.Sentence :=
-  Formula.iAlls (Fin 5)
-    ((tlSuccPosF (Sum.inr 0) (Sum.inr 1) ⊓ (tlPosnF (Sum.inr 2) ⊓
-      (tlRelF (Sum.inr 0) (Sum.inr 2) (Sum.inr 3) ⊓
-        tlRelF (Sum.inr 1) (Sum.inr 2) (Sum.inr 4)))) ⟹ tlHorizF (Sum.inr 3) (Sum.inr 4))
+  fo% ∀ x x' y t t',
+    tlSuccPosF⟨x, x'⟩ ∧ tlPosnF⟨y⟩ ∧ tlRelF⟨x, y, t⟩ ∧ tlRelF⟨x', y, t'⟩ → tlHorizF⟨t, t'⟩
 
 /-- Vertical neighbors are compatible. -/
 noncomputable def tileVertC : tileSOLang.Sentence :=
-  Formula.iAlls (Fin 5)
-    ((tlPosnF (Sum.inr 0) ⊓ (tlSuccPosF (Sum.inr 1) (Sum.inr 2) ⊓
-      (tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3) ⊓
-        tlRelF (Sum.inr 0) (Sum.inr 2) (Sum.inr 4)))) ⟹ tlVertF (Sum.inr 3) (Sum.inr 4))
+  fo% ∀ x y y' t t',
+    tlPosnF⟨x⟩ ∧ tlSuccPosF⟨y, y'⟩ ∧ tlRelF⟨x, y, t⟩ ∧ tlRelF⟨x, y', t'⟩ → tlVertF⟨t, t'⟩
 
 /-- Some cell of the grid carries an accepting tile. -/
 noncomputable def tileAccC : tileSOLang.Sentence :=
-  Formula.iExs (Fin 3)
-    (tlPosnF (Sum.inr 0) ⊓ (tlPosnF (Sum.inr 1) ⊓
-      (tlRelF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2) ⊓ tlAccF (Sum.inr 2))))
+  fo% ∃ x y t, tlPosnF⟨x⟩ ∧ tlPosnF⟨y⟩ ∧ tlRelF⟨x, y, t⟩ ∧ tlAccF⟨t⟩
 
 /-- **The first-order kernel of the `Σ₁` definition**: the tiling the block
 guesses is a tiling of the square, and the instance is well-formed. -/

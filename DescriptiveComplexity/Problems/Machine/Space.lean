@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.PSpace
 
@@ -61,24 +62,19 @@ variable {L' : Language.{0, 0}} {M : Type} [L'.Structure M] {γ : Type}
 
 /-- The tape is total: every cell holds a symbol. -/
 noncomputable def totalF (t : L'.Relations 2) : L'.Formula γ :=
-  ((Relations.formula₂ t (Term.var (Sum.inl (Sum.inr 0))) (Term.var (Sum.inr 0))).iExs
-    (Fin 1)).iAlls (Fin 1)
+  fo% ∀ p, ∃ a, t(p, a)
 
 /-- The tape is functional: a cell holds at most one symbol. -/
 noncomputable def funcF (t : L'.Relations 2) : L'.Formula γ :=
-  ((Relations.formula₂ t (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    ((Relations.formula₂ t (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2))).imp
-      (Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))))).iAlls (Fin 3)
+  fo% ∀ p a a', t(p, a) → t(p, a') → a ≐ a'
 
 /-- The mark is inhabited. -/
 noncomputable def someF (s : L'.Relations 1) : L'.Formula γ :=
-  (Relations.formula₁ s (Term.var (Sum.inr 0))).iExs (Fin 1)
+  fo% ∃ x, s(x)
 
 /-- The mark holds of at most one element. -/
 noncomputable def uniqF (s : L'.Relations 1) : L'.Formula γ :=
-  ((Relations.formula₁ s (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₁ s (Term.var (Sum.inr 1))).imp
-      (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))))).iAlls (Fin 2)
+  fo% ∀ x y, s(x) → s(y) → x ≐ y
 
 /-- **The assignment is a configuration**: a total functional tape and two
 singleton marks. -/
@@ -138,26 +134,17 @@ theorem realize_cfgF (t : L'.Relations 2) (s h : L'.Relations 1) :
 
 /-- Everything the first mark holds of, the second holds of too. -/
 noncomputable def markImpF (s r : L'.Relations 1) : L'.Formula γ :=
-  ((Relations.formula₁ s (Term.var (Sum.inr 0))).imp
-    (Relations.formula₁ r (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+  fo% ∀ x, s(x) → r(x)
 
 /-- The marked position is a least position. -/
 noncomputable def minPosF (h posn : L'.Relations 1) (le : L'.Relations 2) : L'.Formula γ :=
-  ((Relations.formula₁ h (Term.var (Sum.inr 0))).imp
-    (Relations.formula₁ posn (Term.var (Sum.inr 0)) ⊓
-      ((Relations.formula₁ posn (Term.var (Sum.inr 0))).imp
-          (Relations.formula₂ le (Term.var (Sum.inl (Sum.inr 0)))
-            (Term.var (Sum.inr 0)))).iAlls (Fin 1))).iAlls (Fin 1)
+  fo% ∀ p, h(p) → posn(p) ∧ ∀ q, posn(q) → le(p, q)
 
 /-- The tape is an initial tape: each cell holds its input symbol where the
 input is defined, and the blank elsewhere. -/
 noncomputable def initTapeF (t inp : L'.Relations 2) (blank : L'.Relations 1) :
     L'.Formula γ :=
-  ((Relations.formula₂ t (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    (Relations.formula₂ inp (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊔
-      (Formula.iAlls (Fin 1) (∼(Relations.formula₂ inp (Term.var (Sum.inl (Sum.inr 0)))
-            (Term.var (Sum.inr 0)))) ⊓
-        Relations.formula₁ blank (Term.var (Sum.inr 1))))).iAlls (Fin 2)
+  fo% ∀ p a, t(p, a) → inp(p, a) ∨ (∀ b, ¬ inp(p, b)) ∧ blank(a)
 
 @[simp]
 theorem realize_markImpF (s r : L'.Relations 1) :
@@ -203,69 +190,64 @@ theorem realize_initTapeF (t inp : L'.Relations 2) (blank : L'.Relations 1) :
 /-! #### The conjuncts of the transition sentence -/
 
 /-- The transition has the marked element as its source (or destination). -/
-noncomputable def markArgF (r : L'.Relations 2) (s : L'.Relations 1) (τ : L'.Term γ) :
+noncomputable def markArgF (r : L'.Relations 2) (s : L'.Relations 1) (x : γ) :
     L'.Formula γ :=
   ((Relations.formula₁ s (Term.var (Sum.inr 0))).imp
-    (Relations.formula₂ r (τ.relabel Sum.inl) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+    (Relations.formula₂ r (Term.var (Sum.inl x)) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
 
 /-- The transition reads (or writes) the symbol held by the marked cell. -/
 noncomputable def cellArgF (r : L'.Relations 2) (h : L'.Relations 1) (t : L'.Relations 2)
-    (τ : L'.Term γ) : L'.Formula γ :=
+    (x : γ) : L'.Formula γ :=
   ((Relations.formula₁ h (Term.var (Sum.inr 0))).imp
     ((Relations.formula₂ t (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-      (Relations.formula₂ r (τ.relabel Sum.inl) (Term.var (Sum.inr 1))))).iAlls (Fin 2)
+      (Relations.formula₂ r (Term.var (Sum.inl x)) (Term.var (Sum.inr 1))))).iAlls (Fin 2)
 
 /-- Cells other than the marked one hold the same symbol before and after. -/
 noncomputable def frameF (t t' : L'.Relations 2) (h : L'.Relations 1) : L'.Formula γ :=
-  Formula.iAlls (Fin 2) ((∼(Relations.formula₁ h (Term.var (Sum.inr 0)))).imp
-    (((Relations.formula₂ t' (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-        (Relations.formula₂ t (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))) ⊓
-      ((Relations.formula₂ t (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-        (Relations.formula₂ t' (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))))))
+  fo% ∀ p a, ¬ h(p) → (t'(p, a) → t(p, a)) ∧ (t(p, a) → t'(p, a))
 
 /-- `y` is the position immediately after `x`. -/
-noncomputable def succPosF (le : L'.Relations 2) (posn : L'.Relations 1) (x y : L'.Term γ) :
+noncomputable def succPosF (le : L'.Relations 2) (posn : L'.Relations 1) (x y : γ) :
     L'.Formula γ :=
-  ((Relations.formula₁ posn x ⊓ Relations.formula₁ posn y) ⊓
-      (Relations.formula₂ le x y ⊓ ∼(Term.equal x y))) ⊓
+  ((Relations.formula₁ posn (Term.var x) ⊓ Relations.formula₁ posn (Term.var y)) ⊓
+      (Relations.formula₂ le (Term.var x) (Term.var y) ⊓
+        ∼(Term.equal (Term.var x) (Term.var y)))) ⊓
     ((Relations.formula₁ posn (Term.var (Sum.inr 0))).imp
-      ((Relations.formula₂ le (x.relabel Sum.inl) (Term.var (Sum.inr 0))).imp
-        ((Relations.formula₂ le (Term.var (Sum.inr 0)) (y.relabel Sum.inl)).imp
-          (Term.equal (Term.var (Sum.inr 0)) (x.relabel Sum.inl) ⊔
-            Term.equal (Term.var (Sum.inr 0)) (y.relabel Sum.inl))))).iAlls (Fin 1)
+      ((Relations.formula₂ le (Term.var (Sum.inl x)) (Term.var (Sum.inr 0))).imp
+        ((Relations.formula₂ le (Term.var (Sum.inr 0)) (Term.var (Sum.inl y))).imp
+          (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inl x)) ⊔
+            Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inl y)))))).iAlls (Fin 1)
 
 /-- The head moves to the neighboring position in the direction the transition
 names. -/
 noncomputable def moveF (right h h' posn : L'.Relations 1) (le : L'.Relations 2)
-    (τ : L'.Term γ) : L'.Formula γ :=
-  (Relations.formula₁ right τ ⊓
+    (x : γ) : L'.Formula γ :=
+  (Relations.formula₁ right (Term.var x) ⊓
       ((Relations.formula₁ h (Term.var (Sum.inr 0))).imp
         ((Relations.formula₁ h' (Term.var (Sum.inr 1))).imp
-          (succPosF le posn (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))))).iAlls (Fin 2)) ⊔
-    (∼(Relations.formula₁ right τ) ⊓
+          (succPosF le posn (Sum.inr 0) (Sum.inr 1)))).iAlls (Fin 2)) ⊔
+    (∼(Relations.formula₁ right (Term.var x)) ⊓
       ((Relations.formula₁ h (Term.var (Sum.inr 0))).imp
         ((Relations.formula₁ h' (Term.var (Sum.inr 1))).imp
-          (succPosF le posn (Term.var (Sum.inr 1)) (Term.var (Sum.inr 0))))).iAlls (Fin 2))
+          (succPosF le posn (Sum.inr 1) (Sum.inr 0)))).iAlls (Fin 2))
 
 @[simp]
-theorem realize_markArgF (r : L'.Relations 2) (s : L'.Relations 1) (τ : L'.Term γ) :
-    (markArgF r s τ).Realize v ↔
-      ∀ q : M, RelMap s ![q] → RelMap r ![τ.realize v, q] := by
+theorem realize_markArgF (r : L'.Relations 2) (s : L'.Relations 1) (x : γ) :
+    (markArgF r s x).Realize v ↔
+      ∀ q : M, RelMap s ![q] → RelMap r ![v x, q] := by
   rw [markArgF]
   simp only [Formula.realize_iAlls, Formula.realize_imp, Formula.realize_rel₁,
-    Formula.realize_rel₂, Term.realize_var, Term.realize_relabel, Sum.elim_comp_inl,
-    Sum.elim_inr]
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h q => h fun _ => q, fun h i => h (i 0)⟩
 
 @[simp]
 theorem realize_cellArgF (r : L'.Relations 2) (h : L'.Relations 1) (t : L'.Relations 2)
-    (τ : L'.Term γ) :
-    (cellArgF r h t τ).Realize v ↔
-      ∀ p a : M, RelMap h ![p] → RelMap t ![p, a] → RelMap r ![τ.realize v, a] := by
+    (x : γ) :
+    (cellArgF r h t x).Realize v ↔
+      ∀ p a : M, RelMap h ![p] → RelMap t ![p, a] → RelMap r ![v x, a] := by
   rw [cellArgF]
   simp only [Formula.realize_iAlls, Formula.realize_imp, Formula.realize_rel₁,
-    Formula.realize_rel₂, Term.realize_var, Term.realize_relabel, Sum.elim_comp_inl,
-    Sum.elim_inr]
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun hh p a => hh ![p, a], fun hh i => hh (i 0) (i 1)⟩
 
 @[simp]
@@ -283,15 +265,13 @@ theorem realize_frameF (t t' : L'.Relations 2) (h : L'.Relations 1) :
     exact ⟨(hh (i 0) (i 1) hi).mp, (hh (i 0) (i 1) hi).mpr⟩
 
 @[simp]
-theorem realize_succPosF (le : L'.Relations 2) (posn : L'.Relations 1) (x y : L'.Term γ) :
+theorem realize_succPosF (le : L'.Relations 2) (posn : L'.Relations 1) (x y : γ) :
     (succPosF le posn x y).Realize v ↔
-      SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a])
-        (x.realize v) (y.realize v) := by
+      SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a]) (v x) (v y) := by
   rw [succPosF, SuccPos]
   simp only [Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
     Formula.realize_sup, Formula.realize_not, Formula.realize_rel₁, Formula.realize_rel₂,
-    Formula.realize_equal, Term.realize_var, Term.realize_relabel, Sum.elim_comp_inl,
-    Sum.elim_inr, ne_eq]
+    Formula.realize_equal, Term.realize_var, Sum.elim_inl, Sum.elim_inr, ne_eq]
   constructor
   · rintro ⟨⟨⟨h1, h2⟩, h3, h4⟩, h5⟩
     exact ⟨h1, h2, h3, h4, fun r hr hxr hry => h5 (fun _ => r) hr hxr hry⟩
@@ -300,11 +280,11 @@ theorem realize_succPosF (le : L'.Relations 2) (posn : L'.Relations 1) (x y : L'
 
 @[simp]
 theorem realize_moveF (right h h' posn : L'.Relations 1) (le : L'.Relations 2)
-    (τ : L'.Term γ) :
-    (moveF right h h' posn le τ).Realize v ↔
-      ((RelMap right ![τ.realize v] ∧ ∀ p p' : M, RelMap h ![p] → RelMap h' ![p'] →
+    (x : γ) :
+    (moveF right h h' posn le x).Realize v ↔
+      ((RelMap right ![v x] ∧ ∀ p p' : M, RelMap h ![p] → RelMap h' ![p'] →
           SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a]) p p') ∨
-        (¬RelMap right ![τ.realize v] ∧ ∀ p p' : M, RelMap h ![p] → RelMap h' ![p'] →
+        (¬RelMap right ![v x] ∧ ∀ p p' : M, RelMap h ![p] → RelMap h' ![p'] →
           SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a]) p' p)) := by
   rw [moveF]
   simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
@@ -317,16 +297,8 @@ theorem realize_moveF (right h h' posn : L'.Relations 1) (le : L'.Relations 2)
 
 /-- The relation is a linear order. -/
 noncomputable def linOrdF (le : L'.Relations 2) : L'.Formula γ :=
-  ((Relations.formula₂ le (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))).iAlls (Fin 1) ⊓
-      ((Relations.formula₂ le (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-        ((Relations.formula₂ le (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-          (Relations.formula₂ le (Term.var (Sum.inr 0))
-            (Term.var (Sum.inr 2))))).iAlls (Fin 3)) ⊓
-    (((Relations.formula₂ le (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-        ((Relations.formula₂ le (Term.var (Sum.inr 1)) (Term.var (Sum.inr 0))).imp
-          (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))))).iAlls (Fin 2) ⊓
-      (Relations.formula₂ le (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊔
-        Relations.formula₂ le (Term.var (Sum.inr 1)) (Term.var (Sum.inr 0))).iAlls (Fin 2))
+  fo% ((∀ x, le(x, x)) ∧ ∀ x y z, le(x, y) → le(y, z) → le(x, z)) ∧
+    (∀ x y, le(x, y) → le(y, x) → x ≐ y) ∧ ∀ x y, le(x, y) ∨ le(y, x)
 
 /-- **Well-formedness of the instance**, as a sentence: the order is linear,
 there is a position, the input is functional, and there is exactly one blank. -/
@@ -366,9 +338,9 @@ noncomputable def stepF (tr right posn : L'.Relations 1) (src rd dst wr le : L'.
     (t' : L'.Relations 2) : L'.Formula γ :=
   Formula.iExs (Fin 1)
     ((Relations.formula₁ tr (Term.var (Sum.inr 0)) ⊓
-        (markArgF src s (Term.var (Sum.inr 0)) ⊓ cellArgF rd h t (Term.var (Sum.inr 0)))) ⊓
-      ((markArgF dst s' (Term.var (Sum.inr 0)) ⊓ cellArgF wr h t' (Term.var (Sum.inr 0))) ⊓
-        (frameF t t' h ⊓ moveF right h h' posn le (Term.var (Sum.inr 0)))))
+        (markArgF src s (Sum.inr 0) ⊓ cellArgF rd h t (Sum.inr 0))) ⊓
+      ((markArgF dst s' (Sum.inr 0) ⊓ cellArgF wr h t' (Sum.inr 0)) ⊓
+        (frameF t t' h ⊓ moveF right h h' posn le (Sum.inr 0))))
 
 @[simp]
 theorem realize_stepF (tr right posn : L'.Relations 1) (src rd dst wr le : L'.Relations 2)
@@ -392,14 +364,8 @@ theorem realize_stepF (tr right posn : L'.Relations 1) (src rd dst wr le : L'.Re
 
 /-- At most one transition applies in a given state on a given symbol. -/
 noncomputable def trUniqF (tr : L'.Relations 1) (src rd : L'.Relations 2) : L'.Formula γ :=
-  Formula.iAlls (Fin 4)
-    ((Relations.formula₁ tr (Term.var (Sum.inr 0))).imp
-      ((Relations.formula₁ tr (Term.var (Sum.inr 1))).imp
-        ((Relations.formula₂ src (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2))).imp
-          ((Relations.formula₂ src (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-            ((Relations.formula₂ rd (Term.var (Sum.inr 0)) (Term.var (Sum.inr 3))).imp
-              ((Relations.formula₂ rd (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3))).imp
-                (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))))))))
+  fo% ∀ τ τ' q a,
+    tr(τ) → tr(τ') → src(τ, q) → src(τ', q) → rd(τ, a) → rd(τ', a) → τ ≐ τ'
 
 /-- **Determinism of the instance**, as a sentence. -/
 noncomputable def detF (tr start : L'.Relations 1) (src rd dst wr : L'.Relations 2) :

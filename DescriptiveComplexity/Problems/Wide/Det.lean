@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Wide.WellFormed
 import DescriptiveComplexity.Problems.Machine.Space
 
@@ -56,17 +57,17 @@ noncomputable def detInterp :
     FOInterpretation Language.wide Language.wide Unit 1 where
   relFormula {n} R _ :=
     match n, R with
-    | _, .wle => Relations.formula₂ wmLe (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .tr => Relations.formula₁ wmTr (Term.var (0, 0))
-    | _, .start => Relations.formula₁ wmStart (Term.var (0, 0))
-    | _, .acc => detG _ ⊓ Relations.formula₁ wmAcc (Term.var (0, 0))
-    | _, .blank => Relations.formula₁ wmBlank (Term.var (0, 0))
-    | _, .right => Relations.formula₁ wmRight (Term.var (0, 0))
-    | _, .src => Relations.formula₂ wmSrc (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .read => Relations.formula₂ wmRead (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .dst => Relations.formula₂ wmDst (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .write => Relations.formula₂ wmWrite (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .inp => Relations.formula₂ wmInp (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .wle => fo%⟨u, v⟩ wmLe(u, v)
+    | _, .tr => fo%⟨u⟩ wmTr(u)
+    | _, .start => fo%⟨u⟩ wmStart(u)
+    | _, .acc => fo%⟨u⟩ !(detG _) ∧ wmAcc(u)
+    | _, .blank => fo%⟨u⟩ wmBlank(u)
+    | _, .right => fo%⟨u⟩ wmRight(u)
+    | _, .src => fo%⟨u, v⟩ wmSrc(u, v)
+    | _, .read => fo%⟨u, v⟩ wmRead(u, v)
+    | _, .dst => fo%⟨u, v⟩ wmDst(u, v)
+    | _, .write => fo%⟨u, v⟩ wmWrite(u, v)
+    | _, .inp => fo%⟨u, v⟩ wmInp(u, v)
 
 section Reading
 

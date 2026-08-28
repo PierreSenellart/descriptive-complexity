@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.DominatingSet.Defs
 import DescriptiveComplexity.Problems.SetFamily
 
@@ -65,13 +66,11 @@ def eqF (x y : α) : Language.setSystem.Formula α := Term.equal (Term.var x) (T
 
 /-- Some ground element belongs to no set, as a formula. -/
 noncomputable def uncoverableF : Language.setSystem.Formula α :=
-  (elemF (Sum.inr ()) ⊓
-    Formula.iAlls Unit
-      (∼(famF (Sum.inr ()) ⊓ memF (Sum.inl (Sum.inr ())) (Sum.inr ())))).iExs Unit
+  fo% ∃ x, elemF⟨x⟩ ∧ ∀ f, ¬ (famF⟨f⟩ ∧ memF⟨x, f⟩)
 
 /-- There is no ground element at all, as a formula. -/
 noncomputable def noElemF : Language.setSystem.Formula α :=
-  Formula.iAlls Unit (∼(elemF (Sum.inr ())))
+  fo% ∀ x, ¬ elemF⟨x⟩
 
 /-- The gate: either degenerate case. -/
 noncomputable def gateF : Language.setSystem.Formula α := uncoverableF ⊔ noElemF
@@ -122,15 +121,15 @@ theorem realize_uncoverableF : (uncoverableF (α := α)).Realize v ↔ Uncoverab
     Sum.elim_inr, Uncoverable]
   constructor
   · rintro ⟨x, hx, hno⟩
-    exact ⟨x (), hx, fun f hf => hno (fun _ => f) hf⟩
+    exact ⟨x 0, hx, fun f hf => hno (fun _ => f) hf⟩
   · rintro ⟨x, hx, hno⟩
-    exact ⟨fun _ => x, hx, fun f hf => hno (f ()) hf⟩
+    exact ⟨fun _ => x, hx, fun f hf => hno (f 0) hf⟩
 
 @[simp]
 theorem realize_noElemF : (noElemF (α := α)).Realize v ↔ NoElem A := by
   simp only [noElemF, Formula.realize_iAlls, Formula.realize_not, realize_elemF,
     Sum.elim_inr, NoElem]
-  exact ⟨fun h x => h (fun _ => x), fun h i => h (i ())⟩
+  exact ⟨fun h x => h (fun _ => x), fun h i => h (i 0)⟩
 
 @[simp]
 theorem realize_gateF : (gateF (α := α)).Realize v ↔ Uncoverable A ∨ NoElem A := by
@@ -160,9 +159,9 @@ instance : Nonempty DSTag := ⟨DSTag.set⟩
 /-- Defining formula for adjacency, before the gate: the sets form a clique,
 and a set is joined to its elements – and to every junk vertex. -/
 noncomputable def adjF : DSTag → DSTag → Language.setSystem.Formula (Fin 2 × Fin 1)
-  | .set, .set => ∼(eqF (0, 0) (1, 0))
-  | .set, .elt => (famF (0, 0) ⊓ elemF (1, 0) ⊓ memF (1, 0) (0, 0)) ⊔ ∼(elemF (1, 0))
-  | .elt, .set => (famF (1, 0) ⊓ elemF (0, 0) ⊓ memF (0, 0) (1, 0)) ⊔ ∼(elemF (0, 0))
+  | .set, .set => fo%⟨u, v⟩ ¬ eqF⟨u, v⟩
+  | .set, .elt => fo%⟨u, v⟩ ((famF⟨u⟩ ∧ elemF⟨v⟩) ∧ memF⟨v, u⟩) ∨ ¬ elemF⟨v⟩
+  | .elt, .set => fo%⟨u, v⟩ ((famF⟨v⟩ ∧ elemF⟨u⟩) ∧ memF⟨u, v⟩) ∨ ¬ elemF⟨u⟩
   | .elt, .elt => ⊥
 
 /-- The interpretation of Dominating Set instances in set systems. -/

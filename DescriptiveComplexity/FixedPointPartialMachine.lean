@@ -68,25 +68,25 @@ noncomputable def markMeetF (s r : L'.Relations 1) : L'.Formula γ :=
   (Relations.formula₁ s (Term.var (Sum.inr 0)) ⊓
     Relations.formula₁ r (Term.var (Sum.inr 0))).iExs (Fin 1)
 
-/-- The binary relation holds of the term and some element. -/
-noncomputable def someArgF (r : L'.Relations 2) (τ : L'.Term γ) : L'.Formula γ :=
-  (Relations.formula₂ r (τ.relabel Sum.inl) (Term.var (Sum.inr 0))).iExs (Fin 1)
+/-- The binary relation holds of `x` and some element. -/
+noncomputable def someArgF (r : L'.Relations 2) (x : γ) : L'.Formula γ :=
+  (Relations.formula₂ r (Term.var (Sum.inl x)) (Term.var (Sum.inr 0))).iExs (Fin 1)
 
-/-- The term is an applicable transition: a transition whose source is the
+/-- `τ` is an applicable transition: a transition whose source is the
 marked state and whose read symbol is the one held by the marked cell. -/
 noncomputable def applF (tr : L'.Relations 1) (src rd : L'.Relations 2)
-    (s h : L'.Relations 1) (t : L'.Relations 2) (τ : L'.Term γ) : L'.Formula γ :=
-  Relations.formula₁ tr τ ⊓ (markArgF src s τ ⊓ cellArgF rd h t τ)
+    (s h : L'.Relations 1) (t : L'.Relations 2) (τ : γ) : L'.Formula γ :=
+  Relations.formula₁ tr (Term.var τ) ⊓ (markArgF src s τ ⊓ cellArgF rd h t τ)
 
 /-- The head can move from the marked cell to `p'`, in the direction the
 transition names. -/
 noncomputable def moveToF (right : L'.Relations 1) (le : L'.Relations 2)
-    (posn h : L'.Relations 1) (τ p' : L'.Term γ) : L'.Formula γ :=
+    (posn h : L'.Relations 1) (τ p' : γ) : L'.Formula γ :=
   ((Relations.formula₁ h (Term.var (Sum.inr 0))) ⊓
-    ((Relations.formula₁ right (τ.relabel Sum.inl) ⊓
-        succPosF le posn (Term.var (Sum.inr 0)) ((p'.relabel Sum.inl))) ⊔
-      (∼(Relations.formula₁ right (τ.relabel Sum.inl)) ⊓
-        succPosF le posn ((p'.relabel Sum.inl)) (Term.var (Sum.inr 0))))).iExs (Fin 1)
+    ((Relations.formula₁ right (Term.var (Sum.inl τ)) ⊓
+        succPosF le posn (Sum.inr 0) (Sum.inl p')) ⊔
+      (∼(Relations.formula₁ right (Term.var (Sum.inl τ))) ⊓
+        succPosF le posn (Sum.inl p') (Sum.inr 0)))).iExs (Fin 1)
 
 /-- The machine takes a step: no accepting mark, and some applicable
 transition with a destination, a written symbol, and a position to move
@@ -95,28 +95,27 @@ noncomputable def goF (tr : L'.Relations 1) (src rd dst wr : L'.Relations 2)
     (s h : L'.Relations 1) (t : L'.Relations 2) (acc right : L'.Relations 1)
     (le : L'.Relations 2) (posn : L'.Relations 1) : L'.Formula γ :=
   ∼(markMeetF s acc) ⊓
-    ((applF tr src rd s h t (Term.var (Sum.inr 0)) ⊓
-        (someArgF dst (Term.var (Sum.inr 0)) ⊓
-          (someArgF wr (Term.var (Sum.inr 0)) ⊓
-            moveToF right le posn h (Term.var (Sum.inr 0))
-              (Term.var (Sum.inr 1))))).iExs (Fin 2))
+    ((applF tr src rd s h t (Sum.inr 0) ⊓
+        (someArgF dst (Sum.inr 0) ⊓
+          (someArgF wr (Sum.inr 0) ⊓
+            moveToF right le posn h (Sum.inr 0) (Sum.inr 1)))).iExs (Fin 2))
 
 /-- The cell initially holds this symbol: its input symbol, or the blank when
 no input is given for it. -/
 noncomputable def initTapeAtF (inp : L'.Relations 2) (blank : L'.Relations 1)
-    (x y : L'.Term γ) : L'.Formula γ :=
-  Relations.formula₂ inp x y ⊔
+    (x y : γ) : L'.Formula γ :=
+  Relations.formula₂ inp (Term.var x) (Term.var y) ⊔
     (Formula.iAlls (Fin 1)
-        (∼(Relations.formula₂ inp (x.relabel Sum.inl) (Term.var (Sum.inr 0))) :
+        (∼(Relations.formula₂ inp (Term.var (Sum.inl x)) (Term.var (Sum.inr 0))) :
           L'.Formula (γ ⊕ Fin 1)) ⊓
-      Relations.formula₁ blank y)
+      Relations.formula₁ blank (Term.var y))
 
-/-- The term is the lowest position. -/
+/-- `x` is the lowest position. -/
 noncomputable def minPosAtF (le : L'.Relations 2) (posn : L'.Relations 1)
-    (x : L'.Term γ) : L'.Formula γ :=
-  Relations.formula₁ posn x ⊓
+    (x : γ) : L'.Formula γ :=
+  Relations.formula₁ posn (Term.var x) ⊓
     ((Relations.formula₁ posn (Term.var (Sum.inr 0))).imp
-      (Relations.formula₂ le (x.relabel Sum.inl) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+      (Relations.formula₂ le (Term.var (Sum.inl x)) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
 
 variable {v : γ → M}
 
@@ -129,40 +128,40 @@ theorem realize_markMeetF (s r : L'.Relations 1) :
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨q, hq⟩ => ⟨fun _ => q, hq⟩⟩
 
 @[simp]
-theorem realize_someArgF (r : L'.Relations 2) (τ : L'.Term γ) :
-    (someArgF r τ).Realize v ↔ ∃ b : M, RelMap r ![τ.realize v, b] := by
+theorem realize_someArgF (r : L'.Relations 2) (x : γ) :
+    (someArgF r x).Realize v ↔ ∃ b : M, RelMap r ![v x, b] := by
   rw [someArgF]
-  simp only [Formula.realize_iExs, Formula.realize_rel₂, Term.realize_var,
-    Term.realize_relabel, Sum.elim_comp_inl, Sum.elim_inr]
+  simp only [Formula.realize_iExs, Formula.realize_rel₂, Term.realize_var, Sum.elim_inl,
+    Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨b, hb⟩ => ⟨fun _ => b, hb⟩⟩
 
 @[simp]
 theorem realize_applF (tr : L'.Relations 1) (src rd : L'.Relations 2)
-    (s h : L'.Relations 1) (t : L'.Relations 2) (τ : L'.Term γ) :
+    (s h : L'.Relations 1) (t : L'.Relations 2) (τ : γ) :
     (applF tr src rd s h t τ).Realize v ↔
-      (RelMap tr ![τ.realize v] ∧
-        ((∀ q : M, RelMap s ![q] → RelMap src ![τ.realize v, q]) ∧
+      (RelMap tr ![v τ] ∧
+        ((∀ q : M, RelMap s ![q] → RelMap src ![v τ, q]) ∧
           ∀ p a : M, RelMap h ![p] → RelMap t ![p, a] →
-            RelMap rd ![τ.realize v, a])) := by
+            RelMap rd ![v τ, a])) := by
   rw [applF]
   simp only [Formula.realize_inf, Formula.realize_rel₁, realize_markArgF,
-    realize_cellArgF]
+    realize_cellArgF, Term.realize_var]
 
 @[simp]
 theorem realize_moveToF (right : L'.Relations 1) (le : L'.Relations 2)
-    (posn h : L'.Relations 1) (τ p' : L'.Term γ) :
+    (posn h : L'.Relations 1) (τ p' : γ) :
     (moveToF right le posn h τ p').Realize v ↔
       ∃ p : M, RelMap h ![p] ∧
-        ((RelMap right ![τ.realize v] ∧
+        ((RelMap right ![v τ] ∧
             SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a]) p
-              (p'.realize v)) ∨
-          (¬RelMap right ![τ.realize v] ∧
+              (v p')) ∨
+          (¬RelMap right ![v τ] ∧
             SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a])
-              (p'.realize v) p)) := by
+              (v p') p)) := by
   rw [moveToF]
   simp only [Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
     Formula.realize_not, Formula.realize_rel₁, realize_succPosF, Term.realize_var,
-    Term.realize_relabel, Sum.elim_comp_inl, Sum.elim_inr]
+    Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨p, hp⟩ => ⟨fun _ => p, hp⟩⟩
 
 @[simp]
@@ -186,91 +185,87 @@ theorem realize_goF (tr : L'.Relations 1) (src rd dst wr : L'.Relations 2)
                         (fun a => RelMap posn ![a]) p' p)))))) := by
   rw [goF]
   simp only [Formula.realize_inf, Formula.realize_not, realize_markMeetF,
-    Formula.realize_iExs, realize_applF, realize_someArgF, realize_moveToF,
-    Term.realize_var, Sum.elim_inr]
+    Formula.realize_iExs, realize_applF, realize_someArgF, realize_moveToF, Sum.elim_inr]
   refine and_congr Iff.rfl
     ⟨fun ⟨i, hi⟩ => ⟨i 0, i 1, hi⟩, fun ⟨τ, p', hp⟩ => ⟨![τ, p'], hp⟩⟩
 
 @[simp]
 theorem realize_initTapeAtF (inp : L'.Relations 2) (blank : L'.Relations 1)
-    (x y : L'.Term γ) :
+    (x y : γ) :
     (initTapeAtF inp blank x y).Realize v ↔
-      (RelMap inp ![x.realize v, y.realize v] ∨
-        ((∀ b : M, ¬RelMap inp ![x.realize v, b]) ∧
-          RelMap blank ![y.realize v])) := by
+      (RelMap inp ![v x, v y] ∨
+        ((∀ b : M, ¬RelMap inp ![v x, b]) ∧
+          RelMap blank ![v y])) := by
   rw [initTapeAtF]
   simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_iAlls,
     Formula.realize_not, Formula.realize_rel₂, Formula.realize_rel₁, Term.realize_var,
-    Term.realize_relabel, Sum.elim_comp_inl, Sum.elim_inr]
+    Sum.elim_inl, Sum.elim_inr]
   exact or_congr Iff.rfl (and_congr
     ⟨fun hh b => hh fun _ => b, fun hh i => hh (i 0)⟩ Iff.rfl)
 
 @[simp]
 theorem realize_minPosAtF (le : L'.Relations 2) (posn : L'.Relations 1)
-    (x : L'.Term γ) :
+    (x : γ) :
     (minPosAtF le posn x).Realize v ↔
-      MinPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a])
-        (x.realize v) := by
+      MinPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a]) (v x) := by
   rw [minPosAtF, MinPos]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
-    Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var, Term.realize_relabel,
-    Sum.elim_comp_inl, Sum.elim_inr]
+    Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var, Sum.elim_inl,
+    Sum.elim_inr]
   exact and_congr Iff.rfl ⟨fun hh q => hh fun _ => q, fun hh i => hh (i 0)⟩
 
 /-- The transition applies, with a destination, a written symbol, and this
 new symbol written in the marked cell. -/
 noncomputable def writeNewF (tr : L'.Relations 1) (src rd : L'.Relations 2)
-    (s h : L'.Relations 1) (t wr : L'.Relations 2) (y : L'.Term γ) : L'.Formula γ :=
-  (applF tr src rd s h t (Term.var (Sum.inr 0)) ⊓
-    Relations.formula₂ wr (Term.var (Sum.inr 0)) (y.relabel Sum.inl)).iExs (Fin 1)
+    (s h : L'.Relations 1) (t wr : L'.Relations 2) (y : γ) : L'.Formula γ :=
+  (applF tr src rd s h t (Sum.inr 0) ⊓
+    Relations.formula₂ wr (Term.var (Sum.inr 0)) (Term.var (Sum.inl y))).iExs (Fin 1)
 
 /-- The transition applies and moves to this new state. -/
 noncomputable def dstNewF (tr : L'.Relations 1) (src rd : L'.Relations 2)
-    (s h : L'.Relations 1) (t dst : L'.Relations 2) (y : L'.Term γ) : L'.Formula γ :=
-  (applF tr src rd s h t (Term.var (Sum.inr 0)) ⊓
-    Relations.formula₂ dst (Term.var (Sum.inr 0)) (y.relabel Sum.inl)).iExs (Fin 1)
+    (s h : L'.Relations 1) (t dst : L'.Relations 2) (y : γ) : L'.Formula γ :=
+  (applF tr src rd s h t (Sum.inr 0) ⊓
+    Relations.formula₂ dst (Term.var (Sum.inr 0)) (Term.var (Sum.inl y))).iExs (Fin 1)
 
 /-- The transition applies and moves the head to this new position. -/
 noncomputable def headNewF (tr : L'.Relations 1) (src rd : L'.Relations 2)
     (s h : L'.Relations 1) (t : L'.Relations 2) (right : L'.Relations 1)
-    (le : L'.Relations 2) (posn : L'.Relations 1) (y : L'.Term γ) : L'.Formula γ :=
-  (applF tr src rd s h t (Term.var (Sum.inr 0)) ⊓
-    moveToF right le posn h (Term.var (Sum.inr 0)) (y.relabel Sum.inl)).iExs (Fin 1)
+    (le : L'.Relations 2) (posn : L'.Relations 1) (y : γ) : L'.Formula γ :=
+  (applF tr src rd s h t (Sum.inr 0) ⊓
+    moveToF right le posn h (Sum.inr 0) (Sum.inl y)).iExs (Fin 1)
 
 variable {v : γ → M}
 
 @[simp]
 theorem realize_writeNewF (tr : L'.Relations 1) (src rd : L'.Relations 2)
-    (s h : L'.Relations 1) (t wr : L'.Relations 2) (y : L'.Term γ) :
+    (s h : L'.Relations 1) (t wr : L'.Relations 2) (y : γ) :
     (writeNewF tr src rd s h t wr y).Realize v ↔
       ∃ τ : M, (RelMap tr ![τ] ∧
           ((∀ q : M, RelMap s ![q] → RelMap src ![τ, q]) ∧
             ∀ p a : M, RelMap h ![p] → RelMap t ![p, a] → RelMap rd ![τ, a])) ∧
-        RelMap wr ![τ, y.realize v] := by
+        RelMap wr ![τ, v y] := by
   rw [writeNewF]
   simp only [Formula.realize_iExs, Formula.realize_inf, realize_applF,
-    Formula.realize_rel₂, Term.realize_var, Term.realize_relabel, Sum.elim_comp_inl,
-    Sum.elim_inr]
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨τ, hτ⟩ => ⟨fun _ => τ, hτ⟩⟩
 
 @[simp]
 theorem realize_dstNewF (tr : L'.Relations 1) (src rd : L'.Relations 2)
-    (s h : L'.Relations 1) (t dst : L'.Relations 2) (y : L'.Term γ) :
+    (s h : L'.Relations 1) (t dst : L'.Relations 2) (y : γ) :
     (dstNewF tr src rd s h t dst y).Realize v ↔
       ∃ τ : M, (RelMap tr ![τ] ∧
           ((∀ q : M, RelMap s ![q] → RelMap src ![τ, q]) ∧
             ∀ p a : M, RelMap h ![p] → RelMap t ![p, a] → RelMap rd ![τ, a])) ∧
-        RelMap dst ![τ, y.realize v] := by
+        RelMap dst ![τ, v y] := by
   rw [dstNewF]
   simp only [Formula.realize_iExs, Formula.realize_inf, realize_applF,
-    Formula.realize_rel₂, Term.realize_var, Term.realize_relabel, Sum.elim_comp_inl,
-    Sum.elim_inr]
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨τ, hτ⟩ => ⟨fun _ => τ, hτ⟩⟩
 
 @[simp]
 theorem realize_headNewF (tr : L'.Relations 1) (src rd : L'.Relations 2)
     (s h : L'.Relations 1) (t : L'.Relations 2) (right : L'.Relations 1)
-    (le : L'.Relations 2) (posn : L'.Relations 1) (y : L'.Term γ) :
+    (le : L'.Relations 2) (posn : L'.Relations 1) (y : γ) :
     (headNewF tr src rd s h t right le posn y).Realize v ↔
       ∃ τ : M, (RelMap tr ![τ] ∧
           ((∀ q : M, RelMap s ![q] → RelMap src ![τ, q]) ∧
@@ -278,13 +273,13 @@ theorem realize_headNewF (tr : L'.Relations 1) (src rd : L'.Relations 2)
         ∃ p : M, RelMap h ![p] ∧
           ((RelMap right ![τ] ∧
               SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a]) p
-                (y.realize v)) ∨
+                (v y)) ∨
             (¬RelMap right ![τ] ∧
               SuccPos (fun a b => RelMap le ![a, b]) (fun a => RelMap posn ![a])
-                (y.realize v) p)) := by
+                (v y) p)) := by
   rw [headNewF]
   simp only [Formula.realize_iExs, Formula.realize_inf, realize_applF, realize_moveToF,
-    Term.realize_var, Term.realize_relabel, Sum.elim_comp_inl, Sum.elim_inr]
+    Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨τ, hτ⟩ => ⟨fun _ => τ, hτ⟩⟩
 
 end Shapes
@@ -362,14 +357,14 @@ noncomputable def mGoF {γ : Type} : mLang₁.Formula γ :=
 
 /-- The step formula of the tape variable. -/
 noncomputable def stepTapeF : mLang₁.Formula (Fin 2) :=
-  (emptyF ⊓ initTapeAtF (mIn₁ tmInp) (mIn₁ tmBlank) (Term.var 0) (Term.var 1)) ⊔
+  (emptyF ⊓ initTapeAtF (mIn₁ tmInp) (mIn₁ tmBlank) 0 1) ⊔
     (∼emptyF ⊓
       ((∼mGoF ⊓ Relations.formula₂ mT₁ (Term.var 0) (Term.var 1)) ⊔
         (mGoF ⊓ ((∼(Relations.formula₁ mH₁ (Term.var 0)) ⊓
             Relations.formula₂ mT₁ (Term.var 0) (Term.var 1)) ⊔
           (Relations.formula₁ mH₁ (Term.var 0) ⊓
             writeNewF (mIn₁ tmTr) (mIn₁ tmSrc) (mIn₁ tmRead) mS₁ mH₁ mT₁
-              (mIn₁ tmWrite) (Term.var 1))))))
+              (mIn₁ tmWrite) 1)))))
 
 /-- The step formula of the state variable. -/
 noncomputable def stepStateF : mLang₁.Formula (Fin 1) :=
@@ -377,15 +372,15 @@ noncomputable def stepStateF : mLang₁.Formula (Fin 1) :=
     (∼emptyF ⊓
       ((∼mGoF ⊓ Relations.formula₁ mS₁ (Term.var 0)) ⊔
         (mGoF ⊓ dstNewF (mIn₁ tmTr) (mIn₁ tmSrc) (mIn₁ tmRead) mS₁ mH₁ mT₁
-          (mIn₁ tmDst) (Term.var 0))))
+          (mIn₁ tmDst) 0)))
 
 /-- The step formula of the head variable. -/
 noncomputable def stepHeadF : mLang₁.Formula (Fin 1) :=
-  (emptyF ⊓ minPosAtF (mIn₁ tmLe) (mIn₁ tmPosn) (Term.var 0)) ⊔
+  (emptyF ⊓ minPosAtF (mIn₁ tmLe) (mIn₁ tmPosn) 0) ⊔
     (∼emptyF ⊓
       ((∼mGoF ⊓ Relations.formula₁ mH₁ (Term.var 0)) ⊔
         (mGoF ⊓ headNewF (mIn₁ tmTr) (mIn₁ tmSrc) (mIn₁ tmRead) mS₁ mH₁ mT₁
-          (mIn₁ tmRight) (mIn₁ tmLe) (mIn₁ tmPosn) (Term.var 0))))
+          (mIn₁ tmRight) (mIn₁ tmLe) (mIn₁ tmPosn) 0)))
 
 /-- **The machine iteration**: one configuration in the block, one machine
 step per stage, stuttering on halting configurations; the output checks the

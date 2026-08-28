@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.HaltFin
 import DescriptiveComplexity.RecursivelyEnumerable
 import DescriptiveComplexity.Problems.FinSat
@@ -230,52 +231,44 @@ variable {ρ : runBlock.Assignment (A ⊕ Fin m)} {γ : Type}
 
 /-- An atom of a unary relation of the instance. -/
 noncomputable def instF₁ (R : Language.turing.Relations 1) (x : γ) : runLang.Formula γ :=
-  Relations.formula₁ (instSym R) (Term.var x)
+  fo%[x] (instSym R)(x)
 
 /-- An atom of a binary relation of the instance. -/
 noncomputable def instF₂ (R : Language.turing.Relations 2) (x y : γ) : runLang.Formula γ :=
-  Relations.formula₂ (instSym R) (Term.var x) (Term.var y)
+  fo%[x, y] (instSym R)(x, y)
 
 /-- `x` is an original element. -/
-noncomputable def oldF (x : γ) : runLang.Formula γ :=
-  Relations.formula₁ oldSym (Term.var x)
+noncomputable def oldF (x : γ) : runLang.Formula γ := fo%[x] oldSym(x)
 
 /-- Equality of two variables. -/
-noncomputable def eqF (x y : γ) : runLang.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def eqF (x y : γ) : runLang.Formula γ := fo%[x, y] x ≐ y
 
 /-- `x` is a time point. -/
-noncomputable def timeF (x : γ) : runLang.Formula γ := Relations.formula₁ timeSym (Term.var x)
+noncomputable def timeF (x : γ) : runLang.Formula γ := fo%[x] timeSym(x)
 
 /-- The time point `x` precedes `y`. -/
-noncomputable def tleF (x y : γ) : runLang.Formula γ :=
-  Relations.formula₂ tleSym (Term.var x) (Term.var y)
+noncomputable def tleF (x y : γ) : runLang.Formula γ := fo%[x, y] tleSym(x, y)
 
 /-- `x` is a page. -/
-noncomputable def pageF (x : γ) : runLang.Formula γ := Relations.formula₁ pageSym (Term.var x)
+noncomputable def pageF (x : γ) : runLang.Formula γ := fo%[x] pageSym(x)
 
 /-- The page `x` precedes `y`. -/
-noncomputable def pleF (x y : γ) : runLang.Formula γ :=
-  Relations.formula₂ pleSym (Term.var x) (Term.var y)
+noncomputable def pleF (x y : γ) : runLang.Formula γ := fo%[x, y] pleSym(x, y)
 
 /-- `x` is the input page. -/
-noncomputable def zeroF (x : γ) : runLang.Formula γ := Relations.formula₁ zeroSym (Term.var x)
+noncomputable def zeroF (x : γ) : runLang.Formula γ := fo%[x] zeroSym(x)
 
 /-- The state at the time point `t` is `q`. -/
-noncomputable def stF (t q : γ) : runLang.Formula γ :=
-  Relations.formula₂ stSym (Term.var t) (Term.var q)
+noncomputable def stF (t q : γ) : runLang.Formula γ := fo%[t, q] stSym(t, q)
 
 /-- The head is on the page `z` at the time point `t`. -/
-noncomputable def hdPF (t z : γ) : runLang.Formula γ :=
-  Relations.formula₂ hdPSym (Term.var t) (Term.var z)
+noncomputable def hdPF (t z : γ) : runLang.Formula γ := fo%[t, z] hdPSym(t, z)
 
 /-- The head is at the position `p` at the time point `t`. -/
-noncomputable def hdCF (t p : γ) : runLang.Formula γ :=
-  Relations.formula₂ hdCSym (Term.var t) (Term.var p)
+noncomputable def hdCF (t p : γ) : runLang.Formula γ := fo%[t, p] hdCSym(t, p)
 
 /-- The cell `(z, p)` holds `a` at the time point `t`. -/
-noncomputable def symF (t z p a : γ) : runLang.Formula γ :=
-  symSym.formula ![Term.var t, Term.var z, Term.var p, Term.var a]
+noncomputable def symF (t z p a : γ) : runLang.Formula γ := fo%[t, z, p, a] symSym(t, z, p, a)
 
 @[simp]
 theorem realize_instF₁ (R : Language.turing.Relations 1) (x : γ) (v : γ → A ⊕ Fin m) :

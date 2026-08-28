@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.SetFamily.Defs
 import DescriptiveComplexity.SecondOrder
 
@@ -51,88 +53,45 @@ open Language Structure SOBlock
 section SigmaOne
 
 /-- The single existential block shared by the `Σ₁` definitions of the set
-family: a unary relation variable (`true`: the guessed subfamily) and a binary
-one (`false`: the injection witnessing the threshold). -/
-def familyGuessBlock : SOBlock where
-  ι := Bool
-  arity := fun i => cond i 1 2
-
-/-- The symbol of the subfamily relation variable. -/
-def sfGuessRel : familyGuessBlock.lang.Relations 1 := ⟨true, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def sfInjRel : familyGuessBlock.lang.Relations 2 := ⟨false, rfl⟩
-
-/-- The vocabulary of the kernels: set systems together with the two guessed
-relation variables. -/
-abbrev setFamilySOLang : Language := Language.setSystem.sum familyGuessBlock.lang
-
-/-- The ground-element symbol in the kernels' vocabulary. -/
-abbrev sfElemSym : setFamilySOLang.Relations 1 := Sum.inl ssElem
-
-/-- The family symbol in the kernels' vocabulary. -/
-abbrev sfFamSym : setFamilySOLang.Relations 1 := Sum.inl ssFam
-
-/-- The incidence symbol in the kernels' vocabulary. -/
-abbrev sfMemSym : setFamilySOLang.Relations 2 := Sum.inl ssMem
-
-/-- The mark symbol in the kernels' vocabulary. -/
-abbrev sfMarkedSym : setFamilySOLang.Relations 1 := Sum.inl ssMarked
-
-/-- The subfamily symbol in the kernels' vocabulary. -/
-abbrev sfGuessSym : setFamilySOLang.Relations 1 := Sum.inr sfGuessRel
-
-/-- The injection symbol in the kernels' vocabulary. -/
-abbrev sfInjSym : setFamilySOLang.Relations 2 := Sum.inr sfInjRel
+family: a unary relation variable (the guessed subfamily) and a binary one
+(the injection witnessing the threshold). -/
+fo_block familyGuessBlock over Language.setSystem ss into setFamilySOLang with sf where
+  /-- The guessed subfamily. -/
+  guess : 1
+  /-- The injection witnessing the threshold. -/
+  inj : 2
 
 /-! ### The clauses -/
 
 /-- Kernel clause: the guessed subfamily consists of sets of the family. -/
 noncomputable def sfFamClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₁ sfGuessSym (Term.var (Sum.inr 0))).imp
-    (Relations.formula₁ sfFamSym (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+  fo% ∀ s, sfGuessSym(s) → sfFamSym(s)
 
 /-- Kernel clause (Set Cover): every ground element belongs to a guessed
 set. -/
 noncomputable def sfCoverClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₁ sfElemSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₁ sfGuessSym (Term.var (Sum.inr ())) ⊓
-      Relations.formula₂ sfMemSym (Term.var (Sum.inl (Sum.inr 0)))
-        (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ x, sfElemSym(x) → ∃ s, sfGuessSym(s) ∧ sfMemSym(x, s)
 
 /-- Kernel clause (Set Packing): no ground element belongs to two distinct
 guessed sets. -/
 noncomputable def sfDisjClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₁ sfGuessSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ sfGuessSym (Term.var (Sum.inr 1)) ⊓
-      ∼(Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))) ⊓
-      Relations.formula₁ sfElemSym (Term.var (Sum.inr 2))).imp
-    ∼(Relations.formula₂ sfMemSym (Term.var (Sum.inr 2)) (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₂ sfMemSym (Term.var (Sum.inr 2))
-        (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+  fo% ∀ s s' x,
+    ((sfGuessSym(s) ∧ sfGuessSym(s')) ∧ ¬ s ≐ s') ∧ sfElemSym(x) →
+      ¬ (sfMemSym(x, s) ∧ sfMemSym(x, s'))
 
 /-- Kernel clause (Set Cover's threshold, an upper bound): the guessed
 injection maps every member of the subfamily to a marked element. -/
 noncomputable def sfGuessToMarkedClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₁ sfGuessSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₂ sfInjSym (Term.var (Sum.inl (Sum.inr 0)))
-        (Term.var (Sum.inr ())) ⊓
-      Relations.formula₁ sfMarkedSym (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ s, sfGuessSym(s) → ∃ y, sfInjSym(s, y) ∧ sfMarkedSym(y)
 
 /-- Kernel clause (Set Packing's threshold, a lower bound): the guessed
 injection maps every marked element to a member of the subfamily. -/
 noncomputable def sfMarkedToGuessClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₁ sfMarkedSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₂ sfInjSym (Term.var (Sum.inl (Sum.inr 0)))
-        (Term.var (Sum.inr ())) ⊓
-      Relations.formula₁ sfGuessSym (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ y, sfMarkedSym(y) → ∃ s, sfInjSym(y, s) ∧ sfGuessSym(s)
 
 /-- Kernel clause: the guessed injection is injective. -/
 noncomputable def sfInjClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₂ sfInjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ sfInjSym (Term.var (Sum.inr 1))
-        (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+  fo% ∀ x x' y, sfInjSym(x, y) ∧ sfInjSym(x', y) → x ≐ x'
 
 /-- The kernel of the `Σ₁` definition of Set Cover. -/
 noncomputable def setCoverKernel : setFamilySOLang.Sentence :=
@@ -147,20 +106,12 @@ noncomputable def exactCoverKernel : setFamilySOLang.Sentence :=
 /-- Kernel clause (Set Splitting): every set of the family contains a
 colored ground element. -/
 noncomputable def sfSplitInClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₁ sfFamSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₁ sfElemSym (Term.var (Sum.inr ())) ⊓
-      Relations.formula₂ sfMemSym (Term.var (Sum.inr ()))
-        (Term.var (Sum.inl (Sum.inr 0))) ⊓
-      Relations.formula₁ sfGuessSym (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ f, sfFamSym(f) → ∃ x, (sfElemSym(x) ∧ sfMemSym(x, f)) ∧ sfGuessSym(x)
 
 /-- Kernel clause (Set Splitting): every set of the family contains an
 uncolored ground element. -/
 noncomputable def sfSplitOutClause : setFamilySOLang.Sentence :=
-  ((Relations.formula₁ sfFamSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₁ sfElemSym (Term.var (Sum.inr ())) ⊓
-      Relations.formula₂ sfMemSym (Term.var (Sum.inr ()))
-        (Term.var (Sum.inl (Sum.inr 0))) ⊓
-      ∼(Relations.formula₁ sfGuessSym (Term.var (Sum.inr ())))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ f, sfFamSym(f) → ∃ x, (sfElemSym(x) ∧ sfMemSym(x, f)) ∧ ¬ sfGuessSym(x)
 
 /-- The first-order kernel of the `Σ₁` definition of Set Splitting: the
 guessed relation is read as one color class, and every set of the family
@@ -184,20 +135,20 @@ private abbrev SFRealize (φ : setFamilySOLang.Sentence) : Prop :=
     (@sumStructure _ _ A _ (familyGuessBlock.structure ρ)) φ
 
 private theorem realize_sfFamClause :
-    SFRealize ρ sfFamClause ↔ ∀ s : A, ρ true ![s] → SSFam s := by
+    SFRealize ρ sfFamClause ↔ ∀ s : A, ρ .guess ![s] → SSFam s := by
   let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
   rw [sfFamClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_rel₁, Term.realize_var, Sum.elim_inr, Language.relMap_sumInl, hsub]
   exact ⟨fun h s hs => h (fun _ => s) hs, fun h i hi => h (i 0) hi⟩
 
 private theorem realize_sfCoverClause :
-    SFRealize ρ sfCoverClause ↔ ∀ x : A, SSElem x → ∃ s : A, ρ true ![s] ∧ SSMem x s := by
+    SFRealize ρ sfCoverClause ↔ ∀ x : A, SSElem x → ∃ s : A, ρ .guess ![s] ∧ SSMem x s := by
   let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
   rw [sfCoverClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -205,17 +156,17 @@ private theorem realize_sfCoverClause :
   constructor
   · intro h x hx
     obtain ⟨s, hs1, hs2⟩ := h (fun _ => x) hx
-    exact ⟨s (), hs1, hs2⟩
+    exact ⟨s 0, hs1, hs2⟩
   · intro h i hi
     obtain ⟨s, hs1, hs2⟩ := h (i 0) hi
     exact ⟨fun _ => s, hs1, hs2⟩
 
 private theorem realize_sfDisjClause :
-    SFRealize ρ sfDisjClause ↔ ∀ s s' x : A, ρ true ![s] → ρ true ![s'] → s ≠ s' →
+    SFRealize ρ sfDisjClause ↔ ∀ s s' x : A, ρ .guess ![s] → ρ .guess ![s'] → s ≠ s' →
       SSElem x → ¬(SSMem x s ∧ SSMem x s') := by
   let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
   rw [sfDisjClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -225,12 +176,12 @@ private theorem realize_sfDisjClause :
 
 private theorem realize_sfGuessToMarkedClause :
     SFRealize ρ sfGuessToMarkedClause ↔
-      ∀ s : A, ρ true ![s] → ∃ y : A, ρ false ![s, y] ∧ SSMarked y := by
+      ∀ s : A, ρ .guess ![s] → ∃ y : A, ρ .inj ![s, y] ∧ SSMarked y := by
   let := familyGuessBlock.structure ρ
   have hsubG : ∀ (w : Fin 1 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 2 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ false w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [sfGuessToMarkedClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -238,19 +189,19 @@ private theorem realize_sfGuessToMarkedClause :
   constructor
   · intro h s hs
     obtain ⟨y, hy1, hy2⟩ := h (fun _ => s) hs
-    exact ⟨y (), hy1, hy2⟩
+    exact ⟨y 0, hy1, hy2⟩
   · intro h i hi
     obtain ⟨y, hy1, hy2⟩ := h (i 0) hi
     exact ⟨fun _ => y, hy1, hy2⟩
 
 private theorem realize_sfMarkedToGuessClause :
     SFRealize ρ sfMarkedToGuessClause ↔
-      ∀ y : A, SSMarked y → ∃ s : A, ρ false ![y, s] ∧ ρ true ![s] := by
+      ∀ y : A, SSMarked y → ∃ s : A, ρ .inj ![y, s] ∧ ρ .guess ![s] := by
   let := familyGuessBlock.structure ρ
   have hsubG : ∀ (w : Fin 1 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 2 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ false w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [sfMarkedToGuessClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -258,16 +209,16 @@ private theorem realize_sfMarkedToGuessClause :
   constructor
   · intro h y hy
     obtain ⟨s, hs1, hs2⟩ := h (fun _ => y) hy
-    exact ⟨s (), hs1, hs2⟩
+    exact ⟨s 0, hs1, hs2⟩
   · intro h i hi
     obtain ⟨s, hs1, hs2⟩ := h (i 0) hi
     exact ⟨fun _ => s, hs1, hs2⟩
 
 private theorem realize_sfInjClause :
-    SFRealize ρ sfInjClause ↔ ∀ x x' y : A, ρ false ![x, y] → ρ false ![x', y] → x = x' := by
+    SFRealize ρ sfInjClause ↔ ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
   let := familyGuessBlock.structure ρ
   have hsubI : ∀ (w : Fin 2 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ false w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [sfInjClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
@@ -280,10 +231,10 @@ sets and covers every element, and the guessed binary relation injects it into
 the marked set. -/
 private theorem realize_setCoverKernel :
     SFRealize ρ setCoverKernel ↔
-      (∀ s : A, ρ true ![s] → SSFam s) ∧
-        (∀ x : A, SSElem x → ∃ s : A, ρ true ![s] ∧ SSMem x s) ∧
-        (∀ s : A, ρ true ![s] → ∃ y : A, ρ false ![s, y] ∧ SSMarked y) ∧
-        ∀ x x' y : A, ρ false ![x, y] → ρ false ![x', y] → x = x' := by
+      (∀ s : A, ρ .guess ![s] → SSFam s) ∧
+        (∀ x : A, SSElem x → ∃ s : A, ρ .guess ![s] ∧ SSMem x s) ∧
+        (∀ s : A, ρ .guess ![s] → ∃ y : A, ρ .inj ![s, y] ∧ SSMarked y) ∧
+        ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
   rw [setCoverKernel]
   simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
   exact and_congr (realize_sfFamClause ρ)
@@ -295,11 +246,11 @@ pairwise disjoint sets, and the guessed binary relation injects the marked set
 into it. -/
 private theorem realize_setPackingKernel :
     SFRealize ρ setPackingKernel ↔
-      (∀ s : A, ρ true ![s] → SSFam s) ∧
-        (∀ s s' x : A, ρ true ![s] → ρ true ![s'] → s ≠ s' → SSElem x →
+      (∀ s : A, ρ .guess ![s] → SSFam s) ∧
+        (∀ s s' x : A, ρ .guess ![s] → ρ .guess ![s'] → s ≠ s' → SSElem x →
           ¬(SSMem x s ∧ SSMem x s')) ∧
-        (∀ y : A, SSMarked y → ∃ s : A, ρ false ![y, s] ∧ ρ true ![s]) ∧
-        ∀ x x' y : A, ρ false ![x, y] → ρ false ![x', y] → x = x' := by
+        (∀ y : A, SSMarked y → ∃ s : A, ρ .inj ![y, s] ∧ ρ .guess ![s]) ∧
+        ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
   rw [setPackingKernel]
   simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
   exact and_congr (realize_sfFamClause ρ)
@@ -311,9 +262,9 @@ sets of the family, covers every ground element, and no element belongs to two
 distinct members. -/
 private theorem realize_exactCoverKernel :
     SFRealize ρ exactCoverKernel ↔
-      (∀ s : A, ρ true ![s] → SSFam s) ∧
-        (∀ x : A, SSElem x → ∃ s : A, ρ true ![s] ∧ SSMem x s) ∧
-        ∀ s s' x : A, ρ true ![s] → ρ true ![s'] → s ≠ s' → SSElem x →
+      (∀ s : A, ρ .guess ![s] → SSFam s) ∧
+        (∀ x : A, SSElem x → ∃ s : A, ρ .guess ![s] ∧ SSMem x s) ∧
+        ∀ s s' x : A, ρ .guess ![s] → ρ .guess ![s'] → s ≠ s' → SSElem x →
           ¬(SSMem x s ∧ SSMem x s') := by
   rw [exactCoverKernel]
   simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
@@ -322,10 +273,10 @@ private theorem realize_exactCoverKernel :
 
 private theorem realize_sfSplitInClause :
     SFRealize ρ sfSplitInClause ↔
-      ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ true ![x] := by
+      ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ .guess ![x] := by
   let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
   rw [sfSplitInClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
@@ -333,17 +284,17 @@ private theorem realize_sfSplitInClause :
   constructor
   · intro h f hf
     obtain ⟨x, ⟨hx1, hx2⟩, hx3⟩ := h (fun _ => f) hf
-    exact ⟨x (), hx1, hx2, hx3⟩
+    exact ⟨x 0, hx1, hx2, hx3⟩
   · intro h i hi
     obtain ⟨x, hx1, hx2, hx3⟩ := h (i 0) hi
     exact ⟨fun _ => x, ⟨hx1, hx2⟩, hx3⟩
 
 private theorem realize_sfSplitOutClause :
     SFRealize ρ sfSplitOutClause ↔
-      ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ true ![x] := by
+      ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ .guess ![x] := by
   let := familyGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
-      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
   rw [sfSplitOutClause]
   simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁,
@@ -352,7 +303,7 @@ private theorem realize_sfSplitOutClause :
   constructor
   · intro h f hf
     obtain ⟨x, ⟨hx1, hx2⟩, hx3⟩ := h (fun _ => f) hf
-    exact ⟨x (), hx1, hx2, hx3⟩
+    exact ⟨x 0, hx1, hx2, hx3⟩
   · intro h i hi
     obtain ⟨x, hx1, hx2, hx3⟩ := h (i 0) hi
     exact ⟨fun _ => x, ⟨hx1, hx2⟩, hx3⟩
@@ -360,8 +311,8 @@ private theorem realize_sfSplitOutClause :
 /-- Realization of the Set Splitting kernel. -/
 private theorem realize_setSplittingKernel :
     SFRealize ρ setSplittingKernel ↔
-      (∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ true ![x]) ∧
-        ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ true ![x] := by
+      (∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ .guess ![x]) ∧
+        ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ .guess ![x] := by
   rw [setSplittingKernel]
   simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
   exact and_congr (realize_sfSplitInClause ρ) (realize_sfSplitOutClause ρ)
@@ -381,8 +332,8 @@ theorem setCover_sigmaSODefinable : SigmaSODefinable 1 SetCover := by
   · rintro ⟨-, hsc⟩
     obtain ⟨G, hGfam, hcov, ⟨e⟩⟩ := (coversOn_iff_embedding _ _ _ _).mp hsc
     refine ⟨fun i => match i with
-      | true => fun w : Fin 1 → A => G (w 0)
-      | false => fun w : Fin 2 → A =>
+      | .guess => fun w : Fin 1 → A => G (w 0)
+      | .inj => fun w : Fin 2 → A =>
           ∃ h : G (w 0), (e ⟨w 0, h⟩ : {x // SSMarked x}).1 = w 1, ?_⟩
     refine (realize_setCoverKernel _).mpr
       ⟨fun s hs => hGfam s hs, fun x hx => hcov x hx,
@@ -391,11 +342,11 @@ theorem setCover_sigmaSODefinable : SigmaSODefinable 1 SetCover := by
     exact congrArg Subtype.val (e.injective (Subtype.ext (hs.trans hs'.symm)))
   · rintro ⟨ρ, hρ⟩
     obtain ⟨h1, h2, h3, h4⟩ := (realize_setCoverKernel ρ).mp hρ
-    have hch : ∀ s : {x : A // ρ true ![x]},
-        ∃ y : A, ρ false ![s.1, y] ∧ SSMarked y := fun s => h3 s.1 s.2
+    have hch : ∀ s : {x : A // ρ .guess ![x]},
+        ∃ y : A, ρ .inj ![s.1, y] ∧ SSMarked y := fun s => h3 s.1 s.2
     choose f hf1 hf2 using hch
     refine ⟨‹Finite A›, (coversOn_iff_embedding _ _ _ _).mpr
-      ⟨fun a => ρ true ![a], fun s hs => h1 s hs, fun x hx => h2 x hx,
+      ⟨fun a => ρ .guess ![a], fun s hs => h1 s hs, fun x hx => h2 x hx,
         ⟨⟨fun s => ⟨f s, hf2 s⟩, fun s s' hss' => ?_⟩⟩⟩⟩
     have hval : f s = f s' := congrArg Subtype.val hss'
     refine Subtype.ext (h4 s.1 s'.1 (f s) (hf1 s) ?_)
@@ -413,8 +364,8 @@ theorem setPacking_sigmaSODefinable : SigmaSODefinable 1 SetPacking := by
   · rintro ⟨-, hsp⟩
     obtain ⟨G, hGfam, hdisj, ⟨e⟩⟩ := (packsOn_iff_embedding _ _ _ _).mp hsp
     refine ⟨fun i => match i with
-      | true => fun w : Fin 1 → A => G (w 0)
-      | false => fun w : Fin 2 → A =>
+      | .guess => fun w : Fin 1 → A => G (w 0)
+      | .inj => fun w : Fin 2 → A =>
           ∃ h : SSMarked (w 0), (e ⟨w 0, h⟩ : {s // G s}).1 = w 1, ?_⟩
     refine (realize_setPackingKernel _).mpr
       ⟨fun s hs => hGfam s hs, fun s s' x hs hs' hne hx => hdisj s s' hs hs' hne x hx,
@@ -424,10 +375,10 @@ theorem setPacking_sigmaSODefinable : SigmaSODefinable 1 SetPacking := by
   · rintro ⟨ρ, hρ⟩
     obtain ⟨h1, h2, h3, h4⟩ := (realize_setPackingKernel ρ).mp hρ
     have hch : ∀ y : {x : A // SSMarked x},
-        ∃ s : A, ρ false ![y.1, s] ∧ ρ true ![s] := fun y => h3 y.1 y.2
+        ∃ s : A, ρ .inj ![y.1, s] ∧ ρ .guess ![s] := fun y => h3 y.1 y.2
     choose f hf1 hf2 using hch
     refine ⟨‹Finite A›, (packsOn_iff_embedding _ _ _ _).mpr
-      ⟨fun a => ρ true ![a], fun s hs => h1 s hs,
+      ⟨fun a => ρ .guess ![a], fun s hs => h1 s hs,
         fun s s' hs hs' hne x hx => h2 s s' x hs hs' hne hx,
         ⟨⟨fun y => ⟨f y, hf2 y⟩, fun y y' hyy' => ?_⟩⟩⟩⟩
     have hval : f y = f y' := congrArg Subtype.val hyy'
@@ -447,14 +398,14 @@ theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
   constructor
   · rintro ⟨G, hGfam, hcov, hdisj⟩
     refine ⟨fun i => match i with
-      | true => fun w : Fin 1 → A => G (w 0)
-      | false => fun _ : Fin 2 → A => False, ?_⟩
+      | .guess => fun w : Fin 1 → A => G (w 0)
+      | .inj => fun _ : Fin 2 → A => False, ?_⟩
     exact (realize_exactCoverKernel _).mpr
       ⟨fun s hs => hGfam s hs, fun x hx => hcov x hx,
         fun s s' x hs hs' hne hx => hdisj s s' hs hs' hne x hx⟩
   · rintro ⟨ρ, hρ⟩
     obtain ⟨hGfam, hcov, hdisj⟩ := (realize_exactCoverKernel ρ).mp hρ
-    exact ⟨fun s => ρ true ![s], hGfam, hcov,
+    exact ⟨fun s => ρ .guess ![s], hGfam, hcov,
       fun s s' hs hs' hne x hx => hdisj s s' x hs hs' hne hx⟩
 
 /-- **Set Splitting is `Σ₁`-definable**: existentially guess one color class
@@ -466,12 +417,12 @@ theorem setSplitting_sigmaSODefinable : SigmaSODefinable 1 SetSplitting := by
   constructor
   · rintro ⟨S, hS⟩
     refine ⟨fun i => match i with
-      | true => fun w : Fin 1 → A => S (w 0)
-      | false => fun _ : Fin 2 → A => False, ?_⟩
+      | .guess => fun w : Fin 1 → A => S (w 0)
+      | .inj => fun _ : Fin 2 → A => False, ?_⟩
     exact (realize_setSplittingKernel _).mpr
       ⟨fun f hf => (hS f hf).1, fun f hf => (hS f hf).2⟩
   · rintro ⟨ρ, hρ⟩
     obtain ⟨hin, hout⟩ := (realize_setSplittingKernel ρ).mp hρ
-    exact ⟨fun x => ρ true ![x], fun f hf => ⟨hin f hf, hout f hf⟩⟩
+    exact ⟨fun x => ρ .guess ![x], fun f hf => ⟨hin f hf, hout f hf⟩⟩
 
 end DescriptiveComplexity

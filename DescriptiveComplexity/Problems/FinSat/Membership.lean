@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.FinSat.Invented
 import DescriptiveComplexity.RecursivelyEnumerable
 
@@ -196,39 +197,33 @@ variable {ρ : certBlock.Assignment (A ⊕ Fin m)} {γ : Type}
 
 /-- An atom of a unary relation of the instance. -/
 noncomputable def instF₁ (R : Language.finsat.Relations 1) (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ (instSym R) (Term.var x)
+  fo%[x] (instSym R)(x)
 
 /-- An atom of a binary relation of the instance. -/
 noncomputable def instF₂ (R : Language.finsat.Relations 2) (x y : γ) : certLang.Formula γ :=
-  Relations.formula₂ (instSym R) (Term.var x) (Term.var y)
+  fo%[x, y] (instSym R)(x, y)
 
 /-- An atom of a ternary relation of the instance. -/
 noncomputable def instF₃ (R : Language.finsat.Relations 3) (x y z : γ) : certLang.Formula γ :=
-  (instSym R).formula ![Term.var x, Term.var y, Term.var z]
+  fo%[x, y, z] (instSym R)(x, y, z)
 
 /-- `x` is an original element. -/
-noncomputable def oldF (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ oldSym (Term.var x)
+noncomputable def oldF (x : γ) : certLang.Formula γ := fo%[x] oldSym(x)
 
 /-- `x` is an element of the model. -/
-noncomputable def eltF (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ eltSym (Term.var x)
+noncomputable def eltF (x : γ) : certLang.Formula γ := fo%[x] eltSym(x)
 
 /-- `x` is an environment. -/
-noncomputable def envF (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ envSym (Term.var x)
+noncomputable def envF (x : γ) : certLang.Formula γ := fo%[x] envSym(x)
 
 /-- The environment `e` gives the variable `x` the value `d`. -/
-noncomputable def valF (e x d : γ) : certLang.Formula γ :=
-  valSym.formula ![Term.var e, Term.var x, Term.var d]
+noncomputable def valF (e x d : γ) : certLang.Formula γ := fo%[e, x, d] valSym(e, x, d)
 
 /-- The node `g` holds under the environment `e`. -/
-noncomputable def gF (g e : γ) : certLang.Formula γ :=
-  Relations.formula₂ gSym (Term.var g) (Term.var e)
+noncomputable def gF (g e : γ) : certLang.Formula γ := fo%[g, e] gSym(g, e)
 
 /-- The atom at `g` holds under the environment `e`. -/
-noncomputable def hF (g e : γ) : certLang.Formula γ :=
-  Relations.formula₂ hSym (Term.var g) (Term.var e)
+noncomputable def hF (g e : γ) : certLang.Formula γ := fo%[g, e] hSym(g, e)
 
 @[simp]
 theorem realize_instF₁ (R : Language.finsat.Relations 1) (x : γ) (v : γ → A ⊕ Fin m) :
@@ -298,8 +293,7 @@ theorem realize_hF (g e : γ) (v : γ → A ⊕ Fin m) :
   exact Iff.rfl
 
 /-- Equality of two variables. -/
-noncomputable def eqF (x y : γ) : certLang.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def eqF (x y : γ) : certLang.Formula γ := fo%[x, y] x ≐ y
 
 @[simp]
 theorem realize_eqF (x y : γ) (v : γ → A ⊕ Fin m) :

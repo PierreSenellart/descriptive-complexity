@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.GadgetDouble
 
 /-!
@@ -90,25 +91,25 @@ variable {α : Type}
 
 /-- The two coordinates are equal: the point is a vertex-side node, which is
 indexed by the diagonal. -/
-private def diagF (x₀ x₁ : Language.graph.Term α) : Language.graph.Formula α :=
-  Term.equal x₀ x₁
+private def diagF (x₀ x₁ : α) : Language.graph.Formula α :=
+  Term.equal (Term.var x₀) (Term.var x₁)
 
 /-- The two coordinates form an arc: the point is an arc-side node. -/
-private def arcF (x₀ x₁ : Language.graph.Term α) : Language.graph.Formula α :=
-  Relations.formula₂ Language.adj x₀ x₁
+private def arcF (x₀ x₁ : α) : Language.graph.Formula α :=
+  Relations.formula₂ Language.adj (Term.var x₀) (Term.var x₁)
 
 /-- The two points carry the same vertex. -/
-private def sameVtxF (x₀ y₀ : Language.graph.Term α) : Language.graph.Formula α :=
-  Term.equal x₀ y₀
+private def sameVtxF (x₀ y₀ : α) : Language.graph.Formula α :=
+  Term.equal (Term.var x₀) (Term.var y₀)
 
 /-- The two points carry the same arc. -/
-private def sameArcF (x₀ x₁ y₀ y₁ : Language.graph.Term α) : Language.graph.Formula α :=
-  Term.equal x₀ y₀ ⊓ Term.equal x₁ y₁
+private def sameArcF (x₀ x₁ y₀ y₁ : α) : Language.graph.Formula α :=
+  Term.equal (Term.var x₀) (Term.var y₀) ⊓ Term.equal (Term.var x₁) (Term.var y₁)
 
 /-- The edges of the gadget, tag pair by tag pair. Every clause is stated in
 both directions, so the result is symmetric; no clause relates a tag to itself
 on the same point, so it is irreflexive. -/
-def edgeF (t s : GTag) (x₀ x₁ y₀ y₁ : Language.graph.Term α) : Language.graph.Formula α :=
+def edgeF (t s : GTag) (x₀ x₁ y₀ y₁ : α) : Language.graph.Formula α :=
   match t, s with
   -- the lollipop: vertex — m₁, and the triangle m₁ m₂ m₃
   | .vtx, .m₁ => diagF x₀ x₁ ⊓ diagF y₀ y₁ ⊓ sameVtxF x₀ y₀
@@ -126,8 +127,8 @@ def edgeF (t s : GTag) (x₀ x₁ y₀ y₁ : Language.graph.Term α) : Language
   | .b, .a => arcF x₀ x₁ ⊓ arcF y₀ y₁ ⊓ sameArcF x₀ x₁ y₀ y₁
   | .b, .c => arcF x₀ x₁ ⊓ arcF y₀ y₁ ⊓ sameArcF x₀ x₁ y₀ y₁
   | .c, .b => arcF x₀ x₁ ⊓ arcF y₀ y₁ ⊓ sameArcF x₀ x₁ y₀ y₁
-  | .c, .vtx => arcF x₀ x₁ ⊓ diagF y₀ y₁ ⊓ Term.equal x₁ y₀
-  | .vtx, .c => diagF x₀ x₁ ⊓ arcF y₀ y₁ ⊓ Term.equal y₁ x₀
+  | .c, .vtx => arcF x₀ x₁ ⊓ diagF y₀ y₁ ⊓ Term.equal (Term.var x₁) (Term.var y₀)
+  | .vtx, .c => diagF x₀ x₁ ⊓ arcF y₀ y₁ ⊓ Term.equal (Term.var y₁) (Term.var x₀)
   -- the pendant marking the tail side
   | .a, .p => arcF x₀ x₁ ⊓ arcF y₀ y₁ ⊓ sameArcF x₀ x₁ y₀ y₁
   | .p, .a => arcF x₀ x₁ ⊓ arcF y₀ y₁ ⊓ sameArcF x₀ x₁ y₀ y₁
@@ -140,9 +141,7 @@ isomorphisms. Eight tags, dimension two. -/
 def gadget : FOInterpretation Language.graph Language.graph GTag 2 where
   relFormula {n} R :=
     match n, R with
-    | _, .adj => fun t =>
-        edgeF (t 0) (t 1) (Term.var (0, 0)) (Term.var (0, 1))
-          (Term.var (1, 0)) (Term.var (1, 1))
+    | _, .adj => fun t => fo%⟨u, v⟩ (edgeF (t 0) (t 1))⟨u, u[1], v, v[1]⟩
 
 /-! ### The points -/
 

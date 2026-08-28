@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.Problems.ThreeColorability.Defs
 
@@ -57,28 +58,20 @@ inductive ColTag : Type
 carrying an edge. -/
 def isClauseFormula : ColTag → Language.graph.Formula (Fin 1 × Fin 2)
   | .varC _ => ⊥
-  | .vtxClause => Term.equal (Term.var (0, 0)) (Term.var (0, 1))
-  | .edgClause _ => adj.formula₂ (Term.var (0, 0)) (Term.var (0, 1))
+  | .vtxClause => fo%⟨u⟩ u ≐ u[1]
+  | .edgClause _ => fo%⟨u⟩ adj(u, u[1])
 
 /-- Defining formula for `satPosIn`: the vertex clause of `u` contains
 positively exactly the variables `xᵤᵢ`. -/
 def posInFormula : ColTag → ColTag → Language.graph.Formula (Fin 2 × Fin 2)
-  | .vtxClause, .varC _ =>
-      (Term.equal (Term.var (0, 0)) (Term.var (0, 1)) ⊓
-        Term.equal (Term.var (1, 0)) (Term.var (1, 1))) ⊓
-      Term.equal (Term.var (0, 0)) (Term.var (1, 0))
+  | .vtxClause, .varC _ => fo%⟨u, v⟩ (u ≐ u[1] ∧ v ≐ v[1]) ∧ u ≐ v
   | _, _ => ⊥
 
 /-- Defining formula for `satNegIn`: the edge clause of `(u, v)` for color `i`
 contains negatively exactly the variables `xᵤᵢ` and `xᵥᵢ`. -/
 def negInFormula : ColTag → ColTag → Language.graph.Formula (Fin 2 × Fin 2)
   | .edgClause i, .varC j =>
-      if i = j then
-        (adj.formula₂ (Term.var (0, 0)) (Term.var (0, 1)) ⊓
-          Term.equal (Term.var (1, 0)) (Term.var (1, 1))) ⊓
-        (Term.equal (Term.var (1, 0)) (Term.var (0, 0)) ⊔
-          Term.equal (Term.var (1, 0)) (Term.var (0, 1)))
-      else ⊥
+      fo%⟨u, v⟩ if i = j then (adj(u, u[1]) ∧ v ≐ v[1]) ∧ (v ≐ u ∨ v ≐ u[1]) else ⊥ᶠ
   | _, _ => ⊥
 
 /-- The first-order interpretation producing, from a graph, the CNF instance

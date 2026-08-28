@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Qbf.Defs
 import DescriptiveComplexity.SecondOrderMerge
 import DescriptiveComplexity.Padding
@@ -199,20 +200,14 @@ end Realize
 /-- The kernel for a conjunctive matrix: every clause contains a true
 literal. -/
 noncomputable def qbfCnfKernel (k : ℕ) : (qbfSOLang k).Sentence :=
-  ((Relations.formula₁ (qIsClSym k) (Term.var (Sum.inr 0))).imp
-    (((Relations.formula₂ (qPosSym k) (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓ qbfValF k (Sum.inr ())) ⊔
-      (Relations.formula₂ (qNegSym k) (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓ ∼(qbfValF k (Sum.inr ())))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ c, (qIsClSym k)(c) → ∃ x,
+    ((qPosSym k)(c, x) ∧ (qbfValF k)⟨x⟩) ∨ ((qNegSym k)(c, x) ∧ ¬ (qbfValF k)⟨x⟩)
 
 /-- The kernel for a disjunctive matrix: some term has all its literals
 true. -/
 noncomputable def qbfDnfKernel (k : ℕ) : (qbfSOLang k).Sentence :=
-  (Relations.formula₁ (qIsClSym k) (Term.var (Sum.inr 0)) ⊓
-    (((Relations.formula₂ (qPosSym k) (Term.var (Sum.inl (Sum.inr 0)))
-            (Term.var (Sum.inr ()))).imp (qbfValF k (Sum.inr ()))) ⊓
-      ((Relations.formula₂ (qNegSym k) (Term.var (Sum.inl (Sum.inr 0)))
-            (Term.var (Sum.inr ()))).imp (∼(qbfValF k (Sum.inr ()))))).iAlls Unit).iExs (Fin 1)
+  fo% ∃ c, (qIsClSym k)(c) ∧ ∀ x,
+    ((qPosSym k)(c, x) → (qbfValF k)⟨x⟩) ∧ ((qNegSym k)(c, x) → ¬ (qbfValF k)⟨x⟩)
 
 /-- The kernel of the `Σₖ`/`Πₖ` definition of a quantified Boolean formula
 problem, for either shape of matrix. -/
@@ -240,7 +235,7 @@ theorem realize_qbfKernel (k : ℕ) (cnf : Bool) {A : Type} [(Language.qbf k).St
       refine ⟨c 0, hc, fun x => ?_⟩
       exact ⟨(h fun _ => x).1, (h fun _ => x).2⟩
     · rintro ⟨c, hc, h⟩
-      exact ⟨fun _ => c, hc, fun x => ⟨(h (x ())).1, (h (x ())).2⟩⟩
+      exact ⟨fun _ => c, hc, fun x => ⟨(h (x 0)).1, (h (x 0)).2⟩⟩
   · rw [qbfKernel, qbfCnfKernel, QbfMatrix]
     change _ ↔ CnfSatWith false νs
     rw [CnfSatWith]
@@ -252,7 +247,7 @@ theorem realize_qbfKernel (k : ℕ) (cnf : Bool) {A : Type} [(Language.qbf k).St
     constructor
     · intro h c hc
       obtain ⟨x, hx⟩ := h (fun _ => c) hc
-      exact ⟨x (), hx⟩
+      exact ⟨x 0, hx⟩
     · intro h i hc
       obtain ⟨x, hx⟩ := h (i 0) hc
       exact ⟨fun _ => x, hx⟩

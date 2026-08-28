@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.Tactic.FinCases
-import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Encoding
 import DescriptiveComplexity.Decoding
@@ -581,10 +581,7 @@ The well-formedness sentence, its meaning, and the decoder.
 /-- Well-formedness of a website graph: exactly one root page. What makes an
 honest decoder possible. -/
 noncomputable def crawlWFSentence : Language.siteGraph.Sentence :=
-  Formula.iExs (Fin 1) (Relations.formula₁ wsRoot (Term.var (Sum.inr 0)) ⊓
-    Formula.iAlls (Fin 1)
-      ((Relations.formula₁ wsRoot (Term.var (Sum.inr 0))).imp
-        (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inl (Sum.inr 0))))))
+  fo% ∃ x, wsRoot(x) ∧ ∀ y, wsRoot(y) → y ≐ x
 
 theorem realize_crawlWFSentence {A : Type} [Language.siteGraph.Structure A] :
     A ⊨ crawlWFSentence ↔ ∃ x : A, WSRoot x ∧ ∀ y : A, WSRoot y → y = x := by
@@ -866,68 +863,17 @@ open SOBlock
 
 section SigmaOne
 
-/-- The four relation variables guessed by the `Σ₁` definition of Graph
-Crawling. -/
-inductive CrawlGuess
+/-- The single existential block of the `Σ₁` definition of Graph Crawling:
+the four relation variables it guesses. -/
+fo_block crawlGuessBlock over Language.siteGraph ws into crawlSOLang with kCr where
   /-- The crawled set of pages. -/
-  | set
-  /-- The root the crawl starts from. -/
-  | root
-  /-- The order certifying reachability from the root. -/
-  | order
+  set : 1
+  /-- The start page of the crawl. -/
+  start : 1
+  /-- The order certifying reachability from the start page. -/
+  order : 2
   /-- The injection witnessing the budget. -/
-  | inj
-  deriving DecidableEq
-
-instance : Fintype CrawlGuess := ⟨{.set, .root, .order, .inj}, fun t => by cases t <;> decide⟩
-
-/-- The single existential block of the `Σ₁` definition of Graph Crawling. -/
-def crawlGuessBlock : SOBlock where
-  ι := CrawlGuess
-  arity := fun i => match i with
-    | .set => 1
-    | .root => 1
-    | .order => 2
-    | .inj => 2
-
-/-- The symbol of the crawled-set relation variable. -/
-def cgSetRel : crawlGuessBlock.lang.Relations 1 := ⟨.set, rfl⟩
-
-/-- The symbol of the root relation variable. -/
-def cgRootRel : crawlGuessBlock.lang.Relations 1 := ⟨.root, rfl⟩
-
-/-- The symbol of the order relation variable. -/
-def cgOrderRel : crawlGuessBlock.lang.Relations 2 := ⟨.order, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def cgInjRel : crawlGuessBlock.lang.Relations 2 := ⟨.inj, rfl⟩
-
-/-- The vocabulary of the kernel. -/
-abbrev crawlSOLang : Language := Language.siteGraph.sum crawlGuessBlock.lang
-
-/-- The edge symbol in the kernel's vocabulary. -/
-abbrev kCrEdgeSym : crawlSOLang.Relations 2 := Sum.inl wsEdge
-
-/-- The root-mark symbol in the kernel's vocabulary. -/
-abbrev kCrRootMarkSym : crawlSOLang.Relations 1 := Sum.inl wsRoot
-
-/-- The target symbol in the kernel's vocabulary. -/
-abbrev kCrTargetSym : crawlSOLang.Relations 1 := Sum.inl wsTarget
-
-/-- The budget-mark symbol in the kernel's vocabulary. -/
-abbrev kCrMarkedSym : crawlSOLang.Relations 1 := Sum.inl wsMarked
-
-/-- The crawled-set symbol in the kernel's vocabulary. -/
-abbrev kCrSetSym : crawlSOLang.Relations 1 := Sum.inr cgSetRel
-
-/-- The root symbol in the kernel's vocabulary. -/
-abbrev kCrRootSym : crawlSOLang.Relations 1 := Sum.inr cgRootRel
-
-/-- The order symbol in the kernel's vocabulary. -/
-abbrev kCrLtSym : crawlSOLang.Relations 2 := Sum.inr cgOrderRel
-
-/-- The injection symbol in the kernel's vocabulary. -/
-abbrev kCrInjSym : crawlSOLang.Relations 2 := Sum.inr cgInjRel
+  inj : 2
 
 /-! ### The clauses -/
 
@@ -937,30 +883,30 @@ private noncomputable def crTargetClause : crawlSOLang.Sentence :=
 
 /-- Kernel clause: some root is guessed. -/
 private noncomputable def crRootExistsClause : crawlSOLang.Sentence :=
-  fo% ∃ x, kCrRootSym(x)
+  fo% ∃ x, kCrStartSym(x)
 
 /-- Kernel clause: the guessed root carries the vocabulary's root mark and is
 crawled. -/
 private noncomputable def crRootClause : crawlSOLang.Sentence :=
-  fo% ∀ x, kCrRootSym(x) → kCrRootMarkSym(x) ∧ kCrSetSym(x)
+  fo% ∀ x, kCrStartSym(x) → kCrRootSym(x) ∧ kCrSetSym(x)
 
 /-- Kernel clause: there is at most one guessed root. -/
 private noncomputable def crRootUniqueClause : crawlSOLang.Sentence :=
-  fo% ∀ x y, kCrRootSym(x) ∧ kCrRootSym(y) → x ≐ y
+  fo% ∀ x y, kCrStartSym(x) ∧ kCrStartSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
 private noncomputable def crTransClause : crawlSOLang.Sentence :=
-  fo% ∀ x y z, kCrLtSym(x, y) ∧ kCrLtSym(y, z) → kCrLtSym(x, z)
+  fo% ∀ x y z, kCrOrderSym(x, y) ∧ kCrOrderSym(y, z) → kCrOrderSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
 private noncomputable def crIrreflClause : crawlSOLang.Sentence :=
-  fo% ∀ x, ¬ kCrLtSym(x, x)
+  fo% ∀ x, ¬ kCrOrderSym(x, x)
 
 /-- Kernel clause: every crawled non-root page is linked from a crawled page
 strictly below it. -/
 private noncomputable def crStepClause : crawlSOLang.Sentence :=
-  fo% ∀ x, kCrSetSym(x) ∧ ¬ kCrRootSym(x) →
-    ∃ y, (kCrSetSym(y) ∧ kCrEdgeSym(y, x)) ∧ kCrLtSym(y, x)
+  fo% ∀ x, kCrSetSym(x) ∧ ¬ kCrStartSym(x) →
+    ∃ y, (kCrSetSym(y) ∧ kCrEdgeSym(y, x)) ∧ kCrOrderSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every crawled page to a marked
 element. -/
@@ -999,22 +945,22 @@ private theorem realize_crTargetClause :
   exact ⟨fun h x hx => h (fun _ => x) hx, fun h i hi => h (i 0) hi⟩
 
 private theorem realize_crRootExistsClause :
-    CRealize ρ crRootExistsClause ↔ ∃ x : A, ρ .root ![x] := by
+    CRealize ρ crRootExistsClause ↔ ∃ x : A, ρ .start ![x] := by
   let := crawlGuessBlock.structure ρ
   have hR : ∀ (w : Fin 1 → A),
-      RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+      RelMap (L := crawlSOLang) (M := A) kCrStartSym w ↔ ρ .start w := fun _ => Iff.rfl
   rw [crRootExistsClause]
   simp only [CRealize, Sentence.Realize, Formula.realize_iExs, Formula.realize_rel₁,
     Term.realize_var, Sum.elim_inr, hR]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨x, hx⟩ => ⟨fun _ => x, hx⟩⟩
 
 private theorem realize_crRootClause :
-    CRealize ρ crRootClause ↔ ∀ x : A, ρ .root ![x] → WSRoot x ∧ ρ .set ![x] := by
+    CRealize ρ crRootClause ↔ ∀ x : A, ρ .start ![x] → WSRoot x ∧ ρ .set ![x] := by
   let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
-      RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+      RelMap (L := crawlSOLang) (M := A) kCrStartSym w ↔ ρ .start w := fun _ => Iff.rfl
   rw [crRootClause]
   simp only [CRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_rel₁, Term.realize_var, Sum.elim_inr,
@@ -1022,10 +968,10 @@ private theorem realize_crRootClause :
   exact ⟨fun h x hx => h (fun _ => x) hx, fun h i hi => h (i 0) hi⟩
 
 private theorem realize_crRootUniqueClause :
-    CRealize ρ crRootUniqueClause ↔ ∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y := by
+    CRealize ρ crRootUniqueClause ↔ ∀ x y : A, ρ .start ![x] → ρ .start ![y] → x = y := by
   let := crawlGuessBlock.structure ρ
   have hR : ∀ (w : Fin 1 → A),
-      RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+      RelMap (L := crawlSOLang) (M := A) kCrStartSym w ↔ ρ .start w := fun _ => Iff.rfl
   rw [crRootUniqueClause]
   simp only [CRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_rel₁, Formula.realize_equal, Term.realize_var,
@@ -1037,7 +983,7 @@ private theorem realize_crTransClause :
       ∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z] := by
   let := crawlGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
-      RelMap (L := crawlSOLang) (M := A) kCrLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+      RelMap (L := crawlSOLang) (M := A) kCrOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [crTransClause]
   simp only [CRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
@@ -1048,22 +994,22 @@ private theorem realize_crIrreflClause :
     CRealize ρ crIrreflClause ↔ ∀ x : A, ¬ρ .order ![x, x] := by
   let := crawlGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
-      RelMap (L := crawlSOLang) (M := A) kCrLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+      RelMap (L := crawlSOLang) (M := A) kCrOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [crIrreflClause]
   simp only [CRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
     Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
   exact ⟨fun h x => h fun _ => x, fun h i => h (i 0)⟩
 
 private theorem realize_crStepClause :
-    CRealize ρ crStepClause ↔ ∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
+    CRealize ρ crStepClause ↔ ∀ x : A, ρ .set ![x] → ¬ρ .start ![x] →
       ∃ y : A, (ρ .set ![y] ∧ WSEdge y x) ∧ ρ .order ![y, x] := by
   let := crawlGuessBlock.structure ρ
   have hS : ∀ (w : Fin 1 → A),
       RelMap (L := crawlSOLang) (M := A) kCrSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hR : ∀ (w : Fin 1 → A),
-      RelMap (L := crawlSOLang) (M := A) kCrRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+      RelMap (L := crawlSOLang) (M := A) kCrStartSym w ↔ ρ .start w := fun _ => Iff.rfl
   have hL : ∀ (w : Fin 2 → A),
-      RelMap (L := crawlSOLang) (M := A) kCrLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+      RelMap (L := crawlSOLang) (M := A) kCrOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [crStepClause]
   simp only [CRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁,
@@ -1112,12 +1058,12 @@ private theorem realize_crInjClause :
 private theorem realize_crawlKernel :
     CRealize ρ crawlKernel ↔
       (∀ x : A, WSTarget x → ρ .set ![x]) ∧
-      (∃ x : A, ρ .root ![x]) ∧
-      (∀ x : A, ρ .root ![x] → WSRoot x ∧ ρ .set ![x]) ∧
-      (∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y) ∧
+      (∃ x : A, ρ .start ![x]) ∧
+      (∀ x : A, ρ .start ![x] → WSRoot x ∧ ρ .set ![x]) ∧
+      (∀ x y : A, ρ .start ![x] → ρ .start ![y] → x = y) ∧
       (∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z]) ∧
       (∀ x : A, ¬ρ .order ![x, x]) ∧
-      (∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
+      (∀ x : A, ρ .set ![x] → ¬ρ .start ![x] →
         ∃ y : A, (ρ .set ![y] ∧ WSEdge y x) ∧ ρ .order ![y, x]) ∧
       (∀ x : A, ρ .set ![x] → ∃ y : A, ρ .inj ![x, y] ∧ WSMarked y) ∧
       ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
@@ -1147,7 +1093,7 @@ theorem graphCrawling_sigmaSODefinable : SigmaSODefinable 1 GraphCrawling := by
       (crawlOn_iff_certificate _ _ _ _).mp hcr
     refine ⟨fun i => match i with
       | .set => fun w : Fin 1 → A => S (w 0)
-      | .root => fun w : Fin 1 → A => Rt (w 0)
+      | .start => fun w : Fin 1 → A => Rt (w 0)
       | .order => fun w : Fin 2 → A => Lt (w 0) (w 1)
       | .inj => fun w : Fin 2 → A =>
           ∃ h : S (w 0), (e ⟨w 0, h⟩ : {x // WSMarked x}).1 = w 1, ?_⟩
@@ -1167,7 +1113,7 @@ theorem graphCrawling_sigmaSODefinable : SigmaSODefinable 1 GraphCrawling := by
     choose f hf1 hf2 using hch
     refine ⟨‹Finite A›, (crawlOn_iff_certificate _ _ _ _).mpr
       ⟨fun x => ρ .set ![x], htargets,
-        ⟨fun x => ρ .root ![x], hex, fun x hx => hRtP x hx, huniq,
+        ⟨fun x => ρ .start ![x], hex, fun x hx => hRtP x hx, huniq,
           fun x y => ρ .order ![x, y], htrans, hirr, ?_⟩,
         ⟨⟨fun x => ⟨f x, hf2 x⟩, fun x x' hxx' => ?_⟩⟩⟩⟩
     · intro x hx hnr
@@ -1243,25 +1189,22 @@ noncomputable def crawlInterp :
     match n, R with
     | _, .edge => fun t =>
       match t 0, t 1 with
-      | .root, .fam => minF (0, 0) ⊓ Relations.formula₁ oSSFam (Term.var (1, 0))
-      | .fam, .elem =>
-          (Relations.formula₂ oSSMem (Term.var (1, 0)) (Term.var (0, 0)) ⊓
-            Relations.formula₁ oSSFam (Term.var (0, 0))) ⊓
-            Relations.formula₁ oSSElem (Term.var (1, 0))
+      | .root, .fam => fo%⟨u, v⟩ minF⟨u⟩ ∧ oSSFam(v)
+      | .fam, .elem => fo%⟨u, v⟩ (oSSMem(v, u) ∧ oSSFam(u)) ∧ oSSElem(v)
       | _, _ => ⊥
     | _, .root => fun t =>
       match t 0 with
-      | .root => minF (0, 0)
+      | .root => fo%⟨u⟩ minF⟨u⟩
       | _ => ⊥
     | _, .target => fun t =>
       match t 0 with
-      | .elem => Relations.formula₁ oSSElem (Term.var (0, 0))
+      | .elem => fo%⟨u⟩ oSSElem(u)
       | _ => ⊥
     | _, .marked => fun t =>
       match t 0 with
-      | .root => minF (0, 0)
-      | .fam => Relations.formula₁ oSSMarked (Term.var (0, 0))
-      | .elem => Relations.formula₁ oSSElem (Term.var (0, 0))
+      | .root => fo%⟨u⟩ minF⟨u⟩
+      | .fam => fo%⟨u⟩ oSSMarked(u)
+      | .elem => fo%⟨u⟩ oSSElem(u)
 
 section Characterizations
 

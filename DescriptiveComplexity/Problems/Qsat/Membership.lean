@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.Data.Set.Card
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Qsat.Defs
 
 /-!
@@ -83,22 +84,18 @@ theorem realize_bitS (R : L'.Relations 0) :
 /-- “`x` is marked, lies outside `d`, and no marked element outside `d`
 precedes it”: the element a position plays next. -/
 noncomputable def leastF (mark d : L'.Relations 1) (prec : L'.Relations 2)
-    (x : L'.Term γ) : L'.Formula γ :=
-  (Relations.formula₁ mark x ⊓ ∼(Relations.formula₁ d x)) ⊓
-    (((Relations.formula₁ mark (Term.var (Sum.inr 0)) ⊓
-        ∼(Relations.formula₁ d (Term.var (Sum.inr 0)))).imp
-      ∼(Relations.formula₂ prec (Term.var (Sum.inr 0)) (x.relabel Sum.inl))).iAlls (Fin 1))
+    (x : γ) : L'.Formula γ :=
+  fo%[x] (mark(x) ∧ ¬ d(x)) ∧ ∀ y, mark(y) ∧ ¬ d(y) → ¬ prec(y, x)
 
 theorem realize_leastF (mark d : L'.Relations 1) (prec : L'.Relations 2)
-    (x : L'.Term γ) (v : γ → M) :
+    (x : γ) (v : γ → M) :
     (leastF mark d prec x).Realize v ↔
-      (RelMap mark ![x.realize v] ∧ ¬RelMap d ![x.realize v] ∧
-        ∀ y : M, RelMap mark ![y] → ¬RelMap d ![y] →
-          ¬RelMap prec ![y, x.realize v]) := by
+      (RelMap mark ![v x] ∧ ¬RelMap d ![v x] ∧
+        ∀ y : M, RelMap mark ![y] → ¬RelMap d ![y] → ¬RelMap prec ![y, v x]) := by
   rw [leastF]
   simp only [Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁,
     Formula.realize_rel₂, Formula.realize_iAlls, Formula.realize_imp, Term.realize_var,
-    Term.realize_relabel, Sum.elim_comp_inl, and_assoc]
+    Sum.elim_inl, Sum.elim_inr, and_assoc]
   refine and_congr Iff.rfl (and_congr Iff.rfl ⟨fun h y hy hd => ?_, fun h i hi => ?_⟩)
   · exact h (fun _ => y) ⟨hy, hd⟩
   · exact h (i 0) hi.1 hi.2
@@ -106,30 +103,25 @@ theorem realize_leastF (mark d : L'.Relations 1) (prec : L'.Relations 2)
 /-- “`x` is marked, lies inside `d`, and precedes no marked element of `d`”:
 the element a position returns to. -/
 noncomputable def greatestF (mark d : L'.Relations 1) (prec : L'.Relations 2)
-    (x : L'.Term γ) : L'.Formula γ :=
-  (Relations.formula₁ mark x ⊓ Relations.formula₁ d x) ⊓
-    (((Relations.formula₁ mark (Term.var (Sum.inr 0)) ⊓
-        Relations.formula₁ d (Term.var (Sum.inr 0))).imp
-      ∼(Relations.formula₂ prec (x.relabel Sum.inl) (Term.var (Sum.inr 0)))).iAlls (Fin 1))
+    (x : γ) : L'.Formula γ :=
+  fo%[x] (mark(x) ∧ d(x)) ∧ ∀ y, mark(y) ∧ d(y) → ¬ prec(x, y)
 
 theorem realize_greatestF (mark d : L'.Relations 1) (prec : L'.Relations 2)
-    (x : L'.Term γ) (v : γ → M) :
+    (x : γ) (v : γ → M) :
     (greatestF mark d prec x).Realize v ↔
-      (RelMap mark ![x.realize v] ∧ RelMap d ![x.realize v] ∧
-        ∀ y : M, RelMap mark ![y] → RelMap d ![y] →
-          ¬RelMap prec ![x.realize v, y]) := by
+      (RelMap mark ![v x] ∧ RelMap d ![v x] ∧
+        ∀ y : M, RelMap mark ![y] → RelMap d ![y] → ¬RelMap prec ![v x, y]) := by
   rw [greatestF]
   simp only [Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁,
     Formula.realize_rel₂, Formula.realize_iAlls, Formula.realize_imp, Term.realize_var,
-    Term.realize_relabel, Sum.elim_comp_inl, and_assoc]
+    Sum.elim_inl, Sum.elim_inr, and_assoc]
   refine and_congr Iff.rfl (and_congr Iff.rfl ⟨fun h y hy hd => ?_, fun h i hi => ?_⟩)
   · exact h (fun _ => y) ⟨hy, hd⟩
   · exact h (i 0) hi.1 hi.2
 
 /-- “Every marked element lies in `d`”: the position is a leaf. -/
 noncomputable def coveredF (mark d : L'.Relations 1) : L'.Formula γ :=
-  ((Relations.formula₁ mark (Term.var (Sum.inr 0))).imp
-    (Relations.formula₁ d (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+  fo% ∀ y, mark(y) → d(y)
 
 theorem realize_coveredF (mark d : L'.Relations 1) (v : γ → M) :
     (coveredF (γ := γ) mark d).Realize v ↔ ∀ y : M, RelMap mark ![y] → RelMap d ![y] := by
@@ -139,7 +131,7 @@ theorem realize_coveredF (mark d : L'.Relations 1) (v : γ → M) :
 
 /-- “No element lies in `d`”. -/
 noncomputable def emptyF (d : L'.Relations 1) : L'.Formula γ :=
-  Formula.iAlls (Fin 1) (∼(Relations.formula₁ d (Term.var (Sum.inr 0) : L'.Term (γ ⊕ Fin 1))))
+  fo% ∀ y, ¬ d(y)
 
 theorem realize_emptyF (d : L'.Relations 1) (v : γ → M) :
     (emptyF (γ := γ) d).Realize v ↔ ∀ y : M, ¬RelMap d ![y] := by
@@ -151,12 +143,7 @@ theorem realize_emptyF (d : L'.Relations 1) (v : γ → M) :
 makes true. -/
 noncomputable def matrixF (cl mark : L'.Relations 1) (pos neg : L'.Relations 2)
     (t : L'.Relations 1) : L'.Formula γ :=
-  ((Relations.formula₁ cl (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₁ mark (Term.var (Sum.inr 0)) ⊓
-      ((Relations.formula₂ pos (Term.var (Sum.inl (Sum.inr 0))) (Term.var (Sum.inr 0)) ⊓
-          Relations.formula₁ t (Term.var (Sum.inr 0))) ⊔
-        (Relations.formula₂ neg (Term.var (Sum.inl (Sum.inr 0))) (Term.var (Sum.inr 0)) ⊓
-          ∼(Relations.formula₁ t (Term.var (Sum.inr 0)))))).iExs (Fin 1))).iAlls (Fin 1)
+  fo% ∀ c, cl(c) → ∃ y, mark(y) ∧ ((pos(c, y) ∧ t(y)) ∨ (neg(c, y) ∧ ¬ t(y)))
 
 theorem realize_matrixF (cl mark : L'.Relations 1) (pos neg : L'.Relations 2)
     (t : L'.Relations 1) (v : γ → M) :
@@ -176,29 +163,27 @@ theorem realize_matrixF (cl mark : L'.Relations 1) (pos neg : L'.Relations 2)
     exact ⟨fun _ => y, hy⟩
 
 /-- “`a'` holds of `y` exactly when `a` does”: an unchanged component. -/
-def sameF (a' a : L'.Relations 1) (y : L'.Term γ) : L'.Formula γ :=
-  (Relations.formula₁ a' y).iff (Relations.formula₁ a y)
+def sameF (a' a : L'.Relations 1) (y : γ) : L'.Formula γ :=
+  (Relations.formula₁ a' (Term.var y)).iff (Relations.formula₁ a (Term.var y))
 
-theorem realize_sameF (a' a : L'.Relations 1) (y : L'.Term γ) (v : γ → M) :
-    (sameF a' a y).Realize v ↔ (RelMap a' ![y.realize v] ↔ RelMap a ![y.realize v]) := by
+theorem realize_sameF (a' a : L'.Relations 1) (y : γ) (v : γ → M) :
+    (sameF a' a y).Realize v ↔ (RelMap a' ![v y] ↔ RelMap a ![v y]) := by
   rw [sameF]
-  simp only [Formula.realize_iff, Formula.realize_rel₁]
+  simp only [Formula.realize_iff, Formula.realize_rel₁, Term.realize_var]
 
 /-- “`a'` is `a` with the value of `x` set to `φ`”: the one update shape the
 walk needs – adding `x` (`φ = ⊤`) and removing it (`φ = ⊥`). -/
-def updF (a' a : L'.Relations 1) (φ : L'.Formula γ) (x y : L'.Term γ) : L'.Formula γ :=
-  (Relations.formula₁ a' y).iff
-    ((y.equal x ⊓ φ) ⊔ (∼(y.equal x) ⊓ Relations.formula₁ a y))
+def updF (a' a : L'.Relations 1) (φ : L'.Formula γ) (x y : γ) : L'.Formula γ :=
+  (Relations.formula₁ a' (Term.var y)).iff
+    (((Term.var y).equal (Term.var x) ⊓ φ) ⊔
+      (∼((Term.var y).equal (Term.var x)) ⊓ Relations.formula₁ a (Term.var y)))
 
-theorem realize_updF (a' a : L'.Relations 1) (φ : L'.Formula γ) (x y : L'.Term γ)
-    (v : γ → M) :
+theorem realize_updF (a' a : L'.Relations 1) (φ : L'.Formula γ) (x y : γ) (v : γ → M) :
     (updF a' a φ x y).Realize v ↔
-      (RelMap a' ![y.realize v] ↔
-        ((y.realize v = x.realize v ∧ φ.Realize v) ∨
-          (y.realize v ≠ x.realize v ∧ RelMap a ![y.realize v]))) := by
+      (RelMap a' ![v y] ↔ ((v y = v x ∧ φ.Realize v) ∨ (v y ≠ v x ∧ RelMap a ![v y]))) := by
   rw [updF]
   simp only [Formula.realize_iff, Formula.realize_rel₁, Formula.realize_sup,
-    Formula.realize_inf, Formula.realize_not, Formula.realize_equal]
+    Formula.realize_inf, Formula.realize_not, Formula.realize_equal, Term.realize_var]
 
 /-! #### Well-formedness
 
@@ -206,28 +191,19 @@ The prefix order is a strict linear order on the marked elements. -/
 
 /-- The prefix order only relates marked elements. -/
 noncomputable def wfMarkedF (mark : L'.Relations 1) (prec : L'.Relations 2) : L'.Formula γ :=
-  ((Relations.formula₂ prec (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    (Relations.formula₁ mark (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ mark (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, prec(x, y) → mark(x) ∧ mark(y)
 
 /-- The prefix order is irreflexive. -/
 noncomputable def wfIrreflF (prec : L'.Relations 2) : L'.Formula γ :=
-  Formula.iAlls (Fin 1)
-    (∼(Relations.formula₂ prec (Term.var (Sum.inr 0) : L'.Term (γ ⊕ Fin 1)) (Term.var (Sum.inr 0))))
+  fo% ∀ x, ¬ prec(x, x)
 
 /-- The prefix order is transitive. -/
 noncomputable def wfTransF (prec : L'.Relations 2) : L'.Formula γ :=
-  ((Relations.formula₂ prec (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ prec (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Relations.formula₂ prec (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x y z, prec(x, y) ∧ prec(y, z) → prec(x, z)
 
 /-- The prefix order is total on the marked elements. -/
 noncomputable def wfTotalF (mark : L'.Relations 1) (prec : L'.Relations 2) : L'.Formula γ :=
-  ((Relations.formula₁ mark (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ mark (Term.var (Sum.inr 1)) ⊓
-      ∼((Term.var (Sum.inr 0)).equal (Term.var (Sum.inr 1)))).imp
-    (Relations.formula₂ prec (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊔
-      Relations.formula₂ prec (Term.var (Sum.inr 1)) (Term.var (Sum.inr 0)))).iAlls (Fin 2)
+  fo% ∀ x y, (mark(x) ∧ mark(y)) ∧ ¬ x ≐ y → prec(x, y) ∨ prec(y, x)
 
 /-- The instance is well formed: the prefix order is a strict linear order on
 the marked elements. -/
@@ -285,29 +261,26 @@ variable {L' : Language.{0, 0}} {M : Type} [L'.Structure M]
 /-- “The subtree of `x` is finished”: either its second value has been played
 already, or the value just returned settles the node – true at an existential
 `x`, false at a universal one. -/
-def popF (allv t : L'.Relations 1) (r : L'.Relations 0) {γ : Type}
-    (x : L'.Term γ) : L'.Formula γ :=
-  Relations.formula₁ t x ⊔
-    ((Relations.formula₁ allv x ⊓ ∼(bitF r)) ⊔ (∼(Relations.formula₁ allv x) ⊓ bitF r))
+def popF (allv t : L'.Relations 1) (r : L'.Relations 0) {γ : Type} (x : γ) : L'.Formula γ :=
+  Relations.formula₁ t (Term.var x) ⊔
+    ((Relations.formula₁ allv (Term.var x) ⊓ ∼(bitF r)) ⊔
+      (∼(Relations.formula₁ allv (Term.var x)) ⊓ bitF r))
 
 theorem realize_popF (allv t : L'.Relations 1) (r : L'.Relations 0) {γ : Type}
-    (x : L'.Term γ) (v : γ → M) :
+    (x : γ) (v : γ → M) :
     (popF allv t r x).Realize v ↔
-      (RelMap t ![x.realize v] ∨
-        ((RelMap allv ![x.realize v] ∧ ¬RelMap r (![] : Fin 0 → M)) ∨
-          (¬RelMap allv ![x.realize v] ∧ RelMap r (![] : Fin 0 → M)))) := by
+      (RelMap t ![v x] ∨
+        ((RelMap allv ![v x] ∧ ¬RelMap r (![] : Fin 0 → M)) ∨
+          (¬RelMap allv ![v x] ∧ RelMap r (![] : Fin 0 → M)))) := by
   rw [popF]
   simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
-    Formula.realize_rel₁, realize_bitF]
+    Formula.realize_rel₁, realize_bitF, Term.realize_var]
 
 /-- Descending one step: the next variable joins the quantified set with the
 value `false`. -/
 noncomputable def downSetS (mark d t d' t' : L'.Relations 1) (prec : L'.Relations 2) :
     L'.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((leastF mark d prec (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 2))).imp
-      (updF d' d ⊤ (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-        updF t' t ⊥ (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))))
+  fo% ∀ x y, (leastF mark d prec)⟨x⟩ → (updF d' d ⊤)⟨x, y⟩ ∧ (updF t' t ⊥)⟨x, y⟩
 
 theorem realize_downSetS (mark d t d' t' : L'.Relations 1) (prec : L'.Relations 2) :
     M ⊨ downSetS mark d t d' t' prec ↔
@@ -317,7 +290,7 @@ theorem realize_downSetS (mark d t d' t' : L'.Relations 1) (prec : L'.Relations 
           (RelMap t' ![y] ↔ ((y = x ∧ False) ∨ (y ≠ x ∧ RelMap t ![y])))) := by
   rw [downSetS]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
-    realize_leastF, realize_updF, Term.realize_var, Sum.elim_inr, Formula.realize_top,
+    realize_leastF, realize_updF, Sum.elim_inr, Formula.realize_top,
     Formula.realize_bot]
   exact ⟨fun h x y => h ![x, y], fun h i => h (i 0) (i 1)⟩
 
@@ -325,9 +298,7 @@ theorem realize_downSetS (mark d t d' t' : L'.Relations 1) (prec : L'.Relations 
 along. -/
 noncomputable def downBitsS (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) : L'.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((leastF mark d prec (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 1))).imp
-      (∼(bitF u') ⊓ (bitF r').iff (bitF r)))
+  fo% ∀ x, (leastF mark d prec)⟨x⟩ → ¬ !(bitF u') ∧ (!(bitF r') ↔ !(bitF r))
 
 theorem realize_downBitsS (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) :
@@ -338,16 +309,12 @@ theorem realize_downBitsS (mark d : L'.Relations 1) (prec : L'.Relations 2)
           (RelMap r' (![] : Fin 0 → M) ↔ RelMap r (![] : Fin 0 → M))) := by
   rw [downBitsS]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
-    Formula.realize_not, Formula.realize_iff, realize_leastF, realize_bitF, Term.realize_var,
-    Sum.elim_inr]
+    Formula.realize_not, Formula.realize_iff, realize_leastF, realize_bitF, Sum.elim_inr]
   exact ⟨fun h x => h fun _ => x, fun h i => h (i 0)⟩
 
 /-- At a leaf the two unary components are unchanged. -/
 noncomputable def leafSetS (mark d t d' t' : L'.Relations 1) : L'.Sentence :=
-  (coveredF mark d).imp
-    (Formula.iAlls (Fin 1)
-      (sameF d' d (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 1)) ⊓
-        sameF t' t (Term.var (Sum.inr 0))))
+  fo% !(coveredF mark d) → ∀ y, (sameF d' d)⟨y⟩ ∧ (sameF t' t)⟨y⟩
 
 theorem realize_leafSetS (mark d t d' t' : L'.Relations 1) :
     M ⊨ leafSetS mark d t d' t' ↔
@@ -355,7 +322,7 @@ theorem realize_leafSetS (mark d t d' t' : L'.Relations 1) :
         ∀ y : M, (RelMap d' ![y] ↔ RelMap d ![y]) ∧ (RelMap t' ![y] ↔ RelMap t ![y])) := by
   rw [leafSetS]
   simp only [Sentence.Realize, Formula.realize_imp, Formula.realize_iAlls, Formula.realize_inf,
-    realize_coveredF, realize_sameF, Term.realize_var, Sum.elim_inr]
+    realize_coveredF, realize_sameF, Sum.elim_inr]
   exact ⟨fun h hc y => h hc fun _ => y, fun h hc i => h hc (i 0)⟩
 
 /-- At a leaf the walk starts returning, carrying the value of the matrix. -/
@@ -378,52 +345,41 @@ theorem realize_leafBitsS (cl mark d t : L'.Relations 1) (pos neg : L'.Relations
 
 /-- Returning is only possible from a nonempty branch. -/
 noncomputable def upExS (mark d : L'.Relations 1) (prec : L'.Relations 2) : L'.Sentence :=
-  Formula.iExs (Fin 1) (greatestF mark d prec (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 1)))
+  fo% ∃ x, (greatestF mark d prec)⟨x⟩
 
 theorem realize_upExS (mark d : L'.Relations 1) (prec : L'.Relations 2) :
     M ⊨ upExS mark d prec ↔
       ∃ x : M, RelMap mark ![x] ∧ RelMap d ![x] ∧
         ∀ z : M, RelMap mark ![z] → RelMap d ![z] → ¬RelMap prec ![x, z] := by
   rw [upExS]
-  simp only [Sentence.Realize, Formula.realize_iExs, realize_greatestF, Term.realize_var,
-    Sum.elim_inr]
+  simp only [Sentence.Realize, Formula.realize_iExs, realize_greatestF, Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨x, hx⟩ => ⟨fun _ => x, hx⟩⟩
 
 /-- Popping a finished variable: it leaves the quantified set, the values are
 unchanged. -/
 noncomputable def popSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relations 2)
     (r : L'.Relations 0) : L'.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((greatestF mark d prec (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 2)) ⊓
-        popF allv t r (Term.var (Sum.inr 0))).imp
-      (updF d' d ⊥ (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-        sameF t' t (Term.var (Sum.inr 1))))
+  fo% ∀ x y, (greatestF mark d prec)⟨x⟩ ∧ (popF allv t r)⟨x⟩ →
+    (updF d' d ⊥)⟨x, y⟩ ∧ (sameF t' t)⟨y⟩
 
 /-- Playing the second value of an unfinished variable. -/
 noncomputable def flipSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relations 2)
     (r : L'.Relations 0) : L'.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((greatestF mark d prec (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 2)) ⊓
-        ∼(popF allv t r (Term.var (Sum.inr 0)))).imp
-      (sameF d' d (Term.var (Sum.inr 1)) ⊓
-        updF t' t ⊤ (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))))
+  fo% ∀ x y, (greatestF mark d prec)⟨x⟩ ∧ ¬ (popF allv t r)⟨x⟩ →
+    (sameF d' d)⟨y⟩ ∧ (updF t' t ⊤)⟨x, y⟩
 
 /-- Popping a finished variable: the walk keeps returning, with the same
 value. -/
 noncomputable def popBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) : L'.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((greatestF mark d prec (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 1)) ⊓
-        popF allv t r (Term.var (Sum.inr 0))).imp
-      (bitF u' ⊓ (bitF r').iff (bitF r)))
+  fo% ∀ x, (greatestF mark d prec)⟨x⟩ ∧ (popF allv t r)⟨x⟩ →
+    !(bitF u') ∧ (!(bitF r') ↔ !(bitF r))
 
 /-- Playing the second value: the walk goes back to descending. -/
 noncomputable def flipBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) : L'.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((greatestF mark d prec (Term.var (Sum.inr 0) : L'.Term (Empty ⊕ Fin 1)) ⊓
-        ∼(popF allv t r (Term.var (Sum.inr 0)))).imp
-      (∼(bitF u') ⊓ (bitF r').iff (bitF r)))
+  fo% ∀ x, (greatestF mark d prec)⟨x⟩ ∧ ¬ (popF allv t r)⟨x⟩ →
+    ¬ !(bitF u') ∧ (!(bitF r') ↔ !(bitF r))
 
 /-- The shared guard of the two returning cases: `x` is the last variable of
 the branch. -/
@@ -445,8 +401,8 @@ theorem realize_popSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relati
           (RelMap t' ![y] ↔ RelMap t ![y])) := by
   rw [popSetS]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
-    realize_greatestF, realize_popF, realize_updF, realize_sameF, Term.realize_var,
-    Sum.elim_inr, Formula.realize_bot, isLastM, isPopM, and_imp]
+    realize_greatestF, realize_popF, realize_updF, realize_sameF, Sum.elim_inr,
+    Formula.realize_bot, isLastM, isPopM, and_imp]
   exact ⟨fun h x y => h ![x, y], fun h i => h (i 0) (i 1)⟩
 
 theorem realize_flipSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relations 2)
@@ -458,7 +414,7 @@ theorem realize_flipSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relat
   rw [flipSetS]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
     Formula.realize_not, realize_greatestF, realize_popF, realize_updF, realize_sameF,
-    Term.realize_var, Sum.elim_inr, Formula.realize_top, isLastM, isPopM, and_imp]
+    Sum.elim_inr, Formula.realize_top, isLastM, isPopM, and_imp]
   exact ⟨fun h x y => h ![x, y], fun h i => h (i 0) (i 1)⟩
 
 theorem realize_popBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2)
@@ -469,7 +425,7 @@ theorem realize_popBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2
           (RelMap r' (![] : Fin 0 → M) ↔ RelMap r (![] : Fin 0 → M))) := by
   rw [popBitsS]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
-    Formula.realize_iff, realize_greatestF, realize_popF, realize_bitF, Term.realize_var,
+    Formula.realize_iff, realize_greatestF, realize_popF, realize_bitF,
     Sum.elim_inr, isLastM, isPopM, and_imp]
   exact ⟨fun h x => h fun _ => x, fun h i => h (i 0)⟩
 
@@ -482,7 +438,7 @@ theorem realize_flipBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 
   rw [flipBitsS]
   simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
     Formula.realize_iff, Formula.realize_not, realize_greatestF, realize_popF, realize_bitF,
-    Term.realize_var, Sum.elim_inr, isLastM, isPopM, and_imp]
+    Sum.elim_inr, isLastM, isPopM, and_imp]
   exact ⟨fun h x => h fun _ => x, fun h i => h (i 0)⟩
 
 end StepShapes

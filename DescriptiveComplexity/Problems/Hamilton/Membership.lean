@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Hamilton.Defs
 import DescriptiveComplexity.SecondOrder
 
@@ -38,66 +40,44 @@ section SigmaOne
 
 /-- The single existential block of the `Σ₁` definitions: the circuit,
 guessed as a linear order of the universe. -/
-def hamGuessBlock : SOBlock where
-  ι := Unit
-  arity := fun _ => 2
-
-/-- The symbol of the guessed order. -/
-def hamLeRel : hamGuessBlock.lang.Relations 2 := ⟨(), rfl⟩
-
-/-- The vocabulary of the kernel: digraphs together with the guessed order. -/
-abbrev hamSOLang : Language := Language.digraph.sum hamGuessBlock.lang
-
-/-- The arc symbol in the kernel's vocabulary. -/
-abbrev hArcSym : hamSOLang.Relations 2 := Sum.inl dgArc
-
-/-- The order symbol in the kernel's vocabulary. -/
-abbrev hLeSym : hamSOLang.Relations 2 := Sum.inr hamLeRel
+fo_block hamGuessBlock over Language.digraph dg into hamSOLang with h where
+  /-- The guessed order. -/
+  le : 2
 
 /-- The guessed order, as an atom. -/
 private def leF {α : Type} (x y : α) : hamSOLang.Formula α :=
-  Relations.formula₂ hLeSym (Term.var x) (Term.var y)
+  fo%[x, y] hLeSym(x, y)
 
 /-- Adjacency, as the problem at hand reads it: the arc itself when `dir` is
 true, the arc in either direction otherwise. -/
 private def adjF (dir : Bool) {α : Type} (x y : α) : hamSOLang.Formula α :=
-  if dir then Relations.formula₂ hArcSym (Term.var x) (Term.var y)
-  else Relations.formula₂ hArcSym (Term.var x) (Term.var y) ⊔
-    Relations.formula₂ hArcSym (Term.var y) (Term.var x)
+  fo%[x, y] if dir then hArcSym(x, y) else hArcSym(x, y) ∨ hArcSym(y, x)
 
 /-- Kernel conjunct: the guessed order is reflexive. -/
 private noncomputable def hamReflClause : hamSOLang.Sentence :=
-  (leF (Sum.inr 0) (Sum.inr 0)).iAlls (Fin 1)
+  fo% ∀ x, leF⟨x, x⟩
 
 /-- Kernel conjunct: the guessed order is transitive. -/
 private noncomputable def hamTransClause : hamSOLang.Sentence :=
-  ((leF (Sum.inr 0) (Sum.inr 1) ⊓ leF (Sum.inr 1) (Sum.inr 2)).imp
-    (leF (Sum.inr 0) (Sum.inr 2))).iAlls (Fin 3)
+  fo% ∀ x y z, leF⟨x, y⟩ ∧ leF⟨y, z⟩ → leF⟨x, z⟩
 
 /-- Kernel conjunct: the guessed order is antisymmetric. -/
 private noncomputable def hamAntisymClause : hamSOLang.Sentence :=
-  ((leF (Sum.inr 0) (Sum.inr 1) ⊓ leF (Sum.inr 1) (Sum.inr 0)).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, leF⟨x, y⟩ ∧ leF⟨y, x⟩ → x ≐ y
 
 /-- Kernel conjunct: the guessed order is total. -/
 private noncomputable def hamTotalClause : hamSOLang.Sentence :=
-  (leF (Sum.inr 0) (Sum.inr 1) ⊔ leF (Sum.inr 1) (Sum.inr 0)).iAlls (Fin 2)
+  fo% ∀ x y, leF⟨x, y⟩ ∨ leF⟨y, x⟩
 
 /-- Kernel conjunct: every element is adjacent to its immediate successor. -/
 private noncomputable def hamSuccClause (dir : Bool) : hamSOLang.Sentence :=
-  ((leF (Sum.inr 0) (Sum.inr 1) ⊓ ∼(Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))) ⊓
-      (((leF (Sum.inl (Sum.inr 0)) (Sum.inr ()) ⊓
-          leF (Sum.inr ()) (Sum.inl (Sum.inr 1))).imp
-        (Term.equal (Term.var (Sum.inr ())) (Term.var (Sum.inl (Sum.inr 0))) ⊔
-          Term.equal (Term.var (Sum.inr ())) (Term.var (Sum.inl (Sum.inr 1))))).iAlls
-        Unit)).imp
-    (adjF dir (Sum.inr 0) (Sum.inr 1))).iAlls (Fin 2)
+  fo% ∀ x y,
+    (leF⟨x, y⟩ ∧ ¬ x ≐ y) ∧ (∀ z, leF⟨x, z⟩ ∧ leF⟨z, y⟩ → z ≐ x ∨ z ≐ y) →
+      (adjF dir)⟨x, y⟩
 
 /-- Kernel conjunct: the last element is adjacent to the first. -/
 private noncomputable def hamWrapClause (dir : Bool) : hamSOLang.Sentence :=
-  (((leF (Sum.inl (Sum.inr 0)) (Sum.inr ())).iAlls Unit ⊓
-      (leF (Sum.inr ()) (Sum.inl (Sum.inr 1))).iAlls Unit).imp
-    (adjF dir (Sum.inr 1) (Sum.inr 0))).iAlls (Fin 2)
+  fo% ∀ x y, (∀ z, leF⟨x, z⟩) ∧ (∀ z, leF⟨z, y⟩) → (adjF dir)⟨y, x⟩
 
 /-- The first-order kernel of the `Σ₁` definitions: the guessed relation is a
 linear order carrying a tour. -/
@@ -122,13 +102,13 @@ private theorem realize_adjF (dir : Bool) (ρ : hamGuessBlock.Assignment A) {α 
 private theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
     (@Sentence.Realize hamSOLang A
         (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) (hamKernel dir)) ↔
-      IsLinOrd (fun x y : A => ρ () ![x, y]) ∧
-        (∀ x y : A, SuccOf (fun x y : A => ρ () ![x, y]) x y →
+      IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧
+        (∀ x y : A, SuccOf (fun x y : A => ρ .le ![x, y]) x y →
           (if dir then DGArc x y else DGEdge x y)) ∧
-        ∀ x y : A, (∀ z, ρ () ![x, z]) → (∀ z, ρ () ![z, y]) →
+        ∀ x y : A, (∀ z, ρ .le ![x, z]) → (∀ z, ρ .le ![z, y]) →
           (if dir then DGArc y x else DGEdge y x) := by
   let := hamGuessBlock.structure ρ
-  have hsub : ∀ w : Fin 2 → A, RelMap (L := hamSOLang) (M := A) hLeSym w ↔ ρ () w :=
+  have hsub : ∀ w : Fin 2 → A, RelMap (L := hamSOLang) (M := A) hLeSym w ↔ ρ .le w :=
     fun _ => Iff.rfl
   rw [hamKernel]
   simp only [hamReflClause, hamTransClause, hamAntisymClause, hamTotalClause, hamSuccClause,
@@ -147,7 +127,7 @@ private theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A)
             ⟨fun h x y h₁ h₂ => h ![x, y] ⟨fun _ => h₁ _, fun _ => h₂ _⟩,
               fun h i hi => h (i 0) (i 1) (fun z => hi.1 fun _ => z)
                 fun z => hi.2 fun _ => z⟩))))
-  · exact h ![x, y] ⟨hs.1, hs.2.1, fun z hz => hs.2.2 (z ()) hz.1 hz.2⟩
+  · exact h ![x, y] ⟨hs.1, hs.2.1, fun z hz => hs.2.2 (z 0) hz.1 hz.2⟩
   · exact h (i 0) (i 1) ⟨hi.1, hi.2.1, fun z h₁ h₂ => hi.2.2 (fun _ => z) ⟨h₁, h₂⟩⟩
 
 end Realize
@@ -165,11 +145,11 @@ private theorem tourOn_iff_exists (dir : Bool) :
           (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) (hamKernel dir) := by
   constructor
   · rintro ⟨Le, hlin, hsucc, hwrap⟩
-    refine ⟨fun i => match i with | () => fun w : Fin 2 → A => Le (w 0) (w 1),
+    refine ⟨fun i => match i with | .le => fun w : Fin 2 → A => Le (w 0) (w 1),
       (realize_hamKernel dir _).mpr ⟨hlin, hsucc, hwrap⟩⟩
   · rintro ⟨ρ, hρ⟩
     obtain ⟨hlin, hsucc, hwrap⟩ := (realize_hamKernel dir ρ).mp hρ
-    exact ⟨fun x y => ρ () ![x, y], hlin, hsucc, hwrap⟩
+    exact ⟨fun x y => ρ .le ![x, y], hlin, hsucc, hwrap⟩
 
 end Definable
 

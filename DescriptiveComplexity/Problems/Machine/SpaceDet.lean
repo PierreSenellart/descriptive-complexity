@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.Space
 
 /-!
@@ -49,18 +50,18 @@ deterministic. -/
 noncomputable def detInterp : FOInterpretation Language.turing Language.turing Unit 1 where
   relFormula {n} R _ :=
     match n, R with
-    | _, .posn => Relations.formula₁ tmPosn (Term.var (0, 0))
-    | _, .tr => Relations.formula₁ tmTr (Term.var (0, 0))
-    | _, .start => Relations.formula₁ tmStart (Term.var (0, 0))
-    | _, .acc => detG _ ⊓ Relations.formula₁ tmAcc (Term.var (0, 0))
-    | _, .blank => Relations.formula₁ tmBlank (Term.var (0, 0))
-    | _, .right => Relations.formula₁ tmRight (Term.var (0, 0))
-    | _, .le => Relations.formula₂ tmLe (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .tsrc => Relations.formula₂ tmSrc (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .tread => Relations.formula₂ tmRead (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .tdst => Relations.formula₂ tmDst (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .twrite => Relations.formula₂ tmWrite (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .inp => Relations.formula₂ tmInp (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .posn => fo%⟨u⟩ tmPosn(u)
+    | _, .tr => fo%⟨u⟩ tmTr(u)
+    | _, .start => fo%⟨u⟩ tmStart(u)
+    | _, .acc => fo%⟨u⟩ !(detG _) ∧ tmAcc(u)
+    | _, .blank => fo%⟨u⟩ tmBlank(u)
+    | _, .right => fo%⟨u⟩ tmRight(u)
+    | _, .le => fo%⟨u, v⟩ tmLe(u, v)
+    | _, .tsrc => fo%⟨u, v⟩ tmSrc(u, v)
+    | _, .tread => fo%⟨u, v⟩ tmRead(u, v)
+    | _, .tdst => fo%⟨u, v⟩ tmDst(u, v)
+    | _, .twrite => fo%⟨u, v⟩ tmWrite(u, v)
+    | _, .inp => fo%⟨u, v⟩ tmInp(u, v)
 
 section Reading
 

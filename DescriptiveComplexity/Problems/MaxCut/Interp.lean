@@ -147,7 +147,7 @@ noncomputable def mcInterp : FOInterpretation satOrd Language.markedArcGraph MCT
   relFormula {n} R :=
     match n, R with
     | _, .adj => fun t => adjF (t 0) (t 1) ⊓ ∼ThreeSatToSat.wideOrdF
-    | _, .markedArc => fun t => markF (t 0) (t 1)
+    | _, .marked => fun t => markF (t 0) (t 1)
 
 /-! ### The vertices -/
 

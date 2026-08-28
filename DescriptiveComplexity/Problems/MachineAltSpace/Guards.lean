@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.MachineAltSpace
 import DescriptiveComplexity.Exponential.Game
 
@@ -90,54 +91,46 @@ section Guards
 variable {γ : Type}
 
 /-- `x` is a position. -/
-noncomputable def posnG (x : γ) : tmaOrd.Formula γ := Relations.formula₁ posnO (Term.var x)
+noncomputable def posnG (x : γ) : tmaOrd.Formula γ := fo%[x] posnO(x)
 
 /-- `x` is a transition. -/
-noncomputable def trG (x : γ) : tmaOrd.Formula γ := Relations.formula₁ trO (Term.var x)
+noncomputable def trG (x : γ) : tmaOrd.Formula γ := fo%[x] trO(x)
 
 /-- `x` is a start state. -/
-noncomputable def startG (x : γ) : tmaOrd.Formula γ := Relations.formula₁ startO (Term.var x)
+noncomputable def startG (x : γ) : tmaOrd.Formula γ := fo%[x] startO(x)
 
 /-- `x` is an accepting state. -/
-noncomputable def accG (x : γ) : tmaOrd.Formula γ := Relations.formula₁ accO (Term.var x)
+noncomputable def accG (x : γ) : tmaOrd.Formula γ := fo%[x] accO(x)
 
 /-- `x` is the blank symbol. -/
-noncomputable def blankG (x : γ) : tmaOrd.Formula γ := Relations.formula₁ blankO (Term.var x)
+noncomputable def blankG (x : γ) : tmaOrd.Formula γ := fo%[x] blankO(x)
 
 /-- The transition `x` moves the head right. -/
-noncomputable def rightG (x : γ) : tmaOrd.Formula γ := Relations.formula₁ rightO (Term.var x)
+noncomputable def rightG (x : γ) : tmaOrd.Formula γ := fo%[x] rightO(x)
 
 /-- `x` is marked by the `i`-th player. -/
-noncomputable def blkG (i : Fin 2) (x : γ) : tmaOrd.Formula γ :=
-  Relations.formula₁ (blkO i) (Term.var x)
+noncomputable def blkG (i : Fin 2) (x : γ) : tmaOrd.Formula γ := fo%[x] (blkO i)(x)
 
 /-- `x ≤ y` in the machine's own order. -/
-noncomputable def leG (x y : γ) : tmaOrd.Formula γ :=
-  Relations.formula₂ leO (Term.var x) (Term.var y)
+noncomputable def leG (x y : γ) : tmaOrd.Formula γ := fo%[x, y] leO(x, y)
 
 /-- The transition `x` applies in the state `y`. -/
-noncomputable def srcG (x y : γ) : tmaOrd.Formula γ :=
-  Relations.formula₂ srcO (Term.var x) (Term.var y)
+noncomputable def srcG (x y : γ) : tmaOrd.Formula γ := fo%[x, y] srcO(x, y)
 
 /-- The transition `x` reads the symbol `y`. -/
-noncomputable def readG (x y : γ) : tmaOrd.Formula γ :=
-  Relations.formula₂ readO (Term.var x) (Term.var y)
+noncomputable def readG (x y : γ) : tmaOrd.Formula γ := fo%[x, y] readO(x, y)
 
 /-- The transition `x` moves to the state `y`. -/
-noncomputable def dstG (x y : γ) : tmaOrd.Formula γ :=
-  Relations.formula₂ dstO (Term.var x) (Term.var y)
+noncomputable def dstG (x y : γ) : tmaOrd.Formula γ := fo%[x, y] dstO(x, y)
 
 /-- The transition `x` writes the symbol `y`. -/
-noncomputable def writeG (x y : γ) : tmaOrd.Formula γ :=
-  Relations.formula₂ writeO (Term.var x) (Term.var y)
+noncomputable def writeG (x y : γ) : tmaOrd.Formula γ := fo%[x, y] writeO(x, y)
 
 /-- The cell `x` initially holds the input symbol `y`. -/
-noncomputable def inpG (x y : γ) : tmaOrd.Formula γ :=
-  Relations.formula₂ inpO (Term.var x) (Term.var y)
+noncomputable def inpG (x y : γ) : tmaOrd.Formula γ := fo%[x, y] inpO(x, y)
 
 /-- `x` and `y` are the same element. -/
-noncomputable def eqG (x y : γ) : tmaOrd.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def eqG (x y : γ) : tmaOrd.Formula γ := fo%[x, y] x ≐ y
 
 variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A] {v : γ → A}
 
@@ -202,18 +195,16 @@ theorem realize_eqG (x y : γ) : (eqG x y).Realize v ↔ v x = v y := by
 
 /-- `x` is a least position. -/
 noncomputable def minPosG (x : γ) : tmaOrd.Formula γ :=
-  posnG x ⊓ Formula.iAlls (Fin 1) (posnG (Sum.inr 0) ⟹ leG (Sum.inl x) (Sum.inr 0))
+  fo%[x] posnG⟨x⟩ ∧ ∀ y, posnG⟨y⟩ → leG⟨x, y⟩
 
 /-- `y` is the position immediately above `x`. -/
 noncomputable def succPosG (x y : γ) : tmaOrd.Formula γ :=
-  posnG x ⊓ (posnG y ⊓ (leG x y ⊓ (∼(eqG x y) ⊓
-    Formula.iAlls (Fin 1)
-      (((posnG (Sum.inr 0) ⊓ leG (Sum.inl x) (Sum.inr 0)) ⊓ leG (Sum.inr 0) (Sum.inl y)) ⟹
-        (eqG (Sum.inr 0) (Sum.inl x) ⊔ eqG (Sum.inr 0) (Sum.inl y))))))
+  fo%[x, y] posnG⟨x⟩ ∧ posnG⟨y⟩ ∧ leG⟨x, y⟩ ∧ ¬ eqG⟨x, y⟩ ∧
+    ∀ z, (posnG⟨z⟩ ∧ leG⟨x, z⟩) ∧ leG⟨z, y⟩ → eqG⟨z, x⟩ ∨ eqG⟨z, y⟩
 
 /-- The cell `x` may initially hold the symbol `y`. -/
 noncomputable def initTapeG (x y : γ) : tmaOrd.Formula γ :=
-  inpG x y ⊔ (Formula.iAlls (Fin 1) (∼(inpG (Sum.inl x) (Sum.inr 0))) ⊓ blankG y)
+  fo%[x, y] inpG⟨x, y⟩ ∨ (∀ z, ¬ inpG⟨x, z⟩) ∧ blankG⟨y⟩
 
 @[simp]
 theorem realize_minPosG (x : γ) :
@@ -251,28 +242,19 @@ end Guards
 
 /-- The machine's order is linear. -/
 noncomputable def isLinOrdS : tmaOrd.Sentence :=
-  Formula.iAlls (Fin 1) (leG (Sum.inr 0) (Sum.inr 0)) ⊓
-    (Formula.iAlls (Fin 3) (((leG (Sum.inr 0) (Sum.inr 1)) ⊓ leG (Sum.inr 1) (Sum.inr 2)) ⟹
-        leG (Sum.inr 0) (Sum.inr 2)) ⊓
-      (Formula.iAlls (Fin 2) ((leG (Sum.inr 0) (Sum.inr 1) ⊓ leG (Sum.inr 1) (Sum.inr 0)) ⟹
-          eqG (Sum.inr 0) (Sum.inr 1)) ⊓
-        Formula.iAlls (Fin 2) (leG (Sum.inr 0) (Sum.inr 1) ⊔ leG (Sum.inr 1) (Sum.inr 0))))
+  fo% (∀ a, leG⟨a, a⟩) ∧ (∀ a b c, leG⟨a, b⟩ ∧ leG⟨b, c⟩ → leG⟨a, c⟩) ∧
+    (∀ a b, leG⟨a, b⟩ ∧ leG⟨b, a⟩ → eqG⟨a, b⟩) ∧ ∀ a b, leG⟨a, b⟩ ∨ leG⟨b, a⟩
 
 /-- **Well-formedness**, as a sentence: the order is linear, there is a
 position, the input is functional, and there is exactly one blank. -/
 noncomputable def wfS : tmaOrd.Sentence :=
-  isLinOrdS ⊓ (Formula.iExs (Fin 1) (posnG (Sum.inr 0)) ⊓
-    (Formula.iAlls (Fin 3) ((inpG (Sum.inr 0) (Sum.inr 1) ⊓ inpG (Sum.inr 0) (Sum.inr 2)) ⟹
-        eqG (Sum.inr 1) (Sum.inr 2)) ⊓
-      (Formula.iExs (Fin 1) (blankG (Sum.inr 0)) ⊓
-        Formula.iAlls (Fin 2) ((blankG (Sum.inr 0) ⊓ blankG (Sum.inr 1)) ⟹
-          eqG (Sum.inr 0) (Sum.inr 1)))))
+  fo% !isLinOrdS ∧ (∃ p, posnG⟨p⟩) ∧ (∀ p a b, inpG⟨p, a⟩ ∧ inpG⟨p, b⟩ → eqG⟨a, b⟩) ∧
+    (∃ b, blankG⟨b⟩) ∧ ∀ a b, blankG⟨a⟩ ∧ blankG⟨b⟩ → eqG⟨a, b⟩
 
 /-- **The two marks split the states**, as a sentence: every state carries one
 of them and not both. -/
 noncomputable def blocksSplitS : tmaOrd.Sentence :=
-  Formula.iAlls (Fin 1) ((blkG 0 (Sum.inr 0) ⊔ blkG 1 (Sum.inr 0)) ⊓
-    ∼(blkG 0 (Sum.inr 0) ⊓ blkG 1 (Sum.inr 0)))
+  fo% ∀ q, ((blkG 0)⟨q⟩ ∨ (blkG 1)⟨q⟩) ∧ ¬ ((blkG 0)⟨q⟩ ∧ (blkG 1)⟨q⟩)
 
 section PromiseRealize
 

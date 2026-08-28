@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.AltDefs
 import DescriptiveComplexity.Problems.Machine
 
@@ -54,18 +55,18 @@ structure. -/
 noncomputable def markInterp : FOInterpretation Language.turing (Language.turingAlt 1) Unit 1 where
   relFormula {n} R _ :=
     match n, R with
-    | _, .base .posn => Relations.formula₁ tmPosn (Term.var (0, 0))
-    | _, .base .tr => Relations.formula₁ tmTr (Term.var (0, 0))
-    | _, .base .start => Relations.formula₁ tmStart (Term.var (0, 0))
-    | _, .base .acc => Relations.formula₁ tmAcc (Term.var (0, 0))
-    | _, .base .blank => Relations.formula₁ tmBlank (Term.var (0, 0))
-    | _, .base .right => Relations.formula₁ tmRight (Term.var (0, 0))
-    | _, .base .le => Relations.formula₂ tmLe (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .base .tsrc => Relations.formula₂ tmSrc (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .base .tread => Relations.formula₂ tmRead (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .base .tdst => Relations.formula₂ tmDst (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .base .twrite => Relations.formula₂ tmWrite (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .base .inp => Relations.formula₂ tmInp (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .base .posn => fo%⟨u⟩ tmPosn(u)
+    | _, .base .tr => fo%⟨u⟩ tmTr(u)
+    | _, .base .start => fo%⟨u⟩ tmStart(u)
+    | _, .base .acc => fo%⟨u⟩ tmAcc(u)
+    | _, .base .blank => fo%⟨u⟩ tmBlank(u)
+    | _, .base .right => fo%⟨u⟩ tmRight(u)
+    | _, .base .le => fo%⟨u, v⟩ tmLe(u, v)
+    | _, .base .tsrc => fo%⟨u, v⟩ tmSrc(u, v)
+    | _, .base .tread => fo%⟨u, v⟩ tmRead(u, v)
+    | _, .base .tdst => fo%⟨u, v⟩ tmDst(u, v)
+    | _, .base .twrite => fo%⟨u, v⟩ tmWrite(u, v)
+    | _, .base .inp => fo%⟨u, v⟩ tmInp(u, v)
     | _, .blk _ => ⊤
 
 section Reading
@@ -158,7 +159,7 @@ namespace ForgetOne
 element is marked – as a first-order formula whose free variables are unused:
 the guard the image puts on its accepting states. -/
 noncomputable def markedG (γ : Type) : (Language.turingAlt 1).Formula γ :=
-  (Relations.formula₁ (atmBlk (0 : Fin 1)) (Term.var (Sum.inr 0))).iAlls (Fin 1)
+  fo% ∀ q, (atmBlk (0 : Fin 1))(q)
 
 /-- **The identity interpretation that forgets the mark, with a guarded
 accepting predicate.** -/
@@ -166,18 +167,18 @@ noncomputable def forgetInterp :
     FOInterpretation (Language.turingAlt 1) Language.turing Unit 1 where
   relFormula {n} R _ :=
     match n, R with
-    | _, .posn => Relations.formula₁ atmPosn (Term.var (0, 0))
-    | _, .tr => Relations.formula₁ atmTr (Term.var (0, 0))
-    | _, .start => Relations.formula₁ atmStart (Term.var (0, 0))
-    | _, .acc => markedG _ ⊓ Relations.formula₁ atmAcc (Term.var (0, 0))
-    | _, .blank => Relations.formula₁ atmBlank (Term.var (0, 0))
-    | _, .right => Relations.formula₁ atmRight (Term.var (0, 0))
-    | _, .le => Relations.formula₂ atmLe (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .tsrc => Relations.formula₂ atmSrc (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .tread => Relations.formula₂ atmRead (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .tdst => Relations.formula₂ atmDst (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .twrite => Relations.formula₂ atmWrite (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .inp => Relations.formula₂ atmInp (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .posn => fo%⟨u⟩ atmPosn(u)
+    | _, .tr => fo%⟨u⟩ atmTr(u)
+    | _, .start => fo%⟨u⟩ atmStart(u)
+    | _, .acc => fo%⟨u⟩ !(markedG _) ∧ atmAcc(u)
+    | _, .blank => fo%⟨u⟩ atmBlank(u)
+    | _, .right => fo%⟨u⟩ atmRight(u)
+    | _, .le => fo%⟨u, v⟩ atmLe(u, v)
+    | _, .tsrc => fo%⟨u, v⟩ atmSrc(u, v)
+    | _, .tread => fo%⟨u, v⟩ atmRead(u, v)
+    | _, .tdst => fo%⟨u, v⟩ atmDst(u, v)
+    | _, .twrite => fo%⟨u, v⟩ atmWrite(u, v)
+    | _, .inp => fo%⟨u, v⟩ atmInp(u, v)
 
 section Reading
 

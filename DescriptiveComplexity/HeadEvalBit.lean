@@ -159,8 +159,7 @@ as guards, the addition and the bit are *computed*, by `plusP` and by the halvin
 loop `bitP`. -/
 noncomputable def bitAtomP (y cnt cand w tmk a b mk : Fin K) {γ : Type} (hv : γ → Fin K) :
     BitAtom L γ → HeadProgram L K
-  | .le u v => leafP (leF (Term.var (hv u)) (Term.var (hv v)))
-      ((BoundedFormula.IsAtomic.rel _ _).isQF)
+  | .le u v => leafP (leF (hv u) (hv v)) ((BoundedFormula.IsAtomic.rel _ _).isQF)
   | .plus u v z => plusP (hv u) (hv v) (hv z) a b mk
   | .bit u v => bitP (hv u) (hv v) y cnt cand w tmk a b mk
   | .rel R args => leafP (Relations.formula (inOrdSym R) fun t => Term.var (hv (args t)))
@@ -218,9 +217,9 @@ theorem decides_bitAtomP (hs : BitScratch y cnt cand w tmk a b mk S) (hSK : S + 
       (fun x => at'.Holds fun v => x (hv v)) := by
   cases at' with
   | le u v =>
-    exact (decides_leafP (L := L) (K := K) (leF (Term.var (hv u)) (Term.var (hv v)))
+    exact (decides_leafP (L := L) (K := K) (leF (hv u) (hv v))
       ((BoundedFormula.IsAtomic.rel _ _).isQF)).congr fun x => by
-        simp only [realize_leF, Term.realize_var]
+        simp only [realize_leF]
         exact Iff.rfl
   | plus u v z =>
     exact (decides_plusP (hs.plusHeads (hlow u) (hlow v) (hlow z) hd) (by omega)).congr
@@ -366,8 +365,7 @@ theorem deterministic_bitAtomP {γ : Type} (hv : γ → Fin K) (at' : BitAtom L 
     (bitAtomP (L := L) y cnt cand w tmk a b mk hv at').Deterministic A := by
   cases at' with
   | le u v =>
-    exact deterministic_leafP (leF (Term.var (hv u)) (Term.var (hv v)))
-      ((BoundedFormula.IsAtomic.rel _ _).isQF)
+    exact deterministic_leafP (leF (hv u) (hv v)) ((BoundedFormula.IsAtomic.rel _ _).isQF)
   | plus u v z => exact deterministic_plusP _ _ _ _ _ _
   | bit u v => exact deterministic_bitP _ _ _ _ _ _ _ _ _ _
   | rel R args =>

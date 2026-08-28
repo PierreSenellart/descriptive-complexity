@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.SetFamily.Defs
 
 /-!
@@ -37,10 +38,10 @@ def transposeInterp :
     FOInterpretation Language.setSystem Language.setSystem Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .elem => fun _ => ssFam.formula₁ (Term.var (0, 0))
-    | _, .fam => fun _ => ssElem.formula₁ (Term.var (0, 0))
-    | _, .mem => fun _ => ssMem.formula₂ (Term.var (1, 0)) (Term.var (0, 0))
-    | _, .marked => fun _ => ssMarked.formula₁ (Term.var (0, 0))
+    | _, .elem => fun _ => fo%⟨u⟩ ssFam(u)
+    | _, .fam => fun _ => fo%⟨u⟩ ssElem(u)
+    | _, .mem => fun _ => fo%⟨u, v⟩ ssMem(v, u)
+    | _, .marked => fun _ => fo%⟨u⟩ ssMarked(u)
 
 section TransposeCharacterizations
 

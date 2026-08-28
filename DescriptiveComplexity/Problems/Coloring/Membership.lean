@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Coloring.Defs
 import DescriptiveComplexity.SecondOrder
 
@@ -66,12 +68,8 @@ abbrev kcColorSym {k : ℕ} (i : Fin k) : (kColSOLang k).Relations 1 := Sum.inr 
 vertex belongs to some color class, and no edge has both endpoints in the
 same class. -/
 noncomputable def kColKernel (k : ℕ) : (kColSOLang k).Sentence :=
-  (Formula.iSup fun i : Fin k =>
-    Relations.formula₁ (kcColorSym i) (Term.var (Sum.inr 0))).iAlls (Fin 1) ⊓
-  ((Relations.formula₂ (kcAdjSym k) (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    (Formula.iInf fun i : Fin k =>
-      ∼(Relations.formula₁ (kcColorSym i) (Term.var (Sum.inr 0)) ⊓
-        Relations.formula₁ (kcColorSym i) (Term.var (Sum.inr 1))))).iAlls (Fin 2)
+  fo% (∀ x, ⋁ i : Fin k, (kcColorSym i)(x)) ∧
+    ∀ x y, (kcAdjSym k)(x, y) → ⋀ i : Fin k, ¬ ((kcColorSym i)(x) ∧ (kcColorSym i)(y))
 
 /-- Realization of the kernel under an assignment of the color classes. -/
 private theorem realize_kColKernel {k : ℕ} {V : Type} [Language.graph.Structure V]
@@ -124,44 +122,22 @@ section Palette
 /-- The single existential block of the `Σ₁` definitions of the two threshold
 problems: one binary relation variable, read as “this vertex has that
 color”, the colors being the marked elements. -/
-def paletteGuessBlock : SOBlock where
-  ι := Unit
-  arity := fun _ => 2
-
-/-- The symbol of the coloring relation variable. -/
-def pcColRel : paletteGuessBlock.lang.Relations 2 := ⟨(), rfl⟩
-
-/-- The vocabulary of the kernels: marked graphs together with the guessed
-coloring. -/
-abbrev paletteSOLang : Language := Language.markedGraph.sum paletteGuessBlock.lang
-
-/-- The adjacency symbol in the kernels' vocabulary. -/
-abbrev pcAdjSym : paletteSOLang.Relations 2 := Sum.inl mgAdj
-
-/-- The mark symbol in the kernels' vocabulary. -/
-abbrev pcMarkedSym : paletteSOLang.Relations 1 := Sum.inl mgMarked
-
-/-- The coloring symbol in the kernels' vocabulary. -/
-abbrev pcColSym : paletteSOLang.Relations 2 := Sum.inr pcColRel
+fo_block paletteGuessBlock over Language.markedGraph mg into paletteSOLang with pc where
+  /-- The guessed coloring: `col x y` reads “`x` has color `y`”. -/
+  col : 2
 
 /-- Kernel clause: every vertex gets a color, and colors are marked
 elements. -/
 private noncomputable def paletteTotalClause : paletteSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₂ pcColSym (Term.var (Sum.inl (Sum.inr 0))) (Term.var (Sum.inr ())) ⊓
-      Relations.formula₁ pcMarkedSym (Term.var (Sum.inr ()))).iExs Unit)
+  fo% ∀ x, ∃ y, pcColSym(x, y) ∧ pcMarkedSym(y)
 
 /-- Kernel clause: two conflicting vertices never share a color. The flag
 selects the conflict relation: adjacency for Chromatic Number,
 non-adjacency for Clique Cover. -/
 private noncomputable def paletteProperClause (positive : Bool) : paletteSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((∼(Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))) ⊓
-      (if positive then
-        Relations.formula₂ pcAdjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))
-      else ∼(Relations.formula₂ pcAdjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))) ⊓
-      Relations.formula₂ pcColSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ pcColSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp ⊥)
+  fo% ∀ x x' y,
+    ((¬ x ≐ x' ∧ (if positive then pcAdjSym(x, x') else ¬ pcAdjSym(x, x'))) ∧
+      pcColSym(x, y)) ∧ pcColSym(x', y) → ⊥ᶠ
 
 /-- The kernel of the `Σ₁` definition of a threshold coloring problem. -/
 noncomputable def paletteKernel (positive : Bool) : paletteSOLang.Sentence :=
@@ -172,12 +148,12 @@ private theorem realize_paletteKernel {A : Type} [Language.markedGraph.Structure
     (positive : Bool) (ρ : paletteGuessBlock.Assignment A) :
     (@Sentence.Realize paletteSOLang A
         (@sumStructure _ _ A _ (paletteGuessBlock.structure ρ)) (paletteKernel positive)) ↔
-      (∀ x : A, ∃ y : A, ρ () ![x, y] ∧ MGMarked y) ∧
+      (∀ x : A, ∃ y : A, ρ .col ![x, y] ∧ MGMarked y) ∧
         ∀ x x' y : A, x ≠ x' → (if positive then MGAdj x x' else ¬MGAdj x x') →
-          ρ () ![x, y] → ρ () ![x', y] → False := by
+          ρ .col ![x, y] → ρ .col ![x', y] → False := by
   let := paletteGuessBlock.structure ρ
   have hsub : ∀ (w : Fin 2 → A),
-      RelMap (L := paletteSOLang) (M := A) pcColSym w ↔ ρ () w := fun _ => Iff.rfl
+      RelMap (L := paletteSOLang) (M := A) pcColSym w ↔ ρ .col w := fun _ => Iff.rfl
   rw [paletteKernel]
   cases positive
   · simp only [paletteTotalClause, paletteProperClause, Sentence.Realize,
@@ -188,7 +164,7 @@ private theorem realize_paletteKernel {A : Type} [Language.markedGraph.Structure
     refine and_congr ⟨fun h x => ?_, fun h i => ?_⟩ ⟨fun h x x' y hne hadj h₁ h₂ => ?_,
       fun h i hi => ?_⟩
     · obtain ⟨y, hy1, hy2⟩ := h fun _ => x
-      exact ⟨y (), hy1, hy2⟩
+      exact ⟨y 0, hy1, hy2⟩
     · obtain ⟨y, hy1, hy2⟩ := h (i 0)
       exact ⟨fun _ => y, hy1, hy2⟩
     · exact h ![x, x', y] ⟨⟨⟨hne, hadj⟩, h₁⟩, h₂⟩
@@ -201,7 +177,7 @@ private theorem realize_paletteKernel {A : Type} [Language.markedGraph.Structure
     refine and_congr ⟨fun h x => ?_, fun h i => ?_⟩ ⟨fun h x x' y hne hadj h₁ h₂ => ?_,
       fun h i hi => ?_⟩
     · obtain ⟨y, hy1, hy2⟩ := h fun _ => x
-      exact ⟨y (), hy1, hy2⟩
+      exact ⟨y 0, hy1, hy2⟩
     · obtain ⟨y, hy1, hy2⟩ := h (i 0)
       exact ⟨fun _ => y, hy1, hy2⟩
     · exact h ![x, x', y] ⟨⟨⟨hne, hadj⟩, h₁⟩, h₂⟩
@@ -221,7 +197,7 @@ private theorem palette_sigmaSODefinable (positive : Bool)
   rw [hP A]
   constructor
   · rintro ⟨col, hcol, hproper⟩
-    refine ⟨fun i => match i with | () => fun w : Fin 2 → A => col (w 0) = w 1,
+    refine ⟨fun i => match i with | .col => fun w : Fin 2 → A => col (w 0) = w 1,
       (realize_paletteKernel _ _).mpr
       ⟨fun x => ⟨col x, rfl, hcol x⟩, fun x x' y hne hadj h₁ h₂ => ?_⟩⟩
     exact hproper x x' ⟨hne, hadj⟩ (h₁.trans h₂.symm)

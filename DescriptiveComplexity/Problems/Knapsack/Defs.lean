@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Numbers.BinRel
 import DescriptiveComplexity.Interpretation
 import Mathlib.Algebra.BigOperators.Finprod
@@ -55,41 +56,20 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of binary-weighted instances. -/
-inductive binWeightsRel : ℕ → Type
-  /-- `item i`: `i` is an item. -/
-  | item : binWeightsRel 1
-  /-- `posn p`: `p` is a bit position. -/
-  | posn : binWeightsRel 1
-  /-- `bit i p`: the weight of `i` has bit 1 at position `p`. -/
-  | bit : binWeightsRel 2
-  /-- `tgt p`: the target has bit 1 at position `p`. -/
-  | tgt : binWeightsRel 1
-  /-- `le a b`: the linear order carrying the place values. -/
-  | le : binWeightsRel 2
-  deriving DecidableEq
-
 /-- The relational language of binary-weighted instances: items and bit
 positions, the bits of each item's weight and of the target, and a linear
 order. -/
-protected def binWeights : Language :=
-  ⟨fun _ => Empty, binWeightsRel⟩
-  deriving IsRelational
-
-/-- The item symbol. -/
-abbrev bwItem : Language.binWeights.Relations 1 := .item
-
-/-- The position symbol. -/
-abbrev bwPosn : Language.binWeights.Relations 1 := .posn
-
-/-- The bit symbol. -/
-abbrev bwBit : Language.binWeights.Relations 2 := .bit
-
-/-- The target symbol. -/
-abbrev bwTgt : Language.binWeights.Relations 1 := .tgt
-
-/-- The order symbol. -/
-abbrev bwLe : Language.binWeights.Relations 2 := .le
+fo_language binWeights with bw where
+  /-- `item i`: `i` is an item. -/
+  item : 1
+  /-- `posn p`: `p` is a bit position. -/
+  posn : 1
+  /-- `bit i p`: the weight of `i` has bit 1 at position `p`. -/
+  bit : 2
+  /-- `tgt p`: the target has bit 1 at position `p`. -/
+  tgt : 1
+  /-- `le a b`: the linear order carrying the place values. -/
+  le : 2
 
 end Language
 
@@ -107,20 +87,7 @@ section Shorthands
 
 variable {A : Type} [Language.binWeights.Structure A]
 
-/-- Being an item. -/
-def BWItem (a : A) : Prop := RelMap bwItem ![a]
-
-/-- Being a bit position. -/
-def BWPosn (a : A) : Prop := RelMap bwPosn ![a]
-
-/-- The bit of an item's weight at a position. -/
-def BWBit (i p : A) : Prop := RelMap bwBit ![i, p]
-
-/-- The bits of the target. -/
-def BWTgt (p : A) : Prop := RelMap bwTgt ![p]
-
-/-- The order carrying the place values. -/
-def BWLe (a b : A) : Prop := RelMap bwLe ![a, b]
+fo_predicates Language.binWeights bw
 
 /-- The weight of an item, decoded. -/
 noncomputable def BWWeight (i : A) : ℕ := binNum BWLe BWPosn (BWBit i)

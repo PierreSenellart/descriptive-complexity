@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.DagIso.Defs
 
 /-!
@@ -76,25 +77,27 @@ variable {α : Type}
 a diagonal pair whose entry is a marked vertex, and an arc node is a pair that
 is an arc between two marked vertices. -/
 def nodeF (mark : Language.twoGraphs.Relations 1) (adj : Language.twoGraphs.Relations 2)
-    (t : NodeTag) (x y : Language.twoGraphs.Term α) : Language.twoGraphs.Formula α :=
+    (t : NodeTag) (x y : α) : Language.twoGraphs.Formula α :=
   match t with
-  | .vtx => Term.equal x y ⊓ Relations.formula₁ mark x
+  | .vtx => Term.equal (Term.var x) (Term.var y) ⊓ Relations.formula₁ mark (Term.var x)
   | .arcMid | .arcEnd =>
-      Relations.formula₁ mark x ⊓ Relations.formula₁ mark y ⊓ Relations.formula₂ adj x y
+      Relations.formula₁ mark (Term.var x) ⊓ Relations.formula₁ mark (Term.var y) ⊓
+        Relations.formula₂ adj (Term.var x) (Term.var y)
 
 /-- The arcs of the gadget: `u ⟶ a(u,v)`, `a(u,v) ⟶ b(u,v)` and
 `v ⟶ b(u,v)`, and nothing else. -/
 def arcF (mark : Language.twoGraphs.Relations 1) (adj : Language.twoGraphs.Relations 2)
-    (t s : NodeTag) (x₀ x₁ y₀ y₁ : Language.twoGraphs.Term α) :
-    Language.twoGraphs.Formula α :=
+    (t s : NodeTag) (x₀ x₁ y₀ y₁ : α) : Language.twoGraphs.Formula α :=
   match t, s with
   | .vtx, .arcMid =>
-      nodeF mark adj .vtx x₀ x₁ ⊓ nodeF mark adj .arcMid y₀ y₁ ⊓ Term.equal x₀ y₀
+      nodeF mark adj .vtx x₀ x₁ ⊓ nodeF mark adj .arcMid y₀ y₁ ⊓
+        Term.equal (Term.var x₀) (Term.var y₀)
   | .vtx, .arcEnd =>
-      nodeF mark adj .vtx x₀ x₁ ⊓ nodeF mark adj .arcEnd y₀ y₁ ⊓ Term.equal x₀ y₁
+      nodeF mark adj .vtx x₀ x₁ ⊓ nodeF mark adj .arcEnd y₀ y₁ ⊓
+        Term.equal (Term.var x₀) (Term.var y₁)
   | .arcMid, .arcEnd =>
       nodeF mark adj .arcMid x₀ x₁ ⊓ nodeF mark adj .arcEnd y₀ y₁ ⊓
-        (Term.equal x₀ y₀ ⊓ Term.equal x₁ y₁)
+        (Term.equal (Term.var x₀) (Term.var y₀) ⊓ Term.equal (Term.var x₁) (Term.var y₁))
   | _, _ => ⊥
 
 /-- The topological order of the gadget: the level of the tag strictly
@@ -113,14 +116,10 @@ run on the pattern side and on the host side. -/
 def incInterp : FOInterpretation Language.twoGraphs Language.twoDags NodeTag 2 where
   relFormula {n} R :=
     match n, R with
-    | _, .patV => fun t => nodeF tgPatV tgPatE (t 0) (Term.var (0, 0)) (Term.var (0, 1))
-    | _, .hostV => fun t => nodeF tgHostV tgHostE (t 0) (Term.var (0, 0)) (Term.var (0, 1))
-    | _, .patArc => fun t =>
-        arcF tgPatV tgPatE (t 0) (t 1) (Term.var (0, 0)) (Term.var (0, 1))
-          (Term.var (1, 0)) (Term.var (1, 1))
-    | _, .hostArc => fun t =>
-        arcF tgHostV tgHostE (t 0) (t 1) (Term.var (0, 0)) (Term.var (0, 1))
-          (Term.var (1, 0)) (Term.var (1, 1))
+    | _, .patV => fun t => fo%⟨u⟩ (nodeF tgPatV tgPatE (t 0))⟨u, u[1]⟩
+    | _, .hostV => fun t => fo%⟨u⟩ (nodeF tgHostV tgHostE (t 0))⟨u, u[1]⟩
+    | _, .patArc => fun t => fo%⟨u, v⟩ (arcF tgPatV tgPatE (t 0) (t 1))⟨u, u[1], v, v[1]⟩
+    | _, .hostArc => fun t => fo%⟨u, v⟩ (arcF tgHostV tgHostE (t 0) (t 1))⟨u, u[1], v, v[1]⟩
     | _, .patLt => fun t => ltF (t 0) (t 1)
     | _, .hostLt => fun t => ltF (t 0) (t 1)
 

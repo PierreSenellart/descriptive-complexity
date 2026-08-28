@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
@@ -150,9 +151,9 @@ quantifier-free. -/
 def swapSignInterp : FOInterpretation Language.sat Language.sat Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .isClause => fun _ => satIsClause.formula₁ (Term.var (0, 0))
-    | _, .posIn => fun _ => satNegIn.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .negIn => fun _ => satPosIn.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .isClause => fun _ => fo%⟨c⟩ satIsClause(c)
+    | _, .posIn => fun _ => fo%⟨c, x⟩ satNegIn(c, x)
+    | _, .negIn => fun _ => fo%⟨c, x⟩ satPosIn(c, x)
 
 section Characterizations
 

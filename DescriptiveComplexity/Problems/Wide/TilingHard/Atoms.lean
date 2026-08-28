@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Wide.TilingHard.Emit
 
 /-!
@@ -75,52 +76,40 @@ abbrev wdInpSym : wideOrd.Relations 2 := Sum.inl wmInp
 variable {γ : Type}
 
 /-- `x ≤ y` in the machine's own order. -/
-noncomputable def wdLeF (x y : γ) : wideOrd.Formula γ :=
-  Relations.formula₂ wdLeSym (Term.var x) (Term.var y)
+noncomputable def wdLeF (x y : γ) : wideOrd.Formula γ := fo%[x, y] wdLeSym(x, y)
 
 /-- `t` is a transition. -/
-noncomputable def wdTrF (t : γ) : wideOrd.Formula γ :=
-  Relations.formula₁ wdTrSym (Term.var t)
+noncomputable def wdTrF (t : γ) : wideOrd.Formula γ := fo%[t] wdTrSym(t)
 
 /-- `q` is a start state. -/
-noncomputable def wdStartF (q : γ) : wideOrd.Formula γ :=
-  Relations.formula₁ wdStartSym (Term.var q)
+noncomputable def wdStartF (q : γ) : wideOrd.Formula γ := fo%[q] wdStartSym(q)
 
 /-- `q` is an accepting state. -/
-noncomputable def wdAccF (q : γ) : wideOrd.Formula γ :=
-  Relations.formula₁ wdAccSym (Term.var q)
+noncomputable def wdAccF (q : γ) : wideOrd.Formula γ := fo%[q] wdAccSym(q)
 
 /-- `a` is the blank symbol. -/
-noncomputable def wdBlankF (a : γ) : wideOrd.Formula γ :=
-  Relations.formula₁ wdBlankSym (Term.var a)
+noncomputable def wdBlankF (a : γ) : wideOrd.Formula γ := fo%[a] wdBlankSym(a)
 
 /-- `t` moves the head to the right. -/
-noncomputable def wdRightF (t : γ) : wideOrd.Formula γ :=
-  Relations.formula₁ wdRightSym (Term.var t)
+noncomputable def wdRightF (t : γ) : wideOrd.Formula γ := fo%[t] wdRightSym(t)
 
 /-- `t` applies in the state `q`. -/
-noncomputable def wdSrcF (t q : γ) : wideOrd.Formula γ :=
-  Relations.formula₂ wdSrcSym (Term.var t) (Term.var q)
+noncomputable def wdSrcF (t q : γ) : wideOrd.Formula γ := fo%[t, q] wdSrcSym(t, q)
 
 /-- `t` applies on the symbol `a`. -/
-noncomputable def wdReadF (t a : γ) : wideOrd.Formula γ :=
-  Relations.formula₂ wdReadSym (Term.var t) (Term.var a)
+noncomputable def wdReadF (t a : γ) : wideOrd.Formula γ := fo%[t, a] wdReadSym(t, a)
 
 /-- `t` moves to the state `q`. -/
-noncomputable def wdDstF (t q : γ) : wideOrd.Formula γ :=
-  Relations.formula₂ wdDstSym (Term.var t) (Term.var q)
+noncomputable def wdDstF (t q : γ) : wideOrd.Formula γ := fo%[t, q] wdDstSym(t, q)
 
 /-- `t` writes the symbol `a`. -/
-noncomputable def wdWriteF (t a : γ) : wideOrd.Formula γ :=
-  Relations.formula₂ wdWriteSym (Term.var t) (Term.var a)
+noncomputable def wdWriteF (t a : γ) : wideOrd.Formula γ := fo%[t, a] wdWriteSym(t, a)
 
 /-- The cell of `x` starts holding `a`. -/
-noncomputable def wdInpF (x a : γ) : wideOrd.Formula γ :=
-  Relations.formula₂ wdInpSym (Term.var x) (Term.var a)
+noncomputable def wdInpF (x a : γ) : wideOrd.Formula γ := fo%[x, a] wdInpSym(x, a)
 
 /-- `x` and `y` are the same element. -/
-noncomputable def wdEqF (x y : γ) : wideOrd.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def wdEqF (x y : γ) : wideOrd.Formula γ := fo%[x, y] x ≐ y
 
 variable {A : Type} [Language.wide.Structure A] [LinearOrder A] {v : γ → A}
 
@@ -203,21 +192,10 @@ and there is exactly one blank. This is
 drawing carries it – a no-instance whose promises fail has no start tile, hence
 no tiling. -/
 noncomputable def wideWFF : wideOrd.Formula γ :=
-  (Formula.iAlls (Fin 1) (wdLeF (Sum.inr 0) (Sum.inr 0)) ⊓
-      (Formula.iAlls (Fin 3)
-          ((wdLeF (Sum.inr 0) (Sum.inr 1) ⊓ wdLeF (Sum.inr 1) (Sum.inr 2)) ⟹
-            wdLeF (Sum.inr 0) (Sum.inr 2)) ⊓
-        (Formula.iAlls (Fin 2)
-            ((wdLeF (Sum.inr 0) (Sum.inr 1) ⊓ wdLeF (Sum.inr 1) (Sum.inr 0)) ⟹
-              wdEqF (Sum.inr 0) (Sum.inr 1)) ⊓
-          Formula.iAlls (Fin 2)
-            (wdLeF (Sum.inr 0) (Sum.inr 1) ⊔ wdLeF (Sum.inr 1) (Sum.inr 0))))) ⊓
-    (Formula.iAlls (Fin 3)
-        ((wdInpF (Sum.inr 0) (Sum.inr 1) ⊓ wdInpF (Sum.inr 0) (Sum.inr 2)) ⟹
-          wdEqF (Sum.inr 1) (Sum.inr 2)) ⊓
-      (Formula.iExs (Fin 1) (wdBlankF (Sum.inr 0)) ⊓
-        Formula.iAlls (Fin 2)
-          ((wdBlankF (Sum.inr 0) ⊓ wdBlankF (Sum.inr 1)) ⟹ wdEqF (Sum.inr 0) (Sum.inr 1))))
+  fo% ((∀ x, wdLeF⟨x, x⟩) ∧ (∀ x y z, wdLeF⟨x, y⟩ ∧ wdLeF⟨y, z⟩ → wdLeF⟨x, z⟩) ∧
+      (∀ x y, wdLeF⟨x, y⟩ ∧ wdLeF⟨y, x⟩ → wdEqF⟨x, y⟩) ∧ ∀ x y, wdLeF⟨x, y⟩ ∨ wdLeF⟨y, x⟩) ∧
+    (∀ x a a', wdInpF⟨x, a⟩ ∧ wdInpF⟨x, a'⟩ → wdEqF⟨a, a'⟩) ∧
+      (∃ a, wdBlankF⟨a⟩) ∧ ∀ a a', wdBlankF⟨a⟩ ∧ wdBlankF⟨a'⟩ → wdEqF⟨a, a'⟩
 
 variable {A : Type} [Language.wide.Structure A] [LinearOrder A] {v : γ → A}
 

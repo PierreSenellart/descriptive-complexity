@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Feedback.Defs
 
 /-!
@@ -64,11 +65,8 @@ def symmetrizeInterp :
     FOInterpretation Language.markedGraph Language.markedGraph Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .adj => fun _ =>
-        ∼(Term.equal (Term.var (0, 0)) (Term.var (1, 0))) ⊓
-          (mgAdj.formula₂ (Term.var (0, 0)) (Term.var (1, 0)) ⊔
-            mgAdj.formula₂ (Term.var (1, 0)) (Term.var (0, 0)))
-    | _, .marked => fun _ => mgMarked.formula₁ (Term.var (0, 0))
+    | _, .adj => fun _ => fo%⟨u, v⟩ ¬ u ≐ v ∧ (mgAdj(u, v) ∨ mgAdj(v, u))
+    | _, .marked => fun _ => fo%⟨u⟩ mgMarked(u)
 
 section SymmetrizeCharacterizations
 
@@ -141,14 +139,12 @@ def splitInterp :
     match n, R with
     | _, .adj => fun t =>
       match t 0, t 1 with
-      | true, false => Term.equal (Term.var (0, 0)) (Term.var (1, 0))
-      | false, true => mgAdj.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
+      | true, false => fo%⟨u, v⟩ u ≐ v
+      | false, true => fo%⟨u, v⟩ mgAdj(u, v)
       | _, _ => ⊥
-    | _, .markedArc => fun t =>
+    | _, .marked => fun t =>
       match t 0, t 1 with
-      | true, false =>
-          Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊓
-            mgMarked.formula₁ (Term.var (0, 0))
+      | true, false => fo%⟨u, v⟩ u ≐ v ∧ mgMarked(u)
       | _, _ => ⊥
 
 /-! #### The two copies of a vertex -/

@@ -87,20 +87,20 @@ theorem realize_jobSequencingKernel :
   · rintro ⟨⟨⟨hrefl, htrans, hanti, htot⟩, hsrefl, hstrans, hsanti, hstot⟩,
       hlate, ⟨hb1, hs1, hc1, hbo1, ht1⟩, ⟨hb0, hs0, hc0, hbo0, ht0⟩, hldef, hfin⟩
     have hminU : ∀ (R : A → A → Prop) (P : A → Prop) (x : A), MinPos R P x →
-        P x ∧ ∀ y : Unit → A, P (y ()) → R x (y ()) :=
-      fun _ P x h => ⟨h.1, fun y hy => h.2 (y ()) hy⟩
+        P x ∧ ∀ y : Fin 1 → A, P (y 0) → R x (y 0) :=
+      fun _ P x h => ⟨h.1, fun y hy => h.2 (y 0) hy⟩
     have hmaxU : ∀ (R : A → A → Prop) (P : A → Prop) (x : A), MaxPos R P x →
-        P x ∧ ∀ y : Unit → A, P (y ()) → R (y ()) x :=
-      fun _ P x h => ⟨h.1, fun y hy => h.2 (y ()) hy⟩
+        P x ∧ ∀ y : Fin 1 → A, P (y 0) → R (y 0) x :=
+      fun _ P x h => ⟨h.1, fun y hy => h.2 (y 0) hy⟩
     have hsuccU : ∀ (R : A → A → Prop) (P : A → Prop) (x y : A), SuccPos R P x y →
-        P x ∧ (P y ∧ (R x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → R x (r ()) → R (r ()) y → r () = x ∨ r () = y))) :=
+        P x ∧ (P y ∧ (R x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → R x (r 0) → R (r 0) y → r 0 = x ∨ r 0 = y))) :=
       fun _ P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
-        fun r hr h1 h2 => h.2.2.2.2 (r ()) hr h1 h2⟩
+        fun r hr h1 h2 => h.2.2.2.2 (r 0) hr h1 h2⟩
     have hsallU : ∀ x y : A, SuccPos JSLe (fun _ => True) x y →
-        JSLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          JSLe x (r ()) → JSLe (r ()) y → r () = x ∨ r () = y) :=
-      fun x y h => ⟨h.2.2.1, h.2.2.2.1, fun r h1 h2 => h.2.2.2.2 (r ()) trivial h1 h2⟩
+        JSLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          JSLe x (r 0) → JSLe (r 0) y → r 0 = x ∨ r 0 = y) :=
+      fun x y h => ⟨h.2.2.1, h.2.2.2.1, fun r h1 h2 => h.2.2.2.2 (r 0) trivial h1 h2⟩
     refine ⟨⟨⟨fun a => hrefl (fun _ => a),
         fun a b c hab hbc => htrans ![a, b, c] ⟨hab, hbc⟩,
         fun a b hab hba => hanti ![a, b] ⟨hab, hba⟩, fun a b => htot ![a, b]⟩,
@@ -115,9 +115,9 @@ theorem realize_jobSequencingKernel :
             · exact Or.inl ⟨rfl, hsuccU _ _ _ _ h⟩
             · exact Or.inr ⟨hsallU _ _ h1, hmaxU _ _ _ h2, hminU _ _ _ h3⟩⟩,
           fun i j x p hij hp => hbo0 ![i, j, x, p]
-            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y ()), hminU _ _ _ hp.2⟩,
+            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y 0), hminU _ _ _ hp.2⟩,
           fun i j x p hij hp => ht0 ![i, j, x, p]
-            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y ()), hmaxU _ _ _ hp.2⟩⟩
+            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y 0), hmaxU _ _ _ hp.2⟩⟩
       · exact ⟨fun i x p hi hp => hb1 ![i, x, p] ⟨hminU _ _ _ hi, hp⟩,
           fun i j x p hij hp => hs1 ![i, j, x, p] ⟨hsuccU _ _ _ _ hij, hp⟩,
           fun i j x p y q hij hpq => hc1 ![i, j, x, p, y, q] ⟨hsuccU _ _ _ _ hij, by
@@ -125,9 +125,9 @@ theorem realize_jobSequencingKernel :
             · exact Or.inl ⟨rfl, hsuccU _ _ _ _ h⟩
             · exact Or.inr ⟨hsallU _ _ h1, hmaxU _ _ _ h2, hminU _ _ _ h3⟩⟩,
           fun i j x p hij hp => hbo1 ![i, j, x, p]
-            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y ()), hminU _ _ _ hp.2⟩,
+            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y 0), hminU _ _ _ hp.2⟩,
           fun i j x p hij hp => ht1 ![i, j, x, p]
-            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y ()), hmaxU _ _ _ hp.2⟩⟩
+            ⟨hsuccU _ _ _ _ hij, fun y => hp.1 (y 0), hmaxU _ _ _ hp.2⟩⟩
     · refine (hldef (fun _ => j) hj).trans ⟨fun h => ?_, fun h => ?_⟩
       · obtain ⟨w, hw⟩ := h
         exact ⟨w 0, w 1, hw.1, hw.2.1, hw.2.2.1, fun y q hq hab =>
@@ -140,20 +140,20 @@ theorem realize_jobSequencingKernel :
   · rintro ⟨⟨⟨hrefl, htrans, hanti, htot⟩, hsrefl, hstrans, hsanti, hstot⟩,
       hlate, hwalk, hldef, hfin⟩
     have hminM : ∀ (R : A → A → Prop) (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → R x (y ())) → MinPos R P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → R x (y 0)) → MinPos R P x :=
       fun _ P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hmaxM : ∀ (R : A → A → Prop) (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → R (y ()) x) → MaxPos R P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → R (y 0) x) → MaxPos R P x :=
       fun _ P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hsuccM : ∀ (R : A → A → Prop) (P : A → Prop) (x y : A),
-        (P x ∧ (P y ∧ (R x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → R x (r ()) → R (r ()) y → r () = x ∨ r () = y)))) →
+        (P x ∧ (P y ∧ (R x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → R x (r 0) → R (r 0) y → r 0 = x ∨ r 0 = y)))) →
         SuccPos R P x y :=
       fun _ P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
         fun r hr h1 h2 => h.2.2.2.2 (fun _ => r) hr h1 h2⟩
     have hsallM : ∀ x y : A,
-        (JSLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          JSLe x (r ()) → JSLe (r ()) y → r () = x ∨ r () = y)) →
+        (JSLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          JSLe x (r 0) → JSLe (r 0) y → r 0 = x ∨ r 0 = y)) →
         SuccPos JSLe (fun _ => True) x y :=
       fun x y h => ⟨trivial, trivial, h.1, h.2.1,
         fun r _ h1 h2 => h.2.2 (fun _ => r) h1 h2⟩

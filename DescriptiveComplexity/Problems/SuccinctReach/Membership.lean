@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.SuccinctReach.Defs
 
 /-!
@@ -59,27 +60,18 @@ variable {L : Language.{0, 0}} {M : Type} [L.Structure M]
 true.” -/
 noncomputable def clausesHoldS (grp : L.Relations 1) (pos neg : L.Relations 2)
     (nu : L.Relations 1) : L.Sentence :=
-  ((Relations.formula₁ grp (Term.var (Sum.inr 0))).imp
-    (((Relations.formula₂ pos (Term.var (Sum.inl (Sum.inr 0))) (Term.var (Sum.inr ())) ⊓
-        Relations.formula₁ nu (Term.var (Sum.inr ()))) ⊔
-      (Relations.formula₂ neg (Term.var (Sum.inl (Sum.inr 0))) (Term.var (Sum.inr ())) ⊓
-        ∼(Relations.formula₁ nu (Term.var (Sum.inr ()))))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ c, grp(c) → ∃ x, (pos(c, x) ∧ nu(x)) ∨ (neg(c, x) ∧ ¬ nu(x))
 
 /-- “On every element marked by `mark`, the unary relations `nu` and `st`
 agree.” -/
 noncomputable def agreeOnS (mark nu st : L.Relations 1) : L.Sentence :=
-  ((Relations.formula₁ mark (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₁ nu (Term.var (Sum.inr 0))).iff
-      (Relations.formula₁ st (Term.var (Sum.inr 0))))).iAlls (Fin 1)
+  fo% ∀ x, mark(x) → (nu(x) ↔ st(x))
 
 /-- “Whenever `y` is the `nxt`-successor of an element `x` marked by `mark`,
 `nu` holds of `y` exactly when `st` holds of `x`.” -/
 noncomputable def writesS (mark : L.Relations 1) (nxt : L.Relations 2)
     (nu st : L.Relations 1) : L.Sentence :=
-  ((Relations.formula₁ mark (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₂ nxt (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-      ((Relations.formula₁ nu (Term.var (Sum.inr 1))).iff
-        (Relations.formula₁ st (Term.var (Sum.inr 0)))))).iAlls (Fin 2)
+  fo% ∀ x y, mark(x) → nxt(x, y) → (nu(y) ↔ st(x))
 
 theorem realize_clausesHoldS (grp : L.Relations 1) (pos neg : L.Relations 2)
     (nu : L.Relations 1) :
@@ -93,7 +85,7 @@ theorem realize_clausesHoldS (grp : L.Relations 1) (pos neg : L.Relations 2)
   constructor
   · intro h c hc
     obtain ⟨x, hx⟩ := h (fun _ => c) hc
-    exact ⟨x (), hx⟩
+    exact ⟨x 0, hx⟩
   · intro h i hc
     obtain ⟨x, hx⟩ := h (i 0) hc
     exact ⟨fun _ => x, hx⟩

@@ -872,22 +872,19 @@ fo_block cqHomBlock over Language.queryDb qdb into cqSOLang with cq where
   /-- The guessed valuation, as the graph of a map. -/
   hom : 2
 
-/-- Shorthand for the `i`-th universally quantified variable of the main
-kernel conjunct. -/
-private def kv (i : Fin 4) : cqSOLang.Term (Empty ⊕ Fin 4) := Term.var (Sum.inr i)
-
-/-- The kernel formula “`kv j` is a possible image of `kv i`”: an `H`-image
-if `kv i` is a query variable, `kv i` itself otherwise. -/
-def cqImgFormula (i j : Fin 4) : cqSOLang.Formula (Empty ⊕ Fin 4) :=
-  (Relations.formula₁ cqIsVarSym (kv i) ⊓ Relations.formula₂ cqHomSym (kv i) (kv j)) ⊔
-    (∼(Relations.formula₁ cqIsVarSym (kv i)) ⊓ Term.equal (kv i) (kv j))
+/-- The kernel formula “`y` is a possible image of `x`”: an `H`-image if `x`
+is a query variable, `x` itself otherwise. A formula builder: `x` and `y` are
+variables of any free-variable type, so the formula can be used under any
+quantifier block. -/
+def cqImgFormula {α : Type} (x y : α) : cqSOLang.Formula α :=
+  fo%[x, y] (cqIsVarSym(x) ∧ cqHomSym(x, y)) ∨ (¬ cqIsVarSym(x) ∧ x ≐ y)
 
 /-- First kernel conjunct: for all `x y u v`, if `E(x, y)` is an atom and
 `u`, `v` are possible images of `x`, `y`, then `E(u, v)` is a fact between
 two database elements. -/
 noncomputable def cqKernelAtoms : cqSOLang.Sentence :=
   fo% ∀ x y u v,
-    cqAtomSym(x, y) ∧ (!(cqImgFormula 0 2) ∧ !(cqImgFormula 1 3)) →
+    cqAtomSym(x, y) ∧ (cqImgFormula⟨x, u⟩ ∧ cqImgFormula⟨y, v⟩) →
       (cqFactSym(u, v) ∧ ¬ cqIsVarSym(u)) ∧ ¬ cqIsVarSym(v)
 
 /-- Second kernel conjunct: every query variable has at least one
@@ -927,7 +924,7 @@ private theorem realize_cqKernel (ρ : cqHomBlock.Assignment A) :
     simp only [Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
       Formula.realize_sup, Formula.realize_not, Formula.realize_rel₁, Formula.realize_rel₂,
       Formula.realize_equal, Term.realize_var, Sum.elim_inr, Language.relMap_sumInl, hsub,
-      cqImgFormula, kv, PossibleImage, QAtom, QVar, DbFact, DbEdge]
+      cqImgFormula, PossibleImage, QAtom, QVar, DbFact, DbEdge]
     constructor
     · intro hker x y u v hxy hxu hyv
       have h := hker ![x, y, u, v]
@@ -1033,7 +1030,7 @@ def cevIsVarFormula : ColEvalTag → Language.graph.Formula (Fin 1 × Fin 1)
 /-- Defining formula for `atom`: the canonical query of the graph – one atom
 per (directed) edge, between the corresponding query variables. -/
 def cevAtomFormula : ColEvalTag → ColEvalTag → Language.graph.Formula (Fin 2 × Fin 1)
-  | .qvtx, .qvtx => adj.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
+  | .qvtx, .qvtx => fo%⟨u, v⟩ adj(u, v)
   | _, _ => ⊥
 
 /-- Defining formula for `fact`: all pairs of database elements of distinct
@@ -1364,48 +1361,48 @@ inductive PairTag : Type
 instance : Fintype PairTag :=
   ⟨{.query, .db}, fun t => by cases t <;> simp⟩
 
-/-- Formula: argument `i` is a variable of the left query. -/
-private def lvarF {n : ℕ} (i : Fin n) : Language.queryPair.Formula (Fin n × Fin 1) :=
-  qpLeftVar.formula₁ (Term.var (i, 0))
+/-- Formula builder: `x` is a variable of the left query. -/
+private def lvarF {α : Type} (x : α) : Language.queryPair.Formula α :=
+  fo%[x] qpLeftVar(x)
 
-/-- Formula: argument `i` is a variable of the right query. -/
-private def rvarF {n : ℕ} (i : Fin n) : Language.queryPair.Formula (Fin n × Fin 1) :=
-  qpRightVar.formula₁ (Term.var (i, 0))
+/-- Formula builder: `x` is a variable of the right query. -/
+private def rvarF {α : Type} (x : α) : Language.queryPair.Formula α :=
+  fo%[x] qpRightVar(x)
 
-/-- Formula: argument `i` is a variable of either query. -/
-private def pairVarF {n : ℕ} (i : Fin n) : Language.queryPair.Formula (Fin n × Fin 1) :=
-  lvarF i ⊔ rvarF i
+/-- Formula builder: `x` is a variable of either query. -/
+private def pairVarF {α : Type} (x : α) : Language.queryPair.Formula α :=
+  fo%[x] lvarF⟨x⟩ ∨ rvarF⟨x⟩
 
-/-- Formula: argument `i` is a shared constant. -/
-private def constF {n : ℕ} (i : Fin n) : Language.queryPair.Formula (Fin n × Fin 1) :=
-  ∼(lvarF i) ⊓ ∼(rvarF i)
+/-- Formula builder: `x` is a shared constant. -/
+private def constF {α : Type} (x : α) : Language.queryPair.Formula α :=
+  fo%[x] ¬ lvarF⟨x⟩ ∧ ¬ rvarF⟨x⟩
 
-/-- Formula: `E(i, j)` is an atom of the left query. -/
-private def latomF {n : ℕ} (i j : Fin n) : Language.queryPair.Formula (Fin n × Fin 1) :=
-  qpLeftAtom.formula₂ (Term.var (i, 0)) (Term.var (j, 0))
+/-- Formula builder: `E(x, y)` is an atom of the left query. -/
+private def latomF {α : Type} (x y : α) : Language.queryPair.Formula α :=
+  fo%[x, y] qpLeftAtom(x, y)
 
-/-- Formula: `E(i, j)` is an atom of the right query. -/
-private def ratomF {n : ℕ} (i j : Fin n) : Language.queryPair.Formula (Fin n × Fin 1) :=
-  qpRightAtom.formula₂ (Term.var (i, 0)) (Term.var (j, 0))
+/-- Formula builder: `E(x, y)` is an atom of the right query. -/
+private def ratomF {α : Type} (x y : α) : Language.queryPair.Formula α :=
+  fo%[x, y] qpRightAtom(x, y)
 
 /-- Defining formula for `isVar`: on the query side, the variables of either
 query; nothing on the database side. -/
 def ctevIsVarFormula : PairTag → Language.queryPair.Formula (Fin 1 × Fin 1)
-  | .query => pairVarF 0
+  | .query => fo%⟨u⟩ pairVarF⟨u⟩
   | .db => ⊥
 
 /-- Defining formula for `atom`: the right atoms, each endpoint routed to the
 query side if it is a variable and to the database side if it is a
 constant. -/
 def ctevAtomFormula : PairTag → PairTag → Language.queryPair.Formula (Fin 2 × Fin 1)
-  | .query, .query => ratomF 0 1 ⊓ (pairVarF 0 ⊓ pairVarF 1)
-  | .query, .db => ratomF 0 1 ⊓ (pairVarF 0 ⊓ constF 1)
-  | .db, .query => ratomF 0 1 ⊓ (constF 0 ⊓ pairVarF 1)
-  | .db, .db => ratomF 0 1 ⊓ (constF 0 ⊓ constF 1)
+  | .query, .query => fo%⟨u, v⟩ ratomF⟨u, v⟩ ∧ pairVarF⟨u⟩ ∧ pairVarF⟨v⟩
+  | .query, .db => fo%⟨u, v⟩ ratomF⟨u, v⟩ ∧ pairVarF⟨u⟩ ∧ constF⟨v⟩
+  | .db, .query => fo%⟨u, v⟩ ratomF⟨u, v⟩ ∧ constF⟨u⟩ ∧ pairVarF⟨v⟩
+  | .db, .db => fo%⟨u, v⟩ ratomF⟨u, v⟩ ∧ constF⟨u⟩ ∧ constF⟨v⟩
 
 /-- Defining formula for `fact`: the left atoms, on the database side. -/
 def ctevFactFormula : PairTag → PairTag → Language.queryPair.Formula (Fin 2 × Fin 1)
-  | .db, .db => latomF 0 1
+  | .db, .db => fo%⟨u, v⟩ latomF⟨u, v⟩
   | _, _ => ⊥
 
 /-- The first-order interpretation producing, from a query pair, the
@@ -1580,12 +1577,9 @@ def evalToContainment : FOInterpretation Language.queryDb Language.queryPair Uni
   relFormula {n} R :=
     match n, R with
     | _, .leftVar => fun _ => ⊥
-    | _, .rightVar => fun _ => qdbIsVar.formula₁ (Term.var (0, 0))
-    | _, .leftAtom => fun _ =>
-        (qdbFact.formula₂ (Term.var (0, 0)) (Term.var (1, 0)) ⊓
-          ∼(qdbIsVar.formula₁ (Term.var (0, 0)))) ⊓
-          ∼(qdbIsVar.formula₁ (Term.var (1, 0)))
-    | _, .rightAtom => fun _ => qdbAtom.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .rightVar => fun _ => fo%⟨u⟩ qdbIsVar(u)
+    | _, .leftAtom => fun _ => fo%⟨u, v⟩ (qdbFact(u, v) ∧ ¬ qdbIsVar(u)) ∧ ¬ qdbIsVar(v)
+    | _, .rightAtom => fun _ => fo%⟨u, v⟩ qdbAtom(u, v)
 
 section Characterizations
 

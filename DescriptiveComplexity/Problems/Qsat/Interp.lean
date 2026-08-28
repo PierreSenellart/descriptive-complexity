@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Qsat.Tags
 import DescriptiveComplexity.Problems.Qsat.Defs
 import DescriptiveComplexity.Padding
@@ -118,18 +119,16 @@ noncomputable def isBotF (x : α) : transOrd.Formula α := botF (L := Language.t
 
 /-- `x` is the first state variable, as a formula. -/
 noncomputable def minSVF (x : α) : transOrd.Formula α :=
-  svF x ⊓ ∼((svF (Sum.inr ()) ⊓ ltF (Sum.inr ()) (Sum.inl x)).iExs Unit)
+  fo%[x] svF⟨x⟩ ∧ ¬ ∃ y, svF⟨y⟩ ∧ ltF⟨y, x⟩
 
 /-- `x` is the last state variable, as a formula. -/
 noncomputable def maxSVF (x : α) : transOrd.Formula α :=
-  svF x ⊓ ∼((svF (Sum.inr ()) ⊓ ltF (Sum.inl x) (Sum.inr ())).iExs Unit)
+  fo%[x] svF⟨x⟩ ∧ ¬ ∃ y, svF⟨y⟩ ∧ ltF⟨x, y⟩
 
 /-- `x` is the state variable just above the state variable `y`, as a
 formula. -/
 noncomputable def predSVF (x y : α) : transOrd.Formula α :=
-  svF x ⊓ svF y ⊓ ltF x y ⊓
-    ∼((svF (Sum.inr ()) ⊓ ltF (Sum.inl x) (Sum.inr ()) ⊓
-      ltF (Sum.inr ()) (Sum.inl y)).iExs Unit)
+  fo%[x, y] ((svF⟨x⟩ ∧ svF⟨y⟩) ∧ ltF⟨x, y⟩) ∧ ¬ ∃ z, (svF⟨z⟩ ∧ ltF⟨x, z⟩) ∧ ltF⟨z, y⟩
 
 end Atoms
 
@@ -198,7 +197,7 @@ theorem realize_minSVF {x : α} : (minSVF x).Realize V ↔ IsMinSV (V x) := by
   · rintro ⟨h1, h2⟩
     exact ⟨h1, fun z hz hlt => h2 ⟨fun _ => z, hz, hlt⟩⟩
   · rintro ⟨h1, h2⟩
-    exact ⟨h1, fun hh => hh.elim fun i hi => h2 (i ()) hi.1 hi.2⟩
+    exact ⟨h1, fun hh => hh.elim fun i hi => h2 (i 0) hi.1 hi.2⟩
 
 @[simp]
 theorem realize_maxSVF {x : α} : (maxSVF x).Realize V ↔ IsMaxSV (V x) := by
@@ -208,7 +207,7 @@ theorem realize_maxSVF {x : α} : (maxSVF x).Realize V ↔ IsMaxSV (V x) := by
   · rintro ⟨h1, h2⟩
     exact ⟨h1, fun z hz hlt => h2 ⟨fun _ => z, hz, hlt⟩⟩
   · rintro ⟨h1, h2⟩
-    exact ⟨h1, fun hh => hh.elim fun i hi => h2 (i ()) hi.1 hi.2⟩
+    exact ⟨h1, fun hh => hh.elim fun i hi => h2 (i 0) hi.1 hi.2⟩
 
 @[simp]
 theorem realize_predSVF {x y : α} : (predSVF x y).Realize V ↔ IsPredSV (V x) (V y) := by
@@ -218,7 +217,7 @@ theorem realize_predSVF {x y : α} : (predSVF x y).Realize V ↔ IsPredSV (V x) 
   · rintro ⟨h1, h2, h3, h4⟩
     exact ⟨h1, h2, h3, fun z hz hlt => h4 ⟨fun _ => z, hz, hlt⟩⟩
   · rintro ⟨h1, h2, h3, h4⟩
-    exact ⟨h1, h2, h3, fun hh => hh.elim fun i hi => h4 (i ()) hi.1 hi.2⟩
+    exact ⟨h1, h2, h3, fun hh => hh.elim fun i hi => h4 (i 0) hi.1 hi.2⟩
 
 end RealizeAtoms
 
@@ -426,11 +425,11 @@ noncomputable def qsatInterp : FOInterpretation transOrd Language.qsat QTag 2 wh
     match n, R with
     | _, .isVar => fun t =>
         match t 0 with
-        | Sum.inl v => varF v ((0 : Fin 1), (0 : Fin 2)) ((0 : Fin 1), (1 : Fin 2))
+        | Sum.inl v => fo%⟨u⟩ (varF v)⟨u, u[1]⟩
         | Sum.inr _ => ⊥
     | _, .allVar => fun t =>
         match t 0 with
-        | Sum.inl v => allF v ((0 : Fin 1), (0 : Fin 2)) ((0 : Fin 1), (1 : Fin 2))
+        | Sum.inl v => fo%⟨u⟩ (allF v)⟨u, u[1]⟩
         | Sum.inr _ => ⊥
     | _, .prefixLt => fun t =>
         match t 0, t 1 with
@@ -438,7 +437,7 @@ noncomputable def qsatInterp : FOInterpretation transOrd Language.qsat QTag 2 wh
         | _, _ => ⊥
     | _, .isClause => fun t =>
         match t 0 with
-        | Sum.inr c => clF c ((0 : Fin 1), (0 : Fin 2)) ((0 : Fin 1), (1 : Fin 2))
+        | Sum.inr c => fo%⟨u⟩ (clF c)⟨u, u[1]⟩
         | Sum.inl _ => ⊥
     | _, .posIn => fun t =>
         match t 0, t 1 with

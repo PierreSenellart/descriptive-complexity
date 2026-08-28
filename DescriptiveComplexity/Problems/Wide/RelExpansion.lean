@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Wide.RelExp
 
 /-!
@@ -39,7 +40,7 @@ variable (L : Language.{0, 0}) [L.IsRelational] (B : SOBlock)
 
 /-- **No element is marked**, as a sentence. -/
 noncomputable def noOldSentence : (((newLang L).sum Language.order).sum B.lang).Sentence :=
-  Formula.iAlls (Fin 1) (∼(Relations.formula₁ (oldGuard (L := L) B) (Term.var (Sum.inr 0))))
+  fo% ∀ x, ¬ (oldGuard (L := L) B)(x)
 
 open Classical in
 /-- **Every relation variable of the block is empty**, as a sentence. -/

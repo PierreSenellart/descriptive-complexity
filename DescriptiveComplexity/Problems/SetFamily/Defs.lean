@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Numbers.Unary
 
@@ -61,36 +62,18 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of set systems. -/
-inductive setSystemRel : ℕ → Type
-  /-- `elem a`: the element `a` belongs to the ground set. -/
-  | elem : setSystemRel 1
-  /-- `fam a`: the element `a` is one of the sets of the family. -/
-  | fam : setSystemRel 1
-  /-- `mem a b`: the ground element `a` belongs to the set `b`. -/
-  | mem : setSystemRel 2
-  /-- `marked a`: the element `a` belongs to the marked set. -/
-  | marked : setSystemRel 1
-  deriving DecidableEq
-
 /-- The relational language of set systems: a bipartite incidence structure
 between ground elements and sets of a family, together with a marked subset of
 the universe whose cardinality serves as threshold. -/
-protected def setSystem : Language :=
-  ⟨fun _ => Empty, setSystemRel⟩
-  deriving IsRelational
-
-/-- The ground-element symbol of set systems. -/
-abbrev ssElem : Language.setSystem.Relations 1 := .elem
-
-/-- The family symbol of set systems. -/
-abbrev ssFam : Language.setSystem.Relations 1 := .fam
-
-/-- The incidence symbol of set systems. -/
-abbrev ssMem : Language.setSystem.Relations 2 := .mem
-
-/-- The mark symbol of set systems. -/
-abbrev ssMarked : Language.setSystem.Relations 1 := .marked
+fo_language setSystem with ss where
+  /-- `elem a`: the element `a` belongs to the ground set. -/
+  elem : 1
+  /-- `fam a`: the element `a` is one of the sets of the family. -/
+  fam : 1
+  /-- `mem a b`: the ground element `a` belongs to the set `b`. -/
+  mem : 2
+  /-- `marked a`: the element `a` belongs to the marked set. -/
+  marked : 1
 
 end Language
 
@@ -347,17 +330,7 @@ section Shorthands
 
 variable {A : Type} [Language.setSystem.Structure A]
 
-/-- Being a ground element in a set system. -/
-def SSElem (a : A) : Prop := RelMap ssElem ![a]
-
-/-- Being a set of the family in a set system. -/
-def SSFam (a : A) : Prop := RelMap ssFam ![a]
-
-/-- Incidence in a set system. -/
-def SSMem (a b : A) : Prop := RelMap ssMem ![a, b]
-
-/-- Markedness in a set system. -/
-def SSMarked (a : A) : Prop := RelMap ssMarked ![a]
+fo_predicates Language.setSystem ss
 
 end Shorthands
 

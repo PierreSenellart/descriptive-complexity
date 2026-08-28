@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Steiner.Defs
 import DescriptiveComplexity.OrderWalk
 import Mathlib.Data.Fintype.Lattice
@@ -87,9 +88,7 @@ noncomputable def steinerInterp :
     | _, .adj => fun t =>
         match t 0, t 1 with
         | .vertex, .edge =>
-            isDiagF 0 ⊓ isEdgeF 1 ⊓
-              (Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊔
-                Term.equal (Term.var (0, 0)) (Term.var (1, 1)))
+            fo%⟨u, v⟩ (!(isDiagF 0) ∧ !(isEdgeF 1)) ∧ (u ≐ v ∨ u ≐ v[1])
         | .root, .vertex => isDiagF 0 ⊓ minF (0, 0) ⊓ isDiagF 1
         | _, _ => ⊥
     | _, .terminal => fun t =>
@@ -99,7 +98,7 @@ noncomputable def steinerInterp :
         | _ => ⊥
     | _, .marked => fun t =>
         match t 0 with
-        | .vertex => isDiagF 0 ⊓ Relations.formula₁ sMarkedSym (Term.var (0, 0))
+        | .vertex => fo%⟨u⟩ !(isDiagF 0) ∧ sMarkedSym(u)
         | _ => ⊥
 
 section Points
@@ -370,9 +369,7 @@ noncomputable def steinerEdgeInterp :
     | _, .adj => fun t =>
         match t 0, t 1 with
         | .vertex, .edge =>
-            isDiagF 0 ⊓ isEdgeF 1 ⊓
-              (Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊔
-                Term.equal (Term.var (0, 0)) (Term.var (1, 1)))
+            fo%⟨u, v⟩ (!(isDiagF 0) ∧ !(isEdgeF 1)) ∧ (u ≐ v ∨ u ≐ v[1])
         | .root, .vertex => isDiagF 0 ⊓ minF (0, 0) ⊓ isDiagF 1
         | _, _ => ⊥
     | _, .terminal => fun t =>
@@ -382,7 +379,7 @@ noncomputable def steinerEdgeInterp :
         | _ => ⊥
     | _, .marked => fun t =>
         match t 0 with
-        | .vertex => isDiagF 0 ⊓ Relations.formula₁ sMarkedSym (Term.var (0, 0))
+        | .vertex => fo%⟨u⟩ !(isDiagF 0) ∧ sMarkedSym(u)
         | .edge => isEdgeF 0
         | _ => ⊥
 

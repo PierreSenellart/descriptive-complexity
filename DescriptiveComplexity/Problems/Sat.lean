@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Hierarchy
 
 /-!
@@ -37,31 +39,16 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of CNF instances. -/
-inductive satRel : ℕ → Type
-  /-- `isClause c`: the element `c` is a clause. -/
-  | isClause : satRel 1
-  /-- `posIn c x`: the variable `x` occurs positively in the clause `c`. -/
-  | posIn : satRel 2
-  /-- `negIn c x`: the variable `x` occurs negatively in the clause `c`. -/
-  | negIn : satRel 2
-  deriving DecidableEq
-
 /-- The relational language of CNF instances: a unary predicate singling out
 clauses, and two binary predicates for positive and negative occurrences of a
 variable in a clause. -/
-protected def sat : Language :=
-  ⟨fun _ => Empty, satRel⟩
-  deriving IsRelational
-
-/-- The symbol for “is a clause”. -/
-abbrev satIsClause : Language.sat.Relations 1 := .isClause
-
-/-- The symbol for “occurs positively in”. -/
-abbrev satPosIn : Language.sat.Relations 2 := .posIn
-
-/-- The symbol for “occurs negatively in”. -/
-abbrev satNegIn : Language.sat.Relations 2 := .negIn
+fo_language sat with sat where
+  /-- `isClause c`: the element `c` is a clause. -/
+  isClause : 1
+  /-- `posIn c x`: the variable `x` occurs positively in the clause `c`. -/
+  posIn : 2
+  /-- `negIn c x`: the variable `x` occurs negatively in the clause `c`. -/
+  negIn : 2
 
 end Language
 
@@ -154,14 +141,8 @@ abbrev kNuSym : satSOLang.Relations 1 := Sum.inr satNuSym
 contains a true literal. The universally quantified variable is the clause,
 the existentially quantified one the literal's variable. -/
 noncomputable def satKernel : satSOLang.Sentence :=
-  ((Relations.formula₁ kIsClSym (Term.var (Sum.inr 0))).imp
-    (((Relations.formula₂ kPosSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        Relations.formula₁ kNuSym (Term.var (Sum.inr ()))) ⊔
-      (Relations.formula₂ kNegSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        ∼(Relations.formula₁ kNuSym (Term.var (Sum.inr ()))))).iExs
-      Unit)).iAlls (Fin 1)
+  fo% ∀ c, kIsClSym(c) →
+    ∃ x, (kPosSym(c, x) ∧ kNuSym(x)) ∨ (kNegSym(c, x) ∧ ¬ kNuSym(x))
 
 /-- Realization of the kernel under an assignment of the truth-assignment
 variable: every clause contains a true literal. (Reused by the membership
@@ -189,8 +170,8 @@ theorem realize_satKernel {A : Type} [Language.sat.Structure A]
   · intro h c hc
     obtain ⟨x, hx⟩ := h (fun _ => c) hc
     rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
-    · exact ⟨x (), Or.inl ⟨hp, hT⟩⟩
-    · exact ⟨x (), Or.inr ⟨hn, hT⟩⟩
+    · exact ⟨x 0, Or.inl ⟨hp, hT⟩⟩
+    · exact ⟨x 0, Or.inr ⟨hn, hT⟩⟩
   · intro h i hc
     obtain ⟨x, hx⟩ := h (i 0) hc
     rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩

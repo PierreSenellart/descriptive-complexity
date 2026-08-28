@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Knapsack.Defs
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Numbers.Digits
@@ -194,7 +195,7 @@ instance : Nonempty KTag := ⟨KTag.itm⟩
 /-- Defining formula for the items: the sets of the family, padded
 canonically. -/
 noncomputable def itemF : KTag → ssOrd.Formula (Fin 1 × Fin 2)
-  | .itm => famF (0, 0) ⊓ minF (0, 1)
+  | .itm => fo%⟨s⟩ famF⟨s⟩ ∧ minF⟨s[1]⟩
   | .pos => ⊥
 
 /-- Defining formula for the bit positions: the pairs whose first coordinate
@@ -206,18 +207,19 @@ def posnF : KTag → ssOrd.Formula (Fin 1 × Fin 2)
 /-- Defining formula for the bits of the weights: the weight of the set `s`
 has a `1` at the lowest position of the block of `e` exactly when `e ∈ s`. -/
 noncomputable def bitF : KTag → KTag → ssOrd.Formula (Fin 2 × Fin 2)
-  | .itm, .pos => famF (0, 0) ⊓ minF (0, 1) ⊓ elemF (1, 0) ⊓ memF (1, 0) (0, 0) ⊓ minF (1, 1)
+  | .itm, .pos =>
+    fo%⟨s, e⟩ (((famF⟨s⟩ ∧ minF⟨s[1]⟩) ∧ elemF⟨e⟩) ∧ memF⟨e, s⟩) ∧ minF⟨e[1]⟩
   | _, _ => ⊥
 
 /-- Defining formula for the bits of the target: a `1` at the lowest position
 of every block. -/
 noncomputable def tgtF : KTag → ssOrd.Formula (Fin 1 × Fin 2)
-  | .pos => elemF (0, 0) ⊓ minF (0, 1)
+  | .pos => fo%⟨e⟩ elemF⟨e⟩ ∧ minF⟨e[1]⟩
   | .itm => ⊥
 
 /-- The lexicographic comparison of the two argument tuples, as a formula. -/
 def lexF : ssOrd.Formula (Fin 2 × Fin 2) :=
-  ltF (0, 0) (1, 0) ⊔ (eqF (0, 0) (1, 0) ⊓ leF (0, 1) (1, 1))
+  fo%⟨u, v⟩ ltF⟨u, v⟩ ∨ (eqF⟨u, v⟩ ∧ leF⟨u[1], v[1]⟩)
 
 /-- Defining formula for the order: items first, positions next, each group
 ordered lexicographically. -/

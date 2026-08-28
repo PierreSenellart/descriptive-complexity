@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.HornSat.Defs
 
 /-!
@@ -32,10 +33,7 @@ section SigmaOne
 /-- The first-order Horn condition, in the kernel's vocabulary: two variables
 occurring positively in the same clause coincide. -/
 noncomputable def hornCondKernel : satSOLang.Sentence :=
-  ((Relations.formula₁ kIsClSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₂ kPosSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ kPosSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ c x y, (kIsClSym(c) ∧ kPosSym(c, x)) ∧ kPosSym(c, y) → x ≐ y
 
 /-- Realization of the Horn condition: it does not depend on the guessed truth
 assignment, and says exactly that every clause has at most one positive

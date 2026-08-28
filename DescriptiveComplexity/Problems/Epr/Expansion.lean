@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Exponential.Expansion
 import DescriptiveComplexity.Exponential.Copies
 import DescriptiveComplexity.Problems.Epr.Small
@@ -109,32 +110,28 @@ section Atoms
 variable {γ : Type}
 
 /-- The block's variable, as a formula over one copy. -/
-noncomputable def peF1 (x y : γ) : peLang1.Formula γ :=
-  Relations.formula₂ peSym1 (Term.var x) (Term.var y)
+noncomputable def peF1 (x y : γ) : peLang1.Formula γ := fo%[x, y] peSym1(x, y)
 
 /-- The first copy's variable, as a formula over two copies. -/
-noncomputable def peFA (x y : γ) : peLang2.Formula γ :=
-  Relations.formula₂ peSymA (Term.var x) (Term.var y)
+noncomputable def peFA (x y : γ) : peLang2.Formula γ := fo%[x, y] peSymA(x, y)
 
 /-- The second copy's variable, as a formula over two copies. -/
-noncomputable def peFB (x y : γ) : peLang2.Formula γ :=
-  Relations.formula₂ peSymB (Term.var x) (Term.var y)
+noncomputable def peFB (x y : γ) : peLang2.Formula γ := fo%[x, y] peSymB(x, y)
 
 /-- A unary relation of the instance, as a formula. -/
 noncomputable def peMarkG (r : Language.epr.Relations 1) (x : γ) : peOrd.Formula γ :=
-  Relations.formula₁ (peIn r) (Term.var x)
+  fo%[x] (peIn r)(x)
 
 /-- A binary relation of the instance, as a formula. -/
 noncomputable def peBinG (r : Language.epr.Relations 2) (x y : γ) : peOrd.Formula γ :=
-  Relations.formula₂ (peIn r) (Term.var x) (Term.var y)
+  fo%[x, y] (peIn r)(x, y)
 
 /-- A ternary relation of the instance, as a formula. -/
 noncomputable def peTerG (r : Language.epr.Relations 3) (x y z : γ) : peOrd.Formula γ :=
-  Relations.formula (peIn r) ![Term.var x, Term.var y, Term.var z]
+  fo%[x, y, z] (peIn r)(x, y, z)
 
 /-- Equality of two variables, as a formula. -/
-noncomputable def peEqG (x y : γ) : peOrd.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def peEqG (x y : γ) : peOrd.Formula γ := fo%[x, y] x ≐ y
 
 /-- Reading a sentence of the base vocabulary in the one-copy vocabulary. -/
 noncomputable def peLift1 (φ : peOrd.Formula γ) : peLang1.Formula γ :=
@@ -423,12 +420,10 @@ noncomputable def binS (r : Language.epr.Relations 2) : peLang2.Sentence :=
 
 /-- **The first component of a pair**: the pair is `(x, y)` and the second point
 is the element `x`. -/
-noncomputable def fstS : peLang2.Sentence :=
-  Formula.iExs (Fin 2) (peFA (Sum.inr 0) (Sum.inr 1) ⊓ peFB (Sum.inr 0) (Sum.inr 0))
+noncomputable def fstS : peLang2.Sentence := fo% ∃ x y, peFA⟨x, y⟩ ∧ peFB⟨x, x⟩
 
 /-- **The second component of a pair.** -/
-noncomputable def sndS : peLang2.Sentence :=
-  Formula.iExs (Fin 2) (peFA (Sum.inr 0) (Sum.inr 1) ⊓ peFB (Sum.inr 1) (Sum.inr 1))
+noncomputable def sndS : peLang2.Sentence := fo% ∃ x y, peFA⟨x, y⟩ ∧ peFB⟨y, y⟩
 
 /-- **The argument of a literal at a position**: the pair is a literal `l` and a
 position `p`, the second point is the element `x`, and the encoding declares `x`
@@ -440,8 +435,7 @@ noncomputable def argS : peLang2.Sentence :=
 
 /-- **A pair belongs to an assignment**: the second point is the pair `(x, y)`
 and the first, as a relation, holds of `x` and `y`. -/
-noncomputable def memS : peLang2.Sentence :=
-  Formula.iExs (Fin 2) (peFB (Sum.inr 0) (Sum.inr 1) ⊓ peFA (Sum.inr 0) (Sum.inr 1))
+noncomputable def memS : peLang2.Sentence := fo% ∃ x y, peFB⟨x, y⟩ ∧ peFA⟨x, y⟩
 
 /-- The defining sentence of a unary symbol at a tag. -/
 noncomputable def unT (r : Language.epr.Relations 1) : ETag → peLang1.Sentence

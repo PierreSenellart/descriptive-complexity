@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.PSpace
 
 /-!
@@ -62,53 +63,25 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of propositionally described transition
-systems. -/
-inductive transSysRel : ℕ → Type
-  /-- `stateVar x`: the element `x` is a state variable. -/
-  | stateVar : transSysRel 1
-  /-- `next x y`: the element `y` is the next-state copy of the state
-  variable `x`. -/
-  | next : transSysRel 2
-  /-- `stepCl c`: the element `c` is a clause of the transition formula. -/
-  | stepCl : transSysRel 1
-  /-- `srcCl c`: the element `c` is a clause of the source formula. -/
-  | srcCl : transSysRel 1
-  /-- `tgtCl c`: the element `c` is a clause of the target formula. -/
-  | tgtCl : transSysRel 1
-  /-- `posIn c x`: the variable `x` occurs positively in the clause `c`. -/
-  | posIn : transSysRel 2
-  /-- `negIn c x`: the variable `x` occurs negatively in the clause `c`. -/
-  | negIn : transSysRel 2
-  deriving DecidableEq
-
 /-- The relational vocabulary of succinctly described transition systems: the
 state variables and their next-state copies, three groups of clauses, and the
 two literal-occurrence predicates of `FirstOrder.Language.sat`. -/
-protected def transSys : Language :=
-  ⟨fun _ => Empty, transSysRel⟩
-  deriving IsRelational
-
-/-- The symbol for “is a state variable”. -/
-abbrev tsStateVar : Language.transSys.Relations 1 := .stateVar
-
-/-- The symbol for “is the next-state copy of”. -/
-abbrev tsNext : Language.transSys.Relations 2 := .next
-
-/-- The symbol for “is a clause of the transition formula”. -/
-abbrev tsStepCl : Language.transSys.Relations 1 := .stepCl
-
-/-- The symbol for “is a clause of the source formula”. -/
-abbrev tsSrcCl : Language.transSys.Relations 1 := .srcCl
-
-/-- The symbol for “is a clause of the target formula”. -/
-abbrev tsTgtCl : Language.transSys.Relations 1 := .tgtCl
-
-/-- The symbol for “occurs positively in”. -/
-abbrev tsPosIn : Language.transSys.Relations 2 := .posIn
-
-/-- The symbol for “occurs negatively in”. -/
-abbrev tsNegIn : Language.transSys.Relations 2 := .negIn
+fo_language transSys with ts where
+  /-- `stateVar x`: the element `x` is a state variable. -/
+  stateVar : 1
+  /-- `next x y`: the element `y` is the next-state copy of the state
+  variable `x`. -/
+  next : 2
+  /-- `stepCl c`: the element `c` is a clause of the transition formula. -/
+  stepCl : 1
+  /-- `srcCl c`: the element `c` is a clause of the source formula. -/
+  srcCl : 1
+  /-- `tgtCl c`: the element `c` is a clause of the target formula. -/
+  tgtCl : 1
+  /-- `posIn c x`: the variable `x` occurs positively in the clause `c`. -/
+  posIn : 2
+  /-- `negIn c x`: the variable `x` occurs negatively in the clause `c`. -/
+  negIn : 2
 
 end Language
 

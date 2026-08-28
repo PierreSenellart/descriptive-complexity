@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.JobSequencing.Schedule
 import DescriptiveComplexity.Problems.Knapsack.Chain
 import DescriptiveComplexity.Numbers.Wide
@@ -201,11 +202,11 @@ def jqWtF (s : Bool) (i p : α) : jqSOLang.Formula α :=
 
 /-- `x` is a minimum of the order, as a formula. -/
 noncomputable def jqBotF (x : α) : jqSOLang.Formula α :=
-  Formula.iAlls Unit (jqLeF (Sum.inl x) (Sum.inr ()))
+  fo%[x] ∀ y, jqLeF⟨x, y⟩
 
 /-- `x` is a maximum of the order, as a formula. -/
 noncomputable def jqTopF (x : α) : jqSOLang.Formula α :=
-  Formula.iAlls Unit (jqLeF (Sum.inr ()) (Sum.inl x))
+  fo%[x] ∀ y, jqLeF⟨y, x⟩
 
 /-- The bit the job `i` contributes to the walk `s` at the wide position
 `(x, p)`: its number's bit, in the lowest block, if the walk adds it up. -/
@@ -227,47 +228,34 @@ def jqMaj3F (x y z : jqSOLang.Formula α) : jqSOLang.Formula α :=
 
 /-- `i` is the first job of the walk `s`, as a formula. -/
 noncomputable def jqMinItemF (s : Bool) (i : α) : jqSOLang.Formula α :=
-  jqJobF i ⊓ Formula.iAlls Unit
-    ((jqJobF (Sum.inr ())).imp (jqOrdF s (Sum.inl i) (Sum.inr ())))
+  fo%[i] jqJobF⟨i⟩ ∧ ∀ y, jqJobF⟨y⟩ → (jqOrdF s)⟨i, y⟩
 
 /-- `i` is the last job of the walk `s`, as a formula. -/
 noncomputable def jqMaxItemF (s : Bool) (i : α) : jqSOLang.Formula α :=
-  jqJobF i ⊓ Formula.iAlls Unit
-    ((jqJobF (Sum.inr ())).imp (jqOrdF s (Sum.inr ()) (Sum.inl i)))
+  fo%[i] jqJobF⟨i⟩ ∧ ∀ y, jqJobF⟨y⟩ → (jqOrdF s)⟨y, i⟩
 
 /-- `j` is the job right after `i` in the walk `s`, as a formula. -/
 noncomputable def jqSuccItemF (s : Bool) (i j : α) : jqSOLang.Formula α :=
-  jqJobF i ⊓ (jqJobF j ⊓ (jqOrdF s i j ⊓ (∼(jqEqF i j) ⊓
-    Formula.iAlls Unit
-      ((jqJobF (Sum.inr ())).imp ((jqOrdF s (Sum.inl i) (Sum.inr ())).imp
-        ((jqOrdF s (Sum.inr ()) (Sum.inl j)).imp
-          (jqEqF (Sum.inr ()) (Sum.inl i) ⊔ jqEqF (Sum.inr ()) (Sum.inl j))))))))
+  fo%[i, j] jqJobF⟨i⟩ ∧ jqJobF⟨j⟩ ∧ (jqOrdF s)⟨i, j⟩ ∧ ¬ jqEqF⟨i, j⟩ ∧
+    ∀ y, jqJobF⟨y⟩ → (jqOrdF s)⟨i, y⟩ → (jqOrdF s)⟨y, j⟩ → jqEqF⟨y, i⟩ ∨ jqEqF⟨y, j⟩
 
 /-- `p` is the lowest position, as a formula. -/
 noncomputable def jqMinPosnF (p : α) : jqSOLang.Formula α :=
-  jqPosnF p ⊓ Formula.iAlls Unit
-    ((jqPosnF (Sum.inr ())).imp (jqLeF (Sum.inl p) (Sum.inr ())))
+  fo%[p] jqPosnF⟨p⟩ ∧ ∀ q, jqPosnF⟨q⟩ → jqLeF⟨p, q⟩
 
 /-- `p` is the highest position, as a formula. -/
 noncomputable def jqMaxPosnF (p : α) : jqSOLang.Formula α :=
-  jqPosnF p ⊓ Formula.iAlls Unit
-    ((jqPosnF (Sum.inr ())).imp (jqLeF (Sum.inr ()) (Sum.inl p)))
+  fo%[p] jqPosnF⟨p⟩ ∧ ∀ q, jqPosnF⟨q⟩ → jqLeF⟨q, p⟩
 
 /-- `q` is the position right above `p`, as a formula. -/
 noncomputable def jqSuccPosnF (p q : α) : jqSOLang.Formula α :=
-  jqPosnF p ⊓ (jqPosnF q ⊓ (jqLeF p q ⊓ (∼(jqEqF p q) ⊓
-    Formula.iAlls Unit
-      ((jqPosnF (Sum.inr ())).imp ((jqLeF (Sum.inl p) (Sum.inr ())).imp
-        ((jqLeF (Sum.inr ()) (Sum.inl q)).imp
-          (jqEqF (Sum.inr ()) (Sum.inl p) ⊔ jqEqF (Sum.inr ()) (Sum.inl q))))))))
+  fo%[p, q] jqPosnF⟨p⟩ ∧ jqPosnF⟨q⟩ ∧ jqLeF⟨p, q⟩ ∧ ¬ jqEqF⟨p, q⟩ ∧
+    ∀ r, jqPosnF⟨r⟩ → jqLeF⟨p, r⟩ → jqLeF⟨r, q⟩ → jqEqF⟨r, p⟩ ∨ jqEqF⟨r, q⟩
 
 /-- `y` is the element right after `x` in the whole universe, as a formula. -/
 noncomputable def jqSuccAllF (x y : α) : jqSOLang.Formula α :=
-  jqLeF x y ⊓ (∼(jqEqF x y) ⊓
-    Formula.iAlls Unit
-      ((jqLeF (Sum.inl x) (Sum.inr ())).imp
-        ((jqLeF (Sum.inr ()) (Sum.inl y)).imp
-          (jqEqF (Sum.inr ()) (Sum.inl x) ⊔ jqEqF (Sum.inr ()) (Sum.inl y)))))
+  fo%[x, y] jqLeF⟨x, y⟩ ∧ ¬ jqEqF⟨x, y⟩ ∧
+    ∀ r, jqLeF⟨x, r⟩ → jqLeF⟨r, y⟩ → jqEqF⟨r, x⟩ ∨ jqEqF⟨r, y⟩
 
 /-- `(x, p)` is the lowest wide position, as a formula. -/
 noncomputable def jqMinWideF (x p : α) : jqSOLang.Formula α := jqBotF x ⊓ jqMinPosnF p
@@ -292,89 +280,65 @@ end Builders
 
 /-- Kernel clause: the order is reflexive. -/
 noncomputable def jqReflClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (jqLeF (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ x, jqLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
 noncomputable def jqTransClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((jqLeF (Sum.inr 0) (Sum.inr 1) ⊓ jqLeF (Sum.inr 1) (Sum.inr 2)).imp
-      (jqLeF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ x y z, jqLeF⟨x, y⟩ ∧ jqLeF⟨y, z⟩ → jqLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
 noncomputable def jqAntisymmClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((jqLeF (Sum.inr 0) (Sum.inr 1) ⊓ jqLeF (Sum.inr 1) (Sum.inr 0)).imp
-      (jqEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ x y, jqLeF⟨x, y⟩ ∧ jqLeF⟨y, x⟩ → jqEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
 noncomputable def jqTotalClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 2) (jqLeF (Sum.inr 0) (Sum.inr 1) ⊔ jqLeF (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ x y, jqLeF⟨x, y⟩ ∨ jqLeF⟨y, x⟩
 
 /-- Kernel clause: the schedule is reflexive. -/
 noncomputable def jqSchedReflClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (jqSchedF (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ x, jqSchedF⟨x, x⟩
 
 /-- Kernel clause: the schedule is transitive. -/
 noncomputable def jqSchedTransClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((jqSchedF (Sum.inr 0) (Sum.inr 1) ⊓ jqSchedF (Sum.inr 1) (Sum.inr 2)).imp
-      (jqSchedF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ x y z, jqSchedF⟨x, y⟩ ∧ jqSchedF⟨y, z⟩ → jqSchedF⟨x, z⟩
 
 /-- Kernel clause: the schedule is antisymmetric. -/
 noncomputable def jqSchedAntisymmClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((jqSchedF (Sum.inr 0) (Sum.inr 1) ⊓ jqSchedF (Sum.inr 1) (Sum.inr 0)).imp
-      (jqEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ x y, jqSchedF⟨x, y⟩ ∧ jqSchedF⟨y, x⟩ → jqEqF⟨x, y⟩
 
 /-- Kernel clause: the schedule is total. -/
 noncomputable def jqSchedTotalClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    (jqSchedF (Sum.inr 0) (Sum.inr 1) ⊔ jqSchedF (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ x y, jqSchedF⟨x, y⟩ ∨ jqSchedF⟨y, x⟩
 
 /-- Kernel clause: only jobs are late. -/
 noncomputable def jqLateJobClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 1) ((jqLateF (Sum.inr 0)).imp (jqJobF (Sum.inr 0)))
+  fo% ∀ x, jqLateF⟨x⟩ → jqJobF⟨x⟩
 
 /-- Kernel clause: at the first job of the walk `s` the running total is that
 job's contribution. -/
 noncomputable def jqBaseClause (s : Bool) : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((jqMinItemF s (Sum.inr 0) ⊓ jqPosnF (Sum.inr 2)).imp
-      ((jqPSF s (Sum.inr 0) (Sum.inr 1) (Sum.inr 2)).iff
-        (jqAddF s (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))))
+  fo% ∀ i x p, (jqMinItemF s)⟨i⟩ ∧ jqPosnF⟨p⟩ → ((jqPSF s)⟨i, x, p⟩ ↔ (jqAddF s)⟨i, x, p⟩)
 
 /-- Kernel clause: each step of the walk `s` adds a bit. -/
 noncomputable def jqSumClause (s : Bool) : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((jqSuccItemF s (Sum.inr 0) (Sum.inr 1) ⊓ jqPosnF (Sum.inr 3)).imp
-      ((jqPSF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)).iff
-        (jqXor3F (jqPSF s (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-          (jqAddF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))
-          (jqCyF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)))))
+  fo% ∀ i j x p, (jqSuccItemF s)⟨i, j⟩ ∧ jqPosnF⟨p⟩ →
+    ((jqPSF s)⟨j, x, p⟩ ↔
+      jqXor3F⦃(jqPSF s)⟨i, x, p⟩, (jqAddF s)⟨j, x, p⟩, (jqCyF s)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: each step of the walk `s` propagates its carry. -/
 noncomputable def jqCarryClause (s : Bool) : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 6)
-    ((jqSuccItemF s (Sum.inr 0) (Sum.inr 1) ⊓
-        jqSuccWideF (Sum.inr 2) (Sum.inr 3) (Sum.inr 4) (Sum.inr 5)).imp
-      ((jqCyF s (Sum.inr 1) (Sum.inr 4) (Sum.inr 5)).iff
-        (jqMaj3F (jqPSF s (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-          (jqAddF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))
-          (jqCyF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)))))
+  fo% ∀ i j x p y q, (jqSuccItemF s)⟨i, j⟩ ∧ jqSuccWideF⟨x, p, y, q⟩ →
+    ((jqCyF s)⟨j, y, q⟩ ↔
+      jqMaj3F⦃(jqPSF s)⟨i, x, p⟩, (jqAddF s)⟨j, x, p⟩, (jqCyF s)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest wide position. -/
 noncomputable def jqBottomClause (s : Bool) : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((jqSuccItemF s (Sum.inr 0) (Sum.inr 1) ⊓ jqMinWideF (Sum.inr 2) (Sum.inr 3)).imp
-      ∼(jqCyF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)))
+  fo% ∀ i j x p, (jqSuccItemF s)⟨i, j⟩ ∧ jqMinWideF⟨x, p⟩ → ¬ (jqCyF s)⟨j, x, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest wide position. -/
 noncomputable def jqTopClause (s : Bool) : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((jqSuccItemF s (Sum.inr 0) (Sum.inr 1) ⊓ jqMaxWideF (Sum.inr 2) (Sum.inr 3)).imp
-      ∼(jqMaj3F (jqPSF s (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-        (jqAddF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))
-        (jqCyF s (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))))
+  fo% ∀ i j x p, (jqSuccItemF s)⟨i, j⟩ ∧ jqMaxWideF⟨x, p⟩ →
+    ¬ jqMaj3F⦃(jqPSF s)⟨i, x, p⟩, (jqAddF s)⟨j, x, p⟩, (jqCyF s)⟨j, x, p⟩⦄
 
 /-- The clauses of one walk. -/
 noncomputable def jqWalkClauses (s : Bool) : jqSOLang.Sentence :=
@@ -384,43 +348,19 @@ noncomputable def jqWalkClauses (s : Bool) : jqSOLang.Sentence :=
 /-- Kernel clause: a job is late exactly when its deadline is smaller than its
 completion time, compared at the highest wide position where the two differ. -/
 noncomputable def jqLateDefClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((jqJobF (Sum.inr 0)).imp
-      ((jqLateF (Sum.inr 0)).iff
-        (Formula.iExs (Fin 2)
-          (jqPosnF (Sum.inr 1) ⊓
-            (∼(jqDlineWF (Sum.inl (Sum.inr 0)) (Sum.inr 0) (Sum.inr 1)) ⊓
-              (jqPSF true (Sum.inl (Sum.inr 0)) (Sum.inr 0) (Sum.inr 1) ⊓
-                Formula.iAlls (Fin 2)
-                  ((jqPosnF (Sum.inr 1) ⊓
-                      (jqWideLeF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1))
-                          (Sum.inr 0) (Sum.inr 1) ⊓
-                        jqWideNeF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1))
-                          (Sum.inr 0) (Sum.inr 1))).imp
-                    ((jqDlineWF (Sum.inl (Sum.inl (Sum.inr 0))) (Sum.inr 0)
-                        (Sum.inr 1)).iff
-                      (jqPSF true (Sum.inl (Sum.inl (Sum.inr 0))) (Sum.inr 0)
-                        (Sum.inr 1))))))))))
+  fo% ∀ j, jqJobF⟨j⟩ → (jqLateF⟨j⟩ ↔
+    ∃ x p, jqPosnF⟨p⟩ ∧ ¬ jqDlineWF⟨j, x, p⟩ ∧ (jqPSF true)⟨j, x, p⟩ ∧
+      ∀ y q, jqPosnF⟨q⟩ ∧ (jqWideLeF⟨x, p, y, q⟩ ∧ jqWideNeF⟨x, p, y, q⟩) →
+        (jqDlineWF⟨j, y, q⟩ ↔ (jqPSF true)⟨j, y, q⟩))
 
 /-- Kernel clause: the penalty total the second walk ends on does not exceed
 the bound – there is no wide position carrying the total's bit above which the
 two agree. -/
 noncomputable def jqFinalClause : jqSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((jqMaxItemF false (Sum.inr 0)).imp
-      ∼(Formula.iExs (Fin 2)
-        (jqPosnF (Sum.inr 1) ⊓
-          (∼(jqBndWF (Sum.inr 0) (Sum.inr 1)) ⊓
-            (jqPSF false (Sum.inl (Sum.inr 0)) (Sum.inr 0) (Sum.inr 1) ⊓
-              Formula.iAlls (Fin 2)
-                ((jqPosnF (Sum.inr 1) ⊓
-                    (jqWideLeF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1))
-                        (Sum.inr 0) (Sum.inr 1) ⊓
-                      jqWideNeF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1))
-                        (Sum.inr 0) (Sum.inr 1))).imp
-                  ((jqBndWF (Sum.inr 0) (Sum.inr 1)).iff
-                    (jqPSF false (Sum.inl (Sum.inl (Sum.inr 0))) (Sum.inr 0)
-                      (Sum.inr 1)))))))))
+  fo% ∀ i, (jqMaxItemF false)⟨i⟩ →
+    ¬ ∃ x p, jqPosnF⟨p⟩ ∧ ¬ jqBndWF⟨x, p⟩ ∧ (jqPSF false)⟨i, x, p⟩ ∧
+      ∀ y q, jqPosnF⟨q⟩ ∧ (jqWideLeF⟨x, p, y, q⟩ ∧ jqWideNeF⟨x, p, y, q⟩) →
+        (jqBndWF⟨y, q⟩ ↔ (jqPSF false)⟨i, y, q⟩)
 
 /-- The first-order kernel of the `Σ₁` definition of job sequencing. -/
 noncomputable def jobSequencingKernel : jqSOLang.Sentence :=
@@ -436,7 +376,7 @@ What the guessed relations mean, and what the numbers the kernel talks about
 decode to. Everything the walks carry lives on the wide positions, so each
 number of the instance appears there through its lowest block – named by
 minimality, since that is all a formula can say, which is why the predicates
-below quantify over `Unit → A` the way the kernel's `∀` produces. -/
+below quantify over `Fin 1 → A` the way the kernel's `∀` produces. -/
 
 section Reading
 
@@ -444,11 +384,11 @@ variable {A : Type} [Language.jobSeq.Structure A]
 
 /-- A number of the instance, read on the wide positions: its own bits, in the
 lowest block. -/
-def JWide (b : A → Prop) (u : A × A) : Prop := (∀ y : Unit → A, JSLe u.1 (y ())) ∧ b u.2
+def JWide (b : A → Prop) (u : A × A) : Prop := (∀ y : Fin 1 → A, JSLe u.1 (y 0)) ∧ b u.2
 
 theorem jWide_iff {b : A → Prop} {u : A × A} :
     JWide b u ↔ ((∀ y : A, JSLe u.1 y) ∧ b u.2) :=
-  and_congr ⟨fun h y => h fun _ => y, fun h y => h (y ())⟩ Iff.rfl
+  and_congr ⟨fun h y => h fun _ => y, fun h y => h (y 0)⟩ Iff.rfl
 
 /-- **Read on the wide positions, a number still has its value.** -/
 theorem binNum_jWide [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}

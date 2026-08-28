@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.SecondOrderHorn
 import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.Problems.HornSat.Unsat
@@ -87,8 +88,7 @@ noncomputable def negG (i j : Fin 4) : (Language.sat.sum Language.order).Formula
 
 /-- The guard “the clause `xᵢ` has no positive literal”. -/
 noncomputable def noPosG (i : Fin 4) : (Language.sat.sum Language.order).Formula (Fin 4) :=
-  (show (Language.sat.sum Language.order).Formula (Fin 4 ⊕ Fin 1) from
-    ∼(Relations.formula₂ sPosSym (Term.var (Sum.inl i)) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+  fo%[i] ∀ y, ¬ sPosSym(i, y)
 
 /-- The guard `xᵢ ≠ xⱼ`. -/
 noncomputable def neqG (i j : Fin 4) : (Language.sat.sum Language.order).Formula (Fin 4) :=

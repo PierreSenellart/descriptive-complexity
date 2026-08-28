@@ -44,11 +44,22 @@ Atoms come in two forms, matching the two conventions of the library:
   on a vector, which is what a hand-written arity-3 atom does anyway.
 * `f⟨x, y⟩` applies a *formula builder*, one of the `α`-polymorphic
   abbreviations a problem file defines for its own atoms; it is plain function
-  application.
+  application, the builder receiving the *variables* (the library is
+  relational, so a builder never needs a term: every term is a variable).
+* `f⦃φ, ψ⦄` applies a builder that takes *formulas*, such as a three-way
+  exclusive or, to formulas of the surface syntax, translated where they
+  stand: a variable bound outside the braces is in scope inside them.
+
+In both forms the symbol may be an applied term rather than a bare name,
+written in parentheses: `(kcColorSym i)(x)` for the `i`-th of a family of
+relation variables, `(conflict positive)⟨x, y⟩` for a builder taking a
+parameter.
 
 `x ≐ y` is `Term.equal`, and `!e` escapes to an arbitrary Lean term – as a
 whole formula, or (inside an atom's argument list) as a variable that the
-macro should pass through untouched.
+macro should pass through untouched. `if c then φ else ψ` chooses between two
+formulas by a Lean proposition, as the defining formula of an interpretation
+does by its tags.
 
 ## Free variables
 
@@ -90,6 +101,11 @@ syntax:max "⊤ᶠ" : foform
 syntax:max "⊥ᶠ" : foform
 syntax:max ident noWs "(" fovar,* ")" : foform
 syntax:max ident noWs "⟨" fovar,* "⟩" : foform
+syntax:max "(" term ")" noWs "(" fovar,* ")" : foform
+syntax:max "(" term ")" noWs "⟨" fovar,* "⟩" : foform
+syntax:max ident noWs "⦃" foform,* "⦄" : foform
+syntax:max "(" term ")" noWs "⦃" foform,* "⦄" : foform
+syntax:max "if " term " then " foform " else " foform : foform
 syntax:max "!" term:max : foform
 syntax:max fovar " ≐ " fovar : foform
 syntax:40 "¬ " foform:41 : foform
@@ -154,6 +170,21 @@ private def transVar (env : Env) (t : TSyntax `fovar) : MacroM Term := do
         Macro.throwErrorAt t s!"'{i}' is not an object variable in scope: bind it, \
           or declare it in the ⟨…⟩ or […] clause of fo%"
 
+/-- Translate an atom applying the relation symbol `r` to object variables. -/
+private def transRel (env : Env) (r : Term) (args : Array (TSyntax `fovar)) : MacroM Term := do
+  let vs ← args.mapM (transVar env)
+  let ts ← vs.mapM fun v => `(FirstOrder.Language.Term.var $v)
+  match ts.size with
+  | 1 => `(FirstOrder.Language.Relations.formula₁ $r $(ts[0]!))
+  | 2 => `(FirstOrder.Language.Relations.formula₂ $r $(ts[0]!) $(ts[1]!))
+  | _ => `(FirstOrder.Language.Relations.formula $r ![$ts,*])
+
+/-- Translate an atom applying the formula builder `f` to object variables. -/
+private def transBuilder (env : Env) (f : Term) (args : Array (TSyntax `fovar)) :
+    MacroM Term := do
+  let vs ← args.mapM (transVar env)
+  `($f $vs*)
+
 /-- Translate a formula of the surface syntax to the term it abbreviates. -/
 private partial def trans (env : Env) (stx : TSyntax `foform) : MacroM Term := do
   match stx with
@@ -170,15 +201,16 @@ private partial def trans (env : Env) (stx : TSyntax `foform) : MacroM Term := d
       `(FirstOrder.Language.Term.equal
           (FirstOrder.Language.Term.var $(← transVar env x))
           (FirstOrder.Language.Term.var $(← transVar env y)))
-  | `(foform| $r:ident($args,*)) => do
-      let vs ← args.getElems.mapM (transVar env)
-      let ts ← vs.mapM fun v => `(FirstOrder.Language.Term.var $v)
-      match ts.size with
-      | 1 => `(FirstOrder.Language.Relations.formula₁ $r $(ts[0]!))
-      | 2 => `(FirstOrder.Language.Relations.formula₂ $r $(ts[0]!) $(ts[1]!))
-      | _ => `(FirstOrder.Language.Relations.formula $r ![$ts,*])
-  | `(foform| $f:ident⟨$args,*⟩) => do
-      return Syntax.mkApp f (← args.getElems.mapM (transVar env))
+  | `(foform| $r:ident($args,*)) => transRel env r args.getElems
+  | `(foform| ($r:term)($args,*)) => transRel env r args.getElems
+  | `(foform| $f:ident⟨$args,*⟩) => transBuilder env f args.getElems
+  | `(foform| ($f:term)⟨$args,*⟩) => transBuilder env f args.getElems
+  | `(foform| $f:ident⦃$φs,*⦄) => do `($f $(← φs.getElems.mapM (trans env))*)
+  | `(foform| ($f:term)⦃$φs,*⦄) => do `($f $(← φs.getElems.mapM (trans env))*)
+  | `(foform| if $c then $φ else $ψ) => do
+      let φ' ← trans env φ
+      let ψ' ← trans env ψ
+      `(if $c then $φ' else $ψ')
   | `(foform| ⋀ $i $[: $t]?, $φ) => do
       `(FirstOrder.Language.Formula.iInf (fun $i $[: $t]? => $(← trans env φ)))
   | `(foform| ⋁ $i $[: $t]?, $φ) => do

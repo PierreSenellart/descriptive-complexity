@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Feedback.Defs
 import DescriptiveComplexity.SecondOrder
 
@@ -46,75 +48,35 @@ section SigmaOne
 Set: the removed set (unary), a strict partial order certifying acyclicity
 (binary), and an injection of the removed set into the marked set
 (binary). -/
-def feedbackGuessBlock : SOBlock where
-  ι := Option Bool
-  arity := fun i => match i with
-    | none => 1
-    | some _ => 2
-
-/-- The symbol of the removed-set relation variable. -/
-def fvsSetSym : feedbackGuessBlock.lang.Relations 1 := ⟨none, rfl⟩
-
-/-- The symbol of the order relation variable. -/
-def fvsLtSym : feedbackGuessBlock.lang.Relations 2 := ⟨some true, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def fvsInjSym : feedbackGuessBlock.lang.Relations 2 := ⟨some false, rfl⟩
-
-/-- The vocabulary of the kernel: marked graphs together with the three
-guessed relation variables. -/
-abbrev fvsSOLang : Language := Language.markedGraph.sum feedbackGuessBlock.lang
-
-/-- The adjacency symbol in the kernel's vocabulary. -/
-abbrev fAdjSym : fvsSOLang.Relations 2 := Sum.inl mgAdj
-
-/-- The mark symbol in the kernel's vocabulary. -/
-abbrev fMarkedSym : fvsSOLang.Relations 1 := Sum.inl mgMarked
-
-/-- The removed-set symbol in the kernel's vocabulary. -/
-abbrev fSetSym : fvsSOLang.Relations 1 := Sum.inr fvsSetSym
-
-/-- The order symbol in the kernel's vocabulary. -/
-abbrev fLtSym : fvsSOLang.Relations 2 := Sum.inr fvsLtSym
-
-/-- The injection symbol in the kernel's vocabulary. -/
-abbrev fInjSym : fvsSOLang.Relations 2 := Sum.inr fvsInjSym
+fo_block feedbackGuessBlock over Language.markedGraph mg into fvsSOLang with f where
+  /-- The guessed removed set. -/
+  set : 1
+  /-- The guessed strict partial order certifying acyclicity. -/
+  lt : 2
+  /-- The guessed injection of the removed set into the marked set. -/
+  inj : 2
 
 /-- Kernel conjunct: the guessed order is transitive. -/
 private noncomputable def fvsTransClause : fvsSOLang.Sentence :=
-  ((Relations.formula₂ fLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ fLtSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Relations.formula₂ fLtSym (Term.var (Sum.inr 0))
-      (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x y z, fLtSym(x, y) ∧ fLtSym(y, z) → fLtSym(x, z)
 
 /-- Kernel conjunct: the guessed order is irreflexive. -/
 private noncomputable def fvsIrreflClause : fvsSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    (∼(Relations.formula₂ fLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
+  fo% ∀ x, ¬ fLtSym(x, x)
 
 /-- Kernel conjunct: every surviving arc goes forward in the guessed
 order. -/
 private noncomputable def fvsArcClause : fvsSOLang.Sentence :=
-  ((Relations.formula₂ fAdjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      ∼(Relations.formula₁ fSetSym (Term.var (Sum.inr 0))) ⊓
-      ∼(Relations.formula₁ fSetSym (Term.var (Sum.inr 1)))).imp
-    (Relations.formula₂ fLtSym (Term.var (Sum.inr 0))
-      (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, (fAdjSym(x, y) ∧ ¬ fSetSym(x)) ∧ ¬ fSetSym(y) → fLtSym(x, y)
 
 /-- Kernel conjunct: the guessed injection maps every removed vertex to a
 marked element. -/
 private noncomputable def fvsTotalClause : fvsSOLang.Sentence :=
-  ((Relations.formula₁ fSetSym (Term.var (Sum.inr 0))).imp
-    ((Relations.formula₂ fInjSym (Term.var (Sum.inl (Sum.inr 0)))
-        (Term.var (Sum.inr ())) ⊓
-      Relations.formula₁ fMarkedSym (Term.var (Sum.inr ()))).iExs Unit)).iAlls (Fin 1)
+  fo% ∀ x, fSetSym(x) → ∃ y, fInjSym(x, y) ∧ fMarkedSym(y)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
 private noncomputable def fvsInjClause : fvsSOLang.Sentence :=
-  ((Relations.formula₂ fInjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ fInjSym (Term.var (Sum.inr 1))
-        (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+  fo% ∀ x x' y, fInjSym(x, y) ∧ fInjSym(x', y) → x ≐ x'
 
 /-- The first-order kernel of the `Σ₁` definition of Feedback Vertex Set. -/
 noncomputable def feedbackKernel : fvsSOLang.Sentence :=
@@ -126,18 +88,18 @@ private theorem realize_feedbackKernel {A : Type} [Language.markedGraph.Structur
     (ρ : feedbackGuessBlock.Assignment A) :
     (@Sentence.Realize fvsSOLang A
         (@sumStructure _ _ A _ (feedbackGuessBlock.structure ρ)) feedbackKernel) ↔
-      (∀ x y z : A, ρ (some true) ![x, y] → ρ (some true) ![y, z] → ρ (some true) ![x, z]) ∧
-        (∀ x : A, ¬ρ (some true) ![x, x]) ∧
-        (∀ x y : A, MGAdj x y → ¬ρ none ![x] → ¬ρ none ![y] → ρ (some true) ![x, y]) ∧
-        (∀ x : A, ρ none ![x] → ∃ y : A, ρ (some false) ![x, y] ∧ MGMarked y) ∧
-        ∀ x x' y : A, ρ (some false) ![x, y] → ρ (some false) ![x', y] → x = x' := by
+      (∀ x y z : A, ρ .lt ![x, y] → ρ .lt ![y, z] → ρ .lt ![x, z]) ∧
+        (∀ x : A, ¬ρ .lt ![x, x]) ∧
+        (∀ x y : A, MGAdj x y → ¬ρ .set ![x] → ¬ρ .set ![y] → ρ .lt ![x, y]) ∧
+        (∀ x : A, ρ .set ![x] → ∃ y : A, ρ .inj ![x, y] ∧ MGMarked y) ∧
+        ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
   let := feedbackGuessBlock.structure ρ
   have hsubS : ∀ (w : Fin 1 → A),
-      RelMap (L := fvsSOLang) (M := A) fSetSym w ↔ ρ none w := fun _ => Iff.rfl
+      RelMap (L := fvsSOLang) (M := A) fSetSym w ↔ ρ .set w := fun _ => Iff.rfl
   have hsubL : ∀ (w : Fin 2 → A),
-      RelMap (L := fvsSOLang) (M := A) fLtSym w ↔ ρ (some true) w := fun _ => Iff.rfl
+      RelMap (L := fvsSOLang) (M := A) fLtSym w ↔ ρ .lt w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 2 → A),
-      RelMap (L := fvsSOLang) (M := A) fInjSym w ↔ ρ (some false) w := fun _ => Iff.rfl
+      RelMap (L := fvsSOLang) (M := A) fInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [feedbackKernel]
   simp only [fvsTransClause, fvsIrreflClause, fvsArcClause, fvsTotalClause,
     fvsInjClause, Sentence.Realize, Formula.realize_inf, Formula.realize_iAlls,
@@ -157,7 +119,7 @@ private theorem realize_feedbackKernel {A : Type} [Language.markedGraph.Structur
   · exact h ![x, y] ⟨⟨hadj, hx⟩, hy⟩
   · exact h (i 0) (i 1) hi.1.1 hi.1.2 hi.2
   · obtain ⟨y, hy1, hy2⟩ := h (fun _ => x) hx
-    exact ⟨y (), hy1, hy2⟩
+    exact ⟨y 0, hy1, hy2⟩
   · obtain ⟨y, hy1, hy2⟩ := h (i 0) hi
     exact ⟨fun _ => y, hy1, hy2⟩
   · exact h ![x, x', y] ⟨hxy, hx'y⟩
@@ -175,9 +137,9 @@ theorem feedbackVertexSet_sigmaSODefinable : SigmaSODefinable 1 FeedbackVertexSe
   · rintro ⟨-, hfvs⟩
     obtain ⟨C, ⟨Lt, htrans, hirr, hmono⟩, ⟨e⟩⟩ := (feedbackOn_iff_certificate _ _).mp hfvs
     refine ⟨fun i => match i with
-      | none => fun w : Fin 1 → A => C (w 0)
-      | some true => fun w : Fin 2 → A => Lt (w 0) (w 1)
-      | some false => fun w : Fin 2 → A =>
+      | .set => fun w : Fin 1 → A => C (w 0)
+      | .lt => fun w : Fin 2 → A => Lt (w 0) (w 1)
+      | .inj => fun w : Fin 2 → A =>
           ∃ h : C (w 0), (e ⟨w 0, h⟩ : {x // MGMarked x}).1 = w 1, ?_⟩
     refine (realize_feedbackKernel _).mpr
       ⟨htrans, hirr,
@@ -187,12 +149,12 @@ theorem feedbackVertexSet_sigmaSODefinable : SigmaSODefinable 1 FeedbackVertexSe
     exact congrArg Subtype.val (e.injective (Subtype.ext (hy.trans hy'.symm)))
   · rintro ⟨ρ, hρ⟩
     obtain ⟨htrans, hirr, harc, htot, hinj⟩ := (realize_feedbackKernel ρ).mp hρ
-    have hch : ∀ x : {x : A // ρ none ![x]},
-        ∃ y : A, ρ (some false) ![x.1, y] ∧ MGMarked y := fun x => htot x.1 x.2
+    have hch : ∀ x : {x : A // ρ .set ![x]},
+        ∃ y : A, ρ .inj ![x.1, y] ∧ MGMarked y := fun x => htot x.1 x.2
     choose f hf1 hf2 using hch
     refine ⟨‹Finite A›, (feedbackOn_iff_certificate _ _).mpr
-      ⟨fun a => ρ none ![a],
-        ⟨fun x y => ρ (some true) ![x, y], htrans, hirr,
+      ⟨fun a => ρ .set ![a],
+        ⟨fun x y => ρ .lt ![x, y], htrans, hirr,
           fun a b hab => harc a b hab.2.2 hab.1 hab.2.1⟩,
         ⟨⟨fun x => ⟨f x, hf2 x⟩, fun x x' hxx' => ?_⟩⟩⟩⟩
     have hval : f x = f x' := congrArg Subtype.val hxx'
@@ -206,78 +168,36 @@ theorem feedbackVertexSet_sigmaSODefinable : SigmaSODefinable 1 FeedbackVertexSe
 the removed set of arcs (binary), a strict partial order certifying acyclicity
 (binary), and an injection of the removed arcs into the marked relation
 (quaternary: it maps pairs to pairs). -/
-def feedbackArcGuessBlock : SOBlock where
-  ι := Option Bool
-  arity := fun i => match i with
-    | none => 2
-    | some true => 2
-    | some false => 4
-
-/-- The symbol of the removed-arc relation variable. -/
-def fasCutRel : feedbackArcGuessBlock.lang.Relations 2 := ⟨none, rfl⟩
-
-/-- The symbol of the order relation variable. -/
-def fasLtRel : feedbackArcGuessBlock.lang.Relations 2 := ⟨some true, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def fasInjRel : feedbackArcGuessBlock.lang.Relations 4 := ⟨some false, rfl⟩
-
-/-- The vocabulary of the kernel: arc-marked digraphs together with the three
-guessed relation variables. -/
-abbrev fasSOLang : Language := Language.markedArcGraph.sum feedbackArcGuessBlock.lang
-
-/-- The adjacency symbol in the kernel's vocabulary. -/
-abbrev fasAdjSym : fasSOLang.Relations 2 := Sum.inl magAdj
-
-/-- The mark symbol in the kernel's vocabulary. -/
-abbrev fasMarkedSym : fasSOLang.Relations 2 := Sum.inl magMarked
-
-/-- The removed-arc symbol in the kernel's vocabulary. -/
-abbrev fasCutSym : fasSOLang.Relations 2 := Sum.inr fasCutRel
-
-/-- The order symbol in the kernel's vocabulary. -/
-abbrev fasLtSym : fasSOLang.Relations 2 := Sum.inr fasLtRel
-
-/-- The injection symbol in the kernel's vocabulary. -/
-abbrev fasInjSym : fasSOLang.Relations 4 := Sum.inr fasInjRel
+fo_block feedbackArcGuessBlock over Language.markedArcGraph mag into fasSOLang with fas where
+  /-- The removed set of arcs. -/
+  cut : 2
+  /-- The strict partial order certifying acyclicity. -/
+  lt : 2
+  /-- The injection of the removed arcs into the marked relation. -/
+  inj : 4
 
 /-- Kernel conjunct: the guessed order is transitive. -/
 private noncomputable def fasTransClause : fasSOLang.Sentence :=
-  ((Relations.formula₂ fasLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ fasLtSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Relations.formula₂ fasLtSym (Term.var (Sum.inr 0))
-      (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x y z, fasLtSym(x, y) ∧ fasLtSym(y, z) → fasLtSym(x, z)
 
 /-- Kernel conjunct: the guessed order is irreflexive. -/
 private noncomputable def fasIrreflClause : fasSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    (∼(Relations.formula₂ fasLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
+  fo% ∀ x, ¬ fasLtSym(x, x)
 
 /-- Kernel conjunct: every arc that is not cut goes forward in the guessed
 order. -/
 private noncomputable def fasArcClause : fasSOLang.Sentence :=
-  ((Relations.formula₂ fasAdjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      ∼(Relations.formula₂ fasCutSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).imp
-    (Relations.formula₂ fasLtSym (Term.var (Sum.inr 0))
-      (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, fasAdjSym(x, y) ∧ ¬ fasCutSym(x, y) → fasLtSym(x, y)
 
 /-- Kernel conjunct: the guessed injection maps every cut arc to a marked
 arc. -/
 private noncomputable def fasTotalClause : fasSOLang.Sentence :=
-  ((Relations.formula₂ fasCutSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    ((Relations.formula fasInjSym ![Term.var (Sum.inl (Sum.inr 0)),
-          Term.var (Sum.inl (Sum.inr 1)), Term.var (Sum.inr 0), Term.var (Sum.inr 1)] ⊓
-      Relations.formula₂ fasMarkedSym (Term.var (Sum.inr 0))
-        (Term.var (Sum.inr 1))).iExs (Fin 2))).iAlls (Fin 2)
+  fo% ∀ a b, fasCutSym(a, b) → ∃ c d, fasInjSym(a, b, c, d) ∧ fasMarkedSym(c, d)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
 private noncomputable def fasInjClause : fasSOLang.Sentence :=
-  ((Relations.formula fasInjSym ![Term.var (Sum.inr 0), Term.var (Sum.inr 1),
-        Term.var (Sum.inr 4), Term.var (Sum.inr 5)] ⊓
-      Relations.formula fasInjSym ![Term.var (Sum.inr 2), Term.var (Sum.inr 3),
-        Term.var (Sum.inr 4), Term.var (Sum.inr 5)]).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3)))).iAlls (Fin 6)
+  fo% ∀ a b a' b' c d,
+    fasInjSym(a, b, c, d) ∧ fasInjSym(a', b', c, d) → a ≐ a' ∧ b ≐ b'
 
 /-- The first-order kernel of the `Σ₁` definition of Feedback Arc Set. -/
 noncomputable def feedbackArcKernel : fasSOLang.Sentence :=
@@ -289,20 +209,20 @@ private theorem realize_feedbackArcKernel {A : Type} [Language.markedArcGraph.St
     (ρ : feedbackArcGuessBlock.Assignment A) :
     (@Sentence.Realize fasSOLang A
         (@sumStructure _ _ A _ (feedbackArcGuessBlock.structure ρ)) feedbackArcKernel) ↔
-      (∀ x y z : A, ρ (some true) ![x, y] → ρ (some true) ![y, z] → ρ (some true) ![x, z]) ∧
-        (∀ x : A, ¬ρ (some true) ![x, x]) ∧
-        (∀ x y : A, MAGAdj x y → ¬ρ none ![x, y] → ρ (some true) ![x, y]) ∧
-        (∀ a b : A, ρ none ![a, b] →
-          ∃ c d : A, ρ (some false) ![a, b, c, d] ∧ MAGMarked c d) ∧
-        ∀ a b a' b' c d : A, ρ (some false) ![a, b, c, d] → ρ (some false) ![a', b', c, d] →
+      (∀ x y z : A, ρ .lt ![x, y] → ρ .lt ![y, z] → ρ .lt ![x, z]) ∧
+        (∀ x : A, ¬ρ .lt ![x, x]) ∧
+        (∀ x y : A, MAGAdj x y → ¬ρ .cut ![x, y] → ρ .lt ![x, y]) ∧
+        (∀ a b : A, ρ .cut ![a, b] →
+          ∃ c d : A, ρ .inj ![a, b, c, d] ∧ MAGMarked c d) ∧
+        ∀ a b a' b' c d : A, ρ .inj ![a, b, c, d] → ρ .inj ![a', b', c, d] →
           a = a' ∧ b = b' := by
   let := feedbackArcGuessBlock.structure ρ
   have hsubC : ∀ (w : Fin 2 → A),
-      RelMap (L := fasSOLang) (M := A) fasCutSym w ↔ ρ none w := fun _ => Iff.rfl
+      RelMap (L := fasSOLang) (M := A) fasCutSym w ↔ ρ .cut w := fun _ => Iff.rfl
   have hsubL : ∀ (w : Fin 2 → A),
-      RelMap (L := fasSOLang) (M := A) fasLtSym w ↔ ρ (some true) w := fun _ => Iff.rfl
+      RelMap (L := fasSOLang) (M := A) fasLtSym w ↔ ρ .lt w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 4 → A),
-      RelMap (L := fasSOLang) (M := A) fasInjSym w ↔ ρ (some false) w := fun _ => Iff.rfl
+      RelMap (L := fasSOLang) (M := A) fasInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [feedbackArcKernel]
   simp only [fasTransClause, fasIrreflClause, fasArcClause, fasTotalClause,
     fasInjClause, Sentence.Realize, Formula.realize_inf, Formula.realize_iAlls,
@@ -340,9 +260,9 @@ theorem feedbackArcSet_sigmaSODefinable : SigmaSODefinable 1 FeedbackArcSet := b
   · rintro ⟨-, hfas⟩
     obtain ⟨F, ⟨Lt, htrans, hirr, hmono⟩, ⟨e⟩⟩ := (feedbackArcOn_iff_certificate _ _).mp hfas
     refine ⟨fun i => match i with
-      | none => fun w : Fin 2 → A => F (w 0) (w 1)
-      | some true => fun w : Fin 2 → A => Lt (w 0) (w 1)
-      | some false => fun w : Fin 4 → A =>
+      | .cut => fun w : Fin 2 → A => F (w 0) (w 1)
+      | .lt => fun w : Fin 2 → A => Lt (w 0) (w 1)
+      | .inj => fun w : Fin 4 → A =>
           ∃ h : F (w 0) (w 1),
             (e ⟨(w 0, w 1), h⟩ : {p : A × A // MAGMarked p.1 p.2}).1 = (w 2, w 3), ?_⟩
     refine (realize_feedbackArcKernel _).mpr
@@ -355,15 +275,15 @@ theorem feedbackArcSet_sigmaSODefinable : SigmaSODefinable 1 FeedbackArcSet := b
       congrArg Prod.snd (congrArg Subtype.val heq)⟩
   · rintro ⟨ρ, hρ⟩
     obtain ⟨htrans, hirr, harc, htot, hinj⟩ := (realize_feedbackArcKernel ρ).mp hρ
-    have hch : ∀ p : {p : A × A // ρ none ![p.1, p.2]},
-        ∃ q : A × A, ρ (some false) ![p.1.1, p.1.2, q.1, q.2] ∧ MAGMarked q.1 q.2 := by
+    have hch : ∀ p : {p : A × A // ρ .cut ![p.1, p.2]},
+        ∃ q : A × A, ρ .inj ![p.1.1, p.1.2, q.1, q.2] ∧ MAGMarked q.1 q.2 := by
       rintro ⟨⟨a, b⟩, hab⟩
       obtain ⟨c, d, h₁, h₂⟩ := htot a b hab
       exact ⟨(c, d), h₁, h₂⟩
     choose f hf1 hf2 using hch
     refine ⟨‹Finite A›, (feedbackArcOn_iff_certificate _ _).mpr
-      ⟨fun a b => ρ none ![a, b],
-        ⟨fun x y => ρ (some true) ![x, y], htrans, hirr,
+      ⟨fun a b => ρ .cut ![a, b],
+        ⟨fun x y => ρ .lt ![x, y], htrans, hirr,
           fun a b hab => harc a b hab.1 hab.2⟩,
         ⟨⟨fun p => ⟨f p, hf2 p⟩, fun p p' hpp' => ?_⟩⟩⟩⟩
     have hval : f p = f p' := congrArg Subtype.val hpp'

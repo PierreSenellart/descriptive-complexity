@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Problems.Even
 import DescriptiveComplexity.DetLogSpace
 import DescriptiveComplexity.TransitiveClosurePull
@@ -58,21 +59,11 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the vocabulary of a marked subset: one unary
-predicate. -/
-inductive markedSetRel : ℕ → Type
-  /-- `mark x`: the element `x` belongs to the marked subset. -/
-  | mark : markedSetRel 1
-  deriving DecidableEq
-
 /-- The relational vocabulary of a *marked subset*: a finite set with a
 distinguished subset of it. -/
-protected def markedSet : Language :=
-  ⟨fun _ => Empty, markedSetRel⟩
-  deriving IsRelational
-
-/-- The symbol for “is marked”. -/
-abbrev markedSetMark : Language.markedSet.Relations 1 := .mark
+fo_language markedSet with markedSet where
+  /-- `mark x`: the element `x` belongs to the marked subset. -/
+  mark : 1
 
 /-- The marking symbol, in the ordered expansion. Sum-language symbols are
 referenced through an abbreviation with a declared type, never as a raw

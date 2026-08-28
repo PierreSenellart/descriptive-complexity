@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.DigraphIso
 import DescriptiveComplexity.GadgetDouble
 import DescriptiveComplexity.Degree
@@ -42,23 +43,19 @@ dimension, each symbol to its counterpart. -/
 def toTC : FOInterpretation Language.twoGraphs (Language.twoCopies Language.graph) Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .patMark => fun _ => Relations.formula₁ tgPatV (Term.var (0, 0))
-    | _, .hostMark => fun _ => Relations.formula₁ tgHostV (Term.var (0, 0))
-    | _, .pat .adj => fun _ => Relations.formula₂ tgPatE (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .host .adj => fun _ => Relations.formula₂ tgHostE (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .patMark => fun _ => fo%⟨u⟩ tgPatV(u)
+    | _, .hostMark => fun _ => fo%⟨u⟩ tgHostV(u)
+    | _, .pat .adj => fun _ => fo%⟨u, v⟩ tgPatE(u, v)
+    | _, .host .adj => fun _ => fo%⟨u, v⟩ tgHostE(u, v)
 
 /-- The interpretation renaming `twoCopies graph` back to `twoGraphs`. -/
 def ofTC : FOInterpretation (Language.twoCopies Language.graph) Language.twoGraphs Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .patV => fun _ =>
-        Relations.formula₁ (tcPatMark Language.graph) (Term.var (0, 0))
-    | _, .hostV => fun _ =>
-        Relations.formula₁ (tcHostMark Language.graph) (Term.var (0, 0))
-    | _, .patE => fun _ =>
-        Relations.formula₂ (tcPat Language.adj) (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .hostE => fun _ =>
-        Relations.formula₂ (tcHost Language.adj) (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .patV => fun _ => fo%⟨u⟩ (tcPatMark Language.graph)(u)
+    | _, .hostV => fun _ => fo%⟨u⟩ (tcHostMark Language.graph)(u)
+    | _, .patE => fun _ => fo%⟨u, v⟩ (tcPat Language.adj)(u, v)
+    | _, .hostE => fun _ => fo%⟨u, v⟩ (tcHost Language.adj)(u, v)
 
 /-! ### The one-dimensional universe -/
 

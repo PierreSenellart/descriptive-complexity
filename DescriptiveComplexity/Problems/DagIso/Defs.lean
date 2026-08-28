@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Problems.DigraphIso
 import DescriptiveComplexity.Problems.Feedback.Defs
 
@@ -50,46 +51,22 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of two directed acyclic graphs. -/
-inductive twoDagsRel : ℕ → Type
-  /-- `patV a`: `a` is a vertex of the pattern DAG. -/
-  | patV : twoDagsRel 1
-  /-- `hostV a`: `a` is a vertex of the host DAG. -/
-  | hostV : twoDagsRel 1
-  /-- `patArc a b`: there is an arc of the pattern DAG from `a` to `b`. -/
-  | patArc : twoDagsRel 2
-  /-- `hostArc a b`: there is an arc of the host DAG from `a` to `b`. -/
-  | hostArc : twoDagsRel 2
-  /-- `patLt a b`: `a` precedes `b` in the pattern's topological order. -/
-  | patLt : twoDagsRel 2
-  /-- `hostLt a b`: `a` precedes `b` in the host's topological order. -/
-  | hostLt : twoDagsRel 2
-  deriving DecidableEq
-
 /-- The relational language of two directed acyclic graphs: two arc relations
 sharing a universe, each with its own vertex mark and its own topological
 order. -/
-protected def twoDags : Language :=
-  ⟨fun _ => Empty, twoDagsRel⟩
-  deriving IsRelational
-
-/-- The pattern-vertex symbol. -/
-abbrev tdPatV : Language.twoDags.Relations 1 := .patV
-
-/-- The host-vertex symbol. -/
-abbrev tdHostV : Language.twoDags.Relations 1 := .hostV
-
-/-- The pattern-arc symbol. -/
-abbrev tdPatArc : Language.twoDags.Relations 2 := .patArc
-
-/-- The host-arc symbol. -/
-abbrev tdHostArc : Language.twoDags.Relations 2 := .hostArc
-
-/-- The pattern's topological-order symbol. -/
-abbrev tdPatLt : Language.twoDags.Relations 2 := .patLt
-
-/-- The host's topological-order symbol. -/
-abbrev tdHostLt : Language.twoDags.Relations 2 := .hostLt
+fo_language twoDags with td where
+  /-- `patV a`: `a` is a vertex of the pattern DAG. -/
+  patV : 1
+  /-- `hostV a`: `a` is a vertex of the host DAG. -/
+  hostV : 1
+  /-- `patArc a b`: there is an arc of the pattern DAG from `a` to `b`. -/
+  patArc : 2
+  /-- `hostArc a b`: there is an arc of the host DAG from `a` to `b`. -/
+  hostArc : 2
+  /-- `patLt a b`: `a` precedes `b` in the pattern's topological order. -/
+  patLt : 2
+  /-- `hostLt a b`: `a` precedes `b` in the host's topological order. -/
+  hostLt : 2
 
 end Language
 
@@ -177,23 +154,7 @@ section Shorthands
 
 variable {A : Type} [Language.twoDags.Structure A]
 
-/-- Being a vertex of the pattern DAG. -/
-def TDPatV (a : A) : Prop := RelMap tdPatV ![a]
-
-/-- Being a vertex of the host DAG. -/
-def TDHostV (a : A) : Prop := RelMap tdHostV ![a]
-
-/-- An arc of the pattern DAG. -/
-def TDPatArc (a b : A) : Prop := RelMap tdPatArc ![a, b]
-
-/-- An arc of the host DAG. -/
-def TDHostArc (a b : A) : Prop := RelMap tdHostArc ![a, b]
-
-/-- The pattern's topological order. -/
-def TDPatLt (a b : A) : Prop := RelMap tdPatLt ![a, b]
-
-/-- The host's topological order. -/
-def TDHostLt (a b : A) : Prop := RelMap tdHostLt ![a, b]
+fo_predicates Language.twoDags td
 
 end Shorthands
 

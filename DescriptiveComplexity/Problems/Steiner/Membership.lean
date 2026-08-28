@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Steiner.Defs
 import DescriptiveComplexity.SecondOrder
 
@@ -33,126 +35,54 @@ open Language Structure SOBlock
 
 section SigmaOne
 
-/-- The four relation variables guessed by the `Σ₁` definition of Steiner
-Tree. -/
-inductive SteinerGuess
+/-- The single existential block of the `Σ₁` definition of Steiner Tree: its
+four relation variables. -/
+fo_block steinerGuessBlock over Language.steinerGraph st into steinerSOLang with kSt where
   /-- The chosen set of vertices. -/
-  | set
+  set : 1
   /-- The root of the chosen set. -/
-  | root
+  root : 1
   /-- The order certifying connectivity. -/
-  | order
+  order : 2
   /-- The injection witnessing the threshold. -/
-  | inj
-  deriving DecidableEq
-
-instance : Fintype SteinerGuess := ⟨{.set, .root, .order, .inj}, fun t => by cases t <;> decide⟩
-
-/-- The single existential block of the `Σ₁` definition of Steiner Tree. -/
-def steinerGuessBlock : SOBlock where
-  ι := SteinerGuess
-  arity := fun i => match i with
-    | .set => 1
-    | .root => 1
-    | .order => 2
-    | .inj => 2
-
-/-- The symbol of the chosen-set relation variable. -/
-def sgSetRel : steinerGuessBlock.lang.Relations 1 := ⟨.set, rfl⟩
-
-/-- The symbol of the root relation variable. -/
-def sgRootRel : steinerGuessBlock.lang.Relations 1 := ⟨.root, rfl⟩
-
-/-- The symbol of the order relation variable. -/
-def sgOrderRel : steinerGuessBlock.lang.Relations 2 := ⟨.order, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def sgInjRel : steinerGuessBlock.lang.Relations 2 := ⟨.inj, rfl⟩
-
-/-- The vocabulary of the kernel. -/
-abbrev steinerSOLang : Language := Language.steinerGraph.sum steinerGuessBlock.lang
-
-/-- The adjacency symbol in the kernel's vocabulary. -/
-abbrev kStAdjSym : steinerSOLang.Relations 2 := Sum.inl stAdj
-
-/-- The terminal symbol in the kernel's vocabulary. -/
-abbrev kStTermSym : steinerSOLang.Relations 1 := Sum.inl stTerminal
-
-/-- The mark symbol in the kernel's vocabulary. -/
-abbrev kStMarkedSym : steinerSOLang.Relations 1 := Sum.inl stMarked
-
-/-- The chosen-set symbol in the kernel's vocabulary. -/
-abbrev kStSetSym : steinerSOLang.Relations 1 := Sum.inr sgSetRel
-
-/-- The root symbol in the kernel's vocabulary. -/
-abbrev kStRootSym : steinerSOLang.Relations 1 := Sum.inr sgRootRel
-
-/-- The order symbol in the kernel's vocabulary. -/
-abbrev kStLtSym : steinerSOLang.Relations 2 := Sum.inr sgOrderRel
-
-/-- The injection symbol in the kernel's vocabulary. -/
-abbrev kStInjSym : steinerSOLang.Relations 2 := Sum.inr sgInjRel
+  inj : 2
 
 /-! ### The clauses -/
 
 /-- Kernel clause: every terminal is chosen. -/
 private noncomputable def stTermClause : steinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kStTermSym (Term.var (Sum.inr 0))).imp
-      (Relations.formula₁ kStSetSym (Term.var (Sum.inr 0))))
+  fo% ∀ x, kStTerminalSym(x) → kStSetSym(x)
 
 /-- Kernel clause: the root is chosen. -/
 private noncomputable def stRootInClause : steinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kStRootSym (Term.var (Sum.inr 0))).imp
-      (Relations.formula₁ kStSetSym (Term.var (Sum.inr 0))))
+  fo% ∀ x, kStRootSym(x) → kStSetSym(x)
 
 /-- Kernel clause: there is at most one root. -/
 private noncomputable def stRootUniqueClause : steinerSOLang.Sentence :=
-  ((Relations.formula₁ kStRootSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ kStRootSym (Term.var (Sum.inr 1))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, kStRootSym(x) ∧ kStRootSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
 private noncomputable def stTransClause : steinerSOLang.Sentence :=
-  ((Relations.formula₂ kStLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ kStLtSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Relations.formula₂ kStLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x y z, kStOrderSym(x, y) ∧ kStOrderSym(y, z) → kStOrderSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
 private noncomputable def stIrreflClause : steinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    (∼(Relations.formula₂ kStLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
+  fo% ∀ x, ¬ kStOrderSym(x, x)
 
 /-- Kernel clause: every chosen non-root has a chosen neighbor strictly below
 it. -/
 private noncomputable def stStepClause : steinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kStSetSym (Term.var (Sum.inr 0)) ⊓
-        ∼(Relations.formula₁ kStRootSym (Term.var (Sum.inr 0)))).imp
-      ((Relations.formula₁ kStSetSym (Term.var (Sum.inr ())) ⊓
-        (Relations.formula₂ kStAdjSym (Term.var (Sum.inl (Sum.inr 0)))
-            (Term.var (Sum.inr ())) ⊔
-          Relations.formula₂ kStAdjSym (Term.var (Sum.inr ()))
-            (Term.var (Sum.inl (Sum.inr 0)))) ⊓
-        Relations.formula₂ kStLtSym (Term.var (Sum.inr ()))
-          (Term.var (Sum.inl (Sum.inr 0)))).iExs Unit))
+  fo% ∀ x, kStSetSym(x) ∧ ¬ kStRootSym(x) →
+    ∃ y, (kStSetSym(y) ∧ (kStAdjSym(x, y) ∨ kStAdjSym(y, x))) ∧ kStOrderSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every chosen non-terminal to a
 marked element. -/
 private noncomputable def stTotalClause : steinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kStSetSym (Term.var (Sum.inr 0)) ⊓
-        ∼(Relations.formula₁ kStTermSym (Term.var (Sum.inr 0)))).imp
-      ((Relations.formula₂ kStInjSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        Relations.formula₁ kStMarkedSym (Term.var (Sum.inr ()))).iExs Unit))
+  fo% ∀ x, kStSetSym(x) ∧ ¬ kStTerminalSym(x) → ∃ y, kStInjSym(x, y) ∧ kStMarkedSym(y)
 
 /-- Kernel clause: the guessed injection is injective. -/
 private noncomputable def stInjClause : steinerSOLang.Sentence :=
-  ((Relations.formula₂ kStInjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ kStInjSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 3)
+  fo% ∀ x x' y, kStInjSym(x, y) ∧ kStInjSym(x', y) → x ≐ x'
 
 /-- The first-order kernel of the `Σ₁` definition of Steiner Tree. -/
 noncomputable def steinerKernel : steinerSOLang.Sentence :=
@@ -209,7 +139,7 @@ private theorem realize_stTransClause :
       ∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z] := by
   let := steinerGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
-      RelMap (L := steinerSOLang) (M := A) kStLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+      RelMap (L := steinerSOLang) (M := A) kStOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [stTransClause]
   simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
@@ -220,7 +150,7 @@ private theorem realize_stIrreflClause :
     SRealize ρ stIrreflClause ↔ ∀ x : A, ¬ρ .order ![x, x] := by
   let := steinerGuessBlock.structure ρ
   have hL : ∀ (w : Fin 2 → A),
-      RelMap (L := steinerSOLang) (M := A) kStLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+      RelMap (L := steinerSOLang) (M := A) kStOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [stIrreflClause]
   simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
     Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
@@ -235,7 +165,7 @@ private theorem realize_stStepClause :
   have hR : ∀ (w : Fin 1 → A),
       RelMap (L := steinerSOLang) (M := A) kStRootSym w ↔ ρ .root w := fun _ => Iff.rfl
   have hL : ∀ (w : Fin 2 → A),
-      RelMap (L := steinerSOLang) (M := A) kStLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+      RelMap (L := steinerSOLang) (M := A) kStOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
   rw [stStepClause]
   simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup, Formula.realize_not,
@@ -244,7 +174,7 @@ private theorem realize_stStepClause :
   constructor
   · intro h x hx hnr
     obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnr⟩
-    exact ⟨y (), hy⟩
+    exact ⟨y 0, hy⟩
   · intro h i hi
     obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
     exact ⟨fun _ => y, hy⟩
@@ -265,7 +195,7 @@ private theorem realize_stTotalClause :
   constructor
   · intro h x hx hnt
     obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnt⟩
-    exact ⟨y (), hy⟩
+    exact ⟨y 0, hy⟩
   · intro h i hi
     obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
     exact ⟨fun _ => y, hy⟩
@@ -354,141 +284,57 @@ injection mapping *pairs* to *elements* – hence a ternary relation variable,
 for which `DescriptiveComplexity.realize_rel₃` (`DescriptiveComplexity.Interpretation`)
 plays the role Mathlib's `Formula.realize_rel₁`/`₂` play at lower arity. -/
 
-/-- The five relation variables guessed by the `Σ₁` definition of the
-edge-weighted Steiner tree. -/
-inductive EdgeSteinerGuess
-  /-- The chosen set of edges. -/
-  | tree
-  /-- The chosen set of vertices. -/
-  | set
-  /-- The root of the chosen set. -/
-  | root
-  /-- The order certifying connectivity. -/
-  | order
-  /-- The injection witnessing the threshold. -/
-  | inj
-  deriving DecidableEq
-
-instance : Fintype EdgeSteinerGuess :=
-  ⟨{.tree, .set, .root, .order, .inj}, fun t => by cases t <;> decide⟩
-
 /-- The single existential block of the `Σ₁` definition of the edge-weighted
-Steiner tree. -/
-def edgeSteinerGuessBlock : SOBlock where
-  ι := EdgeSteinerGuess
-  arity := fun i => match i with
-    | .tree => 2
-    | .set => 1
-    | .root => 1
-    | .order => 2
-    | .inj => 3
-
-/-- The symbol of the edge-set relation variable. -/
-def esTreeRel : edgeSteinerGuessBlock.lang.Relations 2 := ⟨.tree, rfl⟩
-
-/-- The symbol of the chosen-set relation variable. -/
-def esSetRel : edgeSteinerGuessBlock.lang.Relations 1 := ⟨.set, rfl⟩
-
-/-- The symbol of the root relation variable. -/
-def esRootRel : edgeSteinerGuessBlock.lang.Relations 1 := ⟨.root, rfl⟩
-
-/-- The symbol of the order relation variable. -/
-def esOrderRel : edgeSteinerGuessBlock.lang.Relations 2 := ⟨.order, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def esInjRel : edgeSteinerGuessBlock.lang.Relations 3 := ⟨.inj, rfl⟩
-
-/-- The vocabulary of the edge-weighted kernel. -/
-abbrev edgeSteinerSOLang : Language := Language.steinerGraph.sum edgeSteinerGuessBlock.lang
-
-/-- The adjacency symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsAdjSym : edgeSteinerSOLang.Relations 2 := Sum.inl stAdj
-
-/-- The terminal symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsTermSym : edgeSteinerSOLang.Relations 1 := Sum.inl stTerminal
-
-/-- The mark symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsMarkedSym : edgeSteinerSOLang.Relations 1 := Sum.inl stMarked
-
-/-- The edge-set symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsTreeSym : edgeSteinerSOLang.Relations 2 := Sum.inr esTreeRel
-
-/-- The chosen-set symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsSetSym : edgeSteinerSOLang.Relations 1 := Sum.inr esSetRel
-
-/-- The root symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsRootSym : edgeSteinerSOLang.Relations 1 := Sum.inr esRootRel
-
-/-- The order symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsLtSym : edgeSteinerSOLang.Relations 2 := Sum.inr esOrderRel
-
-/-- The injection symbol in the edge-weighted kernel's vocabulary. -/
-abbrev kEsInjSym : edgeSteinerSOLang.Relations 3 := Sum.inr esInjRel
+Steiner tree: its five relation variables. -/
+fo_block edgeSteinerGuessBlock over Language.steinerGraph st into edgeSteinerSOLang with kEs where
+  /-- The chosen set of edges. -/
+  tree : 2
+  /-- The chosen set of vertices. -/
+  set : 1
+  /-- The root of the chosen set. -/
+  root : 1
+  /-- The order certifying connectivity. -/
+  order : 2
+  /-- The injection witnessing the threshold. -/
+  inj : 3
 
 /-- Kernel clause: the chosen pairs are edges. -/
 private noncomputable def esAdjClause : edgeSteinerSOLang.Sentence :=
-  ((Relations.formula₂ kEsTreeSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    (Relations.formula₂ kEsAdjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ a b, kEsTreeSym(a, b) → kEsAdjSym(a, b)
 
 /-- Kernel clause: every terminal is spanned. -/
 private noncomputable def esTermClause : edgeSteinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kEsTermSym (Term.var (Sum.inr 0))).imp
-      (Relations.formula₁ kEsSetSym (Term.var (Sum.inr 0))))
+  fo% ∀ x, kEsTerminalSym(x) → kEsSetSym(x)
 
 /-- Kernel clause: the root is spanned. -/
 private noncomputable def esRootInClause : edgeSteinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kEsRootSym (Term.var (Sum.inr 0))).imp
-      (Relations.formula₁ kEsSetSym (Term.var (Sum.inr 0))))
+  fo% ∀ x, kEsRootSym(x) → kEsSetSym(x)
 
 /-- Kernel clause: there is at most one root. -/
 private noncomputable def esRootUniqueClause : edgeSteinerSOLang.Sentence :=
-  ((Relations.formula₁ kEsRootSym (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ kEsRootSym (Term.var (Sum.inr 1))).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, kEsRootSym(x) ∧ kEsRootSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
 private noncomputable def esTransClause : edgeSteinerSOLang.Sentence :=
-  ((Relations.formula₂ kEsLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ kEsLtSym (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Relations.formula₂ kEsLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x y z, kEsOrderSym(x, y) ∧ kEsOrderSym(y, z) → kEsOrderSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
 private noncomputable def esIrreflClause : edgeSteinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    (∼(Relations.formula₂ kEsLtSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))))
+  fo% ∀ x, ¬ kEsOrderSym(x, x)
 
 /-- Kernel clause: every spanned non-root steps down along a chosen edge. -/
 private noncomputable def esStepClause : edgeSteinerSOLang.Sentence :=
-  Formula.iAlls (Fin 1)
-    ((Relations.formula₁ kEsSetSym (Term.var (Sum.inr 0)) ⊓
-        ∼(Relations.formula₁ kEsRootSym (Term.var (Sum.inr 0)))).imp
-      ((Relations.formula₁ kEsSetSym (Term.var (Sum.inr ())) ⊓
-        (Relations.formula₂ kEsTreeSym (Term.var (Sum.inl (Sum.inr 0)))
-            (Term.var (Sum.inr ())) ⊔
-          Relations.formula₂ kEsTreeSym (Term.var (Sum.inr ()))
-            (Term.var (Sum.inl (Sum.inr 0)))) ⊓
-        Relations.formula₂ kEsLtSym (Term.var (Sum.inr ()))
-          (Term.var (Sum.inl (Sum.inr 0)))).iExs Unit))
+  fo% ∀ x, kEsSetSym(x) ∧ ¬ kEsRootSym(x) →
+    ∃ y, (kEsSetSym(y) ∧ (kEsTreeSym(x, y) ∨ kEsTreeSym(y, x))) ∧ kEsOrderSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every chosen edge to a marked
 element. -/
 private noncomputable def esTotalClause : edgeSteinerSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((Relations.formula₂ kEsTreeSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-      ((Relations.formula kEsInjSym ![Term.var (Sum.inl (Sum.inr 0)),
-            Term.var (Sum.inl (Sum.inr 1)), Term.var (Sum.inr ())] ⊓
-        Relations.formula₁ kEsMarkedSym (Term.var (Sum.inr ()))).iExs Unit))
+  fo% ∀ a b, kEsTreeSym(a, b) → ∃ y, kEsInjSym(a, b, y) ∧ kEsMarkedSym(y)
 
 /-- Kernel clause: the guessed injection is injective. -/
 private noncomputable def esInjClause : edgeSteinerSOLang.Sentence :=
-  ((Relations.formula kEsInjSym ![Term.var (Sum.inr 0), Term.var (Sum.inr 1),
-        Term.var (Sum.inr 4)] ⊓
-      Relations.formula kEsInjSym ![Term.var (Sum.inr 2), Term.var (Sum.inr 3),
-        Term.var (Sum.inr 4)]).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3)))).iAlls (Fin 5)
+  fo% ∀ a b a' b' y, kEsInjSym(a, b, y) ∧ kEsInjSym(a', b', y) → a ≐ a' ∧ b ≐ b'
 
 /-- The first-order kernel of the `Σ₁` definition of the edge-weighted Steiner
 tree. -/
@@ -519,7 +365,7 @@ private theorem realize_edgeSteinerKernel {A : Type} [Language.steinerGraph.Stru
   have hR : ∀ (w : Fin 1 → A),
       RelMap (L := edgeSteinerSOLang) (M := A) kEsRootSym w ↔ ρ .root w := fun _ => Iff.rfl
   have hL : ∀ (w : Fin 2 → A),
-      RelMap (L := edgeSteinerSOLang) (M := A) kEsLtSym w ↔ ρ .order w := fun _ => Iff.rfl
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
   have hI : ∀ (w : Fin 3 → A),
       RelMap (L := edgeSteinerSOLang) (M := A) kEsInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [edgeSteinerKernel]
@@ -551,11 +397,11 @@ private theorem realize_edgeSteinerKernel {A : Type} [Language.steinerGraph.Stru
   · exact h fun _ => x
   · exact h (i 0)
   · obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnr⟩
-    exact ⟨y (), hy⟩
+    exact ⟨y 0, hy⟩
   · obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
     exact ⟨fun _ => y, hy⟩
   · obtain ⟨y, hy⟩ := h ![a, b] hab
-    exact ⟨y (), hy⟩
+    exact ⟨y 0, hy⟩
   · obtain ⟨y, hy⟩ := h (i 0) (i 1) hi
     exact ⟨fun _ => y, hy⟩
   · exact h ![a, b, a', b', y] ⟨h₁, h₂⟩

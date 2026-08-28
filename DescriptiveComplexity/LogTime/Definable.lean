@@ -202,7 +202,7 @@ section Atoms
 /-- The order between two variables is definable. -/
 theorem arithDef_le (x y : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => v x ≤ v y) :=
-  ⟨aLeF (Term.var x) (Term.var y), fun A _ _ _ _ v => by rw [realize_aLeF]; exact Iff.rfl⟩
+  ⟨aLeF x y, fun A _ _ _ _ v => by rw [realize_aLeF]⟩
 
 /-- Equality between two variables is definable. -/
 theorem arithDef_eq (x y : α) :
@@ -213,14 +213,12 @@ theorem arithDef_eq (x y : α) :
 /-- Addition of the ranks of three variables is definable. -/
 theorem arithDef_plus (x y z : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => orank (v x) + orank (v y) = orank (v z)) :=
-  ⟨aPlusF (Term.var x) (Term.var y) (Term.var z), fun A _ _ _ _ v => by
-    rw [realize_aPlusF]; exact Iff.rfl⟩
+  ⟨aPlusF x y z, fun A _ _ _ _ v => by rw [realize_aPlusF]⟩
 
 /-- Multiplication of the ranks of three variables is definable. -/
 theorem arithDef_times (x y z : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => orank (v x) * orank (v y) = orank (v z)) :=
-  ⟨aTimesF (Term.var x) (Term.var y) (Term.var z), fun A _ _ _ _ v => by
-    rw [realize_aTimesF]; exact Iff.rfl⟩
+  ⟨aTimesF x y z, fun A _ _ _ _ v => by rw [realize_aTimesF]⟩
 
 /-- An input relation symbol, in the arithmetic expansion of its vocabulary.
 Named, as every symbol of a sum vocabulary in this library is, so that `rw`

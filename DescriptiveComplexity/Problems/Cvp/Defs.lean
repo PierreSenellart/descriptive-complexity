@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 
 /-!
@@ -64,57 +65,27 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of Boolean circuits. -/
-inductive circuitRel : ℕ → Type
-  /-- `isTrue g`: the element `g` is a constant input gate holding `1`. -/
-  | isTrue : circuitRel 1
-  /-- `isFalse g`: the element `g` is a constant input gate holding `0`. -/
-  | isFalse : circuitRel 1
-  /-- `isAnd g`: the element `g` is a conjunction gate. -/
-  | isAnd : circuitRel 1
-  /-- `isOr g`: the element `g` is a disjunction gate. -/
-  | isOr : circuitRel 1
-  /-- `isNot g`: the element `g` is a negation gate, its argument read off
-  `left`. -/
-  | isNot : circuitRel 1
-  /-- `out g`: the element `g` is an output gate. -/
-  | out : circuitRel 1
-  /-- `left g x`: the gate `g` takes `x` as its first argument. -/
-  | left : circuitRel 2
-  /-- `right g x`: the gate `g` takes `x` as its second argument. -/
-  | right : circuitRel 2
-  deriving DecidableEq
-
 /-- The relational language of Boolean circuits: one unary predicate per gate
 kind, one marking the output, and two binary predicates wiring a gate to its
 arguments. -/
-protected def circuit : Language :=
-  ⟨fun _ => Empty, circuitRel⟩
-  deriving IsRelational
-
-/-- The symbol for “is a constant `1` input”. -/
-abbrev circIsTrue : Language.circuit.Relations 1 := .isTrue
-
-/-- The symbol for “is a constant `0` input”. -/
-abbrev circIsFalse : Language.circuit.Relations 1 := .isFalse
-
-/-- The symbol for “is a conjunction gate”. -/
-abbrev circIsAnd : Language.circuit.Relations 1 := .isAnd
-
-/-- The symbol for “is a disjunction gate”. -/
-abbrev circIsOr : Language.circuit.Relations 1 := .isOr
-
-/-- The symbol for “is a negation gate”. -/
-abbrev circIsNot : Language.circuit.Relations 1 := .isNot
-
-/-- The symbol for “is the output gate”. -/
-abbrev circOut : Language.circuit.Relations 1 := .out
-
-/-- The symbol for “takes as first argument”. -/
-abbrev circLeft : Language.circuit.Relations 2 := .left
-
-/-- The symbol for “takes as second argument”. -/
-abbrev circRight : Language.circuit.Relations 2 := .right
+fo_language circuit with circ where
+  /-- `isTrue g`: the element `g` is a constant input gate holding `1`. -/
+  isTrue : 1
+  /-- `isFalse g`: the element `g` is a constant input gate holding `0`. -/
+  isFalse : 1
+  /-- `isAnd g`: the element `g` is a conjunction gate. -/
+  isAnd : 1
+  /-- `isOr g`: the element `g` is a disjunction gate. -/
+  isOr : 1
+  /-- `isNot g`: the element `g` is a negation gate, its argument read off
+  `left`. -/
+  isNot : 1
+  /-- `out g`: the element `g` is an output gate. -/
+  out : 1
+  /-- `left g x`: the gate `g` takes `x` as its first argument. -/
+  left : 2
+  /-- `right g x`: the gate `g` takes `x` as its second argument. -/
+  right : 2
 
 end Language
 

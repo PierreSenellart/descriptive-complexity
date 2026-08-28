@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Pcp.Hardness.Match
 import DescriptiveComplexity.Ordered
 
@@ -89,96 +90,76 @@ section Builders
 variable {α : Type}
 
 /-- `x` is a position. -/
-def posnF (x : α) : haltOrd.Formula α := Relations.formula₁ hPosnSym (Term.var x)
+def posnF (x : α) : haltOrd.Formula α := fo%[x] hPosnSym(x)
 
 /-- `x` is a transition. -/
-def trF (x : α) : haltOrd.Formula α := Relations.formula₁ hTrSym (Term.var x)
+def trF (x : α) : haltOrd.Formula α := fo%[x] hTrSym(x)
 
 /-- `x` is a start state. -/
-def startF (x : α) : haltOrd.Formula α := Relations.formula₁ hStartSym (Term.var x)
+def startF (x : α) : haltOrd.Formula α := fo%[x] hStartSym(x)
 
 /-- `x` is an accepting state. -/
-def accF (x : α) : haltOrd.Formula α := Relations.formula₁ hAccSym (Term.var x)
+def accF (x : α) : haltOrd.Formula α := fo%[x] hAccSym(x)
 
 /-- `x` is the blank symbol. -/
-def blankF (x : α) : haltOrd.Formula α := Relations.formula₁ hBlankSym (Term.var x)
+def blankF (x : α) : haltOrd.Formula α := fo%[x] hBlankSym(x)
 
 /-- `x` moves the head right. -/
-def rightF (x : α) : haltOrd.Formula α := Relations.formula₁ hRightSym (Term.var x)
+def rightF (x : α) : haltOrd.Formula α := fo%[x] hRightSym(x)
 
 /-- `x ≤ y` in the machine's order. -/
-def mLeF (x y : α) : haltOrd.Formula α :=
-  Relations.formula₂ hLeSym (Term.var x) (Term.var y)
+def mLeF (x y : α) : haltOrd.Formula α := fo%[x, y] hLeSym(x, y)
 
 /-- `x` applies in the state `y`. -/
-def srcF (x y : α) : haltOrd.Formula α :=
-  Relations.formula₂ hSrcSym (Term.var x) (Term.var y)
+def srcF (x y : α) : haltOrd.Formula α := fo%[x, y] hSrcSym(x, y)
 
 /-- `x` reads the symbol `y`. -/
-def readF (x y : α) : haltOrd.Formula α :=
-  Relations.formula₂ hReadSym (Term.var x) (Term.var y)
+def readF (x y : α) : haltOrd.Formula α := fo%[x, y] hReadSym(x, y)
 
 /-- `x` moves to the state `y`. -/
-def dstF (x y : α) : haltOrd.Formula α :=
-  Relations.formula₂ hDstSym (Term.var x) (Term.var y)
+def dstF (x y : α) : haltOrd.Formula α := fo%[x, y] hDstSym(x, y)
 
 /-- `x` writes the symbol `y`. -/
-def writeF (x y : α) : haltOrd.Formula α :=
-  Relations.formula₂ hWriteSym (Term.var x) (Term.var y)
+def writeF (x y : α) : haltOrd.Formula α := fo%[x, y] hWriteSym(x, y)
 
 /-- The cell `x` initially holds the symbol `y`. -/
-def inpF (x y : α) : haltOrd.Formula α :=
-  Relations.formula₂ hInpSym (Term.var x) (Term.var y)
+def inpF (x y : α) : haltOrd.Formula α := fo%[x, y] hInpSym(x, y)
 
 /-- `x ≤ y` in the ambient order. -/
-def ordF (x y : α) : haltOrd.Formula α :=
-  Relations.formula₂ hOrdSym (Term.var x) (Term.var y)
+def ordF (x y : α) : haltOrd.Formula α := fo%[x, y] hOrdSym(x, y)
 
 /-- `x = y`. -/
-def eqF (x y : α) : haltOrd.Formula α := Term.equal (Term.var x) (Term.var y)
+def eqF (x y : α) : haltOrd.Formula α := fo%[x, y] x ≐ y
 
 /-- `x < y` in the ambient order. -/
-def ordLtF (x y : α) : haltOrd.Formula α := ordF x y ⊓ ∼(eqF x y)
+def ordLtF (x y : α) : haltOrd.Formula α := fo%[x, y] ordF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
 
 /-- `x < y` in the machine's order. -/
-def mLtF (x y : α) : haltOrd.Formula α := mLeF x y ⊓ ∼(eqF x y)
+def mLtF (x y : α) : haltOrd.Formula α := fo%[x, y] mLeF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
 
 /-- `x` is the least element of the ambient order. -/
-noncomputable def minF (x : α) : haltOrd.Formula α :=
-  Formula.iAlls (Fin 1) (ordF (Sum.inl x) (Sum.inr 0))
+noncomputable def minF (x : α) : haltOrd.Formula α := fo%[x] ∀ y, ordF⟨x, y⟩
 
 /-- The cell `x` initially holds `y`: its input symbol, or the blank if it has
 none. -/
 noncomputable def initTapeF (x y : α) : haltOrd.Formula α :=
-  inpF x y ⊔ (Formula.iAlls (Fin 1) (∼(inpF (Sum.inl x) (Sum.inr 0))) ⊓ blankF y)
+  fo%[x, y] inpF⟨x, y⟩ ∨ (∀ a, ¬ inpF⟨x, a⟩) ∧ blankF⟨y⟩
 
 /-- Well-formedness of the machine, as a formula with unused free variables:
 the machine's order is linear, there is a position, the input is functional,
 and there is exactly one blank. -/
 noncomputable def wfF : haltOrd.Formula α :=
-  (Formula.iAlls (Fin 3)
-    ((mLeF (Sum.inr 0) (Sum.inr 0)) ⊓
-      (((mLeF (Sum.inr 0) (Sum.inr 1)).imp
-          ((mLeF (Sum.inr 1) (Sum.inr 2)).imp (mLeF (Sum.inr 0) (Sum.inr 2)))) ⊓
-        (((mLeF (Sum.inr 0) (Sum.inr 1)).imp
-            ((mLeF (Sum.inr 1) (Sum.inr 0)).imp (eqF (Sum.inr 0) (Sum.inr 1)))) ⊓
-          ((mLeF (Sum.inr 0) (Sum.inr 1) ⊔ mLeF (Sum.inr 1) (Sum.inr 0)) ⊓
-            (((inpF (Sum.inr 0) (Sum.inr 1)).imp
-                ((inpF (Sum.inr 0) (Sum.inr 2)).imp (eqF (Sum.inr 1) (Sum.inr 2)))) ⊓
-              ((blankF (Sum.inr 0)).imp
-                ((blankF (Sum.inr 1)).imp (eqF (Sum.inr 0) (Sum.inr 1)))))))))) ⊓
-    (Formula.iExs (Fin 1) (posnF (Sum.inr 0)) ⊓
-      Formula.iExs (Fin 1) (blankF (Sum.inr 0)))
+  fo% (∀ x y z,
+      mLeF⟨x, x⟩ ∧ (mLeF⟨x, y⟩ → mLeF⟨y, z⟩ → mLeF⟨x, z⟩) ∧
+        (mLeF⟨x, y⟩ → mLeF⟨y, x⟩ → eqF⟨x, y⟩) ∧ (mLeF⟨x, y⟩ ∨ mLeF⟨y, x⟩) ∧
+        (inpF⟨x, y⟩ → inpF⟨x, z⟩ → eqF⟨y, z⟩) ∧ (blankF⟨x⟩ → blankF⟨y⟩ → eqF⟨x, y⟩)) ∧
+    (∃ x, posnF⟨x⟩) ∧ ∃ x, blankF⟨x⟩
 
 /-- Some transition with the given attributes exists; the direction of the
 move is a static decision. -/
 noncomputable def existsMoveF (right : Bool) (q a b q' : α) : haltOrd.Formula α :=
-  Formula.iExs (Fin 1)
-    (trF (Sum.inr 0) ⊓
-      (((if right then rightF (Sum.inr 0) else ∼(rightF (Sum.inr 0)))) ⊓
-        (srcF (Sum.inr 0) (Sum.inl q) ⊓
-          (readF (Sum.inr 0) (Sum.inl a) ⊓
-            (dstF (Sum.inr 0) (Sum.inl q') ⊓ writeF (Sum.inr 0) (Sum.inl b))))))
+  fo%[q, a, b, q'] ∃ t, trF⟨t⟩ ∧ (if right then rightF⟨t⟩ else ¬ rightF⟨t⟩) ∧
+    srcF⟨t, q⟩ ∧ readF⟨t, a⟩ ∧ dstF⟨t, q'⟩ ∧ writeF⟨t, b⟩
 
 /-! ### Realization of the builders -/
 
@@ -414,28 +395,28 @@ noncomputable def domF : PTag → haltOrd.Formula (Fin 1 × Fin 5)
   | .dCopyLft | .dCopyRgt | .dCopyBoot | .dCopyHalt => wfF
   | .dCopySym | .dCopyState => wfF
   | .dEraseSymL | .dEraseLft | .dEraseSymR | .dEraseRgt => wfF
-  | .dBoot => wfF ⊓ startF (0, 0)
-  | .dAcc => wfF ⊓ accF (0, 0)
-  | .dMoveR => wfF ⊓ existsMoveF true (0, 0) (0, 1) (0, 2) (0, 3)
-  | .dMoveREnd => wfF ⊓ (existsMoveF true (0, 0) (0, 1) (0, 2) (0, 3) ⊓ blankF (0, 4))
-  | .dMoveL => wfF ⊓ existsMoveF false (0, 0) (0, 1) (0, 2) (0, 3)
-  | .dMoveLEnd => wfF ⊓ (existsMoveF false (0, 0) (0, 1) (0, 2) (0, 3) ⊓ blankF (0, 4))
+  | .dBoot => fo%⟨u⟩ !wfF ∧ startF⟨u⟩
+  | .dAcc => fo%⟨u⟩ !wfF ∧ accF⟨u⟩
+  | .dMoveR => fo%⟨u⟩ !wfF ∧ (existsMoveF true)⟨u, u[1], u[2], u[3]⟩
+  | .dMoveREnd => fo%⟨u⟩ !wfF ∧ (existsMoveF true)⟨u, u[1], u[2], u[3]⟩ ∧ blankF⟨u[4]⟩
+  | .dMoveL => fo%⟨u⟩ !wfF ∧ (existsMoveF false)⟨u, u[1], u[2], u[3]⟩
+  | .dMoveLEnd => fo%⟨u⟩ !wfF ∧ (existsMoveF false)⟨u, u[1], u[2], u[3]⟩ ∧ blankF⟨u[4]⟩
   | _ => ⊥
 
 /-- The ambient lexicographic order of the last four coordinates, as a
 formula. -/
 noncomputable def tupLeF : haltOrd.Formula (Fin 2 × Fin 5) :=
-  ordLtF (0, 1) (1, 1) ⊔ (eqF (0, 1) (1, 1) ⊓
-    (ordLtF (0, 2) (1, 2) ⊔ (eqF (0, 2) (1, 2) ⊓
-      (ordLtF (0, 3) (1, 3) ⊔ (eqF (0, 3) (1, 3) ⊓ ordF (0, 4) (1, 4))))))
+  fo%⟨u, v⟩ ordLtF⟨u[1], v[1]⟩ ∨ eqF⟨u[1], v[1]⟩ ∧
+    (ordLtF⟨u[2], v[2]⟩ ∨ eqF⟨u[2], v[2]⟩ ∧
+      (ordLtF⟨u[3], v[3]⟩ ∨ eqF⟨u[3], v[3]⟩ ∧ ordF⟨u[4], v[4]⟩))
 
 /-- The order of the drawn instance: the static comparisons are decided in
 Lean, the dynamic ones written out. -/
 noncomputable def leF (t t' : PTag) : haltOrd.Formula (Fin 2 × Fin 5) :=
   if t.bIdx < t'.bIdx then ⊤
   else if t'.bIdx < t.bIdx then ⊥
-  else mLtF (0, 0) (1, 0) ⊔ (eqF (0, 0) (1, 0) ⊓
-    (if t.sIdx < t'.sIdx then ⊤ else if t'.sIdx < t.sIdx then ⊥ else tupLeF))
+  else fo%⟨u, v⟩ mLtF⟨u, v⟩ ∨ eqF⟨u, v⟩ ∧
+    (if t.sIdx < t'.sIdx then ⊤ᶠ else if t'.sIdx < t.sIdx then ⊥ᶠ else !tupLeF)
 
 /-- **The interpretation of the PCP vocabulary in an ordered machine
 instance.** -/

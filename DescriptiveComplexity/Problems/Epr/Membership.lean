@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Epr.Expansion
 import DescriptiveComplexity.PSpaceHierarchy
 import DescriptiveComplexity.Exponential.Classes
@@ -73,19 +74,17 @@ variable {γ : Type}
 
 /-- A unary symbol of the points, as a formula. -/
 noncomputable def ptF₁ (r : Language.eprPt.Relations 1) (x : γ) : eprSOLang.Formula γ :=
-  Relations.formula₁ (ptS₁ r) (Term.var x)
+  fo%[x] (ptS₁ r)(x)
 
 /-- A binary symbol of the points, as a formula. -/
 noncomputable def ptF₂ (r : Language.eprPt.Relations 2) (x y : γ) : eprSOLang.Formula γ :=
-  Relations.formula₂ (ptS₂ r) (Term.var x) (Term.var y)
+  fo%[x, y] (ptS₂ r)(x, y)
 
 /-- The guessed symbol, as a formula. -/
-noncomputable def ivF (s w : γ) : eprSOLang.Formula γ :=
-  Relations.formula₂ ivS (Term.var s) (Term.var w)
+noncomputable def ivF (s w : γ) : eprSOLang.Formula γ := fo%[s, w] ivS(s, w)
 
 /-- Equality of two points. -/
-noncomputable def ptEqF (x y : γ) : eprSOLang.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def ptEqF (x y : γ) : eprSOLang.Formula γ := fo%[x, y] x ≐ y
 
 variable {A : Type} [Language.epr.Structure A] [LinearOrder A]
 
@@ -331,33 +330,28 @@ variable {γ : Type}
 
 /-- `q` is the pair of `x` and `y`. -/
 noncomputable def pairOfF (q x y : γ) : eprSOLang.Formula γ :=
-  ptF₁ Language.peIsPairSym q ⊓
-    (ptF₂ Language.peFstSym q x ⊓ ptF₂ Language.peSndSym q y)
+  fo%[q, x, y] (ptF₁ Language.peIsPairSym)⟨q⟩ ∧
+    (ptF₂ Language.peFstSym)⟨q, x⟩ ∧ (ptF₂ Language.peSndSym)⟨q, y⟩
 
 /-- The assignment `w` sends `x` to `y`. -/
 noncomputable def memF (w x y : γ) : eprSOLang.Formula γ :=
-  Formula.iExs (Fin 1) (pairOfF (Sum.inr 0) (Sum.inl x) (Sum.inl y) ⊓
-    ptF₂ Language.peMemSym (Sum.inl w) (Sum.inr 0))
+  fo%[w, x, y] ∃ q, pairOfF⟨q, x, y⟩ ∧ (ptF₂ Language.peMemSym)⟨w, q⟩
 
 /-- The literal `l` names the variable `x` at the position `p`. -/
 noncomputable def argF (l p x : γ) : eprSOLang.Formula γ :=
-  Formula.iExs (Fin 1) (pairOfF (Sum.inr 0) (Sum.inl l) (Sum.inl p) ⊓
-    ptF₂ Language.peArgSym (Sum.inr 0) (Sum.inl x))
+  fo%[l, p, x] ∃ q, pairOfF⟨q, l, p⟩ ∧ (ptF₂ Language.peArgSym)⟨q, x⟩
 
 /-- Every element is sent somewhere by `w`. -/
 noncomputable def totalF (w : γ) : eprSOLang.Formula γ :=
-  Formula.iAlls (Fin 1) (ptF₁ Language.peIsEltSym (Sum.inr 0) ⟹
-    Formula.iExs (Fin 1) (ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓
-      memF (Sum.inl (Sum.inl w)) (Sum.inl (Sum.inr 0)) (Sum.inr 0)))
+  fo%[w] ∀ x, (ptF₁ Language.peIsEltSym)⟨x⟩ →
+    ∃ y, (ptF₁ Language.peIsEltSym)⟨y⟩ ∧ memF⟨w, x, y⟩
 
 /-- And to one place only. -/
 noncomputable def funcF (w : γ) : eprSOLang.Formula γ :=
-  Formula.iAlls (Fin 3)
-    (((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ (ptF₁ Language.peIsEltSym (Sum.inr 1) ⊓
-        ptF₁ Language.peIsEltSym (Sum.inr 2))) ⊓
-      (memF (Sum.inl w) (Sum.inr 0) (Sum.inr 1) ⊓
-        memF (Sum.inl w) (Sum.inr 0) (Sum.inr 2))) ⟹
-      ptEqF (Sum.inr 1) (Sum.inr 2))
+  fo%[w] ∀ x y y',
+    ((ptF₁ Language.peIsEltSym)⟨x⟩ ∧ (ptF₁ Language.peIsEltSym)⟨y⟩ ∧
+        (ptF₁ Language.peIsEltSym)⟨y'⟩) ∧
+      memF⟨w, x, y⟩ ∧ memF⟨w, x, y'⟩ → ptEqF⟨y, y'⟩
 
 variable {A : Type} [Language.epr.Structure A] [LinearOrder A]
 variable (ρ : ivBlock.Assignment (eprExp.Map A)) {v : γ → eprExp.Map A}
@@ -418,45 +412,35 @@ variable {γ : Type}
 /-- The environment `w` is the one the two assignments make: the witness at an
 existential variable, the assignment being tested elsewhere. -/
 noncomputable def combF (e u w : γ) : eprSOLang.Formula γ :=
-  Formula.iAlls (Fin 2)
-    ((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ ptF₁ Language.peIsEltSym (Sum.inr 1)) ⟹
-      (memF (Sum.inl w) (Sum.inr 0) (Sum.inr 1) ⇔
-        ((ptF₁ Language.peEVarSym (Sum.inr 0) ⊓ memF (Sum.inl e) (Sum.inr 0) (Sum.inr 1)) ⊔
-          (∼(ptF₁ Language.peEVarSym (Sum.inr 0)) ⊓
-            memF (Sum.inl u) (Sum.inr 0) (Sum.inr 1)))))
+  fo%[e, u, w] ∀ x y, (ptF₁ Language.peIsEltSym)⟨x⟩ ∧ (ptF₁ Language.peIsEltSym)⟨y⟩ →
+    (memF⟨w, x, y⟩ ↔
+      ((ptF₁ Language.peEVarSym)⟨x⟩ ∧ memF⟨e, x, y⟩) ∨
+        (¬ (ptF₁ Language.peEVarSym)⟨x⟩ ∧ memF⟨u, x, y⟩))
 
 /-- The assignment `w` of the argument positions matches the environment `v` on
 the arguments the literal `l` declares. -/
 noncomputable def matchF (l v w : γ) : eprSOLang.Formula γ :=
-  Formula.iAlls (Fin 3)
-    (((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ (ptF₁ Language.peIsEltSym (Sum.inr 1) ⊓
-        ptF₁ Language.peIsEltSym (Sum.inr 2))) ⊓
-      (argF (Sum.inl l) (Sum.inr 0) (Sum.inr 1) ⊓
-        memF (Sum.inl v) (Sum.inr 1) (Sum.inr 2))) ⟹
-      memF (Sum.inl w) (Sum.inr 0) (Sum.inr 2))
+  fo%[l, v, w] ∀ p x y,
+    ((ptF₁ Language.peIsEltSym)⟨p⟩ ∧ (ptF₁ Language.peIsEltSym)⟨x⟩ ∧
+        (ptF₁ Language.peIsEltSym)⟨y⟩) ∧
+      argF⟨l, p, x⟩ ∧ memF⟨v, x, y⟩ → memF⟨w, p, y⟩
 
 /-- The literal `l` is true at the environment `v`. -/
 noncomputable def litTrueF (l v : γ) : eprSOLang.Formula γ :=
-  Formula.iExs (Fin 2)
-    ((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ (ptF₁ Language.peIsAsgSym (Sum.inr 1) ⊓
-        (totalF (Sum.inr 1) ⊓ (funcF (Sum.inr 1) ⊓
-          matchF (Sum.inl l) (Sum.inl v) (Sum.inr 1))))) ⊓
-      ((ptF₂ Language.pePosSym (Sum.inl l) (Sum.inr 0) ⊓ ivF (Sum.inr 0) (Sum.inr 1)) ⊔
-        (ptF₂ Language.peNegSym (Sum.inl l) (Sum.inr 0) ⊓
-          ∼(ivF (Sum.inr 0) (Sum.inr 1)))))
+  fo%[l, v] ∃ s w,
+    ((ptF₁ Language.peIsEltSym)⟨s⟩ ∧ (ptF₁ Language.peIsAsgSym)⟨w⟩ ∧
+        totalF⟨w⟩ ∧ funcF⟨w⟩ ∧ matchF⟨l, v, w⟩) ∧
+      (((ptF₂ Language.pePosSym)⟨l, s⟩ ∧ ivF⟨s, w⟩) ∨
+        ((ptF₂ Language.peNegSym)⟨l, s⟩ ∧ ¬ ivF⟨s, w⟩))
 
 /-- Every clause is true at every assignment of the universal variables. -/
 noncomputable def matrixF (e : γ) : eprSOLang.Formula γ :=
-  Formula.iAlls (Fin 2)
-    ((ptF₁ Language.peIsAsgSym (Sum.inr 0) ⊓ (totalF (Sum.inr 0) ⊓ (funcF (Sum.inr 0) ⊓
-        (ptF₁ Language.peIsAsgSym (Sum.inr 1) ⊓
-          combF (Sum.inl e) (Sum.inr 0) (Sum.inr 1))))) ⟹
-      Formula.iAlls (Fin 1)
-        ((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ ptF₁ Language.peClSym (Sum.inr 0)) ⟹
-          Formula.iExs (Fin 1)
-            (ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓
-              (ptF₂ Language.peInClSym (Sum.inl (Sum.inr 0)) (Sum.inr 0) ⊓
-                litTrueF (Sum.inr 0) (Sum.inl (Sum.inl (Sum.inr 1)))))))
+  fo%[e] ∀ u w,
+    (ptF₁ Language.peIsAsgSym)⟨u⟩ ∧ totalF⟨u⟩ ∧ funcF⟨u⟩ ∧
+        (ptF₁ Language.peIsAsgSym)⟨w⟩ ∧ combF⟨e, u, w⟩ →
+      ∀ c, (ptF₁ Language.peIsEltSym)⟨c⟩ ∧ (ptF₁ Language.peClSym)⟨c⟩ →
+        ∃ l, (ptF₁ Language.peIsEltSym)⟨l⟩ ∧ (ptF₂ Language.peInClSym)⟨c, l⟩ ∧
+          litTrueF⟨l, w⟩
 
 variable {A : Type} [Language.epr.Structure A] [LinearOrder A]
 variable (ρ : ivBlock.Assignment (eprExp.Map A)) {v : γ → eprExp.Map A}
@@ -516,43 +500,35 @@ section Kernel
 
 /-- The guess is local. -/
 noncomputable def localF : eprSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    (((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ (ptF₁ Language.peIsAsgSym (Sum.inr 1) ⊓
-        ptF₁ Language.peIsAsgSym (Sum.inr 2))) ⊓
-      Formula.iAlls (Fin 2)
-        ((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ (ptF₁ Language.peIsEltSym (Sum.inr 1) ⊓
-            ptF₂ Language.peSigSym (Sum.inl (Sum.inr 0)) (Sum.inr 0))) ⟹
-          (memF (Sum.inl (Sum.inr 1)) (Sum.inr 0) (Sum.inr 1) ⇔
-            memF (Sum.inl (Sum.inr 2)) (Sum.inr 0) (Sum.inr 1)))) ⟹
-      (ivF (Sum.inr 0) (Sum.inr 1) ⇔ ivF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ s w w',
+    ((ptF₁ Language.peIsEltSym)⟨s⟩ ∧ (ptF₁ Language.peIsAsgSym)⟨w⟩ ∧
+        (ptF₁ Language.peIsAsgSym)⟨w'⟩) ∧
+      (∀ x y,
+        (ptF₁ Language.peIsEltSym)⟨x⟩ ∧ (ptF₁ Language.peIsEltSym)⟨y⟩ ∧
+            (ptF₂ Language.peSigSym)⟨s, x⟩ →
+          (memF⟨w, x, y⟩ ↔ memF⟨w', x, y⟩)) →
+      (ivF⟨s, w⟩ ↔ ivF⟨s, w'⟩)
 
 /-- The instance is well-formed: an atom names one variable at each position of
 its symbol's signature, and names one at each. -/
 noncomputable def wfF : eprSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-      (((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ (ptF₁ Language.peIsEltSym (Sum.inr 1) ⊓
-          (ptF₁ Language.peIsEltSym (Sum.inr 2) ⊓ ptF₁ Language.peIsEltSym (Sum.inr 3)))) ⊓
-        (argF (Sum.inr 0) (Sum.inr 1) (Sum.inr 2) ⊓
-          argF (Sum.inr 0) (Sum.inr 1) (Sum.inr 3))) ⟹
-        ptEqF (Sum.inr 2) (Sum.inr 3)) ⊓
-    Formula.iAlls (Fin 3)
-      (((ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓ (ptF₁ Language.peIsEltSym (Sum.inr 1) ⊓
-          ptF₁ Language.peIsEltSym (Sum.inr 2))) ⊓
-        ((ptF₂ Language.pePosSym (Sum.inr 0) (Sum.inr 1) ⊔
-            ptF₂ Language.peNegSym (Sum.inr 0) (Sum.inr 1)) ⊓
-          ptF₂ Language.peSigSym (Sum.inr 1) (Sum.inr 2))) ⟹
-        Formula.iExs (Fin 1) (ptF₁ Language.peIsEltSym (Sum.inr 0) ⊓
-          argF (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 2)) (Sum.inr 0)))
+  fo% (∀ l p x x',
+      ((ptF₁ Language.peIsEltSym)⟨l⟩ ∧ (ptF₁ Language.peIsEltSym)⟨p⟩ ∧
+          (ptF₁ Language.peIsEltSym)⟨x⟩ ∧ (ptF₁ Language.peIsEltSym)⟨x'⟩) ∧
+        argF⟨l, p, x⟩ ∧ argF⟨l, p, x'⟩ → ptEqF⟨x, x'⟩) ∧
+    ∀ l s p,
+      ((ptF₁ Language.peIsEltSym)⟨l⟩ ∧ (ptF₁ Language.peIsEltSym)⟨s⟩ ∧
+          (ptF₁ Language.peIsEltSym)⟨p⟩) ∧
+        ((ptF₂ Language.pePosSym)⟨l, s⟩ ∨ (ptF₂ Language.peNegSym)⟨l, s⟩) ∧
+          (ptF₂ Language.peSigSym)⟨s, p⟩ →
+        ∃ x, (ptF₁ Language.peIsEltSym)⟨x⟩ ∧ argF⟨l, p, x⟩
 
 /-- **The kernel of the `Σ₁` definition**: the instance is well-formed, the
 guess is local, and some assignment of the existential variables satisfies every
 clause at every assignment of the universal ones. -/
 noncomputable def eprKernel : eprSOLang.Sentence :=
-  wfF ⊓ (localF ⊓
-    Formula.iExs (Fin 1)
-      ((ptF₁ Language.peIsAsgSym (Sum.inr 0) ⊓
-          (totalF (Sum.inr 0) ⊓ funcF (Sum.inr 0))) ⊓
-        matrixF (Sum.inr 0)))
+  fo% !wfF ∧ !localF ∧
+    ∃ w, ((ptF₁ Language.peIsAsgSym)⟨w⟩ ∧ totalF⟨w⟩ ∧ funcF⟨w⟩) ∧ matrixF⟨w⟩
 
 variable {A : Type} [Language.epr.Structure A] [LinearOrder A]
 variable (ρ : ivBlock.Assignment (eprExp.Map A))

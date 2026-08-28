@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Partition.Defs
 import DescriptiveComplexity.Problems.Knapsack.Chain
 import DescriptiveComplexity.Numbers.Wide
@@ -146,11 +147,11 @@ def ptSideF (b : Bool) (i : α) : ptSOLang.Formula α :=
 
 /-- `x` is a minimum of the order, as a formula. -/
 noncomputable def ptBotF (x : α) : ptSOLang.Formula α :=
-  Formula.iAlls Unit (ptLeF (Sum.inl x) (Sum.inr ()))
+  fo%[x] ∀ y, ptLeF⟨x, y⟩
 
 /-- `x` is a maximum of the order, as a formula. -/
 noncomputable def ptTopF (x : α) : ptSOLang.Formula α :=
-  Formula.iAlls Unit (ptLeF (Sum.inr ()) (Sum.inl x))
+  fo%[x] ∀ y, ptLeF⟨y, x⟩
 
 /-- The bit that the item `i` contributes at the wide position `(x, p)`: its
 weight's bit, in the lowest block, if it is on the side `b`. -/
@@ -166,47 +167,34 @@ def ptMaj3F (x y z : ptSOLang.Formula α) : ptSOLang.Formula α :=
 
 /-- `i` is the first item, as a formula. -/
 noncomputable def ptMinItemF (i : α) : ptSOLang.Formula α :=
-  ptItemF i ⊓ Formula.iAlls Unit
-    ((ptItemF (Sum.inr ())).imp (ptLeF (Sum.inl i) (Sum.inr ())))
+  fo%[i] ptItemF⟨i⟩ ∧ ∀ y, ptItemF⟨y⟩ → ptLeF⟨i, y⟩
 
 /-- `i` is the last item, as a formula. -/
 noncomputable def ptMaxItemF (i : α) : ptSOLang.Formula α :=
-  ptItemF i ⊓ Formula.iAlls Unit
-    ((ptItemF (Sum.inr ())).imp (ptLeF (Sum.inr ()) (Sum.inl i)))
+  fo%[i] ptItemF⟨i⟩ ∧ ∀ y, ptItemF⟨y⟩ → ptLeF⟨y, i⟩
 
 /-- `j` is the item right after `i`, as a formula. -/
 noncomputable def ptSuccItemF (i j : α) : ptSOLang.Formula α :=
-  ptItemF i ⊓ (ptItemF j ⊓ (ptLeF i j ⊓ (∼(ptEqF i j) ⊓
-    Formula.iAlls Unit
-      ((ptItemF (Sum.inr ())).imp ((ptLeF (Sum.inl i) (Sum.inr ())).imp
-        ((ptLeF (Sum.inr ()) (Sum.inl j)).imp
-          (ptEqF (Sum.inr ()) (Sum.inl i) ⊔ ptEqF (Sum.inr ()) (Sum.inl j))))))))
+  fo%[i, j] ptItemF⟨i⟩ ∧ ptItemF⟨j⟩ ∧ ptLeF⟨i, j⟩ ∧ ¬ ptEqF⟨i, j⟩ ∧
+    ∀ y, ptItemF⟨y⟩ → ptLeF⟨i, y⟩ → ptLeF⟨y, j⟩ → ptEqF⟨y, i⟩ ∨ ptEqF⟨y, j⟩
 
 /-- `p` is the lowest position, as a formula. -/
 noncomputable def ptMinPosnF (p : α) : ptSOLang.Formula α :=
-  ptPosnF p ⊓ Formula.iAlls Unit
-    ((ptPosnF (Sum.inr ())).imp (ptLeF (Sum.inl p) (Sum.inr ())))
+  fo%[p] ptPosnF⟨p⟩ ∧ ∀ q, ptPosnF⟨q⟩ → ptLeF⟨p, q⟩
 
 /-- `p` is the highest position, as a formula. -/
 noncomputable def ptMaxPosnF (p : α) : ptSOLang.Formula α :=
-  ptPosnF p ⊓ Formula.iAlls Unit
-    ((ptPosnF (Sum.inr ())).imp (ptLeF (Sum.inr ()) (Sum.inl p)))
+  fo%[p] ptPosnF⟨p⟩ ∧ ∀ q, ptPosnF⟨q⟩ → ptLeF⟨q, p⟩
 
 /-- `q` is the position right above `p`, as a formula. -/
 noncomputable def ptSuccPosnF (p q : α) : ptSOLang.Formula α :=
-  ptPosnF p ⊓ (ptPosnF q ⊓ (ptLeF p q ⊓ (∼(ptEqF p q) ⊓
-    Formula.iAlls Unit
-      ((ptPosnF (Sum.inr ())).imp ((ptLeF (Sum.inl p) (Sum.inr ())).imp
-        ((ptLeF (Sum.inr ()) (Sum.inl q)).imp
-          (ptEqF (Sum.inr ()) (Sum.inl p) ⊔ ptEqF (Sum.inr ()) (Sum.inl q))))))))
+  fo%[p, q] ptPosnF⟨p⟩ ∧ ptPosnF⟨q⟩ ∧ ptLeF⟨p, q⟩ ∧ ¬ ptEqF⟨p, q⟩ ∧
+    ∀ r, ptPosnF⟨r⟩ → ptLeF⟨p, r⟩ → ptLeF⟨r, q⟩ → ptEqF⟨r, p⟩ ∨ ptEqF⟨r, q⟩
 
 /-- `y` is the element right after `x` in the whole universe, as a formula. -/
 noncomputable def ptSuccAllF (x y : α) : ptSOLang.Formula α :=
-  ptLeF x y ⊓ (∼(ptEqF x y) ⊓
-    Formula.iAlls Unit
-      ((ptLeF (Sum.inl x) (Sum.inr ())).imp
-        ((ptLeF (Sum.inr ()) (Sum.inl y)).imp
-          (ptEqF (Sum.inr ()) (Sum.inl x) ⊔ ptEqF (Sum.inr ()) (Sum.inl y)))))
+  fo%[x, y] ptLeF⟨x, y⟩ ∧ ¬ ptEqF⟨x, y⟩ ∧
+    ∀ r, ptLeF⟨x, r⟩ → ptLeF⟨r, y⟩ → ptEqF⟨r, x⟩ ∨ ptEqF⟨r, y⟩
 
 /-- `(x, p)` is the lowest wide position, as a formula. -/
 noncomputable def ptMinWideF (x p : α) : ptSOLang.Formula α := ptBotF x ⊓ ptMinPosnF p
@@ -225,76 +213,54 @@ end Builders
 
 /-- Kernel clause: the order is reflexive. -/
 private noncomputable def ptReflClause : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 1) (ptLeF (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ x, ptLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
 private noncomputable def ptTransClause : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((ptLeF (Sum.inr 0) (Sum.inr 1) ⊓ ptLeF (Sum.inr 1) (Sum.inr 2)).imp
-      (ptLeF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ x y z, ptLeF⟨x, y⟩ ∧ ptLeF⟨y, z⟩ → ptLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
 private noncomputable def ptAntisymmClause : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 2)
-    ((ptLeF (Sum.inr 0) (Sum.inr 1) ⊓ ptLeF (Sum.inr 1) (Sum.inr 0)).imp
-      (ptEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ x y, ptLeF⟨x, y⟩ ∧ ptLeF⟨y, x⟩ → ptEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
 private noncomputable def ptTotalClause : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 2) (ptLeF (Sum.inr 0) (Sum.inr 1) ⊔ ptLeF (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ x y, ptLeF⟨x, y⟩ ∨ ptLeF⟨y, x⟩
 
 /-- Kernel clause: only items are chosen. -/
 private noncomputable def ptSelClause : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 1) ((ptSelF (Sum.inr 0)).imp (ptItemF (Sum.inr 0)))
+  fo% ∀ x, ptSelF⟨x⟩ → ptItemF⟨x⟩
 
 /-- Kernel clause: at the first item the running total is that item's
 contribution. -/
 private noncomputable def ptBaseClause (b : Bool) : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((ptMinItemF (Sum.inr 0) ⊓ ptPosnF (Sum.inr 2)).imp
-      ((ptPSF b (Sum.inr 0) (Sum.inr 1) (Sum.inr 2)).iff
-        (ptAddF b (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))))
+  fo% ∀ i x p, ptMinItemF⟨i⟩ ∧ ptPosnF⟨p⟩ → ((ptPSF b)⟨i, x, p⟩ ↔ (ptAddF b)⟨i, x, p⟩)
 
 /-- Kernel clause: each step adds a bit. -/
 private noncomputable def ptSumClause (b : Bool) : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((ptSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓ ptPosnF (Sum.inr 3)).imp
-      ((ptPSF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)).iff
-        (ptXor3F (ptPSF b (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-          (ptAddF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))
-          (ptCyF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)))))
+  fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptPosnF⟨p⟩ →
+    ((ptPSF b)⟨j, x, p⟩ ↔
+      ptXor3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: each step propagates its carry. -/
 private noncomputable def ptCarryClause (b : Bool) : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 6)
-    ((ptSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓
-        ptSuccWideF (Sum.inr 2) (Sum.inr 3) (Sum.inr 4) (Sum.inr 5)).imp
-      ((ptCyF b (Sum.inr 1) (Sum.inr 4) (Sum.inr 5)).iff
-        (ptMaj3F (ptPSF b (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-          (ptAddF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))
-          (ptCyF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)))))
+  fo% ∀ i j x p y q, ptSuccItemF⟨i, j⟩ ∧ ptSuccWideF⟨x, p, y, q⟩ →
+    ((ptCyF b)⟨j, y, q⟩ ↔
+      ptMaj3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest wide position. -/
 private noncomputable def ptBottomClause (b : Bool) : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((ptSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓ ptMinWideF (Sum.inr 2) (Sum.inr 3)).imp
-      ∼(ptCyF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3)))
+  fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptMinWideF⟨x, p⟩ → ¬ (ptCyF b)⟨j, x, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest wide position. -/
 private noncomputable def ptTopClause (b : Bool) : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 4)
-    ((ptSuccItemF (Sum.inr 0) (Sum.inr 1) ⊓ ptMaxWideF (Sum.inr 2) (Sum.inr 3)).imp
-      ∼(ptMaj3F (ptPSF b (Sum.inr 0) (Sum.inr 2) (Sum.inr 3))
-        (ptAddF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))
-        (ptCyF b (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))))
+  fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptMaxWideF⟨x, p⟩ →
+    ¬ ptMaj3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄
 
 /-- Kernel clause: at the last item the two walks agree – the two sides weigh
 the same. -/
 private noncomputable def ptFinalClause : ptSOLang.Sentence :=
-  Formula.iAlls (Fin 3)
-    ((ptMaxItemF (Sum.inr 0) ⊓ ptPosnF (Sum.inr 2)).imp
-      ((ptPSF true (Sum.inr 0) (Sum.inr 1) (Sum.inr 2)).iff
-        (ptPSF false (Sum.inr 0) (Sum.inr 1) (Sum.inr 2))))
+  fo% ∀ i x p, ptMaxItemF⟨i⟩ ∧ ptPosnF⟨p⟩ → ((ptPSF true)⟨i, x, p⟩ ↔ (ptPSF false)⟨i, x, p⟩)
 
 /-- The clauses of one walk. -/
 private noncomputable def ptWalkClauses (b : Bool) : ptSOLang.Sentence :=
@@ -329,15 +295,15 @@ def PSide (b : Bool) (i : A) : Prop :=
   | false => BWItem i ∧ ¬PSel ρ i
 
 /-- The bit an item contributes at a wide position: its own bit, in the lowest
-block. The minimality of the block is written with the `Unit`-indexed
+block. The minimality of the block is written with the `Fin 1`-indexed
 quantifier the kernel's `∀` produces; `DescriptiveComplexity.pWt_iff` reads it
 back. -/
 def PWt (i : A) (u : A × A) : Prop :=
-  (∀ y : Unit → A, BWLe u.1 (y ())) ∧ BWBit i u.2
+  (∀ y : Fin 1 → A, BWLe u.1 (y 0)) ∧ BWBit i u.2
 
 theorem pWt_iff {i : A} {u : A × A} :
     PWt (A := A) i u ↔ ((∀ y : A, BWLe u.1 y) ∧ BWBit i u.2) :=
-  and_congr ⟨fun h y => h fun _ => y, fun h y => h (y ())⟩ Iff.rfl
+  and_congr ⟨fun h y => h fun _ => y, fun h y => h (y 0)⟩ Iff.rfl
 
 private theorem realize_partitionKernel :
     (@Sentence.Realize ptSOLang A
@@ -385,20 +351,20 @@ private theorem realize_partitionKernel :
   · rintro ⟨⟨hrefl, htrans, hanti, htot⟩, hsel, ⟨hb1, hs1, hc1, hbo1, ht1⟩,
       ⟨hb0, hs0, hc0, hbo0, ht0⟩, hfin⟩
     have hminU : ∀ (P : A → Prop) (x : A), MinPos BWLe P x →
-        P x ∧ ∀ y : Unit → A, P (y ()) → BWLe x (y ()) :=
-      fun P x h => ⟨h.1, fun y hy => h.2 (y ()) hy⟩
+        P x ∧ ∀ y : Fin 1 → A, P (y 0) → BWLe x (y 0) :=
+      fun P x h => ⟨h.1, fun y hy => h.2 (y 0) hy⟩
     have hmaxU : ∀ (P : A → Prop) (x : A), MaxPos BWLe P x →
-        P x ∧ ∀ y : Unit → A, P (y ()) → BWLe (y ()) x :=
-      fun P x h => ⟨h.1, fun y hy => h.2 (y ()) hy⟩
+        P x ∧ ∀ y : Fin 1 → A, P (y 0) → BWLe (y 0) x :=
+      fun P x h => ⟨h.1, fun y hy => h.2 (y 0) hy⟩
     have hsuccU : ∀ (P : A → Prop) (x y : A), SuccPos BWLe P x y →
-        P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → BWLe x (r ()) → BWLe (r ()) y → r () = x ∨ r () = y))) :=
+        P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → BWLe x (r 0) → BWLe (r 0) y → r 0 = x ∨ r 0 = y))) :=
       fun P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
-        fun r hr h1 h2 => h.2.2.2.2 (r ()) hr h1 h2⟩
+        fun r hr h1 h2 => h.2.2.2.2 (r 0) hr h1 h2⟩
     have hsallU : ∀ x y : A, SuccPos BWLe (fun _ => True) x y →
-        BWLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          BWLe x (r ()) → BWLe (r ()) y → r () = x ∨ r () = y) :=
-      fun x y h => ⟨h.2.2.1, h.2.2.2.1, fun r h1 h2 => h.2.2.2.2 (r ()) trivial h1 h2⟩
+        BWLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          BWLe x (r 0) → BWLe (r 0) y → r 0 = x ∨ r 0 = y) :=
+      fun x y h => ⟨h.2.2.1, h.2.2.2.1, fun r h1 h2 => h.2.2.2.2 (r 0) trivial h1 h2⟩
     refine ⟨⟨fun a => hrefl (fun _ => a), fun a b c hab hbc => htrans ![a, b, c] ⟨hab, hbc⟩,
       fun a b hab hba => hanti ![a, b] ⟨hab, hba⟩, fun a b => htot ![a, b]⟩,
       fun i hi => hsel (fun _ => i) hi, fun b => ?_,
@@ -411,9 +377,9 @@ private theorem realize_partitionKernel :
           · exact Or.inl ⟨rfl, hsuccU _ _ _ h⟩
           · exact Or.inr ⟨hsallU _ _ h1, hmaxU _ _ h2, hminU _ _ h3⟩⟩,
         fun i j x p hij hp => hbo0 ![i, j, x, p]
-          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y ()), hminU _ _ hp.2⟩,
+          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y 0), hminU _ _ hp.2⟩,
         fun i j x p hij hp => ht0 ![i, j, x, p]
-          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y ()), hmaxU _ _ hp.2⟩⟩
+          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y 0), hmaxU _ _ hp.2⟩⟩
     · exact ⟨fun i x p hi hp => hb1 ![i, x, p] ⟨hminU _ _ hi, hp⟩,
         fun i j x p hij hp => hs1 ![i, j, x, p] ⟨hsuccU _ _ _ hij, hp⟩,
         fun i j x p y q hij hpq => hc1 ![i, j, x, p, y, q] ⟨hsuccU _ _ _ hij, by
@@ -421,25 +387,25 @@ private theorem realize_partitionKernel :
           · exact Or.inl ⟨rfl, hsuccU _ _ _ h⟩
           · exact Or.inr ⟨hsallU _ _ h1, hmaxU _ _ h2, hminU _ _ h3⟩⟩,
         fun i j x p hij hp => hbo1 ![i, j, x, p]
-          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y ()), hminU _ _ hp.2⟩,
+          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y 0), hminU _ _ hp.2⟩,
         fun i j x p hij hp => ht1 ![i, j, x, p]
-          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y ()), hmaxU _ _ hp.2⟩⟩
+          ⟨hsuccU _ _ _ hij, fun y => hp.1 (y 0), hmaxU _ _ hp.2⟩⟩
   · rintro ⟨⟨hrefl, htrans, hanti, htot⟩, hsel, hwalk, hfin⟩
     have hminM : ∀ (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → BWLe x (y ())) → MinPos BWLe P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → BWLe x (y 0)) → MinPos BWLe P x :=
       fun P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hmaxM : ∀ (P : A → Prop) (x : A),
-        (P x ∧ ∀ y : Unit → A, P (y ()) → BWLe (y ()) x) → MaxPos BWLe P x :=
+        (P x ∧ ∀ y : Fin 1 → A, P (y 0) → BWLe (y 0) x) → MaxPos BWLe P x :=
       fun P x h => ⟨h.1, fun y hy => h.2 (fun _ => y) hy⟩
     have hsuccM : ∀ (P : A → Prop) (x y : A),
-        (P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          P (r ()) → BWLe x (r ()) → BWLe (r ()) y → r () = x ∨ r () = y)))) →
+        (P x ∧ (P y ∧ (BWLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          P (r 0) → BWLe x (r 0) → BWLe (r 0) y → r 0 = x ∨ r 0 = y)))) →
         SuccPos BWLe P x y :=
       fun P x y h => ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1,
         fun r hr h1 h2 => h.2.2.2.2 (fun _ => r) hr h1 h2⟩
     have hsallM : ∀ x y : A,
-        (BWLe x y ∧ (¬x = y ∧ ∀ r : Unit → A,
-          BWLe x (r ()) → BWLe (r ()) y → r () = x ∨ r () = y)) →
+        (BWLe x y ∧ (¬x = y ∧ ∀ r : Fin 1 → A,
+          BWLe x (r 0) → BWLe (r 0) y → r 0 = x ∨ r 0 = y)) →
         SuccPos BWLe (fun _ => True) x y :=
       fun x y h => ⟨trivial, trivial, h.1, h.2.1,
         fun r _ h1 h2 => h.2.2 (fun _ => r) h1 h2⟩

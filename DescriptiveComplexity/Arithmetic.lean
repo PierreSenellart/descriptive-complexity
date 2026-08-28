@@ -228,63 +228,55 @@ section Formulas
 
 variable {L : Language.{0, 0}} {α : Type}
 
-/-- `t₁ ≤ t₂`, as a formula over the arithmetic expansion. -/
-noncomputable def aLeF (t₁ t₂ : (L.sum Language.arith).Term α) :
-    (L.sum Language.arith).Formula α :=
-  Relations.formula₂ (aLeSym L) t₁ t₂
+/-- `x ≤ y`, as a formula over the arithmetic expansion. -/
+noncomputable def aLeF (x y : α) : (L.sum Language.arith).Formula α :=
+  Relations.formula₂ (aLeSym L) (Term.var x) (Term.var y)
 
-/-- `t₁ < t₂`, as a formula over the arithmetic expansion. -/
-noncomputable def aLtF (t₁ t₂ : (L.sum Language.arith).Term α) :
-    (L.sum Language.arith).Formula α :=
-  aLeF t₁ t₂ ⊓ ∼(aLeF t₂ t₁)
+/-- `x < y`, as a formula over the arithmetic expansion. -/
+noncomputable def aLtF (x y : α) : (L.sum Language.arith).Formula α :=
+  aLeF x y ⊓ ∼(aLeF y x)
 
-/-- `t₁ + t₂ = t₃`, as a formula over the arithmetic expansion. -/
-noncomputable def aPlusF (t₁ t₂ t₃ : (L.sum Language.arith).Term α) :
-    (L.sum Language.arith).Formula α :=
-  Relations.formula (aPlusSym L) ![t₁, t₂, t₃]
+/-- `x + y = z`, as a formula over the arithmetic expansion. -/
+noncomputable def aPlusF (x y z : α) : (L.sum Language.arith).Formula α :=
+  Relations.formula (aPlusSym L) ![Term.var x, Term.var y, Term.var z]
 
-/-- `t₁ * t₂ = t₃`, as a formula over the arithmetic expansion. -/
-noncomputable def aTimesF (t₁ t₂ t₃ : (L.sum Language.arith).Term α) :
-    (L.sum Language.arith).Formula α :=
-  Relations.formula (aTimesSym L) ![t₁, t₂, t₃]
+/-- `x * y = z`, as a formula over the arithmetic expansion. -/
+noncomputable def aTimesF (x y z : α) : (L.sum Language.arith).Formula α :=
+  Relations.formula (aTimesSym L) ![Term.var x, Term.var y, Term.var z]
 
 /-- The variable `x` holds a minimum. -/
 noncomputable def aMinF (x : α) : (L.sum Language.arith).Formula α :=
-  (aLeF (Term.var (Sum.inl x)) (Term.var (Sum.inr 0))).iAlls (Fin 1)
+  (aLeF (Sum.inl x) (Sum.inr 0)).iAlls (Fin 1)
 
 /-- The variable `x` holds a maximum. -/
 noncomputable def aMaxF (x : α) : (L.sum Language.arith).Formula α :=
-  (aLeF (Term.var (Sum.inr 0)) (Term.var (Sum.inl x))).iAlls (Fin 1)
+  (aLeF (Sum.inr 0) (Sum.inl x)).iAlls (Fin 1)
 
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] {v : α → A}
 
 omit [Finite A] in
 @[simp]
-theorem realize_aLeF (t₁ t₂ : (L.sum Language.arith).Term α) :
-    (aLeF t₁ t₂).Realize v ↔ t₁.realize v ≤ t₂.realize v := by
+theorem realize_aLeF (x y : α) : (aLeF (L := L) x y).Realize v ↔ v x ≤ v y := by
   rw [aLeF, Formula.realize_rel₂]
   exact Iff.rfl
 
 omit [Finite A] in
 @[simp]
-theorem realize_aLtF (t₁ t₂ : (L.sum Language.arith).Term α) :
-    (aLtF t₁ t₂).Realize v ↔ t₁.realize v < t₂.realize v := by
+theorem realize_aLtF (x y : α) : (aLtF (L := L) x y).Realize v ↔ v x < v y := by
   rw [aLtF, Formula.realize_inf, Formula.realize_not, realize_aLeF, realize_aLeF]
   exact lt_iff_le_not_ge.symm
 
 omit [Finite A] in
 @[simp]
-theorem realize_aPlusF (t₁ t₂ t₃ : (L.sum Language.arith).Term α) :
-    (aPlusF t₁ t₂ t₃).Realize v ↔
-      orank (t₁.realize v) + orank (t₂.realize v) = orank (t₃.realize v) := by
+theorem realize_aPlusF (x y z : α) :
+    (aPlusF (L := L) x y z).Realize v ↔ orank (v x) + orank (v y) = orank (v z) := by
   rw [aPlusF, Formula.realize_rel]
   exact Iff.rfl
 
 omit [Finite A] in
 @[simp]
-theorem realize_aTimesF (t₁ t₂ t₃ : (L.sum Language.arith).Term α) :
-    (aTimesF t₁ t₂ t₃).Realize v ↔
-      orank (t₁.realize v) * orank (t₂.realize v) = orank (t₃.realize v) := by
+theorem realize_aTimesF (x y z : α) :
+    (aTimesF (L := L) x y z).Realize v ↔ orank (v x) * orank (v y) = orank (v z) := by
   rw [aTimesF, Formula.realize_rel]
   exact Iff.rfl
 
@@ -292,14 +284,14 @@ omit [Finite A] in
 @[simp]
 theorem realize_aMinF (x : α) : (aMinF (L := L) x).Realize v ↔ ∀ a : A, v x ≤ a := by
   rw [aMinF]
-  simp only [Formula.realize_iAlls, realize_aLeF, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+  simp only [Formula.realize_iAlls, realize_aLeF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
 
 omit [Finite A] in
 @[simp]
 theorem realize_aMaxF (x : α) : (aMaxF (L := L) x).Realize v ↔ ∀ a : A, a ≤ v x := by
   rw [aMaxF]
-  simp only [Formula.realize_iAlls, realize_aLeF, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+  simp only [Formula.realize_iAlls, realize_aLeF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
 
 end Formulas
@@ -411,8 +403,7 @@ a statement about the *size* of the instance, which is exactly what a bare order
 cannot express and the numeric predicates can. -/
 noncomputable def evenCardSentence : (L.sum Language.arith).Sentence :=
   ((aMaxF (Sum.inr 0)).imp
-      (∼((aPlusF (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0))
-            (Term.var (Sum.inl (Sum.inr 0)))).iExs (Fin 1)))).iAlls (Fin 1)
+      (∼((aPlusF (Sum.inr 0) (Sum.inr 0) (Sum.inl (Sum.inr 0))).iExs (Fin 1)))).iAlls (Fin 1)
 
 variable {L}
 variable (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
@@ -421,8 +412,8 @@ variable (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 theorem realize_evenCardSentence : A ⊨ evenCardSentence L ↔ Even (Nat.card A) := by
   rw [even_card_iff_forall_isTop (A := A)]
   simp only [Sentence.Realize, evenCardSentence, Formula.realize_iAlls, Formula.realize_imp,
-    realize_aMaxF, Formula.realize_not, Formula.realize_iExs, realize_aPlusF, Term.realize_var,
-    Sum.elim_inl, Sum.elim_inr]
+    realize_aMaxF, Formula.realize_not, Formula.realize_iExs, realize_aPlusF, Sum.elim_inl,
+    Sum.elim_inr]
   constructor
   · rintro h z hz ⟨w, hw⟩
     exact h (fun _ => z) hz ⟨fun _ => w, hw⟩

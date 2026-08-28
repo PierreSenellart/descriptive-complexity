@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.PSpace
 
 /-!
@@ -63,48 +64,23 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of fully quantified Boolean formulas with
-an unbounded quantifier prefix. -/
-inductive qsatRel : ℕ → Type
-  /-- `isVar x`: the element `x` is a quantified propositional variable. -/
-  | isVar : qsatRel 1
-  /-- `allVar x`: the variable `x` is quantified universally. -/
-  | allVar : qsatRel 1
-  /-- `prefixLt x y`: the variable `x` is quantified outside the variable
-  `y`. -/
-  | prefixLt : qsatRel 2
-  /-- `isClause c`: the element `c` is a clause of the matrix. -/
-  | isClause : qsatRel 1
-  /-- `posIn c x`: the variable `x` occurs positively in the clause `c`. -/
-  | posIn : qsatRel 2
-  /-- `negIn c x`: the variable `x` occurs negatively in the clause `c`. -/
-  | negIn : qsatRel 2
-  deriving DecidableEq
-
 /-- The relational vocabulary of fully quantified Boolean formulas: that of
 CNF instances, together with the marks and the order describing the quantifier
 prefix. -/
-protected def qsat : Language :=
-  ⟨fun _ => Empty, qsatRel⟩
-  deriving IsRelational
-
-/-- The symbol for “is a quantified variable”. -/
-abbrev qsIsVar : Language.qsat.Relations 1 := .isVar
-
-/-- The symbol for “is universally quantified”. -/
-abbrev qsAllVar : Language.qsat.Relations 1 := .allVar
-
-/-- The symbol for “is quantified outside”. -/
-abbrev qsPrefixLt : Language.qsat.Relations 2 := .prefixLt
-
-/-- The symbol for “is a clause”. -/
-abbrev qsIsClause : Language.qsat.Relations 1 := .isClause
-
-/-- The symbol for “occurs positively in”. -/
-abbrev qsPosIn : Language.qsat.Relations 2 := .posIn
-
-/-- The symbol for “occurs negatively in”. -/
-abbrev qsNegIn : Language.qsat.Relations 2 := .negIn
+fo_language qsat with qs where
+  /-- `isVar x`: the element `x` is a quantified propositional variable. -/
+  isVar : 1
+  /-- `allVar x`: the variable `x` is quantified universally. -/
+  allVar : 1
+  /-- `prefixLt x y`: the variable `x` is quantified outside the variable
+  `y`. -/
+  prefixLt : 2
+  /-- `isClause c`: the element `c` is a clause of the matrix. -/
+  isClause : 1
+  /-- `posIn c x`: the variable `x` occurs positively in the clause `c`. -/
+  posIn : 2
+  /-- `negIn c x`: the variable `x` occurs negatively in the clause `c`. -/
+  negIn : 2
 
 end Language
 

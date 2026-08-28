@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.DagIso.Defs
 
 /-!
@@ -43,26 +44,17 @@ formulas of an interpretation): irreflexive and transitive on the marked set,
 and containing the arcs. -/
 noncomputable def topoIrreflClause {α : Type} (V : Language.twoDags.Relations 1)
     (Lt : Language.twoDags.Relations 2) : Language.twoDags.Formula α :=
-  ((Relations.formula₁ V (Term.var (Sum.inr 0))).imp
-    ∼(Relations.formula₂ Lt (Term.var (Sum.inr 0)) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+  fo% ∀ x, V(x) → ¬ Lt(x, x)
 
 @[inherit_doc topoIrreflClause]
 noncomputable def topoTransClause {α : Type} (V : Language.twoDags.Relations 1)
     (Lt : Language.twoDags.Relations 2) : Language.twoDags.Formula α :=
-  ((Relations.formula₁ V (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ V (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₁ V (Term.var (Sum.inr 2)) ⊓
-      Relations.formula₂ Lt (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ Lt (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))).imp
-    (Relations.formula₂ Lt (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)))).iAlls (Fin 3)
+  fo% ∀ x y z, (((V(x) ∧ V(y)) ∧ V(z)) ∧ Lt(x, y)) ∧ Lt(y, z) → Lt(x, z)
 
 @[inherit_doc topoIrreflClause]
 noncomputable def topoMonoClause {α : Type} (V : Language.twoDags.Relations 1)
     (Lt Arc : Language.twoDags.Relations 2) : Language.twoDags.Formula α :=
-  ((Relations.formula₁ V (Term.var (Sum.inr 0)) ⊓
-      Relations.formula₁ V (Term.var (Sum.inr 1)) ⊓
-      Relations.formula₂ Arc (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    (Relations.formula₂ Lt (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))).iAlls (Fin 2)
+  fo% ∀ x y, (V(x) ∧ V(y)) ∧ Arc(x, y) → Lt(x, y)
 
 @[inherit_doc topoIrreflClause]
 noncomputable def topoSentence {α : Type} (V : Language.twoDags.Relations 1)
@@ -106,13 +98,10 @@ noncomputable def dagInterp :
     FOInterpretation Language.twoDags Language.twoGraphs Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .patV => fun _ => wfSentence ⊓ Relations.formula₁ tdPatV (Term.var (0, 0))
-    | _, .hostV => fun _ =>
-        (wfSentence ⊓ Relations.formula₁ tdHostV (Term.var (0, 0))) ⊔ ∼wfSentence
-    | _, .patE => fun _ =>
-        wfSentence ⊓ Relations.formula₂ tdPatArc (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .hostE => fun _ =>
-        wfSentence ⊓ Relations.formula₂ tdHostArc (Term.var (0, 0)) (Term.var (1, 0))
+    | _, .patV => fun _ => fo%⟨u⟩ !wfSentence ∧ tdPatV(u)
+    | _, .hostV => fun _ => fo%⟨u⟩ (!wfSentence ∧ tdHostV(u)) ∨ ¬ !wfSentence
+    | _, .patE => fun _ => fo%⟨u, v⟩ !wfSentence ∧ tdPatArc(u, v)
+    | _, .hostE => fun _ => fo%⟨u, v⟩ !wfSentence ∧ tdHostArc(u, v)
 
 section Points
 

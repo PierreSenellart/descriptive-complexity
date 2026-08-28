@@ -303,7 +303,7 @@ open CodeProgRed
 noncomputable def revLexLtF {γ : Type} (p q : Fin (dimOf V) → γ) :
     (L.sum Language.order).Formula γ :=
   listSup ((List.finRange (dimOf V)).map fun j =>
-    ltF (Term.var (p j)) (Term.var (q j)) ⊓
+    ltF (p j) (q j) ⊓
       listInf ((List.finRange (dimOf V)).map fun j' : Fin (dimOf V) =>
         if (j : ℕ) < (j' : ℕ) then Term.equal (Term.var (p j')) (Term.var (q j')) else ⊤))
 

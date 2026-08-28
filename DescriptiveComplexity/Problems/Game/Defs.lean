@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Problems.Reachability
 
@@ -48,36 +49,18 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the vocabulary of AND/OR graphs. -/
-inductive andOrRel : ℕ → Type
-  /-- `move a b`: the player to move at `a` may move to `b`. -/
-  | move : andOrRel 2
-  /-- `univ a`: the node `a` belongs to the universal player. -/
-  | univ : andOrRel 1
-  /-- `start a`: the node `a` is a marked starting position. -/
-  | start : andOrRel 1
-  /-- `won a`: the node `a` wins outright. -/
-  | won : andOrRel 1
-  deriving DecidableEq
-
 /-- The relational vocabulary of AND/OR graphs: a move relation, a mark for the
 nodes of the universal player, a mark for the starting positions and a mark for
 the positions that win outright. -/
-protected def andOrGraph : Language :=
-  ⟨fun _ => Empty, andOrRel⟩
-  deriving IsRelational
-
-/-- The move symbol. -/
-abbrev agMove : Language.andOrGraph.Relations 2 := .move
-
-/-- The universal-player symbol. -/
-abbrev agUniv : Language.andOrGraph.Relations 1 := .univ
-
-/-- The marked-start symbol. -/
-abbrev agStart : Language.andOrGraph.Relations 1 := .start
-
-/-- The won-outright symbol. -/
-abbrev agWon : Language.andOrGraph.Relations 1 := .won
+fo_language andOrGraph with ag where
+  /-- `move a b`: the player to move at `a` may move to `b`. -/
+  move : 2
+  /-- `univ a`: the node `a` belongs to the universal player. -/
+  univ : 1
+  /-- `start a`: the node `a` is a marked starting position. -/
+  start : 1
+  /-- `won a`: the node `a` wins outright. -/
+  won : 1
 
 /-- The move symbol in the ordered expansion. -/
 abbrev agMoveO : (Language.andOrGraph.sum Language.order).Relations 2 := Sum.inl agMove
@@ -107,17 +90,7 @@ section Defs
 
 variable {A : Type} [Language.andOrGraph.Structure A]
 
-/-- The move relation of an AND/OR graph. -/
-def AGMove (a b : A) : Prop := RelMap agMove ![a, b]
-
-/-- Belonging to the universal player. -/
-def AGUniv (a : A) : Prop := RelMap agUniv ![a]
-
-/-- Being a marked starting position. -/
-def AGStart (a : A) : Prop := RelMap agStart ![a]
-
-/-- Winning outright. -/
-def AGWon (a : A) : Prop := RelMap agWon ![a]
+fo_predicates Language.andOrGraph ag
 
 variable (A) in
 /-- **The winning positions of an AND/OR graph**, as a least fixed point: a

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Numbers.Unary
 
@@ -54,25 +55,13 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of marked graphs. -/
-inductive markedGraphRel : ℕ → Type
-  /-- `adj a b`: there is an edge from `a` to `b`. -/
-  | adj : markedGraphRel 2
-  /-- `marked a`: the element `a` belongs to the marked set. -/
-  | marked : markedGraphRel 1
-  deriving DecidableEq
-
 /-- The relational language of marked graphs: a graph together with a marked
 subset of its vertices, whose cardinality serves as threshold. -/
-protected def markedGraph : Language :=
-  ⟨fun _ => Empty, markedGraphRel⟩
-  deriving IsRelational
-
-/-- The adjacency symbol of marked graphs. -/
-abbrev mgAdj : Language.markedGraph.Relations 2 := .adj
-
-/-- The mark symbol of marked graphs. -/
-abbrev mgMarked : Language.markedGraph.Relations 1 := .marked
+fo_language markedGraph with mg where
+  /-- `adj a b`: there is an edge from `a` to `b`. -/
+  adj : 2
+  /-- `marked a`: the element `a` belongs to the marked set. -/
+  marked : 1
 
 end Language
 
@@ -234,11 +223,7 @@ section Shorthands
 
 variable {A : Type} [Language.markedGraph.Structure A]
 
-/-- Adjacency in a marked graph. -/
-def MGAdj (a b : A) : Prop := RelMap mgAdj ![a, b]
-
-/-- Markedness in a marked graph. -/
-def MGMarked (a : A) : Prop := RelMap mgMarked ![a]
+fo_predicates Language.markedGraph mg
 
 end Shorthands
 

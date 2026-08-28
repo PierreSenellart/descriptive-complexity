@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.MachineAltSpace.Guards
 
 /-!
@@ -98,34 +99,31 @@ section Atoms
 variable {γ : Type}
 
 /-- `x` is the state, at one copy. -/
-noncomputable def stF (x : γ) : cfg1.Formula γ := Relations.formula₁ stS (Term.var x)
+noncomputable def stF (x : γ) : cfg1.Formula γ := fo%[x] stS(x)
 
 /-- `x` is the head, at one copy. -/
-noncomputable def hdF (x : γ) : cfg1.Formula γ := Relations.formula₁ hdS (Term.var x)
+noncomputable def hdF (x : γ) : cfg1.Formula γ := fo%[x] hdS(x)
 
 /-- The cell `x` holds `y`, at one copy. -/
-noncomputable def tpF (x y : γ) : cfg1.Formula γ :=
-  Relations.formula₂ tpS (Term.var x) (Term.var y)
+noncomputable def tpF (x y : γ) : cfg1.Formula γ := fo%[x, y] tpS(x, y)
 
 /-- `x` is the state of the current configuration. -/
-noncomputable def stAF (x : γ) : cfg2.Formula γ := Relations.formula₁ stA (Term.var x)
+noncomputable def stAF (x : γ) : cfg2.Formula γ := fo%[x] stA(x)
 
 /-- `x` is the head of the current configuration. -/
-noncomputable def hdAF (x : γ) : cfg2.Formula γ := Relations.formula₁ hdA (Term.var x)
+noncomputable def hdAF (x : γ) : cfg2.Formula γ := fo%[x] hdA(x)
 
 /-- The cell `x` holds `y` in the current configuration. -/
-noncomputable def tpAF (x y : γ) : cfg2.Formula γ :=
-  Relations.formula₂ tpA (Term.var x) (Term.var y)
+noncomputable def tpAF (x y : γ) : cfg2.Formula γ := fo%[x, y] tpA(x, y)
 
 /-- `x` is the state of the next configuration. -/
-noncomputable def stBF (x : γ) : cfg2.Formula γ := Relations.formula₁ stB (Term.var x)
+noncomputable def stBF (x : γ) : cfg2.Formula γ := fo%[x] stB(x)
 
 /-- `x` is the head of the next configuration. -/
-noncomputable def hdBF (x : γ) : cfg2.Formula γ := Relations.formula₁ hdB (Term.var x)
+noncomputable def hdBF (x : γ) : cfg2.Formula γ := fo%[x] hdB(x)
 
 /-- The cell `x` holds `y` in the next configuration. -/
-noncomputable def tpBF (x y : γ) : cfg2.Formula γ :=
-  Relations.formula₂ tpB (Term.var x) (Term.var y)
+noncomputable def tpBF (x y : γ) : cfg2.Formula γ := fo%[x, y] tpB(x, y)
 
 /-- A base guard, read at one copy of the block. -/
 noncomputable def lift1 (φ : tmaOrd.Formula γ) : cfg1.Formula γ := LHom.sumInl.onFormula φ
@@ -323,38 +321,24 @@ end Cfg
 
 /-- An assignment is a configuration, as a sentence over one copy. -/
 noncomputable def isCfgS : cfg1.Sentence :=
-  Formula.iExs (Fin 1) (stF (Sum.inr 0)) ⊓
-    (Formula.iAlls (Fin 2) ((stF (Sum.inr 0) ⊓ stF (Sum.inr 1)) ⟹
-        lift1 (eqG (Sum.inr 0) (Sum.inr 1))) ⊓
-      (Formula.iExs (Fin 1) (hdF (Sum.inr 0)) ⊓
-        (Formula.iAlls (Fin 2) ((hdF (Sum.inr 0) ⊓ hdF (Sum.inr 1)) ⟹
-            lift1 (eqG (Sum.inr 0) (Sum.inr 1))) ⊓
-          (Formula.iAlls (Fin 1) (Formula.iExs (Fin 1)
-              (tpF (Sum.inl (Sum.inr 0)) (Sum.inr 0))) ⊓
-            Formula.iAlls (Fin 3) ((tpF (Sum.inr 0) (Sum.inr 1) ⊓ tpF (Sum.inr 0) (Sum.inr 2)) ⟹
-              lift1 (eqG (Sum.inr 1) (Sum.inr 2)))))))
+  fo% (∃ q, stF⟨q⟩) ∧ (∀ q q', stF⟨q⟩ ∧ stF⟨q'⟩ → lift1⦃eqG⟨q, q'⟩⦄) ∧
+    (∃ h, hdF⟨h⟩) ∧ (∀ h h', hdF⟨h⟩ ∧ hdF⟨h'⟩ → lift1⦃eqG⟨h, h'⟩⦄) ∧
+    (∀ p, ∃ a, tpF⟨p, a⟩) ∧ ∀ p a a', tpF⟨p, a⟩ ∧ tpF⟨p, a'⟩ → lift1⦃eqG⟨a, a'⟩⦄
 
 /-- The *next* configuration is a configuration, as a sentence over two
 copies. -/
 noncomputable def isCfgBS : cfg2.Sentence :=
-  Formula.iExs (Fin 1) (stBF (Sum.inr 0)) ⊓
-    (Formula.iAlls (Fin 2) ((stBF (Sum.inr 0) ⊓ stBF (Sum.inr 1)) ⟹
-        lift2 (eqG (Sum.inr 0) (Sum.inr 1))) ⊓
-      (Formula.iExs (Fin 1) (hdBF (Sum.inr 0)) ⊓
-        (Formula.iAlls (Fin 2) ((hdBF (Sum.inr 0) ⊓ hdBF (Sum.inr 1)) ⟹
-            lift2 (eqG (Sum.inr 0) (Sum.inr 1))) ⊓
-          (Formula.iAlls (Fin 1) (Formula.iExs (Fin 1)
-              (tpBF (Sum.inl (Sum.inr 0)) (Sum.inr 0))) ⊓
-            Formula.iAlls (Fin 3) ((tpBF (Sum.inr 0) (Sum.inr 1) ⊓ tpBF (Sum.inr 0) (Sum.inr 2)) ⟹
-              lift2 (eqG (Sum.inr 1) (Sum.inr 2)))))))
+  fo% (∃ q, stBF⟨q⟩) ∧ (∀ q q', stBF⟨q⟩ ∧ stBF⟨q'⟩ → lift2⦃eqG⟨q, q'⟩⦄) ∧
+    (∃ h, hdBF⟨h⟩) ∧ (∀ h h', hdBF⟨h⟩ ∧ hdBF⟨h'⟩ → lift2⦃eqG⟨h, h'⟩⦄) ∧
+    (∀ p, ∃ a, tpBF⟨p, a⟩) ∧ ∀ p a a', tpBF⟨p, a⟩ ∧ tpBF⟨p, a'⟩ → lift2⦃eqG⟨a, a'⟩⦄
 
 /-- The state is marked by the universal player. -/
 noncomputable def univS : cfg1.Sentence :=
-  Formula.iExs (Fin 1) (stF (Sum.inr 0) ⊓ lift1 (blkG (1 : Fin 2) (Sum.inr 0)))
+  fo% ∃ q, stF⟨q⟩ ∧ lift1⦃(blkG (1 : Fin 2))⟨q⟩⦄
 
 /-- The state is accepting. -/
 noncomputable def wonS : cfg1.Sentence :=
-  Formula.iExs (Fin 1) (stF (Sum.inr 0) ⊓ lift1 (accG (Sum.inr 0)))
+  fo% ∃ q, stF⟨q⟩ ∧ lift1⦃accG⟨q⟩⦄
 
 section SentenceRealize
 
@@ -426,34 +410,20 @@ over the base. -/
 
 /-- **One step of the machine**, as a sentence over two copies of the block. -/
 noncomputable def stepS : cfg2.Sentence :=
-  Formula.iExs (Fin 7)
-    (lift2 (trG (Sum.inr 0)) ⊓
-      (stAF (Sum.inr 1) ⊓
-        (lift2 (srcG (Sum.inr 0) (Sum.inr 1)) ⊓
-          (stBF (Sum.inr 2) ⊓
-            (lift2 (dstG (Sum.inr 0) (Sum.inr 2)) ⊓
-              (hdAF (Sum.inr 3) ⊓
-                (hdBF (Sum.inr 4) ⊓
-                  (tpAF (Sum.inr 3) (Sum.inr 5) ⊓
-                    (lift2 (readG (Sum.inr 0) (Sum.inr 5)) ⊓
-                      (tpBF (Sum.inr 3) (Sum.inr 6) ⊓
-                        (lift2 (writeG (Sum.inr 0) (Sum.inr 6)) ⊓
-                          (Formula.iAlls (Fin 2)
-                              (∼(lift2 (eqG (Sum.inr 0) (Sum.inl (Sum.inr 3)))) ⟹
-                                (tpBF (Sum.inr 0) (Sum.inr 1) ⇔ tpAF (Sum.inr 0) (Sum.inr 1))) ⊓
-                            ((lift2 (rightG (Sum.inr 0)) ⊓
-                                lift2 (succPosG (Sum.inr 3) (Sum.inr 4))) ⊔
-                              (∼(lift2 (rightG (Sum.inr 0))) ⊓
-                                lift2 (succPosG (Sum.inr 4) (Sum.inr 3))))))))))))))))
+  fo% ∃ τ q q' h h' a a',
+    lift2⦃trG⟨τ⟩⦄ ∧ stAF⟨q⟩ ∧ lift2⦃srcG⟨τ, q⟩⦄ ∧ stBF⟨q'⟩ ∧ lift2⦃dstG⟨τ, q'⟩⦄ ∧
+    hdAF⟨h⟩ ∧ hdBF⟨h'⟩ ∧ tpAF⟨h, a⟩ ∧ lift2⦃readG⟨τ, a⟩⦄ ∧ tpBF⟨h, a'⟩ ∧
+    lift2⦃writeG⟨τ, a'⟩⦄ ∧
+    (∀ p b, ¬ lift2⦃eqG⟨p, h⟩⦄ → (tpBF⟨p, b⟩ ↔ tpAF⟨p, b⟩)) ∧
+    ((lift2⦃rightG⟨τ⟩⦄ ∧ lift2⦃succPosG⟨h, h'⟩⦄) ∨
+      (¬ lift2⦃rightG⟨τ⟩⦄ ∧ lift2⦃succPosG⟨h', h⟩⦄))
 
 /-! ### The starting configurations -/
 
 /-- **An initial configuration**, as a sentence over one copy. -/
 noncomputable def isInitS : cfg1.Sentence :=
-  Formula.iExs (Fin 1) (stF (Sum.inr 0) ⊓ lift1 (startG (Sum.inr 0))) ⊓
-    (Formula.iExs (Fin 1) (hdF (Sum.inr 0) ⊓ lift1 (minPosG (Sum.inr 0))) ⊓
-      Formula.iAlls (Fin 2) (tpF (Sum.inr 0) (Sum.inr 1) ⟹
-        lift1 (initTapeG (Sum.inr 0) (Sum.inr 1))))
+  fo% (∃ q, stF⟨q⟩ ∧ lift1⦃startG⟨q⟩⦄) ∧ (∃ h, hdF⟨h⟩ ∧ lift1⦃minPosG⟨h⟩⦄) ∧
+    ∀ p a, tpF⟨p, a⟩ → lift1⦃initTapeG⟨p, a⟩⦄
 
 /-- **A starting state of the game**: the two promises about the instance, and
 an initial configuration. -/

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 
 /-!
@@ -33,35 +34,17 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of triple systems. -/
-inductive tripleSysRel : ℕ → Type
-  /-- `xEl a`: `a` belongs to the first class. -/
-  | xEl : tripleSysRel 1
-  /-- `yEl a`: `a` belongs to the second class. -/
-  | yEl : tripleSysRel 1
-  /-- `zEl a`: `a` belongs to the third class. -/
-  | zEl : tripleSysRel 1
-  /-- `trip a b c`: `(a, b, c)` is one of the available triples. -/
-  | trip : tripleSysRel 3
-  deriving DecidableEq
-
 /-- The relational language of triple systems: three marked classes and a
 ternary relation. -/
-protected def tripleSys : Language :=
-  ⟨fun _ => Empty, tripleSysRel⟩
-  deriving IsRelational
-
-/-- The first-class symbol. -/
-abbrev tsX : Language.tripleSys.Relations 1 := .xEl
-
-/-- The second-class symbol. -/
-abbrev tsY : Language.tripleSys.Relations 1 := .yEl
-
-/-- The third-class symbol. -/
-abbrev tsZ : Language.tripleSys.Relations 1 := .zEl
-
-/-- The triple symbol. -/
-abbrev tsTrip : Language.tripleSys.Relations 3 := .trip
+fo_language tripleSys with ts where
+  /-- `xEl a`: `a` belongs to the first class. -/
+  xEl : 1
+  /-- `yEl a`: `a` belongs to the second class. -/
+  yEl : 1
+  /-- `zEl a`: `a` belongs to the third class. -/
+  zEl : 1
+  /-- `trip a b c`: `(a, b, c)` is one of the available triples. -/
+  trip : 3
 
 end Language
 
@@ -79,17 +62,7 @@ section Shorthands
 
 variable {A : Type} [Language.tripleSys.Structure A]
 
-/-- Belonging to the first class. -/
-def TSXEl (a : A) : Prop := RelMap tsX ![a]
-
-/-- Belonging to the second class. -/
-def TSYEl (a : A) : Prop := RelMap tsY ![a]
-
-/-- Belonging to the third class. -/
-def TSZEl (a : A) : Prop := RelMap tsZ ![a]
-
-/-- Being an available triple. -/
-def TSTrip (a b c : A) : Prop := RelMap tsTrip ![a, b, c]
+fo_predicates Language.tripleSys ts
 
 end Shorthands
 
@@ -132,9 +105,9 @@ variable {A B : Type} [Language.tripleSys.Structure A] [Language.tripleSys.Struc
 private theorem hasThreeDimMatching_of_iso (e : A ≃[Language.tripleSys] B)
     (h : HasThreeDimMatching A) : HasThreeDimMatching B := by
   obtain ⟨hfin, M, hsub, hx, hy, hz, hux, huy, huz⟩ := h
-  have hX : ∀ a : A, TSXEl a ↔ TSXEl (e a) := fun a => relMap_equiv₁ e tsX a
-  have hY : ∀ a : A, TSYEl a ↔ TSYEl (e a) := fun a => relMap_equiv₁ e tsY a
-  have hZ : ∀ a : A, TSZEl a ↔ TSZEl (e a) := fun a => relMap_equiv₁ e tsZ a
+  have hX : ∀ a : A, TSXEl a ↔ TSXEl (e a) := fun a => relMap_equiv₁ e tsXEl a
+  have hY : ∀ a : A, TSYEl a ↔ TSYEl (e a) := fun a => relMap_equiv₁ e tsYEl a
+  have hZ : ∀ a : A, TSZEl a ↔ TSZEl (e a) := fun a => relMap_equiv₁ e tsZEl a
   have hT : ∀ a b c : A, TSTrip a b c ↔ TSTrip (e a) (e b) (e c) := fun a b c =>
     relMap_equiv₃ e tsTrip a b c
   refine ⟨e.toEquiv.finite_iff.mp hfin,

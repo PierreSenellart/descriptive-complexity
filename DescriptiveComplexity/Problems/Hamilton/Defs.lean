@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Numbers.BinRel
 import DescriptiveComplexity.Interpretation
 
@@ -41,20 +42,11 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of digraphs. -/
-inductive digraphRel : ℕ → Type
-  /-- `arc a b`: there is an arc from `a` to `b`. -/
-  | arc : digraphRel 2
-  deriving DecidableEq
-
 /-- The relational language of digraphs: one binary relation. The undirected
 problem reads it symmetrically rather than on a vocabulary of its own. -/
-protected def digraph : Language :=
-  ⟨fun _ => Empty, digraphRel⟩
-  deriving IsRelational
-
-/-- The arc symbol of digraphs. -/
-abbrev dgArc : Language.digraph.Relations 2 := .arc
+fo_language digraph with dg where
+  /-- `arc a b`: there is an arc from `a` to `b`. -/
+  arc : 2
 
 end Language
 
@@ -124,8 +116,7 @@ section Problems
 
 variable {A : Type} [Language.digraph.Structure A]
 
-/-- There is an arc from `a` to `b`. -/
-def DGArc (a b : A) : Prop := RelMap dgArc ![a, b]
+fo_predicates Language.digraph dg
 
 /-- There is an edge between `a` and `b`: the arc relation read
 symmetrically, which is how the undirected problem reads its instance. -/

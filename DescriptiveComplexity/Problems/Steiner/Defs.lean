@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Numbers.Unary
 import DescriptiveComplexity.Problems.CliqueFamily.Defs
@@ -51,32 +52,17 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of graphs with terminals. -/
-inductive steinerRel : ℕ → Type
-  /-- `adj a b`: there is an edge between `a` and `b`. -/
-  | adj : steinerRel 2
-  /-- `terminal a`: the vertex `a` must be spanned. -/
-  | terminal : steinerRel 1
-  /-- `marked a`: the vertex `a` belongs to the marked set carrying the
-  threshold. -/
-  | marked : steinerRel 1
-  deriving DecidableEq
-
 /-- The relational language of graphs with terminals: adjacency, a set of
 terminals to be spanned, and a marked set whose cardinality is the budget of
 non-terminals. -/
-protected def steinerGraph : Language :=
-  ⟨fun _ => Empty, steinerRel⟩
-  deriving IsRelational
-
-/-- The adjacency symbol of terminal-marked graphs. -/
-abbrev stAdj : Language.steinerGraph.Relations 2 := .adj
-
-/-- The terminal symbol of terminal-marked graphs. -/
-abbrev stTerminal : Language.steinerGraph.Relations 1 := .terminal
-
-/-- The mark symbol of terminal-marked graphs. -/
-abbrev stMarked : Language.steinerGraph.Relations 1 := .marked
+fo_language steinerGraph with st where
+  /-- `adj a b`: there is an edge between `a` and `b`. -/
+  adj : 2
+  /-- `terminal a`: the vertex `a` must be spanned. -/
+  terminal : 1
+  /-- `marked a`: the vertex `a` belongs to the marked set carrying the
+  threshold. -/
+  marked : 1
 
 end Language
 
@@ -444,14 +430,7 @@ section Shorthands
 
 variable {A : Type} [Language.steinerGraph.Structure A]
 
-/-- Adjacency in a graph with terminals. -/
-def STAdj (a b : A) : Prop := RelMap stAdj ![a, b]
-
-/-- Being a terminal. -/
-def STTerminal (a : A) : Prop := RelMap stTerminal ![a]
-
-/-- Belonging to the marked set carrying the threshold. -/
-def STMarked (a : A) : Prop := RelMap stMarked ![a]
+fo_predicates Language.steinerGraph st
 
 end Shorthands
 

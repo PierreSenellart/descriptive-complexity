@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Hamilton.Defs
 import DescriptiveComplexity.Problems.CliqueFamily.Defs
 import DescriptiveComplexity.Relativized
@@ -63,32 +64,29 @@ section Formulas
 variable {α : Type}
 
 /-- Symmetric adjacency: an arc in either direction. -/
-private noncomputable def adjOrF (s t : hamL.Term α) : hamL.Formula α :=
-  Relations.formula₂ hAdjSym s t ⊔ Relations.formula₂ hAdjSym t s
+private noncomputable def adjOrF (s t : α) : hamL.Formula α :=
+  Relations.formula₂ hAdjSym (Term.var s) (Term.var t) ⊔
+    Relations.formula₂ hAdjSym (Term.var t) (Term.var s)
 
-/-- The two terms name an (undirected) edge: adjacent in some direction, and
-distinct. -/
-private noncomputable def edgeF (s t : hamL.Term α) : hamL.Formula α :=
-  adjOrF s t ⊓ ∼(Term.equal s t)
+/-- The two variables name an (undirected) edge: adjacent in some direction,
+and distinct. -/
+private noncomputable def edgeF (s t : α) : hamL.Formula α :=
+  adjOrF s t ⊓ ∼(Term.equal (Term.var s) (Term.var t))
 
 /-- `b` is the least neighbor of `a`: it is `≤` every neighbor of `a`. -/
 private noncomputable def minNbrF (a b : α) : hamL.Formula α :=
-  ((edgeF (Term.var (Sum.inl a)) (Term.var (Sum.inr 0))).imp
-    (leF (Term.var (Sum.inl b)) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+  fo%[a, b] ∀ y, edgeF⟨a, y⟩ → leF⟨b, y⟩
 
 /-- `b` is the greatest neighbor of `a`. -/
 private noncomputable def maxNbrF (a b : α) : hamL.Formula α :=
-  ((edgeF (Term.var (Sum.inl a)) (Term.var (Sum.inr 0))).imp
-    (leF (Term.var (Sum.inr 0)) (Term.var (Sum.inl b)))).iAlls (Fin 1)
+  fo%[a, b] ∀ y, edgeF⟨a, y⟩ → leF⟨y, b⟩
 
 /-- `c` is the immediate neighbor-successor of `b` in `a`'s neighbor list: `c`
 is a neighbor of `a`, `b < c`, and no neighbor of `a` lies strictly between
 `b` and `c`. -/
 private noncomputable def succNbrF (a b c : α) : hamL.Formula α :=
-  edgeF (Term.var a) (Term.var c) ⊓ ltF (Term.var b) (Term.var c) ⊓
-    ((edgeF (Term.var (Sum.inl a)) (Term.var (Sum.inr 0))).imp
-      (leF (Term.var (Sum.inr 0)) (Term.var (Sum.inl b)) ⊔
-        leF (Term.var (Sum.inl c)) (Term.var (Sum.inr 0)))).iAlls (Fin 1)
+  fo%[a, b, c] (edgeF⟨a, c⟩ ∧ ltF⟨b, c⟩) ∧
+    ∀ y, edgeF⟨a, y⟩ → leF⟨y, b⟩ ∨ leF⟨c, y⟩
 
 end Formulas
 
@@ -114,15 +112,14 @@ section Realize
 variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] {α : Type} (v : α → A)
 
 @[simp]
-theorem realize_adjOrF (s t : hamL.Term α) :
-    (adjOrF s t).Realize v ↔
-      MGAdj (s.realize v) (t.realize v) ∨ MGAdj (t.realize v) (s.realize v) := by
+theorem realize_adjOrF (s t : α) :
+    (adjOrF s t).Realize v ↔ MGAdj (v s) (v t) ∨ MGAdj (v t) (v s) := by
   rw [adjOrF, Formula.realize_sup, Formula.realize_rel₂, Formula.realize_rel₂]
   simp [MGAdj]
 
 @[simp]
-theorem realize_edgeF (s t : hamL.Term α) :
-    (edgeF s t).Realize v ↔ HEdge (s.realize v) (t.realize v) := by
+theorem realize_edgeF (s t : α) :
+    (edgeF s t).Realize v ↔ HEdge (v s) (v t) := by
   rw [edgeF, Formula.realize_inf, Formula.realize_not, Formula.realize_equal, realize_adjOrF]
   rfl
 
@@ -130,14 +127,14 @@ theorem realize_minNbrF (a b : α) :
     (minNbrF a b).Realize v ↔ ∀ d : A, HEdge (v a) d → v b ≤ d := by
   rw [minNbrF]
   simp only [Formula.realize_iAlls, Formula.realize_imp, realize_edgeF, realize_leF,
-    Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+    Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h d => h (fun _ => d), fun h i => h (i 0)⟩
 
 theorem realize_maxNbrF (a b : α) :
     (maxNbrF a b).Realize v ↔ ∀ d : A, HEdge (v a) d → d ≤ v b := by
   rw [maxNbrF]
   simp only [Formula.realize_iAlls, Formula.realize_imp, realize_edgeF, realize_leF,
-    Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+    Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h d => h (fun _ => d), fun h i => h (i 0)⟩
 
 theorem realize_succNbrF (a b c : α) :
@@ -145,8 +142,7 @@ theorem realize_succNbrF (a b c : α) :
       ∀ d : A, HEdge (v a) d → d ≤ v b ∨ v c ≤ d := by
   rw [succNbrF]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_sup,
-    realize_edgeF, realize_ltF, realize_leF, Term.realize_var, Sum.elim_inl, Sum.elim_inr,
-    and_assoc]
+    realize_edgeF, realize_ltF, realize_leF, Sum.elim_inl, Sum.elim_inr, and_assoc]
   refine and_congr Iff.rfl (and_congr Iff.rfl ?_)
   exact ⟨fun h d => h (fun _ => d), fun h i => h (i 0)⟩
 
@@ -184,30 +180,28 @@ instance : Inhabited HTag := ⟨.sel⟩
 
 /-- Two tuples are equal, coordinatewise. -/
 private noncomputable def hEqTupF : hamL.Formula (Fin 2 × Fin 2) :=
-  Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊓ Term.equal (Term.var (0, 1)) (Term.var (1, 1))
+  fo%⟨u, v⟩ u ≐ v ∧ u[1] ≐ v[1]
 
 /-- The second tuple is the first swapped. -/
 private noncomputable def hSwapTupF : hamL.Formula (Fin 2 × Fin 2) :=
-  Term.equal (Term.var (0, 0)) (Term.var (1, 1)) ⊓ Term.equal (Term.var (0, 1)) (Term.var (1, 0))
+  fo%⟨u, v⟩ u ≐ v[1] ∧ u[1] ≐ v
 
 /-- The chain edge from an exit `⟨g5, (a, b)⟩` to the next entrance
 `⟨g0, (a, c)⟩`: same owner, and `c` the neighbor-successor of `b`. -/
 private noncomputable def hChain50F : hamL.Formula (Fin 2 × Fin 2) :=
-  Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊓ succNbrF (0, 0) (0, 1) (1, 1)
+  fo%⟨u, v⟩ u ≐ v ∧ succNbrF⟨u, u[1], v[1]⟩
 
 /-- The chain edge the other way, from `⟨g0, (a, c)⟩` to `⟨g5, (a, b)⟩`. -/
 private noncomputable def hChain05F : hamL.Formula (Fin 2 × Fin 2) :=
-  Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊓ succNbrF (0, 0) (1, 1) (0, 1)
+  fo%⟨u, v⟩ u ≐ v ∧ succNbrF⟨u, v[1], u[1]⟩
 
 /-- No vertex is marked. -/
 private noncomputable def noMarksF : hamL.Formula (Fin 2) :=
-  Formula.iAlls (Fin 1)
-    (∼(Relations.formula₁ hMarkedSym (Term.var (Sum.inr 0))) : hamL.Formula (Fin 2 ⊕ Fin 1))
+  fo% ∀ x, ¬ hMarkedSym(x)
 
 /-- No two vertices form an edge. -/
 private noncomputable def noEdgesF : hamL.Formula (Fin 2) :=
-  Formula.iAlls (Fin 2)
-    (∼(edgeF (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))) : hamL.Formula (Fin 2 ⊕ Fin 2))
+  fo% ∀ y z, ¬ edgeF⟨y, z⟩
 
 /-- **The reduction of Vertex Cover into Hamilton Circuit**: the twelve-vertex
 cover-testing gadget of each edge, chained along every vertex's neighbor list,
@@ -235,7 +229,7 @@ noncomputable def hamInterp : RelFOInterpretation hamL Language.digraph HTag 2 w
     match t with
     | .sel => Term.equal (Term.var 0) (Term.var 1) ⊓ Relations.formula₁ hMarkedSym (Term.var 0)
     | .hub => Term.equal (Term.var 0) (Term.var 1) ⊓ minF 0 ⊓ noMarksF ⊓ noEdgesF
-    | _ => edgeF (Term.var 0) (Term.var 1)
+    | _ => edgeF 0 1
 
 /-! ### Realization of the degenerate-case guards -/
 
@@ -252,8 +246,7 @@ theorem realize_noMarksF : (noMarksF).Realize w ↔ ∀ y : A, ¬MGMarked y := b
 
 theorem realize_noEdgesF : (noEdgesF).Realize w ↔ ∀ y z : A, ¬HEdge y z := by
   rw [noEdgesF]
-  simp only [Formula.realize_iAlls, Formula.realize_not, realize_edgeF, Term.realize_var,
-    Sum.elim_inr]
+  simp only [Formula.realize_iAlls, Formula.realize_not, realize_edgeF, Sum.elim_inr]
   exact ⟨fun h y z => h ![y, z], fun h i => h (i 0) (i 1)⟩
 
 end DomRealize
@@ -267,10 +260,9 @@ variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
 /-- The domain formula of a gadget tag says the tuple is an edge. -/
 theorem dom_gadget (t : HTag) (ht : t ≠ .sel ∧ t ≠ .hub) (w : Fin 2 → A) :
     (hamInterp.domFormula t).Realize w ↔ HEdge (w 0) (w 1) := by
-  have : hamInterp.domFormula t = edgeF (Term.var 0) (Term.var 1) := by
+  have : hamInterp.domFormula t = edgeF 0 1 := by
     cases t <;> first | rfl | (exfalso; simp_all)
   rw [this, realize_edgeF]
-  rfl
 
 theorem dom_sel (w : Fin 2 → A) :
     (hamInterp.domFormula .sel).Realize w ↔ w 0 = w 1 ∧ MGMarked (w 0) := by

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.CodeHalt.Cert
 import DescriptiveComplexity.RecursivelyEnumerable
 import DescriptiveComplexity.Problems.FinSat
@@ -183,39 +184,32 @@ variable {ρ : evBlock.Assignment (A ⊕ Fin m)} {γ : Type}
 
 /-- An atom of a unary relation of the instance. -/
 noncomputable def instF₁ (R : Language.code.Relations 1) (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ (instSym R) (Term.var x)
+  fo%[x] (instSym R)(x)
 
 /-- An atom of a binary relation of the instance. -/
 noncomputable def instF₂ (R : Language.code.Relations 2) (x y : γ) : certLang.Formula γ :=
-  Relations.formula₂ (instSym R) (Term.var x) (Term.var y)
+  fo%[x, y] (instSym R)(x, y)
 
 /-- `x` is an original element. -/
-noncomputable def oldF (x : γ) : certLang.Formula γ :=
-  Relations.formula₁ oldSym (Term.var x)
+noncomputable def oldF (x : γ) : certLang.Formula γ := fo%[x] oldSym(x)
 
 /-- Equality of two variables. -/
-noncomputable def eqF (x y : γ) : certLang.Formula γ :=
-  Term.equal (Term.var x) (Term.var y)
+noncomputable def eqF (x y : γ) : certLang.Formula γ := fo%[x, y] x ≐ y
 
 /-- The numeral `x` is at most the numeral `y`. -/
-noncomputable def leF (x y : γ) : certLang.Formula γ :=
-  Relations.formula₂ leSym (Term.var x) (Term.var y)
+noncomputable def leF (x y : γ) : certLang.Formula γ := fo%[x, y] leSym(x, y)
 
 /-- `x + y = z`. -/
-noncomputable def addF (x y z : γ) : certLang.Formula γ :=
-  addSym.formula ![Term.var x, Term.var y, Term.var z]
+noncomputable def addF (x y z : γ) : certLang.Formula γ := fo%[x, y, z] addSym(x, y, z)
 
 /-- `⟨a, b⟩ = p`. -/
-noncomputable def prF (a b p : γ) : certLang.Formula γ :=
-  prSym.formula ![Term.var a, Term.var b, Term.var p]
+noncomputable def prF (a b p : γ) : certLang.Formula γ := fo%[a, b, p] prSym(a, b, p)
 
 /-- The node `n` draws the code numbered `e`. -/
-noncomputable def decF (n e : γ) : certLang.Formula γ :=
-  Relations.formula₂ decSym (Term.var n) (Term.var e)
+noncomputable def decF (n e : γ) : certLang.Formula γ := fo%[n, e] decSym(n, e)
 
 /-- The code numbered `e` returns `v` on `x`. -/
-noncomputable def evF (e x v : γ) : certLang.Formula γ :=
-  evSym.formula ![Term.var e, Term.var x, Term.var v]
+noncomputable def evF (e x v : γ) : certLang.Formula γ := fo%[e, x, v] evSym(e, x, v)
 
 @[simp]
 theorem realize_instF₁ (R : Language.code.Relations 1) (x : γ) (v : γ → A ⊕ Fin m) :
@@ -467,7 +461,7 @@ The order-theoretic shapes (`IsZ`, `IsS`, strictly below) and the arithmetic
 of a code's number, each a builder used many times below. -/
 
 /-- The numeral `x` is strictly below `y`. -/
-noncomputable def ltF (x y : γ) : certLang.Formula γ := leF x y ⊓ ∼(eqF x y)
+noncomputable def ltF (x y : γ) : certLang.Formula γ := fo%[x, y] leF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
 
 /-- `x` is the least numeral. -/
 noncomputable def isZF (x : γ) : certLang.Formula γ := allNewF (leF (up x) vr0)
@@ -525,10 +519,11 @@ noncomputable def isRfindEF (e e₁ : γ) : certLang.Formula γ :=
 
 /-- `(a, b)` is the pair enumerated just after `(a', b')`. -/
 noncomputable def nextPRF (a' b' a b : γ) : certLang.Formula γ :=
-  (ltF a' b' ⊓ isSF a' a ⊓ ltF a b' ⊓ eqF b b') ⊔
-    ((isSF a' b' ⊓ eqF a b' ⊓ isZF b) ⊔
-      ((leF b' a' ⊓ isSF b' b ⊓ leF b a' ⊓ eqF a a') ⊔
-        (eqF a' b' ⊓ isZF a ⊓ isSF b' b)))
+  fo%[a', b', a, b]
+    (((ltF⟨a', b'⟩ ∧ isSF⟨a', a⟩) ∧ ltF⟨a, b'⟩) ∧ eqF⟨b, b'⟩) ∨
+      ((isSF⟨a', b'⟩ ∧ eqF⟨a, b'⟩) ∧ isZF⟨b⟩) ∨
+        (((leF⟨b', a'⟩ ∧ isSF⟨b', b⟩) ∧ leF⟨b, a'⟩) ∧ eqF⟨a, a'⟩) ∨
+          ((eqF⟨a', b'⟩ ∧ isZF⟨a⟩) ∧ isSF⟨b', b⟩)
 
 /-! ### The order of the numeral segment -/
 

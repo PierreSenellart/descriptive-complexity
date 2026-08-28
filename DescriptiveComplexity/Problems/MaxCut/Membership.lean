@@ -3,6 +3,8 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.MaxCut.Defs
 import DescriptiveComplexity.Problems.Feedback.Membership
 import DescriptiveComplexity.Hierarchy
@@ -27,53 +29,22 @@ section SigmaOne
 /-- The single existential block of the `Σ₁` definition of Max Cut: one side
 of the cut (unary) and an injection of the marked relation into the cut
 (quaternary: it maps pairs to pairs). -/
-def maxCutGuessBlock : SOBlock where
-  ι := Bool
-  arity := fun i => match i with
-    | false => 1
-    | true => 4
-
-/-- The symbol of the relation variable holding one side of the cut. -/
-def mcSideRel : maxCutGuessBlock.lang.Relations 1 := ⟨false, rfl⟩
-
-/-- The symbol of the injection relation variable. -/
-def mcInjRel : maxCutGuessBlock.lang.Relations 4 := ⟨true, rfl⟩
-
-/-- The vocabulary of the kernel: arc-marked graphs together with the two
-guessed relation variables. -/
-abbrev mcSOLang : Language := Language.markedArcGraph.sum maxCutGuessBlock.lang
-
-/-- The adjacency symbol in the kernel's vocabulary. -/
-abbrev mcAdjSym : mcSOLang.Relations 2 := Sum.inl magAdj
-
-/-- The mark symbol in the kernel's vocabulary. -/
-abbrev mcMarkedSym : mcSOLang.Relations 2 := Sum.inl magMarked
-
-/-- The cut-side symbol in the kernel's vocabulary. -/
-abbrev mcSideSym : mcSOLang.Relations 1 := Sum.inr mcSideRel
-
-/-- The injection symbol in the kernel's vocabulary. -/
-abbrev mcInjSym : mcSOLang.Relations 4 := Sum.inr mcInjRel
+fo_block maxCutGuessBlock over Language.markedArcGraph mag into mcSOLang with mc where
+  /-- One side of the cut. -/
+  side : 1
+  /-- The injection of the marked relation into the cut. -/
+  inj : 4
 
 /-- Kernel conjunct: the guessed injection maps every marked pair to a pair
 crossing the cut. -/
 private noncomputable def mcTotalClause : mcSOLang.Sentence :=
-  ((Relations.formula₂ mcMarkedSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))).imp
-    ((Relations.formula mcInjSym ![Term.var (Sum.inl (Sum.inr 0)),
-          Term.var (Sum.inl (Sum.inr 1)), Term.var (Sum.inr 0), Term.var (Sum.inr 1)] ⊓
-      (Relations.formula₂ mcAdjSym (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)) ⊓
-        (Relations.formula₁ mcSideSym (Term.var (Sum.inr 0)) ⊓
-          ∼(Relations.formula₁ mcSideSym (Term.var (Sum.inr 1)))))).iExs
-      (Fin 2))).iAlls (Fin 2)
+  fo% ∀ a b, mcMarkedSym(a, b) →
+    ∃ c d, mcInjSym(a, b, c, d) ∧ mcAdjSym(c, d) ∧ mcSideSym(c) ∧ ¬ mcSideSym(d)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
 private noncomputable def mcInjClause : mcSOLang.Sentence :=
-  ((Relations.formula mcInjSym ![Term.var (Sum.inr 0), Term.var (Sum.inr 1),
-        Term.var (Sum.inr 4), Term.var (Sum.inr 5)] ⊓
-      Relations.formula mcInjSym ![Term.var (Sum.inr 2), Term.var (Sum.inr 3),
-        Term.var (Sum.inr 4), Term.var (Sum.inr 5)]).imp
-    (Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 2)) ⊓
-      Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 3)))).iAlls (Fin 6)
+  fo% ∀ a b a' b' c d,
+    mcInjSym(a, b, c, d) ∧ mcInjSym(a', b', c, d) → a ≐ a' ∧ b ≐ b'
 
 /-- The first-order kernel of the `Σ₁` definition of Max Cut. -/
 noncomputable def maxCutKernel : mcSOLang.Sentence :=
@@ -86,14 +57,14 @@ private theorem realize_maxCutKernel {A : Type} [Language.markedArcGraph.Structu
     (@Sentence.Realize mcSOLang A
         (@sumStructure _ _ A _ (maxCutGuessBlock.structure ρ)) maxCutKernel) ↔
       (∀ a b : A, MAGMarked a b → ∃ c d : A,
-          ρ true ![a, b, c, d] ∧ MAGAdj c d ∧ ρ false ![c] ∧ ¬ρ false ![d]) ∧
-        ∀ a b a' b' c d : A, ρ true ![a, b, c, d] → ρ true ![a', b', c, d] →
+          ρ .inj ![a, b, c, d] ∧ MAGAdj c d ∧ ρ .side ![c] ∧ ¬ρ .side ![d]) ∧
+        ∀ a b a' b' c d : A, ρ .inj ![a, b, c, d] → ρ .inj ![a', b', c, d] →
           a = a' ∧ b = b' := by
   let := maxCutGuessBlock.structure ρ
   have hsubS : ∀ (w : Fin 1 → A),
-      RelMap (L := mcSOLang) (M := A) mcSideSym w ↔ ρ false w := fun _ => Iff.rfl
+      RelMap (L := mcSOLang) (M := A) mcSideSym w ↔ ρ .side w := fun _ => Iff.rfl
   have hsubI : ∀ (w : Fin 4 → A),
-      RelMap (L := mcSOLang) (M := A) mcInjSym w ↔ ρ true w := fun _ => Iff.rfl
+      RelMap (L := mcSOLang) (M := A) mcInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
   rw [maxCutKernel]
   simp only [mcTotalClause, mcInjClause, Sentence.Realize, Formula.realize_inf,
     Formula.realize_iAlls, Formula.realize_imp, Formula.realize_iExs,
@@ -121,8 +92,8 @@ theorem maxCut_sigmaSODefinable : SigmaSODefinable 1 MaxCut := by
   · rintro ⟨-, hmc⟩
     obtain ⟨S, ⟨e⟩⟩ := (maxCutOn_iff_certificate _ _).mp hmc
     refine ⟨fun i => match i with
-      | false => fun w : Fin 1 → A => S (w 0)
-      | true => fun w : Fin 4 → A =>
+      | .side => fun w : Fin 1 → A => S (w 0)
+      | .inj => fun w : Fin 4 → A =>
           ∃ h : MAGMarked (w 0) (w 1),
             (e ⟨(w 0, w 1), h⟩ : {p : A × A // CutRel MAGAdj S p.1 p.2}).1 = (w 2, w 3), ?_⟩
     refine (realize_maxCutKernel _).mpr ⟨fun a b hab =>
@@ -136,14 +107,14 @@ theorem maxCut_sigmaSODefinable : SigmaSODefinable 1 MaxCut := by
   · rintro ⟨ρ, hρ⟩
     obtain ⟨htot, hinj⟩ := (realize_maxCutKernel ρ).mp hρ
     have hch : ∀ p : {p : A × A // MAGMarked p.1 p.2},
-        ∃ q : A × A, ρ true ![p.1.1, p.1.2, q.1, q.2] ∧
-          CutRel MAGAdj (fun a => ρ false ![a]) q.1 q.2 := by
+        ∃ q : A × A, ρ .inj ![p.1.1, p.1.2, q.1, q.2] ∧
+          CutRel MAGAdj (fun a => ρ .side ![a]) q.1 q.2 := by
       rintro ⟨⟨a, b⟩, hab⟩
       obtain ⟨c, d, h₁, h₂, h₃, h₄⟩ := htot a b hab
       exact ⟨(c, d), h₁, h₂, h₃, h₄⟩
     choose f hf1 hf2 using hch
     refine ⟨‹Finite A›, (maxCutOn_iff_certificate _ _).mpr
-      ⟨fun a => ρ false ![a], ⟨⟨fun p => ⟨f p, hf2 p⟩, fun p p' hpp' => ?_⟩⟩⟩⟩
+      ⟨fun a => ρ .side ![a], ⟨⟨fun p => ⟨f p, hf2 p⟩, fun p p' hpp' => ?_⟩⟩⟩⟩
     have hval : f p = f p' := congrArg Subtype.val hpp'
     obtain ⟨h₁, h₂⟩ := hinj p.1.1 p.1.2 p'.1.1 p'.1.2 (f p).1 (f p).2 (hf1 p)
       (by rw [hval]; exact hf1 p')

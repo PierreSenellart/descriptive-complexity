@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Machine.AltMatrix
 import DescriptiveComplexity.Problems.Machine.AltDefs
 
@@ -107,87 +108,72 @@ section Builders
 variable {k : ℕ} {α : Type}
 
 /-- `x` is a position, as a formula. -/
-def akPosnF (x : α) : (akLang k).Formula α := Relations.formula₁ akPosnSym (Term.var x)
+def akPosnF (x : α) : (akLang k).Formula α := fo%[x] akPosnSym(x)
 
 /-- `x` is a transition, as a formula. -/
-def akTrF (x : α) : (akLang k).Formula α := Relations.formula₁ akTrSym (Term.var x)
+def akTrF (x : α) : (akLang k).Formula α := fo%[x] akTrSym(x)
 
 /-- `x` is a start state, as a formula. -/
-def akStartF (x : α) : (akLang k).Formula α := Relations.formula₁ akStartSym (Term.var x)
+def akStartF (x : α) : (akLang k).Formula α := fo%[x] akStartSym(x)
 
 /-- `x` is an accepting state, as a formula. -/
-def akAccF (x : α) : (akLang k).Formula α := Relations.formula₁ akAccSym (Term.var x)
+def akAccF (x : α) : (akLang k).Formula α := fo%[x] akAccSym(x)
 
 /-- `x` is the blank symbol, as a formula. -/
-def akBlankF (x : α) : (akLang k).Formula α := Relations.formula₁ akBlankSym (Term.var x)
+def akBlankF (x : α) : (akLang k).Formula α := fo%[x] akBlankSym(x)
 
 /-- `x` moves the head right, as a formula. -/
-def akRightF (x : α) : (akLang k).Formula α := Relations.formula₁ akRightSym (Term.var x)
+def akRightF (x : α) : (akLang k).Formula α := fo%[x] akRightSym(x)
 
 /-- `x` carries the mark of block `j`, as a formula. -/
-def akBlkF (j : Fin k) (x : α) : (akLang k).Formula α :=
-  Relations.formula₁ (akBlkSym j) (Term.var x)
+def akBlkF (j : Fin k) (x : α) : (akLang k).Formula α := fo%[x] (akBlkSym j)(x)
 
 /-- `x ≤ y`, as a formula. -/
-def akLeF (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ akLeSym (Term.var x) (Term.var y)
+def akLeF (x y : α) : (akLang k).Formula α := fo%[x, y] akLeSym(x, y)
 
 /-- `x = y`, as a formula. -/
-def akEqF (x y : α) : (akLang k).Formula α := Term.equal (Term.var x) (Term.var y)
+def akEqF (x y : α) : (akLang k).Formula α := fo%[x, y] x ≐ y
 
 /-- The transition `x` applies in the state `y`, as a formula. -/
-def akSrcF (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ akSrcSym (Term.var x) (Term.var y)
+def akSrcF (x y : α) : (akLang k).Formula α := fo%[x, y] akSrcSym(x, y)
 
 /-- The transition `x` reads the symbol `y`, as a formula. -/
-def akReadF (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ akReadSym (Term.var x) (Term.var y)
+def akReadF (x y : α) : (akLang k).Formula α := fo%[x, y] akReadSym(x, y)
 
 /-- The transition `x` moves to the state `y`, as a formula. -/
-def akDstF (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ akDstSym (Term.var x) (Term.var y)
+def akDstF (x y : α) : (akLang k).Formula α := fo%[x, y] akDstSym(x, y)
 
 /-- The transition `x` writes the symbol `y`, as a formula. -/
-def akWriteF (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ akWriteSym (Term.var x) (Term.var y)
+def akWriteF (x y : α) : (akLang k).Formula α := fo%[x, y] akWriteSym(x, y)
 
 /-- The cell `x` initially holds `y`, as a formula. -/
-def akInpF (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ akInpSym (Term.var x) (Term.var y)
+def akInpF (x y : α) : (akLang k).Formula α := fo%[x, y] akInpSym(x, y)
 
 /-- In round `i`, the state at time `x` is `y`. -/
-def akStF (i : Fin k) (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ (akSt i) (Term.var x) (Term.var y)
+def akStF (i : Fin k) (x y : α) : (akLang k).Formula α := fo%[x, y] (akSt i)(x, y)
 
 /-- In round `i`, the head at time `x` is on `y`. -/
-def akHdF (i : Fin k) (x y : α) : (akLang k).Formula α :=
-  Relations.formula₂ (akHd i) (Term.var x) (Term.var y)
+def akHdF (i : Fin k) (x y : α) : (akLang k).Formula α := fo%[x, y] (akHd i)(x, y)
 
 /-- In round `i`, at time `x` the cell `y` holds `z`. -/
-def akTpF (i : Fin k) (x y z : α) : (akLang k).Formula α :=
-  (akTp i).formula ![Term.var x, Term.var y, Term.var z]
+def akTpF (i : Fin k) (x y z : α) : (akLang k).Formula α := fo%[x, y, z] (akTp i)(x, y, z)
 
 /-- `x` is the lowest position, as a formula. -/
 noncomputable def akMinPosF (x : α) : (akLang k).Formula α :=
-  akPosnF x ⊓ Formula.iAlls (Fin 1)
-    ((akPosnF (Sum.inr 0)).imp (akLeF (Sum.inl x) (Sum.inr 0)))
+  fo%[x] akPosnF⟨x⟩ ∧ ∀ y, akPosnF⟨y⟩ → akLeF⟨x, y⟩
 
 /-- `x` is the highest position, as a formula. -/
 noncomputable def akMaxPosF (x : α) : (akLang k).Formula α :=
-  akPosnF x ⊓ Formula.iAlls (Fin 1)
-    ((akPosnF (Sum.inr 0)).imp (akLeF (Sum.inr 0) (Sum.inl x)))
+  fo%[x] akPosnF⟨x⟩ ∧ ∀ y, akPosnF⟨y⟩ → akLeF⟨y, x⟩
 
 /-- `y` is the position immediately above `x`, as a formula. -/
 noncomputable def akSuccPosF (x y : α) : (akLang k).Formula α :=
-  akPosnF x ⊓ (akPosnF y ⊓ (akLeF x y ⊓ (∼(akEqF x y) ⊓
-    Formula.iAlls (Fin 1)
-      ((akPosnF (Sum.inr 0) ⊓ (akLeF (Sum.inl x) (Sum.inr 0) ⊓
-          akLeF (Sum.inr 0) (Sum.inl y))).imp
-        (akEqF (Sum.inr 0) (Sum.inl x) ⊔ akEqF (Sum.inr 0) (Sum.inl y))))))
+  fo%[x, y] akPosnF⟨x⟩ ∧ akPosnF⟨y⟩ ∧ akLeF⟨x, y⟩ ∧ ¬ akEqF⟨x, y⟩ ∧
+    ∀ z, akPosnF⟨z⟩ ∧ akLeF⟨x, z⟩ ∧ akLeF⟨z, y⟩ → akEqF⟨z, x⟩ ∨ akEqF⟨z, y⟩
 
 /-- The cell `x` may initially hold `y`. -/
 noncomputable def akInitTapeF (x y : α) : (akLang k).Formula α :=
-  akInpF x y ⊔ (Formula.iAlls (Fin 1) (∼(akInpF (Sum.inl x) (Sum.inr 0))) ⊓ akBlankF y)
+  fo%[x, y] akInpF⟨x, y⟩ ∨ (∀ z, ¬ akInpF⟨x, z⟩) ∧ akBlankF⟨y⟩
 
 /-- The state `x` is in a block at most `i`. -/
 noncomputable def akBlkLeF (i : Fin k) (x : α) : (akLang k).Formula α :=
@@ -196,94 +182,64 @@ noncomputable def akBlkLeF (i : Fin k) (x : α) : (akLang k).Formula α :=
 /-- In round `i`, the state at time `t` is in a block at most `i` – that is, in
 a block below `i + 1`. -/
 noncomputable def akBlkLtF (i : Fin k) (t : α) : (akLang k).Formula α :=
-  Formula.iAlls (Fin 1) ((akStF i (Sum.inl t) (Sum.inr 0)).imp (akBlkLeF i (Sum.inr 0)))
+  fo%[t] ∀ q, (akStF i)⟨t, q⟩ → (akBlkLeF i)⟨q⟩
 
 /-- In round `i`, the state at time `t` is accepting. -/
 noncomputable def akAccAtF (i : Fin k) (t : α) : (akLang k).Formula α :=
-  Formula.iAlls (Fin 1) ((akStF i (Sum.inl t) (Sum.inr 0)).imp (akAccF (Sum.inr 0)))
+  fo%[t] ∀ q, (akStF i)⟨t, q⟩ → akAccF⟨q⟩
 
 /-- In round `i`, the head at time `t` has somewhere to move in the direction
 `dir`. -/
 noncomputable def akMoveExF (i : Fin k) (t : α) (dir : Bool) : (akLang k).Formula α :=
-  Formula.iAlls (Fin 1)
-    ((akHdF i (Sum.inl t) (Sum.inr 0)).imp
-      (Formula.iExs (Fin 1)
-        (if dir then akSuccPosF (Sum.inl (Sum.inr 0)) (Sum.inr 0)
-          else akSuccPosF (Sum.inr 0) (Sum.inl (Sum.inr 0)))))
+  fo%[t] ∀ p, (akHdF i)⟨t, p⟩ → ∃ p', if dir then akSuccPosF⟨p, p'⟩ else akSuccPosF⟨p', p⟩
 
 /-- In round `i`, the head moves from its cell at `t` to its cell at `t'`, in
 the direction `dir`. -/
 noncomputable def akMoveF (i : Fin k) (t t' : α) (dir : Bool) : (akLang k).Formula α :=
-  Formula.iAlls (Fin 2)
-    ((akHdF i (Sum.inl t) (Sum.inr 0) ⊓ akHdF i (Sum.inl t') (Sum.inr 1)).imp
-      (if dir then akSuccPosF (Sum.inr 0) (Sum.inr 1) else akSuccPosF (Sum.inr 1) (Sum.inr 0)))
+  fo%[t, t'] ∀ p p', (akHdF i)⟨t, p⟩ ∧ (akHdF i)⟨t', p'⟩ →
+    if dir then akSuccPosF⟨p, p'⟩ else akSuccPosF⟨p', p⟩
 
 /-- **The applicable-transition body**: the transition `τ` fires on the
 configuration of round `i` at time `t`. -/
 noncomputable def akAppBodyF (i : Fin k) (t τ : α) : (akLang k).Formula α :=
-  akTrF τ ⊓
-    (Formula.iAlls (Fin 1)
-        ((akStF i (Sum.inl t) (Sum.inr 0)).imp (akSrcF (Sum.inl τ) (Sum.inr 0))) ⊓
-      (Formula.iAlls (Fin 2)
-          ((akHdF i (Sum.inl t) (Sum.inr 0) ⊓
-              akTpF i (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).imp
-            (akReadF (Sum.inl τ) (Sum.inr 1))) ⊓
-        (Formula.iExs (Fin 1) (akDstF (Sum.inl τ) (Sum.inr 0)) ⊓
-          (Formula.iExs (Fin 1) (akWriteF (Sum.inl τ) (Sum.inr 0)) ⊓
-            ((akRightF τ ⊓ akMoveExF i t true) ⊔
-              (∼(akRightF τ) ⊓ akMoveExF i t false))))))
+  fo%[t, τ] akTrF⟨τ⟩ ∧
+    (∀ q, (akStF i)⟨t, q⟩ → akSrcF⟨τ, q⟩) ∧
+    (∀ p a, (akHdF i)⟨t, p⟩ ∧ (akTpF i)⟨t, p, a⟩ → akReadF⟨τ, a⟩) ∧
+    (∃ q, akDstF⟨τ, q⟩) ∧
+    (∃ a, akWriteF⟨τ, a⟩) ∧
+    ((akRightF⟨τ⟩ ∧ !(akMoveExF i t true)) ∨ (¬ akRightF⟨τ⟩ ∧ !(akMoveExF i t false)))
 
 /-- In round `i`, some transition applies to the configuration at time `t`. -/
 noncomputable def akAppTrF (i : Fin k) (t : α) : (akLang k).Formula α :=
-  Formula.iExs (Fin 1) (akAppBodyF i (Sum.inl t) (Sum.inr 0))
+  fo%[t] ∃ τ, (akAppBodyF i)⟨t, τ⟩
 
 /-- **The step body**: in round `i`, the transition `τ` takes the configuration
 at `t` to the one at `t'`. -/
 noncomputable def akStepBodyF (i : Fin k) (t t' τ : α) : (akLang k).Formula α :=
-  akTrF τ ⊓
-    (Formula.iAlls (Fin 1)
-        ((akStF i (Sum.inl t) (Sum.inr 0)).imp (akSrcF (Sum.inl τ) (Sum.inr 0))) ⊓
-      (Formula.iAlls (Fin 2)
-          ((akHdF i (Sum.inl t) (Sum.inr 0) ⊓
-              akTpF i (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).imp
-            (akReadF (Sum.inl τ) (Sum.inr 1))) ⊓
-        (Formula.iAlls (Fin 1)
-            ((akStF i (Sum.inl t') (Sum.inr 0)).imp (akDstF (Sum.inl τ) (Sum.inr 0))) ⊓
-          (Formula.iAlls (Fin 2)
-              ((akHdF i (Sum.inl t) (Sum.inr 0) ⊓
-                  akTpF i (Sum.inl t') (Sum.inr 0) (Sum.inr 1)).imp
-                (akWriteF (Sum.inl τ) (Sum.inr 1))) ⊓
-            (Formula.iAlls (Fin 2)
-                ((∼(akHdF i (Sum.inl t) (Sum.inr 0))).imp
-                  ((akTpF i (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).iff
-                    (akTpF i (Sum.inl t') (Sum.inr 0) (Sum.inr 1)))) ⊓
-              ((akRightF τ ⊓ akMoveF i t t' true) ⊔
-                (∼(akRightF τ) ⊓ akMoveF i t t' false)))))))
+  fo%[t, t', τ] akTrF⟨τ⟩ ∧
+    (∀ q, (akStF i)⟨t, q⟩ → akSrcF⟨τ, q⟩) ∧
+    (∀ p a, (akHdF i)⟨t, p⟩ ∧ (akTpF i)⟨t, p, a⟩ → akReadF⟨τ, a⟩) ∧
+    (∀ q, (akStF i)⟨t', q⟩ → akDstF⟨τ, q⟩) ∧
+    (∀ p a, (akHdF i)⟨t, p⟩ ∧ (akTpF i)⟨t', p, a⟩ → akWriteF⟨τ, a⟩) ∧
+    (∀ p a, ¬ (akHdF i)⟨t, p⟩ → ((akTpF i)⟨t, p, a⟩ ↔ (akTpF i)⟨t', p, a⟩)) ∧
+    ((akRightF⟨τ⟩ ∧ !(akMoveF i t t' true)) ∨ (¬ akRightF⟨τ⟩ ∧ !(akMoveF i t t' false)))
 
 /-- In round `i`, the configuration at `t` steps to the one at `t'`. -/
 noncomputable def akStepF (i : Fin k) (t t' : α) : (akLang k).Formula α :=
-  Formula.iExs (Fin 1) (akStepBodyF i (Sum.inl t) (Sum.inl t') (Sum.inr 0))
+  fo%[t, t'] ∃ τ, (akStepBodyF i)⟨t, t', τ⟩
 
 /-- The configuration of round `i'` at time `t'` is the one of round `i` at
 time `t`. -/
 noncomputable def akSameF (i i' : Fin k) (t t' : α) : (akLang k).Formula α :=
-  Formula.iAlls (Fin 1)
-      ((akStF i' (Sum.inl t') (Sum.inr 0)).iff (akStF i (Sum.inl t) (Sum.inr 0))) ⊓
-    (Formula.iAlls (Fin 1)
-        ((akHdF i' (Sum.inl t') (Sum.inr 0)).iff (akHdF i (Sum.inl t) (Sum.inr 0))) ⊓
-      Formula.iAlls (Fin 2)
-        ((akTpF i' (Sum.inl t') (Sum.inr 0) (Sum.inr 1)).iff
-          (akTpF i (Sum.inl t) (Sum.inr 0) (Sum.inr 1))))
+  fo%[t, t'] (∀ q, (akStF i')⟨t', q⟩ ↔ (akStF i)⟨t, q⟩) ∧
+    (∀ p, (akHdF i')⟨t', p⟩ ↔ (akHdF i)⟨t, p⟩) ∧
+    ∀ p a, (akTpF i')⟨t', p, a⟩ ↔ (akTpF i)⟨t, p, a⟩
 
 /-- In round `i`, the configuration at time `t` is initial. -/
 noncomputable def akInitAtF (i : Fin k) (t : α) : (akLang k).Formula α :=
-  Formula.iAlls (Fin 1)
-      ((akStF i (Sum.inl t) (Sum.inr 0)).imp (akStartF (Sum.inr 0))) ⊓
-    (Formula.iAlls (Fin 1)
-        ((akHdF i (Sum.inl t) (Sum.inr 0)).imp (akMinPosF (Sum.inr 0))) ⊓
-      Formula.iAlls (Fin 2)
-        ((akTpF i (Sum.inl t) (Sum.inr 0) (Sum.inr 1)).imp
-          (akInitTapeF (Sum.inr 0) (Sum.inr 1))))
+  fo%[t] (∀ q, (akStF i)⟨t, q⟩ → akStartF⟨q⟩) ∧
+    (∀ p, (akHdF i)⟨t, p⟩ → akMinPosF⟨p⟩) ∧
+    ∀ p a, (akTpF i)⟨t, p, a⟩ → akInitTapeF⟨p, a⟩
 
 end Builders
 
@@ -606,36 +562,27 @@ variable {k : ℕ}
 
 /-- In round `i` there is a state at each time. -/
 noncomputable def akStateExClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1) (Formula.iExs (Fin 1) (akStF i (Sum.inl (Sum.inr 0)) (Sum.inr 0)))
+  fo% ∀ t, ∃ q, (akStF i)⟨t, q⟩
 
 /-- In round `i` there is only one state at each time. -/
 noncomputable def akStateUniqClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 3)
-    ((akStF i (Sum.inr 0) (Sum.inr 1) ⊓ akStF i (Sum.inr 0) (Sum.inr 2)).imp
-      (akEqF (Sum.inr 1) (Sum.inr 2)))
+  fo% ∀ t q q', (akStF i)⟨t, q⟩ ∧ (akStF i)⟨t, q'⟩ → akEqF⟨q, q'⟩
 
 /-- In round `i` the head is somewhere at each time. -/
 noncomputable def akHeadExClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1) (Formula.iExs (Fin 1) (akHdF i (Sum.inl (Sum.inr 0)) (Sum.inr 0)))
+  fo% ∀ t, ∃ p, (akHdF i)⟨t, p⟩
 
 /-- In round `i` the head is in only one place at each time. -/
 noncomputable def akHeadUniqClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 3)
-    ((akHdF i (Sum.inr 0) (Sum.inr 1) ⊓ akHdF i (Sum.inr 0) (Sum.inr 2)).imp
-      (akEqF (Sum.inr 1) (Sum.inr 2)))
+  fo% ∀ t p p', (akHdF i)⟨t, p⟩ ∧ (akHdF i)⟨t, p'⟩ → akEqF⟨p, p'⟩
 
 /-- In round `i` every cell holds a symbol at each time. -/
 noncomputable def akTapeExClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 2)
-    (Formula.iExs (Fin 1)
-      (akTpF i (Sum.inl (Sum.inr 0)) (Sum.inl (Sum.inr 1)) (Sum.inr 0)))
+  fo% ∀ t p, ∃ a, (akTpF i)⟨t, p, a⟩
 
 /-- In round `i` every cell holds only one symbol at each time. -/
 noncomputable def akTapeUniqClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 4)
-    ((akTpF i (Sum.inr 0) (Sum.inr 1) (Sum.inr 2) ⊓
-        akTpF i (Sum.inr 0) (Sum.inr 1) (Sum.inr 3)).imp
-      (akEqF (Sum.inr 2) (Sum.inr 3)))
+  fo% ∀ t p a a', (akTpF i)⟨t, p, a⟩ ∧ (akTpF i)⟨t, p, a'⟩ → akEqF⟨a, a'⟩
 
 /-- **The guess of round `i` is functional.** -/
 noncomputable def akFunClause (i : Fin k) : (akLang k).Sentence :=
@@ -644,24 +591,20 @@ noncomputable def akFunClause (i : Fin k) : (akLang k).Sentence :=
 
 /-- In round `i` the configuration at the lowest time is initial. -/
 noncomputable def akInitClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1) ((akMinPosF (Sum.inr 0)).imp (akInitAtF i (Sum.inr 0)))
+  fo% ∀ t, akMinPosF⟨t⟩ → (akInitAtF i)⟨t⟩
 
 /-- In round `i` the blocks never decrease. -/
 noncomputable def akBlkMonoClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 4)
-    ((akSuccPosF (Sum.inr 0) (Sum.inr 1) ⊓ (akStF i (Sum.inr 0) (Sum.inr 2) ⊓
-        akStF i (Sum.inr 1) (Sum.inr 3))).imp
-      (Formula.iInf fun jj : {jj : Fin k × Fin k // ¬((jj.1 : ℕ) ≤ (jj.2 : ℕ))} =>
-        ∼(akBlkF jj.1.1 (Sum.inr 2) ⊓ akBlkF jj.1.2 (Sum.inr 3))))
+  fo% ∀ t t' q q', akSuccPosF⟨t, t'⟩ ∧ (akStF i)⟨t, q⟩ ∧ (akStF i)⟨t', q'⟩ →
+    ⋀ jj : {jj : Fin k × Fin k // ¬((jj.1 : ℕ) ≤ (jj.2 : ℕ))},
+      ¬ ((akBlkF jj.1.1)⟨q⟩ ∧ (akBlkF jj.1.2)⟨q'⟩)
 
 /-- In round `i` consecutive times step or stutter, as far as the round answers
 for them. -/
 noncomputable def akStepClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 2)
-    ((akSuccPosF (Sum.inr 0) (Sum.inr 1) ⊓ akBlkLtF i (Sum.inr 0)).imp
-      ((akStepF i (Sum.inr 0) (Sum.inr 1) ⊓ ∼(akAccAtF i (Sum.inr 0))) ⊔
-        (akSameF i i (Sum.inr 0) (Sum.inr 1) ⊓
-          (akAccAtF i (Sum.inr 0) ⊔ ∼(akAppTrF i (Sum.inr 0))))))
+  fo% ∀ t t', akSuccPosF⟨t, t'⟩ ∧ (akBlkLtF i)⟨t⟩ →
+    ((akStepF i)⟨t, t'⟩ ∧ ¬ (akAccAtF i)⟨t⟩) ∨
+      ((akSameF i i)⟨t, t'⟩ ∧ ((akAccAtF i)⟨t⟩ ∨ ¬ (akAppTrF i)⟨t⟩))
 
 /-- **The guess of round `i` is legal below block `i + 1`.** -/
 noncomputable def akLegalClause (i : Fin k) : (akLang k).Sentence :=
@@ -669,57 +612,46 @@ noncomputable def akLegalClause (i : Fin k) : (akLang k).Sentence :=
 
 /-- **Round `i` reproduces what round `j` committed.** -/
 noncomputable def akAgreeClause (j i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1)
-      ((akPosnF (Sum.inr 0) ⊓ akBlkLtF j (Sum.inr 0)).imp
-        (akSameF j i (Sum.inr 0) (Sum.inr 0))) ⊓
-    Formula.iAlls (Fin 2)
-      ((akSuccPosF (Sum.inr 0) (Sum.inr 1) ⊓ akBlkLtF j (Sum.inr 0)).imp
-        (akSameF j i (Sum.inr 1) (Sum.inr 1)))
+  fo% (∀ t, akPosnF⟨t⟩ ∧ (akBlkLtF j)⟨t⟩ → (akSameF j i)⟨t, t⟩) ∧
+    ∀ t t', akSuccPosF⟨t, t'⟩ ∧ (akBlkLtF j)⟨t⟩ → (akSameF j i)⟨t', t'⟩
 
 /-- **The guess of round `i` accepts.** -/
 noncomputable def akAccClause (i : Fin k) : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1) ((akMaxPosF (Sum.inr 0)).imp (akAccAtF i (Sum.inr 0)))
+  fo% ∀ t, akMaxPosF⟨t⟩ → (akAccAtF i)⟨t⟩
 
 variable (k)
 
 /-- The order is reflexive. -/
 noncomputable def akReflClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1) (akLeF (Sum.inr 0) (Sum.inr 0))
+  fo% ∀ a, akLeF⟨a, a⟩
 
 /-- The order is transitive. -/
 noncomputable def akTransClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 3)
-    ((akLeF (Sum.inr 0) (Sum.inr 1) ⊓ akLeF (Sum.inr 1) (Sum.inr 2)).imp
-      (akLeF (Sum.inr 0) (Sum.inr 2)))
+  fo% ∀ a b c, akLeF⟨a, b⟩ ∧ akLeF⟨b, c⟩ → akLeF⟨a, c⟩
 
 /-- The order is antisymmetric. -/
 noncomputable def akAntisymClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 2)
-    ((akLeF (Sum.inr 0) (Sum.inr 1) ⊓ akLeF (Sum.inr 1) (Sum.inr 0)).imp
-      (akEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ a b, akLeF⟨a, b⟩ ∧ akLeF⟨b, a⟩ → akEqF⟨a, b⟩
 
 /-- The order is total. -/
 noncomputable def akTotalClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 2) (akLeF (Sum.inr 0) (Sum.inr 1) ⊔ akLeF (Sum.inr 1) (Sum.inr 0))
+  fo% ∀ a b, akLeF⟨a, b⟩ ∨ akLeF⟨b, a⟩
 
 /-- There is a position. -/
 noncomputable def akPosnExClause : (akLang k).Sentence :=
-  Formula.iExs (Fin 1) (akPosnF (Sum.inr 0))
+  fo% ∃ p, akPosnF⟨p⟩
 
 /-- The input is functional. -/
 noncomputable def akInpFunClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 3)
-    ((akInpF (Sum.inr 0) (Sum.inr 1) ⊓ akInpF (Sum.inr 0) (Sum.inr 2)).imp
-      (akEqF (Sum.inr 1) (Sum.inr 2)))
+  fo% ∀ p a b, akInpF⟨p, a⟩ ∧ akInpF⟨p, b⟩ → akEqF⟨a, b⟩
 
 /-- There is a blank symbol. -/
 noncomputable def akBlankExClause : (akLang k).Sentence :=
-  Formula.iExs (Fin 1) (akBlankF (Sum.inr 0))
+  fo% ∃ b, akBlankF⟨b⟩
 
 /-- There is only one blank symbol. -/
 noncomputable def akBlankUniqClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 2)
-    ((akBlankF (Sum.inr 0) ⊓ akBlankF (Sum.inr 1)).imp (akEqF (Sum.inr 0) (Sum.inr 1)))
+  fo% ∀ a b, akBlankF⟨a⟩ ∧ akBlankF⟨b⟩ → akEqF⟨a, b⟩
 
 /-- **The instance is a well-formed machine.** -/
 noncomputable def akWfClause : (akLang k).Sentence :=
@@ -728,25 +660,17 @@ noncomputable def akWfClause : (akLang k).Sentence :=
 
 /-- Every state carries exactly one block mark. -/
 noncomputable def akOneBlkClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1)
-    (Formula.iSup fun j : Fin k =>
-      akBlkF j (Sum.inr 0) ⊓
-        Formula.iInf fun j' : {j' : Fin k // j' ≠ j} => ∼(akBlkF j'.1 (Sum.inr 0)))
+  fo% ∀ q, ⋁ j : Fin k, (akBlkF j)⟨q⟩ ∧ ⋀ j' : {j' : Fin k // j' ≠ j}, ¬ (akBlkF j'.1)⟨q⟩
 
 /-- A transition stays in its block or moves to the next one. -/
 noncomputable def akStepBlkClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 3)
-    ((akTrF (Sum.inr 0) ⊓ (akSrcF (Sum.inr 0) (Sum.inr 1) ⊓
-        akDstF (Sum.inr 0) (Sum.inr 2))).imp
-      (Formula.iInf fun jj : {jj : Fin k × Fin k //
-          ¬((jj.1 : ℕ) ≤ (jj.2 : ℕ) ∧ (jj.2 : ℕ) ≤ (jj.1 : ℕ) + 1)} =>
-        ∼(akBlkF jj.1.1 (Sum.inr 1) ⊓ akBlkF jj.1.2 (Sum.inr 2))))
+  fo% ∀ τ q q', akTrF⟨τ⟩ ∧ akSrcF⟨τ, q⟩ ∧ akDstF⟨τ, q'⟩ →
+    ⋀ jj : {jj : Fin k × Fin k // ¬((jj.1 : ℕ) ≤ (jj.2 : ℕ) ∧ (jj.2 : ℕ) ≤ (jj.1 : ℕ) + 1)},
+      ¬ ((akBlkF jj.1.1)⟨q⟩ ∧ (akBlkF jj.1.2)⟨q'⟩)
 
 /-- A start state is in block `0`. -/
 noncomputable def akStartBlkClause : (akLang k).Sentence :=
-  Formula.iAlls (Fin 1)
-    ((akStartF (Sum.inr 0)).imp
-      (Formula.iSup fun j : {j : Fin k // (j : ℕ) = 0} => akBlkF j.1 (Sum.inr 0)))
+  fo% ∀ q, akStartF⟨q⟩ → ⋁ j : {j : Fin k // (j : ℕ) = 0}, (akBlkF j.1)⟨q⟩
 
 /-- **The block structure is well formed.** -/
 noncomputable def akBwfClause : (akLang k).Sentence :=
@@ -755,7 +679,7 @@ noncomputable def akBwfClause : (akLang k).Sentence :=
 /-- There is a start state – the one existence clause of the game that is not
 redundant. -/
 noncomputable def akStartExClause : (akLang k).Sentence :=
-  Formula.iExs (Fin 1) (akStartF (Sum.inr 0))
+  fo% ∃ q, akStartF⟨q⟩
 
 end Clauses
 

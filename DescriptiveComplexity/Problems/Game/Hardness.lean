@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Game.Membership
 import DescriptiveComplexity.Problems.HornSat
 import DescriptiveComplexity.Problems.HornSat.Unsat
@@ -101,11 +102,7 @@ noncomputable def negInG (c x : γ) : satOrd.Formula γ :=
 /-- The instance is **not** Horn: some clause has two distinct positive
 literals. A sentence, so every defining formula may use it. -/
 noncomputable def nonHornG : satOrd.Formula γ :=
-  Formula.iExs (Fin 3)
-    (((isClauseG (Sum.inr 0) ⊓ posInG (Sum.inr 0) (Sum.inr 1)) ⊓
-        posInG (Sum.inr 0) (Sum.inr 2)) ⊓
-      ∼(show satOrd.Formula (γ ⊕ Fin 3) from
-        Term.equal (Term.var (Sum.inr 1)) (Term.var (Sum.inr 2))))
+  fo% ∃ c x y, ((isClauseG⟨c⟩ ∧ posInG⟨c, x⟩) ∧ posInG⟨c, y⟩) ∧ ¬ x ≐ y
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {v : γ → A}
 
@@ -149,8 +146,8 @@ noncomputable def gameInterp : FOInterpretation satOrd Language.andOrGraph GTag 
     match n, R with
     | _, .move => fun t =>
         match t 0, t 1 with
-        | .var, .cl => isClauseG (1, 0) ⊓ posInG (1, 0) (0, 0)
-        | .cl, .var => isClauseG (0, 0) ⊓ negInG (0, 0) (1, 0)
+        | .var, .cl => fo%⟨x, c⟩ isClauseG⟨c⟩ ∧ posInG⟨c, x⟩
+        | .cl, .var => fo%⟨c, x⟩ isClauseG⟨c⟩ ∧ negInG⟨c, x⟩
         | _, _ => ⊥
     | _, .univ => fun t =>
         match t 0 with
@@ -159,13 +156,11 @@ noncomputable def gameInterp : FOInterpretation satOrd Language.andOrGraph GTag 
     | _, .start => fun t =>
         match t 0 with
         | .var => nonHornG
-        | .cl => (isClauseG (0, 0) ⊓
-            Formula.iAlls (Fin 1) (∼(posInG (Sum.inl (0, 0)) (Sum.inr 0)))) ⊔ nonHornG
+        | .cl => fo%⟨c⟩ (isClauseG⟨c⟩ ∧ ∀ x, ¬ posInG⟨c, x⟩) ∨ !nonHornG
     | _, .won => fun t =>
         match t 0 with
         | .var => nonHornG
-        | .cl => (isClauseG (0, 0) ⊓
-            Formula.iAlls (Fin 1) (∼(negInG (Sum.inl (0, 0)) (Sum.inr 0)))) ⊔ nonHornG
+        | .cl => fo%⟨c⟩ (isClauseG⟨c⟩ ∧ ∀ y, ¬ negInG⟨c, y⟩) ∨ !nonHornG
 
 /-! ### The points -/
 

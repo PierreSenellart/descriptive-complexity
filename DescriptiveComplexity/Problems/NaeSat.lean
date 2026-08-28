@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.OrderWalk
@@ -336,14 +337,8 @@ section SigmaOne
 /-- The mirror of `DescriptiveComplexity.satKernel`: every clause contains a *false*
 literal. Together they say that no clause is all-equal. -/
 noncomputable def naeFalseKernel : satSOLang.Sentence :=
-  ((Relations.formula₁ kIsClSym (Term.var (Sum.inr 0))).imp
-    (((Relations.formula₂ kPosSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        ∼(Relations.formula₁ kNuSym (Term.var (Sum.inr ())))) ⊔
-      (Relations.formula₂ kNegSym (Term.var (Sum.inl (Sum.inr 0)))
-          (Term.var (Sum.inr ())) ⊓
-        Relations.formula₁ kNuSym (Term.var (Sum.inr ())))).iExs
-      Unit)).iAlls (Fin 1)
+  fo% ∀ c, kIsClSym(c) →
+    ∃ x, (kPosSym(c, x) ∧ ¬ kNuSym(x)) ∨ (kNegSym(c, x) ∧ kNuSym(x))
 
 /-- The first-order kernel of the `Σ₁` definition of NAE-SAT: SAT's kernel
 conjoined with its mirror image. -/
@@ -371,8 +366,8 @@ private theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
   · intro h c hc
     obtain ⟨x, hx⟩ := h (fun _ => c) hc
     rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩
-    · exact ⟨x (), Or.inl ⟨hp, hT⟩⟩
-    · exact ⟨x (), Or.inr ⟨hn, hT⟩⟩
+    · exact ⟨x 0, Or.inl ⟨hp, hT⟩⟩
+    · exact ⟨x 0, Or.inr ⟨hn, hT⟩⟩
   · intro h i hc
     obtain ⟨x, hx⟩ := h (i 0) hc
     rcases hx with ⟨hp, hT⟩ | ⟨hn, hT⟩

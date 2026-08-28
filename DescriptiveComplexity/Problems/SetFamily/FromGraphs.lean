@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.SetFamily.Defs
 import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
@@ -60,17 +61,10 @@ def edgeIncidenceInterp :
     FOInterpretation Language.markedGraph Language.setSystem Unit 2 where
   relFormula {n} R :=
     match n, R with
-    | _, .elem => fun _ =>
-        mgAdj.formula₂ (Term.var (0, 0)) (Term.var (0, 1)) ⊓
-          ∼(Term.equal (Term.var (0, 0)) (Term.var (0, 1)))
-    | _, .fam => fun _ => Term.equal (Term.var (0, 0)) (Term.var (0, 1))
-    | _, .mem => fun _ =>
-        Term.equal (Term.var (1, 0)) (Term.var (1, 1)) ⊓
-          (Term.equal (Term.var (1, 0)) (Term.var (0, 0)) ⊔
-            Term.equal (Term.var (1, 0)) (Term.var (0, 1)))
-    | _, .marked => fun _ =>
-        Term.equal (Term.var (0, 0)) (Term.var (0, 1)) ⊓
-          mgMarked.formula₁ (Term.var (0, 0))
+    | _, .elem => fun _ => fo%⟨u⟩ mgAdj(u, u[1]) ∧ ¬ u ≐ u[1]
+    | _, .fam => fun _ => fo%⟨u⟩ u ≐ u[1]
+    | _, .mem => fun _ => fo%⟨u, v⟩ v ≐ v[1] ∧ (v ≐ u ∨ v ≐ u[1])
+    | _, .marked => fun _ => fo%⟨u⟩ u ≐ u[1] ∧ mgMarked(u)
 
 section EdgeIncidenceCharacterizations
 

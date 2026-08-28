@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Hamilton.Defs
 
 /-!
@@ -30,9 +31,7 @@ each edge becomes a pair of opposite arcs. -/
 def symInterp : FOInterpretation Language.digraph Language.digraph Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .arc => fun _ =>
-        Relations.formula₂ dgArc (Term.var (0, 0)) (Term.var (1, 0)) ⊔
-          Relations.formula₂ dgArc (Term.var (1, 0)) (Term.var (0, 0))
+    | _, .arc => fun _ => fo%⟨u, v⟩ dgArc(u, v) ∨ dgArc(v, u)
 
 section Points
 

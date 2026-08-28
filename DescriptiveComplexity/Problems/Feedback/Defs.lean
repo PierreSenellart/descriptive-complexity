@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Numbers.Unary
 import DescriptiveComplexity.Problems.CliqueFamily.Defs
@@ -58,26 +59,14 @@ namespace FirstOrder
 
 namespace Language
 
-/-- Relation symbols of the language of arc-marked digraphs. -/
-inductive markedArcGraphRel : ℕ → Type
-  /-- `adj a b`: there is an arc from `a` to `b`. -/
-  | adj : markedArcGraphRel 2
-  /-- `markedArc a b`: the pair `(a, b)` belongs to the marked relation. -/
-  | markedArc : markedArcGraphRel 2
-  deriving DecidableEq
-
 /-- The relational language of arc-marked digraphs: a digraph together with a
 marked binary relation, whose cardinality (as a set of pairs) serves as
 threshold. -/
-protected def markedArcGraph : Language :=
-  ⟨fun _ => Empty, markedArcGraphRel⟩
-  deriving IsRelational
-
-/-- The adjacency symbol of arc-marked digraphs. -/
-abbrev magAdj : Language.markedArcGraph.Relations 2 := .adj
-
-/-- The mark symbol of arc-marked digraphs. -/
-abbrev magMarked : Language.markedArcGraph.Relations 2 := .markedArc
+fo_language markedArcGraph with mag where
+  /-- `adj a b`: there is an arc from `a` to `b`. -/
+  adj : 2
+  /-- `marked a b`: the pair `(a, b)` belongs to the marked relation. -/
+  marked : 2
 
 end Language
 
@@ -297,11 +286,7 @@ section Shorthands
 
 variable {A : Type} [Language.markedArcGraph.Structure A]
 
-/-- Adjacency in an arc-marked digraph. -/
-def MAGAdj (a b : A) : Prop := RelMap magAdj ![a, b]
-
-/-- Membership in the marked relation of an arc-marked digraph. -/
-def MAGMarked (a b : A) : Prop := RelMap magMarked ![a, b]
+fo_predicates Language.markedArcGraph mag
 
 end Shorthands
 

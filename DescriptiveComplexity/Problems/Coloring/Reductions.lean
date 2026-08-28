@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Coloring.Defs
 import DescriptiveComplexity.Problems.CliqueFamily.Reductions
 import DescriptiveComplexity.OrderWalk
@@ -59,7 +60,7 @@ def padColorInterp (m : ℕ) :
     match n, R with
     | _, .adj => fun t =>
       match t 0, t 1 with
-      | none, none => adj.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
+      | none, none => fo%⟨u, v⟩ adj(u, v)
       | none, some _ => ⊤
       | some _, none => ⊤
       | some i, some j => if i = j then ⊥ else ⊤
@@ -315,13 +316,9 @@ noncomputable def chromInterp :
   relFormula {n} R :=
     match n, R with
     | _, .adj => fun t =>
-        if t 0 = t 1 then
-          (if t 0 = 0 then
-            Relations.formula₂ oGAdjSym (Term.var (0, 0)) (Term.var (1, 0)) else ⊥)
-        else
-          Term.equal (Term.var (0, 0)) (Term.var (1, 0)) ⊓
-            Relations.formula₂ oGAdjSym (Term.var (0, 0)) (Term.var (0, 0))
-    | _, .marked => fun t => if t 0 = 3 then ⊥ else minF (0, 0)
+        fo%⟨u, v⟩ if t 0 = t 1 then (if t 0 = 0 then oGAdjSym(u, v) else ⊥ᶠ)
+          else u ≐ v ∧ oGAdjSym(u, u)
+    | _, .marked => fun t => fo%⟨u⟩ if t 0 = 3 then ⊥ᶠ else minF⟨u⟩
 
 section ChromCharacterizations
 

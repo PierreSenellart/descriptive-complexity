@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
@@ -98,10 +99,8 @@ def complEdgeInterp :
     FOInterpretation Language.markedGraph Language.markedGraph Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .adj => fun _ =>
-        ∼(Term.equal (Term.var (0, 0)) (Term.var (1, 0))) ⊓
-          ∼(mgAdj.formula₂ (Term.var (0, 0)) (Term.var (1, 0)))
-    | _, .marked => fun _ => mgMarked.formula₁ (Term.var (0, 0))
+    | _, .adj => fun _ => fo%⟨u, v⟩ ¬ u ≐ v ∧ ¬ mgAdj(u, v)
+    | _, .marked => fun _ => fo%⟨u⟩ mgMarked(u)
 
 /-- The mark-complementing interpretation: adjacency is kept, marks are
 complemented. -/
@@ -109,8 +108,8 @@ def complMarkInterp :
     FOInterpretation Language.markedGraph Language.markedGraph Unit 1 where
   relFormula {n} R :=
     match n, R with
-    | _, .adj => fun _ => mgAdj.formula₂ (Term.var (0, 0)) (Term.var (1, 0))
-    | _, .marked => fun _ => ∼(mgMarked.formula₁ (Term.var (0, 0)))
+    | _, .adj => fun _ => fo%⟨u, v⟩ mgAdj(u, v)
+    | _, .marked => fun _ => fo%⟨u⟩ ¬ mgMarked(u)
 
 /-- Both interpretations are quantifier-free. -/
 theorem complEdgeInterp_isQuantifierFree : complEdgeInterp.IsQuantifierFree := by

@@ -3,6 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.ZeroOneIP.Defs
 import DescriptiveComplexity.Problems.Knapsack.Defs
 import DescriptiveComplexity.Padding
@@ -129,8 +130,8 @@ noncomputable def ipInterp : FOInterpretation bwOrd Language.zeroOneIP Unit 1 wh
     | _, .col => fun _ => itemF (0, 0)
     | _, .row => fun _ => minF (0, 0)
     | _, .posn => fun _ => posnF (0, 0)
-    | _, .coef => fun _ => minF (0, 0) ⊓ itemF (1, 0) ⊓ posnF (2, 0) ⊓ bitF (1, 0) (2, 0)
-    | _, .rhs => fun _ => minF (0, 0) ⊓ posnF (1, 0) ⊓ tgtF (1, 0)
+    | _, .coef => fun _ => fo%⟨r, i, p⟩ ((minF⟨r⟩ ∧ itemF⟨i⟩) ∧ posnF⟨p⟩) ∧ bitF⟨i, p⟩
+    | _, .rhs => fun _ => fo%⟨r, p⟩ (minF⟨r⟩ ∧ posnF⟨p⟩) ∧ tgtF⟨p⟩
     | _, .le => fun _ => leBwF (0, 0) (1, 0)
 
 /-! ### The interpreted structure is a copy of the input -/
