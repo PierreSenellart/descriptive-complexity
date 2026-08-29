@@ -6,53 +6,74 @@
 [![Archived in Software Heritage](https://archive.softwareheritage.org/badge/origin/https://github.com/PierreSenellart/descriptive-complexity/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/PierreSenellart/descriptive-complexity)
 
 A Lean 4 library for descriptive complexity on top of Mathlib's `ModelTheory`,
-in the style of Immerman (*Descriptive Complexity*, ch. 3). Every complexity
-class is defined logically, so membership, hardness and completeness proofs
-need no machine model: a definability witness for membership, a first-order
-reduction for hardness, and the framework closes them into a `Complete`
+in the style of Immerman (*Descriptive Complexity*, ch. 3). It rests on four
+notions: a decision problem is an isomorphism-invariant predicate on finite
+structures; a complexity class is defined by its logical characterization;
+membership is shown by a definability witness; hardness is shown by a
+first-order reduction from a known hard problem. No machine model is needed
+for any of them, and a witness together with a reduction is a `Complete`
 theorem. All declarations live in the `DescriptiveComplexity` namespace.
 
-Complexity theory is essentially absent from Mathlib because formalizing a
-model of computation with resource bounds is hard. Most classical hardness
-reductions do not need the full power of PTIME: they are first-order
-expressible. An FO reduction is computable in AC⁰ ⊆ LOGSPACE ⊆ PTIME, so
-exhibiting one is a stronger statement than exhibiting a Karp reduction, while
-requiring only first-order logic, which Mathlib already has.
+Complexity theory is essentially absent from general-purpose proof assistant
+libraries because
+its classical proofs are anchored to a machine model under resource bounds,
+and such models resist mechanization: even once Cook–Levin is proved against
+one, each further completeness result needs a proof that its reduction runs
+within bounded resources. Descriptive complexity sidesteps this. Most
+classical hardness reductions are first-order expressible, and a first-order
+reduction is a Karp reduction, strictly weaker than the general one, so
+hardness proved through it is the stronger statement; and it needs only
+first-order logic, which Mathlib already has.
 
 ## Three layers
 
-* **Model theory.** A decision problem is an isomorphism-invariant property of
-  finite structures over a chosen vocabulary. Concrete instance types can be
-  used instead: a bundled `Encoding` requires polynomial size bounds in both
-  directions to construct, and computable `Decoding`s read well-formed
-  structures back, so completeness theorems can be restricted to the non-junk
-  instances.
-* **Complexity classes.** Classes are logically defined and closed under FO
-  reductions by construction: the polynomial hierarchy by second-order
-  quantifier alternation, PTIME by the Horn fragment, NL by the Krom fragment,
-  PSPACE by second-order transitive closure, RE by value invention, with the
-  fixed-point logics FO(LFP)/FO(IFP)/FO(PFP) alongside. Machine models are
-  theorems here, not definitions (see the table below). The downward closure
-  `below Q₀` of a fixed problem is itself a class, which expresses
-  “GI-complete” without any logic.
-* **Reductions.** Tagged `dim`-dimensional first-order interpretations between
-  languages give the reduction `≤ᶠᵒ`, with its order-invariant variant `≤ᶠᵒ[≤]`
-  for gadgets that genuinely need a linear order and a relativized variant
-  `≤ʳᶠᵒ[≤]` for problems whose target domain is definable; all are closed under
-  composition. The problem catalog is one problem per file – vocabulary,
-  reductions, completeness theorem – with tutorial-style worked examples.
+* **Problems and reductions.** A decision problem over a vocabulary is an
+  isomorphism-invariant predicate on its structures; finiteness is a
+  hypothesis of the theorems, not part of the semantics. A reduction is a
+  tagged `dim`-dimensional first-order interpretation with a proof that it
+  preserves the answer on finite nonempty structures. Tags supply the disjoint
+  copies that textbook reductions take from an order, so the plain `≤ᶠᵒ` is
+  order-free; `≤ᶠᵒ[≤]` may use a linear order, for gadgets that lay numbers
+  along it, and the relativized `≤ʳᶠᵒ[≤]` also cuts the output universe down by
+  domain formulas, for spanning problems. All three compose. Concrete instance
+  types enter through a bundled `Encoding`, which requires polynomial size
+  bounds in both directions; a computable `Decoding` reads well-formed
+  structures back, so that hardness can be restricted to non-junk instances.
+* **Complexity classes.** A class is built from a membership predicate by
+  `ComplexityClass.ofMem`, against a proof that membership travels backward
+  along reductions: a pullback lemma of the class's logic, one per logic,
+  turning a relation variable over the output universe into a block of
+  relation variables over the input, one per assignment of tags. The rewriting
+  is atom by atom, so it preserves the Horn and Krom fragments: PTIME and NL
+  close without leaving their logics. Hardness is then cofinality, and
+  completeness the pair of a witness and a reduction. The degree `below Q₀` of
+  a fixed problem is a class too, which expresses “GI-complete” without any
+  logic.
+* **Machines.** Machine models are theorems here, not definitions (see the
+  table below). No machine is a Lean type: a machine is data in an instance of
+  an acceptance problem, and its budget is a count of universe elements, the
+  polynomial coming from the dimension of the reduction that built the
+  instance.
 
 ## Results
 
-* Cook–Levin, without a machine model (`SAT_NP_complete`), and all of Karp's 21
-  problems.
-* The Immerman–Vardi theorem (`lfpDefinable_iff_mem_PTIME`) and the
-  Abiteboul–Vianu theorem
+* Cook–Levin, without a machine model (`SAT_NP_complete`) and in its textbook
+  form (`SAT_complete_for_ntmAccept`), and all of Karp's 21 problems. Hardness
+  enters the NP catalog once, at ∃SO → SAT (`sat_hard_of_sigmaSODefinable`);
+  every other problem inherits it by composing reductions, membership being a
+  separate definability witness per problem.
+* Relations between classes, proved inside the logic rather than by machine
+  simulation: the Immerman–Vardi theorem (`lfpDefinable_iff_mem_PTIME`), via
+  Grädel's SO-Horn = FO(LFP); FO(PFP) = SO(TC) (`pfpDefinable_iff_mem_PSPACE`);
+  NL = coNL by inductive counting (`NL_eq_coNL`), and `PSPACE_eq_coPSPACE`;
+  each exponential class as the one below read over an exponential expansion
+  (`PSPACE_eq_NL_exp` and its siblings); and the Abiteboul–Vianu theorem
   (`ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace`).
 * Machine bridges: a problem is in the library's NP (resp. PTIME) exactly when
   it ordered-FO-reduces to acceptance by a nondeterministic (resp.
   deterministic) polynomial-time Turing machine (`mem_NP_iff_le_ntmAccept`,
-  `mem_PTIME_iff_le_dtmAccept`).
+  `mem_PTIME_iff_le_dtmAccept`); the other classes are matched against their
+  machines in the table below.
 * Lower bounds, none of them conditional on a complexity assumption:
   Ehrenfeucht–Fraïssé games on finite structures, and the inexpressibility of
   EVEN even when the sentence is given a linear order (`even_not_foDefinable`),
@@ -64,14 +85,13 @@ requiring only first-order logic, which Mathlib already has.
   theorems cannot be dropped.
 * First-order reductions are strictly weaker than the logarithmic-space ones,
   already at the deterministic many-one notion
-  (`exists_dtcReduction_not_orderedReduction`).
+  (`exists_dtcReduction_not_orderedReduction`); completeness under the weaker
+  reduction is the stronger statement.
 * AC⁰ is read here as the logic `FO(≤, +, ×)`; no circuit model is involved. It
-  is proved to sit inside L (`ac0Definable_mem_LOGSPACE`), by a deterministic
-  multi-head automaton that computes the numeric predicates instead of reading
-  them, and to equal both `FO(≤, BIT)` and its machine model, logarithmic time
-  with constantly many alternations (`ac0Definable_iff_ltDecidable`: both halves
-  of Immerman's Thm 1.17, Bit Sum Lemma included). That machine class is the
-  logarithmic-time hierarchy, not the larger ALOGTIME of unbounded alternation.
+  is proved to sit inside L (`ac0Definable_mem_LOGSPACE`), and to equal both
+  `FO(≤, BIT)` and its machine model, logarithmic time with constantly many
+  alternations (`ac0Definable_iff_ltDecidable`, both halves of Immerman's
+  Thm 1.17), i.e., the logarithmic-time hierarchy rather than ALOGTIME.
 
 ## Complexity classes and complete problems
 
@@ -114,39 +134,44 @@ theorems, so SAT-hardness is NP-hardness.
 These limitations are *intrinsic* to the machine-free approach; for what is
 merely not built yet, see `ROADMAP.md`.
 
-* **Complexity of problems, not of algorithms.** No cost model, no `O(·)`, no
-  fine-grained complexity: what you prove is membership, hardness and
-  completeness for the coarse classes above.
-* **Instances are finite relational structures, not strings.** From PTIME up,
-  the machine bridges characterize the classes from inside the framework, by
-  acceptance problems whose instances carry the machine; at L, NL and AC⁰ a
-  single machine, fixed once, decides every instance. Either way their agreement
-  with the usual presentations over string encodings is classical (Fagin;
-  Immerman–Vardi) and is not formalized here – except for RE, where
-  `mem_RE_iff_rePred` identifies the class with Mathlib's `REPred` on an
-  encoding of finite structures.
+* **Complexity of problems, not of algorithms.** No cost model, hence no
+  `O(·)`, no fine-grained complexity, no Δₖᵖ, and no hierarchy theorem:
+  separating DTIME(f) from DTIME(2^f) is a statement about a clock, and there
+  is none here to diagonalize against. What you prove is membership, hardness
+  and completeness for the coarse classes above.
+* **Instances are finite relational structures, not strings.** Strings come
+  ordered and structures do not, so order-invariance is an explicit variant
+  here, and theorems whose whole content is the *absence* of an order become
+  statable. The machine bridges characterize the classes from inside the
+  framework: from PTIME up by acceptance problems whose instances carry the
+  machine, at L, NL and AC⁰ by a single machine, fixed once, deciding every
+  instance. Their agreement with the usual presentations over string encodings
+  is classical (Fagin; Immerman–Vardi) and is not formalized here – except for
+  RE, where `mem_RE_iff_rePred` identifies the class with Mathlib's `REPred` on
+  an encoding of finite structures.
 * **The reduction must be expressible in logic.** A poly-time reduction that is
   not FO-expressible cannot be used; gadgets often need a linear order, tags or
   extra dimensions, and arithmetic inside formulas is limited (addition and
   comparison are FO(≤); multiplication is not FO, being as hard as majority
-  under constant-depth reductions, Vollmer 1999, Cor. 1.39 and 3.34).
-* **Completeness and structure, not class separations.** Whether P = NP and the
-  like is open mathematics the framework does not decide. Separations between
-  *logics* are in scope, and proved (see above).
+  under constant-depth reductions, Vollmer 1999, Cor. 1.39 and 3.34). In
+  practice no problem had to be dropped for this reason.
 
 ## Related projects
 
 * **[Complexitylib](https://github.com/SamuelSchlesinger/complexitylib)** (Lean 4
-  and Mathlib) is machine-model-first: `P` and `NP` are defined by time-bounded
+  and Mathlib) is machine-model-first: its classes are defined by resource-bounded
   multi-tape Turing machines, and hardness is a polynomial-time many-one
-  reduction exhibited as a machine. It reaches results out of scope here, notably
-  the deterministic time hierarchy theorem and circuit lower bounds; its complete
-  problems are SAT and 3SAT. Its descriptive-complexity component was developed
-  independently of this library, on its own foundations rather than Mathlib's
-  `ModelTheory`.
-* **[Karp21](https://github.com/wimmers/poly-reductions)** (Isabelle/HOL)
-  formalizes polynomial-time reductions between Karp's problems, with running
-  times accounted for in NREST; the public repository covers about eight of the 21.
+  reduction exhibited as a machine. It reaches results out of scope here,
+  notably the deterministic time hierarchy theorem and circuit lower bounds;
+  its complete problems are SAT and 3SAT for NP and the complement of SAT for
+  coNP. Its descriptive-complexity component, first- and second-order syntax
+  with one-dimensional first-order reductions, stands on its own foundations
+  rather than Mathlib's `ModelTheory`, and no class is defined through it.
+* **[poly-reductions](https://github.com/rosskopfs/poly-reductions)**
+  (Isabelle/HOL, formerly Karp21) formalizes polynomial-time reductions between
+  26 problems, all of Karp's 21 among them, with running times accounted for in
+  NREST; the tree is rooted at SAT, whose NP-hardness is assumed rather than
+  proved.
 * **The Cook–Levin theorem** is mechanized against concrete models of computation
   by [Gäher and Kunze, ITP 2021](https://uds-psl.github.io/cook-levin/) in
   Coq/Rocq (call-by-value λ-calculus) and [Balbach, AFP
