@@ -1102,4 +1102,53 @@ theorem Fann_eq_S (h_abs : absorptive K) (α : ι → K) (U : Finset ι) (C : �
     Fann α U (C + 1) = S α U (C + 1) :=
   (Fann_eq_F (idempotent_of_absorptive h_abs) α U (C + 1)).trans (F_eq_S h_abs α U C)
 
+/-! ### Existential conditions: worlds meeting a set of qualifying occurrences
+
+A `HAVING` condition such as `MIN(t) ≤ c` or `MAX(t) ≥ c` holds in a world
+exactly when the world contains some *qualifying* occurrence (one with
+`t ≤ c`, resp. `t ≥ c`). The valid worlds are those meeting the set `H` of
+qualifying occurrences, an upward-closed family whose minimal elements are
+the singletons of `H`: the collapse `witness_identity` / `absorbing_subfamily`
+turns the possible-world sum of the factored annotations into the plain
+`⊕`-sum of the qualifying annotations, in every absorptive commutative
+m-semiring. -/
+
+/-- The worlds of `U` meeting `H` form an upward-closed family inside `U`. -/
+theorem meet_upward_closed (U H : Finset ι) :
+    ∀ W ∈ U.powerset.filter (fun W => (W ∩ H).Nonempty),
+      ∀ W' : Finset ι, W ⊆ W' → W' ⊆ U →
+        W' ∈ U.powerset.filter (fun W => (W ∩ H).Nonempty) :=
+  fun _ hW _ hWW' hW'U => Finset.mem_filter.mpr ⟨Finset.mem_powerset.mpr hW'U,
+    (Finset.mem_filter.mp hW).2.mono (Finset.inter_subset_inter hWW' (Finset.Subset.refl H))⟩
+
+/-- **Existential collapse.** In an absorptive commutative m-semiring, the
+`⊕`-sum of the factored world annotations `ann_U(W)` over the worlds of `U`
+meeting `H ⊆ U` is the `⊕`-sum of the annotations of the elements of `H`:
+the family is upward-closed (`meet_upward_closed`), so `witness_identity`
+replaces `ann` by the monomials, and the singletons `{i}`, `i ∈ H`, are a
+covering subfamily (`absorbing_subfamily`) whose monomials are the `α i`. -/
+theorem sum_ann_meet (h_abs : absorptive K) (α : ι → K) {U H : Finset ι}
+    (hHU : H ⊆ U) :
+    ∑ W ∈ U.powerset.filter (fun W => (W ∩ H).Nonempty), ann α U W
+      = ∑ i ∈ H, α i := by
+  have hVU : ∀ W ∈ U.powerset.filter (fun W => (W ∩ H).Nonempty), W ⊆ U :=
+    fun W hW => Finset.mem_powerset.mp (Finset.mem_filter.mp hW).1
+  rw [witness_identity (idempotent_of_absorptive h_abs) α hVU (meet_upward_closed U H)]
+  have hM : H.image (fun i => ({i} : Finset ι))
+      ⊆ U.powerset.filter (fun W => (W ∩ H).Nonempty) := by
+    intro W hW
+    obtain ⟨i, hiH, rfl⟩ := Finset.mem_image.mp hW
+    refine Finset.mem_filter.mpr ⟨Finset.mem_powerset.mpr
+      (Finset.singleton_subset_iff.mpr (hHU hiH)), ⟨i, ?_⟩⟩
+    exact Finset.mem_inter.mpr ⟨Finset.mem_singleton_self i, hiH⟩
+  have hcover : ∀ W ∈ U.powerset.filter (fun W => (W ∩ H).Nonempty),
+      ∃ W' ∈ H.image (fun i => ({i} : Finset ι)), W' ⊆ W := by
+    intro W hW
+    obtain ⟨i, hi⟩ := (Finset.mem_filter.mp hW).2
+    obtain ⟨hiW, hiH⟩ := Finset.mem_inter.mp hi
+    exact ⟨{i}, Finset.mem_image.mpr ⟨i, hiH, rfl⟩, Finset.singleton_subset_iff.mpr hiW⟩
+  rw [absorbing_subfamily α h_abs hM hcover,
+    Finset.sum_image (fun i _ j _ h => Finset.singleton_injective h)]
+  simp [A]
+
 end Having

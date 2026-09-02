@@ -73,6 +73,7 @@ import Provenance.HavingExample
 /- Query-level correctness of the fused Having operator vs the JOIN rewriting -/
 import Provenance.HavingQueryCorrectness
 import Provenance.HavingJoinCompositional
+import Provenance.HavingMonotone
 
 /- Query-level counterexamples for the HAVING / JOIN correspondence -/
 import Provenance.HavingQueryCounterexamples
@@ -453,6 +454,17 @@ proven engine several general results reuse internally.
   aggregates. The compositional query-to-query form of the rewriting
   lives on the general syntax (`GenCountHavingRewrite`, in
   `Provenance.AggQueryEmbedding`)
+- `Provenance.HavingMonotone` – monotone `HAVING` conditions, for which
+  absorptivity suffices: the existential comparisons `MIN(t) ≤ c`, `< c`,
+  `MAX(t) ≥ c`, `> c` rewrite as `ε(Π_{#0}(σ_{t op c}(q)))`
+  (`existential_site_rewrite`, `minLe_site_rewrite` …), and the syntax
+  `MonoCond` of positive Boolean combinations of `COUNT(*) ≥ C`, `> C` and
+  existential atoms comes with the compositional rewriting
+  `MonoCond.rewrite` (conjunction as join on the group key, disjunction as
+  set union), the closed form `MonoCond.site_evaluateAnnotated` of the fused
+  site of a compound condition in the general evaluator, and the site
+  substitution `MonoCond.site_rewrite`, all without distributivity of `⊗`
+  over `⊖`
 - `Provenance.HavingQueryCounterexamples` – `decide`-checked counterexamples,
   at the level of queries evaluated on concrete annotated databases, showing
   that the HAVING / JOIN correspondence for `COUNT(*)` needs both

@@ -207,6 +207,30 @@ theorem seqOf_injective : ∀ {U : List β}, U.Nodup →
       have := Finset.ext_iff.mp htail j
       simpa using this
 
+/-- Membership in the selected subsequence: the elements of `seqOf U W` are
+exactly the entries of `U` at the positions in `W`. -/
+theorem mem_seqOf : ∀ (U : List β) (W : Finset (Fin U.length)) (x : β),
+    x ∈ seqOf U W ↔ ∃ i ∈ W, U.get i = x
+  | [], _, _ => by
+    simp only [seqOf, List.not_mem_nil, false_iff]
+    rintro ⟨i, -, -⟩
+    exact i.elim0
+  | a :: U, W, x => by
+    rw [seqOf, List.mem_append, mem_seqOf U]
+    constructor
+    · rintro (h | ⟨i, hi, rfl⟩)
+      · split_ifs at h with h0
+        · exact ⟨0, h0, (List.mem_singleton.mp h).symm⟩
+        · simp at h
+      · exact ⟨i.succ, (Finset.mem_filter.mp hi).2, rfl⟩
+    · rintro ⟨i, hi, rfl⟩
+      revert hi
+      refine Fin.cases ?_ ?_ i
+      · intro h0
+        exact Or.inl (by rw [if_pos h0]; exact List.mem_singleton.mpr rfl)
+      · intro j hj
+        exact Or.inr ⟨j, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hj⟩, rfl⟩
+
 end Bridge
 
 /-! ### The world annotation, in factored form -/
@@ -501,6 +525,170 @@ theorem havingProv_count_ge_one (h_abs : absorptive K)
   rw [hsum]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [A]
+
+/-! ### Existential aggregate comparisons: `MIN` and `MAX`
+
+A comparison `f(t) op c` is *existential* when, on a non-empty sequence,
+it holds iff some element of the sequence satisfies `x op c`: this is the
+case of `MIN(t) ≤ c`, `MIN(t) < c`, `MAX(t) ≥ c` and `MAX(t) > c`. The
+valid worlds of such a comparison are those meeting the set of qualifying
+occurrences, and `Having.sum_ann_meet` collapses the predicate provenance
+to the `⊕`-sum of the qualifying occurrences' annotations, in every
+absorptive m-semiring and without distributivity of `⊗` over `⊖`. -/
+
+/-- Summing `f` over the entries of a list satisfying `P`, as a sum over
+positions. -/
+theorem sum_map_filter_coe {β γ : Type} [AddCommMonoid γ] (P : β → Prop)
+    [DecidablePred P] (f : β → γ) :
+    ∀ U : List β, ((Multiset.filter P (↑U : Multiset β)).map f).sum
+      = ∑ i : Fin U.length, if P (U.get i) then f (U.get i) else 0
+  | [] => by simp
+  | a :: U => by
+    have ih := sum_map_filter_coe P f U
+    rw [Multiset.filter_coe, Multiset.map_coe, Multiset.sum_coe] at ih ⊢
+    -- `(a :: U).length` is `U.length + 1` only definitionally, so split the
+    -- sum through an explicitly typed instance of `Fin.sum_univ_succ`.
+    have hsplit : (∑ i : Fin (a :: U).length,
+          if P ((a :: U).get i) then f ((a :: U).get i) else 0)
+        = (if P a then f a else 0)
+          + ∑ i : Fin U.length, if P (U.get i) then f (U.get i) else 0 :=
+      Fin.sum_univ_succ _
+    rw [hsplit, ← ih, List.filter_cons]
+    by_cases hP : P a
+    · simp [hP]
+    · simp [hP]
+
+/-- A sequence aggregate `f` is *existential* for the comparison `op` when,
+on non-empty sequences, `f L op c` holds iff some element `x` of `L`
+satisfies `x op c`. -/
+def Existential (f : SeqAggFunc T) (op : CompOp) : Prop :=
+  ∀ (L : List T) (c : T), L ≠ [] → (op.eval (f L) c ↔ ∃ x ∈ L, op.eval x c)
+
+omit [DecidableEq K] in
+/-- **Existential comparisons collapse to the qualifying occurrences.** In
+an absorptive m-semiring, the predicate provenance of an existential
+comparison `f(t) op c` on the group sequence `U` is the `⊕`-sum of the
+annotations of the occurrences whose `t`-value satisfies `x op c`. No
+distributivity of `⊗` over `⊖` is needed (`Having.sum_ann_meet`). -/
+theorem havingProv_existential (h_abs : absorptive K) {f : SeqAggFunc T} {op : CompOp}
+    (hf : Existential f op) (U : List (AnnotatedTuple T K m)) (t : Term T m) (c : T) :
+    havingProv U t f op c
+      = ((Multiset.filter (fun p : AnnotatedTuple T K m => op.eval (t.eval p.fst) c)
+          (↑U : Multiset (AnnotatedTuple T K m))).map Prod.snd).sum := by
+  set H : Finset (Fin U.length) :=
+    Finset.univ.filter (fun i => op.eval (t.eval (U.get i).fst) c) with hH
+  -- the comparison holds in a non-empty world iff the world meets `H`
+  have hiff : ∀ W : Finset (Fin U.length), W.Nonempty →
+      (op.eval (aggValOn U t f W) c ↔ (W ∩ H).Nonempty) := by
+    intro W hW
+    have hne : ((seqOf U W).map (fun p => t.eval p.fst)) ≠ [] := by
+      apply List.ne_nil_of_length_pos
+      rw [List.length_map, seqOf_length]
+      exact Finset.card_pos.mpr hW
+    unfold aggValOn
+    rw [hf _ c hne]
+    constructor
+    · rintro ⟨x, hx, hxc⟩
+      obtain ⟨p, hp, rfl⟩ := List.mem_map.mp hx
+      obtain ⟨i, hiW, rfl⟩ := (mem_seqOf U W p).mp hp
+      exact ⟨i, Finset.mem_inter.mpr ⟨hiW, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hxc⟩⟩⟩
+    · rintro ⟨i, hi⟩
+      obtain ⟨hiW, hiH⟩ := Finset.mem_inter.mp hi
+      exact ⟨t.eval (U.get i).fst,
+        List.mem_map.mpr ⟨U.get i, (mem_seqOf U W _).mpr ⟨i, hiW, rfl⟩, rfl⟩,
+        (Finset.mem_filter.mp hiH).2⟩
+  have hsum : havingProv U t f op c
+      = ∑ W ∈ Finset.univ.powerset.filter
+          (fun W : Finset (Fin U.length) => (W ∩ H).Nonempty),
+          ann (fun i => (U.get i).snd) Finset.univ W := by
+    unfold havingProv
+    rw [Finset.powerset_univ, Finset.sum_filter, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun W _ => ?_
+    by_cases hW : W.Nonempty
+    · rw [if_pos hW, chi, worldAnn_eq_ann]
+      by_cases hmeet : (W ∩ H).Nonempty
+      · rw [if_pos hmeet, if_pos ((hiff W hW).mpr hmeet), mul_one]
+      · rw [if_neg hmeet, if_neg (fun h => hmeet ((hiff W hW).mp h)), mul_zero]
+    · rw [if_neg hW, if_neg]
+      exact fun hmeet => hW (hmeet.mono Finset.inter_subset_left)
+  rw [hsum, sum_ann_meet h_abs _ (Finset.subset_univ H), hH, Finset.sum_filter,
+    sum_map_filter_coe]
+
+/-- `MIN` over a non-empty sequence is below `c` iff some element is. -/
+theorem foldr_min_le_iff {V : Type} [LinearOrder V] (x c : V) :
+    ∀ xs : List V, xs.foldr min x ≤ c ↔ x ≤ c ∨ ∃ y ∈ xs, y ≤ c
+  | [] => by simp
+  | y :: ys => by
+    rw [List.foldr_cons, min_le_iff, foldr_min_le_iff x c ys]
+    simp only [List.mem_cons, exists_eq_or_imp]
+    tauto
+
+/-- `MIN` over a non-empty sequence is strictly below `c` iff some element is. -/
+theorem foldr_min_lt_iff {V : Type} [LinearOrder V] (x c : V) :
+    ∀ xs : List V, (xs.foldr min x < c) ↔ (x < c) ∨ ∃ y ∈ xs, (y < c)
+  | [] => by simp
+  | y :: ys => by
+    rw [List.foldr_cons, min_lt_iff, foldr_min_lt_iff x c ys]
+    simp only [List.mem_cons, exists_eq_or_imp]
+    tauto
+
+/-- `MAX` over a non-empty sequence is above `c` iff some element is. -/
+theorem le_foldr_max_iff {V : Type} [LinearOrder V] (x c : V) :
+    ∀ xs : List V, c ≤ xs.foldr max x ↔ c ≤ x ∨ ∃ y ∈ xs, c ≤ y
+  | [] => by simp
+  | y :: ys => by
+    rw [List.foldr_cons, le_max_iff, le_foldr_max_iff x c ys]
+    simp only [List.mem_cons, exists_eq_or_imp]
+    tauto
+
+/-- `MAX` over a non-empty sequence is strictly above `c` iff some element is. -/
+theorem lt_foldr_max_iff {V : Type} [LinearOrder V] (x c : V) :
+    ∀ xs : List V, (c < xs.foldr max x) ↔ (c < x) ∨ ∃ y ∈ xs, (c < y)
+  | [] => by simp
+  | y :: ys => by
+    rw [List.foldr_cons, lt_max_iff, lt_foldr_max_iff x c ys]
+    simp only [List.mem_cons, exists_eq_or_imp]
+    tauto
+
+/-- `MIN(t) ≤ c` is existential. -/
+theorem existential_minD_le : Existential (SeqAggFunc.minD (T := T)) CompOp.le := by
+  intro L c hL
+  cases L with
+  | nil => exact absurd rfl hL
+  | cons x xs =>
+    show xs.foldr min x ≤ c ↔ ∃ y ∈ x :: xs, y ≤ c
+    rw [foldr_min_le_iff]
+    simp only [List.mem_cons, exists_eq_or_imp]
+
+/-- `MIN(t) < c` is existential. -/
+theorem existential_minD_lt : Existential (SeqAggFunc.minD (T := T)) CompOp.lt := by
+  intro L c hL
+  cases L with
+  | nil => exact absurd rfl hL
+  | cons x xs =>
+    show (xs.foldr min x < c) ↔ ∃ y ∈ x :: xs, (y < c)
+    rw [foldr_min_lt_iff]
+    simp only [List.mem_cons, exists_eq_or_imp]
+
+/-- `MAX(t) ≥ c` is existential. -/
+theorem existential_maxD_ge : Existential (SeqAggFunc.maxD (T := T)) CompOp.ge := by
+  intro L c hL
+  cases L with
+  | nil => exact absurd rfl hL
+  | cons x xs =>
+    show c ≤ xs.foldr max x ↔ ∃ y ∈ x :: xs, c ≤ y
+    rw [le_foldr_max_iff]
+    simp only [List.mem_cons, exists_eq_or_imp]
+
+/-- `MAX(t) > c` is existential. -/
+theorem existential_maxD_gt : Existential (SeqAggFunc.maxD (T := T)) CompOp.gt := by
+  intro L c hL
+  cases L with
+  | nil => exact absurd rfl hL
+  | cons x xs =>
+    show (c < xs.foldr max x) ↔ ∃ y ∈ x :: xs, (c < y)
+    rw [lt_foldr_max_iff]
+    simp only [List.mem_cons, exists_eq_or_imp]
 
 end Having
 

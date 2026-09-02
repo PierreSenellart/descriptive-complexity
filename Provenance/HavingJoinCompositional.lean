@@ -61,12 +61,18 @@ the key query (`α ⊖ α = 𝟘`). -/
 def zeroPadQuery (q : Query ℕ 3) : Query ℕ 1 :=
   Query.Diff (keysQuery q) (keysQuery q)
 
+/-- Key padding of a one-column rewriting `Q` of a `HAVING` site over the
+base query `q`: `Q`, padded with a `𝟘`-annotated row per group key of `q`
+and duplicate-eliminated into one row per group key. -/
+def keyPadded (Q : Query ℕ 3 → Query ℕ 1) (q : Query ℕ 3) : Query ℕ 1 :=
+  Query.Dedup (Query.Sum (Q q) (zeroPadQuery q))
+
 /-- The padded join-based rewriting of `HAVING COUNT(*) op (C + 1)`:
 the join query, padded with a `𝟘`-annotated row per group key and
 duplicate-eliminated into one row per group key. -/
 def joinCountQueryPadded (q : Query ℕ 3) (op : CompOp) (C : ℕ) :
     Query ℕ 1 :=
-  Query.Dedup (Query.Sum (Query.joinCountQuery q op C) (zeroPadQuery q))
+  keyPadded (fun q => Query.joinCountQuery q op C) q
 
 theorem keysQuery_source (q : Query ℕ 3) (hq : q.source) :
     (keysQuery q).source := hq
@@ -74,9 +80,13 @@ theorem keysQuery_source (q : Query ℕ 3) (hq : q.source) :
 theorem zeroPadQuery_source (q : Query ℕ 3) (hq : q.source) :
     (zeroPadQuery q).source := ⟨hq, hq⟩
 
+theorem keyPadded_source (Q : Query ℕ 3 → Query ℕ 1) (q : Query ℕ 3)
+    (hQ : (Q q).source) (hq : q.source) : (keyPadded Q q).source :=
+  ⟨hQ, hq, hq⟩
+
 theorem joinCountQueryPadded_source (q : Query ℕ 3) (hq : q.source)
     (op : CompOp) (C : ℕ) : (joinCountQueryPadded q op C).source :=
-  ⟨Query.joinCountQuery_source q hq op C, hq, hq⟩
+  keyPadded_source _ q (Query.joinCountQuery_source q hq op C) hq
 
 /-! ## Key bookkeeping -/
 
@@ -259,10 +269,66 @@ section SiteCorrectness
 
 variable [HasAltLinearOrder K]
 
-/-- The padding argument, parameterized by the per-key correctness of the
-unpadded join query: whenever `Query.joinCountQuery q op C` gives every
-group key the fused predicate provenance as a per-key annotation sum, the
-padded query evaluates to exactly one row per group key carrying it. Both
+omit [HasAltLinearOrder K] in
+/-- **The padding argument**, for any one-column rewriting `Q` whose rows
+carry keys of the base query: whenever `Q q` gives every group key `u` the
+annotation `F u` as a per-key annotation sum, the padded query evaluates to
+exactly one row per group key `g` of `q`, annotated `F g`. Instances:
+`joinCountQueryPadded_correct_of` for the `COUNT(*)` join rewritings, and
+the existential and compositional rewritings of
+`Provenance.HavingMonotone`. -/
+theorem keyPadded_correct_of (Q : Query ℕ 3 → Query ℕ 1)
+    (q : Query ℕ 3) (hQ : (Q q).source) (hq : q.source) (d : AnnotatedDatabase ℕ K)
+    (F : Tuple ℕ 1 → K)
+    (hkeys : ∀ x ∈ (Q q).evaluateAnnotated hQ d,
+      x.fst ∈ Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf))
+    (hkey : ∀ u : Tuple ℕ 1,
+      (Multiset.map Prod.snd (Multiset.filter (fun p => p.fst = u)
+        ((Q q).evaluateAnnotated hQ d))).sum = F u) :
+    (keyPadded Q q).evaluateAnnotated (keyPadded_source Q q hQ hq) d
+      = (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
+          (fun g => ((g, F g) : Tuple ℕ 1 × K)) := by
+  show Multiset.ofList (groupByKey
+      ((Q q).evaluateAnnotated hQ d
+      + (zeroPadQuery q).evaluateAnnotated (zeroPadQuery_source q hq) d)).val
+    = _
+  rw [groupByKey_eq_dedup_map, zeroPadQuery_eval q hq d, Multiset.map_add,
+    Multiset.dedup_add]
+  rw [show Multiset.dedup (Multiset.map Prod.fst
+        ((Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
+          (fun u => ((u, (0 : K)) : Tuple ℕ 1 × K))))
+      = Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf) from by
+    rw [Multiset.map_map,
+      show Multiset.map
+          (Prod.fst ∘ fun u : Tuple ℕ 1 => ((u, (0 : K)) : Tuple ℕ 1 × K))
+          (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf))
+        = Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf) from
+        Multiset.map_id' _]
+    exact Multiset.dedup_eq_self.mpr (Multiset.nodup_dedup _)]
+  have hsub : Multiset.map Prod.fst ((Q q).evaluateAnnotated hQ d)
+      ⊆ Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf) := by
+    intro x hx
+    obtain ⟨y, hy, hyx⟩ := Multiset.mem_map.mp hx
+    rw [← hyx]
+    exact hkeys y hy
+  rw [Multiset.Subset.ndunion_eq_right hsub]
+  refine Multiset.map_congr rfl (fun u hu => ?_)
+  refine Prod.ext rfl ?_
+  dsimp only
+  rw [Multiset.filter_add, Multiset.map_add, Multiset.sum_add]
+  have hzero : (Multiset.map Prod.snd (Multiset.filter
+      (fun p : AnnotatedTuple ℕ K 1 => p.1 = u)
+      ((Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
+        (fun u => ((u, (0 : K)) : Tuple ℕ 1 × K))))).sum = (0 : K) :=
+    Eq.trans (perKeySum_dedup_map (α := Tuple ℕ 1) (β := K)
+      ((q.evaluateAnnotated hq d).map keyOf) (fun _ => (0 : K)) u)
+      (ite_self _)
+  exact Eq.trans (congrArg₂ (· + ·) (hkey u) hzero) (add_zero _)
+
+/-- The padding argument for the `COUNT(*)` join rewritings: whenever
+`Query.joinCountQuery q op C` gives every group key the fused predicate
+provenance as a per-key annotation sum, the padded query evaluates to
+exactly one row per group key carrying it. Both
 `joinCountQueryPadded_correct` and `joinCountQueryPadded_monotone_correct`
 are instances. -/
 theorem joinCountQueryPadded_correct_of
@@ -280,46 +346,10 @@ theorem joinCountQueryPadded_correct_of
       = (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
           (fun g => ((g, Having.havingProv
             (Having.havingGroup keyIdx (q.evaluateAnnotated hq d) g)
-            (ts 0) SeqAggFunc.count op (C + 1)) : Tuple ℕ 1 × K)) := by
-  show Multiset.ofList (groupByKey
-      ((Query.joinCountQuery q op C).evaluateAnnotated
-        (Query.joinCountQuery_source q hq op C) d
-      + (zeroPadQuery q).evaluateAnnotated (zeroPadQuery_source q hq) d)).val
-    = _
-  rw [groupByKey_eq_dedup_map, zeroPadQuery_eval q hq d, Multiset.map_add,
-    Multiset.dedup_add]
-  rw [show Multiset.dedup (Multiset.map Prod.fst
-        ((Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
-          (fun u => ((u, (0 : K)) : Tuple ℕ 1 × K))))
-      = Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf) from by
-    rw [Multiset.map_map,
-      show Multiset.map
-          (Prod.fst ∘ fun u : Tuple ℕ 1 => ((u, (0 : K)) : Tuple ℕ 1 × K))
-          (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf))
-        = Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf) from
-        Multiset.map_id' _]
-    exact Multiset.dedup_eq_self.mpr (Multiset.nodup_dedup _)]
-  have hsub : Multiset.map Prod.fst
-      ((Query.joinCountQuery q op C).evaluateAnnotated
-        (Query.joinCountQuery_source q hq op C) d)
-      ⊆ Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf) := by
-    intro x hx
-    obtain ⟨y, hy, hyx⟩ := Multiset.mem_map.mp hx
-    rw [← hyx]
-    exact joinCountQuery_key_mem q hq d op C y hy
-  rw [Multiset.Subset.ndunion_eq_right hsub]
-  refine Multiset.map_congr rfl (fun u hu => ?_)
-  refine Prod.ext rfl ?_
-  dsimp only
-  rw [Multiset.filter_add, Multiset.map_add, Multiset.sum_add]
-  have hzero : (Multiset.map Prod.snd (Multiset.filter
-      (fun p : AnnotatedTuple ℕ K 1 => p.1 = u)
-      ((Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
-        (fun u => ((u, (0 : K)) : Tuple ℕ 1 × K))))).sum = (0 : K) :=
-    Eq.trans (perKeySum_dedup_map (α := Tuple ℕ 1) (β := K)
-      ((q.evaluateAnnotated hq d).map keyOf) (fun _ => (0 : K)) u)
-      (ite_self _)
-  exact Eq.trans (congrArg₂ (· + ·) (hkey u) hzero) (add_zero _)
+            (ts 0) SeqAggFunc.count op (C + 1)) : Tuple ℕ 1 × K)) :=
+  keyPadded_correct_of (fun q => Query.joinCountQuery q op C) q
+    (Query.joinCountQuery_source q hq op C) hq d _
+    (fun x hx => joinCountQuery_key_mem q hq d op C x hx) hkey
 
 /-- **Multiset-level correctness of the padded JOIN rewriting.** In an
 absorptive commutative m-semiring whose `⊗` distributes over `⊖`, the
@@ -361,24 +391,24 @@ theorem joinCountQueryPadded_monotone_correct
   joinCountQueryPadded_correct_of q hq d ts op C
     (Query.joinCount_monotone_correct h_abs q hq d hnodup ts op hop C)
 
-/-- **The key-projected fused output.** Projecting the fused
-`HAVING COUNT(*) op (C + 1)` site output to its group key yields the same
-one-row-per-key relation the padded join query evaluates to: combined
-with `joinCountQueryPadded_correct`, the padded rewriting can be
-substituted for the key-projected fused operator inside any surrounding
-query. -/
-theorem fused_key_proj (qg : AggQuery ℕ 3 (ColKind.allReg 3))
+/-- **The key-projected fused output.** Projecting the output of a fused
+`HAVING f(t) op s` site to its group key yields one row per group key of
+the base query, annotated with the predicate provenance of its group: the
+shape the padded rewritings evaluate to (`keyPadded_correct_of`), so that a
+padded rewriting can be substituted for the key-projected fused operator
+inside any surrounding query. -/
+theorem fused_key_proj_gen (qg : AggQuery ℕ 3 (ColKind.allReg 3))
     (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
     (hin : qg.evaluateAnnotated d = q.evaluateAnnotated hq d)
-    (ts' : Tuple (Term ℕ 3) 1) (op : CompOp) (C : ℕ) :
-    ((AggQuery.havingSite keyIdx ts' (fun _ => SeqAggFunc.count) op 0
-        (Term.const (C + 1)) qg).evaluateAnnotated d).map
+    (ts' : Tuple (Term ℕ 3) 1) (fs : Tuple (SeqAggFunc ℕ) 1) (op : CompOp)
+    (s : Term ℕ 1) :
+    ((AggQuery.havingSite keyIdx ts' fs op 0 s qg).evaluateAnnotated d).map
         (fun p => ((fun _ : Fin 1 => p.fst ⟨0, by omega⟩, p.snd)
           : Tuple ℕ 1 × K))
       = (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
           (fun g => ((g, Having.havingProv
             (Having.havingGroup keyIdx (q.evaluateAnnotated hq d) g)
-            (ts' 0) SeqAggFunc.count op (C + 1)) : Tuple ℕ 1 × K)) := by
+            (ts' 0) (fs 0) op (s.eval g)) : Tuple ℕ 1 × K)) := by
   rw [AggQuery.havingSite_evaluateAnnotated, hin]
   show ((Multiset.dedup ((q.evaluateAnnotated hq d).map
       (fun p => fun k : Fin 1 => p.fst (keyIdx k)))).map _).map _ = _
@@ -390,6 +420,21 @@ theorem fused_key_proj (qg : AggQuery ℕ 3 (ColKind.allReg 3))
   funext k
   rw [Having.append_coord_left g _ 0 (by omega) (by omega)]
   exact congrArg g (Subsingleton.elim _ _)
+
+/-- The `COUNT(*) op (C + 1)` instance of `fused_key_proj_gen`. -/
+theorem fused_key_proj (qg : AggQuery ℕ 3 (ColKind.allReg 3))
+    (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
+    (hin : qg.evaluateAnnotated d = q.evaluateAnnotated hq d)
+    (ts' : Tuple (Term ℕ 3) 1) (op : CompOp) (C : ℕ) :
+    ((AggQuery.havingSite keyIdx ts' (fun _ => SeqAggFunc.count) op 0
+        (Term.const (C + 1)) qg).evaluateAnnotated d).map
+        (fun p => ((fun _ : Fin 1 => p.fst ⟨0, by omega⟩, p.snd)
+          : Tuple ℕ 1 × K))
+      = (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
+          (fun g => ((g, Having.havingProv
+            (Having.havingGroup keyIdx (q.evaluateAnnotated hq d) g)
+            (ts' 0) SeqAggFunc.count op (C + 1)) : Tuple ℕ 1 × K)) :=
+  fused_key_proj_gen qg q hq d hin ts' (fun _ => SeqAggFunc.count) op (Term.const (C + 1))
 
 /-- **Site substitution.** The key-projected fused
 `HAVING COUNT(*) op (C + 1)` site over the embedded classical query and
@@ -408,8 +453,7 @@ theorem countHaving_site_rewrite
           : Tuple ℕ 1 × K))
       = (joinCountQueryPadded q op C).evaluateAnnotated
           (joinCountQueryPadded_source q hq op C) d :=
-  (fused_key_proj (q.toAgg hq) q hq d (Query.toAggHaving_input q hq d)
-      ts' op C).trans
+  (fused_key_proj (q.toAgg hq) q hq d (Query.toAggHaving_input q hq d) ts' op C).trans
     (joinCountQueryPadded_correct h_abs h_distrib q hq d hnodup ts' op C).symm
 
 /-- **Site substitution for the monotone comparisons**, in every absorptive
@@ -427,8 +471,7 @@ theorem countHaving_site_rewrite_monotone
           : Tuple ℕ 1 × K))
       = (joinCountQueryPadded q op C).evaluateAnnotated
           (joinCountQueryPadded_source q hq op C) d :=
-  (fused_key_proj (q.toAgg hq) q hq d (Query.toAggHaving_input q hq d)
-      ts' op C).trans
+  (fused_key_proj (q.toAgg hq) q hq d (Query.toAggHaving_input q hq d) ts' op C).trans
     (joinCountQueryPadded_monotone_correct h_abs q hq d hnodup ts' op hop C).symm
 
 end SiteCorrectness
