@@ -36,7 +36,11 @@ comparison is on the multisets of annotations.
   five-element chain semiring – absorptive, hence idempotent, but not
   `⊗`-over-`⊖` distributive (`ChainFive.not_mul_sub_left_distributive`) –
   with annotations `(mid, hi, hi)` on one group, `COUNT(*) = 1` yields
-  annotation `hi` on the fused side but `𝟘` on the join side.
+  annotation `hi` on the fused side but `𝟘` on the join side. On the same
+  instance the monotone comparisons `COUNT(*) ≥ 1` and `COUNT(*) ≥ 2` do
+  agree with `Q₂^{≥1}` and `Q₂^{≥2}` (`ChainFive.query_ge_agree`,
+  `ChainFive.query_ge_two_agree`), as `Query.joinCount_monotone_correct`
+  requires: distributivity is needed for `=`, not for `≥`.
 
 * **Absorptivity is needed**
   (`HavingQueryCounterexamples.TropicalZ.query_counterexample`): in the
@@ -96,6 +100,34 @@ theorem ChainFive.query_counterexample :
     ((AggQuery.havingSite ![0] ![#1] ![SeqAggFunc.count] CompOp.eq 0
         (Term.const 1) qgR).evaluateAnnotated dC).map (fun p => p.snd)
       ≠ (q2eq1.evaluateAnnotated (by decide) dC).map (fun p => p.snd) := by
+  decide
+
+/-- Fused side of `COUNT(*) ≥ 1` on the same instance: `mid ⊕ hi ⊕ hi = hi`
+(the worlds of size `≥ 1`, in factored form, sum to the monomials of the
+singletons). -/
+theorem chainFive_fused_ge_one :
+    ((AggQuery.havingSite ![0] ![#1] ![SeqAggFunc.count] CompOp.ge 0
+        (Term.const 1) qgR).evaluateAnnotated dC).map (fun p => p.snd)
+      = {ChainFive.hi} := by
+  decide
+
+/-- **The monotone case closes in `ChainFive`**: on the very instance
+that separates the fused `COUNT(*) = 1` query from its rewriting, the
+fused `COUNT(*) ≥ 1` query and `Q₂^{≥1}` agree, as
+`Query.joinCount_monotone_correct` predicts for every absorptive
+m-semiring, distributive or not. -/
+theorem ChainFive.query_ge_agree :
+    ((AggQuery.havingSite ![0] ![#1] ![SeqAggFunc.count] CompOp.ge 0
+        (Term.const 1) qgR).evaluateAnnotated dC).map (fun p => p.snd)
+      = (q2ge1.evaluateAnnotated (by decide) dC).map (fun p => p.snd) := by
+  decide
+
+/-- Likewise for `COUNT(*) ≥ 2` and `Q₂^{≥2}`: both sides give
+`mid ⊗ hi ⊕ mid ⊗ hi ⊕ hi ⊗ hi = hi`. -/
+theorem ChainFive.query_ge_two_agree :
+    ((AggQuery.havingSite ![0] ![#1] ![SeqAggFunc.count] CompOp.ge 0
+        (Term.const 2) qgR).evaluateAnnotated dC).map (fun p => p.snd)
+      = (q2ge2.evaluateAnnotated (by decide) dC).map (fun p => p.snd) := by
   decide
 
 /-! ### Absorptivity is needed: the tropical instance over `ℤ ∪ {∞}` -/

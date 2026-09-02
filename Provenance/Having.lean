@@ -566,8 +566,9 @@ join-based provenance `S_C(U)` for all `C ≥ 1`. This is the instance of
 `upward_closed_collapse` for the upward-closed family of worlds of
 cardinality `≥ C`, whose minimal elements are the worlds of cardinality
 exactly `C`; in particular `mul_sub_left_distributive` is *not* needed
-(it re-enters only when relating `T` to the factored form of the world
-annotation, see `T_eq_mul_one_monus_sum`). Absorptive is a strictly
+(and `Fann_eq_S` shows it is not needed either to reach the factored form
+of the world annotation, which `T_eq_mul_one_monus_sum` relates to `T`
+only under distributivity). Absorptive is a strictly
 stronger hypothesis than the bare “idempotent + distributive” combination
 one might wish for, and it is essential:
 `TropicalR.F_ne_S` exhibits a non-absorptive
@@ -952,5 +953,153 @@ theorem card_minimal_sum_ge_le (U : Finset ι) (t : ι → ℕ) {c k : ℕ}
   obtain ⟨hWU, hsum⟩ := Finset.mem_filter.mp hWF
   exact Finset.mem_filter.mpr ⟨hWU,
     minimal_card_le_of_sum_ge hratio (Finset.mem_powerset.mp hWU) hsum hmin⟩
+
+/-! ### The factored world annotation, without distributivity
+
+`T_eq_mul_one_monus_sum` identifies the factored world annotation
+`ann_U(W) = A_W ⊗ (𝟙 ⊖ E_W)` – with `E_W = ⊕_{x ∈ U \ W} α x` the sum of the
+discarded occurrences – with `T_U(W)` when `⊗` distributes over `⊖`.
+Without that hypothesis the two differ (`ChainFive`), but the factored form
+is still sandwiched between `T_U(W)` and `A_W` (`monus_factor_le`), and the
+sandwich is all that the collapse of an upward-closed family of worlds
+needs: in an idempotent m-semiring the `⊕`-sum of the factored annotations
+over an upward-closed family equals the `⊕`-sum of the monomials
+(`witness_identity`), and in an absorptive one the latter collapses to the
+minimal worlds (`witness_minimal`). The `HAVING count ≥ C` instance is
+`Fann_eq_S`: the correspondence with the join-side `S_C(U)` holds in every
+absorptive commutative m-semiring, distributive or not, whereas the `=` and
+`≤` cases do need distributivity (`world_bound`, `ChainFive.not_world_bound`).
+-/
+
+/-- `ann_U(W) = A_W ⊗ (𝟙 ⊖ ⊕_{x ∈ U \ W} α x)`: the annotation of the world
+`W` in the factored form of the possible-world semantics (`worldAnn` is
+its instance over `Finset.univ`). It equals `T α U W` under
+`mul_sub_left_distributive` (`T_eq_mul_one_monus_sum`), not in general. -/
+def ann (α : ι → K) (U W : Finset ι) : K :=
+  A α W * (1 - ∑ x ∈ U \ W, α x)
+
+/-- The one-step extensions of `W` inside `U` sum to `A_W ⊗ E_W`, by
+distributivity of `⊗` over finite sums. -/
+theorem sum_A_insert (α : ι → K) (U W : Finset ι) :
+    ∑ x ∈ U \ W, A α (insert x W) = A α W * ∑ x ∈ U \ W, α x := by
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun x hx => ?_
+  rw [A, A, Finset.prod_insert (Finset.mem_sdiff.mp hx).2, mul_comm]
+
+/-- `T_U(W) ≤ ann_U(W)` in any commutative m-semiring. By residuation it
+suffices that `A_W ≤ A_W ⊗ E_W ⊕ A_W ⊗ (𝟙 ⊖ E_W) = A_W ⊗ (E_W ⊕ (𝟙 ⊖ E_W))`,
+which follows from `𝟙 ≤ E_W ⊕ (𝟙 ⊖ E_W)` and monotonicity of `⊗`. -/
+theorem T_le_ann (α : ι → K) (U W : Finset ι) : T α U W ≤ ann α U W := by
+  rw [T, sum_A_insert, SemiringWithMonus.monus_spec, ann, ← mul_add]
+  calc A α W = A α W * 1 := (mul_one _).symm
+    _ ≤ A α W * (∑ x ∈ U \ W, α x + (1 - ∑ x ∈ U \ W, α x)) :=
+      mul_le_mul_left_canonical _ (le_plus_monus 1 _)
+
+/-- `ann_U(W) ≤ A_W`: the second factor is at most `𝟙`. -/
+theorem ann_le_A (α : ι → K) (U W : Finset ι) : ann α U W ≤ A α W :=
+  calc ann α U W ≤ A α W * 1 := mul_le_mul_left_canonical _ (monus_le 1 _)
+    _ = A α W := mul_one _
+
+/-- **The monus factor is sandwiched**: `T_U(W) ≤ ann_U(W) ≤ A_W` in any
+commutative m-semiring, without absorptivity or distributivity. -/
+theorem monus_factor_le (α : ι → K) (U W : Finset ι) :
+    T α U W ≤ ann α U W ∧ ann α U W ≤ A α W :=
+  ⟨T_le_ann α U W, ann_le_A α U W⟩
+
+/-- Over an upward-closed family `V` of subsets of `U`, the monomial sum is
+bounded by the `T`-sum in an idempotent m-semiring: each `A_W` is below the
+`T`-sum over its supersets (`upward_expansion`), which all lie in `V`, and
+idempotence collapses the repeated summands (`sum_le_of_forall_le`). -/
+theorem sum_A_le_sum_T (h_idem : idempotent K) (α : ι → K)
+    {U : Finset ι} {V : Finset (Finset ι)}
+    (hVU : ∀ W ∈ V, W ⊆ U)
+    (hV_up : ∀ W ∈ V, ∀ W' : Finset ι, W ⊆ W' → W' ⊆ U → W' ∈ V) :
+    ∑ W ∈ V, A α W ≤ ∑ W ∈ V, T α U W := by
+  refine sum_le_of_forall_le h_idem fun W hW => ?_
+  calc A α W ≤ ∑ W' ∈ U.powerset.filter (W ⊆ ·), T α U W' :=
+      upward_expansion α h_idem U W (hVU W hW)
+    _ ≤ ∑ W' ∈ V, T α U W' := by
+      refine Finset.sum_le_sum_of_subset fun W' hW' => ?_
+      rw [Finset.mem_filter, Finset.mem_powerset] at hW'
+      exact hV_up W hW W' hW'.2 hW'.1
+
+/-- Over an upward-closed family, the `T`-sum *is* the monomial sum (the
+`M = F` instance of `upward_closed_collapse`, which needs only
+idempotence). -/
+theorem sum_T_eq_sum_A (h_idem : idempotent K) (α : ι → K)
+    {U : Finset ι} {V : Finset (Finset ι)}
+    (hVU : ∀ W ∈ V, W ⊆ U)
+    (hV_up : ∀ W ∈ V, ∀ W' : Finset ι, W ⊆ W' → W' ⊆ U → W' ∈ V) :
+    ∑ W ∈ V, T α U W = ∑ W ∈ V, A α W :=
+  le_antisymm (Finset.sum_le_sum fun _ _ => monus_le _ _)
+    (sum_A_le_sum_T h_idem α hVU hV_up)
+
+/-- **Witness identity.** In an idempotent commutative m-semiring, for any
+upward-closed family `V` of subsets of `U`, the `⊕`-sum of the factored
+world annotations `ann_U(W)` over `V` equals the `⊕`-sum of the monomials
+`A_W` (and hence, by `sum_T_eq_sum_A`, the `⊕`-sum of the `T_U(W)`).
+Neither absorptivity nor distributivity of `⊗` over `⊖` is used: `≤` is
+summand-wise from `ann_le_A`, and `≥` goes through the `T`-sum via
+`sum_A_le_sum_T` and `T_le_ann`. -/
+theorem witness_identity (h_idem : idempotent K) (α : ι → K)
+    {U : Finset ι} {V : Finset (Finset ι)}
+    (hVU : ∀ W ∈ V, W ⊆ U)
+    (hV_up : ∀ W ∈ V, ∀ W' : Finset ι, W ⊆ W' → W' ⊆ U → W' ∈ V) :
+    ∑ W ∈ V, ann α U W = ∑ W ∈ V, A α W :=
+  le_antisymm (Finset.sum_le_sum fun W _ => ann_le_A α U W)
+    ((sum_A_le_sum_T h_idem α hVU hV_up).trans
+      (Finset.sum_le_sum fun W _ => T_le_ann α U W))
+
+/-- **Collapse of the witnesses to the minimal worlds.** In an absorptive
+commutative m-semiring, the `⊕`-sum of the factored world annotations over
+an upward-closed family `V` equals the `⊕`-sum of the monomials of the
+`⊆`-minimal elements of `V`: `witness_identity` followed by
+`absorbing_subfamily`, every element of `V` containing a minimal one
+(`exists_minimal_subset`). -/
+theorem witness_minimal (h_abs : absorptive K) (α : ι → K)
+    {U : Finset ι} {V : Finset (Finset ι)}
+    (hVU : ∀ W ∈ V, W ⊆ U)
+    (hV_up : ∀ W ∈ V, ∀ W' : Finset ι, W ⊆ W' → W' ⊆ U → W' ∈ V) :
+    ∑ W ∈ V, ann α U W
+      = ∑ W ∈ V.filter (fun W => ∀ W' ⊂ W, ¬ W' ∈ V), A α W := by
+  rw [witness_identity (idempotent_of_absorptive h_abs) α hVU hV_up]
+  refine absorbing_subfamily α h_abs (Finset.filter_subset _ _) fun W hW => ?_
+  obtain ⟨W', hW'W, hW'V, hmin⟩ := exists_minimal_subset (P := (· ∈ V)) hW
+  exact ⟨W', Finset.mem_filter.mpr ⟨hW'V, hmin⟩, hW'W⟩
+
+/-- `⊕_{W ⊆ U, |W| ≥ C} ann_U(W)`: the possible-world provenance of a
+`HAVING count ≥ C` predicate with the world annotations in factored form,
+i.e., `F` with `T` replaced by `ann`. -/
+def Fann (α : ι → K) (U : Finset ι) (C : ℕ) : K :=
+  ∑ W ∈ U.powerset.filter (fun W => C ≤ W.card), ann α U W
+
+omit [DecidableEq ι] in
+/-- The worlds of `U` of cardinality `≥ C` form an upward-closed family. -/
+theorem card_ge_upward_closed (U : Finset ι) (C : ℕ) :
+    ∀ W ∈ U.powerset.filter (fun W => C ≤ W.card),
+      ∀ W' : Finset ι, W ⊆ W' → W' ⊆ U → W' ∈ U.powerset.filter (fun W => C ≤ W.card) :=
+  fun _ hW _ hWW' hW'U => Finset.mem_filter.mpr ⟨Finset.mem_powerset.mpr hW'U,
+    (Finset.mem_filter.mp hW).2.trans (Finset.card_le_card hWW')⟩
+
+/-- In an idempotent commutative m-semiring, the factored and the
+`T`-weighted `HAVING count ≥ C` provenances agree, for every `C`, without
+any distributivity hypothesis: both are the monomial sum over the
+upward-closed family of worlds of size `≥ C` (`witness_identity`,
+`sum_T_eq_sum_A`). -/
+theorem Fann_eq_F (h_idem : idempotent K) (α : ι → K) (U : Finset ι) (C : ℕ) :
+    Fann α U C = F α U C := by
+  have hVU : ∀ W ∈ U.powerset.filter (fun W => C ≤ W.card), W ⊆ U :=
+    fun W hW => Finset.mem_powerset.mp (Finset.mem_filter.mp hW).1
+  exact (witness_identity h_idem α hVU (card_ge_upward_closed U C)).trans
+    (sum_T_eq_sum_A h_idem α hVU (card_ge_upward_closed U C)).symm
+
+/-- **`HAVING count ≥ C` with factored world annotations**: in an
+absorptive commutative m-semiring, `Fann_C(U) = S_C(U)` for all `C ≥ 1`.
+This is `F_eq_S` freed from the detour through `T`: the factored form of
+the possible-world semantics is related to the join-side `S` directly,
+with no use of `mul_sub_left_distributive` anywhere. -/
+theorem Fann_eq_S (h_abs : absorptive K) (α : ι → K) (U : Finset ι) (C : ℕ) :
+    Fann α U (C + 1) = S α U (C + 1) :=
+  (Fann_eq_F (idempotent_of_absorptive h_abs) α U (C + 1)).trans (F_eq_S h_abs α U C)
 
 end Having

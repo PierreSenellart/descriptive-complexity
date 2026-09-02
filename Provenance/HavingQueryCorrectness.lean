@@ -10,8 +10,10 @@ import Provenance.QueryAnnotatedDatabaseHom
 
 This file proves the query-level correspondence between the possible-world
 semantics of the fused `HAVING COUNT(*)` operator and its `JOIN`-based
-rewriting, in absorptive commutative m-semirings in which `⊗` distributes
-over `⊖`.
+rewriting, in absorptive commutative m-semirings. The monotone comparisons
+`≥` and `>` need nothing more (`Query.joinCount_monotone_correct`); the
+comparisons `<`, `≤`, `=`, `≠`, which involve a difference of two chains,
+also need `⊗` to distribute over `⊖` (`Query.joinCount_correct`).
 
 * **`C = 1`** (`AggQuery.havingSite_count_ge_one`): the fused
   `COUNT(*) ≥ 1` operator agrees – key by key, annotation by annotation –
@@ -105,15 +107,15 @@ open Having
 variable {K : Type} [CommSemiringWithMonus K] [DecidableEq K] [HasAltLinearOrder K]
 
 /-- **Query-level correctness for `COUNT(*) ≥ 1`.** In an absorptive
-commutative m-semiring in which `⊗` distributes over `⊖`, the fused
-`HAVING COUNT(*) ≥ 1` site – with its output rows projected to the group
+commutative m-semiring (no distributivity of `⊗` over `⊖` is needed), the
+fused `HAVING COUNT(*) ≥ 1` site – with its output rows projected to the group
 key – computes exactly the duplicate-eliminated key projection
 `ε(Π_{keys}(q))` of the inner query, which is the `C = 1` join-based
 query: one row per non-empty group, annotated by the `⊕`-sum of the
 group's annotations. Stated against any general subquery whose annotated
 evaluation is the classical inner query's. -/
 theorem AggQuery.havingSite_count_ge_one
-    (h_abs : absorptive K) (h_distrib : mul_sub_left_distributive K)
+    (h_abs : absorptive K)
     {m n₁ : ℕ} (is : Tuple (Fin m) n₁) (ts : Tuple (Term ℕ m) 1)
     (q : Query ℕ m) (hq : q.source) (d : AnnotatedDatabase ℕ K) :
     ((AggQuery.havingSite is ts ![SeqAggFunc.count] CompOp.ge 0
@@ -150,7 +152,7 @@ theorem AggQuery.havingSite_count_ge_one
     · -- The annotation part: the fused `COUNT(*) ≥ 1` provenance is the
       -- `⊕`-sum of the group's annotations (`havingProv_count_ge_one`),
       -- which is the annotation `ε` computes for the key `g`.
-      refine Eq.trans (havingProv_count_ge_one h_abs h_distrib
+      refine Eq.trans (havingProv_count_ge_one h_abs
         (havingGroup is r g) (ts 0)) ?_
       have h1 : ((havingGroup is r g).map (fun p => p.snd)).sum
           = (Multiset.map Prod.snd
@@ -672,10 +674,15 @@ theorem q2_source (q : Query ℕ 3) (hq : q.source) (C : ℕ) :
   exact joinChain_source q hq C
 
 /-- **Query-level correctness of the join-based rewriting, general `C`.**
-In an absorptive commutative m-semiring in which `⊗` distributes over
-`⊖`, for every group key `g`, the `⊕`-sum of the annotations that the
-join-based query `ε(Π_{#0}(joinChain q C))` gives to `g` equals the
-fused `HAVING COUNT(*) ≥ C + 1` predicate provenance of the group of `g`.
+In an absorptive commutative m-semiring, for every group key `g`, the
+`⊕`-sum of the annotations that the join-based query
+`ε(Π_{#0}(joinChain q C))` gives to `g` equals the fused
+`HAVING COUNT(*) ≥ C + 1` predicate provenance of the group of `g`.
+Distributivity of `⊗` over `⊖` is not assumed: the `≥` comparison goes
+through `Having.havingProv_count_ge`, hence `Having.Fann_eq_S`, which
+never rewrites the factored world annotations into the `Having.T` form;
+`ChainFive` is an absorptive, non-distributive instance where this
+matters (`HavingQueryCounterexamples.ChainFive.query_ge_agree`).
 The hypothesis `hnodup` states that the occurrence identifiers of the
 base query's third column make its rows pairwise distinct: it is the
 formal counterpart of fixing an arbitrary tie-break `<*` between
@@ -685,7 +692,7 @@ The statement is per-key: a group with fewer than `C + 1` occurrences
 has provenance `𝟘` on both sides – the fused operator gives its row a
 `𝟘` annotation while the join query simply has no row for it. -/
 theorem Query.joinChain_count_correct [HasAltLinearOrder K]
-    (h_abs : absorptive K) (h_distrib : mul_sub_left_distributive K)
+    (h_abs : absorptive K)
     (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
     (hnodup : ((q.evaluateAnnotated hq d).map Prod.fst).Nodup)
     (ts : Tuple (Term ℕ 3) 1) (C : ℕ) (g : Tuple ℕ 1) :
@@ -815,7 +822,7 @@ theorem Query.joinChain_count_correct [HasAltLinearOrder K]
             (q.evaluateAnnotated hq d) g)
           (ts 0) SeqAggFunc.count CompOp.ge (C + 1)
         := by
-          rw [havingProv_count_ge h_abs h_distrib _ (ts 0) C, S_eq_esymm, hlist]
+          rw [havingProv_count_ge h_abs _ (ts 0) C, S_eq_esymm, hlist]
 
 
 /-- One row per distinct key, at the multiset level: filtering a keyed
@@ -954,8 +961,8 @@ theorem Query.joinChainDiff_count_eq_correct [HasAltLinearOrder K]
               (q.evaluateAnnotated hq d) g)
             (ts 0) SeqAggFunc.count CompOp.ge (C + 1 + 1) : K) :=
     congrArg₂ (fun a b : K => a - b)
-      (Query.joinChain_count_correct h_abs h_distrib q hq d hnodup ts C g)
-      (Query.joinChain_count_correct h_abs h_distrib q hq d hnodup ts (C + 1) g)
+      (Query.joinChain_count_correct h_abs q hq d hnodup ts C g)
+      (Query.joinChain_count_correct h_abs q hq d hnodup ts (C + 1) g)
   have h₃ : (havingProv
             (havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
               (q.evaluateAnnotated hq d) g)
@@ -969,10 +976,10 @@ theorem Query.joinChainDiff_count_eq_correct [HasAltLinearOrder K]
           - S (fun i => ((havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
               (q.evaluateAnnotated hq d) g).get i).snd) Finset.univ (C + 1 + 1) : K) :=
     congrArg₂ (fun a b : K => a - b)
-      (havingProv_count_ge h_abs h_distrib
+      (havingProv_count_ge h_abs
         (havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
           (q.evaluateAnnotated hq d) g) (ts 0) C)
-      (havingProv_count_ge h_abs h_distrib
+      (havingProv_count_ge h_abs
         (havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
           (q.evaluateAnnotated hq d) g) (ts 0) (C + 1))
   have h₄ : (S (fun i => ((havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
@@ -1029,8 +1036,8 @@ theorem Query.joinChainDiff_count_le_correct [HasAltLinearOrder K]
               (q.evaluateAnnotated hq d) g)
             (ts 0) SeqAggFunc.count CompOp.ge (C + 1) : K) :=
     congrArg₂ (fun a b : K => a - b)
-      (Query.joinChain_count_correct h_abs h_distrib q hq d hnodup ts 0 g)
-      (Query.joinChain_count_correct h_abs h_distrib q hq d hnodup ts C g)
+      (Query.joinChain_count_correct h_abs q hq d hnodup ts 0 g)
+      (Query.joinChain_count_correct h_abs q hq d hnodup ts C g)
   have h₃ : (havingProv
             (havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
               (q.evaluateAnnotated hq d) g)
@@ -1044,10 +1051,10 @@ theorem Query.joinChainDiff_count_le_correct [HasAltLinearOrder K]
           - S (fun i => ((havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
               (q.evaluateAnnotated hq d) g).get i).snd) Finset.univ (C + 1) : K) :=
     congrArg₂ (fun a b : K => a - b)
-      (havingProv_count_ge h_abs h_distrib
+      (havingProv_count_ge h_abs
         (havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
           (q.evaluateAnnotated hq d) g) (ts 0) 0)
-      (havingProv_count_ge h_abs h_distrib
+      (havingProv_count_ge h_abs
         (havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
           (q.evaluateAnnotated hq d) g) (ts 0) C)
   have h₄ : (S (fun i => ((havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
@@ -1119,7 +1126,9 @@ any comparison operator.** For every `op ∈ {<, ≤, =, ≠, ≥, >}`, every
 threshold `C + 1 ≥ 1` and every group key, in an absorptive commutative
 m-semiring whose `⊗` distributes over `⊖`, the join-based query
 `Query.joinCountQuery q op C` gives the group key the fused
-`COUNT(*) op (C + 1)` predicate provenance. -/
+`COUNT(*) op (C + 1)` predicate provenance. The distributivity hypothesis
+is used only by the `<`, `≤`, `=`, `≠` cases; see
+`Query.joinCount_monotone_correct` for `≥` and `>` without it. -/
 theorem Query.joinCount_correct [HasAltLinearOrder K]
     (h_abs : absorptive K) (h_distrib : mul_sub_left_distributive K)
     (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
@@ -1150,11 +1159,40 @@ theorem Query.joinCount_correct [HasAltLinearOrder K]
       (q2_source q hq (C + 1)) _ d g) ?_
     exact congrArg₂ (fun a b : K => a + b)
       (Query.joinChainDiff_count_le_correct h_abs h_distrib q hq d hnodup ts C g)
-      (Query.joinChain_count_correct h_abs h_distrib q hq d hnodup ts (C + 1) g)
+      (Query.joinChain_count_correct h_abs q hq d hnodup ts (C + 1) g)
   | ge =>
-    exact Query.joinChain_count_correct h_abs h_distrib q hq d hnodup ts C g
+    exact Query.joinChain_count_correct h_abs q hq d hnodup ts C g
   | gt =>
     rw [havingProv_count_gt]
-    exact Query.joinChain_count_correct h_abs h_distrib q hq d hnodup ts (C + 1) g
+    exact Query.joinChain_count_correct h_abs q hq d hnodup ts (C + 1) g
+
+/-- **Monotone `HAVING` conditions need no distributivity.** For the
+comparison operators `≥` and `>`, the join-based rewriting
+`Query.joinCountQuery q op C` is correct in *every* absorptive commutative
+m-semiring, whether or not `⊗` distributes over `⊖`: the family of worlds
+satisfying `COUNT(*) ≥ C + 1` is upward-closed, so the fused provenance
+collapses to the monomials of its minimal worlds through
+`Having.Fann_eq_S` without ever rewriting the factored world annotations
+(`Having.witness_identity`, `Having.witness_minimal`). This is the `≥`/`>`
+part of `Query.joinCount_correct` with the distributivity hypothesis
+dropped; `ChainFive` shows the hypothesis cannot be dropped for `=`
+(`HavingQueryCounterexamples.ChainFive.query_counterexample`). -/
+theorem Query.joinCount_monotone_correct [HasAltLinearOrder K]
+    (h_abs : absorptive K)
+    (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
+    (hnodup : ((q.evaluateAnnotated hq d).map Prod.fst).Nodup)
+    (ts : Tuple (Term ℕ 3) 1) (op : CompOp) (hop : op = CompOp.ge ∨ op = CompOp.gt)
+    (C : ℕ) (g : Tuple ℕ 1) :
+    (Multiset.map Prod.snd (Multiset.filter (fun p => p.fst = g)
+        ((Query.joinCountQuery q op C).evaluateAnnotated
+          (Query.joinCountQuery_source q hq op C) d))).sum
+      = havingProv
+          (havingGroup (fun _ : Fin 1 => (⟨0, by omega⟩ : Fin 3))
+            (q.evaluateAnnotated hq d) g)
+          (ts 0) SeqAggFunc.count op (C + 1) := by
+  rcases hop with rfl | rfl
+  · exact Query.joinChain_count_correct h_abs q hq d hnodup ts C g
+  · rw [havingProv_count_gt]
+    exact Query.joinChain_count_correct h_abs q hq d hnodup ts (C + 1) g
 
 end Assembly

@@ -355,7 +355,11 @@ proven engine several general results reuse internally.
 - `Provenance.Having` – algebraic identities behind `HAVING (count)` aggregate
   provenance: include/exclude recurrences for the JOIN and possible-world expressions,
   the upward-expansion bound, the upward-closed collapse
-  (`upward_closed_collapse`, `collapse_to_minimal`), and the index-set size facts
+  (`upward_closed_collapse`, `collapse_to_minimal`), the sandwich
+  `T_U(W) ≤ ann_U(W) ≤ A_W` of the factored world annotation and the
+  resulting distributivity-free collapse of the monotone case
+  (`monus_factor_le`, `witness_identity`, `witness_minimal`, `Fann_eq_S`),
+  and the index-set size facts
 - `Provenance.HavingSemantics` – the possible-world semantics of the fused
   `Query.Having` operator (grouping + aggregate comparison) over annotated
   databases: group-occurrence sequences, the bridge between subsequences and
@@ -423,7 +427,9 @@ proven engine several general results reuse internally.
   recurrence and CDF assembly.
 - `Provenance.HavingQueryCorrectness` – query-level correctness of the fused
   `Having` operator against the JOIN-based rewriting, in absorptive
-  m-semirings with `⊗`-over-`⊖` distributivity: the `C = 1` case
+  m-semirings (`⊗`-over-`⊖` distributivity is needed for `<`, `≤`, `=`,
+  `≠` only; the monotone `≥` and `>` cases hold without it,
+  `Query.joinCount_monotone_correct`): the `C = 1` case
   (`AggQuery.havingSite_count_ge_one`, the fused `COUNT(*) ≥ 1` site
   equals the duplicate-eliminated key projection) and the general
   case (`Query.joinChain_count_correct`, the `C`-fold self-join chain with
@@ -437,9 +443,11 @@ proven engine several general results reuse internally.
   equality: the padded rewriting `joinCountQueryPadded` (the join query
   unioned with the `𝟘`-annotated self-difference of the key query, then
   duplicate-eliminated) evaluates to exactly one row per group key with
-  the fused predicate provenance (`joinCountQueryPadded_correct`), which
-  is precisely the key projection of the fused output (`fused_key_proj`);
-  the combined `countHaving_site_rewrite` makes the substitution
+  the fused predicate provenance (`joinCountQueryPadded_correct`; for
+  `≥` and `>`, `joinCountQueryPadded_monotone_correct` without
+  distributivity), which is precisely the key projection of the fused
+  output (`fused_key_proj`); the combined `countHaving_site_rewrite`
+  (`countHaving_site_rewrite_monotone`) makes the substitution
   transparent to every surrounding operator – padding matters, since a
   bare “equal up to `𝟘`-rows” relation is not a congruence for enclosing
   aggregates. The compositional query-to-query form of the rewriting
@@ -448,8 +456,9 @@ proven engine several general results reuse internally.
 - `Provenance.HavingQueryCounterexamples` – `decide`-checked counterexamples,
   at the level of queries evaluated on concrete annotated databases, showing
   that the HAVING / JOIN correspondence for `COUNT(*)` needs both
-  absorptivity (tropical over `ℤ ∪ {∞}`) and `⊗`-over-`⊖` distributivity
-  (`ChainFive`).
+  absorptivity (tropical over `ℤ ∪ {∞}`, for `≥`) and `⊗`-over-`⊖`
+  distributivity (`ChainFive`, for `=`), and that the `≥` correspondence
+  does close in `ChainFive` (`ChainFive.query_ge_agree`).
 - `Provenance.Tseitin` – the Tseitin CNF transformation encoding a
   circuit as an equisatisfiable CNF over `X ⊕ Circuit X`. Provides
   syntactic `Literal` / `Clause` / `CNF` types, the Tseitin encoder,

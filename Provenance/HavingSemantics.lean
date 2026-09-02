@@ -38,7 +38,8 @@ a bijection (`seqOf_injective`). Because annotations and aggregate values
 factor through positions, the possible-world `⊕`-sum below is taken over
 `Finset (Fin U.length)` – which is exactly the index representation used by
 `Provenance.Having` – and the whole algebraic development attaches to the
-semantics through `worldAnn_eq_T` and `havingProv_eq_prov`.
+semantics through `worldAnn_eq_T` and `havingProv_eq_prov` (and, for the
+`≥` comparisons, which need no distributivity, through `worldAnn_eq_ann`).
 
 ## The semantics
 
@@ -230,6 +231,14 @@ theorem worldAnn_eq_T (h_distrib : mul_sub_left_distributive K)
   rw [Having.T_eq_mul_one_monus_sum α h_distrib, worldAnn, Having.A,
     Finset.compl_eq_univ_sdiff]
 
+omit [DecidableEq K] in
+/-- The factored world annotation is `Having.ann` over the full universe
+of positions, unconditionally: this is the attachment the `≥` case uses,
+where distributivity is not available (or not needed). -/
+theorem worldAnn_eq_ann {N : ℕ} (α : Fin N → K) (W : Finset (Fin N)) :
+    worldAnn α W = Having.ann α Finset.univ W := by
+  rw [worldAnn, Having.ann, Having.A, Finset.compl_eq_univ_sdiff]
+
 /-! ### Group extraction and aggregate values -/
 
 omit [ValueType T] [CommSemiringWithMonus K] [DecidableEq K] in
@@ -366,23 +375,26 @@ theorem aggValOn_count
 
 omit [DecidableEq K] in
 /-- **`COUNT(*) ≥ C` case of the fused semantics.** In an absorptive
-m-semiring with `⊗` distributive over `⊖`, the predicate provenance of
-`COUNT(*) ≥ C + 1` on the group sequence `U` is the possible-world
-provenance `Having.F` – hence, by `Having.F_eq_S`, the join-side
-`Having.S`, the `⊕`-sum of the monomials of the worlds of size exactly
-`C + 1`. -/
+m-semiring, the predicate provenance of `COUNT(*) ≥ C + 1` on the group
+sequence `U` is the join-side `Having.S`, the `⊕`-sum of the monomials of
+the worlds of size exactly `C + 1`. Unlike the `=` and `≤` cases, no
+distributivity of `⊗` over `⊖` is needed: the factored world annotations
+are summed directly through `Having.Fann_eq_S`, whose proof never rewrites
+them into the `Having.T` form. -/
 theorem havingProv_count_ge (h_abs : absorptive K)
-    (h_distrib : mul_sub_left_distributive K)
     (U : List (AnnotatedTuple ℕ K m)) (t : Term ℕ m) (C : ℕ) :
     havingProv U t SeqAggFunc.count CompOp.ge (C + 1)
       = S (fun i => (U.get i).snd) Finset.univ (C + 1) := by
-  rw [havingProv_eq_prov h_distrib, ← F_eq_S h_abs]
-  unfold prov F
-  refine Finset.sum_congr (Finset.filter_congr fun W _ => ?_) fun _ _ => rfl
-  simp only [CompOp.eval, aggValOn_count, ge_iff_le]
-  constructor
-  · exact fun h => h.2
-  · exact fun h => ⟨Finset.card_pos.mp (by omega), h⟩
+  rw [← Fann_eq_S h_abs]
+  unfold havingProv Fann
+  rw [Finset.powerset_univ, Finset.sum_filter, Finset.sum_filter]
+  refine Finset.sum_congr rfl fun W _ => ?_
+  simp only [chi, CompOp.eval, aggValOn_count, ge_iff_le, worldAnn_eq_ann]
+  by_cases hC : C + 1 ≤ W.card
+  · have hne : W.Nonempty := Finset.card_pos.mp (by omega)
+    simp [hC, hne]
+  · have hne : ¬ (W.Nonempty ∧ C + 1 ≤ W.card) := fun h => hC h.2
+    by_cases hW : W.Nonempty <;> simp [hC, hW]
 
 omit [DecidableEq K] in
 /-- **`COUNT(*) = C` case of the fused semantics.** The predicate
@@ -469,16 +481,15 @@ theorem havingProv_ne_split (U : List (AnnotatedTuple T K m)) (t : Term T m)
 
 omit [DecidableEq K] in
 /-- **`COUNT(*) ≥ 1` collapses to the group annotation sum.** In an
-absorptive m-semiring with `⊗` distributive over `⊖`, the fused
-`COUNT(*) ≥ 1` predicate provenance of a group sequence is the `⊕`-sum of
-the annotations of its occurrences (the `C = 1` instance of the join
-correspondence: `S_1` is the sum of the singleton monomials). -/
+absorptive m-semiring, the fused `COUNT(*) ≥ 1` predicate provenance of a
+group sequence is the `⊕`-sum of the annotations of its occurrences (the
+`C = 1` instance of the join correspondence: `S_1` is the sum of the
+singleton monomials). -/
 theorem havingProv_count_ge_one (h_abs : absorptive K)
-    (h_distrib : mul_sub_left_distributive K)
     (U : List (AnnotatedTuple ℕ K m)) (t : Term ℕ m) :
     havingProv U t SeqAggFunc.count CompOp.ge 1
       = (U.map (fun p => p.snd)).sum := by
-  have h := havingProv_count_ge h_abs h_distrib U t 0
+  have h := havingProv_count_ge h_abs U t 0
   refine h.trans ?_
   show S (fun i => (U.get i).snd) Finset.univ 1 = (U.map (fun p => p.snd)).sum
   unfold S

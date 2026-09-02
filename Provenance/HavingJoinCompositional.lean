@@ -259,18 +259,22 @@ section SiteCorrectness
 
 variable [HasAltLinearOrder K]
 
-/-- **Multiset-level correctness of the padded JOIN rewriting.** In an
-absorptive commutative m-semiring whose `⊗` distributes over `⊖`, the
-padded join-based query evaluates to *exactly* – row for row, annotation
-for annotation – one row per group key of the base query, annotated with
-the fused `COUNT(*) op (C + 1)` predicate provenance. The sole hypothesis
-is the injective per-group occurrence identifiers (global
-row-distinctness of the base query's output). -/
-theorem joinCountQueryPadded_correct
-    (h_abs : absorptive K) (h_distrib : mul_sub_left_distributive K)
+/-- The padding argument, parameterized by the per-key correctness of the
+unpadded join query: whenever `Query.joinCountQuery q op C` gives every
+group key the fused predicate provenance as a per-key annotation sum, the
+padded query evaluates to exactly one row per group key carrying it. Both
+`joinCountQueryPadded_correct` and `joinCountQueryPadded_monotone_correct`
+are instances. -/
+theorem joinCountQueryPadded_correct_of
     (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
-    (hnodup : ((q.evaluateAnnotated hq d).map Prod.fst).Nodup)
-    (ts : Tuple (Term ℕ 3) 1) (op : CompOp) (C : ℕ) :
+    (ts : Tuple (Term ℕ 3) 1) (op : CompOp) (C : ℕ)
+    (hkey : ∀ u : Tuple ℕ 1,
+      (Multiset.map Prod.snd (Multiset.filter (fun p => p.fst = u)
+        ((Query.joinCountQuery q op C).evaluateAnnotated
+          (Query.joinCountQuery_source q hq op C) d))).sum
+      = Having.havingProv
+          (Having.havingGroup keyIdx (q.evaluateAnnotated hq d) u)
+          (ts 0) SeqAggFunc.count op (C + 1)) :
     (joinCountQueryPadded q op C).evaluateAnnotated
         (joinCountQueryPadded_source q hq op C) d
       = (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
@@ -315,9 +319,47 @@ theorem joinCountQueryPadded_correct
     Eq.trans (perKeySum_dedup_map (α := Tuple ℕ 1) (β := K)
       ((q.evaluateAnnotated hq d).map keyOf) (fun _ => (0 : K)) u)
       (ite_self _)
-  exact Eq.trans (congrArg₂ (· + ·)
-    (Query.joinCount_correct h_abs h_distrib q hq d hnodup ts op C u)
-    hzero) (add_zero _)
+  exact Eq.trans (congrArg₂ (· + ·) (hkey u) hzero) (add_zero _)
+
+/-- **Multiset-level correctness of the padded JOIN rewriting.** In an
+absorptive commutative m-semiring whose `⊗` distributes over `⊖`, the
+padded join-based query evaluates to *exactly* – row for row, annotation
+for annotation – one row per group key of the base query, annotated with
+the fused `COUNT(*) op (C + 1)` predicate provenance. The sole hypothesis
+is the injective per-group occurrence identifiers (global
+row-distinctness of the base query's output). -/
+theorem joinCountQueryPadded_correct
+    (h_abs : absorptive K) (h_distrib : mul_sub_left_distributive K)
+    (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
+    (hnodup : ((q.evaluateAnnotated hq d).map Prod.fst).Nodup)
+    (ts : Tuple (Term ℕ 3) 1) (op : CompOp) (C : ℕ) :
+    (joinCountQueryPadded q op C).evaluateAnnotated
+        (joinCountQueryPadded_source q hq op C) d
+      = (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
+          (fun g => ((g, Having.havingProv
+            (Having.havingGroup keyIdx (q.evaluateAnnotated hq d) g)
+            (ts 0) SeqAggFunc.count op (C + 1)) : Tuple ℕ 1 × K)) :=
+  joinCountQueryPadded_correct_of q hq d ts op C
+    (Query.joinCount_correct h_abs h_distrib q hq d hnodup ts op C)
+
+/-- **Padded rewriting of the monotone comparisons, without
+distributivity.** For `op ∈ {≥, >}`, `joinCountQueryPadded_correct` holds
+in every absorptive commutative m-semiring
+(`Query.joinCount_monotone_correct`). -/
+theorem joinCountQueryPadded_monotone_correct
+    (h_abs : absorptive K)
+    (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
+    (hnodup : ((q.evaluateAnnotated hq d).map Prod.fst).Nodup)
+    (ts : Tuple (Term ℕ 3) 1) (op : CompOp) (hop : op = CompOp.ge ∨ op = CompOp.gt)
+    (C : ℕ) :
+    (joinCountQueryPadded q op C).evaluateAnnotated
+        (joinCountQueryPadded_source q hq op C) d
+      = (Multiset.dedup ((q.evaluateAnnotated hq d).map keyOf)).map
+          (fun g => ((g, Having.havingProv
+            (Having.havingGroup keyIdx (q.evaluateAnnotated hq d) g)
+            (ts 0) SeqAggFunc.count op (C + 1)) : Tuple ℕ 1 × K)) :=
+  joinCountQueryPadded_correct_of q hq d ts op C
+    (Query.joinCount_monotone_correct h_abs q hq d hnodup ts op hop C)
 
 /-- **The key-projected fused output.** Projecting the fused
 `HAVING COUNT(*) op (C + 1)` site output to its group key yields the same
@@ -369,5 +411,24 @@ theorem countHaving_site_rewrite
   (fused_key_proj (q.toAgg hq) q hq d (Query.toAggHaving_input q hq d)
       ts' op C).trans
     (joinCountQueryPadded_correct h_abs h_distrib q hq d hnodup ts' op C).symm
+
+/-- **Site substitution for the monotone comparisons**, in every absorptive
+commutative m-semiring: `countHaving_site_rewrite` for `op ∈ {≥, >}` with
+the distributivity hypothesis dropped. -/
+theorem countHaving_site_rewrite_monotone
+    (h_abs : absorptive K)
+    (q : Query ℕ 3) (hq : q.source) (d : AnnotatedDatabase ℕ K)
+    (hnodup : ((q.evaluateAnnotated hq d).map Prod.fst).Nodup)
+    (ts' : Tuple (Term ℕ 3) 1) (op : CompOp) (hop : op = CompOp.ge ∨ op = CompOp.gt)
+    (C : ℕ) :
+    ((AggQuery.havingSite keyIdx ts' (fun _ => SeqAggFunc.count) op 0
+        (Term.const (C + 1)) (q.toAgg hq)).evaluateAnnotated d).map
+        (fun p => ((fun _ : Fin 1 => p.fst ⟨0, by omega⟩, p.snd)
+          : Tuple ℕ 1 × K))
+      = (joinCountQueryPadded q op C).evaluateAnnotated
+          (joinCountQueryPadded_source q hq op C) d :=
+  (fused_key_proj (q.toAgg hq) q hq d (Query.toAggHaving_input q hq d)
+      ts' op C).trans
+    (joinCountQueryPadded_monotone_correct h_abs q hq d hnodup ts' op hop C).symm
 
 end SiteCorrectness
