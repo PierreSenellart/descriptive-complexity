@@ -258,8 +258,10 @@ build times down.
   loop is `DescriptiveComplexity/Problems/SubgraphIso.lean` with its
   `SubgraphIso/Encoding.lean`: a catalog problem, then its concrete encoding
   and a decoder with no well-formedness condition.
-* **Planned work**: `ROADMAP.md` – classes beyond PSPACE, counting and
-  optimization problems, more inexpressibility results, finer reduction notions.
+* **Planned work**: `ROADMAP.md` – locality theorems and 0-1 laws for the
+  inexpressibility track, the graph-isomorphism degree, counting problems and
+  `#P`, finer reduction notions, and further complete problems for PTIME,
+  PSPACE and the exponential classes.
 
 ## Building
 
