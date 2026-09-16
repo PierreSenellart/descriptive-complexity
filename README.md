@@ -168,8 +168,8 @@ Lean code, including most proofs and docstrings, was written with the
 assistance of various generative models from Anthropic (*Claude*).
 Formalization choices, the library architecture, the main definitions and
 theorems, and their alignment with the standard ones, were designed and
-either written or reviewed by the author. Responsibility for the whole
-rests with the author.
+written or reviewed by the author. Responsibility for the whole rests
+with the author.
 
 All proofs are checked by Lean, locally and in continuous integration.
 The library does not depend on any axioms apart from standard Lean ones:
