@@ -58,7 +58,6 @@ preferred-citation:
   year: 2026
   month: 9
   status: preprint
-  repository: arXiv
   identifiers:
     - type: other
       value: "arXiv:2609.18261"
