@@ -201,7 +201,9 @@ strictly stronger than exhibiting a Karp reduction
 only first-order logic, which Mathlib already provides.
 
 This page is the high-level map of the library, part by part. The `README`
-gives the general pitch; the worked examples in
+gives the general pitch; the paper
+[Senellart and Gnatenko 2026][senellart2026descriptive] presents the design and
+the main results; the worked examples in
 `DescriptiveComplexity.Examples.ConjunctiveQueries` (conjunctive-query
 evaluation and containment) and `DescriptiveComplexity.Examples.GraphCrawling`
 (Web data acquisition, with a cardinality threshold, a reachability

@@ -3,6 +3,7 @@
 [![CI](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PierreSenellart/descriptive-complexity/actions/workflows/ci.yml)
 [![Mathlib](https://img.shields.io/badge/Mathlib-v4.33.0-blue)](https://github.com/leanprover-community/mathlib4/releases/tag/v4.33.0)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21678423-007ec6)](https://doi.org/10.5281/zenodo.21678423)
+[![arXiv](https://img.shields.io/badge/arXiv-2609.18261-b31b1b)](https://arxiv.org/abs/2609.18261)
 [![Archived in Software Heritage](https://archive.softwareheritage.org/badge/origin/https://github.com/PierreSenellart/descriptive-complexity/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/PierreSenellart/descriptive-complexity)
 
 A Lean 4 library for descriptive complexity on top of Mathlib's `ModelTheory`,
@@ -265,6 +266,12 @@ build times down.
 
 ## Documentation
 
+* **Paper**: P. Senellart and A. Gnatenko, *Descriptive Complexity in Lean:
+  Completeness by First-Order Reductions*, September 2026,
+  [arXiv:2609.18261](https://arxiv.org/abs/2609.18261) – the design of the
+  library and its main results. To cite the library, cite this paper;
+  `CITATION.cff` has the metadata, and the DOI above identifies the software
+  itself.
 * **API reference**:
   <https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html>
   – the `DescriptiveComplexity` module page is a part-by-part map of the library,

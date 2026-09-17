@@ -1,8 +1,9 @@
 cff-version: 1.2.0
 title: "DescriptiveComplexity: Completeness by First-Order Reductions in Lean"
 message: >-
-  If you use DescriptiveComplexity in academic work, please cite it using the
-  metadata in this file.
+  If you use DescriptiveComplexity in academic work, please cite the paper
+  given as preferred citation below; to refer to a specific version of the
+  software, use the metadata in this file.
 type: software
 authors:
   - family-names: Senellart
@@ -44,3 +45,22 @@ keywords:
   - Lean
   - Mathlib
   - formalized mathematics
+preferred-citation:
+  type: article
+  title: "Descriptive Complexity in Lean: Completeness by First-Order Reductions"
+  authors:
+    - family-names: Senellart
+      given-names: Pierre
+      orcid: "https://orcid.org/0000-0002-7909-5369"
+    - family-names: Gnatenko
+      given-names: Anton
+      orcid: "https://orcid.org/0000-0003-1499-2090"
+  year: 2026
+  month: 9
+  status: preprint
+  repository: arXiv
+  identifiers:
+    - type: other
+      value: "arXiv:2609.18261"
+      description: "arXiv preprint"
+  url: "https://arxiv.org/abs/2609.18261"
