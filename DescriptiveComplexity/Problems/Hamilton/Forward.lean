@@ -279,7 +279,7 @@ open Classical in
 omit [Fintype A] in
 theorem snakeOf_eq {C : A → Prop} {a b : A} (h : HEdge a b) :
     snakeOf C a b = if C b then snakeBoth h else snakeThrough h := by
-  rw [snakeOf, dif_pos h]
+  rw [snakeOf, dite_eq_left h]
 
 open Classical in
 omit [Fintype A] in
@@ -407,7 +407,7 @@ theorem gadget_mem_chain_far {C : A → Prop} {a b : A} (hab : HEdge a b) (i : H
     (hi : i ≠ .sel ∧ i ≠ .hub) (hnc : ¬C a) : gPt i hi hab ∈ chain C b := by
   rw [chain, List.mem_flatMap]
   refine ⟨a, mem_nbrList.mpr (hEdge_symm hab), ?_⟩
-  rw [snakeOf_eq (hEdge_symm hab), if_neg hnc]
+  rw [snakeOf_eq (hEdge_symm hab), ite_eq_right hnc]
   exact mem_snakeThrough_far (hEdge_symm hab) i hi hab
 
 /-! #### The endpoints of a chain -/
@@ -463,9 +463,9 @@ theorem chain_tuple {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p �
   have hwb : HEdge w b := mem_nbrList.mp hbmem
   rw [snakeOf_eq hwb] at hp
   by_cases hCb : C b
-  · rw [if_pos hCb] at hp
+  · rw [ite_eq_left hCb] at hp
     exact Or.inl (snakeBoth_tuple hwb hp).1
-  · rw [if_neg hCb] at hp
+  · rw [ite_eq_right hCb] at hp
     rcases snakeThrough_tuple hwb hp with ⟨h0, -⟩ | ⟨h0, h1⟩
     · exact Or.inl h0
     · exact Or.inr ⟨h1, by rw [h0]; exact hCb⟩
@@ -487,8 +487,8 @@ theorem snakeOf_tuple {C : A → Prop} {w b : A} (hwb : HEdge w b) {p : hamInter
     (hp : p ∈ snakeOf C w b) : (p.1.2 0 = w ∧ p.1.2 1 = b) ∨ (p.1.2 0 = b ∧ p.1.2 1 = w) := by
   rw [snakeOf_eq hwb] at hp
   by_cases hCb : C b
-  · rw [if_pos hCb] at hp; exact Or.inl (snakeBoth_tuple hwb hp)
-  · rw [if_neg hCb] at hp; exact snakeThrough_tuple hwb hp
+  · rw [ite_eq_left hCb] at hp; exact Or.inl (snakeBoth_tuple hwb hp)
+  · rw [ite_eq_right hCb] at hp; exact snakeThrough_tuple hwb hp
 
 omit [Fintype A] in
 /-- Snakes of distinct neighbors of `w` are disjoint. -/

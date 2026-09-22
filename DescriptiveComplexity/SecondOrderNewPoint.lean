@@ -131,9 +131,9 @@ theorem realize_isPointF (v : α) (w : α → M) :
   refine and_congr Iff.rfl (and_congr ?_ Iff.rfl)
   refine forall_congr' fun t' => ?_
   by_cases ht : t' = t
-  · rw [if_pos ht]
+  · rw [ite_eq_left ht]
     exact ⟨fun _ h' => ht, fun _ => Formula.realize_top.mpr trivial⟩
-  · rw [if_neg ht, Formula.realize_not, realize_tagF h]
+  · rw [ite_eq_right ht, Formula.realize_not, realize_tagF h]
     exact ⟨fun hn h' => absurd h' hn, fun hn h' => ht (hn h')⟩
 
 include hinj h in

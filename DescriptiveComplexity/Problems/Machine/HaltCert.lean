@@ -163,7 +163,7 @@ private def ixOf (n : ℕ) (x : ℤ) : Fin (2 * n + 1) :=
 private theorem pgOf_ixOf {n : ℕ} {x : ℤ} (h1 : -(n : ℤ) ≤ x) (h2 : x ≤ n) :
     pgOf n (ixOf n x) = x := by
   have hb : (x + n).toNat < 2 * n + 1 := by omega
-  simp only [ixOf, dif_pos hb, pgOf]
+  simp only [ixOf, dite_eq_left hb, pgOf]
   omega
 
 /-- The certificate a sequence of configurations carries. Named, rather than
@@ -343,14 +343,14 @@ private theorem tapeOf_pg {r : RunCert A T P} {pg : P → ℤ} {b₀ : A} (hinj 
     (t : T) (z : P) (p : A) : tapeOf r pg b₀ t (pg z, p) = r.sym t z p := by
   classical
   have hex : ∃ z', pg z' = ((pg z, p) : ℤ × A).1 := ⟨z, rfl⟩
-  simp only [tapeOf, dif_pos hex]
+  simp only [tapeOf, dite_eq_left hex]
   exact congrArg (fun w => r.sym t w p) (hinj hex.choose_spec)
 
 private theorem tapeOf_out {r : RunCert A T P} {pg : P → ℤ} {b₀ : A} (t : T) {x : ℤ × A}
     (hx : ∀ z, pg z ≠ x.1) : tapeOf r pg b₀ t x = b₀ := by
   classical
   have : ¬∃ z, pg z = x.1 := fun ⟨z, hz⟩ => hx z hz
-  simp only [tapeOf, dif_neg this]
+  simp only [tapeOf, dite_eq_right this]
 
 variable {M : TMData A}
 

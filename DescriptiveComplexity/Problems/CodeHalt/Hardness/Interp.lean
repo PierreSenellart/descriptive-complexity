@@ -318,10 +318,10 @@ theorem mark_pt (s : CodeTag) (t : ProgTag V cP) (u : Fin (dimOf V) → A) :
     rw [FOInterpretation.relMap_map, hφ]
     change (markF V cP s t).Realize _ ↔ _
     by_cases h : ProgTag.mark t = s
-    · rw [markF, if_pos h]
+    · rw [markF, ite_eq_left h]
       refine Iff.trans (realize_guardF_sel₀ t u _ fun _ => rfl) ?_
       exact ⟨fun hh => ⟨hh, h⟩, fun hh => hh.1⟩
-    · rw [markF, if_neg h]
+    · rw [markF, ite_eq_right h]
       exact iff_of_false (by simp) (fun hh => h hh.2)
   cases s
   · exact hkey cZero fun _ => rfl

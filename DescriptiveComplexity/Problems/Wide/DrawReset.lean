@@ -107,7 +107,7 @@ theorem reachesIn_reset (hR : PR.table.Reads)
             else restN (fun _ => False) t) =
           (if t = t then bitVal PR.zero PR.one (bitAtOf RF.cell m fun _ => False)
             else restB (fun _ => False) t)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne (show s ≠ t from hst),
           Prog.passTracks_of_ne (show s ≠ t from hst)]
         exact (hNBslot s hs).symm

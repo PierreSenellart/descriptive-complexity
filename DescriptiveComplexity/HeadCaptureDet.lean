@@ -273,7 +273,7 @@ theorem dblk_val (t : Fin 4) (i : Fin spec.k) :
 theorem dmk_val : ((dmk spec : Fin (dHeads spec)) : ℕ) = 4 * spec.k := rfl
 
 theorem dshd_val {i : ℕ} (h : i < dHeads spec) : ((dshd spec i : Fin (dHeads spec)) : ℕ) = i := by
-  rw [dshd, dif_pos h]
+  rw [dshd, dite_eq_left h]
 
 theorem dshd_val' : ∀ i : ℕ, i < dHeads spec → ((dshd spec i : Fin (dHeads spec)) : ℕ) = i :=
   fun _ h => dshd_val spec h
@@ -534,17 +534,17 @@ theorem runs_resetP (t : Fin 4) :
     (moveP (L := L) (dResetMoves spec t)).Runs A (dprot spec) fun x b y => b = true ∧
       (∀ (i : Fin spec.k) (a : A), y (dblk spec t i) ≤ a) ∧ dKeepBut spec t x y := by
   refine (runs_moveP_local (dResetMoves spec t) (dprot spec) fun h hh => ?_).mono ?_ ?_
-  · rw [dResetMoves, if_neg (high_notMem_range spec t hh)]
+  · rw [dResetMoves, ite_eq_right (high_notMem_range spec t hh)]
   · rintro x b y ⟨rfl, hmv⟩
     refine ⟨rfl, fun i a => ?_, fun t' i ht' => ?_, ?_⟩
     · have hx := hmv (dblk spec t i) (dblk_lt_prot spec t i)
-      rw [dResetMoves, if_pos (dblk_range spec t i)] at hx
+      rw [dResetMoves, ite_eq_left (dblk_range spec t i)] at hx
       exact hx a
     · have hx := hmv (dblk spec t' i) (dblk_lt_prot spec t' i)
-      rw [dResetMoves, if_neg (dblk_notMem_range spec i ht')] at hx
+      rw [dResetMoves, ite_eq_right (dblk_notMem_range spec i ht')] at hx
       exact hx
     · have hx := hmv (dmk spec) (dmk_lt_prot spec)
-      rw [dResetMoves, if_neg (dmk_notMem_range spec t)] at hx
+      rw [dResetMoves, ite_eq_right (dmk_notMem_range spec t)] at hx
       exact hx
   · rintro x b y ⟨rfl, hmin, hkeep, hkmk⟩
     classical
@@ -552,16 +552,16 @@ theorem runs_resetP (t : Fin 4) :
       then y h else x h, ?_, rfl, fun j hj => ?_⟩
     · refine dHeadAgree_iff spec |>.mpr ⟨fun t' i => ?_, ?_⟩
       · by_cases ht' : t' = t
-        · rw [ht', if_pos (dblk_range spec t i)]
-        · rw [if_neg (dblk_notMem_range spec i ht')]
+        · rw [ht', ite_eq_left (dblk_range spec t i)]
+        · rw [ite_eq_right (dblk_notMem_range spec i ht')]
           exact hkeep t' i ht'
-      · rw [if_neg (dmk_notMem_range spec t)]
+      · rw [ite_eq_right (dmk_notMem_range spec t)]
         exact hkmk
     · change (dResetMoves spec t j).Holds x j
         (if (t : ℕ) * spec.k ≤ (j : ℕ) ∧ (j : ℕ) < (t : ℕ) * spec.k + spec.k then y j else x j)
       rw [dResetMoves]
       by_cases hin : (t : ℕ) * spec.k ≤ (j : ℕ) ∧ (j : ℕ) < (t : ℕ) * spec.k + spec.k
-      · rw [if_pos hin, if_pos hin]
+      · rw [ite_eq_left hin, ite_eq_left hin]
         intro a
         have hk : 0 < spec.k := by omega
         have hi : (j : ℕ) - (t : ℕ) * spec.k < spec.k := by omega
@@ -572,7 +572,7 @@ theorem runs_resetP (t : Fin 4) :
           omega
         rw [hje]
         exact hmin _ a
-      · rw [if_neg hin, if_neg hin]
+      · rw [ite_eq_right hin, ite_eq_right hin]
         rfl
 
 omit [Finite A] in
@@ -580,24 +580,24 @@ theorem runs_copyP :
     (moveP (L := L) (dCopyMoves spec 1)).Runs A (dprot spec) fun x b y => b = true ∧
       (∀ i, y (dblk spec 0 i) = x (dblk spec 1 i)) ∧ dKeepBut spec 0 x y := by
   refine (runs_moveP_local (dCopyMoves spec 1) (dprot spec) fun h hh => ?_).mono ?_ ?_
-  · rw [dCopyMoves, if_neg (by
+  · rw [dCopyMoves, ite_eq_right (by
       have := high_notMem_range spec 0 hh
       simp only [Fin.isValue, Fin.val_zero, Nat.zero_mul, Nat.zero_le, true_and] at this
       omega)]
   · rintro x b y ⟨rfl, hmv⟩
     refine ⟨rfl, fun i => ?_, fun t' i ht' => ?_, ?_⟩
     · have hx := hmv (dblk spec 0 i) (dblk_lt_prot spec 0 i)
-      rw [dCopyMoves, if_pos (by simp)] at hx
+      rw [dCopyMoves, ite_eq_left (by simp)] at hx
       rw [hx]
       exact congrArg x (by rw [← dshd_dblk spec 1 i]; simp)
     · have hx := hmv (dblk spec t' i) (dblk_lt_prot spec t' i)
-      rw [dCopyMoves, if_neg (by
+      rw [dCopyMoves, ite_eq_right (by
         have := dblk_notMem_range spec (t := 0) i ht'
         simp only [Fin.isValue, Fin.val_zero, Nat.zero_mul, Nat.zero_le, true_and] at this
         omega)] at hx
       exact hx
     · have hx := hmv (dmk spec) (dmk_lt_prot spec)
-      rw [dCopyMoves, if_neg (by
+      rw [dCopyMoves, ite_eq_right (by
         have := dmk_notMem_range spec 0
         simp only [Fin.isValue, Fin.val_zero, Nat.zero_mul, Nat.zero_le, true_and] at this
         omega)] at hx
@@ -607,13 +607,13 @@ theorem runs_copyP :
     refine ⟨fun h => if (h : ℕ) < spec.k then y h else x h, ?_, rfl, fun j hj => ?_⟩
     · refine dHeadAgree_iff spec |>.mpr ⟨fun t' i => ?_, ?_⟩
       · by_cases ht' : t' = 0
-        · rw [ht', if_pos (by simp)]
-        · rw [if_neg (by
+        · rw [ht', ite_eq_left (by simp)]
+        · rw [ite_eq_right (by
             have := dblk_notMem_range spec (t := 0) i ht'
             simp only [Fin.isValue, Fin.val_zero, Nat.zero_mul, Nat.zero_le, true_and] at this
             omega)]
           exact hkeep t' i ht'
-      · rw [if_neg (by
+      · rw [ite_eq_right (by
           have := dmk_notMem_range spec 0
           simp only [Fin.isValue, Fin.val_zero, Nat.zero_mul, Nat.zero_le, true_and] at this
           omega)]
@@ -621,11 +621,11 @@ theorem runs_copyP :
     · change (dCopyMoves spec 1 j).Holds x j (if (j : ℕ) < spec.k then y j else x j)
       rw [dCopyMoves]
       by_cases hin : (j : ℕ) < spec.k
-      · rw [if_pos hin, if_pos hin]
+      · rw [ite_eq_left hin, ite_eq_left hin]
         have hje : j = dblk spec 0 ⟨(j : ℕ), hin⟩ := Fin.ext (by rw [dblk_val]; simp)
         rw [hje, hcopy ⟨(j : ℕ), hin⟩]
         exact congrArg x (by rw [← dshd_dblk spec 1 ⟨(j : ℕ), hin⟩]; simp)
-      · rw [if_neg hin, if_neg hin]
+      · rw [ite_eq_right hin, ite_eq_right hin]
         rfl
 
 omit [Finite A] in
@@ -641,31 +641,31 @@ omit [Finite A] in
 theorem runs_parkP : (moveP (L := L) (dParkMoves spec)).Runs A (dprot spec) (dRel spec .init) := by
   refine (runs_moveP_local (dParkMoves spec) (dprot spec) fun h hh => ?_).mono ?_ ?_
   · rw [dprot] at hh
-    rw [dParkMoves, if_neg (by omega)]
+    rw [dParkMoves, ite_eq_right (by omega)]
   · rintro x b y ⟨rfl, hmv⟩
     refine ⟨rfl, ?_, fun t i => ?_⟩
     · have hx := hmv (dmk spec) (dmk_lt_prot spec)
-      rw [dParkMoves, if_pos (dmk_val spec)] at hx
+      rw [dParkMoves, ite_eq_left (dmk_val spec)] at hx
       exact hx
     · have hx := hmv (dblk spec t i) (dblk_lt_prot spec t i)
       have hne : ((dblk spec t i : Fin (dHeads spec)) : ℕ) ≠ 4 * spec.k := by
         have := dblk_lt spec t i
         omega
-      rw [dParkMoves, if_neg hne] at hx
+      rw [dParkMoves, ite_eq_right hne] at hx
       exact hx
   · rintro x b y ⟨rfl, hmax, hkeep⟩
     classical
     refine ⟨fun h => if (h : ℕ) = 4 * spec.k then y (dmk spec) else x h, ?_, rfl, fun j hj => ?_⟩
     · refine (dHeadAgree_iff spec).mpr ⟨fun t i => ?_, ?_⟩
-      · rw [if_neg (by have := dblk_lt spec t i; omega)]
+      · rw [ite_eq_right (by have := dblk_lt spec t i; omega)]
         exact hkeep t i
-      · rw [if_pos (dmk_val spec)]
+      · rw [ite_eq_left (dmk_val spec)]
     · change (dParkMoves spec j).Holds x j (if (j : ℕ) = 4 * spec.k then y (dmk spec) else x j)
       rw [dParkMoves]
       by_cases hjm : (j : ℕ) = 4 * spec.k
-      · rw [if_pos hjm, if_pos hjm]
+      · rw [ite_eq_left hjm, ite_eq_left hjm]
         exact hmax
-      · rw [if_neg hjm, if_neg hjm]
+      · rw [ite_eq_right hjm, ite_eq_right hjm]
         rfl
 
 omit [Finite A] in
@@ -686,11 +686,11 @@ theorem runs_startP (ms : spec.Mode) :
     omega
   refine (runs_moveP_local (dStartMoves spec) (dprot spec) fun h hh => ?_).mono ?_ ?_
   · rw [dprot] at hh
-    rw [dStartMoves, if_neg (by omega), if_neg (by omega)]
+    rw [dStartMoves, ite_eq_right (by omega), ite_eq_right (by omega)]
   · rintro x b y ⟨rfl, hmv⟩
     refine ⟨rfl, fun i => ?_, fun i a => ?_, fun t i h0 h3 => ?_, ?_⟩
     · have hx := hmv (dblk spec 0 i) (dblk_lt_prot spec 0 i)
-      rw [dStartMoves, if_pos (by simp)] at hx
+      rw [dStartMoves, ite_eq_left (by simp)] at hx
       rw [hx]
       refine congrArg x ?_
       rw [← dshd_dblk spec 2 i]
@@ -707,14 +707,15 @@ theorem runs_startP (ms : spec.Mode) :
         have h3 : ((3 : Fin 4) : ℕ) = 3 := rfl
         rw [h3] at this
         omega
-      rw [dStartMoves, if_neg h1, if_pos h2] at hx
+      rw [dStartMoves, ite_eq_right h1, ite_eq_left h2] at hx
       exact hx a
     · obtain ⟨h1, h2⟩ := hk3 t i h0 h3
       have hx := hmv (dblk spec t i) (dblk_lt_prot spec t i)
-      rw [dStartMoves, if_neg h1, if_neg h2] at hx
+      rw [dStartMoves, ite_eq_right h1, ite_eq_right h2] at hx
       exact hx
     · have hx := hmv (dmk spec) (dmk_lt_prot spec)
-      rw [dStartMoves, if_neg (by rw [dmk_val]; omega), if_neg (by rw [dmk_val]; omega)] at hx
+      rw [dStartMoves, ite_eq_right (by rw [dmk_val]; omega),
+        ite_eq_right (by rw [dmk_val]; omega)] at hx
       exact hx
   · rintro x b y ⟨rfl, hcopy, hmin, hkeep, hkmk⟩
     classical
@@ -722,32 +723,32 @@ theorem runs_startP (ms : spec.Mode) :
       then y h else x h, ?_, rfl, fun j hj => ?_⟩
     · refine (dHeadAgree_iff spec).mpr ⟨fun t i => ?_, ?_⟩
       · by_cases h0 : t = 0
-        · rw [h0, if_pos (Or.inl (by simp))]
+        · rw [h0, ite_eq_left (Or.inl (by simp))]
         · by_cases h3 : t = 3
-          · refine (if_pos (Or.inr ?_)).symm ▸ rfl
+          · refine (ite_eq_left (Or.inr ?_)).symm ▸ rfl
             have := dblk_range spec t i
             rw [h3] at this ⊢
             have h3' : ((3 : Fin 4) : ℕ) = 3 := rfl
             rw [h3'] at this
             omega
           · obtain ⟨h1, h2⟩ := hk3 t i h0 h3
-            rw [if_neg (by tauto)]
+            rw [ite_eq_right (by tauto)]
             exact hkeep t i h0 h3
-      · rw [if_neg (by rw [dmk_val]; omega)]
+      · rw [ite_eq_right (by rw [dmk_val]; omega)]
         exact hkmk
     · change (dStartMoves spec j).Holds x j
         (if (j : ℕ) < spec.k ∨ (3 * spec.k ≤ (j : ℕ) ∧ (j : ℕ) < 4 * spec.k) then y j else x j)
       rw [dStartMoves]
       by_cases h1 : (j : ℕ) < spec.k
-      · rw [if_pos h1, if_pos (Or.inl h1)]
+      · rw [ite_eq_left h1, ite_eq_left (Or.inl h1)]
         obtain ⟨i, rfl⟩ := dblk_of_range spec (t := 0) (by simp) (by simpa using h1)
         rw [hcopy i]
         refine congrArg x ?_
         rw [← dshd_dblk spec 2 i]
         simp
-      · rw [if_neg h1]
+      · rw [ite_eq_right h1]
         by_cases h2 : 3 * spec.k ≤ (j : ℕ) ∧ (j : ℕ) < 4 * spec.k
-        · rw [if_pos h2, if_pos (Or.inr h2)]
+        · rw [ite_eq_left h2, ite_eq_left (Or.inr h2)]
           obtain ⟨i, rfl⟩ := dblk_of_range spec (t := 3) (by
             have h3' : ((3 : Fin 4) : ℕ) = 3 := rfl
             rw [h3']
@@ -757,7 +758,7 @@ theorem runs_startP (ms : spec.Mode) :
             have := h2.2
             omega)
           exact hmin i
-        · rw [if_neg h2, if_neg (by tauto)]
+        · rw [ite_eq_right h2, ite_eq_right (by tauto)]
           rfl
 
 /-- **The fragments of the deterministic machine run what they are meant to.** -/
@@ -1333,16 +1334,16 @@ theorem exists_dReset (t : Fin 4) (x : Fin (dHeads spec) → A) :
   · change (if (t : ℕ) * spec.k ≤ ((dblk spec t i : Fin (dHeads spec)) : ℕ) ∧
       ((dblk spec t i : Fin (dHeads spec)) : ℕ) < (t : ℕ) * spec.k + spec.k then mn
       else x (dblk spec t i)) ≤ a
-    rw [if_pos (dblk_range spec t i)]
+    rw [ite_eq_left (dblk_range spec t i)]
     exact hmn a
   · change (if (t : ℕ) * spec.k ≤ ((dblk spec t' i : Fin (dHeads spec)) : ℕ) ∧
       ((dblk spec t' i : Fin (dHeads spec)) : ℕ) < (t : ℕ) * spec.k + spec.k then mn
       else x (dblk spec t' i)) = x (dblk spec t' i)
-    rw [if_neg (dblk_notMem_range spec i ht')]
+    rw [ite_eq_right (dblk_notMem_range spec i ht')]
   · change (if (t : ℕ) * spec.k ≤ ((dmk spec : Fin (dHeads spec)) : ℕ) ∧
       ((dmk spec : Fin (dHeads spec)) : ℕ) < (t : ℕ) * spec.k + spec.k then mn
       else x (dmk spec)) = x (dmk spec)
-    rw [if_neg (dmk_notMem_range spec t)]
+    rw [ite_eq_right (dmk_notMem_range spec t)]
 
 omit [Finite A] in
 theorem dstep_candMode {ms m cm : spec.Mode} {i : Fin (modeCard spec + 1)}
@@ -1357,17 +1358,17 @@ theorem ixOf_of_modeAt {i : Fin (modeCard spec + 1)} {m : spec.Mode}
     (h : modeAt spec i = some m) : ixOf spec m = i := by
   rw [modeAt] at h
   by_cases hi : (i : ℕ) < modeCard spec
-  · rw [dif_pos hi] at h
+  · rw [dite_eq_left hi] at h
     have hm : m = (modeEquiv spec).symm ⟨(i : ℕ), hi⟩ := (Option.some.inj h).symm
     refine Fin.ext ?_
     change ((modeEquiv spec m : Fin (modeCard spec)) : ℕ) = (i : ℕ)
     rw [hm, Equiv.apply_symm_apply]
-  · rw [dif_neg hi] at h
+  · rw [dite_eq_right hi] at h
     exact absurd h (by simp)
 
 theorem nextIx_val {i : Fin (modeCard spec + 1)} (hi : (i : ℕ) < modeCard spec) :
     ((nextIx spec i : Fin (modeCard spec + 1)) : ℕ) = (i : ℕ) + 1 := by
-  rw [nextIx, dif_pos hi]
+  rw [nextIx, dite_eq_left hi]
 
 /-- **The chain of candidate modes finds the successor.** -/
 theorem modeFound (ms m cm : spec.Mode) (w' : spec.Node A) :
@@ -1405,7 +1406,7 @@ theorem modeFound (ms m cm : spec.Mode) (w' : spec.Node A) :
       have h2 : ((ixOf spec w'.1 : Fin (modeCard spec + 1)) : ℕ) < modeCard spec + 1 := this
       omega
     obtain ⟨m₂, hm₂⟩ : ∃ m₂, modeAt spec i = some m₂ := by
-      rw [modeAt, dif_pos hilt]
+      rw [modeAt, dite_eq_left hilt]
       exact ⟨_, rfl⟩
     have hne : m₂ ≠ w'.1 := by
       intro he
@@ -1464,14 +1465,14 @@ theorem modeNone (ms m cm : spec.Mode) :
   | zero =>
     intro i x hi hmk _
     have := i.isLt
-    exact hnone i x (by rw [modeAt, dif_neg (by omega)]) hmk
+    exact hnone i x (by rw [modeAt, dite_eq_right (by omega)]) hmk
   | succ d ih =>
     intro i x hi hmk hns
     rcases hmi : modeAt spec i with _ | m₂
     · exact hnone i x hmi hmk
     · have hilt : (i : ℕ) < modeCard spec := by
         by_contra hcon
-        rw [modeAt, dif_neg hcon] at hmi
+        rw [modeAt, dite_eq_right hcon] at hmi
         exact absurd hmi (by simp)
       obtain ⟨y, hmin, hkeep⟩ := exists_dReset 1 x
       have hmky : y (dmk spec) = x (dmk spec) := hkeep.2
@@ -1504,17 +1505,17 @@ theorem exists_dCopy (t : Fin 4) (x : Fin (dHeads spec) → A) :
     fun i => ?_, fun t' i ht' => ?_, ?_⟩
   · change (if hh : ((dblk spec 0 i : Fin (dHeads spec)) : ℕ) < spec.k then
       x (dblk spec t ⟨_, hh⟩) else x (dblk spec 0 i)) = x (dblk spec t i)
-    rw [dif_pos (show ((dblk spec 0 i : Fin (dHeads spec)) : ℕ) < spec.k by simp)]
+    rw [dite_eq_left (show ((dblk spec 0 i : Fin (dHeads spec)) : ℕ) < spec.k by simp)]
     exact congrArg (fun j => x (dblk spec t j)) (Fin.ext (by simp))
   · change (if hh : ((dblk spec t' i : Fin (dHeads spec)) : ℕ) < spec.k then
       x (dblk spec t ⟨_, hh⟩) else x (dblk spec t' i)) = x (dblk spec t' i)
-    refine dif_neg ?_
+    refine dite_eq_right ?_
     have := dblk_notMem_range spec (t := 0) i ht'
     simp only [Fin.isValue, Fin.val_zero, Nat.zero_mul, Nat.zero_le, true_and, Nat.zero_add] at this
     exact this
   · change (if hh : ((dmk spec : Fin (dHeads spec)) : ℕ) < spec.k then
       x (dblk spec t ⟨_, hh⟩) else x (dmk spec)) = x (dmk spec)
-    refine dif_neg ?_
+    refine dite_eq_right ?_
     have := dmk_notMem_range spec 0
     simp only [Fin.isValue, Fin.val_zero, Nat.zero_mul, Nat.zero_le, true_and, Nat.zero_add] at this
     exact this
@@ -1665,7 +1666,7 @@ theorem dcount_isTop {cm : spec.Mode} {t : Fin spec.k → A}
     (modeEquiv spec cm).isLt
   have hlast : ¬((nextIx spec (ixOf spec cm) : Fin (modeCard spec + 1)) : ℕ) < modeCard spec := by
     intro hlt
-    rw [modeAt, dif_pos hlt] at hnone
+    rw [modeAt, dite_eq_left hlt] at hnone
     exact absurd hnone (by simp)
   rw [nextIx_val hix] at hlast
   have hval : ((ixOf spec cm : Fin (modeCard spec + 1)) : ℕ) =
@@ -1693,7 +1694,7 @@ theorem dcount_of_isTop {cm : spec.Mode} {t : Fin spec.k → A}
   have hval : ((ixOf spec cm : Fin (modeCard spec + 1)) : ℕ) =
       ((modeEquiv spec cm : Fin (modeCard spec)) : ℕ) := rfl
   have hix : ((ixOf spec cm : Fin (modeCard spec + 1)) : ℕ) < modeCard spec := hlt
-  rw [modeAt, dif_neg (by rw [nextIx_val hix, hval]; omega)]
+  rw [modeAt, dite_eq_right (by rw [nextIx_val hix, hval]; omega)]
 
 omit [L.Structure A] [Finite A] in
 /-- The counter has exactly as many values as the specification has nodes. -/
@@ -2015,7 +2016,7 @@ theorem walkOut (ms : spec.Mode) : ∀ (z : DCount spec A) (m cm : spec.Mode)
 theorem exists_modeAt_ix0 (m : spec.Mode) : ∃ cm₀, modeAt spec (ix0 spec) = some cm₀ := by
   have hpos : ((ix0 spec : Fin (modeCard spec + 1)) : ℕ) < modeCard spec :=
     Nat.lt_of_le_of_lt (Nat.zero_le _) (modeEquiv spec m).isLt
-  exact ⟨_, by rw [modeAt, dif_pos hpos]⟩
+  exact ⟨_, by rw [modeAt, dite_eq_left hpos]⟩
 
 /-- **A source is tried**: from the test of a source, the machine either
 accepts or comes back for the next tuple of the enumeration, its source block

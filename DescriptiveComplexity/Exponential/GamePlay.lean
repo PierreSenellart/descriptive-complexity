@@ -295,8 +295,8 @@ theorem altAcceptsSpace_of_accepts (h₀ : IsBot a₀)
   · -- an initial configuration: the start state, the lowest position, the empty tape
     refine ⟨rfl, minPos_leftPt h₀ (carity := ctrlArity prog.vars), fun p => ?_⟩
     by_cases hp : machPosn p
-    · exact Or.inl ⟨hp, if_pos hp⟩
-    · exact Or.inr ⟨fun b hb => hp hb.1, if_neg hp⟩
+    · exact Or.inl ⟨hp, ite_eq_left hp⟩
+    · exact Or.inr ⟨fun b hb => hp hb.1, ite_eq_right hp⟩
   · -- the first sweep guesses the starting position
     refine altWin_sweep_ex (natoms := prog.natoms) (concOk := prog.concOk)
       (isTarget := prog.isTarget) (pol := prog.pol) (ρ := emptyAssign spec.B A)
@@ -306,7 +306,7 @@ theorem altAcceptsSpace_of_accepts (h₀ : IsBot a₀)
       cases rr with
       | false => exact absurd rfl hrr
       | true => rfl
-    · exact if_pos hq
+    · exact ite_eq_left hq
     · -- check that it starts the game, and play
       have h₄ : CtrlCfg a₀ hdim prog.vars ρ (emptyAssign spec.B A)
           (MachPh.splitStartPh false false) (fun _ => a₀) c₃ := h₃

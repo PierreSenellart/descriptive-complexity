@@ -256,31 +256,31 @@ theorem add_mod_iff_bits (a b c : ℕ) :
     clear ih hsplit
     have hpow : (2 : ℕ) ^ (i + 1) = 2 ^ i + 2 ^ i := by rw [pow_succ]; ring
     by_cases hcout : 2 ^ (i + 1) ≤ a % 2 ^ (i + 1) + b % 2 ^ (i + 1)
-    · rw [if_pos hcout]
+    · rw [ite_eq_left hcout]
       have hc' := (carry_succ a b i).mp hcout
       clear hcout
       rw [mod_two_pow_succ a i, mod_two_pow_succ b i, mod_two_pow_succ c i, hpow]
       rcases Classical.em (2 ^ i ≤ a % 2 ^ i + b % 2 ^ i) with hcin | hcin
-      · rw [if_pos hcin]
+      · rw [ite_eq_left hcin]
         cases ha : a.testBit i <;> cases hb : b.testBit i <;> cases hc : c.testBit i <;>
           simp_all
         all_goals omega
-      · rw [if_neg hcin]
+      · rw [ite_eq_right hcin]
         cases ha : a.testBit i <;> cases hb : b.testBit i <;> cases hc : c.testBit i <;>
           simp_all
         all_goals omega
-    · rw [if_neg hcout]
+    · rw [ite_eq_right hcout]
       have hc' : ¬ ((a.testBit i = true ∧ b.testBit i = true) ∨
           ((a.testBit i = true ∨ b.testBit i = true) ∧ 2 ^ i ≤ a % 2 ^ i + b % 2 ^ i)) :=
         fun h => hcout ((carry_succ a b i).mpr h)
       clear hcout
       rw [mod_two_pow_succ a i, mod_two_pow_succ b i, mod_two_pow_succ c i]
       rcases Classical.em (2 ^ i ≤ a % 2 ^ i + b % 2 ^ i) with hcin | hcin
-      · rw [if_pos hcin]
+      · rw [ite_eq_left hcin]
         cases ha : a.testBit i <;> cases hb : b.testBit i <;> cases hc : c.testBit i <;>
           simp_all
         all_goals omega
-      · rw [if_neg hcin]
+      · rw [ite_eq_right hcin]
         cases ha : a.testBit i <;> cases hb : b.testBit i <;> cases hc : c.testBit i <;>
           simp_all
         all_goals omega
@@ -326,7 +326,7 @@ theorem plusSweep_ok (x : Fin 3 → A) :
       rw [plusSweep.state_succ x i 1, hst]
       simp only [plusSweep, Matrix.cons_val_one, Matrix.cons_val_fin_one, BitExpr.eval,
         Sum.elim_inl, Sum.elim_inr, Bool.or_eq_true, Bool.and_eq_true, Bool.not_eq_true']
-      rw [hx, hy, hz, hpow, ih, hk, if_pos hcar]
+      rw [hx, hy, hz, hpow, ih, hk, ite_eq_left hcar]
       cases ha : (orank (x 0)).testBit i <;> cases hb : (orank (x 1)).testBit i <;>
         cases hc : (orank (x 2)).testBit i <;>
         simp only [reduceIte, Bool.false_eq_true, Bool.true_eq_false, and_true, and_false,
@@ -337,7 +337,7 @@ theorem plusSweep_ok (x : Fin 3 → A) :
       rw [plusSweep.state_succ x i 1, hst]
       simp only [plusSweep, Matrix.cons_val_one, Matrix.cons_val_fin_one, BitExpr.eval,
         Sum.elim_inl, Sum.elim_inr, Bool.or_eq_true, Bool.and_eq_true, Bool.not_eq_true']
-      rw [hx, hy, hz, hpow, ih, hk, if_neg hcar]
+      rw [hx, hy, hz, hpow, ih, hk, ite_eq_right hcar]
       cases ha : (orank (x 0)).testBit i <;> cases hb : (orank (x 1)).testBit i <;>
         cases hc : (orank (x 2)).testBit i <;>
         simp only [reduceIte, Bool.false_eq_true, Bool.true_eq_false, and_true, and_false,
@@ -365,13 +365,13 @@ theorem plusSweep_accepts (x : Fin 3 → A) :
       intro hcon
       rw [hcarry.mpr hcon] at h0
       exact Bool.noConfusion h0
-    rw [hok, if_neg hcar] at h1
+    rw [hok, ite_eq_right hcar] at h1
     omega
   · intro heq
     have hcar : ¬ 2 ^ posCount A ≤ orank (x 0) + orank (x 1) := by
       rw [heq]
       omega
-    refine ⟨hok.mpr (by rw [if_neg hcar]; omega), ?_⟩
+    refine ⟨hok.mpr (by rw [ite_eq_right hcar]; omega), ?_⟩
     cases hk : plusSweep.state x (posCount A) 0 with
     | false => rfl
     | true => exact absurd (hcarry.mp hk) hcar

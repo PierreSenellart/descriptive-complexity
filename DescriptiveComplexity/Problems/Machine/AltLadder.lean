@@ -87,7 +87,7 @@ omit [Finite A] in
 theorem greedyFrom_of_le {prev : A → Config A} {t x : A} (h : ¬(M.Posn x ∧ ¬M.Le x t)) :
     M.greedyFrom prev t x = prev x := by
   classical
-  rw [greedyFrom, if_neg h]
+  rw [greedyFrom, ite_eq_right h]
 
 omit [Finite A] in
 /-- From the entry time on, the continuation is the greedy sequence. -/
@@ -97,10 +97,10 @@ theorem greedyFrom_of_lt (hlin : IsLinOrd M.Le) {prev : A → Config A} {t x : A
       M.greedy (prev t) (bitRank M.Le M.Posn x - bitRank M.Le M.Posn t) := by
   classical
   rcases eq_or_ne x t with rfl | hne
-  · rw [greedyFrom, if_neg fun h => h.2 (hlin.1 x), Nat.sub_self]
+  · rw [greedyFrom, ite_eq_right fun h => h.2 (hlin.1 x), Nat.sub_self]
     rfl
   · have hnle : ¬M.Le x t := fun hcon => hne (hlin.2.2.1 x t hcon hle)
-    rw [greedyFrom, if_pos ⟨hx, hnle⟩]
+    rw [greedyFrom, ite_eq_left ⟨hx, hnle⟩]
 
 /-- **The greedy continuation is an admissible move for round `i`**, given the
 entry `t` into block `i`: it reproduces everything the earlier rounds committed

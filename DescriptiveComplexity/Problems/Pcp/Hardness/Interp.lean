@@ -480,9 +480,9 @@ theorem realize_cstLF {s tc : PTag} (hv2 : ∀ j, v (2, j) = wc j) :
     (cstLF s tc).Realize v ↔ ((tc, wc) : PV A) = cstE s := by
   rw [cstLF]
   by_cases htc : tc = s
-  · rw [if_pos htc, eq_cstE_iff]
+  · rw [ite_eq_left htc, eq_cstE_iff]
     exact (realize_minAllF hv2).trans ⟨fun h => ⟨htc, h⟩, fun h => h.2⟩
-  · rw [if_neg htc]
+  · rw [ite_eq_right htc]
     simp only [Formula.realize_bot, false_iff]
     rw [eq_cstE_iff]
     exact fun h => htc h.1
@@ -492,14 +492,14 @@ theorem realize_idxLF {s : PTag} {j : Fin 5} {tc : PTag}
     (idxLF s j tc).Realize v ↔ ((tc, wc) : PV A) = idxE s (wd j) := by
   rw [idxLF]
   by_cases htc : tc = s
-  · rw [if_pos htc, eq_idxE_iff]
+  · rw [ite_eq_left htc, eq_idxE_iff]
     rw [Formula.realize_inf, realize_eqF, hv0, hv2, realize_minTailF hv2]
     constructor
     · rintro ⟨h0, h⟩
       exact ⟨htc, h0, h⟩
     · rintro ⟨-, h0, h⟩
       exact ⟨h0, h⟩
-  · rw [if_neg htc]
+  · rw [ite_eq_right htc]
     simp only [Formula.realize_bot, false_iff]
     rw [eq_idxE_iff]
     exact fun h => htc h.1
@@ -515,9 +515,9 @@ theorem realize_posIsF {i : ℕ} {tp : PTag} (hv1 : ∀ j, v (1, j) = wp j) :
     (posIsF i tp).Realize v ↔ ((tp, wp) : PV A) = posE i := by
   rw [posIsF, posE_eq]
   by_cases htp : tp = posTagN i
-  · rw [if_pos htp, eq_cstE_iff]
+  · rw [ite_eq_left htp, eq_cstE_iff]
     exact (realize_minAllF hv1).trans ⟨fun h => ⟨htp, h⟩, fun h => h.2⟩
-  · rw [if_neg htp]
+  · rw [ite_eq_right htp]
     simp only [Formula.realize_bot, false_iff]
     rw [eq_cstE_iff]
     exact fun h => htp h.1
@@ -591,7 +591,7 @@ theorem realize_startBotF {tp tc : PTag}
     · rw [realize_minTailF hv1, eq_idxE_iff]
       exact ⟨fun h => ⟨rfl, rfl, h⟩, fun h => h.2.2⟩
     · by_cases htc : tc = .ltSym
-      · rw [if_pos htc, Formula.realize_inf, realize_initTapeF, hv1, hv2,
+      · rw [ite_eq_left htc, Formula.realize_inf, realize_initTapeF, hv1, hv2,
           realize_minTailF hv2]
         constructor
         · rintro ⟨ha, h⟩
@@ -599,7 +599,7 @@ theorem realize_startBotF {tp tc : PTag}
         · rintro ⟨a, ha, hc⟩
           obtain ⟨-, h0, h⟩ := eq_idxE_iff.mp hc
           exact ⟨h0 ▸ ha, h⟩
-      · rw [if_neg htc]
+      · rw [ite_eq_right htc]
         simp only [Formula.realize_bot, false_iff]
         rintro ⟨a, -, hc⟩
         exact htc (eq_idxE_iff.mp hc).1
@@ -682,22 +682,22 @@ theorem realize_domF {t : PTag} {v : Fin 1 × Fin 5 → A} {wd : Fin 5 → A}
   case dMoveR =>
     refine Formula.realize_inf.trans (and_congr realize_wfF ?_)
     rw [realize_existsMoveF]
-    simp only [hv, if_true]
+    simp only [hv, ite_true]
     exact Iff.rfl
   case dMoveREnd =>
     refine Formula.realize_inf.trans (and_congr realize_wfF ?_)
     rw [Formula.realize_inf, realize_existsMoveF, realize_blankF, hv 4]
-    simp only [hv, if_true]
+    simp only [hv, ite_true]
     exact Iff.rfl
   case dMoveL =>
     refine Formula.realize_inf.trans (and_congr realize_wfF ?_)
     rw [realize_existsMoveF]
-    simp only [hv, Bool.false_eq_true, if_false]
+    simp only [hv, Bool.false_eq_true, ite_false]
     exact Iff.rfl
   case dMoveLEnd =>
     refine Formula.realize_inf.trans (and_congr realize_wfF ?_)
     rw [Formula.realize_inf, realize_existsMoveF, realize_blankF, hv 4]
-    simp only [hv, Bool.false_eq_true, if_false]
+    simp only [hv, Bool.false_eq_true, ite_false]
     exact Iff.rfl
 
 omit [Finite A] [Nonempty A] in
@@ -716,15 +716,15 @@ theorem realize_leF {t t' : PTag} {v : Fin 2 × Fin 5 → A} {w w' : Fin 5 → A
       (t.bIdx < t'.bIdx ∨ (t.bIdx = t'.bIdx ∧ (MLt (w 0) (w' 0) ∨ (w 0 = w' 0 ∧
         (t.sIdx < t'.sIdx ∨ (t.sIdx = t'.sIdx ∧ TupLe w w')))))) from Iff.rfl]
   by_cases h1 : t.bIdx < t'.bIdx
-  · rw [if_pos h1]
+  · rw [ite_eq_left h1]
     simp only [Formula.realize_top, true_iff]
     exact Or.inl h1
-  · rw [if_neg h1]
+  · rw [ite_eq_right h1]
     by_cases h2 : t'.bIdx < t.bIdx
-    · rw [if_pos h2]
+    · rw [ite_eq_left h2]
       simp only [Formula.realize_bot, false_iff]
       rintro (h | ⟨heq, -⟩) <;> omega
-    · rw [if_neg h2]
+    · rw [ite_eq_right h2]
       have heq : t.bIdx = t'.bIdx := by omega
       rw [Formula.realize_sup, Formula.realize_inf, realize_mLtF, realize_eqF,
         hv0, hv1]
@@ -734,11 +734,11 @@ theorem realize_leF {t t' : PTag} {v : Fin 2 × Fin 5 → A} {w w' : Fin 5 → A
         · refine Or.inr ⟨heq, Or.inr ⟨he, ?_⟩⟩
           by_cases h3 : t.sIdx < t'.sIdx
           · exact Or.inl h3
-          · rw [if_neg h3] at hrest
+          · rw [ite_eq_right h3] at hrest
             by_cases h4 : t'.sIdx < t.sIdx
-            · rw [if_pos h4] at hrest
+            · rw [ite_eq_left h4] at hrest
               exact absurd hrest (fun h => h)
-            · rw [if_neg h4] at hrest
+            · rw [ite_eq_right h4] at hrest
               exact Or.inr ⟨by omega, (realize_tupLeF hv0 hv1).mp hrest⟩
       · rintro (h | ⟨-, hrest⟩)
         · exact absurd h h1
@@ -746,9 +746,10 @@ theorem realize_leF {t t' : PTag} {v : Fin 2 × Fin 5 → A} {w w' : Fin 5 → A
         · exact Or.inl hm
         · refine Or.inr ⟨he, ?_⟩
           rcases hsub with h3 | ⟨h34, htup⟩
-          · rw [if_pos h3]
+          · rw [ite_eq_left h3]
             exact Formula.realize_top.mpr trivial
-          · rw [if_neg (by omega : ¬t.sIdx < t'.sIdx), if_neg (by omega : ¬t'.sIdx < t.sIdx)]
+          · rw [ite_eq_right (by omega : ¬t.sIdx < t'.sIdx),
+              ite_eq_right (by omega : ¬t'.sIdx < t.sIdx)]
             exact (realize_tupLeF hv0 hv1).mpr htup
 
 end DomOrdRealize

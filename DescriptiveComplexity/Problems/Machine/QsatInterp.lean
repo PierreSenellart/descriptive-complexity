@@ -261,14 +261,14 @@ theorem realize_qCstF {s : QTag} {q : QV A}
     (qCstF s q.1).Realize v ↔ q = qCst s := by
   rw [qCstF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_minF, h0, h1]
     constructor
     · rintro ⟨ha, hb⟩
       exact qV_ext hs (le_antisymm (ha qBot) (qBot_le _)) (le_antisymm (hb qBot) (qBot_le _))
     · rintro rfl
       exact ⟨fun a => qBot_le a, fun a => qBot_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -277,14 +277,14 @@ theorem realize_qOneF {s : QTag} {x : Fin 2 × Fin 2} {q : QV A}
     (qOneF s x q.1).Realize v ↔ q = qOne s (v x) := by
   rw [qOneF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_eqF, realize_minF, h0, h1]
     constructor
     · rintro ⟨ha, hb⟩
       exact qV_ext hs ha (le_antisymm (hb qBot) (qBot_le _))
     · rintro rfl
       exact ⟨rfl, fun a => qBot_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -562,17 +562,17 @@ theorem relMap_le (p q : QV A) : TMLe (qsatMapEquiv p) (qsatMapEquiv q) ↔ QLe 
   change (leTagF p.1 q.1).Realize _ ↔ _
   rw [leTagF, QLe]
   by_cases h1 : qTagIdx p.1 < qTagIdx q.1
-  · rw [if_pos h1]
+  · rw [ite_eq_left h1]
     simp only [Formula.realize_top, true_iff]
     exact Or.inl h1
-  · rw [if_neg h1]
+  · rw [ite_eq_right h1]
     by_cases h2 : p.1 = q.1
-    · rw [if_pos h2]
+    · rw [ite_eq_left h2]
       simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
         realize_pLeF, realize_eqF]
       rw [QTupLe]
       exact ⟨fun h => Or.inr ⟨h2, h⟩, fun h => h.resolve_left h1 |>.2⟩
-    · rw [if_neg h2]
+    · rw [ite_eq_right h2]
       simp only [Formula.realize_bot, false_iff]
       rintro (h | ⟨h, -⟩)
       · exact h1 h
@@ -804,12 +804,12 @@ theorem relMap_tdst (p q : QV A) : TMDst (qsatMapEquiv p) (qsatMapEquiv q) ↔ Q
       refine or_congr (and_congr ((realize_qOneF h2 h3).trans (by rw [h0])) ?_)
         (and_congr ((realize_qOneF h2 h3).trans (by rw [h0])) ?_)
       · cases fl
-        · rw [if_neg Bool.false_ne_true]
+        · rw [ite_eq_right Bool.false_ne_true]
           refine Iff.trans (by simp only [realize_litF, h0, h1])
             ⟨fun h => Or.inr h, fun h => h.resolve_left (fun hc => Bool.noConfusion hc)⟩
         · exact iff_of_true (Formula.realize_top.mpr trivial) (Or.inl rfl)
       · cases fl
-        · rw [if_neg Bool.false_ne_true, Formula.realize_not]
+        · rw [ite_eq_right Bool.false_ne_true, Formula.realize_not]
           refine ⟨fun h => ⟨rfl, fun hl => h (by simp only [realize_litF, h0, h1]; exact hl)⟩, ?_⟩
           intro h hl
           exact h.2 (by simpa only [realize_litF, h0, h1] using hl)

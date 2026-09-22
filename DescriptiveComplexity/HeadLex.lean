@@ -68,11 +68,11 @@ def testDown {n : ℕ} (j : Fin (n + 1)) : Fin (n + 1) :=
   ⟨(j : ℕ) - 1, by have := j.isLt; omega⟩
 
 theorem testPos_eq_none {n : ℕ} {j : Fin (n + 1)} (h : (j : ℕ) = 0) : testPos j = none := by
-  rw [testPos, dif_neg (by omega)]
+  rw [testPos, dite_eq_right (by omega)]
 
 theorem testPos_eq_some {n : ℕ} {j : Fin (n + 1)} {p : ℕ} (h : (j : ℕ) = p + 1)
     (hp : p < n) : testPos j = some ⟨p, hp⟩ := by
-  rw [testPos, dif_pos (by omega)]
+  rw [testPos, dite_eq_left (by omega)]
   refine congrArg some (Fin.ext ?_)
   change (j : ℕ) - 1 = p
   omega
@@ -157,7 +157,7 @@ theorem runs_lexFam (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (c : LexNode 
     have h2 : ¬∃ i, j < i ∧ h = blk i := by
       rintro ⟨i, -, rfl⟩
       exact absurd (hblk i) (by omega)
-    rw [bumpMoves, if_neg h1, if_neg h2]
+    rw [bumpMoves, ite_eq_right h1, ite_eq_right h2]
 
 theorem headLocal2_lexFamRel (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot)
     (c : LexNode n) : HeadLocal2 prot (lexFamRel (A := A) blk mk prot c) := by
@@ -173,13 +173,13 @@ theorem headLocal2_lexFamRel (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk
     refine headLocal2_moveP fun h hh => ?_
     rw [bumpMoves]
     by_cases h1 : h = blk j
-    · rw [if_pos h1]
+    · rw [ite_eq_left h1]
       exact hh
-    · rw [if_neg h1]
+    · rw [ite_eq_right h1]
       by_cases h2 : ∃ i, j < i ∧ h = blk i
-      · rw [if_pos h2]
+      · rw [ite_eq_left h2]
         trivial
-      · rw [if_neg h2]
+      · rw [ite_eq_right h2]
         trivial
 
 theorem lexRel_local (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot) :
@@ -349,16 +349,16 @@ theorem lexSound (hinj : Function.Injective blk) (hblk : ∀ i, ((blk i : Fin K)
               rw [hinj he] at hi
               exact absurd (lt_trans hi hlt) (lt_irrefl _)
             have hx := hmv (blk i) (hblk i)
-            rw [bumpMoves, if_neg hne, if_neg hne2] at hx
+            rw [bumpMoves, ite_eq_right hne, ite_eq_right hne2] at hx
             rw [hx, hag _ (hblk i)]
           · have hx := hmv (blk ⟨j, hj⟩) (hblk _)
-            rw [bumpMoves, if_pos rfl] at hx
+            rw [bumpMoves, ite_eq_left rfl] at hx
             rw [hag (blk ⟨j, hj⟩) (hblk _)]
             exact hx
           · intro i hi
             have hne : blk i ≠ blk ⟨j, hj⟩ := fun he => absurd (hinj he) (ne_of_gt hi)
             have hx := hmv (blk i) (hblk i)
-            rw [bumpMoves, if_neg hne, if_pos ⟨i, hi, rfl⟩] at hx
+            rw [bumpMoves, ite_eq_right hne, ite_eq_left ⟨i, hi, rfl⟩] at hx
             exact hx
           · intro jh hjh hnb
             have hne : jh ≠ blk ⟨j, hj⟩ := hnb _
@@ -366,7 +366,7 @@ theorem lexSound (hinj : Function.Injective blk) (hblk : ∀ i, ((blk i : Fin K)
               rintro ⟨i', -, he⟩
               exact hnb i' he
             have hx := hmv jh hjh
-            rw [bumpMoves, if_neg hne, if_neg hne2] at hx
+            rw [bumpMoves, ite_eq_right hne, ite_eq_right hne2] at hx
             rw [hx, hag jh hjh]
         · obtain ⟨b₂, -, hw2⟩ := hstep2
           have : lexWire (n := n) (.bump ⟨j, hj⟩) b₂ = Sum.inl w.1 := hw2
@@ -384,20 +384,20 @@ omit [LinearOrder A] in
 theorem bumpTuple_at (blk : Fin n → Fin K) (p : Fin n) (x y : Fin K → A) :
     bumpTuple blk p x y (blk p) = y (blk p) := by
   classical
-  rw [bumpTuple, if_pos rfl]
+  rw [bumpTuple, ite_eq_left rfl]
 
 omit [LinearOrder A] in
 theorem bumpTuple_after (blk : Fin n → Fin K) {p i : Fin n} (hi : p < i) (x y : Fin K → A)
     (hinj : Function.Injective blk) : bumpTuple blk p x y (blk i) = y (blk i) := by
   classical
-  rw [bumpTuple, if_neg (fun he => absurd (hinj he) (ne_of_gt hi)), if_pos ⟨i, hi, rfl⟩]
+  rw [bumpTuple, ite_eq_right (fun he => absurd (hinj he) (ne_of_gt hi)), ite_eq_left ⟨i, hi, rfl⟩]
 
 omit [LinearOrder A] in
 theorem bumpTuple_before (blk : Fin n → Fin K) {p i : Fin n} (hi : i < p) (x y : Fin K → A)
     (hinj : Function.Injective blk) : bumpTuple blk p x y (blk i) = x (blk i) := by
   classical
-  rw [bumpTuple, if_neg (fun he => absurd (hinj he) (ne_of_lt hi)),
-    if_neg (by
+  rw [bumpTuple, ite_eq_right (fun he => absurd (hinj he) (ne_of_lt hi)),
+    ite_eq_right (by
       rintro ⟨i', hi', he⟩
       rw [hinj he] at hi
       exact absurd (lt_trans hi hi') (lt_irrefl _))]
@@ -406,7 +406,7 @@ omit [LinearOrder A] in
 theorem bumpTuple_out (blk : Fin n → Fin K) (p : Fin n) (x y : Fin K → A) {h : Fin K}
     (hh : ∀ i, h ≠ blk i) : bumpTuple blk p x y h = x h := by
   classical
-  rw [bumpTuple, if_neg (hh p), if_neg (by rintro ⟨i, -, he⟩; exact hh i he)]
+  rw [bumpTuple, ite_eq_right (hh p), ite_eq_right (by rintro ⟨i, -, he⟩; exact hh i he)]
 
 /-- **Completeness of the increment**: the outcome the relation describes is
 reached. -/
@@ -442,7 +442,7 @@ theorem lexComplete (hinj : Function.Injective blk) (_hblk : ∀ i, ((blk i : Fi
       · simp only [lexFamRel, hsome]
         exact ⟨⟨fun _ => hat, fun _ => by trivial⟩, HeadAgree.refl x⟩
       · rw [lexWire, hsome]
-        simp only [if_pos]
+        simp only [ite_eq_left]
         exact congrArg Sum.inl (congrArg LexNode.test hdowneq)
     rcases hr with ⟨rfl, p, hp, hne, habove, hbefore, hcover, hafter, hother⟩ | ⟨rfl, hall, hag⟩
     · rcases eq_or_lt_of_le (Nat.lt_succ_iff.mp hp) with hpj | hpj
@@ -476,14 +476,14 @@ theorem lexComplete (hinj : Function.Injective blk) (_hblk : ∀ i, ((blk i : Fi
           · intro h hh
             rw [bumpMoves]
             by_cases h1 : h = blk ⟨j, hj⟩
-            · rw [if_pos h1, h1, bumpTuple_at]
+            · rw [ite_eq_left h1, h1, bumpTuple_at]
               exact hcover
-            · rw [if_neg h1]
+            · rw [ite_eq_right h1]
               by_cases h2 : ∃ i, (⟨j, hj⟩ : Fin n) < i ∧ h = blk i
               · obtain ⟨i, hi, rfl⟩ := h2
-                rw [if_pos ⟨i, hi, rfl⟩, bumpTuple_after blk hi x y hinj]
+                rw [ite_eq_left ⟨i, hi, rfl⟩, bumpTuple_after blk hi x y hinj]
                 exact hafter i hi
-              · rw [if_neg h2]
+              · rw [ite_eq_right h2]
                 by_cases h3 : ∃ i, h = blk i
                 · obtain ⟨i, rfl⟩ := h3
                   have hlt : i < (⟨j, hj⟩ : Fin n) := by
@@ -567,13 +567,13 @@ theorem exists_lexRel_succ [Finite A] (hinj : Function.Injective blk)
           = (ofLex u') i := by
       intro i
       change (if h : ∃ i', blk i = blk i' then (ofLex u') h.choose else x (blk i)) = (ofLex u') i
-      rw [dif_pos ⟨i, rfl⟩]
+      rw [dite_eq_left ⟨i, rfl⟩]
       exact congrArg _ (hinj (Exists.choose_spec (⟨i, rfl⟩ : ∃ i', blk i = blk i')).symm)
     have hyo : ∀ j : Fin K, (∀ i, j ≠ blk i) →
         (fun j => if h : ∃ i, j = blk i then (ofLex u') h.choose else x j) j = x j := by
       intro j hj
       change (if h : ∃ i, j = blk i then (ofLex u') h.choose else x j) = x j
-      rw [dif_neg (by rintro ⟨i, hi⟩; exact hj i hi)]
+      rw [dite_eq_right (by rintro ⟨i, hi⟩; exact hj i hi)]
     first
       | (refine Or.inl ⟨rfl, p, ?_, ?_, ?_, ?_, ?_, ?_⟩
          · intro he

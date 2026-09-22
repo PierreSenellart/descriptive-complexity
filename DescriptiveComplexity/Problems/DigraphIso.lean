@@ -216,20 +216,20 @@ theorem digraphIso_sigmaSODefinable : SigmaSODefinable 1 DigraphIso := by
     refine ⟨‹Finite A›, fun x => if h : TGPatV x then g ⟨x, h⟩ else x, fun x hx => ?_,
       fun x y hx hy hxy => ?_, fun y hy => ?_, fun x y hx hy => ?_⟩
     · change TGHostV (if h : TGPatV x then g ⟨x, h⟩ else x)
-      rw [dif_pos hx]
+      rw [dite_eq_left hx]
       exact hg2 ⟨x, hx⟩
     · have hxy' : (if h : TGPatV x then g ⟨x, h⟩ else x) =
           if h : TGPatV y then g ⟨y, h⟩ else y := hxy
-      rw [dif_pos hx, dif_pos hy] at hxy'
+      rw [dite_eq_left hx, dite_eq_left hy] at hxy'
       exact hinj x y (g ⟨x, hx⟩) hx hy (hg1 ⟨x, hx⟩) (hxy' ▸ hg1 ⟨y, hy⟩)
     · obtain ⟨x, hx, hxy⟩ := hsurj y hy
       refine ⟨x, hx, ?_⟩
       change (if h : TGPatV x then g ⟨x, h⟩ else x) = y
-      rw [dif_pos hx]
+      rw [dite_eq_left hx]
       exact hfunc x (g ⟨x, hx⟩) y hx (hg1 ⟨x, hx⟩) hxy
     · change TGPatE x y ↔ TGHostE (if h : TGPatV x then g ⟨x, h⟩ else x)
         (if h : TGPatV y then g ⟨y, h⟩ else y)
-      rw [dif_pos hx, dif_pos hy]
+      rw [dite_eq_left hx, dite_eq_left hy]
       exact ⟨fun hpe => hedge x y _ _ hx hy hpe (hg1 ⟨x, hx⟩) (hg1 ⟨y, hy⟩),
         fun hhe => hedgeBack x y _ _ hx hy (hg1 ⟨x, hx⟩) (hg1 ⟨y, hy⟩) hhe⟩
 

@@ -61,8 +61,8 @@ variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
   classical
   rw [sideF]
   by_cases h : p
-  · rw [if_pos h]; simp [h]
-  · rw [if_neg h]; simp [h]
+  · rw [ite_eq_left h]; simp [h]
+  · rw [ite_eq_right h]; simp [h]
 
 end Side
 

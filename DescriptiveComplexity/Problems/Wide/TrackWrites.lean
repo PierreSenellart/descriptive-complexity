@@ -54,17 +54,17 @@ theorem exists_seq_of_stepsIn : ∀ {n : ℕ} {c d : Config V}, M.StepsIn n c d 
     refine ⟨fun i => if i = 0 then c else g (i - 1), rfl, ?_, ?_⟩
     · intro i hi
       change (if i = 0 then c else g (i - 1)) = d
-      rw [if_neg (by omega)]
+      rw [ite_eq_right (by omega)]
       exact hgn (i - 1) (by omega)
     · intro i hi
       rcases Nat.eq_zero_or_pos i with rfl | hpos
       · change M.Step (if (0 : ℕ) = 0 then c else g (0 - 1))
           (if (0 : ℕ) + 1 = 0 then c else g (0 + 1 - 1))
-        rw [if_pos rfl, if_neg (by omega)]
+        rw [ite_eq_left rfl, ite_eq_right (by omega)]
         simpa [hg0] using he
       · change M.Step (if i = 0 then c else g (i - 1))
           (if i + 1 = 0 then c else g (i + 1 - 1))
-        rw [if_neg (by omega), if_neg (by omega)]
+        rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         have h1 : i + 1 - 1 = (i - 1) + 1 := by omega
         rw [h1]
         exact hgs (i - 1) (by omega)
@@ -185,8 +185,8 @@ theorem track_after_set {zero one : A} {t : dt.SlotIx}
     (if s = v then ρ.wr f (rest v) else rest s) t = bitVal zero one (s = v) := by
   classical
   by_cases hs : s = v
-  · rw [if_pos hs, hset f (rest v), bitVal_pos hs]
-  · rw [if_neg hs, hzero s, bitVal_neg hs]
+  · rw [ite_eq_left hs, hset f (rest v), bitVal_pos hs]
+  · rw [ite_eq_right hs, hzero s, bitVal_neg hs]
 
 end Keeps
 
@@ -635,27 +635,27 @@ theorem tapeShape_update {lay : Layout dt A R' P' I} {zero one : A}
   file r s hs := by
     by_cases hr : r = v
     · subst hr
-      rw [if_pos rfl, hfile f (rest r) s hs]
+      rw [ite_eq_left rfl, hfile f (rest r) s hs]
       exact hshape.file r s hs
-    · rw [if_neg hr]
+    · rw [ite_eq_right hr]
       exact hshape.file r s hs
   cells r s hs := by
     by_cases hr : r = v
     · subst hr
-      rw [if_pos rfl, hcell f (rest r) s hs]
+      rw [ite_eq_left rfl, hcell f (rest r) s hs]
       exact hshape.cells r s hs
-    · rw [if_neg hr]
+    · rw [ite_eq_right hr]
       exact hshape.cells r s hs
   bits r s hs := by
     by_cases hr : r = v
     · subst hr
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       rcases hbits f (rest r) s with h | h | h
       · rw [h]
         exact hshape.bits r s hs
       · exact Or.inl h
       · exact Or.inr h
-    · rw [if_neg hr]
+    · rw [ite_eq_right hr]
       exact hshape.bits r s hs
 
 omit [Fintype dt.SlotIx] in
@@ -712,8 +712,8 @@ theorem passTracksAt_of_mir_zero {J : Type}
     (bitAtOf cell (fun _ => False) r) else _) = _
   by_cases hs : s = Slot.mir
   · subst hs
-    rw [if_pos rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc), hz]
-  · rw [if_neg hs]
+    rw [ite_eq_left rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc), hz]
+  · rw [ite_eq_right hs]
 
 end Recognize
 
@@ -788,7 +788,7 @@ theorem step_tape_of_shape_tr (hR : PR.table.Reads)
         change (Sum.inr (symElt PR.zero (PR.table.writePl r
           (unpad PR.table.payload_le w))) : WPoint (Univ A R P K dd)) = _
         change _ = Sum.inr (PR.syElt (if s = s then _ else _))
-        rw [if_pos rfl]
+        rw [ite_eq_left rfl]
         refine congrArg Sum.inr (congrArg (symElt PR.zero) ?_)
         change syPl (Q := Q) PR.zero ((PR.rules r).wr _
           (fun s' => unslot (unpad PR.table.payload_le w) (Sum.inr s'))) = _
@@ -798,7 +798,7 @@ theorem step_tape_of_shape_tr (hR : PR.table.Reads)
           exact fun hc => hs (Sum.inl_injective hc)
         rw [hframe _ hne, htape]
         change Sum.inr (PR.syElt (rest s)) = Sum.inr (PR.syElt (if s = v then _ else _))
-        rw [if_neg hs]
+        rw [ite_eq_right hs]
     · have hne : (Sum.inr e : WPoint (Univ A R P K dd)) ≠ x.head := by
         rw [hhead]
         exact fun hc => nomatch hc
@@ -959,9 +959,9 @@ theorem step_track_const (hR : PR.table.Reads) {Ph : P' → Prop} {t : dt.SlotIx
     refine ⟨_, step_tape_of_shape_tr hR hhead htape hread hwrite hframe, fun s => ?_⟩
     by_cases hs : s = v
     · subst hs
-      rw [if_pos rfl]
+      rw [ite_eq_left rfl]
       exact hkeep r hphr _ (rest s)
-    · rw [if_neg hs]
+    · rw [ite_eq_right hs]
   | .sym => exact ((hR.tr _).mp hτ).elim
   | .phase p => exact ((hR.tr _).mp hτ).elim
   | .arg i => exact ((hR.tr _).mp hτ).elim

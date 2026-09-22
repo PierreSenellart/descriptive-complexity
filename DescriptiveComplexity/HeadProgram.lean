@@ -782,7 +782,7 @@ theorem step_compile_false (c d : F.Conf A) : (F.compile false).Step c d ↔ F.S
   obtain ⟨site, x⟩ := c
   rcases site with s | b
   · refine Iff.trans (F.step_compile false) (Iff.trans ?_ (Iff.symm F.step_iff_index))
-    simp only [Bool.false_eq_true, if_false]
+    simp only [Bool.false_eq_true, ite_false]
     constructor
     · rintro ⟨i, hi, htar, hmv⟩
       exact ⟨i, (F.mem_enabled_iff false s x i).mp hi, htar, hmv⟩
@@ -795,7 +795,7 @@ theorem isDeterministic_compile_true : (F.compile true).IsDeterministic := by
   rintro (s | b) r
   · change ((if true then (F.enabled s r).take 1 else F.enabled s r).map
       fun i => F.entryOf ⟨s, i⟩).length ≤ 1
-    rw [if_pos rfl, List.length_map]
+    rw [ite_eq_left rfl, List.length_map]
     simp [List.length_take]
   · exact Nat.zero_le 1
 
@@ -806,7 +806,7 @@ theorem step_compile_true (hdet : F.Deterministic A) (c d : F.Conf A) :
   obtain ⟨site, x⟩ := c
   rcases site with s | b
   · refine Iff.trans (F.step_compile true) (Iff.trans ?_ (Iff.symm F.step_iff_index))
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     constructor
     · rintro ⟨i, hi, htar, hmv⟩
       exact ⟨i, (F.mem_enabled_iff true s x i).mp (List.mem_of_mem_take hi), htar, hmv⟩

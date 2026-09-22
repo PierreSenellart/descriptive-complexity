@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import Mathlib.Computability.TuringMachine.Config
-import Mathlib.Data.Finite.Sum
+import Mathlib.Basic.Finite.Sum
 import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
 
 /-!

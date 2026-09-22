@@ -170,7 +170,7 @@ theorem inflLimit_swap_bare (hd : d.VarBound k) (harity : d.B.arity i = 2)
     omega
   obtain ⟨v, hv₀, hv₁⟩ : ∃ v : Fin k → A,
       v ⟨0, by omega⟩ = x ∧ v ⟨1, by omega⟩ = y :=
-    ⟨fun t => if t = ⟨1, by omega⟩ then y else x, if_neg hne, if_pos rfl⟩
+    ⟨fun t => if t = ⟨1, by omega⟩ then y else x, ite_eq_right hne, ite_eq_left rfl⟩
   -- the swapped tuple has the same equality pattern: a transposition is a bijection
   have hpat : ∀ p q, v p = v q ↔ Equiv.swap x y (v p) = Equiv.swap x y (v q) :=
     fun p q => ⟨fun h => by rw [h], fun h => (Equiv.swap x y).injective h⟩

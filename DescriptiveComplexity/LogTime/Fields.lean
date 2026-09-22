@@ -148,7 +148,7 @@ theorem fieldAt_two_pow_succ {p q x m : A} {a : ℕ} (hp : orank p = 2 ^ a)
   rw [h1]
   have h2 : orank x / 2 ^ a % 2 = 0 ∨ orank x / 2 ^ a % 2 = 1 := by omega
   by_cases hb : orank x / 2 ^ a % 2 = 1
-  · simp only [hb, decide_true, if_pos]
+  · simp only [hb, decide_true, ite_eq_left]
   · have hb0 : orank x / 2 ^ a % 2 = 0 := by omega
     simp only [hb0]
     exact Iff.rfl

@@ -174,18 +174,18 @@ theorem testBit_bitsVal (b : ℕ → Bool) (m : ℕ) {i : ℕ} (hi : i < m) :
     rw [bitsVal_succ]
     rcases Nat.lt_or_ge i m with hlt | hge
     · cases hbm : b m with
-      | false => rw [if_neg (by simp), Nat.add_zero]; exact ih hlt
+      | false => rw [ite_eq_right (by simp), Nat.add_zero]; exact ih hlt
       | true =>
-        rw [if_pos (by simp), Nat.add_comm, Nat.testBit_two_pow_add_gt hlt]
+        rw [ite_eq_left (by simp), Nat.add_comm, Nat.testBit_two_pow_add_gt hlt]
         exact ih hlt
     · have him : i = m := by omega
       subst him
       cases hbm : b i with
       | false =>
-        rw [if_neg (by simp), Nat.add_zero]
+        rw [ite_eq_right (by simp), Nat.add_zero]
         exact Nat.testBit_lt_two_pow hb
       | true =>
-        rw [if_pos (by simp), Nat.add_comm, Nat.testBit_two_pow_add_eq,
+        rw [ite_eq_left (by simp), Nat.add_comm, Nat.testBit_two_pow_add_eq,
           Nat.testBit_lt_two_pow hb]
         rfl
 

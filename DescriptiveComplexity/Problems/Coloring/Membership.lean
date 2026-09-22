@@ -160,7 +160,7 @@ private theorem realize_paletteKernel {A : Type} [Language.markedGraph.Structure
       Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_iExs,
       Formula.realize_not, Formula.realize_bot, Formula.realize_rel₁, Formula.realize_rel₂,
       Formula.realize_equal, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
-      Language.relMap_sumInl, hsub, if_false, Bool.false_eq_true]
+      Language.relMap_sumInl, hsub, ite_false, Bool.false_eq_true]
     refine and_congr ⟨fun h x => ?_, fun h i => ?_⟩ ⟨fun h x x' y hne hadj h₁ h₂ => ?_,
       fun h i hi => ?_⟩
     · obtain ⟨y, hy1, hy2⟩ := h fun _ => x
@@ -173,7 +173,7 @@ private theorem realize_paletteKernel {A : Type} [Language.markedGraph.Structure
       Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_iExs,
       Formula.realize_not, Formula.realize_bot, Formula.realize_rel₁, Formula.realize_rel₂,
       Formula.realize_equal, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
-      Language.relMap_sumInl, hsub, if_true]
+      Language.relMap_sumInl, hsub, ite_true]
     refine and_congr ⟨fun h x => ?_, fun h i => ?_⟩ ⟨fun h x x' y hne hadj h₁ h₂ => ?_,
       fun h i hi => ?_⟩
     · obtain ⟨y, hy1, hy2⟩ := h fun _ => x

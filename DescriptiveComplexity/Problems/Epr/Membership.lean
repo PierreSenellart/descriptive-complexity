@@ -698,9 +698,9 @@ theorem combPt_funPt (e g : A → A) :
   obtain ⟨b, rfl⟩ := exists_eltPt hy
   rw [memPt_funPt, memPt_funPt, memPt_funPt, eVarPt_iff, eprVal]
   by_cases ha : EVarG a
-  · rw [if_pos ha]
+  · rw [ite_eq_left ha]
     exact ⟨fun h => Or.inl ⟨ha, h⟩, fun h => h.elim (fun h => h.2) (fun h => absurd ha h.1)⟩
-  · rw [if_neg ha]
+  · rw [ite_eq_right ha]
     exact ⟨fun h => Or.inr ⟨ha, h⟩, fun h => h.elim (fun h => absurd h.1 ha) (fun h => h.2)⟩
 
 /-- **A model on the instance is a guess the kernel accepts, and back.** -/
@@ -742,10 +742,10 @@ theorem selfModel_iff_kernel :
         rw [memPt_iff, memPt_funPt, memPt_funPt, eVarPt_iff] at h
         rw [h, eprVal]
         by_cases ha : EVarG a
-        · rw [if_pos ha]
+        · rw [ite_eq_left ha]
           exact ⟨fun hc => hc.elim (fun h => h.2) (fun h => absurd ha h.1),
             fun hc => Or.inl ⟨ha, hc⟩⟩
-        · rw [if_neg ha]
+        · rw [ite_eq_right ha]
           exact ⟨fun hc => hc.elim (fun h => absurd h.1 ha) (fun h => h.2),
             fun hc => Or.inr ⟨ha, hc⟩⟩
       subst hwv

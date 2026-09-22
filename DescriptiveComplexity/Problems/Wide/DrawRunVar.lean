@@ -300,7 +300,7 @@ theorem var_reachesIn (hS : wideRank (RF.cell gtop) + 2 +
       change (if (Slot.val : dt.SlotIx) = Slot.val
         then bitVal PR.zero PR.one (bitAtOf RF.cell mw v) else rst v Slot.val) =
         rst v Slot.val
-      rw [if_pos rfl,
+      rw [ite_eq_left rfl,
         bitVal_neg (fun hc => hvnr hc.choose hc.choose_spec.1), hb.2.2.2.2,
         bitVal_neg (fun hc => hvnr hc.choose hc.choose_spec.1)]
     · exact Prog.passTracks_of_ne hs mw v
@@ -337,8 +337,8 @@ theorem var_reachesIn (hS : wideRank (RF.cell gtop) + 2 +
         then bitVal PR.zero PR.one (bitAtOf RF.cell (fun _ => False) r) else restC r s)
     refine congrArg _ (funext fun s => ?_)
     by_cases hs : s = Slot.val
-    · rw [if_pos hs, if_pos hs]
-    · rw [if_neg hs, if_neg hs]
+    · rw [ite_eq_left hs, ite_eq_left hs]
+    · rw [ite_eq_right hs, ite_eq_right hs]
       exact (hCoff r s hs).symm
   -- the dispatch into the first matrix pass
   have hdspM : (wideData (Univ A R P dt.KIx dt.dd)).Step
@@ -465,8 +465,8 @@ theorem var_reachesIn (hS : wideRank (RF.cell gtop) + 2 +
           then bitVal PR.zero PR.one (bitAtOf RF.cell (mV a') r) else restM a' r s)
       refine congrArg _ (funext fun s => ?_)
       by_cases hs : s = Slot.val
-      · rw [if_pos hs, if_pos hs]
-      · rw [if_neg hs, if_neg hs]
+      · rw [ite_eq_left hs, ite_eq_left hs]
+      · rw [ite_eq_right hs, ite_eq_right hs]
         exact (hOMagree a a' hlt hnb r s hs).symm
     refine TMData.ReachesIn.mono
       (show 1 + (wS + (1 + (wS + (1 + wM)))) ≤ 2 * wS + wM + 3 by omega) ?_
@@ -658,7 +658,7 @@ theorem step_var_exit
             then bitVal PR.zero PR.one (bitAtOf RF.cell mval v) else rest v Slot.val) =
           (if (Slot.val : dt.SlotIx) = Slot.val
             then bitVal PR.zero PR.one (bitAtOf RF.cell mval v) else rest' v Slot.val)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne hsv, Prog.passTracks_of_ne hsv, hupd,
           Function.update_of_ne hs]
   refine Prog.step_move hR hlin hvi hoff ?_
@@ -707,7 +707,7 @@ theorem step_var_failExit
             then bitVal PR.zero PR.one (bitAtOf RF.cell mval v) else rest v Slot.val) =
           (if (Slot.val : dt.SlotIx) = Slot.val
             then bitVal PR.zero PR.one (bitAtOf RF.cell mval v) else rest' v Slot.val)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne hsv, Prog.passTracks_of_ne hsv, hupd,
           Function.update_of_ne hs]
   refine Prog.step_move hR hlin hvi hoff ?_

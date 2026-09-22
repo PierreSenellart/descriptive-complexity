@@ -238,7 +238,7 @@ theorem realize_acstF {s : AltTag k} {q : AltV k A}
     (acstF s q.1).Realize v ↔ q = acstI s.1 s.2 := by
   rw [acstF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_minF, h0, h1]
     constructor
     · rintro ⟨ha, hb⟩
@@ -246,7 +246,7 @@ theorem realize_acstF {s : AltTag k} {q : AltV k A}
         (le_antisymm (hb qbotA) (qbotA_le _))
     · rintro rfl
       exact ⟨fun a => qbotA_le a, fun a => qbotA_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -256,14 +256,14 @@ theorem realize_aoneF {s : AltTag k} {x : Fin 2 × Fin 2} {a : A} {q : AltV k A}
   subst hx
   rw [aoneF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_eqF, realize_minF, h0, h1]
     constructor
     · rintro ⟨ha, hb⟩
       exact altV_ext hs ha (le_antisymm (hb qbotA) (qbotA_le _))
     · rintro rfl
       exact ⟨rfl, fun a => qbotA_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -489,11 +489,11 @@ theorem realize_blkAtF {j : Fin (k + 1)} {x : A} {v : Fin 1 × Fin 2 → A} (hx 
     ((if h : (j : ℕ) < k then blkF ⟨(j : ℕ), h⟩ (0, 0) else ⊥ :
       (qbfOrd k).Formula (Fin 1 × Fin 2))).Realize v ↔ QbfBlkAt j x := by
   by_cases h : (j : ℕ) < k
-  · rw [dif_pos h]
+  · rw [dite_eq_left h]
     simp only [realize_blkF, hx, QbfBlkAt]
     exact ⟨fun hb => ⟨⟨(j : ℕ), h⟩, rfl, hb⟩, fun ⟨i, hi, hb⟩ => by
       rwa [show (⟨(j : ℕ), h⟩ : Fin k) = i from Fin.ext hi.symm]⟩
-  · rw [dif_neg h]
+  · rw [dite_eq_right h]
     simp only [Formula.realize_bot, false_iff, QbfBlkAt]
     rintro ⟨i, hi, -⟩
     exact absurd (hi ▸ i.isLt) h

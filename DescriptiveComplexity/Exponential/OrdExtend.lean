@@ -65,14 +65,14 @@ theorem realize_ordSentence (t₁ t₂ : X.Tag) (ρs : Fin 2 → X.B.Assignment 
         (setLinearOrder (X.B.AtomIx A)).le (X.B.atomSet (ρs 0)) (X.B.atomSet (ρs 1))) :=
     prodLex_le_iff
   rcases eq_or_ne t₁ t₂ with rfl | hne
-  · rw [ordSentence, if_pos rfl, X.B.realize_ordLeF ρs, hle]
+  · rw [ordSentence, ite_eq_left rfl, X.B.realize_ordLeF ρs, hle]
     simp
-  · rw [ordSentence, if_neg hne, hle]
+  · rw [ordSentence, ite_eq_right hne, hle]
     rcases lt_or_gt_of_ne hne with hlt | hgt
-    · rw [if_pos hlt]
+    · rw [ite_eq_left hlt]
       simp only [Sentence.Realize, Formula.realize_top, true_iff]
       exact Or.inl hlt
-    · rw [if_neg (not_lt_of_gt hgt)]
+    · rw [ite_eq_right (not_lt_of_gt hgt)]
       simp only [Sentence.Realize, Formula.realize_bot, false_iff]
       rintro (h | ⟨he, -⟩)
       · exact absurd h (not_lt_of_gt hgt)

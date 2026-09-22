@@ -515,7 +515,7 @@ theorem valCarry_eq (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
   classical
   have hex : ∃ u : Univ A R P dt.KIx dt.dd,
       ¬s u ∧ ∀ w, WMLt WMLe u w → s w := ⟨u₀, h1, h2⟩
-  rw [valCarry, dif_pos hex]
+  rw [valCarry, dite_eq_left hex]
   obtain ⟨hc1, hc2⟩ := hex.choose_spec
   by_contra hne
   rcases hlin.2.2.2 hex.choose u₀ with hle | hle

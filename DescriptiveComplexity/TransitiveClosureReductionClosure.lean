@@ -282,7 +282,7 @@ variable {L L' : Language.{0, 0}} [L.IsRelational] [L'.IsRelational] {P : Decisi
 
 /-- A bottom element of a finite nonempty linear order. -/
 theorem exists_bot (A : Type) [LinearOrder A] [Finite A] [Nonempty A] : ∃ a₀ : A, ∀ a, a₀ ≤ a := by
-  obtain ⟨a₀, -, h⟩ := (Finite.to_wellFoundedLT (α := A)).wf.has_min Set.univ
+  obtain ⟨a₀, -, h⟩ := (Finite.to_wellFoundedLT (α := A)).has_min Set.univ
     ⟨Classical.arbitrary A, Set.mem_univ _⟩
   exact ⟨a₀, fun a => not_lt.mp (h a (Set.mem_univ a))⟩
 

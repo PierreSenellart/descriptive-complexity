@@ -129,14 +129,14 @@ def NextP (a' b' a b : ℕ) : Prop :=
 theorem pair_next {a' b' a b : ℕ} (h : NextP a' b' a b) :
     Nat.pair a b = Nat.pair a' b' + 1 := by
   rcases h with ⟨hlt, rfl, hab, rfl⟩ | ⟨hb, rfl, rfl⟩ | ⟨hba, rfl, hb, rfl⟩ | ⟨hab, rfl, rfl⟩
-  · rw [Nat.pair, Nat.pair, if_pos hab, if_pos hlt]
+  · rw [Nat.pair, Nat.pair, ite_eq_left hab, ite_eq_left hlt]
     omega
-  · rw [Nat.pair, Nat.pair, if_neg (by omega), if_pos (by omega)]
+  · rw [Nat.pair, Nat.pair, ite_eq_right (by omega), ite_eq_left (by omega)]
     omega
-  · rw [Nat.pair, Nat.pair, if_neg (by omega), if_neg (by omega)]
+  · rw [Nat.pair, Nat.pair, ite_eq_right (by omega), ite_eq_right (by omega)]
     omega
   · subst hab
-    rw [Nat.pair, Nat.pair, if_pos (by omega), if_neg (by omega)]
+    rw [Nat.pair, Nat.pair, ite_eq_left (by omega), ite_eq_right (by omega)]
     ring
 
 theorem exists_next (a' b' : ℕ) : ∃ a b, NextP a' b' a b := by
@@ -212,7 +212,7 @@ theorem mem_evaln_rfind'_iff {a m : ℕ} :
         (if x = 0 then v = m else v ∈ evaln k (.rfind' cf) (Nat.pair a (m + 1))) := by
   by_cases h : Nat.pair a m ≤ k
   · simp only [Option.mem_def, h, true_and]
-    simp only [evaln, guard, if_pos h, Nat.unpaired, Nat.unpair_pair, bind, pure,
+    simp only [evaln, guard, ite_eq_left h, Nat.unpaired, Nat.unpair_pair, bind, pure,
       Option.bind_eq_some_iff, true_and, exists_const]
     refine exists_congr fun x => and_congr_right fun _ => ?_
     by_cases hx : x = 0 <;> simp [hx, eq_comm]

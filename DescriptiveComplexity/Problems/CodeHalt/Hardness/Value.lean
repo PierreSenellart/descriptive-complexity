@@ -120,18 +120,18 @@ def codeNestFrom (g : Fin m → Code) (k : ℕ) : Code :=
 
 theorem natNestFrom_of_lt (g : Fin m → ℕ) {k : ℕ} (h : k < m) :
     natNestFrom g k = Nat.pair (g ⟨k, h⟩) (natNestFrom g (k + 1)) := by
-  rw [natNestFrom, dif_pos h]
+  rw [natNestFrom, dite_eq_left h]
 
 theorem natNestFrom_of_ge (g : Fin m → ℕ) {k : ℕ} (h : ¬k < m) : natNestFrom g k = 0 := by
-  rw [natNestFrom, dif_neg h]
+  rw [natNestFrom, dite_eq_right h]
 
 theorem codeNestFrom_of_lt (g : Fin m → Code) {k : ℕ} (h : k < m) :
     codeNestFrom g k = Code.pair (g ⟨k, h⟩) (codeNestFrom g (k + 1)) := by
-  rw [codeNestFrom, dif_pos h]
+  rw [codeNestFrom, dite_eq_left h]
 
 theorem codeNestFrom_of_ge (g : Fin m → Code) {k : ℕ} (h : ¬k < m) :
     codeNestFrom g k = Code.zero := by
-  rw [codeNestFrom, dif_neg h]
+  rw [codeNestFrom, dite_eq_right h]
 
 /-- **Reading an entry of a nest**: `d` links past the start `k` sits the
 entry `k + d`, and `0` past the end. -/
@@ -140,14 +140,14 @@ theorem nestGet_natNestFrom (g : Fin m → ℕ) (d k : ℕ) :
   induction d generalizing k with
   | zero =>
     by_cases h : k < m
-    · rw [natNestFrom_of_lt g h, nestGet_pair_zero, dif_pos (by simpa using h)]
+    · rw [natNestFrom_of_lt g h, nestGet_pair_zero, dite_eq_left (by simpa using h)]
       simp
-    · rw [natNestFrom_of_ge g h, nestGet_zero_left, dif_neg (by simpa using h)]
+    · rw [natNestFrom_of_ge g h, nestGet_zero_left, dite_eq_right (by simpa using h)]
   | succ d ih =>
     by_cases h : k < m
     · rw [natNestFrom_of_lt g h, nestGet_pair_succ, ih,
         show k + 1 + d = k + (d + 1) from by omega]
-    · rw [natNestFrom_of_ge g h, nestGet_zero_left, dif_neg (by omega)]
+    · rw [natNestFrom_of_ge g h, nestGet_zero_left, dite_eq_right (by omega)]
 
 end NestFrom
 
@@ -223,11 +223,11 @@ def setCo (j : ℕ) (a : A) (t : Fin (dimOf V) → A) : Fin (dimOf V) → A :=
 
 omit [L.IsRelational] [L.Structure A] in
 theorem setCo_apply_self (j : ℕ) (hj : j < dimOf V) (a : A) (t : Fin (dimOf V) → A) :
-    setCo V j a t ⟨j, hj⟩ = a := by rw [setCo, if_pos rfl]
+    setCo V j a t ⟨j, hj⟩ = a := by rw [setCo, ite_eq_left rfl]
 
 omit [L.IsRelational] [L.Structure A] in
 theorem setCo_apply_ne {j : ℕ} {j' : Fin (dimOf V)} (h : (j' : ℕ) ≠ j) (a : A)
-    (t : Fin (dimOf V) → A) : setCo V j a t j' = t j' := by rw [setCo, if_neg h]
+    (t : Fin (dimOf V) → A) : setCo V j a t j' = t j' := by rw [setCo, ite_eq_right h]
 
 open Classical in
 /-- Whether the symbol `i` holds of the first `V.arity i` coordinates of the
@@ -291,8 +291,8 @@ theorem eval_levelCode (n : ℕ) (f : Fin n → A) (i : Fin V.numSyms) :
     classical
     rw [levelCode_zero, levelVal_zero]
     by_cases h : bitOf V i t
-    · rw [if_pos h, if_pos h]; rfl
-    · rw [if_neg h, if_neg h]; rfl
+    · rw [ite_eq_left h, ite_eq_left h]; rfl
+    · rw [ite_eq_right h, ite_eq_right h]; rfl
   | m + 1, t => by
     rw [levelCode_succ, levelVal_succ]
     exact eval_codeNestFrom _ _ (fun d => eval_levelCode n f i m _) 0
@@ -387,7 +387,7 @@ theorem nestLeaf_levelVal (n : ℕ) (f : Fin n → A) (i : Fin V.numSyms)
       rw [List.drop_eq_getElem_cons (by simpa using hp)]
       simp
     rw [levelVal_succ, hdrop, nestLeaf_cons, nestGet_natNestFrom]
-    rw [dif_pos (show 0 + ds ⟨p, hp⟩ < n from by simpa using hds _)]
+    rw [dite_eq_left (show 0 + ds ⟨p, hp⟩ < n from by simpa using hds _)]
     rw [hp1]
     refine ih (by omega) _ fun j hj => ?_
     rw [← hp1] at hj
@@ -415,7 +415,7 @@ theorem leafOf_structVal (n : ℕ) (f : Fin n → A) (t₀ : Fin (dimOf V) → A
     leafOf (structVal V n f t₀) (i : ℕ) (List.ofFn ds) =
       if bitOf V i (fun j => f ⟨ds j, hds j⟩) then 1 else 0 := by
   rw [leafOf, unpair_structVal_snd, nestGet_natNestFrom,
-    dif_pos (show 0 + (i : ℕ) < V.numSyms from by simp)]
+    dite_eq_left (show 0 + (i : ℕ) < V.numSyms from by simp)]
   have hb : blockVal V n f t₀ ⟨0 + (i : ℕ), by simp⟩ =
       levelVal V n f i (dimOf V) t₀ := by
     rw [blockVal]
@@ -451,11 +451,11 @@ theorem relMapBool_structVal (n : ℕ) (hn : 0 < n) (f : Fin n → A)
       (if h : (j : ℕ) < a then ((y ⟨j, h⟩ : Fin _) : ℕ) else 0) < n := by
     intro j
     by_cases h : (j : ℕ) < a
-    · rw [dif_pos h]
+    · rw [dite_eq_left h]
       have h2 : ((y ⟨j, h⟩ : (structOf V (structVal V n f t₀)).Univ) : ℕ) <
         (structVal V n f t₀).unpair.1 - 1 + 1 := (y ⟨j, h⟩).isLt
       omega
-    · rw [dif_neg h]
+    · rw [dite_eq_right h]
       exact hn
   have ha : V.arity (V.index R) = a := V.arity_index R
   have hbit : (bitOf V (V.index R) fun j' =>
@@ -470,14 +470,14 @@ theorem relMapBool_structVal (n : ℕ) (hn : 0 < n) (f : Fin n → A)
     refine congrArg f (Fin.ext ?_)
     change (if h : ((Fin.castLE (arity_le_dimOf V (V.index R)) j : Fin (dimOf V)) : ℕ) < a then
       ((y ⟨_, h⟩ : Fin _) : ℕ) else 0) = ((z (Fin.cast ha j) : Fin n) : ℕ)
-    rw [dif_pos hj]
+    rw [dite_eq_left hj]
     exact (hyz ⟨_, hj⟩).trans (congrArg (fun w => ((z w : Fin n) : ℕ)) (Fin.ext rfl))
   rw [relMapBool_structOf, leafOf_structVal V n f t₀ (V.index R) _ hds]
   by_cases hb : (bitOf V (V.index R) fun j' =>
       f ⟨if h : (j' : ℕ) < a then ((y ⟨j', h⟩ : Fin _) : ℕ) else 0, hds j'⟩)
-  · rw [if_pos hb]
+  · rw [ite_eq_left hb]
     simp [hbit.mp hb]
-  · rw [if_neg hb]
+  · rw [ite_eq_right hb]
     have hnr : ¬(RelMap R fun j => f (z j) : Prop) := fun hr => hb (hbit.mpr hr)
     simp [hnr]
 
@@ -542,9 +542,9 @@ theorem primrec_structOf : Primrec (structOf V) := by
           FirstOrder.Language.digitAt (q.1.unpair.1 - 1 + 1) q.2 (j : ℕ) else 0 := by
     refine Primrec.list_ofFn fun j => ?_
     by_cases hj : (j : ℕ) < V.arity i'
-    · simp only [if_pos hj]
+    · simp only [ite_eq_left hj]
       exact (FirstOrder.Language.primrec_digitAt (j : ℕ)).comp hcard Primrec.snd
-    · simp only [if_neg hj]
+    · simp only [ite_eq_right hj]
       exact Primrec.const 0
   have hleaf : Primrec fun q : ℕ × ℕ =>
       nestLeaf (nestGet q.1.unpair.2 (i' : ℕ))

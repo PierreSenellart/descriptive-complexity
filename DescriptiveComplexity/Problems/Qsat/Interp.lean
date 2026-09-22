@@ -335,14 +335,14 @@ theorem realize_occF {A : Type} [Language.transSys.Structure A] [LinearOrder A]
   · rintro ⟨ψ, hψmem, hψ⟩
     obtain ⟨l, hl, rfl⟩ := List.mem_map.mp hψmem
     by_cases hc : l.vt = vt ∧ l.sign = sgn
-    · rw [if_pos hc, Formula.realize_inf, Formula.realize_inf, realize_linkF, realize_clF,
+    · rw [ite_eq_left hc, Formula.realize_inf, Formula.realize_inf, realize_linkF, realize_clF,
         realize_varF] at hψ
       exact ⟨l, hl, hc.1, hc.2, hψ.1.1, hψ.1.2, hψ.2⟩
-    · rw [if_neg hc] at hψ
+    · rw [ite_eq_right hc] at hψ
       exact hψ.elim
   · rintro ⟨l, hl, h1, h2, h3, h4, h5⟩
     refine ⟨_, List.mem_map.mpr ⟨l, hl, rfl⟩, ?_⟩
-    rw [if_pos ⟨h1, h2⟩, Formula.realize_inf, Formula.realize_inf, realize_linkF, realize_clF,
+    rw [ite_eq_left ⟨h1, h2⟩, Formula.realize_inf, Formula.realize_inf, realize_linkF, realize_clF,
       realize_varF]
     exact ⟨⟨h3, h4⟩, h5⟩
 

@@ -610,9 +610,9 @@ theorem realize_tagS1 (b : Prop) (ρ : pairBlock.Assignment A) :
   let := pairBlock.structure₁ (L := peOrd) ρ
   classical
   by_cases hb : b
-  · rw [tagS1, if_pos hb]
+  · rw [tagS1, ite_eq_left hb]
     exact iff_of_true (Formula.realize_top.mpr trivial) hb
-  · rw [tagS1, if_neg hb]
+  · rw [tagS1, ite_eq_right hb]
     exact iff_of_false (fun h => Formula.realize_bot.mp h) hb
 
 @[simp]

@@ -654,9 +654,9 @@ theorem sr_lit_iff (s : Bool) (tc tx : SRTag B stepS srcS tgtS)
       (srLitFml B stepS srcS tgtS s tc tx).Realize
         (fun p => ((![((tc, u) : (srInterp B stepS srcS tgtS).Map A), (tx, x)]) p.1).2 p.2) := by
     cases s
-    · rw [if_neg (by simp)]
+    · rw [ite_eq_right (by simp)]
       exact FOInterpretation.relMap_map _ _ tsNegIn _
-    · rw [if_pos rfl]
+    · rw [ite_eq_left rfl]
       exact FOInterpretation.relMap_map _ _ tsPosIn _
   rw [hrel]
   match tc with

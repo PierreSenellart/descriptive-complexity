@@ -172,24 +172,24 @@ noncomputable def inSnd (ℓ : A) (τ : QM A → Prop) : A → Prop :=
   if h : ∃ d : A, IsPredSV d ℓ then stV τ h.choose else stT τ
 
 theorem inFst_of_isMinSV {ℓ : A} (h : IsMinSV ℓ) (τ : QM A → Prop) : inFst ℓ τ = stS τ := by
-  rw [inFst, dif_neg]
+  rw [inFst, dite_eq_right]
   rintro ⟨d, hd⟩
   exact hd.not_isMinSV h
 
 theorem inSnd_of_isMinSV {ℓ : A} (h : IsMinSV ℓ) (τ : QM A → Prop) : inSnd ℓ τ = stT τ := by
-  rw [inSnd, dif_neg]
+  rw [inSnd, dite_eq_right]
   rintro ⟨d, hd⟩
   exact hd.not_isMinSV h
 
 theorem inFst_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) (τ : QM A → Prop) :
     inFst ℓ τ = stU τ d := by
   have hex : ∃ d : A, IsPredSV d ℓ := ⟨d, h⟩
-  rw [inFst, dif_pos hex, isPredSV_unique hex.choose_spec h]
+  rw [inFst, dite_eq_left hex, isPredSV_unique hex.choose_spec h]
 
 theorem inSnd_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) (τ : QM A → Prop) :
     inSnd ℓ τ = stV τ d := by
   have hex : ∃ d : A, IsPredSV d ℓ := ⟨d, h⟩
-  rw [inSnd, dif_pos hex, isPredSV_unique hex.choose_spec h]
+  rw [inSnd, dite_eq_left hex, isPredSV_unique hex.choose_spec h]
 
 /-- The clauses of every level strictly above `ℓ` hold. -/
 def LevBelow (ℓ : A) (τ : QM A → Prop) : Prop :=
@@ -256,13 +256,13 @@ theorem levSat_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (b w s : Boo
   rw [LevSat]
   refine or_congr Iff.rfl (or_congr Iff.rfl ?_)
   by_cases hbw : b = w
-  · rw [if_pos hbw, if_pos hbw]
-  · rw [if_neg hbw, if_neg hbw]
+  · rw [ite_eq_left hbw, ite_eq_left hbw]
+  · rw [ite_eq_right hbw, ite_eq_right hbw]
     cases b
-    · rw [if_neg (by decide : ¬((false : Bool) = true)),
-        if_neg (by decide : ¬((false : Bool) = true))]
+    · rw [ite_eq_right (by decide : ¬((false : Bool) = true)),
+        ite_eq_right (by decide : ¬((false : Bool) = true))]
       exact levIn_snd_iff hℓ x s
-    · rw [if_pos (rfl : (true : Bool) = true), if_pos (rfl : (true : Bool) = true)]
+    · rw [ite_eq_left (rfl : (true : Bool) = true), ite_eq_left (rfl : (true : Bool) = true)]
       exact levIn_fst_iff hℓ x s
 
 theorem levSat_tff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
@@ -405,7 +405,7 @@ theorem inFst_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
   · by_cases hex : ∃ d : A, IsPredSV d ℓ
     · obtain ⟨d, hd⟩ := hex
       rw [inFst_of_isPredSV hd, inFst_of_isPredSV hd, stU_levOver_ne ℓ τ νZ νB νUV hd.2.2.1.ne]
-    · rw [inFst, inFst, dif_neg hex, dif_neg hex, stS_levOver]
+    · rw [inFst, inFst, dite_eq_right hex, dite_eq_right hex, stS_levOver]
 
 theorem inSnd_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
     inSnd ℓ (levOver ℓ τ νZ νB νUV) = inSnd ℓ τ := by
@@ -414,7 +414,7 @@ theorem inSnd_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
   · by_cases hex : ∃ d : A, IsPredSV d ℓ
     · obtain ⟨d, hd⟩ := hex
       rw [inSnd_of_isPredSV hd, inSnd_of_isPredSV hd, stV_levOver_ne ℓ τ νZ νB νUV hd.2.2.1.ne]
-    · rw [inSnd, inSnd, dif_neg hex, dif_neg hex, stT_levOver]
+    · rw [inSnd, inSnd, dite_eq_right hex, dite_eq_right hex, stT_levOver]
 
 /-- **The three blocks of a level leave the levels above it alone.** -/
 theorem levBelow_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :

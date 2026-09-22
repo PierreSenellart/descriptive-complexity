@@ -374,7 +374,7 @@ theorem tuple_reachesIn {f₀ : Q → A} (w : ℕ)
     · rw [hs]
       change (if tDst = tDst then bitVal PR.zero PR.one (bitAtOf RF.cell mAny v)
         else restOf a v tDst) = restOf a v tDst
-      rw [if_pos rfl, hreg, bitVal_neg not_false, hdst a v,
+      rw [ite_eq_left rfl, hreg, bitVal_neg not_false, hdst a v,
         bitVal_neg (fun hc => hvnr hc.choose hc.choose_spec.1)]
     · exact Prog.passTracks_of_ne hs mAny v
   have hnoreg : ∀ mAny : I → Prop, bitAtOf RF.cell mAny v = False := by
@@ -398,8 +398,8 @@ theorem tuple_reachesIn {f₀ : Q → A} (w : ℕ)
         then bitVal PR.zero PR.one (bitAtOf RF.cell (mD a') r) else restOf a' r s)
     refine congrArg _ (funext fun s => ?_)
     by_cases hs : s = tDst
-    · rw [if_pos hs, if_pos hs]
-    · rw [if_neg hs, if_neg hs]
+    · rw [ite_eq_left hs, ite_eq_left hs]
+    · rw [ite_eq_right hs, ite_eq_right hs]
       exact (hagree a a' hlt hnb r s hs).symm
   -- one round from the marker, opened by a caller step into the read's start
   have hround : ∀ (a : ι) {p : P} {f : Q → A},

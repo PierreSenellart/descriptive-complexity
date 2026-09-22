@@ -129,7 +129,7 @@ noncomputable def joinTuple (v : Fin V → A) (ā : Fin (blockArityBound B) → 
 omit [LinearOrder A] in
 theorem joinTuple_of_lt (v : Fin V → A) (ā : Fin (blockArityBound B) → A)
     {k : Fin (gameDim B V)} (h : (k : ℕ) < V) : joinTuple v ā k = v ⟨k, h⟩ := by
-  rw [joinTuple, dif_pos h]
+  rw [joinTuple, dite_eq_left h]
 
 omit [LinearOrder A] in
 /-- **The address of a cell, read as a symbol's address.** -/
@@ -137,15 +137,15 @@ theorem argsOf_pad (a₀ : A) (i : B.ι) (ā : Fin (B.arity i) → A) :
     argsOf (B := B) i (pad a₀ ā) = ā := by
   funext l
   simp only [argsOf, pad]
-  rw [dif_pos (show ((Fin.castLE (arity_le_blockArityBound B i) l : Fin _) : ℕ) < B.arity i from
-    l.isLt)]
+  rw [dite_eq_left
+    (show ((Fin.castLE (arity_le_blockArityBound B i) l : Fin _) : ℕ) < B.arity i from l.isLt)]
   exact congrArg ā (Fin.ext rfl)
 
 omit [LinearOrder A] in
 @[simp] theorem addrOf_joinTuple (v : Fin V → A) (ā : Fin (blockArityBound B) → A) :
     addrOf (joinTuple v ā) = ā := by
   funext l
-  rw [addrOf, joinTuple, dif_neg (by simp)]
+  rw [addrOf, joinTuple, dite_eq_right (by simp)]
   exact congrArg ā (Fin.ext (by simp))
 
 /-- **The tuple a walk step carries**: the valuation its phase already holds,
@@ -178,12 +178,12 @@ noncomputable def truncTuple (a₀ : A) (m : ℕ) {D : ℕ} (w : Fin D → A) : 
 
 omit [LinearOrder A] in
 theorem agree_truncTuple (a₀ : A) (m : ℕ) {D : ℕ} (w : Fin D → A) :
-    Agree m w (truncTuple a₀ m w) := fun _j hj => if_pos hj
+    Agree m w (truncTuple a₀ m w) := fun _j hj => ite_eq_left hj
 
 theorem canon_truncTuple {a₀ : A} (h₀ : IsBot a₀) (m : ℕ) {D : ℕ} (w : Fin D → A) :
     Canon m (truncTuple a₀ m w) := by
   intro j hj
-  rw [truncTuple, if_neg (by omega)]
+  rw [truncTuple, ite_eq_right (by omega)]
   exact h₀
 
 omit [LinearOrder A] in
@@ -191,7 +191,7 @@ omit [LinearOrder A] in
 @[simp] theorem truncTuple_zero (a₀ : A) {D : ℕ} (w : Fin D → A) :
     truncTuple a₀ 0 w = fun _ => a₀ := by
   funext j
-  rw [truncTuple, if_neg (by omega)]
+  rw [truncTuple, ite_eq_right (by omega)]
 
 /-- **And it is the only such tuple**: a state's tuple is determined by the
 transition that entered it, because the domain pins everything the phase does
@@ -200,9 +200,9 @@ theorem eq_truncTuple {a₀ : A} (h₀ : IsBot a₀) {m D : ℕ} {w x : Fin D �
     (hc : Canon m x) (ha : Agree m w x) : x = truncTuple a₀ m w := by
   funext j
   by_cases hj : (j : ℕ) < m
-  · rw [truncTuple, if_pos hj]
+  · rw [truncTuple, ite_eq_left hj]
     exact ha j hj
-  · rw [truncTuple, if_neg hj]
+  · rw [truncTuple, ite_eq_right hj]
     exact le_antisymm (hc j (by omega) a₀) (h₀ _)
 
 /-- **One step of a prefix writes exactly one coordinate**: the tuple the next
@@ -213,11 +213,11 @@ theorem truncTuple_succ {a₀ : A} (h₀ : IsBot a₀) {m D : ℕ} {vv w : Fin D
     truncTuple a₀ (m + 1) w = Function.update vv ⟨m, hm⟩ (w ⟨m, hm⟩) := by
   funext k
   by_cases hk : (k : ℕ) < m + 1
-  · rw [truncTuple, if_pos hk]
+  · rw [truncTuple, ite_eq_left hk]
     by_cases hkm : (k : ℕ) = m
     · rw [show k = (⟨m, hm⟩ : Fin D) from Fin.ext hkm, Function.update_self]
     · rw [Function.update_of_ne (fun hc => hkm (congrArg Fin.val hc)), ha k (by omega)]
-  · rw [truncTuple, if_neg hk,
+  · rw [truncTuple, ite_eq_right hk,
       Function.update_of_ne (fun hc => absurd (congrArg Fin.val hc : (k : ℕ) = m) (by omega))]
     exact le_antisymm (h₀ (vv k)) (hc k (by omega) a₀)
 

@@ -389,18 +389,18 @@ theorem hasSmallFeedbackSet_iff_feedbackArc_map (A : Type)
       rintro p q ⟨hadj, hcut⟩
       rcases split_adj_cases hadj with ⟨v, rfl, rfl⟩ | ⟨u, v, rfl, rfl, huv⟩
       · have hv : ¬C v := fun hv => hcut ⟨v, hv, rfl, rfl⟩
-        exact Or.inr ⟨by rw [splitLvl_inPt, if_neg hv], by rw [splitLvl_outPt, if_neg hv],
-          Or.inr ⟨rfl, rfl, rfl⟩⟩
+        exact Or.inr ⟨by rw [splitLvl_inPt, ite_eq_right hv],
+          by rw [splitLvl_outPt, ite_eq_right hv], Or.inr ⟨rfl, rfl, rfl⟩⟩
       · rcases Classical.em (C u) with hu | hu
         · refine Or.inl ?_
-          rw [splitLvl_outPt, if_pos hu, splitLvl_inPt]
+          rw [splitLvl_outPt, ite_eq_left hu, splitLvl_inPt]
           split <;> omega
         rcases Classical.em (C v) with hv | hv
         · refine Or.inl ?_
-          rw [splitLvl_outPt, if_neg hu, splitLvl_inPt, if_pos hv]
+          rw [splitLvl_outPt, ite_eq_right hu, splitLvl_inPt, ite_eq_left hv]
           omega
-        · exact Or.inr ⟨by rw [splitLvl_outPt, if_neg hu], by rw [splitLvl_inPt, if_neg hv],
-            Or.inl (hmono u v ⟨hu, hv, huv⟩)⟩
+        · exact Or.inr ⟨by rw [splitLvl_outPt, ite_eq_right hu],
+            by rw [splitLvl_inPt, ite_eq_right hv], Or.inl (hmono u v ⟨hu, hv, huv⟩)⟩
     have hcut : {pq : splitInterp.Map A × splitInterp.Map A | cutArcs C pq.1 pq.2}.ncard
         = {v : A | C v}.ncard := by
       refine ncard_internal_eq C _ (fun pq h => ?_) fun v => ⟨fun h => ?_, ?_⟩

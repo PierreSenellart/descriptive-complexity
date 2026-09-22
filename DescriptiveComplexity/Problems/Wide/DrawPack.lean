@@ -131,7 +131,7 @@ noncomputable def PrenexPack.succ (pk : PrenexPack φ) : PrenexPack φ where
       rw [BoundedFormula.realize_liftAt (by omega)]
       refine iff_of_eq (congrArg _ (funext fun i => ?_))
       simp only [Function.comp_apply]
-      rw [if_pos i.isLt]
+      rw [ite_eq_left i.isLt]
       rfl
     refine (pk.spec A (v ∘ Fin.castSucc) xs fun i => ?_).trans ?_
     · rw [hagree i]

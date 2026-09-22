@@ -382,7 +382,7 @@ theorem blockOf_agree (ha₀ : IsBot a₀)
       aposPt B φ a₀ j = aposPt B φ a₀ j' ∧ (j' : ℕ) < B.arity i' := ⟨j, rfl, hj⟩
   have hchoose : hex.choose = j := (aposPt_inj B φ hex.choose_spec.1).symm
   change w (aposPt B φ a₀ j) = dite _ _ _
-  rw [dif_pos hex, argTup, dif_pos hex.choose.isLt]
+  rw [dite_eq_left hex, argTup, dite_eq_left hex.choose.isLt]
   exact (congrArg (fun z => w (aposPt B φ a₀ z)) (Fin.ext (congrArg Fin.val hchoose))).symm
 
 /-! ### ⟸ : a model of the encoded sentence is an assignment of the block -/

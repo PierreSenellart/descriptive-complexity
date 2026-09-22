@@ -139,7 +139,7 @@ theorem StepDef.next_iff_gateMat (hne : zero ≠ one) {i : d.B.ι}
     intro j
     rw [hvB]
     simp only [Fin.val_castLE]
-    rw [dif_pos j.isLt]
+    rw [dite_eq_left j.isLt]
   -- 1. the prefix over points
   have h1 : d.next σ i x ↔
       altQuantFrom pk.pol (fun w => @BoundedFormula.Realize _ (X.Map A) inst _ _ pk.mat
@@ -164,7 +164,7 @@ theorem StepDef.next_iff_gateMat (hne : zero ≠ one) {i : d.B.ι}
     have hjc : j = Fin.castLE pk.kLe ⟨(j : ℕ), hj'⟩ := Fin.ext rfl
     rw [hjc, hV ⟨(j : ℕ), hj'⟩, hvB]
     simp only [Fin.val_castLE]
-    rw [dif_pos hj']
+    rw [dite_eq_left hj']
   exact h1.trans (h2.symm.trans (iff_of_eq h3))
 
 open Classical in

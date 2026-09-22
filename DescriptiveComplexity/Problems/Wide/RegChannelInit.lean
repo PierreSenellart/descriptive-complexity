@@ -143,7 +143,7 @@ theorem initBackReg_wmRegSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     PR.initBackReg (wmRegSeg x) = PR.mark x := by
   classical
   funext s
-  rw [initBackReg, dif_pos ⟨x, hx, rfl⟩]
+  rw [initBackReg, dite_eq_left ⟨x, hx, rfl⟩]
   have hspec := (⟨x, hx, rfl⟩ :
     ∃ y : Univ A R P K dd, PR.marked y ∧ wmRegSeg x = wmRegSeg y).choose_spec
   rw [show (⟨x, hx, rfl⟩ :
@@ -160,7 +160,7 @@ theorem initBackReg_of_not_reg {r : Univ A R P K dd → Prop}
     PR.initBackReg r = PR.blank := by
   classical
   funext s
-  rw [initBackReg, dif_neg fun hc => hno _ hc.choose_spec.1 hc.choose_spec.2]
+  rw [initBackReg, dite_eq_right fun hc => hno _ hc.choose_spec.1 hc.choose_spec.2]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
@@ -178,12 +178,12 @@ theorem trackTape_initBackReg {t₀ : W}
     else PR.initBackReg r s) = PR.initBackReg r s
   by_cases hs : s = t₀
   · subst hs
-    rw [if_pos rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc)]
+    rw [ite_eq_left rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc)]
     rw [initBackReg]
     split
     · exact (hmk _).symm
     · exact hb.symm
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
 
 /-- **A program's run accepts on the clock, at the register channel.** -/
 theorem accepts_progReg (hR : PR.table.Reads)

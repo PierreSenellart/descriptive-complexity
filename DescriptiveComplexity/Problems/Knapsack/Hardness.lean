@@ -643,7 +643,7 @@ theorem hasExactCover_iff_hasSubsetSum :
         rw [Set.mem_singleton_iff, huniq s hs (by simpa using hmem)]
       · rintro rfl
         exact ⟨⟨s₀, hs₀, rfl⟩, he, by simpa using hmem₀⟩
-    rw [hset, Set.ncard_singleton, if_pos he]
+    rw [hset, Set.ncard_singleton, ite_eq_left he]
   · rintro ⟨-, -, S, hSi, hsum⟩
     rw [sum_weights_eq ha₀ hSi, bwTarget_eq ha₀] at hsum
     have hkey : ∀ e, SSElem e →
@@ -654,7 +654,7 @@ theorem hasExactCover_iff_hasSubsetSum :
         ({e : A | SSElem e} : Set A).ncard SSElem rfl _ _
         (fun e' => count_lt_base hSi ha₀ e')
         (fun e' => by by_cases h' : SSElem e' <;> simp [h', base_pos, one_lt_base]) hsum e he
-      rw [h, if_pos he]
+      rw [h, ite_eq_left he]
     refine (exactlyCoversOn_iff_unique _ _ _).mpr
       ⟨fun s => S (kItem a₀ s), fun s hs => ?_, fun e he => ?_⟩
     · simpa [kItem] using ((bwItem_itm _).mp (hSi _ hs)).1

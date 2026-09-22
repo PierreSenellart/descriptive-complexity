@@ -108,7 +108,7 @@ theorem readLvE_chainSt {nr : ℕ} (bit : Fin nr → Prop)
       · rw [chainSt_succ_neg h hb, hupd, ih]
     · have hskip : chainSt bit upd base (n + 1) = chainSt bit upd base n := by
         simp only [chainSt]
-        rw [dif_neg h]
+        rw [dite_eq_right h]
       rw [hskip, ih]
 
 end Riding
@@ -721,7 +721,7 @@ theorem readSac_chainSt {one : A} {nr : ℕ} (bit : Fin nr → Prop)
       · rw [chainSt_succ_neg h hb, hupd, ih]
     · have hskip : chainSt bit upd base (n + 1) = chainSt bit upd base n := by
         simp only [chainSt]
-        rw [dif_neg h]
+        rw [dite_eq_right h]
       rw [hskip, ih]
 
 omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]

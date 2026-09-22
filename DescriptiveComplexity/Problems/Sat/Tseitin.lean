@@ -671,7 +671,7 @@ theorem satCond_iff_gates {a₀ : A} (h₀ : IsBot a₀) (harity : ∀ i : B.ι,
               · exact ((h₀ (x j)).antisymm (hcx j (not_lt.mp hj) a₀)).symm
             · rintro rfl
               refine ⟨canon_pad h₀ _ _, fun j hj => ?_⟩
-              rw [pad, dif_pos hj]
+              rw [pad, dite_eq_left hj]
           constructor
           · intro hsat w
             constructor

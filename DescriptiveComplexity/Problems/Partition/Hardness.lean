@@ -919,11 +919,11 @@ theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (c 
     · have : {i : pInterp.Map A | (EmptyCl c ∧ S (pEmp a₀ c)) ∧ i = pEmp a₀ c} = {pEmp a₀ c} := by
         ext i
         simp [hp]
-      rw [this, Set.ncard_singleton, if_pos hp]
+      rw [this, Set.ncard_singleton, ite_eq_left hp]
     · have : {i : pInterp.Map A | (EmptyCl c ∧ S (pEmp a₀ c)) ∧ i = pEmp a₀ c} = ∅ := by
         ext i
         simp [hp]
-      rw [this, Set.ncard_empty, if_neg hp]
+      rw [this, Set.ncard_empty, ite_eq_right hp]
   rw [cnt, hset, Set.ncard_union_eq hd₂ (Set.toFinite _) (Set.toFinite _),
     Set.ncard_union_eq hd₁ (Set.toFinite _) (Set.toFinite _),
     (pLit_injective a₀).injOn.ncard_image, (pSlk_injective c).injOn.ncard_image, hlast]
@@ -1006,7 +1006,7 @@ theorem cnt_item_lt_pbase {a₀ : A} (ha₀ : IsBot a₀) (b : Bool × A) :
     rw [cnt_item_cls ha₀]
     have h1 := ncard_le_two_card (OccSet e)
     have h2 := ncard_le_two_card (MidSet e)
-    by_cases hemp : EmptyCl e <;> simp only [hemp, if_true, if_false] <;> omega
+    by_cases hemp : EmptyCl e <;> simp only [hemp, ite_true, ite_false] <;> omega
 
 /-- **The balance condition, digit by digit**: a selection weighs as much as
 the items it leaves out exactly when it takes half of every digit. -/
@@ -1176,7 +1176,7 @@ theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) {S T : pInterp.Map A
       rintro ⟨-, hno⟩
       obtain ⟨p, hp⟩ := hne
       exact hno p.1 p.2 hp
-    rw [if_neg (fun h => hemp h.1), if_neg (fun h => hemp h.1)] at hbc
+    rw [ite_eq_right (fun h => hemp h.1), ite_eq_right (fun h => hemp h.1)] at hbc
     have hle : ({p ∈ MidSet c | S (pSlk p.2 c p.1)} : Set (A × Bool)).ncard ≤
         (MidSet c).ncard := Set.ncard_le_ncard (fun p hp => hp.1) (Set.toFinite _)
     have hlt := card_midSet_lt hne
@@ -1199,12 +1199,12 @@ theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) {S T : pInterp.Map A
     have hcp := hcompl (pEmp a₀ c) hitem
     rw [hne, Set.ncard_empty, hz S, hz T] at hbc
     by_cases hSe : S (pEmp a₀ c)
-    · rw [if_pos ⟨hemp, hSe⟩, if_neg (fun h => hcp.mp hSe h.2)] at hbc
+    · rw [ite_eq_left ⟨hemp, hSe⟩, ite_eq_right (fun h => hcp.mp hSe h.2)] at hbc
       omega
     · have hTe : T (pEmp a₀ c) := by
         by_contra h
         exact hSe (hcp.mpr h)
-      rw [if_neg (fun h => hSe h.2), if_pos ⟨hemp, hTe⟩] at hbc
+      rw [ite_eq_right (fun h => hSe h.2), ite_eq_left ⟨hemp, hTe⟩] at hbc
       omega
 
 /-- **Correctness of the reduction**: a CNF structure is not-all-equal
@@ -1288,7 +1288,7 @@ theorem naeSatisfiable_iff_hasEqualSplit (A : Type) [Language.sat.Structure A] [
           simpa using h
         · intro h
           exact ⟨hMsub e h, by simpa using h⟩
-      rw [hlit, hslk, if_neg (fun h : _ ∧ _ => splitSet_pEmp e h.2), hMcard e]
+      rw [hlit, hslk, ite_eq_right (fun h : _ ∧ _ => splitSet_pEmp e h.2), hMcard e]
       by_cases hc : IsCl e
       · obtain ⟨h1, h2⟩ := hocc e hc
         have h3 := card_midSet_add_two (show 2 ≤ (OccSet e).ncard by omega)
@@ -1297,13 +1297,13 @@ theorem naeSatisfiable_iff_hasEqualSplit (A : Type) [Language.sat.Structure A] [
           have hne : (OccSet e).Nonempty := (Set.ncard_pos (Set.toFinite _)).mp (by omega)
           obtain ⟨p, hp⟩ := hne
           exact hno p.1 p.2 hp
-        rw [if_neg hemp]
+        rw [ite_eq_right hemp]
         omega
       · have ho := hOccEmpty e hc
         have hm : MidSet e = ∅ := Set.subset_empty_iff.mp (ho ▸ midSet_subset)
         have hTe : TrueSet ν e = ∅ :=
           Set.subset_empty_iff.mp (ho ▸ (fun p hp => hp.1 : TrueSet ν e ⊆ OccSet e))
-        rw [hTe, ho, hm, Set.ncard_empty, if_neg (fun h : EmptyCl e => hc h.1)]
+        rw [hTe, ho, hm, Set.ncard_empty, ite_eq_right (fun h : EmptyCl e => hc h.1)]
   · rintro ⟨-, -, S, hSi, hsum⟩
     have hbal := (sum_eq_iff ha₀ hSi).mp hsum
     have hcompl : ∀ i, BWItem i → (S i ↔ ¬(BWItem i ∧ ¬S i)) := by

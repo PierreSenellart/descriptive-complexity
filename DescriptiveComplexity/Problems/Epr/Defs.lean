@@ -324,14 +324,14 @@ theorem eprSatOn_map (h : EprSatOn A) : EprSatOn B := by
     · have hy' : EVarG y := by
         have := (eVarG_map e (e.symm y)).mp hy
         rwa [e.apply_symm_apply] at this
-      rw [if_pos hy, if_pos hy']
+      rw [ite_eq_left hy, ite_eq_left hy']
     · have hy' : ¬EVarG y := by
         intro hcy
         refine hy ?_
         have := (eVarG_map e (e.symm y)).symm
         rw [e.apply_symm_apply] at this
         exact this.mp hcy
-      rw [if_neg hy, if_neg hy', e.apply_symm_apply]
+      rw [ite_eq_right hy, ite_eq_right hy', e.apply_symm_apply]
   refine ⟨e l, ?_, ?_⟩
   · have := (inClG_map e (e.symm c) l).mp hl
     rwa [e.apply_symm_apply] at this

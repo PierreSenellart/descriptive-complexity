@@ -121,18 +121,18 @@ theorem realize_detStep (m n : s.Mode) (x y : Fin s.k → A) (z : Fin s.par → 
     have hc := hm hw
     by_cases hmn : m' = n
     · refine ⟨hmn, ?_⟩
-      rw [if_pos hmn, Formula.realize_iInf] at hc
+      rw [ite_eq_left hmn, Formula.realize_iInf] at hc
       funext i
       have hi := hc i
       rw [Formula.realize_equal, Term.realize_var, Term.realize_var] at hi
       exact hi
-    · rw [if_neg hmn, Formula.realize_bot] at hc
+    · rw [ite_eq_right hmn, Formula.realize_bot] at hc
       exact hc.elim
   · refine Formula.realize_iAlls.mpr fun w => ?_
     rw [Formula.realize_imp, Formula.realize_relabel, hrel w]
     intro hw
     obtain ⟨hmn, hwy⟩ := h m' w hw
-    rw [if_pos hmn, Formula.realize_iInf]
+    rw [ite_eq_left hmn, Formula.realize_iInf]
     intro i
     rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
     exact congrFun hwy i

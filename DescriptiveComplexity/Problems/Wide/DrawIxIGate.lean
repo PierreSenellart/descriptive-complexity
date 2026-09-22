@@ -237,12 +237,12 @@ theorem igTagsAre_ixIGateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
       wmBlk (ixAddr elt st.val) (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') ↔ t' = t₁
   · left
-    rw [dspTagOf, dif_pos h]
+    rw [dspTagOf, dite_eq_left h]
     intro t'
     rw [ctlBit_ixIGateTagFam_wit hinj helt hzo f₀ t']
     exact h.choose_spec t'
   · right
-    refine ⟨by rw [dspTagOf, dif_neg h], fun t₁ hc1 => h ⟨t₁, fun t' => ?_⟩⟩
+    refine ⟨by rw [dspTagOf, dite_eq_right h], fun t₁ hc1 => h ⟨t₁, fun t' => ?_⟩⟩
     rw [← ctlBit_ixIGateTagFam_wit (flag := flag) (vAdr := vAdr) hinj helt hzo f₀ t']
     exact hc1 t'
 

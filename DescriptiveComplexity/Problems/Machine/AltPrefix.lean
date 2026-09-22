@@ -64,7 +64,7 @@ theorem altTail_succ (P : (Fin k → A → Prop) → Prop) {r m : ℕ} (h : m < 
     (νs : Fin k → A → Prop) (pol : Bool) :
     AltTail P (r + 1) m νs pol =
       polQuant pol fun ν => AltTail P r (m + 1) (Function.update νs ⟨m, h⟩ ν) (!pol) := by
-  rw [AltTail, dif_pos h]
+  rw [AltTail, dite_eq_left h]
 
 /-! ### Gluing a tail onto a prefix -/
 
@@ -93,25 +93,25 @@ theorem glueTail_cons {m r : ℕ} (h : m < k) (νs : Fin k → A → Prop) (ν :
       intro hcon
       have : (i : ℕ) = m := by rw [hcon]
       omega
-    simp only [glueTail, if_pos hlt, if_pos (show (i : ℕ) < m + 1 by omega),
+    simp only [glueTail, ite_eq_left hlt, ite_eq_left (show (i : ℕ) < m + 1 by omega),
       Function.update_of_ne hne]
   · have hi : i = (⟨m, h⟩ : Fin k) := Fin.ext heq
     subst hi
-    simp only [glueTail, if_neg (lt_irrefl _), if_pos (Nat.lt_succ_self _), Function.update_self,
-      Nat.sub_self, dif_pos (Nat.succ_pos r)]
+    simp only [glueTail, ite_eq_right (lt_irrefl _), ite_eq_left (Nat.lt_succ_self _),
+      Function.update_self, Nat.sub_self, dite_eq_left (Nat.succ_pos r)]
     rfl
   · have hne : i ≠ (⟨m, h⟩ : Fin k) := by
       intro hcon
       have : (i : ℕ) = m := by rw [hcon]
       omega
-    simp only [glueTail, if_neg (show ¬((i : ℕ) < m) by omega),
-      if_neg (show ¬((i : ℕ) < m + 1) by omega), Function.update_of_ne hne]
+    simp only [glueTail, ite_eq_right (show ¬((i : ℕ) < m) by omega),
+      ite_eq_right (show ¬((i : ℕ) < m + 1) by omega), Function.update_of_ne hne]
     by_cases hr : (i : ℕ) - (m + 1) < r
-    · rw [dif_pos (show (i : ℕ) - m < r + 1 by omega), dif_pos hr]
+    · rw [dite_eq_left (show (i : ℕ) - m < r + 1 by omega), dite_eq_left hr]
       have hsucc : (⟨(i : ℕ) - m, show (i : ℕ) - m < r + 1 by omega⟩ : Fin (r + 1)) =
           Fin.succ ⟨(i : ℕ) - (m + 1), hr⟩ := Fin.ext (by simp; omega)
       rw [hsucc, Fin.cons_succ]
-    · rw [dif_neg (show ¬((i : ℕ) - m < r + 1) by omega), dif_neg hr]
+    · rw [dite_eq_right (show ¬((i : ℕ) - m < r + 1) by omega), dite_eq_right hr]
 
 /-! ### The two shapes agree -/
 

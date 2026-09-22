@@ -281,7 +281,7 @@ theorem relMapBool_ofTable (V : FinVocab L) (k : ℕ)
   refine Fin.ext ?_
   have hj : (j : ℕ) < n := by have := j.isLt; omega
   have hd := digitAt_tupleIdx (c := k + 1) hall (j := (j : ℕ)) (by rw [hlen]; exact j.isLt)
-  simp only [hd, List.getD_eq_getElem?_getD, List.getElem?_ofFn, dif_pos hj]
+  simp only [hd, List.getD_eq_getElem?_getD, List.getElem?_ofFn, dite_eq_left hj]
   rfl
 
 /-- **Every finite nonempty structure is presented by a table**, along a chosen

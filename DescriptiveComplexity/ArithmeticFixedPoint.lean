@@ -368,12 +368,12 @@ theorem inflLimit_arith_iff (i : arithBlock.ι) (v : Fin (arithBlock.arity i) �
     fin_cases j <;> rfl
   cases i with
   | false =>
-    simp only [Bool.false_eq_true, if_false]
+    simp only [Bool.false_eq_true, ite_false]
     refine ⟨fun ⟨n, hn⟩ => (inflStage_arith_sound out n).1 v hn, fun h => ?_⟩
     rw [hv]
     exact inflLimit_plus_of_eq out (v 0) (v 1) (v 2) (by simpa using h)
   | true =>
-    simp only [if_true]
+    simp only [ite_true]
     refine ⟨fun ⟨n, hn⟩ => (inflStage_arith_sound out n).2 v hn, fun h => ?_⟩
     rw [hv]
     exact inflLimit_times_of_eq out (v 0) (v 1) (v 2) (by simpa using h)

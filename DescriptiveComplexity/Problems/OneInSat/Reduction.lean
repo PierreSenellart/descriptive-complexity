@@ -185,12 +185,12 @@ private theorem realize_linkLitF {t₁ t₂ : OITag} {s : Bool} {v : Fin 2 × Fi
   constructor
   · rintro ⟨i, hi⟩
     by_cases h : t₁ = .link i ∧ t₂ = .var
-    · rw [if_pos h] at hi
+    · rw [ite_eq_left h] at hi
       exact ⟨i, h, realize_nthF.mp hi⟩
-    · rw [if_neg h] at hi
+    · rw [ite_eq_right h] at hi
       exact absurd hi (by simp)
   · rintro ⟨i, h, hn⟩
-    exact ⟨i, by rw [if_pos h]; exact realize_nthF.mpr hn⟩
+    exact ⟨i, by rw [ite_eq_left h]; exact realize_nthF.mpr hn⟩
 
 /-- The clauses of the gadget. -/
 theorem isCl_pt (t : OITag) (x : A) :
@@ -398,7 +398,7 @@ theorem enum_link {i : Ix3} {c : A} {y : oiInterp.Map A} {u : Bool}
   · cases u with
     | true => simp [posPair_link] at ht
     | false =>
-      rw [if_neg (by simp)] at ht
+      rw [ite_eq_right (by simp)] at ht
       exact Or.inl ⟨by rw [(negPair_link_iff i t).mp ht], rfl⟩
   · obtain rfl : j = i := by simpa using hj.symm
     exact Or.inr ⟨x, u, hn, rfl, rfl⟩
@@ -462,12 +462,12 @@ theorem oneInProper_oiAssign (hw : ¬ThreeSatToSat.Wide A) (hwidth : WidthAtMost
         obtain ⟨t, ht, rfl⟩ := enum_piece hy
         cases u with
         | true =>
-          simp only [if_true] at ht
+          simp only [ite_true] at ht
           rcases (posPair_piece_one t).mp ht with rfl | rfl
           · exact Or.inr (Or.inl ⟨rfl, rfl⟩)
           · exact Or.inr (Or.inr ⟨rfl, rfl⟩)
         | false =>
-          simp only [Bool.false_eq_true, if_false] at ht
+          simp only [Bool.false_eq_true, ite_false] at ht
           rw [(negPair_piece_one t).mp ht]
           exact Or.inl ⟨rfl, rfl⟩
       have hslot : OccIn (pt (.piece .one) c) (pt (.slot .one) c) false :=
@@ -498,13 +498,13 @@ theorem oneInProper_oiAssign (hw : ¬ThreeSatToSat.Wide A) (hwidth : WidthAtMost
         obtain ⟨t, ht, rfl⟩ := enum_piece hy
         cases u with
         | true =>
-          simp only [if_true] at ht
+          simp only [ite_true] at ht
           rcases (posPair_piece_two t).mp ht with rfl | rfl | rfl
           · exact Or.inl ⟨rfl, rfl⟩
           · exact Or.inr (Or.inl ⟨rfl, rfl⟩)
           · exact Or.inr (Or.inr ⟨rfl, rfl⟩)
         | false =>
-          simp only [Bool.false_eq_true, if_false, negPair_piece_two] at ht
+          simp only [Bool.false_eq_true, ite_false, negPair_piece_two] at ht
       have hslot : OccIn (pt (.piece .two) c) (pt (.slot .two) c) true :=
         occIn_same_pos hw rfl hc ((posPair_piece_two _).mpr (Or.inl rfl))
       have he : OccIn (pt (.piece .two) c) (pt (.fresh .e) c) true :=
@@ -533,12 +533,12 @@ theorem oneInProper_oiAssign (hw : ¬ThreeSatToSat.Wide A) (hwidth : WidthAtMost
         obtain ⟨t, ht, rfl⟩ := enum_piece hy
         cases u with
         | true =>
-          simp only [if_true] at ht
+          simp only [ite_true] at ht
           rcases (posPair_piece_three t).mp ht with rfl | rfl
           · exact Or.inr (Or.inl ⟨rfl, rfl⟩)
           · exact Or.inr (Or.inr ⟨rfl, rfl⟩)
         | false =>
-          simp only [Bool.false_eq_true, if_false] at ht
+          simp only [Bool.false_eq_true, ite_false] at ht
           rw [(negPair_piece_three t).mp ht]
           exact Or.inl ⟨rfl, rfl⟩
       have hslot : OccIn (pt (.piece .three) c) (pt (.slot .three) c) false :=
@@ -638,12 +638,12 @@ theorem satisfiable_of_oneInProper (hw : ¬ThreeSatToSat.Wide A)
       obtain ⟨t, ht, rfl⟩ := enum_piece hq2
       cases u2 with
       | true =>
-        simp only [if_true] at ht
+        simp only [ite_true] at ht
         rcases (posPair_piece_two t).mp ht with rfl | rfl | rfl
         · exact absurd hT2 h2
         · exact absurd hT2 hef
         · exact hT2
-      | false => simp only [Bool.false_eq_true, if_false, negPair_piece_two] at ht
+      | false => simp only [Bool.false_eq_true, ite_false, negPair_piece_two] at ht
     -- and the third one now has two true literals
     obtain ⟨q3, u3, -, -, huniq3⟩ := hμ (pt (.piece .three) c) (isCl_gadget rfl hc)
     obtain ⟨e1, -⟩ := huniq3 _ _

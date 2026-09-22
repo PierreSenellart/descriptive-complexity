@@ -193,7 +193,7 @@ private theorem incr_process (h : IsLinOrd ile) (hi : WMIncr ile s t)
       WMRead τ (g (midMirror ile s t w) w) ∧ WMDst τ (accStateAfter ile s qc (qd u₀) w) ∧
       WMWrite τ (g (procMirror ile s t w) w) ∧ ¬WMRight τ := by
   by_cases hcar : ∀ v : I, WMLt ile w v → s v
-  · rw [accState, if_pos hcar]
+  · rw [accState, ite_eq_left hcar]
     by_cases hbit : s w
     · -- a set digit: clear it and carry on
       have hge : ∀ v : I, ile w v → s v := fun v hle => by
@@ -208,7 +208,7 @@ private theorem incr_process (h : IsLinOrd ile) (hi : WMIncr ile s t)
         rcases hc with ⟨rfl, ht⟩ | ⟨hne, hm⟩
         · exact absurd ht (not_incr_of_lt h hi hu₀ hab hlt)
         · exact ⟨hm, hne⟩
-      rw [accStateAfter, if_pos hge, heq]
+      rw [accStateAfter, ite_eq_left hge, heq]
       exact hone _ w ((midMirror_at' h).mpr hbit)
     · -- a clear digit: set it and stop
       have hw : w = u₀ := wmIncr_carry_unique h hbit hcar hu₀ hab
@@ -218,7 +218,7 @@ private theorem incr_process (h : IsLinOrd ile) (hi : WMIncr ile s t)
         · rcases eq_or_ne v w with rfl | hne
           · exact Or.inl ⟨rfl, hw ▸ incr_carry h hi hu₀ hab⟩
           · exact Or.inr ⟨hne, hc.resolve_right hne⟩
-      rw [accStateAfter, if_neg fun hall => hbit (hall w (h.1 w)), heq, ← hw]
+      rw [accStateAfter, ite_eq_right fun hall => hbit (hall w (h.1 w)), heq, ← hw]
       exact hzero _ w fun hc => hbit ((midMirror_at' h).mp hc)
   · -- already stopped: rewrite the symbol and walk on
     obtain ⟨v₀, hv₀⟩ : ∃ v : I, ¬(WMLt ile w v → s v) := by
@@ -239,8 +239,8 @@ private theorem incr_process (h : IsLinOrd ile) (hi : WMIncr ile s t)
       · rcases eq_or_ne v w with rfl | hne
         · exact Or.inl ⟨rfl, (incr_iff_of_lt h hi hu₀ hab hlt).mpr ((midMirror_at' h).mp hc)⟩
         · exact Or.inr ⟨hne, hc⟩
-    rw [accState, if_neg hcar, accStateAfter,
-      if_neg fun hall => hcar fun v hvlt => hall v hvlt.1, heq]
+    rw [accState, ite_eq_right hcar, accStateAfter,
+      ite_eq_right fun hall => hcar fun v hvlt => hall v hvlt.1, heq]
     exact hkeep u₀ _ _
 
 /-! ### The subroutine -/

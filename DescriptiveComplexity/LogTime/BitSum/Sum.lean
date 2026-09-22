@@ -56,8 +56,8 @@ theorem onesBelow_succ (x w : ℕ) :
   classical
   rw [onesBelow, onesBelow, Finset.range_add_one, filter_insert]
   by_cases h : x.testBit w = true
-  · rw [if_pos h, if_pos h, card_insert_of_notMem (by simp)]
-  · rw [if_neg h, if_neg h, Nat.add_zero]
+  · rw [ite_eq_left h, ite_eq_left h, card_insert_of_notMem (by simp)]
+  · rw [ite_eq_right h, ite_eq_right h, Nat.add_zero]
 
 /-- The count only looks at the bits it counts. -/
 theorem onesBelow_congr {x y w : ℕ} (h : ∀ i, i < w → x.testBit i = y.testBit i) :

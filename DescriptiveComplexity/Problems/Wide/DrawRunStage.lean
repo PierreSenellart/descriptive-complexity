@@ -94,8 +94,8 @@ theorem trackTape_back_gen {stA stB : TapeSt dt A R P I} {t : dt.SlotIx}
   refine congrArg _ (funext fun s => ?_)
   by_cases hs : s = t
   · subst hs
-    rw [if_pos rfl, ht]
-  · rw [if_neg hs]
+    rw [ite_eq_left rfl, ht]
+  · rw [ite_eq_right hs]
     exact hagree r s hs
 
 section StageRun
@@ -532,7 +532,7 @@ private theorem stage_reachesIn_legs :
       · subst hm
         change (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _) =
           (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne hm, Prog.passTracks_of_ne hm]
         match s with
         | .wk => exact absurd rfl hs
@@ -1077,7 +1077,7 @@ theorem stage_loops_reachesIn :
   | zero =>
     have hkn : n = k := by omega
     subst hkn
-    have hph : stagePhaseAt emb n = emb .cR1 := dif_neg (lt_irrefl n)
+    have hph : stagePhaseAt emb n = emb .cR1 := dite_eq_right (lt_irrefl n)
     have hfk : (⟨n, Nat.lt_succ_of_le hn⟩ : Fin (n + 1)) = Fin.last n :=
       Fin.ext rfl
     rw [hph, hfk, Nat.mul_zero]
@@ -1086,7 +1086,7 @@ theorem stage_loops_reachesIn :
     have hkl : n < k := by omega
     set ℓ : Fin k := ⟨n, hkl⟩ with hℓ
     have hph : stagePhaseAt emb n = emb (.tupP ℓ (.chk ⟨0, by omega⟩)) :=
-      dif_pos hkl
+      dite_eq_left hkl
     have hcast : (⟨n, Nat.lt_succ_of_le hn⟩ : Fin (k + 1)) = ℓ.castSucc :=
       Fin.ext rfl
     rw [hph, hcast]

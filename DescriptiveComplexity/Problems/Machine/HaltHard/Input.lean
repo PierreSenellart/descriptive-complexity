@@ -141,7 +141,7 @@ theorem offB_eq_sum (c : ℕ) : ∀ i : ℕ, i ≤ V.numSyms →
   | succ i ih =>
     intro hi
     have hlt : i < V.numSyms := by omega
-    rw [offB, ih (by omega), dif_pos hlt, List.take_add_one]
+    rw [offB, ih (by omega), dite_eq_left hlt, List.take_add_one]
     have hget : (List.finRange V.numSyms)[i]? = some ⟨i, hlt⟩ := by
       rw [List.getElem?_eq_getElem (by simpa using hlt)]
       simp
@@ -246,12 +246,12 @@ theorem primrec_offB (i : ℕ) : Primrec fun c : ℕ => offB V c i := by
     · have : (fun c : ℕ => offB V c (i + 1)) =
           fun c : ℕ => offB V c i + c ^ V.arity ⟨i, h⟩ := by
         funext c
-        rw [offB, dif_pos h]
+        rw [offB, dite_eq_left h]
       rw [this]
       exact Primrec.nat_add.comp ih (primrec_pow_const _)
     · have : (fun c : ℕ => offB V c (i + 1)) = fun c : ℕ => offB V c i := by
         funext c
-        rw [offB, dif_neg h]
+        rw [offB, dite_eq_right h]
         omega
       rw [this]
       exact ih
@@ -303,7 +303,7 @@ def pushBit (b : Bool) : Code := if b then pushOne else .zero'
 theorem eval_pushBit (b : Bool) (v : List ℕ) : (pushBit b).eval v = pure (b.toNat :: v) := by
   cases b
   · simp [pushBit]
-  · rw [pushBit, if_pos rfl, eval_pushOne]
+  · rw [pushBit, ite_eq_left rfl, eval_pushOne]
     rfl
 
 section Codes
@@ -366,9 +366,9 @@ def posProc : CPos (allCode cF cP) :=
 
 @[simp] theorem codeAt_posBit (b : Bool) : codeAt (posBit cF cP b) = pushBit b := by
   cases b
-  · rw [posBit, if_neg (by simp), pushBit, if_neg (by simp)]
+  · rw [posBit, ite_eq_right (by simp), pushBit, ite_eq_right (by simp)]
     exact codeAt_posBit0 cF cP
-  · rw [posBit, if_pos rfl, pushBit, if_pos rfl]
+  · rw [posBit, ite_eq_left rfl, pushBit, ite_eq_left rfl]
     exact codeAt_posBit1 cF cP
 
 /-- **The input chain**: one `comp` frame pushing each bit, one folding it

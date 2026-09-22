@@ -190,7 +190,7 @@ theorem ptrTup_ctlOf {coord : Fin dt.dd → dt.CtlIx} (hcoord : Function.Injecti
   classical
   funext j
   change (if h : ∃ i : Fin dt.dd, coord i = coord j then t h.choose else f₀ (coord j)) = t j
-  rw [dif_pos ⟨j, rfl⟩]
+  rw [dite_eq_left ⟨j, rfl⟩]
   exact congrArg t (hcoord (⟨j, rfl⟩ : ∃ i : Fin dt.dd, coord i = coord j).choose_spec)
 
 omit [LinearOrder A] [Finite A] [Nonempty A] [Finite R'] [Finite P'] [Finite dt.KIx]
@@ -207,16 +207,16 @@ theorem ctlOf_ctlOf (coord : Fin dt.dd → dt.CtlIx) (f₀ : dt.CtlIx → A)
   funext q
   by_cases hq : ∃ j : Fin dt.dd, coord j = q
   · change (if h : ∃ j : Fin dt.dd, coord j = q then t h.choose else _) = _
-    rw [dif_pos hq]
+    rw [dite_eq_left hq]
     change _ = (if h : ∃ j : Fin dt.dd, coord j = q then t h.choose else f₀ q)
-    rw [dif_pos hq]
+    rw [dite_eq_left hq]
   · change (if h : ∃ j : Fin dt.dd, coord j = q then t h.choose else
       dt.ctlOf coord f₀ t' q) = _
-    rw [dif_neg hq]
+    rw [dite_eq_right hq]
     change (if h : ∃ j : Fin dt.dd, coord j = q then t' h.choose else f₀ q) = _
-    rw [dif_neg hq]
+    rw [dite_eq_right hq]
     change _ = (if h : ∃ j : Fin dt.dd, coord j = q then t h.choose else f₀ q)
-    rw [dif_neg hq]
+    rw [dite_eq_right hq]
 
 omit [Nonempty A] [Finite R'] [Finite P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
@@ -233,17 +233,17 @@ theorem ptrNext_ctlOf {coord : Fin dt.dd → dt.CtlIx} (hcoord : Function.Inject
   · change (if h : ∃ j : Fin dt.dd, coord j = q then
       (blkNext A dt.KIx dt.dd (b, dt.ptrTup coord (dt.ctlOf coord f₀ t))).2 h.choose
       else _) = _
-    rw [dif_pos hq, dt.ptrTup_ctlOf hcoord f₀ t]
+    rw [dite_eq_left hq, dt.ptrTup_ctlOf hcoord f₀ t]
     change _ = (if h : ∃ j : Fin dt.dd, coord j = q then
       (blkNext A dt.KIx dt.dd (b, t)).2 h.choose else f₀ q)
-    rw [dif_pos hq]
+    rw [dite_eq_left hq]
   · change (if h : ∃ j : Fin dt.dd, coord j = q then _ else dt.ctlOf coord f₀ t q) = _
-    rw [dif_neg hq]
+    rw [dite_eq_right hq]
     change (if h : ∃ j : Fin dt.dd, coord j = q then t h.choose else f₀ q) = _
-    rw [dif_neg hq]
+    rw [dite_eq_right hq]
     change _ = (if h : ∃ j : Fin dt.dd, coord j = q then
       (blkNext A dt.KIx dt.dd (b, t)).2 h.choose else f₀ q)
-    rw [dif_neg hq]
+    rw [dite_eq_right hq]
 
 variable (dt) in
 /-- **The sweep that does nothing**: it writes nothing, moves no pointer and is

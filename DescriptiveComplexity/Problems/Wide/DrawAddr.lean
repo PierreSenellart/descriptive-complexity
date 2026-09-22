@@ -249,7 +249,7 @@ theorem wmBlk_tupAddr {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
     wmBlk (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x)
         (argOut ki (Fin.castLE ha ℓ)) = encMap ly zero one (x ℓ) := by
   rw [tupAddr, wmBlk_outAddr]
-  exact dif_pos ℓ.isLt
+  exact dite_eq_left ℓ.isLt
 
 /-- **An address whose blocks below the arity are the encodings, and which
 marks nothing else, *is* the tuple's address.** The addresses a stage atom
@@ -268,11 +268,11 @@ theorem tupAddr_of_blocks {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
     s = tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x := by
   refine (outAddr_of_blocks (fun k => ?_) hsupp).trans rfl
   by_cases hk : (k : ℕ) < d.B.arity i
-  · rw [dif_pos hk]
+  · rw [dite_eq_left hk]
     have hcast : k = Fin.castLE ha ⟨(k : ℕ), hk⟩ := Fin.ext rfl
     exact (congrArg (fun k' => wmBlk s (argOut ki k')) hcast).trans
       (hblk ⟨(k : ℕ), hk⟩)
-  · rw [dif_neg hk]
+  · rw [dite_eq_right hk]
     exact funext fun v =>
       propext ⟨fun hv => (hbeyond k (not_lt.mp hk) v hv).elim, False.elim⟩
 
@@ -335,7 +335,7 @@ theorem wmSetLt_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
     exact logicalTop_arg _ _
   obtain ⟨k, hk, hv⟩ := hcell
   rw [argOut_injective (P := P) (R := R) hk.symm] at hv
-  rw [dif_pos (show ((Fin.castLE ha ℓ : Fin ko) : ℕ) < d.B.arity i from ℓ.isLt)]
+  rw [dite_eq_left (show ((Fin.castLE ha ℓ : Fin ko) : ℕ) < d.B.arity i from ℓ.isLt)]
     at hv
   exact not_encPt_zeroTup ly hne (x ℓ).1 hv
 
@@ -387,7 +387,7 @@ theorem wmSetLt_tupAddr_logicalTop' [LinearOrder R] [LinearOrder P]
       rw [heq]
       exact logicalTop_arg _ _
     obtain ⟨k, -, hv⟩ := hcell
-    rw [dif_neg (by omega : ¬((k : ℕ) < d.B.arity i))] at hv
+    rw [dite_eq_right (by omega : ¬((k : ℕ) < d.B.arity i))] at hv
     exact hv
   · exact wmSetLt_tupAddr_logicalTop hne hV ha x ⟨0, hpos⟩
 

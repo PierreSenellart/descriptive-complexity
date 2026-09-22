@@ -158,7 +158,7 @@ private theorem update_wk_offSt
     · rw [hsm]
       change (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _) =
         (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _)
-      rw [if_pos rfl, if_pos rfl]
+      rw [ite_eq_left rfl, ite_eq_left rfl]
     · rw [Prog.passTracks_of_ne hsm, Prog.passTracks_of_ne hsm]
       match s with
       | .wk => exact absurd rfl hs
@@ -201,7 +201,7 @@ theorem hasRight_evalAdv
         dstPh := .advP .a1
         dstSt := fun f _ => f
         wr := fun _ g => Function.update g Slot.wk zero
-        moveRight := True } := dif_neg hnl
+        moveRight := True } := dite_eq_right hnl
   refine prog_hasRight_eval (e := .chk (Fin.last dt.nv)) (ρ := .dspA)
     ?_ ?_ ?_ ?_ ?_ ?_
   · rw [hruleAdv]
@@ -255,7 +255,7 @@ theorem hasRight_evalReset
         dstPh := .reset2P .scan
         dstSt := fun f _ => f
         wr := fun _ g => Function.update g Slot.wk zero
-        moveRight := True } := if_neg hnl
+        moveRight := True } := ite_eq_right hnl
   refine prog_hasRight_eval (e := .chk (Fin.last dt.nv)) (ρ := .dspB)
     ?_ ?_ ?_ ?_ ?_ ?_
   · rw [hruleRst]
@@ -773,10 +773,10 @@ theorem step_clearMir2_exit
         (.cmpP (if b then .py else .pn)) fc := by
     by_cases hb : ∀ i, (st.old i (fun _ => False) ↔
         st.new i (fun _ => False))
-    · rw [sweepState, if_pos (fun r hr => hbelow r hr ▸ hb),
+    · rw [sweepState, ite_eq_left (fun r hr => hbelow r hr ▸ hb),
         show b = true from decide_eq_true hb]
       rfl
-    · rw [sweepState, if_neg (fun hc => hb (hc _
+    · rw [sweepState, ite_eq_right (fun hc => hb (hc _
           ((wmSetLt_iff _ _).mpr ⟨wmSetLe_of_empty hlin (fun _ hc' => hc') v',
             fun hc' => ne_of_wmIncr hvi hc'⟩))),
         show b = false from decide_eq_false hb]
@@ -847,7 +847,7 @@ theorem step_compare_exit_pos
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
-  rw [sweepState, if_pos hyes]
+  rw [sweepState, ite_eq_left hyes]
   refine Prog.step_moveBack hR hlin hvp (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.compare
       (Sum.inr true)).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
@@ -886,7 +886,7 @@ theorem step_compare_exit_neg
           ((dt.prog zero one hzo args hpl).syElt
             (dt.prog zero one hzo args hpl).blank)⟩ := by
   classical
-  rw [sweepState, if_neg hno]
+  rw [sweepState, ite_eq_right hno]
   refine Prog.step_moveBack hR hlin hvp (fun _ _ => rfl) ?_
   have hg : ((dt.progAsm zero one hzo args).rule OuterSite.compare
       (Sum.inr false)).guard fc ((dt.prog zero one hzo args hpl).passTracksAt wmSeg
@@ -944,7 +944,7 @@ theorem step_homeCmp_exit
         ((isLinOrd_wmSetLe hlin).2.2.1 r (fun _ => False)
           ((wmSetLt_iff_of_wmIncr hlin hvi r).mp hlt)
           (wmSetLe_of_empty hlin (fun _ hc => hc) r))
-      rw [if_neg hne]
+      rw [ite_eq_right hne]
       rfl
     | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .mir | .tgt
     | .sav | .val | .wk | .bot | .ltp | .new _ => rfl
@@ -975,7 +975,7 @@ theorem step_homeCmp_exit
         bitVal zero one
           ((dt.copySt zero one hzo args st v').old i (fun _ => False))
       simp only [copySt]
-      rw [if_pos h0v']
+      rw [ite_eq_left h0v']
     · have hL : (dt.copyKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
             OuterPh.copyP).wrG
           ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
@@ -991,7 +991,7 @@ theorem step_homeCmp_exit
       · subst hm
         change (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _) =
           (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne hm, Prog.passTracks_of_ne hm]
         match sl with
         | .old i => exact absurd ⟨i, rfl⟩ ho
@@ -1071,8 +1071,8 @@ theorem reaches_copyFrom
         rw [wmSetLt_iff_of_wmIncr hlin hi r, wmSetLt_iff r s]
         exact ⟨fun h => ⟨h, hr⟩, fun h => h.1⟩
       by_cases hc : WMSetLt WMLe r s
-      · rw [if_pos (hiff.mpr hc), if_pos hc]
-      · rw [if_neg (fun h => hc (hiff.mp h)), if_neg hc]
+      · rw [ite_eq_left (hiff.mpr hc), ite_eq_left hc]
+      · rw [ite_eq_right (fun h => hc (hiff.mp h)), ite_eq_right hc]
     | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .mir | .tgt
     | .sav | .val | .wk | .bot | .ltp | .new _ => rfl
   · intro s u hi _ _
@@ -1097,7 +1097,7 @@ theorem reaches_copyFrom
           fun h => nomatch h)]
       change bitVal zero one ((dt.copySt zero one hzo args st s).new i s) =
         bitVal zero one ((dt.copySt zero one hzo args st u).old i s)
-      simp only [copySt, if_pos hsu]
+      simp only [copySt, ite_eq_left hsu]
     · have hL : (dt.copyKit (A := A) (Q := dt.CtlIx) (P := dt.PF)
             OuterPh.copyP).wrG
           ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
@@ -1115,7 +1115,7 @@ theorem reaches_copyFrom
       · subst hm
         change (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _) =
           (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne hm, Prog.passTracks_of_ne hm]
         match sl with
         | .old i => exact absurd ⟨i, rfl⟩ ho

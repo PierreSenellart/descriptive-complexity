@@ -214,9 +214,9 @@ theorem parked_ixSpineStOfB {st₀ : TapeSt dt A R P I} {f₀ : dt.CtlIx → A}
     | succ m ih =>
       rw [ixSpineNodeB]
       by_cases hm : m < dt.nv
-      · rw [dif_pos hm]
+      · rw [dite_eq_left hm]
         exact parked_ixLegStB (PR := PR) F hinj hhasP heltP mV ih _
-      · rw [dif_neg hm]
+      · rw [dite_eq_right hm]
         exact ih
   exact hn (k : ℕ)
 

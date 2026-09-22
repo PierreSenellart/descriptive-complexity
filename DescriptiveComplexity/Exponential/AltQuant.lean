@@ -92,14 +92,14 @@ private theorem altQuantAux_succ {r j : ℕ} (h : j < n) (v : Fin n → A) :
     altQuantAux pol P (r + 1) j v =
       (if pol j = true then ∃ a : A, altQuantAux pol P r (j + 1) (Function.update v ⟨j, h⟩ a)
         else ∀ a : A, altQuantAux pol P r (j + 1) (Function.update v ⟨j, h⟩ a)) := by
-  rw [altQuantAux, dif_pos h]
+  rw [altQuantAux, dite_eq_left h]
 
 /-- **One existential step of the prefix**: the `j`-th variable is chosen by
 the existential player. -/
 theorem altQuantFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
     altQuantFrom pol P j v ↔
       ∃ a : A, altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
-  rw [altQuantFrom, show n - j = (n - (j + 1)) + 1 by omega, altQuantAux_succ h, if_pos hp]
+  rw [altQuantFrom, show n - j = (n - (j + 1)) + 1 by omega, altQuantAux_succ h, ite_eq_left hp]
   rfl
 
 /-- **One universal step of the prefix**: the `j`-th variable is chosen by the
@@ -108,7 +108,7 @@ theorem altQuantFrom_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n �
     altQuantFrom pol P j v ↔
       ∀ a : A, altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
   rw [altQuantFrom, show n - j = (n - (j + 1)) + 1 by omega, altQuantAux_succ h,
-    if_neg (by simp [hp])]
+    ite_eq_right (by simp [hp])]
   rfl
 
 private theorem altQuantAux_congr_pol {pol' : ℕ → Bool} :
@@ -123,7 +123,7 @@ private theorem altQuantAux_congr_pol {pol' : ℕ → Bool} :
     · rw [altQuantAux_succ h, altQuantAux_succ h, hagree j le_rfl]
       have hnext : ∀ i, j + 1 ≤ i → pol i = pol' i := fun i hi => hagree i (by omega)
       simp only [ih (j + 1) hnext]
-    · rw [altQuantAux, altQuantAux, dif_neg h, dif_neg h]
+    · rw [altQuantAux, altQuantAux, dite_eq_right h, dite_eq_right h]
 
 /-- **The prefix only reads the polarities of the variables it still has to
 choose.** -/
@@ -153,7 +153,7 @@ private theorem altQuantAux_congr_val : ∀ (r j : ℕ), n ≤ j + r → ∀ v v
         · rw [Function.update_of_ne (fun hc => hij (congrArg Fin.val hc)),
             Function.update_of_ne (fun hc => hij (congrArg Fin.val hc)), hagree i (by omega)]
       simp only [hstep]
-    · rw [altQuantAux, altQuantAux, dif_neg h, dif_neg h]
+    · rw [altQuantAux, altQuantAux, dite_eq_right h, dite_eq_right h]
       exact congrArg P (funext fun i => hagree i (by have := i.isLt; omega))
 
 /-- **The prefix only reads the coordinates already chosen**: a machine playing

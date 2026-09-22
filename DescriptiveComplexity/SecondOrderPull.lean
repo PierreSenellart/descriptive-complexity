@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Composition
 import DescriptiveComplexity.SecondOrder
-import Mathlib.Data.Finite.Sigma
+import Mathlib.Basic.Finite.Sigma
 
 /-!
 # Pulling second-order definability back through an interpretation

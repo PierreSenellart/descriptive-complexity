@@ -332,7 +332,7 @@ theorem realize_hornStepF (rules : List (HornClause L B k)) (i : B.ι)
     | some a =>
       rw [ruleStepF, hh, Option.elim_some] at hψ
       by_cases hidx : a.idx = i
-      · rw [dif_pos hidx] at hψ
+      · rw [dite_eq_left hidx] at hψ
         rw [Formula.realize_inf, Formula.realize_inf, Formula.realize_iInf] at hψ
         obtain ⟨⟨heqs, hguard⟩, hbody⟩ := hψ
         subst hidx
@@ -346,7 +346,7 @@ theorem realize_hornStepF (rules : List (HornClause L B k)) (i : B.ι)
           rw [realize_listInf] at hbody
           exact (realize_bodyAtomF ρ b _).mp
             (hbody _ (List.mem_map_of_mem hb))
-      · rw [dif_neg hidx, Formula.realize_bot] at hψ
+      · rw [dite_eq_right hidx, Formula.realize_bot] at hψ
         exact hψ.elim
   · rintro ⟨c, hc, a, hh, v, heq, hguard, hbody⟩
     refine ⟨v, ?_⟩
@@ -355,7 +355,7 @@ theorem realize_hornStepF (rules : List (HornClause L B k)) (i : B.ι)
     have hidx : i = a.idx := congrArg Sigma.fst heq
     subst hidx
     injection heq with _ hargs
-    rw [ruleStepF, hh, Option.elim_some, dif_pos rfl]
+    rw [ruleStepF, hh, Option.elim_some, dite_eq_left rfl]
     rw [Formula.realize_inf, Formula.realize_inf, Formula.realize_iInf]
     refine ⟨⟨fun j => ?_, ?_⟩, ?_⟩
     · rw [Formula.realize_equal]

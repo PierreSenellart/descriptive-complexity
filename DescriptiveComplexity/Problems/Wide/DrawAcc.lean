@@ -60,13 +60,13 @@ theorem accCVal_of_lt {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A
     accCVal pol P le j v ↔
       ∃ a : A, WMLt le a (v ⟨j, h⟩) ∧
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
-  rw [accCVal, dif_pos h, if_pos hp]
+  rw [accCVal, dite_eq_left h, ite_eq_left hp]
 
 theorem accCVal_of_lt_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A) :
     accCVal pol P le j v ↔
       ∀ a : A, WMLt le a (v ⟨j, h⟩) →
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
-  rw [accCVal, dif_pos h, if_neg (by simp [hp])]
+  rw [accCVal, dite_eq_left h, ite_eq_right (by simp [hp])]
 
 /-- **The fold value is the contribution combined with the deeper value** –
 `DescriptiveComplexity.foldFrom_ex` / `foldFrom_all` read through the
@@ -77,9 +77,9 @@ theorem foldFrom_eq_accCVal {j : ℕ} (h : j < n) (v : Fin n → A) :
       (if pol j = true then accCVal pol P le j v ∨ foldFrom pol P le (j + 1) v
         else accCVal pol P le j v ∧ foldFrom pol P le (j + 1) v) := by
   by_cases hp : pol j = true
-  · rw [if_pos hp, foldFrom_ex h hp, accCVal_of_lt h hp]
+  · rw [ite_eq_left hp, foldFrom_ex h hp, accCVal_of_lt h hp]
   · have hp' : pol j = false := by simpa using hp
-    rw [if_neg hp, foldFrom_all h hp', accCVal_of_lt_all h hp']
+    rw [ite_eq_right hp, foldFrom_all h hp', accCVal_of_lt_all h hp']
 
 /-! ### The three update rules along an increment -/
 
@@ -127,7 +127,7 @@ theorem accCVal_carry (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c <
     · rw [hic]
       simp
     · have hne' : (i : ℕ) ≠ c := fun hcon => hic (Fin.ext hcon)
-      simp only [Function.update_apply, if_neg hic]
+      simp only [Function.update_apply, ite_eq_right hic]
       exact (hagree i (by omega)).symm
   have hmid : altQuantFrom pol P (c + 1) v =
       altQuantFrom pol P (c + 1) (Function.update v ⟨c, hc⟩ (v ⟨c, hc⟩)) := by
@@ -147,7 +147,7 @@ theorem accCVal_carry (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c <
       · exact ⟨hlt.1, hna⟩
       · exact ⟨h.1 _, hna⟩
   by_cases hp : pol c = true
-  · rw [if_pos hp, accCVal_of_lt hc hp, accCVal_of_lt hc hp, hdeep, hmid]
+  · rw [ite_eq_left hp, accCVal_of_lt hc hp, accCVal_of_lt hc hp, hdeep, hmid]
     have h1 : (∃ a : A, WMLt le a (v' ⟨c, hc⟩) ∧
           altQuantFrom pol P (c + 1) (Function.update v' ⟨c, hc⟩ a)) ↔
         ∃ a : A, le a (v ⟨c, hc⟩) ∧
@@ -164,7 +164,7 @@ theorem accCVal_carry (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c <
     · intro hn
       exact ⟨_, rfl, hn⟩
   · have hp' : pol c = false := by simpa using hp
-    rw [if_neg hp, accCVal_of_lt_all hc hp', accCVal_of_lt_all hc hp', hdeep, hmid]
+    rw [ite_eq_right hp, accCVal_of_lt_all hc hp', accCVal_of_lt_all hc hp', hdeep, hmid]
     refine (forall_congr' fun a => imp_congr (hsucc a) (iff_of_eq (hupd a))).trans ?_
     constructor
     · intro hall
@@ -216,7 +216,7 @@ theorem chainFrom_succ {j : ℕ} (h : j < n) :
     chainFrom pol acc leaf n j =
       (if pol j = true then acc j ∨ chainFrom pol acc leaf n (j + 1)
         else acc j ∧ chainFrom pol acc leaf n (j + 1)) := by
-  rw [chainFrom, show n - j = (n - (j + 1)) + 1 by omega, chainAux, if_pos h]
+  rw [chainFrom, show n - j = (n - (j + 1)) + 1 by omega, chainAux, ite_eq_left h]
   rfl
 
 /-- **The chain is the fold value**: a control whose bits are the
@@ -239,9 +239,9 @@ theorem chainFrom_iff_foldFrom {v : Fin n → A}
       by_cases hjn : j < n
       · rw [chainFrom_succ hjn, foldFrom_eq_accCVal hjn]
         by_cases hp : pol j = true
-        · rw [if_pos hp, if_pos hp]
+        · rw [ite_eq_left hp, ite_eq_left hp]
           exact or_congr (hacc j hjn) (ih (j + 1) (by omega))
-        · rw [if_neg hp, if_neg hp]
+        · rw [ite_eq_right hp, ite_eq_right hp]
           exact and_congr (hacc j hjn) (ih (j + 1) (by omega))
       · rw [chainFrom_of_le (by omega), foldFrom_of_le (by omega)]
         exact hleaf
@@ -267,17 +267,17 @@ theorem accCVal_step (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c < 
     acc' i ↔ accCVal pol P le i v' := by
   rw [hnew i hi]
   rcases lt_trichotomy i c with hic | rfl | hic
-  · rw [if_pos hic, hacc i hi]
+  · rw [ite_eq_left hic, hacc i hi]
     exact (accCVal_congr_above (lt_trans hic hc)
       (fun k hk => hagree k (by omega))).symm
-  · rw [if_neg (lt_irrefl i), if_pos rfl,
+  · rw [ite_eq_right (lt_irrefl i), ite_eq_left rfl,
       accCVal_carry (P := P) h hc hagree htop hsucc]
     by_cases hp : pol i = true
-    · rw [if_pos hp, if_pos hp, hacc i hi]
+    · rw [ite_eq_left hp, ite_eq_left hp, hacc i hi]
       exact or_congr Iff.rfl (chainFrom_iff_foldFrom hacc hleaf (i + 1))
-    · rw [if_neg hp, if_neg hp, hacc i hi]
+    · rw [ite_eq_right hp, ite_eq_right hp, hacc i hi]
       exact and_congr Iff.rfl (chainFrom_iff_foldFrom hacc hleaf (i + 1))
-  · rw [if_neg (by omega), if_neg (by omega)]
+  · rw [ite_eq_right (by omega), ite_eq_right (by omega)]
     exact (accCVal_reset (P := P) hi (fun a => hbot ⟨i, hi⟩ hic a)).symm
 
 /-- **At the first valuation every accumulator is the polarity's unit**:
@@ -288,7 +288,7 @@ theorem accCVal_bot {v : Fin n → A}
     accCVal pol P le i v ↔ (pol i = false) := by
   by_cases hin : i < n
   · exact accCVal_reset (P := P) hin fun a => hbot ⟨i, hin⟩ a
-  · rw [accCVal, dif_neg hin]
+  · rw [accCVal, dite_eq_right hin]
 
 end Vector
 

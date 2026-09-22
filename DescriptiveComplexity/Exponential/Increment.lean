@@ -209,12 +209,12 @@ theorem realSet_surjective : Function.Surjective (B.realSet (A := A)) :=
 theorem padMin_apply_of_lt (i : B.ι) (u : Fin (B.arity i) → A)
     (k : Fin (blockArityBound B)) (hk : (k : ℕ) < B.arity i) :
     B.padMin i u k = u ⟨k, hk⟩ := by
-  simp only [padMin, dif_pos hk]
+  simp only [padMin, dite_eq_left hk]
 
 theorem padMin_apply_of_ge (i : B.ι) (u : Fin (B.arity i) → A)
     (k : Fin (blockArityBound B)) (hk : ¬(k : ℕ) < B.arity i) :
     B.padMin i u k = minEl A := by
-  simp only [padMin, dif_neg hk]
+  simp only [padMin, dite_eq_right hk]
 
 theorem padMin_castLE (i : B.ι) (u : Fin (B.arity i) → A) (j : Fin (B.arity i)) :
     B.padMin i u (Fin.castLE (arity_le_blockArityBound B i) j) = u j := by

@@ -168,7 +168,7 @@ noncomputable def resetSeg (σ : QV A → QV A) (p₀ p r : QV A) : QV A :=
 theorem resetSeg_of_not {p₀ p r : QV A}
     (h : ¬(QPosn r ∧ r.1 = QTag.pCell ∧ QLe p₀ r ∧ QLe r p ∧ r ≠ p)) :
     resetSeg σ p₀ p r = σ r := by
-  rw [resetSeg, if_neg h]
+  rw [resetSeg, ite_eq_right h]
 
 theorem resetSeg_self (p₀ p : QV A) : resetSeg σ p₀ p p = σ p :=
   resetSeg_of_not fun h => h.2.2.2.2 rfl
@@ -200,14 +200,14 @@ theorem resetSeg_frame (hwf : QsatWf A) {p₀ p q : QV A}
       exact hs.2.2.2.1 (hanti _ _ hs.2.2.1 (he ▸ h4))
   rw [resetSeg, resetSeg]
   by_cases h : QPosn r ∧ r.1 = QTag.pCell ∧ QLe p₀ r ∧ QLe r p ∧ r ≠ p
-  · rw [if_pos (hiff.mpr h), if_pos h]
-  · rw [if_neg (fun hh => h (hiff.mp hh)), if_neg h]
+  · rw [ite_eq_left (hiff.mpr h), ite_eq_left h]
+  · rw [ite_eq_right (fun hh => h (hiff.mp hh)), ite_eq_right h]
 
 /-- Extending the segment past a variable's cell resets that cell. -/
 theorem resetSeg_at {p₀ p q : QV A} {x : A} (hs : SuccPos (QLe (A := A)) QPosn p q)
     (hle : QLe p₀ p) (hp : p = posCell x) :
     resetSeg σ p₀ q p = symV false false x := by
-  rw [resetSeg, if_pos ⟨hs.1, by rw [hp]; rfl, hle, hs.2.2.1, hs.2.2.2.1⟩, hp]
+  rw [resetSeg, ite_eq_left ⟨hs.1, by rw [hp]; rfl, hle, hs.2.2.1, hs.2.2.2.1⟩, hp]
   rfl
 
 /-- **The descent runs to the right marker**, resetting every variable's cell
@@ -832,7 +832,7 @@ theorem not_succPos_posStart (hwf : QsatWf A) {p' : QV A}
 
 theorem resetSeg_posEnd_cell {p₀ : QV A} {x : A} (hx : IsQVar x) (hle : QLe p₀ (posCell x)) :
     resetSeg σ p₀ posEnd (posCell x) = symV false false x := by
-  rw [resetSeg, if_pos ⟨qPosn_posCell hx, rfl, hle, qLe_cell_end x,
+  rw [resetSeg, ite_eq_left ⟨qPosn_posCell hx, rfl, hle, qLe_cell_end x,
     fun he => QTag.noConfusion (congrArg Prod.fst he)⟩]
   rfl
 
@@ -853,7 +853,7 @@ theorem tapeOk_resetSeg (hok : TapeOk σ) (p₀ p : QV A) :
   by_cases h : QPosn (posCell x : QV A) ∧ (posCell x : QV A).1 = QTag.pCell ∧
       QLe p₀ (posCell x) ∧ QLe (posCell x) p ∧ (posCell x : QV A) ≠ p
   · refine ⟨false, false, ?_⟩
-    rw [resetSeg, if_pos h]
+    rw [resetSeg, ite_eq_left h]
     rfl
   · obtain ⟨b, f, hbf⟩ := hok x hx
     exact ⟨b, f, (resetSeg_of_not h).trans hbf⟩

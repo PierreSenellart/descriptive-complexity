@@ -178,13 +178,13 @@ theorem realize_lexLeF {Tag : Type} [LinearOrder Tag] {d : ℕ} {t₁ t₂ : Tag
     (lexLeF L d t₁ t₂).Realize v ↔
       tagTupleLe (t₁, fun i => v (0, i)) (t₂, fun i => v (1, i)) := by
   rcases eq_or_ne t₁ t₂ with rfl | hne
-  · rw [lexLeF, if_pos rfl, realize_lexTupleLeF]
+  · rw [lexLeF, ite_eq_left rfl, realize_lexTupleLeF]
     simp [tagTupleLe]
-  · rw [lexLeF, if_neg hne]
+  · rw [lexLeF, ite_eq_right hne]
     rcases lt_or_gt_of_ne hne with hlt | hgt
-    · rw [if_pos hlt]
+    · rw [ite_eq_left hlt]
       simp [tagTupleLe, hlt]
-    · rw [if_neg (not_lt_of_gt hgt)]
+    · rw [ite_eq_right (not_lt_of_gt hgt)]
       simp only [Formula.realize_bot, false_iff]
       rintro (h | ⟨he, -⟩)
       · exact absurd h (not_lt_of_gt hgt)

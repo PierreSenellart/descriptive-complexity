@@ -319,9 +319,9 @@ theorem prefixHolds_congr {A : Type} :
     intro pol P Q h
     refine ih (fun j => pol j.castSucc) fun v => ?_
     by_cases hp : pol (Fin.last m) = true
-    · rw [if_pos hp, if_pos hp]
+    · rw [ite_eq_left hp, ite_eq_left hp]
       exact exists_congr fun a => h _
-    · rw [if_neg hp, if_neg hp]
+    · rw [ite_eq_right hp, ite_eq_right hp]
       exact forall_congr' fun a => h _
 
 /-! ### Prenexing: what a quantifier prefix does to the connectives
@@ -346,9 +346,9 @@ theorem prefixHolds_not {A : Type} :
     rw [prefixHolds, prefixHolds, ih]
     refine prefixHolds_congr m _ fun v => ?_
     by_cases hp : pol (Fin.last m) = true
-    · rw [if_pos hp, if_neg (by simp [hp])]
+    · rw [ite_eq_left hp, ite_eq_right (by simp [hp])]
       exact not_exists
-    · rw [if_neg hp, if_pos (by simp only [Bool.not_eq_true] at hp; simp [hp])]
+    · rw [ite_eq_right hp, ite_eq_left (by simp only [Bool.not_eq_true] at hp; simp [hp])]
       exact not_forall
 
 /-- **A prefix absorbs a side condition** it does not mention. The universal
@@ -364,9 +364,9 @@ theorem prefixHolds_and_const {A : Type} [Nonempty A] :
     rw [prefixHolds, prefixHolds, ← ih]
     refine prefixHolds_congr m _ fun v => ?_
     by_cases hp : pol (Fin.last m) = true
-    · rw [if_pos hp, if_pos hp]
+    · rw [ite_eq_left hp, ite_eq_left hp]
       exact exists_and_right
-    · rw [if_neg hp, if_neg hp]
+    · rw [ite_eq_right hp, ite_eq_right hp]
       exact forall_and.trans (and_congr Iff.rfl (forall_const A))
 
 /-- **Two prefixes concatenate**: a prefix of `k₁ + k₂` variables, read on a
@@ -422,11 +422,11 @@ theorem prefixHolds_add {A : Type} (k₁ : ℕ) :
     split
     · next hp =>
       have hp' : pol (Fin.last (k₁ + k₂)) = true := hp
-      rw [if_pos hp']
+      rw [ite_eq_left hp']
       exact exists_congr fun a => Iff.of_eq (hstep v a _ rfl)
     · next hp =>
       have hp' : ¬ pol (Fin.last (k₁ + k₂)) = true := hp
-      rw [if_neg hp']
+      rw [ite_eq_right hp']
       exact forall_congr' fun a => Iff.of_eq (hstep v a _ rfl)
 
 /-- **A block of equal polarity is one quantifier** over the tuple it fills:

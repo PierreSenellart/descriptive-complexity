@@ -217,7 +217,7 @@ theorem startBack_initBackReg (hR : PR.table.Reads)
         (if h : ∃ u : dt.RegIx (A := A) (R' := R') (P' := NexPh (Option dt.KIx) PE),
             wmRegSeg x = (dt.regLaid hlin hord).cell u then
           (dt.regLaid hlin hord).arg h.choose (Fin.castLE dt.dd0Le j) else PR.zero) from rfl,
-        dif_pos ⟨⟨x, (hinp x).mpr hx⟩, hcell.symm⟩]
+        dite_eq_left ⟨⟨x, (hinp x).mpr hx⟩, hcell.symm⟩]
       have hch : ((⟨⟨x, (hinp x).mpr hx⟩, hcell.symm⟩ :
           ∃ u : dt.RegIx (A := A) (R' := R') (P' := NexPh (Option dt.KIx) PE),
             wmRegSeg x = (dt.regLaid hlin hord).cell u).choose).1 = x :=
@@ -256,84 +256,84 @@ theorem startBack_initBackReg (hR : PR.table.Reads)
           if s = Slot.wk ∨ s = Slot.bot then bitVal PR.zero PR.one (r = v) else PR.zero := by
       intro s
       match s with
-      | .reg => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .reg => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 exact bitVal_neg (by rintro ⟨u, hu⟩; exact hnc u hu)
-      | .regFirst => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .regFirst => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                      exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .regLast => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .regLast => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                     exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .blk b => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .blk b => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                   exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .name j => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
-                   exact dif_neg (by rintro ⟨u, hu⟩; exact hnc u hu)
-      | .pdd => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .name j => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
+                   exact dite_eq_right (by rintro ⟨u, hu⟩; exact hnc u hu)
+      | .pdd => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .mir => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .mir => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .tgt => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .tgt => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .sav => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .sav => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .val => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .val => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 exact bitVal_neg (by rintro ⟨u, hu, -⟩; exact hnc u hu)
-      | .wk => rw [if_pos (Or.inl rfl)]; exact rfl
-      | .bot => rw [if_pos (Or.inr rfl)]; exact rfl
-      | .ltp => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .wk => rw [ite_eq_left (Or.inl rfl)]; exact rfl
+      | .bot => rw [ite_eq_left (Or.inr rfl)]; exact rfl
+      | .ltp => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 exact bitVal_neg (fun hc' => hc')
-      | .old i => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .old i => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                   exact bitVal_neg (fun hc' => hc')
-      | .new i => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .new i => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                   exact bitVal_neg (fun hc' => hc')
     by_cases hrv : r = v
     · subst hrv
       rw [show dt.startBack PR.initBackReg PR.one r r =
         Function.update (Function.update (PR.initBackReg r) Slot.wk PR.one)
-          Slot.bot PR.one from if_pos rfl]
+          Slot.bot PR.one from ite_eq_left rfl]
       funext s
       rw [hzero s, Prog.initBackReg_of_not_reg
         (fun x hx hcx => hc ⟨x, hx, hcx⟩)]
       match s with
-      | .wk => rw [if_pos (Or.inl rfl), bitVal_pos rfl,
+      | .wk => rw [ite_eq_left (Or.inl rfl), bitVal_pos rfl,
           Function.update_of_ne (by rintro hc'; exact nomatch hc'),
           Function.update_self]
-      | .bot => rw [if_pos (Or.inr rfl), bitVal_pos rfl, Function.update_self]
-      | .reg => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .bot => rw [ite_eq_left (Or.inr rfl), bitVal_pos rfl, Function.update_self]
+      | .reg => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                   Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .regFirst => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .regFirst => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                      rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                        Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .regLast => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .regLast => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                     rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                       Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .blk b => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .blk b => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                   rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                     Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .name j => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .name j => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                    rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                      Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .pdd => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .pdd => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                   Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .mir => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .mir => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                   Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .tgt => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .tgt => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                   Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .sav => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .sav => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                   Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .val => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .val => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                   Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .ltp => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .ltp => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                 rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                   Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .old i => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .old i => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                   rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                     Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
-      | .new i => rw [if_neg (by rintro (hc' | hc') <;> exact nomatch hc')]
+      | .new i => rw [ite_eq_right (by rintro (hc' | hc') <;> exact nomatch hc')]
                   rw [Function.update_of_ne (by rintro hc'; exact nomatch hc'),
                     Function.update_of_ne (by rintro hc'; exact nomatch hc'), hblank]
     · rw [startBack_frame hrv, Prog.initBackReg_of_not_reg
@@ -341,8 +341,8 @@ theorem startBack_initBackReg (hR : PR.table.Reads)
       funext s
       rw [hzero s, hblank]
       by_cases hs : s = Slot.wk ∨ s = Slot.bot
-      · rw [if_pos hs, bitVal_neg hrv]
-      · rw [if_neg hs]
+      · rw [ite_eq_left hs, bitVal_neg hrv]
+      · rw [ite_eq_right hs]
 
 omit [Nonempty A] [Nonempty dt.KIx] in
 omit [DecidableEq dt.SlotIx] in
@@ -410,7 +410,7 @@ theorem tapeShape_initBackReg (hR : PR.table.Reads)
       have h2 : dt.startBack PR.initBackReg PR.one r r s = PR.initBackReg r s := by
         rw [show dt.startBack PR.initBackReg PR.one r r =
           Function.update (Function.update (PR.initBackReg r) Slot.wk PR.one)
-            Slot.bot PR.one from if_pos rfl,
+            Slot.bot PR.one from ite_eq_left rfl,
           Function.update_of_ne hne₁, Function.update_of_ne hne₂]
       rw [← h2, h]
     · rw [← dt.startBack_frame (bg := PR.initBackReg) (one := PR.one) (v := v) hrv,

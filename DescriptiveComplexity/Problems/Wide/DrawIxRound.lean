@@ -357,7 +357,7 @@ theorem ixIGFs_congr_scratch {v : Univ A R P dt.KIx dt.dd → Prop}
   | succ n ih =>
     rw [ixIGFs, ixIGFs]
     by_cases hn : n < dt.nIn vi
-    · rw [dif_pos hn, dif_pos hn, ih]
+    · rw [dite_eq_left hn, dite_eq_left hn, ih]
       have htest : (∀ u, dt.ixIGTest F zero one stV (dt.igBlk vi ⟨n, hn⟩) u) =
           (∀ u, dt.ixIGTest F zero one stV' (dt.igBlk vi ⟨n, hn⟩) u) :=
         propext (forall_congr' fun u =>
@@ -365,11 +365,11 @@ theorem ixIGFs_congr_scratch {v : Univ A R P dt.KIx dt.dd → Prop}
             (b := dt.igBlk vi ⟨n, hn⟩) (u := u))
       rw [htest, h.2.2.1, h.ixBack hreg]
       by_cases hp : ∀ u, dt.ixIGTest F zero one stV' (dt.igBlk vi ⟨n, hn⟩) u
-      · rw [if_pos hp, if_pos hp,
+      · rw [ite_eq_left hp, ite_eq_left hp,
           ixIGateTagFam_congr_scratch (F := F) (hhas := hhas) h hreg _ _,
           ixIGateFam_congr_scratch (F := F) (hhas := hhas) h hreg _ _ _]
-      · rw [if_neg hp, if_neg hp]
-    · rw [dif_neg hn, dif_neg hn, ih]
+      · rw [ite_eq_right hp, ite_eq_right hp]
+    · rw [dite_eq_right hn, dite_eq_right hn, ih]
 
 /-- **What one level's gate is worth**: the file test passed, the block
 value's witness one-hot at the dispatched tag, and the domain condition
@@ -443,12 +443,12 @@ theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
         dt.setCtl zero one dt.existGateC True
           (dt.setCtl zero one dt.allGateC True f) else f) (dt.accC jj) = _
     by_cases h0 : (ℓ : ℕ) = 0
-    · rw [if_pos h0,
+    · rw [ite_eq_left h0,
         setCtl_of_ne (show dt.accC jj ≠ dt.existGateC from
           fun h => nomatch h),
         setCtl_of_ne (show dt.accC jj ≠ dt.allGateC from
           fun h => nomatch h)]
-    · rw [if_neg h0]
+    · rw [ite_eq_right h0]
   induction n with
   | zero => rfl
   | succ n ih =>
@@ -480,7 +480,7 @@ theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
                       Tag R P dt.KIx))))))
               (dt.ixBack F.toLayout zero one dt.dd0Le stV v) := by
           simp only [ixIGFs]
-          rw [dif_pos hn, if_pos hp]
+          rw [dite_eq_left hn, ite_eq_left hp]
         rw [hFa]
         set t := dt.dspTagOf zero one
           (wmBlk (ixAddr elt stV.val)
@@ -536,7 +536,7 @@ theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
                 (dt.ixBack F.toLayout zero one dt.dd0Le stV v))
               (dt.ixBack F.toLayout zero one dt.dd0Le stV v) := by
           simp only [ixIGFs]
-          rw [dif_pos hn, if_neg hp]
+          rw [dite_eq_left hn, ite_eq_right hp]
         rw [hFa]
         change dt.setCtl zero one
           (if dt.polOf vi (dt.arOf vi + n) then dt.existGateC
@@ -552,7 +552,7 @@ theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     · have hFa : dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ (n + 1) =
           dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ n := by
         simp only [ixIGFs]
-        rw [dif_neg hn]
+        rw [dite_eq_right hn]
       rw [hFa]
       exact ih
 
@@ -667,7 +667,7 @@ theorem ixKindExitCtl_apply_roundFlag {q : dt.CtlIx}
                 (dt.ixStageFAt F hhas one vi ts av st elt v f n)
                 (toLex topTup) := by
             simp only [ixStageFAt]
-            rw [dif_pos h]
+            rw [dite_eq_left h]
           rw [hstep]
           refine (tupleIter1_apply_of q ?_ ?_ ?_ _ _ _ _ _).trans ih
           · intro bb fd g
@@ -682,7 +682,7 @@ theorem ixKindExitCtl_apply_roundFlag {q : dt.CtlIx}
         · have hstep : dt.ixStageFAt F hhas one vi ts av st elt v f (n + 1) =
               dt.ixStageFAt F hhas one vi ts av st elt v f n := by
             simp only [ixStageFAt]
-            rw [dif_neg h]
+            rw [dite_eq_right h]
           rw [hstep]
           exact ih
     have hK : dt.ixKindExitCtl F zero one hhas vi av st v (.stage i ts) sem hk hnd
@@ -793,7 +793,7 @@ theorem ixMatFs_apply_roundFlag {q : dt.CtlIx}
                 (dt.varArgsOf zero one vi).enterAtomSt sem f₀ n)
               (dt.ixBack F.toLayout zero one dt.dd0Le st v)) := by
         simp only [ixMatFs]
-        rw [dif_pos hn]
+        rw [dite_eq_left hn]
       rw [hFa, ixKindExitCtl_apply_roundFlag (F := F) (hhas := hhas) (hq := hq)]
       exact ih
     · have hFa : dt.ixMatFs F zero one hhas vi st v
@@ -801,7 +801,7 @@ theorem ixMatFs_apply_roundFlag {q : dt.CtlIx}
           dt.ixMatFs F zero one hhas vi st v
             (dt.varArgsOf zero one vi).enterAtomSt sem f₀ n := by
         simp only [ixMatFs]
-        rw [dif_neg hn]
+        rw [dite_eq_right hn]
       rw [hFa]
       exact ih
 
@@ -857,7 +857,7 @@ theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
                   Tag R P dt.KIx))))))
           (dt.ixBack F.toLayout zero one dt.dd0Le stV v) := by
       simp only [ixIGFs]
-      rw [dif_pos hℓn, if_pos hp]
+      rw [dite_eq_left hℓn, ite_eq_left hp]
     rw [hFa]
     by_cases hqf : dt.igFlag vi ⟨n, hℓn⟩ = q
     · subst hqf
@@ -956,7 +956,7 @@ theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
             (dt.ixBack F.toLayout zero one dt.dd0Le stV v))
           (dt.ixBack F.toLayout zero one dt.dd0Le stV v) := by
       simp only [ixIGFs]
-      rw [dif_pos hℓn, if_neg hp]
+      rw [dite_eq_left hℓn, ite_eq_right hp]
     rw [hFa]
     have hchg : dt.ctlBit one
         ((dt.varArgsOf zero one vi).setFailIGOf ⟨n, hℓn⟩
@@ -1057,7 +1057,7 @@ theorem ctlBit_flag_ixIGFs (hzo : zero ≠ one) {q : dt.CtlIx}
               (dt.setCtl zero one dt.allGateC True
                 (dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ n))
           else dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ n) q ↔ _
-        rw [if_neg (by omega)]
+        rw [ite_eq_right (by omega)]
       refine hsucc.trans (Iff.trans ?_ hsplit.symm)
       constructor
       · rintro ⟨h1', h2⟩
@@ -1228,7 +1228,7 @@ theorem ixRoundCtl_congr_scratch (hzo : zero ≠ one)
   by_cases hc : dt.ctlBit one (dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ (dt.nIn vi))
         dt.existGateC ∧
       dt.ctlBit one (dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ (dt.nIn vi)) dt.allGateC
-  · simp only [ixRoundCtl, dif_pos hc, dif_pos (hig ▸ hc)]
+  · simp only [ixRoundCtl, dite_eq_left hc, dite_eq_left (hig ▸ hc)]
     refine Eq.trans (ixMatFs_congr_scratch (F := F) (hhas := hhas) (h := h)
       (hreg := hreg) _ _ _ _) ?_
     exact congrArg (fun fc : dt.CtlIx → A =>
@@ -1238,7 +1238,7 @@ theorem ixRoundCtl_congr_scratch (hzo : zero ≠ one)
             (helt := helt) (hzo := hzo) (vi := vi) (stV := stV) (v := v)
             (f₀ := f₀) (h := hc)) a)) fc
         (dt.natOf vi)) hig
-  · simp only [ixRoundCtl, dif_neg hc, dif_neg (hig ▸ hc)]
+  · simp only [ixRoundCtl, dite_eq_right hc, dite_eq_right (hig ▸ hc)]
     rw [hig]
 
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
@@ -1270,9 +1270,9 @@ theorem ixRoundCtlT_eq_ixRoundCtl (hzo : zero ≠ one)
   by_cases hc : dt.ctlBit one (dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ (dt.nIn vi))
         dt.existGateC ∧
       dt.ctlBit one (dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ (dt.nIn vi)) dt.allGateC
-  · simp only [ixRoundCtlT, ixRoundCtl, dif_pos hc]
+  · simp only [ixRoundCtlT, ixRoundCtl, dite_eq_left hc]
     exact ixMatFsT_eq_ixMatFs (F := F) (hhas := hhas) (hreg := hreg) _ _ _ _
-  · simp only [ixRoundCtlT, ixRoundCtl, dif_neg hc]
+  · simp only [ixRoundCtlT, ixRoundCtl, dite_eq_right hc]
 
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The accumulators survive one whole round.** -/
@@ -1332,7 +1332,7 @@ theorem ixRoundCtl_of_flags {hzo : zero ≠ one} (vi : dt.VarIx)
       dt.ixMatFs F zero one hhas vi stV v (dt.varArgsOf zero one vi).enterAtomSt
         (sem hp)
         (dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ (dt.nIn vi)) (dt.natOf vi) := by
-  rw [ixRoundCtl, dif_pos ⟨hEx, hAl⟩]
+  rw [ixRoundCtl, dite_eq_left ⟨hEx, hAl⟩]
 
 end Rides
 
@@ -1458,7 +1458,7 @@ theorem ixIGs_reachesIn (f₀ : dt.CtlIx → A) :
                     Tag R P dt.KIx))))))
             (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV v) := by
         simp only [ixIGFs]
-        rw [dif_pos ℓ.isLt, if_pos hp]
+        rw [dite_eq_left ℓ.isLt, ite_eq_left hp]
       rw [hFa]
       have hrdt := dt.domRd (dt.dspTagOf PR.zero PR.one
         (wmBlk (ixAddr elt stV.val)
@@ -1490,7 +1490,7 @@ theorem ixIGs_reachesIn (f₀ : dt.CtlIx → A) :
               (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV v))
             (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV v) := by
         simp only [ixIGFs]
-        rw [dif_pos ℓ.isLt, if_neg hp]
+        rw [dite_eq_left ℓ.isLt, ite_eq_right hp]
       rw [hFa]
       have hwPt := hwP
       refine TMData.ReachesIn.mono ?_
@@ -1710,7 +1710,7 @@ theorem ixRound_reachesIn (stV : TapeSt dt A R P I)
       (dt.ixIGFs (elt := elt) F PR.zero PR.one hhasP vi stV v f (dt.nIn vi)) dt.existGateC ∧
     dt.ctlBit PR.one
       (dt.ixIGFs (elt := elt) F PR.zero PR.one hhasP vi stV v f (dt.nIn vi)) dt.allGateC
-  · rw [dif_pos hbr]
+  · rw [dite_eq_left hbr]
     -- the passing dispatch into the matrix
     have hdsp : (wideData (Univ A R P dt.KIx dt.dd)).Step
         ⟨Sum.inr (PR.stElt (emb (.matrixP .rchk))
@@ -1781,7 +1781,7 @@ theorem ixRound_reachesIn (stV : TapeSt dt A R P I)
       exact ⟨rEmb .mchk1 .stay, by rw [h]; exact hwkv',
         by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl,
         fun hc => (by rw [h] at hc; exact hc)⟩
-  · rw [dif_neg hbr]
+  · rw [dite_eq_right hbr]
     -- the skipping dispatch, straight to the fold checkpoint
     have hdsp : (wideData (Univ A R P dt.KIx dt.dd)).Step
         ⟨Sum.inr (PR.stElt (emb (.matrixP .rchk))
@@ -1922,7 +1922,7 @@ theorem ixRound_run_thread_reachesIn (stV : TapeSt dt A R P I)
       (dt.ixIGFs (elt := elt) F PR.zero PR.one hhasP vi stV v f (dt.nIn vi)) dt.existGateC ∧
     dt.ctlBit PR.one
       (dt.ixIGFs (elt := elt) F PR.zero PR.one hhasP vi stV v f (dt.nIn vi)) dt.allGateC
-  · rw [dif_pos hbr, if_pos hbr]
+  · rw [dite_eq_left hbr, ite_eq_left hbr]
     -- the passing dispatch into the matrix
     have hdsp : (wideData (Univ A R P dt.KIx dt.dd)).Step
         ⟨Sum.inr (PR.stElt (emb (.matrixP .rchk))
@@ -2001,7 +2001,7 @@ theorem ixRound_run_thread_reachesIn (stV : TapeSt dt A R P I)
       exact ⟨rEmb .mchk1 .stay, by rw [h]; exact hwkv'T,
         by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl, by rw [h]; rfl,
         fun hc => (by rw [h] at hc; exact hc)⟩
-  · rw [dif_neg hbr, if_neg hbr]
+  · rw [dite_eq_right hbr, ite_eq_right hbr]
     -- the skipping dispatch, straight to the fold checkpoint
     have hdsp : (wideData (Univ A R P dt.KIx dt.dd)).Step
         ⟨Sum.inr (PR.stElt (emb (.matrixP .rchk))

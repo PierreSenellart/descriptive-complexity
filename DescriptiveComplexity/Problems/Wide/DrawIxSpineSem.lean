@@ -175,7 +175,7 @@ theorem ixSpine_new_off (k : Fin (dt.nv + 1)) (i : dt.d.B.ι)
         ⟨n, Nat.lt_succ_of_lt hnv⟩ := rfl
     rw [hsucc, hcast] at hstep
     exact (iff_of_eq (hstep.trans
-      (if_neg (fun h : i = dt.varList.get ⟨n, hnv⟩ ∧ r = v => hr h.2)))).trans
+      (ite_eq_right (fun h : i = dt.varList.get ⟨n, hnv⟩ ∧ r = v => hr h.2)))).trans
       (ih _)
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
@@ -211,14 +211,14 @@ theorem ixNew_last_get (j : Fin dt.nv) :
           intro hc
           have hjj : j = (⟨n, hnv⟩ : Fin dt.nv) := varList_get_inj hc
           exact absurd (congrArg Fin.val hjj) (show (j : ℕ) ≠ n by omega)
-        exact (iff_of_eq (hcong.trans (if_neg
+        exact (iff_of_eq (hcong.trans (ite_eq_right
           (fun h : dt.varList.get j = dt.varList.get ⟨n, hnv⟩ ∧ v = v =>
             hne h.1)))).trans (ih _ j hlt)
       · -- this very position
         have hjn : j = (⟨n, hnv⟩ : Fin dt.nv) :=
           Fin.ext (show (j : ℕ) = n by omega)
         subst hjn
-        exact iff_of_eq (hcong.trans (if_pos ⟨rfl, rfl⟩))
+        exact iff_of_eq (hcong.trans (ite_eq_left ⟨rfl, rfl⟩))
   exact key dt.nv (Nat.lt_succ_self _) j j.isLt
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
@@ -639,10 +639,10 @@ theorem ixSpineStOfB_wk (k : Fin (dt.nv + 1)) :
     | succ m ih =>
       rw [ixSpineNodeB]
       by_cases hm : m < dt.nv
-      · rw [dif_pos hm]
+      · rw [dite_eq_left hm]
         exact ((dt.ixLegStB_fields (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
           mV ⟨m, hm⟩ _ _ _).2.1).trans ih
-      · rw [dif_neg hm]
+      · rw [dite_eq_right hm]
         exact ih
   exact hn (k : ℕ)
 
@@ -661,10 +661,10 @@ theorem ixSpineStOfB_bot (k : Fin (dt.nv + 1)) :
     | succ m ih =>
       rw [ixSpineNodeB]
       by_cases hm : m < dt.nv
-      · rw [dif_pos hm]
+      · rw [dite_eq_left hm]
         exact ((dt.ixLegStB_fields (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
           mV ⟨m, hm⟩ _ _ _).2.2.1).trans ih
-      · rw [dif_neg hm]
+      · rw [dite_eq_right hm]
         exact ih
   exact hn (k : ℕ)
 
@@ -686,10 +686,10 @@ theorem ixSpineStOfB_old (k : Fin (dt.nv + 1)) :
     | succ m ih =>
       rw [ixSpineNodeB]
       by_cases hm : m < dt.nv
-      · rw [dif_pos hm]
+      · rw [dite_eq_left hm]
         exact ((dt.ixLegStB_fields (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
           mV ⟨m, hm⟩ _ _ _).2.2.2.1).trans ih
-      · rw [dif_neg hm]
+      · rw [dite_eq_right hm]
         exact ih
   exact hn (k : ℕ)
 
@@ -731,7 +731,7 @@ theorem ixSpineFsOfB_succ (j : Fin dt.nv) :
           mV st₀ f₀ semB j.castSucc) := by
   change (dt.ixSpineNodeB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
     mV st₀ f₀ semB ((j : ℕ) + 1)).2.2 = _
-  rw [ixSpineNodeB, dif_pos j.isLt]
+  rw [ixSpineNodeB, dite_eq_left j.isLt]
   rfl
 
 omit [Finite R] [Finite (P)] [Finite dt.KIx]
@@ -749,7 +749,7 @@ theorem ixSpineStOfB_succ (j : Fin dt.nv) :
           mV st₀ f₀ semB j.castSucc) := by
   change (dt.ixSpineNodeB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
     mV st₀ f₀ semB ((j : ℕ) + 1)).1 = _
-  rw [ixSpineNodeB, dif_pos j.isLt]
+  rw [ixSpineNodeB, dite_eq_left j.isLt]
   rfl
 
 /-! ### The branched spine's dictionary at one address

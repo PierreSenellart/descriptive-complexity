@@ -191,7 +191,7 @@ theorem eval_reachesIn :
       refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
       refine hasRight_of_rule dt hrules (i := .chk j.castSucc) (ρ := .dspA)
         ?_ ?_ ?_ ?_ ?_ ?_
-      · rw [evalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [evalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
         constructor
         · rw [Prog.passTracks_of_ne hne_wk_val, hwkOf]
@@ -199,16 +199,16 @@ theorem eval_reachesIn :
         · rw [Prog.passTracks_of_ne hne_reg_val, hrgOf,
             bitVal_neg (fun hc => hvnr hc.choose hc.choose_spec)]
           exact PR.zero_ne_one
-      · rw [evalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [evalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
-      · rw [evalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [evalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
         rfl
-      · rw [evalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [evalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
-      · rw [evalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [evalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
-      · rw [evalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [evalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
         trivial
     -- the machinery's run, and the walk back at the next checkpoint

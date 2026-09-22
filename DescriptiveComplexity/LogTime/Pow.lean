@@ -199,7 +199,7 @@ theorem chainBelow_zero : chainBelow 0 = 0 := by rw [chainBelow]; simp
 
 theorem chainBelow_pos {a : ℕ} (ha : 0 < a) :
     chainBelow a = 2 ^ (a / 2) + chainBelow (a / 2) := by
-  rw [chainBelow, if_neg (by omega)]
+  rw [chainBelow, ite_eq_right (by omega)]
 
 /-- **The chain below its top fits under its top**: `Y` is a rank whenever the
 place value it certifies is one, which is what makes the certificate exist. The
@@ -225,10 +225,10 @@ the only bit-level computation the chain's element needs. -/
 theorem testBit_two_pow_add {m y : ℕ} (hy : y < 2 ^ m) (k : ℕ) :
     (2 ^ m + y).testBit k = if k < m then y.testBit k else decide (k = m) := by
   rcases lt_trichotomy k m with hk | rfl | hk
-  · rw [if_pos hk, Nat.testBit_two_pow_add_gt hk]
-  · rw [if_neg (lt_irrefl k), Nat.testBit_two_pow_add_eq, Nat.testBit_lt_two_pow hy]
+  · rw [ite_eq_left hk, Nat.testBit_two_pow_add_gt hk]
+  · rw [ite_eq_right (lt_irrefl k), Nat.testBit_two_pow_add_eq, Nat.testBit_lt_two_pow hy]
     simp
-  · rw [if_neg (by omega), Nat.testBit_lt_two_pow, decide_eq_false (by omega)]
+  · rw [ite_eq_right (by omega), Nat.testBit_lt_two_pow, decide_eq_false (by omega)]
     calc 2 ^ m + y < 2 ^ m + 2 ^ m := by omega
       _ = 2 ^ (m + 1) := by rw [pow_succ]; ring
       _ ≤ 2 ^ k := Nat.pow_le_pow_right (by norm_num) (by omega)
@@ -254,12 +254,12 @@ theorem testBit_chainBelow : ∀ a k : ℕ,
     · have hhalf : a / 2 < a := by omega
       rw [chainBelow_pos hpos, testBit_two_pow_add (chainBelow_lt (a / 2))]
       rcases lt_trichotomy k (a / 2) with hk | rfl | hk
-      · rw [if_pos hk, ih (a / 2) hhalf k]
+      · rw [ite_eq_left hk, ih (a / 2) hhalf k]
         exact ⟨fun h => ⟨chainSet_of_half h.1, by omega⟩,
           fun h => ⟨chainSet_half_of_ne h.1 (by omega), by omega⟩⟩
-      · rw [if_neg (lt_irrefl _)]
+      · rw [ite_eq_right (lt_irrefl _)]
         exact ⟨fun _ => ⟨⟨1, by norm_num⟩, by omega⟩, fun _ => by simp⟩
-      · rw [if_neg (by omega)]
+      · rw [ite_eq_right (by omega)]
         simp only [decide_eq_true_eq]
         constructor
         · omega
@@ -281,7 +281,7 @@ theorem chainVals_zero : chainVals 0 = 0 := by rw [chainVals]; simp
 
 theorem chainVals_pos {a : ℕ} (ha : 0 < a) :
     chainVals a = a / 2 * 2 ^ (a / 2) + chainVals (a / 2) := by
-  rw [chainVals, if_neg (by omega)]
+  rw [chainVals, ite_eq_right (by omega)]
 
 /-- **An entry fits in the field it is given**: `k / 2` is written in the
 `k - k / 2` bits between the positions of index `k / 2` and `k`, which is
@@ -492,7 +492,7 @@ theorem powVal_eq {i p Y E q v : A} {k : ℕ} (hp : IsPos p) (hq : orank q = 2 ^
     (hv : ValAt i p Y E q v) : powVal i p Y E k = orank v := by
   have hex : ∃ m : ℕ, ∃ q v : A, orank q = 2 ^ k ∧ ValAt i p Y E q v ∧ orank v = m :=
     ⟨orank v, q, v, hq, hv, rfl⟩
-  rw [powVal, dif_pos hex]
+  rw [powVal, dite_eq_left hex]
   obtain ⟨q', v', hq', hv', hm⟩ := hex.choose_spec
   rw [orank_inj (hq'.trans hq.symm)] at hv'
   rw [← hm, valAt_unique hp hv' hv]

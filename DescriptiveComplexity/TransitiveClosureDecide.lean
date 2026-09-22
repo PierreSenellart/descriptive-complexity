@@ -865,7 +865,7 @@ variable [Nonempty A]
 theorem out_all {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (t : D.Coord ⊕ Unit → A) :
     (D.all.Out v t true ↔ ∀ y, P y) ∧ (D.all.Out v t false ↔ ¬∀ y, P y) := by
   obtain ⟨y₀, hy₀⟩ : ∃ y₀ : A, ∀ a, y₀ ≤ a := by
-    obtain ⟨y₀, -, hy₀⟩ := (Finite.to_wellFoundedLT (α := A)).wf.has_min Set.univ
+    obtain ⟨y₀, -, hy₀⟩ := (Finite.to_wellFoundedLT (α := A)).has_min Set.univ
       ⟨Classical.arbitrary A, Set.mem_univ _⟩
     exact ⟨y₀, fun a => not_lt.mp (hy₀ a (Set.mem_univ a))⟩
   have hinit : D.all.StepAt v (none, t) (some D.start, Sum.elim (t ∘ Sum.inl) fun _ => y₀) :=

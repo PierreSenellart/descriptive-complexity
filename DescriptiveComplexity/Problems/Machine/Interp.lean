@@ -132,14 +132,14 @@ theorem realize_cstF {s : SatTag} {q : SatV A}
     (cstF s q.1).Realize v ↔ q = cst s := by
   rw [cstF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_minF, h0, h1]
     constructor
     · rintro ⟨ha, hb⟩
       exact satV_ext hs (le_antisymm (ha botA) (botA_le _)) (le_antisymm (hb botA) (botA_le _))
     · rintro rfl
       exact ⟨fun a => botA_le a, fun a => botA_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -148,14 +148,14 @@ theorem realize_oneF {s : SatTag} {x : Fin 2 × Fin 2} {q : SatV A}
     (oneF s x q.1).Realize v ↔ q = one s (v x) := by
   rw [oneF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, SatOcc.realize_eqF, realize_minF, h0, h1]
     constructor
     · rintro ⟨ha, hb⟩
       exact satV_ext hs ha (le_antisymm (hb botA) (botA_le _))
     · rintro rfl
       exact ⟨rfl, fun a => botA_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -516,10 +516,10 @@ theorem realize_chkLitF {b : Bool} {c x : A} {v : Fin 2 × Fin 2 → A}
     (h0 : v (0, 0) = c) (h1 : v (0, 1) = x) :
     (chkLitF b).Realize v ↔ SatLit c x b := by
   cases b
-  · rw [chkLitF, if_neg (Bool.false_ne_true)]
+  · rw [chkLitF, ite_eq_right (Bool.false_ne_true)]
     simp only [SatOcc.realize_negF, h0, h1, SatLit, SatPos, SatNeg, SatOcc.NegIn]
     simp
-  · rw [chkLitF, if_pos rfl]
+  · rw [chkLitF, ite_eq_left rfl]
     simp only [SatOcc.realize_posF, h0, h1, SatLit, SatPos, SatNeg, SatOcc.PosIn]
     simp
 
@@ -551,7 +551,7 @@ theorem relMap_tdst (p q : SatV A) :
             ⟨fun h => Or.inr h, fun h => h.resolve_left (fun hc => Bool.noConfusion hc)⟩
         · exact iff_of_true (Formula.realize_top.mpr trivial) (Or.inl rfl)
       · cases f
-        · rw [if_neg Bool.false_ne_true, Formula.realize_not]
+        · rw [ite_eq_right Bool.false_ne_true, Formula.realize_not]
           exact ⟨fun h => ⟨rfl, fun hl => h ((realize_chkLitF h0 h1).mpr hl)⟩,
             fun h hl => h.2 ((realize_chkLitF h0 h1).mp hl)⟩
         · exact iff_of_false (by exact fun h => h) (fun h => Bool.noConfusion h.1)

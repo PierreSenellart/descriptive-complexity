@@ -104,7 +104,7 @@ private theorem foldAux_succ {r j : ℕ} (h : j < n) (v : Fin n → A) :
           (∀ a : A, WMLt le a (v ⟨j, h⟩) →
             altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a)) ∧
             foldAux pol P le r (j + 1) v) := by
-  rw [foldAux, dif_pos h]
+  rw [foldAux, dite_eq_left h]
 
 /-- **One existential level of the accumulator.** -/
 theorem foldFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
@@ -112,7 +112,7 @@ theorem foldFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) 
       ((∃ a : A, WMLt le a (v ⟨j, h⟩) ∧
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a)) ∨
           foldFrom pol P le (j + 1) v) := by
-  rw [foldFrom, show n - j = (n - (j + 1)) + 1 by omega, foldAux_succ h, if_pos hp]
+  rw [foldFrom, show n - j = (n - (j + 1)) + 1 by omega, foldAux_succ h, ite_eq_left hp]
   rfl
 
 /-- **One universal level of the accumulator.** -/
@@ -122,7 +122,7 @@ theorem foldFrom_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a)) ∧
           foldFrom pol P le (j + 1) v) := by
   rw [foldFrom, show n - j = (n - (j + 1)) + 1 by omega, foldAux_succ h,
-    if_neg (by simp [hp])]
+    ite_eq_right (by simp [hp])]
   rfl
 
 /-! ### The two ends of the enumeration -/
@@ -143,15 +143,15 @@ theorem foldFrom_bot {v : Fin n → A} {j₀ : ℕ}
           hlt.2 (hbot ⟨j, h⟩ hj a)
         rw [foldAux_succ h]
         by_cases hp : pol j = true
-        · rw [if_pos hp]
+        · rw [ite_eq_left hp]
           refine ⟨fun hc => ?_, fun hc => Or.inr ((ih (j + 1) (by omega)).mpr hc)⟩
           rcases hc with ⟨a, hlt, -⟩ | hc
           · exact absurd hlt (hno a)
           · exact (ih (j + 1) (by omega)).mp hc
-        · rw [if_neg hp]
+        · rw [ite_eq_right hp]
           exact ⟨fun hc => (ih (j + 1) (by omega)).mp hc.2,
             fun hc => ⟨fun a hlt => absurd hlt (hno a), (ih (j + 1) (by omega)).mpr hc⟩⟩
-      · rw [foldAux, dif_neg h]
+      · rw [foldAux, dite_eq_right h]
   exact key _ j hj
 
 /-- **At the last valuation the accumulator is the whole prefix**: every leaf has
@@ -221,7 +221,7 @@ theorem levelEx_congr {v v' : Fin n → A} {j : ℕ} (hj : j < n)
     by_cases hij : i = ⟨j, hj⟩
     · rw [hij]
       simp
-    · simp only [Function.update_apply, if_neg hij]
+    · simp only [Function.update_apply, ite_eq_right hij]
       exact hagree i (by have := i.isLt; omega)
   rw [hagree ⟨j, hj⟩ le_rfl]
   exact exists_congr fun a => and_congr Iff.rfl (iff_of_eq (hupd a))
@@ -240,7 +240,7 @@ theorem levelAll_congr {v v' : Fin n → A} {j : ℕ} (hj : j < n)
     by_cases hij : i = ⟨j, hj⟩
     · rw [hij]
       simp
-    · simp only [Function.update_apply, if_neg hij]
+    · simp only [Function.update_apply, ite_eq_right hij]
       exact hagree i (by have := i.isLt; omega)
   rw [hagree ⟨j, hj⟩ le_rfl]
   exact forall_congr' fun a => imp_congr Iff.rfl (iff_of_eq (hupd a))
@@ -259,10 +259,10 @@ theorem foldFrom_above {v v' : Fin n → A} {j : ℕ} (hj : j < n)
             altQuantFrom pol P (j + 1) (Function.update v ⟨j, hj⟩ a)) ∧
             foldFrom pol P le (j + 1) v')) := by
   by_cases hp : pol j = true
-  · rw [if_pos hp, foldFrom_ex hj hp v']
+  · rw [ite_eq_left hp, foldFrom_ex hj hp v']
     exact or_congr (levelEx_congr hj hagree).symm Iff.rfl
   · have hp' : pol j = false := by simpa using hp
-    rw [if_neg hp, foldFrom_all hj hp' v']
+    rw [ite_eq_right hp, foldFrom_all hj hp' v']
     exact and_congr (levelAll_congr hj hagree).symm Iff.rfl
 
 /-- **At the carry level the accumulator absorbs the subtree just completed.**
@@ -287,7 +287,7 @@ theorem foldFrom_carry {v v' : Fin n → A} {c : ℕ} (h : IsLinOrd le) (hc : c 
     · rw [hic]
       simp
     · have hne' : (i : ℕ) ≠ c := fun hcon => hic (Fin.ext hcon)
-      simp only [Function.update_apply, if_neg hic]
+      simp only [Function.update_apply, ite_eq_right hic]
       exact (hagree i (by omega)).symm
   have hmid : altQuantFrom pol P (c + 1) v =
       altQuantFrom pol P (c + 1) (Function.update v ⟨c, hc⟩ (v ⟨c, hc⟩)) := by
@@ -306,7 +306,7 @@ theorem foldFrom_carry {v v' : Fin n → A} {c : ℕ} (h : IsLinOrd le) (hc : c 
       · exact ⟨hlt.1, hna⟩
       · exact ⟨h.1 _, hna⟩
   by_cases hp : pol c = true
-  · rw [if_pos hp, foldFrom_ex hc hp v', foldFrom_ex hc hp v, hdeep, hmid]
+  · rw [ite_eq_left hp, foldFrom_ex hc hp v', foldFrom_ex hc hp v, hdeep, hmid]
     refine or_congr ?_ Iff.rfl
     have h1 : (∃ a : A, WMLt le a (v' ⟨c, hc⟩) ∧
           altQuantFrom pol P (c + 1) (Function.update v' ⟨c, hc⟩ a)) ↔
@@ -324,7 +324,7 @@ theorem foldFrom_carry {v v' : Fin n → A} {c : ℕ} (h : IsLinOrd le) (hc : c 
     · intro hn
       exact ⟨_, rfl, hn⟩
   · have hp' : pol c = false := by simpa using hp
-    rw [if_neg hp, foldFrom_all hc hp' v', foldFrom_all hc hp' v, hdeep, hmid]
+    rw [ite_eq_right hp, foldFrom_all hc hp' v', foldFrom_all hc hp' v, hdeep, hmid]
     refine and_congr ?_ Iff.rfl
     refine (forall_congr' fun a => imp_congr (hsucc a) (iff_of_eq (hupd a))).trans ?_
     constructor

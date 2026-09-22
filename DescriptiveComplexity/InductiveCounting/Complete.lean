@@ -30,7 +30,7 @@ variable {V : Type} [LinearOrder V] [Finite V] {E : V → V → Prop} {S T : V �
 theorem order_induction_down {A : Type} [LinearOrder A] [Finite A] {P : A → Prop}
     (hmax : ∀ z : A, (∀ a : A, a ≤ z) → P z)
     (hstep : ∀ w z : A, w ⋖ z → P z → P w) (z : A) : P z := by
-  induction z using (Finite.to_wellFoundedGT (α := A)).wf.induction with
+  induction z using (Finite.to_wellFoundedGT (α := A)).induction with
   | _ z ih =>
     by_cases hz : ∀ a : A, a ≤ z
     · exact hmax z hz

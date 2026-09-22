@@ -204,7 +204,7 @@ theorem tupSucc_tupNext {t : Fin D → A} (h : ¬IsMaxTup t) :
     TupSucc t (tupNext t) := by
   classical
   have hex := exists_tupSucc_of_not_isMaxTup h
-  rw [tupNext, dif_pos hex]
+  rw [tupNext, dite_eq_left hex]
   exact hex.choose_spec
 
 /-! ### The coordinate a round carries
@@ -244,7 +244,7 @@ theorem tupCarry_eq {t : Fin D → A} {p : Fin D}
     (hp : TupSuccAt p t (tupNext t)) : tupCarry t = (p : ℕ) := by
   classical
   have hex : ∃ p : Fin D, TupSuccAt p t (tupNext t) := ⟨p, hp⟩
-  rw [tupCarry, dif_pos hex]
+  rw [tupCarry, dite_eq_left hex]
   exact congrArg Fin.val (tupSuccAt_unique hex.choose_spec hp)
 
 /-- **Below the top the carried coordinate is a level**, and the round steps
@@ -294,7 +294,7 @@ variable {dt}
 theorem putLv_of_not_lv {f : dt.CtlIx → A} {w : Fin dt.dd0 → A} {q : dt.CtlIx}
     (h : ∀ j : Fin dt.dd0, q ≠ dt.lvC j) : dt.putLv f w q = f q := by
   classical
-  rw [putLv, dif_neg]
+  rw [putLv, dite_eq_right]
   rintro ⟨j, hj⟩
   exact h j hj
 
@@ -305,7 +305,7 @@ theorem readLv_putLv (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) :
   funext j
   have hex : ∃ j' : Fin dt.dd0, dt.lvC j = dt.lvC j' := ⟨j, rfl⟩
   change (if h : ∃ j' : Fin dt.dd0, dt.lvC j = dt.lvC j' then w h.choose else _) = w j
-  rw [dif_pos hex]
+  rw [dite_eq_left hex]
   exact congrArg w (dt.lvC_injective hex.choose_spec).symm
 
 theorem putLv_acc (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) (k : Fin dt.naDim) :
@@ -342,7 +342,7 @@ variable {dt}
 theorem putLvE_of_not_lv {f : dt.CtlIx → A} {w : Fin dt.eDim → A} {q : dt.CtlIx}
     (h : ∀ j : Fin dt.eDim, q ≠ dt.lvE j) : dt.putLvE f w q = f q := by
   classical
-  rw [putLvE, dif_neg]
+  rw [putLvE, dite_eq_right]
   rintro ⟨j, hj⟩
   exact h j hj
 
@@ -353,7 +353,7 @@ theorem readLvE_putLvE (f : dt.CtlIx → A) (w : Fin dt.eDim → A) :
   funext j
   have hex : ∃ j' : Fin dt.eDim, dt.lvE j = dt.lvE j' := ⟨j, rfl⟩
   change (if h : ∃ j' : Fin dt.eDim, dt.lvE j = dt.lvE j' then w h.choose else _) = w j
-  rw [dif_pos hex]
+  rw [dite_eq_left hex]
   exact congrArg w (dt.lvE_injective hex.choose_spec).symm
 
 /-- The accumulators, the verdicts and the flags ride along a write of the

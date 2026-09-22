@@ -52,7 +52,7 @@ omit [Finite A] in
 theorem splice_of_le {x : A} (h : ¬(M.Posn x ∧ ¬M.Le x t)) :
     M.splice prev t ℓ f x = prev x := by
   classical
-  rw [splice, if_neg h]
+  rw [splice, ite_eq_right h]
 
 omit [Finite A] in
 include hlin in
@@ -63,10 +63,10 @@ theorem splice_of_lt {x : A} (hx : M.Posn x) (ht : M.Posn t) (hle : M.Le t x)
       f (min (bitRank M.Le M.Posn x - bitRank M.Le M.Posn t) ℓ) := by
   classical
   rcases eq_or_ne x t with rfl | hne
-  · rw [splice, if_neg (fun h => h.2 (hlin.1 x)), Nat.sub_self, h0]
+  · rw [splice, ite_eq_right (fun h => h.2 (hlin.1 x)), Nat.sub_self, h0]
     simp
   · have hnle : ¬M.Le x t := fun hcon => hne (hlin.2.2.1 x t hcon hle)
-    rw [splice, if_pos ⟨hx, hnle⟩]
+    rw [splice, ite_eq_left ⟨hx, hnle⟩]
 
 include hlin in
 /-- The spliced walk at the `j`-th position after `t`. -/
@@ -198,12 +198,12 @@ theorem greedy_step (M : ATMData A) (c₀ : Config A) (j : ℕ) :
         (M.Acc (M.greedy c₀ j).state ∨ M.Stuck (M.greedy c₀ j))) := by
   classical
   by_cases hacc : M.Acc (M.greedy c₀ j).state
-  · exact Or.inr ⟨by rw [greedy, if_pos hacc], Or.inl hacc⟩
+  · exact Or.inr ⟨by rw [greedy, ite_eq_left hacc], Or.inl hacc⟩
   by_cases h : ∃ d, M.Step (M.greedy c₀ j) d
   · refine Or.inl ⟨?_, hacc⟩
-    rw [greedy, if_neg hacc, dif_pos h]
+    rw [greedy, ite_eq_right hacc, dite_eq_left h]
     exact h.choose_spec
-  · exact Or.inr ⟨by rw [greedy, if_neg hacc, dif_neg h],
+  · exact Or.inr ⟨by rw [greedy, ite_eq_right hacc, dite_eq_right h],
       Or.inr fun d hd => h ⟨d, hd⟩⟩
 
 /-- The walk that runs the greedy continuation along the positions. -/

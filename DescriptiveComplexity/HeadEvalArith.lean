@@ -495,7 +495,7 @@ theorem AC0Definable.dtcDefinable (h : AC0Definable P) : DTCDefinable P := by
   have hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i := by
     intro i hi
     rw [hsh0]
-    simp only [dif_pos hi]
+    simp only [dite_eq_left hi]
   set acc : Fin K := ⟨S, by omega⟩ with hacc
   set cnt : Fin K := ⟨S + 1, by omega⟩ with hcnt
   set cand : Fin K := ⟨S + 2, by omega⟩ with hcand

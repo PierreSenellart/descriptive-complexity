@@ -132,7 +132,7 @@ theorem pack_left {V : Type} (x y : Fin s.k → V) (z : Fin s.par → V) (i : Fi
     pack x y z (s.leftIx i) = x i := by
   have hi : ((s.leftIx i : Fin (s.k + s.k + s.par)) : ℕ) < s.k := i.isLt
   simp only [pack]
-  rw [dif_pos hi]
+  rw [dite_eq_left hi]
   exact congrArg x (Fin.ext rfl)
 
 @[simp]
@@ -144,7 +144,7 @@ theorem pack_right {V : Type} (x y : Fin s.k → V) (z : Fin s.par → V) (i : F
   have h2 : ((s.rightIx i : Fin (s.k + s.k + s.par)) : ℕ) < s.k + s.k := by
     simp only [rightIx]; omega
   simp only [pack]
-  rw [dif_neg h1, dif_pos h2]
+  rw [dite_eq_right h1, dite_eq_left h2]
   exact congrArg y (Fin.ext (by simp only [rightIx]; omega))
 
 @[simp]
@@ -156,7 +156,7 @@ theorem pack_par {V : Type} (x y : Fin s.k → V) (z : Fin s.par → V) (j : Fin
   have h2 : ¬(((s.parIx j : Fin (s.k + s.k + s.par)) : ℕ) < s.k + s.k) := by
     simp only [parIx]; omega
   simp only [pack]
-  rw [dif_neg h1, dif_neg h2]
+  rw [dite_eq_right h1, dite_eq_right h2]
   exact congrArg z (Fin.ext (by simp only [parIx]; omega))
 
 /-- Every tuple is packed from its three parts. -/

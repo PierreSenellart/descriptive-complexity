@@ -129,14 +129,14 @@ theorem realize_pfpValue_iff (d : StepDef L) (A : Type) [L.Structure A] :
       d.PFPHolds A ∨ (¬d.PFPConverges A ∧
         @Sentence.Realize _ A (d.B.structure₁ (L := L) (d.B.botAssign A)) d.out) := by
   by_cases h : d.PFPConverges A
-  · rw [pfpValue, dif_pos h]
+  · rw [pfpValue, dite_eq_left h]
     constructor
     · intro hout
       exact Or.inl ⟨h.choose, h.choose_spec, hout⟩
     · rintro (⟨n, hn, hout⟩ | ⟨hdiv, -⟩)
       · rwa [d.partStage_eq_of_isFixedPt h.choose_spec hn]
       · exact absurd h hdiv
-  · rw [pfpValue, dif_neg h]
+  · rw [pfpValue, dite_eq_right h]
     constructor
     · intro hout
       exact Or.inr ⟨h, hout⟩

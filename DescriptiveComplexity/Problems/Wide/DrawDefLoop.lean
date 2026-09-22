@@ -56,7 +56,7 @@ omit [Finite A] in
 /-- **An exhausted tuple stands still.** -/
 theorem tupNext_of_isMaxTup {t : Fin D → A} (h : IsMaxTup t) : tupNext t = t := by
   classical
-  rw [tupNext, dif_neg]
+  rw [tupNext, dite_eq_right]
   rintro ⟨w, p, hp⟩
   exact absurd (h p (w p)) (not_le.mpr hp.2.1.1)
 
@@ -93,7 +93,7 @@ omit [Finite A] in
 /-- **An exhausted tuple carries past its last coordinate.** -/
 theorem tupCarry_of_isMaxTup {t : Fin D → A} (h : IsMaxTup t) : tupCarry t = D := by
   classical
-  rw [tupCarry, dif_neg]
+  rw [tupCarry, dite_eq_right]
   rintro ⟨p, hp⟩
   exact absurd (h p (tupNext t p)) (not_le.mpr hp.2.1.1)
 
@@ -103,9 +103,9 @@ theorem tupCarry_le {t : Fin D → A} : tupCarry t ≤ D := by
   classical
   rw [tupCarry]
   by_cases h : ∃ p : Fin D, TupSuccAt p t (tupNext t)
-  · rw [dif_pos h]
+  · rw [dite_eq_left h]
     exact le_of_lt h.choose.isLt
-  · rw [dif_neg h]
+  · rw [dite_eq_right h]
 
 /-- **The next tuple, coordinate by coordinate**: below the carry a copy, at
 the carry the next element, above it the least one. This is the reading the
@@ -116,12 +116,12 @@ theorem tupNext_apply_of_carry (hb : IsBot zero)
     tupNext t j = if j < p then t j else if j = p then ordSucc (t j) else zero := by
   have hh : TupSuccAt p t (tupNext t) := tupSuccAt_of_carry hp hab
   rcases lt_trichotomy j p with hlt | heq | hlt
-  · rw [if_pos hlt]
+  · rw [ite_eq_left hlt]
     exact (hh.1 j hlt).symm
   · subst heq
-    rw [if_neg (lt_irrefl j), if_pos rfl]
+    rw [ite_eq_right (lt_irrefl j), ite_eq_left rfl]
     exact eq_ordSucc_of_covBy ⟨hh.2.1.1, fun c hc1 hc2 => hh.2.1.2 c ⟨hc1, hc2⟩⟩
-  · rw [if_neg (not_lt.mpr hlt.le), if_neg (Fin.ne_of_gt hlt)]
+  · rw [ite_eq_right (not_lt.mpr hlt.le), ite_eq_right (Fin.ne_of_gt hlt)]
     exact le_antisymm ((hh.2.2 j hlt).2 zero) (hb _)
 
 omit [Finite A] in

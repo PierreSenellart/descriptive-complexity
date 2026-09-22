@@ -548,7 +548,7 @@ noncomputable def rowFun (R : A → A → Prop) : A → A :=
 omit [Language.tiling.Structure A] [LinearOrder A] in
 theorem rowFun_spec {R : A → A → Prop} {x : A} (h : ∃ t, R x t) : R x (rowFun R x) := by
   classical
-  rw [rowFun, dif_pos h]
+  rw [rowFun, dite_eq_left h]
   exact h.choose_spec
 
 /-- **The corridor a walk has built so far**, with the row it has reached on
@@ -598,38 +598,38 @@ theorem exists_corridorTo {ρ σ : corBlock.Assignment A} (hsrc : corSpec.IsSrc 
       ?_, hdlegal, ?_⟩
     · intro k x hk hx
       by_cases hkn : k = n + 1
-      · simp only [if_pos hkn]
+      · simp only [ite_eq_left hkn]
         obtain ⟨t, ht, htile⟩ := hdlegal.1 x hx
         rw [hdlegal.2.1 x (rowFun (corRow d) x) t (hspec x hx) ht]
         exact htile
-      · simp only [if_neg hkn]
+      · simp only [ite_eq_right hkn]
         exact h1 k x (by omega) hx
-    · simpa only [if_neg (by omega : (0 : ℕ) ≠ n + 1)] using h2
+    · simpa only [ite_eq_right (by omega : (0 : ℕ) ≠ n + 1)] using h2
     · intro k x hk hmin
       by_cases hkn : k = n + 1
-      · simp only [if_pos hkn]
+      · simp only [ite_eq_left hkn]
         exact hdlegal.2.2.2.1 x _ hmin (hspec x hmin.1)
-      · simp only [if_neg hkn]
+      · simp only [ite_eq_right hkn]
         exact h3 k x (by omega) hmin
     · intro k x hk hmax
       by_cases hkn : k = n + 1
-      · simp only [if_pos hkn]
+      · simp only [ite_eq_left hkn]
         exact hdlegal.2.2.2.2 x _ hmax (hspec x hmax.1)
-      · simp only [if_neg hkn]
+      · simp only [ite_eq_right hkn]
         exact h4 k x (by omega) hmax
     · intro k x x' hk hs
       by_cases hkn : k = n + 1
-      · simp only [if_pos hkn]
+      · simp only [ite_eq_left hkn]
         exact hdlegal.2.2.1 x x' _ _ hs (hspec x hs.1) (hspec x' hs.2.1)
-      · simp only [if_neg hkn]
+      · simp only [ite_eq_right hkn]
         exact h5 k x x' (by omega) hs
     · intro k x hk hx
       by_cases hkn : k = n
       · subst hkn
-        simp only [if_neg (by omega : k ≠ k + 1)]
+        simp only [ite_eq_right (by omega : k ≠ k + 1)]
         exact hdvert x (τ k x) _ hx (htop x hx) (hspec x hx)
       · have hk1 : k + 1 ≠ n + 1 := by omega
-        simp only [if_neg (by omega : k ≠ n + 1), if_neg hk1]
+        simp only [ite_eq_right (by omega : k ≠ n + 1), ite_eq_right hk1]
         exact h6 k x (by omega) hx
     · intro x hx
       simpa using hspec x hx

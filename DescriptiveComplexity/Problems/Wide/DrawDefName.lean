@@ -55,9 +55,9 @@ theorem uReadable_encTup {c : PtCode dt.X}
   · obtain ⟨q, rfl⟩ := hc
     by_cases hq : q = c
     · exact (uReadable_one (L := L) (Q := Q) (W := dt.SlotIx)).congr fun _ _ _ => by
-        rw [encTup_cIx, if_pos hq]
+        rw [encTup_cIx, ite_eq_left hq]
     · exact (uReadable_zero (L := L) (Q := Q) (W := dt.SlotIx)).congr fun _ _ _ => by
-        rw [encTup_cIx, if_neg hq]
+        rw [encTup_cIx, ite_eq_right hq]
   · by_cases hp : ∃ p : Fin (blockArityBound dt.X.B), dt.ly.pIx p = k
     · obtain ⟨p, rfl⟩ := hp
       exact (hpay p).congr fun _ _ _ => by rw [encTup_pIx]
@@ -190,9 +190,9 @@ theorem uGDefinable_exists_encAsgTup (i : dt.X.B.ι) :
   constructor
   · rintro ⟨w, hw⟩ j
     by_cases hj : dt.PayCoord i j
-    · rw [if_pos hj]
+    · rw [ite_eq_left hj]
       trivial
-    · rw [if_neg hj, hw j]
+    · rw [ite_eq_right hj, hw j]
       exact encAsgTup_congr_of_not_payCoord hj w fun _ => e.zero
   · intro hall
     refine ⟨fun p' : Fin (dt.X.B.arity i) =>
@@ -209,10 +209,10 @@ theorem uGDefinable_exists_encAsgTup (i : dt.X.B.ι) :
       change g (Slot.name j) =
         (if h : ∃ j' : Fin dt.dd0, dt.ly.pIx p = Fin.castLE dt.dd0Le j'
           then g (Slot.name h.choose) else e.zero)
-      rw [dif_pos hex, hjj]
+      rw [dite_eq_left hex, hjj]
     · rw [encAsgTup_congr_of_not_payCoord hj _ fun _ => e.zero]
       have h1 := hall j
-      rw [if_neg hj] at h1
+      rw [ite_eq_right hj] at h1
       exact h1
 
 omit [L.IsRelational] in

@@ -322,9 +322,9 @@ theorem tupN_tupOf (i : Fin V.numSyms) {t : ℕ} (ht : t < (k + 1) ^ V.arity i) 
       List.ofFn fun j : Fin (dimOf V) => digitAt (k + 1) t (j : ℕ) := by
     refine congrArg List.ofFn (funext fun j => ?_)
     by_cases hj : (j : ℕ) < V.arity i
-    · rw [tupOf, pad, dif_pos hj]
+    · rw [tupOf, pad, dite_eq_left hj]
       simp
-    · rw [tupOf, pad, dif_neg hj]
+    · rw [tupOf, pad, dite_eq_right hj]
       rw [eSymm_botOrd]
       have hdig : digitAt (k + 1) t (j : ℕ) = 0 := by
         rw [digitAt, Nat.div_eq_of_lt, Nat.zero_mod]
@@ -521,7 +521,7 @@ theorem bitAt_iff_bitOf (i : Fin V.numSyms) (t : ℕ) :
     bitAt V k e i t = true ↔ bitOf V i (tupOf V k e i t) := by
   rw [bitAt, decide_eq_true_iff, bitOf]
   refine iff_of_eq (congrArg _ (funext fun j => ?_))
-  rw [tupOf, pad, dif_pos (show ((Fin.castLE (arity_le_dimOf V i) j : Fin (dimOf V)) : ℕ) <
+  rw [tupOf, pad, dite_eq_left (show ((Fin.castLE (arity_le_dimOf V i) j : Fin (dimOf V)) : ℕ) <
     V.arity i from j.isLt)]
   exact congrArg _ (Fin.ext rfl)
 
@@ -581,14 +581,14 @@ theorem sLt_one {a a' : Fin (k + 1)} (h : a' < a) :
     SLt V cF cP (hPt (Sum.inr .cOne) (pad (botOrd A) fun _ : Fin 1 => e a))
       (hPt (Sum.inr .cOne) (pad (botOrd A) fun _ : Fin 1 => e a')) := by
   refine sLt_of_revLex V cF cP rfl ⟨⟨0, dimOf_pos V⟩, ?_, ?_⟩
-  · rw [pad, dif_pos (by simp : ((⟨0, dimOf_pos V⟩ : Fin (dimOf V)) : ℕ) < 1),
-      pad, dif_pos (by simp : ((⟨0, dimOf_pos V⟩ : Fin (dimOf V)) : ℕ) < 1)]
+  · rw [pad, dite_eq_left (by simp : ((⟨0, dimOf_pos V⟩ : Fin (dimOf V)) : ℕ) < 1),
+      pad, dite_eq_left (by simp : ((⟨0, dimOf_pos V⟩ : Fin (dimOf V)) : ℕ) < 1)]
     exact e.strictMono h
   · intro j' hj'
     have hj1 : ¬((j' : ℕ) < 1) := by
       have : (0 : ℕ) < (j' : ℕ) := hj'
       omega
-    rw [pad, dif_neg hj1, pad, dif_neg hj1]
+    rw [pad, dite_eq_right hj1, pad, dite_eq_right hj1]
 
 /-- Pairwise over a `flatMap`, from pairwise inside each image and pairwise
 across the images. -/

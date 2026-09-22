@@ -112,7 +112,7 @@ noncomputable def nextPos (M : ATMData A) (t : A) : A :=
 theorem succPos_nextPos {t : A} (h : ∃ q, SuccPos M.Le M.Posn t q) :
     SuccPos M.Le M.Posn t (M.nextPos t) := by
   classical
-  rw [nextPos, dif_pos h]
+  rw [nextPos, dite_eq_left h]
   exact h.choose_spec
 
 /-- The positions reached from `t` by stepping `j` times along the order. -/

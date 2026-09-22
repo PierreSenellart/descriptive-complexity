@@ -119,14 +119,14 @@ theorem realize_slotOccF {o : Option (KromLit B k)} {pos : Bool} {i : B.ι}
   | some l =>
     rw [Option.elim_some]
     by_cases hc : l.positive = pos ∧ l.atom.idx = i
-    · rw [if_pos hc, realize_atomOccF]
+    · rw [ite_eq_left hc, realize_atomOccF]
       refine ⟨fun h => ⟨l, rfl, hc.1, hc.2, h⟩, ?_⟩
       rintro ⟨l', hl', -, -, h⟩
       have hle := Option.mem_def.mp hl'
       rw [Option.some.injEq] at hle
       subst hle
       exact h
-    · rw [if_neg hc]
+    · rw [ite_eq_right hc]
       refine iff_of_false id ?_
       rintro ⟨l', hl', hpos, hidx, -⟩
       have hle := Option.mem_def.mp hl'
@@ -335,13 +335,13 @@ theorem krom_satisfiable_iff :
       rw [KromLit.Holds] at hlT
       cases hpos : l.positive with
       | false =>
-        simp only [hpos, Bool.false_eq_true, if_false] at hlT
+        simp only [hpos, Bool.false_eq_true, ite_false] at hlT
         refine Or.inr ⟨?_, ?_⟩
         · exact (krom_negIn_cl_var c l.atom.idx u _).mpr
             ⟨o, ho, l, hl, hpos, rfl, padTup_pad ha₀ _ u⟩
         · exact fun h => hlT ((hval l.atom).mp h)
       | true =>
-        simp only [hpos, if_true] at hlT
+        simp only [hpos, ite_true] at hlT
         refine Or.inl ⟨?_, ?_⟩
         · exact (krom_posIn_cl_var c l.atom.idx u _).mpr
             ⟨o, ho, l, hl, hpos, rfl, padTup_pad ha₀ _ u⟩

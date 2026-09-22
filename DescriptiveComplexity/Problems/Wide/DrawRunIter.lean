@@ -72,7 +72,7 @@ theorem iterOrd_covers {init : Q'} {step : ι → Q' → Q'} {a a' : ι}
   have hex : ∃ b : ι, orank b = orank a := ⟨a, rfl⟩
   rw [iterOrd, hrk]
   simp only [iterState]
-  rw [dif_pos hex, orank_inj hex.choose_spec]
+  rw [dite_eq_left hex, orank_inj hex.choose_spec]
   rfl
 
 omit [Finite ι] in
@@ -126,7 +126,7 @@ theorem chainSt_succ_pos {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' �
       upd ⟨j, h⟩ true (chainSt bit upd base j) := by
   classical
   simp only [chainSt]
-  rw [dif_pos h, if_pos hb]
+  rw [dite_eq_left h, ite_eq_left hb]
 
 /-- A negative read's link. -/
 theorem chainSt_succ_neg {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' → Q'}
@@ -135,7 +135,7 @@ theorem chainSt_succ_neg {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' �
       upd ⟨j, h⟩ false (chainSt bit upd base j) := by
   classical
   simp only [chainSt]
-  rw [dif_pos h, if_neg hb]
+  rw [dite_eq_left h, ite_eq_right hb]
 
 end Chain
 
@@ -652,9 +652,9 @@ theorem tuple_reachesIn_iter (w : ℕ)
     (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀)
     hnameS huniqS hnameD huniqD ?_ ?_ hbitFlag ?_ ?_ ?_ hmaxT hmaxF w hcost ?_
   · intro a hb
-    rw [tupleIter1, if_pos hb]
+    rw [tupleIter1, ite_eq_left hb]
   · intro a hb
-    rw [tupleIter1, if_neg hb]
+    rw [tupleIter1, ite_eq_right hb]
   · intro a a' hlt hnb
     have hcov : tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a' =
         advLv (tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a)

@@ -298,7 +298,7 @@ theorem realize_newRelF_base {k : ℕ} (R : L₂.Relations k) (t : Fin k → Tag
   let := hostStruc (L₁ := L₁) A n ρ
   have hex : ∃ t' : Fin k → Tag, ∀ i, (Sum.inl (t i) : Tag ⊕ Unit) = Sum.inl (t' i) :=
     ⟨t, fun _ => rfl⟩
-  rw [newRelF, dif_pos hex]
+  rw [newRelF, dite_eq_left hex]
   have hch : hex.choose = t := funext fun i => (Sum.inl_injective (hex.choose_spec i)).symm
   rw [hch, Formula.realize_relabel, LHom.realize_onFormula]
   have hval : (w ∘ fun p : Fin k × Fin dim => (p.1, Fin.castSucc p.2)) =
@@ -313,7 +313,7 @@ omit [L₁.IsRelational] in
 theorem newRelF_base_eq_bot {k : ℕ} (R : L₂.Relations k) (τ : Fin k → Tag ⊕ Unit)
     (h : ¬∃ t : Fin k → Tag, ∀ i, τ i = Sum.inl (t i)) :
     newRelF L₁ Tag dim B I (tgtBaseSym L₂ B R) τ = ⊥ := by
-  rw [newRelF, dif_neg h]
+  rw [newRelF, dite_eq_right h]
 
 /-- The marker `old` holds exactly of the interpreted points. -/
 theorem realize_newRelF_old (τ : Fin 1 → Tag ⊕ Unit) (w : Fin 1 × Fin (dim + 1) → A ⊕ Fin n) :
@@ -322,9 +322,9 @@ theorem realize_newRelF_old (τ : Fin 1 → Tag ⊕ Unit) (w : Fin 1 × Fin (dim
   let := hostStruc (L₁ := L₁) A n ρ
   rw [newRelF]
   by_cases h : (τ 0).isLeft = true
-  · rw [if_pos h]
+  · rw [ite_eq_left h]
     simp [h]
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     simp [h]
 
 /-- A relation variable of the target's block is read off the pulled variable

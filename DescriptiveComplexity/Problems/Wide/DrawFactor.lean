@@ -366,8 +366,8 @@ theorem UGDefinable.ite {p : Prop} [Decidable p] (h : UGDefinable N)
     (h' : UGDefinable N') :
     UGDefinable fun e f g => if p then N e f g else N' e f g := by
   by_cases hp : p
-  · exact h.congr fun _ _ _ => iff_of_eq (if_pos hp)
-  · exact h'.congr fun _ _ _ => iff_of_eq (if_neg hp)
+  · exact h.congr fun _ _ _ => iff_of_eq (ite_eq_left hp)
+  · exact h'.congr fun _ _ _ => iff_of_eq (ite_eq_right hp)
 
 /-! ### The atoms of a written value -/
 
@@ -459,8 +459,8 @@ theorem USlotDefinable.ite {p : Prop} [Decidable p] (h : USlotDefinable V)
     (h' : USlotDefinable V') :
     USlotDefinable fun e f g => if p then V e f g else V' e f g := by
   by_cases hp : p
-  · exact h.congr fun _ _ _ => if_pos hp
-  · exact h'.congr fun _ _ _ => if_neg hp
+  · exact h.congr fun _ _ _ => ite_eq_left hp
+  · exact h'.congr fun _ _ _ => ite_eq_right hp
 
 open Classical in
 /-- **A value chosen by definable cases**: finitely many conditions, each
@@ -544,8 +544,8 @@ theorem UReadable.ite {p : Prop} [Decidable p] (h : UReadable V)
     (h' : UReadable V') :
     UReadable fun e f g => if p then V e f g else V' e f g := by
   by_cases hp : p
-  · exact h.congr fun _ _ _ => if_pos hp
-  · exact h'.congr fun _ _ _ => if_neg hp
+  · exact h.congr fun _ _ _ => ite_eq_left hp
+  · exact h'.congr fun _ _ _ => ite_eq_right hp
 
 /-! ### From slots to payloads -/
 
@@ -595,8 +595,8 @@ theorem UStDefinable.ite {p : Prop} [Decidable p] (h : UStDefinable F)
     (h' : UStDefinable F') :
     UStDefinable fun e f g => if p then F e f g else F' e f g := by
   by_cases hp : p
-  · exact h.congr fun _ _ _ _ => by rw [if_pos hp]
-  · exact h'.congr fun _ _ _ _ => by rw [if_neg hp]
+  · exact h.congr fun _ _ _ _ => by rw [ite_eq_left hp]
+  · exact h'.congr fun _ _ _ _ => by rw [ite_eq_right hp]
 
 /-! ### The payload statements the interpretation reads -/
 

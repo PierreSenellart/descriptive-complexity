@@ -358,9 +358,9 @@ theorem ixKind_hStage_thread_reachesIn
       (hwP := hwP) (hwR := hwR) (hwK := hwK) (hb := ?_) (f := f)
     by_cases hbb : st.old i
       (ixAddr elt (dt.ixStageTgt F hhasP vi ts { st with sav := ixMark elt v } (dt.d.B.arity i)))
-    · rw [if_pos hbb]
+    · rw [ite_eq_left hbb]
       exact ⟨fun _ => rfl, fun _ => hbb⟩
-    · rw [if_neg hbb]
+    · rw [ite_eq_right hbb]
       exact ⟨fun h => absurd h hbb, fun h => nomatch h⟩
   | @exp k e ts =>
     obtain ⟨pts, hENC⟩ := sem
@@ -368,12 +368,12 @@ theorem ixKind_hStage_thread_reachesIn
       by_cases h : 0 < k * Fintype.card dt.X.Tag
       · rw [show dt.kindEntry (MatAtom.exp e ts) =
             TagPh.tagRdP ⟨0, h⟩ ReadPh.start from by
-            rw [kindEntry]; exact dif_pos h,
+            rw [kindEntry]; exact dite_eq_left h,
           show (tagFirstRd emb : P) =
-            emb (TagPh.tagRdP ⟨0, h⟩ ReadPh.start) from dif_pos h]
+            emb (TagPh.tagRdP ⟨0, h⟩ ReadPh.start) from dite_eq_left h]
       · rw [show dt.kindEntry (MatAtom.exp e ts) = TagPh.brP from by
-            rw [kindEntry]; exact dif_neg h,
-          show (tagFirstRd emb : P) = emb TagPh.brP from dif_neg h]
+            rw [kindEntry]; exact dite_eq_right h,
+          show (tagFirstRd emb : P) = emb TagPh.brP from dite_eq_right h]
     rw [hent]
     have hrd' : dt.relNr e (fun ℓ => (pts ℓ).1.1) ≤ dt.nfDim :=
       le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
@@ -475,9 +475,9 @@ theorem ixKind_hStage_reachesIn
       (hgap := hgap) (hwP := hwP) (hwR := hwR) (hwK := hwK) (hb := ?_) (f := f)
     by_cases hbb : st.old i
       (ixAddr elt (dt.ixStageTgt F hhasP vi ts { st with sav := ixMark elt v } (dt.d.B.arity i)))
-    · rw [if_pos hbb]
+    · rw [ite_eq_left hbb]
       exact ⟨fun _ => rfl, fun _ => hbb⟩
-    · rw [if_neg hbb]
+    · rw [ite_eq_right hbb]
       exact ⟨fun h => absurd h hbb, fun h => nomatch h⟩
   | @exp k e ts =>
     obtain ⟨pts, hENC⟩ := sem
@@ -485,12 +485,12 @@ theorem ixKind_hStage_reachesIn
       by_cases h : 0 < k * Fintype.card dt.X.Tag
       · rw [show dt.kindEntry (MatAtom.exp e ts) =
             TagPh.tagRdP ⟨0, h⟩ ReadPh.start from by
-            rw [kindEntry]; exact dif_pos h,
+            rw [kindEntry]; exact dite_eq_left h,
           show (tagFirstRd emb : P) =
-            emb (TagPh.tagRdP ⟨0, h⟩ ReadPh.start) from dif_pos h]
+            emb (TagPh.tagRdP ⟨0, h⟩ ReadPh.start) from dite_eq_left h]
       · rw [show dt.kindEntry (MatAtom.exp e ts) = TagPh.brP from by
-            rw [kindEntry]; exact dif_neg h,
-          show (tagFirstRd emb : P) = emb TagPh.brP from dif_neg h]
+            rw [kindEntry]; exact dite_eq_right h,
+          show (tagFirstRd emb : P) = emb TagPh.brP from dite_eq_right h]
     rw [hent]
     have hrd' : dt.relNr e (fun ℓ => (pts ℓ).1.1) ≤ dt.nfDim :=
       le_trans (Finset.le_sup (f := fun τ' : Fin k → dt.X.Tag =>
@@ -798,7 +798,7 @@ theorem ixKindExitCtl_apply_avC
                 (dt.ixStageFAt F hhas one vi ts av st elt v f n)
                 (toLex topTup) := by
             simp only [ixStageFAt]
-            rw [dif_pos h]
+            rw [dite_eq_left h]
           rw [hstep]
           refine (tupleIter1_apply_of (dt.avC a') ?_ ?_ ?_ _ _ _ _ _).trans ih
           · intro bb fd g
@@ -814,7 +814,7 @@ theorem ixKindExitCtl_apply_avC
         · have hstep : dt.ixStageFAt F hhas one vi ts av st elt v f (n + 1) =
               dt.ixStageFAt F hhas one vi ts av st elt v f n := by
             simp only [ixStageFAt]
-            rw [dif_neg h]
+            rw [dite_eq_right h]
           rw [hstep]
           exact ih
     exact hstage _
@@ -972,7 +972,7 @@ theorem ixKindExitCtl_apply_accC
                 (dt.ixStageFAt F hhas one vi ts av st elt v f n)
                 (toLex topTup) := by
             simp only [ixStageFAt]
-            rw [dif_pos h]
+            rw [dite_eq_left h]
           rw [hstep]
           refine (tupleIter1_apply_of (dt.accC jj) ?_ ?_ ?_ _ _ _ _ _).trans ih
           · intro bb fd g
@@ -988,7 +988,7 @@ theorem ixKindExitCtl_apply_accC
         · have hstep : dt.ixStageFAt F hhas one vi ts av st elt v f (n + 1) =
               dt.ixStageFAt F hhas one vi ts av st elt v f n := by
             simp only [ixStageFAt]
-            rw [dif_neg h]
+            rw [dite_eq_right h]
           rw [hstep]
           exact ih
     have hK : dt.ixKindExitCtl F zero one hhas vi av st v (.stage i ts) sem hk hnd
@@ -1104,13 +1104,13 @@ theorem ixMatFs_apply_accC
               (dt.ixMatFs F zero one hhas vi st v enterSt sem f₀ n)
               (dt.ixBack F.toLayout zero one dt.dd0Le st v)) := by
         simp only [ixMatFs]
-        rw [dif_pos hn]
+        rw [dite_eq_left hn]
       rw [hFa, ixKindExitCtl_apply_accC F hhas _ _ _ _ _ _ jj, hEnterAcc]
       exact ih
     · have hFa : dt.ixMatFs F zero one hhas vi st v enterSt sem f₀ (n + 1) =
           dt.ixMatFs F zero one hhas vi st v enterSt sem f₀ n := by
         simp only [ixMatFs]
-        rw [dif_neg hn]
+        rw [dite_eq_right hn]
       rw [hFa]
       exact ih
 
@@ -1147,7 +1147,7 @@ theorem ixMatFs_apply_avC
         (dt.avC (Fin.castLE (dt.natOf_le_natMax vi) a)) by
     rw [h (dt.natOf vi) a.isLt le_rfl]
     simp only [ixMatFs]
-    rw [dif_pos a.isLt]
+    rw [dite_eq_left a.isLt]
   intro n h1 h2
   induction n with
   | zero => omega
@@ -1174,7 +1174,7 @@ theorem ixMatFs_apply_avC
               (dt.ixMatFs F zero one hhas vi st v enterSt sem f₀ n)
               (dt.ixBack F.toLayout zero one dt.dd0Le st v)) := by
         simp only [ixMatFs]
-        rw [dif_pos hn]
+        rw [dite_eq_left hn]
       rw [hFa, ixKindExitCtl_apply_avC F hhas _ _ _ _ _ _ hne, hEnterAv]
       exact ih hstep (by omega)
     · have hn : n = (a : ℕ) := by omega
@@ -1246,8 +1246,8 @@ theorem ixCmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
       (dt.padBits zero (encMap dt.ly zero one p) (ofLex u) ↔
         dt.padBits zero (encMap dt.ly zero one q) (ofLex u)) :=
   by
-  rw [CmpAgr, cmpSet, cmpSet, cmpCell, cmpCell, if_pos rfl, if_pos rfl,
-    if_neg (by decide : ¬(1 : Fin 2) = 0), if_neg (by decide : ¬(1 : Fin 2) = 0),
+  rw [CmpAgr, cmpSet, cmpSet, cmpCell, cmpCell, ite_eq_left rfl, ite_eq_left rfl,
+    ite_eq_right (by decide : ¬(1 : Fin 2) = 0), ite_eq_right (by decide : ¬(1 : Fin 2) = 0),
     ← ixAddr_elt hinj (dt.lvSet st vi j₁)
       (F.toLayout.reg hhas (dt.lvBlk vi j₁) (ofLex u)),
     ← ixAddr_elt hinj (dt.lvSet st vi j₂)
@@ -1380,9 +1380,9 @@ theorem ctlBit_ixKindExitCtl_self (hzo : zero ≠ one)
     refine Iff.trans ?_ (hOld i ts)
     by_cases hb : st.old i (ixAddr elt (dt.ixStageTgt F hhas vi ts
           { st with sav := ixMark elt v } (dt.d.B.arity i)))
-    · rw [if_pos hb]
+    · rw [ite_eq_left hb]
       exact ⟨fun _ => hb, fun _ => rfl⟩
-    · rw [if_neg hb]
+    · rw [ite_eq_right hb]
       exact ⟨fun h => absurd h (by decide), fun h => absurd h hb⟩
   | @exp k e ts =>
     simp only [ixMkKindSem, ixKindExitCtl, MatAtom.holds]
@@ -1583,10 +1583,10 @@ theorem ixMatFs_congr_scratch {st' : TapeSt dt A R P I} (h : dt.ScratchEq st st'
   | succ n ih =>
     rw [ixMatFs, ixMatFs]
     by_cases hn : n < dt.natOf vi
-    · rw [dif_pos hn, dif_pos hn, ih, h.ixBack hreg]
+    · rw [dite_eq_left hn, dite_eq_left hn, ih, h.ixBack hreg]
       exact ixKindExitCtl_congr_scratch (F := F) (hhas := hhas) (h := h)
         (hreg := hreg) (κ := dt.kindOf vi ⟨n, hn⟩) (sem := sem ⟨n, hn⟩) _ _ _ _
-    · rw [dif_neg hn, dif_neg hn, ih]
+    · rw [dite_eq_right hn, dite_eq_right hn, ih]
 
 omit [Finite I] in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite dt.KIx] in
@@ -1614,12 +1614,12 @@ theorem ixMatFsT_eq_ixMatFs (hreg : ¬∃ u : I, v = F.cell u)
   | succ n ih =>
     rw [ixMatFsT, ixMatFs]
     by_cases hn : n < dt.natOf vi
-    · rw [dif_pos hn, dif_pos hn, ih,
+    · rw [dite_eq_left hn, dite_eq_left hn, ih,
         (ixScratchEq_matSt (elt := elt) n).ixBack hreg]
       exact ixKindExitCtl_congr_scratch (F := F) (hhas := hhas)
         (h := ixScratchEq_matSt (elt := elt) n) (hreg := hreg)
         (κ := dt.kindOf vi ⟨n, hn⟩) (sem := semT ⟨n, hn⟩) _ _ _ _
-    · rw [dif_neg hn, dif_neg hn, ih]
+    · rw [dite_eq_right hn, dite_eq_right hn, ih]
 
 include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmirSt
   hbotSt hrules hmono hup he₀ hvh hxdUse hgap hwP hwR hwK hcostR hwA in
@@ -1679,12 +1679,12 @@ theorem ixMatrix_run_thread_reachesIn
             (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le
               (dt.ixMatSt (elt := elt) vi st v (a : ℕ)) v)) := by
       simp only [ixMatFsT]
-      rw [dif_pos a.isLt]
+      rw [dite_eq_left a.isLt]
     have hSt : dt.ixMatSt (elt := elt) vi st v ((a : ℕ) + 1) =
         dt.ixKindEndSt (elt := elt) vi v (dt.kindOf vi a)
           (dt.ixMatSt (elt := elt) vi st v (a : ℕ)) := by
       simp only [ixMatSt]
-      rw [dif_pos a.isLt]
+      rw [dite_eq_left a.isLt]
     rw [hFa, hSt]
     obtain ⟨hw, hm, hb, -, -⟩ := ixMatSt_fields (elt := elt) (v := v) (st := st) (a : ℕ)
     exact ixKind_hStage_thread_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP)
@@ -1786,7 +1786,7 @@ theorem ixMatrix_reachesIn (f₀ : dt.CtlIx → A) :
           (enterSt a (dt.ixMatFs F PR.zero PR.one hhasP vi st v enterSt sem f₀ (a : ℕ))
             (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st v)) := by
       simp only [ixMatFs]
-      rw [dif_pos a.isLt]
+      rw [dite_eq_left a.isLt]
     rw [hFa]
     exact ixKind_hStage_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP)
       (hix := hix)
@@ -1973,7 +1973,7 @@ theorem ixGates_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx �
             (toLex topTup) (Fin.last (dt.domNr (tOf ℓ))))
           (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st v) := by
       simp only [ixGatesFs]
-      rw [dif_pos ℓ.isLt]
+      rw [dite_eq_left ℓ.isLt]
     rw [hFa]
     have hrules' : ∀ (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i),
         PR.rules (rEmb (.sub ℓ i) ρ) =
@@ -2097,7 +2097,7 @@ theorem ixGates_reachesIn_fail (ℓ₀ : Fin (dt.arOf vi))
             dstSt := enterSt
               ⟨((ℓ₀.castSucc : Fin (dt.arOf vi + 1)) : ℕ), hlt⟩
             wr := fun _ g => g
-            moveRight := True } := dif_pos hlt
+            moveRight := True } := dite_eq_left hlt
       rw [hrule] at h
       refine ⟨rEmb (.chk ℓ₀.castSucc) .dspA, ?_, by rw [h], by rw [h]; rfl,
         ?_, by rw [h], by rw [h]; trivial⟩
@@ -2153,7 +2153,7 @@ theorem ixGates_reachesIn_fail (ℓ₀ : Fin (dt.arOf vi))
             (toLex topTup) (Fin.last (dt.domNr (tOf ℓ))))
           (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st v) := by
       simp only [ixGatesFs]
-      rw [dif_pos ℓ.isLt]
+      rw [dite_eq_left ℓ.isLt]
     rw [hFa]
     have hrules' : ∀ (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i),
         PR.rules (rEmb (.sub ℓ i) ρ) =
@@ -2254,7 +2254,7 @@ theorem ctlBit_gateFlagC_ixGatesFs (hzo : PR.zero ≠ PR.one)
               (toLex topTup) (Fin.last (dt.domNr (tOf ⟨n, hlt⟩))))
             (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st v) := by
         simp only [ixGatesFs]
-        rw [dif_pos hlt]
+        rw [dite_eq_left hlt]
       rw [hstep, ctlBit_gateFlagC_ixGate_domHolds (F := F) (hhas := hhasP) (hinj := hinj)
         (helt := heltP) (b := bOf ⟨n, hlt⟩) (st := st) (t := tOf ⟨n, hlt⟩)
         (hc := hc) (hn := hnG) (hrd := hrdG) (vAdr := v) hzo _, hEnter, ih]
@@ -2274,7 +2274,7 @@ theorem ctlBit_gateFlagC_ixGatesFs (hzo : PR.zero ≠ PR.one)
           dt.ixGatesFs F PR.zero PR.one hhasP vi st v bOf hc hnG hrdG tOf enterSt
             f₀ n := by
         simp only [ixGatesFs]
-        rw [dif_neg hlt]
+        rw [dite_eq_right hlt]
       rw [hstep, ih]
       refine and_congr Iff.rfl (forall_congr' fun ℓ => ?_)
       constructor

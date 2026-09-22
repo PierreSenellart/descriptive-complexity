@@ -178,7 +178,7 @@ theorem blkNextB_eq [Nonempty A] [Nonempty K] (b : Option K) :
   have hlinB := Wide.isLinOrd_blkTagLe K
   by_cases hex : ∃ c : Option K, WMLt (Wide.blkTagLe K) b c
   · have hsucc := (exists_ixSucc (Wide.blkTagLe K) hlinB hex).choose_spec
-    rw [blkNextTag, dif_pos hex]
+    rw [blkNextTag, dite_eq_left hex]
     -- the index above `(b, tupTop)` exists, its block is above `b`
     have hlt : WMLt (Wide.blkLe K A dd) (b, tupTop A dd)
         ((exists_ixSucc (Wide.blkTagLe K) hlinB hex).choose, fun _ => Classical.arbitrary A) :=
@@ -203,7 +203,7 @@ theorem blkNextB_eq [Nonempty A] [Nonempty K] (b : Option K) :
       rw [blkNextB, hb3']
       exact hlinB.1 _
   · -- no block above: the sweep stays where it is
-    rw [blkNextTag, dif_neg hex]
+    rw [blkNextTag, dite_eq_right hex]
     have htop : ∀ v : Wide.BlkIx K A dd, Wide.blkLe K A dd v (b, tupTop A dd) := by
       intro v
       rcases hlinB.2.2.2 v.1 b with hb | hb
@@ -308,11 +308,11 @@ theorem uRulesDefinable_nexEvalRule {PM SM B : Type} {nv : ℕ} {ShM : SM → Ty
         (fun _ _ _ => rfl) fun _ _ _ => rfl
     | .dsp =>
       by_cases hk : (k : ℕ) < nv
-      · simp only [nexEvalRule, dif_pos hk]
+      · simp only [nexEvalRule, dite_eq_left hk]
         exact uRuleDefinable_of_keep ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_true fun _ => trivial⟩ uGDefinable_exitG (fun _ _ _ => rfl)
           fun _ _ _ => rfl
-      · simp only [nexEvalRule, dif_neg hk]
+      · simp only [nexEvalRule, dite_eq_right hk]
         exact uRuleDefinable_of_keep ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_true fun _ => trivial⟩ uGDefinable_exitG (fun _ _ _ => rfl)
           fun _ _ _ => rfl
@@ -405,11 +405,11 @@ theorem uStDefinable_st0 [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx) :
   · refine (uSlotDefinable_zero (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)).congr
       fun e f _ => ?_
     change dt.ctlOf coord f (blkBot e.α dt.KIx dt.dd).2 q = e.zero
-    rw [ctlOf, dif_pos hq]
+    rw [ctlOf, dite_eq_left hq]
     exact snd_blkBot_apply e.hbot _
   · refine (uSlotDefinable_ctl (L := L) (W := dt.SlotIx) q).congr fun e f _ => ?_
     change dt.ctlOf coord f (blkBot e.α dt.KIx dt.dd).2 q = f q
-    rw [ctlOf, dif_neg hq]
+    rw [ctlOf, dite_eq_right hq]
 
 omit [DecidableEq dt.SlotIx] in
 /-- **The first-register test is definable**: the pointer is at the file's first
@@ -534,7 +534,7 @@ theorem uStDefinable_ptrNext [Nonempty dt.KIx] {coord : Fin dt.dd → dt.CtlIx}
       have hex : ∃ j' : Fin dt.dd, coord j' = coord j := ⟨j, rfl⟩
       change (if h : ∃ j' : Fin dt.dd, coord j' = coord j then
         (blkNext e.α dt.KIx dt.dd (b, dt.ptrTup coord f)).2 h.choose else f (coord j)) = _
-      rw [dif_pos hex, hcoord hex.choose_spec]
+      rw [dite_eq_left hex, hcoord hex.choose_spec]
     by_cases hb : b = blkTopB dt.KIx
     · -- the last block: the advance is the tuple's successor, itself at the top
       refine (uSlotDefinable_tupNext_coord coord j).congr fun e f _ => ?_
@@ -576,7 +576,7 @@ theorem uStDefinable_ptrNext [Nonempty dt.KIx] {coord : Fin dt.dd → dt.CtlIx}
         rw [hval e f, blkNext_snd_of_ne_tupTop (hno ())]
   · refine (uSlotDefinable_ctl (L := L) (W := dt.SlotIx) q).congr fun e f _ => ?_
     change dt.ptrNext coord b f q = f q
-    rw [ptrNext, dif_neg hq]
+    rw [ptrNext, dite_eq_right hq]
 
 end BuildSpec
 

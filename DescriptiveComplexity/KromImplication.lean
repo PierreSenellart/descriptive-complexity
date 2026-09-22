@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.SecondOrderKrom
 import DescriptiveComplexity.TwoCnf
-import Mathlib.Data.Finite.Sigma
+import Mathlib.Basic.Finite.Sigma
 
 /-!
 # The implication graph of a Krom program

@@ -355,7 +355,7 @@ omit [(Language.qbf k).Structure A] in
 theorem altBlockOf_stG {i : Fin (k + 1)} (hi : (i : ℕ) < k) (d : Bool) :
     altBlockOf (stG i d : AltV k A) = (i : ℕ) := by
   simp only [altBlockOf, acstI, stG]
-  exact if_pos hi
+  exact ite_eq_left hi
 
 omit [(Language.qbf k).Structure A] in
 theorem altBlockOf_stChk (f d : Bool) (c : A) :
@@ -401,7 +401,7 @@ theorem altMachine_blocksWellFormed (cnf : Bool) (hk : 0 < k) :
   · rintro q ⟨hq, -⟩
     change (0 : ℕ) = altBlockOf q
     simp only [altBlockOf, hq]
-    exact (if_pos hk).symm
+    exact (ite_eq_left hk).symm
 
 end Machine
 

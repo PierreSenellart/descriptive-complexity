@@ -58,7 +58,7 @@ omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrde
 theorem initBack_wmSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     (x : Univ A R P K dd) : PR.initBack (wmSeg x) = PR.mark x := by
   funext s
-  rw [initBack, dif_pos ⟨x, rfl⟩]
+  rw [initBack, dite_eq_left ⟨x, rfl⟩]
   have hspec := (⟨x, rfl⟩ : ∃ y : Univ A R P K dd, wmSeg x = wmSeg y).choose_spec
   rw [show (⟨x, rfl⟩ : ∃ y : Univ A R P K dd, wmSeg x = wmSeg y).choose = x from
     (wmSeg_injective hlin hspec).symm]
@@ -69,7 +69,7 @@ omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrde
 theorem initBack_of_not_reg {r : Univ A R P K dd → Prop}
     (hno : ∀ x : Univ A R P K dd, r ≠ wmSeg x) : PR.initBack r = PR.blank := by
   funext s
-  rw [initBack, dif_neg fun hc => hno _ hc.choose_spec]
+  rw [initBack, dite_eq_right fun hc => hno _ hc.choose_spec]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
@@ -86,12 +86,12 @@ theorem trackTape_initBack {t₀ : W}
     else PR.initBack r s) = PR.initBack r s
   by_cases hs : s = t₀
   · subst hs
-    rw [if_pos rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc)]
+    rw [ite_eq_left rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc)]
     rw [initBack]
     split
     · exact (hmk _).symm
     · exact hb.symm
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
@@ -112,12 +112,12 @@ theorem trackTapeAt_initBack {J : Type} (cell : J → (Univ A R P K dd → Prop)
     else PR.initBack r s) = PR.initBack r s
   by_cases hs : s = t₀
   · subst hs
-    rw [if_pos rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc)]
+    rw [ite_eq_left rfl, bitVal_neg (by rintro ⟨u, -, hc⟩; exact hc)]
     rw [initBack]
     split
     · exact (hmk _).symm
     · exact hb.symm
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
 
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in

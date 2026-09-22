@@ -516,7 +516,7 @@ theorem stageSt_old
       (dt.d.partStage (dt.X.Map A) n) ih hbelow hbot (s₁ := ltpAddr) hlt
       ltpAddr (wmSetLe_of_empty hlin (fun _ hc => hc) ltpAddr)
       ((isLinOrd_wmSetLe hlin).1 ltpAddr)
-    rw [dt.stageSt_succ hlin hord mV semG ltpAddr st₀ f₀ n, hcopy, if_pos hs,
+    rw [dt.stageSt_succ hlin hord mV semG ltpAddr st₀ f₀ n, hcopy, ite_eq_left hs,
       dt.d.partStage_succ (A := dt.X.Map A) n]
     exact (dt.stEndB_new_off (PR := dt.progOf zero one hzo hpl) (aT := aT) (wmSegFile hlin) hord mV
       semG ltpAddr _

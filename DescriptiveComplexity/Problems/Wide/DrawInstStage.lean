@@ -185,8 +185,8 @@ theorem readLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
       rw [readLv_setCtl_bitFlagC]
     rw [hadv]
     by_cases hb : dt.lvSet st vi (ts ℓ) (dt.stageXS zero vi iv ts ℓ w)
-    · rw [if_pos hb, hset, ih, ofLex_eq_tupNext_of_covers hwz hnb]
-    · rw [if_neg hb, hset, ih, ofLex_eq_tupNext_of_covers hwz hnb]
+    · rw [ite_eq_left hb, hset, ih, ofLex_eq_tupNext_of_covers hwz hnb]
+    · rw [ite_eq_right hb, hset, ih, ofLex_eq_tupNext_of_covers hwz hnb]
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- The post-store control's loop element is still the round's tuple. -/
@@ -207,9 +207,9 @@ theorem readLv_stageIter1 (b : Lex (Fin dt.dd0 → A)) :
     rw [readLv_setCtl_bitFlagC]
   rw [tupleIter1]
   by_cases hb : dt.lvSet st vi (ts ℓ) (dt.stageXS zero vi iv ts ℓ b)
-  · rw [if_pos hb, hset]
+  · rw [ite_eq_left hb, hset]
     exact readLv_stageIter0 RF b
-  · rw [if_neg hb, hset]
+  · rw [ite_eq_right hb, hset]
     exact readLv_stageIter0 RF b
 
 end Iter
@@ -436,7 +436,7 @@ theorem stageTuple_run :
     intro a
     rw [tupleIter1]
     by_cases hb : dt.lvSet st vi (ts ℓ) (dt.stageXS PR.zero vi iv ts ℓ a)
-    · rw [if_pos hb]
+    · rw [ite_eq_left hb]
       change dt.ctlBit PR.one (dt.setCtl PR.zero PR.one dt.bitFlagC
         (true = true)
         (tupleIter0 (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
@@ -447,7 +447,7 @@ theorem stageTuple_run :
         dt.bitFlagC ↔ _
       rw [ctlBit_setCtl_self hzo]
       exact ⟨fun _ => hb, fun _ => rfl⟩
-    · rw [if_neg hb]
+    · rw [ite_eq_right hb]
       change dt.ctlBit PR.one (dt.setCtl PR.zero PR.one dt.bitFlagC
         (false = true)
         (tupleIter0 (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
@@ -627,8 +627,8 @@ theorem stageTgtD_congr_scratch {st' : TapeStD dt A R P}
   | succ n ih =>
     simp only [stageTgtD]
     by_cases hn : n < dt.d.B.arity iv
-    · rw [dif_pos hn, dif_pos hn, hlv, ih]
-    · rw [dif_neg hn, dif_neg hn, ih]
+    · rw [dite_eq_left hn, dite_eq_left hn, hlv, ih]
+    · rw [dite_eq_right hn, dite_eq_right hn, ih]
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The control of the copy loops is blind to them too** – the
@@ -653,10 +653,10 @@ theorem stageFAt_congr_scratch {st' : TapeStD dt A R P}
   | succ n ih =>
     simp only [stageFAt]
     by_cases hn : n < dt.d.B.arity iv
-    · rw [dif_pos hn, dif_pos hn, hlv, ih,
+    · rw [dite_eq_left hn, dite_eq_left hn, hlv, ih,
         dt.stageTgtD_congr_scratch h n]
       exact tupleIter1_congr_restF hrest _ _ _ _ _
-    · rw [dif_neg hn, dif_neg hn, ih]
+    · rw [dite_eq_right hn, dite_eq_right hn, ih]
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
@@ -699,7 +699,7 @@ theorem stageTgtD_iff (n : ℕ) (y : Univ A R P dt.KIx dt.dd) :
             (dt.stageXD zero iv ⟨n, hlt⟩)
             (toLex topTup) := by
         simp only [stageTgtD]
-        rw [dif_pos hlt]
+        rw [dite_eq_left hlt]
       rw [hstep]
       constructor
       · rintro (⟨hy, hsrc⟩ | ⟨hne, hD⟩)
@@ -740,7 +740,7 @@ theorem stageTgtD_iff (n : ℕ) (y : Univ A R P dt.KIx dt.dd) :
     · have hstep : dt.stageTgtD zero vi iv ts st v (n + 1) =
           dt.stageTgtD zero vi iv ts st v n := by
         simp only [stageTgtD]
-        rw [dif_neg hlt]
+        rw [dite_eq_right hlt]
       rw [hstep, ih]
       constructor
       · rintro ⟨ℓ, u, hℓ, hy, hsrc⟩
@@ -840,7 +840,7 @@ theorem stageChain_run :
           (dt.stageXS PR.zero vi iv ts ℓ) (dt.stageXD PR.zero iv ℓ)
           (toLex topTup) := by
       simp only [stageTgtD]
-      rw [dif_pos ℓ.isLt]
+      rw [dite_eq_left ℓ.isLt]
     have hFa1 : dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀
         ((ℓ : ℕ) + 1) =
         tupleIter1 (dt.stageArgs PR.zero PR.one vi iv ts av).setBit
@@ -853,7 +853,7 @@ theorem stageChain_run :
           (dt.stageFAt RF PR.zero PR.one vi iv ts av st v f₀ (ℓ : ℕ))
           (toLex topTup) := by
       simp only [stageFAt]
-      rw [dif_pos ℓ.isLt]
+      rw [dite_eq_left ℓ.isLt]
     -- the entry tape, re-walked at the source track
     have htin : PR.trackTapeAt RF.cell Slot.mir
         (dt.back RF.cell PR.zero PR.one dt.dd0Le

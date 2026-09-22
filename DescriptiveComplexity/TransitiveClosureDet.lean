@@ -141,12 +141,12 @@ theorem realize_detStep (m n : spec.Mode) (x y : Fin spec.k → A) :
     have hc := hm hz
     by_cases hmn : m' = n
     · refine ⟨hmn, ?_⟩
-      rw [if_pos hmn, Formula.realize_iInf] at hc
+      rw [ite_eq_left hmn, Formula.realize_iInf] at hc
       funext i
       have := hc i
       rw [Formula.realize_equal, Term.realize_var, Term.realize_var] at this
       exact this
-    · rw [if_neg hmn, Formula.realize_bot] at hc
+    · rw [ite_eq_right hmn, Formula.realize_bot] at hc
       exact hc.elim
   · refine Formula.realize_iAlls.mpr fun z => ?_
     rw [Formula.realize_imp, Formula.realize_relabel]
@@ -156,7 +156,7 @@ theorem realize_detStep (m n : spec.Mode) (x y : Fin spec.k → A) :
     rw [hrel]
     intro hz
     obtain ⟨hmn, hzy⟩ := h m' z hz
-    rw [if_pos hmn, Formula.realize_iInf]
+    rw [ite_eq_left hmn, Formula.realize_iInf]
     intro i
     rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
     exact congrFun hzy i

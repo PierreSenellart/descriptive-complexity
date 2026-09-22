@@ -263,14 +263,14 @@ theorem realize_bddRelF_base {k : ℕ} (R : L.Relations k) (a : Fin k → A)
     letI := bddHostStruc (L := L) A ρ
     (bddRelF L d B (Sum.inl (Sum.inl R)) (fun _ => false)).Realize w ↔ RelMap R a := by
   let := bddHostStruc (L := L) A ρ
-  rw [bddRelF, if_pos (fun _ => rfl), LHom.realize_onFormula, Formula.realize_rel]
+  rw [bddRelF, ite_eq_left (fun _ => rfl), LHom.realize_onFormula, Formula.realize_rel]
   exact iff_of_eq (congrArg _ (funext fun i => hw i 0))
 
 omit [L.IsRelational] [L.Structure A] in
 /-- **A base symbol never holds of an invented point.** -/
 theorem bddRelF_base_eq_bot {k : ℕ} (R : L.Relations k) (τ : Fin k → Bool)
     (h : ¬∀ i, τ i = false) : bddRelF L d B (Sum.inl (Sum.inl R)) τ = ⊥ := by
-  rw [bddRelF, if_neg h]
+  rw [bddRelF, ite_eq_right h]
 
 omit [L.IsRelational] in
 /-- **The marker `old` holds exactly of the original points.** -/
@@ -280,8 +280,8 @@ theorem realize_bddRelF_old (τ : Fin 1 → Bool) (w : Fin 1 × Fin d → A) :
   let := bddHostStruc (L := L) A ρ
   rw [bddRelF]
   by_cases h : τ 0 = false
-  · rw [if_pos h]; simp [h]
-  · rw [if_neg h]; simp [h]
+  · rw [ite_eq_left h]; simp [h]
+  · rw [ite_eq_right h]; simp [h]
 
 omit [L.IsRelational] in
 /-- **A relation variable of the block** is read off the pulled variable
@@ -406,7 +406,7 @@ theorem bddBack_bddPoint {e : Fin m → Fin d → A} (he : Function.Injective e)
   | inr i =>
     have hex : ∃ j, e j = e i := ⟨i, rfl⟩
     change (if h : ∃ j, e j = e i then Sum.inr h.choose else Sum.inl ((e i) 0)) = Sum.inr i
-    rw [dif_pos hex]
+    rw [dite_eq_left hex]
     exact congrArg Sum.inr (he hex.choose_spec)
 
 open Classical in

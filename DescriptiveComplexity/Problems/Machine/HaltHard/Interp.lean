@@ -441,7 +441,7 @@ theorem realize_revLexLtF {γ : Type} {p q : Fin (dimOf V) → γ} {v : γ → A
     refine ⟨j, by simpa using hr.1, ?_⟩
     intro j' hj'
     have h := hr.2 _ (List.mem_map.mpr ⟨j', List.mem_finRange j', rfl⟩)
-    rw [if_pos (show (j : ℕ) < (j' : ℕ) from hj')] at h
+    rw [ite_eq_left (show (j : ℕ) < (j' : ℕ) from hj')] at h
     simpa using h
   · rintro ⟨j, hj, htl⟩
     refine ⟨_, List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩, ?_⟩
@@ -450,9 +450,9 @@ theorem realize_revLexLtF {γ : Type} {p q : Fin (dimOf V) → γ} {v : γ → A
     intro φ hφ
     obtain ⟨j', -, rfl⟩ := List.mem_map.mp hφ
     by_cases h : (j : ℕ) < (j' : ℕ)
-    · rw [if_pos h]
+    · rw [ite_eq_left h]
       simpa using htl j' h
-    · rw [if_neg h]
+    · rw [ite_eq_right h]
       simp
 
 theorem relMap_posn (t : HTag V cF cP) (w : Fin (dimOf V) → A) :
@@ -485,11 +485,11 @@ theorem relMap_unary (Q : SimU (allCode cF cP) → Prop)
   | inl u =>
     by_cases hQ : Q u
     · rw [show mUnaryF V cF cP Q (Sum.inl u) = if Q u then canonF 0 (sel₀ V) else ⊥ from rfl,
-        if_pos hQ, realize_canonF]
+        ite_eq_left hQ, realize_canonF]
       simp only [Sum.inl.injEq]
       exact ⟨fun h => ⟨⟨u, rfl, hQ⟩, h⟩, fun h => h.2⟩
     · rw [show mUnaryF V cF cP Q (Sum.inl u) = if Q u then canonF 0 (sel₀ V) else ⊥ from rfl,
-        if_neg hQ]
+        ite_eq_right hQ]
       refine iff_of_false (by simp) ?_
       rintro ⟨⟨u', hu, hQ'⟩, -⟩
       obtain rfl : u' = u := by simpa using hu.symm
@@ -514,7 +514,7 @@ theorem relMap_binary (Q : SimU (allCode cF cP) → SimU (allCode cF cP) → Pro
     · by_cases hQ : Q u u'
       · rw [show mBinaryF V cF cP Q (Sum.inl u) (Sum.inl u') =
             if Q u u' then canonF 0 (selA V) ⊓ canonF 0 (selB V) else ⊥ from rfl,
-          if_pos hQ, Formula.realize_inf, realize_canonF, realize_canonF]
+          ite_eq_left hQ, Formula.realize_inf, realize_canonF, realize_canonF]
         constructor
         · rintro ⟨h1, h2⟩
           exact ⟨⟨u, u', rfl, rfl, hQ⟩, h1, h2⟩
@@ -522,7 +522,7 @@ theorem relMap_binary (Q : SimU (allCode cF cP) → SimU (allCode cF cP) → Pro
           exact ⟨h1, h2⟩
       · rw [show mBinaryF V cF cP Q (Sum.inl u) (Sum.inl u') =
             if Q u u' then canonF 0 (selA V) ⊓ canonF 0 (selB V) else ⊥ from rfl,
-          if_neg hQ]
+          ite_eq_right hQ]
         refine iff_of_false (by simp) ?_
         rintro ⟨⟨u₁, u₂, h1, h2, hQ'⟩, -⟩
         obtain rfl : u₁ = u := by simpa using h1.symm
@@ -542,9 +542,9 @@ theorem relMap_le (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
   classical
   rw [hLe_def]
   rcases lt_trichotomy (blockIdx V cF cP t) (blockIdx V cF cP t') with h | h | h
-  · rw [hLeF, if_pos h]
+  · rw [hLeF, ite_eq_left h]
     exact iff_of_true (by simp) (Or.inl h)
-  · rw [hLeF, if_neg (by omega), if_neg (by omega), Formula.realize_sup,
+  · rw [hLeF, ite_eq_right (by omega), ite_eq_right (by omega), Formula.realize_sup,
       Formula.realize_inf, realize_revLexLtF, realize_eqTupF]
     constructor
     · rintro (hr | ⟨he, hs⟩)
@@ -553,7 +553,7 @@ theorem relMap_le (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
         · funext j
           exact (congrFun he j).symm
         · by_contra hcon
-          rw [if_neg hcon] at hs
+          rw [ite_eq_right hcon] at hs
           simp at hs
     · rintro (hlt | ⟨-, hr | ⟨he, hs⟩⟩)
       · omega
@@ -561,9 +561,9 @@ theorem relMap_le (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
       · refine Or.inr ⟨?_, ?_⟩
         · funext j
           exact (congrFun he j).symm
-        · rw [if_pos hs]
+        · rw [ite_eq_left hs]
           simp
-  · rw [hLeF, if_neg (by omega), if_pos h]
+  · rw [hLeF, ite_eq_right (by omega), ite_eq_left h]
     refine iff_of_false (by simp) ?_
     rintro (hlt | ⟨he, -⟩) <;> omega
 

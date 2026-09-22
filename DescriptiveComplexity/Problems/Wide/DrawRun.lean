@@ -226,7 +226,7 @@ theorem initBack_eq_back
       exact hvy
     | .name j =>
       change u.2 _ = _
-      rw [back_name, dif_pos ⟨u, rfl⟩]
+      rw [back_name, dite_eq_left ⟨u, rfl⟩]
       have hspec :=
         (⟨u, rfl⟩ : ∃ v : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd,
           wmSeg u = wmSeg v).choose_spec
@@ -249,7 +249,7 @@ theorem initBack_eq_back
     | .regLast => exact (hno _ (fun h => hr ⟨h.choose, h.choose_spec.1⟩)).symm
     | .blk b => exact (hno _ (fun h => hr ⟨h.choose, h.choose_spec.1⟩)).symm
     | .pdd => exact (hno _ (fun h => hr ⟨h.choose, h.choose_spec.1⟩)).symm
-    | .name j => exact (by rw [back_name, dif_neg hr] : _ = zero).symm
+    | .name j => exact (by rw [back_name, dite_eq_right hr] : _ = zero).symm
     | .mir => exact (hno _ (fun h => hr ⟨h.choose, h.choose_spec.1⟩)).symm
     | .tgt => exact (hno _ (fun h => hr ⟨h.choose, h.choose_spec.1⟩)).symm
     | .sav => exact (hno _ (fun h => hr ⟨h.choose, h.choose_spec.1⟩)).symm
@@ -346,7 +346,7 @@ theorem step_start (hR : (dt.prog zero one hzo args hpl).table.Reads)
         · subst hm
           change (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _) =
             (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _)
-          rw [if_pos rfl, if_pos rfl]
+          rw [ite_eq_left rfl, ite_eq_left rfl]
         · rw [Prog.passTracks_of_ne hm, Prog.passTracks_of_ne hm]
           exact hoth _ s hw hb
   refine Prog.step_move hR hlin hi hframe ?_
@@ -396,9 +396,9 @@ theorem trackTape_back {st st' : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
   change (if s = t then bitVal zero one (regBit m r) else _) = _
   by_cases hs : s = t
   · subst hs
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     exact (ht r).symm
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     exact hagree r s hs
 
 omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
@@ -928,7 +928,7 @@ theorem reaches_reset1 (hR : (dt.prog zero one hzo args hpl).table.Reads)
         · subst hm
           change (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _) =
             (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _)
-          rw [if_pos rfl, if_pos rfl]
+          rw [ite_eq_left rfl, ite_eq_left rfl]
         · rw [Prog.passTracks_of_ne hm, Prog.passTracks_of_ne hm]
           match s with
           | .wk => exact absurd rfl hw
@@ -1260,8 +1260,8 @@ theorem reaches_copy (hR : (dt.prog zero one hzo args hpl).table.Reads)
         rw [wmSetLt_iff_of_wmIncr hlin hi r, wmSetLt_iff r s]
         exact ⟨fun h => ⟨h, hr⟩, fun h => h.1⟩
       by_cases hc : WMSetLt WMLe r s
-      · rw [if_pos (hiff.mpr hc), if_pos hc]
-      · rw [if_neg (fun h => hc (hiff.mp h)), if_neg hc]
+      · rw [ite_eq_left (hiff.mpr hc), ite_eq_left hc]
+      · rw [ite_eq_right (fun h => hc (hiff.mp h)), ite_eq_right hc]
     | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .mir | .tgt
     | .sav | .val | .wk | .bot | .ltp | .new _ => rfl
   · -- the rewrite at the frontier's own cell
@@ -1286,7 +1286,7 @@ theorem reaches_copy (hR : (dt.prog zero one hzo args hpl).table.Reads)
           fun h => nomatch h)]
       change bitVal zero one ((dt.copySt zero one hzo args st s).new i s) =
         bitVal zero one ((dt.copySt zero one hzo args st u).old i s)
-      simp only [copySt, if_pos hsu]
+      simp only [copySt, ite_eq_left hsu]
     · have hL : (dt.copyKit (A := A) (Q := Q) (P := dt.PF) OuterPh.copyP).wrG
           ((dt.prog zero one hzo args hpl).passTracksAt wmSeg Slot.mir
             (dt.back wmSeg zero one dt.dd0Le (dt.copySt zero one hzo args st s))
@@ -1303,7 +1303,7 @@ theorem reaches_copy (hR : (dt.prog zero one hzo args hpl).table.Reads)
       · subst hm
         change (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _) =
           (if (Slot.mir : dt.SlotIx) = Slot.mir then _ else _)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne hm, Prog.passTracks_of_ne hm]
         match sl with
         | .old i => exact absurd ⟨i, rfl⟩ ho

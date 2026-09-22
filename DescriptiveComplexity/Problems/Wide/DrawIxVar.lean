@@ -613,7 +613,7 @@ theorem ixValCarry_eq (hix : IsLinOrd F.le)
     dt.ixValCarry F m = some u₀ := by
   classical
   have hex : ∃ u : I, ¬m u ∧ ∀ w, WMLt F.le u w → m w := ⟨u₀, h1, h2⟩
-  rw [ixValCarry, dif_pos hex]
+  rw [ixValCarry, dite_eq_left hex]
   obtain ⟨hc1, hc2⟩ := hex.choose_spec
   refine congrArg some ?_
   by_contra hne

@@ -284,16 +284,16 @@ theorem realize_meanFlipB :
     obtain ⟨u, hu, h1, h2⟩ := h (fun o => o.elim v y) ⟨hv, hy⟩
     refine ⟨u 0, hu, h1, fun i' hii w => ?_⟩
     have := h2 i'
-    rw [if_neg hii, Formula.realize_iAlls] at this
+    rw [ite_eq_right hii, Formula.realize_iAlls] at this
     simp only [Formula.realize_iff, realize_meanAtomB] at this
     exact this w
   · intro h u hg
     obtain ⟨v, hv, h1, h2⟩ := h (u none) (fun j => u (some j)) hg.1 hg.2
     refine ⟨fun _ => v, hv, h1, fun i' => ?_⟩
     by_cases hii : i' = i
-    · rw [if_pos hii]
+    · rw [ite_eq_left hii]
       exact Formula.realize_top.mpr trivial
-    · rw [if_neg hii, Formula.realize_iAlls]
+    · rw [ite_eq_right hii, Formula.realize_iAlls]
       simp only [Formula.realize_iff, realize_meanAtomB]
       exact h2 i' hii
 

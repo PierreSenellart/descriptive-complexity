@@ -136,9 +136,9 @@ theorem realize_tagGuardF (σ : (B.withTag T).Assignment A) :
       rw [Subsingleton.elim x default]
       have := hrest _ (List.mem_map.mpr ⟨t', mem_finEnum t', rfl⟩)
       rcases eq_or_ne t' t with rfl | hne
-      · rw [if_pos rfl] at this
+      · rw [ite_eq_left rfl] at this
         exact propext ⟨fun _ => rfl, fun _ => (realize_tagBitF σ t').mp hset⟩
-      · rw [if_neg hne, Formula.realize_not, realize_tagBitF] at this
+      · rw [ite_eq_right hne, Formula.realize_not, realize_tagBitF] at this
         exact propext ⟨fun h => absurd h this, fun h => absurd h hne⟩
   · rintro ⟨t, ρ, rfl⟩
     refine ⟨_, List.mem_map.mpr ⟨t, mem_finEnum t, rfl⟩, ?_⟩
@@ -146,9 +146,9 @@ theorem realize_tagGuardF (σ : (B.withTag T).Assignment A) :
     refine ⟨(realize_tagBitF _ t).mpr rfl, fun ψ hψ => ?_⟩
     obtain ⟨t', -, rfl⟩ := List.mem_map.mp hψ
     rcases eq_or_ne t' t with rfl | hne
-    · rw [if_pos rfl]
+    · rw [ite_eq_left rfl]
       exact Formula.realize_top.mpr trivial
-    · rw [if_neg hne, Formula.realize_not, realize_tagBitF]
+    · rw [ite_eq_right hne, Formula.realize_not, realize_tagBitF]
       exact hne
 
 end SOBlock

@@ -184,7 +184,7 @@ theorem sweepTape_posStart (νs : Fin k → A → Prop) (i : ℕ) :
   obtain ⟨⟨t, j⟩, w⟩ := q
   cases t <;> simp only [sweepTape, tapeAfter]
   refine if_congr Iff.rfl ?_ rfl
-  refine if_neg ?_
+  refine ite_eq_right ?_
   rintro ⟨hle, -⟩
   have h := altBaseIdx_le_of_tag_le (altTagTupleLe_tag_le hle)
   exact absurd h (show ¬(altBaseIdx AltBase.pCell ≤ altBaseIdx AltBase.pStart) by decide)
@@ -197,7 +197,7 @@ theorem sweepTape_posEnd (νs : Fin k → A → Prop) (i : ℕ) :
   obtain ⟨⟨t, j⟩, w⟩ := q
   cases t <;> simp only [sweepTape, tapeAfter]
   refine if_congr Iff.rfl ?_ rfl
-  refine if_pos ⟨altTagTupleLe_of_tag_lt (altTag_lt_of_base_lt (by decide) j 0), ?_⟩
+  refine ite_eq_left ⟨altTagTupleLe_of_tag_lt (altTag_lt_of_base_lt (by decide) j 0), ?_⟩
   intro hcon
   exact absurd (congrArg (fun p => p.1.1) hcon) (show ¬(AltBase.pCell = AltBase.pEnd) by decide)
 
@@ -212,7 +212,7 @@ theorem sweepTape_frame (νs : Fin k → A → Prop) (i : ℕ) {p q r : AltV k A
   obtain ⟨⟨t, j⟩, w⟩ := r
   cases t <;> simp only [sweepTape]
   by_cases hcell : IsCellTup (((AltBase.pCell, j), w) : AltV k A)
-  · rw [if_pos hcell, if_pos hcell]
+  · rw [ite_eq_left hcell, ite_eq_left hcell]
     refine if_congr ?_ rfl rfl
     constructor
     · rintro ⟨hle, hne⟩
@@ -227,7 +227,7 @@ theorem sweepTape_frame (νs : Fin k → A → Prop) (i : ℕ) {p q r : AltV k A
       refine ⟨isLinOrd_altTagTupleLe.2.1 _ p q hle hsucc.2.2.1, ?_⟩
       rintro rfl
       exact hsucc.2.2.2.1 (isLinOrd_altTagTupleLe.2.2.1 _ _ hsucc.2.2.1 hle)
-  · rw [if_neg hcell, if_neg hcell]
+  · rw [ite_eq_right hcell, ite_eq_right hcell]
 
 /-! ### The rightward pass -/
 
@@ -248,15 +248,15 @@ theorem sweepTape_posCell_bot (i : ℕ) :
   obtain ⟨⟨t, j⟩, w⟩ := q
   cases t <;> simp only [sweepTape, tapeAfter]
   by_cases hcell : IsCellTup (((AltBase.pCell, j), w) : AltV k A)
-  · rw [if_pos hcell, if_pos hcell]
-    refine if_neg ?_
+  · rw [ite_eq_left hcell, ite_eq_left hcell]
+    refine ite_eq_right ?_
     rintro ⟨hle, hne⟩
     refine hne ?_
     have hq : (((AltBase.pCell, j), w) : AltV k A) = posCell (w 0) :=
       eq_posCell_of_posn (show AltPosn (((AltBase.pCell, j), w) : AltV k A) from hcell) rfl
     have hx : w 0 ≤ qbotA := posCell_le_iff.mp (hq ▸ hle)
     rw [hq, le_antisymm hx (qbotA_le _)]
-  · rw [if_neg hcell, if_neg hcell]
+  · rw [ite_eq_right hcell, ite_eq_right hcell]
 
 /-- **A sweep starts from the tape the sweeps below it left.** -/
 theorem tape_confSweep_bot (i : Fin (k + 1)) :
@@ -278,9 +278,9 @@ theorem isInit_confSweep (cnf : Bool) :
       | (refine Or.inr ⟨fun b hb => ?_, rfl, isMinTup2_qbot⟩
          rcases hb with ⟨h, -⟩ | ⟨h, -, -, -⟩ | ⟨h, -⟩ <;> simp at h)
       | (by_cases hcell : IsCellTup (((AltBase.pCell, j), w) : AltV k A)
-         · rw [if_pos hcell, valAfter_zero]
+         · rw [ite_eq_left hcell, valAfter_zero]
            exact Or.inl (Or.inr (Or.inl ⟨rfl, rfl, rfl, fun b => qbotA_le b⟩))
-         · rw [if_neg hcell]
+         · rw [ite_eq_right hcell]
            exact Or.inl (Or.inr (Or.inl ⟨rfl, rfl, rfl, fun b => qbotA_le b⟩)))
 
 variable {νs}
@@ -293,8 +293,8 @@ theorem sweepTape_at_head {i : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 
   simp only at hb
   subst hb
   simp only [sweepTape]
-  rw [if_pos (show IsCellTup (((AltBase.pCell, j), w) : AltV k A) from hp),
-    if_neg (fun hc => hc.2 rfl)]
+  rw [ite_eq_left (show IsCellTup (((AltBase.pCell, j), w) : AltV k A) from hp),
+    ite_eq_right (fun hc => hc.2 rfl)]
 
 /-- The value written under the head is the new one. -/
 theorem sweepTape_written {i : ℕ} {p q : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell)
@@ -305,8 +305,8 @@ theorem sweepTape_written {i : ℕ} {p q : AltV k A} (hp : AltPosn p) (hb : p.1.
   simp only at hb
   subst hb
   simp only [sweepTape]
-  rw [if_pos (show IsCellTup (((AltBase.pCell, j), w) : AltV k A) from hp),
-    if_pos ⟨hsucc.2.2.1, hsucc.2.2.2.1⟩]
+  rw [ite_eq_left (show IsCellTup (((AltBase.pCell, j), w) : AltV k A) from hp),
+    ite_eq_left ⟨hsucc.2.2.1, hsucc.2.2.2.1⟩]
 
 /-- **One step of a rightward pass.** At a cell the machine writes the value
 its block gives the variable – keeping the old one, or setting it – and moves
@@ -423,7 +423,7 @@ theorem tapeAfter_at_cell {m : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 
   simp only at hb
   subst hb
   simp only [tapeAfter]
-  rw [if_pos (show IsCellTup (((AltBase.pCell, j), w) : AltV k A) from hp)]
+  rw [ite_eq_left (show IsCellTup (((AltBase.pCell, j), w) : AltV k A) from hp)]
 
 theorem tapeAfter_posCell (i : ℕ) (x : A) :
     tapeAfter νs i (posCell x : AltV k A) = symV (valAfter νs i x) x :=

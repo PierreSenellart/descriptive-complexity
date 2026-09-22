@@ -950,14 +950,14 @@ theorem accStateAfter_succ (h : IsLinOrd ile) {u u' : I} (hs : IxSucc ile u u') 
       fun hall v hle => hall v ⟨h.2.1 u u' v hs.1.1 hle, fun hc => hs.1.2 (h.2.1 u' v u hle hc)⟩⟩
   unfold accStateAfter accState
   by_cases hc : ∀ v : I, WMLt ile u v → P v
-  · rw [if_pos (hiff.mpr hc), if_pos hc]
-  · rw [if_neg fun hcon => hc (hiff.mp hcon), if_neg hc]
+  · rw [ite_eq_left (hiff.mpr hc), ite_eq_left hc]
+  · rw [ite_eq_right fun hcon => hc (hiff.mp hcon), ite_eq_right hc]
 
 omit [Finite A] [Language.wide.Structure A] in
 /-- **At the last register nothing has been seen yet**, so the pass starts in the
 first state. -/
 theorem accState_top {top : I} (htop : ∀ v : I, ile v top) : accState ile P qy qn top = qy :=
-  if_pos fun v hlt => absurd (htop v) hlt.2
+  ite_eq_left fun v hlt => absurd (htop v) hlt.2
 
 omit [Finite A] [Language.wide.Structure A] in
 /-- A pass is in one of its two states, whatever it has seen. -/
@@ -971,13 +971,13 @@ omit [Finite A] [Language.wide.Structure A] in
 /-- **A pass that saw a failure ends in the second state.** -/
 theorem accStateAfter_bot_neg {bot : I} (hbot : ∀ v : I, ile bot v) {u : I} (hu : ¬P u) :
     accStateAfter ile P qy qn bot = qn :=
-  if_neg fun hall => hu (hall u (hbot u))
+  ite_eq_right fun hall => hu (hall u (hbot u))
 
 omit [Finite A] [Language.wide.Structure A] in
 /-- **A pass that saw no failure ends in the first state.** -/
 theorem accStateAfter_bot_pos {bot : I} (hall : ∀ u : I, P u) :
     accStateAfter ile P qy qn bot = qy :=
-  if_pos fun v _ => hall v
+  ite_eq_left fun v _ => hall v
 
 end Walk
 

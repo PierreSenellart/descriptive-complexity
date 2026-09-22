@@ -273,9 +273,9 @@ theorem passW_hENC (hzo : zero ≠ one)
       encMap dt.ly zero one (dt.passW RF zero one hzo hlin vi stV hp mbW j) := by
   rw [lvSet, lvBlk, passW]
   by_cases h : (j : ℕ) < dt.arOf vi
-  · rw [if_pos h, dif_pos h, dif_pos h]
+  · rw [ite_eq_left h, dite_eq_left h, dite_eq_left h]
     exact hmb ⟨(j : ℕ), h⟩
-  · rw [if_neg h, dif_neg h, dif_neg h]
+  · rw [ite_eq_right h, dite_eq_right h, dite_eq_right h]
     have hspec := ((dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV
       ⟨(j : ℕ) - dt.arOf vi, by
         have h1 := j.isLt
@@ -438,9 +438,9 @@ theorem igFlag_eq_existGateC_iff (vi : dt.VarIx) (ℓ : Fin (dt.nIn vi)) :
       dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = true := by
   rw [igFlag]
   by_cases hb : dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = true
-  · rw [if_pos hb]
+  · rw [ite_eq_left hb]
     exact iff_of_true rfl hb
-  · rw [if_neg hb]
+  · rw [ite_eq_right hb]
     refine iff_of_false (fun h => ?_) hb
     injection h with h'
     exact absurd h' (by decide)
@@ -456,11 +456,11 @@ theorem igFlag_eq_allGateC_iff (vi : dt.VarIx) (ℓ : Fin (dt.nIn vi)) :
       dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = false := by
   rw [igFlag]
   by_cases hb : dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = true
-  · rw [if_pos hb]
+  · rw [ite_eq_left hb]
     refine iff_of_false (fun h => ?_) (by rw [hb]; exact fun h => nomatch h)
     injection h with h'
     exact absurd h' (by decide)
-  · rw [if_neg hb]
+  · rw [ite_eq_right hb]
     exact iff_of_true rfl (Bool.eq_false_iff.mpr hb)
 
 variable {zero one} in
@@ -549,9 +549,9 @@ theorem levelVal_encMap (hzo : zero ≠ one)
         (dt.passW RF zero one hzo hlin vi stV hp mbW j) := by
   rw [levelVal, passW]
   by_cases h : (j : ℕ) < dt.arOf vi
-  · rw [dif_pos h, dif_pos h]
+  · rw [dite_eq_left h, dite_eq_left h]
     exact hmb ⟨(j : ℕ), h⟩
-  · rw [dif_neg h, dif_neg h]
+  · rw [dite_eq_right h, dite_eq_right h]
     have hspec := ((dt.igPassP_iff_isEnc RF zero one hzo hlin vi stV
       ⟨(j : ℕ) - dt.arOf vi, by
         have h1 := j.isLt

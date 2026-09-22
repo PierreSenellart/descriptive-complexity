@@ -188,22 +188,22 @@ theorem seq_reachesIn :
         refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
         refine hasRight_of_rule hrules (i := .chk j.castSucc) (ρ := .dspA)
           ?_ ?_ ?_ ?_ ?_ ?_
-        · rw [seqRule, dif_pos (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
+        · rw [seqRule, dite_eq_left (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
             from hkl)]
           exact ⟨hgwk j.castSucc, hgrg j.castSucc⟩
-        · rw [seqRule, dif_pos (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
+        · rw [seqRule, dite_eq_left (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
             from hkl)]
-        · rw [seqRule, dif_pos (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
+        · rw [seqRule, dite_eq_left (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
             from hkl)]
           rfl
-        · rw [seqRule, dif_pos (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
+        · rw [seqRule, dite_eq_left (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
             from hkl)]
           change enterSt j (fs j.castSucc)
             (PR.passTracksAt RF.cell t₀ (restOf j.castSucc) (mOf j.castSucc) v) = _
           rw [passTracks_of_back RF (hmOf j.castSucc) v]
-        · rw [seqRule, dif_pos (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
+        · rw [seqRule, dite_eq_left (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
             from hkl)]
-        · rw [seqRule, dif_pos (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
+        · rw [seqRule, dite_eq_left (show ((j.castSucc : Fin (n + 1)) : ℕ) < n
             from hkl)]
           trivial
       have hback : (wideData (Univ A R P K dd)).Step
@@ -243,13 +243,13 @@ theorem seq_reachesIn :
     refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
     refine hasRight_of_rule hrules (i := .chk (Fin.last n)) (ρ := .dspA)
       ?_ ?_ ?_ ?_ ?_ ?_
-    · rw [seqRule, dif_neg hnl]
+    · rw [seqRule, dite_eq_right hnl]
       exact ⟨hgwk (Fin.last n), hgrg (Fin.last n)⟩
-    · rw [seqRule, dif_neg hnl]
-    · rw [seqRule, dif_neg hnl]
-    · rw [seqRule, dif_neg hnl]
-    · rw [seqRule, dif_neg hnl]
-    · rw [seqRule, dif_neg hnl]
+    · rw [seqRule, dite_eq_right hnl]
+    · rw [seqRule, dite_eq_right hnl]
+    · rw [seqRule, dite_eq_right hnl]
+    · rw [seqRule, dite_eq_right hnl]
+    · rw [seqRule, dite_eq_right hnl]
       trivial
   have h0 := hchain 0 (Nat.zero_le n)
   rw [Nat.sub_zero] at h0
@@ -364,22 +364,22 @@ theorem seq_run_prefix (j : Fin (n + 1))
       refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
       refine hasRight_of_rule hrules (i := .chk a.castSucc) (ρ := .dspA)
         ?_ ?_ ?_ ?_ ?_ ?_
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         exact ⟨hgwk a.castSucc, hgrg a.castSucc⟩
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         rfl
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         change enterSt a (fs a.castSucc)
           (PR.passTracksAt RF.cell t₀ (restOf a.castSucc) (mOf a.castSucc) v) = _
         rw [passTracks_of_back RF (hmOf a.castSucc) v]
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         trivial
     have hback : (wideData (Univ A R P K dd)).Step
@@ -489,22 +489,22 @@ theorem seq_reachesIn_prefix (j : Fin (n + 1))
       refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
       refine hasRight_of_rule hrules (i := .chk a.castSucc) (ρ := .dspA)
         ?_ ?_ ?_ ?_ ?_ ?_
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         exact ⟨hgwk a.castSucc, hgrg a.castSucc⟩
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         rfl
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         change enterSt a (fs a.castSucc)
           (PR.passTracksAt RF.cell t₀ (restOf a.castSucc) (mOf a.castSucc) v) = _
         rw [passTracks_of_back RF (hmOf a.castSucc) v]
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
-      · rw [seqRule, dif_pos (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
+      · rw [seqRule, dite_eq_left (show ((a.castSucc : Fin (n + 1)) : ℕ) < n
           from hml)]
         trivial
     have hback : (wideData (Univ A R P K dd)).Step

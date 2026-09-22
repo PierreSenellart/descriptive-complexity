@@ -72,7 +72,7 @@ def blockSel {l : ℕ} (sel : Fin l → Fin k) : Fin k → Fin k :=
 theorem blockSel_castLE {l : ℕ} (sel : Fin l → Fin k) {a : ℕ} (ha : a ≤ k)
     (hal : a = l) (j : Fin a) :
     blockSel sel (Fin.castLE ha j) = sel (Fin.cast hal j) := by
-  rw [blockSel, dif_pos (show ((Fin.castLE ha j : Fin k) : ℕ) < l from hal ▸ j.isLt)]
+  rw [blockSel, dite_eq_left (show ((Fin.castLE ha j : Fin k) : ℕ) < l from hal ▸ j.isLt)]
   exact congrArg sel (Fin.ext rfl)
 
 open Classical in
@@ -383,7 +383,7 @@ theorem realize_pebbleCompile {m : ℕ} {ρ : B.Assignment A}
                 ![Term.var (Sum.inl 0), Term.var (Sum.inr 0)] ⟹
               (pebbleCompile g ψ (Fin.snoc h hfresh.choose)).relabel
                 fun _ => Sum.inr 0) := by
-        rw [pebbleCompile, dif_pos hfresh]
+        rw [pebbleCompile, dite_eq_left hfresh]
       rw [he, Formula.realize_iAlls]
       refine forall_congr' fun c => ?_
       rw [Formula.realize_imp, Formula.realize_relabel]
@@ -534,7 +534,7 @@ theorem invAssign_injOn {B : SOBlock} {S : Set (Σ n, L.Relations n)} {A : Type}
     change (if hq : ((Fin.castLE (harity i) p : Fin k) : ℕ) < B.arity i then
       y ⟨((Fin.castLE (harity i) p : Fin k) : ℕ), hq⟩ else
       Classical.arbitrary A) = y p
-    rw [dif_pos (show ((Fin.castLE (harity i) p : Fin k) : ℕ) < B.arity i from
+    rw [dite_eq_left (show ((Fin.castLE (harity i) p : Fin k) : ℕ) < B.arity i from
       p.isLt)]
     exact congrArg y (Fin.ext rfl)
   obtain ⟨u, hu⟩ := hy

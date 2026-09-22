@@ -374,32 +374,32 @@ theorem runs_bitFam (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : m
     have h1 : q ≠ y := fun he => by rw [he] at hq; exact absurd hh.lt_m_y (by omega)
     have h2 : q ≠ cnt := fun he => by rw [he] at hq; exact absurd hh.lt_m_cnt (by omega)
     have h3 : q ≠ tmk := fun he => by rw [he] at hq; exact absurd hh.lt_m_tmk (by omega)
-    rw [bitInitMoves, if_neg h1, if_neg h2, if_neg h3]
+    rw [bitInitMoves, ite_eq_right h1, ite_eq_right h2, ite_eq_right h3]
   | scanInit =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.lt_m_cand (by omega)
-    rw [bitScanInitMoves, if_neg h1]
+    rw [bitScanInitMoves, ite_eq_right h1]
   | parInit =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.lt_m_cand (by omega)
-    rw [bitScanInitMoves, if_neg h1]
+    rw [bitScanInitMoves, ite_eq_right h1]
   | scanStep =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.lt_m_cand (by omega)
-    rw [bitStepMoves, if_neg h1]
+    rw [bitStepMoves, ite_eq_right h1]
   | parStep =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.lt_m_cand (by omega)
-    rw [bitStepMoves, if_neg h1]
+    rw [bitStepMoves, ite_eq_right h1]
   | mkW =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ w := fun he => by rw [he] at hq; exact absurd hh.lt_m_w (by omega)
-    rw [bitWMoves, if_neg h1]
+    rw [bitWMoves, ite_eq_right h1]
   | commit =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ y := fun he => by rw [he] at hq; exact absurd hh.lt_m_y (by omega)
     have h2 : q ≠ cnt := fun he => by rw [he] at hq; exact absurd hh.lt_m_cnt (by omega)
-    rw [bitCommitMoves, if_neg h1, if_neg h2]
+    rw [bitCommitMoves, ite_eq_right h1, ite_eq_right h2]
   | outer =>
     exact (decides_leafP (HeadMove.eqVarF L cnt ih)
       ((BoundedFormula.IsAtomic.equal _ _).isQF)).congr fun x => by simp
@@ -627,17 +627,17 @@ theorem holds_bitInitMoves {x z : Fin K → A}
   classical
   refine ⟨?_, ?_, ?_, fun q hq hqy hqc hqt => ?_⟩
   · have := hmv y hh.lt_m_y
-    rw [bitInitMoves, if_pos rfl] at this
+    rw [bitInitMoves, ite_eq_left rfl] at this
     exact this
   · have := hmv cnt hh.lt_m_cnt
-    rw [bitInitMoves, if_neg (Ne.symm hh.ne_y_cnt), if_pos rfl] at this
+    rw [bitInitMoves, ite_eq_right (Ne.symm hh.ne_y_cnt), ite_eq_left rfl] at this
     exact this
   · have := hmv tmk hh.lt_m_tmk
-    rw [bitInitMoves, if_neg (Ne.symm hh.ne_y_tmk), if_neg (Ne.symm hh.ne_cnt_tmk),
-      if_pos rfl] at this
+    rw [bitInitMoves, ite_eq_right (Ne.symm hh.ne_y_tmk), ite_eq_right (Ne.symm hh.ne_cnt_tmk),
+      ite_eq_left rfl] at this
     exact this
   · have := hmv q hq
-    rw [bitInitMoves, if_neg hqy, if_neg hqc, if_neg hqt] at this
+    rw [bitInitMoves, ite_eq_right hqy, ite_eq_right hqc, ite_eq_right hqt] at this
     exact this
 
 omit [Finite A] in
@@ -648,10 +648,10 @@ theorem holds_bitScanInitMoves {x z : Fin K → A}
   classical
   refine ⟨?_, fun q hq hqc => ?_⟩
   · have := hmv cand hh.lt_m_cand
-    rw [bitScanInitMoves, if_pos rfl] at this
+    rw [bitScanInitMoves, ite_eq_left rfl] at this
     exact this
   · have := hmv q hq
-    rw [bitScanInitMoves, if_neg hqc] at this
+    rw [bitScanInitMoves, ite_eq_right hqc] at this
     exact this
 
 omit [Finite A] in
@@ -662,10 +662,10 @@ theorem holds_bitStepMoves {x z : Fin K → A}
   classical
   refine ⟨?_, fun q hq hqc => ?_⟩
   · have := hmv cand hh.lt_m_cand
-    rw [bitStepMoves, if_pos rfl] at this
+    rw [bitStepMoves, ite_eq_left rfl] at this
     exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
   · have := hmv q hq
-    rw [bitStepMoves, if_neg hqc] at this
+    rw [bitStepMoves, ite_eq_right hqc] at this
     exact this
 
 omit [Finite A] in
@@ -676,10 +676,10 @@ theorem holds_bitWMoves {x z : Fin K → A}
   classical
   refine ⟨?_, fun q hq hqw => ?_⟩
   · have := hmv w hh.lt_m_w
-    rw [bitWMoves, if_pos rfl] at this
+    rw [bitWMoves, ite_eq_left rfl] at this
     exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
   · have := hmv q hq
-    rw [bitWMoves, if_neg hqw] at this
+    rw [bitWMoves, ite_eq_right hqw] at this
     exact this
 
 omit [Finite A] in
@@ -690,13 +690,13 @@ theorem holds_bitCommitMoves {x z : Fin K → A}
   classical
   refine ⟨?_, ?_, fun q hq hqy hqc => ?_⟩
   · have := hmv y hh.lt_m_y
-    rw [bitCommitMoves, if_pos rfl] at this
+    rw [bitCommitMoves, ite_eq_left rfl] at this
     exact this
   · have := hmv cnt hh.lt_m_cnt
-    rw [bitCommitMoves, if_neg (Ne.symm hh.ne_y_cnt), if_pos rfl] at this
+    rw [bitCommitMoves, ite_eq_right (Ne.symm hh.ne_y_cnt), ite_eq_left rfl] at this
     exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
   · have := hmv q hq
-    rw [bitCommitMoves, if_neg hqy, if_neg hqc] at this
+    rw [bitCommitMoves, ite_eq_right hqy, ite_eq_right hqc] at this
     exact this
 
 end Moves
@@ -752,14 +752,14 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
       cases c with
       | true =>
         have hu1 : u'.1 = .parInit := by
-          rw [bitWire, if_pos rfl] at hwire
+          rw [bitWire, ite_eq_left rfl] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hb', ?_⟩
         rw [hcnteq, hc.mp rfl, hiheq]
       | false =>
         have hu1 : u'.1 = .scanInit := by
-          rw [bitWire, if_neg (by simp)] at hwire
+          rw [bitWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hb', ?_⟩
@@ -799,7 +799,7 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
       cases c with
       | true =>
         have hu1 : u'.1 = .commit := by
-          rw [bitWire, if_pos rfl] at hwire
+          rw [bitWire, ite_eq_left rfl] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hb', by rw [hcntq]; exact hi.2.1, ?_⟩
@@ -808,7 +808,7 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
         omega
       | false =>
         have hu1 : u'.1 = .scanOver := by
-          rw [bitWire, if_neg (by simp)] at hwire
+          rw [bitWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hb', by rw [hcntq]; exact hi.2.1, ?_, ?_⟩
@@ -828,11 +828,11 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
       have htmkq : u'.2 tmk = v.2 tmk := (hag tmk htmkm).symm
       cases c with
       | true =>
-        rw [bitWire, if_pos rfl] at hwire
+        rw [bitWire, ite_eq_left rfl] at hwire
         exact absurd hwire (by simp)
       | false =>
         have hu1 : u'.1 = .mkW := by
-          rw [bitWire, if_neg (by simp)] at hwire
+          rw [bitWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hi.1.congr hh hag, by rw [hcntq]; exact hi.2.1, ?_, ?_, ?_⟩
@@ -885,7 +885,7 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
       cases c with
       | true =>
         have hu1 : u'.1 = .commit := by
-          rw [bitWire, if_pos rfl] at hwire
+          rw [bitWire, ite_eq_left rfl] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hb', by rw [hcntq]; exact hi.2.1, ?_⟩
@@ -895,7 +895,7 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
         omega
       | false =>
         have hu1 : u'.1 = .scanStep := by
-          rw [bitWire, if_neg (by simp)] at hwire
+          rw [bitWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hb', by rw [hcntq]; exact hi.2.1, ?_, ?_, ?_, ?_⟩
@@ -985,11 +985,11 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
       have hcntq : u'.2 cnt = v.2 cnt := (hag cnt hcntm).symm
       cases c with
       | true =>
-        rw [bitWire, if_pos rfl] at hwire
+        rw [bitWire, ite_eq_left rfl] at hwire
         exact absurd hwire (by simp)
       | false =>
         have hu1 : u'.1 = .parOver := by
-          rw [bitWire, if_neg (by simp)] at hwire
+          rw [bitWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hi.1.congr hh hag, by rw [hcntq]; exact hi.2.1, ?_, ?_⟩
@@ -1008,11 +1008,11 @@ theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : 
       have hcntq : u'.2 cnt = v.2 cnt := (hag cnt hcntm).symm
       cases c with
       | true =>
-        rw [bitWire, if_pos rfl] at hwire
+        rw [bitWire, ite_eq_left rfl] at hwire
         exact absurd hwire (by simp)
       | false =>
         have hu1 : u'.1 = .parStep := by
-          rw [bitWire, if_neg (by simp)] at hwire
+          rw [bitWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hu1]
         refine ⟨hi.1.congr hh hag, by rw [hcntq]; exact hi.2.1, ?_, ?_⟩
@@ -1094,11 +1094,11 @@ theorem walk_scan_step (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : 
       (.mkW, z) (.probeO, z1) := by
     refine ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩
     by_cases hqw : q = w
-    · rw [bitWMoves, if_pos hqw, hqw]
+    · rw [bitWMoves, ite_eq_left hqw, hqw]
       change z cand < z1 w ∧ ∀ e : A, ¬(z cand < e ∧ e < z1 w)
       rw [hz1w]
       exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-    · rw [bitWMoves, if_neg hqw]
+    · rw [bitWMoves, ite_eq_right hqw]
       change z1 q = z q
       exact hz1o q hqw
   have hprobeO : orank (z1 cand) + orank (z1 w) ≠ orank (z1 y) := by
@@ -1110,11 +1110,11 @@ theorem walk_scan_step (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : 
       (.scanStep, z1) (.probeE, z2) := by
     refine ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩
     by_cases hqc : q = cand
-    · rw [bitStepMoves, if_pos hqc, hqc]
+    · rw [bitStepMoves, ite_eq_left hqc, hqc]
       change z1 cand < z2 cand ∧ ∀ e : A, ¬(z1 cand < e ∧ e < z2 cand)
       rw [hz2c, hz1o cand hh.ne_cand_w]
       exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-    · rw [bitStepMoves, if_neg hqc]
+    · rw [bitStepMoves, ite_eq_right hqc]
       change z2 q = z1 q
       exact hz2o q hqc
   refine ⟨z2, ((((Relation.ReflTransGen.single s1).tail s2).tail s3).tail s4).tail s5, ?_, ?_⟩
@@ -1186,11 +1186,11 @@ theorem walk_commit (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin
         (.mkW, z) (.probeO, z1) := by
       refine ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩
       by_cases hqw : q = w
-      · rw [bitWMoves, if_pos hqw, hqw]
+      · rw [bitWMoves, ite_eq_left hqw, hqw]
         change z cand < z1 w ∧ ∀ e : A, ¬(z cand < e ∧ e < z1 w)
         rw [hz1w]
         exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-      · rw [bitWMoves, if_neg hqw]
+      · rw [bitWMoves, ite_eq_right hqw]
         change z1 q = z q
         exact hz1o q hqw
     have s4 : wireStep (bitFamRel (A := A) ih xh y cnt cand w tmk m) bitWire
@@ -1232,20 +1232,20 @@ theorem walk_outer (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin 
         Function.update_of_ne hqy]
     refine ⟨z0, Relation.ReflTransGen.single ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩, ?_, ?_, ?_, ?_⟩
     · by_cases hqy : q = y
-      · rw [bitInitMoves, if_pos hqy, hqy]
+      · rw [bitInitMoves, ite_eq_left hqy, hqy]
         change z0 y = x xh
         exact hz0y
       · by_cases hqc : q = cnt
-        · rw [bitInitMoves, if_neg hqy, if_pos hqc, hqc]
+        · rw [bitInitMoves, ite_eq_right hqy, ite_eq_left hqc, hqc]
           change ∀ e : A, z0 cnt ≤ e
           rw [hz0cnt]
           exact fun e => isMin_of_orank_eq_zero hm0 e
         · by_cases hqt : q = tmk
-          · rw [bitInitMoves, if_neg hqy, if_neg hqc, if_pos hqt, hqt]
+          · rw [bitInitMoves, ite_eq_right hqy, ite_eq_right hqc, ite_eq_left hqt, hqt]
             change ∀ e : A, e ≤ z0 tmk
             rw [hz0tmk]
             exact hmxtop
-          · rw [bitInitMoves, if_neg hqy, if_neg hqc, if_neg hqt]
+          · rw [bitInitMoves, ite_eq_right hqy, ite_eq_right hqc, ite_eq_right hqt]
             change z0 q = x q
             exact hz0o q hqy hqc hqt
     · rw [hz0cnt, hm0]
@@ -1278,11 +1278,11 @@ theorem walk_outer (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin 
         (.scanInit, z) (.probeE, z0) := by
       refine ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩
       by_cases hqc : q = cand
-      · rw [bitScanInitMoves, if_pos hqc, hqc]
+      · rw [bitScanInitMoves, ite_eq_left hqc, hqc]
         change ∀ e : A, z0 cand ≤ e
         rw [hz0c]
         exact fun e => isMin_of_orank_eq_zero hc0 e
-      · rw [bitScanInitMoves, if_neg hqc]
+      · rw [bitScanInitMoves, ite_eq_right hqc]
         change z0 q = z q
         exact hz0o q hqc
     -- the scan finds the half and the round is closed
@@ -1322,15 +1322,15 @@ theorem walk_outer (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin 
         (.commit, z2) (.outer, z3) := by
       refine ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩
       by_cases hqy : q = y
-      · rw [bitCommitMoves, if_pos hqy, hqy]
+      · rw [bitCommitMoves, ite_eq_left hqy, hqy]
         change z3 y = z2 cand
         exact hz3y
       · by_cases hqc : q = cnt
-        · rw [bitCommitMoves, if_neg hqy, if_pos hqc, hqc]
+        · rw [bitCommitMoves, ite_eq_right hqy, ite_eq_left hqc, hqc]
           change z2 cnt < z3 cnt ∧ ∀ e : A, ¬(z2 cnt < e ∧ e < z3 cnt)
           rw [hz3cnt]
           exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-        · rw [bitCommitMoves, if_neg hqy, if_neg hqc]
+        · rw [bitCommitMoves, ite_eq_right hqy, ite_eq_right hqc]
           change z3 q = z2 q
           exact hz3o q hqy hqc
     refine ⟨z3, ((((hwalk.tail s1).tail s2).trans hwalk1).trans hwalk2).tail s3, ?_, ?_, ?_, ?_⟩
@@ -1367,11 +1367,11 @@ theorem walk_par_step (_hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : 
       (.parStep, z) (.parProbe, z1) := by
     refine ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩
     by_cases hqc : q = cand
-    · rw [bitStepMoves, if_pos hqc, hqc]
+    · rw [bitStepMoves, ite_eq_left hqc, hqc]
       change z cand < z1 cand ∧ ∀ e : A, ¬(z cand < e ∧ e < z1 cand)
       rw [hz1c]
       exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-    · rw [bitStepMoves, if_neg hqc]
+    · rw [bitStepMoves, ite_eq_right hqc]
       change z1 q = z q
       exact hz1o q hqc
   exact ⟨z1, ((Relation.ReflTransGen.single s1).tail s2).tail s3, by rw [hz1c, hs],
@@ -1455,7 +1455,7 @@ theorem decides_bitP (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : 
       rw [hnode] at hrel hwire
       obtain ⟨hc, -⟩ := hrel
       cases c' with
-      | false => rw [bitWire, if_neg (by simp)] at hwire; exact absurd hwire (by simp)
+      | false => rw [bitWire, ite_eq_right (by simp)] at hwire; exact absurd hwire (by simp)
       | true =>
         have hcandtmk : u.2 cand = u.2 tmk := hc.mp rfl
         have htop : orank (u.2 tmk) = Nat.card A - 1 := orank_isTop hi.1.2.2.2
@@ -1480,7 +1480,7 @@ theorem decides_bitP (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : 
       rw [hnode] at hrel hwire
       obtain ⟨hc, hag⟩ := hrel
       cases c' with
-      | false => rw [bitWire, if_neg (by simp)] at hwire; exact absurd hwire (by simp)
+      | false => rw [bitWire, ite_eq_right (by simp)] at hwire; exact absurd hwire (by simp)
       | true =>
         have hcf : c = false := (Sum.inr.inj hwire).symm
         have heven : orank (u.2 cand) + orank (u.2 cand) = orank (u.2 y) := hc.mp rfl
@@ -1497,7 +1497,7 @@ theorem decides_bitP (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : 
       rw [hnode] at hrel hwire
       obtain ⟨hc, hag⟩ := hrel
       cases c' with
-      | false => rw [bitWire, if_neg (by simp)] at hwire; exact absurd hwire (by simp)
+      | false => rw [bitWire, ite_eq_right (by simp)] at hwire; exact absurd hwire (by simp)
       | true =>
         have hct : c = true := (Sum.inr.inj hwire).symm
         have hcandtmk : u.2 cand = u.2 tmk := hc.mp rfl
@@ -1552,11 +1552,11 @@ theorem decides_bitP (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : 
         (.parInit, v) (.parProbe, v0) := by
       refine ⟨true, ⟨rfl, fun q hq => ?_⟩, rfl⟩
       by_cases hqc : q = cand
-      · rw [bitScanInitMoves, if_pos hqc, hqc]
+      · rw [bitScanInitMoves, ite_eq_left hqc, hqc]
         change ∀ e : A, v0 cand ≤ e
         rw [hv0c]
         exact fun e => isMin_of_orank_eq_zero hc0 e
-      · rw [bitScanInitMoves, if_neg hqc]
+      · rw [bitScanInitMoves, ite_eq_right hqc]
         change v0 q = v q
         exact hv0o q hqc
     have hv0y : v0 y = v y := hv0o y hh.ne_y_cand

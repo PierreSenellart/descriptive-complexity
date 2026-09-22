@@ -152,11 +152,11 @@ theorem tag_back (hR : PR.table.Reads)
     exact PR.zero_ne_one
   refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
   by_cases hlt : 0 < m
-  · have hfr : tagFirstRd emb = emb (.tagRdP ⟨0, hlt⟩ .start) := dif_pos hlt
+  · have hfr : tagFirstRd emb = emb (.tagRdP ⟨0, hlt⟩ .start) := dite_eq_left hlt
     rw [hfr]
     exact hasLeft_of_rule hrules (i := .tagRd ⟨0, hlt⟩) (ρ := Sum.inl .stayS)
       hwkv' rfl rfl rfl rfl not_false
-  · have hfr : tagFirstRd emb = emb .brP := dif_neg hlt
+  · have hfr : tagFirstRd emb = emb .brP := dite_eq_right hlt
     rw [hfr]
     exact hasLeft_of_rule hrules (i := .br) (ρ := .stay)
       hwkv' rfl rfl rfl rfl not_false
@@ -198,7 +198,7 @@ private theorem tag_reads : ∀ (k : ℕ) (hk : k ≤ m),
   | zero =>
     have hkn : k = m := by omega
     subst hkn
-    have hph : tagPhaseAt emb k = emb .brP := dif_neg (lt_irrefl k)
+    have hph : tagPhaseAt emb k = emb .brP := dite_eq_right (lt_irrefl k)
     have hfk : (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (k + 1)) = Fin.last k :=
       Fin.ext rfl
     rw [hph, hfk, Nat.mul_zero]
@@ -206,7 +206,7 @@ private theorem tag_reads : ∀ (k : ℕ) (hk : k ≤ m),
   | succ n ih =>
     have hkl : k < m := by omega
     set i : Fin m := ⟨k, hkl⟩ with hi
-    have hph : tagPhaseAt emb k = emb (.tagRdP i .start) := dif_pos hkl
+    have hph : tagPhaseAt emb k = emb (.tagRdP i .start) := dite_eq_left hkl
     have hcast : (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (m + 1)) = i.castSucc :=
       Fin.ext rfl
     have hrulesK : ∀ ρ : ReadRule,
@@ -257,12 +257,12 @@ private theorem tag_reads : ∀ (k : ℕ) (hk : k ≤ m),
       refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
       by_cases hlt : (i : ℕ) + 1 < m
       · have hnx : tagNextRd emb i = emb (.tagRdP ⟨(i : ℕ) + 1, hlt⟩ .start) :=
-          dif_pos hlt
+          dite_eq_left hlt
         rw [hnx]
         exact hasLeft_of_rule hrules
           (i := .tagRd ⟨(i : ℕ) + 1, hlt⟩) (ρ := Sum.inl .stayS)
           hwkv' rfl rfl rfl rfl not_false
-      · have hnx : tagNextRd emb i = emb .brP := dif_neg hlt
+      · have hnx : tagNextRd emb i = emb .brP := dite_eq_right hlt
         rw [hnx]
         exact hasLeft_of_rule hrules (i := .br) (ρ := .stay)
           hwkv' rfl rfl rfl rfl not_false

@@ -398,7 +398,7 @@ theorem expLeafVal_iff {k : ℕ} (e : dt.X.E.Relations k) (τ : Fin k → dt.X.T
       dt.expLeaf e τ ρs fun j => f (dt.lvE (Fin.castLE hn j)) := by
   refine qfValue_congr _ _ _ fun a ha => ?_
   by_cases hb : isBlkAtom a = true
-  · rw [if_pos hb]
+  · rw [ite_eq_left hb]
     have hmem : a ∈ blkAtoms (dt.relPk e τ).mat := List.mem_filter.mpr ⟨ha, hb⟩
     obtain ⟨r, hr⟩ : ∃ r : Fin (dt.relNr e τ),
         (blkAtoms (dt.relPk e τ).mat).get r = a := List.mem_iff_get.mp hmem
@@ -415,7 +415,7 @@ theorem expLeafVal_iff {k : ℕ} (e : dt.X.E.Relations k) (τ : Fin k → dt.X.T
       exact hsame ▸ (hav r').mp hbit
     · intro hh
       exact ⟨r, hr, (hav r).mpr hh⟩
-  · rw [if_neg hb]
+  · rw [ite_eq_right hb]
     obtain ⟨κ, hκ⟩ :=
       Option.isSome_iff_exists.mp (isSome_blkAtom?_of_mem_qfAtoms (dt.relPk e τ).mat a ha)
     rw [hκ]
@@ -605,7 +605,7 @@ theorem domLeafVal_iff (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
       dt.domLeaf t ρ fun j => f (dt.lvE (Fin.castLE hn j)) := by
   refine qfValue_congr _ _ _ fun a ha => ?_
   by_cases hb : isBlkAtom a = true
-  · rw [if_pos hb]
+  · rw [ite_eq_left hb]
     have hmem : a ∈ blkAtoms (dt.domPk t).mat := List.mem_filter.mpr ⟨ha, hb⟩
     obtain ⟨r, hr⟩ : ∃ r : Fin (dt.domNr t),
         (blkAtoms (dt.domPk t).mat).get r = a := List.mem_iff_get.mp hmem
@@ -621,7 +621,7 @@ theorem domLeafVal_iff (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
       exact hsame ▸ (hav r').mp hbit
     · intro hh
       exact ⟨r, hr, (hav r).mpr hh⟩
-  · rw [if_neg hb]
+  · rw [ite_eq_right hb]
     obtain ⟨κ, hκ⟩ :=
       Option.isSome_iff_exists.mp (isSome_blkAtom?_of_mem_qfAtoms (dt.domPk t).mat a ha)
     rw [hκ]
@@ -704,7 +704,7 @@ theorem dspTagOf_eq_of_onehot {S : (Fin dt.dd → A) → Prop} {t : dt.X.Tag}
   classical
   have hex : ∃ t₁ : dt.X.Tag, ∀ t' : dt.X.Tag,
       S (encTagTup dt.ly zero one t') ↔ t' = t₁ := ⟨t, hone⟩
-  rw [dspTagOf, dif_pos hex]
+  rw [dspTagOf, dite_eq_left hex]
   exact (hone hex.choose).mp ((hex.choose_spec hex.choose).mpr rfl)
 
 /-- **A gate's conjoining exit**: the flag keeps its value only if the

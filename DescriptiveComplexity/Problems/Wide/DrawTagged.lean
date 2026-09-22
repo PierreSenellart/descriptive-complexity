@@ -143,8 +143,8 @@ theorem tagRule_dstPh (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i) :
   have hnext : ∀ i : Fin m, ∃ p : TagPh m T nrOf, tagNextRd emb i = emb p := by
     intro i
     by_cases h : (i : ℕ) + 1 < m
-    · exact ⟨_, dif_pos h⟩
-    · exact ⟨_, dif_neg h⟩
+    · exact ⟨_, dite_eq_left h⟩
+    · exact ⟨_, dite_eq_right h⟩
   match i, ρ with
   | .tagRd i, Sum.inl σ =>
     obtain ⟨p, hp⟩ := (ReadKit.mk (rdTrackT i) wk (MatchT i)

@@ -159,8 +159,8 @@ theorem gateBlockRule_dstPh (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
   have hdom : ∃ p : dt.GateBlockPh, dt.gateDomEntry emb = emb p := by
     change ∃ p : dt.GateBlockPh, tagFirstRd (fun p => emb (Sum.inr p)) = emb p
     by_cases h : 0 < Fintype.card dt.X.Tag
-    · exact ⟨_, dif_pos h⟩
-    · exact ⟨_, dif_neg h⟩
+    · exact ⟨_, dite_eq_left h⟩
+    · exact ⟨_, dite_eq_right h⟩
   match i, ρ with
   | Sum.inl _, Sum.inl σ =>
     obtain ⟨t, ht⟩ := (TestKit.mk (A := A) (Q := Q) (W := dt.SlotIx) Slot.mir

@@ -63,7 +63,7 @@ theorem putVec_of_not_mem {m : ℕ} {accs : Fin m → dt.CtlIx} {f : dt.CtlIx �
     {b : Fin m → Prop} {q : dt.CtlIx} (h : ∀ j : Fin m, q ≠ accs j) :
     dt.putVec zero one accs f b q = f q := by
   classical
-  rw [putVec, dif_neg]
+  rw [putVec, dite_eq_right]
   rintro ⟨j, hj⟩
   exact h j hj
 
@@ -76,13 +76,13 @@ theorem readVec_putVec (hzo : zero ≠ one) {m : ℕ} {accs : Fin m → dt.CtlIx
   constructor
   · rintro ⟨h, hv⟩
     have hex : ∃ j' : Fin m, accs ⟨j, h⟩ = accs j' := ⟨⟨j, h⟩, rfl⟩
-    rw [putVec, dif_pos hex] at hv
+    rw [putVec, dite_eq_left hex] at hv
     have hb := (bitVal_iff hzo).mp hv
     rwa [hinj hex.choose_spec.symm] at hb
   · intro hb
     refine ⟨hj, ?_⟩
     have hex : ∃ j' : Fin m, accs ⟨j, hj⟩ = accs j' := ⟨⟨j, hj⟩, rfl⟩
-    rw [putVec, dif_pos hex]
+    rw [putVec, dite_eq_left hex]
     refine (bitVal_iff hzo).mpr ?_
     rw [← hinj hex.choose_spec]
     exact hb

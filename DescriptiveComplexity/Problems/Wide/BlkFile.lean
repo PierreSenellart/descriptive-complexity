@@ -92,7 +92,7 @@ theorem ixSucc_blkNext {u : Wide.BlkIx K A dd}
     (hne : ∃ v : Wide.BlkIx K A dd, WMLt (Wide.blkLe K A dd) u v) :
     IxSucc (Wide.blkLe K A dd) u (blkNext A K dd u) := by
   classical
-  rw [blkNext, dif_pos hne]
+  rw [blkNext, dite_eq_left hne]
   exact (exists_ixSucc (Wide.blkLe K A dd) (Wide.isLinOrd_blkLe K A dd) hne).choose_spec
 
 variable (A K) in
@@ -102,7 +102,7 @@ theorem blkNext_of_top {u : Wide.BlkIx K A dd}
     (htop : ∀ v : Wide.BlkIx K A dd, Wide.blkLe K A dd v u) :
     blkNext A K dd u = u := by
   classical
-  refine dif_neg fun hc => ?_
+  refine dite_eq_right fun hc => ?_
   obtain ⟨v, -, hne⟩ := hc
   exact hne (htop v)
 

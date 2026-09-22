@@ -132,7 +132,7 @@ theorem matching_exists (hwf : IsWF A) (g : A) {M : Type} (v : A → M) :
   refine ⟨fun p => if h : ∃ x, ArgG g p x then v h.choose else v p, fun p x hp => ?_⟩
   have hex : ∃ x, ArgG g p x := ⟨x, hp⟩
   change (if h : ∃ x, ArgG g p x then v h.choose else v p) = v x
-  rw [dif_pos hex]
+  rw [dite_eq_left hex]
   exact congrArg v (hwf.arg_fun g p _ _ hex.choose_spec hp)
 
 /-- Two assignments matching the arguments of an atom agree on every position
@@ -431,14 +431,14 @@ theorem envH_coh (hwf : IsWF A) (hloc : Local I) {g g' s : A} {e e' : A → M}
     ⟨fun p => if h : ∃ x', ArgG g' p x' then e' h.choose else w p, fun p x' hp => ?_, ?_⟩
   · have hex : ∃ x', ArgG g' p x' := ⟨x', hp⟩
     change (if h : ∃ x', ArgG g' p x' then e' h.choose else w p) = e' x'
-    rw [dif_pos hex]
+    rw [dite_eq_left hex]
     exact congrArg e' (hwf.arg_fun g' p _ _ hex.choose_spec hp)
   · refine (hloc s _ w fun p hp => ?_).mpr hI
     obtain ⟨x, hx⟩ := hwf.arg_tot g s p hs hp
     obtain ⟨x', hx'⟩ := hwf.arg_tot g' s p hs' hp
     have hex : ∃ x', ArgG g' p x' := ⟨x', hx'⟩
     change (if h : ∃ x', ArgG g' p x' then e' h.choose else w p) = w p
-    rw [dif_pos hex]
+    rw [dite_eq_left hex]
     have hch : hex.choose = x' := hwf.arg_fun g' p _ _ hex.choose_spec hx'
     rw [hch, hw p x hx]
     exact (envVal_eq (hval p x x' hx hx')).symm

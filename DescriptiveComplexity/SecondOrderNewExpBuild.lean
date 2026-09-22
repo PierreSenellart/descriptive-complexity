@@ -382,7 +382,7 @@ theorem card_taggedAssign_le [Finite A] [Nonempty A] :
           (Fin.castLE (arity_le_blockArityBound (taggedBlock X) i) j)) j = ts j := by
     intro j
     simp only [Fin.castLE]
-    rw [dif_pos j.2]
+    rw [dite_eq_left j.2]
   have h := congrFun hαβ (i, fun l : Fin d =>
     if h : (l : ℕ) < (taggedBlock X).arity i then ts ⟨l, h⟩ else a₀)
   simpa only [funext hw] using h

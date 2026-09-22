@@ -66,18 +66,18 @@ private theorem test_process (h : IsLinOrd ile) {g : I → A}
     ∃ τ : A, WMTr τ ∧ WMSrc τ (accState ile P qy qn w) ∧ WMRead τ (g w) ∧
       WMDst τ (accStateAfter ile P qy qn w) ∧ WMWrite τ (g w) ∧ ¬WMRight τ := by
   by_cases hcar : ∀ v : I, WMLt ile w v → P v
-  · rw [accState, if_pos hcar]
+  · rw [accState, ite_eq_left hcar]
     by_cases hw : P w
     · have hge : ∀ v : I, ile w v → P v := fun v hle => by
         rcases eq_or_ne w v with rfl | hne
         · exact hw
         · exact hcar v ⟨hle, fun hc => hne (h.2.2.1 w v hle hc)⟩
-      rw [accStateAfter, if_pos hge]
+      rw [accStateAfter, ite_eq_left hge]
       exact hpass w hw
-    · rw [accStateAfter, if_neg fun hall => hw (hall w (h.1 w))]
+    · rw [accStateAfter, ite_eq_right fun hall => hw (hall w (h.1 w))]
       exact hfail w hw
-  · rw [accState, if_neg hcar, accStateAfter,
-      if_neg fun hall => hcar fun v hlt => hall v hlt.1]
+  · rw [accState, ite_eq_right hcar, accStateAfter,
+      ite_eq_right fun hall => hcar fun v hlt => hall v hlt.1]
     exact hkeep _
 
 variable [Finite A]

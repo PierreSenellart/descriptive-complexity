@@ -146,20 +146,20 @@ theorem relIsoOn_iff_equiv (PV HV : A → Prop) (PE HE : A → A → Prop) :
     refine ⟨fun x => if h : PV x then (e ⟨x, h⟩).1 else x, fun x hx => ?_,
       fun x y hx hy hxy => ?_, fun y hy => ?_, fun x y hx hy => ?_⟩
     · change HV (if h : PV x then (e ⟨x, h⟩).1 else x)
-      rw [dif_pos hx]
+      rw [dite_eq_left hx]
       exact (e ⟨x, hx⟩).2
     · have hxy' : (if h : PV x then (e ⟨x, h⟩).1 else x) =
           if h : PV y then (e ⟨y, h⟩).1 else y := hxy
-      rw [dif_pos hx, dif_pos hy] at hxy'
+      rw [dite_eq_left hx, dite_eq_left hy] at hxy'
       exact congrArg Subtype.val (e.injective (Subtype.ext hxy'))
     · obtain ⟨z, hz⟩ : ∃ z : {x : A // PV x}, e z = ⟨y, hy⟩ :=
         ⟨e.symm ⟨y, hy⟩, e.apply_symm_apply _⟩
       refine ⟨z.1, z.2, ?_⟩
       change (if h : PV z.1 then (e ⟨z.1, h⟩).1 else z.1) = y
-      rw [dif_pos z.2, Subtype.coe_eta, hz]
+      rw [dite_eq_left z.2, Subtype.coe_eta, hz]
     · change PE x y ↔ HE (if h : PV x then (e ⟨x, h⟩).1 else x)
         (if h : PV y then (e ⟨y, h⟩).1 else y)
-      rw [dif_pos hx, dif_pos hy]
+      rw [dite_eq_left hx, dite_eq_left hy]
       exact hedge ⟨x, hx⟩ ⟨y, hy⟩
 
 end Generic

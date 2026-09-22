@@ -194,21 +194,21 @@ theorem uRulesDefinable_evalRule {PM SM : Type} {nv : ℕ} {ShM : SM → Type}
         (fun _ _ _ => rfl) fun _ _ _ => rfl
     | .dspA =>
       by_cases hk : (k : ℕ) < nv
-      · simp only [evalRule, dif_pos hk]
+      · simp only [evalRule, dite_eq_left hk]
         exact uRuleDefinable_of_keep ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_true fun _ => trivial⟩ uGDefinable_exitG (fun _ _ _ => rfl)
           fun _ _ _ => rfl
-      · simp only [evalRule, dif_neg hk]
+      · simp only [evalRule, dite_eq_right hk]
         exact uRuleDefinable_of_keepSt ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_true fun _ => trivial⟩ (uGDefinable_exitG.and hltp.not)
           (fun _ _ _ => rfl) (uTrDefinable_id.update Slot.wk uSlotDefinable_zero)
     | .dspB =>
       by_cases hk : (k : ℕ) < nv
-      · simp only [evalRule, if_pos hk]
+      · simp only [evalRule, ite_eq_left hk]
         exact uRuleDefinable_of_keep ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_false fun _ => not_false⟩ uGDefinable_false (fun _ _ _ => rfl)
           fun _ _ _ => rfl
-      · simp only [evalRule, if_neg hk]
+      · simp only [evalRule, ite_eq_right hk]
         exact uRuleDefinable_of_keepSt ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_true fun _ => trivial⟩ (uGDefinable_exitG.and hltp)
           (fun _ _ _ => rfl) (uTrDefinable_id.update Slot.wk uSlotDefinable_zero)

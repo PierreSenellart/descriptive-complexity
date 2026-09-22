@@ -115,8 +115,8 @@ theorem seqRule_dstIn {S : P → Prop} (hemb : ∀ p : SeqPh n PA, S (emb p))
   | .chk k, .stay => exact hemb _
   | .chk k, .dspA =>
     by_cases hk : (k : ℕ) < n
-    · rw [seqRule, dif_pos hk]; exact hemb _
-    · rw [seqRule, dif_neg hk]; exact hexit
+    · rw [seqRule, dite_eq_left hk]; exact hemb _
+    · rw [seqRule, dite_eq_right hk]; exact hexit
   | .chk k, .dspB => exact hemb _
   | .sub a s, ρ => exact hA a s ρ
 
@@ -160,18 +160,18 @@ theorem seqSep
   | .chk k, .dspB, .dspB => rfl
   | .chk k, .stay, .dspA =>
     by_cases hk : (k : ℕ) < n
-    · simp only [seqRule, dif_pos hk] at hg'
+    · simp only [seqRule, dite_eq_left hk] at hg'
       simp only [seqRule] at hg
       exact absurd hg'.1 hg
-    · simp only [seqRule, dif_neg hk] at hg'
+    · simp only [seqRule, dite_eq_right hk] at hg'
       simp only [seqRule] at hg
       exact absurd hg'.1 hg
   | .chk k, .dspA, .stay =>
     by_cases hk : (k : ℕ) < n
-    · simp only [seqRule, dif_pos hk] at hg
+    · simp only [seqRule, dite_eq_left hk] at hg
       simp only [seqRule] at hg'
       exact absurd hg.1 hg'
-    · simp only [seqRule, dif_neg hk] at hg
+    · simp only [seqRule, dite_eq_right hk] at hg
       simp only [seqRule] at hg'
       exact absurd hg.1 hg'
   | .chk k, .stay, .dspB => exact hg'.elim

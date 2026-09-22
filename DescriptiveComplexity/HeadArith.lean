@@ -344,16 +344,17 @@ theorem holds_plusInitMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk pro
   classical
   refine ⟨?_, ?_, ?_, fun p hpa hpb hpmk => ?_⟩
   · have := hmv a
-    rw [plusInitMoves, if_pos rfl] at this
+    rw [plusInitMoves, ite_eq_left rfl] at this
     exact this
   · have := hmv b
-    rw [plusInitMoves, if_neg (Ne.symm hh.ab), if_pos rfl] at this
+    rw [plusInitMoves, ite_eq_right (Ne.symm hh.ab), ite_eq_left rfl] at this
     exact this
   · have := hmv mk
-    rw [plusInitMoves, if_neg (Ne.symm hh.amk), if_neg (Ne.symm hh.bmk), if_pos rfl] at this
+    rw [plusInitMoves, ite_eq_right (Ne.symm hh.amk), ite_eq_right (Ne.symm hh.bmk),
+      ite_eq_left rfl] at this
     exact this
   · have := hmv p
-    rw [plusInitMoves, if_neg hpa, if_neg hpb, if_neg hpmk] at this
+    rw [plusInitMoves, ite_eq_right hpa, ite_eq_right hpb, ite_eq_right hpmk] at this
     exact this
 
 omit [Finite A] in
@@ -364,13 +365,13 @@ theorem holds_plusStepMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk pro
   classical
   refine ⟨?_, ?_, fun p hpa hpb => ?_⟩
   · have := hmv a
-    rw [plusStepMoves, if_pos rfl] at this
+    rw [plusStepMoves, ite_eq_left rfl] at this
     exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
   · have := hmv b
-    rw [plusStepMoves, if_neg (Ne.symm hh.ab), if_pos rfl] at this
+    rw [plusStepMoves, ite_eq_right (Ne.symm hh.ab), ite_eq_left rfl] at this
     exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
   · have := hmv p
-    rw [plusStepMoves, if_neg hpa, if_neg hpb] at this
+    rw [plusStepMoves, ite_eq_right hpa, ite_eq_right hpb] at this
     exact this
 
 /-- **The invariant holds all along the control walk**: this is the whole
@@ -413,13 +414,13 @@ theorem plusInv_of_walk (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
       cases c with
       | true =>
         have hw : w.1 = .check := by
-          rw [plusWire, if_pos rfl] at hwire
+          rw [plusWire, ite_eq_left rfl] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hw, hyx]
         exact ⟨hbase, by rw [hc.mp rfl, hjeq]⟩
       | false =>
         have hw : w.1 = .over := by
-          rw [plusWire, if_neg (by simp)] at hwire
+          rw [plusWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hw, hyx]
         refine ⟨hbase, fun he => ?_⟩
@@ -437,11 +438,11 @@ theorem plusInv_of_walk (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
       obtain ⟨-, hyx⟩ := hrel
       cases c with
       | true =>
-        rw [plusWire, if_pos rfl] at hwire
+        rw [plusWire, ite_eq_left rfl] at hwire
         exact absurd hwire (by simp)
       | false =>
         have hw : w.1 = .step := by
-          rw [plusWire, if_neg (by simp)] at hwire
+          rw [plusWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hw, hyx]
         exact hov
@@ -507,23 +508,23 @@ theorem exists_walk_test (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
       ?_, ?_, ?_, ?_⟩
     · refine Relation.ReflTransGen.single ⟨true, ⟨rfl, fun h => ?_⟩, rfl⟩
       by_cases hha : h = a
-      · rw [plusInitMoves, if_pos hha, hha]
+      · rw [plusInitMoves, ite_eq_left hha, hha]
         change Function.update (Function.update (Function.update x a (x i)) b m0) mk mx a = x i
         rw [Function.update_of_ne hh.amk, Function.update_of_ne hh.ab,
           Function.update_self]
       · by_cases hhb : h = b
-        · rw [plusInitMoves, if_neg hha, if_pos hhb, hhb]
+        · rw [plusInitMoves, ite_eq_right hha, ite_eq_left hhb, hhb]
           change ∀ e : A,
             Function.update (Function.update (Function.update x a (x i)) b m0) mk mx b ≤ e
           rw [Function.update_of_ne hh.bmk, Function.update_self]
           exact fun e => isMin_of_orank_eq_zero hm0 e
         · by_cases hhmk : h = mk
-          · rw [plusInitMoves, if_neg hha, if_neg hhb, if_pos hhmk, hhmk]
+          · rw [plusInitMoves, ite_eq_right hha, ite_eq_right hhb, ite_eq_left hhmk, hhmk]
             change ∀ e : A,
               e ≤ Function.update (Function.update (Function.update x a (x i)) b m0) mk mx mk
             rw [Function.update_self]
             exact hmxtop
-          · rw [plusInitMoves, if_neg hha, if_neg hhb, if_neg hhmk]
+          · rw [plusInitMoves, ite_eq_right hha, ite_eq_right hhb, ite_eq_right hhmk]
             change Function.update (Function.update (Function.update x a (x i)) b m0) mk mx h = x h
             rw [Function.update_of_ne hhmk, Function.update_of_ne hhb, Function.update_of_ne hha]
     · intro p hpa hpb hpmk
@@ -571,18 +572,18 @@ theorem exists_walk_test (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
         (.step, z) (.test, z') := by
       refine ⟨true, ⟨rfl, fun h => ?_⟩, rfl⟩
       by_cases hha : h = a
-      · rw [plusStepMoves, if_pos hha, hha]
+      · rw [plusStepMoves, ite_eq_left hha, hha]
         have hcov : z a ⋖ za' := covBy_of_orank_succ (by rw [hza', hza]; omega)
         change z a < z' a ∧ ∀ e : A, ¬(z a < e ∧ e < z' a)
         rw [hz'a]
         exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
       · by_cases hhb : h = b
-        · rw [plusStepMoves, if_neg hha, if_pos hhb, hhb]
+        · rw [plusStepMoves, ite_eq_right hha, ite_eq_left hhb, hhb]
           have hcov : z b ⋖ zb' := covBy_of_orank_succ (by rw [hzb', hzb])
           change z b < z' b ∧ ∀ e : A, ¬(z b < e ∧ e < z' b)
           rw [hz'b]
           exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-        · rw [plusStepMoves, if_neg hha, if_neg hhb]
+        · rw [plusStepMoves, ite_eq_right hha, ite_eq_right hhb]
           exact hz'p h hha hhb
     refine ⟨z', ((hwalk.tail s1).tail s2).tail s3, ?_, ?_, ?_⟩
     · intro p hpa hpb hpmk
@@ -649,10 +650,10 @@ theorem decides_plusP (hh : PlusHeads i j k a b mk prot) (hprotK : prot ≤ K) :
       obtain ⟨hc, hyu⟩ := hrel
       cases c' with
       | false =>
-        rw [plusWire, if_neg (by simp)] at hwire
+        rw [plusWire, ite_eq_right (by simp)] at hwire
         exact absurd hwire (by simp)
       | true =>
-        rw [plusWire, if_pos rfl] at hwire
+        rw [plusWire, ite_eq_left rfl] at hwire
         have hcf : c = false := (Sum.inr.inj hwire).symm
         have hmkr : orank (u.2 mk) = Nat.card A - 1 := orank_isTop hbase.2.2.2
         have hatop : orank (u.2 a) = Nat.card A - 1 := by
@@ -908,20 +909,20 @@ theorem runs_timesFam (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK :
     have h1 : q ≠ acc := fun he => by rw [he] at hq; exact absurd hh.hplus.hi (by omega)
     have h2 : q ≠ cnt := fun he => by rw [he] at hq; exact absurd hh.hcnt.2 (by omega)
     have h3 : q ≠ tmk := fun he => by rw [he] at hq; exact absurd hh.htmk.2 (by omega)
-    rw [timesInitMoves, if_neg h1, if_neg h2, if_neg h3]
+    rw [timesInitMoves, ite_eq_right h1, ite_eq_right h2, ite_eq_right h3]
   | scanInit =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.hplus.hk (by omega)
-    rw [timesScanInitMoves, if_neg h1]
+    rw [timesScanInitMoves, ite_eq_right h1]
   | scanStep =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ cand := fun he => by rw [he] at hq; exact absurd hh.hplus.hk (by omega)
-    rw [timesScanStepMoves, if_neg h1]
+    rw [timesScanStepMoves, ite_eq_right h1]
   | commit =>
     refine runs_moveP_local _ _ fun q hq => ?_
     have h1 : q ≠ acc := fun he => by rw [he] at hq; exact absurd hh.hplus.hi (by omega)
     have h2 : q ≠ cnt := fun he => by rw [he] at hq; exact absurd hh.hcnt.2 (by omega)
-    rw [timesCommitMoves, if_neg h1, if_neg h2]
+    rw [timesCommitMoves, ite_eq_right h1, ite_eq_right h2]
   | outer =>
     exact (decides_leafP (HeadMove.eqVarF L cnt j)
       ((BoundedFormula.IsAtomic.equal _ _).isQF)).congr fun x => by simp
@@ -1077,16 +1078,17 @@ theorem holds_timesInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
   classical
   refine ⟨?_, ?_, ?_, fun q hq h1 h2 h3 => ?_⟩
   · have := hmv acc hh.hplus.hi
-    rw [timesInitMoves, if_pos rfl] at this
+    rw [timesInitMoves, ite_eq_left rfl] at this
     exact this
   · have := hmv cnt hh.hcnt.2
-    rw [timesInitMoves, if_neg (Ne.symm hh.hac), if_pos rfl] at this
+    rw [timesInitMoves, ite_eq_right (Ne.symm hh.hac), ite_eq_left rfl] at this
     exact this
   · have := hmv tmk hh.htmk.2
-    rw [timesInitMoves, if_neg (Ne.symm hh.hacm), if_neg (Ne.symm hh.hcm), if_pos rfl] at this
+    rw [timesInitMoves, ite_eq_right (Ne.symm hh.hacm), ite_eq_right (Ne.symm hh.hcm),
+      ite_eq_left rfl] at this
     exact this
   · have := hmv q hq
-    rw [timesInitMoves, if_neg h1, if_neg h2, if_neg h3] at this
+    rw [timesInitMoves, ite_eq_right h1, ite_eq_right h2, ite_eq_right h3] at this
     exact this
 
 omit [Finite A] in
@@ -1098,10 +1100,10 @@ theorem holds_timesScanInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk 
   classical
   refine ⟨?_, fun q hq h1 => ?_⟩
   · have := hmv cand hh.hplus.hk
-    rw [timesScanInitMoves, if_pos rfl] at this
+    rw [timesScanInitMoves, ite_eq_left rfl] at this
     exact this
   · have := hmv q hq
-    rw [timesScanInitMoves, if_neg h1] at this
+    rw [timesScanInitMoves, ite_eq_right h1] at this
     exact this
 
 omit [Finite A] in
@@ -1113,10 +1115,10 @@ theorem holds_timesScanStepMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk 
   classical
   refine ⟨?_, fun q hq h1 => ?_⟩
   · have := hmv cand hh.hplus.hk
-    rw [timesScanStepMoves, if_pos rfl] at this
+    rw [timesScanStepMoves, ite_eq_left rfl] at this
     exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
   · have := hmv q hq
-    rw [timesScanStepMoves, if_neg h1] at this
+    rw [timesScanStepMoves, ite_eq_right h1] at this
     exact this
 
 omit [Finite A] in
@@ -1129,13 +1131,13 @@ theorem holds_timesCommitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p 
   classical
   refine ⟨?_, ?_, fun q hq h1 h2 => ?_⟩
   · have := hmv acc hh.hplus.hi
-    rw [timesCommitMoves, if_pos rfl] at this
+    rw [timesCommitMoves, ite_eq_left rfl] at this
     exact this
   · have := hmv cnt hh.hcnt.2
-    rw [timesCommitMoves, if_neg (Ne.symm hh.hac), if_pos rfl] at this
+    rw [timesCommitMoves, ite_eq_right (Ne.symm hh.hac), ite_eq_left rfl] at this
     exact ⟨this.1, fun e h1 h2 => this.2 e ⟨h1, h2⟩⟩
   · have := hmv q hq
-    rw [timesCommitMoves, if_neg h1, if_neg h2] at this
+    rw [timesCommitMoves, ite_eq_right h1, ite_eq_right h2] at this
     exact this
 
 /-- **The invariant holds all along the control walk of a multiplication.** -/
@@ -1216,13 +1218,13 @@ theorem timesInv_of_walk (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x 
       cases c with
       | true =>
         have hw : w.1 = .final := by
-          rw [timesWire, if_pos rfl] at hwire
+          rw [timesWire, ite_eq_left rfl] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hw]
         exact ⟨hbase', by rw [hcnteq, hc.mp rfl, hjeq]⟩
       | false =>
         have hw : w.1 = .scanInit := by
-          rw [timesWire, if_neg (by simp)] at hwire
+          rw [timesWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hw]
         refine ⟨hbase', fun he => ?_⟩
@@ -1277,7 +1279,7 @@ theorem timesInv_of_walk (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x 
       cases c with
       | true =>
         have hw : w.1 = .commit := by
-          rw [timesWire, if_pos rfl] at hwire
+          rw [timesWire, ite_eq_left rfl] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hw]
         refine ⟨hbase', by rw [hcnteq]; exact hne, ?_⟩
@@ -1285,7 +1287,7 @@ theorem timesInv_of_walk (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x 
         exact (hc.mp rfl).symm
       | false =>
         have hw : w.1 = .scanOver := by
-          rw [timesWire, if_neg (by simp)] at hwire
+          rw [timesWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         rw [hw]
         refine ⟨hbase', by rw [hcnteq]; exact hne, ?_⟩
@@ -1304,11 +1306,11 @@ theorem timesInv_of_walk (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x 
       obtain ⟨-, hag⟩ := hrel
       cases c with
       | true =>
-        rw [timesWire, if_pos rfl] at hwire
+        rw [timesWire, ite_eq_left rfl] at hwire
         exact absurd hwire (by simp)
       | false =>
         have hw : w.1 = .scanStep := by
-          rw [timesWire, if_neg (by simp)] at hwire
+          rw [timesWire, ite_eq_right (by simp)] at hwire
           exact (Sum.inl.inj hwire).symm ▸ rfl
         have hacceq : w.2 acc = v.2 acc := (hag acc hh.hplus.hi).symm
         have hcnteq : w.2 cnt = v.2 cnt := (hag cnt hh.hcnt.2).symm
@@ -1423,12 +1425,12 @@ theorem exists_walk_probe (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
         (.scanStep, z) (.probe, z') := by
       refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
       by_cases hq : q = cand
-      · rw [timesScanStepMoves, if_pos hq, hq]
+      · rw [timesScanStepMoves, ite_eq_left hq, hq]
         have hcov : z cand ⋖ c' := covBy_of_orank_succ (by rw [hc', hzc])
         change z cand < z' cand ∧ ∀ e : A, ¬(z cand < e ∧ e < z' cand)
         rw [hz'c]
         exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-      · rw [timesScanStepMoves, if_neg hq]
+      · rw [timesScanStepMoves, ite_eq_right hq]
         exact hz'q q hq
     refine ⟨z', ((hwalk.tail s1).tail s2).tail s3, ?_, ?_⟩
     · intro q hq hqc
@@ -1505,21 +1507,21 @@ theorem exists_walk_outer (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x
     refine ⟨z, Relation.ReflTransGen.single ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩,
       fun q _ h1 h2 _ h4 => hzq q h1 h2 h4, ?_, ?_, ?_⟩
     · by_cases h1 : q = acc
-      · rw [timesInitMoves, if_pos h1, h1]
+      · rw [timesInitMoves, ite_eq_left h1, h1]
         change ∀ e : A, z acc ≤ e
         rw [hzacc]
         exact hm0min
       · by_cases h2 : q = cnt
-        · rw [timesInitMoves, if_neg h1, if_pos h2, h2]
+        · rw [timesInitMoves, ite_eq_right h1, ite_eq_left h2, h2]
           change ∀ e : A, z cnt ≤ e
           rw [hzcnt]
           exact hm0min
         · by_cases h3 : q = tmk
-          · rw [timesInitMoves, if_neg h1, if_neg h2, if_pos h3, h3]
+          · rw [timesInitMoves, ite_eq_right h1, ite_eq_right h2, ite_eq_left h3, h3]
             change ∀ e : A, e ≤ z tmk
             rw [hztmk]
             exact hmxtop
-          · rw [timesInitMoves, if_neg h1, if_neg h2, if_neg h3]
+          · rw [timesInitMoves, ite_eq_right h1, ite_eq_right h2, ite_eq_right h3]
             exact hzq q h1 h2 h3
     · rw [hzacc, hm0]
       omega
@@ -1551,11 +1553,11 @@ theorem exists_walk_outer (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x
         (.scanInit, z) (.probe, z₁) := by
       refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
       by_cases hq : q = cand
-      · rw [timesScanInitMoves, if_pos hq, hq]
+      · rw [timesScanInitMoves, ite_eq_left hq, hq]
         change ∀ e : A, z₁ cand ≤ e
         rw [hz₁c]
         exact fun e => isMin_of_orank_eq_zero hm0 e
-      · rw [timesScanInitMoves, if_neg hq]
+      · rw [timesScanInitMoves, ite_eq_right hq]
         exact hz₁q q hq
     -- scan up to the next partial product
     have h₁acc : orank (z₁ acc) = orank (x i) * r := by
@@ -1589,17 +1591,17 @@ theorem exists_walk_outer (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x
         (.commit, z₂) (.outer, z₃) := by
       refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
       by_cases h1 : q = acc
-      · rw [timesCommitMoves, if_pos h1, h1]
+      · rw [timesCommitMoves, ite_eq_left h1, h1]
         change z₃ acc = z₂ cand
         exact h₃acc
       · by_cases h2 : q = cnt
-        · rw [timesCommitMoves, if_neg h1, if_pos h2, h2]
+        · rw [timesCommitMoves, ite_eq_right h1, ite_eq_left h2, h2]
           have hcov : z₂ cnt ⋖ cs := covBy_of_orank_succ (by
             rw [hcs, h₂cnt, hz₁q cnt hh.hcc, hzcnt])
           change z₂ cnt < z₃ cnt ∧ ∀ e : A, ¬(z₂ cnt < e ∧ e < z₃ cnt)
           rw [h₃cnt]
           exact ⟨hcov.lt, fun e he => hcov.2 he.1 he.2⟩
-        · rw [timesCommitMoves, if_neg h1, if_neg h2]
+        · rw [timesCommitMoves, ite_eq_right h1, ite_eq_right h2]
           exact h₃q q h1 h2
     refine ⟨z₃, (((hwalk.tail s1).tail s2).trans hwalk₂).tail s3 |>.tail s4, ?_, ?_, ?_, ?_⟩
     · intro q hq h1 h2 h3 h4
@@ -1727,10 +1729,10 @@ theorem decides_timesP (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK 
       obtain ⟨hc, hag⟩ := hrel
       cases c' with
       | false =>
-        rw [timesWire, if_neg (by simp)] at hwire
+        rw [timesWire, ite_eq_right (by simp)] at hwire
         exact absurd hwire (by simp)
       | true =>
-        rw [timesWire, if_pos rfl] at hwire
+        rw [timesWire, ite_eq_left rfl] at hwire
         have hcf : c = false := (Sum.inr.inj hwire).symm
         have htop : orank (u.2 cand) = Nat.card A - 1 := by
           rw [hc.mp rfl]
@@ -1805,11 +1807,11 @@ theorem decides_timesP (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK 
           (.scanInit, z) (.probe, z₁) := by
         refine ⟨true, ⟨rfl, fun q _ => ?_⟩, rfl⟩
         by_cases hq : q = cand
-        · rw [timesScanInitMoves, if_pos hq, hq]
+        · rw [timesScanInitMoves, ite_eq_left hq, hq]
           change ∀ e : A, z₁ cand ≤ e
           rw [hz₁c]
           exact fun e => isMin_of_orank_eq_zero hm0 e
-        · rw [timesScanInitMoves, if_neg hq]
+        · rw [timesScanInitMoves, ite_eq_right hq]
           exact hz₁q q hq
       have h₁acc : orank (z₁ acc) = orank (x i) * (Nat.find hex - 1) := by
         rw [hz₁q acc hh.haca, hzacc]

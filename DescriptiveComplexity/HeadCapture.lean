@@ -168,14 +168,14 @@ theorem runs_guessStepP (h : Fin K) (hh : (h : ℕ) < m) :
       · change (setHead h (HeadMove.succ h) j).Holds x j
           (if (j : ℕ) < m then y j else if j = h then y j else x j)
         by_cases hj : j = h
-        · rw [hj, setHead_self, if_pos hh]
+        · rw [hj, setHead_self, ite_eq_left hh]
           exact hsucc
         · rw [setHead_of_ne _ hj]
           change (if (j : ℕ) < m then y j else if j = h then y j else x j) = x j
           by_cases hjm : (j : ℕ) < m
-          · rw [if_pos hjm]
+          · rw [ite_eq_left hjm]
             exact hkeep j hjm hj
-          · rw [if_neg hjm, if_neg hj]
+          · rw [ite_eq_right hjm, ite_eq_right hj]
     · refine ⟨x, hag.symm, (reach_exit_flat hflat).mpr ⟨⟨⊤, fun _ => .stay, Sum.inr false⟩,
         by simp, Formula.realize_top.mpr trivial, rfl, fun _ => rfl⟩⟩
 
@@ -419,12 +419,12 @@ theorem runs_guessManyP (hd : ℕ → Fin K) (m : ℕ) (hhd : ∀ i : ℕ, i < m
       · refine ⟨rfl, fun j hj hjne => ?_⟩
         have hjv : (j : ℕ) ≠ lo + n := fun he => hjne (Fin.ext (by rw [he, hhd _ hlt]))
         change (if (j : ℕ) = lo + n then z j else x j) = x j
-        rw [if_neg hjv]
+        rw [ite_eq_right hjv]
       · refine ⟨rfl, fun j hj hjor => ?_⟩
         change z j = if (j : ℕ) = lo + n then z j else x j
         by_cases hjv : (j : ℕ) = lo + n
-        · rw [if_pos hjv]
-        · rw [if_neg hjv]
+        · rw [ite_eq_left hjv]
+        · rw [ite_eq_right hjv]
           exact hk j hj (by omega)
 
 end GuessMany
@@ -520,7 +520,7 @@ noncomputable def shd (i : ℕ) : Fin (specHeads spec) :=
     (two_k_lt_specHeads spec)⟩
 
 theorem shd_val {i : ℕ} (h : i < specHeads spec) : (shd spec i : ℕ) = i := by
-  rw [shd, dif_pos h]
+  rw [shd, dite_eq_left h]
 
 @[simp]
 theorem blk0_val (i : Fin spec.k) : (blk0 spec i : ℕ) = i := rfl
@@ -701,7 +701,7 @@ noncomputable def ixOf (m : spec.Mode) : Fin (modeCard spec + 1) :=
 
 theorem modeAt_ixOf (m : spec.Mode) : modeAt spec (ixOf spec m) = some m := by
   have h : ((ixOf spec m : Fin (modeCard spec + 1)) : ℕ) < modeCard spec := (modeEquiv spec m).isLt
-  rw [modeAt, dif_pos h]
+  rw [modeAt, dite_eq_left h]
   refine congrArg some ?_
   rw [show (⟨((ixOf spec m : Fin (modeCard spec + 1)) : ℕ), h⟩ : Fin (modeCard spec)) =
     modeEquiv spec m from Fin.ext rfl, Equiv.symm_apply_apply]
@@ -798,25 +798,25 @@ theorem runs_drvFam (c : DrvNode spec.Mode (modeCard spec)) :
       · omega
   | commit m m' =>
     refine (runs_moveP_local (commitMoves spec) (2 * spec.k) fun j hj => ?_).mono ?_ ?_
-    · rw [commitMoves, dif_neg (by omega)]
+    · rw [commitMoves, dite_eq_right (by omega)]
     · rintro x b y ⟨rfl, hmv⟩
       refine ⟨rfl, fun i => ?_, fun j hj1 hj2 => ?_⟩
       · have hx := hmv (blk0 spec i) (lt_of_lt_of_le i.isLt (by omega))
-        rw [commitMoves, dif_pos (show ((blk0 spec i : Fin (specHeads spec)) : ℕ) < spec.k from
+        rw [commitMoves, dite_eq_left (show ((blk0 spec i : Fin (specHeads spec)) : ℕ) < spec.k from
           i.isLt)] at hx
         rw [hx]
         exact congrArg (fun w => x (blk1 spec w)) (Fin.ext rfl)
       · have hx := hmv j hj2
-        rw [commitMoves, dif_neg (by omega)] at hx
+        rw [commitMoves, dite_eq_right (by omega)] at hx
         exact hx
     · rintro x b y ⟨rfl, hcopy, hkeep⟩
       refine ⟨y, HeadAgree.refl y, rfl, fun j hj => ?_⟩
       by_cases hjk : (j : ℕ) < spec.k
-      · rw [commitMoves, dif_pos hjk]
+      · rw [commitMoves, dite_eq_left hjk]
         have hx := hcopy ⟨j, hjk⟩
         rw [show blk0 spec ⟨j, hjk⟩ = j from Fin.ext rfl] at hx
         exact hx
-      · rw [commitMoves, dif_neg hjk]
+      · rw [commitMoves, dite_eq_right hjk]
         exact hkeep j (by omega) hj
   | dead => exact runs_exitP_local false _
 
@@ -1099,18 +1099,18 @@ noncomputable def putBlk1 (x : Fin (specHeads spec) → A) (u : Fin spec.k → A
 omit [L.Structure A] [LinearOrder A] [Finite A] in
 theorem putBlk0_blk0 (x : Fin (specHeads spec) → A) (u : Fin spec.k → A) (i : Fin spec.k) :
     putBlk0 spec x u (blk0 spec i) = u i := by
-  rw [putBlk0, dif_pos (show ((blk0 spec i : Fin (specHeads spec)) : ℕ) < spec.k from i.isLt)]
+  rw [putBlk0, dite_eq_left (show ((blk0 spec i : Fin (specHeads spec)) : ℕ) < spec.k from i.isLt)]
   exact congrArg u (Fin.ext rfl)
 
 omit [L.Structure A] [LinearOrder A] [Finite A] in
 theorem putBlk0_of_le (x : Fin (specHeads spec) → A) (u : Fin spec.k → A)
     {j : Fin (specHeads spec)} (hj : spec.k ≤ (j : ℕ)) : putBlk0 spec x u j = x j := by
-  rw [putBlk0, dif_neg (by omega)]
+  rw [putBlk0, dite_eq_right (by omega)]
 
 omit [L.Structure A] [LinearOrder A] [Finite A] in
 theorem putBlk1_blk1 (x : Fin (specHeads spec) → A) (u : Fin spec.k → A) (i : Fin spec.k) :
     putBlk1 spec x u (blk1 spec i) = u i := by
-  rw [putBlk1, dif_pos (show spec.k ≤ ((blk1 spec i : Fin (specHeads spec)) : ℕ) ∧
+  rw [putBlk1, dite_eq_left (show spec.k ≤ ((blk1 spec i : Fin (specHeads spec)) : ℕ) ∧
     ((blk1 spec i : Fin (specHeads spec)) : ℕ) < 2 * spec.k from
       ⟨by simp only [blk1_val]; omega, by simp only [blk1_val]; have := i.isLt; omega⟩)]
   exact congrArg u (Fin.ext (by simp only [blk1_val]; omega))
@@ -1118,7 +1118,7 @@ theorem putBlk1_blk1 (x : Fin (specHeads spec) → A) (u : Fin spec.k → A) (i 
 omit [L.Structure A] [LinearOrder A] [Finite A] in
 theorem putBlk1_of_lt (x : Fin (specHeads spec) → A) (u : Fin spec.k → A)
     {j : Fin (specHeads spec)} (hj : (j : ℕ) < spec.k) : putBlk1 spec x u j = x j := by
-  rw [putBlk1, dif_neg (by omega)]
+  rw [putBlk1, dite_eq_right (by omega)]
 
 omit [Finite A] in
 /-- The chain of free choices reaches every mode. -/
@@ -1135,7 +1135,7 @@ theorem walk_pickSrc (x : Fin (specHeads spec) → A) :
     refine (ih (by omega)).tail ⟨false, HeadAgree.refl x, ?_⟩
     rw [drvWire_pickSrc_false]
     refine congrArg Sum.inl (congrArg DrvNode.pickSrc ?_)
-    rw [nextIx, dif_pos (show ((⟨n, by omega⟩ : Fin (modeCard spec + 1)) : ℕ) < modeCard spec
+    rw [nextIx, dite_eq_left (show ((⟨n, by omega⟩ : Fin (modeCard spec + 1)) : ℕ) < modeCard spec
       from show n < modeCard spec by omega)]
 
 omit [Finite A] in
@@ -1153,7 +1153,7 @@ theorem walk_pickCand (x : Fin (specHeads spec) → A) (m : spec.Mode) :
     refine (ih (by omega)).tail ⟨false, HeadAgree.refl x, ?_⟩
     rw [drvWire_pickCand_false]
     refine congrArg Sum.inl (congrArg (DrvNode.pickCand m) ?_)
-    rw [nextIx, dif_pos (show ((⟨n, by omega⟩ : Fin (modeCard spec + 1)) : ℕ) < modeCard spec
+    rw [nextIx, dite_eq_left (show ((⟨n, by omega⟩ : Fin (modeCard spec + 1)) : ℕ) < modeCard spec
       from show n < modeCard spec by omega)]
 
 omit [Finite A] in

@@ -38,7 +38,7 @@ def flipAt [DecidableEq α] (T : Finset α) (a : α) : Finset α :=
 
 theorem flipAt_of_notMem [DecidableEq α] {T : Finset α} {a : α} (ha : a ∉ T) :
     flipAt T a = insert a T := by
-  rw [flipAt, if_neg ha]
+  rw [flipAt, ite_eq_right ha]
 
 /-- **A family containing the empty set and closed under one-element flips is
 everything**: every finite set is reached from the empty one by flipping its
@@ -93,7 +93,7 @@ theorem bijective_of_flipClosedP [Finite α] (f : ι → α → Prop)
       refine ⟨j, Finset.ext fun x => ?_⟩
       rw [mem_toFinsetOf, hj x, flipAt]
       by_cases ha : a ∈ toFinsetOf f i
-      · rw [if_pos ha, Finset.mem_erase, mem_toFinsetOf]
+      · rw [ite_eq_left ha, Finset.mem_erase, mem_toFinsetOf]
         have hai : f i a := (mem_toFinsetOf f i a).mp ha
         constructor
         · rintro (⟨h1, h2⟩ | ⟨h1, h2⟩)
@@ -101,7 +101,7 @@ theorem bijective_of_flipClosedP [Finite α] (f : ι → α → Prop)
           · exact absurd (h1 ▸ hai) h2
         · rintro ⟨h1, h2⟩
           exact Or.inl ⟨h2, h1⟩
-      · rw [if_neg ha, Finset.mem_insert, mem_toFinsetOf]
+      · rw [ite_eq_right ha, Finset.mem_insert, mem_toFinsetOf]
         have hai : ¬f i a := fun hc => ha ((mem_toFinsetOf f i a).mpr hc)
         constructor
         · rintro (⟨h1, h2⟩ | ⟨h1, h2⟩)

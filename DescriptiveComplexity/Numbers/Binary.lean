@@ -168,8 +168,8 @@ theorem binValue_eq_sum_range (b : P → Prop) :
   rw [hrank]
   cases hb : posBits P b (i : ℕ) with
   | false =>
-    rw [if_neg fun hh => absurd (hbit.mpr hh) (by simp [hb]), if_neg (by simp)]
-  | true => rw [if_pos (hbit.mp hb), if_pos rfl]
+    rw [ite_eq_right fun hh => absurd (hbit.mpr hh) (by simp [hb]), ite_eq_right (by simp)]
+  | true => rw [ite_eq_left (hbit.mp hb), ite_eq_left rfl]
 
 /-- The decoded number is smaller than `2 ^ #positions`. -/
 theorem binValue_lt_two_pow (b : P → Prop) : binValue P b < 2 ^ Fintype.card P := by

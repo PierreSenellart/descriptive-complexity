@@ -132,9 +132,9 @@ theorem realize_atTagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.As
     intro ψ hψ
     obtain ⟨r, -, rfl⟩ := List.mem_map.mp hψ
     rcases eq_or_ne r p with rfl | hne
-    · rw [if_pos rfl]
+    · rw [ite_eq_left rfl]
       exact Formula.realize_top.mpr trivial
-    · rw [if_neg hne, Formula.realize_not]
+    · rw [ite_eq_right hne, Formula.realize_not]
       exact fun h => hne (((realize_tagTwoF r q σ ν).mp h).trans hpq.symm)
 
 open Classical in
@@ -156,7 +156,7 @@ theorem exists_tagAssign_two (p : T) (σ τ : (C.withTag T).Assignment A)
     · rcases eq_or_ne r p with rfl | hne
       · rfl
       · have hne' := hrest _ (List.mem_map.mpr ⟨r, mem_finEnum r, rfl⟩)
-        rw [if_neg hne, Formula.realize_not] at hne'
+        rw [ite_eq_right hne, Formula.realize_not] at hne'
         exact absurd ((realize_tagTwoF' r σ τ x).mpr hr) hne'
     · have hrp : r = p := hr
       rw [hrp] at *

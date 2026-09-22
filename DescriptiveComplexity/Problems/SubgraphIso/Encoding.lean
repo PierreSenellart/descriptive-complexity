@@ -104,11 +104,11 @@ theorem subgraphIsoOn_iff_subtype (PV HV : A → Prop) (PE HE : A → A → Prop
   · rintro ⟨f, hinj, hedge⟩
     refine ⟨fun x => if h : PV x then (f ⟨x, h⟩).1 else x, fun x hx => ?_,
       fun x y hx hy hxy => ?_, fun x y hx hy hxy => ?_⟩
-    · simp only [dif_pos hx]
+    · simp only [dite_eq_left hx]
       exact (f ⟨x, hx⟩).2
-    · simp only [dif_pos hx, dif_pos hy] at hxy
+    · simp only [dite_eq_left hx, dite_eq_left hy] at hxy
       exact congrArg Subtype.val (hinj (Subtype.ext hxy))
-    · simp only [dif_pos hx, dif_pos hy]
+    · simp only [dite_eq_left hx, dite_eq_left hy]
       exact hedge ⟨x, hx⟩ ⟨y, hy⟩ hxy
 
 /-- **The generic property is the textbook predicate**, once the pattern and

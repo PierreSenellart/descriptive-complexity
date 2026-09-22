@@ -495,7 +495,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
   | @acc q hacc =>
     have hcnt : stateCount x = 0 ∧ stateCount y = 0 := by
       rw [hu, stateCount_append, stateCount_append] at hcnt1
-      simp only [stateCount_cons, stateCount_nil, isState_state, if_true] at hcnt1
+      simp only [stateCount_cons, stateCount_nil, isState_state, ite_true] at hcnt1
       omega
     have heq : x ++ TapeLetter.state q :: y =
         (TapeLetter.lft :: cellSyms c ls) ++ TapeLetter.state c.state ::
@@ -508,7 +508,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
     have hcnt : stateCount x = 0 ∧ stateCount y = 0 := by
       rw [hu, stateCount_append, stateCount_append] at hcnt1
       simp only [stateCount_cons, stateCount_nil, isState_state, isState_sym,
-        if_true] at hcnt1
+        ite_true] at hcnt1
       omega
     have heq : x ++ TapeLetter.state q :: (TapeLetter.sym a :: TapeLetter.sym cc :: y) =
         (TapeLetter.lft :: cellSyms c ls) ++ TapeLetter.state c.state ::
@@ -533,18 +533,18 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
     have hrne : ∀ z ∈ r₁ :: rs', z ≠ c.head := fun z hz => ((hwlt.2 z hz).ne).symm
     refine Or.inl ⟨⟨q', r₁, fun z => if z = c.head then b else c.tape z⟩,
       ⟨τ, hτ, hq' ▸ hsrc, ha ▸ hread, hdst, by simpa using hwrite,
-        fun z hz => if_neg hz, Or.inl ⟨hR, hsucc⟩⟩,
+        fun z hz => ite_eq_right hz, Or.inl ⟨hR, hsucc⟩⟩,
       ls ++ [c.head], rs', ?_, ?_, ?_, ?_⟩
     · rw [hv, hxeq, hy]
       have h1 : List.map (fun z => TapeLetter.sym (if z = c.head then b else c.tape z)) ls =
           List.map (fun z => TapeLetter.sym (c.tape z)) ls :=
-        List.map_congr_left fun z hz => by rw [if_neg (hheadne z hz)]
+        List.map_congr_left fun z hz => by rw [ite_eq_right (hheadne z hz)]
       have h2 : List.map (fun z => TapeLetter.sym (if z = c.head then b else c.tape z)) rs' =
           List.map (fun z => TapeLetter.sym (c.tape z)) rs' :=
         List.map_congr_left fun z hz => by
-          rw [if_neg (hrne z (List.mem_cons_of_mem r₁ hz))]
+          rw [ite_eq_right (hrne z (List.mem_cons_of_mem r₁ hz))]
       simp only [cellSyms, List.map_append, List.map_cons, List.map_nil, h1, h2]
-      simp [if_neg (hrne r₁ List.mem_cons_self), hcc]
+      simp [ite_eq_right (hrne r₁ List.mem_cons_self), hcc]
     · simpa using hchain
     · intro z hz
       refine hposn z ?_
@@ -554,7 +554,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
         intro hcon
         exact hnot (by simp [hcon])
       change M.Blank (if (z, p) = c.head then b else c.tape (z, p))
-      rw [if_neg hne]
+      rw [ite_eq_right hne]
       refine hblank z p hp ?_
       intro hcon
       refine hnot ?_
@@ -563,7 +563,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
     have hcnt : stateCount x = 0 ∧ stateCount y = 0 := by
       rw [hu, stateCount_append, stateCount_append] at hcnt1
       simp only [stateCount_cons, stateCount_nil, isState_state, isState_sym,
-        isState_rgt, if_true] at hcnt1
+        isState_rgt, ite_true] at hcnt1
       omega
     have heq : x ++ TapeLetter.state q :: (TapeLetter.sym a :: TapeLetter.rgt :: y) =
         (TapeLetter.lft :: cellSyms c ls) ++ TapeLetter.state c.state ::
@@ -596,14 +596,14 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
       have hnne : n ≠ c.head := fun hcon => hnnot (by simp [hcon])
       refine Or.inl ⟨⟨q', n, fun z => if z = c.head then b else c.tape z⟩,
         ⟨τ, hτ, hq' ▸ hsrc, ha ▸ hread, hdst, by simpa using hwrite,
-          fun z hz => if_neg hz, Or.inl ⟨hR, hn⟩⟩,
+          fun z hz => ite_eq_right hz, Or.inl ⟨hR, hn⟩⟩,
         ls ++ [c.head], [], ?_, ?_, ?_, ?_⟩
       · rw [hv, hxeq, hy]
         have h1 : List.map (fun z => TapeLetter.sym (if z = c.head then b else c.tape z)) ls =
             List.map (fun z => TapeLetter.sym (c.tape z)) ls :=
-          List.map_congr_left fun z hz => by rw [if_neg (hheadne z hz)]
+          List.map_congr_left fun z hz => by rw [ite_eq_right (hheadne z hz)]
         simp only [cellSyms, List.map_append, List.map_cons, List.map_nil, h1]
-        simp [if_neg hnne, hnbk]
+        simp [ite_eq_right hnne, hnbk]
       · simp only [List.append_assoc, List.singleton_append]
         rw [List.isChain_split]
         refine ⟨by simpa using hchain, ?_⟩
@@ -621,7 +621,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
           intro hcon
           exact hnot (by simp [hcon])
         change M.Blank (if (z, p) = c.head then b else c.tape (z, p))
-        rw [if_neg hne]
+        rw [ite_eq_right hne]
         refine hblank z p hp ?_
         intro hcon
         refine hnot ?_
@@ -636,7 +636,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
     have hcnt : stateCount x = 0 ∧ stateCount y = 0 := by
       rw [hu, stateCount_append, stateCount_append] at hcnt1
       simp only [stateCount_cons, stateCount_nil, isState_state, isState_sym,
-        if_true] at hcnt1
+        ite_true] at hcnt1
       omega
     have heq : (x ++ [TapeLetter.sym cc]) ++
         TapeLetter.state q :: (TapeLetter.sym a :: y) =
@@ -681,19 +681,19 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
       have hrslt : ∀ z ∈ rs, CellLt M c.head z := hwlt.2
       refine Or.inl ⟨⟨q', lst, fun z => if z = c.head then b else c.tape z⟩,
         ⟨τ, hτ, hq' ▸ hsrc, ha ▸ hread, hdst, by simpa using hwrite,
-          fun z hz => if_neg hz, Or.inr ⟨hR, hsucc⟩⟩,
+          fun z hz => ite_eq_right hz, Or.inr ⟨hR, hsucc⟩⟩,
         init, c.head :: rs, ?_, ?_, ?_, ?_⟩
       · rw [hv, hxeq'', hy]
         have h1 : List.map
               (fun z => TapeLetter.sym (if z = c.head then b else c.tape z)) init =
             List.map (fun z => TapeLetter.sym (c.tape z)) init :=
-          List.map_congr_left fun z hz => by rw [if_neg (hinitlt z hz).ne]
+          List.map_congr_left fun z hz => by rw [ite_eq_right (hinitlt z hz).ne]
         have h2 : List.map
               (fun z => TapeLetter.sym (if z = c.head then b else c.tape z)) rs =
             List.map (fun z => TapeLetter.sym (c.tape z)) rs :=
-          List.map_congr_left fun z hz => by rw [if_neg (Ne.symm (hrslt z hz).ne)]
+          List.map_congr_left fun z hz => by rw [ite_eq_right (Ne.symm (hrslt z hz).ne)]
         simp only [cellSyms, List.map_cons, h1, h2]
-        simp [if_neg hlstne, hcc']
+        simp [ite_eq_right hlstne, hcc']
       · simpa using hchain
       · intro z hz
         refine hposn z ?_
@@ -705,7 +705,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
           refine hnot ?_
           simp [hcon]
         change M.Blank (if (z, p) = c.head then b else c.tape (z, p))
-        rw [if_neg hne]
+        rw [ite_eq_right hne]
         refine hblank z p hp ?_
         intro hcon
         refine hnot ?_
@@ -715,7 +715,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
     have hcnt : stateCount x = 0 ∧ stateCount y = 0 := by
       rw [hu, stateCount_append, stateCount_append] at hcnt1
       simp only [stateCount_cons, stateCount_nil, isState_state, isState_sym,
-        isState_lft, if_true] at hcnt1
+        isState_lft, ite_true] at hcnt1
       omega
     have heq : (x ++ [TapeLetter.lft]) ++
         TapeLetter.state q :: (TapeLetter.sym a :: y) =
@@ -767,14 +767,14 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
       have hrslt : ∀ z ∈ rs, CellLt M c.head z := hwlt.2
       refine Or.inl ⟨⟨q', n, fun z => if z = c.head then b else c.tape z⟩,
         ⟨τ, hτ, hq' ▸ hsrc, ha ▸ hread, hdst, by simpa using hwrite,
-          fun z hz => if_neg hz, Or.inr ⟨hR, hn⟩⟩,
+          fun z hz => ite_eq_right hz, Or.inr ⟨hR, hn⟩⟩,
         [], c.head :: rs, ?_, ?_, ?_, ?_⟩
       · rw [hv, hx0, hy]
         have h2 : List.map (fun z => TapeLetter.sym (if z = c.head then b else c.tape z)) rs =
             List.map (fun z => TapeLetter.sym (c.tape z)) rs :=
-          List.map_congr_left fun z hz => by rw [if_neg (Ne.symm (hrslt z hz).ne)]
+          List.map_congr_left fun z hz => by rw [ite_eq_right (Ne.symm (hrslt z hz).ne)]
         simp only [cellSyms, List.map_cons, List.map_nil, h2]
-        simp [if_neg hnne, hnbk]
+        simp [ite_eq_right hnne, hnbk]
       · rw [List.nil_append, List.isChain_cons_cons]
         exact ⟨hn, by simpa using hchain⟩
       · intro z hz
@@ -788,7 +788,7 @@ theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLette
           refine hnot ?_
           simp [hcon]
         change M.Blank (if (z, p) = c.head then b else c.tape (z, p))
-        rw [if_neg hne]
+        rw [ite_eq_right hne]
         refine hblank z p hp ?_
         intro hcon
         refine hnot ?_
@@ -1144,11 +1144,11 @@ theorem exists_isInitU [Finite A] (hwf : M.WellFormed) {q₀ : A} (hq : M.Start 
     fun x => if h : x.1 = 0 ∧ ∃ a, M.Inp x.2 a then h.2.choose else b₀⟩,
     ⟨hq, rfl, hp₀, fun z p hp => ⟨fun hz => ?_, fun hz => ?_⟩⟩, rfl⟩
   · by_cases h : ∃ a, M.Inp p a
-    · exact Or.inl (by simpa only [dif_pos (⟨hz, h⟩ : (z = 0) ∧ _)] using
+    · exact Or.inl (by simpa only [dite_eq_left (⟨hz, h⟩ : (z = 0) ∧ _)] using
         (⟨hz, h⟩ : (z = 0) ∧ ∃ a, M.Inp p a).2.choose_spec)
     · refine Or.inr ⟨fun b hb => h ⟨b, hb⟩, ?_⟩
-      simpa only [dif_neg (fun hcon : (z = 0) ∧ ∃ a, M.Inp p a => h hcon.2)] using hb₀
-  · simpa only [dif_neg (fun hcon : (z = 0) ∧ ∃ a, M.Inp p a => hz hcon.1)] using hb₀
+      simpa only [dite_eq_right (fun hcon : (z = 0) ∧ ∃ a, M.Inp p a => h hcon.2)] using hb₀
+  · simpa only [dite_eq_right (fun hcon : (z = 0) ∧ ∃ a, M.Inp p a => hz hcon.1)] using hb₀
 
 /-- **The word of an initial configuration**: the input page between the
 endmarkers, the state in front of its first cell. -/

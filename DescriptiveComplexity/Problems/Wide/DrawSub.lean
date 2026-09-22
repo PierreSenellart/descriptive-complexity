@@ -74,10 +74,10 @@ theorem passTracks_update_cell (F : IxFile (Univ A R P K dd) I ile) (hix : IsLin
   refine funext fun s => ?_
   by_cases hs : s = t
   · subst hs
-    rw [Function.update_self, if_pos rfl]
+    rw [Function.update_self, ite_eq_left rfl]
     exact bitVal_congr ⟨fun hc => hc.elim (fun h => h.2) fun h => absurd rfl h.1,
       fun hb => Or.inl ⟨rfl, hb⟩⟩
-  · rw [Function.update_of_ne hs, if_neg hs, if_neg hs]
+  · rw [Function.update_of_ne hs, ite_eq_right hs, ite_eq_right hs]
 
 omit [Finite I] in
 /-- **One step writing the walked track at a register cell**, moving left: the

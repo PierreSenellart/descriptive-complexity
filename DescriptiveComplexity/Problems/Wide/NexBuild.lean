@@ -87,7 +87,7 @@ theorem regAt_cell {I : Type} {F : LaidFile dt A R' P' I}
     regAt F dflt (F.cell v) = v := by
   classical
   have hex : ∃ w : I, F.cell v = F.cell w := ⟨v, rfl⟩
-  rw [regAt, dif_pos hex]
+  rw [regAt, dite_eq_left hex]
   exact (hinj hex.choose_spec).symm
 
 /-! ### The step the sweep asks for, at a register -/
@@ -212,7 +212,7 @@ theorem phAt_cell (hinj : Function.Injective F.cell) (blk : I → Option dt.KIx)
     phAt F blk inb done (F.cell v) = inb (blk v) := by
   classical
   have hex : ∃ w : I, F.cell v = F.cell w := ⟨v, rfl⟩
-  rw [phAt, dif_pos hex]
+  rw [phAt, dite_eq_left hex]
   exact congrArg (fun w => inb (blk w)) (hinj hex.choose_spec).symm
 
 /-- Off the file the phase is the turn-around one. -/
@@ -221,7 +221,7 @@ theorem phAt_not_cell {blk : I → Option dt.KIx}
     {done : NexPh (Option dt.KIx) PE}
     {r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hr : ∀ v : I, r ≠ F.cell v) : phAt F blk inb done r = done :=
-  dif_neg fun hc => hr hc.choose hc.choose_spec
+  dite_eq_right fun hc => hr hc.choose hc.choose_spec
 
 /-- At a register's cell the control holds that register's tuple. -/
 theorem fcAt_cell (hinj : Function.Injective F.cell) (tup : I → Fin dt.dd → A)
@@ -233,7 +233,7 @@ theorem fcAt_not_cell {tup : I → Fin dt.dd → A}
     {r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hr : ∀ v : I, r ≠ F.cell v) :
     dt.fcAt F dflt coord f₀ tup r = dt.ctlOf coord f₀ (tup dflt) := by
-  rw [fcAt, regAt, dif_neg fun hc => hr hc.choose hc.choose_spec]
+  rw [fcAt, regAt, dite_eq_right fun hc => hr hc.choose hc.choose_spec]
 
 end Families
 
@@ -283,9 +283,9 @@ theorem buildWr_eq_passTracks {coord : Fin dt.dd → dt.CtlIx}
   rw [Prog.passTracksAt]
   by_cases hs : sl = Slot.mir
   · subst hs
-    rw [if_pos rfl, bitVal_neg (fun hc => hc.choose_spec.2)]
+    rw [ite_eq_left rfl, bitVal_neg (fun hc => hc.choose_spec.2)]
     rfl
-  · rw [if_neg hs, hbg]
+  · rw [ite_eq_right hs, hbg]
 
 end Written
 

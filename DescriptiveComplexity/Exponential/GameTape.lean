@@ -648,14 +648,14 @@ noncomputable def updAssign {B : SOBlock} {A : Type} (α : B.Assignment A) (i : 
 theorem updAssign_self {B : SOBlock} {A : Type} (α : B.Assignment A) (i : B.ι)
     (ā : Fin (B.arity i) → A) (b : Bool) : updAssign α i ā b i ā = (b = true) := by
   classical
-  rw [updAssign, if_pos rfl]
+  rw [updAssign, ite_eq_left rfl]
 
 theorem updAssign_of_ne {B : SOBlock} {A : Type} (α : B.Assignment A) (i : B.ι)
     (ā : Fin (B.arity i) → A) (b : Bool) {i' : B.ι} {ā' : Fin (B.arity i') → A}
     (h : (⟨i', ā'⟩ : Σ j : B.ι, Fin (B.arity j) → A) ≠ ⟨i, ā⟩) :
     updAssign α i ā b i' ā' = α i' ā' := by
   classical
-  rw [updAssign, if_neg h]
+  rw [updAssign, ite_eq_right h]
 
 variable [LinearOrder A] {carity : C → ℕ}
 

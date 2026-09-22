@@ -203,10 +203,10 @@ variable {A : Type} [Language.wide.Structure A] [LinearOrder A] {v : γ → A}
 theorem realize_tagIfF (b : Prop) : ((tagIfF b).Realize v) ↔ b := by
   classical
   by_cases hb : b
-  · rw [tagIfF, if_pos hb]
+  · rw [tagIfF, ite_eq_left hb]
     simp only [Formula.realize_top]
     exact iff_of_true trivial hb
-  · rw [tagIfF, if_neg hb]
+  · rw [tagIfF, ite_eq_right hb]
     simp only [Formula.realize_bot]
     exact iff_of_false (fun h => h) hb
 

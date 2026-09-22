@@ -378,7 +378,7 @@ theorem ixBack_of_not_reg {r : Univ A R' P' dt.KIx dt.dd → Prop}
   | regFirst => exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
   | regLast => exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
   | blk b => exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
-  | name j => exact dif_neg hno
+  | name j => exact dite_eq_right hno
   | pdd => exact bitVal_neg fun hc => hr hc.choose hc.choose_spec.1
   | mir => exact bitVal_neg (bitAtOf_of_not_reg hr)
   | tgt => exact bitVal_neg (bitAtOf_of_not_reg hr)
@@ -458,7 +458,7 @@ theorem ixBack_name_cell (hinj : Function.Injective lay.cell) (u : I) (j : Fin d
   classical
   change (if h : ∃ v : I, lay.cell u = lay.cell v then
     lay.arg h.choose (Fin.castLE hdd j) else zero) = _
-  rw [dif_pos ⟨u, rfl⟩]
+  rw [dite_eq_left ⟨u, rfl⟩]
   have hspec := (⟨u, rfl⟩ : ∃ v : I, lay.cell u = lay.cell v).choose_spec
   rw [show (⟨u, rfl⟩ : ∃ v : I, lay.cell u = lay.cell v).choose = u from (hinj hspec).symm]
 
@@ -745,7 +745,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 /-- A named tuple is canonically padded. -/
 theorem padTup_pad (zero : A) (c : Fin dt.dd0 → A) {j : Fin dt.dd}
     (hj : dt.dd0 ≤ (j : ℕ)) : padTup zero c j = zero :=
-  dif_neg (by omega)
+  dite_eq_right (by omega)
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
@@ -755,7 +755,7 @@ theorem padTup_coord (zero : A) (c : Fin dt.dd0 → A) (hdd : dt.dd0 ≤ dt.dd)
   have h : ((Fin.castLE hdd j : Fin dt.dd) : ℕ) < dt.dd0 := j.isLt
   change (if h : ((Fin.castLE hdd j : Fin dt.dd) : ℕ) < dt.dd0 then
     c ⟨_, h⟩ else zero) = c j
-  rw [dif_pos h]
+  rw [dite_eq_left h]
   exact congrArg c (Fin.ext rfl)
 
 end IxName

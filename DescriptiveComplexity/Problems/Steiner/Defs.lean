@@ -142,7 +142,7 @@ private theorem rdist_step {R : A → A → Prop} {r x : A} (hx : Relation.ReflT
     (hne : x ≠ r) : ∃ z, R z x ∧ rdist R r z < rdist R r x := by
   classical
   have hex : ∃ n, reachIn R n r x := (reflTransGen_iff_exists_reachIn R r x).mp hx
-  have hd : rdist R r x = Nat.find hex := dif_pos hex
+  have hd : rdist R r x = Nat.find hex := dite_eq_left hex
   have hfind : reachIn R (Nat.find hex) r x := Nat.find_spec hex
   rcases hn : Nat.find hex with _ | m
   · rw [hn] at hfind
@@ -155,7 +155,7 @@ private theorem rdist_step {R : A → A → Prop} {r x : A} (hx : Relation.ReflT
     · refine ⟨z, hzx, ?_⟩
       have hzex : ∃ n, reachIn R n r z := ⟨m, hz⟩
       have hle : rdist R r z ≤ m := by
-        rw [rdist, dif_pos hzex]
+        rw [rdist, dite_eq_left hzex]
         exact Nat.find_le hz
       rw [hd, hn]
       omega

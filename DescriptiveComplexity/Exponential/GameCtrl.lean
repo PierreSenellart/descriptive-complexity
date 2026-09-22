@@ -502,10 +502,10 @@ theorem par_of_ctrlStep {p p' : MachPh V M} (h : CtrlStep vars natoms p p') :
   · rcases h with rfl | rfl <;> rfl
   · rcases h with rfl | rfl <;> rfl
   · by_cases hj : (p.j : ℕ) < vars p.q
-    · rw [if_pos hj] at h
+    · rw [ite_eq_left hj] at h
       obtain ⟨_, _, rfl⟩ := h
       rfl
-    · rw [if_neg hj] at h
+    · rw [ite_eq_right hj] at h
       subst h
       rfl
   · obtain ⟨_, rfl⟩ := h; rfl

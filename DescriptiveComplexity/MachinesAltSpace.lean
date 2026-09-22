@@ -124,7 +124,7 @@ theorem exists_altAcc_of_altWin [Finite A] {start : Bool} {c : Config A}
     have hle : (if h : M.Step c c' then f c' h else 0) ≤
         Finset.univ.sup fun d => if h : M.Step c d then f d h else 0 :=
       Finset.le_sup (f := fun d => if h : M.Step c d then f d h else 0) (Finset.mem_univ c')
-    rw [dif_pos hc'] at hle
+    rw [dite_eq_left hc'] at hle
     exact hle
 
 /-- **The two presentations agree**: winning is accepting within some budget.

@@ -104,7 +104,7 @@ noncomputable def addrSeq (h : IsLinOrd (WMLe (A := A))) : ℕ → (A → Prop)
 theorem wmIncr_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
     (hex : ∃ x : A, ¬addrSeq h j x) : WMIncr WMLe (addrSeq h j) (addrSeq h (j + 1)) := by
   have : addrSeq h (j + 1) = Classical.choose (exists_wmIncr h hex) := by
-    simp only [addrSeq, dif_pos hex]
+    simp only [addrSeq, dite_eq_left hex]
   rw [this]
   exact Classical.choose_spec (exists_wmIncr h hex)
 
@@ -418,7 +418,7 @@ theorem exists_not_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
   classical
   by_contra hc
   have hstay : addrSeq h (j + 1) = addrSeq h j := by
-    simp only [addrSeq, dif_neg hc]
+    simp only [addrSeq, dite_eq_right hc]
   have h1 := wideRank_addrSeq h j (by omega)
   have h2 := wideRank_addrSeq h (j + 1) hj
   rw [hstay, h1] at h2

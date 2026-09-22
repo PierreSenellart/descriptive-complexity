@@ -537,11 +537,11 @@ theorem step_of_goOn {c : Config A} (hgo : GoOn (cfgAssign c)) :
   refine ⟨⟨q₀, p', fun r => if r = c.head then a₀ else c.tape r⟩, τ, htr,
     hsrcs c.state rfl, hreads c.head (c.tape c.head) rfl rfl, hq₀, ?_, ?_, hmv⟩
   · change TMWrite τ (if c.head = c.head then a₀ else c.tape c.head)
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     exact ha₀
   · intro r hr
     change (if r = c.head then a₀ else c.tape r) = c.tape r
-    rw [if_neg hr]
+    rw [ite_eq_right hr]
 
 omit [LinearOrder A] in
 /-- On a non-accepting configuration that steps, the iteration takes **the**

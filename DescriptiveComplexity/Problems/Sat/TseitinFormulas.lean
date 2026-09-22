@@ -121,7 +121,7 @@ theorem realize_atomLitF {m l : ℕ} (h : m ≤ D)
   constructor
   · intro hval j hj
     have := hval _ (List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩)
-    rw [dif_pos hj] at this
+    rw [dite_eq_left hj] at this
     rwa [Formula.realize_equal, Term.realize_var, realize_tTerm] at this
   · intro hval ψ hψ
     obtain ⟨j, -, rfl⟩ := List.mem_map.mp hψ
@@ -217,7 +217,7 @@ theorem realize_isClauseF :
               else if k = 1 then
                 canonF n c ⊓ ∼(termEqF ((le_maxCtx _).trans hctx) t₁ t₂ c)
               else ⊥).Realize v ↔ _
-          rw [if_neg hk, if_neg hk1, Formula.realize_bot]
+          rw [ite_eq_right hk, ite_eq_right hk1, Formula.realize_bot]
           refine iff_of_false id ?_
           rintro ⟨-, ⟨h, -⟩ | ⟨h, -⟩⟩
           exacts [hk h, hk1 h]
@@ -253,7 +253,7 @@ theorem realize_isClauseF :
                 else if k = 1 then
                   canonF n c ⊓ ∼(relAtF ((le_maxCtx _).trans hctx) r ts c)
                 else ⊥).Realize v ↔ _
-              rw [if_neg hk, if_neg hk1, Formula.realize_bot]
+              rw [ite_eq_right hk, ite_eq_right hk1, Formula.realize_bot]
               refine iff_of_false id ?_
               rintro ⟨-, ⟨h, -⟩ | ⟨h, -⟩⟩
               exacts [hk h, hk1 h]
@@ -290,7 +290,7 @@ theorem realize_isClauseF :
               · exact hc
           · change (if k = 0 then canonF (n + 1) c
                 else if k = 1 then canonF n c else ⊥).Realize v ↔ _
-            rw [if_neg hk, if_neg hk1, Formula.realize_bot]
+            rw [ite_eq_right hk, ite_eq_right hk1, Formula.realize_bot]
             refine iff_of_false id ?_
             rintro (⟨h, -⟩ | ⟨h, -⟩)
             exacts [hk h, hk1 h]

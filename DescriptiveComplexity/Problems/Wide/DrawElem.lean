@@ -160,13 +160,13 @@ theorem elemRule_dstPh (i : ElemSite nr) (ρ : ElemSh nr i) :
       exitPh i ρ).dstPh = exitPh := by
   have hfirst : ∃ p : ElemPh nr, elemFirstRd emb = emb p := by
     by_cases h : 0 < nr
-    · exact ⟨_, dif_pos h⟩
-    · exact ⟨_, dif_neg h⟩
+    · exact ⟨_, dite_eq_left h⟩
+    · exact ⟨_, dite_eq_right h⟩
   have hnext : ∀ j : Fin nr, ∃ p : ElemPh nr, elemNextRd emb j = emb p := by
     intro j
     by_cases h : (j : ℕ) + 1 < nr
-    · exact ⟨_, dif_pos h⟩
-    · exact ⟨_, dif_neg h⟩
+    · exact ⟨_, dite_eq_left h⟩
+    · exact ⟨_, dite_eq_right h⟩
   match i, ρ with
   | .e0, .stay => exact Or.inl ⟨_, rfl⟩
   | .e0, .dspA => exact Or.inl hfirst

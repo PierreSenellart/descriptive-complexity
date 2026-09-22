@@ -86,7 +86,7 @@ node.** -/
 theorem nodeAt_shift (t : T) (pts : Fin n → X.Map A) :
     nodeAt I hdn t 0 (fun i => pts (shiftIx d n hdn i)) = nodeAt I hdn t 1 pts := by
   refine congrArg (fun f => ((t, f) : I.Map (X.Map A))) (funext fun b => congrArg pts ?_)
-  rw [shiftIx, dif_pos (show ((paramIx d n hdn 0 b : Fin n) : ℕ) < d by simp)]
+  rw [shiftIx, dite_eq_left (show ((paramIx d n hdn 0 b : Fin n) : ℕ) < d by simp)]
   exact Fin.ext (by simp; omega)
 
 omit [Finite T] [Finite A] [Nonempty A] in
@@ -108,11 +108,11 @@ theorem exists_pts_of_node (z : I.Map (X.Map A)) (pts : Fin n → X.Map A) :
       simp only [paramIx_val, Fin.val_one, one_mul]
       omega
     rw [hdef]
-    simp only [dif_pos hin]
+    simp only [dite_eq_left hin]
     refine congrArg z.2 (Fin.ext ?_)
     simp only [paramIx_val, Fin.val_one, one_mul]
     omega
-  refine ⟨pts', fun i hi => by rw [hdef]; exact dif_neg hi, ?_⟩
+  refine ⟨pts', fun i hi => by rw [hdef]; exact dite_eq_right hi, ?_⟩
   change ((z.1, fun b => pts' (paramIx d n hdn 1 b)) : I.Map (X.Map A)) = z
   rw [funext hmid]
   rfl
@@ -274,10 +274,10 @@ theorem wins_preEntry (s : Sub) (tx ty : T) (pts : Fin n → X.Map A) :
     (fun i => pointAssign (pts i)) τs) ?_ ?_
   · intro τs kk hkk
     simp only [fillRounds]
-    rw [dif_neg (by omega)]
+    rw [dite_eq_right (by omega)]
   · intro τs i kk hkk
     simp only [fillRounds]
-    rw [dif_pos (by omega)]
+    rw [dite_eq_left (by omega)]
     exact congrArg τs (Fin.ext (show (kk : ℕ) - (n - D s tx ty) = (i : ℕ) by omega))
 
 /-! ### The node phases play the graph -/

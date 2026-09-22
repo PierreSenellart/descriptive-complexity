@@ -355,7 +355,7 @@ theorem hasSmallSetCover_iff_hasSmallDominatingSet :
           intro a ha
           have hex := hcov a ha
           rw [hcovdef]
-          simp only [dif_pos hex]
+          simp only [dite_eq_left hex]
           exact hex.choose_spec
         set g : dsInterp.Map A → A := fun v =>
           match v.1 with

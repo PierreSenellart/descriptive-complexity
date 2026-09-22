@@ -147,18 +147,18 @@ theorem nexEvalSep
   | .chk k, .dsp, .dsp => rfl
   | .chk k, .stay, .dsp =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [nexEvalRule, dif_pos hk] at hg'
+    · simp only [nexEvalRule, dite_eq_left hk] at hg'
       simp only [nexEvalRule] at hg
       exact absurd hg'.1 hg
-    · simp only [nexEvalRule, dif_neg hk] at hg'
+    · simp only [nexEvalRule, dite_eq_right hk] at hg'
       simp only [nexEvalRule] at hg
       exact absurd hg'.1 hg
   | .chk k, .dsp, .stay =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [nexEvalRule, dif_pos hk] at hg
+    · simp only [nexEvalRule, dite_eq_left hk] at hg
       simp only [nexEvalRule] at hg'
       exact absurd hg.1 hg'
-    · simp only [nexEvalRule, dif_neg hk] at hg
+    · simp only [nexEvalRule, dite_eq_right hk] at hg
       simp only [nexEvalRule] at hg'
       exact absurd hg.1 hg'
   | .sub s, ρ, ρ' => exact hsepM s ρ ρ' f g hg hg' hph
@@ -174,8 +174,8 @@ theorem nexEvalRule_dstIn {S : NexPh B (EvalPh nv PM) → Prop}
   | .chk k, .stay => exact hemb _
   | .chk k, .dsp =>
     by_cases hk : (k : ℕ) < nv
-    · rw [nexEvalRule, dif_pos hk]; exact hemb _
-    · rw [nexEvalRule, dif_neg hk]; exact hexit
+    · rw [nexEvalRule, dite_eq_left hk]; exact hemb _
+    · rw [nexEvalRule, dite_eq_right hk]; exact hexit
   | .sub s, ρ => exact hM s ρ
 
 /-! ### The spine at the clocked machineries
@@ -571,7 +571,7 @@ theorem nexEval_reachesIn :
       refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
       refine hasRight_of_rule hrules (i := .chk j.castSucc) (ρ := .dsp)
         ?_ ?_ ?_ ?_ ?_ ?_
-      · rw [nexEvalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [nexEvalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
         constructor
         · rw [Prog.passTracks_of_ne hne_wk_val, hwkOf]
@@ -579,16 +579,16 @@ theorem nexEval_reachesIn :
         · rw [Prog.passTracks_of_ne hne_reg_val, hrgOf,
             bitVal_neg (fun hc => hvnr hc.choose hc.choose_spec)]
           exact PR.zero_ne_one
-      · rw [nexEvalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [nexEvalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
-      · rw [nexEvalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [nexEvalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
         rfl
-      · rw [nexEvalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [nexEvalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
-      · rw [nexEvalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [nexEvalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
-      · rw [nexEvalRule, dif_pos (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
+      · rw [nexEvalRule, dite_eq_left (show ((j.castSucc : Fin (nv + 1)) : ℕ) < nv
           from hkl)]
         trivial
     -- the machinery's run, and the walk back at the next checkpoint
@@ -665,13 +665,13 @@ theorem step_nexEvalExit (hR : PR.table.Reads)
         wideTape (PR.trackTapeAt RF.cell Slot.val rest m) (PR.syElt PR.blank)⟩ := by
   refine Prog.step_move hR hlin hvi (fun _ _ => rfl) ?_
   refine hasRight_of_rule hrules (i := .chk (Fin.last nv)) (ρ := .dsp) ?_ ?_ ?_ ?_ ?_ ?_
-  · rw [nexEvalRule, dif_neg (by simp [Fin.last])]
+  · rw [nexEvalRule, dite_eq_right (by simp [Fin.last])]
     exact hex
-  · rw [nexEvalRule, dif_neg (by simp [Fin.last])]
-  · rw [nexEvalRule, dif_neg (by simp [Fin.last])]
-  · rw [nexEvalRule, dif_neg (by simp [Fin.last])]
-  · rw [nexEvalRule, dif_neg (by simp [Fin.last])]
-  · rw [nexEvalRule, dif_neg (by simp [Fin.last])]
+  · rw [nexEvalRule, dite_eq_right (by simp [Fin.last])]
+  · rw [nexEvalRule, dite_eq_right (by simp [Fin.last])]
+  · rw [nexEvalRule, dite_eq_right (by simp [Fin.last])]
+  · rw [nexEvalRule, dite_eq_right (by simp [Fin.last])]
+  · rw [nexEvalRule, dite_eq_right (by simp [Fin.last])]
     trivial
 
 end NexEvalRun

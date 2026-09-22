@@ -657,14 +657,14 @@ theorem stageG_covBy {j j' : Fin (hs d)} {V : Fin (kk d) → A}
     toLex ((j, toLex fun q => V (vT1 d q)) : Fin (hs d) × Lex (Fin (hm d) → A)) ⋖
       toLex (j', toLex fun q => V (vT2 d q)) := by
   rcases (mem_stagePairs (d := d)).mp hjj with rfl | hcross
-  · rw [stageG, if_pos rfl] at h
+  · rw [stageG, ite_eq_left rfl] at h
     exact prodLex_covBy_iff.mpr (Or.inl ⟨rfl,
       tupSucc_iff_covBy.mp ((realize_succTupF (L := L) _ _).mp h)⟩)
   · have hne : j ≠ j' := by
       intro he
       rw [he] at hcross
       omega
-    rw [stageG, if_neg hne, Formula.realize_inf] at h
+    rw [stageG, ite_eq_right hne, Formula.realize_inf] at h
     refine prodLex_covBy_iff.mpr (Or.inr ⟨finCovBy_iff.mpr hcross, ?_, ?_⟩)
     · exact tup_isTop_iff.mpr ((realize_maxTupF (L := L) _).mp h.1)
     · exact tup_isBot_iff.mpr ((realize_minTupF (L := L) _).mp h.2)
@@ -678,7 +678,7 @@ theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
       toLex (j', toLex fun q => V (vT2 d q))) :
     (stageG d j j').Realize V := by
   rcases (mem_stagePairs (d := d)).mp hjj with rfl | hcross
-  · rw [stageG, if_pos rfl]
+  · rw [stageG, ite_eq_left rfl]
     rcases prodLex_covBy_iff.mp hcov with ⟨-, htail⟩ | ⟨hjcov, -, -⟩
     · exact (realize_succTupF (L := L) _ _).mpr (tupSucc_iff_covBy.mpr htail)
     · exact absurd hjcov.1 (lt_irrefl _)
@@ -686,7 +686,7 @@ theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
       intro he
       rw [he] at hcross
       omega
-    rw [stageG, if_neg hne, Formula.realize_inf]
+    rw [stageG, ite_eq_right hne, Formula.realize_inf]
     rcases prodLex_covBy_iff.mp hcov with ⟨heq, -⟩ | ⟨-, htop, hbot⟩
     · exact absurd heq hne
     · exact ⟨(realize_maxTupF (L := L) _).mpr (tup_isTop_iff.mp htop),
@@ -1112,7 +1112,7 @@ theorem packV_comp_vT1 : (fun q => packV t1 t2 x e sp (vT1 d q)) = t1 := by
   have hq := q.isLt
   have hv : ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_left (by rw [hv]; omega)]
   exact congrArg t1 (Fin.ext (show ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) from hv))
 
 theorem packV_comp_vT2 : (fun q => packV t1 t2 x e sp (vT2 d q)) = t2 := by
@@ -1120,7 +1120,7 @@ theorem packV_comp_vT2 : (fun q => packV t1 t2 x e sp (vT2 d q)) = t2 := by
   have hq := q.isLt
   have hv : ((vT2 d q : Fin (kk d)) : ℕ) = hm d + (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_left (by rw [hv]; omega)]
   exact congrArg t2 (Fin.ext
     (show ((vT2 d q : Fin (kk d)) : ℕ) - hm d = (q : ℕ) from by rw [hv]; omega))
 
@@ -1131,8 +1131,9 @@ theorem packV_comp_eSel {n : ℕ} (hn : n ≤ hX d) {v : Fin n → A}
   have hq := q.isLt
   have hv : ((eSel d hn q : Fin (kk d)) : ℕ) = 3 * hm d + (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_pos (by rw [hv]; have := lt_of_lt_of_le hq hn; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega),
+    dite_eq_left (by rw [hv]; have := lt_of_lt_of_le hq hn; omega)]
   rw [← hpad q]
   exact congrArg e (Fin.ext
     (show ((eSel d hn q : Fin (kk d)) : ℕ) - 3 * hm d = (q : ℕ) from by rw [hv]; omega))
@@ -1140,8 +1141,8 @@ theorem packV_comp_eSel {n : ℕ} (hn : n ≤ hX d) {v : Fin n → A}
 theorem packV_vS : packV t1 t2 x e sp (vS d) = sp := by
   have hv : ((vS d : Fin (kk d)) : ℕ) = 3 * hm d + hX d := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega)]
 
 theorem packV_comp_xa {i : d.B.ι}
     {xt : Fin (d.B.arity i) → A}
@@ -1152,8 +1153,8 @@ theorem packV_comp_xa {i : d.B.ι}
   have hq := lt_of_lt_of_le q.isLt (arity_le_blockArityBound d.B i)
   have hv : ((xa d i q : Fin (kk d)) : ℕ) = 2 * hm d + (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_pos (by rw [hv]; simp only [hm] at hq ⊢; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_left (by rw [hv]; simp only [hm] at hq ⊢; omega)]
   rw [← hpad q]
   exact congrArg x (Fin.ext
     (show ((xa d i q : Fin (kk d)) : ℕ) - 2 * hm d = (q : ℕ) from by rw [hv]; omega))
@@ -1169,14 +1170,14 @@ omit [L.Structure A] [LinearOrder A] [Finite A] in
 theorem packV_comp_eSel_pad {n : ℕ} (hn : n ≤ hX d) {v : Fin n → A} :
     (fun q => packV t1 t2 x (padF v) sp (eSel d hn q)) = v :=
   packV_comp_eSel hn fun q => by
-    rw [padF, dif_pos (show ((⟨q, lt_of_lt_of_le q.isLt hn⟩ : Fin (hX d)) : ℕ) < n
+    rw [padF, dite_eq_left (show ((⟨q, lt_of_lt_of_le q.isLt hn⟩ : Fin (hX d)) : ℕ) < n
       from q.isLt)]
 
 omit [L.Structure A] [LinearOrder A] [Finite A] in
 theorem packV_comp_xa_pad {i : d.B.ι} {xt : Fin (d.B.arity i) → A} :
     (fun q => packV t1 t2 (padF xt) e sp (xa d i q)) = xt :=
   packV_comp_xa fun q => by
-    rw [padF, dif_pos (show ((⟨q, lt_of_lt_of_le q.isLt
+    rw [padF, dite_eq_left (show ((⟨q, lt_of_lt_of_le q.isLt
       (arity_le_blockArityBound d.B i)⟩ : Fin (hm d)) : ℕ) < d.B.arity i from q.isLt)]
 
 /-! #### Membership of the rules in the program -/

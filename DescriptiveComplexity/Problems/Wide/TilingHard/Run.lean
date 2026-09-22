@@ -226,7 +226,7 @@ theorem tileAt_head (hh : (g k).head = cell) (hk : k < n) :
     tileAt g tr n k cell =
       (TileTag.head, ![wpElt ((g k).tape cell), wpElt (g k).state, wpElt (tr k)]) := by
   rw [tileAt]
-  simp only [if_pos hh, if_pos hk]
+  simp only [ite_eq_left hh, ite_eq_left hk]
 
 open Classical in
 @[simp]
@@ -235,7 +235,7 @@ theorem tileAt_halt (hh : (g k).head = cell) (hk : ¬k < n) :
       (TileTag.halt, ![wpElt ((g k).tape cell), wpElt (g k).state,
         wpElt ((g k).tape cell)]) := by
   rw [tileAt]
-  simp only [if_pos hh, if_neg hk]
+  simp only [ite_eq_left hh, ite_eq_right hk]
 
 open Classical in
 @[simp]
@@ -244,7 +244,7 @@ theorem tileAt_sym (hh : (g k).head ≠ cell) (hnext : ¬(k < n ∧ (g (k + 1)).
       (TileTag.sym, ![wpElt ((g k).tape cell), wpElt ((g k).tape cell),
         wpElt ((g k).tape cell)]) := by
   rw [tileAt]
-  simp only [if_neg hh, if_neg hnext]
+  simp only [ite_eq_right hh, ite_eq_right hnext]
 
 open Classical in
 theorem tileAt_arr (hh : (g k).head ≠ cell) (hk : k < n) (hnext : (g (k + 1)).head = cell) :
@@ -254,10 +254,10 @@ theorem tileAt_arr (hh : (g k).head ≠ cell) (hk : k < n) (hnext : (g (k + 1)).
           wpElt ((g k).tape cell)]) := by
   have hcond : k < n ∧ (g (k + 1)).head = cell := ⟨hk, hnext⟩
   rw [tileAt]
-  simp only [if_neg hh, if_pos hcond]
+  simp only [ite_eq_right hh, ite_eq_left hcond]
   by_cases hr : WMRight (wpElt (tr k))
-  · simp only [if_pos hr]
-  · simp only [if_neg hr]
+  · simp only [ite_eq_left hr]
+  · simp only [ite_eq_right hr]
 
 /-- The symbol a tile of the table holds is what the tape holds there. -/
 theorem tpSym_tileAt : tpSym (tileAt g tr n k cell) = wpElt ((g k).tape cell) := by

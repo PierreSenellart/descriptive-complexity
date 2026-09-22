@@ -277,7 +277,7 @@ theorem decides_quantP {pol : Bool} {h hm : Fin K} {lvl : ℕ} (hh : (h : ℕ) =
   have hPloc2 : HeadLocal (lvl + 2) P := hP.mono (by omega)
   cases pol with
   | false =>
-    exact (decides_scanP hh hhm hF hP).congr fun x => by rw [if_neg (by simp)]
+    exact (decides_scanP hh hhm hF hP).congr fun x => by rw [ite_eq_right (by simp)]
   | true =>
     have hnot : (notP F).Decides A (lvl + 2) (fun x => ¬ P x) := decides_notP hF hPloc2
     have hscan := decides_scanP hh hhm hnot (fun x x' hxx => not_congr (hP x x' hxx))
@@ -289,7 +289,7 @@ theorem decides_quantP {pol : Bool} {h hm : Fin K} {lvl : ℕ} (hh : (h : ℕ) =
       · rw [Function.update_of_ne hne, Function.update_of_ne hne]
         exact hxx j (by have : (j : ℕ) ≠ lvl := fun hc => hne (Fin.ext (by omega)); omega)
     refine (decides_notP hscan hloc).congr fun x => ?_
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     simp only [not_forall, not_not]
 
 omit [LinearOrder A] [Finite A] in
@@ -430,7 +430,7 @@ theorem BitDefinable.dtcDefinable (h : BitDefinable P) : DTCDefinable P := by
   have hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i := by
     intro i hi
     rw [hsh0]
-    simp only [dif_pos hi]
+    simp only [dite_eq_left hi]
   set y : Fin K := ⟨S, by omega⟩ with hy
   set cnt : Fin K := ⟨S + 1, by omega⟩ with hcnt
   set cand : Fin K := ⟨S + 2, by omega⟩ with hcand

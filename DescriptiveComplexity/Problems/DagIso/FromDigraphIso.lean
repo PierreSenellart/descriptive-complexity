@@ -652,7 +652,7 @@ theorem relIsoOn_of_dagIso
   set g : A → A := fun v => if h : TGPatV v then gg ⟨v, h⟩ else v with hgdef
   have hg : ∀ v, TGPatV v → TGHostV (g v) ∧ F (vPt v) = vPt (g v) := by
     intro v hv
-    have hgv : g v = gg ⟨v, hv⟩ := by rw [hgdef]; exact dif_pos hv
+    have hgv : g v = gg ⟨v, hv⟩ := by rw [hgdef]; exact dite_eq_left hv
     rw [hgv]
     exact ⟨hgg1 ⟨v, hv⟩, hgg2 ⟨v, hv⟩⟩
   have hginj : ∀ x y, TGPatV x → TGPatV y → g x = g y → x = y := by

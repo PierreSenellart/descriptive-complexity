@@ -146,10 +146,10 @@ theorem uRulesDefinable_seqRule {wk rg : W} {emb : SeqPh n PA → P}
         (uGDefinable_trkOne (L := L) (Q := Q) wk).and
           (uGDefinable_trkOne (L := L) (Q := Q) rg).not
       by_cases hk : (k : ℕ) < n
-      · simp only [seqRule, dif_pos hk]
+      · simp only [seqRule, dite_eq_left hk]
         exact uRuleDefinable_of_keepWr ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_true fun _ => trivial⟩ hg (hen ⟨(k : ℕ), hk⟩) fun _ _ _ => rfl
-      · simp only [seqRule, dif_neg hk]
+      · simp only [seqRule, dite_eq_right hk]
         exact uRuleDefinable_of_keep ⟨⟨_, fun _ => rfl⟩, ⟨_, fun _ => rfl⟩,
           uRight_of_true fun _ => trivial⟩ hg (fun _ _ _ => rfl) fun _ _ _ => rfl
     | .dspB =>

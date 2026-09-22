@@ -146,14 +146,14 @@ theorem stepAt_iff (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A
   rintro (j' | k)
   · simp only [Sum.elim_inl]
     rcases Nat.eq_zero_or_pos (orank i) with h0 | hpos
-    · rw [if_pos h0]
+    · rw [ite_eq_left h0]
       constructor
       · rintro (⟨-, h⟩ | ⟨i', ⟨hlt, -⟩, -⟩)
         · exact h
         · exact absurd (orank_lt_orank hlt) (by omega)
       · intro h
         exact Or.inl ⟨h0, h⟩
-    · rw [if_neg (by omega)]
+    · rw [ite_eq_right (by omega)]
       constructor
       · rintro (⟨h0, -⟩ | ⟨i', ⟨hlt, hcov⟩, hbit⟩)
         · exact absurd h0 (by omega)
@@ -188,12 +188,12 @@ theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ 
       cases i with
       | zero => simp
       | succ i' =>
-        simp only [Nat.succ_sub_one, if_neg (Nat.succ_ne_zero i')]
+        simp only [Nat.succ_sub_one, ite_eq_right (Nat.succ_ne_zero i')]
         have hi' : i' < posCount A := by omega
         have hstored : storedAfter S t f i' j' ↔ S.state x (i' + 1) j' = true :=
           IH i' (by omega) hi' j'
         have hlow : storedAfter S t f i' j' ↔ (orank (t j')).testBit i' = true := by
-          rw [storedAfter, if_pos (by omega)]
+          rw [storedAfter, ite_eq_left (by omega)]
         have hiff : ((orank (t j')).testBit i' = true) ↔ (S.state x (i' + 1) j' = true) :=
           hlow.symm.trans hstored
         by_cases hs : S.state x (i' + 1) j' = true
@@ -206,10 +206,10 @@ theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ 
     rcases Nat.lt_or_ge (i + 1) (posCount A) with hlt | hge
     · have hlow : IsLowIx e := by rw [IsLowIx, he]; omega
       have hbit : ((orank (t j)).testBit i = true) ↔ BitIx e (t j) := by rw [bitIx_iff, he]
-      rw [storedAfter, if_pos hlt, hbit, hw.1 e hlow j]
+      rw [storedAfter, ite_eq_left hlt, hbit, hw.1 e hlow j]
       exact hstep
     · have htop : IsTopIx e := by rw [IsTopIx, he]; omega
-      rw [storedAfter, if_neg (by omega), hw.2.1 e htop j]
+      rw [storedAfter, ite_eq_right (by omega), hw.2.1 e htop j]
       exact hstep
 
 /-- **The formula says what the sweep does.** -/
@@ -230,7 +230,7 @@ theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
         (hw.2.2.1 (exists_isTopIx_iff.mpr hpos))
       have h1 : posCount A - 1 + 1 = posCount A := by omega
       have := hstate j
-      rw [storedAfter, if_neg (by omega), h1] at this
+      rw [storedAfter, ite_eq_right (by omega), h1] at this
       exact this.symm
   · intro hacc
     rcases Nat.eq_zero_or_pos (posCount A) with h0 | hpos
@@ -267,7 +267,7 @@ theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
         cases d with
         | zero => simp
         | succ d' =>
-          simp only [Nat.succ_sub_one, if_neg (Nat.succ_ne_zero d')]
+          simp only [Nat.succ_sub_one, ite_eq_right (Nat.succ_ne_zero d')]
           exact ht j' d' (by omega)
       refine ⟨t, fun j => if S.state x (posCount A) j = true then one else zero, ?_, ?_, ?_, ?_⟩
       · intro i hlow j

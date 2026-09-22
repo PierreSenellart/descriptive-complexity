@@ -161,9 +161,9 @@ theorem passTracks_cell (F : IxFile (Univ A R P K dd) I ile)
       fun s => if s = t then bitVal PR.zero PR.one (m u) else rest (F.cell u) s := by
   refine funext fun s => ?_
   by_cases hs : s = t
-  · simp only [passTracksAt, if_pos hs]
+  · simp only [passTracksAt, ite_eq_left hs]
     exact bitVal_congr (F.bitAt_cell hix m u)
-  · simp only [passTracksAt, if_neg hs]
+  · simp only [passTracksAt, ite_eq_right hs]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
@@ -182,7 +182,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 guard of a register pass that is not about the track itself reads through this. -/
 theorem passTracks_of_ne {sl : W} (hne : sl ≠ t) (m : I → Prop) (r : Univ A R P K dd → Prop) :
     PR.passTracksAt cell t rest m r sl = rest r sl := by
-  simp only [passTracksAt, if_neg hne]
+  simp only [passTracksAt, ite_eq_right hne]
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
@@ -482,9 +482,9 @@ theorem reachesIn_fileIncrBlk [Finite I] (F : IxFile (Univ A R P K dd) I ile)
       refine funext fun s => ?_
       by_cases hs : s = t
       · subst hs
-        rw [Function.update_self, if_pos rfl]
+        rw [Function.update_self, ite_eq_left rfl]
         exact bitVal_neg fun hc => hc.2 rfl
-      · rw [Function.update_of_ne hs, if_neg hs, if_neg hs]
+      · rw [Function.update_of_ne hs, ite_eq_right hs, ite_eq_right hs]
     rw [trackTapeAt_eq, trackTapeAt_eq, hwrite]
     refine step_of_hasLeft hR (hclear _ ?_ (hrgSeg k u))
     rw [passTracks_cell_apply F hix]
@@ -496,9 +496,9 @@ theorem reachesIn_fileIncrBlk [Finite I] (F : IxFile (Univ A R P K dd) I ile)
       refine funext fun s => ?_
       by_cases hs : s = t
       · subst hs
-        rw [Function.update_self, if_pos rfl]
+        rw [Function.update_self, ite_eq_left rfl]
         exact bitVal_pos (Or.inr rfl)
-      · rw [Function.update_of_ne hs, if_neg hs, if_neg hs]
+      · rw [Function.update_of_ne hs, ite_eq_right hs, ite_eq_right hs]
     rw [trackTapeAt_eq, trackTapeAt_eq, hwrite]
     refine step_of_hasLeft hR
       (hset (blkOf u) _ ?_ (hrgSeg k u) (hbsSeg k u) fun b' hb' => ?_)

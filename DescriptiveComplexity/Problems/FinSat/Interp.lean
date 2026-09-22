@@ -538,16 +538,16 @@ theorem realize_leFml (t : Fin 2 → FTag B φ) (v : Fin 2 × Fin (finsatDim B �
   classical
   simp only [leFml]
   by_cases h1 : fkey B φ (t 0) < fkey B φ (t 1)
-  · rw [if_pos h1, Formula.realize_top]
+  · rw [ite_eq_left h1, Formula.realize_top]
     exact iff_of_true trivial (Or.inl h1)
-  · rw [if_neg h1]
+  · rw [ite_eq_right h1]
     by_cases h2 : fkey B φ (t 1) < fkey B φ (t 0)
-    · rw [if_pos h2, Formula.realize_bot]
+    · rw [ite_eq_left h2, Formula.realize_bot]
       refine iff_of_false not_false ?_
       rintro (hc | ⟨he, -⟩)
       · exact h1 hc
       · exact absurd he (ne_of_gt h2)
-    · rw [if_neg h2]
+    · rw [ite_eq_right h2]
       have hkey : fkey B φ (t 0) = fkey B φ (t 1) := le_antisymm (not_lt.mp h2) (not_lt.mp h1)
       rw [realize_tupLeF]
       exact ⟨fun h => Or.inr ⟨hkey, h⟩, fun h => h.elim (fun hc => absurd hc h1) fun h => h.2⟩
@@ -647,9 +647,9 @@ theorem realize_tagF {n : ℕ} (t : Fin n → FTag B φ) (P : Prop)
   rw [tagF, realize_canonInf]
   refine and_congr Iff.rfl ?_
   by_cases h : P
-  · rw [if_pos h, Formula.realize_top]
+  · rw [ite_eq_left h, Formula.realize_top]
     exact iff_of_true trivial h
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false h
 
 theorem realize_andFml (t : Fin 1 → FTag B φ) (v : Fin 1 × Fin (finsatDim B φ) → A) :

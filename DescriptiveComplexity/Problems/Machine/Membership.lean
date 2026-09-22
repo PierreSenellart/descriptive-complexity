@@ -379,7 +379,7 @@ variable {α : Type} (v : α → A)
   let := tmGuessBlock.structure ρ
   cases dir <;>
     simp only [tqMoveF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
-      realize_tqHeadF, realize_tqSuccPosF, Sum.elim_inl, Sum.elim_inr, if_true, if_false,
+      realize_tqHeadF, realize_tqSuccPosF, Sum.elim_inl, Sum.elim_inr, ite_true, ite_false,
       Bool.false_eq_true] <;>
     exact ⟨fun h p p' h₁ h₂ => h ![p, p'] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
 
@@ -399,7 +399,7 @@ theorem realize_tqStepBodyF (t t' τ : α) :
     Formula.realize_not, Formula.realize_iff, Formula.realize_iAlls, realize_tqTrF,
     realize_tqStateF, realize_tqSrcF, realize_tqHeadF, realize_tqTapeF, realize_tqReadF,
     realize_tqDstF, realize_tqWriteF, realize_tqRightF, realize_tqMoveF, Sum.elim_inl,
-    Sum.elim_inr, if_true, if_false, Bool.false_eq_true]
+    Sum.elim_inr, ite_true, ite_false, Bool.false_eq_true]
   refine and_congr Iff.rfl (and_congr ?_ (and_congr ?_ (and_congr ?_ (and_congr ?_
     (and_congr ?_ Iff.rfl)))))
   · exact ⟨fun h q hq => h (fun _ => q) hq, fun h i hi => h (i 0) hi⟩

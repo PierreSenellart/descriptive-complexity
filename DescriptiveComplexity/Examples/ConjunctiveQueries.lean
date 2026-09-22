@@ -746,27 +746,27 @@ def cqCode {m : ℕ} (h : (cqConsts S).card = m + 1) :
   left_inv x := by
     dsimp only
     by_cases hx : x ∈ cqVars S
-    · rw [dif_pos hx, Sum.elim_inl, OrderIso.apply_symm_apply]
-    · rw [dif_neg hx, Sum.elim_inr, fin_cast_cast, OrderIso.apply_symm_apply]
+    · rw [dite_eq_left hx, Sum.elim_inl, OrderIso.apply_symm_apply]
+    · rw [dite_eq_right hx, Sum.elim_inr, fin_cast_cast, OrderIso.apply_symm_apply]
   right_inv y := by
     rcases y with a | b
     · dsimp only [Sum.elim_inl]
-      rw [dif_pos (Finset.coe_mem _), Subtype.coe_eta, OrderIso.symm_apply_apply]
+      rw [dite_eq_left (Finset.coe_mem _), Subtype.coe_eta, OrderIso.symm_apply_apply]
     · dsimp only [Sum.elim_inr]
       have hb : (((cqConsts S).orderIsoOfFin rfl) (Fin.cast h.symm b) : Fin S.card) ∉
           cqVars S :=
         fun hv => ((mem_cqConsts S _).mp (Finset.coe_mem _)) ((mem_cqVars S _).mp hv)
-      rw [dif_neg hb, Subtype.coe_eta, OrderIso.symm_apply_apply, fin_cast_cast']
+      rw [dite_eq_right hb, Subtype.coe_eta, OrderIso.symm_apply_apply, fin_cast_cast']
 
 theorem cqCode_isLeft {m : ℕ} (h : (cqConsts S).card = m + 1) (x : Fin S.card) :
     QVar x ↔ ((cqCode S h) x).isLeft = true := by
   by_cases hx : x ∈ cqVars S
   · simp only [cqCode, Equiv.coe_fn_mk]
-    rw [dif_pos hx]
+    rw [dite_eq_left hx]
     simp [(mem_cqVars S x).mp hx]
   · have hnq : ¬QVar x := fun hq => hx ((mem_cqVars S x).mpr hq)
     simp only [cqCode, Equiv.coe_fn_mk]
-    rw [dif_neg hx]
+    rw [dite_eq_right hx]
     simp [hnq]
 
 /-- The decoder: enumerate variables and constants, read the atoms and facts
@@ -973,14 +973,14 @@ theorem cqEval_sigmaSODefinable : SigmaSODefinable 1 CQEval := by
     obtain ⟨hmain, htotal⟩ := (realize_cqKernel ρ).mp hρ
     classical
     choose f hf using htotal
-    refine ⟨fun x => if hx : QVar x then f x hx else x, fun x hx => dif_neg hx,
+    refine ⟨fun x => if hx : QVar x then f x hx else x, fun x hx => dite_eq_right hx,
       fun x y hxy => ?_⟩
     have himg : ∀ z : A, PossibleImage ρ z (if hz : QVar z then f z hz else z) := by
       intro z
       by_cases hz : QVar z
-      · exact Or.inl ⟨hz, by rw [dif_pos hz]; exact hf z hz⟩
+      · exact Or.inl ⟨hz, by rw [dite_eq_left hz]; exact hf z hz⟩
       · refine Or.inr ⟨hz, ?_⟩
-        rw [dif_neg hz]
+        rw [dite_eq_right hz]
     exact hmain x y _ _ hxy (himg x) (himg y)
 
 /-- BCQ evaluation is in NP. -/
@@ -1473,7 +1473,7 @@ private theorem routedVal_spec {A : Type} [Language.queryPair.Structure A]
   cases s with
   | query =>
     simp only [routedVal]
-    exact if_pos (hTs.mp rfl)
+    exact ite_eq_left (hTs.mp rfl)
   | db =>
     have hnv : ¬PairVar (ws 0) := fun hpv => by simpa using hTs.mpr hpv
     simp only [routedVal]
@@ -1499,7 +1499,7 @@ theorem queryContained_iff_map_queryHolds (A : Type) [Language.queryPair.Structu
       | query =>
         have hnv : ¬PairVar (w 0) := fun hv => hp ((ctev_isVar_iff _ _).mpr ⟨rfl, hv⟩)
         simp only [routedVal]
-        exact if_neg hnv
+        exact ite_eq_right hnv
       | db => rfl
     · obtain ⟨t, w⟩ := p
       obtain ⟨t', w'⟩ := q
@@ -1517,19 +1517,19 @@ theorem queryContained_iff_map_queryHolds (A : Type) [Language.queryPair.Structu
     rintro ⟨H, hfix, hatom⟩
     classical
     refine ⟨fun z => if PairVar z then (H (PairTag.query, fun _ => z)).2 0 else z,
-      fun z hz => if_neg hz, fun x y hxy => ?_⟩
+      fun z hz => ite_eq_right hz, fun x y hxy => ?_⟩
     have route : ∀ z : A, ∃ p : containmentToEval.Map A,
         (p.1 = PairTag.query ↔ PairVar (p.2 0)) ∧ p.2 0 = z ∧
           (H p).2 0 = if PairVar z then (H (PairTag.query, fun _ => z)).2 0 else z := by
       intro z
       by_cases hz : PairVar z
       · refine ⟨(PairTag.query, fun _ => z), by simp [hz], rfl, ?_⟩
-        rw [if_pos hz]
+        rw [ite_eq_left hz]
       · refine ⟨(PairTag.db, fun _ => z), by simp [hz], rfl, ?_⟩
         have hnq : ¬QVar (A := containmentToEval.Map A) (PairTag.db, fun _ => z) := by
           simp
         rw [hfix _ hnq]
-        exact (if_neg hz).symm
+        exact (ite_eq_right hz).symm
     obtain ⟨p, hp1, hp2, hp3⟩ := route x
     obtain ⟨q, hq1, hq2, hq3⟩ := route y
     have hpq : QAtom p q := by

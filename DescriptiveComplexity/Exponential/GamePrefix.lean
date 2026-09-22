@@ -69,7 +69,7 @@ omit instL [LinearOrder A] in
 theorem fillRounds_zero (hk : 0 ≤ n) (ρs : Fin n → X.pointBlock.Assignment A)
     (τs : Fin 0 → X.pointBlock.Assignment A) : fillRounds hk ρs τs = ρs := by
   funext i
-  rw [fillRounds, dif_neg]
+  rw [fillRounds, dite_eq_right]
   have := i.isLt
   omega
 
@@ -91,13 +91,13 @@ theorem fillRounds_succ (k : ℕ) (hk : k + 1 ≤ n)
       intro hc
       have : (i : ℕ) = (r : ℕ) := congrArg Fin.val hc
       omega
-    rw [dif_neg (by omega), dif_neg (by omega)]
+    rw [dite_eq_right (by omega), dite_eq_right (by omega)]
     exact hag i hne
   · rcases eq_or_ne (i : ℕ) (n - (k + 1)) with heq | hne
     · have hir : i = r := Fin.ext (by omega)
-      rw [dif_pos (by omega), dif_neg (by omega), show σs i = σs r from congrArg σs hir]
+      rw [dite_eq_left (by omega), dite_eq_right (by omega), show σs i = σs r from congrArg σs hir]
       exact cons_of_val_zero _ τs _ (show (i : ℕ) - (n - (k + 1)) = 0 by omega)
-    · rw [dif_pos (by omega), dif_pos (by omega)]
+    · rw [dite_eq_left (by omega), dite_eq_left (by omega)]
       refine cons_of_val_succ _ τs _ ⟨(i : ℕ) - (n - k), by omega⟩ ?_
       change (i : ℕ) - (n - (k + 1)) = ((i : ℕ) - (n - k)) + 1
       omega

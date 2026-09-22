@@ -199,14 +199,14 @@ theorem trackTape_blank_congr {I' : Type}
     exact bitVal_neg (fun hc => hc.choose_spec.2)
   by_cases hs : s = t
   · subst hs
-    rw [if_pos rfl, hnone]
+    rw [ite_eq_left rfl, hnone]
     by_cases hs' : s = t'
-    · rw [if_pos hs', hnone]
-    · rw [if_neg hs', hrest', hb]
-  · rw [if_neg hs, hrest]
+    · rw [ite_eq_left hs', hnone]
+    · rw [ite_eq_right hs', hrest', hb]
+  · rw [ite_eq_right hs, hrest]
     by_cases hs' : s = t'
-    · rw [if_pos hs', hnone, hs', hb']
-    · rw [if_neg hs', hrest']
+    · rw [ite_eq_left hs', hnone, hs', hb']
+    · rw [ite_eq_right hs', hrest']
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] [Finite A] [Finite R']
@@ -236,8 +236,8 @@ theorem trackTape_empty_congr {I' : Type}
     exact bitVal_neg (fun hc => hc.choose_spec.2)
   by_cases hs : s = t
   · subst hs
-    rw [if_pos rfl, if_pos rfl, hnone, hnone]
-  · rw [if_neg hs, if_neg hs]
+    rw [ite_eq_left rfl, ite_eq_left rfl, hnone, hnone]
+  · rw [ite_eq_right hs, ite_eq_right hs]
 
 end Init
 
@@ -285,7 +285,7 @@ theorem startBack_frame
     {one : A} {v r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hr : r ≠ v) : dt.startBack bg one v r = bg r := by
   classical
-  exact if_neg hr
+  exact ite_eq_right hr
 
 omit [LinearOrder A] [LinearOrder R'] [Nonempty A] [Finite A] [Finite R']
   [Finite dt.KIx] [LinearOrder (NexPh (Option dt.KIx) PE)]
@@ -308,27 +308,27 @@ theorem startBack_wr
   funext s
   have hbg : dt.startBack bg PR.one v v =
       Function.update (Function.update (bg v) Slot.wk PR.one) Slot.bot PR.one :=
-    if_pos rfl
+    ite_eq_left rfl
   by_cases hb : s = Slot.bot
   · subst hb
     rw [Function.update_self]
     change (if (Slot.bot : dt.SlotIx) = Slot.mir then _
       else dt.startBack bg PR.one v v Slot.bot) = PR.one
-    rw [if_neg (by exact fun hc => nomatch hc), hbg, Function.update_self]
+    rw [ite_eq_right (by exact fun hc => nomatch hc), hbg, Function.update_self]
   · rw [Function.update_of_ne hb]
     by_cases hs : s = Slot.wk
     · subst hs
       rw [Function.update_self]
       change (if (Slot.wk : dt.SlotIx) = Slot.mir then _
         else dt.startBack bg PR.one v v Slot.wk) = PR.one
-      rw [if_neg (by exact fun hc => nomatch hc), hbg,
+      rw [ite_eq_right (by exact fun hc => nomatch hc), hbg,
         Function.update_of_ne (by exact fun hc => nomatch hc), Function.update_self]
     · rw [Function.update_of_ne hs]
       change (if s = (Slot.mir : dt.SlotIx) then _ else dt.startBack bg PR.one v v s) =
         if s = (Slot.mir : dt.SlotIx) then _ else bg v s
       by_cases hm : s = Slot.mir
-      · rw [if_pos hm, if_pos hm]
-      · rw [if_neg hm, if_neg hm, hbg, Function.update_of_ne hb,
+      · rw [ite_eq_left hm, ite_eq_left hm]
+      · rw [ite_eq_right hm, ite_eq_right hm, hbg, Function.update_of_ne hb,
           Function.update_of_ne hs]
 
 /-! ### The state a clocked program starts in
@@ -882,9 +882,9 @@ theorem nexProg_initBack (hzo : zero ≠ one)
     else (dt.nexProg zero one hzo hpl coord β γ args bot).blank s) = zero
   by_cases hr : ∃ x : Univ A (dt.NexRIx (G := G))
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd, r = wmSeg x
-  · rw [dif_pos hr]
+  · rw [dite_eq_left hr]
     rfl
-  · rw [dif_neg hr]
+  · rw [dite_eq_right hr]
     rfl
 
 /-- **The clocked program's run makes its instance a yes-instance**: an

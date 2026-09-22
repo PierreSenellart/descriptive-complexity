@@ -91,7 +91,7 @@ theorem ixBack_name_cell_eq (hinj : Function.Injective lay.cell)
   have hex : ∃ u' : I, lay.cell u = lay.cell u' := ⟨u, rfl⟩
   change (if h : ∃ u' : I, lay.cell u = lay.cell u' then
     lay.arg h.choose (Fin.castLE dt.dd0Le j) else zero) = _
-  rw [dif_pos hex]
+  rw [dite_eq_left hex]
   exact congrArg (fun u' => lay.arg u' (Fin.castLE dt.dd0Le j)) (hinj hex.choose_spec).symm
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']

@@ -765,11 +765,11 @@ theorem gbMap_chained {c x : A} {s : Bool} (hocc : OccIn c x s) (hne : (x, s) �
   have hmin := hfst c ⟨x, s, hocc⟩
   rw [gbMap]
   by_cases hx : (x, s) = fst c
-  · rw [if_pos hx]
+  · rw [ite_eq_left hx]
     refine ⟨(hch c hocc.1).1, fun hminc => ?_⟩
     have h1 : ch c = fst c := by simpa using minOcc_unique hminc hmin
     exact hne (hx.trans h1.symm)
-  · rw [if_neg hx]
+  · rw [ite_eq_right hx]
     refine ⟨hocc, fun hminx => ?_⟩
     exact hx (by simpa using minOcc_unique hminx hmin)
 
@@ -780,11 +780,11 @@ theorem gbMap_inj {c x x' : A} {s s' : Bool} (hne : (x, s) ≠ ch c) (hne' : (x'
   rw [gbMap, gbMap] at h
   by_cases hx : (x, s) = fst c <;> by_cases hx' : (x', s') = fst c
   · rw [hx, hx']
-  · rw [if_pos hx, if_neg hx'] at h
+  · rw [ite_eq_left hx, ite_eq_right hx'] at h
     exact absurd h.symm hne'
-  · rw [if_neg hx, if_pos hx'] at h
+  · rw [ite_eq_right hx, ite_eq_left hx'] at h
     exact absurd h hne
-  · rw [if_neg hx, if_neg hx'] at h
+  · rw [ite_eq_right hx, ite_eq_right hx'] at h
     exact h
 
 omit [Finite A] hch in
@@ -803,8 +803,8 @@ theorem gbMap_surj {c x' : A} {s' : Bool} (hchained : Chained c x' s') :
   · refine ⟨(fst c).1, (fst c).2, hmin.1, ?_, ?_⟩
     · rw [← hc]
       exact fun h => hnefst h.symm
-    · rw [gbMap, if_pos (by simp), ← hc]
-  · exact ⟨x', s', hchained.1, hc, by rw [gbMap, if_neg hnefst]⟩
+    · rw [gbMap, ite_eq_left (by simp), ← hc]
+  · exact ⟨x', s', hchained.1, hc, by rw [gbMap, ite_eq_right hnefst]⟩
 
 include hnxt
 

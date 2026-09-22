@@ -463,10 +463,10 @@ theorem decides_detReachDecider :
   let := W.modeOrder
   have : Nonempty W.Mode := ⟨ma⟩
   intro t
-  obtain ⟨cmin, -, hcmin⟩ := (Finite.to_wellFoundedLT (α := W.Mode)).wf.has_min Set.univ
+  obtain ⟨cmin, -, hcmin⟩ := (Finite.to_wellFoundedLT (α := W.Mode)).has_min Set.univ
     ⟨ma, Set.mem_univ _⟩
   have hcmin' : ∀ c' : W.Mode, cmin ≤ c' := fun c' => not_lt.mp (hcmin c' (Set.mem_univ c'))
-  obtain ⟨amin, -, hamin⟩ := (Finite.to_wellFoundedLT (α := A)).wf.has_min Set.univ
+  obtain ⟨amin, -, hamin⟩ := (Finite.to_wellFoundedLT (α := A)).has_min Set.univ
     ⟨Classical.arbitrary A, Set.mem_univ _⟩
   have hamin' : ∀ a : A, amin ≤ a := fun a => not_lt.mp (hamin a (Set.mem_univ a))
   have hinit : (W.detReachDecider ma mb).StepAt w (none, t)

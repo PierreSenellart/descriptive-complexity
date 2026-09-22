@@ -140,7 +140,7 @@ theorem exists_succ_of_not_min {z : A} (hz : ¬∀ a : A, z ≤ a) :
 successor at a time. -/
 theorem order_induction {P : A → Prop} (hmin : ∀ z : A, (∀ a : A, z ≤ a) → P z)
     (hstep : ∀ w z : A, w < z → (∀ a : A, ¬(w < a ∧ a < z)) → P w → P z) (z : A) : P z := by
-  induction z using (Finite.to_wellFoundedLT (α := A)).wf.induction with
+  induction z using (Finite.to_wellFoundedLT (α := A)).induction with
   | _ z ih =>
     by_cases hz : ∀ a : A, z ≤ a
     · exact hmin z hz
@@ -169,7 +169,7 @@ correct in – a walk that stops at the greatest element knows about the element
 above the one it stands on. -/
 theorem order_induction_down {P : A → Prop} (hmax : ∀ z : A, (∀ a : A, a ≤ z) → P z)
     (hstep : ∀ w z : A, w < z → (∀ a : A, ¬(w < a ∧ a < z)) → P z → P w) (z : A) : P z := by
-  induction z using (Finite.to_wellFoundedGT (α := A)).wf.induction with
+  induction z using (Finite.to_wellFoundedGT (α := A)).induction with
   | _ z ih =>
     by_cases hz : ∀ a : A, a ≤ z
     · exact hmax z hz

@@ -130,7 +130,7 @@ noncomputable def relExpMapEquiv :
           dite (∃ σ : Fin n → X.Tag, ∀ i, (some (x i).1.1 : Option X.Tag) = some (σ i))
             (fun h => relativizeTo (oldGuard (L := L) (X.B.replicate n))
               ((newBlockLHom (X.B.replicate n)).onSentence (X.relSentence r h.choose)))
-            (fun _ => ⊥) from rfl, dif_pos hex, hchoose]
+            (fun _ => ⊥) from rfl, dite_eq_left hex, hchoose]
       change @Sentence.Realize _ ((dblInterp L).Map A)
         ((X.B.replicate n).structure₁ (X.B.replicateAssign fun i => extAssign (x i).1.2))
         ((relExp X).relSentence r (fun i => (some (x i).1.1 : Option X.Tag))) ↔ _

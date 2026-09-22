@@ -159,8 +159,8 @@ theorem tapeAfter_congr_off {ρ σ : Fin k → A → Prop} {m m' : ℕ} {r : Alt
   obtain ⟨⟨t, j⟩, w⟩ := r
   cases t <;> simp only [tapeAfter]
   by_cases hcell : IsCellTup (((AltBase.pCell, j), w) : AltV k A)
-  · rw [if_pos hcell, if_pos hcell, h rfl hcell]
-  · rw [if_neg hcell, if_neg hcell]
+  · rw [ite_eq_left hcell, ite_eq_left hcell, h rfl hcell]
+  · rw [ite_eq_right hcell, ite_eq_right hcell]
 
 /-- **Setting one cell adds one variable to the block's assignment.** This is
 the only computation the read-off of a sweep performs: the cell of `x` turns

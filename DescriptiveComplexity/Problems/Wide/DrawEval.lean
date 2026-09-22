@@ -185,43 +185,43 @@ theorem evalSep
   | .chk k, .dspB, .dspB => rfl
   | .chk k, .stay, .dspA =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [evalRule, dif_pos hk] at hg'
+    · simp only [evalRule, dite_eq_left hk] at hg'
       simp only [evalRule] at hg
       exact absurd hg'.1 hg
-    · simp only [evalRule, dif_neg hk] at hg'
+    · simp only [evalRule, dite_eq_right hk] at hg'
       simp only [evalRule] at hg
       exact absurd hg'.1.1 hg
   | .chk k, .dspA, .stay =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [evalRule, dif_pos hk] at hg
+    · simp only [evalRule, dite_eq_left hk] at hg
       simp only [evalRule] at hg'
       exact absurd hg.1 hg'
-    · simp only [evalRule, dif_neg hk] at hg
+    · simp only [evalRule, dite_eq_right hk] at hg
       simp only [evalRule] at hg'
       exact absurd hg.1.1 hg'
   | .chk k, .stay, .dspB =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [evalRule, if_pos hk] at hg'
-    · simp only [evalRule, if_neg hk] at hg'
+    · simp only [evalRule, ite_eq_left hk] at hg'
+    · simp only [evalRule, ite_eq_right hk] at hg'
       simp only [evalRule] at hg
       exact absurd hg'.1.1 hg
   | .chk k, .dspB, .stay =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [evalRule, if_pos hk] at hg
-    · simp only [evalRule, if_neg hk] at hg
+    · simp only [evalRule, ite_eq_left hk] at hg
+    · simp only [evalRule, ite_eq_right hk] at hg
       simp only [evalRule] at hg'
       exact absurd hg.1.1 hg'
   | .chk k, .dspA, .dspB =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [evalRule, if_pos hk] at hg'
-    · simp only [evalRule, dif_neg hk] at hg
-      simp only [evalRule, if_neg hk] at hg'
+    · simp only [evalRule, ite_eq_left hk] at hg'
+    · simp only [evalRule, dite_eq_right hk] at hg
+      simp only [evalRule, ite_eq_right hk] at hg'
       exact absurd hg'.2 hg.2
   | .chk k, .dspB, .dspA =>
     by_cases hk : (k : ℕ) < nv
-    · simp only [evalRule, if_pos hk] at hg
-    · simp only [evalRule, if_neg hk] at hg
-      simp only [evalRule, dif_neg hk] at hg'
+    · simp only [evalRule, ite_eq_left hk] at hg
+    · simp only [evalRule, ite_eq_right hk] at hg
+      simp only [evalRule, dite_eq_right hk] at hg'
       exact absurd hg.2 hg'.2
   | .sub s, ρ, ρ' => exact hsepM s ρ ρ' f g hg hg' hph
 

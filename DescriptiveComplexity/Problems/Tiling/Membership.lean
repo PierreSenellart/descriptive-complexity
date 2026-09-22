@@ -593,7 +593,7 @@ theorem tiling_sigmaSODefinable : SigmaSODefinable 1 TILING := by
       intro x y t ht
       have hex : ∃ t, ρ () ![x, y, t] := ⟨t, ht⟩
       rw [hτ]
-      simp only [dif_pos hex]
+      simp only [dite_eq_left hex]
       exact hfunc x y hex.choose t hex.choose_spec ht
     refine ⟨hwf, τ, fun x y hx hy => ?_, fun x y hx hy => ?_, fun x y hy hx => ?_,
       fun x y hy hx => ?_, fun x x' y hs hy => ?_,

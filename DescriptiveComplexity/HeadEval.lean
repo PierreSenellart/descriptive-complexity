@@ -106,7 +106,7 @@ theorem runs_moveP_local (mvs : Fin K → HeadMove K) (m : ℕ)
     · simpa [hj] using hmv j hj
     · rw [hstay j (not_lt.mp hj)]
       change (if (j : ℕ) < m then y j else x j) = x j
-      rw [if_neg hj]
+      rw [ite_eq_right hj]
 
 end Moves
 

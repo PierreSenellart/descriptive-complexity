@@ -293,13 +293,13 @@ theorem binNum_peel_min {Le : A → A → Prop} {Posn b : A → Prop} {p₀ : A}
         ext p
         simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
         exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hb⟩⟩
-      rw [this, finsum_mem_singleton, hrank₀, if_pos hb, pow_zero]
+      rw [this, finsum_mem_singleton, hrank₀, ite_eq_left hb, pow_zero]
     · have : {p : A | p = p₀ ∧ b p} = (∅ : Set A) := by
         ext p
         simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         rintro ⟨rfl, hcon⟩
         exact hb hcon
-      rw [this, finsum_mem_empty, if_neg hb]
+      rw [this, finsum_mem_empty, ite_eq_right hb]
   have hfirst : (∑ᶠ p ∈ {p : A | (Posn p ∧ p ≠ p₀) ∧ b p}, 2 ^ bitRank Le Posn p)
       = 2 * binNum Le (fun q => Posn q ∧ q ≠ p₀) b := by
     rw [binNum, finsum_mem_eq_finite_toFinset_sum _ (Set.toFinite _),
@@ -648,7 +648,7 @@ theorem exists_ripple (hlin : IsLinOrd Le) :
           rw [hzero] at hbound
           have hcin' : ¬maj (a p₀) (b p₀) cin := by
             intro hcon
-            rw [if_pos hcon] at hbound
+            rw [ite_eq_left hcon] at hbound
             omega
           simpa [hpp₀] using hcin'
         · have := htop' p ⟨⟨hp, hpne⟩, fun q hq => hpmax q hq.1⟩
@@ -680,12 +680,12 @@ theorem exists_ripple (hlin : IsLinOrd Le) :
       rw [hzero a, hzero b, hn0] at hlt
       have hcin : ¬cin := by
         intro hc
-        rw [if_pos hc] at hlt
+        rw [ite_eq_left hc] at hlt
         omega
       exact ⟨fun _ => False, fun _ => False,
         fun p hp => absurd hp (hempty p), fun p q hpq => absurd hpq.1 (hempty p),
         fun p hp => absurd hp.1 (hempty p), fun p hp => absurd hp.1 (hempty p),
-        by rw [hzero, hzero a, hzero b, if_neg hcin]⟩
+        by rw [hzero, hzero a, hzero b, ite_eq_right hcin]⟩
 
 open Classical in
 /-- **Every number that fits can be written**: a value below `2` to the number
@@ -725,9 +725,9 @@ theorem exists_binNum (hlin : IsLinOrd Le) :
       rw [hpeel]
       simp only [true_and, ne_eq, not_true_eq_false, false_and, or_false]
       rcases (by omega : k % 2 = 0 ∨ k % 2 = 1) with hpar | hpar
-      · rw [if_neg (by omega)]
+      · rw [ite_eq_right (by omega)]
         omega
-      · rw [if_pos hpar]
+      · rw [ite_eq_left hpar]
         omega
     · have hempty : ∀ p, ¬Posn p := fun p hp => hne ⟨p, hp⟩
       have hn0 : n = 0 := by

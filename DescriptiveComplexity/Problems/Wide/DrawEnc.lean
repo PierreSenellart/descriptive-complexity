@@ -99,9 +99,9 @@ discrete datum. -/
 theorem encTup_code_inj (hne : zero ≠ one) {d d' : D} {pay pay' : Fin a' → A}
     (h : encTup ly zero one d pay = encTup ly zero one d' pay') : d = d' := by
   have hd := congrFun h (ly.cIx d)
-  rw [encTup_cIx, encTup_cIx, if_pos rfl] at hd
+  rw [encTup_cIx, encTup_cIx, ite_eq_left rfl] at hd
   by_contra hcon
-  rw [if_neg hcon] at hd
+  rw [ite_eq_right hcon] at hd
   exact hne hd.symm
 
 /-- **The payload reads back**: two encoded tuples that are equal carry the same
@@ -162,10 +162,10 @@ theorem not_encPt_zeroTup (hne : zero ≠ one) (p : X.Point A) :
     ¬encPt ly zero one p (fun _ => zero) := by
   rintro (h | ⟨i, w, -, h⟩)
   · have hc := congrFun h (ly.cIx (Sum.inl p.1))
-    rw [encTagTup, encTup_cIx, if_pos rfl] at hc
+    rw [encTagTup, encTup_cIx, ite_eq_left rfl] at hc
     exact hne hc
   · have hc := congrFun h (ly.cIx (Sum.inr i))
-    rw [encAsgTup, encTup_cIx, if_pos rfl] at hc
+    rw [encAsgTup, encTup_cIx, ite_eq_left rfl] at hc
     exact hne hc
 
 /-- The tag witness belongs to the encoding. -/

@@ -157,9 +157,9 @@ theorem tseitin_lit_iff (s : Bool) (tc tx : TseitinTag B φ)
       (tseitinLitFml B φ s tc tx).Realize
         (fun p => ((![((tc, u) : (tseitinInterp B φ).Map A), (tx, x)]) p.1).2 p.2) := by
     cases s
-    · rw [if_neg (by simp)]
+    · rw [ite_eq_right (by simp)]
       exact FOInterpretation.relMap_map _ _ satNegIn _
-    · rw [if_pos rfl]
+    · rw [ite_eq_left rfl]
       exact FOInterpretation.relMap_map _ _ satPosIn _
   rw [hlit]
   rcases tc with tcl | tcv

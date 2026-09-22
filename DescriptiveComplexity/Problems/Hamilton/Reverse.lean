@@ -85,7 +85,7 @@ theorem nextIdx_eq_finRotate (i : Fin N) : nextIdx i = finRotate N i := by
   simp only [nextIdx, coe_finRotate]
   by_cases h : i = Fin.last n
   · subst h; simp [Fin.val_last]
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     exact Nat.mod_eq_of_lt (by have := Fin.val_lt_last h; omega)
 
 /-- In a cyclic enumeration `nextIdx` applied twice returns a *different* index,
@@ -759,8 +759,8 @@ theorem recover_selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInter
     recover f (selOf f v) (bit f v) = v := by
   unfold recover selOf bit
   by_cases h : isSel (tourSucc f v)
-  · rw [if_pos (decide_eq_true_eq.mpr h), if_pos h, Equiv.symm_apply_apply]
-  · rw [if_neg (by rw [decide_eq_true_eq]; exact h), if_neg h, Equiv.apply_symm_apply]
+  · rw [ite_eq_left (decide_eq_true_eq.mpr h), ite_eq_left h, Equiv.symm_apply_apply]
+  · rw [ite_eq_right (by rw [decide_eq_true_eq]; exact h), ite_eq_right h, Equiv.apply_symm_apply]
 
 omit [Fintype A] in
 /-- When `v` has a selector tour-neighbor, `selOf v` is that selector. -/
@@ -768,8 +768,8 @@ theorem isSel_selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) {v : hamInterp.
     (h : isSel (tourSucc f v) ∨ isSel ((tourSucc f).symm v)) : isSel (selOf f v) := by
   unfold selOf
   by_cases hs : isSel (tourSucc f v)
-  · rwa [if_pos hs]
-  · rw [if_neg hs]; exact h.resolve_left hs
+  · rwa [ite_eq_left hs]
+  · rw [ite_eq_right hs]; exact h.resolve_left hs
 
 /-- `a` is *active* in tour `f`: both its chain entrance and its chain exit are
 tour-adjacent to a selector (so its whole chain is a selector-to-selector arc). -/
@@ -790,7 +790,7 @@ theorem isSel_selOf_ptOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
     isSel (selOf f (ptOf a d)) := by
   obtain ⟨h, hE, hX⟩ := ha
   have hpt : ptOf a d = bif d then exitPt h else entrancePt h := by
-    rw [ptOf, dif_pos h]
+    rw [ptOf, dite_eq_left h]
   rw [hpt]
   cases d
   · exact isSel_selOf f hE
@@ -846,7 +846,7 @@ theorem active_ncard_le {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A)
         hsel_eq hp.1 hq.1 hmm, hbit]
     -- unfold ptOf for active vertices
     obtain ⟨hE, -⟩ := hp.1; obtain ⟨hE', -⟩ := hq.1
-    rw [ptOf, dif_pos hE] at hpt; rw [ptOf, dif_pos hE'] at hpt
+    rw [ptOf, dite_eq_left hE] at hpt; rw [ptOf, dite_eq_left hE'] at hpt
     cases d <;> cases d' <;> simp only [Bool.cond_true, Bool.cond_false] at hpt
     · exact Prod.ext (entrancePt_inj hE hE' hpt) rfl
     · exact absurd hpt (entrancePt_ne_exitPt hE hE')

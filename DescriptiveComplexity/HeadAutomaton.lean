@@ -375,12 +375,12 @@ theorem isSrc_toSpec (a : M.Config A) :
   change ((if a.1 = M.start then listInf ((List.finRange k).map fun j => minF j)
     else ⊥ : (L.sum Language.order).Formula (Fin k))).Realize a.2 ↔ _
   by_cases hs : a.1 = M.start
-  · rw [if_pos hs, realize_listInf]
+  · rw [ite_eq_left hs, realize_listInf]
     refine ⟨fun h => ⟨hs, fun j => ?_⟩, fun h ψ hψ => ?_⟩
     · exact (realize_minF j).mp (h _ (List.mem_map.mpr ⟨j, List.mem_finRange j, rfl⟩))
     · obtain ⟨j, -, rfl⟩ := List.mem_map.mp hψ
       exact (realize_minF j).mpr (h.2 j)
-  · rw [if_neg hs, Formula.realize_bot]
+  · rw [ite_eq_right hs, Formula.realize_bot]
     exact iff_of_false id fun h => hs h.1
 
 theorem isTgt_toSpec (a : M.Config A) : M.toSpec.IsTgt a ↔ M.accept a.1 = true := by
@@ -388,9 +388,9 @@ theorem isTgt_toSpec (a : M.Config A) : M.toSpec.IsTgt a ↔ M.accept a.1 = true
   change ((if M.accept a.1 then ⊤ else ⊥ : (L.sum Language.order).Formula (Fin k))).Realize
     a.2 ↔ _
   by_cases hs : M.accept a.1 = true
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     exact iff_of_true (Formula.realize_top.mpr trivial) hs
-  · rw [if_neg hs, Formula.realize_bot]
+  · rw [ite_eq_right hs, Formula.realize_bot]
     exact iff_of_false id hs
 
 /-- The walk of the specification is the run of the automaton. -/

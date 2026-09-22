@@ -58,7 +58,7 @@ def claimsOf (q : GameQuestion) (b : Fin (prog.data q).natoms → Bool) : Fin M 
 theorem claimsOf_apply (q : GameQuestion) (b : Fin (prog.data q).natoms → Bool)
     (j : Fin (prog.data q).natoms) :
     prog.claimsOf q b (Fin.castLE (prog.natoms_le q) j) = b j := by
-  rw [claimsOf, dif_pos (show ((Fin.castLE (prog.natoms_le q) j : Fin M) : ℕ) <
+  rw [claimsOf, dite_eq_left (show ((Fin.castLE (prog.natoms_le q) j : Fin M) : ℕ) <
     (prog.data q).natoms from j.isLt)]
   exact congrArg b (Fin.ext rfl)
 

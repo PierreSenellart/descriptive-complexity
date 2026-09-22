@@ -398,7 +398,7 @@ theorem reachesIn :
         change (if κ.t = κ.t then bitVal PR.zero PR.one (bitAtOf F.cell (ixMark elt v) v)
           else bg v v κ.t) =
           (if κ.t = κ.t then bitVal PR.zero PR.one (bitAtOf F.cell (ixMark elt v) v) else bgN v κ.t)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne (show s ≠ κ.t from hst),
           Prog.passTracks_of_ne (show s ≠ κ.t from hst)]
         exact (hbgNoth v v s hs).symm
@@ -418,7 +418,7 @@ theorem reachesIn :
           else bgN v' κ.t) =
           (if κ.t = κ.t then bitVal PR.zero PR.one (bitAtOf F.cell (ixMark elt v) v')
             else bg v' v' κ.t)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne (show s ≠ κ.t from hst),
           Prog.passTracks_of_ne (show s ≠ κ.t from hst)]
         exact hbgNoth v' v' s hs

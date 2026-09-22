@@ -405,7 +405,7 @@ theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → Bool)
     A ⊨ powRelSentence L c d (Sum.inl R) τ ↔
       ∃ x : Fin n → A, (∀ i, eltOf (ρs i) (x i)) ∧ RelMap R x := by
   let := ((powBlock c d).replicate n).structure₁ (L := L) ((powBlock c d).replicateAssign ρs)
-  rw [powRelSentence, if_pos hτ, Sentence.Realize, Formula.realize_iExs]
+  rw [powRelSentence, ite_eq_left hτ, Sentence.Realize, Formula.realize_iExs]
   refine exists_congr fun x => ?_
   rw [Formula.realize_inf, Formula.realize_iInf]
   refine and_congr (forall_congr' fun i => ?_) Iff.rfl
@@ -416,7 +416,7 @@ open Classical in
 /-- **A relation of the instance never holds of an invented point.** -/
 theorem powRelSentence_base_eq_bot (R : L.Relations n) (τ : Fin n → Bool)
     (hτ : ¬∀ i, τ i = false) : powRelSentence L c d (Sum.inl R) τ = ⊥ := by
-  rw [powRelSentence, if_neg hτ]
+  rw [powRelSentence, ite_eq_right hτ]
 
 omit [L.IsRelational] in
 open Classical in
@@ -429,8 +429,8 @@ theorem realize_powRelSentence_old (σs : Fin 1 → (powBlock c d).Assignment A)
   let := ((powBlock c d).replicate 1).structure₁ (L := L) ((powBlock c d).replicateAssign σs)
   rw [powRelSentence]
   by_cases h : τ 0 = false
-  · rw [if_pos h]; simp [h]
-  · rw [if_neg h]; simp [h]
+  · rw [ite_eq_left h]; simp [h]
+  · rw [ite_eq_right h]; simp [h]
 
 end RelRealize
 

@@ -84,10 +84,10 @@ theorem realize_mLitF {b : Bool} {c x : A} {v : Fin 2 × Fin 3 → A}
     (h0 : v (0, 0) = c) (h1 : v (0, 1) = x) :
     (mLitF b).Realize v ↔ MLit c x b := by
   cases b
-  · rw [mLitF, if_neg Bool.false_ne_true]
+  · rw [mLitF, ite_eq_right Bool.false_ne_true]
     simp only [realize_negF, h0, h1, MLit, SatPos, SatNeg, SatOcc.NegIn]
     simp
-  · rw [mLitF, if_pos rfl]
+  · rw [mLitF, ite_eq_left rfl]
     simp only [realize_posF, h0, h1, MLit, SatPos, SatNeg, SatOcc.PosIn]
     simp
 
@@ -130,7 +130,7 @@ theorem realize_cstHF {s : UPTag} {q : HV A}
     (cstHF s q.1).Realize v ↔ q = cstH s := by
   rw [cstHF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_minF, h0, h1, h2]
     constructor
     · rintro ⟨⟨ha, hb⟩, hc⟩
@@ -138,7 +138,7 @@ theorem realize_cstHF {s : UPTag} {q : HV A}
         (le_antisymm (hc botA) (botA_le _))
     · rintro rfl
       exact ⟨⟨fun a => botA_le a, fun a => botA_le a⟩, fun a => botA_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -147,14 +147,14 @@ theorem realize_oneHF {s : UPTag} {x : Fin 2 × Fin 3} {q : HV A}
     (oneHF s x q.1).Realize v ↔ q = oneH s (v x) := by
   rw [oneHF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_eqF, realize_minF, h0, h1, h2]
     constructor
     · rintro ⟨⟨ha, hb⟩, hc⟩
       exact hV_ext hs ha (le_antisymm (hb botA) (botA_le _)) (le_antisymm (hc botA) (botA_le _))
     · rintro rfl
       exact ⟨⟨rfl, fun a => botA_le a⟩, fun a => botA_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -163,14 +163,14 @@ theorem realize_twoHF {s : UPTag} {x y : Fin 2 × Fin 3} {q : HV A}
     (twoHF s x y q.1).Realize v ↔ q = twoH s (v x) (v y) := by
   rw [twoHF]
   by_cases hs : q.1 = s
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_eqF, realize_minF, h0, h1, h2]
     constructor
     · rintro ⟨⟨ha, hb⟩, hc⟩
       exact hV_ext hs ha hb (le_antisymm (hc botA) (botA_le _))
     · rintro rfl
       exact ⟨⟨rfl, rfl⟩, fun a => botA_le a⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
@@ -181,10 +181,10 @@ theorem realize_roundDstF {x : Fin 2 × Fin 3} {q : HV A}
       (q.1 = UPTag.qChk true ∧ q.2 0 = v x ∧ SatMinCl (q.2 1) ∧ ∀ a : A, q.2 2 ≤ a) := by
   rw [roundDstF]
   by_cases hs : q.1 = UPTag.qChk true
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_eqF, realize_minF, realize_minClF h1, h0, h2]
     exact ⟨fun ⟨⟨ha, hb⟩, hc⟩ => ⟨hs, ha, hb, hc⟩, fun ⟨_, ha, hb, hc⟩ => ⟨⟨ha, hb⟩, hc⟩⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs hq.1
 
@@ -196,10 +196,10 @@ theorem realize_verDstF {q : HV A}
         ∀ a : A, q.2 2 ≤ a) := by
   rw [verDstF]
   by_cases hs : q.1 = UPTag.qVer false true
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     simp only [Formula.realize_inf, realize_minF, realize_minClF h0, h1, h2]
     exact ⟨fun ⟨⟨ha, hb⟩, hc⟩ => ⟨hs, ha, hb, hc⟩, fun ⟨_, ha, hb, hc⟩ => ⟨⟨ha, hb⟩, hc⟩⟩
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs hq.1
 
@@ -633,13 +633,13 @@ theorem relMap_twrite (p q : HV A) :
         rw [realize_posF, h1, h2]
         exact Iff.rfl
       cases mrk
-      · rw [if_neg Bool.false_ne_true, if_neg Bool.false_ne_true]
+      · rw [ite_eq_right Bool.false_ne_true, ite_eq_right Bool.false_ne_true]
         refine or_congr ?_ (and_congr hq2 ?_)
         · rw [Formula.realize_bot]
           exact iff_of_false (fun h => h.2) (fun h => Bool.noConfusion h.2.1)
         · rw [Formula.realize_top]
           exact ⟨fun _ => Or.inl rfl, fun _ => trivial⟩
-      · rw [if_pos rfl, if_pos rfl, Formula.realize_not]
+      · rw [ite_eq_left rfl, ite_eq_left rfl, Formula.realize_not]
         refine or_congr (and_congr hq1 ?_) (and_congr hq2 ?_)
         · exact hpos.trans ⟨fun h => ⟨rfl, h⟩, fun h => h.2⟩
         · exact (not_congr hpos).trans
@@ -694,15 +694,15 @@ theorem relMap_tdst (p q : HV A) :
         rw [realize_negF, h1, h2]
         exact Iff.rfl
       cases f
-      · rw [if_neg Bool.false_ne_true, if_neg Bool.false_ne_true]
+      · rw [ite_eq_right Bool.false_ne_true, ite_eq_right Bool.false_ne_true]
         refine or_congr ?_ (and_congr htw₂ ?_)
         · rw [Formula.realize_bot]
           exact iff_of_false (fun h => h.2) (fun h => Bool.noConfusion h.2.1)
         · rw [Formula.realize_top]
           exact ⟨fun _ => Or.inl rfl, fun _ => trivial⟩
-      · rw [if_pos rfl, if_pos rfl]
+      · rw [ite_eq_left rfl, ite_eq_left rfl]
         cases m
-        · rw [if_neg Bool.false_ne_true, if_neg Bool.false_ne_true,
+        · rw [ite_eq_right Bool.false_ne_true, ite_eq_right Bool.false_ne_true,
             Formula.realize_not]
           refine or_congr (and_congr htw₁ ?_) (and_congr htw₂ ?_)
           · exact (not_congr hneg).trans
@@ -711,7 +711,7 @@ theorem relMap_tdst (p q : HV A) :
           · exact hneg.trans
               ⟨fun hn => Or.inr ⟨hn, rfl⟩,
                 fun h => (h.resolve_left (fun hc => Bool.noConfusion hc)).1⟩
-        · rw [if_pos rfl, if_pos rfl]
+        · rw [ite_eq_left rfl, ite_eq_left rfl]
           refine or_congr (and_congr htw₁ ?_) ?_
           · rw [Formula.realize_top]
             exact ⟨fun _ => ⟨rfl, fun _ => rfl⟩, fun _ => trivial⟩
@@ -739,13 +739,13 @@ theorem relMap_tdst (p q : HV A) :
         simp only [h0]
         try exact Iff.rfl
       cases f
-      · rw [if_neg Bool.false_ne_true, if_neg Bool.false_ne_true, Formula.realize_not]
+      · rw [ite_eq_right Bool.false_ne_true, ite_eq_right Bool.false_ne_true, Formula.realize_not]
         refine or_congr (and_congr ho₁ ?_) (and_congr ho₂ ?_)
         · exact (realize_mLitF h0 h1).trans
             ⟨fun h => Or.inr h, fun h => h.resolve_left (fun hc => Bool.noConfusion hc)⟩
         · exact (not_congr (realize_mLitF h0 h1)).trans
             ⟨fun h => ⟨rfl, h⟩, fun h => h.2⟩
-      · rw [if_pos rfl, if_pos rfl]
+      · rw [ite_eq_left rfl, ite_eq_left rfl]
         refine or_congr (and_congr ho₁ ?_) ?_
         · rw [Formula.realize_top]
           exact ⟨fun _ => Or.inl rfl, fun _ => trivial⟩

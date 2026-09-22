@@ -190,13 +190,13 @@ omit [Finite A] in
 /-- The cell the head stands on still holds its old symbol. -/
 theorem midTape_self {B : Type} (f₀ f₁ : (A → Prop) → B) (s : A → Prop) :
     midTape f₀ f₁ s s = f₀ s :=
-  if_neg fun hlt => ((wmSetLt_iff _ _).mp hlt).2 rfl
+  ite_eq_right fun hlt => ((wmSetLt_iff _ _).mp hlt).2 rfl
 
 /-- One increment later, the cell holds its new symbol. -/
 theorem midTape_incr {B : Type} (h : IsLinOrd (WMLe (A := A))) (f₀ f₁ : (A → Prop) → B)
     {s t : A → Prop}
     (hi : WMIncr WMLe s t) : midTape f₀ f₁ t s = f₁ s :=
-  if_pos ((wmSetLt_iff_of_wmIncr h hi s).mpr ((isLinOrd_wmSetLe h).1 s))
+  ite_eq_left ((wmSetLt_iff_of_wmIncr h hi s).mpr ((isLinOrd_wmSetLe h).1 s))
 
 /-- **A step of the sweep changes one cell**: off the cell the head is on, the
 tape before and after the write agree. -/
@@ -209,8 +209,8 @@ theorem midTape_agree {B : Type} (h : IsLinOrd (WMLe (A := A))) (f₀ f₁ : (A 
     exact ⟨fun hle => ⟨hle, hne⟩, fun hc => hc.1⟩
   unfold midTape
   by_cases hc : WMSetLt WMLe r s
-  · rw [if_pos (hiff.mpr hc), if_pos hc]
-  · rw [if_neg fun hcon => hc (hiff.mp hcon), if_neg hc]
+  · rw [ite_eq_left (hiff.mpr hc), ite_eq_left hc]
+  · rw [ite_eq_right fun hcon => hc (hiff.mp hcon), ite_eq_right hc]
 
 /-- **A writing sweep carrying a state.** At every cell of a stretch the machine
 writes the new symbol and moves right, and its state advances with the head: at

@@ -60,7 +60,7 @@ noncomputable def collapse (ε : A → M) (m₀ : M) : A → M :=
 theorem collapse_eVar {ε : A → M} {m₀ : M} {x : A} (h : EVarG x) :
     collapse ε m₀ x = ε x := by
   classical
-  rw [collapse, if_pos h]
+  rw [collapse, ite_eq_left h]
 
 /-- **The collapse commutes with the two environments**: the value a variable
 takes when it stands for itself, mapped into the model, is the value it takes
@@ -71,8 +71,8 @@ theorem collapse_val (ε : A → M) (m₀ : M) (u : A → A) (x : A) :
   classical
   rw [eprVal, eprVal]
   by_cases hx : EVarG x
-  · rw [if_pos hx, if_pos hx, collapse_eVar hx]
-  · rw [if_neg hx, if_neg hx]
+  · rw [ite_eq_left hx, ite_eq_left hx, collapse_eVar hx]
+  · rw [ite_eq_right hx, ite_eq_right hx]
 
 open Classical in
 /-- **The arguments of a literal, as an assignment of its positions**: the
@@ -85,7 +85,7 @@ theorem argAssign_eq (hwf : IsWF A) (u : A → A) {l p x : A} (h : ArgG l p x) :
     argAssign u l p = eprVal (fun y : A => y) u x := by
   classical
   have hex : ∃ x, ArgG l p x := ⟨x, h⟩
-  rw [argAssign, dif_pos hex, hwf.1 l p hex.choose x hex.choose_spec h]
+  rw [argAssign, dite_eq_left hex, hwf.1 l p hex.choose x hex.choose_spec h]
 
 /-- **A model becomes one on the instance**: read every symbol through the
 collapse, and take each variable to stand for itself. -/

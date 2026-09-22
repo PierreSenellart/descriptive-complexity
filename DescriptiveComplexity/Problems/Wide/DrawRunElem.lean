@@ -77,8 +77,8 @@ theorem trackTape_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A
   refine congrArg _ (funext fun s => ?_)
   by_cases hs : s = t
   · subst hs
-    rw [if_pos rfl, hm]
-  · rw [if_neg hs]
+    rw [ite_eq_left rfl, hm]
+  · rw [ite_eq_right hs]
 
 /-- A backed track's pass presentation is the background itself. -/
 theorem passTracks_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A}
@@ -91,8 +91,8 @@ theorem passTracks_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → 
     rest r s
   by_cases hs : s = t
   · subst hs
-    rw [if_pos rfl, hm]
-  · rw [if_neg hs]
+    rw [ite_eq_left rfl, hm]
+  · rw [ite_eq_right hs]
 
 end Backed
 
@@ -233,7 +233,7 @@ private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
   | zero =>
     have hkn : k = nr := by omega
     subst hkn
-    have hph : elemPhaseAt emb k = emb .e1 := dif_neg (lt_irrefl k)
+    have hph : elemPhaseAt emb k = emb .e1 := dite_eq_right (lt_irrefl k)
     have hfk : (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (k + 1)) = Fin.last k :=
       Fin.ext rfl
     rw [hph, hfk, Nat.mul_zero]
@@ -241,7 +241,7 @@ private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
   | succ n ih =>
     have hkl : k < nr := by omega
     set j : Fin nr := ⟨k, hkl⟩ with hj
-    have hph : elemPhaseAt emb k = emb (.rdP j .start) := dif_pos hkl
+    have hph : elemPhaseAt emb k = emb (.rdP j .start) := dite_eq_left hkl
     have hcast : (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (nr + 1)) = j.castSucc :=
       Fin.ext rfl
     -- the read kit at read `j`
@@ -297,12 +297,12 @@ private theorem elem_reads : ∀ (k : ℕ) (hk : k ≤ nr),
       refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
       by_cases hlt : (j : ℕ) + 1 < nr
       · have hnx : elemNextRd emb j = emb (.rdP ⟨(j : ℕ) + 1, hlt⟩ .start) :=
-          dif_pos hlt
+          dite_eq_left hlt
         rw [hnx]
         exact hasLeft_of_rule hrules
           (i := .rd ⟨(j : ℕ) + 1, hlt⟩) (ρ := Sum.inl .stayS)
           hwkv' rfl rfl rfl rfl not_false
-      · have hnx : elemNextRd emb j = emb .e1 := dif_neg hlt
+      · have hnx : elemNextRd emb j = emb .e1 := dite_eq_right hlt
         rw [hnx]
         exact hasLeft_of_rule hrules (i := .e1) (ρ := .stay)
           hwkv' rfl rfl rfl rfl not_false
@@ -395,11 +395,11 @@ private theorem elem_round {p : P} {f : Q → A} {a : ι}
       exact PR.zero_ne_one
     refine Prog.step_moveBack hR hlin hvi (fun _ _ => rfl) ?_
     by_cases hlt : 0 < nr
-    · have hfr : elemFirstRd emb = emb (.rdP ⟨0, hlt⟩ .start) := dif_pos hlt
+    · have hfr : elemFirstRd emb = emb (.rdP ⟨0, hlt⟩ .start) := dite_eq_left hlt
       rw [hfr]
       exact hasLeft_of_rule hrules (i := .rd ⟨0, hlt⟩) (ρ := Sum.inl .stayS)
         hwkv' rfl rfl rfl rfl not_false
-    · have hfr : elemFirstRd emb = emb .e1 := dif_neg hlt
+    · have hfr : elemFirstRd emb = emb .e1 := dite_eq_right hlt
       rw [hfr]
       exact hasLeft_of_rule hrules (i := .e1) (ρ := .stay)
         hwkv' rfl rfl rfl rfl not_false

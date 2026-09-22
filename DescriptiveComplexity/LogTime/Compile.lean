@@ -248,7 +248,7 @@ theorem plus_iff_bits [Nonempty A] (x y z : A) :
     · have hnc : ¬ 2 ^ posCount A ≤ orank x + orank y := by
         have := hcap z
         omega
-      exact hbits.mp (by rw [if_neg hnc]; omega) (orank i) hlt
+      exact hbits.mp (by rw [ite_eq_right hnc]; omega) (orank i) hlt
     · have hpow : 2 ^ posCount A ≤ 2 ^ orank i := Nat.pow_le_pow_right (by norm_num) hge
       have hx := testBit_orank_eq_false (x := x) hge
       have hy := testBit_orank_eq_false (x := y) hge
@@ -277,7 +277,7 @@ theorem plus_iff_bits [Nonempty A] (x y z : A) :
       testBit_orank_eq_false (x := y) (le_refl _),
       testBit_orank_eq_false (x := z) (le_refl _), hK x, hK y] at htop
     have hnc : ¬ 2 ^ posCount A ≤ orank x + orank y := by simpa using htop
-    rw [if_neg hnc] at hsum
+    rw [ite_eq_right hnc] at hsum
     omega
 
 end Carry

@@ -922,7 +922,7 @@ theorem hTape_posHCell (M : A → Bool) (y : A) :
     hTape M (posHCell y : HV A) = symCell (M y) y := by
   classical
   simp only [hTape]
-  exact if_pos ⟨fun a => botA_le a, fun a => botA_le a⟩
+  exact ite_eq_left ⟨fun a => botA_le a, fun a => botA_le a⟩
 
 omit [Language.sat.Structure A] in
 /-- Marked tapes agree wherever the marks do – in particular junk cells never
@@ -934,8 +934,8 @@ theorem hTape_congr {M M' : A → Bool} (p : HV A)
   cases t <;> simp only [hTape]
   case pCell =>
     by_cases hcond : (∀ a : A, w 1 ≤ a) ∧ (∀ a : A, w 2 ≤ a)
-    · rw [if_pos hcond, if_pos hcond, h (w 0)]
-    · rw [if_neg hcond, if_neg hcond]
+    · rw [ite_eq_left hcond, ite_eq_left hcond, h (w 0)]
+    · rw [ite_eq_right hcond, ite_eq_right hcond]
 
 open Classical in
 /-- The tape during a return sweep of the clause `c` with the head at `p`,
@@ -1184,7 +1184,7 @@ theorem markTape_topA (M : A → Bool) (c : A) (r : HV A) :
   cases t <;> simp only [markTape, hTape]
   case pCell =>
     by_cases hcond : (∀ a : A, w 1 ≤ a) ∧ (∀ a : A, w 2 ≤ a)
-    · rw [if_pos hcond, if_pos hcond, if_neg]
+    · rw [ite_eq_left hcond, ite_eq_left hcond, ite_eq_right]
       rintro ⟨hle, hne⟩
       have hcw : ((UPTag.pCell, w) : HV A) = posHCell (w 0) := by
         refine hV_ext rfl ?_ ?_ ?_
@@ -1193,7 +1193,7 @@ theorem markTape_topA (M : A → Bool) (c : A) (r : HV A) :
         · exact le_antisymm (hcond.2 botA) (botA_le _)
       have := posHCell_le_iff.mp (hcw ▸ hle)
       exact hne (hcw ▸ congrArg posHCell (le_antisymm (le_topA (w 0)) this)).symm
-    · rw [if_neg hcond, if_neg hcond]
+    · rw [ite_eq_right hcond, ite_eq_right hcond]
 
 /-- At the bottom of the return sweep everything has been processed: the tape
 carries the new marks. -/
@@ -1204,11 +1204,11 @@ theorem markTape_posHStart_eq (M : A → Bool) (c : A) (r : HV A) :
   cases t <;> simp only [markTape, hTape]
   case pCell =>
     by_cases hcond : (∀ a : A, w 1 ≤ a) ∧ (∀ a : A, w 2 ≤ a)
-    · rw [if_pos hcond, if_pos hcond, if_pos]
+    · rw [ite_eq_left hcond, ite_eq_left hcond, ite_eq_left]
       refine ⟨hTagTupleLe_of_tag_lt (show UPTag.pStart < UPTag.pCell by decide), ?_⟩
       intro h
       exact absurd (congrArg Prod.fst h) (show ¬(UPTag.pStart = UPTag.pCell) by decide)
-    · rw [if_neg hcond, if_neg hcond]
+    · rw [ite_eq_right hcond, ite_eq_right hcond]
 
 /-- **The return sweep only ever changes the cell under the head**, exactly as
 the SAT machine's guess sweep: moving the head down brings its own cell into the
@@ -1221,7 +1221,7 @@ theorem markTape_frame' (M : A → Bool) (c : A) {p q r : HV A}
   cases t <;> simp only [markTape]
   case pCell =>
     by_cases hcond : (∀ a : A, w 1 ≤ a) ∧ (∀ a : A, w 2 ≤ a)
-    · rw [if_pos hcond, if_pos hcond]
+    · rw [ite_eq_left hcond, ite_eq_left hcond]
       have hiff : (tagTupleLe q ((UPTag.pCell, w) : HV A) ∧ q ≠ ((UPTag.pCell, w) : HV A)) ↔
           (tagTupleLe p ((UPTag.pCell, w) : HV A) ∧ p ≠ ((UPTag.pCell, w) : HV A)) := by
         have hcw : HPosn ((UPTag.pCell, w) : HV A) := hcond
@@ -1238,7 +1238,7 @@ theorem markTape_frame' (M : A → Bool) (c : A) {p q r : HV A}
           rw [← he] at hle
           exact hsucc.2.2.2.1 (isLinOrd_hTagTupleLe.2.2.1 _ _ hsucc.2.2.1 hle)
       exact if_congr hiff rfl rfl
-    · rw [if_neg hcond, if_neg hcond]
+    · rw [ite_eq_right hcond, ite_eq_right hcond]
 
 /-- What the return sweep reads at its own head: the old mark. -/
 theorem markTape_at_head (M : A → Bool) (c : A) {p : HV A} (hp : HPosn p)
@@ -1249,7 +1249,7 @@ theorem markTape_at_head (M : A → Bool) (c : A) {p : HV A} (hp : HPosn p)
   cases hcell
   have hp' : (∀ a : A, w 1 ≤ a) ∧ (∀ a : A, w 2 ≤ a) := hp
   simp only [markTape]
-  rw [if_pos hp', if_neg (fun h => h.2 rfl)]
+  rw [ite_eq_left hp', ite_eq_right (fun h => h.2 rfl)]
 
 /-! ### The intended run: single steps -/
 
@@ -1327,7 +1327,7 @@ theorem step_hMark (M : A → Bool) {m : Bool} {r c : A} (hc : SatCl c)
     have hp' : (∀ a : A, w 1 ≤ a) ∧ (∀ a : A, w 2 ≤ a) :=
       (show HPosn ((UPTag.pCell, w) : HV A) from hsucc.2.1)
     simp only [markTape]
-    rw [if_pos hp', if_pos ⟨hsucc.2.2.1, hsucc.2.2.2.1⟩]
+    rw [ite_eq_left hp', ite_eq_left ⟨hsucc.2.2.1, hsucc.2.2.2.1⟩]
   refine ⟨(UPTag.tMark (M (p.2 0)) m, ![r, c, p.2 0]), hc, rfl, hread, rfl, ?_,
     fun r' hr' => markTape_frame' M c hsucc hr', Or.inr ⟨fun h => h, hsucc⟩⟩
   change (hornMachine A).Write (UPTag.tMark (M (p.2 0)) m, ![r, c, p.2 0]) (markTape M c q p)

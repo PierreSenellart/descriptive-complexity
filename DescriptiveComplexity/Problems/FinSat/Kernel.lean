@@ -82,21 +82,21 @@ theorem kidOf_imp_left {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) :
   have h : Tseitin.isRootB f₁ (Tseitin.rootAt f₁) = true :=
     (Tseitin.isRootB_iff f₁ _).mpr rfl
   change (if Tseitin.isRootB f₁ (Tseitin.rootAt f₁) then some true else none) = some true
-  rw [h, if_pos rfl]
+  rw [h, ite_eq_left rfl]
 
 theorem kidOf_imp_right {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) :
     kidOf (f₁.imp f₂) (Sum.inl ⟨rfl⟩) (Sum.inr (Sum.inr (Tseitin.rootAt f₂))) = some false := by
   have h : Tseitin.isRootB f₂ (Tseitin.rootAt f₂) = true :=
     (Tseitin.isRootB_iff f₂ _).mpr rfl
   change (if Tseitin.isRootB f₂ (Tseitin.rootAt f₂) then some false else none) = some false
-  rw [h, if_pos rfl]
+  rw [h, ite_eq_left rfl]
 
 theorem kidOf_all_body {n : ℕ} (f : L'.BoundedFormula Empty (n + 1)) :
     kidOf f.all (Sum.inl ⟨rfl⟩) (Sum.inr (Tseitin.rootAt f)) = some false := by
   have h : Tseitin.isRootB f (Tseitin.rootAt f) = true :=
     (Tseitin.isRootB_iff f _).mpr rfl
   change (if Tseitin.isRootB f (Tseitin.rootAt f) then some false else none) = some false
-  rw [h, if_pos rfl]
+  rw [h, ite_eq_left rfl]
 
 /-! The children of a position of a subformula stay inside that subformula: what
 lets an induction over subformulas see all the children a node of the *whole*
@@ -312,7 +312,7 @@ theorem lt_arityOf_of_argOf {n : ℕ} {f : ((newLang L).sum B.lang).BoundedFormu
   rw [arityOf]
   split at h
   · by_contra hj
-    rw [dif_neg hj] at h
+    rw [dite_eq_right hj] at h
     exact absurd h (by simp)
   · exact absurd h (by simp)
 
@@ -379,7 +379,7 @@ theorem argOf_some [L.IsRelational] :
         obtain ⟨l, hl, hlt⟩ := termLevel_some (B := B) (ts ⟨j, hj⟩)
         refine ⟨l, ?_, hlt⟩
         simp only [argOf, kernelNode]
-        rw [dif_pos hj]
+        rw [dite_eq_left hj]
         exact hl
   | _, .imp f₁ f₂, _, q, j, h => by
       obtain ⟨⟨rfl⟩⟩ | q₁ | q₂ := q

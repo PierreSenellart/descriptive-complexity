@@ -272,7 +272,7 @@ theorem reachesIn
       · subst hst
         change (if κ.t = κ.t then bitVal PR.zero PR.one (bitAtOf F.cell m v') else restN v' κ.t) =
           (if κ.t = κ.t then bitVal PR.zero PR.one (bitAtOf F.cell m v') else restB v' κ.t)
-        rw [if_pos rfl, if_pos rfl]
+        rw [ite_eq_left rfl, ite_eq_left rfl]
       · rw [Prog.passTracks_of_ne (show s ≠ κ.t from hst),
           Prog.passTracks_of_ne (show s ≠ κ.t from hst)]
         exact (hNoth s hs).symm

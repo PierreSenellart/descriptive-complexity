@@ -73,9 +73,9 @@ theorem tpTile_tileAt (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (
   · by_cases hnext : k < n ∧ (g (k + 1)).head = cell
     · rw [tileAt_arr hh hnext.1 hnext.2]
       by_cases hr : WMRight (wpElt (tr k))
-      · simp only [if_pos hr]
+      · simp only [ite_eq_left hr]
         trivial
-      · simp only [if_neg hr]
+      · simp only [ite_eq_right hr]
         trivial
     · rw [tileAt_sym hh hnext]
       trivial
@@ -100,9 +100,9 @@ theorem tpNoHead_tileAt {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) :
   by_cases hnext : k < n ∧ (g (k + 1)).head = cell
   · rw [tileAt_arr hh hnext.1 hnext.2]
     by_cases hr : WMRight (wpElt (tr k))
-    · simp only [if_pos hr]
+    · simp only [ite_eq_left hr]
       exact Or.inr (Or.inl rfl)
-    · simp only [if_neg hr]
+    · simp only [ite_eq_right hr]
       exact Or.inr (Or.inr rfl)
   · rw [tileAt_sym hh hnext]
     exact Or.inl rfl
@@ -169,15 +169,15 @@ theorem tpVert_tileAt
       by_cases hk' : k + 1 < n
       · rw [tileAt_head hnext.2 hk']
         by_cases hr : WMRight (wpElt (tr k))
-        · simp only [if_pos hr]
+        · simp only [ite_eq_left hr]
           exact ⟨Or.inl rfl, by rw [hsame]; rfl, rfl⟩
-        · simp only [if_neg hr]
+        · simp only [ite_eq_right hr]
           exact ⟨Or.inl rfl, by rw [hsame]; rfl, rfl⟩
       · rw [tileAt_halt hnext.2 hk']
         by_cases hr : WMRight (wpElt (tr k))
-        · simp only [if_pos hr]
+        · simp only [ite_eq_left hr]
           exact ⟨Or.inr rfl, by rw [hsame]; rfl, rfl⟩
-        · simp only [if_neg hr]
+        · simp only [ite_eq_right hr]
           exact ⟨Or.inr rfl, by rw [hsame]; rfl, rfl⟩
     · -- nothing happens here
       have hne : (g (k + 1)).head ≠ cell := by
@@ -204,9 +204,9 @@ theorem head_eq_of_tileAt {k : ℕ} {cell : WPoint A}
   · by_cases hnext : k < n ∧ (g (k + 1)).head = cell
     · rw [tileAt_arr hh hnext.1 hnext.2] at h
       by_cases hr : WMRight (wpElt (tr k))
-      · rw [if_pos hr] at h
+      · rw [ite_eq_left hr] at h
         rcases h with h | h <;> exact TileTag.noConfusion h
-      · rw [if_neg hr] at h
+      · rw [ite_eq_right hr] at h
         rcases h with h | h <;> exact TileTag.noConfusion h
     · rw [tileAt_sym hh hnext] at h
       rcases h with h | h <;> exact TileTag.noConfusion h
@@ -232,20 +232,20 @@ theorem arr_of_tileAt {k : ℕ} {cell : WPoint A} {right : Bool}
     intro hc
     by_cases hk : k < n
     · rw [tileAt_head hc hk] at h
-      cases right <;> simp only [Bool.false_eq_true, if_true, if_false] at h <;>
+      cases right <;> simp only [Bool.false_eq_true, ite_true, ite_false] at h <;>
         exact TileTag.noConfusion h
     · rw [tileAt_halt hc hk] at h
-      cases right <;> simp only [Bool.false_eq_true, if_true, if_false] at h <;>
+      cases right <;> simp only [Bool.false_eq_true, ite_true, ite_false] at h <;>
         exact TileTag.noConfusion h
   by_cases hnext : k < n ∧ (g (k + 1)).head = cell
   · refine ⟨hh, hnext.1, hnext.2, ?_⟩
     rw [tileAt_arr hh hnext.1 hnext.2] at h
     by_cases hr : WMRight (wpElt (tr k))
-    · rw [if_pos hr] at h
+    · rw [ite_eq_left hr] at h
       cases right
       · exact absurd h (by simp)
       · exact iff_of_true hr rfl
-    · rw [if_neg hr] at h
+    · rw [ite_eq_right hr] at h
       cases right
       · exact iff_of_false hr (by simp)
       · exact absurd h (by simp)
@@ -308,7 +308,7 @@ theorem tpHoriz_tileAt (hlin : IsLinOrd (WMLe (A := A)))
     have hnext : (g (k + 1)).head = cR := TMData.succPos_right_unique hwp hmv hs
     have hhR : (g k).head ≠ cR := fun hc => hs.2.2.2.1 (hhL.symm.trans hc)
     refine ⟨?_, ?_⟩
-    · rw [tileAt_arr_tag hhR hk hnext, if_pos hright]
+    · rw [tileAt_arr_tag hhR hk hnext, ite_eq_left hright]
     · rw [tpTr_tileAt_head hhL hk, tpState_tileAt_arr hhR hk hnext]
       exact wpAttr_elt hdst
   · -- a head at the right that moves left hands the state to the left cell
@@ -324,7 +324,7 @@ theorem tpHoriz_tileAt (hlin : IsLinOrd (WMLe (A := A)))
     have hprev : (g (k + 1)).head = cL := succPos_left_unique hwp hmv hs
     have hhL : (g k).head ≠ cL := fun hc => hs.2.2.2.1 (hc.symm.trans hhR)
     refine ⟨?_, ?_⟩
-    · rw [tileAt_arr_tag hhL hk hprev, if_neg hleft]
+    · rw [tileAt_arr_tag hhL hk hprev, ite_eq_right hleft]
     · rw [tpTr_tileAt_head hhR hk, tpState_tileAt_arr hhL hk hprev]
       exact wpAttr_elt hdst
   · -- an arrival from the left is the left neighbor's head, moving right

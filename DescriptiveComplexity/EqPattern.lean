@@ -164,13 +164,13 @@ noncomputable def ordSucc [Preorder A] (a : A) : A :=
 
 theorem covBy_ordSucc [Preorder A] {a : A} (h : ∃ b : A, a ⋖ b) : a ⋖ ordSucc a := by
   classical
-  rw [ordSucc, dif_pos h]
+  rw [ordSucc, dite_eq_left h]
   exact h.choose_spec
 
 theorem ordSucc_of_not_covBy [Preorder A] {a : A} (h : ¬∃ b : A, a ⋖ b) :
     ordSucc a = a := by
   classical
-  rw [ordSucc, dif_neg h]
+  rw [ordSucc, dite_eq_right h]
 
 /-- **The cover is the next element.** -/
 theorem eq_ordSucc_of_covBy [LinearOrder A] {a b : A} (h : a ⋖ b) :
@@ -265,10 +265,10 @@ variable {bot top : A}
 theorem realize_litF {b : Bool} {φ : (L.sum Language.order).Formula γ} :
     (litF b φ).Realize v ↔ (φ.Realize v ↔ b = true) := by
   cases b
-  · simp only [litF, if_neg Bool.false_ne_true, Formula.realize_not]
+  · simp only [litF, ite_eq_right Bool.false_ne_true, Formula.realize_not]
     exact ⟨fun h => ⟨fun hc => absurd hc h, fun hc => absurd hc Bool.false_ne_true⟩,
       fun h hc => Bool.false_ne_true (h.mp hc)⟩
-  · rw [litF, if_pos rfl]
+  · rw [litF, ite_eq_left rfl]
     exact ⟨fun h => ⟨fun _ => rfl, fun _ => h⟩, fun h => h.mpr rfl⟩
 
 theorem realize_covByF {x y : γ} : (covByF (L := L) x y).Realize v ↔ v x ⋖ v y := by

@@ -252,7 +252,7 @@ variable {L : Language.{0, 0}}
 nothing. -/
 theorem pad_full {A : Type} {D : ℕ} (a₀ : A) (w : Fin D → A) : pad a₀ w = w := by
   funext j
-  rw [pad, dif_pos j.isLt]
+  rw [pad, dite_eq_left j.isLt]
 
 /-- Reindexing an alternating quantification along an equality of lengths. -/
 theorem altQuant_cast {A : Type} {m n : ℕ} (h : m = n)

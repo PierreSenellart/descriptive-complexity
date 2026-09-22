@@ -52,12 +52,12 @@ noncomputable def stepNext (R : N → N → Prop) (a : N) : N :=
 
 theorem step_stepNext (h : ∃ b, R a b) : R a (stepNext R a) := by
   classical
-  rw [stepNext, dif_pos h]
+  rw [stepNext, dite_eq_left h]
   exact h.choose_spec
 
 theorem stepNext_eq_self (h : ¬∃ b, R a b) : stepNext R a = a := by
   classical
-  rw [stepNext, dif_neg h]
+  rw [stepNext, dite_eq_right h]
 
 /-- On a functional relation the walk follows the only step there is. -/
 theorem stepNext_eq (hfun : ∀ u v w : N, R u v → R u w → v = w) (h : R a b) :

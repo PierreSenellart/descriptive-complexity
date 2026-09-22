@@ -770,7 +770,7 @@ theorem isInit_confGuess (ν : A → Bool) :
     first
       | exact Or.inl (Or.inl ⟨hq, rfl, isMinTup_bot⟩)
       | exact Or.inl (Or.inr (Or.inr ⟨hq, rfl, isMinTup_bot⟩))
-      | (rw [if_neg (hne q hq)]
+      | (rw [ite_eq_right (hne q hq)]
          exact Or.inl (Or.inr (Or.inl ⟨hq, rfl, rfl, fun b => botA_le b⟩)))
       | (refine Or.inr ⟨fun b hb => ?_, rfl, isMinTup_bot⟩
          rcases hb with ⟨h, -⟩ | ⟨h, -, -, -⟩ | ⟨h, -⟩ <;> rw [hq] at h <;> simp at h)
@@ -806,10 +806,10 @@ theorem step_guess (ν : A → Bool) {p q : SatV A}
       Or.inl ⟨trivial, hsucc⟩⟩
     · change guessTape ν p p = symU (p.2 0)
       simp only [guessTape, h]
-      exact if_neg (fun hc => hc.2.2 rfl)
+      exact ite_eq_right (fun hc => hc.2.2 rfl)
     · change guessTape ν q p = symV (ν (p.2 0)) (p.2 0)
       simp only [guessTape, h]
-      exact if_pos ⟨hpos, hsucc.2.2.1, hsucc.2.2.2.1⟩
+      exact ite_eq_left ⟨hpos, hsucc.2.2.1, hsucc.2.2.2.1⟩
   · exact absurd (isLinOrd_tagTupleLe.2.2.1 p q hsucc.2.2.1
       ((eq_posEnd_of_posn hsucc.1 h) ▸ hb)) hsucc.2.2.2.1
 
@@ -917,7 +917,7 @@ theorem doneTape_cell (ν : A → Bool) {q : SatV A} (hq : q.1 = SatTag.pCell)
     (hpos : ∀ a : A, q.2 1 ≤ a) : doneTape ν q = symV (ν (q.2 0)) (q.2 0) := by
   classical
   simp only [doneTape, guessTape, hq]
-  refine if_pos ⟨hpos, tagTupleLe_of_tag_lt ?_, ?_⟩
+  refine ite_eq_left ⟨hpos, tagTupleLe_of_tag_lt ?_, ?_⟩
   · rw [hq]
     exact show SatTag.pCell < SatTag.pEnd by decide
   · intro h
@@ -1445,14 +1445,14 @@ theorem guessTape_congr {ν ν' : A → Bool} {p : SatV A}
   case pCell =>
     by_cases hcond : (∀ a : A, w 1 ≤ a) ∧ tagTupleLe ((SatTag.pCell, w) : SatV A) p ∧
         ((SatTag.pCell, w) : SatV A) ≠ p
-    · rw [if_pos hcond, if_pos hcond]
+    · rw [ite_eq_left hcond, ite_eq_left hcond]
       have hcw : ((SatTag.pCell, w) : SatV A) = posCell (w 0) := by
         refine satV_ext rfl ?_ ?_
         · simp [one]
         · exact le_antisymm (hcond.1 botA) (botA_le _)
       change symV (ν (w 0)) (w 0) = symV (ν' (w 0)) (w 0)
       rw [h (w 0) (hcw ▸ hcond.2.1) (hcw ▸ hcond.2.2)]
-    · rw [if_neg hcond, if_neg hcond]
+    · rw [ite_eq_right hcond, ite_eq_right hcond]
 
 /-- **The initial configuration is unique**: the start state and the lowest
 position are pinned, and the initial tape is functional, so any initial
@@ -1668,7 +1668,7 @@ theorem sat_of_guess : ∀ (k : ℕ) (ν : A → Bool) (p : SatV A) (cfin : Conf
       have hcell : (confGuess ν p).tape ((confGuess ν p).head) = symU (p.2 0) := by
         change guessTape ν p p = symU (p.2 0)
         simp only [guessTape, htag]
-        exact if_neg (fun hcon => hcon.2.2 rfl)
+        exact ite_eq_right (fun hcon => hcon.2.2 rfl)
       rw [hcell] at hread
       obtain ⟨v, hτ₁⟩ := trTag_guess_sU τ.1 (satTr_isTrTag hτ)
         (satSrc_tag hτ hsrc).symm (satRead_tag hτ hread).symm
@@ -1698,7 +1698,7 @@ theorem sat_of_guess : ∀ (k : ℕ) (ν : A → Bool) (p : SatV A) (cfin : Conf
         · rw [heq, hwr]
           change _ = guessTape (Function.update ν (p.2 0) v) c₁.head p
           simp only [guessTape, htag]
-          rw [if_pos ⟨hpos1, hsucc.2.2.1, hsucc.2.2.2.1⟩, Function.update_self]
+          rw [ite_eq_left ⟨hpos1, hsucc.2.2.1, hsucc.2.2.2.1⟩, Function.update_self]
         · rw [hframe r hr]
           change guessTape ν p r = guessTape (Function.update ν (p.2 0) v) c₁.head r
           rw [guessTape_frame (Function.update ν (p.2 0) v) hsucc hr]

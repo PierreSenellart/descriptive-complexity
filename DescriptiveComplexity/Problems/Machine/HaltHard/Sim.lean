@@ -76,13 +76,13 @@ theorem stepRet_popTarget {k : PCont c} (hk : k ≠ PCont.halt) (v : List ℕ) :
     rcases hv : v.headI with - | y
     · refine Or.inr ⟨?_, ?_⟩
       · change (if v.headI = 0 then stepRet k₀.toCont v.tail else _) = _
-        rw [if_pos hv]
-        simp only [popTarget, hv, if_pos]
+        rw [ite_eq_left hv]
+        simp only [popTarget, hv, ite_eq_left]
       · simp [popTarget, hv]
     · refine Or.inl ?_
       change (if v.headI = 0 then _ else stepNormal (codeAt p) (Cont.fix (codeAt p) k₀.toCont)
         v.tail) = _
-      rw [if_neg (by omega)]
+      rw [ite_eq_right (by omega)]
       have h := pStepNormal_toCont p (.fix p k₀) v.tail
       rw [show popTarget (PCont.fix p k₀) v = pStepNormal p (.fix p k₀) v.tail by
         simp [popTarget, hv]]

@@ -168,13 +168,13 @@ theorem realize_clauseEdgeF {c : KromClause (L.sum Language.order) B k} {i j : B
     obtain ⟨pr, hpr, rfl⟩ := List.mem_map.mp hψmem
     by_cases hcond : pr.1.atom.idx = i ∧ pr.1.positive = !s ∧ pr.2.atom.idx = j ∧
         pr.2.positive = t
-    · rw [if_pos hcond, realize_edgeCaseF] at hψ
+    · rw [ite_eq_left hcond, realize_edgeCaseF] at hψ
       exact ⟨pr, hpr, hcond.1, hcond.2.1, hcond.2.2.1, hcond.2.2.2, hψ⟩
-    · rw [if_neg hcond] at hψ
+    · rw [ite_eq_right hcond] at hψ
       exact hψ.elim
   · rintro ⟨pr, hpr, h₁, h₂, h₃, h₄, hex⟩
     refine ⟨_, List.mem_map.mpr ⟨pr, hpr, rfl⟩, ?_⟩
-    rw [if_pos ⟨h₁, h₂, h₃, h₄⟩, realize_edgeCaseF]
+    rw [ite_eq_left ⟨h₁, h₂, h₃, h₄⟩, realize_edgeCaseF]
     exact hex
 
 end ClauseEdge
@@ -319,15 +319,15 @@ theorem realize_goalF : (goalF prog).Realize v ↔ KromImpl.GoalFires prog A := 
   · rintro ⟨ψ, hψmem, hψ⟩
     obtain ⟨c, hc, rfl⟩ := List.mem_map.mp hψmem
     by_cases hnone : c.lit₁ = none ∧ c.lit₂ = none
-    · rw [if_pos hnone, Formula.realize_iExs] at hψ
+    · rw [ite_eq_left hnone, Formula.realize_iExs] at hψ
       obtain ⟨t, ht⟩ := hψ
       rw [realize_guardF] at ht
       exact ⟨c, hc, _, ht, hnone.1, hnone.2⟩
-    · rw [if_neg hnone] at hψ
+    · rw [ite_eq_right hnone] at hψ
       exact hψ.elim
   · rintro ⟨c, hc, vv, hg, h₁, h₂⟩
     refine ⟨_, List.mem_map.mpr ⟨c, hc, rfl⟩, ?_⟩
-    rw [if_pos ⟨h₁, h₂⟩, Formula.realize_iExs]
+    rw [ite_eq_left ⟨h₁, h₂⟩, Formula.realize_iExs]
     refine ⟨pad a₀ vv, ?_⟩
     rw [realize_guardF]
     have hpref : (fun m => Sum.elim v (pad (D := clauseDim B k) a₀ vv)
@@ -419,9 +419,9 @@ theorem realize_stepWalkF {p q : Walk B}
   rw [stepWalkF]
   by_cases hmode : q.1 = p.1 ∧
       (q.2.2 = p.2.2 ∨ (p.2.2 = false ∧ q.2.2 = true ∧ q.2.1 = (p.1.1, !p.1.2)))
-  · rw [if_pos hmode]
+  · rw [ite_eq_left hmode]
     by_cases hflip : p.2.2 = false ∧ q.2.2 = true
-    · rw [if_pos hflip]
+    · rw [ite_eq_left hflip]
       simp only [Formula.realize_inf, realize_eqTupF, realize_edgeF, Sum.elim_inl,
         Sum.elim_inr]
       constructor
@@ -429,7 +429,7 @@ theorem realize_stepWalkF {p q : Walk B}
         exact ⟨hmode, hs, hc₁, hc₂, hst, fun _ _ => hf⟩
       · rintro ⟨-, hs, hc₁, hc₂, hst, hf⟩
         exact ⟨⟨hs, hc₁, hc₂, hst⟩, hf hflip.1 hflip.2⟩
-    · rw [if_neg hflip]
+    · rw [ite_eq_right hflip]
       simp only [Formula.realize_inf, realize_eqTupF, realize_edgeF, Formula.realize_top,
         and_true, Sum.elim_inl, Sum.elim_inr]
       constructor
@@ -438,7 +438,7 @@ theorem realize_stepWalkF {p q : Walk B}
         exact absurd (show p.2.2 = false ∧ q.2.2 = true from ⟨h₁, h₂⟩) hflip
       · rintro ⟨-, hs, hc₁, hc₂, hst, -⟩
         exact ⟨hs, hc₁, hc₂, hst⟩
-  · rw [if_neg hmode]
+  · rw [ite_eq_right hmode]
     constructor
     · exact fun h => h.elim
     · rintro ⟨hm, -⟩
@@ -675,14 +675,14 @@ theorem isSrc_inl_iff {i j : B.ι} {s t ph : Bool}
   change (srcF prog (Sum.inl ((i, s), (j, t), ph))).Realize x ↔ _
   rw [srcF]
   by_cases hc : ((i, s) : LitMode B) = (j, t) ∧ ph = false
-  · rw [if_pos hc]
+  · rw [ite_eq_left hc]
     simp only [Formula.realize_inf, realize_eqTupF, realize_canonF]
     constructor
     · rintro ⟨⟨h₁, h₂⟩, h₃⟩
       exact ⟨hc, h₁, h₂, h₃⟩
     · rintro ⟨-, h₁, h₂, h₃⟩
       exact ⟨⟨h₁, h₂⟩, h₃⟩
-  · rw [if_neg hc]
+  · rw [ite_eq_right hc]
     constructor
     · exact fun h => h.elim
     · rintro ⟨h, -⟩
@@ -701,10 +701,10 @@ theorem isTgt_inl_iff {i j : B.ι} {s t ph : Bool}
   change (tgtF prog (Sum.inl ((i, s), (j, t), ph))).Realize x ↔ _
   rw [tgtF]
   by_cases hc : ((i, s) : LitMode B) = (j, t) ∧ ph = true
-  · rw [if_pos hc]
+  · rw [ite_eq_left hc]
     rw [realize_eqTupF]
     exact ⟨fun h => ⟨hc, h⟩, fun h => h.2⟩
-  · rw [if_neg hc]
+  · rw [ite_eq_right hc]
     constructor
     · exact fun h => h.elim
     · rintro ⟨h, -⟩

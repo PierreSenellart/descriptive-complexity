@@ -83,7 +83,7 @@ theorem reachesIn_flagSweep (hR : PR.table.Reads)
       (sweepStateAfter_succ hlin hi).symm]
   by_cases hall : ∀ r : Univ A R P K dd → Prop, WMSetLt WMLe r s → Test r
   · rw [show sweepState Test (PR.stElt py f) (PR.stElt pn f) s = PR.stElt py f from
-      if_pos hall]
+      ite_eq_left hall]
     by_cases hTest : Test s
     · rw [show sweepStateAfter Test (PR.stElt py f) (PR.stElt pn f) s = PR.stElt py f from
         sweepStateAfter_pos fun r hr => by
@@ -101,7 +101,7 @@ theorem reachesIn_flagSweep (hR : PR.table.Reads)
       exact hall fun r hr => hc r hr
     obtain ⟨r₁, hr₁lt, hr₁⟩ := hfail
     rw [show sweepState Test (PR.stElt py f) (PR.stElt pn f) s = PR.stElt pn f from
-      if_neg hall]
+      ite_eq_right hall]
     rw [show sweepStateAfter Test (PR.stElt py f) (PR.stElt pn f) s = PR.stElt pn f from
       sweepStateAfter_neg ((wmSetLt_iff r₁ s).mp hr₁lt).1 hr₁]
     exact PR.step_move hR hlin hi (fun _ _ => rfl) (hstepP s u hi hlb hub)
@@ -272,13 +272,13 @@ theorem reachesIn_installOut (hR : PR.table.Reads)
   have hstart : midTape bg₀ bg₁ s₀ = bg₀ := by
     refine funext fun r => ?_
     by_cases hc : WMSetLt WMLe r s₀
-    · exact (if_pos hc).trans (hbelow r hc)
-    · exact if_neg hc
+    · exact (ite_eq_left hc).trans (hbelow r hc)
+    · exact ite_eq_right hc
   have hend : midTape bg₀ bg₁ s₁ = bg₁ := by
     refine funext fun r => ?_
     by_cases hc : WMSetLt WMLe r s₁
-    · exact if_pos hc
-    · exact (if_neg hc).trans (habove r hc).symm
+    · exact ite_eq_left hc
+    · exact (ite_eq_right hc).trans (habove r hc).symm
   have hrun := reachesIn_installSweep (cell := cell) (bg₀ := bg₀) (bg₁ := bg₁)
     hR hlin hle hstep
   rwa [hstart, hend] at hrun

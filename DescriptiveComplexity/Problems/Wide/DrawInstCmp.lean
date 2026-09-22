@@ -69,9 +69,9 @@ theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P I) (v : dt.VarIx)
       bitVal zero one (bitAtOf RF.cell (dt.lvSet st v j) r) := by
   rw [lvTrack, lvSet]
   by_cases h : (j : ℕ) < dt.arOf v
-  · rw [if_pos h, if_pos h]
+  · rw [ite_eq_left h, ite_eq_left h]
     rfl
-  · rw [if_neg h, if_neg h]
+  · rw [ite_eq_right h, ite_eq_right h]
     rfl
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] in
@@ -105,9 +105,9 @@ theorem wk_ne_lvTrack (v : dt.VarIx) (j : Fin (dt.nOf v)) :
     (Slot.wk : dt.SlotIx) ≠ dt.lvTrack v j := by
   rw [lvTrack]
   by_cases h : (j : ℕ) < dt.arOf v
-  · rw [if_pos h]
+  · rw [ite_eq_left h]
     exact fun hc => nomatch hc
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     exact fun hc => nomatch hc
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -118,9 +118,9 @@ theorem reg_ne_lvTrack (v : dt.VarIx) (j : Fin (dt.nOf v)) :
     (Slot.reg : dt.SlotIx) ≠ dt.lvTrack v j := by
   rw [lvTrack]
   by_cases h : (j : ℕ) < dt.arOf v
-  · rw [if_pos h]
+  · rw [ite_eq_left h]
     exact fun hc => nomatch hc
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     exact fun hc => nomatch hc
 
 /-! ### The loop element through the comparison's operations -/
@@ -216,12 +216,12 @@ theorem back_cmpSet (k : Fin 2) (r : Univ A R P dt.KIx dt.dd → Prop) :
       bitVal zero one (bitAtOf RF.cell (dt.cmpSet vi j₁ j₂ st k) r) := by
   by_cases hk : k = 0
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
-      dt.lvTrack vi j₁ from by rw [cmpArgs]; exact if_pos hk,
-      show dt.cmpSet vi j₁ j₂ st k = dt.lvSet st vi j₁ from if_pos hk]
+      dt.lvTrack vi j₁ from by rw [cmpArgs]; exact ite_eq_left hk,
+      show dt.cmpSet vi j₁ j₂ st k = dt.lvSet st vi j₁ from ite_eq_left hk]
     exact dt.back_lvTrack RF zero one st vi j₁ r
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
-      dt.lvTrack vi j₂ from by rw [cmpArgs]; exact if_neg hk,
-      show dt.cmpSet vi j₁ j₂ st k = dt.lvSet st vi j₂ from if_neg hk]
+      dt.lvTrack vi j₂ from by rw [cmpArgs]; exact ite_eq_right hk,
+      show dt.cmpSet vi j₁ j₂ st k = dt.lvSet st vi j₂ from ite_eq_right hk]
     exact dt.back_lvTrack RF zero one st vi j₂ r
 
 omit [Fintype dt.SlotIx] in
@@ -231,10 +231,10 @@ theorem wk_ne_cmp_rdTrack (k : Fin 2) :
       (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k := by
   by_cases hk : k = 0
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
-      dt.lvTrack vi j₁ from by rw [cmpArgs]; exact if_pos hk]
+      dt.lvTrack vi j₁ from by rw [cmpArgs]; exact ite_eq_left hk]
     exact dt.wk_ne_lvTrack vi j₁
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
-      dt.lvTrack vi j₂ from by rw [cmpArgs]; exact if_neg hk]
+      dt.lvTrack vi j₂ from by rw [cmpArgs]; exact ite_eq_right hk]
     exact dt.wk_ne_lvTrack vi j₂
 
 omit [Fintype dt.SlotIx] in
@@ -244,10 +244,10 @@ theorem reg_ne_cmp_rdTrack (k : Fin 2) :
       (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k := by
   by_cases hk : k = 0
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
-      dt.lvTrack vi j₁ from by rw [cmpArgs]; exact if_pos hk]
+      dt.lvTrack vi j₁ from by rw [cmpArgs]; exact ite_eq_left hk]
     exact dt.reg_ne_lvTrack vi j₁
   · rw [show (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k =
-      dt.lvTrack vi j₂ from by rw [cmpArgs]; exact if_neg hk]
+      dt.lvTrack vi j₂ from by rw [cmpArgs]; exact ite_eq_right hk]
     exact dt.reg_ne_lvTrack vi j₂
 
 /-! ### The loop element is the round's tuple -/
@@ -309,7 +309,7 @@ theorem readLv_cmp_chain (bit : Fin 2 → Prop) (base : dt.CtlIx → A)
             (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' b q' g)
           base n := by
         simp only [chainSt]
-        rw [dif_neg h]
+        rw [dite_eq_right h]
       rw [hskip]
       exact ih
 
@@ -429,7 +429,7 @@ theorem cmp_chain_apply_ne {bit : Fin 2 → Prop} {base : dt.CtlIx → A}
             (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag j' b q' g)
           base n := by
         simp only [chainSt]
-        rw [dif_neg h]
+        rw [dite_eq_right h]
       rw [hskip]
       exact ih
 
@@ -465,9 +465,9 @@ theorem ctlBit_chain_setCtl {zero one : A} (hzo : zero ≠ one) {nr : ℕ}
           rw [hjeq, ctlBit_setCtl_self hzo]
           rw [← hbb]
           by_cases hb : bit ⟨n, h⟩
-          · rw [if_pos hb]
+          · rw [ite_eq_left hb]
             exact ⟨fun _ => hb, fun _ => rfl⟩
-          · rw [if_neg hb]
+          · rw [ite_eq_right hb]
             exact ⟨fun hc => absurd hc (by decide), fun hc => absurd hc hb⟩
         · have hne : slotOf j ≠ slotOf ⟨n, h⟩ := fun hc =>
             absurd (congrArg Fin.val (hinj _ _ hc)) hjn
@@ -475,16 +475,16 @@ theorem ctlBit_chain_setCtl {zero one : A} (hzo : zero ≠ one) {nr : ℕ}
           exact ih j (by omega)
       by_cases hb : bit ⟨n, h⟩
       · rw [chainSt_succ_pos h hb]
-        exact hcase true (by rw [if_pos hb])
+        exact hcase true (by rw [ite_eq_left hb])
       · rw [chainSt_succ_neg h hb]
-        exact hcase false (by rw [if_neg hb])
+        exact hcase false (by rw [ite_eq_right hb])
     · have hskip : chainSt bit
           (fun j' b q' => dt.setCtl zero one (slotOf j') (b = true) q')
           base (n + 1) = chainSt bit
           (fun j' b q' => dt.setCtl zero one (slotOf j') (b = true) q')
           base n := by
         simp only [chainSt]
-        rw [dif_neg h]
+        rw [dite_eq_right h]
       rw [hskip]
       have hjn : (j : ℕ) < n := lt_of_lt_of_le j.isLt (Nat.le_of_not_lt h)
       exact ih j hjn
@@ -991,10 +991,10 @@ theorem ctlBit_avC_cmp_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
   -- assemble, per polarity
   rw [cmpVerdict]
   by_cases hEq : isEq = true
-  · rw [if_pos hEq, if_pos hEq, hlast, ctlBit_cmpAccC_cmpFold hzo hnf,
+  · rw [ite_eq_left hEq, ite_eq_left hEq, hlast, ctlBit_cmpAccC_cmpFold hzo hnf,
       hchA, hrd0, hrd1]
     exact hAccAll
-  · rw [if_neg hEq, if_neg hEq, hlast, ctlBit_cmpAccC_cmpFold hzo hnf,
+  · rw [ite_eq_right hEq, ite_eq_right hEq, hlast, ctlBit_cmpAccC_cmpFold hzo hnf,
       ctlBit_cmpValC_cmpFold hzo hnf, hchA, hchD, hchV, hrd0, hrd1]
     exact or_congr hAccAll hValAll
 

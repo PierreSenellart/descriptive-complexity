@@ -253,12 +253,12 @@ theorem igTagsAre_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
       wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)
         (encTagTup dt.ly zero one t') ↔ t' = t₁
   · left
-    rw [dspTagOf, dif_pos h]
+    rw [dspTagOf, dite_eq_left h]
     intro t'
     rw [dt.ctlBit_igateTagFam_wit RF hzo f₀ t']
     exact h.choose_spec t'
   · right
-    refine ⟨by rw [dspTagOf, dif_neg h], fun t₁ hc1 => h ⟨t₁, fun t' => ?_⟩⟩
+    refine ⟨by rw [dspTagOf, dite_eq_right h], fun t₁ hc1 => h ⟨t₁, fun t' => ?_⟩⟩
     rw [← dt.ctlBit_igateTagFam_wit (flag := flag) (vAdr := vAdr) RF hzo f₀ t']
     exact hc1 t'
 
@@ -1186,7 +1186,7 @@ theorem igVerdict_iff_isEnc (hzo : zero ≠ one)
     have hex : ∃ t₁ : dt.X.Tag, ∀ t' : dt.X.Tag,
         S (encTagTup dt.ly zero one t') ↔ t' = t₁ := ⟨t, hone⟩
     have htag : dt.dspTagOf zero one S = t := by
-      rw [dspTagOf, dif_pos hex]
+      rw [dspTagOf, dite_eq_left hex]
       exact (hone hex.choose).mp ((hex.choose_spec hex.choose).mpr rfl)
     rw [htag]
     exact ⟨hone, hdom⟩

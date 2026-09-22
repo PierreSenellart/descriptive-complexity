@@ -462,14 +462,14 @@ theorem sweepStateAfter_succ (h : IsLinOrd (WMLe (A := A))) {w w' : A → Prop}
       fun hall r hle => hall r ((wmSetLt_iff_of_wmIncr h hi r).mpr hle)⟩
   unfold sweepStateAfter sweepState
   by_cases hc : ∀ r : A → Prop, WMSetLt WMLe r w' → P r
-  · rw [if_pos (hiff.mpr hc), if_pos hc]
-  · rw [if_neg fun hcon => hc (hiff.mp hcon), if_neg hc]
+  · rw [ite_eq_left (hiff.mpr hc), ite_eq_left hc]
+  · rw [ite_eq_right fun hcon => hc (hiff.mp hcon), ite_eq_right hc]
 
 /-- **A sweep starts in the first state**: nothing lies below the empty
 address. -/
 theorem sweepState_bot (h : IsLinOrd (WMLe (A := A))) :
     sweepState P qy qn (fun _ => False) = qy := by
-  refine if_pos fun r hlt => absurd ?_ ((wmSetLt_iff _ _).mp hlt).2
+  refine ite_eq_left fun r hlt => absurd ?_ ((wmSetLt_iff _ _).mp hlt).2
   exact (isLinOrd_wmSetLe h).2.2.1 r _ ((wmSetLt_iff _ _).mp hlt).1
     (wmSetLe_of_empty h (fun _ hc => hc) r)
 
@@ -477,13 +477,13 @@ omit [Finite A] in
 /-- **A sweep that saw no failure ends in the first state.** -/
 theorem sweepStateAfter_pos {w : A → Prop} (hall : ∀ r : A → Prop, WMSetLe WMLe r w → P r) :
     sweepStateAfter P qy qn w = qy :=
-  if_pos hall
+  ite_eq_left hall
 
 omit [Finite A] in
 /-- **A sweep that saw a failure ends in the second state.** -/
 theorem sweepStateAfter_neg {w r : A → Prop} (hle : WMSetLe WMLe r w) (hP : ¬P r) :
     sweepStateAfter P qy qn w = qn :=
-  if_neg fun hall => hP (hall r hle)
+  ite_eq_right fun hall => hP (hall r hle)
 
 /-! ### The scan -/
 

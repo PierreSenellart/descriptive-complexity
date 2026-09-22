@@ -87,15 +87,17 @@ theorem ptOf_inj {t : FTag B φ} {w w' : Fin (tagDim B φ t) → A}
   funext j
   have hj : (Fin.castLE (tagDim_le_finsatDim B φ t) j : ℕ) < tagDim B φ t := j.isLt
   have := congrFun h2 (Fin.castLE (tagDim_le_finsatDim B φ t) j)
-  rwa [pad, pad, dif_pos hj, dif_pos hj, show (⟨(Fin.castLE (tagDim_le_finsatDim B φ t) j : ℕ),
-    hj⟩ : Fin (tagDim B φ t)) = j from Fin.ext rfl] at this
+  rwa [pad, pad, dite_eq_left hj, dite_eq_left hj,
+    show (⟨(Fin.castLE (tagDim_le_finsatDim B φ t) j : ℕ), hj⟩ : Fin (tagDim B φ t)) = j from
+      Fin.ext rfl] at this
 
 omit [L.Structure A] [LinearOrder A] in
 /-- The first coordinate of a point, which is where a tag of dimension one – the
 prefix, its variable, a literal of a translated atom – holds its element. -/
 theorem ptOf_c0 {t : FTag B φ} (hd : 0 < tagDim B φ t) (w : Fin (tagDim B φ t) → A) :
     (ptOf B φ a₀ t w).2 (c0 B φ) = w ⟨0, hd⟩ := by
-  rw [ptOf_snd, pad, dif_pos (show ((c0 B φ : Fin (finsatDim B φ)) : ℕ) < tagDim B φ t from hd)]
+  rw [ptOf_snd, pad,
+    dite_eq_left (show ((c0 B φ : Fin (finsatDim B φ)) : ℕ) < tagDim B φ t from hd)]
   exact congrArg w (Fin.ext rfl)
 
 omit [L.Structure A] [LinearOrder A] in
@@ -103,7 +105,8 @@ omit [L.Structure A] [LinearOrder A] in
 diagram holds the second of its two elements. -/
 theorem ptOf_c1 {t : FTag B φ} (hd : 1 < tagDim B φ t) (w : Fin (tagDim B φ t) → A) :
     (ptOf B φ a₀ t w).2 (c1 B φ) = w ⟨1, hd⟩ := by
-  rw [ptOf_snd, pad, dif_pos (show ((c1 B φ : Fin (finsatDim B φ)) : ℕ) < tagDim B φ t from hd)]
+  rw [ptOf_snd, pad,
+    dite_eq_left (show ((c1 B φ : Fin (finsatDim B φ)) : ℕ) < tagDim B φ t from hd)]
   exact congrArg w (Fin.ext rfl)
 
 /-! ### The kinds of a node, at a point
@@ -283,9 +286,9 @@ theorem childG_body_nd (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) :
   simp only [childBodyF] at key
   refine key.trans ?_
   by_cases h : pol = true ∧ p = rootPos B φ
-  · rw [if_pos h, Formula.realize_top]
+  · rw [ite_eq_left h, Formula.realize_top]
     exact iff_of_true trivial h
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false h
 
 /-- **Inside the translated kernel the child relation follows
@@ -298,9 +301,9 @@ theorem childG_nd_nd (ha₀ : IsBot a₀) (p q : Pos B φ) (pol pol' : Bool) :
   simp only [childBodyF] at key
   refine key.trans ?_
   by_cases h : kidOf φ p.2 q.2 = some (xor pol pol')
-  · rw [if_pos h, Formula.realize_top]
+  · rw [ite_eq_left h, Formula.realize_top]
     exact iff_of_true trivial h
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false h
 
 /-- A translated atom takes the tuple nodes where it holds: **the one place the
@@ -315,7 +318,7 @@ theorem childG_nd_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
   have key := childG_ptOf_iff B φ ha₀ (Tag.nd p pol) (Tag.atup p pol) (fun _ => a₀) w
   rw [childBodyF] at key
   refine key.trans ?_
-  rw [if_pos ⟨rfl, rfl⟩]
+  rw [ite_eq_left ⟨rfl, rfl⟩]
 
 /-- Each tuple node takes one equality literal per argument position, binding
 that argument to the variable of the corresponding element. -/
@@ -328,13 +331,13 @@ theorem childG_atup_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
   rw [childBodyF] at key
   refine key.trans ?_
   by_cases h : (j : ℕ) < inArity B φ p
-  · rw [if_pos ⟨rfl, rfl, h⟩, Formula.realize_equal, Term.realize_var, Term.realize_var]
+  · rw [ite_eq_left ⟨rfl, rfl, h⟩, Formula.realize_equal, Term.realize_var, Term.realize_var]
     have h1 : val₂ B φ (ptOf B φ a₀ (Tag.atup p pol) w)
         (ptOf B φ a₀ (Tag.alit p pol j) fun _ => a) (1, c0 B φ) = a :=
       ptOf_c0 B φ (t := Tag.alit p pol j) Nat.one_pos _
     rw [h1]
     exact ⟨fun hv => ⟨h, hv⟩, fun hv => hv.2⟩
-  · rw [if_neg (fun hc => h hc.2.2), Formula.realize_bot]
+  · rw [ite_eq_right (fun hc => h hc.2.2), Formula.realize_bot]
     exact iff_of_false not_false fun hc => h hc.1
 
 /-! ### The binders, the literals and the root -/
@@ -381,9 +384,9 @@ theorem bindG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
   simp only [bindBodyF] at key
   refine key.trans ?_
   by_cases h : qLevel B φ p = some (l : ℕ)
-  · rw [if_pos h, Formula.realize_top]
+  · rw [ite_eq_left h, Formula.realize_top]
     exact iff_of_true trivial h
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false h
 
 theorem neqG_ptOf_iff (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B φ t) → A)
@@ -528,9 +531,9 @@ theorem tup_two_eq {t : FTag B φ} (h : tagDim B φ t = 2) (w : Fin (tagDim B φ
   funext j
   have hj := lt_of_lt_of_le j.isLt (le_of_eq h)
   by_cases hj0 : (j : ℕ) = 0
-  · rw [if_pos hj0]
+  · rw [ite_eq_left hj0]
     exact congrArg w (Fin.ext hj0)
-  · rw [if_neg hj0]
+  · rw [ite_eq_right hj0]
     have hj1 : (j : ℕ) = 1 := by omega
     exact congrArg w (Fin.ext hj1)
 
@@ -621,9 +624,9 @@ theorem eqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
   simp only [eqBodyF] at key
   refine key.trans ?_
   by_cases h : pol = true ∧ eqArgs B φ p = some ((l₁ : ℕ), (l₂ : ℕ))
-  · rw [if_pos h, Formula.realize_top]
+  · rw [ite_eq_left h, Formula.realize_top]
     exact iff_of_true trivial h
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false h
 
 /-- A negated equality of the kernel. -/
@@ -637,9 +640,9 @@ theorem neqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
   simp only [neqBodyF] at key
   refine key.trans ?_
   by_cases h : pol = false ∧ eqArgs B φ p = some ((l₁ : ℕ), (l₂ : ℕ))
-  · rw [if_pos h, Formula.realize_top]
+  · rw [ite_eq_left h, Formula.realize_top]
     exact iff_of_true trivial h
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false h
 
 /-- **A literal of a translated atom**: the argument of the atom at one position
@@ -660,9 +663,9 @@ theorem eqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (fins
       (2, c0 B φ) = b := ptOf_c0 B φ (t := Tag.pvar) Nat.one_pos _
   refine key.trans ?_
   by_cases h : pol = true ∧ inArg B φ p (j : ℕ) = some (l : ℕ)
-  · rw [if_pos h, Formula.realize_equal, Term.realize_var, Term.realize_var, h0, h2]
+  · rw [ite_eq_left h, Formula.realize_equal, Term.realize_var, Term.realize_var, h0, h2]
     exact ⟨fun hv => ⟨h, hv⟩, fun hv => hv.2⟩
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false fun hc => h hc.1
 
 /-- The same, negated: what a tuple of a *negatively* translated atom asks. -/
@@ -682,9 +685,9 @@ theorem neqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (fin
       (2, c0 B φ) = b := ptOf_c0 B φ (t := Tag.pvar) Nat.one_pos _
   refine key.trans ?_
   by_cases h : pol = false ∧ inArg B φ p (j : ℕ) = some (l : ℕ)
-  · rw [if_pos h, Formula.realize_equal, Term.realize_var, Term.realize_var, h0, h2]
+  · rw [ite_eq_left h, Formula.realize_equal, Term.realize_var, Term.realize_var, h0, h2]
     exact ⟨fun hv => ⟨h, hv⟩, fun hv => hv.2⟩
-  · rw [if_neg h, Formula.realize_bot]
+  · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false fun hc => h hc.1
 
 /-! The atoms of the relation variables, which the encoded sentence does name:
@@ -761,7 +764,7 @@ theorem eq_of_childG_nd_atup (ha₀ : IsBot a₀) {p q : Pos B φ} {pol pol' : B
       (ptOf B φ a₀ (Tag.atup q pol') w)) : p = q ∧ pol = pol' := by
   classical
   by_contra hc
-  rw [childG_ptOf_iff B φ ha₀, childBodyF, if_neg hc] at h
+  rw [childG_ptOf_iff B φ ha₀, childBodyF, ite_eq_right hc] at h
   exact h
 
 /-- A tuple node only takes literals of its own position and polarity. -/
@@ -773,7 +776,7 @@ theorem eq_of_childG_atup_alit (ha₀ : IsBot a₀) {p q : Pos B φ} {pol pol' :
   classical
   by_contra hc
   rw [childG_ptOf_iff B φ ha₀, childBodyF,
-    if_neg (fun hcond : p = q ∧ pol = pol' ∧ (j : ℕ) < inArity B φ p =>
+    ite_eq_right (fun hcond : p = q ∧ pol = pol' ∧ (j : ℕ) < inArity B φ p =>
       hc ⟨hcond.1, hcond.2.1⟩)] at h
   exact h
 
@@ -1160,9 +1163,9 @@ theorem argTup_congr (ha₀ : IsBot a₀) (i : B.ι) {w w' : (finsatInterp B φ)
     fun k hk => (sigG_ptOf B φ ha₀ (Tag.sym i) (Tag.apos k) _ _).mpr hk
   funext j
   by_cases hj : (j : ℕ) < finsatDim B φ
-  · rw [argTup, argTup, dif_pos hj, dif_pos hj]
+  · rw [argTup, argTup, dite_eq_left hj, dite_eq_left hj]
     exact hag _ (hsig ⟨(j : ℕ), hj⟩ j.isLt)
-  · rw [argTup, argTup, dif_neg hj, dif_neg hj]
+  · rw [argTup, argTup, dite_eq_right hj, dite_eq_right hj]
     refine hag _ (hsig (c0 B φ) ?_)
     change (0 : ℕ) < B.arity i
     have h2 := two_le_finsatDim B φ
@@ -1212,7 +1215,7 @@ theorem argAssign_spec (v : (finsatInterp B φ).Map A → M) (g : (finsatInterp 
     (junk : M) (q x : (finsatInterp B φ).Map A) (hx : ArgG g q x) :
     argAssign B φ v g junk q = v x := by
   classical
-  rw [argAssign, dif_pos ⟨x, hx⟩]
+  rw [argAssign, dite_eq_left ⟨x, hx⟩]
   exact congrArg v (arg_fun_map B φ g q _ x (Exists.choose_spec ⟨x, hx⟩) hx)
 
 /-- **Any matching assignment gives the atom the same value** as the canonical
@@ -1431,7 +1434,7 @@ theorem realize_inAtomF_input {p : Pos B φ} {k : ℕ} {r : L.Relations k}
     (inAtomF B φ p).Realize v ↔ RelMap r fun j => v (1, Fin.castLE h j) := by
   rw [inAtomF, hk]
   dsimp only
-  rw [dif_pos h]
+  rw [dite_eq_left h]
   exact Formula.realize_rel.trans (relMap_sumInl r _)
 
 theorem realize_inAtomF_old {p : Pos B φ} {x : Option ℕ}
@@ -2197,7 +2200,7 @@ theorem argTup_argAssign (ha₀ : IsBot a₀) (v : (finsatInterp B φ).Map A →
     rw [← arityOf_eq (f := φ) hs]
     exact (arityOf_le φ p.2).trans (maxArity_le_finsatDim B φ)
   have hlt : (j : ℕ) < finsatDim B φ := lt_of_lt_of_le j.isLt harity
-  rw [argTup, dif_pos hlt]
+  rw [argTup, dite_eq_left hlt]
   exact argAssign_spec B φ v _ junk _ _
     ((argG_ptOf B φ ha₀ (Tag.nd p pol) (Tag.apos ⟨(j : ℕ), hlt⟩) (Tag.dbvar l)
       _ _ _).mpr hl)
@@ -2267,7 +2270,7 @@ theorem atom_translation [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot
         ∀ j : Fin k, pad a₀ w ⟨(j : ℕ), lt_of_lt_of_le j.isLt hkd⟩ = y j := by
     intro pol y
     refine ⟨fun jj => y ⟨(jj : ℕ), by rw [← hdim]; exact jj.isLt⟩, fun j => ?_⟩
-    rw [pad, dif_pos (hjt pol j)]
+    rw [pad, dite_eq_left (hjt pol j)]
   -- what a tuple node says, at both polarities
   have htup_true : ∀ w : Fin (tagDim B φ (Tag.atup p true)) → A,
       (Gval I v (atupPt B φ a₀ p true w) ↔
@@ -2413,7 +2416,7 @@ theorem gval_kernel [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀
           intro j h
           rw [inArg, hk]
           dsimp only
-          rw [dif_pos h]
+          rw [dite_eq_left h]
         obtain ⟨lev, hlev₁, hlev₂⟩ := inAtom_levels B φ hn v ts hia
         refine atom_translation B φ ha₀ (blockI B φ a₀ μ) v ι hv p hq he hs hcn hin hnokid
           hdim hkd lev hlev₁ (RelMap r) ?_ ?_
@@ -2440,7 +2443,7 @@ theorem gval_kernel [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀
           intro j h
           rw [inArg, hk]
           dsimp only
-          rw [if_pos (Nat.lt_one_iff.mp h)]
+          rw [ite_eq_left (Nat.lt_one_iff.mp h)]
           exact congrArg (fun z : Fin 1 => termLevel (ts z)) (Subsingleton.elim _ _)
         obtain ⟨lev, hlev₁, hlev₂⟩ := inAtom_levels B φ hn v ts hia
         refine atom_translation B φ ha₀ (blockI B φ a₀ μ) v ι hv p hq he hs hcn hin hnokid
@@ -2475,7 +2478,7 @@ theorem gval_kernel [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀
               some ((⟨l, lt_of_lt_of_le hlt hn⟩ : Fin (Tseitin.maxCtx φ)) : ℕ) := by
             rw [blockArg, argOf, hk]
             dsimp only
-            rw [dif_pos hjk]
+            rw [dite_eq_left hjk]
             exact hl
           rw [argTup_argAssign B φ ha₀ v p pol r.1 hs _ j _ harg,
             realize_of_termLevel hl hlt]

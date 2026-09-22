@@ -129,7 +129,7 @@ private theorem padTuple_castLE [Nonempty A] (i : B.ι) (x : Fin (B.arity i) →
     B.padTuple i x (Fin.castLE (arity_le_blockArityBound B i) j) = x j := by
   have hj : ((Fin.castLE (arity_le_blockArityBound B i) j : Fin (blockArityBound B)) : ℕ)
       < B.arity i := j.isLt
-  simp only [padTuple, dif_pos hj]
+  simp only [padTuple, dite_eq_left hj]
   exact congrArg x (Fin.val_injective rfl)
 
 variable (A) in

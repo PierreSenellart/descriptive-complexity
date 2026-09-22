@@ -277,7 +277,7 @@ private theorem cliqueVertex_marked {S : A → Prop}
     (e : {x : A // MGMarked x} ↪ {x : A // S x}) {v : A} (h : MGMarked v) :
     cliqueVertex e v = (e ⟨v, h⟩).1 := by
   classical
-  rw [cliqueVertex, dif_pos h]
+  rw [cliqueVertex, dite_eq_left h]
 
 /-- Correctness of the interpretation: a graph has a clique at least as large
 as its marked set iff the complete graph on that marked set embeds into it. -/
@@ -422,15 +422,15 @@ theorem subgraphIso_sigmaSODefinable : SigmaSODefinable 1 SubgraphIso := by
     refine ⟨‹Finite A›, fun x => if h : TGPatV x then g ⟨x, h⟩ else x, fun x hx => ?_,
       fun x y hx hy hxy => ?_, fun x y hx hy hxy => ?_⟩
     · change TGHostV (if h : TGPatV x then g ⟨x, h⟩ else x)
-      rw [dif_pos hx]
+      rw [dite_eq_left hx]
       exact hg2 ⟨x, hx⟩
     · have hxy' : (if h : TGPatV x then g ⟨x, h⟩ else x) =
           if h : TGPatV y then g ⟨y, h⟩ else y := hxy
-      rw [dif_pos hx, dif_pos hy] at hxy'
+      rw [dite_eq_left hx, dite_eq_left hy] at hxy'
       exact hinj x y (g ⟨x, hx⟩) hx hy (hg1 ⟨x, hx⟩) (hxy' ▸ hg1 ⟨y, hy⟩)
     · change TGHostE (if h : TGPatV x then g ⟨x, h⟩ else x)
         (if h : TGPatV y then g ⟨y, h⟩ else y)
-      rw [dif_pos hx, dif_pos hy]
+      rw [dite_eq_left hx, dite_eq_left hy]
       exact hedge x y _ _ hx hy hxy (hg1 ⟨x, hx⟩) (hg1 ⟨y, hy⟩)
 
 end SigmaOne

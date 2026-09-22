@@ -335,13 +335,13 @@ theorem realize_covPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁
     subst e₀
     subst e₁
     by_cases heq : p₀.1 = p₁.1
-    · rw [if_pos heq] at hbody
+    · rw [ite_eq_left heq] at hbody
       exact Or.inl ⟨heq, hsucc.mp hbody⟩
-    · rw [if_neg heq] at hbody
+    · rw [ite_eq_right heq] at hbody
       by_cases hcov : TagCovBy X p₀.1 p₁.1
-      · rw [if_pos hcov] at hbody
+      · rw [ite_eq_left hcov] at hbody
         exact Or.inr ⟨hcov.1, hcov.2, (htb.mp hbody).1, (htb.mp hbody).2⟩
-      · rw [if_neg hcov, Formula.realize_bot] at hbody
+      · rw [ite_eq_right hcov, Formula.realize_bot] at hbody
         exact hbody.elim
   · intro h
     refine ⟨_, List.mem_map.mpr ⟨(p₀.1, p₁.1), mem_finEnum _, rfl⟩, ?_⟩
@@ -349,10 +349,10 @@ theorem realize_covPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁
     rw [Formula.realize_inf, Formula.realize_inf]
     refine ⟨⟨(realize_slotTagF h₀ _).mpr rfl, (realize_slotTagF h₁ _).mpr rfl⟩, ?_⟩
     rcases h with ⟨heq, hsc⟩ | ⟨hlt, hnb, htop, hbot⟩
-    · rw [if_pos heq]
+    · rw [ite_eq_left heq]
       exact hsucc.mpr hsc
     · have hcov : TagCovBy X p₀.1 p₁.1 := ⟨hlt, hnb⟩
-      rw [if_neg (ne_of_lt hlt), if_pos hcov]
+      rw [ite_eq_right (ne_of_lt hlt), ite_eq_left hcov]
       exact htb.mpr ⟨htop, hbot⟩
 
 theorem realize_minPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
@@ -372,16 +372,16 @@ theorem realize_minPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
   · rintro ⟨ψ, hψ, hr⟩
     obtain ⟨t, -, rfl⟩ := List.mem_map.mp hψ
     by_cases ht : IsMinTag X t
-    · rw [if_pos ht] at hr
+    · rw [ite_eq_left ht] at hr
       have het : t = p.1 := (realize_slotTagF hs t).mp hr
       rw [← het]
       exact ht
-    · rw [if_neg ht, Formula.realize_bot] at hr
+    · rw [ite_eq_right ht, Formula.realize_bot] at hr
       exact hr.elim
   · intro h
     refine ⟨_, List.mem_map.mpr ⟨p.1, mem_finEnum _, rfl⟩, ?_⟩
     have ht : IsMinTag X p.1 := h
-    rw [if_pos ht]
+    rw [ite_eq_left ht]
     exact (realize_slotTagF hs _).mpr rfl
 
 theorem realize_maxPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
@@ -401,16 +401,16 @@ theorem realize_maxPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
   · rintro ⟨ψ, hψ, hr⟩
     obtain ⟨t, -, rfl⟩ := List.mem_map.mp hψ
     by_cases ht : IsMaxTag X t
-    · rw [if_pos ht] at hr
+    · rw [ite_eq_left ht] at hr
       have het : t = p.1 := (realize_slotTagF hs t).mp hr
       rw [← het]
       exact ht
-    · rw [if_neg ht, Formula.realize_bot] at hr
+    · rw [ite_eq_right ht, Formula.realize_bot] at hr
       exact hr.elim
   · intro h
     refine ⟨_, List.mem_map.mpr ⟨p.1, mem_finEnum _, rfl⟩, ?_⟩
     have ht : IsMaxTag X p.1 := h
-    rw [if_pos ht]
+    rw [ite_eq_left ht]
     exact (realize_slotTagF hs _).mpr rfl
 
 end Slots
@@ -843,15 +843,15 @@ theorem isTgt_autoSpec (σ : (cfgBlock X k M.State).Assignment A) (s : M.State)
   · rintro ⟨ψ, hψ, hr⟩
     obtain ⟨s', -, rfl⟩ := List.mem_map.mp hψ
     by_cases hacc : M.accept s' = true
-    · rw [if_pos hacc] at hr
+    · rw [ite_eq_left hacc] at hr
       have hs' : s' = s := (realize_ctrlF X k M.State s' s x).mp hr
       rw [← hs']
       exact hacc
-    · rw [if_neg hacc, Formula.realize_bot] at hr
+    · rw [ite_eq_right hacc, Formula.realize_bot] at hr
       exact hr.elim
   · intro hacc
     refine ⟨_, List.mem_map.mpr ⟨s, mem_finEnum _, rfl⟩, ?_⟩
-    rw [if_pos hacc]
+    rw [ite_eq_left hacc]
     exact (realize_ctrlF X k M.State s s x).mpr rfl
 
 /-- A walk of the simulation that starts at a configuration stays at

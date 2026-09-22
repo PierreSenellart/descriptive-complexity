@@ -75,11 +75,11 @@ theorem exitG_at_marker {lay : Layout dt' A' R'' P'' I'}
   constructor
   · change (if (Slot.wk : dt'.SlotIx) = Slot.mir then _ else
       dt'.ixBack lay PR'.zero PR'.one dt'.dd0Le st v Slot.wk) = PR'.one
-    rw [if_neg (by rintro hc; exact nomatch hc)]
+    rw [ite_eq_right (by rintro hc; exact nomatch hc)]
     exact bitVal_pos hwk
   · change (if (Slot.reg : dt'.SlotIx) = Slot.mir then _ else
       dt'.ixBack lay PR'.zero PR'.one dt'.dd0Le st v Slot.reg) ≠ PR'.one
-    rw [if_neg (by rintro hc; exact nomatch hc)]
+    rw [ite_eq_right (by rintro hc; exact nomatch hc)]
     change bitVal PR'.zero PR'.one (∃ u : I', v = lay.cell u) ≠ PR'.one
     rw [bitVal_neg (by rintro ⟨u, hu⟩; exact hnc u hu)]
     exact PR'.zero_ne_one

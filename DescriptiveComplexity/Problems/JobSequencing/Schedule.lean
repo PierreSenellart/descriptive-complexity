@@ -158,10 +158,10 @@ theorem exists_schedule_onTime {S : A → Prop}
     rintro k ⟨-, hk⟩
     rcases hk with ⟨hle, hne⟩ | ⟨he, -⟩
     · by_contra hSk
-      simp only [hkey, if_pos hSj, if_neg hSk] at hle
+      simp only [hkey, ite_eq_left hSj, ite_eq_right hSk] at hle
       exact absurd (Nat.le_zero.mp hle) one_ne_zero
     · by_contra hSk
-      simp only [hkey, if_pos hSj, if_neg hSk] at he
+      simp only [hkey, ite_eq_left hSj, ite_eq_right hSk] at he
       exact absurd he one_ne_zero
   have hle : JSCompletion sched j ≤ ∑ᶠ k ∈ {k : A | S k}, JSTimeVal k :=
     finsum_mem_mono hpre JSTimeVal

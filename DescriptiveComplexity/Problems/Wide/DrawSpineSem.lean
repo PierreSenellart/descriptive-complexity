@@ -118,7 +118,7 @@ theorem wmNext_eq (h : IsLinOrd Le) {w w' : α → Prop} (hi : WMIncr Le w w') :
   have hx : ∃ x, ¬w x := by
     obtain ⟨u, hu, -, -⟩ := hi
     exact ⟨u, hu⟩
-  rw [wmNext, dif_pos hx]
+  rw [wmNext, dite_eq_left hx]
   exact wmIncr_functional h (exists_wmIncr h hx).choose_spec hi
 
 /-- **A value iterated along the addresses**: the base at the empty
@@ -307,7 +307,7 @@ theorem spine_new_off (k : Fin (dt.nv + 1)) (i : dt.d.B.ι)
         ⟨n, Nat.lt_succ_of_lt hnv⟩ := rfl
     rw [hsucc, hcast] at hstep
     exact (iff_of_eq (hstep.trans
-      (if_neg (fun h : i = dt.varList.get ⟨n, hnv⟩ ∧ r = v => hr h.2)))).trans
+      (ite_eq_right (fun h : i = dt.varList.get ⟨n, hnv⟩ ∧ r = v => hr h.2)))).trans
       (ih _)
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
@@ -342,14 +342,14 @@ theorem new_last_get (j : Fin dt.nv) :
           intro hc
           have hjj : j = (⟨n, hnv⟩ : Fin dt.nv) := varList_get_inj hc
           exact absurd (congrArg Fin.val hjj) (show (j : ℕ) ≠ n by omega)
-        exact (iff_of_eq (hcong.trans (if_neg
+        exact (iff_of_eq (hcong.trans (ite_eq_right
           (fun h : dt.varList.get j = dt.varList.get ⟨n, hnv⟩ ∧ v = v =>
             hne h.1)))).trans (ih _ j hlt)
       · -- this very position
         have hjn : j = (⟨n, hnv⟩ : Fin dt.nv) :=
           Fin.ext (show (j : ℕ) = n by omega)
         subst hjn
-        exact iff_of_eq (hcong.trans (if_pos ⟨rfl, rfl⟩))
+        exact iff_of_eq (hcong.trans (ite_eq_left ⟨rfl, rfl⟩))
   exact key dt.nv (Nat.lt_succ_self _) j j.isLt
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
@@ -1164,7 +1164,7 @@ theorem legBitB_gatedSem (hzo : PR.zero ≠ PR.one)
         (dt.legCtl (v := v) (aT := aT) RF hord mV j st (dt.tagAt (PR := PR) j st)
           (dt.gatedSem₀ RF hzo hlin mV j st hg) f₀) := by
   classical
-  rw [legBitB, dif_pos hg, dt.gatedSem_eq_semCastT RF hzo hlin mV j st hg,
+  rw [legBitB, dite_eq_left hg, dt.gatedSem_eq_semCastT RF hzo hlin mV j st hg,
     dt.legCtlT_eq_legCtl RF hord mV hreg j st (dt.tagAt (PR := PR) j st) _ f₀]
 
 /-! ### The per-position families, built -/
@@ -1249,7 +1249,7 @@ theorem spineFsOf_succ (j : Fin dt.nv) :
         (dt.spineFsOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc) := by
   change (dt.spineNode (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf
     ((j : ℕ) + 1)).2.2 = _
-  rw [spineNode, dif_pos j.isLt]
+  rw [spineNode, dite_eq_left j.isLt]
   rfl
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
@@ -1269,7 +1269,7 @@ theorem spineStOf_succ (j : Fin dt.nv) :
               j.castSucc))) := by
   change (dt.spineNode (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf
     ((j : ℕ) + 1)).1 = _
-  rw [spineNode, dif_pos j.isLt]
+  rw [spineNode, dite_eq_left j.isLt]
   rfl
 
 /-! ### The per-position families, threaded -/
@@ -1424,7 +1424,7 @@ theorem spineFsOfB_succ (j : Fin dt.nv) :
         (dt.spineSemOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j)
         (dt.spineFsOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.castSucc) := by
   change (dt.spineNodeB (v := v) (aT := aT) RF hord mV st₀ f₀ semB ((j : ℕ) + 1)).2.2 = _
-  rw [spineNodeB, dif_pos j.isLt]
+  rw [spineNodeB, dite_eq_left j.isLt]
   rfl
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
@@ -1437,7 +1437,7 @@ theorem spineStOfB_succ (j : Fin dt.nv) :
         (dt.spineSemOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j)
         (dt.spineFsOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.castSucc) := by
   change (dt.spineNodeB (v := v) (aT := aT) RF hord mV st₀ f₀ semB ((j : ℕ) + 1)).1 = _
-  rw [spineNodeB, dif_pos j.isLt]
+  rw [spineNodeB, dite_eq_left j.isLt]
   rfl
 
 /-- **The verdicts of the branched family**: at each position, the stage
@@ -1577,7 +1577,7 @@ theorem new_last_trackOf_B
   · -- one of them does not: the position writes `False`, and so does the
     -- dictionary
     have hbit : ¬dt.spineBitOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j := by
-      rw [spineBitOfB, legBitB, dif_neg hg]
+      rw [spineBitOfB, legBitB, dite_eq_right hg]
       exact id
     refine iff_of_false (fun hc => hbit ((dt.new_last_get hwr j).mp hc)) ?_
     obtain ⟨ℓ₀, hℓ₀⟩ : ∃ ℓ : Fin (dt.arOf (dt.varAt j)),

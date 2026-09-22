@@ -68,13 +68,13 @@ theorem partSum_min {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
       ext j
       simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
       exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hSi⟩⟩
-    rw [PartSum, hset, hsingle, finsum_mem_singleton, if_pos hSi]
+    rw [PartSum, hset, hsingle, finsum_mem_singleton, ite_eq_left hSi]
   · have hempty : {j : A | j = i ∧ S j} = (∅ : Set A) := by
       ext j
       simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       rintro ⟨rfl, hj⟩
       exact hSi hj
-    rw [PartSum, hset, hempty, finsum_mem_empty, if_neg hSi]
+    rw [PartSum, hset, hempty, finsum_mem_empty, ite_eq_right hSi]
 
 open Classical in
 /-- Each step of the walk adds one item's contribution. -/
@@ -107,14 +107,14 @@ theorem partSum_succ {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
       ext j
       simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
       exact ⟨fun h => h.1, fun h => ⟨h, h ▸ hSi⟩⟩
-    rw [hsingle, finsum_mem_singleton, if_pos hSi]
+    rw [hsingle, finsum_mem_singleton, ite_eq_left hSi]
     rfl
   · have hempty : {j : A | j = i ∧ S j} = (∅ : Set A) := by
       ext j
       simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
       rintro ⟨rfl, hj⟩
       exact hSi hj
-    rw [hempty, finsum_mem_empty, if_neg hSi]
+    rw [hempty, finsum_mem_empty, ite_eq_right hSi]
     rfl
 
 /-- A running total never exceeds the total. -/
@@ -166,9 +166,9 @@ theorem binNum_chainAdd (PLe : P → P → Prop) (PPosn : P → Prop) (S : A →
       if S i then binNum PLe PPosn (wt i) else 0 := by
   classical
   by_cases hSi : S i
-  · rw [if_pos hSi]
+  · rw [ite_eq_left hSi]
     exact binNum_congr fun p => ⟨fun h => h.2, fun h => ⟨hSi, h⟩⟩
-  · rw [if_neg hSi]
+  · rw [ite_eq_right hSi]
     have : binNum PLe PPosn (ChainAdd S wt i) = binNum PLe PPosn (fun _ => False) :=
       binNum_congr fun p => ⟨fun h => hSi h.1, fun h => h.elim⟩
     rw [this, binNum_bot]
@@ -215,7 +215,7 @@ theorem chain_sound (hlin : IsLinOrd (ILe)) (hPlin : IsLinOrd PLe)
           (fun p hp => iff_false_intro (hstepbot h i p hsucc hp))
           (fun p hp => (iff_false_intro (hsteptop h i p hsucc hp)).symm)
           (fun _ => Iff.rfl)
-        rw [if_neg not_false, Nat.mul_zero, Nat.add_zero, Nat.add_zero] at hripple
+        rw [ite_eq_right not_false, Nat.mul_zero, Nat.add_zero, Nat.add_zero] at hripple
         rw [hripple, hIH, partSum_succ hlin hS hsucc]
         congr 1
         exact binNum_chainAdd PLe PPosn S wt i

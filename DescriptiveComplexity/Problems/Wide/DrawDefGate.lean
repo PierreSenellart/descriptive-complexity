@@ -91,7 +91,7 @@ theorem uStDefinable_putVec_comp {m : ℕ} {accs : Fin m → dt.CtlIx}
     have hex : ∃ j' : Fin m, accs j = accs j' := ⟨j, rfl⟩
     change (if h : ∃ j' : Fin m, accs j = accs j' then
       bitVal e.zero e.one (b e h.choose f g) else F e f g (accs j)) = _
-    rw [dif_pos hex, hinj hex.choose_spec.symm]
+    rw [dite_eq_left hex, hinj hex.choose_spec.symm]
   · refine (hF q).congr fun _ _ _ => ?_
     exact putVec_of_not_mem fun j hc => hq ⟨j, hc⟩
 

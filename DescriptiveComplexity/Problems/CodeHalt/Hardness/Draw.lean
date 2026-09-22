@@ -287,11 +287,11 @@ theorem canon_setCo {m : ℕ} {j : ℕ} (hj : j < m) (a : A) {u : Fin (dimOf V) 
 
 omit [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 theorem setCo_at (l : Fin (dimOf V)) (a : A) (t : Fin (dimOf V) → A) :
-    setCo V (l : ℕ) a t l = a := by rw [setCo, if_pos rfl]
+    setCo V (l : ℕ) a t l = a := by rw [setCo, ite_eq_left rfl]
 
 omit [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 theorem setCo_at_fz (a : A) (t : Fin (dimOf V) → A) : setCo V 0 a t (fz V) = a := by
-  rw [setCo, if_pos (show ((fz V : Fin (dimOf V)) : ℕ) = 0 from rfl)]
+  rw [setCo, ite_eq_left (show ((fz V : Fin (dimOf V)) : ℕ) = 0 from rfl)]
 
 omit [L.Structure A] in
 theorem setCo_bot_at (l : Fin (dimOf V)) {u : Fin (dimOf V) → A} (h : IsBot (u l)) :
@@ -299,7 +299,7 @@ theorem setCo_bot_at (l : Fin (dimOf V)) {u : Fin (dimOf V) → A} (h : IsBot (u
   rw [show botOrd A = u l from eq_of_isBot isBot_botA h]
   funext j
   by_cases hj : (j : ℕ) = (l : ℕ)
-  · rw [setCo, if_pos hj]
+  · rw [setCo, ite_eq_left hj]
     exact congrArg u (Fin.ext hj).symm
   · rw [setCo_apply_ne V hj]
 
@@ -316,12 +316,12 @@ theorem cArg1_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) (m : ℕ)
   | 0 =>
     rw [levelPt, bitPt]
     by_cases hb : bitOf V i uk
-    · rw [if_pos hb]
+    · rw [ite_eq_left hb]
       exact (cArg1_pt _ _ _ _).mpr ⟨hok, canon_botTup _, by omega, hb⟩
-    · rw [if_neg hb]
+    · rw [ite_eq_right hb]
       exact (cArg1_pt _ _ _ _).mpr ⟨hok, canon_botTup _, by omega, hb⟩
   | m' + 1 =>
-    rw [levelPt, chainPt, dif_pos (Nat.card_pos (α := A))]
+    rw [levelPt, chainPt, dite_eq_left (Nat.card_pos (α := A))]
     have hlt : dimOf V - (m' + 1) < dimOf V := Nat.sub_lt (dimOf_pos V) (Nat.succ_pos m')
     have hl'v : ((⟨dimOf V - (m' + 1), hlt⟩ : Fin (dimOf V)) : ℕ) = (l : ℕ) + 1 := by
       change dimOf V - (m' + 1) = (l : ℕ) + 1
@@ -339,7 +339,7 @@ theorem cArg2_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) {u : Fin (dimOf V)
   have hok : Canon ((l : ℕ) + 1) (setCo V (l : ℕ) (ordEnum A ⟨k, hk⟩) u) :=
     canon_setCo (by omega) _ (canon_mono hu (by omega))
   by_cases hk1 : k + 1 < Nat.card A
-  · rw [chainPt, dif_pos hk1]
+  · rw [chainPt, dite_eq_left hk1]
     refine (cArg2_pt _ _ _ _).mpr ⟨hok,
       (okOn_chainN _ _ _).mpr (canon_setCo (by omega) _ (canon_mono hu (by omega))),
       ⟨rfl, rfl⟩, ?_, ?_⟩
@@ -347,7 +347,7 @@ theorem cArg2_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) {u : Fin (dimOf V)
       exact ⟨ordEnum_lt_succ hk1, ordEnum_covBy hk1⟩
     · intro j hj
       rw [setCo_apply_ne V (by omega) _ _, setCo_apply_ne V (by omega) _ _]
-  · rw [chainPt, dif_neg hk1]
+  · rw [chainPt, dite_eq_right hk1]
     refine (cArg2_pt _ _ _ _).mpr ⟨hok, canon_botTup _, ?_⟩
     change IsTop _
     rw [setCo_at, show (⟨k, hk⟩ : Fin (Nat.card A)) = ⟨Nat.card A - 1, by omega⟩ from
@@ -368,8 +368,8 @@ theorem decodesTo_levelPt : ∀ (m : ℕ), m ≤ dimOf V → ∀ (i : Fin V.numS
     intro _ i u _
     rw [levelPt, levelCode_zero, bitPt]
     by_cases hb : bitOf V i u
-    · rw [if_pos hb, if_pos hb]; exact decodesTo_onePt
-    · rw [if_neg hb, if_neg hb]; exact decodesTo_zeroPt
+    · rw [ite_eq_left hb, ite_eq_left hb]; exact decodesTo_onePt
+    · rw [ite_eq_right hb, ite_eq_right hb]; exact decodesTo_zeroPt
   | succ m ih =>
     intro hm i u hu
     have hlt : dimOf V - (m + 1) < dimOf V := Nat.sub_lt (dimOf_pos V) (Nat.succ_pos m)
@@ -387,12 +387,12 @@ theorem decodesTo_levelPt : ∀ (m : ℕ), m ≤ dimOf V → ∀ (i : Fin V.numS
       | zero =>
         intro k hk
         have hkn : ¬k < Nat.card A := by omega
-        rw [chainPt, dif_neg hkn, codeNestFrom_of_ge _ hkn]
+        rw [chainPt, dite_eq_right hkn, codeNestFrom_of_ge _ hkn]
         exact decodesTo_zeroPt
       | succ j ihj =>
         intro k hk
         have hkn : k < Nat.card A := by omega
-        rw [chainPt, dif_pos hkn, codeNestFrom_of_lt _ hkn]
+        rw [chainPt, dite_eq_left hkn, codeNestFrom_of_lt _ hkn]
         have hokk : Canon ((l : ℕ) + 1) (setCo V (l : ℕ) (ordEnum A ⟨k, hkn⟩) u) :=
           canon_setCo (by omega) _ (canon_mono hu' (by omega))
         refine ⟨(mark_pt CodeTag.pair _ _).mpr ⟨hokk, rfl⟩,
@@ -412,7 +412,7 @@ theorem decodesTo_blockPt (cP : Code) (i : Fin V.numSyms) :
   obtain ⟨d, hd⟩ : ∃ d, dimOf V = d + 1 :=
     ⟨dimOf V - 1, by have := dimOf_pos V; omega⟩
   have h := decodesTo_levelPt (cP := cP) (d + 1) (by omega) i (botTup V A) (canon_botTup _)
-  rw [levelPt, chainPt, dif_pos (Nat.card_pos (α := A))] at h
+  rw [levelPt, chainPt, dite_eq_left (Nat.card_pos (α := A))] at h
   rw [show (⟨dimOf V - (d + 1), Nat.sub_lt (dimOf_pos V) (Nat.succ_pos d)⟩ : Fin (dimOf V)) =
       ⟨0, dimOf_pos V⟩ from Fin.ext (by change dimOf V - (d + 1) = 0; omega),
     ordEnum_zero, setCo_bot_at _ isBot_botA, ← hd] at h
@@ -430,20 +430,20 @@ theorem decodesTo_symPt : ∀ (j k : ℕ), k + j = V.numSyms →
   | zero =>
     intro k hk
     have hkn : ¬k < V.numSyms := by omega
-    rw [symPt, dif_neg hkn, codeNestFrom_of_ge _ hkn]
+    rw [symPt, dite_eq_right hkn, codeNestFrom_of_ge _ hkn]
     exact decodesTo_zeroPt
   | succ j ihj =>
     intro k hk
     have hkn : k < V.numSyms := by omega
-    rw [symPt, dif_pos hkn, codeNestFrom_of_lt _ hkn]
+    rw [symPt, dite_eq_left hkn, codeNestFrom_of_lt _ hkn]
     refine ⟨(mark_pt CodeTag.pair _ _).mpr ⟨canon_botTup _, rfl⟩,
       progPt (ProgTag.chainN ⟨k, hkn⟩ ⟨0, dimOf_pos V⟩) (botTup V A), symPt V cP A (k + 1), ?_, ?_,
       decodesTo_blockPt _ _, ihj (k + 1) (by omega)⟩
     · exact (cArg1_pt _ _ _ _).mpr ⟨canon_botTup _, canon_botTup _, ⟨rfl, rfl⟩, isBot_botA⟩
     · by_cases hk1 : k + 1 < V.numSyms
-      · rw [symPt, dif_pos hk1]
+      · rw [symPt, dite_eq_left hk1]
         exact (cArg2_pt _ _ _ _).mpr ⟨canon_botTup _, canon_botTup _, rfl⟩
-      · rw [symPt, dif_neg hk1]
+      · rw [symPt, dite_eq_right hk1]
         exact (cArg2_pt _ _ _ _).mpr
           ⟨canon_botTup _, canon_botTup _, by change k + 1 = V.numSyms; omega⟩
 
@@ -456,12 +456,12 @@ theorem decodesTo_numPt : ∀ (j k : ℕ), k + j = Nat.card A →
   | zero =>
     intro k hk
     have hkn : ¬k < Nat.card A := by omega
-    rw [numPt, dif_neg hkn, show Nat.card A - k = 0 from by omega, numCode]
+    rw [numPt, dite_eq_right hkn, show Nat.card A - k = 0 from by omega, numCode]
     exact decodesTo_zeroPt
   | succ j ihj =>
     intro k hk
     have hkn : k < Nat.card A := by omega
-    rw [numPt, dif_pos hkn, show Nat.card A - k = Nat.card A - (k + 1) + 1 from by omega,
+    rw [numPt, dite_eq_left hkn, show Nat.card A - k = Nat.card A - (k + 1) + 1 from by omega,
       numCode]
     have hok : Canon 1 (setCo V 0 (ordEnum A ⟨k, hkn⟩) (botTup V A)) :=
       canon_setCo (by omega) _ (canon_botTup _)
@@ -469,13 +469,13 @@ theorem decodesTo_numPt : ∀ (j k : ℕ), k + j = Nat.card A →
       numPt V cP A (k + 1), (cArg1_pt _ _ _ _).mpr ⟨hok, canon_botTup _, trivial⟩, ?_,
       decodesTo_onePt, ihj (k + 1) (by omega)⟩
     by_cases hk1 : k + 1 < Nat.card A
-    · rw [numPt, dif_pos hk1]
+    · rw [numPt, dite_eq_left hk1]
       refine (cArg2_pt _ _ _ _).mpr
         ⟨hok, canon_setCo (show (0 : ℕ) < 1 from by omega) _ (canon_botTup _), ?_⟩
       change _ < _ ∧ _
       rw [setCo_at_fz, setCo_at_fz]
       exact ⟨ordEnum_lt_succ hk1, ordEnum_covBy hk1⟩
-    · rw [numPt, dif_neg hk1]
+    · rw [numPt, dite_eq_right hk1]
       refine (cArg2_pt _ _ _ _).mpr ⟨hok, canon_botTup _, ?_⟩
       change IsTop _
       rw [setCo_at_fz, show (⟨k, hkn⟩ : Fin (Nat.card A)) = ⟨Nat.card A - 1, by omega⟩ from
@@ -492,16 +492,16 @@ theorem decodesTo_pairPt (cP : Code) :
         (codeNestFrom (blockCode V (Nat.card A) (ordEnum A) (botTup V A)) 0)) := by
   refine ⟨(mark_pt CodeTag.pair _ _).mpr ⟨canon_botTup _, rfl⟩, numPt V cP A 0,
     symPt V cP A 0, ?_, ?_, ?_, decodesTo_symPt V.numSyms 0 (Nat.zero_add _)⟩
-  · rw [numPt, dif_pos (Nat.card_pos (α := A))]
+  · rw [numPt, dite_eq_left (Nat.card_pos (α := A))]
     refine (cArg1_pt _ _ _ _).mpr ⟨canon_botTup _,
       canon_setCo (show (0 : ℕ) < 1 from by omega) _ (canon_botTup _), ?_⟩
     change IsBot _
     rw [setCo_at_fz]
     exact isBot_ordEnum_zero _
   · by_cases hs : 0 < V.numSyms
-    · rw [symPt, dif_pos hs]
+    · rw [symPt, dite_eq_left hs]
       exact (cArg2_pt _ _ _ _).mpr ⟨canon_botTup _, canon_botTup _, rfl⟩
-    · rw [symPt, dif_neg hs]
+    · rw [symPt, dite_eq_right hs]
       exact (cArg2_pt _ _ _ _).mpr
         ⟨canon_botTup _, canon_botTup _, by change V.numSyms = 0; omega⟩
   · have h := decodesTo_numPt (V := V) (cP := cP) (A := A) (Nat.card A) 0 (Nat.zero_add _)

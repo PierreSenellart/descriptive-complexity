@@ -89,7 +89,7 @@ theorem back_postVarSt_off
   match s with
   | .new i' =>
     change bitVal zero one (if i' = i ∧ r = v then b else st.new i' r) = _
-    rw [if_neg (fun h => hr h.2)]
+    rw [ite_eq_right (fun h => hr h.2)]
     rfl
   | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .mir | .sav
   | .tgt | .val | .wk | .bot | .ltp | .old _ => rfl
@@ -110,11 +110,11 @@ theorem back_postVarSt_v :
     by_cases hi : i' = i
     · subst hi
       change bitVal zero one (if i' = i' ∧ v = v then b else st.new i' v) = _
-      rw [if_pos ⟨rfl, rfl⟩, Function.update_self]
+      rw [ite_eq_left ⟨rfl, rfl⟩, Function.update_self]
     · have hs : (Slot.new i' : dt.SlotIx) ≠ Slot.new i :=
         fun h => hi (by injection h)
       change bitVal zero one (if i' = i ∧ v = v then b else st.new i' v) = _
-      rw [if_neg (fun h => hi h.1), Function.update_of_ne hs]
+      rw [ite_eq_right (fun h => hi h.1), Function.update_of_ne hs]
       rfl
   | .reg =>
     rw [Function.update_of_ne (show (Slot.reg : dt.SlotIx) ≠ Slot.new i from
@@ -1575,11 +1575,11 @@ theorem legStB_fields (j : Fin dt.nv)
       (dt.legStB (aT := aT) RF hord mV j st semT f₀).ltp = st.ltp := by
   classical
   by_cases hg : dt.gatedAt (PR := PR) RF j st
-  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dif_pos hg]
+  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_left hg]
     obtain ⟨h1, h2, h3, h4, h5, -⟩ := dt.legStT_fields (aT := aT) RF hord mV j st
       (dt.tagAt (PR := PR) j st) (semT hg) f₀
     exact ⟨h1, h2, h3, h4, h5⟩
-  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dif_neg hg]
+  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_right hg]
     exact ⟨rfl, rfl, rfl, rfl, rfl⟩
 
 open Classical in
@@ -1630,8 +1630,8 @@ theorem legStB_new (j : Fin dt.nv)
         dt.legBitB (aT := aT) RF hord mV j st semT f₀ else st.new i' r) := by
   classical
   by_cases hg : dt.gatedAt (PR := PR) RF j st
-  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dif_pos hg,
-      show dt.legBitB (aT := aT) RF hord mV j st semT f₀ = _ from dif_pos hg, legStT]
+  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_left hg,
+      show dt.legBitB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_left hg, legStT]
     exact congrArg
       (fun N : dt.d.B.ι →
           (Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) →
@@ -1644,8 +1644,8 @@ theorem legStB_new (j : Fin dt.nv)
       (dt.varStE_new RF hord (dt.varAt j) st mV (semT hg)
         (dt.varFG (PR := PR) RF (dt.varAt j) st v (dt.tagAt (PR := PR) j st) f₀)
         aT)
-  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dif_neg hg,
-      show dt.legBitB (aT := aT) RF hord mV j st semT f₀ = _ from dif_neg hg]
+  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_right hg,
+      show dt.legBitB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_right hg]
     rfl
 
 include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
@@ -1686,13 +1686,13 @@ theorem varLegB_run (j : Fin dt.nv)
         (semT hg) f₀).val = mV aT :=
       (dt.legStT_fields (aT := aT) RF hord mV j st (dt.tagAt (PR := PR) j st)
         (semT hg) f₀).2.2.2.2.2
-    rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dif_pos hg,
-      show dt.legCtlB (aT := aT) RF hord mV j st semT f₀ = _ from dif_pos hg, hval]
+    rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_left hg,
+      show dt.legCtlB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_left hg, hval]
     exact dt.varLeg_run_thread RF hord hrules hR hlin htop hbot hwork hv hvi hbotV
       htopV mV hmV0 hIncr hTestT hTestF j st hwkSt (dt.shapeAt (PR := PR) RF j st)
       (fun _ _ => Iff.rfl) (dt.tagAt (PR := PR) j st) (fun ℓ => (hg.2 ℓ).1) hmir hbotSt
       (semT hg) (fun ℓ => (hg.2 ℓ).2) hg.1 f₀
-  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dif_neg hg]
+  · rw [show dt.legStB (aT := aT) RF hord mV j st semT f₀ = _ from dite_eq_right hg]
     by_cases hs : ∀ (ℓ : Fin (dt.arOf (dt.varAt j))) u,
         dt.shapeAt (PR := PR) RF j st ℓ u
     · -- well shaped, but a tag or the domain fails: the ungated exit
@@ -1701,7 +1701,7 @@ theorem varLegB_run (j : Fin dt.nv)
         exact hg ⟨hs, fun ℓ => not_not.mp (fun h => hc ⟨ℓ, h⟩)⟩
       obtain ⟨ℓ₀, hℓ₀⟩ := hbad
       rw [show dt.legCtlB (aT := aT) RF hord mV j st semT f₀ = _ from
-        (dif_neg hg).trans (dif_pos hs)]
+        (dite_eq_right hg).trans (dite_eq_left hs)]
       exact dt.varLegUngated_run RF hord hrules hR hlin htop hbot hv hvi j st
         hwkSt (dt.shapeAt (PR := PR) RF j st) (fun _ _ => Iff.rfl)
         (dt.tagAt (PR := PR) j st) (fun _ => rfl) hs ℓ₀ hℓ₀ f₀
@@ -1709,7 +1709,7 @@ theorem varLegB_run (j : Fin dt.nv)
       obtain ⟨u₀, hfail, hlt⟩ :=
         (exists_least_fail (T := dt.shapeAt (PR := PR) RF j st) hs).choose_spec
       rw [show dt.legCtlB (aT := aT) RF hord mV j st semT f₀ = _ from
-        (dif_neg hg).trans (dif_neg hs)]
+        (dite_eq_right hg).trans (dite_eq_right hs)]
       exact dt.varLegFail_run RF hord hrules hR hlin htop hbot hv hvi j st hwkSt
         (dt.shapeAt (PR := PR) RF j st) (fun _ _ => Iff.rfl) (dt.tagAt (PR := PR) j st)
         (fun _ => rfl) _ hlt hfail f₀

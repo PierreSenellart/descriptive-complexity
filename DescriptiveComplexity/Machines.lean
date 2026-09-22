@@ -409,9 +409,9 @@ theorem exists_isInit [Finite A] (hwf : M.WellFormed) {q₀ : A} (hq : M.Start q
   refine ⟨⟨q₀, p₀, fun p => if h : ∃ a, M.Inp p a then h.choose else b₀⟩, ⟨hq, hp₀, fun p => ?_⟩,
     rfl⟩
   by_cases h : ∃ a, M.Inp p a
-  · exact Or.inl (by simpa only [dif_pos h] using h.choose_spec)
+  · exact Or.inl (by simpa only [dite_eq_left h] using h.choose_spec)
   · refine Or.inr ⟨fun b hb => h ⟨b, hb⟩, ?_⟩
-    simpa only [dif_neg h] using hb₀
+    simpa only [dite_eq_right h] using hb₀
 
 end Unique
 

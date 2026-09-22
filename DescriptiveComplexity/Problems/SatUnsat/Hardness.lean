@@ -131,7 +131,7 @@ noncomputable def sideFml (I : FOInterpretation (L.sum Language.order) Language.
 theorem sideFml_eq_bot (I : FOInterpretation (L.sum Language.order) Language.sat T dm)
     (hd : dm ≤ d) (get : Tg → Option T) {n : ℕ} (R : Language.sat.Relations n)
     (t : Fin n → Tg) (h : ¬∀ i, (get (t i)).isSome) : sideFml I hd get R t = ⊥ :=
-  dif_neg h
+  dite_eq_right h
 
 /-- Realization of a side's defining formula at tags that all belong to it:
 this side's own formula holds of the prefixes, and every argument tuple is
@@ -146,7 +146,7 @@ theorem realize_sideFml (I : FOInterpretation (L.sum Language.order) Language.sa
   have hsome : ∀ i, (get (t i)).isSome := fun i => by rw [ht i]; rfl
   have hgt : (fun i => (get (t i)).get (hsome i)) = t' :=
     funext fun i => Option.some_injective _ ((Option.some_get (hsome i)).trans (ht i))
-  rw [sideFml, dif_pos hsome, hgt, Formula.realize_inf, Formula.realize_relabel,
+  rw [sideFml, dite_eq_left hsome, hgt, Formula.realize_inf, Formula.realize_relabel,
     realize_listInf]
   refine and_congr Iff.rfl ⟨fun h i => ?_, fun h ψ hψ => ?_⟩
   · exact realize_canonF.mp (h _ (List.mem_map.mpr ⟨i, List.mem_finRange i, rfl⟩))

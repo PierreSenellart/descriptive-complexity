@@ -98,7 +98,7 @@ theorem ixBack_postVarSt_off
   match s with
   | .new i' =>
     change bitVal zero one (if i' = i ∧ r = v then b else st.new i' r) = _
-    rw [if_neg (fun h => hr h.2)]
+    rw [ite_eq_right (fun h => hr h.2)]
     rfl
   | .reg | .regFirst | .regLast | .blk _ | .name _ | .pdd | .mir | .sav
   | .tgt | .val | .wk | .bot | .ltp | .old _ => rfl
@@ -120,11 +120,11 @@ theorem ixBack_postVarSt_v :
     by_cases hi : i' = i
     · subst hi
       change bitVal zero one (if i' = i' ∧ v = v then b else st.new i' v) = _
-      rw [if_pos ⟨rfl, rfl⟩, Function.update_self]
+      rw [ite_eq_left ⟨rfl, rfl⟩, Function.update_self]
     · have hs : (Slot.new i' : dt.SlotIx) ≠ Slot.new i :=
         fun h => hi (by injection h)
       change bitVal zero one (if i' = i ∧ v = v then b else st.new i' v) = _
-      rw [if_neg (fun h => hi h.1), Function.update_of_ne hs]
+      rw [ite_eq_right (fun h => hi h.1), Function.update_of_ne hs]
       rfl
   | .reg =>
     rw [Function.update_of_ne (show (Slot.reg : dt.SlotIx) ≠ Slot.new i from
@@ -1304,7 +1304,7 @@ theorem ixOutLeg_run_any
                 mV st tOf semOf f₀)))
       else dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le (dt.ixRoundSt st (mV aT)) r)
     (dt.ixVarBg_back F hix htop (dt.ixRoundSt st (mV aT)) hwkSt) hns
-    (fun r hr => if_neg hr) (if_pos rfl)
+    (fun r hr => ite_eq_right hr) (ite_eq_left rfl)
   refine TMData.ReachesIn.mono (le_of_eq ?_)
     (((TMData.reachesIn_of_step hback).trans hmach).tail hexit)
   rw [ixOutLegCost]
@@ -1504,13 +1504,13 @@ theorem ixLegStB_fields (j : Fin dt.nv)
   classical
   by_cases hg : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st
   · rw [show dt.ixLegStB (elt := elt) (aT := aT) F hinj hhasP heltP
-    mV j st semT f₀ = _ from dif_pos hg]
+    mV j st semT f₀ = _ from dite_eq_left hg]
     obtain ⟨h1, h2, h3, h4, h5, -⟩ := dt.ixLegStT_fields (elt := elt) (aT := aT) F hinj hhasP heltP
       mV j st
       (dt.ixTagAt (PR := PR) (elt := elt) j st) (semT hg) f₀
     exact ⟨h1, h2, h3, h4, h5⟩
   · rw [show dt.ixLegStB (elt := elt) (aT := aT) F hinj hhasP heltP
-    mV j st semT f₀ = _ from dif_neg hg]
+    mV j st semT f₀ = _ from dite_eq_right hg]
     exact ⟨rfl, rfl, rfl, rfl, rfl⟩
 
 open Classical in
@@ -1565,9 +1565,9 @@ theorem ixLegStB_new (j : Fin dt.nv)
   classical
   by_cases hg : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st
   · rw [show dt.ixLegStB (elt := elt) (aT := aT) F hinj hhasP heltP
-    mV j st semT f₀ = _ from dif_pos hg,
+    mV j st semT f₀ = _ from dite_eq_left hg,
       show dt.ixLegBitB (elt := elt) (aT := aT) F hinj hhasP heltP
-        mV j st semT f₀ = _ from dif_pos hg, ixLegStT]
+        mV j st semT f₀ = _ from dite_eq_left hg, ixLegStT]
     exact congrArg
       (fun N : dt.d.B.ι →
           (Univ A R P dt.KIx dt.dd → Prop) →
@@ -1583,9 +1583,9 @@ theorem ixLegStB_new (j : Fin dt.nv)
           j st) f₀)
         aT)
   · rw [show dt.ixLegStB (elt := elt) (aT := aT) F hinj hhasP heltP
-    mV j st semT f₀ = _ from dif_neg hg,
+    mV j st semT f₀ = _ from dite_eq_right hg,
       show dt.ixLegBitB (elt := elt) (aT := aT) F hinj hhasP heltP
-        mV j st semT f₀ = _ from dif_neg hg]
+        mV j st semT f₀ = _ from dite_eq_right hg]
     rfl
 
 include hrulesM hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv hvi
@@ -1630,9 +1630,9 @@ theorem ixVarLegB_reachesIn (j : Fin dt.nv)
         mV j st (dt.ixTagAt (PR := PR) (elt := elt) j st)
         (semT hg) f₀).2.2.2.2.2
     rw [show dt.ixLegStB (elt := elt) (aT := aT) F hinj hhasP heltP
-      mV j st semT f₀ = _ from dif_pos hg,
+      mV j st semT f₀ = _ from dite_eq_left hg,
       show dt.ixLegCtlB (elt := elt) (aT := aT) F hinj hhasP heltP
-        mV j st semT f₀ = _ from dif_pos hg, hval]
+        mV j st semT f₀ = _ from dite_eq_left hg, hval]
     exact ixVarLeg_run_thread_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP)
       (hix := hix) (hinj := hinj) (heltP := heltP) (he₀ := he₀) (hord := hord)
       (hrulesM := hrulesM) (hR := hR) (hlin := hlin) (htop := htop)
@@ -1648,7 +1648,7 @@ theorem ixVarLegB_reachesIn (j : Fin dt.nv)
       (hwitOf := fun ℓ => (hg.2 ℓ).1) (hmir := hmir) (hbotSt := hbotSt)
       (semT := semT hg) (hDom := fun ℓ => (hg.2 ℓ).2) (hTestOf := hg.1) (f₀ := f₀)
   · rw [show dt.ixLegStB (elt := elt) (aT := aT) F hinj hhasP heltP
-    mV j st semT f₀ = _ from dif_neg hg]
+    mV j st semT f₀ = _ from dite_eq_right hg]
     by_cases hs : ∀ (ℓ : Fin (dt.arOf (dt.varAt j))) u,
         dt.ixShapeAt (PR := PR) (F := F) j st ℓ u
     · -- well shaped, but a tag or the domain fails: the ungated exit
@@ -1657,7 +1657,7 @@ theorem ixVarLegB_reachesIn (j : Fin dt.nv)
         exact hg ⟨hs, fun ℓ => not_not.mp (fun h => hc ⟨ℓ, h⟩)⟩
       obtain ⟨ℓ₀, hℓ₀⟩ := hbad
       rw [show dt.ixLegCtlB (elt := elt) (aT := aT) F hinj hhasP heltP mV j st semT f₀ = _ from
-        (dif_neg hg).trans (dif_pos hs)]
+        (dite_eq_right hg).trans (dite_eq_left hs)]
       exact ixVarLegUngated_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP)
         (hix := hix) (hinj := hinj) (heltP := heltP)
         (hrulesM := hrulesM) (hR := hR) (hlin := hlin) (htop := htop)
@@ -1673,7 +1673,7 @@ theorem ixVarLegB_reachesIn (j : Fin dt.nv)
       obtain ⟨u₀, hfail, hlt⟩ :=
         (exists_least_fail (T := dt.ixShapeAt (PR := PR) (F := F) j st) hs).choose_spec
       rw [show dt.ixLegCtlB (elt := elt) (aT := aT) F hinj hhasP heltP mV j st semT f₀ = _ from
-        (dif_neg hg).trans (dif_neg hs)]
+        (dite_eq_right hg).trans (dite_eq_right hs)]
       exact ixVarLegFail_reachesIn (F := F) (hhasP := hhasP) (hsepP := hsepP)
         (hix := hix) (hinj := hinj) (heltP := heltP)
         (hrulesM := hrulesM) (hR := hR) (hlin := hlin) (htop := htop)

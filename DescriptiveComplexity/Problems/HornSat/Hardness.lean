@@ -117,14 +117,14 @@ theorem realize_headOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
   | some a =>
     rw [Option.elim_some]
     by_cases hi : a.idx = i
-    · rw [if_pos hi, realize_atomOccF]
+    · rw [ite_eq_left hi, realize_atomOccF]
       refine ⟨fun h => ⟨a, rfl, hi, h⟩, ?_⟩
       rintro ⟨a', ha', -, h⟩
       have hae := Option.mem_def.mp ha'
       rw [Option.some.injEq] at hae
       subst hae
       exact h
-    · rw [if_neg hi]
+    · rw [ite_eq_right hi]
       refine iff_of_false id ?_
       rintro ⟨a', ha', hi', -⟩
       have hae := Option.mem_def.mp ha'
@@ -143,13 +143,13 @@ theorem realize_bodyOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
   · rintro ⟨ψ, hψmem, hψ⟩
     obtain ⟨a, ha, rfl⟩ := List.mem_map.mp hψmem
     by_cases hi : a.idx = i
-    · rw [if_pos hi, realize_atomOccF] at hψ
+    · rw [ite_eq_left hi, realize_atomOccF] at hψ
       exact ⟨a, ha, hi, hψ⟩
-    · rw [if_neg hi] at hψ
+    · rw [ite_eq_right hi] at hψ
       exact hψ.elim
   · rintro ⟨a, ha, hi, hpad⟩
     refine ⟨_, List.mem_map.mpr ⟨a, ha, rfl⟩, ?_⟩
-    rw [if_pos hi, realize_atomOccF]
+    rw [ite_eq_left hi, realize_atomOccF]
     exact hpad
 
 end Formulas

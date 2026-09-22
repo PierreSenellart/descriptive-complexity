@@ -67,7 +67,7 @@ noncomputable def maxVert (c : A) : mcInterp.Map A :=
 
 theorem maxVert_eq {c x : A} {s : Bool} (h : MaxOcc c x s) : maxVert c = occPt s c x := by
   have hex : ∃ p : A × Bool, MaxOcc c p.1 p.2 := ⟨(x, s), h⟩
-  rw [maxVert, dif_pos hex]
+  rw [maxVert, dite_eq_left hex]
   obtain ⟨hx, hs⟩ := maxOcc_unique hex.choose_spec h
   rw [hx, hs]
 
@@ -165,22 +165,22 @@ theorem pick_cases {S : mcInterp.Map A → Prop} {u v m : mcInterp.Map A} (huv :
 omit [Language.sat.Structure A] [LinearOrder A] in
 theorem pick_left {S : mcInterp.Map A → Prop} {u v m : mcInterp.Map A} (hm : S m)
     (h : u ≠ m) : pick S u v m = u := by
-  rw [pick, if_pos hm, if_neg h]
+  rw [pick, ite_eq_left hm, ite_eq_right h]
 
 omit [Language.sat.Structure A] [LinearOrder A] in
 theorem pick_right {S : mcInterp.Map A → Prop} {u v m : mcInterp.Map A} (hm : ¬S m)
     (h : v ≠ m) : pick S u v m = v := by
-  rw [pick, if_neg hm, if_neg h]
+  rw [pick, ite_eq_right hm, ite_eq_right h]
 
 omit [Language.sat.Structure A] [LinearOrder A] in
 theorem pick_of_left_eq {S : mcInterp.Map A → Prop} {v m : mcInterp.Map A} (hm : S m) :
     pick S m v m = v := by
-  rw [pick, if_pos hm, if_pos rfl]
+  rw [pick, ite_eq_left hm, ite_eq_left rfl]
 
 omit [Language.sat.Structure A] [LinearOrder A] in
 theorem pick_of_right_eq {S : mcInterp.Map A → Prop} {u m : mcInterp.Map A} (hm : ¬S m) :
     pick S u m m = u := by
-  rw [pick, if_neg hm, if_pos rfl]
+  rw [pick, ite_eq_right hm, ite_eq_left rfl]
 
 variable [Finite A]
 
@@ -310,20 +310,20 @@ theorem cutMap_injOn (hwidth : WidthAtMostThree A) (S : mcInterp.Map A → Prop)
     simp only at hin hout hin' hout'
     by_cases hm : S (occPt u c z)
     · simp only [pick] at hpick
-      rw [if_pos hm, if_pos hm] at hpick
+      rw [ite_eq_left hm, ite_eq_left hm] at hpick
       by_cases h₁ : occPt s c x = occPt u c z
-      · rw [if_pos h₁] at hpick
+      · rw [ite_eq_left h₁] at hpick
         by_cases h₂ : occPt s' c x' = occPt u c z
-        · rw [if_pos h₂] at hpick
+        · rw [ite_eq_left h₂] at hpick
           rw [Prod.mk.injEq]
           exact ⟨h₁.trans h₂.symm, hpick⟩
-        · rw [if_neg h₂] at hpick
+        · rw [ite_eq_right h₂] at hpick
           exact absurd (hpick ▸ hin') hout
-      · rw [if_neg h₁] at hpick
+      · rw [ite_eq_right h₁] at hpick
         by_cases h₂ : occPt s' c x' = occPt u c z
-        · rw [if_pos h₂] at hpick
+        · rw [ite_eq_left h₂] at hpick
           exact absurd (hpick ▸ hin) hout'
-        · rw [if_neg h₂] at hpick
+        · rw [ite_eq_right h₂] at hpick
           by_cases hb : occPt t c y = occPt t' c y'
           · rw [Prod.mk.injEq]
             exact ⟨hpick, hb⟩
@@ -332,20 +332,20 @@ theorem cutMap_injOn (hwidth : WidthAtMostThree A) (S : mcInterp.Map A → Prop)
               (fun hc => hout (hc ▸ hin)) (fun hc => hout' (hc ▸ hin))
               (fun hc => hout (hc ▸ hm)) (fun hc => hout' (hc ▸ hm)) hb).elim
     · simp only [pick] at hpick
-      rw [if_neg hm, if_neg hm] at hpick
+      rw [ite_eq_right hm, ite_eq_right hm] at hpick
       by_cases h₁ : occPt t c y = occPt u c z
-      · rw [if_pos h₁] at hpick
+      · rw [ite_eq_left h₁] at hpick
         by_cases h₂ : occPt t' c y' = occPt u c z
-        · rw [if_pos h₂] at hpick
+        · rw [ite_eq_left h₂] at hpick
           rw [Prod.mk.injEq]
           exact ⟨hpick, h₁.trans h₂.symm⟩
-        · rw [if_neg h₂] at hpick
+        · rw [ite_eq_right h₂] at hpick
           exact absurd (hpick ▸ hin) hout'
-      · rw [if_neg h₁] at hpick
+      · rw [ite_eq_right h₁] at hpick
         by_cases h₂ : occPt t' c y' = occPt u c z
-        · rw [if_pos h₂] at hpick
+        · rw [ite_eq_left h₂] at hpick
           exact absurd (hpick ▸ hin') hout
-        · rw [if_neg h₂] at hpick
+        · rw [ite_eq_right h₂] at hpick
           by_cases ha : occPt s c x = occPt s' c x'
           · rw [Prod.mk.injEq]
             exact ⟨ha, hpick⟩

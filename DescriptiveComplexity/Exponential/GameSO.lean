@@ -404,9 +404,9 @@ theorem realize_atPhaseTwoF (p q : Phase) (τ : (preBlock B M).Assignment A) (ρ
     intro ψ hψ
     obtain ⟨r, -, rfl⟩ := List.mem_map.mp hψ
     rcases eq_or_ne r p with rfl | hne
-    · rw [if_pos rfl]
+    · rw [ite_eq_left rfl]
       exact Formula.realize_top.mpr trivial
-    · rw [if_neg hne, Formula.realize_not]
+    · rw [ite_eq_right hne, Formula.realize_not]
       exact fun h => hne (((realize_phaseTwoF r q τ ρ' σ').mp h).trans hpq.symm)
 
 open Classical in
@@ -428,7 +428,7 @@ theorem exists_preAssign_two (p : Phase) (τ τ' : (preBlock B M).Assignment A)
     · exact ⟨fun _ => rfl, fun _ => (realize_phaseTwoF' r τ τ' x).mp hset⟩
     · refine ⟨fun hr => ?_, fun hr => absurd hr hne⟩
       have hne' := hrest _ (List.mem_map.mpr ⟨r, mem_finEnum r, rfl⟩)
-      rw [if_neg hne, Formula.realize_not] at hne'
+      rw [ite_eq_right hne, Formula.realize_not] at hne'
       exact absurd ((realize_phaseTwoF' r τ τ' x).mpr hr) hne'
   refine ⟨fun i => τ' (Sum.inr (Sum.inl i)), fun j => τ' (Sum.inr (Sum.inr j)), ?_⟩
   funext i

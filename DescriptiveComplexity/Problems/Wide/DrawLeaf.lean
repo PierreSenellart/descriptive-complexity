@@ -114,8 +114,8 @@ theorem leafP_irrel (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
   refine iff_of_eq (congrArg (dt.gateHolds zero one v σ) (funext fun j => ?_))
   rw [levelVal, levelVal]
   by_cases h : (j : ℕ) < dt.arOf v
-  · rw [dif_pos h, dif_pos h]
-  · rw [dif_neg h, dif_neg h]
+  · rw [dite_eq_left h, dite_eq_left h]
+  · rw [dite_eq_right h, dite_eq_right h]
     refine Function.update_of_ne (fun hc => ?_) _ _
     have hval : (j : ℕ) = (ℓ : ℕ) := congrArg Fin.val hc
     have := j.isLt
@@ -148,11 +148,11 @@ theorem leafP_iff_split (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
       dt.levelVal v mb w j =
         w ⟨(j : ℕ), lt_of_lt_of_le j.isLt (dt.nOf_le_ki v)⟩ := by
     intro j h
-    rw [levelVal, dif_neg (by omega)]
+    rw [levelVal, dite_eq_right (by omega)]
   have hfree : ∀ (j : Fin (dt.nOf v)) (h : (j : ℕ) < dt.arOf v),
       IsEnc dt.ly zero one (dt.levelVal v mb w j) := by
     intro j h
-    rw [levelVal, dif_pos h]
+    rw [levelVal, dite_eq_left h]
     exact houter _ h
   constructor
   · rintro ⟨hex, hall⟩
@@ -228,7 +228,7 @@ theorem altQuantFrom_leafP (hzo : zero ≠ one) (i : dt.d.B.ι)
         mb ⟨(j : ℕ), lt_of_lt_of_le hj (dt.arOf_le_ko (some i))⟩ := by
     intro j hj
     rw [hwA]
-    exact dif_pos hj
+    exact dite_eq_left hj
   have h3 : altQuantFrom (dt.polOf (some i))
         (fun u : Fin (dt.nOf (some i)) → ((Fin dt.dd → A) → Prop) =>
           dt.gateHolds zero one (some i) σ (dt.freeVal (some i) mb u)) (dt.arOf (some i))
@@ -239,8 +239,8 @@ theorem altQuantFrom_leafP (hzo : zero ≠ one) (i : dt.d.B.ι)
     refine iff_of_eq (congrArg (dt.gateHolds zero one (some i) σ) (funext fun j => ?_))
     rw [freeVal]
     by_cases h : (j : ℕ) < dt.arOf (some i)
-    · rw [dif_pos h, hu j h, hV j h]
-    · rw [dif_neg h]
+    · rw [dite_eq_left h, hu j h, hV j h]
+    · rw [dite_eq_right h]
   -- the pack's own statement
   have h4 := StepDef.next_iff_gateMat (ly := dt.ly) (zero := zero) (one := one) hzo
     (pk := dt.pk i) σ x
@@ -290,7 +290,7 @@ theorem altQuantFrom_leafP_out (hzo : zero ≠ one)
     refine altQuantFrom_congr_mat fun u _ => ?_
     refine iff_of_eq (congrArg (dt.gateHolds zero one none σ) (funext fun j => ?_))
     rw [freeVal]
-    exact dif_neg (Nat.not_lt_zero _)
+    exact dite_eq_right (Nat.not_lt_zero _)
   exact (h2.trans h3).trans
     (StepDef.out_iff_gateMat (ly := dt.ly) hzo dt.pkOut σ _).symm
 

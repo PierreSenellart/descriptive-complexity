@@ -339,7 +339,7 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
                 fun p => Term.var (x p)) E H =
               Relations.formula (backBaseSym L k B' R'.2)
                 fun p => Term.var (Sum.elim E H (x 0) (g p)) := by
-            simp only [backCompile, Language.Term.varOf, dif_pos hmem]
+            simp only [backCompile, Language.Term.varOf, dite_eq_left hmem]
           rw [he]
           let := (ordBlock k).structure₁ (L := L) σ
           let := @SOBlock.structure₁ (L.sum (ordBlock k).lang)
@@ -349,7 +349,7 @@ theorem realize_backCompile (lo : LinearOrder (InvMap S k A))
         · have he : backCompile L k S (B' := B')
               (BoundedFormula.rel (Sum.inl (Sum.inl (InvRel.relBit R' g)))
                 fun p => Term.var (x p)) E H = ⊥ := by
-            simp only [backCompile, Language.Term.varOf, dif_neg hmem]
+            simp only [backCompile, Language.Term.varOf, dite_eq_right hmem]
           rw [he]
           exact iff_of_false (fun hf => hf) fun hf => hmem hf.1
       | sub j =>

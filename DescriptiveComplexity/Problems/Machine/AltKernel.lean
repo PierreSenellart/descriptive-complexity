@@ -456,7 +456,7 @@ variable {α : Type} (v : α → A)
             A).Le (atmData k A).Posn p' p := by
   cases dir <;>
     simp only [akMoveExF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_iExs,
-      realize_akHdF, realize_akSuccPosF, Sum.elim_inl, Sum.elim_inr, if_true, if_false,
+      realize_akHdF, realize_akSuccPosF, Sum.elim_inl, Sum.elim_inr, ite_true, ite_false,
       Bool.false_eq_true] <;>
     exact ⟨fun h p hp => let ⟨j', hj'⟩ := h (fun _ => p) hp; ⟨j' 0, hj'⟩,
       fun h j hj => let ⟨p', hp'⟩ := h (j 0) hj; ⟨fun _ => p', hp'⟩⟩
@@ -468,7 +468,7 @@ variable {α : Type} (v : α → A)
             (atmData k A).Posn p' p) := by
   cases dir <;>
     simp only [akMoveF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
-      realize_akHdF, realize_akSuccPosF, Sum.elim_inl, Sum.elim_inr, if_true, if_false,
+      realize_akHdF, realize_akSuccPosF, Sum.elim_inl, Sum.elim_inr, ite_true, ite_false,
       Bool.false_eq_true] <;>
     exact ⟨fun h p p' h₁ h₂ => h ![p, p'] ⟨h₁, h₂⟩, fun h j hj => h (j 0) (j 1) hj.1 hj.2⟩
 
@@ -487,7 +487,7 @@ variable {α : Type} (v : α → A)
     Formula.realize_not, Formula.realize_iAlls, Formula.realize_iExs, realize_akTrF,
     realize_akStF, realize_akSrcF, realize_akHdF, realize_akTpF, realize_akReadF,
     realize_akDstF, realize_akWriteF, realize_akRightF, realize_akMoveExF, Sum.elim_inl,
-    Sum.elim_inr, if_true, if_false, Bool.false_eq_true]
+    Sum.elim_inr, ite_true, ite_false, Bool.false_eq_true]
   refine and_congr Iff.rfl (and_congr ?_ (and_congr ?_ (and_congr ?_ (and_congr ?_ Iff.rfl))))
   · exact ⟨fun h q hq => h (fun _ => q) hq, fun h j hj => h (j 0) hj⟩
   · exact ⟨fun h p a h₁ h₂ => h ![p, a] ⟨h₁, h₂⟩, fun h j hj => h (j 0) (j 1) hj.1 hj.2⟩
@@ -516,7 +516,7 @@ variable {α : Type} (v : α → A)
     Formula.realize_not, Formula.realize_iff, Formula.realize_iAlls, realize_akTrF,
     realize_akStF, realize_akSrcF, realize_akHdF, realize_akTpF, realize_akReadF,
     realize_akDstF, realize_akWriteF, realize_akRightF, realize_akMoveF, Sum.elim_inl,
-    Sum.elim_inr, if_true, if_false, Bool.false_eq_true]
+    Sum.elim_inr, ite_true, ite_false, Bool.false_eq_true]
   refine and_congr Iff.rfl (and_congr ?_ (and_congr ?_ (and_congr ?_ (and_congr ?_
     (and_congr ?_ Iff.rfl)))))
   · exact ⟨fun h q hq => h (fun _ => q) hq, fun h j hj => h (j 0) hj⟩

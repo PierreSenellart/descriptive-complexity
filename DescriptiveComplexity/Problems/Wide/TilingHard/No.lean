@@ -321,7 +321,7 @@ omit hlin in
 theorem headCol_spec {k : ℕ} (h : ∃ s, IsHeadTile (R.tl k s)) :
     IsHeadTile (R.tl k (headCol R k)) := by
   classical
-  rw [headCol, dif_pos h]
+  rw [headCol, dite_eq_left h]
   exact h.choose_spec
 
 include hlin in
@@ -557,7 +557,7 @@ theorem wideRank_rowAt {k : ℕ} (hk : k < Nat.card {p : WPoint A // (wideData A
     wideRank (rowAt (A := A) k) = k := by
   classical
   have hex : ∃ s : A → Prop, wideRank s = k := exists_wideRank_eq hlin hk
-  rw [rowAt, dif_pos hex]
+  rw [rowAt, dite_eq_left hex]
   exact hex.choose_spec
 
 omit [LinearOrder A] in
@@ -565,7 +565,7 @@ omit [LinearOrder A] in
 theorem rowAt_zero : rowAt (A := A) 0 = fun _ : A => False := by
   classical
   have hex : ∃ s : A → Prop, wideRank s = 0 := ⟨fun _ => False, wideRank_bot hlin⟩
-  rw [rowAt, dif_pos hex]
+  rw [rowAt, dite_eq_left hex]
   exact wideRank_injective hlin (hex.choose_spec.trans (wideRank_bot hlin).symm)
 
 omit [LinearOrder A] in

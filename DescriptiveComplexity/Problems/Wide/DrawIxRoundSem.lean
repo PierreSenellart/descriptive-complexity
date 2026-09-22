@@ -279,9 +279,9 @@ theorem ixPassW_hENC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
         (hp := hp) (mbW := mbW) j) := by
   rw [lvSet, lvBlk, ixPassW]
   by_cases h : (j : ℕ) < dt.arOf vi
-  · rw [if_pos h, dif_pos h, dif_pos h]
+  · rw [ite_eq_left h, dite_eq_left h, dite_eq_left h]
     exact hmb ⟨(j : ℕ), h⟩
-  · rw [if_neg h, dif_neg h, dif_neg h]
+  · rw [ite_eq_right h, dite_eq_right h, dite_eq_right h]
     have hspec := ((hpassEnc vi stV
       ⟨(j : ℕ) - dt.arOf vi, by
         have h1 := j.isLt
@@ -626,9 +626,9 @@ theorem ixLevelVal_encMap (vi : dt.VarIx) (stV : TapeSt dt A R P I)
         (hp := hp) (mbW := mbW) j) := by
   rw [levelVal, ixPassW]
   by_cases h : (j : ℕ) < dt.arOf vi
-  · rw [dif_pos h, dif_pos h]
+  · rw [dite_eq_left h, dite_eq_left h]
     exact hmb ⟨(j : ℕ), h⟩
-  · rw [dif_neg h, dif_neg h]
+  · rw [dite_eq_right h, dite_eq_right h]
     have hspec := ((hpassEnc vi stV
       ⟨(j : ℕ) - dt.arOf vi, by
         have h1 := j.isLt

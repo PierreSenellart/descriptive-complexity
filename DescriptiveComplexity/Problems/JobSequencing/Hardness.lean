@@ -1176,24 +1176,24 @@ noncomputable def dval (A : Type) [Language.sat.Structure A] [LinearOrder A] [Fi
 
 omit [Finite A] in
 theorem dd_deg (hdeg : Deg A) (b : Bool × A) : dd b = 0 := by
-  rw [dd, if_pos hdeg]
+  rw [dd, ite_eq_left hdeg]
 
 omit [Finite A] in
 theorem dd_var (hdeg : ¬Deg A) (x : A) : dd ((false, x) : Bool × A) = 1 := by
-  rw [dd, if_neg hdeg, if_pos rfl]
+  rw [dd, ite_eq_right hdeg, ite_eq_left rfl]
 
 open Classical in
 omit [Finite A] in
 theorem dd_cls (hdeg : ¬Deg A) {c : A} (hc : IsCl c) :
     dd ((true, c) : Bool × A) = if ∃ x s, Mid c x s then 2 else 1 := by
-  rw [dd, if_neg hdeg, if_neg (by simp), if_pos hc]
+  rw [dd, ite_eq_right hdeg, ite_eq_right (by simp), ite_eq_left hc]
 
 omit [Finite A] in
 theorem dd_not_cls (c : A) (hc : ¬IsCl c) : dd ((true, c) : Bool × A) = 0 := by
   rw [dd]
   by_cases h : Deg A
-  · rw [if_pos h]
-  · rw [if_neg h, if_neg (by simp), if_neg hc]
+  · rw [ite_eq_left h]
+  · rw [ite_eq_right h, ite_eq_right (by simp), ite_eq_right hc]
 
 omit [Finite A] in
 theorem dd_le_two (b : Bool × A) : dd b ≤ 2 := by
@@ -1264,11 +1264,11 @@ theorem jsBnd_pos (k : Bool) (f : Fin 3) (w : Fin 2 → A) :
             obtain ⟨x, s, h⟩ := hm
             cases s
             exacts [⟨x, Or.inl h⟩, ⟨x, Or.inr h⟩]
-          rw [dht, dd_cls hdeg hc, if_pos hm]
+          rw [dht, dd_cls hdeg hc, ite_eq_left hm]
           fin_cases f <;> simp [jInterp, bndF, dbitF, hdeg, hc, hm']
         · have hm' : ∀ x : A, ¬Mid (w 0) x false ∧ ¬Mid (w 0) x true := fun x =>
             ⟨fun h => hm ⟨x, false, h⟩, fun h => hm ⟨x, true, h⟩⟩
-          rw [dht, dd_cls hdeg hc, if_neg hm]
+          rw [dht, dd_cls hdeg hc, ite_eq_right hm]
           fin_cases f <;> simp [jInterp, bndF, dbitF, hdeg, hc, hm']
       · rw [dht, dd_not_cls _ hc]
         fin_cases f <;> simp [jInterp, bndF, dbitF, hdeg, hc]
@@ -1389,12 +1389,12 @@ theorem two_mul_dd {a₀ : A} (ha₀ : IsBot a₀) (hd : ¬Deg A) (hwidth : Widt
       have hle := ncard_midSet_le_one hwidth c
       rw [dd_cls hd hc]
       by_cases hm : ∃ x s, Mid c x s
-      · rw [if_pos hm]
+      · rw [ite_eq_left hm]
         have hpos : 0 < (MidSet c).ncard := by
           obtain ⟨x, s, h⟩ := hm
           exact (Set.ncard_pos (Set.toFinite _)).mpr ⟨(x, s), h⟩
         omega
-      · rw [if_neg hm]
+      · rw [ite_eq_right hm]
         have hzero : (MidSet c).ncard = 0 := by
           rw [Set.ncard_eq_zero (Set.toFinite _)]
           ext p
@@ -1689,12 +1689,12 @@ theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structu
           have h4 := ncard_midSet_le_one hwidth e
           rw [dd_cls hdeg hc]
           by_cases hm : ∃ x s, Mid e x s
-          · rw [if_pos hm]
+          · rw [ite_eq_left hm]
             have hpos : 0 < (MidSet e).ncard := by
               obtain ⟨x, s, h⟩ := hm
               exact (Set.ncard_pos (Set.toFinite _)).mpr ⟨(x, s), h⟩
             omega
-          · rw [if_neg hm]
+          · rw [ite_eq_right hm]
             have hzero : (MidSet e).ncard = 0 := by
               rw [Set.ncard_eq_zero (Set.toFinite _)]
               ext p

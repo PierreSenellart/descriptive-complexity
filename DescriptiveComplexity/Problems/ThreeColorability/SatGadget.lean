@@ -138,7 +138,7 @@ theorem gadCol_proper {ν : A → Prop}
     obtain ⟨-, c, hmin, hmax⟩ := h
     obtain ⟨z, u, hz, hT⟩ := hν c hmin.occIn.isCl
     obtain ⟨rfl, rfl⟩ := eq_of_minOcc_of_maxOcc hmin hmax hz
-    simp only [gadCol, if_pos hT]
+    simp only [gadCol, ite_eq_left hT]
     decide
   case lit.palB s =>
     simp only [gadCol]
@@ -148,8 +148,8 @@ theorem gadCol_proper {ν : A → Prop}
     have key := prefixOrStrict_of_min_succ (ν := ν) hmin hsucc
     simp only [gadCol]
     by_cases hA : PrefixOrStrict ν a₁ b₁ s
-    · rw [if_pos hA, if_pos (key.mp hA)]; decide
-    · rw [if_neg hA, if_neg (fun hT => hA (key.mpr hT))]
+    · rw [ite_eq_left hA, ite_eq_left (key.mp hA)]; decide
+    · rw [ite_eq_right hA, ite_eq_right (fun hT => hA (key.mpr hT))]
       split_ifs <;> decide
   case gu.gv s t =>
     obtain ⟨rfl, rfl, rfl, -⟩ := h
@@ -161,16 +161,16 @@ theorem gadCol_proper {ν : A → Prop}
       have hor := prefixOr_iff (ν := ν) hch.occIn
       simp only [gadCol]
       by_cases hA : PrefixOrStrict ν a₁ b₁ t
-      · rw [if_pos hA, if_pos (hor.mpr (Or.inl hA))]; decide
-      · rw [if_neg hA]
+      · rw [ite_eq_left hA, ite_eq_left (hor.mpr (Or.inl hA))]; decide
+      · rw [ite_eq_right hA]
         by_cases hB : LitTrue ν b₁ t
-        · rw [if_pos hB, if_pos (hor.mpr (Or.inr hB))]; decide
-        · rw [if_neg hB, if_neg fun hO => (hor.mp hO).elim hA hB]; decide
+        · rw [ite_eq_left hB, ite_eq_left (hor.mpr (Or.inr hB))]; decide
+        · rw [ite_eq_right hB, ite_eq_right fun hO => (hor.mp hO).elim hA hB]; decide
     · have key := prefixOrStrict_succ (ν := ν) hsucc
       simp only [gadCol]
       by_cases hA : PrefixOrStrict ν a₁ b₁ s
-      · rw [if_pos hA, if_pos (key.mp hA)]; decide
-      · rw [if_neg hA, if_neg (fun hO => hA (key.mpr hO))]
+      · rw [ite_eq_left hA, ite_eq_left (key.mp hA)]; decide
+      · rw [ite_eq_right hA, ite_eq_right (fun hO => hA (key.mpr hO))]
         split_ifs <;> decide
   case gv.lit s t =>
     obtain ⟨rfl, -, rfl, -⟩ := h
@@ -182,15 +182,15 @@ theorem gadCol_proper {ν : A → Prop}
     have hor := prefixOr_iff (ν := ν) hch.occIn
     simp only [gadCol]
     by_cases hA : PrefixOrStrict ν a₁ b₁ t
-    · rw [if_pos hA, if_pos (hor.mpr (Or.inl hA))]; decide
-    · rw [if_neg hA]
+    · rw [ite_eq_left hA, ite_eq_left (hor.mpr (Or.inl hA))]; decide
+    · rw [ite_eq_right hA]
       by_cases hB : LitTrue ν b₁ t
-      · rw [if_pos hB, if_pos (hor.mpr (Or.inr hB))]; decide
-      · rw [if_neg hB, if_neg fun hO => (hor.mp hO).elim hA hB]; decide
+      · rw [ite_eq_left hB, ite_eq_left (hor.mpr (Or.inr hB))]; decide
+      · rw [ite_eq_right hB, ite_eq_right fun hO => (hor.mp hO).elim hA hB]; decide
   case go.palF s =>
     obtain ⟨hch, hmax⟩ := h
     obtain ⟨z, u, hz, hT⟩ := hν _ hch.occIn.isCl
-    simp only [gadCol, if_pos (prefixOr_of_max hmax hz hT)]
+    simp only [gadCol, ite_eq_left (prefixOr_of_max hmax hz hT)]
     decide
   case go.palB s =>
     simp only [gadCol]
@@ -263,16 +263,16 @@ theorem satisfiable_iff_gadColoring [Finite A] :
           (if MinOcc c x s then col (.lit s) x x else col (.go s) c x) = fc := by
         intro x s hxs Hpred
         by_cases hmin : MinOcc c x s
-        · rw [if_pos hmin]; exact Hfalse x s hxs
-        · rw [if_neg hmin]
+        · rw [ite_eq_left hmin]; exact Hfalse x s hxs
+        · rw [ite_eq_right hmin]
           obtain ⟨y, t, hsucc⟩ := exists_succOcc ⟨hxs, hmin⟩
           have ha := Hpred y t hsucc.1 hsucc.2.2.1
           have hu_ne : col (.gu s) c x ≠ fc := by
             by_cases hminy : MinOcc c y t
-            · rw [if_pos hminy] at ha
+            · rw [ite_eq_left hminy] at ha
               have h' := hcol (.gu s) c x (.lit t) y y ⟨rfl, ⟨hxs, hmin⟩, hminy, hsucc⟩
               rwa [ha] at h'
-            · rw [if_neg hminy] at ha
+            · rw [ite_eq_right hminy] at ha
               have h' := hcol (.gu s) c x (.go t) c y
                 (Or.inr ⟨rfl, ⟨hxs, hmin⟩, ⟨hsucc.1, hminy⟩, hsucc⟩)
               rwa [ha] at h'
@@ -306,11 +306,11 @@ theorem satisfiable_iff_gadColoring [Finite A] :
       obtain ⟨xm, sm, hmax⟩ := exists_maxOcc hocc
       have hm := main xm sm hmax.occIn
       by_cases hminm : MinOcc c xm sm
-      · rw [if_pos hminm] at hm
+      · rw [ite_eq_left hminm] at hm
         have h' := hcol (.lit sm) xm xm .palF a₀ a₀ ⟨rfl, c, hminm, hmax⟩
         rw [hm] at h'
         exact h' rfl
-      · rw [if_neg hminm] at hm
+      · rw [ite_eq_right hminm] at hm
         have h' := hcol (.go sm) c xm .palF a₀ a₀ ⟨⟨hmax.occIn, hminm⟩, hmax⟩
         rw [hm] at h'
         exact h' rfl

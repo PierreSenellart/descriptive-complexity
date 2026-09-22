@@ -876,14 +876,14 @@ theorem stageG_covBy {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d)
     toLex ((j, toLex fun q => V (vT1 d q)) : Fin (hs d) × Lex (Fin (hm d) → A)) ⋖
       toLex (j', toLex fun q => V (vT2 d q)) := by
   rcases (mem_stagePairs (d := d)).mp hjj with rfl | hcross
-  · rw [stageG, if_pos rfl] at h
+  · rw [stageG, ite_eq_left rfl] at h
     exact prodLex_covBy_iff.mpr (Or.inl ⟨rfl,
       tupSucc_iff_covBy.mp ((realize_succTupF (L := L) _ _).mp h)⟩)
   · have hne : j ≠ j' := by
       intro he
       rw [he] at hcross
       omega
-    rw [stageG, if_neg hne, Formula.realize_inf] at h
+    rw [stageG, ite_eq_right hne, Formula.realize_inf] at h
     refine prodLex_covBy_iff.mpr (Or.inr ⟨finCovBy_iff.mpr hcross, ?_, ?_⟩)
     · exact tup_isTop_iff.mpr ((realize_maxTupF (L := L) _).mp h.1)
     · exact tup_isBot_iff.mpr ((realize_minTupF (L := L) _).mp h.2)
@@ -1271,7 +1271,7 @@ theorem packV_comp_vT1 : (fun q => packV t1 t2 x w1 w2 e sp (vT1 d q)) = t1 := b
   have hq := q.isLt
   have hv : ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_left (by rw [hv]; omega)]
   exact congrArg t1 (Fin.ext (show ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) from hv))
 
 theorem packV_comp_vT2 : (fun q => packV t1 t2 x w1 w2 e sp (vT2 d q)) = t2 := by
@@ -1279,7 +1279,7 @@ theorem packV_comp_vT2 : (fun q => packV t1 t2 x w1 w2 e sp (vT2 d q)) = t2 := b
   have hq := q.isLt
   have hv : ((vT2 d q : Fin (kk d)) : ℕ) = hm d + (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_left (by rw [hv]; omega)]
   exact congrArg t2 (Fin.ext
     (show ((vT2 d q : Fin (kk d)) : ℕ) - hm d = (q : ℕ) from by rw [hv]; omega))
 
@@ -1288,8 +1288,8 @@ theorem packV_comp_vW1 : (fun q => packV t1 t2 x w1 w2 e sp (vW1 d q)) = w1 := b
   have hq := q.isLt
   have hv : ((vW1 d q : Fin (kk d)) : ℕ) = 3 * hm d + (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega), dite_eq_left (by rw [hv]; omega)]
   exact congrArg w1 (Fin.ext
     (show ((vW1 d q : Fin (kk d)) : ℕ) - 3 * hm d = (q : ℕ) from by rw [hv]; omega))
 
@@ -1298,9 +1298,9 @@ theorem packV_comp_vW2 : (fun q => packV t1 t2 x w1 w2 e sp (vW2 d q)) = w2 := b
   have hq := q.isLt
   have hv : ((vW2 d q : Fin (kk d)) : ℕ) = 3 * hm d + d.k + (q : ℕ) := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_left (by rw [hv]; omega)]
   exact congrArg w2 (Fin.ext
     (show ((vW2 d q : Fin (kk d)) : ℕ) - (3 * hm d + d.k) = (q : ℕ) from by
       rw [hv]; omega))
@@ -1311,12 +1311,12 @@ theorem packV_comp_eSel {n : ℕ} [Nonempty A] (hn : n ≤ hX d) {v : Fin n → 
   have hq := q.isLt
   have hv : ((eSel d hn q : Fin (kk d)) : ℕ) = 3 * hm d + 2 * d.k + (q : ℕ) := rfl
   simp only [packV, padF]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega), dite_eq_left (by rw [hv]; omega)]
   have hq2 : (((eSel d hn q : Fin (kk d)) : ℕ) - (3 * hm d + 2 * d.k) : ℕ) < n := by
     rw [hv]; omega
-  rw [dif_pos hq2]
+  rw [dite_eq_left hq2]
   exact congrArg v (Fin.ext
     (show ((eSel d hn q : Fin (kk d)) : ℕ) - (3 * hm d + 2 * d.k) = (q : ℕ) from by
       rw [hv]; omega))
@@ -1324,9 +1324,9 @@ theorem packV_comp_eSel {n : ℕ} [Nonempty A] (hn : n ≤ hX d) {v : Fin n → 
 theorem packV_vS : packV t1 t2 x w1 w2 e sp (vS d) = sp := by
   have hv : ((vS d : Fin (kk d)) : ℕ) = 3 * hm d + 2 * d.k + hX d := rfl
   simp only [packV]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega)]
 
 theorem packV_comp_xa {i : d.B.ι} [Nonempty A] {xt : Fin (d.B.arity i) → A} :
     (fun q => packV t1 t2 (padF xt) w1 w2 e sp (xa d i q)) = xt := by
@@ -1335,11 +1335,11 @@ theorem packV_comp_xa {i : d.B.ι} [Nonempty A] {xt : Fin (d.B.arity i) → A} :
   have hqm : (q : ℕ) < hm d := lt_of_lt_of_le hq (arity_le_blockArityBound d.B i)
   have hv : ((xa d i q : Fin (kk d)) : ℕ) = 2 * hm d + (q : ℕ) := rfl
   simp only [packV, padF]
-  rw [dif_neg (by rw [hv]; omega), dif_neg (by rw [hv]; omega),
-    dif_pos (by rw [hv]; omega)]
+  rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
+    dite_eq_left (by rw [hv]; omega)]
   have hq2 : (((xa d i q : Fin (kk d)) : ℕ) - 2 * hm d : ℕ) < d.B.arity i := by
     rw [hv]; omega
-  rw [dif_pos hq2]
+  rw [dite_eq_left hq2]
   exact congrArg xt (Fin.ext
     (show ((xa d i q : Fin (kk d)) : ℕ) - 2 * hm d = (q : ℕ) from by rw [hv]; omega))
 
@@ -1445,7 +1445,7 @@ theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
       toLex (j', toLex fun q => V (vT2 d q))) :
     (stageG d j j').Realize V := by
   rcases (mem_stagePairs (d := d)).mp hjj with rfl | hcross
-  · rw [stageG, if_pos rfl]
+  · rw [stageG, ite_eq_left rfl]
     rcases prodLex_covBy_iff.mp hcov with ⟨-, htail⟩ | ⟨hjcov, -, -⟩
     · exact (realize_succTupF (L := L) _ _).mpr (tupSucc_iff_covBy.mpr htail)
     · exact absurd hjcov.1 (lt_irrefl _)
@@ -1453,7 +1453,7 @@ theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
       intro he
       rw [he] at hcross
       omega
-    rw [stageG, if_neg hne, Formula.realize_inf]
+    rw [stageG, ite_eq_right hne, Formula.realize_inf]
     rcases prodLex_covBy_iff.mp hcov with ⟨heq, -⟩ | ⟨-, htop, hbot⟩
     · exact absurd heq hne
     · exact ⟨(realize_maxTupF (L := L) _).mpr (tup_isTop_iff.mp htop),

@@ -65,8 +65,8 @@ variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
   classical
   rw [sideF]
   by_cases h : p
-  · rw [if_pos h]; simp [h]
-  · rw [if_neg h]; simp [h]
+  · rw [ite_eq_left h]; simp [h]
+  · rw [ite_eq_right h]; simp [h]
 
 end Side
 
@@ -399,9 +399,9 @@ theorem padTup_iff_eq_pad (h₀ : IsBot a₀) {m D : ℕ} (f : Fin m → Fin D)
   · rintro ⟨hc, he⟩
     funext j
     by_cases hj : (j : ℕ) < m
-    · rw [pad, dif_pos hj]
+    · rw [pad, dite_eq_left hj]
       exact he j hj
-    · rw [pad, dif_neg hj]
+    · rw [pad, dite_eq_right hj]
       exact le_antisymm (hc j (by omega) a₀) (h₀ _)
   · rintro rfl
     exact padTup_pad h₀ f u
@@ -550,22 +550,22 @@ theorem realize_isTargetF {p : MachPh V M} {s : SymTag B}
   classical
   rw [isTargetF, GameProg.isTarget]
   by_cases h : (p.k : ℕ) < (prog.data p.q).natoms
-  · rw [dif_pos h]
+  · rw [dite_eq_left h]
     by_cases hs : s = SymTag.val (p.claims (Fin.castLE (prog.natoms_le p.q) ⟨(p.k : ℕ), h⟩))
         (if ((prog.data p.q).atoms ⟨(p.k : ℕ), h⟩).copy then !p.r else p.r)
         ((prog.data p.q).atoms ⟨(p.k : ℕ), h⟩).var
-    · rw [if_pos hs, realize_eqIxF]
+    · rw [ite_eq_left hs, realize_eqIxF]
       have hargs : (fun l => v (argVar 1 0 (addrIx
           ((prog.data p.q).atoms ⟨(p.k : ℕ), h⟩).var l))) =
           argsOf ((prog.data p.q).atoms ⟨(p.k : ℕ), h⟩).var (addrOf fun j => v (0, j)) :=
         argsOf_addrIx _ (fun j => v (0, j))
       rw [hargs]
       exact ⟨fun he => ⟨h, hs, he⟩, fun he => he.2.2⟩
-    · rw [if_neg hs]
+    · rw [ite_eq_right hs]
       simp only [Formula.realize_bot, false_iff]
       rintro ⟨h', hs', -⟩
       exact hs hs'
-  · rw [dif_neg h]
+  · rw [dite_eq_right h]
     simp only [Formula.realize_bot, false_iff]
     rintro ⟨h', -, -⟩
     exact h h'
@@ -578,7 +578,7 @@ theorem realize_ruleF {tr : TrTag B V M} {v : Fin 1 × Fin (gameDim B V) → A} 
   simp only [Formula.realize_sup, Formula.realize_inf, Formula.realize_not, realize_sideF,
     realize_isTargetF]
   by_cases hc : tr.src.kind = PhKind.conc
-  · rw [if_pos hc, realize_concOkF]
+  · rw [ite_eq_left hc, realize_concOkF]
     constructor
     · rintro ((((((((⟨h1, h2⟩ | h) | h) | h) | h) | h) | h) | h) | h)
       · exact Or.inl ⟨h1.1, h1.2.1, h1.2.2.1, h1.2.2.2, fun _ => h2⟩
@@ -603,7 +603,7 @@ theorem realize_ruleF {tr : TrTag B V M} {v : Fin 1 × Fin (gameDim B V) → A} 
       · exact Or.inl (Or.inl (Or.inr h))
       · exact Or.inl (Or.inr ⟨⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1, h.2.2.2.2.1⟩, h.2.2.2.2.2⟩)
       · exact Or.inr ⟨⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1⟩, h.2.2.2.2⟩
-  · rw [if_neg hc]
+  · rw [ite_eq_right hc]
     simp only [Formula.realize_top, and_true]
     constructor
     · rintro ((((((((h | h) | h) | h) | h) | h) | h) | h) | h)
