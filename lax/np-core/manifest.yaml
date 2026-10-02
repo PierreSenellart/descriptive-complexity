@@ -1,0 +1,28 @@
+specVersion: "1"
+id: "lax-904597"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Descriptive complexity: first-order reductions and the NP core"
+authors:
+- name: "Pierre Senellart"
+  orcid: "0000-0002-7909-5369"
+  github: "PierreSenellart"
+- name: "Claude (Anthropic)"
+bibEntries:
+- |
+  @misc{senellart2026descriptive,
+    author = {Pierre Senellart and Anton Gnatenko},
+    title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+    year = {2026},
+    eprint = {2609.18261},
+    archivePrefix = {arXiv}
+  }
+- |
+  @software{senellart2026descriptivecomplexity,
+    author = {Pierre Senellart},
+    title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+    version = {1.2.2},
+    year = {2026},
+    doi = {10.5281/zenodo.21678423},
+    url = {https://github.com/PierreSenellart/descriptive-complexity}
+  }

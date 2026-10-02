@@ -1,0 +1,131 @@
+# An export of the NP core of the descriptive-complexity library: SAT
+# NP-complete under first-order reductions and in Cook–Levin's machine form.
+# Copy this file into the folder `lax init` made, as export.yaml, and run
+#   lax_export.py export.yaml
+
+library: https://github.com/PierreSenellart/descriptive-complexity   # or a local checkout
+ref: v1.2.2                                       # default: HEAD / the default branch
+prefix: DescriptiveComplexity                     # the library's top-level namespace
+targets:                                          # the library theorems the bridges rest on
+  - DescriptiveComplexity.SAT_NP_complete
+  - DescriptiveComplexity.sat_sigmaSODefinable
+  - DescriptiveComplexity.sat_hard_of_sigmaSODefinable
+  - DescriptiveComplexity.SAT_complete_for_ntmAccept
+  - DescriptiveComplexity.mem_NP_iff_le_ntmAccept
+  - DescriptiveComplexity.agree_of_equiv
+  - DescriptiveComplexity.TMData.Agree.wellFormed
+  - DescriptiveComplexity.TMData.Agree.accepts
+  - DescriptiveComplexity.SigmaSODefinable.of_foReduction
+  - DescriptiveComplexity.SigmaSODefinable.of_orderedReduction
+  - DescriptiveComplexity.sigmaSODefinable_congr
+  - DescriptiveComplexity.CofinalHard.of_foReduction
+  - DescriptiveComplexity.CofinalHard.of_orderedReduction
+  - DescriptiveComplexity.CofinalHard.of_relOrderedReduction
+  - DescriptiveComplexity.CofinalHard.congr
+  - DescriptiveComplexity.cofinalHard_iff
+# options:                  # elaboration options the library's lakefile sets and its code
+#   - maxSynthPendingDepth 3  # needs; this library's build without them, so none are listed
+copyright: 2026 Pierre Senellart
+manifest:                                         # the Lax archive's manifest.yaml, minus the id
+                                                  # `lax init` wrote and the versions the tool fills in
+  title: "Descriptive complexity: first-order reductions and the NP core"
+  authors:
+    - name: Pierre Senellart
+      orcid: "0000-0002-7909-5369"
+      github: PierreSenellart
+    - name: Claude (Anthropic)
+  bibEntries:
+    - |
+      @misc{senellart2026descriptive,
+        author = {Pierre Senellart and Anton Gnatenko},
+        title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+        year = {2026},
+        eprint = {2609.18261},
+        archivePrefix = {arXiv}
+      }
+    - |
+      @software{senellart2026descriptivecomplexity,
+        author = {Pierre Senellart},
+        title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+        version = {1.2.2},
+        year = {2026},
+        doi = {10.5281/zenodo.21678423},
+        url = {https://github.com/PierreSenellart/descriptive-complexity}
+      }
+
+# Library declarations the concept package restates verbatim: the library's
+# copy is dropped and the vendored proofs use the concept's. Concept names
+# are relative to this submission's concept package.
+restated:
+  DescriptiveComplexity.DecisionProblem: Problems.DecisionProblem
+  DescriptiveComplexity.DecisionProblem.instCoeFunForallForallStructureProp: Problems.DecisionProblem.instCoeFun
+  DescriptiveComplexity.FOInterpretation: Interpretations.FOInterpretation
+  DescriptiveComplexity.FOInterpretation.Map: Interpretations.FOInterpretation.Map
+  DescriptiveComplexity.FOInterpretation.mapStructure: Interpretations.FOInterpretation.mapStructure
+  DescriptiveComplexity.FOReduction: Interpretations.FOReduction
+  DescriptiveComplexity.sumOrderStructure: Interpretations.sumOrderStructure
+  DescriptiveComplexity.instOrderedStructureSumOrder_descriptiveComplexity: Interpretations.sumOrderOrderedStructure
+  DescriptiveComplexity.OrderedFOReduction: Interpretations.OrderedFOReduction
+  DescriptiveComplexity.RelFOInterpretation: Relativized.RelFOInterpretation
+  DescriptiveComplexity.RelFOInterpretation.MapRel: Relativized.RelFOInterpretation.MapRel
+  DescriptiveComplexity.RelFOInterpretation.mapRelStructure: Relativized.RelFOInterpretation.mapRelStructure
+  DescriptiveComplexity.RelOrderedFOReduction: Relativized.RelOrderedFOReduction
+  DescriptiveComplexity.SOBlock: SecondOrder.SOBlock
+  DescriptiveComplexity.SOBlock.lang: SecondOrder.SOBlock.lang
+  DescriptiveComplexity.instIsRelationalLang: SecondOrder.instIsRelationalLang
+  DescriptiveComplexity.SOBlock.Assignment: SecondOrder.SOBlock.Assignment
+  DescriptiveComplexity.SOBlock.structure: SecondOrder.SOBlock.structure
+  DescriptiveComplexity.soLang: SecondOrder.soLang
+  DescriptiveComplexity.SORealize: SecondOrder.SORealize
+  DescriptiveComplexity.SigmaSODefinable: SecondOrder.SigmaSODefinable
+  DescriptiveComplexity.PiSODefinable: SecondOrder.PiSODefinable
+  DescriptiveComplexity.CofinalHard: Classes.CofinalHard
+  FirstOrder.Language.satRel: Sat.satRel
+  FirstOrder.Language.instDecidableEqSatRel: Sat.instDecidableEqSatRel
+  FirstOrder.Language.sat: Sat.sat
+  FirstOrder.Language.instIsRelationalSat: Sat.instIsRelationalSat
+  FirstOrder.Language.satIsClause: Sat.satIsClause
+  FirstOrder.Language.satPosIn: Sat.satPosIn
+  FirstOrder.Language.satNegIn: Sat.satNegIn
+  DescriptiveComplexity.Satisfiable: Sat.Satisfiable
+  DescriptiveComplexity.SAT: Sat.SAT
+  DescriptiveComplexity.IsLinOrd: Machines.IsLinOrd
+  DescriptiveComplexity.MinPos: Machines.MinPos
+  DescriptiveComplexity.SuccPos: Machines.SuccPos
+  DescriptiveComplexity.Config: Machines.Config
+  DescriptiveComplexity.TMData: Machines.TMData
+  DescriptiveComplexity.TMData.InitTape: Machines.TMData.InitTape
+  DescriptiveComplexity.TMData.IsInit: Machines.TMData.IsInit
+  DescriptiveComplexity.TMData.Step: Machines.TMData.Step
+  DescriptiveComplexity.TMData.StepsIn: Machines.TMData.StepsIn
+  DescriptiveComplexity.TMData.Accepts: Machines.TMData.Accepts
+  DescriptiveComplexity.TMData.WellFormed: Machines.TMData.WellFormed
+  FirstOrder.Language.turingRel: Machines.turingRel
+  FirstOrder.Language.instDecidableEqTuringRel: Machines.instDecidableEqTuringRel
+  FirstOrder.Language.turing: Machines.turing
+  FirstOrder.Language.instIsRelationalTuring: Machines.instIsRelationalTuring
+  FirstOrder.Language.tmPosn: Machines.tmPosn
+  FirstOrder.Language.tmTr: Machines.tmTr
+  FirstOrder.Language.tmStart: Machines.tmStart
+  FirstOrder.Language.tmAcc: Machines.tmAcc
+  FirstOrder.Language.tmBlank: Machines.tmBlank
+  FirstOrder.Language.tmRight: Machines.tmRight
+  FirstOrder.Language.tmLe: Machines.tmLe
+  FirstOrder.Language.tmSrc: Machines.tmSrc
+  FirstOrder.Language.tmRead: Machines.tmRead
+  FirstOrder.Language.tmDst: Machines.tmDst
+  FirstOrder.Language.tmWrite: Machines.tmWrite
+  FirstOrder.Language.tmInp: Machines.tmInp
+  DescriptiveComplexity.TMPosn: Machines.TMPosn
+  DescriptiveComplexity.TMTr: Machines.TMTr
+  DescriptiveComplexity.TMStart: Machines.TMStart
+  DescriptiveComplexity.TMAcc: Machines.TMAcc
+  DescriptiveComplexity.TMBlank: Machines.TMBlank
+  DescriptiveComplexity.TMRight: Machines.TMRight
+  DescriptiveComplexity.TMLe: Machines.TMLe
+  DescriptiveComplexity.TMSrc: Machines.TMSrc
+  DescriptiveComplexity.TMRead: Machines.TMRead
+  DescriptiveComplexity.TMDst: Machines.TMDst
+  DescriptiveComplexity.TMWrite: Machines.TMWrite
+  DescriptiveComplexity.TMInp: Machines.TMInp
+  DescriptiveComplexity.tmData: Machines.tmData
