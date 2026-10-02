@@ -17,8 +17,9 @@ Dahlhaus, it rewrites the first-order kernel of the defining sentence into
 clauses over the elements of the input structure, with the guessed relations
 as propositional variables.
 
-Since ordered first-order reductions are computable in $\mathrm{AC}^0$, the
-hardness half is stronger than hardness under polynomial-time reductions.
+Since ordered first-order reductions are computable in $\mathrm{AC}^0$ (a
+standard fact, not formalized here), the hardness half is stronger than
+hardness under polynomial-time reductions.
 -/
 
 namespace Lax904597.CookLevin

@@ -6,9 +6,10 @@ import Lax904597.Problems
 title: SAT, propositional satisfiability
 type: definition
 ---
-A CNF formula is a structure over a vocabulary with a unary symbol singling
-out the clauses and two binary symbols recording that a variable occurs
-positively, or negatively, in a clause. It is satisfiable when some
+A CNF instance is a structure over a vocabulary with a unary symbol and
+two binary symbols: the elements the unary symbol marks are the clauses,
+and the binary symbols record that an element occurs positively, or
+negatively, in a clause. It is satisfiable when some
 assignment of truth values to the elements makes every clause contain a true
 literal; elements that are neither clauses nor variables of the formula are
 harmless, since no clause mentions them. SAT is the decision problem of
@@ -81,8 +82,10 @@ def SAT : DecisionProblem sat where
       obtain ⟨x, hx⟩ := hν (e.symm c) ((rel₁ e.symm satIsClause c).mp hc)
       refine ⟨e x, ?_⟩
       exact hx.elim
-        (fun hp => Or.inl ⟨by simpa using (rel₂ e satPosIn (e.symm c) x).mp hp.1, by simpa using hp.2⟩)
-        (fun hn => Or.inr ⟨by simpa using (rel₂ e satNegIn (e.symm c) x).mp hn.1, by simpa using hn.2⟩)
+        (fun hp => Or.inl ⟨by simpa using (rel₂ e satPosIn (e.symm c) x).mp hp.1,
+          by simpa using hp.2⟩)
+        (fun hn => Or.inr ⟨by simpa using (rel₂ e satNegIn (e.symm c) x).mp hn.1,
+          by simpa using hn.2⟩)
     exact ⟨fwd e, fwd e.symm⟩
 
 end Lax904597.Sat

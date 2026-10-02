@@ -8,16 +8,17 @@ title: The Cook–Levin theorem, in its machine form
 type: theorem
 ---
 Machine acceptance – does a nondeterministic Turing machine, given as a
-finite structure, accept its input within as many steps as there are
+finite structure, accept its input in fewer steps than there are
 positions? – is interreducible with SAT, and characterizes NP: a problem is
 existential second-order definable exactly when it has an ordered
 first-order reduction to machine acceptance.
 
-Together with the machine-free Cook–Levin theorem this gives the classical
-statement: SAT is NP-complete for NP read as nondeterministic polynomial
-time, with polynomial time measured by the number of positions of the
-structure – the time bound is unary by construction, and the reduction from a
-machine to a formula is the usual tableau, built here as a first-order
+Together with the machine-free Cook–Levin theorem this gives the statement
+in machine terms: SAT is NP-complete for NP read as nondeterministic
+polynomial time, where the time available to a machine is the number of
+positions of the structure a reduction builds, polynomial in the input –
+the bound is unary by construction – and where the reduction from a machine
+to a formula is the usual tableau, built here as a first-order
 interpretation.
 -/
 

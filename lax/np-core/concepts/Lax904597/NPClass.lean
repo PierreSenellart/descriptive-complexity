@@ -5,17 +5,16 @@ import Lax904597.Classes
 title: NP is a complexity class
 type: theorem
 ---
-What makes the classes built from a membership predicate complexity classes
-in the sense of the library this submission comes from, where closure under
-reductions is part of the definition of a class: membership in NP travels
-backward along first-order and ordered first-order reductions and depends
-only on the finite instances of a problem, and cofinal hardness, for any
-membership predicate, travels forward along first-order, ordered and
-relativized ordered reductions and depends only on finite instances.
+The library this submission comes from makes closure under reductions part
+of the definition of a complexity class; these are the closure facts for
+NP, and for cofinal hardness in general. Membership in NP travels backward
+along first-order and ordered first-order reductions and depends only on
+the finite instances of a problem. Cofinal hardness, for any membership
+predicate, travels forward along first-order, ordered and relativized
+ordered reductions and depends only on finite instances.
 
-Finally, cofinal hardness is the usual notion: over a relational
-vocabulary, $P$ is cofinally hard for a collection exactly when every
-problem of the collection reduces to $P$.
+Finally, cofinal hardness is the usual notion: $P$ is cofinally hard for a
+collection exactly when every problem of the collection reduces to $P$.
 -/
 
 namespace Lax904597.NPClass

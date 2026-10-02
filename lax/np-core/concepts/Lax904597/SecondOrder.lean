@@ -14,7 +14,7 @@ is universal; a decision problem is $\Sigma_k$- or $\Pi_k$-definable when
 such a sentence defines it on nonempty finite structures. No object-level
 second-order syntax is needed: a block is instantiated by an assignment of
 actual relations, which turns it into a structure over the block's own
-vocabulary, and only the first-order kernel is a Lean-level sentence.
+vocabulary, and only the first-order kernel is an object-level sentence.
 
 $\Sigma_1$-definability is existential second-order logic, and by Fagin's
 theorem the $\Sigma_1$-definable problems are exactly NP. This is how NP is

@@ -27,8 +27,9 @@ yes-instances, since a relation symbol is not a linear order by itself.
 Machine acceptance, the decision problem so defined, is the machine side of
 the Cook–Levin theorem. That it is isomorphism-invariant, which makes it a
 decision problem, is the one claim of this module: the proof transports runs
-along the isomorphism and is too long for a concept, so the bundled problem
-takes the invariance proof as a parameter. By proof irrelevance the problem
+along the isomorphism and belongs to the proofs of this submission, so the
+bundled problem takes the invariance proof as a parameter. By proof
+irrelevance the problem
 does not depend on which proof is supplied, and every statement about it is
 made for an arbitrary one.
 -/

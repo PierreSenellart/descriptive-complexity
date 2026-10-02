@@ -20,10 +20,11 @@ A *first-order reduction* from a problem $P$ to a problem $Q$ is such an
 interpretation mapping yes-instances of $P$ exactly to yes-instances of $Q$,
 on every finite nonempty structure. An *ordered* first-order reduction is
 one over the expansion of $L$ by a linear order, correct for every linear
-order put on the input; since $P$ does not depend on the order, this is an
-order-invariant reduction. Both are computable in $\mathrm{AC}^0$ on
-encodings of finite structures, hence in particular polynomial-time
-many-one reductions.
+order put on the input; since $P$ does not depend on the order, neither
+does whether the image is a yes-instance of $Q$, so the reduction is
+order-invariant. Both kinds are computable in $\mathrm{AC}^0$ on encodings
+of finite structures, hence in particular polynomial-time many-one
+reductions; this standard fact is not part of the formalization.
 -/
 
 namespace Lax904597.Interpretations
