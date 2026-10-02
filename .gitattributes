@@ -1,3 +1,9 @@
 # Keep GitHub's "Languages" bar representative of the Lean sources.
 # docbuild/ is the documentation build (theme CSS, footer injection), not code.
 docbuild/** linguist-documentation
+
+# The Lax archive submissions under lax/ are exports of a tagged version of the
+# library (concepts restating its definitions, the sliced proofs vendored in):
+# they are read by the archive at a commit and a path, not from a release
+# archive, so keep them out of the tarballs GitHub and Zenodo build.
+lax/** export-ignore
