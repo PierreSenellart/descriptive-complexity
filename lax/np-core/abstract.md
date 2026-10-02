@@ -15,9 +15,9 @@ machine-based mechanizations prove, SAT complete for the class that
 nondeterministic machine acceptance defines. The library has no model of
 computation: machine acceptance is one more decision problem, whose
 instances are finite structures describing a nondeterministic Turing
-machine, its input and its step budget, and "accepted by a polynomial-time
-machine" means "reduces to that problem by an ordered first-order
-reduction". SAT reduces to machine acceptance, and every problem that
+machine, its input and its step budget, and “accepted by a polynomial-time
+machine” means “reduces to that problem by an ordered first-order
+reduction”. SAT reduces to machine acceptance, and every problem that
 reduces to machine acceptance reduces to SAT.
 
 The proofs are those of version 1.2.2 of the library, sliced to what these
