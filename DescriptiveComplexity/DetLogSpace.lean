@@ -70,8 +70,8 @@ logarithmic space on ordered structures ([Immerman
 1987][immerman1987languages]).
 
 Hardness is stated cofinally, exactly as for the other classes of this library
-(`DescriptiveComplexity.CofinalHard`); over a relational vocabulary it is the usual
-notion, `DescriptiveComplexity.hard_LOGSPACE_iff`. -/
+(`DescriptiveComplexity.CofinalHard`), which is the usual notion,
+`DescriptiveComplexity.hard_LOGSPACE_iff`. -/
 noncomputable def LOGSPACE : ComplexityClass :=
   .ofMem (fun P => DTCDefinable P)
     (fun f h => h.of_foReduction f)
@@ -82,8 +82,8 @@ noncomputable def LOGSPACE : ComplexityClass :=
 theorem mem_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ LOGSPACE ↔ DTCDefinable P :=
   Iff.rfl
 
-/-- Over a relational vocabulary, LOGSPACE-hardness is the usual notion: every
-FO(DTC) definable problem reduces to `P`. -/
+/-- LOGSPACE-hardness is the usual notion: every FO(DTC) definable problem
+reduces to `P`. -/
 theorem hard_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
     LOGSPACE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),

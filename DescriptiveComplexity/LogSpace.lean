@@ -59,8 +59,8 @@ existential second-order logic, which captures nondeterministic logarithmic
 space on ordered structures ([Grädel 1992][gradel1992capturing]).
 
 Hardness is stated cofinally, exactly as for the other classes of this library
-(`DescriptiveComplexity.CofinalHard`); over a relational vocabulary it is the usual
-notion, `DescriptiveComplexity.hard_NL_iff`. -/
+(`DescriptiveComplexity.CofinalHard`), which is the usual notion,
+`DescriptiveComplexity.hard_NL_iff`. -/
 noncomputable def NL : ComplexityClass :=
   .ofMem (fun P => SigmaSOKromDefinable P)
     (fun f h => h.of_foReduction f)
@@ -71,8 +71,8 @@ noncomputable def NL : ComplexityClass :=
 theorem mem_NL_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ NL ↔ SigmaSOKromDefinable P :=
   Iff.rfl
 
-/-- Over a relational vocabulary, NL-hardness is the usual notion: every
-SO-Krom definable problem reduces to `P`. -/
+/-- NL-hardness is the usual notion: every SO-Krom definable problem reduces
+to `P`. -/
 theorem hard_NL_iff [L.IsRelational] (P : DecisionProblem L) :
     NL.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),

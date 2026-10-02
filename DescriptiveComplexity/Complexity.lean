@@ -9,7 +9,7 @@ import DescriptiveComplexity.Relativized
 # Abstract complexity classes, the polynomial hierarchy, and NP-completeness
 
 Complexity classes are introduced *abstractly*: a `ComplexityClass` assigns to
-decision problems (over arbitrary vocabularies) a membership predicate and a
+decision problems (over any relational vocabulary) a membership predicate and a
 hardness predicate, and is required to be closed under (ordered) first-order
 reductions – membership downward (`P ≤ᶠᵒ Q` and `Q ∈ 𝒞` give `P ∈ 𝒞`),
 hardness upward (`P ≤ᶠᵒ Q` and `P` `𝒞`-hard give `Q` `𝒞`-hard). Since FO
@@ -46,11 +46,10 @@ open Language
 abstract; the closure requirements are sound for every class containing
 LOGSPACE, since (ordered) FO reductions are computable in AC⁰.
 
-Hardness is a field of its own rather than a function of `Mem`: the naive
-“every member reduces to `P`” cannot even be stated here, since a reduction
-has a *relational* target while `Hard` ranges over arbitrary vocabularies. The
-classes of this library take it to be cofinal hardness for their own members
-and are built by `DescriptiveComplexity.ComplexityClass.ofMem`, which supplies both
+Hardness is a field of its own rather than a function of `Mem`. The classes of
+this library take it to be cofinal hardness for their own members – equivalent
+to “every member reduces to `P`” (`DescriptiveComplexity.cofinalHard_iff`) – and
+are built by `DescriptiveComplexity.ComplexityClass.ofMem`, which supplies both
 that reading of `Hard` and the three closure proofs it needs; keeping the field
 abstract leaves room for the two that read hardness differently
 (`DescriptiveComplexity.ComplexityClass.empty`, `DescriptiveComplexity.PH`). -/

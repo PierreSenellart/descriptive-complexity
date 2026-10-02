@@ -266,8 +266,8 @@ def CofinalHardLFP (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], Deci
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         Mem Q → Nonempty (Q ≤ˡᶠᵖ S)
 
-/-- **Over a relational vocabulary, hardness under FO(LFP) reductions is the
-usual notion**: every problem of the collection reduces to `P` itself. -/
+/-- **Hardness under FO(LFP) reductions is the usual notion**: every problem of
+the collection reduces to `P` itself. -/
 theorem cofinalHardLFP_iff
     (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) :

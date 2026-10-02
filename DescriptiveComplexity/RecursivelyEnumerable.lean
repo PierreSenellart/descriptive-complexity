@@ -90,8 +90,8 @@ theorem mem_RE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ RE ↔ Sigma
 theorem mem_coRE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ coRE ↔ SigmaSONewDefinable Pᶜ :=
   Iff.rfl
 
-/-- Over a relational vocabulary, cofinal RE-hardness is the usual notion:
-every `∃SO[new]`-definable problem reduces to `P`. -/
+/-- Cofinal RE-hardness is the usual notion: every `∃SO[new]`-definable
+problem reduces to `P`. -/
 theorem hard_RE_iff [L.IsRelational] (P : DecisionProblem L) :
     RE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),

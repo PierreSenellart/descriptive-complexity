@@ -66,8 +66,8 @@ polynomial space on ordered structures ([Immerman
 1999][immerman1999descriptive]).
 
 Hardness is stated cofinally, exactly as for the other classes of this library
-(`DescriptiveComplexity.CofinalHard`); over a relational vocabulary it is the usual
-notion, `DescriptiveComplexity.hard_PSPACE_iff`. -/
+(`DescriptiveComplexity.CofinalHard`), which is the usual notion,
+`DescriptiveComplexity.hard_PSPACE_iff`. -/
 noncomputable def PSPACE : ComplexityClass :=
   .ofMem (fun P => SOTCDefinable P)
     (fun f h => h.of_foReduction f)
@@ -78,8 +78,8 @@ noncomputable def PSPACE : ComplexityClass :=
 theorem mem_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ PSPACE ↔ SOTCDefinable P :=
   Iff.rfl
 
-/-- Over a relational vocabulary, PSPACE-hardness is the usual notion: every
-SO(TC) definable problem reduces to `P`. -/
+/-- PSPACE-hardness is the usual notion: every SO(TC) definable problem
+reduces to `P`. -/
 theorem hard_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
     PSPACE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),

@@ -23,13 +23,12 @@ theorems of `DescriptiveComplexity.SecondOrderPull` and
 `DescriptiveComplexity.SecondOrderOrdered`.
 
 Hardness is defined *cofinally*: `P` is hard when every problem of the class
-reduces (by an ordered FO reduction) to every relational problem that `P`
-itself reduces to. For a problem over a relational vocabulary this is
-equivalent to the usual “everything in the class reduces to `P`”
+reduces (by an ordered FO reduction) to every problem that `P` itself reduces
+to. This is equivalent to the usual “everything in the class reduces to `P`”
 (`DescriptiveComplexity.cofinalHard_iff`, with per-class specializations
 `DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff` and
 `DescriptiveComplexity.hard_PTIME_iff`), and the formulation makes hardness travel
-forward along reductions even through non-relational vocabularies.
+forward along reductions by composition alone.
 
 Level 0 is `DescriptiveComplexity.PTIME`, polynomial time, *defined* here as
 definability in the Horn fragment SO-Horn of existential second-order logic
@@ -110,10 +109,9 @@ def OrderedFOReduction.congrSource {L' : Language.{0, 0}} [L'.IsRelational]
 /-! ### Cofinal hardness -/
 
 /-- Hardness for a collection of problems, cofinally: every problem of the
-collection reduces to every relational problem that `P` reduces to. For `P`
-over a relational vocabulary this is the usual notion (see
-`DescriptiveComplexity.hard_sigmaP_succ_iff`); this formulation is closed under
-reductions out of arbitrary vocabularies. -/
+collection reduces to every problem that `P` reduces to. This is the usual
+notion (see `DescriptiveComplexity.cofinalHard_iff`), in a formulation closed
+under reductions by composition alone. -/
 def CofinalHard (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) : Prop :=
   ∀ {L' : Language.{0, 0}} [L'.IsRelational] (S : DecisionProblem L'),
@@ -153,8 +151,8 @@ theorem CofinalHard.congr
   intro L' _ S hS L'' _ R hR
   exact hP S (hS.map fun g => g.congrSource fun A _ _ => (h A).symm) R hR
 
-/-- **Over a relational vocabulary, cofinal hardness is the usual notion**:
-every problem of the collection reduces to `P` itself. This holds whatever the
+/-- **Cofinal hardness is the usual notion**: every problem of the collection
+reduces to `P` itself. This holds whatever the
 collection is – the proof only uses reflexivity and transitivity of reductions
 – so the specializations to the individual classes below
 (`DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff`,
@@ -348,26 +346,26 @@ theorem compl_mem_coNP_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionP
     Pᶜ ∈ coNP ↔ P ∈ NP := by
   rw [mem_piP_iff, DecisionProblem.compl_compl]
 
-/-! ### Hardness over relational vocabularies -/
+/-! ### Hardness, class by class -/
 
-/-- Over a relational vocabulary, cofinal `Σₖ₊₁ᵖ`-hardness is the usual
-notion: every `Σₖ₊₁`-definable problem reduces to `P`. -/
+/-- Cofinal `Σₖ₊₁ᵖ`-hardness is the usual notion: every `Σₖ₊₁`-definable
+problem reduces to `P`. -/
 theorem hard_sigmaP_succ_iff (k : ℕ) (P : DecisionProblem L) :
     (SigmaP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
-/-- Over a relational vocabulary, cofinal `Πₖ₊₁ᵖ`-hardness is the usual
-notion: every `Πₖ₊₁`-definable problem reduces to `P`. -/
+/-- Cofinal `Πₖ₊₁ᵖ`-hardness is the usual notion: every `Πₖ₊₁`-definable
+problem reduces to `P`. -/
 theorem hard_piP_succ_iff (k : ℕ) (P : DecisionProblem L) :
     (PiP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         PiSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
-/-- Over a relational vocabulary, cofinal PTIME-hardness is the usual notion:
-every SO-Horn definable problem reduces to `P`. -/
+/-- Cofinal PTIME-hardness is the usual notion: every SO-Horn definable
+problem reduces to `P`. -/
 theorem hard_PTIME_iff (P : DecisionProblem L) :
     PTIME.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),

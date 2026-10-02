@@ -412,8 +412,8 @@ of the hierarchy from both sides. -/
 theorem DP_subset_piP_two : DP ⊆ PiP 2 :=
   fun _ _ _ hP => DPDefinable.piSODefinable_two ((mem_DP_iff _).mp hP)
 
-/-- Over a relational vocabulary, DP-hardness is the usual notion: every
-DP-definable problem reduces to `P`. -/
+/-- DP-hardness is the usual notion: every DP-definable problem reduces to
+`P`. -/
 theorem hard_DP_iff (P : DecisionProblem L) :
     DP.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
