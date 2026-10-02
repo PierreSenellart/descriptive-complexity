@@ -6,8 +6,8 @@ title: Decision problems on finite structures
 type: definition
 ---
 A decision problem over a relational vocabulary $L$ is an
-isomorphism-invariant property of $L$-structures: for each universe `A`
-carrying an $L$-structure, whether `A` is a yes-instance, with the
+isomorphism-invariant property of $L$-structures: for each universe $A$
+carrying an $L$-structure, whether $A$ is a yes-instance, with the
 requirement that isomorphic structures are both yes-instances or both
 no-instances. Invariance is part of the notion, as in finite model theory: a
 problem cannot tell apart two presentations of the same structure.

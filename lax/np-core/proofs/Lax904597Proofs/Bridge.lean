@@ -113,7 +113,7 @@ theorem NP_mem_of_orderedReduction {L L' : Language.{0, 0}} [L.IsRelational] [L'
 ---
 conclusion: Lax904597.NPClass.NP_mem_congr_finite
 ---
-A `Σ₁` definition only speaks about finite structures.
+A $\Sigma_1$ definition only speaks about finite structures.
 -/
 theorem NP_mem_congr_finite {L : Language.{0, 0}} [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) : NP.Mem P ↔ NP.Mem Q :=
@@ -124,7 +124,7 @@ theorem NP_mem_congr_finite {L : Language.{0, 0}} [L.IsRelational] {P Q : Decisi
 conclusion: Lax904597.NPClass.cofinalHard_of_foReduction
 ---
 A first-order reduction composes, as an ordered relativized one, with the
-reductions out of `Q`.
+reductions out of $Q$.
 -/
 theorem cofinalHard_of_foReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
@@ -138,7 +138,7 @@ theorem cofinalHard_of_foReduction
 conclusion: Lax904597.NPClass.cofinalHard_of_orderedReduction
 ---
 An ordered first-order reduction composes, relativized, with the reductions
-out of `Q`.
+out of $Q$.
 -/
 theorem cofinalHard_of_orderedReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
@@ -177,7 +177,7 @@ theorem cofinalHard_congr
 ---
 conclusion: Lax904597.NPClass.cofinalHard_iff
 ---
-Over a relational vocabulary `P` reduces to itself, so cofinal hardness is
+Over a relational vocabulary $P$ reduces to itself, so cofinal hardness is
 the usual one.
 -/
 theorem cofinalHard_iff {L : Language.{0, 0}} [L.IsRelational]

@@ -14,8 +14,8 @@ membership predicate, travels forward along first-order, ordered and
 relativized ordered reductions and depends only on finite instances.
 
 Finally, cofinal hardness is the usual notion: over a relational
-vocabulary, `P` is cofinally hard for a collection exactly when every
-problem of the collection reduces to `P`.
+vocabulary, $P$ is cofinally hard for a collection exactly when every
+problem of the collection reduces to $P$.
 -/
 
 namespace Lax904597.NPClass

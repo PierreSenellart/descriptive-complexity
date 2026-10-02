@@ -14,8 +14,8 @@ classes of this development are built from their membership predicate
 alone, with hardness read *cofinally*: a problem $P$ is hard when every
 member of the class reduces, by a relativized ordered first-order reduction,
 to every problem that $P$ itself reduces to. Over a relational vocabulary
-this is the usual "every member reduces to $P$" (a statement of
-`Lax904597.NPClass`), and the cofinal form makes hardness travel forward
+this is the usual "every member reduces to $P$" (stated in *NP is a
+complexity class*), and the cofinal form makes hardness travel forward
 along reductions through non-relational vocabularies. A problem is
 complete for a class when it belongs to it and is hard for it.
 
@@ -24,7 +24,7 @@ Fagin's theorem; more generally the level $\Sigma_{k+1}$ of the polynomial
 hierarchy has the $\Sigma_{k+1}$-definable problems as members. That these
 are closed under first-order reductions, which is what makes them
 complexity classes in the sense of the library this submission comes from,
-is stated separately, in `Lax904597.NPClass`.
+is stated separately, in *NP is a complexity class*.
 -/
 
 namespace Lax904597.Classes
