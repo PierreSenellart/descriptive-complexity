@@ -77,7 +77,9 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 
 /-! ### Congruence of definability in the problem -/
 
-/-- `Σₖ`-definability only depends on the finite instances of a problem. -/
+/-- `Σₖ`-definability only depends on the finite instances of a problem.
+Registered in the Lax archive (for `NP`) as
+[`Lax904597.NPClass.NP_mem_congr_finite`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.NP_mem_congr_finite). -/
 theorem sigmaSODefinable_congr {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) (k : ℕ) :
     SigmaSODefinable k P ↔ SigmaSODefinable k Q := by
@@ -119,6 +121,9 @@ def CofinalHard (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], Decisio
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         Mem Q → Nonempty (Q ≤ʳᶠᵒ[≤] S)
 
+/-- Cofinal hardness travels forward along first-order reductions.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_of_foReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_of_foReduction). -/
 theorem CofinalHard.of_foReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
@@ -127,6 +132,9 @@ theorem CofinalHard.of_foReduction
   intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.toOrdered.toRel.trans g) R hR
 
+/-- Cofinal hardness travels forward along ordered first-order reductions.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_of_orderedReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_of_orderedReduction). -/
 theorem CofinalHard.of_orderedReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
@@ -135,6 +143,10 @@ theorem CofinalHard.of_orderedReduction
   intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.toRel.trans g) R hR
 
+/-- Cofinal hardness travels forward along relativized ordered first-order
+reductions.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_of_relOrderedReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_of_relOrderedReduction). -/
 theorem CofinalHard.of_relOrderedReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
@@ -143,6 +155,9 @@ theorem CofinalHard.of_relOrderedReduction
   intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.trans g) R hR
 
+/-- Cofinal hardness only depends on the finite instances of a problem.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_congr`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_congr). -/
 theorem CofinalHard.congr
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ : Language.{0, 0}} [L₁.IsRelational] {P P' : DecisionProblem L₁}
@@ -160,7 +175,9 @@ collection is – the proof only uses reflexivity and transitivity of reductions
 
 The left-to-right direction is what a *user* of a hardness result needs, to
 extract an actual reduction; it is where relationality of `P` is used, to
-instantiate the cofinal quantifier at `P` itself. -/
+instantiate the cofinal quantifier at `P` itself.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_iff`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_iff). -/
 theorem cofinalHard_iff
     (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) :

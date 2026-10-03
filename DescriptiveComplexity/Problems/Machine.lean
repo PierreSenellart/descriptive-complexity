@@ -84,7 +84,9 @@ theorem ntmAccept_NP_complete : NP.Complete NTMAccept :=
 /-- **The machine characterization of NP**: a problem is `Σ₁`-definable exactly
 when it ordered-FO-reduces to machine acceptance. Forward through SAT – the
 generic Tseitin discharge followed by the machine of a CNF formula – and
-backward because membership travels along reductions. -/
+backward because membership travels along reductions.
+Registered in the Lax archive as
+[`Lax904597.MachineForm.mem_NP_iff_le_ntmAccept`](https://laxarchive.org/lax-904597/Lax904597.MachineForm.html#s-Lax904597.MachineForm.mem_NP_iff_le_ntmAccept). -/
 theorem mem_NP_iff_le_ntmAccept {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ NP ↔ Nonempty (P ≤ᶠᵒ[≤] NTMAccept) := by
   constructor
@@ -122,7 +124,9 @@ nothing here is definitional about the logically defined
 machine defines. The extra content over the interreducible form is exactly the
 cofinal quantifier: `DescriptiveComplexity.mem_NP_iff_le_ntmAccept` turns an
 arbitrary problem accepted by a machine into a `Σ₁` definition, which the
-generic discharge then sends to `DescriptiveComplexity.SAT`. -/
+generic discharge then sends to `DescriptiveComplexity.SAT`.
+Registered in the Lax archive as
+[`Lax904597.MachineForm.SAT_complete_for_ntmAccept`](https://laxarchive.org/lax-904597/Lax904597.MachineForm.html#s-Lax904597.MachineForm.SAT_complete_for_ntmAccept). -/
 theorem SAT_complete_for_ntmAccept :
     Nonempty (SAT ≤ᶠᵒ[≤] NTMAccept) ∧
       ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),

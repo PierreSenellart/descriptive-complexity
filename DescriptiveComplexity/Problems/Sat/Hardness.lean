@@ -337,7 +337,9 @@ end Interp
 /-- The hardness half of the Cook–Levin theorem: every
 existential-second-order definable problem admits an ordered first-order
 reduction to SAT. Machine-free NP-hardness in the style of Dahlhaus, by the
-generic Tseitin reduction `DescriptiveComplexity.tseitinReduction`. -/
+generic Tseitin reduction `DescriptiveComplexity.tseitinReduction`.
+Registered in the Lax archive as
+[`Lax904597.CookLevin.sat_hard_of_sigmaSODefinable`](https://laxarchive.org/lax-904597/Lax904597.CookLevin.html#s-Lax904597.CookLevin.sat_hard_of_sigmaSODefinable). -/
 theorem sat_hard_of_sigmaSODefinable :
     ∀ {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionProblem L),
       SigmaSODefinable 1 Q → Nonempty (Q ≤ᶠᵒ[≤] SAT) := by
@@ -351,7 +353,9 @@ theorem sat_hard_of_sigmaSODefinable :
 
 /-- **The Cook–Levin theorem**: SAT is NP-complete. Membership is
 `DescriptiveComplexity.sat_sigmaSODefinable`; hardness is
-`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`, the generic Tseitin reduction. -/
+`DescriptiveComplexity.sat_hard_of_sigmaSODefinable`, the generic Tseitin reduction.
+Registered in the Lax archive as
+[`Lax904597.CookLevin.SAT_NP_complete`](https://laxarchive.org/lax-904597/Lax904597.CookLevin.html#s-Lax904597.CookLevin.SAT_NP_complete). -/
 theorem SAT_NP_complete : NP.Complete SAT :=
   ⟨sat_sigmaSODefinable,
     (hard_sigmaP_succ_iff 0 SAT).mpr fun Q hQ =>

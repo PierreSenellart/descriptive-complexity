@@ -180,7 +180,9 @@ theorem realize_satKernel {A : Type} [Language.sat.Structure A]
 
 /-- **SAT is `Σ₁`-definable**: satisfiability of a CNF structure is expressed
 by existentially quantifying a truth assignment and checking, in first-order
-logic, that every clause contains a true literal. -/
+logic, that every clause contains a true literal.
+Registered in the Lax archive as
+[`Lax904597.CookLevin.sat_sigmaSODefinable`](https://laxarchive.org/lax-904597/Lax904597.CookLevin.html#s-Lax904597.CookLevin.sat_sigmaSODefinable). -/
 theorem sat_sigmaSODefinable : SigmaSODefinable 1 SAT := by
   refine ⟨[satAssignBlock], rfl, satKernel, ?_⟩
   intro A _ _ _

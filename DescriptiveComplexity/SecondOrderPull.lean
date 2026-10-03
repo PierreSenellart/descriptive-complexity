@@ -292,7 +292,9 @@ section Closure
 variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 variable {k : ℕ}
 
-/-- `Σₖ`-definability is closed under first-order reductions. -/
+/-- `Σₖ`-definability is closed under first-order reductions.
+Registered in the Lax archive (for `NP`) as
+[`Lax904597.NPClass.NP_mem_of_foReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.NP_mem_of_foReduction). -/
 theorem SigmaSODefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : SigmaSODefinable k Q) :
     SigmaSODefinable k P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h
