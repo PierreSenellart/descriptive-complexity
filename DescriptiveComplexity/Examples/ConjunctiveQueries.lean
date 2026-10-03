@@ -482,7 +482,9 @@ private theorem concreteVal_eq [Nonempty C] {h : V ⊕ C → V ⊕ C} {x : V} {c
 
 /-- **The encoding is faithful**: the abstract semantics `QueryHolds` of the
 encoded structure agrees with the textbook semantics of the concrete query
-on the concrete database. -/
+on the concrete database.
+Registered in the Lax archive as
+[`Lax420092.EncodingFaithful.concreteQueryHolds_iff_queryHolds`](https://laxarchive.org/lax-420092/Lax420092.EncodingFaithful.html#s-Lax420092.EncodingFaithful.concreteQueryHolds_iff_queryHolds). -/
 theorem concreteQueryHolds_iff_queryHolds [Nonempty C]
     (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
     ConcreteQueryHolds q D ↔ @QueryHolds (V ⊕ C) (queryDbStructure q D) := by
@@ -553,7 +555,9 @@ private theorem queryHolds_congr {A : Type} (S T : Language.queryDb.Structure A)
 /-- **The packaged encoding is faithful**: the abstract problem `CQEval`
 computes the textbook semantics on every encoded instance. This is obligation
 (1) of step 1, proved against the bundled encoding – whose construction
-already discharged obligation (2). -/
+already discharged obligation (2).
+Registered in the Lax archive as
+[`Lax420092.EncodingFaithful.cqEncoding_faithful`](https://laxarchive.org/lax-420092/Lax420092.EncodingFaithful.html#s-Lax420092.EncodingFaithful.cqEncoding_faithful). -/
 theorem cqEncoding_faithful : cqEncoding.Faithful ConcreteCQHolds CQEval := by
   rintro ⟨n, m, q, D⟩
   have hconc : ConcreteCQHolds ⟨n, m, q, D⟩ ↔ ConcreteQueryHolds q.toList D.toList := by
@@ -1180,7 +1184,8 @@ theorem cqEval_NP_hard : NP.Hard CQEval :=
   NP.hard_of_foReduction threeCol_fo_reduction_cqEval threeCol_NP_hard
 
 /-- **BCQ evaluation (combined complexity) is NP-complete** (Chandra–Merlin).
--/
+Registered in the Lax archive as
+[`Lax420092.EvaluationNPComplete.cqEval_NP_complete`](https://laxarchive.org/lax-420092/Lax420092.EvaluationNPComplete.html#s-Lax420092.EvaluationNPComplete.cqEval_NP_complete). -/
 theorem cqEval_NP_complete : NP.Complete CQEval :=
   ⟨cqEval_mem_NP, cqEval_NP_hard⟩
 
@@ -1197,7 +1202,9 @@ the well-formed instances of step 6. Both halves are one-line upgrades of the
 plain completeness proof – the same reduction with its image lemma
 (`FOReduction.withInvariant`), the same kernel with the sentence conjoined
 (`SigmaSODefinable.inf_ofSentence`) – the pattern for reading hardness on
-non-junk instances (`DescriptiveComplexity/Decoding.lean`). -/
+non-junk instances (`DescriptiveComplexity/Decoding.lean`).
+Registered in the Lax archive as
+[`Lax420092.DecodingAndWellFormed.wfCQEval_NP_complete`](https://laxarchive.org/lax-420092/Lax420092.DecodingAndWellFormed.html#s-Lax420092.DecodingAndWellFormed.wfCQEval_NP_complete). -/
 theorem cqEvalWF_NP_complete :
     NP.Complete (DecisionProblem.ofSentence cqWFSentence ⊓ CQEval) :=
   ⟨cqEval_sigmaSODefinable.inf_ofSentence cqWFSentence,
@@ -1294,7 +1301,9 @@ i.e., a map of the universe to itself, fixing the constants, that sends every
 right atom to a left atom. The forward direction instantiates containment at
 the canonical database (which satisfies the left query via the identity
 valuation); the backward direction composes the homomorphism with any
-satisfying valuation. -/
+satisfying valuation.
+Registered in the Lax archive as
+[`Lax420092.ChandraMerlin.queryContained_iff_hom`](https://laxarchive.org/lax-420092/Lax420092.ChandraMerlin.html#s-Lax420092.ChandraMerlin.queryContained_iff_hom). -/
 theorem queryContained_iff_hom (A : Type) [Language.queryPair.Structure A] :
     QueryContained A ↔ CQHom (PairVar (A := A)) (RAtom (A := A)) (LAtom (A := A)) := by
   constructor
@@ -1663,7 +1672,9 @@ to it. -/
 theorem cqContainment_NP_hard : NP.Hard CQContainment :=
   NP.hard_of_foReduction cqEval_fo_reduction_cqContainment cqEval_NP_hard
 
-/-- **BCQ containment is NP-complete** (Chandra–Merlin). -/
+/-- **BCQ containment is NP-complete** (Chandra–Merlin).
+Registered in the Lax archive as
+[`Lax420092.ContainmentNPComplete.cqContainment_NP_complete`](https://laxarchive.org/lax-420092/Lax420092.ContainmentNPComplete.html#s-Lax420092.ContainmentNPComplete.cqContainment_NP_complete). -/
 theorem cqContainment_NP_complete : NP.Complete CQContainment :=
   ⟨cqContainment_mem_NP, cqContainment_NP_hard⟩
 
