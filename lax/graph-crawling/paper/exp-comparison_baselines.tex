@@ -1,0 +1,173 @@
+\subsection{Comparison with Baselines}\label{subsubsection:main_result}
+
+\begin{toappendix}
+  \subsection{Comparison with Baselines}
+
+In the experiments, we apply filters on MIME types and URL
+extensions to avoid downloading multimedia content. The MIME types in the
+blocklist are those for multimedia content, namely \texttt{image/*},
+\texttt{audio/*}, and \texttt{video/*}. The associated URL extensions are
+the following:
+
+{\small\ttfamily
+\begin{multicols}{12}
+\noindent
+\input{extensions}
+\end{multicols}}
+
+Note that URL extension filters are not useful on all websites (on some,
+URLs don't usually include any extension, see the discussion at the
+beginning of Section~\ref{subsection:url_classifier}).
+\end{toappendix}
+
+\begin{figure*}
+	\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+    \renewcommand{\thesubfigure}{\arabic{subfigure}}
+	\begin{subfigure}[t]{\textwidth}
+		\includegraphics[width=\linewidth]{plots/oracle_vs_classifier/legend.pdf}
+	\end{subfigure}
+	\foreach \i [count=\n from 1] in \websitesSinglePage {
+		\begin{subfigure}[t]{0.47\textwidth}
+			\includegraphics[width=\linewidth]{plots/oracle_vs_classifier/\i.pdf}
+
+			\vspace{-1em}
+			\caption{\getfullname{\n}}
+		\end{subfigure}
+		\qquad
+	}
+
+	\vspace{-.75em}
+  \caption{Comparison of different crawler performance for 10
+    selected websites presented in
+Table~\ref{tab:websites_characteristics}; for {\small TRES}, experiments
+are only shown for fully-crawled websites. {\small SB-CLASSIFIER} is the proposed approach.}
+	\label{fig:10_sites_plots}
+\end{figure*}
+
+
+\begin{table*}
+	\centering
+	\caption{Percentage of requests that each crawler performs to retrieve 90\% of the targets, for websites in Table~\ref{tab:websites_characteristics}. Below double horizontal rule, percentage of saved requests and percentage of lost targets due to early-stopping mechanism (see Sec.~\ref{sec:early_stopping}).}
+
+	\setlength{\tabcolsep}{3pt}
+	\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}r*{18}{c}}
+		\toprule
+		\bfseries \diagbox{\scriptsize Crawler}{\scriptsize Website}         & {\emph{ab}}     & {\emph{as}}     & {\emph{be}}     & {\emph{ce}}     & {\emph{cl}}     & {\emph{cn}}     & {\emph{ed}}     & {\emph{il}}     & {\emph{in}}     & {\emph{is}}     & {\emph{jp}}     & {\emph{ju}}     & {\emph{nc}}     & {\emph{oe}}     & {\emph{ok}}     & {\emph{qa}}     & {\emph{wh}}     & {\emph{wo}}     \\
+		\midrule
+		\textsf{\small SB-ORACLE} & {NA}            & {NA}            & {72.6}          & {NA}            & {70.7}          & {70.3}          & {48.0}          & {NA}            & {12.8}          & {73.8}          & {NA}            & {34.1}          & {50.8}         & {55.8}          & {13.8}          & {47.3}          & {NA}            & {NA}            \\
+		\textsf{\small SB-CLASS.} & {\textbf{31.2}} & {\textbf{35.1}} & {\textbf{75.7}} & {\textbf{23.5}} & {74.4} & {\textbf{70.9}} & {\textbf{51.5}} & {\textbf{14.2}} & {\textbf{11.9}} & {\textbf{76.0}} & {\textbf{37.7}} & {\textbf{35.8}} & {\textbf{51.6}} & {\textbf{59.2}} & {\textbf{15.5}} & {\textbf{57.7}} & {\textbf{19.7}} & {\textbf{18.6}} \\
+		\midrule
+		\textsf{\small FOCUSED}   & {68.2}          & {$+\infty$}     & {87.8}          & {36.0}          & {88.9}          & {82.7}          & {86.7}          & {$+\infty$}     & {62.8}          & {86.9}          & {42.0}         & {91.1}          & {92.8}          & {84.9}          & {51.8}          & {71.0}          & {$+\infty$}     & {$+\infty$}     \\
+		\textsf{\small TP-OFF}    & {96.4}          & {50.3}          & {86.2}          & {34.7}          & {81.8}          & {88.2}          & {95.6}          & {$+\infty$}     & {99.7}          & {88.0}          & {$+\infty$}     & {74.4}          & {93.0}          & {88.7}          & {76.2}          & {88.6}          & {$+\infty$}     & {$+\infty$}     \\
+		\textsf{\small BFS}       & {97.4}          & {90.8}          & {89.1}          & {73.5}          & {87.5}         & {80.0}          & {94.6}          & {33.2}          & {99.3}          & {92.7}          & {45.2}          & {80.8}          & {81.8}         & {96.5}          & {66.8}          & {70.6}          & {79.0}          & {92.0}          \\
+		\textsf{\small DFS}       & {83.7}          & {$+\infty$}     & {85.2}          & {74.9}          & {\textbf{70.6}} & {84.6}          & {90.5}          & {$+\infty$}     & {99.7}          & {87.7}          & {45.6}          & {80.2}          & {93.7}          & {88.7}          & {80.5}          & {74.4}          & {$+\infty$}     & {$+\infty$}     \\
+		\textsf{\small RANDOM}    & {$+\infty$}     & {98.2}          & {92.4}          & {44.5}          & {89.2}          & {85.1}          & {95.0}          & {$+\infty$}     & {99.0}          & {92.7}          & {$+\infty$}     & {83.2}          & {87.9}          & {96.8}          & {85.0}          & {77.8}          & {71.0}          & {$+\infty$}     \\
+		\midrule
+    \addlinespace[-0.2ex]
+		\midrule
+		{Saved req.} & {34.4} & {\00.0} & {\00.0} & {\00.0} & {\00.0} & {\00.0} & {27.4} & {\00.0} & {82.6} & {\02.2} & {39.0} & {18.8} & {20.4} & {\00.0} & {73.1} & {\00.0} & {\00.0} & {\00.0} \\
+		{Lost targets} & {13.5} & {\00.0} & {\00.0} & {\00.0} & {\00.0} & {\00.0} & {\00.1} & {\00.0} & {\00.0} & {\00.0} & {\02.5} & {\00.4} & {\00.1} & {\00.0} & {\02.0} & {\00.0} & {\00.0} & {\00.0} \\
+		\bottomrule
+	\end{tabular*}
+	\label{tab:all_crawlers_all_sites_nb_requests}
+\end{table*}
+
+\begin{toappendix}
+  \bigskip
+
+	\def\websitesAppendix{{ab}, {as}, {be}, {cn}, {is}, {jp}, {oe}, {qa}}
+
+	\begin{figure*}[b]
+	\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+    \renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/oracle_vs_classifier/legend.pdf}
+		\end{subfigure}
+		\foreach \short in \websitesAppendix {
+			\begin{subfigure}[t]{0.47\textwidth}
+				\includegraphics[width=\linewidth]{plots/oracle_vs_classifier/\short.pdf}
+
+				\vspace{-1em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\qquad
+		}
+
+		\caption{Comparison of different crawler performance for the 8 websites not presented in Figure~\ref{fig:10_sites_plots} due to space reasons;
+for {\small TRES}, experiments
+are only shown for fully-crawled websites}
+		\label{fig:8_last_sites_plots}
+	\end{figure*}
+	Figure~\ref{fig:8_last_sites_plots} completes
+  Figure~\ref{fig:10_sites_plots} with the eight remaining websites plots
+  that could not fit in the paper (see
+  Table~\ref{tab:websites_characteristics} for characteristics of
+  websites). Figures~\ref{fig:hyper_param_alpha_1} to \ref{fig:hyper_param_similarity_threshold_2} present exhaustive graphical results of the hyper-parameters studies conducted on the 11 fully-crawled websites. Especially, Figures~\ref{fig:hyper_param_alpha_1} and \ref{fig:hyper_param_alpha_2} study the exploration--exploitation coefficient $\alpha$, Figures~\ref{fig:hyper_param_n_grams_1} and \ref{fig:hyper_param_n_grams_2} study the choice of $n$ in $n$-grams used in tag paths vector representation, and  Figures~\ref{fig:hyper_param_similarity_threshold_1} and \ref{fig:hyper_param_similarity_threshold_2} study the similarity threshold $\theta$.
+\end{toappendix}
+
+\begin{table*}
+	\centering
+	\caption{Fraction of non-target volume each crawler retrieves before reaching 90\% of total target volume, for websites in Table~\ref{tab:websites_characteristics}}.
+
+	\setlength{\tabcolsep}{3pt}
+	\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}r*{18}{c}}
+		\toprule
+		\bfseries  \diagbox{\scriptsize Crawler}{\scriptsize Website}         & {\emph{ab}}    & {\emph{as}}     & {\emph{be}}     & {\emph{ce}}     & {\emph{cl}}     & {\emph{cn}}     & {\emph{ed}}     & {\emph{il}}      & {\emph{in}}     & {\emph{is}}     & {\emph{jp}}     & {\emph{ju}}     & {\emph{nc}}     & {\emph{oe}}     & {\emph{ok}}     & {\emph{qa}}     & {\emph{wh}}     & {\emph{wo}}     \\
+		\midrule
+		\textsf{\small SB-ORACLE} & {NA}            & {NA}            & {24.2}          & {NA}            & {56.3}          & {24.6}          & {49.2}          & {NA}             & {12.5}          & {59.7}          & {NA}            & {22.9}          & {29.5}          & {48.0}          & {33.2}          & {30.2}          & {NA}            & {NA}            \\
+		\textsf{\small SB-CLASS.} & {\textbf{20.4}} & {\textbf{21.4}} & {\textbf{29.5}} & {\textbf{29.1}} & {56.0}          & {\textbf{29.0}} & {\textbf{49.2}} & {53.2}           & {\textbf{23.6}} & {\textbf{64.7}}          & {\textbf{18.6}} & {\textbf{23.1}} & {\textbf{34.5}} & {\textbf{49.5}} & {\textbf{34.9}} & {\textbf{33.2}} & {\textbf{32.7}} & {\textbf{35.8}} \\
+		\midrule
+		\textsf{\small FOCUSED}   & {$+\infty$}     & {$+\infty$}     & {85.2}          & {97.0}          & {76.3}          & {74.7}          & {86.4}          & {$+\infty$}      & {67.3}          & {73.8} & {66.8}          & {72.2}          & {84.9}          & {72.7}          & {49.8}          & {80.3}          & {$+\infty$}     & {$+\infty$}     \\
+		\textsf{\small TP-OFF}    & {$+\infty$}     & {$+\infty$}     & {92.3}          & {64.4}          & {65.0}          & {94.7}          & {92.9}          & {$+\infty$}      & {98.8}          & {89.7}          & {$+\infty$}     & {72.3}          & {89.2}          & {89.0}          & {73.6}          & {46.9}          & {$+\infty$}     & {$+\infty$}     \\
+		\textsf{\small BFS}       & {81.8}          & {75.7}          & {66.5}          & {98.5}          & {80.8}          & {50.4}          & {93.2}          & {\textbf{\03.6}} & {99.0}          & {93.8}          & {54.0}          & {68.0}          & {84.5}          & {97.5}          & {63.3}          & {87.3}          & {91.5}          & {98.3}          \\
+		\textsf{\small DFS}       & {98.6}          & {$+\infty$}     & {64.2}          & {97.0}          & {\textbf{45.0}} & {82.4}          & {90.8}          & {$+\infty$}     & {98.1}          & {85.0}          & {59.5}          & {68.6}          & {96.1}          & {90.5}          & {97.0}          & {75.0}          & {$+\infty$}     & {$+\infty$}     \\
+		\textsf{\small RANDOM}    & {71.6}          & {$+\infty$}     & {83.4}          & {$+\infty$}     & {89.3}          & {82.7}          & {92.9}          & {$+\infty$}      & {95.8}          & {98.3}          & {$+\infty$}     & {70.1}          & {88.2}          & {98.1}          & {86.6}          & {77.8}          & {$+\infty$}     & {$+\infty$}     \\
+		\bottomrule
+	\end{tabular*}
+	\label{tab:all_crawlers_all_sites_volume}
+\end{table*}
+
+Figure~\ref{fig:10_sites_plots} compares our crawler's performance with the baselines on 10 diverse, representative websites; the other plots are in the extended version~\cite{github_repository}. Default settings are $n=2$ ($n$-grams), $\theta=0.75$, $\alpha=2\sqrt{2}$, $m=12$ (path vector dimension), $w=15$ (hash function), and $b=10$ (batch size). MIME type and extension blocklists are chosen to filter out multimedia content (image, audio, video), usually large in volume. Full lists are in~\cite{github_repository}. 
+
+In addition, for each crawler and all 18 websites, Table~\ref{tab:all_crawlers_all_sites_nb_requests} (above the double rule) shows \emph{the percentage of requests needed to retrieve 90\% of targets}, and Table~\ref{tab:all_crawlers_all_sites_volume} \emph{the percentage of non-target page volume retrieved before reaching 90\% of total target volume}. Lower values indicate greater efficiency. For partially crawled sites, metrics are computed on pages visited by BFS.
+ If a crawler never reaches the 90\%, we show $+\infty$.
+The best-performing crawler per website is in bold, excluding \textsf{\small SB-ORACLE} (as unrealistic). 
+ For each website in Figure~\ref{fig:10_sites_plots}, two graphs show crawler performance: on the left, the \emph{number of crawled targets v.s.\ number of HTTP requests} (both GET
+and HEAD, in thousands); 
+on the right, the \emph{volume of
+	target responses (GB) v.s.\ volume of non-target ones}. In both
+graphs, \emph{a higher curve is better}.
+
+For \emph{fully-crawled websites},
+we run two variants of our crawler:  \textsf{\small SB-CLASSIFIER} 
+and \textsf{\small SB-ORACLE} (see Sec.~\ref{subsection:baselines}).
+This assesses the impact of the URL classifier on crawl performance. 
+Results are \emph{averaged over 15 runs}, with shaded areas indicating $\pm$ one STD. STD are in most cases low, indicating stable behavior. Variability arises mainly from: randomness in link selection within chosen actions; the stochastic SGD-trained classifier; and the single-state RL agent, whose design is crucial for stabilization (see~\cite{github_repository}).
+
+
+For \emph{partially crawled websites}, we report a single run of \textsf{\small SB-CLASSIFIER}, lacking perfect classifier information, and since multiple crawls are unfeasible 
+(Sec.~\ref{sec:exp-crawl-modalities}). All baselines but \textsf{\small RANDOM} and \textsf{\small TRES} are deterministic, thus one run suffices. \textsf{\small TRES} is only evaluated on the 10 smallest fully-crawled websites, as it requires oracle access and does not scale: beyond small websites (\emph{be}, \emph{cl}, \emph{cn}, and \emph{qa}), it exceeds the 1-minute-per-request threshold and is stopped before completing the crawl of larger websites. Crawling 100k additional pages at that point would require at the very least 10 more weeks.
+
+The plots and Tables~\ref{tab:all_crawlers_all_sites_nb_requests} and \ref{tab:all_crawlers_all_sites_volume} show that \textbf{our crawler with the URL
+classifier outperforms all baselines}, with one exception: on \emph{cl}, \textsf{\small DFS} is slightly better near the end. On \emph{il} (volume only) \textsf{\small BFS} briefly surpasses ours, but overall our crawler retrieves twice more targets.  
+\textbf{For websites \emph{as}, \emph{ce}, \emph{ed}, \emph{il}, \emph{in}, \emph{ju}, \emph{nc}, \emph{wh}, and \emph{wo}, \textsf{\small SB-CLASSIFIER}} significantly reduces resource usage (time or bandwidth) to reach a fixed number of targets or maximize targets under a budget. 
+On \emph{wo}, the best baseline (\textsf{\small BFS}) would require 3 months to match our targets (linear extrapolation), and \textsf{\small FOCUSED} 9 months; on \emph{wh}, the best baseline (\textsf{\small RANDOM}) would require 3 months and the worst (\textsf{\small TP-OFF}) 6 years. On \emph{il}, the top-3 baselines find no targets in the last 650k iterations, whereas ours continues until the end.
+
+
+On other sites (\emph{be}, \emph{cn}, \emph{cl}, \emph{jp}, \emph{qa}), while some baselines approach \textsf{\small SB-CLASSIFIER} performance, it remains superior overall, outperforming all baselines on a wide variety of websites, with respect to the size, depth, target distribution, etc.
+Small sites (\emph{be}, \emph{cl}, \emph{cn}, \emph{qa}) are traversed quickly, allowing less learning, yet our approach adapts effectively.  
+
+\textsf{\small TP-OFF} performs poorly, especially on \emph{ed}, \emph{il}, \emph{jp}, \emph{wh}, and \emph{wo}.
+Learning from just 3k pages proves insufficient on large websites. 
+On \emph{cn}, \textsf{\small TP-OFF} underperforms BFS after the initial 3k pages, despite only three times more pages remaining. Increasing the training set could help but would approach the simplicity of a standard \textsf{\small BFS} crawler.
+\textsf{\small FOCUSED} is outperformed by ours on all websites, showing early focused-crawlers are too basic to efficiently solve our problem.
+On 10 websites out of 18, it is even beaten by \textsf{\small BFS}, \textsf{\small DFS} or \textsf{\small RANDOM}.
+
+Despite being given three unfair advantages (hand-picked keywords, access to training pages with target links, and an oracle for URL type prediction), 
+\textsf{\small TRES} fails on 9 out of 10 websites, performing reasonably only on \emph{oe} and only until it had to be stopped. More critically, \textsf{\small TRES} cannot scale to medium or large sites, even when run fully locally. Crawl iterations slow dramatically due to exhaustive feature-based evaluations during tree expansion.
+These results confirm that topical crawlers are fundamentally ill-suited for direct target retrieval, even when heavily adapted and unfairly favored.
+
+Comparing our \textsf{\small SB-CLASSIFIER} with \textsf{\small SB-ORACLE}
+shows that our classifier is close to the (virtual)
+	perfect oracle. Further analysis (our classifier's impact) is
+  provided in the extended version~\cite{github_repository}.

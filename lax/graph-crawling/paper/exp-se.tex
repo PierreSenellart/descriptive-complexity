@@ -1,0 +1,16 @@
+\subsection{Search Engines and Dataset Search}
+\label{subsubsection:search_engines}
+
+We attempted to retrieve SDs using search engines (SEs), in particular by testing three popular Google services:
+\href{https://www.google.com/}{classical search} (GS), \href{https://datasetsearch.research.google.com/}{Google Datasets Search} (GDS), and the \href{https://www.google.com/publicdata/directory}{Google Public Data Explorer} (GPDE) providing data from international
+organizations.
+
+GS allows filtering by website (\textsf{\small site:}) and file type (\textsf{\small filetype:}), via its Web interface and \href{https://programmablesearchengine.google.com/}{API}. However, SEs, including Google, do not fully index websites and GS caps results at 1k, often truncating them. 
+For instance, querying \emph{ju} for PDFs yields only 302 results, although more than 9k exist; similarly, only 240 ODS files are returned (out of 910), and on \emph{in} 38 XLS (out of 1\,546). Even worse: TSV is not recognized at all despite 11\,097 files on \emph{ju}. On \emph{il}, GS lists 641 results instead of over 49k, and no ZIP archives instead of at least 2\,239.
+GDS trims results even further, e.g., 109 tabular files on
+\emph{ju} (vs. 1\,188); 93 datasets on \emph{il} (vs.\ $\geq$170k found by our crawler); and 312 on \emph{ce} (vs.\ 800k), etc. 
+GPDE is built for human readers, indexing from a closed, fixed set of providers, such as \href{https://ec.europa.eu/eurostat/}{Eurostat}, \emph{wo}, \href{https://www.statcan.gc.ca/}{Statistics Canada}, and \emph{oe}, but excludes key sites like UN’s \emph{wh}, \emph{il}, and US agencies (\emph{be}, \emph{nc}, \emph{ce}).	
+GPDE only allows manual exploration, plotting datasets guided by users' filters but offering neither downloads nor links to originals: e.g., it displays 150 OECD statistics across 37 countries and 100 years, but only references a 272-page PDF (\href{https://www.oecd-ilibrary.org/}{OECD iLibrary}).  
+
+
+Overall, \textbf{SEs lack transparency and control over the retrieved SDs}, a critical limitation for our task. In contrast, our crawler retrieves all data files within a specified budget, with explainable decisions and explicit choice of target MIME types.

@@ -1,0 +1,92 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: v1.2.2
+prefix: DescriptiveComplexity
+targets:
+  - DescriptiveComplexity.hasCheapCrawl_iso
+  - DescriptiveComplexity.graphCrawling_sigmaSODefinable
+  - DescriptiveComplexity.setCover_ordered_fo_reduction_graphCrawling
+  - DescriptiveComplexity.crawlEncoding
+  - DescriptiveComplexity.crawlEncoding_faithful
+  - DescriptiveComplexity.crawlDecode_sound
+  - DescriptiveComplexity.crawlDecode_total
+  - DescriptiveComplexity.crawlInterp_wf
+  - DescriptiveComplexity.realize_crawlWFSentence
+  - DescriptiveComplexity.SigmaSODefinable.inf_ofSentence
+  - DescriptiveComplexity.OrderedFOReduction.withInvariant
+  - DescriptiveComplexity.DecisionProblem.min_holds
+  - DescriptiveComplexity.DecisionProblem.ofSentence_holds
+  - DescriptiveComplexity.Encoding.relMap_iff
+  - DescriptiveComplexity.FinPresentation.relMap_iff
+copyright: 2026 Pierre Senellart
+manifest:
+  title: Graph crawling is NP-complete
+  authors:
+    - name: Pierre Senellart
+      orcid: 0000-0002-7909-5369
+      github: PierreSenellart
+    - name: Claude (Anthropic)
+  bibEntries:
+    - "@inproceedings{gauquier2026efficient,\n  author = {Antoine Gauquier and Ioana Manolescu and Pierre Senellart},\n  title\
+      \ = {Efficient Crawling for Scalable Web Data Acquisition},\n  booktitle = {Proceedings of the 29th International Conference\
+      \ on Extending Database Technology, {EDBT} 2026},\n  year = {2026},\n  doi = {10.48786/edbt.2026.30}\n}\n"
+    - "@misc{gauquier2026efficientextended,\n  author = {Antoine Gauquier and Ioana Manolescu and Pierre Senellart},\n  title\
+      \ = {Efficient Crawling for Scalable Web Data Acquisition (Extended Version)},\n  year = {2026},\n  eprint = {2602.11874},\n\
+      \  archivePrefix = {arXiv}\n}\n"
+    - "@software{senellart2026descriptivecomplexity,\n  author = {Pierre Senellart},\n  title = {{DescriptiveComplexity}:\
+      \ Completeness by First-Order Reductions in {Lean}},\n  version = {1.2.2},\n  year = {2026},\n  doi = {10.5281/zenodo.21678423},\n\
+      \  url = {https://github.com/PierreSenellart/descriptive-complexity}\n}\n"
+  paper:
+    folder: paper
+    main: main.tex
+    engine: pdflatex
+requires:
+  - package: Lax904597
+    repository: https://github.com/PierreSenellart/descriptive-complexity
+    commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+    folder: lax/np-core
+    restated_from: ../np-core/export.yaml
+  - package: Lax799700
+    repository: https://github.com/PierreSenellart/descriptive-complexity
+    commit: 5f34068ba7707478cd268f2316c295d7ea51a711
+    folder: lax/np-catalog
+    restated_from: ../np-catalog/export.yaml
+restated:
+  DescriptiveComplexity.ConcreteCrawlHolds: CrawlInstances.ConcreteCrawlHolds
+  DescriptiveComplexity.CrawlInstance: CrawlInstances.CrawlInstance
+  DescriptiveComplexity.CrawlInstance.budget: CrawlInstances.CrawlInstance.budget
+  DescriptiveComplexity.CrawlInstance.edges: CrawlInstances.CrawlInstance.edges
+  DescriptiveComplexity.CrawlInstance.mk: CrawlInstances.CrawlInstance.mk
+  DescriptiveComplexity.CrawlInstance.n: CrawlInstances.CrawlInstance.n
+  DescriptiveComplexity.CrawlInstance.root: CrawlInstances.CrawlInstance.root
+  DescriptiveComplexity.CrawlInstance.targets: CrawlInstances.CrawlInstance.targets
+  DescriptiveComplexity.CrawlOn: GraphCrawlingProblem.CrawlOn
+  DescriptiveComplexity.DiLink: GraphCrawlingProblem.DiLink
+  DescriptiveComplexity.FinPresentation: CrawlInstances.FinPresentation
+  DescriptiveComplexity.FinPresentation.card: CrawlInstances.FinPresentation.card
+  DescriptiveComplexity.FinPresentation.mk: CrawlInstances.FinPresentation.mk
+  DescriptiveComplexity.FinPresentation.relBool: CrawlInstances.FinPresentation.relBool
+  DescriptiveComplexity.HasCheapCrawl: GraphCrawlingProblem.HasCheapCrawl
+  DescriptiveComplexity.ReachesAllOn: GraphCrawlingProblem.ReachesAllOn
+  DescriptiveComplexity.WSEdge: WebsiteGraphs.WSEdge
+  DescriptiveComplexity.WSMarked: WebsiteGraphs.WSMarked
+  DescriptiveComplexity.WSRoot: WebsiteGraphs.WSRoot
+  DescriptiveComplexity.WSTarget: WebsiteGraphs.WSTarget
+  DescriptiveComplexity.crawlDecode: CrawlInstances.crawlDecode
+  DescriptiveComplexity.crawlDecodeAt: CrawlInstances.crawlDecodeAt
+  DescriptiveComplexity.crawlRelBool: CrawlInstances.crawlRelBool
+  DescriptiveComplexity.crawlRoots: CrawlInstances.crawlRoots
+  DescriptiveComplexity.crawlSize: CrawlInstances.crawlSize
+  DescriptiveComplexity.crawlWFSentence: CrawlInstances.crawlWFSentence
+  DescriptiveComplexity.instDecidableEqCrawlInstance: CrawlInstances.instDecidableEqCrawlInstance
+  FirstOrder.Language.instDecidableEqSiteGraphRel: WebsiteGraphs.instDecidableEqSiteGraphRel
+  FirstOrder.Language.instIsRelationalSiteGraph: WebsiteGraphs.instIsRelationalSiteGraph
+  FirstOrder.Language.siteGraph: WebsiteGraphs.siteGraph
+  FirstOrder.Language.siteGraphRel: WebsiteGraphs.siteGraphRel
+  FirstOrder.Language.siteGraphRel.edge: WebsiteGraphs.siteGraphRel.edge
+  FirstOrder.Language.siteGraphRel.marked: WebsiteGraphs.siteGraphRel.marked
+  FirstOrder.Language.siteGraphRel.root: WebsiteGraphs.siteGraphRel.root
+  FirstOrder.Language.siteGraphRel.target: WebsiteGraphs.siteGraphRel.target
+  FirstOrder.Language.wsEdge: WebsiteGraphs.wsEdge
+  FirstOrder.Language.wsMarked: WebsiteGraphs.wsMarked
+  FirstOrder.Language.wsRoot: WebsiteGraphs.wsRoot
+  FirstOrder.Language.wsTarget: WebsiteGraphs.wsTarget

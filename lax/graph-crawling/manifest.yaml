@@ -1,0 +1,40 @@
+specVersion: "1"
+id: "lax-117614"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Graph crawling is NP-complete"
+authors:
+  - name: "Pierre Senellart"
+    orcid: "0000-0002-7909-5369"
+    github: "PierreSenellart"
+  - name: "Claude (Anthropic)"
+bibEntries:
+  - |
+    @inproceedings{gauquier2026efficient,
+      author = {Antoine Gauquier and Ioana Manolescu and Pierre Senellart},
+      title = {Efficient Crawling for Scalable Web Data Acquisition},
+      booktitle = {Proceedings of the 29th International Conference on Extending Database Technology, {EDBT} 2026},
+      year = {2026},
+      doi = {10.48786/edbt.2026.30}
+    }
+  - |
+    @misc{gauquier2026efficientextended,
+      author = {Antoine Gauquier and Ioana Manolescu and Pierre Senellart},
+      title = {Efficient Crawling for Scalable Web Data Acquisition (Extended Version)},
+      year = {2026},
+      eprint = {2602.11874},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+paper:
+  folder: "paper"
+  main: "main.tex"
+  engine: "pdflatex"

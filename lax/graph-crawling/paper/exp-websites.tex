@@ -1,0 +1,55 @@
+\subsection{Websites}\label{subsection:dataset_characteristics}
+
+
+\begin{table*}
+	\caption{Main characteristics of websites (see detailed crawling methodology in Sec.~\ref{sec:exp-crawl-modalities})}
+	%\vspace{-.5em}%\tiny
+	%\hspace*{-3.75em}
+  \begin{tabular}{cl@{}ccc@{\hspace{.75em}}c@{\hspace{.75em}}ccccc}
+		\toprule
+		          & \bfseries Starting URL                                & \bfseries Mlg.       & \bfseries F. C.  & \bfseries \#Available (k)                             &
+    \bfseries \#Target (k) & \bfseries HTML to T. (\%) & \bfseries
+    Target Size (MB) & \bfseries Target Depth                                                            \\
+		\midrule
+		\emph{ab} & \tiny\url{https://www.abs.gov.au/}                    & \xmark               & \xmark                        & 952.26                       & 263.26               & \08.86 & \04.50 ($\pm$\056.04)  & \0\08.94 ($\pm$\02.56) \\
+		\emph{as} & \tiny\url{https://www.assemblee-nationale.fr/}        & \xmark               & \xmark                        & 949.42                       & 155.94               & \04.34 & \00.54 ($\pm$\0\06.38) & \0\05.84 ($\pm$\01.07) \\
+		\emph{be} & \tiny\url{https://www.bea.gov/}                       & \xmark               & \cmark                        & \031.23                      & \015.84              & 32.19  & \02.03 ($\pm$\0\06.99) & \0\05.73 ($\pm$\03.21) \\
+		\emph{ce} & \tiny\url{https://www.census.gov/}                    & \xmark               & \xmark                        & 988.37                       & 257.68               & \03.47 & \01.51 ($\pm$\015.77)  & \0\04.23 ($\pm$\00.48) \\
+		\emph{cl} & \tiny\url{https://www.collectivites-locales.gouv.fr/} & \xmark               & \cmark                        & \0\05.54                     & \0\03.70             & \05.40 & \01.15 ($\pm$\0\04.91) & \0\02.80 ($\pm$\00.82) \\
+		\emph{cn} & \tiny\url{https://www.cnis.fr/}                       & \xmark               & \cmark                        & \012.80                      & \0\07.49             & 13.87  & \00.43 ($\pm$\0\01.74) & \0\04.26 ($\pm$\01.59) \\
+		\emph{ed} & \tiny\url{https://www.education.gouv.fr/}             & \xmark               & \cmark                        & 102.71                       & \010.47              & \03.95 & \01.00 ($\pm$\0\03.07) & \011.89 ($\pm$13.22)   \\
+		\emph{il} & \tiny\url{https://www.ilo.org/}                       & \cmark               & \xmark                        & 990.71                       & \081.01              & \02.53 & 13.40 ($\pm$110.01)    & \0\04.26 ($\pm$\01.28) \\
+		\emph{in} & \tiny\url{https://www.interieur.gouv.fr/}             & \xmark               & \cmark                        & 922.46                       & \022.98              & \01.54 & \01.12 ($\pm$\0\03.06) & \066.94 ($\pm$39.43)   \\
+		\emph{is} & \tiny\url{https://www.insee.fr/}                      & \cmark               & \cmark                        & 285.55                       & 168.88               & 41.34  & \03.13 ($\pm$\021.43)  & \0\05.20 ($\pm$\01.81) \\
+		\emph{jp} & \tiny\url{https://www.soumu.go.jp/}                   & \cmark               & \xmark                        & 993.87                       & 328.83               & \06.30 & \00.80 ($\pm$\0\04.49) & \0\05.18 ($\pm$\01.29) \\
+		\emph{ju} & \tiny\url{https://www.justice.gouv.fr/}               & \xmark               & \cmark                        & \056.61                      & \014.85              & \04.85 & \00.48 ($\pm$\0\01.34) & \086.91 ($\pm$86.30)   \\
+		\emph{nc} & \tiny\url{https://nces.ed.gov/}                       & \xmark               & \cmark                        & 309.97                       & \084.94              & 18.87  & \01.10 ($\pm$\011.56)  & \0\03.63 ($\pm$\01.66) \\
+		\emph{oe} & \tiny\url{https://www.oecd.org/}                      & \cmark               & \cmark                        & 222.58                       & \045.04              & 15.61  & \02.31 ($\pm$\023.37)  & \0\06.28 ($\pm$\05.65) \\
+		\emph{ok} & \tiny\url{https://okfn.org/}                          & \cmark               & \cmark                        & 423.12                       & \012.95              & \00.74 & \00.04 ($\pm$\0\00.24) & \0\02.64 ($\pm$\02.89) \\
+		\emph{qa} & \tiny\url{https://www.psa.gov.qa/}                    & \cmark               & \cmark                        & \0\04.36                     & \0\02.45             & \04.15 & \02.97 ($\pm$\019.28)  & \0\03.03 ($\pm$\00.61) \\
+		\emph{wh} & \tiny\url{https://www.who.int/}                       & \cmark               & \xmark                        & 351.86                       & \055.59              & 14.19  & \01.26 ($\pm$\011.14)  & \0\04.43 ($\pm$\00.62) \\
+		\emph{wo} & \tiny\url{https://www.worldbank.org/}                 & \cmark               & \xmark                        & 223.67                       & \023.10              & \02.38 & \02.80 ($\pm$\027.16)  & \0\04.52 ($\pm$\00.69) \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:websites_characteristics}
+\end{table*}
+
+\def\websites{{as},{cl},{cn},{ed},{il},{in},{jp},{ju},{qa}}
+
+Table~\ref{tab:websites_characteristics} lists the 18 websites used in our experiments.
+As our primary application is a collaboration with French journalists~\cite{DBLP:conf/cikm/BalalauEGMMDGKP22} from \href{https://www.radiofrance.fr/}{RadioFrance},
+six websites are French, public, and governmental: the \href{https://www.assemblee-nationale.fr/}{French National Assembly} (\emph{as}), \href{https://www.collectivites-locales.gouv.fr/}{French Local Communities} (\emph{cl}), \href{https://www.cnis.fr/}{French Council for Statistical Information} (\emph{cn}), and the ministries of \href{https://www.interieur.gouv.fr/}{Interior} (\emph{in}), \href{https://www.education.gouv.fr/}{Education} (\emph{ed}), and \href{https://www.justice.gouv.fr/}{Justice} (\emph{ju}). Each contains material on government branches, including SDs (our crawler's targets).
+We also include eight multilingual websites: the UN's \href{https://www.ilo.org/}{International Labor Organization} (\emph{il}), \href{https://www.insee.fr/}{French Official Statistical Institute} (\emph{is}), \href{https://www.soumu.go.jp/}{Japan's Ministry of Interior} (\emph{jp}), \href{https://www.oecd.org/}{OECD} (\emph{oe}), \href{https://okfn.org/}{Open Knowledge Foundation} (\emph{ok}), \href{https://www.psa.gov.qa/}{Qatar's Official Statistical Service} (\emph{qa}), the UN \href{https://www.who.int/}{World Health Organization} (\emph{wh}), and the \href{https://www.worldbank.org/}{World Bank} (\emph{wo}).
+Finally, we add national websites in English: the \href{https://www.abs.gov.au/}{Australian Bureau of Statistics} (\emph{ab}), \href{https://nces.ed.gov/}{US National Center for Education Statistics} (\emph{nc}), the \href{https://www.census.gov/}{US Census} (\emph{ce}), and the \href{https://www.bea.gov/}{US Bureau of Economic Analysis} (\emph{be}). Websites  in at least two languages have a \cmark{} in the ``\textbf{Mlg.}'' column.
+The websites range from a few thousand to over 1M pages, excluding those resulting in 4xx or 5xx HTTP errors (see ``\textbf{\#Available (k)}'' column). A \xmark{} in the ``\textbf{F. C.}'' (``Fully Crawled'') column indicates incomplete crawls (Sec.~\ref{sec:exp-crawl-modalities}).
+
+The following metrics assess the \emph{difficulty} and \emph{interest} of a focused crawl. For partially crawled websites, metrics are computed on the BFS-visited subset (Sec.~\ref{sec:exp-crawl-modalities}). ``\textbf{\#Target~(k)}'' is the total number of identified targets, and the ratio $\frac{\textrm{\#Target (k)}}{\textrm{\#Available (k)}}$ measures \emph{target density}; extremes are 66.78\% (\emph{cl}) and 2.49\% (\emph{in}). ``\textbf{HTML to T. (\%)}'' is the percentage of HTML pages linking to at least one target, reflecting the \emph{density of target-pointing pages} (e.g., \emph{cl} has the highest density, but all targets are concentrated in 5.40\% of HTML pages). ``\textbf{Target Size (MB)}'' gives the mean and standard deviation (STD) of target file sizes, and ``\textbf{Target Depth}'' the mean and STD of depths (shortest link navigation from the root). \emph{Mean depths vary greatly, from 3 to nearly 90}: highest values arise on portals requiring page-to-page navigation, e.g. \emph{ju}.
+Table~\ref{tab:websites_characteristics} shows our websites are \emph{extremely diverse}: small or huge, varying in depth, target number and  locations, and over 20 languages. This diversity demands \emph{adaptable crawling strategies} to efficiently retrieve targets. A manual analysis of typical target locations on \emph{ju}, \emph{il}, \emph{wh}, and \emph{nc} is provided in the extended version in~\cite{github_repository}.
+
+
+\begin{toappendix}
+
+\subsection{Websites}
+
+To further emphasize the diversity of crawling efforts, we manually analyzed the types of pages where targets are typically found. In \emph{ju}, targets appear under various resource lists and data portals disseminated across the website. Some are huge (e.g., \url{https://www.justice.gouv.fr/documentation/bulletin-officiel}), while others are smaller (e.g., \url{https://www.justice.gouv.fr/documentation/ressources/conventions-judiciaires-dinteret-public}). Some require multi-step navigation to reach deeper pages that contain one or a few target links. In \emph{il}, most targets are found in small, dispersed data catalogs: some gathered in ``ILOSTAT'' (\url{https://ilostat.ilo.org/}), others accessible only through further exploration. These targets are generally downloadable directly from the catalogs. In \emph{wh}, the majority of targets require multi-step navigation through a hierarchy of subjects and sub-subjects, with only a subset leading to targets: efficient crawling thus requires quickly identifying interesting parts. In \emph{nc}, all previously mentioned typologies are present: data portals (e.g., \url{https://nces.ed.gov/national-center-education-statistics-nces/products}), exhaustive lists (e.g., \url{https://nces.ed.gov/surveys/spp/results.asp}), and deep pages requiring multi-step navigation.
+\end{toappendix}

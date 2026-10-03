@@ -1,0 +1,109 @@
+\section{Introduction}\label{section:introduction}
+
+Openly accessible data has long been shared through the Web; in
+particular, many HTML pages contain \emph{entity-centric tables}, where
+each line is about an entity, e.g., an album, and describes its attributes such as artist or year. Entity-centric tables have been leveraged to extract large-scale, open knowledge bases \cite{DBLP:conf/wsdm/LockardSDH20,DBLP:conf/semweb/AuerBKLCI07,DBLP:conf/esws/TanonWS20,DBLP:journals/ftdb/WeikumDRS21}, and for question answering \cite{DBLP:journals/pacmmod/WangF23,herzig-etal-2021-open,Christmann2023CompMixAB,Hulsebos2024ItTL}.
+They are also frequent in \emph{data lakes}, \cite{fan_semantics-aware_2023,deng_lakebench_2024,christensen_fantastic_2025}.
+In this work, we focus on \emph{openly accessible} Web data, independently of their licensing status. Among them, \emph{statistics datasets} (\textbf{SDs}, in short) form a distinct and highly valuable category.
+They are compiled by domain specialists typically working for national
+or international governing bodies, such as the
+\href{https://www.un.org/}{United Nations}, the
+\href{https://www.imf.org/}{IMF}, but also by companies, NGOs, etc.
+Some organizations, e.g.,
+\href{https://ec.europa.eu/eurostat/}{Eurostat}, publish hundreds of
+thousands of SDs, updated yearly; others, e.g., an NGO focused on equitable justice, or a pollution watchdog in a certain area, may only publish a few dozen highly specialized datasets.
+
+SDs~significantly differ from entity-oriented Web tables.
+SD~content is
+mostly numeric, e.g.,  birth and death counts by age in a
+country over decades, or chip production per country and type of chip.
+From a data management perspective, SDs are multidimensional
+	aggregates, sometimes data cubes.
+Also, SDs are mostly  published as standalone files, encoded in a
+variety of formats, e.g., CSV, TSV, spreadsheets, XML dialects such as
+SDMX~\cite{sdmx}, JSON, etc. Open SDs are also sometimes embedded in PDF
+documents.
+
+\emph{Answering queries or questions over tables}, and
+  in our context, over SDs, is as the very core of the data management
+  science and industry. The wide availability of statistic datasets on the Web requires tools that make
+such data reachable in order to realize its potential; as the paper shows, such tools are currently lacking.
+
+SDs are of great public utility. Officials rely on them to
+inform decisions and support debates; social scientists use them to
+analyze policy impacts and detect trends; newsrooms use them to check the
+accuracy of public statements, make comparisons across countries, etc.
+Also, the \emph{statistical literacy} of the general public needs to be improved: for instance, US voters vastly misrepresent the size of various fractions of
+the US population, e.g., how many are transgender (estimated: 21\%,
+true: 0.6\%)~\cite{wrongstats}. Thus, \emph{building and using warehouses of
+statistics data} is central. Research works seeking to automate the recognition and checking of claims leveraging on retrieved corpora of SDs include, e.g.,~\cite{DBLP:journals/pvldb/Karagiannis0PT20,DBLP:journals/debu/0002P21,DBLP:conf/webdb/CaoMT18,balalau2024star, claimbuster} in the Information Retrieval and Data Management, and \cite{vlachos-riedel-2015-identification} in NLP.
+
+Finding all SDs published by an organization is desirable in
+order to study them as a whole, compare among organizations, populate a data lake for fact-checking, etc. For example, a work historian may want to retrieve all SDs published by the \href{https://www.ilo.org}{ILO}; a journalist may need all \href{https://ec.europa.eu/eurostat/}{Eurostat} SDs on poverty.  Unfortunately, current methods for this are either lacking, or quite inefficient.
+
+Some websites publish an API to retrieve all their SDs, e.g.,
+\href{https://ec.europa.eu/eurostat/}{Eurostat},
+yet writing
+custom code for each such API is cumbersome and brittle when APIs change.
+Worse, many sites hosting numerous Open SDs, e.g., the ILO, do not
+provide APIs to access all their data.
+\emph{Search engines} (SEs, in short) and associated data
+portals turn out to provide access to only a tiny fraction of
+existing SDs (see Sec.~\ref{subsubsection:search_engines}); also, how these are selected is opaque to users.
+A  \textbf{na\"ive, exhaustive website crawl is extremely inefficient} for large websites:
+\begin{inparaenum}[(i)]
+	\item acquiring a full
+	website takes space and time;
+	\item {\em crawling ethics} requires to wait
+	(typically 1~second) between two successive HTTP requests; for
+	a site of 1~million pages, such waits, alone, take 11
+	days.
+\end{inparaenum}
+Thus, we are interested in a focused crawl, seeking to acquire within a given website as many \textbf{targets} as possible, while
+\textbf{minimizing the resources consumed}, e.g., HTTP requests or
+volume of transferred data.
+Motivated by our SD retrieval problem, we define \emph{targets} as \emph{data files (CSV, spreadsheet, etc.)}. This can generalize to \emph{any} definition of target. Also, we aim for an efficient method, feasible on a single machine, as opposed to SE-scale parallel infrastructure.
+
+Focused crawlers have been extensively
+studied~\cite{chakrabarti1999focused,diligenti2000focused,gouriten2014scalable,meusel2014focused,faheem2015adaptive,han2018focused,kontogiannis2022tree}.
+However, existing approaches often rely on \emph{assumptions that may not
+hold in our setting}, e.g., that all pages on a
+topic tend to be close within a website~\cite{10.1145/345508.345597}.
+Early work includes generic focused crawling
+approaches~\cite{chakrabarti1999focused,diligenti2000focused} (that we
+will illustrate with a \textsf{\small FOCUSED} baseline); other study
+large-scale website selection~\cite{meusel2014focused} (as opposed to SDs
+within a given website), topic-driven page retrieval methods such as
+\textsf{\small TRES}~\cite{kontogiannis2022tree}
+or~\cite{chakrabarti1999focused,gouriten2014scalable,han2018focused}, and
+non-topical objectives such as textual
+diversity~\cite{faheem2015adaptive} (adapted to our setting
+as a \textsf{\small TP-OFF} baseline).
+
+Motivated by the large numbers of open, valuable SDs accessible
+via navigation, we address the challenging problem of
+\textbf{retrieving SDs in a website  as efficiently as possible, 
+without relying on prior knowledge of the website's structure or content.}
+
+\setlength{\fboxsep}{2pt}
+\paragraph*{Contributions} Our contributions are as follows. \begin{inparaenum}[(1)]
+	\noindent\item We formalize
+	our graph crawling problem and show that optimally solving it is
+	intractable (Sec.~\ref{sec:problem-model}).
+	\noindent\item We propose a novel approach \textsf{\small SB-CLASSIFIER} based on
+		reinforcement learning (RL) in Sec.~\ref{section:solution}, relying on two crucial  hypotheses: \begin{inparaenum}[(i)]
+		\item 
+		\emph{links found on similar \fbox{tag paths} within HTML web pages} (a tag path~\cite{miao2009extracting, furche2012turn} goes from the page root, to a hyperlink tag such as \texttt{\small $<$a$>$}) \emph{lead to similar content},
+		\item \emph{we can learn, from the tag path structure, which
+			tag paths are likely to lead to links towards targets}.
+	\end{inparaenum}
+	\noindent\item We demonstrate the effectiveness and efficiency of our approach
+	through extensive experiments on diverse
+		websites, totalling 22.2 millions pages (Sec.~\ref{sec:results}). \textsf{\small SB-CLASSIFIER} outperforms all baselines.
+	On some websites we experimented on, in particular very large ones,
+	\textbf{our crawler retrieves 90\% of the targets  accessing only 20\% of the
+		webpages} (Sec.~\ref{subsection:dataset_characteristics}).
+\end{inparaenum}
+
+We discuss related work in
+Sec.~\ref{section:related_work}. This paper is an extended version of the conference paper~\cite{gauquier2026efficient2}. A Github repository~\cite{github_repository} provides code to reproduce the experiments. 

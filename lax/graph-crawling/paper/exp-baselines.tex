@@ -1,0 +1,47 @@
+\subsection{Baselines}
+\label{subsection:baselines}
+
+We compare our best-performing \textsf{\small SB-CLASSIFIER} with an adapted version in which the URL classifier is replaced by an (unrealistic) perfect oracle~(\textsf{\small SB-ORACLE}), as well as with several baseline methods. First, we consider four simple crawlers.
+\begin{inparaenum}[(i)]
+\item The \textsf{\small RANDOM} crawler selects the next hyperlink to visit
+	uniformly at random from the crawl frontier.
+	\item The
+    \emph{Breadth-First Search} (\textsf{\small BFS}) exhaustive crawler maintains the
+	frontier as a \emph{First-In-First-Out queue} data structure. It crawls
+	all pages reachable by a path of length $\ell$ before any page reachable
+	only by longer paths ($\ell' > \ell$).
+	\item \emph{Depth-First
+    Search} (\textsf{\small{DFS}}) maintains the frontier in a \emph{Last-In-First-Out stack}.
+	It is rarely used for exhaustive crawling since it may fall
+        into
+	\href{https://en.wikipedia.org/wiki/Spider_trap}{robot traps}.
+	\item The unrealistic \emph{Omniscient Crawler} (\textsf{\small OMNISCIENT}) knows all target URLs ($V^*$) from the start and crawls them sequentially. Since an optimal crawler is intractable (Prop.~\ref{prop:np-complete}), this omniscient crawler provides an (unreachable) upper bound on crawler efficiency.
+\end{inparaenum}
+
+
+The \emph{Offline-Trained, Tag Path-Based Crawler} (\textsf{\small TP-OFF})~\cite{faheem2015adaptive} is a closely related focused crawler originally designed to retrieve \emph{diverse} textual content. We apply it \emph{technically unchanged}, except for redefining its reward to target retrieval.
+As described in~\cite{faheem2015adaptive}, it first crawls 3k pages with BFS and groups the tag paths leading to followed links as in Sec.~\ref{subsection:states_actions}. Page benefits are computed immediately, and tag path groups are stored in a priority queue ordered by average benefit. After these 3k pages, \cite{faheem2015adaptive} \emph{only considers links matching existing tag path groups} (ordered by priority), other are ignored. 
+In our context, benefit computation requires knowing if links lead to targets. To enable this baseline, \emph{we provide it with the true benefit} (number of targets behind a page's links) as if given by an oracle, for the initial 3k pages. Beyond this point, newly formed tag path groups receive a fixed benefit of~0. This baseline, given an unfair advantage in its first stage, can be seen as an \emph{ablated} version of ours, learning \emph{offline} instead of \emph{online} with our RL method.
+
+The \emph{Focused Crawler} (\textsf{\small FOCUSED}) represents early generic focused crawling approaches that rely on a classifier to estimate the likelihood that a newly discovered hyperlink leads to a target~\cite{chakrabarti1999focused,diligenti2000focused}. The frontier is maintained as a \emph{priority queue},  favoring links predicted to be relevant. It relies on a standard \emph{logistic regression}, periodically retrained on crawled pages at no extra HTTP cost.
+Its features follow standard focused crawler practice: the (approximated) depth of the source page, a 2-gram BoW representation of the URL (similarly to Sec.~\ref{subsection:url_classifier}), and a 2-gram BoW representation of the link's \emph{anchor} text~\cite{chakrabarti1999focused,diligenti2000focused}. \emph{Topic-oriented} features are intentionally excluded (further discussed in Sec.~\ref{section:related_work}). Overall, \textsf{\small FOCUSED} can be viewed as an \emph{ablated} version of our crawler, as it neither exploits tag-path structure (Sec.~\ref{subsection:url_classifier}) nor uses RL (Sec.~\ref{subsection:crawling_algorithm}).
+
+
+{\textsf{\small TRES}}~\cite{kontogiannis2022tree} is a topical, RL-based focused crawler using a Bi-LSTM classifier to assess HTML page relevance. Like our approach, it employs RL to learn where interesting content resides in a website. However, {\textsf{\small TRES}} defines interestingness through a user-specified topic, whereas we target SDs regardless of subject. As it targets topic-relevant HTML pages only, it requires input keywords, positive HTML examples, and is limited to one language.
+To include {\textsf{\small TRES}} as a baseline for SD retrieval, we made changes related to its focus, \emph{without altering its core logic or technical components}. Specifically, we give it three \emph{unfair advantages}: \begin{inparaenum}[(i)]
+\item \textsf{\small TRES} expects a list of topic-specific keywords to initialize its classifier's training: we supply 74 hand-crafted terms likely to appear in links' anchors to targets to initialize its classifier.  
+\item We provide 1k HTML pages with links to targets from the evaluation websites as positive examples (based on prior crawls), as required to pre-train its classifier, giving it partial access to the solution.  
+\item \textsf{\small TRES} must classify URLs as HTML or not to manage its frontier, as it only accepts HTML pages. Although costly in practice (see Sec.~\ref{subsection:url_classifier}), we gave it an oracle doing this classification at no cost, giving it its chance while not affecting its original behavior.
+\end{inparaenum}
+Since its RL agent and classifier rely only on textual HTML features, {\textsf{\small TRES}} cannot directly detect targets. We therefore added two adjustments: links are added to the frontier as in~\cite{kontogiannis2022tree}, while others (which TRES would normally ignore) are visited immediately and targets counted if found; and its language filter was disabled, preventing coarse URL-based false exclusions. The modified code is available at~\cite{tres_modified_repository}.
+
+\begin{toappendix}
+  \subsection{Baselines}
+    We use the following list of keywords as initial input to
+  \textsf{\small TRES} to train its classifier:
+    \begin{multicols}{4}
+      \noindent
+      \input{keywords_bilstm_tres}
+    \end{multicols}
+  
+\end{toappendix}

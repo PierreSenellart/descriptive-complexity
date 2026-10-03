@@ -1,0 +1,85 @@
+\section{Related Work}\label{section:related_work}
+\paragraph*{Web crawlers} We discuss several aspects of Web
+crawlers, see the extended version~\cite{github_repository} for other relevant work and a summary table outlining the characteristics 
+ of existing focused crawlers. \begin{asparaenum} 
+
+\item \emph{Focused crawlers} prioritize some pages during the crawl, often based on predefined \emph{topics}. Traditional focused crawlers \cite{chakrabarti1999focused,diligenti2000focused} mainly train a classifier to predict the likelihood that a hyperlink leads to a relevant page; we adapted this approach to our target retrieval in \textsf{\small FOCUSED}. Modern focused crawlers typically employ RL to adapt the crawl: we review them here. We distinguish two kinds of focused crawlers by their \emph{focus}: most are \emph{topical} crawlers \cite{gouriten2014scalable,han2018focused,zhang2021dsdd,kontogiannis2022tree}, which focus on a predefined \emph{topic} via keywords or sample documents. \emph{Non-topical} focused crawlers are rarer: besides this work (which focuses on \emph{targets} of a given file type), examples include \textsf{\small Anthelion} \cite{meusel2014focused}, which focuses on semantic annotations in Web pages, and \textsf{\small ACEBot} \cite{faheem2015adaptive}, which accumulates as much diverse textual content as possible. Anthelion's focus is more specific than ours and ACEBot's focus differs but we adapted it for target retrieval in \textsf{\small TP-OFF}. 
+Topical crawlers are ill-suited for target retrieval as shown in Sec.~\ref{subsubsection:main_result}, since they target HTML content and require language-specific elements defining the topic. %(hence, are not \textbf{language-independent}). 
+Our SD application requires crawling sites with content about different domains (economics, education, health, etc.) and in multiple languages (Sec.~\ref{subsection:dataset_characteristics}). Another key difference is that assumptions of topical locality \cite{10.1145/345508.345597} (similar-topic pages are close) and crawl direction \cite{han2018focused} (page scores increase near topic-relevant pages) do not typically hold in our case.
+  Existing systems differ in the way they use learning: many choose to have
+  a simple single-state representation
+  \cite{gouriten2014scalable,meusel2014focused,zhang2021dsdd} in the form
+  of classical MABs, while some introduce a multiple-state MDP
+  representation as in \cite{han2018focused} or
+  \cite{kontogiannis2022tree} which directly extends on
+  \cite{han2018focused}. In order to support an MDP representation,
+  \cite{han2018focused,kontogiannis2022tree} have to define states that
+  cannot just be the current state of the crawl but a summary thereof (as
+  RL policy optimization requires visiting many times each state). For
+  this, they use features characterizing the topic relevance of the last crawled
+  page and its neighborhood. This does not have a direct
+  equivalent in the setting of target retrieval (again, because of
+  non-locality). 
+  We differ from prior work by choosing a SB representation, a mathematically well-founded way to both use a single state and model that not all actions are available at every step. It also allows faster convergence of action estimation than multiple-state approaches. Unlike our method, \cite{faheem2015adaptive} does not use RL but relies on offline training on part of the website (see Sec.~\ref{subsection:baselines}).
+  In most cases, including ours, actions correspond to selecting the next URL to retrieve. Two works differ: \cite{meusel2014focused} applies RL only to select \emph{sites}, to crawl the next URL from, with URL choice handled separately, while \cite{zhang2021dsdd} additionally allows actions that query a SE.
+  Finally, except for \cite{faheem2015adaptive}, our work differs from all cited approaches in targeting a focused crawl of a single given website: the most common approach crawl across sites without strict scope constraints. This distinction is crucial for our application, which requires retrieving datasets exclusively from trusted sources.
+
+\begin{toappendix}
+  \begin{table*}
+    \caption{Characteristics of focused crawler works
+    (LI = Language-Independent; Code = Code publicly available)}
+    \label{tab:related-work}
+    \vspace{-.5em}
+    \begin{tabular}{rlllllcc}
+      \toprule
+      \textbf{System}&\textbf{Focus}&\textbf{Learning
+      Model}&\textbf{States}&\textbf{Actions}&\textbf{Scope}&\textbf{LI}&\textbf{Code}\\
+      \midrule
+      Gouriten et al. \cite{gouriten2014scalable}&Topic&Bandit&—&URL
+      selection&Across sites&\xmark&\xmark\\
+      \textsf{\small{Anthelion}}
+      \cite{meusel2014focused}&Semantic annot.&Bandit&---&Site
+      selection&Across sites&\cmark&\cmark\\
+      \textsf{\small ACEBot} \cite{faheem2015adaptive}&Text
+      content&Offline&—&URL selection&Site-by-site&\cmark&\xmark\\
+      Han et al. \cite{han2018focused}&Topic&MDP&Relevance features&URL
+      selection&Across sites&\xmark&\xmark\\
+      \textsf{\small DSDD} \cite{zhang2021dsdd}&Topic&Bandit&---&URL selection
+      or SE use&Across sites&\xmark&\xmark\\
+      \textsf{\small TRES} \cite{kontogiannis2022tree}&Topic&MDP&Relevance
+      features&URL selection&Across sites&\xmark&\cmark\\
+    \textbf{\textsf{\small FOCUSED}}&Targets&Online&---&URL
+      selection&Site-by-site&\xmark&\cmark\\
+    \textbf{\textsf{\small SB-CLASSIFIER}}&Targets&Sleeping Bandit&Available tag paths&URL
+      selection&Site-by-site&\cmark&\cmark\\
+      \bottomrule
+    \end{tabular}
+  \end{table*}
+
+    \paragraph*{Web crawlers}
+    Table~\ref{tab:related-work} presents the main characteristics of focused crawler works. We then discuss other relevant literature on Web crawling apart from focused and incremental crawling.
+    \begin{asparaenum}
+	\item \emph{Distributed} or \emph{parallel} Web crawlers use multiple
+	crawlers concurrently to speed up page retrieval. Key challenges lie in resource (especially, network)
+	management. \cite{cho2002parallel} introduced general architectures
+	for parallel crawling, while \cite{boldi2004ubicrawler} proposed
+	\textsf{\small UbiCrawler}, a decentralized and distributed system using consistent hashing for domain partitioning. Other works \cite{chau2007parallel, bosnjak2012twitterecho} focus on social network crawling. These  works aim to efficiently crawl a given set of pages, whereas we focus on minimizing that set. The two could be combined to improve crawling speed and reduce network load.
+      \item \emph{Web crawlers targeting specific website types} (such as forums, blogs, or CMS) are built to leverage specific and common structural patterns within these sites. For instance, \cite{guo2006board, cai2008irobot} are focusing on forums. While effective, these crawlers are less general, relying on assumptions about site structure. In contrast, our approach adapts to each website dynamically, 
+        and needs no assumptions (see Sec.~\ref{section:problem_statement}). 
+	\item \emph{Hidden-} or \emph{deep-}Web crawlers explore content not reachable via standard hyperlinks, often requiring user interactions such as filling out forms. A comparative study of state-of-the-art deep-Web crawler appears in~\cite{hernandez2019deep}. In contrast, our work focuses on acquiring specific targets from official websites. In our context, form-based interfaces serve mainly as filters, which are not useful for large-scale retrieval. Moreover, on many institutional websites (see Sec.~\ref{subsection:dataset_characteristics}), such data is accessible through standard navigation, not portals. Extending our approach to deep-Web crawling remains a natural direction for future work (see Sec.~\ref{section:conclusion}).
+  \end{asparaenum}
+\end{toappendix}
+
+\item \emph{Incremental} or \emph{revisit policy-based} crawling views a website as an evolving set of pages and selectively revisits them to maximize updated content while minimizing unnecessary requests. \cite{cho2000evolution} presents core challenges, and \cite{sigurdhsson2005incremental} introduces an incremental version of \textsf{\small Heritrix}~\cite{mohr2004introduction}, used by the \href{https://archive.org/}{Internet Archive}. More recent works propose learning-based revisit policies: \cite{dang2023look, avrachenkov2022online, kolobov2019optimal} predict emergence of new outlinks from page features. Others use RL: \cite{schulam2023improving} shows Thompson Sampling (TS) outperforms MAB alternatives and the \textsf{\small Pham Crawler}~\cite{pham2018learning}, and \cite{kolobov2019staying} introduces a learning algorithm to compute optimal revisit policies. While our method is a single-shot crawl, we plan to build upon it to implement incremental strategies.
+
+\end{asparaenum}
+
+\paragraph*{Tag paths} Tag paths, e.g., \emph{root-to-link} paths
+in the DOM of each HTML page, have been exploited for Web crawling.
+\cite{crescenzi2003fine, crescenzi2005clustering} take advantage of the website structure to cluster webpages, with applications to \emph{Web scrapers} aiming to automatically extract and structure data from HTML pages. \cite{faheem2015adaptive} directly uses paths in the DOM of each HTML page in order to do focused Web crawling.
+
+\begin{toappendix}
+\paragraph*{MAB algorithms} While UCB~\cite{auer2002finite} and its
+variants are the state of the art for solving MAB problems, simpler approaches like $\epsilon$-greedy~\cite{sutton2018reinforcement} randomly select actions with probability $\epsilon$ and otherwise choose the highest scoring action. We also considered {Bayesian} Bandits, especially TS, a probabilistic method based on posterior distribution estimation. We excluded those approaches to ensure our crawler's {\em stability}, i.e., ability to give the same output if run several times independently of how the site can change from one crawl to
+another. Also, Bayesian approaches require prior distributions, unavailable to us due to lack of prior knowledge about the websites. We also did not adopt \emph{linear} or \emph{kernel}-based bandit methods, despite their generalization capabilities. These approaches require stable, qualitative feature representations, extracted from webpages, which are difficult to define in our context. Indeed, while we hypothesize that links appearing in similar tag paths lead to similar content, this assumption does not guarantee the existence of consistent features extracted from the \emph{content} (not structure) of the pages. We would also need to choose \emph{universal} features, i.e., computable for any page of any website we want our crawler to visit. Moreover, most feature-based methods are language-dependent, which conflicts with our aim of being language-independent. Given these limitations, and the good performance we already observed, we focused on AUER~\cite{kleinberg2010regret}, the sleeping variant of UCB.
+\end{toappendix}

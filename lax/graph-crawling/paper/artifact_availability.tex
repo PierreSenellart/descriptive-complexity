@@ -1,0 +1,13 @@
+\section*{Artifacts}
+
+The repository~\cite{github_repository} provides a complete experiment reproducibility kit. The \texttt{README.md} file describes the repository contents and explains how it is organized. The kit mainly allows running the crawlers \textsf{\small SB-ORACLE}, \textsf{\small SB-CLASSIFIER}, \textsf{\small FOCUSED}, \textsf{\small TP-OFF} (sometimes referred to as \verb|dom_off|), \textsf{\small BFS}, \textsf{\small DFS}, and \textsf{\small RANDOM}. Three execution modes are available:
+\begin{itemize}
+  \item \emph{Local crawling}: used when a website has already been fully replicated in a local database (see Sec.~\ref{sec:exp-crawl-modalities}).
+  \item \emph{Online-to-local crawling}: creates a local copy of a website using a naive crawler.
+  \item \emph{Semi-online crawling}: first checks the local database and fetches the resource only if it is not present (applied to non-fully crawled websites, also described in Sec.~\ref{sec:exp-crawl-modalities}).
+\end{itemize}
+
+The folder \texttt{url\_classifier\_confusion\_matrices} contains all confusions matrices used to compute the ``MR'' metric in Sec.~\ref{subsubsection:metaparameters_result} for the URL classifier models.
+The repository also contains code to reproduce the plots, information about the websites used in our experiments, and an extended version of this paper. The extended version includes: the proof of Prop.~\ref{prop:np-complete}; additional details about the websites' characteristics; the MIME type list defining the targets used in the experiments; the initial keyword set for \textsf{\small TRES}; and a complete blocklist of URL extensions and MIME types. It also provides the plots of the 8 websites that could not be included in Figure~\ref{fig:10_sites_plots}; exhaustive plots from the hyper-parameter studies; extra examples of typical tag paths for 6 websites; plots and confusion matrices for the URL classifier models evaluation; additional results on URL classification quality; a visualization of the early-stopping mechanism for two websites; a table summarizing the main characteristics of related focused crawlers; and an extended discussion of other crawler types, as well as alternatives to AUER for MAB algorithms.
+
+A second repository~\cite{tres_modified_repository} contains a fork of the \textsf{\small TRES}~\cite{kontogiannis2022tree} crawler code, adapted for the target retrieval task described in Sec.~\ref{subsection:baselines}. 

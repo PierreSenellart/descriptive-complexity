@@ -1,0 +1,174 @@
+
+\documentclass[sigconf,nonacm]{acmart}  
+
+\usepackage{amsthm, amsfonts}
+\usepackage{stmaryrd}
+
+\usepackage{microtype}
+\usepackage{multicol}
+\usepackage{comment}
+\usepackage{diagbox}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{paralist}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[noend]{algorithm2e}
+\usepackage{etoolbox}
+\gappto{\UrlSpecials}{\do\_{\penalty\UrlBreakPenalty\mathchar`_}}
+
+\definecolor{green}{RGB}{0,128,0}
+\colorlet{orange}{orange!85!black}
+
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+\newcommand{\orange}[1]{\textcolor{orange}{#1}}
+\newcommand{\purple}[1]{\textcolor{purple}{#1}}
+
+\newcommand{\summation}[2]{\sum\limits^{#2}_{#1}}
+\usepackage{balance}
+\usepackage{dsfont}
+\usepackage{mathtools}
+\usepackage{paralist}
+\usepackage{tikz}
+\usepackage[appendix=append]{apxproof}
+\renewcommand{\appendixsectionformat}[2]{Supplementary material for Section~#1 (#2)}
+\usepackage{subcaption}
+\usepackage{pifont}
+\usepackage{enumitem}
+\usepackage[normalem]{ulem}
+\usepackage{xparse}
+\usepackage{pgffor}
+
+\def\websitesSinglePage{{ce}, {cl}, {ed}, {il}, {in}, {ju}, {nc}, {ok}, {wh}, {wo}}
+
+\makeatletter
+\newcommand{\getfullname}[1]{%
+  \csname fullname@#1\endcsname%
+}
+
+\expandafter\def\csname fullname@1\endcsname{US Census (\emph{ce})}
+\expandafter\def\csname fullname@2\endcsname{French Local Communities (\emph{cl}) }
+\expandafter\def\csname fullname@3\endcsname{French Ministry of Education (\emph{ed})}
+\expandafter\def\csname fullname@4\endcsname{UN International Labor Organization (\emph{il})}
+\expandafter\def\csname fullname@5\endcsname{French Ministry of Interior (\emph{in})}
+\expandafter\def\csname fullname@6\endcsname{French Ministry of Justice (\emph{ju})}
+\expandafter\def\csname fullname@7\endcsname{US National Center for Education Statistics (\emph{nc})}
+\expandafter\def\csname fullname@8\endcsname{Open Knowledge
+Foundation (\emph{ok})}
+\expandafter\def\csname fullname@9\endcsname{UN
+World Health Organization (\emph{wh})}
+\expandafter\def\csname fullname@10\endcsname{World Bank (\emph{wo})}
+\makeatother
+
+\newcommand{\0}{\phantom{0}}
+
+\SetKwInput{KwInput}{Input}
+\SetKwInput{KwOutput}{Output}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\RestyleAlgo{ruled}
+\SetInd{0.5em}{0.3em}
+\SetKwComment{Comment}{}{}
+
+\newtheoremrep{theorem}{Theorem}
+\newtheoremrep{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{problem}[theorem]{Problem}
+
+\renewcommand\leq\leqslant
+\renewcommand\geq\geqslant
+\renewcommand\epsilon\varepsilon
+\renewcommand\phi\varphi
+
+\setlength{\abovecaptionskip}{6pt}
+\setlength{\belowcaptionskip}{6pt}
+
+\begin{document}
+
+\newcommand{\extVersion}{false}
+
+\newcommand{\printIfExtVersion}[2]%
+{%
+	\ifthenelse{\equal{\extVersion}{true}}{#1}{}%
+	\ifthenelse{\equal{\extVersion}{false}}{#2}{}%
+}
+
+\title{Efficient~Crawling~for~Scalable~Web~Data~Acquisition (Extended~Version)}
+
+\author{Antoine Gauquier}
+\email{antoine.gauquier@ens.psl.eu}
+\orcid{0009-0005-9573-6364}
+\affiliation{%
+	\institution{DI ENS, ENS, CNRS, PSL, Inria}
+	\city{Paris}
+	\country{France}
+}
+
+\author{Ioana Manolescu}
+\email{ioana.manolescu@inria.fr}
+\orcid{0000-0002-0425-2462}
+\affiliation{%
+  \institution{\makebox[0pt]{Inria \& Institut Polytechnique de Paris}}
+	\city{Palaiseau}
+	\country{France}
+}
+
+\author{Pierre Senellart}
+\email{pierre@senellart.com}
+\orcid{0000-0002-7909-5369}
+\affiliation{%
+	\institution{DI ENS, ENS, CNRS, PSL, Inria}
+	\city{Paris}
+	\country{France}
+}
+
+%\renewcommand{\shortauthors}{Gauquier et al.} 
+
+
+\begin{abstract}
+  Journalistic fact-checking, as well as social or economic research,
+  require analyzing \emph{high-quality statistics datasets} (\emph{SDs}, in short).
+  However, retrieving  SD corpora at scale may be hard, inefficient, or impossible,
+  depending on how they are published online.
+	To improve open statistics data accessibility, we present a \emph{focused Web crawling
+  algorithm} that retrieves  as many \emph{targets}, i.e., resources of certain types,
+  as possible, from a given website, in an efficient and scalable way, by crawling (much)
+  less than the full website.  We show that optimally solving this problem is intractable,
+  and propose an approach based on reinforcement learning, namely using sleeping bandits.
+  We propose \textsf{\small SB-CLASSIFIER}, a crawler that  efficiently learns \emph{which
+  hyperlinks lead to pages that link to many targets}, based on the paths leading to the
+  links in their enclosing webpages. Our experiments on websites with millions of webpages
+  show that our crawler is \emph{highly efficient}, delivering high fractions of a site's
+  targets while crawling only a small part.
+\end{abstract}
+
+\keywords{Web and Focused Crawling, Data Acquisition, Reinforcement Learning, Scalability, Algorithm}
+
+\maketitle
+
+\input{introduction}
+\input{problem_statement}
+\input{graph_to_data_crawling}
+\input{approach_rl}
+\input{experiments}
+\input{related_work}
+\input{conclusion}
+
+\begin{acks}
+  We thank Antoine Krempf (Radio~France) for suggesting the SD retrieval problem.
+  This work was funded in part by the French government under management of
+Agence Nationale de la  Recher-che (ANR) as part of the ``France~2030'' program,
+reference ANR-23-IACL-0008 (PR[AI]RIE-PSAI) and ANR-23-IACL-005 (Hi! PARIS Cluster 2030).
+\end{acks}
+
+\input{artifact_availability}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{main}
+
+\end{document}

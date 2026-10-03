@@ -1,0 +1,34 @@
+\subsection{Practical Crawling in our Experiments}
+\label{sec:exp-crawl-modalities}
+
+To evaluate six baselines and our crawler with various
+hyper-parameters, repeated crawls per website are infeasible
+due to time constraints (e.g., large files or slow connections), and crawling ethics. Thus, for each website, all baselines and our crawler run in a setting where \emph{each first checks if the resource is already stored in a local database}. If so, we use it; otherwise, we fetch it via HTTP~GET and the URL, HTTP status, headers, and response body are stored.
+
+\emph{For evaluation purposes only}, we stop crawling a website under any of the following conditions:
+\begin{inparaenum}[(i)]
+	\item One crawler terminates before reaching 1M pages, yielding a complete local replication: all others then rely solely on database look-ups.
+	\item All crawlers reach 1M visited webpages (possibly not the
+          same pages across crawlers).
+    \item A 3-week time limit is reached, as crawling can be extremely slow for some websites (across 18 sites, 22.2M distinct pages were retrieved).
+	\item A crawler exceeds 1 minute between two requests, excluding network latency (only affecting \textsf{\small TRES}).
+\end{inparaenum}
+
+We conduct and present our experiments as follows:
+\begin{inparaenum}[(i)]
+    \item We carry hyper-parameter studies and evaluate our URL classifier on fully-crawled websites with \emph{fewer than 1M pages}. Full replication enables parallel runs under multiple parameter settings and provides complete knowledge for both (unrealistic) \textsf{\small SB-ORACLE} crawler and \textsf{\small TRES} baseline (see Sec.~\ref{subsubsection:main_result}).
+	\item On websites where \emph{all baselines reach 1M webpages}, crawlers are compared on the subset of the website each of them visited. Note that their target sets, and the retrieved data volume, may differ: a good crawler prioritizes \emph{more target-rich} pages.
+    \item On websites where \emph{at least one baseline did not crawl 1M pages within the time limit}, crawlers are compared on the smallest crawl size achieved: e.g., if three crawlers visit 400k, 200k, and 800k pages, respectively, we compare them on their first 200k pages.
+    \item On websites where \emph{at least one baseline fails to reach 1M pages} within the time limit, crawlers are compared on the smallest crawl size achieved: e.g., if crawlers visit 400k, 200k, and 800k pages, results are computed on their first 200k pages.
+
+\end{inparaenum}
+
+We
+exclude retrieval times from our results, 
+since these vary out of our control. 
+We focus on the \emph{number of requests and data volumes}; crawl time
+can be estimated from these, knowing the bandwidth and the ethics waiting
+time. To illustrate retrieval times, on the medium-sized website
+\emph{ed}, \textsf{\small SB-CLASSIFIER} requires 3h~16min to collect 5k
+targets and 10h~52min to collect 10k, whereas \textsf{\small BFS} requires
+5h~13min and 48h~45min respectively (1.6$\times$ and 4.5$\times$ more).

@@ -1,0 +1,631 @@
+\subsection{Hyper-Parameters}\label{subsubsection:metaparameters_result}
+
+We present the impact of three key hyper-parameters ($\alpha$, $n$, and $\theta$) on crawl performance. Table~\ref{tab:parameter_study} reports the number of requests (resp. response volume for non-target pages) needed to retrieve 90\% of the targets (resp. target volume);
+full plots are available in~\cite{github_repository}. When varying one parameter, others remain at default values (Sec.~\ref{subsubsection:main_result}). Additional parameters, including the projection dimension~$D$ (Sec.~\ref{subsection:group-links}), showed no significant effect.
+
+\begin{inparaenum}
+	\item \emph{Impact of $\alpha$.} $\alpha$ controls the exploration--exploitation trade-off (Sec.~\ref{subsection:group-links}). We test $\alpha \in \{0.1,2\sqrt{2},30\}$ (Table~\ref{tab:parameter_study}, top), as optimality of $2\sqrt{2}$ is not guaranteed in our non-standard MAB setting. Smaller $\alpha$ generally improves performance, with best results for $\alpha=2\sqrt{2}$. Large $\alpha$ leads to excessive \emph{exploration}, especially on low or moderate-reward websites, neglecting useful, already discovered actions.
+	\item \emph{Impact of $n$ in $n$-grams for tag path representation.} For merging tag paths (Sec.~\ref{subsection:states_actions}), we test $n \in \{1,2,3\}$ ($n=1$ represents paths as sets of HTML tags). Table~\ref{tab:parameter_study} (middle) shows that $n=2$ and $3$ generally outperform $n=1$, confirming that groups of tag paths provide a better learning basis than sets of tags. We choose $n=2$, as $3$ yields similar performance but incurs higher computational cost due to exponential growth feature space growth.
+	\item \emph{Impact of $\theta$.} The similarity threshold $\theta$ controls tag path grouping (Sec.~\ref{subsection:states_actions}). We test $\theta \in \{0.55,0.75,0.95\}$ (Table~\ref{tab:parameter_study}, bottom). High $\theta$ often performs poorly, especially when no similarity $>95\%$ exists, as with websites adding unique IDs in tags. For example, on \emph{ed} it caused an OOM error by creating as many actions as HTML pages. Best results occur with $\theta \in \{0.55,0.75\}$, with $\theta=0.75$ usually superior: when $0.55$ performs better, $0.75$ remains comparable, but not conversely (e.g., on \emph{ju}, $\theta=0.75$ improves both requests and volume by 40\%).
+
+\end{inparaenum}
+
+\begin{table*}
+	\centering
+	\caption{Percentage of requests that an SB crawler with oracle
+		performs to retrieve 90\% of the targets (left of |).\\
+		Right of |:
+		percentage of the volume of non-target pages retrieved, before
+  retrieving 90\% of the total target volume. \\Hyper-parameter study on
+$\alpha$ (top), $n$ (in $n$-grams, center), and $\theta$ (bottom), for
+the 11 fully-crawled websites.}
+
+	\footnotesize
+	\setlength{\tabcolsep}{2.5pt}
+
+	\begin{tabular*}{\textwidth}{
+	@{\extracolsep{\fill}}
+	r
+	*{11}{r@{\hspace*{0.3em}\textbar\hspace*{-.75em}}r}
+	}
+	\toprule
+	\bfseries Crawler
+	& \multicolumn{2}{c}{\emph{be}}
+	& \multicolumn{2}{c}{\emph{cl}}
+	& \multicolumn{2}{c}{\emph{cn}}
+	& \multicolumn{2}{c}{\emph{ed}}
+	& \multicolumn{2}{c}{\emph{in}}
+	& \multicolumn{2}{c}{\emph{is}}
+	& \multicolumn{2}{c}{\emph{ju}}
+	& \multicolumn{2}{c}{\emph{nc}}
+	& \multicolumn{2}{c}{\emph{oe}}
+	& \multicolumn{2}{c}{\emph{ok}}
+	& \multicolumn{2}{c}{\emph{qa}} \\
+	\midrule
+	$\alpha = 0.1$
+	& 86.3 & 26.2
+	& \textbf{75.9} & \textbf{42.3}
+	& 74.3 & 35.5
+	& 53.7 & 54.1
+	& \textbf{\09.8} & \textbf{10.2}
+	& 77.1 & 66.2
+	& 37.1 & 35.0
+	& 51.6 & \textbf{26.2}
+	& \textbf{55.6} & \textbf{34.4}
+	& 14.3 & 33.2
+	& \textbf{67.7} & 32.1 \\
+
+	$\alpha = 2\sqrt{2}$
+	& 84.7 & \textbf{24.2}
+	& 76.4 & 56.3
+	& \textbf{71.8} & \textbf{24.6}
+	& \textbf{53.0} & 49.2
+	& 11.1 & 11.0
+	& \textbf{74.2} & \textbf{58.9}
+	& \textbf{35.0} & \textbf{22.9}
+	& \textbf{51.4} & 29.5
+	& 59.2 & 48.0
+	& \textbf{10.3} & \textbf{19.0}
+	& 68.9 & 33.9 \\
+
+	$\alpha = 30$
+	& \textbf{83.8} & 36.7
+	& 79.6 & 58.9
+	& 75.3 & 32.4
+	& 66.2 & \textbf{41.5}
+	& 11.6 & 11.8
+	& 80.9 & 66.4
+	& 43.3 & 28.8
+	& 67.3 & 29.5
+	& 68.8 & 72.9
+	& 36.7 & 71.3
+	& 71.8 & \textbf{30.4} \\
+
+	\midrule
+	$n = 1$
+	& 84.5 & 27.1
+	& 77.2 & \textbf{48.5}
+	& 78.6 & 56.3
+	& 57.3 & 55.1
+	& \textbf{\09.9} & 10.7
+	& 78.2 & 69.6
+	& 35.7 & \textbf{17.6}
+	& 54.8 & 33.5
+	& \textbf{52.6} & \textbf{28.1}
+	& 13.6 & 27.2
+	& 68.9 & 34.7 \\
+
+	$n = 2$
+	& 84.7 & \textbf{24.2}
+	& \textbf{76.4} & 56.3
+	& 71.8 & \textbf{24.6}
+	& \textbf{53.0} & \textbf{49.2}
+	& 11.1 & 11.0
+	& 74.2 & 58.9
+	& \textbf{35.0} & 22.9
+	& 51.4 & 29.5
+	& 59.2 & 48.0
+	& 10.3 & 19.0
+	& \textbf{68.3} & \textbf{33.9} \\
+
+	$n = 3$
+	& \textbf{84.1} & 32.8
+	& 78.2 & 51.2
+	& \textbf{71.3} & 25.7
+	& 57.0 & 53.1
+	& 10.7 & \textbf{10.5}
+	& \textbf{71.3} & \textbf{49.2}
+	& 37.0 & 26.9
+	& \textbf{51.2} & \textbf{27.0}
+	& 79.6 & 79.0
+	& \textbf{\06.0} & \textbf{\08.8}
+	& 70.0 & 34.9 \\
+
+	\midrule
+	$\theta = 0.55$
+	& \textbf{81.2} & 42.0
+	& 76.8 & \textbf{50.5}
+	& 76.6 & 41.9
+	& 56.5 & 53.1
+	& \textbf{\08.2} & \textbf{\09.4}
+	& 78.7 & 65.5
+	& 80.6 & 65.4
+	& 56.1 & 35.5
+	& \textbf{52.4} & \textbf{30.9}
+	& 12.5 & 25.7
+	& \textbf{67.8} & 26.0 \\
+
+	$\theta = 0.75$
+	& 84.7 & \textbf{24.2}
+	& \textbf{76.4} & 56.3
+	& \textbf{71.8} & \textbf{24.6}
+	& \textbf{53.0} & \textbf{49.2}
+	& 11.1 & 11.0
+	& 74.2 & 58.9
+	& \textbf{35.0} & \textbf{22.9}
+	& \textbf{51.4} & \textbf{29.5}
+	& 59.2 & 48.0
+	& \textbf{10.3} & \textbf{18.7}
+	& 68.9 & 33.9 \\
+
+	$\theta = 0.95$
+	& 82.4 & 47.7
+	& 84.3 & 72.1
+	& 73.1 & 44.7
+	& OOM & OOM
+	& \09.8 & 11.0
+	& \textbf{71.0} & \textbf{54.9}
+	& 73.3 & 66.5
+	& 57.3 & 33.2
+	& 90.2 & 87.2
+	& 12.4 & 19.0
+	& 68.3 & \textbf{25.9} \\
+	\bottomrule
+	\end{tabular*}
+	\label{tab:parameter_study}
+	\end{table*}
+
+
+All crawls with \textsf{\small SB-CLASSIFIER} so far use a logistic
+regression classifier (\textsc{LR}) with URL features
+(\textsc{URL\_ONLY}). To study model and feature impacts, we also
+evaluate a linear SVM (\textsc{SVM}), multinomial Naive Bayes
+(\textsc{NB}), and a passive--aggressive
+classifier~\cite{crammer2006online} (\textsc{PA}), restricting to
+lightweight online models and excluding deep approaches whose cost would
+shift the bottleneck from network latency to local CPU/GPU time. Each
+model is used with two feature sets: \textsc{URL\_ONLY} and
+\textsc{URL\_CONT} (URL plus anchor text, DOM path, and surrounding
+text). All features use character-level 2-gram BoW encoding, yielding
+eight variants. Experiments are run on fully-crawled websites, with 15
+runs per configuration and per site. Table~\ref{tab:expes_url_classifier}
+reports, for each website and variant, the \emph{intra-website} crawl
+metric of Table~\ref{tab:all_crawlers_all_sites_nb_requests} (number of
+requests to reach 90\% of targets); variants requiring at least 2\% fewer
+requests than \textsc{URL\_ONLY--LR} are in bold. The last column
+(\textbf{``MR''}) reports \emph{inter-website} misclassification rates on
+HTML pages and targets from averaged confusion matrices. On 10 of the 11
+websites, no variant improves over \textsc{URL\_ONLY--LR} by more than
+2\%; the sole exception is \emph{qa}, where two variants achieve a $\leq
+2.3\%$ gain. This lack of consistent gains, also seen in \textbf{``MR''}, shows that neither richer features nor more complex models yield meaningful gains, justifying the choice of \textsc{URL\_ONLY--LR}.
+
+
+\begin{table*}
+	\centering
+	\caption{Intra-website crawl metric (90\% targets reached) and inter-website misclassification rates for URL classifier variants.}
+	\begin{tabular}{lcccccccccccc}
+		\toprule
+		\textbf{Variant} & \emph{be} & \emph{cl} & \emph{cn} & \emph{ed} & \emph{in} & \emph{is} & \emph{ju} & \emph{nc} & \emph{oe} & \emph{ok} & \emph{qa} & \bfseries MR \\
+		\midrule
+		\small URL\_ONLY-LR & 82.1 & 75.1 & 71.3 & 53.2 & 11.7 & 76.1 & 36.5 & 52.6 & 60.7 & 15.9 & 62.3 & 2.62 \\
+		\small URL\_ONLY-SVM & 82.7 & 75.7 & 71.8 & 63.6 & 11.3 & 76.0 & 37.4 & 52.2 & 63.5 & 16.7 & 61.5 & 2.99 \\
+		\small URL\_ONLY-NB & 82.9 & 75.2 & 72.1 & 53.7 & 11.4 & 76.3 & 35.8 & 52.7 & 59.7 & 18.0 & 63.1 & 2.92 \\
+		\small URL\_ONLY-PA & 82.3 & 74.4 & 71.7 & 53.3 & 11.1 & 75.8 & 36.7 & 51.6 & 60.5 & 15.9 & 60.9 & 2.56 \\
+		\small URL\_CONT-LR & 82.2 & 74.4 & 71.9 & 54.3 & 11.3 & 76.4 & 37.8 & 52.9 & 64.7 & 16.8 & \textbf{60.0} & 5.93 \\
+		\small URL\_CONT-SVM & 82.6 & 75.0 & 71.8 & 52.8 & 11.6 & 76.4 & 38.8 & 53.1 & 61.1 & 18.7 & \textbf{60.1} & 6.36 \\
+		\small URL\_CONT-NB & 84.1 & 74.7 & 71.9 & 53.6 & 11.4 & 75.7 & 35.5 & 52.3 & 59.9 & 19.1 & 60.4 & 7.15 \\
+		\small URL\_CONT-PA & 82.5 & 75.1 & 71.9 & 53.6 & 11.6 & 76.2 & 38.4 & 52.1 & 62.6 & 16.1 & 60.6 & 4.12 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:expes_url_classifier}
+\end{table*}
+
+\begin{toappendix}
+
+	\def\websitesHyperParamOne{{be}, {cl}, {cn}, {ed}, {in}, {is}}
+	\def\websitesHyperParamTwo{{ju}, {nc}, {oe}, {ok}, {qa}}
+
+	% -------------- Alpha --------------
+	\newcounter{plotcount}
+	\begin{figure}
+	\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+\renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/alpha/legend.pdf}
+		\end{subfigure}
+
+		\setcounter{plotcount}{0}
+		\foreach \short in \websitesHyperParamOne {
+			\stepcounter{plotcount}
+			\ifnum\value{plotcount}<9
+			\begin{subfigure}[t]{0.47\textwidth}
+				\includegraphics[width=\linewidth]{plots/alpha/\short.pdf}
+				\vspace{-2em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\ifodd\value{plotcount}
+			\hfill
+			\else
+			\par\vspace{0.5em}
+			\fi
+			\else
+
+			\begin{center}
+				\begin{subfigure}[t]{0.47\textwidth}
+					\includegraphics[width=\linewidth]{plots/alpha/\short.pdf}
+					\vspace{-2em}
+					\caption{\emph{\short}}
+				\end{subfigure}
+			\end{center}
+			\fi
+		}
+
+		\caption{Crawler performance for hyper-parameter study on
+			exploration--exploitation coefficient $\alpha$, for websites \emph{be}, \emph{cl}, \emph{cn}, \emph{ed}, \emph{in}, and \emph{is}}
+		\label{fig:hyper_param_alpha_1}
+	\end{figure}
+
+	\begin{figure}
+	\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+\renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/alpha/legend.pdf}
+		\end{subfigure}
+
+		\setcounter{plotcount}{0}
+		\foreach \short in \websitesHyperParamTwo {
+			\stepcounter{plotcount}
+			\ifnum\value{plotcount}<9
+			\begin{subfigure}[t]{0.47\textwidth}
+				\includegraphics[width=\linewidth]{plots/alpha/\short.pdf}
+				\vspace{-2em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\ifodd\value{plotcount}
+			\hfill
+			\else
+			\par\vspace{0.5em}
+			\fi
+			\else
+
+			\begin{center}
+				\begin{subfigure}[t]{0.47\textwidth}
+					\includegraphics[width=\linewidth]{plots/alpha/\short.pdf}
+					\vspace{-2em}
+					\caption{\emph{\short}}
+				\end{subfigure}
+			\end{center}
+			\fi
+		}
+
+		\caption{Crawler performance for hyper-parameter study on
+			exploration--exploitation coefficient $\alpha$, for websites \emph{ju}, \emph{nc}, \emph{oe}, \emph{ok}, and \emph{qa}}
+		\label{fig:hyper_param_alpha_2}
+	\end{figure}
+
+	% -------------- n-grams --------------
+
+	\begin{figure}
+	\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+\renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/n_grams/legend.pdf}
+		\end{subfigure}
+
+		\setcounter{plotcount}{0}
+		\foreach \short in \websitesHyperParamOne {
+			\stepcounter{plotcount}
+			\ifnum\value{plotcount}<9
+			\begin{subfigure}[t]{0.47\textwidth}
+				\includegraphics[width=\linewidth]{plots/n_grams/\short.pdf}
+				\vspace{-2em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\ifodd\value{plotcount}
+			\hfill
+			\else
+			\par\vspace{0.5em}
+			\fi
+			\else
+
+			\begin{center}
+				\begin{subfigure}[t]{0.47\textwidth}
+					\includegraphics[width=\linewidth]{plots/n_grams/\short.pdf}
+					\vspace{-2em}
+					\caption{\emph{\short}}
+				\end{subfigure}
+			\end{center}
+			\fi
+		}
+
+		\caption{Crawler performance for impact study of the choice of $n$ in $n$-grams used in tag path vector representation, for websites \emph{be}, \emph{cl}, \emph{cn}, \emph{ed}, \emph{in}, and \emph{is}}
+		\label{fig:hyper_param_n_grams_1}
+	\end{figure}
+
+	\begin{figure}
+	\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+\renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/n_grams/legend.pdf}
+		\end{subfigure}
+
+		\setcounter{plotcount}{0}
+		\foreach \short in \websitesHyperParamTwo {
+			\stepcounter{plotcount}
+			\ifnum\value{plotcount}<9
+			\begin{subfigure}[t]{0.47\textwidth}
+				\includegraphics[width=\linewidth]{plots/n_grams/\short.pdf}
+				\vspace{-2em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\ifodd\value{plotcount}
+			\hfill
+			\else
+			\par\vspace{0.5em}
+			\fi
+			\else
+
+			\begin{center}
+				\begin{subfigure}[t]{0.47\textwidth}
+					\includegraphics[width=\linewidth]{plots/n_grams/\short.pdf}
+					\vspace{-2em}
+					\caption{\emph{\short}}
+				\end{subfigure}
+			\end{center}
+			\fi
+		}
+
+		\caption{Crawler performance for impact study of the choice of $n$ in $n$-grams used in tag path vector representation, for websites \emph{ju}, \emph{nc}, \emph{oe}, \emph{ok}, and \emph{qa}}
+		\label{fig:hyper_param_n_grams_2}
+	\end{figure}
+
+
+	% -------------- similarity threshold --------------
+
+	\begin{figure}
+	\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+\renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/similarity_threshold/legend.pdf}
+		\end{subfigure}
+
+		\setcounter{plotcount}{0}
+		\foreach \short in \websitesHyperParamOne {
+			\stepcounter{plotcount}
+			\ifnum\value{plotcount}<9
+			\begin{subfigure}[t]{0.47\textwidth}
+				\includegraphics[width=\linewidth]{plots/similarity_threshold/\short.pdf}
+				\vspace{-2em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\ifodd\value{plotcount}
+			\hfill
+			\else
+			\par\vspace{0.5em}
+			\fi
+			\else
+
+			\begin{center}
+				\begin{subfigure}[t]{0.47\textwidth}
+					\includegraphics[width=\linewidth]{plots/similarity_threshold/\short.pdf}
+					\vspace{-2em}
+					\caption{\emph{\short}}
+				\end{subfigure}
+			\end{center}
+			\fi
+		}
+
+		\caption{Crawler performance for impact study on similarity threshold $\theta$, \emph{cl}, \emph{cn}, \emph{ed}, \emph{in}, and \emph{is}}
+		\label{fig:hyper_param_similarity_threshold_1}
+	\end{figure}
+
+	\begin{figure}
+		\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+\renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/similarity_threshold/legend.pdf}
+		\end{subfigure}
+
+		\setcounter{plotcount}{0}
+		\foreach \short in \websitesHyperParamTwo {
+			\stepcounter{plotcount}
+			\ifnum\value{plotcount}<9
+			\begin{subfigure}[t]{0.47\textwidth}
+				\includegraphics[width=\linewidth]{plots/similarity_threshold/\short.pdf}
+				\vspace{-2em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\ifodd\value{plotcount}
+			\hfill
+			\else
+			\par\vspace{0.5em}
+			\fi
+			\else
+
+			\begin{center}
+				\begin{subfigure}[t]{0.47\textwidth}
+					\includegraphics[width=\linewidth]{plots/similarity_threshold/\short.pdf}
+					\vspace{-2em}
+					\caption{\emph{\short}}
+				\end{subfigure}
+			\end{center}
+			\fi
+		}
+
+		\caption{Crawler performance for impact study on similarity threshold $\theta$, for websites \emph{ju}, \emph{nc}, \emph{oe}, \emph{ok}, and \emph{qa}}
+		\label{fig:hyper_param_similarity_threshold_2}
+	\end{figure}
+	\clearpage
+
+\def\websitesFullyCrawled{{be}, {cl}, {cn}, {ed}, {in}, {is}, {ju}, {nc}, {oe}, {ok}, {qa}}
+
+Figure~\ref{fig:url_classifier_models_features_study} shows the crawl performance of \textsf{\small SB-CLASSIFIER} across different URL classifier configurations, combining various learning models (LR: logistic regression; SVM: linear support vector machine; NB: multinomial Naive Bayes; PA: passive-aggressive classifier) and feature sets (URL\_ONLY: character-level 2-gram bag-of-words of the URL alone; URL\_CONT: URL\_ONLY augmented with character-level 2-gram bag-of-words of the anchor text, DOM path, and surrounding text), evaluated on the 11 fully-crawled websites.
+
+
+\begin{figure}
+\captionsetup[subfigure]{labelformat=simple, labelsep=period}
+\renewcommand{\thesubfigure}{\arabic{subfigure}}
+		\begin{subfigure}[t]{\textwidth}
+			\includegraphics[width=\linewidth]{plots/url_classifier/legend.pdf}
+		\end{subfigure}
+
+		\setcounter{plotcount}{0}
+		\foreach \short in \websitesFullyCrawled {
+			\stepcounter{plotcount}
+			\begin{subfigure}[t]{0.24\textwidth}
+				\includegraphics[width=\linewidth]{plots/url_classifier/\short.pdf}
+				\vspace{-2em}
+				\caption{\emph{\short}}
+			\end{subfigure}
+			\ifnum\value{plotcount}=4
+			\par\vspace{0.5em}
+			\setcounter{plotcount}{0}
+			\else
+			\hfill
+			\fi
+		}
+
+	\caption{Crawler performance for impact study on URL classifier models and feature sets, for all 11 fully-crawled websites}
+	\label{fig:url_classifier_models_features_study}
+\end{figure}
+\clearpage
+
+Tables~\ref{tab:cm_pcts_url_only_lr}~to~\ref{tab:cm_pcts_url_cont_pa} report the confusion matrices for each URL classifier variant, averaged across the 11 fully-crawled websites and over 15 runs. Detailed confusion matrices for each variant on individual sites are available in the repository~\cite{github_repository}.
+
+
+\begin{table}[h]
+	\centering
+	\caption{Confusion matrix of the URL classifier URL\_ONLY-LR, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		\bfseries HTML    & 58.73 & \01.69 & 0.00 \\
+		\bfseries Target  & \00.77  & 32.73 & 0.00 \\
+		\bfseries Neither & \04.50  & \01.58 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_only_lr}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\vspace{-1em}
+	\caption{Confusion matrix of the URL classifier URL\_ONLY-SVM, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		\bfseries HTML    & 58.59 & \01.84 & 0.00 \\
+		\bfseries Target  & \00.98  & 32.53 & 0.00 \\
+		\bfseries Neither & \04.48  & \01.60 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_only_svm}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\vspace{-1em}
+	\caption{Confusion matrix of the URL classifier URL\_ONLY-NB, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		\bfseries HTML    & 58.44 & \01.97 & 0.00 \\
+		\bfseries Target  & \00.77  & 32.73 & 0.00 \\
+		\bfseries Neither & \04.47  & \01.61 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_only_nb}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\vspace{-1em}
+	\caption{Confusion matrix of the URL classifier URL\_ONLY-PA, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		\bfseries HTML    & 58.60 & \01.82 & 0.00 \\
+		\bfseries Target  & \00.58  & 32.92 & 0.00 \\
+		\bfseries Neither & \04.50  & \01.57 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_only_pa}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\vspace{-1em}
+	\caption{Confusion matrix of the URL classifier URL\_CONT-LR, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		\bfseries HTML    & 57.62 & \02.79 & 0.00 \\
+		\bfseries Target  & \02.78  & 30.73 & 0.00 \\
+		\bfseries Neither & \04.58  & \01.49 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_cont_lr}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\vspace{-1em}
+	\caption{Confusion matrix of the URL classifier URL\_CONT-SVM, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		\bfseries HTML    & 57.47 & \02.94 & 0.00 \\
+		\bfseries Target  & \03.03  & 30.48 & 0.00 \\
+		\bfseries Neither & \04.61  & \01.46 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_cont_svm}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\vspace{-1em}
+	\caption{Confusion matrix of the URL classifier URL\_CONT-NB, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		\bfseries HTML    & 58.34 & \02.08 & 0.00 \\
+		\bfseries Target  & \04.64 & 28.87 & 0.00 \\
+		\bfseries Neither & \04.58 & \01.49 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_cont_nb}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\vspace{-1em}
+	\caption{Confusion matrix of the URL classifier URL\_CONT-PA, inter-site average over the 11 fully-crawled websites (each averaged over 15 runs)}
+	\vspace*{-.5em}
+	\begin{tabular}{lrrr}
+		\toprule
+		\bfseries \diagbox{True}{Predicted} & \bfseries HTML (\%) &
+		\bfseries Target (\%) & \bfseries Neither (\%) \\
+		\midrule
+		bfseries HTML    & 57.96 & \02.45 & 0.00 \\
+		\bfseries Target  & \01.42 & 32.09 & 0.00 \\
+		\bfseries Neither & \04.54 & \01.53 & 0.00 \\
+		\bottomrule
+	\end{tabular}
+	\label{tab:cm_pcts_url_cont_pa}
+\end{table}
+
+\clearpage
+
+\end{toappendix}

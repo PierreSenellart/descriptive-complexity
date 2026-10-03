@@ -1,0 +1,12 @@
+\section{Conclusion}\label{section:conclusion}
+
+We addressed the problem of scalable web data acquisition by developing an efficient crawling that aims to maximize the retrieval of targets (interesting pages or files) while minimizing computational resource usage in terms of time and bandwidth, and respecting crawling ethics. 
+Our solution, based on RL, outperforms standard baselines on an heterogeneous set of websites.
+
+In our future work, we would like to explore more complex reward functions than the simple number of targets reachable. 
+Also, integrating deep-Web crawling techniques could enhance our crawler's ability to access data behind forms or within portals more efficiently, thereby further improving our web data acquisition at scale.
+Finally, while our crawler focuses on the initial acquisition of
+targets, it does not handle updates or newly published resources: an
+important limitation for statistical data journalism, where timely
+information is essential. We leave extending our crawler with
+\emph{incremental revisits} for future work, combining the knowledge acquired by our RL-agent with existing re-crawling strategies.
