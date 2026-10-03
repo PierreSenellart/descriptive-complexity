@@ -205,14 +205,17 @@ end FinVocab
 
 open Lax904597.Machines Lax624099.FiniteSatisfiability Lax624099.CodeHalting
 
-instance instDecidableEqSigmaNatRelationsTuring : DecidableEq ((n : ℕ) × turing.Relations n) :=
-  inferInstanceAs (DecidableEq ((n : ℕ) × turingRel n))
+instance instDecidableEqSigmaNatRelationsTuring : DecidableEq ((n : ℕ) × turing.Relations n) := by
+  show DecidableEq ((n : ℕ) × turingRel n)
+  infer_instance
 
-instance instDecidableEqSigmaNatRelationsFinsat : DecidableEq ((n : ℕ) × finsat.Relations n) :=
-  inferInstanceAs (DecidableEq ((n : ℕ) × finsatRel n))
+instance instDecidableEqSigmaNatRelationsFinsat : DecidableEq ((n : ℕ) × finsat.Relations n) := by
+  show DecidableEq ((n : ℕ) × finsatRel n)
+  infer_instance
 
-instance instDecidableEqSigmaNatRelationsCode : DecidableEq ((n : ℕ) × code.Relations n) :=
-  inferInstanceAs (DecidableEq ((n : ℕ) × codeRel n))
+instance instDecidableEqSigmaNatRelationsCode : DecidableEq ((n : ℕ) × code.Relations n) := by
+  show DecidableEq ((n : ℕ) × codeRel n)
+  infer_instance
 
 /-- **The vocabulary of machine instances, presented**: twelve symbols, six
 unary and six binary. -/
