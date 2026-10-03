@@ -1,0 +1,115 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: v1.2.2
+prefix: DescriptiveComplexity
+targets:
+  - DescriptiveComplexity.CQContainment
+  - DescriptiveComplexity.CQEval
+  - DescriptiveComplexity.DecisionProblem.min_holds
+  - DescriptiveComplexity.DecisionProblem.ofSentence_holds
+  - DescriptiveComplexity.Encoding.relMap_iff
+  - DescriptiveComplexity.FOReduction.withInvariant
+  - DescriptiveComplexity.FinPresentation.relMap_iff
+  - DescriptiveComplexity.SigmaSODefinable.inf_ofSentence
+  - DescriptiveComplexity.concreteQueryHolds_iff_queryHolds
+  - DescriptiveComplexity.cqCode
+  - DescriptiveComplexity.cqContainment_fo_reduction_cqEval
+  - DescriptiveComplexity.cqContainment_mem_NP
+  - DescriptiveComplexity.cqDecode
+  - DescriptiveComplexity.cqDecode_sound
+  - DescriptiveComplexity.cqDecode_total
+  - DescriptiveComplexity.cqEncoding
+  - DescriptiveComplexity.cqEncoding_faithful
+  - DescriptiveComplexity.cqEval_fo_reduction_cqContainment
+  - DescriptiveComplexity.cqEval_sigmaSODefinable
+  - DescriptiveComplexity.queryContained_iff_hom
+  - DescriptiveComplexity.queryContained_iso
+  - DescriptiveComplexity.queryHolds_iso
+  - DescriptiveComplexity.realize_cqWFSentence
+  - DescriptiveComplexity.threeColToCQEval_wf
+  - DescriptiveComplexity.threeCol_fo_reduction_cqEval
+copyright: 2026 Pierre Senellart
+manifest:
+  title: Conjunctive query evaluation and containment are NP-complete
+  authors:
+    - name: Pierre Senellart
+      orcid: 0000-0002-7909-5369
+      github: PierreSenellart
+    - name: Claude (Anthropic)
+  bibEntries:
+    - "@inproceedings{chandra1977optimal,\n  author = {Ashok K. Chandra and Philip M. Merlin},\n  editor = {John E. Hopcroft\
+      \ and Emily P. Friedman and Michael A. Harrison},\n  title = {Optimal Implementation of Conjunctive Queries in Relational\
+      \ Data Bases},\n  booktitle = {Proceedings of the 9th Annual {ACM} Symposium on Theory of Computing, May 4-6, 1977,\
+      \ Boulder, Colorado, {USA}},\n  pages = {77--90},\n  publisher = {{ACM}},\n  year = {1977},\n  doi = {10.1145/800105.803397},\n\
+      \  bibsource = {dblp computer science bibliography, https://dblp.org}\n}\n"
+    - "@misc{senellart2026descriptive,\n  author = {Pierre Senellart and Anton Gnatenko},\n  title = {Descriptive Complexity\
+      \ in {Lean}: Completeness by First-Order Reductions},\n  year = {2026},\n  eprint = {2609.18261},\n  archivePrefix =\
+      \ {arXiv}\n}\n"
+    - "@software{senellart2026descriptivecomplexity,\n  author = {Pierre Senellart},\n  title = {{DescriptiveComplexity}:\
+      \ Completeness by First-Order Reductions in {Lean}},\n  version = {1.2.2},\n  year = {2026},\n  doi = {10.5281/zenodo.21678423},\n\
+      \  url = {https://github.com/PierreSenellart/descriptive-complexity}\n}\n"
+requires:
+  - package: Lax904597
+    repository: https://github.com/PierreSenellart/descriptive-complexity
+    commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+    folder: lax/np-core
+    restated_from: ../np-core/export.yaml
+  - package: Lax799700
+    repository: https://github.com/PierreSenellart/descriptive-complexity
+    commit: 5f34068ba7707478cd268f2316c295d7ea51a711
+    folder: lax/np-catalog
+    restated_from: ../np-catalog/export.yaml
+restated:
+  DescriptiveComplexity.CQHom: Evaluation.CQHom
+  DescriptiveComplexity.CQInstance: PackagedInstances.CQInstance
+  DescriptiveComplexity.CQInstance.atoms: PackagedInstances.CQInstance.atoms
+  DescriptiveComplexity.CQInstance.consts: PackagedInstances.CQInstance.consts
+  DescriptiveComplexity.CQInstance.facts: PackagedInstances.CQInstance.facts
+  DescriptiveComplexity.CQInstance.mk: PackagedInstances.CQInstance.mk
+  DescriptiveComplexity.CQInstance.vars: PackagedInstances.CQInstance.vars
+  DescriptiveComplexity.ConcreteCQHolds: PackagedInstances.ConcreteCQHolds
+  DescriptiveComplexity.ConcreteQueryHolds: PackagedInstances.ConcreteQueryHolds
+  DescriptiveComplexity.DbEdge: QueryDatabases.DbEdge
+  DescriptiveComplexity.DbFact: QueryDatabases.DbFact
+  DescriptiveComplexity.FinPresentation: PackagedInstances.FinPresentation
+  DescriptiveComplexity.FinPresentation.card: PackagedInstances.FinPresentation.card
+  DescriptiveComplexity.FinPresentation.mk: PackagedInstances.FinPresentation.mk
+  DescriptiveComplexity.FinPresentation.relBool: PackagedInstances.FinPresentation.relBool
+  DescriptiveComplexity.LAtom: QueryPairs.LAtom
+  DescriptiveComplexity.LVar: QueryPairs.LVar
+  DescriptiveComplexity.PairVar: QueryPairs.PairVar
+  DescriptiveComplexity.QAtom: QueryDatabases.QAtom
+  DescriptiveComplexity.QVar: QueryDatabases.QVar
+  DescriptiveComplexity.QueryContained: QueryPairs.QueryContained
+  DescriptiveComplexity.QueryHolds: Evaluation.QueryHolds
+  DescriptiveComplexity.RAtom: QueryPairs.RAtom
+  DescriptiveComplexity.RVar: QueryPairs.RVar
+  DescriptiveComplexity.SatisfiedIn: Evaluation.SatisfiedIn
+  DescriptiveComplexity.cqConsts: PackagedInstances.cqConsts
+  DescriptiveComplexity.cqRelBool: PackagedInstances.cqRelBool
+  DescriptiveComplexity.cqSize: PackagedInstances.cqSize
+  DescriptiveComplexity.cqVars: PackagedInstances.cqVars
+  DescriptiveComplexity.cqWFSentence: PackagedInstances.cqWFSentence
+  DescriptiveComplexity.instDecidableEqCQInstance: PackagedInstances.instDecidableEqCQInstance
+  DescriptiveComplexity.queryDbStructure: PackagedInstances.queryDbStructure
+  FirstOrder.Language.instDecidableEqQueryDbRel: QueryDatabases.instDecidableEqQueryDbRel
+  FirstOrder.Language.instDecidableEqQueryPairRel: QueryPairs.instDecidableEqQueryPairRel
+  FirstOrder.Language.instIsRelationalQueryDb: PackagedInstances.instIsRelationalQueryDb
+  FirstOrder.Language.instIsRelationalQueryPair: QueryPairs.instIsRelationalQueryPair
+  FirstOrder.Language.qdbAtom: QueryDatabases.qdbAtom
+  FirstOrder.Language.qdbFact: QueryDatabases.qdbFact
+  FirstOrder.Language.qdbIsVar: QueryDatabases.qdbIsVar
+  FirstOrder.Language.qpLeftAtom: QueryPairs.qpLeftAtom
+  FirstOrder.Language.qpLeftVar: QueryPairs.qpLeftVar
+  FirstOrder.Language.qpRightAtom: QueryPairs.qpRightAtom
+  FirstOrder.Language.qpRightVar: QueryPairs.qpRightVar
+  FirstOrder.Language.queryDb: QueryDatabases.queryDb
+  FirstOrder.Language.queryDbRel: QueryDatabases.queryDbRel
+  FirstOrder.Language.queryDbRel.atom: QueryDatabases.queryDbRel.atom
+  FirstOrder.Language.queryDbRel.fact: QueryDatabases.queryDbRel.fact
+  FirstOrder.Language.queryDbRel.isVar: QueryDatabases.queryDbRel.isVar
+  FirstOrder.Language.queryPair: QueryPairs.queryPair
+  FirstOrder.Language.queryPairRel: QueryPairs.queryPairRel
+  FirstOrder.Language.queryPairRel.leftAtom: QueryPairs.queryPairRel.leftAtom
+  FirstOrder.Language.queryPairRel.leftVar: QueryPairs.queryPairRel.leftVar
+  FirstOrder.Language.queryPairRel.rightAtom: QueryPairs.queryPairRel.rightAtom
+  FirstOrder.Language.queryPairRel.rightVar: QueryPairs.queryPairRel.rightVar

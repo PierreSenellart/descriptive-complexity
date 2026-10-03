@@ -1,0 +1,40 @@
+specVersion: "1"
+id: "lax-420092"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Conjunctive query evaluation and containment are NP-complete"
+authors:
+  - name: "Pierre Senellart"
+    orcid: "0000-0002-7909-5369"
+    github: "PierreSenellart"
+  - name: "Claude (Anthropic)"
+bibEntries:
+  - |
+    @inproceedings{chandra1977optimal,
+      author = {Ashok K. Chandra and Philip M. Merlin},
+      editor = {John E. Hopcroft and Emily P. Friedman and Michael A. Harrison},
+      title = {Optimal Implementation of Conjunctive Queries in Relational Data Bases},
+      booktitle = {Proceedings of the 9th Annual {ACM} Symposium on Theory of Computing, May 4-6, 1977, Boulder, Colorado, {USA}},
+      pages = {77--90},
+      publisher = {{ACM}},
+      year = {1977},
+      doi = {10.1145/800105.803397},
+      bibsource = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
