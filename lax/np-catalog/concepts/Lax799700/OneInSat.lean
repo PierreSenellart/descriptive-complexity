@@ -71,7 +71,8 @@ axiom oneInSatisfiable_iso : ∀ {A B : Type} [Lax904597.Sat.sat.Structure A] [L
 def OneInSAT : DecisionProblem Lax904597.Sat.sat :=
   DecisionProblem.ofPred OneInSatisfiable
 
-/-- The yes-instances of OneInSAT are exactly the structures satisfying `OneInSatisfiable`. -/
+/-- The yes-instances of OneInSAT are exactly the structures satisfying
+`OneInSatisfiable`. -/
 axiom oneInSat_iff : ∀ (A : Type) [Lax904597.Sat.sat.Structure A], OneInSAT A ↔ OneInSatisfiable A
 
 /-- OneInSAT is NP-complete. -/

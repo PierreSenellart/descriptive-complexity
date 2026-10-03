@@ -39,10 +39,10 @@ theorem threeDimMatching_agree (A : Type) [Lax799700.ThreeDimMatching.tripleSys.
 ---
 conclusion: Lax799700.ThreeDimMatching.threeDimMatching_NP_complete
 ---
-Membership from the library's existential second-order definition of ThreeDimMatching; hardness from the library's reduction out of
-SAT, which is NP-hard by the
-NP core's Cook–Levin theorem. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+ThreeDimMatching; hardness from the library's reduction out of SAT, which is
+NP-hard by the NP core’s Cook–Levin theorem. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem threeDimMatching_NP_complete : NP.Complete ThreeDimMatching :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => threeDimMatching_agree A).mp DescriptiveComplexity.threeDimMatching_sigmaSODefinable,

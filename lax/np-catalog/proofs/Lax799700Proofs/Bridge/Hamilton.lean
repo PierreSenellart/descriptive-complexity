@@ -41,10 +41,10 @@ theorem hamCircuit_agree (A : Type) [Lax799700.Hamilton.digraph.Structure A] : D
 ---
 conclusion: Lax799700.Hamilton.hamCircuit_NP_complete
 ---
-Membership from the library's existential second-order definition of HamCircuit; hardness from the library's reduction out of
-VertexCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+HamCircuit; hardness from the library's reduction out of VertexCover, which is
+NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem hamCircuit_NP_complete : NP.Complete HamCircuit :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => hamCircuit_agree A).mp DescriptiveComplexity.hamCircuit_sigmaSODefinable,
@@ -79,10 +79,10 @@ theorem dirHamCircuit_agree (A : Type) [Lax799700.Hamilton.digraph.Structure A] 
 ---
 conclusion: Lax799700.Hamilton.dirHamCircuit_NP_complete
 ---
-Membership from the library's existential second-order definition of DirHamCircuit; hardness from the library's reduction out of
-HamCircuit, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+DirHamCircuit; hardness from the library's reduction out of HamCircuit, which
+is NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem dirHamCircuit_NP_complete : NP.Complete DirHamCircuit :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => dirHamCircuit_agree A).mp DescriptiveComplexity.dirHamCircuit_sigmaSODefinable,

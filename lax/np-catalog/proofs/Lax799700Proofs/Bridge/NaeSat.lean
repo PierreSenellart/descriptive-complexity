@@ -37,10 +37,10 @@ theorem naeSat_agree (A : Type) [Lax904597.Sat.sat.Structure A] : DescriptiveCom
 ---
 conclusion: Lax799700.NaeSat.naeSat_NP_complete
 ---
-Membership from the library's existential second-order definition of NAESAT; hardness from the library's reduction out of
-SAT, which is NP-hard by the
-NP core's Cook–Levin theorem. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of NAESAT;
+hardness from the library's reduction out of SAT, which is NP-hard by the NP
+core’s Cook–Levin theorem. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem naeSat_NP_complete : NP.Complete NAESAT :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => naeSat_agree A).mp DescriptiveComplexity.naeSat_sigmaSODefinable,

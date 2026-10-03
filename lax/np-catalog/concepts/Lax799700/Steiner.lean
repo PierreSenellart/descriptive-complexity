@@ -165,7 +165,8 @@ axiom hasSmallEdgeSteinerTree_iso : ∀ {A B : Type} [Lax799700.Steiner.steinerG
 def EdgeSteinerTree : DecisionProblem Lax799700.Steiner.steinerGraph :=
   DecisionProblem.ofPred HasSmallEdgeSteinerTree
 
-/-- The yes-instances of EdgeSteinerTree are exactly the structures satisfying `HasSmallEdgeSteinerTree`. -/
+/-- The yes-instances of EdgeSteinerTree are exactly the structures satisfying
+`HasSmallEdgeSteinerTree`. -/
 axiom edgeSteinerTree_iff : ∀ (A : Type) [Lax799700.Steiner.steinerGraph.Structure A], EdgeSteinerTree A ↔ HasSmallEdgeSteinerTree A
 
 /-- EdgeSteinerTree is NP-complete. -/
@@ -179,7 +180,8 @@ axiom hasSmallSteinerTree_iso : ∀ {A B : Type} [Lax799700.Steiner.steinerGraph
 def SteinerTree : DecisionProblem Lax799700.Steiner.steinerGraph :=
   DecisionProblem.ofPred HasSmallSteinerTree
 
-/-- The yes-instances of SteinerTree are exactly the structures satisfying `HasSmallSteinerTree`. -/
+/-- The yes-instances of SteinerTree are exactly the structures satisfying
+`HasSmallSteinerTree`. -/
 axiom steinerTree_iff : ∀ (A : Type) [Lax799700.Steiner.steinerGraph.Structure A], SteinerTree A ↔ HasSmallSteinerTree A
 
 /-- SteinerTree is NP-complete. -/

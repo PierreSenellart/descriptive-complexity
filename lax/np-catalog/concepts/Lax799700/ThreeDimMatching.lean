@@ -127,7 +127,8 @@ axiom hasThreeDimMatching_iso : ∀ {A B : Type} [Lax799700.ThreeDimMatching.tri
 def ThreeDimMatching : DecisionProblem Lax799700.ThreeDimMatching.tripleSys :=
   DecisionProblem.ofPred HasThreeDimMatching
 
-/-- The yes-instances of ThreeDimMatching are exactly the structures satisfying `HasThreeDimMatching`. -/
+/-- The yes-instances of ThreeDimMatching are exactly the structures
+satisfying `HasThreeDimMatching`. -/
 axiom threeDimMatching_iff : ∀ (A : Type) [Lax799700.ThreeDimMatching.tripleSys.Structure A], ThreeDimMatching A ↔ HasThreeDimMatching A
 
 /-- ThreeDimMatching is NP-complete. -/

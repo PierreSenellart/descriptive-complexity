@@ -38,10 +38,10 @@ theorem nae3Sat_agree (A : Type) [Lax904597.Sat.sat.Structure A] : DescriptiveCo
 ---
 conclusion: Lax799700.NaeThreeSat.nae3Sat_NP_complete
 ---
-Membership from the library's reduction of NAE3SAT to NAESAT, which is in NP; hardness from the library's reduction out of
-NAESAT, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's reduction of NAE3SAT to NAESAT, which is in NP;
+hardness from the library's reduction out of NAESAT, which is NP-hard by the
+catalog’s statement for it. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem nae3Sat_NP_complete : NP.Complete NAE3SAT :=
   ⟨Lax904597.NPClass.NP_mem_of_foReduction

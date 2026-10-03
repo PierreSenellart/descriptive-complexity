@@ -40,10 +40,10 @@ theorem zeroOneIP_agree (A : Type) [Lax799700.ZeroOneIP.zeroOneIP.Structure A] :
 ---
 conclusion: Lax799700.ZeroOneIP.zeroOneIP_NP_complete
 ---
-Membership from the library's existential second-order definition of ZeroOneIP; hardness from the library's reduction out of
-Knapsack, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+ZeroOneIP; hardness from the library's reduction out of Knapsack, which is NP-
+hard by the catalog’s statement for it. Both are transported to the catalog's
+problems along the agreements.
 -/
 theorem zeroOneIP_NP_complete : NP.Complete ZeroOneIP :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => zeroOneIP_agree A).mp DescriptiveComplexity.zeroOneIP_sigmaSODefinable,

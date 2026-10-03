@@ -40,10 +40,10 @@ theorem jobSequencing_agree (A : Type) [Lax799700.JobSequencing.jobSeq.Structure
 ---
 conclusion: Lax799700.JobSequencing.jobSequencing_NP_complete
 ---
-Membership from the library's existential second-order definition of JobSequencing; hardness from the library's reduction out of
-NAE3SAT, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+JobSequencing; hardness from the library's reduction out of NAE3SAT, which is
+NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem jobSequencing_NP_complete : NP.Complete JobSequencing :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => jobSequencing_agree A).mp DescriptiveComplexity.jobSequencing_sigmaSODefinable,

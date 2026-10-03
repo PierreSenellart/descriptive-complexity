@@ -40,10 +40,10 @@ theorem knapsack_agree (A : Type) [Lax799700.Knapsack.binWeights.Structure A] : 
 ---
 conclusion: Lax799700.Knapsack.knapsack_NP_complete
 ---
-Membership from the library's existential second-order definition of Knapsack; hardness from the library's reduction out of
-ExactCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of Knapsack;
+hardness from the library's reduction out of ExactCover, which is NP-hard by
+the catalog’s statement for it. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem knapsack_NP_complete : NP.Complete Knapsack :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => knapsack_agree A).mp DescriptiveComplexity.knapsack_sigmaSODefinable,

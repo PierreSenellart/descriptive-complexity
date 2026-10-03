@@ -40,10 +40,10 @@ theorem dominatingSet_agree (A : Type) [Lax799700.CliqueFamily.markedGraph.Struc
 ---
 conclusion: Lax799700.DominatingSet.dominatingSet_NP_complete
 ---
-Membership from the library's existential second-order definition of DominatingSet; hardness from the library's reduction out of
-SetCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+DominatingSet; hardness from the library's reduction out of SetCover, which is
+NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem dominatingSet_NP_complete : NP.Complete DominatingSet :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => dominatingSet_agree A).mp DescriptiveComplexity.dominatingSet_sigmaSODefinable,

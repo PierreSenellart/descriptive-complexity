@@ -68,7 +68,8 @@ axiom hasSmallDominatingSet_iso : ∀ {A B : Type} [Lax799700.CliqueFamily.marke
 def DominatingSet : DecisionProblem Lax799700.CliqueFamily.markedGraph :=
   DecisionProblem.ofPred HasSmallDominatingSet
 
-/-- The yes-instances of DominatingSet are exactly the structures satisfying `HasSmallDominatingSet`. -/
+/-- The yes-instances of DominatingSet are exactly the structures satisfying
+`HasSmallDominatingSet`. -/
 axiom dominatingSet_iff : ∀ (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A], DominatingSet A ↔ HasSmallDominatingSet A
 
 /-- DominatingSet is NP-complete. -/

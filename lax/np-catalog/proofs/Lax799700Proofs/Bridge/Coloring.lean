@@ -40,10 +40,10 @@ theorem chromaticNumber_agree (A : Type) [Lax799700.CliqueFamily.markedGraph.Str
 ---
 conclusion: Lax799700.Coloring.chromaticNumber_NP_complete
 ---
-Membership from the library's existential second-order definition of ChromaticNumber; hardness from the library's reduction out of
-ThreeCol, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+ChromaticNumber; hardness from the library's reduction out of ThreeCol, which
+is NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem chromaticNumber_NP_complete : NP.Complete ChromaticNumber :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => chromaticNumber_agree A).mp DescriptiveComplexity.chromaticNumber_sigmaSODefinable,
@@ -78,10 +78,10 @@ theorem cliqueCover_agree (A : Type) [Lax799700.CliqueFamily.markedGraph.Structu
 ---
 conclusion: Lax799700.Coloring.cliqueCover_NP_complete
 ---
-Membership from the library's existential second-order definition of CliqueCover; hardness from the library's reduction out of
-ChromaticNumber, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+CliqueCover; hardness from the library's reduction out of ChromaticNumber,
+which is NP-hard by the catalog’s statement for it. Both are transported to
+the catalog's problems along the agreements.
 -/
 theorem cliqueCover_NP_complete : NP.Complete CliqueCover :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => cliqueCover_agree A).mp DescriptiveComplexity.cliqueCover_sigmaSODefinable,
@@ -121,7 +121,8 @@ conclusion: Lax799700.Coloring.kCol_NP_complete
 ---
 Membership from the library's existential second-order definition of
 $k$-colorability; hardness by padding the reduction of 3-colorability to
-$k$-colorability with $k - 3$ further colors, 3-colorability being NP-hard by the catalog's statement for it.
+$k$-colorability with $k - 3$ further colors, 3-colorability being NP-hard by
+the catalog's statement for it.
 -/
 theorem kCol_NP_complete {k : ℕ} (hk : 3 ≤ k) : NP.Complete (KCol k) := by
   obtain ⟨m, rfl⟩ : ∃ m, k = 3 + m := ⟨k - 3, by omega⟩

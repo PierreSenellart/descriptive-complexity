@@ -49,7 +49,8 @@ axiom threeColorable_iso : ∀ {A B : Type} [FirstOrder.Language.graph.Structure
 def ThreeCol : DecisionProblem FirstOrder.Language.graph :=
   DecisionProblem.ofPred ThreeColorable
 
-/-- The yes-instances of ThreeCol are exactly the structures satisfying `ThreeColorable`. -/
+/-- The yes-instances of ThreeCol are exactly the structures satisfying
+`ThreeColorable`. -/
 axiom threeCol_iff : ∀ (A : Type) [FirstOrder.Language.graph.Structure A], ThreeCol A ↔ ThreeColorable A
 
 /-- ThreeCol is NP-complete. -/

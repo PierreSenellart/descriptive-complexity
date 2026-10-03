@@ -40,10 +40,10 @@ theorem feedbackVertexSet_agree (A : Type) [Lax799700.CliqueFamily.markedGraph.S
 ---
 conclusion: Lax799700.Feedback.feedbackVertexSet_NP_complete
 ---
-Membership from the library's existential second-order definition of FeedbackVertexSet; hardness from the library's reduction out of
-VertexCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+FeedbackVertexSet; hardness from the library's reduction out of VertexCover,
+which is NP-hard by the catalog’s statement for it. Both are transported to
+the catalog's problems along the agreements.
 -/
 theorem feedbackVertexSet_NP_complete : NP.Complete FeedbackVertexSet :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => feedbackVertexSet_agree A).mp DescriptiveComplexity.feedbackVertexSet_sigmaSODefinable,
@@ -78,10 +78,10 @@ theorem feedbackArcSet_agree (A : Type) [Lax799700.Feedback.markedArcGraph.Struc
 ---
 conclusion: Lax799700.Feedback.feedbackArcSet_NP_complete
 ---
-Membership from the library's existential second-order definition of FeedbackArcSet; hardness from the library's reduction out of
-FeedbackVertexSet, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+FeedbackArcSet; hardness from the library's reduction out of
+FeedbackVertexSet, which is NP-hard by the catalog’s statement for it. Both
+are transported to the catalog's problems along the agreements.
 -/
 theorem feedbackArcSet_NP_complete : NP.Complete FeedbackArcSet :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => feedbackArcSet_agree A).mp DescriptiveComplexity.feedbackArcSet_sigmaSODefinable,

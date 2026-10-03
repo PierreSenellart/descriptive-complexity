@@ -116,7 +116,8 @@ axiom hasSmallChromaticNumber_iso : ∀ {A B : Type} [Lax799700.CliqueFamily.mar
 def ChromaticNumber : DecisionProblem Lax799700.CliqueFamily.markedGraph :=
   DecisionProblem.ofPred HasSmallChromaticNumber
 
-/-- The yes-instances of ChromaticNumber are exactly the structures satisfying `HasSmallChromaticNumber`. -/
+/-- The yes-instances of ChromaticNumber are exactly the structures satisfying
+`HasSmallChromaticNumber`. -/
 axiom chromaticNumber_iff : ∀ (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A], ChromaticNumber A ↔ HasSmallChromaticNumber A
 
 /-- ChromaticNumber is NP-complete. -/
@@ -130,7 +131,8 @@ axiom hasSmallCliqueCover_iso : ∀ {A B : Type} [Lax799700.CliqueFamily.markedG
 def CliqueCover : DecisionProblem Lax799700.CliqueFamily.markedGraph :=
   DecisionProblem.ofPred HasSmallCliqueCover
 
-/-- The yes-instances of CliqueCover are exactly the structures satisfying `HasSmallCliqueCover`. -/
+/-- The yes-instances of CliqueCover are exactly the structures satisfying
+`HasSmallCliqueCover`. -/
 axiom cliqueCover_iff : ∀ (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A], CliqueCover A ↔ HasSmallCliqueCover A
 
 /-- CliqueCover is NP-complete. -/
@@ -146,7 +148,8 @@ def KCol (k : ℕ) : DecisionProblem FirstOrder.Language.graph :=
   DecisionProblem.ofPred (KColorable k)
 
 /-- The yes-instances of KCol k are exactly the k-colorable graphs. -/
-axiom kCol_iff : ∀ (k : ℕ) (A : Type) [FirstOrder.Language.graph.Structure A], KCol k A ↔ KColorable k A
+axiom kCol_iff : ∀ (k : ℕ) (A : Type) [FirstOrder.Language.graph.Structure A],
+  KCol k A ↔ KColorable k A
 
 /-- k-colorability is NP-complete for every k ≥ 3. -/
 axiom kCol_NP_complete : ∀ {k : ℕ}, 3 ≤ k → NP.Complete (KCol k)

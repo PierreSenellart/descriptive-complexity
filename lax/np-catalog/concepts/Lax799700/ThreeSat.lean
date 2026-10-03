@@ -71,7 +71,8 @@ axiom threeSatisfiable_iso : ∀ {A B : Type} [Lax904597.Sat.sat.Structure A] [L
 def ThreeSAT : DecisionProblem Lax904597.Sat.sat :=
   DecisionProblem.ofPred ThreeSatisfiable
 
-/-- The yes-instances of ThreeSAT are exactly the structures satisfying `ThreeSatisfiable`. -/
+/-- The yes-instances of ThreeSAT are exactly the structures satisfying
+`ThreeSatisfiable`. -/
 axiom threeSat_iff : ∀ (A : Type) [Lax904597.Sat.sat.Structure A], ThreeSAT A ↔ ThreeSatisfiable A
 
 /-- ThreeSAT is NP-complete. -/

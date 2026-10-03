@@ -45,10 +45,10 @@ theorem setCover_agree (A : Type) [Lax799700.SetFamily.setSystem.Structure A] : 
 ---
 conclusion: Lax799700.SetFamily.setCover_NP_complete
 ---
-Membership from the library's existential second-order definition of SetCover; hardness from the library's reduction out of
-VertexCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of SetCover;
+hardness from the library's reduction out of VertexCover, which is NP-hard by
+the catalog’s statement for it. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem setCover_NP_complete : NP.Complete SetCover :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => setCover_agree A).mp DescriptiveComplexity.setCover_sigmaSODefinable,
@@ -83,10 +83,10 @@ theorem exactCover_agree (A : Type) [Lax799700.SetFamily.setSystem.Structure A] 
 ---
 conclusion: Lax799700.SetFamily.exactCover_NP_complete
 ---
-Membership from the library's existential second-order definition of ExactCover; hardness from the library's reduction out of
-OneInSAT, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+ExactCover; hardness from the library's reduction out of OneInSAT, which is
+NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem exactCover_NP_complete : NP.Complete ExactCover :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => exactCover_agree A).mp DescriptiveComplexity.exactCover_sigmaSODefinable,
@@ -121,10 +121,10 @@ theorem hittingSet_agree (A : Type) [Lax799700.SetFamily.setSystem.Structure A] 
 ---
 conclusion: Lax799700.SetFamily.hittingSet_NP_complete
 ---
-Membership from the library's reduction of HittingSet to SetCover, which is in NP; hardness from the library's reduction out of
-SetCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's reduction of HittingSet to SetCover, which is in
+NP; hardness from the library's reduction out of SetCover, which is NP-hard by
+the catalog’s statement for it. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem hittingSet_NP_complete : NP.Complete HittingSet :=
   ⟨Lax904597.NPClass.NP_mem_of_foReduction
@@ -160,10 +160,10 @@ theorem setPacking_agree (A : Type) [Lax799700.SetFamily.setSystem.Structure A] 
 ---
 conclusion: Lax799700.SetFamily.setPacking_NP_complete
 ---
-Membership from the library's existential second-order definition of SetPacking; hardness from the library's reduction out of
-IndependentSet, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+SetPacking; hardness from the library's reduction out of IndependentSet, which
+is NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem setPacking_NP_complete : NP.Complete SetPacking :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => setPacking_agree A).mp DescriptiveComplexity.setPacking_sigmaSODefinable,
@@ -198,10 +198,10 @@ theorem setSplitting_agree (A : Type) [Lax799700.SetFamily.setSystem.Structure A
 ---
 conclusion: Lax799700.SetFamily.setSplitting_NP_complete
 ---
-Membership from the library's existential second-order definition of SetSplitting; hardness from the library's reduction out of
-NAESAT, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+SetSplitting; hardness from the library's reduction out of NAESAT, which is
+NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem setSplitting_NP_complete : NP.Complete SetSplitting :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => setSplitting_agree A).mp DescriptiveComplexity.setSplitting_sigmaSODefinable,

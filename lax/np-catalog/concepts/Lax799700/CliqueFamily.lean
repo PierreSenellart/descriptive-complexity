@@ -140,7 +140,8 @@ axiom hasLargeClique_iso : ∀ {A B : Type} [Lax799700.CliqueFamily.markedGraph.
 def Clique : DecisionProblem Lax799700.CliqueFamily.markedGraph :=
   DecisionProblem.ofPred HasLargeClique
 
-/-- The yes-instances of Clique are exactly the structures satisfying `HasLargeClique`. -/
+/-- The yes-instances of Clique are exactly the structures satisfying
+`HasLargeClique`. -/
 axiom clique_iff : ∀ (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A], Clique A ↔ HasLargeClique A
 
 /-- Clique is NP-complete. -/
@@ -154,7 +155,8 @@ axiom hasLargeIndependentSet_iso : ∀ {A B : Type} [Lax799700.CliqueFamily.mark
 def IndependentSet : DecisionProblem Lax799700.CliqueFamily.markedGraph :=
   DecisionProblem.ofPred HasLargeIndependentSet
 
-/-- The yes-instances of IndependentSet are exactly the structures satisfying `HasLargeIndependentSet`. -/
+/-- The yes-instances of IndependentSet are exactly the structures satisfying
+`HasLargeIndependentSet`. -/
 axiom indSet_iff : ∀ (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A], IndependentSet A ↔ HasLargeIndependentSet A
 
 /-- IndependentSet is NP-complete. -/
@@ -168,7 +170,8 @@ axiom hasSmallVertexCover_iso : ∀ {A B : Type} [Lax799700.CliqueFamily.markedG
 def VertexCover : DecisionProblem Lax799700.CliqueFamily.markedGraph :=
   DecisionProblem.ofPred HasSmallVertexCover
 
-/-- The yes-instances of VertexCover are exactly the structures satisfying `HasSmallVertexCover`. -/
+/-- The yes-instances of VertexCover are exactly the structures satisfying
+`HasSmallVertexCover`. -/
 axiom vertexCover_iff : ∀ (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A], VertexCover A ↔ HasSmallVertexCover A
 
 /-- VertexCover is NP-complete. -/

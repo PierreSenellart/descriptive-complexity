@@ -116,7 +116,8 @@ axiom hasHamCircuit_iso : ∀ {A B : Type} [Lax799700.Hamilton.digraph.Structure
 def HamCircuit : DecisionProblem Lax799700.Hamilton.digraph :=
   DecisionProblem.ofPred HasHamCircuit
 
-/-- The yes-instances of HamCircuit are exactly the structures satisfying `HasHamCircuit`. -/
+/-- The yes-instances of HamCircuit are exactly the structures satisfying
+`HasHamCircuit`. -/
 axiom hamCircuit_iff : ∀ (A : Type) [Lax799700.Hamilton.digraph.Structure A], HamCircuit A ↔ HasHamCircuit A
 
 /-- HamCircuit is NP-complete. -/
@@ -130,7 +131,8 @@ axiom hasDirHamCircuit_iso : ∀ {A B : Type} [Lax799700.Hamilton.digraph.Struct
 def DirHamCircuit : DecisionProblem Lax799700.Hamilton.digraph :=
   DecisionProblem.ofPred HasDirHamCircuit
 
-/-- The yes-instances of DirHamCircuit are exactly the structures satisfying `HasDirHamCircuit`. -/
+/-- The yes-instances of DirHamCircuit are exactly the structures satisfying
+`HasDirHamCircuit`. -/
 axiom dirHamCircuit_iff : ∀ (A : Type) [Lax799700.Hamilton.digraph.Structure A], DirHamCircuit A ↔ HasDirHamCircuit A
 
 /-- DirHamCircuit is NP-complete. -/

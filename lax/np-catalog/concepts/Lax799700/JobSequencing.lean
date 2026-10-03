@@ -187,7 +187,8 @@ axiom hasGoodSchedule_iso : ∀ {A B : Type} [Lax799700.JobSequencing.jobSeq.Str
 def JobSequencing : DecisionProblem Lax799700.JobSequencing.jobSeq :=
   DecisionProblem.ofPred HasGoodSchedule
 
-/-- The yes-instances of JobSequencing are exactly the structures satisfying `HasGoodSchedule`. -/
+/-- The yes-instances of JobSequencing are exactly the structures satisfying
+`HasGoodSchedule`. -/
 axiom jobSequencing_iff : ∀ (A : Type) [Lax799700.JobSequencing.jobSeq.Structure A], JobSequencing A ↔ HasGoodSchedule A
 
 /-- JobSequencing is NP-complete. -/

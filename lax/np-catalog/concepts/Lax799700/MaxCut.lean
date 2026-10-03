@@ -73,7 +73,8 @@ axiom hasLargeCut_iso : ∀ {A B : Type} [Lax799700.Feedback.markedArcGraph.Stru
 def MaxCut : DecisionProblem Lax799700.Feedback.markedArcGraph :=
   DecisionProblem.ofPred HasLargeCut
 
-/-- The yes-instances of MaxCut are exactly the structures satisfying `HasLargeCut`. -/
+/-- The yes-instances of MaxCut are exactly the structures satisfying
+`HasLargeCut`. -/
 axiom maxCut_iff : ∀ (A : Type) [Lax799700.Feedback.markedArcGraph.Structure A], MaxCut A ↔ HasLargeCut A
 
 /-- MaxCut is NP-complete. -/

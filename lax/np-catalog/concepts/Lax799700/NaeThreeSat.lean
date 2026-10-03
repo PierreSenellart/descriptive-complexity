@@ -64,7 +64,8 @@ axiom naeThreeSatisfiable_iso : ∀ {A B : Type} [Lax904597.Sat.sat.Structure A]
 def NAE3SAT : DecisionProblem Lax904597.Sat.sat :=
   DecisionProblem.ofPred NAEThreeSatisfiable
 
-/-- The yes-instances of NAE3SAT are exactly the structures satisfying `NAEThreeSatisfiable`. -/
+/-- The yes-instances of NAE3SAT are exactly the structures satisfying
+`NAEThreeSatisfiable`. -/
 axiom nae3Sat_iff : ∀ (A : Type) [Lax904597.Sat.sat.Structure A], NAE3SAT A ↔ NAEThreeSatisfiable A
 
 /-- NAE3SAT is NP-complete. -/

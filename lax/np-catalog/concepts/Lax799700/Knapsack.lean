@@ -146,7 +146,8 @@ axiom hasSubsetSum_iso : ∀ {A B : Type} [Lax799700.Knapsack.binWeights.Structu
 def Knapsack : DecisionProblem Lax799700.Knapsack.binWeights :=
   DecisionProblem.ofPred HasSubsetSum
 
-/-- The yes-instances of Knapsack are exactly the structures satisfying `HasSubsetSum`. -/
+/-- The yes-instances of Knapsack are exactly the structures satisfying
+`HasSubsetSum`. -/
 axiom knapsack_iff : ∀ (A : Type) [Lax799700.Knapsack.binWeights.Structure A], Knapsack A ↔ HasSubsetSum A
 
 /-- Knapsack is NP-complete. -/

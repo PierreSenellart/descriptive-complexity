@@ -40,10 +40,10 @@ theorem maxCut_agree (A : Type) [Lax799700.Feedback.markedArcGraph.Structure A] 
 ---
 conclusion: Lax799700.MaxCut.maxCut_NP_complete
 ---
-Membership from the library's existential second-order definition of MaxCut; hardness from the library's reduction out of
-NAE3SAT, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of MaxCut;
+hardness from the library's reduction out of NAE3SAT, which is NP-hard by the
+catalog’s statement for it. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem maxCut_NP_complete : NP.Complete MaxCut :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => maxCut_agree A).mp DescriptiveComplexity.maxCut_sigmaSODefinable,

@@ -38,10 +38,10 @@ theorem subgraphIso_agree (A : Type) [Lax799700.SubgraphIso.twoGraphs.Structure 
 ---
 conclusion: Lax799700.SubgraphIso.subgraphIso_NP_complete
 ---
-Membership from the library's existential second-order definition of SubgraphIso; hardness from the library's reduction out of
-Clique, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+SubgraphIso; hardness from the library's reduction out of Clique, which is NP-
+hard by the catalog’s statement for it. Both are transported to the catalog's
+problems along the agreements.
 -/
 theorem subgraphIso_NP_complete : NP.Complete SubgraphIso :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => subgraphIso_agree A).mp DescriptiveComplexity.subgraphIso_sigmaSODefinable,

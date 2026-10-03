@@ -149,7 +149,8 @@ axiom hasSmallFeedbackSet_iso : ∀ {A B : Type} [Lax799700.CliqueFamily.markedG
 def FeedbackVertexSet : DecisionProblem Lax799700.CliqueFamily.markedGraph :=
   DecisionProblem.ofPred HasSmallFeedbackSet
 
-/-- The yes-instances of FeedbackVertexSet are exactly the structures satisfying `HasSmallFeedbackSet`. -/
+/-- The yes-instances of FeedbackVertexSet are exactly the structures
+satisfying `HasSmallFeedbackSet`. -/
 axiom feedbackVertexSet_iff : ∀ (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A], FeedbackVertexSet A ↔ HasSmallFeedbackSet A
 
 /-- FeedbackVertexSet is NP-complete. -/
@@ -163,7 +164,8 @@ axiom hasSmallFeedbackArcSet_iso : ∀ {A B : Type} [Lax799700.Feedback.markedAr
 def FeedbackArcSet : DecisionProblem Lax799700.Feedback.markedArcGraph :=
   DecisionProblem.ofPred HasSmallFeedbackArcSet
 
-/-- The yes-instances of FeedbackArcSet are exactly the structures satisfying `HasSmallFeedbackArcSet`. -/
+/-- The yes-instances of FeedbackArcSet are exactly the structures satisfying
+`HasSmallFeedbackArcSet`. -/
 axiom feedbackArcSet_iff : ∀ (A : Type) [Lax799700.Feedback.markedArcGraph.Structure A], FeedbackArcSet A ↔ HasSmallFeedbackArcSet A
 
 /-- FeedbackArcSet is NP-complete. -/

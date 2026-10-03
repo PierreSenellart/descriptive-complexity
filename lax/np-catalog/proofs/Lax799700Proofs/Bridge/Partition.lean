@@ -40,10 +40,10 @@ theorem partition_agree (A : Type) [Lax799700.Knapsack.binWeights.Structure A] :
 ---
 conclusion: Lax799700.Partition.partition_NP_complete
 ---
-Membership from the library's existential second-order definition of Partition; hardness from the library's reduction out of
-NAESAT, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+Partition; hardness from the library's reduction out of NAESAT, which is NP-
+hard by the catalog’s statement for it. Both are transported to the catalog's
+problems along the agreements.
 -/
 theorem partition_NP_complete : NP.Complete Partition :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => partition_agree A).mp DescriptiveComplexity.partition_sigmaSODefinable,

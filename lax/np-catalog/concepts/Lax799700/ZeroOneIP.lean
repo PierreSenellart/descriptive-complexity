@@ -152,7 +152,8 @@ axiom hasZeroOneSolution_iso : ∀ {A B : Type} [Lax799700.ZeroOneIP.zeroOneIP.S
 def ZeroOneIP : DecisionProblem Lax799700.ZeroOneIP.zeroOneIP :=
   DecisionProblem.ofPred HasZeroOneSolution
 
-/-- The yes-instances of ZeroOneIP are exactly the structures satisfying `HasZeroOneSolution`. -/
+/-- The yes-instances of ZeroOneIP are exactly the structures satisfying
+`HasZeroOneSolution`. -/
 axiom zeroOneIP_iff : ∀ (A : Type) [Lax799700.ZeroOneIP.zeroOneIP.Structure A], ZeroOneIP A ↔ HasZeroOneSolution A
 
 /-- ZeroOneIP is NP-complete. -/

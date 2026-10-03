@@ -63,7 +63,8 @@ axiom hasEqualSplit_iso : ∀ {A B : Type} [Lax799700.Knapsack.binWeights.Struct
 def Partition : DecisionProblem Lax799700.Knapsack.binWeights :=
   DecisionProblem.ofPred HasEqualSplit
 
-/-- The yes-instances of Partition are exactly the structures satisfying `HasEqualSplit`. -/
+/-- The yes-instances of Partition are exactly the structures satisfying
+`HasEqualSplit`. -/
 axiom partition_iff : ∀ (A : Type) [Lax799700.Knapsack.binWeights.Structure A], Partition A ↔ HasEqualSplit A
 
 /-- Partition is NP-complete. -/

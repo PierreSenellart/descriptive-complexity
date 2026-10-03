@@ -74,7 +74,8 @@ axiom naeSatisfiable_iso : ∀ {A B : Type} [Lax904597.Sat.sat.Structure A] [Lax
 def NAESAT : DecisionProblem Lax904597.Sat.sat :=
   DecisionProblem.ofPred NAESatisfiable
 
-/-- The yes-instances of NAESAT are exactly the structures satisfying `NAESatisfiable`. -/
+/-- The yes-instances of NAESAT are exactly the structures satisfying
+`NAESatisfiable`. -/
 axiom naeSat_iff : ∀ (A : Type) [Lax904597.Sat.sat.Structure A], NAESAT A ↔ NAESatisfiable A
 
 /-- NAESAT is NP-complete. -/

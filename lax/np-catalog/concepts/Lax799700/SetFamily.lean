@@ -189,7 +189,8 @@ axiom hasSmallSetCover_iso : ∀ {A B : Type} [Lax799700.SetFamily.setSystem.Str
 def SetCover : DecisionProblem Lax799700.SetFamily.setSystem :=
   DecisionProblem.ofPred HasSmallSetCover
 
-/-- The yes-instances of SetCover are exactly the structures satisfying `HasSmallSetCover`. -/
+/-- The yes-instances of SetCover are exactly the structures satisfying
+`HasSmallSetCover`. -/
 axiom setCover_iff : ∀ (A : Type) [Lax799700.SetFamily.setSystem.Structure A], SetCover A ↔ HasSmallSetCover A
 
 /-- SetCover is NP-complete. -/
@@ -203,7 +204,8 @@ axiom hasExactCover_iso : ∀ {A B : Type} [Lax799700.SetFamily.setSystem.Struct
 def ExactCover : DecisionProblem Lax799700.SetFamily.setSystem :=
   DecisionProblem.ofPred HasExactCover
 
-/-- The yes-instances of ExactCover are exactly the structures satisfying `HasExactCover`. -/
+/-- The yes-instances of ExactCover are exactly the structures satisfying
+`HasExactCover`. -/
 axiom exactCover_iff : ∀ (A : Type) [Lax799700.SetFamily.setSystem.Structure A], ExactCover A ↔ HasExactCover A
 
 /-- ExactCover is NP-complete. -/
@@ -217,7 +219,8 @@ axiom hasSmallHittingSet_iso : ∀ {A B : Type} [Lax799700.SetFamily.setSystem.S
 def HittingSet : DecisionProblem Lax799700.SetFamily.setSystem :=
   DecisionProblem.ofPred HasSmallHittingSet
 
-/-- The yes-instances of HittingSet are exactly the structures satisfying `HasSmallHittingSet`. -/
+/-- The yes-instances of HittingSet are exactly the structures satisfying
+`HasSmallHittingSet`. -/
 axiom hittingSet_iff : ∀ (A : Type) [Lax799700.SetFamily.setSystem.Structure A], HittingSet A ↔ HasSmallHittingSet A
 
 /-- HittingSet is NP-complete. -/
@@ -231,7 +234,8 @@ axiom hasLargeSetPacking_iso : ∀ {A B : Type} [Lax799700.SetFamily.setSystem.S
 def SetPacking : DecisionProblem Lax799700.SetFamily.setSystem :=
   DecisionProblem.ofPred HasLargeSetPacking
 
-/-- The yes-instances of SetPacking are exactly the structures satisfying `HasLargeSetPacking`. -/
+/-- The yes-instances of SetPacking are exactly the structures satisfying
+`HasLargeSetPacking`. -/
 axiom setPacking_iff : ∀ (A : Type) [Lax799700.SetFamily.setSystem.Structure A], SetPacking A ↔ HasLargeSetPacking A
 
 /-- SetPacking is NP-complete. -/
@@ -245,7 +249,8 @@ axiom hasSetSplitting_iso : ∀ {A B : Type} [Lax799700.SetFamily.setSystem.Stru
 def SetSplitting : DecisionProblem Lax799700.SetFamily.setSystem :=
   DecisionProblem.ofPred HasSetSplitting
 
-/-- The yes-instances of SetSplitting are exactly the structures satisfying `HasSetSplitting`. -/
+/-- The yes-instances of SetSplitting are exactly the structures satisfying
+`HasSetSplitting`. -/
 axiom setSplitting_iff : ∀ (A : Type) [Lax799700.SetFamily.setSystem.Structure A], SetSplitting A ↔ HasSetSplitting A
 
 /-- SetSplitting is NP-complete. -/

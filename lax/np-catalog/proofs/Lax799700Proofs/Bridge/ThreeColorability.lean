@@ -39,10 +39,10 @@ theorem threeCol_agree (A : Type) [FirstOrder.Language.graph.Structure A] : Desc
 ---
 conclusion: Lax799700.ThreeColorability.threeCol_NP_complete
 ---
-Membership from the library's reduction of ThreeCol to SAT, which is in NP; hardness from the library's reduction out of
-SAT, which is NP-hard by the
-NP core's Cook–Levin theorem. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's reduction of ThreeCol to SAT, which is in NP;
+hardness from the library's reduction out of SAT, which is NP-hard by the NP
+core’s Cook–Levin theorem. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem threeCol_NP_complete : NP.Complete ThreeCol :=
   ⟨Lax904597.NPClass.NP_mem_of_foReduction

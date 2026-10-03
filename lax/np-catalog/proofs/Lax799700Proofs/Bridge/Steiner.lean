@@ -40,10 +40,10 @@ theorem edgeSteinerTree_agree (A : Type) [Lax799700.Steiner.steinerGraph.Structu
 ---
 conclusion: Lax799700.Steiner.edgeSteinerTree_NP_complete
 ---
-Membership from the library's existential second-order definition of EdgeSteinerTree; hardness from the library's reduction out of
-VertexCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+EdgeSteinerTree; hardness from the library's reduction out of VertexCover,
+which is NP-hard by the catalog’s statement for it. Both are transported to
+the catalog's problems along the agreements.
 -/
 theorem edgeSteinerTree_NP_complete : NP.Complete EdgeSteinerTree :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => edgeSteinerTree_agree A).mp DescriptiveComplexity.edgeSteinerTree_sigmaSODefinable,
@@ -78,10 +78,10 @@ theorem steinerTree_agree (A : Type) [Lax799700.Steiner.steinerGraph.Structure A
 ---
 conclusion: Lax799700.Steiner.steinerTree_NP_complete
 ---
-Membership from the library's existential second-order definition of SteinerTree; hardness from the library's reduction out of
-VertexCover, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of
+SteinerTree; hardness from the library's reduction out of VertexCover, which
+is NP-hard by the catalog’s statement for it. Both are transported to the
+catalog's problems along the agreements.
 -/
 theorem steinerTree_NP_complete : NP.Complete SteinerTree :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => steinerTree_agree A).mp DescriptiveComplexity.steinerTree_sigmaSODefinable,

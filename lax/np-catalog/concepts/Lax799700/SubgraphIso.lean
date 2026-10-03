@@ -139,7 +139,8 @@ axiom hasSubgraphIso_iso : ∀ {A B : Type} [Lax799700.SubgraphIso.twoGraphs.Str
 def SubgraphIso : DecisionProblem Lax799700.SubgraphIso.twoGraphs :=
   DecisionProblem.ofPred HasSubgraphIso
 
-/-- The yes-instances of SubgraphIso are exactly the structures satisfying `HasSubgraphIso`. -/
+/-- The yes-instances of SubgraphIso are exactly the structures satisfying
+`HasSubgraphIso`. -/
 axiom subgraphIso_iff : ∀ (A : Type) [Lax799700.SubgraphIso.twoGraphs.Structure A], SubgraphIso A ↔ HasSubgraphIso A
 
 /-- SubgraphIso is NP-complete. -/

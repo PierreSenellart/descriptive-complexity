@@ -24,6 +24,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 
 import yaml
 
@@ -300,7 +301,8 @@ def KCol (k : ℕ) : DecisionProblem FirstOrder.Language.graph :=
   DecisionProblem.ofPred (KColorable k)
 
 /-- The yes-instances of KCol k are exactly the k-colorable graphs. -/
-axiom kCol_iff : ∀ (k : ℕ) (A : Type) [FirstOrder.Language.graph.Structure A], KCol k A ↔ KColorable k A
+axiom kCol_iff : ∀ (k : ℕ) (A : Type) [FirstOrder.Language.graph.Structure A],
+  KCol k A ↔ KColorable k A
 
 /-- k-colorability is NP-complete for every k ≥ 3. -/
 axiom kCol_NP_complete : ∀ {k : ℕ}, 3 ≤ k → NP.Complete (KCol k)'''
@@ -338,7 +340,8 @@ conclusion: {cname}.Coloring.kCol_NP_complete
 ---
 Membership from the library's existential second-order definition of
 $k$-colorability; hardness by padding the reduction of 3-colorability to
-$k$-colorability with $k - 3$ further colors, 3-colorability being NP-hard by the catalog's statement for it.
+$k$-colorability with $k - 3$ further colors, 3-colorability being NP-hard by
+the catalog's statement for it.
 -/
 theorem kCol_NP_complete {{k : ℕ}} (hk : 3 ≤ k) : NP.Complete (KCol k) := by
   obtain ⟨m, rfl⟩ : ∃ m, k = 3 + m := ⟨k - 3, by omega⟩
@@ -493,6 +496,8 @@ def main():
         for key in keys:
             p = table[key]
             P, pred, L = p["problem"], p["pred"], lang_ref(p["lang"])
+            iff_doc = textwrap.fill(f"/-- The yes-instances of {P} are exactly the structures satisfying "
+                                    f"`{pred}`. -/", 78)
             parts.append(f'''/-- The property `{pred}` is isomorphism-invariant. -/
 axiom {p["iso"]} : ∀ {{A B : Type}} [{L}.Structure A] [{L}.Structure B],
   (A ≃[{L}] B) → ({pred} A ↔ {pred} B)
@@ -501,7 +506,7 @@ axiom {p["iso"]} : ∀ {{A B : Type}} [{L}.Structure A] [{L}.Structure B],
 def {P} : DecisionProblem {L} :=
   DecisionProblem.ofPred {pred}
 
-/-- The yes-instances of {P} are exactly the structures satisfying `{pred}`. -/
+{iff_doc}
 axiom {key}_iff : ∀ (A : Type) [{L}.Structure A], {P} A ↔ {pred} A
 
 /-- {P} is NP-complete. -/
@@ -556,6 +561,11 @@ axiom {key}_NP_complete : NP.Complete {P}''')
                              f"{tgt_stmt}.1")
                 mem_prose = (f"Membership from the library's reduction of {P} to "
                              f"{table[tgt]['problem'] if tgt != 'sat' else 'SAT'}, which is in NP")
+            complete_prose = textwrap.fill(
+                f"{mem_prose}; hardness from the library's reduction out of "
+                f"{table[src]['problem'] if src != 'sat' else 'SAT'}, which is NP-hard by the "
+                f"{'NP core’s Cook–Levin theorem' if src == 'sat' else 'catalog’s statement for it'}. "
+                f"Both are transported to the catalog's problems along the agreements.", 78)
             parts.append(f'''/--
 ---
 conclusion: {cname}.{fam}.{p["iso"]}
@@ -584,10 +594,7 @@ theorem {key}_agree (A : Type) [{L}.Structure A] : {PFX}.{P} A ↔ {P} A :=
 ---
 conclusion: {cname}.{fam}.{key}_NP_complete
 ---
-{mem_prose}; hardness from the library's reduction out of
-{table[src]["problem"] if src != "sat" else "SAT"}, which is NP-hard by the
-{"NP core's Cook–Levin theorem" if src == "sat" else "catalog's statement for it"}. Both are
-transported to the catalog's problems along the agreements.
+{complete_prose}
 -/
 theorem {key}_NP_complete : NP.Complete {P} :=
   ⟨{mem_proof},

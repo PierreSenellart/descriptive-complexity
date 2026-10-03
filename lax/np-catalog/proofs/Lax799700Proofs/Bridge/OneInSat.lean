@@ -39,10 +39,10 @@ theorem oneInSat_agree (A : Type) [Lax904597.Sat.sat.Structure A] : DescriptiveC
 ---
 conclusion: Lax799700.OneInSat.oneInSat_NP_complete
 ---
-Membership from the library's existential second-order definition of OneInSAT; hardness from the library's reduction out of
-ThreeSAT, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of OneInSAT;
+hardness from the library's reduction out of ThreeSAT, which is NP-hard by the
+catalog’s statement for it. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem oneInSat_NP_complete : NP.Complete OneInSAT :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => oneInSat_agree A).mp DescriptiveComplexity.oneInSat_sigmaSODefinable,

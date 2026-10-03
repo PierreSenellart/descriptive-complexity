@@ -40,10 +40,10 @@ theorem clique_agree (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A]
 ---
 conclusion: Lax799700.CliqueFamily.clique_NP_complete
 ---
-Membership from the library's existential second-order definition of Clique; hardness from the library's reduction out of
-SAT, which is NP-hard by the
-NP core's Cook–Levin theorem. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's existential second-order definition of Clique;
+hardness from the library's reduction out of SAT, which is NP-hard by the NP
+core’s Cook–Levin theorem. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem clique_NP_complete : NP.Complete Clique :=
   ⟨(Lax904597.NPClass.NP_mem_congr_finite fun A _ _ => clique_agree A).mp DescriptiveComplexity.clique_sigmaSODefinable,
@@ -78,10 +78,10 @@ theorem indSet_agree (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A]
 ---
 conclusion: Lax799700.CliqueFamily.indSet_NP_complete
 ---
-Membership from the library's reduction of IndependentSet to Clique, which is in NP; hardness from the library's reduction out of
-Clique, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's reduction of IndependentSet to Clique, which is
+in NP; hardness from the library's reduction out of Clique, which is NP-hard
+by the catalog’s statement for it. Both are transported to the catalog's
+problems along the agreements.
 -/
 theorem indSet_NP_complete : NP.Complete IndependentSet :=
   ⟨Lax904597.NPClass.NP_mem_of_foReduction
@@ -117,10 +117,10 @@ theorem vertexCover_agree (A : Type) [Lax799700.CliqueFamily.markedGraph.Structu
 ---
 conclusion: Lax799700.CliqueFamily.vertexCover_NP_complete
 ---
-Membership from the library's reduction of VertexCover to IndependentSet, which is in NP; hardness from the library's reduction out of
-IndependentSet, which is NP-hard by the
-catalog's statement for it. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's reduction of VertexCover to IndependentSet,
+which is in NP; hardness from the library's reduction out of IndependentSet,
+which is NP-hard by the catalog’s statement for it. Both are transported to
+the catalog's problems along the agreements.
 -/
 theorem vertexCover_NP_complete : NP.Complete VertexCover :=
   ⟨Lax904597.NPClass.NP_mem_of_foReduction

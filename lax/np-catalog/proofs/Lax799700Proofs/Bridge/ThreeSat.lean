@@ -39,10 +39,10 @@ theorem threeSat_agree (A : Type) [Lax904597.Sat.sat.Structure A] : DescriptiveC
 ---
 conclusion: Lax799700.ThreeSat.threeSat_NP_complete
 ---
-Membership from the library's reduction of ThreeSAT to SAT, which is in NP; hardness from the library's reduction out of
-SAT, which is NP-hard by the
-NP core's Cook–Levin theorem. Both are
-transported to the catalog's problems along the agreements.
+Membership from the library's reduction of ThreeSAT to SAT, which is in NP;
+hardness from the library's reduction out of SAT, which is NP-hard by the NP
+core’s Cook–Levin theorem. Both are transported to the catalog's problems
+along the agreements.
 -/
 theorem threeSat_NP_complete : NP.Complete ThreeSAT :=
   ⟨Lax904597.NPClass.NP_mem_of_foReduction
