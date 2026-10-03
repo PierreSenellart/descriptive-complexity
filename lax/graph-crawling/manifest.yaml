@@ -38,3 +38,6 @@ paper:
   folder: "paper"
   main: "main.tex"
   engine: "pdflatex"
+issue:
+  repositoryId: 1320232165
+  number: 163
