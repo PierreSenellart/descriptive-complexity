@@ -1,5 +1,5 @@
 Two forms of the NP-completeness of SAT from the descriptive-complexity
-library, with the definitions they rest on: a decision problem is an
+library, with corresponding definitions: a decision problem is an
 isomorphism-invariant predicate on the finite structures of a relational
 vocabulary; a reduction is a first-order interpretation, with tags for
 disjoint copies and, in the ordered variant, a linear order on the input;
