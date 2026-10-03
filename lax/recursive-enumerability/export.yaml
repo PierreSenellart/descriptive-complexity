@@ -1,0 +1,282 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: v1.2.2
+prefix: DescriptiveComplexity
+targets:
+  - DescriptiveComplexity.CODEHALT
+  - DescriptiveComplexity.FINSAT
+  - DescriptiveComplexity.FINSAT_RE_complete
+  - DescriptiveComplexity.FinSat.finSatOn_map
+  - DescriptiveComplexity.HALT
+  - DescriptiveComplexity.PCP
+  - DescriptiveComplexity.Pcp.pcpOn_map
+  - DescriptiveComplexity.RE_ne_coRE
+  - DescriptiveComplexity.RE_subset_rePred
+  - DescriptiveComplexity.SigmaSODefinable.toNew
+  - DescriptiveComplexity.SigmaSONewDefinable.of_foReduction
+  - DescriptiveComplexity.SigmaSONewDefinable.of_orderedReduction
+  - DescriptiveComplexity.agree_of_equiv
+  - DescriptiveComplexity.codehalt_mem_RE
+  - DescriptiveComplexity.codehalt_sigmaSONewDefinable
+  - DescriptiveComplexity.decodesTo_equiv
+  - DescriptiveComplexity.finsat_hard_of_sigmaSONewDefinable
+  - DescriptiveComplexity.finsat_mem_RE
+  - DescriptiveComplexity.finsat_not_computable
+  - DescriptiveComplexity.finsat_rePred
+  - DescriptiveComplexity.finsat_sigmaSONewDefinable
+  - DescriptiveComplexity.halt_mem_RE
+  - DescriptiveComplexity.halt_not_computable
+  - DescriptiveComplexity.halt_ordered_fo_reduction_pcp
+  - DescriptiveComplexity.halt_rePred
+  - DescriptiveComplexity.halt_sigmaSONewDefinable
+  - DescriptiveComplexity.hard_RE_iff
+  - DescriptiveComplexity.mem_RE_iff
+  - DescriptiveComplexity.mem_RE_iff_rePred
+  - DescriptiveComplexity.not_computablePred_codehalt
+  - DescriptiveComplexity.not_computablePred_of_RE_hard
+  - DescriptiveComplexity.not_computablePred_of_relOrderedReduction
+  - DescriptiveComplexity.orderedReduction_codehalt
+  - DescriptiveComplexity.orderedReduction_halt
+  - DescriptiveComplexity.pcp_mem_RE
+  - DescriptiveComplexity.pcp_not_computable
+  - DescriptiveComplexity.pcp_sigmaSONewDefinable
+  - DescriptiveComplexity.sigmaSONewDefinable_congr
+  - DescriptiveComplexity.toPred_ofEquiv
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: recursive enumerability, Trakhtenbrot and halting'
+  authors:
+    - name: Pierre Senellart
+      orcid: 0000-0002-7909-5369
+      github: PierreSenellart
+    - name: Claude (Anthropic)
+  bibEntries:
+    - "@misc{senellart2026descriptive,\n  author = {Pierre Senellart and Anton Gnatenko},\n  title = {Descriptive Complexity\
+      \ in {Lean}: Completeness by First-Order Reductions},\n  year = {2026},\n  eprint = {2609.18261},\n  archivePrefix =\
+      \ {arXiv}\n}\n"
+    - "@software{senellart2026descriptivecomplexity,\n  author = {Pierre Senellart},\n  title = {{DescriptiveComplexity}:\
+      \ Completeness by First-Order Reductions in {Lean}},\n  version = {1.2.2},\n  year = {2026},\n  doi = {10.5281/zenodo.21678423},\n\
+      \  url = {https://github.com/PierreSenellart/descriptive-complexity}\n}\n"
+    - "@article{trakhtenbrot1950,\n  author = {Boris A. Trakhtenbrot},\n  title = {The impossibility of an algorithm for the\
+      \ decidability problem on finite classes},\n  journal = {Proceedings of the USSR Academy of Sciences},\n  volume = {70},\n\
+      \  number = {4},\n  pages = {569--572},\n  year = {1950},\n  note = {In Russian}\n}\n"
+    - "@article{post1946variant,\n  author = {Emil L. Post},\n  title = {A variant of a recursively unsolvable problem},\n\
+      \  journal = {Bulletin of the American Mathematical Society},\n  volume = {52},\n  number = {4},\n  pages = {264--268},\n\
+      \  year = {1946},\n  doi = {10.1090/S0002-9904-1946-08555-9}\n}\n"
+    - "@book{libkin2004elements,\n  author = {Leonid Libkin},\n  title = {Elements of Finite Model Theory},\n  series = {Texts\
+      \ in Theoretical Computer Science. An {EATCS} Series},\n  publisher = {Springer},\n  year = {2004},\n  isbn = {3-540-21202-7},\n\
+      \  doi = {10.1007/978-3-662-07003-1},\n  bibsource = {dblp computer science bibliography, https://dblp.org}\n}\n"
+    - "@book{abiteboul1995foundations,\n  author = {Serge Abiteboul and Richard Hull and Victor Vianu},\n  title = {Foundations\
+      \ of Databases},\n  publisher = {Addison-Wesley},\n  year = {1995},\n  isbn = {0-201-53771-0}\n}\n"
+requires:
+  - package: Lax904597
+    repository: https://github.com/PierreSenellart/descriptive-complexity
+    commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+    folder: lax/np-core
+    restated_from: ../np-core/export.yaml
+restated:
+  DescriptiveComplexity.CArg1: CodeHalting.CArg1
+  DescriptiveComplexity.CArg2: CodeHalting.CArg2
+  DescriptiveComplexity.CComp: CodeHalting.CComp
+  DescriptiveComplexity.CLeft: CodeHalting.CLeft
+  DescriptiveComplexity.CPair: CodeHalting.CPair
+  DescriptiveComplexity.CPrec: CodeHalting.CPrec
+  DescriptiveComplexity.CRfind: CodeHalting.CRfind
+  DescriptiveComplexity.CRight: CodeHalting.CRight
+  DescriptiveComplexity.CRoot: CodeHalting.CRoot
+  DescriptiveComplexity.CSucc: CodeHalting.CSucc
+  DescriptiveComplexity.CZero: CodeHalting.CZero
+  DescriptiveComplexity.ConfigU: Halting.ConfigU
+  DescriptiveComplexity.ConfigU.head: Halting.ConfigU.head
+  DescriptiveComplexity.ConfigU.mk: Halting.ConfigU.mk
+  DescriptiveComplexity.ConfigU.state: Halting.ConfigU.state
+  DescriptiveComplexity.ConfigU.tape: Halting.ConfigU.tape
+  DescriptiveComplexity.DecisionProblem.compl: ClassRE.DecisionProblem.compl
+  DescriptiveComplexity.DecisionProblem.toPred: ConcreteInstances.DecisionProblem.toPred
+  DescriptiveComplexity.DecodesTo: CodeHalting.DecodesTo
+  DescriptiveComplexity.FinSat.AllG: FiniteSatisfiability.FinSat.AllG
+  DescriptiveComplexity.FinSat.AndG: FiniteSatisfiability.FinSat.AndG
+  DescriptiveComplexity.FinSat.ArgG: FiniteSatisfiability.FinSat.ArgG
+  DescriptiveComplexity.FinSat.BindG: FiniteSatisfiability.FinSat.BindG
+  DescriptiveComplexity.FinSat.ChildG: FiniteSatisfiability.FinSat.ChildG
+  DescriptiveComplexity.FinSat.EqG: FiniteSatisfiability.FinSat.EqG
+  DescriptiveComplexity.FinSat.ExG: FiniteSatisfiability.FinSat.ExG
+  DescriptiveComplexity.FinSat.FinSatOn: FiniteSatisfiability.FinSat.FinSatOn
+  DescriptiveComplexity.FinSat.Gval: FiniteSatisfiability.FinSat.Gval
+  DescriptiveComplexity.FinSat.IsWF: FiniteSatisfiability.FinSat.IsWF
+  DescriptiveComplexity.FinSat.IsWF.mk: FiniteSatisfiability.FinSat.IsWF.mk
+  DescriptiveComplexity.FinSat.Local: FiniteSatisfiability.FinSat.Local
+  DescriptiveComplexity.FinSat.NegG: FiniteSatisfiability.FinSat.NegG
+  DescriptiveComplexity.FinSat.NeqG: FiniteSatisfiability.FinSat.NeqG
+  DescriptiveComplexity.FinSat.OrG: FiniteSatisfiability.FinSat.OrG
+  DescriptiveComplexity.FinSat.Ord: FiniteSatisfiability.FinSat.Ord
+  DescriptiveComplexity.FinSat.OrdLt: FiniteSatisfiability.FinSat.OrdLt
+  DescriptiveComplexity.FinSat.PosG: FiniteSatisfiability.FinSat.PosG
+  DescriptiveComplexity.FinSat.RootG: FiniteSatisfiability.FinSat.RootG
+  DescriptiveComplexity.FinSat.SigG: FiniteSatisfiability.FinSat.SigG
+  DescriptiveComplexity.FinSat.gstep: FiniteSatisfiability.FinSat.gstep
+  DescriptiveComplexity.FinSat.gval: FiniteSatisfiability.FinSat.gval
+  DescriptiveComplexity.FinSat.upd: FiniteSatisfiability.FinSat.upd
+  DescriptiveComplexity.IsOld: ValueInvention.IsOld
+  DescriptiveComplexity.MaxPos: Halting.MaxPos
+  DescriptiveComplexity.Pcp.DomG: PostCorrespondence.Pcp.DomG
+  DescriptiveComplexity.Pcp.IsWF: PostCorrespondence.Pcp.IsWF
+  DescriptiveComplexity.Pcp.IsWF.mk: PostCorrespondence.Pcp.IsWF.mk
+  DescriptiveComplexity.Pcp.IsWordU: PostCorrespondence.Pcp.IsWordU
+  DescriptiveComplexity.Pcp.IsWordV: PostCorrespondence.Pcp.IsWordV
+  DescriptiveComplexity.Pcp.Ord: PostCorrespondence.Pcp.Ord
+  DescriptiveComplexity.Pcp.OrdLt: PostCorrespondence.Pcp.OrdLt
+  DescriptiveComplexity.Pcp.PcpOn: PostCorrespondence.Pcp.PcpOn
+  DescriptiveComplexity.Pcp.UAt: PostCorrespondence.Pcp.UAt
+  DescriptiveComplexity.Pcp.UsedU: PostCorrespondence.Pcp.UsedU
+  DescriptiveComplexity.Pcp.UsedV: PostCorrespondence.Pcp.UsedV
+  DescriptiveComplexity.Pcp.VAt: PostCorrespondence.Pcp.VAt
+  DescriptiveComplexity.SigmaSONewDefinable: ValueInvention.SigmaSONewDefinable
+  DescriptiveComplexity.TMData.AcceptsU: Halting.TMData.AcceptsU
+  DescriptiveComplexity.TMData.IsInitU: Halting.TMData.IsInitU
+  DescriptiveComplexity.TMData.StepU: Halting.TMData.StepU
+  DescriptiveComplexity.TMData.StepsInU: Halting.TMData.StepsInU
+  DescriptiveComplexity.TMData.SuccCell: Halting.TMData.SuccCell
+  DescriptiveComplexity.codeVocab: ConcreteInstances.codeVocab
+  DescriptiveComplexity.extBase: ValueInvention.extBase
+  DescriptiveComplexity.extStructure: ValueInvention.extStructure
+  DescriptiveComplexity.finsatVocab: ConcreteInstances.finsatVocab
+  DescriptiveComplexity.instDecidableEqSigmaNatRelationsCode: ConcreteInstances.instDecidableEqSigmaNatRelationsCode
+  DescriptiveComplexity.instDecidableEqSigmaNatRelationsFinsat: ConcreteInstances.instDecidableEqSigmaNatRelationsFinsat
+  DescriptiveComplexity.instDecidableEqSigmaNatRelationsTuring: ConcreteInstances.instDecidableEqSigmaNatRelationsTuring
+  DescriptiveComplexity.newLang: ValueInvention.newLang
+  DescriptiveComplexity.oldMarkStructure: ValueInvention.oldMarkStructure
+  DescriptiveComplexity.turingVocab: ConcreteInstances.turingVocab
+  FirstOrder.Language.FinStruct: ConcreteInstances.FinStruct
+  FirstOrder.Language.FinStruct.Univ: ConcreteInstances.FinStruct.Univ
+  FirstOrder.Language.FinStruct.card: ConcreteInstances.FinStruct.card
+  FirstOrder.Language.FinStruct.equivProd: ConcreteInstances.FinStruct.equivProd
+  FirstOrder.Language.FinStruct.instPrimcodable: ConcreteInstances.FinStruct.instPrimcodable
+  FirstOrder.Language.FinStruct.instStructure: ConcreteInstances.FinStruct.instStructure
+  FirstOrder.Language.FinStruct.mk: ConcreteInstances.FinStruct.mk
+  FirstOrder.Language.FinStruct.ofTable: ConcreteInstances.FinStruct.ofTable
+  FirstOrder.Language.FinStruct.relMapBool: ConcreteInstances.FinStruct.relMapBool
+  FirstOrder.Language.FinStruct.table: ConcreteInstances.FinStruct.table
+  FirstOrder.Language.FinStruct.univSize: ConcreteInstances.FinStruct.univSize
+  FirstOrder.Language.FinVocab: ConcreteInstances.FinVocab
+  FirstOrder.Language.FinVocab.arity: ConcreteInstances.FinVocab.arity
+  FirstOrder.Language.FinVocab.index: ConcreteInstances.FinVocab.index
+  FirstOrder.Language.FinVocab.mk: ConcreteInstances.FinVocab.mk
+  FirstOrder.Language.FinVocab.numSyms: ConcreteInstances.FinVocab.numSyms
+  FirstOrder.Language.FinVocab.ofEquivSigma: ConcreteInstances.FinVocab.ofEquivSigma
+  FirstOrder.Language.FinVocab.ofList: ConcreteInstances.FinVocab.ofList
+  FirstOrder.Language.FinVocab.sym: ConcreteInstances.FinVocab.sym
+  FirstOrder.Language.FinVocab.symOf: ConcreteInstances.FinVocab.symOf
+  FirstOrder.Language.cArg1: CodeHalting.cArg1
+  FirstOrder.Language.cArg2: CodeHalting.cArg2
+  FirstOrder.Language.cComp: CodeHalting.cComp
+  FirstOrder.Language.cLeft: CodeHalting.cLeft
+  FirstOrder.Language.cPair: CodeHalting.cPair
+  FirstOrder.Language.cPrec: CodeHalting.cPrec
+  FirstOrder.Language.cRfind: CodeHalting.cRfind
+  FirstOrder.Language.cRight: CodeHalting.cRight
+  FirstOrder.Language.cRoot: CodeHalting.cRoot
+  FirstOrder.Language.cSucc: CodeHalting.cSucc
+  FirstOrder.Language.cZero: CodeHalting.cZero
+  FirstOrder.Language.code: CodeHalting.code
+  FirstOrder.Language.codeRel: CodeHalting.codeRel
+  FirstOrder.Language.codeRel.carg1: CodeHalting.codeRel.carg1
+  FirstOrder.Language.codeRel.carg1.elim: CodeHalting.codeRel.carg1.elim
+  FirstOrder.Language.codeRel.carg2: CodeHalting.codeRel.carg2
+  FirstOrder.Language.codeRel.carg2.elim: CodeHalting.codeRel.carg2.elim
+  FirstOrder.Language.codeRel.ccomp: CodeHalting.codeRel.ccomp
+  FirstOrder.Language.codeRel.ccomp.elim: CodeHalting.codeRel.ccomp.elim
+  FirstOrder.Language.codeRel.cleft: CodeHalting.codeRel.cleft
+  FirstOrder.Language.codeRel.cleft.elim: CodeHalting.codeRel.cleft.elim
+  FirstOrder.Language.codeRel.cpair: CodeHalting.codeRel.cpair
+  FirstOrder.Language.codeRel.cpair.elim: CodeHalting.codeRel.cpair.elim
+  FirstOrder.Language.codeRel.cprec: CodeHalting.codeRel.cprec
+  FirstOrder.Language.codeRel.cprec.elim: CodeHalting.codeRel.cprec.elim
+  FirstOrder.Language.codeRel.crfind: CodeHalting.codeRel.crfind
+  FirstOrder.Language.codeRel.crfind.elim: CodeHalting.codeRel.crfind.elim
+  FirstOrder.Language.codeRel.cright: CodeHalting.codeRel.cright
+  FirstOrder.Language.codeRel.cright.elim: CodeHalting.codeRel.cright.elim
+  FirstOrder.Language.codeRel.croot: CodeHalting.codeRel.croot
+  FirstOrder.Language.codeRel.croot.elim: CodeHalting.codeRel.croot.elim
+  FirstOrder.Language.codeRel.csucc: CodeHalting.codeRel.csucc
+  FirstOrder.Language.codeRel.csucc.elim: CodeHalting.codeRel.csucc.elim
+  FirstOrder.Language.codeRel.ctorElim: CodeHalting.codeRel.ctorElim
+  FirstOrder.Language.codeRel.ctorElimType: CodeHalting.codeRel.ctorElimType
+  FirstOrder.Language.codeRel.czero: CodeHalting.codeRel.czero
+  FirstOrder.Language.codeRel.czero.elim: CodeHalting.codeRel.czero.elim
+  FirstOrder.Language.codeRel.match_on_same_ctor._@.DescriptiveComplexity.Problems.CodeHalt.Defs.1426611180._hygCtx._hyg.50: CodeHalting.codeRel.match_on_same_ctor._@.DescriptiveComplexity.Problems.CodeHalt.Defs.1426611180._hygCtx._hyg.50
+  ? FirstOrder.Language.codeRel.match_on_same_ctor.het._@.DescriptiveComplexity.Problems.CodeHalt.Defs.1426611180._hygCtx._hyg.50
+  : CodeHalting.codeRel.match_on_same_ctor.het._@.DescriptiveComplexity.Problems.CodeHalt.Defs.1426611180._hygCtx._hyg.50
+  FirstOrder.Language.digitAt: ConcreteInstances.digitAt
+  FirstOrder.Language.finsat: FiniteSatisfiability.finsat
+  FirstOrder.Language.finsatAllSym: FiniteSatisfiability.finsatAllSym
+  FirstOrder.Language.finsatAndSym: FiniteSatisfiability.finsatAndSym
+  FirstOrder.Language.finsatArgSym: FiniteSatisfiability.finsatArgSym
+  FirstOrder.Language.finsatBindSym: FiniteSatisfiability.finsatBindSym
+  FirstOrder.Language.finsatChildSym: FiniteSatisfiability.finsatChildSym
+  FirstOrder.Language.finsatEqSym: FiniteSatisfiability.finsatEqSym
+  FirstOrder.Language.finsatExSym: FiniteSatisfiability.finsatExSym
+  FirstOrder.Language.finsatLeSym: FiniteSatisfiability.finsatLeSym
+  FirstOrder.Language.finsatNegSym: FiniteSatisfiability.finsatNegSym
+  FirstOrder.Language.finsatNeqSym: FiniteSatisfiability.finsatNeqSym
+  FirstOrder.Language.finsatOrSym: FiniteSatisfiability.finsatOrSym
+  FirstOrder.Language.finsatPosSym: FiniteSatisfiability.finsatPosSym
+  FirstOrder.Language.finsatRel: FiniteSatisfiability.finsatRel
+  FirstOrder.Language.finsatRel.allN: FiniteSatisfiability.finsatRel.allN
+  FirstOrder.Language.finsatRel.allN.elim: FiniteSatisfiability.finsatRel.allN.elim
+  FirstOrder.Language.finsatRel.andN: FiniteSatisfiability.finsatRel.andN
+  FirstOrder.Language.finsatRel.andN.elim: FiniteSatisfiability.finsatRel.andN.elim
+  FirstOrder.Language.finsatRel.arg: FiniteSatisfiability.finsatRel.arg
+  FirstOrder.Language.finsatRel.arg.elim: FiniteSatisfiability.finsatRel.arg.elim
+  FirstOrder.Language.finsatRel.bind: FiniteSatisfiability.finsatRel.bind
+  FirstOrder.Language.finsatRel.bind.elim: FiniteSatisfiability.finsatRel.bind.elim
+  FirstOrder.Language.finsatRel.child: FiniteSatisfiability.finsatRel.child
+  FirstOrder.Language.finsatRel.child.elim: FiniteSatisfiability.finsatRel.child.elim
+  FirstOrder.Language.finsatRel.ctorElim: FiniteSatisfiability.finsatRel.ctorElim
+  FirstOrder.Language.finsatRel.ctorElimType: FiniteSatisfiability.finsatRel.ctorElimType
+  FirstOrder.Language.finsatRel.eqL: FiniteSatisfiability.finsatRel.eqL
+  FirstOrder.Language.finsatRel.eqL.elim: FiniteSatisfiability.finsatRel.eqL.elim
+  FirstOrder.Language.finsatRel.exN: FiniteSatisfiability.finsatRel.exN
+  FirstOrder.Language.finsatRel.exN.elim: FiniteSatisfiability.finsatRel.exN.elim
+  FirstOrder.Language.finsatRel.le: FiniteSatisfiability.finsatRel.le
+  FirstOrder.Language.finsatRel.le.elim: FiniteSatisfiability.finsatRel.le.elim
+  FirstOrder.Language.finsatRel.match_on_same_ctor._@.DescriptiveComplexity.Problems.FinSat.Defs.1403011780._hygCtx._hyg.59: FiniteSatisfiability.finsatRel.match_on_same_ctor._@.DescriptiveComplexity.Problems.FinSat.Defs.1403011780._hygCtx._hyg.59
+  ? FirstOrder.Language.finsatRel.match_on_same_ctor.het._@.DescriptiveComplexity.Problems.FinSat.Defs.1403011780._hygCtx._hyg.59
+  : FiniteSatisfiability.finsatRel.match_on_same_ctor.het._@.DescriptiveComplexity.Problems.FinSat.Defs.1403011780._hygCtx._hyg.59
+  FirstOrder.Language.finsatRel.negL: FiniteSatisfiability.finsatRel.negL
+  FirstOrder.Language.finsatRel.negL.elim: FiniteSatisfiability.finsatRel.negL.elim
+  FirstOrder.Language.finsatRel.neqL: FiniteSatisfiability.finsatRel.neqL
+  FirstOrder.Language.finsatRel.neqL.elim: FiniteSatisfiability.finsatRel.neqL.elim
+  FirstOrder.Language.finsatRel.orN: FiniteSatisfiability.finsatRel.orN
+  FirstOrder.Language.finsatRel.orN.elim: FiniteSatisfiability.finsatRel.orN.elim
+  FirstOrder.Language.finsatRel.posL: FiniteSatisfiability.finsatRel.posL
+  FirstOrder.Language.finsatRel.posL.elim: FiniteSatisfiability.finsatRel.posL.elim
+  FirstOrder.Language.finsatRel.root: FiniteSatisfiability.finsatRel.root
+  FirstOrder.Language.finsatRel.root.elim: FiniteSatisfiability.finsatRel.root.elim
+  FirstOrder.Language.finsatRel.sig: FiniteSatisfiability.finsatRel.sig
+  FirstOrder.Language.finsatRel.sig.elim: FiniteSatisfiability.finsatRel.sig.elim
+  FirstOrder.Language.finsatRootSym: FiniteSatisfiability.finsatRootSym
+  FirstOrder.Language.finsatSigSym: FiniteSatisfiability.finsatSigSym
+  FirstOrder.Language.instDecidableEqCodeRel: CodeHalting.instDecidableEqCodeRel
+  FirstOrder.Language.instDecidableEqCodeRel.decEq: CodeHalting.instDecidableEqCodeRel.decEq
+  FirstOrder.Language.instDecidableEqFinsatRel: FiniteSatisfiability.instDecidableEqFinsatRel
+  FirstOrder.Language.instDecidableEqFinsatRel.decEq: FiniteSatisfiability.instDecidableEqFinsatRel.decEq
+  FirstOrder.Language.instDecidableEqOldMarkRel: ValueInvention.instDecidableEqOldMarkRel
+  FirstOrder.Language.instDecidableEqPcpRel: PostCorrespondence.instDecidableEqPcpRel
+  FirstOrder.Language.instIsRelationalCode: CodeHalting.instIsRelationalCode
+  FirstOrder.Language.instIsRelationalFinsat: FiniteSatisfiability.instIsRelationalFinsat
+  FirstOrder.Language.instIsRelationalOldMark: ValueInvention.instIsRelationalOldMark
+  FirstOrder.Language.instIsRelationalPcp: PostCorrespondence.instIsRelationalPcp
+  FirstOrder.Language.oldMark: ValueInvention.oldMark
+  FirstOrder.Language.oldRel: ValueInvention.oldRel
+  FirstOrder.Language.oldRel.old: ValueInvention.oldRel.old
+  FirstOrder.Language.pcp: PostCorrespondence.pcp
+  FirstOrder.Language.pcpDomSym: PostCorrespondence.pcpDomSym
+  FirstOrder.Language.pcpLeSym: PostCorrespondence.pcpLeSym
+  FirstOrder.Language.pcpRel: PostCorrespondence.pcpRel
+  FirstOrder.Language.pcpRel.dom: PostCorrespondence.pcpRel.dom
+  FirstOrder.Language.pcpRel.le: PostCorrespondence.pcpRel.le
+  FirstOrder.Language.pcpRel.uAt: PostCorrespondence.pcpRel.uAt
+  FirstOrder.Language.pcpRel.vAt: PostCorrespondence.pcpRel.vAt
+  FirstOrder.Language.pcpUSym: PostCorrespondence.pcpUSym
+  FirstOrder.Language.pcpVSym: PostCorrespondence.pcpVSym
+  FirstOrder.Language.tupleIdx: ConcreteInstances.tupleIdx
