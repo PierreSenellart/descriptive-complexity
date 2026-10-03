@@ -1,11 +1,10 @@
 Recursive enumerability as a logically defined class, from the
-descriptive-complexity library, built on the NP core registered as
-lax-904597 and on the catalog registered as lax-799700. RE is the class of
-decision problems on finite structures definable in existential second-order
-logic with value invention: the certificate is a finite extension of the
-universe by invented values, in unbounded number, together with relations
-over it checked by a first-order kernel. No machine model enters the
-definition.
+descriptive-complexity library, built on the NP core registered as lax-904597.
+RE is the class of decision problems on finite structures definable in
+existential second-order logic with value invention: the certificate is a
+finite extension of the universe by invented values, in unbounded number,
+together with relations over it checked by a first-order kernel. No machine
+model enters the definition.
 
 Four problems are RE-complete under the core's first-order reductions:
 finite satisfiability of first-order sentences, by the generic reduction
