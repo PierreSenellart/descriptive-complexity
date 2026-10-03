@@ -42,7 +42,9 @@ theorem threeSat_NP_hard : NP.Hard ThreeSAT :=
   NP.hard_of_orderedReduction sat_ordered_fo_reduction_threeSat sat_NP_hard
 
 /-- **3SAT is NP-complete**, derived from the two first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.ThreeSat.threeSat_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.ThreeSat.html#s-Lax799700.ThreeSat.threeSat_NP_complete). -/
 theorem threeSat_NP_complete : NP.Complete ThreeSAT :=
   ⟨threeSat_mem_NP, threeSat_NP_hard⟩
 

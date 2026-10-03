@@ -390,7 +390,9 @@ theorem nae3Sat_NP_hard : NP.Hard NAE3SAT :=
   NP.hard_of_orderedReduction naeSat_ordered_fo_reduction_nae3Sat naeSat_NP_hard
 
 /-- **NAE-3SAT is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.NaeThreeSat.nae3Sat_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.NaeThreeSat.html#s-Lax799700.NaeThreeSat.nae3Sat_NP_complete). -/
 theorem nae3Sat_NP_complete : NP.Complete NAE3SAT :=
   ⟨nae3Sat_mem_NP, nae3Sat_NP_hard⟩
 

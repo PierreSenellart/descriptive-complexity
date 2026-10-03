@@ -50,7 +50,9 @@ theorem kCol_NP_hard {k : ℕ} (hk : 3 ≤ k) : NP.Hard (KCol k) := by
   obtain ⟨m, rfl⟩ : ∃ m, k = 3 + m := ⟨k - 3, by omega⟩
   exact NP.hard_of_foReduction (threeCol_fo_reduction_kCol m) threeCol_NP_hard
 
-/-- **`k`-colorability is NP-complete for every `k ≥ 3`.** -/
+/-- **`k`-colorability is NP-complete for every `k ≥ 3`.**
+Registered in the Lax archive as
+[`Lax799700.Coloring.kCol_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Coloring.html#s-Lax799700.Coloring.kCol_NP_complete). -/
 theorem kCol_NP_complete {k : ℕ} (hk : 3 ≤ k) : NP.Complete (KCol k) :=
   ⟨kCol_mem_NP k, kCol_NP_hard hk⟩
 
@@ -66,7 +68,9 @@ theorem chromaticNumber_NP_hard : NP.Hard ChromaticNumber :=
   NP.hard_of_orderedReduction threeCol_ordered_fo_reduction_chromaticNumber threeCol_NP_hard
 
 /-- **Chromatic Number is NP-complete**, derived from the first-order
-reductions of this library and the Cook–Levin theorem. -/
+reductions of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.Coloring.chromaticNumber_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Coloring.html#s-Lax799700.Coloring.chromaticNumber_NP_complete). -/
 theorem chromaticNumber_NP_complete : NP.Complete ChromaticNumber :=
   ⟨chromaticNumber_mem_NP, chromaticNumber_NP_hard⟩
 
@@ -79,7 +83,9 @@ it by complementing the edges. -/
 theorem cliqueCover_NP_hard : NP.Hard CliqueCover :=
   NP.hard_of_foReduction chromaticNumber_fo_reduction_cliqueCover chromaticNumber_NP_hard
 
-/-- **Clique Cover is NP-complete**. -/
+/-- **Clique Cover is NP-complete**.
+Registered in the Lax archive as
+[`Lax799700.Coloring.cliqueCover_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Coloring.html#s-Lax799700.Coloring.cliqueCover_NP_complete). -/
 theorem cliqueCover_NP_complete : NP.Complete CliqueCover :=
   ⟨cliqueCover_mem_NP, cliqueCover_NP_hard⟩
 

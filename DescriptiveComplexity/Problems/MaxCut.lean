@@ -44,7 +44,9 @@ theorem maxCut_NP_hard : NP.Hard MaxCut :=
   NP.hard_of_orderedReduction MaxCutRed.nae3Sat_ordered_fo_reduction_maxCut nae3Sat_NP_hard
 
 /-- **Max Cut is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.MaxCut.maxCut_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.MaxCut.html#s-Lax799700.MaxCut.maxCut_NP_complete). -/
 theorem maxCut_NP_complete : NP.Complete MaxCut :=
   ⟨maxCut_mem_NP, maxCut_NP_hard⟩
 

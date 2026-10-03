@@ -276,7 +276,9 @@ theorem exactCover_NP_hard : NP.Hard ExactCover :=
   NP.hard_of_foReduction oneInSat_fo_reduction_exactCover oneInSat_NP_hard
 
 /-- **Exact Cover is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.SetFamily.exactCover_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.SetFamily.html#s-Lax799700.SetFamily.exactCover_NP_complete). -/
 theorem exactCover_NP_complete : NP.Complete ExactCover :=
   ⟨exactCover_mem_NP, exactCover_NP_hard⟩
 

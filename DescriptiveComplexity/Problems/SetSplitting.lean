@@ -275,7 +275,9 @@ theorem setSplitting_NP_hard : NP.Hard SetSplitting :=
   NP.hard_of_foReduction naeSat_fo_reduction_setSplitting naeSat_NP_hard
 
 /-- **Set Splitting is NP-complete**, derived from the first-order reductions
-of this library and the Cook–Levin theorem. -/
+of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.SetFamily.setSplitting_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.SetFamily.html#s-Lax799700.SetFamily.setSplitting_NP_complete). -/
 theorem setSplitting_NP_complete : NP.Complete SetSplitting :=
   ⟨setSplitting_mem_NP, setSplitting_NP_hard⟩
 

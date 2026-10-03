@@ -55,7 +55,9 @@ theorem jobSequencing_NP_hard : NP.Hard JobSequencing :=
 /-- **Job sequencing is NP-complete**, derived from the first-order reductions
 of this library and the Cook–Levin theorem. Its execution times, deadlines,
 penalties and bound are written in *binary*: under the unary representation
-the problem is solvable in polynomial time by dynamic programming. -/
+the problem is solvable in polynomial time by dynamic programming.
+Registered in the Lax archive as
+[`Lax799700.JobSequencing.jobSequencing_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.JobSequencing.html#s-Lax799700.JobSequencing.jobSequencing_NP_complete). -/
 theorem jobSequencing_NP_complete : NP.Complete JobSequencing :=
   ⟨jobSequencing_mem_NP, jobSequencing_NP_hard⟩
 

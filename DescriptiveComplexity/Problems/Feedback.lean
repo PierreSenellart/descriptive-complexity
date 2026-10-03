@@ -60,7 +60,9 @@ theorem feedbackVertexSet_NP_hard : NP.Hard FeedbackVertexSet :=
   NP.hard_of_foReduction vertexCover_fo_reduction_feedbackVertexSet vertexCover_NP_hard
 
 /-- **Feedback Vertex Set is NP-complete**, derived from the first-order
-reductions of this library and the Cook–Levin theorem. -/
+reductions of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.Feedback.feedbackVertexSet_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Feedback.html#s-Lax799700.Feedback.feedbackVertexSet_NP_complete). -/
 theorem feedbackVertexSet_NP_complete : NP.Complete FeedbackVertexSet :=
   ⟨feedbackVertexSet_mem_NP, feedbackVertexSet_NP_hard⟩
 
@@ -73,7 +75,9 @@ reduces to it by vertex splitting. -/
 theorem feedbackArcSet_NP_hard : NP.Hard FeedbackArcSet :=
   NP.hard_of_foReduction feedbackVertexSet_fo_reduction_feedbackArcSet feedbackVertexSet_NP_hard
 
-/-- **Feedback Arc Set is NP-complete**. -/
+/-- **Feedback Arc Set is NP-complete**.
+Registered in the Lax archive as
+[`Lax799700.Feedback.feedbackArcSet_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Feedback.html#s-Lax799700.Feedback.feedbackArcSet_NP_complete). -/
 theorem feedbackArcSet_NP_complete : NP.Complete FeedbackArcSet :=
   ⟨feedbackArcSet_mem_NP, feedbackArcSet_NP_hard⟩
 

@@ -447,7 +447,9 @@ theorem subgraphIso_NP_hard : NP.Hard SubgraphIso :=
   NP.hard_of_foReduction clique_fo_reduction_subgraphIso clique_NP_hard
 
 /-- **Subgraph Isomorphism is NP-complete**, derived from the first-order
-reductions of this library and the Cook–Levin theorem. -/
+reductions of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.SubgraphIso.subgraphIso_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.SubgraphIso.html#s-Lax799700.SubgraphIso.subgraphIso_NP_complete). -/
 theorem subgraphIso_NP_complete : NP.Complete SubgraphIso :=
   ⟨subgraphIso_mem_NP, subgraphIso_NP_hard⟩
 

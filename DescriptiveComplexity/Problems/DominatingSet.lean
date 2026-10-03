@@ -41,7 +41,9 @@ theorem dominatingSet_NP_hard : NP.Hard DominatingSet :=
   NP.hard_of_foReduction DomRed.setCover_fo_reduction_dominatingSet setCover_NP_hard
 
 /-- **Dominating Set is NP-complete**, derived from the first-order reductions
-of this library and the Cook–Levin theorem. -/
+of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.DominatingSet.dominatingSet_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.DominatingSet.html#s-Lax799700.DominatingSet.dominatingSet_NP_complete). -/
 theorem dominatingSet_NP_complete : NP.Complete DominatingSet :=
   ⟨dominatingSet_mem_NP, dominatingSet_NP_hard⟩
 

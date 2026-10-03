@@ -305,6 +305,7 @@ carries the submission's id as a tag.
 | Submission | Statements | Library | Environment |
 | --- | --- | --- | --- |
 | [lax-904597](https://laxarchive.org/lax-904597/) | The Cook–Levin theorem ([`CookLevin`](https://laxarchive.org/lax-904597/Lax904597.CookLevin.html)), its machine form ([`MachineForm`](https://laxarchive.org/lax-904597/Lax904597.MachineForm.html)), the closure laws of NP ([`NPClass`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html)); concepts for decision problems, first-order interpretations and reductions, second-order definability, complexity classes with cofinal hardness, SAT and machine acceptance | `v1.2.2` | Lean `v4.33.0` |
+| [lax-799700](https://laxarchive.org/lax-799700/) | A catalog of thirty NP-complete problems, one concept module per family with the problem, its invariance, its characterization and its NP-completeness as statements: Karp's twenty-one (SAT in the core), 3SAT, NAE-SAT, NAE-3SAT, 1-in-SAT, Independent Set, Dominating Set, Subgraph Isomorphism, Set Splitting, the edge-weighted Steiner tree, 3-colorability and `k`-colorability ([the module list](https://laxarchive.org/lax-799700/)); the proofs assume the core's statements, so the archive's proof network is the reduction tree | `v1.2.2` | Lean `v4.33.0` |
 
 A submission building on these notions can require the concept package of
 the earlier one instead of restating them. The submissions live under `lax/`

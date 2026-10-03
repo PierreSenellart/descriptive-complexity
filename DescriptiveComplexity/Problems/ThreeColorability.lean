@@ -40,7 +40,9 @@ theorem threeCol_NP_hard : NP.Hard ThreeCol :=
   NP.hard_of_orderedReduction sat_ordered_fo_reduction_threeCol sat_NP_hard
 
 /-- **3-colorability is NP-complete**, derived from the two first-order
-reductions of this library and the Cook–Levin theorem. -/
+reductions of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.ThreeColorability.threeCol_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.ThreeColorability.html#s-Lax799700.ThreeColorability.threeCol_NP_complete). -/
 theorem threeCol_NP_complete : NP.Complete ThreeCol :=
   ⟨threeCol_mem_NP, threeCol_NP_hard⟩
 

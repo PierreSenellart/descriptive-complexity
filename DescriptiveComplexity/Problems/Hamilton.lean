@@ -69,11 +69,15 @@ theorem dirHamCircuit_NP_hard : NP.Hard DirHamCircuit :=
   NP.hard_of_foReduction hamCircuit_fo_reduction_dirHamCircuit hamCircuit_NP_hard
 
 /-- **Hamilton Circuit is NP-complete**, derived from the first-order
-reductions of this library and the Cook–Levin theorem. -/
+reductions of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.Hamilton.hamCircuit_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Hamilton.html#s-Lax799700.Hamilton.hamCircuit_NP_complete). -/
 theorem hamCircuit_NP_complete : NP.Complete HamCircuit :=
   ⟨hamCircuit_mem_NP, hamCircuit_NP_hard⟩
 
-/-- **Directed Hamilton Circuit is NP-complete** – closing Karp's 21. -/
+/-- **Directed Hamilton Circuit is NP-complete** – closing Karp's 21.
+Registered in the Lax archive as
+[`Lax799700.Hamilton.dirHamCircuit_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Hamilton.html#s-Lax799700.Hamilton.dirHamCircuit_NP_complete). -/
 theorem dirHamCircuit_NP_complete : NP.Complete DirHamCircuit :=
   ⟨dirHamCircuit_mem_NP, dirHamCircuit_NP_hard⟩
 
