@@ -67,7 +67,9 @@ theorem finsat_hard_of_sigmaSONewDefinable :
 first-order sentence is RE-complete.
 
 Membership is `DescriptiveComplexity.finsat_mem_RE`, hardness
-`DescriptiveComplexity.finsat_hard_of_sigmaSONewDefinable`. -/
+`DescriptiveComplexity.finsat_hard_of_sigmaSONewDefinable`.
+Registered in the Lax archive as
+[`Lax624099.FinsatREComplete.finsat_RE_complete`](https://laxarchive.org/lax-624099/Lax624099.FinsatREComplete.html#s-Lax624099.FinsatREComplete.finsat_RE_complete). -/
 theorem FINSAT_RE_complete : RE.Complete FINSAT :=
   ⟨finsat_mem_RE,
     (hard_RE_iff FINSAT).mpr fun Q hQ => finsat_hard_of_sigmaSONewDefinable Q hQ⟩

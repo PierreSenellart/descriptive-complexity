@@ -697,7 +697,9 @@ theorem computablePred_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q)
     ⟨fun s => D _, hD.comp (primrec_mapStruct f.toRelInterpretation T e.symm V V').to_comp⟩ hiff
 
 /-- **`¬ComputablePred` transfers backwards along a relativized ordered
-reduction.** -/
+reduction.**
+Registered in the Lax archive as
+[`Lax624099.ReductionsComputable.not_computablePred_of_relOrderedReduction`](https://laxarchive.org/lax-624099/Lax624099.ReductionsComputable.html#s-Lax624099.ReductionsComputable.not_computablePred_of_relOrderedReduction). -/
 theorem not_computablePred_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q)
     (V : FinVocab L) (V' : FinVocab L') (hP : ¬ComputablePred (P.toPred V)) :
     ¬ComputablePred (Q.toPred V') :=

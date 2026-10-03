@@ -44,13 +44,17 @@ theorem codehalt_RE_hard : RE.Hard CODEHALT :=
   (orderedReduction_codehalt FINSAT finsat_rePred).elim fun f =>
     RE.hard_of_orderedReduction f finsat_RE_hard
 
-/-- **CODEHALT is RE-complete.** -/
+/-- **CODEHALT is RE-complete.**
+Registered in the Lax archive as
+[`Lax624099.CodehaltREComplete.codehalt_RE_complete`](https://laxarchive.org/lax-624099/Lax624099.CodehaltREComplete.html#s-Lax624099.CodehaltREComplete.codehalt_RE_complete). -/
 theorem codehalt_RE_complete : RE.Complete CODEHALT :=
   ⟨codehalt_mem_RE, codehalt_RE_hard⟩
 
 /-- **RE is exactly the recursively enumerable properties of finite
 structures.** A problem is `∃SO[new]`-definable exactly when the set of its
-concrete instances is semi-decidable in Mathlib's sense. -/
+concrete instances is semi-decidable in Mathlib's sense.
+Registered in the Lax archive as
+[`Lax624099.REIsRecursivelyEnumerable.mem_RE_iff_rePred`](https://laxarchive.org/lax-624099/Lax624099.REIsRecursivelyEnumerable.html#s-Lax624099.REIsRecursivelyEnumerable.mem_RE_iff_rePred). -/
 theorem mem_RE_iff_rePred {L : Language.{0, 0}} [L.IsRelational] (V : FinVocab L)
     (P : DecisionProblem L) : P ∈ RE ↔ REPred (P.toPred V) :=
   ⟨fun hP => RE_subset_rePred V P hP,
@@ -59,7 +63,9 @@ theorem mem_RE_iff_rePred {L : Language.{0, 0}} [L.IsRelational] (V : FinVocab L
 
 /-- **RE is not closed under complement.** With the equivalence above, this is
 Post's theorem applied to the undecidability of `CODEHALT`: a problem and its
-complement both recursively enumerable would be decidable. -/
+complement both recursively enumerable would be decidable.
+Registered in the Lax archive as
+[`Lax624099.RENeCoRE.RE_ne_coRE`](https://laxarchive.org/lax-624099/Lax624099.RENeCoRE.html#s-Lax624099.RENeCoRE.RE_ne_coRE). -/
 theorem RE_ne_coRE : RE ≠ coRE := by
   intro heq
   have h1 : CODEHALT ∈ RE := codehalt_mem_RE
