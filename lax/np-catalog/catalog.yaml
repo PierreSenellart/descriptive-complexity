@@ -1,0 +1,313 @@
+# Titles and descriptions of the catalog's concept modules, keyed by module.
+# A module without an entry takes its prose from the library's docstring.
+# The archive sets a backtick span as mathematics, so Lean names are written
+# as plain words here.
+
+Common:
+  title: Clauses, literals and binary numbers
+  description: |
+    The two pieces of shared vocabulary the catalog's problems are stated
+    with. On a CNF structure of the NP core's vocabulary, IsCl, PosIn, NegIn
+    and OccIn read off clauses and the signed occurrences of variables in
+    them, and LitTrue evaluates a literal under an assignment; the
+    satisfiability variants (3SAT, NAE-SAT, 1-in-SAT) are written with these.
+    On a structure carrying a set of bit positions and an order on them,
+    bitRank is the number of positions strictly below a position and binNum
+    decodes a set of positions as the number whose binary digits they are;
+    the problems written in binary (Knapsack, Partition, 0-1 integer
+    programming, job sequencing) compare numbers decoded this way. Both
+    decoders are total, defined for an arbitrary relation in place of the
+    order, so that isomorphism-invariance is a plain transport statement.
+
+ThreeSat:
+  title: 3SAT
+  description: |
+    3SAT on the vocabulary of SAT: a CNF structure is a yes-instance when
+    every clause has at most three literal occurrences (WidthAtMostThree) and
+    the CNF is satisfiable (ThreeSatisfiable). The width bound is part of the
+    yes-instances rather than of the vocabulary, which is what makes 3SAT a
+    decision problem on arbitrary CNF structures; it is expressed without
+    counting, as “among any four literal occurrences of a clause, two
+    coincide”.
+
+    Membership in NP is by the identity-like first-order reduction to SAT;
+    hardness is the classical clause splitting, an ordered first-order
+    reduction from SAT in which the chain of fresh variables of a clause
+    follows the order on its occurrences.
+
+NaeSat:
+  title: Not-all-equal SAT
+  description: |
+    NOT-ALL-EQUAL SAT: is there a truth assignment giving every clause both a
+    true and a false literal? It lives on the vocabulary of SAT, and only its
+    notion of satisfaction differs (NAEProper), which is closed under
+    flipping the assignment. That symmetry is what the hardness proof uses:
+    adding one fresh variable, positive in every clause, turns a satisfying
+    assignment into a not-all-equal one and back, once the fresh variable is
+    normalized to false. The fresh variable is picked out as the minimum of
+    its copy of the universe, so the reduction from SAT is an ordered
+    first-order reduction. Membership is by an existential second-order
+    definition, SAT's kernel conjoined with its mirror image.
+
+NaeThreeSat:
+  title: Not-all-equal 3SAT
+  description: |
+    NAE-3SAT is the width-three restriction of NAE-SAT: a CNF structure is a
+    yes-instance when every clause has at most three literal occurrences, the
+    promise 3SAT uses, and some assignment gives every clause both a true and
+    a false literal. Both reductions are the interpretations of the SAT and
+    3SAT pair applied unchanged: membership through the identity-like
+    reduction to NAE-SAT, hardness through the clause-splitting ordered
+    reduction from NAE-SAT, whose chain of pieces also works for the
+    not-all-equal reading. Its value in the catalog is as a reduction source,
+    for Max Cut and for job sequencing.
+
+OneInSat:
+  title: 1-in-SAT
+  description: |
+    EXACTLY-ONE SATISFIABILITY: is there a truth assignment giving every
+    clause exactly one true literal? It lives on the vocabulary of SAT with
+    its own notion of satisfaction (OneInProper). Membership is by an
+    existential second-order definition, SAT's kernel plus uniqueness, one
+    clause per pattern of signs; hardness is an ordered first-order reduction
+    from 3SAT. The catalog states it at unrestricted width because it is the
+    source for Exact Cover, where a 1-in-SAT instance becomes an exact cover
+    with no gadget at all.
+
+ThreeColorability:
+  title: 3-colorability
+  description: |
+    A graph is a structure of Mathlib's graph vocabulary, a single binary
+    relation; ThreeColorable says some map into three colors separates every
+    adjacent pair, and ThreeCol is the decision problem. A self-loop makes a
+    structure a no-instance. On structures arising from Mathlib's simple
+    graphs the property agrees with Mathlib's colorability. Membership in NP
+    is by a first-order reduction to SAT, hardness by an ordered first-order
+    reduction from SAT.
+
+Coloring:
+  title: Coloring, chromatic number and clique cover
+  description: |
+    Three problems built on one generic property, ColorableOn: a map into
+    $k$ colors separating the pairs related by a conflict relation. KCol $k$,
+    on graphs, asks whether the graph is $k$-colorable for a $k$ fixed once
+    and for all, and is NP-complete for every $k \geq 3$ by a first-order
+    reduction from 3-colorability. ChromaticNumber, on marked graphs, asks
+    whether the chromatic number is at most $k$ where $k$ is the cardinality
+    of the marked set, the unary representation of a threshold; this is
+    Karp's CHROMATIC NUMBER, and it is NP-hard by an ordered first-order
+    reduction from 3-colorability. CliqueCover, on the same vocabulary, asks
+    whether the vertices can be covered by at most $k$ cliques; a clique
+    cover is a proper coloring of the complement graph, so the first-order
+    interpretation complementing the edges off the diagonal reduces
+    Chromatic Number to Clique Cover.
+
+    The two threshold problems take their conflict relation off the diagonal,
+    so they are about the underlying loopless graph. Their existential
+    second-order definitions guess a coloring in palette form, a map into the
+    marked set itself, since the number $k$ is not available to a formula.
+
+CliqueFamily:
+  title: Clique, Independent Set and Vertex Cover
+  description: |
+    The three classical threshold problems on graphs, as decision problems on
+    marked graphs: a binary adjacency relation and a unary mark whose
+    cardinality is the threshold $k$ of the textbook problems, in unary
+    representation, order-free and isomorphism-invariant. Clique asks for a
+    clique at least as large as the marked set, IndependentSet for an
+    independent set at least as large, VertexCover for a vertex cover at most
+    as large. Self-loops are ignored and adjacency is required in both
+    directions, so the problems agree with their standard versions on simple
+    graphs. Finiteness of the universe is part of the yes-instances, since
+    cardinality thresholds only mean something on finite structures.
+
+    Clique is in NP by an existential second-order definition that guesses
+    an injection of the marked set into a clique, and NP-hard by an ordered
+    first-order reduction from SAT. Independent Set reduces to and from
+    Clique by complementing the edges, and Vertex Cover to and from
+    Independent Set by complementing the chosen set; these two first-order
+    reductions give both their membership and their hardness.
+
+SubgraphIso:
+  title: Subgraph Isomorphism
+  description: |
+    SUBGRAPH ISOMORPHISM: does the host graph contain a subgraph isomorphic
+    to the pattern graph, that is, is there an injective homomorphism of the
+    pattern into the host (SubgraphIsoOn)? Non-edges of the pattern are
+    unconstrained, the standard reading and the one that makes Clique a
+    special case. An instance carries two graphs in one universe: two unary
+    marks separate the pattern vertices from the host vertices, and two
+    binary relations are their adjacencies; elements outside both marks are
+    junk no condition mentions. Membership is by an existential second-order
+    definition guessing the map; hardness is a quantifier-free first-order
+    reduction from Clique, the host being the input graph and the pattern
+    the complete graph on its marked set.
+
+SetFamily:
+  title: Set Cover, Hitting Set, Set Packing, Exact Cover and Set Splitting
+  description: |
+    Five problems on set systems: a universe carrying two unary marks that
+    separate the ground elements from the sets of a family, a binary
+    incidence relation between them, and a third unary mark whose
+    cardinality is the threshold $k$, in unary representation. SetCover asks
+    for at most $k$ sets covering every element, HittingSet for at most $k$
+    elements meeting every set, SetPacking for at least $k$ pairwise disjoint
+    sets, ExactCover for a subfamily covering every element exactly once, and
+    SetSplitting for a two-coloring of the elements leaving no set
+    monochromatic. Nothing forces an element of the universe to be an element
+    or a set, and disjointness in a packing is required of the ground
+    elements only; both conventions are what let a first-order interpretation
+    build a set system inside a tagged power of its input.
+
+    All five are in NP by existential second-order definitions except Hitting
+    Set, which reduces to Set Cover by reading incidence backwards, the same
+    interpretation reducing Set Cover to Hitting Set. Hardness comes by
+    first-order reductions: Set Cover from Vertex Cover, Set Packing from
+    Independent Set, Exact Cover from 1-in-SAT, Set Splitting from NAE-SAT.
+
+DominatingSet:
+  title: Dominating Set
+  description: |
+    DOMINATING SET: is there a set of vertices, at most as large as the
+    marked set, such that every vertex is in it or adjacent to it? The
+    vocabulary is that of marked graphs, the one Clique and Vertex Cover use.
+    Domination ranges over every element of the universe, so a reduction
+    into it cannot leave junk tuples behind: the first-order reduction from
+    Set Cover makes the junk adjacent to the vertices that a solution always
+    contains. Membership is by an existential second-order definition.
+
+Feedback:
+  title: Feedback Vertex Set and Feedback Arc Set
+  description: |
+    The two feedback problems of Karp on directed graphs, the adjacency
+    relation of a structure being an arbitrary binary relation.
+    FeedbackVertexSet asks for at most $k$ vertices whose removal leaves an
+    acyclic digraph, $k$ the cardinality of the marked set of a marked graph.
+    FeedbackArcSet asks for at most $k$ arcs; a set of arcs can have
+    quadratically many elements, so its threshold moves one arity up, to the
+    vocabulary of graphs with a marked binary relation, the number being the
+    cardinality of the marked set of pairs. Self-loops are cycles, as they
+    should be. Acyclicity (AcyclicRel) is a transitive-closure condition,
+    not first-order, but it is equivalent to the existence of a strict
+    partial order containing every surviving arc; guessing that order is
+    what puts both problems in NP, and what makes the reductions provable
+    without manipulating cycles. Hardness is by first-order reductions, of
+    Feedback Vertex Set from Vertex Cover and of Feedback Arc Set from
+    Feedback Vertex Set.
+
+Hamilton:
+  title: Hamilton circuits
+  description: |
+    DIRECTED HAMILTON CIRCUIT and HAMILTON CIRCUIT: does a graph have a
+    circuit visiting every vertex exactly once? Both live on the vocabulary
+    of digraphs, a single binary relation; the undirected problem reads that
+    relation symmetrically (DGEdge). A circuit is read, after cutting it
+    anywhere, as a linear order whose consecutive elements are adjacent and
+    whose last element is adjacent to its first (TourOn); a relation is what
+    an existential second-order block can guess, and the rest is first-order,
+    so both problems are in NP. The empty graph is a yes-instance and a
+    one-element graph is one exactly when it has a self-loop. Hardness of
+    the undirected problem is a relativized ordered first-order reduction
+    from Vertex Cover, the one reduction of the catalog that needs the
+    relativized form; the directed problem is NP-hard by a first-order
+    reduction from the undirected one.
+
+Steiner:
+  title: Steiner Tree
+  description: |
+    STEINER TREE: given a graph, a set of terminals and a threshold $k$, is
+    there a connected set of vertices containing every terminal and using at
+    most $k$ non-terminals (SteinerTree, the node-weighted form with unit
+    weights), or a set of at most $k$ arcs of the graph connecting a set of
+    vertices that contains every terminal (EdgeSteinerTree, the edge-weighted
+    form, arcs counted as ordered pairs)? The vocabulary is that of graphs
+    with two unary marks, the terminals and the marked set carrying $k$ in
+    unary representation. Connectivity (ConnectedOn) is not first-order; the
+    membership proofs certify it by a root of the chosen set and a strict
+    partial order in which every other chosen vertex has a chosen neighbor
+    strictly below it. Both forms are NP-hard by ordered first-order
+    reductions from Vertex Cover.
+
+ThreeDimMatching:
+  title: 3-dimensional matching
+  description: |
+    3-DIMENSIONAL MATCHING: given three marked classes and a set of triples,
+    one element from each class, is there a set of triples covering every
+    marked element exactly once? The vocabulary carries three unary marks and
+    one ternary relation, and a yes-instance admits a matching
+    (IsMatchingOn), a sub-relation of the triples that covers each marked
+    element exactly once; nothing asks the three classes to be disjoint or
+    to exhaust the universe. Membership is by an existential second-order
+    definition, hardness by an ordered first-order reduction from SAT.
+
+MaxCut:
+  title: Max Cut
+  description: |
+    MAX CUT: is there a set $S$ of vertices such that at least $k$ edges have
+    exactly one endpoint in $S$? Since a cut can have quadratically many
+    edges, the threshold is carried at arity two, as the cardinality of a
+    marked binary relation, on the vocabulary Feedback Arc Set uses. The cut
+    is read as a set of ordered pairs (CutRel), $u$ adjacent to $v$ with $u$
+    inside $S$ and $v$ outside, which on a symmetric adjacency relation
+    counts every cut edge exactly once. Membership is by an existential
+    second-order definition, hardness by an ordered first-order reduction
+    from NAE-3SAT.
+
+Knapsack:
+  title: Knapsack, in binary
+  description: |
+    KNAPSACK, in the subset-sum form of Karp: given weights and a target, is
+    there a set of items whose weights sum to the target? Numbers are
+    written in binary, as the last four problems of Karp's list require:
+    under the unary encoding they are solvable in polynomial time by dynamic
+    programming, so the representation is part of the statement. The
+    vocabulary carries the items, the bit positions, the bits of each
+    weight, the bits of the target, and a linear order fixing the place
+    values; being a linear order is folded into the yes-instances. The
+    decoding (binNum) sums $2^{\mathrm{rank}}$ over a set of positions, and
+    is defined for an arbitrary relation so that invariance is a plain
+    transport. Membership is by an existential second-order definition that
+    walks the order on items to verify the arithmetic; hardness is an
+    ordered first-order reduction from Exact Cover.
+
+Partition:
+  title: Partition
+  description: |
+    PARTITION: can a family of numbers be split into two parts of equal sum?
+    It lives on the vocabulary of Knapsack with the target symbol unused:
+    what a part must match is the weight of the items it leaves out. That is
+    what makes Partition a different problem rather than a special case of
+    Knapsack: the number to reach, half the total, is not part of the
+    instance, so an interpretation cannot compute it, and the classical
+    padding by two extra items is not first-order definable. Hardness comes
+    instead by an ordered first-order reduction from NAE-SAT, whose
+    not-all-equal condition is the two-sided constraint a balanced split
+    imposes. Membership is by an existential second-order definition.
+
+ZeroOneIP:
+  title: 0-1 integer programming
+  description: |
+    0-1 INTEGER PROGRAMMING: given a matrix $C$ and a vector $d$, is there a
+    0-1 vector $x$ with $Cx = d$? It is the multi-row form of Knapsack and is
+    written in binary like it. The vocabulary carries the columns, the rows,
+    the bit positions, the bits of each coefficient (the catalog's one
+    ternary symbol), the bits of each right-hand side, and a linear order
+    fixing the place values. Entries are natural numbers: Karp states the
+    problem over the integers, and this restriction is the one his reduction
+    produces, so its NP-hardness gives his problem's a fortiori. Membership
+    is by an existential second-order definition, hardness by an ordered
+    first-order reduction from Knapsack.
+
+JobSequencing:
+  title: Job sequencing
+  description: |
+    SEQUENCING: given jobs with execution times, deadlines and penalties, and
+    a bound, is there a one-processor schedule whose jobs missing their
+    deadline carry a total penalty at most the bound? Numbers are written in
+    binary, as for Knapsack. A schedule is a linear order on the universe,
+    which a certificate can guess and a first-order kernel can constrain; a
+    job's completion time is the total execution time of the jobs at or
+    before it (JSCompletion), it is late when that exceeds its deadline, and
+    the schedule is good when the late jobs' penalties sum to at most the
+    bound. Membership is by an existential second-order definition, hardness
+    by an ordered first-order reduction from NAE-3SAT.

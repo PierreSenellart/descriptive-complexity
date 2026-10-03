@@ -1,0 +1,754 @@
+/-
+Copyright (c) 2026 Pierre Senellart. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Pierre Senellart
+-/
+import Lax799700Proofs.DescriptiveComplexity.Block
+import Mathlib.ModelTheory.Semantics
+import Mathlib.ModelTheory.Syntax
+import Lax799700Proofs.DescriptiveComplexity.Problems.Steiner.Defs
+import Lax799700Proofs.DescriptiveComplexity.SecondOrder
+import Lax799700.CliqueFamily
+import Lax799700.Coloring
+import Lax799700.Common
+import Lax799700.DominatingSet
+import Lax799700.Feedback
+import Lax799700.Hamilton
+import Lax799700.JobSequencing
+import Lax799700.Knapsack
+import Lax799700.MaxCut
+import Lax799700.NaeSat
+import Lax799700.NaeThreeSat
+import Lax799700.OneInSat
+import Lax799700.Partition
+import Lax799700.SetFamily
+import Lax799700.Steiner
+import Lax799700.SubgraphIso
+import Lax799700.ThreeColorability
+import Lax799700.ThreeDimMatching
+import Lax799700.ThreeSat
+import Lax799700.ZeroOneIP
+import Lax904597.Classes
+import Lax904597.Interpretations
+import Lax904597.Machines
+import Lax904597.Problems
+import Lax904597.Relativized
+import Lax904597.Sat
+import Lax904597.SecondOrder
+
+/-!
+# Steiner Tree is existential second-order definable
+
+The membership half of its NP-completeness
+(`Lax799700Proofs.DescriptiveComplexity.steinerTree_sigmaSODefinable`). The existential block guesses
+four relations – the chosen set, a root, a strict partial order certifying
+connectivity, and an injection of the chosen non-terminals into the marked set
+– and the first-order kernel checks the eight conditions of
+`Lax799700Proofs.DescriptiveComplexity.steinerOn_iff_certificate`.
+
+The interesting one is connectivity, which is a transitive-closure condition
+and hence not first-order. What is guessed instead is a *root* – as a relation
+constrained to hold of at most one element, since the empty set is connected
+and has no root – together with an order in which every other chosen vertex
+has a chosen neighbor strictly below it. Walking down the order reaches the
+root; that is the same certificate idea as for acyclicity in
+`Lax799700Proofs.DescriptiveComplexity.Problems.Feedback`, run in the opposite direction.
+-/
+
+namespace Lax799700Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure Lax904597.SecondOrder.SOBlock
+
+section SigmaOne
+
+end SigmaOne
+
+end Lax799700Proofs.DescriptiveComplexity
+
+namespace Lax799700Proofs.DescriptiveComplexity
+
+/-- The relation variables of the block. -/
+inductive SteinerGuessBlockIx where
+/-- The chosen set of vertices. -/
+
+  | set
+/-- The root of the chosen set. -/
+
+  | root
+/-- The order certifying connectivity. -/
+
+  | order
+/-- The injection witnessing the threshold. -/
+
+  | inj
+  deriving DecidableEq
+
+instance : Fintype _root_.Lax799700Proofs.DescriptiveComplexity.SteinerGuessBlockIx :=
+  ⟨List.toFinset [.set, .root, .order, .inj], by intro x; cases x <;> simp⟩
+
+/-- The single existential block of the `Σ₁` definition of Steiner Tree: its
+four relation variables. -/
+def steinerGuessBlock : Lax904597.SecondOrder.SOBlock
+    where
+  ι := _root_.Lax799700Proofs.DescriptiveComplexity.SteinerGuessBlockIx
+  arity := fun i =>
+    match i with
+    | .set => 1
+    | .root => 1
+    | .order => 2
+    | .inj => 2
+
+/-- The vocabulary of the kernel: the instance expanded by the block. -/
+abbrev steinerSOLang : FirstOrder.Language :=
+  (Lax799700.Steiner.steinerGraph).sum (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.steinerGuessBlock)
+
+/-- The `adj` symbol over the sum. -/
+abbrev kStAdjSym : (_root_.Lax799700Proofs.DescriptiveComplexity.steinerSOLang).Relations 2 :=
+  Sum.inl Lax799700.Steiner.stAdj
+
+/-- The `terminal` symbol over the sum. -/
+abbrev kStTerminalSym : (_root_.Lax799700Proofs.DescriptiveComplexity.steinerSOLang).Relations 1 :=
+  Sum.inl Lax799700.Steiner.stTerminal
+
+/-- The `marked` symbol over the sum. -/
+abbrev kStMarkedSym : (_root_.Lax799700Proofs.DescriptiveComplexity.steinerSOLang).Relations 1 :=
+  Sum.inl Lax799700.Steiner.stMarked
+
+/-- The `set` relation variable. -/
+def kStSetRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.steinerGuessBlock).Relations 1 :=
+  ⟨.set, rfl⟩
+
+/-- The `set` symbol over the sum. -/
+abbrev kStSetSym : (_root_.Lax799700Proofs.DescriptiveComplexity.steinerSOLang).Relations 1 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kStSetRel
+
+/-- The `root` relation variable. -/
+def kStRootRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.steinerGuessBlock).Relations 1 :=
+  ⟨.root, rfl⟩
+
+/-- The `root` symbol over the sum. -/
+abbrev kStRootSym : (_root_.Lax799700Proofs.DescriptiveComplexity.steinerSOLang).Relations 1 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kStRootRel
+
+/-- The `order` relation variable. -/
+def kStOrderRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.steinerGuessBlock).Relations 2 :=
+  ⟨.order, rfl⟩
+
+/-- The `order` symbol over the sum. -/
+abbrev kStOrderSym : (_root_.Lax799700Proofs.DescriptiveComplexity.steinerSOLang).Relations 2 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kStOrderRel
+
+/-- The `inj` relation variable. -/
+def kStInjRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.steinerGuessBlock).Relations 2 :=
+  ⟨.inj, rfl⟩
+
+/-- The `inj` symbol over the sum. -/
+abbrev kStInjSym : (_root_.Lax799700Proofs.DescriptiveComplexity.steinerSOLang).Relations 2 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kStInjRel
+
+end Lax799700Proofs.DescriptiveComplexity
+
+namespace Lax799700Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure Lax904597.SecondOrder.SOBlock
+
+section SigmaOne
+
+/-! ### The clauses -/
+
+/-- Kernel clause: every terminal is chosen. -/
+private noncomputable def stTermClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      ((FirstOrder.Language.Relations.formula₁ kStTerminalSym (FirstOrder.Language.Term.var (Sum.inr 0))).imp
+        (FirstOrder.Language.Relations.formula₁ kStSetSym (FirstOrder.Language.Term.var (Sum.inr 0))))
+
+/-- Kernel clause: the root is chosen. -/
+private noncomputable def stRootInClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      ((FirstOrder.Language.Relations.formula₁ kStRootSym (FirstOrder.Language.Term.var (Sum.inr 0))).imp
+        (FirstOrder.Language.Relations.formula₁ kStSetSym (FirstOrder.Language.Term.var (Sum.inr 0))))
+
+/-- Kernel clause: there is at most one root. -/
+private noncomputable def stRootUniqueClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 2)
+      ((FirstOrder.Language.Relations.formula₁ kStRootSym (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+            FirstOrder.Language.Relations.formula₁ kStRootSym (FirstOrder.Language.Term.var (Sum.inr 1))).imp
+        (FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 1))))
+
+/-- Kernel clause: the guessed order is transitive. -/
+private noncomputable def stTransClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 3)
+      ((FirstOrder.Language.Relations.formula₂ kStOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+              (FirstOrder.Language.Term.var (Sum.inr 1)) ⊓
+            FirstOrder.Language.Relations.formula₂ kStOrderSym (FirstOrder.Language.Term.var (Sum.inr 1))
+              (FirstOrder.Language.Term.var (Sum.inr 2))).imp
+        (FirstOrder.Language.Relations.formula₂ kStOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 2))))
+
+/-- Kernel clause: the guessed order is irreflexive. -/
+private noncomputable def stIrreflClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      (FirstOrder.Language.BoundedFormula.not
+        (FirstOrder.Language.Relations.formula₂ kStOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 0))))
+
+/-- Kernel clause: every chosen non-root has a chosen neighbor strictly below
+it. -/
+private noncomputable def stStepClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      ((FirstOrder.Language.Relations.formula₁ kStSetSym (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+            FirstOrder.Language.BoundedFormula.not
+              (FirstOrder.Language.Relations.formula₁ kStRootSym (FirstOrder.Language.Term.var (Sum.inr 0)))).imp
+        (FirstOrder.Language.Formula.iExs (Fin 1)
+          (FirstOrder.Language.Relations.formula₁ kStSetSym (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+              (FirstOrder.Language.Relations.formula₂ kStAdjSym (FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0)))
+                  (FirstOrder.Language.Term.var (Sum.inr 0)) ⊔
+                FirstOrder.Language.Relations.formula₂ kStAdjSym (FirstOrder.Language.Term.var (Sum.inr 0))
+                  (FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0)))) ⊓
+            FirstOrder.Language.Relations.formula₂ kStOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+              (FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0))))))
+
+/-- Kernel clause: the guessed injection maps every chosen non-terminal to a
+marked element. -/
+private noncomputable def stTotalClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      ((FirstOrder.Language.Relations.formula₁ kStSetSym (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+            FirstOrder.Language.BoundedFormula.not
+              (FirstOrder.Language.Relations.formula₁ kStTerminalSym (FirstOrder.Language.Term.var (Sum.inr 0)))).imp
+        (FirstOrder.Language.Formula.iExs (Fin 1)
+          (FirstOrder.Language.Relations.formula₂ kStInjSym (FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0)))
+              (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+            FirstOrder.Language.Relations.formula₁ kStMarkedSym (FirstOrder.Language.Term.var (Sum.inr 0)))))
+
+/-- Kernel clause: the guessed injection is injective. -/
+private noncomputable def stInjClause : steinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 3)
+      ((FirstOrder.Language.Relations.formula₂ kStInjSym (FirstOrder.Language.Term.var (Sum.inr 0))
+              (FirstOrder.Language.Term.var (Sum.inr 2)) ⊓
+            FirstOrder.Language.Relations.formula₂ kStInjSym (FirstOrder.Language.Term.var (Sum.inr 1))
+              (FirstOrder.Language.Term.var (Sum.inr 2))).imp
+        (FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 1))))
+
+/-- The first-order kernel of the `Σ₁` definition of Steiner Tree. -/
+noncomputable def steinerKernel : steinerSOLang.Sentence :=
+  stTermClause ⊓ (stRootInClause ⊓ (stRootUniqueClause ⊓ (stTransClause ⊓
+    (stIrreflClause ⊓ (stStepClause ⊓ (stTotalClause ⊓ stInjClause))))))
+
+/-! ### Realization -/
+
+section Realize
+
+variable {A : Type} [Lax799700.Steiner.steinerGraph.Structure A]
+  (ρ : steinerGuessBlock.Assignment A)
+
+/-- Realization at a structure expanded by an assignment of the block. -/
+private abbrev SRealize (φ : steinerSOLang.Sentence) : Prop :=
+  @Sentence.Realize steinerSOLang A
+    (@sumStructure _ _ A _ (steinerGuessBlock.structure ρ)) φ
+
+private theorem realize_stTermClause :
+    SRealize ρ stTermClause ↔ ∀ x : A, Lax799700.Steiner.STTerminal x → ρ .set ![x] := by
+  let := steinerGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  rw [stTermClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_rel₁, Term.realize_var, Sum.elim_inr, Language.relMap_sumInl, hS]
+  exact ⟨fun h x hx => h (fun _ => x) hx, fun h i hi => h (i 0) hi⟩
+
+private theorem realize_stRootInClause :
+    SRealize ρ stRootInClause ↔ ∀ x : A, ρ .root ![x] → ρ .set ![x] := by
+  let := steinerGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := steinerSOLang) (M := A) kStRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+  rw [stRootInClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_rel₁, Term.realize_var, Sum.elim_inr, hS, hR]
+  exact ⟨fun h x hx => h (fun _ => x) hx, fun h i hi => h (i 0) hi⟩
+
+private theorem realize_stRootUniqueClause :
+    SRealize ρ stRootUniqueClause ↔ ∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y := by
+  let := steinerGuessBlock.structure ρ
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := steinerSOLang) (M := A) kStRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+  rw [stRootUniqueClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₁, Formula.realize_equal, Term.realize_var,
+    Sum.elim_inr, hR]
+  exact ⟨fun h x y hx hy => h ![x, y] ⟨hx, hy⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
+
+private theorem realize_stTransClause :
+    SRealize ρ stTransClause ↔
+      ∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z] := by
+  let := steinerGuessBlock.structure ρ
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := steinerSOLang) (M := A) kStOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
+  rw [stTransClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
+  exact ⟨fun h x y z h₁ h₂ => h ![x, y, z] ⟨h₁, h₂⟩,
+    fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
+
+private theorem realize_stIrreflClause :
+    SRealize ρ stIrreflClause ↔ ∀ x : A, ¬ρ .order ![x, x] := by
+  let := steinerGuessBlock.structure ρ
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := steinerSOLang) (M := A) kStOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
+  rw [stIrreflClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
+  exact ⟨fun h x => h fun _ => x, fun h i => h (i 0)⟩
+
+private theorem realize_stStepClause :
+    SRealize ρ stStepClause ↔ ∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
+      ∃ y : A, (ρ .set ![y] ∧ (Lax799700.Steiner.STAdj x y ∨ Lax799700.Steiner.STAdj y x)) ∧ ρ .order ![y, x] := by
+  let := steinerGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := steinerSOLang) (M := A) kStRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := steinerSOLang) (M := A) kStOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
+  rw [stStepClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup, Formula.realize_not,
+    Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
+    Language.relMap_sumInl, hS, hR, hL]
+  constructor
+  · intro h x hx hnr
+    obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnr⟩
+    exact ⟨y 0, hy⟩
+  · intro h i hi
+    obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
+    exact ⟨fun _ => y, hy⟩
+
+private theorem realize_stTotalClause :
+    SRealize ρ stTotalClause ↔ ∀ x : A, ρ .set ![x] → ¬Lax799700.Steiner.STTerminal x →
+      ∃ y : A, ρ .inj ![x, y] ∧ Lax799700.Steiner.STMarked y := by
+  let := steinerGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := steinerSOLang) (M := A) kStSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hI : ∀ (w : Fin 2 → A),
+      RelMap (L := steinerSOLang) (M := A) kStInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [stTotalClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
+    Language.relMap_sumInl, hS, hI]
+  constructor
+  · intro h x hx hnt
+    obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnt⟩
+    exact ⟨y 0, hy⟩
+  · intro h i hi
+    obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
+    exact ⟨fun _ => y, hy⟩
+
+private theorem realize_stInjClause :
+    SRealize ρ stInjClause ↔ ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
+  let := steinerGuessBlock.structure ρ
+  have hI : ∀ (w : Fin 2 → A),
+      RelMap (L := steinerSOLang) (M := A) kStInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [stInjClause]
+  simp only [SRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
+    Sum.elim_inr, hI]
+  exact ⟨fun h x x' y h₁ h₂ => h ![x, x', y] ⟨h₁, h₂⟩,
+    fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
+
+private theorem realize_steinerKernel :
+    SRealize ρ steinerKernel ↔
+      (∀ x : A, Lax799700.Steiner.STTerminal x → ρ .set ![x]) ∧
+      (∀ x : A, ρ .root ![x] → ρ .set ![x]) ∧
+      (∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y) ∧
+      (∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z]) ∧
+      (∀ x : A, ¬ρ .order ![x, x]) ∧
+      (∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
+        ∃ y : A, (ρ .set ![y] ∧ (Lax799700.Steiner.STAdj x y ∨ Lax799700.Steiner.STAdj y x)) ∧ ρ .order ![y, x]) ∧
+      (∀ x : A, ρ .set ![x] → ¬Lax799700.Steiner.STTerminal x → ∃ y : A, ρ .inj ![x, y] ∧ Lax799700.Steiner.STMarked y) ∧
+      ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
+  rw [steinerKernel]
+  simp only [SRealize, Sentence.Realize, Formula.realize_inf]
+  exact and_congr (realize_stTermClause ρ)
+    (and_congr (realize_stRootInClause ρ)
+      (and_congr (realize_stRootUniqueClause ρ)
+        (and_congr (realize_stTransClause ρ)
+          (and_congr (realize_stIrreflClause ρ)
+            (and_congr (realize_stStepClause ρ)
+              (and_congr (realize_stTotalClause ρ) (realize_stInjClause ρ)))))))
+
+end Realize
+
+/-- **Steiner Tree is `Σ₁`-definable**: guess the chosen set, its root, an
+order certifying that it is connected, and an injection of its non-terminals
+into the marked set, then check the eight conditions first-order. -/
+theorem steinerTree_sigmaSODefinable : Lax904597.SecondOrder.SigmaSODefinable 1 SteinerTree := by
+  refine ⟨[steinerGuessBlock], rfl, steinerKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨-, hst⟩
+    obtain ⟨S, hterms, ⟨Rt, hRtS, huniq, Lt, htrans, hirr, hstep⟩, ⟨e⟩⟩ :=
+      (steinerOn_iff_certificate _ _ _).mp hst
+    refine ⟨fun i => match i with
+      | .set => fun w : Fin 1 → A => S (w 0)
+      | .root => fun w : Fin 1 → A => Rt (w 0)
+      | .order => fun w : Fin 2 → A => Lt (w 0) (w 1)
+      | .inj => fun w : Fin 2 → A =>
+          ∃ h : S (w 0) ∧ ¬Lax799700.Steiner.STTerminal (w 0),
+            (e ⟨w 0, h⟩ : {x // Lax799700.Steiner.STMarked x}).1 = w 1, ?_⟩
+    refine (realize_steinerKernel _).mpr ⟨hterms, hRtS, huniq, htrans, hirr, ?_,
+      fun x hx hnt => ⟨(e ⟨x, hx, hnt⟩).1, ⟨⟨hx, hnt⟩, rfl⟩, (e ⟨x, hx, hnt⟩).2⟩, ?_⟩
+    · intro x hx hnr
+      obtain ⟨y, hlink, hlt⟩ := hstep x hx hnr
+      exact ⟨y, ⟨hlink.2.1, hlink.2.2⟩, hlt⟩
+    · rintro x x' y ⟨h, hy⟩ ⟨h', hy'⟩
+      exact congrArg Subtype.val (e.injective (Subtype.ext (hy.trans hy'.symm)))
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨hterms, hRtS, huniq, htrans, hirr, hstep, htot, hinj⟩ :=
+      (realize_steinerKernel ρ).mp hρ
+    have hch : ∀ x : {x : A // ρ .set ![x] ∧ ¬Lax799700.Steiner.STTerminal x},
+        ∃ y : A, ρ .inj ![x.1, y] ∧ Lax799700.Steiner.STMarked y := fun x => htot x.1 x.2.1 x.2.2
+    choose f hf1 hf2 using hch
+    refine ⟨‹Finite A›, (steinerOn_iff_certificate _ _ _).mpr
+      ⟨fun x => ρ .set ![x], hterms,
+        ⟨fun x => ρ .root ![x], hRtS, huniq, fun x y => ρ .order ![x, y], htrans, hirr, ?_⟩,
+        ⟨⟨fun x => ⟨f x, hf2 x⟩, fun x x' hxx' => ?_⟩⟩⟩⟩
+    · intro x hx hnr
+      obtain ⟨y, ⟨hy, hadj⟩, hlt⟩ := hstep x hx hnr
+      exact ⟨y, ⟨hx, hy, hadj⟩, hlt⟩
+    · have hval : f x = f x' := congrArg Subtype.val hxx'
+      refine Subtype.ext (hinj x.1 x'.1 (f x) (hf1 x) ?_)
+      rw [hval]
+      exact hf1 x'
+
+/-! ### The edge-weighted variant
+
+The same certificate, plus the edge set itself, and with the threshold
+injection mapping *pairs* to *elements* – hence a ternary relation variable,
+for which `Lax799700Proofs.DescriptiveComplexity.realize_rel₃` (`Lax799700Proofs.DescriptiveComplexity.Interpretation`)
+plays the role Mathlib's `Formula.realize_rel₁`/`₂` play at lower arity. -/
+
+end SigmaOne
+
+end Lax799700Proofs.DescriptiveComplexity
+
+namespace Lax799700Proofs.DescriptiveComplexity
+
+/-- The relation variables of the block. -/
+inductive EdgeSteinerGuessBlockIx where
+/-- The chosen set of edges. -/
+
+  | tree
+/-- The chosen set of vertices. -/
+
+  | set
+/-- The root of the chosen set. -/
+
+  | root
+/-- The order certifying connectivity. -/
+
+  | order
+/-- The injection witnessing the threshold. -/
+
+  | inj
+  deriving DecidableEq
+
+instance : Fintype _root_.Lax799700Proofs.DescriptiveComplexity.EdgeSteinerGuessBlockIx :=
+  ⟨List.toFinset [.tree, .set, .root, .order, .inj], by intro x; cases x <;> simp⟩
+
+/-- The single existential block of the `Σ₁` definition of the edge-weighted
+Steiner tree: its five relation variables. -/
+def edgeSteinerGuessBlock : Lax904597.SecondOrder.SOBlock
+    where
+  ι := _root_.Lax799700Proofs.DescriptiveComplexity.EdgeSteinerGuessBlockIx
+  arity := fun i =>
+    match i with
+    | .tree => 2
+    | .set => 1
+    | .root => 1
+    | .order => 2
+    | .inj => 3
+
+/-- The vocabulary of the kernel: the instance expanded by the block. -/
+abbrev edgeSteinerSOLang : FirstOrder.Language :=
+  (Lax799700.Steiner.steinerGraph).sum (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerGuessBlock)
+
+/-- The `adj` symbol over the sum. -/
+abbrev kEsAdjSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 2 :=
+  Sum.inl Lax799700.Steiner.stAdj
+
+/-- The `terminal` symbol over the sum. -/
+abbrev kEsTerminalSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 1 :=
+  Sum.inl Lax799700.Steiner.stTerminal
+
+/-- The `marked` symbol over the sum. -/
+abbrev kEsMarkedSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 1 :=
+  Sum.inl Lax799700.Steiner.stMarked
+
+/-- The `tree` relation variable. -/
+def kEsTreeRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerGuessBlock).Relations 2 :=
+  ⟨.tree, rfl⟩
+
+/-- The `tree` symbol over the sum. -/
+abbrev kEsTreeSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 2 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kEsTreeRel
+
+/-- The `set` relation variable. -/
+def kEsSetRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerGuessBlock).Relations 1 :=
+  ⟨.set, rfl⟩
+
+/-- The `set` symbol over the sum. -/
+abbrev kEsSetSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 1 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kEsSetRel
+
+/-- The `root` relation variable. -/
+def kEsRootRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerGuessBlock).Relations 1 :=
+  ⟨.root, rfl⟩
+
+/-- The `root` symbol over the sum. -/
+abbrev kEsRootSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 1 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kEsRootRel
+
+/-- The `order` relation variable. -/
+def kEsOrderRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerGuessBlock).Relations 2 :=
+  ⟨.order, rfl⟩
+
+/-- The `order` symbol over the sum. -/
+abbrev kEsOrderSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 2 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kEsOrderRel
+
+/-- The `inj` relation variable. -/
+def kEsInjRel : (Lax904597.SecondOrder.SOBlock.lang _root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerGuessBlock).Relations 3 :=
+  ⟨.inj, rfl⟩
+
+/-- The `inj` symbol over the sum. -/
+abbrev kEsInjSym : (_root_.Lax799700Proofs.DescriptiveComplexity.edgeSteinerSOLang).Relations 3 :=
+  Sum.inr _root_.Lax799700Proofs.DescriptiveComplexity.kEsInjRel
+
+end Lax799700Proofs.DescriptiveComplexity
+
+namespace Lax799700Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure Lax904597.SecondOrder.SOBlock
+
+section SigmaOne
+
+/-- Kernel clause: the chosen pairs are edges. -/
+private noncomputable def esAdjClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 2)
+      ((FirstOrder.Language.Relations.formula₂ kEsTreeSym (FirstOrder.Language.Term.var (Sum.inr 0))
+            (FirstOrder.Language.Term.var (Sum.inr 1))).imp
+        (FirstOrder.Language.Relations.formula₂ kEsAdjSym (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 1))))
+
+/-- Kernel clause: every terminal is spanned. -/
+private noncomputable def esTermClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      ((FirstOrder.Language.Relations.formula₁ kEsTerminalSym (FirstOrder.Language.Term.var (Sum.inr 0))).imp
+        (FirstOrder.Language.Relations.formula₁ kEsSetSym (FirstOrder.Language.Term.var (Sum.inr 0))))
+
+/-- Kernel clause: the root is spanned. -/
+private noncomputable def esRootInClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      ((FirstOrder.Language.Relations.formula₁ kEsRootSym (FirstOrder.Language.Term.var (Sum.inr 0))).imp
+        (FirstOrder.Language.Relations.formula₁ kEsSetSym (FirstOrder.Language.Term.var (Sum.inr 0))))
+
+/-- Kernel clause: there is at most one root. -/
+private noncomputable def esRootUniqueClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 2)
+      ((FirstOrder.Language.Relations.formula₁ kEsRootSym (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+            FirstOrder.Language.Relations.formula₁ kEsRootSym (FirstOrder.Language.Term.var (Sum.inr 1))).imp
+        (FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 1))))
+
+/-- Kernel clause: the guessed order is transitive. -/
+private noncomputable def esTransClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 3)
+      ((FirstOrder.Language.Relations.formula₂ kEsOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+              (FirstOrder.Language.Term.var (Sum.inr 1)) ⊓
+            FirstOrder.Language.Relations.formula₂ kEsOrderSym (FirstOrder.Language.Term.var (Sum.inr 1))
+              (FirstOrder.Language.Term.var (Sum.inr 2))).imp
+        (FirstOrder.Language.Relations.formula₂ kEsOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 2))))
+
+/-- Kernel clause: the guessed order is irreflexive. -/
+private noncomputable def esIrreflClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      (FirstOrder.Language.BoundedFormula.not
+        (FirstOrder.Language.Relations.formula₂ kEsOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+          (FirstOrder.Language.Term.var (Sum.inr 0))))
+
+/-- Kernel clause: every spanned non-root steps down along a chosen edge. -/
+private noncomputable def esStepClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 1)
+      ((FirstOrder.Language.Relations.formula₁ kEsSetSym (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+            FirstOrder.Language.BoundedFormula.not
+              (FirstOrder.Language.Relations.formula₁ kEsRootSym (FirstOrder.Language.Term.var (Sum.inr 0)))).imp
+        (FirstOrder.Language.Formula.iExs (Fin 1)
+          (FirstOrder.Language.Relations.formula₁ kEsSetSym (FirstOrder.Language.Term.var (Sum.inr 0)) ⊓
+              (FirstOrder.Language.Relations.formula₂ kEsTreeSym (FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0)))
+                  (FirstOrder.Language.Term.var (Sum.inr 0)) ⊔
+                FirstOrder.Language.Relations.formula₂ kEsTreeSym (FirstOrder.Language.Term.var (Sum.inr 0))
+                  (FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0)))) ⊓
+            FirstOrder.Language.Relations.formula₂ kEsOrderSym (FirstOrder.Language.Term.var (Sum.inr 0))
+              (FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0))))))
+
+/-- Kernel clause: the guessed injection maps every chosen edge to a marked
+element. -/
+private noncomputable def esTotalClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 2)
+      ((FirstOrder.Language.Relations.formula₂ kEsTreeSym (FirstOrder.Language.Term.var (Sum.inr 0))
+            (FirstOrder.Language.Term.var (Sum.inr 1))).imp
+        (FirstOrder.Language.Formula.iExs (Fin 1)
+          (FirstOrder.Language.Relations.formula kEsInjSym
+              ![FirstOrder.Language.Term.var (Sum.inl (Sum.inr 0)), FirstOrder.Language.Term.var (Sum.inl (Sum.inr 1)),
+                FirstOrder.Language.Term.var (Sum.inr 0)] ⊓
+            FirstOrder.Language.Relations.formula₁ kEsMarkedSym (FirstOrder.Language.Term.var (Sum.inr 0)))))
+
+/-- Kernel clause: the guessed injection is injective. -/
+private noncomputable def esInjClause : edgeSteinerSOLang.Sentence :=
+  FirstOrder.Language.Formula.iAlls (Fin 5)
+      ((FirstOrder.Language.Relations.formula kEsInjSym
+              ![FirstOrder.Language.Term.var (Sum.inr 0), FirstOrder.Language.Term.var (Sum.inr 1),
+                FirstOrder.Language.Term.var (Sum.inr 4)] ⊓
+            FirstOrder.Language.Relations.formula kEsInjSym
+              ![FirstOrder.Language.Term.var (Sum.inr 2), FirstOrder.Language.Term.var (Sum.inr 3),
+                FirstOrder.Language.Term.var (Sum.inr 4)]).imp
+        (FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (Sum.inr 0))
+            (FirstOrder.Language.Term.var (Sum.inr 2)) ⊓
+          FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (Sum.inr 1))
+            (FirstOrder.Language.Term.var (Sum.inr 3))))
+
+/-- The first-order kernel of the `Σ₁` definition of the edge-weighted Steiner
+tree. -/
+noncomputable def edgeSteinerKernel : edgeSteinerSOLang.Sentence :=
+  esAdjClause ⊓ (esTermClause ⊓ (esRootInClause ⊓ (esRootUniqueClause ⊓ (esTransClause ⊓
+    (esIrreflClause ⊓ (esStepClause ⊓ (esTotalClause ⊓ esInjClause)))))))
+
+/-- Realization of the edge-weighted kernel. -/
+private theorem realize_edgeSteinerKernel {A : Type} [Lax799700.Steiner.steinerGraph.Structure A]
+    (ρ : edgeSteinerGuessBlock.Assignment A) :
+    (@Sentence.Realize edgeSteinerSOLang A
+        (@sumStructure _ _ A _ (edgeSteinerGuessBlock.structure ρ)) edgeSteinerKernel) ↔
+      (∀ a b : A, ρ .tree ![a, b] → Lax799700.Steiner.STAdj a b) ∧
+      (∀ x : A, Lax799700.Steiner.STTerminal x → ρ .set ![x]) ∧
+      (∀ x : A, ρ .root ![x] → ρ .set ![x]) ∧
+      (∀ x y : A, ρ .root ![x] → ρ .root ![y] → x = y) ∧
+      (∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z]) ∧
+      (∀ x : A, ¬ρ .order ![x, x]) ∧
+      (∀ x : A, ρ .set ![x] → ¬ρ .root ![x] →
+        ∃ y : A, (ρ .set ![y] ∧ (ρ .tree ![x, y] ∨ ρ .tree ![y, x])) ∧ ρ .order ![y, x]) ∧
+      (∀ a b : A, ρ .tree ![a, b] → ∃ y : A, ρ .inj ![a, b, y] ∧ Lax799700.Steiner.STMarked y) ∧
+      (∀ a b a' b' y : A, ρ .inj ![a, b, y] → ρ .inj ![a', b', y] → a = a' ∧ b = b') := by
+  let := edgeSteinerGuessBlock.structure ρ
+  have hT : ∀ (w : Fin 2 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsTreeSym w ↔ ρ .tree w := fun _ => Iff.rfl
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsRootSym w ↔ ρ .root w := fun _ => Iff.rfl
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
+  have hI : ∀ (w : Fin 3 → A),
+      RelMap (L := edgeSteinerSOLang) (M := A) kEsInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [edgeSteinerKernel]
+  simp only [esAdjClause, esTermClause, esRootInClause, esRootUniqueClause, esTransClause,
+    esIrreflClause, esStepClause, esTotalClause, esInjClause, Sentence.Realize,
+    Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_sup, Formula.realize_not, realize_rel₃,
+    Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
+    Sum.elim_inr, Sum.elim_inl, Language.relMap_sumInl, hT, hS, hR, hL, hI]
+  refine and_congr ⟨fun h a b hab => ?_, fun h i hi => ?_⟩
+    (and_congr ⟨fun h x hx => ?_, fun h i hi => ?_⟩
+      (and_congr ⟨fun h x hx => ?_, fun h i hi => ?_⟩
+        (and_congr ⟨fun h x y hx hy => ?_, fun h i hi => ?_⟩
+          (and_congr ⟨fun h x y z h₁ h₂ => ?_, fun h i hi => ?_⟩
+            (and_congr ⟨fun h x => ?_, fun h i => ?_⟩
+              (and_congr ⟨fun h x hx hnr => ?_, fun h i hi => ?_⟩
+                (and_congr ⟨fun h a b hab => ?_, fun h i hi => ?_⟩
+                  ⟨fun h a b a' b' y h₁ h₂ => ?_, fun h i hi => ?_⟩)))))))
+  · exact h ![a, b] hab
+  · exact h (i 0) (i 1) hi
+  · exact h (fun _ => x) hx
+  · exact h (i 0) hi
+  · exact h (fun _ => x) hx
+  · exact h (i 0) hi
+  · exact h ![x, y] ⟨hx, hy⟩
+  · exact h (i 0) (i 1) hi.1 hi.2
+  · exact h ![x, y, z] ⟨h₁, h₂⟩
+  · exact h (i 0) (i 1) (i 2) hi.1 hi.2
+  · exact h fun _ => x
+  · exact h (i 0)
+  · obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnr⟩
+    exact ⟨y 0, hy⟩
+  · obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
+    exact ⟨fun _ => y, hy⟩
+  · obtain ⟨y, hy⟩ := h ![a, b] hab
+    exact ⟨y 0, hy⟩
+  · obtain ⟨y, hy⟩ := h (i 0) (i 1) hi
+    exact ⟨fun _ => y, hy⟩
+  · exact h ![a, b, a', b', y] ⟨h₁, h₂⟩
+  · exact h (i 0) (i 1) (i 2) (i 3) (i 4) hi.1 hi.2
+
+/-- **The edge-weighted Steiner Tree is `Σ₁`-definable**: guess the edge set,
+the vertices it spans, a root, an order certifying connectivity, and an
+injection of the chosen edges into the marked set. -/
+theorem edgeSteinerTree_sigmaSODefinable : Lax904597.SecondOrder.SigmaSODefinable 1 EdgeSteinerTree := by
+  refine ⟨[edgeSteinerGuessBlock], rfl, edgeSteinerKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨-, hst⟩
+    obtain ⟨T, S, hsub, hterms, ⟨Rt, hRtS, huniq, Lt, htrans, hirr, hstep⟩, ⟨e⟩⟩ :=
+      (steinerEdgeOn_iff_certificate _ _ _).mp hst
+    refine ⟨fun i => match i with
+      | .tree => fun w : Fin 2 → A => T (w 0) (w 1)
+      | .set => fun w : Fin 1 → A => S (w 0)
+      | .root => fun w : Fin 1 → A => Rt (w 0)
+      | .order => fun w : Fin 2 → A => Lt (w 0) (w 1)
+      | .inj => fun w : Fin 3 → A =>
+          ∃ h : T (w 0) (w 1), (e ⟨(w 0, w 1), h⟩ : {x // Lax799700.Steiner.STMarked x}).1 = w 2, ?_⟩
+    refine (realize_edgeSteinerKernel _).mpr
+      ⟨hsub, hterms, hRtS, huniq, htrans, hirr, ?_,
+        fun a b hab => ⟨(e ⟨(a, b), hab⟩).1, ⟨hab, rfl⟩, (e ⟨(a, b), hab⟩).2⟩, ?_⟩
+    · intro x hx hnr
+      obtain ⟨y, hlink, hlt⟩ := hstep x hx hnr
+      exact ⟨y, ⟨hlink.2.1, hlink.2.2⟩, hlt⟩
+    · rintro a b a' b' y ⟨h, hy⟩ ⟨h', hy'⟩
+      have heq := e.injective (Subtype.ext (hy.trans hy'.symm) :
+        (e ⟨(a, b), h⟩ : {x // Lax799700.Steiner.STMarked x}) = e ⟨(a', b'), h'⟩)
+      exact ⟨congrArg Prod.fst (congrArg Subtype.val heq),
+        congrArg Prod.snd (congrArg Subtype.val heq)⟩
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨hsub, hterms, hRtS, huniq, htrans, hirr, hstep, htot, hinj⟩ :=
+      (realize_edgeSteinerKernel ρ).mp hρ
+    have hch : ∀ p : {p : A × A // ρ .tree ![p.1, p.2]},
+        ∃ y : A, ρ .inj ![p.1.1, p.1.2, y] ∧ Lax799700.Steiner.STMarked y := by
+      rintro ⟨⟨a, b⟩, hab⟩
+      exact htot a b hab
+    choose f hf1 hf2 using hch
+    refine ⟨‹Finite A›, (steinerEdgeOn_iff_certificate _ _ _).mpr
+      ⟨fun a b => ρ .tree ![a, b], fun x => ρ .set ![x], hsub, hterms,
+        ⟨fun x => ρ .root ![x], hRtS, huniq, fun x y => ρ .order ![x, y], htrans, hirr, ?_⟩,
+        ⟨⟨fun p => ⟨f p, hf2 p⟩, fun p p' hpp' => ?_⟩⟩⟩⟩
+    · intro x hx hnr
+      obtain ⟨y, ⟨hy, hlink⟩, hlt⟩ := hstep x hx hnr
+      exact ⟨y, ⟨hx, hy, hlink⟩, hlt⟩
+    · have hval : f p = f p' := congrArg Subtype.val hpp'
+      obtain ⟨h₁, h₂⟩ := hinj p.1.1 p.1.2 p'.1.1 p'.1.2 (f p) (hf1 p)
+        (by rw [hval]; exact hf1 p')
+      exact Subtype.ext (Prod.ext h₁ h₂)
+
+end SigmaOne
+
+end Lax799700Proofs.DescriptiveComplexity
+
+

@@ -309,7 +309,7 @@ KCOL_BRIDGE = '''/--
 ---
 conclusion: {cname}.Coloring.kColorable_iso
 ---
-The library's invariance theorem for `KColorable`.
+The library's invariance theorem for KColorable.
 -/
 theorem kColorable_iso {{k : ℕ}} {{A B : Type}} [FirstOrder.Language.graph.Structure A]
     [FirstOrder.Language.graph.Structure B] (e : A ≃[FirstOrder.Language.graph] B) :
@@ -336,9 +336,9 @@ theorem kCol_agree (k : ℕ) (A : Type) [FirstOrder.Language.graph.Structure A] 
 ---
 conclusion: {cname}.Coloring.kCol_NP_complete
 ---
-Membership from the library's `Σ₁` definition of k-colorability; hardness by
-padding the reduction of 3-colorability to k-colorability with `k - 3` further
-colors, 3-colorability being NP-hard by the catalog's statement for it.
+Membership from the library's existential second-order definition of
+$k$-colorability; hardness by padding the reduction of 3-colorability to
+$k$-colorability with $k - 3$ further colors, 3-colorability being NP-hard by the catalog's statement for it.
 -/
 theorem kCol_NP_complete {{k : ℕ}} (hk : 3 ≤ k) : NP.Complete (KCol k) := by
   obtain ⟨m, rfl⟩ : ∃ m, k = 3 + m := ⟨k - 3, by omega⟩
@@ -547,7 +547,7 @@ axiom {key}_NP_complete : NP.Complete {P}''')
             if "sigma" in p["mem"]:
                 mem_proof = (f"({CORE}.NPClass.NP_mem_congr_finite fun A _ _ => {key}_agree A).mp "
                              f"{PFX}.{p['mem']['sigma']}")
-                mem_prose = f"Membership from the library's `Σ₁` definition of {P}"
+                mem_prose = f"Membership from the library's existential second-order definition of {P}"
             else:
                 tgt = p["mem"]["source"]
                 tgt_agree, tgt_stmt = agree_and_statement(tgt)
@@ -560,7 +560,7 @@ axiom {key}_NP_complete : NP.Complete {P}''')
 ---
 conclusion: {cname}.{fam}.{p["iso"]}
 ---
-The library's invariance theorem for `{pred}`.
+The library's invariance theorem for {pred}.
 -/
 theorem {p["iso"]} {{A B : Type}} [{L}.Structure A] [{L}.Structure B] (e : A ≃[{L}] B) :
     {pred} A ↔ {pred} B :=
