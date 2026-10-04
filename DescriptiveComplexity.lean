@@ -78,6 +78,9 @@ import DescriptiveComplexity.FixedPointInflationary
 import DescriptiveComplexity.FixedPointInflationaryLFP
 import DescriptiveComplexity.FixedPointPartial
 import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Counting
+import DescriptiveComplexity.Counting.SharpP
+import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -2029,6 +2032,67 @@ The bottom of the ordered world, and the only vocabulary here that is a
   (`DescriptiveComplexity.Problems.FinSat`), and Post's correspondence problem
   is a member of it (`DescriptiveComplexity.pcp_mem_RE`).
 
+## Counting problems, and the class `#P`
+
+Everything above measures *decision* problems. A **counting problem**
+(`DescriptiveComplexity.CountingProblem`, in `DescriptiveComplexity.Counting`) attaches an
+isomorphism-invariant natural number to every structure, and its reductions are
+the **parsimonious** ones, `C ≤ᵖ D` and `C ≤ᵖ[≤] D`: a first-order
+interpretation under which the two counts are equal. They compose like the
+decision reductions, for the same reason.
+
+* **The class** `DescriptiveComplexity.SharpP` is *defined* by witness counting
+  ([Saluja, Subrahmanyam, Thakur 1995][saluja1995descriptive]): a counting
+  problem is `#P`-definable (`DescriptiveComplexity.SharpPDefinable`) when it is the
+  number of assignments of a second-order block satisfying a first-order kernel
+  over the ordered expansion, whatever the linear order. This is the prenex
+  form of the logic ΣQSO(FO) of
+  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive]. The order is a
+  parameter and not a guessed relation: guessing it, as the definition of NP
+  may, would multiply every count by the number of linear orders. Closure under
+  parsimonious reductions (`DescriptiveComplexity.SharpPDefinable.of_orderedParsimonious`)
+  rests on the pullback of a block being a *bijection* on assignments
+  (`DescriptiveComplexity.witnessCount_map`).
+* **#SAT is parsimoniously `#P`-complete**
+  (`DescriptiveComplexity.sharpSat_sharpP_parsimoniousComplete`,
+  [Valiant 1979][valiant1979complexity]): it is in `#P`, and every problem of
+  `#P` reduces to it by an ordered parsimonious reduction. A model is a set of
+  *variables of the formula*, i.e., of elements
+  occurring in a clause (`DescriptiveComplexity.SatModel`). Hardness is the Tseitin
+  reduction of the Cook–Levin theorem, which preserves the number of solutions
+  because gates determine the position variables
+  (`DescriptiveComplexity.Tseitin.gates_unique`) and every variable of the encoding
+  sits at a canonically padded tuple
+  (`DescriptiveComplexity.Tseitin.litSem_varCanon`); one tautological clause per block
+  variable is added so that each of them is a variable of the formula.
+* **The machine bridge**: counting accepting runs
+  (`DescriptiveComplexity.SharpNTMAccept`, in
+  `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
+  machine of `DescriptiveComplexity.NTMAccept` reaching an accepting state within the
+  budget, each counted up to its first accepting configuration. It is
+  parsimoniously `#P`-complete
+  (`DescriptiveComplexity.sharpNtmAccept_sharpP_parsimoniousComplete`), and a counting
+  problem is in `#P` exactly when it reduces parsimoniously to it
+  (`DescriptiveComplexity.mem_sharpP_iff_le_sharpNtmAccept`) – the definition of `#P`
+  by accepting paths. Membership is the tableau of a run, which the run
+  determines; hardness is the machine `M_φ` of the Cook–Levin bridge, which
+  guesses only at the variables of the formula, so that its accepting runs are
+  the models (`DescriptiveComplexity.card_haltWalk_satMachine`).
+* **Relation to NP**, through the *support* of a counting problem, “is the count
+  positive?”: NP is exactly the class of supports of `#P`
+  (`DescriptiveComplexity.mem_NP_iff_exists_sharpP_support`), the support of a
+  parsimoniously `#P`-hard problem is NP-hard
+  (`DescriptiveComplexity.NP_hard_support_of_sharpP_parsimoniousHard`), and a
+  parsimoniously `#P`-hard problem whose support is in PTIME gives `NP ⊆ PTIME`
+  (`DescriptiveComplexity.NP_subset_PTIME_of_sharpP_parsimoniousHard`).
+* **Parsimonious hardness is not the hardness of the literature.** “`#P`-hard”
+  usually means hard under polynomial-time Turing reductions, and counting the
+  satisfying assignments of a DNF formula is `#P`-complete in that sense while
+  its decision version is trivial. By the last statement above it is *not*
+  parsimoniously `#P`-hard unless `NP ⊆ PTIME`. This is why the library says
+  `ParsimoniousHard` and `ParsimoniousComplete` and never the bare words, which
+  are left for the weaker notion; nothing here is claimed about it.
+
 ## Shared encodings
 
 * `DescriptiveComplexity.SecondOrderMerge` – merging a second-order quantifier
@@ -2155,6 +2219,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · counting the accepting runs of such a machine – *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

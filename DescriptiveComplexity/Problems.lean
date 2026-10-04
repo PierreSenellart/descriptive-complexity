@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.Problems.SatUnsat
 import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Problems.Sat.TseitinUnique
+import DescriptiveComplexity.Problems.Sat.Counting
+import DescriptiveComplexity.Problems.Sat.CountingHardness
 import DescriptiveComplexity.Problems.SatUnsat.Hardness
 import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut
@@ -51,6 +54,8 @@ import DescriptiveComplexity.Problems.SuccinctReach
 import DescriptiveComplexity.Problems.FinSat
 import DescriptiveComplexity.Problems.Pcp
 import DescriptiveComplexity.Problems.Machine
+import DescriptiveComplexity.Problems.Machine.Counting
+import DescriptiveComplexity.Problems.Machine.CountingHardness
 import DescriptiveComplexity.Problems.MachineAlt
 import DescriptiveComplexity.Problems.MachineAltSpace
 import DescriptiveComplexity.Problems.MachineAltSpace.Membership

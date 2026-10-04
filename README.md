@@ -76,6 +76,18 @@ first-order logic, which Mathlib already has.
   deterministic) polynomial-time Turing machine (`mem_NP_iff_le_ntmAccept`,
   `mem_PTIME_iff_le_dtmAccept`); the other classes are matched against their
   machines in the table below.
+* Counting: `#P`, defined as the counting problems that count the witnesses
+  of an ∃SO sentence over ordered structures, with #SAT *parsimoniously*
+  complete for it (`sharpSat_sharpP_parsimoniousComplete`) – the Tseitin
+  reduction again, its gate variables being functionally determined. This is
+  stronger than the `#P`-completeness of the literature, which allows Turing
+  reductions: NP is exactly the class of supports of `#P`
+  (`mem_NP_iff_exists_sharpP_support`), and a parsimoniously `#P`-hard problem
+  with a polynomial-time decision version would put NP inside PTIME
+  (`NP_subset_PTIME_of_sharpP_parsimoniousHard`), so #DNF and its like are not
+  covered. The machine bridge holds here too: a counting problem is in `#P`
+  exactly when it reduces parsimoniously to counting the accepting runs of a
+  nondeterministic polynomial-time machine (`mem_sharpP_iff_le_sharpNtmAccept`).
 * Lower bounds, none of them conditional on a complexity assumption:
   Ehrenfeucht–Fraïssé games on finite structures, and the inexpressibility of
   EVEN even when the sentence is given a linear order (`even_not_foDefinable`),
@@ -116,6 +128,7 @@ for it under FO reductions.
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there); equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | **EXPSPACE** | SO(PFP), i.e., PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | **RE** | ∃SO[new] (∃SO with value invention, unbounded) | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| **#P** (a counting class) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe, i.e., #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · counting the accepting runs of such a machine – *parsimoniously* complete, a stronger notion than the usual `#P`-completeness |
 | **the degree of a problem** – `below Q₀`, e.g., **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a
