@@ -497,6 +497,6 @@ of a machine reduces, parsimoniously, to counting the models of a CNF formula.
 As on the decision side, no tableau-to-CNF encoding appears: the `Σ₁`
 definition of a run feeds the generic parsimonious Tseitin reduction. -/
 theorem sharpNtmAccept_reduces_to_sharpSat : Nonempty (SharpNTMAccept ≤ᵖ[≤] SharpSAT) :=
-  sharpSat_sharpP_parsimoniousHard SharpNTMAccept sharpNtmAccept_mem_sharpP
+  sharpSat_parsimoniousHard_of_sharpPDefinable SharpNTMAccept sharpNtmAccept_mem_sharpP
 
 end DescriptiveComplexity

@@ -286,7 +286,8 @@ witnesses of an existential second-order sentence exactly when it reduces
 parsimoniously to counting the accepting runs of a nondeterministic machine. -/
 theorem mem_sharpP_iff_le_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational]
     (C : CountingProblem L) : C ∈ SharpP ↔ Nonempty (C ≤ᵖ[≤] SharpNTMAccept) :=
-  ⟨fun hC => sharpNtmAccept_sharpP_parsimoniousHard C hC,
+  ⟨fun hC => (sharpSat_parsimoniousHard_of_sharpPDefinable C hC).map fun g =>
+      g.trans SatTM.sharpSat_ordered_parsimonious_sharpNtmAccept,
     fun ⟨f⟩ => SharpP.mem_of_orderedParsimonious f sharpNtmAccept_mem_sharpP⟩
 
 /-- **Counting accepting runs and counting models reduce to each other**,

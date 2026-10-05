@@ -80,6 +80,7 @@ import DescriptiveComplexity.FixedPointPartial
 import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.Counting
 import DescriptiveComplexity.Counting.SharpP
+import DescriptiveComplexity.Counting.Relativized
 import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.SecondOrderTransitiveClosure
@@ -2041,7 +2042,12 @@ Everything above measures *decision* problems. A **counting problem**
 isomorphism-invariant natural number to every structure, and its reductions are
 the **parsimonious** ones, `C ≤ᵖ D` and `C ≤ᵖ[≤] D`: a first-order
 interpretation under which the two counts are equal. They compose like the
-decision reductions, for the same reason.
+decision reductions, for the same reason. As on the decision side there is a
+relativized form `C ≤ʳᵖ[≤] D`, with a definable target universe
+(`DescriptiveComplexity.Counting.Relativized`), for the problems whose solutions span
+the universe; parsimonious hardness for a counting class is hardness under
+those (`DescriptiveComplexity.parsimoniousHard_sharpP_iff`), every ordinary reduction
+being one.
 
 * **The class** `DescriptiveComplexity.SharpP` is *defined* by witness counting
   ([Saluja, Subrahmanyam, Thakur 1995][saluja1995descriptive]): a counting

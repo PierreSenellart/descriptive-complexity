@@ -4,7 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Counting.SharpP
+import DescriptiveComplexity.Counting.Relativized
 import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.FixedPointReductionClosure
 
 /-!
 # Counting classes, the class `#P`, and its relation to NP
@@ -13,7 +15,10 @@ A `DescriptiveComplexity.CountingClass` is to counting problems what a
 `DescriptiveComplexity.ComplexityClass` is to decision problems: a membership
 predicate and a hardness predicate, closed under reductions – here the
 *parsimonious* ones of `DescriptiveComplexity.Counting`, membership backward and
-hardness forward.
+hardness forward. As on the decision side, hardness also travels along the
+*relativized* reductions of `DescriptiveComplexity.Counting.Relativized`, whose target
+universe is definable, and hardness for a class is cofinality for those: a
+problem whose solutions span the universe can be hard in no other way.
 
 ## Parsimonious hardness is not the hardness of the literature
 
@@ -98,6 +103,12 @@ structure CountingClass where
   parsimoniousHard_of_orderedParsimonious : ∀ {L L' : Language.{0, 0}} [L.IsRelational]
     [L'.IsRelational] {C : CountingProblem L} {D : CountingProblem L'},
     (C ≤ᵖ[≤] D) → ParsimoniousHard C → ParsimoniousHard D
+  /-- Parsimonious hardness travels forward along relativized ordered
+  parsimonious reductions – the reductions with a definable target universe,
+  needed for the problems whose solutions span it. -/
+  parsimoniousHard_of_relOrderedParsimonious : ∀ {L L' : Language.{0, 0}} [L.IsRelational]
+    [L'.IsRelational] {C : CountingProblem L} {D : CountingProblem L'},
+    (C ≤ʳᵖ[≤] D) → ParsimoniousHard C → ParsimoniousHard D
   /-- Membership only depends on the values of a counting problem on finite
   structures. -/
   mem_congr_finite : ∀ {L : Language.{0, 0}} [L.IsRelational] {C D : CountingProblem L},
@@ -113,8 +124,9 @@ scoped notation:50 C:51 " ∈ " K:51 => CountingClass.Mem K C
 namespace CountingClass
 
 /-- The counting class with a given membership predicate, parsimonious hardness
-being cofinality for it: every member reduces to the problem, by an ordered
-parsimonious reduction. Only the membership obligations have to be supplied. -/
+being cofinality for it: every member reduces to the problem, by a relativized
+ordered parsimonious reduction. Only the membership obligations have to be
+supplied. -/
 def ofMem
     (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], CountingProblem L₀ → Prop)
     (mem_of_orderedParsimonious : ∀ {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational]
@@ -125,11 +137,13 @@ def ofMem
     CountingClass where
   Mem C := Mem C
   ParsimoniousHard C := ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (D : CountingProblem L''),
-    Mem D → Nonempty (D ≤ᵖ[≤] C)
+    Mem D → Nonempty (D ≤ʳᵖ[≤] C)
   mem_of_parsimonious f h := mem_of_orderedParsimonious f.toOrdered h
-  parsimoniousHard_of_parsimonious f hC := fun D hD => ⟨(hC D hD).some.trans f.toOrdered⟩
+  parsimoniousHard_of_parsimonious f hC := fun D hD =>
+    ⟨(hC D hD).some.trans f.toOrdered.toRel⟩
   mem_of_orderedParsimonious f h := mem_of_orderedParsimonious f h
-  parsimoniousHard_of_orderedParsimonious f hC := fun D hD => ⟨(hC D hD).some.trans f⟩
+  parsimoniousHard_of_orderedParsimonious f hC := fun D hD => ⟨(hC D hD).some.trans f.toRel⟩
+  parsimoniousHard_of_relOrderedParsimonious f hC := fun D hD => ⟨(hC D hD).some.trans f⟩
   mem_congr_finite h := mem_congr_finite h
   parsimoniousHard_congr_finite h :=
     ⟨fun hC _ _ D hD => ⟨(hC D hD).some.congrTarget h⟩,
@@ -155,8 +169,8 @@ end CountingClass
 /-- **The class `#P`**: the counting problems that count the witnesses of an
 existential second-order sentence over ordered structures
 ([Saluja, Subrahmanyam, Thakur 1995][saluja1995descriptive]). It is closed
-under parsimonious reductions, and hardness for it is hardness under ordered
-parsimonious reductions. -/
+under parsimonious reductions, and hardness for it is hardness under
+relativized ordered parsimonious reductions. -/
 noncomputable def SharpP : CountingClass :=
   .ofMem (fun C => SharpPDefinable C)
     (fun f h => h.of_orderedParsimonious f)
@@ -168,12 +182,19 @@ theorem mem_sharpP_iff (C : CountingProblem L) : C ∈ SharpP ↔ SharpPDefinabl
   Iff.rfl
 
 /-- Parsimonious `#P`-hardness, unfolded: every `#P`-definable counting problem
-reduces to `C` by an ordered parsimonious reduction. -/
+reduces to `C` by a relativized ordered parsimonious reduction. -/
 theorem parsimoniousHard_sharpP_iff (C : CountingProblem L) :
     SharpP.ParsimoniousHard C ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (D : CountingProblem L''),
-        SharpPDefinable D → Nonempty (D ≤ᵖ[≤] C) :=
+        SharpPDefinable D → Nonempty (D ≤ʳᵖ[≤] C) :=
   Iff.rfl
+
+/-- A problem every `#P`-definable counting problem reduces to by an ordinary
+ordered parsimonious reduction is parsimoniously `#P`-hard. -/
+theorem parsimoniousHard_sharpP_of_ordered {C : CountingProblem L}
+    (h : ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (D : CountingProblem L''),
+      SharpPDefinable D → Nonempty (D ≤ᵖ[≤] C)) : SharpP.ParsimoniousHard C :=
+  fun D hD => (h D hD).map fun g => g.toRel
 
 /-- The witness-counting problem of an existential second-order sentence is in
 `#P`. -/
@@ -230,26 +251,26 @@ theorem mem_NP_iff_exists_sharpP_support (P : DecisionProblem L) :
 
 /-- Every problem of NP reduces to the support of a parsimoniously `#P`-hard counting
 problem. -/
-theorem nonempty_orderedReduction_support_of_sharpP_parsimoniousHard {C : CountingProblem L}
-    (hC : SharpP.ParsimoniousHard C) {L' : Language.{0, 0}} [L'.IsRelational]
-    (Q : DecisionProblem L')
-    (hQ : Q ∈ NP) : Nonempty (Q ≤ᶠᵒ[≤] C.support) := by
+theorem nonempty_relOrderedReduction_support_of_sharpP_parsimoniousHard
+    {C : CountingProblem L} (hC : SharpP.ParsimoniousHard C) {L' : Language.{0, 0}}
+    [L'.IsRelational] (Q : DecisionProblem L') (hQ : Q ∈ NP) :
+    Nonempty (Q ≤ʳᶠᵒ[≤] C.support) := by
   obtain ⟨D, hD, hDQ⟩ := (mem_NP_iff_exists_sharpP_support Q).mp hQ
   obtain ⟨g⟩ := hC D hD
   let := g.tagFinite
-  let := g.tagNonempty
   exact ⟨{ Tag := g.Tag
            dim := g.dim
-           toInterpretation := g.toInterpretation
+           toRelInterpretation := g.toRelInterpretation
+           dom_nonempty := g.dom_nonempty
            correct := fun A _ _ _ _ =>
-            (hDQ A).symm.trans (g.toOrderedFOReduction.correct A) }⟩
+            (hDQ A).symm.trans (g.toRelOrderedFOReduction.correct A) }⟩
 
 /-- **The support of a parsimoniously `#P`-hard counting problem is NP-hard.** -/
 theorem NP_hard_support_of_sharpP_parsimoniousHard {C : CountingProblem L}
     (hC : SharpP.ParsimoniousHard C) :
     NP.Hard C.support :=
   (hard_sigmaP_succ_iff 0 C.support).mpr fun Q hQ =>
-    ⟨(nonempty_orderedReduction_support_of_sharpP_parsimoniousHard hC Q hQ).some.toRel⟩
+    nonempty_relOrderedReduction_support_of_sharpP_parsimoniousHard hC Q hQ
 
 /-- **A parsimoniously `#P`-hard counting problem with an easy decision version collapses NP
 into PTIME.** This is why the counting problems whose support is in PTIME –
@@ -259,7 +280,7 @@ not parsimoniously `#P`-complete unless `NP ⊆ PTIME`. -/
 theorem NP_subset_PTIME_of_sharpP_parsimoniousHard {C : CountingProblem L}
     (hC : SharpP.ParsimoniousHard C)
     (hsupp : C.support ∈ PTIME) : NP ⊆ PTIME := fun _ _ Q hQ =>
-  PTIME.mem_of_orderedReduction
-    (nonempty_orderedReduction_support_of_sharpP_parsimoniousHard hC Q hQ).some hsupp
+  mem_PTIME_of_relOrderedReduction
+    (nonempty_relOrderedReduction_support_of_sharpP_parsimoniousHard hC Q hQ).some hsupp
 
 end DescriptiveComplexity

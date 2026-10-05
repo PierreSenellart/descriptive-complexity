@@ -435,7 +435,8 @@ end Reduction
 
 /-- #SAT is parsimoniously `#P`-hard. -/
 theorem sharpSat_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpSAT :=
-  fun C hC => sharpSat_parsimoniousHard_of_sharpPDefinable C hC
+  parsimoniousHard_sharpP_of_ordered fun C hC =>
+    sharpSat_parsimoniousHard_of_sharpPDefinable C hC
 
 /-- **#SAT is parsimoniously `#P`-complete**: the counting form
 of the Cook–Levin theorem ([Valiant 1979][valiant1979complexity]). Membership
