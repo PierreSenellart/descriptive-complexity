@@ -85,6 +85,8 @@ import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.Counting.SizedPairs
 import DescriptiveComplexity.Counting.Post
+import DescriptiveComplexity.Counting.PossibleWorlds
+import DescriptiveComplexity.Counting.Probability
 import DescriptiveComplexity.Counting.Reduction
 import DescriptiveComplexity.Counting.RelClosure
 import DescriptiveComplexity.Counting.Subtractive
@@ -218,7 +220,9 @@ the main results; the worked examples in
 `DescriptiveComplexity.Examples.ConjunctiveQueries` (conjunctive-query
 evaluation and containment) and `DescriptiveComplexity.Examples.GraphCrawling`
 (Web data acquisition, with a cardinality threshold, a reachability
-certificate and an ordered reduction) are the hands-on tutorials;
+certificate and an ordered reduction) are the hands-on tutorials, with
+`DescriptiveComplexity.Examples.ProbabilisticQueries` (query evaluation over
+probabilistic databases) for the counting side;
 individual declarations are documented on their own pages.
 
 ## The framework: problems, interpretations, reductions
@@ -2366,6 +2370,28 @@ pulled relations hold only of points of the domain
   `#BIS + #PP2DNF = 2 ^ n`. It is the source of the `#P`-hardness of the query
   `R(x), S(x, y), T(y)` over probabilistic databases
   ([Dalvi and Suciu 2012][dalvi2012dichotomy]).
+* **Possible worlds** (`DescriptiveComplexity.Counting.PossibleWorlds`): for a
+  finite relational schema, an instance holds certain facts and uncertain ones,
+  a possible world keeps the first and some of the second, and
+  `DescriptiveComplexity.PossibleWorlds φ` counts the worlds in which the
+  sentence `φ` holds. It is in `#P` for every first-order `φ`
+  (`DescriptiveComplexity.possibleWorlds_mem_sharpP`), and an instance with `k`
+  open facts has `2 ^ k` worlds (`DescriptiveComplexity.card_isWorld`), so the
+  count is the probability of `φ` over a tuple-independent database with
+  probabilities `1` and `1/2`, up to the factor `2 ^ k`. For the query above
+  it is one-call `#P`-complete
+  (`DescriptiveComplexity.possibleWorlds_h0_sharpP_oneCallComplete`, in the
+  tutorial `DescriptiveComplexity.Examples.ProbabilisticQueries`).
+* **Probabilities as weighted counts**
+  (`DescriptiveComplexity.Counting.Probability`): finitely many independent
+  Boolean variables with rational probabilities, the distribution on
+  valuations and the probability of an event, taken from the
+  provenance-lean library; and, with a probability `a / (a + c)` given by two
+  natural weights, the fact that the probability of an event is the ratio of
+  its weighted count to that of the sure event
+  (`DescriptiveComplexity.ProbAssignment.funcProb_ofWeights`). This is the
+  concrete side of query evaluation over a tuple-independent database; the
+  counting problem of weighted worlds it calls for is not built yet.
 
 ## Shared encodings
 

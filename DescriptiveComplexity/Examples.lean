@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Examples.ConjunctiveQueries
 import DescriptiveComplexity.Examples.GraphCrawling
+import DescriptiveComplexity.Examples.ProbabilisticQueries
 
 /-!
 # Worked examples
@@ -29,4 +30,11 @@ to be read top to bottom as a template for new formalizations.
   paper's reduction from Set Cover. Read second: it exercises what the CQ
   tutorial does not – a cardinality threshold, a reachability certificate,
   an *ordered* FO reduction, and a single-sorted concrete encoding.
+* `DescriptiveComplexity.Examples.ProbabilisticQueries`: query evaluation over
+  probabilistic databases, the first tutorial about a *counting* problem. The
+  count of the possible worlds of the query `R(x), S(x, y), T(y)` is one-call
+  `#P`-complete ([Dalvi and Suciu 2012][dalvi2012dichotomy]), by a
+  parsimonious reduction from #PP2DNF; membership in `#P` holds for every
+  first-order query. It works on the abstract instances directly, with no
+  concrete encoding step.
 -/

@@ -8,6 +8,7 @@ import DescriptiveComplexity.Numbers.MonotoneBijection
 import DescriptiveComplexity.Numbers.Binary
 import DescriptiveComplexity.Numbers.Digits
 import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Numbers.BinCount
 import DescriptiveComplexity.Numbers.Wide
 
 /-!
@@ -55,7 +56,10 @@ never sum them.
 The answer of a counting oracle is a number as well, read by the
 post-processing term of a one-call reduction and not by formulas:
 `DescriptiveComplexity.Numbers.DigitExtract` reads a count off one base-`B`
-digit of a sum of powers.
+digit of a sum of powers. In the other direction a binary number of the
+instance can act as a *weight* in a count:
+`DescriptiveComplexity.Numbers.BinCount` shows that the sets of bits below it
+are as many as its value.
 
 That the choice is part of the statement and not bookkeeping is itself a
 theorem: `DescriptiveComplexity.no_unary_encoding`

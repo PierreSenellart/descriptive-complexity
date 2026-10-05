@@ -99,7 +99,11 @@ first-order logic, which Mathlib already has.
   vertex, the independent sets of one size are counted by one base-`2ⁿ` digit
   of the answer, which a quotient and a remainder extract; stretching every
   edge then takes the problem to bipartite graphs (`sharpBIS_sharpP_oneCallComplete`),
-  and to its dual #PP2DNF (`sharpPP2DNF_sharpP_oneCallComplete`).
+  and to its dual #PP2DNF (`sharpPP2DNF_sharpP_oneCallComplete`). From there,
+  the probability of the query `R(x), S(x, y), T(y)` over a probabilistic
+  database is one-call `#P`-complete to compute
+  (`possibleWorlds_h0_sharpP_oneCallComplete`), while counting the possible
+  worlds of any first-order query is in `#P` (`possibleWorlds_mem_sharpP`).
   #3SAT, #1-in-SAT, #Exact Cover, #Knapsack and #0-1 Integer
   Programming are parsimoniously complete as well: the first two by clause
   splittings whose fresh variables are forced, the last two because a solution
@@ -336,6 +340,9 @@ build times down.
   loop is `DescriptiveComplexity/Problems/SubgraphIso.lean` with its
   `SubgraphIso/Encoding.lean`: a catalog problem, then its concrete encoding
   and a decoder with no well-formedness condition.
+  A third one, `DescriptiveComplexity/Examples/ProbabilisticQueries.lean`, does
+  the same for a counting problem, query evaluation over probabilistic
+  databases, so far without the concrete encoding step.
 * **Planned work**: `ROADMAP.md` – locality theorems and 0-1 laws for the
   inexpressibility track, the graph-isomorphism degree, counting problems and
   `#P`, finer reduction notions, and further complete problems for PTIME,
