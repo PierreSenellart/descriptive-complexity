@@ -81,6 +81,7 @@ import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.Counting
 import DescriptiveComplexity.Counting.SharpP
 import DescriptiveComplexity.Counting.Class
+import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -2086,6 +2087,36 @@ decision reductions, for the same reason.
   solutions only if a solution has one. Totals and carries are forced where
   the walk reads them (`DescriptiveComplexity.isChain_agree`), and the counting kernel
   forbids them elsewhere (`DescriptiveComplexity.sharpKnapsackKernel`).
+* **#0-1 integer programming**
+  (`DescriptiveComplexity.sharpZeroOneIP_sharpP_parsimoniousComplete`), from #Knapsack
+  by the one-equation reading, whose interpreted universe is a copy of the
+  input; its membership is Knapsack's argument once per row.
+* **#Clique** (`DescriptiveComplexity.sharpClique_sharpP_parsimoniousComplete`), counting
+  the cliques with *exactly* as many vertices as the marked set. Its kernel is
+  the first of the catalog to read the order: a size is certified by a
+  bijection with the marked set, one among many, and the kernel asks for the
+  monotone one, unique on a linear order (`DescriptiveComplexity.MonoBij.ext`). That
+  argument is made once, for any solution of the threshold size with a
+  first-order property (`DescriptiveComplexity.sharpPDefinable_of_sized_set`, in
+  `DescriptiveComplexity.Counting.Sized`). The
+  reduction is from #1-in-SAT and is not that of
+  `DescriptiveComplexity.sat_ordered_fo_reduction_clique`, in which a clique picks one
+  true literal per clause among several: an occurrence vertex here stands for
+  “this literal is the true one of its clause and the others are false”,
+  adjacency is agreement of the values so forced
+  (`DescriptiveComplexity.OneInToClique.Clash`), and one clause vertex per clause keeps
+  the threshold away from `1`, where every vertex is a clique
+  (`DescriptiveComplexity.OneInToClique.solEquiv`).
+* **#Independent Set and #Vertex Cover**
+  (`DescriptiveComplexity.sharpIndependentSet_sharpP_parsimoniousComplete`,
+  `DescriptiveComplexity.sharpVertexCover_sharpP_parsimoniousComplete`), again at exactly
+  the threshold size, by the two complementing interpretations of the decision
+  problems unchanged: the covers of a size are the complements of the
+  independent sets of the complementary size
+  (`DescriptiveComplexity.coverComplEquiv`).
+* **#Set Packing** (`DescriptiveComplexity.sharpSetPacking_sharpP_parsimoniousComplete`),
+  from #Independent Set by the edge-incidence interpretation unchanged, whose
+  sets are the vertices, one each (`DescriptiveComplexity.packEquiv`).
 * **The machine bridge**: counting accepting runs
   (`DescriptiveComplexity.SharpNTMAccept`, in
   `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
@@ -2240,7 +2271,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack (binary weights) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing (all four counting the solutions of exactly the threshold size) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

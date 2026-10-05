@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Numbers.Unary
+import DescriptiveComplexity.Numbers.MonotoneBijection
 import DescriptiveComplexity.Numbers.Binary
 import DescriptiveComplexity.Numbers.Digits
 import DescriptiveComplexity.Numbers.Wide
@@ -28,7 +29,10 @@ Two encodings are in use across the catalog, complements rather than rivals:
   counting arcs need. The tagged framework does cardinality arithmetic
   natively: disjoint union via tags adds, dimension multiplies, complement
   subtracts. Honest only for numbers that are polynomially bounded – a unary
-  SubsetSum is in P, hence not NP-hard.
+  SubsetSum is in P, hence not NP-hard. A size is certified by an injection
+  or a bijection with the marked set, of which there are many; where the
+  certificates are *counted*, the one to guess is the monotone bijection, unique
+  on a linear order (`DescriptiveComplexity.Numbers.MonotoneBijection`).
 * **binary**, a number as a set of *bit positions*
   (`DescriptiveComplexity.Numbers.Binary`, with the order as a relation symbol
   of the vocabulary in `DescriptiveComplexity.Numbers.BinRel`, base-`B` digits

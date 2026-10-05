@@ -31,6 +31,9 @@ import DescriptiveComplexity.Problems.OneInSat.Counting
 import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
 import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 import DescriptiveComplexity.Problems.CliqueFamily
+import DescriptiveComplexity.Problems.CliqueFamily.Counting
+import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
+import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
 import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Problems.SubgraphIso.Encoding
 import DescriptiveComplexity.Problems.DigraphIso
@@ -41,6 +44,7 @@ import DescriptiveComplexity.Problems.GraphIso.Gadget
 import DescriptiveComplexity.Problems.GraphIso.Hardness
 import DescriptiveComplexity.Problems.GIDegree
 import DescriptiveComplexity.Problems.SetFamily
+import DescriptiveComplexity.Problems.SetFamily.CountingPacking
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetFamily.Counting
 import DescriptiveComplexity.Problems.ExactCoverCounting
@@ -51,6 +55,8 @@ import DescriptiveComplexity.Problems.Knapsack.Counting
 import DescriptiveComplexity.Problems.Knapsack.CountingHardness
 import DescriptiveComplexity.Problems.Partition
 import DescriptiveComplexity.Problems.ZeroOneIP
+import DescriptiveComplexity.Problems.ZeroOneIP.Counting
+import DescriptiveComplexity.Problems.ZeroOneIP.CountingHardness
 import DescriptiveComplexity.Problems.JobSequencing
 import DescriptiveComplexity.Problems.ThreeDimMatching
 import DescriptiveComplexity.Problems.Hamilton

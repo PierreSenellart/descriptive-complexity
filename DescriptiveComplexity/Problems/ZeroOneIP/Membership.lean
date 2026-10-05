@@ -203,6 +203,22 @@ noncomputable def zeroOneIPKernel : zoSOLang.Sentence :=
     (zoXClause ⊓ (zoBaseClause ⊓ (zoSumClause ⊓ (zoCarryClause ⊓
       (zoBottomClause ⊓ (zoTopClause ⊓ (zoFinalClause ⊓ zoEmptyClause)))))))
 
+/-- Kernel clause of the counting kernel: the running totals are stored at
+rows, columns and positions only. -/
+private noncomputable def zoPinPSClause : zoSOLang.Sentence :=
+  fo% ∀ r j p, zoPSF⟨r, j, p⟩ → (zoRowF⟨r⟩ ∧ zoColF⟨j⟩) ∧ zoPosnF⟨p⟩
+
+/-- Kernel clause of the counting kernel: the carries are stored at rows,
+positions and the columns that are not the first one only. -/
+private noncomputable def zoPinCyClause : zoSOLang.Sentence :=
+  fo% ∀ r j p, zoCyF⟨r, j, p⟩ → ((zoRowF⟨r⟩ ∧ zoColF⟨j⟩) ∧ zoPosnF⟨p⟩) ∧ ¬ zoMinColF⟨j⟩
+
+/-- **The counting kernel of 0-1 integer programming**: the kernel of its `Σ₁`
+definition, and the two clauses that leave nothing of a certificate
+unconstrained, so that a solution has exactly one. -/
+noncomputable def sharpZeroOneIPKernel : zoSOLang.Sentence :=
+  zeroOneIPKernel ⊓ (zoPinPSClause ⊓ zoPinCyClause)
+
 /-! ### Realization -/
 
 section Realize
@@ -305,6 +321,76 @@ private theorem realize_zeroOneIPKernel :
       fun w h => hfin (w 0) (w 1) (w 2) h.1 (hmaxM _ _ h.2.1) h.2.2,
       fun hno w h => hemp (fun j => hno (fun _ => j)) (w 0) (w 1) h.1 h.2⟩
 
+/-- What the counting kernel says of an assignment of the block: the instance
+is well formed, the chosen elements are columns, each row carries a walk ending
+on its right-hand side, and the two ternary relations hold nowhere else. -/
+def ZeroOneIPCert (A : Type) [Language.zeroOneIP.Structure A]
+    (ρ : zeroOneIPGuessBlock.Assignment A) : Prop :=
+  IsLinOrd (IPLe (A := A)) ∧ (∀ j : A, ρ .x ![j] → IPCol j) ∧
+    (∀ r : A, IPRow r → IsChain IPLe IPCol IPLe IPPosn (fun j : A => ρ .x ![j]) (IPCoef r)
+      (fun j p => ρ .pS ![r, j, p]) (fun j p => ρ .cy ![r, j, p])) ∧
+    (∀ r j p : A, IPRow r → MaxPos IPLe IPCol j → IPPosn p →
+      (ρ .pS ![r, j, p] ↔ IPRhs r p)) ∧
+    ((∀ j : A, ¬IPCol j) → ∀ r p : A, IPRow r → IPPosn p → ¬IPRhs r p) ∧
+    (∀ r j p : A, ρ .pS ![r, j, p] → IPRow r ∧ IPCol j ∧ IPPosn p) ∧
+    ∀ r j p : A, ρ .cy ![r, j, p] → IPRow r ∧ IPCol j ∧ IPPosn p ∧ ¬MinPos IPLe IPCol j
+
+private theorem realize_zoPinClauses :
+    (@Sentence.Realize zoSOLang A
+        (@sumStructure _ _ A _ (zeroOneIPGuessBlock.structure ρ))
+        (zoPinPSClause ⊓ zoPinCyClause)) ↔
+      (∀ r j p : A, ZPS ρ r j p → IPRow r ∧ IPCol j ∧ IPPosn p) ∧
+        ∀ r j p : A, ZCy ρ r j p → IPRow r ∧ IPCol j ∧ IPPosn p ∧ ¬MinPos IPLe IPCol j := by
+  let := zeroOneIPGuessBlock.structure ρ
+  have hsubP : ∀ w : Fin 3 → A,
+      RelMap (L := zoSOLang) (M := A) zoPSSym w ↔ ρ .pS w := fun _ => Iff.rfl
+  have hsubC : ∀ w : Fin 3 → A,
+      RelMap (L := zoSOLang) (M := A) zoCySym w ↔ ρ .cy w := fun _ => Iff.rfl
+  simp only [zoPinPSClause, zoPinCyClause, zoColF, zoRowF, zoPosnF, zoLeF, zoPSF, zoCyF,
+    zoMinColF, Sentence.Realize, Formula.realize_inf, Formula.realize_imp, Formula.realize_not,
+    Formula.realize_iAlls, Formula.realize_rel₁, Formula.realize_rel₂, realize_rel₃,
+    Term.realize_var, Sum.elim_inr, Sum.elim_inl, Language.relMap_sumInl, hsubP, hsubC]
+  constructor
+  · rintro ⟨h1, h2⟩
+    refine ⟨fun r j p h => ?_, fun r j p h => ?_⟩
+    · obtain ⟨⟨hr, hj⟩, hp⟩ := h1 ![r, j, p] h
+      exact ⟨hr, hj, hp⟩
+    · obtain ⟨⟨⟨hr, hj⟩, hp⟩, hnmin⟩ := h2 ![r, j, p] h
+      exact ⟨hr, hj, hp, fun hmin => hnmin ⟨hmin.1, fun y hy => hmin.2 (y 0) hy⟩⟩
+  · rintro ⟨h1, h2⟩
+    refine ⟨fun w h => ?_, fun w h => ?_⟩
+    · obtain ⟨hr, hj, hp⟩ := h1 (w 0) (w 1) (w 2) h
+      exact ⟨⟨hr, hj⟩, hp⟩
+    · obtain ⟨hr, hj, hp, hnmin⟩ := h2 (w 0) (w 1) (w 2) h
+      exact ⟨⟨⟨hr, hj⟩, hp⟩, fun hmin => hnmin ⟨hmin.1, fun y hy => hmin.2 (fun _ => y) hy⟩⟩
+
+/-- **The counting kernel says exactly what it should.** -/
+theorem realize_sharpZeroOneIPKernel :
+    (@Sentence.Realize zoSOLang A
+        (@sumStructure _ _ A _ (zeroOneIPGuessBlock.structure ρ)) sharpZeroOneIPKernel) ↔
+      ZeroOneIPCert A ρ := by
+  have h1 := realize_zeroOneIPKernel ρ
+  have h2 := realize_zoPinClauses ρ
+  have hinf : (@Sentence.Realize zoSOLang A
+        (@sumStructure _ _ A _ (zeroOneIPGuessBlock.structure ρ)) sharpZeroOneIPKernel) ↔
+      (@Sentence.Realize zoSOLang A
+        (@sumStructure _ _ A _ (zeroOneIPGuessBlock.structure ρ)) zeroOneIPKernel) ∧
+      (@Sentence.Realize zoSOLang A
+        (@sumStructure _ _ A _ (zeroOneIPGuessBlock.structure ρ))
+        (zoPinPSClause ⊓ zoPinCyClause)) := by
+    let := zeroOneIPGuessBlock.structure ρ
+    exact Formula.realize_inf
+  rw [hinf, h1, h2]
+  exact ⟨fun ⟨⟨hlin, hx, hb, hs, hc, hbo, ht, hfin, hemp⟩, hp1, hp2⟩ =>
+      ⟨hlin, hx, fun r hr => ⟨fun j p => hb r j p hr, fun i j p => hs r i j p hr,
+        fun i j p q => hc r i j p q hr, fun i j p => hbo r i j p hr,
+        fun i j p => ht r i j p hr⟩, hfin, hemp, hp1, hp2⟩,
+    fun ⟨hlin, hx, hch, hfin, hemp, hp1, hp2⟩ =>
+      ⟨⟨hlin, hx, fun r j p hr => (hch r hr).1 j p, fun r i j p hr => (hch r hr).2.1 i j p,
+        fun r i j p q hr => (hch r hr).2.2.1 i j p q,
+        fun r i j p hr => (hch r hr).2.2.2.1 i j p,
+        fun r i j p hr => (hch r hr).2.2.2.2 i j p, hfin, hemp⟩, hp1, hp2⟩⟩
+
 end Realize
 
 /-! ### Membership -/
@@ -312,6 +398,77 @@ end Realize
 section Membership
 
 variable {A : Type} [Finite A] [Language.zeroOneIP.Structure A]
+
+/-- **A solution has a walk per row**, each ending on that row's right-hand
+side. -/
+theorem exists_chains_of_zeroOneSol (hlin : IsLinOrd (IPLe (A := A))) {S : A → Prop}
+    (hScol : ∀ j, S j → IPCol j)
+    (hsumeq : ∀ r, IPRow r → (∑ᶠ j ∈ {j | S j}, IPCoefVal r j) = IPRhsVal r) :
+    ∃ PS Cy : A → A → A → Prop,
+      (∀ r : A, IPRow r → IsChain IPLe IPCol IPLe IPPosn S (IPCoef r) (PS r) (Cy r)) ∧
+      (∀ r j p : A, IPRow r → MaxPos IPLe IPCol j → IPPosn p → (PS r j p ↔ IPRhs r p)) ∧
+      ((∀ j : A, ¬IPCol j) → ∀ r p : A, IPRow r → IPPosn p → ¬IPRhs r p) := by
+  have hex : ∀ r : A, ∃ PS Cy : A → A → Prop,
+      IPRow r → IsChain IPLe IPCol IPLe IPPosn S (IPCoef r) PS Cy := by
+    intro r
+    by_cases hr : IPRow r
+    · have hbound : (∑ᶠ j ∈ {j : A | S j}, binNum IPLe IPPosn (IPCoef r j)) <
+          2 ^ ({p : A | IPPosn p} : Set A).ncard := by
+        rw [show (∑ᶠ j ∈ {j : A | S j}, binNum IPLe IPPosn (IPCoef r j)) =
+          ∑ᶠ j ∈ {j : A | S j}, IPCoefVal r j from rfl, hsumeq r hr, IPRhsVal]
+        exact binNum_lt_two_pow hlin _ IPPosn rfl (IPRhs r)
+      obtain ⟨PS, Cy, hchain⟩ := exists_chain (ILe := IPLe) (IItem := IPCol)
+        (PLe := IPLe) (PPosn := IPPosn) (S := S) (wt := IPCoef r) hlin hlin hScol hbound
+      exact ⟨PS, Cy, fun _ => hchain⟩
+    · exact ⟨fun _ _ => False, fun _ _ => False, fun h => absurd h hr⟩
+  choose PS Cy hchain using hex
+  refine ⟨PS, Cy, hchain, ?_, ?_⟩
+  · -- at the last column the running total is the right-hand side
+    intro r j p hr hj hp
+    refine binNum_inj_on hlin _ IPPosn rfl (PS r j) (IPRhs r) ?_ p hp
+    rw [chain_sound hlin hlin hScol (hchain r hr) j hj.1, partSum_max hScol hj]
+    rw [show (∑ᶠ j ∈ {j : A | S j}, binNum IPLe IPPosn (IPCoef r j)) =
+      ∑ᶠ j ∈ {j : A | S j}, IPCoefVal r j from rfl, hsumeq r hr, IPRhsVal]
+  · -- with no columns every right-hand side must vanish
+    intro hno r p hr hp
+    have hSempty : {j : A | S j} = (∅ : Set A) := by
+      ext j
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
+      exact fun hj => hno j (hScol j hj)
+    have hzero : binNum (IPLe (A := A)) IPPosn (IPRhs r) = 0 := by
+      rw [show binNum (IPLe (A := A)) IPPosn (IPRhs r) = IPRhsVal r from rfl,
+        ← hsumeq r hr, hSempty, finsum_mem_empty]
+    have := binNum_inj_on hlin _ IPPosn rfl (IPRhs r) (fun _ => False)
+      (by rw [hzero, binNum_bot]) p hp
+    exact this.mp
+
+/-- **Walks ending on the right-hand sides make a solution.** -/
+theorem zeroOneSol_of_chains (hlin : IsLinOrd (IPLe (A := A))) {S : A → Prop}
+    {PS Cy : A → A → A → Prop} (hx : ∀ j, S j → IPCol j)
+    (hchains : ∀ r : A, IPRow r → IsChain IPLe IPCol IPLe IPPosn S (IPCoef r) (PS r) (Cy r))
+    (hfin : ∀ r j p : A, IPRow r → MaxPos IPLe IPCol j → IPPosn p → (PS r j p ↔ IPRhs r p))
+    (hemp : (∀ j : A, ¬IPCol j) → ∀ r p : A, IPRow r → IPPosn p → ¬IPRhs r p) :
+    ∀ r, IPRow r → (∑ᶠ j ∈ {j | S j}, IPCoefVal r j) = IPRhsVal r := by
+  intro r hr
+  have hchain := hchains r hr
+  by_cases hcols : ∃ j : A, IPCol j
+  · obtain ⟨jmax, hjmax⟩ := exists_maxPos hlin hcols
+    have h1 := chain_sound hlin hlin hx hchain jmax hjmax.1
+    have h2 : binNum IPLe IPPosn (PS r jmax) = IPRhsVal r :=
+      binNum_congr_on fun p hp => hfin r jmax p hr hjmax hp
+    rw [show (∑ᶠ j ∈ {j : A | S j}, IPCoefVal r j) =
+      ∑ᶠ j ∈ {j : A | S j}, binNum IPLe IPPosn (IPCoef r j) from rfl,
+      ← partSum_max hx hjmax, ← h1, h2]
+  · have hno : ∀ j : A, ¬IPCol j := fun j hj => hcols ⟨j, hj⟩
+    have hSempty : {j : A | S j} = (∅ : Set A) := by
+      ext j
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
+      exact fun hj => hno j (hx j hj)
+    have hrhs : {p : A | IPPosn p ∧ IPRhs r p} = (∅ : Set A) := by
+      ext p
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
+      exact fun h => hemp hno r p hr h.1 h.2
+    rw [hSempty, finsum_mem_empty, IPRhsVal, binNum, hrhs, finsum_mem_empty]
 
 /-- **0-1 integer programming is `Σ₁`-definable**: guess the `0-1` vector and,
 for each row, the running totals and the carries of a ripple-carry addition,
@@ -324,76 +481,25 @@ theorem zeroOneIP_sigmaSODefinable : SigmaSODefinable 1 ZeroOneIP := by
   constructor
   · -- a solution yields a certificate: one walk per row
     rintro ⟨hfin, hlin, S, hScol, hsumeq⟩
-    have hex : ∀ r : A, ∃ PS Cy : A → A → Prop,
-        IPRow r → IsChain IPLe IPCol IPLe IPPosn S (IPCoef r) PS Cy := by
-      intro r
-      by_cases hr : IPRow r
-      · have hbound : (∑ᶠ j ∈ {j : A | S j}, binNum IPLe IPPosn (IPCoef r j)) <
-            2 ^ ({p : A | IPPosn p} : Set A).ncard := by
-          rw [show (∑ᶠ j ∈ {j : A | S j}, binNum IPLe IPPosn (IPCoef r j)) =
-            ∑ᶠ j ∈ {j : A | S j}, IPCoefVal r j from rfl, hsumeq r hr, IPRhsVal]
-          exact binNum_lt_two_pow hlin _ IPPosn rfl (IPRhs r)
-        obtain ⟨PS, Cy, hchain⟩ := exists_chain (ILe := IPLe) (IItem := IPCol)
-          (PLe := IPLe) (PPosn := IPPosn) (S := S) (wt := IPCoef r) hlin hlin hScol hbound
-        exact ⟨PS, Cy, fun _ => hchain⟩
-      · exact ⟨fun _ _ => False, fun _ _ => False, fun h => absurd h hr⟩
-    choose PS Cy hchain using hex
+    obtain ⟨PS, Cy, hchain, hfinal, hempty⟩ := exists_chains_of_zeroOneSol hlin hScol hsumeq
     refine ⟨fun idx => match idx with
       | .x => fun w : Fin 1 → A => S (w 0)
       | .pS => fun w : Fin 3 → A => PS (w 0) (w 1) (w 2)
       | .cy => fun w : Fin 3 → A => Cy (w 0) (w 1) (w 2), ?_⟩
-    refine (realize_zeroOneIPKernel _).mpr ⟨hlin, hScol,
+    exact (realize_zeroOneIPKernel _).mpr ⟨hlin, hScol,
       fun r j p hr => (hchain r hr).1 j p,
       fun r i j p hr => (hchain r hr).2.1 i j p,
       fun r i j p q hr => (hchain r hr).2.2.1 i j p q,
       fun r i j p hr => (hchain r hr).2.2.2.1 i j p,
-      fun r i j p hr => (hchain r hr).2.2.2.2 i j p, ?_, ?_⟩
-    · -- at the last column the running total is the right-hand side
-      intro r j p hr hj hp
-      refine binNum_inj_on hlin _ IPPosn rfl (PS r j) (IPRhs r) ?_ p hp
-      rw [chain_sound hlin hlin hScol (hchain r hr) j hj.1, partSum_max hScol hj]
-      rw [show (∑ᶠ j ∈ {j : A | S j}, binNum IPLe IPPosn (IPCoef r j)) =
-        ∑ᶠ j ∈ {j : A | S j}, IPCoefVal r j from rfl, hsumeq r hr, IPRhsVal]
-    · -- with no columns every right-hand side must vanish
-      intro hno r p hr hp
-      have hSempty : {j : A | S j} = (∅ : Set A) := by
-        ext j
-        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
-        exact fun hj => hno j (hScol j hj)
-      have hzero : binNum (IPLe (A := A)) IPPosn (IPRhs r) = 0 := by
-        rw [show binNum (IPLe (A := A)) IPPosn (IPRhs r) = IPRhsVal r from rfl,
-          ← hsumeq r hr, hSempty, finsum_mem_empty]
-      have := binNum_inj_on hlin _ IPPosn rfl (IPRhs r) (fun _ => False)
-        (by rw [hzero, binNum_bot]) p hp
-      exact this.mp
+      fun r i j p hr => (hchain r hr).2.2.2.2 i j p, hfinal, hempty⟩
   · -- a certificate yields a solution: every row's walk is sound
     rintro ⟨ρ, hρ⟩
     obtain ⟨hlin, hx, hbase, hsum, hcarry, hbot, htop, hfin, hemp⟩ :=
       (realize_zeroOneIPKernel ρ).mp hρ
-    refine ⟨‹Finite A›, hlin, ZX ρ, hx, ?_⟩
-    intro r hr
-    have hchain : IsChain IPLe IPCol IPLe IPPosn (ZX ρ) (IPCoef r) (ZPS ρ r) (ZCy ρ r) :=
-      ⟨fun j p => hbase r j p hr, fun i j p => hsum r i j p hr,
+    exact ⟨‹Finite A›, hlin, ZX ρ, hx, zeroOneSol_of_chains hlin hx
+      (fun r hr => ⟨fun j p => hbase r j p hr, fun i j p => hsum r i j p hr,
         fun i j p q => hcarry r i j p q hr, fun i j p => hbot r i j p hr,
-        fun i j p => htop r i j p hr⟩
-    by_cases hcols : ∃ j : A, IPCol j
-    · obtain ⟨jmax, hjmax⟩ := exists_maxPos hlin hcols
-      have h1 := chain_sound hlin hlin hx hchain jmax hjmax.1
-      have h2 : binNum IPLe IPPosn (ZPS ρ r jmax) = IPRhsVal r :=
-        binNum_congr_on fun p hp => hfin r jmax p hr hjmax hp
-      rw [show (∑ᶠ j ∈ {j : A | ZX ρ j}, IPCoefVal r j) =
-        ∑ᶠ j ∈ {j : A | ZX ρ j}, binNum IPLe IPPosn (IPCoef r j) from rfl,
-        ← partSum_max hx hjmax, ← h1, h2]
-    · have hno : ∀ j : A, ¬IPCol j := fun j hj => hcols ⟨j, hj⟩
-      have hSempty : {j : A | ZX ρ j} = (∅ : Set A) := by
-        ext j
-        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
-        exact fun hj => hno j (hx j hj)
-      have hrhs : {p : A | IPPosn p ∧ IPRhs r p} = (∅ : Set A) := by
-        ext p
-        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
-        exact fun h => hemp hno r p hr h.1 h.2
-      rw [hSempty, finsum_mem_empty, IPRhsVal, binNum, hrhs, finsum_mem_empty]
+        fun i j p => htop r i j p hr⟩) hfin hemp⟩
 
 end Membership
 
