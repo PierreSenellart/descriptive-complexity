@@ -9,6 +9,7 @@ import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Problems.Sat.TseitinUnique
 import DescriptiveComplexity.Problems.Sat.Counting
 import DescriptiveComplexity.Problems.Sat.CountingHardness
+import DescriptiveComplexity.Problems.Sat.CountingDnf
 import DescriptiveComplexity.Problems.SatUnsat.Hardness
 import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut
@@ -34,6 +35,10 @@ import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.CliqueFamily.Counting
 import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
 import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+import DescriptiveComplexity.Problems.CliqueFamily.Pendant
+import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
+import DescriptiveComplexity.Problems.CliqueFamily.Stretch
+import DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
 import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Problems.SubgraphIso.Encoding
 import DescriptiveComplexity.Problems.DigraphIso

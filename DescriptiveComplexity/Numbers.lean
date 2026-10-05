@@ -7,6 +7,7 @@ import DescriptiveComplexity.Numbers.Unary
 import DescriptiveComplexity.Numbers.MonotoneBijection
 import DescriptiveComplexity.Numbers.Binary
 import DescriptiveComplexity.Numbers.Digits
+import DescriptiveComplexity.Numbers.DigitExtract
 import DescriptiveComplexity.Numbers.Wide
 
 /-!
@@ -50,6 +51,11 @@ binary problem can only write numbers it can define one bit at a time, and an
 iterated sum is not one of them. Reductions the other way, from a binary
 problem into a unary one, are unproblematic – formulas only ever read bits,
 never sum them.
+
+The answer of a counting oracle is a number as well, read by the
+post-processing term of a one-call reduction and not by formulas:
+`DescriptiveComplexity.Numbers.DigitExtract` reads a count off one base-`B`
+digit of a sum of powers.
 
 That the choice is part of the statement and not bookkeeping is itself a
 theorem: `DescriptiveComplexity.no_unary_encoding`

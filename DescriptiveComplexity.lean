@@ -84,6 +84,8 @@ import DescriptiveComplexity.Counting.Relativized
 import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.Counting.SizedPairs
+import DescriptiveComplexity.Counting.Post
+import DescriptiveComplexity.Counting.Reduction
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -2250,11 +2252,74 @@ being one.
   (`DescriptiveComplexity.NP_subset_PTIME_of_sharpP_parsimoniousHard`).
 * **Parsimonious hardness is not the hardness of the literature.** “`#P`-hard”
   usually means hard under polynomial-time Turing reductions, and counting the
-  satisfying assignments of a DNF formula is `#P`-complete in that sense while
-  its decision version is trivial. By the last statement above it is *not*
-  parsimoniously `#P`-hard unless `NP ⊆ PTIME`. This is why the library says
-  `ParsimoniousHard` and `ParsimoniousComplete` and never the bare words, which
-  are left for the weaker notion; nothing here is claimed about it.
+  models of a DNF formula is `#P`-complete in that sense while its decision
+  version is trivial. By the last statement above it is *not* parsimoniously
+  `#P`-hard unless `NP ⊆ PTIME`. This is why the library says
+  `ParsimoniousHard` and `ParsimoniousComplete` and never the bare words; the
+  weaker notion that follows is qualified too.
+* **One-call reductions**, `C ≤ᶜ[≤] D` (`DescriptiveComplexity.OneCallReduction`,
+  in `DescriptiveComplexity.Counting.Reduction`): a relativized ordered
+  interpretation and a *post-processing term*, the count of the source being
+  the value of the term at the count of the interpreted instance. The terms
+  (`DescriptiveComplexity.PostTerm`, in `DescriptiveComplexity.Counting.Post`)
+  are built from the oracle's answer, first-order definable cardinalities of
+  the instance and powers of two of those, by `+`, `*`, truncated `-`, `/` and
+  `%`: arithmetic on numbers of polynomially many bits, with no counting of its
+  own. A definable cardinality is stored as the universe of a relativized
+  interpretation, so terms pull back along interpretations by the existing
+  composition, and one-call reductions compose
+  (`DescriptiveComplexity.OneCallReduction.trans`) – still with one call. A
+  parsimonious reduction is the case where the term is the oracle's answer.
+  `#P` is not expected to be closed under these reductions, so the plain words
+  are not used for them either. What they are the reductions of is the
+  **one-call closure** of a class, `DescriptiveComplexity.CountingClass.OneCallMem`:
+  the problems reducing with one call to a problem of the class. It is closed
+  under one-call reductions, `DescriptiveComplexity.CountingClass.OneCallHard` is
+  hardness for it (`DescriptiveComplexity.CountingClass.oneCallHard_iff`), and
+  `DescriptiveComplexity.CountingClass.OneCallComplete` conjoins the two;
+  parsimonious hardness implies one-call hardness
+  (`DescriptiveComplexity.oneCallHard_sharpP_of_parsimoniousHard`). The one-call
+  closure of `#P` is a logical counterpart of `FP^#P`, not given that name
+  since the equivalence is not proved. A one-call reduction is a restricted
+  polynomial-time 1-Turing reduction, so one-call hardness is at least the
+  `#P`-hardness of the literature; a problem `#P`-hard under 1-Turing
+  reductions is hard for the higher counting classes too
+  ([Toda and Watanabe 1992][toda1992polynomial]). The subtractive reductions of
+  [Durand, Hermann, Kolaitis 2005][durand2005subtractive], under which `#P` is
+  closed, are not formalized.
+* **#DNF is one-call `#P`-complete** (`DescriptiveComplexity.sharpDnf_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.Sat.CountingDnf`), and is the first problem
+  complete under one-call reductions only. By De Morgan's law the sets of variables that
+  are not models of a CNF formula are the models of its sign swap read
+  disjunctively (`DescriptiveComplexity.dnfModel_swap_iff`), so
+  `#SAT(φ) = 2 ^ n - #DNF(¬φ)` for `n` the number of variables of `φ`
+  (`DescriptiveComplexity.sharpSat_oneCall_sharpDnf`); this one is a strong
+  subtractive reduction, the example of the paper just cited.
+* **Counting all the independent sets of a graph is one-call `#P`-complete**
+  (`DescriptiveComplexity.sharpAllIndependentSets_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.CliqueFamily.CountingAll`), from the count of the
+  independent sets of exactly the threshold size, which is parsimoniously
+  complete. The reduction attaches `n` pendant leaves to each of the `n`
+  vertices: an independent set of the result is an independent set `S` of the
+  graph with any leaves of the vertices outside it, so the oracle answers
+  `∑ S, (2 ^ n) ^ (n - |S|)`, a number whose digit of rank `n - k` in base
+  `2 ^ n` counts the independent sets of size `k`
+  (`DescriptiveComplexity.card_indepSet_pend_digit`). The post-processing term is
+  that digit, a quotient and a remainder; the arithmetic behind it is
+  `DescriptiveComplexity.sum_pow_div_mod`, in
+  `DescriptiveComplexity.Numbers.DigitExtract`.
+* **#BIS is one-call `#P`-complete** (`DescriptiveComplexity.sharpBIS_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite`): counting the
+  independent sets of a bipartite graph given with its bipartition
+  (`FirstOrder.Language.bipGraph`). The reduction, from the previous problem,
+  stretches every edge into `2n` paths of length two, whose middle vertices
+  form one side: an independent set of the result is any set `S` of vertices
+  with any middles of the edges having no endpoint in `S`, so the oracle
+  answers `∑ S, (2 ^ (2n)) ^ e(S)`, and its remainder modulo `2 ^ (2n)` counts
+  the sets with `e(S) = 0`, the complements of the independent sets
+  (`DescriptiveComplexity.card_stretchIndep_mod`). The two gadgets compose into
+  one call (`DescriptiveComplexity.OneCallReduction.trans`), so every problem of
+  `#P` is one question about the independent sets of a bipartite graph.
 
 ## Shared encodings
 
@@ -2382,7 +2447,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, counting all the independent sets of a graph, and #BIS (those of a bipartite graph), complete under one-call reductions only |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

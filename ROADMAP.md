@@ -490,62 +490,28 @@ a formula reconstruct a machine's binary output bit by bit.
 
 The concrete items, in dependency order:
 
-- **The quantitative framework layer** [M]: the real framework work, and it
-  depends on nothing beyond what exists today. A `CountingProblem` is an
-  iso-invariant `Count : Structure → ℕ`; the reductions reuse
-  `FOInterpretation`, `Tag`, `dim` and the finite/nonempty side conditions of
-  `FOReduction` verbatim, only the `correct` field changing. The names
-  `Counting.lean` / `Counting/` are free for this layer (the
-  Immerman–Szelepcsényi module having become `InductiveCounting`), with the
-  ΣQSO syntax and evaluator in `Quantitative.lean` / `QSO/`: the same split
-  between framework and defining logic that `Complexity.lean` and the
-  `SecondOrder*` / `FixedPoint*` files already make on the decision side.
-- **The reduction ladder** [M for levels 0–1, L for level 2]: three notions,
-  each a special case of the next, so a hardness result proved low transports
-  up.
-  - *Parsimonious* (`≤ᵖ`): `P.Count A = Q.Count (I A)`, the iff of
-    `FOReduction.correct` replaced by an equation. Composition is
-    `FOInterpretation.comp` plus `compLEquiv`, with `iso_invariant` where the
-    decision proof rewrites with it.
-  - *Counting, one oracle call* (`≤ᶜ`):
-    `(P.Count A : ℤ) = scale A * Q.Count (I A) + shift A`. Typing the equation
-    in ℤ is not a convenience: the monotone sources need subtraction (the
-    independent sets of a bipartite graph are exactly the worlds where no edge
-    is fully selected, `#IS = 2^{n+m} − #PP2DNF`), which is the
-    ΣQSO-with-ℤ-constants/GapP phenomenon of the table above. Composing
-    `c·Q∘I + d` with `c'·R∘J + d'` gives
-    `(c · c'∘I)·R∘(J∘I) + (c · d'∘I + d)`, so the coefficients must be closed
-    under sum, product and *pullback along an interpretation* – the last being
-    the same `comp`/`compLEquiv` argument again, plus iso-invariance.
-  - *Non-adaptive linear combinations* [L]:
-    `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
-    i.e., polynomially many oracle calls at definable parameters, combined
-    definably. It needs *parameterized* interpretations (thread `k` extra free
-    variables through every defining formula and through `Map`), which is the
-    level's main cost; the divisor on the left keeps Lagrange denominators out
-    of the statement. Index sets multiply, parameters concatenate and divisors
-    multiply, so composition still closes. This is the shape of every
-    interpolation-based `#P`-hardness proof. *Adaptive* Turing reductions,
-    where a later query depends on an earlier answer, stay out: that is the
-    honest boundary of a machine-free framework, and `FP^#P` lives beyond it.
-- **The coefficient budget** [S, but the notion is vacuous without it]:
-  coefficients must come from
-  a class *strictly weaker* than the one being defined, exactly as the
-  classical definition asks its post-processing to be polynomial-time.
-  Otherwise the notion is vacuous: with arbitrary `#P` coefficients, take `Q`
-  constantly `1` and `scale := P`, and every counting problem reduces to a
-  trivial one. The principled budget is `QFO(LFP) = FP`, deferred below; the
-  cheap interim one is the grammar
-  `b ::= k ∈ ℤ | |{x̄ : φ}| | 2^{|{x̄ : φ}|} | b + b | b · b` with `φ ∈ FO(≤)`,
-  which contains `n^k` and `2^n`, is closed under pullback for free (FO
-  formulas pull back along interpretations, which is `relMap_map`), and sits
-  comfortably inside FP.
-- **`CountingClass`** [S]: `Mem`, `Hard` and `Complete` as in
-  `Complexity.lean`, with one structural difference: closure is *asymmetric*.
-  `Mem` is closed under `≤ᵖ` only, since `#P` is not closed under the
-  subtractive correction (that is what GapP is for); `Hard` is closed under
-  `≤ᶜ`, which needs only transitivity of the reduction, supplied by the
-  composition above.
+- **The quantitative framework layer** [M]: counting problems, their
+  parsimonious and one-call reductions and counting classes exist
+  (`Counting.lean`, `Counting/`); what remains is the ΣQSO syntax and evaluator,
+  in `Quantitative.lean` / `QSO/`: the same split between framework and
+  defining logic that `Complexity.lean` and the `SecondOrder*` / `FixedPoint*`
+  files already make on the decision side.
+- **Non-adaptive linear combinations** [L], the reduction notion above the
+  one-call reductions `≤ᶜ[≤]`:
+  `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
+  i.e., polynomially many oracle calls at definable parameters, combined
+  definably. It needs *parameterized* interpretations (thread `k` extra free
+  variables through every defining formula and through `Map`), which is the
+  level's main cost; the divisor on the left keeps Lagrange denominators out
+  of the statement. Index sets multiply, parameters concatenate and divisors
+  multiply, so composition still closes. This is the shape of every
+  interpolation-based `#P`-hardness proof. *Adaptive* Turing reductions,
+  where a later query depends on an earlier answer, stay out: that is the
+  honest boundary of a machine-free framework, and `FP^#P` lives beyond it.
+  The coefficients must come from a class strictly weaker than the one being
+  defined, or the notion is vacuous; the post-processing terms of
+  `Counting/Post.lean` are the interim budget, `QFO(LFP) = FP` the principled
+  one.
 - **ΣQSO evaluator** [M–L]: a fresh inductive for the quantitative layer (~8
   constructors) over the existing Boolean layer, with a recursive evaluator
   into ℕ whose semantics is Mathlib-native (`⟦Σx.α⟧ = Finset.sum`,
