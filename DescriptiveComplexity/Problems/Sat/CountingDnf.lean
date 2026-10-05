@@ -19,7 +19,7 @@ variables of the formula making every literal of some term true
 Deciding whether a DNF formula has a model is easy – it has one exactly when
 some term contains no variable both positively and negatively – so #DNF is
 not parsimoniously `#P`-hard unless `P = NP`. It is the first problem of the
-catalog that is complete under one-call reductions only:
+catalog that is not parsimoniously complete:
 
 * `DescriptiveComplexity.sharpDnf_mem_sharpP`: the models are the witnesses of
   an existential second-order sentence;
@@ -39,8 +39,9 @@ This is the reduction of
 where it is the example of a *strong subtractive* reduction: the difference of
 the counts at a tautology and at the negated formula, the models of the second
 being among those of the first. So #DNF is also complete under subtractive
-reductions, a notion under which `#P` is closed; the library states the
-one-call form only.
+reductions, a notion under which `#P` is closed: that stronger statement is
+`DescriptiveComplexity.sharpDnf_sharpP_complete`, in
+`DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive`.
 -/
 
 namespace DescriptiveComplexity
@@ -230,6 +231,17 @@ end DeMorgan
 /-- “`x` is a variable of the formula”: it occurs in some clause. -/
 noncomputable def satOccursAt {α : Type} (x : α) : Language.sat.Formula α :=
   fo%[x] ∃ c, satIsClause(c) ∧ (satPosIn(c, x) ∨ satNegIn(c, x))
+
+theorem realize_satOccursAt {α : Type} (A : Type) [Language.sat.Structure A] (x : α)
+    (v : α → A) : (satOccursAt x).Realize v ↔ SatOccurs A (v x) := by
+  rw [satOccursAt]
+  simp only [SatOccurs, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
+    Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl]
+  constructor
+  · rintro ⟨c, hc, h⟩
+    exact ⟨c 0, hc, h⟩
+  · rintro ⟨c, hc, h⟩
+    exact ⟨fun _ => c, hc, h⟩
 
 /-- “`x` is a variable of the formula”, over the ordered expansion. -/
 noncomputable def satOccursFormula : (Language.sat.sum Language.order).Formula (Fin 1) :=

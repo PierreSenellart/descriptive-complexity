@@ -53,15 +53,18 @@ instance.
   under them (their Theorem 3.3). The reduction of #SAT to #DNF is one
   (their Proposition 3.4), `g(x)` being a tautology: here it is the one-call
   reduction with term `2 ^ n - oracle`, the answer at the tautology being
-  known. The reductions that read a digit by a quotient and a remainder are
-  not subtractive, and nothing is claimed here about whether their targets
-  are complete under subtractive reductions.
+  known. Subtractive reductions are formalized in
+  `DescriptiveComplexity.Counting.Subtractive`, with the closure of `#P`. The
+  reductions that read a digit by a quotient and a remainder are not
+  subtractive, and nothing is claimed here about whether their targets are
+  complete under subtractive reductions.
 
 ## The one-call closure of a class
 
 `#P` is not expected to be closed under one-call reductions, so the plain
-words *hard* and *complete* are not used for them: on the decision side those
-words belong to reductions the class is closed under. What one-call reductions
+words *hard* and *complete* are not used for them: as on the decision side,
+those words belong to reductions the class is closed under, here the
+subtractive ones (`DescriptiveComplexity.Counting.Subtractive`). What one-call reductions
 are the reductions *of* is the **one-call closure** of a class,
 `DescriptiveComplexity.CountingClass.OneCallMem`: the problems that reduce with
 one call to a problem of the class. It contains the class, is closed under

@@ -10,6 +10,7 @@ import DescriptiveComplexity.Problems.Sat.TseitinUnique
 import DescriptiveComplexity.Problems.Sat.Counting
 import DescriptiveComplexity.Problems.Sat.CountingHardness
 import DescriptiveComplexity.Problems.Sat.CountingDnf
+import DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive
 import DescriptiveComplexity.Problems.SatUnsat.Hardness
 import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut

@@ -86,6 +86,7 @@ import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.Counting.SizedPairs
 import DescriptiveComplexity.Counting.Post
 import DescriptiveComplexity.Counting.Reduction
+import DescriptiveComplexity.Counting.Subtractive
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -2255,8 +2256,8 @@ being one.
   models of a DNF formula is `#P`-complete in that sense while its decision
   version is trivial. By the last statement above it is *not* parsimoniously
   `#P`-hard unless `NP ⊆ PTIME`. This is why the library says
-  `ParsimoniousHard` and `ParsimoniousComplete` and never the bare words; the
-  weaker notion that follows is qualified too.
+  `ParsimoniousHard` and `ParsimoniousComplete`; the bare words are kept for
+  the subtractive reductions below, and the one-call notion is qualified too.
 * **One-call reductions**, `C ≤ᶜ[≤] D` (`DescriptiveComplexity.OneCallReduction`,
   in `DescriptiveComplexity.Counting.Reduction`): a relativized ordered
   interpretation and a *post-processing term*, the count of the source being
@@ -2271,7 +2272,7 @@ being one.
   (`DescriptiveComplexity.OneCallReduction.trans`) – still with one call. A
   parsimonious reduction is the case where the term is the oracle's answer.
   `#P` is not expected to be closed under these reductions, so the plain words
-  are not used for them either. What they are the reductions of is the
+  are not used for them. What they are the reductions of is the
   **one-call closure** of a class, `DescriptiveComplexity.CountingClass.OneCallMem`:
   the problems reducing with one call to a problem of the class. It is closed
   under one-call reductions, `DescriptiveComplexity.CountingClass.OneCallHard` is
@@ -2284,17 +2285,42 @@ being one.
   polynomial-time 1-Turing reduction, so one-call hardness is at least the
   `#P`-hardness of the literature; a problem `#P`-hard under 1-Turing
   reductions is hard for the higher counting classes too
-  ([Toda and Watanabe 1992][toda1992polynomial]). The subtractive reductions of
-  [Durand, Hermann, Kolaitis 2005][durand2005subtractive], under which `#P` is
-  closed, are not formalized.
+  ([Toda and Watanabe 1992][toda1992polynomial]).
+* **Subtractive reductions**, `C ≤ˢ D` (`DescriptiveComplexity.SubtractiveReducible`,
+  in `DescriptiveComplexity.Counting.Subtractive`), are the notion of
+  [Durand, Hermann, Kolaitis 2005][durand2005subtractive] under which `#P` *is*
+  closed (`DescriptiveComplexity.SharpPDefinable.of_subtractive`, their
+  Theorem 3.3). A strong subtractive reduction
+  (`DescriptiveComplexity.StrongSubtractiveReduction`) draws two instances of the
+  target, with the same tags and dimension and hence the same universe, such
+  that every solution of the first is a solution of the second and the count
+  of the source is the difference of the two counts. Since the condition is
+  about solutions, the target comes presented as the witness count of a
+  kernel. The closure is then one line of logic: the solutions of the second
+  instance that are not solutions of the first are the witnesses of the
+  conjunction of one pulled kernel with the negation of the other. Strong
+  reductions do not compose, so a subtractive reduction is a chain of steps,
+  each a strong subtractive or an ordered parsimonious reduction.
+  This is the widest notion of the library under which `#P` is closed, so the
+  plain words go to it, as on the decision side:
+  `DescriptiveComplexity.CountingClass.Hard` and
+  `DescriptiveComplexity.CountingClass.Complete` are hardness and completeness
+  under subtractive reductions. #SAT is complete
+  (`DescriptiveComplexity.sharpSat_sharpP_complete`), and
+  **#DNF is `#P`-complete**
+  (`DescriptiveComplexity.sharpDnf_sharpP_complete`, in
+  `DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive`; their
+  Proposition 3.4), the two instances being the negated formula and a
+  tautology over the same variables. Whether the two digit-reading reductions
+  below can be replaced by subtractive ones is not known here.
 * **#DNF is one-call `#P`-complete** (`DescriptiveComplexity.sharpDnf_sharpP_oneCallComplete`, in
   `DescriptiveComplexity.Problems.Sat.CountingDnf`), and is the first problem
   complete under one-call reductions only. By De Morgan's law the sets of variables that
   are not models of a CNF formula are the models of its sign swap read
   disjunctively (`DescriptiveComplexity.dnfModel_swap_iff`), so
   `#SAT(φ) = 2 ^ n - #DNF(¬φ)` for `n` the number of variables of `φ`
-  (`DescriptiveComplexity.sharpSat_oneCall_sharpDnf`); this one is a strong
-  subtractive reduction, the example of the paper just cited.
+  (`DescriptiveComplexity.sharpSat_oneCall_sharpDnf`); this is the one-call form
+  of the subtractive reduction above, the count at the tautology being known.
 * **Counting all the independent sets of a graph is one-call `#P`-complete**
   (`DescriptiveComplexity.sharpAllIndependentSets_sharpP_oneCallComplete`, in
   `DescriptiveComplexity.Problems.CliqueFamily.CountingAll`), from the count of the
@@ -2447,7 +2473,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, counting all the independent sets of a graph, and #BIS (those of a bipartite graph), complete under one-call reductions only |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, complete under subtractive reductions (plain `#P`-complete here) · counting all the independent sets of a graph, and #BIS (those of a bipartite graph), complete under one-call reductions only |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

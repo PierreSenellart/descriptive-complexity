@@ -88,7 +88,11 @@ first-order logic, which Mathlib already has.
   is a weaker notion, still stronger than Turing hardness: one oracle call, at
   an instance defined first-order, followed by arithmetic on the answer and on
   definable cardinalities. #DNF is one-call `#P`-complete
-  (`sharpDnf_sharpP_oneCallComplete`), by `#SAT(φ) = 2ⁿ − #DNF(¬φ)`, and so is
+  (`sharpDnf_sharpP_oneCallComplete`), by `#SAT(φ) = 2ⁿ − #DNF(¬φ)`; it is also
+  complete under the subtractive reductions of Durand, Hermann and Kolaitis
+  (`sharpDnf_sharpP_complete`), under which `#P` is proved closed
+  (`SharpPDefinable.of_subtractive`); plain “`#P`-complete” in this library
+  means complete under those. One-call `#P`-complete as well is
   counting all the independent sets of a graph
   (`sharpAllIndependentSets_sharpP_oneCallComplete`): with `n` pendant leaves at each
   vertex, the independent sets of one size are counted by one base-`2ⁿ` digit
@@ -158,7 +162,7 @@ for it under FO reductions.
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there); equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | **EXPSPACE** | SO(PFP), i.e., PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | **RE** | ∃SO[new] (∃SO with value invention, unbounded) | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| **#P** (a counting class) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe, i.e., #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the usual `#P`-completeness · #DNF, counting all the independent sets of a graph, and #BIS (those of a bipartite graph), complete under one-call reductions only |
+| **#P** (a counting class) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe, i.e., #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the usual `#P`-completeness · #DNF, complete under subtractive reductions (plain `#P`-complete here) · counting all the independent sets of a graph, and #BIS (those of a bipartite graph), complete under one-call reductions only |
 | **the degree of a problem** – `below Q₀`, e.g., **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a
