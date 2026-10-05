@@ -45,6 +45,7 @@ import DescriptiveComplexity.Problems.GraphIso.Hardness
 import DescriptiveComplexity.Problems.GIDegree
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.SetFamily.CountingPacking
+import DescriptiveComplexity.Problems.SetFamily.CountingCover
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetFamily.Counting
 import DescriptiveComplexity.Problems.ExactCoverCounting
