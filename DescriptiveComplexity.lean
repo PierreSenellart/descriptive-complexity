@@ -89,6 +89,17 @@ import DescriptiveComplexity.Counting.Encoding
 import DescriptiveComplexity.Counting.PossibleWorlds
 import DescriptiveComplexity.Counting.Probability
 import DescriptiveComplexity.Counting.FP
+import DescriptiveComplexity.Counting.DigitDefinable
+import DescriptiveComplexity.Counting.Digits.SetArith
+import DescriptiveComplexity.Counting.Digits.Tower
+import DescriptiveComplexity.Counting.Digits.Formulas
+import DescriptiveComplexity.Counting.Digits.Closure
+import DescriptiveComplexity.Counting.Digits.SumSweep
+import DescriptiveComplexity.Counting.Digits.ProdSem
+import DescriptiveComplexity.Counting.Digits.ProdSweep
+import DescriptiveComplexity.Counting.Digits.Bounds
+import DescriptiveComplexity.Counting.Digits.Term
+import DescriptiveComplexity.Counting.Digits.NormalForm
 import DescriptiveComplexity.Counting.Quantitative
 import DescriptiveComplexity.Counting.QuantitativePull
 import DescriptiveComplexity.Counting.Reduction
@@ -2403,6 +2414,46 @@ pulled relations hold only of points of the domain
   (`DescriptiveComplexity.NP_subset_PTIME_of_mem_FP_of_parsimoniousHard`).
   Not formalized: the second-order sums and products of their full logic QSO,
   the capture theorem itself, and a machine characterization.
+* **The number written by a circuit, complete for FP**
+  (`DescriptiveComplexity.Problems.CircuitNumber`,
+  `DescriptiveComplexity.Counting.DigitDefinable`): the function counterpart of
+  the circuit value problem. An instance is a circuit with several output
+  gates and a comparison of them, and `DescriptiveComplexity.CircuitNumber` is
+  the number whose binary digits are the values of the outputs. It is complete
+  for FP under parsimonious reductions
+  (`DescriptiveComplexity.circuitNumber_FP_parsimoniousComplete`). Membership
+  is the gate rules of CVP and one term writing the number digit by digit.
+  Hardness has two halves. A function whose binary digits are relations of a
+  least fixed point (`DescriptiveComplexity.DigitDefinable`) reduces to the
+  problem by drawing the rules as a monotone circuit, one disjunction gate per
+  atom and one conjunction chain per rule instance, with no stratification by
+  stages (`DescriptiveComplexity.DigitDefinable.nonempty_orderedParsimonious`).
+  And every problem of FP is digit-definable, the next item. The statement was
+  not found in the literature; under polynomial-time reductions it would be
+  empty, every function of FP being complete.
+* **The normal form of FP** (`DescriptiveComplexity.Counting.Digits.NormalForm`
+  and the files beside it): every problem defined in QFO(LFP) has its binary
+  digits defined by a least fixed point
+  (`DescriptiveComplexity.FPDefinable.digitDefinable`), so that the
+  digit-definable problems are exactly those of FP
+  (`DescriptiveComplexity.digitDefinable_iff_mem_FP`). This is the normal form
+  in the proof of the capture theorem of
+  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive], obtained there through
+  machines and here inside the logic. The digits are computed by a tower of
+  inflationary inductions, one induction by stratification
+  (`DescriptiveComplexity.StepDef.stratify`), each stratum free to negate the
+  ones below: a sum of two numbers is first-order, by carry lookahead
+  (`DescriptiveComplexity.Digits.addF`); a sum over the tuples is a sweep
+  along the lexicographic order
+  (`DescriptiveComplexity.Digits.Dig.sum`), a row being written once, in full,
+  when the row before it is marked done
+  (`DescriptiveComplexity.Digits.sweep_stage`); a product is one sweep running
+  Horner's scheme (`DescriptiveComplexity.Digits.Dig.prod`). Arithmetic is
+  exact modulo `2 ^ (n ^ ℓ)`, so no intermediate value has to be bounded, and
+  the one-element structures, which have too few tuples, are treated apart
+  (`DescriptiveComplexity.QTerm.exists_formulas`). The limit of the tower is a
+  least fixed point of rules by the translation of FO(≤, IFP) into FO(LFP)
+  (`DescriptiveComplexity.IFPLfp.homAssign_lfpAssign_trRules`).
 * **Possible worlds** (`DescriptiveComplexity.Counting.PossibleWorlds`): for a
   finite relational schema, an instance holds certain facts and uncertain ones,
   a possible world keeps the first and some of the second, and

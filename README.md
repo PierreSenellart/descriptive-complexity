@@ -116,7 +116,13 @@ first-order logic, which Mathlib already has.
   built by sums and products over the elements from polynomial-time
   conditions. The class is closed under parsimonious reductions, its supports
   are in PTIME (`support_mem_PTIME_of_mem_FP`), and none of its problems is
-  parsimoniously `#P`-hard unless NP ⊆ PTIME.
+  parsimoniously `#P`-hard unless NP ⊆ PTIME. FP has a complete problem under
+  parsimonious reductions, the function counterpart of circuit value: the
+  number written in binary by the outputs of a circuit
+  (`circuitNumber_FP_parsimoniousComplete`). Hardness goes through a normal
+  form, proved inside the logic: every function of FP has its binary digits
+  computed by a least fixed point (`FPDefinable.digitDefinable`), iterated
+  sums and products included.
   #3SAT, #1-in-SAT, #Exact Cover, #Knapsack and #0-1 Integer
   Programming are parsimoniously complete as well: the first two by clause
   splittings whose fresh variables are forced, the last two because a solution
@@ -181,7 +187,7 @@ for it under FO reductions.
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there); equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | **EXPSPACE** | SO(PFP), i.e., PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | **RE** | ∃SO[new] (∃SO with value invention, unbounded) | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| **FP** (polynomial-time functions, with natural-number values) | QFO(LFP), the quantitative first-order logic of Arenas, Muñoz and Riveros over least fixed points: sums and products, over the elements, of polynomial-time conditions | – | – |
+| **FP** (polynomial-time functions, with natural-number values) | QFO(LFP), the quantitative first-order logic of Arenas, Muñoz and Riveros over least fixed points: sums and products, over the elements, of polynomial-time conditions; equivalently, binary digits computed by a least fixed point | – | the number written by a circuit (parsimonious reductions) |
 | **#P** (a counting class) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe, i.e., #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the usual `#P`-completeness · #DNF, complete under subtractive reductions (plain `#P`-complete here) · counting all the independent sets of a graph, #BIS (those of a bipartite graph) and #PP2DNF, complete under one-call reductions only |
 | **the degree of a problem** – `below Q₀`, e.g., **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
