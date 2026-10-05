@@ -44,6 +44,45 @@ open FirstOrder
 
 open Language Structure
 
+open Classical in
+/-- **A sum of place values, read along an enumeration of the digits.** Marked
+elements `Out`, compared by `Below`, each contributing two to the number of
+marked elements strictly below it when it carries a digit `Bit`: if the marked
+elements are enumerated by a finite linear order, in order, the sum is the one
+over that order, with ranks as exponents. -/
+theorem finsum_digits_eq {X P : Type} [LinearOrder P] [Finite P] (Out Bit : X → Prop)
+    (Below : X → X → Prop) (φ : P → X) (hφ : Function.Injective φ)
+    (hout : ∀ x, Out x ↔ ∃ q, x = φ q) (hbelow : ∀ q' q, Below (φ q') (φ q) ↔ q' ≤ q) :
+    (∑ᶠ x : X, if Out x ∧ Bit x then
+        2 ^ Nat.card {y : X // Out y ∧ y ≠ x ∧ Below y x} else 0) =
+      ∑ᶠ q : P, if Bit (φ q) then 2 ^ orank q else 0 := by
+  have hrank : ∀ q : P, Nat.card {y : X // Out y ∧ y ≠ φ q ∧ Below y (φ q)} = orank q := by
+    intro q
+    rw [orank, ← Nat.card_coe_set_eq]
+    symm
+    refine Nat.card_eq_of_bijective
+      (fun q' => ⟨φ q'.1, (hout _).mpr ⟨q'.1, rfl⟩, fun h => ne_of_lt q'.2 (hφ h),
+        (hbelow _ _).mpr (le_of_lt q'.2)⟩) ⟨?_, ?_⟩
+    · intro y y' h
+      exact Subtype.ext (hφ (congrArg Subtype.val h))
+    · rintro ⟨y, ho, hne, hb⟩
+      obtain ⟨q', rfl⟩ := (hout y).mp ho
+      exact ⟨⟨q', lt_of_le_of_ne ((hbelow _ _).mp hb) fun h => hne (congrArg φ h)⟩, rfl⟩
+  have hsupp : ∀ x ∈ Function.support (fun x : X => if Out x ∧ Bit x then
+      2 ^ Nat.card {y : X // Out y ∧ y ≠ x ∧ Below y x} else 0),
+      x ∈ Set.univ ↔ x ∈ Set.range φ := by
+    intro x hx
+    refine ⟨fun _ => ?_, fun _ => trivial⟩
+    have h : Out x ∧ Bit x := by
+      by_contra h
+      exact hx (ite_eq_right h)
+    obtain ⟨q, hq⟩ := (hout x).mp h.1
+    exact ⟨q, hq.symm⟩
+  rw [← finsum_mem_univ, finsum_mem_inter_support_eq' _ _ _ hsupp, finsum_mem_range hφ]
+  refine finsum_congr fun q => ?_
+  rw [hrank q]
+  exact if_congr (and_iff_right ((hout _).mpr ⟨q, rfl⟩)) rfl rfl
+
 /-- A definition of a number by its binary digits: a least fixed point, as for
 `DescriptiveComplexity.LFPDef`, and the relation variables holding the
 digits. -/

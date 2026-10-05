@@ -17,6 +17,7 @@ import DescriptiveComplexity.Problems.ThreeDnfTaut
 import DescriptiveComplexity.Problems.HornSat
 import DescriptiveComplexity.Problems.Cvp
 import DescriptiveComplexity.Problems.CircuitNumber
+import DescriptiveComplexity.Problems.MachineNumber
 import DescriptiveComplexity.Problems.Reachability
 import DescriptiveComplexity.Problems.Game
 import DescriptiveComplexity.Problems.ReachabilityDet

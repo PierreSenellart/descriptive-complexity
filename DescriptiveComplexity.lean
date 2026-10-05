@@ -100,6 +100,9 @@ import DescriptiveComplexity.Counting.Digits.ProdSweep
 import DescriptiveComplexity.Counting.Digits.Bounds
 import DescriptiveComplexity.Counting.Digits.Term
 import DescriptiveComplexity.Counting.Digits.NormalForm
+import DescriptiveComplexity.Problems.HornSat.Number
+import DescriptiveComplexity.Problems.HornSat.NumberHardness
+import DescriptiveComplexity.Problems.MachineNumber
 import DescriptiveComplexity.Counting.Quantitative
 import DescriptiveComplexity.Counting.QuantitativePull
 import DescriptiveComplexity.Counting.Reduction
@@ -2454,6 +2457,29 @@ pulled relations hold only of points of the domain
   (`DescriptiveComplexity.QTerm.exists_formulas`). The limit of the tower is a
   least fixed point of rules by the translation of FO(≤, IFP) into FO(LFP)
   (`DescriptiveComplexity.IFPLfp.homAssign_lfpAssign_trRules`).
+* **The machine bridge for FP** (`DescriptiveComplexity.Problems.MachineNumber`,
+  `DescriptiveComplexity.Problems.HornSat.Number`): the function counterparts
+  of deterministic machine acceptance and of HORN-SAT.
+  `DescriptiveComplexity.DTMNumber` is the number a deterministic machine,
+  carried by the instance, leaves on its marked output cells when it halts and
+  accepts within its clock; `DescriptiveComplexity.HornNumber` is the number
+  whose digits say which marked variables of a Horn formula unit propagation
+  forces. Both are complete for FP under parsimonious reductions
+  (`DescriptiveComplexity.dtmNumber_FP_parsimoniousComplete`,
+  `DescriptiveComplexity.hornNumber_FP_parsimoniousComplete`), and a function is
+  in FP exactly when it reduces to the first
+  (`DescriptiveComplexity.mem_FP_iff_le_dtmNumber`): the library's FP, defined
+  by a logic, is the machine one. Membership reads the number off the least
+  fixed point of the run, the halting time being a first-order condition on it
+  (`DescriptiveComplexity.MachNum.halted_iff`). Hardness chains the normal
+  form of the previous item, the Horn discharge – the least fixed point of
+  rules is the least model of a Horn formula
+  (`DescriptiveComplexity.HornNum.forced_var_iff`) – and the unit-propagation
+  machine of the PTIME bridge, which accepts with that model on its tape
+  (`DescriptiveComplexity.hornMachine_final`). The order of significance of the
+  output cells is a relation of the instance, not the order of the tape: a
+  composition of two interpretations does not control how the second lays out
+  the tags of the first.
 * **Possible worlds** (`DescriptiveComplexity.Counting.PossibleWorlds`): for a
   finite relational schema, an instance holds certain facts and uncertain ones,
   a possible world keeps the first and some of the second, and
