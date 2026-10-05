@@ -64,7 +64,9 @@ theorem twoSat_NL_hard : NL.Hard TwoSAT :=
 /-- **2SAT is NL-complete.** Membership is `DescriptiveComplexity.twoSat_mem_NL` – the
 Krom program that guesses a truth assignment and enforces the width promise by
 a guard; hardness is `DescriptiveComplexity.twoSat_NL_hard`, the Krom discharge. This
-is the NL-level analogue of the Cook–Levin theorem, and like it machine-free. -/
+is the NL-level analogue of the Cook–Levin theorem, and like it machine-free.
+Registered in the Lax archive as
+[`Lax485149.TwoSatNLComplete.twoSat_NL_complete`](https://laxarchive.org/lax-485149/Lax485149.TwoSatNLComplete.html#s-Lax485149.TwoSatNLComplete.twoSat_NL_complete). -/
 theorem TwoSAT_NL_complete : NL.Complete TwoSAT :=
   ⟨twoSat_mem_NL, twoSat_NL_hard⟩
 
@@ -79,7 +81,9 @@ theorem NL_subset_PTIME : NL ⊆ PTIME := by
   exact PTIME.mem_of_orderedReduction f twoSat_mem_PTIME
 
 /-- **NL ⊆ NP**, by composing `DescriptiveComplexity.NL_subset_PTIME` with
-`DescriptiveComplexity.PTIME_subset_NP`. -/
+`DescriptiveComplexity.PTIME_subset_NP`.
+Registered in the Lax archive as
+[`Lax485149.NLSubsetNP.NL_subset_NP`](https://laxarchive.org/lax-485149/Lax485149.NLSubsetNP.html#s-Lax485149.NLSubsetNP.NL_subset_NP). -/
 theorem NL_subset_NP : NL ⊆ NP := by
   intro L _ P hP
   exact PTIME_subset_NP (NL_subset_PTIME hP)

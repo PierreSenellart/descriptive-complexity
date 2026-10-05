@@ -2191,7 +2191,9 @@ multi-head automaton recognizes it. One direction is
 specification, and determinism of the control is functionality of the walk –
 and the other is the machine built here: it scans where the machine of
 `DescriptiveComplexity.HeadCapture` guesses, and counts so that a walk leading nowhere
-is abandoned. -/
+is abandoned.
+Registered in the Lax archive as
+[`Lax485149.LByAutomata.dtcDefinable_iff_automaton`](https://laxarchive.org/lax-485149/Lax485149.LByAutomata.html#s-Lax485149.LByAutomata.dtcDefinable_iff_automaton). -/
 theorem dtcDefinable_iff_automaton {L : Language.{0, 0}} [L.IsRelational]
     {P : DecisionProblem L} :
     DTCDefinable P ↔ ∃ (k : ℕ) (M : HeadAutomaton L k) (_ : M.IsDeterministic),
@@ -2208,7 +2210,9 @@ theorem dtcDefinable_iff_automaton {L : Language.{0, 0}} [L.IsRelational]
 /-- **LOGSPACE is the class of the deterministic two-way multi-head
 automata**: membership in `DescriptiveComplexity.LOGSPACE` is recognizability by such
 a machine, the deterministic counterpart of
-`DescriptiveComplexity.mem_NL_iff_automaton`. -/
+`DescriptiveComplexity.mem_NL_iff_automaton`.
+Registered in the Lax archive as
+[`Lax485149.LByAutomata.mem_LOGSPACE_iff_automaton`](https://laxarchive.org/lax-485149/Lax485149.LByAutomata.html#s-Lax485149.LByAutomata.mem_LOGSPACE_iff_automaton). -/
 theorem mem_LOGSPACE_iff_automaton {L : Language.{0, 0}} [L.IsRelational]
     {P : DecisionProblem L} :
     P ∈ LOGSPACE ↔ ∃ (k : ℕ) (M : HeadAutomaton L k) (_ : M.IsDeterministic),

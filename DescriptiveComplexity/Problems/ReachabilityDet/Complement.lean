@@ -692,7 +692,9 @@ noncomputable abbrev coLOGSPACE : ComplexityClass := LOGSPACE.compl
 Unlike `NL = coNL` (`DescriptiveComplexity.NL_eq_coNL`, Immerman–Szelepcsényi) this
 needs no inductive counting: a deterministic walk has only one thing to do at
 each node, so *not* arriving is witnessed by walking until the budget runs
-out. -/
+out.
+Registered in the Lax archive as
+[`Lax485149.LEqCoL.LOGSPACE_eq_coLOGSPACE`](https://laxarchive.org/lax-485149/Lax485149.LEqCoL.html#s-Lax485149.LEqCoL.LOGSPACE_eq_coLOGSPACE). -/
 theorem LOGSPACE_eq_coLOGSPACE : LOGSPACE = coLOGSPACE := by
   refine ComplexityClass.ext (fun P => (mem_LOGSPACE_compl_iff P).symm) fun P => ?_
   constructor
@@ -722,7 +724,9 @@ theorem unreachd_LOGSPACE_hard : LOGSPACE.Hard UNREACHd :=
 /-- **UNREACHd is LOGSPACE-complete.** Both halves come from the same side here,
 unlike the REACH/UNREACH pair one level up: an operator-based logic defines a
 problem and its complement alike, so no analogue of Immerman–Szelepcsényi is
-needed to complete the picture. -/
+needed to complete the picture.
+Registered in the Lax archive as
+[`Lax485149.UnreachdLComplete.unreachd_LOGSPACE_complete`](https://laxarchive.org/lax-485149/Lax485149.UnreachdLComplete.html#s-Lax485149.UnreachdLComplete.unreachd_LOGSPACE_complete). -/
 theorem UNREACHd_LOGSPACE_complete : LOGSPACE.Complete UNREACHd :=
   ⟨unreachd_mem_LOGSPACE, unreachd_LOGSPACE_hard⟩
 

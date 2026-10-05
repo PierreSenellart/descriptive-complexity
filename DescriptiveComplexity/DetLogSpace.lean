@@ -92,7 +92,9 @@ theorem hard_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
 
 /-- **L ⊆ NL**: a deterministic walk is a walk, and FO(TC) definability is
 membership in NL (`DescriptiveComplexity.tcDefinable_iff_mem_NL`, the two
-translations through the Krom fragment). -/
+translations through the Krom fragment).
+Registered in the Lax archive as
+[`Lax485149.LSubsetNL.LOGSPACE_subset_NL`](https://laxarchive.org/lax-485149/Lax485149.LSubsetNL.html#s-Lax485149.LSubsetNL.LOGSPACE_subset_NL). -/
 theorem LOGSPACE_subset_NL : LOGSPACE ⊆ NL :=
   fun _ _ P hP => (tcDefinable_iff_mem_NL P).mp (DTCDefinable.tcDefinable hP)
 

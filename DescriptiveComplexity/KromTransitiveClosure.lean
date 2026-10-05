@@ -822,7 +822,9 @@ cycle-witnessing graph – whose nodes are a pair of literals and a flag, i.e., 
 mode and two canonically padded tuples. Together with
 `DescriptiveComplexity.SigmaSOKromDefinable.compl_of_tcDefinable` this gives
 `co-NL(Krom) = NL(TC)`; it is upgraded to `NL = coNL` by Immerman–Szelepcsényi
-(`DescriptiveComplexity.NL_eq_coNL`). -/
+(`DescriptiveComplexity.NL_eq_coNL`).
+Registered in the Lax archive as
+[`Lax485149.KromAndTransitiveClosure.tcDefinable_compl_of_sigmaSOKromDefinable`](https://laxarchive.org/lax-485149/Lax485149.KromAndTransitiveClosure.html#s-Lax485149.KromAndTransitiveClosure.tcDefinable_compl_of_sigmaSOKromDefinable). -/
 theorem TCDefinable.compl_of_sigmaSOKromDefinable {L : Language.{0, 0}}
     [L.IsRelational] {P : DecisionProblem L} (h : SigmaSOKromDefinable P) : TCDefinable Pᶜ := by
   obtain ⟨B, k, prog, hprog⟩ := h
@@ -838,7 +840,9 @@ theorem sigmaSOKromDefinable_iff_tcDefinable_compl {L : Language.{0, 0}}
   have := SigmaSOKromDefinable.compl_of_tcDefinable h
   rwa [DecisionProblem.compl_compl] at this
 
-/-- **NL is the complements of the FO(TC) definable problems.** -/
+/-- **NL is the complements of the FO(TC) definable problems.**
+Registered in the Lax archive as
+[`Lax485149.NLIsTransitiveClosure.mem_NL_iff_tcDefinable_compl`](https://laxarchive.org/lax-485149/Lax485149.NLIsTransitiveClosure.html#s-Lax485149.NLIsTransitiveClosure.mem_NL_iff_tcDefinable_compl). -/
 theorem mem_NL_iff_tcDefinable_compl {L : Language.{0, 0}} [L.IsRelational]
     (P : DecisionProblem L) :
     P ∈ NL ↔ TCDefinable Pᶜ :=

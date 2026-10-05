@@ -328,7 +328,9 @@ open TCKrom in
 guess the set of nodes from which an accepting node is reachable – one `k`-ary
 relation variable per mode – close it under predecessors with the 2-clause
 `¬U_q(ȳ) ∨ U_p(x̄)`, and forbid the starting nodes. This is the direction a
-clausal fragment gives for free; the converse is Immerman–Szelepcsényi. -/
+clausal fragment gives for free; the converse is Immerman–Szelepcsényi.
+Registered in the Lax archive as
+[`Lax485149.KromAndTransitiveClosure.sigmaSOKromDefinable_compl_of_tcDefinable`](https://laxarchive.org/lax-485149/Lax485149.KromAndTransitiveClosure.html#s-Lax485149.KromAndTransitiveClosure.sigmaSOKromDefinable_compl_of_tcDefinable). -/
 theorem SigmaSOKromDefinable.compl_of_tcDefinable {L : Language.{0, 0}}
     [L.IsRelational] {P : DecisionProblem L} (h : TCDefinable P) : SigmaSOKromDefinable Pᶜ := by
   obtain ⟨spec, hspec⟩ := h
