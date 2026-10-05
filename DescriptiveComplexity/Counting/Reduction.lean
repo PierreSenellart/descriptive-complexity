@@ -32,12 +32,26 @@ instance.
 
 * A parsimonious reduction is the case `post = oracle`
   (`DescriptiveComplexity.RelOrderedParsimoniousReduction.toOneCall`).
-* A one-call reduction is a *polynomial-time 1-Turing reduction*: one oracle
-  call, and polynomial-time computation before and after it. It is a
-  restricted one, the instance being first-order definable and the computation
-  after the call a fixed arithmetic term. A one-call hard problem is
-  therefore `#P`-hard under 1-Turing reductions, hence under Turing
-  reductions, the sense the literature most often means.
+* A one-call reduction is what the literature calls a **metric reduction**,
+  `f(x) = ψ(x, g(φ(x)))` with `φ` and `ψ` computable in polynomial time, a
+  notion due to [Krentel 1988][krentel1988complexity] (here as stated in
+  [Faliszewski and Hemaspaandra 2009][faliszewski2009complexity],
+  Definition 1.2), or equivalently a *polynomial-time 1-Turing reduction*: one
+  oracle call, and polynomial-time computation before and after it. It is a
+  restricted one, `φ` being a first-order interpretation and `ψ` a fixed
+  arithmetic term. A one-call hard problem is therefore `#P`-hard under
+  metric reductions, hence under Turing reductions, the sense the literature
+  most often means. There is no single agreed notion of completeness for
+  classes of functions: beside the metric and the parsimonious reductions, the
+  *many-one* reductions for functions ask that `ψ` not read the input,
+  `f(x) = ψ(g(φ(x)))`; a one-call reduction is one of those when its term
+  mentions no cardinality of the instance.
+  [Durand, Haak, Kontinen, Vollmer 2016][durand2016descriptive] use exactly
+  the reduction of #SAT to #DNF by `2 ^ n - oracle`, under the name of an
+  AC⁰-Turing reduction (their Lemma 19; the preprint of the paper calls it a
+  metric reduction), and a division of the oracle's answer for another, a
+  TC⁰-Turing reduction (their Lemma 20), as the digit extractions of this
+  library do.
 * That notion is coarse.
   [Toda and Watanabe 1992][toda1992polynomial] show that a problem `#P`-hard
   under polynomial-time 1-Turing reductions is hard for the higher counting
