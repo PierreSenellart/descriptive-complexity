@@ -103,6 +103,17 @@ disjoint – and, exactness replacing the threshold, no injection clause. -/
 noncomputable def exactCoverKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfCoverClause ⊓ sfDisjClause)
 
+/-- Kernel clause: the binary relation variable of the block is empty. Exact
+Cover does not use it, and a definition that *counts* the witnesses has to say
+so, or each exact cover would be counted once per binary relation. -/
+noncomputable def sfNoInjClause : setFamilySOLang.Sentence :=
+  fo% ∀ x y, ¬ sfInjSym(x, y)
+
+/-- The kernel of the witness-counting definition of Exact Cover: the kernel of
+its `Σ₁` definition, with the unused relation variable pinned. -/
+noncomputable def sharpExactCoverKernel : setFamilySOLang.Sentence :=
+  exactCoverKernel ⊓ sfNoInjClause
+
 /-- Kernel clause (Set Splitting): every set of the family contains a
 colored ground element. -/
 noncomputable def sfSplitInClause : setFamilySOLang.Sentence :=
@@ -270,6 +281,31 @@ private theorem realize_exactCoverKernel :
   simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
   exact and_congr (realize_sfFamClause ρ)
     (and_congr (realize_sfCoverClause ρ) (realize_sfDisjClause ρ))
+
+private theorem realize_sfNoInjClause :
+    SFRealize ρ sfNoInjClause ↔ ∀ x y : A, ¬ρ .inj ![x, y] := by
+  let := familyGuessBlock.structure ρ
+  have hsubI : ∀ (w : Fin 2 → A),
+      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [sfNoInjClause]
+  simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hsubI]
+  exact ⟨fun h x y => h ![x, y], fun h i => h (i 0) (i 1)⟩
+
+/-- Realization of the counting kernel of Exact Cover: the guessed subfamily is
+an exact cover, and the unused relation variable is empty. -/
+theorem realize_sharpExactCoverKernel :
+    (@Sentence.Realize setFamilySOLang A
+        (@sumStructure _ _ A _ (familyGuessBlock.structure ρ)) sharpExactCoverKernel) ↔
+      ExactCoverBy (SSElem (A := A)) SSFam SSMem (fun s => ρ .guess ![s]) ∧
+        ∀ x y : A, ¬ρ .inj ![x, y] := by
+  have h1 := realize_exactCoverKernel ρ
+  have h2 := realize_sfNoInjClause ρ
+  let := familyGuessBlock.structure ρ
+  rw [sharpExactCoverKernel, Sentence.Realize, Formula.realize_inf]
+  refine and_congr (h1.trans ?_) h2
+  exact ⟨fun ⟨hf, hc, hd⟩ => ⟨hf, hc, fun s s' hs hs' hne x hx => hd s s' x hs hs' hne hx⟩,
+    fun ⟨hf, hc, hd⟩ => ⟨hf, hc, fun s s' x hs hs' hne hx => hd s s' hs hs' hne x hx⟩⟩
 
 private theorem realize_sfSplitInClause :
     SFRealize ρ sfSplitInClause ↔

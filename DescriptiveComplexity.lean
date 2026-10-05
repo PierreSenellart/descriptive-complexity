@@ -144,6 +144,7 @@ import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.EqPattern
 import DescriptiveComplexity.OccurrenceOrder
+import DescriptiveComplexity.OccurrencePrefix
 import DescriptiveComplexity.OccurrenceFormulas
 import DescriptiveComplexity.OccurrenceSlack
 import DescriptiveComplexity.OccurrenceVar
@@ -2065,6 +2066,17 @@ decision reductions, for the same reason.
   sits at a canonically padded tuple
   (`DescriptiveComplexity.Tseitin.litSem_varCanon`); one tautological clause per block
   variable is added so that each of them is a variable of the formula.
+* **A parsimonious catalog.** #3SAT
+  (`DescriptiveComplexity.sharpThreeSat_sharpP_parsimoniousComplete`), #1-in-SAT
+  (`DescriptiveComplexity.sharpOneInSat_sharpP_parsimoniousComplete`) and #Exact Cover
+  (`DescriptiveComplexity.sharpExactCover_sharpP_parsimoniousComplete`). The decision
+  reductions into the first two thread fresh variables along the occurrences of
+  a clause and leave them free once the clause is satisfied; the counting ones
+  force them, each being the truth of a prefix disjunction
+  (`DescriptiveComplexity.OccurrencePrefix`), in clauses of width three for #3SAT and
+  in exactly-one clauses for #1-in-SAT. The reduction of 1-in-SAT to Exact Cover
+  is parsimonious as it stands, its ground elements being the *variables* of
+  the formula and not every element of the instance.
 * **The machine bridge**: counting accepting runs
   (`DescriptiveComplexity.SharpNTMAccept`, in
   `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
@@ -2219,7 +2231,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · counting the accepting runs of such a machine – *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

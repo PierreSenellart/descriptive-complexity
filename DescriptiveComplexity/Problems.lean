@@ -21,10 +21,15 @@ import DescriptiveComplexity.Problems.ReachabilityDet.Complement
 import DescriptiveComplexity.Problems.ThreeColorability
 import DescriptiveComplexity.Problems.Coloring
 import DescriptiveComplexity.Problems.ThreeSat
+import DescriptiveComplexity.Problems.ThreeSat.Counting
+import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
 import DescriptiveComplexity.Problems.TwoSat
 import DescriptiveComplexity.Problems.NaeSat
 import DescriptiveComplexity.Problems.NaeThreeSat
 import DescriptiveComplexity.Problems.OneInSat
+import DescriptiveComplexity.Problems.OneInSat.Counting
+import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
+import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Problems.SubgraphIso.Encoding
@@ -37,6 +42,8 @@ import DescriptiveComplexity.Problems.GraphIso.Hardness
 import DescriptiveComplexity.Problems.GIDegree
 import DescriptiveComplexity.Problems.SetFamily
 import DescriptiveComplexity.Problems.ExactCover
+import DescriptiveComplexity.Problems.SetFamily.Counting
+import DescriptiveComplexity.Problems.ExactCoverCounting
 import DescriptiveComplexity.Problems.SetSplitting
 import DescriptiveComplexity.Problems.DominatingSet
 import DescriptiveComplexity.Problems.Knapsack

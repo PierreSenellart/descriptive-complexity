@@ -36,11 +36,6 @@ section Models
 
 variable (A : Type) [Language.sat.Structure A]
 
-/-- The element `x` is a variable of the CNF formula: it occurs, positively or
-negatively, in some clause. -/
-def SatOccurs (x : A) : Prop :=
-  ∃ c : A, RelMap satIsClause ![c] ∧ (RelMap satPosIn ![c, x] ∨ RelMap satNegIn ![c, x])
-
 /-- The set `ν` of true variables is a model of the CNF formula: every clause
 contains a true literal, and `ν` consists of variables of the formula. -/
 def SatModel (ν : A → Prop) : Prop :=
@@ -73,11 +68,15 @@ section Kernel
 
 open SOBlock
 
+/-- Kernel conjunct: the truth assignment only holds of variables of the
+formula, i.e., of elements occurring in a clause. -/
+noncomputable def satVarKernel : satSOLang.Sentence :=
+  fo% ∀ x, kNuSym(x) → ∃ c, kIsClSym(c) ∧ (kPosSym(c, x) ∨ kNegSym(c, x))
+
 /-- The first-order kernel of #SAT: the kernel of SAT, and the truth assignment
 only holds of variables of the formula. -/
 noncomputable def sharpSatKernel : satSOLang.Sentence :=
-  satKernel ⊓
-    fo% ∀ x, kNuSym(x) → ∃ c, kIsClSym(c) ∧ (kPosSym(c, x) ∨ kNegSym(c, x))
+  satKernel ⊓ satVarKernel
 
 /-- Unary relations, as assignments of the truth-assignment block. -/
 def satAssignEquiv (A : Type) : (A → Prop) ≃ satAssignBlock.Assignment A where
@@ -89,21 +88,21 @@ def satAssignEquiv (A : Type) : (A → Prop) ≃ satAssignBlock.Assignment A whe
     exact congrArg (ρ i) (funext fun j =>
       congrArg x (@Subsingleton.elim (Fin 1) _ _ _))
 
-/-- Realization of the kernel of #SAT: the assignment is a model. -/
-theorem realize_sharpSatKernel {A : Type} [Language.sat.Structure A]
+/-- Realization of the variable conjunct: the assignment holds only of
+variables of the formula. -/
+theorem realize_satVarKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
-        (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) sharpSatKernel) ↔
-      SatModel A ((satAssignEquiv A).symm ρ) := by
+        (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) satVarKernel) ↔
+      ∀ x : A, (satAssignEquiv A).symm ρ x → SatOccurs A x := by
   let := satAssignBlock.structure ρ
   have hsub : ∀ (w : Fin 1 → A),
       RelMap (L := satSOLang) (M := A) kNuSym w ↔ ρ satNuSym.1 fun _ => w 0 := by
     intro w
     change ρ satNuSym.1 _ ↔ ρ satNuSym.1 _
     exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
-  rw [sharpSatKernel, Sentence.Realize, Formula.realize_inf]
-  refine and_congr (realize_satKernel ρ) ?_
-  simp only [Formula.realize_iAlls, Formula.realize_imp,
+  rw [satVarKernel]
+  simp only [Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_iExs, Formula.realize_sup, Formula.realize_inf,
     Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
     Language.relMap_sumInl, hsub]
@@ -114,6 +113,18 @@ theorem realize_sharpSatKernel {A : Type} [Language.sat.Structure A]
   · intro h x hx
     obtain ⟨c, hc, hor⟩ := h (x 0) hx
     exact ⟨fun _ => c, hc, hor⟩
+
+/-- Realization of the kernel of #SAT: the assignment is a model. -/
+theorem realize_sharpSatKernel {A : Type} [Language.sat.Structure A]
+    (ρ : satAssignBlock.Assignment A) :
+    (@Sentence.Realize satSOLang A
+        (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) sharpSatKernel) ↔
+      SatModel A ((satAssignEquiv A).symm ρ) := by
+  have h1 := realize_satKernel ρ
+  have h2 := realize_satVarKernel ρ
+  let := satAssignBlock.structure ρ
+  rw [sharpSatKernel, Sentence.Realize, Formula.realize_inf]
+  exact and_congr h1 h2
 
 end Kernel
 

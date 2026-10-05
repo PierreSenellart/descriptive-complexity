@@ -126,6 +126,18 @@ def ExactlyCoversOn (Ep Fp : A → Prop) (Mp : A → A → Prop) : Prop :=
   ∃ G : A → Prop, (∀ s, G s → Fp s) ∧ (∀ x, Ep x → ∃ s, G s ∧ Mp x s) ∧
     ∀ s s', G s → G s' → s ≠ s' → ∀ x, Ep x → ¬(Mp x s ∧ Mp x s')
 
+/-- The subfamily `G` is an exact cover: it consists of `Fp`-sets, covers every
+`Ep`-element, and no element belongs to two distinct members. This is the body
+of `DescriptiveComplexity.ExactlyCoversOn`, named for the statements that are about a
+particular cover and not only about the existence of one. -/
+def ExactCoverBy (Ep Fp : A → Prop) (Mp : A → A → Prop) (G : A → Prop) : Prop :=
+  (∀ s, G s → Fp s) ∧ (∀ x, Ep x → ∃ s, G s ∧ Mp x s) ∧
+    ∀ s s', G s → G s' → s ≠ s' → ∀ x, Ep x → ¬(Mp x s ∧ Mp x s')
+
+theorem exactlyCoversOn_iff_exists (Ep Fp : A → Prop) (Mp : A → A → Prop) :
+    ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, ExactCoverBy Ep Fp Mp G :=
+  Iff.rfl
+
 /-- Exactness in the “exactly one” form: covering plus disjointness is one
 covering set per element. -/
 theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
