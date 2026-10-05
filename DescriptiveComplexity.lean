@@ -2357,7 +2357,15 @@ pulled relations hold only of points of the domain
   the sets with `e(S) = 0`, the complements of the independent sets
   (`DescriptiveComplexity.card_stretchIndep_mod`). The two gadgets compose into
   one call (`DescriptiveComplexity.OneCallReduction.trans`), so every problem of
-  `#P` is one question about the independent sets of a bipartite graph.
+  `#P` is one question about the independent sets of a bipartite graph. This
+  is the problem #PP2CNF of [Provan and Ball 1983][provan1983complexity], an
+  independent set being the complement of a vertex cover; its dual **#PP2DNF**
+  (`DescriptiveComplexity.SharpPP2DNF`), the models of `⋁ (x ∧ y)` over the
+  edges, is one-call `#P`-complete too
+  (`DescriptiveComplexity.sharpPP2DNF_sharpP_oneCallComplete`), by
+  `#BIS + #PP2DNF = 2 ^ n`. It is the source of the `#P`-hardness of the query
+  `R(x), S(x, y), T(y)` over probabilistic databases
+  ([Dalvi and Suciu 2012][dalvi2012dichotomy]).
 
 ## Shared encodings
 
@@ -2485,7 +2493,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, complete under subtractive reductions (plain `#P`-complete here) · counting all the independent sets of a graph, and #BIS (those of a bipartite graph), complete under one-call reductions only |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, complete under subtractive reductions (plain `#P`-complete here) · counting all the independent sets of a graph, #BIS (those of a bipartite graph) and #PP2DNF, complete under one-call reductions only |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a
