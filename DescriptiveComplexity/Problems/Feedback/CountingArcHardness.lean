@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Feedback.SplitBundle
 import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Feedback Arc Set is parsimoniously `#P`-complete
@@ -511,5 +512,10 @@ feedback arc sets of exactly the threshold size. -/
 theorem sharpFeedbackArcSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpFeedbackArcSet :=
   ⟨sharpFeedbackArcSet_mem_sharpP, sharpFeedbackArcSet_sharpP_parsimoniousHard⟩
+
+/-- `SharpFeedbackArcSet` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpFeedbackArcSet_sharpP_complete : SharpP.Complete SharpFeedbackArcSet :=
+  complete_sharpP_of_parsimoniousComplete sharpFeedbackArcSet_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

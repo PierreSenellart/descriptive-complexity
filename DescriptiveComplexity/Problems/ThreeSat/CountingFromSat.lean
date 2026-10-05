@@ -8,6 +8,7 @@ import DescriptiveComplexity.OccurrencePrefix
 import DescriptiveComplexity.Problems.ThreeSat.Counting
 import DescriptiveComplexity.Problems.Sat.CountingHardness
 import Mathlib.Data.Fintype.Pigeonhole
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #SAT reduces parsimoniously to #3SAT
@@ -688,5 +689,10 @@ theorem sharpThreeSat_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpThr
 theorem sharpThreeSat_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpThreeSAT :=
   ⟨sharpThreeSat_mem_sharpP, sharpThreeSat_sharpP_parsimoniousHard⟩
+
+/-- `SharpThreeSAT` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpThreeSat_sharpP_complete : SharpP.Complete SharpThreeSAT :=
+  complete_sharpP_of_parsimoniousComplete sharpThreeSat_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

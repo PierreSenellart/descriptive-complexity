@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Machine.Counting
 import DescriptiveComplexity.Problems.Machine.Interp
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # Counting accepting runs is parsimoniously `#P`-complete
@@ -280,6 +281,11 @@ this theorem is the bridge saying it is the machine one. -/
 theorem sharpNtmAccept_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpNTMAccept :=
   ⟨sharpNtmAccept_mem_sharpP, sharpNtmAccept_sharpP_parsimoniousHard⟩
+
+/-- `SharpNTMAccept` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpNtmAccept_sharpP_complete : SharpP.Complete SharpNTMAccept :=
+  complete_sharpP_of_parsimoniousComplete sharpNtmAccept_sharpP_parsimoniousComplete
 
 /-- **The machine characterization of `#P`**: a counting problem counts the
 witnesses of an existential second-order sentence exactly when it reduces

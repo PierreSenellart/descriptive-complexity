@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Sat.Counting
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Problems.Sat.TseitinUnique
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #SAT is parsimoniously `#P`-complete
@@ -444,5 +445,10 @@ is `DescriptiveComplexity.sharpSat_mem_sharpP`; hardness is the generic parsimon
 Tseitin reduction `DescriptiveComplexity.sharpTseitinReduction`. -/
 theorem sharpSat_sharpP_parsimoniousComplete : SharpP.ParsimoniousComplete SharpSAT :=
   ⟨sharpSat_mem_sharpP, sharpSat_sharpP_parsimoniousHard⟩
+
+/-- `SharpSAT` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpSat_sharpP_complete : SharpP.Complete SharpSAT :=
+  complete_sharpP_of_parsimoniousComplete sharpSat_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

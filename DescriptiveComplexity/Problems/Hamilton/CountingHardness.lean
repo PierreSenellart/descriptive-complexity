@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Hamilton.CountingReverse
 import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 import DescriptiveComplexity.Counting.Relativized
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Directed Hamilton Circuit is parsimoniously `#P`-complete
@@ -365,5 +366,10 @@ the Hamilton circuits of a digraph. -/
 theorem sharpDirHamCircuit_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpDirHamCircuit :=
   ⟨sharpDirHamCircuit_mem_sharpP, sharpDirHamCircuit_sharpP_parsimoniousHard⟩
+
+/-- `SharpDirHamCircuit` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpDirHamCircuit_sharpP_complete : SharpP.Complete SharpDirHamCircuit :=
+  complete_sharpP_of_parsimoniousComplete sharpDirHamCircuit_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

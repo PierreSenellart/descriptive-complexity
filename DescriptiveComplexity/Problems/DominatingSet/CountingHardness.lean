@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.DominatingSet.Counting
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.Sat.CountingHardness
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Dominating Set is parsimoniously `#P`-complete
@@ -515,5 +516,10 @@ sets of exactly the threshold size. -/
 theorem sharpDominatingSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpDominatingSet :=
   ⟨sharpDominatingSet_mem_sharpP, sharpDominatingSet_sharpP_parsimoniousHard⟩
+
+/-- `SharpDominatingSet` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpDominatingSet_sharpP_complete : SharpP.Complete SharpDominatingSet :=
+  complete_sharpP_of_parsimoniousComplete sharpDominatingSet_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

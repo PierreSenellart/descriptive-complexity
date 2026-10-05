@@ -342,12 +342,6 @@ noncomputable def sharpSat_strongSubtractive_sharpDnf :
 theorem sharpSat_subtractive_sharpDnf : SharpSAT ≤ˢ SharpDNF :=
   sharpSat_strongSubtractive_sharpDnf.subtractiveReducible
 
-/-- **#SAT is `#P`-complete**: parsimoniously, hence under subtractive
-reductions. -/
-theorem sharpSat_sharpP_complete : SharpP.Complete SharpSAT :=
-  ⟨sharpSat_mem_sharpP, hard_sharpP_of_ordered fun D hD =>
-    sharpSat_parsimoniousHard_of_sharpPDefinable D hD⟩
-
 /-- **#DNF is `#P`-hard**: every problem of `#P` reduces to #SAT
 parsimoniously, and #SAT to #DNF by a strong subtractive reduction. -/
 theorem sharpDnf_sharpP_hard : SharpP.Hard SharpDNF :=

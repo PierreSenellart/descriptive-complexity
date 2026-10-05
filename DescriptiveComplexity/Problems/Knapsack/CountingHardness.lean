@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.Knapsack.Counting
 import DescriptiveComplexity.Problems.Knapsack.Hardness
 import DescriptiveComplexity.Problems.ExactCoverCounting
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Knapsack is parsimoniously `#P`-complete
@@ -79,5 +80,10 @@ binary. -/
 theorem sharpKnapsack_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpKnapsack :=
   ⟨sharpKnapsack_mem_sharpP, sharpKnapsack_sharpP_parsimoniousHard⟩
+
+/-- `SharpKnapsack` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpKnapsack_sharpP_complete : SharpP.Complete SharpKnapsack :=
+  complete_sharpP_of_parsimoniousComplete sharpKnapsack_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

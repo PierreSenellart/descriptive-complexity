@@ -86,6 +86,7 @@ import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.Counting.SizedPairs
 import DescriptiveComplexity.Counting.Post
 import DescriptiveComplexity.Counting.Reduction
+import DescriptiveComplexity.Counting.RelClosure
 import DescriptiveComplexity.Counting.Subtractive
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
@@ -2051,7 +2052,15 @@ relativized form `C ≤ʳᵖ[≤] D`, with a definable target universe
 (`DescriptiveComplexity.Counting.Relativized`), for the problems whose solutions span
 the universe; parsimonious hardness for a counting class is hardness under
 those (`DescriptiveComplexity.parsimoniousHard_sharpP_iff`), every ordinary reduction
-being one.
+being one. Membership in `#P` travels backward along them too
+(`DescriptiveComplexity.SharpPDefinable.of_relOrderedParsimonious`, in
+`DescriptiveComplexity.Counting.RelClosure`). Pulling a kernel back through a
+definable domain is only a retraction on assignments, a pulled relation being
+free to hold of tuples that are not points of the target, which would count
+every witness several times; one more conjunct in the kernel, saying that the
+pulled relations hold only of points of the domain
+(`DescriptiveComplexity.supportSentence`), makes it a bijection
+(`DescriptiveComplexity.witnessCount_mapRel`).
 
 * **The class** `DescriptiveComplexity.SharpP` is *defined* by witness counting
   ([Saluja, Subrahmanyam, Thakur 1995][saluja1995descriptive]): a counting
@@ -2300,13 +2309,16 @@ being one.
   instance that are not solutions of the first are the witnesses of the
   conjunction of one pulled kernel with the negation of the other. Strong
   reductions do not compose, so a subtractive reduction is a chain of steps,
-  each a strong subtractive or an ordered parsimonious reduction.
+  each a strong subtractive or a (relativized) parsimonious reduction.
   This is the widest notion of the library under which `#P` is closed, so the
   plain words go to it, as on the decision side:
   `DescriptiveComplexity.CountingClass.Hard` and
   `DescriptiveComplexity.CountingClass.Complete` are hardness and completeness
-  under subtractive reductions. #SAT is complete
-  (`DescriptiveComplexity.sharpSat_sharpP_complete`), and
+  under subtractive reductions. Parsimonious completeness implies it
+  (`DescriptiveComplexity.complete_sharpP_of_parsimoniousComplete`), so every
+  problem of the parsimonious catalog above is `#P`-complete in the plain
+  sense, each with its theorem (`DescriptiveComplexity.sharpSat_sharpP_complete`,
+  `DescriptiveComplexity.sharpHamCircuit_sharpP_complete`…), and
   **#DNF is `#P`-complete**
   (`DescriptiveComplexity.sharpDnf_sharpP_complete`, in
   `DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive`; their

@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
 import DescriptiveComplexity.Problems.CliqueFamily.Reductions
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Independent Set and #Vertex Cover
@@ -310,6 +311,11 @@ theorem sharpIndependentSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpIndependentSet :=
   ⟨sharpIndependentSet_mem_sharpP, sharpIndependentSet_sharpP_parsimoniousHard⟩
 
+/-- `SharpIndependentSet` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpIndependentSet_sharpP_complete : SharpP.Complete SharpIndependentSet :=
+  complete_sharpP_of_parsimoniousComplete sharpIndependentSet_sharpP_parsimoniousComplete
+
 /-- **#Vertex Cover is in `#P`.** -/
 theorem sharpVertexCover_mem_sharpP : SharpVertexCover ∈ SharpP :=
   SharpP.mem_of_parsimonious sharpVertexCover_parsimonious_sharpIndependentSet
@@ -326,5 +332,10 @@ covers of exactly the threshold size. -/
 theorem sharpVertexCover_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpVertexCover :=
   ⟨sharpVertexCover_mem_sharpP, sharpVertexCover_sharpP_parsimoniousHard⟩
+
+/-- `SharpVertexCover` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpVertexCover_sharpP_complete : SharpP.Complete SharpVertexCover :=
+  complete_sharpP_of_parsimoniousComplete sharpVertexCover_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

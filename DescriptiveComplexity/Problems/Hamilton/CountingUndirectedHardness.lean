@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
 import DescriptiveComplexity.Problems.Hamilton.CountingHardness
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Hamilton Circuit is parsimoniously `#P`-complete
@@ -383,5 +384,10 @@ circuits of an undirected graph, as sets of edges. -/
 theorem sharpHamCircuit_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpHamCircuit :=
   ⟨sharpHamCircuit_mem_sharpP, sharpHamCircuit_sharpP_parsimoniousHard⟩
+
+/-- `SharpHamCircuit` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpHamCircuit_sharpP_complete : SharpP.Complete SharpHamCircuit :=
+  complete_sharpP_of_parsimoniousComplete sharpHamCircuit_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

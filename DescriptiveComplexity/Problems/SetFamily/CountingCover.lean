@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.SetFamily.CountingPacking
 import DescriptiveComplexity.Problems.SetFamily.Reductions
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Set Cover and #Hitting Set
@@ -358,6 +359,11 @@ theorem sharpSetCover_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpSetCover :=
   ⟨sharpSetCover_mem_sharpP, sharpSetCover_sharpP_parsimoniousHard⟩
 
+/-- `SharpSetCover` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpSetCover_sharpP_complete : SharpP.Complete SharpSetCover :=
+  complete_sharpP_of_parsimoniousComplete sharpSetCover_sharpP_parsimoniousComplete
+
 /-- **#Hitting Set is in `#P`.** -/
 theorem sharpHittingSet_mem_sharpP : SharpHittingSet ∈ SharpP :=
   SharpP.mem_of_parsimonious sharpHittingSet_parsimonious_sharpSetCover
@@ -373,5 +379,10 @@ of exactly the threshold size. -/
 theorem sharpHittingSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpHittingSet :=
   ⟨sharpHittingSet_mem_sharpP, sharpHittingSet_sharpP_parsimoniousHard⟩
+
+/-- `SharpHittingSet` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpHittingSet_sharpP_complete : SharpP.Complete SharpHittingSet :=
+  complete_sharpP_of_parsimoniousComplete sharpHittingSet_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

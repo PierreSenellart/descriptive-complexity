@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.Steiner.Counting
 import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Steiner Tree is parsimoniously `#P`-complete
@@ -137,5 +138,10 @@ using exactly the threshold number of non-terminals. -/
 theorem sharpSteinerTree_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpSteinerTree :=
   ⟨sharpSteinerTree_mem_sharpP, sharpSteinerTree_sharpP_parsimoniousHard⟩
+
+/-- `SharpSteinerTree` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpSteinerTree_sharpP_complete : SharpP.Complete SharpSteinerTree :=
+  complete_sharpP_of_parsimoniousComplete sharpSteinerTree_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

@@ -3,7 +3,7 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Class
+import DescriptiveComplexity.Counting.RelClosure
 
 /-!
 # Subtractive reductions
@@ -32,10 +32,11 @@ Strong subtractive reductions do not compose, and a **subtractive reduction**
 `C ≤ˢ D` (`DescriptiveComplexity.SubtractiveReducible`) is a finite chain of
 steps, as in the paper. Two departures from it, both forced:
 
-* a step is a strong subtractive reduction *or an ordered parsimonious
-  reduction*. The paper obtains the second as the special case of the first
-  whose subtrahend has no solution, which needs the target to have such an
-  instance, definably; admitting the step directly asks for nothing;
+* a step is a strong subtractive reduction *or a parsimonious reduction*, in
+  its most general form, relativized and ordered. The paper obtains the second
+  as the special case of the first whose subtrahend has no solution, which
+  needs the target to have such an instance, definably; admitting the step
+  directly asks for nothing;
 * the target of a strong step is presented by a first-order kernel, hence is
   itself in `#P`. The paper's relations are arbitrary, which is what lets it
   speak of the classes above `#P`; the library has no such classes yet.
@@ -49,10 +50,9 @@ notion of the library under which the class is closed, and the plain words go
 to it, as on the decision side they go to reductions the classes are closed
 under: `DescriptiveComplexity.CountingClass.Hard` and
 `DescriptiveComplexity.CountingClass.Complete` are hardness and completeness
-under subtractive reductions. A parsimoniously complete problem reached by
-ordered reductions is complete (`DescriptiveComplexity.hard_sharpP_of_ordered`);
-one reached only by relativized reductions is not known to be, membership in
-`#P` not being proved closed under those.
+under subtractive reductions. Parsimonious hardness and completeness imply
+them (`DescriptiveComplexity.hard_sharpP_of_parsimoniousHard`,
+`DescriptiveComplexity.complete_sharpP_of_parsimoniousComplete`).
 -/
 
 namespace DescriptiveComplexity
@@ -242,7 +242,8 @@ end Closure
 /-! ### Subtractive reductions -/
 
 /-- **Subtractive reducibility**, `C ≤ˢ D`: a finite chain of steps, each a
-strong subtractive reduction or an ordered parsimonious reduction. -/
+strong subtractive reduction or a relativized ordered parsimonious
+reduction. -/
 inductive SubtractiveReducible : ∀ {L L' : Language.{0, 0}} [L.IsRelational] [L'.IsRelational],
     CountingProblem L → CountingProblem L' → Prop
   /-- The empty chain. -/
@@ -253,10 +254,10 @@ inductive SubtractiveReducible : ∀ {L L' : Language.{0, 0}} [L.IsRelational] [
       [L₃.IsRelational] {C : CountingProblem L₁} {D : CountingProblem L₂}
       {E : CountingProblem L₃} (f : StrongSubtractiveReduction C D)
       (h : SubtractiveReducible D E) : SubtractiveReducible C E
-  /-- An ordered parsimonious step, then a chain. -/
+  /-- A parsimonious step, then a chain. -/
   | parsimonious {L₁ L₂ L₃ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
       [L₃.IsRelational] {C : CountingProblem L₁} {D : CountingProblem L₂}
-      {E : CountingProblem L₃} (f : C ≤ᵖ[≤] D)
+      {E : CountingProblem L₃} (f : C ≤ʳᵖ[≤] D)
       (h : SubtractiveReducible D E) : SubtractiveReducible C E
 
 @[inherit_doc]
@@ -272,9 +273,13 @@ theorem StrongSubtractiveReduction.subtractiveReducible (f : StrongSubtractiveRe
     C ≤ˢ D :=
   .strong f (.refl D)
 
+/-- A relativized parsimonious reduction is a subtractive reduction. -/
+theorem RelOrderedParsimoniousReduction.subtractiveReducible (f : C ≤ʳᵖ[≤] D) : C ≤ˢ D :=
+  .parsimonious f (.refl D)
+
 /-- An ordered parsimonious reduction is a subtractive reduction. -/
 theorem OrderedParsimoniousReduction.subtractiveReducible (f : C ≤ᵖ[≤] D) : C ≤ˢ D :=
-  .parsimonious f (.refl D)
+  f.toRel.subtractiveReducible
 
 /-- A parsimonious reduction is a subtractive reduction. -/
 theorem ParsimoniousReduction.subtractiveReducible (f : C ≤ᵖ D) : C ≤ˢ D :=
@@ -295,7 +300,7 @@ theorem SharpPDefinable.of_subtractive (h : C ≤ˢ D) (hD : SharpPDefinable D) 
   induction h with
   | refl _ => exact hD
   | strong f _ _ => exact .of_strongSubtractive f
-  | parsimonious f _ ih => exact (ih hD).of_orderedParsimonious f
+  | parsimonious f _ ih => exact (ih hD).of_relOrderedParsimonious f
 
 end Reducible
 
@@ -333,11 +338,15 @@ theorem mem_sharpP_of_subtractive [L.IsRelational] [L'.IsRelational] {C : Counti
     {D : CountingProblem L'} (h : C ≤ˢ D) (hD : D ∈ SharpP) : C ∈ SharpP :=
   SharpPDefinable.of_subtractive h hD
 
-/-- A problem every `#P`-definable counting problem reduces to by an ordered
-parsimonious reduction is `#P`-hard. -/
-theorem hard_sharpP_of_ordered [L.IsRelational] {C : CountingProblem L}
-    (h : ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (D : CountingProblem L''),
-      SharpPDefinable D → Nonempty (D ≤ᵖ[≤] C)) : SharpP.Hard C :=
+/-- **Parsimonious `#P`-hardness implies `#P`-hardness**: a relativized
+parsimonious reduction is a subtractive reduction. -/
+theorem hard_sharpP_of_parsimoniousHard [L.IsRelational] {C : CountingProblem L}
+    (h : SharpP.ParsimoniousHard C) : SharpP.Hard C :=
   fun D hD => (h D hD).some.subtractiveReducible
+
+/-- A parsimoniously `#P`-complete problem is `#P`-complete. -/
+theorem complete_sharpP_of_parsimoniousComplete [L.IsRelational] {C : CountingProblem L}
+    (h : SharpP.ParsimoniousComplete C) : SharpP.Complete C :=
+  ⟨h.1, hard_sharpP_of_parsimoniousHard h.2⟩
 
 end DescriptiveComplexity

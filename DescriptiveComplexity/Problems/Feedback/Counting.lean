@@ -8,6 +8,7 @@ import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Feedback.Reductions
 import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
 import DescriptiveComplexity.Counting.Sized
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Feedback Vertex Set
@@ -351,5 +352,10 @@ feedback vertex sets of exactly the threshold size. -/
 theorem sharpFeedbackVertexSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpFeedbackVertexSet :=
   ⟨sharpFeedbackVertexSet_mem_sharpP, sharpFeedbackVertexSet_sharpP_parsimoniousHard⟩
+
+/-- `SharpFeedbackVertexSet` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpFeedbackVertexSet_sharpP_complete : SharpP.Complete SharpFeedbackVertexSet :=
+  complete_sharpP_of_parsimoniousComplete sharpFeedbackVertexSet_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

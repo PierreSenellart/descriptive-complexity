@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.OneInSat.Counting
 import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
 import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #SAT reduces parsimoniously to #1-in-SAT
@@ -742,5 +743,10 @@ theorem sharpOneInSat_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpOne
 theorem sharpOneInSat_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpOneInSAT :=
   ⟨sharpOneInSat_mem_sharpP, sharpOneInSat_sharpP_parsimoniousHard⟩
+
+/-- `SharpOneInSAT` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpOneInSat_sharpP_complete : SharpP.Complete SharpOneInSAT :=
+  complete_sharpP_of_parsimoniousComplete sharpOneInSat_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

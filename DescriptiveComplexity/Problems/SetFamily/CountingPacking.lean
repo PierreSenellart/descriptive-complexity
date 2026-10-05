@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.SetFamily.FromGraphs
 import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Set Packing
@@ -228,5 +229,10 @@ exactly the threshold size. -/
 theorem sharpSetPacking_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpSetPacking :=
   ⟨sharpSetPacking_mem_sharpP, sharpSetPacking_sharpP_parsimoniousHard⟩
+
+/-- `SharpSetPacking` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpSetPacking_sharpP_complete : SharpP.Complete SharpSetPacking :=
+  complete_sharpP_of_parsimoniousComplete sharpSetPacking_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

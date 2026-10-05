@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetFamily.Counting
 import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #ExactCover is parsimoniously `#P`-complete
@@ -80,5 +81,10 @@ theorem sharpExactCover_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpE
 theorem sharpExactCover_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpExactCover :=
   ⟨sharpExactCover_mem_sharpP, sharpExactCover_sharpP_parsimoniousHard⟩
+
+/-- `SharpExactCover` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpExactCover_sharpP_complete : SharpP.Complete SharpExactCover :=
+  complete_sharpP_of_parsimoniousComplete sharpExactCover_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

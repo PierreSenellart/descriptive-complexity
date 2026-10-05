@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.ZeroOneIP.Counting
 import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
 import DescriptiveComplexity.Problems.Knapsack.CountingHardness
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #0-1 integer programming is parsimoniously `#P`-complete
@@ -72,5 +73,10 @@ being written in binary. -/
 theorem sharpZeroOneIP_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpZeroOneIP :=
   ⟨sharpZeroOneIP_mem_sharpP, sharpZeroOneIP_sharpP_parsimoniousHard⟩
+
+/-- `SharpZeroOneIP` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpZeroOneIP_sharpP_complete : SharpP.Complete SharpZeroOneIP :=
+  complete_sharpP_of_parsimoniousComplete sharpZeroOneIP_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

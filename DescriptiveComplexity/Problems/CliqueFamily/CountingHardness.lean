@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.CliqueFamily.Counting
 import DescriptiveComplexity.Problems.CliqueFamily.FromSat
 import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Clique is parsimoniously `#P`-complete
@@ -691,5 +692,10 @@ the threshold size. -/
 theorem sharpClique_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpClique :=
   ⟨sharpClique_mem_sharpP, sharpClique_sharpP_parsimoniousHard⟩
+
+/-- `SharpClique` is `#P`-complete: parsimoniously, hence under subtractive
+reductions. -/
+theorem sharpClique_sharpP_complete : SharpP.Complete SharpClique :=
+  complete_sharpP_of_parsimoniousComplete sharpClique_sharpP_parsimoniousComplete
 
 end DescriptiveComplexity

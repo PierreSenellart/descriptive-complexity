@@ -92,7 +92,8 @@ first-order logic, which Mathlib already has.
   complete under the subtractive reductions of Durand, Hermann and Kolaitis
   (`sharpDnf_sharpP_complete`), under which `#P` is proved closed
   (`SharpPDefinable.of_subtractive`); plain “`#P`-complete” in this library
-  means complete under those. One-call `#P`-complete as well is
+  means complete under those, and every parsimoniously complete problem is
+  (`complete_sharpP_of_parsimoniousComplete`). One-call `#P`-complete as well is
   counting all the independent sets of a graph
   (`sharpAllIndependentSets_sharpP_oneCallComplete`): with `n` pendant leaves at each
   vertex, the independent sets of one size are counted by one base-`2ⁿ` digit
