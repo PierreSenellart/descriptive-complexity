@@ -252,6 +252,17 @@ theorem sharpPDefinable_of_sized {L : Language.{0, 0}} [L.IsRelational]
   ⟨B.withOrder, sizedKernel L B mk i₀ h₀ φ₀, fun A _ _ _ _ =>
     (hC A).trans (witnessCount_sizedKernel L B mk i₀ h₀ φ₀).symm⟩
 
+/-- A set no larger than a number no larger than the universe extends to a set
+of exactly that size: what makes the support of an exact-size count of
+*upward closed* solutions the “at most” decision problem. -/
+theorem exists_superset_ncard_eq {A : Type} [Finite A] {s : Set A} {k : ℕ}
+    (hs : s.ncard ≤ k) (hk : k ≤ Nat.card A) : ∃ t : Set A, s ⊆ t ∧ t.ncard = k := by
+  have hcompl := Set.ncard_add_ncard_compl s
+  obtain ⟨T, hT, hTcard⟩ := Set.exists_subset_card_eq (s := sᶜ) (n := k - s.ncard) (by omega)
+  refine ⟨s ∪ T, Set.subset_union_left, ?_⟩
+  rw [Set.ncard_union_eq (Set.disjoint_left.mpr fun v hv hvT => hT hvT hv), hTcard]
+  omega
+
 /-- Sets, as the assignments of a block whose only variable is unary. -/
 def unaryAssignEquiv (B : SOBlock) [Subsingleton B.ι] (i₀ : B.ι) (h₀ : B.arity i₀ = 1)
     (A : Type) : (A → Prop) ≃ B.Assignment A where

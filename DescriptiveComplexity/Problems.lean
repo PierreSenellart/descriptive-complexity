@@ -72,6 +72,7 @@ import DescriptiveComplexity.Problems.Hamilton.CountingHardness
 import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
 import DescriptiveComplexity.Problems.Hamilton.CountingUndirectedHardness
 import DescriptiveComplexity.Problems.Feedback
+import DescriptiveComplexity.Problems.Feedback.Counting
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner
 import DescriptiveComplexity.Problems.Qbf

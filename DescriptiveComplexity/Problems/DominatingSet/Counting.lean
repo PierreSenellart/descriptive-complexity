@@ -96,17 +96,12 @@ theorem sharpDominatingSet_support_iff (A : Type) [Language.markedGraph.Structur
   · rintro ⟨⟨D, hfin, hdom, hcard⟩, -⟩
     exact ⟨hfin, D, hdom, hcard.le⟩
   · rintro ⟨hfin, D, hdom, hcard⟩
-    have hcompl := Set.ncard_add_ncard_compl {v | D v}
-    have hK := Set.ncard_le_card {v : A | MGMarked v}
-    obtain ⟨T, hT, hTcard⟩ := Set.exists_subset_card_eq
-      (s := {v | D v}ᶜ) (n := {v : A | MGMarked v}.ncard - {v | D v}.ncard) (by omega)
-    have hunion : ({v | D v} ∪ T).ncard = {v : A | MGMarked v}.ncard := by
-      rw [Set.ncard_union_eq (Set.disjoint_left.mpr fun v hv hvT => hT hvT hv), hTcard]
-      omega
-    refine ⟨⟨⟨fun v => v ∈ {v | D v} ∪ T, hfin, fun v => ?_, hunion⟩⟩, inferInstance⟩
+    obtain ⟨T, hDT, hT⟩ := exists_superset_ncard_eq hcard
+      (Set.ncard_le_card {v : A | MGMarked v})
+    refine ⟨⟨⟨fun v => v ∈ T, hfin, fun v => ?_, hT⟩⟩, inferInstance⟩
     rcases hdom v with h | ⟨u, hu, hadj⟩
-    · exact Or.inl (Or.inl h)
-    · exact Or.inr ⟨u, Or.inl hu, hadj⟩
+    · exact Or.inl (hDT h)
+    · exact Or.inr ⟨u, hDT hu, hadj⟩
 
 /-! ### Membership -/
 
