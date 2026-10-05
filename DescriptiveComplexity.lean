@@ -83,6 +83,7 @@ import DescriptiveComplexity.Counting.SharpP
 import DescriptiveComplexity.Counting.Relativized
 import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Counting.Sized
+import DescriptiveComplexity.Counting.SizedPairs
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -2155,6 +2156,25 @@ being one.
   first-order *checkable*: a transitive irreflexive relation containing the
   arcs, each pair of which starts with an arc
   (`DescriptiveComplexity.IsAcyclicClosure.eq_transGen`).
+* **#Feedback Arc Set**
+  (`DescriptiveComplexity.sharpFeedbackArcSet_sharpP_parsimoniousComplete`), counting the
+  sets of *arcs* of exactly the threshold size – the size of a marked binary
+  relation, certified by the monotone bijection between two sets of pairs
+  (`DescriptiveComplexity.sharpPDefinable_of_sizedPairs`). The vertex-splitting
+  reduction from Feedback Vertex Set is not parsimonious and cannot be made
+  so: a superset of a solution is a solution on both sides, and the paddings
+  do not correspond. The reduction is from #1-in-SAT, through instances with
+  no slack: the clique instance of the formula has no clique above its
+  threshold (`DescriptiveComplexity.OneInToClique.ncard_clique_le`), and on such a
+  graph the feedback arc sets of the threshold size of its *conflict split
+  graph* – two parallel paths per conflict, so that a crossing arc alone cuts
+  nothing – are the complements of the cliques, by a count
+  (`DescriptiveComplexity.SplitBundle.internal_of_fas`). The second interpretation is
+  wrong on other graphs, so the two are composed under a promise
+  (`DescriptiveComplexity.OrderedParsimoniousReduction.transPromise`). As for Set
+  Cover, the support is “some feedback arc set has exactly the threshold
+  size” (`DescriptiveComplexity.sharpFeedbackArcSet_support_iff`), not the decision
+  problem.
 * **#Directed Hamilton Circuit**
   (`DescriptiveComplexity.sharpDirHamCircuit_sharpP_parsimoniousComplete`). What is
   counted is the circuit, as its “comes next” relation
@@ -2346,7 +2366,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set (all eight counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set (all nine counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

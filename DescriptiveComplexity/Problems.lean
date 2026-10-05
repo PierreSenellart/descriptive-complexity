@@ -73,6 +73,9 @@ import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
 import DescriptiveComplexity.Problems.Hamilton.CountingUndirectedHardness
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.Feedback.Counting
+import DescriptiveComplexity.Problems.Feedback.CountingArc
+import DescriptiveComplexity.Problems.Feedback.SplitBundle
+import DescriptiveComplexity.Problems.Feedback.CountingArcHardness
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner
 import DescriptiveComplexity.Problems.Qbf
