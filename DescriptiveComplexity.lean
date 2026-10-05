@@ -2127,6 +2127,16 @@ decision reductions, for the same reason.
   cover has exactly the threshold size”
   (`DescriptiveComplexity.sharpSetCover_support_iff`), which implies Set Cover and is
   not implied by it.
+* **#Dominating Set**
+  (`DescriptiveComplexity.sharpDominatingSet_sharpP_parsimoniousComplete`), from #SAT and
+  order-free. The reduction from Set Cover is not parsimonious – a dominating
+  set may hold element vertices, and a smaller cover can be padded with one –
+  so the graph is built to leave the threshold no slack: two adjacent literal
+  vertices per variable and two private vertices seen only from them force a
+  dominating set of as many vertices as there are variables to hold exactly
+  one literal vertex per variable and nothing else
+  (`DescriptiveComplexity.SatToDom.dom_structure`), and dominating the clause vertices
+  is satisfying the clauses.
 * **The machine bridge**: counting accepting runs
   (`DescriptiveComplexity.SharpNTMAccept`, in
   `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
@@ -2281,7 +2291,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set (all six counting the solutions of exactly the threshold size) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set (all seven counting the solutions of exactly the threshold size) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

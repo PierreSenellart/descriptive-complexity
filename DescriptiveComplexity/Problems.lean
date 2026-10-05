@@ -51,6 +51,8 @@ import DescriptiveComplexity.Problems.SetFamily.Counting
 import DescriptiveComplexity.Problems.ExactCoverCounting
 import DescriptiveComplexity.Problems.SetSplitting
 import DescriptiveComplexity.Problems.DominatingSet
+import DescriptiveComplexity.Problems.DominatingSet.Counting
+import DescriptiveComplexity.Problems.DominatingSet.CountingHardness
 import DescriptiveComplexity.Problems.Knapsack
 import DescriptiveComplexity.Problems.Knapsack.Counting
 import DescriptiveComplexity.Problems.Knapsack.CountingHardness
