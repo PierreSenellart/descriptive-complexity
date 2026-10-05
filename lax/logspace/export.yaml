@@ -1,0 +1,192 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: v1.2.2
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.tcDefinable_iff_mem_NL
+- DescriptiveComplexity.mem_NL_iff_tcDefinable_compl
+- DescriptiveComplexity.mem_LOGSPACE_compl_iff
+- DescriptiveComplexity.TCDefinable.compl
+- DescriptiveComplexity.TCDefinable.compl_of_sigmaSOKromDefinable
+- DescriptiveComplexity.SigmaSOKromDefinable.compl_of_tcDefinable
+- DescriptiveComplexity.REACH_NL_complete
+- DescriptiveComplexity.UNREACH_NL_complete
+- DescriptiveComplexity.TwoSAT_NL_complete
+- DescriptiveComplexity.reach_tcDefinable
+- DescriptiveComplexity.reach_hard_of_tcDefinable
+- DescriptiveComplexity.REACHd_LOGSPACE_complete
+- DescriptiveComplexity.UNREACHd_LOGSPACE_complete
+- DescriptiveComplexity.NL_subset_NP
+- DescriptiveComplexity.mem_NL_iff_automaton
+- DescriptiveComplexity.tcDefinable_iff_automaton
+- DescriptiveComplexity.mem_LOGSPACE_iff_automaton
+- DescriptiveComplexity.dtcDefinable_iff_automaton
+- DescriptiveComplexity.FODefinable.dtcDefinable
+- DescriptiveComplexity.DTCDefinable.tcDefinable
+- DescriptiveComplexity.SigmaSOKromDefinable.of_foReduction
+- DescriptiveComplexity.SigmaSOKromDefinable.of_orderedReduction
+- DescriptiveComplexity.sigmaSOKromDefinable_congr
+- DescriptiveComplexity.TCDefinable.of_foReduction
+- DescriptiveComplexity.TCDefinable.of_orderedReduction
+- DescriptiveComplexity.tcDefinable_congr
+- DescriptiveComplexity.DTCDefinable.of_foReduction
+- DescriptiveComplexity.DTCDefinable.of_orderedReduction
+- DescriptiveComplexity.dtcDefinable_congr
+- DescriptiveComplexity.reachable_iso
+- DescriptiveComplexity.detReachable_iso
+- DescriptiveComplexity.twoSatisfiable_iso
+- DescriptiveComplexity.reachd_dtcDefinable
+- DescriptiveComplexity.reachd_hard_of_dtcDefinable
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: L, NL and transitive closure'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @article{immerman1988nondeterministic,
+      author       = {Neil Immerman},
+      title        = {Nondeterministic Space is Closed Under Complementation},
+      journal      = {{SIAM} J. Comput.},
+      volume       = {17},
+      number       = {5},
+      pages        = {935--938},
+      year         = {1988},
+      doi          = {10.1137/0217058},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{szelepcsenyi1988method,
+      author       = {R{\'{o}}bert Szelepcs{\'{e}}nyi},
+      title        = {The Method of Forced Enumeration for Nondeterministic Automata},
+      journal      = {Acta Informatica},
+      volume       = {26},
+      number       = {3},
+      pages        = {279--284},
+      year         = {1988},
+      doi          = {10.1007/BF00299636},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{gradel1992capturing,
+      author       = {Erich Gr{\"{a}}del},
+      title        = {Capturing Complexity Classes by Fragments of Second-Order
+                      Logic},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {101},
+      number       = {1},
+      pages        = {35--57},
+      year         = {1992},
+      doi          = {10.1016/0304-3975(92)90149-A},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{immerman1987languages,
+      author       = {Neil Immerman},
+      title        = {Languages that Capture Complexity Classes},
+      journal      = {{SIAM} J. Comput.},
+      volume       = {16},
+      number       = {4},
+      pages        = {760--778},
+      year         = {1987},
+      doi          = {10.1137/0216051},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{jones1975space,
+      author       = {Neil D. Jones},
+      title        = {Space-Bounded Reducibility among Combinatorial Problems},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {11},
+      number       = {1},
+      pages        = {68--85},
+      year         = {1975},
+      doi          = {10.1016/S0022-0000(75)80050-X},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @book{immerman1999descriptive,
+      author       = {Neil Immerman},
+      title        = {Descriptive Complexity},
+      series       = {Graduate Texts in Computer Science},
+      publisher    = {Springer},
+      year         = {1999},
+      isbn         = {978-1-4612-6809-3},
+      doi          = {10.1007/978-1-4612-0539-5},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+restated:
+  DescriptiveComplexity.DecisionProblem.compl: Complement.DecisionProblem.compl
+  DescriptiveComplexity.SOAtom: SecondOrderAtoms.SOAtom
+  DescriptiveComplexity.SOAtom.Holds: SecondOrderAtoms.SOAtom.Holds
+  DescriptiveComplexity.KromLit: KromFragment.KromLit
+  DescriptiveComplexity.KromLit.Holds: KromFragment.KromLit.Holds
+  DescriptiveComplexity.KromLit.slotHolds: KromFragment.KromLit.slotHolds
+  DescriptiveComplexity.KromClause: KromFragment.KromClause
+  DescriptiveComplexity.KromClause.Holds: KromFragment.KromClause.Holds
+  DescriptiveComplexity.KromProgram: KromFragment.KromProgram
+  DescriptiveComplexity.KromProgram.Holds: KromFragment.KromProgram.Holds
+  DescriptiveComplexity.SigmaSOKromDefinable: KromFragment.SigmaSOKromDefinable
+  DescriptiveComplexity.TCSpec: TransitiveClosure.TCSpec
+  DescriptiveComplexity.TCSpec.Node: TransitiveClosure.TCSpec.Node
+  DescriptiveComplexity.TCSpec.Step: TransitiveClosure.TCSpec.Step
+  DescriptiveComplexity.TCSpec.Reach: TransitiveClosure.TCSpec.Reach
+  DescriptiveComplexity.TCSpec.IsSrc: TransitiveClosure.TCSpec.IsSrc
+  DescriptiveComplexity.TCSpec.IsTgt: TransitiveClosure.TCSpec.IsTgt
+  DescriptiveComplexity.TCSpec.Accepts: TransitiveClosure.TCSpec.Accepts
+  DescriptiveComplexity.TCDefinable: TransitiveClosure.TCDefinable
+  DescriptiveComplexity.TCSpec.detVar: DeterministicTransitiveClosure.TCSpec.detVar
+  DescriptiveComplexity.TCSpec.detStep: DeterministicTransitiveClosure.TCSpec.detStep
+  DescriptiveComplexity.TCSpec.det: DeterministicTransitiveClosure.TCSpec.det
+  DescriptiveComplexity.DTCDefinable: DeterministicTransitiveClosure.DTCDefinable
+  DescriptiveComplexity.HeadMove: HeadAutomata.HeadMove
+  DescriptiveComplexity.HeadMove.Holds: HeadAutomata.HeadMove.Holds
+  DescriptiveComplexity.HeadAutomaton: HeadAutomata.HeadAutomaton
+  DescriptiveComplexity.HeadAutomaton.Config: HeadAutomata.HeadAutomaton.Config
+  DescriptiveComplexity.HeadAutomaton.reading: HeadAutomata.HeadAutomaton.reading
+  DescriptiveComplexity.HeadAutomaton.Step: HeadAutomata.HeadAutomaton.Step
+  DescriptiveComplexity.HeadAutomaton.Accepts: HeadAutomata.HeadAutomaton.Accepts
+  DescriptiveComplexity.HeadAutomaton.IsDeterministic: HeadAutomata.HeadAutomaton.IsDeterministic
+  FirstOrder.Language.stGraph: Reachability.stGraph
+  DescriptiveComplexity.Reachable: Reachability.Reachable
+  DescriptiveComplexity.DetEdge: DeterministicReachability.DetEdge
+  DescriptiveComplexity.DetReachable: DeterministicReachability.DetReachable
+  DescriptiveComplexity.SatOcc.IsCl: TwoSat.SatOcc.IsCl
+  DescriptiveComplexity.SatOcc.PosIn: TwoSat.SatOcc.PosIn
+  DescriptiveComplexity.SatOcc.NegIn: TwoSat.SatOcc.NegIn
+  DescriptiveComplexity.SatOcc.OccIn: TwoSat.SatOcc.OccIn
+  DescriptiveComplexity.WidthAtMostTwo: TwoSat.WidthAtMostTwo
+  DescriptiveComplexity.TwoSatisfiable: TwoSat.TwoSatisfiable
+  DescriptiveComplexity.FODefinable: FirstOrderDefinability.FODefinable
+  FirstOrder.Language.stGraphRel: Reachability.stGraphRel
+  FirstOrder.Language.sgEdge: Reachability.sgEdge
+  FirstOrder.Language.sgSource: Reachability.sgSource
+  FirstOrder.Language.sgTarget: Reachability.sgTarget
+  DescriptiveComplexity.SGEdge: Reachability.SGEdge
+  DescriptiveComplexity.SGSource: Reachability.SGSource
+  DescriptiveComplexity.SGTarget: Reachability.SGTarget
