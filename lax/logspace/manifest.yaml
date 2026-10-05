@@ -98,3 +98,6 @@ bibEntries:
       doi          = {10.1007/978-1-4612-0539-5},
       bibsource    = {dblp computer science bibliography, https://dblp.org}
     }
+issue:
+  repositoryId: 1320232165
+  number: 171
