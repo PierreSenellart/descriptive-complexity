@@ -76,81 +76,17 @@ first-order logic, which Mathlib already has.
   deterministic) polynomial-time Turing machine (`mem_NP_iff_le_ntmAccept`,
   `mem_PTIME_iff_le_dtmAccept`); the other classes are matched against their
   machines in the table below.
-* Counting: `#P`, defined as the counting problems that count the witnesses
-  of an ∃SO sentence over ordered structures, with #SAT *parsimoniously*
-  complete for it (`sharpSat_sharpP_parsimoniousComplete`) – the Tseitin
-  reduction again, its gate variables being functionally determined. This is
-  stronger than the `#P`-completeness of the literature, which allows Turing
-  reductions: NP is exactly the class of supports of `#P`
-  (`mem_NP_iff_exists_sharpP_support`), and a parsimoniously `#P`-hard problem
-  with a polynomial-time decision version would put NP inside PTIME
-  (`NP_subset_PTIME_of_sharpP_parsimoniousHard`). For #DNF and its like there
-  is a weaker notion, still stronger than Turing hardness: one oracle call, at
-  an instance defined first-order, followed by arithmetic on the answer and on
-  definable cardinalities. #DNF is one-call `#P`-complete
-  (`sharpDnf_sharpP_oneCallComplete`), by `#SAT(φ) = 2ⁿ − #DNF(¬φ)`; it is also
-  complete under the subtractive reductions of Durand, Hermann and Kolaitis
-  (`sharpDnf_sharpP_complete`), under which `#P` is proved closed
-  (`SharpPDefinable.of_subtractive`); plain “`#P`-complete” in this library
-  means complete under those, and every parsimoniously complete problem is
-  (`complete_sharpP_of_parsimoniousComplete`). One-call `#P`-complete as well is
-  counting all the independent sets of a graph
-  (`sharpAllIndependentSets_sharpP_oneCallComplete`): with `n` pendant leaves at each
-  vertex, the independent sets of one size are counted by one base-`2ⁿ` digit
-  of the answer, which a quotient and a remainder extract; stretching every
-  edge then takes the problem to bipartite graphs (`sharpBIS_sharpP_oneCallComplete`),
-  and to its dual #PP2DNF (`sharpPP2DNF_sharpP_oneCallComplete`). From there,
-  the probability of the query `R(x), S(x, y), T(y)` over a probabilistic
-  database is one-call `#P`-complete to compute
-  (`possibleWorlds_h0_sharpP_oneCallComplete`), while counting the possible
-  worlds of any first-order query is in `#P` (`possibleWorlds_mem_sharpP`).
-  With a probability per fact, written in binary in the instance, the
-  probability of any first-order query is a ratio of two `#P` numbers
-  (`funcProb_holdsEvent_eq_ratio`, `weightedWorlds_mem_sharpP`), and for that
-  query the numerator is one-call `#P`-complete
-  (`weightedWorlds_h0_sharpP_oneCallComplete`).
-  At the other end, FP, the polynomial-time computable functions, is taken in
-  its natural-number-valued part and defined by the quantitative logic of Arenas, Muñoz
-  and Riveros, QFO(LFP), which captures it over ordered structures (their
-  theorem): a counting problem is in FP when it is the value of an expression
-  built by sums and products over the elements from polynomial-time
-  conditions. The class is closed under parsimonious reductions, its supports
-  are in PTIME (`support_mem_PTIME_of_mem_FP`), and none of its problems is
-  parsimoniously `#P`-hard unless NP ⊆ PTIME. FP has a complete problem under
-  parsimonious reductions, the function counterpart of circuit value: the
-  number written in binary by the outputs of a circuit
-  (`circuitNumber_FP_parsimoniousComplete`). Hardness goes through a normal
-  form, proved inside the logic: every function of FP has its binary digits
-  computed by a least fixed point (`FPDefinable.digitDefinable`), iterated
-  sums and products included. The same normal form gives FP its machine
-  bridge: the number a deterministic machine leaves on its marked output cells
-  is complete for FP (`dtmNumber_FP_parsimoniousComplete`), so a function is
-  in FP exactly when it reduces to it (`mem_FP_iff_le_dtmNumber`), and so is
-  the number written by unit propagation on a Horn formula.
-  #3SAT, #1-in-SAT, #Exact Cover, #Knapsack and #0-1 Integer
-  Programming are parsimoniously complete as well: the first two by clause
-  splittings whose fresh variables are forced, the last two because a solution
-  has exactly one addition certificate. So are #Clique, #Independent Set,
-  #Vertex Cover, #Set Packing, #Set Cover, #Hitting Set, #Dominating Set and
-  #Feedback Vertex Set, counting the solutions of exactly the threshold size:
-  the size is certified by the one monotone bijection with the marked set
-  (and, for Feedback Vertex Set, acyclicity by the transitive closure, the one
-  order among many that certify it), and the reductions to #Clique and
-  #Dominating Set are new ones, built so that the threshold leaves a solution
-  no slack. #Feedback Arc Set is reached the same way, through instances with
-  no slack: a superset of a feedback arc set is one, so the reduction composes
-  two interpretations of which the second is correct only on the outputs of
-  the first. And so is #Steiner Tree, connectivity being certified by a
-  reachability clock that walks the order of the instance. And so is #Directed Hamilton Circuit, counting the
-  circuits of a digraph: its reduction lays one two-way row per variable, with
-  a detour through a clause that a row cannot avoid in the direction making
-  the literal true, so that a clause is visited once exactly when one of its
-  literals is true. The undirected #Hamilton Circuit follows, a circuit being
-  its set of edges: splitting each vertex in three turns a directed circuit
-  into one undirected circuit, not two.
-  The machine bridge holds here too: a counting problem is in `#P`
-  exactly when it reduces parsimoniously to counting the accepting runs of a
-  nondeterministic polynomial-time machine (`mem_sharpP_iff_le_sharpNtmAccept`).
+* Counting: `#P` as the number of witnesses of an ∃SO sentence, with #SAT
+  *parsimoniously* complete for it (`sharpSat_sharpP_parsimoniousComplete`), a
+  stronger statement than the Turing completeness of the literature; weaker
+  notions, subtractive and one-call reductions, cover #DNF and the hardness of
+  query evaluation over probabilistic databases
+  (`weightedWorlds_h0_sharpP_oneCallComplete`). FP, the polynomial-time
+  functions, is defined by the quantitative logic of Arenas, Muñoz and
+  Riveros, and has complete problems too (`circuitNumber_FP_parsimoniousComplete`)
+  through a normal form proved inside the logic (`FPDefinable.digitDefinable`).
+  Both classes have their machine bridge (`mem_sharpP_iff_le_sharpNtmAccept`,
+  `mem_FP_iff_le_dtmNumber`).
 * Lower bounds, none of them conditional on a complexity assumption:
   Ehrenfeucht–Fraïssé games on finite structures, and the inexpressibility of
   EVEN even when the sentence is given a linear order (`even_not_foDefinable`),
