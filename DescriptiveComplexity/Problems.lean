@@ -63,6 +63,7 @@ import DescriptiveComplexity.Problems.ZeroOneIP.CountingHardness
 import DescriptiveComplexity.Problems.JobSequencing
 import DescriptiveComplexity.Problems.ThreeDimMatching
 import DescriptiveComplexity.Problems.Hamilton
+import DescriptiveComplexity.Problems.Hamilton.Counting
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner

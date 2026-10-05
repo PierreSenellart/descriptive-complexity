@@ -2137,6 +2137,14 @@ decision reductions, for the same reason.
   one literal vertex per variable and nothing else
   (`DescriptiveComplexity.SatToDom.dom_structure`), and dominating the clause vertices
   is satisfying the clauses.
+* **#Directed Hamilton Circuit** (`DescriptiveComplexity.SharpDirHamCircuit`, in
+  `DescriptiveComplexity.Problems.Hamilton.Counting`) is in `#P`
+  (`DescriptiveComplexity.sharpDirHamCircuit_mem_sharpP`); its hardness is not
+  established. What is counted is the circuit, as its “comes next” relation
+  (`DescriptiveComplexity.IsCircuit`), not the linear orders the decision problem
+  guesses, of which a circuit through `n` vertices has `n`. The counting kernel
+  guesses the one that starts at the least element of the instance
+  (`DescriptiveComplexity.card_rootedTour_eq`).
 * **The machine bridge**: counting accepting runs
   (`DescriptiveComplexity.SharpNTMAccept`, in
   `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
