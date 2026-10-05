@@ -9,6 +9,7 @@ import DescriptiveComplexity.Numbers.Binary
 import DescriptiveComplexity.Numbers.Digits
 import DescriptiveComplexity.Numbers.DigitExtract
 import DescriptiveComplexity.Numbers.BinCount
+import DescriptiveComplexity.Numbers.BinEnum
 import DescriptiveComplexity.Numbers.Wide
 
 /-!
@@ -60,6 +61,11 @@ digit of a sum of powers. In the other direction a binary number of the
 instance can act as a *weight* in a count:
 `DescriptiveComplexity.Numbers.BinCount` shows that the sets of bits below it
 are as many as its value.
+
+For an *encoder* of binary numbers, `DescriptiveComplexity.Numbers.BinEnum`
+holds the decoding once and for all: when the positions of the encoded
+universe are enumerated in increasing order, the `Nat.testBit` digits of a
+number decode to that number, whatever else the universe contains.
 
 That the choice is part of the statement and not bookkeeping is itself a
 theorem: `DescriptiveComplexity.no_unary_encoding`

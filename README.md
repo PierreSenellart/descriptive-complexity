@@ -104,6 +104,11 @@ first-order logic, which Mathlib already has.
   database is one-call `#P`-complete to compute
   (`possibleWorlds_h0_sharpP_oneCallComplete`), while counting the possible
   worlds of any first-order query is in `#P` (`possibleWorlds_mem_sharpP`).
+  With a probability per fact, written in binary in the instance, the
+  probability of any first-order query is a ratio of two `#P` numbers
+  (`funcProb_holdsEvent_eq_ratio`, `weightedWorlds_mem_sharpP`), and for that
+  query the numerator is one-call `#P`-complete
+  (`weightedWorlds_h0_sharpP_oneCallComplete`).
   #3SAT, #1-in-SAT, #Exact Cover, #Knapsack and #0-1 Integer
   Programming are parsimoniously complete as well: the first two by clause
   splittings whose fresh variables are forced, the last two because a solution
@@ -342,7 +347,8 @@ build times down.
   and a decoder with no well-formedness condition.
   A third one, `DescriptiveComplexity/Examples/ProbabilisticQueries.lean`, does
   the same for a counting problem, query evaluation over probabilistic
-  databases, so far without the concrete encoding step.
+  databases, ending with a concrete database type, its computed weighted
+  count, its faithful encoding and a decoder.
 * **Planned work**: `ROADMAP.md` – locality theorems and 0-1 laws for the
   inexpressibility track, the graph-isomorphism degree, counting problems and
   `#P`, finer reduction notions, and further complete problems for PTIME,

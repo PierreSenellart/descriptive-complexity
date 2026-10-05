@@ -85,11 +85,14 @@ import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.Counting.SizedPairs
 import DescriptiveComplexity.Counting.Post
+import DescriptiveComplexity.Counting.Encoding
 import DescriptiveComplexity.Counting.PossibleWorlds
 import DescriptiveComplexity.Counting.Probability
 import DescriptiveComplexity.Counting.Reduction
 import DescriptiveComplexity.Counting.RelClosure
 import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.UnitWeights
+import DescriptiveComplexity.Counting.WeightedWorlds
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -2390,8 +2393,40 @@ pulled relations hold only of points of the domain
   natural weights, the fact that the probability of an event is the ratio of
   its weighted count to that of the sure event
   (`DescriptiveComplexity.ProbAssignment.funcProb_ofWeights`). This is the
-  concrete side of query evaluation over a tuple-independent database; the
-  counting problem of weighted worlds it calls for is not built yet.
+  concrete side of query evaluation over a tuple-independent database.
+* **Weighted worlds** (`DescriptiveComplexity.Counting.WeightedWorlds`): the
+  same with a probability per uncertain fact, given by two weights written in
+  binary in the instance (`DescriptiveComplexity.weightedLang`).
+  `DescriptiveComplexity.WeightedWorlds φ` is in `#P` for every first-order
+  `φ` (`DescriptiveComplexity.weightedWorlds_mem_sharpP`), and on a linearly
+  ordered instance it is the sum, over the worlds satisfying `φ`, of the
+  product of the weights of the facts
+  (`DescriptiveComplexity.weightedWorlds_eq_weightSum`); on an instance whose
+  position order is not linear it is zero
+  (`DescriptiveComplexity.weightedWorlds_of_not_isLinOrd`). A weight cannot
+  multiply a count directly, so the witness carries one number per open fact
+  below the weight that fact takes: “below” is first-order
+  (`DescriptiveComplexity.numLtFormula`), and the numbers below a weight are
+  as many as the weight (`DescriptiveComplexity.card_binNum_lt`). The worlds
+  being the valuations of the open facts, the probability of `φ` is
+  `WeightedWorlds φ / WeightedWorlds ⊤`
+  (`DescriptiveComplexity.funcProb_holdsEvent_eq_ratio`): **the probability of
+  any first-order query over a tuple-independent database is a ratio of two
+  `#P` numbers**. The uniform problem is the case of weight one
+  (`DescriptiveComplexity.possibleWorlds_ordered_parsimonious_weightedWorlds`,
+  in `DescriptiveComplexity.Counting.UnitWeights`), so for the query
+  `R(x), S(x, y), T(y)` the numerator is one-call `#P`-complete
+  (`DescriptiveComplexity.weightedWorlds_h0_sharpP_oneCallComplete`). The
+  tutorial ends with a concrete database type, its faithful encoding
+  (`DescriptiveComplexity.probDbEncoding_countFaithful`) and a computable
+  decoder (`DescriptiveComplexity.probDbDecoding`), on two pieces of
+  shared machinery: `DescriptiveComplexity.Numbers.BinEnum`, the decoding of
+  the binary digits an encoder writes, which
+  `DescriptiveComplexity.Encoding.BinarySubsetSum` uses too, and
+  `DescriptiveComplexity.Encoding.CountFaithful` and
+  `DescriptiveComplexity.CountDecoding`
+  (`DescriptiveComplexity.Counting.Encoding`), the counting forms of a faithful
+  encoding and of a computable decoding.
 
 ## Shared encodings
 

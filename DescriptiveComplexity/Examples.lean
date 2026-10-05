@@ -35,6 +35,8 @@ to be read top to bottom as a template for new formalizations.
   count of the possible worlds of the query `R(x), S(x, y), T(y)` is one-call
   `#P`-complete ([Dalvi and Suciu 2012][dalvi2012dichotomy]), by a
   parsimonious reduction from #PP2DNF; membership in `#P` holds for every
-  first-order query. It works on the abstract instances directly, with no
-  concrete encoding step.
+  first-order query. With probabilities in the instance, written in binary,
+  the probability of any first-order query is a ratio of two `#P` numbers; a
+  concrete database type, computed, faithfully encoded and decoded, closes
+  the file.
 -/
