@@ -138,12 +138,11 @@ theorem exactlyCoversOn_iff_exists (Ep Fp : A → Prop) (Mp : A → A → Prop) 
     ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, ExactCoverBy Ep Fp Mp G :=
   Iff.rfl
 
-/-- Exactness in the “exactly one” form: covering plus disjointness is one
-covering set per element. -/
-theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
-    ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, (∀ s, G s → Fp s) ∧
-      ∀ x, Ep x → ∃! s, G s ∧ Mp x s := by
-  refine exists_congr fun G => and_congr_right fun _ => ?_
+/-- Exactness of a given subfamily in the “exactly one” form: covering plus
+disjointness is one covering set per element. -/
+theorem exactCoverBy_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) (G : A → Prop) :
+    ExactCoverBy Ep Fp Mp G ↔ (∀ s, G s → Fp s) ∧ ∀ x, Ep x → ∃! s, G s ∧ Mp x s := by
+  refine and_congr_right fun _ => ?_
   constructor
   · rintro ⟨hcov, hdisj⟩ x hx
     obtain ⟨s, hs, hms⟩ := hcov x hx
@@ -157,6 +156,13 @@ theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) 
     · rintro ⟨h1, h2⟩
       obtain ⟨s₀, -, huniq⟩ := h x hx
       exact hne ((huniq s ⟨hs, h1⟩).trans (huniq s' ⟨hs', h2⟩).symm)
+
+/-- Exactness in the “exactly one” form: covering plus disjointness is one
+covering set per element. -/
+theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
+    ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, (∀ s, G s → Fp s) ∧
+      ∀ x, Ep x → ∃! s, G s ∧ Mp x s :=
+  exists_congr fun G => exactCoverBy_iff_unique Ep Fp Mp G
 
 /-- Some two-coloring of the ground elements *splits* every set of the
 family: no set is monochromatic. Like `DescriptiveComplexity.ExactlyCoversOn` this

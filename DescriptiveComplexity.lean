@@ -2077,6 +2077,15 @@ decision reductions, for the same reason.
   in exactly-one clauses for #1-in-SAT. The reduction of 1-in-SAT to Exact Cover
   is parsimonious as it stands, its ground elements being the *variables* of
   the formula and not every element of the instance.
+* **#Knapsack** (`DescriptiveComplexity.sharpKnapsack_sharpP_parsimoniousComplete`),
+  with binary weights. Karp's reduction from Exact Cover has one item per set of
+  the family and is parsimonious as it stands
+  (`DescriptiveComplexity.KnapRed.solEquiv`). Membership is where counting asks for
+  more than a `Σ₁` definition: the certificate carries the running totals and
+  the carries of an addition walk, and a count of certificates is a count of
+  solutions only if a solution has one. Totals and carries are forced where
+  the walk reads them (`DescriptiveComplexity.isChain_agree`), and the counting kernel
+  forbids them elsewhere (`DescriptiveComplexity.sharpKnapsackKernel`).
 * **The machine bridge**: counting accepting runs
   (`DescriptiveComplexity.SharpNTMAccept`, in
   `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
@@ -2231,7 +2240,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack (binary weights) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a
