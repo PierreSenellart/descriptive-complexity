@@ -64,6 +64,11 @@ import DescriptiveComplexity.Problems.JobSequencing
 import DescriptiveComplexity.Problems.ThreeDimMatching
 import DescriptiveComplexity.Problems.Hamilton
 import DescriptiveComplexity.Problems.Hamilton.Counting
+import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
+import DescriptiveComplexity.Problems.Hamilton.CountingGadget
+import DescriptiveComplexity.Problems.Hamilton.CountingForward
+import DescriptiveComplexity.Problems.Hamilton.CountingReverse
+import DescriptiveComplexity.Problems.Hamilton.CountingHardness
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner

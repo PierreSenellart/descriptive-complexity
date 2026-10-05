@@ -2143,14 +2143,29 @@ being one.
   one literal vertex per variable and nothing else
   (`DescriptiveComplexity.SatToDom.dom_structure`), and dominating the clause vertices
   is satisfying the clauses.
-* **#Directed Hamilton Circuit** (`DescriptiveComplexity.SharpDirHamCircuit`, in
-  `DescriptiveComplexity.Problems.Hamilton.Counting`) is in `#P`
-  (`DescriptiveComplexity.sharpDirHamCircuit_mem_sharpP`); its hardness is not
-  established. What is counted is the circuit, as its “comes next” relation
+* **#Directed Hamilton Circuit**
+  (`DescriptiveComplexity.sharpDirHamCircuit_sharpP_parsimoniousComplete`). What is
+  counted is the circuit, as its “comes next” relation
   (`DescriptiveComplexity.IsCircuit`), not the linear orders the decision problem
-  guesses, of which a circuit through `n` vertices has `n`. The counting kernel
+  guesses, of which a circuit through `n` vertices has `n`; the counting kernel
   guesses the one that starts at the least element of the instance
-  (`DescriptiveComplexity.card_rootedTour_eq`).
+  (`DescriptiveComplexity.card_rootedTour_eq`). Hardness is a *relativized* reduction
+  from #1-in-SAT
+  (`DescriptiveComplexity.sharpOneInSat_rel_ordered_parsimonious_sharpDirHamCircuit`),
+  a circuit spanning the universe, and not the one of the decision problem,
+  which goes through Vertex Cover and is not parsimonious. Each variable has a
+  two-way row through its occurrences, traversed from the left when it is true
+  and from the right when it is false; inside an occurrence the row is one-way
+  in the direction that makes the literal true, *through the clause vertex*, so
+  a clause is visited once per true literal
+  (`DescriptiveComplexity.Problems.Hamilton.CountingGadget`). A circuit is read
+  locally – every vertex is left once and reached once
+  (`DescriptiveComplexity.IsCircuit.local`) – which forces each row to be swept in one
+  direction (`DescriptiveComplexity.HamGadget.Circ.rowT`); and the relation of a model
+  is a circuit because a potential increases along it
+  (`DescriptiveComplexity.isCircuit_of_potential`), no enumeration being written.
+  The circuits are the models, bijectively
+  (`DescriptiveComplexity.HamGadget.modelEquiv`).
 * **The machine bridge**: counting accepting runs
   (`DescriptiveComplexity.SharpNTMAccept`, in
   `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
@@ -2305,7 +2320,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set (all seven counting the solutions of exactly the threshold size) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set (all seven counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

@@ -30,7 +30,8 @@ A circuit has no first-order certificate of its own, so the counting kernel
 (`DescriptiveComplexity.sharpDirHamKernel`) still guesses an order – but the one that
 starts at the least element of the instance: every circuit has exactly one
 (`DescriptiveComplexity.exists_rooted_order`, `DescriptiveComplexity.linOrd_eq_of_cycSucc`).
-Hence `DescriptiveComplexity.sharpDirHamCircuit_mem_sharpP`.
+Hence `DescriptiveComplexity.sharpDirHamCircuit_mem_sharpP`. Parsimonious hardness is
+in `DescriptiveComplexity.Problems.Hamilton.CountingHardness`.
 -/
 
 namespace DescriptiveComplexity
