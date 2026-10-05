@@ -308,32 +308,39 @@ does. -/
 noncomputable def dhcRootClause : dhcLang.Sentence :=
   fo% ∀ x, (∀ z, dhcOrdSym(x, z)) → ∀ y, dhcVarSym(x, y)
 
+/-- The guessed relation is a linear order carrying a tour – of the arcs when
+`dir` is true, of the edges otherwise – and it starts at the least element of
+the instance. -/
+noncomputable def rootedHamKernel (dir : Bool) : dhcLang.Sentence :=
+  orderFreeKernel hamGuessBlock (hamKernel dir) ⊓ dhcRootClause
+
 /-- The first-order kernel of #Directed Hamilton Circuit: the guessed relation
 is a linear order carrying a tour, and it starts at the least element of the
 instance. -/
 noncomputable def sharpDirHamKernel : dhcLang.Sentence :=
-  orderFreeKernel hamGuessBlock (hamKernel true) ⊓ dhcRootClause
+  rootedHamKernel true
 
 section Kernel
 
 variable {A : Type} [Language.digraph.Structure A] [LinearOrder A]
 
-/-- Realization of the kernel of #Directed Hamilton Circuit. -/
-theorem realize_sharpDirHamKernel (ρ : hamGuessBlock.Assignment A) :
+/-- Realization of the rooted tour kernel. -/
+theorem realize_rootedHamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
     (@Sentence.Realize dhcLang A
-        (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) sharpDirHamKernel) ↔
+        (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) (rootedHamKernel dir)) ↔
       IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧
-        (∀ x y : A, SuccOf (fun x y : A => ρ .le ![x, y]) x y → DGArc x y) ∧
-        (∀ x y : A, (∀ z, ρ .le ![x, z]) → (∀ z, ρ .le ![z, y]) → DGArc y x) ∧
+        (∀ x y : A, SuccOf (fun x y : A => ρ .le ![x, y]) x y →
+          (if dir then DGArc x y else DGEdge x y)) ∧
+        (∀ x y : A, (∀ z, ρ .le ![x, z]) → (∀ z, ρ .le ![z, y]) →
+          (if dir then DGArc y x else DGEdge y x)) ∧
         ∀ x : A, IsBot x → ∀ y, ρ .le ![x, y] := by
-  have hk := realize_hamKernel true ρ
-  simp only [↓reduceIte] at hk
+  have hk := realize_hamKernel dir ρ
   let := hamGuessBlock.structure ρ
   have hexp : (LHom.sumMap (LHom.sumInl : Language.digraph →ᴸ
       Language.digraph.sum Language.order) (LHom.id hamGuessBlock.lang)).IsExpansionOn A :=
     ⟨fun f _ => by cases f <;> rfl, fun r _ => by cases r <;> rfl⟩
   have hfree := LHom.realize_onSentence A (LHom.sumMap (LHom.sumInl : Language.digraph →ᴸ
-    Language.digraph.sum Language.order) (LHom.id hamGuessBlock.lang)) (hamKernel true)
+    Language.digraph.sum Language.order) (LHom.id hamGuessBlock.lang)) (hamKernel dir)
   have hVar : ∀ w : Fin 2 → A, RelMap (L := dhcLang) (M := A) dhcVarSym w ↔ ρ .le w :=
     fun _ => Iff.rfl
   have hOrd : ∀ w : Fin 2 → A, RelMap (L := dhcLang) (M := A) dhcOrdSym w ↔ w 0 ≤ w 1 :=
@@ -345,10 +352,22 @@ theorem realize_sharpDirHamKernel (ρ : hamGuessBlock.Assignment A) :
       Matrix.cons_val_zero, Matrix.cons_val_one]
     exact ⟨fun h x hx y => h (fun _ => x) (fun z => hx (z 0)) fun _ => y,
       fun h i hi y => h (i 0) (fun z => hi fun _ => z) (y 0)⟩
-  rw [sharpDirHamKernel, Sentence.Realize, Formula.realize_inf]
+  rw [rootedHamKernel, Sentence.Realize, Formula.realize_inf]
   rw [← and_assoc, ← and_assoc]
   refine and_congr (hfree.trans (hk.trans ?_)) hroot
   rw [and_assoc]
+
+/-- Realization of the kernel of #Directed Hamilton Circuit. -/
+theorem realize_sharpDirHamKernel (ρ : hamGuessBlock.Assignment A) :
+    (@Sentence.Realize dhcLang A
+        (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) sharpDirHamKernel) ↔
+      IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧
+        (∀ x y : A, SuccOf (fun x y : A => ρ .le ![x, y]) x y → DGArc x y) ∧
+        (∀ x y : A, (∀ z, ρ .le ![x, z]) → (∀ z, ρ .le ![z, y]) → DGArc y x) ∧
+        ∀ x : A, IsBot x → ∀ y, ρ .le ![x, y] := by
+  have h := realize_rootedHamKernel true ρ
+  simp only [↓reduceIte] at h
+  exact h
 
 /-- A binary relation, as an assignment of the block guessing the order. -/
 def hamAssignEquiv (A : Type) : hamGuessBlock.Assignment A ≃ (A → A → Prop) where

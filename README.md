@@ -97,7 +97,9 @@ first-order logic, which Mathlib already has.
   circuits of a digraph: its reduction lays one two-way row per variable, with
   a detour through a clause that a row cannot avoid in the direction making
   the literal true, so that a clause is visited once exactly when one of its
-  literals is true.
+  literals is true. The undirected #Hamilton Circuit follows, a circuit being
+  its set of edges: splitting each vertex in three turns a directed circuit
+  into one undirected circuit, not two.
   The machine bridge holds here too: a counting problem is in `#P`
   exactly when it reduces parsimoniously to counting the accepting runs of a
   nondeterministic polynomial-time machine (`mem_sharpP_iff_le_sharpNtmAccept`).
@@ -141,7 +143,7 @@ for it under FO reductions.
 | **NEXPTIME** | ∃SO over an exponential expansion (NP read there); equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | **EXPSPACE** | SO(PFP), i.e., PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | **RE** | ∃SO[new] (∃SO with value invention, unbounded) | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| **#P** (a counting class) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe, i.e., #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set (all seven counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the usual `#P`-completeness |
+| **#P** (a counting class) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe, i.e., #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set (all seven counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the usual `#P`-completeness |
 | **the degree of a problem** – `below Q₀`, e.g., **GI** | none: a downward closure under FO reductions rather than a logic | – | for GI: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

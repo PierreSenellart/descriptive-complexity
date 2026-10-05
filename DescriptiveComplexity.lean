@@ -2166,6 +2166,20 @@ being one.
   (`DescriptiveComplexity.isCircuit_of_potential`), no enumeration being written.
   The circuits are the models, bijectively
   (`DescriptiveComplexity.HamGadget.modelEquiv`).
+* **#Hamilton Circuit**
+  (`DescriptiveComplexity.sharpHamCircuit_sharpP_parsimoniousComplete`), for undirected
+  graphs, a circuit being its **set of edges**
+  (`DescriptiveComplexity.IsUCircuit`) and not one of its two orientations. The
+  counting kernel fixes the orientation as well as the cut: from the least
+  element the guessed order goes first to the smaller of its two neighbours
+  (`DescriptiveComplexity.Oriented`, `DescriptiveComplexity.card_orientedTour_eq`). Hardness is
+  from the directed problem, order-free: each vertex is split into a path of
+  three, an arc joining the exit of one to the entry of the next, and the
+  middle vertex forces an undirected circuit to traverse every path the same
+  way round (`DescriptiveComplexity.Split.forward_all`), by induction along the
+  circuit (`DescriptiveComplexity.IsCircuit.induction`). So a directed circuit becomes
+  one edge set (`DescriptiveComplexity.Split.splitEquiv`); doubling each edge, the
+  reduction of the library in the other direction, would give two.
 * **The machine bridge**: counting accepting runs
   (`DescriptiveComplexity.SharpNTMAccept`, in
   `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
@@ -2320,7 +2334,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set (all seven counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set (all seven counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

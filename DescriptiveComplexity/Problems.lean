@@ -69,6 +69,8 @@ import DescriptiveComplexity.Problems.Hamilton.CountingGadget
 import DescriptiveComplexity.Problems.Hamilton.CountingForward
 import DescriptiveComplexity.Problems.Hamilton.CountingReverse
 import DescriptiveComplexity.Problems.Hamilton.CountingHardness
+import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
+import DescriptiveComplexity.Problems.Hamilton.CountingUndirectedHardness
 import DescriptiveComplexity.Problems.Feedback
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner

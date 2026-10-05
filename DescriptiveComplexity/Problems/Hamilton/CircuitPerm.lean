@@ -42,7 +42,62 @@ theorem nextIdx_injective {n : ℕ} : Function.Injective (nextIdx : Fin n → Fi
   rw [Nat.mod_eq_of_lt i.isLt, Nat.mod_eq_of_lt j.isLt] at h''
   exact Fin.ext h''
 
+theorem nextIdx_iterate {n : ℕ} (k : ℕ) (i : Fin n) :
+    ((nextIdx^[k] i : Fin n) : ℕ) = ((i : ℕ) + k) % n := by
+  induction k with
+  | zero => simp [Nat.mod_eq_of_lt i.isLt]
+  | succ k ih =>
+    rw [Function.iterate_succ_apply']
+    change ((nextIdx^[k] i : ℕ) + 1) % n = _
+    rw [ih, Nat.mod_add_mod, Nat.add_assoc]
+
+/-- The cyclic successor of the reverse order is the cyclic predecessor. -/
+theorem cycSucc_reverse {Le : V → V → Prop} {x y : V} :
+    CycSucc (fun a b => Le b a) x y ↔ CycSucc Le y x := by
+  constructor
+  · rintro (⟨h₁, h₂, h₃⟩ | ⟨h₁, h₂⟩)
+    · exact Or.inl ⟨h₁, Ne.symm h₂, fun z hz hz' => (h₃ z hz' hz).symm⟩
+    · exact Or.inr ⟨h₂, h₁⟩
+  · rintro (⟨h₁, h₂, h₃⟩ | ⟨h₁, h₂⟩)
+    · exact Or.inl ⟨h₁, Ne.symm h₂, fun z hz hz' => (h₃ z hz' hz).symm⟩
+    · exact Or.inr ⟨h₂, h₁⟩
+
+/-- A circuit of a symmetric relation, traversed backwards, is a circuit. -/
+theorem IsCircuit.reverse {R Nxt : V → V → Prop} (hsym : ∀ x y, R x y → R y x)
+    (h : IsCircuit R Nxt) : IsCircuit R fun x y => Nxt y x := by
+  obtain ⟨Le, hlin, hiff, hR⟩ := h
+  exact ⟨fun a b => Le b a, hlin.reverse, fun x y => (hiff y x).trans cycSucc_reverse.symm,
+    fun x y hxy => hsym _ _ (hR _ _ hxy)⟩
+
 variable [Finite V]
+
+/-- **Induction along a circuit**: a property of one vertex that passes to the
+next vertex holds of every vertex. -/
+theorem IsCircuit.induction {R Nxt : V → V → Prop} (h : IsCircuit R Nxt) {P : V → Prop}
+    (x₀ : V) (h0 : P x₀) (hstep : ∀ x y, Nxt x y → P x → P y) : ∀ x, P x := by
+  obtain ⟨Le, hlin, hiff, -⟩ := h
+  obtain ⟨f, hf⟩ := exists_mono_enum hlin
+  have hN : ∀ x y, Nxt x y ↔ y = f (nextIdx (f.symm x)) := fun x y =>
+    (hiff x y).trans (cycSucc_iff f hf x y)
+  have hk : ∀ k : ℕ, P (f (nextIdx^[k] (f.symm x₀))) := by
+    intro k
+    induction k with
+    | zero => simpa using h0
+    | succ k ih =>
+      rw [Function.iterate_succ_apply']
+      exact hstep _ _ ((hN _ _).mpr (by simp)) ih
+  intro x
+  have hx := (f.symm x).isLt
+  have hx₀ := (f.symm x₀).isLt
+  have he : nextIdx^[(f.symm x : ℕ) + (Nat.card V - (f.symm x₀ : ℕ))] (f.symm x₀) = f.symm x := by
+    refine Fin.ext ?_
+    rw [nextIdx_iterate]
+    have : (f.symm x₀ : ℕ) + ((f.symm x : ℕ) + (Nat.card V - (f.symm x₀ : ℕ))) =
+        (f.symm x : ℕ) + Nat.card V := by omega
+    rw [this, Nat.add_mod_right, Nat.mod_eq_of_lt hx]
+  have h := hk ((f.symm x : ℕ) + (Nat.card V - (f.symm x₀ : ℕ)))
+  rw [he] at h
+  simpa using h
 
 /-- **A circuit, read locally**: every vertex is left once and reached once,
 along the relation, and two vertices following each other both ways are the
