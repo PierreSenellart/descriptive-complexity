@@ -1,0 +1,25 @@
+name = "Lax535992"
+defaultTargets = ["Lax535992"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "db584cd6d46c92f209a44c0f1c829460d327499d"
+
+[[require]]
+name = "Lax904597"
+git = "https://github.com/PierreSenellart/descriptive-complexity"
+rev = "5aef71b6365249121f68485b77de5e25e26f41bf"
+subDir = "lax/np-core/concepts"
+
+[[require]]
+name = "Lax485149"
+git = "https://github.com/PierreSenellart/descriptive-complexity"
+rev = "eee50ee7b4c7bbf5f3d7efadda7518899cca280b"
+subDir = "lax/logspace/concepts"
+
+[[lean_lib]]
+name = "Lax535992"
