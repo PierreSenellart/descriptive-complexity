@@ -244,6 +244,68 @@ theorem ncard_vPt_eq (P : A → Prop) (Q : steinerInterp.Map A → Prop)
 
 end Counting
 
+/-! #### The two halves of the correspondence, set by set -/
+
+section Halves
+
+variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
+
+/-- The terminals together with the points of a vertex cover are connected:
+every edge reaches the root through a covering endpoint. -/
+theorem steiner_connectedOn_of_cover {m : A} (hm : ∀ a : A, m ≤ a) {C : A → Prop}
+    (hcov : ∀ x y, x ≠ y → MGAdj x y → C x ∨ C y) :
+    ConnectedOn STAdj fun p : steinerInterp.Map A => STTerminal p ∨ ∃ v, C v ∧ p = vPt v := by
+  have hroot : STTerminal (rPt m (A := A)) := (steiner_terminal_r m).mpr hm
+  have hlinkroot : ∀ v : A, C v →
+      Link STAdj (fun p => STTerminal p ∨ ∃ v, C v ∧ p = vPt v) (vPt v) (rPt m) := by
+    intro v hv
+    exact ⟨Or.inr ⟨v, hv, rfl⟩, Or.inl hroot,
+      Or.inr ((steiner_adj_rv m v).mpr hm)⟩
+  have hreach : ∀ p, (STTerminal p ∨ ∃ v, C v ∧ p = vPt v) →
+      Relation.ReflTransGen
+        (Link STAdj fun p => STTerminal p ∨ ∃ v, C v ∧ p = vPt v) p (rPt m) := by
+    rintro p (hp | ⟨v, hv, rfl⟩)
+    · rcases steiner_terminal_shape hp with ⟨u, v, rfl, hadj, hne⟩ | ⟨r, rfl, hminr⟩
+      · -- an edge terminal: step to a covering endpoint, then to the root
+        have hC := hcov u v hne hadj
+        rcases hC with hu | hv
+        · exact Relation.ReflTransGen.head
+            (link_symm ⟨Or.inr ⟨u, hu, rfl⟩, Or.inl hp,
+              Or.inl ((steiner_adj_ve u u v).mpr ⟨⟨hadj, hne⟩, Or.inl rfl⟩)⟩)
+            (Relation.ReflTransGen.single (hlinkroot u hu))
+        · exact Relation.ReflTransGen.head
+            (link_symm ⟨Or.inr ⟨v, hv, rfl⟩, Or.inl hp,
+              Or.inl ((steiner_adj_ve v u v).mpr ⟨⟨hadj, hne⟩, Or.inr rfl⟩)⟩)
+            (Relation.ReflTransGen.single (hlinkroot v hv))
+      · have : r = m := le_antisymm (hminr m) (hm r)
+        subst this
+        exact Relation.ReflTransGen.refl
+    · exact Relation.ReflTransGen.single (hlinkroot v hv)
+  intro x y hx hy
+  exact (hreach x hx).trans
+    (reflTransGen_symm (fun _ _ hab => link_symm hab) (hreach y hy))
+
+/-- The vertices of a connected set containing the terminals cover every edge:
+the path from an edge terminal to the root starts at an endpoint. -/
+theorem steiner_cover_of_connected {m : A} (hm : ∀ a : A, m ≤ a)
+    {S : steinerInterp.Map A → Prop} (hterms : ∀ p, STTerminal p → S p)
+    (hconn : ConnectedOn STAdj S) (x y : A) (hxy : x ≠ y) (hadj : MGAdj x y) :
+    S (vPt x) ∨ S (vPt y) := by
+  have hroot : STTerminal (rPt m (A := A)) := (steiner_terminal_r m).mpr hm
+  have hex : S (ePt x y) := hterms _ ((steiner_terminal_e x y).mpr ⟨hadj, hxy⟩)
+  have hrt : S (rPt m) := hterms _ hroot
+  have hpath := hconn (ePt x y) (rPt m) hex hrt
+  rcases Relation.ReflTransGen.cases_head hpath with heq | ⟨q, hlink, -⟩
+  · have htag : SteinerTag.edge = SteinerTag.root :=
+      congrArg (fun p : SteinerTag × (Fin 2 → A) => p.1) heq
+    exact absurd htag (by decide)
+  · obtain ⟨hq, hqS⟩ := steiner_link_ePt hlink
+    rcases hq with rfl | rfl
+    · exact Or.inl hqS
+    · exact Or.inr hqS
+
+end Halves
+
 /-! #### Correctness -/
 
 section Correctness
@@ -265,35 +327,7 @@ theorem hasSmallVertexCover_iff_steiner_map :
     have := hfin
     refine ⟨inferInstance,
       fun p => STTerminal p ∨ ∃ v, C v ∧ p = vPt v, fun x hx => Or.inl hx, ?_, ?_⟩
-    · -- connectivity: every member reaches the root
-      have hlinkroot : ∀ v : A, C v →
-          Link STAdj (fun p => STTerminal p ∨ ∃ v, C v ∧ p = vPt v) (vPt v) (rPt m) := by
-        intro v hv
-        exact ⟨Or.inr ⟨v, hv, rfl⟩, Or.inl hroot,
-          Or.inr ((steiner_adj_rv m v).mpr hm)⟩
-      have hreach : ∀ p, (STTerminal p ∨ ∃ v, C v ∧ p = vPt v) →
-          Relation.ReflTransGen
-            (Link STAdj fun p => STTerminal p ∨ ∃ v, C v ∧ p = vPt v) p (rPt m) := by
-        rintro p (hp | ⟨v, hv, rfl⟩)
-        · rcases steiner_terminal_shape hp with ⟨u, v, rfl, hadj, hne⟩ | ⟨r, rfl, hminr⟩
-          · -- an edge terminal: step to a covering endpoint, then to the root
-            have hC := hcov u v hne hadj
-            rcases hC with hu | hv
-            · exact Relation.ReflTransGen.head
-                (link_symm ⟨Or.inr ⟨u, hu, rfl⟩, Or.inl hp,
-                  Or.inl ((steiner_adj_ve u u v).mpr ⟨⟨hadj, hne⟩, Or.inl rfl⟩)⟩)
-                (Relation.ReflTransGen.single (hlinkroot u hu))
-            · exact Relation.ReflTransGen.head
-                (link_symm ⟨Or.inr ⟨v, hv, rfl⟩, Or.inl hp,
-                  Or.inl ((steiner_adj_ve v u v).mpr ⟨⟨hadj, hne⟩, Or.inr rfl⟩)⟩)
-                (Relation.ReflTransGen.single (hlinkroot v hv))
-          · have : r = m := le_antisymm (hminr m) (hm r)
-            subst this
-            exact Relation.ReflTransGen.refl
-        · exact Relation.ReflTransGen.single (hlinkroot v hv)
-      intro x y hx hy
-      exact (hreach x hx).trans
-        (reflTransGen_symm (fun _ _ hab => link_symm hab) (hreach y hy))
+    · exact steiner_connectedOn_of_cover hm hcov
     · -- counting: the non-terminals of the chosen set are the cover
       have hne : {p : steinerInterp.Map A |
           (STTerminal p ∨ ∃ v, C v ∧ p = vPt v) ∧ ¬STTerminal p}.ncard
@@ -313,18 +347,7 @@ theorem hasSmallVertexCover_iff_steiner_map :
     have hA : Finite A := Finite.of_injective _ (vPt_injective (A := A))
     have := hA
     refine ⟨hA, fun v => S (vPt v), fun x y hxy hadj => ?_, ?_⟩
-    · -- the path from the edge terminal to the root starts at an endpoint
-      have hex : S (ePt x y) := hterms _ ((steiner_terminal_e x y).mpr ⟨hadj, hxy⟩)
-      have hrt : S (rPt m) := hterms _ hroot
-      have hpath := hconn (ePt x y) (rPt m) hex hrt
-      rcases Relation.ReflTransGen.cases_head hpath with heq | ⟨q, hlink, -⟩
-      · have htag : SteinerTag.edge = SteinerTag.root :=
-          congrArg (fun p : SteinerTag × (Fin 2 → A) => p.1) heq
-        exact absurd htag (by decide)
-      · obtain ⟨hq, hqS⟩ := steiner_link_ePt hlink
-        rcases hq with rfl | rfl
-        · exact Or.inl hqS
-        · exact Or.inr hqS
+    · exact steiner_cover_of_connected hm hterms hconn x y hxy hadj
     · -- the cover injects into the non-terminals of the chosen set
       have hsub : vPt '' {v : A | S (vPt v)} ⊆
           {p : steinerInterp.Map A | S p ∧ ¬STTerminal p} := by

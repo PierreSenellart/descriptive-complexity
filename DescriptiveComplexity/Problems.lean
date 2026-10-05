@@ -78,6 +78,8 @@ import DescriptiveComplexity.Problems.Feedback.SplitBundle
 import DescriptiveComplexity.Problems.Feedback.CountingArcHardness
 import DescriptiveComplexity.Problems.MaxCut
 import DescriptiveComplexity.Problems.Steiner
+import DescriptiveComplexity.Problems.Steiner.Counting
+import DescriptiveComplexity.Problems.Steiner.CountingHardness
 import DescriptiveComplexity.Problems.Qbf
 import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.SuccinctReach

@@ -18,8 +18,11 @@ of the set is first-order, and this file says so once for all of them
 `DescriptiveComplexity.sharpPDefinable_of_sized_set` when the set is the whole
 certificate).
 
-The input is an order-free kernel `φ₀` over a block `B`, one of whose unary
-variables `i₀` is the set being sized, and the symbol `mk` of the marked set.
+The input is a kernel `φ₀` over a block `B`, one of whose unary variables `i₀`
+is the set being sized, and the symbol `mk` of the marked set. The kernel may
+read the order (`DescriptiveComplexity.sharpPDefinable_of_sized_ordered`, for a
+certificate walking the order, as the reachability clock of Steiner Tree does)
+or not (`DescriptiveComplexity.sharpPDefinable_of_sized`).
 The counting kernel (`DescriptiveComplexity.sizedKernel`) adds one binary variable and
 asks it to be the graph of the *monotone* bijection from the marked set onto
 the set (`DescriptiveComplexity.MonoBij`): a bijection certifies the size, and the
@@ -42,26 +45,28 @@ section Sized
 
 variable (L : Language.{0, 0}) (B : SOBlock)
 
-/-- The inclusion of the vocabulary of an order-free kernel into that of the
-sized kernel: the order is added to the instance and the bijection variable to
-the block. -/
-def sizedLHom : L.sum B.lang →ᴸ (L.sum Language.order).sum B.withOrder.lang where
+/-- The inclusion of the vocabulary of a kernel into that of the sized kernel:
+the bijection variable is added to the block. -/
+def sizedLHom :
+    (L.sum Language.order).sum B.lang →ᴸ (L.sum Language.order).sum B.withOrder.lang where
   onFunction {_n} f :=
     match f with
-    | Sum.inl g => Sum.inl (Sum.inl g)
+    | Sum.inl g => Sum.inl g
     | Sum.inr g => nomatch g
   onRelation {n} r :=
     match n, r with
-    | _, Sum.inl s => Sum.inl (Sum.inl s)
+    | _, Sum.inl s => Sum.inl s
     | _, Sum.inr s => Sum.inr ⟨Sum.inr s.1, s.2⟩
 
 variable {A : Type}
 
-/-- The structure of the sized kernel expands that of the order-free one. -/
+/-- The structure of the sized kernel expands that of the kernel. -/
 theorem sizedLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder A)
     (ρ : B.withOrder.Assignment A) :
     @LHom.IsExpansionOn _ _ (sizedLHom L B) A
-      (@sumStructure L B.lang A instA (B.structure (B.restPart ρ)))
+      (@sumStructure (L.sum Language.order) B.lang A
+        (letI := instA; letI := lo; sumOrderStructure L A)
+        (B.structure (B.restPart ρ)))
       (@sumStructure (L.sum Language.order) B.withOrder.lang A
         (letI := instA; letI := lo; sumOrderStructure L A)
         (B.withOrder.structure ρ)) := by
@@ -179,10 +184,11 @@ theorem realize_monoBijS (instA : L.Structure A) [LinearOrder A]
   · exact h ![a, a', b, b'] ⟨hab, hab'⟩
   · exact h (i 0) (i 1) (i 2) (i 3) hi.1 hi.2
 
-variable (φ₀ : (L.sum B.lang).Sentence)
+variable (φ₀ : ((L.sum Language.order).sum B.lang).Sentence)
 
-/-- **The sized kernel**: the order-free kernel `φ₀`, and the extra variable is
-the monotone bijection from the marked set onto the set `i₀`. -/
+/-- **The sized kernel**: the kernel `φ₀`, which may read the order, and the
+extra variable is the monotone bijection from the marked set onto the set
+`i₀`. -/
 noncomputable def sizedKernel : ((L.sum Language.order).sum B.withOrder.lang).Sentence :=
   (sizedLHom L B).onSentence φ₀ ⊓ monoBijS L B mk i₀ h₀
 
@@ -193,8 +199,8 @@ theorem realize_sizedKernel (instA : L.Structure A) [LinearOrder A]
         (@sumStructure (L.sum Language.order) B.withOrder.lang A _
           (B.withOrder.structure ρ))
         (sizedKernel L B mk i₀ h₀ φ₀) ↔
-      @Sentence.Realize (L.sum B.lang) A
-          (@sumStructure L B.lang A instA (B.structure (B.restPart ρ))) φ₀ ∧
+      @Sentence.Realize ((L.sum Language.order).sum B.lang) A
+          (@sumStructure (L.sum Language.order) B.lang A _ (B.structure (B.restPart ρ))) φ₀ ∧
         MonoBij (fun a : A => RelMap mk ![a]) (fun a => ρ (Sum.inr i₀) fun _ => a)
           fun a b => ρ (Sum.inl ()) ![a, b] := by
   have hmono := realize_monoBijS L B mk i₀ h₀ instA ρ
@@ -205,13 +211,13 @@ theorem realize_sizedKernel (instA : L.Structure A) [LinearOrder A]
   exact and_congr (LHom.realize_onSentence A (sizedLHom L B) φ₀) hmono
 
 /-- **The witnesses of the sized kernel** are the assignments of the block
-satisfying the order-free kernel whose set has exactly the size of the marked
-set, bijectively and whatever the linear order. -/
+satisfying the kernel whose set has exactly the size of the marked set,
+bijectively. -/
 theorem witnessCount_sizedKernel [instA : L.Structure A] [LinearOrder A] [Finite A] :
     witnessCount B.withOrder (sizedKernel L B mk i₀ h₀ φ₀) A =
       Nat.card {ρ₀ : B.Assignment A //
-        @Sentence.Realize (L.sum B.lang) A
-            (@sumStructure L B.lang A instA (B.structure ρ₀)) φ₀ ∧
+        @Sentence.Realize ((L.sum Language.order).sum B.lang) A
+            (@sumStructure (L.sum Language.order) B.lang A _ (B.structure ρ₀)) φ₀ ∧
           {a | ρ₀ i₀ fun _ => a}.ncard = {a : A | RelMap mk ![a]}.ncard} := by
   refine Nat.card_congr
     { toFun := fun ρ => ⟨B.restPart ρ.1,
@@ -237,9 +243,43 @@ theorem witnessCount_sizedKernel [instA : L.Structure A] [LinearOrder A] [Finite
 end Sized
 
 /-- **A count of the solutions of exactly the threshold size is
-`#P`-definable**, when the property of the solution is first-order: the size is
-certified by the monotone bijection with the marked set, the one certificate a
-linear order offers. -/
+`#P`-definable**, when the property of the solution is first-order over the
+ordered expansion: the size is certified by the monotone bijection with the
+marked set, the one certificate a linear order offers. The kernel may read the
+order, and then has to define the same count whatever the order. -/
+theorem sharpPDefinable_of_sized_ordered {L : Language.{0, 0}} [L.IsRelational]
+    (C : CountingProblem L) (B : SOBlock) (mk : L.Relations 1) (i₀ : B.ι)
+    (h₀ : B.arity i₀ = 1) (φ₀ : ((L.sum Language.order).sum B.lang).Sentence)
+    (hC : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A],
+      C A = Nat.card {ρ₀ : B.Assignment A //
+        @Sentence.Realize ((L.sum Language.order).sum B.lang) A
+            (@sumStructure (L.sum Language.order) B.lang A _ (B.structure ρ₀)) φ₀ ∧
+          {a | ρ₀ i₀ fun _ => a}.ncard = {a : A | RelMap mk ![a]}.ncard}) :
+    SharpPDefinable C :=
+  ⟨B.withOrder, sizedKernel L B mk i₀ h₀ φ₀, fun A _ _ _ _ =>
+    (hC A).trans (witnessCount_sizedKernel L B mk i₀ h₀ φ₀).symm⟩
+
+/-- An order-free kernel, lifted to the ordered expansion, holds exactly when
+it did. -/
+theorem realize_orderFreeKernel {L : Language.{0, 0}} (B : SOBlock)
+    (φ₀ : (L.sum B.lang).Sentence) {A : Type} [instA : L.Structure A] [LinearOrder A]
+    (ρ₀ : B.Assignment A) :
+    @Sentence.Realize ((L.sum Language.order).sum B.lang) A
+        (@sumStructure (L.sum Language.order) B.lang A _ (B.structure ρ₀))
+        (orderFreeKernel B φ₀) ↔
+      @Sentence.Realize (L.sum B.lang) A
+        (@sumStructure L B.lang A instA (B.structure ρ₀)) φ₀ := by
+  let := B.structure ρ₀
+  have : (LHom.sumMap (LHom.sumInl : L →ᴸ L.sum Language.order)
+      (LHom.id B.lang)).IsExpansionOn A :=
+    ⟨fun f _ => by cases f <;> rfl, fun r _ => by cases r <;> rfl⟩
+  exact LHom.realize_onSentence A (LHom.sumMap (LHom.sumInl : L →ᴸ L.sum Language.order)
+    (LHom.id B.lang)) φ₀
+
+/-- **A count of the solutions of exactly the threshold size is
+`#P`-definable**, when the property of the solution is first-order: the case of
+`DescriptiveComplexity.sharpPDefinable_of_sized_ordered` where the kernel does not read
+the order. -/
 theorem sharpPDefinable_of_sized {L : Language.{0, 0}} [L.IsRelational]
     (C : CountingProblem L) (B : SOBlock) (mk : L.Relations 1) (i₀ : B.ι)
     (h₀ : B.arity i₀ = 1) (φ₀ : (L.sum B.lang).Sentence)
@@ -249,8 +289,9 @@ theorem sharpPDefinable_of_sized {L : Language.{0, 0}} [L.IsRelational]
             (@sumStructure L B.lang A instA (B.structure ρ₀)) φ₀ ∧
           {a | ρ₀ i₀ fun _ => a}.ncard = {a : A | RelMap mk ![a]}.ncard}) :
     SharpPDefinable C :=
-  ⟨B.withOrder, sizedKernel L B mk i₀ h₀ φ₀, fun A _ _ _ _ =>
-    (hC A).trans (witnessCount_sizedKernel L B mk i₀ h₀ φ₀).symm⟩
+  sharpPDefinable_of_sized_ordered C B mk i₀ h₀ (orderFreeKernel B φ₀) fun A _ _ _ =>
+    (hC A).trans (Nat.card_congr (Equiv.subtypeEquivRight fun ρ₀ =>
+      and_congr (realize_orderFreeKernel B φ₀ ρ₀).symm Iff.rfl))
 
 /-- A set no larger than a number no larger than the universe extends to a set
 of exactly that size: what makes the support of an exact-size count of
