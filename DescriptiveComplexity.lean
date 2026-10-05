@@ -88,6 +88,9 @@ import DescriptiveComplexity.Counting.Post
 import DescriptiveComplexity.Counting.Encoding
 import DescriptiveComplexity.Counting.PossibleWorlds
 import DescriptiveComplexity.Counting.Probability
+import DescriptiveComplexity.Counting.FP
+import DescriptiveComplexity.Counting.Quantitative
+import DescriptiveComplexity.Counting.QuantitativePull
 import DescriptiveComplexity.Counting.Reduction
 import DescriptiveComplexity.Counting.RelClosure
 import DescriptiveComplexity.Counting.Subtractive
@@ -2373,6 +2376,33 @@ pulled relations hold only of points of the domain
   `#BIS + #PP2DNF = 2 ^ n`. It is the source of the `#P`-hardness of the query
   `R(x), S(x, y), T(y)` over probabilistic databases
   ([Dalvi and Suciu 2012][dalvi2012dichotomy]).
+* **FP, by quantitative logic** (`DescriptiveComplexity.Counting.Quantitative`,
+  `DescriptiveComplexity.Counting.QuantitativePull`,
+  `DescriptiveComplexity.Counting.FP`). The logic is that of
+  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive], whose idea it is to
+  put a *quantitative* level above a Boolean one: a formula counts `1` or `0`,
+  and above formulas come constants, `+`, `·`, and the sum `Σx` and the product
+  `Πx` over the elements (`DescriptiveComplexity.QTerm`, their grammar (3.1)
+  restricted to first-order quantifiers; `DescriptiveComplexity.QTerm.eval`,
+  their Table 1). Their Theorem 4.4 is that this logic over least fixed
+  points, QFO(LFP), captures FP over ordered structures, and the library
+  *defines* `DescriptiveComplexity.FP` that way
+  (`DescriptiveComplexity.FPDefinable`), the theorem being cited as the capture
+  theorems behind the other logically defined classes are. A term with no
+  fixed point is enough for most concrete functions
+  (`DescriptiveComplexity.fpDefinable_of_qfo`). The class is closed under
+  parsimonious reductions
+  (`DescriptiveComplexity.FPDefinable.of_orderedParsimonious`): the fixed point
+  pulls back as for PTIME, and a term through an interpretation by
+  `DescriptiveComplexity.QTerm.pull`, a sum over the interpreted universe
+  becoming a finite sum over tags of a sum over tuples. Positivity of a term
+  is a first-order formula (`DescriptiveComplexity.QTerm.pos`), so the support
+  of a problem of FP is in PTIME
+  (`DescriptiveComplexity.support_mem_PTIME_of_mem_FP`) and no problem of FP is
+  parsimoniously `#P`-hard unless `NP ⊆ PTIME`
+  (`DescriptiveComplexity.NP_subset_PTIME_of_mem_FP_of_parsimoniousHard`).
+  Not formalized: the second-order sums and products of their full logic QSO,
+  the capture theorem itself, and a machine characterization.
 * **Possible worlds** (`DescriptiveComplexity.Counting.PossibleWorlds`): for a
   finite relational schema, an instance holds certain facts and uncertain ones,
   a possible world keeps the first and some of the second, and
@@ -2554,6 +2584,7 @@ reduction and certificate in full.
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| `FP` (polynomial-time functions with natural-number values, `DescriptiveComplexity.FP`) | QFO(LFP), the quantitative first-order logic of [Arenas, Muñoz, Riveros 2020][arenas2020descriptive] over least fixed points: sums and products, over the elements, of polynomial-time conditions | – | – |
 | `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, complete under subtractive reductions (plain `#P`-complete here) · counting all the independent sets of a graph, #BIS (those of a bipartite graph) and #PP2DNF, complete under one-call reductions only |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
