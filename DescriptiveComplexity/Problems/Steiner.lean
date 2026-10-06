@@ -43,7 +43,9 @@ theorem steinerTree_NP_hard : NP.Hard SteinerTree :=
   NP.hard_of_orderedReduction vertexCover_ordered_fo_reduction_steinerTree vertexCover_NP_hard
 
 /-- **Steiner Tree is NP-complete**, derived from the first-order reductions
-of this library and the Cook–Levin theorem. -/
+of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.Steiner.steinerTree_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Steiner.html#s-Lax799700.Steiner.steinerTree_NP_complete). -/
 theorem steinerTree_NP_complete : NP.Complete SteinerTree :=
   ⟨steinerTree_mem_NP, steinerTree_NP_hard⟩
 
@@ -60,7 +62,9 @@ theorem edgeSteinerTree_NP_hard : NP.Hard EdgeSteinerTree :=
     vertexCover_NP_hard
 
 /-- **The edge-weighted Steiner Tree is NP-complete** – Karp's original
-reading of the problem. -/
+reading of the problem.
+Registered in the Lax archive as
+[`Lax799700.Steiner.edgeSteinerTree_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Steiner.html#s-Lax799700.Steiner.edgeSteinerTree_NP_complete). -/
 theorem edgeSteinerTree_NP_complete : NP.Complete EdgeSteinerTree :=
   ⟨edgeSteinerTree_mem_NP, edgeSteinerTree_NP_hard⟩
 

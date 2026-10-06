@@ -494,7 +494,9 @@ theorem primrec_codeStruct : Primrec codeStruct := by
 
 /-- **CODEHALT is undecidable.** Mathlib's halting problem maps into it by the
 tree encoding, which is primitive recursive, so a decision procedure for the
-concrete instances would decide whether a partial recursive code halts. -/
+concrete instances would decide whether a partial recursive code halts.
+Registered in the Lax archive as
+[`Lax624099.HaltingUndecidable.codehalt_not_computable`](https://laxarchive.org/lax-624099/Lax624099.HaltingUndecidable.html#s-Lax624099.HaltingUndecidable.codehalt_not_computable). -/
 theorem not_computablePred_codehalt : ¬ComputablePred (CODEHALT.toPred codeVocab) := by
   intro h
   refine ComputablePred.halting_problem 0 ?_
@@ -513,7 +515,9 @@ the induced sets
 
 This is the leverage the whole `DescriptiveComplexity.Computability` layer
 exists for: every completeness theorem for RE now yields undecidability with no
-computability work of its own. -/
+computability work of its own.
+Registered in the Lax archive as
+[`Lax624099.REHardUndecidable.not_computablePred_of_RE_hard`](https://laxarchive.org/lax-624099/Lax624099.REHardUndecidable.html#s-Lax624099.REHardUndecidable.not_computablePred_of_RE_hard). -/
 theorem not_computablePred_of_RE_hard {L : Language.{0, 0}} [L.IsRelational]
     {P : DecisionProblem L} (hP : RE.Hard P) (V : FinVocab L) :
     ¬ComputablePred (P.toPred V) := by
@@ -521,7 +525,9 @@ theorem not_computablePred_of_RE_hard {L : Language.{0, 0}} [L.IsRelational]
   exact not_computablePred_of_relOrderedReduction f codeVocab V not_computablePred_codehalt
 
 /-- **Trakhtenbrot's theorem**: whether a first-order sentence has a *finite*
-model is undecidable. -/
+model is undecidable.
+Registered in the Lax archive as
+[`Lax624099.Trakhtenbrot.finsat_not_computable`](https://laxarchive.org/lax-624099/Lax624099.Trakhtenbrot.html#s-Lax624099.Trakhtenbrot.finsat_not_computable). -/
 theorem finsat_not_computable : ¬ComputablePred (FINSAT.toPred finsatVocab) :=
   not_computablePred_of_RE_hard finsat_RE_hard finsatVocab
 

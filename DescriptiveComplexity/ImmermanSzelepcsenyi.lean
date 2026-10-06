@@ -48,7 +48,9 @@ The specification of the complement is the inductive-counting machine: its
 modes are the control states (a phase, one flag and the mode of each of eight
 registers) and its tuples hold the eight registers side by side, so that
 counting the nodes of every layer of the given walk – and certifying, at the
-last layer, that no accepting node was ever counted in – is itself one walk. -/
+last layer, that no accepting node was ever counted in – is itself one walk.
+Registered in the Lax archive as
+[`Lax485149.ImmermanSzelepcsenyi.tcDefinable_compl`](https://laxarchive.org/lax-485149/Lax485149.ImmermanSzelepcsenyi.html#s-Lax485149.ImmermanSzelepcsenyi.tcDefinable_compl). -/
 theorem TCDefinable.compl [L.IsRelational] {P : DecisionProblem L} (h : TCDefinable P) :
     TCDefinable Pᶜ := by
   classical
@@ -71,7 +73,9 @@ theorem tcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
 
 /-- **NL is FO(TC)**: a problem is in NL exactly when it is FO(TC) definable.
 The two translations against the Krom fragment give this only up to a
-complement; Immerman–Szelepcsényi removes it. -/
+complement; Immerman–Szelepcsényi removes it.
+Registered in the Lax archive as
+[`Lax485149.NLIsTransitiveClosure.tcDefinable_iff_mem_NL`](https://laxarchive.org/lax-485149/Lax485149.NLIsTransitiveClosure.html#s-Lax485149.NLIsTransitiveClosure.tcDefinable_iff_mem_NL). -/
 theorem tcDefinable_iff_mem_NL [L.IsRelational] (P : DecisionProblem L) : TCDefinable P ↔ P ∈ NL :=
   ((tcDefinable_compl_iff P).symm).trans (mem_NL_iff_tcDefinable_compl P).symm
 
@@ -85,7 +89,9 @@ theorem sigmaSOKromDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) 
 
 /-- **`NL = coNL`** ([Immerman 1988][immerman1988nondeterministic],
 [Szelepcsényi 1988][szelepcsenyi1988method]): nondeterministic logarithmic
-space is closed under complement. -/
+space is closed under complement.
+Registered in the Lax archive as
+[`Lax485149.NLEqCoNL.NL_eq_coNL`](https://laxarchive.org/lax-485149/Lax485149.NLEqCoNL.html#s-Lax485149.NLEqCoNL.NL_eq_coNL). -/
 theorem NL_eq_coNL : NL = coNL := by
   refine ComplexityClass.ext (fun P => (sigmaSOKromDefinable_compl_iff P).symm) fun P => ?_
   constructor

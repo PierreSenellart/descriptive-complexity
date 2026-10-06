@@ -99,7 +99,7 @@ private theorem realize_adjF (dir : Bool) (ρ : hamGuessBlock.Assignment A) {α 
     simp [adjF, DGArc, DGEdge, Language.relMap_sumInl, Formula.realize_rel₂]
 
 /-- Realization of the kernel under an assignment of the guessed order. -/
-private theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
+theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
     (@Sentence.Realize hamSOLang A
         (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) (hamKernel dir)) ↔
       IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧

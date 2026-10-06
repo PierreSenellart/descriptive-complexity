@@ -411,7 +411,9 @@ theorem inflLimit_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrd
 /-- **Every FO(LFP) definition is an FO(≤, IFP) definition**: read the rules
 as one simultaneous step; inflation iterates them to their least fixed point,
 and the output survives unchanged. (The converse, closing the circle back
-into FO(LFP), is `DescriptiveComplexity.FixedPointInflationaryLFP`.) -/
+into FO(LFP), is `DescriptiveComplexity.FixedPointInflationaryLFP`.)
+Registered in the Lax archive as
+[`Lax535992.InflationaryIsLeastFixedPoint.lfpDefinable_ifpDefinable`](https://laxarchive.org/lax-535992/Lax535992.InflationaryIsLeastFixedPoint.html#s-Lax535992.InflationaryIsLeastFixedPoint.lfpDefinable_ifpDefinable). -/
 theorem LFPDefinable.ifpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : LFPDefinable P) :
     IFPDefinable P := by

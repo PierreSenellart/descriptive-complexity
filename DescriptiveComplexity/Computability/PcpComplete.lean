@@ -33,12 +33,16 @@ dominoes carry hardness forward. -/
 theorem pcp_RE_hard : RE.Hard PCP :=
   RE.hard_of_orderedReduction halt_ordered_fo_reduction_pcp halt_RE_hard
 
-/-- **PCP is RE-complete.** -/
+/-- **PCP is RE-complete.**
+Registered in the Lax archive as
+[`Lax624099.PcpREComplete.pcp_RE_complete`](https://laxarchive.org/lax-624099/Lax624099.PcpREComplete.html#s-Lax624099.PcpREComplete.pcp_RE_complete). -/
 theorem pcp_RE_complete : RE.Complete PCP :=
   ⟨pcp_mem_RE, pcp_RE_hard⟩
 
 /-- **Post's correspondence problem is undecidable**: no numbering of its
-instances has a computable characteristic function. -/
+instances has a computable characteristic function.
+Registered in the Lax archive as
+[`Lax624099.PcpUndecidable.pcp_not_computable`](https://laxarchive.org/lax-624099/Lax624099.PcpUndecidable.html#s-Lax624099.PcpUndecidable.pcp_not_computable). -/
 theorem pcp_not_computable (V : FinVocab Language.pcp) :
     ¬ComputablePred (PCP.toPred V) :=
   not_computablePred_of_RE_hard pcp_RE_hard V

@@ -21,9 +21,10 @@ Hardness comes from exactly-one satisfiability
 (`DescriptiveComplexity.Problems.OneInSat`) by a reduction with **no gadget and no
 counting**, order-free and of dimension 1:
 
-* the ground elements are the variables and the clauses;
-* the family has one set per literal `(x, s)`, namely `{x} ∪ {clauses where
-  (x, s) occurs}`.
+* the ground elements are the variables and the clauses, a variable being an
+  element that occurs in some clause (`DescriptiveComplexity.SatOccurs`);
+* the family has one set per literal `(x, s)` of a variable `x`, namely
+  `{x} ∪ {clauses where (x, s) occurs}`.
 
 Covering the element `x` exactly once picks exactly one of the two literals of
 `x` – that *is* a truth assignment – and covering a clause exactly once is
@@ -64,16 +65,31 @@ instance : Nonempty ECTag := ⟨ECTag.velt⟩
 
 /-! ### The interpretation -/
 
+/-- `x` is a variable of the formula – it occurs in some clause –, as a
+formula. Without this guard an element in no clause would be a ground element
+with two singleton sets to choose from: harmless for the existence of an exact
+cover, and a factor two in their number. -/
+noncomputable def occursF {α : Type} (x : α) : Language.sat.Formula α :=
+  Formula.iExs Unit (ThreeSatToSat.clF (Sum.inr ()) ⊓
+    (ThreeSatToSat.posF (Sum.inr ()) (Sum.inl x) ⊔ ThreeSatToSat.negF (Sum.inr ()) (Sum.inl x)))
+
+theorem realize_occursF {A : Type} [Language.sat.Structure A] {α : Type} {v : α → A} {x : α} :
+    (occursF x).Realize v ↔ SatOccurs A (v x) := by
+  simp only [occursF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
+    ThreeSatToSat.realize_clF, ThreeSatToSat.realize_posF, ThreeSatToSat.realize_negF,
+    Sum.elim_inl, Sum.elim_inr]
+  exact ⟨fun ⟨i, hi⟩ => ⟨i (), hi⟩, fun ⟨c, hc⟩ => ⟨fun _ => c, hc⟩⟩
+
 /-- Defining formula for the ground elements: the variables and the
 clauses. -/
 noncomputable def elemF : ECTag → Language.sat.Formula (Fin 1 × Fin 1)
-  | .velt => ⊤
+  | .velt => occursF (0, 0)
   | .celt => ThreeSatToSat.clF (0, 0)
   | .lset _ => ⊥
 
-/-- Defining formula for the family: one set per literal. -/
+/-- Defining formula for the family: one set per literal of a variable. -/
 noncomputable def famF : ECTag → Language.sat.Formula (Fin 1 × Fin 1)
-  | .lset _ => ⊤
+  | .lset _ => occursF (0, 0)
   | _ => ⊥
 
 /-- Defining formula for incidence: the set of `(x, s)` contains the element
@@ -121,9 +137,9 @@ section Characterizations
 variable {A : Type} [Language.sat.Structure A]
 
 @[simp]
-theorem ssElem_velt (x : A) : SSElem (ecPt .velt x) := by
+theorem ssElem_velt (x : A) : SSElem (ecPt .velt x) ↔ SatOccurs A x := by
   rw [SSElem, ecPt, FOInterpretation.relMap_map]
-  simp [ecInterp, elemF]
+  simp [ecInterp, elemF, realize_occursF]
 
 @[simp]
 theorem ssElem_celt (c : A) : SSElem (ecPt .celt c) ↔ IsCl c := by
@@ -136,9 +152,9 @@ theorem ssElem_lset (s : Bool) (x : A) : ¬SSElem (ecPt (.lset s) x) := by
   simp [ecInterp, elemF]
 
 @[simp]
-theorem ssFam_lset (s : Bool) (x : A) : SSFam (ecPt (.lset s) x) := by
+theorem ssFam_lset (s : Bool) (x : A) : SSFam (ecPt (.lset s) x) ↔ SatOccurs A x := by
   rw [SSFam, ecPt, FOInterpretation.relMap_map]
-  simp [ecInterp, famF]
+  simp [ecInterp, famF, realize_occursF]
 
 @[simp]
 theorem ssFam_velt (x : A) : ¬SSFam (ecPt .velt x) := by
@@ -162,98 +178,136 @@ theorem ssMem_celt_lset (c : A) (s : Bool) (x : A) :
   rw [SSMem, ecPt, ecPt, FOInterpretation.relMap_map]
   simp [ecInterp, memF, ThreeSatToSat.realize_occF]
 
-/-- The sets of the family are exactly the literal sets. -/
-theorem ssFam_cases {q : ecInterp.Map A} (h : SSFam q) : ∃ s x, q = ecPt (.lset s) x := by
+/-- The sets of the family are exactly the literal sets of the variables. -/
+theorem ssFam_cases {q : ecInterp.Map A} (h : SSFam q) :
+    ∃ s x, SatOccurs A x ∧ q = ecPt (.lset s) x := by
   obtain ⟨t, x, rfl⟩ := ecPt_surj q
   cases t with
   | velt => exact absurd h (ssFam_velt x)
   | celt => exact absurd h (ssFam_celt x)
-  | lset s => exact ⟨s, x, rfl⟩
+  | lset s => exact ⟨s, x, (ssFam_lset s x).mp h, rfl⟩
 
 /-- The ground elements are exactly the variables and the clauses. -/
 theorem ssElem_cases {q : ecInterp.Map A} (h : SSElem q) :
-    (∃ x, q = ecPt .velt x) ∨ ∃ c, IsCl c ∧ q = ecPt .celt c := by
+    (∃ x, SatOccurs A x ∧ q = ecPt .velt x) ∨ ∃ c, IsCl c ∧ q = ecPt .celt c := by
   obtain ⟨t, x, rfl⟩ := ecPt_surj q
   cases t with
-  | velt => exact Or.inl ⟨x, rfl⟩
+  | velt => exact Or.inl ⟨x, (ssElem_velt x).mp h, rfl⟩
   | celt => exact Or.inr ⟨x, (ssElem_celt x).mp h, rfl⟩
   | lset s => exact absurd h (ssElem_lset s x)
 
 end Characterizations
 
-/-! ### Correctness -/
+/-! ### Correctness
+
+Stated for an explicit assignment and an explicit cover, so that the same
+lemmas give the equivalence of the two decision problems and the bijection
+between their solutions (`DescriptiveComplexity.Problems.ExactCoverCounting`). -/
 
 section Correctness
 
-variable (A : Type) [Language.sat.Structure A]
+variable {A : Type} [Language.sat.Structure A]
 
+/-- A literal occurring in a clause is a literal of a variable. -/
+theorem satOccurs_of_occIn {c x : A} {s : Bool} (h : OccIn c x s) : SatOccurs A x := by
+  cases s
+  · exact ⟨c, h.1, Or.inr h.2⟩
+  · exact ⟨c, h.1, Or.inl h.2⟩
+
+/-- The subfamily of an assignment: the sets of its true literals. -/
+def coverOf (ν : A → Prop) (S : ecInterp.Map A) : Prop :=
+  ∃ s x, S = ecPt (.lset s) x ∧ LitTrue ν x s ∧ SatOccurs A x
+
+/-- The assignment of a subfamily: the variables whose positive literal set is
+chosen. -/
+def assignOf (G : ecInterp.Map A → Prop) (z : A) : Prop := G (ecPt (.lset true) z)
+
+/-- **The true literals of an exactly-one assignment form an exact cover.** -/
+theorem exactCoverBy_coverOf {ν : A → Prop} (hν : OneInProper ν) :
+    ExactCoverBy (SSElem (A := ecInterp.Map A)) SSFam SSMem (coverOf ν) := by
+  refine ⟨?_, ?_, ?_⟩
+  · rintro S ⟨s, x, rfl, -, hx⟩
+    exact (ssFam_lset s x).mpr hx
+  · intro p hp
+    rcases ssElem_cases hp with ⟨x, hocc, rfl⟩ | ⟨c, hc, rfl⟩
+    · -- the element of a variable is covered by the literal it makes true
+      by_cases hx : ν x
+      · exact ⟨ecPt (.lset true) x, ⟨true, x, rfl, hx, hocc⟩,
+          (ssMem_velt_lset x true x).mpr rfl⟩
+      · exact ⟨ecPt (.lset false) x, ⟨false, x, rfl, hx, hocc⟩,
+          (ssMem_velt_lset x false x).mpr rfl⟩
+    · -- the element of a clause is covered by its unique true literal
+      obtain ⟨x, s, hocc, hT, -⟩ := hν c hc
+      exact ⟨ecPt (.lset s) x, ⟨s, x, rfl, hT, satOccurs_of_occIn hocc⟩,
+        (ssMem_celt_lset c s x).mpr hocc⟩
+  · rintro S S' ⟨s, x, rfl, hT, -⟩ ⟨s', x', rfl, hT', -⟩ hne p hp ⟨hm, hm'⟩
+    rcases ssElem_cases hp with ⟨y, -, rfl⟩ | ⟨c, hc, rfl⟩
+    · -- two literals of the same variable, both true
+      obtain rfl : y = x := (ssMem_velt_lset y s x).mp hm
+      obtain rfl : y = x' := (ssMem_velt_lset y s' x').mp hm'
+      refine hne ?_
+      obtain rfl : s = s' := by
+        cases s <;> cases s' <;> simp_all [LitTrue]
+      rfl
+    · -- two true literals of the same clause
+      obtain ⟨z, u, -, -, huniq⟩ := hν c hc
+      obtain ⟨rfl, rfl⟩ := huniq x s ((ssMem_celt_lset c s x).mp hm) hT
+      obtain ⟨rfl, rfl⟩ := huniq x' s' ((ssMem_celt_lset c s' x').mp hm') hT'
+      exact hne rfl
+
+/-- **The chosen sets of an exact cover are the true literals of its
+assignment**, at every variable. -/
+theorem exactCoverBy_lit {G : ecInterp.Map A → Prop}
+    (hG : ExactCoverBy (SSElem (A := ecInterp.Map A)) SSFam SSMem G) {x : A}
+    (hx : SatOccurs A x) (s : Bool) :
+    G (ecPt (.lset s) x) ↔ LitTrue (assignOf G) x s := by
+  obtain ⟨hGfam, hcov, hdisj⟩ := hG
+  have hone : G (ecPt (.lset true) x) ∨ G (ecPt (.lset false) x) := by
+    obtain ⟨S, hS, hmem⟩ := hcov (ecPt .velt x) ((ssElem_velt x).mpr hx)
+    obtain ⟨u, y, -, rfl⟩ := ssFam_cases (hGfam S hS)
+    obtain rfl : x = y := (ssMem_velt_lset x u y).mp hmem
+    cases u
+    · exact Or.inr hS
+    · exact Or.inl hS
+  have hnot : ¬(G (ecPt (.lset true) x) ∧ G (ecPt (.lset false) x)) := by
+    rintro ⟨h1, h2⟩
+    refine hdisj _ _ h1 h2 (by simp [ecPt_eq_iff]) (ecPt .velt x) ((ssElem_velt x).mpr hx) ?_
+    exact ⟨(ssMem_velt_lset x true x).mpr rfl, (ssMem_velt_lset x false x).mpr rfl⟩
+  cases s with
+  | true => exact Iff.rfl
+  | false =>
+    change G (ecPt (.lset false) x) ↔ ¬G (ecPt (.lset true) x)
+    constructor
+    · exact fun h h' => hnot ⟨h', h⟩
+    · exact fun h => hone.resolve_left h
+
+/-- **An exact cover reads off an exactly-one assignment.** -/
+theorem oneInProper_assignOf {G : ecInterp.Map A → Prop}
+    (hG : ExactCoverBy (SSElem (A := ecInterp.Map A)) SSFam SSMem G) :
+    OneInProper (assignOf G) := by
+  intro c hc
+  obtain ⟨hGfam, hcov, hdisj⟩ := hG
+  obtain ⟨S, hS, hmem⟩ := hcov (ecPt .celt c) ((ssElem_celt c).mpr hc)
+  obtain ⟨s, x, -, rfl⟩ := ssFam_cases (hGfam S hS)
+  have hocc : OccIn c x s := (ssMem_celt_lset c s x).mp hmem
+  refine ⟨x, s, hocc,
+    (exactCoverBy_lit ⟨hGfam, hcov, hdisj⟩ (satOccurs_of_occIn hocc) s).mp hS,
+    fun y t hy hTy => ?_⟩
+  by_contra hne
+  refine hdisj _ _
+    ((exactCoverBy_lit ⟨hGfam, hcov, hdisj⟩ (satOccurs_of_occIn hy) t).mpr hTy) hS ?_
+    (ecPt .celt c) ((ssElem_celt c).mpr hc) ⟨(ssMem_celt_lset c t y).mpr hy, hmem⟩
+  rw [Ne, ecPt_eq_iff]
+  rintro ⟨ht, rfl⟩
+  exact hne ⟨rfl, by simpa using ht⟩
+
+variable (A) in
 /-- Correctness of the reduction: a CNF structure is exactly-one satisfiable
 iff its literal set system has an exact cover. -/
 theorem oneInSatisfiable_iff_hasExactCover :
-    OneInSatisfiable A ↔ HasExactCover (ecInterp.Map A) := by
-  constructor
-  · -- the true literals of an exactly-one assignment form an exact cover
-    rintro ⟨ν, hν⟩
-    refine ⟨fun S => ∃ s x, S = ecPt (.lset s) x ∧ LitTrue ν x s, ?_, ?_, ?_⟩
-    · rintro S ⟨s, x, rfl, -⟩
-      exact ssFam_lset s x
-    · intro p hp
-      rcases ssElem_cases hp with ⟨x, rfl⟩ | ⟨c, hc, rfl⟩
-      · -- the element of a variable is covered by the literal it makes true
-        by_cases hx : ν x
-        · exact ⟨ecPt (.lset true) x, ⟨true, x, rfl, hx⟩, (ssMem_velt_lset x true x).mpr rfl⟩
-        · exact ⟨ecPt (.lset false) x, ⟨false, x, rfl, hx⟩, (ssMem_velt_lset x false x).mpr rfl⟩
-      · -- the element of a clause is covered by its unique true literal
-        obtain ⟨x, s, hocc, hT, -⟩ := hν c hc
-        exact ⟨ecPt (.lset s) x, ⟨s, x, rfl, hT⟩, (ssMem_celt_lset c s x).mpr hocc⟩
-    · rintro S S' ⟨s, x, rfl, hT⟩ ⟨s', x', rfl, hT'⟩ hne p hp ⟨hm, hm'⟩
-      rcases ssElem_cases hp with ⟨y, rfl⟩ | ⟨c, hc, rfl⟩
-      · -- two literals of the same variable, both true
-        obtain rfl : y = x := (ssMem_velt_lset y s x).mp hm
-        obtain rfl : y = x' := (ssMem_velt_lset y s' x').mp hm'
-        refine hne ?_
-        obtain rfl : s = s' := by
-          cases s <;> cases s' <;> simp_all [LitTrue]
-        rfl
-      · -- two true literals of the same clause
-        obtain ⟨z, u, -, -, huniq⟩ := hν c hc
-        obtain ⟨rfl, rfl⟩ := huniq x s ((ssMem_celt_lset c s x).mp hm) hT
-        obtain ⟨rfl, rfl⟩ := huniq x' s' ((ssMem_celt_lset c s' x').mp hm') hT'
-        exact hne rfl
-  · -- an exact cover reads off an exactly-one assignment
-    rintro ⟨G, hGfam, hcov, hdisj⟩
-    -- the chosen sets are exactly the true literals
-    have hkey : ∀ (x : A) (s : Bool),
-        G (ecPt (.lset s) x) ↔ LitTrue (fun z => G (ecPt (.lset true) z)) x s := by
-      intro x s
-      have hone : G (ecPt (.lset true) x) ∨ G (ecPt (.lset false) x) := by
-        obtain ⟨S, hS, hmem⟩ := hcov (ecPt .velt x) (ssElem_velt x)
-        obtain ⟨u, y, rfl⟩ := ssFam_cases (hGfam S hS)
-        obtain rfl : x = y := (ssMem_velt_lset x u y).mp hmem
-        cases u
-        · exact Or.inr hS
-        · exact Or.inl hS
-      have hnot : ¬(G (ecPt (.lset true) x) ∧ G (ecPt (.lset false) x)) := by
-        rintro ⟨h1, h2⟩
-        refine hdisj _ _ h1 h2 (by simp [ecPt_eq_iff]) (ecPt .velt x) (ssElem_velt x) ?_
-        exact ⟨(ssMem_velt_lset x true x).mpr rfl, (ssMem_velt_lset x false x).mpr rfl⟩
-      cases s with
-      | true => exact Iff.rfl
-      | false =>
-        change G (ecPt (.lset false) x) ↔ ¬G (ecPt (.lset true) x)
-        constructor
-        · exact fun h h' => hnot ⟨h', h⟩
-        · exact fun h => hone.resolve_left h
-    refine ⟨fun z => G (ecPt (.lset true) z), fun c hc => ?_⟩
-    obtain ⟨S, hS, hmem⟩ := hcov (ecPt .celt c) ((ssElem_celt c).mpr hc)
-    obtain ⟨s, x, rfl⟩ := ssFam_cases (hGfam S hS)
-    refine ⟨x, s, (ssMem_celt_lset c s x).mp hmem, (hkey x s).mp hS, fun y t hy hTy => ?_⟩
-    by_contra hne
-    refine hdisj _ _ ((hkey y t).mpr hTy) hS ?_ (ecPt .celt c) ((ssElem_celt c).mpr hc)
-      ⟨(ssMem_celt_lset c t y).mpr hy, hmem⟩
-    rw [Ne, ecPt_eq_iff]
-    rintro ⟨ht, rfl⟩
-    exact hne ⟨rfl, by simpa using ht⟩
+    OneInSatisfiable A ↔ HasExactCover (ecInterp.Map A) :=
+  ⟨fun ⟨ν, hν⟩ => ⟨coverOf ν, exactCoverBy_coverOf hν⟩,
+    fun ⟨G, hG⟩ => ⟨assignOf G, oneInProper_assignOf hG⟩⟩
 
 end Correctness
 
@@ -276,7 +330,9 @@ theorem exactCover_NP_hard : NP.Hard ExactCover :=
   NP.hard_of_foReduction oneInSat_fo_reduction_exactCover oneInSat_NP_hard
 
 /-- **Exact Cover is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.SetFamily.exactCover_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.SetFamily.html#s-Lax799700.SetFamily.exactCover_NP_complete). -/
 theorem exactCover_NP_complete : NP.Complete ExactCover :=
   ⟨exactCover_mem_NP, exactCover_NP_hard⟩
 

@@ -84,7 +84,9 @@ theorem ntmAccept_NP_complete : NP.Complete NTMAccept :=
 /-- **The machine characterization of NP**: a problem is `Σ₁`-definable exactly
 when it ordered-FO-reduces to machine acceptance. Forward through SAT – the
 generic Tseitin discharge followed by the machine of a CNF formula – and
-backward because membership travels along reductions. -/
+backward because membership travels along reductions.
+Registered in the Lax archive as
+[`Lax904597.MachineForm.mem_NP_iff_le_ntmAccept`](https://laxarchive.org/lax-904597/Lax904597.MachineForm.html#s-Lax904597.MachineForm.mem_NP_iff_le_ntmAccept). -/
 theorem mem_NP_iff_le_ntmAccept {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ NP ↔ Nonempty (P ≤ᶠᵒ[≤] NTMAccept) := by
   constructor
@@ -122,7 +124,9 @@ nothing here is definitional about the logically defined
 machine defines. The extra content over the interreducible form is exactly the
 cofinal quantifier: `DescriptiveComplexity.mem_NP_iff_le_ntmAccept` turns an
 arbitrary problem accepted by a machine into a `Σ₁` definition, which the
-generic discharge then sends to `DescriptiveComplexity.SAT`. -/
+generic discharge then sends to `DescriptiveComplexity.SAT`.
+Registered in the Lax archive as
+[`Lax904597.MachineForm.SAT_complete_for_ntmAccept`](https://laxarchive.org/lax-904597/Lax904597.MachineForm.html#s-Lax904597.MachineForm.SAT_complete_for_ntmAccept). -/
 theorem SAT_complete_for_ntmAccept :
     Nonempty (SAT ≤ᶠᵒ[≤] NTMAccept) ∧
       ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
@@ -160,7 +164,9 @@ theorem dtmAccept_PTIME_hard : PTIME.Hard DTMAccept :=
 /-- **Deterministic machine acceptance is PTIME-complete**: the analogue of
 `DescriptiveComplexity.ntmAccept_NP_complete` one level down. The library's
 polynomial time is defined by the Horn fragment; this theorem is the bridge
-saying it is the machine one. -/
+saying it is the machine one.
+Registered in the Lax archive as
+[`Lax535992.DeterministicMachinePTIMEComplete.dtmAccept_PTIME_complete`](https://laxarchive.org/lax-535992/Lax535992.DeterministicMachinePTIMEComplete.html#s-Lax535992.DeterministicMachinePTIMEComplete.dtmAccept_PTIME_complete). -/
 theorem dtmAccept_PTIME_complete : PTIME.Complete DTMAccept :=
   ⟨dtmAccept_mem_PTIME, dtmAccept_PTIME_hard⟩
 
@@ -168,7 +174,9 @@ theorem dtmAccept_PTIME_complete : PTIME.Complete DTMAccept :=
 – equivalently, FO(LFP) definable – exactly when it ordered-FO-reduces to
 deterministic machine acceptance. Forward through HORN-SAT – the Horn
 discharge followed by the unit-propagation machine – and backward because
-membership travels along reductions. -/
+membership travels along reductions.
+Registered in the Lax archive as
+[`Lax535992.DeterministicMachinePTIMEComplete.mem_PTIME_iff_le_dtmAccept`](https://laxarchive.org/lax-535992/Lax535992.DeterministicMachinePTIMEComplete.html#s-Lax535992.DeterministicMachinePTIMEComplete.mem_PTIME_iff_le_dtmAccept). -/
 theorem mem_PTIME_iff_le_dtmAccept {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PTIME ↔ Nonempty (P ≤ᶠᵒ[≤] DTMAccept) := by
   constructor

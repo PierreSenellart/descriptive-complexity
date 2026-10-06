@@ -23,13 +23,12 @@ theorems of `DescriptiveComplexity.SecondOrderPull` and
 `DescriptiveComplexity.SecondOrderOrdered`.
 
 Hardness is defined *cofinally*: `P` is hard when every problem of the class
-reduces (by an ordered FO reduction) to every relational problem that `P`
-itself reduces to. For a problem over a relational vocabulary this is
-equivalent to the usual “everything in the class reduces to `P`”
+reduces (by an ordered FO reduction) to every problem that `P` itself reduces
+to. This is equivalent to the usual “everything in the class reduces to `P`”
 (`DescriptiveComplexity.cofinalHard_iff`, with per-class specializations
 `DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff` and
 `DescriptiveComplexity.hard_PTIME_iff`), and the formulation makes hardness travel
-forward along reductions even through non-relational vocabularies.
+forward along reductions by composition alone.
 
 Level 0 is `DescriptiveComplexity.PTIME`, polynomial time, *defined* here as
 definability in the Horn fragment SO-Horn of existential second-order logic
@@ -78,7 +77,9 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 
 /-! ### Congruence of definability in the problem -/
 
-/-- `Σₖ`-definability only depends on the finite instances of a problem. -/
+/-- `Σₖ`-definability only depends on the finite instances of a problem.
+Registered in the Lax archive (for `NP`) as
+[`Lax904597.NPClass.NP_mem_congr_finite`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.NP_mem_congr_finite). -/
 theorem sigmaSODefinable_congr {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) (k : ℕ) :
     SigmaSODefinable k P ↔ SigmaSODefinable k Q := by
@@ -110,10 +111,9 @@ def OrderedFOReduction.congrSource {L' : Language.{0, 0}} [L'.IsRelational]
 /-! ### Cofinal hardness -/
 
 /-- Hardness for a collection of problems, cofinally: every problem of the
-collection reduces to every relational problem that `P` reduces to. For `P`
-over a relational vocabulary this is the usual notion (see
-`DescriptiveComplexity.hard_sigmaP_succ_iff`); this formulation is closed under
-reductions out of arbitrary vocabularies. -/
+collection reduces to every problem that `P` reduces to. This is the usual
+notion (see `DescriptiveComplexity.cofinalHard_iff`), in a formulation closed
+under reductions by composition alone. -/
 def CofinalHard (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) : Prop :=
   ∀ {L' : Language.{0, 0}} [L'.IsRelational] (S : DecisionProblem L'),
@@ -121,6 +121,9 @@ def CofinalHard (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], Decisio
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         Mem Q → Nonempty (Q ≤ʳᶠᵒ[≤] S)
 
+/-- Cofinal hardness travels forward along first-order reductions.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_of_foReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_of_foReduction). -/
 theorem CofinalHard.of_foReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
@@ -129,6 +132,9 @@ theorem CofinalHard.of_foReduction
   intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.toOrdered.toRel.trans g) R hR
 
+/-- Cofinal hardness travels forward along ordered first-order reductions.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_of_orderedReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_of_orderedReduction). -/
 theorem CofinalHard.of_orderedReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
@@ -137,6 +143,10 @@ theorem CofinalHard.of_orderedReduction
   intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.toRel.trans g) R hR
 
+/-- Cofinal hardness travels forward along relativized ordered first-order
+reductions.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_of_relOrderedReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_of_relOrderedReduction). -/
 theorem CofinalHard.of_relOrderedReduction
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
@@ -145,6 +155,9 @@ theorem CofinalHard.of_relOrderedReduction
   intro L' _ S hQS L'' _ R hR
   exact hP S (hQS.map fun g => f.trans g) R hR
 
+/-- Cofinal hardness only depends on the finite instances of a problem.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_congr`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_congr). -/
 theorem CofinalHard.congr
     {Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     {L₁ : Language.{0, 0}} [L₁.IsRelational] {P P' : DecisionProblem L₁}
@@ -153,8 +166,8 @@ theorem CofinalHard.congr
   intro L' _ S hS L'' _ R hR
   exact hP S (hS.map fun g => g.congrSource fun A _ _ => (h A).symm) R hR
 
-/-- **Over a relational vocabulary, cofinal hardness is the usual notion**:
-every problem of the collection reduces to `P` itself. This holds whatever the
+/-- **Cofinal hardness is the usual notion**: every problem of the collection
+reduces to `P` itself. This holds whatever the
 collection is – the proof only uses reflexivity and transitivity of reductions
 – so the specializations to the individual classes below
 (`DescriptiveComplexity.hard_sigmaP_succ_iff`, `DescriptiveComplexity.hard_piP_succ_iff`,
@@ -162,7 +175,9 @@ collection is – the proof only uses reflexivity and transitivity of reductions
 
 The left-to-right direction is what a *user* of a hardness result needs, to
 extract an actual reduction; it is where relationality of `P` is used, to
-instantiate the cofinal quantifier at `P` itself. -/
+instantiate the cofinal quantifier at `P` itself.
+Registered in the Lax archive as
+[`Lax904597.NPClass.cofinalHard_iff`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.cofinalHard_iff). -/
 theorem cofinalHard_iff
     (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) :
@@ -295,7 +310,9 @@ level: by definition at level 0, and by the quantifier duality
 (That moreover `PiP 0 = SigmaP 0` – polynomial time closed under complement –
 is `DescriptiveComplexity.piP_zero_eq`: complementing a Horn program needs its least
 model computed inside the fragment, which is what the translation from FO(LFP)
-provides.) -/
+provides.)
+Registered in the Lax archive as
+[`Lax564036.HierarchyDuality.mem_piP_iff`](https://laxarchive.org/lax-564036/Lax564036.HierarchyDuality.html#s-Lax564036.HierarchyDuality.mem_piP_iff). -/
 theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PiP k ↔ Pᶜ ∈ SigmaP k := by
   cases k with
@@ -343,31 +360,33 @@ downstream, with HORN-SAT.) -/
 theorem piP_subset_PH (k : ℕ) : PiP (k + 1) ⊆ PH :=
   fun _ _ _ hP => ⟨k + 2, piP_subset_sigmaP_succ k hP⟩
 
-/-- A problem's complement is in coNP iff the problem is in NP. -/
+/-- A problem's complement is in coNP iff the problem is in NP.
+Registered in the Lax archive as
+[`Lax564036.HierarchyDuality.compl_mem_coNP_iff`](https://laxarchive.org/lax-564036/Lax564036.HierarchyDuality.html#s-Lax564036.HierarchyDuality.compl_mem_coNP_iff). -/
 theorem compl_mem_coNP_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     Pᶜ ∈ coNP ↔ P ∈ NP := by
   rw [mem_piP_iff, DecisionProblem.compl_compl]
 
-/-! ### Hardness over relational vocabularies -/
+/-! ### Hardness, class by class -/
 
-/-- Over a relational vocabulary, cofinal `Σₖ₊₁ᵖ`-hardness is the usual
-notion: every `Σₖ₊₁`-definable problem reduces to `P`. -/
+/-- Cofinal `Σₖ₊₁ᵖ`-hardness is the usual notion: every `Σₖ₊₁`-definable
+problem reduces to `P`. -/
 theorem hard_sigmaP_succ_iff (k : ℕ) (P : DecisionProblem L) :
     (SigmaP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SigmaSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
-/-- Over a relational vocabulary, cofinal `Πₖ₊₁ᵖ`-hardness is the usual
-notion: every `Πₖ₊₁`-definable problem reduces to `P`. -/
+/-- Cofinal `Πₖ₊₁ᵖ`-hardness is the usual notion: every `Πₖ₊₁`-definable
+problem reduces to `P`. -/
 theorem hard_piP_succ_iff (k : ℕ) (P : DecisionProblem L) :
     (PiP (k + 1)).Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         PiSODefinable (k + 1) Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
-/-- Over a relational vocabulary, cofinal PTIME-hardness is the usual notion:
-every SO-Horn definable problem reduces to `P`. -/
+/-- Cofinal PTIME-hardness is the usual notion: every SO-Horn definable
+problem reduces to `P`. -/
 theorem hard_PTIME_iff (P : DecisionProblem L) :
     PTIME.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),

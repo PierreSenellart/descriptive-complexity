@@ -413,7 +413,9 @@ theorem satUnsat_DP_hard : DP.Hard SATUNSAT :=
 1984][papadimitriou1984complexity]): membership is
 `DescriptiveComplexity.satUnsat_mem_DP`, the shape of the problem itself; hardness is
 `DescriptiveComplexity.satUnsat_hard_of_dpDefinable`, the two Cook–Levin discharges run
-side by side into one paired instance. -/
+side by side into one paired instance.
+Registered in the Lax archive as
+[`Lax564036.SatUnsatDPComplete.satUnsat_DP_complete`](https://laxarchive.org/lax-564036/Lax564036.SatUnsatDPComplete.html#s-Lax564036.SatUnsatDPComplete.satUnsat_DP_complete). -/
 theorem SATUNSAT_DP_complete : DP.Complete SATUNSAT :=
   ⟨satUnsat_mem_DP, satUnsat_DP_hard⟩
 

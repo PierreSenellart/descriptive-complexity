@@ -313,7 +313,9 @@ theorem threeDnfTaut_hard_of_piSODefinable :
   exact (threeUnsat_hard_of_piSODefinable Q hQ).map fun f =>
     f.trans_fo threeUnsat_fo_reduction_threeDnfTaut
 
-/-- **3-UNSAT is coNP-complete.** -/
+/-- **3-UNSAT is coNP-complete.**
+Registered in the Lax archive as
+[`Lax564036.ThreeDnfTautCoNPComplete.threeUnsat_coNP_complete`](https://laxarchive.org/lax-564036/Lax564036.ThreeDnfTautCoNPComplete.html#s-Lax564036.ThreeDnfTautCoNPComplete.threeUnsat_coNP_complete). -/
 theorem ThreeUNSAT_coNP_complete : coNP.Complete ThreeUNSAT :=
   ⟨threeUnsat_mem_coNP,
     (hard_piP_succ_iff 0 ThreeUNSAT).mpr fun Q hQ =>
@@ -322,7 +324,9 @@ theorem ThreeUNSAT_coNP_complete : coNP.Complete ThreeUNSAT :=
 /-- **3-DNF-TAUT is coNP-complete.** Membership is the gated sign swap; the
 hardness discharge is the Cook–Levin theorem read through the complement,
 routed through 3-UNSAT so that the width promise of the clause-splitting
-reduction is available where it is needed. -/
+reduction is available where it is needed.
+Registered in the Lax archive as
+[`Lax564036.ThreeDnfTautCoNPComplete.threeDnfTaut_coNP_complete`](https://laxarchive.org/lax-564036/Lax564036.ThreeDnfTautCoNPComplete.html#s-Lax564036.ThreeDnfTautCoNPComplete.threeDnfTaut_coNP_complete). -/
 theorem ThreeDnfTAUT_coNP_complete : coNP.Complete ThreeDnfTAUT :=
   ⟨threeDnfTaut_mem_coNP,
     (hard_piP_succ_iff 0 ThreeDnfTAUT).mpr fun Q hQ =>

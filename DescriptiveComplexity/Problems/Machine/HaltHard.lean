@@ -61,12 +61,16 @@ theorem halt_RE_hard : RE.Hard HALT :=
   (orderedReduction_halt FINSAT finsat_rePred).elim fun f =>
     RE.hard_of_orderedReduction f finsat_RE_hard
 
-/-- **HALT is RE-complete.** -/
+/-- **HALT is RE-complete.**
+Registered in the Lax archive as
+[`Lax624099.HaltREComplete.halt_RE_complete`](https://laxarchive.org/lax-624099/Lax624099.HaltREComplete.html#s-Lax624099.HaltREComplete.halt_RE_complete). -/
 theorem halt_RE_complete : RE.Complete HALT :=
   ⟨halt_mem_RE, halt_RE_hard⟩
 
 /-- **The halting problem is undecidable**, in the concrete sense: no
-numbering of its instances has a computable characteristic function. -/
+numbering of its instances has a computable characteristic function.
+Registered in the Lax archive as
+[`Lax624099.HaltingUndecidable.halt_not_computable`](https://laxarchive.org/lax-624099/Lax624099.HaltingUndecidable.html#s-Lax624099.HaltingUndecidable.halt_not_computable). -/
 theorem halt_not_computable (V' : FinVocab Language.turing) :
     ¬ComputablePred (HALT.toPred V') :=
   not_computablePred_of_RE_hard halt_RE_hard V'

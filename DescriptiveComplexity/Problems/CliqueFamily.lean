@@ -63,7 +63,9 @@ theorem clique_NP_hard : NP.Hard Clique :=
   NP.hard_of_orderedReduction sat_ordered_fo_reduction_clique sat_NP_hard
 
 /-- **Clique is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.CliqueFamily.clique_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.CliqueFamily.html#s-Lax799700.CliqueFamily.clique_NP_complete). -/
 theorem clique_NP_complete : NP.Complete Clique :=
   ⟨clique_mem_NP, clique_NP_hard⟩
 
@@ -75,7 +77,9 @@ theorem indSet_mem_NP : IndependentSet ∈ NP :=
 theorem indSet_NP_hard : NP.Hard IndependentSet :=
   NP.hard_of_foReduction clique_fo_reduction_indSet clique_NP_hard
 
-/-- **Independent Set is NP-complete**. -/
+/-- **Independent Set is NP-complete**.
+Registered in the Lax archive as
+[`Lax799700.CliqueFamily.indSet_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.CliqueFamily.html#s-Lax799700.CliqueFamily.indSet_NP_complete). -/
 theorem indSet_NP_complete : NP.Complete IndependentSet :=
   ⟨indSet_mem_NP, indSet_NP_hard⟩
 
@@ -89,7 +93,9 @@ it. -/
 theorem vertexCover_NP_hard : NP.Hard VertexCover :=
   NP.hard_of_foReduction indSet_fo_reduction_vertexCover indSet_NP_hard
 
-/-- **Vertex Cover is NP-complete**. -/
+/-- **Vertex Cover is NP-complete**.
+Registered in the Lax archive as
+[`Lax799700.CliqueFamily.vertexCover_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.CliqueFamily.html#s-Lax799700.CliqueFamily.vertexCover_NP_complete). -/
 theorem vertexCover_NP_complete : NP.Complete VertexCover :=
   ⟨vertexCover_mem_NP, vertexCover_NP_hard⟩
 

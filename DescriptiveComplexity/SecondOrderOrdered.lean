@@ -327,7 +327,9 @@ variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂} {k : ℕ}
 re-quantified existentially inside the first block, guarded by a conjunct
 stating that it is a linear order. Order-invariance of the reduction is what
 lets `DescriptiveComplexity.sigmaSODefinable_of_orderPull` be applied: the pulled-back
-sentence is correct not merely for *some* order but for every one. -/
+sentence is correct not merely for *some* order but for every one.
+Registered in the Lax archive (for `NP`) as
+[`Lax904597.NPClass.NP_mem_of_orderedReduction`](https://laxarchive.org/lax-904597/Lax904597.NPClass.html#s-Lax904597.NPClass.NP_mem_of_orderedReduction). -/
 theorem SigmaSODefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
     (h : SigmaSODefinable (k + 1) Q) : SigmaSODefinable (k + 1) P := by
   obtain ⟨Bs, hk, φ, hφ⟩ := h

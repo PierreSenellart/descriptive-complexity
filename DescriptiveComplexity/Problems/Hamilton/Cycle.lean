@@ -45,14 +45,16 @@ theorem nextIdx_of_last {n : ℕ} {i : Fin n} (h : (i : ℕ) + 1 = n) : (nextIdx
   rw [nextIdx]
   simp [h]
 
-/-- **An enumeration is a tour**: order the universe by the position of each
-element; consecutive positions are then consecutive in that order, and the
-last position wraps to the first. -/
-theorem tourOn_of_enum {R : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
-    (h : ∀ i : Fin n, R (f i) (f (nextIdx i))) : TourOn R := by
+/-- The order of an enumeration – by the position of each element – is a tour
+of any relation the enumeration follows: consecutive positions are consecutive
+in that order, and the last position wraps to the first. -/
+theorem tour_of_enum {R : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
+    (h : ∀ i : Fin n, R (f i) (f (nextIdx i))) :
+    IsLinOrd (fun x y => f.symm x ≤ f.symm y) ∧
+      (∀ x y, SuccOf (fun x y => f.symm x ≤ f.symm y) x y → R x y) ∧
+      ∀ x y, (∀ z, f.symm x ≤ f.symm z) → (∀ z, f.symm z ≤ f.symm y) → R y x := by
   classical
-  refine ⟨fun x y => f.symm x ≤ f.symm y,
-    isLinOrd_of_key isLinOrd_le f.symm f.symm.injective fun _ _ => Iff.rfl, ?_, ?_⟩
+  refine ⟨isLinOrd_of_key isLinOrd_le f.symm f.symm.injective fun _ _ => Iff.rfl, ?_, ?_⟩
   · rintro x y ⟨hle, hne, hbetween⟩
     have hlt : f.symm x < f.symm y := lt_of_le_of_ne hle fun he => hne (f.symm.injective he)
     have hstep : (f.symm y : ℕ) = (f.symm x : ℕ) + 1 := by
@@ -105,24 +107,21 @@ theorem tourOn_of_enum {R : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
     rw [hwrap] at hR
     simpa using hR
 
-variable [Finite A]
+/-- **An enumeration is a tour**: order the universe by the position of each
+element. -/
+theorem tourOn_of_enum {R : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
+    (h : ∀ i : Fin n, R (f i) (f (nextIdx i))) : TourOn R :=
+  ⟨_, tour_of_enum f h⟩
 
-/-- **A tour is an enumeration**: reading the universe along the order the
-tour carries lists every element exactly once, consecutive ones being
-adjacent, and the last one adjacent to the first. -/
-theorem enum_of_tourOn {R : A → A → Prop} (h : TourOn R) :
-    ∃ (n : ℕ) (f : Fin n ≃ A), ∀ i : Fin n, R (f i) (f (nextIdx i)) := by
-  classical
-  obtain ⟨Le, hlin, hsucc, hwrap⟩ := h
-  let : LinearOrder A := IsLinOrd.toLinearOrder hlin
-  have : Fintype A := Fintype.ofFinite A
-  refine ⟨Fintype.card A, (monoEquivOfFin A rfl).toEquiv, fun i => ?_⟩
-  set f := (monoEquivOfFin A rfl).toEquiv with hf
-  have hle : ∀ a b : A, a ≤ b ↔ Le a b := fun _ _ => Iff.rfl
-  have hmono : ∀ j k : Fin (Fintype.card A), Le (f j) (f k) ↔ j ≤ k := fun j k =>
-    (hle _ _).symm.trans (monoEquivOfFin A rfl).le_iff_le
-  have hinv : ∀ j : Fin (Fintype.card A), f.symm (f j) = j := fun j => f.symm_apply_apply j
-  by_cases hlast : (i : ℕ) + 1 < Fintype.card A
+/-- An increasing enumeration of a tour follows the relation: consecutive
+elements are adjacent, and the last one is adjacent to the first. -/
+theorem enum_of_mono {R Le : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
+    (hmono : ∀ j k : Fin n, Le (f j) (f k) ↔ j ≤ k)
+    (hsucc : ∀ x y, SuccOf Le x y → R x y)
+    (hwrap : ∀ x y, (∀ z, Le x z) → (∀ z, Le z y) → R y x) (i : Fin n) :
+    R (f i) (f (nextIdx i)) := by
+  have hinv : ∀ j : Fin n, f.symm (f j) = j := fun j => f.symm_apply_apply j
+  by_cases hlast : (i : ℕ) + 1 < n
   · -- an interior index: the next one is its immediate successor in the order
     have hkval : (nextIdx i : ℕ) = (i : ℕ) + 1 := nextIdx_of_lt hlast
     refine hsucc (f i) (f (nextIdx i))
@@ -145,7 +144,7 @@ theorem enum_of_tourOn {R : A → A → Prop} (h : TourOn R) :
         rw [← hzi]
         simp
   · -- the last index: it wraps to the first, which is the bottom of the order
-    have hcard : (i : ℕ) + 1 = Fintype.card A := by
+    have hcard : (i : ℕ) + 1 = n := by
       have := i.isLt
       omega
     have hzero : (nextIdx i : ℕ) = 0 := nextIdx_of_last hcard
@@ -162,6 +161,26 @@ theorem enum_of_tourOn {R : A → A → Prop} (h : TourOn R) :
       have := (hmono (f.symm z) i).mpr hz
       simpa using this
     exact hwrap (f (nextIdx i)) (f i) hbot htop
+
+variable [Finite A]
+
+/-- A linear order of a finite universe has an increasing enumeration. -/
+theorem exists_mono_enum {Le : A → A → Prop} (hlin : IsLinOrd Le) :
+    ∃ f : Fin (Nat.card A) ≃ A, ∀ j k : Fin (Nat.card A), Le (f j) (f k) ↔ j ≤ k := by
+  classical
+  let : LinearOrder A := IsLinOrd.toLinearOrder hlin
+  have : Fintype A := Fintype.ofFinite A
+  exact ⟨(monoEquivOfFin A Nat.card_eq_fintype_card.symm).toEquiv,
+    fun _ _ => (monoEquivOfFin A Nat.card_eq_fintype_card.symm).le_iff_le⟩
+
+/-- **A tour is an enumeration**: reading the universe along the order the
+tour carries lists every element exactly once, consecutive ones being
+adjacent, and the last one adjacent to the first. -/
+theorem enum_of_tourOn {R : A → A → Prop} (h : TourOn R) :
+    ∃ (n : ℕ) (f : Fin n ≃ A), ∀ i : Fin n, R (f i) (f (nextIdx i)) := by
+  obtain ⟨Le, hlin, hsucc, hwrap⟩ := h
+  obtain ⟨f, hmono⟩ := exists_mono_enum hlin
+  exact ⟨_, f, enum_of_mono f hmono hsucc hwrap⟩
 
 /-- **A tour is exactly a cyclic enumeration**: the two readings of a Hamilton
 circuit agree. -/

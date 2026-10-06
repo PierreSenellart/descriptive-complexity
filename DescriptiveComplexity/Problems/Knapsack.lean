@@ -42,7 +42,9 @@ theorem knapsack_NP_hard : NP.Hard Knapsack :=
 
 /-- **Knapsack is NP-complete**, derived from the first-order reductions of
 this library and the Cook–Levin theorem. Its weights are written in *binary*:
-under the unary representation the problem is solvable in polynomial time. -/
+under the unary representation the problem is solvable in polynomial time.
+Registered in the Lax archive as
+[`Lax799700.Knapsack.knapsack_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.Knapsack.html#s-Lax799700.Knapsack.knapsack_NP_complete). -/
 theorem knapsack_NP_complete : NP.Complete Knapsack :=
   ⟨knapsack_mem_NP, knapsack_NP_hard⟩
 

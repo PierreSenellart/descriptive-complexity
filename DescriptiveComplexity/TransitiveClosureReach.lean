@@ -228,7 +228,9 @@ is Immerman–Szelepcsényi, the Krom fragment defining non-reachability head-on
 hardness is `DescriptiveComplexity.reach_NL_hard`, the FO(TC) discharge. Directed
 `s`-`t` reachability is the canonical NL-complete problem ([Jones
 1975][jones1975space]), here complete under order-invariant first-order
-reductions rather than logarithmic-space ones. -/
+reductions rather than logarithmic-space ones.
+Registered in the Lax archive as
+[`Lax485149.ReachNLComplete.reach_NL_complete`](https://laxarchive.org/lax-485149/Lax485149.ReachNLComplete.html#s-Lax485149.ReachNLComplete.reach_NL_complete). -/
 theorem REACH_NL_complete : NL.Complete REACH :=
   ⟨reach_mem_NL, reach_NL_hard⟩
 
@@ -252,7 +254,9 @@ rejection, so non-reachability is what it defines directly. Hardness is
 `DescriptiveComplexity.unreach_NL_hard`, which needs `NL = coNL`; without
 Immerman–Szelepcsényi neither half would be available for *both* problems, and
 the two would sit on either side of a complement that is not known to be
-crossable. -/
+crossable.
+Registered in the Lax archive as
+[`Lax485149.UnreachNLComplete.unreach_NL_complete`](https://laxarchive.org/lax-485149/Lax485149.UnreachNLComplete.html#s-Lax485149.UnreachNLComplete.unreach_NL_complete). -/
 theorem UNREACH_NL_complete : NL.Complete UNREACH :=
   ⟨unreach_mem_NL, unreach_NL_hard⟩
 

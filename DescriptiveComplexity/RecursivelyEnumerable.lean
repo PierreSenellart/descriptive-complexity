@@ -90,8 +90,8 @@ theorem mem_RE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ RE ↔ Sigma
 theorem mem_coRE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ coRE ↔ SigmaSONewDefinable Pᶜ :=
   Iff.rfl
 
-/-- Over a relational vocabulary, cofinal RE-hardness is the usual notion:
-every `∃SO[new]`-definable problem reduces to `P`. -/
+/-- Cofinal RE-hardness is the usual notion: every `∃SO[new]`-definable
+problem reduces to `P`. -/
 theorem hard_RE_iff [L.IsRelational] (P : DecisionProblem L) :
     RE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
@@ -100,7 +100,8 @@ theorem hard_RE_iff [L.IsRelational] (P : DecisionProblem L) :
 
 /-- **`NP ⊆ RE`**: an existential second-order sentence is an `∃SO[new]`
 sentence that invents nothing (`DescriptiveComplexity.SigmaSODefinable.toNew`).
--/
+Registered in the Lax archive as
+[`Lax624099.NPSubsetRE.NP_subset_RE`](https://laxarchive.org/lax-624099/Lax624099.NPSubsetRE.html#s-Lax624099.NPSubsetRE.NP_subset_RE). -/
 theorem NP_subset_RE : NP ⊆ RE :=
   fun _ _ _ hP => SigmaSODefinable.toNew hP
 

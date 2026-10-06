@@ -43,7 +43,9 @@ theorem oneInSat_NP_hard : NP.Hard OneInSAT :=
   NP.hard_of_orderedReduction OneInRed.threeSat_ordered_fo_reduction_oneInSat threeSat_NP_hard
 
 /-- **1-in-SAT is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.OneInSat.oneInSat_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.OneInSat.html#s-Lax799700.OneInSat.oneInSat_NP_complete). -/
 theorem oneInSat_NP_complete : NP.Complete OneInSAT :=
   ⟨oneInSat_mem_NP, oneInSat_NP_hard⟩
 

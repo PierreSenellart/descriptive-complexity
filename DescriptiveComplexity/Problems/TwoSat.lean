@@ -64,7 +64,9 @@ theorem twoSat_NL_hard : NL.Hard TwoSAT :=
 /-- **2SAT is NL-complete.** Membership is `DescriptiveComplexity.twoSat_mem_NL` – the
 Krom program that guesses a truth assignment and enforces the width promise by
 a guard; hardness is `DescriptiveComplexity.twoSat_NL_hard`, the Krom discharge. This
-is the NL-level analogue of the Cook–Levin theorem, and like it machine-free. -/
+is the NL-level analogue of the Cook–Levin theorem, and like it machine-free.
+Registered in the Lax archive as
+[`Lax485149.TwoSatNLComplete.twoSat_NL_complete`](https://laxarchive.org/lax-485149/Lax485149.TwoSatNLComplete.html#s-Lax485149.TwoSatNLComplete.twoSat_NL_complete). -/
 theorem TwoSAT_NL_complete : NL.Complete TwoSAT :=
   ⟨twoSat_mem_NL, twoSat_NL_hard⟩
 
@@ -72,21 +74,27 @@ theorem TwoSAT_NL_complete : NL.Complete TwoSAT :=
 PTIME by the Horn program for its implication graph. The inclusion has no
 syntactic route – a Krom kernel is not a Horn kernel – so it goes through the
 complete problem, exactly as `DescriptiveComplexity.PTIME_subset_NP` goes through
-HORN-SAT. -/
+HORN-SAT.
+Registered in the Lax archive as
+[`Lax535992.NLSubsetPTIME.NL_subset_PTIME`](https://laxarchive.org/lax-535992/Lax535992.NLSubsetPTIME.html#s-Lax535992.NLSubsetPTIME.NL_subset_PTIME). -/
 theorem NL_subset_PTIME : NL ⊆ PTIME := by
   intro L _ P hP
   obtain ⟨f⟩ := twoSat_hard_of_sigmaSOKromDefinable P hP
   exact PTIME.mem_of_orderedReduction f twoSat_mem_PTIME
 
 /-- **NL ⊆ NP**, by composing `DescriptiveComplexity.NL_subset_PTIME` with
-`DescriptiveComplexity.PTIME_subset_NP`. -/
+`DescriptiveComplexity.PTIME_subset_NP`.
+Registered in the Lax archive as
+[`Lax485149.NLSubsetNP.NL_subset_NP`](https://laxarchive.org/lax-485149/Lax485149.NLSubsetNP.html#s-Lax485149.NLSubsetNP.NL_subset_NP). -/
 theorem NL_subset_NP : NL ⊆ NP := by
   intro L _ P hP
   exact PTIME_subset_NP (NL_subset_PTIME hP)
 
 /-- **L ⊆ PTIME**, by composing `DescriptiveComplexity.LOGSPACE_subset_NL` with
 `DescriptiveComplexity.NL_subset_PTIME`: a deterministic walk is a walk, and NL is
-inside polynomial time through 2SAT. -/
+inside polynomial time through 2SAT.
+Registered in the Lax archive as
+[`Lax535992.NLSubsetPTIME.LOGSPACE_subset_PTIME`](https://laxarchive.org/lax-535992/Lax535992.NLSubsetPTIME.html#s-Lax535992.NLSubsetPTIME.LOGSPACE_subset_PTIME). -/
 theorem LOGSPACE_subset_PTIME : LOGSPACE ⊆ PTIME := by
   intro L _ P hP
   exact NL_subset_PTIME (LOGSPACE_subset_NL hP)

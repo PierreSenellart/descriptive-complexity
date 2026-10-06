@@ -1963,7 +1963,9 @@ open IFPLfp in
 /-- **Every FO(≤, IFP) definition is an FO(LFP) definition**: the hard half of
 the capture theorem FO(≤, IFP) = PTIME – translate the inflationary iteration
 into a stage walk with a dual truth/falsity evaluator for the step
-formulas. -/
+formulas.
+Registered in the Lax archive as
+[`Lax535992.InflationaryIsLeastFixedPoint.ifpDefinable_lfpDefinable`](https://laxarchive.org/lax-535992/Lax535992.InflationaryIsLeastFixedPoint.html#s-Lax535992.InflationaryIsLeastFixedPoint.ifpDefinable_lfpDefinable). -/
 theorem IFPDefinable.lfpDefinable {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinable P) : LFPDefinable P := by
   obtain ⟨d, hd⟩ := h
@@ -1981,7 +1983,9 @@ theorem ifpDefinable_iff_lfpDefinable {L : Language.{0, 0}} [L.IsRelational]
   ⟨IFPDefinable.lfpDefinable, LFPDefinable.ifpDefinable⟩
 
 /-- **The capture theorem FO(≤, IFP) = PTIME**: a problem is FO(≤, IFP)
-definable exactly when it is in PTIME. -/
+definable exactly when it is in PTIME.
+Registered in the Lax archive as
+[`Lax535992.InflationaryIsLeastFixedPoint.ifpDefinable_iff_mem_PTIME`](https://laxarchive.org/lax-535992/Lax535992.InflationaryIsLeastFixedPoint.html#s-Lax535992.InflationaryIsLeastFixedPoint.ifpDefinable_iff_mem_PTIME). -/
 theorem ifpDefinable_iff_mem_PTIME {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     IFPDefinable P ↔ P ∈ PTIME :=
   (ifpDefinable_iff_lfpDefinable P).trans (lfpDefinable_iff_sigmaSOHornDefinable P)

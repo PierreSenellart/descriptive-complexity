@@ -72,6 +72,14 @@ def Satisfiable : Prop :=
   ∃ ν : A → Prop, ∀ c : A, RelMap satIsClause ![c] →
     ∃ x : A, (RelMap satPosIn ![c, x] ∧ ν x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν x)
 
+/-- The element `x` is a variable of the CNF formula: it occurs, positively or
+negatively, in some clause. The decision problem does not need the notion –
+an element in no clause is harmless – but everything that *counts* assignments
+does, and so does any reduction that must not give such an element a truth
+value to choose. -/
+def SatOccurs (x : A) : Prop :=
+  ∃ c : A, RelMap satIsClause ![c] ∧ (RelMap satPosIn ![c, x] ∨ RelMap satNegIn ![c, x])
+
 end Sat
 
 section Iso
@@ -180,7 +188,9 @@ theorem realize_satKernel {A : Type} [Language.sat.Structure A]
 
 /-- **SAT is `Σ₁`-definable**: satisfiability of a CNF structure is expressed
 by existentially quantifying a truth assignment and checking, in first-order
-logic, that every clause contains a true literal. -/
+logic, that every clause contains a true literal.
+Registered in the Lax archive as
+[`Lax904597.CookLevin.sat_sigmaSODefinable`](https://laxarchive.org/lax-904597/Lax904597.CookLevin.html#s-Lax904597.CookLevin.sat_sigmaSODefinable). -/
 theorem sat_sigmaSODefinable : SigmaSODefinable 1 SAT := by
   refine ⟨[satAssignBlock], rfl, satKernel, ?_⟩
   intro A _ _ _

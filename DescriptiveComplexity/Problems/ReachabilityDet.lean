@@ -284,7 +284,9 @@ transitive closure (membership), and a deterministic transitive closure *is*
 deterministic reachability in the graph of its walk (hardness). Compare REACH,
 whose NL-completeness needs Immerman–Szelepcsényi on the membership side; here
 nothing of the kind is required, the fragment issue that forces it not arising
-for an operator-based logic. -/
+for an operator-based logic.
+Registered in the Lax archive as
+[`Lax485149.ReachdLComplete.reachd_LOGSPACE_complete`](https://laxarchive.org/lax-485149/Lax485149.ReachdLComplete.html#s-Lax485149.ReachdLComplete.reachd_LOGSPACE_complete). -/
 theorem REACHd_LOGSPACE_complete : LOGSPACE.Complete REACHd :=
   ⟨reachd_mem_LOGSPACE, reachd_LOGSPACE_hard⟩
 

@@ -1473,7 +1473,9 @@ theorem graphCrawling_NP_hard : NP.Hard GraphCrawling :=
   NP.hard_of_orderedReduction setCover_ordered_fo_reduction_graphCrawling setCover_NP_hard
 
 /-- **The graph crawling problem is NP-complete**
-([Gauquier–Manolescu–Senellart 2026][gauquier2026efficient2], Prop. 4). -/
+([Gauquier–Manolescu–Senellart 2026][gauquier2026efficient2], Prop. 4).
+Registered in the Lax archive as
+[`Lax117614.GraphCrawlingNPComplete.graphCrawling_NP_complete`](https://laxarchive.org/lax-117614/Lax117614.GraphCrawlingNPComplete.html#s-Lax117614.GraphCrawlingNPComplete.graphCrawling_NP_complete). -/
 theorem graphCrawling_NP_complete : NP.Complete GraphCrawling :=
   ⟨graphCrawling_mem_NP, graphCrawling_NP_hard⟩
 
@@ -1493,7 +1495,9 @@ theorem crawlInterp_wf (A : Type) [Language.setSystem.Structure A] [LinearOrder 
 /-- **Well-formed graph crawling is NP-complete**: crawling restricted to
 websites with exactly one root – the instances the decoder of step 6
 handles. Both halves are one-line upgrades of the plain completeness proof
-(`OrderedFOReduction.withInvariant`, `SigmaSODefinable.inf_ofSentence`). -/
+(`OrderedFOReduction.withInvariant`, `SigmaSODefinable.inf_ofSentence`).
+Registered in the Lax archive as
+[`Lax117614.CrawlDecoding.wfGraphCrawling_NP_complete`](https://laxarchive.org/lax-117614/Lax117614.CrawlDecoding.html#s-Lax117614.CrawlDecoding.wfGraphCrawling_NP_complete). -/
 theorem crawlWF_NP_complete :
     NP.Complete (DecisionProblem.ofSentence crawlWFSentence ⊓ GraphCrawling) :=
   ⟨graphCrawling_sigmaSODefinable.inf_ofSentence crawlWFSentence,

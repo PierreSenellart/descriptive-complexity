@@ -44,7 +44,9 @@ theorem zeroOneIP_NP_hard : NP.Hard ZeroOneIP :=
 /-- **0-1 integer programming is NP-complete**, derived from the first-order
 reductions of this library and the Cook–Levin theorem. Its entries are written
 in *binary*: under the unary representation the problem is solvable in
-polynomial time. -/
+polynomial time.
+Registered in the Lax archive as
+[`Lax799700.ZeroOneIP.zeroOneIP_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.ZeroOneIP.html#s-Lax799700.ZeroOneIP.zeroOneIP_NP_complete). -/
 theorem zeroOneIP_NP_complete : NP.Complete ZeroOneIP :=
   ⟨zeroOneIP_mem_NP, zeroOneIP_NP_hard⟩
 

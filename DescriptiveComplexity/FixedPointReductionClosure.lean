@@ -231,7 +231,9 @@ section RelOrdered
 
 variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
-/-- **PTIME is closed under relativized ordered reductions.** -/
+/-- **PTIME is closed under relativized ordered reductions.**
+Registered in the Lax archive as
+[`Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction`](https://laxarchive.org/lax-535992/Lax535992.PTIMEClosure.html#s-Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction). -/
 theorem mem_PTIME_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
   (ifpDefinable_iff_mem_PTIME P).mp
     (((ifpDefinable_iff_mem_PTIME Q).mpr h).of_relOrderedReduction f)
@@ -266,8 +268,8 @@ def CofinalHardLFP (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], Deci
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         Mem Q → Nonempty (Q ≤ˡᶠᵖ S)
 
-/-- **Over a relational vocabulary, hardness under FO(LFP) reductions is the
-usual notion**: every problem of the collection reduces to `P` itself. -/
+/-- **Hardness under FO(LFP) reductions is the usual notion**: every problem of
+the collection reduces to `P` itself. -/
 theorem cofinalHardLFP_iff
     (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) :

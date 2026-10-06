@@ -43,7 +43,9 @@ theorem threeDimMatching_NP_hard : NP.Hard ThreeDimMatching :=
   NP.hard_of_orderedReduction sat_ordered_fo_reduction_threeDimMatching sat_NP_hard
 
 /-- **3-dimensional matching is NP-complete**, derived from the first-order
-reductions of this library and the Cook–Levin theorem. -/
+reductions of this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.ThreeDimMatching.threeDimMatching_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.ThreeDimMatching.html#s-Lax799700.ThreeDimMatching.threeDimMatching_NP_complete). -/
 theorem threeDimMatching_NP_complete : NP.Complete ThreeDimMatching :=
   ⟨threeDimMatching_mem_NP, threeDimMatching_NP_hard⟩
 

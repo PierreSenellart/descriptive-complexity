@@ -400,7 +400,9 @@ theorem game_PTIME_hard : PTIME.Hard GAME := by
 
 /-- **GAME is PTIME-complete.** Membership is
 `DescriptiveComplexity.game_mem_PTIME`, the least fixed point with its scan of
-the order; hardness is unit propagation read as a game. -/
+the order; hardness is unit propagation read as a game.
+Registered in the Lax archive as
+[`Lax535992.GamePTIMEComplete.game_PTIME_complete`](https://laxarchive.org/lax-535992/Lax535992.GamePTIMEComplete.html#s-Lax535992.GamePTIMEComplete.game_PTIME_complete). -/
 theorem game_PTIME_complete : PTIME.Complete GAME :=
   ⟨game_mem_PTIME, game_PTIME_hard⟩
 

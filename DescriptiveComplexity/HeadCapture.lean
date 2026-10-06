@@ -1305,7 +1305,9 @@ end Machine
 /-- **The capture theorem for FO(TC)**: a problem is definable by a single
 transitive closure exactly when a two-way multi-head automaton recognizes it.
 One direction is `DescriptiveComplexity.tcDefinable_of_automaton` – a configuration is
-a node of a specification – and the other is the machine built here. -/
+a node of a specification – and the other is the machine built here.
+Registered in the Lax archive as
+[`Lax485149.NLByAutomata.tcDefinable_iff_automaton`](https://laxarchive.org/lax-485149/Lax485149.NLByAutomata.html#s-Lax485149.NLByAutomata.tcDefinable_iff_automaton). -/
 theorem tcDefinable_iff_automaton [L.IsRelational] {P : DecisionProblem L} :
     TCDefinable P ↔ ∃ (k : ℕ) (M : HeadAutomaton L k),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
@@ -1318,7 +1320,9 @@ theorem tcDefinable_iff_automaton [L.IsRelational] {P : DecisionProblem L} :
     exact tcDefinable_of_automaton M hM
 
 /-- **NL is the class of the two-way multi-head automata**: membership in
-`DescriptiveComplexity.NL` is recognizability by such a machine. -/
+`DescriptiveComplexity.NL` is recognizability by such a machine.
+Registered in the Lax archive as
+[`Lax485149.NLByAutomata.mem_NL_iff_automaton`](https://laxarchive.org/lax-485149/Lax485149.NLByAutomata.html#s-Lax485149.NLByAutomata.mem_NL_iff_automaton). -/
 theorem mem_NL_iff_automaton [L.IsRelational] {P : DecisionProblem L} :
     P ∈ NL ↔ ∃ (k : ℕ) (M : HeadAutomaton L k),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

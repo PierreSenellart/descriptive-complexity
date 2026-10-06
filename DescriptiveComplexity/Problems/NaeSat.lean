@@ -344,7 +344,7 @@ noncomputable def naeFalseKernel : satSOLang.Sentence :=
 conjoined with its mirror image. -/
 noncomputable def naeKernel : satSOLang.Sentence := satKernel ⊓ naeFalseKernel
 
-private theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
+theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) naeFalseKernel) ↔
@@ -374,7 +374,7 @@ private theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
     · exact ⟨fun _ => x, Or.inl ⟨hp, hT⟩⟩
     · exact ⟨fun _ => x, Or.inr ⟨hn, hT⟩⟩
 
-private theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
+theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) naeKernel) ↔
@@ -415,7 +415,9 @@ theorem naeSat_NP_hard : NP.Hard NAESAT :=
   NP.hard_of_orderedReduction sat_ordered_fo_reduction_naeSat sat_NP_hard
 
 /-- **NAE-SAT is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.NaeSat.naeSat_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.NaeSat.html#s-Lax799700.NaeSat.naeSat_NP_complete). -/
 theorem naeSat_NP_complete : NP.Complete NAESAT :=
   ⟨naeSat_mem_NP, naeSat_NP_hard⟩
 

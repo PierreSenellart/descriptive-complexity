@@ -67,7 +67,9 @@ theorem setCover_NP_hard : NP.Hard SetCover :=
   NP.hard_of_foReduction vertexCover_fo_reduction_setCover vertexCover_NP_hard
 
 /-- **Set Cover is NP-complete**, derived from the first-order reductions of
-this library and the Cook–Levin theorem. -/
+this library and the Cook–Levin theorem.
+Registered in the Lax archive as
+[`Lax799700.SetFamily.setCover_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.SetFamily.html#s-Lax799700.SetFamily.setCover_NP_complete). -/
 theorem setCover_NP_complete : NP.Complete SetCover :=
   ⟨setCover_mem_NP, setCover_NP_hard⟩
 
@@ -80,7 +82,9 @@ transposing the incidence relation. -/
 theorem hittingSet_NP_hard : NP.Hard HittingSet :=
   NP.hard_of_foReduction setCover_fo_reduction_hittingSet setCover_NP_hard
 
-/-- **Hitting Set is NP-complete**. -/
+/-- **Hitting Set is NP-complete**.
+Registered in the Lax archive as
+[`Lax799700.SetFamily.hittingSet_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.SetFamily.html#s-Lax799700.SetFamily.hittingSet_NP_complete). -/
 theorem hittingSet_NP_complete : NP.Complete HittingSet :=
   ⟨hittingSet_mem_NP, hittingSet_NP_hard⟩
 
@@ -93,7 +97,9 @@ by the edge-incidence interpretation. -/
 theorem setPacking_NP_hard : NP.Hard SetPacking :=
   NP.hard_of_foReduction indSet_fo_reduction_setPacking indSet_NP_hard
 
-/-- **Set Packing is NP-complete**. -/
+/-- **Set Packing is NP-complete**.
+Registered in the Lax archive as
+[`Lax799700.SetFamily.setPacking_NP_complete`](https://laxarchive.org/lax-799700/Lax799700.SetFamily.html#s-Lax799700.SetFamily.setPacking_NP_complete). -/
 theorem setPacking_NP_complete : NP.Complete SetPacking :=
   ⟨setPacking_mem_NP, setPacking_NP_hard⟩
 
