@@ -23,9 +23,8 @@ type: theorem
 ---
 Polynomial time is the bottom of the hierarchy: PTIME is contained in coNP,
 and in $\Sigma_k^p$ for every $k$; with PTIME $\subseteq$ NP this places
-it in NP $\cap$ coNP. The inclusion in coNP is not read off the syntax of
-the Horn fragment; it is the dual of the inclusion in NP, PTIME being
-closed under complement.
+it in NP $\cap$ coNP. The inclusion in coNP is the dual of the inclusion
+in NP, PTIME being closed under complement.
 -/
 
 namespace Lax564036.PolynomialTimeInHierarchy

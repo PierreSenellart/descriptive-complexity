@@ -16,10 +16,11 @@ formula; and it contains the polynomial hierarchy, level by level.
 First-order logic with partial fixed points defines the same problems on
 ordered structures, FO(≤, PFP) = SO(TC) = PSPACE, and contains the
 inflationary logic. With the capture of polynomial time by inflationary
-fixed points this gives the Abiteboul–Vianu theorem on ordered structures;
-the theorem proper is proved too: on finite structures without an order,
-the inflationary and the partial fixed-point logics define the same
-problems exactly when PTIME = PSPACE.
+fixed points this gives the Abiteboul–Vianu theorem on ordered structures,
+and the theorem itself is proved as well: on finite structures without an
+order, the
+inflationary and the partial fixed-point logics define the same problems
+exactly when PTIME = PSPACE.
 
 Four problems are complete under the core's first-order reductions:
 quantified Boolean formulas, reachability in a succinctly described

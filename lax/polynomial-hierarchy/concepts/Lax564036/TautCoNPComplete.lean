@@ -23,8 +23,8 @@ type: theorem
 ---
 TAUT, the tautology problem for DNF formulas, is coNP-complete under
 first-order reductions: swapping the signs of the literals turns a DNF
-tautology into an unsatisfiable CNF formula and back, so the result is the
-Cook–Levin theorem complemented.
+tautology into an unsatisfiable CNF formula and back, so the result follows
+from the Cook–Levin theorem by complementation.
 -/
 
 namespace Lax564036.TautCoNPComplete

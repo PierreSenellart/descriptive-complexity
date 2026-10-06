@@ -28,8 +28,8 @@ SO(TC) definable, so PSPACE is the class of the order-free SO(TC) definable
 problems. A walk can guess its order: one more binary relation variable of
 the state holds a candidate order, the source sentence checks that it is
 linear, every step keeps it unchanged, and the three sentences read it in
-place of the order symbol. The deterministic and the clausal logics of the
-classes below cannot do this.
+place of the order symbol. The logics of the classes below, deterministic
+or clausal, have no relation variable to guess an order with.
 -/
 
 namespace Lax134656.TransitiveClosureWithoutOrder

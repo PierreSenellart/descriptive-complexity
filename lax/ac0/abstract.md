@@ -7,17 +7,17 @@ ordered instance, invariantly in the order: the logic that defines the
 problems of uniform AC⁰, by theorems of Barrington, Immerman and Straubing.
 No circuit model is introduced.
 
-The identification of the two classical vocabularies is proved in both
-directions: FO(≤, +, ×) = FO(≤, +, BIT), where BIT reads a bit of the rank of
-an element. One direction defines the powers of two from the arithmetic; the
+The two classical vocabularies define the same problems,
+FO(≤, +, ×) = FO(≤, +, BIT), where BIT reads a bit of the rank of an
+element. One direction defines the powers of two from the arithmetic; the
 other defines multiplication from BIT, through the Bit Sum Lemma, which
 counts the ones of a word of logarithmic length.
 
-The logic is then given its machine model: a problem is AC⁰ definable
-exactly when it is decided by an alternating machine with a logarithmic
-clock and constantly many alternations, which guesses addresses, queries the
-input at them, and passes over their bits with finite automata. This is the
-logarithmic-time hierarchy.
+The machine side is the logarithmic-time hierarchy: a problem is AC⁰
+definable exactly when it is decided by an alternating machine with a
+logarithmic clock and constantly many alternations, which guesses
+addresses, queries the input at them, and passes over their bits with
+finite automata.
 
 AC⁰ definability is closed under complement and contains FO(≤). It is
 contained in L, by evaluating the sentence with a deterministic multihead

@@ -29,7 +29,8 @@ type: theorem
 ---
 If two structures over a relational vocabulary are $n$-round equivalent,
 they satisfy the same first-order sentences of quantifier depth at most
-$n$. Every inexpressibility result below is a contrapositive of this.
+$n$. The inexpressibility results of this submission are contrapositives
+of it.
 -/
 
 namespace Lax945089.EhrenfeuchtMethodology

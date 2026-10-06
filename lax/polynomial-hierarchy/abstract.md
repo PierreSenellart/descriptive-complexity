@@ -10,9 +10,9 @@ and Stockmeyer. coNP is Π₁, PH is the union of the levels, and DP is the
 class of conjunctions of an NP and a coNP condition. No machine model enters
 the definitions.
 
-The structure of the hierarchy is proved, not assumed: Πₖ is the class of
-complements of Σₖ, the levels are nested and contained in PH, polynomial
-time sits at the bottom, inside NP ∩ coNP, and NP ∪ coNP ⊆ DP ⊆ Σ₂ ∩ Π₂.
+Πₖ is the class of complements of Σₖ, the levels are nested and contained
+in PH, polynomial time is at the bottom, inside NP ∩ coNP, and
+NP ∪ coNP ⊆ DP ⊆ Σ₂ ∩ Π₂.
 coNP and DP are closed under first-order reductions.
 
 Complete problems are given at every level, under the core's first-order
@@ -25,7 +25,7 @@ Each level is then related to a machine model: acceptance by an alternating
 Turing machine with k blocks of states, within the bounds of the instance,
 is complete for Σₖ or Πₖ according to its first block, and a problem is in
 the level exactly when it reduces to that acceptance problem. At one block
-this gives coNP its machine.
+these are the nondeterministic machine and its dual.
 
 The proofs are those of version 1.2.2 of the library, sliced to what these
 statements use; they assume the core's hardness laws and the submission's

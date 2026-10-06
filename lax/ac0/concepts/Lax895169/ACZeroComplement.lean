@@ -19,7 +19,7 @@ title: AC⁰ is closed under complement
 type: theorem
 ---
 If a decision problem $P$ is AC⁰ definable, then so is its complement
-$P^c$: the defining object is a sentence, and it suffices to negate it.
+$P^c$: it suffices to negate the defining sentence.
 -/
 
 namespace Lax895169.ACZeroComplement

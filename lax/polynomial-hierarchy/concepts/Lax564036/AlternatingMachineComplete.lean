@@ -29,7 +29,7 @@ if it reduces to the corresponding acceptance problem by an ordered
 first-order reduction. Each level of the logically defined hierarchy is thus
 the corresponding level of the alternating-machine hierarchy of Chandra,
 Kozen and Stockmeyer; at one block these are the nondeterministic machine
-and its dual, which gives coNP its machine. Membership reads a run as a game
+and its dual, the machine model of coNP. Membership reads a run as a game
 of $k$ rounds, each guessing one walk; hardness builds, inside the instance,
 the machine of a quantified Boolean formula, which sweeps the tape once per
 quantifier block.

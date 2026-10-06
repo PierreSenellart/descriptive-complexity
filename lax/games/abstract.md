@@ -1,6 +1,6 @@
-What the logics of descriptive complexity cannot express, from the
-descriptive-complexity library: the part of the development that proves
-separations outright, with no complexity-theoretic assumption. It builds on
+The separations proved in the descriptive-complexity library, which need
+no complexity-theoretic assumption: what the logics of descriptive
+complexity cannot express. It builds on
 the NP core registered as lax-904597 and on the submissions on logarithmic
 space, polynomial time, polynomial space and AC⁰.
 
