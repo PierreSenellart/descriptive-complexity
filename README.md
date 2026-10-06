@@ -153,6 +153,12 @@ Here a problem attaches a number to each instance. Completeness is under
 | **FP** | QFO(LFP): sums and products of polynomial-time conditions; equivalently, binary digits computed by a least fixed point | deterministic polynomial-time Turing machine writing a number | the number written by a circuit · by unit propagation on a Horn formula · by such a machine |
 | **#P** | the number of witnesses of an ∃SO sentence | nondeterministic polynomial-time Turing machine, counting its accepting runs | **SAT-family:** #SAT · #3SAT · #1-in-SAT<br>**Solutions of the threshold size:** #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree<br>**Others:** #Exact Cover · #Knapsack · #0-1 Integer Programming · #Hamilton Circuit (directed & undirected) · counting the accepting runs of such a machine<br>**Under weaker reductions:** #DNF · counting all independent sets · #BIS · #PP2DNF |
 
+The decision classes defined by a property of such a count, ⊕P, Mod_k P, PP,
+C₌P and UP, are defined too, with the inclusions between them and NP, coNP,
+and one complete problem each where one is known (⊕SAT, Mod_k-SAT, and for
+PP and C₌P the comparison of the models of a CNF formula by the value of a
+selected variable).
+
 ## Scope
 
 These limitations are *intrinsic* to the machine-free approach; for what is

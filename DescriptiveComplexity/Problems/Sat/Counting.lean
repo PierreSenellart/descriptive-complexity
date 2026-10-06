@@ -56,6 +56,37 @@ theorem satModel_restrict {ν : A → Prop}
   · exact ⟨x, Or.inl ⟨hp, hx, c, hc, Or.inl hp⟩⟩
   · exact ⟨x, Or.inr ⟨hn, fun h' => hx h'.1⟩⟩
 
+/-- Models transport along an isomorphism. -/
+theorem satModel_equiv {B : Type} [Language.sat.Structure B] (e : A ≃[Language.sat] B)
+    (ν : B → Prop) : SatModel A (fun a => ν (e a)) ↔ SatModel B ν := by
+  have h1 : ∀ c, (RelMap satIsClause ![e c] : Prop) ↔ RelMap satIsClause ![c] :=
+    fun c => (relMap_equiv₁ e satIsClause c).symm
+  have h2 : ∀ c x, (RelMap satPosIn ![e c, e x] : Prop) ↔ RelMap satPosIn ![c, x] :=
+    fun c x => (relMap_equiv₂ e satPosIn c x).symm
+  have h3 : ∀ c x, (RelMap satNegIn ![e c, e x] : Prop) ↔ RelMap satNegIn ![c, x] :=
+    fun c x => (relMap_equiv₂ e satNegIn c x).symm
+  have hocc : ∀ x, SatOccurs A x ↔ SatOccurs B (e x) := by
+    intro x
+    constructor
+    · rintro ⟨c, hc, h⟩
+      exact ⟨e c, (h1 c).mpr hc, h.imp (h2 c x).mpr (h3 c x).mpr⟩
+    · rintro ⟨c, hc, h⟩
+      obtain ⟨c, rfl⟩ := e.toEquiv.surjective c
+      exact ⟨c, (h1 c).mp hc, h.imp (h2 c x).mp (h3 c x).mp⟩
+  constructor
+  · rintro ⟨hcl, hvar⟩
+    refine ⟨fun c hc => ?_, fun x hx => ?_⟩
+    · obtain ⟨c, rfl⟩ := e.toEquiv.surjective c
+      obtain ⟨x, h⟩ := hcl c ((h1 c).mp hc)
+      exact ⟨e x, h.imp (fun h => ⟨(h2 c x).mpr h.1, h.2⟩) fun h => ⟨(h3 c x).mpr h.1, h.2⟩⟩
+    · obtain ⟨x, rfl⟩ := e.toEquiv.surjective x
+      exact (hocc x).mp (hvar x hx)
+  · rintro ⟨hcl, hvar⟩
+    refine ⟨fun c hc => ?_, fun x hx => (hocc x).mpr (hvar _ hx)⟩
+    obtain ⟨x, h⟩ := hcl (e c) ((h1 c).mpr hc)
+    obtain ⟨x, rfl⟩ := e.toEquiv.surjective x
+    exact ⟨x, h.imp (fun h => ⟨(h2 c x).mp h.1, h.2⟩) fun h => ⟨(h3 c x).mp h.1, h.2⟩⟩
+
 /-- A CNF formula is satisfiable exactly when it has a model. -/
 theorem satisfiable_iff_exists_satModel : Satisfiable A ↔ ∃ ν : A → Prop, SatModel A ν :=
   ⟨fun ⟨_, hν⟩ => ⟨_, satModel_restrict hν⟩, fun ⟨ν, hν⟩ => ⟨ν, hν.1⟩⟩

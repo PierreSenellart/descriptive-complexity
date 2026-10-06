@@ -113,6 +113,8 @@ import DescriptiveComplexity.Counting.QuantitativePull
 import DescriptiveComplexity.Counting.Reduction
 import DescriptiveComplexity.Counting.RelClosure
 import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.KernelPair
+import DescriptiveComplexity.Counting.DecisionClasses
 import DescriptiveComplexity.Counting.UnitWeights
 import DescriptiveComplexity.Counting.WeightedWorlds
 import DescriptiveComplexity.SecondOrderTransitiveClosure
@@ -2498,6 +2500,48 @@ pulled relations hold only of points of the domain
   variables come first, in that order
   (`DescriptiveComplexity.FOInterpretation.reorder`), and the machine lays its
   cells out accordingly.
+* **Decision classes defined by counting**
+  (`DescriptiveComplexity.Counting.DecisionClasses`): `⊕P`, `Mod_k P`, `PP`,
+  `C₌P` and `UP`, each the class `DescriptiveComplexity.countClass S R` of the
+  problems whose answer is the relation `R` between two witness counts of
+  `∃SO` sentences, under the side condition `S` – the characterization of
+  these classes by differences of two `#P` functions
+  ([Fenner, Fortnow, Kurtz 1994][fenner1994gap]), which needs no
+  integer-valued problem. Closure under reductions is the pullback of the two
+  kernels (`DescriptiveComplexity.CountDefinable.of_orderedReduction`), a
+  member is given by two problems of `#P`
+  (`DescriptiveComplexity.mem_countClass_of_sharpP`), and the arithmetic on
+  kernels the inclusions need is the **pair kernel** of
+  `DescriptiveComplexity.Counting.KernelPair`: a selector variable of arity
+  zero choosing between two kernels, whose witness count is the sum of the two
+  (`DescriptiveComplexity.witnessCount_pairKernel`) and whose selector reads
+  the summands back (`DescriptiveComplexity.card_pairWitness_sel`). Hence
+  `UP ⊆ NP`, `UP ⊆ ⊕P`, `NP ⊆ PP`, `coNP ⊆ PP`, and the closure of `⊕P` and
+  `PP` under complement (`DescriptiveComplexity.compl_mem_parityP`,
+  `DescriptiveComplexity.compl_mem_PP`). The complete problems
+  (`DescriptiveComplexity.Problems.Sat.CountingDecision`,
+  `DescriptiveComplexity.Problems.Sat.CountingCompare`): the decision version
+  of `#SAT` by any property of one count is complete for the class of that
+  property (`DescriptiveComplexity.decide_sharpSat_countClass₁_complete`), by
+  the parsimonious Tseitin interpretation, so `⊕SAT` is `⊕P`-complete and
+  `Mod_k-SAT` is `Mod_k P`-complete; completeness transfers to the decision
+  version of every parsimoniously `#P`-complete problem
+  (`DescriptiveComplexity.countClass₁_complete_of_sharpP_parsimoniousComplete`),
+  in particular to the parity of the number of accepting runs of a machine,
+  which gives the machine characterization of `⊕P`
+  (`DescriptiveComplexity.mem_parityP_iff_le_parity_sharpNtmAccept`). For the
+  two-count classes, a CNF formula with a *selected variable*
+  (`FirstOrder.Language.satSel`) carries two counts, the models in which the
+  variable is true and those in which it is false
+  (`DescriptiveComplexity.SharpSelSAT`); `SelMajSAT` compares them and is
+  `PP`-complete (`DescriptiveComplexity.selMajSat_PP_complete`), `SelEqSAT`
+  equates them and is `C₌P`-complete
+  (`DescriptiveComplexity.selEqSat_CeqP_complete`), the hardness being the
+  Tseitin formula of a pair kernel with the selector's variable selected
+  (`DescriptiveComplexity.PairSel.pairTseitinInterp`). `UP` has no known
+  complete problem, and the question does not relativize
+  ([Hartmanis, Hemachandra 1988][hartmanis1988complexity]); it is here for its
+  inclusions.
 * **Possible worlds** (`DescriptiveComplexity.Counting.PossibleWorlds`): for a
   finite relational schema, an instance holds certain facts and uncertain ones,
   a possible world keeps the first and some of the second, and
@@ -2686,6 +2730,11 @@ reduction and certificate in full.
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine, `k` blocks, existential first | `QBF k` – at `k = 1`, NP · `ATMAccept k true` |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` – at `k = 1`, coNP · `ATMAccept k false` |
 | `PH` | full second-order logic | — | — |
+| `⊕P` | the number of witnesses of an ∃SO sentence is odd (`DescriptiveComplexity.ParityP`) | nondeterministic polynomial-time Turing machine, the parity of its accepting runs | ⊕SAT · the parity of every parsimoniously `#P`-complete problem (`DescriptiveComplexity.parityP_complete_of_sharpP_parsimoniousComplete`) |
+| `Mod_k P` | the number of witnesses is not a multiple of `k` (`DescriptiveComplexity.ModP`) | the same machine, the residue of its accepting runs | Mod_k-SAT · likewise for every parsimoniously `#P`-complete problem |
+| `PP` | one witness count exceeds another (`DescriptiveComplexity.PP`) | — | SelMajSAT: the selected variable is true in more models than it is false |
+| `C₌P` | two witness counts are equal (`DescriptiveComplexity.CeqP`) | — | SelEqSAT: in exactly as many |
+| `UP` | at most one witness, and the answer is whether there is one (`DescriptiveComplexity.UP`) | — | — (none is known) |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
 | `EXPTIME` | SO(LFP): PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating polynomial-space Turing machine | acceptance by such a machine (`APSPACE = EXPTIME`) |
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |

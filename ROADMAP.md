@@ -438,64 +438,24 @@ non-reducibility, impossible in the machine world.
 
 ## 6. Beyond decision problems: counting and optimization
 
-Everything above measures *decision* problems. The non-decision world repeats
-the same pattern, a syntactic class matching a computational one, with a number
-or a relation in place of the yes/no answer: Saluja–Subrahmanyam–Thakur (1995)
-prove `#FO = #P` with the hierarchy `#Σ₀ ⊊ #Σ₁ ⊊ #Π₁ ⊊ #Σ₂ ⊊ #Π₂ = #FO`;
-Arenas–Muñoz–Riveros (LICS 2017; LMCS 16(1), 2020) give a cleaner framework,
-**QSO** (Quantitative Second-Order logic), a restriction of Droste–Gastin
-weighted logics to the semiring ℕ; on the optimization side there is
-Papadimitriou–Yannakakis's **MAX SNP** (1991), and for numeric output
-Grädel–Gurevich metafinite model theory.
+The counting layer exists: counting problems (iso-invariant `Structure → ℕ`),
+parsimonious, relativized, one-call and subtractive reductions, `#P` defined
+by witness counts of `∃SO` sentences, FP defined by QFO(LFP) in the sense of
+Arenas–Muñoz–Riveros (LMCS 16(1), 2020), both with a catalog of complete
+problems and a machine bridge, the decision classes defined by counting
+(`⊕P`, `Mod_k P`, `PP`, `C₌P`, `UP`) with theirs, and the possible-worlds /
+weighted-worlds problems of probabilistic query evaluation with their
+tutorial. What follows is what the same pattern still leaves open, in
+dependency order.
 
-Two observations set the design. First, the **core generalization is cheap**: a
-decision problem is an iso-invariant `Structure → Prop`, a counting problem an
-iso-invariant `Structure → ℕ`, and vocabularies, tagged interpretations and the
-invariance discipline transport unchanged. Second, **QSO is already this
-library's idiom**, so prefer ΣQSO over raw #FO as the object-level logic. QSO
-has a two-layer syntax: the Boolean layer is an ordinary SO formula evaluating
-to 1 or 0 (Mathlib's `BoundedFormula` untouched), the quantitative layer is
-built from `+`, `·` and the quantifiers `Σx`, `Πx`, `ΣX`, `ΠX` (`Σx` sums a
-subformula's value over domain elements, `ΣX` over all relations of the
-relevant arity). That is exactly “kernel as data rather than a shape carved out
-of `BoundedFormula`”, the way SO-Horn is a `HornProgram` clause list and
-FO(LFP) a rule system. Formulas transcribe the mathematics directly; the
-permanent of a 0-1 matrix is
-
-```
-ΣS. permut(S) · Πx.(∃y. S(x,y) ∧ M(x,y))
-```
-
-a second-order sum over binary relations, `permut(S)` acting as a filter and
-the product computing `∏ A[i, σ(i)]`.
-
-The capture results, all over ordered structures, are what the class
-definitions should be read against (as in §4, the library would *define* its
-classes by these fragments rather than prove machine equivalences):
-
-| fragment | class |
-|---|---|
-| ΣQSO(FO) | #P (`#FO = #P` is inherited; #FO sits inside ΣQSO(FO)) |
-| ΣQSO(∃SO) | SpanP (the paper captures SpanP, not SpanL; #L appears only via a support-based quantitative least fixed point) |
-| QFO(LFP) | FP |
-| QSO(PFP) / QFO(PFP) | FPSPACE / FPSPACE(poly) |
-| ΣQSO with ℤ constants | GapP |
-| MaxQSO(FO) / MinQSO(FO) | MaxP / MinP |
-
-The FP row is the methodologically interesting one: FP is *not* reachable by
-counting satisfying tuples of any FO fragment (`#Σ₁` already encodes such
-`#P`-complete problems as #3-DNF, and dropping second-order free variables
-loses `2ⁿ`). Products rescue it, `Πȳ.((ȳ < x̄) ↦ 2)` yielding `2^m`, which lets
-a formula reconstruct a machine's binary output bit by bit.
-
-The concrete items, in dependency order:
-
-- **The quantitative framework layer** [M]: counting problems, their
-  parsimonious and one-call reductions and counting classes exist
-  (`Counting.lean`, `Counting/`); what remains is the ΣQSO syntax and evaluator,
-  in `Quantitative.lean` / `QSO/`: the same split between framework and
-  defining logic that `Complexity.lean` and the `SecondOrder*` / `FixedPoint*`
-  files already make on the decision side.
+- **ΣQSO(FO) as the logic of `#P`** [M]: the quantitative terms exist
+  (`Counting/Quantitative.lean`, sums and products over first-order
+  conditions, the FP side), but `#P` is defined by the witness-count form
+  `ΣX̄. Σx̄. φ`. Adding second-order sums `ΣX` to the term language and proving
+  that every ΣQSO(FO) term is a witness count of an `∃SO` sentence (and
+  conversely) would make the two readings of `#P` coincide inside the library,
+  as the paper's Proposition has it, and give the permanent its natural
+  statement, `ΣS. permut(S) · Πx.(∃y. S(x,y) ∧ M(x,y))`.
 - **Non-adaptive linear combinations** [L], the reduction notion above the
   one-call reductions `≤ᶜ[≤]`:
   `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
@@ -505,37 +465,20 @@ The concrete items, in dependency order:
   level's main cost; the divisor on the left keeps Lagrange denominators out
   of the statement. Index sets multiply, parameters concatenate and divisors
   multiply, so composition still closes. This is the shape of every
-  interpolation-based `#P`-hardness proof. *Adaptive* Turing reductions,
-  where a later query depends on an earlier answer, stay out: that is the
-  honest boundary of a machine-free framework, and `FP^#P` lives beyond it.
-  The coefficients must come from a class strictly weaker than the one being
-  defined, or the notion is vacuous; the post-processing terms of
-  `Counting/Post.lean` are the interim budget, `QFO(LFP) = FP` the principled
-  one.
-- **ΣQSO evaluator** [M–L]: a fresh inductive for the quantitative layer (~8
-  constructors) over the existing Boolean layer, with a recursive evaluator
-  into ℕ whose semantics is Mathlib-native (`⟦Σx.α⟧ = Finset.sum`,
-  `⟦Πx.α⟧ = Finset.prod`). Recover #FO as the prenex fragment `ΣX̄.Σx̄.φ`.
-- **`#P := ΣQSO(FO)`** [M after the two above]: as with `NP = Σ₁ᵖ` and
-  PTIME = SO-Horn, the class is a definition and the theorem content is closure
-  under parsimonious reductions plus completeness, not a machine equivalence.
-  The discharge symmetry of §2 extends unchanged, each quantitative fragment
-  getting the complete problem that is its syntactic image (ΣQSO(FO) ↔ #SAT,
-  QFO(LFP) ↔ FP). Note that the output number lives in Lean, computed by the
-  evaluator, so the choice of number representation constrains only the numbers
-  inside *instances*, never the value of a counting problem.
-- **#SAT complete for ΣQSO(FO)** [M–L]: the high-value target, and probably the
-  cheapest route to a headline result. Tseitin gates preserve solution counts
-  precisely because they are functionally determined, and `exists_gates`
-  (`∃ gates. CNF(atoms, gates) ↔ φ(atoms)`) already exists in the QBF
-  development; strengthen it to `ExistsUnique` and the Cook–Levin discharge
-  becomes parsimonious.
-- **The free catalog entries** [S each]: reductions already bijective on
-  solutions are parsimonious almost by inspection, notably 1-in-3-SAT → Exact
-  Cover (no order, no gadget, no counting, dimension 1: covering `x` once *is*
-  an assignment) and Set Splitting. Also #3COL and the permanent as new
-  entries.
-- **Structure inside #P** [R]: the ΣQSO(FO)-hierarchy tracks the #FO one but
+  interpolation-based `#P`-hardness proof: the permanent and #PerfectMatching
+  (Valiant 1979), and Dalvi–Suciu's `h₁` as the paper proves it. *Adaptive*
+  Turing reductions, where a later query depends on an earlier answer, stay
+  out: that is the honest boundary of a machine-free framework, and `FP^#P`
+  lives beyond it. The coefficients must come from a class strictly weaker
+  than the one being defined, or the notion is vacuous; the post-processing
+  terms of `Counting/Post.lean` are the interim budget, FP the principled one.
+- **The rest of the catalog** [S each]: the NAE-SAT family, Set Splitting and
+  3-Colorability count solutions up to a constant factor (complementary pairs,
+  permutations of the colors), so each needs its counting convention fixed
+  before it can be parsimoniously or one-call complete; the one-call entries
+  #Monotone-2SAT, #2SAT, #HornSAT by inclusion of instances, and all the vertex
+  covers of a graph as complements of the independent sets.
+- **Structure inside `#P`** [R]: the ΣQSO(FO)-hierarchy tracks the #FO one but
   diverges at the bottom (`#Σᵢ ⊊ ΣQSO(Σᵢ)` for `i = 0, 1`, coinciding from Π₁
   up; ΣQSO(Σ₀) and #Σ₁ incomparable), and the gap is the point: #Σ₁ has an
   FPRAS but is not closed under sum; ΣQSO(Σ₁) is, but subtraction by one is
@@ -545,11 +488,13 @@ The concrete items, in dependency order:
   logarithmic-size witnesses a fixed formula can identify and delete). A
   Grädel-style Horn restriction ΣQSO(Σ₂-Horn) has #DisjHornSAT as a natural
   complete problem under parsimonious reductions, rhyming with the SO-Horn
-  layer already in the library.
+  layer already in the library. The FPRAS story of the bottom level is the
+  probabilistic-database approximability story (Karp–Luby on the lineage DNF),
+  so this is the application's own fine print rather than an unrelated item.
 - **Quantitative least fixed point** [R, deferred]: the support-based `lsfp`
-  needed for QFO(LFP) = FP and for #L. It needs its own monotonicity and
-  termination argument; `derivesIn`/`depth` in the FO(LFP) layer is the right
-  precedent.
+  of the paper, needed for `#L`; FP was reached without it, through QFO(LFP)
+  over Horn rules. It needs its own monotonicity and termination argument;
+  `derivesIn`/`depth` in the FO(LFP) layer is the right precedent.
 - **Optimization: MaxSNP** [R, deferred furthest]: Papadimitriou–Yannakakis's
   syntactically defined optimization classes (Π₁-definable objective),
   L-reductions, MAX-3SAT completeness; MaxQSO/MinQSO is the definitional route
@@ -557,69 +502,40 @@ The concrete items, in dependency order:
   delicate than parsimonious ones, which is also why PCP-based hardness of
   approximation stays out of scope.
 
-### Probabilistic query evaluation, and what “`#P`-hard” should mean
+### Probabilistic query evaluation, what remains
 
-The intended consumer of this track is probability computation, where the
-field's own “`#P`-hard” is an abuse: computing a probability is a map into ℚ,
-so the honest classical statement is `FP^#P`-completeness under Turing
-reductions, which the ladder above deliberately does not reach. The abuse is an
-artifact of the *output type*, and it disappears by counting worlds instead:
-for a fixed query `Q` and a TID instance whose probabilistic tuples `T` all
-carry probability 1/2,
+The tutorial (`Examples/ProbabilisticQueries.lean`) has the possible-worlds
+and weighted-worlds problems, the `h₀` hardness (one-call, from #PP2DNF), the
+probability of any first-order query as a ratio of two `#P` numbers, the
+encoding of a concrete database with its faithfulness and decoding, and the
+safe query `R(x), S(x, y)` in FP. Still open:
 
-```
-#PQE(Q) : Structure → ℕ,   #PQE(Q)(D) = P(Q on D) · 2^{|T|}
-```
-
-is an iso-invariant counting problem, and the normalization `2^{|T|}` is a
-property of the instance, not of the answer, so it is definable and the two
-formulations differ by a fixed factor rather than by an oracle protocol. Only
-uniform 1/2 is covered; non-uniform dyadic probabilities are a *weighted* model
-count, whose weight is a product over tuples, hence a `Π` that ΣQSO lacks by
-design (the same reason FP is not reachable by counting) – bit-blasting
-`a_t / 2^k` into `k` independent 1/2-tuples brings them back into the
-unweighted setting at a `k`-fold blow-up, if ever needed.
-
-- **Membership** [S]: `ΣX̄. φ_Q(X̄)` is #FO, and for a UCQ it lands at the very
-  bottom, `#Σ₁` / `ΣQSO(Σ₁)`. Worth noting that the FPRAS story of that level –
-  approximable, not closed under sum – *is* the probabilistic-database
-  approximability story (Karp–Luby on the lineage DNF), so “structure inside
-  `#P`” above is not an unrelated research item but this application's own
-  fine print.
-- **Tier 1, an FO query with negation** [S]: put the assignment in a
-  probabilistic unary relation, the clauses in deterministic ones, and let `Q`
-  say “this assignment satisfies the formula”; worlds satisfying `Q` are the
-  satisfying assignments, exactly. The reduction from #SAT is a dimension-1
-  interpretation re-reading a SAT instance as a PQE instance, parsimonious
-  because the correspondence is a bijection. Nearly free once #SAT is complete
-  for ΣQSO(FO), and enough to state “probabilistic query evaluation is
-  `#P`-complete” with no abuse at all. It says nothing about the queries the
-  field cares about.
-- **Tier 2, a UCQ** [L, gated on a literature check]: for
-  `h₀ = ∃x∃y. R(x) ∧ S(x,y) ∧ T(y)` with `R`, `T` probabilistic, `#PQE(h₀)`
-  *is* `#PP2DNF` up to renaming, by a bijection between worlds and assignments.
-  So the difficulty is not in the database layer: proving it hard *is* proving
-  Provan–Ball, which would have to be formalized. Tier 1's trick cannot help,
-  because the query is monotone: fix one edge and let the other `|T| − 2`
-  tuples vary, and the count is either 0 or `≥ 2^{|T|}/4`, so a parsimonious
-  reduction from a formula with three models would force `|T| ≤ 3`, i.e., a
-  logarithmic-size output instance, i.e., a reduction that counted by itself.
-  This holds for every monotone query, which is why the field's own statements
-  here are Turing-flavored. **Check before committing**: whether the classical
-  proof is one oracle call plus arithmetic (level 1) or genuinely interpolates
-  (level 2). If neither, the hardness would have to be imported as a hypothesis
-  and only the bijection formalized.
-- **The dichotomy itself** [R]: safe queries in PTIME needs the FP side
-  (`QFO(LFP)`) and is a meta-theorem quantifying over queries rather than a
-  completeness result about one problem. Much larger than the hardness half,
-  and out of scope here.
+- **A parsimoniously complete query with negation** [S]: over a schema holding
+  a CNF and one uncertain unary relation, the query “the uncertain relation is
+  a model of the certain CNF”; worlds satisfying it are the models, exactly,
+  so `#SAT ≤ᵖ PossibleWorlds φ` with the uncertain facts the occurring
+  variables. A plain `#P`-complete instance beside `h₀`.
+- **`h₁ = R(x₀), S(x₀, y₀) ∨ S(x₁, y₁), T(y₁)`** [M]: Dalvi–Suciu prove its
+  hardness by interpolation with `m + 1` oracle calls, which needs the linear
+  combinations above. A one-call derivation exists (not in the paper, checked
+  by brute force on small instances): weights `c = 1`, `a = 2^t − 1` on the
+  `S`-facts with `2^t > 2ⁿ` make `#BIS` the lowest base-`2^t` digit of
+  `2^(n + t·m) − W(h₁)`; the weight is a block of ones, bitwise definable.
+- **A sparse instance format** [S]: the concrete step encodes dense tables;
+  a list-of-facts format, with the decoding statements for the denominator and
+  for the probability itself.
+- **The dichotomy** [R]: every hierarchical self-join-free conjunctive query
+  has a safe plan, and a safe plan is a QFO term (join = product, projection =
+  complement of a product over the domain); the hard queries reduce from `h₀`
+  or `h₁`. A meta-theorem over queries rather than a completeness result about
+  one problem; the maintainer may do it outside this library.
 
 Beyond the library, the counting track is the direct bridge to provenance-lean:
 the counting provenance semantics of a query is exactly a model count, so the
 two libraries would meet here, with semiring provenance as the common
 generalization (and QSO's weighted-logic ancestry is the same idea from the
-other side). PQE above is the concrete meeting point: `#PQE(Q)` is the model
-count of the query's lineage.
+other side). PQE above is the concrete meeting point: the weighted count of
+the worlds satisfying a query is the model count of the query's lineage.
 
 ## 7. Machine bridges beyond NP and PTIME
 
@@ -827,17 +743,12 @@ provable rather than merely reasonable.
 
 **Alongside, or after:**
 
-- **The counting track of §6**, as far as #SAT plus the free catalog entries:
-  counting descriptive complexity has no formalization anywhere, and ΣQSO's
-  two-layer syntax fits the kernel-as-data idiom unusually well. It depends on
-  nothing unbuilt, so nothing else here can block it; a cheap headline (#SAT
-  complete for ΣQSO(FO)) sits one `exists_gates` strengthening in; and it is
-  the meeting point with provenance-lean. Internal order: framework layer and
-  ladder levels 0–1 → evaluator → `#P := ΣQSO(FO)` → #SAT → the free entries
-  and PQE tier 1; stop there (level 2 of the ladder, PQE tier 2, structure
-  inside #P, the quantitative fixed point and MaxSNP are genuine research, or
-  gated on a literature check). Its size is what puts it beside the numbered
-  line rather than in it.
+- **What is left of the counting track of §6**: the ΣQSO(FO) reading of
+  `#P`; the linear combinations are the one item that
+  unlocks new hardness results (the permanent, `h₁`) and the one to price
+  honestly; structure inside `#P`, the quantitative fixed point and MaxSNP
+  are genuine research. Its size is what puts it beside the numbered line
+  rather than in it.
 - **The rest of the sharpening pass** (each [M], no prerequisites, no new
   surface): **quantifier-free / projection / dimension tracking through
   composition** (§3's reduction-notion refinements), which upgrades catalog
