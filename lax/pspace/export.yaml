@@ -1,0 +1,242 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: v1.2.2
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.SOTCDefinable.of_foReduction
+- DescriptiveComplexity.SOTCDefinable.of_orderedReduction
+- DescriptiveComplexity.sotcDefinable_congr
+- DescriptiveComplexity.sotcDefinable_iff_free
+- DescriptiveComplexity.SOTCDefinable.compl
+- DescriptiveComplexity.NP_subset_PSPACE
+- DescriptiveComplexity.PTIME_subset_PSPACE
+- DescriptiveComplexity.sigmaP_subset_PSPACE
+- DescriptiveComplexity.piP_subset_PSPACE
+- DescriptiveComplexity.PFPDefinable.sotcDefinable
+- DescriptiveComplexity.pfpDefinable_of_mem_PSPACE
+- DescriptiveComplexity.IFPDefinable.pfpDefinable
+- DescriptiveComplexity.IFPDefinableFree.pfpDefinableFree
+- DescriptiveComplexity.PFPDefinableFree.pfpDefinable
+- DescriptiveComplexity.IFPDefinableFree.ifpDefinable
+- DescriptiveComplexity.PFPDefinable.of_foReduction
+- DescriptiveComplexity.PFPDefinable.of_orderedReduction
+- DescriptiveComplexity.PFPDefinable.of_relOrderedReduction
+- DescriptiveComplexity.pfpDefinable_congr
+- DescriptiveComplexity.QSAT_PSPACE_complete
+- DescriptiveComplexity.SUCCINCTREACH_PSPACE_complete
+- DescriptiveComplexity.dtmAcceptSpace_PSPACE_complete
+- DescriptiveComplexity.ntmAcceptSpace_PSPACE_complete
+- DescriptiveComplexity.ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace
+- DescriptiveComplexity.succinctReachable_iso
+- DescriptiveComplexity.DTMAcceptSpace
+- DescriptiveComplexity.NTMAcceptSpace
+- DescriptiveComplexity.QSAT
+- DescriptiveComplexity.ComplexityClass.ext
+- DescriptiveComplexity.SUCCINCTREACH
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: PSPACE, partial fixed points and the Abiteboul–Vianu theorem'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @inproceedings{abiteboul1989fixpoint,
+      author       = {Serge Abiteboul and
+                      Victor Vianu},
+      title        = {Fixpoint Extensions of First-Order Logic and Datalog-Like Languages},
+      booktitle    = {Proceedings of the Fourth Annual Symposium on Logic in Computer
+                      Science {(LICS} '89), Pacific Grove, California, USA, June 5-8, 1989},
+      pages        = {71--79},
+      publisher    = {{IEEE} Computer Society},
+      year         = {1989},
+      doi          = {10.1109/LICS.1989.39160}
+    }
+  - |
+    @article{abiteboul1991generic,
+      author       = {Serge Abiteboul and
+                      Victor Vianu},
+      title        = {Generic Computation and Its Complexity},
+      journal      = {Proceedings of the 23rd Annual {ACM} Symposium on Theory of
+                      Computing ({STOC} '91), New Orleans, Louisiana, USA, May 5-8,
+                      1991},
+      pages        = {209--219},
+      publisher    = {{ACM}},
+      year         = {1991},
+      doi          = {10.1145/103418.103444}
+    }
+  - |
+    @article{dawar1995infinitary,
+      author       = {Anuj Dawar and
+                      Steven Lindell and
+                      Scott Weinstein},
+      title        = {Infinitary Logic and Inductive Definability over Finite Structures},
+      journal      = {Inf. Comput.},
+      volume       = {119},
+      number       = {2},
+      pages        = {160--175},
+      year         = {1995},
+      doi          = {10.1006/INCO.1995.1084},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @book{ebbinghaus1995finite,
+      author       = {Heinz{-}Dieter Ebbinghaus and
+                      J{\"{o}}rg Flum},
+      title        = {Finite Model Theory},
+      series       = {Perspectives in Mathematical Logic},
+      publisher    = {Springer},
+      year         = {1995},
+      isbn         = {3-540-60149-X}
+    }
+  - |
+    @article{savitch1970relationships,
+      author       = {Walter J. Savitch},
+      title        = {Relationships Between Nondeterministic and Deterministic Tape Complexities},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {4},
+      number       = {2},
+      pages        = {177--192},
+      year         = {1970},
+      doi          = {10.1016/S0022-0000(70)80006-X},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @inproceedings{stockmeyer1973word,
+      author       = {Larry J. Stockmeyer and Albert R. Meyer},
+      title        = {Word Problems Requiring Exponential Time: Preliminary Report},
+      booktitle    = {Proceedings of the 5th Annual {ACM} Symposium on Theory of Computing (STOC)},
+      pages        = {1--9},
+      year         = {1973},
+      doi          = {10.1145/800125.804029},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @inproceedings{vardi1982complexity,
+      author       = {Moshe Y. Vardi},
+      editor       = {Harry R. Lewis and
+                      Barbara B. Simons and
+                      Walter A. Burkhard and
+                      Lawrence H. Landweber},
+      title        = {The Complexity of Relational Query Languages (Extended Abstract)},
+      booktitle    = {Proceedings of the 14th Annual {ACM} Symposium on Theory of Computing,
+                      May 5-7, 1982, San Francisco, California, {USA}},
+      pages        = {137--146},
+      publisher    = {{ACM}},
+      year         = {1982},
+      doi          = {10.1145/800070.802186},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @book{immerman1999descriptive,
+      author       = {Neil Immerman},
+      title        = {Descriptive Complexity},
+      series       = {Graduate Texts in Computer Science},
+      publisher    = {Springer},
+      year         = {1999},
+      isbn         = {978-1-4612-6809-3},
+      doi          = {10.1007/978-1-4612-0539-5},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax799700
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5f34068ba7707478cd268f2316c295d7ea51a711
+  folder: lax/np-catalog
+  restated_from: ../np-catalog/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+- package: Lax564036
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: '0000000000000000000000000000000000000000'
+  folder: lax/polynomial-hierarchy
+  restated_from: ../polynomial-hierarchy/export.yaml
+restated:
+  DescriptiveComplexity.SOBlock.structure₂: SecondOrderTransitiveClosure.SOBlock.structure₂
+  DescriptiveComplexity.SOTCSpec: SecondOrderTransitiveClosure.SOTCSpec
+  DescriptiveComplexity.SOTCSpec.State: SecondOrderTransitiveClosure.SOTCSpec.State
+  DescriptiveComplexity.SOTCSpec.Step: SecondOrderTransitiveClosure.SOTCSpec.Step
+  DescriptiveComplexity.SOTCSpec.Reach: SecondOrderTransitiveClosure.SOTCSpec.Reach
+  DescriptiveComplexity.SOTCSpec.IsSrc: SecondOrderTransitiveClosure.SOTCSpec.IsSrc
+  DescriptiveComplexity.SOTCSpec.IsTgt: SecondOrderTransitiveClosure.SOTCSpec.IsTgt
+  DescriptiveComplexity.SOTCSpec.Accepts: SecondOrderTransitiveClosure.SOTCSpec.Accepts
+  DescriptiveComplexity.SOTCDefinable: SecondOrderTransitiveClosure.SOTCDefinable
+  DescriptiveComplexity.SOTCSpecFree: OrderFreeTransitiveClosure.SOTCSpecFree
+  DescriptiveComplexity.SOTCSpecFree.State: OrderFreeTransitiveClosure.SOTCSpecFree.State
+  DescriptiveComplexity.SOTCSpecFree.Step: OrderFreeTransitiveClosure.SOTCSpecFree.Step
+  DescriptiveComplexity.SOTCSpecFree.Reach: OrderFreeTransitiveClosure.SOTCSpecFree.Reach
+  DescriptiveComplexity.SOTCSpecFree.IsSrc: OrderFreeTransitiveClosure.SOTCSpecFree.IsSrc
+  DescriptiveComplexity.SOTCSpecFree.IsTgt: OrderFreeTransitiveClosure.SOTCSpecFree.IsTgt
+  DescriptiveComplexity.SOTCSpecFree.Accepts: OrderFreeTransitiveClosure.SOTCSpecFree.Accepts
+  DescriptiveComplexity.SOTCDefinableFree: OrderFreeTransitiveClosure.SOTCDefinableFree
+  DescriptiveComplexity.StepDef.PFPHolds: PartialFixedPoint.StepDef.PFPHolds
+  DescriptiveComplexity.PFPDefinable: PartialFixedPoint.PFPDefinable
+  DescriptiveComplexity.PFPDefinableFree: PartialFixedPoint.PFPDefinableFree
+  DescriptiveComplexity.IFPDefinableFree: PartialFixedPoint.IFPDefinableFree
+  DescriptiveComplexity.IsQVar: Qsat.IsQVar
+  DescriptiveComplexity.IsQAll: Qsat.IsQAll
+  DescriptiveComplexity.QPrec: Qsat.QPrec
+  DescriptiveComplexity.QsatWf: Qsat.QsatWf
+  DescriptiveComplexity.QsatMatrix: Qsat.QsatMatrix
+  DescriptiveComplexity.qAdd: Qsat.qAdd
+  DescriptiveComplexity.qUpd: Qsat.qUpd
+  DescriptiveComplexity.QLeast: Qsat.QLeast
+  DescriptiveComplexity.QsatWins: Qsat.QsatWins
+  DescriptiveComplexity.QsatHolds: Qsat.QsatHolds
+  FirstOrder.Language.qsat: Qsat.qsat
+  DescriptiveComplexity.ClausesHold: SuccinctReach.ClausesHold
+  DescriptiveComplexity.ReadsCur: SuccinctReach.ReadsCur
+  DescriptiveComplexity.WritesNext: SuccinctReach.WritesNext
+  DescriptiveComplexity.StepRel: SuccinctReach.StepRel
+  DescriptiveComplexity.IsStart: SuccinctReach.IsStart
+  DescriptiveComplexity.IsGoal: SuccinctReach.IsGoal
+  DescriptiveComplexity.SuccinctReachable: SuccinctReach.SuccinctReachable
+  FirstOrder.Language.transSys: SuccinctReach.transSys
+  DescriptiveComplexity.TMData.AcceptsSpace: SpaceBoundedMachines.TMData.AcceptsSpace
+  FirstOrder.Language.qsatRel: Qsat.qsatRel
+  FirstOrder.Language.qsIsClause: Qsat.qsIsClause
+  FirstOrder.Language.qsPosIn: Qsat.qsPosIn
+  FirstOrder.Language.qsNegIn: Qsat.qsNegIn
+  FirstOrder.Language.qsIsVar: Qsat.qsIsVar
+  FirstOrder.Language.qsAllVar: Qsat.qsAllVar
+  FirstOrder.Language.qsPrefixLt: Qsat.qsPrefixLt
+  FirstOrder.Language.transSysRel: SuccinctReach.transSysRel
+  FirstOrder.Language.tsStateVar: SuccinctReach.tsStateVar
+  FirstOrder.Language.tsNext: SuccinctReach.tsNext
+  FirstOrder.Language.tsStepCl: SuccinctReach.tsStepCl
+  FirstOrder.Language.tsSrcCl: SuccinctReach.tsSrcCl
+  FirstOrder.Language.tsTgtCl: SuccinctReach.tsTgtCl
+  FirstOrder.Language.tsPosIn: SuccinctReach.tsPosIn
+  FirstOrder.Language.tsNegIn: SuccinctReach.tsNegIn
+  DescriptiveComplexity.StepDef.partStage: PartialFixedPoint.StepDef.partStage
