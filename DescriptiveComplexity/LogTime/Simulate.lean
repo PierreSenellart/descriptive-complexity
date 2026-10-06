@@ -410,7 +410,9 @@ a guessed trace pinned by its transition.
 
 With `DescriptiveComplexity.BitDefinable.ltDecidable` this makes the fence an
 **equality**: the machine model is exactly characterized by a logic, and by the
-logic that is classically AC⁰. -/
+logic that is classically AC⁰.
+Registered in the Lax archive as
+[`Lax895169.ACZeroIsLogTime.ltDecidable_bitDefinable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroIsLogTime.html#s-Lax895169.ACZeroIsLogTime.ltDecidable_bitDefinable). -/
 theorem LTDecidable.bitDefinable {P : DecisionProblem L} (h : LTDecidable P) :
     BitDefinable P := by
   obtain ⟨M, hM⟩ := h

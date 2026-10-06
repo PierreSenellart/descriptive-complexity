@@ -513,7 +513,9 @@ def LFPDefinable {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) 
 
 /-- **FO(LFP) definability is closed under complement.** This is the one line
 that the Horn fragment cannot supply, and the reason to have the logic at all:
-negate the output formula. -/
+negate the output formula.
+Registered in the Lax archive as
+[`Lax535992.LeastFixedPointComplement.lfpDefinable_compl`](https://laxarchive.org/lax-535992/Lax535992.LeastFixedPointComplement.html#s-Lax535992.LeastFixedPointComplement.lfpDefinable_compl). -/
 theorem LFPDefinable.compl {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : LFPDefinable P) : LFPDefinable Pᶜ := by
   obtain ⟨d, hd⟩ := h
@@ -618,7 +620,9 @@ theorem realize_hornOutF (prog : HornProgram (L.sum Language.order) B k) :
 end Realize
 
 /-- **Every SO-Horn definition is an FO(LFP) definition**: keep the rules,
-and turn the goal clauses into the output formula. -/
+and turn the goal clauses into the output formula.
+Registered in the Lax archive as
+[`Lax535992.HornIsLeastFixedPoint.sigmaSOHornDefinable_lfpDefinable`](https://laxarchive.org/lax-535992/Lax535992.HornIsLeastFixedPoint.html#s-Lax535992.HornIsLeastFixedPoint.sigmaSOHornDefinable_lfpDefinable). -/
 theorem SigmaSOHornDefinable.lfpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSOHornDefinable P) : LFPDefinable P := by
   obtain ⟨B, k, prog, hprog⟩ := h

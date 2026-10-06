@@ -83,7 +83,9 @@ theorem hornSat_PTIME_hard : PTIME.Hard HORNSAT :=
 `DescriptiveComplexity.hornSat_mem_PTIME` – the Horn program that computes unit
 propagation, assembling the unbounded body of an input clause along the order;
 hardness is `DescriptiveComplexity.hornSat_PTIME_hard`, the Horn discharge. This is the
-P-level analogue of the Cook–Levin theorem, and like it it is machine-free. -/
+P-level analogue of the Cook–Levin theorem, and like it it is machine-free.
+Registered in the Lax archive as
+[`Lax535992.HornSatPTIMEComplete.hornSat_PTIME_complete`](https://laxarchive.org/lax-535992/Lax535992.HornSatPTIMEComplete.html#s-Lax535992.HornSatPTIMEComplete.hornSat_PTIME_complete). -/
 theorem HORNSAT_PTIME_complete : PTIME.Complete HORNSAT :=
   ⟨hornSat_mem_PTIME, hornSat_PTIME_hard⟩
 
@@ -91,7 +93,9 @@ theorem HORNSAT_PTIME_complete : PTIME.Complete HORNSAT :=
 reduces to HORN-SAT, which is in NP. This is the level-0 case of
 `DescriptiveComplexity.sigmaP_subset_sigmaP_succ`; it lives here rather than with the
 hierarchy because it goes through the Horn discharge, needing no separate
-compilation of a Horn program into an existential second-order sentence. -/
+compilation of a Horn program into an existential second-order sentence.
+Registered in the Lax archive as
+[`Lax535992.PTIMESubsetNP.PTIME_subset_NP`](https://laxarchive.org/lax-535992/Lax535992.PTIMESubsetNP.html#s-Lax535992.PTIMESubsetNP.PTIME_subset_NP). -/
 theorem PTIME_subset_NP : PTIME ⊆ NP := by
   intro L _ P hP
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP
@@ -107,7 +111,9 @@ theorem coPTIME_subset_coNP : PiP 0 ⊆ PiP 1 := by
 /-- **PTIME ⊆ coNP**, i.e., `SigmaP 0 ⊆ PiP 1`: complementing the Horn
 discharge sends an SO-Horn definable problem to the complement of HORN-SAT,
 which is in NP by the unsatisfiability certificate
-`DescriptiveComplexity.hornSat_compl_mem_NP`. -/
+`DescriptiveComplexity.hornSat_compl_mem_NP`.
+Registered in the Lax archive as
+[`Lax564036.PolynomialTimeInHierarchy.PTIME_subset_coNP`](https://laxarchive.org/lax-564036/Lax564036.PolynomialTimeInHierarchy.html#s-Lax564036.PolynomialTimeInHierarchy.PTIME_subset_coNP). -/
 theorem PTIME_subset_coNP : PTIME ⊆ coNP := by
   intro L _ P hP
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP
@@ -149,13 +155,17 @@ theorem piP_subset_succ (k : ℕ) : PiP k ⊆ PiP (k + 1) := by
 
 /-- **The `Σ` levels are monotone**: `j ≤ k` gives `Σⱼᵖ ⊆ Σₖᵖ`, by induction on
 `k` along `DescriptiveComplexity.sigmaP_subset_succ`. In particular `PTIME ⊆ Σₖᵖ` and
-`NP ⊆ Σₖᵖ` for every `k ≥ 1`. -/
+`NP ⊆ Σₖᵖ` for every `k ≥ 1`.
+Registered in the Lax archive as
+[`Lax564036.HierarchyInclusions.sigmaP_mono`](https://laxarchive.org/lax-564036/Lax564036.HierarchyInclusions.html#s-Lax564036.HierarchyInclusions.sigmaP_mono). -/
 theorem sigmaP_mono {j k : ℕ} (h : j ≤ k) : SigmaP j ⊆ SigmaP k := by
   induction k, h using Nat.le_induction with
   | base => exact fun _ _ _ hP => hP
   | succ k hk ih => exact fun _ _ _ hP => sigmaP_subset_succ k (ih hP)
 
-/-- **The `Π` levels are monotone**: `j ≤ k` gives `Πⱼᵖ ⊆ Πₖᵖ`. -/
+/-- **The `Π` levels are monotone**: `j ≤ k` gives `Πⱼᵖ ⊆ Πₖᵖ`.
+Registered in the Lax archive as
+[`Lax564036.HierarchyInclusions.piP_mono`](https://laxarchive.org/lax-564036/Lax564036.HierarchyInclusions.html#s-Lax564036.HierarchyInclusions.piP_mono). -/
 theorem piP_mono {j k : ℕ} (h : j ≤ k) : PiP j ⊆ PiP k := by
   induction k, h using Nat.le_induction with
   | base => exact fun _ _ _ hP => hP
@@ -164,7 +174,9 @@ theorem piP_mono {j k : ℕ} (h : j ≤ k) : PiP j ⊆ PiP k := by
 /-- **`PTIME ⊆ Σₖᵖ`** at every level. Stated separately because
 `DescriptiveComplexity.PTIME` is a definition of its own rather than the literal
 `SigmaP 0`: the two are definitionally equal, but unification cannot guess the
-level, so `DescriptiveComplexity.sigmaP_mono` does not apply as it stands. -/
+level, so `DescriptiveComplexity.sigmaP_mono` does not apply as it stands.
+Registered in the Lax archive as
+[`Lax564036.PolynomialTimeInHierarchy.PTIME_subset_sigmaP`](https://laxarchive.org/lax-564036/Lax564036.PolynomialTimeInHierarchy.html#s-Lax564036.PolynomialTimeInHierarchy.PTIME_subset_sigmaP). -/
 theorem PTIME_subset_sigmaP (k : ℕ) : PTIME ⊆ SigmaP k :=
   sigmaP_mono (Nat.zero_le k)
 

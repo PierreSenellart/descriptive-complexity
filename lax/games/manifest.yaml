@@ -1,0 +1,106 @@
+specVersion: "1"
+id: "lax-945089"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Descriptive complexity: games and inexpressibility"
+authors:
+  - name: "Pierre Senellart"
+    orcid: "0000-0002-7909-5369"
+    github: "PierreSenellart"
+  - name: "Claude (Anthropic)"
+bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @article{ehrenfeucht1961application,
+      author       = {Andrzej Ehrenfeucht},
+      title        = {An application of games to the completeness problem for formalized theories},
+      journal      = {Fundamenta Mathematicae},
+      volume       = {49},
+      pages        = {129--141},
+      year         = {1961},
+      doi          = {10.4064/fm-49-2-129-141}
+    }
+  - |
+    @article{immerman1987languages,
+      author       = {Neil Immerman},
+      title        = {Languages that Capture Complexity Classes},
+      journal      = {{SIAM} J. Comput.},
+      volume       = {16},
+      number       = {4},
+      pages        = {760--778},
+      year         = {1987},
+      doi          = {10.1137/0216051},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{ajtai1983sigma11,
+      author       = {Mikl{\'o}s Ajtai},
+      title        = {{$\Sigma^1_1$}-formulae on finite structures},
+      journal      = {Ann. Pure Appl. Log.},
+      volume       = {24},
+      number       = {1},
+      pages        = {1--48},
+      year         = {1983},
+      doi          = {10.1016/0168-0072(83)90038-6}
+    }
+  - |
+    @article{furst1984parity,
+      author       = {Merrick L. Furst and
+                      James B. Saxe and
+                      Michael Sipser},
+      title        = {Parity, circuits, and the polynomial-time hierarchy},
+      journal      = {Math. Syst. Theory},
+      volume       = {17},
+      number       = {1},
+      pages        = {13--27},
+      year         = {1984},
+      doi          = {10.1007/BF01744431}
+    }
+  - |
+    @inproceedings{hastad1986almost,
+      author       = {Johan H{\aa}stad},
+      title        = {Almost Optimal Lower Bounds for Small Depth Circuits},
+      booktitle    = {Proceedings of the 18th Annual {ACM} Symposium on Theory of Computing,
+                      1986, Berkeley, California, {USA}},
+      pages        = {6--20},
+      publisher    = {{ACM}},
+      year         = {1986},
+      doi          = {10.1145/12130.12132}
+    }
+  - |
+    @book{immerman1999descriptive,
+      author       = {Neil Immerman},
+      title        = {Descriptive Complexity},
+      series       = {Graduate Texts in Computer Science},
+      publisher    = {Springer},
+      year         = {1999},
+      isbn         = {978-1-4612-6809-3},
+      doi          = {10.1007/978-1-4612-0539-5},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @book{ebbinghaus1995finite,
+      author       = {Heinz{-}Dieter Ebbinghaus and
+                      J{\"{o}}rg Flum},
+      title        = {Finite Model Theory},
+      series       = {Perspectives in Mathematical Logic},
+      publisher    = {Springer},
+      year         = {1995},
+      isbn         = {3-540-60149-X}
+    }

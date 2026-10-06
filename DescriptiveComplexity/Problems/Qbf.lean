@@ -88,7 +88,9 @@ theorem qbfProblem_mem_piP (k : ℕ) (cnf : Bool) :
 /-- **QBF with `k + 1` alternating blocks is `Σₖ₊₁ᵖ`-complete.** Membership is
 `DescriptiveComplexity.qbf_mem_sigmaP` – guess the `k + 1` truth assignments as monadic
 second-order relations and evaluate the matrix first-order. Hardness is
-`DescriptiveComplexity.qbf_hard_of_sigmaSODefinable`, the marked Tseitin discharge. -/
+`DescriptiveComplexity.qbf_hard_of_sigmaSODefinable`, the marked Tseitin discharge.
+Registered in the Lax archive as
+[`Lax564036.QbfComplete.qbf_complete`](https://laxarchive.org/lax-564036/Lax564036.QbfComplete.html#s-Lax564036.QbfComplete.qbf_complete). -/
 theorem QBF_complete (k : ℕ) : (SigmaP (k + 1)).Complete (QBF (k + 1)) :=
   ⟨qbf_mem_sigmaP k,
     (hard_sigmaP_succ_iff k (QBF (k + 1))).mpr fun Q hQ =>
@@ -102,7 +104,9 @@ theorem qbf_hard (k : ℕ) : (SigmaP (k + 1)).Hard (QBF (k + 1)) :=
 outermost block, is complete for `Πₖ₊₁ᵖ`. Membership is
 `DescriptiveComplexity.qbfPi_mem_piP`; hardness is
 `DescriptiveComplexity.qbfPi_hard_of_piSODefinable`, the same marked Tseitin discharge at
-the other starting polarity. -/
+the other starting polarity.
+Registered in the Lax archive as
+[`Lax564036.QbfComplete.qbfPi_complete`](https://laxarchive.org/lax-564036/Lax564036.QbfComplete.html#s-Lax564036.QbfComplete.qbfPi_complete). -/
 theorem QBFPi_complete (k : ℕ) : (PiP (k + 1)).Complete (QBFPi (k + 1)) :=
   ⟨qbfPi_mem_piP k,
     (hard_piP_succ_iff k (QBFPi (k + 1))).mpr fun Q hQ =>

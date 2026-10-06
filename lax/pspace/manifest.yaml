@@ -1,0 +1,130 @@
+specVersion: "1"
+id: "lax-134656"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Descriptive complexity: PSPACE, partial fixed points and the
+  Abiteboul–Vianu theorem"
+authors:
+  - name: "Pierre Senellart"
+    orcid: "0000-0002-7909-5369"
+    github: "PierreSenellart"
+  - name: "Claude (Anthropic)"
+bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @inproceedings{abiteboul1989fixpoint,
+      author       = {Serge Abiteboul and
+                      Victor Vianu},
+      title        = {Fixpoint Extensions of First-Order Logic and Datalog-Like Languages},
+      booktitle    = {Proceedings of the Fourth Annual Symposium on Logic in Computer
+                      Science {(LICS} '89), Pacific Grove, California, USA, June 5-8, 1989},
+      pages        = {71--79},
+      publisher    = {{IEEE} Computer Society},
+      year         = {1989},
+      doi          = {10.1109/LICS.1989.39160}
+    }
+  - |
+    @article{abiteboul1991generic,
+      author       = {Serge Abiteboul and
+                      Victor Vianu},
+      title        = {Generic Computation and Its Complexity},
+      journal      = {Proceedings of the 23rd Annual {ACM} Symposium on Theory of
+                      Computing ({STOC} '91), New Orleans, Louisiana, USA, May 5-8,
+                      1991},
+      pages        = {209--219},
+      publisher    = {{ACM}},
+      year         = {1991},
+      doi          = {10.1145/103418.103444}
+    }
+  - |
+    @article{dawar1995infinitary,
+      author       = {Anuj Dawar and
+                      Steven Lindell and
+                      Scott Weinstein},
+      title        = {Infinitary Logic and Inductive Definability over Finite Structures},
+      journal      = {Inf. Comput.},
+      volume       = {119},
+      number       = {2},
+      pages        = {160--175},
+      year         = {1995},
+      doi          = {10.1006/INCO.1995.1084},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @book{ebbinghaus1995finite,
+      author       = {Heinz{-}Dieter Ebbinghaus and
+                      J{\"{o}}rg Flum},
+      title        = {Finite Model Theory},
+      series       = {Perspectives in Mathematical Logic},
+      publisher    = {Springer},
+      year         = {1995},
+      isbn         = {3-540-60149-X}
+    }
+  - |
+    @article{savitch1970relationships,
+      author       = {Walter J. Savitch},
+      title        = {Relationships Between Nondeterministic and Deterministic Tape Complexities},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {4},
+      number       = {2},
+      pages        = {177--192},
+      year         = {1970},
+      doi          = {10.1016/S0022-0000(70)80006-X},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @inproceedings{stockmeyer1973word,
+      author       = {Larry J. Stockmeyer and Albert R. Meyer},
+      title        = {Word Problems Requiring Exponential Time: Preliminary Report},
+      booktitle    = {Proceedings of the 5th Annual {ACM} Symposium on Theory of Computing (STOC)},
+      pages        = {1--9},
+      year         = {1973},
+      doi          = {10.1145/800125.804029},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @inproceedings{vardi1982complexity,
+      author       = {Moshe Y. Vardi},
+      editor       = {Harry R. Lewis and
+                      Barbara B. Simons and
+                      Walter A. Burkhard and
+                      Lawrence H. Landweber},
+      title        = {The Complexity of Relational Query Languages (Extended Abstract)},
+      booktitle    = {Proceedings of the 14th Annual {ACM} Symposium on Theory of Computing,
+                      May 5-7, 1982, San Francisco, California, {USA}},
+      pages        = {137--146},
+      publisher    = {{ACM}},
+      year         = {1982},
+      doi          = {10.1145/800070.802186},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @book{immerman1999descriptive,
+      author       = {Neil Immerman},
+      title        = {Descriptive Complexity},
+      series       = {Graduate Texts in Computer Science},
+      publisher    = {Springer},
+      year         = {1999},
+      isbn         = {978-1-4612-6809-3},
+      doi          = {10.1007/978-1-4612-0539-5},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+issue:
+  repositoryId: 1320232165
+  number: 175

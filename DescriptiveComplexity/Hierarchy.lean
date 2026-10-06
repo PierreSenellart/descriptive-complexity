@@ -310,7 +310,9 @@ level: by definition at level 0, and by the quantifier duality
 (That moreover `PiP 0 = SigmaP 0` – polynomial time closed under complement –
 is `DescriptiveComplexity.piP_zero_eq`: complementing a Horn program needs its least
 model computed inside the fragment, which is what the translation from FO(LFP)
-provides.) -/
+provides.)
+Registered in the Lax archive as
+[`Lax564036.HierarchyDuality.mem_piP_iff`](https://laxarchive.org/lax-564036/Lax564036.HierarchyDuality.html#s-Lax564036.HierarchyDuality.mem_piP_iff). -/
 theorem mem_piP_iff (k : ℕ) {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PiP k ↔ Pᶜ ∈ SigmaP k := by
   cases k with
@@ -358,7 +360,9 @@ downstream, with HORN-SAT.) -/
 theorem piP_subset_PH (k : ℕ) : PiP (k + 1) ⊆ PH :=
   fun _ _ _ hP => ⟨k + 2, piP_subset_sigmaP_succ k hP⟩
 
-/-- A problem's complement is in coNP iff the problem is in NP. -/
+/-- A problem's complement is in coNP iff the problem is in NP.
+Registered in the Lax archive as
+[`Lax564036.HierarchyDuality.compl_mem_coNP_iff`](https://laxarchive.org/lax-564036/Lax564036.HierarchyDuality.html#s-Lax564036.HierarchyDuality.compl_mem_coNP_iff). -/
 theorem compl_mem_coNP_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     Pᶜ ∈ coNP ↔ P ∈ NP := by
   rw [mem_piP_iff, DecisionProblem.compl_compl]

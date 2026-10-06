@@ -255,7 +255,9 @@ theorem taut_hard_of_piSODefinable :
 /-- **TAUT is coNP-complete.** Membership is `DescriptiveComplexity.taut_mem_coNP` and
 hardness `DescriptiveComplexity.taut_hard_of_piSODefinable`; both are the Cook–Levin
 theorem read through the complement, with no second-order argument of their
-own. -/
+own.
+Registered in the Lax archive as
+[`Lax564036.TautCoNPComplete.taut_coNP_complete`](https://laxarchive.org/lax-564036/Lax564036.TautCoNPComplete.html#s-Lax564036.TautCoNPComplete.taut_coNP_complete). -/
 theorem TAUT_coNP_complete : coNP.Complete TAUT :=
   ⟨taut_mem_coNP,
     (hard_piP_succ_iff 0 TAUT).mpr fun Q hQ =>

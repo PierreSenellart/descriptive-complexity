@@ -92,7 +92,9 @@ def AC0Definable (P : DecisionProblem L) : Prop :=
 
 /-- AC⁰ definability only depends on the finite instances of a problem – the
 hypothesis a `DescriptiveComplexity.ComplexityClass` demands of its membership
-predicate. -/
+predicate.
+Registered in the Lax archive as
+[`Lax895169.ACZeroFinite.ac0Definable_congr_finite`](https://laxarchive.org/lax-895169/Lax895169.ACZeroFinite.html#s-Lax895169.ACZeroFinite.ac0Definable_congr_finite). -/
 theorem ac0Definable_congr {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     AC0Definable P ↔ AC0Definable Q := by
@@ -105,7 +107,9 @@ theorem ac0Definable_congr {P Q : DecisionProblem L}
 /-- **`FO(≤) ⊆ AC⁰`**: an order-invariant first-order definition is an
 arithmetic one, by transport along `DescriptiveComplexity.sumOrderToArith` – the
 numeric predicates are simply not used. The inclusion is strict
-(`DescriptiveComplexity.exists_ac0Definable_not_foDefinable`). -/
+(`DescriptiveComplexity.exists_ac0Definable_not_foDefinable`).
+Registered in the Lax archive as
+[`Lax895169.FirstOrderInACZero.foDefinable_ac0Definable`](https://laxarchive.org/lax-895169/Lax895169.FirstOrderInACZero.html#s-Lax895169.FirstOrderInACZero.foDefinable_ac0Definable). -/
 theorem FODefinable.ac0Definable {P : DecisionProblem L} (h : FODefinable P) :
     AC0Definable P := by
   obtain ⟨φ, hφ⟩ := h
@@ -123,7 +127,9 @@ theorem FODefinableFree.ac0Definable {P : DecisionProblem L} (h : FODefinableFre
 
 /-- **AC⁰ is closed under complement**: negate the sentence. Nothing like
 Immerman–Szelepcsényi is needed at this level – the defining object is a
-sentence, not a walk. -/
+sentence, not a walk.
+Registered in the Lax archive as
+[`Lax895169.ACZeroComplement.ac0Definable_compl`](https://laxarchive.org/lax-895169/Lax895169.ACZeroComplement.html#s-Lax895169.ACZeroComplement.ac0Definable_compl). -/
 theorem AC0Definable.compl {P : DecisionProblem L} (h : AC0Definable P) :
     AC0Definable Pᶜ := by
   obtain ⟨φ, hφ⟩ := h

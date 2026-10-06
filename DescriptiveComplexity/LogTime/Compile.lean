@@ -333,7 +333,9 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 /-- **The lower fence**: every prenex `FO(≤, +, BIT)` sentence is decided by a
 machine with a logarithmic clock and a bit-level base. The order and the addition
 are the sweeps of `DescriptiveComplexity.LogTime.Arith`, the bit is a read, and
-the quantifiers are the registers. -/
+the quantifiers are the registers.
+Registered in the Lax archive as
+[`Lax895169.ACZeroIsLogTime.bitDefinable_ltDecidable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroIsLogTime.html#s-Lax895169.ACZeroIsLogTime.bitDefinable_ltDecidable). -/
 theorem BitDefinable.ltDecidable {P : DecisionProblem L} (h : BitDefinable P) :
     LTDecidable P := by
   obtain ⟨φ, hφ⟩ := h
