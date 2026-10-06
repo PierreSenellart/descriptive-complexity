@@ -407,7 +407,9 @@ variable {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
 
 /-- **AC⁰ ⊆ FO(IFP)**: the numeric predicates are the limit of the simultaneous
 induction of `DescriptiveComplexity.arithStep`, and an AC⁰ sentence is its
-output, translated by `DescriptiveComplexity.arithToBlock`. -/
+output, translated by `DescriptiveComplexity.arithToBlock`.
+Registered in the Lax archive as
+[`Lax895169.ACZeroInPTIME.ac0Definable_ifpDefinable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroInPTIME.html#s-Lax895169.ACZeroInPTIME.ac0Definable_ifpDefinable). -/
 theorem AC0Definable.ifpDefinable (h : AC0Definable P) : IFPDefinable P := by
   obtain ⟨φ, hφ⟩ := h
   refine ⟨arithStepDef ((arithToBlock L).onSentence φ), ?_⟩
@@ -437,14 +439,18 @@ theorem AC0Definable.ifpDefinable (h : AC0Definable P) : IFPDefinable P := by
   exact (LHom.realize_onSentence A (arithToBlock L) φ).symm
 
 /-- **AC⁰ ⊆ FO(LFP)**, through the equivalence of the inflationary and the least
-fixed point. -/
+fixed point.
+Registered in the Lax archive as
+[`Lax895169.ACZeroInPTIME.ac0Definable_lfpDefinable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroInPTIME.html#s-Lax895169.ACZeroInPTIME.ac0Definable_lfpDefinable). -/
 theorem AC0Definable.lfpDefinable (h : AC0Definable P) : LFPDefinable P :=
   h.ifpDefinable.lfpDefinable
 
 /-- **AC⁰ ⊆ PTIME.** With `DescriptiveComplexity.FODefinable.ac0Definable` and
 `DescriptiveComplexity.exists_ac0Definable_not_foDefinable` this places the
 arithmetic logic strictly above FO(≤) and inside polynomial time; the sharper
-`AC⁰ ⊆ LOGSPACE` needs the multi-head automaton instead. -/
+`AC⁰ ⊆ LOGSPACE` needs the multi-head automaton instead.
+Registered in the Lax archive as
+[`Lax895169.ACZeroInPTIME.ac0Definable_mem_PTIME`](https://laxarchive.org/lax-895169/Lax895169.ACZeroInPTIME.html#s-Lax895169.ACZeroInPTIME.ac0Definable_mem_PTIME). -/
 theorem ac0Definable_mem_PTIME (h : AC0Definable P) : P ∈ PTIME :=
   (lfpDefinable_iff_mem_PTIME P).mp h.lfpDefinable
 

@@ -485,7 +485,9 @@ and the two numeric atoms *computed* by
 `DescriptiveComplexity.HeadProgram.timesP`.
 
 The machine has `qdepthA φ + 7` heads: two per nested quantifier, then the four
-working heads of a multiplication and the three scratch heads of an addition. -/
+working heads of a multiplication and the three scratch heads of an addition.
+Registered in the Lax archive as
+[`Lax895169.ACZeroInLogSpace.ac0Definable_dtcDefinable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroInLogSpace.html#s-Lax895169.ACZeroInLogSpace.ac0Definable_dtcDefinable). -/
 theorem AC0Definable.dtcDefinable (h : AC0Definable P) : DTCDefinable P := by
   classical
   obtain ⟨φ, hφ⟩ := h
@@ -541,11 +543,15 @@ theorem AC0Definable.dtcDefinable (h : AC0Definable P) : DTCDefinable P := by
 
 with the first inclusion strict and the strictness of the second exactly the
 switching lemma – `DescriptiveComplexity.PARITY` is in LOGSPACE here and outside
-AC⁰ classically, which this library does not prove. -/
+AC⁰ classically, which this library does not prove.
+Registered in the Lax archive as
+[`Lax895169.ACZeroInLogSpace.ac0Definable_mem_LOGSPACE`](https://laxarchive.org/lax-895169/Lax895169.ACZeroInLogSpace.html#s-Lax895169.ACZeroInLogSpace.ac0Definable_mem_LOGSPACE). -/
 theorem ac0Definable_mem_LOGSPACE (h : AC0Definable P) : P ∈ LOGSPACE :=
   (mem_LOGSPACE_iff P).mpr h.dtcDefinable
 
-/-- **AC⁰ ⊆ NL**, by the inclusion of LOGSPACE. -/
+/-- **AC⁰ ⊆ NL**, by the inclusion of LOGSPACE.
+Registered in the Lax archive as
+[`Lax895169.ACZeroInLogSpace.ac0Definable_mem_NL`](https://laxarchive.org/lax-895169/Lax895169.ACZeroInLogSpace.html#s-Lax895169.ACZeroInLogSpace.ac0Definable_mem_NL). -/
 theorem ac0Definable_mem_NL (h : AC0Definable P) : P ∈ NL :=
   LOGSPACE_subset_NL (ac0Definable_mem_LOGSPACE h)
 

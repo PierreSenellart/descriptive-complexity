@@ -154,7 +154,9 @@ theorem ArithDef.bitDef {R : ArithRel L α} (h : ArithDef R) : BitDef R := by
 
 /-! ### What it buys -/
 
-/-- **AC⁰ definability is bit-definability.** -/
+/-- **AC⁰ definability is bit-definability.**
+Registered in the Lax archive as
+[`Lax895169.ACZeroIsBitLogic.ac0Definable_bitDefinable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroIsBitLogic.html#s-Lax895169.ACZeroIsBitLogic.ac0Definable_bitDefinable). -/
 theorem AC0Definable.bitDefinable {P : DecisionProblem L} (h : AC0Definable P) :
     BitDefinable P := by
   obtain ⟨φ, hφ⟩ := h
@@ -174,7 +176,9 @@ theorem AC0Definable.ltDecidable {P : DecisionProblem L} (h : AC0Definable P) :
 `DescriptiveComplexity.LogTime` development aims at, with `⊇` through
 `DescriptiveComplexity.powArithDef` and `⊆` through
 `DescriptiveComplexity.timesBitDef`: both halves of [Immerman
-1999][immerman1999descriptive] Thm 1.17, with no hypothesis left. -/
+1999][immerman1999descriptive] Thm 1.17, with no hypothesis left.
+Registered in the Lax archive as
+[`Lax895169.ACZeroIsLogTime.ac0Definable_iff_ltDecidable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroIsLogTime.html#s-Lax895169.ACZeroIsLogTime.ac0Definable_iff_ltDecidable). -/
 theorem ac0Definable_iff_ltDecidable {P : DecisionProblem L} :
     AC0Definable P ↔ LTDecidable P :=
   ⟨fun h => h.ltDecidable, fun h => h.ac0Definable⟩
