@@ -158,7 +158,7 @@ requires:
   restated_from: ../counting/export.yaml
 - package: Lax280166
   repository: https://github.com/PierreSenellart/descriptive-complexity
-  commit: 4ba19bc77eb189ea76b00497ae9f03292b26cd03
+  commit: 76872696ea1fbcfd245e4ddffa32a4ed8b882140
   folder: lax/sharpp-catalog
   restated_from: ../sharpp-catalog/export.yaml
 restated:
