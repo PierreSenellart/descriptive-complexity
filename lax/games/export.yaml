@@ -162,7 +162,7 @@ requires:
   restated_from: ../pspace/export.yaml
 - package: Lax895169
   repository: https://github.com/PierreSenellart/descriptive-complexity
-  commit: '0000000000000000000000000000000000000000'
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
   folder: lax/ac0
   restated_from: ../ac0/export.yaml
 restated:
