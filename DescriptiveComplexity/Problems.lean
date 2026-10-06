@@ -13,6 +13,7 @@ import DescriptiveComplexity.Problems.Sat.CountingDnf
 import DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive
 import DescriptiveComplexity.Problems.Sat.CountingDecision
 import DescriptiveComplexity.Problems.Sat.CountingCompare
+import DescriptiveComplexity.Problems.Sat.CountingRestricted
 import DescriptiveComplexity.Problems.SatUnsat.Hardness
 import DescriptiveComplexity.Problems.Taut
 import DescriptiveComplexity.Problems.ThreeDnfTaut
@@ -25,6 +26,9 @@ import DescriptiveComplexity.Problems.Game
 import DescriptiveComplexity.Problems.ReachabilityDet
 import DescriptiveComplexity.Problems.ReachabilityDet.Complement
 import DescriptiveComplexity.Problems.ThreeColorability
+import DescriptiveComplexity.Problems.ThreeColorability.CountGadget
+import DescriptiveComplexity.Problems.ThreeColorability.Counting
+import DescriptiveComplexity.Problems.ThreeColorability.CountDraw
 import DescriptiveComplexity.Problems.Coloring
 import DescriptiveComplexity.Problems.ThreeSat
 import DescriptiveComplexity.Problems.ThreeSat.Counting
@@ -66,6 +70,7 @@ import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Problems.SetFamily.Counting
 import DescriptiveComplexity.Problems.ExactCoverCounting
 import DescriptiveComplexity.Problems.SetSplitting
+import DescriptiveComplexity.Problems.NaeSatCounting
 import DescriptiveComplexity.Problems.DominatingSet
 import DescriptiveComplexity.Problems.DominatingSet.Counting
 import DescriptiveComplexity.Problems.DominatingSet.CountingHardness

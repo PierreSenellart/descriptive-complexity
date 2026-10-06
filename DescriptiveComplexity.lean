@@ -111,6 +111,11 @@ import DescriptiveComplexity.Problems.MachineNumber
 import DescriptiveComplexity.Counting.Quantitative
 import DescriptiveComplexity.Counting.QuantitativePull
 import DescriptiveComplexity.Counting.Reduction
+import DescriptiveComplexity.Counting.Restrict
+import DescriptiveComplexity.Counting.QSO
+import DescriptiveComplexity.Counting.QSOWitness
+import DescriptiveComplexity.Counting.QSOQuantifiers
+import DescriptiveComplexity.Counting.QSOSharpP
 import DescriptiveComplexity.Counting.RelClosure
 import DescriptiveComplexity.Counting.Subtractive
 import DescriptiveComplexity.Counting.KernelPair
@@ -2113,7 +2118,14 @@ pulled relations hold only of points of the domain
   number of assignments of a second-order block satisfying a first-order kernel
   over the ordered expansion, whatever the linear order. This is the prenex
   form of the logic ΣQSO(FO) of
-  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive]. The order is a
+  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive], and the two readings
+  coincide (`DescriptiveComplexity.mem_sharpP_iff_sqDefinable`): every term of
+  the logic (`DescriptiveComplexity.SQTerm`) – sums, products, first-order sums
+  and products, second-order sums – is a witness count, each construction
+  being a closure property of witness counts with free variables
+  (`DescriptiveComplexity.WCount`); the first-order product is the one that
+  rewrites the kernel, every relation variable taking the tuple as more
+  arguments (`DescriptiveComplexity.extendRel`). The order is a
   parameter and not a guessed relation: guessing it, as the definition of NP
   may, would multiply every count by the number of linear orders. Closure under
   parsimonious reductions (`DescriptiveComplexity.SharpPDefinable.of_orderedParsimonious`)
@@ -2411,6 +2423,29 @@ pulled relations hold only of points of the domain
   `#BIS + #PP2DNF = 2 ^ n`. It is the source of the `#P`-hardness of the query
   `R(x), S(x, y), T(y)` over probabilistic databases
   ([Dalvi and Suciu 2012][dalvi2012dichotomy]).
+* **The rest of the one-call catalog.** #2SAT, #HORN-SAT and #Monotone-2SAT
+  (`DescriptiveComplexity.sharpTwoSat_sharpP_oneCallComplete`,
+  `DescriptiveComplexity.sharpHornSat_sharpP_oneCallComplete`,
+  `DescriptiveComplexity.sharpMonotoneTwoSat_sharpP_oneCallComplete`), the
+  model counts of formulas of a definable shape, i.e., #SAT restricted to a
+  sentence (`DescriptiveComplexity.CountingProblem.restrict`), all reached
+  from counting all the independent sets by one clause per edge, of either
+  sign, each isolated vertex doubling the count
+  (`DescriptiveComplexity.sharpAllIndependentSets_oneCall_sharpSat`); counting
+  all the vertex covers (`DescriptiveComplexity.sharpAllVertexCovers_sharpP_oneCallComplete`),
+  the complements of the independent sets. #NAE-SAT
+  (`DescriptiveComplexity.sharpNaeSat_sharpP_oneCallComplete`) and #Set
+  Splitting (`DescriptiveComplexity.sharpSetSplitting_sharpP_oneCallComplete`),
+  whose solutions come in complementary pairs, by the reductions of the
+  decision problems unchanged, halving the count or dividing it by `2` to the
+  number of elements that are no variables. #3-Colorability
+  (`DescriptiveComplexity.sharpThreeCol_sharpP_oneCallComplete`) needs a new
+  reduction: the OR gate of the decision reduction leaves its output free when
+  one input is true, while three triangles attached to `z`, `¬p`, `¬ℓ` and
+  `F` force `z = p ∨ ℓ` with exactly `8` colorings
+  (`DescriptiveComplexity.SatToColCount.gate_iff`), so that the count is
+  `6 · 8 ^ g` times the number of models
+  (`DescriptiveComplexity.SatToColCount.card_proper`).
 * **The permanent is one-call `#P`-complete**
   (`DescriptiveComplexity.sharpCycleCover_sharpP_oneCallComplete`, in
   `DescriptiveComplexity.Problems.CycleCover.Completeness`): Valiant's theorem
@@ -2783,7 +2818,7 @@ reduction and certificate in full.
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
 | `FP` (polynomial-time functions with natural-number values, `DescriptiveComplexity.FP`) | QFO(LFP), the quantitative first-order logic of [Arenas, Muñoz, Riveros 2020][arenas2020descriptive] over least fixed points: sums and products, over the elements, of polynomial-time conditions | – | – |
-| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, the prenex form of ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, complete under subtractive reductions (plain `#P`-complete here) · counting all the independent sets of a graph, #BIS (those of a bipartite graph) and #PP2DNF, complete under one-call reductions only |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, equivalently ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, complete under subtractive reductions (plain `#P`-complete here) · #2SAT · #HORN-SAT · #Monotone-2SAT · #NAE-SAT · #Set Splitting · #3-Colorability · counting all the independent sets or all the vertex covers of a graph · #BIS (the independent sets of a bipartite graph) · #PP2DNF · the permanent (#Cycle Cover), complete under one-call reductions only |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

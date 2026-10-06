@@ -107,7 +107,7 @@ machine bridges.
   “numbers must be bitwise definable” rule; generalized chess, checkers and Go
   (EXPTIME) are tiling-scale simulations with a board layer on top.
 - Δₖᵖ and oracle classes are blocked on machine models, presumably forever out
-  of scope (§7 refines both judgments).
+  of scope (§6 refines both judgments).
 
 ## 3. Logics and framework extensions
 
@@ -358,7 +358,7 @@ X”), and the two formula compilers along a definable quotient
   plumbing: sentence → family with gates (subformula, assignment) and a
   quantifier-free predecessor relation; family → sentence by `Acc_d` nested
   to the constant depth (Thm 4.69, `⊇`), a finite nesting with no fixpoint.
-  Note what neither discharges: the structures-vs-strings bridge of §7 and of
+  Note what neither discharges: the structures-vs-strings bridge of §6 and of
   the README's *Scope* is about string encodings, and no bridge inside this
   framework closes it (the input gates are the tuples of the structure's
   relations, a definition made here rather than transported); and the closure
@@ -436,110 +436,7 @@ non-reducibility, impossible in the machine world.
   `≤ᶠᵒ[≤]` would need a reduction that builds the arithmetic, which the
   separation suggests `FO(≤)` cannot do. Suggests, not proves.
 
-## 6. Beyond decision problems: counting and optimization
-
-The counting layer exists: counting problems (iso-invariant `Structure → ℕ`),
-parsimonious, relativized, one-call and subtractive reductions, `#P` defined
-by witness counts of `∃SO` sentences, FP defined by QFO(LFP) in the sense of
-Arenas–Muñoz–Riveros (LMCS 16(1), 2020), both with a catalog of complete
-problems and a machine bridge, the decision classes defined by counting
-(`⊕P`, `Mod_k P`, `PP`, `C₌P`, `UP`) with theirs, and the possible-worlds /
-weighted-worlds problems of probabilistic query evaluation with their
-tutorial. What follows is what the same pattern still leaves open, in
-dependency order.
-
-- **ΣQSO(FO) as the logic of `#P`** [M]: the quantitative terms exist
-  (`Counting/Quantitative.lean`, sums and products over first-order
-  conditions, the FP side), but `#P` is defined by the witness-count form
-  `ΣX̄. Σx̄. φ`. Adding second-order sums `ΣX` to the term language and proving
-  that every ΣQSO(FO) term is a witness count of an `∃SO` sentence (and
-  conversely) would make the two readings of `#P` coincide inside the library,
-  as the paper's Proposition has it, and give the permanent its natural
-  statement, `ΣS. permut(S) · Πx.(∃y. S(x,y) ∧ M(x,y))`, beside the
-  witness-count form of `Problems/CycleCover/Defs.lean`.
-- **Non-adaptive linear combinations** [L], the reduction notion above the
-  one-call reductions `≤ᶜ[≤]`:
-  `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
-  i.e., polynomially many oracle calls at definable parameters, combined
-  definably. It needs *parameterized* interpretations (thread `k` extra free
-  variables through every defining formula and through `Map`), which is the
-  level's main cost; the divisor on the left keeps Lagrange denominators out
-  of the statement. Index sets multiply, parameters concatenate and divisors
-  multiply, so composition still closes. This is the shape of every
-  interpolation-based `#P`-hardness proof, Dalvi–Suciu's `h₁` as the paper
-  proves it among them (the permanent, in the library, is one-call complete
-  by Valiant's modular trick and needs none of this). *Adaptive*
-  Turing reductions, where a later query depends on an earlier answer, stay
-  out: that is the honest boundary of a machine-free framework, and `FP^#P`
-  lives beyond it. The coefficients must come from a class strictly weaker
-  than the one being defined, or the notion is vacuous; the post-processing
-  terms of `Counting/Post.lean` are the interim budget, FP the principled one.
-- **The rest of the catalog** [S each]: the NAE-SAT family, Set Splitting and
-  3-Colorability count solutions up to a constant factor (complementary pairs,
-  permutations of the colors), so each needs its counting convention fixed
-  before it can be parsimoniously or one-call complete; the one-call entries
-  #Monotone-2SAT, #2SAT, #HornSAT by inclusion of instances, and all the vertex
-  covers of a graph as complements of the independent sets.
-- **Structure inside `#P`** [R]: the ΣQSO(FO)-hierarchy tracks the #FO one but
-  diverges at the bottom (`#Σᵢ ⊊ ΣQSO(Σᵢ)` for `i = 0, 1`, coinciding from Π₁
-  up; ΣQSO(Σ₀) and #Σ₁ incomparable), and the gap is the point: #Σ₁ has an
-  FPRAS but is not closed under sum; ΣQSO(Σ₁) is, but subtraction by one is
-  open (conjectured to fail); ΣQSO(Σ₁[FO]), allowing FO subformulas as atoms,
-  is closed under sum, product and subtraction by one, sits in TotP and has an
-  FPRAS everywhere (that subtraction proof is the paper's hardest, turning on
-  logarithmic-size witnesses a fixed formula can identify and delete). A
-  Grädel-style Horn restriction ΣQSO(Σ₂-Horn) has #DisjHornSAT as a natural
-  complete problem under parsimonious reductions, rhyming with the SO-Horn
-  layer already in the library. The FPRAS story of the bottom level is the
-  probabilistic-database approximability story (Karp–Luby on the lineage DNF),
-  so this is the application's own fine print rather than an unrelated item.
-- **Quantitative least fixed point** [R, deferred]: the support-based `lsfp`
-  of the paper, needed for `#L`; FP was reached without it, through QFO(LFP)
-  over Horn rules. It needs its own monotonicity and termination argument;
-  `derivesIn`/`depth` in the FO(LFP) layer is the right precedent.
-- **Optimization: MaxSNP** [R, deferred furthest]: Papadimitriou–Yannakakis's
-  syntactically defined optimization classes (Π₁-definable objective),
-  L-reductions, MAX-3SAT completeness; MaxQSO/MinQSO is the definitional route
-  to the same territory. L-reductions are approximation-preserving and far more
-  delicate than parsimonious ones, which is also why PCP-based hardness of
-  approximation stays out of scope.
-
-### Probabilistic query evaluation, what remains
-
-The tutorial (`Examples/ProbabilisticQueries.lean`) has the possible-worlds
-and weighted-worlds problems, the `h₀` hardness (one-call, from #PP2DNF), the
-probability of any first-order query as a ratio of two `#P` numbers, the
-encoding of a concrete database with its faithfulness and decoding, and the
-safe query `R(x), S(x, y)` in FP. Still open:
-
-- **A parsimoniously complete query with negation** [S]: over a schema holding
-  a CNF and one uncertain unary relation, the query “the uncertain relation is
-  a model of the certain CNF”; worlds satisfying it are the models, exactly,
-  so `#SAT ≤ᵖ PossibleWorlds φ` with the uncertain facts the occurring
-  variables. A plain `#P`-complete instance beside `h₀`.
-- **`h₁ = R(x₀), S(x₀, y₀) ∨ S(x₁, y₁), T(y₁)`** [M]: Dalvi–Suciu prove its
-  hardness by interpolation with `m + 1` oracle calls, which needs the linear
-  combinations above. A one-call derivation exists (not in the paper, checked
-  by brute force on small instances): weights `c = 1`, `a = 2^t − 1` on the
-  `S`-facts with `2^t > 2ⁿ` make `#BIS` the lowest base-`2^t` digit of
-  `2^(n + t·m) − W(h₁)`; the weight is a block of ones, bitwise definable.
-- **A sparse instance format** [S]: the concrete step encodes dense tables;
-  a list-of-facts format, with the decoding statements for the denominator and
-  for the probability itself.
-- **The dichotomy** [R]: every hierarchical self-join-free conjunctive query
-  has a safe plan, and a safe plan is a QFO term (join = product, projection =
-  complement of a product over the domain); the hard queries reduce from `h₀`
-  or `h₁`. A meta-theorem over queries rather than a completeness result about
-  one problem; the maintainer may do it outside this library.
-
-Beyond the library, the counting track is the direct bridge to provenance-lean:
-the counting provenance semantics of a query is exactly a model count, so the
-two libraries would meet here, with semiring provenance as the common
-generalization (and QSO's weighted-logic ancestry is the same idea from the
-other side). PQE above is the concrete meeting point: the weighted count of
-the worlds satisfying a query is the model count of the query's lineage.
-
-## 7. Machine bridges beyond NP and PTIME
+## 6. Machine bridges beyond NP and PTIME
 
 Design analysis for the one direction the machine bridge does not reach – the
 string-encoding layer – and pricing rules for any machine problem added later.
@@ -639,18 +536,15 @@ The concrete items:
 - **Limits that survive every variant**: the string-encoding layer (above);
   oracle and `Δₖᵖ` classes – the bridge would make them definable, but by a machine,
   against the library's classes-are-logic principle (a decision, not a
-  drift); `#P` as “number of accepting runs” is easy to state but needs the
-  parsimonious-reduction notion the framework still lacks (§6, first item);
-  the classes-are-logic principle points at `ΣQSO(FO)` for the definition
-  either way, with the machine count as a bridge statement.
+  drift).
 
-## 8. Teaching material
+## 7. Teaching material
 
 - **Reduction cookbook** [M]: grow the `Examples/` directory into a curated,
   tutorial-style example set (cf. Grange et al., MFCS 2024) as the catalog
   broadens, so the library doubles as a complexity-course companion.
 
-## 9. Populating the GI degree, and reduction theories without a class
+## 8. Populating the GI degree, and reduction theories without a class
 
 The degree machinery itself is built (`DescriptiveComplexity.Degree`:
 `ComplexityClass.below`, completeness for a degree as mutual reducibility, and
@@ -735,7 +629,7 @@ provable rather than merely reasonable.
    next substantial piece of the inexpressibility track, and the one that
    gives connectivity and acyclicity without bespoke strategies. The 0-1 laws
    are its independent neighbor.
-2. **Populating the GI degree** (§9) [M each]: with the degree machinery and
+2. **Populating the GI degree** (§8) [M each]: with the degree machinery and
    the doubling lemma in place, an entry costs its gadget and an
    `IsoReflecting` proof and nothing besides, which makes this the cheapest
    result per line on the list. Hypergraph / set-system isomorphism first, its
@@ -745,12 +639,6 @@ provable rather than merely reasonable.
 
 **Alongside, or after:**
 
-- **What is left of the counting track of §6**: the ΣQSO(FO) reading of
-  `#P`; the linear combinations are the one item that
-  unlocks new hardness results (`h₁`) and the one to price
-  honestly; structure inside `#P`, the quantitative fixed point and MaxSNP
-  are genuine research. Its size is what puts it beside the numbered line
-  rather than in it.
 - **The rest of the sharpening pass** (each [M], no prerequisites, no new
   surface): **quantifier-free / projection / dimension tracking through
   composition** (§3's reduction-notion refinements), which upgrades catalog
@@ -773,7 +661,7 @@ provable rather than merely reasonable.
   [R]. Everything short of it is built – the logic, the machine model and
   their equality – and nothing above depends on it; the by-inspection claims
   in the README stay an honest, documented gap, being about string encodings
-  (§7), which no bridge inside this framework closes. What is worth doing
+  (§6), which no bridge inside this framework closes. What is worth doing
   next in that area is, on demand, class-hood (§3, not [R]).
 - The succinct problems of §2 and EPR's hardness. Both are drawings out of the
   wide machine, each about the size of the tilings that are built, and neither
@@ -782,7 +670,7 @@ provable rather than merely reasonable.
   research-level and sharing its evaluator with two other items.
 
 This weighting assumes the goal is research output and formalization firsts. If
-the near-term goal is the course companion of §8, the cookbook and catalog
-growth move up and the counting and inexpressibility tracks slide down:
-students meet NL, P-completeness and reductions long before they meet ΣQSO or
-an Ehrenfeucht–Fraïssé game.
+the near-term goal is the course companion of §7, the cookbook and catalog
+growth move up and the inexpressibility track slides down: students meet NL,
+P-completeness and reductions long before they meet an Ehrenfeucht–Fraïssé
+game.

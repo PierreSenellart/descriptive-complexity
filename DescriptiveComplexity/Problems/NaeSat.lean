@@ -344,7 +344,7 @@ noncomputable def naeFalseKernel : satSOLang.Sentence :=
 conjoined with its mirror image. -/
 noncomputable def naeKernel : satSOLang.Sentence := satKernel ⊓ naeFalseKernel
 
-private theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
+theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) naeFalseKernel) ↔
@@ -374,7 +374,7 @@ private theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
     · exact ⟨fun _ => x, Or.inl ⟨hp, hT⟩⟩
     · exact ⟨fun _ => x, Or.inr ⟨hn, hT⟩⟩
 
-private theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
+theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) naeKernel) ↔
