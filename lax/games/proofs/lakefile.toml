@@ -46,13 +46,13 @@ subDir = "lax/polynomial-hierarchy/concepts"
 [[require]]
 name = "Lax134656"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "0000000000000000000000000000000000000000"
+rev = "154fe206220472baa3b470bc99c69234b7fbb2ee"
 subDir = "lax/pspace/concepts"
 
 [[require]]
 name = "Lax895169"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "0000000000000000000000000000000000000000"
+rev = "646a3b4286aec6f78457067508d69471f8822db6"
 subDir = "lax/ac0/concepts"
 
 [[lean_lib]]

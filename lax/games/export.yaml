@@ -157,7 +157,7 @@ requires:
   restated_from: ../polynomial-hierarchy/export.yaml
 - package: Lax134656
   repository: https://github.com/PierreSenellart/descriptive-complexity
-  commit: '0000000000000000000000000000000000000000'
+  commit: 154fe206220472baa3b470bc99c69234b7fbb2ee
   folder: lax/pspace
   restated_from: ../pspace/export.yaml
 - package: Lax895169
