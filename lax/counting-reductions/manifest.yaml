@@ -86,3 +86,6 @@ bibEntries:
       year         = {1983},
       doi          = {10.1137/0212053}
     }
+issue:
+  repositoryId: 1320232165
+  number: 181
