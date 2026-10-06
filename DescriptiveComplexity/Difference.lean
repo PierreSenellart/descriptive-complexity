@@ -391,24 +391,32 @@ theorem piSODefinable_triv : PiSODefinable 1 (DecisionProblem.triv L) := by
   exact fun h => h
 
 /-- **NP ⊆ DP**: an NP condition is itself a DP condition, conjoined with the
-tautology. -/
+tautology.
+Registered in the Lax archive as
+[`Lax564036.DPInclusions.NP_subset_DP`](https://laxarchive.org/lax-564036/Lax564036.DPInclusions.html#s-Lax564036.DPInclusions.NP_subset_DP). -/
 theorem NP_subset_DP : NP ⊆ DP := by
   intro L _ P hP
   exact ⟨P, DecisionProblem.triv L, hP, piSODefinable_triv,
     fun A _ _ _ => ⟨fun h => ⟨h, trivial⟩, And.left⟩⟩
 
-/-- **coNP ⊆ DP**, the mirror image. -/
+/-- **coNP ⊆ DP**, the mirror image.
+Registered in the Lax archive as
+[`Lax564036.DPInclusions.coNP_subset_DP`](https://laxarchive.org/lax-564036/Lax564036.DPInclusions.html#s-Lax564036.DPInclusions.coNP_subset_DP). -/
 theorem coNP_subset_DP : coNP ⊆ DP := by
   intro L _ P hP
   exact ⟨DecisionProblem.triv L, P, sigmaSODefinable_triv, hP,
     fun A _ _ _ => ⟨fun h => ⟨trivial, h⟩, And.right⟩⟩
 
-/-- **DP ⊆ Σ₂ᵖ**, as an inclusion of classes. -/
+/-- **DP ⊆ Σ₂ᵖ**, as an inclusion of classes.
+Registered in the Lax archive as
+[`Lax564036.DPInclusions.DP_subset_sigmaP_two`](https://laxarchive.org/lax-564036/Lax564036.DPInclusions.html#s-Lax564036.DPInclusions.DP_subset_sigmaP_two). -/
 theorem DP_subset_sigmaP_two : DP ⊆ SigmaP 2 :=
   fun _ _ _ hP => DPDefinable.sigmaSODefinable_two ((mem_DP_iff _).mp hP)
 
 /-- **DP ⊆ Π₂ᵖ**, as an inclusion of classes: DP sits inside the second level
-of the hierarchy from both sides. -/
+of the hierarchy from both sides.
+Registered in the Lax archive as
+[`Lax564036.DPInclusions.DP_subset_piP_two`](https://laxarchive.org/lax-564036/Lax564036.DPInclusions.html#s-Lax564036.DPInclusions.DP_subset_piP_two). -/
 theorem DP_subset_piP_two : DP ⊆ PiP 2 :=
   fun _ _ _ hP => DPDefinable.piSODefinable_two ((mem_DP_iff _).mp hP)
 

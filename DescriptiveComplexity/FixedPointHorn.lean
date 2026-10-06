@@ -2356,7 +2356,9 @@ theorem sigmaSOHornDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) 
 capture theorem at level 0 of the hierarchy, the identity that was open while
 the fragment stood alone: it needs the least model of a Horn program computed
 *inside* the fragment, which is what the translation through FO(LFP)
-provides. -/
+provides.
+Registered in the Lax archive as
+[`Lax564036.PolynomialTimeInHierarchy.piP_zero_eq`](https://laxarchive.org/lax-564036/Lax564036.PolynomialTimeInHierarchy.html#s-Lax564036.PolynomialTimeInHierarchy.piP_zero_eq). -/
 theorem piP_zero_eq : PiP 0 = SigmaP 0 := by
   change PTIME.compl = PTIME
   refine ComplexityClass.ext (fun P => sigmaSOHornDefinable_compl_iff P) fun P => ?_

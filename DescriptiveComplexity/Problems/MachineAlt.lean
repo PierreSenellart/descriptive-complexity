@@ -136,13 +136,17 @@ theorem atmAccept_piP_hard (k : ℕ) : (PiP (k + 1)).Hard (ATMAccept (k + 1) fal
 alternating acceptance with `k + 1` blocks, the first existential, is
 `Σₖ₊₁ᵖ`-complete. The classes of this library are defined by second-order
 alternation; this theorem says they are the levels of the alternating-machine
-hierarchy of [Chandra–Kozen–Stockmeyer 1981][chandra1981alternation]. -/
+hierarchy of [Chandra–Kozen–Stockmeyer 1981][chandra1981alternation].
+Registered in the Lax archive as
+[`Lax564036.AlternatingMachineComplete.atmAccept_sigmaP_complete`](https://laxarchive.org/lax-564036/Lax564036.AlternatingMachineComplete.html#s-Lax564036.AlternatingMachineComplete.atmAccept_sigmaP_complete). -/
 theorem atmAccept_sigmaP_complete (k : ℕ) :
     (SigmaP (k + 1)).Complete (ATMAccept (k + 1) true) :=
   ⟨atmAccept_mem_sigmaP k, atmAccept_sigmaP_hard k⟩
 
 /-- **The machine bridge, universal half**: with a universal first block,
-`Πₖ₊₁ᵖ`-complete. -/
+`Πₖ₊₁ᵖ`-complete.
+Registered in the Lax archive as
+[`Lax564036.AlternatingMachineComplete.atmAccept_piP_complete`](https://laxarchive.org/lax-564036/Lax564036.AlternatingMachineComplete.html#s-Lax564036.AlternatingMachineComplete.atmAccept_piP_complete). -/
 theorem atmAccept_piP_complete (k : ℕ) :
     (PiP (k + 1)).Complete (ATMAccept (k + 1) false) :=
   ⟨atmAccept_mem_piP k, atmAccept_piP_hard k⟩
@@ -151,7 +155,9 @@ theorem atmAccept_piP_complete (k : ℕ) :
 level exactly when it ordered-FO-reduces to acceptance by an alternating
 machine with `k + 1` blocks starting existentially. Forward through
 `DescriptiveComplexity.QBF`, backward because membership travels along
-reductions. -/
+reductions.
+Registered in the Lax archive as
+[`Lax564036.AlternatingMachineComplete.mem_sigmaP_iff_le_atmAccept`](https://laxarchive.org/lax-564036/Lax564036.AlternatingMachineComplete.html#s-Lax564036.AlternatingMachineComplete.mem_sigmaP_iff_le_atmAccept). -/
 theorem mem_sigmaP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} [L.IsRelational] (k : ℕ)
     (P : DecisionProblem L) :
     P ∈ SigmaP (k + 1) ↔ Nonempty (P ≤ᶠᵒ[≤] ATMAccept (k + 1) true) := by
@@ -173,7 +179,9 @@ the existential polarity as `DescriptiveComplexity.NTMAccept`. -/
 theorem atmAccept_one_coNP_complete : coNP.Complete (ATMAccept 1 false) :=
   atmAccept_piP_complete 0
 
-/-- **The machine characterization of `Πₖ₊₁ᵖ`.** -/
+/-- **The machine characterization of `Πₖ₊₁ᵖ`.**
+Registered in the Lax archive as
+[`Lax564036.AlternatingMachineComplete.mem_piP_iff_le_atmAccept`](https://laxarchive.org/lax-564036/Lax564036.AlternatingMachineComplete.html#s-Lax564036.AlternatingMachineComplete.mem_piP_iff_le_atmAccept). -/
 theorem mem_piP_iff_le_atmAccept {L : FirstOrder.Language.{0, 0}} [L.IsRelational] (k : ℕ)
     (P : DecisionProblem L) :
     P ∈ PiP (k + 1) ↔ Nonempty (P ≤ᶠᵒ[≤] ATMAccept (k + 1) false) := by
