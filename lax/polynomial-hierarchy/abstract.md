@@ -11,9 +11,8 @@ class of conjunctions of an NP and a coNP condition. No machine model enters
 the definitions.
 
 Πₖ is the class of complements of Σₖ, the levels are nested and contained
-in PH, polynomial time is at the bottom, inside NP ∩ coNP, and
-NP ∪ coNP ⊆ DP ⊆ Σ₂ ∩ Π₂.
-coNP and DP are closed under first-order reductions.
+in PH, polynomial time is at the bottom, inside NP ∩ coNP, and NP ∪ coNP
+⊆ DP ⊆ Σ₂ ∩ Π₂. coNP and DP are closed under first-order reductions.
 
 Complete problems are given at every level, under the core's first-order
 reductions: tautology of DNF formulas, its restriction to width three and
