@@ -74,18 +74,6 @@ bibEntries:
       year         = {2016},
       doi          = {10.4230/LIPIcs.CSL.2016.20}
     }
-  - |
-    @article{provan1983complexity,
-      author       = {J. Scott Provan and Michael O. Ball},
-      title        = {The Complexity of Counting Cuts and of Computing the
-                      Probability that a Graph is Connected},
-      journal      = {{SIAM} J. Comput.},
-      volume       = {12},
-      number       = {4},
-      pages        = {777--788},
-      year         = {1983},
-      doi          = {10.1137/0212053}
-    }
 issue:
   repositoryId: 1320232165
   number: 181

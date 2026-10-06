@@ -22,9 +22,7 @@ type: theorem
 #BIS is one-call #P-complete, by a one-call reduction from counting all
 independent sets. #PP2DNF is, by a one-call reduction from #BIS: on a
 bipartite graph, the sets of vertices that are not independent are the
-models of its partitioned positive 2-DNF formula. Provan and Ball proved the
-hardness of these problems by another route, and Dalvi and Suciu use #PP2DNF
-for probabilistic databases.
+models of its partitioned positive 2-DNF formula.
 -/
 
 namespace Lax859101.BipartiteComplete
