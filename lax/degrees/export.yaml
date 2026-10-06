@@ -106,7 +106,7 @@ requires:
   restated_from: ../ptime/export.yaml
 - package: Lax564036
   repository: https://github.com/PierreSenellart/descriptive-complexity
-  commit: '0000000000000000000000000000000000000000'
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
   folder: lax/polynomial-hierarchy
   restated_from: ../polynomial-hierarchy/export.yaml
 - package: Lax624099
