@@ -608,67 +608,97 @@ theorem count_lt_base {S : kInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i
 
 end Counting
 
-/-! ### Correctness -/
+/-! ### Correctness
+
+Stated for an explicit cover and an explicit set of items, so that the same
+lemmas give the equivalence of the two decision problems and the bijection
+between their solutions (`DescriptiveComplexity.Problems.Knapsack.CountingHardness`). -/
 
 section Correctness
 
-variable (A : Type) [Language.setSystem.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
+variable {A : Type} [Language.setSystem.Structure A] [LinearOrder A] [Finite A]
+
+/-- The items of a subfamily: the padded items of its sets. -/
+def itemsOf (a₀ : A) (G : A → Prop) (i : kInterp.Map A) : Prop := ∃ s, G s ∧ i = kItem a₀ s
+
+/-- The subfamily of a set of items: the sets whose padded item is chosen. -/
+def coverOfItems (a₀ : A) (S : kInterp.Map A → Prop) (s : A) : Prop := S (kItem a₀ s)
 
 open Classical in
+/-- **The items of an exact cover sum to the target.** -/
+theorem subsetSum_itemsOf [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀) {G : A → Prop}
+    (hG : ExactCoverBy (SSElem (A := A)) SSFam SSMem G) :
+    (∀ i, itemsOf a₀ G i → BWItem i) ∧
+      (∑ᶠ i ∈ {i | itemsOf a₀ G i}, BWWeight i) = BWTarget (kInterp.Map A) := by
+  classical
+  obtain ⟨hGfam, hcov, hdisj⟩ := hG
+  have : Finite (kInterp.Map A) := kInterp.map_finite A
+  have hS : ∀ i : kInterp.Map A, itemsOf a₀ G i → BWItem i := by
+    rintro i ⟨s, hs, rfl⟩
+    exact (bwItem_itm _).mpr ⟨by simpa [kItem] using hGfam s hs, by simpa [kItem] using ha₀⟩
+  refine ⟨hS, ?_⟩
+  rw [sum_weights_eq ha₀ hS, bwTarget_eq ha₀]
+  refine digitNum_congr_on fun e he => ?_
+  obtain ⟨s₀, hs₀, hmem₀⟩ := hcov e he
+  have huniq : ∀ s, G s → SSMem e s → s = s₀ := fun s hs hmem => by
+    by_contra hne
+    exact hdisj s s₀ hs hs₀ hne e he ⟨hmem, hmem₀⟩
+  have hset : {i : kInterp.Map A | itemsOf a₀ G i ∧ SSElem e ∧ SSMem e (i.2 0)} =
+      {kItem a₀ s₀} := by
+    ext i
+    constructor
+    · rintro ⟨⟨s, hs, rfl⟩, -, hmem⟩
+      rw [Set.mem_singleton_iff, huniq s hs (by simpa using hmem)]
+    · rintro rfl
+      exact ⟨⟨s₀, hs₀, rfl⟩, he, by simpa using hmem₀⟩
+  rw [hset, Set.ncard_singleton, ite_eq_left he]
+
+open Classical in
+/-- **A set of items summing to the target is an exact cover.** -/
+theorem exactCoverBy_coverOfItems [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀)
+    {S : kInterp.Map A → Prop} (hSi : ∀ i, S i → BWItem i)
+    (hsum : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget (kInterp.Map A)) :
+    ExactCoverBy (SSElem (A := A)) SSFam SSMem (coverOfItems a₀ S) := by
+  classical
+  have : Finite (kInterp.Map A) := kInterp.map_finite A
+  rw [sum_weights_eq ha₀ hSi, bwTarget_eq ha₀] at hsum
+  have hkey : ∀ e, SSElem e →
+      ({i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} : Set _).ncard = 1 := by
+    intro e he
+    have h := digitNum_inj (Le := (· ≤ · : A → A → Prop)) (B := base A)
+      ⟨fun _ => le_rfl, fun _ _ _ => le_trans, fun _ _ => le_antisymm, le_total⟩ base_pos
+      ({e : A | SSElem e} : Set A).ncard SSElem rfl _ _
+      (fun e' => count_lt_base hSi ha₀ e')
+      (fun e' => by by_cases h' : SSElem e' <;> simp [h', base_pos, one_lt_base]) hsum e he
+    rw [h, ite_eq_left he]
+  refine (exactCoverBy_iff_unique _ _ _ _).mpr ⟨fun s hs => ?_, fun e he => ?_⟩
+  · simpa [kItem] using ((bwItem_itm _).mp (hSi _ hs)).1
+  · obtain ⟨i₀, hi₀⟩ := Set.ncard_eq_one.mp (hkey e he)
+    have hmem₀ : i₀ ∈ {i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} := by
+      rw [hi₀]
+      exact rfl
+    obtain ⟨hS₀, -, hmem⟩ := hmem₀
+    obtain ⟨hi, -⟩ := eq_kItem ha₀ (hSi _ hS₀)
+    refine ⟨i₀.2 0, ⟨show S (kItem a₀ (i₀.2 0)) by rw [← hi]; exact hS₀, hmem⟩, fun s hs => ?_⟩
+    have hmem' : kItem a₀ s ∈ {i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} :=
+      ⟨hs.1, he, by simpa using hs.2⟩
+    rw [hi₀, Set.mem_singleton_iff] at hmem'
+    exact congrArg (fun q : kInterp.Map A => q.2 0) hmem'
+
+variable (A) in
 /-- **Correctness of the reduction**: the set system has an exact cover iff the
 interpreted binary-weighted instance has a set of items summing to the
 target. -/
-theorem hasExactCover_iff_hasSubsetSum :
+theorem hasExactCover_iff_hasSubsetSum [Nonempty A] :
     HasExactCover A ↔ HasSubsetSum (kInterp.Map A) := by
-  classical
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   have : Finite (kInterp.Map A) := kInterp.map_finite A
   constructor
-  · rintro ⟨G, hGfam, hcov, hdisj⟩
-    have hS : ∀ i : kInterp.Map A, (∃ s, G s ∧ i = kItem a₀ s) → BWItem i := by
-      rintro i ⟨s, hs, rfl⟩
-      exact (bwItem_itm _).mpr ⟨by simpa [kItem] using hGfam s hs, by simpa [kItem] using ha₀⟩
-    refine ⟨inferInstance, isLinOrd_bwLe, fun i => ∃ s, G s ∧ i = kItem a₀ s, hS, ?_⟩
-    rw [sum_weights_eq ha₀ hS, bwTarget_eq ha₀]
-    refine digitNum_congr_on fun e he => ?_
-    obtain ⟨s₀, hs₀, hmem₀⟩ := hcov e he
-    have huniq : ∀ s, G s → SSMem e s → s = s₀ := fun s hs hmem => by
-      by_contra hne
-      exact hdisj s s₀ hs hs₀ hne e he ⟨hmem, hmem₀⟩
-    have hset : {i : kInterp.Map A | (∃ s, G s ∧ i = kItem a₀ s) ∧ SSElem e ∧ SSMem e (i.2 0)} =
-        {kItem a₀ s₀} := by
-      ext i
-      constructor
-      · rintro ⟨⟨s, hs, rfl⟩, -, hmem⟩
-        rw [Set.mem_singleton_iff, huniq s hs (by simpa using hmem)]
-      · rintro rfl
-        exact ⟨⟨s₀, hs₀, rfl⟩, he, by simpa using hmem₀⟩
-    rw [hset, Set.ncard_singleton, ite_eq_left he]
+  · rintro ⟨G, hG⟩
+    obtain ⟨hS, hsum⟩ := subsetSum_itemsOf ha₀ hG
+    exact ⟨inferInstance, isLinOrd_bwLe, itemsOf a₀ G, hS, hsum⟩
   · rintro ⟨-, -, S, hSi, hsum⟩
-    rw [sum_weights_eq ha₀ hSi, bwTarget_eq ha₀] at hsum
-    have hkey : ∀ e, SSElem e →
-        ({i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} : Set _).ncard = 1 := by
-      intro e he
-      have h := digitNum_inj (Le := (· ≤ · : A → A → Prop)) (B := base A)
-        ⟨fun _ => le_rfl, fun _ _ _ => le_trans, fun _ _ => le_antisymm, le_total⟩ base_pos
-        ({e : A | SSElem e} : Set A).ncard SSElem rfl _ _
-        (fun e' => count_lt_base hSi ha₀ e')
-        (fun e' => by by_cases h' : SSElem e' <;> simp [h', base_pos, one_lt_base]) hsum e he
-      rw [h, ite_eq_left he]
-    refine (exactlyCoversOn_iff_unique _ _ _).mpr
-      ⟨fun s => S (kItem a₀ s), fun s hs => ?_, fun e he => ?_⟩
-    · simpa [kItem] using ((bwItem_itm _).mp (hSi _ hs)).1
-    · obtain ⟨i₀, hi₀⟩ := Set.ncard_eq_one.mp (hkey e he)
-      have hmem₀ : i₀ ∈ {i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} := by
-        rw [hi₀]
-        exact rfl
-      obtain ⟨hS₀, -, hmem⟩ := hmem₀
-      obtain ⟨hi, -⟩ := eq_kItem ha₀ (hSi _ hS₀)
-      refine ⟨i₀.2 0, ⟨show S (kItem a₀ (i₀.2 0)) by rw [← hi]; exact hS₀, hmem⟩, fun s hs => ?_⟩
-      have hmem' : kItem a₀ s ∈ {i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} :=
-        ⟨hs.1, he, by simpa using hs.2⟩
-      rw [hi₀, Set.mem_singleton_iff] at hmem'
-      exact congrArg (fun q : kInterp.Map A => q.2 0) hmem'
+    exact ⟨coverOfItems a₀ S, exactCoverBy_coverOfItems ha₀ hSi hsum⟩
 
 end Correctness
 

@@ -120,7 +120,7 @@ def IsWalk (conf : A → Config A) : Prop :=
 variable {M}
 
 /-- A run of `n` steps, presented as its sequence of configurations. -/
-private theorem exists_run : ∀ (n : ℕ) (c d : Config A), M.StepsIn n c d →
+theorem exists_run : ∀ (n : ℕ) (c d : Config A), M.StepsIn n c d →
     ∃ f : ℕ → Config A, f 0 = c ∧ f n = d ∧ ∀ i, i < n → M.Step (f i) (f (i + 1)) := by
   intro n
   induction n with
@@ -134,6 +134,31 @@ private theorem exists_run : ∀ (n : ℕ) (c d : Config A), M.StepsIn n c d →
     cases i with
     | zero => simpa [hf0] using hstep
     | succ j => exact hfs j (by omega)
+
+/-- **A walk is a run**: the configuration at a position is reached from the
+one at the lowest position in at most as many steps as the position has
+positions below it, a stutter costing none. -/
+theorem IsWalk.exists_stepsIn [Finite A] (hlin : IsLinOrd M.Le) {conf : A → Config A}
+    (h : M.IsWalk conf) {p₀ : A} (hp₀ : MinPos M.Le M.Posn p₀) :
+    ∀ p, M.Posn p → ∃ n ≤ bitRank M.Le M.Posn p, M.StepsIn n (conf p₀) (conf p) := by
+  obtain ⟨-, hstep, -⟩ := h
+  have key : ∀ k : ℕ, ∀ p, M.Posn p → bitRank M.Le M.Posn p = k →
+      ∃ n ≤ k, M.StepsIn n (conf p₀) (conf p) := by
+    intro k
+    induction k using Nat.strong_induction_on with
+    | _ k ih =>
+      intro p hp hrank
+      by_cases hmin : MinPos M.Le M.Posn p
+      · have hpp : p = p₀ := hlin.2.2.1 p p₀ (hmin.2 p₀ hp₀.1) (hp₀.2 p hp)
+        exact ⟨0, Nat.zero_le _, by rw [hpp]; rfl⟩
+      · obtain ⟨q, hq⟩ := exists_predPos hlin hp hmin
+        have hrq : bitRank M.Le M.Posn q + 1 = k := by
+          rw [← hrank, bitRank_succPos hlin hq]
+        obtain ⟨n, hn, hsteps⟩ := ih (bitRank M.Le M.Posn q) (by omega) q hq.1 rfl
+        rcases hstep q p hq with hs | ⟨-, heq⟩
+        · exact ⟨n + 1, by omega, hsteps.trans_step hs⟩
+        · exact ⟨n, by omega, heq ▸ hsteps⟩
+  exact fun p hp => key _ p hp rfl
 
 /-- **Acceptance is a walk along the positions.** -/
 theorem accepts_iff_exists_walk [Finite A] (hwf : M.WellFormed) :
@@ -164,23 +189,8 @@ theorem accepts_iff_exists_walk [Finite A] (hwf : M.WellFormed) :
       rw [min_eq_right (by omega), hfn]
       exact hacc
   · rintro ⟨conf, hinit, hstep, haccept⟩
-    have key : ∀ k : ℕ, ∀ p, M.Posn p → bitRank M.Le M.Posn p = k →
-        ∃ n ≤ k, M.StepsIn n (conf p₀) (conf p) := by
-      intro k
-      induction k using Nat.strong_induction_on with
-      | _ k ih =>
-        intro p hp hrank
-        by_cases hmin : MinPos M.Le M.Posn p
-        · have hpp : p = p₀ := hlin.2.2.1 p p₀ (hmin.2 p₀ hp₀.1) (hp₀.2 p hp)
-          exact ⟨0, Nat.zero_le _, by rw [hpp]; rfl⟩
-        · obtain ⟨q, hq⟩ := exists_predPos hlin hp hmin
-          have hrq : bitRank M.Le M.Posn q + 1 = k := by
-            rw [← hrank, bitRank_succPos hlin hq]
-          obtain ⟨n, hn, hsteps⟩ := ih (bitRank M.Le M.Posn q) (by omega) q hq.1 rfl
-          rcases hstep q p hq with hs | ⟨-, heq⟩
-          · exact ⟨n + 1, by omega, hsteps.trans_step hs⟩
-          · exact ⟨n, by omega, heq ▸ hsteps⟩
-    obtain ⟨n, hn, hsteps⟩ := key _ p₁ hp₁.1 rfl
+    obtain ⟨n, hn, hsteps⟩ :=
+      IsWalk.exists_stepsIn hlin ⟨hinit, hstep, haccept⟩ hp₀ p₁ hp₁.1
     have hmax : bitRank M.Le M.Posn p₁ + 1 = Nat.card {x : A // M.Posn x} :=
       bitRank_maxPos hp₁
     exact ⟨conf p₀, conf p₁, n, hinit p₀ hp₀, by omega, hsteps, haccept p₁ hp₁⟩
@@ -242,72 +252,79 @@ structure RelWalk : Prop where
 
 variable {M Q H T}
 
+/-- The configurations a relational walk describes: at each time, the state,
+the head cell and the tape contents the three functional relations name. -/
+noncomputable def RelWalk.conf (h : M.RelWalk Q H T) (t : A) : Config A :=
+  ⟨(h.qex t).choose, (h.hex t).choose, fun p => (h.tex t p).choose⟩
+
+/-- A relational walk is a walk, through the configurations it describes. -/
+theorem RelWalk.isWalk (h : M.RelWalk Q H T) : M.IsWalk h.conf := by
+  refine ⟨?_, ?_, ?_⟩
+  · -- the configuration chosen at the lowest time is initial
+    intro t ht
+    obtain ⟨hst, hhd, htp⟩ := h.init t ht
+    exact ⟨hst _ (h.qex t).choose_spec, hhd _ (h.hex t).choose_spec,
+      fun p => htp p _ (h.tex t p).choose_spec⟩
+  · -- consecutive chosen configurations step or stutter
+    intro t t' hs
+    have hQ : ∀ s, Q s (h.qex s).choose := fun s => (h.qex s).choose_spec
+    have hH : ∀ s, H s (h.hex s).choose := fun s => (h.hex s).choose_spec
+    have hT : ∀ s p, T s p (h.tex s p).choose := fun s p => (h.tex s p).choose_spec
+    rcases h.step t t' hs with ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ | hstut
+    · refine Or.inl ⟨τ, hτ, hsrc _ (hQ t), hread _ _ (hH t) (hT t _),
+        hdst _ (hQ t'), hwrite _ _ (hH t) (hT t' _), fun p hp => ?_, ?_⟩
+      · have hnh : ¬ H t p := fun hcon => hp (h.huniq t p _ hcon (hH t))
+        exact h.tuniq t' p _ _ (hT t' p) ((hframe p _ hnh).mp (hT t p))
+      · rcases hmove with ⟨hr, hmv⟩ | ⟨hr, hmv⟩
+        · exact Or.inl ⟨hr, hmv _ _ (hH t) (hH t')⟩
+        · exact Or.inr ⟨hr, hmv _ _ (hH t) (hH t')⟩
+    · obtain ⟨hacc, hq, hh, ht⟩ := hstut
+      refine Or.inr ⟨hacc _ (hQ t), ?_⟩
+      refine Config.ext (h.quniq t _ _ ((hq _).mp (hQ t')) (hQ t))
+        (h.huniq t _ _ ((hh _).mp (hH t')) (hH t)) (funext fun p => ?_)
+      exact h.tuniq t p _ _ ((ht p _).mp (hT t' p)) (hT t p)
+  · intro t ht
+    exact h.acc t ht _ (h.qex t).choose_spec
+
+/-- A walk is a relational walk, through the graphs of its configurations. -/
+theorem IsWalk.relWalk {conf : A → Config A} (h : M.IsWalk conf) :
+    M.RelWalk (fun t q => q = (conf t).state) (fun t p => p = (conf t).head)
+      (fun t p a => a = (conf t).tape p) := by
+  obtain ⟨hinit, hstep, hacc⟩ := h
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact fun t => ⟨_, rfl⟩
+  · rintro t q q' rfl rfl; rfl
+  · exact fun t => ⟨_, rfl⟩
+  · rintro t p p' rfl rfl; rfl
+  · exact fun t p => ⟨_, rfl⟩
+  · rintro t p a a' rfl rfl; rfl
+  · rintro t ht
+    obtain ⟨hst, hhd, htp⟩ := hinit t ht
+    exact ⟨by rintro q rfl; exact hst, by rintro p rfl; exact hhd,
+      by rintro p a rfl; exact htp p⟩
+  · intro t t' hs
+    rcases hstep t t' hs with ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ | ⟨hacc', heq⟩
+    · refine Or.inl ⟨τ, hτ, by rintro q rfl; exact hsrc, ?_, by rintro q rfl; exact hdst,
+        ?_, ?_, ?_⟩
+      · rintro p a rfl rfl; exact hread
+      · rintro p a rfl rfl; exact hwrite
+      · intro p a hp
+        dsimp only at hp ⊢
+        rw [hframe p fun hcon => hp hcon]
+      · rcases hmove with ⟨hr, hmv⟩ | ⟨hr, hmv⟩
+        · exact Or.inl ⟨hr, by rintro p p' rfl rfl; exact hmv⟩
+        · exact Or.inr ⟨hr, by rintro p p' rfl rfl; exact hmv⟩
+    · refine Or.inr ⟨by rintro q rfl; exact hacc', fun q => ?_, fun p => ?_, fun p a => ?_⟩ <;>
+        dsimp only <;> rw [heq]
+  · rintro t ht q rfl
+    exact hacc t ht
+
 /-- **The two forms of a walk agree.** Left to right the relations are read off
 the configurations; right to left the configurations are chosen, which is what
 the functionality clauses make well defined. -/
 theorem exists_relWalk_iff_exists_walk :
-    (∃ Q H T, M.RelWalk Q H T) ↔ ∃ conf : A → Config A, M.IsWalk conf := by
-  constructor
-  · rintro ⟨Q, H, T, h⟩
-    classical
-    refine ⟨fun t => ⟨(h.qex t).choose, (h.hex t).choose, fun p => (h.tex t p).choose⟩,
-      ?_, ?_, ?_⟩
-    · -- the configuration chosen at the lowest time is initial
-      intro t ht
-      obtain ⟨hst, hhd, htp⟩ := h.init t ht
-      exact ⟨hst _ (h.qex t).choose_spec, hhd _ (h.hex t).choose_spec,
-        fun p => htp p _ (h.tex t p).choose_spec⟩
-    · -- consecutive chosen configurations step or stutter
-      intro t t' hs
-      have hQ : ∀ s, Q s (h.qex s).choose := fun s => (h.qex s).choose_spec
-      have hH : ∀ s, H s (h.hex s).choose := fun s => (h.hex s).choose_spec
-      have hT : ∀ s p, T s p (h.tex s p).choose := fun s p => (h.tex s p).choose_spec
-      rcases h.step t t' hs with ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ | hstut
-      · refine Or.inl ⟨τ, hτ, hsrc _ (hQ t), hread _ _ (hH t) (hT t _),
-          hdst _ (hQ t'), hwrite _ _ (hH t) (hT t' _), fun p hp => ?_, ?_⟩
-        · have hnh : ¬ H t p := fun hcon => hp (h.huniq t p _ hcon (hH t))
-          dsimp only
-          exact h.tuniq t' p _ _ (hT t' p) ((hframe p _ hnh).mp (hT t p))
-        · rcases hmove with ⟨hr, hmv⟩ | ⟨hr, hmv⟩
-          · exact Or.inl ⟨hr, hmv _ _ (hH t) (hH t')⟩
-          · exact Or.inr ⟨hr, hmv _ _ (hH t) (hH t')⟩
-      · obtain ⟨hacc, hq, hh, ht⟩ := hstut
-        refine Or.inr ⟨hacc _ (hQ t), ?_⟩
-        dsimp only
-        refine Config.ext (h.quniq t _ _ ((hq _).mp (hQ t')) (hQ t))
-          (h.huniq t _ _ ((hh _).mp (hH t')) (hH t)) (funext fun p => ?_)
-        exact h.tuniq t p _ _ ((ht p _).mp (hT t' p)) (hT t p)
-    · intro t ht
-      exact h.acc t ht _ (h.qex t).choose_spec
-  · rintro ⟨conf, hinit, hstep, hacc⟩
-    refine ⟨fun t q => q = (conf t).state, fun t p => p = (conf t).head,
-      fun t p a => a = (conf t).tape p, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-    · exact fun t => ⟨_, rfl⟩
-    · rintro t q q' rfl rfl; rfl
-    · exact fun t => ⟨_, rfl⟩
-    · rintro t p p' rfl rfl; rfl
-    · exact fun t p => ⟨_, rfl⟩
-    · rintro t p a a' rfl rfl; rfl
-    · rintro t ht
-      obtain ⟨hst, hhd, htp⟩ := hinit t ht
-      exact ⟨by rintro q rfl; exact hst, by rintro p rfl; exact hhd,
-        by rintro p a rfl; exact htp p⟩
-    · intro t t' hs
-      rcases hstep t t' hs with ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ | ⟨hacc', heq⟩
-      · refine Or.inl ⟨τ, hτ, by rintro q rfl; exact hsrc, ?_, by rintro q rfl; exact hdst,
-          ?_, ?_, ?_⟩
-        · rintro p a rfl rfl; exact hread
-        · rintro p a rfl rfl; exact hwrite
-        · intro p a hp
-          dsimp only at hp ⊢
-          rw [hframe p fun hcon => hp hcon]
-        · rcases hmove with ⟨hr, hmv⟩ | ⟨hr, hmv⟩
-          · exact Or.inl ⟨hr, by rintro p p' rfl rfl; exact hmv⟩
-          · exact Or.inr ⟨hr, by rintro p p' rfl rfl; exact hmv⟩
-      · refine Or.inr ⟨by rintro q rfl; exact hacc', fun q => ?_, fun p => ?_, fun p a => ?_⟩ <;>
-          dsimp only <;> rw [heq]
-    · rintro t ht q rfl
-      exact hacc t ht
+    (∃ Q H T, M.RelWalk Q H T) ↔ ∃ conf : A → Config A, M.IsWalk conf :=
+  ⟨fun ⟨_, _, _, h⟩ => ⟨_, h.isWalk⟩, fun ⟨_, h⟩ => ⟨_, _, _, h.relWalk⟩⟩
 
 end Relational
 

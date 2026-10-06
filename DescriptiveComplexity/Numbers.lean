@@ -4,8 +4,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Numbers.Unary
+import DescriptiveComplexity.Numbers.MonotoneBijection
 import DescriptiveComplexity.Numbers.Binary
 import DescriptiveComplexity.Numbers.Digits
+import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Numbers.BinCount
+import DescriptiveComplexity.Numbers.BinEnum
 import DescriptiveComplexity.Numbers.Wide
 
 /-!
@@ -28,7 +32,10 @@ Two encodings are in use across the catalog, complements rather than rivals:
   counting arcs need. The tagged framework does cardinality arithmetic
   natively: disjoint union via tags adds, dimension multiplies, complement
   subtracts. Honest only for numbers that are polynomially bounded – a unary
-  SubsetSum is in P, hence not NP-hard.
+  SubsetSum is in P, hence not NP-hard. A size is certified by an injection
+  or a bijection with the marked set, of which there are many; where the
+  certificates are *counted*, the one to guess is the monotone bijection, unique
+  on a linear order (`DescriptiveComplexity.Numbers.MonotoneBijection`).
 * **binary**, a number as a set of *bit positions*
   (`DescriptiveComplexity.Numbers.Binary`, with the order as a relation symbol
   of the vocabulary in `DescriptiveComplexity.Numbers.BinRel`, base-`B` digits
@@ -46,6 +53,19 @@ binary problem can only write numbers it can define one bit at a time, and an
 iterated sum is not one of them. Reductions the other way, from a binary
 problem into a unary one, are unproblematic – formulas only ever read bits,
 never sum them.
+
+The answer of a counting oracle is a number as well, read by the
+post-processing term of a one-call reduction and not by formulas:
+`DescriptiveComplexity.Numbers.DigitExtract` reads a count off one base-`B`
+digit of a sum of powers. In the other direction a binary number of the
+instance can act as a *weight* in a count:
+`DescriptiveComplexity.Numbers.BinCount` shows that the sets of bits below it
+are as many as its value.
+
+For an *encoder* of binary numbers, `DescriptiveComplexity.Numbers.BinEnum`
+holds the decoding once and for all: when the positions of the encoded
+universe are enumerated in increasing order, the `Nat.testBit` digits of a
+number decode to that number, whatever else the universe contains.
 
 That the choice is part of the statement and not bookkeeping is itself a
 theorem: `DescriptiveComplexity.no_unary_encoding`

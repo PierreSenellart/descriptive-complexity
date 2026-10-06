@@ -69,37 +69,6 @@ open FirstOrder
 
 open Language Structure
 
-/-! ### The two assignment transfers are mutually inverse -/
-
-section AssignEquiv
-
-variable {Tag : Type} [Finite Tag] {d : ℕ} {A : Type}
-
-/-- Merging a pulled assignment gives the assignment back: the transfer
-`DescriptiveComplexity.SOBlock.pullAssign` is injective, with
-`DescriptiveComplexity.SOBlock.mergeAssign` as a retraction on the other side. -/
-theorem SOBlock.mergeAssign_pullAssign (B : SOBlock)
-    (ρ : B.Assignment (Tag × (Fin d → A))) : B.mergeAssign (B.pullAssign ρ) = ρ := by
-  funext i y
-  change ρ i (fun k => ((y k).1, fun j =>
-    (y (finProdFinEquiv.symm (finProdFinEquiv (k, j))).1).2
-      (finProdFinEquiv.symm (finProdFinEquiv (k, j))).2)) = ρ i y
-  refine congrArg (ρ i) (funext fun k => ?_)
-  simp only [Equiv.symm_apply_apply]
-
-variable (Tag d A) in
-/-- **The states of the pulled walk are the states of the original walk on the
-interpreted universe**: assignments of the pulled block on the base universe
-correspond bijectively to assignments of the block on the tagged tuples. -/
-def SOBlock.pullAssignEquiv (B : SOBlock) :
-    B.Assignment (Tag × (Fin d → A)) ≃ (B.pull Tag d).Assignment A where
-  toFun := B.pullAssign
-  invFun := B.mergeAssign
-  left_inv := B.mergeAssign_pullAssign
-  right_inv := B.pullAssign_mergeAssign
-
-end AssignEquiv
-
 /-! ### The pullback of a specification -/
 
 section Comap

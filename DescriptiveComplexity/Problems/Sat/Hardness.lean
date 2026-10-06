@@ -199,7 +199,141 @@ theorem tseitin_lit_iff (s : Bool) (tc tx : TseitinTag B φ)
 
 end Characterizations
 
-/-! ### Correctness of the reduction -/
+/-! ### Correctness of the reduction
+
+The two directions are stated for an explicit truth assignment of the
+interpreted instance, so that they can be reused where the assignments
+themselves matter and not only their existence (counting,
+`DescriptiveComplexity.Problems.Sat.CountingHardness`). -/
+
+section Correctness
+
+variable {A : Type} [L.Structure A] [LinearOrder A]
+
+/-- The valuation of the propositional variables of the encoding determined by
+an assignment of the block: a block variable at a tuple reads the assignment at
+the tuple's prefix, a position variable the truth value of its subformula. -/
+def tseitinVal (μ : B.Assignment A) (vt : B.ι ⊕ Σ m, NodeAt φ m)
+    (x : Fin (tseitinDim B φ) → A) : Prop :=
+  match vt with
+  | Sum.inl i => μ i fun j => x (Fin.castLE (arity_le_tseitinDim B φ i) j)
+  | Sum.inr σp =>
+      canonVal μ φ σp.1 σp.2
+        (pref ((nodeAt_le_maxCtx φ σp.2).trans (maxCtx_le_tseitinDim B φ)) x)
+
+omit [LinearOrder A] in
+theorem padAssign_tseitinVal (a₀ : A) (μ : B.Assignment A) :
+    padAssign a₀ (tseitinVal B φ μ) = μ := by
+  funext i a
+  change μ i (fun j => pad a₀ a (Fin.castLE (arity_le_tseitinDim B φ i) j)) = μ i a
+  exact congrArg (μ i) (pref_pad a₀ (arity_le_tseitinDim B φ i) a)
+
+omit [LinearOrder A] in
+theorem padVal_tseitinVal (a₀ : A) (μ : B.Assignment A) :
+    padVal a₀ (tseitinVal B φ μ) = canonVal μ φ := by
+  funext m p w
+  change canonVal μ φ m p
+    (pref ((nodeAt_le_maxCtx φ p).trans (maxCtx_le_tseitinDim B φ)) (pad a₀ w)) =
+      canonVal μ φ m p w
+  exact congrArg (canonVal μ φ m p) (pref_pad a₀ _ w)
+
+/-- **From clauses to gates**: a truth assignment satisfying every clause of
+the interpreted instance induces, through canonical padding, a valuation
+satisfying every gate, and the block assignment it induces realizes the
+kernel. -/
+theorem tseitin_gates_of_clauses {a₀ : A} (ha₀ : IsBot a₀)
+    (ν : (tseitinInterp B φ).Map A → Prop)
+    (hν : ∀ c : (tseitinInterp B φ).Map A, RelMap satIsClause ![c] →
+      ∃ x, (RelMap satPosIn ![c, x] ∧ ν x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν x)) :
+    Gates (padAssign a₀ fun vt x => ν (Sum.inr vt, x)) φ
+        (padVal a₀ fun vt x => ν (Sum.inr vt, x)) ∧
+      RealizeWith (padAssign a₀ fun vt x => ν (Sum.inr vt, x)) φ finZeroElim := by
+  have hctx := maxCtx_le_tseitinDim B φ
+  have harity := arity_le_tseitinDim B φ
+  have hsat : SatCond φ hctx fun vt x => ν (Sum.inr vt, x) := by
+    intro m p k u hcl
+    obtain ⟨⟨tx, x⟩, hx⟩ := hν (Sum.inl (Sum.inl (⟨m, p⟩, k)), u)
+      ((tseitin_isClause_node B φ ⟨m, p⟩ k u).mpr hcl)
+    rcases hx with ⟨hpos, hval⟩ | ⟨hneg, hval⟩
+    · have hls := (tseitin_lit_iff B φ true (Sum.inl (Sum.inl (⟨m, p⟩, k))) tx
+        u x).mp hpos
+      rcases tx with tcl | vt
+      · exact hls.elim
+      · exact ⟨vt, x, Or.inl ⟨hls, hval⟩⟩
+    · have hls := (tseitin_lit_iff B φ false (Sum.inl (Sum.inl (⟨m, p⟩, k))) tx
+        u x).mp hneg
+      rcases tx with tcl | vt
+      · exact hls.elim
+      · exact ⟨vt, x, Or.inr ⟨hls, hval⟩⟩
+  have hg := (satCond_iff_gates ha₀ harity φ hctx _).mp hsat
+  refine ⟨hg, ?_⟩
+  obtain ⟨⟨tx, x⟩, hx⟩ := hν (Sum.inl (Sum.inr ()), fun _ => a₀)
+    ((tseitin_isClause_top B φ _).mpr fun j _ => ha₀)
+  rcases hx with ⟨hpos, hval⟩ | ⟨hneg, hval⟩
+  · have hls := (tseitin_lit_iff B φ true (Sum.inl (Sum.inr ())) tx _ x).mp hpos
+    rcases tx with tcl | vt
+    · exact hls.elim
+    · rcases vt with i | σp'
+      · exact hls.elim
+      · obtain ⟨-, rfl, -, hcx⟩ := hls
+        refine (gates_realize _ φ _ hg finZeroElim).mp ?_
+        change ν (Sum.inr (Sum.inr ⟨0, rootAt φ⟩), pad a₀ finZeroElim)
+        have hx0 : x = pad a₀ finZeroElim := by
+          rw [← pad_pref_of_canon ha₀ (Nat.zero_le _) hcx]
+          exact (congrArg (pad a₀) (Subsingleton.elim _ _)).symm
+        rw [← hx0]
+        exact hval
+  · have hls := (tseitin_lit_iff B φ false (Sum.inl (Sum.inr ())) tx _ x).mp hneg
+    rcases tx with tcl | vt
+    · exact hls.elim
+    · rcases vt with i | σp'
+      · exact hls.elim
+      · exact absurd hls.1 (by simp)
+
+/-- **From an assignment to clauses**: a truth assignment of the interpreted
+instance that reads, at the propositional variables, the valuation determined
+by a block assignment realizing the kernel, satisfies every clause. -/
+theorem tseitin_clauses_of_realize {a₀ : A} (ha₀ : IsBot a₀) (μ : B.Assignment A)
+    (hμ : RealizeWith μ φ finZeroElim) (ν : (tseitinInterp B φ).Map A → Prop)
+    (hνμ : ∀ vt x, ν (Sum.inr vt, x) ↔ tseitinVal B φ μ vt x)
+    (c : (tseitinInterp B φ).Map A) (hcl : RelMap satIsClause ![c]) :
+    ∃ x, (RelMap satPosIn ![c, x] ∧ ν x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν x) := by
+  have hctx := maxCtx_le_tseitinDim B φ
+  have harity := arity_le_tseitinDim B φ
+  have hg : Gates (padAssign a₀ (tseitinVal B φ μ)) φ (padVal a₀ (tseitinVal B φ μ)) := by
+    rw [padAssign_tseitinVal, padVal_tseitinVal]
+    exact gates_canonVal μ φ
+  have hsat := (satCond_iff_gates ha₀ harity φ hctx (tseitinVal B φ μ)).mpr hg
+  obtain ⟨tc, u⟩ := c
+  rcases tc with tcl | vt
+  swap
+  · exact absurd hcl (tseitin_isClause_var B φ vt u)
+  rcases tcl with ⟨σp, k⟩ | u'
+  · rw [tseitin_isClause_node] at hcl
+    obtain ⟨vt, x, hor⟩ := hsat σp.1 σp.2 k u hcl
+    rcases hor with ⟨hls, hval⟩ | ⟨hls, hval⟩
+    · refine ⟨(Sum.inr vt, x), Or.inl ⟨?_, (hνμ vt x).mpr hval⟩⟩
+      exact (tseitin_lit_iff B φ true (Sum.inl (Sum.inl (σp, k)))
+        (Sum.inr vt) u x).mpr hls
+    · refine ⟨(Sum.inr vt, x), Or.inr ⟨?_, fun h => hval ((hνμ vt x).mp h)⟩⟩
+      exact (tseitin_lit_iff B φ false (Sum.inl (Sum.inl (σp, k)))
+        (Sum.inr vt) u x).mpr hls
+  · rw [tseitin_isClause_top] at hcl
+    refine ⟨(Sum.inr (Sum.inr ⟨0, rootAt φ⟩), pad a₀ finZeroElim),
+      Or.inl ⟨?_, (hνμ _ _).mpr ?_⟩⟩
+    · exact (tseitin_lit_iff B φ true (Sum.inl (Sum.inr u'))
+        (Sum.inr (Sum.inr ⟨0, rootAt φ⟩)) u _).mpr
+        ⟨rfl, rfl, hcl, canon_pad ha₀ 0 _⟩
+    · change canonVal μ φ 0 (rootAt φ)
+        (pref ((nodeAt_le_maxCtx φ (rootAt φ)).trans hctx) (pad a₀ finZeroElim))
+      refine (canonVal_rootAt μ φ _).mpr ?_
+      have he : (pref ((nodeAt_le_maxCtx φ (rootAt φ)).trans hctx)
+          (pad a₀ finZeroElim) : Fin 0 → A) = finZeroElim :=
+        Subsingleton.elim _ _
+      rw [he]
+      exact hμ
+
+end Correctness
 
 /-- **Correctness of the Tseitin interpretation**: the interpreted CNF
 instance is satisfiable iff some assignment of the block variables realizes
@@ -209,103 +343,15 @@ theorem tseitin_satisfiable_iff (A : Type) [L.Structure A] [LinearOrder A]
     Satisfiable ((tseitinInterp B φ).Map A) ↔
       ∃ μ : B.Assignment A, RealizeWith μ φ finZeroElim := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
-  have hctx := maxCtx_le_tseitinDim B φ
-  have harity := arity_le_tseitinDim B φ
   constructor
   · rintro ⟨ν, hν⟩
-    have hsat : SatCond φ hctx fun vt x => ν (Sum.inr vt, x) := by
-      intro m p k u hcl
-      obtain ⟨⟨tx, x⟩, hx⟩ := hν (Sum.inl (Sum.inl (⟨m, p⟩, k)), u)
-        ((tseitin_isClause_node B φ ⟨m, p⟩ k u).mpr hcl)
-      rcases hx with ⟨hpos, hval⟩ | ⟨hneg, hval⟩
-      · have hls := (tseitin_lit_iff B φ true (Sum.inl (Sum.inl (⟨m, p⟩, k))) tx
-          u x).mp hpos
-        rcases tx with tcl | vt
-        · exact hls.elim
-        · exact ⟨vt, x, Or.inl ⟨hls, hval⟩⟩
-      · have hls := (tseitin_lit_iff B φ false (Sum.inl (Sum.inl (⟨m, p⟩, k))) tx
-          u x).mp hneg
-        rcases tx with tcl | vt
-        · exact hls.elim
-        · exact ⟨vt, x, Or.inr ⟨hls, hval⟩⟩
-    have hg := (satCond_iff_gates ha₀ harity φ hctx _).mp hsat
-    obtain ⟨⟨tx, x⟩, hx⟩ := hν (Sum.inl (Sum.inr ()), fun _ => a₀)
-      ((tseitin_isClause_top B φ _).mpr fun j _ => ha₀)
-    rcases hx with ⟨hpos, hval⟩ | ⟨hneg, hval⟩
-    · have hls := (tseitin_lit_iff B φ true (Sum.inl (Sum.inr ())) tx _ x).mp hpos
-      rcases tx with tcl | vt
-      · exact hls.elim
-      · rcases vt with i | σp'
-        · exact hls.elim
-        · obtain ⟨-, rfl, -, hcx⟩ := hls
-          refine ⟨padAssign a₀ fun vt x => ν (Sum.inr vt, x), ?_⟩
-          refine (gates_realize _ φ _ hg finZeroElim).mp ?_
-          change ν (Sum.inr (Sum.inr ⟨0, rootAt φ⟩), pad a₀ finZeroElim)
-          have hx0 : x = pad a₀ finZeroElim := by
-            rw [← pad_pref_of_canon ha₀ (Nat.zero_le _) hcx]
-            exact (congrArg (pad a₀) (Subsingleton.elim _ _)).symm
-          rw [← hx0]
-          exact hval
-    · have hls := (tseitin_lit_iff B φ false (Sum.inl (Sum.inr ())) tx _ x).mp hneg
-      rcases tx with tcl | vt
-      · exact hls.elim
-      · rcases vt with i | σp'
-        · exact hls.elim
-        · exact absurd hls.1 (by simp)
+    exact ⟨_, (tseitin_gates_of_clauses B φ ha₀ ν hν).2⟩
   · rintro ⟨μ, hμ⟩
-    set tv : (B.ι ⊕ Σ m, NodeAt φ m) → (Fin (tseitinDim B φ) → A) → Prop :=
-      fun vt x =>
-        match vt with
-        | Sum.inl i => μ i fun j => x (Fin.castLE (harity i) j)
-        | Sum.inr σp =>
-            canonVal μ φ σp.1 σp.2
-              (pref ((nodeAt_le_maxCtx φ σp.2).trans hctx) x)
-      with htv
-    have hpa : padAssign a₀ tv = μ := by
-      funext i a
-      change μ i (fun j => pad a₀ a (Fin.castLE (harity i) j)) = μ i a
-      exact congrArg (μ i) (pref_pad a₀ (harity i) a)
-    have hpv : padVal a₀ tv = canonVal μ φ := by
-      funext m p w
-      change canonVal μ φ m p
-        (pref ((nodeAt_le_maxCtx φ p).trans hctx) (pad a₀ w)) = canonVal μ φ m p w
-      exact congrArg (canonVal μ φ m p) (pref_pad a₀ _ w)
-    have hg : Gates (padAssign a₀ tv) φ (padVal a₀ tv) := by
-      rw [hpa, hpv]
-      exact gates_canonVal μ φ
-    have hsat := (satCond_iff_gates ha₀ harity φ hctx tv).mpr hg
     refine ⟨fun e =>
       match e with
-      | (Sum.inr vt, x) => tv vt x
-      | (Sum.inl _, _) => False, ?_⟩
-    rintro ⟨tc, u⟩ hcl
-    rcases tc with tcl | vt
-    swap
-    · exact absurd hcl (tseitin_isClause_var B φ vt u)
-    rcases tcl with ⟨σp, k⟩ | u'
-    · rw [tseitin_isClause_node] at hcl
-      obtain ⟨vt, x, hor⟩ := hsat σp.1 σp.2 k u hcl
-      rcases hor with ⟨hls, hval⟩ | ⟨hls, hval⟩
-      · refine ⟨(Sum.inr vt, x), Or.inl ⟨?_, hval⟩⟩
-        exact (tseitin_lit_iff B φ true (Sum.inl (Sum.inl (σp, k)))
-          (Sum.inr vt) u x).mpr hls
-      · refine ⟨(Sum.inr vt, x), Or.inr ⟨?_, hval⟩⟩
-        exact (tseitin_lit_iff B φ false (Sum.inl (Sum.inl (σp, k)))
-          (Sum.inr vt) u x).mpr hls
-    · rw [tseitin_isClause_top] at hcl
-      refine ⟨(Sum.inr (Sum.inr ⟨0, rootAt φ⟩), pad a₀ finZeroElim),
-        Or.inl ⟨?_, ?_⟩⟩
-      · exact (tseitin_lit_iff B φ true (Sum.inl (Sum.inr u'))
-          (Sum.inr (Sum.inr ⟨0, rootAt φ⟩)) u _).mpr
-          ⟨rfl, rfl, hcl, canon_pad ha₀ 0 _⟩
-      · change canonVal μ φ 0 (rootAt φ)
-          (pref ((nodeAt_le_maxCtx φ (rootAt φ)).trans hctx) (pad a₀ finZeroElim))
-        refine (canonVal_rootAt μ φ _).mpr ?_
-        have he : (pref ((nodeAt_le_maxCtx φ (rootAt φ)).trans hctx)
-            (pad a₀ finZeroElim) : Fin 0 → A) = finZeroElim :=
-          Subsingleton.elim _ _
-        rw [he]
-        exact hμ
+      | (Sum.inr vt, x) => tseitinVal B φ μ vt x
+      | (Sum.inl _, _) => False, fun c hcl => ?_⟩
+    exact tseitin_clauses_of_realize B φ ha₀ μ hμ _ (fun _ _ => Iff.rfl) c hcl
 
 /-- The head of a one-block second-order satisfaction is realization of the
 kernel in the expansion by an assignment. -/
