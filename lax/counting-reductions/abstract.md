@@ -26,9 +26,7 @@ Hermann, and Kolaitis showed and as Durand, Haak, Kontinen, and Vollmer used
 for #AC⁰. #NAE-SAT, #Set Splitting, #3-Colorability, counting all
 independent sets and all vertex covers, #2SAT, #HORN-SAT, #Monotone-2SAT,
 #BIS, and #PP2DNF are one-call #P-complete; the proofs follow the library's
-tree of reductions, from #SAT and #Independent Set. Provan and Ball proved
-the hardness of #BIS and #PP2DNF by another route, and Dalvi and Suciu use
-#PP2DNF for probabilistic databases.
+tree of reductions, from #SAT and #Independent Set.
 
 The proofs are those of the library's development after version 1.2.2, on
 its Lean 4.33 branch, sliced to what these statements use; they assume the

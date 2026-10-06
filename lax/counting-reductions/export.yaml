@@ -137,18 +137,6 @@ manifest:
       year         = {1983},
       doi          = {10.1137/0212053}
     }
-  - |
-    @article{dalvi2012dichotomy,
-      author       = {Nilesh Dalvi and Dan Suciu},
-      title        = {The dichotomy of probabilistic inference for unions of
-                      conjunctive queries},
-      journal      = {J. {ACM}},
-      volume       = {59},
-      number       = {6},
-      pages        = {1--87},
-      year         = {2012},
-      doi          = {10.1145/2395116.2395119}
-    }
 requires:
 - package: Lax904597
   repository: https://github.com/PierreSenellart/descriptive-complexity
