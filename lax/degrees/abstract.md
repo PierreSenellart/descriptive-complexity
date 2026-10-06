@@ -3,8 +3,9 @@ degree of a decision problem under first-order reductions, and the graph
 isomorphism problems, which are complete for a degree and, conjecturally,
 for no class defined by a logic. It builds on the NP core registered as
 lax-904597, the catalog of NP-complete problems lax-799700, and the
-submissions on logarithmic space, polynomial time, the polynomial hierarchy,
-and recursive enumerability.
+submissions on logarithmic space (lax-485149), polynomial time
+(lax-535992), the polynomial hierarchy (lax-564036), and recursive
+enumerability (lax-624099).
 
 The degree of a problem is the class of the problems that reduce to it by an
 ordered first-order reduction, with the hardness of the NP core. A problem

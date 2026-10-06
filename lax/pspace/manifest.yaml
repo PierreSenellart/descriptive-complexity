@@ -125,6 +125,32 @@ bibEntries:
       doi          = {10.1007/978-1-4612-0539-5},
       bibsource    = {dblp computer science bibliography, https://dblp.org}
     }
+  - |
+    @inproceedings{cook1971complexity,
+      author       = {Stephen A. Cook},
+      editor       = {Michael A. Harrison and
+                      Ranan B. Banerji and
+                      Jeffrey D. Ullman},
+      title        = {The Complexity of Theorem-Proving Procedures},
+      booktitle    = {Proceedings of the 3rd Annual {ACM} Symposium on Theory of Computing,
+                      May 3-5, 1971, Shaker Heights, Ohio, {USA}},
+      pages        = {151--158},
+      publisher    = {{ACM}},
+      year         = {1971},
+      doi          = {10.1145/800157.805047},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{levin1973universal,
+      author       = {Leonid A. Levin},
+      title        = {Universal sequential search problems},
+      journal      = {Problems of Information Transmission},
+      volume       = {9},
+      number       = {3},
+      pages        = {265--266},
+      year         = {1973},
+      note         = {Russian original: Problemy Peredachi Informatsii 9(3):115--116}
+    }
 issue:
   repositoryId: 1320232165
   number: 175

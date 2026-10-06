@@ -2,7 +2,8 @@ Counting problems in descriptive complexity, from the descriptive-complexity
 library: the classes #P and FP, defined by logics, their closure under
 parsimonious first-order reductions, and their complete problems. It builds
 on the NP core registered as lax-904597 and on the submissions on
-logarithmic space, polynomial time, and AC⁰.
+logarithmic space (lax-485149), polynomial time (lax-535992), and AC⁰
+(lax-895169).
 
 A counting problem attaches an isomorphism-invariant natural number to every
 finite structure, and a parsimonious reduction is a first-order
