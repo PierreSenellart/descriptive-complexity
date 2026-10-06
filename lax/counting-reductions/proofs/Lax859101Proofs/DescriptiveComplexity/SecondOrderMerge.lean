@@ -1,0 +1,171 @@
+/-
+Copyright (c) 2026 Pierre Senellart. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Pierre Senellart
+-/
+import Lax859101Proofs.DescriptiveComplexity.SecondOrderLift
+import Lax280166.CountingCliques
+import Lax280166.CountingDominatingSets
+import Lax280166.CountingFeedbackSets
+import Lax280166.CountingHamiltonCircuits
+import Lax280166.CountingKnapsacks
+import Lax280166.CountingSatVariants
+import Lax280166.CountingSetFamilies
+import Lax280166.CountingSteinerTrees
+import Lax366625.CountingProblems
+import Lax366625.CountingRuns
+import Lax366625.CountingSat
+import Lax366625.HornNumbers
+import Lax366625.MachineNumbers
+import Lax366625.NumberedCircuits
+import Lax366625.QuantitativeLogic
+import Lax366625.SecondOrderCounting
+import Lax366625.WitnessCounting
+import Lax485149.Complement
+import Lax485149.DeterministicReachability
+import Lax485149.DeterministicTransitiveClosure
+import Lax485149.FirstOrderDefinability
+import Lax485149.HeadAutomata
+import Lax485149.KromFragment
+import Lax485149.Reachability
+import Lax485149.SecondOrderAtoms
+import Lax485149.TransitiveClosure
+import Lax485149.TwoSat
+import Lax535992.CircuitValue
+import Lax535992.DeterministicMachines
+import Lax535992.Game
+import Lax535992.HornFragment
+import Lax535992.HornSat
+import Lax535992.InflationaryFixedPoint
+import Lax535992.LeastFixedPoint
+import Lax799700.CliqueFamily
+import Lax799700.Coloring
+import Lax799700.Common
+import Lax799700.DominatingSet
+import Lax799700.Feedback
+import Lax799700.Hamilton
+import Lax799700.JobSequencing
+import Lax799700.Knapsack
+import Lax799700.MaxCut
+import Lax799700.NaeSat
+import Lax799700.NaeThreeSat
+import Lax799700.OneInSat
+import Lax799700.Partition
+import Lax799700.SetFamily
+import Lax799700.Steiner
+import Lax799700.SubgraphIso
+import Lax799700.ThreeColorability
+import Lax799700.ThreeDimMatching
+import Lax799700.ThreeSat
+import Lax799700.ZeroOneIP
+import Lax859101.CountingAllSets
+import Lax859101.CountingBipartite
+import Lax859101.CountingDnf
+import Lax859101.CountingNaeSat
+import Lax859101.CountingRestrictedSat
+import Lax859101.OneCallReductions
+import Lax859101.SubtractiveReductions
+import Lax895169.ArithmeticLogic
+import Lax895169.BitLogic
+import Lax895169.BitPredicate
+import Lax895169.LogTimeMachines
+import Lax904597.Classes
+import Lax904597.Interpretations
+import Lax904597.Machines
+import Lax904597.Problems
+import Lax904597.Relativized
+import Lax904597.Sat
+import Lax904597.SecondOrder
+
+namespace Lax859101Proofs.DescriptiveComplexity.SOBlock
+end Lax859101Proofs.DescriptiveComplexity.SOBlock
+
+namespace Lax904597.SecondOrder
+end Lax904597.SecondOrder
+
+namespace Lax859101Proofs.DescriptiveComplexity
+export Lax904597.SecondOrder (SOBlock SORealize soLang)
+end Lax859101Proofs.DescriptiveComplexity
+
+/-!
+# Merging a quantifier prefix into a single second-order block
+
+A second-order sentence with `k` alternating blocks quantifies over a list of
+blocks `Bs`, and its kernel lives over the iterated expansion
+`DescriptiveComplexity.soLang L Bs`. Constructions that must *read* the kernel – above all
+the Tseitin translation of `DescriptiveComplexity.Problems.Sat.Tseitin`, which turns it
+into a CNF instance – are stated for a single block, over `L.sum B.lang`.
+
+This file bridges the two: `DescriptiveComplexity.mergeBlocks` collects a list of blocks
+into one block whose relation variables are the disjoint union of theirs, and
+`DescriptiveComplexity.mergeHom` transports the kernel accordingly. The alternation is
+*not* lost – it moves from the block list to
+`DescriptiveComplexity.altAssign`, which quantifies the components of a merged assignment
+alternately – so `DescriptiveComplexity.sorealize_iff_altAssign` rewrites alternating
+second-order satisfaction as an alternating quantification over the pieces of
+a single assignment, with a single-block kernel.
+
+The only mathematical content is the re-association
+`(L ⊕ B) ⊕ M ≅ L ⊕ (B ⊕ M)` of `DescriptiveComplexity.mergeStep`, applied once per block.
+-/
+
+namespace Lax859101Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+/-! ### Merging blocks -/
+
+/-- Prepending a block to another: the relation variables are the disjoint
+union of both families. Reducible, so that `(SOBlock.cons B M).ι` unfolds to a
+sum type when elaborating index literals. -/
+@[reducible]
+def SOBlock.cons (B M : Lax904597.SecondOrder.SOBlock) : Lax904597.SecondOrder.SOBlock where
+  ι := B.ι ⊕ M.ι
+  arity := Sum.elim B.arity M.arity
+
+end Lax859101Proofs.DescriptiveComplexity
+
+namespace Lax904597.SecondOrder.SOBlock
+
+export Lax859101Proofs.DescriptiveComplexity.SOBlock (cons)
+
+end Lax904597.SecondOrder.SOBlock
+
+namespace Lax859101Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+/-! ### Re-associating an expansion -/
+
+/-! ### Transporting the kernel -/
+
+/-! ### Alternating quantification over a merged assignment -/
+
+/-! ### The merging theorem -/
+
+/-! ### Enlarging the innermost block
+
+The Tseitin translation of a kernel introduces auxiliary *gate* variables,
+which have to be quantified together with the relation variables of the
+innermost block. The constructions below enlarge the last block of a prefix by
+a further block `Gt`, and show that quantifying the enlarged prefix is
+quantifying the original one with an extra quantifier – of the *innermost*
+polarity – over `Gt` inside. Lists are given as a head and a tail, so that
+“nonempty” is built into the syntax and the recursion has no overlapping
+patterns. -/
+
+/-! ### The converse transport
+
+For *stating* that a problem is second-order definable one needs to go the
+other way: a kernel written over the single merged block has to be turned into
+a kernel over the iterated expansion. The morphisms below invert those above,
+and give the same theorem read from right to left
+(`DescriptiveComplexity.sorealize_unmerge`). -/
+
+end Lax859101Proofs.DescriptiveComplexity
+
+

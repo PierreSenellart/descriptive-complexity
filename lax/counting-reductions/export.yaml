@@ -1,0 +1,222 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: backport-lean-4.33
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.OneCallReduction.trans
+- DescriptiveComplexity.RelOrderedParsimoniousReduction.toOneCall
+- DescriptiveComplexity.OrderedParsimoniousReduction.toOneCall
+- DescriptiveComplexity.ParsimoniousReduction.toOneCall
+- DescriptiveComplexity.OneCallReduction.congrSource
+- DescriptiveComplexity.OneCallReduction.congrTarget
+- DescriptiveComplexity.CountingClass.OneCallMem.of_mem
+- DescriptiveComplexity.CountingClass.OneCallMem.of_oneCall
+- DescriptiveComplexity.CountingClass.OneCallHard.of_oneCall
+- DescriptiveComplexity.CountingClass.oneCallHard_iff
+- DescriptiveComplexity.CountingClass.oneCallHard_congr_finite
+- DescriptiveComplexity.oneCallComplete_sharpP_of_parsimoniousComplete
+- DescriptiveComplexity.oneCallHard_sharpP_of_parsimoniousHard
+- DescriptiveComplexity.SubtractiveReducible.trans
+- DescriptiveComplexity.RelOrderedParsimoniousReduction.subtractiveReducible
+- DescriptiveComplexity.StrongSubtractiveReduction.subtractiveReducible
+- DescriptiveComplexity.SharpPDefinable.of_subtractive
+- DescriptiveComplexity.CountingClass.Hard.of_subtractive
+- DescriptiveComplexity.complete_sharpP_of_parsimoniousComplete
+- DescriptiveComplexity.mem_sharpP_of_subtractive
+- DescriptiveComplexity.sharpSat_subtractive_sharpDnf
+- DescriptiveComplexity.sharpDnf_sharpP_complete
+- DescriptiveComplexity.sharpDnf_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpNaeSat_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpSetSplitting_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpThreeCol_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpAllIndependentSets_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpAllVertexCovers_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpTwoSat_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpHornSat_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpMonotoneTwoSat_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpBIS_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpPP2DNF_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpSat_oneCall_sharpDnf
+- DescriptiveComplexity.sharpSat_oneCall_sharpNaeSat
+- DescriptiveComplexity.sharpNaeSat_oneCall_sharpSetSplitting
+- DescriptiveComplexity.sharpSat_oneCall_sharpThreeCol
+- DescriptiveComplexity.sharpIndependentSet_oneCall_sharpAllIndependentSets
+- DescriptiveComplexity.sharpAllVertexCovers_eq
+- DescriptiveComplexity.sharpAllIndependentSets_oneCall_sharpSat
+- DescriptiveComplexity.sharpAllIndependentSets_oneCall_sharpBIS
+- DescriptiveComplexity.sharpBIS_oneCall_sharpPP2DNF
+- DescriptiveComplexity.realize_widthTwoS
+- DescriptiveComplexity.realize_hornS
+- DescriptiveComplexity.realize_monotoneS
+- DescriptiveComplexity.edge_widthAtMostTwo
+- DescriptiveComplexity.edge_atMostOnePositive
+- DescriptiveComplexity.edge_noNegative
+- DescriptiveComplexity.sharpThreeSat_sharpP_parsimoniousComplete
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: one-call and subtractive counting reductions'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @article{krentel1988complexity,
+      author       = {Mark W. Krentel},
+      title        = {The complexity of optimization problems},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {36},
+      number       = {3},
+      pages        = {490--509},
+      year         = {1988},
+      doi          = {10.1016/0022-0000(88)90039-6}
+    }
+  - |
+    @article{faliszewski2009complexity,
+      author       = {Piotr Faliszewski and Lane Hemaspaandra},
+      title        = {The complexity of power-index comparison},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {410},
+      number       = {1},
+      pages        = {101--107},
+      year         = {2009},
+      doi          = {10.1016/j.tcs.2008.09.034}
+    }
+  - |
+    @article{toda1992polynomial,
+      author       = {Seinosuke Toda and Osamu Watanabe},
+      title        = {Polynomial-time 1-{T}uring reductions from {\#}{PH} to {\#}{P}},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {100},
+      number       = {1},
+      pages        = {205--221},
+      year         = {1992},
+      doi          = {10.1016/0304-3975(92)90369-Q}
+    }
+  - |
+    @article{durand2005subtractive,
+      author       = {Arnaud Durand and Miki Hermann and Phokion G. Kolaitis},
+      title        = {Subtractive reductions and complete problems for counting
+                      complexity classes},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {340},
+      number       = {3},
+      pages        = {496--513},
+      year         = {2005},
+      doi          = {10.1016/j.tcs.2005.03.012}
+    }
+  - |
+    @inproceedings{durand2016descriptive,
+      author       = {Arnaud Durand and Anselm Haak and Juha Kontinen and Heribert Vollmer},
+      title        = {Descriptive Complexity of {\#}{AC}{$^0$} Functions},
+      booktitle    = {{CSL} 2016},
+      series       = {LIPIcs},
+      volume       = {62},
+      pages        = {20:1--20:16},
+      publisher    = {Schloss Dagstuhl -- Leibniz-Zentrum f{\"{u}}r Informatik},
+      year         = {2016},
+      doi          = {10.4230/LIPIcs.CSL.2016.20}
+    }
+  - |
+    @article{provan1983complexity,
+      author       = {J. Scott Provan and Michael O. Ball},
+      title        = {The Complexity of Counting Cuts and of Computing the
+                      Probability that a Graph is Connected},
+      journal      = {{SIAM} J. Comput.},
+      volume       = {12},
+      number       = {4},
+      pages        = {777--788},
+      year         = {1983},
+      doi          = {10.1137/0212053}
+    }
+  - |
+    @article{dalvi2012dichotomy,
+      author       = {Nilesh Dalvi and Dan Suciu},
+      title        = {The dichotomy of probabilistic inference for unions of
+                      conjunctive queries},
+      journal      = {J. {ACM}},
+      volume       = {59},
+      number       = {6},
+      pages        = {1--87},
+      year         = {2012},
+      doi          = {10.1145/2395116.2395119}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax799700
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5f34068ba7707478cd268f2316c295d7ea51a711
+  folder: lax/np-catalog
+  restated_from: ../np-catalog/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+- package: Lax895169
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
+  folder: lax/ac0
+  restated_from: ../ac0/export.yaml
+- package: Lax366625
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 2c6d7c607a315c0a412dae550b8b4988e6fa9a60
+  folder: lax/counting
+  restated_from: ../counting/export.yaml
+- package: Lax280166
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 4ba19bc77eb189ea76b00497ae9f03292b26cd03
+  folder: lax/sharpp-catalog
+  restated_from: ../sharpp-catalog/export.yaml
+restated:
+  DescriptiveComplexity.PolyTerm: OneCallReductions.PolyTerm
+  DescriptiveComplexity.PolyTerm.eval: OneCallReductions.PolyTerm.eval
+  DescriptiveComplexity.PostTerm: OneCallReductions.PostTerm
+  DescriptiveComplexity.PostTerm.eval: OneCallReductions.PostTerm.eval
+  DescriptiveComplexity.OneCallReduction: OneCallReductions.OneCallReduction
+  DescriptiveComplexity.StrongSubtractiveReduction: SubtractiveReductions.StrongSubtractiveReduction
+  DescriptiveComplexity.FOInterpretation.WitAt: SubtractiveReductions.FOInterpretation.WitAt
+  DescriptiveComplexity.SubtractiveReducible: SubtractiveReductions.SubtractiveReducible
+  DescriptiveComplexity.DnfModel: CountingDnf.DnfModel
+  DescriptiveComplexity.NAEModel: CountingNaeSat.NAEModel
+  DescriptiveComplexity.SplitColoring: CountingNaeSat.SplitColoring
+  DescriptiveComplexity.NoNegative: CountingRestrictedSat.NoNegative
+  DescriptiveComplexity.IndepSet: CountingAllSets.IndepSet
+  DescriptiveComplexity.GVertexCover: CountingAllSets.GVertexCover
+  DescriptiveComplexity.BipIndep: CountingBipartite.BipIndep
+  DescriptiveComplexity.Pp2dnfModel: CountingBipartite.Pp2dnfModel
+  FirstOrder.Language.bipGraph: CountingBipartite.bipGraph
+  FirstOrder.Language.bgEdge: CountingBipartite.bgEdge
+  FirstOrder.Language.bgLeft: CountingBipartite.bgLeft
+  FirstOrder.Language.bipGraphRel: CountingBipartite.bipGraphRel
+  FirstOrder.Language.bipGraphRel.edge: CountingBipartite.bipGraphRel.edge
+  FirstOrder.Language.bipGraphRel.left: CountingBipartite.bipGraphRel.left
+  FirstOrder.Language.instIsRelationalBipGraph: CountingBipartite.instIsRelationalBipGraph
+  FirstOrder.Language.instDecidableEqBipGraphRel: CountingBipartite.instDecidableEqBipGraphRel
+  DescriptiveComplexity.BGEdge: CountingBipartite.BGEdge
+  DescriptiveComplexity.BGLeft: CountingBipartite.BGLeft
+  DescriptiveComplexity.FOInterpretation.ordExtend: SubtractiveReductions.FOInterpretation.ordExtend
+  DescriptiveComplexity.lexLeF: SubtractiveReductions.lexLeF
+  DescriptiveComplexity.lexTupleLeF: SubtractiveReductions.lexTupleLeF
+  DescriptiveComplexity.oEqF: SubtractiveReductions.oEqF
+  DescriptiveComplexity.oLeF: SubtractiveReductions.oLeF
+  DescriptiveComplexity.oLtF: SubtractiveReductions.oLtF
+  DescriptiveComplexity.WidthAtMostTwo: CountingRestrictedSat.WidthAtMostTwo
+  DescriptiveComplexity.AtMostOnePositive: CountingRestrictedSat.AtMostOnePositive
