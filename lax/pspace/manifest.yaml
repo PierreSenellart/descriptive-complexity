@@ -2,7 +2,8 @@ specVersion: "1"
 id: "lax-134656"
 leanVersion: "v4.33.0"
 mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
-title: "Descriptive complexity: PSPACE, partial fixed points and the Abiteboul–Vianu theorem"
+title: "Descriptive complexity: PSPACE, partial fixed points and the
+  Abiteboul–Vianu theorem"
 authors:
   - name: "Pierre Senellart"
     orcid: "0000-0002-7909-5369"
@@ -124,3 +125,6 @@ bibEntries:
       doi          = {10.1007/978-1-4612-0539-5},
       bibsource    = {dblp computer science bibliography, https://dblp.org}
     }
+issue:
+  repositoryId: 1320232165
+  number: 175
