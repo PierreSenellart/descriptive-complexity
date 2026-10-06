@@ -24,9 +24,9 @@ structures: its value on $A$ is the least of the numbers attached to the
 structures isomorphic to $A$, which is the number itself when that is
 invariant.
 
-A parsimonious reduction from $C$ to $D$ is a first-order interpretation
-under which the counts agree: $C(A) = D(I(A))$ for every nonempty finite
-$A$. In an ordered parsimonious reduction the interpretation reads the
+A parsimonious reduction from $C$ to $D$, a notion due to Simon, is a
+first-order interpretation under which the counts agree: $C(A) = D(I(A))$
+for every nonempty finite $A$. In an ordered parsimonious reduction the interpretation reads the
 ordered expansion and the equation holds for every linear order on $A$; in
 a relativized one, the interpreted universe is a definable subset of the
 tagged tuples, nonempty on nonempty structures.

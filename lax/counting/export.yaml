@@ -33,18 +33,9 @@ manifest:
   - name: Claude (Anthropic)
   bibEntries:
   - |
-    @misc{senellart2026descriptive,
-      author = {Pierre Senellart and Anton Gnatenko},
-      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
-      year = {2026},
-      eprint = {2609.18261},
-      archivePrefix = {arXiv}
-    }
-  - |
     @software{senellart2026descriptivecomplexity,
       author = {Pierre Senellart},
       title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
-      version = {1.2.2},
       year = {2026},
       doi = {10.5281/zenodo.21678423},
       url = {https://github.com/PierreSenellart/descriptive-complexity}
@@ -130,6 +121,18 @@ manifest:
       isbn         = {978-1-4612-6809-3},
       doi          = {10.1007/978-1-4612-0539-5},
       bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @inproceedings{simon1977difference,
+      author       = {Janos Simon},
+      title        = {On the Difference Between One and Many (Preliminary Version)},
+      booktitle    = {Automata, Languages and Programming, Fourth Colloquium, {ICALP} 1977},
+      series       = {Lecture Notes in Computer Science},
+      volume       = {52},
+      pages        = {480--491},
+      publisher    = {Springer},
+      year         = {1977},
+      doi          = {10.1007/3-540-08342-1_37}
     }
 requires:
 - package: Lax904597

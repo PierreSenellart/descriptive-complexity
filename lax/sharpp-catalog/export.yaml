@@ -1,0 +1,190 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: backport-lean-4.33
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.sharpClique_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpOneInSat_ordered_parsimonious_sharpClique
+- DescriptiveComplexity.sharpDirHamCircuit_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpOneInSat_rel_ordered_parsimonious_sharpDirHamCircuit
+- DescriptiveComplexity.sharpDominatingSet_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpSat_parsimonious_sharpDominatingSet
+- DescriptiveComplexity.sharpExactCover_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpOneInSat_parsimonious_sharpExactCover
+- DescriptiveComplexity.sharpFeedbackArcSet_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpOneInSat_ordered_parsimonious_sharpFeedbackArcSet
+- DescriptiveComplexity.sharpFeedbackVertexSet_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpVertexCover_parsimonious_sharpFeedbackVertexSet
+- DescriptiveComplexity.sharpHamCircuit_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpDirHamCircuit_parsimonious_sharpHamCircuit
+- DescriptiveComplexity.sharpHittingSet_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpSetCover_parsimonious_sharpHittingSet
+- DescriptiveComplexity.sharpIndependentSet_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpClique_parsimonious_sharpIndependentSet
+- DescriptiveComplexity.sharpKnapsack_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpExactCover_ordered_parsimonious_sharpKnapsack
+- DescriptiveComplexity.sharpOneInSat_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpSat_ordered_parsimonious_sharpOneInSat
+- DescriptiveComplexity.sharpSetCover_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpVertexCover_parsimonious_sharpSetCover
+- DescriptiveComplexity.sharpSetPacking_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpIndependentSet_parsimonious_sharpSetPacking
+- DescriptiveComplexity.sharpSteinerTree_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpVertexCover_ordered_parsimonious_sharpSteinerTree
+- DescriptiveComplexity.sharpThreeSat_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpSat_ordered_parsimonious_sharpThreeSat
+- DescriptiveComplexity.sharpVertexCover_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpIndependentSet_parsimonious_sharpVertexCover
+- DescriptiveComplexity.sharpZeroOneIP_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpKnapsack_ordered_parsimonious_sharpZeroOneIP
+- DescriptiveComplexity.sharpClique_support_iff
+- DescriptiveComplexity.sharpIndependentSet_support_iff
+- DescriptiveComplexity.sharpVertexCover_support_iff
+- DescriptiveComplexity.sharpDominatingSet_support_iff
+- DescriptiveComplexity.sharpFeedbackVertexSet_support_iff
+- DescriptiveComplexity.sharpFeedbackArcSet_support_iff
+- DescriptiveComplexity.feedbackArcSet_of_sharpFeedbackArcSet_support
+- DescriptiveComplexity.sharpDirHamCircuit_support_iff
+- DescriptiveComplexity.sharpHamCircuit_support_iff
+- DescriptiveComplexity.sharpKnapsack_support_iff
+- DescriptiveComplexity.sharpOneInSat_support_iff
+- DescriptiveComplexity.sharpExactCover_support_iff
+- DescriptiveComplexity.sharpSetCover_support_iff
+- DescriptiveComplexity.sharpHittingSet_support_iff
+- DescriptiveComplexity.setCover_of_sharpSetCover_support
+- DescriptiveComplexity.hittingSet_of_sharpHittingSet_support
+- DescriptiveComplexity.sharpSetPacking_support_iff
+- DescriptiveComplexity.sharpSteinerTree_support_iff
+- DescriptiveComplexity.steinerTree_of_sharpSteinerTree_support
+- DescriptiveComplexity.sharpThreeSat_support_iff
+- DescriptiveComplexity.sharpZeroOneIP_support_iff
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: a catalog of parsimoniously #P-complete problems'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @incollection{karp1972reducibility,
+      author       = {Richard M. Karp},
+      editor       = {Raymond E. Miller and
+                      James W. Thatcher},
+      title        = {Reducibility Among Combinatorial Problems},
+      booktitle    = {Proceedings of a symposium on the Complexity of Computer Computations,
+                      held March 20-22, 1972, at the {IBM} Thomas J. Watson Research Center,
+                      Yorktown Heights, New York, {USA}},
+      series       = {The {IBM} Research Symposia Series},
+      pages        = {85--103},
+      publisher    = {Plenum Press, New York},
+      year         = {1972},
+      doi          = {10.1007/978-1-4684-2001-2_9},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @inproceedings{schaefer1978complexity,
+      author       = {Thomas J. Schaefer},
+      editor       = {Richard J. Lipton and
+                      Walter A. Burkhard and
+                      Walter J. Savitch and
+                      Emily P. Friedman and
+                      Alfred V. Aho},
+      title        = {The Complexity of Satisfiability Problems},
+      booktitle    = {Proceedings of the 10th Annual {ACM} Symposium on Theory of Computing,
+                      May 1-3, 1978, San Diego, California, {USA}},
+      pages        = {216--226},
+      publisher    = {{ACM}},
+      year         = {1978},
+      doi          = {10.1145/800133.804350},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @inproceedings{simon1977difference,
+      author       = {Janos Simon},
+      title        = {On the Difference Between One and Many (Preliminary Version)},
+      booktitle    = {Automata, Languages and Programming, Fourth Colloquium, {ICALP} 1977},
+      series       = {Lecture Notes in Computer Science},
+      volume       = {52},
+      pages        = {480--491},
+      publisher    = {Springer},
+      year         = {1977},
+      doi          = {10.1007/3-540-08342-1_37}
+    }
+  - |
+    @article{valiant1979enumeration,
+      author       = {Leslie G. Valiant},
+      title        = {The Complexity of Enumeration and Reliability Problems},
+      journal      = {{SIAM} J. Comput.},
+      volume       = {8},
+      number       = {3},
+      pages        = {410--421},
+      year         = {1979},
+      doi          = {10.1137/0208032}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax799700
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5f34068ba7707478cd268f2316c295d7ea51a711
+  folder: lax/np-catalog
+  restated_from: ../np-catalog/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+- package: Lax895169
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
+  folder: lax/ac0
+  restated_from: ../ac0/export.yaml
+- package: Lax366625
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 8839d139f2f3ecced222445bab17791af7ed6b81
+  folder: lax/counting
+  restated_from: ../counting/export.yaml
+restated:
+  DescriptiveComplexity.OneInModel: CountingSatVariants.OneInModel
+  DescriptiveComplexity.CliqueOfSize: CountingCliques.CliqueOfSize
+  DescriptiveComplexity.IndepOfSize: CountingCliques.IndepOfSize
+  DescriptiveComplexity.CoverOfSize: CountingCliques.CoverOfSize
+  DescriptiveComplexity.DomOfSizeOn: CountingDominatingSets.DomOfSizeOn
+  DescriptiveComplexity.DomSetOfSize: CountingDominatingSets.DomSetOfSize
+  DescriptiveComplexity.FvsOfSize: CountingFeedbackSets.FvsOfSize
+  DescriptiveComplexity.FasOfSize: CountingFeedbackSets.FasOfSize
+  DescriptiveComplexity.DirCircuit: CountingHamiltonCircuits.DirCircuit
+  DescriptiveComplexity.UCircuit: CountingHamiltonCircuits.UCircuit
+  DescriptiveComplexity.ExactCoverBy: CountingSetFamilies.ExactCoverBy
+  DescriptiveComplexity.PackingOfSize: CountingSetFamilies.PackingOfSize
+  DescriptiveComplexity.SetCoverOfSize: CountingSetFamilies.SetCoverOfSize
+  DescriptiveComplexity.HittingSetOfSize: CountingSetFamilies.HittingSetOfSize
+  DescriptiveComplexity.KnapsackSol: CountingKnapsacks.KnapsackSol
+  DescriptiveComplexity.ZeroOneSol: CountingKnapsacks.ZeroOneSol
+  DescriptiveComplexity.SteinerOfSizeOn: CountingSteinerTrees.SteinerOfSizeOn
+  DescriptiveComplexity.SteinerOfSize: CountingSteinerTrees.SteinerOfSize
+  DescriptiveComplexity.CliqueOfSizeOn: CountingCliques.CliqueOfSizeOn
+  DescriptiveComplexity.CoverOfSizeOn: CountingCliques.CoverOfSizeOn
+  DescriptiveComplexity.FeedbackOfSizeOn: CountingFeedbackSets.FeedbackOfSizeOn
+  DescriptiveComplexity.FasOfSizeOn: CountingFeedbackSets.FasOfSizeOn
+  DescriptiveComplexity.IsCircuit: CountingHamiltonCircuits.IsCircuit
+  DescriptiveComplexity.IsUCircuit: CountingHamiltonCircuits.IsUCircuit
+  DescriptiveComplexity.CoverFamOfSizeOn: CountingSetFamilies.CoverFamOfSizeOn
+  DescriptiveComplexity.CycSucc: CountingHamiltonCircuits.CycSucc

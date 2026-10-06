@@ -6,8 +6,8 @@ logarithmic space (lax-485149), polynomial time (lax-535992), and AC⁰
 (lax-895169).
 
 A counting problem attaches an isomorphism-invariant natural number to every
-finite structure, and a parsimonious reduction is a first-order
-interpretation that preserves it. #P is the class of the numbers of
+finite structure, and a parsimonious reduction, after Simon, is a
+first-order interpretation that preserves it. #P is the class of the numbers of
 witnesses of existential second-order sentences over ordered structures,
 after Saluja, Subrahmanyam, and Thakur, and it coincides with the quantitative
 logic ΣQSO(FO) of Arenas, Muñoz, and Riveros. FP is the class defined by
