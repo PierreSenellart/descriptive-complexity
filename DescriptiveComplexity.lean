@@ -117,6 +117,15 @@ import DescriptiveComplexity.Counting.KernelPair
 import DescriptiveComplexity.Counting.DecisionClasses
 import DescriptiveComplexity.Counting.UnitWeights
 import DescriptiveComplexity.Counting.WeightedWorlds
+import DescriptiveComplexity.Permanent.Basic
+import DescriptiveComplexity.Permanent.Minor
+import DescriptiveComplexity.Permanent.Attach
+import DescriptiveComplexity.Permanent.Xor
+import DescriptiveComplexity.Permanent.AttachAll
+import DescriptiveComplexity.Permanent.Flat
+import DescriptiveComplexity.Permanent.CycNext
+import DescriptiveComplexity.Permanent.Ladder
+import DescriptiveComplexity.Permanent.Widths
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -2402,6 +2411,39 @@ pulled relations hold only of points of the domain
   `#BIS + #PP2DNF = 2 ^ n`. It is the source of the `#P`-hardness of the query
   `R(x), S(x, y), T(y)` over probabilistic databases
   ([Dalvi and Suciu 2012][dalvi2012dichotomy]).
+* **The permanent is one-call `#P`-complete**
+  (`DescriptiveComplexity.sharpCycleCover_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.CycleCover.Completeness`): Valiant's theorem
+  ([Valiant 1979][valiant1979complexity]), for the number of cycle covers of a
+  digraph (`DescriptiveComplexity.SharpCycleCover`), which is the permanent of
+  its 0-1 adjacency matrix (`DescriptiveComplexity.sharpCycleCover_eq_bperm`)
+  and the number of perfect matchings of its bipartite double cover. The
+  permanent of a rectangular matrix and its Laplace expansion along a set of
+  rows (`DescriptiveComplexity.bperm_laplace`), stated on minors indexed by
+  sets of deleted rows and columns (`DescriptiveComplexity.pdel`), are what a
+  gadget argument computes with (`DescriptiveComplexity.Permanent`). Valiant's
+  XOR gadget (`DescriptiveComplexity.xorGadget`, six local values by `decide`)
+  is attached at every **site**, a pair of edges of which a cover uses exactly
+  one, and the expansion along the gadget rows leaves `4` per site times the
+  **XOR sum** over the choices of one edge per site of the corresponding
+  minor of the base graph (`DescriptiveComplexity.Site.pdel_attachAll`). The
+  base graph of a #1-in-SAT instance pairs, at each occurrence of a literal,
+  the self-loop of a track node with that of a spoke: the tracks of a literal
+  form a cycle through its occurrences in the order of the clauses, used
+  entirely or not at all (`DescriptiveComplexity.eq_empty_or_eq_of_cycNext_closed`),
+  and a hub per clause closes a cycle with exactly one free spoke; a minor is
+  `1` when the choice is consistent and `0` otherwise
+  (`DescriptiveComplexity.SatCover.pdel_base`), and the consistent choices are
+  the exactly-one models (`DescriptiveComplexity.SatCover.consistentEquiv`).
+  The gadget has entries `-1`, `2` and `3`; the **ladder expansion**
+  (`DescriptiveComplexity.ladder`, `DescriptiveComplexity.bperm_ladder`) turns
+  a matrix of natural numbers into a 0-1 matrix of the same permanent, an
+  edge of weight `k` becoming a level of `k` rungs and `2 ^ L` a ladder of `L`
+  levels of two rungs, so that `-1` is `2 ^ L` modulo `2 ^ L + 1`
+  (`DescriptiveComplexity.bperm_ladder_widths_modEq`). The one call asks for
+  the permanent of the drawn digraph; the count is its remainder modulo
+  `2 ^ L + 1` divided by `4` to the number of occurrences, both definable
+  cardinalities (`DescriptiveComplexity.sharpOneInSat_oneCall_sharpCycleCover`).
 * **FP, by quantitative logic** (`DescriptiveComplexity.Counting.Quantitative`,
   `DescriptiveComplexity.Counting.QuantitativePull`,
   `DescriptiveComplexity.Counting.FP`). The logic is that of

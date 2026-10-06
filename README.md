@@ -78,16 +78,11 @@ first-order logic, which Mathlib already has.
   machines in the table below.
 * Counting: `#P` as the number of witnesses of an ∃SO sentence, with #SAT
   *parsimoniously* complete for it (`sharpSat_sharpP_parsimoniousComplete`), a
-  stronger statement than the Turing completeness of the literature; weaker
-  notions, subtractive and one-call reductions, cover #DNF and the hardness of
-  query evaluation over probabilistic databases
-  (`weightedWorlds_h0_sharpP_oneCallComplete`), next to a query that is easy
-  (`weightedWorlds_rs_mem_FP`). FP, the polynomial-time
-  functions, is defined by the quantitative logic of Arenas, Muñoz and
-  Riveros, and has complete problems too (`circuitNumber_FP_parsimoniousComplete`)
-  through a normal form proved inside the logic (`FPDefinable.digitDefinable`).
-  Both classes have their machine bridge (`mem_sharpP_iff_le_sharpNtmAccept`,
-  `mem_FP_iff_le_dtmNumber`).
+  stronger statement than the Turing completeness of the literature; under
+  one-call reductions, the permanent (`sharpCycleCover_sharpP_oneCallComplete`,
+  Valiant's theorem) and query evaluation over probabilistic databases. FP is
+  defined by the quantitative logic of Arenas, Muñoz and Riveros, with its own
+  complete problems. Both classes have their machine bridge.
 * Lower bounds, none of them conditional on a complexity assumption:
   Ehrenfeucht–Fraïssé games on finite structures, and the inexpressibility of
   EVEN even when the sentence is given a linear order (`even_not_foDefinable`),
@@ -151,7 +146,7 @@ Here a problem attaches a number to each instance. Completeness is under
 | Class | Logical characterization | Machine model | Problems proved complete |
 | --- | --- | --- | --- |
 | **FP** | QFO(LFP): sums and products of polynomial-time conditions; equivalently, binary digits computed by a least fixed point | deterministic polynomial-time Turing machine writing a number | the number written by a circuit · by unit propagation on a Horn formula · by such a machine |
-| **#P** | the number of witnesses of an ∃SO sentence | nondeterministic polynomial-time Turing machine, counting its accepting runs | **SAT-family:** #SAT · #3SAT · #1-in-SAT<br>**Solutions of the threshold size:** #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree<br>**Others:** #Exact Cover · #Knapsack · #0-1 Integer Programming · #Hamilton Circuit (directed & undirected) · counting the accepting runs of such a machine<br>**Under weaker reductions:** #DNF · counting all independent sets · #BIS · #PP2DNF |
+| **#P** | the number of witnesses of an ∃SO sentence | nondeterministic polynomial-time Turing machine, counting its accepting runs | **SAT-family:** #SAT · #3SAT · #1-in-SAT<br>**Solutions of the threshold size:** #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree<br>**Others:** #Exact Cover · #Knapsack · #0-1 Integer Programming · #Hamilton Circuit (directed & undirected) · counting the accepting runs of such a machine<br>**Under weaker reductions:** #DNF · counting all independent sets · #BIS · #PP2DNF · the permanent (#Cycle Cover) |
 
 The decision classes defined by a property of such a count, ⊕P, Mod_k P, PP,
 C₌P and UP, are defined too, with the inclusions between them and NP, coNP,

@@ -455,7 +455,8 @@ dependency order.
   that every ΣQSO(FO) term is a witness count of an `∃SO` sentence (and
   conversely) would make the two readings of `#P` coincide inside the library,
   as the paper's Proposition has it, and give the permanent its natural
-  statement, `ΣS. permut(S) · Πx.(∃y. S(x,y) ∧ M(x,y))`.
+  statement, `ΣS. permut(S) · Πx.(∃y. S(x,y) ∧ M(x,y))`, beside the
+  witness-count form of `Problems/CycleCover/Defs.lean`.
 - **Non-adaptive linear combinations** [L], the reduction notion above the
   one-call reductions `≤ᶜ[≤]`:
   `divisor A * P.Count A = ∑ p ∈ paramSet A, coeff A p * Q.Count (I p A)`,
@@ -465,8 +466,9 @@ dependency order.
   level's main cost; the divisor on the left keeps Lagrange denominators out
   of the statement. Index sets multiply, parameters concatenate and divisors
   multiply, so composition still closes. This is the shape of every
-  interpolation-based `#P`-hardness proof: the permanent and #PerfectMatching
-  (Valiant 1979), and Dalvi–Suciu's `h₁` as the paper proves it. *Adaptive*
+  interpolation-based `#P`-hardness proof, Dalvi–Suciu's `h₁` as the paper
+  proves it among them (the permanent, in the library, is one-call complete
+  by Valiant's modular trick and needs none of this). *Adaptive*
   Turing reductions, where a later query depends on an earlier answer, stay
   out: that is the honest boundary of a machine-free framework, and `FP^#P`
   lives beyond it. The coefficients must come from a class strictly weaker
@@ -745,7 +747,7 @@ provable rather than merely reasonable.
 
 - **What is left of the counting track of §6**: the ΣQSO(FO) reading of
   `#P`; the linear combinations are the one item that
-  unlocks new hardness results (the permanent, `h₁`) and the one to price
+  unlocks new hardness results (`h₁`) and the one to price
   honestly; structure inside `#P`, the quantitative fixed point and MaxSNP
   are genuine research. Its size is what puts it beside the numbered line
   rather than in it.

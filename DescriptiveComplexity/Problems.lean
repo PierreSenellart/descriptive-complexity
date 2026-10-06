@@ -36,6 +36,12 @@ import DescriptiveComplexity.Problems.OneInSat
 import DescriptiveComplexity.Problems.OneInSat.Counting
 import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
 import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+import DescriptiveComplexity.Problems.CycleCover.Defs
+import DescriptiveComplexity.Problems.CycleCover.Base
+import DescriptiveComplexity.Problems.CycleCover.Models
+import DescriptiveComplexity.Problems.CycleCover.Formulas
+import DescriptiveComplexity.Problems.CycleCover.Drawing
+import DescriptiveComplexity.Problems.CycleCover.Completeness
 import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Problems.CliqueFamily.Counting
 import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
