@@ -158,7 +158,7 @@ requires:
   restated_from: ../ac0/export.yaml
 - package: Lax366625
   repository: https://github.com/PierreSenellart/descriptive-complexity
-  commit: 8839d139f2f3ecced222445bab17791af7ed6b81
+  commit: 2c6d7c607a315c0a412dae550b8b4988e6fa9a60
   folder: lax/counting
   restated_from: ../counting/export.yaml
 restated:

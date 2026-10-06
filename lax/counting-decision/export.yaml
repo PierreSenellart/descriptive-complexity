@@ -1,0 +1,186 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: backport-lean-4.33
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.UP_subset_parityP
+- DescriptiveComplexity.UP_subset_NP
+- DescriptiveComplexity.NP_subset_PP
+- DescriptiveComplexity.coNP_subset_PP
+- DescriptiveComplexity.compl_mem_parityP
+- DescriptiveComplexity.compl_mem_PP
+- DescriptiveComplexity.mem_countClass_of_sharpP
+- DescriptiveComplexity.paritySat_parityP_complete
+- DescriptiveComplexity.modSat_modP_complete
+- DescriptiveComplexity.parityP_complete_of_sharpP_parsimoniousComplete
+- DescriptiveComplexity.modP_complete_of_sharpP_parsimoniousComplete
+- DescriptiveComplexity.mem_parityP_iff_le_parity_sharpNtmAccept
+- DescriptiveComplexity.mem_modP_iff_le_mod_sharpNtmAccept
+- DescriptiveComplexity.selMajSat_PP_complete
+- DescriptiveComplexity.selEqSat_CeqP_complete
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: decision classes defined by counting'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @inproceedings{papadimitriou1982two,
+      author       = {Christos H. Papadimitriou and
+                      Stathis K. Zachos},
+      editor       = {Armin B. Cremers and
+                      Hans{-}Peter Kriegel},
+      title        = {Two remarks on the power of counting},
+      booktitle    = {Theoretical Computer Science, 6th GI-Conference},
+      series       = {Lecture Notes in Computer Science},
+      pages        = {269--275},
+      publisher    = {Springer},
+      year         = {1982},
+      doi          = {10.1007/BFb0009651}
+    }
+  - |
+    @article{goldschlager1986parallel,
+      author       = {Leslie M. Goldschlager and
+                      Ian Parberry},
+      title        = {On the construction of parallel computers from various bases of boolean
+                      functions},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {43},
+      pages        = {43--58},
+      year         = {1986},
+      doi          = {10.1016/0304-3975(86)90165-9}
+    }
+  - |
+    @article{cai1990complexity,
+      author       = {Jin{-}yi Cai and
+                      Lane A. Hemachandra},
+      title        = {On the power of parity polynomial time},
+      journal      = {Math. Syst. Theory},
+      volume       = {23},
+      number       = {1},
+      pages        = {95--106},
+      year         = {1990},
+      doi          = {10.1007/BF02090768}
+    }
+  - |
+    @article{gill1977computational,
+      author       = {John Gill},
+      title        = {Computational Complexity of Probabilistic Turing Machines},
+      journal      = {{SIAM} J. Comput.},
+      volume       = {6},
+      number       = {4},
+      pages        = {675--695},
+      year         = {1977},
+      doi          = {10.1137/0206049}
+    }
+  - |
+    @article{wagner1986complexity,
+      author       = {Klaus W. Wagner},
+      title        = {The complexity of combinatorial problems with succinct input representation},
+      journal      = {Acta Informatica},
+      volume       = {23},
+      number       = {3},
+      pages        = {325--356},
+      year         = {1986},
+      doi          = {10.1007/BF00289117}
+    }
+  - |
+    @article{valiant1976relative,
+      author       = {Leslie G. Valiant},
+      title        = {Relative complexity of checking and evaluating},
+      journal      = {Inf. Process. Lett.},
+      volume       = {5},
+      number       = {1},
+      pages        = {20--23},
+      year         = {1976},
+      doi          = {10.1016/0020-0190(76)90097-1}
+    }
+  - |
+    @article{fenner1994gap,
+      author       = {Stephen A. Fenner and
+                      Lance J. Fortnow and
+                      Stuart A. Kurtz},
+      title        = {Gap-definable counting classes},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {48},
+      number       = {1},
+      pages        = {116--148},
+      year         = {1994},
+      doi          = {10.1016/S0022-0000(05)80024-8}
+    }
+  - |
+    @article{hartmanis1988complexity,
+      author       = {Juris Hartmanis and
+                      Lane A. Hemachandra},
+      title        = {Complexity classes without machines: On complete languages for {UP}},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {58},
+      number       = {1--3},
+      pages        = {129--142},
+      year         = {1988},
+      doi          = {10.1016/0304-3975(88)90022-9}
+    }
+  - |
+    @incollection{tseitin1968complexity,
+      author       = {G. S. Tseitin},
+      editor       = {A. O. Slisenko},
+      title        = {On the complexity of derivation in propositional calculus},
+      booktitle    = {Studies in Constructive Mathematics and Mathematical Logic, Part II},
+      series       = {Seminars in Mathematics},
+      pages        = {115--125},
+      publisher    = {Steklov Mathematical Institute},
+      year         = {1968},
+      note         = {Translated from the Russian}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+- package: Lax564036
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
+  folder: lax/polynomial-hierarchy
+  restated_from: ../polynomial-hierarchy/export.yaml
+- package: Lax895169
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
+  folder: lax/ac0
+  restated_from: ../ac0/export.yaml
+- package: Lax366625
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 2c6d7c607a315c0a412dae550b8b4988e6fa9a60
+  folder: lax/counting
+  restated_from: ../counting/export.yaml
+restated:
+  DescriptiveComplexity.CountDefinable: CountDefinability.CountDefinable
+  FirstOrder.Language.selMark: SelectedSat.selMark
+  FirstOrder.Language.selMarkRel: SelectedSat.selMarkRel
+  FirstOrder.Language.smSel: SelectedSat.smSel
+  FirstOrder.Language.satSel: SelectedSat.satSel
+  FirstOrder.Language.instIsRelationalSelMark: SelectedSat.instIsRelationalSelMark
+  FirstOrder.Language.instDecidableEqSelMarkRel: SelectedSat.instDecidableEqSelMarkRel
+  DescriptiveComplexity.ssSel: SelectedSat.ssSel
+  DescriptiveComplexity.satSelStructure: SelectedSat.satSelStructure
+  DescriptiveComplexity.SelModel: SelectedSat.SelModel

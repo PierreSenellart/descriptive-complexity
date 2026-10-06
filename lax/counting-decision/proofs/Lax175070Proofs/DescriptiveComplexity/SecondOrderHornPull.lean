@@ -1,0 +1,442 @@
+/-
+Copyright (c) 2026 Pierre Senellart. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Pierre Senellart
+-/
+import Lax175070Proofs.DescriptiveComplexity.SecondOrderHorn
+import Lax175070Proofs.DescriptiveComplexity.SecondOrderPull
+import Lax175070Proofs.DescriptiveComplexity.OrderedComposition
+import Lax175070.CountDefinability
+import Lax175070.SelectedSat
+import Lax366625.CountingProblems
+import Lax366625.CountingRuns
+import Lax366625.CountingSat
+import Lax366625.HornNumbers
+import Lax366625.MachineNumbers
+import Lax366625.NumberedCircuits
+import Lax366625.QuantitativeLogic
+import Lax366625.SecondOrderCounting
+import Lax366625.WitnessCounting
+import Lax485149.Complement
+import Lax485149.DeterministicReachability
+import Lax485149.DeterministicTransitiveClosure
+import Lax485149.FirstOrderDefinability
+import Lax485149.HeadAutomata
+import Lax485149.KromFragment
+import Lax485149.Reachability
+import Lax485149.SecondOrderAtoms
+import Lax485149.TransitiveClosure
+import Lax485149.TwoSat
+import Lax535992.CircuitValue
+import Lax535992.DeterministicMachines
+import Lax535992.Game
+import Lax535992.HornFragment
+import Lax535992.HornSat
+import Lax535992.InflationaryFixedPoint
+import Lax535992.LeastFixedPoint
+import Lax564036.AlternatingMachines
+import Lax564036.Difference
+import Lax564036.QuantifiedBooleanFormulas
+import Lax564036.SatUnsat
+import Lax564036.Tautology
+import Lax564036.ThreeDnfTautology
+import Lax895169.ArithmeticLogic
+import Lax895169.BitLogic
+import Lax895169.BitPredicate
+import Lax895169.LogTimeMachines
+import Lax904597.Classes
+import Lax904597.Interpretations
+import Lax904597.Machines
+import Lax904597.Problems
+import Lax904597.Relativized
+import Lax904597.Sat
+import Lax904597.SecondOrder
+
+namespace Lax175070Proofs.DescriptiveComplexity.HornClause
+end Lax175070Proofs.DescriptiveComplexity.HornClause
+
+namespace Lax175070Proofs.DescriptiveComplexity.HornProgram
+end Lax175070Proofs.DescriptiveComplexity.HornProgram
+
+namespace Lax175070Proofs.DescriptiveComplexity.SigmaSOHornDefinable
+end Lax175070Proofs.DescriptiveComplexity.SigmaSOHornDefinable
+
+namespace Lax535992.HornFragment
+end Lax535992.HornFragment
+
+namespace Lax904597.Interpretations
+end Lax904597.Interpretations
+
+namespace Lax904597.Problems
+end Lax904597.Problems
+
+namespace Lax904597.SecondOrder
+end Lax904597.SecondOrder
+
+namespace Lax175070Proofs.DescriptiveComplexity
+export Lax904597.Problems (DecisionProblem)
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax175070Proofs.DescriptiveComplexity
+export Lax904597.Interpretations (FOInterpretation)
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax175070Proofs.DescriptiveComplexity
+export Lax904597.SecondOrder (SOBlock)
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax175070Proofs.DescriptiveComplexity
+export Lax535992.HornFragment (HornClause HornProgram SigmaSOHornDefinable)
+end Lax175070Proofs.DescriptiveComplexity
+
+/-!
+# Pulling SO-Horn definability back through an interpretation
+
+SO-Horn definability is closed under (ordered) first-order reductions
+(`DescriptiveComplexity.SigmaSOHornDefinable.of_orderedReduction`). This is what makes
+the fragment a `DescriptiveComplexity.ComplexityClass` – the class
+`DescriptiveComplexity.PTIME` – rather than a mere definability predicate.
+
+The closure is *not* an instance of the general pullback of
+`DescriptiveComplexity.SecondOrderPull`, which only says that the pulled-back kernel is
+some first-order formula: here the pulled-back kernel has to stay *Horn*. It
+does, and for a structural reason worth stating, since it is exactly what the
+Horn condition is careful about: the condition constrains the occurrences of
+the *second-order* variables only, while an interpretation rewrites the
+*input-vocabulary* atoms – which live in the guard, where anything is allowed.
+Concretely, pulling a clause back through a `d`-dimensional interpretation
+with tag type `Tag`:
+
+* the block is pulled as in `DescriptiveComplexity.SOBlock.pull`: an `n`-ary relation
+  variable on `Tag × A^d` becomes one `(n·d)`-ary relation variable on `A` per
+  `n`-tuple of tags;
+* a clause becomes one clause per assignment `t : Fin k → Tag` of tags to its
+  universally quantified variables (`DescriptiveComplexity.HornClause.pull`), with the
+  `k` variables replaced by `k · d` coordinates;
+* its guard becomes the ordinary formula pullback
+  `DescriptiveComplexity.FOInterpretation.pull` at the tag assignment `t` – an arbitrary
+  first-order formula, which is fine, guards being unconstrained;
+* each body and head atom becomes the atom of the corresponding pulled
+  relation variable (`DescriptiveComplexity.SOAtom.pull`) – *still an atom*, which is
+  what keeps the clause Horn.
+
+The one place the order is needed is that the guards of the target may mention
+it: the pullback interprets the target's order by the lexicographic order on
+tagged tuples (`DescriptiveComplexity.FOInterpretation.ordExtend`), which is why the
+definability notion quantifies over ordered structures in the first place.
+-/
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+/-! ### Pulling back a clause and a program -/
+
+/-- The pullback of a Horn clause at a tag assignment: guards pull back as
+formulas, atoms as atoms – so the result is again a Horn clause. -/
+noncomputable def HornClause.pull (I : Lax904597.Interpretations.FOInterpretation L₁ L₂ Tag d)
+    (c : Lax535992.HornFragment.HornClause L₂ B k) (t : Fin k → Tag) : Lax535992.HornFragment.HornClause L₁ (B.pull Tag d) (k * d) where
+  guard := guardPull I c.guard t
+  body := c.body.map fun a => a.pull d t
+  head := c.head.map fun a => a.pull d t
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.HornClause
+
+export Lax175070Proofs.DescriptiveComplexity.HornClause (pull)
+
+end Lax535992.HornFragment.HornClause
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+theorem HornClause.pull_holds {A : Type} [L₁.Structure A]
+    (I : Lax904597.Interpretations.FOInterpretation L₁ L₂ Tag d) (c : Lax535992.HornFragment.HornClause L₂ B k) (t : Fin k → Tag)
+    (ρ : B.Assignment (I.Map A)) (w : Fin (k * d) → A) :
+    (c.pull I t).Holds (B.pullAssign ρ) w ↔ c.Holds ρ (tagVal I t w) := by
+  have hhead : (c.pull I t).HeadHolds (B.pullAssign ρ) w ↔ c.HeadHolds ρ (tagVal I t w) := by
+    rw [Lax535992.HornFragment.HornClause.HeadHolds, Lax535992.HornFragment.HornClause.HeadHolds, HornClause.pull]
+    cases c.head with
+    | none => exact Iff.rfl
+    | some a => exact a.pull_holds I t ρ w
+  refine imp_congr (and_congr ?_ ?_) hhead
+  · exact realize_guardPull I c.guard t w
+  · rw [HornClause.pull]
+    constructor
+    · intro h a ha
+      exact (a.pull_holds I t ρ w).mp (h _ (List.mem_map_of_mem ha))
+    · intro h a' ha'
+      obtain ⟨a, ha, rfl⟩ := List.mem_map.mp ha'
+      exact (a.pull_holds I t ρ w).mpr (h a ha)
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.HornClause
+
+export Lax175070Proofs.DescriptiveComplexity.HornClause (pull_holds)
+
+end Lax535992.HornFragment.HornClause
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+/-- The pullback of a Horn program: one clause per clause of the program and
+per assignment of tags to its universally quantified variables. -/
+noncomputable def HornProgram.pull (I : Lax904597.Interpretations.FOInterpretation L₁ L₂ Tag d)
+    (prog : Lax535992.HornFragment.HornProgram L₂ B k) : Lax535992.HornFragment.HornProgram L₁ (B.pull Tag d) (k * d) :=
+  prog.flatMap fun c => (allTagAssign Tag k).map fun t => c.pull I t
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.HornProgram
+
+export Lax175070Proofs.DescriptiveComplexity.HornProgram (pull)
+
+end Lax535992.HornFragment.HornProgram
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+theorem HornProgram.pull_mem (I : Lax904597.Interpretations.FOInterpretation L₁ L₂ Tag d)
+    {prog : Lax535992.HornFragment.HornProgram L₂ B k} {c : Lax535992.HornFragment.HornClause L₂ B k} (hc : c ∈ prog)
+    (t : Fin k → Tag) : c.pull I t ∈ prog.pull I := by
+  rw [HornProgram.pull, List.mem_flatMap]
+  exact ⟨c, hc, List.mem_map.mpr ⟨t, mem_allTagAssign t, rfl⟩⟩
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.HornProgram
+
+export Lax175070Proofs.DescriptiveComplexity.HornProgram (pull_mem)
+
+end Lax535992.HornFragment.HornProgram
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+theorem HornProgram.pull_cases (I : Lax904597.Interpretations.FOInterpretation L₁ L₂ Tag d)
+    {prog : Lax535992.HornFragment.HornProgram L₂ B k} {c' : Lax535992.HornFragment.HornClause L₁ (B.pull Tag d) (k * d)}
+    (hc' : c' ∈ prog.pull I) : ∃ c ∈ prog, ∃ t : Fin k → Tag, c' = c.pull I t := by
+  rw [HornProgram.pull, List.mem_flatMap] at hc'
+  obtain ⟨c, hc, hmem⟩ := hc'
+  obtain ⟨t, -, rfl⟩ := List.mem_map.mp hmem
+  exact ⟨c, hc, t, rfl⟩
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.HornProgram
+
+export Lax175070Proofs.DescriptiveComplexity.HornProgram (pull_cases)
+
+end Lax535992.HornFragment.HornProgram
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+/-! ### Correctness of the pullback -/
+
+section Correctness
+
+variable {A : Type} [L₁.Structure A] (I : Lax904597.Interpretations.FOInterpretation L₁ L₂ Tag d)
+
+variable (prog : Lax535992.HornFragment.HornProgram L₂ B k)
+
+/-- An assignment satisfies a program on the interpreted structure iff its
+transfer satisfies the pulled program on the base structure. -/
+theorem HornProgram.pull_holds (ρ : B.Assignment (I.Map A)) :
+    (prog.pull I).Holds (B.pullAssign ρ) ↔ prog.Holds ρ := by
+  constructor
+  · intro h v c hc
+    have hp := h (fun m => (v (finProdFinEquiv.symm m).1).2 (finProdFinEquiv.symm m).2)
+      (c.pull I fun p => (v p).1) (HornProgram.pull_mem I hc _)
+    have h2 := (HornClause.pull_holds I c (fun p => (v p).1) ρ _).mp hp
+    rwa [tagVal_split I v] at h2
+  · intro h w c' hc'
+    obtain ⟨c, hc, t, rfl⟩ := HornProgram.pull_cases I hc'
+    exact (HornClause.pull_holds I c t ρ w).mpr (h (tagVal I t w) c hc)
+
+end Correctness
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.HornProgram
+
+export Lax175070Proofs.DescriptiveComplexity.HornProgram (pull_holds)
+
+end Lax535992.HornFragment.HornProgram
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+section Correctness
+
+variable {A : Type} [L₁.Structure A] (I : Lax904597.Interpretations.FOInterpretation L₁ L₂ Tag d)
+
+variable (prog : Lax535992.HornFragment.HornProgram L₂ B k)
+
+/-- **The pullback is correct**: the program is satisfiable on the interpreted
+structure iff its pullback is satisfiable on the base structure. -/
+theorem exists_holds_pull :
+    (∃ ρ : B.Assignment (I.Map A), prog.Holds ρ) ↔
+      ∃ σ : (B.pull Tag d).Assignment A, (prog.pull I).Holds σ := by
+  constructor
+  · rintro ⟨ρ, hρ⟩
+    exact ⟨B.pullAssign ρ, (HornProgram.pull_holds I prog ρ).mpr hρ⟩
+  · rintro ⟨σ, hσ⟩
+    refine ⟨B.mergeAssign σ, (HornProgram.pull_holds I prog (B.mergeAssign σ)).mp ?_⟩
+    rw [B.pullAssign_mergeAssign σ]
+    exact hσ
+
+end Correctness
+
+/-! ### Closure under reductions -/
+
+section Closure
+
+variable [L₁.IsRelational] {P : Lax904597.Problems.DecisionProblem L₁} {Q : Lax904597.Problems.DecisionProblem L₂}
+
+/-- **SO-Horn definability is closed under ordered first-order reductions.**
+The Horn shape survives the pullback because an interpretation only rewrites
+the input-vocabulary atoms, which live in the guards; the second-order atoms
+are merely re-indexed. -/
+theorem SigmaSOHornDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q)
+    (h : Lax535992.HornFragment.SigmaSOHornDefinable Q) : Lax535992.HornFragment.SigmaSOHornDefinable P := by
+  obtain ⟨B, k, prog, hprog⟩ := h
+  let := f.tagFinite
+  let := f.tagNonempty
+  let : LinearOrder f.Tag := finiteLinearOrder f.Tag
+  refine ⟨B.pull f.Tag f.dim, k * f.dim,
+    HornProgram.pull f.toInterpretation.ordExtend prog, ?_⟩
+  intro A _ _ _ _
+  let := f.toInterpretation.mapLinearOrder A
+  have := f.toInterpretation.map_finite A
+  have := f.toInterpretation.map_nonempty A
+  refine (f.correct A).trans ((hprog (f.toInterpretation.Map A)).trans ?_)
+  refine Iff.trans ?_ (exists_holds_pull f.toInterpretation.ordExtend prog)
+  exact (exists_holds_equiv (f.toInterpretation.ordExtendLEquiv A) prog).symm
+
+end Closure
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.SigmaSOHornDefinable
+
+export Lax175070Proofs.DescriptiveComplexity.SigmaSOHornDefinable (of_orderedReduction)
+
+end Lax535992.HornFragment.SigmaSOHornDefinable
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+section Closure
+
+variable [L₁.IsRelational] {P : Lax904597.Problems.DecisionProblem L₁} {Q : Lax904597.Problems.DecisionProblem L₂}
+
+/-- SO-Horn definability is closed under first-order reductions. -/
+theorem SigmaSOHornDefinable.of_foReduction (f : P ≤ᶠᵒ Q)
+    (h : Lax535992.HornFragment.SigmaSOHornDefinable Q) : Lax535992.HornFragment.SigmaSOHornDefinable P :=
+  h.of_orderedReduction f.toOrdered
+
+end Closure
+
+end Lax175070Proofs.DescriptiveComplexity
+
+namespace Lax535992.HornFragment.SigmaSOHornDefinable
+
+export Lax175070Proofs.DescriptiveComplexity.SigmaSOHornDefinable (of_foReduction)
+
+end Lax535992.HornFragment.SigmaSOHornDefinable
+
+namespace Lax175070Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L₁ L₂ : Language.{0, 0}} {Tag : Type} [Finite Tag] {d : ℕ}
+
+variable {B : Lax904597.SecondOrder.SOBlock} {k : ℕ}
+
+variable [L₂.IsRelational]
+
+section Closure
+
+variable [L₁.IsRelational] {P : Lax904597.Problems.DecisionProblem L₁} {Q : Lax904597.Problems.DecisionProblem L₂}
+
+end Closure
+
+end Lax175070Proofs.DescriptiveComplexity
+
+

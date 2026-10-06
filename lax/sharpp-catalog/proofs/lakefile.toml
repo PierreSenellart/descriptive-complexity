@@ -46,7 +46,7 @@ subDir = "lax/ac0/concepts"
 [[require]]
 name = "Lax366625"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "8839d139f2f3ecced222445bab17791af7ed6b81"
+rev = "2c6d7c607a315c0a412dae550b8b4988e6fa9a60"
 subDir = "lax/counting/concepts"
 
 [[lean_lib]]

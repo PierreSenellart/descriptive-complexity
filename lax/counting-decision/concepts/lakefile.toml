@@ -1,5 +1,5 @@
-name = "Lax280166"
-defaultTargets = ["Lax280166"]
+name = "Lax175070"
+defaultTargets = ["Lax175070"]
 
 [leanOptions]
 autoImplicit = false
@@ -16,12 +16,6 @@ rev = "5aef71b6365249121f68485b77de5e25e26f41bf"
 subDir = "lax/np-core/concepts"
 
 [[require]]
-name = "Lax799700"
-git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "5f34068ba7707478cd268f2316c295d7ea51a711"
-subDir = "lax/np-catalog/concepts"
-
-[[require]]
 name = "Lax485149"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
 rev = "eee50ee7b4c7bbf5f3d7efadda7518899cca280b"
@@ -32,6 +26,12 @@ name = "Lax535992"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
 rev = "89e95257ba3b6f37dae8a18b6fee583e62ecb749"
 subDir = "lax/ptime/concepts"
+
+[[require]]
+name = "Lax564036"
+git = "https://github.com/PierreSenellart/descriptive-complexity"
+rev = "646a3b4286aec6f78457067508d69471f8822db6"
+subDir = "lax/polynomial-hierarchy/concepts"
 
 [[require]]
 name = "Lax895169"
@@ -46,4 +46,4 @@ rev = "2c6d7c607a315c0a412dae550b8b4988e6fa9a60"
 subDir = "lax/counting/concepts"
 
 [[lean_lib]]
-name = "Lax280166"
+name = "Lax175070"
