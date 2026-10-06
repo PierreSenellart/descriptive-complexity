@@ -291,6 +291,14 @@ theorem forced_varPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
   · rw [pref_pad]
     exact h
 
+omit [Finite A] [Nonempty A] in
+include hinj hℓ in
+/-- The output variables of the Horn formula are linearly ordered. -/
+theorem varOrder_hornNumInterp (h₀ : IsBot a₀) : VarOrder ((hornNumInterp prog bit).Map A) :=
+  enum_linear (fun x => RelMap (M := (hornNumInterp prog bit).Map A) hnOut ![x])
+    (fun y x => RelMap (M := (hornNumInterp prog bit).Map A) hnBelow ![y, x])
+    (varPt prog bit hℓ a₀) (out_iff_varPt hℓ h₀) (below_varPt hinj hℓ)
+
 include hinj in
 open Classical in
 /-- **The Horn formula writes the number whose digits are the relations
@@ -303,7 +311,7 @@ theorem hornNumber_hornNumInterp (hhead : ∀ c ∈ prog, c.head.isSome) (h₀ :
         else 0 := by
   have hs : HornSatisfiable ((hornNumInterp prog bit).Map A) :=
     (hornSatisfiable_iso (satEquiv prog bit A)).mpr (hornSatisfiable_of_headed hhead)
-  rw [hornNumber, ite_eq_left hs]
+  rw [hornNumber, ite_eq_left ⟨hs, varOrder_hornNumInterp hinj hℓ h₀⟩]
   have key := finsum_digits_eq (X := (hornNumInterp prog bit).Map A)
     (fun x => RelMap hnOut ![x]) Forced (fun y x => RelMap hnBelow ![y, x])
     (varPt prog bit hℓ a₀) (varPt_injective hinj hℓ a₀) (out_iff_varPt hℓ h₀)

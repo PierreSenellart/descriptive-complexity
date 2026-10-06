@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Problems.CircuitNumber.Membership
 import DescriptiveComplexity.Problems.CircuitNumber.Hardness
+import DescriptiveComplexity.Problems.CircuitNumber.Junk
 import DescriptiveComplexity.Counting.Digits.NormalForm
 
 /-!
@@ -41,6 +42,16 @@ So the digit-definable problems are exactly those of FP
 proof that QFO(LFP) captures FP
 ([Arenas, Muñoz, Riveros 2020][arenas2020descriptive], Theorem 4.4), here a
 theorem about the logic with no machine in it.
+
+## Relativized reductions
+
+FP is closed under *relativized* parsimonious reductions as well
+(`DescriptiveComplexity.mem_FP_of_relOrderedParsimonious`), those whose target
+universe is a definable set of tagged tuples. No pullback of a quantitative
+term through such a reduction is needed: the reduction is composed down to
+this problem, which ignores isolated elements
+(`DescriptiveComplexity.circuitNumber_of_embedding`), so that the tuples
+outside the domain can be kept.
 
 ## Attribution
 
@@ -79,5 +90,13 @@ theorem circuitNumber_FP_parsimoniousHard : FP.ParsimoniousHard CircuitNumber :=
 reductions.** -/
 theorem circuitNumber_FP_parsimoniousComplete : FP.ParsimoniousComplete CircuitNumber :=
   ⟨circuitNumber_mem_FP, circuitNumber_FP_parsimoniousHard⟩
+
+/-- **FP is closed under relativized ordered parsimonious reductions.** -/
+theorem mem_FP_of_relOrderedParsimonious {L' : Language.{0, 0}} [L'.IsRelational]
+    {C : CountingProblem L} {D : CountingProblem L'} (f : C ≤ʳᵖ[≤] D) (h : D ∈ FP) :
+    C ∈ FP := by
+  obtain ⟨g⟩ := (FPDefinable.digitDefinable h).nonempty_orderedParsimonious
+  exact FP.mem_of_orderedParsimonious (f.trans g.toRel).unrelCircuitNumber
+    circuitNumber_mem_FP
 
 end DescriptiveComplexity

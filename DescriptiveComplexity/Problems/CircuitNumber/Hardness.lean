@@ -27,8 +27,9 @@ circuit being the one drawn from the rules
 * **The outputs are the digits**: the output gates are the canonically padded
   atoms of the relations holding the digits, and padding preserves the
   lexicographic order (`DescriptiveComplexity.CircNum.tupLeLex_pad`), so the
-  rank of an output among the outputs is the rank of its position
-  (`DescriptiveComplexity.CircNum.outRank_bitPt`).
+  outputs are compared as their positions are
+  (`DescriptiveComplexity.CircNum.below_bitPt`), and the number is read off
+  the positions (`DescriptiveComplexity.finsum_digits_eq`).
 -/
 
 namespace DescriptiveComplexity
@@ -300,71 +301,48 @@ theorem outBit_bitPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
     exact ⟨(out_atom _ _).mpr ⟨⟨_, rfl⟩, canon_pad h₀ _ _⟩, gateVal_of_derives h₀ ⟨_, _⟩ h⟩
 
 include hinj in
-/-- The outputs strictly below the gate of a position are the gates of the
-positions strictly below it. -/
-theorem lowerOut_bitPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A))
-    (p : (drawInterp prog bit).Map A) :
-    LowerOut (bitPt prog bit hℓ a₀ q) p ↔ ∃ q', p = bitPt prog bit hℓ a₀ q' ∧ q' < q := by
-  have hbelow : ∀ q' : Fin c ×ₗ Lex (Fin ℓ → A),
-      RelMap (M := (drawInterp prog bit).Map A) ncBelow
-          ![bitPt prog bit hℓ a₀ q', bitPt prog bit hℓ a₀ q] ↔ q' ≤ q := by
-    rintro ⟨τ', y'⟩
-    obtain ⟨τ, y⟩ := q
-    refine (below_bit_bit hinj τ' τ _ _).trans (Iff.trans ?_ prodLex_le_iff.symm)
-    refine or_congr Iff.rfl ⟨?_, ?_⟩
-    · rintro ⟨rfl, h⟩
-      exact ⟨rfl, (tupLeLex_iff_le _ _).mp ((tupLeLex_cast (hℓ τ') _ _).mp
-        ((tupLeLex_pad a₀ (arity_le_clauseDim (bit τ')) _ _).mp h))⟩
-    · rintro ⟨rfl, h⟩
-      exact ⟨rfl, (tupLeLex_pad a₀ (arity_le_clauseDim (bit τ')) _ _).mpr
-        ((tupLeLex_cast (hℓ τ') _ _).mpr ((tupLeLex_iff_le _ _).mpr h))⟩
-  constructor
-  · rintro ⟨ho, hne, hb⟩
-    obtain ⟨q', rfl⟩ := (out_iff_bitPt hℓ h₀ p).mp ho
-    exact ⟨q', rfl, lt_of_le_of_ne ((hbelow q').mp hb) fun h => hne (congrArg _ h)⟩
-  · rintro ⟨q', rfl, hlt⟩
-    exact ⟨(out_iff_bitPt hℓ h₀ _).mpr ⟨q', rfl⟩,
-      fun h => ne_of_lt hlt (bitPt_injective hinj hℓ a₀ h), (hbelow q').mpr hlt.le⟩
+/-- The gates of the positions are compared as the positions are. -/
+theorem below_bitPt (q' q : Fin c ×ₗ Lex (Fin ℓ → A)) :
+    RelMap (M := (drawInterp prog bit).Map A) ncBelow
+        ![bitPt prog bit hℓ a₀ q', bitPt prog bit hℓ a₀ q] ↔ q' ≤ q := by
+  obtain ⟨τ', y'⟩ := q'
+  obtain ⟨τ, y⟩ := q
+  refine (below_bit_bit hinj τ' τ _ _).trans (Iff.trans ?_ prodLex_le_iff.symm)
+  refine or_congr Iff.rfl ⟨?_, ?_⟩
+  · rintro ⟨rfl, h⟩
+    exact ⟨rfl, (tupLeLex_iff_le _ _).mp ((tupLeLex_cast (hℓ τ') _ _).mp
+      ((tupLeLex_pad a₀ (arity_le_clauseDim (bit τ')) _ _).mp h))⟩
+  · rintro ⟨rfl, h⟩
+    exact ⟨rfl, (tupLeLex_pad a₀ (arity_le_clauseDim (bit τ')) _ _).mpr
+      ((tupLeLex_cast (hℓ τ') _ _).mpr ((tupLeLex_iff_le _ _).mpr h))⟩
 
-include hinj in
-/-- **The rank of an output among the outputs is the rank of its position.** -/
-theorem outRank_bitPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
-    outRank (bitPt prog bit hℓ a₀ q) = orank q := by
-  rw [outRank, orank, ← Nat.card_coe_set_eq]
-  symm
-  refine Nat.card_eq_of_bijective
-    (fun q' => ⟨bitPt prog bit hℓ a₀ q'.1,
-      (lowerOut_bitPt hinj hℓ h₀ q _).mpr ⟨q'.1, rfl, q'.2⟩⟩) ⟨?_, ?_⟩
-  · intro y y' h
-    exact Subtype.ext (bitPt_injective hinj hℓ a₀ (congrArg Subtype.val h))
-  · rintro ⟨p, hp⟩
-    obtain ⟨q', rfl, hq'⟩ := (lowerOut_bitPt hinj hℓ h₀ q p).mp hp
-    exact ⟨⟨q', hq'⟩, rfl⟩
+include hinj hℓ in
+/-- The outputs of the drawn circuit are linearly ordered. -/
+theorem outOrder_drawInterp (h₀ : IsBot a₀) : OutOrder ((drawInterp prog bit).Map A) :=
+  enum_linear (fun x => RelMap (M := (drawInterp prog bit).Map A) ncOut ![x])
+    (fun y x => RelMap (M := (drawInterp prog bit).Map A) ncBelow ![y, x])
+    (bitPt prog bit hℓ a₀) (out_iff_bitPt hℓ h₀) (below_bitPt hinj hℓ)
 
 include hinj in
 open Classical in
 /-- **The drawn circuit writes the number whose digits are the relations
 `bit τ` of the least fixed point.** -/
-theorem circuitNumber_drawInterp (h₀ : IsBot a₀) :
+theorem circuitNumber_drawInterp [Finite A] (h₀ : IsBot a₀) :
     circuitNumber ((drawInterp prog bit).Map A) =
       ∑ᶠ q : Fin c ×ₗ Lex (Fin ℓ → A),
         if lfpAssign prog (bit (ofLex q).1)
             (fun k => ofLex (ofLex q).2 (Fin.cast (hℓ (ofLex q).1) k)) then 2 ^ orank q
         else 0 := by
-  have hsupp : ∀ g ∈ Function.support
-      (fun g : (drawInterp prog bit).Map A => if OutBit g then 2 ^ outRank g else 0),
-      g ∈ Set.univ ↔ g ∈ Set.range (bitPt prog bit hℓ a₀) := by
-    intro g hg
-    refine ⟨fun _ => ?_, fun _ => trivial⟩
-    have hbit : OutBit g := by
-      by_contra h
-      exact hg (ite_eq_right h)
-    obtain ⟨q, hq⟩ := (out_iff_bitPt hℓ h₀ g).mp hbit.1
-    exact ⟨q, hq.symm⟩
-  rw [circuitNumber, ← finsum_mem_univ, finsum_mem_inter_support_eq' _ _ _ hsupp,
-    finsum_mem_range (bitPt_injective hinj hℓ a₀)]
-  refine finsum_congr fun q => ?_
-  rw [outRank_bitPt hinj hℓ h₀ q, if_congr (outBit_bitPt hℓ h₀ q) rfl rfl]
+  rw [circuitNumber, ite_eq_left (outOrder_drawInterp hinj hℓ h₀)]
+  have key := finsum_digits_eq (X := (drawInterp prog bit).Map A)
+    (fun x => RelMap ncOut ![x]) (GateVal true) (fun y x => RelMap ncBelow ![y, x])
+    (bitPt prog bit hℓ a₀) (bitPt_injective hinj hℓ a₀) (out_iff_bitPt hℓ h₀)
+    (below_bitPt hinj hℓ)
+  refine Eq.trans ?_ (key.trans ?_)
+  · exact finsum_congr fun x => if_congr Iff.rfl rfl rfl
+  · refine finsum_congr fun q => if_congr ⟨fun hg => ?_, fun h => ((outBit_bitPt hℓ h₀ q).mpr h).2⟩
+      rfl rfl
+    exact (outBit_bitPt hℓ h₀ q).mp ⟨(out_iff_bitPt hℓ h₀ _).mpr ⟨q, rfl⟩, hg⟩
 
 end Count
 

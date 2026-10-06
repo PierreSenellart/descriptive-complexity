@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Problems.CircuitNumber.Defs
 import DescriptiveComplexity.Problems.Cvp.Membership
 import DescriptiveComplexity.Counting.FP
+import DescriptiveComplexity.Syntax
 
 /-!
 # The number written by a circuit is in FP
@@ -133,10 +134,17 @@ noncomputable def lowF : outLang.Formula ((Empty ⊕ Fin 1) ⊕ Fin 1) :=
     ∼(Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inl (Sum.inr 0)))) ⊓
     Relations.formula₂ oBelow (Term.var (Sum.inr 0)) (Term.var (Sum.inl (Sum.inr 0)))
 
-/-- **The output term**: `Σg. [g holds the digit 1] · Πh. ([h is an output
-strictly below g] + 1)`. -/
+/-- “The outputs are linearly ordered.” -/
+noncomputable def outOrdS : outLang.Sentence :=
+  fo% ((∀ p, oOut(p) → oBelow(p, p)) ∧
+      ∀ p, ∀ q, ∀ r, oOut(p) → oOut(q) → oOut(r) → oBelow(p, q) → oBelow(q, r) → oBelow(p, r)) ∧
+    (∀ p, ∀ q, oOut(p) → oOut(q) → oBelow(p, q) → oBelow(q, p) → p ≐ q) ∧
+    ∀ p, ∀ q, oOut(p) → oOut(q) → oBelow(p, q) ∨ oBelow(q, p)
+
+/-- **The output term**: `[the outputs are linearly ordered] · Σg. [g holds
+the digit 1] · Πh. ([h is an output strictly below g] + 1)`. -/
 noncomputable def numOut : QTerm outLang Empty :=
-  .sum 1 (.mul (.ind bitF) (.prod 1 (.add (.ind lowF) (.const 1))))
+  .mul (.ind outOrdS) (.sum 1 (.mul (.ind bitF) (.prod 1 (.add (.ind lowF) (.const 1)))))
 
 /-- The definition of the number written by a circuit in QFO(LFP). -/
 noncomputable def numDef : QLFPDef Language.numCircuit where
@@ -166,9 +174,25 @@ theorem realize_lowF (w u : Fin 1 → A) :
     Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal]
   exact and_assoc
 
+theorem realize_outOrdS :
+    (@Sentence.Realize outLang A
+        (@sumStructure _ _ A _ (Cvp.valBlock.structure (lfpAssign (A := A) numRules))) outOrdS) ↔
+      OutOrder A := by
+  let := Cvp.valBlock.structure (lfpAssign (A := A) numRules)
+  rw [outOrdS, OutOrder, Sentence.Realize]
+  simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_sup, Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal,
+    Term.realize_var, Sum.elim_inl, Sum.elim_inr]
+  refine and_assoc.trans (and_congr ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
+    (and_congr ⟨fun h a b c => h (fun _ => a) (fun _ => b) fun _ => c,
+        fun h i j k => h (i 0) (j 0) (k 0)⟩
+      (and_congr ⟨fun h a b => h (fun _ => a) fun _ => b, fun h i j => h (i 0) (j 0)⟩
+        ⟨fun h a b => h (fun _ => a) fun _ => b, fun h i j => h (i 0) (j 0)⟩)))
+
 open Classical in
 /-- **The definition computes the number written by the circuit.** -/
 theorem numDef_value [Finite A] : numDef.value A = circuitNumber A := by
+  have hord := realize_outOrdS (A := A)
   let := Cvp.valBlock.structure (lfpAssign (A := A) numRules)
   have hprod : ∀ w : Fin 1 → A,
       ∏ᶠ u : Fin 1 → A, ((if LowerOut (w 0) (u 0) then 1 else 0) + 1) = 2 ^ outRank (w 0) :=
@@ -178,8 +202,9 @@ theorem numDef_value [Finite A] : numDef.value A = circuitNumber A := by
   rw [QLFPDef.value, QTerm.value, circuitNumber]
   change (numOut.eval (A := A) default) = _
   simp only [numOut, QTerm.eval, realize_bitF, realize_lowF, hprod, ite_mul, one_mul, zero_mul]
-  exact finsum_comp_equiv (Equiv.funUnique (Fin 1) A)
-    (f := fun g => if OutBit g then 2 ^ outRank g else 0)
+  have hord' : (Formula.Realize outOrdS (default : Empty → A)) ↔ OutOrder A := hord
+  exact if_congr hord' (finsum_comp_equiv (Equiv.funUnique (Fin 1) A)
+    (f := fun g => if OutBit g then 2 ^ outRank g else 0)) rfl
 
 end Value
 

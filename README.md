@@ -81,7 +81,8 @@ first-order logic, which Mathlib already has.
   stronger statement than the Turing completeness of the literature; weaker
   notions, subtractive and one-call reductions, cover #DNF and the hardness of
   query evaluation over probabilistic databases
-  (`weightedWorlds_h0_sharpP_oneCallComplete`). FP, the polynomial-time
+  (`weightedWorlds_h0_sharpP_oneCallComplete`), next to a query that is easy
+  (`weightedWorlds_rs_mem_FP`). FP, the polynomial-time
   functions, is defined by the quantitative logic of Arenas, Muñoz and
   Riveros, and has complete problems too (`circuitNumber_FP_parsimoniousComplete`)
   through a normal form proved inside the logic (`FPDefinable.digitDefinable`).
@@ -311,7 +312,8 @@ build times down.
   A third one, `DescriptiveComplexity/Examples/ProbabilisticQueries.lean`, does
   the same for a counting problem, query evaluation over probabilistic
   databases, ending with a concrete database type, its computed weighted
-  count, its faithful encoding and a decoder.
+  count, its faithful encoding and a decoder, and closing on a query of the
+  easy side, in FP.
 * **Planned work**: `ROADMAP.md` – locality theorems and 0-1 laws for the
   inexpressibility track, the graph-isomorphism degree, counting problems and
   `#P`, finer reduction notions, and further complete problems for PTIME,

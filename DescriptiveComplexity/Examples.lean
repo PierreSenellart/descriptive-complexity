@@ -37,6 +37,10 @@ to be read top to bottom as a template for new formalizations.
   parsimonious reduction from #PP2DNF; membership in `#P` holds for every
   first-order query. With probabilities in the instance, written in binary,
   the probability of any first-order query is a ratio of two `#P` numbers; a
-  concrete database type, computed, faithfully encoded and decoded, closes
-  the file.
+  concrete database type, computed, faithfully encoded and decoded, follows.
+  The file closes on the other side of the dichotomy of Dalvi and Suciu: on
+  the same instances, the weighted count of the query `R(x), S(x, y)` is in
+  FP, failing being a product over independent facts and a first-success
+  identity turning the complement into a quantitative term with no
+  subtraction.
 -/

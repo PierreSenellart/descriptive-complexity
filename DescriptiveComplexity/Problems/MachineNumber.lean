@@ -14,8 +14,8 @@ import DescriptiveComplexity.Counting.Digits.NormalForm
 The machine bridge for FP, the class of the functions computable in
 polynomial time (`DescriptiveComplexity.FP`), which the library defines by a
 logic: `DescriptiveComplexity.DTMNumber` – the number a deterministic machine,
-carried by the instance, leaves on its marked output cells when it halts and
-accepts within its clock – is complete for FP under parsimonious reductions
+carried by the instance, leaves on its marked output cells, read in tape
+order, when it halts and accepts within its clock – is complete for FP under parsimonious reductions
 (`DescriptiveComplexity.dtmNumber_FP_parsimoniousComplete`). Hence the machine
 characterization of the class
 (`DescriptiveComplexity.mem_FP_iff_le_dtmNumber`): a function is in FP exactly
@@ -47,10 +47,13 @@ counterpart of HORN-SAT.
 ## The output convention
 
 The output cells are marked in the instance, as are the symbols read as the
-digit `1`, and the cells are compared by a relation of the instance rather
-than by their place on the tape: a reduction composed of two interpretations
-has no control over the order in which the second lays out the tags of the
-first, so the order of significance has to travel with the instance.
+digit `1`, and the digits are read **in tape order**: the first output cell
+holds the least significant digit. The reduction from the number written by
+unit propagation, whose output variables are compared by a relation of the
+instance, is where the two conventions meet: the reduction first reorders its
+input so that the output variables come first, in the order of significance
+(`DescriptiveComplexity.FOInterpretation.reorder`), and the machine then lays
+its cells out in that order.
 -/
 
 namespace DescriptiveComplexity

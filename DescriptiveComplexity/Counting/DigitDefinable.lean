@@ -83,6 +83,30 @@ theorem finsum_digits_eq {X P : Type} [LinearOrder P] [Finite P] (Out Bit : X �
   rw [hrank q]
   exact if_congr (and_iff_right ((hout _).mpr ⟨q, rfl⟩)) rfl rfl
 
+/-- **Marked elements enumerated by a linear order are linearly ordered**:
+the four clauses of a linear order among the marked elements. -/
+theorem enum_linear {X P : Type} [LinearOrder P] (Out : X → Prop) (Below : X → X → Prop)
+    (φ : P → X) (hout : ∀ x, Out x ↔ ∃ q, x = φ q)
+    (hbelow : ∀ q' q, Below (φ q') (φ q) ↔ q' ≤ q) :
+    (∀ p, Out p → Below p p) ∧
+      (∀ p q r, Out p → Out q → Out r → Below p q → Below q r → Below p r) ∧
+      (∀ p q, Out p → Out q → Below p q → Below q p → p = q) ∧
+      ∀ p q, Out p → Out q → Below p q ∨ Below q p := by
+  refine ⟨fun p hp => ?_, fun p q r hp hq hr hpq hqr => ?_, fun p q hp hq hpq hqp => ?_,
+    fun p q hp hq => ?_⟩
+  · obtain ⟨a, rfl⟩ := (hout p).mp hp
+    exact (hbelow a a).mpr le_rfl
+  · obtain ⟨a, rfl⟩ := (hout p).mp hp
+    obtain ⟨b, rfl⟩ := (hout q).mp hq
+    obtain ⟨c, rfl⟩ := (hout r).mp hr
+    exact (hbelow a c).mpr (((hbelow a b).mp hpq).trans ((hbelow b c).mp hqr))
+  · obtain ⟨a, rfl⟩ := (hout p).mp hp
+    obtain ⟨b, rfl⟩ := (hout q).mp hq
+    exact congrArg φ (le_antisymm ((hbelow a b).mp hpq) ((hbelow b a).mp hqp))
+  · obtain ⟨a, rfl⟩ := (hout p).mp hp
+    obtain ⟨b, rfl⟩ := (hout q).mp hq
+    exact (le_total a b).imp (hbelow a b).mpr (hbelow b a).mpr
+
 /-- A definition of a number by its binary digits: a least fixed point, as for
 `DescriptiveComplexity.LFPDef`, and the relation variables holding the
 digits. -/

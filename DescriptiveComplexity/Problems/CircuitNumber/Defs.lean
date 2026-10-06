@@ -24,10 +24,11 @@ order, are the binary digits of a natural number, and
   evaluated by `DescriptiveComplexity.GateVal`.
 * `DescriptiveComplexity.circuitNumber`: an output gate `g` deriving the value
   `1` contributes `2 ^ r`, where `r` is the number of output gates strictly
-  below `g` (`DescriptiveComplexity.outRank`). When `below` linearly orders the
-  output gates, this is the number whose binary digits are their values, the
-  lowest gate holding the least significant digit; nothing is required of
-  `below` otherwise, and the definition is read as it stands.
+  below `g` (`DescriptiveComplexity.outRank`). This is the number whose binary
+  digits are the values of the output gates, the lowest holding the least
+  significant digit, when `below` linearly orders the output gates
+  (`DescriptiveComplexity.OutOrder`); an instance whose `below` does not
+  writes `0`.
 -/
 
 namespace FirstOrder
@@ -118,11 +119,24 @@ noncomputable def outRank (g : A) : ℕ :=
   Nat.card {h : A // LowerOut g h}
 
 variable (A) in
+/-- **The comparison of the outputs is a linear order on them**: reflexive,
+transitive, antisymmetric and total among the output gates. -/
+def OutOrder : Prop :=
+  (∀ p : A, RelMap ncOut ![p] → RelMap ncBelow ![p, p]) ∧
+    (∀ p q r : A, RelMap ncOut ![p] → RelMap ncOut ![q] → RelMap ncOut ![r] →
+      RelMap ncBelow ![p, q] → RelMap ncBelow ![q, r] → RelMap ncBelow ![p, r]) ∧
+    (∀ p q : A, RelMap ncOut ![p] → RelMap ncOut ![q] →
+      RelMap ncBelow ![p, q] → RelMap ncBelow ![q, p] → p = q) ∧
+    ∀ p q : A, RelMap ncOut ![p] → RelMap ncOut ![q] →
+      RelMap ncBelow ![p, q] ∨ RelMap ncBelow ![q, p]
+
+variable (A) in
 open Classical in
 /-- **The number written by a circuit**: each output gate deriving the value
-`1` contributes two to the power of its rank among the outputs. -/
+`1` contributes two to the power of its rank among the outputs; `0` unless the
+outputs are linearly ordered. -/
 noncomputable def circuitNumber : ℕ :=
-  ∑ᶠ g : A, if OutBit g then 2 ^ outRank g else 0
+  if OutOrder A then ∑ᶠ g : A, if OutBit g then 2 ^ outRank g else 0 else 0
 
 end Semantics
 
@@ -146,14 +160,48 @@ theorem lowerOut_equiv (e : A ≃[Language.numCircuit] B) (g h : A) :
 theorem outRank_equiv (e : A ≃[Language.numCircuit] B) (g : A) : outRank (e g) = outRank g :=
   (Nat.card_congr (e.toEquiv.subtypeEquiv fun h => (lowerOut_equiv e g h).symm)).symm
 
+theorem outOrder_equiv (e : A ≃[Language.numCircuit] B) : OutOrder A ↔ OutOrder B := by
+  have h1 : ∀ p, (RelMap ncOut ![e p] : Prop) ↔ RelMap ncOut ![p] :=
+    fun p => (relMap_equiv₁ e ncOut p).symm
+  have h2 : ∀ p q, (RelMap ncBelow ![e p, e q] : Prop) ↔ RelMap ncBelow ![p, q] :=
+    fun p q => (relMap_equiv₂ e ncBelow p q).symm
+  constructor
+  · rintro ⟨hr, ht, ha, hl⟩
+    refine ⟨fun p hp => ?_, fun p q r hp hq hr' hpq hqr => ?_, fun p q hp hq hpq hqp => ?_,
+      fun p q hp hq => ?_⟩
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      exact (h2 p p).mpr (hr p ((h1 p).mp hp))
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      obtain ⟨q, rfl⟩ := e.toEquiv.surjective q
+      obtain ⟨r, rfl⟩ := e.toEquiv.surjective r
+      exact (h2 p r).mpr (ht p q r ((h1 p).mp hp) ((h1 q).mp hq) ((h1 r).mp hr')
+        ((h2 p q).mp hpq) ((h2 q r).mp hqr))
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      obtain ⟨q, rfl⟩ := e.toEquiv.surjective q
+      exact congrArg e (ha p q ((h1 p).mp hp) ((h1 q).mp hq) ((h2 p q).mp hpq) ((h2 q p).mp hqp))
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      obtain ⟨q, rfl⟩ := e.toEquiv.surjective q
+      exact (hl p q ((h1 p).mp hp) ((h1 q).mp hq)).imp (h2 p q).mpr (h2 q p).mpr
+  · rintro ⟨hr, ht, ha, hl⟩
+    exact ⟨fun p hp => (h2 p p).mp (hr _ ((h1 p).mpr hp)),
+      fun p q r hp hq hr' hpq hqr => (h2 p r).mp (ht _ _ _ ((h1 p).mpr hp) ((h1 q).mpr hq)
+        ((h1 r).mpr hr') ((h2 p q).mpr hpq) ((h2 q r).mpr hqr)),
+      fun p q hp hq hpq hqp => e.toEquiv.injective
+        (ha _ _ ((h1 p).mpr hp) ((h1 q).mpr hq) ((h2 p q).mpr hpq) ((h2 q p).mpr hqp)),
+      fun p q hp hq => (hl _ _ ((h1 p).mpr hp) ((h1 q).mpr hq)).imp (h2 p q).mp (h2 q p).mp⟩
+
 /-- The number written is isomorphism-invariant. -/
 theorem circuitNumber_iso (e : A ≃[Language.numCircuit] B) :
     circuitNumber A = circuitNumber B := by
   classical
-  rw [circuitNumber, circuitNumber, ← finsum_comp_equiv e.toEquiv]
-  refine finsum_congr fun g => ?_
-  change _ = if OutBit (e g) then 2 ^ outRank (e g) else 0
-  rw [outRank_equiv e g, if_congr (outBit_equiv e g) rfl rfl]
+  have hsum : (∑ᶠ g : A, if OutBit g then 2 ^ outRank g else 0) =
+      ∑ᶠ g : B, if OutBit g then 2 ^ outRank g else 0 := by
+    rw [← finsum_comp_equiv e.toEquiv]
+    refine finsum_congr fun g => ?_
+    change _ = if OutBit (e g) then 2 ^ outRank (e g) else 0
+    rw [outRank_equiv e g, if_congr (outBit_equiv e g) rfl rfl]
+  rw [circuitNumber, circuitNumber, hsum]
+  exact if_congr (outOrder_equiv e) rfl rfl
 
 end Iso
 

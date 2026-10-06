@@ -10,6 +10,8 @@ import DescriptiveComplexity.Counting.UnitWeights
 import DescriptiveComplexity.Counting.Encoding
 import DescriptiveComplexity.Numbers.BinEnum
 import DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
+import DescriptiveComplexity.Counting.WeightedTerms
+import DescriptiveComplexity.Counting.FP
 
 /-!
 # Worked example: query evaluation over probabilistic databases
@@ -25,7 +27,15 @@ for the conjunctive query
 `h₀ = ∃ x y, R(x) ∧ S(x, y) ∧ T(y)`
 
 ([Dalvi and Suciu 2012][dalvi2012dichotomy], Proposition 5.2), which is the
-result formalized here.
+first result formalized here; the second is that on the same instances the
+query
+
+`∃ x y, R(x) ∧ S(x, y)`
+
+is *easy*: the numerator of its probability is in FP, the polynomial-time
+functions. The two queries are the smallest pair on the two sides of the
+dichotomy of that paper, the second being hierarchical and the first not; the
+dichotomy itself is not formalized, and nothing here is generic in the query.
 
 ## The model
 
@@ -109,6 +119,41 @@ reductions is not known here.
    the instance (`DescriptiveComplexity.probDbDecoding`, a
    `DescriptiveComplexity.CountDecoding`). So the hardness of the abstract
    problem is hardness on instances that are databases.
+
+## The easy query
+
+Steps 10 to 15 are the second result, on the same weighted instances.
+
+10. **The query**, `DescriptiveComplexity.rs`.
+11. **The weights.** Every fact is a Boolean variable with a weight of
+    presence and a weight of absence
+    (`DescriptiveComplexity.Counting.WeightedFacts`); the facts of the schema
+    are the `R`-facts, the `S`-facts and the `T`-facts
+    (`DescriptiveComplexity.factEquiv`).
+12. **Failing is a product.** The query fails in a world when no `x` has both
+    `R(x)` and some `S(x, y)`. Given which `R`-facts are present, this
+    constrains each `S`-fact separately; summing over the `R`-facts then
+    factorizes too. The weight of the worlds in which the query fails is
+    `∏x. F(x)`, times the total weight of the `T`-facts
+    (`DescriptiveComplexity.SafeQ.weightedCount_fail`), `F(x)` being the
+    weight of failing at `x`.
+13. **Succeeding, without a subtraction.** The weight of the worlds in which
+    the query holds is the total weight minus that product. A quantitative
+    term has no subtraction; the *first success* identity
+    (`DescriptiveComplexity.prod_add_eq_prod_add_sum`) removes it, by sorting
+    the worlds by the first `x` at which the query succeeds – and, inside the
+    weight of succeeding at `x`, by the first `y`
+    (`DescriptiveComplexity.SafeQ.weightedWorlds_rs_eq`).
+14. **The term.** The closed form is a term of quantitative first-order logic
+    over the instance, its leaves being the weights, read in binary
+    (`DescriptiveComplexity.SafeQ.rsT`). The order it sorts by is the order of
+    the definition, on which the value does not depend.
+15. **The theorem**: `DescriptiveComplexity.weightedWorlds_rs_mem_FP`.
+
+Steps 12 and 13 use the library's lemmas on independent Boolean variables
+(`DescriptiveComplexity.Counting.Independence`), and step 14 its helpers for
+writing terms (`DescriptiveComplexity.Counting.QuantitativeBinders`,
+`DescriptiveComplexity.Counting.WeightedTerms`).
 
 ## The concrete step, and what it relies on
 
@@ -558,7 +603,7 @@ noncomputable def worldEquiv (n : ℕ) : (worldBlock Language.rst).Assignment (F
       · exact decide_eq_true (show W.2.2 y = true from h)
 
 /-- The facts over the schema: an `R`-fact, an `S`-fact or a `T`-fact. -/
-def factEquiv (n : ℕ) : Fact Language.rst (Fin n) ≃ Fin n ⊕ (Fin n × Fin n) ⊕ Fin n where
+def factEquiv (A : Type) : Fact Language.rst A ≃ A ⊕ (A × A) ⊕ A where
   toFun q :=
     match q with
     | ⟨⟨_, .r⟩, x⟩ => .inl (x 0)
@@ -677,7 +722,7 @@ def ProbDb.statusAt (i : ProbDb) (z : Fin i.n ⊕ (Fin i.n × Fin i.n) ⊕ Fin i
 
 theorem ProbDb.Matches.statusAt (hm : i.Matches)
     (z : Fin i.n ⊕ (Fin i.n × Fin i.n) ⊕ Fin i.n) :
-    StatusAt (i.statusAt z) ((factEquiv i.n).symm z) := by
+    StatusAt (i.statusAt z) ((factEquiv (Fin i.n)).symm z) := by
   rcases z with a | p | b
   · exact hm.r a
   · exact hm.s p.1 p.2
@@ -689,10 +734,10 @@ weight of its concrete world. -/
 theorem ProbDb.Matches.finprod_factWeight (hm : i.Matches)
     (ρ : (worldBlock Language.rst).Assignment (Fin i.n)) :
     ∏ᶠ q : Fact Language.rst (Fin i.n), factWeight ρ q = i.weight (worldTables ρ) := by
-  let := Fintype.ofEquiv _ (factEquiv i.n).symm
+  let := Fintype.ofEquiv _ (factEquiv (Fin i.n)).symm
   rw [finprod_eq_prod_of_fintype,
-    ← Fintype.prod_equiv (factEquiv i.n).symm
-      (fun z => factWeight ρ ((factEquiv i.n).symm z)) _ (fun _ => rfl),
+    ← Fintype.prod_equiv (factEquiv (Fin i.n)).symm
+      (fun z => factWeight ρ ((factEquiv (Fin i.n)).symm z)) _ (fun _ => rfl),
     Fintype.prod_sum_type, Fintype.prod_sum_type, Fintype.prod_prod_type]
   simp only [(hm.statusAt _).factWeight_eq ρ]
   rfl
@@ -709,7 +754,7 @@ theorem ProbDb.Matches.isWeightedWorld_iff (hm : i.Matches)
       fun x y => ((hm.s x y).admits_iff _).mpr (h ⟨⟨2, rstS⟩, ![x, y]⟩),
       fun y => ((hm.t y).admits_iff _).mpr (h ⟨⟨1, rstT⟩, ![y]⟩)⟩
   · rintro ⟨hr, hs, ht⟩ q
-    obtain ⟨z, rfl⟩ := (factEquiv i.n).symm.surjective q
+    obtain ⟨z, rfl⟩ := (factEquiv (Fin i.n)).symm.surjective q
     rcases z with a | p | b
     · exact ((hm.r a).admits_iff _).mp (hr a)
     · exact ((hm.s p.1 p.2).admits_iff _).mp (hs p.1 p.2)
@@ -1016,5 +1061,375 @@ set_option linter.hashCommand false in
 
 set_option linter.hashCommand false in
 #guard (probDbDecode examplePresentation).map ProbDb.total = some 8
+
+/-! ## Step 10: the easy query -/
+
+/-- The query `∃ x y, R(x) ∧ S(x, y)`. -/
+noncomputable def rs : Language.rst.Sentence :=
+  fo% ∃ x y, rstR(x) ∧ rstS(x, y)
+
+theorem realize_rs {B : Type} (ρ : (worldBlock Language.rst).Assignment B) :
+    @Sentence.Realize Language.rst B (worldStructure ρ) rs ↔
+      ∃ a b : B, ρ ⟨1, rstR⟩ ![a] ∧ ρ ⟨2, rstS⟩ ![a, b] := by
+  let := worldStructure ρ
+  rw [rs]
+  simp only [Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
+    Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr]
+  constructor
+  · rintro ⟨v, h⟩
+    exact ⟨v 0, v 1, h⟩
+  · rintro ⟨a, b, h⟩
+    exact ⟨![a, b], h⟩
+
+namespace SafeQ
+
+/-! ## Step 11: the weights -/
+
+section Weights
+
+variable (A : Type) [(weightedLang Language.rst).Structure A]
+
+/-- The weight of presence of the fact `R(x)`. -/
+noncomputable def aR (x : A) : ℕ := fullPresWeight (⟨⟨1, rstR⟩, ![x]⟩ : Fact Language.rst A)
+
+/-- The weight of absence of the fact `R(x)`. -/
+noncomputable def cR (x : A) : ℕ := fullAbsWeight (⟨⟨1, rstR⟩, ![x]⟩ : Fact Language.rst A)
+
+/-- The weight of presence of the fact `S(x, y)`. -/
+noncomputable def aS (x y : A) : ℕ :=
+  fullPresWeight (⟨⟨2, rstS⟩, ![x, y]⟩ : Fact Language.rst A)
+
+/-- The weight of absence of the fact `S(x, y)`. -/
+noncomputable def cS (x y : A) : ℕ :=
+  fullAbsWeight (⟨⟨2, rstS⟩, ![x, y]⟩ : Fact Language.rst A)
+
+/-- The total weight of the fact `T(y)`, which the query does not read. -/
+noncomputable def tT (y : A) : ℕ :=
+  fullPresWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A) +
+    fullAbsWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A)
+
+variable [Fintype A]
+
+/-- **The weight of failing at `x`**: `R(x)` is present and no `S(x, y)` is,
+or `R(x)` is absent. -/
+noncomputable def failW (x : A) : ℕ :=
+  aR A x * ∏ y, cS A x y + cR A x * ∏ y, (aS A x y + cS A x y)
+
+variable [LinearOrder A]
+
+/-- **The weight of succeeding at `x`**: `R(x)` is present, and the `S(x, y)`
+are sorted by the first `y` that is present. -/
+noncomputable def succW (x : A) : ℕ :=
+  aR A x * ∑ y, (∏ y' ∈ Finset.univ.filter (· < y), cS A x y') * aS A x y *
+    ∏ y' ∈ Finset.univ.filter (y < ·), (aS A x y' + cS A x y')
+
+end Weights
+
+/-! ## Step 12: failing is a product -/
+
+section Count
+
+variable {A : Type} [(weightedLang Language.rst).Structure A]
+
+/-- The facts, as variables: the `R`-facts, the `S`-facts and the `T`-facts. -/
+abbrev Var (A : Type) : Type := A ⊕ (A × A) ⊕ A
+
+theorem pres_comp :
+    (fun z : Var A => fullPresWeight ((factEquiv A).symm z)) =
+      Sum.elim (aR A) (Sum.elim (fun p => aS A p.1 p.2)
+        fun y => fullPresWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A)) := by
+  funext z
+  rcases z with x | p | y <;> rfl
+
+theorem abs_comp :
+    (fun z : Var A => fullAbsWeight ((factEquiv A).symm z)) =
+      Sum.elim (cR A) (Sum.elim (fun p => cS A p.1 p.2)
+        fun y => fullAbsWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A)) := by
+  funext z
+  rcases z with x | p | y <;> rfl
+
+variable [Fintype A] [LinearOrder A]
+
+/-- What failing asks of each `S`-fact and `T`-fact, given the `R`-facts: an
+`S`-fact at an `x` whose `R`-fact is present must be absent. -/
+def okS (vR : A → Bool) : (A × A) ⊕ A → Bool → Bool
+  | Sum.inl p, b => !(vR p.1 && b)
+  | Sum.inr _, _ => true
+
+/-- “The query holds”, on a valuation of the facts. -/
+def holdsRs (v : Var A → Bool) : Bool :=
+  decide (∃ x y : A, v (.inl x) = true ∧ v (.inr (.inl (x, y))) = true)
+
+/-- **The count of the weighted worlds of the query**, as a weighted count
+over the valuations of the facts. -/
+theorem weightedWorlds_rs_eq_weightedCount (hlin : IsLinOrd (WLe Language.rst A)) :
+    WeightedWorlds rs A =
+      weightedCount (fun z : Var A => fullPresWeight ((factEquiv A).symm z))
+        (fun z => fullAbsWeight ((factEquiv A).symm z)) holdsRs := by
+  have : Finite A := Finite.of_fintype A
+  let : DecidableEq (Fact Language.rst A) := Classical.decEq _
+  rw [weightedWorlds_eq_weightedCount_facts hlin,
+    weightedCount_equiv _ _ (factEquiv A).symm]
+  refine congrArg _ (funext fun v => ?_)
+  rw [holdsRs]
+  refine decide_eq_decide.mpr ((realize_rs _).trans ?_)
+  have hR : ∀ x : A, (factEquiv A).symm.symm (⟨⟨1, rstR⟩, ![x]⟩ : Fact Language.rst A) =
+      .inl x := fun x => rfl
+  have hS : ∀ x y : A, (factEquiv A).symm.symm (⟨⟨2, rstS⟩, ![x, y]⟩ : Fact Language.rst A) =
+      .inr (.inl (x, y)) := fun x y => rfl
+  simp only [factWorld, hR, hS]
+
+/-- **Failing is a product**: the weight of the worlds in which the query
+fails is the product, over `x`, of the weight of failing at `x`, times the
+total weight of the `T`-facts. -/
+theorem weightedCount_fail :
+    weightedCount (fun z : Var A => fullPresWeight ((factEquiv A).symm z))
+        (fun z => fullAbsWeight ((factEquiv A).symm z)) (fun v => !holdsRs v) =
+      (∏ y, tT A y) * ∏ x, failW A x := by
+  rw [pres_comp, abs_comp, weightedCount_sum_type]
+  -- given the `R`-facts, the event constrains each other fact separately
+  have hev : ∀ vR : A → Bool, (fun vST : (A × A) ⊕ A → Bool => !holdsRs (Sum.elim vR vST)) =
+      fun vST => decide (∀ z, okS vR z (vST z) = true) := by
+    intro vR
+    funext vST
+    rw [holdsRs, ← decide_not]
+    refine decide_eq_decide.mpr ⟨fun h z => ?_, fun h ⟨x, y, hx, hy⟩ => ?_⟩
+    · rcases z with ⟨x, y⟩ | y
+      · cases hx : vR x
+        · simp [okS, hx]
+        · cases hy : vST (Sum.inl (x, y))
+          · simp [okS]
+          · exact absurd ⟨x, y, hx, hy⟩ h
+      · rfl
+    · have hx' : vR x = true := hx
+      have hy' : vST (Sum.inl (x, y)) = true := hy
+      have := h (Sum.inl (x, y))
+      simp [okS, hx', hy'] at this
+  have hinner : ∀ vR : A → Bool,
+      weightedCount (Sum.elim (fun p : A × A => aS A p.1 p.2)
+          fun y => fullPresWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A))
+        (Sum.elim (fun p : A × A => cS A p.1 p.2)
+          fun y => fullAbsWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A))
+        (fun vST => !holdsRs (Sum.elim vR vST)) =
+      (∏ x, ∏ y, if vR x then cS A x y else aS A x y + cS A x y) * ∏ y, tT A y := by
+    intro vR
+    rw [hev vR]
+    have hfa := weightedCount_forall
+      (Sum.elim (fun p : A × A => aS A p.1 p.2)
+        fun y => fullPresWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A))
+      (Sum.elim (fun p : A × A => cS A p.1 p.2)
+        fun y => fullAbsWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A))
+      (okS vR)
+    refine hfa.trans ?_
+    rw [Fintype.prod_sum_type, Fintype.prod_prod_type]
+    refine congrArg₂ (· * ·) (Finset.prod_congr rfl fun x _ => Finset.prod_congr rfl fun y _ => ?_)
+      (Finset.prod_congr rfl fun y _ => ?_)
+    · cases hx : vR x <;> simp [okS, hx]
+    · simp [okS, tT]
+  -- summing over the `R`-facts factorizes too
+  have hsum := weightedCount_true (fun x : A => aR A x * ∏ y, cS A x y)
+    (fun x : A => cR A x * ∏ y, (aS A x y + cS A x y))
+  simp only [weightedCount, valWeight, ite_true] at hsum
+  rw [Finset.sum_congr rfl fun vR _ => congrArg (valWeight (aR A) (cR A) vR * ·) (hinner vR)]
+  have hterm : ∀ vR : A → Bool, valWeight (aR A) (cR A) vR *
+      ((∏ x, ∏ y, if vR x then cS A x y else aS A x y + cS A x y) * ∏ y, tT A y) =
+      (∏ y, tT A y) * ∏ x, (if vR x then aR A x * ∏ y, cS A x y
+        else cR A x * ∏ y, (aS A x y + cS A x y)) := by
+    intro vR
+    rw [valWeight, ← mul_assoc, ← Finset.prod_mul_distrib, mul_comm]
+    refine congrArg _ (Finset.prod_congr rfl fun x _ => ?_)
+    cases vR x <;> simp
+  rw [Finset.sum_congr rfl fun vR _ => hterm vR, ← Finset.mul_sum, hsum]
+  rfl
+
+/-! ## Step 13: succeeding, without a subtraction -/
+
+/-- Failing or succeeding at `x` is the total weight of the facts about
+`x`: the first success identity, over `y`. -/
+theorem failW_add_succW (x : A) :
+    failW A x + succW A x = (aR A x + cR A x) * ∏ y, (aS A x y + cS A x y) := by
+  have h := prod_add_eq_prod_add_sum (fun y => cS A x y) (fun y => aS A x y)
+  have h' : ∏ y, (aS A x y + cS A x y) = ∏ y, (cS A x y + aS A x y) :=
+    Finset.prod_congr rfl fun y _ => add_comm _ _
+  have h'' : ∀ y, ∏ y' ∈ Finset.univ.filter (y < ·), (aS A x y' + cS A x y') =
+      ∏ y' ∈ Finset.univ.filter (y < ·), (cS A x y' + aS A x y') := fun y =>
+    Finset.prod_congr rfl fun y' _ => add_comm _ _
+  rw [failW, succW, h', Finset.sum_congr rfl fun y _ => congrArg _ (h'' y), h]
+  ring
+
+/-- **The count of the weighted worlds of the query, in closed form**: the
+worlds in which the query holds, sorted by the first `x` at which it
+succeeds. -/
+theorem weightedWorlds_rs_eq (hlin : IsLinOrd (WLe Language.rst A)) :
+    WeightedWorlds rs A = (∏ y, tT A y) *
+      ∑ x, (∏ x' ∈ Finset.univ.filter (· < x), failW A x') * succW A x *
+        ∏ x' ∈ Finset.univ.filter (x < ·), (failW A x' + succW A x') := by
+  have htot : (∏ z : Var A, (fullPresWeight ((factEquiv A).symm z) +
+      fullAbsWeight ((factEquiv A).symm z))) =
+      (∏ y, tT A y) * ∏ x, (failW A x + succW A x) := by
+    rw [Fintype.prod_sum_type, Fintype.prod_sum_type, Fintype.prod_prod_type,
+      Finset.prod_congr rfl fun x _ => failW_add_succW x, Finset.prod_mul_distrib]
+    change (∏ x, (aR A x + cR A x)) * ((∏ x, ∏ y, (aS A x y + cS A x y)) * ∏ y, tT A y) = _
+    ring
+  have hadd := weightedCount_add_not
+    (fun z : Var A => fullPresWeight ((factEquiv A).symm z))
+    (fun z => fullAbsWeight ((factEquiv A).symm z)) holdsRs
+  rw [← weightedWorlds_rs_eq_weightedCount hlin, weightedCount_fail, htot,
+    prod_add_eq_prod_add_sum (failW A) (succW A), mul_add] at hadd
+  rw [add_comm] at hadd
+  exact Nat.add_left_cancel hadd
+
+end Count
+
+/-! ## Step 14: the term -/
+
+section Term
+
+variable {δ : Type}
+
+/-- The weight of presence of `R(x)`, as a term. -/
+noncomputable def aRT (x : δ) : QTerm (wOrd Language.rst) δ := fullPresT rstR ![x]
+
+/-- The weight of absence of `R(x)`, as a term. -/
+noncomputable def cRT (x : δ) : QTerm (wOrd Language.rst) δ := fullAbsT rstR ![x]
+
+/-- The weight of presence of `S(x, y)`, as a term. -/
+noncomputable def aST (x y : δ) : QTerm (wOrd Language.rst) δ := fullPresT rstS ![x, y]
+
+/-- The weight of absence of `S(x, y)`, as a term. -/
+noncomputable def cST (x y : δ) : QTerm (wOrd Language.rst) δ := fullAbsT rstS ![x, y]
+
+/-- The total weight of `T(y)`, as a term. -/
+noncomputable def tTT (y : δ) : QTerm (wOrd Language.rst) δ :=
+  .add (fullPresT rstT ![y]) (fullAbsT rstT ![y])
+
+/-- The weight of failing at `x`, as a term. -/
+noncomputable def failT (x : δ) : QTerm (wOrd Language.rst) δ :=
+  .add (.mul (aRT x) (QTerm.prodOver fun up y => cST (up x) y))
+    (.mul (cRT x) (QTerm.prodOver fun up y => .add (aST (up x) y) (cST (up x) y)))
+
+/-- The weight of succeeding at `x`, as a term: a sum over the first `y`. -/
+noncomputable def succT (x : δ) : QTerm (wOrd Language.rst) δ :=
+  .mul (aRT x) (QTerm.sumOver fun up y =>
+    .mul (.mul
+      (QTerm.prodOver fun up' y' =>
+        QTerm.cond (ltF (L := weightedLang Language.rst) y' (up' y))
+          (cST (up' (up x)) y') (.const 1))
+      (aST (up x) y))
+      (QTerm.prodOver fun up' y' =>
+        QTerm.cond (ltF (L := weightedLang Language.rst) (up' y) y')
+          (.add (aST (up' (up x)) y') (cST (up' (up x)) y')) (.const 1)))
+
+/-- **The term computing the weighted count of the query**: the total weight
+of the `T`-facts, times the sum, over the first `x` at which the query
+succeeds, of the weight of failing before, succeeding at `x`, and doing
+anything after; all of it `0` unless the positions are linearly ordered. -/
+noncomputable def rsT : QTerm (wOrd Language.rst) Empty :=
+  .mul linGuardT (.mul (QTerm.prodOver fun _ y => tTT y)
+    (QTerm.sumOver fun _ x =>
+      .mul (.mul
+        (QTerm.prodOver fun up x' =>
+          QTerm.cond (ltF (L := weightedLang Language.rst) x' (up x)) (failT x') (.const 1))
+        (succT x))
+        (QTerm.prodOver fun up x' =>
+          QTerm.cond (ltF (L := weightedLang Language.rst) (up x) x')
+            (.add (failT x') (succT x')) (.const 1))))
+
+theorem comp_vec1 {A : Type} (v : δ → A) (x : δ) : (fun m => v (![x] m)) = ![v x] :=
+  funext fun m => by fin_cases m; rfl
+
+theorem comp_vec2 {A : Type} (v : δ → A) (x y : δ) :
+    (fun m => v (![x, y] m)) = ![v x, v y] :=
+  funext fun m => by fin_cases m <;> rfl
+
+variable {A : Type} [(weightedLang Language.rst).Structure A] [LinearOrder A]
+
+section Leaves
+
+variable [Finite A]
+
+theorem eval_aRT (x : δ) (v : δ → A) : (aRT x).eval v = aR A (v x) := by
+  rw [aRT, eval_fullPresT, comp_vec1, aR]
+
+theorem eval_cRT (x : δ) (v : δ → A) : (cRT x).eval v = cR A (v x) := by
+  rw [cRT, eval_fullAbsT, comp_vec1, cR]
+
+theorem eval_aST (x y : δ) (v : δ → A) : (aST x y).eval v = aS A (v x) (v y) := by
+  rw [aST, eval_fullPresT, comp_vec2, aS]
+
+theorem eval_cST (x y : δ) (v : δ → A) : (cST x y).eval v = cS A (v x) (v y) := by
+  rw [cST, eval_fullAbsT, comp_vec2, cS]
+
+theorem eval_tTT (y : δ) (v : δ → A) : (tTT y).eval v = tT A (v y) := by
+  rw [tTT, QTerm.eval_add, eval_fullPresT, eval_fullAbsT, comp_vec1, tT]
+
+end Leaves
+
+variable [Fintype A]
+
+theorem eval_failT (x : δ) (v : δ → A) : (failT x).eval v = failW A (v x) := by
+  rw [failT, QTerm.eval_add, QTerm.eval_mul, QTerm.eval_mul, QTerm.eval_prodOver,
+    QTerm.eval_prodOver, eval_aRT, eval_cRT, finprod_eq_prod_of_fintype,
+    finprod_eq_prod_of_fintype, failW]
+  refine congrArg₂ (· + ·) (congrArg _ (Finset.prod_congr rfl fun y _ => ?_))
+    (congrArg _ (Finset.prod_congr rfl fun y _ => ?_))
+  · exact eval_cST _ _ _
+  · rw [QTerm.eval_add, eval_aST, eval_cST]
+    rfl
+
+open Classical in
+theorem eval_succT (x : δ) (v : δ → A) : (succT x).eval v = succW A (v x) := by
+  rw [succT, QTerm.eval_mul, eval_aRT, QTerm.eval_sumOver, finsum_eq_sum_of_fintype, succW]
+  refine congrArg _ (Finset.sum_congr rfl fun y _ => ?_)
+  rw [QTerm.eval_mul, QTerm.eval_mul, QTerm.eval_prodOver, QTerm.eval_prodOver, eval_aST,
+    finprod_eq_prod_of_fintype, finprod_eq_prod_of_fintype, Finset.prod_filter,
+    Finset.prod_filter]
+  refine congrArg₂ (· * ·) (congrArg₂ (· * ·) (Finset.prod_congr rfl fun y' _ => ?_) rfl)
+    (Finset.prod_congr rfl fun y' _ => ?_)
+  · rw [QTerm.eval_cond, eval_cST]
+    exact if_congr (realize_ltF _ _) rfl rfl
+  · rw [QTerm.eval_cond, QTerm.eval_add, eval_aST, eval_cST]
+    exact if_congr (realize_ltF _ _) rfl rfl
+
+omit [Fintype A] in
+open Classical in
+/-- **The term computes the weighted count of the query.** -/
+theorem rsT_value [Finite A] : WeightedWorlds rs A = rsT.value A := by
+  let := Fintype.ofFinite A
+  rw [QTerm.value, rsT, QTerm.eval_mul, eval_linGuardT]
+  by_cases hlin : IsLinOrd (WLe Language.rst A)
+  · rw [ite_eq_left hlin, one_mul, weightedWorlds_rs_eq hlin, QTerm.eval_mul, QTerm.eval_prodOver,
+      QTerm.eval_sumOver, finprod_eq_prod_of_fintype, finsum_eq_sum_of_fintype]
+    refine congrArg₂ (· * ·) (Finset.prod_congr rfl fun y _ =>
+        (eval_tTT (A := A) (Sum.inr 0) (Sum.elim default fun _ => y)).symm)
+      (Finset.sum_congr rfl fun x _ => ?_)
+    rw [QTerm.eval_mul, QTerm.eval_mul, QTerm.eval_prodOver, QTerm.eval_prodOver, eval_succT,
+      finprod_eq_prod_of_fintype, finprod_eq_prod_of_fintype, Finset.prod_filter,
+      Finset.prod_filter]
+    refine congrArg₂ (· * ·) (congrArg₂ (· * ·) (Finset.prod_congr rfl fun x' _ => ?_) rfl)
+      (Finset.prod_congr rfl fun x' _ => ?_)
+    · rw [QTerm.eval_cond, eval_failT]
+      exact if_congr (realize_ltF (L := weightedLang Language.rst)
+        (v := Sum.elim (Sum.elim (default : Empty → A) fun _ => x) fun _ => x') (Sum.inr 0)
+        (Sum.inl (Sum.inr 0))).symm rfl rfl
+    · rw [QTerm.eval_cond, QTerm.eval_add, eval_failT, eval_succT]
+      exact if_congr (realize_ltF (L := weightedLang Language.rst)
+        (v := Sum.elim (Sum.elim (default : Empty → A) fun _ => x) fun _ => x')
+        (Sum.inl (Sum.inr 0)) (Sum.inr 0)).symm rfl rfl
+  · rw [ite_eq_right hlin, zero_mul]
+    exact weightedWorlds_of_not_isLinOrd rs A hlin
+
+end Term
+
+end SafeQ
+
+/-! ## Step 15: the theorem -/
+
+/-- **The weighted count of `∃ x y, R(x) ∧ S(x, y)` is in FP**: the numerator
+of the probability of this query over a probabilistic database is computed in
+polynomial time, where that of `∃ x y, R(x) ∧ S(x, y) ∧ T(y)` is `#P`-hard
+(`DescriptiveComplexity.weightedWorlds_h0_sharpP_oneCallComplete`). -/
+theorem weightedWorlds_rs_mem_FP : WeightedWorlds rs ∈ FP :=
+  fpDefinable_of_qfo SafeQ.rsT fun _ _ _ _ _ => SafeQ.rsT_value
 
 end DescriptiveComplexity

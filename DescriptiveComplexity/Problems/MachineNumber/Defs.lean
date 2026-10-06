@@ -18,10 +18,9 @@ The function counterpart of deterministic machine acceptance
 the problem is to compute the number it leaves on its tape.
 
 * The vocabulary is the one of machine instances
-  (`FirstOrder.Language.turing`) with three more symbols
-  (`FirstOrder.Language.tapeOut`): `out` marks the **output cells**, `one`
-  marks the symbols read as the digit `1`, and `below` compares the output
-  cells by significance.
+  (`FirstOrder.Language.turing`) with two more symbols
+  (`FirstOrder.Language.tapeOut`): `out` marks the **output cells** and `one`
+  marks the symbols read as the digit `1`.
 * The machine **halts** (`DescriptiveComplexity.TMData.Halts`) in a
   configuration reached from the initial one within the clock – fewer steps
   than there are positions, as for acceptance – from which no step is
@@ -29,13 +28,11 @@ the problem is to compute the number it leaves on its tape.
   (`DescriptiveComplexity.TMData.halts_unique`).
 * `DescriptiveComplexity.machineNumber`: an output cell holding, when the
   machine halts in an accepting state, a symbol marked `one` contributes
-  `2 ^ r`, where `r` is the number of output cells strictly below it. A machine
-  that does not halt within its clock, or halts without accepting, writes `0`,
-  and so does an instance that is not a well-formed deterministic machine.
-
-The order of significance is a relation of the instance and not the order of
-the tape. For a machine whose output cells are meant in tape order the two
-coincide, and `below` is then the order of the positions.
+  `2 ^ r`, where `r` is the number of output cells strictly before it on the
+  tape: the digits are read **in tape order**, the lowest cell holding the
+  least significant one. A machine that does not halt within its clock, or
+  halts without accepting, writes `0`, and so does an instance that is not a
+  well-formed deterministic machine.
 -/
 
 namespace FirstOrder
@@ -48,9 +45,6 @@ fo_language tapeOut with tp where
   out : 1
   /-- `one a`: the symbol `a` is read as the digit `1`. -/
   one : 1
-  /-- `below q p`: the digit of the cell `q` is at most as significant as the
-  one of the cell `p`. -/
-  below : 2
 
 /-- The relational language of machines writing a number. -/
 abbrev turingOut : Language.{0, 0} := Language.turing.sum Language.tapeOut
@@ -157,9 +151,8 @@ abbrev mnOut : Language.turingOut.Relations 1 := Sum.inr tpOut
 number. -/
 abbrev mnOne : Language.turingOut.Relations 1 := Sum.inr tpOne
 
-/-- The comparison of the output cells, in the vocabulary of machines writing
-a number. -/
-abbrev mnBelow : Language.turingOut.Relations 2 := Sum.inr tpBelow
+/-- The order of the tape, in the vocabulary of machines writing a number. -/
+abbrev mnLe : Language.turingOut.Relations 2 := Sum.inl tmLe
 
 /-- A machine writing a number is a machine. -/
 instance turingOutStructure (A : Type) [Language.turingOut.Structure A] :
@@ -176,12 +169,12 @@ def OutDigit (p : A) : Prop :=
   RelMap mnOut ![p] ∧ ∃ c : Config A, (tmData A).Halts c ∧ (tmData A).Acc c.state ∧
     RelMap mnOne ![c.tape p]
 
-/-- `q` is an output cell strictly below `p`. -/
+/-- `q` is an output cell strictly before `p` on the tape. -/
 def LowerCell (p q : A) : Prop :=
-  RelMap mnOut ![q] ∧ q ≠ p ∧ RelMap mnBelow ![q, p]
+  RelMap mnOut ![q] ∧ q ≠ p ∧ RelMap mnLe ![q, p]
 
 /-- The rank of a cell among the output cells: the number of output cells
-strictly below it. -/
+strictly before it on the tape. -/
 noncomputable def cellRank (p : A) : ℕ :=
   Nat.card {q : A // LowerCell p q}
 
@@ -223,7 +216,7 @@ theorem outDigit_equiv (e : A ≃[Language.turingOut] B) (p : A) : OutDigit (e p
 theorem lowerCell_equiv (e : A ≃[Language.turingOut] B) (p q : A) :
     LowerCell (e p) (e q) ↔ LowerCell p q :=
   and_congr (relMap_equiv₁ e mnOut q).symm
-    (and_congr e.toEquiv.injective.ne_iff (relMap_equiv₂ e mnBelow q p).symm)
+    (and_congr e.toEquiv.injective.ne_iff (relMap_equiv₂ e mnLe q p).symm)
 
 theorem cellRank_equiv (e : A ≃[Language.turingOut] B) (p : A) :
     cellRank (e p) = cellRank p :=

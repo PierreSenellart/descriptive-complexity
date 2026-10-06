@@ -22,8 +22,10 @@ which of them unit propagation forces to be true
   two more symbols (`FirstOrder.Language.digitOrder`): `out` marks the output
   variables and `below` compares them.
 * `DescriptiveComplexity.hornNumber`: a forced output variable contributes
-  `2 ^ r`, where `r` is the number of output variables strictly below it. An
-  instance that is not a satisfiable Horn formula writes `0`.
+  `2 ^ r`, where `r` is the number of output variables strictly below it, when
+  `below` linearly orders the output variables
+  (`DescriptiveComplexity.VarOrder`). An instance that is not a satisfiable
+  Horn formula, or whose `below` is not such an order, writes `0`.
 
 This is the problem through which the number written by a machine
 (`DescriptiveComplexity.DTMNumber`) is shown hard for FP: the least fixed
@@ -119,12 +121,26 @@ noncomputable def varRank (x : A) : ℕ :=
   Nat.card {y : A // LowerVar x y}
 
 variable (A) in
+/-- **The comparison of the outputs is a linear order on them**: reflexive,
+transitive, antisymmetric and total among the output variables. -/
+def VarOrder : Prop :=
+  (∀ p : A, RelMap hnOut ![p] → RelMap hnBelow ![p, p]) ∧
+    (∀ p q r : A, RelMap hnOut ![p] → RelMap hnOut ![q] → RelMap hnOut ![r] →
+      RelMap hnBelow ![p, q] → RelMap hnBelow ![q, r] → RelMap hnBelow ![p, r]) ∧
+    (∀ p q : A, RelMap hnOut ![p] → RelMap hnOut ![q] →
+      RelMap hnBelow ![p, q] → RelMap hnBelow ![q, p] → p = q) ∧
+    ∀ p q : A, RelMap hnOut ![p] → RelMap hnOut ![q] →
+      RelMap hnBelow ![p, q] ∨ RelMap hnBelow ![q, p]
+
+variable (A) in
 open Classical in
 /-- **The number written by unit propagation**: each forced output variable
 contributes two to the power of its rank among the outputs. Instances that are
-not satisfiable Horn formulas write `0`. -/
+not satisfiable Horn formulas, or whose outputs are not linearly ordered,
+write `0`. -/
 noncomputable def hornNumber : ℕ :=
-  if HornSatisfiable A then ∑ᶠ x : A, if ForcedDigit x then 2 ^ varRank x else 0 else 0
+  if HornSatisfiable A ∧ VarOrder A then ∑ᶠ x : A, if ForcedDigit x then 2 ^ varRank x else 0
+  else 0
 
 end Semantics
 
@@ -144,6 +160,36 @@ theorem lowerVar_equiv (e : A ≃[Language.satOut] B) (x y : A) :
 theorem varRank_equiv (e : A ≃[Language.satOut] B) (x : A) : varRank (e x) = varRank x :=
   (Nat.card_congr (e.toEquiv.subtypeEquiv fun y => (lowerVar_equiv e x y).symm)).symm
 
+theorem varOrder_equiv (e : A ≃[Language.satOut] B) : VarOrder A ↔ VarOrder B := by
+  have h1 : ∀ p, (RelMap hnOut ![e p] : Prop) ↔ RelMap hnOut ![p] :=
+    fun p => (relMap_equiv₁ e hnOut p).symm
+  have h2 : ∀ p q, (RelMap hnBelow ![e p, e q] : Prop) ↔ RelMap hnBelow ![p, q] :=
+    fun p q => (relMap_equiv₂ e hnBelow p q).symm
+  constructor
+  · rintro ⟨hr, ht, ha, hl⟩
+    refine ⟨fun p hp => ?_, fun p q r hp hq hr' hpq hqr => ?_, fun p q hp hq hpq hqp => ?_,
+      fun p q hp hq => ?_⟩
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      exact (h2 p p).mpr (hr p ((h1 p).mp hp))
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      obtain ⟨q, rfl⟩ := e.toEquiv.surjective q
+      obtain ⟨r, rfl⟩ := e.toEquiv.surjective r
+      exact (h2 p r).mpr (ht p q r ((h1 p).mp hp) ((h1 q).mp hq) ((h1 r).mp hr')
+        ((h2 p q).mp hpq) ((h2 q r).mp hqr))
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      obtain ⟨q, rfl⟩ := e.toEquiv.surjective q
+      exact congrArg e (ha p q ((h1 p).mp hp) ((h1 q).mp hq) ((h2 p q).mp hpq) ((h2 q p).mp hqp))
+    · obtain ⟨p, rfl⟩ := e.toEquiv.surjective p
+      obtain ⟨q, rfl⟩ := e.toEquiv.surjective q
+      exact (hl p q ((h1 p).mp hp) ((h1 q).mp hq)).imp (h2 p q).mpr (h2 q p).mpr
+  · rintro ⟨hr, ht, ha, hl⟩
+    exact ⟨fun p hp => (h2 p p).mp (hr _ ((h1 p).mpr hp)),
+      fun p q r hp hq hr' hpq hqr => (h2 p r).mp (ht _ _ _ ((h1 p).mpr hp) ((h1 q).mpr hq)
+        ((h1 r).mpr hr') ((h2 p q).mpr hpq) ((h2 q r).mpr hqr)),
+      fun p q hp hq hpq hqp => e.toEquiv.injective
+        (ha _ _ ((h1 p).mpr hp) ((h1 q).mpr hq) ((h2 p q).mpr hpq) ((h2 q p).mpr hqp)),
+      fun p q hp hq => (hl _ _ ((h1 p).mpr hp) ((h1 q).mpr hq)).imp (h2 p q).mp (h2 q p).mp⟩
+
 /-- The number written is isomorphism-invariant. -/
 theorem hornNumber_iso (e : A ≃[Language.satOut] B) : hornNumber A = hornNumber B := by
   classical
@@ -154,7 +200,7 @@ theorem hornNumber_iso (e : A ≃[Language.satOut] B) : hornNumber A = hornNumbe
     change _ = if ForcedDigit (e x) then 2 ^ varRank (e x) else 0
     rw [varRank_equiv e x, if_congr (forcedDigit_equiv e x) rfl rfl]
   rw [hornNumber, hornNumber, hsum]
-  exact if_congr (hornSatisfiable_iso (reductSumInlEquiv e)) rfl rfl
+  exact if_congr (and_congr (hornSatisfiable_iso (reductSumInlEquiv e)) (varOrder_equiv e)) rfl rfl
 
 end Iso
 

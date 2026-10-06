@@ -9,6 +9,7 @@ import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Ordered
 import DescriptiveComplexity.Composition
 import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedReorder
 import DescriptiveComplexity.Complexity
 import DescriptiveComplexity.Encoding
 import DescriptiveComplexity.Encoding.BinarySubsetSum
@@ -100,6 +101,10 @@ import DescriptiveComplexity.Counting.Digits.ProdSweep
 import DescriptiveComplexity.Counting.Digits.Bounds
 import DescriptiveComplexity.Counting.Digits.Term
 import DescriptiveComplexity.Counting.Digits.NormalForm
+import DescriptiveComplexity.Counting.Independence
+import DescriptiveComplexity.Counting.WeightedFacts
+import DescriptiveComplexity.Counting.QuantitativeBinders
+import DescriptiveComplexity.Counting.WeightedTerms
 import DescriptiveComplexity.Problems.HornSat.Number
 import DescriptiveComplexity.Problems.HornSat.NumberHardness
 import DescriptiveComplexity.Problems.MachineNumber
@@ -242,7 +247,7 @@ evaluation and containment) and `DescriptiveComplexity.Examples.GraphCrawling`
 (Web data acquisition, with a cardinality threshold, a reachability
 certificate and an ordered reduction) are the hands-on tutorials, with
 `DescriptiveComplexity.Examples.ProbabilisticQueries` (query evaluation over
-probabilistic databases) for the counting side;
+probabilistic databases, a hard query and an easy one) for the counting side;
 individual declarations are documented on their own pages.
 
 ## The framework: problems, interpretations, reductions
@@ -269,6 +274,11 @@ individual declarations are documented on their own pages.
   (notation `P ≤ᶠᵒ[≤] Q`): order-invariant FO(≤) reductions, correct on every
   finite linearly ordered input. This is the standard notion of the field and
   the home of gadget constructions that genuinely need an order.
+  `DescriptiveComplexity.OrderedReorder` lets such a reduction replace the
+  order of its input by any linear order it can define
+  (`DescriptiveComplexity.FOInterpretation.reorder`), which is how a problem
+  reading its output in the order of the universe is reached from one that
+  carries the order of significance as a relation.
 * Logarithmic-space and polynomial-time reductions are *stronger* notions, and
   need a logic capturing those classes to state: they appear below, as
   `DescriptiveComplexity.TCReduction` (notation `P ≤ᵗᶜ Q`) and
@@ -2431,7 +2441,11 @@ pulled relations hold only of points of the domain
   problem by drawing the rules as a monotone circuit, one disjunction gate per
   atom and one conjunction chain per rule instance, with no stratification by
   stages (`DescriptiveComplexity.DigitDefinable.nonempty_orderedParsimonious`).
-  And every problem of FP is digit-definable, the next item. The statement was
+  And every problem of FP is digit-definable, the next item. The problem
+  ignores isolated elements
+  (`DescriptiveComplexity.circuitNumber_of_embedding`), which closes FP under
+  relativized parsimonious reductions too
+  (`DescriptiveComplexity.mem_FP_of_relOrderedParsimonious`). The statement was
   not found in the literature; under polynomial-time reductions it would be
   empty, every function of FP being complete.
 * **The normal form of FP** (`DescriptiveComplexity.Counting.Digits.NormalForm`
@@ -2461,10 +2475,12 @@ pulled relations hold only of points of the domain
   `DescriptiveComplexity.Problems.HornSat.Number`): the function counterparts
   of deterministic machine acceptance and of HORN-SAT.
   `DescriptiveComplexity.DTMNumber` is the number a deterministic machine,
-  carried by the instance, leaves on its marked output cells when it halts and
-  accepts within its clock; `DescriptiveComplexity.HornNumber` is the number
-  whose digits say which marked variables of a Horn formula unit propagation
-  forces. Both are complete for FP under parsimonious reductions
+  carried by the instance, leaves on its marked output cells, read in tape
+  order, when it halts and accepts within its clock;
+  `DescriptiveComplexity.HornNumber` is the number whose digits say which
+  marked variables of a Horn formula unit propagation forces, the variables
+  compared by a relation of the instance. Both are complete for FP under
+  parsimonious reductions
   (`DescriptiveComplexity.dtmNumber_FP_parsimoniousComplete`,
   `DescriptiveComplexity.hornNumber_FP_parsimoniousComplete`), and a function is
   in FP exactly when it reduces to the first
@@ -2476,10 +2492,12 @@ pulled relations hold only of points of the domain
   rules is the least model of a Horn formula
   (`DescriptiveComplexity.HornNum.forced_var_iff`) – and the unit-propagation
   machine of the PTIME bridge, which accepts with that model on its tape
-  (`DescriptiveComplexity.hornMachine_final`). The order of significance of the
-  output cells is a relation of the instance, not the order of the tape: a
-  composition of two interpretations does not control how the second lays out
-  the tags of the first.
+  (`DescriptiveComplexity.hornMachine_final`). The last step reads the digits
+  in tape order while the Horn formula compares its output variables by a
+  relation: the reduction first reorders its input so that the output
+  variables come first, in that order
+  (`DescriptiveComplexity.FOInterpretation.reorder`), and the machine lays its
+  cells out accordingly.
 * **Possible worlds** (`DescriptiveComplexity.Counting.PossibleWorlds`): for a
   finite relational schema, an instance holds certain facts and uncertain ones,
   a possible world keeps the first and some of the second, and
@@ -2492,6 +2510,18 @@ pulled relations hold only of points of the domain
   it is one-call `#P`-complete
   (`DescriptiveComplexity.possibleWorlds_h0_sharpP_oneCallComplete`, in the
   tutorial `DescriptiveComplexity.Examples.ProbabilisticQueries`).
+* **A safe query** (`DescriptiveComplexity.Examples.ProbabilisticQueries`,
+  steps 10 to 15): on the same
+  weighted instances, the count of the weighted worlds of `R(x), S(x, y)` is in
+  FP (`DescriptiveComplexity.weightedWorlds_rs_mem_FP`), by a term of
+  quantitative first-order logic with no fixed point. The library helpers
+  behind it are generic: every fact as a Boolean variable with two weights
+  (`DescriptiveComplexity.weightedWorlds_eq_weightedCount_facts`), weighted
+  counts of independent events and the first-success identity that removes a
+  subtraction (`DescriptiveComplexity.weightedCount_forall`,
+  `DescriptiveComplexity.prod_add_eq_prod_add_sum`), named binders for terms
+  (`DescriptiveComplexity.QTerm.sumOver`), and the weights of an instance as
+  terms (`DescriptiveComplexity.fullPresT`).
 * **Probabilities as weighted counts**
   (`DescriptiveComplexity.Counting.Probability`): finitely many independent
   Boolean variables with rational probabilities, the distribution on

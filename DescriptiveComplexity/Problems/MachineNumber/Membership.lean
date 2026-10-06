@@ -23,7 +23,8 @@ import DescriptiveComplexity.Problems.CircuitNumber.Membership
   a definition in QFO(LFP) is free to use.
 * The output is the term
   `Σp. [p is an output cell holding a one at the halting time] · Πq. ([q is an
-  output cell below p] + 1)`, as for the number written by a circuit.
+  output cell before p on the tape] + 1)`, as for the number written by a
+  circuit.
 -/
 
 namespace DescriptiveComplexity
@@ -110,9 +111,9 @@ noncomputable def outA (x : γ) : outLang.Formula γ :=
 noncomputable def oneA (x : γ) : outLang.Formula γ :=
   Relations.formula₁ (Sum.inl (Sum.inl mnOne) : outLang.Relations 1) (Term.var x)
 
-/-- The comparison of the output cells. -/
-noncomputable def belowA (x y : γ) : outLang.Formula γ :=
-  Relations.formula₂ (Sum.inl (Sum.inl mnBelow) : outLang.Relations 2) (Term.var x) (Term.var y)
+/-- The order of the tape. -/
+noncomputable def leA (x y : γ) : outLang.Formula γ :=
+  Relations.formula₂ (Sum.inl (Sum.inl mnLe) : outLang.Relations 2) (Term.var x) (Term.var y)
 
 /-- The state of the run at a time. -/
 noncomputable def qA (t q : γ) : outLang.Formula γ :=
@@ -148,10 +149,10 @@ noncomputable def digitF : outLang.Formula (Empty ⊕ Fin 1) :=
         ∼(coreF (Sum.inr 1) (Sum.inr 2) (Sum.inr 3))) ⊓ accA (Sum.inr 1)) ⊓
         tA (Sum.inr 0) (Sum.inl (Sum.inr 0)) (Sum.inr 4)) ⊓ oneA (Sum.inr 4))
 
-/-- “`q` is an output cell strictly below `p`”. -/
+/-- “`q` is an output cell strictly before `p`”. -/
 noncomputable def lowF : outLang.Formula ((Empty ⊕ Fin 1) ⊕ Fin 1) :=
   (outA (Sum.inr 0) ⊓ ∼(Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inl (Sum.inr 0))))) ⊓
-    belowA (Sum.inr 0) (Sum.inl (Sum.inr 0))
+    leA (Sum.inr 0) (Sum.inl (Sum.inr 0))
 
 end Formulas
 
@@ -226,8 +227,8 @@ theorem realize_oneA (x : γ) :
   exact Formula.realize_rel₁
 
 omit [Finite A] [Nonempty A] in
-theorem realize_belowA (x y : γ) :
-    (@Formula.Realize _ A (outStr A) _ (belowA x y) v) ↔ RelMap mnBelow ![v x, v y] := by
+theorem realize_leA (x y : γ) :
+    (@Formula.Realize _ A (outStr A) _ (leA x y) v) ↔ RelMap mnLe ![v x, v y] := by
   let := outStr A
   exact Formula.realize_rel₂
 
@@ -303,7 +304,7 @@ theorem realize_lowF (w u : Fin 1 → A) :
       LowerCell (w 0) (u 0) := by
   have h1 := realize_outA (Sum.elim (Sum.elim default w) u : (Empty ⊕ Fin 1) ⊕ Fin 1 → A)
     (Sum.inr 0)
-  have h2 := realize_belowA (Sum.elim (Sum.elim default w) u : (Empty ⊕ Fin 1) ⊕ Fin 1 → A)
+  have h2 := realize_leA (Sum.elim (Sum.elim default w) u : (Empty ⊕ Fin 1) ⊕ Fin 1 → A)
     (Sum.inr 0) (Sum.inl (Sum.inr 0))
   let := outStr A
   exact (Formula.realize_inf.trans (and_congr (Formula.realize_inf.trans (and_congr h1
