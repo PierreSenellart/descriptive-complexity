@@ -83,7 +83,9 @@ theorem hornSat_PTIME_hard : PTIME.Hard HORNSAT :=
 `DescriptiveComplexity.hornSat_mem_PTIME` – the Horn program that computes unit
 propagation, assembling the unbounded body of an input clause along the order;
 hardness is `DescriptiveComplexity.hornSat_PTIME_hard`, the Horn discharge. This is the
-P-level analogue of the Cook–Levin theorem, and like it it is machine-free. -/
+P-level analogue of the Cook–Levin theorem, and like it it is machine-free.
+Registered in the Lax archive as
+[`Lax535992.HornSatPTIMEComplete.hornSat_PTIME_complete`](https://laxarchive.org/lax-535992/Lax535992.HornSatPTIMEComplete.html#s-Lax535992.HornSatPTIMEComplete.hornSat_PTIME_complete). -/
 theorem HORNSAT_PTIME_complete : PTIME.Complete HORNSAT :=
   ⟨hornSat_mem_PTIME, hornSat_PTIME_hard⟩
 
@@ -91,7 +93,9 @@ theorem HORNSAT_PTIME_complete : PTIME.Complete HORNSAT :=
 reduces to HORN-SAT, which is in NP. This is the level-0 case of
 `DescriptiveComplexity.sigmaP_subset_sigmaP_succ`; it lives here rather than with the
 hierarchy because it goes through the Horn discharge, needing no separate
-compilation of a Horn program into an existential second-order sentence. -/
+compilation of a Horn program into an existential second-order sentence.
+Registered in the Lax archive as
+[`Lax535992.PTIMESubsetNP.PTIME_subset_NP`](https://laxarchive.org/lax-535992/Lax535992.PTIMESubsetNP.html#s-Lax535992.PTIMESubsetNP.PTIME_subset_NP). -/
 theorem PTIME_subset_NP : PTIME ⊆ NP := by
   intro L _ P hP
   obtain ⟨f⟩ := hornSat_hard_of_sigmaSOHornDefinable P hP

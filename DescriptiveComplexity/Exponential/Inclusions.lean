@@ -50,7 +50,9 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 /-! ### The two polynomial-level complement facts, in the form used here -/
 
 /-- Polynomial time is closed under complement
-(`DescriptiveComplexity.piP_zero_eq`, restated as an equality of classes). -/
+(`DescriptiveComplexity.piP_zero_eq`, restated as an equality of classes).
+Registered in the Lax archive as
+[`Lax535992.PTIMEEqCoPTIME.PTIME_eq_coPTIME`](https://laxarchive.org/lax-535992/Lax535992.PTIMEEqCoPTIME.html#s-Lax535992.PTIMEEqCoPTIME.PTIME_eq_coPTIME). -/
 theorem PTIME_compl_eq : PTIME.compl = PTIME := piP_zero_eq
 
 /-- Polynomial space is closed under complement
