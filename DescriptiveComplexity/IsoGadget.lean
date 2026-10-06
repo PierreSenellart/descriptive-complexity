@@ -126,7 +126,9 @@ theorem RelIsoOn.equiv_iff (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B →
 /-- **The property is isomorphism of the two marked graphs**: a map of the
 universe as in `DescriptiveComplexity.RelIsoOn` is the same thing as an
 equivalence of the marked subsets carrying one adjacency relation to the
-other. -/
+other.
+Registered in the Lax archive as
+[`Lax604544.RelationIsomorphismSemantics.relIsoOn_iff_equiv`](https://laxarchive.org/lax-604544/Lax604544.RelationIsomorphismSemantics.html#s-Lax604544.RelationIsomorphismSemantics.relIsoOn_iff_equiv). -/
 theorem relIsoOn_iff_equiv (PV HV : A → Prop) (PE HE : A → A → Prop) :
     RelIsoOn PV HV PE HE ↔
       ∃ e : {x : A // PV x} ≃ {y : A // HV y},

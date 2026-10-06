@@ -442,7 +442,9 @@ theorem sharpSat_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpSAT :=
 /-- **#SAT is parsimoniously `#P`-complete**: the counting form
 of the Cook–Levin theorem ([Valiant 1979][valiant1979complexity]). Membership
 is `DescriptiveComplexity.sharpSat_mem_sharpP`; hardness is the generic parsimonious
-Tseitin reduction `DescriptiveComplexity.sharpTseitinReduction`. -/
+Tseitin reduction `DescriptiveComplexity.sharpTseitinReduction`.
+Registered in the Lax archive as
+[`Lax366625.SharpSatComplete.sharpSat_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-366625/Lax366625.SharpSatComplete.html#s-Lax366625.SharpSatComplete.sharpSat_sharpP_parsimoniousComplete). -/
 theorem sharpSat_sharpP_parsimoniousComplete : SharpP.ParsimoniousComplete SharpSAT :=
   ⟨sharpSat_mem_sharpP, sharpSat_sharpP_parsimoniousHard⟩
 

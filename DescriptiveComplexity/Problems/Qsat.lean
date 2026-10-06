@@ -92,7 +92,9 @@ theorem qsat_PSPACE_mem : QSAT ∈ PSPACE :=
   qsat_mem_PSPACE
 
 /-- **QSAT is PSPACE-complete** ([Stockmeyer–Meyer 1973][stockmeyer1973word]):
-the canonical complete problem for `DescriptiveComplexity.PSPACE`. -/
+the canonical complete problem for `DescriptiveComplexity.PSPACE`.
+Registered in the Lax archive as
+[`Lax134656.QsatPSPACEComplete.qsat_PSPACE_complete`](https://laxarchive.org/lax-134656/Lax134656.QsatPSPACEComplete.html#s-Lax134656.QsatPSPACEComplete.qsat_PSPACE_complete). -/
 theorem qsat_PSPACE_complete : PSPACE.Complete QSAT :=
   QSAT_PSPACE_complete
 

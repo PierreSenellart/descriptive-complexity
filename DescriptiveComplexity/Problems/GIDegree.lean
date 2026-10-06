@@ -36,7 +36,9 @@ theorem dagIso_GI_hard : GI.Hard DagIso :=
 
 /-- **DAG Isomorphism is GI-complete**: it reduces to Digraph Isomorphism by
 forgetting the carried topological orders, and Digraph Isomorphism reduces to it
-by subdividing every arc twice. -/
+by subdividing every arc twice.
+Registered in the Lax archive as
+[`Lax604544.GraphIsomorphismDegree.dagIso_GI_complete`](https://laxarchive.org/lax-604544/Lax604544.GraphIsomorphismDegree.html#s-Lax604544.GraphIsomorphismDegree.dagIso_GI_complete). -/
 theorem dagIso_GI_complete : GI.Complete DagIso :=
   ⟨dagIso_mem_GI, dagIso_GI_hard⟩
 

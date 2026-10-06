@@ -567,7 +567,9 @@ over ordered structures and order-free SO(TC) definability are the same notion.
 Left to right the order is guessed into the state
 (`DescriptiveComplexity.SOTCSpec.orderFree`) – a linear order exists on every
 finite universe, and by order-invariance any one of them will do; right to left
-a specification that never mentions the order is one that ignores it. -/
+a specification that never mentions the order is one that ignores it.
+Registered in the Lax archive as
+[`Lax134656.TransitiveClosureWithoutOrder.sotcDefinable_iff_free`](https://laxarchive.org/lax-134656/Lax134656.TransitiveClosureWithoutOrder.html#s-Lax134656.TransitiveClosureWithoutOrder.sotcDefinable_iff_free). -/
 theorem sotcDefinable_iff_free [L.IsRelational] {P : DecisionProblem L} :
     SOTCDefinable P ↔ SOTCDefinableFree P := by
   constructor
@@ -589,7 +591,9 @@ theorem sotcDefinable_iff_free [L.IsRelational] {P : DecisionProblem L} :
     exact hspec A
 
 /-- **PSPACE needs no order**: membership is definability by an order-free
-SO(TC) specification. -/
+SO(TC) specification.
+Registered in the Lax archive as
+[`Lax134656.TransitiveClosureWithoutOrder.mem_PSPACE_iff_sotcDefinableFree`](https://laxarchive.org/lax-134656/Lax134656.TransitiveClosureWithoutOrder.html#s-Lax134656.TransitiveClosureWithoutOrder.mem_PSPACE_iff_sotcDefinableFree). -/
 theorem mem_PSPACE_iff_sotcDefinableFree [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PSPACE ↔ SOTCDefinableFree P :=
   (mem_PSPACE_iff P).trans sotcDefinable_iff_free

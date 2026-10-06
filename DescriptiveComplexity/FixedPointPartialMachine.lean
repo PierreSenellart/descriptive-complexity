@@ -785,7 +785,9 @@ theorem dtmAcceptSpace_pfpDefinable : PFPDefinable DTMAcceptSpace := by
     exact acceptsSpace_of_pfpHolds_mPfp h
 
 /-- **PSPACE is contained in FO(≤, PFP)**: reduce to the machine problem and
-pull the iteration back through the relativized reduction. -/
+pull the iteration back through the relativized reduction.
+Registered in the Lax archive as
+[`Lax134656.PartialFixedPointCapture.pfpDefinable_of_mem_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointCapture.html#s-Lax134656.PartialFixedPointCapture.pfpDefinable_of_mem_PSPACE). -/
 theorem pfpDefinable_of_mem_PSPACE {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : P ∈ PSPACE) : PFPDefinable P := by
   obtain ⟨f⟩ := le_dtmAcceptSpace_of_mem_PSPACE P h
@@ -793,7 +795,9 @@ theorem pfpDefinable_of_mem_PSPACE {L : Language.{0, 0}} [L.IsRelational] {P : D
 
 /-- **The capture theorem FO(≤, PFP) = PSPACE** ([Abiteboul–Vianu
 1989][abiteboul1989fixpoint]; [Ebbinghaus–Flum 1995][ebbinghaus1995finite],
-ch. 7): a problem is FO(≤, PFP) definable exactly when it is in PSPACE. -/
+ch. 7): a problem is FO(≤, PFP) definable exactly when it is in PSPACE.
+Registered in the Lax archive as
+[`Lax134656.PartialFixedPointCapture.pfpDefinable_iff_mem_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointCapture.html#s-Lax134656.PartialFixedPointCapture.pfpDefinable_iff_mem_PSPACE). -/
 theorem pfpDefinable_iff_mem_PSPACE {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     PFPDefinable P ↔ P ∈ PSPACE :=
   ⟨mem_PSPACE_of_pfpDefinable, pfpDefinable_of_mem_PSPACE⟩

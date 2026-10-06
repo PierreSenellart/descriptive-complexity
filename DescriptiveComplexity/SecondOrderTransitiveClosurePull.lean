@@ -157,7 +157,9 @@ variable {L L' : Language.{0, 0}} [L.IsRelational] [L'.IsRelational] {P : Decisi
 
 /-- **SO(TC) definability is closed under ordered first-order reductions.** The
 walk of the specification on the interpreted structure is a walk on the base
-structure, its states the assignments of the pulled block. -/
+structure, its states the assignments of the pulled block.
+Registered in the Lax archive as
+[`Lax134656.PSPACEClosure.PSPACE_mem_of_orderedReduction`](https://laxarchive.org/lax-134656/Lax134656.PSPACEClosure.html#s-Lax134656.PSPACEClosure.PSPACE_mem_of_orderedReduction). -/
 theorem SOTCDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : SOTCDefinable Q) :
     SOTCDefinable P := by
   obtain ⟨spec, hspec⟩ := h
@@ -172,7 +174,9 @@ theorem SOTCDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : SOTCDefi
   exact (f.correct A).trans ((hspec (f.toInterpretation.Map A)).trans
     (spec.comap_accepts_iff f.toInterpretation))
 
-/-- SO(TC) definability is closed under first-order reductions. -/
+/-- SO(TC) definability is closed under first-order reductions.
+Registered in the Lax archive as
+[`Lax134656.PSPACEClosure.PSPACE_mem_of_foReduction`](https://laxarchive.org/lax-134656/Lax134656.PSPACEClosure.html#s-Lax134656.PSPACEClosure.PSPACE_mem_of_foReduction). -/
 theorem SOTCDefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : SOTCDefinable Q) :
     SOTCDefinable P :=
   h.of_orderedReduction f.toOrdered

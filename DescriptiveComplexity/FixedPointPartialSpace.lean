@@ -265,7 +265,9 @@ end ToSOTC
 /-! ### FO(≤, PFP) is contained in PSPACE -/
 
 /-- **Every FO(≤, PFP) definable problem is SO(TC) definable**: the partial
-iteration is a deterministic walk on the assignments of its own block. -/
+iteration is a deterministic walk on the assignments of its own block.
+Registered in the Lax archive as
+[`Lax134656.PartialFixedPointCapture.pfpDefinable_sotcDefinable`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointCapture.html#s-Lax134656.PartialFixedPointCapture.pfpDefinable_sotcDefinable). -/
 theorem PFPDefinable.sotcDefinable [L.IsRelational] {P : DecisionProblem L} (h : PFPDefinable P) :
     SOTCDefinable P := by
   obtain ⟨d, hd⟩ := h

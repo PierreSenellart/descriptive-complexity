@@ -74,7 +74,9 @@ theorem hornNumber_FP_parsimoniousHard : FP.ParsimoniousHard HornNumber :=
   fun _ hD => ⟨(FPDefinable.digitDefinable hD).nonempty_orderedParsimoniousHorn.some.toRel⟩
 
 /-- **The number written by unit propagation is complete for FP under
-parsimonious reductions.** -/
+parsimonious reductions.**
+Registered in the Lax archive as
+[`Lax366625.FPComplete.hornNumber_FP_parsimoniousComplete`](https://laxarchive.org/lax-366625/Lax366625.FPComplete.html#s-Lax366625.FPComplete.hornNumber_FP_parsimoniousComplete). -/
 theorem hornNumber_FP_parsimoniousComplete : FP.ParsimoniousComplete HornNumber :=
   ⟨hornNumber_mem_FP, hornNumber_FP_parsimoniousHard⟩
 
@@ -86,13 +88,17 @@ theorem dtmNumber_FP_parsimoniousHard : FP.ParsimoniousHard DTMNumber :=
 
 /-- **The number written by a deterministic machine is complete for FP under
 parsimonious reductions**: the library's FP, defined by a logic, is the
-machine one. -/
+machine one.
+Registered in the Lax archive as
+[`Lax366625.FPComplete.dtmNumber_FP_parsimoniousComplete`](https://laxarchive.org/lax-366625/Lax366625.FPComplete.html#s-Lax366625.FPComplete.dtmNumber_FP_parsimoniousComplete). -/
 theorem dtmNumber_FP_parsimoniousComplete : FP.ParsimoniousComplete DTMNumber :=
   ⟨dtmNumber_mem_FP, dtmNumber_FP_parsimoniousHard⟩
 
 /-- **The machine characterization of FP**: a counting problem is in FP exactly
 when it reduces, by an ordered parsimonious reduction, to the number written
-by a deterministic machine. -/
+by a deterministic machine.
+Registered in the Lax archive as
+[`Lax366625.FPComplete.mem_FP_iff_le_dtmNumber`](https://laxarchive.org/lax-366625/Lax366625.FPComplete.html#s-Lax366625.FPComplete.mem_FP_iff_le_dtmNumber). -/
 theorem mem_FP_iff_le_dtmNumber {L : Language.{0, 0}} [L.IsRelational]
     (C : CountingProblem L) : C ∈ FP ↔ Nonempty (C ≤ᵖ[≤] DTMNumber) :=
   ⟨fun h => ⟨(FPDefinable.digitDefinable h).nonempty_orderedParsimoniousHorn.some.trans

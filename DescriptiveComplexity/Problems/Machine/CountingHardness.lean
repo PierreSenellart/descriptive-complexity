@@ -277,7 +277,9 @@ theorem sharpNtmAccept_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpNT
 
 /-- **Counting the accepting runs of a nondeterministic machine is
 parsimoniously `#P`-complete.** The class of this library is defined in logic;
-this theorem is the bridge saying it is the machine one. -/
+this theorem is the bridge saying it is the machine one.
+Registered in the Lax archive as
+[`Lax366625.CountingRunsComplete.sharpNtmAccept_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-366625/Lax366625.CountingRunsComplete.html#s-Lax366625.CountingRunsComplete.sharpNtmAccept_sharpP_parsimoniousComplete). -/
 theorem sharpNtmAccept_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpNTMAccept :=
   ⟨sharpNtmAccept_mem_sharpP, sharpNtmAccept_sharpP_parsimoniousHard⟩
@@ -289,7 +291,9 @@ theorem sharpNtmAccept_sharpP_complete : SharpP.Complete SharpNTMAccept :=
 
 /-- **The machine characterization of `#P`**: a counting problem counts the
 witnesses of an existential second-order sentence exactly when it reduces
-parsimoniously to counting the accepting runs of a nondeterministic machine. -/
+parsimoniously to counting the accepting runs of a nondeterministic machine.
+Registered in the Lax archive as
+[`Lax366625.CountingRunsComplete.mem_sharpP_iff_le_sharpNtmAccept`](https://laxarchive.org/lax-366625/Lax366625.CountingRunsComplete.html#s-Lax366625.CountingRunsComplete.mem_sharpP_iff_le_sharpNtmAccept). -/
 theorem mem_sharpP_iff_le_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational]
     (C : CountingProblem L) : C ∈ SharpP ↔ Nonempty (C ≤ᵖ[≤] SharpNTMAccept) :=
   ⟨fun hC => (sharpSat_parsimoniousHard_of_sharpPDefinable C hC).map fun g =>

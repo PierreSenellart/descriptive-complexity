@@ -47,7 +47,9 @@ variable {L : Language.{0, 0}}
 problem is SO(TC) definable.
 
 Reduce to QSAT – through SUCCINCT-REACH and Savitch's recursive doubling – and
-read the deterministic evaluation walk of QSAT backwards. -/
+read the deterministic evaluation walk of QSAT backwards.
+Registered in the Lax archive as
+[`Lax134656.PSPACEEqCoPSPACE.sotcDefinable_compl`](https://laxarchive.org/lax-134656/Lax134656.PSPACEEqCoPSPACE.html#s-Lax134656.PSPACEEqCoPSPACE.sotcDefinable_compl). -/
 theorem SOTCDefinable.compl [L.IsRelational] {P : DecisionProblem L} (h : SOTCDefinable P) :
     SOTCDefinable Pᶜ := by
   obtain ⟨f⟩ := succinctReach_hard_of_sotcDefinable P h
@@ -63,7 +65,9 @@ theorem sotcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
 
 /-! ### `PSPACE = coPSPACE` -/
 
-/-- **`PSPACE = coPSPACE`**: polynomial space is closed under complement. -/
+/-- **`PSPACE = coPSPACE`**: polynomial space is closed under complement.
+Registered in the Lax archive as
+[`Lax134656.PSPACEEqCoPSPACE.PSPACE_eq_coPSPACE`](https://laxarchive.org/lax-134656/Lax134656.PSPACEEqCoPSPACE.html#s-Lax134656.PSPACEEqCoPSPACE.PSPACE_eq_coPSPACE). -/
 theorem PSPACE_eq_coPSPACE : PSPACE = coPSPACE := by
   refine ComplexityClass.ext (fun P => (sotcDefinable_compl_iff P).symm) fun P => ?_
   constructor
@@ -76,7 +80,9 @@ theorem PSPACE_eq_coPSPACE : PSPACE = coPSPACE := by
 theorem mem_PSPACE_compl_iff [L.IsRelational] (P : DecisionProblem L) : Pᶜ ∈ PSPACE ↔ P ∈ PSPACE :=
   sotcDefinable_compl_iff P
 
-/-- **QSAT is coPSPACE-complete**, since PSPACE and coPSPACE coincide. -/
+/-- **QSAT is coPSPACE-complete**, since PSPACE and coPSPACE coincide.
+Registered in the Lax archive as
+[`Lax134656.QsatPSPACEComplete.qsat_coPSPACE_complete`](https://laxarchive.org/lax-134656/Lax134656.QsatPSPACEComplete.html#s-Lax134656.QsatPSPACEComplete.qsat_coPSPACE_complete). -/
 theorem QSAT_coPSPACE_complete : coPSPACE.Complete QSAT :=
   PSPACE_eq_coPSPACE ▸ qsat_PSPACE_complete
 

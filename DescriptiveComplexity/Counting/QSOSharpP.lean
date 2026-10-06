@@ -57,7 +57,9 @@ def SQDefinable (C : CountingProblem L) : Prop :=
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A], C A = t.value A
 
 /-- **ΣQSO(FO) captures `#P`**: a counting problem is in `#P` iff it is
-ΣQSO(FO)-definable. -/
+ΣQSO(FO)-definable.
+Registered in the Lax archive as
+[`Lax366625.SharpPAsQuantitativeLogic.mem_sharpP_iff_sqDefinable`](https://laxarchive.org/lax-366625/Lax366625.SharpPAsQuantitativeLogic.html#s-Lax366625.SharpPAsQuantitativeLogic.mem_sharpP_iff_sqDefinable). -/
 theorem mem_sharpP_iff_sqDefinable (C : CountingProblem L) : C ∈ SharpP ↔ SQDefinable C := by
   constructor
   · rintro ⟨B, φ, h⟩

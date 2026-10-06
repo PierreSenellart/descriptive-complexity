@@ -49,11 +49,15 @@ theorem ntmAcceptSpace_PSPACE_hard : PSPACE.Hard NTMAcceptSpace :=
 
 /-- **Deterministic space-bounded machine acceptance is PSPACE-complete.** The
 classes of this library are definitions in logic; this theorem is the bridge
-saying its PSPACE is the machine one. -/
+saying its PSPACE is the machine one.
+Registered in the Lax archive as
+[`Lax134656.SpaceMachinesPSPACEComplete.dtmAcceptSpace_PSPACE_complete`](https://laxarchive.org/lax-134656/Lax134656.SpaceMachinesPSPACEComplete.html#s-Lax134656.SpaceMachinesPSPACEComplete.dtmAcceptSpace_PSPACE_complete). -/
 theorem dtmAcceptSpace_PSPACE_complete : PSPACE.Complete DTMAcceptSpace :=
   ⟨dtmAcceptSpace_mem_PSPACE, dtmAcceptSpace_PSPACE_hard⟩
 
-/-- **Nondeterministic space-bounded machine acceptance is PSPACE-complete.** -/
+/-- **Nondeterministic space-bounded machine acceptance is PSPACE-complete.**
+Registered in the Lax archive as
+[`Lax134656.SpaceMachinesPSPACEComplete.ntmAcceptSpace_PSPACE_complete`](https://laxarchive.org/lax-134656/Lax134656.SpaceMachinesPSPACEComplete.html#s-Lax134656.SpaceMachinesPSPACEComplete.ntmAcceptSpace_PSPACE_complete). -/
 theorem ntmAcceptSpace_PSPACE_complete : PSPACE.Complete NTMAcceptSpace :=
   ⟨ntmAcceptSpace_mem_PSPACE, ntmAcceptSpace_PSPACE_hard⟩
 
@@ -61,7 +65,9 @@ theorem ntmAcceptSpace_PSPACE_complete : PSPACE.Complete NTMAcceptSpace :=
 the forward half of a machine characterization of the class. (The converse
 direction is membership, `DescriptiveComplexity.dtmAcceptSpace_mem_PSPACE`, but a
 *relativized* reduction only carries hardness, so the two do not assemble into
-an `iff` the way `DescriptiveComplexity.mem_NP_iff_le_ntmAccept` does.) -/
+an `iff` the way `DescriptiveComplexity.mem_NP_iff_le_ntmAccept` does.)
+Registered in the Lax archive as
+[`Lax134656.SpaceMachinesPSPACEComplete.le_dtmAcceptSpace_of_mem_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.SpaceMachinesPSPACEComplete.html#s-Lax134656.SpaceMachinesPSPACEComplete.le_dtmAcceptSpace_of_mem_PSPACE). -/
 theorem le_dtmAcceptSpace_of_mem_PSPACE {L : Language.{0, 0}} [L.IsRelational]
     (P : DecisionProblem L)
     (hP : P ∈ PSPACE) : Nonempty (P ≤ʳᶠᵒ[≤] DTMAcceptSpace) :=

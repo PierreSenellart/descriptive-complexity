@@ -85,7 +85,9 @@ section Iso
 
 variable {A B : Type} [Language.twoGraphs.Structure A] [Language.twoGraphs.Structure B]
 
-/-- The graph-isomorphism property is isomorphism-invariant. -/
+/-- The graph-isomorphism property is isomorphism-invariant.
+Registered in the Lax archive as
+[`Lax604544.IsomorphismInvariance.hasGraphIso_iso`](https://laxarchive.org/lax-604544/Lax604544.IsomorphismInvariance.html#s-Lax604544.IsomorphismInvariance.hasGraphIso_iso). -/
 theorem hasGraphIso_iso (e : A ≃[Language.twoGraphs] B) :
     HasGraphIso A ↔ HasGraphIso B :=
   and_congr e.toEquiv.finite_iff
@@ -277,13 +279,17 @@ noncomputable def GI : ComplexityClass :=
 theorem graphIso_mem_GI : GraphIso ∈ GI :=
   ComplexityClass.mem_below_self GraphIso
 
-/-- Graph Isomorphism is in NP: it reduces to the directed problem, which is. -/
+/-- Graph Isomorphism is in NP: it reduces to the directed problem, which is.
+Registered in the Lax archive as
+[`Lax604544.IsomorphismInNP.graphIso_mem_NP`](https://laxarchive.org/lax-604544/Lax604544.IsomorphismInNP.html#s-Lax604544.IsomorphismInNP.graphIso_mem_NP). -/
 theorem graphIso_mem_NP : GraphIso ∈ NP :=
   NP.mem_of_foReduction graphIso_fo_reduction_digraphIso digraphIso_mem_NP
 
 /-- The whole GI degree lies inside NP, since Graph Isomorphism does and
 membership travels backward along reductions. (Whether the inclusion is strict
-is the open question; the framework decides no such thing.) -/
+is the open question; the framework decides no such thing.)
+Registered in the Lax archive as
+[`Lax604544.IsomorphismInNP.GI_subset_NP`](https://laxarchive.org/lax-604544/Lax604544.IsomorphismInNP.html#s-Lax604544.IsomorphismInNP.GI_subset_NP). -/
 theorem GI_subset_NP : GI ⊆ NP :=
   fun _ _ _ h => NP.mem_of_orderedReduction h.some graphIso_mem_NP
 

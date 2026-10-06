@@ -231,7 +231,9 @@ theorem support_mem_NP {C : CountingProblem L} (h : C ∈ SharpP) : C.support �
 /-- **NP is the class of supports of `#P`**: a decision problem is in NP exactly
 when it is, on nonempty finite structures, the question whether some counting
 problem of `#P` is positive – the counting problem being the number of
-witnesses of the `Σ₁` definition. -/
+witnesses of the `Σ₁` definition.
+Registered in the Lax archive as
+[`Lax366625.SharpPAndNP.mem_NP_iff_exists_sharpP_support`](https://laxarchive.org/lax-366625/Lax366625.SharpPAndNP.html#s-Lax366625.SharpPAndNP.mem_NP_iff_exists_sharpP_support). -/
 theorem mem_NP_iff_exists_sharpP_support (P : DecisionProblem L) :
     P ∈ NP ↔ ∃ C : CountingProblem L, C ∈ SharpP ∧
       ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], C.support A ↔ P A := by
@@ -265,7 +267,9 @@ theorem nonempty_relOrderedReduction_support_of_sharpP_parsimoniousHard
            correct := fun A _ _ _ _ =>
             (hDQ A).symm.trans (g.toRelOrderedFOReduction.correct A) }⟩
 
-/-- **The support of a parsimoniously `#P`-hard counting problem is NP-hard.** -/
+/-- **The support of a parsimoniously `#P`-hard counting problem is NP-hard.**
+Registered in the Lax archive as
+[`Lax366625.SharpPAndNP.NP_hard_support_of_sharpP_parsimoniousHard`](https://laxarchive.org/lax-366625/Lax366625.SharpPAndNP.html#s-Lax366625.SharpPAndNP.NP_hard_support_of_sharpP_parsimoniousHard). -/
 theorem NP_hard_support_of_sharpP_parsimoniousHard {C : CountingProblem L}
     (hC : SharpP.ParsimoniousHard C) :
     NP.Hard C.support :=
@@ -276,7 +280,9 @@ theorem NP_hard_support_of_sharpP_parsimoniousHard {C : CountingProblem L}
 into PTIME.** This is why the counting problems whose support is in PTIME –
 satisfying assignments of a DNF or of a monotone 2-CNF formula, independent
 sets, worlds of a probabilistic database satisfying a monotone query – are
-not parsimoniously `#P`-complete unless `NP ⊆ PTIME`. -/
+not parsimoniously `#P`-complete unless `NP ⊆ PTIME`.
+Registered in the Lax archive as
+[`Lax366625.SharpPAndNP.NP_subset_PTIME_of_sharpP_parsimoniousHard`](https://laxarchive.org/lax-366625/Lax366625.SharpPAndNP.html#s-Lax366625.SharpPAndNP.NP_subset_PTIME_of_sharpP_parsimoniousHard). -/
 theorem NP_subset_PTIME_of_sharpP_parsimoniousHard {C : CountingProblem L}
     (hC : SharpP.ParsimoniousHard C)
     (hsupp : C.support ∈ PTIME) : NP ⊆ PTIME := fun _ _ Q hQ =>

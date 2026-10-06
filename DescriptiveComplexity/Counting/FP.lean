@@ -45,7 +45,9 @@ section Closure
 variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
 variable {C : CountingProblem L₁} {D : CountingProblem L₂}
 
-/-- **FP is closed under ordered parsimonious reductions.** -/
+/-- **FP is closed under ordered parsimonious reductions.**
+Registered in the Lax archive as
+[`Lax366625.FPClosure.FP_mem_of_orderedParsimonious`](https://laxarchive.org/lax-366625/Lax366625.FPClosure.html#s-Lax366625.FPClosure.FP_mem_of_orderedParsimonious). -/
 theorem FPDefinable.of_orderedParsimonious (f : C ≤ᵖ[≤] D) (h : FPDefinable D) :
     FPDefinable C := by
   obtain ⟨d, hd⟩ := h
@@ -113,12 +115,16 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 theorem mem_FP_iff (C : CountingProblem L) : C ∈ FP ↔ FPDefinable C :=
   Iff.rfl
 
-/-- The support of a problem of FP is in PTIME. -/
+/-- The support of a problem of FP is in PTIME.
+Registered in the Lax archive as
+[`Lax366625.FPAndPTIME.support_mem_PTIME_of_mem_FP`](https://laxarchive.org/lax-366625/Lax366625.FPAndPTIME.html#s-Lax366625.FPAndPTIME.support_mem_PTIME_of_mem_FP). -/
 theorem support_mem_PTIME_of_mem_FP {C : CountingProblem L} (h : C ∈ FP) :
     C.support ∈ PTIME :=
   support_mem_PTIME_of_fpDefinable h
 
-/-- **No problem of FP is parsimoniously `#P`-hard, unless `NP ⊆ PTIME`.** -/
+/-- **No problem of FP is parsimoniously `#P`-hard, unless `NP ⊆ PTIME`.**
+Registered in the Lax archive as
+[`Lax366625.FPAndPTIME.NP_subset_PTIME_of_mem_FP_of_parsimoniousHard`](https://laxarchive.org/lax-366625/Lax366625.FPAndPTIME.html#s-Lax366625.FPAndPTIME.NP_subset_PTIME_of_mem_FP_of_parsimoniousHard). -/
 theorem NP_subset_PTIME_of_mem_FP_of_parsimoniousHard {C : CountingProblem L} (h : C ∈ FP)
     (hard : SharpP.ParsimoniousHard C) : NP ⊆ PTIME :=
   NP_subset_PTIME_of_parsimoniousHard_of_fpDefinable hard h

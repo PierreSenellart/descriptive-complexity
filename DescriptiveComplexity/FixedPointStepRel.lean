@@ -455,7 +455,9 @@ theorem IFPDefinable.of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : IFPD
     (f.toRelInterpretation.ordExtendRelLEquiv A)).symm
 
 /-- **FO(≤, PFP) definability is closed under relativized ordered
-reductions.** -/
+reductions.**
+Registered in the Lax archive as
+[`Lax134656.PartialFixedPointClosure.pfpDefinable_of_relOrderedReduction`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointClosure.html#s-Lax134656.PartialFixedPointClosure.pfpDefinable_of_relOrderedReduction). -/
 theorem PFPDefinable.of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : PFPDefinable Q) :
     PFPDefinable P := by
   obtain ⟨d, hd⟩ := h

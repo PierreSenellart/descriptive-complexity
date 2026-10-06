@@ -145,7 +145,9 @@ theorem sharpPDefinable_congr {C C' : CountingProblem L}
 variable {L' : Language.{0, 0}} [L'.IsRelational] {C : CountingProblem L}
   {D : CountingProblem L'}
 
-/-- **`#P`-definability is closed under ordered parsimonious reductions.** -/
+/-- **`#P`-definability is closed under ordered parsimonious reductions.**
+Registered in the Lax archive as
+[`Lax366625.SharpPClosure.SharpP_mem_of_orderedParsimonious`](https://laxarchive.org/lax-366625/Lax366625.SharpPClosure.html#s-Lax366625.SharpPClosure.SharpP_mem_of_orderedParsimonious). -/
 theorem SharpPDefinable.of_orderedParsimonious (f : C ≤ᵖ[≤] D) (h : SharpPDefinable D) :
     SharpPDefinable C := by
   obtain ⟨B, φ, hφ⟩ := h

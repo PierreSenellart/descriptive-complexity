@@ -241,7 +241,9 @@ theorem fpDefinable_congr {C C' : CountingProblem L}
   exact ⟨d, fun A _ _ _ _ => (h A).symm.trans (hd A)⟩
 
 /-- **A term with no fixed point defines a problem of FP**: a counting problem
-that is the value of a QFO term over the ordered vocabulary is in FP. -/
+that is the value of a QFO term over the ordered vocabulary is in FP.
+Registered in the Lax archive as
+[`Lax366625.FPByDigits.fpDefinable_of_qfo`](https://laxarchive.org/lax-366625/Lax366625.FPByDigits.html#s-Lax366625.FPByDigits.fpDefinable_of_qfo). -/
 theorem fpDefinable_of_qfo {C : CountingProblem L} (t : QTerm (L.sum Language.order) Empty)
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       C A = t.value A) : FPDefinable C := by

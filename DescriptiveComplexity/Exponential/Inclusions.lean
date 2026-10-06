@@ -114,7 +114,9 @@ theorem PSPACE_subset_coEXPTIME : PSPACE ⊆ coEXPTIME :=
   EXPTIME_eq_coEXPTIME ▸ PSPACE_subset_EXPTIME
 
 /-- `PTIME ⊆ PSPACE`, routed through NP – the polynomial-level inclusion the
-exponential ones are lifted from. -/
+exponential ones are lifted from.
+Registered in the Lax archive as
+[`Lax134656.HierarchyInPSPACE.PTIME_subset_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.HierarchyInPSPACE.html#s-Lax134656.HierarchyInPSPACE.PTIME_subset_PSPACE). -/
 theorem PTIME_subset_PSPACE : PTIME ⊆ PSPACE :=
   fun _ _ _ h => NP_subset_PSPACE (PTIME_subset_NP h)
 

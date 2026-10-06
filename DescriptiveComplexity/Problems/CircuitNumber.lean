@@ -77,7 +77,9 @@ theorem DigitDefinable.mem_FP {C : CountingProblem L} (h : DigitDefinable C) : C
   obtain ⟨f⟩ := h.nonempty_orderedParsimonious
   exact FP.mem_of_orderedParsimonious f circuitNumber_mem_FP
 
-/-- **The digit-definable problems are those of FP.** -/
+/-- **The digit-definable problems are those of FP.**
+Registered in the Lax archive as
+[`Lax366625.FPByDigits.digitDefinable_iff_mem_FP`](https://laxarchive.org/lax-366625/Lax366625.FPByDigits.html#s-Lax366625.FPByDigits.digitDefinable_iff_mem_FP). -/
 theorem digitDefinable_iff_mem_FP (C : CountingProblem L) : DigitDefinable C ↔ C ∈ FP :=
   ⟨DigitDefinable.mem_FP, fun h => FPDefinable.digitDefinable h⟩
 
@@ -87,11 +89,15 @@ theorem circuitNumber_FP_parsimoniousHard : FP.ParsimoniousHard CircuitNumber :=
   fun _ hD => ⟨(FPDefinable.digitDefinable hD).nonempty_orderedParsimonious.some.toRel⟩
 
 /-- **The number written by a circuit is complete for FP under parsimonious
-reductions.** -/
+reductions.**
+Registered in the Lax archive as
+[`Lax366625.FPComplete.circuitNumber_FP_parsimoniousComplete`](https://laxarchive.org/lax-366625/Lax366625.FPComplete.html#s-Lax366625.FPComplete.circuitNumber_FP_parsimoniousComplete). -/
 theorem circuitNumber_FP_parsimoniousComplete : FP.ParsimoniousComplete CircuitNumber :=
   ⟨circuitNumber_mem_FP, circuitNumber_FP_parsimoniousHard⟩
 
-/-- **FP is closed under relativized ordered parsimonious reductions.** -/
+/-- **FP is closed under relativized ordered parsimonious reductions.**
+Registered in the Lax archive as
+[`Lax366625.FPClosure.FP_mem_of_relOrderedParsimonious`](https://laxarchive.org/lax-366625/Lax366625.FPClosure.html#s-Lax366625.FPClosure.FP_mem_of_relOrderedParsimonious). -/
 theorem mem_FP_of_relOrderedParsimonious {L' : Language.{0, 0}} [L'.IsRelational]
     {C : CountingProblem L} {D : CountingProblem L'} (f : C ≤ʳᵖ[≤] D) (h : D ∈ FP) :
     C ∈ FP := by

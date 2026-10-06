@@ -36,7 +36,9 @@ open Language
 /-- **Abiteboul–Vianu, ordered case**: the inflationary and partial
 fixed-point logics agree on ordered structures exactly when `PTIME = PSPACE`.
 A corollary of the two capture theorems; see the module docstring for what it
-does *not* say (the unordered statement). -/
+does *not* say (the unordered statement).
+Registered in the Lax archive as
+[`Lax134656.AbiteboulVianuOrdered.ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace`](https://laxarchive.org/lax-134656/Lax134656.AbiteboulVianuOrdered.html#s-Lax134656.AbiteboulVianuOrdered.ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace). -/
 theorem ifpDefinable_eq_pfpDefinable_iff_ptime_eq_pspace :
     (∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
         IFPDefinable P ↔ PFPDefinable P) ↔ PTIME = PSPACE := by

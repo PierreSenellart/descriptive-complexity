@@ -186,7 +186,9 @@ theorem pfpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
   · exact (h A).trans (hd A)
 
 /-- FO(≤, PFP) definability only depends on the finite instances of a
-problem. -/
+problem.
+Registered in the Lax archive as
+[`Lax134656.PartialFixedPointClosure.pfpDefinable_congr_finite`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointClosure.html#s-Lax134656.PartialFixedPointClosure.pfpDefinable_congr_finite). -/
 theorem pfpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     PFPDefinable P ↔ PFPDefinable Q := by
@@ -232,7 +234,9 @@ theorem PFPDefinableFree.of_foReduction (f : P ≤ᶠᵒ Q) (h : PFPDefinableFre
 /-- **FO(≤, PFP) definability is closed under ordered first-order
 reductions**, by the same route as for IFP
 (`DescriptiveComplexity.IFPDefinable.of_orderedReduction`), stage by
-stage. -/
+stage.
+Registered in the Lax archive as
+[`Lax134656.PartialFixedPointClosure.pfpDefinable_of_orderedReduction`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointClosure.html#s-Lax134656.PartialFixedPointClosure.pfpDefinable_of_orderedReduction). -/
 theorem PFPDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : PFPDefinable Q) :
     PFPDefinable P := by
   obtain ⟨d, hd⟩ := h
@@ -275,7 +279,9 @@ theorem PFPDefinable.of_orderedReduction (f : P ≤ᶠᵒ[≤] Q) (h : PFPDefina
   exact hout.symm.trans hpull.symm
 
 /-- FO(≤, PFP) definability is closed under plain first-order reductions,
-which are in particular ordered ones. -/
+which are in particular ordered ones.
+Registered in the Lax archive as
+[`Lax134656.PartialFixedPointClosure.pfpDefinable_of_foReduction`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointClosure.html#s-Lax134656.PartialFixedPointClosure.pfpDefinable_of_foReduction). -/
 theorem PFPDefinable.of_foReduction (f : P ≤ᶠᵒ Q) (h : PFPDefinable Q) :
     PFPDefinable P :=
   h.of_orderedReduction f.toOrdered
@@ -349,7 +355,9 @@ theorem StepDef.pfpHolds_inflate (d : StepDef L) (A : Type) [L.Structure A]
       exact hout
 
 /-- **Order-free FO(IFP) is contained in order-free FO(PFP)**: inflate the
-induction. The easy inclusion of the Abiteboul–Vianu theorem. -/
+induction. The easy inclusion of the Abiteboul–Vianu theorem.
+Registered in the Lax archive as
+[`Lax134656.InflationaryInPartial.ifpDefinableFree_pfpDefinableFree`](https://laxarchive.org/lax-134656/Lax134656.InflationaryInPartial.html#s-Lax134656.InflationaryInPartial.ifpDefinableFree_pfpDefinableFree). -/
 theorem IFPDefinableFree.pfpDefinableFree [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinableFree P) : PFPDefinableFree P := by
   obtain ⟨d, hd⟩ := h
@@ -357,7 +365,9 @@ theorem IFPDefinableFree.pfpDefinableFree [L.IsRelational] {P : DecisionProblem 
   intro A _ _ _
   exact (hd A).trans (d.pfpHolds_inflate A).symm
 
-/-- **FO(≤, IFP) is contained in FO(≤, PFP)**: inflate the induction. -/
+/-- **FO(≤, IFP) is contained in FO(≤, PFP)**: inflate the induction.
+Registered in the Lax archive as
+[`Lax134656.InflationaryInPartial.ifpDefinable_pfpDefinable`](https://laxarchive.org/lax-134656/Lax134656.InflationaryInPartial.html#s-Lax134656.InflationaryInPartial.ifpDefinable_pfpDefinable). -/
 theorem IFPDefinable.pfpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinable P) : PFPDefinable P := by
   obtain ⟨d, hd⟩ := h

@@ -181,7 +181,9 @@ variable {L L' : Language.{0, 0}} [L.IsRelational] [L'.IsRelational]
   {C : CountingProblem L} {D : CountingProblem L'}
 
 /-- **`#P`-definability is closed under relativized ordered parsimonious
-reductions.** -/
+reductions.**
+Registered in the Lax archive as
+[`Lax366625.SharpPClosure.SharpP_mem_of_relOrderedParsimonious`](https://laxarchive.org/lax-366625/Lax366625.SharpPClosure.html#s-Lax366625.SharpPClosure.SharpP_mem_of_relOrderedParsimonious). -/
 theorem SharpPDefinable.of_relOrderedParsimonious (f : C ≤ʳᵖ[≤] D) (h : SharpPDefinable D) :
     SharpPDefinable C := by
   obtain ⟨B, φ, hφ⟩ := h

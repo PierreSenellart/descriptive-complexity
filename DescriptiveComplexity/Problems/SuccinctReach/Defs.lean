@@ -198,7 +198,9 @@ private theorem succinctReachable_of_iso (e : A ≃[Language.transSys] B)
     ⟨pushPred e μ, clausesHold_push e hcl', readsCur_push e hr'⟩, reach_push e hreach⟩
 
 /-- Reachability in a succinctly described transition system is
-isomorphism-invariant. -/
+isomorphism-invariant.
+Registered in the Lax archive as
+[`Lax134656.SuccinctReachInvariance.succinctReachable_iso`](https://laxarchive.org/lax-134656/Lax134656.SuccinctReachInvariance.html#s-Lax134656.SuccinctReachInvariance.succinctReachable_iso). -/
 theorem succinctReachable_iso (e : A ≃[Language.transSys] B) :
     SuccinctReachable A ↔ SuccinctReachable B :=
   ⟨succinctReachable_of_iso e, succinctReachable_of_iso e.symm⟩
