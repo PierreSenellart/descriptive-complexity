@@ -9,7 +9,7 @@ title: Isomorphism of directed acyclic graphs
 type: definition
 ---
 An instance is a pair of directed graphs on one universe, each with a mark
-on its vertices, a relation of arcs and a further binary relation given as a
+on its vertices, a relation of arcs, and a further binary relation given as a
 witness of acyclicity. That relation is a topological order of the arcs
 when it is a strict partial order on the marked vertices containing the
 arcs; the instance carries one because acyclicity is not first-order

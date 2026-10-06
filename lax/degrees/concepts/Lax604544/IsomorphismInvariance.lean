@@ -23,10 +23,10 @@ import Lax604544.DagIsomorphism
 title: Invariance and characterization of the isomorphism problems
 type: lemma
 ---
-Having isomorphic marked graphs, having isomorphic simple marked graphs and
+Having isomorphic marked graphs, having isomorphic simple marked graphs, and
 having isomorphic acyclic marked graphs with valid witnesses are invariant
 under isomorphism of instances, and an instance is a yes-instance of
-Digraph Isomorphism, Graph Isomorphism or DAG Isomorphism exactly when it
+Digraph Isomorphism, Graph Isomorphism, or DAG Isomorphism exactly when it
 has the corresponding property.
 -/
 

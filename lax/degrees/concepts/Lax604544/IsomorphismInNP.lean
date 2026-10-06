@@ -23,7 +23,7 @@ import Lax604544.DagIsomorphism
 title: The isomorphism problems are in NP
 type: theorem
 ---
-Digraph Isomorphism, Graph Isomorphism and DAG Isomorphism are in NP, by an
+Digraph Isomorphism, Graph Isomorphism, and DAG Isomorphism are in NP, by an
 existential second-order sentence guessing the bijection, with no order and
 no counting; and every problem of GI is in NP.
 -/

@@ -11,7 +11,7 @@ type: definition
 An instance describes a transition system succinctly. Some of its elements
 are state variables, each with next-state copies given by a binary
 relation, and its clauses, with positive and negative occurrences of
-variables, are split into three groups: transition, source and target
+variables, are split into three groups: transition, source, and target
 clauses. A state of the system is a truth assignment to the state
 variables. There is a transition from a state $S$ to a state $S'$ when some
 valuation of all the variables satisfies every transition clause, agrees

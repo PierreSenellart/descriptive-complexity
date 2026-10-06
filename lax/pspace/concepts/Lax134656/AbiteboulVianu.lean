@@ -32,7 +32,7 @@ equivalence of $k$-tuples by the $k$-pebble game; it therefore runs on the
 structure of the equivalence classes, which carries a linear order
 definable by an inflationary induction, and there the equality of the
 logics on ordered structures applies. The proof follows the machine-free
-route of Dawar, Lindell and Weinstein and of Ebbinghaus and Flum.
+route of Dawar, Lindell, and Weinstein and of Ebbinghaus and Flum.
 -/
 
 namespace Lax134656.AbiteboulVianu

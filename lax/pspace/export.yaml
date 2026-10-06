@@ -34,7 +34,7 @@ targets:
 - DescriptiveComplexity.SUCCINCTREACH
 copyright: 2026 Pierre Senellart
 manifest:
-  title: 'Descriptive complexity: PSPACE, partial fixed points and the Abiteboul–Vianu theorem'
+  title: 'Descriptive complexity: PSPACE, partial fixed points, and the Abiteboul–Vianu theorem'
   authors:
   - name: Pierre Senellart
     orcid: 0000-0002-7909-5369

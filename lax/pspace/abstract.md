@@ -1,7 +1,8 @@
 Polynomial space as a logically defined class, from the
-descriptive-complexity library, built on the NP core registered as
-lax-904597, the classes of logarithmic space and polynomial time,
-lax-485149 and lax-535992, and the polynomial hierarchy. PSPACE is the class
+descriptive-complexity library. It builds on the NP core registered as
+lax-904597, the catalog of NP-complete problems lax-799700, and the
+submissions on logarithmic space (lax-485149), polynomial time
+(lax-535992), and the polynomial hierarchy (lax-564036). PSPACE is the class
 of decision problems on finite structures definable in second-order logic
 with a transitive closure, SO(TC): a walk on the assignments of a block of
 relation variables, each step a first-order condition on two consecutive
@@ -18,9 +19,8 @@ ordered structures, FO(≤, PFP) = SO(TC) = PSPACE, and contains the
 inflationary logic. With the capture of polynomial time by inflationary
 fixed points this gives the Abiteboul–Vianu theorem on ordered structures,
 and the theorem itself is proved as well: on finite structures without an
-order, the
-inflationary and the partial fixed-point logics define the same problems
-exactly when PTIME = PSPACE.
+order, the inflationary and the partial fixed-point logics define the same
+problems exactly when PTIME = PSPACE.
 
 Four problems are complete under the core's first-order reductions:
 quantified Boolean formulas, reachability in a succinctly described

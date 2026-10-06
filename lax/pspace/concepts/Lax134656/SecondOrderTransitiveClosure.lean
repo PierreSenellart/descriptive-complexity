@@ -47,7 +47,7 @@ def SOBlock.structure₂ {L : Language.{0, 0}} (B : SOBlock) {A : Type} [inst : 
   @sumStructure (L.sum B.lang) B.lang A (SOBlock.structure₁ B ρ) (B.structure σ)
 
 /-- A single-`TC` definition over a second-order block: the states of the walk
-are the assignments of the block `B`, and the transition, source and target
+are the assignments of the block `B`, and the transition, source, and target
 conditions are first-order sentences over the base vocabulary expanded by the
 order and by copies of the block. The transition sentence sees two copies –
 the current state and the next one.

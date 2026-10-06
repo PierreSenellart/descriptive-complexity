@@ -25,7 +25,7 @@ type: theorem
 ---
 Each logically defined class with a complete problem is the degree of that
 problem: NP is the degree of SAT, coNP of TAUT, PTIME of HORN-SAT, NL of
-2SAT and RE of FINSAT. Every member of the class reduces to the problem by
+2SAT, and RE of FINSAT. Every member of the class reduces to the problem by
 an ordered first-order reduction, the generic reduction that reads a
 definition, and the class is closed under such reductions. Hardness for a
 complete problem is therefore hardness for the class: SAT-hardness is

@@ -24,7 +24,7 @@ title: FO(≤, PFP) definability is closed under first-order reductions
 type: theorem
 ---
 FO($\le$, PFP) definability travels backward along first-order reductions,
-ordered first-order reductions and relativized ordered first-order
+ordered first-order reductions, and relativized ordered first-order
 reductions, and reads a problem on its finite instances only. For a
 relativized reduction the block is pulled back onto the definable domain,
 the transfer of assignments being a bijection onto the assignments inside

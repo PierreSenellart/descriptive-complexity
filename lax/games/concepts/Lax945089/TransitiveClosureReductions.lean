@@ -15,7 +15,7 @@ title: Reductions in first-order logic with a deterministic transitive closure
 type: definition
 ---
 A parameterized walk over a vocabulary is a finite set of modes, an arity
-$k$, a number of parameters and a step formula for each pair of modes, in
+$k$, a number of parameters, and a step formula for each pair of modes, in
 two $k$-tuples of variables and the parameters; at a valuation of the
 parameters it defines a graph on the pairs of a mode and a $k$-tuple, and
 its reachability relation. Its determinization keeps only the steps that
@@ -200,7 +200,7 @@ noncomputable def detStep (m n : s.Mode) : L.Formula ((Fin s.k ⊕ Fin s.k) ⊕ 
 /-- **The deterministic reading of a walk**: the same modes, arity and
 parameters, with the step formula replaced by its determinization.
 
-Reducible, so that the modes, the arity and the parameter count of `s.det` are
+Reducible, so that the modes, the arity, and the parameter count of `s.det` are
 those of `s` transparently – a node of the deterministic reading *is* a node,
 and the block of a determinized family *is* the block of the family. -/
 @[reducible]

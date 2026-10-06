@@ -2,7 +2,7 @@ The separations proved in the descriptive-complexity library, which need
 no complexity-theoretic assumption: what the logics of descriptive
 complexity cannot express. It builds on
 the NP core registered as lax-904597 and on the submissions on logarithmic
-space, polynomial time, polynomial space and AC⁰.
+space, polynomial time, polynomial space, and AC⁰.
 
 The tools are games. The Ehrenfeucht–Fraïssé game is defined with its
 method: structures equivalent for n rounds satisfy the same first-order

@@ -1,0 +1,153 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: backport-lean-4.33
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.SharpPDefinable.of_orderedParsimonious
+- DescriptiveComplexity.SharpPDefinable.of_relOrderedParsimonious
+- DescriptiveComplexity.parsimoniousHard_sharpP_iff
+- DescriptiveComplexity.sharpSat_sharpP_parsimoniousComplete
+- DescriptiveComplexity.sharpNtmAccept_sharpP_parsimoniousComplete
+- DescriptiveComplexity.mem_sharpP_iff_le_sharpNtmAccept
+- DescriptiveComplexity.mem_NP_iff_exists_sharpP_support
+- DescriptiveComplexity.NP_hard_support_of_sharpP_parsimoniousHard
+- DescriptiveComplexity.NP_subset_PTIME_of_sharpP_parsimoniousHard
+- DescriptiveComplexity.mem_sharpP_iff_sqDefinable
+- DescriptiveComplexity.digitDefinable_iff_mem_FP
+- DescriptiveComplexity.FPDefinable.of_orderedParsimonious
+- DescriptiveComplexity.mem_FP_of_relOrderedParsimonious
+- DescriptiveComplexity.fpDefinable_of_qfo
+- DescriptiveComplexity.circuitNumber_FP_parsimoniousComplete
+- DescriptiveComplexity.hornNumber_FP_parsimoniousComplete
+- DescriptiveComplexity.dtmNumber_FP_parsimoniousComplete
+- DescriptiveComplexity.mem_FP_iff_le_dtmNumber
+- DescriptiveComplexity.support_mem_PTIME_of_mem_FP
+- DescriptiveComplexity.NP_subset_PTIME_of_mem_FP_of_parsimoniousHard
+- DescriptiveComplexity.OrderedParsimoniousReduction.congrTarget
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: counting problems, #P, and FP'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+- package: Lax895169
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
+  folder: lax/ac0
+  restated_from: ../ac0/export.yaml
+restated:
+  DescriptiveComplexity.CountingProblem: CountingProblems.CountingProblem
+  DescriptiveComplexity.CountingProblem.instCoeFunForallForallStructureNat: CountingProblems.CountingProblem.instCoeFun
+  DescriptiveComplexity.CountingProblem.support: CountingProblems.CountingProblem.support
+  DescriptiveComplexity.ParsimoniousReduction: CountingProblems.ParsimoniousReduction
+  DescriptiveComplexity.OrderedParsimoniousReduction: CountingProblems.OrderedParsimoniousReduction
+  DescriptiveComplexity.RelOrderedParsimoniousReduction: CountingProblems.RelOrderedParsimoniousReduction
+  DescriptiveComplexity.witnessCount: WitnessCounting.witnessCount
+  DescriptiveComplexity.SharpPDefinable: WitnessCounting.SharpPDefinable
+  DescriptiveComplexity.SQTerm: SecondOrderCounting.SQTerm
+  DescriptiveComplexity.SQTerm.eval: SecondOrderCounting.SQTerm.eval
+  DescriptiveComplexity.SQTerm.value: SecondOrderCounting.SQTerm.value
+  DescriptiveComplexity.SQDefinable: SecondOrderCounting.SQDefinable
+  DescriptiveComplexity.QTerm: QuantitativeLogic.QTerm
+  DescriptiveComplexity.QTerm.eval: QuantitativeLogic.QTerm.eval
+  DescriptiveComplexity.QTerm.value: QuantitativeLogic.QTerm.value
+  DescriptiveComplexity.QLFPDef: QuantitativeLogic.QLFPDef
+  DescriptiveComplexity.QLFPDef.value: QuantitativeLogic.QLFPDef.value
+  DescriptiveComplexity.FPDefinable: QuantitativeLogic.FPDefinable
+  DescriptiveComplexity.DigitLFPDef: QuantitativeLogic.DigitLFPDef
+  DescriptiveComplexity.DigitLFPDef.Holds: QuantitativeLogic.DigitLFPDef.Holds
+  DescriptiveComplexity.DigitLFPDef.value: QuantitativeLogic.DigitLFPDef.value
+  DescriptiveComplexity.DigitDefinable: QuantitativeLogic.DigitDefinable
+  DescriptiveComplexity.SatOccurs: CountingSat.SatOccurs
+  DescriptiveComplexity.SatModel: CountingSat.SatModel
+  DescriptiveComplexity.LowerOut: NumberedCircuits.LowerOut
+  DescriptiveComplexity.OutBit: NumberedCircuits.OutBit
+  DescriptiveComplexity.OutOrder: NumberedCircuits.OutOrder
+  DescriptiveComplexity.circuitNumber: NumberedCircuits.circuitNumber
+  DescriptiveComplexity.circuitOfNum: NumberedCircuits.circuitOfNum
+  DescriptiveComplexity.numCircuitStructure: NumberedCircuits.numCircuitStructure
+  DescriptiveComplexity.outRank: NumberedCircuits.outRank
+  FirstOrder.Language.numCircuit: NumberedCircuits.numCircuit
+  FirstOrder.Language.numCircuitRel: NumberedCircuits.numCircuitRel
+  FirstOrder.Language.ncBelow: NumberedCircuits.ncBelow
+  FirstOrder.Language.ncIsAnd: NumberedCircuits.ncIsAnd
+  FirstOrder.Language.ncIsFalse: NumberedCircuits.ncIsFalse
+  FirstOrder.Language.ncIsNot: NumberedCircuits.ncIsNot
+  FirstOrder.Language.ncIsOr: NumberedCircuits.ncIsOr
+  FirstOrder.Language.ncIsTrue: NumberedCircuits.ncIsTrue
+  FirstOrder.Language.ncLeft: NumberedCircuits.ncLeft
+  FirstOrder.Language.ncOut: NumberedCircuits.ncOut
+  FirstOrder.Language.ncRight: NumberedCircuits.ncRight
+  DescriptiveComplexity.Forced: HornNumbers.Forced
+  DescriptiveComplexity.ForcedIn: HornNumbers.ForcedIn
+  DescriptiveComplexity.ForcedDigit: HornNumbers.ForcedDigit
+  DescriptiveComplexity.LowerVar: HornNumbers.LowerVar
+  DescriptiveComplexity.VarOrder: HornNumbers.VarOrder
+  DescriptiveComplexity.hnBelow: HornNumbers.hnBelow
+  DescriptiveComplexity.hnOut: HornNumbers.hnOut
+  DescriptiveComplexity.hornNumber: HornNumbers.hornNumber
+  DescriptiveComplexity.satOutStructure: HornNumbers.satOutStructure
+  DescriptiveComplexity.varRank: HornNumbers.varRank
+  FirstOrder.Language.digitOrder: HornNumbers.digitOrder
+  FirstOrder.Language.digitOrderRel: HornNumbers.digitOrderRel
+  FirstOrder.Language.dgoBelow: HornNumbers.dgoBelow
+  FirstOrder.Language.dgoOut: HornNumbers.dgoOut
+  FirstOrder.Language.satOut: HornNumbers.satOut
+  DescriptiveComplexity.MaxPos: MachineNumbers.MaxPos
+  DescriptiveComplexity.LowerCell: MachineNumbers.LowerCell
+  DescriptiveComplexity.OutDigit: MachineNumbers.OutDigit
+  DescriptiveComplexity.cellRank: MachineNumbers.cellRank
+  DescriptiveComplexity.machineNumber: MachineNumbers.machineNumber
+  DescriptiveComplexity.mnLe: MachineNumbers.mnLe
+  DescriptiveComplexity.mnOne: MachineNumbers.mnOne
+  DescriptiveComplexity.mnOut: MachineNumbers.mnOut
+  DescriptiveComplexity.turingOutStructure: MachineNumbers.turingOutStructure
+  FirstOrder.Language.tapeOut: MachineNumbers.tapeOut
+  FirstOrder.Language.tapeOutRel: MachineNumbers.tapeOutRel
+  FirstOrder.Language.tpOne: MachineNumbers.tpOne
+  FirstOrder.Language.tpOut: MachineNumbers.tpOut
+  FirstOrder.Language.turingOut: MachineNumbers.turingOut
+  DescriptiveComplexity.TMData.IsWalk: CountingRuns.TMData.IsWalk
+  DescriptiveComplexity.TMData.Halts: MachineNumbers.TMData.Halts
+  DescriptiveComplexity.TMData.IsHaltWalk: CountingRuns.TMData.IsHaltWalk
+  FirstOrder.Language.instIsRelationalNumCircuit: NumberedCircuits.instIsRelationalNumCircuit
+  FirstOrder.Language.instDecidableEqNumCircuitRel: NumberedCircuits.instDecidableEqNumCircuitRel
+  FirstOrder.Language.instIsRelationalDigitOrder: HornNumbers.instIsRelationalDigitOrder
+  FirstOrder.Language.instDecidableEqDigitOrderRel: HornNumbers.instDecidableEqDigitOrderRel
+  FirstOrder.Language.instIsRelationalTapeOut: MachineNumbers.instIsRelationalTapeOut
+  FirstOrder.Language.instDecidableEqTapeOutRel: MachineNumbers.instDecidableEqTapeOutRel
