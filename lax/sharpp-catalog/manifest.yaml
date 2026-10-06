@@ -73,3 +73,6 @@ bibEntries:
       year         = {1979},
       doi          = {10.1137/0208032}
     }
+issue:
+  repositoryId: 1320232165
+  number: 180
