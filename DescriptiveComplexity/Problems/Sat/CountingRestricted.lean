@@ -208,7 +208,9 @@ theorem sharpAllVertexCovers_mem_sharpP : SharpAllVertexCovers ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => (sharpAllVertexCovers_eq A).symm)
     sharpAllIndependentSets_mem_sharpP
 
-/-- **Counting all the vertex covers of a graph is one-call `#P`-complete.** -/
+/-- **Counting all the vertex covers of a graph is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.AllSetsComplete.sharpAllVertexCovers_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.AllSetsComplete.html#s-Lax859101.AllSetsComplete.sharpAllVertexCovers_sharpP_oneCallComplete). -/
 theorem sharpAllVertexCovers_sharpP_oneCallComplete :
     SharpP.OneCallComplete SharpAllVertexCovers :=
   .of_mem sharpAllVertexCovers_mem_sharpP
@@ -527,21 +529,27 @@ end Edge
 
 /-! ### Completeness -/
 
-/-- **#2SAT is one-call `#P`-complete.** -/
+/-- **#2SAT is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.RestrictedSatComplete.sharpTwoSat_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.RestrictedSatComplete.html#s-Lax859101.RestrictedSatComplete.sharpTwoSat_sharpP_oneCallComplete). -/
 theorem sharpTwoSat_sharpP_oneCallComplete : SharpP.OneCallComplete SharpTwoSAT :=
   .of_mem sharpTwoSat_mem_sharpP (CountingClass.OneCallHard.of_oneCall
     ((sharpAllIndependentSets_oneCall_sharpSat false).restrict widthTwoS fun _ _ _ _ _ =>
       realize_widthTwoS.mpr edge_widthAtMostTwo)
     sharpAllIndependentSets_sharpP_oneCallHard)
 
-/-- **#HORN-SAT is one-call `#P`-complete.** -/
+/-- **#HORN-SAT is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.RestrictedSatComplete.sharpHornSat_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.RestrictedSatComplete.html#s-Lax859101.RestrictedSatComplete.sharpHornSat_sharpP_oneCallComplete). -/
 theorem sharpHornSat_sharpP_oneCallComplete : SharpP.OneCallComplete SharpHornSAT :=
   .of_mem sharpHornSat_mem_sharpP (CountingClass.OneCallHard.of_oneCall
     ((sharpAllIndependentSets_oneCall_sharpSat false).restrict hornS fun _ _ _ _ _ =>
       realize_hornS.mpr edge_atMostOnePositive)
     sharpAllIndependentSets_sharpP_oneCallHard)
 
-/-- **#Monotone-2SAT is one-call `#P`-complete.** -/
+/-- **#Monotone-2SAT is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.RestrictedSatComplete.sharpMonotoneTwoSat_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.RestrictedSatComplete.html#s-Lax859101.RestrictedSatComplete.sharpMonotoneTwoSat_sharpP_oneCallComplete). -/
 theorem sharpMonotoneTwoSat_sharpP_oneCallComplete : SharpP.OneCallComplete SharpMonotoneTwoSAT :=
   .of_mem sharpMonotoneTwoSat_mem_sharpP (CountingClass.OneCallHard.of_oneCall
     ((sharpAllIndependentSets_oneCall_sharpSat true).restrict _ fun _ _ _ _ _ =>

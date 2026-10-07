@@ -290,7 +290,9 @@ theorem sharpBIS_sharpP_oneCallHard : SharpP.OneCallHard SharpBIS :=
 
 /-- **#BIS is one-call `#P`-complete**: counting the independent sets of a
 bipartite graph is in `#P`, and every problem of `#P` reduces to it with one
-call. -/
+call.
+Registered in the Lax archive as
+[`Lax859101.BipartiteComplete.sharpBIS_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.BipartiteComplete.html#s-Lax859101.BipartiteComplete.sharpBIS_sharpP_oneCallComplete). -/
 theorem sharpBIS_sharpP_oneCallComplete : SharpP.OneCallComplete SharpBIS :=
   .of_mem sharpBIS_mem_sharpP sharpBIS_sharpP_oneCallHard
 
@@ -367,7 +369,9 @@ noncomputable def sharpBIS_oneCall_sharpPP2DNF : SharpBIS ≤ᶜ[≤] SharpPP2DN
 theorem sharpPP2DNF_sharpP_oneCallHard : SharpP.OneCallHard SharpPP2DNF :=
   CountingClass.OneCallHard.of_oneCall sharpBIS_oneCall_sharpPP2DNF sharpBIS_sharpP_oneCallHard
 
-/-- **#PP2DNF is one-call `#P`-complete.** -/
+/-- **#PP2DNF is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.BipartiteComplete.sharpPP2DNF_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.BipartiteComplete.html#s-Lax859101.BipartiteComplete.sharpPP2DNF_sharpP_oneCallComplete). -/
 theorem sharpPP2DNF_sharpP_oneCallComplete : SharpP.OneCallComplete SharpPP2DNF :=
   .of_mem sharpPP2DNF_mem_sharpP sharpPP2DNF_sharpP_oneCallHard
 

@@ -229,7 +229,9 @@ theorem sharpAllIndependentSets_sharpP_oneCallHard : SharpP.OneCallHard SharpAll
     (oneCallHard_sharpP_of_parsimoniousHard sharpIndependentSet_sharpP_parsimoniousHard)
 
 /-- **Counting all the independent sets of a graph is one-call
-`#P`-complete.** -/
+`#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.AllSetsComplete.sharpAllIndependentSets_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.AllSetsComplete.html#s-Lax859101.AllSetsComplete.sharpAllIndependentSets_sharpP_oneCallComplete). -/
 theorem sharpAllIndependentSets_sharpP_oneCallComplete :
     SharpP.OneCallComplete SharpAllIndependentSets :=
   .of_mem sharpAllIndependentSets_mem_sharpP sharpAllIndependentSets_sharpP_oneCallHard

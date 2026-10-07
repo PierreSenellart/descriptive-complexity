@@ -338,7 +338,9 @@ noncomputable def sharpSat_strongSubtractive_sharpDnf :
     rw [h1, h2, h4, ← h3, sharpSat_apply]
     exact Nat.add_comm _ _
 
-/-- #SAT reduces to #DNF by a subtractive reduction. -/
+/-- #SAT reduces to #DNF by a subtractive reduction.
+Registered in the Lax archive as
+[`Lax859101.DnfComplete.sharpSat_subtractive_sharpDnf`](https://laxarchive.org/lax-859101/Lax859101.DnfComplete.html#s-Lax859101.DnfComplete.sharpSat_subtractive_sharpDnf). -/
 theorem sharpSat_subtractive_sharpDnf : SharpSAT ≤ˢ SharpDNF :=
   sharpSat_strongSubtractive_sharpDnf.subtractiveReducible
 
@@ -350,7 +352,9 @@ theorem sharpDnf_sharpP_hard : SharpP.Hard SharpDNF :=
 /-- **#DNF is `#P`-complete**
 (Proposition 3.4 of [Durand, Hermann, Kolaitis 2005][durand2005subtractive]):
 it is in `#P`, every problem of `#P` reduces to it by a subtractive reduction,
-and `#P` is closed under those. -/
+and `#P` is closed under those.
+Registered in the Lax archive as
+[`Lax859101.DnfComplete.sharpDnf_sharpP_complete`](https://laxarchive.org/lax-859101/Lax859101.DnfComplete.html#s-Lax859101.DnfComplete.sharpDnf_sharpP_complete). -/
 theorem sharpDnf_sharpP_complete : SharpP.Complete SharpDNF :=
   ⟨sharpDnf_mem_sharpP, sharpDnf_sharpP_hard⟩
 

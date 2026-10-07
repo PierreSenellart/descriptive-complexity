@@ -570,7 +570,9 @@ noncomputable def sharpSat_oneCall_sharpThreeCol : SharpSAT ≤ᶜ[≤] SharpThr
     rw [sharpThreeCol_draw, card_proper, eval_gateCount, pow_mul, sharpSat_apply]
     norm_num
 
-/-- **#3-Colorability is one-call `#P`-complete.** -/
+/-- **#3-Colorability is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.ColoringComplete.sharpThreeCol_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.ColoringComplete.html#s-Lax859101.ColoringComplete.sharpThreeCol_sharpP_oneCallComplete). -/
 theorem sharpThreeCol_sharpP_oneCallComplete : SharpP.OneCallComplete SharpThreeCol :=
   .of_mem sharpThreeCol_mem_sharpP (CountingClass.OneCallHard.of_oneCall
     sharpSat_oneCall_sharpThreeCol

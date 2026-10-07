@@ -338,7 +338,9 @@ noncomputable def sharpSat_oneCall_sharpNaeSat : SharpSAT ≤ᶜ[≤] SharpNAESA
     · omega
     · rw [h1, h2]
 
-/-- **#NAE-SAT is one-call `#P`-complete.** -/
+/-- **#NAE-SAT is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.NaeSatComplete.sharpNaeSat_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.NaeSatComplete.html#s-Lax859101.NaeSatComplete.sharpNaeSat_sharpP_oneCallComplete). -/
 theorem sharpNaeSat_sharpP_oneCallComplete : SharpP.OneCallComplete SharpNAESAT :=
   .of_mem sharpNaeSat_mem_sharpP (CountingClass.OneCallHard.of_oneCall
     sharpSat_oneCall_sharpNaeSat
@@ -508,7 +510,9 @@ noncomputable def sharpNaeSat_oneCall_sharpSetSplitting : SharpNAESAT ≤ᶜ[≤
       change SharpNAESAT A = SharpSetSplitting (splInterp.Map A) / 2 ^ nonVarCount.eval A
       rw [eval_nonVarCount, card_split_map, Nat.mul_div_cancel _ (by positivity)]
 
-/-- **#Set Splitting is one-call `#P`-complete.** -/
+/-- **#Set Splitting is one-call `#P`-complete.**
+Registered in the Lax archive as
+[`Lax859101.NaeSatComplete.sharpSetSplitting_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.NaeSatComplete.html#s-Lax859101.NaeSatComplete.sharpSetSplitting_sharpP_oneCallComplete). -/
 theorem sharpSetSplitting_sharpP_oneCallComplete : SharpP.OneCallComplete SharpSetSplitting :=
   .of_mem sharpSetSplitting_mem_sharpP (CountingClass.OneCallHard.of_oneCall
     sharpNaeSat_oneCall_sharpSetSplitting sharpNaeSat_sharpP_oneCallComplete.oneCallHard)

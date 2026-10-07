@@ -312,7 +312,9 @@ theorem OneCallHard.of_oneCall {C : CountingProblem L} {D : CountingProblem L'}
   fun E hE => ⟨(hC E hE).some.trans f⟩
 
 /-- One-call hardness is hardness for the one-call closure: every problem of
-the closure, and not only of the class, reduces to a one-call hard problem. -/
+the closure, and not only of the class, reduces to a one-call hard problem.
+Registered in the Lax archive as
+[`Lax859101.OneCallClosure.oneCallHard_iff`](https://laxarchive.org/lax-859101/Lax859101.OneCallClosure.html#s-Lax859101.OneCallClosure.oneCallHard_iff). -/
 theorem oneCallHard_iff {C : CountingProblem L} :
     K.OneCallHard C ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (D : CountingProblem L''),
@@ -363,7 +365,9 @@ theorem oneCallHard_sharpP_of_parsimoniousHard {C : CountingProblem L}
     (h : SharpP.ParsimoniousHard C) : SharpP.OneCallHard C :=
   fun D hD => (h D hD).map fun g => g.toOneCall
 
-/-- A parsimoniously `#P`-complete problem is one-call `#P`-complete. -/
+/-- A parsimoniously `#P`-complete problem is one-call `#P`-complete.
+Registered in the Lax archive as
+[`Lax859101.OneCallClosure.oneCallComplete_sharpP_of_parsimoniousComplete`](https://laxarchive.org/lax-859101/Lax859101.OneCallClosure.html#s-Lax859101.OneCallClosure.oneCallComplete_sharpP_of_parsimoniousComplete). -/
 theorem oneCallComplete_sharpP_of_parsimoniousComplete {C : CountingProblem L}
     (h : SharpP.ParsimoniousComplete C) : SharpP.OneCallComplete C :=
   .of_mem h.1 (oneCallHard_sharpP_of_parsimoniousHard h.2)

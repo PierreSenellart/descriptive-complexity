@@ -284,7 +284,9 @@ theorem sharpDnf_sharpP_oneCallHard : SharpP.OneCallHard SharpDNF :=
 
 /-- **#DNF is one-call `#P`-complete**
 ([Durand, Hermann, Kolaitis 2005][durand2005subtractive]): in `#P`, and every
-problem of `#P` reduces to it with one call. -/
+problem of `#P` reduces to it with one call.
+Registered in the Lax archive as
+[`Lax859101.DnfComplete.sharpDnf_sharpP_oneCallComplete`](https://laxarchive.org/lax-859101/Lax859101.DnfComplete.html#s-Lax859101.DnfComplete.sharpDnf_sharpP_oneCallComplete). -/
 theorem sharpDnf_sharpP_oneCallComplete : SharpP.OneCallComplete SharpDNF :=
   .of_mem sharpDnf_mem_sharpP sharpDnf_sharpP_oneCallHard
 
