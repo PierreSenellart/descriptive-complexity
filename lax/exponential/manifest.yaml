@@ -26,3 +26,6 @@ bibEntries:
       doi = {10.5281/zenodo.21678423},
       url = {https://github.com/PierreSenellart/descriptive-complexity}
     }
+issue:
+  repositoryId: 1320232165
+  number: 185
