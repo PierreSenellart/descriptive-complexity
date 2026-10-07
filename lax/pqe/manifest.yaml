@@ -1,0 +1,31 @@
+specVersion: "1"
+id: "lax-794877"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Probabilistic query evaluation is #P-hard"
+authors:
+  - name: "Pierre Senellart"
+    orcid: "0000-0002-7909-5369"
+    github: "PierreSenellart"
+  - name: "Claude (Anthropic)"
+bibEntries:
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @article{dalvi2012dichotomy,
+      author       = {Nilesh Dalvi and Dan Suciu},
+      title        = {The dichotomy of probabilistic inference for unions of
+                      conjunctive queries},
+      journal      = {J. {ACM}},
+      volume       = {59},
+      number       = {6},
+      pages        = {1--87},
+      year         = {2012},
+      doi          = {10.1145/2395116.2395119}
+    }
