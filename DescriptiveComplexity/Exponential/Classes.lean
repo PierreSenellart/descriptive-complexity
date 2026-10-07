@@ -122,12 +122,16 @@ Every later result about the exponential classes is stated about
 the work happens once, at `DescriptiveComplexity.ComplexityClass.exp` and an
 arbitrary class. -/
 
-/-- **EXPTIME is polynomial time on succinct instances.** -/
+/-- **EXPTIME is polynomial time on succinct instances.**
+Registered in the Lax archive as
+[`Lax480241.ExponentialCaptures.EXPTIME_eq_PTIME_exp`](https://laxarchive.org/lax-480241/Lax480241.ExponentialCaptures.html#s-Lax480241.ExponentialCaptures.EXPTIME_eq_PTIME_exp). -/
 theorem EXPTIME_eq_PTIME_exp : EXPTIME = PTIME.exp :=
   ComplexityClass.ext (fun P => solfpDefinable_iff_expDefinable P)
     fun P => cofinalHard_congr_mem (fun Q => solfpDefinable_iff_expDefinable Q) P
 
-/-- **EXPSPACE is polynomial space on succinct instances.** -/
+/-- **EXPSPACE is polynomial space on succinct instances.**
+Registered in the Lax archive as
+[`Lax480241.ExponentialCaptures.EXPSPACE_eq_PSPACE_exp`](https://laxarchive.org/lax-480241/Lax480241.ExponentialCaptures.html#s-Lax480241.ExponentialCaptures.EXPSPACE_eq_PSPACE_exp). -/
 theorem EXPSPACE_eq_PSPACE_exp : EXPSPACE = PSPACE.exp :=
   ComplexityClass.ext (fun P => sopfpDefinable_iff_expDefinable P)
     fun P => cofinalHard_congr_mem (fun Q => sopfpDefinable_iff_expDefinable Q) P

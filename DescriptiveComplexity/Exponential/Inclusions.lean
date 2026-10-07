@@ -73,12 +73,16 @@ theorem EXPSPACE_eq_coEXPSPACE : EXPSPACE = coEXPSPACE := by
   rw [show coEXPSPACE = EXPSPACE.compl from rfl, EXPSPACE_eq_PSPACE_exp,
     ← ComplexityClass.exp_compl, PSPACE_compl_eq]
 
-/-- A problem is in EXPTIME exactly when its complement is. -/
+/-- A problem is in EXPTIME exactly when its complement is.
+Registered in the Lax archive as
+[`Lax480241.ExponentialComplements.mem_EXPTIME_compl_iff`](https://laxarchive.org/lax-480241/Lax480241.ExponentialComplements.html#s-Lax480241.ExponentialComplements.mem_EXPTIME_compl_iff). -/
 theorem mem_EXPTIME_compl_iff (P : DecisionProblem L) : Pᶜ ∈ EXPTIME ↔ P ∈ EXPTIME := by
   conv_rhs => rw [EXPTIME_eq_coEXPTIME]
   exact Iff.rfl
 
-/-- A problem is in EXPSPACE exactly when its complement is. -/
+/-- A problem is in EXPSPACE exactly when its complement is.
+Registered in the Lax archive as
+[`Lax480241.ExponentialComplements.mem_EXPSPACE_compl_iff`](https://laxarchive.org/lax-480241/Lax480241.ExponentialComplements.html#s-Lax480241.ExponentialComplements.mem_EXPSPACE_compl_iff). -/
 theorem mem_EXPSPACE_compl_iff (P : DecisionProblem L) : Pᶜ ∈ EXPSPACE ↔ P ∈ EXPSPACE := by
   conv_rhs => rw [EXPSPACE_eq_coEXPSPACE]
   exact Iff.rfl
@@ -104,7 +108,9 @@ a polynomial-level inclusion, read through the bridge theorems of
 
 /-- **`PSPACE ⊆ EXPTIME`**: an SO(TC) walk is a reachability question on the
 expansion whose points are its states, and reachability is in polynomial time.
-On the definitions this is **SO(TC) ⊆ SO(LFP)**. -/
+On the definitions this is **SO(TC) ⊆ SO(LFP)**.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.PSPACE_subset_EXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.PSPACE_subset_EXPTIME). -/
 theorem PSPACE_subset_EXPTIME : PSPACE ⊆ EXPTIME := by
   rw [EXPTIME_eq_PTIME_exp]
   exact PSPACE_subset_PTIME_exp
@@ -121,7 +127,9 @@ theorem PTIME_subset_PSPACE : PTIME ⊆ PSPACE :=
   fun _ _ _ h => NP_subset_PSPACE (PTIME_subset_NP h)
 
 /-- **`EXPTIME ⊆ EXPSPACE`**, i.e., **SO(LFP) ⊆ SO(PFP)** – the second-order
-shadow of `PTIME ⊆ PSPACE`. -/
+shadow of `PTIME ⊆ PSPACE`.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.EXPTIME_subset_EXPSPACE`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.EXPTIME_subset_EXPSPACE). -/
 theorem EXPTIME_subset_EXPSPACE : EXPTIME ⊆ EXPSPACE := by
   rw [EXPTIME_eq_PTIME_exp, EXPSPACE_eq_PSPACE_exp]
   exact ComplexityClass.exp_mono PTIME_subset_PSPACE
@@ -130,19 +138,25 @@ theorem EXPTIME_subset_EXPSPACE : EXPTIME ⊆ EXPSPACE := by
 theorem coEXPTIME_subset_EXPSPACE : coEXPTIME ⊆ EXPSPACE :=
   EXPTIME_eq_coEXPTIME ▸ EXPTIME_subset_EXPSPACE
 
-/-- **`EXPTIME ⊆ NEXPTIME`**, the second-order shadow of `PTIME ⊆ NP`. -/
+/-- **`EXPTIME ⊆ NEXPTIME`**, the second-order shadow of `PTIME ⊆ NP`.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.EXPTIME_subset_NEXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.EXPTIME_subset_NEXPTIME). -/
 theorem EXPTIME_subset_NEXPTIME : EXPTIME ⊆ NEXPTIME := by
   rw [EXPTIME_eq_PTIME_exp, NEXPTIME_eq_NP_exp]
   exact ComplexityClass.exp_mono PTIME_subset_NP
 
-/-- **`NEXPTIME ⊆ EXPSPACE`**, the second-order shadow of `NP ⊆ PSPACE`. -/
+/-- **`NEXPTIME ⊆ EXPSPACE`**, the second-order shadow of `NP ⊆ PSPACE`.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.NEXPTIME_subset_EXPSPACE`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.NEXPTIME_subset_EXPSPACE). -/
 theorem NEXPTIME_subset_EXPSPACE : NEXPTIME ⊆ EXPSPACE := by
   rw [NEXPTIME_eq_NP_exp, EXPSPACE_eq_PSPACE_exp]
   exact ComplexityClass.exp_mono NP_subset_PSPACE
 
 /-- `NL.exp ⊆ EXPTIME`, the second-order shadow of `NL ⊆ PTIME`. Together with
 `DescriptiveComplexity.PSPACE_subset_NL_exp` it sandwiches `NL.exp` between
-PSPACE and EXPTIME. -/
+PSPACE and EXPTIME.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.NL_exp_subset_EXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.NL_exp_subset_EXPTIME). -/
 theorem NL_exp_subset_EXPTIME : NL.exp ⊆ EXPTIME := by
   rw [EXPTIME_eq_PTIME_exp]
   exact ComplexityClass.exp_mono NL_subset_PTIME
@@ -152,17 +166,28 @@ theorem NL_exp_subset_EXPTIME : NL.exp ⊆ EXPTIME := by
 All of these route through `PSPACE ⊆ EXPTIME`, which is the only inclusion of
 this development with content. -/
 
+/-- PTIME ⊆ EXPTIME.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.PTIME_subset_EXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.PTIME_subset_EXPTIME). -/
 theorem PTIME_subset_EXPTIME : PTIME ⊆ EXPTIME :=
   fun _ _ _ h => PSPACE_subset_EXPTIME (PTIME_subset_PSPACE h)
 
+/-- NP ⊆ NEXPTIME.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.NP_subset_NEXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.NP_subset_NEXPTIME). -/
 theorem NP_subset_NEXPTIME : NP ⊆ NEXPTIME :=
   fun _ _ _ h => EXPTIME_subset_NEXPTIME (PSPACE_subset_EXPTIME (NP_subset_PSPACE h))
 
+/-- PSPACE ⊆ EXPSPACE.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.PSPACE_subset_EXPSPACE`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.PSPACE_subset_EXPSPACE). -/
 theorem PSPACE_subset_EXPSPACE : PSPACE ⊆ EXPSPACE :=
   fun _ _ _ h => EXPTIME_subset_EXPSPACE (PSPACE_subset_EXPTIME h)
 
 /-- The whole polynomial hierarchy sits inside EXPTIME, through
-`DescriptiveComplexity.PH_subset_PSPACE`. -/
+`DescriptiveComplexity.PH_subset_PSPACE`.
+Registered in the Lax archive as
+[`Lax480241.ExponentialInclusions.PH_subset_EXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.PH_subset_EXPTIME). -/
 theorem PH_subset_EXPTIME : PH ⊆ EXPTIME :=
   fun _ _ _ h => PSPACE_subset_EXPTIME (PH_subset_PSPACE h)
 

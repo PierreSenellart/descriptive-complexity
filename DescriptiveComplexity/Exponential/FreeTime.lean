@@ -451,7 +451,9 @@ theorem solfpDefinable_iff_free (P : DecisionProblem L) :
   (solfpDefinable_iff_expDefinable P).trans
     ((expDefinable_PTIME_iff_free P).trans (solfpDefinableFree_iff_expDefinableFree P).symm)
 
-/-- **EXPTIME is SO(LFP), no order needed.** -/
+/-- **EXPTIME is SO(LFP), no order needed.**
+Registered in the Lax archive as
+[`Lax480241.ExponentialCaptures.mem_EXPTIME_iff_solfpDefinableFree`](https://laxarchive.org/lax-480241/Lax480241.ExponentialCaptures.html#s-Lax480241.ExponentialCaptures.mem_EXPTIME_iff_solfpDefinableFree). -/
 theorem mem_EXPTIME_iff_solfpDefinableFree (P : DecisionProblem L) :
     P ∈ EXPTIME ↔ SOLFPDefinableFree P :=
   (mem_EXPTIME_iff P).trans (solfpDefinable_iff_free P)
