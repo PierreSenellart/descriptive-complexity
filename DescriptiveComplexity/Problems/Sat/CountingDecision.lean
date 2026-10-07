@@ -177,16 +177,22 @@ noncomputable def ParitySAT : DecisionProblem Language.sat :=
 noncomputable def ModSAT (k : ℕ) : DecisionProblem Language.sat :=
   SharpSAT.decide fun c => ¬ k ∣ c
 
-/-- **⊕SAT is `⊕P`-complete.** -/
+/-- **⊕SAT is `⊕P`-complete.**
+Registered in the Lax archive as
+[`Lax175070.ParitySatComplete.paritySat_parityP_complete`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.paritySat_parityP_complete). -/
 theorem paritySat_parityP_complete : ParityP.Complete ParitySAT :=
   decide_sharpSat_countClass₁_complete Odd
 
-/-- **Mod_k-SAT is `Mod_k P`-complete.** -/
+/-- **Mod_k-SAT is `Mod_k P`-complete.**
+Registered in the Lax archive as
+[`Lax175070.ParitySatComplete.modSat_modP_complete`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.modSat_modP_complete). -/
 theorem modSat_modP_complete (k : ℕ) : (ModP k).Complete (ModSAT k) :=
   decide_sharpSat_countClass₁_complete _
 
 /-- The parity of every parsimoniously `#P`-complete problem is
-`⊕P`-complete. -/
+`⊕P`-complete.
+Registered in the Lax archive as
+[`Lax175070.ParitySatComplete.parityP_complete_of_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.parityP_complete_of_sharpP_parsimoniousComplete). -/
 theorem parityP_complete_of_sharpP_parsimoniousComplete {L : Language.{0, 0}} [L.IsRelational]
     {C : CountingProblem L} (hC : SharpP.ParsimoniousComplete C) :
     ParityP.Complete (C.decide Odd) :=
@@ -194,19 +200,25 @@ theorem parityP_complete_of_sharpP_parsimoniousComplete {L : Language.{0, 0}} [L
 
 /-- **The machine characterization of `⊕P`**: a problem is in `⊕P` exactly
 when it reduces to the parity of the number of accepting runs of a
-nondeterministic polynomial-time machine. -/
+nondeterministic polynomial-time machine.
+Registered in the Lax archive as
+[`Lax175070.ParitySatComplete.mem_parityP_iff_le_parity_sharpNtmAccept`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.mem_parityP_iff_le_parity_sharpNtmAccept). -/
 theorem mem_parityP_iff_le_parity_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational]
     (P : DecisionProblem L) : P ∈ ParityP ↔ Nonempty (P ≤ᶠᵒ[≤] SharpNTMAccept.decide Odd) :=
   mem_countClass₁_iff_le_decide_sharpNtmAccept Odd P
 
-/-- **The machine characterization of `Mod_k P`**. -/
+/-- **The machine characterization of `Mod_k P`**.
+Registered in the Lax archive as
+[`Lax175070.ParitySatComplete.mem_modP_iff_le_mod_sharpNtmAccept`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.mem_modP_iff_le_mod_sharpNtmAccept). -/
 theorem mem_modP_iff_le_mod_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational] (k : ℕ)
     (P : DecisionProblem L) :
     P ∈ ModP k ↔ Nonempty (P ≤ᶠᵒ[≤] SharpNTMAccept.decide fun c => ¬ k ∣ c) :=
   mem_countClass₁_iff_le_decide_sharpNtmAccept _ P
 
 /-- The residue of every parsimoniously `#P`-complete problem is
-`Mod_k P`-complete. -/
+`Mod_k P`-complete.
+Registered in the Lax archive as
+[`Lax175070.ParitySatComplete.modP_complete_of_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.modP_complete_of_sharpP_parsimoniousComplete). -/
 theorem modP_complete_of_sharpP_parsimoniousComplete {L : Language.{0, 0}} [L.IsRelational]
     (k : ℕ) {C : CountingProblem L} (hC : SharpP.ParsimoniousComplete C) :
     (ModP k).Complete (C.decide fun c => ¬ k ∣ c) :=

@@ -88,7 +88,9 @@ theorem sharpDominatingSet_apply (A : Type) [Language.markedGraph.Structure A] :
   rfl
 
 /-- **The support of #Dominating Set is Dominating Set**: a dominating set at
-most as large as the marked set extends to one of exactly that size. -/
+most as large as the marked set extends to one of exactly that size.
+Registered in the Lax archive as
+[`Lax280166.DominatingSetComplete.sharpDominatingSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.DominatingSetComplete.html#s-Lax280166.DominatingSetComplete.sharpDominatingSet_support_iff). -/
 theorem sharpDominatingSet_support_iff (A : Type) [Language.markedGraph.Structure A]
     [Finite A] : SharpDominatingSet.support A ↔ DominatingSet A := by
   rw [CountingProblem.support_iff, sharpDominatingSet_apply, Nat.card_pos_iff]

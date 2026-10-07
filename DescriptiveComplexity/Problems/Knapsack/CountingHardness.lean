@@ -76,7 +76,9 @@ theorem sharpKnapsack_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpKna
     sharpExactCover_ordered_parsimonious_sharpKnapsack sharpExactCover_sharpP_parsimoniousHard
 
 /-- **#Knapsack is parsimoniously `#P`-complete**, its weights being written in
-binary. -/
+binary.
+Registered in the Lax archive as
+[`Lax280166.KnapsackComplete.sharpKnapsack_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.KnapsackComplete.html#s-Lax280166.KnapsackComplete.sharpKnapsack_sharpP_parsimoniousComplete). -/
 theorem sharpKnapsack_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpKnapsack :=
   ⟨sharpKnapsack_mem_sharpP, sharpKnapsack_sharpP_parsimoniousHard⟩

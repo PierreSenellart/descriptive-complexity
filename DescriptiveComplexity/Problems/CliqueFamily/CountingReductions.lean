@@ -167,7 +167,9 @@ theorem sharpVertexCover_apply :
     SharpVertexCover A = Nat.card {C : A → Prop // CoverOfSize A C} :=
   rfl
 
-/-- **The support of #Independent Set is Independent Set.** -/
+/-- **The support of #Independent Set is Independent Set.**
+Registered in the Lax archive as
+[`Lax280166.IndependentSetComplete.sharpIndependentSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.IndependentSetComplete.html#s-Lax280166.IndependentSetComplete.sharpIndependentSet_support_iff). -/
 theorem sharpIndependentSet_support_iff [Finite A] :
     SharpIndependentSet.support A ↔ IndependentSet A := by
   rw [CountingProblem.support_iff, sharpIndependentSet_apply, Nat.card_pos_iff]
@@ -179,7 +181,9 @@ theorem sharpIndependentSet_support_iff [Finite A] :
     exact ⟨⟨⟨S, hfin, hS⟩⟩, inferInstance⟩
 
 /-- **The support of #Vertex Cover is Vertex Cover**: a cover at most as large
-as the marked set extends to one of exactly that size. -/
+as the marked set extends to one of exactly that size.
+Registered in the Lax archive as
+[`Lax280166.VertexCoverComplete.sharpVertexCover_support_iff`](https://laxarchive.org/lax-280166/Lax280166.VertexCoverComplete.html#s-Lax280166.VertexCoverComplete.sharpVertexCover_support_iff). -/
 theorem sharpVertexCover_support_iff [Finite A] :
     SharpVertexCover.support A ↔ VertexCover A := by
   rw [CountingProblem.support_iff, sharpVertexCover_apply, Nat.card_pos_iff]
@@ -306,7 +310,9 @@ theorem sharpIndependentSet_sharpP_parsimoniousHard :
     sharpClique_sharpP_parsimoniousHard
 
 /-- **#Independent Set is parsimoniously `#P`-complete**, counting the
-independent sets of exactly the threshold size. -/
+independent sets of exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.IndependentSetComplete.sharpIndependentSet_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.IndependentSetComplete.html#s-Lax280166.IndependentSetComplete.sharpIndependentSet_sharpP_parsimoniousComplete). -/
 theorem sharpIndependentSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpIndependentSet :=
   ⟨sharpIndependentSet_mem_sharpP, sharpIndependentSet_sharpP_parsimoniousHard⟩
@@ -328,7 +334,9 @@ theorem sharpVertexCover_sharpP_parsimoniousHard :
     sharpIndependentSet_sharpP_parsimoniousHard
 
 /-- **#Vertex Cover is parsimoniously `#P`-complete**, counting the vertex
-covers of exactly the threshold size. -/
+covers of exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.VertexCoverComplete.sharpVertexCover_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.VertexCoverComplete.html#s-Lax280166.VertexCoverComplete.sharpVertexCover_sharpP_parsimoniousComplete). -/
 theorem sharpVertexCover_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpVertexCover :=
   ⟨sharpVertexCover_mem_sharpP, sharpVertexCover_sharpP_parsimoniousHard⟩

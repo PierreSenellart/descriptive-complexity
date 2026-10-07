@@ -217,7 +217,9 @@ def atomicAgreeOn₂ (S : Set (Σ n, L.Relations n)) (M N : Type) [L.Structure M
 pebbles**: over the empty vocabulary, tuples with the same equality pattern
 are `≡ᵏ`-equivalent *across* the two sets, however far apart their sizes. The
 strategy is the one of `DescriptiveComplexity.exists_update_pattern`, played
-on both sides at once. -/
+on both sides at once.
+Registered in the Lax archive as
+[`Lax945089.PebbleInvariance.equivK₂_bare`](https://laxarchive.org/lax-945089/Lax945089.PebbleInvariance.html#s-Lax945089.PebbleInvariance.equivK₂_bare). -/
 theorem equivK₂_bare [Language.empty.Structure M] [Language.empty.Structure N]
     [Finite M] [Finite N] {S : Set (Σ n, Language.empty.Relations n)}
     (hM : k ≤ Nat.card M) (hN : k ≤ Nat.card N) {v : Fin k → M} {w : Fin k → N}

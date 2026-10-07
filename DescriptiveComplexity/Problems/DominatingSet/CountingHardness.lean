@@ -512,7 +512,9 @@ theorem sharpDominatingSet_sharpP_parsimoniousHard :
     sharpSat_sharpP_parsimoniousHard
 
 /-- **#Dominating Set is parsimoniously `#P`-complete**, counting the dominating
-sets of exactly the threshold size. -/
+sets of exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.DominatingSetComplete.sharpDominatingSet_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.DominatingSetComplete.html#s-Lax280166.DominatingSetComplete.sharpDominatingSet_sharpP_parsimoniousComplete). -/
 theorem sharpDominatingSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpDominatingSet :=
   ⟨sharpDominatingSet_mem_sharpP, sharpDominatingSet_sharpP_parsimoniousHard⟩

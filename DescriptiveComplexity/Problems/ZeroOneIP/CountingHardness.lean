@@ -69,7 +69,9 @@ theorem sharpZeroOneIP_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpZe
     sharpKnapsack_ordered_parsimonious_sharpZeroOneIP sharpKnapsack_sharpP_parsimoniousHard
 
 /-- **#0-1 integer programming is parsimoniously `#P`-complete**, its entries
-being written in binary. -/
+being written in binary.
+Registered in the Lax archive as
+[`Lax280166.ZeroOneIPComplete.sharpZeroOneIP_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.ZeroOneIPComplete.html#s-Lax280166.ZeroOneIPComplete.sharpZeroOneIP_sharpP_parsimoniousComplete). -/
 theorem sharpZeroOneIP_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpZeroOneIP :=
   ⟨sharpZeroOneIP_mem_sharpP, sharpZeroOneIP_sharpP_parsimoniousHard⟩

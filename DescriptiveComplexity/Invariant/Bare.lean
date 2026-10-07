@@ -201,7 +201,9 @@ are there because a binary variable forces `2 ≤ k ≤ Nat.card A`.
 
 This is the order-invariance of the library's definability notions, as a
 theorem: what a first-order induction is handed with the order, it cannot
-build. -/
+build.
+Registered in the Lax archive as
+[`Lax945089.NoDefinableOrder.not_isLinearOrder_inflLimit`](https://laxarchive.org/lax-945089/Lax945089.NoDefinableOrder.html#s-Lax945089.NoDefinableOrder.not_isLinearOrder_inflLimit). -/
 theorem not_isLinearOrder_inflLimit (hd : d.VarBound k) (harity : d.B.arity i = 2)
     (A : Type) [Language.empty.Structure A] [Finite A] (hA : k ≤ Nat.card A) :
     ¬IsLinearOrder A fun x y => d.inflLimit A i (fun p => ![x, y] (Fin.cast harity p)) := by

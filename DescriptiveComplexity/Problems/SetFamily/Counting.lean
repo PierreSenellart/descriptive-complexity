@@ -70,7 +70,9 @@ theorem sharpExactCover_apply (A : Type) [Language.setSystem.Structure A] :
       Nat.card {G : A → Prop // ExactCoverBy (SSElem (A := A)) SSFam SSMem G} :=
   rfl
 
-/-- **The support of #ExactCover is Exact Cover.** -/
+/-- **The support of #ExactCover is Exact Cover.**
+Registered in the Lax archive as
+[`Lax280166.ExactCoverComplete.sharpExactCover_support_iff`](https://laxarchive.org/lax-280166/Lax280166.ExactCoverComplete.html#s-Lax280166.ExactCoverComplete.sharpExactCover_support_iff). -/
 theorem sharpExactCover_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
     SharpExactCover.support A ↔ ExactCover A := by
   rw [CountingProblem.support_iff, sharpExactCover_apply, Nat.card_pos_iff]

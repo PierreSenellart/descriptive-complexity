@@ -688,7 +688,9 @@ theorem sharpClique_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpCliqu
     sharpOneInSat_ordered_parsimonious_sharpClique sharpOneInSat_sharpP_parsimoniousHard
 
 /-- **#Clique is parsimoniously `#P`-complete**, counting the cliques of exactly
-the threshold size. -/
+the threshold size.
+Registered in the Lax archive as
+[`Lax280166.CliqueComplete.sharpClique_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.CliqueComplete.html#s-Lax280166.CliqueComplete.sharpClique_sharpP_parsimoniousComplete). -/
 theorem sharpClique_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpClique :=
   ⟨sharpClique_mem_sharpP, sharpClique_sharpP_parsimoniousHard⟩

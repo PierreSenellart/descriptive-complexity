@@ -279,7 +279,9 @@ theorem sharpDirHamCircuit_apply (A : Type) [Language.digraph.Structure A] :
   rfl
 
 /-- **The support of #Directed Hamilton Circuit is Directed Hamilton
-Circuit.** -/
+Circuit.**
+Registered in the Lax archive as
+[`Lax280166.DirHamCircuitComplete.sharpDirHamCircuit_support_iff`](https://laxarchive.org/lax-280166/Lax280166.DirHamCircuitComplete.html#s-Lax280166.DirHamCircuitComplete.sharpDirHamCircuit_support_iff). -/
 theorem sharpDirHamCircuit_support_iff (A : Type) [Language.digraph.Structure A]
     [Finite A] : SharpDirHamCircuit.support A ↔ DirHamCircuit A := by
   rw [CountingProblem.support_iff, sharpDirHamCircuit_apply, Nat.card_pos_iff]

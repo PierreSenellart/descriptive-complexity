@@ -739,7 +739,9 @@ theorem sharpOneInSat_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpOne
   SharpP.parsimoniousHard_of_orderedParsimonious sharpSat_ordered_parsimonious_sharpOneInSat
     sharpSat_sharpP_parsimoniousHard
 
-/-- **#1-in-SAT is parsimoniously `#P`-complete.** -/
+/-- **#1-in-SAT is parsimoniously `#P`-complete.**
+Registered in the Lax archive as
+[`Lax280166.OneInSATComplete.sharpOneInSat_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.OneInSATComplete.html#s-Lax280166.OneInSATComplete.sharpOneInSat_sharpP_parsimoniousComplete). -/
 theorem sharpOneInSat_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpOneInSAT :=
   ⟨sharpOneInSat_mem_sharpP, sharpOneInSat_sharpP_parsimoniousHard⟩

@@ -86,7 +86,9 @@ theorem oneInModel_restrict {A : Type} [Language.sat.Structure A] {ν : A → Pr
   exact ⟨x, s, hx, (hlit c x s hx).mpr hT,
     fun y t hy hTy => huniq y t hy ((hlit c y t hy).mp hTy)⟩
 
-/-- **The support of #1-in-SAT is 1-in-SAT.** -/
+/-- **The support of #1-in-SAT is 1-in-SAT.**
+Registered in the Lax archive as
+[`Lax280166.OneInSATComplete.sharpOneInSat_support_iff`](https://laxarchive.org/lax-280166/Lax280166.OneInSATComplete.html#s-Lax280166.OneInSATComplete.sharpOneInSat_support_iff). -/
 theorem sharpOneInSat_support_iff (A : Type) [Language.sat.Structure A] [Finite A] :
     SharpOneInSAT.support A ↔ OneInSAT A := by
   rw [CountingProblem.support_iff, sharpOneInSat_apply, Nat.card_pos_iff]

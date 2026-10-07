@@ -155,7 +155,9 @@ theorem sharpZeroOneIP_apply (A : Type) [Language.zeroOneIP.Structure A] :
     SharpZeroOneIP A = Nat.card {x : A → Prop // ZeroOneSol A x} :=
   rfl
 
-/-- **The support of #0-1 integer programming is 0-1 integer programming.** -/
+/-- **The support of #0-1 integer programming is 0-1 integer programming.**
+Registered in the Lax archive as
+[`Lax280166.ZeroOneIPComplete.sharpZeroOneIP_support_iff`](https://laxarchive.org/lax-280166/Lax280166.ZeroOneIPComplete.html#s-Lax280166.ZeroOneIPComplete.sharpZeroOneIP_support_iff). -/
 theorem sharpZeroOneIP_support_iff (A : Type) [Language.zeroOneIP.Structure A] [Finite A] :
     SharpZeroOneIP.support A ↔ ZeroOneIP A := by
   rw [CountingProblem.support_iff, sharpZeroOneIP_apply, Nat.card_pos_iff]

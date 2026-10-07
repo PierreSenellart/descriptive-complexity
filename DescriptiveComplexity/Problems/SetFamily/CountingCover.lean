@@ -133,27 +133,35 @@ theorem sharpHittingSet_apply :
     SharpHittingSet A = Nat.card {H : A → Prop // HittingSetOfSize A H} :=
   rfl
 
-/-- The support of #Set Cover: some cover has exactly the threshold size. -/
+/-- The support of #Set Cover: some cover has exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.SetCoverComplete.sharpSetCover_support_iff`](https://laxarchive.org/lax-280166/Lax280166.SetCoverComplete.html#s-Lax280166.SetCoverComplete.sharpSetCover_support_iff). -/
 theorem sharpSetCover_support_iff [Finite A] :
     SharpSetCover.support A ↔ ∃ G : A → Prop, SetCoverOfSize A G := by
   rw [CountingProblem.support_iff, sharpSetCover_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨G⟩, _⟩ => ⟨G.1, G.2⟩, fun ⟨G, hG⟩ => ⟨⟨⟨G, hG⟩⟩, inferInstance⟩⟩
 
 /-- The support of #Hitting Set: some hitting set has exactly the threshold
-size. -/
+size.
+Registered in the Lax archive as
+[`Lax280166.HittingSetComplete.sharpHittingSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.HittingSetComplete.html#s-Lax280166.HittingSetComplete.sharpHittingSet_support_iff). -/
 theorem sharpHittingSet_support_iff [Finite A] :
     SharpHittingSet.support A ↔ ∃ H : A → Prop, HittingSetOfSize A H := by
   rw [CountingProblem.support_iff, sharpHittingSet_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨H⟩, _⟩ => ⟨H.1, H.2⟩, fun ⟨H, hH⟩ => ⟨⟨⟨H, hH⟩⟩, inferInstance⟩⟩
 
 /-- The support of #Set Cover implies Set Cover; the converse fails when the
-threshold exceeds the size of the family. -/
+threshold exceeds the size of the family.
+Registered in the Lax archive as
+[`Lax280166.SetCoverComplete.setCover_of_sharpSetCover_support`](https://laxarchive.org/lax-280166/Lax280166.SetCoverComplete.html#s-Lax280166.SetCoverComplete.setCover_of_sharpSetCover_support). -/
 theorem setCover_of_sharpSetCover_support [Finite A] (h : SharpSetCover.support A) :
     SetCover A := by
   obtain ⟨G, hfin, hfam, hcov, hcard⟩ := (sharpSetCover_support_iff A).mp h
   exact ⟨hfin, G, hfam, hcov, hcard.le⟩
 
-/-- The support of #Hitting Set implies Hitting Set. -/
+/-- The support of #Hitting Set implies Hitting Set.
+Registered in the Lax archive as
+[`Lax280166.HittingSetComplete.hittingSet_of_sharpHittingSet_support`](https://laxarchive.org/lax-280166/Lax280166.HittingSetComplete.html#s-Lax280166.HittingSetComplete.hittingSet_of_sharpHittingSet_support). -/
 theorem hittingSet_of_sharpHittingSet_support [Finite A] (h : SharpHittingSet.support A) :
     HittingSet A := by
   obtain ⟨H, hfin, helem, hhit, hcard⟩ := (sharpHittingSet_support_iff A).mp h
@@ -354,7 +362,9 @@ theorem sharpSetCover_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpSet
     sharpVertexCover_sharpP_parsimoniousHard
 
 /-- **#Set Cover is parsimoniously `#P`-complete**, counting the covers of
-exactly the threshold size. -/
+exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.SetCoverComplete.sharpSetCover_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.SetCoverComplete.html#s-Lax280166.SetCoverComplete.sharpSetCover_sharpP_parsimoniousComplete). -/
 theorem sharpSetCover_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpSetCover :=
   ⟨sharpSetCover_mem_sharpP, sharpSetCover_sharpP_parsimoniousHard⟩
@@ -375,7 +385,9 @@ theorem sharpHittingSet_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpH
     sharpSetCover_sharpP_parsimoniousHard
 
 /-- **#Hitting Set is parsimoniously `#P`-complete**, counting the hitting sets
-of exactly the threshold size. -/
+of exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.HittingSetComplete.sharpHittingSet_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.HittingSetComplete.html#s-Lax280166.HittingSetComplete.sharpHittingSet_sharpP_parsimoniousComplete). -/
 theorem sharpHittingSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpHittingSet :=
   ⟨sharpHittingSet_mem_sharpP, sharpHittingSet_sharpP_parsimoniousHard⟩

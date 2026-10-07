@@ -101,14 +101,18 @@ theorem sharpFeedbackArcSet_apply (A : Type) [Language.markedArcGraph.Structure 
   rfl
 
 /-- The support of #Feedback Arc Set: some feedback arc set has exactly the
-threshold size. -/
+threshold size.
+Registered in the Lax archive as
+[`Lax280166.FeedbackArcSetComplete.sharpFeedbackArcSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.FeedbackArcSetComplete.html#s-Lax280166.FeedbackArcSetComplete.sharpFeedbackArcSet_support_iff). -/
 theorem sharpFeedbackArcSet_support_iff (A : Type) [Language.markedArcGraph.Structure A]
     [Finite A] : SharpFeedbackArcSet.support A ↔ ∃ F : A → A → Prop, FasOfSize A F := by
   rw [CountingProblem.support_iff, sharpFeedbackArcSet_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨F⟩, _⟩ => ⟨F.1, F.2⟩, fun ⟨F, hF⟩ => ⟨⟨⟨F, hF⟩⟩, inferInstance⟩⟩
 
 /-- The support of #Feedback Arc Set implies Feedback Arc Set; the converse
-fails when the threshold exceeds the number of arcs. -/
+fails when the threshold exceeds the number of arcs.
+Registered in the Lax archive as
+[`Lax280166.FeedbackArcSetComplete.feedbackArcSet_of_sharpFeedbackArcSet_support`](https://laxarchive.org/lax-280166/Lax280166.FeedbackArcSetComplete.html#s-Lax280166.FeedbackArcSetComplete.feedbackArcSet_of_sharpFeedbackArcSet_support). -/
 theorem feedbackArcSet_of_sharpFeedbackArcSet_support (A : Type)
     [Language.markedArcGraph.Structure A] [Finite A] (h : SharpFeedbackArcSet.support A) :
     FeedbackArcSet A := by

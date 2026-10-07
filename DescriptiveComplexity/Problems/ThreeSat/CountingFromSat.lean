@@ -685,7 +685,9 @@ theorem sharpThreeSat_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpThr
   SharpP.parsimoniousHard_of_orderedParsimonious sharpSat_ordered_parsimonious_sharpThreeSat
     sharpSat_sharpP_parsimoniousHard
 
-/-- **#3SAT is parsimoniously `#P`-complete.** -/
+/-- **#3SAT is parsimoniously `#P`-complete.**
+Registered in the Lax archive as
+[`Lax280166.ThreeSATComplete.sharpThreeSat_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.ThreeSATComplete.html#s-Lax280166.ThreeSATComplete.sharpThreeSat_sharpP_parsimoniousComplete). -/
 theorem sharpThreeSat_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpThreeSAT :=
   ⟨sharpThreeSat_mem_sharpP, sharpThreeSat_sharpP_parsimoniousHard⟩

@@ -85,7 +85,9 @@ theorem sharpSetPacking_apply (A : Type) [Language.setSystem.Structure A] :
   rfl
 
 /-- **The support of #Set Packing is Set Packing**: a packing at least as large
-as the marked set contains one of exactly that size. -/
+as the marked set contains one of exactly that size.
+Registered in the Lax archive as
+[`Lax280166.SetPackingComplete.sharpSetPacking_support_iff`](https://laxarchive.org/lax-280166/Lax280166.SetPackingComplete.html#s-Lax280166.SetPackingComplete.sharpSetPacking_support_iff). -/
 theorem sharpSetPacking_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
     SharpSetPacking.support A ↔ SetPacking A := by
   rw [CountingProblem.support_iff, sharpSetPacking_apply, Nat.card_pos_iff]
@@ -225,7 +227,9 @@ theorem sharpSetPacking_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpS
     sharpIndependentSet_sharpP_parsimoniousHard
 
 /-- **#Set Packing is parsimoniously `#P`-complete**, counting the packings of
-exactly the threshold size. -/
+exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.SetPackingComplete.sharpSetPacking_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.SetPackingComplete.html#s-Lax280166.SetPackingComplete.sharpSetPacking_sharpP_parsimoniousComplete). -/
 theorem sharpSetPacking_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpSetPacking :=
   ⟨sharpSetPacking_mem_sharpP, sharpSetPacking_sharpP_parsimoniousHard⟩

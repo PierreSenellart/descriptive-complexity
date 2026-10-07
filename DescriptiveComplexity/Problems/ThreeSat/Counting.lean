@@ -75,7 +75,9 @@ theorem sharpThreeSat_eq_sharpSat {A : Type} [Language.sat.Structure A]
     (h : WidthAtMostThree A) : SharpThreeSAT A = SharpSAT A :=
   Nat.card_congr (Equiv.subtypeEquivRight fun _ => and_iff_right h)
 
-/-- **The support of #3SAT is 3SAT.** -/
+/-- **The support of #3SAT is 3SAT.**
+Registered in the Lax archive as
+[`Lax280166.ThreeSATComplete.sharpThreeSat_support_iff`](https://laxarchive.org/lax-280166/Lax280166.ThreeSATComplete.html#s-Lax280166.ThreeSATComplete.sharpThreeSat_support_iff). -/
 theorem sharpThreeSat_support_iff (A : Type) [Language.sat.Structure A] [Finite A] :
     SharpThreeSAT.support A ↔ ThreeSAT A := by
   by_cases h : WidthAtMostThree A

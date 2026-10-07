@@ -134,7 +134,9 @@ theorem sharpSteinerTree_sharpP_parsimoniousHard : SharpP.ParsimoniousHard Sharp
     sharpVertexCover_sharpP_parsimoniousHard
 
 /-- **#Steiner Tree is parsimoniously `#P`-complete**, counting the Steiner sets
-using exactly the threshold number of non-terminals. -/
+using exactly the threshold number of non-terminals.
+Registered in the Lax archive as
+[`Lax280166.SteinerTreeComplete.sharpSteinerTree_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.SteinerTreeComplete.html#s-Lax280166.SteinerTreeComplete.sharpSteinerTree_sharpP_parsimoniousComplete). -/
 theorem sharpSteinerTree_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpSteinerTree :=
   ⟨sharpSteinerTree_mem_sharpP, sharpSteinerTree_sharpP_parsimoniousHard⟩

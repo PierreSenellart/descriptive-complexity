@@ -204,7 +204,9 @@ theorem sharpHamCircuit_apply (A : Type) [Language.digraph.Structure A] :
     SharpHamCircuit A = Nat.card {E : A → A → Prop // UCircuit A E} :=
   rfl
 
-/-- **The support of #Hamilton Circuit is Hamilton Circuit.** -/
+/-- **The support of #Hamilton Circuit is Hamilton Circuit.**
+Registered in the Lax archive as
+[`Lax280166.HamCircuitComplete.sharpHamCircuit_support_iff`](https://laxarchive.org/lax-280166/Lax280166.HamCircuitComplete.html#s-Lax280166.HamCircuitComplete.sharpHamCircuit_support_iff). -/
 theorem sharpHamCircuit_support_iff (A : Type) [Language.digraph.Structure A] [Finite A] :
     SharpHamCircuit.support A ↔ HamCircuit A := by
   rw [CountingProblem.support_iff, sharpHamCircuit_apply, Nat.card_pos_iff]

@@ -280,7 +280,9 @@ def modelsEquiv :
 variable [Finite A] [Nonempty A]
 
 /-- **The models with the selected variable at `b` are the witnesses of the
-pair kernel whose selector is `b`.** -/
+pair kernel whose selector is `b`.**
+Registered in the Lax archive as
+[`Lax175070.CountingValues.sharpSelSat_eq`](https://laxarchive.org/lax-175070/Lax175070.CountingValues.html#s-Lax175070.CountingValues.sharpSelSat_eq). -/
 theorem sharpSelSat_eq (b : Bool) :
     SharpSelSAT b ((pairTseitinInterp B B' φ φ').Map A) =
       Nat.card {w : Witness (PB B B') (PK B B' φ φ') A // pairSel w.1 ↔ b = true} := by
@@ -384,11 +386,15 @@ theorem selEqSat_CeqP_hard : CeqP.Hard SelEqSAT := by
   exact ⟨(CountDefinable.orderedReduction_sel (fun c d => c = d) B φ B' φ'
     fun A _ _ _ _ => (hφ A).2).toRel⟩
 
-/-- **SelMajSAT is `PP`-complete.** -/
+/-- **SelMajSAT is `PP`-complete.**
+Registered in the Lax archive as
+[`Lax175070.SelectedSatComplete.selMajSat_PP_complete`](https://laxarchive.org/lax-175070/Lax175070.SelectedSatComplete.html#s-Lax175070.SelectedSatComplete.selMajSat_PP_complete). -/
 theorem selMajSat_PP_complete : PP.Complete SelMajSAT :=
   ⟨selMajSat_mem_PP, selMajSat_PP_hard⟩
 
-/-- **SelEqSAT is `C₌P`-complete.** -/
+/-- **SelEqSAT is `C₌P`-complete.**
+Registered in the Lax archive as
+[`Lax175070.SelectedSatComplete.selEqSat_CeqP_complete`](https://laxarchive.org/lax-175070/Lax175070.SelectedSatComplete.html#s-Lax175070.SelectedSatComplete.selEqSat_CeqP_complete). -/
 theorem selEqSat_CeqP_complete : CeqP.Complete SelEqSAT :=
   ⟨selEqSat_mem_CeqP, selEqSat_CeqP_hard⟩
 

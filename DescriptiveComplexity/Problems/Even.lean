@@ -96,7 +96,9 @@ them apart. -/
 /-- **EVEN is not first-order definable.** A defining sentence of quantifier
 rank `n` would have to separate two bare sets of at least `n` elements each,
 which the duplicator's strategy (`DescriptiveComplexity.efEquiv_bare`)
-forbids. -/
+forbids.
+Registered in the Lax archive as
+[`Lax945089.EvenNotFirstOrder.even_not_foDefinableFree`](https://laxarchive.org/lax-945089/Lax945089.EvenNotFirstOrder.html#s-Lax945089.EvenNotFirstOrder.even_not_foDefinableFree). -/
 theorem even_not_foDefinableFree : ¬FODefinableFree EVEN := by
   intro h
   obtain ⟨N, hN⟩ := exists_card_bound_of_foDefinableFree h
@@ -131,7 +133,9 @@ strategy on a line (`DescriptiveComplexity.efEquiv_linearOrder`) forbids.
 Together with `DescriptiveComplexity.even_tcDefinable` below, this is the
 unconditional strict inclusion `FO ⊊ FO(TC)`, and, through the inclusions the
 library proves for the classes above `DescriptiveComplexity.NL`, the statement
-that first-order logic is strictly weaker than every logic here. -/
+that first-order logic is strictly weaker than every logic here.
+Registered in the Lax archive as
+[`Lax945089.EvenNotFirstOrder.even_not_foDefinable`](https://laxarchive.org/lax-945089/Lax945089.EvenNotFirstOrder.html#s-Lax945089.EvenNotFirstOrder.even_not_foDefinable). -/
 theorem even_not_foDefinable : ¬FODefinable EVEN := by
   rintro ⟨φ, hφ⟩
   set n := qdepth φ with hn
@@ -309,7 +313,9 @@ theorem accepts_evenSpec_iff : evenSpec.Accepts A ↔ Even (Nat.card A) := by
 
 end Membership
 
-/-- **EVEN is FO(≤, TC) definable**, by the parity walk. -/
+/-- **EVEN is FO(≤, TC) definable**, by the parity walk.
+Registered in the Lax archive as
+[`Lax945089.FirstOrderBelowTransitiveClosure.even_tcDefinable`](https://laxarchive.org/lax-945089/Lax945089.FirstOrderBelowTransitiveClosure.html#s-Lax945089.FirstOrderBelowTransitiveClosure.even_tcDefinable). -/
 theorem even_tcDefinable : TCDefinable EVEN :=
   ⟨evenSpec, fun _ _ _ _ _ => accepts_evenSpec_iff.symm⟩
 
@@ -317,17 +323,23 @@ theorem even_tcDefinable : TCDefinable EVEN :=
 closure is *strictly* stronger than first-order logic on ordered finite
 structures: the inclusion is `DescriptiveComplexity.FODefinable.tcDefinable`,
 and EVEN separates the two – a single walk along the order defines it, and no
-sentence does. No complexity-theoretic assumption enters either half. -/
+sentence does. No complexity-theoretic assumption enters either half.
+Registered in the Lax archive as
+[`Lax945089.FirstOrderBelowTransitiveClosure.exists_tcDefinable_not_foDefinable`](https://laxarchive.org/lax-945089/Lax945089.FirstOrderBelowTransitiveClosure.html#s-Lax945089.FirstOrderBelowTransitiveClosure.exists_tcDefinable_not_foDefinable). -/
 theorem exists_tcDefinable_not_foDefinable :
     ∃ P : DecisionProblem Language.empty, TCDefinable P ∧ ¬FODefinable P :=
   ⟨EVEN, even_tcDefinable, even_not_foDefinable⟩
 
 /-- **EVEN is in NL** – as far from first-order logic as it is easy to
-compute. -/
+compute.
+Registered in the Lax archive as
+[`Lax945089.FirstOrderBelowTransitiveClosure.even_mem_NL`](https://laxarchive.org/lax-945089/Lax945089.FirstOrderBelowTransitiveClosure.html#s-Lax945089.FirstOrderBelowTransitiveClosure.even_mem_NL). -/
 theorem even_mem_NL : EVEN ∈ NL :=
   (tcDefinable_iff_mem_NL EVEN).mp even_tcDefinable
 
-/-- **EVEN is in PTIME**. -/
+/-- **EVEN is in PTIME**.
+Registered in the Lax archive as
+[`Lax945089.FirstOrderBelowTransitiveClosure.even_mem_PTIME`](https://laxarchive.org/lax-945089/Lax945089.FirstOrderBelowTransitiveClosure.html#s-Lax945089.FirstOrderBelowTransitiveClosure.even_mem_PTIME). -/
 theorem even_mem_PTIME : EVEN ∈ PTIME :=
   NL_subset_PTIME even_mem_NL
 
@@ -354,7 +366,9 @@ to the greatest one – the sentence `DescriptiveComplexity.evenCardSentence`,
 which mentions the input vocabulary not at all.
 
 Contrast with PARITY, the parity of a marked *subset*, which is classically
-*not* in AC⁰: see the section docstring. -/
+*not* in AC⁰: see the section docstring.
+Registered in the Lax archive as
+[`Lax945089.FirstOrderBelowACZero.even_ac0Definable`](https://laxarchive.org/lax-945089/Lax945089.FirstOrderBelowACZero.html#s-Lax945089.FirstOrderBelowACZero.even_ac0Definable). -/
 theorem even_ac0Definable : AC0Definable EVEN :=
   ⟨evenCardSentence Language.empty, fun A _ _ _ _ =>
     (even_holds_iff A).trans (realize_evenCardSentence A).symm⟩
@@ -368,7 +382,9 @@ complexity-theoretic assumption enters either half.
 
 This is the second unconditional separation of the library, beside
 `DescriptiveComplexity.exists_tcDefinable_not_foDefinable`, and it is the one
-that says the arithmetic is not decoration. -/
+that says the arithmetic is not decoration.
+Registered in the Lax archive as
+[`Lax945089.FirstOrderBelowACZero.exists_ac0Definable_not_foDefinable`](https://laxarchive.org/lax-945089/Lax945089.FirstOrderBelowACZero.html#s-Lax945089.FirstOrderBelowACZero.exists_ac0Definable_not_foDefinable). -/
 theorem exists_ac0Definable_not_foDefinable :
     ∃ P : DecisionProblem Language.empty, AC0Definable P ∧ ¬FODefinable P :=
   ⟨EVEN, even_ac0Definable, even_not_foDefinable⟩
@@ -386,7 +402,9 @@ logic there – no longer reaches all of PTIME, and EVEN is the witness: a
 /-- **EVEN is not order-free FO(IFP) definable**: a defining induction with
 variable budget `k` – covering also the quantifier depth of its output
 sentence – would have to separate two bare sets of `2 * k + 2` and `2 * k + 3`
-elements, which `DescriptiveComplexity.StepDef.ifpHolds_equivK₂` forbids. -/
+elements, which `DescriptiveComplexity.StepDef.ifpHolds_equivK₂` forbids.
+Registered in the Lax archive as
+[`Lax945089.OrderFreeInductionMissesPTIME.even_not_ifpDefinableFree`](https://laxarchive.org/lax-945089/Lax945089.OrderFreeInductionMissesPTIME.html#s-Lax945089.OrderFreeInductionMissesPTIME.even_not_ifpDefinableFree). -/
 theorem even_not_ifpDefinableFree : ¬IFPDefinableFree EVEN := by
   rintro ⟨d, hd⟩
   obtain ⟨k₀, hk₀⟩ := d.exists_varBound
@@ -416,7 +434,9 @@ theorem even_not_ifpDefinableFree : ¬IFPDefinableFree EVEN := by
 /-- **Order-free FO(IFP) does not capture PTIME**, unconditionally – against
 `DescriptiveComplexity.lfpDefinable_iff_mem_PTIME`, which says it *does* over
 ordered structures. The order in every capture theorem of this library is
-therefore doing real work. -/
+therefore doing real work.
+Registered in the Lax archive as
+[`Lax945089.OrderFreeInductionMissesPTIME.exists_mem_PTIME_not_ifpDefinableFree`](https://laxarchive.org/lax-945089/Lax945089.OrderFreeInductionMissesPTIME.html#s-Lax945089.OrderFreeInductionMissesPTIME.exists_mem_PTIME_not_ifpDefinableFree). -/
 theorem exists_mem_PTIME_not_ifpDefinableFree :
     ∃ P : DecisionProblem Language.empty, P ∈ PTIME ∧ ¬IFPDefinableFree P :=
   ⟨EVEN, even_mem_PTIME, even_not_ifpDefinableFree⟩

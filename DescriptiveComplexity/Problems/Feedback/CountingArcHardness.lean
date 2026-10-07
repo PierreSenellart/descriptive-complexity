@@ -508,7 +508,9 @@ theorem sharpFeedbackArcSet_sharpP_parsimoniousHard :
     sharpOneInSat_ordered_parsimonious_sharpFeedbackArcSet sharpOneInSat_sharpP_parsimoniousHard
 
 /-- **#Feedback Arc Set is parsimoniously `#P`-complete**, counting the
-feedback arc sets of exactly the threshold size. -/
+feedback arc sets of exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.FeedbackArcSetComplete.sharpFeedbackArcSet_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.FeedbackArcSetComplete.html#s-Lax280166.FeedbackArcSetComplete.sharpFeedbackArcSet_sharpP_parsimoniousComplete). -/
 theorem sharpFeedbackArcSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpFeedbackArcSet :=
   ⟨sharpFeedbackArcSet_mem_sharpP, sharpFeedbackArcSet_sharpP_parsimoniousHard⟩

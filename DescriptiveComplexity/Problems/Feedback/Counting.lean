@@ -185,7 +185,9 @@ theorem sharpFeedbackVertexSet_apply (A : Type) [Language.markedGraph.Structure 
 
 /-- **The support of #Feedback Vertex Set is Feedback Vertex Set**: a feedback
 vertex set at most as large as the marked set extends to one of exactly that
-size. -/
+size.
+Registered in the Lax archive as
+[`Lax280166.FeedbackVertexSetComplete.sharpFeedbackVertexSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.FeedbackVertexSetComplete.html#s-Lax280166.FeedbackVertexSetComplete.sharpFeedbackVertexSet_support_iff). -/
 theorem sharpFeedbackVertexSet_support_iff (A : Type) [Language.markedGraph.Structure A]
     [Finite A] : SharpFeedbackVertexSet.support A ↔ FeedbackVertexSet A := by
   rw [CountingProblem.support_iff, sharpFeedbackVertexSet_apply, Nat.card_pos_iff]
@@ -348,7 +350,9 @@ theorem sharpFeedbackVertexSet_sharpP_parsimoniousHard :
     sharpVertexCover_sharpP_parsimoniousHard
 
 /-- **#Feedback Vertex Set is parsimoniously `#P`-complete**, counting the
-feedback vertex sets of exactly the threshold size. -/
+feedback vertex sets of exactly the threshold size.
+Registered in the Lax archive as
+[`Lax280166.FeedbackVertexSetComplete.sharpFeedbackVertexSet_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.FeedbackVertexSetComplete.html#s-Lax280166.FeedbackVertexSetComplete.sharpFeedbackVertexSet_sharpP_parsimoniousComplete). -/
 theorem sharpFeedbackVertexSet_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpFeedbackVertexSet :=
   ⟨sharpFeedbackVertexSet_mem_sharpP, sharpFeedbackVertexSet_sharpP_parsimoniousHard⟩

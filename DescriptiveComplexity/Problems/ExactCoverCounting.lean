@@ -77,7 +77,9 @@ theorem sharpExactCover_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpE
   SharpP.parsimoniousHard_of_parsimonious sharpOneInSat_parsimonious_sharpExactCover
     sharpOneInSat_sharpP_parsimoniousHard
 
-/-- **#ExactCover is parsimoniously `#P`-complete.** -/
+/-- **#ExactCover is parsimoniously `#P`-complete.**
+Registered in the Lax archive as
+[`Lax280166.ExactCoverComplete.sharpExactCover_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.ExactCoverComplete.html#s-Lax280166.ExactCoverComplete.sharpExactCover_sharpP_parsimoniousComplete). -/
 theorem sharpExactCover_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpExactCover :=
   ⟨sharpExactCover_mem_sharpP, sharpExactCover_sharpP_parsimoniousHard⟩

@@ -152,7 +152,9 @@ theorem sharpKnapsack_apply (A : Type) [Language.binWeights.Structure A] :
     SharpKnapsack A = Nat.card {S : A → Prop // KnapsackSol A S} :=
   rfl
 
-/-- **The support of #Knapsack is Knapsack.** -/
+/-- **The support of #Knapsack is Knapsack.**
+Registered in the Lax archive as
+[`Lax280166.KnapsackComplete.sharpKnapsack_support_iff`](https://laxarchive.org/lax-280166/Lax280166.KnapsackComplete.html#s-Lax280166.KnapsackComplete.sharpKnapsack_support_iff). -/
 theorem sharpKnapsack_support_iff (A : Type) [Language.binWeights.Structure A] [Finite A] :
     SharpKnapsack.support A ↔ Knapsack A := by
   rw [CountingProblem.support_iff, sharpKnapsack_apply, Nat.card_pos_iff]

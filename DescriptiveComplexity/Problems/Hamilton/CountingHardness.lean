@@ -362,7 +362,9 @@ theorem sharpDirHamCircuit_sharpP_parsimoniousHard :
     sharpOneInSat_sharpP_parsimoniousHard
 
 /-- **#Directed Hamilton Circuit is parsimoniously `#P`-complete**: counting
-the Hamilton circuits of a digraph. -/
+the Hamilton circuits of a digraph.
+Registered in the Lax archive as
+[`Lax280166.DirHamCircuitComplete.sharpDirHamCircuit_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.DirHamCircuitComplete.html#s-Lax280166.DirHamCircuitComplete.sharpDirHamCircuit_sharpP_parsimoniousComplete). -/
 theorem sharpDirHamCircuit_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpDirHamCircuit :=
   ⟨sharpDirHamCircuit_mem_sharpP, sharpDirHamCircuit_sharpP_parsimoniousHard⟩

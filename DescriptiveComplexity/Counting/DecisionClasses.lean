@@ -153,7 +153,9 @@ theorem mem_countClass_iff (P : DecisionProblem L) :
     P ∈ countClass S R ↔ CountDefinable S R P :=
   Iff.rfl
 
-/-- **A problem of the class, from two counting problems of `#P`.** -/
+/-- **A problem of the class, from two counting problems of `#P`.**
+Registered in the Lax archive as
+[`Lax175070.CountClassMembership.mem_countClass_of_sharpP`](https://laxarchive.org/lax-175070/Lax175070.CountClassMembership.html#s-Lax175070.CountClassMembership.mem_countClass_of_sharpP). -/
 theorem mem_countClass_of_sharpP {C D : CountingProblem L} (hC : C ∈ SharpP) (hD : D ∈ SharpP)
     {P : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
@@ -184,13 +186,17 @@ theorem countClass_subset {S R S' R' : ℕ → ℕ → Prop} (hS : ∀ c d, S c 
   exact ⟨B, φ, B', φ', fun A _ _ _ _ =>
     ⟨hS _ _ (hφ A).1, (hφ A).2.trans (hR _ _ (hφ A).1)⟩⟩
 
-/-- `UP ⊆ ⊕P`: at most one witness, and one is an odd number of them. -/
+/-- `UP ⊆ ⊕P`: at most one witness, and one is an odd number of them.
+Registered in the Lax archive as
+[`Lax175070.CountClassInclusions.UP_subset_parityP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.UP_subset_parityP). -/
 theorem UP_subset_parityP : UP ⊆ ParityP :=
   countClass_subset (fun _ _ _ => trivial) fun c _ hc => by
     rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hc with rfl | rfl <;> simp
 
 /-- `UP ⊆ NP`: a problem with at most one witness is a problem with a
-witness, and the order the kernel reads is re-quantified. -/
+witness, and the order the kernel reads is re-quantified.
+Registered in the Lax archive as
+[`Lax175070.CountClassInclusions.UP_subset_NP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.UP_subset_NP). -/
 theorem UP_subset_NP : UP ⊆ NP := by
   rintro L _ P ⟨B, φ, B', φ', hφ⟩
   refine sigmaSODefinable_of_orderPull (k := 0) [B] rfl φ ?_
@@ -208,7 +214,9 @@ theorem UP_subset_NP : UP ⊆ NP := by
     exact (hφ A).2.mpr (by omega)
 
 /-- `NP ⊆ PP`: a problem with a witness has more witnesses than the kernel
-`⊥` has, namely none. -/
+`⊥` has, namely none.
+Registered in the Lax archive as
+[`Lax175070.CountClassInclusions.NP_subset_PP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.NP_subset_PP). -/
 theorem NP_subset_PP : NP ⊆ PP := by
   intro L _ P hP
   obtain ⟨C, hC, hCP⟩ := (mem_NP_iff_exists_sharpP_support P).mp hP
@@ -247,7 +255,9 @@ theorem compl_mem_countClass {L : Language.{0, 0}} [L.IsRelational] {S R : ℕ �
   exact ⟨B, φ, B', φ', fun A _ _ _ _ => ⟨(hφ A).1, not_congr (hφ A).2⟩⟩
 
 /-- **`⊕P` is closed under complement**: a number is even exactly when its
-successor is odd. -/
+successor is odd.
+Registered in the Lax archive as
+[`Lax175070.CountClassComplements.compl_mem_parityP`](https://laxarchive.org/lax-175070/Lax175070.CountClassComplements.html#s-Lax175070.CountClassComplements.compl_mem_parityP). -/
 theorem compl_mem_parityP {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : P ∈ ParityP) : Pᶜ ∈ ParityP := by
   have := countClass_succ_subset _ _ (compl_mem_countClass h)
@@ -262,7 +272,9 @@ theorem compl_mem_parityP {L : Language.{0, 0}} [L.IsRelational] {P : DecisionPr
     exact ⟨c', rfl, Nat.odd_add_one.mp hc⟩
 
 /-- **`PP` is closed under complement**: `¬ (d < c)` is `c < d + 1`, with the
-counts swapped. -/
+counts swapped.
+Registered in the Lax archive as
+[`Lax175070.CountClassComplements.compl_mem_PP`](https://laxarchive.org/lax-175070/Lax175070.CountClassComplements.html#s-Lax175070.CountClassComplements.compl_mem_PP). -/
 theorem compl_mem_PP {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : P ∈ PP) : Pᶜ ∈ PP := by
   have := countClass_succ_subset _ _ (countClass_swap_subset _ _ (compl_mem_countClass h))
@@ -274,7 +286,9 @@ theorem compl_mem_PP {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem
     obtain ⟨c', rfl⟩ : ∃ c', c = c' + 1 := ⟨c - 1, by omega⟩
     exact ⟨c', rfl, not_lt.mpr (Nat.le_of_lt_succ hc)⟩
 
-/-- `coNP ⊆ PP`. -/
+/-- `coNP ⊆ PP`.
+Registered in the Lax archive as
+[`Lax175070.CountClassInclusions.coNP_subset_PP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.coNP_subset_PP). -/
 theorem coNP_subset_PP : coNP ⊆ PP := by
   intro L _ P hP
   rw [← DecisionProblem.compl_compl P]

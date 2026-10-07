@@ -51,7 +51,9 @@ over a relational vocabulary, with relation symbols in `S`, cannot separate a
 pair of `k`-pebble equivalent tuples of two structures: its free variables
 read the tuples through an arbitrary selection of coordinates, its bound
 variables through an injective selection disjoint from it, and the coordinates
-left over leave room for its quantifier depth. -/
+left over leave room for its quantifier depth.
+Registered in the Lax archive as
+[`Lax945089.PebbleInvariance.realize_equivK₂`](https://laxarchive.org/lax-945089/Lax945089.PebbleInvariance.html#s-Lax945089.PebbleInvariance.realize_equivK₂). -/
 theorem realize_equivK₂ {α : Type} [Fintype α] :
     ∀ {n : ℕ} (φ : L.BoundedFormula α n) (g : α → Fin k)
       (h : Fin n → Fin k), Function.Injective h → (∀ i j, g i ≠ h j) →

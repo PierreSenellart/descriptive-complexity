@@ -380,7 +380,9 @@ theorem sharpHamCircuit_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpH
     sharpDirHamCircuit_sharpP_parsimoniousHard
 
 /-- **#Hamilton Circuit is parsimoniously `#P`-complete**: counting the Hamilton
-circuits of an undirected graph, as sets of edges. -/
+circuits of an undirected graph, as sets of edges.
+Registered in the Lax archive as
+[`Lax280166.HamCircuitComplete.sharpHamCircuit_sharpP_parsimoniousComplete`](https://laxarchive.org/lax-280166/Lax280166.HamCircuitComplete.html#s-Lax280166.HamCircuitComplete.sharpHamCircuit_sharpP_parsimoniousComplete). -/
 theorem sharpHamCircuit_sharpP_parsimoniousComplete :
     SharpP.ParsimoniousComplete SharpHamCircuit :=
   ⟨sharpHamCircuit_mem_sharpP, sharpHamCircuit_sharpP_parsimoniousHard⟩

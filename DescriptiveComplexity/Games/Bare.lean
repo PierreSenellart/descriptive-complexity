@@ -125,7 +125,9 @@ theorem efStage_bare : ∀ (n : ℕ) {j : ℕ} (a : Fin j → M) (b : Fin j → 
           (by omega) (by omega)⟩
 
 /-- **Two bare sets with at least `n` elements each are `n`-round
-equivalent** – however different their sizes. -/
+equivalent** – however different their sizes.
+Registered in the Lax archive as
+[`Lax945089.GamesOnSets.efEquiv_bare`](https://laxarchive.org/lax-945089/Lax945089.GamesOnSets.html#s-Lax945089.GamesOnSets.efEquiv_bare). -/
 theorem efEquiv_bare (n : ℕ) (hM : n ≤ Nat.card M) (hN : n ≤ Nat.card N) :
     EFEquiv Language.empty M N n :=
   efStage_bare n default default (fun i => i.elim0) (by simpa using hM) (by simpa using hN)
@@ -140,7 +142,9 @@ defining sentence – one round of the game per quantifier
 `DescriptiveComplexity.realize_sentence_of_efEquiv`).
 
 Every inexpressibility result over the empty vocabulary is an instance:
-exhibit two large sets of different sizes the problem separates. -/
+exhibit two large sets of different sizes the problem separates.
+Registered in the Lax archive as
+[`Lax945089.GamesOnSets.exists_card_bound_of_foDefinableFree`](https://laxarchive.org/lax-945089/Lax945089.GamesOnSets.html#s-Lax945089.GamesOnSets.exists_card_bound_of_foDefinableFree). -/
 theorem exists_card_bound_of_foDefinableFree {P : DecisionProblem Language.empty}
     (h : FODefinableFree P) :
     ∃ N : ℕ, ∀ (A B : Type) [Language.empty.Structure A] [Language.empty.Structure B],
