@@ -29,3 +29,6 @@ bibEntries:
       year         = {2012},
       doi          = {10.1145/2395116.2395119}
     }
+issue:
+  repositoryId: 1320232165
+  number: 186
