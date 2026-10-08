@@ -178,7 +178,9 @@ theorem wideTiling_NEXPTIME_hard : NEXPTIME.Hard WideTiling :=
 /-- **Tiling a wide square is NEXPTIME-complete.** The membership half is
 `DescriptiveComplexity.wideTiling_mem_NEXPTIME`: a wide tiling is an ordinary
 tiling of an exponential expansion, and `DescriptiveComplexity.TILING` is in
-NP. -/
+NP.
+Registered in the Lax archive as
+[`Lax822549.TilingsComplete.wideTiling_NEXPTIME_complete`](https://laxarchive.org/lax-822549/Lax822549.TilingsComplete.html#s-Lax822549.TilingsComplete.wideTiling_NEXPTIME_complete). -/
 theorem wideTiling_NEXPTIME_complete : NEXPTIME.Complete WideTiling :=
   ⟨wideTiling_mem_NEXPTIME, wideTiling_NEXPTIME_hard⟩
 

@@ -80,7 +80,9 @@ def IsOpenFact [(L.sum L).Structure A] (q : Σ p : Σ n, L.Relations n, Fin p.1 
 /-- **An instance with `k` open facts has `2 ^ k` possible worlds**: a world
 is a choice among them. So, each open fact being present with probability
 `1/2` independently of the others, the probability of a sentence is the
-number of worlds in which it holds, divided by `2 ^ k`. -/
+number of worlds in which it holds, divided by `2 ^ k`.
+Registered in the Lax archive as
+[`Lax794877.WorldCount.card_isWorld`](https://laxarchive.org/lax-794877/Lax794877.WorldCount.html#s-Lax794877.WorldCount.card_isWorld). -/
 theorem card_isWorld [(L.sum L).Structure A] [Finite A] :
     Nat.card {ρ : (worldBlock L).Assignment A // IsWorld ρ} =
       2 ^ Nat.card {q : Σ p : Σ n, L.Relations n, Fin p.1 → A // IsOpenFact q} := by
@@ -211,7 +213,9 @@ theorem possibleWorlds_apply (φ : L.Sentence) (A : Type) [(L.sum L).Structure A
   Nat.card_congr (Equiv.subtypeEquivRight fun ρ => realize_worldKernel ρ φ)
 
 /-- **Counting the possible worlds of a first-order sentence is in `#P`**,
-whatever the sentence. -/
+whatever the sentence.
+Registered in the Lax archive as
+[`Lax794877.WorldsInSharpP.possibleWorlds_mem_sharpP`](https://laxarchive.org/lax-794877/Lax794877.WorldsInSharpP.html#s-Lax794877.WorldsInSharpP.possibleWorlds_mem_sharpP). -/
 theorem possibleWorlds_mem_sharpP (φ : L.Sentence) : PossibleWorlds φ ∈ SharpP :=
   sharpPDefinable_ofKernel (worldBlock L) (worldKernel φ)
 

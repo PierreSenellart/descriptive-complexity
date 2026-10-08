@@ -344,7 +344,9 @@ theorem wideRegAccept_NEXPTIME_hard : NEXPTIME.Hard WideRegAccept := by
     OrderedFOReduction.toRel
 
 /-- **Acceptance on a clock at the register channel is NEXPTIME-complete.** The
-membership half is `DescriptiveComplexity.wideRegAccept_mem_NEXPTIME`. -/
+membership half is `DescriptiveComplexity.wideRegAccept_mem_NEXPTIME`.
+Registered in the Lax archive as
+[`Lax822549.WideMachinesComplete.wideRegAccept_NEXPTIME_complete`](https://laxarchive.org/lax-822549/Lax822549.WideMachinesComplete.html#s-Lax822549.WideMachinesComplete.wideRegAccept_NEXPTIME_complete). -/
 theorem wideRegAccept_NEXPTIME_complete : NEXPTIME.Complete WideRegAccept :=
   ⟨wideRegAccept_mem_NEXPTIME, wideRegAccept_NEXPTIME_hard⟩
 

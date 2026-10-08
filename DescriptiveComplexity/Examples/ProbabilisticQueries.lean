@@ -380,7 +380,9 @@ theorem possibleWorlds_h0_sharpP_oneCallHard : SharpP.OneCallHard (PossibleWorld
 
 /-- **Counting the worlds of `h₀` is one-call `#P`-complete**: it is in `#P`,
 like the count of the worlds of any first-order query, and every problem of
-`#P` reduces to it with one call. -/
+`#P` reduces to it with one call.
+Registered in the Lax archive as
+[`Lax794877.H0Complete.possibleWorlds_h0_sharpP_oneCallComplete`](https://laxarchive.org/lax-794877/Lax794877.H0Complete.html#s-Lax794877.H0Complete.possibleWorlds_h0_sharpP_oneCallComplete). -/
 theorem possibleWorlds_h0_sharpP_oneCallComplete :
     SharpP.OneCallComplete (PossibleWorlds h0) :=
   .of_mem (possibleWorlds_mem_sharpP h0) possibleWorlds_h0_sharpP_oneCallHard
@@ -396,7 +398,9 @@ theorem weightedWorlds_h0_sharpP_oneCallHard : SharpP.OneCallHard (WeightedWorld
 
 /-- **The numerator of the probability of `h₀` is one-call `#P`-complete**:
 counting the weighted worlds of `h₀` is in `#P`, like those of any
-first-order query, and every problem of `#P` reduces to it with one call. -/
+first-order query, and every problem of `#P` reduces to it with one call.
+Registered in the Lax archive as
+[`Lax794877.H0Complete.weightedWorlds_h0_sharpP_oneCallComplete`](https://laxarchive.org/lax-794877/Lax794877.H0Complete.html#s-Lax794877.H0Complete.weightedWorlds_h0_sharpP_oneCallComplete). -/
 theorem weightedWorlds_h0_sharpP_oneCallComplete :
     SharpP.OneCallComplete (WeightedWorlds h0) :=
   .of_mem (weightedWorlds_mem_sharpP h0) weightedWorlds_h0_sharpP_oneCallHard
@@ -866,7 +870,9 @@ theorem probDbEncoding_countFaithful_total :
 /-- **The probability of `h₀` over a database is the ratio of the two numbers
 computed from it.** The uncertain facts of the database being present
 independently, each with probability its weight of presence over the sum of
-its weights, the probability that the query holds is `count / total`. -/
+its weights, the probability that the query holds is `count / total`.
+Registered in the Lax archive as
+[`Lax794877.ExampleDatabaseProbability.probDb_worldProb_eq`](https://laxarchive.org/lax-794877/Lax794877.ExampleDatabaseProbability.html#s-Lax794877.ExampleDatabaseProbability.probDb_worldProb_eq). -/
 theorem probDb_worldProb_eq (i : ProbDb)
     (hpos : ∀ x : {q : @Fact Language.rst (Fin i.n) // @IsOpen _ _ (probDbStructure i) q},
       0 < @presWeight _ _ (probDbStructure i) x + @absWeight _ _ (probDbStructure i) x) :
@@ -1428,7 +1434,9 @@ end SafeQ
 /-- **The weighted count of `∃ x y, R(x) ∧ S(x, y)` is in FP**: the numerator
 of the probability of this query over a probabilistic database is computed in
 polynomial time, where that of `∃ x y, R(x) ∧ S(x, y) ∧ T(y)` is `#P`-hard
-(`DescriptiveComplexity.weightedWorlds_h0_sharpP_oneCallComplete`). -/
+(`DescriptiveComplexity.weightedWorlds_h0_sharpP_oneCallComplete`).
+Registered in the Lax archive as
+[`Lax794877.HierarchicalQueryInFP.weightedWorlds_rs_mem_FP`](https://laxarchive.org/lax-794877/Lax794877.HierarchicalQueryInFP.html#s-Lax794877.HierarchicalQueryInFP.weightedWorlds_rs_mem_FP). -/
 theorem weightedWorlds_rs_mem_FP : WeightedWorlds rs ∈ FP :=
   fpDefinable_of_qfo SafeQ.rsT fun _ _ _ _ _ => SafeQ.rsT_value
 

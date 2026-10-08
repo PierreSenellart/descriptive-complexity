@@ -530,7 +530,9 @@ theorem dwideAcceptSpace_EXPSPACE_hard : EXPSPACE.Hard DWideAcceptSpace := by
 EXPSPACE-complete.** The membership half is
 `DescriptiveComplexity.dwideAcceptSpace_mem_EXPSPACE`; the hardness half is the
 reduction above, run at the doubled universe so that the machine always has two
-elements to write bits with. -/
+elements to write bits with.
+Registered in the Lax archive as
+[`Lax822549.WideMachinesComplete.dwideAcceptSpace_EXPSPACE_complete`](https://laxarchive.org/lax-822549/Lax822549.WideMachinesComplete.html#s-Lax822549.WideMachinesComplete.dwideAcceptSpace_EXPSPACE_complete). -/
 theorem dwideAcceptSpace_EXPSPACE_complete : EXPSPACE.Complete DWideAcceptSpace :=
   ⟨dwideAcceptSpace_mem_EXPSPACE, dwideAcceptSpace_EXPSPACE_hard⟩
 
@@ -584,7 +586,9 @@ theorem wideAcceptSpace_EXPSPACE_hard : EXPSPACE.Hard WideAcceptSpace :=
   EXPSPACE.hard_of_foReduction dwideAcceptSpace_fo_reduction_wideAcceptSpace
     dwideAcceptSpace_EXPSPACE_hard
 
-/-- **Acceptance in bounded space on a wide machine is EXPSPACE-complete.** -/
+/-- **Acceptance in bounded space on a wide machine is EXPSPACE-complete.**
+Registered in the Lax archive as
+[`Lax822549.WideMachinesComplete.wideAcceptSpace_EXPSPACE_complete`](https://laxarchive.org/lax-822549/Lax822549.WideMachinesComplete.html#s-Lax822549.WideMachinesComplete.wideAcceptSpace_EXPSPACE_complete). -/
 theorem wideAcceptSpace_EXPSPACE_complete : EXPSPACE.Complete WideAcceptSpace :=
   ⟨wideAcceptSpace_mem_EXPSPACE, wideAcceptSpace_EXPSPACE_hard⟩
 
