@@ -289,8 +289,8 @@ build times down.
   and a decoder with no well-formedness condition.
 * **Planned work**: `ROADMAP.md` – locality theorems and 0-1 laws for the
   inexpressibility track, the graph-isomorphism degree, counting problems and
-  `#P`, finer reduction notions, and further complete problems for PTIME,
-  PSPACE and the exponential classes.
+  `#P`, MaxSNP and the W-hierarchy, finer reduction notions, and further
+  complete problems for PTIME, PSPACE and the exponential classes.
 
 ## Lax archive
 

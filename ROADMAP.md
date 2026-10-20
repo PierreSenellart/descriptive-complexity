@@ -495,8 +495,8 @@ The concrete items, in dependency order:
   iso-invariant `Count : Structure → ℕ`; the reductions reuse
   `FOInterpretation`, `Tag`, `dim` and the finite/nonempty side conditions of
   `FOReduction` verbatim, only the `correct` field changing. The names
-  `Counting.lean` / `Counting/` are free for this layer (the
-  Immerman–Szelepcsényi module having become `InductiveCounting`), with the
+  `Counting.lean` / `Counting/` are free for this layer (`InductiveCounting`
+  being the combinatorial core of Immerman–Szelepcsényi), with the
   ΣQSO syntax and evaluator in `Quantitative.lean` / `QSO/`: the same split
   between framework and defining logic that `Complexity.lean` and the
   `SecondOrder*` / `FixedPoint*` files already make on the decision side.
@@ -584,12 +584,6 @@ The concrete items, in dependency order:
   needed for QFO(LFP) = FP and for #L. It needs its own monotonicity and
   termination argument; `derivesIn`/`depth` in the FO(LFP) layer is the right
   precedent.
-- **Optimization: MaxSNP** [R, deferred furthest]: Papadimitriou–Yannakakis's
-  syntactically defined optimization classes (Π₁-definable objective),
-  L-reductions, MAX-3SAT completeness; MaxQSO/MinQSO is the definitional route
-  to the same territory. L-reductions are approximation-preserving and far more
-  delicate than parsimonious ones, which is also why PCP-based hardness of
-  approximation stays out of scope.
 
 ### Probabilistic query evaluation, and what “`#P`-hard” should mean
 
@@ -648,12 +642,112 @@ unweighted setting at a `k`-fold blow-up, if ever needed.
   completeness result about one problem. Much larger than the hardness half,
   and out of scope here.
 
-Beyond the library, the counting track is the direct bridge to provenance-lean:
-the counting provenance semantics of a query is exactly a model count, so the
-two libraries would meet here, with semiring provenance as the common
-generalization (and QSO's weighted-logic ancestry is the same idea from the
-other side). PQE above is the concrete meeting point: `#PQE(Q)` is the model
-count of the query's lineage.
+Beyond the library, the counting track extends a dependency that already
+exists: provenance-lean pins this library and uses it on the decision side
+(non-zero `HAVING SUM` provenance is NP-complete there, by an FO reduction
+from `Knapsack` through `binarySubsetSumEncoding`). Its possible-worlds
+reading of `𝔹[X]` annotations and its ℕ semiring are where a counting problem
+of this track would be read: the counting provenance of a query is a model
+count, and `#PQE(Q)` above is the model count of the query's lineage, so that
+is the statement the two libraries would share once this library has counting
+problems (QSO's weighted-logic ancestry is semiring provenance seen from the
+other side).
+
+### Optimization: MaxSNP, L-reductions, and approximation hardness
+
+The syntactic theory of Papadimitriou–Yannakakis (1991) – MaxSNP, MaxNP,
+L-reductions, MAX-3SAT complete – and the Kolaitis–Thakur hierarchy above it
+(MaxΣ₀ ⊊ MaxΣ₁ ⊊ MaxΠ₁ ⊊ MaxΠ₂) fit the library's idiom and reuse more of it
+than the counting track does. What they cannot deliver is the usual reading of
+“approximation hardness”: “no PTAS unless P = NP” rests on the PCP theorem,
+and APX as the closure of MaxSNP under PTAS-reductions
+(Khanna–Motwani–Sudan–Vazirani 1998) is a machine statement; neither is in
+reach, and nothing below may be presented as either. None of these papers has
+a bibliography entry yet; fetch them from DBLP before the first file is
+written.
+
+What exists already: a solution is an assignment to an `SOBlock`, with its
+isomorphism transport `SOBlock.mapAssign`; the objective of a MaxSNP problem
+is the number of tuples satisfying a quantifier-free kernel, which the `ncard`
+kit of `Numbers/Unary.lean` counts and transports; quantifier-freeness is
+Mathlib's `IsQF`, already tracked for interpretations
+(`FOInterpretation.IsQuantifierFree`). Max Cut is the test of fit: `MaxCutOn`
+*is* “some `S` has at least `k` pairs in `CutRel`”, the MaxSNP form with a
+threshold glued on, and most unary-threshold entries of the catalog are the
+threshold version of a MaxSNP or MaxNP problem.
+
+- **Optimization problems and their levels** [L, with the next item]: an
+  optimization problem is a block, a cost function on its assignments at every
+  structure, isomorphism invariance of the cost, a goal (max or min) and – see
+  the promise point below – an iso-invariant validity predicate. The optimum
+  exists because assignments over a finite structure form a finite type, and
+  polynomial boundedness is automatic when the cost counts tuples (the unary
+  convention again). MaxSNP is a quantifier-free kernel, MaxNP an existential
+  one, and the Kolaitis–Thakur levels add the universal and Π₂ kernels: all
+  “kernel as data”, like a `HornProgram`. A generic theorem – the threshold
+  version of an optimization problem is in NP, by the injection certificate
+  `nonempty_embedding_iff_ncard_le` – recovers the existing membership proofs,
+  and `MaxCut` should be shown equal to the threshold version of its
+  optimization problem by `DecisionProblem.ext`.
+- **L-reductions**: an interpretation (plain or ordered) plus a *solution
+  reader*, formulas defining the source's relation variables from the target's
+  solution. That solution lives on tagged tuples, and `SOBlock.pull` /
+  `pullAssign` / `mergeAssign` (`SecondOrderPull.lean`) are exactly the
+  bijection between such solutions and tuples of relations over the base, so
+  the reader is a formula over `L.sum (B.pull Tag d).lang`. The two
+  inequalities are stated in ℕ, where truncated subtraction is exact because
+  the optimum bounds every cost. Transitivity composes readers through
+  `FOInterpretation.extendSO` and multiplies the two constants. Asking for a
+  first-order reader is stronger than the literature's polynomial-time one, in
+  the way `≤ᶠᵒ` is stronger than Karp, and every textbook L-reduction has one.
+- **The class** [S once the two above exist]: a sibling of `ComplexityClass`,
+  not an instance of it – its fields are over `DecisionProblem`, and its
+  membership closure is a requirement the theory does not make: a kernel
+  pulled back through an interpretation with quantified formulas is not
+  quantifier-free, the phenomenon §3's quantifier-free tracking is about.
+  Membership is syntactic, hardness is cofinal under L-reductions, and only
+  hardness needs a closure proof.
+- **Memberships** [S each]: Max Cut (its kernel is `CutRel`), MAX-2SAT and
+  MAX-k-SAT on tuple vocabularies (see the vocabulary decision below).
+- **MAX-3SAT is MaxSNP-complete** [XL, the one large item]: the generic
+  reduction from an arbitrary quantifier-free kernel, with three costs. The
+  tuples whose kernel is unsatisfiable must be filtered first-order, which
+  works because satisfiability at a tuple depends only on the pattern of base
+  atoms there, of which there are finitely many (`EqPattern.lean` is the
+  precedent). The optimum is at least a constant fraction of the live tuples –
+  the first inequality needs it – by a double count over all assignments, a
+  few hundred lines. Each live tuple becomes a Tseitin encoding of its kernel
+  with one unit clause on the output node, so an optimal assignment loses
+  exactly one clause per unsatisfied tuple (`Problems/Sat/Tseitin.lean` is
+  the starting point). A fixed kernel arity means no padding, so this is
+  probably order-free, and cheaper than the Cook–Levin discharge.
+- **The L-reduction catalog** [M–L each]: MAX-2SAT, bounded-degree Independent
+  Set and Vertex Cover, Max Cut. Two quantitative bounds and a reader replace
+  the one equivalence of a decision reduction; the charging map of
+  `Problems/MaxCut/Reduction.lean` is about half of one such proof.
+- **Definable approximation** [M–L, the one approximation statement
+  available]: a solution relation definable in FO(LFP) whose cost is within a
+  given factor of the optimum. L-reductions preserve it because the reader is
+  first-order, so “if MAX-3SAT has a definable approximation at every ratio,
+  every MaxSNP problem has one” is provable here, machine-free.
+- **MaxSNP ⊊ MaxNP, and the strictness of the hierarchy** [R]:
+  inexpressibility results; they belong with §5.
+
+Two design decisions to take before the first file:
+
+- **MAX-3SAT needs a clause-as-tuple vocabulary.** On `Language.sat`, where
+  clauses are elements with occurrence relations, “some occurrence is
+  satisfied” is an existential kernel, so Max SAT lands in MaxNP and not in
+  MaxSNP. The classical statement uses ternary relations indexed by sign
+  pattern; a new vocabulary with a reduction to the existing 3SAT is needed,
+  and counting each clause once per tuple rules out working around this with
+  an order.
+- **Promise instances need a domain.** Bounded-degree Independent Set is
+  MaxSNP-complete on bounded-degree instances only, and an L-reduction's first
+  inequality fails where junk instances have optimum zero. Hence the validity
+  predicate above, with reductions required to send valid instances to valid
+  ones. Decision problems fold promises into yes-instances (3SAT's width
+  bound); that trick does not transfer.
 
 ## 7. Machine bridges beyond NP and PTIME
 
@@ -773,8 +867,8 @@ The degree machinery itself is built (`DescriptiveComplexity.Degree`:
 the check that the logically defined classes *are* the degrees of their
 complete problems), and so is the doubling lemma every entry of the degree goes
 through (`DescriptiveComplexity.isoReflecting_fo_reduction`, below). What is
-left is populating the degree, and the second reduction theory not organized
-around a class.
+left is populating the degree, and the two reduction theories not organized
+around a class: CSP templates, and the W-hierarchy, which is a degree as well.
 
 - **Hardness for isomorphism problems must be order-free** – a design-triage
   rule, beside the choice of number encoding
@@ -818,19 +912,71 @@ around a class.
   under `≤ᶠᵒ` the degree is finer, which makes each statement *stronger* than
   the literature's, and some classically GI-complete problems will not survive.
 - **CSP templates and pp-interpretations** [M for the reduction theory, R for
-  the dichotomy]: the other reduction theory not organized around a class, and
-  the better fit of the two. For a fixed finite template `B`, `CSP(B)` is a
-  decision problem in this library's sense, and the field's reduction notion –
-  primitive-positive interpretations – *is* a first-order interpretation
-  restricted to the existential-conjunctive fragment, so `FOInterpretation` is
-  already the right object and `IsQuantifierFree` shows how a fragment gets
-  tracked (§3, reduction-notion refinements). “`B'` pp-interprets `B` implies
+  the dichotomy]: a reduction theory not organized around a class, and a
+  better fit for the framework than GI. For a fixed finite template `B`,
+  `CSP(B)` is a decision problem in this library's sense, and the field's
+  reduction notion – primitive-positive interpretations – *is* a first-order
+  interpretation restricted to the existential-conjunctive fragment, so
+  `FOInterpretation` is already the right object and `IsQuantifierFree` shows
+  how a fragment gets tracked (§3, reduction-notion refinements). “`B'`
+  pp-interprets `B` implies
   `CSP(B) ≤ᶠᵒ CSP(B')`” is directly formalizable. What makes it worth doing is
   **Schaefer's dichotomy**, a finite case analysis over Boolean templates whose
   tractable cases are already in the catalog – 2SAT, HORN-SAT and dual-Horn,
   1-in-3-SAT, NAE-SAT – with affine the only one missing. Also the item in this
   document closest to conjunctive-query evaluation and containment
   (`Examples/ConjunctiveQueries.lean`).
+- **The W-hierarchy as degrees** [M for the framework, L for the generic Σ₁
+  reduction, S per entry]: parameterized complexity is the third reduction
+  theory that belongs here, and the one whose problems the library already
+  has. A parameterized problem is a decision problem with an iso-invariant
+  parameter, and the natural choice is the cardinality of a designated unary
+  mark – which is how Clique, Independent Set, Dominating Set and Vertex Cover
+  already carry their threshold, so the same Lean objects are the
+  parameterized problems, and an existing reduction that transports the mark
+  unchanged (Clique to Independent Set by `complEdgeInterp`) is already an
+  fpt-reduction with identity parameter bound. Two things are new.
+  * *Slicewise reductions.* An fpt-reduction is machine-defined, but every
+    textbook W[1] reduction is an interpretation chosen knowing the parameter,
+    with tags and dimension allowed to grow with it: a family of
+    interpretations indexed by the parameter value, each correct on its
+    slice, with the image parameter bounded by a function of the source's.
+    Composition is `comp` slice by slice. Producing a mark of a prescribed
+    size needs an order, so slices are ordered reductions.
+  * *The class as a degree.* Defining W[1] by a logic and proving closure
+    fails as it does for MaxSNP (§6): a Σ₁ sentence pulled back through an
+    interpretation with quantified formulas is not Σ₁. Take instead the
+    Downey–Fellows–Regan (1998) characterization as the definition – W[1] is
+    the class of problems slicewise-reducible to Σ₁ model checking,
+    equivalently the degree below Clique – and membership closure is
+    composition, hardness is cofinality, both free as for the GI degree
+    (`ComplexityClass.below`, over slicewise reductions). This also sidesteps
+    the weft-1 normalization theorem of Downey–Fellows, the heavy step of the
+    classical completeness of Clique.
+  The one theorem of substance is the analog of the ∃SO → SAT discharge:
+  every slicewise Σ₁-definable problem reduces to Clique. Per slice the kernel
+  is a quantifier-free formula read as data, with one tag per variable and per
+  literal, dimension the maximal arity of the vocabulary, and consistency
+  edges between tags sharing a variable; the case split on the kernel is the
+  one `EqPattern.lean` makes. No Tseitin nodes and no padding, so medium-large
+  and well under Cook–Levin. It gives memberships in definability style:
+  Clique at slice `k` is “`k` distinct pairwise adjacent elements”. The
+  catalog after it is cheap: Multicolored Clique, Partial Vertex Cover, the
+  bounded-parameter subgraph problems. W[2] is a separate decision: defining
+  it by Σ₂,₁ model checking costs the same, but Dominating Set's completeness
+  is the long reduction of Downey–Fellows–Regan [L].
+  **Out of reach, to be written as such**: fixed-parameter tractability
+  itself – the polynomial's degree must not depend on the parameter, which no
+  family of formulas indexed by it controls, so “Vertex Cover is in FPT” needs
+  a machine bridge or a bounded-variable fragment, and a literature check –
+  and uniformity: without a computable family of interpretations the classes
+  are the nonuniform variants. Mathlib's encodable formulas and the
+  `Nat.Partrec.Code` machinery of the RE layer could express computability,
+  at the price of concrete tag types and encodable symbols throughout; start
+  without it and document the gap as the README does for the by-inspection
+  claims. Check the exact statements of Flum–Grohe, *Describing parameterized
+  complexity classes* (2003), and of Downey–Fellows–Regan before fixing the
+  definitions; neither paper has a bibliography entry yet.
 - **The negative half is §5.** A degree structure is only worth building if
   non-reducibility is provable, and Ehrenfeucht–Fraïssé games are exactly that.
   The two together give an *unconditional* degree structure at the FO level,
@@ -865,13 +1011,25 @@ provable rather than merely reasonable.
   counting descriptive complexity has no formalization anywhere, and ΣQSO's
   two-layer syntax fits the kernel-as-data idiom unusually well. It depends on
   nothing unbuilt, so nothing else here can block it; a cheap headline (#SAT
-  complete for ΣQSO(FO)) sits one `exists_gates` strengthening in; and it is
-  the meeting point with provenance-lean. Internal order: framework layer and
+  complete for ΣQSO(FO)) sits one `exists_gates` strengthening in; and it
+  extends to counting the dependency provenance-lean already has on the
+  library. Internal order: framework layer and
   ladder levels 0–1 → evaluator → `#P := ΣQSO(FO)` → #SAT → the free entries
   and PQE tier 1; stop there (level 2 of the ladder, PQE tier 2, structure
-  inside #P, the quantitative fixed point and MaxSNP are genuine research, or
-  gated on a literature check). Its size is what puts it beside the numbered
-  line rather than in it.
+  inside #P and the quantitative fixed point are genuine research, or gated
+  on a literature check). Its size is what puts it beside the numbered line
+  rather than in it.
+- **The optimization track of §6**, framework and memberships first: MaxSNP
+  reuses the block, pullback and counting machinery almost unchanged, Max Cut
+  is already in the MaxSNP shape, and the two design decisions it needs (a
+  tuple vocabulary for MAX-3SAT, a validity predicate for promise instances)
+  are cheaper taken before the first file than after. MAX-3SAT's completeness
+  is the one large item and can wait; the strictness of the hierarchy is
+  research.
+- **The W-hierarchy of §9**, right after the GI degree: the same degree
+  machinery, problems the catalog already has, one medium-large generic
+  reduction (slicewise Σ₁ to Clique) and then an entry per gadget. It needs
+  the honest framing its item spells out: nonuniform, and no FPT membership.
 - **The rest of the sharpening pass** (each [M], no prerequisites, no new
   surface): **quantifier-free / projection / dimension tracking through
   composition** (§3's reduction-notion refinements), which upgrades catalog
