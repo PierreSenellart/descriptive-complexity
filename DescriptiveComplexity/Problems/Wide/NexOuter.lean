@@ -603,7 +603,7 @@ theorem hasLeft_buildExit (f : Q → A) (g : dt.SlotIx → A) :
     PR.HasLeft NexPh.buildDoneP f g NexPh.homeBuildP f g := by
   refine ⟨rEmb .build (Sum.inr (Sum.inr (Sum.inr ()))), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     rw [hrules .build (Sum.inr (Sum.inr (Sum.inr ())))] <;>
-      first | trivial | rfl | exact id
+      first | trivial | exact id
 
 /-- **The exit of the walk home after the file**: at the marker, start
 guessing. -/
@@ -646,7 +646,7 @@ theorem hasLeft_guessExit (f : Q → A) (g : dt.SlotIx → A) :
   refine ⟨rEmb .guess (Sum.inr (Sum.inr (Sum.inr (Sum.inl ())))), ?_, ?_, ?_, ?_,
     ?_, ?_⟩ <;>
     rw [hrules .guess (Sum.inr (Sum.inr (Sum.inr (Sum.inl ()))))] <;>
-      first | trivial | rfl | exact id
+      first | trivial | exact id
 
 /-- **The guessing sweep stops here**: the rule that ends a region-wide guess,
 available at every address, so where the walk stops is one more nondeterministic
@@ -656,7 +656,7 @@ theorem hasLeft_guessStop (b : B) (f : Q → A) (g : dt.SlotIx → A) :
   refine ⟨rEmb .guess (Sum.inr (Sum.inr (Sum.inr (Sum.inr b)))), ?_, ?_, ?_, ?_,
     ?_, ?_⟩ <;>
     rw [hrules .guess (Sum.inr (Sum.inr (Sum.inr (Sum.inr b))))] <;>
-      first | trivial | rfl | exact id
+      first | trivial | exact id
 
 /-- **The exit of the walk home after the guess**: at the marker, enter the
 evaluation. -/

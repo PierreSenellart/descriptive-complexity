@@ -92,9 +92,8 @@ theorem step_eval_true {c x : A} (hc : QCl c) (hx : IsQVar x) {b f fl d : Bool}
   rcases hmove with ⟨hd, hs⟩ | ⟨hd, hs⟩
   · exact Or.inl ⟨hd, hs⟩
   · refine Or.inr ⟨?_, hs⟩
-    first
-      | exact fun h => Bool.noConfusion h
-      | (subst hd; exact fun h => Bool.noConfusion h)
+    subst hd
+    exact fun h => Bool.noConfusion h
 
 /-- **A sweep step that leaves the flag down**: it was down and the literal at
 this cell does not satisfy the clause. -/
@@ -107,9 +106,8 @@ theorem step_eval_false {c x : A} (hc : QCl c) (hx : IsQVar x) {b f d : Bool}
   rcases hmove with ⟨hd, hs⟩ | ⟨hd, hs⟩
   · exact Or.inl ⟨hd, hs⟩
   · refine Or.inr ⟨?_, hs⟩
-    first
-      | exact fun h => Bool.noConfusion h
-      | (subst hd; exact fun h => Bool.noConfusion h)
+    subst hd
+    exact fun h => Bool.noConfusion h
 
 /-- The movement of a turn, against the direction just swept. -/
 def TurnMove (d : Bool) (p q : QV A) : Prop :=
@@ -123,9 +121,8 @@ theorem step_turnNext {c c₂ : A} (hcc : QNextCl c c₂) {d : Bool}
   rcases hmove with ⟨hd, hs⟩ | ⟨hd, hs⟩
   · exact Or.inl ⟨hd, hs⟩
   · refine Or.inr ⟨?_, hs⟩
-    first
-      | exact fun h => Bool.noConfusion h
-      | (subst hd; exact fun h => Bool.noConfusion h)
+    subst hd
+    exact fun h => Bool.noConfusion h
 
 /-- **Turn**: the clause is satisfied and it was the last one, so the matrix is
 true. -/
@@ -137,9 +134,8 @@ theorem step_turnLast {c : A} (hc : QMaxCl c) {d : Bool}
   rcases hmove with ⟨hd, hs⟩ | ⟨hd, hs⟩
   · exact Or.inl ⟨hd, hs⟩
   · refine Or.inr ⟨?_, hs⟩
-    first
-      | exact fun h => Bool.noConfusion h
-      | (subst hd; exact fun h => Bool.noConfusion h)
+    subst hd
+    exact fun h => Bool.noConfusion h
 
 /-- **Turn**: the clause is not satisfied, so the matrix is false. -/
 theorem step_turnFalse {c : A} (hc : QCl c) {d : Bool}
@@ -150,9 +146,8 @@ theorem step_turnFalse {c : A} (hc : QCl c) {d : Bool}
   rcases hmove with ⟨hd, hs⟩ | ⟨hd, hs⟩
   · exact Or.inl ⟨hd, hs⟩
   · refine Or.inr ⟨?_, hs⟩
-    first
-      | exact fun h => Bool.noConfusion h
-      | (subst hd; exact fun h => Bool.noConfusion h)
+    subst hd
+    exact fun h => Bool.noConfusion h
 
 /-! ### Carrying the value to the right marker -/
 

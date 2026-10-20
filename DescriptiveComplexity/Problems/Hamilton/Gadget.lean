@@ -328,7 +328,6 @@ theorem iAdjRaw_symm (p q : HTag × (Fin 2 → A)) : IAdjRaw p q ↔ IAdjRaw q p
   obtain ⟨t', w'⟩ := q
   cases t <;> cases t' <;> simp only [IAdjRaw] <;>
     first
-      | rfl
       | (constructor <;> exact fun h => ⟨h.1.symm, h.2.symm⟩)
       | (constructor <;> exact fun h => ⟨h.2.symm, h.1.symm⟩)
       | (constructor <;> exact fun ⟨h0, h1, h2, h3⟩ =>

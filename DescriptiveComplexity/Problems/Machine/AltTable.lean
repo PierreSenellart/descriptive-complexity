@@ -210,7 +210,6 @@ theorem altSrc_base {cnf : Bool} {τ q : AltV k A} (hτ : AltTr cnf τ) (hs : Al
   obtain ⟨⟨t, i⟩, w⟩ := τ
   cases t <;> dsimp only [AltTr, AltSrc, stateBase, isSweepBase] at hτ hs ⊢ <;>
     first
-      | exact False.elim hτ
       | (subst hs; exact ⟨rfl, fun _ => rfl⟩)
       | (subst hs; exact ⟨rfl, fun h => absurd h (by simp)⟩)
 
@@ -220,7 +219,6 @@ theorem altRead_base {cnf : Bool} {τ a : AltV k A} (hτ : AltTr cnf τ) (hr : A
   obtain ⟨⟨t, i⟩, w⟩ := τ
   cases t <;> dsimp only [AltTr, AltRead, readBase] at hτ hr ⊢ <;>
     first
-      | exact False.elim hτ
       | (subst hr; rfl)
       | (rename_i d; cases d <;> (subst hr; rfl))
 
@@ -245,10 +243,8 @@ theorem altTr_index_zero {cnf : Bool} {τ : AltV k A} (hτ : AltTr cnf τ)
   obtain ⟨⟨t, i⟩, w⟩ := τ
   cases t <;> dsimp only [AltTr, isSweepBase] at hτ h ⊢ <;>
     first
-      | exact False.elim hτ
       | exact absurd rfl h
       | exact hτ.2
-      | exact hτ.1.2
       | exact hτ.2.1
 
 /-- Whether a transition's source is a sweeping state is determined by the base
@@ -278,8 +274,6 @@ theorem altTr_payload {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) 
   cases ht
   cases t <;> dsimp only [AltTr, AltSrc, AltRead] at hτ hτ' hs hs' hr hr' <;>
     first
-      | exact False.elim hτ
-      | exact Prod.ext rfl (isMinTup2_unique hτ hτ')
       | exact Prod.ext rfl (isMinTup2_unique hτ.1 hτ'.1)
       | exact altV_ext rfl (aoneI_eq_iff.mp (hr.symm.trans hr')).2.2 (hmin _ _ hτ.1 hτ'.1)
       | exact altV_ext rfl (aoneI_eq_iff.mp (hs.symm.trans hs')).2.2

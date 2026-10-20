@@ -8,6 +8,9 @@ package "descriptive-complexity" where
     "NP-completeness", "reductions"]
   homepage := "https://pierresenellart.github.io/descriptive-complexity/DescriptiveComplexity.html"
   license := "Apache-2.0"
+  -- Mathlib is built with the module system; this keeps Lake quiet about the
+  -- files of this library that are not modules yet, and goes once they all are.
+  allowNonModules := true
   leanOptions := #[
     ⟨`pp.unicode.fun, true⟩, -- pretty-prints `fun a ↦ b`
     ⟨`autoImplicit, false⟩,

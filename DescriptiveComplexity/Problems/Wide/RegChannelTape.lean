@@ -117,10 +117,9 @@ theorem wideRegData_wellFormed_iff : (wideRegData A).WellFormed ↔ WideWF A := 
   · rintro ⟨hlin, hinp, ⟨b, hb⟩, huniq⟩
     refine ⟨isLinOrd_wpLe hlin, ⟨Sum.inl fun _ => False, trivial⟩, ?_, ⟨Sum.inr b, hb⟩, ?_⟩
     · rintro (s | x) (a | a) (c | c) h1 h2 <;>
-        first
+        try first
           | exact False.elim h1
           | exact False.elim h2
-          | skip
       obtain ⟨u, hu, hau⟩ := h1
       obtain ⟨v, hv, hcv⟩ := h2
       have huv : u = v := wmRegSeg_injOn hlin ⟨a, hau⟩ ⟨c, hcv⟩

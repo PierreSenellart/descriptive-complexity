@@ -579,10 +579,9 @@ theorem ok_decodeDom {x : PV A} (hx : PDom x) :
     Pcp.History.Ok (MRule (tmData A)) (decodeDom x) := by
   obtain ⟨t, w⟩ := x
   obtain ⟨-, hg⟩ := hx
-  cases t <;> first
+  cases t <;> try first
     | exact hg.elim
     | trivial
-    | skip
   case dBoot => exact ⟨MRule.boot hg, by simp, by simp⟩
   case dAcc => exact ⟨MRule.acc hg, by simp, by simp⟩
   case dMoveR =>

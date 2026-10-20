@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 import DescriptiveComplexity.Composition
 import DescriptiveComplexity.Ordered
 import Mathlib.Order.PiLex
-import Mathlib.Data.Prod.Lex
+import Mathlib.Order.Prod.Lex.Basic
 import Mathlib.Data.Fintype.EquivFin
 
 /-!

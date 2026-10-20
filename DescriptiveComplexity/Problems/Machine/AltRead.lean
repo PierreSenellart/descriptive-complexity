@@ -340,10 +340,7 @@ theorem inSweepR_step {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
       succPos_left_unique isLinOrd_altTagTupleLe hsucc (by rw [hhead]; exact succPos_posCell_posEnd)
     exact Or.inr ⟨ν', fun x hx => (hsupp x hx).1, hDst.trans (by rw [hidx]), hsucc.1,
       by rw [hback]; exact altTagTupleLe_refl _, htape' ▸ htape⟩
-  all_goals
-    first
-      | exact hTr.elim
-      | exact absurd (hst.symm.trans hSrc) (by simp [acstI, aoneI])
+  all_goals exact absurd (hst.symm.trans hSrc) (by simp [acstI, aoneI])
 
 /-! ### Where a sweep hands over -/
 
@@ -458,10 +455,7 @@ theorem inSweepL_step {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
         isLinOrd_altTagTupleLe hsucc succPos_posStart_posCell
     exact Or.inr ⟨ν', hsupp, hhead', htape' ▸ htape,
       Or.inr ⟨hlast, Or.inr ⟨hTr.2.2.2, hTr.2.2.1, hDst⟩⟩⟩
-  all_goals
-    first
-      | exact hTr.elim
-      | exact absurd (hst.symm.trans hSrc) (by simp [acstI, aoneI])
+  all_goals exact absurd (hst.symm.trans hSrc) (by simp [acstI, aoneI])
 
 end Readoff
 

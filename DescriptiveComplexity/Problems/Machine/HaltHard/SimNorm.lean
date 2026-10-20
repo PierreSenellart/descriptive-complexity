@@ -256,10 +256,10 @@ def pStepNormal (p : CPos c) (k : PCont c) (v : List ℕ) : PCont c × List ℕ 
   termination_by sizeOf (codeAt p)
   decreasing_by
   · rw [codeAt_c₁_cons _h, _h]; simp; try omega
-  · rw [codeAt_c₂_comp _h, _h]; simp; try omega
+  · rw [codeAt_c₂_comp _h, _h]; simp
   · rw [codeAt_c₁_case _h, _h]; simp; try omega
-  · rw [codeAt_c₂_case _h, _h]; simp; try omega
-  · rw [codeAt_c₁_fix _h, _h]; simp; try omega
+  · rw [codeAt_c₂_case _h, _h]; simp
+  · rw [codeAt_c₁_fix _h, _h]; simp
 
 /-- The positioned `stepNormal` projects onto the library's. -/
 theorem pStepNormal_toCont (p : CPos c) (k : PCont c) (v : List ℕ) :

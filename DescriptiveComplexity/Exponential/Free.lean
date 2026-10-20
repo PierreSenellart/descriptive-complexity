@@ -187,9 +187,7 @@ def toExpLEquiv :
   { toEquiv := toExpEquiv
     map_fun' := fun f => isEmptyElim f
     map_rel' := fun {n} r x => by
-      first
-        | exact realize_blockOrderLift (X.B.replicate n) _ (X.relSentence r _)
-        | exact (realize_blockOrderLift (X.B.replicate n) _ (X.relSentence r _)).symm }
+      exact (realize_blockOrderLift (X.B.replicate n) _ (X.relSentence r _)).symm }
 
 end ExpExpansionFree
 

@@ -128,7 +128,7 @@ theorem ordInv_default (n : ℕ) (hA : 2 ^ n ≤ Nat.card A) (hB : 2 ^ n ≤ Nat
   · exact i.elim0
   · exact i.elim0
   · exact i'.elim0
-  · cases β <;> cases β' <;> simp only [extRank] <;> first | rfl | exact hneg | exact hpos | simp
+  · cases β <;> cases β' <;> simp only [extRank] <;> first | exact hneg | exact hpos | simp
 
 variable [Finite A] [Finite B]
 

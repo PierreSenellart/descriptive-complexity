@@ -209,10 +209,7 @@ theorem turn_of_step_chkR {cnf : Bool} {c : A} {c' : Config (AltV k A)}
     obtain ⟨hf, hd, hcl⟩ := stChk_eq_iff.mp hSrc.symm
     subst hd
     exact Or.inr ⟨hf.symm, fun h => by rw [← hcl]; exact hTr.2.2.2 h⟩
-  all_goals
-    first
-      | exact hTr.elim
-      | exact absurd hSrc (by simp [acstI, aoneI])
+  all_goals exact absurd hSrc (by simp [acstI, aoneI])
 
 /-- **The turn at the left marker, read backwards.** -/
 theorem turn_of_step_chkL {cnf : Bool} {c : A} {c' : Config (AltV k A)}
@@ -266,10 +263,7 @@ theorem turn_of_step_chkL {cnf : Bool} {c : A} {c' : Config (AltV k A)}
     obtain ⟨hf, hd, hcl⟩ := stChk_eq_iff.mp hSrc.symm
     subst hd
     exact Or.inr ⟨hf.symm, fun h => by rw [← hcl]; exact hTr.2.2.2 h⟩
-  all_goals
-    first
-      | exact hTr.elim
-      | exact absurd hSrc (by simp [acstI, aoneI])
+  all_goals exact absurd hSrc (by simp [acstI, aoneI])
 
 /-! ### Putting the clauses together -/
 

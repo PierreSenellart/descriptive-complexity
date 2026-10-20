@@ -444,16 +444,13 @@ def qReadTag : QTag → QTag
 theorem qSrc_tag {τ q : QV A} (hτ : QTr τ) (hs : QSrc τ q) : q.1 = qStateTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [QTr, QSrc] at hτ hs <;>
-    first
-      | exact False.elim hτ
-      | (rw [hs]; rfl)
+    (rw [hs]; rfl)
 
 /-- **The symbol read pins the transition's tag.** -/
 theorem qRead_tag {τ a : QV A} (hτ : QTr τ) (hr : QRead τ a) : a.1 = qReadTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [QTr, QRead] at hτ hr <;>
     first
-      | exact False.elim hτ
       | (rw [hr]; rfl)
       | (rename_i d; cases d <;> (rw [hr]; rfl))
 
@@ -578,7 +575,6 @@ theorem qTr_payload {τ τ' q a : QV A} (hτ : QTr τ) (hτ' : QTr τ')
   cases ht
   cases t <;> dsimp only [QTr, QSrc, QRead, IsMin1] at hτ hτ' hs hs' hr hr' <;>
     first
-      | exact False.elim hτ
       | exact Prod.ext rfl (isMinTup_unique hτ hτ')
       | exact Prod.ext rfl (isMinTup_unique hτ.1 hτ'.1)
       | exact qV_ext rfl (qOne_eq_qOne_iff.mp (hr.symm.trans hr')).2 (hmin _ _ hτ.2 hτ'.2)

@@ -90,9 +90,7 @@ theorem wideData_deterministic_iff : (wideData A).Deterministic ↔ WideDet A :=
           | exact False.elim h1
           | exact False.elim h2
           | exact False.elim h3
-          | exact False.elim h4
           | exact False.elim h5
-          | exact False.elim h6
           | exact congrArg Sum.inr (huniq τ τ' q a h1 h2 h3 h4 h5 h6)
     · rintro (s | τ) (t | q) (t' | q') h1 h2 <;>
         first
@@ -186,10 +184,9 @@ theorem wideData_wellFormed_iff [Finite A] : (wideData A).WellFormed ↔ WideWF 
   · rintro ⟨hlin, hinp, ⟨b, hb⟩, huniq⟩
     refine ⟨isLinOrd_wpLe hlin, ⟨Sum.inl fun _ => False, trivial⟩, ?_, ⟨Sum.inr b, hb⟩, ?_⟩
     · rintro (s | x) (a | a) (c | c) h1 h2 <;>
-        first
+        try first
           | exact False.elim h1
           | exact False.elim h2
-          | skip
       obtain ⟨u, hu, hau⟩ := h1
       obtain ⟨v, hv, hcv⟩ := h2
       exact congrArg Sum.inr (hinp u a c hau ((eq_of_wmDown hlin hv hu) ▸ hcv))

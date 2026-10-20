@@ -367,9 +367,7 @@ omit [Language.sat.Structure A] in
 theorem hSrc_tag {τ q : HV A} (hs : HSrc τ q) : q.1 = hStateTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [HSrc] at hs <;>
-    first
-      | exact False.elim hs
-      | (rw [hs]; rfl)
+    (rw [hs]; rfl)
 
 omit [Language.sat.Structure A] in
 /-- **The symbol read pins the transition's tag.** -/
@@ -377,7 +375,6 @@ theorem hRead_tag {τ a : HV A} (hr : HRead τ a) : a.1 = hReadTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [HRead] at hr <;>
     first
-      | exact False.elim hr
       | (rw [hr]; rfl)
       | (rename_i b; cases b <;> (rw [hr]; rfl))
 

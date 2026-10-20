@@ -302,7 +302,7 @@ theorem derives_allge {x : A} (hw : ∀ b : A, AGMove x b → Derives (A := A) g
         (v := ![x, z, z]) ?_ ?_
       · rw [rTopNo, Formula.realize_inf, Formula.realize_not]
         exact ⟨(realize_maxF (L := Language.andOrGraph) 1).mpr hz,
-          fun h => hmv (by first | assumption | simpa using (realize_moveG (A := A) 0 1).mp h)⟩
+          fun h => hmv (by simpa using (realize_moveG (A := A) 0 1).mp h)⟩
       · intro b hbmem
         rw [rTopNo] at hbmem
         simp at hbmem
@@ -327,7 +327,7 @@ theorem derives_allge {x : A} (hw : ∀ b : A, AGMove x b → Derives (A := A) g
         (v := ![x, w, z]) ?_ ?_
       · rw [rStepNo, Formula.realize_inf, Formula.realize_not]
         refine ⟨(realize_succF (L := Language.andOrGraph) 1 2).mpr ⟨hwz, ?_⟩,
-          fun h => hmv (by first | assumption | simpa using (realize_moveG (A := A) 0 1).mp h)⟩
+          fun h => hmv (by simpa using (realize_moveG (A := A) 0 1).mp h)⟩
         intro a ha
         exact hgap a ha
       · intro b hbmem
@@ -353,7 +353,7 @@ theorem derives_of_winsOn {x : A} (h : WinsOn A x) :
     refine Derives.rule (c := rEx) rEx_mem (a := winAt 0) rfl (v := ![a, b, b])
       ?_ ?_
     · rw [rEx, Formula.realize_inf, Formula.realize_not]
-      exact ⟨fun hc => hu (by first | assumption | simpa using (realize_univG (A := A) 0).mp hc),
+      exact ⟨fun hc => hu (by simpa using (realize_univG (A := A) 0).mp hc),
         (realize_moveG (A := A) 0 1).mpr hmv⟩
     · intro c hcmem
       rw [rEx] at hcmem

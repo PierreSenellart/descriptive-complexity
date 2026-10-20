@@ -190,7 +190,7 @@ theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
     | exact absurd hg.2.1 hg'.1
     | exact absurd hg'.2.1 hg.1
     | exact congrArg IncrRule.set (hg'.2.2.2 _ hg.2.2.1)
-    | (have hbb := hemb hph; cases hbb <;> rfl)
+    | (have hbb := hemb hph; cases hbb; try rfl)
 
 /-- **Exit disjointness** at the kit's landing phases. -/
 theorem exit_disjoint (hemb : Function.Injective κ.emb) :

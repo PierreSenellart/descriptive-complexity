@@ -667,10 +667,9 @@ theorem realize_domF {t : PTag} {v : Fin 1 × Fin 5 → A} {wd : Fin 5 → A}
   have hwfonly : ∀ h : (wfF (α := Fin 1 × Fin 5)).Realize v ↔ (tmData A).WellFormed,
       ((wfF (α := Fin 1 × Fin 5)).Realize v ↔ (tmData A).WellFormed ∧ True) :=
     fun h => h.trans ⟨fun hh => ⟨hh, trivial⟩, fun hh => hh.1⟩
-  cases t <;> first
+  cases t <;> try first
     | exact iff_of_false (fun h => h) (fun h => h.2)
     | exact hwfonly realize_wfF
-    | skip
   case dBoot =>
     refine Formula.realize_inf.trans (and_congr realize_wfF ?_)
     rw [realize_startF, hv 0]

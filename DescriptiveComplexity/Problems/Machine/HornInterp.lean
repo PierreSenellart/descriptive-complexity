@@ -627,7 +627,6 @@ theorem relMap_twrite (p q : HV A) :
           q = symCell m (w 2) := by
         refine (realize_oneHF e0 e1 e2).trans ?_
         simp only [h2]
-        try exact Iff.rfl
       have hpos : (posF (0, 1) (0, 2) : satOrd.Formula (Fin 2 × Fin 3)).Realize v ↔
           SatPos (w 1) (w 2) := by
         rw [realize_posF, h1, h2]
@@ -683,12 +682,10 @@ theorem relMap_tdst (p q : HV A) :
           q = stHChk true (w 0) (w 1) := by
         refine (realize_twoHF e0 e1 e2).trans ?_
         simp only [h0, h1]
-        try exact Iff.rfl
       have htw₂ : (twoHF (.qChk false) (0, 0) (0, 1) q.1).Realize v ↔
           q = stHChk false (w 0) (w 1) := by
         refine (realize_twoHF e0 e1 e2).trans ?_
         simp only [h0, h1]
-        try exact Iff.rfl
       have hneg : (negF (0, 1) (0, 2) : satOrd.Formula (Fin 2 × Fin 3)).Realize v ↔
           SatNeg (w 1) (w 2) := by
         rw [realize_negF, h1, h2]
@@ -732,12 +729,10 @@ theorem relMap_tdst (p q : HV A) :
           q = stHVer true d (w 0) := by
         refine (realize_oneHF e0 e1 e2).trans ?_
         simp only [h0]
-        try exact Iff.rfl
       have ho₂ : (oneHF (.qVer false d) (0, 0) q.1).Realize v ↔
           q = stHVer false d (w 0) := by
         refine (realize_oneHF e0 e1 e2).trans ?_
         simp only [h0]
-        try exact Iff.rfl
       cases f
       · rw [ite_eq_right Bool.false_ne_true, ite_eq_right Bool.false_ne_true, Formula.realize_not]
         refine or_congr (and_congr ho₁ ?_) (and_congr ho₂ ?_)

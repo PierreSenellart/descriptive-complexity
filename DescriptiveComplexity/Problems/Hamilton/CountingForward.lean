@@ -79,14 +79,14 @@ theorem S_functional (hν : OneInProper ν) {u v v' : Vtx A} (h : S ν u v) (h' 
       first | exact absurd hx hx' | exact absurd hx' hx | exact h.trans h'.symm
   | lft x =>
     rcases h with ⟨hx, h⟩ | ⟨hx, h⟩ <;> rcases h' with ⟨hx', h'⟩ | ⟨hx', h'⟩ <;>
-      first | exact absurd hx hx' | exact absurd hx' hx | skip
+      try first | exact absurd hx hx' | exact absurd hx' hx
     · exact h.trans h'.symm
     · obtain ⟨y, hy, rfl⟩ := h
       obtain ⟨y', hy', rfl⟩ := h'
       rw [nextVar_right_unique hy hy']
   | rgt x =>
     rcases h with ⟨hx, h⟩ | ⟨hx, h⟩ <;> rcases h' with ⟨hx', h'⟩ | ⟨hx', h'⟩ <;>
-      first | exact absurd hx hx' | exact absurd hx' hx | skip
+      try first | exact absurd hx hx' | exact absurd hx' hx
     · obtain ⟨y, hy, rfl⟩ := h
       obtain ⟨y', hy', rfl⟩ := h'
       rw [nextVar_right_unique hy hy']
@@ -96,7 +96,7 @@ theorem S_functional (hν : OneInProper ν) {u v v' : Vtx A} (h : S ν u v) (h' 
       rw [hc, hs]
   | pad0 x =>
     rcases h with ⟨hx, h⟩ | ⟨hx, h⟩ <;> rcases h' with ⟨hx', h'⟩ | ⟨hx', h'⟩ <;>
-      first | exact absurd hx hx' | exact absurd hx' hx | skip
+      try first | exact absurd hx hx' | exact absurd hx' hx
     · obtain ⟨c, s, hm, rfl⟩ := h
       obtain ⟨c', s', hm', rfl⟩ := h'
       obtain ⟨hc, hs⟩ := varMin_unique hm hm'
@@ -104,7 +104,7 @@ theorem S_functional (hν : OneInProper ν) {u v v' : Vtx A} (h : S ν u v) (h' 
     · exact h.trans h'.symm
   | ain s x c =>
     rcases h with ⟨hx, h⟩ | ⟨hx, h⟩ <;> rcases h' with ⟨hx', h'⟩ | ⟨hx', h'⟩ <;>
-      first | exact absurd hx hx' | exact absurd hx' hx | skip
+      try first | exact absurd hx hx' | exact absurd hx' hx
     · rcases h with ⟨hs, h⟩ | ⟨hs, h⟩ <;> rcases h' with ⟨hs', h'⟩ | ⟨hs', h'⟩ <;>
         first
           | exact h.trans h'.symm
@@ -118,7 +118,7 @@ theorem S_functional (hν : OneInProper ν) {u v v' : Vtx A} (h : S ν u v) (h' 
       · rfl
   | bout s x c =>
     rcases h with ⟨hx, h⟩ | ⟨hx, h⟩ <;> rcases h' with ⟨hx', h'⟩ | ⟨hx', h'⟩ <;>
-      first | exact absurd hx hx' | exact absurd hx' hx | skip
+      try first | exact absurd hx hx' | exact absurd hx' hx
     · exact h.trans h'.symm
     · rcases h with ⟨hs, h⟩ | ⟨hs, h⟩ <;> rcases h' with ⟨hs', h'⟩ | ⟨hs', h'⟩ <;>
         first
@@ -126,7 +126,7 @@ theorem S_functional (hν : OneInProper ν) {u v v' : Vtx A} (h : S ν u v) (h' 
           | exact absurd (hs.symm.trans hs') (by decide)
   | pad s x c =>
     rcases h with ⟨hx, h⟩ | ⟨hx, h⟩ <;> rcases h' with ⟨hx', h'⟩ | ⟨hx', h'⟩ <;>
-      first | exact absurd hx hx' | exact absurd hx' hx | skip
+      try first | exact absurd hx hx' | exact absurd hx' hx
     · rcases h with ⟨c₁, s₁, hst, rfl⟩ | ⟨hm, rfl⟩ <;>
         rcases h' with ⟨c₂, s₂, hst', rfl⟩ | ⟨hm', rfl⟩
       · obtain ⟨hc, hs⟩ := varStep_right_unique hst hst'

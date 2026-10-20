@@ -592,7 +592,6 @@ theorem var_unique {sg sg' : Bool} {t : PTag} {w we we' : Fin 2 → A}
   cases t <;> cases sg <;> cases sg' <;>
     first
       | exact h.elim
-      | exact h'.elim
       | exact ⟨(ownVar_eq h.2.1).trans (ownVar_eq h'.2.1).symm, rfl⟩
       | exact absurd (h.1.symm.trans h'.1) (by decide)
 

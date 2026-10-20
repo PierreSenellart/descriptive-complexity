@@ -491,10 +491,9 @@ end Words
 theorem startBotAt_fun (hwf : (tmData A).WellFormed) {p c c' : PV A}
     (h₁ : StartBotAt p c) (h₂ : StartBotAt p c') : c = c' := by
   obtain ⟨t, w⟩ := p
-  cases t <;> first
+  cases t <;> try first
     | exact h₁.elim
     | (exact h₁.2.trans h₂.2.symm)
-    | skip
   case pairSym =>
     obtain ⟨-, -, a, ha, rfl⟩ := h₁
     obtain ⟨-, -, a', ha', rfl⟩ := h₂

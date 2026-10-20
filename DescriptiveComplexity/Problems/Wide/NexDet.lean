@@ -84,10 +84,9 @@ theorem uniqueFrom_of_sepOn (hR : T.Reads)
           | exact ha'.elim
           | exact congrArg Sum.inr (T.write_functional hR τ a a' ha ha')
     · rintro (sτ | τ) (sσ | σ) hτ hσ hsrc hsrc' hread hread' <;>
-        first
+        try first
           | exact hτ.elim
           | exact hσ.elim
-          | skip
       rcases hxs : x.state with sx | qx
       · rw [hxs] at hsrc; exact hsrc.elim
       rcases hxa : x.tape x.head with sa | qa

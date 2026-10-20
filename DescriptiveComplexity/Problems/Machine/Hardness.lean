@@ -356,9 +356,7 @@ theorem satSrc_tag {τ q : SatV A} (hτ : SatTr τ) (hs : SatSrc τ q) :
     q.1 = stateTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [SatTr, SatSrc] at hτ hs <;>
-    first
-      | exact False.elim hτ
-      | (rw [hs]; rfl)
+    (rw [hs]; rfl)
 
 /-- **The symbol read pins the transition's tag.** -/
 theorem satRead_tag {τ a : SatV A} (hτ : SatTr τ) (hr : SatRead τ a) :
@@ -366,7 +364,6 @@ theorem satRead_tag {τ a : SatV A} (hτ : SatTr τ) (hr : SatRead τ a) :
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [SatTr, SatRead] at hτ hr <;>
     first
-      | exact False.elim hτ
       | (rw [hr]; rfl)
       | (rename_i d; cases d <;> (rw [hr]; rfl))
 
@@ -453,7 +450,6 @@ theorem satTr_payload {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
   cases ht
   cases t <;> dsimp only [SatTr, SatSrc, SatRead] at hτ hτ' hs hs' hr hr' <;>
     first
-      | exact False.elim hτ
       | exact Prod.ext rfl (isMinTup_unique hτ hτ')
       | exact Prod.ext rfl (isMinTup_unique hτ.1 hτ'.1)
       | exact satV_ext rfl (one_eq_one_iff.mp (hr.symm.trans hr')).2 (hmin _ _ hτ.1 hτ'.1)
@@ -734,7 +730,6 @@ theorem satWrite_eq_read {τ a b : SatV A} (hr : SatRead τ a) (hw : SatWrite τ
   cases t <;> dsimp only [SatRead, SatWrite] at hr hw <;>
     first
       | exact hw.trans hr.symm
-      | exact False.elim hr
       | exact absurd rfl (hg _)
 
 /-- **Only a guess write changes the tape.** -/
@@ -762,7 +757,6 @@ theorem step_state_ne_guess {c d : Config (SatV A)} (h : (satMachine A).Step c d
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [SatTr, SatDst] at hτ' hdst' <;>
     first
-      | exact False.elim hτ'
       | (rw [hdst']; exact fun h => SatTag.noConfusion h)
       | (rcases hdst' with ⟨h, -⟩ | ⟨h, -⟩ <;> rw [h] <;> exact fun h => SatTag.noConfusion h)
       | (rcases hs with hs | hs

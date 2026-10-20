@@ -137,7 +137,6 @@ theorem satTagIdx_injective : Function.Injective satTagIdx := by
   cases s <;> cases t <;>
     simp only [satTagIdx] at h ⊢ <;>
       first
-        | rfl
         | omega
         | (rename_i i j; exact congrArg _ (Fin.ext (by omega)))
         | (rename_i i; omega)
