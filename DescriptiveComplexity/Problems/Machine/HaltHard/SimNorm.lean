@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.Zip
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Zip
 
 /-!
 # The dispatch phase of the simulation
@@ -25,6 +27,8 @@ dispatch (for the four node shapes, having pushed the frame) or back to rest
 `DescriptiveComplexity.HaltHard.sim_norm` chains them by induction on the
 size of the dispatched code.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

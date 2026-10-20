@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Matrix
+module
+
+public import DescriptiveComplexity.Exponential.Matrix
 
 /-!
 # Peeling a quantifier into a block
@@ -29,6 +31,8 @@ assignments to be inhabited, which they are –
 `DescriptiveComplexity.SOBlock.botAssign` – and the existential case of the
 implication needs excluded middle, as relativized quantification always does.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

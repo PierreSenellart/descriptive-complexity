@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.RelClosure
+module
+
+public import DescriptiveComplexity.Counting.RelClosure
 
 /-!
 # Subtractive reductions
@@ -54,6 +56,8 @@ under subtractive reductions. Parsimonious hardness and completeness imply
 them (`DescriptiveComplexity.hard_sharpP_of_parsimoniousHard`,
 `DescriptiveComplexity.complete_sharpP_of_parsimoniousComplete`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

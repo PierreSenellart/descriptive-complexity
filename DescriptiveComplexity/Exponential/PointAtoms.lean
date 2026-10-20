@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Rounds
+module
+
+public import DescriptiveComplexity.Exponential.Rounds
 
 /-!
 # The atoms of the translation
@@ -28,6 +30,8 @@ Equality is the exception and is cheaper: rather than a disjunction over tag
 pairs it compares the tag bits round by round, which says the tags agree without
 naming them.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Relativized
-import Mathlib.SetTheory.Cardinal.Finite
+module
+
+public import DescriptiveComplexity.Counting.Relativized
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Post-processing terms
@@ -34,6 +36,8 @@ composition of relativized interpretations and needs nothing new. With
 substitution for the oracle's answer (`DescriptiveComplexity.PostTerm.subst`),
 this is what makes one-call reductions compose.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureDecideReach
-import DescriptiveComplexity.TransitiveClosureReductionDet
-import DescriptiveComplexity.WalkBudget
+module
+
+public import DescriptiveComplexity.TransitiveClosureDecideReach
+public import DescriptiveComplexity.TransitiveClosureReductionDet
+public import DescriptiveComplexity.WalkBudget
 
 /-!
 # Deciding reachability in a deterministic walk: a step budget
@@ -29,6 +31,8 @@ functional relation is reached in fewer steps than that
 arrived when the budget runs out never will. This is the argument of
 `DescriptiveComplexity.LOGSPACE_eq_coLOGSPACE`, with parameters.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

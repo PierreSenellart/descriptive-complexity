@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.CountingDecision
+module
+
+public import DescriptiveComplexity.Problems.Sat.CountingDecision
 
 /-!
 # SelMajSAT and SelEqSAT: complete problems for PP and C₌P
@@ -31,6 +33,8 @@ selector (`DescriptiveComplexity.PairSel.pairTseitinInterp`). The models in
 which the selected variable is true are then the witnesses of the first
 kernel, and the others those of the second.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

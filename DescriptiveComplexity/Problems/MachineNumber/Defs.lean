@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Defs
-import DescriptiveComplexity.Problems.Machine.DetRun
-import DescriptiveComplexity.FixedPointOrderTransfer
-import DescriptiveComplexity.Counting
-import DescriptiveComplexity.Vocabulary
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Problems.Machine.Defs
+public import DescriptiveComplexity.Problems.Machine.DetRun
+public import DescriptiveComplexity.FixedPointOrderTransfer
+public import DescriptiveComplexity.Counting
+public import DescriptiveComplexity.Vocabulary
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # The number written by a machine: definition
@@ -34,6 +36,8 @@ the problem is to compute the number it leaves on its tape.
   halts without accepting, writes `0`, and so does an instance that is not a
   well-formed deterministic machine.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

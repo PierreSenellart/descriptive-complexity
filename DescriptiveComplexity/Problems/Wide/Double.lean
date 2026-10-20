@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInterp
-import DescriptiveComplexity.Relativize
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInterp
+public import DescriptiveComplexity.Relativize
 
 /-!
 # A base that is never a singleton
@@ -33,6 +35,8 @@ it under the wide interpretation multiplies the dimension by one and the tags by
 `Bool ^ dd`: the composite is again a tagged-tuple interpretation of the
 instance, with the same dimension.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

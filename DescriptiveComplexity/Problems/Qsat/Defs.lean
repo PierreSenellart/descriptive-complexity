@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.PSpace
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.PSpace
 
 /-!
 # QSAT: quantified Boolean formulas with an unbounded prefix
@@ -56,6 +58,8 @@ The quantified variable at a position is the `prefixLt`-least one not yet in
 `D` (`DescriptiveComplexity.QLeast`), so the prefix is read outermost-first and the
 players move in the order the instance prescribes.
 -/
+
+@[expose] public section
 
 /- The language of quantified CNF instances with an unbounded prefix lives in
 Mathlib's `FirstOrder.Language` namespace, next to `Language.sat` and
@@ -282,7 +286,7 @@ section Iso
 variable {A B : Type} [Language.qsat.Structure A] [Language.qsat.Structure B]
 
 /-- The push-forward of a predicate along an isomorphism. -/
-private def pushQ (e : A ≃[Language.qsat] B) (ν : A → Prop) : B → Prop :=
+def pushQ (e : A ≃[Language.qsat] B) (ν : A → Prop) : B → Prop :=
   fun b => ν (e.symm b)
 
 private theorem pushQ_apply (e : A ≃[Language.qsat] B) (ν : A → Prop) (a : A) :
@@ -392,7 +396,7 @@ empty valuation – is won by the existential player. -/
 def QsatHolds : Prop :=
   QsatWf A ∧ QsatWins (fun _ : A => False) (fun _ : A => False)
 
-private theorem qsatHolds_of_iso {B : Type} [Language.qsat.Structure B]
+theorem qsatHolds_of_iso {B : Type} [Language.qsat.Structure B]
     (e : A ≃[Language.qsat] B) (h : QsatHolds A) : QsatHolds B := by
   obtain ⟨hwf, hw⟩ := h
   refine ⟨qsatWf_push e hwf, ?_⟩

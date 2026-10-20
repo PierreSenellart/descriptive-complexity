@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawStageAtom
-import DescriptiveComplexity.Problems.Wide.DrawTagged
-import DescriptiveComplexity.Problems.Wide.DrawSeq
-import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
-import DescriptiveComplexity.Problems.Wide.DrawVar
-import DescriptiveComplexity.Problems.Wide.DrawRound
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
+public import DescriptiveComplexity.Problems.Wide.DrawTagged
+public import DescriptiveComplexity.Problems.Wide.DrawSeq
+public import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
+public import DescriptiveComplexity.Problems.Wide.DrawVar
+public import DescriptiveComplexity.Problems.Wide.DrawRound
 
 /-!
 # The phase tower: the program's phase and site types, assembled
@@ -32,6 +34,8 @@ matrix – the guard atoms' trips read a harmless witness cell and their
 flags are ignored by the folds – so the loop lengths match the
 `DescriptiveComplexity.Draw.Data.kindReads` budgets exactly.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

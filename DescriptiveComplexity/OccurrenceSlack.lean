@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceFormulas
-import Mathlib.Data.Set.Card
+module
+
+public import DescriptiveComplexity.OccurrenceFormulas
+public import Mathlib.Data.Set.Card
 
 /-!
 # Slack occurrences of a clause
@@ -25,6 +27,8 @@ occurrence has strictly fewer slack occurrences than occurrences
 occurrences has exactly two fewer
 (`DescriptiveComplexity.SatOcc.card_midSet_add_two`) – its first and its last.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

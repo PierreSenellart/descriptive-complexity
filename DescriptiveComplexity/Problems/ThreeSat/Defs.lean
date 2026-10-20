@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceOrder
+module
+
+public import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # 3SAT: definition
@@ -21,6 +23,8 @@ counting, as: among any four literal occurrences of a clause, two coincide.
 The reductions to and from SAT, and NP-completeness, are in
 `DescriptiveComplexity.Problems.ThreeSat`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

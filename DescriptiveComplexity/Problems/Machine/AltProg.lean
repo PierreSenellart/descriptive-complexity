@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltTape
-import DescriptiveComplexity.Problems.Qbf.Defs
-import DescriptiveComplexity.MachinesAlt
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltTape
+public import DescriptiveComplexity.Problems.Qbf.Defs
+public import DescriptiveComplexity.MachinesAlt
 
 /-!
 # The machine of a quantified Boolean formula
@@ -56,6 +58,8 @@ Everything here is a plain predicate on tagged tuples: the machine is assembled
 as a `DescriptiveComplexity.ATMData` and reasoned about directly. Only once its
 correctness is proved does the first-order transcription happen.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

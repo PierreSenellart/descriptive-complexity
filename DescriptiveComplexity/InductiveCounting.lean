@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.InductiveCounting.Machine
-import DescriptiveComplexity.InductiveCounting.Order
-import DescriptiveComplexity.InductiveCounting.Sound
-import DescriptiveComplexity.InductiveCounting.Complete
+module
+
+public import DescriptiveComplexity.InductiveCounting.Machine
+public import DescriptiveComplexity.InductiveCounting.Order
+public import DescriptiveComplexity.InductiveCounting.Sound
+public import DescriptiveComplexity.InductiveCounting.Complete
 
 /-!
 # Inductive counting
@@ -20,3 +22,5 @@ its correctness (`DescriptiveComplexity.InductiveCounting.Sound`,
 first-order; `DescriptiveComplexity.TransitiveClosureCompl` is what runs the
 machine inside a single `TC`.
 -/
+
+@[expose] public section

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderKrom
-import DescriptiveComplexity.SecondOrderPull
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.SecondOrderKrom
+public import DescriptiveComplexity.SecondOrderPull
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Pulling SO-Krom definability back through an interpretation
@@ -42,6 +44,8 @@ The shared pieces (`DescriptiveComplexity.SOAtom.pull`, `DescriptiveComplexity.g
 SO-Horn: the pullback interprets the target's order by the lexicographic order
 on tagged tuples (`DescriptiveComplexity.FOInterpretation.ordExtend`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
-import DescriptiveComplexity.OccurrenceFormulas
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+public import DescriptiveComplexity.OccurrenceFormulas
 
 /-!
 # SAT reduces to Clique by an ordered FO reduction
@@ -42,6 +44,8 @@ structures – exactly the correctness contract of
 correct on infinite structures as well, where SAT can hold while no clique
 instance is a yes-instance).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -224,7 +228,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- When no clause is empty, the marked vertices are exactly the diagonal
 clause vertices, one per clause. -/
-private def markedEquivClause (hne : ¬∃ c : A, EmptyCl c) :
+def markedEquivClause (hne : ¬∃ c : A, EmptyCl c) :
     {v : satToClique.Map A // MGMarked v} ≃ {c : A // IsCl c} where
   toFun v := ⟨v.1.2 0, by
     obtain ⟨⟨t, w⟩, hm⟩ := v

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Class
-import DescriptiveComplexity.PSpace
-import DescriptiveComplexity.SecondOrderTransitiveClosureFree
+module
+
+public import DescriptiveComplexity.Exponential.Class
+public import DescriptiveComplexity.PSpace
+public import DescriptiveComplexity.SecondOrderTransitiveClosureFree
 
 /-!
 # Exponential expansions that see no order
@@ -44,6 +46,8 @@ for `PSPACE`, which guesses the copy as a relation, and
 of its points. They conclude `EXPSPACE = SO(PFP)` and `EXPTIME = SO(LFP)`, with
 no order in either statement.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

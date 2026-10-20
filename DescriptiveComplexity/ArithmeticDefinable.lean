@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Arithmetic
-import DescriptiveComplexity.FirstOrderDefinable
-import DescriptiveComplexity.Complexity
+module
+
+public import DescriptiveComplexity.Arithmetic
+public import DescriptiveComplexity.FirstOrderDefinable
+public import DescriptiveComplexity.Complexity
 
 /-!
 # AC⁰ definability: first-order logic with the numeric predicates
@@ -67,6 +69,8 @@ pattern of the classes above it.
   separately, through the multi-head automaton, and gives every consumer that
   the missing closure lemma would.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

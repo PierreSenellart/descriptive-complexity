@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Problems.DigraphIso
-import DescriptiveComplexity.Problems.Feedback.Defs
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Problems.DigraphIso
+public import DescriptiveComplexity.Problems.Feedback.Defs
 
 /-!
 # DAG Isomorphism: vocabulary and semantics
@@ -44,6 +46,8 @@ This is the same “junk is ignorable” discipline as everywhere in the catalog
 one level up: elements outside both marks are junk, and instances whose order
 relation is not a witness are no-instances.
 -/
+
+@[expose] public section
 
 /- The language of two-DAG structures lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.twoGraphs`. -/

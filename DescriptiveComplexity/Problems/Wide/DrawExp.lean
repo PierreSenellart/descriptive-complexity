@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
-import DescriptiveComplexity.Problems.Wide.DrawData
-import DescriptiveComplexity.Problems.Wide.DrawPad
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
+public import DescriptiveComplexity.Problems.Wide.DrawData
+public import DescriptiveComplexity.Problems.Wide.DrawPad
 
 /-!
 # What an expansion atom's element loop computes
@@ -32,6 +34,8 @@ enumerates *every* loop-variable slot – the levels past the sentence's own
 prefix being read by nobody
 (`DescriptiveComplexity.Draw.altQuantFrom_pad`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

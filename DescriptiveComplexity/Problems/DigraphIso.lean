@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SubgraphIso
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.IsoGadget
+module
+
+public import DescriptiveComplexity.Problems.SubgraphIso
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.IsoGadget
 
 /-!
 # Digraph Isomorphism, and the degree it defines
@@ -55,6 +57,8 @@ literally the existence of an equivalence between the two marked sets carrying
 one adjacency relation to the other.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -100,33 +104,33 @@ def DigraphIso : DecisionProblem Language.twoGraphs where
 section SigmaOne
 
 /-- Kernel clause: every pattern vertex is mapped to some host vertex. -/
-private noncomputable def giTotalClause : subgraphSOLang.Sentence :=
+noncomputable def giTotalClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀, sgPatVSym(x₀) → ∃ y, sgMapSym(x₀, y) ∧ sgHostVSym(y)
 
 /-- Kernel clause: the guessed map is a function on the pattern. -/
-private noncomputable def giFuncClause : subgraphSOLang.Sentence :=
+noncomputable def giFuncClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂,
     (sgPatVSym(x₀) ∧ sgMapSym(x₀, x₁)) ∧ sgMapSym(x₀, x₂) → x₁ ≐ x₂
 
 /-- Kernel clause: the guessed map is injective on the pattern. -/
-private noncomputable def giInjClause : subgraphSOLang.Sentence :=
+noncomputable def giInjClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂,
     ((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₂) → x₀ ≐ x₁
 
 /-- Kernel clause: every host vertex is hit – what makes the map onto, and the
 one clause Subgraph Isomorphism does not have. -/
-private noncomputable def giSurjClause : subgraphSOLang.Sentence :=
+noncomputable def giSurjClause : subgraphSOLang.Sentence :=
   fo% ∀ y₀, sgHostVSym(y₀) → ∃ x, sgPatVSym(x) ∧ sgMapSym(x, y₀)
 
 /-- Kernel clause: the guessed map carries pattern edges to host edges. -/
-private noncomputable def giEdgeClause : subgraphSOLang.Sentence :=
+noncomputable def giEdgeClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂ x₃,
     (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgPatESym(x₀, x₁)) ∧
       sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₃) → sgHostESym(x₂, x₃)
 
 /-- Kernel clause: the guessed map reflects host edges to pattern edges – the
 other clause distinguishing isomorphism from an injective homomorphism. -/
-private noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
+noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂ x₃,
     (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧
       sgMapSym(x₁, x₃)) ∧ sgHostESym(x₂, x₃) → sgPatESym(x₀, x₁)

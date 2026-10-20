@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesAlt
+module
+
+public import DescriptiveComplexity.MachinesAlt
 
 /-!
 # One block at a time: collapsing the moves of a player into a single play
@@ -40,6 +42,8 @@ over to block `i + 1`.
 Both statements are equivalences, and both are proved by induction on the
 budget with the *play* generalized, so no strategy tree is ever built.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

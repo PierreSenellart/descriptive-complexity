@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawData
-import DescriptiveComplexity.Problems.Wide.DrawTripKits
-import DescriptiveComplexity.Problems.Wide.DrawIncrKit
-import DescriptiveComplexity.Problems.Wide.DrawSweepKit
-import DescriptiveComplexity.Problems.Wide.DrawAdvKit
-import DescriptiveComplexity.Problems.Wide.DrawSeekKit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawData
+public import DescriptiveComplexity.Problems.Wide.DrawTripKits
+public import DescriptiveComplexity.Problems.Wide.DrawIncrKit
+public import DescriptiveComplexity.Problems.Wide.DrawSweepKit
+public import DescriptiveComplexity.Problems.Wide.DrawAdvKit
+public import DescriptiveComplexity.Problems.Wide.DrawSeekKit
 
 /-!
 # The call sites' kits, at the concrete slots
@@ -26,6 +28,8 @@ register mark, `regLast` the file-top mark (the greatest element's cell *is*
 the file's top), `wk` the working-cell marker – and the guards are exactly
 the slot conditions the kits' separation lemmas were built around.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

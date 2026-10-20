@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceOrder
-import DescriptiveComplexity.Problems.Sat.Counting
-import Mathlib.Data.Fintype.Perm
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Tactic.Ring
-import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
+module
+
+public import DescriptiveComplexity.OccurrenceOrder
+public import DescriptiveComplexity.Problems.Sat.Counting
+public import Mathlib.Data.Fintype.Perm
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Tactic.Ring
+public import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
 
 /-!
 # A count-preserving 3-coloring gadget graph of a CNF formula
@@ -34,6 +36,8 @@ occurrence and `ℓ` its literal, is exactly
 each with two colorings. The value of the last prefix of each clause is
 forced true by an edge to `F`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

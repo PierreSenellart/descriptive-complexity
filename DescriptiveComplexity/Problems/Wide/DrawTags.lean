@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Marks
-import DescriptiveComplexity.Problems.Wide.Blocks
+module
+
+public import DescriptiveComplexity.Problems.Wide.Marks
+public import DescriptiveComplexity.Problems.Wide.Blocks
 
 /-!
 # The universe the EXPSPACE reduction draws
@@ -63,6 +65,8 @@ The states and symbols are *elements* carrying those tags rather than addresses,
 which is what keeps the control an ordinary, polynomial part of the instance while
 the tape is exponential.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

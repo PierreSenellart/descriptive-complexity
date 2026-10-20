@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Membership
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Membership
 
 /-!
 # The complement of QSAT is in PSPACE
@@ -27,6 +29,8 @@ This is the whole content of `PSPACE = coPSPACE`
 (`DescriptiveComplexity.PSpaceCompl`): every SO(TC) definable problem reduces to
 QSAT, and complementing a reduction is free.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

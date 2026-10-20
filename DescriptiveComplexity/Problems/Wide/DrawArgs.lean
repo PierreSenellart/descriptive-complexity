@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawAccCtl
-import DescriptiveComplexity.Problems.Wide.DrawKindRule
-import DescriptiveComplexity.Problems.Wide.DrawProg
-import DescriptiveComplexity.Problems.Wide.DrawName
-import DescriptiveComplexity.Problems.Wide.DrawExp
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawAccCtl
+public import DescriptiveComplexity.Problems.Wide.DrawKindRule
+public import DescriptiveComplexity.Problems.Wide.DrawProg
+public import DescriptiveComplexity.Problems.Wide.DrawName
+public import DescriptiveComplexity.Problems.Wide.DrawExp
 
 /-!
 # The semantic parameters, filled in: the comparison atoms
@@ -34,6 +36,8 @@ Where a level's point lives is fixed here too
 blocks of the MIRROR register – the working address – and the quantified ones
 in the inner blocks of VAL.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

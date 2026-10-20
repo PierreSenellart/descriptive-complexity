@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointStratify
-import DescriptiveComplexity.FixedPointPartial
+module
+
+public import DescriptiveComplexity.FixedPointStratify
+public import DescriptiveComplexity.FixedPointPartial
 
 /-!
 # An induction, then a partial iteration: one partial iteration
@@ -45,6 +47,8 @@ only occur after the gate has fired – before it, either the first stratum stil
 moves or the gate itself does – so the composite converges exactly when the
 second stratum does, and reads the same output there.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

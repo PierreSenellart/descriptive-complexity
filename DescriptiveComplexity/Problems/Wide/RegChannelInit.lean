@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelTape
-import DescriptiveComplexity.Problems.Wide.DrawInit
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelTape
+public import DescriptiveComplexity.Problems.Wide.DrawInit
 
 /-!
 # A program's run at the register channel
@@ -21,6 +23,8 @@ segment channel the program marks everything and the file is the ruler; at the
 register channel it marks its argument elements and the file lies in the working
 region (`DescriptiveComplexity.wideRank_wmRegSeg_lt`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

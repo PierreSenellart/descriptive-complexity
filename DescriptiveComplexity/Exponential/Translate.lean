@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Peel
+module
+
+public import DescriptiveComplexity.Exponential.Peel
 
 /-!
 # The translation lemma
@@ -47,6 +49,8 @@ The number of rounds is likewise produced by the induction (the `d` of
 `DescriptiveComplexity.ExpExpansion.exists_transl`) instead of by a second
 recursion counting quantifiers.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

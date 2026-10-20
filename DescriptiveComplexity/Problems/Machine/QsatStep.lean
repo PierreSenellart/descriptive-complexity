@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.QsatGeom
+module
+
+public import DescriptiveComplexity.Problems.Machine.QsatGeom
 
 /-!
 # One step of the QBF machine
@@ -26,6 +28,8 @@ required to hold the written symbol at the head and to agree with `σ`
 everywhere else, which is exactly what `DescriptiveComplexity.TMData.Step` asks
 and what the run induction will supply.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

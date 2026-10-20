@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ExactCover
-import DescriptiveComplexity.Problems.SetFamily.Counting
-import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.ExactCover
+public import DescriptiveComplexity.Problems.SetFamily.Counting
+public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #ExactCover is parsimoniously `#P`-complete
@@ -22,6 +24,8 @@ The one thing counting asks of that reduction is that only the *variables* of
 the formula be ground elements: an element occurring in no clause would
 otherwise be covered by either of two singleton sets.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

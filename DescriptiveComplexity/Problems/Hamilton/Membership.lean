@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Hamilton.Defs
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Hamilton.Defs
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # The Hamilton circuit problems are existential second-order definable
@@ -30,6 +32,8 @@ in how the last two read the arc relation: as it stands for the directed
 problem, symmetrized for the undirected one.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -45,39 +49,39 @@ fo_block hamGuessBlock over Language.digraph dg into hamSOLang with h where
   le : 2
 
 /-- The guessed order, as an atom. -/
-private def leF {α : Type} (x y : α) : hamSOLang.Formula α :=
+def hamLeF {α : Type} (x y : α) : hamSOLang.Formula α :=
   fo%[x, y] hLeSym(x, y)
 
 /-- Adjacency, as the problem at hand reads it: the arc itself when `dir` is
 true, the arc in either direction otherwise. -/
-private def adjF (dir : Bool) {α : Type} (x y : α) : hamSOLang.Formula α :=
+def adjF (dir : Bool) {α : Type} (x y : α) : hamSOLang.Formula α :=
   fo%[x, y] if dir then hArcSym(x, y) else hArcSym(x, y) ∨ hArcSym(y, x)
 
 /-- Kernel conjunct: the guessed order is reflexive. -/
-private noncomputable def hamReflClause : hamSOLang.Sentence :=
-  fo% ∀ x, leF⟨x, x⟩
+noncomputable def hamReflClause : hamSOLang.Sentence :=
+  fo% ∀ x, hamLeF⟨x, x⟩
 
 /-- Kernel conjunct: the guessed order is transitive. -/
-private noncomputable def hamTransClause : hamSOLang.Sentence :=
-  fo% ∀ x y z, leF⟨x, y⟩ ∧ leF⟨y, z⟩ → leF⟨x, z⟩
+noncomputable def hamTransClause : hamSOLang.Sentence :=
+  fo% ∀ x y z, hamLeF⟨x, y⟩ ∧ hamLeF⟨y, z⟩ → hamLeF⟨x, z⟩
 
 /-- Kernel conjunct: the guessed order is antisymmetric. -/
-private noncomputable def hamAntisymClause : hamSOLang.Sentence :=
-  fo% ∀ x y, leF⟨x, y⟩ ∧ leF⟨y, x⟩ → x ≐ y
+noncomputable def hamAntisymClause : hamSOLang.Sentence :=
+  fo% ∀ x y, hamLeF⟨x, y⟩ ∧ hamLeF⟨y, x⟩ → x ≐ y
 
 /-- Kernel conjunct: the guessed order is total. -/
-private noncomputable def hamTotalClause : hamSOLang.Sentence :=
-  fo% ∀ x y, leF⟨x, y⟩ ∨ leF⟨y, x⟩
+noncomputable def hamTotalClause : hamSOLang.Sentence :=
+  fo% ∀ x y, hamLeF⟨x, y⟩ ∨ hamLeF⟨y, x⟩
 
 /-- Kernel conjunct: every element is adjacent to its immediate successor. -/
-private noncomputable def hamSuccClause (dir : Bool) : hamSOLang.Sentence :=
+noncomputable def hamSuccClause (dir : Bool) : hamSOLang.Sentence :=
   fo% ∀ x y,
-    (leF⟨x, y⟩ ∧ ¬ x ≐ y) ∧ (∀ z, leF⟨x, z⟩ ∧ leF⟨z, y⟩ → z ≐ x ∨ z ≐ y) →
+    (hamLeF⟨x, y⟩ ∧ ¬ x ≐ y) ∧ (∀ z, hamLeF⟨x, z⟩ ∧ hamLeF⟨z, y⟩ → z ≐ x ∨ z ≐ y) →
       (adjF dir)⟨x, y⟩
 
 /-- Kernel conjunct: the last element is adjacent to the first. -/
-private noncomputable def hamWrapClause (dir : Bool) : hamSOLang.Sentence :=
-  fo% ∀ x y, (∀ z, leF⟨x, z⟩) ∧ (∀ z, leF⟨z, y⟩) → (adjF dir)⟨y, x⟩
+noncomputable def hamWrapClause (dir : Bool) : hamSOLang.Sentence :=
+  fo% ∀ x y, (∀ z, hamLeF⟨x, z⟩) ∧ (∀ z, hamLeF⟨z, y⟩) → (adjF dir)⟨y, x⟩
 
 /-- The first-order kernel of the `Σ₁` definitions: the guessed relation is a
 linear order carrying a tour. -/
@@ -112,7 +116,7 @@ theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
     fun _ => Iff.rfl
   rw [hamKernel]
   simp only [hamReflClause, hamTransClause, hamAntisymClause, hamTotalClause, hamSuccClause,
-    hamWrapClause, leF, Sentence.Realize, Formula.realize_inf, Formula.realize_sup,
+    hamWrapClause, hamLeF, Sentence.Realize, Formula.realize_inf, Formula.realize_sup,
     Formula.realize_iAlls, Formula.realize_imp, Formula.realize_not, Formula.realize_equal,
     Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl, hsub,
     realize_adjF dir ρ]

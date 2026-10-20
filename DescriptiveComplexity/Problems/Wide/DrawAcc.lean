@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Fold
+module
+
+public import DescriptiveComplexity.Problems.Wide.Fold
 
 /-!
 # What the control carries: contributions, not fold values
@@ -32,6 +34,8 @@ is closed under the update is the family of **contributions** themselves:
 So the machine's payload holds one bit per level – the contribution – plus the
 last leaf, and every verdict it ever needs is a chain of those bits.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

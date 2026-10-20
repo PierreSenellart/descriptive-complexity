@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CodeHalt.Arith
-import DescriptiveComplexity.Problems.CodeHalt.Numerals
-import DescriptiveComplexity.Problems.CodeHalt.Defs
+module
+
+public import DescriptiveComplexity.Problems.CodeHalt.Arith
+public import DescriptiveComplexity.Problems.CodeHalt.Numerals
+public import DescriptiveComplexity.Problems.CodeHalt.Defs
 
 /-!
 # A halting computation, read off as a finite certificate
@@ -44,6 +46,8 @@ and `v` returns something nonzero
 would appeal to the *same* code at a *larger* argument, which no measure
 decreases along; the universal reading appeals only to the argument's code.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

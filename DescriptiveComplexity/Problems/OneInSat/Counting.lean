@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.OneInSat.Defs
-import DescriptiveComplexity.Problems.Sat.Counting
+module
+
+public import DescriptiveComplexity.Problems.OneInSat.Defs
+public import DescriptiveComplexity.Problems.Sat.Counting
 
 /-!
 # #1-in-SAT: counting exactly-one models
@@ -18,6 +20,8 @@ a set of variables of the formula – of elements occurring in a clause
 (`DescriptiveComplexity.sharpOneInSat_mem_sharpP`); its parsimonious hardness is in
 `DescriptiveComplexity.Problems.OneInSat.CountingFromSat`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

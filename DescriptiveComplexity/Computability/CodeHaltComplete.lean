@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Computability.CodeHalt
-import DescriptiveComplexity.Problems.CodeHalt.Hardness
+module
+
+public import DescriptiveComplexity.Computability.CodeHalt
+public import DescriptiveComplexity.Problems.CodeHalt.Hardness
 
 /-!
 # RE is exactly recursive enumerability
@@ -29,6 +31,8 @@ reduction of any semi-decidable problem to `DescriptiveComplexity.CODEHALT`.
   `REPred`, hence computable by Post's theorem, against
   `DescriptiveComplexity.not_computablePred_codehalt`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

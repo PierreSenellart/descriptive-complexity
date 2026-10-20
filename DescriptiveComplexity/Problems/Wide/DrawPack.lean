@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSpec
-import DescriptiveComplexity.Problems.Wide.DrawData
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSpec
+public import DescriptiveComplexity.Problems.Wide.DrawData
 
 /-!
 # Padding a prefix normal form
@@ -23,6 +25,8 @@ content is `DescriptiveComplexity.Draw.altQuantFrom_liftLast` – a prefix over 
 predicate that ignores its last coordinate is the prefix without it – whose
 `Nonempty` hypothesis is what makes the new level vacuous in *both* polarities.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

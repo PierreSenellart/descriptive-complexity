@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefAsm
-import DescriptiveComplexity.Problems.Wide.DrawDefLoop
-import DescriptiveComplexity.Problems.Wide.DrawCtl
-import DescriptiveComplexity.Problems.Wide.DrawOrd
-import DescriptiveComplexity.Problems.Wide.NexEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefAsm
+public import DescriptiveComplexity.Problems.Wide.DrawDefLoop
+public import DescriptiveComplexity.Problems.Wide.DrawCtl
+public import DescriptiveComplexity.Problems.Wide.DrawOrd
+public import DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!
 # The clocked program's rules are definable
@@ -27,6 +29,8 @@ specifications: `uRulesDefinable_nexProg` is the whole clocked rule set, and
 what a *reduction* still owes is its own `VarArgs`, the same obligation the
 space-bounded one already meets.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

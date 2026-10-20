@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Interp
-import DescriptiveComplexity.Problems.Qsat.Blocks
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Interp
+public import DescriptiveComplexity.Problems.Qsat.Blocks
 
 /-!
 # The quantifier prefix of the constructed instance
@@ -28,6 +30,8 @@ downward closure of the position – hold for *every* triple
 so a peeling step is only ever a matter of recognizing which triple comes next
 (`DescriptiveComplexity.qPlayed_step`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

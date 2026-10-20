@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.ProdSem
-import DescriptiveComplexity.Counting.Digits.SumSweep
+module
+
+public import DescriptiveComplexity.Counting.Digits.ProdSem
+public import DescriptiveComplexity.Counting.Digits.SumSweep
 
 /-!
 # Closure under products over the tuples of the structure
@@ -22,6 +24,8 @@ formulas (`DescriptiveComplexity.Digits.prodBotF`,
 `DescriptiveComplexity.Digits.prodCovF`), and the reading of the answer off the
 last row.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

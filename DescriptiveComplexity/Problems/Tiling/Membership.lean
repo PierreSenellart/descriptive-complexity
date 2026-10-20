@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Tiling.Defs
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Tiling.Defs
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # Tiling a square is existential second-order definable
@@ -36,6 +38,8 @@ The grid is indexed by the positions of the instance, so this is an `n × n`
 tiling and the definition is a `Σ₁` one. Read over an exponential expansion the
 same sentence asks about a `2ⁿ × 2ⁿ` square.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

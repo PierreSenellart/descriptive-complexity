@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Epr.Defs
-import DescriptiveComplexity.Problems.Epr.Small
-import DescriptiveComplexity.Problems.Epr.Membership
+module
+
+public import DescriptiveComplexity.Problems.Epr.Defs
+public import DescriptiveComplexity.Problems.Epr.Small
+public import DescriptiveComplexity.Problems.Epr.Membership
 
 /-!
 # EPR, the umbrella
@@ -22,6 +24,8 @@ such a model is one `Σ₁` sentence read over an expansion whose points are the
 *relations* on the instance – an assignment of the universal variables being one
 of them. Hardness is not formalized yet.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

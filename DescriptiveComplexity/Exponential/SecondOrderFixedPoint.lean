@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Class
-import DescriptiveComplexity.FixedPointHorn
-import DescriptiveComplexity.FixedPointPartialMachine
+module
+
+public import DescriptiveComplexity.Exponential.Class
+public import DescriptiveComplexity.FixedPointHorn
+public import DescriptiveComplexity.FixedPointPartialMachine
 
 /-!
 # Second-order fixed points: SO(LFP) and SO(PFP)
@@ -63,6 +65,8 @@ and the resulting union of copies costs one existential – paid for by guessing
 the copy in `DescriptiveComplexity.Exponential.FreeSpace`, and by naming it with
 a point in `DescriptiveComplexity.Exponential.FreeTime`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

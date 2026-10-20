@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # QBF: quantified Boolean formulas with bounded alternation
@@ -40,6 +42,8 @@ for even `k` – the standard form of the `Σₖᵖ`-complete quantified Boolean
 formula problems ([Stockmeyer 1976][stockmeyer1976polynomial]; [Wrathall
 1976][wrathall1976complete]).
 -/
+
+@[expose] public section
 
 /- The language of quantified CNF instances lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.graph` and `Language.sat`
@@ -314,7 +318,7 @@ private theorem dnfSat_equiv (e : A ≃[Language.qbf k] B) (νs : Fin k → B �
     · refine (h (e x)).2 ?_ ((qbfVal_equiv e νs x).mp hv)
       simpa using (relMap_equiv₂ e _ (e.symm c) x).mp hn
 
-private theorem qbfMatrix_equiv (cnf : Bool) (e : A ≃[Language.qbf k] B)
+theorem qbfMatrix_equiv (cnf : Bool) (e : A ≃[Language.qbf k] B)
     (νs : Fin k → B → Prop) :
     QbfMatrix cnf (fun i a => νs i (e a)) ↔ QbfMatrix cnf νs := by
   cases cnf

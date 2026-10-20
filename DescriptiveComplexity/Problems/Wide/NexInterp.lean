@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexDef
-import DescriptiveComplexity.Problems.Wide.DrawInterp
+module
+
+public import DescriptiveComplexity.Problems.Wide.NexDef
+public import DescriptiveComplexity.Problems.Wide.DrawInterp
 
 /-!
 # The clocked machine, written down
@@ -24,6 +26,8 @@ hands the run layer. What is left to a reduction emitting it is its own
 `DescriptiveComplexity.Draw.Data.VarArgs`, the obligation the space-bounded
 reduction already meets.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewRead
-import DescriptiveComplexity.Exponential.Expansion
+module
+
+public import DescriptiveComplexity.SecondOrderNewRead
+public import DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # Which invented values are points, and what the expanded relations say of them
@@ -33,6 +35,8 @@ Both are written over an abstract target vocabulary
 are formulas with free variables of an arbitrary type, so that the assembly can
 plug them under whatever quantifiers it needs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

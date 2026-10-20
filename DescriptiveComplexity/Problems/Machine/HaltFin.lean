@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Halt
-import DescriptiveComplexity.Problems.Machine.HaltCert
+module
+
+public import DescriptiveComplexity.Problems.Machine.Halt
+public import DescriptiveComplexity.Problems.Machine.HaltCert
 
 /-!
 # The certificate as relations on invented values
@@ -31,6 +33,8 @@ what lets the run of `n` steps be read off over `Fin (2n + 1)` alone, with the
 time points the first `n + 1` values and the pages all of them, instead of over
 a disjoint sum that would then have to be transported to a `Fin m`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -285,7 +289,7 @@ section ToRel
 variable {A : Type} {M : TMData A}
 
 /-- The time index a value of the band denotes, clamped so as to be total. -/
-private def tIx (n : ℕ) (d : Fin (2 * n + 1)) : Fin (n + 1) := ⟨min (d : ℕ) n, by omega⟩
+def tIx (n : ℕ) (d : Fin (2 * n + 1)) : Fin (n + 1) := ⟨min (d : ℕ) n, by omega⟩
 
 private theorem tIx_val {n : ℕ} {d : Fin (2 * n + 1)} (hd : (d : ℕ) < n + 1) :
     (tIx n d : ℕ) = (d : ℕ) := by
@@ -296,7 +300,7 @@ private theorem tIx_eq {n : ℕ} {d : Fin (2 * n + 1)} {i : Fin (n + 1)} (hd : (
     (hi : (d : ℕ) = (i : ℕ)) : tIx n d = i := Fin.ext ((tIx_val hd).trans hi)
 
 /-- A run over the band, read as relations on `Fin (2n + 1)`. -/
-private def toRunRel {n : ℕ} (zero : Fin (2 * n + 1))
+def toRunRel {n : ℕ} (zero : Fin (2 * n + 1))
     (r : RunCert A (Fin (n + 1)) (Fin (2 * n + 1))) : RunRel A (Fin (2 * n + 1)) where
   Time d := (d : ℕ) < n + 1
   TLe d d' := (d : ℕ) ≤ (d' : ℕ)

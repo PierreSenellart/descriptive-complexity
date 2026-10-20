@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Feedback.Counting
-import DescriptiveComplexity.Counting.SizedPairs
+module
+
+public import DescriptiveComplexity.Problems.Feedback.Counting
+public import DescriptiveComplexity.Counting.SizedPairs
 
 /-!
 # #Feedback Arc Set: counting the feedback arc sets of the threshold size
@@ -32,6 +34,8 @@ sets of pairs for the size (`DescriptiveComplexity.sharpPDefinable_of_sizedPairs
 Parsimonious hardness is in
 `DescriptiveComplexity.Problems.Feedback.CountingArcHardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

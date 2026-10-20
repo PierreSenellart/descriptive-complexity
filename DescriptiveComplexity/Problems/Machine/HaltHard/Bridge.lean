@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.Sim
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Sim
 
 /-!
 # The simulating machine as rewriting, and the transport to a drawn machine
@@ -32,6 +34,8 @@ when `simTM` does from its preimage
 turns `DescriptiveComplexity.TMData.AcceptsU` of the drawn machine into
 termination of the abstract evaluation, with no tape-function bookkeeping.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

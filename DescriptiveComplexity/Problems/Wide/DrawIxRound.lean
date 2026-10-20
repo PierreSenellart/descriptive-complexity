@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxSeq
-import DescriptiveComplexity.Problems.Wide.DrawIxIGate
-import DescriptiveComplexity.Problems.Wide.DrawInstRound
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxSeq
+public import DescriptiveComplexity.Problems.Wide.DrawIxIGate
+public import DescriptiveComplexity.Problems.Wide.DrawInstRound
 
 /-!
 # One round of a variable's loop at an arbitrary file
@@ -15,6 +17,8 @@ inner gates of a round (their file tests, their families and their flags), the
 control the round folds and the round's two runs. Everything below it is
 already at the file, so this is the last layer before the variable's loop.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

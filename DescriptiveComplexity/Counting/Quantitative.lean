@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Class
-import DescriptiveComplexity.FixedPointHorn
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Counting.Class
+public import DescriptiveComplexity.FixedPointHorn
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Quantitative first-order logic, and the class FP
@@ -49,6 +51,8 @@ a problem of `#P` is in NP; and a parsimoniously `#P`-hard problem cannot be
 in FP unless `NP ⊆ PTIME`
 (`DescriptiveComplexity.NP_subset_PTIME_of_parsimoniousHard_of_fpDefinable`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

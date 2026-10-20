@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawData
-import DescriptiveComplexity.Problems.Wide.DrawPad
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawData
+public import DescriptiveComplexity.Problems.Wide.DrawPad
 
 /-!
 # What the inner loop computes
@@ -36,6 +38,8 @@ level `0` – and the middle by
 `foldFrom_leafP_top` then reads it off the accumulators, at the address the
 loop stops at.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Increment
-import DescriptiveComplexity.TransitiveClosure
+module
+
+public import DescriptiveComplexity.Exponential.Increment
+public import DescriptiveComplexity.TransitiveClosure
 
 /-!
 # Trading an expansion's domain for a mark
@@ -37,6 +39,8 @@ the same block, so its points are the same pairs, its order is the same order,
 and its relations are given by the same sentences. Nothing but the domain
 condition changes, and that is a proof field of the subtype.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

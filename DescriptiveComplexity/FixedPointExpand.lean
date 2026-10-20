@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointInflationaryLFP
-import DescriptiveComplexity.FixedPointOrderTransfer
-import DescriptiveComplexity.SecondOrderMerge
-import DescriptiveComplexity.Problems.HornSat
+module
+
+public import DescriptiveComplexity.FixedPointInflationaryLFP
+public import DescriptiveComplexity.FixedPointOrderTransfer
+public import DescriptiveComplexity.SecondOrderMerge
+public import DescriptiveComplexity.Problems.HornSat
 
 /-!
 # Eliminating an induction from a second-order definition
@@ -45,6 +47,8 @@ induction read over a larger vocabulary computes the same value
 blocks in either order is the same structure
 (`DescriptiveComplexity.swapExpand`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Steiner.Counting
-import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Steiner.Counting
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Steiner Tree is parsimoniously `#P`-complete
@@ -24,6 +26,8 @@ non-terminals are the vertex covers of that size, bijectively. A superset of a
 solution is a solution on both sides here, and the two paddings are the same
 vertices.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

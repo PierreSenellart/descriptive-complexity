@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.Sort
-import Mathlib.Data.Set.Card
-import Mathlib.Order.Hom.Set
-import Mathlib.SetTheory.Cardinal.Finite
+module
+
+public import Mathlib.Data.Fintype.Sort
+public import Mathlib.Data.Set.Card
+public import Mathlib.Order.Hom.Set
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # The monotone bijection between two sets of the same size
@@ -25,6 +27,8 @@ is the one a counting kernel guesses.
 * `DescriptiveComplexity.exists_monoBij`, `DescriptiveComplexity.MonoBij.ext`: on a finite
   linear order, two sets of the same size have one, and only one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Machine
+module
+
+public import DescriptiveComplexity.LogTime.Machine
 
 /-!
 # The arithmetic a sweep can do: comparison and addition, bit by bit
@@ -38,6 +40,8 @@ reads a bit at an address instead of computing anything. Eliminating `×` in
 favor of that read is the classical theorem the model waits on, not a widening
 of this file; see `DescriptiveComplexity.LogTime`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

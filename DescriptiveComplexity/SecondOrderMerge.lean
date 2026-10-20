@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderLift
+module
+
+public import DescriptiveComplexity.SecondOrderLift
 
 /-!
 # Merging a quantifier prefix into a single second-order block
@@ -26,6 +28,8 @@ a single assignment, with a single-block kernel.
 The only mathematical content is the re-association
 `(L ⊕ B) ⊕ M ≅ L ⊕ (B ⊕ M)` of `DescriptiveComplexity.mergeStep`, applied once per block.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

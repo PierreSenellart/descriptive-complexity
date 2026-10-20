@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointStep
+module
+
+public import DescriptiveComplexity.FixedPointStep
 
 /-!
 # FO(IFP): first-order logic with an inflationary fixed point
@@ -64,6 +66,8 @@ and the output sentence pulls back through the extended interpretation,
 exactly as for FO(LFP). The notion is class-worthy in the sense of
 `DescriptiveComplexity.ComplexityClass`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

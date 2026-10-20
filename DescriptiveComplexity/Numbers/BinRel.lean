@@ -3,9 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.Unary
-import Mathlib.Algebra.BigOperators.Finprod
-import Mathlib.Data.Set.Finite.Lemmas
+module
+
+public import DescriptiveComplexity.Numbers.Unary
+public import Mathlib.Algebra.BigOperators.Finprod
+public import Mathlib.Data.Set.Finite.Lemmas
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Tactic.Ring
 
 /-!
 # Binary numbers carried by a relation
@@ -35,6 +39,8 @@ their bits agree, and `DescriptiveComplexity.binNum_lt_iff`, one is smaller exac
 when they differ and the higher bit is the second's – both bitwise, hence
 first-order, which is why a kernel can compare numbers it has guessed.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

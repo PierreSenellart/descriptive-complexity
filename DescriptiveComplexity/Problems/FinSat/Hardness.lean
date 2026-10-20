@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.FinSat.Interp
-import DescriptiveComplexity.Problems.FinSat.Fixpoint
+module
+
+public import DescriptiveComplexity.Problems.FinSat.Interp
+public import DescriptiveComplexity.Problems.FinSat.Fixpoint
 
 /-!
 # Reading the encoded sentence off the image
@@ -34,6 +36,8 @@ literal at the type `FOInterpretation.Map` is ill-typed at the transparency
 `rw` and `simp` work at, so the named constructor is not a convenience but a
 requirement.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.CountingDnf
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Sat.CountingDnf
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #DNF is `#P`-complete
@@ -34,6 +36,8 @@ The semantic content is two lemmas about a formula embedded in a larger
 universe, `DescriptiveComplexity.dnfModel_embed_swap_iff` (De Morgan) and
 `DescriptiveComplexity.card_embedded_sets`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

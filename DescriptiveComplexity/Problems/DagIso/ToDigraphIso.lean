@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.DagIso.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.DagIso.Defs
 
 /-!
 # DAG Isomorphism reduces to Digraph Isomorphism
@@ -27,6 +29,8 @@ matching the no-instance the ill-formed input is. This test is the whole reason
 the instances carry their acyclicity witness: acyclicity itself is not
 first-order, so no interpretation could gate on it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

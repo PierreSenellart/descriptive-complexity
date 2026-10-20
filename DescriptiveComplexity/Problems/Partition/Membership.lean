@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Partition.Defs
-import DescriptiveComplexity.Problems.Knapsack.Chain
-import DescriptiveComplexity.Numbers.Wide
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Partition.Defs
+public import DescriptiveComplexity.Problems.Knapsack.Chain
+public import DescriptiveComplexity.Numbers.Wide
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # Partition is in NP
@@ -33,6 +35,8 @@ family is written as a function of `b`, and so is the semantic argument, which
 is `DescriptiveComplexity.chain_sound` and `DescriptiveComplexity.exists_chain`
 (`DescriptiveComplexity.Problems.Knapsack.Chain`) applied twice.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -212,58 +216,58 @@ end Builders
 /-! ### The clauses -/
 
 /-- Kernel clause: the order is reflexive. -/
-private noncomputable def ptReflClause : ptSOLang.Sentence :=
+noncomputable def ptReflClause : ptSOLang.Sentence :=
   fo% ∀ x, ptLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
-private noncomputable def ptTransClause : ptSOLang.Sentence :=
+noncomputable def ptTransClause : ptSOLang.Sentence :=
   fo% ∀ x y z, ptLeF⟨x, y⟩ ∧ ptLeF⟨y, z⟩ → ptLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
-private noncomputable def ptAntisymmClause : ptSOLang.Sentence :=
+noncomputable def ptAntisymmClause : ptSOLang.Sentence :=
   fo% ∀ x y, ptLeF⟨x, y⟩ ∧ ptLeF⟨y, x⟩ → ptEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
-private noncomputable def ptTotalClause : ptSOLang.Sentence :=
+noncomputable def ptTotalClause : ptSOLang.Sentence :=
   fo% ∀ x y, ptLeF⟨x, y⟩ ∨ ptLeF⟨y, x⟩
 
 /-- Kernel clause: only items are chosen. -/
-private noncomputable def ptSelClause : ptSOLang.Sentence :=
+noncomputable def ptSelClause : ptSOLang.Sentence :=
   fo% ∀ x, ptSelF⟨x⟩ → ptItemF⟨x⟩
 
 /-- Kernel clause: at the first item the running total is that item's
 contribution. -/
-private noncomputable def ptBaseClause (b : Bool) : ptSOLang.Sentence :=
+noncomputable def ptBaseClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i x p, ptMinItemF⟨i⟩ ∧ ptPosnF⟨p⟩ → ((ptPSF b)⟨i, x, p⟩ ↔ (ptAddF b)⟨i, x, p⟩)
 
 /-- Kernel clause: each step adds a bit. -/
-private noncomputable def ptSumClause (b : Bool) : ptSOLang.Sentence :=
+noncomputable def ptSumClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptPosnF⟨p⟩ →
     ((ptPSF b)⟨j, x, p⟩ ↔
       ptXor3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: each step propagates its carry. -/
-private noncomputable def ptCarryClause (b : Bool) : ptSOLang.Sentence :=
+noncomputable def ptCarryClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p y q, ptSuccItemF⟨i, j⟩ ∧ ptSuccWideF⟨x, p, y, q⟩ →
     ((ptCyF b)⟨j, y, q⟩ ↔
       ptMaj3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest wide position. -/
-private noncomputable def ptBottomClause (b : Bool) : ptSOLang.Sentence :=
+noncomputable def ptBottomClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptMinWideF⟨x, p⟩ → ¬ (ptCyF b)⟨j, x, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest wide position. -/
-private noncomputable def ptTopClause (b : Bool) : ptSOLang.Sentence :=
+noncomputable def ptTopClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptMaxWideF⟨x, p⟩ →
     ¬ ptMaj3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄
 
 /-- Kernel clause: at the last item the two walks agree – the two sides weigh
 the same. -/
-private noncomputable def ptFinalClause : ptSOLang.Sentence :=
+noncomputable def ptFinalClause : ptSOLang.Sentence :=
   fo% ∀ i x p, ptMaxItemF⟨i⟩ ∧ ptPosnF⟨p⟩ → ((ptPSF true)⟨i, x, p⟩ ↔ (ptPSF false)⟨i, x, p⟩)
 
 /-- The clauses of one walk. -/
-private noncomputable def ptWalkClauses (b : Bool) : ptSOLang.Sentence :=
+noncomputable def ptWalkClauses (b : Bool) : ptSOLang.Sentence :=
   ptBaseClause b ⊓ (ptSumClause b ⊓ (ptCarryClause b ⊓
     (ptBottomClause b ⊓ ptTopClause b)))
 

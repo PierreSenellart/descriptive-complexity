@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Relativize
-import DescriptiveComplexity.RelComposition
-import DescriptiveComplexity.SecondOrderPull
+module
+
+public import DescriptiveComplexity.Relativize
+public import DescriptiveComplexity.RelComposition
+public import DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Pulling `∃SO[new]` definability back through an interpretation
@@ -57,6 +59,8 @@ Everything else is machinery that already exists:
   read in `A ⊕ Fin m` relativized to the original elements
   (`DescriptiveComplexity.relOld` of `DescriptiveComplexity.Relativize`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

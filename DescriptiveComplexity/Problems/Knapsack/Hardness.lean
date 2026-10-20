@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Knapsack.Defs
-import DescriptiveComplexity.Problems.SetFamily
-import DescriptiveComplexity.Numbers.Digits
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Knapsack.Defs
+public import DescriptiveComplexity.Problems.SetFamily
+public import DescriptiveComplexity.Numbers.Digits
+public import DescriptiveComplexity.Padding
 
 /-!
 # Knapsack is NP-hard
@@ -40,6 +42,8 @@ pin the padding of the items down to a single representative – so this is an
 `DescriptiveComplexity.OrderedFOReduction`, and being one has the pleasant side effect
 of supplying the finiteness that the counting needs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

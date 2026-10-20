@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Defs
-import DescriptiveComplexity.Problems.Machine.Defs
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.Exponential.Expansion
-import DescriptiveComplexity.Exponential.AddrExp
+module
+
+public import DescriptiveComplexity.Problems.Wide.Defs
+public import DescriptiveComplexity.Problems.Machine.Defs
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.Exponential.Expansion
+public import DescriptiveComplexity.Exponential.AddrExp
 
 /-!
 # The wide machine as an exponential expansion
@@ -39,6 +41,8 @@ Three things fix the whole design.
   over the **base** – an element, never an address – which is exactly what
   keeps them first-order there.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

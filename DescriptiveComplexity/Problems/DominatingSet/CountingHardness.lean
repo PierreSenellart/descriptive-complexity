@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.DominatingSet.Counting
-import DescriptiveComplexity.Problems.ExactCover
-import DescriptiveComplexity.Problems.Sat.CountingHardness
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.DominatingSet.Counting
+public import DescriptiveComplexity.Problems.ExactCover
+public import DescriptiveComplexity.Problems.Sat.CountingHardness
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Dominating Set is parsimoniously `#P`-complete
@@ -43,6 +45,8 @@ with no clause at all has one model, and is sent to the edgeless graph with
 everything marked, which has one dominating set of the threshold size
 (`DescriptiveComplexity.SatToDom.NoCl`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,65 +3,67 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Block
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.Exponential.Expansion
-import DescriptiveComplexity.Exponential.AddrExp
-import DescriptiveComplexity.Exponential.Pull
-import DescriptiveComplexity.Exponential.Order
-import DescriptiveComplexity.Exponential.OrdFormula
-import DescriptiveComplexity.Exponential.OrdExtend
-import DescriptiveComplexity.Exponential.TagBits
-import DescriptiveComplexity.Exponential.PointGuard
-import DescriptiveComplexity.Exponential.Rounds
-import DescriptiveComplexity.Exponential.PointAtoms
-import DescriptiveComplexity.Exponential.Matrix
-import DescriptiveComplexity.Exponential.Peel
-import DescriptiveComplexity.Exponential.Translate
-import DescriptiveComplexity.Exponential.Increment
-import DescriptiveComplexity.Exponential.Trivialize
-import DescriptiveComplexity.Exponential.Class
-import DescriptiveComplexity.Exponential.Kernel
-import DescriptiveComplexity.Exponential.KernelPad
-import DescriptiveComplexity.Exponential.KernelArity
-import DescriptiveComplexity.Exponential.Free
-import DescriptiveComplexity.Exponential.FreeCopy
-import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
-import DescriptiveComplexity.Exponential.Classes
-import DescriptiveComplexity.Exponential.Reach
-import DescriptiveComplexity.Exponential.Game
-import DescriptiveComplexity.Exponential.GameSO
-import DescriptiveComplexity.Exponential.GameNode
-import DescriptiveComplexity.Exponential.GamePhase
-import DescriptiveComplexity.Exponential.GameMove
-import DescriptiveComplexity.Exponential.GameRounds
-import DescriptiveComplexity.Exponential.GameKernel
-import DescriptiveComplexity.Exponential.GameGraph
-import DescriptiveComplexity.Exponential.GameState
-import DescriptiveComplexity.Exponential.GameSpec
-import DescriptiveComplexity.Exponential.GamePrefix
-import DescriptiveComplexity.Exponential.GameNodes
-import DescriptiveComplexity.Exponential.GameExp
-import DescriptiveComplexity.Exponential.Inclusions
-import DescriptiveComplexity.Exponential.PSpaceOn
-import DescriptiveComplexity.Exponential.Simulate
-import DescriptiveComplexity.Exponential.Gate
-import DescriptiveComplexity.Exponential.FreeSpace
-import DescriptiveComplexity.Exponential.FreeTime
-import DescriptiveComplexity.Exponential.AltQuant
-import DescriptiveComplexity.Exponential.BlockClaim
-import DescriptiveComplexity.Exponential.GameProgram
-import DescriptiveComplexity.Exponential.GameTape
-import DescriptiveComplexity.Exponential.GameCtrl
-import DescriptiveComplexity.Exponential.GameMachine
-import DescriptiveComplexity.Exponential.GameRun
-import DescriptiveComplexity.Exponential.GameAsk
-import DescriptiveComplexity.Exponential.GameSweep
-import DescriptiveComplexity.Exponential.GamePlay
-import DescriptiveComplexity.Exponential.GameBack
-import DescriptiveComplexity.Exponential.GameAskBack
-import DescriptiveComplexity.Exponential.GameInterp
-import DescriptiveComplexity.Exponential.GamePlayBack
+module
+
+public import DescriptiveComplexity.Exponential.Block
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.Exponential.Expansion
+public import DescriptiveComplexity.Exponential.AddrExp
+public import DescriptiveComplexity.Exponential.Pull
+public import DescriptiveComplexity.Exponential.Order
+public import DescriptiveComplexity.Exponential.OrdFormula
+public import DescriptiveComplexity.Exponential.OrdExtend
+public import DescriptiveComplexity.Exponential.TagBits
+public import DescriptiveComplexity.Exponential.PointGuard
+public import DescriptiveComplexity.Exponential.Rounds
+public import DescriptiveComplexity.Exponential.PointAtoms
+public import DescriptiveComplexity.Exponential.Matrix
+public import DescriptiveComplexity.Exponential.Peel
+public import DescriptiveComplexity.Exponential.Translate
+public import DescriptiveComplexity.Exponential.Increment
+public import DescriptiveComplexity.Exponential.Trivialize
+public import DescriptiveComplexity.Exponential.Class
+public import DescriptiveComplexity.Exponential.Kernel
+public import DescriptiveComplexity.Exponential.KernelPad
+public import DescriptiveComplexity.Exponential.KernelArity
+public import DescriptiveComplexity.Exponential.Free
+public import DescriptiveComplexity.Exponential.FreeCopy
+public import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
+public import DescriptiveComplexity.Exponential.Classes
+public import DescriptiveComplexity.Exponential.Reach
+public import DescriptiveComplexity.Exponential.Game
+public import DescriptiveComplexity.Exponential.GameSO
+public import DescriptiveComplexity.Exponential.GameNode
+public import DescriptiveComplexity.Exponential.GamePhase
+public import DescriptiveComplexity.Exponential.GameMove
+public import DescriptiveComplexity.Exponential.GameRounds
+public import DescriptiveComplexity.Exponential.GameKernel
+public import DescriptiveComplexity.Exponential.GameGraph
+public import DescriptiveComplexity.Exponential.GameState
+public import DescriptiveComplexity.Exponential.GameSpec
+public import DescriptiveComplexity.Exponential.GamePrefix
+public import DescriptiveComplexity.Exponential.GameNodes
+public import DescriptiveComplexity.Exponential.GameExp
+public import DescriptiveComplexity.Exponential.Inclusions
+public import DescriptiveComplexity.Exponential.PSpaceOn
+public import DescriptiveComplexity.Exponential.Simulate
+public import DescriptiveComplexity.Exponential.Gate
+public import DescriptiveComplexity.Exponential.FreeSpace
+public import DescriptiveComplexity.Exponential.FreeTime
+public import DescriptiveComplexity.Exponential.AltQuant
+public import DescriptiveComplexity.Exponential.BlockClaim
+public import DescriptiveComplexity.Exponential.GameProgram
+public import DescriptiveComplexity.Exponential.GameTape
+public import DescriptiveComplexity.Exponential.GameCtrl
+public import DescriptiveComplexity.Exponential.GameMachine
+public import DescriptiveComplexity.Exponential.GameRun
+public import DescriptiveComplexity.Exponential.GameAsk
+public import DescriptiveComplexity.Exponential.GameSweep
+public import DescriptiveComplexity.Exponential.GamePlay
+public import DescriptiveComplexity.Exponential.GameBack
+public import DescriptiveComplexity.Exponential.GameAskBack
+public import DescriptiveComplexity.Exponential.GameInterp
+public import DescriptiveComplexity.Exponential.GamePlayBack
 
 /-!
 # The exponential classes, by expansion
@@ -364,3 +366,5 @@ above. For NEXPTIME the literature's characterization is existential
 third-order syntax layer and so does not state that equivalence – an honest and
 narrow gap, recorded in `DescriptiveComplexity.Exponential.Classes`.
 -/
+
+@[expose] public section

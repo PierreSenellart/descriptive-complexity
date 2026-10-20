@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTripKits
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTripKits
 
 /-!
 # The increment kit: a round trip around the block-indexed mirror increment
@@ -27,6 +29,8 @@ Rules are owned by their source phase: entry (at the scan phase) and exit
 (at the marker, in a landing phase, guarded `wk = one ∧ rg ≠ one`) belong to
 the caller.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

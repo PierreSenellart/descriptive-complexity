@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSub
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSub
 
 /-!
 # Plain sweeps: one step per address, a flag or a write
@@ -31,6 +33,8 @@ business – the intended device is a permanent **end marker** planted at the
 top of the logical interval once, at startup, since a cell of the working area
 is not otherwise recognizable (its tracks are stage bits like any other).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

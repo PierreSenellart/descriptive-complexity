@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
 # Reductions between Clique, Independent Set and Vertex Cover
@@ -33,6 +35,8 @@ comparisons – and is discharged by
 `DescriptiveComplexity.ncard_compl_le_ncard_compl_iff` and
 `DescriptiveComplexity.ncard_compl_le_iff` of `DescriptiveComplexity.Numbers.Unary`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

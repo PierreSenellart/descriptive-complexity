@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Matrix
-import DescriptiveComplexity.Exponential.Increment
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.HeadAutomaton
-import DescriptiveComplexity.PSpace
+module
+
+public import DescriptiveComplexity.Exponential.Matrix
+public import DescriptiveComplexity.Exponential.Increment
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.HeadAutomaton
+public import DescriptiveComplexity.PSpace
 
 /-!
 # Simulating a machine that walks an expanded universe
@@ -61,6 +63,8 @@ The state block is then `(repMerged X.pointBlock k).withTag M.State`, the two
 copies of it that a transition sentence sees are `SOBlock.replicate 2`, and both
 hosts are addressed by the same slot machinery.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

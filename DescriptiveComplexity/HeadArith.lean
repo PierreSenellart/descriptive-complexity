@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadEval
-import DescriptiveComplexity.Arithmetic
+module
+
+public import DescriptiveComplexity.HeadEval
+public import DescriptiveComplexity.Arithmetic
 
 /-!
 # Arithmetic with heads: addition of ranks
@@ -70,6 +72,8 @@ locality. At level `K` locality is free
 to the caller's level afterwards, which is where the three scratch heads are
 forgotten.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

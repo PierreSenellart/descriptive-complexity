@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.InductiveCounting.Order
+module
+
+public import DescriptiveComplexity.InductiveCounting.Order
 
 /-!
 # Soundness of the inductive-counting machine
@@ -22,6 +24,8 @@ next layer – has been skipped
 (`DescriptiveComplexity.InductiveCounting.InnerInv`, last clause). At the end of the scan the
 counter is checked against `|Rset d|`, which leaves no room for a skipped node.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

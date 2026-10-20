@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Ordered
 
 /-!
 # SO-Krom: existential second-order logic with a Krom kernel
@@ -61,6 +63,8 @@ closed under (ordered) first-order reductions by
 `DescriptiveComplexity.ComplexityClass` – the class `DescriptiveComplexity.NL` of
 `DescriptiveComplexity.LogSpace`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

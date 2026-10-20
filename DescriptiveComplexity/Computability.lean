@@ -3,16 +3,18 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Computability.Realize
-import DescriptiveComplexity.Computability.FinStruct
-import DescriptiveComplexity.Computability.Vocab
-import DescriptiveComplexity.Computability.Eval
-import DescriptiveComplexity.Computability.REPred
-import DescriptiveComplexity.Computability.Reduction
-import DescriptiveComplexity.Computability.Catalog
-import DescriptiveComplexity.Computability.CodeHalt
-import DescriptiveComplexity.Computability.CodeHaltComplete
-import DescriptiveComplexity.Computability.PcpComplete
+module
+
+public import DescriptiveComplexity.Computability.Realize
+public import DescriptiveComplexity.Computability.FinStruct
+public import DescriptiveComplexity.Computability.Vocab
+public import DescriptiveComplexity.Computability.Eval
+public import DescriptiveComplexity.Computability.REPred
+public import DescriptiveComplexity.Computability.Reduction
+public import DescriptiveComplexity.Computability.Catalog
+public import DescriptiveComplexity.Computability.CodeHalt
+public import DescriptiveComplexity.Computability.CodeHaltComplete
+public import DescriptiveComplexity.Computability.PcpComplete
 
 /-!
 # The bridge to Mathlib's computability layer
@@ -97,3 +99,5 @@ list of the symbols of its vocabulary.
    (`DescriptiveComplexity.halt_not_computable`,
    `DescriptiveComplexity.pcp_not_computable`).
 -/
+
+@[expose] public section

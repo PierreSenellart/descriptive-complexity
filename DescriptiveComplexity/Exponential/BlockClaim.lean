@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.Composition
+module
+
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.Composition
 
 /-!
 # Claiming the block atoms of a quantifier-free matrix
@@ -53,6 +55,8 @@ transparency – `Language.sum` has to be unfolded for it to typecheck – so
 `DescriptiveComplexity.exists_symCase`, and every realization lemma is stated
 at a named symbol.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

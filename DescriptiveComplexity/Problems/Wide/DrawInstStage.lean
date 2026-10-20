@@ -3,7 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstCmp
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstCmp
+import all DescriptiveComplexity.Problems.Wide.DrawRunStage
 
 /-!
 # The stage atoms, instantiated: the copy loops
@@ -28,6 +31,8 @@ this file proves its three invariants and its run:
 The chaining of the `k` loops and the whole stage atom's run assemble on
 top, with `DescriptiveComplexity.Draw.Data.stage_run`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSpec
-import DescriptiveComplexity.Problems.Wide.DrawInner
-import DescriptiveComplexity.Problems.Wide.DrawTable
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSpec
+public import DescriptiveComplexity.Problems.Wide.DrawInner
+public import DescriptiveComplexity.Problems.Wide.DrawTable
 
 /-!
 # The argument blocks, concretely: outer arguments first, inner variables last
@@ -35,6 +37,8 @@ is, with every other block empty; it is what the working cell of the sweep
 holds, and its non-argument blocks being empty is what puts it in the logical
 interval (`DescriptiveComplexity.Draw.wmSetLe_logicalTop`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Relativized
+module
+
+public import DescriptiveComplexity.Relativized
 
 /-!
 # Abstract complexity classes, the polynomial hierarchy, and NP-completeness
@@ -33,6 +35,8 @@ completeness theorems for other problems in their files under
 `DescriptiveComplexity/Problems/` (e.g., `DescriptiveComplexity.threeCol_NP_complete` in
 `DescriptiveComplexity.Problems.ThreeColorability`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

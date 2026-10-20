@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceFormulas
-import DescriptiveComplexity.Problems.Sat
+module
+
+public import DescriptiveComplexity.OccurrenceFormulas
+public import DescriptiveComplexity.Problems.Sat
 
 /-!
 # 2SAT: definition
@@ -27,6 +29,8 @@ first-order expressible over the ordered expansion
 structure has *two signed occurrences covering all of them*
 (`DescriptiveComplexity.exists_covering_pair`), the shape a 2-clause can talk about.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

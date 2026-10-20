@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
 
 /-!
 # The two scratch registers are parked at the marker
@@ -20,6 +22,8 @@ parked leaves with them parked, and the property rides the matrix's chain, the
 round, the VAL loop's thread and the whole branched spine. The marker being the
 empty address, the entry state has them parked for free.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

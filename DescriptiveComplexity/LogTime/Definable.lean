@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.ArithmeticDefinable
+module
+
+public import DescriptiveComplexity.ArithmeticDefinable
 
 /-!
 # Arithmetically definable relations: AC⁰ definability with free variables
@@ -49,6 +51,8 @@ A `DescriptiveComplexity.ArithDef.congr` lemma lets a relation be replaced by a
 pointwise-equivalent one, which is how a semantic reformulation – the shape most
 proofs actually want – is fed to the closure lemmas.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

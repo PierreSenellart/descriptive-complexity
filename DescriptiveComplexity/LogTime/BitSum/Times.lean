@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Columns
-import DescriptiveComplexity.LogTime.BitSum.Level1
-import DescriptiveComplexity.LogTime.Small
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Columns
+public import DescriptiveComplexity.LogTime.BitSum.Level1
+public import DescriptiveComplexity.LogTime.Small
 
 /-!
 # `TIMES` from `BSUM`: multiplication of ranks, in the bit logic
@@ -44,6 +46,8 @@ result, `DescriptiveComplexity.timesBitDef`, is consumed in
 `LogTime/Translate.lean`, where it closes `AC⁰ = FO(≤, BIT)` – the machine
 model *is* AC⁰.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

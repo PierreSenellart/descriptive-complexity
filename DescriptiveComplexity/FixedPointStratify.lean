@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderBlockHom
-import DescriptiveComplexity.FixedPointInflationary
+module
+
+public import DescriptiveComplexity.SecondOrderBlockHom
+public import DescriptiveComplexity.FixedPointInflationary
 
 /-!
 # Stratified inflationary inductions
@@ -31,6 +33,8 @@ Its consumer is the invariant layer of the Abiteboul–Vianu development: the
 canonical order on `≡ᵏ`-classes is one stratum, the simulation of an ordered
 induction over the invariant structure reads it as a second.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

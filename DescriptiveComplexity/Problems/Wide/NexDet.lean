@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTable
-import DescriptiveComplexity.Problems.Machine.DetRun
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTable
+public import DescriptiveComplexity.Problems.Machine.DetRun
 
 /-!
 # A guessing program, deterministic after its guess
@@ -24,6 +26,8 @@ at are never left; and the conclusion is uniqueness from any configuration whose
 state has one of those phases. Global determinism is the case `Ph = fun _ => True`,
 where `hclosed` is free.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

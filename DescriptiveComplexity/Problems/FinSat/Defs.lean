@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Interpretation
+module
+
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # FINSAT: finite satisfiability of a first-order sentence
@@ -78,6 +80,8 @@ completeness of FINSAT for it is a statement about that logic. It becomes
 *undecidability* of finite satisfiability only through the bridge to Mathlib's
 computability layer (`DescriptiveComplexity.finsat_not_computable`).
 -/
+
+@[expose] public section
 
 /- The language of encoded sentences lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.sat` and `Language.qbf`. -/

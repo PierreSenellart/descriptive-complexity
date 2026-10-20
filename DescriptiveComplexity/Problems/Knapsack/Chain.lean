@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Knapsack.Defs
+module
+
+public import DescriptiveComplexity.Problems.Knapsack.Defs
 
 /-!
 # Adding up binary weights along the item order
@@ -33,6 +35,8 @@ positions are all parameters, because the clients need different ones.
   walk *per row*, so its guessed relations carry a row argument and each slice
   is a walk of its own.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

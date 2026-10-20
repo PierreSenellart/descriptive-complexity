@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.FinSat.Nodes
-import DescriptiveComplexity.SecondOrderNew
+module
+
+public import DescriptiveComplexity.Problems.FinSat.Nodes
+public import DescriptiveComplexity.SecondOrderNew
 
 /-!
 # Reading the kernel of an `∃SO[new]` definition, position by position
@@ -38,6 +40,8 @@ length `m` has level below `m ≤ maxCtx φ`, and the tag `dbvar l` carries
 `l : Fin (maxCtx φ)`, so comparing the two as naturals is exactly right and
 needs no cast through the changing bound of a recursion.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

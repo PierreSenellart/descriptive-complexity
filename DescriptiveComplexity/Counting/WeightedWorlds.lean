@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Counting.PossibleWorlds
-import DescriptiveComplexity.Numbers.BinCount
-import DescriptiveComplexity.Counting.Probability
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Counting.PossibleWorlds
+public import DescriptiveComplexity.Numbers.BinCount
+public import DescriptiveComplexity.Counting.Probability
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Counting weighted possible worlds
@@ -70,6 +72,8 @@ any first-order query over a tuple-independent database is a ratio of two
 `#P` numbers**.
 
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

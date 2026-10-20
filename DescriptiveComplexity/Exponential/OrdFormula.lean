@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Order
+module
+
+public import DescriptiveComplexity.Exponential.Order
 
 /-!
 # The defining sentence of the order on an expanded universe
@@ -32,6 +34,8 @@ The three quantifier blocks over `Fin (blockArityBound B)` are `Formula.iExs`
 and `Formula.iAlls`, so the free-variable bookkeeping is `Sum.inr` for the
 innermost tuple and `Sum.inl ∘ Sum.inr` for the one bound outside it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

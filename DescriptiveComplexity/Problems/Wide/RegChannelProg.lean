@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelLaid
-import DescriptiveComplexity.Problems.Wide.NexInterp
-import DescriptiveComplexity.Problems.Wide.RegChannelInit
-import DescriptiveComplexity.Problems.Wide.NexRun
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelLaid
+public import DescriptiveComplexity.Problems.Wide.NexInterp
+public import DescriptiveComplexity.Problems.Wide.RegChannelInit
+public import DescriptiveComplexity.Problems.Wide.NexRun
 
 /-!
 # The clocked program of a reduction into the register channel
@@ -36,6 +38,8 @@ yes-instance (`wideRegAccept_of_legs`, at an arbitrary program), and the
 rule-level facts a determinism argument is built from: separation after the
 guess and the accepting phase no rule fires from.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

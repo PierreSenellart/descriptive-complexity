@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.ModelTheory.Semantics
-import Mathlib.Data.Fintype.Pi
+module
+
+public import Mathlib.ModelTheory.Semantics
+public import Mathlib.Data.Fintype.Pi
 
 /-!
 # Deciding first-order satisfaction on a finite structure
@@ -24,6 +26,8 @@ The instance is deliberately independent of the rest of the bridge: it
 mentions no encoding of structures, and it is useful on its own wherever a
 first-order condition has to be checked by `decide`.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

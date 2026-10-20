@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Arith
-import DescriptiveComplexity.LogTime.BitLogic
-import DescriptiveComplexity.LogTime.Simulate
+module
+
+public import DescriptiveComplexity.LogTime.Arith
+public import DescriptiveComplexity.LogTime.BitLogic
+public import DescriptiveComplexity.LogTime.Simulate
 
 /-!
 # The lower fence: a bit-level prenex logic, compiled into machines
@@ -87,6 +89,8 @@ direction:
 Neither is a defect of the machine: they are statements about two vocabularies,
 and the machine is exactly the one of them that a machine can be.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

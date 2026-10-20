@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat
-import Mathlib.Data.Set.Finite.Lemmas
+module
+
+public import DescriptiveComplexity.Problems.Sat
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # Literal occurrences of a CNF structure, ordered
@@ -34,6 +36,8 @@ Everything in this file is first-order definable over
 `Language.sat.sum Language.order`; the corresponding formulas and their
 realization lemmas are in `DescriptiveComplexity.OccurrenceFormulas`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

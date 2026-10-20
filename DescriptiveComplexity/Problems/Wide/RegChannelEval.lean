@@ -3,12 +3,15 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelLaid
-import DescriptiveComplexity.Problems.Wide.NexSpine
-import DescriptiveComplexity.Problems.Wide.DrawIxPack
-import DescriptiveComplexity.Problems.Wide.BlkLayout
-import DescriptiveComplexity.Problems.Wide.DrawIxWidth
-import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelLaid
+public import DescriptiveComplexity.Problems.Wide.NexSpine
+public import DescriptiveComplexity.Problems.Wide.DrawIxPack
+public import DescriptiveComplexity.Problems.Wide.BlkLayout
+public import DescriptiveComplexity.Problems.Wide.DrawIxWidth
+public import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+public import Mathlib.Data.Nat.Log
 
 /-!
 # The clocked evaluation at the file the channel hands over
@@ -25,6 +28,8 @@ one number, `regWidthBound`: three of the four are linear in the file's own
 bound, and the seek is quadratic, being a pass of the file per bit of its
 target.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

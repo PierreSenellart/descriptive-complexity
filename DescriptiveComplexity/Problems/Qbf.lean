@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qbf.Defs
-import DescriptiveComplexity.Problems.Qbf.Membership
-import DescriptiveComplexity.Problems.Qbf.Transfer
-import DescriptiveComplexity.Problems.Qbf.Hardness
+module
+
+public import DescriptiveComplexity.Problems.Qbf.Defs
+public import DescriptiveComplexity.Problems.Qbf.Membership
+public import DescriptiveComplexity.Problems.Qbf.Transfer
+public import DescriptiveComplexity.Problems.Qbf.Hardness
 
 /-!
 # QBF: quantified Boolean formulas with bounded alternation
@@ -60,6 +62,8 @@ specialize to NP- and coNP-completeness
 Like the rest of the library the development is axiom-free: `#print axioms`
 reports only `propext`, `Classical.choice` and `Quot.sound`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

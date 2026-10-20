@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameNode
+module
+
+public import DescriptiveComplexity.Exponential.GameNode
 
 /-!
 # The sentences a phased game is made of
@@ -29,6 +31,8 @@ graph game needs, its states being the nodes of
 `DescriptiveComplexity.ExpExpansion.nodeBlock` – a merged tuple of rounds rather
 than a `DescriptiveComplexity.SOBlock.cons`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.TagBits
+module
+
+public import DescriptiveComplexity.Exponential.TagBits
 
 /-!
 # A guessed block that is a point of the expanded universe
@@ -26,6 +28,8 @@ The domain sentence is selected by the tag *bits* rather than statically, so it
 appears once per tag, guarded by that tag's bit. Exactly one bit is set, so
 exactly one of those implications has a true hypothesis.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

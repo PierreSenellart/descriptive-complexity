@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderBlockHom
-import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+module
+
+public import DescriptiveComplexity.SecondOrderBlockHom
+public import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 
 /-!
 # Independent copies of a second-order block
@@ -35,6 +37,8 @@ through an interpretation is exactly that re-association, so the commutation is
 the lemma `DescriptiveComplexity.Exponential.Pull` rests on, and is proved by
 `rfl`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

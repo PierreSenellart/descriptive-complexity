@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Ordered
-import DescriptiveComplexity.Encoding
+module
+
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Ordered
+public import DescriptiveComplexity.Encoding
 
 /-!
 # Well-formed instances and computable decodings
@@ -96,6 +98,8 @@ nothing to exclude.
   `DescriptiveComplexity.Decoding.exists_conc_iff` as the `Prop`-level
   consequence.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

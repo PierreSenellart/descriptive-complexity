@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.Stages
-import DescriptiveComplexity.Invariant.OrderedPebble
+module
+
+public import DescriptiveComplexity.Invariant.Stages
+public import DescriptiveComplexity.Invariant.OrderedPebble
 
 /-!
 # The invariant structure `Iᵏ A`
@@ -39,6 +41,8 @@ the canonical order `DescriptiveComplexity.OrdK` on tuples, which descends to
 a linear order on the classes (`DescriptiveComplexity.invLinearOrder`) – the
 order the simulated computation of the Abiteboul–Vianu argument runs on.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

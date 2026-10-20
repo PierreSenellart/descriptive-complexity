@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewOrdered
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.SecondOrderNewOrdered
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # The class RE, defined by value invention
@@ -49,6 +51,8 @@ this file assumes them:
 
 Both are in `DescriptiveComplexity.Computability.CodeHaltComplete`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

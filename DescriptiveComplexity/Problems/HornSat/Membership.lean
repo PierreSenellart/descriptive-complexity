@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.HornSat.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.HornSat.Defs
 
 /-!
 # HORN-SAT is existential second-order definable
@@ -21,6 +23,8 @@ HORN-SAT is the canonical complete problem for polynomial time. What the
 library can state without a definition of PTIME is the hardness half, in
 `DescriptiveComplexity.Problems.HornSat.Hardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,13 +3,15 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.JobSequencing.Defs
-import DescriptiveComplexity.Problems.JobSequencing.Schedule
-import DescriptiveComplexity.Problems.JobSequencing.Kernel
-import DescriptiveComplexity.Problems.JobSequencing.Membership
-import DescriptiveComplexity.Problems.JobSequencing.Hardness
-import DescriptiveComplexity.Problems.NaeThreeSat
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Problems.JobSequencing.Defs
+public import DescriptiveComplexity.Problems.JobSequencing.Schedule
+public import DescriptiveComplexity.Problems.JobSequencing.Kernel
+public import DescriptiveComplexity.Problems.JobSequencing.Membership
+public import DescriptiveComplexity.Problems.JobSequencing.Hardness
+public import DescriptiveComplexity.Problems.NaeThreeSat
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # Job sequencing
@@ -36,6 +38,8 @@ gives every digit block an even total – `2` per variable, `2 (w − 1)` per
 clause of width `w` – so that the deadline is the digit-wise half, one bit per
 block, the bound is the deadline, and a good schedule is a balanced split.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

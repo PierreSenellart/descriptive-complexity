@@ -3,14 +3,16 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltDefs
-import DescriptiveComplexity.Problems.Machine.AltOne
-import DescriptiveComplexity.Problems.Machine.AltRound
-import DescriptiveComplexity.Problems.Machine.AltMembership
-import DescriptiveComplexity.Problems.Machine.AltInterp
-import DescriptiveComplexity.Problems.Qbf
-import DescriptiveComplexity.SecondOrderReplicate
-import DescriptiveComplexity.MachinesAltPlay
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltDefs
+public import DescriptiveComplexity.Problems.Machine.AltOne
+public import DescriptiveComplexity.Problems.Machine.AltRound
+public import DescriptiveComplexity.Problems.Machine.AltMembership
+public import DescriptiveComplexity.Problems.Machine.AltInterp
+public import DescriptiveComplexity.Problems.Qbf
+public import DescriptiveComplexity.SecondOrderReplicate
+public import DescriptiveComplexity.MachinesAltPlay
 
 /-!
 # Alternating machine acceptance, and the machine bridge for the hierarchy
@@ -94,6 +96,8 @@ of [Chandra–Kozen–Stockmeyer 1981][chandra1981alternation].
 Both halves are complete at every level, so the levels of this library's
 hierarchy are the levels of the alternating-machine one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

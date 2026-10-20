@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Machines
-import DescriptiveComplexity.Interpretation
-import DescriptiveComplexity.Exponential.AddrExp
+module
+
+public import DescriptiveComplexity.Machines
+public import DescriptiveComplexity.Interpretation
+public import DescriptiveComplexity.Exponential.AddrExp
 
 /-!
 # The wide machine: a machine addressed by the subsets of its instance
@@ -66,6 +68,8 @@ come from, so the input appears along the tape in the instance's own order, and
 the whole of it is first-order describable over the instance, which is what the
 expansion needs.
 -/
+
+@[expose] public section
 
 /- The vocabulary of wide machines lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.turing`. -/

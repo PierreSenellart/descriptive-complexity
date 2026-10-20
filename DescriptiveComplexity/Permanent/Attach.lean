@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Permanent.Minor
-import Mathlib.Data.Fintype.Sum
-import Mathlib.Tactic.Ring
+module
+
+public import DescriptiveComplexity.Permanent.Minor
+public import Mathlib.Data.Fintype.Sum
+public import Mathlib.Tactic.Ring
 
 /-!
 # Attaching a gadget to a matrix
@@ -24,6 +26,8 @@ two out-ports `o`, `o'` leaving to two base columns `v`, `v'`
 (`DescriptiveComplexity.pdel_attachXor`). It is stated on minors, so that it
 can be applied to one gadget at a time when several are attached.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Knapsack.Defs
-import DescriptiveComplexity.Problems.Knapsack.Chain
-import DescriptiveComplexity.Problems.Knapsack.Membership
-import DescriptiveComplexity.Problems.Knapsack.Hardness
-import DescriptiveComplexity.Problems.ExactCover
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Problems.Knapsack.Defs
+public import DescriptiveComplexity.Problems.Knapsack.Chain
+public import DescriptiveComplexity.Problems.Knapsack.Membership
+public import DescriptiveComplexity.Problems.Knapsack.Hardness
+public import DescriptiveComplexity.Problems.ExactCover
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # Knapsack
@@ -25,6 +27,8 @@ addition) and the hardness half
 bit positions per ground element of an exact-cover instance). Partition, Job
 Sequencing and 0-1 Integer Programming follow from Knapsack.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

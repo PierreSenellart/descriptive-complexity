@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Machines
+module
+
+public import DescriptiveComplexity.Machines
 
 /-!
 # Turing machines on an unbounded tape
@@ -47,6 +49,8 @@ Unlike the bounded model, **no move is ever impossible**: there is no “the hea
 falls off the end and the run stops” case, one branch fewer in every proof
 downstream.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

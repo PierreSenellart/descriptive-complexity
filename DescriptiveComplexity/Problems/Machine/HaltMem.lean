@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Machine.HaltFin
-import DescriptiveComplexity.RecursivelyEnumerable
-import DescriptiveComplexity.Problems.FinSat
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Machine.HaltFin
+public import DescriptiveComplexity.RecursivelyEnumerable
+public import DescriptiveComplexity.Problems.FinSat
 
 /-!
 # The halting problem is in RE
@@ -35,6 +37,8 @@ The corollary the file exists for is
 to finite satisfiability, which is Trakhtenbrot's theorem in the form it is
 usually stated. It needs no new hardness work – FINSAT is already RE-hard.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

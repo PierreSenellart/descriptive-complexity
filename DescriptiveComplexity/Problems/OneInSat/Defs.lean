@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.OccurrenceOrder
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # 1-in-SAT: the problem, and its membership in NP
@@ -29,6 +31,8 @@ Membership reuses SAT's kernel (`DescriptiveComplexity.realize_satKernel`, “ev
 has a true literal”) and adds uniqueness, as three clauses – one per pattern
 of signs, the mixed pattern being simply forbidden.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -101,18 +105,18 @@ def OneInSAT : DecisionProblem Language.sat where
 section SigmaOne
 
 /-- Kernel conjunct: a clause has at most one true *positive* literal. -/
-private noncomputable def oiPPClause : satSOLang.Sentence :=
+noncomputable def oiPPClause : satSOLang.Sentence :=
   fo% ∀ c x y,
     kIsClSym(c) ∧ (kPosSym(c, x) ∧ kNuSym(x)) ∧ (kPosSym(c, y) ∧ kNuSym(y)) → x ≐ y
 
 /-- Kernel conjunct: a clause has at most one true *negative* literal. -/
-private noncomputable def oiNNClause : satSOLang.Sentence :=
+noncomputable def oiNNClause : satSOLang.Sentence :=
   fo% ∀ c x y,
     kIsClSym(c) ∧ (kNegSym(c, x) ∧ ¬ kNuSym(x)) ∧ (kNegSym(c, y) ∧ ¬ kNuSym(y)) → x ≐ y
 
 /-- Kernel conjunct: a clause has no true positive *and* true negative
 literal. -/
-private noncomputable def oiPNClause : satSOLang.Sentence :=
+noncomputable def oiPNClause : satSOLang.Sentence :=
   fo% ∀ c x y,
     ¬ (kIsClSym(c) ∧ (kPosSym(c, x) ∧ kNuSym(x)) ∧ (kNegSym(c, y) ∧ ¬ kNuSym(y)))
 

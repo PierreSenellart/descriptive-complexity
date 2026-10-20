@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Walk
+module
+
+public import DescriptiveComplexity.Problems.Wide.Walk
 
 /-!
 # Testing the register file
@@ -33,6 +35,8 @@ A pass costs one move per register plus the step off the file, so a caller that
 is counting bounds the moves – the addresses between consecutive registers – and
 gets the product.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

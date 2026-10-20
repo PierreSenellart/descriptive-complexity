@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.Correct
-import DescriptiveComplexity.Problems.Machine.HaltMem
-import DescriptiveComplexity.Problems.FinSat
-import DescriptiveComplexity.Computability.Catalog
-import DescriptiveComplexity.Computability.CodeHalt
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Correct
+public import DescriptiveComplexity.Problems.Machine.HaltMem
+public import DescriptiveComplexity.Problems.FinSat
+public import DescriptiveComplexity.Computability.Catalog
+public import DescriptiveComplexity.Computability.CodeHalt
 
 /-!
 # The halting problem is RE-complete
@@ -27,6 +29,8 @@ RE-complete (`DescriptiveComplexity.halt_RE_complete`): the machine model now
 states “RE is the class of semi-decidable problems” alongside the code model
 (`DescriptiveComplexity.codehalt_RE_complete`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

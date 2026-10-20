@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Bridge
-import DescriptiveComplexity.OrderedComposition
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.Problems.Wide.Bridge
+public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # The order key a reduction writes is the block-major one
@@ -36,6 +38,8 @@ for them: `DescriptiveComplexity.Wide.isLinOrd_tagTupleLe`, transported from the
 `DescriptiveComplexity.Wide.isLinOrd_tupLeLex`, which is the same statement with no
 tag at all.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

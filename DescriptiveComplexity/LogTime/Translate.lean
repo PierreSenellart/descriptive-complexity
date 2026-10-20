@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Small
-import DescriptiveComplexity.LogTime.BitSum.Times
-import DescriptiveComplexity.LogTime.Compile
+module
+
+public import DescriptiveComplexity.LogTime.Small
+public import DescriptiveComplexity.LogTime.BitSum.Times
+public import DescriptiveComplexity.LogTime.Compile
 
 /-!
 # `FO(≤, +, ×)` into the bit logic: the machine model is AC⁰
@@ -59,6 +61,8 @@ already paid for elsewhere in the library:
 It is not a normal-form theorem: the bit logic is prenex by construction and the
 `BitDef` API merges prefixes semantically, so no `toPrenex` is involved.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

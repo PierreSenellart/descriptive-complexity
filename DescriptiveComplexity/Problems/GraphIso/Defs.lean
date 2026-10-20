@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.DigraphIso
-import DescriptiveComplexity.Degree
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.DigraphIso
+public import DescriptiveComplexity.Degree
 
 /-!
 # Graph Isomorphism: vocabulary, semantics, and membership in the GI degree
@@ -25,6 +27,8 @@ directed problem is complete for it too – the two are interreducible – but t
 needs the gadget of `DescriptiveComplexity.Problems.GraphIso.Hardness`, so it is
 proved there.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

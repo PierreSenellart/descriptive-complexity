@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting
-import DescriptiveComplexity.FixedPoint
-import DescriptiveComplexity.OrderWalk
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Counting
+public import DescriptiveComplexity.FixedPoint
+public import DescriptiveComplexity.OrderWalk
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Functions defined by their binary digits
@@ -37,6 +39,8 @@ in FP (`DescriptiveComplexity.DigitDefinable.mem_FP`), and every problem of FP
 is digit-definable (`DescriptiveComplexity.FPDefinable.digitDefinable`, in
 `DescriptiveComplexity.Counting.Digits.NormalForm`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

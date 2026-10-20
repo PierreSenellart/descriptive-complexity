@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureParam
-import DescriptiveComplexity.FixedPointReductionClosure
+module
+
+public import DescriptiveComplexity.TransitiveClosureParam
+public import DescriptiveComplexity.FixedPointReductionClosure
 
 /-!
 # FO(TC) reductions: the logarithmic-space reductions
@@ -50,6 +52,8 @@ interpretation, flattening them with the same deciders, and extending the
 inner interpretation to the outer walks' vocabulary. So `≤ᵗᶜ` is a reduction
 *order*, with the closure properties of NL and of the classes above it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

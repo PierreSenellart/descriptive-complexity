@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard.Emit
-import DescriptiveComplexity.Problems.Wide.Increment
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Emit
+public import DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The grid of the emitted tiling is the machine's tape
@@ -21,6 +23,8 @@ coordinates being compared differ at a digit, and there the emitted order is the
 machine's: the binary-number order on coordinates *is* the binary-number order on
 the machine's addresses (`tpCol_setLe`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

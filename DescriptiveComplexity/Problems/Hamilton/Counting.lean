@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.Cycle
-import DescriptiveComplexity.Problems.Hamilton.Membership
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.Cycle
+public import DescriptiveComplexity.Problems.Hamilton.Membership
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #Directed Hamilton Circuit: counting the circuits
@@ -33,6 +35,8 @@ starts at the least element of the instance: every circuit has exactly one
 Hence `DescriptiveComplexity.sharpDirHamCircuit_mem_sharpP`. Parsimonious hardness is
 in `DescriptiveComplexity.Problems.Hamilton.CountingHardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Tactic.FinCases
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Hierarchy
+module
+
+public import Mathlib.Tactic.FinCases
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # SAT: propositional satisfiability
@@ -31,6 +33,8 @@ of `DescriptiveComplexity.Problems.Sat.Hardness`. Other problems' NP-completenes
 proofs derive from it through first-order reductions; see e.g.,
 `DescriptiveComplexity.Problems.ThreeColorability`.
 -/
+
+@[expose] public section
 
 /- The language of CNF instances lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order` – a project-local

@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Composition
-import DescriptiveComplexity.Ordered
-import Mathlib.Order.PiLex
-import Mathlib.Order.Prod.Lex.Basic
-import Mathlib.Data.Fintype.EquivFin
+module
+
+public import DescriptiveComplexity.Composition
+public import DescriptiveComplexity.Ordered
+public import Mathlib.Order.PiLex
+public import Mathlib.Order.Prod.Lex.Basic
+public import Mathlib.Data.Fintype.EquivFin
 
 /-!
 # Composition of ordered first-order reductions
@@ -45,6 +47,8 @@ Concretely:
   combinations.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -77,11 +81,11 @@ def tagTupleLe (p q : Tag × (Fin d → A)) : Prop :=
   p.1 < q.1 ∨ (p.1 = q.1 ∧ tupLeLex p.2 q.2)
 
 /-- Embedding into Mathlib's lexicographic order types. -/
-private def lexEmbed (p : Tag × (Fin d → A)) : Tag ×ₗ Lex (Fin d → A) :=
+def lexEmbed (p : Tag × (Fin d → A)) : Tag ×ₗ Lex (Fin d → A) :=
   toLex (p.1, toLex p.2)
 
 omit [LinearOrder Tag] [LinearOrder A] in
-private theorem lexEmbed_injective :
+theorem lexEmbed_injective :
     Function.Injective (lexEmbed (Tag := Tag) (d := d) (A := A)) := by
   intro p q h
   have h' : (p.1, toLex p.2) = (q.1, toLex q.2) := toLex.injective h
@@ -124,15 +128,15 @@ section LexFormulas
 variable {L : Language.{0, 0}}
 
 /-- `x = y`, as a formula over the ordered expansion. -/
-private def oEqF {α : Type} (x y : α) : (L.sum Language.order).Formula α :=
+def oEqF {α : Type} (x y : α) : (L.sum Language.order).Formula α :=
   Term.equal (Term.var x) (Term.var y)
 
 /-- `x ≤ y`, as a formula over the ordered expansion. -/
-private def oLeF {α : Type} (x y : α) : (L.sum Language.order).Formula α :=
+def oLeF {α : Type} (x y : α) : (L.sum Language.order).Formula α :=
   Relations.formula₂ leSymb (Term.var x) (Term.var y)
 
 /-- `x < y`, as a formula over the ordered expansion. -/
-private def oLtF {α : Type} (x y : α) : (L.sum Language.order).Formula α :=
+def oLtF {α : Type} (x y : α) : (L.sum Language.order).Formula α :=
   oLeF x y ⊓ ∼(oEqF x y)
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {α : Type} {v : α → A}

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.FinSat.Hardness
-import DescriptiveComplexity.RecursivelyEnumerable
+module
+
+public import DescriptiveComplexity.Problems.FinSat.Hardness
+public import DescriptiveComplexity.RecursivelyEnumerable
 
 /-!
 # The reduction to FINSAT, and its correctness
@@ -35,6 +37,8 @@ interpretation at the symbols some node carries
 (`DescriptiveComplexity.FinSat.gval_congr_I`), which is what lets the model's
 own interpretation be replaced by the one a block assignment induces.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

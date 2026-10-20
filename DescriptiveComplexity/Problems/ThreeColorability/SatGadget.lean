@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceOrder
+module
+
+public import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # The 3-coloring gadget graph of a CNF structure
@@ -40,6 +42,8 @@ Junk vertices (tuples not matching the shapes above) have no incident edges.
 
 The main result is `DescriptiveComplexity.SatToCol.satisfiable_iff_gadColoring`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexEval
-import DescriptiveComplexity.Problems.Wide.DrawIxEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.NexEval
+public import DescriptiveComplexity.Problems.Wide.DrawIxEval
 
 /-!
 # The clocked spine at an arbitrary file
@@ -15,6 +17,8 @@ phases wrapped in `NexPh`). The legs are the same theorems the space-bounded
 spine folds – they are generic in the wrapper – so what this file adds is one
 run: the branched evaluation of the whole spine, on a clock.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.Bare
+module
+
+public import DescriptiveComplexity.Invariant.Bare
 
 /-!
 # The `k`-pebble game between two structures
@@ -32,6 +34,8 @@ same equality pattern, whatever the two sizes. That is the sentence-level
 counterpart of `DescriptiveComplexity.equivK_bare`, and the reason a
 `k`-variable induction cannot count.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

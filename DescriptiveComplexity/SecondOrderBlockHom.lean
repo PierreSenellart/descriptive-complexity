@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointStep
+module
+
+public import DescriptiveComplexity.FixedPointStep
 
 /-!
 # Morphisms of second-order blocks
@@ -24,6 +26,8 @@ translated program computes them as one group of a larger block; the
 invariant-structure simulations of `DescriptiveComplexity.Invariant.Simulation`
 want it for the same reason.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

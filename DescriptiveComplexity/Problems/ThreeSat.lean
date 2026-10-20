@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Problems.ThreeSat.ToSat
-import DescriptiveComplexity.Problems.ThreeSat.FromSat
+module
+
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Problems.ThreeSat.ToSat
+public import DescriptiveComplexity.Problems.ThreeSat.FromSat
 
 /-!
 # 3SAT is NP-complete
@@ -27,6 +29,8 @@ and deriving its NP-completeness from the Cook–Levin theorem
 complexity-theoretic statement, these results are about finite CNF structures
 only (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

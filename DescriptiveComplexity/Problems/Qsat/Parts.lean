@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Matrix
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Matrix
 
 /-!
 # The blocks of the prefix, and what the matrix says
@@ -27,6 +29,8 @@ pair to the pair it receives from above (`DescriptiveComplexity.LevPart`).
 Each group is the conjunction of two clauses of opposite signs, which is why the
 conditions come out as equivalences rather than implications.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

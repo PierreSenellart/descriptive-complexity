@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Levels
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Levels
 
 /-!
 # The matrix of the constructed instance
@@ -21,6 +23,8 @@ variable, the existential quantifier of a literal collapses
 on what the valuation reads (`DescriptiveComplexity.clSat_cSrc` and its
 companions).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

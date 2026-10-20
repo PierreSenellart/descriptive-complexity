@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelProg
-import DescriptiveComplexity.Problems.Wide.PadRules
-import DescriptiveComplexity.Problems.Wide.RegChannelEntry
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelProg
+public import DescriptiveComplexity.Problems.Wide.PadRules
+public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
 
 /-!
 # The handed program, with room on its clock
@@ -22,6 +24,8 @@ carrying a rule that never fires. Its record, its channel, its marks and its
 phases are the originals – only the rule names are wider – so every constant the
 clock is measured against is unchanged and the count goes up by `n`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

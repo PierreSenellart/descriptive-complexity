@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.FreeCopy
-import DescriptiveComplexity.FixedPointPartialMachine
-import DescriptiveComplexity.FixedPointStepRel
-import DescriptiveComplexity.PSpaceHierarchy
-import DescriptiveComplexity.Exponential.Classes
+module
+
+public import DescriptiveComplexity.Exponential.FreeCopy
+public import DescriptiveComplexity.FixedPointPartialMachine
+public import DescriptiveComplexity.FixedPointStepRel
+public import DescriptiveComplexity.PSpaceHierarchy
+public import DescriptiveComplexity.Exponential.Classes
 
 /-!
 # “Some copy answers yes” stays in polynomial space
@@ -36,6 +38,8 @@ Three closure properties of `DescriptiveComplexity.SOTCDefinable` do the work:
   closed under those
   (`DescriptiveComplexity.PFPDefinable.of_relOrderedReduction`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

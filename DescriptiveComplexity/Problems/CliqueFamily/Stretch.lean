@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.Pendant
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.Pendant
 
 /-!
 # Stretched edges: the independent sets of a graph, read off a bipartite one
@@ -23,6 +25,8 @@ of them, `e(S)` being the number of edges with no endpoint in `S`. When
 `2 ^ t` is the number of sets `S` with `e(S) = 0`, i.e., whose complement is
 independent (`DescriptiveComplexity.card_bisIndep_stretch_mod`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

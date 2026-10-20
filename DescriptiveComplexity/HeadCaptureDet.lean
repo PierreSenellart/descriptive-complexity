@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadLex
-import DescriptiveComplexity.WalkBudget
+module
+
+public import DescriptiveComplexity.HeadLex
+public import DescriptiveComplexity.WalkBudget
 
 /-!
 # The capture theorem for L: the deterministic machine of a specification
@@ -136,6 +138,8 @@ holds of with no side condition. `DescriptiveComplexity.dtcDefinable_of_automato
 loop.
 
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

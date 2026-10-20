@@ -3,15 +3,26 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Tactic.FinCases
-import Mathlib.Data.Fintype.BigOperators
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Counting.UnitWeights
-import DescriptiveComplexity.Counting.Encoding
-import DescriptiveComplexity.Numbers.BinEnum
-import DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
-import DescriptiveComplexity.Counting.WeightedTerms
-import DescriptiveComplexity.Counting.FP
+module
+
+public import Mathlib.Tactic.FinCases
+meta import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.BigOperators
+meta import Mathlib.Data.Fintype.BigOperators
+public import DescriptiveComplexity.Syntax
+meta import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Counting.UnitWeights
+meta import DescriptiveComplexity.Counting.UnitWeights
+public import DescriptiveComplexity.Counting.Encoding
+meta import DescriptiveComplexity.Counting.Encoding
+public import DescriptiveComplexity.Numbers.BinEnum
+meta import DescriptiveComplexity.Numbers.BinEnum
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
+meta import DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
+public import DescriptiveComplexity.Counting.WeightedTerms
+meta import DescriptiveComplexity.Counting.WeightedTerms
+public import DescriptiveComplexity.Counting.FP
+meta import DescriptiveComplexity.Counting.FP
 
 /-!
 # Worked example: query evaluation over probabilistic databases
@@ -176,6 +187,8 @@ One restriction of the format is deliberate: the weights are written on `n`
 bits, `n` being the number of constants, since the constants double as bit
 positions. A database with longer weights is padded with unused constants.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

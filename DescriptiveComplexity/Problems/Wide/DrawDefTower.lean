@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefKit
-import DescriptiveComplexity.Problems.Wide.DrawTuple
-import DescriptiveComplexity.Problems.Wide.DrawTagged
-import DescriptiveComplexity.Problems.Wide.DrawSeq
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefKit
+public import DescriptiveComplexity.Problems.Wide.DrawTuple
+public import DescriptiveComplexity.Problems.Wide.DrawTagged
+public import DescriptiveComplexity.Problems.Wide.DrawSeq
 
 /-!
 # The combinators carry definability up the tower
@@ -24,6 +26,8 @@ updates. So each proof is: the leaves by
 `DescriptiveComplexity.Problems.Wide.DrawDefKit`, the checkpoints by the atoms,
 and nothing else.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

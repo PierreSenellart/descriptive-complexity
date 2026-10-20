@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Coloring.Defs
-import DescriptiveComplexity.Problems.CliqueFamily.Reductions
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Coloring.Defs
+public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # Reductions of the coloring family
@@ -39,6 +41,8 @@ Three reductions, one per problem of the family:
   cliques is coloring the complement, and complementing off the diagonal
   exchanges the two conflict relations while keeping the marked set.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -103,10 +107,10 @@ section Palette
 variable {m : ℕ}
 
 /-- One of the first three colors of a palette of `3 + m`. -/
-private def origColor (i : Fin 3) : Fin (3 + m) := ⟨i.1, by have := i.isLt; omega⟩
+def origColor (i : Fin 3) : Fin (3 + m) := ⟨i.1, by have := i.isLt; omega⟩
 
 /-- One of the last `m` colors of a palette of `3 + m`. -/
-private def padColor (j : Fin m) : Fin (3 + m) := ⟨3 + j.1, by have := j.isLt; omega⟩
+def padColor (j : Fin m) : Fin (3 + m) := ⟨3 + j.1, by have := j.isLt; omega⟩
 
 private theorem origColor_injective : Function.Injective (origColor (m := m)) := by
   intro i j h
@@ -139,7 +143,7 @@ variable {m : ℕ} {A : Type} [Language.graph.Structure A]
 /-- The `k`-coloring of the padded graph built from a 3-coloring of the
 input: the original copy keeps its three colors, and the `i`-th blown-up
 universal vertex takes the `i`-th spare color. -/
-private def paddedColoring (c : A → Fin 3) :
+def paddedColoring (c : A → Fin 3) :
     Option (Fin m) × (Fin 1 → A) → Fin (3 + m) :=
   fun p => p.1.elim (origColor (c (p.2 0))) padColor
 

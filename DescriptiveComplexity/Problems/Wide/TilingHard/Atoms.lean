@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Wide.TilingHard.Emit
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Emit
 
 /-!
 # The atoms the drawing is written with
@@ -23,6 +25,8 @@ Everything here is about the *source* of the reduction, so it says nothing about
 tiles; the formulas that draw them are in
 `DescriptiveComplexity.Problems.Wide.TilingHard.Draw`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

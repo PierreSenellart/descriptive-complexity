@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Blocks
-import DescriptiveComplexity.Problems.Machine.Program
+module
+
+public import DescriptiveComplexity.Problems.Wide.Blocks
+public import DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The sweep of a wide machine
@@ -38,6 +40,8 @@ instance's input channel, its control being instance data already, so it leaves
 `DescriptiveComplexity.isInit_wide` exhibits the one initial configuration: a
 start state, the head on the empty address, every cell blank.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

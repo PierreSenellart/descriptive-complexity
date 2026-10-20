@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstVar
-import DescriptiveComplexity.Problems.Wide.DrawGateFacts
-import DescriptiveComplexity.Problems.Wide.DrawLeaf
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstVar
+public import DescriptiveComplexity.Problems.Wide.DrawGateFacts
+public import DescriptiveComplexity.Problems.Wide.DrawLeaf
 
 /-!
 # The round flags, read semantically, and the pack built from the pass
@@ -30,6 +32,8 @@ pack `semOf` – discharged at the concrete threads:
   chosen from `DescriptiveComplexity.Draw.Data.igPassP_iff_isEnc` –
   so the capstone's `hsem` is `rfl`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

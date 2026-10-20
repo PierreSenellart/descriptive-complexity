@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawOuter
-import DescriptiveComplexity.Problems.Wide.DrawBuild
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawOuter
+public import DescriptiveComplexity.Problems.Wide.DrawBuild
 
 /-!
 # The clocked program's outer layer
@@ -71,6 +73,8 @@ The exit into the next sweep **resets the pointer** (`SweepSpec.st0`): the sweep
 that just finished left it at the file's last register, and the next one starts
 at the first.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

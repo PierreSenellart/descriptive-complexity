@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Degree
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Problems.Taut
-import DescriptiveComplexity.Problems.HornSat
-import DescriptiveComplexity.Problems.TwoSat
-import DescriptiveComplexity.Problems.FinSat
+module
+
+public import DescriptiveComplexity.Degree
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Problems.Taut
+public import DescriptiveComplexity.Problems.HornSat
+public import DescriptiveComplexity.Problems.TwoSat
+public import DescriptiveComplexity.Problems.FinSat
 
 /-!
 # The logically defined classes are the degrees of their complete problems
@@ -31,6 +33,8 @@ reduction `≤ᶠᵒ[≤]` that the equality needs – cofinal hardness on its o
 only `≤ʳᶠᵒ[≤]`. This is why the statement cannot be proved generically, for an
 arbitrary class and an arbitrary complete problem of it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

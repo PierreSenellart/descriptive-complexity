@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SetFamily.Defs
-import DescriptiveComplexity.Problems.SetFamily.Reductions
-import DescriptiveComplexity.Problems.SetFamily.FromGraphs
-import DescriptiveComplexity.Problems.SetFamily.Membership
-import DescriptiveComplexity.Problems.CliqueFamily
-import DescriptiveComplexity.Composition
+module
+
+public import DescriptiveComplexity.Problems.SetFamily.Defs
+public import DescriptiveComplexity.Problems.SetFamily.Reductions
+public import DescriptiveComplexity.Problems.SetFamily.FromGraphs
+public import DescriptiveComplexity.Problems.SetFamily.Membership
+public import DescriptiveComplexity.Problems.CliqueFamily
+public import DescriptiveComplexity.Composition
 
 /-!
 # The set family is NP-complete
@@ -42,6 +44,8 @@ its own definition. As with any complexity-theoretic statement, these results
 are about finite set systems only
 (`DescriptiveComplexity.ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

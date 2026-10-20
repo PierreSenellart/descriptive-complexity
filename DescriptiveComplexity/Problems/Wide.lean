@@ -3,196 +3,198 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Defs
-import DescriptiveComplexity.Problems.Wide.Expansion
-import DescriptiveComplexity.Problems.Wide.Tiling
-import DescriptiveComplexity.Problems.Wide.TilingExp
-import DescriptiveComplexity.Problems.Wide.TilingHard
-import DescriptiveComplexity.Problems.Wide.CorridorHard
-import DescriptiveComplexity.Problems.Wide.WellFormed
-import DescriptiveComplexity.Problems.Wide.Increment
-import DescriptiveComplexity.Problems.Wide.Blocks
-import DescriptiveComplexity.Problems.Wide.Sweep
-import DescriptiveComplexity.Problems.Wide.Fold
-import DescriptiveComplexity.Problems.Wide.Step
-import DescriptiveComplexity.Problems.Wide.Roam
-import DescriptiveComplexity.Problems.Wide.Marks
-import DescriptiveComplexity.Problems.Wide.Tape
-import DescriptiveComplexity.Problems.Wide.RegFile
-import DescriptiveComplexity.Problems.Wide.LowFile
-import DescriptiveComplexity.Problems.Wide.IxAddr
-import DescriptiveComplexity.Problems.Wide.BlkFile
-import DescriptiveComplexity.Problems.Wide.BlkLayout
-import DescriptiveComplexity.Problems.Wide.NexSpec
-import DescriptiveComplexity.Problems.Wide.NexBuild
-import DescriptiveComplexity.Problems.Wide.NexGuess
-import DescriptiveComplexity.Problems.Wide.NexEval
-import DescriptiveComplexity.Problems.Wide.NexSpine
-import DescriptiveComplexity.Problems.Wide.NexDef
-import DescriptiveComplexity.Problems.Wide.NexInterp
-import DescriptiveComplexity.Problems.Wide.NexRun
-import DescriptiveComplexity.Problems.Wide.Walk
-import DescriptiveComplexity.Problems.Wide.Mirror
-import DescriptiveComplexity.Problems.Wide.Det
-import DescriptiveComplexity.Problems.Wide.Test
-import DescriptiveComplexity.Problems.Wide.DrawTags
-import DescriptiveComplexity.Problems.Wide.DrawMatrix
-import DescriptiveComplexity.Problems.Wide.DrawGeom
-import DescriptiveComplexity.Problems.Wide.DrawShape
-import DescriptiveComplexity.Problems.Wide.DrawTable
-import DescriptiveComplexity.Problems.Wide.DrawRegion
-import DescriptiveComplexity.Problems.Wide.DrawTracks
-import DescriptiveComplexity.Problems.Wide.DrawRules
-import DescriptiveComplexity.Problems.Wide.DrawPass
-import DescriptiveComplexity.Problems.Wide.DrawScan
-import DescriptiveComplexity.Problems.Wide.DrawRel
-import DescriptiveComplexity.Problems.Wide.DrawEnc
-import DescriptiveComplexity.Problems.Wide.DrawInner
-import DescriptiveComplexity.Problems.Wide.DrawLoop
-import DescriptiveComplexity.Problems.Wide.DrawSpec
-import DescriptiveComplexity.Problems.Wide.DrawAddr
-import DescriptiveComplexity.Problems.Wide.DrawOrd
-import DescriptiveComplexity.Problems.Wide.DrawGate
-import DescriptiveComplexity.Problems.Wide.DrawSlots
-import DescriptiveComplexity.Problems.Wide.DrawSub
-import DescriptiveComplexity.Problems.Wide.DrawInit
-import DescriptiveComplexity.Problems.Wide.DrawAdv
-import DescriptiveComplexity.Problems.Wide.DrawSweep
-import DescriptiveComplexity.Problems.Wide.DrawTrip
-import DescriptiveComplexity.Problems.Wide.DrawSeek
-import DescriptiveComplexity.Problems.Wide.DrawRead
-import DescriptiveComplexity.Problems.Wide.DrawAcc
-import DescriptiveComplexity.Problems.Wide.DrawAtoms
-import DescriptiveComplexity.Problems.Wide.DrawData
-import DescriptiveComplexity.Problems.Wide.NexPack
-import DescriptiveComplexity.Problems.Wide.DrawKit
-import DescriptiveComplexity.Problems.Wide.DrawFactor
-import DescriptiveComplexity.Problems.Wide.DrawDefKit
-import DescriptiveComplexity.Problems.Wide.DrawDefTower
-import DescriptiveComplexity.Problems.Wide.DrawDefStage
-import DescriptiveComplexity.Problems.Wide.DrawDefKind
-import DescriptiveComplexity.Problems.Wide.DrawDefVar
-import DescriptiveComplexity.Problems.Wide.DrawDefProg
-import DescriptiveComplexity.Problems.Wide.DrawDefAsm
-import DescriptiveComplexity.Problems.Wide.DrawDefLoop
-import DescriptiveComplexity.Problems.Wide.DrawDefCtl
-import DescriptiveComplexity.Problems.Wide.DrawDefAcc
-import DescriptiveComplexity.Problems.Wide.DrawDefTags
-import DescriptiveComplexity.Problems.Wide.DrawDefName
-import DescriptiveComplexity.Problems.Wide.DrawDefGate
-import DescriptiveComplexity.Problems.Wide.DrawDefExp
-import DescriptiveComplexity.Problems.Wide.DrawInterp
-import DescriptiveComplexity.Problems.Wide.DrawPack
-import DescriptiveComplexity.Problems.Wide.Double
-import DescriptiveComplexity.Problems.Wide.RelExp
-import DescriptiveComplexity.Problems.Wide.RelExpansion
-import DescriptiveComplexity.Problems.Wide.RelExpMap
-import DescriptiveComplexity.Problems.Wide.ShFinite
-import DescriptiveComplexity.Problems.Wide.Reduce
-import DescriptiveComplexity.Problems.Wide.DrawAsm
-import DescriptiveComplexity.Problems.Wide.DrawTripKits
-import DescriptiveComplexity.Problems.Wide.DrawIncrKit
-import DescriptiveComplexity.Problems.Wide.DrawSweepKit
-import DescriptiveComplexity.Problems.Wide.DrawAdvKit
-import DescriptiveComplexity.Problems.Wide.DrawSeekKit
-import DescriptiveComplexity.Problems.Wide.DrawReset
-import DescriptiveComplexity.Problems.Wide.DrawSites
-import DescriptiveComplexity.Problems.Wide.DrawBack
-import DescriptiveComplexity.Problems.Wide.DrawBuild
-import DescriptiveComplexity.Problems.Wide.DrawOuter
-import DescriptiveComplexity.Problems.Wide.NexOuter
-import DescriptiveComplexity.Problems.Wide.NexDet
-import DescriptiveComplexity.Problems.Wide.DrawEval
-import DescriptiveComplexity.Problems.Wide.DrawVar
-import DescriptiveComplexity.Problems.Wide.DrawChain
-import DescriptiveComplexity.Problems.Wide.DrawTuple
-import DescriptiveComplexity.Problems.Wide.DrawStageAtom
-import DescriptiveComplexity.Problems.Wide.DrawElem
-import DescriptiveComplexity.Problems.Wide.DrawTagged
-import DescriptiveComplexity.Problems.Wide.DrawSeq
-import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
-import DescriptiveComplexity.Problems.Wide.DrawRound
-import DescriptiveComplexity.Problems.Wide.DrawTower
-import DescriptiveComplexity.Problems.Wide.DrawKindRule
-import DescriptiveComplexity.Problems.Wide.DrawVarRule
-import DescriptiveComplexity.Problems.Wide.DrawCtl
-import DescriptiveComplexity.Problems.Wide.DrawName
-import DescriptiveComplexity.Problems.Wide.DrawPad
-import DescriptiveComplexity.Problems.Wide.DrawLeaf
-import DescriptiveComplexity.Problems.Wide.DrawExp
-import DescriptiveComplexity.Problems.Wide.DrawCmp
-import DescriptiveComplexity.Problems.Wide.DrawAccCtl
-import DescriptiveComplexity.Problems.Wide.DrawArgs
-import DescriptiveComplexity.Problems.Wide.DrawProg
-import DescriptiveComplexity.Problems.Wide.DrawRun
-import DescriptiveComplexity.Problems.Wide.DrawRunElem
-import DescriptiveComplexity.Problems.Wide.DrawRunTagged
-import DescriptiveComplexity.Problems.Wide.DrawRunTuple
-import DescriptiveComplexity.Problems.Wide.DrawRunVar
-import DescriptiveComplexity.Problems.Wide.DrawRunEval
-import DescriptiveComplexity.Problems.Wide.DrawRunSeq
-import DescriptiveComplexity.Problems.Wide.DrawRunStage
-import DescriptiveComplexity.Problems.Wide.DrawRunIter
-import DescriptiveComplexity.Problems.Wide.DrawInstCmp
-import DescriptiveComplexity.Problems.Wide.DrawInstStage
-import DescriptiveComplexity.Problems.Wide.DrawIxStage
-import DescriptiveComplexity.Problems.Wide.DrawIxExp
-import DescriptiveComplexity.Problems.Wide.DrawIxGate
-import DescriptiveComplexity.Problems.Wide.DrawIxIGate
-import DescriptiveComplexity.Problems.Wide.DrawIxMat
-import DescriptiveComplexity.Problems.Wide.DrawIxSeq
-import DescriptiveComplexity.Problems.Wide.DrawIxRound
-import DescriptiveComplexity.Problems.Wide.DrawIxVar
-import DescriptiveComplexity.Problems.Wide.DrawIxEval
-import DescriptiveComplexity.Problems.Wide.DrawIxWidth
-import DescriptiveComplexity.Problems.Wide.DrawIxBridge
-import DescriptiveComplexity.Problems.Wide.DrawIxPack
-import DescriptiveComplexity.Problems.Wide.Limits
-import DescriptiveComplexity.Problems.Wide.PadRules
-import DescriptiveComplexity.Problems.Wide.RegChannelPad
-import DescriptiveComplexity.Problems.Wide.RegChannelJoin
-import DescriptiveComplexity.Problems.Wide.TrackWrites
-import DescriptiveComplexity.Problems.Wide.RegChannelBack
-import DescriptiveComplexity.Problems.Wide.RegChannel
-import DescriptiveComplexity.Problems.Wide.RegChannelTape
-import DescriptiveComplexity.Problems.Wide.RegChannelInit
-import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
-import DescriptiveComplexity.Problems.Wide.RegChannelLaid
-import DescriptiveComplexity.Problems.Wide.RegChannelEval
-import DescriptiveComplexity.Problems.Wide.RegChannelProg
-import DescriptiveComplexity.Problems.Wide.RegChannelEntry
-import DescriptiveComplexity.Problems.Wide.RegChannelEnum
-import DescriptiveComplexity.Problems.Wide.SpineSav
-import DescriptiveComplexity.Problems.Wide.RegChannelWalk
-import DescriptiveComplexity.Problems.Wide.RegChannelAccept
-import DescriptiveComplexity.Problems.Wide.RegChannelYes
-import DescriptiveComplexity.Problems.Wide.RegChannelNo
-import DescriptiveComplexity.Problems.Wide.RegChannelReduce
-import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
-import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
-import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
-import DescriptiveComplexity.Problems.Wide.DrawInstExp
-import DescriptiveComplexity.Problems.Wide.DrawInstGate
-import DescriptiveComplexity.Problems.Wide.DrawInstIGate
-import DescriptiveComplexity.Problems.Wide.DrawInstMat
-import DescriptiveComplexity.Problems.Wide.DrawInstSeq
-import DescriptiveComplexity.Problems.Wide.DrawInstRound
-import DescriptiveComplexity.Problems.Wide.DrawGateFacts
-import DescriptiveComplexity.Problems.Wide.DrawInstVar
-import DescriptiveComplexity.Problems.Wide.DrawRoundSem
-import DescriptiveComplexity.Problems.Wide.DrawVerdict
-import DescriptiveComplexity.Problems.Wide.DrawInstEval
-import DescriptiveComplexity.Problems.Wide.DrawSpineSem
-import DescriptiveComplexity.Problems.Wide.DrawRunOuter
-import DescriptiveComplexity.Problems.Wide.DrawRunSpine
-import DescriptiveComplexity.Problems.Wide.DrawValEnum
-import DescriptiveComplexity.Problems.Wide.DrawHalt
-import DescriptiveComplexity.Problems.Wide.DrawYes
-import DescriptiveComplexity.Problems.Wide.DrawNo
-import DescriptiveComplexity.Problems.Wide.Bridge
-import DescriptiveComplexity.Problems.Wide.Instance
-import DescriptiveComplexity.Problems.Wide.Key
-import DescriptiveComplexity.Problems.Wide.Membership
+module
+
+public import DescriptiveComplexity.Problems.Wide.Defs
+public import DescriptiveComplexity.Problems.Wide.Expansion
+public import DescriptiveComplexity.Problems.Wide.Tiling
+public import DescriptiveComplexity.Problems.Wide.TilingExp
+public import DescriptiveComplexity.Problems.Wide.TilingHard
+public import DescriptiveComplexity.Problems.Wide.CorridorHard
+public import DescriptiveComplexity.Problems.Wide.WellFormed
+public import DescriptiveComplexity.Problems.Wide.Increment
+public import DescriptiveComplexity.Problems.Wide.Blocks
+public import DescriptiveComplexity.Problems.Wide.Sweep
+public import DescriptiveComplexity.Problems.Wide.Fold
+public import DescriptiveComplexity.Problems.Wide.Step
+public import DescriptiveComplexity.Problems.Wide.Roam
+public import DescriptiveComplexity.Problems.Wide.Marks
+public import DescriptiveComplexity.Problems.Wide.Tape
+public import DescriptiveComplexity.Problems.Wide.RegFile
+public import DescriptiveComplexity.Problems.Wide.LowFile
+public import DescriptiveComplexity.Problems.Wide.IxAddr
+public import DescriptiveComplexity.Problems.Wide.BlkFile
+public import DescriptiveComplexity.Problems.Wide.BlkLayout
+public import DescriptiveComplexity.Problems.Wide.NexSpec
+public import DescriptiveComplexity.Problems.Wide.NexBuild
+public import DescriptiveComplexity.Problems.Wide.NexGuess
+public import DescriptiveComplexity.Problems.Wide.NexEval
+public import DescriptiveComplexity.Problems.Wide.NexSpine
+public import DescriptiveComplexity.Problems.Wide.NexDef
+public import DescriptiveComplexity.Problems.Wide.NexInterp
+public import DescriptiveComplexity.Problems.Wide.NexRun
+public import DescriptiveComplexity.Problems.Wide.Walk
+public import DescriptiveComplexity.Problems.Wide.Mirror
+public import DescriptiveComplexity.Problems.Wide.Det
+public import DescriptiveComplexity.Problems.Wide.Test
+public import DescriptiveComplexity.Problems.Wide.DrawTags
+public import DescriptiveComplexity.Problems.Wide.DrawMatrix
+public import DescriptiveComplexity.Problems.Wide.DrawGeom
+public import DescriptiveComplexity.Problems.Wide.DrawShape
+public import DescriptiveComplexity.Problems.Wide.DrawTable
+public import DescriptiveComplexity.Problems.Wide.DrawRegion
+public import DescriptiveComplexity.Problems.Wide.DrawTracks
+public import DescriptiveComplexity.Problems.Wide.DrawRules
+public import DescriptiveComplexity.Problems.Wide.DrawPass
+public import DescriptiveComplexity.Problems.Wide.DrawScan
+public import DescriptiveComplexity.Problems.Wide.DrawRel
+public import DescriptiveComplexity.Problems.Wide.DrawEnc
+public import DescriptiveComplexity.Problems.Wide.DrawInner
+public import DescriptiveComplexity.Problems.Wide.DrawLoop
+public import DescriptiveComplexity.Problems.Wide.DrawSpec
+public import DescriptiveComplexity.Problems.Wide.DrawAddr
+public import DescriptiveComplexity.Problems.Wide.DrawOrd
+public import DescriptiveComplexity.Problems.Wide.DrawGate
+public import DescriptiveComplexity.Problems.Wide.DrawSlots
+public import DescriptiveComplexity.Problems.Wide.DrawSub
+public import DescriptiveComplexity.Problems.Wide.DrawInit
+public import DescriptiveComplexity.Problems.Wide.DrawAdv
+public import DescriptiveComplexity.Problems.Wide.DrawSweep
+public import DescriptiveComplexity.Problems.Wide.DrawTrip
+public import DescriptiveComplexity.Problems.Wide.DrawSeek
+public import DescriptiveComplexity.Problems.Wide.DrawRead
+public import DescriptiveComplexity.Problems.Wide.DrawAcc
+public import DescriptiveComplexity.Problems.Wide.DrawAtoms
+public import DescriptiveComplexity.Problems.Wide.DrawData
+public import DescriptiveComplexity.Problems.Wide.NexPack
+public import DescriptiveComplexity.Problems.Wide.DrawKit
+public import DescriptiveComplexity.Problems.Wide.DrawFactor
+public import DescriptiveComplexity.Problems.Wide.DrawDefKit
+public import DescriptiveComplexity.Problems.Wide.DrawDefTower
+public import DescriptiveComplexity.Problems.Wide.DrawDefStage
+public import DescriptiveComplexity.Problems.Wide.DrawDefKind
+public import DescriptiveComplexity.Problems.Wide.DrawDefVar
+public import DescriptiveComplexity.Problems.Wide.DrawDefProg
+public import DescriptiveComplexity.Problems.Wide.DrawDefAsm
+public import DescriptiveComplexity.Problems.Wide.DrawDefLoop
+public import DescriptiveComplexity.Problems.Wide.DrawDefCtl
+public import DescriptiveComplexity.Problems.Wide.DrawDefAcc
+public import DescriptiveComplexity.Problems.Wide.DrawDefTags
+public import DescriptiveComplexity.Problems.Wide.DrawDefName
+public import DescriptiveComplexity.Problems.Wide.DrawDefGate
+public import DescriptiveComplexity.Problems.Wide.DrawDefExp
+public import DescriptiveComplexity.Problems.Wide.DrawInterp
+public import DescriptiveComplexity.Problems.Wide.DrawPack
+public import DescriptiveComplexity.Problems.Wide.Double
+public import DescriptiveComplexity.Problems.Wide.RelExp
+public import DescriptiveComplexity.Problems.Wide.RelExpansion
+public import DescriptiveComplexity.Problems.Wide.RelExpMap
+public import DescriptiveComplexity.Problems.Wide.ShFinite
+public import DescriptiveComplexity.Problems.Wide.Reduce
+public import DescriptiveComplexity.Problems.Wide.DrawAsm
+public import DescriptiveComplexity.Problems.Wide.DrawTripKits
+public import DescriptiveComplexity.Problems.Wide.DrawIncrKit
+public import DescriptiveComplexity.Problems.Wide.DrawSweepKit
+public import DescriptiveComplexity.Problems.Wide.DrawAdvKit
+public import DescriptiveComplexity.Problems.Wide.DrawSeekKit
+public import DescriptiveComplexity.Problems.Wide.DrawReset
+public import DescriptiveComplexity.Problems.Wide.DrawSites
+public import DescriptiveComplexity.Problems.Wide.DrawBack
+public import DescriptiveComplexity.Problems.Wide.DrawBuild
+public import DescriptiveComplexity.Problems.Wide.DrawOuter
+public import DescriptiveComplexity.Problems.Wide.NexOuter
+public import DescriptiveComplexity.Problems.Wide.NexDet
+public import DescriptiveComplexity.Problems.Wide.DrawEval
+public import DescriptiveComplexity.Problems.Wide.DrawVar
+public import DescriptiveComplexity.Problems.Wide.DrawChain
+public import DescriptiveComplexity.Problems.Wide.DrawTuple
+public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
+public import DescriptiveComplexity.Problems.Wide.DrawElem
+public import DescriptiveComplexity.Problems.Wide.DrawTagged
+public import DescriptiveComplexity.Problems.Wide.DrawSeq
+public import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
+public import DescriptiveComplexity.Problems.Wide.DrawRound
+public import DescriptiveComplexity.Problems.Wide.DrawTower
+public import DescriptiveComplexity.Problems.Wide.DrawKindRule
+public import DescriptiveComplexity.Problems.Wide.DrawVarRule
+public import DescriptiveComplexity.Problems.Wide.DrawCtl
+public import DescriptiveComplexity.Problems.Wide.DrawName
+public import DescriptiveComplexity.Problems.Wide.DrawPad
+public import DescriptiveComplexity.Problems.Wide.DrawLeaf
+public import DescriptiveComplexity.Problems.Wide.DrawExp
+public import DescriptiveComplexity.Problems.Wide.DrawCmp
+public import DescriptiveComplexity.Problems.Wide.DrawAccCtl
+public import DescriptiveComplexity.Problems.Wide.DrawArgs
+public import DescriptiveComplexity.Problems.Wide.DrawProg
+public import DescriptiveComplexity.Problems.Wide.DrawRun
+public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+public import DescriptiveComplexity.Problems.Wide.DrawRunTagged
+public import DescriptiveComplexity.Problems.Wide.DrawRunTuple
+public import DescriptiveComplexity.Problems.Wide.DrawRunVar
+public import DescriptiveComplexity.Problems.Wide.DrawRunEval
+public import DescriptiveComplexity.Problems.Wide.DrawRunSeq
+public import DescriptiveComplexity.Problems.Wide.DrawRunStage
+public import DescriptiveComplexity.Problems.Wide.DrawRunIter
+public import DescriptiveComplexity.Problems.Wide.DrawInstCmp
+public import DescriptiveComplexity.Problems.Wide.DrawInstStage
+public import DescriptiveComplexity.Problems.Wide.DrawIxStage
+public import DescriptiveComplexity.Problems.Wide.DrawIxExp
+public import DescriptiveComplexity.Problems.Wide.DrawIxGate
+public import DescriptiveComplexity.Problems.Wide.DrawIxIGate
+public import DescriptiveComplexity.Problems.Wide.DrawIxMat
+public import DescriptiveComplexity.Problems.Wide.DrawIxSeq
+public import DescriptiveComplexity.Problems.Wide.DrawIxRound
+public import DescriptiveComplexity.Problems.Wide.DrawIxVar
+public import DescriptiveComplexity.Problems.Wide.DrawIxEval
+public import DescriptiveComplexity.Problems.Wide.DrawIxWidth
+public import DescriptiveComplexity.Problems.Wide.DrawIxBridge
+public import DescriptiveComplexity.Problems.Wide.DrawIxPack
+public import DescriptiveComplexity.Problems.Wide.Limits
+public import DescriptiveComplexity.Problems.Wide.PadRules
+public import DescriptiveComplexity.Problems.Wide.RegChannelPad
+public import DescriptiveComplexity.Problems.Wide.RegChannelJoin
+public import DescriptiveComplexity.Problems.Wide.TrackWrites
+public import DescriptiveComplexity.Problems.Wide.RegChannelBack
+public import DescriptiveComplexity.Problems.Wide.RegChannel
+public import DescriptiveComplexity.Problems.Wide.RegChannelTape
+public import DescriptiveComplexity.Problems.Wide.RegChannelInit
+public import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
+public import DescriptiveComplexity.Problems.Wide.RegChannelLaid
+public import DescriptiveComplexity.Problems.Wide.RegChannelEval
+public import DescriptiveComplexity.Problems.Wide.RegChannelProg
+public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
+public import DescriptiveComplexity.Problems.Wide.RegChannelEnum
+public import DescriptiveComplexity.Problems.Wide.SpineSav
+public import DescriptiveComplexity.Problems.Wide.RegChannelWalk
+public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
+public import DescriptiveComplexity.Problems.Wide.RegChannelYes
+public import DescriptiveComplexity.Problems.Wide.RegChannelNo
+public import DescriptiveComplexity.Problems.Wide.RegChannelReduce
+public import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
+public import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
+public import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+public import DescriptiveComplexity.Problems.Wide.DrawInstExp
+public import DescriptiveComplexity.Problems.Wide.DrawInstGate
+public import DescriptiveComplexity.Problems.Wide.DrawInstIGate
+public import DescriptiveComplexity.Problems.Wide.DrawInstMat
+public import DescriptiveComplexity.Problems.Wide.DrawInstSeq
+public import DescriptiveComplexity.Problems.Wide.DrawInstRound
+public import DescriptiveComplexity.Problems.Wide.DrawGateFacts
+public import DescriptiveComplexity.Problems.Wide.DrawInstVar
+public import DescriptiveComplexity.Problems.Wide.DrawRoundSem
+public import DescriptiveComplexity.Problems.Wide.DrawVerdict
+public import DescriptiveComplexity.Problems.Wide.DrawInstEval
+public import DescriptiveComplexity.Problems.Wide.DrawSpineSem
+public import DescriptiveComplexity.Problems.Wide.DrawRunOuter
+public import DescriptiveComplexity.Problems.Wide.DrawRunSpine
+public import DescriptiveComplexity.Problems.Wide.DrawValEnum
+public import DescriptiveComplexity.Problems.Wide.DrawHalt
+public import DescriptiveComplexity.Problems.Wide.DrawYes
+public import DescriptiveComplexity.Problems.Wide.DrawNo
+public import DescriptiveComplexity.Problems.Wide.Bridge
+public import DescriptiveComplexity.Problems.Wide.Instance
+public import DescriptiveComplexity.Problems.Wide.Key
+public import DescriptiveComplexity.Problems.Wide.Membership
 
 /-!
 # The wide machine: a machine model for NEXPTIME and EXPSPACE
@@ -1751,3 +1753,5 @@ store – rather than a normal form putting every occurrence on a prefix
 same problem again). That is why the clocked program keeps the EXPSPACE atom
 machinery instead of asking the control to hold the valuation.
 -/
+
+@[expose] public section

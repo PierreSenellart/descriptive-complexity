@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesAlt
-import DescriptiveComplexity.Problems.Machine.Defs
+module
+
+public import DescriptiveComplexity.MachinesAlt
+public import DescriptiveComplexity.Problems.Machine.Defs
 
 /-!
 # Alternating machine acceptance as a decision problem
@@ -49,6 +51,8 @@ the bridge costs nothing beyond swapping the marks – the machine-side reading
 of `DescriptiveComplexity.QBF` and `DescriptiveComplexity.QBFPi` sharing a
 single reduction.
 -/
+
+@[expose] public section
 
 /- The language of alternating machine instances lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.turing`. -/

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltGuess
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltGuess
 
 /-!
 # The check phase decides the matrix
@@ -26,6 +28,8 @@ The induction is therefore over the clauses, upwards, exactly as in the two
 forward lemmas: `DescriptiveComplexity.AltQbf.ChkOk` is what the run from a clause
 proves about that clause and every clause above it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

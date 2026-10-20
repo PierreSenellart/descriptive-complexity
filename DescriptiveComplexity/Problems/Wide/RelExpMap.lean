@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RelExpansion
+module
+
+public import DescriptiveComplexity.Problems.Wide.RelExpansion
 
 /-!
 # The relativized expansion over the doubled universe is the expansion
@@ -21,6 +23,8 @@ instance. And every sentence the expansion is made of transports by
 of the block, and each defining sentence at `n` copies, where the extension
 commutes with replication exactly.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

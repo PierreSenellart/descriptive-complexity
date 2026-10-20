@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.Closure
+module
+
+public import DescriptiveComplexity.Counting.Digits.Closure
 
 /-!
 # Closure under sums over the tuples of the structure
@@ -20,6 +22,8 @@ of the row before it and of `F(w̄, ū)`
 (`DescriptiveComplexity.Digits.sumTheta`). The answer is the row of the last
 tuple.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

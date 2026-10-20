@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ThreeColorability
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
+module
+
+public import DescriptiveComplexity.Problems.ThreeColorability
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
 # The coloring family: definitions
@@ -48,6 +50,8 @@ This is the form the second-order definitions guess, since it needs only a
 binary relation variable, where the number `k` is not available to the
 formulas.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

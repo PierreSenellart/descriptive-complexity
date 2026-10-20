@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Defs
-import DescriptiveComplexity.Exponential.Order
+module
+
+public import DescriptiveComplexity.Problems.Wide.Defs
+public import DescriptiveComplexity.Exponential.Order
 
 /-!
 # What the promises of a wide machine come to
@@ -36,6 +38,8 @@ This is the lemma a *reduction into* a wide machine will need: an interpretation
 writing a wide machine down owes only three first-order conditions about the
 instance it draws, and none about its power set.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

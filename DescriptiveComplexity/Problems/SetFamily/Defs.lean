@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Interpretation
-import DescriptiveComplexity.Numbers.Unary
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Interpretation
+public import DescriptiveComplexity.Numbers.Unary
 
 /-!
 # Set Cover, Hitting Set and Set Packing: definitions
@@ -54,6 +56,8 @@ finite structures, so finiteness of the universe is part of the yes-instances;
 by `DescriptiveComplexity.ComplexityClass.mem_congr_finite` this does not affect
 any complexity-theoretic statement.
 -/
+
+@[expose] public section
 
 /- The language of set systems lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order` – a project-local

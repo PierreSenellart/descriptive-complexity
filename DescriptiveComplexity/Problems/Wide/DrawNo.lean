@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawYes
-import DescriptiveComplexity.Problems.Wide.DrawHalt
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawYes
+public import DescriptiveComplexity.Problems.Wide.DrawHalt
 
 /-!
 # A partial fixed point that fails makes the machine reject
@@ -24,6 +26,8 @@ What is left of soundness is the diverging case, where the machine has no
 halting configuration to reach at all and
 `DescriptiveComplexity.TMData.not_acceptsSpace_of_chain` takes over.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

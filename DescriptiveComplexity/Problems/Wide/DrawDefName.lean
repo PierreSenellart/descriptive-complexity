@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefTags
-import DescriptiveComplexity.Problems.Wide.DrawName
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefTags
+public import DescriptiveComplexity.Problems.Wide.DrawName
 
 /-!
 # The names a trip walks to are definable
@@ -24,6 +26,8 @@ a payload position, or the clear element, and *which* it holds is decided by
 coordinate is `DescriptiveComplexity.Draw.UReadable` as soon as the payload is,
 and every payload the program spells is a control slot or the clear element.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

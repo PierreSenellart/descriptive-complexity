@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.Tags
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Tags
 
 /-!
 # The transition table of the simulating machine
@@ -51,6 +53,8 @@ families between the unique letters `endL`/`mid`/`endR`/headers:
   frame's head block (sitting at the frame's right end, since the frame is
   mirrored), and discard the rest.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

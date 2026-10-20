@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltLadder
-import DescriptiveComplexity.Problems.Machine.Membership
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltLadder
+public import DescriptiveComplexity.Problems.Machine.Membership
 
 /-!
 # The ladder, written with the relations a second-order block guesses
@@ -36,6 +38,8 @@ exactly when an *applicable transition* does – the successor configuration can
 be assembled from the transition's own data – and that is a first-order
 condition on the transition table.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

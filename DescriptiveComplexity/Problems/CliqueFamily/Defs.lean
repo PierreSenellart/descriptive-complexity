@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Interpretation
-import DescriptiveComplexity.Numbers.Unary
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Interpretation
+public import DescriptiveComplexity.Numbers.Unary
 
 /-!
 # Clique, Independent Set and Vertex Cover: definitions
@@ -47,6 +49,8 @@ The three predicates are instances of generic properties `DescriptiveComplexity.
 generic form is shared by the isomorphism-invariance proofs and by the
 reductions of `DescriptiveComplexity.Problems.CliqueFamily.Reductions`.
 -/
+
+@[expose] public section
 
 /- The language of marked graphs lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order` – a project-local

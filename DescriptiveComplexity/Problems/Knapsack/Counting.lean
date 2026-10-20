@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Knapsack.Membership
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Problems.Knapsack.Membership
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #Knapsack: counting the solutions of a subset-sum instance
@@ -24,6 +26,8 @@ and carries are forced where the walk reads them
 certificates are then the solutions, bijectively
 (`DescriptiveComplexity.knapsackEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

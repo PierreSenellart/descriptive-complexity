@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.Counting
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Problems.Sat.TseitinUnique
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Sat.Counting
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Problems.Sat.TseitinUnique
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #SAT is parsimoniously `#P`-complete
@@ -32,6 +34,8 @@ assignments of the block. The interpretation `DescriptiveComplexity.sharpTseitin
 therefore adds one tautological clause `R(ā) ∨ ¬R(ā)` per block variable and
 tuple, which makes each of them occur without constraining anything.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Hamilton.Defs
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
-import DescriptiveComplexity.Relativized
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Hamilton.Defs
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+public import DescriptiveComplexity.Relativized
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The Vertex Cover → Hamilton Circuit gadget interpretation
@@ -41,6 +43,8 @@ marked set. This file only builds the interpretation and characterizes its
 adjacency; the two directions of correctness are in `Forward` and `Reverse`.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -64,27 +68,27 @@ section Formulas
 variable {α : Type}
 
 /-- Symmetric adjacency: an arc in either direction. -/
-private noncomputable def adjOrF (s t : α) : hamL.Formula α :=
+noncomputable def adjOrF (s t : α) : hamL.Formula α :=
   Relations.formula₂ hAdjSym (Term.var s) (Term.var t) ⊔
     Relations.formula₂ hAdjSym (Term.var t) (Term.var s)
 
 /-- The two variables name an (undirected) edge: adjacent in some direction,
 and distinct. -/
-private noncomputable def edgeF (s t : α) : hamL.Formula α :=
+noncomputable def edgeF (s t : α) : hamL.Formula α :=
   adjOrF s t ⊓ ∼(Term.equal (Term.var s) (Term.var t))
 
 /-- `b` is the least neighbor of `a`: it is `≤` every neighbor of `a`. -/
-private noncomputable def minNbrF (a b : α) : hamL.Formula α :=
+noncomputable def minNbrF (a b : α) : hamL.Formula α :=
   fo%[a, b] ∀ y, edgeF⟨a, y⟩ → leF⟨b, y⟩
 
 /-- `b` is the greatest neighbor of `a`. -/
-private noncomputable def maxNbrF (a b : α) : hamL.Formula α :=
+noncomputable def maxNbrF (a b : α) : hamL.Formula α :=
   fo%[a, b] ∀ y, edgeF⟨a, y⟩ → leF⟨y, b⟩
 
 /-- `c` is the immediate neighbor-successor of `b` in `a`'s neighbor list: `c`
 is a neighbor of `a`, `b < c`, and no neighbor of `a` lies strictly between
 `b` and `c`. -/
-private noncomputable def succNbrF (a b c : α) : hamL.Formula α :=
+noncomputable def succNbrF (a b c : α) : hamL.Formula α :=
   fo%[a, b, c] (edgeF⟨a, c⟩ ∧ ltF⟨b, c⟩) ∧
     ∀ y, edgeF⟨a, y⟩ → leF⟨y, b⟩ ∨ leF⟨c, y⟩
 
@@ -179,28 +183,28 @@ instance : Fintype HTag :=
 instance : Inhabited HTag := ⟨.sel⟩
 
 /-- Two tuples are equal, coordinatewise. -/
-private noncomputable def hEqTupF : hamL.Formula (Fin 2 × Fin 2) :=
+noncomputable def hEqTupF : hamL.Formula (Fin 2 × Fin 2) :=
   fo%⟨u, v⟩ u ≐ v ∧ u[1] ≐ v[1]
 
 /-- The second tuple is the first swapped. -/
-private noncomputable def hSwapTupF : hamL.Formula (Fin 2 × Fin 2) :=
+noncomputable def hSwapTupF : hamL.Formula (Fin 2 × Fin 2) :=
   fo%⟨u, v⟩ u ≐ v[1] ∧ u[1] ≐ v
 
 /-- The chain edge from an exit `⟨g5, (a, b)⟩` to the next entrance
 `⟨g0, (a, c)⟩`: same owner, and `c` the neighbor-successor of `b`. -/
-private noncomputable def hChain50F : hamL.Formula (Fin 2 × Fin 2) :=
+noncomputable def hChain50F : hamL.Formula (Fin 2 × Fin 2) :=
   fo%⟨u, v⟩ u ≐ v ∧ succNbrF⟨u, u[1], v[1]⟩
 
 /-- The chain edge the other way, from `⟨g0, (a, c)⟩` to `⟨g5, (a, b)⟩`. -/
-private noncomputable def hChain05F : hamL.Formula (Fin 2 × Fin 2) :=
+noncomputable def hChain05F : hamL.Formula (Fin 2 × Fin 2) :=
   fo%⟨u, v⟩ u ≐ v ∧ succNbrF⟨u, v[1], u[1]⟩
 
 /-- No vertex is marked. -/
-private noncomputable def noMarksF : hamL.Formula (Fin 2) :=
+noncomputable def noMarksF : hamL.Formula (Fin 2) :=
   fo% ∀ x, ¬ hMarkedSym(x)
 
 /-- No two vertices form an edge. -/
-private noncomputable def noEdgesF : hamL.Formula (Fin 2) :=
+noncomputable def noEdgesF : hamL.Formula (Fin 2) :=
   fo% ∀ y z, ¬ edgeF⟨y, z⟩
 
 /-- **The reduction of Vertex Cover into Hamilton Circuit**: the twelve-vertex

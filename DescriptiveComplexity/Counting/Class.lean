@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.SharpP
-import DescriptiveComplexity.Counting.Relativized
-import DescriptiveComplexity.Hierarchy
-import DescriptiveComplexity.FixedPointReductionClosure
+module
+
+public import DescriptiveComplexity.Counting.SharpP
+public import DescriptiveComplexity.Counting.Relativized
+public import DescriptiveComplexity.Hierarchy
+public import DescriptiveComplexity.FixedPointReductionClosure
 
 /-!
 # Counting classes, the class `#P`, and its relation to NP
@@ -55,6 +57,8 @@ count positive?”. Three statements tie `#P` to NP through it:
   parsimoniously `#P`-hard problem has
   its support in PTIME, then `NP ⊆ PTIME`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

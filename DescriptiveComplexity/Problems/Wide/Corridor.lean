@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingExp
-import DescriptiveComplexity.Problems.Tiling.CorridorMem
-import DescriptiveComplexity.Exponential.Classes
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingExp
+public import DescriptiveComplexity.Problems.Tiling.CorridorMem
+public import DescriptiveComplexity.Exponential.Classes
 
 /-!
 # The wide corridor: a strip as wide as the addresses
@@ -22,6 +24,8 @@ same `DescriptiveComplexity.wideTileData` as the square's, so the two problems
 differ only in the question asked, and the membership is again a composition:
 the corridor of the exponential expansion, `CORRIDOR` being in PSPACE.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

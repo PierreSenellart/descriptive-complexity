@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.ModelTheory.Complexity
+module
+
+public import Mathlib.ModelTheory.Complexity
 
 /-!
 # A sentence as an alternating prefix, played one variable at a time
@@ -40,6 +42,8 @@ grows, so the matrix never moves, no cast appears, and – this is the point –
 the resulting predicate is literally the transition system a machine runs:
 one phase index, one tuple, one coordinate written per step.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

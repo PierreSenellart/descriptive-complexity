@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxGate
-import DescriptiveComplexity.Problems.Wide.DrawInstIGate
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxGate
+public import DescriptiveComplexity.Problems.Wide.DrawInstIGate
 
 /-!
 # The inner gates at an arbitrary file
@@ -16,6 +18,8 @@ the level's polarity flag. The registers the trips go to are the gates' own
 (`DescriptiveComplexity.Draw.Data.ixGateTagCell`/`ixGateECell`), so only the
 families, the guards and the run are restated here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

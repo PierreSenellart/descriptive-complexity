@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Finset.Max
-import Mathlib.Order.Interval.Finset.Defs
+module
+
+public import Mathlib.Data.Finset.Max
+public import Mathlib.Order.Interval.Finset.Defs
 
 /-!
 # The cyclic successor on a finite set
@@ -17,6 +19,8 @@ itself injectively (`DescriptiveComplexity.cycNext_injOn`), and a subset of
 `S` (`DescriptiveComplexity.eq_empty_or_eq_of_cycNext_closed`), so that a
 cycle through `S` is used entirely or not at all.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

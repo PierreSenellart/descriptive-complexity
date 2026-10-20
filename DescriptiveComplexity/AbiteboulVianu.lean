@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointOrderTransfer
-import DescriptiveComplexity.FixedPointInflationaryLFP
-import DescriptiveComplexity.FixedPointPartialMachine
-import DescriptiveComplexity.FixedPointStratify
-import DescriptiveComplexity.Invariant.Backward
+module
+
+public import DescriptiveComplexity.FixedPointOrderTransfer
+public import DescriptiveComplexity.FixedPointInflationaryLFP
+public import DescriptiveComplexity.FixedPointPartialMachine
+public import DescriptiveComplexity.FixedPointStratify
+public import DescriptiveComplexity.Invariant.Backward
 
 /-!
 # The Abiteboul–Vianu theorem
@@ -50,6 +52,8 @@ single induction by stratification
 for the IFP-versus-PFP form, as in Abiteboul and Vianu's original;
 Gurevich–Shelah (order-free LFP = IFP) is deliberately not involved.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

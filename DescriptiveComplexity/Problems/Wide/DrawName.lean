@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawBack
-import DescriptiveComplexity.Problems.Wide.DrawGate
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawBack
+public import DescriptiveComplexity.Problems.Wide.DrawGate
 
 /-!
 # The cell of an encoded tuple: what one leaf read reads
@@ -41,6 +43,8 @@ the read stops at the register the layout names by the encoded tuple's
 coordinates, and `elt_reg_encCoord` says that register's address is the cell the
 elementwise read would have gone to.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

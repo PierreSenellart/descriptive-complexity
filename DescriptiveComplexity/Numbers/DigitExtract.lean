@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Data.Fintype.BigOperators
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Algebra.Group.Action.Defs
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import Mathlib.Data.Fintype.BigOperators
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Algebra.Group.Action.Defs
+public import Mathlib.Tactic.Ring
 
 /-!
 # Reading a count off a digit
@@ -23,6 +25,8 @@ count the solutions of one weight.
 Also here: a finite set with `k` elements has `2 ^ k` subsets, stated for
 predicates (`DescriptiveComplexity.card_subsets_eq_two_pow`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

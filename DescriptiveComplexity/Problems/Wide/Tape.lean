@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Marks
+module
+
+public import DescriptiveComplexity.Problems.Wide.Marks
 
 /-!
 # A program's tape is a function of the address
@@ -38,6 +40,8 @@ addresses is not decidable, and a program's tapes come from formulas anyway. A
 write is described by naming the new tape function and saying where it agrees
 with the old one, which is what `hagree` is in every statement below.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

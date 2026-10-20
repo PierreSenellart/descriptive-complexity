@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.FreeCopy
-import DescriptiveComplexity.Exponential.Classes
-import DescriptiveComplexity.FixedPointParam
-import DescriptiveComplexity.FixedPointStepRel
+module
+
+public import DescriptiveComplexity.Exponential.FreeCopy
+public import DescriptiveComplexity.Exponential.Classes
+public import DescriptiveComplexity.FixedPointParam
+public import DescriptiveComplexity.FixedPointStepRel
 
 /-!
 # The copy a point names, and EXPTIME without the order
@@ -34,6 +36,8 @@ Two steps, then:
 The conclusion is `DescriptiveComplexity.mem_EXPTIME_iff_solfpDefinableFree`:
 `EXPTIME` is SO(LFP) with no order in the statement, as `EXPSPACE` is SO(PFP).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

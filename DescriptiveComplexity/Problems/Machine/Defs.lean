@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Machines
-import DescriptiveComplexity.Interpretation
+module
+
+public import DescriptiveComplexity.Machines
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # Machine acceptance as a decision problem
@@ -50,6 +52,8 @@ it is reachable only through a transition, and a reduction controls which
 elements it marks accepting. Should a construction want them, adding a unary
 symbol is a local change to this file and to the well-formedness predicate.
 -/
+
+@[expose] public section
 
 /- The language of machine instances lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order`. -/

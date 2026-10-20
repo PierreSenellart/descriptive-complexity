@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CircuitNumber.Defs
-import DescriptiveComplexity.Problems.Cvp.Membership
-import DescriptiveComplexity.Counting.FP
-import DescriptiveComplexity.Syntax
+module
+
+public import DescriptiveComplexity.Problems.CircuitNumber.Defs
+public import DescriptiveComplexity.Problems.Cvp.Membership
+public import DescriptiveComplexity.Counting.FP
+public import DescriptiveComplexity.Syntax
 
 /-!
 # The number written by a circuit is in FP
@@ -27,6 +29,8 @@ import DescriptiveComplexity.Syntax
   ([Arenas, Muñoz, Riveros 2020][arenas2020descriptive], Theorem 4.4), a
   number being written digit by digit.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Tiling.Defs
-import DescriptiveComplexity.Problems.Tiling.Membership
-import DescriptiveComplexity.Problems.Tiling.CorridorMem
+module
+
+public import DescriptiveComplexity.Problems.Tiling.Defs
+public import DescriptiveComplexity.Problems.Tiling.Membership
+public import DescriptiveComplexity.Problems.Tiling.CorridorMem
 
 /-!
 # TILING and CORRIDOR, the umbrella
@@ -22,3 +24,5 @@ exponential expansion, the same definitions ask about a `2ⁿ × 2ⁿ` square an
 corridor of width `2ⁿ`, which are the classical second complete problems of
 NEXPTIME and of EXPSPACE beside a machine.
 -/
+
+@[expose] public section

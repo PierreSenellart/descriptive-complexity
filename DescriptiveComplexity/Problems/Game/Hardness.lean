@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Game.Membership
-import DescriptiveComplexity.Problems.HornSat
-import DescriptiveComplexity.Problems.HornSat.Unsat
-import DescriptiveComplexity.OccurrenceOrder
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Game.Membership
+public import DescriptiveComplexity.Problems.HornSat
+public import DescriptiveComplexity.Problems.HornSat.Unsat
+public import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # HORN-SAT to GAME: unit propagation is a game
@@ -48,6 +50,8 @@ instance that is not Horn. The interpretation therefore marks *every* node both
 every defining formula), which makes such an instance a yes-instance of GAME
 with no propagation at all.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.OneInSat.Counting
-import DescriptiveComplexity.Permanent.CycNext
-import DescriptiveComplexity.Permanent.Flat
-import DescriptiveComplexity.Permanent.Minor
+module
+
+public import DescriptiveComplexity.Problems.OneInSat.Counting
+public import DescriptiveComplexity.Permanent.CycNext
+public import DescriptiveComplexity.Permanent.Flat
+public import DescriptiveComplexity.Permanent.Minor
 
 /-!
 # The base graph of a #1-in-SAT instance
@@ -45,6 +47,8 @@ literal – and does not exist otherwise
 (`DescriptiveComplexity.SatCover.pdel_base`). The consistent choices are the
 exactly-one models (`DescriptiveComplexity.SatCover.consistentEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

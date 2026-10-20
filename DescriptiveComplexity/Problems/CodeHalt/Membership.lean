@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.CodeHalt.Cert
-import DescriptiveComplexity.RecursivelyEnumerable
-import DescriptiveComplexity.Problems.FinSat
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.CodeHalt.Cert
+public import DescriptiveComplexity.RecursivelyEnumerable
+public import DescriptiveComplexity.Problems.FinSat
 
 /-!
 # `CODEHALT` is in RE
@@ -34,6 +36,8 @@ The corollary the file exists for is
 `DescriptiveComplexity.finsat_not_computable`: Trakhtenbrot's theorem, now with
 nothing left to assume.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

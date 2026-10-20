@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderLift
-import DescriptiveComplexity.SecondOrderPull
-import DescriptiveComplexity.SecondOrderOrdered
-import DescriptiveComplexity.SecondOrderHornPull
-import DescriptiveComplexity.RelComposition
+module
+
+public import DescriptiveComplexity.SecondOrderLift
+public import DescriptiveComplexity.SecondOrderPull
+public import DescriptiveComplexity.SecondOrderOrdered
+public import DescriptiveComplexity.SecondOrderHornPull
+public import DescriptiveComplexity.RelComposition
 
 /-!
 # The polynomial hierarchy, defined by second-order alternation
@@ -66,6 +68,8 @@ The level inclusions above 0, the duality `Πₖᵖ = co-Σₖᵖ` and the class
 all proved (`DescriptiveComplexity.sigmaP_subset_sigmaP_succ`,
 `DescriptiveComplexity.mem_piP_iff`…).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Pcp.Hardness.Interp
-import DescriptiveComplexity.Problems.Machine.Halt
+module
+
+public import DescriptiveComplexity.Problems.Pcp.Hardness.Interp
+public import DescriptiveComplexity.Problems.Machine.Halt
 
 /-!
 # The halting problem reduces to Post's correspondence problem
@@ -34,6 +36,8 @@ With `DescriptiveComplexity.pcp_mem_RE` this makes PCP RE-complete as soon as
 `HALT` is RE-hard, which is `DescriptiveComplexity.halt_RE_hard`
 (`DescriptiveComplexity.Problems.Machine.HaltHard`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.Tseitin
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.Problems.Sat.Tseitin
+public import DescriptiveComplexity.Ordered
 
 /-!
 # The Tseitin encoding of a first-order kernel: defining formulas
@@ -25,6 +27,8 @@ interpretation (`Fin 1 × Fin D`, `Fin 2 × Fin D`). The order is used in a
 single place: the formula `DescriptiveComplexity.botF` expressing that a
 coordinate is a minimum, which pins down the canonical padding of tuples.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

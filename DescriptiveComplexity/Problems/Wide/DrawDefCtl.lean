@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefLoop
-import DescriptiveComplexity.Problems.Wide.DrawAccCtl
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefLoop
+public import DescriptiveComplexity.Problems.Wide.DrawAccCtl
 
 /-!
 # The control's reads and writes are definable
@@ -20,6 +22,8 @@ Reading is the same statement one step simpler:
 `DescriptiveComplexity.Draw.Data.readVec` is an existential over the levels of
 a slot family, and `ctlBit` is a single atom.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

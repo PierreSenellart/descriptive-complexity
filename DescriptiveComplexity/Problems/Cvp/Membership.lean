@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Cvp.Defs
-import DescriptiveComplexity.FixedPointHorn
+module
+
+public import DescriptiveComplexity.Problems.Cvp.Defs
+public import DescriptiveComplexity.FixedPointHorn
 
 /-!
 # CVP is in polynomial time
@@ -30,6 +32,8 @@ prefixpoint, so it contains the least one
 (`DescriptiveComplexity.Cvp.gateVal_of_derives`, by
 `DescriptiveComplexity.lfpAssign_least_of_closed`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

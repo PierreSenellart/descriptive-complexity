@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesUnbounded
-import DescriptiveComplexity.Problems.Pcp.Hardness.History
+module
+
+public import DescriptiveComplexity.MachinesUnbounded
+public import DescriptiveComplexity.Problems.Pcp.Hardness.History
 
 /-!
 # Configurations as words: the rewriting system of a machine
@@ -55,6 +57,8 @@ No letter of a configuration word is a boot or halting letter, so the boot
 rule fires only on the start word and the erasers only after an accepting
 state was seen: the phases of a derivation cannot mix.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawAtoms
-import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
-import DescriptiveComplexity.Problems.Wide.DrawSlots
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawAtoms
+public import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
+public import DescriptiveComplexity.Problems.Wide.DrawSlots
 
 /-!
 # The data of the EXPSPACE reduction, bundled
@@ -25,6 +27,8 @@ this data (one call site per variable, per atom, per argument position), so
 every site file takes one `Draw.Data` and nothing else, and the dimensions are
 *defined* as the exact maxima rather than constrained by inequalities.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

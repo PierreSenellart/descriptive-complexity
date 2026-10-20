@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosurePull
-import DescriptiveComplexity.ImmermanSzelepcsenyi
+module
+
+public import DescriptiveComplexity.TransitiveClosurePull
+public import DescriptiveComplexity.ImmermanSzelepcsenyi
 
 /-!
 # LOGSPACE, by deterministic transitive closure
@@ -55,6 +57,8 @@ class to a machine model. `L ≠ NL` and `L = NL` are both consistent with
 everything proved here, and the containment `FO(DTC) ⊆ L` on the machine side –
 the half of Immerman's theorem this definition replaces – is not formalized.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

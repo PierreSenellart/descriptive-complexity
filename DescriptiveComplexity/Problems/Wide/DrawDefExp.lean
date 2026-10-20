@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefGate
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefGate
 
 /-!
 # An expansion atom's pack
@@ -18,6 +20,8 @@ the leaf from the control, and the three shapes of a fold.
 With them, `DescriptiveComplexity.Draw.UTagArgsDef` of
 `DescriptiveComplexity.Draw.Data.expArgs` is a field-by-field check.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

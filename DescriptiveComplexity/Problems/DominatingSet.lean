@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.DominatingSet.Defs
-import DescriptiveComplexity.Problems.DominatingSet.Membership
-import DescriptiveComplexity.Problems.DominatingSet.Reduction
-import DescriptiveComplexity.Problems.SetFamily
+module
+
+public import DescriptiveComplexity.Problems.DominatingSet.Defs
+public import DescriptiveComplexity.Problems.DominatingSet.Membership
+public import DescriptiveComplexity.Problems.DominatingSet.Reduction
+public import DescriptiveComplexity.Problems.SetFamily
 
 /-!
 # Dominating Set is NP-complete
@@ -26,6 +28,8 @@ degenerate cases (an element in no set, and no element at all) look at first
 sight as if they needed a canonical extra vertex – i.e., an order. They do not:
 both are first-order conditions, so gating on them is enough.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

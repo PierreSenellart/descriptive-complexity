@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
-import DescriptiveComplexity.Problems.Wide.DrawVerdict
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
+public import DescriptiveComplexity.Problems.Wide.DrawVerdict
 
 /-!
 # One variable's verdict at an arbitrary file
@@ -13,6 +15,8 @@ import DescriptiveComplexity.Problems.Wide.DrawVerdict
 machinery's exit bit as the alternating prefix over the leaf, and its
 specialization at a fixed-point variable and at the output.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

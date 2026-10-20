@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltSweep
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltSweep
 
 /-!
 # The intended run: the check phase
@@ -27,6 +29,8 @@ A sweep alternates direction with each clause, as in
 from the first cell, having been entered by
 `DescriptiveComplexity.AltQbf.step_toChk`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

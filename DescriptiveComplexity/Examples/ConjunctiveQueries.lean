@@ -3,12 +3,22 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Tactic.FinCases
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Encoding
-import DescriptiveComplexity.Decoding
-import DescriptiveComplexity.Problems.ThreeColorability
+module
+
+public import Mathlib.Tactic.FinCases
+meta import Mathlib.Tactic.FinCases
+public import DescriptiveComplexity.Block
+meta import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+meta import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Encoding
+meta import DescriptiveComplexity.Encoding
+public import DescriptiveComplexity.Decoding
+meta import DescriptiveComplexity.Decoding
+public import DescriptiveComplexity.Problems.ThreeColorability
+meta import DescriptiveComplexity.Problems.ThreeColorability
+public import Mathlib.Data.Finset.Sort
+meta import Mathlib.Data.Finset.Sort
 
 /-!
 # Worked example: Boolean conjunctive queries – evaluation and containment
@@ -88,6 +98,8 @@ Main results:
 * **`DescriptiveComplexity.cqEval_NP_complete`** and
   **`DescriptiveComplexity.cqContainment_NP_complete`**.
 -/
+
+@[expose] public section
 
 /-!
 ### Step 1: the concrete problem, in the user's own formalism
@@ -470,7 +482,7 @@ def queryDbStructure (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
 /-- The concrete assignment read off a structural valuation: the constant
 the valuation sends a variable to (or a default for the junk case of a
 variable mapped to a variable, possible only for variables in no atom). -/
-private noncomputable def concreteVal [Nonempty C] (h : V ⊕ C → V ⊕ C) (x : V) : C :=
+noncomputable def concreteVal [Nonempty C] (h : V ⊕ C → V ⊕ C) (x : V) : C :=
   match h (Sum.inl x) with
   | Sum.inr c => c
   | Sum.inl _ => Classical.arbitrary C
@@ -903,7 +915,7 @@ variable {A : Type} [Language.queryDb.Structure A]
 
 /-- Lean-level counterpart of `cqImgFormula` under an assignment `ρ` of the
 relation variable. -/
-private def PossibleImage (ρ : cqHomBlock.Assignment A) (x u : A) : Prop :=
+def PossibleImage (ρ : cqHomBlock.Assignment A) (x u : A) : Prop :=
   (QVar x ∧ ρ .hom ![x, u]) ∨ (¬QVar x ∧ x = u)
 
 /-- Realization of the kernel under an assignment of the guessed-valuation
@@ -1371,27 +1383,27 @@ instance : Fintype PairTag :=
   ⟨{.query, .db}, fun t => by cases t <;> simp⟩
 
 /-- Formula builder: `x` is a variable of the left query. -/
-private def lvarF {α : Type} (x : α) : Language.queryPair.Formula α :=
+def lvarF {α : Type} (x : α) : Language.queryPair.Formula α :=
   fo%[x] qpLeftVar(x)
 
 /-- Formula builder: `x` is a variable of the right query. -/
-private def rvarF {α : Type} (x : α) : Language.queryPair.Formula α :=
+def rvarF {α : Type} (x : α) : Language.queryPair.Formula α :=
   fo%[x] qpRightVar(x)
 
 /-- Formula builder: `x` is a variable of either query. -/
-private def pairVarF {α : Type} (x : α) : Language.queryPair.Formula α :=
+def pairVarF {α : Type} (x : α) : Language.queryPair.Formula α :=
   fo%[x] lvarF⟨x⟩ ∨ rvarF⟨x⟩
 
 /-- Formula builder: `x` is a shared constant. -/
-private def constF {α : Type} (x : α) : Language.queryPair.Formula α :=
+def constF {α : Type} (x : α) : Language.queryPair.Formula α :=
   fo%[x] ¬ lvarF⟨x⟩ ∧ ¬ rvarF⟨x⟩
 
 /-- Formula builder: `E(x, y)` is an atom of the left query. -/
-private def latomF {α : Type} (x y : α) : Language.queryPair.Formula α :=
+def latomF {α : Type} (x y : α) : Language.queryPair.Formula α :=
   fo%[x, y] qpLeftAtom(x, y)
 
 /-- Formula builder: `E(x, y)` is an atom of the right query. -/
-private def ratomF {α : Type} (x y : α) : Language.queryPair.Formula α :=
+def ratomF {α : Type} (x y : α) : Language.queryPair.Formula α :=
   fo%[x, y] qpRightAtom(x, y)
 
 /-- Defining formula for `isVar`: on the query side, the variables of either
@@ -1467,7 +1479,7 @@ database-side copy of its `h`-image, fix everything else. (A top-level
 definition rather than a `fun` inside the proof, so that its defining
 equations are available to `simp` – a trick worth remembering whenever a
 witness is defined by cases.) -/
-private noncomputable def routedVal {A : Type} [Language.queryPair.Structure A]
+noncomputable def routedVal {A : Type} [Language.queryPair.Structure A]
     (h : A → A) : containmentToEval.Map A → containmentToEval.Map A
   | (.query, w) => if PairVar (w 0) then (.db, fun _ => h (w 0)) else (.query, w)
   | (.db, w) => (.db, w)

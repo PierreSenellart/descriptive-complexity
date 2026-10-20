@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.Membership
-import DescriptiveComplexity.Counting.Sized
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.Membership
+public import DescriptiveComplexity.Counting.Sized
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #Clique: counting the cliques of the threshold size
@@ -24,6 +26,8 @@ is unique on a finite linear order. That argument is generic
 (`DescriptiveComplexity.sharpPDefinable_of_sized_set`), and what this file supplies is
 the order-free part: a set is a clique (`DescriptiveComplexity.cliqueSelKernel`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

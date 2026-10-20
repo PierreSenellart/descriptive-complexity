@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.FinSat.Kernel
-import DescriptiveComplexity.Problems.FinSat.Defs
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.Problems.FinSat.Kernel
+public import DescriptiveComplexity.Problems.FinSat.Defs
+public import DescriptiveComplexity.Ordered
 
 /-!
 # The sentence a reduction into FINSAT produces
@@ -62,6 +64,8 @@ is junk – an element of the encoded sentence that no node binds and no literal
 reads. `le` carries no such guard, since it has to be a linear order on the
 whole universe.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSub
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSub
 
 /-!
 # The two ends of a program's run, at the pass-layer presentation
@@ -26,6 +28,8 @@ delivers – for the latter, together with the separation argument
 (`DescriptiveComplexity.Draw.Prog.sep_of`), the two promises of
 `DescriptiveComplexity.DWideAcceptSpace`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

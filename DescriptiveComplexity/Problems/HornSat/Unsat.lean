@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Order.Lattice.Nat
-import Mathlib.Data.Fintype.Card
-import Mathlib.Data.Fintype.Lattice
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.HornSat.Membership
-import Mathlib.Data.Set.Card
+module
+
+public import Mathlib.Order.Lattice.Nat
+public import Mathlib.Data.Fintype.Card
+public import Mathlib.Data.Fintype.Lattice
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.HornSat.Membership
+public import Mathlib.Data.Set.Card
 
 /-!
 # Horn *un*satisfiability has a short certificate
@@ -54,6 +56,8 @@ every clause whose negative literals are all forced had a positive literal –
 then `Forced` would itself be a model, so the formula would be satisfiable
 (`DescriptiveComplexity.exists_goalClause`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

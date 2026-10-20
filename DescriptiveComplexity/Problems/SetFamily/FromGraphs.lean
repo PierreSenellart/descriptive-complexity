@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.SetFamily.Defs
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.SetFamily.Defs
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
 # Hardness of the set family: graphs as incidence systems
@@ -44,6 +46,8 @@ destructuring an element of the interpreted universe inside a set-builder
 membership goal produces exactly such a statement. Keeping every hypothesis in
 the shape `∀ p, Q p → ∃ v, p = diagPt v` avoids the issue outright.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

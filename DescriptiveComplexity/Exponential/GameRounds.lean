@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameMove
-import DescriptiveComplexity.Exponential.Translate
+module
+
+public import DescriptiveComplexity.Exponential.GameMove
+public import DescriptiveComplexity.Exponential.Translate
 
 /-!
 # Moving whole rounds
@@ -30,6 +32,8 @@ of `DescriptiveComplexity.Exponential.GameMove`.
 
 Nothing here mentions an expansion: a round is any block, replicated.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

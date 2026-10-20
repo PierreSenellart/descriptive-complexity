@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSweep
-import DescriptiveComplexity.Problems.Wide.DrawBack
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSweep
+public import DescriptiveComplexity.Problems.Wide.DrawBack
 
 /-!
 # A program builds its own register file, and guesses its certificate
@@ -63,6 +65,8 @@ changes, everything else rides along
 **parameter** – which is what makes the statement a guess, since the run exists
 for every certificate. It is the only nondeterminism the clocked program has.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

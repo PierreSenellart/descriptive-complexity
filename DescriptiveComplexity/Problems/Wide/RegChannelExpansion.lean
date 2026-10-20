@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannel
-import DescriptiveComplexity.Problems.Wide.Membership
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannel
+public import DescriptiveComplexity.Problems.Wide.Membership
 
 /-!
 # The register channel, as an expansion
@@ -24,6 +26,8 @@ itself first-order (`hasInpG`), so the expansion stays what it was, and the two
 expansions have the same tags, the same block and the same domain, hence the
 same universe.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

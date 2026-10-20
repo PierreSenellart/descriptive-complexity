@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.ParamFormula
-import DescriptiveComplexity.Exponential.Block
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.ParamFormula
+public import DescriptiveComplexity.Exponential.Block
+public import DescriptiveComplexity.Ordered
 
 /-!
 # Reading an expansion's defining sentences through the meanings
@@ -43,6 +45,8 @@ the assembly that puts the order, the meanings, the tag bits and a guessed
 certificate into one block chooses where each of them sits, and nothing here
 needs to know.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

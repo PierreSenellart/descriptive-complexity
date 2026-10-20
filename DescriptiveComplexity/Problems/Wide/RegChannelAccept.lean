@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelEntry
-import DescriptiveComplexity.Problems.Wide.RegChannelEval
-import DescriptiveComplexity.Problems.Wide.RegChannelJoin
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
+public import DescriptiveComplexity.Problems.Wide.RegChannelEval
+public import DescriptiveComplexity.Problems.Wide.RegChannelJoin
 
 /-!
 # The evaluation with its verdict read, and the two exits
@@ -21,6 +23,8 @@ The two exits of the walks home come with it (`exitG_at_marker`): they are facts
 about where the marker is, and nothing about what the machine has written, so
 both directions of the correctness supply them the same way.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

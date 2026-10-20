@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSpec
-import DescriptiveComplexity.Problems.Wide.DrawMatrix
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSpec
+public import DescriptiveComplexity.Problems.Wide.DrawMatrix
 
 /-!
 # The atoms of a step matrix, classified
@@ -30,6 +32,8 @@ holds at a valuation of the prefix exactly as its kind says, the stage atoms
 reading the assignment, the order atoms the chosen order on points, the
 expansion atoms the expanded structure.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

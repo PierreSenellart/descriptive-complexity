@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureDecideReachDet
+module
+
+public import DescriptiveComplexity.TransitiveClosureDecideReachDet
 
 /-!
 # Flattening a walk whose steps are decided: the suspension
@@ -40,6 +42,8 @@ dependent sum over the pairs of modes; `DescriptiveComplexity.CoordWalk.toParam`
 enumerates them for the `DescriptiveComplexity.ParamTCSpec` the rest of the
 development consumes.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.NaeSat
-import DescriptiveComplexity.Problems.ThreeSat.ToSat
-import DescriptiveComplexity.Problems.ThreeSat.FromSat
+module
+
+public import DescriptiveComplexity.Problems.NaeSat
+public import DescriptiveComplexity.Problems.ThreeSat.ToSat
+public import DescriptiveComplexity.Problems.ThreeSat.FromSat
 
 /-!
 # NAE-3SAT is NP-complete
@@ -56,6 +58,8 @@ applies to it – and, by the flip symmetry of not-all-equal satisfaction
 (`DescriptiveComplexity.NAEProper.not`), also to its negation, which is what yields the
 false literal.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

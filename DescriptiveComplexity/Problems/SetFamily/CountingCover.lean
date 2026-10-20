@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SetFamily.CountingPacking
-import DescriptiveComplexity.Problems.SetFamily.Reductions
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.SetFamily.CountingPacking
+public import DescriptiveComplexity.Problems.SetFamily.Reductions
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Set Cover and #Hitting Set
@@ -37,6 +39,8 @@ size” (`DescriptiveComplexity.sharpSetCover_support_iff`), which implies Set C
 (`DescriptiveComplexity.setCover_of_sharpSetCover_support`) and is not implied by it.
 This is unlike #Vertex Cover, where the family is the whole universe.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

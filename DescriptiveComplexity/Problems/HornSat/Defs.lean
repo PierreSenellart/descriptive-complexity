@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat
+module
+
+public import DescriptiveComplexity.Problems.Sat
 
 /-!
 # HORN-SAT: definition
@@ -27,6 +29,8 @@ canonical complete problem for polynomial time. The corresponding hardness
 statement, machine-free and one level below the Cook–Levin discharge, is in
 `DescriptiveComplexity.Problems.HornSat.Hardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

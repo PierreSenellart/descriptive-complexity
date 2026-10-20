@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Machine.QsatRun
-import DescriptiveComplexity.Problems.Machine.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Machine.QsatRun
+public import DescriptiveComplexity.Problems.Machine.Defs
 
 /-!
 # The transcription: `QSAT ≤ᶠᵒ[≤] DTMAcceptSpace`
@@ -28,6 +30,8 @@ one realization lemma, and every defining formula then matches on its *first*
 tag alone. Comparisons of tags – which are static data – are decided in Lean
 rather than in the formula, so `⊤` and `⊥` do most of the work.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

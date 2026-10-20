@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.ModelTheory.Graph
-import Mathlib.Combinatorics.SimpleGraph.Coloring.Vertex
-import DescriptiveComplexity.Interpretation
+module
+
+public import Mathlib.ModelTheory.Graph
+public import Mathlib.Combinatorics.SimpleGraph.Coloring.Vertex
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # 3-colorability: definition
@@ -19,6 +21,8 @@ from Mathlib's `SimpleGraph` this agrees with `SimpleGraph.Colorable`
 The reductions to and from SAT, and NP-completeness, are in
 `DescriptiveComplexity.Problems.ThreeColorability`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CircuitNumber.Draw
-import DescriptiveComplexity.Counting.DigitDefinable
+module
+
+public import DescriptiveComplexity.Problems.CircuitNumber.Draw
+public import DescriptiveComplexity.Counting.DigitDefinable
 
 /-!
 # Every digit-definable function reduces to the number written by a circuit
@@ -31,6 +33,8 @@ circuit being the one drawn from the rules
   (`DescriptiveComplexity.CircNum.below_bitPt`), and the number is read off
   the positions (`DescriptiveComplexity.finsum_digits_eq`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

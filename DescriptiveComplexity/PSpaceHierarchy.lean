@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.PSpaceCompl
-import DescriptiveComplexity.SecondOrderMerge
-import DescriptiveComplexity.Problems.HornSat
+module
+
+public import DescriptiveComplexity.PSpaceCompl
+public import DescriptiveComplexity.SecondOrderMerge
+public import DescriptiveComplexity.Problems.HornSat
 
 /-!
 # `PH ⊆ PSPACE`
@@ -39,6 +41,8 @@ The prefix is then peeled one block at a time
 first-order sentence is a walk with a trivial block and no step. Level `0` of the
 hierarchy is not second-order at all and goes through `PTIME ⊆ NP ⊆ PSPACE`.
 -/
+
+@[expose] public section
 namespace DescriptiveComplexity
 
 open FirstOrder Language

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitLogic
+module
+
+public import DescriptiveComplexity.LogTime.BitLogic
 
 /-!
 # The upper fence: a machine's acceptance is a sentence of the bit-level logic
@@ -62,6 +64,8 @@ definability of `i ↦ 2 ^ i`. Both are unconditional, and the statement of reco
 here is the first, `DescriptiveComplexity.LTDecidable.bitDefinable`: it is the
 classical logic for AC⁰, and it is what the converse direction reads.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

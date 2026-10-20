@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Turing machines over a universe, without a vocabulary
@@ -54,6 +56,8 @@ correspond along an equivalence, fieldwise; `DescriptiveComplexity.TMData.Agree.
 transports acceptance along it. This is all the isomorphism-invariance proof of
 the decision problems needs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

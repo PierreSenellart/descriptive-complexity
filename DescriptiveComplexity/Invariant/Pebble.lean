@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Iterate
-import Mathlib.Data.Fintype.Pi
+module
+
+public import DescriptiveComplexity.Iterate
+public import Mathlib.Data.Fintype.Pi
 
 /-!
 # The `k`-pebble refinement, over an abstract initial relation
@@ -47,6 +49,8 @@ invariance results for the fixed-point logics, not here. The same skeleton
 with rounds in place of pebbles is the Ehrenfeucht–Fraïssé refinement, a
 second consumer this file is stated to serve.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

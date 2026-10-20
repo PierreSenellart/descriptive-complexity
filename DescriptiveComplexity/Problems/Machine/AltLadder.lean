@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltRound
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltRound
 
 /-!
 # The round game as an implication ladder
@@ -31,6 +33,8 @@ That is first-order – it is `∃ q, Start q`, the rest being supplied by
 `DescriptiveComplexity.TMData.exists_isInit` – and it is carried into the
 sentence as a plain conjunct rather than as a quantifier.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameProgram
-import DescriptiveComplexity.Exponential.GameTape
+module
+
+public import DescriptiveComplexity.Exponential.GameProgram
+public import DescriptiveComplexity.Exponential.GameTape
 
 /-!
 # The control of a machine playing a second-order game
@@ -88,6 +90,8 @@ come from the product, the tag order of
 numbering of constructors has to be maintained. Unreachable field combinations
 are harmless – no transition mentions them.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

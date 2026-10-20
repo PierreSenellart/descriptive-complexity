@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureReductionClosure
+module
+
+public import DescriptiveComplexity.TransitiveClosureReductionClosure
 
 /-!
 # Transitivity of FO(TC) and FO(DTC) reductions
@@ -47,6 +49,8 @@ lose nothing by it. The pullback of a determinized walk is functional
 (`DescriptiveComplexity.ParamTCSpec.comapRel_functional`), which is what the
 searching simulation needs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

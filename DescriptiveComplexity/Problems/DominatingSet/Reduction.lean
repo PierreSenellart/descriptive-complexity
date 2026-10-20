@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.DominatingSet.Defs
-import DescriptiveComplexity.Problems.SetFamily
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.DominatingSet.Defs
+public import DescriptiveComplexity.Problems.SetFamily
 
 /-!
 # Set Cover FO-reduces to Dominating Set
@@ -32,6 +34,8 @@ the junk is made adjacent to all set-vertices. Junk cannot be ignored here:
 domination constrains *every* element of the universe, unlike the covering and
 packing conditions of the set family.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

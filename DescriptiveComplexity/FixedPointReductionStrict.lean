@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointReductionClosure
-import DescriptiveComplexity.Problems.Even
-import DescriptiveComplexity.Problems.Parity
+module
+
+public import DescriptiveComplexity.FixedPointReductionClosure
+public import DescriptiveComplexity.Problems.Even
+public import DescriptiveComplexity.Problems.Parity
 
 /-!
 # FO(LFP) reductions are strictly stronger than first-order ones
@@ -42,6 +44,8 @@ Two things to read off this.
   library's own hardness results stay stated with `≤ᶠᵒ[≤]`, where no such
   collapse happens.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

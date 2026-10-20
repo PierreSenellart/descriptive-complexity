@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Machine
-import DescriptiveComplexity.LogTime.Pow
+module
+
+public import DescriptiveComplexity.LogTime.Machine
+public import DescriptiveComplexity.LogTime.Pow
 
 /-!
 # The bit-level logic, and definability in it
@@ -55,6 +57,8 @@ the statement no hypothesis. The converse direction, that a machine's acceptance
 is a sentence of *this* logic rather than of the arithmetic one, is
 `DescriptiveComplexity.LogTime.Simulate`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

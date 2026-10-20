@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawEval
 
 /-!
 # The chain combinator: checkpoints around abstract stages
@@ -33,6 +35,8 @@ built once:
 A machinery block is then a stage family (its kits, with their `sep` and
 `exit_disjoint`) plus a descriptor list, and nothing else.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

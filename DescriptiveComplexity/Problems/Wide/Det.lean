@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Wide.WellFormed
-import DescriptiveComplexity.Problems.Machine.Space
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Wide.WellFormed
+public import DescriptiveComplexity.Problems.Machine.Space
 
 /-!
 # Determinism is a promise a reduction can enforce: `DWideAcceptSpace ≤ᶠᵒ WideAcceptSpace`
@@ -34,6 +36,8 @@ no-instances.
 Nothing here needs an order, so this is a plain `≤ᶠᵒ` reduction; the ordered
 and relativized readings follow.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

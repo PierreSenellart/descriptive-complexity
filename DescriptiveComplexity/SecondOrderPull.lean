@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Composition
-import DescriptiveComplexity.SecondOrder
-import Mathlib.Basic.Finite.Sigma
+module
+
+public import DescriptiveComplexity.Composition
+public import DescriptiveComplexity.SecondOrder
+public import Mathlib.Basic.Finite.Sigma
 
 /-!
 # Pulling second-order definability back through an interpretation
@@ -38,6 +40,8 @@ satisfaction in the interpreted structure coincides with alternating
 second-order satisfaction of the pulled sentence (over the pulled blocks) in
 the base structure.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

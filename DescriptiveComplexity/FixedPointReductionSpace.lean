@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointStratifyPartial
-import DescriptiveComplexity.FixedPointPartialMachine
-import DescriptiveComplexity.FixedPointReductionHierarchy
+module
+
+public import DescriptiveComplexity.FixedPointStratifyPartial
+public import DescriptiveComplexity.FixedPointPartialMachine
+public import DescriptiveComplexity.FixedPointReductionHierarchy
 
 /-!
 # PSPACE is closed under FO(LFP) reductions
@@ -41,6 +43,8 @@ partial iteration cannot do is *gate itself*, and it does not have to – the
 gate is an arity-`0` variable of the state, set by the inflationary stratum,
 and the partial stratum is merely conjoined with it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

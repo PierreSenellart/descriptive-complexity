@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexOuter
-import DescriptiveComplexity.Problems.Wide.NexSpec
+module
+
+public import DescriptiveComplexity.Problems.Wide.NexOuter
+public import DescriptiveComplexity.Problems.Wide.NexSpec
 
 /-!
 # What a rule may not write
@@ -23,6 +25,8 @@ write can take: no write at all, an update of a slot that is not one of those,
 and the guess's own write. With them the outer layer's rules keep the file, which
 is what an opening's reading needs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.List.Forall2
-import DescriptiveComplexity.Interpretation
+module
+
+public import Mathlib.Data.List.Forall2
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # PCP: Post's correspondence problem
@@ -65,6 +67,8 @@ and Post's problem undecidable (`DescriptiveComplexity.pcp_RE_complete`,
 `DescriptiveComplexity.pcp_not_computable`, in
 `DescriptiveComplexity.Computability.PcpComplete`).
 -/
+
+@[expose] public section
 
 /- The language of encoded domino lists lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.sat` and

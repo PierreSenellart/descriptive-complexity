@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameKernel
-import DescriptiveComplexity.Exponential.GameNode
+module
+
+public import DescriptiveComplexity.Exponential.GameKernel
+public import DescriptiveComplexity.Exponential.GameNode
 
 /-!
 # The six questions an interpreted AND/OR graph asks, and their kernels
@@ -47,6 +49,8 @@ fills round `n - j` is the same for all six
 at the top is what keeps every kernel a sentence over *one* block: no morphism
 between merged blocks of different lengths is ever needed.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

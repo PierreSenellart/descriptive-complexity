@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Machine.AltDefs
-import DescriptiveComplexity.Problems.Machine
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Machine.AltDefs
+public import DescriptiveComplexity.Problems.Machine
 
 /-!
 # The alternating bridge at one block: `ATMAccept 1 true` is NP-complete
@@ -37,6 +39,8 @@ specific to one block except the two `k = 1` facts of
 `DescriptiveComplexity.Problems.Machine.AltDefs`; the general bridge replaces
 them by the collapse lemmas of `DescriptiveComplexity.MachinesAltPlay`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

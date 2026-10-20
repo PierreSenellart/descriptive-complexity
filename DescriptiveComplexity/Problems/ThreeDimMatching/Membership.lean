@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # 3-dimensional matching is existential second-order definable
@@ -19,6 +21,8 @@ catalog – and the kernel spells out the seven conditions of
 inside the three classes, that every marked element is covered, and that no
 two triples share a coordinate.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -35,41 +39,41 @@ fo_block tdmGuessBlock over Language.tripleSys ts into tdmSOLang with t where
   matching : 3
 
 /-- The guessed matching, as an atom. -/
-private def matF {α : Type} (x y z : α) : tdmSOLang.Formula α :=
+def matF {α : Type} (x y z : α) : tdmSOLang.Formula α :=
   fo%[x, y, z] tMatchingSym(x, y, z)
 
 /-- The available triples, as an atom. -/
-private def tripF {α : Type} (x y z : α) : tdmSOLang.Formula α :=
+def tripF {α : Type} (x y z : α) : tdmSOLang.Formula α :=
   fo%[x, y, z] tTripSym(x, y, z)
 
 /-- Kernel conjunct: the guessed triples are available ones, inside the three
 classes. -/
-private noncomputable def tdmSubClause : tdmSOLang.Sentence :=
+noncomputable def tdmSubClause : tdmSOLang.Sentence :=
   fo% ∀ x y z,
     matF⟨x, y, z⟩ → ((tripF⟨x, y, z⟩ ∧ tXElSym(x)) ∧ tYElSym(y)) ∧ tZElSym(z)
 
 /-- Kernel conjunct: every element of the first class is covered. -/
-private noncomputable def tdmCovXClause : tdmSOLang.Sentence :=
+noncomputable def tdmCovXClause : tdmSOLang.Sentence :=
   fo% ∀ x, tXElSym(x) → ∃ y z, matF⟨x, y, z⟩
 
 /-- Kernel conjunct: every element of the second class is covered. -/
-private noncomputable def tdmCovYClause : tdmSOLang.Sentence :=
+noncomputable def tdmCovYClause : tdmSOLang.Sentence :=
   fo% ∀ y, tYElSym(y) → ∃ x z, matF⟨x, y, z⟩
 
 /-- Kernel conjunct: every element of the third class is covered. -/
-private noncomputable def tdmCovZClause : tdmSOLang.Sentence :=
+noncomputable def tdmCovZClause : tdmSOLang.Sentence :=
   fo% ∀ z, tZElSym(z) → ∃ x y, matF⟨x, y, z⟩
 
 /-- Kernel conjunct: two triples sharing their first coordinate coincide. -/
-private noncomputable def tdmUniqXClause : tdmSOLang.Sentence :=
+noncomputable def tdmUniqXClause : tdmSOLang.Sentence :=
   fo% ∀ x y z y' z', matF⟨x, y, z⟩ ∧ matF⟨x, y', z'⟩ → y ≐ y' ∧ z ≐ z'
 
 /-- Kernel conjunct: two triples sharing their second coordinate coincide. -/
-private noncomputable def tdmUniqYClause : tdmSOLang.Sentence :=
+noncomputable def tdmUniqYClause : tdmSOLang.Sentence :=
   fo% ∀ x y z x' z', matF⟨x, y, z⟩ ∧ matF⟨x', y, z'⟩ → x ≐ x' ∧ z ≐ z'
 
 /-- Kernel conjunct: two triples sharing their third coordinate coincide. -/
-private noncomputable def tdmUniqZClause : tdmSOLang.Sentence :=
+noncomputable def tdmUniqZClause : tdmSOLang.Sentence :=
   fo% ∀ x y z x' y', matF⟨x, y, z⟩ ∧ matF⟨x', y', z⟩ → x ≐ x' ∧ y ≐ y'
 
 /-- The first-order kernel of the `Σ₁` definition: the guessed relation is a

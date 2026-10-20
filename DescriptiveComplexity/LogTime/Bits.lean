@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Nat.Bitwise
-import Mathlib.Data.Nat.Log
-import Mathlib.Data.Nat.Prime.Basic
-import Mathlib.Data.Fintype.Lattice
-import DescriptiveComplexity.LogTime.Definable
+module
+
+public import Mathlib.Data.Nat.Bitwise
+public import Mathlib.Data.Nat.Log
+public import Mathlib.Data.Nat.Prime.Basic
+public import Mathlib.Data.Fintype.Lattice
+public import DescriptiveComplexity.LogTime.Definable
 
 /-!
 # The bit layer of a finite ordered universe
@@ -63,6 +65,8 @@ That one-position gap is what forces the sweep simulation of
 `DescriptiveComplexity.LogTime` to carry the state of its last step separately,
 and it is the only place the arithmetic of the layer is not uniform.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

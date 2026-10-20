@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Numbers.BinRel
-import DescriptiveComplexity.Interpretation
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Numbers.BinRel
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # Hamilton circuits: definitions
@@ -34,6 +36,8 @@ On the empty universe every condition is vacuous, so the empty graph counts as
 a yes-instance; on a one-element universe the wrap-around demand becomes a
 self-loop, which is the usual convention.
 -/
+
+@[expose] public section
 
 /- The language of digraphs lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order` – a project-local

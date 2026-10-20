@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Qbf.Defs
-import DescriptiveComplexity.SecondOrderMerge
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Qbf.Defs
+public import DescriptiveComplexity.SecondOrderMerge
+public import DescriptiveComplexity.Padding
 
 /-!
 # QBF is second-order definable
@@ -33,6 +35,8 @@ written over the *single* merged block, where the relation variable of block
 expansion while turning the alternating second-order quantification into
 `DescriptiveComplexity.altQuant`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

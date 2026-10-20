@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
-import DescriptiveComplexity.Problems.ThreeDimMatching.Membership
-import DescriptiveComplexity.Problems.ThreeDimMatching.Hardness
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
+public import DescriptiveComplexity.Problems.ThreeDimMatching.Membership
+public import DescriptiveComplexity.Problems.ThreeDimMatching.Hardness
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # 3-dimensional matching
@@ -27,6 +29,8 @@ occurrences of each variable, a pair per clause coverable only through the tip
 of a true literal, and one garbage pair per occurrence that is not the first
 of its clause – exactly as many as there are tips left over.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

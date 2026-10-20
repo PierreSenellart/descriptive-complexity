@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard
-import DescriptiveComplexity.Problems.Wide.Corridor
-import DescriptiveComplexity.Problems.Wide.Membership
-import DescriptiveComplexity.Problems.Wide.Reduce
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard
+public import DescriptiveComplexity.Problems.Wide.Corridor
+public import DescriptiveComplexity.Problems.Wide.Membership
+public import DescriptiveComplexity.Problems.Wide.Reduce
 
 /-!
 # Tiling a wide corridor is EXPSPACE-complete
@@ -24,6 +26,8 @@ clocked one by a register file, the space-bounded one by the ruler of all the
 segments – which is why the drawing carries that row as a parameter
 (`DescriptiveComplexity.TilingHard.tileStrOf`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

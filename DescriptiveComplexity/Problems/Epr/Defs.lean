@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Interpretation
+module
+
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # EPR: satisfiability of an `∃*∀*` sentence
@@ -53,6 +55,8 @@ Equality is not part of the encoding. The class is NEXPTIME-complete either
 way, and a reduction that wants equality can carry its own equality symbol with
 the axioms it needs.
 -/
+
+@[expose] public section
 
 /- The language of encoded `∃*∀*` sentences lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.finsat`. -/

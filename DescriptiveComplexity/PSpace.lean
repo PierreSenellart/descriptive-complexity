@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderTransitiveClosurePull
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # PSPACE, by second-order transitive closure
@@ -51,6 +53,8 @@ assumed (see `DescriptiveComplexity.Machines`).
   `Σ₁`-definability is SO(TC) definability with an empty transition relation.
   Everything below NP follows by composition.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

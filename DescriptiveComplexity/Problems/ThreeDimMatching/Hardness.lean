@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.OccurrenceVar
-import DescriptiveComplexity.OccurrenceSlack
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.OccurrenceVar
+public import DescriptiveComplexity.OccurrenceSlack
+public import DescriptiveComplexity.Padding
 
 /-!
 # 3-dimensional matching is NP-hard
@@ -45,6 +47,8 @@ signed occurrence – the clause `c` contains the literal `(x, s)` – and let a
 Nothing here bounds the width of a clause, so the source is SAT itself; an
 empty clause leaves its two elements uncoverable, which is the right answer.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

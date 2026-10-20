@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # Completeness without a class: the degree of a problem
@@ -38,6 +40,8 @@ Two sanity checks come with the construction:
   discharge delivers one, while `DescriptiveComplexity.cofinalHard_iff` on its
   own yields only the relativized `≤ʳᶠᵒ[≤]`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

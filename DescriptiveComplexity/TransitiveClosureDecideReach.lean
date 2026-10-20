@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureDecideFormula
-import DescriptiveComplexity.TransitiveClosureCompl
+module
+
+public import DescriptiveComplexity.TransitiveClosureDecideFormula
+public import DescriptiveComplexity.TransitiveClosureCompl
 
 /-!
 # Deciding reachability in a walk: Immerman–Szelepcsényi with parameters
@@ -33,6 +35,8 @@ as variables (`DescriptiveComplexity.fromConst`). Mathlib's
 directions, and a structure interprets the constants by the valuation of the
 parameters (`DescriptiveComplexity.constStructure`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

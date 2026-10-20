@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard.Tiles
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Tiles
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # The tile system a machine is drawn as, and its grid
@@ -24,6 +26,8 @@ step. The other points of the emitted universe are tiles, and they are ordered
 binary-number order the coordinates are compared by: two coordinates differ at a
 digit, and there the emitted order is the machine's own.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

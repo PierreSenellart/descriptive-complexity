@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Class
-import DescriptiveComplexity.SecondOrderRelPull
+module
+
+public import DescriptiveComplexity.Counting.Class
+public import DescriptiveComplexity.SecondOrderRelPull
 
 /-!
 # `#P` is closed under relativized parsimonious reductions
@@ -33,6 +35,8 @@ assignments the read-back is injective
 of the kernel in the target are, bijectively, the supported witnesses of the
 pulled kernel in the source (`DescriptiveComplexity.witnessCount_mapRel`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Step
+module
+
+public import DescriptiveComplexity.Problems.Wide.Step
 
 /-!
 # A wide machine that accepts
@@ -30,6 +32,8 @@ will use, so it is worth reading as a template: a `FirstOrder.Language.wide`
 structure is eleven relations on a finite type, and the two promises are then
 four conditions and four more.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Table
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Table
 
 /-!
 # The running sum: counting a long word by counting its chunks
@@ -41,6 +43,8 @@ below `k` plus those of the chunk starting at `k`. The chunk is read with
 the truncation is harmless because a window's own count ignores what was cut off
 (`DescriptiveComplexity.BitSum.onesBelow_mod`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

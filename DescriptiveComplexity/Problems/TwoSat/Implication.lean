@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.TwoSat.Defs
-import DescriptiveComplexity.TwoCnf
+module
+
+public import DescriptiveComplexity.Problems.TwoSat.Defs
+public import DescriptiveComplexity.TwoCnf
 
 /-!
 # The implication graph of a width-two CNF
@@ -31,6 +33,8 @@ satisfying the structure (some occurrence of every clause is true) and
 satisfying the abstract 2-CNF (some literal of every clause is true), which is
 where the width promise and the absence of an empty clause are used.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

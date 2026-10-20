@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewPull
-import DescriptiveComplexity.SecondOrderOrdered
+module
+
+public import DescriptiveComplexity.SecondOrderNewPull
+public import DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # Closure of `∃SO[new]` definability under ordered FO reductions
@@ -33,6 +35,8 @@ the order of the extended structure (`DescriptiveComplexity.extLeRel`), which
 is what the language morphism `DescriptiveComplexity.extOrderElim` needs to be
 an expansion.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -136,36 +140,36 @@ section Guard
 variable (L : Language.{0, 0}) (C : SOBlock)
 
 /-- `x ≤ y` for the order variable. -/
-private def leEF {α : Type} (x y : α) : ((newLang L).sum C.withOrder.lang).Formula α :=
+def leEF {α : Type} (x y : α) : ((newLang L).sum C.withOrder.lang).Formula α :=
   Relations.formula₂ (ordVarSym (newLang L) C) (Term.var x) (Term.var y)
 
 /-- `old x`. -/
-private def oldEF {α : Type} (x : α) : ((newLang L).sum C.withOrder.lang).Formula α :=
+def oldEF {α : Type} (x : α) : ((newLang L).sum C.withOrder.lang).Formula α :=
   Relations.formula₁ (extOldSym L C) (Term.var x)
 
 /-- The order variable relates original elements only. -/
-private noncomputable def oldOnlyS : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def oldOnlyS : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⟹ (oldEF L C (Sum.inr 0) ⊓ oldEF L C (Sum.inr 1)))
 
 /-- The order variable is reflexive on the original elements. -/
-private noncomputable def reflES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def reflES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 1) (oldEF L C (Sum.inr 0) ⟹ leEF L C (Sum.inr 0) (Sum.inr 0))
 
 /-- The order variable is transitive. -/
-private noncomputable def transES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def transES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 3)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⊓ leEF L C (Sum.inr 1) (Sum.inr 2) ⟹
       leEF L C (Sum.inr 0) (Sum.inr 2))
 
 /-- The order variable is antisymmetric. -/
-private noncomputable def antisymmES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def antisymmES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⊓ leEF L C (Sum.inr 1) (Sum.inr 0) ⟹
       Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))
 
 /-- The order variable is total on the original elements. -/
-private noncomputable def totalES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def totalES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (oldEF L C (Sum.inr 0) ⊓ oldEF L C (Sum.inr 1) ⟹
       (leEF L C (Sum.inr 0) (Sum.inr 1) ⊔ leEF L C (Sum.inr 1) (Sum.inr 0)))

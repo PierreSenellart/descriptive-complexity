@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Permanent.Attach
-import Mathlib.Data.Fin.VecNotation
+module
+
+public import DescriptiveComplexity.Permanent.Attach
+public import Mathlib.Data.Fin.VecNotation
 
 /-!
 # Valiant's XOR gadget
@@ -19,6 +21,8 @@ first edge enters at node `0` and leaves from node `3`; the second enters at
 node `3` and leaves from node `0`. The six local values are computed by
 `decide`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

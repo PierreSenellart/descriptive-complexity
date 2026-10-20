@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewExpBuild
-import DescriptiveComplexity.SecondOrderNewBdd
-import DescriptiveComplexity.Exponential.Class
-import DescriptiveComplexity.Exponential.Classes
+module
+
+public import DescriptiveComplexity.SecondOrderNewExpBuild
+public import DescriptiveComplexity.SecondOrderNewBdd
+public import DescriptiveComplexity.Exponential.Class
+public import DescriptiveComplexity.Exponential.Classes
 
 /-!
 # From a problem over an expansion to one with value invention
@@ -24,6 +26,8 @@ arity. Nothing about the source problem enters the bound – its own `Σ₁` blo
 rides along inside the guess, over the extended universe, and is read at the
 values naming the points.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.EquivFin
-import Mathlib.Data.Set.Card
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Logic.Equiv.Prod
+module
+
+public import Mathlib.Data.Fintype.EquivFin
+public import Mathlib.Data.Set.Card
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Logic.Equiv.Prod
 
 /-!
 # Unary representation of numbers in finite structures
@@ -42,6 +44,8 @@ Unary representation keeps numbers polynomial in the instance size; problems
 whose numbers must be exponential (SubsetSum and friends) use the binary
 representation of `DescriptiveComplexity.Numbers.Binary` instead.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

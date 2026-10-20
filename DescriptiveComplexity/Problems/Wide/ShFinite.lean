@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawProg
-import DescriptiveComplexity.Problems.Wide.NexEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawProg
+public import DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!
 # The rule names of the EXPSPACE program are finitely many
@@ -24,6 +26,8 @@ machineries first (`ChainSh`, `SeqSh`, `ElemSh`, `StageSh`, `TagSh`, `RoundSh`,
 `DescriptiveComplexity.Draw.Data.SFSh`, and the file ends at
 `DescriptiveComplexity.Draw.Data.finite_RIx`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

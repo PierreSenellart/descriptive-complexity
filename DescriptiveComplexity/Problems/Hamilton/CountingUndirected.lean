@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
 
 /-!
 # #Hamilton Circuit: counting the circuits of an undirected graph
@@ -30,6 +32,8 @@ circuit (`DescriptiveComplexity.cycSucc_of_sym`). Hence
 Parsimonious hardness is in
 `DescriptiveComplexity.Problems.Hamilton.CountingUndirectedHardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

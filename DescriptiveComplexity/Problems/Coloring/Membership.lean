@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Coloring.Defs
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Coloring.Defs
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # The coloring family is existential second-order definable
@@ -34,6 +36,8 @@ The two threshold problems differ only in the sign of the adjacency atom in
 that second clause, so their kernels come from one builder
 (`DescriptiveComplexity.paletteProperClause`) parameterized by that sign.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -128,13 +132,13 @@ fo_block paletteGuessBlock over Language.markedGraph mg into paletteSOLang with 
 
 /-- Kernel clause: every vertex gets a color, and colors are marked
 elements. -/
-private noncomputable def paletteTotalClause : paletteSOLang.Sentence :=
+noncomputable def paletteTotalClause : paletteSOLang.Sentence :=
   fo% ∀ x, ∃ y, pcColSym(x, y) ∧ pcMarkedSym(y)
 
 /-- Kernel clause: two conflicting vertices never share a color. The flag
 selects the conflict relation: adjacency for Chromatic Number,
 non-adjacency for Clique Cover. -/
-private noncomputable def paletteProperClause (positive : Bool) : paletteSOLang.Sentence :=
+noncomputable def paletteProperClause (positive : Bool) : paletteSOLang.Sentence :=
   fo% ∀ x x' y,
     ((¬ x ≐ x' ∧ (if positive then pcAdjSym(x, x') else ¬ pcAdjSym(x, x'))) ∧
       pcColSym(x, y)) ∧ pcColSym(x', y) → ⊥ᶠ

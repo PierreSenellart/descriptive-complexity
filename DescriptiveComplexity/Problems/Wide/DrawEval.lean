@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawOuter
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawOuter
 
 /-!
 # The evaluation's spine: the per-variable loop
@@ -24,6 +26,8 @@ the `ltp` cell, into the post-sweep reset at it. A sub-machinery's final
 exit targets the next checkpoint, which is how the spine needs to know
 nothing about its internals.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

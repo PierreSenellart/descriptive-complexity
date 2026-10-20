@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewPoint
-import DescriptiveComplexity.SecondOrderNewMeansB
-import DescriptiveComplexity.SecondOrderNewOrdered
-import DescriptiveComplexity.SubstFormula
+module
+
+public import DescriptiveComplexity.SecondOrderNewPoint
+public import DescriptiveComplexity.SecondOrderNewMeansB
+public import DescriptiveComplexity.SecondOrderNewOrdered
+public import DescriptiveComplexity.SubstFormula
 
 /-!
 # The block a problem over an expansion is guessed in
@@ -33,6 +35,8 @@ translations of `DescriptiveComplexity.SecondOrderNewRead` and
 (`DescriptiveComplexity.pullPointOn`), given only that its order part is a
 linear order of the original elements.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

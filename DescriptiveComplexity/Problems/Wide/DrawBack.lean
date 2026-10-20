@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSites
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSites
 
 /-!
 # The background: the machine's mutable state, presented as a tape
@@ -44,6 +46,8 @@ two ends are already general
 `DescriptiveComplexity.Draw.Data.ixBack_regLast`): which cell carries them is
 a fact about the layout order and about nothing else.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

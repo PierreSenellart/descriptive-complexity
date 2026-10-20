@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesAltSpace
-import DescriptiveComplexity.Problems.Machine.AltDefs
+module
+
+public import DescriptiveComplexity.MachinesAltSpace
+public import DescriptiveComplexity.Problems.Machine.AltDefs
 
 /-!
 # Alternating machine acceptance in bounded space, as a decision problem
@@ -38,6 +40,8 @@ supplies – one per direction – so that only the forward transport lemmas of
 `DescriptiveComplexity.MachinesAltSpace` are needed and no finiteness is
 assumed.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

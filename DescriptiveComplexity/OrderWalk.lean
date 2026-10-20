@@ -3,10 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Order.PiLex
-import Mathlib.Order.Prod.Lex.Basic
-import Mathlib.Data.Set.Card
-import DescriptiveComplexity.Padding
+module
+
+public import Mathlib.Order.PiLex
+public import Mathlib.Order.Prod.Lex.Basic
+public import Mathlib.Data.Set.Card
+public import DescriptiveComplexity.Padding
+public import Mathlib.Data.Finset.Max
 
 /-!
 # Walking a finite linear order, first-order
@@ -45,6 +48,8 @@ rank `0` at the bottom (`DescriptiveComplexity.orank_eq_zero`), `+1` along a cov
 tuple is matched with the `ℕ`-indexed stages of
 `DescriptiveComplexity.derivesIn`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

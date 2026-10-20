@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.WellFormed
+module
+
+public import DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # The address primitives of a wide machine
@@ -35,6 +37,8 @@ two agree, which is what lets a machine maintain a mirror of its own head
 position by incrementing it – the invariant the whole hardness plan rests on,
 since a head cannot read the digits of its address.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -373,7 +377,7 @@ which is what a program handed its file counts its rounds over. -/
 section Chain
 
 /-- The addresses strictly below a given one, as a measure to induct on. -/
-private noncomputable def belowCount (Le : α → α → Prop) (s : α → Prop) : ℕ :=
+noncomputable def belowCount (Le : α → α → Prop) (s : α → Prop) : ℕ :=
   {t : α → Prop | WMSetLt Le t s}.ncard
 
 private theorem belowCount_lt (h : IsLinOrd Le) {s t : α → Prop} (hi : WMIncr Le s t) :

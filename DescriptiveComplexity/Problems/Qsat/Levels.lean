@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Prefix
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Prefix
 
 /-!
 # The levels of the Savitch recursion, and what a valuation reads
@@ -30,6 +32,8 @@ correctness proof only ever reads it through the ten projections below
 `DescriptiveComplexity.bitB`, `DescriptiveComplexity.valP`…), one per variable tag,
 which turn it back into the states, bits and valuations the reduction means.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

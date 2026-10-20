@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltTable
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltTable
 
 /-!
 # The positions of the QBF machine's tape, concretely
@@ -21,6 +23,8 @@ The file ends with the determinism of the machine away from the guessing
 choice, which is what makes the `⇐` half of correctness a corollary of
 `DescriptiveComplexity.AltQbf.altTr_unique` rather than a second induction.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

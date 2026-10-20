@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.Formulas
+module
+
+public import DescriptiveComplexity.Counting.Digits.Formulas
 
 /-!
 # The rows of a product sweep
@@ -22,6 +24,8 @@ The row of `(ū, j̄)` holds (`DescriptiveComplexity.Digits.pval`)
 rank `r` of `f(ū)` is `1` (`DescriptiveComplexity.Digits.prodPhi_eq`); and `P`
 is itself a row, the last one of the previous tuple.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

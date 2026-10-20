@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Free
+module
+
+public import DescriptiveComplexity.Exponential.Free
 
 /-!
 # The copies of an order-guessing expansion, and the problem read in one of them
@@ -35,6 +37,8 @@ The whole content is the identification of a copy: a set of points satisfying
 the original vocabulary, to the expanded universe read at that order
 (`DescriptiveComplexity.ExpExpansion.clsEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

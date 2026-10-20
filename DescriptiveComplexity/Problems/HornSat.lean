@@ -3,13 +3,15 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.HornSat.Defs
-import DescriptiveComplexity.Problems.HornSat.Membership
-import DescriptiveComplexity.Problems.HornSat.Unsat
-import DescriptiveComplexity.Problems.HornSat.Definability
-import DescriptiveComplexity.FixedPoint
-import DescriptiveComplexity.FixedPointHorn
-import DescriptiveComplexity.Problems.HornSat.Hardness
+module
+
+public import DescriptiveComplexity.Problems.HornSat.Defs
+public import DescriptiveComplexity.Problems.HornSat.Membership
+public import DescriptiveComplexity.Problems.HornSat.Unsat
+public import DescriptiveComplexity.Problems.HornSat.Definability
+public import DescriptiveComplexity.FixedPoint
+public import DescriptiveComplexity.FixedPointHorn
+public import DescriptiveComplexity.Problems.HornSat.Hardness
 
 /-!
 # HORN-SAT
@@ -70,6 +72,8 @@ The route that works is the logic-to-logic equivalence SO-Horn = FO(LFP) of
 construction; `DescriptiveComplexity.hornSat_compl_mem_PTIME` below is the resulting
 answer, and `DescriptiveComplexity.piP_zero_eq` the resulting identity.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

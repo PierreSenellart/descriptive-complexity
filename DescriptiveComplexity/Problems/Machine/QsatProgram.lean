@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.QsatTape
+module
+
+public import DescriptiveComplexity.Problems.Machine.QsatTape
 
 /-!
 # The machine of a quantified Boolean formula
@@ -56,6 +58,8 @@ transcribed into defining formulas. A transition table type-checks whatever it
 says, so it has to be validated by proofs – which is what the second half of
 this file is.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.GraphIso.Defs
-import DescriptiveComplexity.Problems.GraphIso.Gadget
-import DescriptiveComplexity.Problems.DigraphIso.Bridge
+module
+
+public import DescriptiveComplexity.Problems.GraphIso.Defs
+public import DescriptiveComplexity.Problems.GraphIso.Gadget
+public import DescriptiveComplexity.Problems.DigraphIso.Bridge
 
 /-!
 # Graph Isomorphism is GI-complete
@@ -26,6 +28,8 @@ is discharged here, by transporting the gadget's symmetry and irreflexivity
 the sides of a doubled construction with the gadget's values
 (`DescriptiveComplexity.patSideDoubleEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

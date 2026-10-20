@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Game
-import DescriptiveComplexity.Exponential.TagBits
-import DescriptiveComplexity.SecondOrderMerge
-import DescriptiveComplexity.Exponential.PSpaceOn
+module
+
+public import DescriptiveComplexity.Exponential.Game
+public import DescriptiveComplexity.Exponential.TagBits
+public import DescriptiveComplexity.SecondOrderMerge
+public import DescriptiveComplexity.Exponential.PSpaceOn
 
 /-!
 # A second-order quantifier prefix, played as a game
@@ -45,6 +47,8 @@ assignment admitting no starting state would contribute no move at all and so
 be silently skipped by the universal clause of
 `DescriptiveComplexity.SOGameSpec.Wins`, instead of refuting it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadAutomaton
+module
+
+public import DescriptiveComplexity.HeadAutomaton
 
 /-!
 # Programs: two-way multi-head automata, written with guarded transitions
@@ -72,6 +74,8 @@ program, and – the one that does the work – that a run of the program which
 starts inside the fragment either is still inside it or has left it through one
 of its exits.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

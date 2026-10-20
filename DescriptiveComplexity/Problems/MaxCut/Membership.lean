@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.MaxCut.Defs
-import DescriptiveComplexity.Problems.Feedback.Membership
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.MaxCut.Defs
+public import DescriptiveComplexity.Problems.Feedback.Membership
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # Max Cut is in NP
@@ -17,6 +19,8 @@ and an injection of the marked pairs into the cut, the injection being a
 *quaternary* relation variable since it maps pairs to pairs, exactly as for
 Feedback Arc Set, and reusing its `DescriptiveComplexity.realize_rel₄`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -37,12 +41,12 @@ fo_block maxCutGuessBlock over Language.markedArcGraph mag into mcSOLang with mc
 
 /-- Kernel conjunct: the guessed injection maps every marked pair to a pair
 crossing the cut. -/
-private noncomputable def mcTotalClause : mcSOLang.Sentence :=
+noncomputable def mcTotalClause : mcSOLang.Sentence :=
   fo% ∀ a b, mcMarkedSym(a, b) →
     ∃ c d, mcInjSym(a, b, c, d) ∧ mcAdjSym(c, d) ∧ mcSideSym(c) ∧ ¬ mcSideSym(d)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
-private noncomputable def mcInjClause : mcSOLang.Sentence :=
+noncomputable def mcInjClause : mcSOLang.Sentence :=
   fo% ∀ a b a' b' c d,
     mcInjSym(a, b, c, d) ∧ mcInjSym(a', b', c, d) → a ≐ a' ∧ b ≐ b'
 

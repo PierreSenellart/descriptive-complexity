@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNew
+module
+
+public import DescriptiveComplexity.SecondOrderNew
 
 /-!
 # Relativization of a formula to a unary predicate
@@ -35,6 +37,8 @@ is exactly relativization to the predicate `old`. The specialization
 The same machinery is what a relativized *membership* pullback – one through
 an interpretation whose domain is cut out by a formula – would want.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

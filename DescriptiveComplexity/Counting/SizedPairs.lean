@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Sized
+module
+
+public import DescriptiveComplexity.Counting.Sized
 
 /-!
 # Counting the solutions of exactly the threshold size, for sets of pairs
@@ -17,6 +19,8 @@ pairs, and the variable that guesses it is quaternary
 (`DescriptiveComplexity.sizedPairsKernel`, `DescriptiveComplexity.witnessCount_sizedPairsKernel`,
 `DescriptiveComplexity.sharpPDefinable_of_sizedPairs`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -101,7 +105,7 @@ abbrev sz₂LeSym : ((L.sum Language.order).sum B.withBij₂.lang).Relations 2 :
 
 /-- The pair `(x, y)` is at most `(x', y')` lexicographically, as a
 formula. -/
-private def szPairLeF {α : Type} (x y x' y' : α) :
+def szPairLeF {α : Type} (x y x' y' : α) :
     ((L.sum Language.order).sum B.withBij₂.lang).Formula α :=
   (Relations.formula₂ (sz₂LeSym L B) (Term.var x) (Term.var x') ⊓
       ∼(Term.equal (Term.var x) (Term.var x'))) ⊔
@@ -109,7 +113,7 @@ private def szPairLeF {α : Type} (x y x' y' : α) :
       Relations.formula₂ (sz₂LeSym L B) (Term.var y) (Term.var y'))
 
 /-- The bijection relates `(x, y)` to `(x', y')`, as a formula. -/
-private def szPairBijF {α : Type} (x y x' y' : α) :
+def szPairBijF {α : Type} (x y x' y' : α) :
     ((L.sum Language.order).sum B.withBij₂.lang).Formula α :=
   Relations.formula (sz₂BijSym L B) ![Term.var x, Term.var y, Term.var x', Term.var y']
 

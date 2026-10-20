@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FirstOrderDefinable
-import DescriptiveComplexity.Games.Ehrenfeucht
+module
+
+public import DescriptiveComplexity.FirstOrderDefinable
+public import DescriptiveComplexity.Games.Ehrenfeucht
 
 /-!
 # The game on bare sets
@@ -25,6 +27,8 @@ whole content of the inexpressibility of `DescriptiveComplexity.EVEN`
 (`DescriptiveComplexity.Problems.Even`), and the reason the same problem must
 be attacked with a much finer game once a linear order is available.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qbf.Defs
-import DescriptiveComplexity.SecondOrderMerge
+module
+
+public import DescriptiveComplexity.Problems.Qbf.Defs
+public import DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Transferring an alternating prefix from valuations to block assignments
@@ -23,6 +25,8 @@ things: that the quantified predicates correspond under the reading, and that
 the reading is surjective at every block (`DescriptiveComplexity.ReadSurj`) – the
 propositional variables of a block are free enough to realize any relation.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

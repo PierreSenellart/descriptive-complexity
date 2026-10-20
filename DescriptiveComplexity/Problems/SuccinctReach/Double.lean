@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderTransitiveClosure
+module
+
+public import DescriptiveComplexity.SecondOrderTransitiveClosure
 
 /-!
 # One block instead of two: the doubled block
@@ -44,6 +46,8 @@ the order symbol, both read by the same linear order.
 be used as the defining formulas of an interpretation whose source vocabulary
 is `L₀ ⊕ order`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

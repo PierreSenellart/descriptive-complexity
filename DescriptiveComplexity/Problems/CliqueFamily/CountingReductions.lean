@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
-import DescriptiveComplexity.Problems.CliqueFamily.Reductions
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
+public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Independent Set and #Vertex Cover
@@ -35,6 +37,8 @@ problem. The support of the exact count is Vertex Cover all the same, a cover
 smaller than the threshold extending to one of exactly that size
 (`DescriptiveComplexity.sharpVertexCover_support_iff`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

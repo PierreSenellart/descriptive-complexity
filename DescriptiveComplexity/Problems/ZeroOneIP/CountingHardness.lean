@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ZeroOneIP.Counting
-import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
-import DescriptiveComplexity.Problems.Knapsack.CountingHardness
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.ZeroOneIP.Counting
+public import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
+public import DescriptiveComplexity.Problems.Knapsack.CountingHardness
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #0-1 integer programming is parsimoniously `#P`-complete
@@ -18,6 +20,8 @@ universe is a copy of the input. A set of items is a `0-1` vector, and it sums
 to the target exactly when the equation holds, so the solutions correspond
 bijectively (`DescriptiveComplexity.IPRed.solEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

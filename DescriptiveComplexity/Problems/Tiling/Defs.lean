@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Complexity
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.Complexity
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Tiling a square: the local problem behind the machines
@@ -46,6 +48,8 @@ condition on the position, which is what an expansion can carry. The accepting
 condition is a mark on tiles, and it is what turns a *tiling* into a *decision*:
 without it every tile system with a compatible bottom row is a yes-instance.
 -/
+
+@[expose] public section
 
 /- The vocabulary of tile systems lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.turing`. -/

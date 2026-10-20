@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointInflationaryLFP
-import DescriptiveComplexity.FixedPointPartialMachine
+module
+
+public import DescriptiveComplexity.FixedPointInflationaryLFP
+public import DescriptiveComplexity.FixedPointPartialMachine
 
 /-!
 # Abiteboul–Vianu, the ordered case
@@ -26,6 +28,8 @@ the equivalence with `P = PSPACE` is the celebrated content – is
 `DescriptiveComplexity.Invariant`. This file is the ordered milestone on that
 route, and the natural stopping point of the capture half.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

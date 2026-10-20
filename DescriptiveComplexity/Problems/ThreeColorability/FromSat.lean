@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ThreeColorability.SatGadget
-import DescriptiveComplexity.Problems.ThreeColorability.Defs
-import DescriptiveComplexity.OccurrenceFormulas
+module
+
+public import DescriptiveComplexity.Problems.ThreeColorability.SatGadget
+public import DescriptiveComplexity.Problems.ThreeColorability.Defs
+public import DescriptiveComplexity.OccurrenceFormulas
 
 /-!
 # SAT reduces to 3-colorability by an ordered FO reduction
@@ -28,6 +30,8 @@ the shared occurrence formula builders of `DescriptiveComplexity.OccurrenceFormu
 (`occF`, `minOccF`, `succOccF`…), and packages everything into the
 interpretation `SatToCol.satToCol` and the final reduction.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

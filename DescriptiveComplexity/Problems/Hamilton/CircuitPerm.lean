@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.Counting
-import Mathlib.GroupTheory.Perm.Cycle.Basic
-import Mathlib.GroupTheory.OrderOfElement
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.Counting
+public import Mathlib.GroupTheory.Perm.Cycle.Basic
+public import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Circuits, locally and from a potential
@@ -26,6 +28,8 @@ into a circuit problem.
   The order is then read off the powers of the permutation, and the potential
   is checked arc by arc: no enumeration of the circuit has to be written.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

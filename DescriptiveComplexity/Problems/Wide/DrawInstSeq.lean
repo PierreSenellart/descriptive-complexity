@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstMat
-import DescriptiveComplexity.Problems.Wide.DrawRunSeq
-import DescriptiveComplexity.Problems.Wide.DrawCmp
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstMat
+public import DescriptiveComplexity.Problems.Wide.DrawRunSeq
+public import DescriptiveComplexity.Problems.Wide.DrawCmp
 
 /-!
 # The atom kinds, dispatched: one stage interface for the matrix
@@ -21,6 +23,8 @@ discharge: whatever the kind, from the machinery's entry phase one cell
 right of the marker to the exit phase back there, at the `Slot.val`-walked
 presentation – the shape `DescriptiveComplexity.Draw.seq_run` consumes.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

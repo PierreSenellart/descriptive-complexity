@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTracks
-import DescriptiveComplexity.Problems.Wide.Walk
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTracks
+public import DescriptiveComplexity.Problems.Wide.Walk
 
 /-!
 # A program, written rule by rule
@@ -44,6 +46,8 @@ Two things fall out of that, and they are the point of the file.
   from the same state must be the same rule. That is a check on pairs of rule
   families, which is what a program can actually carry out.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

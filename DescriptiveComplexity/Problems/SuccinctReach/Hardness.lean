@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SuccinctReach.Membership
-import DescriptiveComplexity.Problems.SuccinctReach.Double
-import DescriptiveComplexity.Problems.Sat.TseitinFormulas
+module
+
+public import DescriptiveComplexity.Problems.SuccinctReach.Membership
+public import DescriptiveComplexity.Problems.SuccinctReach.Double
+public import DescriptiveComplexity.Problems.Sat.TseitinFormulas
 
 /-!
 # SUCCINCT-REACH is PSPACE-hard
@@ -58,6 +60,8 @@ values no clause constrains and no reading of a state ever looks at
 (`DescriptiveComplexity.SuccinctReachHard.srStateOf` reads the canonical
 padding only), so they cost nothing and save the canonicity guards.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -1216,7 +1220,7 @@ section Correct
 variable {B stepS srcS tgtS} {A : Type} [L.Structure A] [LinearOrder A] {a₀ : A}
 
 /-- The transition relation of the specification, spelled out. -/
-private def specStep (ρ σ : B.Assignment A) : Prop :=
+def specStep (ρ σ : B.Assignment A) : Prop :=
   @Sentence.Realize _ A (B.structure₂ ρ σ) stepS
 
 private theorem reach_srStateOf (h₀ : IsBot a₀) {ρ σ : B.Assignment A}

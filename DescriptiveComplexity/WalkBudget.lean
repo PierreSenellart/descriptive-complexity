@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # Budgets for deterministic walks
@@ -34,6 +36,8 @@ along covers, so what it must be shown is that enough covers are available:
 bottom, one cover short of the whole order. Matching the two halves is then a
 matter of counting the nodes and the counter values with the same number.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

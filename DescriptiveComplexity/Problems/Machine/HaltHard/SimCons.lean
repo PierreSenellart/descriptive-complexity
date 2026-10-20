@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.SimNorm
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.SimNorm
 
 /-!
 # The `cons` push, and the assembled dispatch simulation
@@ -22,6 +24,8 @@ from the dispatch of the code at `p`, the machine reaches the resting
 configuration of `DescriptiveComplexity.HaltHard.pStepNormal p k v`, by
 induction on the size of the dispatched code.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

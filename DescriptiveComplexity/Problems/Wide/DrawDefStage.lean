@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefTower
-import DescriptiveComplexity.Problems.Wide.DrawStageAtom
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefTower
+public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
 
 /-!
 # The two guards the program's own sites are written from, and the stage atom
@@ -24,6 +26,8 @@ The naming guard is stated at an arbitrary coordinate function
 element loops compute an encoded tuple there, and what they owe is the same
 shape as what the coordinate loops owe.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

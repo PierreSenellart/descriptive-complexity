@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.Term
-import DescriptiveComplexity.Counting.Digits.Bounds
-import DescriptiveComplexity.Counting.DigitDefinable
-import DescriptiveComplexity.FixedPointInflationaryLFP
-import Mathlib.Order.Interval.Finset.Fin
-import Mathlib.SetTheory.Cardinal.NatCard
+module
+
+public import DescriptiveComplexity.Counting.Digits.Term
+public import DescriptiveComplexity.Counting.Digits.Bounds
+public import DescriptiveComplexity.Counting.DigitDefinable
+public import DescriptiveComplexity.FixedPointInflationaryLFP
+public import Mathlib.Order.Interval.Finset.Fin
+public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
 # The normal form of FP: every problem of FP is digit-definable
@@ -38,6 +40,8 @@ theorem; it is proved here inside the logic, with no machine.
 * The tower is one inflationary induction, whose limit is a least fixed point
   of rules (`DescriptiveComplexity.IFPLfp.homAssign_lfpAssign_trRules`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

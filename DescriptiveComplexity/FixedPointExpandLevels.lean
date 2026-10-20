@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointExpand
+module
+
+public import DescriptiveComplexity.FixedPointExpand
 
 /-!
 # Eliminating an induction under a quantifier prefix
@@ -37,6 +39,8 @@ Existentially that is `DescriptiveComplexity.PTIME_subset_NP`, universally
 `DescriptiveComplexity.PTIME_subset_coNP`; the parity of the prefix decides
 which is used, and nothing else in the argument changes.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

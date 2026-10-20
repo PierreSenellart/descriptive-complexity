@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qbf.Transfer
-import DescriptiveComplexity.Problems.Sat.Hardness
+module
+
+public import DescriptiveComplexity.Problems.Qbf.Transfer
+public import DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # Hardness of QBF
@@ -50,6 +52,8 @@ The discharge itself is `DescriptiveComplexity.qbf_hard_of_sigmaSODefinable`; to
 with the membership half of `DescriptiveComplexity.Problems.Qbf.Membership` it gives the
 completeness theorem `DescriptiveComplexity.QBF_complete`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

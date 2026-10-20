@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TrackWrites
-import DescriptiveComplexity.Problems.Wide.RegChannelAccept
+module
+
+public import DescriptiveComplexity.Problems.Wide.TrackWrites
+public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
 
 /-!
 # Where a backward reading of an accepting run starts
@@ -25,6 +27,8 @@ and whose phase is post-guess: the point where the machine's nondeterminism is
 spent, the guess is written on the tape, and the rest of the run is the
 evaluation's – deterministic, and read forward.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

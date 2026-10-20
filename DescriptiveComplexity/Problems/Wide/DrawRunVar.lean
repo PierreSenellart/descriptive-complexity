@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawBack
-import DescriptiveComplexity.Problems.Wide.DrawVar
-import DescriptiveComplexity.Problems.Wide.DrawRunElem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawBack
+public import DescriptiveComplexity.Problems.Wide.DrawVar
+public import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # One variable's machinery: the run
@@ -39,6 +41,8 @@ widths are read off the caller's own runs
 (`DescriptiveComplexity.TMData.exists_reachesIn_of_reflTransGen`) and the
 sweeps' off `wideRank_lt_card`, so a space-bounded caller counts nothing.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

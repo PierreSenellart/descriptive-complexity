@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderHorn
-import DescriptiveComplexity.SecondOrderPull
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.SecondOrderHorn
+public import DescriptiveComplexity.SecondOrderPull
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Pulling SO-Horn definability back through an interpretation
@@ -43,6 +45,8 @@ it: the pullback interprets the target's order by the lexicographic order on
 tagged tuples (`DescriptiveComplexity.FOInterpretation.ordExtend`), which is why the
 definability notion quantifies over ordered structures in the first place.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderHorn
-import DescriptiveComplexity.ClauseDischarge
-import DescriptiveComplexity.Problems.HornSat.Defs
+module
+
+public import DescriptiveComplexity.SecondOrderHorn
+public import DescriptiveComplexity.ClauseDischarge
+public import DescriptiveComplexity.Problems.HornSat.Defs
 
 /-!
 # Hardness of HORN-SAT: the Horn discharge
@@ -51,6 +53,8 @@ the truth value `ρ i (pref x)` of the propositional variable `(i, x)`, and
 conversely a satisfying truth assignment `ν` gives the assignment
 `ρ i ā := ν (i, pad ā)`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.Exponential.Classes
-import DescriptiveComplexity.Problems.Game
+module
+
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.Exponential.Classes
+public import DescriptiveComplexity.Problems.Game
 
 /-!
 # A second-order alternating game is GAME on an exponential expansion
@@ -51,6 +53,8 @@ sentences. It is what an alternating space-bounded machine
 assignments of a block with one variable for the state, one for the head and one
 for the tape.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

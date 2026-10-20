@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.Formulas
+module
+
+public import DescriptiveComplexity.Counting.Digits.Formulas
 
 /-!
 # Numbers computed by a tower
@@ -24,6 +26,8 @@ This file holds the two ways of adding a relation to a tower – by a formula
 (`DescriptiveComplexity.Digits.exists_ext_of_sweep`) – and the first closure
 property, under addition (`DescriptiveComplexity.Digits.Dig.add`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderKrom
-import DescriptiveComplexity.TwoCnf
-import Mathlib.Basic.Finite.Sigma
+module
+
+public import DescriptiveComplexity.SecondOrderKrom
+public import DescriptiveComplexity.TwoCnf
+public import Mathlib.Basic.Finite.Sigma
 
 /-!
 # The implication graph of a Krom program
@@ -35,6 +37,8 @@ to FO(TC): what remains after it is to *express* the implication graph as a
 half proved here is where the mathematics is; the other half is formula
 plumbing.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstStage
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstStage
 
 /-!
 # The expansion atoms, instantiated: the tag-branched wide loop
@@ -25,6 +27,8 @@ This file builds the generated families and their invariants:
 * the chain read-backs: the witness flags decode the points' tags, the
   leaf-read flags hold the block atoms' bits.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

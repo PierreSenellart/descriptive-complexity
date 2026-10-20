@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.ImmermanSzelepcsenyi
+module
+
+public import DescriptiveComplexity.ImmermanSzelepcsenyi
 
 /-!
 # REACH is NL-complete
@@ -62,6 +64,8 @@ on: `REACH ∈ NL` is Immerman–Szelepcsényi, and the passage from an SO-Krom
 definition to an FO(TC) one is the translation of
 `DescriptiveComplexity.KromTransitiveClosure`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

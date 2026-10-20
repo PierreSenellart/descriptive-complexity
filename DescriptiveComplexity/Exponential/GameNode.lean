@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameSO
-import DescriptiveComplexity.Exponential.Peel
-import DescriptiveComplexity.Problems.Game
+module
+
+public import DescriptiveComplexity.Exponential.GameSO
+public import DescriptiveComplexity.Exponential.Peel
+public import DescriptiveComplexity.Problems.Game
 
 /-!
 # The nodes of an interpreted AND/OR graph, as states of a game
@@ -37,6 +39,8 @@ says exactly that a guessed state is such a tuple
 nodes of the graph is quantifying over guarded states
 (`DescriptiveComplexity.ExpExpansion.exists_node_iff`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

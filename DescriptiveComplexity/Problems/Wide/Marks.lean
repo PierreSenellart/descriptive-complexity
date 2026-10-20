@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Roam
+module
+
+public import DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The cells a wide machine can recognize
@@ -52,6 +54,8 @@ This file says what those cells are and where they sit:
 Nothing here is about a program: these are facts about the vocabulary, settled
 before any transition table is written.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

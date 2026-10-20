@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.TwoInvariance
-import DescriptiveComplexity.FixedPointInflationary
+module
+
+public import DescriptiveComplexity.Invariant.TwoInvariance
+public import DescriptiveComplexity.FixedPointInflationary
 
 /-!
 # An induction cannot separate two `k`-pebble equivalent structures
@@ -26,6 +28,8 @@ FO(IFP)-definable. Over bare sets, where `k` pebbles cannot count past `k`
 `DescriptiveComplexity.EVEN` for order-free inflationary induction – the
 failure of capture, since parity is decidable in polynomial time.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

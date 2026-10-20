@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Bridge
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Problems.Wide.Bridge
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The fold on a final segment of the blocks
@@ -34,6 +36,8 @@ Everything is about the product order `DescriptiveComplexity.lexRel` on
 `T × V`; joining it to the machine's own order is the instance's `le` field, as
 everywhere in the layer.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

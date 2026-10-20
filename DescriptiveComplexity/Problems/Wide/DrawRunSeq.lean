@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSeq
-import DescriptiveComplexity.Problems.Wide.DrawRunElem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSeq
+public import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The sequencer's run
@@ -23,6 +25,8 @@ stages' runs by `DescriptiveComplexity.TMData.exists_reachesIn_of_reflTransGen`
 and the largest taken, which is why a space-bounded caller need not have
 counted anything.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.JobSequencing.Schedule
-import DescriptiveComplexity.Problems.Knapsack.Chain
-import DescriptiveComplexity.Numbers.Wide
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.JobSequencing.Schedule
+public import DescriptiveComplexity.Problems.Knapsack.Chain
+public import DescriptiveComplexity.Numbers.Wide
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # The certificate of job sequencing
@@ -37,6 +39,8 @@ highest differing position (`DescriptiveComplexity.binNum_lt_iff`), the deadline
 the bound being read on the wide positions through their lowest block
 (`DescriptiveComplexity.binNum_wide_bot`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

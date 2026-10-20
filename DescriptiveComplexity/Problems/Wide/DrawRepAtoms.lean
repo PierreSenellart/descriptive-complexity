@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawAtoms
-import DescriptiveComplexity.Exponential.Block
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawAtoms
+public import DescriptiveComplexity.Exponential.Block
 
 /-!
 # The atoms of a defining sentence, classified
@@ -31,6 +33,8 @@ readings. For a defining sentence the assignment is
 splits into the copy – *which argument point* – and the point's own relation
 variable.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

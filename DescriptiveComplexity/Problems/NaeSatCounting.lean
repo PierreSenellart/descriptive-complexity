@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.NaeSat
-import DescriptiveComplexity.Problems.SetSplitting
-import DescriptiveComplexity.Problems.SetFamily.Counting
-import DescriptiveComplexity.Problems.Sat.CountingDnf
-import DescriptiveComplexity.Numbers.DigitExtract
+module
+
+public import DescriptiveComplexity.Problems.NaeSat
+public import DescriptiveComplexity.Problems.SetSplitting
+public import DescriptiveComplexity.Problems.SetFamily.Counting
+public import DescriptiveComplexity.Problems.Sat.CountingDnf
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # #NAE-SAT and #Set Splitting
@@ -32,6 +34,8 @@ pairs, which is why neither is reached parsimoniously; both are one-call
   and the others alike, and each element that is no variable doubles the
   count (`DescriptiveComplexity.NaeCount.card_split_map`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

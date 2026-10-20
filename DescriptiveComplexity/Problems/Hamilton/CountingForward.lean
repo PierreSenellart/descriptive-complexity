@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.CountingGadget
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.CountingGadget
 
 /-!
 # The circuit of an exactly-one model
@@ -24,6 +26,8 @@ then the position in the row, counted from the left for a true variable and
 from the right for a false one. That is a circuit, by
 `DescriptiveComplexity.isCircuit_of_potential`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

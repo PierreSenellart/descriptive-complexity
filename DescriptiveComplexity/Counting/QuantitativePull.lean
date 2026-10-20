@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Quantitative
-import DescriptiveComplexity.SecondOrderPull
+module
+
+public import DescriptiveComplexity.Counting.Quantitative
+public import DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Pulling a quantitative term back through an interpretation
@@ -23,6 +25,8 @@ This is what closes FP under parsimonious reductions
 (`DescriptiveComplexity.Counting.FP`), the least fixed point being pulled back
 as for PTIME (`DescriptiveComplexity.lfpAssign_pull`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

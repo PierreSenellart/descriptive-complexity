@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRunOuter
-import DescriptiveComplexity.Problems.Wide.DrawSpineSem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRunOuter
+public import DescriptiveComplexity.Problems.Wide.DrawSpineSem
 
 /-!
 # The sweep and MAIN, at the concrete program
@@ -29,6 +31,8 @@ arguments only up to unfolding, so the program is named once
 (`DescriptiveComplexity.Draw.Data.progOf`, reducible) and pinned
 explicitly wherever a pack's *type* mentions them.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

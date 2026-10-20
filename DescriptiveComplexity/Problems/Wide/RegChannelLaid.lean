@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannel
-import DescriptiveComplexity.Problems.Wide.DrawBack
-import DescriptiveComplexity.Problems.Wide.LowFile
-import DescriptiveComplexity.Problems.Wide.DrawName
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannel
+public import DescriptiveComplexity.Problems.Wide.DrawBack
+public import DescriptiveComplexity.Problems.Wide.LowFile
+public import DescriptiveComplexity.Problems.Wide.DrawName
 
 /-!
 # The file of the register channel, laid out
@@ -27,6 +29,8 @@ Everything the evaluation asks of a layout is the elementwise one's, restricted:
 * the registers grow with the elements (`wmSetLt_wmRegSeg`), which is the one
   property the singleton channel could not give.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

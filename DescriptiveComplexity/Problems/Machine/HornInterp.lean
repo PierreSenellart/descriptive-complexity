@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HornHardness
-import DescriptiveComplexity.Problems.Machine.Interp
+module
+
+public import DescriptiveComplexity.Problems.Machine.HornHardness
+public import DescriptiveComplexity.Problems.Machine.Interp
 
 /-!
 # The transcription: `HORNSAT ≤ᶠᵒ[≤] DTMAccept`
@@ -29,6 +31,8 @@ from the SAT machine unchanged; the element-order ones (`minF`, `maxF`, `succF`)
 come from `DescriptiveComplexity.OrderWalk`, with a small bridge from `succF`'s
 between-form to `DescriptiveComplexity.SuccElt`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

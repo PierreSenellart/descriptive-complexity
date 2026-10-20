@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Counter
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Counter
 
 /-!
 # Counting ones, and the two atoms level 3 counts with
@@ -37,6 +39,8 @@ parameter rather than “all of them” because levels 1 and 2 count ones below 
   *number* of values a sub-block can take, which is the gap of the table's
   sections.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

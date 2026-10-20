@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureFlatten
+module
+
+public import DescriptiveComplexity.TransitiveClosureFlatten
 
 /-!
 # A walk over an expansion, with endpoints, as one decider
@@ -28,6 +30,8 @@ encodings of the two nodes, decided by
 walk, which is functional. The encodings are two more quantified tuples,
 pinned by a formula (`DescriptiveComplexity.ParamTCSpec.encF`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SetFamily.FromGraphs
-import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.SetFamily.FromGraphs
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Set Packing
@@ -23,6 +25,8 @@ interpreted system are the vertices, one each, so its packings of a size are
 the independent sets of that size, bijectively
 (`DescriptiveComplexity.packEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Numbers.BinRel
-import DescriptiveComplexity.Interpretation
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Numbers.BinRel
+public import DescriptiveComplexity.Interpretation
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Binary-weighted instances, and Karp's Knapsack
@@ -48,6 +50,8 @@ finiteness assumption is needed to *state* the value; on an infinite universe
 it is `0`, which no yes-instance ever looks at since finiteness is part of the
 problem.
 -/
+
+@[expose] public section
 
 /- The language of binary-weighted instances lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.graph` and

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.PartrecCode
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Computability.PartrecCode
+public import Mathlib.Tactic.Ring
 
 /-!
 # The arithmetic a certificate for `CODEHALT` has to speak
@@ -37,6 +39,8 @@ structures. Three groups:
   bounded evaluation can produce, which is what makes the numeral segment of a
   certificate finite.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

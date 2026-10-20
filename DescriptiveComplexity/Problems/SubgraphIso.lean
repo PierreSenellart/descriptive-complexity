@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
 
 /-!
 # Subgraph Isomorphism is NP-complete
@@ -49,6 +51,8 @@ The problem on *concrete* graphs – two edge sets on `Fin p` and `Fin h` – an
 its encoding, faithfulness and decoding are in
 `DescriptiveComplexity.Problems.SubgraphIso.Encoding`.
 -/
+
+@[expose] public section
 
 /- The language of two-graph structures lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.graph` – a project-local
@@ -269,7 +273,7 @@ open Classical in
 /-- Where a vertex goes under the embedding of the pattern: a marked vertex to
 its image under the guessed injection into the clique, anything else to
 itself – a value no condition of the problem mentions. -/
-private noncomputable def cliqueVertex {S : A → Prop}
+noncomputable def cliqueVertex {S : A → Prop}
     (e : {x : A // MGMarked x} ↪ {x : A // S x}) (v : A) : A :=
   if h : MGMarked v then (e ⟨v, h⟩).1 else v
 
@@ -349,16 +353,16 @@ fo_block isoGuessBlock over Language.twoGraphs tg into subgraphSOLang with sg wh
   map : 2
 
 /-- Kernel clause: every pattern vertex is mapped to some host vertex. -/
-private noncomputable def sgTotalClause : subgraphSOLang.Sentence :=
+noncomputable def sgTotalClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀, sgPatVSym(x₀) → ∃ y, sgMapSym(x₀, y) ∧ sgHostVSym(y)
 
 /-- Kernel clause: the guessed map is injective on the pattern. -/
-private noncomputable def sgInjClause : subgraphSOLang.Sentence :=
+noncomputable def sgInjClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂,
     ((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₂) → x₀ ≐ x₁
 
 /-- Kernel clause: the guessed map carries pattern edges to host edges. -/
-private noncomputable def sgEdgeClause : subgraphSOLang.Sentence :=
+noncomputable def sgEdgeClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂ x₃,
     (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgPatESym(x₀, x₁)) ∧
       sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₃) → sgHostESym(x₂, x₃)

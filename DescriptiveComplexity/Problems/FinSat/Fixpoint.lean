@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Set.Card
-import DescriptiveComplexity.Problems.FinSat.Defs
+module
+
+public import Mathlib.Data.Set.Card
+public import DescriptiveComplexity.Problems.FinSat.Defs
 
 /-!
 # Satisfaction is the unique fixed point of the truth definition
@@ -29,6 +31,8 @@ only on the values of nodes *strictly below it in the order of the syntax*.
 That is the only use well-formedness has here, and it is what replaces
 well-founded recursion on a decoded parse tree.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

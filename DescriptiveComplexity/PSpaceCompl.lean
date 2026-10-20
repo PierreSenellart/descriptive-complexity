@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat
-import DescriptiveComplexity.Problems.SuccinctReach
+module
+
+public import DescriptiveComplexity.Problems.Qsat
+public import DescriptiveComplexity.Problems.SuccinctReach
 
 /-!
 # `PSPACE = coPSPACE`
@@ -34,6 +36,8 @@ complemented by flipping its answer. Savitch's recursive doubling is what
 walk of an arbitrary SO(TC) specification into the deterministic evaluation of a
 quantified Boolean formula.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

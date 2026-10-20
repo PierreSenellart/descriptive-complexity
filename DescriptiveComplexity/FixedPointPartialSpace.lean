@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointPartial
-import DescriptiveComplexity.PSpace
+module
+
+public import DescriptiveComplexity.FixedPointPartial
+public import DescriptiveComplexity.PSpace
 
 /-!
 # FO(≤, PFP) is contained in SO(TC)
@@ -47,6 +49,8 @@ PSPACE-complete deterministic machine problem and is built in
 definition of this library in the textbook divergence convention – see the
 divergence discussion in `DescriptiveComplexity.FixedPointPartial`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

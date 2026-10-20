@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.TwoSat.Defs
-import DescriptiveComplexity.Problems.TwoSat.Membership
-import DescriptiveComplexity.Problems.TwoSat.Hardness
-import DescriptiveComplexity.Problems.TwoSat.Ptime
-import DescriptiveComplexity.Problems.HornSat
-import DescriptiveComplexity.DetLogSpace
+module
+
+public import DescriptiveComplexity.Problems.TwoSat.Defs
+public import DescriptiveComplexity.Problems.TwoSat.Membership
+public import DescriptiveComplexity.Problems.TwoSat.Hardness
+public import DescriptiveComplexity.Problems.TwoSat.Ptime
+public import DescriptiveComplexity.Problems.HornSat
+public import DescriptiveComplexity.DetLogSpace
 
 /-!
 # 2SAT is NL-complete
@@ -52,6 +54,8 @@ logarithmic-space class below inherits both
 (`DescriptiveComplexity.LOGSPACE_subset_PTIME`, `DescriptiveComplexity.LOGSPACE_subset_NP`),
 its own inclusion in NL being immediate.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Epr.Defs
+module
+
+public import DescriptiveComplexity.Problems.Epr.Defs
 
 /-!
 # The small-model property of `∃*∀*` sentences
@@ -28,6 +30,8 @@ instance, an interpretation is a relation on the instance and an assignment of
 the universal variables is a *function* on it – one point of an exponential
 expansion.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

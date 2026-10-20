@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.Tower
+module
+
+public import DescriptiveComplexity.Counting.Digits.Tower
 
 /-!
 # Arithmetic on numbers given by formulas
@@ -29,6 +31,8 @@ The vocabulary `N` of the formulas is arbitrary; it receives the ordered
 vocabulary through a map `ι`, along which the order formulas of
 `DescriptiveComplexity.OrderWalk` are read.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

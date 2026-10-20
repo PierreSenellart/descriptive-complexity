@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Savitch
-import DescriptiveComplexity.Problems.SuccinctReach.Defs
+module
+
+public import DescriptiveComplexity.Savitch
+public import DescriptiveComplexity.Problems.SuccinctReach.Defs
 
 /-!
 # SUCCINCT-REACH as a Savitch recursion
@@ -23,6 +25,8 @@ There are `2 ^ m` such restrictions for `m` state variables
 (`DescriptiveComplexity.card_stateClass`), so `m` levels of doubling suffice:
 `DescriptiveComplexity.succinctReachable_iff_savPow`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

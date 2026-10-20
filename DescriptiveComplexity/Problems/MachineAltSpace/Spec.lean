@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.MachineAltSpace.Guards
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.MachineAltSpace.Guards
 
 /-!
 # The configuration block, and the four sentences of the machine
@@ -30,6 +32,8 @@ The two promises `DescriptiveComplexity.TMData.WellFormed` and
 `DescriptiveComplexity.ExpDefinable` compares `P A` with `Q (X.Map A)` and has
 nowhere else to put a condition on `A` alone.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

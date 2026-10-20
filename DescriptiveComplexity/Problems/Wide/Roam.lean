@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Step
+module
+
+public import DescriptiveComplexity.Problems.Wide.Step
 
 /-!
 # Roaming: what a wide machine may do between its phases
@@ -57,6 +59,8 @@ first stopping cell and learns, on arrival, that nothing it passed was one. The
 extremum is taken there, once, so no phase of a program has to name the address
 a mark sits at.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

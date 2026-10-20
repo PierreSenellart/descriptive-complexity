@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Tape
+module
+
+public import DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # What a register file has to be
@@ -54,6 +56,8 @@ file low on the tape and instantiates the same walks at it: that is what this
 interface is for, and why the walks above it name a `DescriptiveComplexity.RegFile`
 rather than `DescriptiveComplexity.wmSeg`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

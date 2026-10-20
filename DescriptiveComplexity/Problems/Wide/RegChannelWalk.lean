@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelEnum
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelEnum
 
 /-!
 # The opening's walk at the register channel
@@ -24,6 +26,8 @@ channel they are all forced:
 
 So the whole geometry follows from the marking, and this file derives it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

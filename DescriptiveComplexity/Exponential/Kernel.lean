@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Class
-import DescriptiveComplexity.SecondOrderOrdered
+module
+
+public import DescriptiveComplexity.Exponential.Class
+public import DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # What a NEXPTIME source problem looks like
@@ -40,6 +42,8 @@ Which linear order is on the expanded universe is left to the consumer: the
 normal form holds at **every** one, so a reduction may choose the order its
 encoding induces and pay nothing for the choice.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

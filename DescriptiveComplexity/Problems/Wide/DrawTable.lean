@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawGeom
-import DescriptiveComplexity.Problems.Wide.Key
-import DescriptiveComplexity.Problems.Wide.Tape
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawGeom
+public import DescriptiveComplexity.Problems.Wide.Key
+public import DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # The transition table, and the two promises it has to keep
@@ -58,6 +60,8 @@ data. The padding of `DescriptiveComplexity.Draw.pad` is what makes that a
 condition about payloads rather than about tuples, which is the whole reason it
 is there.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

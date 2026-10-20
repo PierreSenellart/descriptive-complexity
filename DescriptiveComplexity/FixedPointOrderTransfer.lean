@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointPartial
+module
+
+public import DescriptiveComplexity.FixedPointPartial
 
 /-!
 # Order relativization: moving the order between the instance and the vocabulary
@@ -36,6 +38,8 @@ instance, identical to the given one through the identity isomorphism
 ordered `L`-structure *is* an instance of the expansion whose order symbol is
 a linear order (`DescriptiveComplexity.sumOrderStructure`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -160,7 +164,7 @@ section WithOrder
 
 variable [L.IsRelational] (P : DecisionProblem L)
 
-private theorem withOrder_iso_invariant {A B : Type}
+theorem withOrder_iso_invariant {A B : Type}
     [instA : (L.sum Language.order).Structure A]
     [instB : (L.sum Language.order).Structure B] (e : A ≃[L.sum Language.order] B) :
     (LeLinearOn L A ∧
@@ -240,7 +244,7 @@ private theorem vecEta₂ {A : Type} (x : Fin 2 → A) : ![x 0, x 1] = x := by
 /-- The ordered instance rebuilt from a structure over the expansion whose
 order symbol is a linear order is the given instance, through the identity
 isomorphism. -/
-private noncomputable def rebuildEquiv {A : Type}
+noncomputable def rebuildEquiv {A : Type}
     [inst : (L.sum Language.order).Structure A]
     (h : LeLinearOn L A) :
     @Language.Equiv (L.sum Language.order) A A

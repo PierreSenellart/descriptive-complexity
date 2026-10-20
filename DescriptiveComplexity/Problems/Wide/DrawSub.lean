@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawScan
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawScan
 
 /-!
 # One-cell writes, and tests the tracks can decide
@@ -40,6 +42,8 @@ A *track* is a predicate on the index and an *address* is a predicate on the
 universe; at the file a space-bounded program uses the two are the same type,
 which is why the diagonal reads as it does.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

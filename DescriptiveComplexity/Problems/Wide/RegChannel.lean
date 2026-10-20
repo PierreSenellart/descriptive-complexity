@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Defs
-import DescriptiveComplexity.Problems.Wide.Marks
-import DescriptiveComplexity.Problems.Wide.Roam
-import DescriptiveComplexity.Problems.Wide.RegFile
+module
+
+public import DescriptiveComplexity.Problems.Wide.Defs
+public import DescriptiveComplexity.Problems.Wide.Marks
+public import DescriptiveComplexity.Problems.Wide.Roam
+public import DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The wide machine with a register channel
@@ -40,6 +42,8 @@ Two properties, and they are exactly the two a register file has to have.
   has its file inside the working region, where the segment channel's ruler is
   in the top half.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

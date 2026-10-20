@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.Stages
+module
+
+public import DescriptiveComplexity.Invariant.Stages
 
 /-!
 # `≡ᵏ` on a bare set, and the order an induction cannot define
@@ -37,6 +39,8 @@ inside one structure. The class-level statement (order-free FO(IFP) does not
 capture PTIME, at `DescriptiveComplexity.EVEN`) needs the two-structure pebble
 game and is a separate development.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

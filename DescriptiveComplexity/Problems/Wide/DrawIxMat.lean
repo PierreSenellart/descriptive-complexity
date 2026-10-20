@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxIGate
-import DescriptiveComplexity.Problems.Wide.DrawIxStage
-import DescriptiveComplexity.Problems.Wide.DrawInstMat
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxIGate
+public import DescriptiveComplexity.Problems.Wide.DrawIxStage
+public import DescriptiveComplexity.Problems.Wide.DrawInstMat
 
 /-!
 # The matrix's stages at an arbitrary file
@@ -17,6 +19,8 @@ right at the `Slot.val`-walked presentation and exit at the next checkpoint.
 Each wrapper is the clocked run of its atom with the walk-back the dispatch
 owes, so each carries its atom's budget plus one step.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

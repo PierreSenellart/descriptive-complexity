@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Set.Card
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Qsat.Defs
+module
+
+public import Mathlib.Data.Set.Card
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Qsat.Defs
 
 /-!
 # QSAT is in PSPACE
@@ -51,6 +53,8 @@ where the prefix order is not a linear order on the variables, and neither the
 next nor the last variable of a position need exist – has no starting state at
 all.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -383,13 +387,13 @@ noncomputable def flipBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relation
 
 /-- The shared guard of the two returning cases: `x` is the last variable of
 the branch. -/
-private def isLastM (mark d : L'.Relations 1) (prec : L'.Relations 2) (x : M) : Prop :=
+def isLastM (mark d : L'.Relations 1) (prec : L'.Relations 2) (x : M) : Prop :=
   RelMap mark ![x] ∧ RelMap d ![x] ∧
     ∀ z : M, RelMap mark ![z] → RelMap d ![z] → ¬RelMap prec ![x, z]
 
 /-- The shared guard of the two returning cases: the subtree of `x` is
 finished. -/
-private def isPopM (allv t : L'.Relations 1) (r : L'.Relations 0) (x : M) : Prop :=
+def isPopM (allv t : L'.Relations 1) (r : L'.Relations 0) (x : M) : Prop :=
   RelMap t ![x] ∨ ((RelMap allv ![x] ∧ ¬RelMap r (![] : Fin 0 → M)) ∨
     (¬RelMap allv ![x] ∧ RelMap r (![] : Fin 0 → M)))
 

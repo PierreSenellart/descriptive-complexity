@@ -3,8 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelEntry
-import DescriptiveComplexity.Problems.Wide.DrawValEnum
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
+public import DescriptiveComplexity.Problems.Wide.DrawValEnum
+public import Mathlib.Data.Nat.Log
 
 /-!
 # The rounds of the evaluation, counted over the handed file
@@ -22,6 +25,8 @@ Everything it needs is generic (`DescriptiveComplexity.exists_wmChainOf`,
 element every register does, and a marked address holds inner elements alone –
 which is what the semantic layer reads a round through.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

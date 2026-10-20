@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.SetTheory.Cardinal.NatCard
-import DescriptiveComplexity.InductiveCounting.Machine
+module
+
+public import Mathlib.SetTheory.Cardinal.NatCard
+public import DescriptiveComplexity.InductiveCounting.Machine
 
 /-!
 # Registers as counters and as loop positions
@@ -17,6 +19,8 @@ collects the arithmetic of the two readings: how a cover moves a loop past one
 more node, how the count of a set restricted to the scanned part grows, and
 when a counter still has room to be incremented.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

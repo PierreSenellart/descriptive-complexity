@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.SuccinctReach.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.SuccinctReach.Defs
 
 /-!
 # SUCCINCT-REACH is in PSPACE
@@ -43,6 +45,8 @@ current copy of the block and the next one:
 * `DescriptiveComplexity.writesS` – “on the next-state copy of every marked element, this
   unary relation holds the value the other gives to the element itself”.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -310,7 +314,7 @@ variable {A : Type} [Language.transSys.Structure A] [LinearOrder A]
 
 /-- The state of the walk holding a given state, transition witness and pair of
 endpoint witnesses. -/
-private def srLift (S v w₁ w₂ : A → Prop) : srBlock.Assignment A :=
+def srLift (S v w₁ w₂ : A → Prop) : srBlock.Assignment A :=
   srAssign fun i => if i = srX then S else if i = srV then v else if i = srW₁ then w₁ else w₂
 
 /-- A walk of the system lifts to a walk of the specification, along which the

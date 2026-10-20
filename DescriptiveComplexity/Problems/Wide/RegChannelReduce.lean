@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Reduce
-import DescriptiveComplexity.Problems.Wide.RegChannelAccept
-import DescriptiveComplexity.Problems.Wide.RegChannelNo
-import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
-import DescriptiveComplexity.Exponential.KernelArity
+module
+
+public import DescriptiveComplexity.Problems.Wide.Reduce
+public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
+public import DescriptiveComplexity.Problems.Wide.RegChannelNo
+public import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
+public import DescriptiveComplexity.Exponential.KernelArity
 
 /-!
 # The reduction into the register channel
@@ -28,6 +30,8 @@ is the machine's correctness, which is the run of
 `DescriptiveComplexity.Draw.Data.wideRegAccept_regLaid_of_rules` on the
 yes-side and `DescriptiveComplexity.Problems.Wide.DrawNo` on the no-side.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

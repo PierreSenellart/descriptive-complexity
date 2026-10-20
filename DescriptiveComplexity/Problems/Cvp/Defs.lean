@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Interpretation
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # The circuit value problem: definition
@@ -58,6 +60,8 @@ reason: it keeps CVP a decision problem on arbitrary `Language.circuit`
 structures, so that it lives in the same catalog and composes with the same
 reductions.
 -/
+
+@[expose] public section
 
 /- The language of Boolean circuits lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.sat`. -/

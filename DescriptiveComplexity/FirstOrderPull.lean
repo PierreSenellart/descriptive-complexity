@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FirstOrderDefinable
-import DescriptiveComplexity.SecondOrderPull
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.FirstOrderDefinable
+public import DescriptiveComplexity.SecondOrderPull
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # First-order definability travels backward along reductions
@@ -28,6 +30,8 @@ applied to `DescriptiveComplexity.EVEN`
 (`DescriptiveComplexity.even_not_foDefinable`), whence
 `DescriptiveComplexity.even_not_le_of_foDefinable`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

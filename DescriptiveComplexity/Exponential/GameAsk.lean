@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameRun
+module
+
+public import DescriptiveComplexity.Exponential.GameRun
 
 /-!
 # Asking a question of the machine
@@ -32,6 +34,8 @@ program supplies, and the round becomes a statement about a *sentence*:
   `(data q).sub b` realized at the valuation the tuple carries, which is what
   `DescriptiveComplexity.QuestionData.MatrixHolds` supplies.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

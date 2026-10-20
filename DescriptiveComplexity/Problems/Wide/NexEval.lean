@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexSpec
-import DescriptiveComplexity.Problems.Wide.DrawProg
-import DescriptiveComplexity.Problems.Wide.NexOuter
-import DescriptiveComplexity.Problems.Wide.DrawRunEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.NexSpec
+public import DescriptiveComplexity.Problems.Wide.DrawProg
+public import DescriptiveComplexity.Problems.Wide.NexOuter
+public import DescriptiveComplexity.Problems.Wide.DrawRunEval
 
 /-!
 # The clocked evaluation's spine
@@ -39,6 +41,8 @@ deterministic: its guess site fires three rules on the same data, which is the
 one piece of nondeterminism it has, and what does hold there is
 `DescriptiveComplexity.Draw.Data.nexSep_postGuess`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

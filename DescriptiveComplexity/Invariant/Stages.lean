@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.EquivK
-import DescriptiveComplexity.FixedPointStep
+module
+
+public import DescriptiveComplexity.Invariant.EquivK
+public import DescriptiveComplexity.FixedPointStep
 
 /-!
 # `≡ᵏ`-invariance of the fixed-point stages
@@ -40,6 +42,8 @@ Every induction has a budget (`DescriptiveComplexity.StepDef.exists_varBound`):
 invariant layer is consumed – each phase-G statement carries the `k` and the
 symbols of the definition it starts from.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

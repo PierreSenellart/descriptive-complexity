@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Probability
-import Mathlib.Data.Finset.Max
-import Mathlib.Data.Fintype.BigOperators
-import Mathlib.Logic.Equiv.Prod
+module
+
+public import DescriptiveComplexity.Counting.Probability
+public import Mathlib.Data.Finset.Max
+public import Mathlib.Data.Fintype.BigOperators
+public import Mathlib.Logic.Equiv.Prod
 
 /-!
 # Weighted counts of independent events
@@ -30,6 +32,8 @@ the variables.
   `∏ (F i + S i) - ∏ F i`, the weight of succeeding somewhere, into a sum of
   products: no subtraction is left, which is what a quantitative term needs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

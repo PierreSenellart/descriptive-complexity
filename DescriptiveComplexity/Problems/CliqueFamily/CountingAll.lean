@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-import DescriptiveComplexity.Problems.CliqueFamily.Pendant
-import DescriptiveComplexity.Counting.Reduction
-import Mathlib.ModelTheory.Graph
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+public import DescriptiveComplexity.Problems.CliqueFamily.Pendant
+public import DescriptiveComplexity.Counting.Reduction
+public import Mathlib.ModelTheory.Graph
 
 /-!
 # Counting all the independent sets of a graph
@@ -33,6 +35,8 @@ reduction of the library to use a quotient and a remainder.
 The interpretation is two-dimensional and relativized: the vertices are the
 diagonal pairs of one tag, the leaves all the pairs of the other.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

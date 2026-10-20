@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Cvp.Defs
-import DescriptiveComplexity.Problems.HornSat
-import DescriptiveComplexity.OccurrenceFormulas
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Problems.Cvp.Defs
+public import DescriptiveComplexity.Problems.HornSat
+public import DescriptiveComplexity.OccurrenceFormulas
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # HORN-SAT to CVP: the circuit that runs unit propagation
@@ -52,6 +54,8 @@ Junk is disposed of in the usual way: the coordinates a tag does not use are
 pinned to the minimum, and the copies with other coordinates carry no mark and
 no wire, so they derive nothing and are wired to nothing.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

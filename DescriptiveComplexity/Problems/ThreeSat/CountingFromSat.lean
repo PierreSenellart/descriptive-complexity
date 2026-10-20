@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceFormulas
-import DescriptiveComplexity.OccurrencePrefix
-import DescriptiveComplexity.Problems.ThreeSat.Counting
-import DescriptiveComplexity.Problems.Sat.CountingHardness
-import Mathlib.Data.Fintype.Pigeonhole
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.OccurrenceFormulas
+public import DescriptiveComplexity.OccurrencePrefix
+public import DescriptiveComplexity.Problems.ThreeSat.Counting
+public import DescriptiveComplexity.Problems.Sat.CountingHardness
+public import Mathlib.Data.Fintype.Pigeonhole
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #SAT reduces parsimoniously to #3SAT
@@ -36,6 +38,8 @@ Empty clauses are copied as empty clauses. That such `z` are determined by the
 assignment, and exist exactly when it satisfies every clause, is the
 interpretation-free content of `DescriptiveComplexity.OccurrencePrefix`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

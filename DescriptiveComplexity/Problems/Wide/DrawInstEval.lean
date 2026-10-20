@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstVar
-import DescriptiveComplexity.Problems.Wide.DrawRunEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstVar
+public import DescriptiveComplexity.Problems.Wide.DrawRunEval
 
 /-!
 # The spine, instantiated: one variable's machinery per position
@@ -25,6 +27,8 @@ and stays abstract here, with the per-position semantic data
 (`DescriptiveComplexity.Draw.Data.KindSem`, the gates' domain facts), to
 be supplied by the encoding layer.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

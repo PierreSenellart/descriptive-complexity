@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Interpretation
-import Mathlib.Logic.Equiv.Fin.Basic
+module
+
+public import DescriptiveComplexity.Interpretation
+public import Mathlib.Logic.Equiv.Fin.Basic
 
 /-!
 # Composition of first-order reductions (transitivity)
@@ -36,6 +38,8 @@ Two points deserve attention:
   tags, so composite formulas are noncomputable (they are built with
   `BoundedFormula.iInf`); this does not affect any of the theorems.
 -/
+
+@[expose] public section
 
 /-! ### Terms of a relational language are variables
 
@@ -88,13 +92,13 @@ def FOInterpretation.liftEnv (I : FOInterpretation L₁ L₂ Tag d) {A : Type} {
   (τ b, fun j => v (b, j))
 
 /-- Relabeling that splits off the coordinates of the last bound variable. -/
-private def splitLast {β : Type} {d n : ℕ} :
+def splitLast {β : Type} {d n : ℕ} :
     (β ⊕ Fin (n + 1)) × Fin d → ((β ⊕ Fin n) × Fin d) ⊕ Fin d
   | (.inl b, j) => .inl (.inl b, j)
   | (.inr i, j) => Fin.lastCases (.inr j) (fun i' => .inl (.inr i', j)) i
 
 /-- Extending a tag assignment to one more bound variable. -/
-private def extendTag {β : Type} {n : ℕ} (τ : (β ⊕ Fin n) → Tag) (t : Tag) :
+def extendTag {β : Type} {n : ℕ} (τ : (β ⊕ Fin n) → Tag) (t : Tag) :
     (β ⊕ Fin (n + 1)) → Tag :=
   Sum.elim (fun b => τ (.inl b)) (Fin.snoc (fun i => τ (.inr i)) t)
 

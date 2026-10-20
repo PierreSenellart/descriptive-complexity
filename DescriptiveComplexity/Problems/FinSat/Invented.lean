@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.FinSat.Fixpoint
+module
+
+public import DescriptiveComplexity.Problems.FinSat.Fixpoint
 
 /-!
 # The certificate: a finite model, invented
@@ -45,6 +47,8 @@ Note that `G` must be given separately from `H`: a node that is a *negated*
 atom has the negation of the atom's truth value, so the two cannot be the same
 relation – the equation `G g e ↔ ¬G g e` has no solutions.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

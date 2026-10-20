@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Game.Hardness
+module
+
+public import DescriptiveComplexity.Problems.Game.Hardness
 
 /-!
 # GAME, alternating reachability
@@ -43,3 +45,5 @@ HORN-SAT, and `DescriptiveComplexity.piP_zero_eq` (polynomial time is closed
 under complement) carries hardness back – the same last step
 `DescriptiveComplexity.Problems.Cvp.Hardness` takes.
 -/
+
+@[expose] public section

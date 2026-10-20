@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.Lattice
-import DescriptiveComplexity.Complexity
+module
+
+public import Mathlib.Data.Fintype.Lattice
+public import DescriptiveComplexity.Complexity
 
 /-!
 # Second-order definability with bounded alternation
@@ -43,6 +45,8 @@ and padding in `DescriptiveComplexity.SecondOrderLift`, closure under FO reducti
 `DescriptiveComplexity.SecondOrderOrdered`, and the resulting definition of the levels
 `Σₖᵖ`/`Πₖᵖ` for `k ≥ 1` in `DescriptiveComplexity.Hierarchy`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

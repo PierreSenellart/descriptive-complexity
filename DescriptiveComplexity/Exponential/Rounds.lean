@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.PointGuard
-import DescriptiveComplexity.SecondOrderReplicate
+module
+
+public import DescriptiveComplexity.Exponential.PointGuard
+public import DescriptiveComplexity.SecondOrderReplicate
 
 /-!
 # Placing an expansion's sentences into a quantifier prefix
@@ -38,6 +40,8 @@ assignment back along the renaming gives the replicated assignment of the
 selected rounds, with their tag bits dropped. It is `relMap_repSym` read as a
 statement about assignments rather than about `RelMap`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

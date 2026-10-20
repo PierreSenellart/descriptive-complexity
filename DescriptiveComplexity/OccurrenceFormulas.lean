@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceOrder
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.OccurrenceOrder
+public import DescriptiveComplexity.Ordered
 
 /-!
 # First-order formulas for literal occurrences, over the ordered expansion
@@ -23,6 +25,8 @@ quantifiers). Occurrence *signs* are static (Lean-level) `Bool` parameters:
 a quantification over signs becomes a finite conjunction or disjunction of
 formulas.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

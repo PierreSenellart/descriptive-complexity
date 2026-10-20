@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.Perm
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Algebra.BigOperators.Group.Finset.Sigma
-import Mathlib.Algebra.BigOperators.ModEq
+module
+
+public import Mathlib.Data.Fintype.Perm
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
+public import Mathlib.Data.Finset.Powerset
+public import Mathlib.Algebra.BigOperators.Group.Finset.Sigma
+public import Mathlib.Algebra.BigOperators.ModEq
 
 /-!
 # Permanents of rectangular matrices, and their Laplace expansion
@@ -32,6 +34,8 @@ restriction of the expansion to the columns the rows are supported on
 when a set of rows is supported on as many columns
 (`DescriptiveComplexity.bperm_block`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

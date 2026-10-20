@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawKit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # Assembling a program from call sites
@@ -26,6 +28,8 @@ file – its `Sh i` a kit rule type (or a sum of one with its exit rules), its
 `hsep i` the kit's `sep` plus its `exit_disjoint` – and the assembly is the
 only place they meet.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

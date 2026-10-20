@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexSpec
-import DescriptiveComplexity.Problems.Wide.DrawBuild
+module
+
+public import DescriptiveComplexity.Problems.Wide.NexSpec
+public import DescriptiveComplexity.Problems.Wide.DrawBuild
 
 /-!
 # The clocked program lays its file out
@@ -57,6 +59,8 @@ the guess, and `step_homeGuessExit` enters the evaluation. The whole opening is
 those five legs, and `DescriptiveComplexity.TMData.reachesIn_five` adds them up:
 twice a phase and three steps.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

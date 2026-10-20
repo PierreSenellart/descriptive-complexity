@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Cvp.Defs
-import DescriptiveComplexity.Counting
-import Mathlib.Algebra.BigOperators.Finprod
-import Mathlib.SetTheory.Cardinal.Finite
+module
+
+public import DescriptiveComplexity.Problems.Cvp.Defs
+public import DescriptiveComplexity.Counting
+public import Mathlib.Algebra.BigOperators.Finprod
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # The number written by a circuit: definition
@@ -30,6 +32,8 @@ order, are the binary digits of a natural number, and
   (`DescriptiveComplexity.OutOrder`); an instance whose `below` does not
   writes `0`.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

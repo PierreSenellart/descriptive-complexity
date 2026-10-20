@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSites
-import DescriptiveComplexity.Problems.Wide.DrawReset
-import DescriptiveComplexity.Problems.Wide.DrawAsm
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSites
+public import DescriptiveComplexity.Problems.Wide.DrawReset
+public import DescriptiveComplexity.Problems.Wide.DrawAsm
 
 /-!
 # The outer program: every call site but the evaluation
@@ -53,6 +55,8 @@ The control flow:
 
 Everything here is rules and shapes; the runs are `DrawRun`'s.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxEval
-import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
-import DescriptiveComplexity.Problems.Wide.DrawIxBridge
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxEval
+public import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
+public import DescriptiveComplexity.Problems.Wide.DrawIxBridge
 
 /-!
 # A gated position's semantic pack, at an arbitrary file and phase
@@ -25,6 +27,8 @@ asks of a threaded family. The transport lemmas under them
 (`ixPassW_congr`, `ixKindSemCast_passSem`, and the one-pack family) say the same
 thing once: a pack sees the state through the mirror and VAL alone.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

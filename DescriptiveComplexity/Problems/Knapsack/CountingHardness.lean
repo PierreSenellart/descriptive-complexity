@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Knapsack.Counting
-import DescriptiveComplexity.Problems.Knapsack.Hardness
-import DescriptiveComplexity.Problems.ExactCoverCounting
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Knapsack.Counting
+public import DescriptiveComplexity.Problems.Knapsack.Hardness
+public import DescriptiveComplexity.Problems.ExactCoverCounting
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Knapsack is parsimoniously `#P`-complete
@@ -20,6 +22,8 @@ chosen sets that contain it. Hence the solutions of the interpreted instance
 are the exact covers of the set system, bijectively
 (`DescriptiveComplexity.KnapRed.solEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

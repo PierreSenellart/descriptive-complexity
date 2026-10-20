@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstGate
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstGate
 
 /-!
 # The matrix's stages: the atom runs in the sequencer's shape
@@ -23,6 +25,8 @@ instantiated atom runs into that shape:
   `Slot.val`-walked presentation of one boundary state – the presentation
   `DescriptiveComplexity.Draw.Data.var_run` hands the matrix.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

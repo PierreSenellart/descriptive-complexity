@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.MachineNumber.Membership
-import DescriptiveComplexity.Problems.MachineNumber.Hardness
-import DescriptiveComplexity.Problems.HornSat.NumberHardness
-import DescriptiveComplexity.Counting.Digits.NormalForm
+module
+
+public import DescriptiveComplexity.Problems.MachineNumber.Membership
+public import DescriptiveComplexity.Problems.MachineNumber.Hardness
+public import DescriptiveComplexity.Problems.HornSat.NumberHardness
+public import DescriptiveComplexity.Counting.Digits.NormalForm
 
 /-!
 # The number written by a machine is complete for FP
@@ -55,6 +57,8 @@ input so that the output variables come first, in the order of significance
 (`DescriptiveComplexity.FOInterpretation.reorder`), and the machine then lays
 its cells out in that order.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

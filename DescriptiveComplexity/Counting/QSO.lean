@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.KernelPair
-import DescriptiveComplexity.SecondOrderMerge
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Counting.KernelPair
+public import DescriptiveComplexity.SecondOrderMerge
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # ΣQSO(FO): quantitative second-order logic with second-order sums
@@ -24,6 +26,8 @@ second-order product `ΠX` of the full logic QSO is left out: ΣQSO(FO) is the
 fragment that captures `#P` over ordered structures, which is
 `DescriptiveComplexity.mem_sharpP_iff_sqDefinable`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

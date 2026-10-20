@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Padding
 
 /-!
 # Shared scaffolding of the clausal discharges
@@ -32,6 +34,8 @@ Everything that does not depend on that difference is here:
   second-order atom – the two building blocks of every defining formula of such
   a discharge, with their realization lemmas.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

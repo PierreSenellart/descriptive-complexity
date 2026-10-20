@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Padding
-import Mathlib.Data.Fintype.Lattice
-import Mathlib.Tactic.FinCases
+module
+
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Padding
+public import Mathlib.Data.Fintype.Lattice
+public import Mathlib.Tactic.FinCases
 
 /-!
 # The Tseitin encoding of a first-order kernel: semantic layer
@@ -50,6 +52,8 @@ the FO formulas defining the CNF instance inside the input structure:
 The corresponding first-order formulas and their realization lemmas are in
 `DescriptiveComplexity.Problems.Sat.TseitinFormulas`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -165,13 +169,13 @@ theorem nodeAt_le_maxCtx :
       · exact le_maxCtx _
       · exact nodeAt_le_maxCtx f q
 
-private def rootSigmaEquiv (n : ℕ) : PUnit.{1} ≃ (Σ m, PLift (n = m)) where
+def rootSigmaEquiv (n : ℕ) : PUnit.{1} ≃ (Σ m, PLift (n = m)) where
   toFun _ := ⟨n, ⟨rfl⟩⟩
   invFun _ := ⟨⟩
   left_inv _ := rfl
   right_inv := by rintro ⟨m, ⟨rfl⟩⟩; rfl
 
-private instance (n : ℕ) : Finite (Σ m, PLift (n = m)) :=
+instance (n : ℕ) : Finite (Σ m, PLift (n = m)) :=
   Finite.of_equiv _ (rootSigmaEquiv n)
 
 /-- There are finitely many positions in a formula. -/

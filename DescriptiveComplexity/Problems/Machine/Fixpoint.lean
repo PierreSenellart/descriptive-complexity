@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Machine.Defs
-import DescriptiveComplexity.Problems.Machine.Walk
-import DescriptiveComplexity.Problems.Machine.Program
-import DescriptiveComplexity.FixedPoint
-import DescriptiveComplexity.FixedPointHorn
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Machine.Defs
+public import DescriptiveComplexity.Problems.Machine.Walk
+public import DescriptiveComplexity.Problems.Machine.Program
+public import DescriptiveComplexity.FixedPoint
+public import DescriptiveComplexity.FixedPointHorn
 
 /-!
 # Deterministic machine acceptance is in PTIME
@@ -55,6 +57,8 @@ induction on derivations, completeness
 time position, and together they make the output read exactly “the machine
 accepts within its budget”.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

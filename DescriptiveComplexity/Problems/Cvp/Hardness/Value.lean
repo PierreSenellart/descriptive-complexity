@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Cvp.Hardness.Wiring
+module
+
+public import DescriptiveComplexity.Problems.Cvp.Hardness.Wiring
 
 /-!
 # What the drawn circuit computes
@@ -25,6 +27,8 @@ Only the true rail carries information; the false rail is where the constant
 `0` and the unfired chains sit, and nothing downstream reads it, so the
 inverting half states nothing about it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

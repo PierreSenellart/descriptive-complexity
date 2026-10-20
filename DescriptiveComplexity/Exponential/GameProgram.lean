@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.AltQuant
-import DescriptiveComplexity.Exponential.BlockClaim
-import DescriptiveComplexity.Exponential.Game
+module
+
+public import DescriptiveComplexity.Exponential.AltQuant
+public import DescriptiveComplexity.Exponential.BlockClaim
+public import DescriptiveComplexity.Exponential.Game
 
 /-!
 # The six questions a machine playing a second-order game must answer
@@ -51,6 +53,8 @@ machine plays: the existential player claims the whole vector in one move, the
 universal player challenges one claim by a tape lookup or lets the residual
 formula be evaluated.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Counting
-import DescriptiveComplexity.Problems.Machine.Interp
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Machine.Counting
+public import DescriptiveComplexity.Problems.Machine.Interp
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # Counting accepting runs is parsimoniously `#P`-complete
@@ -39,6 +41,8 @@ of the formula, writing “false” at every other element. So:
   overwritten, so the final tape says what each guess step wrote, and away from
   the guess the machine is deterministic.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

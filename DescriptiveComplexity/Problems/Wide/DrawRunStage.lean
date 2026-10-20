@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawStageAtom
-import DescriptiveComplexity.Problems.Wide.DrawBack
-import DescriptiveComplexity.Problems.Wide.DrawRunElem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
+public import DescriptiveComplexity.Problems.Wide.DrawBack
+public import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The stage atom's run
@@ -33,6 +35,8 @@ addresses because the correspondence carries the order. The elementwise file is
 that at the identity (`DescriptiveComplexity.Draw.Data.diagLaid`), which is
 what `stageAtSt`, `stageEndSt` and `trackTape_back_gen_diag` are.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

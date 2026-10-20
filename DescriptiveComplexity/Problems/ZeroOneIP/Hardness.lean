@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.ZeroOneIP.Defs
-import DescriptiveComplexity.Problems.Knapsack.Defs
-import DescriptiveComplexity.Padding
-import Mathlib.Data.Fintype.Lattice
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.ZeroOneIP.Defs
+public import DescriptiveComplexity.Problems.Knapsack.Defs
+public import DescriptiveComplexity.Padding
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # 0-1 integer programming is NP-hard
@@ -29,6 +31,8 @@ Naming the minimum is the only use of the order, so this is an
 `DescriptiveComplexity.OrderedFOReduction`; conveniently, being one also supplies the
 finiteness and nonemptiness that make the minimum exist.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

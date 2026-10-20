@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SatUnsat
-import DescriptiveComplexity.Problems.Sat.Hardness
+module
+
+public import DescriptiveComplexity.Problems.SatUnsat
+public import DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # DP-hardness of SAT-UNSAT
@@ -48,6 +50,8 @@ Both sides are handled once, by a section generic in the tag injection
 `inj : T → Tg` and its partial inverse `get : Tg → Option T`, instantiated at
 `Sum.inl`/`Sum.getLeft?` and `Sum.inr`/`Sum.getRight?`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

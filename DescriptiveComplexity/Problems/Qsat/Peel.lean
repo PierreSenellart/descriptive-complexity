@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Parts
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Parts
 
 /-!
 # Peeling the blocks of the prefix
@@ -23,6 +25,8 @@ The whole of that reading is the five transition lemmas below
 computation on block coordinates, and every variable's block coordinates are one
 of three shapes (`DescriptiveComplexity.keyTriple_cases`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

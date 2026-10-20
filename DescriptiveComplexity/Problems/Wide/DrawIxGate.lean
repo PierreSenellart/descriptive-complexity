@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxExp
-import DescriptiveComplexity.Problems.Wide.DrawInstGate
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxExp
+public import DescriptiveComplexity.Problems.Wide.DrawInstGate
 
 /-!
 # The gates at an arbitrary file
@@ -24,6 +26,8 @@ stand for holds (`DescriptiveComplexity.ixAddr`).
 Only the declarations that mention the file are restated here; everything the
 elementwise file says about the control alone is imported.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

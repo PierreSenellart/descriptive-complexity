@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureCompl
-import DescriptiveComplexity.KromTransitiveClosure
-import DescriptiveComplexity.Problems.Reachability
+module
+
+public import DescriptiveComplexity.TransitiveClosureCompl
+public import DescriptiveComplexity.KromTransitiveClosure
+public import DescriptiveComplexity.Problems.Reachability
 
 /-!
 # Immerman–Szelepcsényi: `NL = coNL`
@@ -32,6 +34,8 @@ inspection of clauses could give; and `REACH ∈ NL`
 (`DescriptiveComplexity.reach_mem_NL`), the membership a clausal fragment cannot state
 directly because it defines non-reachability head-on.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

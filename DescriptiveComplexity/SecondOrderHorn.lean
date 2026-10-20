@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Ordered
 
 /-!
 # SO-Horn: existential second-order logic with a Horn kernel
@@ -44,6 +46,8 @@ the SO-Horn analogue of `DescriptiveComplexity.SigmaSODefinable`; it is closed u
 `DescriptiveComplexity.ComplexityClass` – the class `DescriptiveComplexity.PTIME` of
 `DescriptiveComplexity.Hierarchy`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

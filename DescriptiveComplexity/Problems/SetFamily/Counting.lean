@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SetFamily.Membership
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Problems.SetFamily.Membership
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #ExactCover: counting exact covers
@@ -18,6 +20,8 @@ nothing has to be said about the other elements of the instance.
 (`DescriptiveComplexity.sharpExactCover_mem_sharpP`); its parsimonious hardness is in
 `DescriptiveComplexity.Problems.ExactCoverCounting`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

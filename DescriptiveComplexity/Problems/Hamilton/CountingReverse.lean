@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.CountingForward
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.CountingForward
 
 /-!
 # Every circuit of the row graph is the circuit of a model
@@ -32,6 +34,8 @@ once, along an arc, and no two vertices follow each other both ways.
 A clause vertex is then entered from each of its true literals, and it is
 entered once.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

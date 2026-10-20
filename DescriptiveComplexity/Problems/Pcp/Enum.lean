@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Finset.Sort
-import Mathlib.Data.List.Forall2
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import Mathlib.Data.Finset.Sort
+public import Mathlib.Data.List.Forall2
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Sorted enumerations, and matchings between them
@@ -34,6 +36,8 @@ The converse pairing, `DescriptiveComplexity.Pcp.IdxMatch`, is the matching two
 lists of the same length carry for free; it is the certificate a yes-instance
 hands back.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

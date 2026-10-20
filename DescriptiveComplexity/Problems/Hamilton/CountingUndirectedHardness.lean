@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
-import DescriptiveComplexity.Problems.Hamilton.CountingHardness
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
+public import DescriptiveComplexity.Problems.Hamilton.CountingHardness
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Hamilton Circuit is parsimoniously `#P`-complete
@@ -35,6 +37,8 @@ Both directions of the correspondence build a circuit from a potential
 (`DescriptiveComplexity.isCircuit_of_potential`): the position of the vertex in the
 other circuit.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

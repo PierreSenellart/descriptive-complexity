@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Set.Card
-import Mathlib.Data.Fintype.Pigeonhole
-import Mathlib.Dynamics.FixedPoints.Basic
-import Mathlib.Order.Lattice.Nat
+module
+
+public import Mathlib.Data.Set.Card
+public import Mathlib.Data.Fintype.Pigeonhole
+public import Mathlib.Dynamics.FixedPoints.Basic
+public import Mathlib.Order.Lattice.Nat
 
 /-!
 # Orbits of a self-map on a finite type
@@ -36,6 +38,8 @@ future exponential iteration (SO(LFP), SO(PFP)). Everything is stated over an
 arbitrary starting point, so ascending chains from `⊥` and descending chains
 from `⊤` are both instances.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

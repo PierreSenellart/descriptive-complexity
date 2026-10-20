@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadCapture
+module
+
+public import DescriptiveComplexity.HeadCapture
 
 /-!
 # Counting on a block of heads
@@ -31,6 +33,8 @@ turns it into `DescriptiveComplexity.TupSucc`, the coordinatewise description of
 covering in `Lex (Fin n → A)`, and the walk becomes a walk along a finite linear
 order like any other.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

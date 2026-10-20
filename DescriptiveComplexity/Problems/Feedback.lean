@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Feedback.Defs
-import DescriptiveComplexity.Problems.Feedback.Reductions
-import DescriptiveComplexity.Problems.Feedback.Membership
-import DescriptiveComplexity.Problems.CliqueFamily
-import DescriptiveComplexity.Composition
+module
+
+public import DescriptiveComplexity.Problems.Feedback.Defs
+public import DescriptiveComplexity.Problems.Feedback.Reductions
+public import DescriptiveComplexity.Problems.Feedback.Membership
+public import DescriptiveComplexity.Problems.CliqueFamily
+public import DescriptiveComplexity.Composition
 
 /-!
 # The feedback problems are NP-complete
@@ -38,6 +40,8 @@ As with any complexity-theoretic statement, these results are about finite
 structures only
 (`DescriptiveComplexity.ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

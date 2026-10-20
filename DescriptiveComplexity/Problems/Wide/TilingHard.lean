@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard.Draw
-import DescriptiveComplexity.Problems.Wide.TilingHard.No
-import DescriptiveComplexity.Problems.Wide.TilingExp
-import DescriptiveComplexity.Problems.Wide.RegChannelReduce
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Draw
+public import DescriptiveComplexity.Problems.Wide.TilingHard.No
+public import DescriptiveComplexity.Problems.Wide.TilingExp
+public import DescriptiveComplexity.Problems.Wide.RegChannelReduce
 
 /-!
 # Tiling a wide square is NEXPTIME-complete
@@ -25,6 +27,8 @@ What this file adds is the bridge: the interpreted structure is the emitted one,
 symbol by symbol, so the identity is an isomorphism between them and the two
 halves apply to the interpretation itself.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

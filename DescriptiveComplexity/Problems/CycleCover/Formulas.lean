@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CycleCover.Models
-import DescriptiveComplexity.Permanent.Widths
-import DescriptiveComplexity.OccurrenceFormulas
-import DescriptiveComplexity.OrderedComposition
-import DescriptiveComplexity.RelComposition
-import DescriptiveComplexity.Syntax
+module
+
+public import DescriptiveComplexity.Problems.CycleCover.Models
+public import DescriptiveComplexity.Permanent.Widths
+public import DescriptiveComplexity.OccurrenceFormulas
+public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.RelComposition
+public import DescriptiveComplexity.Syntax
 
 /-!
 # The formulas of the reduction of #1-in-SAT to #Cycle Cover
@@ -34,6 +36,8 @@ with its realization lemma; the drawing itself is in
 * A **rung** is a node, a node, a level and an index below the width
   (`DescriptiveComplexity.SatCover.widthF`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

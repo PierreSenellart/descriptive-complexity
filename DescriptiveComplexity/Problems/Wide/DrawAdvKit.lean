@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawAdv
-import DescriptiveComplexity.Problems.Wide.DrawKit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawAdv
+public import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # The advance kit: one round of a sweep
@@ -23,6 +25,8 @@ phase is only ever entered on the fresh marker cell), and the increment and
 return rules are the ones the third hardening shaped, with the landing
 phase's single `rg = one ∨ wk ≠ one` rule serving hold, walk and return.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

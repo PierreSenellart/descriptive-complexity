@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.Table
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Table
 
 /-!
 # The simulating machine on a zipper tape
@@ -28,6 +30,8 @@ set of letters unchanged in one direction crosses any run of them
 (`DescriptiveComplexity.HaltHard.reach_walkR`/`reach_walkL`). Every phase of
 the simulation is a chain of these.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

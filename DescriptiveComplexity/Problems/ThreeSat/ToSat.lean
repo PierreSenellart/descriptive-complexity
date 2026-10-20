@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ThreeSat.Defs
-import DescriptiveComplexity.OccurrenceFormulas
+module
+
+public import DescriptiveComplexity.Problems.ThreeSat.Defs
+public import DescriptiveComplexity.OccurrenceFormulas
 
 /-!
 # 3SAT FO-reduces to SAT
@@ -28,6 +30,8 @@ distinct literal occurrences”):
 The order is not needed: this is an order-free FO reduction (though not a
 quantifier-free one, since `wideS` quantifies over clauses and occurrences).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

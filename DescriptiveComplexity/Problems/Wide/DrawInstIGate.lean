@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstGate
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstGate
 
 /-!
 # The inner gates, instantiated
@@ -21,6 +23,8 @@ The flag-riding lemmas are stated at a flag constrained to the round's
 two (`hflag : flag = existGateC ∨ flag = allGateC`), which is what makes
 every disequality against the machinery's written slots decidable.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

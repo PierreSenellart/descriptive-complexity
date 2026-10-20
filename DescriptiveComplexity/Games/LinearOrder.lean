@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Games.Distance
-import DescriptiveComplexity.Games.Ehrenfeucht
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Games.Distance
+public import DescriptiveComplexity.Games.Ehrenfeucht
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The game on finite linear orders
@@ -43,6 +45,8 @@ here is the translation between the game and the arithmetic: a position is
 legal exactly when the ranks are in the same order, and a round is one
 application of the answer lemma.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.DominatingSet.Defs
-import DescriptiveComplexity.Counting.Sized
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.DominatingSet.Defs
+public import DescriptiveComplexity.Counting.Sized
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #Dominating Set: counting the dominating sets of the threshold size
@@ -24,6 +26,8 @@ generic argument for a solution of the threshold size
 Parsimonious hardness is in
 `DescriptiveComplexity.Problems.DominatingSet.CountingHardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

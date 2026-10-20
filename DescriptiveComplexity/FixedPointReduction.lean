@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointInflationary
-import DescriptiveComplexity.RelComposition
-import DescriptiveComplexity.SecondOrderLift
+module
+
+public import DescriptiveComplexity.FixedPointInflationary
+public import DescriptiveComplexity.RelComposition
+public import DescriptiveComplexity.SecondOrderLift
 
 /-!
 # FO(LFP) reductions: the polynomial-time reductions of a machine-free library
@@ -70,6 +72,8 @@ EVEN reduces in FO(LFP) but not in FO(≤).
   implied by the library's own hardness
   (`DescriptiveComplexity.FixedPointReductionClosure`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

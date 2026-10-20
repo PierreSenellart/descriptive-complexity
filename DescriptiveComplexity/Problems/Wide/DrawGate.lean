@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawEnc
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawEnc
 
 /-!
 # The gate, decomposed the way the machine checks it
@@ -29,6 +31,8 @@ the only thing tying the block value to one tag – and it costs nothing: the
 machine reads every tag's witness cell anyway, so the condition is a
 one-hotness test on the flags it has just filled.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

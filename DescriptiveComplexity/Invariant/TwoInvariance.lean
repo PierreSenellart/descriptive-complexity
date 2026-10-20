@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.TwoPebble
+module
+
+public import DescriptiveComplexity.Invariant.TwoPebble
 
 /-!
 # The `k`-variable invariance lemma, across two structures
@@ -21,6 +23,8 @@ Read at a sentence, this is what separates a *Boolean* query: two structures
 with a `k`-pebble equivalent pair of tuples satisfy the same formulas of
 `k` variables.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

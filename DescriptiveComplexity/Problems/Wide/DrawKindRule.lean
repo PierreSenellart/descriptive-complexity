@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTower
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTower
 
 /-!
 # The rules of an atom's machinery, dispatched by its kind
@@ -25,6 +27,8 @@ The packs keep the semantic content where it belongs – it is fixed with
 the runs – while the shapes and their separation are closed here: `kindSep`
 needs nothing beyond the packs and the embedding's injectivity.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

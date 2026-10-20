@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Sat.Hardness
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # TAUT: propositional tautology
@@ -36,6 +38,8 @@ No new second-order argument is needed: TAUT is coNP-complete
 `DescriptiveComplexity.Complexity` and the duality
 `DescriptiveComplexity.piSODefinable_iff_compl`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

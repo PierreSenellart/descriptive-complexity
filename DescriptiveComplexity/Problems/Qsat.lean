@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Blocks
-import DescriptiveComplexity.Problems.Qsat.Complement
-import DescriptiveComplexity.Problems.Qsat.Hardness
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Blocks
+public import DescriptiveComplexity.Problems.Qsat.Complement
+public import DescriptiveComplexity.Problems.Qsat.Hardness
 
 /-!
 # QSAT: quantified Boolean formulas with an unbounded prefix
@@ -83,6 +85,8 @@ reading its answer the other way round decides the complement,
 `DescriptiveComplexity.Problems.Qsat.Complement`. Together with hardness that is
 `PSPACE = coPSPACE` (`DescriptiveComplexity.PSpaceCompl`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

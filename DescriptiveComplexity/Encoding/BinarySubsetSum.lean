@@ -3,10 +3,18 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Decoding
-import DescriptiveComplexity.Numbers.Binary
-import DescriptiveComplexity.Numbers.BinEnum
-import DescriptiveComplexity.Problems.Knapsack.Defs
+module
+
+public import DescriptiveComplexity.Decoding
+meta import DescriptiveComplexity.Decoding
+public import DescriptiveComplexity.Numbers.Binary
+meta import DescriptiveComplexity.Numbers.Binary
+public import DescriptiveComplexity.Numbers.BinEnum
+meta import DescriptiveComplexity.Numbers.BinEnum
+public import DescriptiveComplexity.Problems.Knapsack.Defs
+meta import DescriptiveComplexity.Problems.Knapsack.Defs
+public import Mathlib.Algebra.Order.BigOperators.Group.List
+meta import Mathlib.Algebra.Order.BigOperators.Group.List
 
 /-!
 # The binary encoding of subset-sum instances, and what it decodes to
@@ -63,6 +71,8 @@ constructor application would be typed at the unfolded sum instead. The two
 constructors carry the right type by definition, and
 `BinarySubsetSum.pt_cases` replaces `cases` on a universe element.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

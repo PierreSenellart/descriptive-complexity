@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceOrder
+module
+
+public import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # Prefix valuations: the chain of a clause, with determined links
@@ -29,6 +31,8 @@ beyond the assignment; an assignment has a prefix valuation exactly when it
 satisfies every clause (`DescriptiveComplexity.SatOcc.PrefixVal.exists_litTrue`,
 `DescriptiveComplexity.SatOcc.prefixVal_prefixOr`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

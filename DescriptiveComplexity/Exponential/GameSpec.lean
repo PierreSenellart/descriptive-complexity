@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameState
+module
+
+public import DescriptiveComplexity.Exponential.GameState
 
 /-!
 # The graph game, as a second-order alternating game
@@ -34,6 +36,8 @@ the point guards of a prefix live inside its kernel
 twice and break the correspondence with
 `DescriptiveComplexity.ExpExpansion.exists_paramKernel`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

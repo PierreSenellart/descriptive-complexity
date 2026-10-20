@@ -3,8 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Vocabulary
+module
+
+public meta import Lean.Elab.Command
+public import DescriptiveComplexity.SecondOrder
+public meta import DescriptiveComplexity.Vocabulary
 
 /-!
 # Declaring a second-order block
@@ -40,6 +43,8 @@ inductive rather than `Unit` or `Fin k` even for a single variable: a numeral
 does not elaborate at the `ι` field, and a named constructor is what the
 `⟨.i, rfl⟩` symbols and the assignment `ρ` read.
 -/
+
+public meta section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CodeHalt.Defs
-import DescriptiveComplexity.Problems.CodeHalt.Membership
-import DescriptiveComplexity.Problems.CodeHalt.Hardness
+module
+
+public import DescriptiveComplexity.Problems.CodeHalt.Defs
+public import DescriptiveComplexity.Problems.CodeHalt.Membership
+public import DescriptiveComplexity.Problems.CodeHalt.Hardness
 
 /-!
 # CODEHALT: does the partial recursive code drawn in the instance halt?
@@ -40,3 +42,5 @@ it has all three halves:
 Together with the RE-hardness of `DescriptiveComplexity.FINSAT` the last two
 give `DescriptiveComplexity.finsat_not_computable`, Trakhtenbrot's theorem.
 -/
+
+@[expose] public section

@@ -3,15 +3,17 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Games.Bare
-import DescriptiveComplexity.Games.LinearOrder
-import DescriptiveComplexity.TransitiveClosureFO
-import DescriptiveComplexity.ImmermanSzelepcsenyi
-import DescriptiveComplexity.Invariant.TwoStages
-import DescriptiveComplexity.Problems.TwoSat
-import DescriptiveComplexity.FirstOrderPull
-import DescriptiveComplexity.ArithmeticDefinable
-import DescriptiveComplexity.LogTime
+module
+
+public import DescriptiveComplexity.Games.Bare
+public import DescriptiveComplexity.Games.LinearOrder
+public import DescriptiveComplexity.TransitiveClosureFO
+public import DescriptiveComplexity.ImmermanSzelepcsenyi
+public import DescriptiveComplexity.Invariant.TwoStages
+public import DescriptiveComplexity.Problems.TwoSat
+public import DescriptiveComplexity.FirstOrderPull
+public import DescriptiveComplexity.ArithmeticDefinable
+public import DescriptiveComplexity.LogTime
 
 /-!
 # EVEN: the parity of a bare set
@@ -65,6 +67,8 @@ This is the first *unconditional* separation of the library – no complexity
 assumption enters, in contrast with everything the completeness results say,
 which is why the game layer is worth its cost.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

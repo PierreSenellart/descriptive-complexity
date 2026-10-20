@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosure
-import DescriptiveComplexity.SecondOrderKrom
-import DescriptiveComplexity.LogSpace
+module
+
+public import DescriptiveComplexity.TransitiveClosure
+public import DescriptiveComplexity.SecondOrderKrom
+public import DescriptiveComplexity.LogSpace
 
 /-!
 # From FO(TC) to the Krom fragment, through the complement
@@ -43,6 +45,8 @@ itself in the Krom fragment – is Immerman–Szelepcsényi, proved through FO(T
 in `DescriptiveComplexity.ImmermanSzelepcsenyi`; see also the discussion in
 `DescriptiveComplexity.LogSpace`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

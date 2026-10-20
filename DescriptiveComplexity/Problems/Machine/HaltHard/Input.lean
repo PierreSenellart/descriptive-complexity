@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.RE
-import Mathlib.Computability.PartrecBasis
-import DescriptiveComplexity.Problems.Machine.HaltHard.Bridge
-import DescriptiveComplexity.Computability.Eval
+module
+
+public import Mathlib.Computability.RE
+public import Mathlib.Computability.PartrecBasis
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Bridge
+public import DescriptiveComplexity.Computability.Eval
 
 /-!
 # The input chain: getting the instance into the machine
@@ -40,6 +42,8 @@ headers (`DescriptiveComplexity.HaltHard.frameSeg_inputChain`), and its
 evaluation is total until the final procedure
 (`DescriptiveComplexity.HaltHard.inputChain_dom_iff`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

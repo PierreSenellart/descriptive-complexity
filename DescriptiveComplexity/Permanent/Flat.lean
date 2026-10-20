@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Permanent.AttachAll
+module
+
+public import DescriptiveComplexity.Permanent.AttachAll
 
 /-!
 # The gadgets attached at every site, flattened
@@ -15,6 +17,8 @@ indexed by the sites themselves (`DescriptiveComplexity.Site.flatAttach`).
 The two have the same permanent (`DescriptiveComplexity.Site.bperm_flatAttach`):
 the nested type and the flat one are in bijection, entry by entry.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

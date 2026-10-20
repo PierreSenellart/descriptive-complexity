@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.SetTheory.Cardinal.Finite
-import DescriptiveComplexity.Interpretation
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # Faithful encodings of concrete instance types
@@ -111,6 +113,8 @@ weights and a target and proves the encoding faithful for Knapsack. The
 theorem that the size bounds have teeth (no unary encoding of subset-sum
 satisfies them) is in `DescriptiveComplexity/Encoding/UnaryBlowup.lean`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

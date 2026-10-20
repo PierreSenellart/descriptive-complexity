@@ -3,14 +3,16 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Permanent.Basic
-import Mathlib.Data.Fintype.Sigma
-import Mathlib.Data.Fintype.Pi
-import Mathlib.Data.Fintype.Prod
-import Mathlib.Data.Fintype.Sum
-import Mathlib.Basic.Finite.Sum
-import Mathlib.Data.Fintype.BigOperators
-import Mathlib.Order.Cover
+module
+
+public import DescriptiveComplexity.Permanent.Basic
+public import Mathlib.Data.Fintype.Sigma
+public import Mathlib.Data.Fintype.Pi
+public import Mathlib.Data.Fintype.Prod
+public import Mathlib.Data.Fintype.Sum
+public import Mathlib.Basic.Finite.Sum
+public import Mathlib.Data.Fintype.BigOperators
+public import Mathlib.Order.Cover
 
 /-!
 # Expanding a weighted graph into a 0-1 graph: ladders
@@ -33,6 +35,8 @@ Series and parallel composition at once, which is what a reduction needs: an
 edge of weight `2 ^ n` costs `n` levels of two rungs, an edge of weight `3` a
 single level of three rungs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

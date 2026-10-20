@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameAsk
-import DescriptiveComplexity.Exponential.GameBack
+module
+
+public import DescriptiveComplexity.Exponential.GameAsk
+public import DescriptiveComplexity.Exponential.GameBack
 
 /-!
 # A question, read back
@@ -28,6 +30,8 @@ from the entry of a question's prefix, the question holds.
   with the phase's valuation – which is the only place the two halves of a
   transition's tuple are pulled apart backwards.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

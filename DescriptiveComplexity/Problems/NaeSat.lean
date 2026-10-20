@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.OrderWalk
-import DescriptiveComplexity.OccurrenceOrder
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.OrderWalk
+public import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # NAE-SAT is NP-complete
@@ -47,6 +49,8 @@ Membership reuses SAT's kernel verbatim
 its mirror image, the clause stating that every clause also has a *false*
 literal.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

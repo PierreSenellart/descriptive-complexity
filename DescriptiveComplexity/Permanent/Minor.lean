@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Permanent.Basic
+module
+
+public import DescriptiveComplexity.Permanent.Basic
 
 /-!
 # Minors of the permanent
@@ -24,6 +26,8 @@ deleting the row `u` then the row `u'` is deleting `{u, u'}`.
 * `DescriptiveComplexity.pdel_block`: the factorization when a set of rows is
   supported on as many columns.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # A block with one argument more
@@ -16,6 +18,8 @@ must all have an argument
 block, the symbol map and the way an assignment of the extended block is read at
 one value of the extra argument are the same in both, and are here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

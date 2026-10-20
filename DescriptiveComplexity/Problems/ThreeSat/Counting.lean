@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ThreeSat.ToSat
-import DescriptiveComplexity.Problems.Sat.Counting
+module
+
+public import DescriptiveComplexity.Problems.ThreeSat.ToSat
+public import DescriptiveComplexity.Problems.Sat.Counting
 
 /-!
 # #3SAT: counting the models of a 3-CNF formula
@@ -20,6 +22,8 @@ the formula (`DescriptiveComplexity.SatModel`).
 with the first-order sentence stating the width bound. Its parsimonious
 hardness is in `DescriptiveComplexity.Problems.ThreeSat.CountingFromSat`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

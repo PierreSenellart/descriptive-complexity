@@ -3,9 +3,16 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Encoding
-import DescriptiveComplexity.Decoding
-import DescriptiveComplexity.Problems.SubgraphIso
+module
+
+public import DescriptiveComplexity.Encoding
+meta import DescriptiveComplexity.Encoding
+public import DescriptiveComplexity.Decoding
+meta import DescriptiveComplexity.Decoding
+public import DescriptiveComplexity.Problems.SubgraphIso
+meta import DescriptiveComplexity.Problems.SubgraphIso
+public import Mathlib.Data.Finset.Sort
+meta import Mathlib.Data.Finset.Sort
 
 /-!
 # Subgraph Isomorphism on concrete graphs: encoding and decoding
@@ -48,6 +55,8 @@ the pattern vertices and one of the host vertices, the generic property
 enumerates them by the two injections of the sum, the decoding by
 `Finset.orderIsoOfFin` on the two marked sets.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,20 +3,22 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Defs
-import DescriptiveComplexity.Problems.Machine.Walk
-import DescriptiveComplexity.Problems.Machine.Membership
-import DescriptiveComplexity.Problems.Machine.Program
-import DescriptiveComplexity.Problems.Machine.Tape
-import DescriptiveComplexity.Problems.Machine.Hardness
-import DescriptiveComplexity.Problems.Machine.Interp
-import DescriptiveComplexity.Problems.Machine.Fixpoint
-import DescriptiveComplexity.Problems.Machine.HornInterp
-import DescriptiveComplexity.Problems.Machine.Space
-import DescriptiveComplexity.Problems.Machine.SpaceHard
-import DescriptiveComplexity.Problems.Qsat
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Problems.HornSat
+module
+
+public import DescriptiveComplexity.Problems.Machine.Defs
+public import DescriptiveComplexity.Problems.Machine.Walk
+public import DescriptiveComplexity.Problems.Machine.Membership
+public import DescriptiveComplexity.Problems.Machine.Program
+public import DescriptiveComplexity.Problems.Machine.Tape
+public import DescriptiveComplexity.Problems.Machine.Hardness
+public import DescriptiveComplexity.Problems.Machine.Interp
+public import DescriptiveComplexity.Problems.Machine.Fixpoint
+public import DescriptiveComplexity.Problems.Machine.HornInterp
+public import DescriptiveComplexity.Problems.Machine.Space
+public import DescriptiveComplexity.Problems.Machine.SpaceHard
+public import DescriptiveComplexity.Problems.Qsat
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Problems.HornSat
 
 /-!
 # Machine acceptance is NP-complete, and its deterministic restriction PTIME-complete
@@ -65,6 +67,8 @@ As with any complexity-theoretic statement, these results are about finite
 structures only
 (`DescriptiveComplexity.ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

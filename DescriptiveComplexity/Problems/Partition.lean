@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Partition.Defs
-import DescriptiveComplexity.Problems.Partition.Membership
-import DescriptiveComplexity.Problems.Partition.Hardness
-import DescriptiveComplexity.Problems.NaeSat
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Problems.Partition.Defs
+public import DescriptiveComplexity.Problems.Partition.Membership
+public import DescriptiveComplexity.Problems.Partition.Hardness
+public import DescriptiveComplexity.Problems.NaeSat
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # Partition
@@ -29,6 +31,8 @@ Karp's own reduction pads a Knapsack instance with the weights `2Σ − T` and
 `Σ + T`; both are arithmetic in the total, hence not first-order definable, so
 hardness has to start from NAE-SAT instead.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

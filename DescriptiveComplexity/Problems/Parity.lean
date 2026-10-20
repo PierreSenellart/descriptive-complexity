@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Problems.Even
-import DescriptiveComplexity.DetLogSpace
-import DescriptiveComplexity.TransitiveClosurePull
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Problems.Even
+public import DescriptiveComplexity.DetLogSpace
+public import DescriptiveComplexity.TransitiveClosurePull
 
 /-!
 # PARITY: the parity of a marked subset
@@ -51,6 +53,8 @@ proves any AC⁰ lower bound. The gap is deliberate and documented; what is
 recorded here is that the *other* three sides of the square – PARITY in LOGSPACE,
 PARITY not in FO(≤), EVEN in AC⁰, AC⁰ inside PTIME – are theorems.
 -/
+
+@[expose] public section
 
 /- The vocabulary of a marked subset lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.order` and the vocabularies of the rest of the

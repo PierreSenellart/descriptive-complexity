@@ -3,7 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.Numbers.BinRel
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
 
 /-!
 # Wide numbers: sums that no longer fit in the instance's own positions
@@ -37,6 +40,8 @@ first-order layer needs on top is the translation of the walk along the wide
 positions into two coordinates, which is `DescriptiveComplexity.minPos_wide`,
 `DescriptiveComplexity.maxPos_wide` and `DescriptiveComplexity.succPos_wide`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

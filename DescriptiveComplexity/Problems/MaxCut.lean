@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.MaxCut.Defs
-import DescriptiveComplexity.Problems.MaxCut.Membership
-import DescriptiveComplexity.Problems.MaxCut.Reduction
-import DescriptiveComplexity.Problems.NaeThreeSat
+module
+
+public import DescriptiveComplexity.Problems.MaxCut.Defs
+public import DescriptiveComplexity.Problems.MaxCut.Membership
+public import DescriptiveComplexity.Problems.MaxCut.Reduction
+public import DescriptiveComplexity.Problems.NaeThreeSat
 
 /-!
 # Max Cut is NP-complete
@@ -29,6 +31,8 @@ the threshold is the `Set.ncard` of a marked binary relation. As with any
 complexity-theoretic statement, these results are about finite structures only
 (`DescriptiveComplexity.ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

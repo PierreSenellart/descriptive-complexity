@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.WeightedWorlds
+module
+
+public import DescriptiveComplexity.Counting.WeightedWorlds
 
 /-!
 # Possible worlds are weighted worlds of weight one
@@ -27,6 +29,8 @@ weights `1` and `1`.
 So a hardness result for the unweighted problem is a hardness result for the
 weighted one, at uniform probability `1/2`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

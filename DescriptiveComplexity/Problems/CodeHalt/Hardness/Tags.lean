@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Basic.Finite.Sum
-import DescriptiveComplexity.Problems.CodeHalt.Hardness.Value
-import DescriptiveComplexity.Problems.CodeHalt.Defs
+module
+
+public import Mathlib.Basic.Finite.Sum
+public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Value
+public import DescriptiveComplexity.Problems.CodeHalt.Defs
 
 /-!
 # The elements of the CODEHALT instance an instance is drawn as
@@ -46,6 +48,8 @@ the bit of a tuple an *edge* of the drawing rather than a conditional mark, so
 that every tag has one constructor (`DescriptiveComplexity.ProgTag.mark`) and
 exclusivity of the marks is immediate.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

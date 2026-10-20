@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Problems.ThreeColorability.ToSat
-import DescriptiveComplexity.Problems.ThreeColorability.FromSat
+module
+
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Problems.ThreeColorability.ToSat
+public import DescriptiveComplexity.Problems.ThreeColorability.FromSat
 
 /-!
 # 3-colorability is NP-complete
@@ -25,6 +27,8 @@ and deriving its NP-completeness from the Cook–Levin theorem
 complexity-theoretic statement, these results are about finite graphs only
 (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

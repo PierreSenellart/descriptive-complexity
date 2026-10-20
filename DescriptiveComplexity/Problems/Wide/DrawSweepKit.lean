@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSweep
-import DescriptiveComplexity.Problems.Wide.DrawKit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSweep
+public import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # Kits for the plain sweeps
@@ -22,6 +24,8 @@ startup. Every stepping rule is guarded `ltp ≠ one`, so the sweep has no
 rule at the marked cell and stops there; the caller's exit rule at
 `ltp = one` is disjoint from every rule here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltPos
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltPos
 
 /-!
 # The intended run: the guessing sweeps
@@ -24,6 +26,8 @@ tag on a tuple that is not a position – are frozen at `false`, which is what
 `DescriptiveComplexity.AltQbf.AltInp` gives them and what the frame condition of every
 step then preserves.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,25 +3,27 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Arith
-import DescriptiveComplexity.LogTime.Fields
-import DescriptiveComplexity.LogTime.Pow
-import DescriptiveComplexity.LogTime.Small
-import DescriptiveComplexity.LogTime.Translate
-import DescriptiveComplexity.LogTime.BitSum.Sizes
-import DescriptiveComplexity.LogTime.BitSum.Blocks
-import DescriptiveComplexity.LogTime.BitSum.Counter
-import DescriptiveComplexity.LogTime.BitSum.Ones
-import DescriptiveComplexity.LogTime.BitSum.Table
-import DescriptiveComplexity.LogTime.BitSum.Sum
-import DescriptiveComplexity.LogTime.BitSum.Level2
-import DescriptiveComplexity.LogTime.BitSum.Level1
-import DescriptiveComplexity.LogTime.BitSum.Columns
-import DescriptiveComplexity.LogTime.BitSum.Times
-import DescriptiveComplexity.LogTime.Compile
-import DescriptiveComplexity.LogTime.Simulate
-import DescriptiveComplexity.HeadEvalArith
-import DescriptiveComplexity.HeadEvalBit
+module
+
+public import DescriptiveComplexity.LogTime.Arith
+public import DescriptiveComplexity.LogTime.Fields
+public import DescriptiveComplexity.LogTime.Pow
+public import DescriptiveComplexity.LogTime.Small
+public import DescriptiveComplexity.LogTime.Translate
+public import DescriptiveComplexity.LogTime.BitSum.Sizes
+public import DescriptiveComplexity.LogTime.BitSum.Blocks
+public import DescriptiveComplexity.LogTime.BitSum.Counter
+public import DescriptiveComplexity.LogTime.BitSum.Ones
+public import DescriptiveComplexity.LogTime.BitSum.Table
+public import DescriptiveComplexity.LogTime.BitSum.Sum
+public import DescriptiveComplexity.LogTime.BitSum.Level2
+public import DescriptiveComplexity.LogTime.BitSum.Level1
+public import DescriptiveComplexity.LogTime.BitSum.Columns
+public import DescriptiveComplexity.LogTime.BitSum.Times
+public import DescriptiveComplexity.LogTime.Compile
+public import DescriptiveComplexity.LogTime.Simulate
+public import DescriptiveComplexity.HeadEvalArith
+public import DescriptiveComplexity.HeadEvalBit
 
 /-!
 # A machine model at the bottom of the ladder: the logarithmic-time hierarchy
@@ -175,6 +177,8 @@ The bridge does not touch the structures-versus-strings gap either: like
 `DescriptiveComplexity.mem_LOGSPACE_iff_automaton`, it relates a logic and a
 machine over the *same* structure-based framework.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

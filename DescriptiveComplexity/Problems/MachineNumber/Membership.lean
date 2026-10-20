@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.MachineNumber.Defs
-import DescriptiveComplexity.Problems.Machine.Fixpoint
-import DescriptiveComplexity.Problems.CircuitNumber.Membership
+module
+
+public import DescriptiveComplexity.Problems.MachineNumber.Defs
+public import DescriptiveComplexity.Problems.Machine.Fixpoint
+public import DescriptiveComplexity.Problems.CircuitNumber.Membership
 
 /-!
 # The number written by a machine is in FP
@@ -26,6 +28,8 @@ import DescriptiveComplexity.Problems.CircuitNumber.Membership
   output cell before p on the tape] + 1)`, as for the number written by a
   circuit.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

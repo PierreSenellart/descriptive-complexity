@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Computability.REPred
-import DescriptiveComplexity.Computability.Reduction
-import DescriptiveComplexity.Problems.Machine
-import DescriptiveComplexity.Problems.Machine.HaltMem
-import DescriptiveComplexity.Problems.FinSat
+module
+
+public import DescriptiveComplexity.Computability.REPred
+public import DescriptiveComplexity.Computability.Reduction
+public import DescriptiveComplexity.Problems.Machine
+public import DescriptiveComplexity.Problems.Machine.HaltMem
+public import DescriptiveComplexity.Problems.FinSat
 
 /-!
 # The catalog's vocabularies, presented
@@ -34,6 +36,8 @@ The hypothetical form kept here,
 conclusion through the *machine* model instead; its hypothesis is supplied by
 `DescriptiveComplexity.halt_not_computable`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

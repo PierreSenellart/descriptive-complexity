@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Knapsack.Defs
+module
+
+public import DescriptiveComplexity.Problems.Knapsack.Defs
 
 /-!
 # Partition: definition
@@ -24,6 +26,8 @@ definable); it comes from NAE-SAT, whose *not-all-equal* condition is exactly
 the two-sided constraint a balanced split imposes
 (`DescriptiveComplexity.naeSat_ordered_fo_reduction_partition`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

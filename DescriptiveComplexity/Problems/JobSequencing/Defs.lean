@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Numbers.BinRel
-import DescriptiveComplexity.Interpretation
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Numbers.BinRel
+public import DescriptiveComplexity.Interpretation
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Job sequencing: definition
@@ -41,6 +43,8 @@ exceeds its deadline, and the schedule is good when the late jobs' penalties
 sum to at most the bound. Only jobs are summed over, so the elements of the
 universe that are bit positions ride along in the order harmlessly.
 -/
+
+@[expose] public section
 
 /- The language of job-sequencing instances lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.graph` and

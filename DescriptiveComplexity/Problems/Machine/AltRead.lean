@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltCheck
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltCheck
 
 /-!
 # Reading a block's assignment off an arbitrary run
@@ -26,6 +28,8 @@ The only two transitions that can fire at a cell are `tGKeep`, which changes
 nothing, and `tGSet`, which adds the cell's variable to `ν'`. That the machine
 has no other choice is `DescriptiveComplexity.AltQbf.altTr_unique`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

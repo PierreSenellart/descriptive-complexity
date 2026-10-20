@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Cvp.Hardness.Interp
+module
+
+public import DescriptiveComplexity.Problems.Cvp.Hardness.Interp
 
 /-!
 # The drawn circuit, gate by gate
@@ -25,6 +27,8 @@ Everything is stated relative to a minimum `m` and a maximum `M` of the
 universe, which a finite nonempty linear order supplies; the coordinates a tag
 does not use are pinned to `m`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

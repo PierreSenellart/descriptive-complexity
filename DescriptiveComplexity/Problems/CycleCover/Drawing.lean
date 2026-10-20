@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CycleCover.Formulas
-import DescriptiveComplexity.Problems.CycleCover.Defs
-import DescriptiveComplexity.Counting.Post
-import DescriptiveComplexity.Numbers.DigitExtract
+module
+
+public import DescriptiveComplexity.Problems.CycleCover.Formulas
+public import DescriptiveComplexity.Problems.CycleCover.Defs
+public import DescriptiveComplexity.Counting.Post
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # The drawing of the reduction of #1-in-SAT to #Cycle Cover
@@ -24,6 +26,8 @@ remainder modulo `2 ^ L + 1`, `L` the number of levels, and a quotient by `4`
 to the number of occurrences, both definable cardinalities
 (`DescriptiveComplexity.sharpOneInSat_oneCall_sharpCycleCover`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

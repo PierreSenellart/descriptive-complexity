@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.DagIso.ToDigraphIso
-import DescriptiveComplexity.Problems.DagIso.FromDigraphIso
+module
+
+public import DescriptiveComplexity.Problems.DagIso.ToDigraphIso
+public import DescriptiveComplexity.Problems.DagIso.FromDigraphIso
 
 /-!
 # DAG Isomorphism is GI-complete
@@ -33,6 +35,8 @@ Membership in NP comes from the same reduction as membership in the degree
 (`DescriptiveComplexity.dagIso_mem_NP`); no hardness for a *class* is claimed,
 and none is expected – that is what makes the degree worth having.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

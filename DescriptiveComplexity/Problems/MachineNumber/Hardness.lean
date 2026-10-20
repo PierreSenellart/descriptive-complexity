@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.MachineNumber.Defs
-import DescriptiveComplexity.Problems.HornSat.Number
-import DescriptiveComplexity.Problems.Machine.HornInterp
-import DescriptiveComplexity.OrderedReorder
-import DescriptiveComplexity.Syntax
+module
+
+public import DescriptiveComplexity.Problems.MachineNumber.Defs
+public import DescriptiveComplexity.Problems.HornSat.Number
+public import DescriptiveComplexity.Problems.Machine.HornInterp
+public import DescriptiveComplexity.OrderedReorder
+public import DescriptiveComplexity.Syntax
 
 /-!
 # The number written by unit propagation reduces to the number written by a machine
@@ -35,6 +37,8 @@ out in the new order, and the cells of the output variables come in the order
 of significance. When `below` is not such an order the number written by the
 formula is `0`, and the reduction marks no output cell.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

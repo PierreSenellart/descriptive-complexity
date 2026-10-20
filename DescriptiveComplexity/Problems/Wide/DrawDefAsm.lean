@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefProg
-import DescriptiveComplexity.Problems.Wide.DrawProg
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefProg
+public import DescriptiveComplexity.Problems.Wide.DrawProg
 
 /-!
 # The whole assembly is definable, given its semantic packs
@@ -21,6 +23,8 @@ Nothing above this file reads a rule any more: what is left of the discharge is
 `DescriptiveComplexity.Draw.Data.varArgsOf` meeting `UVarArgsDef`, which is a
 statement about `DescriptiveComplexity.Problems.Wide.DrawArgs` alone.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

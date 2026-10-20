@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointInflationary
-import DescriptiveComplexity.SecondOrderBlockHom
-import DescriptiveComplexity.FixedPointHorn
+module
+
+public import DescriptiveComplexity.FixedPointInflationary
+public import DescriptiveComplexity.SecondOrderBlockHom
+public import DescriptiveComplexity.FixedPointHorn
 
 /-!
 # FO(≤, IFP) into FO(LFP): the capture of the inflationary limit
@@ -59,6 +61,8 @@ variables by reading the top of the walk
 `DescriptiveComplexity.IFPLfp.inflStage_srank_top`: the top rank is beyond
 the atom count, where the stages have stabilized to the limit).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

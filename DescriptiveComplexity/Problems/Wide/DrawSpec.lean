@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRel
-import DescriptiveComplexity.Problems.Wide.DrawEnc
-import DescriptiveComplexity.FixedPointPartial
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRel
+public import DescriptiveComplexity.Problems.Wide.DrawEnc
+public import DescriptiveComplexity.FixedPointPartial
 
 /-!
 # What one step of the iteration is, on the machine's side of the encoding
@@ -46,6 +48,8 @@ binary block-value order along the encoding, making order atoms the register
 comparison the machine can run – is its own decision, discharged where the
 machine meets the tape.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

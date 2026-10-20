@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Increment
+module
+
+public import DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # An address, read block by block
@@ -43,6 +45,8 @@ All of them are stated at arbitrary linear order relations on `T` and on `V`, so
 they apply to whatever key a reduction chooses;
 `DescriptiveComplexity.isLinOrd_lexRel` supplies the linearity of the product.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceFormulas
-import DescriptiveComplexity.Problems.ThreeSat.Defs
+module
+
+public import DescriptiveComplexity.OccurrenceFormulas
+public import DescriptiveComplexity.Problems.ThreeSat.Defs
 
 /-!
 # SAT reduces to 3SAT by an ordered FO reduction
@@ -37,6 +39,8 @@ literals, by uniqueness of the successor occurrence) and
 `SatToThreeSat.satisfiable_iff_map` (satisfiability is preserved, by the
 usual chain argument, threaded along the occurrence order).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

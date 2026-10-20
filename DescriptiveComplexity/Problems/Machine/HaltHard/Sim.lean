@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.SimRet
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.SimRet
 
 /-!
 # The assembled simulation
@@ -31,6 +33,8 @@ abstract side of each pop is `DescriptiveComplexity.HaltHard.stepRet_popTarget`,
 and termination of the abstract machine is traded for termination of
 `Turing.ToPartrec.Cont.eval` through `Turing.ToPartrec.stepRet_eval`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.MachineAltSpace.Spec
+module
+
+public import DescriptiveComplexity.Problems.MachineAltSpace.Spec
 
 /-!
 # Alternating acceptance in bounded space is in EXPTIME
@@ -27,6 +29,8 @@ Where the promises go: `DescriptiveComplexity.ExpDefinable` compares `P A` with
 ride on the `start` sentence – a game with no starting state is lost, which is
 what a failed promise should mean.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

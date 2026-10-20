@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Hamilton.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Hamilton.Defs
 
 /-!
 # Hamilton Circuit reduces to Directed Hamilton Circuit
@@ -17,6 +19,8 @@ the hardness of HAMILTON CIRCUIT over to DIRECTED HAMILTON CIRCUIT, which is
 why the gadget work (from Vertex Cover) only has to be done once, on the
 undirected side.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

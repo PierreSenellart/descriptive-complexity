@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
 # Dominating Set: the problem
@@ -21,6 +23,8 @@ of them has to be dominated too. The reduction of
 `DescriptiveComplexity.Problems.DominatingSet.Reduction` handles this by making the
 junk adjacent to the vertices that a solution always contains.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

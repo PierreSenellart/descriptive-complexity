@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.SetFamily.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.SetFamily.Defs
 
 /-!
 # Set Cover and Hitting Set are transposes of each other
@@ -23,6 +25,8 @@ Set Packing has no such partner: its condition is not the transpose of
 another problem of the family, and its hardness comes from graphs directly
 (`DescriptiveComplexity.Problems.SetFamily.FromGraphs`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

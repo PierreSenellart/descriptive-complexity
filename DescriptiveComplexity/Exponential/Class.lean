@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Pull
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Exponential.Pull
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # The exponential of a complexity class
@@ -32,6 +34,8 @@ that `C.exp` is a class at all – is
 an expansion is an expansion. Nothing about `C` is used, which is why the
 closure holds at an arbitrary class.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

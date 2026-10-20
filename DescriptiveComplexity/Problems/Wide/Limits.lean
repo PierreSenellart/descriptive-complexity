@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Key
-import DescriptiveComplexity.Problems.Wide.DrawRules
+module
+
+public import DescriptiveComplexity.Problems.Wide.Key
+public import DescriptiveComplexity.Problems.Wide.DrawRules
 
 /-!
 # What a wide machine cannot do: name its own elements
@@ -35,6 +37,8 @@ the two constraints move together. What is left to a program is a file it is
 (`DescriptiveComplexity.wmSeg`) and not the reduction's – or an evaluation that
 never records an address at all.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

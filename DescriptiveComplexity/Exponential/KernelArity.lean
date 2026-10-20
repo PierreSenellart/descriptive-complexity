@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Kernel
-import DescriptiveComplexity.SecondOrderParam
+module
+
+public import DescriptiveComplexity.Exponential.Kernel
+public import DescriptiveComplexity.SecondOrderParam
 
 /-!
 # Giving every guessed variable an argument
@@ -28,6 +30,8 @@ This file is that transformation on formulas (`arityLift`), its correctness
 (`realize_arityLift`), and the kernel it makes (`NexKernel.withArg`,
 `NexKernel.withArg_holds`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

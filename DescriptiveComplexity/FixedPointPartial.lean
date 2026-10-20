@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointInflationary
+module
+
+public import DescriptiveComplexity.FixedPointInflationary
 
 /-!
 # FO(PFP): first-order logic with a partial fixed point
@@ -63,6 +65,8 @@ definition and its output-negation false – but follows on ordered structures
 from the capture theorem (`DescriptiveComplexity.FixedPointPartialSpace`)
 and `PSPACE = coPSPACE`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

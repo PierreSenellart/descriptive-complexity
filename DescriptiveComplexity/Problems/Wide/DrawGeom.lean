@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawMatrix
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawMatrix
 
 /-!
 # Where the states, the symbols and the transitions sit
@@ -33,6 +35,8 @@ exactly when their payloads do
 (`DescriptiveComplexity.Draw.pad_injective`). Those are the distinctness facts the
 well-formedness and determinism obligations are discharged from.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Induction
-import DescriptiveComplexity.Problems.SuccinctReach
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Induction
+public import DescriptiveComplexity.Problems.SuccinctReach
 
 /-!
 # QSAT is PSPACE-hard
@@ -23,6 +25,8 @@ An instance with no state variable has no level at all: the first block and ever
 level block are empty, so the initial position *is* the position of the last
 block, and `DescriptiveComplexity.game_aux` answers directly.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

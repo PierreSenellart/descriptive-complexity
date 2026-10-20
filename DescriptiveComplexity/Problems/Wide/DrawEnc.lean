@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawGeom
-import DescriptiveComplexity.Exponential.Expansion
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawGeom
+public import DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # Encoding the points of an expansion as block values
@@ -35,6 +37,8 @@ expanded universe – is the condition the relativization lemma of
 `DescriptiveComplexity.Problems.Wide.DrawRel` asks for
 (`DescriptiveComplexity.Draw.isEnc_iff`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

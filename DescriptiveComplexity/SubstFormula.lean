@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Composition
+module
+
+public import DescriptiveComplexity.Composition
 
 /-!
 # Interpreting a vocabulary by formulas on a definable part
@@ -29,6 +31,8 @@ injection into the target whose range the domain formula defines. That is what
 lets a caller take the part to be the object it already has – the universe of an
 expansion, say – instead of a subtype it would then have to transport across.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.FinSat.Invented
-import DescriptiveComplexity.RecursivelyEnumerable
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.FinSat.Invented
+public import DescriptiveComplexity.RecursivelyEnumerable
 
 /-!
 # FINSAT is in RE
@@ -33,6 +35,8 @@ syntax:
   are what make the kernel say exactly the certificate conditions, in both
   directions, rather than something stronger on one side.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

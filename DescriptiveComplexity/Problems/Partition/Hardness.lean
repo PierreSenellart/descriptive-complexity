@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Partition.Defs
-import DescriptiveComplexity.Problems.NaeSat
-import DescriptiveComplexity.OccurrenceSlack
-import DescriptiveComplexity.Numbers.Digits
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Problems.Partition.Defs
+public import DescriptiveComplexity.Problems.NaeSat
+public import DescriptiveComplexity.OccurrenceSlack
+public import DescriptiveComplexity.Numbers.Digits
+public import DescriptiveComplexity.Padding
 
 /-!
 # Partition is NP-hard
@@ -55,6 +57,8 @@ The order of the interpreted structure is described once, by a *key* into
 `ℕ × A × ℕ × A` read lexicographically
 (`DescriptiveComplexity.PartRed.bwLe_iff`), rather than tag pair by tag pair.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

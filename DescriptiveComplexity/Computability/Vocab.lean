@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.List.NodupEquivFin
-import Mathlib.Logic.Equiv.Sum
-import Mathlib.Logic.Equiv.Fin.Basic
-import DescriptiveComplexity.Computability.FinStruct
+module
+
+public import Mathlib.Data.List.NodupEquivFin
+public import Mathlib.Logic.Equiv.Sum
+public import Mathlib.Logic.Equiv.Fin.Basic
+public import DescriptiveComplexity.Computability.FinStruct
 
 /-!
 # Presenting vocabularies as data
@@ -33,6 +35,8 @@ the second-order machinery are sums of an instance's vocabulary with a
 quantifier block's, and everything about them is encoded by the same means as
 an ordinary instance.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

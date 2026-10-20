@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawElem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawElem
 
 /-!
 # Tag-branched element loops: the expansion atoms and the domain gates
@@ -22,6 +24,8 @@ The expansion atoms instantiate this at their arity, the domain gates at
 one argument. As everywhere, the shapes and separation are fixed here; the
 decodings and folds are parameters.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

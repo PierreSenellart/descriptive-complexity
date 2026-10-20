@@ -3,13 +3,15 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.Defs
-import DescriptiveComplexity.Problems.Hamilton.Cycle
-import DescriptiveComplexity.Problems.Hamilton.Membership
-import DescriptiveComplexity.Problems.Hamilton.Reductions
-import DescriptiveComplexity.Problems.Hamilton.Hardness
-import DescriptiveComplexity.Problems.CliqueFamily
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.Defs
+public import DescriptiveComplexity.Problems.Hamilton.Cycle
+public import DescriptiveComplexity.Problems.Hamilton.Membership
+public import DescriptiveComplexity.Problems.Hamilton.Reductions
+public import DescriptiveComplexity.Problems.Hamilton.Hardness
+public import DescriptiveComplexity.Problems.CliqueFamily
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # Hamilton circuits are NP-complete
@@ -42,6 +44,8 @@ Cover (`DescriptiveComplexity.Problems.Hamilton.Gadget` for the interpretation,
 `Forward` and `Reverse` for the two directions of correctness, `Hardness` for
 the assembly). Both problems are NP-complete – the last of Karp's 21.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

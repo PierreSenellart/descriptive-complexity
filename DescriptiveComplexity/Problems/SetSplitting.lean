@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SetFamily
-import DescriptiveComplexity.Problems.NaeThreeSat
-import DescriptiveComplexity.Problems.ThreeSat.ToSat
+module
+
+public import DescriptiveComplexity.Problems.SetFamily
+public import DescriptiveComplexity.Problems.NaeThreeSat
+public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # Set Splitting is NP-complete
@@ -31,6 +33,8 @@ literal, which is not-all-equal satisfaction. The correspondence is so direct
 that the reduction is essentially the identity on clauses; only the pair sets
 are new, and they are what turns an arbitrary coloring into an assignment.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

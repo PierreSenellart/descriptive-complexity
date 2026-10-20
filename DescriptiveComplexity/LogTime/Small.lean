@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitLogic
+module
+
+public import DescriptiveComplexity.LogTime.BitLogic
 
 /-!
 # Small universes are transparent: how to drop a size condition
@@ -43,6 +45,8 @@ The finiteness hypothesis is on the *variables*, not on anything else: a
 disjunction over the rank assignments of infinitely many variables is not a
 formula. Every consumer has finitely many, and states them as a `Fin m`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

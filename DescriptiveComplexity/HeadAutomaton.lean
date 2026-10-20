@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.DetLogSpace
-import DescriptiveComplexity.OrderWalk
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.DetLogSpace
+public import DescriptiveComplexity.OrderWalk
+public import DescriptiveComplexity.Padding
 
 /-!
 # Two-way multi-head automata over a structure
@@ -84,6 +86,8 @@ nondeterministic one guesses, and to bound its own walk with a step budget –
 giving `DescriptiveComplexity.dtcDefinable_iff_automaton` and
 `DescriptiveComplexity.mem_LOGSPACE_iff_automaton`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

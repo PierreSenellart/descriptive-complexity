@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Simulate
-import DescriptiveComplexity.Exponential.Trivialize
-import DescriptiveComplexity.Exponential.Reach
-import DescriptiveComplexity.HeadCapture
+module
+
+public import DescriptiveComplexity.Exponential.Simulate
+public import DescriptiveComplexity.Exponential.Trivialize
+public import DescriptiveComplexity.Exponential.Reach
+public import DescriptiveComplexity.HeadCapture
 
 /-!
 # The operator pinned: `PSPACE = NL.exp`
@@ -48,6 +50,8 @@ walk and then asks REACH of it, and REACH is not known to this library to be in
 the expansion to be *functional* – a deterministic reachability argument, i.e.,
 Savitch read one exponential up – and is not claimed here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

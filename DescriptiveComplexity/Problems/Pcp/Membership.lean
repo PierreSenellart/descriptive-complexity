@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Pcp.Cert
-import DescriptiveComplexity.RecursivelyEnumerable
-import DescriptiveComplexity.Problems.FinSat
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Pcp.Cert
+public import DescriptiveComplexity.RecursivelyEnumerable
+public import DescriptiveComplexity.Problems.FinSat
 
 /-!
 # `PCP` is in RE
@@ -37,6 +39,8 @@ RE-*hardness* of `PCP` is a different matter – the computation-history
 dominoes of `DescriptiveComplexity.Problems.Pcp.Hardness` – and with it Post's
 problem is RE-complete (`DescriptiveComplexity.pcp_RE_complete`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderKromPull
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.SecondOrderKromPull
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # NL, by the Krom fragment
@@ -45,6 +47,8 @@ reachability condition on the implication graph. Nothing in this library
 depends on that, since NL is defined by the fragment rather than by a machine;
 it is why the fragment is the right primitive here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

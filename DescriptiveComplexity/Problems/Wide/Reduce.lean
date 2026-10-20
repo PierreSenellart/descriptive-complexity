@@ -3,14 +3,16 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RelExpMap
-import DescriptiveComplexity.Problems.Wide.ShFinite
-import DescriptiveComplexity.Problems.Wide.DrawNo
-import DescriptiveComplexity.Problems.Wide.NexPack
-import DescriptiveComplexity.Problems.Wide.DrawPack
-import DescriptiveComplexity.Problems.Wide.Membership
-import DescriptiveComplexity.Problems.Wide.Det
-import DescriptiveComplexity.Relativized
+module
+
+public import DescriptiveComplexity.Problems.Wide.RelExpMap
+public import DescriptiveComplexity.Problems.Wide.ShFinite
+public import DescriptiveComplexity.Problems.Wide.DrawNo
+public import DescriptiveComplexity.Problems.Wide.NexPack
+public import DescriptiveComplexity.Problems.Wide.DrawPack
+public import DescriptiveComplexity.Problems.Wide.Membership
+public import DescriptiveComplexity.Problems.Wide.Det
+public import DescriptiveComplexity.Relativized
 
 /-!
 # The EXPSPACE reduction, assembled
@@ -35,6 +37,8 @@ whole record as a parameter and two records differing in *any* field are opaque
 to each other. What closes it is `Finset.sup_congr` down the chain, each step
 instantiated at a *constructor* of the index so that the matcher reduces.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

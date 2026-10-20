@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.Ordered
 
 /-!
 # Plain first-order definability of a decision problem
@@ -24,6 +26,8 @@ them unconditionally, with no complexity-theoretic assumption. The refutations
 themselves are Ehrenfeucht–Fraïssé arguments
 (`DescriptiveComplexity.Games.Ehrenfeucht`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

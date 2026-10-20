@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawGeom
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawGeom
+public import DescriptiveComplexity.Padding
 
 /-!
 # The layout's geometry is the padding layer's, so its formulas are written
@@ -43,6 +45,8 @@ a quantifier-free formula over the payload slots for the guard, and per-slot
 “copy this slot or write this constant” for the destination and the written
 symbol.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

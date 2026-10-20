@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogSpace
-import DescriptiveComplexity.Problems.TwoSat.Defs
+module
+
+public import DescriptiveComplexity.LogSpace
+public import DescriptiveComplexity.Problems.TwoSat.Defs
 
 /-!
 # 2SAT is SO-Krom definable, hence in NL
@@ -35,6 +37,8 @@ Correctness rests on `DescriptiveComplexity.exists_covering_pair`: under the wid
 bound, a clause with an occurrence has two signed occurrences covering all of
 them, which is exactly the shape a single 2-clause can speak about.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

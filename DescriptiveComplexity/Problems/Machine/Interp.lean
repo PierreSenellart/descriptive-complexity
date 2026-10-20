@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Defs
-import DescriptiveComplexity.Problems.Machine.Hardness
-import DescriptiveComplexity.OccurrenceFormulas
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Problems.Machine.Defs
+public import DescriptiveComplexity.Problems.Machine.Hardness
+public import DescriptiveComplexity.OccurrenceFormulas
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The transcription: `SAT ≤ᶠᵒ[≤] NTMAccept`
@@ -41,6 +43,8 @@ interpreted structure describes agrees with `DescriptiveComplexity.satMachine`, 
 acceptance and well-formedness transport, and correctness is inherited from the
 semantic layer.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

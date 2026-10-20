@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointPartialSpace
-import DescriptiveComplexity.SecondOrderNewPull
+module
+
+public import DescriptiveComplexity.FixedPointPartialSpace
+public import DescriptiveComplexity.SecondOrderNewPull
 
 /-!
 # Pulling a simultaneous induction through a relativized interpretation
@@ -50,6 +52,8 @@ with the domain threaded through:
   (`DescriptiveComplexity.StepDef.ifpHolds_pullRel`,
   `DescriptiveComplexity.StepDef.pfpHolds_pullRel`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

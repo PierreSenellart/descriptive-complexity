@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawKit
-import DescriptiveComplexity.EqPattern
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawKit
+public import DescriptiveComplexity.EqPattern
 
 /-!
 # What a rule owes the interpretation, and the algebra that discharges it
@@ -53,6 +55,8 @@ program's tower, one statement per rule, composed site by site, with a kit's
 abstract parameters (`Match`, `setFlag` …) contributing hypotheses of the same
 shape.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -372,10 +376,10 @@ theorem UGDefinable.ite {p : Prop} [Decidable p] (h : UGDefinable N)
 /-! ### The atoms of a written value -/
 
 /-- The variable a written value is named at. -/
-private abbrev outVar : Fin (Fintype.card (Q ⊕ W)) ⊕ Unit := Sum.inr ()
+abbrev outVar : Fin (Fintype.card (Q ⊕ W)) ⊕ Unit := Sum.inr ()
 
 /-- A guard's formula, read in the context a written value is named in. -/
-private def liftG (φ : (L.sum Language.order).Formula (Fin (Fintype.card (Q ⊕ W)))) :
+def liftG (φ : (L.sum Language.order).Formula (Fin (Fintype.card (Q ⊕ W)))) :
     (L.sum Language.order).Formula (Fin (Fintype.card (Q ⊕ W)) ⊕ Unit) :=
   Formula.relabel Sum.inl φ
 

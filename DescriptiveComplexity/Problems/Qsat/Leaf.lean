@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Peel
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Peel
 
 /-!
 # The innermost block: the base case of the recursion
@@ -20,6 +22,8 @@ The three conditions are independent because the three valuations are read on
 disjoint sets of elements, which is what lets the single existential quantifier
 over the block be split (`DescriptiveComplexity.auxVal`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

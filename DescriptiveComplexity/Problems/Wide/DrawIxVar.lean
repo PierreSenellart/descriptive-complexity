@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxRound
-import DescriptiveComplexity.Problems.Wide.DrawInstVar
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxRound
+public import DescriptiveComplexity.Problems.Wide.DrawInstVar
 
 /-!
 # One variable's machinery at an arbitrary file
@@ -14,6 +16,8 @@ gates' leg and the matrix leg of one variable's machinery, the VAL loop's
 thread and the capstone runs. Everything below it is already at the file, so
 this is the last layer before the evaluation.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

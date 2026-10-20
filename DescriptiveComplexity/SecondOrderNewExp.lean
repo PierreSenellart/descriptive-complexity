@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewBdd
-import DescriptiveComplexity.Exponential.Free
-import DescriptiveComplexity.SecondOrderMerge
-import DescriptiveComplexity.Relativize
+module
+
+public import DescriptiveComplexity.SecondOrderNewBdd
+public import DescriptiveComplexity.Exponential.Free
+public import DescriptiveComplexity.SecondOrderMerge
+public import DescriptiveComplexity.Relativize
 
 /-!
 # The expansion a bounded invention lives in
@@ -31,6 +33,8 @@ extended structure `A ⊕ Fin (2 ^ nᵈ)` with *every* invented value present; a
 sentence that wants fewer of them marks the ones it uses, which is a guess and
 so stays inside `Σ₁`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

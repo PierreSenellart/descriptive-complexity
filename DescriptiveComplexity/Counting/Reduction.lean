@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Class
-import DescriptiveComplexity.Counting.Post
+module
+
+public import DescriptiveComplexity.Counting.Class
+public import DescriptiveComplexity.Counting.Post
 
 /-!
 # One-call counting reductions, and the one-call closure of a counting class
@@ -95,6 +97,8 @@ given that name: that it is the same class would need one oracle call to
 suffice, and a polynomial-time computation after the call to be replaceable by
 a post-processing term, and neither is proved here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

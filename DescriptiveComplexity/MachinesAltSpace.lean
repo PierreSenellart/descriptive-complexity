@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesAlt
+module
+
+public import DescriptiveComplexity.MachinesAlt
 
 /-!
 # Alternating machines in bounded space
@@ -44,6 +46,8 @@ is the existential player and block `1` the universal one
 record is needed and no lemma of `DescriptiveComplexity.MachinesAlt` has to be
 restated: the vocabulary is `FirstOrder.Language.turingAlt 2` unchanged.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

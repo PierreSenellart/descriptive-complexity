@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.KromImplication
-import DescriptiveComplexity.ClauseDischarge
-import DescriptiveComplexity.TransitiveClosureKrom
+module
+
+public import DescriptiveComplexity.KromImplication
+public import DescriptiveComplexity.ClauseDischarge
+public import DescriptiveComplexity.TransitiveClosureKrom
 
 /-!
 # From the Krom fragment to FO(TC), through the complement
@@ -45,6 +47,8 @@ in `DescriptiveComplexity.TransitiveClosureKrom` this is an equivalence,
 is *not* is `REACH ∈ NL`, which needs the complementation of FO(TC) itself
 (Immerman–Szelepcsényi).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

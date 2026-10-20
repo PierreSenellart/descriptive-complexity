@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting
-import DescriptiveComplexity.RelComposition
+module
+
+public import DescriptiveComplexity.Counting
+public import DescriptiveComplexity.RelComposition
 
 /-!
 # Relativized parsimonious reductions
@@ -31,6 +33,8 @@ Parsimonious hardness for the counting classes of
 `DescriptiveComplexity.Counting.Class` is hardness under these reductions, as hardness
 for the decision classes is hardness under `≤ʳᶠᵒ[≤]`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Reachability
-import DescriptiveComplexity.TransitiveClosureReach
-import DescriptiveComplexity.DetLogSpace
+module
+
+public import DescriptiveComplexity.Problems.Reachability
+public import DescriptiveComplexity.TransitiveClosureReach
+public import DescriptiveComplexity.DetLogSpace
 
 /-!
 # REACHd: deterministic reachability, complete for LOGSPACE
@@ -52,6 +54,8 @@ being functional by construction.
   determinized specification is functional, so that reachability in the
   interpreted graph and *deterministic* reachability agree.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

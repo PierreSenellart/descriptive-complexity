@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Machine.AltMatrix
-import DescriptiveComplexity.Problems.Machine.AltDefs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Machine.AltMatrix
+public import DescriptiveComplexity.Problems.Machine.AltDefs
 
 /-!
 # The `Σₖ` kernel of alternating acceptance
@@ -29,6 +31,8 @@ clauses, transcribing the same relations – with three differences:
 Every builder here is parameterized by the round it reads, so the file writes
 the clause layer once rather than `k` times.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

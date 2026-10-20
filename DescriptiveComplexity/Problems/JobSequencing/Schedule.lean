@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.JobSequencing.Defs
+module
+
+public import DescriptiveComplexity.Problems.JobSequencing.Defs
 
 /-!
 # What a schedule can achieve
@@ -31,6 +33,8 @@ sequencing can be built out of a balanced-split gadget – provided it also
 writes the deadline, its double and the bound, which is what constrains the
 gadget.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

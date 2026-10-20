@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Steiner.Defs
-import DescriptiveComplexity.Problems.Steiner.Reductions
-import DescriptiveComplexity.Problems.Steiner.Membership
-import DescriptiveComplexity.Problems.CliqueFamily
+module
+
+public import DescriptiveComplexity.Problems.Steiner.Defs
+public import DescriptiveComplexity.Problems.Steiner.Reductions
+public import DescriptiveComplexity.Problems.Steiner.Membership
+public import DescriptiveComplexity.Problems.CliqueFamily
 
 /-!
 # Steiner Tree is NP-complete
@@ -28,6 +30,8 @@ As with any complexity-theoretic statement, these results are about finite
 structures only
 (`DescriptiveComplexity.ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

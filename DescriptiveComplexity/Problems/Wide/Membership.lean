@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Expansion
-import DescriptiveComplexity.Exponential.Classes
-import DescriptiveComplexity.Problems.Machine
-import DescriptiveComplexity.Problems.Machine.Space
+module
+
+public import DescriptiveComplexity.Problems.Wide.Expansion
+public import DescriptiveComplexity.Exponential.Classes
+public import DescriptiveComplexity.Problems.Machine
+public import DescriptiveComplexity.Problems.Machine.Space
 
 /-!
 # The wide machines are members of the exponential classes
@@ -30,6 +32,8 @@ machine runs over, and everything else is the composition that
 `DescriptiveComplexity.ExpDefinable` is made of – an expansion applied after the
 problem, which is the composition that exists.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Machines
+module
+
+public import DescriptiveComplexity.Machines
 
 /-!
 # Alternating Turing machines over a universe, without a vocabulary
@@ -65,6 +67,8 @@ over different universes correspond along an equivalence, and the lemmas below
 transport acceptance along it – all the isomorphism-invariance proof of the
 decision problem needs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

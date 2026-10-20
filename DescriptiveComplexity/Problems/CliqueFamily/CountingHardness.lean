@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.Counting
-import DescriptiveComplexity.Problems.CliqueFamily.FromSat
-import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.Counting
+public import DescriptiveComplexity.Problems.CliqueFamily.FromSat
+public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Clique is parsimoniously `#P`-complete
@@ -39,6 +41,8 @@ occurrence vertex, so the count is `0`, as it should be.
 The formulas do not mention the order; as in the decision reduction, the
 packaging is ordered because both counts are of finite structures only.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstStage
-import DescriptiveComplexity.Problems.Wide.IxAddr
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstStage
+public import DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Problems.Wide.DrawRunStage
 
 /-!
 # The address a stage atom builds, at an arbitrary file
@@ -34,6 +37,8 @@ elementwise one, so the semantics of the atom – the dictionary, `trackOf`, the
 logical interval – says of a clocked program's run exactly what it says of a
 space-bounded one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

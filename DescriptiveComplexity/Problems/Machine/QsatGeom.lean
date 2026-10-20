@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.QsatProgram
+module
+
+public import DescriptiveComplexity.Problems.Machine.QsatProgram
 
 /-!
 # The geometry of the QBF machine's tape
@@ -30,6 +32,8 @@ All of it needs the instance to be well formed, since that is exactly when the
 prefix order is a linear order on the variables and `QLe` is a linear order at
 all (`DescriptiveComplexity.QsatTM.isLinOrd_qLe`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.MaxCut.Defs
-import DescriptiveComplexity.Problems.NaeThreeSat
+module
+
+public import DescriptiveComplexity.Problems.MaxCut.Defs
+public import DescriptiveComplexity.Problems.NaeThreeSat
 
 /-!
 # The gadget graph of the reduction from NAE-3SAT to Max Cut
@@ -57,6 +59,8 @@ while the threshold stays positive, so the output is a no-instance. The gate
 is what makes the per-clause budget `k − 1` an upper bound, a clique on `k`
 vertices having a larger cut as soon as `k ≥ 4`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

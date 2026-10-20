@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Leaf
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Leaf
 
 /-!
 # One level of the recursion
@@ -21,6 +23,8 @@ Iterating that step down the levels and finishing with
 position opened by a level computes reachability in at most `2 ^ k` moves, `k`
 the number of levels from it to the last one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

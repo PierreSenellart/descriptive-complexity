@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawVerdict
-import DescriptiveComplexity.Problems.Wide.DrawInstEval
-import DescriptiveComplexity.Problems.Wide.DrawRun
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawVerdict
+public import DescriptiveComplexity.Problems.Wide.DrawInstEval
+public import DescriptiveComplexity.Problems.Wide.DrawRun
 
 /-!
 # What the spine does to the tape at one address
@@ -75,6 +77,8 @@ input in – `new_last_trackOf` at an address whose blocks encode a tuple,
 `new` tracks of exactly the addresses it has passed, everything else still
 carrying what it started with.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

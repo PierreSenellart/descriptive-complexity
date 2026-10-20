@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltRank
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltRank
 
 /-!
 # Splicing a play into a walk
@@ -27,6 +29,8 @@ of `t`: strictly below it the walk is the previous one, at it the play starts,
 above it the play runs and then repeats. Nothing else about the order is
 involved, which is why the file is short.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

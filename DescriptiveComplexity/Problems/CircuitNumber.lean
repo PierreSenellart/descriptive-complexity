@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CircuitNumber.Membership
-import DescriptiveComplexity.Problems.CircuitNumber.Hardness
-import DescriptiveComplexity.Problems.CircuitNumber.Junk
-import DescriptiveComplexity.Counting.Digits.NormalForm
+module
+
+public import DescriptiveComplexity.Problems.CircuitNumber.Membership
+public import DescriptiveComplexity.Problems.CircuitNumber.Hardness
+public import DescriptiveComplexity.Problems.CircuitNumber.Junk
+public import DescriptiveComplexity.Counting.Digits.NormalForm
 
 /-!
 # The number written by a circuit is complete for FP
@@ -62,6 +64,8 @@ arises for reductions this weak; the proof combines the normal form of
 Arenas, Muñoz and Riveros with the classical completeness of circuit value
 for PTIME.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

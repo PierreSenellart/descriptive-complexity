@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Data.Fintype.Sort
-import Mathlib.Data.Nat.Bitwise
-import Mathlib.Order.Hom.Set
+module
+
+public import Mathlib.Algebra.BigOperators.Fin
+public import Mathlib.Data.Fintype.Sort
+public import Mathlib.Data.Nat.Bitwise
+public import Mathlib.Order.Hom.Set
 
 /-!
 # Binary representation of numbers in finite structures
@@ -40,6 +42,8 @@ order on positions is a relation symbol of the vocabulary rather than a
 Programming. The choice between this encoding and the unary one is argued in
 `DescriptiveComplexity.Numbers`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

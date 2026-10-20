@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureDet
-import DescriptiveComplexity.SecondOrderPull
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.TransitiveClosureDet
+public import DescriptiveComplexity.SecondOrderPull
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Pulling FO(TC) and FO(DTC) definability back through an interpretation
@@ -57,6 +59,8 @@ the same argument as `DescriptiveComplexity.TCDefinable`, with no side condition
 re-establish – which is the point of taking determinization to be a formula
 (see `DescriptiveComplexity.TransitiveClosureDet`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

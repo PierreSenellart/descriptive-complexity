@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard.Run
-import DescriptiveComplexity.Problems.Machine.Program
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Run
+public import DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # An accepting run tiles the emitted square
@@ -23,6 +25,8 @@ reduction emits. Each of the five conditions is one fact about the run –
 * vertical neighbors agree, because a step writes under the head and leaves
   every other cell alone.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

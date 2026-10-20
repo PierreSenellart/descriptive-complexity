@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefVar
-import DescriptiveComplexity.Problems.Wide.DrawVar
-import DescriptiveComplexity.Problems.Wide.DrawRound
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefVar
+public import DescriptiveComplexity.Problems.Wide.DrawVar
+public import DescriptiveComplexity.Problems.Wide.DrawRound
 
 /-!
 # The last four layers, and the program's own kits
@@ -20,6 +22,8 @@ questions they are written from – every stage track agrees with its next
 argument-tagged block. Each is a conjunction, a disjunction or an equivalence
 of the three atoms, indexed by a finite type.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

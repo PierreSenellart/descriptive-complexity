@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Wide.RelExp
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Wide.RelExp
 
 /-!
 # The expansion, relativized to the marked part
@@ -23,6 +25,8 @@ part at all, where a relativized sentence has nothing to be about; the tag
 `none` is the point that exists exactly there, and over a doubled universe – one
 that always has a marked part – it contributes nothing.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

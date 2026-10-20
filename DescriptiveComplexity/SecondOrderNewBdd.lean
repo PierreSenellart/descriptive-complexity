@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.SetTheory.Cardinal.Finite
-import DescriptiveComplexity.SecondOrderNew
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import DescriptiveComplexity.SecondOrderNew
 
 /-!
 # Value invention, bounded
@@ -42,6 +44,8 @@ definability statement is an equivalence, so relaxing the bound loses the
 backward direction and tightening it loses the forward one. Passing between the
 notions means re-guarding the sentence, not reusing it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

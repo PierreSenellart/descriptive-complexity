@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRunElem
-import DescriptiveComplexity.Problems.Wide.DrawRunTagged
-import DescriptiveComplexity.Problems.Wide.DrawRunTuple
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+public import DescriptiveComplexity.Problems.Wide.DrawRunTagged
+public import DescriptiveComplexity.Problems.Wide.DrawRunTuple
 
 /-!
 # Generated control families: the runs, iterated
@@ -26,6 +28,8 @@ builds the family once, for every instantiation:
   generated family: the caller supplies only the name guards at the
   generated states, the exhaustion conditions, and the geometry.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

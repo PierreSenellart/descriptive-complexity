@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Tape
-import DescriptiveComplexity.Problems.Sat
+module
+
+public import DescriptiveComplexity.Problems.Machine.Tape
+public import DescriptiveComplexity.Problems.Sat
 
 /-!
 # The machine of a CNF formula
@@ -52,6 +54,8 @@ its correctness is proved does the first-order transcription happen, one
 realization lemma per `relFormula`. A transition table type-checks whatever it
 says, so it has to be validated by a proof, not by elaboration.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

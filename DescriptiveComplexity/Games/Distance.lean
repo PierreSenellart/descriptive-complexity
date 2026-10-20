@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.EquivFin
-import Mathlib.Data.Finset.Max
-import Mathlib.Algebra.Order.GroupWithZero.Basic
-import Mathlib.Tactic.Positivity
+module
+
+public import Mathlib.Data.Fintype.EquivFin
+public import Mathlib.Data.Finset.Max
+public import Mathlib.Algebra.Order.GroupWithZero.Basic
+public import Mathlib.Tactic.Positivity
 
 /-!
 # Truncated distances, and the duplicator's answer on a line
@@ -33,6 +35,8 @@ left neighbor, or to the right one, or, when both are large, land in the
 middle of a gap that the invariant guarantees is twice as large on the other
 side – with the halving of the budget appearing exactly there.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

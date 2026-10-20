@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.Structure
-import DescriptiveComplexity.FixedPointPartial
-import DescriptiveComplexity.Composition
+module
+
+public import DescriptiveComplexity.Invariant.Structure
+public import DescriptiveComplexity.FixedPointPartial
+public import DescriptiveComplexity.Composition
 
 /-!
 # Simulating a `k`-variable induction on the invariant structure
@@ -35,6 +37,8 @@ a representative); the induced induction on the invariant structure and the
 stage-by-stage tracking are `DescriptiveComplexity.StepDef.invStepDef` and
 its lemmas, further down.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

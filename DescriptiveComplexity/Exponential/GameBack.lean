@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameRun
+module
+
+public import DescriptiveComplexity.Exponential.GameRun
 
 /-!
 # Reading a win back: the phases of a question
@@ -41,6 +43,8 @@ seek's own valuation up to the arity its phase declares, and an address that
 condition on it, and only the program knows that the coordinates outside those
 two halves are irrelevant.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

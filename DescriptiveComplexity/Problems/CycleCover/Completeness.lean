@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CycleCover.Drawing
-import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-import DescriptiveComplexity.Counting.Reduction
+module
+
+public import DescriptiveComplexity.Problems.CycleCover.Drawing
+public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+public import DescriptiveComplexity.Counting.Reduction
 
 /-!
 # #Cycle Cover is one-call `#P`-complete
@@ -32,6 +34,8 @@ The route, file by file:
   `DescriptiveComplexity.Problems.CycleCover.Drawing`: the ladder expansion
   is first-order definable over the ordered expansion of the formula.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

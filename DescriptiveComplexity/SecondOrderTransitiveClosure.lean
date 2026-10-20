@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Ordered
 
 /-!
 # SO(TC): second-order logic with transitive closure
@@ -69,6 +71,8 @@ pullback), and the definability notion
 itself is built on top of it in `DescriptiveComplexity.PSpace`, once closure
 under reductions is available.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

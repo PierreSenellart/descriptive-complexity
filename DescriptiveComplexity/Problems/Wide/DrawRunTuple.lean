@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTuple
-import DescriptiveComplexity.Problems.Wide.DrawRunElem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTuple
+public import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The tuple loop's run
@@ -24,6 +26,8 @@ shape: an abstract finite linear order for the enumeration, control families
 `fs0`/`fs1` around the store, and the loop closed by
 `DescriptiveComplexity.Draw.reflTransGen_of_ordLoop`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

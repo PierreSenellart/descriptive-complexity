@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Taut
-import DescriptiveComplexity.Problems.Sat.CountingHardness
-import DescriptiveComplexity.Counting.Reduction
-import DescriptiveComplexity.Numbers.DigitExtract
+module
+
+public import DescriptiveComplexity.Problems.Taut
+public import DescriptiveComplexity.Problems.Sat.CountingHardness
+public import DescriptiveComplexity.Counting.Reduction
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # #DNF: counting the models of a DNF formula
@@ -43,6 +45,8 @@ reductions, a notion under which `#P` is closed: that stronger statement is
 `DescriptiveComplexity.sharpDnf_sharpP_complete`, in
 `DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

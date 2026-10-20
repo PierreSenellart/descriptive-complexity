@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.Exponential.Class
-import DescriptiveComplexity.ImmermanSzelepcsenyi
-import DescriptiveComplexity.PSpace
+module
+
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.Exponential.Class
+public import DescriptiveComplexity.ImmermanSzelepcsenyi
+public import DescriptiveComplexity.PSpace
 
 /-!
 # An SO(TC) walk is reachability on an exponential expansion
@@ -37,6 +39,8 @@ the inclusion that starts the tower above PSPACE. Read on the definitions the
 second one is **SO(TC) ⊆ SO(LFP)** – a transitive closure is a least fixed
 point – which is the second-order shadow of `NL ⊆ PTIME`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

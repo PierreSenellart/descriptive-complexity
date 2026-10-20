@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CodeHalt.Hardness.Tags
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Tags
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The interpretation that draws an instance as a program
@@ -37,6 +39,8 @@ relation of `FirstOrder.Language.code` back through
 relations `DescriptiveComplexity.Arg1On` and `DescriptiveComplexity.Arg2On`
 are the only interface the correctness proof uses.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

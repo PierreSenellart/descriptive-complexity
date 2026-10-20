@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Increment
+module
+
+public import DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The address a file's marks stand for
@@ -34,6 +36,8 @@ For a clocked program's file all three hold of the argument registers, because
 the argument tags are the *last* ones (`DescriptiveComplexity.Draw.lt_arg`) and
 therefore the least significant: the addresses over them are the logical ones.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

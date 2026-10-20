@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltSplice
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltSplice
 
 /-!
 # One round of the game, and what it leaves behind
@@ -25,6 +27,8 @@ position, every block is low, and
 `DescriptiveComplexity.ATMData.gameFrom_of_blkLt` reduces the rest of the game
 to whether that configuration accepts.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

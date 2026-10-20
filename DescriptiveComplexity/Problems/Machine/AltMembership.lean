@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltKernel
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltKernel
 
 /-!
 # Alternating acceptance is `Σₖ`-definable
@@ -29,6 +31,8 @@ The proof is the assembly of the four layers below it:
   prefix is `k+1` copies of one block
   (`DescriptiveComplexity.sorealize_repBlocks`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

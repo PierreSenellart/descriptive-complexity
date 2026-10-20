@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CircuitNumber.Defs
-import DescriptiveComplexity.Counting.Relativized
+module
+
+public import DescriptiveComplexity.Problems.CircuitNumber.Defs
+public import DescriptiveComplexity.Counting.Relativized
 
 /-!
 # The number written by a circuit ignores isolated elements
@@ -24,6 +26,8 @@ This is what closes FP under relativized parsimonious reductions
 `DescriptiveComplexity.Problems.CircuitNumber`): the class has a complete
 problem that tolerates junk.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

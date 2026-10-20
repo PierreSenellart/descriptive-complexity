@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.Gadget
-import DescriptiveComplexity.Problems.Hamilton.Cycle
-import DescriptiveComplexity.Problems.Hamilton.Forward
-import DescriptiveComplexity.Problems.Hamilton.Reverse
-import DescriptiveComplexity.Problems.CliqueFamily
-import Mathlib.Data.Fintype.Lattice
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.Gadget
+public import DescriptiveComplexity.Problems.Hamilton.Cycle
+public import DescriptiveComplexity.Problems.Hamilton.Forward
+public import DescriptiveComplexity.Problems.Hamilton.Reverse
+public import DescriptiveComplexity.Problems.CliqueFamily
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Vertex Cover reduces to Hamilton Circuit
@@ -32,6 +34,8 @@ The correctness of the interpretation
 (`DescriptiveComplexity.hasSmallVertexCover_iff_hamCircuit_mapRel`) splits into the two
 classical directions, proved in `Forward` and `Reverse` and linked here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

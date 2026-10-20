@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTable
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTable
 
 /-!
 # Payloads by name, and the tape they present
@@ -29,6 +31,8 @@ Which slots there are is not decided here.
 slots a state uses and the **track** slots a symbol uses, and builds the tape a
 register pass runs over on top of the two.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

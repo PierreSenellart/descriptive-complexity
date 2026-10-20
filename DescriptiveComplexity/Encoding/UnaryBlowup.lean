@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Analysis.SpecificLimits.Normed
-import DescriptiveComplexity.Encoding.BinarySubsetSum
+module
+
+public import Mathlib.Analysis.SpecificLimits.Normed
+public import DescriptiveComplexity.Encoding.BinarySubsetSum
 
 /-!
 # The size bounds have teeth: unary encodings are rejected
@@ -37,6 +39,8 @@ This file is deliberately off the library's core import path: the negative
 result needs a little asymptotics (`Mathlib.Analysis.SpecificLimits.Normed`),
 which the core does not otherwise pull in.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

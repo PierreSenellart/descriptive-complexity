@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawChain
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawChain
 
 /-!
 # The sequencer: heterogeneous stages in a row
@@ -22,6 +24,8 @@ matrix instantiates this with the kind-dependent atom machineries and the
 gates with the per-block gate machinery, and neither needs a new
 checkpoint proof.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

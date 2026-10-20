@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Kernel
+module
+
+public import DescriptiveComplexity.Exponential.Kernel
 
 /-!
 # Padding a kernel's block
@@ -25,6 +27,8 @@ reads a kernel over it (`blockPadLHom`), the two directions of the transport
 (`realize_blockPad`), and the kernel-level statement
 (`NexKernel.pad_holds`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

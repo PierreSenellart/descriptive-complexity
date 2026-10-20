@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexOuter
-import DescriptiveComplexity.Problems.Wide.NexSpec
-import DescriptiveComplexity.Problems.Wide.DrawBuild
+module
+
+public import DescriptiveComplexity.Problems.Wide.NexOuter
+public import DescriptiveComplexity.Problems.Wide.NexSpec
+public import DescriptiveComplexity.Problems.Wide.DrawBuild
 
 /-!
 # Guessing the certificate onto the region
@@ -34,6 +36,8 @@ pointer never moves, so that the site's *roll-over* arm is the walk's every step
 `reachesIn_guessRegion`, at the stretch's own length, and the whole phase –
 sweep, stop, walk home – is `reachesIn_guessRegionPhase`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

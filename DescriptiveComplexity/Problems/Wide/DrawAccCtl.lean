@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawCtl
-import DescriptiveComplexity.Problems.Wide.DrawAcc
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawCtl
+public import DescriptiveComplexity.Problems.Wide.DrawAcc
 
 /-!
 # The fold, in the control's slots
@@ -29,6 +31,8 @@ Every one of them is a function of the pointer alone, and each comes with
 the equation the run needs: what the *next* pointer's slots read back. The
 fold's own correctness is `DrawAcc`'s; nothing here repeats it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

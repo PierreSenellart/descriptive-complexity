@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.DigraphIso
-import DescriptiveComplexity.GadgetDouble
-import DescriptiveComplexity.Degree
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.DigraphIso
+public import DescriptiveComplexity.GadgetDouble
+public import DescriptiveComplexity.Degree
 
 /-!
 # Digraph Isomorphism is the generic isomorphism problem of the graph vocabulary
@@ -27,6 +29,8 @@ on is meant to be – therefore reaches the degree through
 `DescriptiveComplexity.isoReflecting_fo_reduction` and this bridge, with no
 further vocabulary bookkeeping.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

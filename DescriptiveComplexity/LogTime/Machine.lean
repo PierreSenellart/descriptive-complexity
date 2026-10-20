@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Bits
+module
+
+public import DescriptiveComplexity.LogTime.Bits
 
 /-!
 # Alternating machines with a logarithmic clock, at the level of bits
@@ -68,6 +70,8 @@ collapses to what a finite automaton reading `Nat.card A` in binary can decide.
 That is the reason a read is a primitive here and not a convenience; see
 `DescriptiveComplexity.LogTime`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

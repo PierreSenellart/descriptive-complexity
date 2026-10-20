@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameMachine
+module
+
+public import DescriptiveComplexity.Exponential.GameMachine
 
 /-!
 # A configuration of the control, and the steps out of it
@@ -64,6 +66,8 @@ the question's variables), and the challenge round that settles the matrix –
 it is parametric in `concOk` and `isTarget`; the program that supplies them is
 `DescriptiveComplexity.Exponential.GameAsk`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

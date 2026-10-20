@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.List.Basic
-import Mathlib.Logic.Relation
+module
+
+public import Mathlib.Data.List.Basic
+public import Mathlib.Logic.Relation
 
 /-!
 # Computation histories as dominoes
@@ -51,6 +53,8 @@ The alignment is then algebra: `starL` and `starR` are homomorphisms, and
 `starL w ++ [star] = star :: starR w` is the half-letter offset that makes the
 top and the bottom of a match spell the same word.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

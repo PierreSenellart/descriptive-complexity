@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxMat
-import DescriptiveComplexity.Problems.Wide.DrawInstSeq
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxMat
+public import DescriptiveComplexity.Problems.Wide.DrawInstSeq
 
 /-!
 # The matrix's sequencer at an arbitrary file
@@ -18,6 +20,8 @@ The runs here are `Relation.ReflTransGen`: the atoms below them carry their
 budgets, and the counting of the layers above the matrix is one pass, to be
 made once the conversion reaches the evaluation.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

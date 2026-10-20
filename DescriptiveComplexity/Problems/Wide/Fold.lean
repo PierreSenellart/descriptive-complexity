@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Increment
-import DescriptiveComplexity.Exponential.AltQuant
+module
+
+public import DescriptiveComplexity.Problems.Wide.Increment
+public import DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # Evaluating a quantifier prefix by one monotone sweep
@@ -46,6 +48,8 @@ construction, so this file is independent of the address layer; it is
 `DescriptiveComplexity.wmSetLt_iff_of_wmIncr` that supplies the hypothesis when
 the values are addresses.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

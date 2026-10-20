@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ZeroOneIP.Defs
-import DescriptiveComplexity.Problems.ZeroOneIP.Membership
-import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
-import DescriptiveComplexity.Problems.Knapsack
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Problems.ZeroOneIP.Defs
+public import DescriptiveComplexity.Problems.ZeroOneIP.Membership
+public import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
+public import DescriptiveComplexity.Problems.Knapsack
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # 0-1 integer programming
@@ -25,6 +27,8 @@ with `0-1` variables *is* a subset-sum instance, so Knapsack reduces to it by
 a one-tag, dimension-one interpretation whose only piece of work is naming the
 single row, the minimum of the input order.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

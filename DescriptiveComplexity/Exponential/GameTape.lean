@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Padding
-import DescriptiveComplexity.Numbers.BinRel
-import DescriptiveComplexity.OrderedComposition
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Padding
+public import DescriptiveComplexity.Numbers.BinRel
+public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # The tape of a machine playing a second-order game
@@ -81,6 +83,8 @@ arity on is a minimum (`DescriptiveComplexity.Canon`). That is what makes the
 cells of variable `i` correspond to the atoms of `i` one for one, rather than
 `n^{dim - arity i}` times over.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Steiner.Defs
-import DescriptiveComplexity.OrderWalk
-import Mathlib.Data.Fintype.Lattice
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Steiner.Defs
+public import DescriptiveComplexity.OrderWalk
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Vertex Cover reduces to Steiner Tree
@@ -38,6 +40,8 @@ of the universe, so the root has to be picked out inside its copy as the
 minimum (`DescriptiveComplexity.minF`).
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -52,14 +56,14 @@ abbrev sMarkedSym : (Language.markedGraph.sum Language.order).Relations 1 := Sum
 
 /-- “The pair is an edge of the input”, as a formula on the coordinates of the
 `i`-th argument. -/
-private noncomputable def isEdgeF {n : ℕ} (i : Fin n) :
+noncomputable def isEdgeF {n : ℕ} (i : Fin n) :
     (Language.markedGraph.sum Language.order).Formula (Fin n × Fin 2) :=
   Relations.formula₂ sAdjSym (Term.var (i, 0)) (Term.var (i, 1)) ⊓
     ∼(Term.equal (Term.var (i, 0)) (Term.var (i, 1)))
 
 /-- “The pair is diagonal”, as a formula on the coordinates of the `i`-th
 argument. -/
-private noncomputable def isDiagF {n : ℕ} (i : Fin n) :
+noncomputable def isDiagF {n : ℕ} (i : Fin n) :
     (Language.markedGraph.sum Language.order).Formula (Fin n × Fin 2) :=
   Term.equal (Term.var (i, 0)) (Term.var (i, 1))
 
@@ -571,7 +575,7 @@ variable {A : Type}
 
 open Classical in
 /-- The endpoint through which an edge is attached to the cover. -/
-private noncomputable def coverPick (C : A → Prop) (u v : A) : A := if C u then u else v
+noncomputable def coverPick (C : A → Prop) (u v : A) : A := if C u then u else v
 
 private theorem coverPick_mem (C : A → Prop) {u v : A} (h : C u ∨ C v) :
     C (coverPick C u v) := by

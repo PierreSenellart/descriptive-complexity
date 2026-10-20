@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameAskBack
-import DescriptiveComplexity.Exponential.GameSweep
-import DescriptiveComplexity.Exponential.GamePlay
+module
+
+public import DescriptiveComplexity.Exponential.GameAskBack
+public import DescriptiveComplexity.Exponential.GameSweep
+public import DescriptiveComplexity.Exponential.GamePlay
 
 /-!
 # The game, read back
@@ -46,6 +48,8 @@ of it. That lets the universal sweep be proved *forward*: its run supplies the
 chain, the handover the last step, and the motive delivers the clauses at the
 **rewind** configuration – whose clause is the `ContGoal` wanted.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

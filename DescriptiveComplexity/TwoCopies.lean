@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.IsoGadget
+module
+
+public import DescriptiveComplexity.IsoGadget
 
 /-!
 # Two marked copies of a vocabulary, and the isomorphism problem they carry
@@ -30,6 +32,8 @@ since the defining formulas have to be given symbol by symbol. Problems added
 to the degree from here on should be stated over `twoCopies`; the two existing
 hand-rolled vocabularies stay as they are, their results being already proved.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

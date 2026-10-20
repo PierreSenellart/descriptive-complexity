@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawProg
-import DescriptiveComplexity.Problems.Wide.DrawBack
-import DescriptiveComplexity.Problems.Wide.DrawInit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawProg
+public import DescriptiveComplexity.Problems.Wide.DrawBack
+public import DescriptiveComplexity.Problems.Wide.DrawInit
 
 /-!
 # The runs: the program's rules are its kits' rules
@@ -23,6 +25,8 @@ This file is that plumbing, one lemma per call site of the outer loop, all
 program by naming its site; what a leg then needs is only the *background*
 equations, which `DescriptiveComplexity.Problems.Wide.DrawBack` proves once.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

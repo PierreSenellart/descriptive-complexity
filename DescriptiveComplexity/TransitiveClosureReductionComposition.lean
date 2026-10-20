@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureReductionDet
-import DescriptiveComplexity.FixedPointReductionComposition
+module
+
+public import DescriptiveComplexity.TransitiveClosureReductionDet
+public import DescriptiveComplexity.FixedPointReductionComposition
 
 /-!
 # Composing an FO(TC) reduction with a first-order one
@@ -34,6 +36,8 @@ interpretation extended to their vocabulary substitutes the flattened atoms
 for the outer ones: that is `DescriptiveComplexity.TCReduction.trans`, in
 `DescriptiveComplexity.TransitiveClosureReductionTrans`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

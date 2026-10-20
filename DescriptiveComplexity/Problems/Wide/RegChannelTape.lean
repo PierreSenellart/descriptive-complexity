@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannel
-import DescriptiveComplexity.Problems.Wide.Tape
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannel
+public import DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # Starting a run at the register channel
@@ -22,6 +24,8 @@ segment channel says “every cell holds its element's symbol, every other
 address is blank”, the register channel says the same of the elements it writes
 for, and an address that is nobody's cell is blank as before.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

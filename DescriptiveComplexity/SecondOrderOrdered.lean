@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderPull
-import DescriptiveComplexity.SecondOrderLift
-import DescriptiveComplexity.OrderedComposition
-import Mathlib.Tactic.FinCases
+module
+
+public import DescriptiveComplexity.SecondOrderPull
+public import DescriptiveComplexity.SecondOrderLift
+public import DescriptiveComplexity.OrderedComposition
+public import Mathlib.Tactic.FinCases
 
 /-!
 # Closure of second-order definability under ordered FO reductions
@@ -35,6 +37,8 @@ order-invariance clause of `OrderedFOReduction.correct` to connect different
 choices of the order. This requires at least one second-order block to
 piggyback on, whence the level `k + 1`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -82,27 +86,27 @@ variable (L : Language.{0, 0}) (B : SOBlock)
 
 /-- `x ≤ y` for the order variable, as a formula over the expanded
 language. -/
-private def leVF {α : Type} (x y : α) : (L.sum B.withOrder.lang).Formula α :=
+def leVF {α : Type} (x y : α) : (L.sum B.withOrder.lang).Formula α :=
   Relations.formula₂ (ordVarSym L B) (Term.var x) (Term.var y)
 
 /-- The order variable is reflexive. -/
-private noncomputable def reflS : (L.sum B.withOrder.lang).Sentence :=
+noncomputable def reflS : (L.sum B.withOrder.lang).Sentence :=
   (leVF L B (Sum.inr 0) (Sum.inr 0)).iAlls (Fin 1)
 
 /-- The order variable is transitive. -/
-private noncomputable def transS : (L.sum B.withOrder.lang).Sentence :=
+noncomputable def transS : (L.sum B.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 3)
     (leVF L B (Sum.inr 0) (Sum.inr 1) ⊓ leVF L B (Sum.inr 1) (Sum.inr 2) ⟹
       leVF L B (Sum.inr 0) (Sum.inr 2))
 
 /-- The order variable is antisymmetric. -/
-private noncomputable def antisymmS : (L.sum B.withOrder.lang).Sentence :=
+noncomputable def antisymmS : (L.sum B.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (leVF L B (Sum.inr 0) (Sum.inr 1) ⊓ leVF L B (Sum.inr 1) (Sum.inr 0) ⟹
       Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))
 
 /-- The order variable is total. -/
-private noncomputable def totalS : (L.sum B.withOrder.lang).Sentence :=
+noncomputable def totalS : (L.sum B.withOrder.lang).Sentence :=
   (leVF L B (Sum.inr 0) (Sum.inr 1) ⊔ leVF L B (Sum.inr 1) (Sum.inr 0)).iAlls (Fin 2)
 
 /-- The guard sentence: the order variable is (reflexive, transitive,

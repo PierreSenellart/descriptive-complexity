@@ -3,14 +3,16 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.Unary
-import DescriptiveComplexity.Numbers.MonotoneBijection
-import DescriptiveComplexity.Numbers.Binary
-import DescriptiveComplexity.Numbers.Digits
-import DescriptiveComplexity.Numbers.DigitExtract
-import DescriptiveComplexity.Numbers.BinCount
-import DescriptiveComplexity.Numbers.BinEnum
-import DescriptiveComplexity.Numbers.Wide
+module
+
+public import DescriptiveComplexity.Numbers.Unary
+public import DescriptiveComplexity.Numbers.MonotoneBijection
+public import DescriptiveComplexity.Numbers.Binary
+public import DescriptiveComplexity.Numbers.Digits
+public import DescriptiveComplexity.Numbers.DigitExtract
+public import DescriptiveComplexity.Numbers.BinCount
+public import DescriptiveComplexity.Numbers.BinEnum
+public import DescriptiveComplexity.Numbers.Wide
 
 /-!
 # Number encodings
@@ -74,3 +76,5 @@ subset-sum instances sized by bit length can spend one universe element per
 unit of weight, with the binary encoding of the same instances as the positive
 contrast.
 -/
+
+@[expose] public section

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Interpretation
-import DescriptiveComplexity.Problems.Reachability
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Interpretation
+public import DescriptiveComplexity.Problems.Reachability
 
 /-!
 # GAME: alternating reachability
@@ -44,6 +46,8 @@ player. That is also the presentation the FO(LFP) membership proof mirrors
 clause by clause – with one twist, since a Horn rule cannot carry a universally
 quantified body atom; see `DescriptiveComplexity.Problems.Game.Membership`.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

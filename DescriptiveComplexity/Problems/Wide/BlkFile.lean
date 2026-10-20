@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.LowFile
-import DescriptiveComplexity.Problems.Wide.Key
-import DescriptiveComplexity.Problems.Wide.DrawTable
-import DescriptiveComplexity.Problems.Wide.IxAddr
+module
+
+public import DescriptiveComplexity.Problems.Wide.LowFile
+public import DescriptiveComplexity.Problems.Wide.Key
+public import DescriptiveComplexity.Problems.Wide.DrawTable
+public import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # The file a clocked program lays out
@@ -34,6 +36,8 @@ stretch (`DescriptiveComplexity.ixSegFile`) and the background
 instantiation and the two numbers a caller has to check: how many registers
 there are, and that the stretch fits.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Interpretation
-import Mathlib.ModelTheory.Order
+module
+
+public import DescriptiveComplexity.Interpretation
+public import Mathlib.ModelTheory.Order
 
 /-!
 # Ordered first-order reductions
@@ -31,6 +33,8 @@ Since the problem `P` does not mention the order and correctness is required
 for *every* linear order on the input structure, an `OrderedFOReduction` is
 what descriptive complexity calls an order-invariant FO reduction.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

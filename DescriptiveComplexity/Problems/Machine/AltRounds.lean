@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltPrefix
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltPrefix
 
 /-!
 # The rounds, one block at a time
@@ -27,6 +29,8 @@ not follow the read-off at all: it names the configuration it wants to hand
 over (`DescriptiveComplexity.AltQbf.exists_atRound`) and appeals to the fact that
 every successor of a universal configuration accepts.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

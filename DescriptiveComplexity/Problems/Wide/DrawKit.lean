@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRead
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRead
 
 /-!
 # Composite kits: how the program instantiates its subroutines
@@ -35,6 +37,8 @@ This file builds the smallest kit with full content – the named-bit read of
 `DescriptiveComplexity.Problems.Wide.DrawRead` – as the template the others
 follow.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

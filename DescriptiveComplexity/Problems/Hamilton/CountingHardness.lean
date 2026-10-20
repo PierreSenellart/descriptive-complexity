@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.CountingReverse
-import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-import DescriptiveComplexity.Counting.Relativized
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.CountingReverse
+public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+public import DescriptiveComplexity.Counting.Relativized
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Directed Hamilton Circuit is parsimoniously `#P`-complete
@@ -32,6 +34,8 @@ pair that is no vertex would have to lie on every circuit. It is ordered
 because the rows are: the occurrences of a variable are laid out in the order
 of the instance, and so are the variables.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

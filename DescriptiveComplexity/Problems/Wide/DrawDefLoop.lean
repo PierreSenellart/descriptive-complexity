@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefAsm
-import DescriptiveComplexity.Problems.Wide.DrawCtl
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefAsm
+public import DescriptiveComplexity.Problems.Wide.DrawCtl
 
 /-!
 # The loop variables are definable: the one write that is not a copy
@@ -30,6 +32,8 @@ reading of `tupNext`, and the three statements after it are what a variable's
 pack owes for its loop: the loop started, the loop advanced, and the loop
 exhausted – at both widths.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

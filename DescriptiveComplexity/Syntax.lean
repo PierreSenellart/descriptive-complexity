@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.ModelTheory.Syntax
-import Mathlib.ModelTheory.Semantics
+module
+
+public import Mathlib.ModelTheory.Syntax
+public import Mathlib.ModelTheory.Semantics
 
 /-!
 # A surface syntax for first-order formulas
@@ -83,6 +85,8 @@ show the underlying `iAlls` term. Terms are out of scope, the library being
 relational throughout.
 -/
 
+public meta section
+
 namespace DescriptiveComplexity
 
 open Lean
@@ -127,7 +131,7 @@ namespace FOSurface
 
 /-- `Sum.inl` applied `d` times to `e`: the lift of a variable of an outer
 block to the free-variable type of the `d`-th block inside it. -/
-private def liftIn : Nat → Term → MacroM Term
+def liftIn : Nat → Term → MacroM Term
   | 0, e => pure e
   | d + 1, e => do liftIn d (← `(Sum.inl $e))
 
@@ -135,7 +139,7 @@ private def liftIn : Nat → Term → MacroM Term
 which names they bound (with the depth at which each was bound and its index in
 its block), which names are free variables of the ambient formula, and which
 name the arguments of an interpretation. -/
-private structure Env where
+structure Env where
   /-- The number of quantifier blocks open at this point. -/
   depth : Nat
   /-- The bound names, each with its birth depth and its index in its block. -/
@@ -146,13 +150,13 @@ private structure Env where
   args : List Name
 
 /-- Open one more block, binding `xs` in order. -/
-private def Env.push (env : Env) (xs : Array Ident) : Env :=
+def Env.push (env : Env) (xs : Array Ident) : Env :=
   { env with
     depth := env.depth + 1,
     vars := env.vars ++ xs.toList.zipIdx.map fun (x, i) => (x.getId, env.depth, i) }
 
 /-- Translate one occurrence of an object variable. -/
-private def transVar (env : Env) (t : TSyntax `fovar) : MacroM Term := do
+def transVar (env : Env) (t : TSyntax `fovar) : MacroM Term := do
   if let `(fovar| !$e) := t then return e
   let coord : Nat := if let `(fovar| $_:ident[$j]) := t then j.getNat else 0
   unless t.raw[0].isIdent do Macro.throwErrorAt t "expected an object variable"
@@ -171,7 +175,7 @@ private def transVar (env : Env) (t : TSyntax `fovar) : MacroM Term := do
           or declare it in the ⟨…⟩ or […] clause of fo%"
 
 /-- Translate an atom applying the relation symbol `r` to object variables. -/
-private def transRel (env : Env) (r : Term) (args : Array (TSyntax `fovar)) : MacroM Term := do
+def transRel (env : Env) (r : Term) (args : Array (TSyntax `fovar)) : MacroM Term := do
   let vs ← args.mapM (transVar env)
   let ts ← vs.mapM fun v => `(FirstOrder.Language.Term.var $v)
   match ts.size with
@@ -180,7 +184,7 @@ private def transRel (env : Env) (r : Term) (args : Array (TSyntax `fovar)) : Ma
   | _ => `(FirstOrder.Language.Relations.formula $r ![$ts,*])
 
 /-- Translate an atom applying the formula builder `f` to object variables. -/
-private def transBuilder (env : Env) (f : Term) (args : Array (TSyntax `fovar)) :
+def transBuilder (env : Env) (f : Term) (args : Array (TSyntax `fovar)) :
     MacroM Term := do
   let vs ← args.mapM (transVar env)
   `($f $vs*)
@@ -224,7 +228,7 @@ private partial def trans (env : Env) (stx : TSyntax `foform) : MacroM Term := d
   | _ => Macro.throwErrorAt stx "unsupported first-order syntax"
 
 /-- The names of an optional comma-separated declaration clause. -/
-private def declared (o : Option (Syntax.TSepArray `ident ",")) : List Name :=
+def declared (o : Option (Syntax.TSepArray `ident ",")) : List Name :=
   match o with
   | some xs => xs.getElems.toList.map (·.getId)
   | none => []

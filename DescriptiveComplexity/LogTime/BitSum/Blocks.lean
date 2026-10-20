@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Sizes
-import DescriptiveComplexity.LogTime.BitLogic
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Sizes
+public import DescriptiveComplexity.LogTime.BitLogic
 
 /-!
 # Co-location: the one device the Bit Sum Lemma is built out of
@@ -48,6 +50,8 @@ The **counter field** – a second element carrying, in the field the same
 boundaries delimit, the number of the boundary – is the other half of the device
 and comes with the level it is first needed at.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

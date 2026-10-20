@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Interpretation
-import Mathlib.ModelTheory.Graph
+module
+
+public import DescriptiveComplexity.Interpretation
+public import Mathlib.ModelTheory.Graph
 
 /-!
 # The two marked sides of an isomorphism problem, as structures
@@ -36,6 +38,8 @@ predicate and a binary one, so the same lemmas serve
 `FirstOrder.Language.twoDags` (`patV`/`patArc`), whose extra relations the
 isomorphism ignores.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

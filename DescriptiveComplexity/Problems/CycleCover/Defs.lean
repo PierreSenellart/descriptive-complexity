@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Hamilton.Defs
-import DescriptiveComplexity.Counting.Class
-import DescriptiveComplexity.Permanent.Basic
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Hamilton.Defs
+public import DescriptiveComplexity.Counting.Class
+public import DescriptiveComplexity.Permanent.Basic
 
 /-!
 # #Cycle Cover: the permanent of a 0-1 matrix
@@ -25,6 +27,8 @@ is in `DescriptiveComplexity.Problems.CycleCover.Completeness`.
 (`DescriptiveComplexity.sharpCycleCover_mem_sharpP`): the cover is a guessed
 binary relation, checked first-order to be a bijection along the arcs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -98,7 +102,7 @@ fo_block coverGuessBlock over Language.digraph dg into coverSOLang with cv where
   nxt : 2
 
 /-- The guessed cover, as an atom. -/
-private def nxtF {α : Type} (x y : α) : coverSOLang.Formula α :=
+def nxtF {α : Type} (x y : α) : coverSOLang.Formula α :=
   fo%[x, y] cvNxtSym(x, y)
 
 /-- The first-order kernel: the guessed relation leaves and enters every

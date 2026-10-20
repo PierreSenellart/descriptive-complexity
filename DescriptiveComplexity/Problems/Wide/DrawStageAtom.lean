@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTuple
-import DescriptiveComplexity.Problems.Wide.DrawSites
-import DescriptiveComplexity.Problems.Wide.DrawReset
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTuple
+public import DescriptiveComplexity.Problems.Wide.DrawSites
+public import DescriptiveComplexity.Problems.Wide.DrawReset
 
 /-!
 # The stage atom's machinery: a random access
@@ -30,6 +32,8 @@ As everywhere in the assembly, the semantic parameters – the loop-variable
 updates, the stored-bit updates, the verdict store – are `dstSt`/guard
 parameters; the shapes and their separation are what this file fixes.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

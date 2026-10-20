@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesUnbounded
-import DescriptiveComplexity.Problems.Machine.Defs
+module
+
+public import DescriptiveComplexity.MachinesUnbounded
+public import DescriptiveComplexity.Problems.Machine.Defs
 
 /-!
 # HALT: the halting problem as a decision problem
@@ -42,6 +44,8 @@ undecidable (`DescriptiveComplexity.halt_not_computable`), stating “RE is the
 class of semi-decidable problems” at the machine model as
 `DescriptiveComplexity.mem_RE_iff_rePred` states it at the code model.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

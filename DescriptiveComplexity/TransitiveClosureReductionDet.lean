@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureReduction
-import DescriptiveComplexity.TransitiveClosureDet
+module
+
+public import DescriptiveComplexity.TransitiveClosureReduction
+public import DescriptiveComplexity.TransitiveClosureDet
 
 /-!
 # FO(DTC) reductions: the logarithmic-space reduction of the textbooks
@@ -52,6 +54,8 @@ nondeterministic one needs inductive counting. Transitivity is
 `DescriptiveComplexity.TransitiveClosureReductionTrans` read through its
 determinization.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

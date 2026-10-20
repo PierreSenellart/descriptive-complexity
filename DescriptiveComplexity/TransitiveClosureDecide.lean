@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OrderWalk
-import DescriptiveComplexity.TransitiveClosurePull
+module
+
+public import DescriptiveComplexity.OrderWalk
+public import DescriptiveComplexity.TransitiveClosurePull
 
 /-!
 # Deciders: walks with two exits, closed under the first-order connectives
@@ -52,6 +54,8 @@ what makes the same algebra serve the deterministic logic: a functional
 decider, turned into a specification (`DescriptiveComplexity.Decider.toSpec`),
 is unchanged by determinization.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

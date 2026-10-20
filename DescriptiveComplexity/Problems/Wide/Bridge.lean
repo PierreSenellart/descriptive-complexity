@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Blocks
-import DescriptiveComplexity.Problems.Wide.Fold
+module
+
+public import DescriptiveComplexity.Problems.Wide.Blocks
+public import DescriptiveComplexity.Problems.Wide.Fold
 
 /-!
 # The blocks of an address are the valuation the fold runs on
@@ -30,6 +32,8 @@ hypotheses (`DescriptiveComplexity.wmSetLe_of_full`,
 `DescriptiveComplexity.wmSetLt_iff_of_wmIncr` read through
 `DescriptiveComplexity.wmLt_wmSetLe_iff`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

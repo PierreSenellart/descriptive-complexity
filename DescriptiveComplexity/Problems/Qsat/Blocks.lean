@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Membership
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Membership
 
 /-!
 # Playing a whole quantifier block at once
@@ -32,6 +34,8 @@ that a block assignment `ν : A → Prop` never has to be converted; the two are
 related by `DescriptiveComplexity.qsatWins_ex_iff'` and
 `DescriptiveComplexity.qsatWins_all_iff'`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -88,7 +92,7 @@ theorem qSet_self_eq (τ : A → Prop) (x : A) : qSet τ x (τ x) = τ := by
 
 open Classical in
 /-- A proposition as a Boolean. -/
-private noncomputable def boolOf (P : Prop) : Bool := if P then true else false
+noncomputable def boolOf (P : Prop) : Bool := if P then true else false
 
 private theorem boolOf_iff (P : Prop) : (boolOf P = true) ↔ P := by
   classical

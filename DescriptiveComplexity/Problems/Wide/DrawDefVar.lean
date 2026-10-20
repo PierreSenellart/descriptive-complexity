@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefKind
-import DescriptiveComplexity.Problems.Wide.DrawVarRule
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefKind
+public import DescriptiveComplexity.Problems.Wide.DrawVarRule
 
 /-!
 # The matrix and the gates carry definability
@@ -22,6 +24,8 @@ the pointer alone, failing applies the caller's clearing update, and
 `DescriptiveComplexity.Draw.UStDefinable.ite` decides which when the formula is
 built.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

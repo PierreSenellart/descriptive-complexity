@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Pcp.Defs
-import DescriptiveComplexity.Problems.Pcp.Enum
+module
+
+public import DescriptiveComplexity.Problems.Pcp.Defs
+public import DescriptiveComplexity.Problems.Pcp.Enum
 
 /-!
 # A match, read off as a finite certificate
@@ -50,6 +52,8 @@ parses have the same length, so pairing them index by index
 rebuild the two words from their enumerations before the matching lemma
 applies.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Feedback.CountingArc
+module
+
+public import DescriptiveComplexity.Problems.Feedback.CountingArc
 
 /-!
 # The conflict split graph: feedback arc sets with no slack
@@ -40,6 +42,8 @@ threshold size, bijectively.
 A graph with no marked vertex has one clique of the threshold size, the empty
 one, and no promise to offer; it is sent to the graph with no arc.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

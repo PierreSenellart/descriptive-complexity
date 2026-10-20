@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.QuantitativePull
-import DescriptiveComplexity.FixedPoint
+module
+
+public import DescriptiveComplexity.Counting.QuantitativePull
+public import DescriptiveComplexity.FixedPoint
 
 /-!
 # The class FP
@@ -33,6 +35,8 @@ point pulls back through the interpretation as it does for PTIME
 (`DescriptiveComplexity.lfpAssign_pull`), and the quantitative output as
 `DescriptiveComplexity.QTerm.pull`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Blocks
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Blocks
 
 /-!
 # The counter field: telling a block which block it is
@@ -39,6 +41,8 @@ The capacity condition is the expected one: a field of `g` bits must hold every
 index it names, so `posCount A ≤ orank g * 2 ^ orank g`. For the gaps of §2.3
 that is true with room to spare.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

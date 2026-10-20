@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameCtrl
-import DescriptiveComplexity.MachinesAltSpace
-import DescriptiveComplexity.Problems.Machine.Walk
+module
+
+public import DescriptiveComplexity.Exponential.GameCtrl
+public import DescriptiveComplexity.MachinesAltSpace
+public import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # The machine of a second-order game
@@ -53,6 +55,8 @@ transitions: the first is about the order, the positions, the input and the
 blank – all fixed by the layout – and the second is about the marks, which are
 `DescriptiveComplexity.MachPh.IsUniv` read off the phase.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

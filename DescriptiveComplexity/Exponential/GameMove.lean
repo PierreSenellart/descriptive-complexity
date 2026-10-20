@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GamePhase
+module
+
+public import DescriptiveComplexity.Exponential.GamePhase
 
 /-!
 # Reading a block sentence in a copy, and moving one variable onto another
@@ -31,6 +33,8 @@ block `C` and finite tag type `T`.
   copying the points of the node just chosen onto the slots the next position
   reads them from. Freezing is the diagonal case `j = i`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

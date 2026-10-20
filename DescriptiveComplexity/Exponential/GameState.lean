@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameGraph
+module
+
+public import DescriptiveComplexity.Exponential.GameGraph
 
 /-!
 # The states of the graph game
@@ -56,6 +58,8 @@ node-carrying phase are, which is what
 every node move preserves.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -88,7 +92,7 @@ variable {T : Type} {Dm : ℕ}
 
 /-- The phases, coded into a sum of products, so that finiteness is
 inherited. -/
-private def code : Ph T Dm →
+def code : Ph T Dm →
     T ⊕ T ⊕ (T × T) ⊕ (T × T) ⊕ (T × T) ⊕ (Sub × T × T × Fin (Dm + 1) × Bool)
   | .startPick tx => .inl tx
   | .main tx => .inr (.inl tx)

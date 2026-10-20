@@ -3,8 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.QSOQuantifiers
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Counting.QSOQuantifiers
+public import DescriptiveComplexity.Counting.Class
+public import Mathlib.Algebra.BigOperators.Ring.Finset
 
 /-!
 # ΣQSO(FO) is the logic of `#P`
@@ -29,6 +32,8 @@ So a problem stated as a ΣQSO(FO) term – the permanent as
 `ΣS. [S is a permutation] · Πx. (∃y. S(x, y) ∧ M(x, y))`, a probability of a
 query as a weighted count – is in `#P` without writing its kernel.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

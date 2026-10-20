@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Set.Card
-import DescriptiveComplexity.Numbers.DigitExtract
+module
+
+public import Mathlib.Data.Set.Card
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # Pendant leaves: the independent sets of one size, read off a digit
@@ -23,6 +25,8 @@ of them, `S` ranging over the independent sets of the old graph. Fewer than
 `2 ^ n` whose digit of rank `n - k` is the number of independent sets of size
 `k` (`DescriptiveComplexity.card_indepSet_pend_digit`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

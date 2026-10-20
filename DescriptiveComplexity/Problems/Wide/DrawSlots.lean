@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawAddr
-import DescriptiveComplexity.Problems.Wide.DrawTracks
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawAddr
+public import DescriptiveComplexity.Problems.Wide.DrawTracks
 
 /-!
 # The slots of the EXPSPACE program, and the mark of a register cell
@@ -47,6 +49,8 @@ lemma per slot kind; `DescriptiveComplexity.Draw.slotMark_name` is the one the
 counting argument of `Problems/Wide/Marks.lean` allows, and the one everything
 else was built to reach.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -96,7 +100,7 @@ namespace Slot
 
 variable {ι : Type} {ko ki dd0 : ℕ}
 
-private def toSum : Slot ι ko ki dd0 →
+def slotsToSum : Slot ι ko ki dd0 →
     (Option (Fin ko ⊕ Fin ki) ⊕ Fin dd0 ⊕ ι ⊕ ι) ⊕ Fin 11
   | .blk b => Sum.inl (Sum.inl b)
   | .name j => Sum.inl (Sum.inr (Sum.inl j))
@@ -115,9 +119,9 @@ private def toSum : Slot ι ko ki dd0 →
   | .ltp => Sum.inr 10
 
 instance [Finite ι] : Finite (Slot ι ko ki dd0) := by
-  refine Finite.of_injective toSum ?_
+  refine Finite.of_injective slotsToSum ?_
   intro a b h
-  cases a <;> cases b <;> simp_all [toSum]
+  cases a <;> cases b <;> simp_all [slotsToSum]
 
 noncomputable instance [Finite ι] : Fintype (Slot ι ko ki dd0) := Fintype.ofFinite _
 
@@ -149,7 +153,7 @@ namespace Ctl
 
 variable {e na nat nf ntg : ℕ}
 
-private def toSum : Ctl e na nat nf ntg →
+def slotsToSum : Ctl e na nat nf ntg →
     Fin e ⊕ Fin na ⊕ Fin e ⊕ Fin nat ⊕ Fin nf ⊕ Fin ntg ⊕ Fin 8
   | .lv j => Sum.inl j
   | .acc j => Sum.inr (Sum.inl j)
@@ -160,9 +164,9 @@ private def toSum : Ctl e na nat nf ntg →
   | .flag k => Sum.inr (Sum.inr (Sum.inr (Sum.inr (Sum.inr (Sum.inr k)))))
 
 instance : Finite (Ctl e na nat nf ntg) := by
-  refine Finite.of_injective toSum ?_
+  refine Finite.of_injective slotsToSum ?_
   intro a b h
-  cases a <;> cases b <;> simp_all [toSum]
+  cases a <;> cases b <;> simp_all [slotsToSum]
 
 noncomputable instance : Fintype (Ctl e na nat nf ntg) := Fintype.ofFinite _
 

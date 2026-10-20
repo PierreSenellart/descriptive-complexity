@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CycleCover.Base
+module
+
+public import DescriptiveComplexity.Problems.CycleCover.Base
 
 /-!
 # The consistent choices are the exactly-one models
@@ -20,6 +22,8 @@ the base graph with the gadgets attached is `4` to the number of occurrences
 times the number of exactly-one models
 (`DescriptiveComplexity.SatCover.bperm_attachAll_sites_eq`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

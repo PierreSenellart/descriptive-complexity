@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
+module
+
+public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
 
 /-!
 # The drawn instance draws the intended code
@@ -29,6 +31,8 @@ drawing whose marks and children follow `DescriptiveComplexity.subAt`,
 `DescriptiveComplexity.sub1` and `DescriptiveComplexity.sub2` draws every
 subterm at its position, by structural induction on the code.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Permanent.Xor
+module
+
+public import DescriptiveComplexity.Permanent.Xor
 
 /-!
 # Attaching Valiant's gadget at every site of a list
@@ -26,6 +28,8 @@ edges in place that use exactly one edge of each site, weighted by the base
 entries (`DescriptiveComplexity.Site.xorSum_eq_sum`, as a sum over the choice
 functions).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

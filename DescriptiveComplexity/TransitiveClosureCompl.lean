@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosure
-import DescriptiveComplexity.InductiveCounting.Complete
+module
+
+public import DescriptiveComplexity.TransitiveClosure
+public import DescriptiveComplexity.InductiveCounting.Complete
 
 /-!
 # FO(TC) is closed under complement
@@ -34,6 +36,8 @@ condition on tuples of elements: equality, the lexicographic minimum, maximum
 or successor (`DescriptiveComplexity.OrderWalk`), or one of the given spec's own
 formulas.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -67,7 +71,7 @@ instance instNonemptyPadMode (spec : TCSpec L) : Nonempty (spec.pad).Mode :=
 variable (spec : TCSpec L) {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- The nodes of the padded specification that carry a genuine mode. -/
-private def padNode (a : spec.Node A) : (spec.pad).Node A := (some a.1, a.2)
+def padNode (a : spec.Node A) : (spec.pad).Node A := (some a.1, a.2)
 
 private theorem pad_step_iff {a b : spec.Node A} :
     (spec.pad).Step (spec.padNode a) (spec.padNode b) ↔ spec.Step a b := Iff.rfl

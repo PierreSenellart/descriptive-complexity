@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureDecide
-import DescriptiveComplexity.TransitiveClosureParam
+module
+
+public import DescriptiveComplexity.TransitiveClosureDecide
+public import DescriptiveComplexity.TransitiveClosureParam
 
 /-!
 # Every formula over decided relations is decided
@@ -29,6 +31,8 @@ reachability relations of a family of walks are
 built in `DescriptiveComplexity.TransitiveClosureDecideReach` and
 `DescriptiveComplexity.TransitiveClosureDecideReachDet`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

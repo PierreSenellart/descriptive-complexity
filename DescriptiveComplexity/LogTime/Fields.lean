@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Bits
+module
+
+public import DescriptiveComplexity.LogTime.Bits
 
 /-!
 # Fields: reading a packed number out of one element
@@ -33,6 +35,8 @@ rank of the universe, and the whole thing is a formula of `FO(≤, +, ×)`
 A construction that lays numbers out in an element states its layout with
 `FieldAt` and never touches a bit again.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

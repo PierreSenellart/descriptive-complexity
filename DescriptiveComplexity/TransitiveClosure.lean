@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Ordered
-import DescriptiveComplexity.Complexity
+module
+
+public import DescriptiveComplexity.Ordered
+public import DescriptiveComplexity.Complexity
 
 /-!
 # FO(TC): first-order logic with transitive closure
@@ -63,6 +65,8 @@ The canonical example is `DescriptiveComplexity.reach_tcDefinable` – REACH *is
 at arity one and with a single mode, over the edge relation between the marked
 sources and the marked targets.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

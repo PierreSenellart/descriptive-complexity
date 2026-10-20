@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Translate
-import DescriptiveComplexity.PSpaceHierarchy
+module
+
+public import DescriptiveComplexity.Exponential.Translate
+public import DescriptiveComplexity.PSpaceHierarchy
 
 /-!
 # Every first-order property of an expansion is in the polynomial hierarchy
@@ -30,6 +32,8 @@ Two steps, both off the shelf once the translation is available.
   block to carry the order variable even when the sentence has no quantifiers
   at all.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

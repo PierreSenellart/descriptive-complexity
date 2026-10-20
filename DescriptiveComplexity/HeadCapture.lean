@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadEval
+module
+
+public import DescriptiveComplexity.HeadEval
 
 /-!
 # The capture theorem for NL: FO(TC) is what a multi-head automaton recognizes
@@ -66,6 +68,8 @@ two directions:
 The result is `DescriptiveComplexity.tcDefinable_iff_automaton`, and with it
 `DescriptiveComplexity.mem_NL_iff_automaton`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

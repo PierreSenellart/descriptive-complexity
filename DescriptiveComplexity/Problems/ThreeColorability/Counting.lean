@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Coloring.Membership
-import DescriptiveComplexity.Problems.ThreeColorability.Defs
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Problems.Coloring.Membership
+public import DescriptiveComplexity.Problems.ThreeColorability.Defs
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #3-Colorability: counting the proper 3-colorings
@@ -17,6 +19,8 @@ proper colorings of a graph with the three colors `Fin 3`
 guessed color classes partitioning the vertices; its one-call completeness is
 in `DescriptiveComplexity.Problems.ThreeColorability.CountDraw`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

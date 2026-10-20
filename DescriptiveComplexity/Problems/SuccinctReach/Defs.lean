@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.PSpace
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.PSpace
 
 /-!
 # SUCCINCT-REACH: reachability in a propositionally described transition system
@@ -56,6 +58,8 @@ states, and reachability is the transitive closure. That is what makes the
 membership half cheap (`DescriptiveComplexity.Problems.SuccinctReach.Membership`) and
 the hardness half a Tseitin translation.
 -/
+
+@[expose] public section
 
 /- The language of succinctly described transition systems lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.sat` and `Language.order`. -/
@@ -150,7 +154,7 @@ section Iso
 variable {A B : Type} [Language.transSys.Structure A] [Language.transSys.Structure B]
 
 /-- The push-forward of a predicate along an isomorphism. -/
-private def pushPred (e : A ≃[Language.transSys] B) (ν : A → Prop) : B → Prop :=
+def pushPred (e : A ≃[Language.transSys] B) (ν : A → Prop) : B → Prop :=
   fun b => ν (e.symm b)
 
 private theorem clausesHold_push (e : A ≃[Language.transSys] B) {ν : A → Prop}

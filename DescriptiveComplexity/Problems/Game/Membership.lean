@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Game.Defs
-import DescriptiveComplexity.FixedPointHorn
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Problems.Game.Defs
+public import DescriptiveComplexity.FixedPointHorn
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # GAME is in PTIME
@@ -34,6 +36,8 @@ That this stays a *least* fixed point is the point of doing it this way: `allge`
 is derivable exactly when the winners it quantifies over are already derived, so
 nothing is derived early and the two variables grow together.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

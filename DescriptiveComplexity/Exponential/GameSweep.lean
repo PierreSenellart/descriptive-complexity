@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameRun
+module
+
+public import DescriptiveComplexity.Exponential.GameRun
 
 /-!
 # The sweep, read back
@@ -37,6 +39,8 @@ sentinel.
   *every* assignment of the region has to be answered. It is the one place a
   walk is run backwards, through `DescriptiveComplexity.altWin_of_walk`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

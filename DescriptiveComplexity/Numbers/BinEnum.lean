@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.Binary
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.Numbers.Binary
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Binary numbers on enumerated positions
@@ -25,6 +27,8 @@ encoder writes `w.testBit p` at the position of index `p`, and the abstract
 semantics reads `w` back. Whatever else the universe holds – items, vertices,
 facts – plays no part.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

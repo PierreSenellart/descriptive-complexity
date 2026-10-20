@@ -3,8 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import DescriptiveComplexity.LogTime.BitSum.Sum
+module
+
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import DescriptiveComplexity.LogTime.BitSum.Sum
+public import Mathlib.Algebra.Group.Action.Defs
 
 /-!
 # The columns of a product, and the carry chain that adds one block of them
@@ -46,6 +49,8 @@ This file is the `ℕ` side of that construction, with no structure in sight:
   column, and the column count, with the product identity
   `DescriptiveComplexity.BitSum.mul_eq_colSum`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

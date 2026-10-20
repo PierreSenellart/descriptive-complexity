@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Knapsack.Chain
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Knapsack.Chain
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # Knapsack is in NP
@@ -29,6 +31,8 @@ chain exists whenever the sum fits is `DescriptiveComplexity.exists_ripple`
 Walking the items in order is what makes a *single* relation `psum` enough, and
 it is why the vocabulary orders the items and not only the bit positions.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -129,55 +133,55 @@ end Builders
 /-! ### The clauses -/
 
 /-- Kernel clause: the order is reflexive. -/
-private noncomputable def ksReflClause : ksSOLang.Sentence :=
+noncomputable def ksReflClause : ksSOLang.Sentence :=
   fo% ∀ x, kLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
-private noncomputable def ksTransClause : ksSOLang.Sentence :=
+noncomputable def ksTransClause : ksSOLang.Sentence :=
   fo% ∀ x y z, kLeF⟨x, y⟩ ∧ kLeF⟨y, z⟩ → kLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
-private noncomputable def ksAntisymmClause : ksSOLang.Sentence :=
+noncomputable def ksAntisymmClause : ksSOLang.Sentence :=
   fo% ∀ x y, kLeF⟨x, y⟩ ∧ kLeF⟨y, x⟩ → kEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
-private noncomputable def ksTotalClause : ksSOLang.Sentence :=
+noncomputable def ksTotalClause : ksSOLang.Sentence :=
   fo% ∀ x y, kLeF⟨x, y⟩ ∨ kLeF⟨y, x⟩
 
 /-- Kernel clause: only items are chosen. -/
-private noncomputable def ksSelClause : ksSOLang.Sentence :=
+noncomputable def ksSelClause : ksSOLang.Sentence :=
   fo% ∀ x, kSelF⟨x⟩ → kItemF⟨x⟩
 
 /-- Kernel clause: at the first item the running total is that item's
 contribution. -/
-private noncomputable def ksBaseClause : ksSOLang.Sentence :=
+noncomputable def ksBaseClause : ksSOLang.Sentence :=
   fo% ∀ i p, kMinItemF⟨i⟩ ∧ kPosnF⟨p⟩ → (kPSF⟨i, p⟩ ↔ kAddF⟨i, p⟩)
 
 /-- Kernel clause: each step adds a bit. -/
-private noncomputable def ksSumClause : ksSOLang.Sentence :=
+noncomputable def ksSumClause : ksSOLang.Sentence :=
   fo% ∀ i j p, kSuccItemF⟨i, j⟩ ∧ kPosnF⟨p⟩ →
     (kPSF⟨j, p⟩ ↔ kXor3F⦃kPSF⟨i, p⟩, kAddF⟨j, p⟩, kCarryF⟨j, p⟩⦄)
 
 /-- Kernel clause: each step propagates its carry. -/
-private noncomputable def ksCarryClause : ksSOLang.Sentence :=
+noncomputable def ksCarryClause : ksSOLang.Sentence :=
   fo% ∀ i j p q, kSuccItemF⟨i, j⟩ ∧ kSuccPosnF⟨p, q⟩ →
     (kCarryF⟨j, q⟩ ↔ kMaj3F⦃kPSF⟨i, p⟩, kAddF⟨j, p⟩, kCarryF⟨j, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest position. -/
-private noncomputable def ksBottomClause : ksSOLang.Sentence :=
+noncomputable def ksBottomClause : ksSOLang.Sentence :=
   fo% ∀ i j p, kSuccItemF⟨i, j⟩ ∧ kMinPosnF⟨p⟩ → ¬ kCarryF⟨j, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest position. -/
-private noncomputable def ksTopClause : ksSOLang.Sentence :=
+noncomputable def ksTopClause : ksSOLang.Sentence :=
   fo% ∀ i j p, kSuccItemF⟨i, j⟩ ∧ kMaxPosnF⟨p⟩ →
     ¬ kMaj3F⦃kPSF⟨i, p⟩, kAddF⟨j, p⟩, kCarryF⟨j, p⟩⦄
 
 /-- Kernel clause: at the last item the running total is the target. -/
-private noncomputable def ksFinalClause : ksSOLang.Sentence :=
+noncomputable def ksFinalClause : ksSOLang.Sentence :=
   fo% ∀ i p, kMaxItemF⟨i⟩ ∧ kPosnF⟨p⟩ → (kPSF⟨i, p⟩ ↔ kTgtF⟨p⟩)
 
 /-- Kernel clause: with no item at all, the target must be zero. -/
-private noncomputable def ksEmptyClause : ksSOLang.Sentence :=
+noncomputable def ksEmptyClause : ksSOLang.Sentence :=
   fo% (∀ x, ¬ kItemF⟨x⟩) → ∀ p, kPosnF⟨p⟩ → ¬ kTgtF⟨p⟩
 
 /-- The first-order kernel of the `Σ₁` definition of Knapsack. -/
@@ -188,12 +192,12 @@ noncomputable def knapsackKernel : ksSOLang.Sentence :=
 
 /-- Kernel clause of the counting kernel: the running totals are stored at
 items and positions only. -/
-private noncomputable def ksPinPSClause : ksSOLang.Sentence :=
+noncomputable def ksPinPSClause : ksSOLang.Sentence :=
   fo% ∀ i p, kPSF⟨i, p⟩ → kItemF⟨i⟩ ∧ kPosnF⟨p⟩
 
 /-- Kernel clause of the counting kernel: the carries are stored at positions
 and at the items that are not the first one only. -/
-private noncomputable def ksPinCarryClause : ksSOLang.Sentence :=
+noncomputable def ksPinCarryClause : ksSOLang.Sentence :=
   fo% ∀ i p, kCarryF⟨i, p⟩ → (kItemF⟨i⟩ ∧ kPosnF⟨p⟩) ∧ ¬ kMinItemF⟨i⟩
 
 /-- **The counting kernel of Knapsack**: the kernel of its `Σ₁` definition, and
@@ -209,16 +213,16 @@ section Realize
 variable {A : Type} [Language.binWeights.Structure A] (ρ : knapsackGuessBlock.Assignment A)
 
 /-- The chosen items, read off an assignment of the block. -/
-private def Sel (i : A) : Prop := ρ .sel ![i]
+def Sel (i : A) : Prop := ρ .sel ![i]
 
 /-- The running total, read off an assignment of the block. -/
-private def PSum (i p : A) : Prop := ρ .pS ![i, p]
+def PSum (i p : A) : Prop := ρ .pS ![i, p]
 
 /-- The carries, read off an assignment of the block. -/
-private def Cy (i p : A) : Prop := ρ .carry ![i, p]
+def Cy (i p : A) : Prop := ρ .carry ![i, p]
 
 /-- The bit that an item contributes. -/
-private def Add (i p : A) : Prop := Sel ρ i ∧ BWBit i p
+def Add (i p : A) : Prop := Sel ρ i ∧ BWBit i p
 
 private theorem realize_knapsackKernel :
     (@Sentence.Realize ksSOLang A

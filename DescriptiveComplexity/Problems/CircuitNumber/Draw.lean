@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CircuitNumber.Defs
-import DescriptiveComplexity.Problems.HornSat.Hardness
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.Problems.CircuitNumber.Defs
+public import DescriptiveComplexity.Problems.HornSat.Hardness
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # The circuit of a system of rules
@@ -36,6 +38,8 @@ least fixed point of the rules as it stands.
 This file holds the interpretation and reads its relations; the evaluation is
 `DescriptiveComplexity.Problems.CircuitNumber.Hardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

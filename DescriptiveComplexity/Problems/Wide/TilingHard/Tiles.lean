@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Tiling
-import DescriptiveComplexity.Problems.Wide.RegChannel
-import DescriptiveComplexity.Problems.Wide.WellFormed
+module
+
+public import DescriptiveComplexity.Problems.Wide.Tiling
+public import DescriptiveComplexity.Problems.Wide.RegChannel
+public import DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # The tiles a computation table is drawn with
@@ -44,6 +46,8 @@ rule *justifies* it against the neighboring head, and the vertical rule *turns
 it into* the head of the next row. That is what keeps a row to exactly one head
 with rules that never see more than two cells.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

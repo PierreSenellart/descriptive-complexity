@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureParam
-import DescriptiveComplexity.SecondOrderLift
-import DescriptiveComplexity.FixedPointStratify
+module
+
+public import DescriptiveComplexity.TransitiveClosureParam
+public import DescriptiveComplexity.SecondOrderLift
+public import DescriptiveComplexity.FixedPointStratify
 
 /-!
 # Towers of walks: reachability relations that may read earlier ones
@@ -45,6 +47,8 @@ is proved one level at a time and at the encodings of nodes
 `DescriptiveComplexity.NL` under `≤ᵗᶜ` uses, and not as an equality of
 families; a tower is not flattened as such.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

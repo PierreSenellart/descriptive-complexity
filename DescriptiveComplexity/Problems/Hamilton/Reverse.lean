@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.Gadget
-import DescriptiveComplexity.Problems.Hamilton.Cycle
-import Mathlib.Logic.Equiv.Fin.Rotate
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.Gadget
+public import DescriptiveComplexity.Problems.Hamilton.Cycle
+public import Mathlib.Logic.Equiv.Fin.Rotate
 
 /-!
 # Vertex Cover from a Hamilton circuit
@@ -43,6 +45,8 @@ neighbors of each gadget vertex (`DescriptiveComplexity.dgEdge_iff` /
 `DescriptiveComplexity.eq_gPt_of_val` below reconstructs a vertex from its tag and
 coordinates (sidestepping a `simp`/subtype mismatch), the workhorse of step 1.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

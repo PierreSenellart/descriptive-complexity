@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Quantitative
+module
+
+public import DescriptiveComplexity.Counting.Quantitative
 
 /-!
 # Writing quantitative terms
@@ -22,6 +24,8 @@ the elements (`DescriptiveComplexity.QTerm.eval_sumOver`).
 `DescriptiveComplexity.QTerm.cond` is the choice between two terms by a
 formula.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointExpand
-import DescriptiveComplexity.FixedPointReductionComposition
-import DescriptiveComplexity.SecondOrderRelPull
+module
+
+public import DescriptiveComplexity.FixedPointExpand
+public import DescriptiveComplexity.FixedPointReductionComposition
+public import DescriptiveComplexity.SecondOrderRelPull
 
 /-!
 # The classes are closed under FO(LFP) reductions
@@ -49,6 +51,8 @@ direction: hardness under a *larger* class of reductions is a *weaker*
 statement, so every completeness theorem of the catalog implies its
 polynomial-time-reduction reading, and none of them is superseded by it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

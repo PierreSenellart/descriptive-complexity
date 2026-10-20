@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.RE
-import DescriptiveComplexity.Computability.Eval
-import DescriptiveComplexity.RecursivelyEnumerable
+module
+
+public import Mathlib.Computability.RE
+public import DescriptiveComplexity.Computability.Eval
+public import DescriptiveComplexity.RecursivelyEnumerable
 
 /-!
 # RE is recursively enumerable
@@ -49,6 +51,8 @@ That every `REPred` is in `RE` is proved one layer up, in
 already exist, so that the reduction can draw a semi-decision procedure inside
 the instance rather than build one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

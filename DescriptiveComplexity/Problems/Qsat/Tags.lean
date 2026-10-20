@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Qsat.Reach
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.Problems.Qsat.Reach
+public import DescriptiveComplexity.Ordered
 
 /-!
 # The shape of the QSAT instance built by the Savitch reduction
@@ -52,6 +54,8 @@ It orders the prefix as `S, T` – then, for each level `ℓ` in increasing orde
 universal one. Blocks of like polarity are exactly the sets of variables sharing
 the first three components (`DescriptiveComplexity.keyTriple`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -113,7 +117,7 @@ inductive QClTag where
 /-- The tags of the interpretation: a variable tag or a clause tag. -/
 abbrev QTag : Type := QVarTag ⊕ QClTag
 
-private def varIdx : QVarTag → Fin 10
+def varIdx : QVarTag → Fin 10
   | .sS => 0
   | .sT => 1
   | .sZ => 2
@@ -128,7 +132,7 @@ private def varIdx : QVarTag → Fin 10
 instance : Finite QVarTag :=
   Finite.of_injective varIdx (by intro x y h; cases x <;> cases y <;> simp_all [varIdx])
 
-private def clIdx : QClTag → Fin 8 × Bool × Bool × Bool
+def clIdx : QClTag → Fin 8 × Bool × Bool × Bool
   | .cSrc => (0, false, false, false)
   | .cTgt => (1, false, false, false)
   | .cStep => (2, false, false, false)

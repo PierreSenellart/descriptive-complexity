@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelEval
-import DescriptiveComplexity.Problems.Wide.TrackWrites
-import DescriptiveComplexity.Problems.Wide.RegChannelProg
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelEval
+public import DescriptiveComplexity.Problems.Wide.TrackWrites
+public import DescriptiveComplexity.Problems.Wide.RegChannelProg
 
 /-!
 # The tape the register channel hands over is the state the run reads
@@ -28,6 +30,8 @@ Only two slots need an argument, and both are about the file's ends:
 Everything else is a tag decision the layout repeats (the block one-hots, the
 name slots, the padding flag) or a track that starts clear.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

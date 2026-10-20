@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.HornSat.Number
-import DescriptiveComplexity.Problems.HornSat.Hardness
-import DescriptiveComplexity.Problems.CircuitNumber.Hardness
+module
+
+public import DescriptiveComplexity.Problems.HornSat.Number
+public import DescriptiveComplexity.Problems.HornSat.Hardness
+public import DescriptiveComplexity.Problems.CircuitNumber.Hardness
 
 /-!
 # Every digit-definable function reduces to the number written by unit propagation
@@ -23,6 +25,8 @@ variables are the atoms of the relations holding the digits. The rules without
 a head derive nothing and are dropped first: they would be goal clauses, and
 could make the formula unsatisfiable.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

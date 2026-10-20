@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.QsatInterp
-import DescriptiveComplexity.Problems.Machine.SpaceDet
-import DescriptiveComplexity.Problems.Machine.Space
-import DescriptiveComplexity.Problems.Qsat
+module
+
+public import DescriptiveComplexity.Problems.Machine.QsatInterp
+public import DescriptiveComplexity.Problems.Machine.SpaceDet
+public import DescriptiveComplexity.Problems.Machine.Space
+public import DescriptiveComplexity.Problems.Qsat
 
 /-!
 # The space-bounded machine problems are PSPACE-complete
@@ -30,6 +32,8 @@ The two completeness theorems together say `PSPACE = NPSPACE` in the form this
 library can state it: deterministic and nondeterministic space-bounded
 acceptance are complete for the same class.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

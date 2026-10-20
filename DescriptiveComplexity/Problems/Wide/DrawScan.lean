@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawPass
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawPass
 
 /-!
 # Scanning to a cell recognized by its tracks
@@ -28,6 +30,8 @@ As everywhere in the pass layer, the caller supplies rules (`Prog.HasRight` /
 `Prog.trackTapeAt` presentation, so a program never mentions
 `FirstOrder.Language.wide`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

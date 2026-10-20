@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.JobSequencing.Kernel
+module
+
+public import DescriptiveComplexity.Problems.JobSequencing.Kernel
 
 /-!
 # Job sequencing is in NP
@@ -15,6 +17,8 @@ directions of the `Σ₁` definition can be argued with
 `DescriptiveComplexity.chain_sound` and `DescriptiveComplexity.exists_chain` for the
 walks and `DescriptiveComplexity.binNum_lt_iff` for the two comparisons.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

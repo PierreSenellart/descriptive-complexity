@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawVarRule
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawVarRule
 
 /-!
 # The program, assembled
@@ -33,6 +35,8 @@ is the post-matrix checkpoint, which folds and tests VAL for exhaustion –
 increment and matrix again, or the exit checkpoint, which writes the
 variable's next-stage bit at the marker.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

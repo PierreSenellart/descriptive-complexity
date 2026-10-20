@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.ModelTheory.Semantics
-import Mathlib.ModelTheory.Complexity
-import Mathlib.Tactic.FinCases
+module
+
+public import Mathlib.ModelTheory.Semantics
+public import Mathlib.ModelTheory.Complexity
+public import Mathlib.Tactic.FinCases
 
 /-!
 # First-order interpretations and FO reductions
@@ -61,6 +63,8 @@ problem that is false on an empty structure could reduce to SAT (whose empty
 instance is trivially satisfiable), and hardness results would fail for
 spurious reasons.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

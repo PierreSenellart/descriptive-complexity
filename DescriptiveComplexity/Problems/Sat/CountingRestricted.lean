@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Restrict
-import DescriptiveComplexity.Problems.TwoSat.Defs
-import DescriptiveComplexity.Problems.HornSat.Defs
-import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
+module
+
+public import DescriptiveComplexity.Counting.Restrict
+public import DescriptiveComplexity.Problems.TwoSat.Defs
+public import DescriptiveComplexity.Problems.HornSat.Defs
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
 
 /-!
 # #2SAT, #HORN-SAT, #Monotone-2SAT, and all the vertex covers of a graph
@@ -33,6 +35,8 @@ the formula a monotone 2-CNF. In both cases the models are sets of
 vertex doubles the count of the graph: the post-processing multiplies by `2`
 to the number of isolated vertices.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

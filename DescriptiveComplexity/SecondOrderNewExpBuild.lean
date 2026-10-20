@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewExpPull
-import DescriptiveComplexity.SecondOrderNewExp
+module
+
+public import DescriptiveComplexity.SecondOrderNewExpPull
+public import DescriptiveComplexity.SecondOrderNewExp
 
 /-!
 # The guess the forward direction makes
@@ -24,6 +26,8 @@ say “these values name points the certificate relates”. Nothing here is a
 choice: the guards pin the guess down to exactly this, up to which value gets
 which assignment.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

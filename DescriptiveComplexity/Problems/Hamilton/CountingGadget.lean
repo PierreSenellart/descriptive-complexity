@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
-import DescriptiveComplexity.OccurrenceVar
-import DescriptiveComplexity.Problems.OneInSat.Counting
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
+public import DescriptiveComplexity.OccurrenceVar
+public import DescriptiveComplexity.Problems.OneInSat.Counting
 
 /-!
 # The row graph of a CNF formula
@@ -51,6 +53,8 @@ directions of the correspondence use: the cyclic successor on the variables of
 the formula, induction along the occurrences of a variable in both directions,
 and the rank of an occurrence.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # Clique is existential second-order definable
@@ -25,6 +27,8 @@ Since NP is *defined* as `Σ₁`-definability, this is the statement
 `Clique ∈ NP`; see `DescriptiveComplexity.Problems.CliqueFamily` for the
 NP-completeness theorems of the whole clique family.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

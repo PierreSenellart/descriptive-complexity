@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
-import DescriptiveComplexity.Problems.Wide.DrawIxPack
-import DescriptiveComplexity.Problems.Wide.DrawSpineSem
-import DescriptiveComplexity.Problems.Wide.DrawIxEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
+public import DescriptiveComplexity.Problems.Wide.DrawIxPack
+public import DescriptiveComplexity.Problems.Wide.DrawSpineSem
+public import DescriptiveComplexity.Problems.Wide.DrawIxEval
 
 /-!
 # What the spine does to the tape, at an arbitrary file
@@ -15,6 +17,8 @@ import DescriptiveComplexity.Problems.Wide.DrawIxEval
 whole spine leaves on the tape at one address, the sweep's fold over the
 addresses, and the semantic packs the positions are run with.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

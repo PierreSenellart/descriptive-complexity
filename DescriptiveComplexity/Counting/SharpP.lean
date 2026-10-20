@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting
-import DescriptiveComplexity.SecondOrderOrdered
-import Mathlib.SetTheory.Cardinal.Finite
+module
+
+public import DescriptiveComplexity.Counting
+public import DescriptiveComplexity.SecondOrderOrdered
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Counting the witnesses of a second-order block: `#P`-definability
@@ -39,6 +41,8 @@ pulled block to come from one of the original block; counting needs the
 correspondence to be a bijection (`DescriptiveComplexity.SOBlock.pullAssignEquiv`),
 which it is because the interpreted universe is all of `Tag × A^d`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

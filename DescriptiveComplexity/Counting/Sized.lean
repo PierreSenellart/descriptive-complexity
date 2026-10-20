@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.SharpP
-import DescriptiveComplexity.SecondOrderOrdered
-import DescriptiveComplexity.Numbers.MonotoneBijection
+module
+
+public import DescriptiveComplexity.Counting.SharpP
+public import DescriptiveComplexity.SecondOrderOrdered
+public import DescriptiveComplexity.Numbers.MonotoneBijection
 
 /-!
 # Counting the solutions of exactly the threshold size
@@ -34,6 +36,8 @@ The extra variable is that of `DescriptiveComplexity.SOBlock.withOrder`, reused 
 its assignment bookkeeping: there it is an order being re-quantified, here a
 bijection.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -103,22 +107,22 @@ abbrev szLeSym : ((L.sum Language.order).sum B.withOrder.lang).Relations 2 :=
   Sum.inl (Sum.inr leSymb)
 
 /-- `x` is marked, as a formula of the sized kernel. -/
-private def szMk {α : Type} (x : α) :
+def szMk {α : Type} (x : α) :
     ((L.sum Language.order).sum B.withOrder.lang).Formula α :=
   Relations.formula₁ (szMkSym L B mk) (Term.var x)
 
 /-- `x` belongs to the sized set, as a formula. -/
-private def szSel {α : Type} (x : α) :
+def szSel {α : Type} (x : α) :
     ((L.sum Language.order).sum B.withOrder.lang).Formula α :=
   Relations.formula₁ (szSelSym L B i₀ h₀) (Term.var x)
 
 /-- The bijection relates `x` to `y`, as a formula. -/
-private def szBij {α : Type} (x y : α) :
+def szBij {α : Type} (x y : α) :
     ((L.sum Language.order).sum B.withOrder.lang).Formula α :=
   Relations.formula₂ (szBijSym L B) (Term.var x) (Term.var y)
 
 /-- `x ≤ y`, as a formula of the sized kernel. -/
-private def szLe {α : Type} (x y : α) :
+def szLe {α : Type} (x y : α) :
     ((L.sum Language.order).sum B.withOrder.lang).Formula α :=
   Relations.formula₂ (szLeSym L B) (Term.var x) (Term.var y)
 

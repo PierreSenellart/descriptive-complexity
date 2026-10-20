@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.Problems.ThreeColorability.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.Problems.ThreeColorability.Defs
 
 /-!
 # 3-colorability FO-reduces to SAT
@@ -34,6 +36,8 @@ Elements of the interpreted universe not of the shapes above (“junk”, e.g.,
 an edge) are neither clauses nor occur in any clause, so they do not affect
 satisfiability.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

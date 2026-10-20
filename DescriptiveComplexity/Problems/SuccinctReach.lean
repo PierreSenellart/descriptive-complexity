@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SuccinctReach.Defs
-import DescriptiveComplexity.Problems.SuccinctReach.Membership
-import DescriptiveComplexity.Problems.SuccinctReach.Double
-import DescriptiveComplexity.Problems.SuccinctReach.Hardness
+module
+
+public import DescriptiveComplexity.Problems.SuccinctReach.Defs
+public import DescriptiveComplexity.Problems.SuccinctReach.Membership
+public import DescriptiveComplexity.Problems.SuccinctReach.Double
+public import DescriptiveComplexity.Problems.SuccinctReach.Hardness
 
 /-!
 # SUCCINCT-REACH: reachability in a propositionally described transition system
@@ -61,6 +63,8 @@ nothing else, the two walks correspond step by step, with no initialization or
 finalization steps to peel off; that is why the endpoint conditions stay two
 extra clause groups rather than being folded into the transition.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

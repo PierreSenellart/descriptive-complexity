@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Program
+module
+
+public import DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # Runs of a deterministic machine, unbounded in time
@@ -38,6 +40,8 @@ the guess rather than a second induction. Global determinism is the special case
 Nothing here is about space: the statements hold for any `TMData` whose runs
 are read with `Relation.ReflTransGen`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

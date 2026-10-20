@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Bits
+module
+
+public import DescriptiveComplexity.LogTime.Bits
 
 /-!
 # The three sizes of the Bit Sum Lemma, and that they fit
@@ -56,6 +58,8 @@ purpose – it is discharged once and for all by
 statement about the large universes into a statement about all of them, so
 nothing downstream carries it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

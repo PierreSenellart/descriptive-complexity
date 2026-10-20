@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawEnc
-import DescriptiveComplexity.Problems.Wide.Increment
-import DescriptiveComplexity.Exponential.Order
-import DescriptiveComplexity.OrderedComposition
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawEnc
+public import DescriptiveComplexity.Problems.Wide.Increment
+public import DescriptiveComplexity.Exponential.Order
+public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The order the reduction puts on the points
@@ -33,6 +35,8 @@ lexicographically least.
 padded atoms second; nothing here conflicts with it – the reduction simply
 instantiates the definition's order quantifier differently.)
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

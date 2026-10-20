@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointInflationaryLFP
-import DescriptiveComplexity.SecondOrderNew
-import DescriptiveComplexity.SecondOrderParam
+module
+
+public import DescriptiveComplexity.FixedPointInflationaryLFP
+public import DescriptiveComplexity.SecondOrderNew
+public import DescriptiveComplexity.SecondOrderParam
 
 /-!
 # An element, quantified in front of a fixed point
@@ -37,6 +39,8 @@ is what a fixed point can afford instead.
 `DescriptiveComplexity.EXPTIME` has to say “some copy of the order-guessing
 expansion answers yes”, and a copy is named by any one of its points.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.PartrecCode
-import DescriptiveComplexity.Interpretation
+module
+
+public import Mathlib.Computability.PartrecCode
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # CODEHALT: does the partial recursive code drawn in the instance halt?
@@ -38,6 +40,8 @@ decoding is unique (`DescriptiveComplexity.decodesTo_unique`), which holds as
 soon as the marks are exclusive and the child relations are functional
 (`DescriptiveComplexity.CodeWF`).
 -/
+
+@[expose] public section
 
 /- The language of code instances lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order`. -/

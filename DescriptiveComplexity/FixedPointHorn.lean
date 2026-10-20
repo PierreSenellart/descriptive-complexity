@@ -3,10 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import DescriptiveComplexity.FixedPoint
-import DescriptiveComplexity.OrderWalk
-import DescriptiveComplexity.Hierarchy
+module
+
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import DescriptiveComplexity.FixedPoint
+public import DescriptiveComplexity.OrderWalk
+public import DescriptiveComplexity.Hierarchy
+public import Mathlib.Algebra.Group.Action.Defs
 
 /-!
 # FO(LFP) = SO-Horn: the translation into the fragment
@@ -63,6 +66,8 @@ that any satisfying assignment of the program contains it – in particular the
 falsity of the output, when false, always reaches the goal clause
 (`DescriptiveComplexity.LFPHorn.holds_iff_exists`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

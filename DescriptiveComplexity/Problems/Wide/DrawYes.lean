@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRunSpine
-import DescriptiveComplexity.Problems.Wide.DrawValEnum
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRunSpine
+public import DescriptiveComplexity.Problems.Wide.DrawValEnum
 
 /-!
 # A partial fixed point that holds makes the machine accept
@@ -33,6 +35,8 @@ The two constraints on the layout the assembly needs are the ones
 coordinate of slack beyond the encoding budget (`dd0 < dd`) and one argument
 block to name (`dt.KIx` nonempty).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

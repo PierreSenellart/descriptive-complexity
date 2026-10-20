@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawChain
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawChain
 
 /-!
 # The tuple loop: copying a block bit by bit
@@ -25,6 +27,8 @@ parameters: their content – the lexicographic enumeration, tied to
 `DescriptiveComplexity.Draw.reflTransGen_of_tupLoop` – is fixed with the
 runs.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

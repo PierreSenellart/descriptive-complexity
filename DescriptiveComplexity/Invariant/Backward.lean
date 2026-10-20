@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.OrderDef
-import DescriptiveComplexity.Invariant.Simulation
+module
+
+public import DescriptiveComplexity.Invariant.OrderDef
+public import DescriptiveComplexity.Invariant.Simulation
 
 /-!
 # Pulling an ordered induction on the invariant structure back to the base
@@ -39,6 +41,8 @@ definable refinement (`DescriptiveComplexity.Invariant.OrderDef`,
 `DescriptiveComplexity.FixedPointStratify`), this is what turns an ordered
 induction on `Iᵏ A` into an order-free induction on `A`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

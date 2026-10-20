@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointExpandLevels
-import DescriptiveComplexity.TransitiveClosureReductionDet
+module
+
+public import DescriptiveComplexity.FixedPointExpandLevels
+public import DescriptiveComplexity.TransitiveClosureReductionDet
 
 /-!
 # The whole polynomial hierarchy is closed under FO(LFP) reductions
@@ -31,6 +33,8 @@ is `Σₖ` definability of the complement
 `Π`-polarity of the expansion theorem – though it has it, which is what would
 be needed to close the levels without complementing.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

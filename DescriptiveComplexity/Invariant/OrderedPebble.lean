@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.Pebble
+module
+
+public import DescriptiveComplexity.Invariant.Pebble
 
 /-!
 # The canonical order on `≡ᵏ`-classes, as an inflationary refinement
@@ -41,6 +43,8 @@ vocabulary in sight, exactly as in `DescriptiveComplexity.Invariant.Pebble`;
 the instantiation at the atomic coloring of a structure, and the first-order
 definition of one round, live with the invariant structure.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

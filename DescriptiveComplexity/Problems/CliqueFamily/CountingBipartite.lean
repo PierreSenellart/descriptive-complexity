@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
-import DescriptiveComplexity.Problems.CliqueFamily.Stretch
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
+public import DescriptiveComplexity.Problems.CliqueFamily.Stretch
 
 /-!
 # #BIS and #PP2DNF: counting the independent sets of a bipartite graph
@@ -47,6 +49,8 @@ The interpretation is three-dimensional and relativized: the vertices are the
 diagonal triples of one tag, and each of two other tags carries the triples
 `(u, v, i)` with `u – v` an edge.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

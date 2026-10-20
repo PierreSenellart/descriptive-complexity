@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.QSO
-import DescriptiveComplexity.Counting.SharpP
-import Mathlib.SetTheory.Cardinal.Finite
+module
+
+public import DescriptiveComplexity.Counting.QSO
+public import DescriptiveComplexity.Counting.SharpP
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Witness counts with free variables, and their closure properties
@@ -27,6 +29,8 @@ variables. Witness counts are closed under every construction of ΣQSO(FO):
 The first-order sum and product are in
 `DescriptiveComplexity.Counting.QSOQuantifiers`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

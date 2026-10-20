@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderHorn
-import DescriptiveComplexity.Problems.TwoSat.Implication
-import DescriptiveComplexity.Problems.TwoSat.Membership
+module
+
+public import DescriptiveComplexity.SecondOrderHorn
+public import DescriptiveComplexity.Problems.TwoSat.Implication
+public import DescriptiveComplexity.Problems.TwoSat.Membership
 
 /-!
 # 2SAT is in PTIME, by a Horn program for the implication graph
@@ -37,6 +39,8 @@ Note the shape of the argument: the *acceptance* condition of 2SAT is negative
 (“no bad cycle”), which a Horn program can state because a goal clause is
 exactly a negative constraint on the guessed relation.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

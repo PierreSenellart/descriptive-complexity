@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Interpretation
-import DescriptiveComplexity.Numbers.Unary
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Interpretation
+public import DescriptiveComplexity.Numbers.Unary
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
 # Steiner Tree: definitions
@@ -44,6 +46,8 @@ needs a *distance*, which `Relation.ReflTransGen` does not carry. The
 of the extra machinery. It is stated for an arbitrary relation, so the
 Hamilton problems and the edge-weighted Steiner tree can reuse it.
 -/
+
+@[expose] public section
 
 /- The language of terminal-marked graphs lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.graph` – a project-local
@@ -135,7 +139,7 @@ open Classical in
 /-- The distance from `r`: the least number of steps in which `x` is
 reachable (and `0` when it is not reachable at all, a value the certificate
 never looks at). -/
-private noncomputable def rdist (R : A → A → Prop) (r x : A) : ℕ :=
+noncomputable def rdist (R : A → A → Prop) (r x : A) : ℕ :=
   if h : ∃ n, reachIn R n r x then Nat.find h else 0
 
 private theorem rdist_step {R : A → A → Prop} {r x : A} (hx : Relation.ReflTransGen R r x)

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Ones
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Ones
 
 /-!
 # Level 3: counting the ones of a short word, by a table indexed by its value
@@ -46,6 +48,8 @@ step is **guarded** by `DescriptiveComplexity.IsLowIx`, for the reason the
 counter's step is: above the top position an element has no bits, so a condition
 demanded there would be unsatisfiable rather than merely idle.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

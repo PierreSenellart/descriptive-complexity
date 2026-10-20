@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.Ordered
 
 /-!
 # Relativized first-order interpretations (definable target universes)
@@ -38,6 +40,8 @@ hardness proof for a spanning problem needs. Membership closure under
 relativized reductions lives in `DescriptiveComplexity.FixedPointStepRel`, and is
 not needed when membership is a direct second-order sentence.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

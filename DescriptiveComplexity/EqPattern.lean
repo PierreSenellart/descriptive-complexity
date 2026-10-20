@@ -3,7 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Padding
+public import Mathlib.Data.Finset.Max
 
 /-!
 # Data read only through its equality pattern is first-order definable
@@ -49,6 +52,8 @@ The two designated elements are the order's least and greatest, because those
 are the only elements an interpretation can name; `DescriptiveComplexity.botF`
 is `Padding`'s and `DescriptiveComplexity.topF` is its mirror.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

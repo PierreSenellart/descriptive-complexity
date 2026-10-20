@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstRound
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstRound
 
 /-!
 # The gates' facts, from the marks
@@ -33,6 +35,8 @@ answers are statements about the value:
   marks-to-shapes bridge the two-flag characterization was stated
   against.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

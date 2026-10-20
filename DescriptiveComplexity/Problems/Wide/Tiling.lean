@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Tiling.Defs
-import DescriptiveComplexity.Problems.Wide.WellFormed
+module
+
+public import DescriptiveComplexity.Problems.Tiling.Defs
+public import DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # The wide tiling: a square addressed by the subsets of its instance
@@ -41,6 +43,8 @@ machine's input (`wmInp`), and for the same reason: a first-order condition on
 the *element* is what an expansion can carry, while a listing of `2ⁿ` cells is
 not.
 -/
+
+@[expose] public section
 
 /- The vocabulary of wide tile systems lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.wide`. -/

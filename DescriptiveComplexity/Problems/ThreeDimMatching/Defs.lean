@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Interpretation
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # 3-dimensional matching: definition
@@ -26,6 +28,8 @@ Perfect matchings force the three classes to have the same size, which is why
 the problem is the tripartite form of Exact Cover with sets of size three, and
 why it is the natural source of the exact-cover family.
 -/
+
+@[expose] public section
 
 /- The language of triple systems lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order` – a project-local

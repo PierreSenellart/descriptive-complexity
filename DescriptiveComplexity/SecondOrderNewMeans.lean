@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewCount
-import DescriptiveComplexity.SecondOrderNew
+module
+
+public import DescriptiveComplexity.SecondOrderNewCount
+public import DescriptiveComplexity.SecondOrderNew
 
 /-!
 # Guessing what the invented values mean
@@ -36,6 +38,8 @@ by `DescriptiveComplexity.bijective_of_flipClosedP` – a counting argument in
 Lean, not a condition in the logic. That is where the bound of an
 exponentially-bounded invention is spent.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

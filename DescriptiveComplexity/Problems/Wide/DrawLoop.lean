@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Machines
-import DescriptiveComplexity.OrderWalk
-import Mathlib.Logic.Relation
+module
+
+public import DescriptiveComplexity.Machines
+public import DescriptiveComplexity.OrderWalk
+public import Mathlib.Logic.Relation
 
 /-!
 # Loops in the control: runs indexed by a finite linear order
@@ -35,6 +37,8 @@ which keeps the count a clocked program has to compare with its clock: one
 round's budget, once per element of the enumeration. A space-bounded program
 throws the count away and uses the two above.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

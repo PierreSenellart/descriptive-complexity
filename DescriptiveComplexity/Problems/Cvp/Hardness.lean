@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Cvp.Hardness.Value
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.Problems.Cvp.Hardness.Value
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # CVP is `PTIME`-hard
@@ -29,6 +31,8 @@ Reducing from the complement is what keeps the circuit monotone: a circuit
 reporting *satisfiability* would have to negate the propagation, while one
 reporting failure only has to detect a falsified goal clause.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Sweep
+module
+
+public import DescriptiveComplexity.Problems.Wide.Sweep
 
 /-!
 # One step of a wide machine, packaged
@@ -30,6 +32,8 @@ per increment, start blank on the empty address, and end accepting. That is the
 whole of `DescriptiveComplexity.WideAccept` for a monotone sweep, with no run, no
 counting and no `DescriptiveComplexity.SuccPos` in sight.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

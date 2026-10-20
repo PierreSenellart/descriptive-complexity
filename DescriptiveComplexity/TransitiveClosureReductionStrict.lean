@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureReductionDet
-import DescriptiveComplexity.FixedPointReductionStrict
+module
+
+public import DescriptiveComplexity.TransitiveClosureReductionDet
+public import DescriptiveComplexity.FixedPointReductionStrict
 
 /-!
 # FO(TC) reductions are strictly stronger than first-order ones
@@ -41,6 +43,8 @@ its FO(DTC) definition (`DescriptiveComplexity.even_dtcDefinable`), and so its
 membership in `DescriptiveComplexity.LOGSPACE` by the logic rather than through
 the bit-level stack.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

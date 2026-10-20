@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawArgs
-import DescriptiveComplexity.Problems.Wide.DrawRunIter
-import DescriptiveComplexity.Problems.Wide.DrawRunStage
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawArgs
+public import DescriptiveComplexity.Problems.Wide.DrawRunIter
+public import DescriptiveComplexity.Problems.Wide.DrawRunStage
 
 /-!
 # The comparison atoms, instantiated
@@ -32,6 +34,8 @@ control's verdict bit is characterized against the two tracks' padded bits
 `DescriptiveComplexity.Problems.Wide.DrawCmp` turns into the equality and
 order atoms.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

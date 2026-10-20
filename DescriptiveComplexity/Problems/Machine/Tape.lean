@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Program
-import DescriptiveComplexity.OrderedComposition
-import Mathlib.Data.Fintype.Lattice
+module
+
+public import DescriptiveComplexity.Problems.Machine.Program
+public import DescriptiveComplexity.OrderedComposition
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The tape of the SAT machine
@@ -49,6 +51,8 @@ always more than the machine needs. The filler is over-provisioned rather than
 the bound tightened: nothing downstream depends on the constant, and an
 off-by-one here would only surface at the very end of the correctness proof.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

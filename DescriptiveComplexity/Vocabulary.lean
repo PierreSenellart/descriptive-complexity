@@ -3,8 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.ModelTheory.Syntax
-import Mathlib.ModelTheory.Semantics
+module
+
+public meta import Lean.Elab.Command
+public import Mathlib.ModelTheory.Syntax
+public import Mathlib.ModelTheory.Semantics
 
 /-!
 # Declaring a vocabulary
@@ -51,6 +54,8 @@ following the same convention.
 The generated declarations are the hand-written ones, so a vocabulary
 converted to these commands changes nothing that reads it.
 -/
+
+public meta section
 
 namespace DescriptiveComplexity
 

@@ -1,9 +1,11 @@
-import DescriptiveComplexity.Problems.Wide.DrawTags
 /-
 Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTags
 
 /-!
 # A quantifier-free matrix is a Boolean function of its atoms
@@ -41,6 +43,8 @@ is the standard way to recurse on a syntactic class carved out by a `Prop`.
 Discarding the quantifier node is also why the list stays at one depth: a
 quantifier-free formula never changes it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

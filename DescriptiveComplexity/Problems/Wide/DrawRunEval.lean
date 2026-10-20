@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRunVar
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRunVar
 
 /-!
 # The evaluation spine's run
@@ -23,6 +25,8 @@ The two boundary steps at the last checkpoint – erase the marker rightwards
 into the sweep's advance, or into the post-sweep reset at the `ltp` cell –
 are separate single-step lemmas, consumed by the outer composition.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

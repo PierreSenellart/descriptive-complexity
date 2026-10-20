@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.DominatingSet.Defs
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.DominatingSet.Defs
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # Dominating Set is in NP
@@ -15,6 +17,8 @@ The `Σ₁` definition of `DescriptiveComplexity.DominatingSet`: guess the domin
 and an injection of it into the marked set, then check first-order that every
 vertex is dominated and that the injection is one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -34,16 +38,16 @@ fo_block dominatingGuessBlock over Language.markedGraph mg into dsSOLang with ds
 
 /-- Kernel conjunct: every vertex is in the guessed set or has a neighbor in
 it. -/
-private noncomputable def dsDomClause : dsSOLang.Sentence :=
+noncomputable def dsDomClause : dsSOLang.Sentence :=
   fo% ∀ x, dsSetSym(x) ∨ ∃ u, dsSetSym(u) ∧ dsAdjSym(u, x)
 
 /-- Kernel conjunct: the guessed injection maps every vertex of the dominating
 set to a marked vertex. -/
-private noncomputable def dsTotalClause : dsSOLang.Sentence :=
+noncomputable def dsTotalClause : dsSOLang.Sentence :=
   fo% ∀ x, dsSetSym(x) → ∃ y, dsInjSym(x, y) ∧ dsMarkedSym(y)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
-private noncomputable def dsInjClause : dsSOLang.Sentence :=
+noncomputable def dsInjClause : dsSOLang.Sentence :=
   fo% ∀ x x' y, dsInjSym(x, y) ∧ dsInjSym(x', y) → x ≐ x'
 
 /-- The first-order kernel of the `Σ₁` definition of Dominating Set. -/

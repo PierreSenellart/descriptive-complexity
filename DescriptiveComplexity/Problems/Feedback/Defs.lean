@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Interpretation
-import DescriptiveComplexity.Numbers.Unary
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Interpretation
+public import DescriptiveComplexity.Numbers.Unary
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
 # Feedback Vertex Set and Feedback Arc Set: definitions
@@ -51,6 +53,8 @@ underneath, which is what the shared certificate lemmas exploit.
 Self-loops are cycles under this reading, as they should be: a self-loop at a
 vertex forces that vertex (resp. that arc) into the removed set.
 -/
+
+@[expose] public section
 
 /- The language of arc-marked graphs lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.graph` and `Language.order` – a project-local

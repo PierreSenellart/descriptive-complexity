@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.PSpace
-import DescriptiveComplexity.SecondOrderOrdered
+module
+
+public import DescriptiveComplexity.PSpace
+public import DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # SO(TC) needs no order: the order is a guessed state component
@@ -50,6 +52,8 @@ hypothesis while `DescriptiveComplexity.PSPACE` loses it.
   `DescriptiveComplexity.mem_PSPACE_iff_sotcDefinableFree`: membership in
   `PSPACE` is definability by an order-free specification.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -258,12 +262,12 @@ abbrev ordSndSym : ((L.sum B.withOrder.lang).sum B.withOrder.lang).Relations 2 :
   Sum.inr B.orderSym
 
 /-- `x ≤ y` for the order variable of the current state. -/
-private def leFstF {α : Type} (x y : α) :
+def leFstF {α : Type} (x y : α) :
     ((L.sum B.withOrder.lang).sum B.withOrder.lang).Formula α :=
   Relations.formula₂ (ordFstSym L B) (Term.var x) (Term.var y)
 
 /-- `x ≤ y` for the order variable of the next state. -/
-private def leSndF {α : Type} (x y : α) :
+def leSndF {α : Type} (x y : α) :
     ((L.sum B.withOrder.lang).sum B.withOrder.lang).Formula α :=
   Relations.formula₂ (ordSndSym L B) (Term.var x) (Term.var y)
 

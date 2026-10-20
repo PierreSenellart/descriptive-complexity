@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Quantitative
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Counting.Quantitative
+public import DescriptiveComplexity.Padding
 
 /-!
 # The size of the value of a quantitative term
@@ -21,6 +23,8 @@ Two facts about a term of quantitative first-order logic
   A one-element structure has a single tuple of each length, hence too few
   positions, and is treated apart.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

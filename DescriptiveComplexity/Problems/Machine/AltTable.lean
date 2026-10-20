@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltProg
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltProg
 
 /-!
 # The transition table of the QBF machine is a table
@@ -28,6 +30,8 @@ Unlike the SAT machine there are *three* such places, not two:
   ambiguity `DescriptiveComplexity.AltQbf.altTr_unique` does not resolve: it is the
   round's move.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

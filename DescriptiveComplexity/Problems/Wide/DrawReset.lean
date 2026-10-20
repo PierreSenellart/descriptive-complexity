@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTrip
-import DescriptiveComplexity.Problems.Wide.DrawKit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTrip
+public import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # Resetting the working cell to the bottom
@@ -23,6 +25,8 @@ bounce steps; the erasing entry is the caller's rule, and the landing phase
 hosts nothing – the machine arrives exactly once, at the bottom cell, where
 the caller's exit fires.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

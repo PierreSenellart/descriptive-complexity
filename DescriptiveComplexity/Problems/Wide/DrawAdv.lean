@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSub
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSub
 
 /-!
 # ADVANCE: moving the working cell one address, mirror in tow
@@ -30,6 +32,8 @@ the cell-coupled walking hypotheses – whose cells are all at or above a
 register – never meet the marker, and one rule family per walking phase
 serves both the pass's descent and the return scan.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

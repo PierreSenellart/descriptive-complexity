@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegFile
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # A register file on a stretch of consecutive addresses
@@ -49,6 +51,8 @@ that has to be proved is that there is room, and there is, with room to spare:
 there are `2 ^ n` addresses for `n` elements
 (`DescriptiveComplexity.card_wideAddr`, the clock of the model read as a count).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

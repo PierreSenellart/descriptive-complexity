@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # Functoriality of block expansion, and padding with trivial blocks
@@ -34,6 +36,8 @@ Infrastructure for the second-order definability layer of
 Languages vary through all the inductions, so the recursive definitions and
 statements take them as explicit arguments.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

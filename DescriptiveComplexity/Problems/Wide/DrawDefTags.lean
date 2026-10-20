@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefAcc
-import DescriptiveComplexity.Problems.Wide.DrawArgs
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefAcc
+public import DescriptiveComplexity.Problems.Wide.DrawArgs
 
 /-!
 # What a gate's branch dispatches on
@@ -23,6 +25,8 @@ irrelevance, the structure that witnessed the tags inhabited does not survive
 into the value – and `DescriptiveComplexity.Draw.Data.uConst_defTag` is that
 fact: one environment is all it takes, and every other names the same tag.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FirstOrderDefinable
-import DescriptiveComplexity.TransitiveClosureDet
+module
+
+public import DescriptiveComplexity.FirstOrderDefinable
+public import DescriptiveComplexity.TransitiveClosureDet
 
 /-!
 # First-order logic sits inside FO(TC), and inside FO(DTC)
@@ -29,6 +31,8 @@ says nothing about where FO(≤) itself sits.
 The converse fails, unconditionally: `EVEN` is a walk and is not a sentence
 (`DescriptiveComplexity.exists_tcDefinable_not_foDefinable`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

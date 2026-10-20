@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Feedback.Defs
+module
+
+public import DescriptiveComplexity.Problems.Feedback.Defs
 
 /-!
 # Max Cut: the problem
@@ -23,6 +25,8 @@ inside `S` and `v` outside. On a symmetric adjacency relation this counts
 every cut edge exactly once, which is what makes the threshold comparison the
 intended one without any division by two.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

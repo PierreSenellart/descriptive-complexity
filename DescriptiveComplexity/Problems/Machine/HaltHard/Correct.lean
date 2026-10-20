@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.Interp
-import DescriptiveComplexity.Problems.CodeHalt.Hardness.Draw
-import DescriptiveComplexity.Problems.Machine.Halt
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Interp
+public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Draw
+public import DescriptiveComplexity.Problems.Machine.Halt
 
 /-!
 # The drawn instance is a well-formed machine embedding the simulator
@@ -19,6 +21,8 @@ machine element on the canonically padded bottom tuple
 cells and the initial tape are the next file's business; this one only
 speaks about tags and tuples.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

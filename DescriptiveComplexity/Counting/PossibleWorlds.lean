@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Class
-import DescriptiveComplexity.Numbers.DigitExtract
+module
+
+public import DescriptiveComplexity.Counting.Class
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # Counting possible worlds
@@ -36,6 +38,8 @@ probabilities are `1/2` and `1`.
 Hardness depends on the query, and is the business of
 `DescriptiveComplexity.Examples.ProbabilisticQueries`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

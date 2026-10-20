@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxVar
-import DescriptiveComplexity.Problems.Wide.DrawRoundSem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxVar
+public import DescriptiveComplexity.Problems.Wide.DrawRoundSem
 
 /-!
 # The round flags and the pass's pack, at an arbitrary file
@@ -13,6 +15,8 @@ import DescriptiveComplexity.Problems.Wide.DrawRoundSem
 flags' semantic readings, the pass they jointly deliver, the valuation and the
 semantic pack built from it, and the leaf's two readings.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard.Atoms
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Atoms
 
 /-!
 # The drawing, as formulas
@@ -24,6 +26,8 @@ Each formula is checked against the predicate it draws, at an arbitrary
 valuation, so `DescriptiveComplexity.TilingHard.tileInterp` is the emitted
 structure of `DescriptiveComplexity.TilingHard.tileStr` symbol by symbol.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

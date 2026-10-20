@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Program
-import DescriptiveComplexity.OrderedComposition
-import Mathlib.Data.Fintype.Lattice
-import Mathlib.Order.Interval.Finset.Fin
+module
+
+public import DescriptiveComplexity.Problems.Machine.Program
+public import DescriptiveComplexity.OrderedComposition
+public import Mathlib.Data.Fintype.Lattice
+public import Mathlib.Order.Interval.Finset.Fin
 
 /-!
 # The tape of the alternating QBF machine
@@ -62,6 +64,8 @@ their own, and `DescriptiveComplexity.AltQbf.alt_budget` says that is always mor
 the filler is over-provisioned rather than the bound tightened, as in
 `DescriptiveComplexity.sat_budget`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

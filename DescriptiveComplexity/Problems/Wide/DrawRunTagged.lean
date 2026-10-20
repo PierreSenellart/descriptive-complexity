@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTagged
-import DescriptiveComplexity.Problems.Wide.DrawRunElem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTagged
+public import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The tag-branched machinery's run
@@ -25,6 +27,8 @@ on the marker (the caller's dispatch steps right and
 `DescriptiveComplexity.Draw.tag_back` walks back down), and it leaves through
 the loop's exit dispatch one cell to the marker's right.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

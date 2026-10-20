@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard
-import DescriptiveComplexity.Problems.Pcp.Hardness
-import DescriptiveComplexity.Problems.Pcp.Membership
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard
+public import DescriptiveComplexity.Problems.Pcp.Hardness
+public import DescriptiveComplexity.Problems.Pcp.Membership
 
 /-!
 # Post's correspondence problem is RE-complete
@@ -21,6 +23,8 @@ Undecidability of Post's problem
 work of its own: RE-hardness makes the concrete instances a target of the
 code model's halting problem, and first-order reductions are computable.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

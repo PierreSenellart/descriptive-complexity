@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadBit
-import DescriptiveComplexity.HeadEvalArith
-import DescriptiveComplexity.LogTime.Simulate
+module
+
+public import DescriptiveComplexity.HeadBit
+public import DescriptiveComplexity.HeadEvalArith
+public import DescriptiveComplexity.LogTime.Simulate
 
 /-!
 # The bit-level logic is inside LOGSPACE
@@ -45,6 +47,8 @@ and the addition's three). Where an arithmetic evaluation pays seven scratch
 heads (`DescriptiveComplexity.HeadProgram.ArithScratch`), a bit-level one pays
 eight, and it never needs a multiplication.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

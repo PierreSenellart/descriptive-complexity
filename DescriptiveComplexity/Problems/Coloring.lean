@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Coloring.Defs
-import DescriptiveComplexity.Problems.Coloring.Reductions
-import DescriptiveComplexity.Problems.Coloring.Membership
-import DescriptiveComplexity.Problems.ThreeColorability
-import DescriptiveComplexity.Composition
+module
+
+public import DescriptiveComplexity.Problems.Coloring.Defs
+public import DescriptiveComplexity.Problems.Coloring.Reductions
+public import DescriptiveComplexity.Problems.Coloring.Membership
+public import DescriptiveComplexity.Problems.ThreeColorability
+public import DescriptiveComplexity.Composition
 
 /-!
 # The coloring family is NP-complete
@@ -33,6 +35,8 @@ carries the hardness. As with any complexity-theoretic statement, these
 results are about finite structures only
 (`DescriptiveComplexity.ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

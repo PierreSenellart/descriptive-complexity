@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewMeans
-import DescriptiveComplexity.SecondOrderMerge
+module
+
+public import DescriptiveComplexity.SecondOrderNewMeans
+public import DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Meanings for a whole block
@@ -32,6 +34,8 @@ are exactly the flips of one tuple of one variable, and
 between the invented values and *all* assignments of the block, through the
 counting of `DescriptiveComplexity.SecondOrderNewCount`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

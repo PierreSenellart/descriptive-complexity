@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameAsk
-import DescriptiveComplexity.Exponential.GameSweep
+module
+
+public import DescriptiveComplexity.Exponential.GameAsk
+public import DescriptiveComplexity.Exponential.GameSweep
 
 /-!
 # The machine plays the game
@@ -43,6 +45,8 @@ an *arbitrary* candidate to `allStep`, where the existential player either
 refutes the move – no sentence over the base could have filtered it out earlier
 – or plays on, which is the induction hypothesis.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

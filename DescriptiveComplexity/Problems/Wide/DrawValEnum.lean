@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRunVar
-import DescriptiveComplexity.Problems.Wide.Roam
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRunVar
+public import DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The VAL loop's enumeration
@@ -26,6 +28,8 @@ measure `DescriptiveComplexity.reaches_of_wideRounds` walks) –
 `DescriptiveComplexity.Draw.Data.exists_valEnum`, the package in exactly
 the run theorem's hypothesis forms.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

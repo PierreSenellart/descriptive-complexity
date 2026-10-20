@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawKindRule
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawKindRule
 
 /-!
 # The matrix's and the gates' rules
@@ -18,6 +20,8 @@ whole gate sequence with the verdict flag cleared.
 As below, the semantic parameters ride in packs and `dstSt` parameters;
 the shapes and separations close here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

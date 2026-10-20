@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSub
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSub
 
 /-!
 # A round trip to the register file
@@ -20,6 +22,8 @@ The seek loop, the test rounds of a random access and the gate checks are all
 this composite around their respective passes; `DrawAdv`'s ADVANCE is the same
 shape inlined with its two marker steps.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

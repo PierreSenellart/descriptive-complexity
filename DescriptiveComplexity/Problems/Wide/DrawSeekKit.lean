@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawSeek
-import DescriptiveComplexity.Problems.Wide.DrawKit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawSeek
+public import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # The seek kit: random access
@@ -25,6 +27,8 @@ slots of one symbol.
 Exit is the caller's: a rule at the passing phase `ty`, at the marker,
 guarded `wk = one ∧ rg ≠ one` – disjoint from every rule here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

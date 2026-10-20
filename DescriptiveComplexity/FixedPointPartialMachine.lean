@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointStepRel
-import DescriptiveComplexity.Problems.Machine.SpaceHard
+module
+
+public import DescriptiveComplexity.FixedPointStepRel
+public import DescriptiveComplexity.Problems.Machine.SpaceHard
 
 /-!
 # PSPACE is contained in FO(≤, PFP)
@@ -42,6 +44,8 @@ definability crosses such reductions
 inclusion of `DescriptiveComplexity.FixedPointPartialSpace`, the capture
 theorem `DescriptiveComplexity.pfpDefinable_iff_mem_PSPACE`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

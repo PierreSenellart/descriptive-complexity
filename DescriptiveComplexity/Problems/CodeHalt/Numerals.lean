@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # The numeral segment of a certificate
@@ -23,6 +25,8 @@ there on a certificate is a statement about natural numbers.
 The last two lemmas run the bridge the other way, on `Fin (N + 1)` with its own
 order, which is the segment a certificate is *built* on.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

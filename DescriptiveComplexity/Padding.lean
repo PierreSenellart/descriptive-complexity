@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Ordered
+module
+
+public import DescriptiveComplexity.Ordered
 
 /-!
 # Canonically padded tuples
@@ -41,6 +43,8 @@ types of the defining formulas of an interpretation (`Fin 1 × Fin D`,
 Clients: the Tseitin encoding of `DescriptiveComplexity.Problems.Sat.Tseitin` and the
 Horn discharge of `DescriptiveComplexity.Problems.HornSat.Hardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

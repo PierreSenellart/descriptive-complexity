@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.ZeroOneIP.Defs
-import DescriptiveComplexity.Problems.Knapsack.Chain
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.ZeroOneIP.Defs
+public import DescriptiveComplexity.Problems.Knapsack.Chain
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # 0-1 integer programming is in NP
@@ -33,6 +35,8 @@ order and item predicate rather than over one vocabulary.
 Unlike Partition, the walks run on the *instance's own* positions: each row's
 total is its right-hand side, which is written there, so it fits.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -143,57 +147,57 @@ Every clause of a walk is guarded by `row r`: the rows do not interact, so the
 kernel is Knapsack's read once per row. -/
 
 /-- Kernel clause: the order is reflexive. -/
-private noncomputable def zoReflClause : zoSOLang.Sentence :=
+noncomputable def zoReflClause : zoSOLang.Sentence :=
   fo% ∀ x, zoLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
-private noncomputable def zoTransClause : zoSOLang.Sentence :=
+noncomputable def zoTransClause : zoSOLang.Sentence :=
   fo% ∀ x y z, zoLeF⟨x, y⟩ ∧ zoLeF⟨y, z⟩ → zoLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
-private noncomputable def zoAntisymmClause : zoSOLang.Sentence :=
+noncomputable def zoAntisymmClause : zoSOLang.Sentence :=
   fo% ∀ x y, zoLeF⟨x, y⟩ ∧ zoLeF⟨y, x⟩ → zoEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
-private noncomputable def zoTotalClause : zoSOLang.Sentence :=
+noncomputable def zoTotalClause : zoSOLang.Sentence :=
   fo% ∀ x y, zoLeF⟨x, y⟩ ∨ zoLeF⟨y, x⟩
 
 /-- Kernel clause: only columns are set to `1`. -/
-private noncomputable def zoXClause : zoSOLang.Sentence :=
+noncomputable def zoXClause : zoSOLang.Sentence :=
   fo% ∀ x, zoXF⟨x⟩ → zoColF⟨x⟩
 
 /-- Kernel clause: at the first column each row's running total is that
 column's contribution. -/
-private noncomputable def zoBaseClause : zoSOLang.Sentence :=
+noncomputable def zoBaseClause : zoSOLang.Sentence :=
   fo% ∀ r j p, zoRowF⟨r⟩ ∧ zoMinColF⟨j⟩ ∧ zoPosnF⟨p⟩ → (zoPSF⟨r, j, p⟩ ↔ zoAddF⟨r, j, p⟩)
 
 /-- Kernel clause: each step adds a bit. -/
-private noncomputable def zoSumClause : zoSOLang.Sentence :=
+noncomputable def zoSumClause : zoSOLang.Sentence :=
   fo% ∀ r i j p, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoPosnF⟨p⟩ →
     (zoPSF⟨r, j, p⟩ ↔ zoXor3F⦃zoPSF⟨r, i, p⟩, zoAddF⟨r, j, p⟩, zoCyF⟨r, j, p⟩⦄)
 
 /-- Kernel clause: each step propagates its carry. -/
-private noncomputable def zoCarryClause : zoSOLang.Sentence :=
+noncomputable def zoCarryClause : zoSOLang.Sentence :=
   fo% ∀ r i j p q, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoSuccPosnF⟨p, q⟩ →
     (zoCyF⟨r, j, q⟩ ↔ zoMaj3F⦃zoPSF⟨r, i, p⟩, zoAddF⟨r, j, p⟩, zoCyF⟨r, j, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest position. -/
-private noncomputable def zoBottomClause : zoSOLang.Sentence :=
+noncomputable def zoBottomClause : zoSOLang.Sentence :=
   fo% ∀ r i j p, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoMinPosnF⟨p⟩ → ¬ zoCyF⟨r, j, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest position. -/
-private noncomputable def zoTopClause : zoSOLang.Sentence :=
+noncomputable def zoTopClause : zoSOLang.Sentence :=
   fo% ∀ r i j p, zoRowF⟨r⟩ ∧ zoSuccColF⟨i, j⟩ ∧ zoMaxPosnF⟨p⟩ →
     ¬ zoMaj3F⦃zoPSF⟨r, i, p⟩, zoAddF⟨r, j, p⟩, zoCyF⟨r, j, p⟩⦄
 
 /-- Kernel clause: at the last column each row's running total is that row's
 right-hand side. -/
-private noncomputable def zoFinalClause : zoSOLang.Sentence :=
+noncomputable def zoFinalClause : zoSOLang.Sentence :=
   fo% ∀ r j p, zoRowF⟨r⟩ ∧ zoMaxColF⟨j⟩ ∧ zoPosnF⟨p⟩ → (zoPSF⟨r, j, p⟩ ↔ zoRhsF⟨r, p⟩)
 
 /-- Kernel clause: with no column at all, every right-hand side must be
 zero. -/
-private noncomputable def zoEmptyClause : zoSOLang.Sentence :=
+noncomputable def zoEmptyClause : zoSOLang.Sentence :=
   fo% (∀ x, ¬ zoColF⟨x⟩) → ∀ r p, zoRowF⟨r⟩ ∧ zoPosnF⟨p⟩ → ¬ zoRhsF⟨r, p⟩
 
 /-- The first-order kernel of the `Σ₁` definition of 0-1 integer
@@ -205,12 +209,12 @@ noncomputable def zeroOneIPKernel : zoSOLang.Sentence :=
 
 /-- Kernel clause of the counting kernel: the running totals are stored at
 rows, columns and positions only. -/
-private noncomputable def zoPinPSClause : zoSOLang.Sentence :=
+noncomputable def zoPinPSClause : zoSOLang.Sentence :=
   fo% ∀ r j p, zoPSF⟨r, j, p⟩ → (zoRowF⟨r⟩ ∧ zoColF⟨j⟩) ∧ zoPosnF⟨p⟩
 
 /-- Kernel clause of the counting kernel: the carries are stored at rows,
 positions and the columns that are not the first one only. -/
-private noncomputable def zoPinCyClause : zoSOLang.Sentence :=
+noncomputable def zoPinCyClause : zoSOLang.Sentence :=
   fo% ∀ r j p, zoCyF⟨r, j, p⟩ → ((zoRowF⟨r⟩ ∧ zoColF⟨j⟩) ∧ zoPosnF⟨p⟩) ∧ ¬ zoMinColF⟨j⟩
 
 /-- **The counting kernel of 0-1 integer programming**: the kernel of its `Σ₁`

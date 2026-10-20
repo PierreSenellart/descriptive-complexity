@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.GadgetDouble
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.GadgetDouble
 
 /-!
 # The digraph-to-graph gadget
@@ -46,6 +48,8 @@ leaf neighbor, and so on. Points of the tagged power that no clause makes
 adjacent to anything – an arc node for a pair that is not an arc – are isolated,
 hence harmless: an isomorphism matches them by degree.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -91,19 +95,19 @@ variable {α : Type}
 
 /-- The two coordinates are equal: the point is a vertex-side node, which is
 indexed by the diagonal. -/
-private def diagF (x₀ x₁ : α) : Language.graph.Formula α :=
+def diagF (x₀ x₁ : α) : Language.graph.Formula α :=
   Term.equal (Term.var x₀) (Term.var x₁)
 
 /-- The two coordinates form an arc: the point is an arc-side node. -/
-private def arcF (x₀ x₁ : α) : Language.graph.Formula α :=
+def arcF (x₀ x₁ : α) : Language.graph.Formula α :=
   Relations.formula₂ Language.adj (Term.var x₀) (Term.var x₁)
 
 /-- The two points carry the same vertex. -/
-private def sameVtxF (x₀ y₀ : α) : Language.graph.Formula α :=
+def sameVtxF (x₀ y₀ : α) : Language.graph.Formula α :=
   Term.equal (Term.var x₀) (Term.var y₀)
 
 /-- The two points carry the same arc. -/
-private def sameArcF (x₀ x₁ y₀ y₁ : α) : Language.graph.Formula α :=
+def sameArcF (x₀ x₁ y₀ y₁ : α) : Language.graph.Formula α :=
   Term.equal (Term.var x₀) (Term.var y₀) ⊓ Term.equal (Term.var x₁) (Term.var y₁)
 
 /-- The edges of the gadget, tag pair by tag pair. Every clause is stated in

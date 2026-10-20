@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltVerdict
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltVerdict
 
 /-!
 # The quantifier prefix, read from the middle
@@ -22,6 +24,8 @@ gluing map `DescriptiveComplexity.AltQbf.glueTail` is what translates between th
 and the whole content of the bridge is that pushing a block past it is
 `Function.update`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

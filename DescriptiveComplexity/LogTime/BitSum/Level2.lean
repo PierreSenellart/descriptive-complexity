@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Sum
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Sum
 
 /-!
 # Level 2: counting a middling word by its sub-blocks
@@ -34,6 +36,8 @@ two variables, and no formula here ever has to state it.
 past `m`, not at `m` itself, so the sub-block length never has to divide the word
 length. Counting further costs nothing, the word having no ones up there.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

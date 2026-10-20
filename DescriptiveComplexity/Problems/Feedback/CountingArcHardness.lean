@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Feedback.SplitBundle
-import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.Feedback.SplitBundle
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Feedback Arc Set is parsimoniously `#P`-complete
@@ -36,6 +38,8 @@ isolated vertex changes nothing to a set of arcs
 (`DescriptiveComplexity.fasOfSizeOnEmbEquiv`): no domain formula is needed.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -48,6 +52,10 @@ section Embedding
 
 variable {W M : Type}
 
+-- In a module, a proof inside an exposed definition is elaborated apart from the
+-- definition, so it can no longer fill in metavariables of its expected type; this
+-- equivalence's inverse proofs do exactly that.
+set_option backward.proofsInPublic true in
 /-- **Feedback arc sets through an embedding**: if the arcs and the marked
 pairs of a graph all lie in the image of an injection, its feedback arc sets
 of the threshold size are those of the graph it is the image of. -/

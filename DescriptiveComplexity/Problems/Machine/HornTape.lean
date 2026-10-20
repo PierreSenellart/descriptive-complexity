@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Program
-import DescriptiveComplexity.OrderedComposition
-import Mathlib.Data.Fintype.Lattice
+module
+
+public import DescriptiveComplexity.Problems.Machine.Program
+public import DescriptiveComplexity.OrderedComposition
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The tape of the unit-propagation machine
@@ -35,6 +37,8 @@ order of the positions undisturbed. The states carry up to two elements – the
 current round and the current clause – which is what the third dimension of the
 payload accommodates.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

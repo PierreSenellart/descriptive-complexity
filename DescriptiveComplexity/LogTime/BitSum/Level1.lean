@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.BitSum.Level2
+module
+
+public import DescriptiveComplexity.LogTime.BitSum.Level2
 
 /-!
 # Level 1: counting all the ones of an element
@@ -32,6 +34,8 @@ That is why the statement takes no word-length parameter: the tail makes the
 count total by construction, and the answer is the number of ones of `x`, full
 stop.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

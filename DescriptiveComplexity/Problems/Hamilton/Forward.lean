@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.Cycle
-import DescriptiveComplexity.Problems.Hamilton.Gadget
-import Mathlib.Data.List.NodupEquivFin
-import Mathlib.Data.List.Chain
-import Mathlib.Data.Finset.Sort
-import Mathlib.Data.Fintype.Lattice
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.Cycle
+public import DescriptiveComplexity.Problems.Hamilton.Gadget
+public import Mathlib.Data.List.NodupEquivFin
+public import Mathlib.Data.List.Chain
+public import Mathlib.Data.Finset.Sort
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # A Hamilton circuit presented as a cyclic list
@@ -20,6 +22,8 @@ chains of the cover vertices – so it is convenient to introduce a tour from a
 consecutive elements are adjacent and whose last element is adjacent to its
 first, is a tour (`DescriptiveComplexity.tourOn_of_cycleList`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -242,7 +246,8 @@ theorem nbrList_isChain (a : A) :
     (nbrList a).IsChain
       (fun b c => ∀ (hb : HEdge a b) (hc : HEdge a c), DGEdge (gv5 hb) (gv0 hc)) := by
   have hp : (nbrList a).Pairwise (· < ·) :=
-    List.pairwise_iff_getElem.mpr fun i j h1 h2 hij => nbrList_sortedLT a (by simpa using hij)
+    List.pairwise_iff_getElem.mpr fun i j h1 h2 hij =>
+      (nbrList_sortedLT a).strictMono_get (by simpa using hij)
   apply List.isChain_iff_forall_rel_of_append_cons_cons.mpr
   intro b c l₁ l₂ heq hb hc
   rw [heq, List.pairwise_append, List.pairwise_cons, List.pairwise_cons] at hp
@@ -339,7 +344,7 @@ theorem chain_isChain (C : A → Prop) (a : A) : (chain C a).IsChain DGEdge := b
 /-- The head of the neighbor list is the least neighbor. -/
 theorem head_nbrList_le {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
     (nbrList a).head hne ≤ d := by
-  have hmono : StrictMono (nbrList a).get := nbrList_sortedLT a
+  have hmono : StrictMono (nbrList a).get := (nbrList_sortedLT a).strictMono_get
   have h0 : 0 < (nbrList a).length := List.length_pos_of_ne_nil hne
   obtain ⟨j, rfl⟩ := List.mem_iff_get.mp (mem_nbrList.mpr hd)
   have hhead : (nbrList a).head hne = (nbrList a).get ⟨0, h0⟩ := by
@@ -350,7 +355,7 @@ theorem head_nbrList_le {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d
 /-- The last of the neighbor list is the greatest neighbor. -/
 theorem le_getLast_nbrList {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
     d ≤ (nbrList a).getLast hne := by
-  have hmono : StrictMono (nbrList a).get := nbrList_sortedLT a
+  have hmono : StrictMono (nbrList a).get := (nbrList_sortedLT a).strictMono_get
   have h0 : (nbrList a).length - 1 < (nbrList a).length := by
     have := List.length_pos_of_ne_nil hne; omega
   obtain ⟨j, rfl⟩ := List.mem_iff_get.mp (mem_nbrList.mpr hd)

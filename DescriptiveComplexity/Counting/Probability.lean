@@ -3,18 +3,20 @@ Copyright (c) 2025 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
-import Mathlib.Algebra.BigOperators.Pi
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.BigOperators.Field
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Algebra.Order.BigOperators.Ring.Finset
-import Mathlib.Algebra.Order.Ring.Rat
-import Mathlib.Algebra.Order.Field.Basic
-import Mathlib.Data.Fintype.Pi
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.Algebra.BigOperators.Pi
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.BigOperators.Field
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+public import Mathlib.Algebra.Order.Ring.Rat
+public import Mathlib.Algebra.Order.Field.Basic
+public import Mathlib.Data.Fintype.Pi
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.FieldSimp
+public import Mathlib.Tactic.Ring
 
 /-!
 # Independent Boolean variables: probabilities, and weighted counts
@@ -43,6 +45,8 @@ valuations in it, of the product of the weights each variable takes. Then
 (`DescriptiveComplexity.ProbAssignment.funcProb_ofWeights`): a probability is
 a ratio of two weighted counts, and those are natural numbers.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Walk
+module
+
+public import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Running a phase of a machine
@@ -32,6 +34,8 @@ then `[p₁, p₂]` takes `(rank p₁ - rank p₀) + (rank p₂ - rank p₁)` st
 budget obligation of the reduction is a comparison of ranks with
 `Nat.card {p // Posn p}`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

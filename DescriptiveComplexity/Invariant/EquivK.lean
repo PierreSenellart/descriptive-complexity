@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.Pebble
-import Mathlib.ModelTheory.Semantics
+module
+
+public import DescriptiveComplexity.Invariant.Pebble
+public import Mathlib.ModelTheory.Semantics
 
 /-!
 # `k`-variable equivalence over a structure
@@ -52,6 +54,8 @@ layer: atomic agreement at selections of coordinates is only the atomic type
 when terms are variables. (Everything a `StepDef` runs on in the
 Abiteboul–Vianu development is relational or expanded from relational.)
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

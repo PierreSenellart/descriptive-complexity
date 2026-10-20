@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRoundSem
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRoundSem
 
 /-!
 # One variable's verdict *is* one step of the iteration
@@ -30,6 +32,8 @@ than a fixed choice, because the spine's per-position family
 (`DescriptiveComplexity.Draw.Data.evalSpine_run`'s `semOfJ`) is chosen by
 the caller and only has to *agree* with the pass's pack.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,126 +3,128 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.Problems.SatUnsat
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Problems.Sat.TseitinUnique
-import DescriptiveComplexity.Problems.Sat.Counting
-import DescriptiveComplexity.Problems.Sat.CountingHardness
-import DescriptiveComplexity.Problems.Sat.CountingDnf
-import DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive
-import DescriptiveComplexity.Problems.Sat.CountingDecision
-import DescriptiveComplexity.Problems.Sat.CountingCompare
-import DescriptiveComplexity.Problems.Sat.CountingRestricted
-import DescriptiveComplexity.Problems.SatUnsat.Hardness
-import DescriptiveComplexity.Problems.Taut
-import DescriptiveComplexity.Problems.ThreeDnfTaut
-import DescriptiveComplexity.Problems.HornSat
-import DescriptiveComplexity.Problems.Cvp
-import DescriptiveComplexity.Problems.CircuitNumber
-import DescriptiveComplexity.Problems.MachineNumber
-import DescriptiveComplexity.Problems.Reachability
-import DescriptiveComplexity.Problems.Game
-import DescriptiveComplexity.Problems.ReachabilityDet
-import DescriptiveComplexity.Problems.ReachabilityDet.Complement
-import DescriptiveComplexity.Problems.ThreeColorability
-import DescriptiveComplexity.Problems.ThreeColorability.CountGadget
-import DescriptiveComplexity.Problems.ThreeColorability.Counting
-import DescriptiveComplexity.Problems.ThreeColorability.CountDraw
-import DescriptiveComplexity.Problems.Coloring
-import DescriptiveComplexity.Problems.ThreeSat
-import DescriptiveComplexity.Problems.ThreeSat.Counting
-import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
-import DescriptiveComplexity.Problems.TwoSat
-import DescriptiveComplexity.Problems.NaeSat
-import DescriptiveComplexity.Problems.NaeThreeSat
-import DescriptiveComplexity.Problems.OneInSat
-import DescriptiveComplexity.Problems.OneInSat.Counting
-import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
-import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-import DescriptiveComplexity.Problems.CycleCover.Defs
-import DescriptiveComplexity.Problems.CycleCover.Base
-import DescriptiveComplexity.Problems.CycleCover.Models
-import DescriptiveComplexity.Problems.CycleCover.Formulas
-import DescriptiveComplexity.Problems.CycleCover.Drawing
-import DescriptiveComplexity.Problems.CycleCover.Completeness
-import DescriptiveComplexity.Problems.CliqueFamily
-import DescriptiveComplexity.Problems.CliqueFamily.Counting
-import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
-import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-import DescriptiveComplexity.Problems.CliqueFamily.Pendant
-import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
-import DescriptiveComplexity.Problems.CliqueFamily.Stretch
-import DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
-import DescriptiveComplexity.Problems.SubgraphIso
-import DescriptiveComplexity.Problems.SubgraphIso.Encoding
-import DescriptiveComplexity.Problems.DigraphIso
-import DescriptiveComplexity.Problems.DigraphIso.Bridge
-import DescriptiveComplexity.Problems.DagIso
-import DescriptiveComplexity.Problems.GraphIso.Defs
-import DescriptiveComplexity.Problems.GraphIso.Gadget
-import DescriptiveComplexity.Problems.GraphIso.Hardness
-import DescriptiveComplexity.Problems.GIDegree
-import DescriptiveComplexity.Problems.SetFamily
-import DescriptiveComplexity.Problems.SetFamily.CountingPacking
-import DescriptiveComplexity.Problems.SetFamily.CountingCover
-import DescriptiveComplexity.Problems.ExactCover
-import DescriptiveComplexity.Problems.SetFamily.Counting
-import DescriptiveComplexity.Problems.ExactCoverCounting
-import DescriptiveComplexity.Problems.SetSplitting
-import DescriptiveComplexity.Problems.NaeSatCounting
-import DescriptiveComplexity.Problems.DominatingSet
-import DescriptiveComplexity.Problems.DominatingSet.Counting
-import DescriptiveComplexity.Problems.DominatingSet.CountingHardness
-import DescriptiveComplexity.Problems.Knapsack
-import DescriptiveComplexity.Problems.Knapsack.Counting
-import DescriptiveComplexity.Problems.Knapsack.CountingHardness
-import DescriptiveComplexity.Problems.Partition
-import DescriptiveComplexity.Problems.ZeroOneIP
-import DescriptiveComplexity.Problems.ZeroOneIP.Counting
-import DescriptiveComplexity.Problems.ZeroOneIP.CountingHardness
-import DescriptiveComplexity.Problems.JobSequencing
-import DescriptiveComplexity.Problems.ThreeDimMatching
-import DescriptiveComplexity.Problems.Hamilton
-import DescriptiveComplexity.Problems.Hamilton.Counting
-import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
-import DescriptiveComplexity.Problems.Hamilton.CountingGadget
-import DescriptiveComplexity.Problems.Hamilton.CountingForward
-import DescriptiveComplexity.Problems.Hamilton.CountingReverse
-import DescriptiveComplexity.Problems.Hamilton.CountingHardness
-import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
-import DescriptiveComplexity.Problems.Hamilton.CountingUndirectedHardness
-import DescriptiveComplexity.Problems.Feedback
-import DescriptiveComplexity.Problems.Feedback.Counting
-import DescriptiveComplexity.Problems.Feedback.CountingArc
-import DescriptiveComplexity.Problems.Feedback.SplitBundle
-import DescriptiveComplexity.Problems.Feedback.CountingArcHardness
-import DescriptiveComplexity.Problems.MaxCut
-import DescriptiveComplexity.Problems.Steiner
-import DescriptiveComplexity.Problems.Steiner.Counting
-import DescriptiveComplexity.Problems.Steiner.CountingHardness
-import DescriptiveComplexity.Problems.Qbf
-import DescriptiveComplexity.Problems.Qsat
-import DescriptiveComplexity.Problems.SuccinctReach
-import DescriptiveComplexity.Problems.FinSat
-import DescriptiveComplexity.Problems.Pcp
-import DescriptiveComplexity.Problems.Machine
-import DescriptiveComplexity.Problems.Machine.Counting
-import DescriptiveComplexity.Problems.Machine.CountingHardness
-import DescriptiveComplexity.Problems.MachineAlt
-import DescriptiveComplexity.Problems.MachineAltSpace
-import DescriptiveComplexity.Problems.MachineAltSpace.Membership
-import DescriptiveComplexity.Problems.Wide
-import DescriptiveComplexity.Problems.Tiling
-import DescriptiveComplexity.Problems.Epr
-import DescriptiveComplexity.Problems.Machine.Halt
-import DescriptiveComplexity.Problems.Machine.HaltCert
-import DescriptiveComplexity.Problems.Machine.HaltFin
-import DescriptiveComplexity.Problems.Machine.HaltMem
-import DescriptiveComplexity.Problems.Machine.HaltHard
-import DescriptiveComplexity.Problems.CodeHalt
-import DescriptiveComplexity.Problems.Even
-import DescriptiveComplexity.Problems.Parity
+module
+
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.Problems.SatUnsat
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Problems.Sat.TseitinUnique
+public import DescriptiveComplexity.Problems.Sat.Counting
+public import DescriptiveComplexity.Problems.Sat.CountingHardness
+public import DescriptiveComplexity.Problems.Sat.CountingDnf
+public import DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive
+public import DescriptiveComplexity.Problems.Sat.CountingDecision
+public import DescriptiveComplexity.Problems.Sat.CountingCompare
+public import DescriptiveComplexity.Problems.Sat.CountingRestricted
+public import DescriptiveComplexity.Problems.SatUnsat.Hardness
+public import DescriptiveComplexity.Problems.Taut
+public import DescriptiveComplexity.Problems.ThreeDnfTaut
+public import DescriptiveComplexity.Problems.HornSat
+public import DescriptiveComplexity.Problems.Cvp
+public import DescriptiveComplexity.Problems.CircuitNumber
+public import DescriptiveComplexity.Problems.MachineNumber
+public import DescriptiveComplexity.Problems.Reachability
+public import DescriptiveComplexity.Problems.Game
+public import DescriptiveComplexity.Problems.ReachabilityDet
+public import DescriptiveComplexity.Problems.ReachabilityDet.Complement
+public import DescriptiveComplexity.Problems.ThreeColorability
+public import DescriptiveComplexity.Problems.ThreeColorability.CountGadget
+public import DescriptiveComplexity.Problems.ThreeColorability.Counting
+public import DescriptiveComplexity.Problems.ThreeColorability.CountDraw
+public import DescriptiveComplexity.Problems.Coloring
+public import DescriptiveComplexity.Problems.ThreeSat
+public import DescriptiveComplexity.Problems.ThreeSat.Counting
+public import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
+public import DescriptiveComplexity.Problems.TwoSat
+public import DescriptiveComplexity.Problems.NaeSat
+public import DescriptiveComplexity.Problems.NaeThreeSat
+public import DescriptiveComplexity.Problems.OneInSat
+public import DescriptiveComplexity.Problems.OneInSat.Counting
+public import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
+public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+public import DescriptiveComplexity.Problems.CycleCover.Defs
+public import DescriptiveComplexity.Problems.CycleCover.Base
+public import DescriptiveComplexity.Problems.CycleCover.Models
+public import DescriptiveComplexity.Problems.CycleCover.Formulas
+public import DescriptiveComplexity.Problems.CycleCover.Drawing
+public import DescriptiveComplexity.Problems.CycleCover.Completeness
+public import DescriptiveComplexity.Problems.CliqueFamily
+public import DescriptiveComplexity.Problems.CliqueFamily.Counting
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+public import DescriptiveComplexity.Problems.CliqueFamily.Pendant
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
+public import DescriptiveComplexity.Problems.CliqueFamily.Stretch
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
+public import DescriptiveComplexity.Problems.SubgraphIso
+public import DescriptiveComplexity.Problems.SubgraphIso.Encoding
+public import DescriptiveComplexity.Problems.DigraphIso
+public import DescriptiveComplexity.Problems.DigraphIso.Bridge
+public import DescriptiveComplexity.Problems.DagIso
+public import DescriptiveComplexity.Problems.GraphIso.Defs
+public import DescriptiveComplexity.Problems.GraphIso.Gadget
+public import DescriptiveComplexity.Problems.GraphIso.Hardness
+public import DescriptiveComplexity.Problems.GIDegree
+public import DescriptiveComplexity.Problems.SetFamily
+public import DescriptiveComplexity.Problems.SetFamily.CountingPacking
+public import DescriptiveComplexity.Problems.SetFamily.CountingCover
+public import DescriptiveComplexity.Problems.ExactCover
+public import DescriptiveComplexity.Problems.SetFamily.Counting
+public import DescriptiveComplexity.Problems.ExactCoverCounting
+public import DescriptiveComplexity.Problems.SetSplitting
+public import DescriptiveComplexity.Problems.NaeSatCounting
+public import DescriptiveComplexity.Problems.DominatingSet
+public import DescriptiveComplexity.Problems.DominatingSet.Counting
+public import DescriptiveComplexity.Problems.DominatingSet.CountingHardness
+public import DescriptiveComplexity.Problems.Knapsack
+public import DescriptiveComplexity.Problems.Knapsack.Counting
+public import DescriptiveComplexity.Problems.Knapsack.CountingHardness
+public import DescriptiveComplexity.Problems.Partition
+public import DescriptiveComplexity.Problems.ZeroOneIP
+public import DescriptiveComplexity.Problems.ZeroOneIP.Counting
+public import DescriptiveComplexity.Problems.ZeroOneIP.CountingHardness
+public import DescriptiveComplexity.Problems.JobSequencing
+public import DescriptiveComplexity.Problems.ThreeDimMatching
+public import DescriptiveComplexity.Problems.Hamilton
+public import DescriptiveComplexity.Problems.Hamilton.Counting
+public import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
+public import DescriptiveComplexity.Problems.Hamilton.CountingGadget
+public import DescriptiveComplexity.Problems.Hamilton.CountingForward
+public import DescriptiveComplexity.Problems.Hamilton.CountingReverse
+public import DescriptiveComplexity.Problems.Hamilton.CountingHardness
+public import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
+public import DescriptiveComplexity.Problems.Hamilton.CountingUndirectedHardness
+public import DescriptiveComplexity.Problems.Feedback
+public import DescriptiveComplexity.Problems.Feedback.Counting
+public import DescriptiveComplexity.Problems.Feedback.CountingArc
+public import DescriptiveComplexity.Problems.Feedback.SplitBundle
+public import DescriptiveComplexity.Problems.Feedback.CountingArcHardness
+public import DescriptiveComplexity.Problems.MaxCut
+public import DescriptiveComplexity.Problems.Steiner
+public import DescriptiveComplexity.Problems.Steiner.Counting
+public import DescriptiveComplexity.Problems.Steiner.CountingHardness
+public import DescriptiveComplexity.Problems.Qbf
+public import DescriptiveComplexity.Problems.Qsat
+public import DescriptiveComplexity.Problems.SuccinctReach
+public import DescriptiveComplexity.Problems.FinSat
+public import DescriptiveComplexity.Problems.Pcp
+public import DescriptiveComplexity.Problems.Machine
+public import DescriptiveComplexity.Problems.Machine.Counting
+public import DescriptiveComplexity.Problems.Machine.CountingHardness
+public import DescriptiveComplexity.Problems.MachineAlt
+public import DescriptiveComplexity.Problems.MachineAltSpace
+public import DescriptiveComplexity.Problems.MachineAltSpace.Membership
+public import DescriptiveComplexity.Problems.Wide
+public import DescriptiveComplexity.Problems.Tiling
+public import DescriptiveComplexity.Problems.Epr
+public import DescriptiveComplexity.Problems.Machine.Halt
+public import DescriptiveComplexity.Problems.Machine.HaltCert
+public import DescriptiveComplexity.Problems.Machine.HaltFin
+public import DescriptiveComplexity.Problems.Machine.HaltMem
+public import DescriptiveComplexity.Problems.Machine.HaltHard
+public import DescriptiveComplexity.Problems.CodeHalt
+public import DescriptiveComplexity.Problems.Even
+public import DescriptiveComplexity.Problems.Parity
 
 /-!
 # The problem catalog
@@ -175,3 +177,5 @@ the word it spells, and hardness is the computation-history dominoes from
 undecidability of Post's problem
 (`DescriptiveComplexity.pcp_not_computable`).
 -/
+
+@[expose] public section

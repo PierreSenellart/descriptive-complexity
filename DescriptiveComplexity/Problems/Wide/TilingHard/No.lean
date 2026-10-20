@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard.Yes
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Yes
 
 /-!
 # A tiling of the emitted square is an accepting run
@@ -32,6 +34,8 @@ numbered by the clock, columns the machine's addresses – so the coordinates of
 the emitted square are translated once and the argument itself is a plain
 induction on the row number.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

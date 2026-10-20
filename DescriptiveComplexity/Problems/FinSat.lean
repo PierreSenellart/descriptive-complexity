@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.FinSat.Membership
-import DescriptiveComplexity.Problems.FinSat.Reduction
+module
+
+public import DescriptiveComplexity.Problems.FinSat.Membership
+public import DescriptiveComplexity.Problems.FinSat.Reduction
 
 /-!
 # Trakhtenbrot's theorem: finite satisfiability is RE-complete
@@ -45,6 +47,8 @@ satisfiability only through the bridge to Mathlib's computability layer,
 `DescriptiveComplexity.Computability`, where the encoding of finite structures
 as numbers turns it into `DescriptiveComplexity.finsat_not_computable`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawEval
 
 /-!
 # One variable's machinery: gates, the VAL loop, the stage write
@@ -27,6 +29,8 @@ their own rules, and the exit – writing the variable's next-stage bit at the
 marker off the verdict accumulator – targets a parameter phase. One copy of
 this file's shapes per variable position is instantiated at assembly.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

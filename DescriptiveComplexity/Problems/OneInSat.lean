@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.OneInSat.Defs
-import DescriptiveComplexity.Problems.OneInSat.Slots
-import DescriptiveComplexity.Problems.OneInSat.Reduction
-import DescriptiveComplexity.Problems.ThreeSat
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.Problems.OneInSat.Defs
+public import DescriptiveComplexity.Problems.OneInSat.Slots
+public import DescriptiveComplexity.Problems.OneInSat.Reduction
+public import DescriptiveComplexity.Problems.ThreeSat
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # 1-in-SAT is NP-complete
@@ -28,6 +30,8 @@ The gadget normalizes every clause to three *slots*
 (`DescriptiveComplexity.Problems.OneInSat.Slots`), which is what lets one uniform
 construction handle clauses of width 0, 1, 2 and 3 at once.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

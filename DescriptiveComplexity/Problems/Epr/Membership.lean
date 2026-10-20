@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Epr.Expansion
-import DescriptiveComplexity.PSpaceHierarchy
-import DescriptiveComplexity.Exponential.Classes
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Epr.Expansion
+public import DescriptiveComplexity.PSpaceHierarchy
+public import DescriptiveComplexity.Exponential.Classes
 
 /-!
 # EPR is in NEXPTIME
@@ -32,6 +34,8 @@ those predicates at the three kinds of point, which is where
 `DescriptiveComplexity.Epr.realize_memP` and the rest of the expansion's API is
 used. Splitting the two keeps the formula layer free of case analysis.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

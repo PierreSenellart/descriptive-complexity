@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Pcp.Defs
-import DescriptiveComplexity.Problems.Pcp.Membership
-import DescriptiveComplexity.Problems.Pcp.Hardness
+module
+
+public import DescriptiveComplexity.Problems.Pcp.Defs
+public import DescriptiveComplexity.Problems.Pcp.Membership
+public import DescriptiveComplexity.Problems.Pcp.Hardness
 
 /-!
 # PCP: Post's correspondence problem
@@ -49,3 +51,5 @@ reduction is the classical computation-history construction, one decorated
 domino per transition-attribute tuple of the machine the `HALT` instance
 carries as elements.
 -/
+
+@[expose] public section

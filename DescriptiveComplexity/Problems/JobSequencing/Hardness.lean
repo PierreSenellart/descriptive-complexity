@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.JobSequencing.Schedule
-import DescriptiveComplexity.Problems.NaeThreeSat
-import DescriptiveComplexity.OccurrenceSlack
-import DescriptiveComplexity.OrderedComposition
-import DescriptiveComplexity.Numbers.Digits
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Problems.JobSequencing.Schedule
+public import DescriptiveComplexity.Problems.NaeThreeSat
+public import DescriptiveComplexity.OccurrenceSlack
+public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.Numbers.Digits
+public import DescriptiveComplexity.Padding
 
 /-!
 # Job sequencing is NP-hard
@@ -63,6 +65,8 @@ their absence: a degenerate input is sent to an instance of deadline `0` and
 bound `0`, which no schedule can meet, every literal job having a positive
 execution time.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

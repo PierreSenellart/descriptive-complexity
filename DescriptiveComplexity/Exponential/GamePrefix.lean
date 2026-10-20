@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameSpec
+module
+
+public import DescriptiveComplexity.Exponential.GameSpec
 
 /-!
 # The prefix phases play the alternating prefix
@@ -27,6 +29,8 @@ Two things make the base and the step line up.
   filling `j + 1` rounds of the state left and filling `j` rounds of the state
   entered.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

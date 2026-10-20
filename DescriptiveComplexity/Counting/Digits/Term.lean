@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.ProdSweep
-import DescriptiveComplexity.Counting.Quantitative
+module
+
+public import DescriptiveComplexity.Counting.Digits.ProdSweep
+public import DescriptiveComplexity.Counting.Quantitative
 
 /-!
 # The digits of a quantitative term
@@ -26,6 +28,8 @@ on the term, each construct being one closure property:
 The digits are those of the value modulo `2 ^ (n ^ ℓ)`, for any `ℓ`; no bound
 on the value is needed here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

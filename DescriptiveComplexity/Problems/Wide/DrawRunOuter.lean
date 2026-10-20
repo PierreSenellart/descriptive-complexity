@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRun
-import DescriptiveComplexity.Problems.Wide.DrawInstEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRun
+public import DescriptiveComplexity.Problems.Wide.DrawInstEval
 
 /-!
 # The outer composition: the sweep's rounds
@@ -21,6 +23,8 @@ track (the advance's) by
 nothing because the background carries every register's digits at its own
 slot.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

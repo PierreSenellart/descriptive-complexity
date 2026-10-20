@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderNewBdd
-import DescriptiveComplexity.SecondOrderNewPull
+module
+
+public import DescriptiveComplexity.SecondOrderNewBdd
+public import DescriptiveComplexity.SecondOrderNewPull
 
 /-!
 # A bounded extension lives inside the instance's own tuples
@@ -41,6 +43,8 @@ eliminating the invention, this is what the bound is for: an interpretation
 cannot invent, so the values have to come from the instance, and
 the bound is exactly the promise that they can.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

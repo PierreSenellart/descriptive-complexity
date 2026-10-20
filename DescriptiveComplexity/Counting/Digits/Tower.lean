@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Digits.SetArith
-import DescriptiveComplexity.FixedPointStratify
+module
+
+public import DescriptiveComplexity.Counting.Digits.SetArith
+public import DescriptiveComplexity.FixedPointStratify
 
 /-!
 # Towers of inductions: first-order strata and sweep strata
@@ -31,6 +33,8 @@ tower, the base vocabulary expanded by the relations already computed:
 `DescriptiveComplexity.StepDef.Ext` is the bookkeeping of a tower: an
 induction extends another when it computes, among others, the same relations.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

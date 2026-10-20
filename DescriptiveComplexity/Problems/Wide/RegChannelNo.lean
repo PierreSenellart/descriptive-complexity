@@ -3,8 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelYes
-import DescriptiveComplexity.Problems.Wide.RegChannelBack
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelYes
+public import DescriptiveComplexity.Problems.Wide.RegChannelBack
+public import Mathlib.Data.Nat.Log
 
 /-!
 # The handed program on a no-instance
@@ -27,6 +30,8 @@ Everything else – the marking, the file's ends, the rounds, the exits, the par
 scratch and the region the atoms stay inside – is what the yes-direction
 supplies, and is supplied here the same way.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

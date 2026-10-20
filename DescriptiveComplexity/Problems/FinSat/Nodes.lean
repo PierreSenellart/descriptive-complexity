@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.Tseitin
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Problems.Sat.Tseitin
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # Positions and tags of the FINSAT reduction
@@ -59,6 +61,8 @@ comparison of the tuples. That last comparison is
 lexicographic order where a reduction defining the order of its image has to
 *decide* it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

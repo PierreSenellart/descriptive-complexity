@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GamePrefix
+module
+
+public import DescriptiveComplexity.Exponential.GamePrefix
 
 /-!
 # The node phases play the AND/OR graph
@@ -27,6 +29,8 @@ The two places the simulation could have gone wrong, and how it does not:
   the player refute `AGMove` instead of the move being filtered out – which no
   sentence over the base could do.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

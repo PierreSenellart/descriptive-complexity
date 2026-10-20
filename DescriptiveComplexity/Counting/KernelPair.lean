@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.SharpP
-import DescriptiveComplexity.SecondOrderMerge
+module
+
+public import DescriptiveComplexity.Counting.SharpP
+public import DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # The sum of two witness counts, as one witness count
@@ -30,6 +32,8 @@ under complement of `⊕P` and `PP` rests on. The second is what the
 completeness of a problem comparing two counts rests on: a single formula,
 whose models are told apart by the value of the selector's variable.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

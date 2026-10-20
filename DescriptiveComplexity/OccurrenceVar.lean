@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OccurrenceFormulas
+module
+
+public import DescriptiveComplexity.OccurrenceFormulas
 
 /-!
 # The occurrences of a variable, cyclically ordered
@@ -24,6 +26,8 @@ Everything here has a first-order counterpart, over the ordered expansion
 `DescriptiveComplexity.SatOcc.satOrd`, since the successor is “the next occurrence,
 or the first one if there is no next”, and both halves are first-order.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.OrdFormula
+module
+
+public import DescriptiveComplexity.Exponential.OrdFormula
 
 /-!
 # Extending an expansion with its own order
@@ -27,6 +29,8 @@ The tag comparison is **static**, exactly as in
 their tags alone, so the defining sentence at such a pair is `⊤` or `⊥`, and
 only the equal-tag case emits a real comparison.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

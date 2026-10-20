@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesUnbounded
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.MachinesUnbounded
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # An accepting run, read off as a finite certificate
@@ -45,6 +47,8 @@ The page successor of the step clause is
 by `z'`”: the certificate's pages are an abstract order, and covering is what a
 first-order kernel can say about one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -149,7 +153,7 @@ section OfRun
 variable {A : Type} {M : TMData A}
 
 /-- The integer a page index of the band stands for. -/
-private def pgOf (n : ℕ) (z : Fin (2 * n + 1)) : ℤ := (z : ℤ) - n
+def pgOf (n : ℕ) (z : Fin (2 * n + 1)) : ℤ := (z : ℤ) - n
 
 private theorem pgOf_injective (n : ℕ) : Function.Injective (pgOf n) := by
   intro z z' h
@@ -157,7 +161,7 @@ private theorem pgOf_injective (n : ℕ) : Function.Injective (pgOf n) := by
   exact Fin.ext (by exact_mod_cast hz)
 
 /-- The page index of a cell of the band. -/
-private def ixOf (n : ℕ) (x : ℤ) : Fin (2 * n + 1) :=
+def ixOf (n : ℕ) (x : ℤ) : Fin (2 * n + 1) :=
   if h : (x + n).toNat < 2 * n + 1 then ⟨(x + n).toNat, h⟩ else ⟨0, Nat.succ_pos _⟩
 
 private theorem pgOf_ixOf {n : ℕ} {x : ℤ} (h1 : -(n : ℤ) ≤ x) (h2 : x ≤ n) :
@@ -169,7 +173,7 @@ private theorem pgOf_ixOf {n : ℕ} {x : ℤ} (h1 : -(n : ℤ) ≤ x) (h2 : x �
 /-- The certificate a sequence of configurations carries. Named, rather than
 written as a structure literal inside the proof, so that its four projections
 have stated equations and `rw` applies under them. -/
-private def runOfSeq (n : ℕ) (f : ℕ → ConfigU A) :
+def runOfSeq (n : ℕ) (f : ℕ → ConfigU A) :
     RunCert A (Fin (n + 1)) (Fin (2 * n + 1)) where
   st i := (f i).state
   hdP i := ixOf n (f i).head.1
@@ -298,7 +302,7 @@ private theorem orank_injective [LinearOrder P] [Finite P] :
 
 /-- The integer a page stands for: its rank, shifted so that the input page is
 cell `0`. -/
-private noncomputable def pgEmb [LinearOrder P] (zero : P) (z : P) : ℤ :=
+noncomputable def pgEmb [LinearOrder P] (zero : P) (z : P) : ℤ :=
   (orank z : ℤ) - (orank zero : ℤ)
 
 private theorem pgEmb_injective [LinearOrder P] [Finite P] (zero : P) :
@@ -321,12 +325,12 @@ private theorem pgEmb_covBy [LinearOrder P] [Finite P] {zero a b : P} (h : a ⋖
 open Classical in
 /-- The tape a certificate induces: the certificate's symbol where the cell is
 the image of a page, and the blank everywhere else. -/
-private noncomputable def tapeOf (r : RunCert A T P) (pg : P → ℤ) (b₀ : A) (t : T)
+noncomputable def tapeOf (r : RunCert A T P) (pg : P → ℤ) (b₀ : A) (t : T)
     (x : ℤ × A) : A :=
   if hx : ∃ z, pg z = x.1 then r.sym t hx.choose x.2 else b₀
 
 /-- The configuration a certificate induces at a time point. -/
-private noncomputable def confOf [LinearOrder P] (r : RunCert A T P) (pg : P → ℤ) (b₀ : A)
+noncomputable def confOf [LinearOrder P] (r : RunCert A T P) (pg : P → ℤ) (b₀ : A)
     (t : T) : ConfigU A :=
   ⟨r.st t, (pg (r.hdP t), r.hdC t), tapeOf r pg b₀ t⟩
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.SecondOrderHorn
-import DescriptiveComplexity.OrderWalk
-import DescriptiveComplexity.Problems.HornSat.Unsat
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.SecondOrderHorn
+public import DescriptiveComplexity.OrderWalk
+public import DescriptiveComplexity.Problems.HornSat.Unsat
 
 /-!
 # HORN-SAT is SO-Horn definable
@@ -41,6 +43,8 @@ and appear only in *guards*, where arbitrary first-order formulas are allowed.
 The second-order atoms are `T` and `B` only, one or two per clause body: the
 program is Horn.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

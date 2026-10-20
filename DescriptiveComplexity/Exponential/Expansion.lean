@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Block
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.Exponential.Block
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Exponential expansions: reading a structure over its second-order objects
@@ -51,6 +53,8 @@ of `DescriptiveComplexity.SOTCSpec`: the capture theorems this development
 builds on are the ordered ones, while order-invariance is what makes the notion
 a `DescriptiveComplexity.DecisionProblem`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

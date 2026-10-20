@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Expansion
+module
+
+public import DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # Pulling an exponential expansion back through an interpretation
@@ -47,6 +49,8 @@ one lemma – `DescriptiveComplexity.ExpExpansion.realize_extendSO_pullSentence`
 – serves both the domain sentence (one copy of the block) and every defining
 sentence (as many copies as the symbol has arguments).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

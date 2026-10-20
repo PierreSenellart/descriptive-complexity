@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointReduction
-import DescriptiveComplexity.FixedPointStratify
-import DescriptiveComplexity.FixedPointStepRel
+module
+
+public import DescriptiveComplexity.FixedPointReduction
+public import DescriptiveComplexity.FixedPointStratify
+public import DescriptiveComplexity.FixedPointStepRel
 
 /-!
 # Composition of FO(LFP) reductions
@@ -53,6 +55,8 @@ be read there. `DescriptiveComplexity.RelFOInterpretation.ordExtendSrc` is the
 order extension along an arbitrary vocabulary map of the source, of which
 `DescriptiveComplexity.RelFOInterpretation.ordExtendRel` is the identity case.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

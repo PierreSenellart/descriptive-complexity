@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureSentenceDecide
-import DescriptiveComplexity.TransitiveClosureParamPull
-import DescriptiveComplexity.TransitiveClosureReductionComposition
-import DescriptiveComplexity.DetLogSpace
+module
+
+public import DescriptiveComplexity.TransitiveClosureSentenceDecide
+public import DescriptiveComplexity.TransitiveClosureParamPull
+public import DescriptiveComplexity.TransitiveClosureReductionComposition
+public import DescriptiveComplexity.DetLogSpace
 
 /-!
 # NL is closed under FO(TC) reductions, and LOGSPACE under FO(DTC) reductions
@@ -42,6 +44,8 @@ definability. The searching flat walk simulates the outer walk only when that
 one is functional – which the pullback of a determinized walk is
 (`DescriptiveComplexity.TCSpec.pullSpec_functional`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

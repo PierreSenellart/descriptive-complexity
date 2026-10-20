@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Ordered
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Ordered
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The numeric predicates: the arithmetic expansion of a vocabulary
@@ -70,6 +72,8 @@ element. That sentence is what separates FO(≤) from AC⁰
 one thing the numeric predicates buy over a bare order: access to the *size* of
 the universe, one bit at a time.
 -/
+
+@[expose] public section
 
 /- The language of arithmetic lives in Mathlib's `FirstOrder.Language`
 namespace, next to `Language.order` and the vocabularies of the problem

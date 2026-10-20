@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.Lattice
-import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
-import DescriptiveComplexity.Problems.Machine.Defs
+module
+
+public import Mathlib.Data.Fintype.Lattice
+public import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
+public import DescriptiveComplexity.Problems.Machine.Defs
 
 /-!
 # Drawing the domino system of a machine
@@ -57,6 +59,8 @@ which is what interleaves the page block correctly – then the static sub-index
 the ambient order. On a well-formed machine this is a linear order on all of
 `PV A`, junk included.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Composition
-import DescriptiveComplexity.Relativize
+module
+
+public import DescriptiveComplexity.Composition
+public import DescriptiveComplexity.Relativize
 
 /-!
 # Vocabulary maps with parameters
@@ -50,6 +52,8 @@ quantifiers are guarded by the marker, and the source structure is read on the
 marked elements, at symbols that still mention the parameters.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -79,7 +83,7 @@ variable (F : ParamHom L₁ L₂ α)
 
 /-- Renaming a variable of the source formula: the source's own free variables
 sit on the left of the target's, the parameters on the right. -/
-private def shift {n : ℕ} : β ⊕ Fin n → (β ⊕ α) ⊕ Fin n :=
+def shift {n : ℕ} : β ⊕ Fin n → (β ⊕ α) ⊕ Fin n :=
   Sum.map Sum.inl id
 
 /-! ### The map on formulas -/

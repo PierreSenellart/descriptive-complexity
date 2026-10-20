@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstRound
-import DescriptiveComplexity.Problems.Wide.DrawRunVar
-import DescriptiveComplexity.Problems.Wide.DrawInner
-import DescriptiveComplexity.Problems.Wide.DrawAddr
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstRound
+public import DescriptiveComplexity.Problems.Wide.DrawRunVar
+public import DescriptiveComplexity.Problems.Wide.DrawInner
+public import DescriptiveComplexity.Problems.Wide.DrawAddr
 
 /-!
 # One variable's machinery, instantiated: the gates' and the matrix's legs
@@ -21,6 +23,8 @@ the sub-machinery's first checkpoint, the assembled run
 `DescriptiveComplexity.Draw.Data.matrix_run`), and the walk-back at the
 landing checkpoint.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

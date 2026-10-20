@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Tiling
-import DescriptiveComplexity.Problems.Tiling.Membership
-import DescriptiveComplexity.Exponential.Classes
+module
+
+public import DescriptiveComplexity.Problems.Wide.Tiling
+public import DescriptiveComplexity.Problems.Tiling.Membership
+public import DescriptiveComplexity.Exponential.Classes
 
 /-!
 # The wide tiling as an exponential expansion
@@ -25,6 +27,8 @@ the accepting ones, a binary attribute for the two compatibilities, the
 binary-number order for the order, and the initial-segment reading for the
 bottom row.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

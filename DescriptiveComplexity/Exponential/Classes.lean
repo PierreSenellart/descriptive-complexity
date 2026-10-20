@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
+module
+
+public import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
 
 /-!
 # The exponential classes: EXPTIME, NEXPTIME, EXPSPACE
@@ -49,6 +51,8 @@ right logics to name the classes after, cited as motivation and not as a
 theorem proved here; it is stated in the relational (order-free, generic)
 setting, which is a second reason not to cite it flatly.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

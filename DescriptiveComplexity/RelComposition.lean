@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Relativized
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.Relativized
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Composition of relativized first-order reductions
@@ -27,6 +29,8 @@ pulled-back outer domain, and the two decompose in exactly the way
 `realize_pullRel` needs.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -40,18 +44,6 @@ variable {L₁ L₂ L₃ : Language.{0, 0}}
 section PullRel
 
 variable {Tag : Type} {d : ℕ} {β : Type}
-
-/-- Relabeling that splits off the coordinates of the last bound variable
-(local copy of `Composition`'s private helper). -/
-private def splitLast {d n : ℕ} :
-    (β ⊕ Fin (n + 1)) × Fin d → ((β ⊕ Fin n) × Fin d) ⊕ Fin d
-  | (.inl b, j) => .inl (.inl b, j)
-  | (.inr i, j) => Fin.lastCases (.inr j) (fun i' => .inl (.inr i', j)) i
-
-/-- Extending a tag assignment to one more bound variable (local copy). -/
-private def extendTag {n : ℕ} (τ : (β ⊕ Fin n) → Tag) (t : Tag) :
-    (β ⊕ Fin (n + 1)) → Tag :=
-  Sum.elim (fun b => τ (.inl b)) (Fin.snoc (fun i => τ (.inr i)) t)
 
 /-- The in-domain environment of the relativized interpreted structure induced
 by tags `τ`, coordinates `v`, and a proof `hv` that each variable's coordinates
@@ -231,13 +223,13 @@ variable [L₂.IsRelational] [L₃.IsRelational] [Finite Tag₁]
 variable (J : RelFOInterpretation L₂ L₃ Tag₂ d₂) (I : RelFOInterpretation L₁ L₂ Tag₁ d₁)
 
 /-- The relabeling of the composite's coordinates onto a `d₂ × d₁` matrix. -/
-private def compRelabel {n : ℕ} :
+def compRelabel {n : ℕ} :
     (((Fin n × Fin d₂) ⊕ Fin 0) × Fin d₁) → (Fin n × Fin (d₂ * d₁))
   | (.inl p, j) => (p.1, finProdFinEquiv (p.2, j))
   | (.inr z, _) => z.elim0
 
 /-- The relabeling of the composite domain formula's coordinates. -/
-private def compDomRelabel :
+def compDomRelabel :
     (((Fin d₂ ⊕ Fin 0) × Fin d₁)) → Fin (d₂ * d₁)
   | (.inl k, j) => finProdFinEquiv (k, j)
   | (.inr z, _) => z.elim0

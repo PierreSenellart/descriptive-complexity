@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointStepRel
-import DescriptiveComplexity.SecondOrderOrdered
+module
+
+public import DescriptiveComplexity.FixedPointStepRel
+public import DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # Second-order definability pulls back through a relativized interpretation
@@ -38,6 +40,8 @@ forward and read back, a universal one is instantiated at the read-back
 assignment. The off-domain junk a guess may carry is never looked at, since
 every atom the kernel evaluates sits at points of the domain.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.OneInSat.Counting
-import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
-import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Problems.OneInSat.Counting
+public import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
+public import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #SAT reduces parsimoniously to #1-in-SAT
@@ -32,6 +34,8 @@ occurrence and `ℓ` the literal: three more variables name the cases
 each with exactly one true literal, force them and `z`. The first occurrence
 of a clause has the clause `{¬z, ℓ}`, and the last one the unit clause `{z}`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

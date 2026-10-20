@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosureParam
-import DescriptiveComplexity.FixedPointStepRel
+module
+
+public import DescriptiveComplexity.TransitiveClosureParam
+public import DescriptiveComplexity.FixedPointStepRel
 
 /-!
 # Pulling a walk back through a relativized interpretation
@@ -42,6 +44,8 @@ is what pulls the *outer* walks of a composite back to the base, the first
 half of transitivity of `≤ᵗᶜ` (`DescriptiveComplexity.TCReduction.trans`),
 whose second half is the same flattening.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.SetFamily.Defs
-import DescriptiveComplexity.SecondOrder
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.SetFamily.Defs
+public import DescriptiveComplexity.SecondOrder
 
 /-!
 # The set family is existential second-order definable
@@ -43,6 +45,8 @@ makes, which is exactly what the embedding forms of
 `DescriptiveComplexity.clique_sigmaSODefinable`, whose threshold is a lower bound like
 Set Packing's.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -151,7 +155,7 @@ section Realize
 variable {A : Type} [Language.setSystem.Structure A] (ρ : familyGuessBlock.Assignment A)
 
 /-- Realization at a set system expanded by an assignment of the block. -/
-private abbrev SFRealize (φ : setFamilySOLang.Sentence) : Prop :=
+abbrev SFRealize (φ : setFamilySOLang.Sentence) : Prop :=
   @Sentence.Realize setFamilySOLang A
     (@sumStructure _ _ A _ (familyGuessBlock.structure ρ)) φ
 

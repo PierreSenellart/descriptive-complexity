@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.SetFamily
-import DescriptiveComplexity.Problems.OneInSat
-import DescriptiveComplexity.Problems.ThreeSat.ToSat
+module
+
+public import DescriptiveComplexity.Problems.SetFamily
+public import DescriptiveComplexity.Problems.OneInSat
+public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # Exact Cover is NP-complete
@@ -32,6 +34,8 @@ exactly what exactly-one satisfaction asks. Nothing here depends on the width
 of the clauses, which is why the source is unrestricted 1-in-SAT rather than
 its width-three restriction.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

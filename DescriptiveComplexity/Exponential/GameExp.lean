@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameNodes
+module
+
+public import DescriptiveComplexity.Exponential.GameNodes
 
 /-!
 # EXPTIME is second-order alternating reachability
@@ -46,6 +48,8 @@ base, never a first-order one. That is the obstruction the whole design works
 around, and it works around it by the observation that it does not apply to a
 **move**.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

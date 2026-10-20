@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Tape
-import DescriptiveComplexity.Problems.Qsat.Defs
+module
+
+public import DescriptiveComplexity.Problems.Machine.Tape
+public import DescriptiveComplexity.Problems.Qsat.Defs
 
 /-!
 # The tape of the QBF machine
@@ -45,6 +47,8 @@ map to a machine that cannot accept – which a guard achieves and a broken
 order would not (an instance whose prefix order relates a non-variable still
 has a linear `PLe`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

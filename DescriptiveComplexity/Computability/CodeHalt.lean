@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.Halting
-import DescriptiveComplexity.Computability.Catalog
-import DescriptiveComplexity.Problems.CodeHalt.Membership
+module
+
+public import Mathlib.Computability.Halting
+public import DescriptiveComplexity.Computability.Catalog
+public import DescriptiveComplexity.Problems.CodeHalt.Membership
 
 /-!
 # Drawing a partial recursive code as a concrete instance
@@ -38,6 +40,8 @@ Whence the two results the layer exists for:
 undecidable, and its first instance
 `DescriptiveComplexity.finsat_not_computable`, Trakhtenbrot's theorem.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

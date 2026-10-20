@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefName
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefName
 
 /-!
 # A gate's four folds
@@ -20,6 +22,8 @@ the loop element, the sub-fold's accumulators, and the sub-leaf flag – are
 disjoint, so each write reads what it was given. With those, the pieces are the
 ones already discharged.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

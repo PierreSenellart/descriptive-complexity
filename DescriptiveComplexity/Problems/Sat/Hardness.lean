@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.Problems.Sat.TseitinFormulas
+module
+
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.Problems.Sat.TseitinFormulas
 
 /-!
 # The Cook–Levin theorem: hardness of SAT
@@ -44,6 +46,8 @@ equivalence `DescriptiveComplexity.Tseitin.satCond_iff_gates` and the
 gate-correctness lemmas `DescriptiveComplexity.Tseitin.gates_realize` /
 `DescriptiveComplexity.Tseitin.gates_canonVal`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

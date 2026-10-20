@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameExp
-import DescriptiveComplexity.Exponential.GamePlayBack
-import DescriptiveComplexity.Problems.MachineAltSpace.Membership
+module
+
+public import DescriptiveComplexity.Exponential.GameExp
+public import DescriptiveComplexity.Exponential.GamePlayBack
+public import DescriptiveComplexity.Problems.MachineAltSpace.Membership
 
 /-!
 # The machine, written in first-order logic
@@ -39,6 +41,8 @@ is left is small:
   `DescriptiveComplexity.padTupF`;
 * and the two hooks into the source structure, `concOk` and `isTarget`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

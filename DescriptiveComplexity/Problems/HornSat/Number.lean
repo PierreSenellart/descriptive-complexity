@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.HornSat.Unsat
-import DescriptiveComplexity.FixedPointOrderTransfer
-import DescriptiveComplexity.Counting
-import DescriptiveComplexity.Vocabulary
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Problems.HornSat.Unsat
+public import DescriptiveComplexity.FixedPointOrderTransfer
+public import DescriptiveComplexity.Counting
+public import DescriptiveComplexity.Vocabulary
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # The number written by unit propagation: definition
@@ -32,6 +34,8 @@ This is the problem through which the number written by a machine
 point of a system of rules is the least model of a Horn formula, and the
 unit-propagation machine leaves that model on its tape.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

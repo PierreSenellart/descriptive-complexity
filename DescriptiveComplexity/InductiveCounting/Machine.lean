@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The inductive-counting machine, abstractly
@@ -44,6 +46,8 @@ and the count `m` is the `m`-th value of `WithBot V`). This uniformity is what
 lets a register be stored, in the first-order realization, as one tuple of
 elements together with a finite mode.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

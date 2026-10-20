@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.BinRel
-import Mathlib.SetTheory.Cardinal.Finite
+module
+
+public import DescriptiveComplexity.Numbers.BinRel
+public import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Counting the binary numbers below a bound
@@ -21,6 +23,8 @@ witness that carries, beside a solution, a number below the weight of that
 solution is counted once per unit of weight, and “below” is first-order
 (`DescriptiveComplexity.binNum_lt_iff`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

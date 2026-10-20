@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Counting problems and parsimonious reductions
@@ -37,6 +39,8 @@ first-order reduction between their supports
 hardness results for counting problems yield hardness results for decision
 problems.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

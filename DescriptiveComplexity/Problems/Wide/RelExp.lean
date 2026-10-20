@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.Double
-import DescriptiveComplexity.SecondOrderTransitiveClosure
+module
+
+public import DescriptiveComplexity.Problems.Wide.Double
+public import DescriptiveComplexity.SecondOrderTransitiveClosure
 
 /-!
 # Reading the instance inside the doubled universe
@@ -25,6 +27,8 @@ and that is the shape the *support* condition of the relativized expansion will
 pin down: an assignment over the doubled universe that only ever holds of marked
 tuples is an assignment of the instance and nothing more.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

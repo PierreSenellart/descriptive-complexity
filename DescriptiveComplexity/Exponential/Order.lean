@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Expansion
-import DescriptiveComplexity.OrderWalk
+module
+
+public import DescriptiveComplexity.Exponential.Expansion
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The order on an expanded universe
@@ -50,6 +52,8 @@ The defining *formula* and its realization lemma live in
 is proved against.
 -/
 
+@[expose] public section
+
 namespace DescriptiveComplexity
 
 open FirstOrder
@@ -65,11 +69,11 @@ variable {I : Type}
 open Classical in
 /-- The key ordering subsets of `I`: the characteristic function, read
 lexicographically with `False < True`. -/
-private noncomputable def setKey (S : I → Prop) : Lex (I → Bool) :=
+noncomputable def setKey (S : I → Prop) : Lex (I → Bool) :=
   toLex fun i => decide (S i)
 
 open Classical in
-private theorem setKey_injective : Function.Injective (setKey (I := I)) := by
+theorem setKey_injective : Function.Injective (setKey (I := I)) := by
   intro S T h
   funext i
   exact propext (decide_eq_decide.mp (congrFun (toLex.injective h) i))
@@ -120,7 +124,7 @@ def atomSet (ρ : B.Assignment A) : B.AtomIx A → Prop :=
   fun p => ρ p.1 fun j => p.2 (Fin.castLE (arity_le_blockArityBound B p.1) j)
 
 /-- A tuple of the arity of `i`, padded out to the block's maximal arity. -/
-private noncomputable def padTuple [Nonempty A] (i : B.ι) (x : Fin (B.arity i) → A) :
+noncomputable def padTuple [Nonempty A] (i : B.ι) (x : Fin (B.arity i) → A) :
     Fin (blockArityBound B) → A :=
   fun k => if h : (k : ℕ) < B.arity i then x ⟨k, h⟩ else Classical.arbitrary A
 

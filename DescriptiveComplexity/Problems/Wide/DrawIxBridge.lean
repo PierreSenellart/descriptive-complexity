@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawGateFacts
-import DescriptiveComplexity.Problems.Wide.IxAddr
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawGateFacts
+public import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # What a coarse file's gate test is, elementwise
@@ -22,6 +24,8 @@ element it stands for, which is the step the two bridges `hpassEnc` and
 `hgateEnc` need: `DescriptiveComplexity.Draw.Data.gate_trichotomy` is stated
 elementwise and reaches a coarse file through this file.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

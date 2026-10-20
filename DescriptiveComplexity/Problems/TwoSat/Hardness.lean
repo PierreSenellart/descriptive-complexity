@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderKrom
-import DescriptiveComplexity.ClauseDischarge
-import DescriptiveComplexity.Problems.TwoSat.Defs
+module
+
+public import DescriptiveComplexity.SecondOrderKrom
+public import DescriptiveComplexity.ClauseDischarge
+public import DescriptiveComplexity.Problems.TwoSat.Defs
 
 /-!
 # Hardness of 2SAT: the Krom discharge
@@ -42,6 +44,8 @@ padding: an assignment `ρ` of the block gives the truth value `ρ i (pref x)` o
 the propositional variable `(i, x)`, and conversely a satisfying truth
 assignment `ν` gives the assignment `ρ i ā := ν (i, pad ā)`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

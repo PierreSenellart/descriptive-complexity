@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.InductiveCounting.Sound
+module
+
+public import DescriptiveComplexity.InductiveCounting.Sound
 
 /-!
 # Completeness of the inductive-counting machine
@@ -15,6 +17,8 @@ outer scan, and the sequence of stages – each by an induction along the finite
 linear order of nodes or, for the stages, on how much room the layer still has
 to grow.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

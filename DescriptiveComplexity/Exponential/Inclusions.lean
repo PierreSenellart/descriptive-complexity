@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Classes
-import DescriptiveComplexity.Exponential.Reach
-import DescriptiveComplexity.PSpaceCompl
-import DescriptiveComplexity.PSpaceHierarchy
-import DescriptiveComplexity.Problems.TwoSat
+module
+
+public import DescriptiveComplexity.Exponential.Classes
+public import DescriptiveComplexity.Exponential.Reach
+public import DescriptiveComplexity.PSpaceCompl
+public import DescriptiveComplexity.PSpaceHierarchy
+public import DescriptiveComplexity.Problems.TwoSat
 
 /-!
 # The exponential classes: complements and inclusions
@@ -38,6 +40,8 @@ the expansion whose points are its states – which lives in
 **No claim is made for NEXPTIME**, which is not expected to be closed under
 complement.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

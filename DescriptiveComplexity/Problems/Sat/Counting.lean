@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #SAT: counting the models of a CNF formula
@@ -25,6 +27,8 @@ problem can afford to leave them unconstrained.
 `Σ₁` definition of SAT with one conjunct added to the kernel. Its hardness is
 in `DescriptiveComplexity.Problems.Sat.CountingHardness`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawOuter
-import DescriptiveComplexity.Problems.Wide.DrawEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawOuter
+public import DescriptiveComplexity.Problems.Wide.DrawEval
 
 /-!
 # One round of the VAL loop: inner gates, branch, matrix
@@ -29,6 +31,8 @@ its run theorem and everything above them are untouched.
 
 Shapes only; the runs are the instantiation files'.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

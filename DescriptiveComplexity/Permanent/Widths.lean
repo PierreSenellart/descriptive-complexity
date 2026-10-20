@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Permanent.Ladder
-import Mathlib.Data.Int.GCD
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Positivity
+module
+
+public import DescriptiveComplexity.Permanent.Ladder
+public import Mathlib.Data.Int.GCD
+public import Mathlib.Tactic.Ring
+public import Mathlib.Tactic.Positivity
 
 /-!
 # From an integer matrix to a 0-1 matrix, modulo `2 ^ L + 1`
@@ -23,6 +25,8 @@ the permanent of the 0-1 matrix by a remainder and a quotient
 (`DescriptiveComplexity.bperm_ladder_widths_div`): the arithmetic the one-call
 reduction to #Cycle Cover applies to the answer of its oracle.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,11 +3,13 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Computability.Eval
-import Mathlib.Computability.RE
-import Mathlib.Logic.Equiv.Fin.Basic
-import DescriptiveComplexity.Relativized
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.Computability.Eval
+public import Mathlib.Computability.RE
+public import Mathlib.Logic.Equiv.Fin.Basic
+public import DescriptiveComplexity.Relativized
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # First-order reductions are computable
@@ -47,6 +49,8 @@ sentences; `DescriptiveComplexity.flatRel` and `DescriptiveComplexity.flatDom` f
 the former into the latter through `Fin.finProdFinEquiv` and
 `FirstOrder.Language.BoundedFormula.relabel`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

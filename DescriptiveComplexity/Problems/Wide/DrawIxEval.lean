@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawIxVar
-import DescriptiveComplexity.Problems.Wide.DrawInstEval
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawIxVar
+public import DescriptiveComplexity.Problems.Wide.DrawInstEval
 
 /-!
 # The spine's legs at an arbitrary file
@@ -19,6 +21,8 @@ the spine's, whose rule shape the space-bounded and the clocked programs do not
 share. The fold of these legs is
 `DescriptiveComplexity.Problems.Wide.NexSpine`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

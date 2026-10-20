@@ -3,9 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.Primrec.List
-import DescriptiveComplexity.Computability.Realize
-import DescriptiveComplexity.Interpretation
+module
+
+public import Mathlib.Computability.Primrec.List
+public import DescriptiveComplexity.Computability.Realize
+public import DescriptiveComplexity.Interpretation
+public import Mathlib.Data.List.GetD
 
 /-!
 # Finite structures as concrete data
@@ -38,6 +41,8 @@ file is `Primrec` facts. Out-of-range lookups return `false`, so *every* piece
 of data denotes a structure and no well-formedness side condition ever has to
 be carried.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

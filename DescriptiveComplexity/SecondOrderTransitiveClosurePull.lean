@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderTransitiveClosure
-import DescriptiveComplexity.SecondOrderPull
-import DescriptiveComplexity.OrderedComposition
+module
+
+public import DescriptiveComplexity.SecondOrderTransitiveClosure
+public import DescriptiveComplexity.SecondOrderPull
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Pulling SO(TC) definability back through an interpretation
@@ -62,6 +64,8 @@ interpreted by the *same* assignment on both sides, which is
 `DescriptiveComplexity.SOBlock.mapAssign` along `Equiv.refl` is the identity, by
 definitional eta).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

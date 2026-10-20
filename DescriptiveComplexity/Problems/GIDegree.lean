@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.GraphIso.Hardness
-import DescriptiveComplexity.Problems.DagIso
+module
+
+public import DescriptiveComplexity.Problems.GraphIso.Hardness
+public import DescriptiveComplexity.Problems.DagIso
 
 /-!
 # The GI degree, collected
@@ -21,6 +23,8 @@ Complete for the degree: Graph Isomorphism itself
 (`DescriptiveComplexity.digraphIso_GI_complete`) and DAG Isomorphism
 (`DescriptiveComplexity.dagIso_GI_complete`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

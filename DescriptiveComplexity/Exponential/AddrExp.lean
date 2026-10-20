@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.Exponential.Expansion
+module
+
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # Reading a structure over its subsets: the address expansion
@@ -43,6 +45,8 @@ That relation and the initial segment an element cuts
 (`DescriptiveComplexity.WMDown`) are stated here for an arbitrary relation on an
 arbitrary type, since both the problems and their expansions read them.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

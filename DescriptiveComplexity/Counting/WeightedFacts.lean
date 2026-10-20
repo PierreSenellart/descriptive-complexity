@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.WeightedWorlds
-import DescriptiveComplexity.Counting.Independence
+module
+
+public import DescriptiveComplexity.Counting.WeightedWorlds
+public import DescriptiveComplexity.Counting.Independence
 
 /-!
 # Weighted worlds, with every fact as a variable
@@ -28,6 +30,8 @@ a weighted count over all the valuations
 side condition on the worlds: the independence lemmas of
 `DescriptiveComplexity.Counting.Independence` apply to it as they stand.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

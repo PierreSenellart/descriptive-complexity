@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawPack
-import DescriptiveComplexity.Exponential.Kernel
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawPack
+public import DescriptiveComplexity.Exponential.Kernel
 
 /-!
 # A kernel, packed as the data of a wide program
@@ -33,6 +35,8 @@ in the *sizes*: the derived dimensions of
 them is the kernel's own value or the (vacuous) demand of an unread step,
 whichever is larger. A larger inventory costs a wider control and nothing else.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

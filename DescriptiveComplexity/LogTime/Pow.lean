@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.LogTime.Fields
-import Mathlib.Data.Fintype.Lattice
+module
+
+public import DescriptiveComplexity.LogTime.Fields
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The doubling chain: `i ↦ 2 ^ i` is first-order in `≤`, `+` and `×`
@@ -95,6 +97,8 @@ Four consequences worth keeping:
   field reader `DescriptiveComplexity.arithDef_fieldAt`, giving
   `DescriptiveComplexity.powArithDef`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.MachinesAltPlay
-import DescriptiveComplexity.Problems.Machine.Program
+module
+
+public import DescriptiveComplexity.MachinesAltPlay
+public import DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The `k`-round game: what a `Σₖ` definition of alternating acceptance guesses
@@ -67,6 +69,8 @@ throughout: induction upwards from a position
 `DescriptiveComplexity.ATMData.nextPos` walking along it, whose rank increases
 by one until the highest position is reached.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

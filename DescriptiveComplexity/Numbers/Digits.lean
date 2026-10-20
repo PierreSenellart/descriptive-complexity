@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Numbers written in base `B` on a relation-ordered index set
@@ -22,6 +24,8 @@ The development mirrors the binary one: a peeling lemma for the lowest block
 `DescriptiveComplexity.binNum` is the special case of base two with digits `0` and `1`
 (`DescriptiveComplexity.binNum_eq_digitNum`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

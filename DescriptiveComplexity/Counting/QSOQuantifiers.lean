@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.QSOWitness
-import DescriptiveComplexity.Syntax
+module
+
+public import DescriptiveComplexity.Counting.QSOWitness
+public import DescriptiveComplexity.Syntax
 
 /-!
 # First-order sums and products of witness counts
@@ -21,6 +23,8 @@ counts.
   formula reads them by substituting `X'(w̄, ȳ)` for every atom `X(ȳ)`
   (`DescriptiveComplexity.extendRel`), and holds for every tuple.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

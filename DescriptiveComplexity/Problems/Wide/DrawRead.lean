@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawScan
-import DescriptiveComplexity.Problems.Wide.DrawSub
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawScan
+public import DescriptiveComplexity.Problems.Wide.DrawSub
 
 /-!
 # Reading one named register bit
@@ -23,6 +25,8 @@ marker.
 outcomes. The read changes nothing on the tape, so the two theorems mention
 one tape; the caller cases on the bit.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTuple
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTuple
 
 /-!
 # The element loop: a sub-fold over control-held tuples
@@ -27,6 +29,8 @@ is any function of the pointer, and the reduction, which writes the
 transition table by formulas, may evaluate them there. As everywhere, the
 semantic parameters stay abstract.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

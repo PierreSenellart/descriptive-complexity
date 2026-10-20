@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadArith
+module
+
+public import DescriptiveComplexity.HeadArith
 
 /-!
 # The bit of a rank, as a head program
@@ -53,6 +55,8 @@ layout `DescriptiveComplexity.HeadProgram.BitHeads`. The clock is
 `O(log n)` rounds of a scan, hence `O(n log n)` steps – irrelevant to the space
 bound, which is the number of heads.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -1056,7 +1060,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
 variable {ih xh y cnt cand w tmk a b mk : Fin K} {p S m : ℕ}
 
 /-- Abbreviation for the control walk of a bit. -/
-private abbrev BWalk (ih xh y cnt cand w tmk : Fin K) (m : ℕ) :
+abbrev BWalk (ih xh y cnt cand w tmk : Fin K) (m : ℕ) :
     BitNode × (Fin K → A) → BitNode × (Fin K → A) → Prop :=
   Relation.ReflTransGen (wireStep (bitFamRel (A := A) ih xh y cnt cand w tmk m) bitWire)
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInterp
-import DescriptiveComplexity.Problems.Wide.TrackWrites
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInterp
+public import DescriptiveComplexity.Problems.Wide.TrackWrites
 
 /-!
 # Rules that never fire, and the tags they buy
@@ -24,6 +26,8 @@ The whole thing is generic in the site type, so it applies to any program the
 definability layer writes down (`padRules`, `uRulesDefinable_padRules`), and the
 count is one line (`card_rTagOf_pad`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

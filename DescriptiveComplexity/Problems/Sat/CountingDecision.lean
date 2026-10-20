@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Sat.CountingHardness
-import DescriptiveComplexity.Problems.Machine.CountingHardness
-import DescriptiveComplexity.Counting.DecisionClasses
+module
+
+public import DescriptiveComplexity.Problems.Sat.CountingHardness
+public import DescriptiveComplexity.Problems.Machine.CountingHardness
+public import DescriptiveComplexity.Counting.DecisionClasses
 
 /-!
 # ⊕SAT and Mod_k-SAT: complete problems for the classes defined by one count
@@ -37,6 +39,8 @@ The classical statements are [Papadimitriou, Zachos 1982][papadimitriou1982two]
 for `⊕SAT` and [Valiant 1979][valiant1979complexity] for the transfer: a
 parsimonious reduction preserves every property of the count.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

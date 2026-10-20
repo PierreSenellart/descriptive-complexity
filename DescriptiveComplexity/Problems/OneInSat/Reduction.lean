@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.OneInSat.Slots
-import DescriptiveComplexity.Problems.ThreeSat.Defs
+module
+
+public import DescriptiveComplexity.Problems.OneInSat.Slots
+public import DescriptiveComplexity.Problems.ThreeSat.Defs
 
 /-!
 # 3SAT ordered-FO-reduces to 1-in-SAT
@@ -35,6 +37,8 @@ literal, let alone exactly one. The order is used only to say *`i`-th
 occurrence*, so this is an ordered reduction; the dimension is 1, all the
 fresh variables being carried by tags.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

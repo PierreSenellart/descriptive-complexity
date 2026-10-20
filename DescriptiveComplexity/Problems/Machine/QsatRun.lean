@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.QsatStep
-import DescriptiveComplexity.Problems.Machine.DetRun
+module
+
+public import DescriptiveComplexity.Problems.Machine.QsatStep
+public import DescriptiveComplexity.Problems.Machine.DetRun
 
 /-!
 # The run of the QBF machine
@@ -24,6 +26,8 @@ is the resulting reading of the matrix: it holds exactly when every clause has
 a variable whose cell satisfies it, which is what one full sweep of the
 `Eval` phase decides.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,12 +3,15 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Steiner.Reductions
-import DescriptiveComplexity.Arithmetic
-import DescriptiveComplexity.Counting.Sized
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Steiner.Reductions
+public import DescriptiveComplexity.Arithmetic
+public import DescriptiveComplexity.Counting.Sized
+public import DescriptiveComplexity.Counting.Class
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # #Steiner Tree: counting the Steiner sets of the threshold size
@@ -42,6 +45,8 @@ As for Set Cover, the support is “some Steiner set uses exactly the threshold
 number of non-terminals”, not the decision problem: a Steiner set can only be
 extended by a neighbour.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

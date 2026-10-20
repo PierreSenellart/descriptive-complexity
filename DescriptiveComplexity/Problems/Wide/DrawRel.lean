@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.AltQuant
+module
+
+public import DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # Relativizing an alternating prefix along an encoding
@@ -31,6 +33,8 @@ Everything is stated for an arbitrary injection with image `G`, so the same
 lemma serves the point encodings of the reduction and the singleton encodings
 of its element loops.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

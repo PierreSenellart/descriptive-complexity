@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Cvp.Defs
-import DescriptiveComplexity.Problems.Cvp.Membership
-import DescriptiveComplexity.Problems.Cvp.Hardness
+module
+
+public import DescriptiveComplexity.Problems.Cvp.Defs
+public import DescriptiveComplexity.Problems.Cvp.Membership
+public import DescriptiveComplexity.Problems.Cvp.Hardness
 
 /-!
 # CVP
@@ -47,6 +49,8 @@ keeps CVP a total predicate on arbitrary `Language.circuit`-structures – and i
 matters, acyclicity not being first-order and so not something a reduction
 could be asked to establish.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

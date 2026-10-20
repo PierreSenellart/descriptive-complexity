@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.PointAtoms
+module
+
+public import DescriptiveComplexity.Exponential.PointAtoms
 
 /-!
 # Translating a quantifier-free matrix
@@ -31,6 +33,8 @@ eliminated by `isEmptyElim` rather than mapped to a default: a term *is* a
 variable (`DescriptiveComplexity.ExpExpansion.termVar`). Only the distinction
 between a free and a bound variable needs an `Option`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

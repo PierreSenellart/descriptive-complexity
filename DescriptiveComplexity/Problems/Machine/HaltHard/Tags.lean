@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.TuringMachine.Config
-import Mathlib.Basic.Finite.Sum
-import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
+module
+
+public import Mathlib.Computability.TuringMachine.Config
+public import Mathlib.Basic.Finite.Sum
+public import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
 
 /-!
 # The alphabet of the machine simulating a `ToPartrec` code
@@ -46,6 +48,8 @@ is a subcode of `c`, so the positioned continuations `PCont` mirror
 `DescriptiveComplexity.HaltHard.PCont.toCont` projects back, and the
 simulation is stated over `PCont` throughout.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

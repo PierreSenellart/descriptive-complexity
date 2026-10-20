@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.Block
+module
+
+public import DescriptiveComplexity.Exponential.Block
 
 /-!
 # Writing an expansion's sentences with iterated block expansions
@@ -30,6 +32,8 @@ replicated assignment *is* reading the `k`-th assignment – so their correctnes
 lemmas are `DescriptiveComplexity.SOBlock.realize_homSentence` and one
 `LHom.IsExpansionOn` whose relation case is `rfl`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

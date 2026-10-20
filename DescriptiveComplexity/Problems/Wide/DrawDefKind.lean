@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefStage
-import DescriptiveComplexity.Problems.Wide.DrawKindRule
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefStage
+public import DescriptiveComplexity.Problems.Wide.DrawKindRule
 
 /-!
 # What a parameter pack owes, and one atom kind's machinery
@@ -25,6 +27,8 @@ a time: the stage atom's by
 atom's by the tag-branched statement, an equality's and an order atom's by the
 element loop's.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

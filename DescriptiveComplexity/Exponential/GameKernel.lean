@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.GameRounds
+module
+
+public import DescriptiveComplexity.Exponential.GameRounds
 
 /-!
 # A defining formula of an interpretation, with its arguments pinned to rounds
@@ -34,6 +36,8 @@ prenex form (`FirstOrder.Language.BoundedFormula.toPrenex`, whose *proof* is wha
 `exists_transl` recurses on), and the slots are sent to their rounds by the `hv`
 argument of `exists_transl`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

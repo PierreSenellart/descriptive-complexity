@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.BlkLayout
-import DescriptiveComplexity.Problems.Wide.NexOuter
+module
+
+public import DescriptiveComplexity.Problems.Wide.BlkLayout
+public import DescriptiveComplexity.Problems.Wide.NexOuter
 
 /-!
 # What the clocked program's file-laying sweep writes
@@ -38,6 +40,8 @@ guessing phase's write is here as well
 (`DescriptiveComplexity.Draw.Data.guessWr`): the cell it read with the stage
 tracks holding the guessed value, and nothing else touched.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

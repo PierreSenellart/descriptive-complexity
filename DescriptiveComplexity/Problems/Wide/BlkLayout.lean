@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.BlkFile
-import DescriptiveComplexity.Problems.Wide.DrawName
+module
+
+public import DescriptiveComplexity.Problems.Wide.BlkFile
+public import DescriptiveComplexity.Problems.Wide.DrawName
 
 /-!
 # The layout of a clocked program's file
@@ -37,6 +39,8 @@ The two properties are then:
 Together they are the stopping condition of a scan by name
 (`DescriptiveComplexity.Draw.Data.nameGF_unique_addr`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

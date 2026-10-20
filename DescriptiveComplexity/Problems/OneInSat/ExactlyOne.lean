@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.OneInSat.Defs
+module
+
+public import DescriptiveComplexity.Problems.OneInSat.Defs
 
 /-!
 # Exactly one true literal, clause by clause
@@ -16,6 +18,8 @@ the propositional statement about the truth values of those literals, for
 clauses of zero to four literals, so that a correctness proof is left with
 propositional reasoning only.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

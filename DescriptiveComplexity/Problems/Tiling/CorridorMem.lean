@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Tiling.Corridor
-import DescriptiveComplexity.PSpace
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Tiling.Corridor
+public import DescriptiveComplexity.PSpace
 
 /-!
 # Tiling a corridor is in PSPACE
@@ -31,6 +33,8 @@ read back by one realization lemma. Read over an exponential expansion the same
 specification asks about a corridor of exponential width, which is the EXPSPACE
 half.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

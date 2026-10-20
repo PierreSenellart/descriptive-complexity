@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltGame
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltGame
 
 /-!
 # Walking the positions, and reading a play off a walk
@@ -40,6 +42,8 @@ stuck, or runs out of budget. Those four alternatives are exactly the cases the
 two collapse lemmas distinguish, so this is the whole interface the round
 induction needs in that direction.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

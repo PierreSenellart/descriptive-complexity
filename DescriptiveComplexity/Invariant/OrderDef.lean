@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.Structure
+module
+
+public import DescriptiveComplexity.Invariant.Structure
 
 /-!
 # The canonical order is inflationary-definable
@@ -36,6 +38,8 @@ check – and each formula builder comes with its realization lemma, so the
 step formula realizes one round of `DescriptiveComplexity.ordRefine`
 (`DescriptiveComplexity.realize_ordStepF`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

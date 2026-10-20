@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Machines
+module
+
+public import DescriptiveComplexity.Machines
 
 /-!
 # A run is a walk along the positions
@@ -28,6 +30,8 @@ Because a stalled machine has no successor configuration, the walk allows a
 *stutter* – but only in an accepting state, so that a walk that has accepted
 stays accepted until the last position, where acceptance is read off.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

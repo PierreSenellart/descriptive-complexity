@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderOrdered
-import DescriptiveComplexity.Hierarchy
+module
+
+public import DescriptiveComplexity.SecondOrderOrdered
+public import DescriptiveComplexity.Hierarchy
 
 /-!
 # DP, the class of differences of NP problems
@@ -55,6 +57,8 @@ those the universal covers. Each half is then definable at its level by
 order-elimination construction stated for a sentence rather than for a
 reduction.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -131,7 +135,7 @@ section OrderedComap
 variable [L'.IsRelational] {Tag : Type} {dim : ℕ}
   (I : FOInterpretation (L.sum Language.order) L' Tag dim) (Q : DecisionProblem L')
 
-private theorem exOrd_iso {A B : Type} [L.Structure A] [L.Structure B] (e : A ≃[L] B)
+theorem exOrd_iso {A B : Type} [L.Structure A] [L.Structure B] (e : A ≃[L] B)
     (h : ∃ lo : LinearOrder A,
       letI := lo
       Q (I.Map A)) :
@@ -372,7 +376,7 @@ def DecisionProblem.triv (L : Language.{0, 0}) [L.IsRelational] : DecisionProble
 
 /-- A one-variable block, to carry the tautological kernel of the trivial
 problem: a `Σ₁` or `Π₁` witness needs a block to quantify, even an idle one. -/
-private def trivBlock : SOBlock where
+def trivBlock : SOBlock where
   ι := Unit
   arity := fun _ => 1
 

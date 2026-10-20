@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Invariant.EquivK
+module
+
+public import DescriptiveComplexity.Invariant.EquivK
 
 /-!
 # Ehrenfeucht–Fraïssé games on finite structures
@@ -39,6 +41,8 @@ The vocabulary is relational, as everywhere in this library, so that atomic
 formulas read coordinates rather than terms
 (`DescriptiveComplexity.exists_eq_var_of_isRelational`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.WeightedFacts
-import DescriptiveComplexity.Counting.QuantitativeBinders
-import DescriptiveComplexity.Problems.CircuitNumber.Membership
+module
+
+public import DescriptiveComplexity.Counting.WeightedFacts
+public import DescriptiveComplexity.Counting.QuantitativeBinders
+public import DescriptiveComplexity.Problems.CircuitNumber.Membership
 
 /-!
 # The weights of a weighted instance, as quantitative terms
@@ -26,6 +28,8 @@ instance. It is the value of a term of quantitative first-order logic:
 These are the leaves of a term computing the weighted count of a safe query:
 see `DescriptiveComplexity.Examples.ProbabilisticQueries`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

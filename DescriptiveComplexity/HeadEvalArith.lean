@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadArith
-import DescriptiveComplexity.ArithmeticDefinable
-import DescriptiveComplexity.HeadCaptureDet
+module
+
+public import DescriptiveComplexity.HeadArith
+public import DescriptiveComplexity.ArithmeticDefinable
+public import DescriptiveComplexity.HeadCaptureDet
 
 /-!
 # Evaluating an arithmetic formula with heads, and `AC⁰ ⊆ LOGSPACE`
@@ -71,6 +73,8 @@ the same corollaries and because the two together say something the machine rout
 alone does not – that the numeric predicates are *simultaneously* one induction
 and one deterministic walk.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawRules
-import DescriptiveComplexity.Problems.Wide.Mirror
-import DescriptiveComplexity.Problems.Wide.Test
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawRules
+public import DescriptiveComplexity.Problems.Wide.Mirror
+public import DescriptiveComplexity.Problems.Wide.Test
 
 /-!
 # A program's rules run its register passes
@@ -66,6 +68,8 @@ variant: the mark of a register cell records which block that register lies in
 (finitely many kinds, so finitely many rules), and the stopping rule reads it off
 the symbol. That variant is not built here.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

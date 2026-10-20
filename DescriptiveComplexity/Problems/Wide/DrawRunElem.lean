@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawElem
-import DescriptiveComplexity.Problems.Wide.DrawLoop
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawElem
+public import DescriptiveComplexity.Problems.Wide.DrawLoop
 
 /-!
 # The element loop's run
@@ -46,6 +48,8 @@ trips walking different tracks share one tape term
 track is a set of registers and the cells the reads stop at are registers, so
 nothing here asks the file to have one register per element of the universe.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltRel
-import DescriptiveComplexity.SecondOrderReplicate
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltRel
+public import DescriptiveComplexity.SecondOrderReplicate
 
 /-!
 # The matrix of the ladder
@@ -25,6 +27,8 @@ out of the quantifiers over the rounds still to come
 `DescriptiveComplexity.altBlockQuant_imp_left`); both need the assignments to
 form a nonempty type, which they do – the empty relation is one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

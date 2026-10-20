@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Qsat.Tags
-import DescriptiveComplexity.Problems.Qsat.Defs
-import DescriptiveComplexity.Padding
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Qsat.Tags
+public import DescriptiveComplexity.Problems.Qsat.Defs
+public import DescriptiveComplexity.Padding
 
 /-!
 # The interpretation of the Savitch reduction
@@ -34,6 +36,8 @@ The section “Characterization of the interpreted relations” reads each of th
 back through `DescriptiveComplexity.FOInterpretation.relMap_map`; those lemmas are
 the only interface the correctness proof uses.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

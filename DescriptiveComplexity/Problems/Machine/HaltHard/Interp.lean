@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.Input
-import DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
-import DescriptiveComplexity.Problems.Machine.Defs
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.Input
+public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
+public import DescriptiveComplexity.Problems.Machine.Defs
 
 /-!
 # Drawing the simulating machine and its input page
@@ -26,6 +28,8 @@ a static sub-index that interleaves each bit cell with its fold cell.
 Unused coordinates are pinned to the minimum
 (`DescriptiveComplexity.Canon`), so cells enumerate exactly once.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

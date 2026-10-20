@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Pcp.Hardness.Draw
-import DescriptiveComplexity.Problems.Pcp.Cert
+module
+
+public import DescriptiveComplexity.Problems.Pcp.Hardness.Draw
+public import DescriptiveComplexity.Problems.Pcp.Cert
 
 /-!
 # The drawn instance has a match exactly when the machine accepts
@@ -42,6 +44,8 @@ back into the equality of the abstract words. Chained with
 correctness statement `DescriptiveComplexity.HaltPcp.pcpOn_iff_of_reads` the
 `Interp` file consumes.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

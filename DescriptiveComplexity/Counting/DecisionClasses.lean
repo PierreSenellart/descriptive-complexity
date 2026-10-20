@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Class
-import DescriptiveComplexity.Counting.KernelPair
+module
+
+public import DescriptiveComplexity.Counting.Class
+public import DescriptiveComplexity.Counting.KernelPair
 
 /-!
 # Decision classes defined by counting
@@ -48,6 +50,8 @@ closed under complement, by adding one witness to a kernel
 variables). Whether `C₌P` is closed under complement is open. The complete
 problems are in `DescriptiveComplexity.Problems.Sat.CountingDecision`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

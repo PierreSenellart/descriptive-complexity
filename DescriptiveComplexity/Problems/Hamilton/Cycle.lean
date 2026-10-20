@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Hamilton.Defs
-import Mathlib.Order.Fin.Basic
-import Mathlib.Data.Fintype.Sort
+module
+
+public import DescriptiveComplexity.Problems.Hamilton.Defs
+public import Mathlib.Order.Fin.Basic
+public import Mathlib.Data.Fintype.Sort
 
 /-!
 # A tour is a cyclic enumeration
@@ -23,6 +25,8 @@ the cyclic successor `f (nextIdx i)` (`DescriptiveComplexity.enum_of_tourOn`), w
 local structure – every vertex is left once and reached once – is what forces
 a gadget to be traversed the intended way.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

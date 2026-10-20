@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.NexBuild
-import DescriptiveComplexity.Problems.Wide.NexGuess
-import DescriptiveComplexity.Problems.Wide.NexDet
-import DescriptiveComplexity.Problems.Wide.DrawInit
-import DescriptiveComplexity.Problems.Wide.NexEval
-import DescriptiveComplexity.Problems.Wide.DrawRegion
+module
+
+public import DescriptiveComplexity.Problems.Wide.NexBuild
+public import DescriptiveComplexity.Problems.Wide.NexGuess
+public import DescriptiveComplexity.Problems.Wide.NexDet
+public import DescriptiveComplexity.Problems.Wide.DrawInit
+public import DescriptiveComplexity.Problems.Wide.NexEval
+public import DescriptiveComplexity.Problems.Wide.DrawRegion
 
 /-!
 # The clocked program's whole run, and its clock
@@ -62,6 +64,8 @@ is proved, not assumed:
 `nexEvalRuleF_postGuess`, and under it a chain of «this machinery leaves only
 into its own phases or its exit» lemmas, one per builder, down to the trips.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

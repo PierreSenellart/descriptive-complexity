@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTable
-import DescriptiveComplexity.Problems.Wide.Roam
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTable
+public import DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The region a clocked program works in, and its size
@@ -22,6 +24,8 @@ address has rank below `2 ^ (k · m)`, with `k` the number of argument blocks an
 `m` the number of tuples – the two numbers the clock's own arithmetic is written
 in (`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Taut
-import DescriptiveComplexity.Problems.ThreeSat.ToSat
-import DescriptiveComplexity.Problems.ThreeSat.FromSat
+module
+
+public import DescriptiveComplexity.Problems.Taut
+public import DescriptiveComplexity.Problems.ThreeSat.ToSat
+public import DescriptiveComplexity.Problems.ThreeSat.FromSat
 
 /-!
 # 3-DNF-TAUT is coNP-complete
@@ -58,6 +60,8 @@ Both problems are coNP-complete (`DescriptiveComplexity.ThreeDnfTAUT_coNP_comple
 `DescriptiveComplexity.ThreeUNSAT_coNP_complete`), with no second-order argument of
 their own.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

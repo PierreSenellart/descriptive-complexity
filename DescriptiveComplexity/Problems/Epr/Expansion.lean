@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Exponential.Expansion
-import DescriptiveComplexity.Exponential.Copies
-import DescriptiveComplexity.Problems.Epr.Small
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Exponential.Expansion
+public import DescriptiveComplexity.Exponential.Copies
+public import DescriptiveComplexity.Problems.Epr.Small
 
 /-!
 # The expansion whose points are the relations on the instance
@@ -30,6 +32,8 @@ The size is what the class needs: with `n` elements there are `2^(n²)` points,
 so a `Σ₁` sentence read here is a nondeterministic computation of exponential
 time in a *polynomial* of the instance, which is what NEXPTIME is.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

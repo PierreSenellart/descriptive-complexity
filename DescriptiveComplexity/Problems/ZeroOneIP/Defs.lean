@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Numbers.BinRel
-import DescriptiveComplexity.Interpretation
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Numbers.BinRel
+public import DescriptiveComplexity.Interpretation
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # 0-1 integer programming: definition
@@ -36,6 +38,8 @@ special case, so its NP-hardness gives his problem's a fortiori, while
 membership in NP for signed entries would need the two sides of each equation
 weighed separately and is not claimed.
 -/
+
+@[expose] public section
 
 /- The language of 0-1 integer programs lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.graph` and

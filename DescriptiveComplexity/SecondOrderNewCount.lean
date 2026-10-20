@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Data.Fintype.Card
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Data.Fintype.Card
 
 /-!
 # Surjectivity from a flip
@@ -27,6 +29,8 @@ That is the shape the exponential rung of value invention needs: *invent
 exponentially many* is not a condition a sentence states, it is a bound the
 definition carries, and this is where the bound is spent.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

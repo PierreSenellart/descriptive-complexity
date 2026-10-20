@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawDefExp
-import DescriptiveComplexity.Problems.Wide.DrawShape
-import DescriptiveComplexity.Problems.Wide.DrawTable
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawDefExp
+public import DescriptiveComplexity.Problems.Wide.DrawShape
+public import DescriptiveComplexity.Problems.Wide.DrawTable
 
 /-!
 # Writing the emitted machine down
@@ -35,6 +37,8 @@ What is left for the formula is the *shape* – a tuple is canonically padded
 (`DescriptiveComplexity.canonF`, read at the layout's `IsPad` by
 `DescriptiveComplexity.Draw.realize_canonF_isPad`) – and the payload.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

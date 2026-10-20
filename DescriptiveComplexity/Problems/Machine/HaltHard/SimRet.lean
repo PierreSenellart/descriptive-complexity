@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HaltHard.SimCons
+module
+
+public import DescriptiveComplexity.Problems.Machine.HaltHard.SimCons
 
 /-!
 # The pop phase of the simulation
@@ -21,6 +23,8 @@ ends either back at rest – for the pops that consume no code – or at the
 dispatch point of a child, where `DescriptiveComplexity.HaltHard.sim_norm`
 takes over.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

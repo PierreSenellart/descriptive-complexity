@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.HornTape
-import DescriptiveComplexity.Problems.Machine.Hardness
-import DescriptiveComplexity.Problems.HornSat
+module
+
+public import DescriptiveComplexity.Problems.Machine.HornTape
+public import DescriptiveComplexity.Problems.Machine.Hardness
+public import DescriptiveComplexity.Problems.HornSat
 
 /-!
 # The unit-propagation machine of a Horn formula
@@ -43,6 +45,8 @@ imported from `DescriptiveComplexity.Problems.Machine.Hardness` together with
 the clause-order machinery), and the only two additions are the element order
 (rounds walk it) and the Horn gate on the accept transition.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

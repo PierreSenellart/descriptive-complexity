@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Order.Lattice.Nat
-import Mathlib.Data.Set.Card
-import DescriptiveComplexity.Iterate
-import DescriptiveComplexity.SecondOrderHorn
-import DescriptiveComplexity.SecondOrderHornPull
-import DescriptiveComplexity.Padding
+module
+
+public import Mathlib.Order.Lattice.Nat
+public import Mathlib.Data.Set.Card
+public import DescriptiveComplexity.Iterate
+public import DescriptiveComplexity.SecondOrderHorn
+public import DescriptiveComplexity.SecondOrderHornPull
+public import DescriptiveComplexity.Padding
 
 /-!
 # FO(LFP): first-order logic with a least fixed point
@@ -80,6 +82,8 @@ Rules whose head is `none` derive nothing and are simply inert here, so an
 SO-Horn program can be handed over unchanged: its goal clauses reappear in the
 output formula.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

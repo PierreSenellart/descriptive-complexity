@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Feedback.Defs
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Feedback.Defs
 
 /-!
 # Hardness of the feedback problems
@@ -49,6 +51,8 @@ strict partial order out of another one, and no cycle is ever decomposed.
   since both have source vertex `u`; so both go forward in `Lt'`, and
   transitivity closes the case.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Vocabulary
-import DescriptiveComplexity.Problems.HornSat.Hardness
-import DescriptiveComplexity.FixedPoint
-import DescriptiveComplexity.FixedPointHorn
-import DescriptiveComplexity.LogSpace
-import DescriptiveComplexity.TransitiveClosure
+module
+
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Problems.HornSat.Hardness
+public import DescriptiveComplexity.FixedPoint
+public import DescriptiveComplexity.FixedPointHorn
+public import DescriptiveComplexity.LogSpace
+public import DescriptiveComplexity.TransitiveClosure
 
 /-!
 # Reachability, and the Horn fragment at work
@@ -64,6 +66,8 @@ logic closed under negation; at the Krom level the corresponding statement is
 (`DescriptiveComplexity.reach_mem_NL`, in
 `DescriptiveComplexity.ImmermanSzelepcsenyi`).
 -/
+
+@[expose] public section
 
 /- The vocabulary of graphs with marked sources and targets lives in Mathlib's
 `FirstOrder.Language` namespace, next to `Language.graph` – a project-local

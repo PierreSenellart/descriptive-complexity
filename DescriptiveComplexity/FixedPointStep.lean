@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Iterate
-import DescriptiveComplexity.FixedPoint
-import DescriptiveComplexity.SecondOrderTransitiveClosure
-import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+module
+
+public import DescriptiveComplexity.Iterate
+public import DescriptiveComplexity.FixedPoint
+public import DescriptiveComplexity.SecondOrderTransitiveClosure
+public import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 
 /-!
 # Simultaneous first-order inductions: one skeleton for IFP and PFP
@@ -70,6 +72,8 @@ block through a first-order interpretation
 the orbit; these are the lemmas isomorphism-invariance and closure under
 reductions rest on, for every logic built on this skeleton.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

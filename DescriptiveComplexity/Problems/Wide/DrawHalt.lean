@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawProg
-import DescriptiveComplexity.Problems.Machine.DetRun
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawProg
+public import DescriptiveComplexity.Problems.Machine.DetRun
 
 /-!
 # The accepting phase is a dead end
@@ -27,6 +29,8 @@ phase is such a phase – `OuterSh … .accept` is `Empty` – whence
 output a *rejection* rather than a detour, and it costs one case analysis on
 the tag of a transition rather than one per rule.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

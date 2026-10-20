@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Computability.Vocab
+module
+
+public import DescriptiveComplexity.Computability.Vocab
 
 /-!
 # Evaluating a formula on a concrete structure is primitive recursive
@@ -39,6 +41,8 @@ Valuations are `List ℕ` – the values of the bound variables, in de Bruijn
 order – rather than `Fin l → Univ`: a dependent function type would be
 encoded, at every recursive call, into exactly this list.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

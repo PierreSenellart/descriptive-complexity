@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawTrip
-import DescriptiveComplexity.Problems.Wide.DrawKit
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawTrip
+public import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # Kits for the round trips: the file test
@@ -31,6 +33,8 @@ scan phase, off the marker) and how it *leaves* the two verdict phases (at
 the marker, guarded `wk = one ∧ rg ≠ one`, disjoint from every rule here) is
 the caller's business.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

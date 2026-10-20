@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Computability.PartrecCode
-import Mathlib.Data.Fintype.Sort
-import DescriptiveComplexity.Computability.Eval
+module
+
+public import Mathlib.Computability.PartrecCode
+public import Mathlib.Data.Fintype.Sort
+public import DescriptiveComplexity.Computability.Eval
 
 /-!
 # The number an instance is written as, and the code that writes it
@@ -47,6 +49,8 @@ the tuple's coordinates down the nests reaches `1`. It is primitive recursive
 (`DescriptiveComplexity.primrec_structOf`), which is what lets the reduction
 compose with the semi-decision procedure of the source problem.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

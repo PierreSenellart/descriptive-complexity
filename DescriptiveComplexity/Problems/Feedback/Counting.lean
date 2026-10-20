@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Feedback.Reductions
-import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-import DescriptiveComplexity.Counting.Sized
-import DescriptiveComplexity.Counting.Subtractive
+module
+
+public import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Feedback.Reductions
+public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+public import DescriptiveComplexity.Counting.Sized
+public import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Feedback Vertex Set
@@ -42,6 +44,8 @@ turns every edge into a 2-cycle, so the feedback vertex sets of the output are
 the vertex covers of the input, the same sets
 (`DescriptiveComplexity.cover_iff_acyclic_symmetrized`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

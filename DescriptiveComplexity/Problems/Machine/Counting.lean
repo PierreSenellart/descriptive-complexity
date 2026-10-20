@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.Membership
-import DescriptiveComplexity.Problems.Sat.CountingHardness
+module
+
+public import DescriptiveComplexity.Problems.Machine.Membership
+public import DescriptiveComplexity.Problems.Sat.CountingHardness
 
 /-!
 # Counting the accepting runs of a machine
@@ -37,6 +39,8 @@ The converse reduction is in
 parsimoniously `#P`-complete and `#P` the class of the problems reducing to
 it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ThreeColorability.CountGadget
-import DescriptiveComplexity.Problems.ThreeColorability.Counting
-import DescriptiveComplexity.Problems.Sat.CountingHardness
-import DescriptiveComplexity.OccurrenceFormulas
-import DescriptiveComplexity.OccurrencePrefix
-import DescriptiveComplexity.Counting.Reduction
+module
+
+public import DescriptiveComplexity.Problems.ThreeColorability.CountGadget
+public import DescriptiveComplexity.Problems.ThreeColorability.Counting
+public import DescriptiveComplexity.Problems.Sat.CountingHardness
+public import DescriptiveComplexity.OccurrenceFormulas
+public import DescriptiveComplexity.OccurrencePrefix
+public import DescriptiveComplexity.Counting.Reduction
 
 /-!
 # #3-Colorability is one-call `#P`-complete
@@ -22,6 +24,8 @@ proper 3-colorings is `6 · 8 ^ g` times the number of models, `g` the number of
 non-first occurrences, a definable cardinality: one division recovers #SAT
 (`DescriptiveComplexity.sharpSat_oneCall_sharpThreeCol`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

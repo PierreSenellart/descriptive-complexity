@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Counting.Reduction
+module
+
+public import DescriptiveComplexity.Counting.Reduction
 
 /-!
 # Restricting a counting problem to a definable class of instances
@@ -17,6 +19,8 @@ the kernel (`DescriptiveComplexity.SharpPDefinable.restrict`), and one-call
 hardness, by any one-call reduction whose outputs all lie in the class
 (`DescriptiveComplexity.OneCallReduction.restrict`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

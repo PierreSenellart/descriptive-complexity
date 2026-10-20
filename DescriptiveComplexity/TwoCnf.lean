@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Logic.Relation
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Fintype.EquivFin
+module
+
+public import Mathlib.Logic.Relation
+public import Mathlib.Data.Finset.Basic
+public import Mathlib.Data.Fintype.EquivFin
 
 /-!
 # The criterion for 2-satisfiability, abstractly
@@ -39,6 +41,8 @@ the new part into the forbidden cycle and a clash with the old part into a
 variable that was already decided. Deciding every variable in turn gives the
 assignment, and closedness makes every clause true.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

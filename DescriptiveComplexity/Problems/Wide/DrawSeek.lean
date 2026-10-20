@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawAdv
-import DescriptiveComplexity.Problems.Wide.DrawTrip
-import DescriptiveComplexity.Problems.Wide.IxAddr
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawAdv
+public import DescriptiveComplexity.Problems.Wide.DrawTrip
+public import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # Random access: seeking the working cell to a target address
@@ -42,6 +44,8 @@ loop; their disjointness at the program level is by the guards (`wk` set vs
 clear, `rl` set vs clear, register vs working area), as everywhere in the
 layer.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

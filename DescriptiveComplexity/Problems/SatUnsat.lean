@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Sat
-import DescriptiveComplexity.Difference
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Sat
+public import DescriptiveComplexity.Difference
 
 /-!
 # SAT-UNSAT, the canonical DP problem
@@ -50,6 +52,8 @@ half and that of the complement of the `Π₁` half, run side by side into a
 single paired instance. The lemma below on satisfiability along a
 clause-covering embedding is the step it needs.
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 

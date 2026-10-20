@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TransitiveClosure
+module
+
+public import DescriptiveComplexity.TransitiveClosure
 
 /-!
 # FO(DTC): first-order logic with deterministic transitive closure
@@ -56,6 +58,8 @@ competitor), the resulting definability notion
 `DescriptiveComplexity.DTCDefinable.tcDefinable` – the future `L ⊆ NL`, a one-liner
 because a determinized specification *is* a specification.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

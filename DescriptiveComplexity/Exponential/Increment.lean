@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.OrdFormula
+module
+
+public import DescriptiveComplexity.Exponential.OrdFormula
 
 /-!
 # The binary increment on a block's atoms
@@ -52,6 +54,8 @@ Accordingly the sentence takes its lexicographic comparisons on the
 **truncated** selectors: `DescriptiveComplexity.lexSelLtF` accepts a selector of
 any width, so the atoms it compares are the real ones.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 
@@ -165,7 +169,7 @@ comparing those representatives is comparing the real atoms. -/
 section RealAtoms
 
 /-- The least element of a finite nonempty linear order. -/
-private noncomputable def minEl (A : Type) [LinearOrder A] [Finite A] [Nonempty A] : A :=
+noncomputable def minEl (A : Type) [LinearOrder A] [Finite A] [Nonempty A] : A :=
   (Finite.exists_min (id : A → A)).choose
 
 private theorem minEl_le {A : Type} [LinearOrder A] [Finite A] [Nonempty A] (a : A) :

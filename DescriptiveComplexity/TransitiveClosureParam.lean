@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.FixedPointInflationary
-import DescriptiveComplexity.TransitiveClosure
+module
+
+public import DescriptiveComplexity.FixedPointInflationary
+public import DescriptiveComplexity.TransitiveClosure
 
 /-!
 # Transitive closures with parameters, as relations a formula may read
@@ -57,6 +59,8 @@ node”, with the walk itself now an atom rather than an operator
 property is thereby available to an FO(TC) reduction as a formula, which is how
 `DescriptiveComplexity.EVEN` enters `DescriptiveComplexity.TCReduction`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

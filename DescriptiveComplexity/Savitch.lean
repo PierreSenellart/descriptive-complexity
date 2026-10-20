@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.SetTheory.Cardinal.Finite
-import Mathlib.Logic.Relation
+module
+
+public import Mathlib.SetTheory.Cardinal.Finite
+public import Mathlib.Logic.Relation
 
 /-!
 # Savitch's recursive doubling
@@ -37,6 +39,8 @@ shortened. Together they give the statement a reduction uses,
 `DescriptiveComplexity.savPow_of_reflTransGen`: as soon as `2 ^ k` classes are
 enough, `SavPow k` *is* reachability.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

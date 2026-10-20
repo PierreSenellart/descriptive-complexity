@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderLift
+module
+
+public import DescriptiveComplexity.SecondOrderLift
 
 /-!
 # Existential second-order logic with value invention
@@ -66,6 +68,8 @@ collapse into RE rather than stack. (That collapse is a semantic remark, not a
 theorem here: proving it inside the logic needs the same encoding as the
 inclusion RE ⊆ `∃SO[new]`.)
 -/
+
+@[expose] public section
 
 namespace FirstOrder
 
@@ -265,7 +269,7 @@ section NoNew
 variable (L : Language.{0, 0})
 
 /-- The atom `old x`, over the extended vocabulary. -/
-private def oldF {α : Type} (x : α) : (newLang L).Formula α :=
+def oldF {α : Type} (x : α) : (newLang L).Formula α :=
   Relations.formula₁ (Sum.inr Language.oldSym) (Term.var x)
 
 /-- The sentence “nothing was invented”: every element of the universe is an

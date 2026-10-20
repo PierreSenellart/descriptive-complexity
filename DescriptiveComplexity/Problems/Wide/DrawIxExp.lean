@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstExp
-import DescriptiveComplexity.Problems.Wide.IxAddr
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstExp
+public import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # The expansion atoms at an arbitrary file
@@ -28,6 +30,8 @@ one **coherence** hypothesis – the element a register holds the bit of is the
 element its name spells – and everything the semantics says of an elementwise
 run then says of this one.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

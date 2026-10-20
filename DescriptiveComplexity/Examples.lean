@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Examples.ConjunctiveQueries
-import DescriptiveComplexity.Examples.GraphCrawling
-import DescriptiveComplexity.Examples.ProbabilisticQueries
+module
+
+public import DescriptiveComplexity.Examples.ConjunctiveQueries
+public import DescriptiveComplexity.Examples.GraphCrawling
+public import DescriptiveComplexity.Examples.ProbabilisticQueries
 
 /-!
 # Worked examples
@@ -44,3 +46,5 @@ to be read top to bottom as a template for new formalizations.
   identity turning the complement into a quantitative term with no
   subtraction.
 -/
+
+@[expose] public section

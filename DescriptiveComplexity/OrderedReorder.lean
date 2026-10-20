@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OrderedComposition
-import DescriptiveComplexity.Numbers.BinRel
+module
+
+public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Replacing the order of an ordered structure by a definable one
@@ -23,6 +25,8 @@ the universe – the tape order of `DescriptiveComplexity.DTMNumber` – can be
 composed after one that produces the order of significance as a relation of
 the instance: the second reduction reorders its input so that the two agree.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

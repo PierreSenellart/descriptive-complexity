@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawFactor
-import DescriptiveComplexity.Problems.Wide.DrawIncrKit
-import DescriptiveComplexity.Problems.Wide.DrawSeekKit
-import DescriptiveComplexity.Problems.Wide.DrawAdvKit
-import DescriptiveComplexity.Problems.Wide.DrawSweepKit
-import DescriptiveComplexity.Problems.Wide.DrawReset
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawFactor
+public import DescriptiveComplexity.Problems.Wide.DrawIncrKit
+public import DescriptiveComplexity.Problems.Wide.DrawSeekKit
+public import DescriptiveComplexity.Problems.Wide.DrawAdvKit
+public import DescriptiveComplexity.Problems.Wide.DrawSweepKit
+public import DescriptiveComplexity.Problems.Wide.DrawReset
 
 /-!
 # Every leaf kit's rules are definable
@@ -30,6 +32,8 @@ The kits are stated at a *family* of kits, one per environment: the slots, the
 phase embedding and the shape are the same at every instance – they are what an
 interpretation's tag decides – and only the parameters vary with it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

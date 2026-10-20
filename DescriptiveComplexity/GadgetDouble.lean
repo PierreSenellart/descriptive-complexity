@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.TwoCopies
-import DescriptiveComplexity.Relativize
+module
+
+public import DescriptiveComplexity.TwoCopies
+public import DescriptiveComplexity.Relativize
 
 /-!
 # Doubling a gadget: one construction, run on each side
@@ -30,6 +32,8 @@ have to cross a language reduct and the restriction a `Substructure` coercion,
 and the two identifications would then have to be composed with the subtype the
 side structures are actually stated on.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

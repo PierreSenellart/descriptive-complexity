@@ -3,12 +3,14 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.CliqueFamily.Defs
-import DescriptiveComplexity.Problems.CliqueFamily.Reductions
-import DescriptiveComplexity.Problems.CliqueFamily.Membership
-import DescriptiveComplexity.Problems.CliqueFamily.FromSat
-import DescriptiveComplexity.Problems.Sat.Hardness
-import DescriptiveComplexity.Composition
+module
+
+public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
+public import DescriptiveComplexity.Problems.CliqueFamily.Membership
+public import DescriptiveComplexity.Problems.CliqueFamily.FromSat
+public import DescriptiveComplexity.Problems.Sat.Hardness
+public import DescriptiveComplexity.Composition
 
 /-!
 # The clique family is NP-complete
@@ -36,6 +38,8 @@ forward along the quantifier-free inter-reductions, yielding
 statement, these results are about finite marked graphs only
 (`ComplexityClass.mem_congr_finite`/`hard_congr_finite`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

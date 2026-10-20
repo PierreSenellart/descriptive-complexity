@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelEval
-import DescriptiveComplexity.Problems.Wide.RegChannelPad
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelEval
+public import DescriptiveComplexity.Problems.Wide.RegChannelPad
 
 /-!
 # The two legs, joined at any program with the clocked rules
@@ -23,6 +25,8 @@ predicate. So the program a reduction emits and the *padded* one that buys the
 clock its room (`RegChannelPad.lean`) are both instances of one statement, and
 nothing here has to be proved twice.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

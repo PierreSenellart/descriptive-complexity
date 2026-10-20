@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Tiling.Defs
+module
+
+public import DescriptiveComplexity.Problems.Tiling.Defs
 
 /-!
 # Tiling a corridor: the same tiles, one dimension unbounded
@@ -30,6 +32,8 @@ walk of that shape is exactly what `DescriptiveComplexity.SOTCSpec` describes,
 which is why the height is a plain `ℕ` here and not a coordinate of the
 instance: nothing in the problem bounds it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

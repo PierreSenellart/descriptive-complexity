@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawInstExp
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawInstExp
 
 /-!
 # The gates, instantiated: the domain evaluation of one block
@@ -21,6 +23,8 @@ The layer mirrors `DescriptiveComplexity.Problems.Wide.DrawInstExp` with two
 differences: every read walks the MIRROR track, and the exit **conjoins**
 into the gates' flag, so one failing block fails the address.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.SecondOrderMerge
+module
+
+public import DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # A quantifier prefix of `k` copies of one block
@@ -34,6 +36,8 @@ Nothing here is specific to a block: the symbol and the assignment are built by
 the same recursion on `k`, so the reading lemma is `Iff.rfl` at the head and the
 induction hypothesis at the tail.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

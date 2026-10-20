@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.OrderWalk
-import Mathlib.Algebra.BigOperators.Finprod
+module
+
+public import DescriptiveComplexity.OrderWalk
+public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Binary numbers as sets of positions, and sweeps along an order
@@ -32,6 +34,8 @@ The semantic layer of the normal form of FP
   which is what lets its defining condition be an arbitrary one, negations
   included.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

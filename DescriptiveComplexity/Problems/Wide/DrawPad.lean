@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Exponential.AltQuant
+module
+
+public import DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # Levels a prefix's matrix does not read
@@ -34,6 +36,8 @@ above `j`, so what the matrix does below them is the caller's business.
 Everything here is about `DescriptiveComplexity.altQuantFrom` alone; no
 machine, no encoding.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

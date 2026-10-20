@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.HeadProgram
+module
+
+public import DescriptiveComplexity.HeadProgram
 
 /-!
 # Evaluating a first-order formula with heads
@@ -61,6 +63,8 @@ hypothesis. The result, `DescriptiveComplexity.HeadProgram.decides_evalP`, is a
 deterministic – a sweep is not a guess – which is what lets the same evaluator
 serve the deterministic capture.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

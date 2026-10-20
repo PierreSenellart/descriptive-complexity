@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegFile
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # Walking the register file
@@ -71,6 +73,8 @@ the generalization free: a walk never holds an index anywhere the machine can
 see, only its caller does. Two linear orders separate in the general form – the
 addresses' and the index's – and a statement that needs only one says so.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

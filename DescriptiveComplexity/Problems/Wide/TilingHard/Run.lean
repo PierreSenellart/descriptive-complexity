@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.TilingHard.Grid
-import DescriptiveComplexity.Problems.Wide.TrackWrites
-import DescriptiveComplexity.Problems.Wide.Roam
-import DescriptiveComplexity.Problems.Wide.LowFile
+module
+
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Grid
+public import DescriptiveComplexity.Problems.Wide.TrackWrites
+public import DescriptiveComplexity.Problems.Wide.Roam
+public import DescriptiveComplexity.Problems.Wide.LowFile
 
 /-!
 # A run, read as a table of tiles
@@ -29,6 +31,8 @@ of its universe – `Sum.inr` points – and a tile stores the *element*, so the
 reading `DescriptiveComplexity.TilingHard.wpElt` is used throughout, and loses
 nothing: a mark or an attribute of the instance holds of no address.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

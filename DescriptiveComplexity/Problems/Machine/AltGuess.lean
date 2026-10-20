@@ -3,7 +3,9 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Machine.AltRead
+module
+
+public import DescriptiveComplexity.Problems.Machine.AltRead
 
 /-!
 # A round of the game, played by either player
@@ -28,6 +30,8 @@ with no term at all has nothing to check and nothing to accept. That is
 `DescriptiveComplexity.AltQbf.CanHandOver`, and it is exactly the case where the
 formula is false.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.DrawName
-import DescriptiveComplexity.Problems.Wide.DrawOrd
+module
+
+public import DescriptiveComplexity.Problems.Wide.DrawName
+public import DescriptiveComplexity.Problems.Wide.DrawOrd
 
 /-!
 # What a comparison loop decides
@@ -35,6 +37,8 @@ The bridge underneath is `padLt_iff`: padding is an order embedding of the
 `dd₀`-tuples the control enumerates into the `dd`-tuples the cells are, since
 two padded tuples agree beyond `dd₀` and so are compared inside it.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

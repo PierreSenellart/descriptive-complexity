@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.OneInSat.Defs
-import DescriptiveComplexity.Problems.ThreeSat.ToSat
+module
+
+public import DescriptiveComplexity.Problems.OneInSat.Defs
+public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # The three slots of a clause
@@ -21,6 +23,8 @@ The formulas defining `NthOcc` over the ordered expansion, and their
 realization lemmas, are here too: they are built from `minOccF` and `succOccF`
 of `DescriptiveComplexity.OccurrenceFormulas`.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

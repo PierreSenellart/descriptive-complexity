@@ -3,10 +3,12 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.Wide.RegChannelAccept
-import DescriptiveComplexity.Problems.Wide.RegChannelWalk
-import DescriptiveComplexity.Problems.Wide.SpineSav
-import DescriptiveComplexity.Problems.Wide.DrawYes
+module
+
+public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
+public import DescriptiveComplexity.Problems.Wide.RegChannelWalk
+public import DescriptiveComplexity.Problems.Wide.SpineSav
+public import DescriptiveComplexity.Problems.Wide.DrawYes
 
 /-!
 # The handed program accepts, from the sentence alone
@@ -23,6 +25,8 @@ This file supplies all of those, so that what is left of the run is what the
 *reduction* decides: the assignment its guess writes, the sentence being true,
 the order on the expanded universe, and the three numbers of the clock.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

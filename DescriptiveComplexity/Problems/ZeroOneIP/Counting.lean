@@ -3,8 +3,10 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Problems.ZeroOneIP.Membership
-import DescriptiveComplexity.Counting.Class
+module
+
+public import DescriptiveComplexity.Problems.ZeroOneIP.Membership
+public import DescriptiveComplexity.Counting.Class
 
 /-!
 # #0-1 integer programming: counting the `0-1` solutions
@@ -20,6 +22,8 @@ of a certificate are forced where they are read
 so a solution has exactly one certificate
 (`DescriptiveComplexity.zeroOneIPEquiv`).
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

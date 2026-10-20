@@ -3,9 +3,11 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Problems.Machine.Defs
-import DescriptiveComplexity.PSpace
+module
+
+public import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Problems.Machine.Defs
+public import DescriptiveComplexity.PSpace
 
 /-!
 # The space-bounded machine problems are in PSPACE
@@ -36,6 +38,8 @@ holds of every assignment coming from a configuration, and the transition
 sentence demands it of the state it moves to, so every state along an accepting
 walk is a configuration.
 -/
+
+@[expose] public section
 
 namespace DescriptiveComplexity
 

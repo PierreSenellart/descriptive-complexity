@@ -3,17 +3,32 @@ Copyright (c) 2026 Pierre Senellart. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Pierre Senellart
 -/
-import Mathlib.Data.Fintype.Lattice
-import Mathlib.Tactic.FinCases
-import DescriptiveComplexity.Block
-import DescriptiveComplexity.Syntax
-import DescriptiveComplexity.Encoding
-import DescriptiveComplexity.Decoding
-import DescriptiveComplexity.SecondOrder
-import DescriptiveComplexity.Ordered
-import DescriptiveComplexity.OrderWalk
-import DescriptiveComplexity.Problems.Steiner.Defs
-import DescriptiveComplexity.Problems.SetFamily
+module
+
+public import Mathlib.Data.Fintype.Lattice
+meta import Mathlib.Data.Fintype.Lattice
+public import Mathlib.Tactic.FinCases
+meta import Mathlib.Tactic.FinCases
+public import DescriptiveComplexity.Block
+meta import DescriptiveComplexity.Block
+public import DescriptiveComplexity.Syntax
+meta import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.Encoding
+meta import DescriptiveComplexity.Encoding
+public import DescriptiveComplexity.Decoding
+meta import DescriptiveComplexity.Decoding
+public import DescriptiveComplexity.SecondOrder
+meta import DescriptiveComplexity.SecondOrder
+public import DescriptiveComplexity.Ordered
+meta import DescriptiveComplexity.Ordered
+public import DescriptiveComplexity.OrderWalk
+meta import DescriptiveComplexity.OrderWalk
+public import DescriptiveComplexity.Problems.Steiner.Defs
+meta import DescriptiveComplexity.Problems.Steiner.Defs
+public import DescriptiveComplexity.Problems.SetFamily
+meta import DescriptiveComplexity.Problems.SetFamily
+public import Mathlib.Data.Finset.Sort
+meta import Mathlib.Data.Finset.Sort
 
 /-!
 # Worked example: web crawling – data acquisition as graph crawling
@@ -70,6 +85,8 @@ Main results:
   **`DescriptiveComplexity.crawlWF_NP_complete`**: the computable decoding of
   well-formed (single-root) websites, and completeness restricted to them.
 -/
+
+@[expose] public section
 
 /-!
 ### Step 1: the concrete problem, in the user's own formalism
@@ -258,15 +275,15 @@ open Classical in
 reachable (and `0` when it is not reachable at all, a value the certificate
 never looks at). Same device as in `DescriptiveComplexity.Problems.Steiner.Defs`,
 over the directed step relation. -/
-private noncomputable def rdist (R : A → A → Prop) (r x : A) : ℕ :=
+noncomputable def crawlRdist (R : A → A → Prop) (r x : A) : ℕ :=
   if h : ∃ n, reachIn R n r x then Nat.find h else 0
 
 private theorem rdist_step {R : A → A → Prop} {r x : A}
     (hx : Relation.ReflTransGen R r x) (hne : x ≠ r) :
-    ∃ z, R z x ∧ rdist R r z < rdist R r x := by
+    ∃ z, R z x ∧ crawlRdist R r z < crawlRdist R r x := by
   classical
   have hex : ∃ n, reachIn R n r x := (reflTransGen_iff_exists_reachIn R r x).mp hx
-  have hd : rdist R r x = Nat.find hex := dite_eq_left hex
+  have hd : crawlRdist R r x = Nat.find hex := dite_eq_left hex
   have hfind : reachIn R (Nat.find hex) r x := Nat.find_spec hex
   rcases hn : Nat.find hex with _ | m
   · rw [hn] at hfind
@@ -278,8 +295,8 @@ private theorem rdist_step {R : A → A → Prop} {r x : A}
       omega
     · refine ⟨z, hzx, ?_⟩
       have hzex : ∃ n, reachIn R n r z := ⟨m, hz⟩
-      have hle : rdist R r z ≤ m := by
-        rw [rdist, dite_eq_left hzex]
+      have hle : crawlRdist R r z ≤ m := by
+        rw [crawlRdist, dite_eq_left hzex]
         exact Nat.find_le hz
       rw [hd, hn]
       omega
@@ -297,7 +314,7 @@ theorem reachesAllOn_iff_exists_order [Finite A] (Adjp : A → A → Prop) (r : 
       ∀ x, S x → x ≠ r → ∃ y, S y ∧ Adjp y x ∧ Lt y x := by
   constructor
   · intro hreach
-    refine ⟨fun y x => rdist (DiLink Adjp S) r y < rdist (DiLink Adjp S) r x,
+    refine ⟨fun y x => crawlRdist (DiLink Adjp S) r y < crawlRdist (DiLink Adjp S) r x,
       fun _ _ _ h₁ h₂ => lt_trans h₁ h₂, fun _ => lt_irrefl _, fun x hx hne => ?_⟩
     obtain ⟨z, hzx, hlt⟩ := rdist_step (hreach x hx) hne
     exact ⟨z, hzx.1, hzx.2.2, hlt⟩
@@ -878,43 +895,43 @@ fo_block crawlGuessBlock over Language.siteGraph ws into crawlSOLang with kCr wh
 /-! ### The clauses -/
 
 /-- Kernel clause: every target is crawled. -/
-private noncomputable def crTargetClause : crawlSOLang.Sentence :=
+noncomputable def crTargetClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrTargetSym(x) → kCrSetSym(x)
 
 /-- Kernel clause: some root is guessed. -/
-private noncomputable def crRootExistsClause : crawlSOLang.Sentence :=
+noncomputable def crRootExistsClause : crawlSOLang.Sentence :=
   fo% ∃ x, kCrStartSym(x)
 
 /-- Kernel clause: the guessed root carries the vocabulary's root mark and is
 crawled. -/
-private noncomputable def crRootClause : crawlSOLang.Sentence :=
+noncomputable def crRootClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrStartSym(x) → kCrRootSym(x) ∧ kCrSetSym(x)
 
 /-- Kernel clause: there is at most one guessed root. -/
-private noncomputable def crRootUniqueClause : crawlSOLang.Sentence :=
+noncomputable def crRootUniqueClause : crawlSOLang.Sentence :=
   fo% ∀ x y, kCrStartSym(x) ∧ kCrStartSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
-private noncomputable def crTransClause : crawlSOLang.Sentence :=
+noncomputable def crTransClause : crawlSOLang.Sentence :=
   fo% ∀ x y z, kCrOrderSym(x, y) ∧ kCrOrderSym(y, z) → kCrOrderSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
-private noncomputable def crIrreflClause : crawlSOLang.Sentence :=
+noncomputable def crIrreflClause : crawlSOLang.Sentence :=
   fo% ∀ x, ¬ kCrOrderSym(x, x)
 
 /-- Kernel clause: every crawled non-root page is linked from a crawled page
 strictly below it. -/
-private noncomputable def crStepClause : crawlSOLang.Sentence :=
+noncomputable def crStepClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrSetSym(x) ∧ ¬ kCrStartSym(x) →
     ∃ y, (kCrSetSym(y) ∧ kCrEdgeSym(y, x)) ∧ kCrOrderSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every crawled page to a marked
 element. -/
-private noncomputable def crTotalClause : crawlSOLang.Sentence :=
+noncomputable def crTotalClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrSetSym(x) → ∃ y, kCrInjSym(x, y) ∧ kCrMarkedSym(y)
 
 /-- Kernel clause: the guessed injection is injective. -/
-private noncomputable def crInjClause : crawlSOLang.Sentence :=
+noncomputable def crInjClause : crawlSOLang.Sentence :=
   fo% ∀ x y z, kCrInjSym(x, z) ∧ kCrInjSym(y, z) → x ≐ y
 
 /-- The first-order kernel of the `Σ₁` definition of Graph Crawling. -/
@@ -930,7 +947,7 @@ variable {A : Type} [Language.siteGraph.Structure A]
   (ρ : crawlGuessBlock.Assignment A)
 
 /-- Realization at a structure expanded by an assignment of the block. -/
-private abbrev CRealize (φ : crawlSOLang.Sentence) : Prop :=
+abbrev CRealize (φ : crawlSOLang.Sentence) : Prop :=
   @Sentence.Realize crawlSOLang A
     (@sumStructure _ _ A _ (crawlGuessBlock.structure ρ)) φ
 
