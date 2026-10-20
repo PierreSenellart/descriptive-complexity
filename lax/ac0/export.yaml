@@ -1,0 +1,141 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: v1.2.2
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.AC0Definable.compl
+- DescriptiveComplexity.FODefinable.ac0Definable
+- DescriptiveComplexity.ac0Definable_congr
+- DescriptiveComplexity.AC0Definable.bitDefinable
+- DescriptiveComplexity.BitDefinable.ac0Definable
+- DescriptiveComplexity.AC0Definable.dtcDefinable
+- DescriptiveComplexity.ac0Definable_mem_NL
+- DescriptiveComplexity.ac0Definable_mem_PTIME
+- DescriptiveComplexity.AC0Definable.lfpDefinable
+- DescriptiveComplexity.AC0Definable.ifpDefinable
+- DescriptiveComplexity.BitDefinable.ltDecidable
+- DescriptiveComplexity.LTDecidable.bitDefinable
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: AC⁰ as a logic'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @article{barrington1990uniformity,
+      author       = {David A. Mix Barrington and
+                      Neil Immerman and
+                      Howard Straubing},
+      title        = {On Uniformity within {NC$^1$}},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {41},
+      number       = {3},
+      pages        = {274--306},
+      year         = {1990},
+      doi          = {10.1016/0022-0000(90)90022-D}
+    }
+  - |
+    @inproceedings{sipser1983borel,
+      author       = {Michael Sipser},
+      editor       = {David S. Johnson and
+                      Ronald Fagin and
+                      Michael L. Fredman and
+                      David Harel and
+                      Richard M. Karp and
+                      Nancy A. Lynch and
+                      Christos H. Papadimitriou and
+                      Ronald L. Rivest and
+                      Walter L. Ruzzo and
+                      Joel I. Seiferas},
+      title        = {Borel Sets and Circuit Complexity},
+      booktitle    = {Proceedings of the 15th Annual {ACM} Symposium on Theory of Computing,
+                      25-27 April, 1983, Boston, Massachusetts, {USA}},
+      pages        = {61--69},
+      publisher    = {{ACM}},
+      year         = {1983},
+      doi          = {10.1145/800061.808733}
+    }
+  - |
+    @article{ruzzo1981uniform,
+      author       = {Walter L. Ruzzo},
+      title        = {On Uniform Circuit Complexity},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {22},
+      number       = {3},
+      pages        = {365--383},
+      year         = {1981},
+      doi          = {10.1016/0022-0000(81)90038-6}
+    }
+  - |
+    @book{immerman1999descriptive,
+      author       = {Neil Immerman},
+      title        = {Descriptive Complexity},
+      series       = {Graduate Texts in Computer Science},
+      publisher    = {Springer},
+      year         = {1999},
+      isbn         = {978-1-4612-6809-3},
+      doi          = {10.1007/978-1-4612-0539-5},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+restated:
+  DescriptiveComplexity.arithStructure: ArithmeticLogic.arithStructure
+  DescriptiveComplexity.AC0Definable: ArithmeticLogic.AC0Definable
+  FirstOrder.Language.arithRel: ArithmeticLogic.arithRel
+  FirstOrder.Language.arith: ArithmeticLogic.arith
+  FirstOrder.Language.instIsRelationalArith: ArithmeticLogic.instIsRelationalArith
+  DescriptiveComplexity.orank: BitPredicate.orank
+  DescriptiveComplexity.posCount: BitPredicate.posCount
+  DescriptiveComplexity.BitIx: BitPredicate.BitIx
+  DescriptiveComplexity.BitAtom: BitLogic.BitAtom
+  DescriptiveComplexity.BitAtom.Holds: BitLogic.BitAtom.Holds
+  DescriptiveComplexity.BitKernel: BitLogic.BitKernel
+  DescriptiveComplexity.BitKernel.Holds: BitLogic.BitKernel.Holds
+  DescriptiveComplexity.BitSentence: BitLogic.BitSentence
+  DescriptiveComplexity.BitSentence.Holds: BitLogic.BitSentence.Holds
+  DescriptiveComplexity.BitDefinable: BitLogic.BitDefinable
+  DescriptiveComplexity.BaseTest: LogTimeMachines.BaseTest
+  DescriptiveComplexity.BaseTest.Holds: LogTimeMachines.BaseTest.Holds
+  DescriptiveComplexity.BitExpr: LogTimeMachines.BitExpr
+  DescriptiveComplexity.BitExpr.eval: LogTimeMachines.BitExpr.eval
+  DescriptiveComplexity.Sweep: LogTimeMachines.Sweep
+  DescriptiveComplexity.Sweep.Accepts: LogTimeMachines.Sweep.Accepts
+  DescriptiveComplexity.LTMachine: LogTimeMachines.LTMachine
+  DescriptiveComplexity.LTMachine.Accepts: LogTimeMachines.LTMachine.Accepts
+  DescriptiveComplexity.prefixHolds: BitPredicate.prefixHolds
+  DescriptiveComplexity.LTDecidable: LogTimeMachines.LTDecidable
+  DescriptiveComplexity.Sweep.state: LogTimeMachines.Sweep.state

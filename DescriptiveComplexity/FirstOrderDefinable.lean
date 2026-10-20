@@ -65,7 +65,9 @@ theorem foDefinable_congr {P Q : DecisionProblem L}
   · exact (h A).trans (hφ A)
 
 /-- An order-free first-order definition is in particular an order-invariant
-one: the order symbol is simply not used. -/
+one: the order symbol is simply not used.
+Registered in the Lax archive as
+[`Lax945089.EvenNotFirstOrder.foDefinableFree_foDefinable`](https://laxarchive.org/lax-945089/Lax945089.EvenNotFirstOrder.html#s-Lax945089.EvenNotFirstOrder.foDefinableFree_foDefinable). -/
 theorem FODefinableFree.foDefinable {P : DecisionProblem L} (h : FODefinableFree P) :
     FODefinable P := by
   obtain ⟨φ, hφ⟩ := h

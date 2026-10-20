@@ -408,7 +408,9 @@ theorem pfpHolds_liftOrder :
 end StepDef
 
 /-- **Order-free FO(IFP) definability implies ordered definability**: the
-induction ignores the order. -/
+induction ignores the order.
+Registered in the Lax archive as
+[`Lax134656.InflationaryInPartial.ifpDefinableFree_ifpDefinable`](https://laxarchive.org/lax-134656/Lax134656.InflationaryInPartial.html#s-Lax134656.InflationaryInPartial.ifpDefinableFree_ifpDefinable). -/
 theorem IFPDefinableFree.ifpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : IFPDefinableFree P) : IFPDefinable P := by
   obtain ⟨d, hd⟩ := h
@@ -417,7 +419,9 @@ theorem IFPDefinableFree.ifpDefinable [L.IsRelational] {P : DecisionProblem L}
   exact (hd A).trans (d.ifpHolds_liftOrder).symm
 
 /-- **Order-free FO(PFP) definability implies ordered definability**: the
-induction ignores the order. -/
+induction ignores the order.
+Registered in the Lax archive as
+[`Lax134656.InflationaryInPartial.pfpDefinableFree_pfpDefinable`](https://laxarchive.org/lax-134656/Lax134656.InflationaryInPartial.html#s-Lax134656.InflationaryInPartial.pfpDefinableFree_pfpDefinable). -/
 theorem PFPDefinableFree.pfpDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : PFPDefinableFree P) : PFPDefinable P := by
   obtain ⟨d, hd⟩ := h

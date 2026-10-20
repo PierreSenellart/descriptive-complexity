@@ -72,6 +72,14 @@ def Satisfiable : Prop :=
   ∃ ν : A → Prop, ∀ c : A, RelMap satIsClause ![c] →
     ∃ x : A, (RelMap satPosIn ![c, x] ∧ ν x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν x)
 
+/-- The element `x` is a variable of the CNF formula: it occurs, positively or
+negatively, in some clause. The decision problem does not need the notion –
+an element in no clause is harmless – but everything that *counts* assignments
+does, and so does any reduction that must not give such an element a truth
+value to choose. -/
+def SatOccurs (x : A) : Prop :=
+  ∃ c : A, RelMap satIsClause ![c] ∧ (RelMap satPosIn ![c, x] ∨ RelMap satNegIn ![c, x])
+
 end Sat
 
 section Iso

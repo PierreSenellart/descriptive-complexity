@@ -164,7 +164,9 @@ theorem dtmAccept_PTIME_hard : PTIME.Hard DTMAccept :=
 /-- **Deterministic machine acceptance is PTIME-complete**: the analogue of
 `DescriptiveComplexity.ntmAccept_NP_complete` one level down. The library's
 polynomial time is defined by the Horn fragment; this theorem is the bridge
-saying it is the machine one. -/
+saying it is the machine one.
+Registered in the Lax archive as
+[`Lax535992.DeterministicMachinePTIMEComplete.dtmAccept_PTIME_complete`](https://laxarchive.org/lax-535992/Lax535992.DeterministicMachinePTIMEComplete.html#s-Lax535992.DeterministicMachinePTIMEComplete.dtmAccept_PTIME_complete). -/
 theorem dtmAccept_PTIME_complete : PTIME.Complete DTMAccept :=
   ⟨dtmAccept_mem_PTIME, dtmAccept_PTIME_hard⟩
 
@@ -172,7 +174,9 @@ theorem dtmAccept_PTIME_complete : PTIME.Complete DTMAccept :=
 – equivalently, FO(LFP) definable – exactly when it ordered-FO-reduces to
 deterministic machine acceptance. Forward through HORN-SAT – the Horn
 discharge followed by the unit-propagation machine – and backward because
-membership travels along reductions. -/
+membership travels along reductions.
+Registered in the Lax archive as
+[`Lax535992.DeterministicMachinePTIMEComplete.mem_PTIME_iff_le_dtmAccept`](https://laxarchive.org/lax-535992/Lax535992.DeterministicMachinePTIMEComplete.html#s-Lax535992.DeterministicMachinePTIMEComplete.mem_PTIME_iff_le_dtmAccept). -/
 theorem mem_PTIME_iff_le_dtmAccept {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     P ∈ PTIME ↔ Nonempty (P ≤ᶠᵒ[≤] DTMAccept) := by
   constructor

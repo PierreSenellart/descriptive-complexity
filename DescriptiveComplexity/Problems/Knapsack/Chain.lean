@@ -272,6 +272,63 @@ theorem exists_chain (hlin : IsLinOrd (ILe)) (hPlin : IsLinOrd PLe)
   · exact fun i j p hij hp => (hCy j i hij).2.2.1 p hp
   · exact fun i j p hij hp => (hCy j i hij).2.2.2 p hp
 
+/-! ### A walk is determined by the chosen items
+
+What a definition that *counts* certificates needs: the conditions of a walk
+read the running totals only at items and positions, and the carries only at
+the items that have a predecessor, and there they are forced. -/
+
+omit [Finite A] [Finite P] in
+theorem maj_congr {x y z x' y' z' : Prop} (hx : x ↔ x') (hy : y ↔ y') (hz : z ↔ z') :
+    maj x y z ↔ maj x' y' z' :=
+  or_congr (and_congr hx hy) (or_congr (and_congr hx hz) (and_congr hy hz))
+
+omit [Finite A] [Finite P] in
+/-- The conditions of a walk only read the totals at items and positions, and
+the carries at the items that have a predecessor. -/
+theorem IsChain.congr {PS' Cy' : A → P → Prop}
+    (hchain : IsChain ILe IItem PLe PPosn S wt PS Cy)
+    (hPS : ∀ i p, IItem i → PPosn p → (PS i p ↔ PS' i p))
+    (hCy : ∀ i j p, SuccPos ILe IItem i j → PPosn p → (Cy j p ↔ Cy' j p)) :
+    IsChain ILe IItem PLe PPosn S wt PS' Cy' := by
+  obtain ⟨hbase, hsum, hcarry, hbot, htop⟩ := hchain
+  refine ⟨fun i p hi hp => (hPS i p hi.1 hp).symm.trans (hbase i p hi hp),
+    fun i j p hij hp => (hPS j p hij.2.1 hp).symm.trans ((hsum i j p hij hp).trans
+      (iff_congr (hPS i p hij.1 hp) (iff_congr Iff.rfl (hCy i j p hij hp)))),
+    fun i j p q hij hpq => (hCy i j q hij hpq.2.1).symm.trans ((hcarry i j p q hij hpq).trans
+      (maj_congr (hPS i p hij.1 hpq.1) Iff.rfl (hCy i j p hij hpq.1))),
+    fun i j p hij hp h => hbot i j p hij hp ((hCy i j p hij hp.1).mpr h),
+    fun i j p hij hp h => htop i j p hij hp
+      ((maj_congr (hPS i p hij.1 hp.1) Iff.rfl (hCy i j p hij hp.1)).mpr h)⟩
+
+/-- **Two walks of the same chosen items agree**, wherever the conditions of a
+walk read them: the running totals are the partial sums, and each carry is the
+majority of three values already known. -/
+theorem isChain_agree {PS' Cy' : A → P → Prop} (hlin : IsLinOrd (ILe)) (hPlin : IsLinOrd PLe)
+    (hS : ∀ i, S i → IItem i) (h : IsChain ILe IItem PLe PPosn S wt PS Cy)
+    (h' : IsChain ILe IItem PLe PPosn S wt PS' Cy') :
+    (∀ i p, IItem i → PPosn p → (PS i p ↔ PS' i p)) ∧
+      ∀ i j p, SuccPos ILe IItem i j → PPosn p → (Cy j p ↔ Cy' j p) := by
+  have hPS : ∀ i p, IItem i → PPosn p → (PS i p ↔ PS' i p) := fun i p hi hp =>
+    binNum_inj_on hPlin _ PPosn rfl (PS i) (PS' i)
+      ((chain_sound hlin hPlin hS h i hi).trans (chain_sound hlin hPlin hS h' i hi).symm) p hp
+  refine ⟨hPS, fun i j p hij hp => ?_⟩
+  have key : ∀ (m : ℕ) (p : P), bitRank PLe PPosn p = m → PPosn p → (Cy j p ↔ Cy' j p) := by
+    intro m
+    induction m using Nat.strong_induction_on with
+    | _ m IH =>
+      intro p hr hp
+      by_cases hmin : MinPos PLe PPosn p
+      · exact iff_of_false (h.2.2.2.1 i j p hij hmin) (h'.2.2.2.1 i j p hij hmin)
+      · obtain ⟨r, hrp⟩ := exists_predPos hPlin hp hmin
+        have hlt : bitRank PLe PPosn r < m := by
+          rw [← hr]
+          exact bitRank_lt hPlin hrp.1 hrp.2.2.1 hrp.2.2.2.1
+        exact (h.2.2.1 i j r p hij hrp).trans
+          ((maj_congr (hPS i r hij.1 hrp.1) Iff.rfl (IH _ hlt r rfl hrp.1)).trans
+            (h'.2.2.1 i j r p hij hrp).symm)
+  exact key _ p rfl hp
+
 end Chain
 
 end DescriptiveComplexity

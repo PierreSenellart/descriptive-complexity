@@ -1,0 +1,326 @@
+/-
+Copyright (c) 2026 Pierre Senellart. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Pierre Senellart
+-/
+import Mathlib.ModelTheory.Semantics
+import Mathlib.ModelTheory.Syntax
+import Lax280166Proofs.DescriptiveComplexity.Problems.SetFamily.Defs
+import Lax280166Proofs.DescriptiveComplexity.Problems.CliqueFamily.Defs
+import Lax280166.CountingCliques
+import Lax280166.CountingDominatingSets
+import Lax280166.CountingFeedbackSets
+import Lax280166.CountingHamiltonCircuits
+import Lax280166.CountingKnapsacks
+import Lax280166.CountingSatVariants
+import Lax280166.CountingSetFamilies
+import Lax280166.CountingSteinerTrees
+import Lax366625.CountingProblems
+import Lax366625.CountingRuns
+import Lax366625.CountingSat
+import Lax366625.HornNumbers
+import Lax366625.MachineNumbers
+import Lax366625.NumberedCircuits
+import Lax366625.QuantitativeLogic
+import Lax366625.SecondOrderCounting
+import Lax366625.WitnessCounting
+import Lax485149.Complement
+import Lax485149.DeterministicReachability
+import Lax485149.DeterministicTransitiveClosure
+import Lax485149.FirstOrderDefinability
+import Lax485149.HeadAutomata
+import Lax485149.KromFragment
+import Lax485149.Reachability
+import Lax485149.SecondOrderAtoms
+import Lax485149.TransitiveClosure
+import Lax485149.TwoSat
+import Lax535992.CircuitValue
+import Lax535992.DeterministicMachines
+import Lax535992.Game
+import Lax535992.HornFragment
+import Lax535992.HornSat
+import Lax535992.InflationaryFixedPoint
+import Lax535992.LeastFixedPoint
+import Lax799700.CliqueFamily
+import Lax799700.Coloring
+import Lax799700.Common
+import Lax799700.DominatingSet
+import Lax799700.Feedback
+import Lax799700.Hamilton
+import Lax799700.JobSequencing
+import Lax799700.Knapsack
+import Lax799700.MaxCut
+import Lax799700.NaeSat
+import Lax799700.NaeThreeSat
+import Lax799700.OneInSat
+import Lax799700.Partition
+import Lax799700.SetFamily
+import Lax799700.Steiner
+import Lax799700.SubgraphIso
+import Lax799700.ThreeColorability
+import Lax799700.ThreeDimMatching
+import Lax799700.ThreeSat
+import Lax799700.ZeroOneIP
+import Lax895169.ArithmeticLogic
+import Lax895169.BitLogic
+import Lax895169.BitPredicate
+import Lax895169.LogTimeMachines
+import Lax904597.Classes
+import Lax904597.Interpretations
+import Lax904597.Machines
+import Lax904597.Problems
+import Lax904597.Relativized
+import Lax904597.Sat
+import Lax904597.SecondOrder
+
+namespace Lax799700.CliqueFamily
+end Lax799700.CliqueFamily
+
+namespace Lax799700.SetFamily
+end Lax799700.SetFamily
+
+namespace Lax904597.Interpretations
+end Lax904597.Interpretations
+
+namespace Lax280166Proofs.DescriptiveComplexity
+export Lax904597.Interpretations (FOInterpretation)
+end Lax280166Proofs.DescriptiveComplexity
+
+namespace Lax280166Proofs.DescriptiveComplexity
+export Lax799700.CliqueFamily (HasLargeIndependentSet HasSmallVertexCover MGAdj MGMarked)
+end Lax280166Proofs.DescriptiveComplexity
+
+namespace Lax280166Proofs.DescriptiveComplexity
+export Lax799700.SetFamily (HasLargeSetPacking HasSmallSetCover SSElem SSMarked SSMem)
+end Lax280166Proofs.DescriptiveComplexity
+
+namespace FirstOrder.Language
+export Lax799700.CliqueFamily (markedGraph mgAdj mgMarked)
+end FirstOrder.Language
+
+namespace FirstOrder.Language
+export Lax799700.SetFamily (setSystem ssElem ssFam ssMarked ssMem)
+end FirstOrder.Language
+
+/-!
+# Hardness of the set family: graphs as incidence systems
+
+One interpretation, read twice. `DescriptiveComplexity.edgeIncidenceInterp` maps a
+marked graph to the incidence system of its edges: the ground elements are the
+(oriented) edges, the sets are the vertices, and a vertex-set contains the
+edges it is an endpoint of. It has tag `Unit` and dimension 2, and splits the
+pairs of vertices in three: an *off-diagonal adjacent* pair is the ground
+element for that edge, a *diagonal* pair `(v, v)` is the vertex-set of `v`,
+and any other pair is junk that no relation of the output mentions. The
+threshold is transported to the marked diagonal, so the interpreted marked set
+is in bijection with the input one and encodes the same number.
+
+Under this reading,
+
+* a set of vertices meets every edge iff the family of its vertex-sets covers
+  every ground element, giving
+  `DescriptiveComplexity.vertexCover_fo_reduction_setCover`;
+* two distinct vertices are non-adjacent iff their vertex-sets are disjoint
+  (`DescriptiveComplexity.exists_elem_mem_both_iff`), giving
+  `DescriptiveComplexity.indSet_fo_reduction_setPacking`.
+
+Each edge gives *two* ground elements, one per orientation, and this is
+harmless: the two carry the same constraint in both readings. The cardinality
+bookkeeping – the interpreted family and marked set are diagonal, hence in
+bijection with their vertex counterparts – is `DescriptiveComplexity.ncard_diag_eq`
+below, the unary representation's counting step for both reductions.
+
+The vertex-sets are named (`DescriptiveComplexity.diagPt`) and characterized by an
+iff lemma (`DescriptiveComplexity.eq_diagPt_iff`) rather than handled by
+projections. The reason is that `FOInterpretation.Map` is a non-reducible
+definition: a statement phrased over the raw `Tag × (Fin d → A)` is ill-typed
+at the transparency `rw`/`simp` match at, even though `exact` accepts it, and
+destructuring an element of the interpreted universe inside a set-builder
+membership goal produces exactly such a statement. Keeping every hypothesis in
+the shape `∀ p, Q p → ∃ v, p = diagPt v` avoids the issue outright.
+-/
+
+namespace Lax280166Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure BoundedFormula
+
+/-! ### The interpretation -/
+
+/-- The edge-incidence interpretation of a marked graph as a set system: the
+ground elements are the (oriented) edges, the sets are the vertices, sitting
+on the diagonal, and a vertex-set contains the edges it is an endpoint of.
+The threshold moves to the marked diagonal, encoding the same number. -/
+def edgeIncidenceInterp :
+    Lax904597.Interpretations.FOInterpretation Lax799700.CliqueFamily.markedGraph Lax799700.SetFamily.setSystem Unit 2 where
+  relFormula {n} R :=
+    match n, R with
+    | _, .elem => fun _ => FirstOrder.Language.Relations.formula₂ Lax799700.CliqueFamily.mgAdj (FirstOrder.Language.Term.var (0, 0))
+                                 (FirstOrder.Language.Term.var (0, 1)) ⊓
+                               FirstOrder.Language.BoundedFormula.not
+                                 (FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (0, 0)) (FirstOrder.Language.Term.var (0, 1)))
+    | _, .fam => fun _ => FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (0, 0)) (FirstOrder.Language.Term.var (0, 1))
+    | _, .mem => fun _ => FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (1, 0)) (FirstOrder.Language.Term.var (1, 1)) ⊓
+                              (FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (1, 0)) (FirstOrder.Language.Term.var (0, 0)) ⊔
+                                FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (1, 0)) (FirstOrder.Language.Term.var (0, 1)))
+    | _, .marked => fun _ => FirstOrder.Language.Term.equal (FirstOrder.Language.Term.var (0, 0)) (FirstOrder.Language.Term.var (0, 1)) ⊓
+                                 FirstOrder.Language.Relations.formula₁ Lax799700.CliqueFamily.mgMarked (FirstOrder.Language.Term.var (0, 0))
+
+section EdgeIncidenceCharacterizations
+
+variable {A : Type} [Lax799700.CliqueFamily.markedGraph.Structure A]
+
+@[simp]
+theorem edgeIncidence_elem (w : Fin 2 → A) :
+    RelMap (M := edgeIncidenceInterp.Map A) Lax799700.SetFamily.ssElem ![((), w)] ↔
+      RelMap Lax799700.CliqueFamily.mgAdj ![w 0, w 1] ∧ w 0 ≠ w 1 := by
+  rw [FOInterpretation.relMap_map]
+  simp [edgeIncidenceInterp, Formula.realize_rel₂]
+
+@[simp]
+theorem edgeIncidence_fam (w : Fin 2 → A) :
+    RelMap (M := edgeIncidenceInterp.Map A) Lax799700.SetFamily.ssFam ![((), w)] ↔ w 0 = w 1 := by
+  rw [FOInterpretation.relMap_map]
+  simp [edgeIncidenceInterp]
+
+@[simp]
+theorem edgeIncidence_mem (w₁ w₂ : Fin 2 → A) :
+    RelMap (M := edgeIncidenceInterp.Map A) Lax799700.SetFamily.ssMem ![((), w₁), ((), w₂)] ↔
+      w₂ 0 = w₂ 1 ∧ (w₂ 0 = w₁ 0 ∨ w₂ 0 = w₁ 1) := by
+  rw [FOInterpretation.relMap_map]
+  simp [edgeIncidenceInterp]
+
+@[simp]
+theorem edgeIncidence_marked (w : Fin 2 → A) :
+    RelMap (M := edgeIncidenceInterp.Map A) Lax799700.SetFamily.ssMarked ![((), w)] ↔
+      w 0 = w 1 ∧ RelMap Lax799700.CliqueFamily.mgMarked ![w 0] := by
+  rw [FOInterpretation.relMap_map]
+  simp [edgeIncidenceInterp, Formula.realize_rel₁]
+
+end EdgeIncidenceCharacterizations
+
+/-! ### The counting step
+
+Both the interpreted family and the interpreted marked set live on the
+diagonal, which is in bijection with the vertex set; so the numbers they
+encode are the numbers encoded by their vertex counterparts. -/
+
+section Counting
+
+variable {A : Type}
+
+/-- A vertex, as a set of the interpreted set system: the diagonal pair. -/
+def diagPt (v : A) : edgeIncidenceInterp.Map A := ((), ![v, v])
+
+/-- A tagged pair is the vertex-set of `v` exactly when both its coordinates
+are `v`. Stating the diagonal condition this way, rather than by projections,
+is what keeps the proofs about the interpreted structure free of
+destructuring (see the module docstring above). -/
+theorem eq_diagPt_iff (t : Unit) (w : Fin 2 → A) (v : A) :
+    ((t, w) : edgeIncidenceInterp.Map A) = diagPt v ↔ w 0 = v ∧ w 1 = v := by
+  constructor
+  · intro h
+    have hw : w = ![v, v] := congrArg (fun p : Unit × (Fin 2 → A) => p.2) h
+    exact ⟨by rw [hw]; simp, by rw [hw]; simp⟩
+  · rintro ⟨h0, h1⟩
+    cases t
+    refine Prod.ext_iff.mpr ⟨rfl, ?_⟩
+    funext i
+    fin_cases i <;> simp [diagPt, h0, h1]
+
+/-- Distinct vertices give distinct vertex-sets. -/
+theorem diagPt_injective : Function.Injective (diagPt (A := A)) := by
+  intro v v' h
+  simpa using ((eq_diagPt_iff () ![v, v] v').mp h).1
+
+/-- A predicate that only holds of diagonal pairs encodes the same number as
+its restriction to the diagonal, read as a predicate on vertices. -/
+theorem ncard_diag_eq (P : A → Prop) (Q : edgeIncidenceInterp.Map A → Prop)
+    (hdiag : ∀ p, Q p → ∃ v, p = diagPt v) (hP : ∀ v : A, Q (diagPt v) ↔ P v) :
+    {p | Q p}.ncard = {v | P v}.ncard := by
+  have hset : {p | Q p} = diagPt '' {v | P v} := by
+    ext p
+    constructor
+    · intro hq
+      obtain ⟨v, rfl⟩ := hdiag p hq
+      exact ⟨v, (hP v).mp hq, rfl⟩
+    · rintro ⟨v, hv, rfl⟩
+      exact (hP v).mpr hv
+  rw [hset, Set.ncard_image_of_injective _ diagPt_injective]
+
+/-- The subfamily of vertex-sets attached to a set of vertices: the diagonal
+pairs of its members. Shared by the reductions of Vertex Cover to Set Cover
+and of Independent Set to Set Packing, which both send a set of vertices to
+the family of its vertex-sets. -/
+def vertexFamily (C : A → Prop) : edgeIncidenceInterp.Map A → Prop :=
+  fun p => ∃ v, C v ∧ p = diagPt v
+
+/-- The family of vertex-sets of a set of vertices encodes the same number as
+the set itself. -/
+theorem ncard_vertexFamily (C : A → Prop) :
+    {p | vertexFamily C p}.ncard = {v | C v}.ncard :=
+  ncard_diag_eq C (vertexFamily C) (fun _ h => ⟨h.choose, h.choose_spec.2⟩)
+    fun v => ⟨fun ⟨_, hv', heq⟩ => diagPt_injective heq ▸ hv', fun hv => ⟨v, hv, rfl⟩⟩
+
+end Counting
+
+section EdgeIncidenceCorrectness
+
+variable (A : Type) [Lax799700.CliqueFamily.markedGraph.Structure A]
+
+/-- The interpreted marked set lives on the diagonal. -/
+theorem marked_diag :
+    ∀ p : edgeIncidenceInterp.Map A, Lax799700.SetFamily.SSMarked p → ∃ v, p = diagPt v := by
+  rintro ⟨⟨⟩, w⟩ hw
+  exact ⟨w 0, (eq_diagPt_iff () w (w 0)).mpr ⟨rfl, ((edgeIncidence_marked w).mp hw).1.symm⟩⟩
+
+/-- The interpreted marked set encodes the same number as the input one. -/
+theorem ncard_marked :
+    {p : edgeIncidenceInterp.Map A | Lax799700.SetFamily.SSMarked p}.ncard = {v : A | Lax799700.CliqueFamily.MGMarked v}.ncard :=
+  ncard_diag_eq (A := A) Lax799700.CliqueFamily.MGMarked (fun p => Lax799700.SetFamily.SSMarked p) (marked_diag A)
+    fun v => (edgeIncidence_marked (A := A) ![v, v]).trans (by simp [Lax799700.CliqueFamily.MGMarked])
+
+end EdgeIncidenceCorrectness
+
+/-! ### Independent Set reduces to Set Packing
+
+The same interpretation, read again: a set of vertices is independent exactly
+when the family of their vertex-sets is pairwise disjoint. -/
+
+section Correctness
+
+variable {A : Type} [Lax799700.CliqueFamily.markedGraph.Structure A]
+
+/-- Two distinct vertices have intersecting sets of incident edges exactly
+when they are adjacent (in either direction). This is the whole content of
+the reduction; note that only *ground elements*, i.e., genuine edges, count as
+witnesses of an intersection. -/
+theorem exists_elem_mem_both_iff {u v : A} (huv : u ≠ v) :
+    (∃ x : edgeIncidenceInterp.Map A, Lax799700.SetFamily.SSElem x ∧ Lax799700.SetFamily.SSMem x (diagPt u) ∧ Lax799700.SetFamily.SSMem x (diagPt v)) ↔
+      Lax799700.CliqueFamily.MGAdj u v ∨ Lax799700.CliqueFamily.MGAdj v u := by
+  constructor
+  · rintro ⟨⟨⟨⟩, w⟩, hx, hmu, hmv⟩
+    obtain ⟨hadj, hne⟩ := (edgeIncidence_elem w).mp hx
+    obtain ⟨-, hu⟩ := (edgeIncidence_mem w ![u, u]).mp hmu
+    obtain ⟨-, hv⟩ := (edgeIncidence_mem w ![v, v]).mp hmv
+    simp only [Matrix.cons_val_zero] at hu hv
+    rcases hu with hu | hu <;> rcases hv with hv | hv
+    · exact absurd (hu.trans hv.symm) huv
+    · exact Or.inl (by rw [hu, hv]; exact hadj)
+    · exact Or.inr (by rw [hu, hv]; exact hadj)
+    · exact absurd (hu.trans hv.symm) huv
+  · intro h
+    rcases h with h | h
+    · exact ⟨((), ![u, v]), (edgeIncidence_elem ![u, v]).mpr ⟨h, huv⟩,
+        (edgeIncidence_mem ![u, v] ![u, u]).mpr ⟨rfl, Or.inl rfl⟩,
+        (edgeIncidence_mem ![u, v] ![v, v]).mpr ⟨rfl, Or.inr rfl⟩⟩
+    · exact ⟨((), ![v, u]), (edgeIncidence_elem ![v, u]).mpr ⟨h, huv.symm⟩,
+        (edgeIncidence_mem ![v, u] ![u, u]).mpr ⟨rfl, Or.inr rfl⟩,
+        (edgeIncidence_mem ![v, u] ![v, v]).mpr ⟨rfl, Or.inl rfl⟩⟩
+
+end Correctness
+
+end Lax280166Proofs.DescriptiveComplexity
+
+

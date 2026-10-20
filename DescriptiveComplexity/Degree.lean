@@ -105,14 +105,18 @@ theorem hard_below_self (Q₀ : DecisionProblem L₀) : (below Q₀).Hard Q₀ :
   (hard_below_iff Q₀).mpr fun _ h => ⟨h.some.toRel⟩
 
 /-- **A problem is complete for its own degree** – the statement that makes
-`below` the right construction. -/
+`below` the right construction.
+Registered in the Lax archive as
+[`Lax604544.DegreeOfAProblem.below_complete_self`](https://laxarchive.org/lax-604544/Lax604544.DegreeOfAProblem.html#s-Lax604544.DegreeOfAProblem.below_complete_self). -/
 theorem below_complete_self (Q₀ : DecisionProblem L₀) : (below Q₀).Complete Q₀ :=
   ⟨mem_below_self Q₀, hard_below_self Q₀⟩
 
 /-- **`Q₀`-completeness is mutual reducibility**: `P` is complete for the degree
 of `Q₀` exactly when `P` reduces to `Q₀` and `Q₀` reduces back to `P`. The
 backward reduction is the relativized `≤ʳᶠᵒ[≤]`, which is what hardness
-delivers and what a spanning problem needs. -/
+delivers and what a spanning problem needs.
+Registered in the Lax archive as
+[`Lax604544.DegreeOfAProblem.complete_below_iff`](https://laxarchive.org/lax-604544/Lax604544.DegreeOfAProblem.html#s-Lax604544.DegreeOfAProblem.complete_below_iff). -/
 theorem complete_below_iff (P : DecisionProblem L) :
     (below Q₀).Complete P ↔ Nonempty (P ≤ᶠᵒ[≤] Q₀) ∧ Nonempty (Q₀ ≤ʳᶠᵒ[≤] P) := by
   refine ⟨fun h => ⟨h.mem, (hard_below_iff P).mp h.hard Q₀ (mem_below_self Q₀)⟩,
@@ -120,7 +124,9 @@ theorem complete_below_iff (P : DecisionProblem L) :
   exact ⟨hQ.some.toRel.trans hhard.some⟩
 
 /-- The degree only depends on the *degree*: mutually reducible problems have
-the same downward closure. -/
+the same downward closure.
+Registered in the Lax archive as
+[`Lax604544.DegreeOfAProblem.below_congr`](https://laxarchive.org/lax-604544/Lax604544.DegreeOfAProblem.html#s-Lax604544.DegreeOfAProblem.below_congr). -/
 theorem below_congr {L₁ : Language.{0, 0}} [L₁.IsRelational] {Q₁ : DecisionProblem L₁}
     (h₀ : Nonempty (Q₀ ≤ᶠᵒ[≤] Q₁)) (h₁ : Nonempty (Q₁ ≤ᶠᵒ[≤] Q₀)) :
     below Q₀ = below Q₁ := by

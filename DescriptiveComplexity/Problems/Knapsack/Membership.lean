@@ -186,6 +186,22 @@ noncomputable def knapsackKernel : ksSOLang.Sentence :=
     (ksSelClause ⊓ (ksBaseClause ⊓ (ksSumClause ⊓ (ksCarryClause ⊓
       (ksBottomClause ⊓ (ksTopClause ⊓ (ksFinalClause ⊓ ksEmptyClause)))))))
 
+/-- Kernel clause of the counting kernel: the running totals are stored at
+items and positions only. -/
+private noncomputable def ksPinPSClause : ksSOLang.Sentence :=
+  fo% ∀ i p, kPSF⟨i, p⟩ → kItemF⟨i⟩ ∧ kPosnF⟨p⟩
+
+/-- Kernel clause of the counting kernel: the carries are stored at positions
+and at the items that are not the first one only. -/
+private noncomputable def ksPinCarryClause : ksSOLang.Sentence :=
+  fo% ∀ i p, kCarryF⟨i, p⟩ → (kItemF⟨i⟩ ∧ kPosnF⟨p⟩) ∧ ¬ kMinItemF⟨i⟩
+
+/-- **The counting kernel of Knapsack**: the kernel of its `Σ₁` definition, and
+the two clauses that leave nothing of a certificate unconstrained, so that a
+solution has exactly one. -/
+noncomputable def sharpKnapsackKernel : ksSOLang.Sentence :=
+  knapsackKernel ⊓ (ksPinPSClause ⊓ ksPinCarryClause)
+
 /-! ### Realization -/
 
 section Realize
@@ -281,11 +297,137 @@ private theorem realize_knapsackKernel :
       fun i hi => hfin (i 0) (i 1) ⟨hi.1.1, fun j hj => hi.1.2 (fun _ => j) hj⟩ hi.2,
       fun hno i hi => hemp (fun j => hno (fun _ => j)) (i 0) hi⟩
 
+/-- What the counting kernel says of an assignment of the block: the instance
+is well formed, the chosen elements are items, the two binary relations are a
+walk ending on the target, and they hold nowhere else. -/
+def KnapsackCert (A : Type) [Language.binWeights.Structure A]
+    (ρ : knapsackGuessBlock.Assignment A) : Prop :=
+  IsLinOrd (BWLe (A := A)) ∧ (∀ i : A, ρ .sel ![i] → BWItem i) ∧
+    IsChain BWLe BWItem BWLe BWPosn (fun i : A => ρ .sel ![i]) BWBit
+      (fun i p => ρ .pS ![i, p]) (fun i p => ρ .carry ![i, p]) ∧
+    (∀ i p : A, MaxPos BWLe BWItem i → BWPosn p → (ρ .pS ![i, p] ↔ BWTgt p)) ∧
+    ((∀ i : A, ¬BWItem i) → ∀ p : A, BWPosn p → ¬BWTgt p) ∧
+    (∀ i p : A, ρ .pS ![i, p] → BWItem i ∧ BWPosn p) ∧
+    ∀ i p : A, ρ .carry ![i, p] → BWItem i ∧ BWPosn p ∧ ¬MinPos BWLe BWItem i
+
+private theorem realize_ksPinClauses :
+    (@Sentence.Realize ksSOLang A
+        (@sumStructure _ _ A _ (knapsackGuessBlock.structure ρ))
+        (ksPinPSClause ⊓ ksPinCarryClause)) ↔
+      (∀ i p : A, PSum ρ i p → BWItem i ∧ BWPosn p) ∧
+        ∀ i p : A, Cy ρ i p → BWItem i ∧ BWPosn p ∧ ¬MinPos BWLe BWItem i := by
+  let := knapsackGuessBlock.structure ρ
+  have hsubP : ∀ w : Fin 2 → A,
+      RelMap (L := ksSOLang) (M := A) ksPSSym w ↔ ρ .pS w := fun _ => Iff.rfl
+  have hsubC : ∀ w : Fin 2 → A,
+      RelMap (L := ksSOLang) (M := A) ksCarrySym w ↔ ρ .carry w := fun _ => Iff.rfl
+  simp only [ksPinPSClause, ksPinCarryClause, kItemF, kPosnF, kLeF, kPSF, kCarryF, kMinItemF,
+    Sentence.Realize, Formula.realize_inf, Formula.realize_imp, Formula.realize_not,
+    Formula.realize_iAlls, Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var,
+    Sum.elim_inr, Sum.elim_inl, Language.relMap_sumInl, hsubP, hsubC]
+  constructor
+  · rintro ⟨h1, h2⟩
+    refine ⟨fun i p h => h1 ![i, p] h, fun i p h => ?_⟩
+    obtain ⟨⟨hi, hp⟩, hnmin⟩ := h2 ![i, p] h
+    exact ⟨hi, hp, fun hmin => hnmin ⟨hmin.1, fun y hy => hmin.2 (y 0) hy⟩⟩
+  · rintro ⟨h1, h2⟩
+    refine ⟨fun i h => h1 (i 0) (i 1) h, fun i h => ?_⟩
+    obtain ⟨hi, hp, hnmin⟩ := h2 (i 0) (i 1) h
+    exact ⟨⟨hi, hp⟩, fun hmin => hnmin ⟨hmin.1, fun y hy => hmin.2 (fun _ => y) hy⟩⟩
+
+/-- **The counting kernel says exactly what it should.** -/
+theorem realize_sharpKnapsackKernel :
+    (@Sentence.Realize ksSOLang A
+        (@sumStructure _ _ A _ (knapsackGuessBlock.structure ρ)) sharpKnapsackKernel) ↔
+      KnapsackCert A ρ := by
+  have h1 := realize_knapsackKernel ρ
+  have h2 := realize_ksPinClauses ρ
+  have hinf : (@Sentence.Realize ksSOLang A
+        (@sumStructure _ _ A _ (knapsackGuessBlock.structure ρ)) sharpKnapsackKernel) ↔
+      (@Sentence.Realize ksSOLang A
+        (@sumStructure _ _ A _ (knapsackGuessBlock.structure ρ)) knapsackKernel) ∧
+      (@Sentence.Realize ksSOLang A
+        (@sumStructure _ _ A _ (knapsackGuessBlock.structure ρ))
+        (ksPinPSClause ⊓ ksPinCarryClause)) := by
+    let := knapsackGuessBlock.structure ρ
+    exact Formula.realize_inf
+  rw [hinf, h1, h2]
+  exact ⟨fun ⟨⟨hlin, hsel, hb, hs, hc, hbo, ht, hfin, hemp⟩, hp1, hp2⟩ =>
+      ⟨hlin, hsel, ⟨hb, hs, hc, hbo, ht⟩, hfin, hemp, hp1, hp2⟩,
+    fun ⟨hlin, hsel, ⟨hb, hs, hc, hbo, ht⟩, hfin, hemp, hp1, hp2⟩ =>
+      ⟨⟨hlin, hsel, hb, hs, hc, hbo, ht, hfin, hemp⟩, hp1, hp2⟩⟩
+
 end Realize
 
 /-! ### Membership -/
 
-open Classical in
+section Walks
+
+variable {A : Type} [Language.binWeights.Structure A] [Finite A]
+
+/-- **A solution has a walk**: running totals and carries of a ripple-carry
+addition of the chosen weights, ending on the target. -/
+theorem exists_chain_of_subsetSum (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
+    (hSitem : ∀ i, S i → BWItem i)
+    (hsumeq : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget A) :
+    ∃ PS Cy : A → A → Prop, IsChain BWLe BWItem BWLe BWPosn S BWBit PS Cy ∧
+      (∀ i p : A, MaxPos BWLe BWItem i → BWPosn p → (PS i p ↔ BWTgt p)) ∧
+      ((∀ i : A, ¬BWItem i) → ∀ p : A, BWPosn p → ¬BWTgt p) := by
+  have htot : (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) <
+      2 ^ ({p : A | BWPosn p} : Set A).ncard := by
+    rw [show (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) =
+      ∑ᶠ j ∈ {j : A | S j}, BWWeight j from rfl, hsumeq, BWTarget]
+    exact binNum_lt_two_pow hlin _ BWPosn rfl BWTgt
+  obtain ⟨PS, Cy, hchain⟩ := exists_chain (wt := BWBit) hlin hlin hSitem htot
+  refine ⟨PS, Cy, hchain, ?_, ?_⟩
+  · -- at the last item the running total is the target
+    intro i p hi hp
+    refine binNum_inj_on hlin _ BWPosn rfl (PS i) BWTgt ?_ p hp
+    rw [chain_sound hlin hlin hSitem hchain i hi.1, partSum_max hSitem hi]
+    rw [show (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) =
+      ∑ᶠ j ∈ {j : A | S j}, BWWeight j from rfl, hsumeq, BWTarget]
+  · -- with no items the target must vanish
+    intro hno p hp
+    have hSempty : {j : A | S j} = (∅ : Set A) := by
+      ext j
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
+      exact fun hj => hno j (hSitem j hj)
+    have hzero : binNum (BWLe (A := A)) BWPosn BWTgt = 0 := by
+      have htarget : BWTarget A = 0 := by
+        rw [← hsumeq, hSempty, finsum_mem_empty]
+      exact htarget
+    have := binNum_inj_on hlin _ BWPosn rfl BWTgt (fun _ => False)
+      (by rw [hzero, binNum_bot]) p hp
+    exact this.mp
+
+/-- **A walk ending on the target is a solution.** -/
+theorem subsetSum_of_chain (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
+    {PS Cy : A → A → Prop} (hsel : ∀ i, S i → BWItem i)
+    (hchain : IsChain BWLe BWItem BWLe BWPosn S BWBit PS Cy)
+    (hfinal : ∀ i p : A, MaxPos BWLe BWItem i → BWPosn p → (PS i p ↔ BWTgt p))
+    (hempty : (∀ i : A, ¬BWItem i) → ∀ p : A, BWPosn p → ¬BWTgt p) :
+    (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget A := by
+  by_cases hitems : ∃ i : A, BWItem i
+  · obtain ⟨imax, himax⟩ := exists_maxPos hlin hitems
+    have h1 := chain_sound hlin hlin hsel hchain imax himax.1
+    have h2 : binNum BWLe BWPosn (PS imax) = BWTarget A :=
+      binNum_congr_on fun p hp => hfinal imax p himax hp
+    rw [show (∑ᶠ j ∈ {j : A | S j}, BWWeight j) =
+      ∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j) from rfl,
+      ← partSum_max hsel himax, ← h1, h2]
+  · have hno : ∀ i, ¬BWItem i := fun i hi => hitems ⟨i, hi⟩
+    have hSempty : {i : A | S i} = (∅ : Set A) := by
+      ext i
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
+      exact fun hi => hno i (hsel i hi)
+    have htgt : {p : A | BWPosn p ∧ BWTgt p} = (∅ : Set A) := by
+      ext p
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
+      exact fun h => hempty hno p h.1 h.2
+    rw [hSempty, finsum_mem_empty, BWTarget, binNum, htgt, finsum_mem_empty]
+
+end Walks
+
 /-- **Knapsack is `Σ₁`-definable**: guess the chosen items, the running totals
 and the carries, and check first-order that each step is a ripple-carry
 addition whose last total is the target. Since NP is defined as
@@ -297,62 +439,19 @@ theorem knapsack_sigmaSODefinable : SigmaSODefinable 1 Knapsack := by
   constructor
   · -- a solution yields a certificate: the walk of `exists_chain`
     rintro ⟨hfin, hlin, S, hSitem, hsumeq⟩
-    have htot : (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) <
-        2 ^ ({p : A | BWPosn p} : Set A).ncard := by
-      rw [show (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) =
-        ∑ᶠ j ∈ {j : A | S j}, BWWeight j from rfl, hsumeq, BWTarget]
-      exact binNum_lt_two_pow hlin _ BWPosn rfl BWTgt
-    obtain ⟨PS, Cy, hchain⟩ := exists_chain (wt := BWBit) hlin hlin hSitem htot
+    obtain ⟨PS, Cy, hchain, hfinal, hempty⟩ := exists_chain_of_subsetSum hlin hSitem hsumeq
     refine ⟨fun idx => match idx with
       | .sel => fun w : Fin 1 → A => S (w 0)
       | .pS => fun w : Fin 2 → A => PS (w 0) (w 1)
       | .carry => fun w : Fin 2 → A => Cy (w 0) (w 1), ?_⟩
-    refine (realize_knapsackKernel _).mpr ⟨hlin, hSitem, hchain.1, hchain.2.1,
-      hchain.2.2.1, hchain.2.2.2.1, hchain.2.2.2.2, ?_, ?_⟩
-    · -- at the last item the running total is the target
-      intro i p hi hp
-      refine binNum_inj_on hlin _ BWPosn rfl (PS i) BWTgt ?_ p hp
-      rw [chain_sound hlin hlin hSitem hchain i hi.1, partSum_max hSitem hi]
-      rw [show (∑ᶠ j ∈ {j : A | S j}, binNum BWLe BWPosn (BWBit j)) =
-        ∑ᶠ j ∈ {j : A | S j}, BWWeight j from rfl, hsumeq, BWTarget]
-    · -- with no items the target must vanish
-      intro hno p hp
-      have hSempty : {j : A | S j} = (∅ : Set A) := by
-        ext j
-        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
-        exact fun hj => hno j (hSitem j hj)
-      have hzero : binNum (BWLe (A := A)) BWPosn BWTgt = 0 := by
-        have htarget : BWTarget A = 0 := by
-          rw [← hsumeq, hSempty, finsum_mem_empty]
-        exact htarget
-      have := binNum_inj_on hlin _ BWPosn rfl BWTgt (fun _ => False)
-        (by rw [hzero, binNum_bot]) p hp
-      exact this.mp
+    exact (realize_knapsackKernel _).mpr ⟨hlin, hSitem, hchain.1, hchain.2.1,
+      hchain.2.2.1, hchain.2.2.2.1, hchain.2.2.2.2, hfinal, hempty⟩
   · -- a certificate yields a solution: the walk is sound
     rintro ⟨ρ, hρ⟩
     obtain ⟨hlin, hsel, hbase, hstepsum, hstepcarry, hstepbot, hsteptop, hfinal, hempty⟩ :=
       (realize_knapsackKernel ρ).mp hρ
-    have hchain : IsChain BWLe BWItem BWLe BWPosn (Sel ρ) BWBit (PSum ρ) (Cy ρ) :=
-      ⟨hbase, hstepsum, hstepcarry, hstepbot, hsteptop⟩
-    refine ⟨‹Finite A›, hlin, Sel ρ, hsel, ?_⟩
-    by_cases hitems : ∃ i : A, BWItem i
-    · obtain ⟨imax, himax⟩ := exists_maxPos hlin hitems
-      have h1 := chain_sound hlin hlin hsel hchain imax himax.1
-      have h2 : binNum BWLe BWPosn (PSum ρ imax) = BWTarget A :=
-        binNum_congr_on fun p hp => hfinal imax p himax hp
-      rw [show (∑ᶠ j ∈ {j : A | Sel ρ j}, BWWeight j) =
-        ∑ᶠ j ∈ {j : A | Sel ρ j}, binNum BWLe BWPosn (BWBit j) from rfl,
-        ← partSum_max hsel himax, ← h1, h2]
-    · have hno : ∀ i, ¬BWItem i := fun i hi => hitems ⟨i, hi⟩
-      have hSempty : {i : A | Sel ρ i} = (∅ : Set A) := by
-        ext i
-        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
-        exact fun hi => hno i (hsel i hi)
-      have htgt : {p : A | BWPosn p ∧ BWTgt p} = (∅ : Set A) := by
-        ext p
-        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
-        exact fun h => hempty hno p h.1 h.2
-      rw [hSempty, finsum_mem_empty, BWTarget, binNum, htgt, finsum_mem_empty]
+    exact ⟨‹Finite A›, hlin, Sel ρ, hsel, subsetSum_of_chain hlin hsel
+      ⟨hbase, hstepsum, hstepcarry, hstepbot, hsteptop⟩ hfinal hempty⟩
 
 end SigmaOne
 

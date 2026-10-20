@@ -410,7 +410,9 @@ theorem parity_dtcDefinable : DTCDefinable PARITY :=
 
 /-- **PARITY is in LOGSPACE.** With `DescriptiveComplexity.parity_not_foDefinable`
 below, and the AC⁰ layer, this is three of the four sides of `AC⁰ ⊊ LOGSPACE`;
-the fourth is PARITY ∉ AC⁰, which this library does not prove. -/
+the fourth is PARITY ∉ AC⁰, which this library does not prove.
+Registered in the Lax archive as
+[`Lax945089.ParityInLogSpace.parity_mem_LOGSPACE`](https://laxarchive.org/lax-945089/Lax945089.ParityInLogSpace.html#s-Lax945089.ParityInLogSpace.parity_mem_LOGSPACE). -/
 theorem parity_mem_LOGSPACE : PARITY ∈ LOGSPACE :=
   (mem_LOGSPACE_iff PARITY).mpr parity_dtcDefinable
 
@@ -443,7 +445,9 @@ noncomputable def even_fo_reduction_parity : EVEN ≤ᶠᵒ PARITY where
       (((Equiv.punitProd (Fin 1 → A)).trans (Equiv.funUnique (Fin 1) A)).symm)
 
 /-- **PARITY is not first-order definable**, even order-invariantly: EVEN is not
-(`DescriptiveComplexity.even_not_foDefinable`), and it reduces to PARITY. -/
+(`DescriptiveComplexity.even_not_foDefinable`), and it reduces to PARITY.
+Registered in the Lax archive as
+[`Lax945089.ParityInLogSpace.parity_not_foDefinable`](https://laxarchive.org/lax-945089/Lax945089.ParityInLogSpace.html#s-Lax945089.ParityInLogSpace.parity_not_foDefinable). -/
 theorem parity_not_foDefinable : ¬FODefinable PARITY := fun h =>
   even_not_foDefinable (h.of_foReduction even_fo_reduction_parity)
 

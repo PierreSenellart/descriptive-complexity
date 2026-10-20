@@ -176,7 +176,9 @@ vocabulary. -/
 noncomputable def digraphIso_fo_reduction_graphIso : DigraphIso ≤ᶠᵒ GraphIso :=
   digraphIso_fo_reduction_twoCopiesIso.trans twoCopiesIso_fo_reduction_graphIso
 
-/-- **Graph Isomorphism is GI-complete**, the degree being defined on it. -/
+/-- **Graph Isomorphism is GI-complete**, the degree being defined on it.
+Registered in the Lax archive as
+[`Lax604544.GraphIsomorphismDegree.graphIso_GI_complete`](https://laxarchive.org/lax-604544/Lax604544.GraphIsomorphismDegree.html#s-Lax604544.GraphIsomorphismDegree.graphIso_GI_complete). -/
 theorem graphIso_GI_complete : GI.Complete GraphIso :=
   ComplexityClass.below_complete_self GraphIso
 
@@ -185,12 +187,16 @@ problem by the gadget – every arc subdivided three times, each vertex carrying
 a lollipop and each tail a pendant – and the undirected problem reduces back to
 it by testing simplicity. The directed problem is *not* what the literature
 calls GI, which is why the degree is named after the other one; this theorem is
-what says the choice costs nothing. -/
+what says the choice costs nothing.
+Registered in the Lax archive as
+[`Lax604544.GraphIsomorphismDegree.digraphIso_GI_complete`](https://laxarchive.org/lax-604544/Lax604544.GraphIsomorphismDegree.html#s-Lax604544.GraphIsomorphismDegree.digraphIso_GI_complete). -/
 theorem digraphIso_GI_complete : GI.Complete DigraphIso :=
   ⟨⟨digraphIso_fo_reduction_graphIso.toOrdered⟩,
     GI.hard_of_foReduction graphIso_fo_reduction_digraphIso graphIso_GI_complete.hard⟩
 
-/-- **The directed and undirected problems have the same degree.** -/
+/-- **The directed and undirected problems have the same degree.**
+Registered in the Lax archive as
+[`Lax604544.GraphIsomorphismDegree.GI_eq_below_digraphIso`](https://laxarchive.org/lax-604544/Lax604544.GraphIsomorphismDegree.html#s-Lax604544.GraphIsomorphismDegree.GI_eq_below_digraphIso). -/
 theorem GI_eq_below_digraphIso : GI = ComplexityClass.below DigraphIso :=
   ComplexityClass.below_congr ⟨graphIso_fo_reduction_digraphIso.toOrdered⟩
     ⟨digraphIso_fo_reduction_graphIso.toOrdered⟩

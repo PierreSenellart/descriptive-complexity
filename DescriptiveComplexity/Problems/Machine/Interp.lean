@@ -74,6 +74,12 @@ noncomputable def nextClF (c c' : α) : satOrd.Formula α :=
 noncomputable def noClF : satOrd.Formula α :=
   Formula.iAlls Unit (∼(clF (Sum.inr () : α ⊕ Unit)))
 
+/-- `x` is a variable of the instance – it occurs in some clause –, as a
+formula. -/
+noncomputable def varF (x : α) : satOrd.Formula α :=
+  Formula.iExs Unit (clF (Sum.inr ()) ⊓
+    (SatOcc.posF (Sum.inr ()) (Sum.inl x) ⊔ SatOcc.negF (Sum.inr ()) (Sum.inl x)))
+
 end Builders
 
 section BuilderRealize
@@ -106,6 +112,12 @@ theorem realize_nextClF {x y : α} {c c' : A} (hx : v x = c) (hy : v y = c') :
 theorem realize_noClF : (noClF (α := α)).Realize v ↔ ∀ e : A, ¬ SatCl e := by
   simp only [noClF, Formula.realize_iAlls, Formula.realize_not, realize_clF, Sum.elim_inr]
   exact ⟨fun h e => h fun _ => e, fun h i => h (i ())⟩
+
+theorem realize_varF {x : α} {a : A} (h : v x = a) :
+    (varF x).Realize v ↔ SatVar a := by
+  simp only [varF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
+    realize_clF, SatOcc.realize_posF, SatOcc.realize_negF, Sum.elim_inl, Sum.elim_inr, h]
+  exact ⟨fun ⟨i, hi⟩ => ⟨i (), hi⟩, fun ⟨c, hc⟩ => ⟨fun _ => c, hc⟩⟩
 
 end BuilderRealize
 
@@ -180,7 +192,7 @@ noncomputable def posnF : SatTag → satOrd.Formula (Fin 1 × Fin 2)
 `DescriptiveComplexity.SatTr`. -/
 noncomputable def trF : SatTag → satOrd.Formula (Fin 1 × Fin 2)
   | .tGuessStart => minF (0, 0) ⊓ minF (0, 1)
-  | .tGuessVal _ => minF (0, 1)
+  | .tGuessVal b => minF (0, 1) ⊓ (if b then varF (0, 0) else ⊤)
   | .tGuessEndAcc => minF (0, 0) ⊓ minF (0, 1) ⊓ noClF
   | .tGuessEndChk => minF (0, 1) ⊓ minClF (0, 0)
   | .tChk _ _ _ => clF (0, 0)
@@ -333,8 +345,18 @@ theorem relMap_tr (p : SatV A) : TMTr (satMapEquiv p) ↔ SatTr p := by
     simp only [Formula.realize_inf, realize_minF, h0, h1, IsMinTup]
   cases t
   case tGuessStart => exact hmin _ rfl rfl
-  case tGuessVal _ =>
-    exact (realize_minF (L := Language.sat) (A := A) ((0 : Fin 1), (1 : Fin 2)))
+  case tGuessVal b =>
+    have key : ∀ v : Fin 1 × Fin 2 → A, v (0, 0) = w 0 → v (0, 1) = w 1 →
+        ((minF (0, 1) ⊓ (if b then varF (0, 0) else ⊤) :
+            satOrd.Formula (Fin 1 × Fin 2)).Realize v ↔
+          ((∀ a : A, w 1 ≤ a) ∧ (b = true → SatVar (w 0)))) := by
+      intro v h0 h1
+      cases b
+      · simp only [Formula.realize_inf, realize_minF, h1, Bool.false_eq_true, ite_false,
+          Formula.realize_top, and_true, false_imp_iff]
+      · simp only [Formula.realize_inf, realize_minF, h1, ite_true, realize_varF h0,
+          true_imp_iff]
+    exact key _ rfl rfl
   case tGuessEndAcc =>
     have key : ∀ v : Fin 1 × Fin 2 → A, v (0, 0) = w 0 → v (0, 1) = w 1 →
         ((minF (0, 0) ⊓ minF (0, 1) ⊓ noClF : satOrd.Formula (Fin 1 × Fin 2)).Realize v ↔

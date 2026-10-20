@@ -1,0 +1,224 @@
+/-
+Copyright (c) 2026 Pierre Senellart. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Pierre Senellart
+-/
+import Lax945089Proofs.DescriptiveComplexity.SecondOrder
+import Lax945089Proofs.DescriptiveComplexity.Ordered
+import Lax134656.OrderFreeTransitiveClosure
+import Lax134656.PartialFixedPoint
+import Lax134656.Qsat
+import Lax134656.SecondOrderTransitiveClosure
+import Lax134656.SpaceBoundedMachines
+import Lax134656.SuccinctReach
+import Lax485149.Complement
+import Lax485149.DeterministicReachability
+import Lax485149.DeterministicTransitiveClosure
+import Lax485149.FirstOrderDefinability
+import Lax485149.HeadAutomata
+import Lax485149.KromFragment
+import Lax485149.Reachability
+import Lax485149.SecondOrderAtoms
+import Lax485149.TransitiveClosure
+import Lax485149.TwoSat
+import Lax535992.CircuitValue
+import Lax535992.DeterministicMachines
+import Lax535992.Game
+import Lax535992.HornFragment
+import Lax535992.HornSat
+import Lax535992.InflationaryFixedPoint
+import Lax535992.LeastFixedPoint
+import Lax564036.AlternatingMachines
+import Lax564036.Difference
+import Lax564036.QuantifiedBooleanFormulas
+import Lax564036.SatUnsat
+import Lax564036.Tautology
+import Lax564036.ThreeDnfTautology
+import Lax799700.CliqueFamily
+import Lax799700.Coloring
+import Lax799700.Common
+import Lax799700.DominatingSet
+import Lax799700.Feedback
+import Lax799700.Hamilton
+import Lax799700.JobSequencing
+import Lax799700.Knapsack
+import Lax799700.MaxCut
+import Lax799700.NaeSat
+import Lax799700.NaeThreeSat
+import Lax799700.OneInSat
+import Lax799700.Partition
+import Lax799700.SetFamily
+import Lax799700.Steiner
+import Lax799700.SubgraphIso
+import Lax799700.ThreeColorability
+import Lax799700.ThreeDimMatching
+import Lax799700.ThreeSat
+import Lax799700.ZeroOneIP
+import Lax895169.ArithmeticLogic
+import Lax895169.BitLogic
+import Lax895169.BitPredicate
+import Lax895169.LogTimeMachines
+import Lax904597.Classes
+import Lax904597.Interpretations
+import Lax904597.Machines
+import Lax904597.Problems
+import Lax904597.Relativized
+import Lax904597.Sat
+import Lax904597.SecondOrder
+import Lax945089.EhrenfeuchtGames
+import Lax945089.OrderFreeFirstOrder
+import Lax945089.Parity
+import Lax945089.PebbleGames
+import Lax945089.TransitiveClosureReductions
+
+namespace Lax134656.SecondOrderTransitiveClosure
+end Lax134656.SecondOrderTransitiveClosure
+
+namespace Lax134656.SecondOrderTransitiveClosure.SOBlock
+end Lax134656.SecondOrderTransitiveClosure.SOBlock
+
+namespace Lax535992.InflationaryFixedPoint.SOBlock
+end Lax535992.InflationaryFixedPoint.SOBlock
+
+namespace Lax904597.Problems
+end Lax904597.Problems
+
+namespace Lax904597.SecondOrder
+end Lax904597.SecondOrder
+
+namespace Lax945089Proofs.DescriptiveComplexity.SOBlock
+end Lax945089Proofs.DescriptiveComplexity.SOBlock
+
+namespace Lax945089Proofs.DescriptiveComplexity.SOTCSpec
+end Lax945089Proofs.DescriptiveComplexity.SOTCSpec
+
+namespace Lax945089Proofs.DescriptiveComplexity
+export Lax904597.Problems (DecisionProblem)
+end Lax945089Proofs.DescriptiveComplexity
+
+namespace Lax945089Proofs.DescriptiveComplexity
+export Lax904597.SecondOrder (SOBlock)
+end Lax945089Proofs.DescriptiveComplexity
+
+namespace Lax945089Proofs.DescriptiveComplexity
+export Lax134656.SecondOrderTransitiveClosure (SOTCDefinable SOTCSpec)
+end Lax945089Proofs.DescriptiveComplexity
+
+namespace Lax904597.SecondOrder.SOBlock
+export Lax535992.InflationaryFixedPoint.SOBlock (structure₁)
+end Lax904597.SecondOrder.SOBlock
+
+namespace Lax904597.SecondOrder.SOBlock
+export Lax134656.SecondOrderTransitiveClosure.SOBlock (structure₂)
+end Lax904597.SecondOrder.SOBlock
+
+/-!
+# SO(TC): second-order logic with transitive closure
+
+The logic that captures polynomial space on ordered structures ([Immerman
+1999][immerman1999descriptive], ch. 10): a transitive closure taken not over
+tuples of *elements*, as in `DescriptiveComplexity.TransitiveClosure`, but over
+tuples of *relations*. A state of the walk is an assignment of relations to a
+second-order quantifier block, so a structure of size `n` has `2^(n^a)` states
+and a walk through them is a computation of exponentially many steps – each one
+first-order, hence cheap – on a polynomial amount of remembered information.
+That is exactly the resource PSPACE measures.
+
+## Why no fragment of plain SO would do
+
+`DescriptiveComplexity.SigmaSODefinable` and its levels give the polynomial
+hierarchy, and plain second-order logic gives `PH` as a whole
+([Fagin 1974][fagin1974generalized]; [Stockmeyer
+1976][stockmeyer1976polynomial]), so no fragment of plain SO can define PSPACE
+without collapsing PH. Some iteration operator is unavoidable, and the
+transitive closure is the cheapest one: it needs no positivity condition, no
+stage or inflationary machinery, and no syntax of its own.
+
+## The operator as data
+
+As in `DescriptiveComplexity.TransitiveClosure` (and for the same reasons – not
+touching Mathlib's `FirstOrder.Language.BoundedFormula`), the operator lives at
+the Lean level. A `DescriptiveComplexity.SOTCSpec` bundles
+
+* a second-order quantifier block `B`, whose assignments are the *states* of
+  the walk;
+* a `step` **sentence** over the base vocabulary expanded by the order and by
+  *two* copies of the block – the current state and the next one;
+* `src` and `tgt` sentences over one copy of the block.
+
+Reachability itself is `Relation.ReflTransGen`, and a structure is accepted
+when some `tgt` state is reachable from some `src` state
+(`DescriptiveComplexity.SOTCSpec.Accepts`). A single application of `TC` in front
+of a first-order matrix is taken as the definition, exactly as a single
+existential block is taken as the definition of `Σ₁`-definability.
+
+## No modes, no tuples
+
+`DescriptiveComplexity.TCSpec` carries a finite *mode* beside its tuple of elements,
+because a tuple of elements cannot hold finite data on a one-element universe.
+Here nothing of the sort is needed: a relation variable of arity `0` *is* a
+bit, so finite control is already inside a block, and a relation variable of
+arity `1` holding a singleton is an element register. A state is therefore a
+bare `DescriptiveComplexity.SOBlock.Assignment` and the walk carries no extra
+components – which also makes the pullback of a specification through an
+interpretation (`DescriptiveComplexity.SecondOrderTransitiveClosurePull`) purely a
+matter of pulling the block back.
+
+## What this file contains
+
+The semantics (`DescriptiveComplexity.SOTCSpec.Step`,
+`DescriptiveComplexity.SOTCSpec.Reach`, `DescriptiveComplexity.SOTCSpec.Accepts`),
+its isomorphism-invariance, the transfer of acceptance along a bijection of
+states (`DescriptiveComplexity.SOTCSpec.accepts_congr`, the workhorse of the
+pullback), and the definability notion
+`DescriptiveComplexity.SOTCDefinable`. The class `DescriptiveComplexity.PSPACE`
+itself is built on top of it in `DescriptiveComplexity.PSpace`, once closure
+under reductions is available.
+-/
+
+namespace Lax945089Proofs.DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+variable {L : Language.{0, 0}}
+
+/-! ### Expanding a structure by one or two copies of a block -/
+
+section Expand
+
+end Expand
+
+/-! ### Specifications -/
+
+namespace SOTCSpec
+
+section Semantics
+
+end Semantics
+
+/-! ### Transfer along a bijection of states
+
+Acceptance only depends on the walk up to a bijection of its states. Stated for
+two specifications over two vocabularies, since the pullback through an
+interpretation relates a specification over the base structure to one over the
+interpreted structure. -/
+
+section Transfer
+
+end Transfer
+
+/-! ### Isomorphism-invariance -/
+
+section Iso
+
+end Iso
+
+end SOTCSpec
+
+/-! ### SO(TC) definability -/
+
+end Lax945089Proofs.DescriptiveComplexity
+
+

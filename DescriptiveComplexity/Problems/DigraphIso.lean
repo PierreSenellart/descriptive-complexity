@@ -77,7 +77,9 @@ section Iso
 
 variable {A B : Type} [Language.twoGraphs.Structure A] [Language.twoGraphs.Structure B]
 
-/-- The graph-isomorphism property is isomorphism-invariant. -/
+/-- The graph-isomorphism property is isomorphism-invariant.
+Registered in the Lax archive as
+[`Lax604544.IsomorphismInvariance.hasDigraphIso_iso`](https://laxarchive.org/lax-604544/Lax604544.IsomorphismInvariance.html#s-Lax604544.IsomorphismInvariance.hasDigraphIso_iso). -/
 theorem hasDigraphIso_iso (e : A ≃[Language.twoGraphs] B) :
     HasDigraphIso A ↔ HasDigraphIso B :=
   and_congr e.toEquiv.finite_iff
@@ -235,7 +237,9 @@ theorem digraphIso_sigmaSODefinable : SigmaSODefinable 1 DigraphIso := by
 
 end SigmaOne
 
-/-- Digraph Isomorphism is in NP: it is `Σ₁`-definable. -/
+/-- Digraph Isomorphism is in NP: it is `Σ₁`-definable.
+Registered in the Lax archive as
+[`Lax604544.IsomorphismInNP.digraphIso_mem_NP`](https://laxarchive.org/lax-604544/Lax604544.IsomorphismInNP.html#s-Lax604544.IsomorphismInNP.digraphIso_mem_NP). -/
 theorem digraphIso_mem_NP : DigraphIso ∈ NP :=
   digraphIso_sigmaSODefinable
 

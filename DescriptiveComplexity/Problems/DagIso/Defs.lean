@@ -177,7 +177,9 @@ section Iso
 
 variable {A B : Type} [Language.twoDags.Structure A] [Language.twoDags.Structure B]
 
-/-- The DAG-isomorphism property is isomorphism-invariant. -/
+/-- The DAG-isomorphism property is isomorphism-invariant.
+Registered in the Lax archive as
+[`Lax604544.IsomorphismInvariance.hasDagIso_iso`](https://laxarchive.org/lax-604544/Lax604544.IsomorphismInvariance.html#s-Lax604544.IsomorphismInvariance.hasDagIso_iso). -/
 theorem hasDagIso_iso (e : A ≃[Language.twoDags] B) :
     HasDagIso A ↔ HasDagIso B :=
   and_congr e.toEquiv.finite_iff

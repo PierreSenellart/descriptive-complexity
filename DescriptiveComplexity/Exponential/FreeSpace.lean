@@ -459,7 +459,9 @@ theorem sopfpDefinable_iff_free (P : DecisionProblem L) :
   (sopfpDefinable_iff_expDefinable P).trans
     ((expDefinable_PSPACE_iff_free P).trans (sopfpDefinableFree_iff_expDefinableFree P).symm)
 
-/-- **EXPSPACE is SO(PFP), no order needed.** -/
+/-- **EXPSPACE is SO(PFP), no order needed.**
+Registered in the Lax archive as
+[`Lax480241.ExponentialCaptures.mem_EXPSPACE_iff_sopfpDefinableFree`](https://laxarchive.org/lax-480241/Lax480241.ExponentialCaptures.html#s-Lax480241.ExponentialCaptures.mem_EXPSPACE_iff_sopfpDefinableFree). -/
 theorem mem_EXPSPACE_iff_sopfpDefinableFree (P : DecisionProblem L) :
     P ∈ EXPSPACE ↔ SOPFPDefinableFree P :=
   (mem_EXPSPACE_iff P).trans (sopfpDefinable_iff_free P)

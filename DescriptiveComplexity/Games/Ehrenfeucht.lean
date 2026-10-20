@@ -216,7 +216,9 @@ theorem realize_efStage : ∀ {j : ℕ} (φ : L.BoundedFormula Empty j) {n : ℕ
 
 /-- **The methodology lemma**: `n`-round equivalent structures satisfy the
 same sentences of quantifier rank at most `n`. Everything the inexpressibility
-toolkit proves is a contrapositive of this. -/
+toolkit proves is a contrapositive of this.
+Registered in the Lax archive as
+[`Lax945089.EhrenfeuchtMethodology.realize_sentence_of_efEquiv`](https://laxarchive.org/lax-945089/Lax945089.EhrenfeuchtMethodology.html#s-Lax945089.EhrenfeuchtMethodology.realize_sentence_of_efEquiv). -/
 theorem realize_sentence_of_efEquiv (h : EFEquiv L M N n) (φ : L.Sentence)
     (hφ : qdepth φ ≤ n) : M ⊨ φ ↔ N ⊨ φ :=
   realize_efStage φ hφ h

@@ -183,7 +183,9 @@ end SigmaOne
 
 /-- **`NP ⊆ PSPACE`**: NP is `Σ₁`-definability (Fagin) and PSPACE is SO(TC)
 definability, and an existential block is a walk that guesses its state and
-stops. -/
+stops.
+Registered in the Lax archive as
+[`Lax134656.HierarchyInPSPACE.NP_subset_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.HierarchyInPSPACE.html#s-Lax134656.HierarchyInPSPACE.NP_subset_PSPACE). -/
 theorem NP_subset_PSPACE : NP ⊆ PSPACE :=
   fun _ _ _ h => SOTCDefinable.of_sigmaSODefinable h
 

@@ -205,15 +205,29 @@ private theorem realize_oneInKernel :
 
 end Realize
 
-/-- **1-in-SAT is `Σ₁`-definable**: guess the assignment, then check
-first-order that every clause has a true literal – SAT's kernel – and that it
-has no second one. -/
-theorem oneInSat_sigmaSODefinable : SigmaSODefinable 1 OneInSAT := by
-  refine ⟨[satAssignBlock], rfl, oneInKernel, ?_⟩
-  intro A _ _ _
+/-- **The kernel says exactly what it should**: the guessed assignment gives
+every clause exactly one true literal. -/
+theorem realize_oneInKernel_iff_oneInProper {A : Type} [Language.sat.Structure A]
+    (ρ : satAssignBlock.Assignment A) :
+    (@Sentence.Realize satSOLang A
+        (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) oneInKernel) ↔
+      OneInProper fun x => ρ satNuSym.1 fun _ => x := by
+  rw [realize_oneInKernel]
   constructor
-  · rintro ⟨ν, hν⟩
-    refine ⟨fun _ x => ν (x ⟨0, Nat.one_pos⟩), (realize_oneInKernel _).mpr ⟨?_, ?_, ?_, ?_⟩⟩
+  · rintro ⟨hsat, hPP, hNN, hPN⟩ c hc
+    obtain ⟨x, s, hx, hT⟩ := satClauses_occ hsat c hc
+    refine ⟨x, s, hx, hT, fun y t hy hTy => ?_⟩
+    cases s with
+    | false =>
+      cases t with
+      | false => exact ⟨hNN c y x hc hy.2 hTy hx.2 hT, rfl⟩
+      | true => exact absurd (hPN c y x hc hy.2 hTy hx.2) hT
+    | true =>
+      cases t with
+      | false => exact absurd (hPN c x y hc hx.2 hT hy.2) hTy
+      | true => exact ⟨hPP c y x hc hy.2 hTy hx.2 hT, rfl⟩
+  · intro hν
+    refine ⟨?_, ?_, ?_, ?_⟩
     · intro c hc
       obtain ⟨x, s, hx, hT, -⟩ := hν c hc
       cases s with
@@ -235,20 +249,19 @@ theorem oneInSat_sigmaSODefinable : SigmaSODefinable 1 OneInSAT := by
       obtain ⟨-, h1⟩ := huniq x true ⟨hc, hx⟩ hTx
       obtain ⟨-, h2⟩ := huniq y false ⟨hc, hy⟩ hTy
       exact Bool.noConfusion (h1.trans h2.symm)
+
+/-- **1-in-SAT is `Σ₁`-definable**: guess the assignment, then check
+first-order that every clause has a true literal – SAT's kernel – and that it
+has no second one. -/
+theorem oneInSat_sigmaSODefinable : SigmaSODefinable 1 OneInSAT := by
+  refine ⟨[satAssignBlock], rfl, oneInKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨ν, hν⟩
+    exact ⟨fun _ x => ν (x ⟨0, Nat.one_pos⟩),
+      (realize_oneInKernel_iff_oneInProper _).mpr hν⟩
   · rintro ⟨ρ, hρ⟩
-    obtain ⟨hsat, hPP, hNN, hPN⟩ := (realize_oneInKernel ρ).mp hρ
-    refine ⟨fun x => ρ satNuSym.1 fun _ => x, fun c hc => ?_⟩
-    obtain ⟨x, s, hx, hT⟩ := satClauses_occ hsat c hc
-    refine ⟨x, s, hx, hT, fun y t hy hTy => ?_⟩
-    cases s with
-    | false =>
-      cases t with
-      | false => exact ⟨hNN c y x hc hy.2 hTy hx.2 hT, rfl⟩
-      | true => exact absurd (hPN c y x hc hy.2 hTy hx.2) hT
-    | true =>
-      cases t with
-      | false => exact absurd (hPN c x y hc hx.2 hT hy.2) hTy
-      | true => exact ⟨hPP c y x hc hy.2 hTy hx.2 hT, rfl⟩
+    exact ⟨fun x => ρ satNuSym.1 fun _ => x, (realize_oneInKernel_iff_oneInProper ρ).mp hρ⟩
 
 end SigmaOne
 

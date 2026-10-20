@@ -114,7 +114,9 @@ theorem StepDef.inflLimit_invariant₂ (d : StepDef L) (hd : d.VarBound k)
 carrying a `k`-pebble equivalent pair of tuples**, `k` covering both its
 variable budget and the quantifier depth of its output sentence. This is the
 Boolean-query form of `≡ᵏ`-invariance, and the one a capture statement needs:
-the value of the induction is the same on both sides. -/
+the value of the induction is the same on both sides.
+Registered in the Lax archive as
+[`Lax945089.PebbleInvariance.ifpHolds_equivK₂`](https://laxarchive.org/lax-945089/Lax945089.PebbleInvariance.html#s-Lax945089.PebbleInvariance.ifpHolds_equivK₂). -/
 theorem StepDef.ifpHolds_equivK₂ (d : StepDef L) (hd : d.VarBound k) (hrels : d.UsesRels S)
     (hout : qdepth d.out ≤ k) {v : Fin k → M} {w : Fin k → N}
     (hvw : EquivK₂ (atomicAgreeOn₂ S M N k) v w) : d.IFPHolds M ↔ d.IFPHolds N := by

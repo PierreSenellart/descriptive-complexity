@@ -36,7 +36,9 @@ and none is expected – that is what makes the degree worth having.
 
 namespace DescriptiveComplexity
 
-/-- DAG Isomorphism is in NP: it reduces to Digraph Isomorphism, which is. -/
+/-- DAG Isomorphism is in NP: it reduces to Digraph Isomorphism, which is.
+Registered in the Lax archive as
+[`Lax604544.IsomorphismInNP.dagIso_mem_NP`](https://laxarchive.org/lax-604544/Lax604544.IsomorphismInNP.html#s-Lax604544.IsomorphismInNP.dagIso_mem_NP). -/
 theorem dagIso_mem_NP : DagIso ∈ NP :=
   NP.mem_of_foReduction dagIso_fo_reduction_digraphIso digraphIso_mem_NP
 

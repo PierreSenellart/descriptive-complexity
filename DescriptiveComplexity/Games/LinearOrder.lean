@@ -224,7 +224,9 @@ elements each are `n`-round equivalent, however far apart their sizes. By the
 methodology lemma (`DescriptiveComplexity.realize_sentence_of_efEquiv`) a
 sentence of quantifier rank `n` over the ordered vocabulary cannot separate
 them: first-order logic counts the elements of an ordered set only up to
-`2 ^ n`. -/
+`2 ^ n`.
+Registered in the Lax archive as
+[`Lax945089.GamesOnLinearOrders.efEquiv_linearOrder`](https://laxarchive.org/lax-945089/Lax945089.GamesOnLinearOrders.html#s-Lax945089.GamesOnLinearOrders.efEquiv_linearOrder). -/
 theorem efEquiv_linearOrder (n : ℕ) (hA : 2 ^ n ≤ Nat.card A) (hB : 2 ^ n ≤ Nat.card B) :
     EFEquiv (Language.empty.sum Language.order) A B n :=
   efStage_of_ordInv n default default (ordInv_default n hA hB)

@@ -154,7 +154,9 @@ theorem accepts_det_evenSpec_iff : evenSpec.det.Accepts A ↔ evenSpec.Accepts A
 /-- **EVEN is FO(DTC) definable**: the parity walk is deterministic, so the
 walk that defines EVEN survives Immerman's determinization. Hence EVEN is in
 `DescriptiveComplexity.LOGSPACE` by the logic, the bit-level route
-(`DescriptiveComplexity.even_mem_LOGSPACE_bit`) being a second proof. -/
+(`DescriptiveComplexity.even_mem_LOGSPACE_bit`) being a second proof.
+Registered in the Lax archive as
+[`Lax945089.FirstOrderBelowTransitiveClosure.even_dtcDefinable`](https://laxarchive.org/lax-945089/Lax945089.FirstOrderBelowTransitiveClosure.html#s-Lax945089.FirstOrderBelowTransitiveClosure.even_dtcDefinable). -/
 theorem even_dtcDefinable : DTCDefinable EVEN := by
   refine ⟨evenSpec, fun A _ _ _ _ => ?_⟩
   exact (accepts_evenSpec_iff (A := A)).symm.trans (accepts_det_evenSpec_iff A).symm
@@ -210,7 +212,9 @@ theorem even_dtcReduction_nonemptyMark : Nonempty (EVEN ≤ᵈᵗᶜ NONEMPTYMAR
 than first-order ones**: EVEN reduces to `DescriptiveComplexity.NONEMPTYMARK`
 in FO(≤, DTC) – one walk that never has a choice – and by no first-order
 reduction. This is the sharpest form of the separation: the notion on the left
-is the many-one reduction of the textbooks. -/
+is the many-one reduction of the textbooks.
+Registered in the Lax archive as
+[`Lax945089.ReductionsBelowLogSpace.exists_dtcReduction_not_orderedReduction`](https://laxarchive.org/lax-945089/Lax945089.ReductionsBelowLogSpace.html#s-Lax945089.ReductionsBelowLogSpace.exists_dtcReduction_not_orderedReduction). -/
 theorem exists_dtcReduction_not_orderedReduction :
     ∃ (L : Language.{0, 0}) (_ : L.IsRelational) (Q : DecisionProblem L),
       Nonempty (EVEN ≤ᵈᵗᶜ Q) ∧ IsEmpty (EVEN ≤ᶠᵒ[≤] Q) :=

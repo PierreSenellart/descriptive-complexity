@@ -5,6 +5,7 @@ Authors: Pierre Senellart
 -/
 import DescriptiveComplexity.Decoding
 import DescriptiveComplexity.Numbers.Binary
+import DescriptiveComplexity.Numbers.BinEnum
 import DescriptiveComplexity.Problems.Knapsack.Defs
 
 /-!
@@ -231,58 +232,39 @@ values, and the encoder's `Nat.testBit` digits are read back as the number
 they came from.
 -/
 
+/-- The bit positions of an encoded instance are enumerated, in increasing
+order, by `posnPt`: the hypothesis of the generic decoding lemmas of
+`DescriptiveComplexity.Numbers.BinEnum`. -/
+theorem binEnum :
+    BinEnum (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn (posnPt i) where
+  injective := posnPt_injective
+  posn_iff q := by
+    rcases pt_cases q with ⟨j, rfl⟩ | ⟨p, rfl⟩
+    · simp
+    · simp
+  le_iff _ _ := le_posnPt_posnPt _ _
+
 /-- The rank of a bit position is its index: the positions strictly below it
 are exactly those with a smaller index. -/
 theorem bitRank_posnPt (p : Fin (ssSize i + 1)) :
-    bitRank (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn (posnPt i p) = (p : ℕ) := by
-  classical
-  have hset :
-      {q : binarySubsetSumEncoding.Univ i | BWPosn q ∧ BWLe q (posnPt i p) ∧ q ≠ posnPt i p}
-        = posnPt i '' ↑(Finset.Iio p) := by
-    ext q
-    rcases pt_cases q with ⟨j, rfl⟩ | ⟨p', rfl⟩
-    · simp
-    · simp only [Set.mem_ofPred_eq, posn_posnPt, le_posnPt_posnPt, true_and, ne_eq,
-        posnPt_inj, Set.mem_image, Finset.coe_Iio, Set.mem_Iio]
-      constructor
-      · rintro ⟨hle, hne⟩
-        exact ⟨p', lt_of_le_of_ne hle hne, rfl⟩
-      · rintro ⟨x, hx, rfl⟩
-        exact ⟨le_of_lt hx, ne_of_lt hx⟩
-  unfold bitRank
-  rw [hset, Set.ncard_image_of_injective _ posnPt_injective, Set.ncard_coe_finset,
-    Fin.card_Iio]
+    bitRank (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn (posnPt i p) = (p : ℕ) :=
+  binEnum.bitRank_eq p
 
 open Classical in
 /-- On an encoded instance, `binNum` is the plain sum of place values over the
 bit positions. -/
 theorem binNum_eq_sum (b : binarySubsetSumEncoding.Univ i → Prop) :
     binNum (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn b
-      = ∑ p : Fin (ssSize i + 1), if b (posnPt i p) then 2 ^ (p : ℕ) else 0 := by
-  classical
-  have hset : {q : binarySubsetSumEncoding.Univ i | BWPosn q ∧ b q}
-      = posnPt i '' ↑(Finset.univ.filter fun p : Fin (ssSize i + 1) => b (posnPt i p)) := by
-    ext q
-    rcases pt_cases q with ⟨j, rfl⟩ | ⟨p, rfl⟩
-    · simp
-    · simp
-  unfold binNum
-  rw [hset, finsum_mem_image posnPt_injective.injOn,
-    finsum_mem_congr rfl fun p _ => by rw [bitRank_posnPt p], finsum_mem_coe_finset,
-    Finset.sum_filter]
+      = ∑ p : Fin (ssSize i + 1), if b (posnPt i p) then 2 ^ (p : ℕ) else 0 :=
+  binEnum.binNum_eq_sum b
 
 /-- **The decoding.** A set of bit positions carrying the binary digits of a
 number that fits in the position block decodes to that number. -/
 theorem binNum_eq (w : ℕ) (hw : w < 2 ^ (ssSize i + 1))
     (b : binarySubsetSumEncoding.Univ i → Prop)
     (hb : ∀ p : Fin (ssSize i + 1), b (posnPt i p) ↔ w.testBit (p : ℕ)) :
-    binNum (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn b = w := by
-  classical
-  have hval : binValue (Fin (ssSize i + 1)) (binEncode (Fin (ssSize i + 1)) w) = w :=
-    binValue_binEncode (by simpa using hw)
-  rw [binNum_eq_sum, ← hval, binValue]
-  refine Finset.sum_congr rfl fun p _ => ?_
-  by_cases h : w.testBit (p : ℕ) <;> simp [binEncode, hb p, h]
+    binNum (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn b = w :=
+  binEnum.binNum_eq_of_testBit w hw b hb
 
 /-! ### The weights and the target -/
 

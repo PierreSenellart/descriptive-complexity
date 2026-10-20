@@ -16,7 +16,8 @@ in `DescriptiveComplexity.Problems.Machine.Tape`.
 ## The program
 
 ```
-  guess :  ⊢ →  at each cell (x,U) write (x,T) or (x,F), moving right  → ⊣
+  guess :  ⊢ →  at each cell (x,U) write (x,F), or (x,T) if x occurs in a
+                clause, moving right  → ⊣
   check c: sweep back over the cells, accumulating
              flag := flag ∨ (posIn c x ∧ b) ∨ (negIn c x ∧ ¬b)
            at the far marker: if flag, take the next clause and turn round;
@@ -33,9 +34,14 @@ there are no rewind states; the markers are what tell the machine a pass has
 ended.
 
 The machine is nondeterministic in exactly one place, the choice of `(x,T)` or
-`(x,F)` in the guess phase. That is a deliberate design decision, and it
-is what will make the `⇒` half of correctness a corollary of uniqueness rather
-than a second invariant induction.
+`(x,F)` in the guess phase, and it has that choice only at an element that is a
+variable of the instance (`DescriptiveComplexity.SatVar`): elsewhere it writes
+`(x,F)`. The decision problem does not need this restriction; it is what makes
+the accepting runs correspond one to one to the models of the formula
+(`DescriptiveComplexity.Problems.Machine.CountingHardness`). Branching at the
+guess only is a deliberate design decision, and it is what will make the `⇒`
+half of correctness a corollary of uniqueness rather than a second invariant
+induction.
 
 ## Semantics first
 
@@ -73,6 +79,12 @@ the clause `c`. This is the first-order test on the source structure that the
 transition relation performs; it is the whole of the check phase. -/
 def SatLit (c x : A) (v : Bool) : Prop :=
   (SatPos c x ∧ v = true) ∨ (SatNeg c x ∧ v = false)
+
+/-- The element `x` is a variable of the instance: it occurs in some clause.
+The machine guesses a truth value only at such an element, and writes “false”
+at the others, so that its accepting runs are the models of the formula and
+not its satisfying assignments of all elements. -/
+def SatVar (x : A) : Prop := ∃ c : A, SatCl c ∧ (SatPos c x ∨ SatNeg c x)
 
 /-- `c` is the lowest clause. -/
 def SatMinCl (c : A) : Prop := SatCl c ∧ ∀ e, SatCl e → c ≤ e
@@ -152,7 +164,7 @@ clauses, so that no junk element is ever a transition. -/
 def SatTr (τ : SatV A) : Prop :=
   match τ.1 with
   | .tGuessStart => IsMinTup τ.2
-  | .tGuessVal _ => ∀ a : A, τ.2 1 ≤ a
+  | .tGuessVal v => (∀ a : A, τ.2 1 ≤ a) ∧ (v = true → SatVar (τ.2 0))
   | .tGuessEndAcc => IsMinTup τ.2 ∧ ∀ e : A, ¬ SatCl e
   | .tGuessEndChk => (∀ a : A, τ.2 1 ≤ a) ∧ SatMinCl (τ.2 0)
   | .tChk _ _ _ => SatCl (τ.2 0)
@@ -444,7 +456,7 @@ theorem satTr_payload {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
       | exact False.elim hτ
       | exact Prod.ext rfl (isMinTup_unique hτ hτ')
       | exact Prod.ext rfl (isMinTup_unique hτ.1 hτ'.1)
-      | exact satV_ext rfl (one_eq_one_iff.mp (hr.symm.trans hr')).2 (hmin _ _ hτ hτ')
+      | exact satV_ext rfl (one_eq_one_iff.mp (hr.symm.trans hr')).2 (hmin _ _ hτ.1 hτ'.1)
       | exact satV_ext rfl (le_antisymm (hτ.2.2 _ hτ'.2.1) (hτ'.2.2 _ hτ.2.1))
           (hmin _ _ hτ.1 hτ'.1)
       | exact satV_ext rfl (one_eq_one_iff.mp (hs.symm.trans hs')).2
@@ -666,6 +678,29 @@ theorem succPos_posCell_posEnd :
       rw [hcell, le_antisymm (le_topA _) hx]
     · exact Or.inr (eq_posEnd_of_posn hr h)
 
+/-- **A transition determines the step**: two steps out of the same
+configuration by the same transition lead to the same configuration. -/
+theorem config_eq_of_tr {c c₁ c₂ : Config (SatV A)} {τ : SatV A} (hdst : SatDst τ c₁.state)
+    (hdst' : SatDst τ c₂.state) (hwrite : SatWrite τ (c₁.tape c.head))
+    (hwrite' : SatWrite τ (c₂.tape c.head))
+    (hframe : ∀ p, p ≠ c.head → c₁.tape p = c.tape p)
+    (hframe' : ∀ p, p ≠ c.head → c₂.tape p = c.tape p)
+    (hmove : (SatRight τ ∧ SuccPos tagTupleLe SatPosn c.head c₁.head) ∨
+      (¬ SatRight τ ∧ SuccPos tagTupleLe SatPosn c₁.head c.head))
+    (hmove' : (SatRight τ ∧ SuccPos tagTupleLe SatPosn c.head c₂.head) ∨
+      (¬ SatRight τ ∧ SuccPos tagTupleLe SatPosn c₂.head c.head)) :
+    c₁ = c₂ := by
+  refine Config.ext (satDst_functional hdst hdst') ?_ (funext fun p => ?_)
+  · rcases hmove with ⟨hrt, hsp⟩ | ⟨hrt, hsp⟩ <;>
+      rcases hmove' with ⟨hrt', hsp'⟩ | ⟨hrt', hsp'⟩
+    · exact TMData.succPos_right_unique (M := satMachine A) isLinOrd_tagTupleLe hsp hsp'
+    · exact absurd hrt hrt'
+    · exact absurd hrt' hrt
+    · exact succPos_left_unique isLinOrd_tagTupleLe hsp hsp'
+  · rcases eq_or_ne p c.head with rfl | hne
+    · exact satWrite_functional hwrite hwrite'
+    · rw [hframe p hne, hframe' p hne]
+
 /-- **The machine is deterministic away from the guess.** Once the transition
 is pinned (`DescriptiveComplexity.satTr_unique`), the successor configuration is too: its
 state by `satDst_functional`, the cell under the head by `satWrite_functional`,
@@ -682,16 +717,85 @@ theorem step_functional_off_guess {c c₁ c₂ : Config (SatV A)}
   obtain ⟨σ, hσ, hsrc', hread', hdst', hwrite', hframe', hmove'⟩ := h₂
   have hteq : τ = σ := satTr_unique hτ hσ hsrc hsrc' hread hread' hguess
   subst hteq
-  refine Config.ext (satDst_functional hdst hdst') ?_ (funext fun p => ?_)
-  · rcases hmove with ⟨hrt, hsp⟩ | ⟨hrt, hsp⟩ <;>
-      rcases hmove' with ⟨hrt', hsp'⟩ | ⟨hrt', hsp'⟩
-    · exact TMData.succPos_right_unique isLinOrd_tagTupleLe hsp hsp'
-    · exact absurd hrt hrt'
-    · exact absurd hrt' hrt
-    · exact succPos_left_unique isLinOrd_tagTupleLe hsp hsp'
-  · rcases eq_or_ne p c.head with rfl | hne
-    · exact satWrite_functional hwrite hwrite'
-    · rw [hframe p hne, hframe' p hne]
+  exact config_eq_of_tr hdst hdst' hwrite hwrite' hframe hframe' hmove hmove'
+
+/-! ### What a step leaves alone
+
+Three facts about arbitrary steps, which the counting form of the correctness
+proof needs (`DescriptiveComplexity.Problems.Machine.CountingHardness`): only a guess
+write changes the tape, the guessing state is never entered again once left,
+and an accepting configuration has no successor. -/
+
+omit [Language.sat.Structure A] in
+/-- A transition other than a guess write writes back the symbol it read. -/
+theorem satWrite_eq_read {τ a b : SatV A} (hr : SatRead τ a) (hw : SatWrite τ b)
+    (hg : ∀ v, τ.1 ≠ SatTag.tGuessVal v) : b = a := by
+  obtain ⟨t, w⟩ := τ
+  cases t <;> dsimp only [SatRead, SatWrite] at hr hw <;>
+    first
+      | exact hw.trans hr.symm
+      | exact False.elim hr
+      | exact absurd rfl (hg _)
+
+/-- **Only a guess write changes the tape.** -/
+theorem step_tape_eq {c d : Config (SatV A)} (h : (satMachine A).Step c d)
+    (hng : ¬ (c.state = stGuess ∧ ∃ x : A, c.tape c.head = symU x)) : d.tape = c.tape := by
+  obtain ⟨τ, hτ, hsrc, hread, -, hwrite, hframe, -⟩ := h
+  have hg : ∀ v, τ.1 ≠ SatTag.tGuessVal v := fun v hv =>
+    hng ⟨satSrc_guessVal hv hsrc, τ.2 0, satRead_guessVal hv hread⟩
+  funext p
+  rcases eq_or_ne p c.head with rfl | hne
+  · exact satWrite_eq_read hread hwrite hg
+  · exact hframe p hne
+
+/-- **The guessing state is not entered again**: a step out of a state that is
+not the guessing one, or out of the guessing state over the right marker,
+leads to a state that is not the guessing one. -/
+theorem step_state_ne_guess {c d : Config (SatV A)} (h : (satMachine A).Step c d)
+    (hs : c.state.1 ≠ SatTag.qGuess ∨ c.tape c.head = symEnd) :
+    d.state.1 ≠ SatTag.qGuess := by
+  obtain ⟨τ, hτ, hsrc, hread, hdst, -, -, -⟩ := h
+  have h1 : c.state.1 = stateTag τ.1 := satSrc_tag hτ hsrc
+  have h2 : (c.tape c.head).1 = readTag τ.1 := satRead_tag hτ hread
+  have hdst' : SatDst τ d.state := hdst
+  have hτ' : SatTr τ := hτ
+  obtain ⟨t, w⟩ := τ
+  cases t <;> dsimp only [SatTr, SatDst] at hτ' hdst' <;>
+    first
+      | exact False.elim hτ'
+      | (rw [hdst']; exact fun h => SatTag.noConfusion h)
+      | (rcases hdst' with ⟨h, -⟩ | ⟨h, -⟩ <;> rw [h] <;> exact fun h => SatTag.noConfusion h)
+      | (rcases hs with hs | hs
+         · exact absurd h1 hs
+         · rw [hs] at h2
+           exact SatTag.noConfusion h2)
+
+/-- **Past the guess phase the tape is frozen**: a run from a state that is not
+the guessing one ends on the tape it started with. -/
+theorem stepsIn_tape_eq : ∀ (k : ℕ) (c cfin : Config (SatV A)),
+    (satMachine A).StepsIn k c cfin → c.state.1 ≠ SatTag.qGuess → cfin.tape = c.tape := by
+  intro k
+  induction k with
+  | zero =>
+    intro c cfin hk _
+    have heq : c = cfin := hk
+    rw [heq]
+  | succ k ih =>
+    rintro c cfin ⟨c₁, hstep, hrest⟩ hc
+    have hng : ¬ (c.state = stGuess ∧ ∃ x : A, c.tape c.head = symU x) :=
+      fun hcon => hc (by rw [hcon.1]; rfl)
+    rw [ih c₁ cfin hrest (step_state_ne_guess hstep (Or.inl hc)), step_tape_eq hstep hng]
+
+/-- No transition applies in the accepting state. -/
+theorem trTag_state_ne_qAcc : ∀ t : SatTag, isTrTag t → stateTag t ≠ SatTag.qAcc := by decide
+
+/-- **An accepting configuration has no successor.** -/
+theorem not_step_of_acc {c d : Config (SatV A)} (hacc : SatAcc c.state) :
+    ¬ (satMachine A).Step c d := by
+  rintro ⟨τ, hτ, hsrc, -⟩
+  have h1 : c.state.1 = stateTag τ.1 := satSrc_tag hτ hsrc
+  have hacc' : c.state.1 = SatTag.qAcc := hacc
+  exact trTag_state_ne_qAcc τ.1 (satTr_isTrTag hτ) (h1.symm.trans hacc')
 
 /-! ### The intended run: the guess phase -/
 
@@ -783,7 +887,7 @@ theorem tag_le_pEnd {t : SatTag} (h : t ≤ SatTag.pEnd) :
 /-- **One step of the guess sweep.** At the left marker the machine steps over
 it; at a cell it writes the guessed value and moves on; past the right marker
 the segment bound leaves nothing to prove. -/
-theorem step_guess (ν : A → Bool) {p q : SatV A}
+theorem step_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x) {p q : SatV A}
     (hsucc : SuccPos tagTupleLe SatPosn p q) (hb : tagTupleLe q posEnd) :
     (satMachine A).Step (confGuess ν p) (confGuess ν q) := by
   classical
@@ -802,7 +906,8 @@ theorem step_guess (ν : A → Bool) {p q : SatV A}
       have := hsucc.1
       rw [SatPosn, h] at this
       exact this
-    refine ⟨one (.tGuessVal (ν (p.2 0))) (p.2 0), fun a => botA_le a, rfl, ?_, rfl, ?_, hframe,
+    refine ⟨one (.tGuessVal (ν (p.2 0))) (p.2 0), ⟨fun a => botA_le a, hν (p.2 0)⟩, rfl, ?_,
+      rfl, ?_, hframe,
       Or.inl ⟨trivial, hsucc⟩⟩
     · change guessTape ν p p = symU (p.2 0)
       simp only [guessTape, h]
@@ -816,13 +921,13 @@ theorem step_guess (ν : A → Bool) {p q : SatV A}
 /-- **The whole guess sweep.** From the left marker to the right one, the
 machine writes a truth value in every cell, in as many steps as there are
 positions strictly between the markers – plus the two markers themselves. -/
-theorem steps_guess (ν : A → Bool) :
+theorem steps_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x) :
     (satMachine A).StepsIn
       (bitRank tagTupleLe SatPosn (posEnd : SatV A) -
         bitRank tagTupleLe SatPosn (posStart : SatV A))
       (confGuess ν posStart) (confGuess ν posEnd) :=
   TMData.stepsIn_of_segment isLinOrd_tagTupleLe satPosn_posStart
-    (fun _ _ hsucc _ hb => step_guess ν hsucc hb) posEnd satPosn_posEnd
+    (fun _ _ hsucc _ hb => step_guess ν hν hsucc hb) posEnd satPosn_posEnd
     (minPos_posStart.2 posEnd satPosn_posEnd) (tagTupleLe_refl _)
 
 /-- **The turn out of the guess phase**, when there is a clause to check: the
@@ -1332,17 +1437,22 @@ theorem satMachine_wellFormed : (satMachine A).WellFormed :=
 
 /-! ### Correctness, the chaining half -/
 
-/-- **A satisfying assignment makes the machine accept, within the budget.**
+/-- **The run of a satisfying assignment**, true only at variables of the
+instance: the machine reaches an accepting configuration within the budget,
+through the configuration that ends the guess sweep.
 The run is the guess sweep, the turn into the lowest clause, and one sweep per
 clause; its length is at most `(m + 1) · (n + 2)` steps for `n` elements and
 `m` clauses, which `DescriptiveComplexity.sat_budget` puts strictly below the number
 of filler positions alone. -/
-theorem satMachine_accepts_of_sat (ν : A → Bool)
+theorem satMachine_run_of_sat (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x)
     (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
-    (satMachine A).Accepts := by
+    ∃ (n : ℕ) (cfin : Config (SatV A)), n < Nat.card {p : SatV A // SatPosn p} ∧
+      (satMachine A).StepsIn n (confGuess ν posStart) cfin ∧ SatAcc cfin.state ∧
+      (satMachine A).StepsIn
+        (n - bitRank tagTupleLe SatPosn (posEnd : SatV A)) (confGuess ν posEnd) cfin := by
   have hguess : (satMachine A).StepsIn (bitRank tagTupleLe SatPosn (posEnd : SatV A))
       (confGuess ν posStart) (confGuess ν posEnd) := by
-    have h := steps_guess ν
+    have h := steps_guess ν hν
     rwa [bitRank_posStart, Nat.sub_zero] at h
   have hRle : bitRank tagTupleLe SatPosn (posEnd : SatV A) ≤ Nat.card A + 1 :=
     bitRank_posEnd_le
@@ -1364,8 +1474,11 @@ theorem satMachine_accepts_of_sat (ν : A → Bool)
       rw [heq]
       exact step_turnChk ν hmincl
     have hchain := (hguess.trans_step hturn).trans hrun
-    refine ⟨confGuess ν posStart, cfin,
-      bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 + n, isInit_confGuess ν, ?_, hchain, hacc⟩
+    refine ⟨bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 + n, cfin, ?_, hchain, hacc, ?_⟩
+    swap
+    · rw [show bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 + n -
+          bitRank tagTupleLe SatPosn (posEnd : SatV A) = n + 1 by omega]
+      exact ⟨_, hturn, hrun⟩
     have hm : {e : A | SatCl e ∧ c₀ ≤ e}.ncard ≤ Nat.card A := by
       have h := Set.ncard_le_ncard (Set.subset_univ {e : A | SatCl e ∧ c₀ ≤ e})
         (Set.toFinite _)
@@ -1386,13 +1499,23 @@ theorem satMachine_accepts_of_sat (ν : A → Bool)
       _ ≤ _ := hbudget
   · have hno : ∀ e : A, ¬ SatCl e := fun e he => hcl ⟨e, he⟩
     have hchain := hguess.trans_step (step_turnAcc ν hno)
-    refine ⟨confGuess ν posStart, _, bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1,
-      isInit_confGuess ν, ?_, hchain, rfl⟩
+    refine ⟨bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1, _, ?_, hchain, rfl, ?_⟩
+    swap
+    · rw [show bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 -
+          bitRank tagTupleLe SatPosn (posEnd : SatV A) = 1 by omega]
+      exact ⟨_, step_turnAcc ν hno, rfl⟩
     have hs := sat_budget (m := 0) hA (Nat.zero_le _)
     calc bitRank tagTupleLe SatPosn (posEnd : SatV A) + 1 ≤ Nat.card A + 2 := by omega
       _ = (0 + 1) * (Nat.card A + 2) := by ring
       _ < 8 * Nat.card A * Nat.card A := hs
       _ ≤ _ := hbudget
+
+/-- **A satisfying assignment makes the machine accept, within the budget.** -/
+theorem satMachine_accepts_of_sat (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x)
+    (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
+    (satMachine A).Accepts := by
+  obtain ⟨n, cfin, hn, hrun, hacc, -⟩ := satMachine_run_of_sat ν hν hsat
+  exact ⟨confGuess ν posStart, cfin, n, isInit_confGuess ν, hn, hrun, hacc⟩
 
 /-! ### Correctness, from an accepting run to an assignment
 
@@ -1632,33 +1755,128 @@ theorem sat_of_chk (k : ℕ) :
         exact absurd (satRead_tag hτ hread).symm (trTag_read_ne_sBlank τ.1 (satTr_isTrTag hτ))
       all_goals (rw [SatPosn, htag] at hp; exact hp.elim)
 
+/-- **The tape at the end of the guess sweep is final**: a run from the
+configuration that ends the guess sweep never writes again. -/
+theorem stepsIn_posEnd_tape (ν : A → Bool) : ∀ (k : ℕ) (cfin : Config (SatV A)),
+    (satMachine A).StepsIn k (confGuess ν posEnd) cfin → cfin.tape = doneTape ν := by
+  intro k cfin hk
+  cases k with
+  | zero =>
+    have heq : confGuess ν posEnd = cfin := hk
+    rw [← heq]
+    rfl
+  | succ k =>
+    obtain ⟨c₁, hstep, hrest⟩ := hk
+    have hend : (confGuess ν (posEnd : SatV A)).tape (confGuess ν posEnd).head = symEnd := rfl
+    have hng : ¬ ((confGuess ν (posEnd : SatV A)).state = stGuess ∧
+        ∃ x : A, (confGuess ν posEnd).tape (confGuess ν posEnd).head = symU x) := by
+      rintro ⟨-, x, hx⟩
+      rw [hend] at hx
+      exact SatTag.noConfusion (congrArg Prod.fst hx)
+    rw [stepsIn_tape_eq k c₁ cfin hrest (step_state_ne_guess hstep (Or.inr hend)),
+      step_tape_eq hstep hng]
+    rfl
+
+/-- **A guess step writes a truth value**: out of the guessing state over the
+unassigned cell of `x`, the cell under the old head holds `(x, v)` for some
+`v`. -/
+theorem step_guess_write {c d : Config (SatV A)} (h : (satMachine A).Step c d) {x : A}
+    (hst : c.state = stGuess) (hx : c.tape c.head = symU x) :
+    ∃ v, d.tape c.head = symV v x := by
+  obtain ⟨τ, hτ, hsrc, hread, -, hwrite, -, -⟩ := h
+  have hreadτ : SatRead τ (symU x) := hx ▸ hread
+  have hsrcτ : SatSrc τ stGuess := hst ▸ hsrc
+  obtain ⟨v, hv⟩ := trTag_guess_sU τ.1 (satTr_isTrTag hτ)
+    (satSrc_tag hτ hsrcτ).symm (satRead_tag hτ hreadτ).symm
+  have hτx : τ.2 0 = x := (one_eq_one_iff.mp (satRead_guessVal hv hreadτ)).2.symm
+  refine ⟨v, ?_⟩
+  have h : SatWrite τ (d.tape c.head) := hwrite
+  unfold SatWrite at h
+  rw [hv, hτx] at h
+  exact h
+
+/-- **The symbol written determines the step**: two steps out of the same
+configuration that leave the same symbol under the old head are the same step.
+Away from the guess this is determinism; at a guess the symbol written is the
+truth value chosen. -/
+theorem step_functional_of_write {c c₁ c₂ : Config (SatV A)}
+    (h₁ : (satMachine A).Step c c₁) (h₂ : (satMachine A).Step c c₂)
+    (hw : c₁.tape c.head = c₂.tape c.head) : c₁ = c₂ := by
+  by_cases hguess : c.state = stGuess ∧ ∃ x : A, c.tape c.head = symU x
+  swap
+  · exact step_functional_off_guess hguess h₁ h₂
+  obtain ⟨hst, x, hx⟩ := hguess
+  obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := h₁
+  obtain ⟨σ, hσ, hsrc', hread', hdst', hwrite', hframe', hmove'⟩ := h₂
+  have hreadτ : SatRead τ (symU x) := hx ▸ hread
+  have hreadσ : SatRead σ (symU x) := hx ▸ hread'
+  have hsrcτ : SatSrc τ stGuess := hst ▸ hsrc
+  have hsrcσ : SatSrc σ stGuess := hst ▸ hsrc'
+  obtain ⟨v, hv⟩ := trTag_guess_sU τ.1 (satTr_isTrTag hτ)
+    (satSrc_tag hτ hsrcτ).symm (satRead_tag hτ hreadτ).symm
+  obtain ⟨v', hv'⟩ := trTag_guess_sU σ.1 (satTr_isTrTag hσ)
+    (satSrc_tag hσ hsrcσ).symm (satRead_tag hσ hreadσ).symm
+  have hτx : τ.2 0 = x := (one_eq_one_iff.mp (satRead_guessVal hv hreadτ)).2.symm
+  have hσx : σ.2 0 = x := (one_eq_one_iff.mp (satRead_guessVal hv' hreadσ)).2.symm
+  have hτtr : (∀ a : A, τ.2 1 ≤ a) ∧ (v = true → SatVar (τ.2 0)) := by
+    have h : SatTr τ := hτ
+    unfold SatTr at h
+    rw [hv] at h
+    exact h
+  have hσtr : (∀ a : A, σ.2 1 ≤ a) ∧ (v' = true → SatVar (σ.2 0)) := by
+    have h : SatTr σ := hσ
+    unfold SatTr at h
+    rw [hv'] at h
+    exact h
+  have hwτ : c₁.tape c.head = symV v x := by
+    have h : SatWrite τ (c₁.tape c.head) := hwrite
+    unfold SatWrite at h
+    rw [hv, hτx] at h
+    exact h
+  have hwσ : c₂.tape c.head = symV v' x := by
+    have h : SatWrite σ (c₂.tape c.head) := hwrite'
+    unfold SatWrite at h
+    rw [hv', hσx] at h
+    exact h
+  have hvv : v = v' := by
+    have h := (one_eq_one_iff.mp (hwτ.symm.trans (hw.trans hwσ))).1
+    revert h
+    cases v <;> cases v' <;> simp
+  have hteq : τ = σ :=
+    satV_ext (hv.trans (hvv ▸ hv'.symm)) (hτx.trans hσx.symm)
+      (le_antisymm (hτtr.1 _) (hσtr.1 _))
+  subst hteq
+  exact config_eq_of_tr hdst hdst' hwrite hwrite' hframe hframe' hmove hmove'
+
 /-- **The guess-phase analysis**: an accepting run from a guess configuration
 yields a satisfying assignment. Walking the guess sweep, the assignment is
 rebuilt one cell at a time from the values the run chose to write; at the right
 marker the run either accepts – no clause exists – or enters the check phase,
 where `DescriptiveComplexity.sat_of_chk` takes over. -/
 theorem sat_of_guess : ∀ (k : ℕ) (ν : A → Bool) (p : SatV A) (cfin : Config (SatV A)),
-    SatPosn p → tagTupleLe p posEnd →
+    (∀ x : A, ν x = true → SatVar x) → SatPosn p → tagTupleLe p posEnd →
     (satMachine A).StepsIn k (confGuess ν p) cfin → SatAcc cfin.state →
-    ∃ ν' : A → Bool, ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν' y) := by
+    ∃ ν' : A → Bool, (∀ x : A, ν' x = true → SatVar x) ∧
+      (∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν' y)) ∧ cfin.tape = doneTape ν' := by
   intro k
   induction k with
   | zero =>
-    intro ν p cfin hp hle hk hacc
+    intro ν p cfin hν hp hle hk hacc
     have heq : _ = cfin := hk
     rw [← heq] at hacc
     exact SatTag.noConfusion hacc
   | succ k ih =>
-    rintro ν p cfin hp hle ⟨c₁, hstep, hrest⟩ hacc
+    rintro ν p cfin hν hp hle ⟨c₁, hstep, hrest⟩ hacc
+    have hrun : (satMachine A).StepsIn (k + 1) (confGuess ν p) cfin := ⟨c₁, hstep, hrest⟩
     rcases tag_le_pEnd (tagTupleLe_tag_le hle) with htag | htag | htag
     · -- the left marker: step over it
       rw [show p = posStart from eq_posStart_of_posn hp htag] at hstep
       have hc₁ : c₁ = confGuess ν (posCell botA) :=
         step_functional_off_guess
           (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.2.choose_spec)) hstep
-          (step_guess ν succPos_posStart_posCell (posCell_le_posEnd botA))
+          (step_guess ν hν succPos_posStart_posCell (posCell_le_posEnd botA))
       rw [hc₁] at hrest
-      exact ih ν (posCell botA) cfin (satPosn_posCell _) (posCell_le_posEnd _) hrest hacc
+      exact ih ν (posCell botA) cfin hν (satPosn_posCell _) (posCell_le_posEnd _) hrest hacc
     · -- a cell: the guess itself
       obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := hstep
       have hpos1 : ∀ a : A, p.2 1 ≤ a := by
@@ -1714,9 +1932,21 @@ theorem sat_of_guess : ∀ (k : ℕ) (ν : A → Bool) (p : SatV A) (cfin : Conf
           · exact SatTag.noConfusion ((congrArg Prod.fst h').trans htag)
           · rw [← h']
             exact isLinOrd_tagTupleLe.1 posEnd
-      exact ih (Function.update ν (p.2 0) v) c₁.head cfin hsucc.2.1 hqle hrest hacc
+      have hν' : ∀ y : A, Function.update ν (p.2 0) v y = true → SatVar y := by
+        intro y hy
+        by_cases hyx : y = p.2 0
+        · rw [hyx, Function.update_self] at hy
+          have h : SatTr τ := hτ
+          unfold SatTr at h
+          rw [hτ₁] at h
+          rw [hyx, ← hx]
+          exact h.2 hy
+        · rw [Function.update_of_ne hyx] at hy
+          exact hν y hy
+      exact ih (Function.update ν (p.2 0) v) c₁.head cfin hν' hsucc.2.1 hqle hrest hacc
     · -- the right marker: turn out of the guess phase
-      rw [show p = posEnd from eq_posEnd_of_posn hp htag] at hstep
+      rw [show p = posEnd from eq_posEnd_of_posn hp htag] at hstep hrun
+      have htape : cfin.tape = doneTape ν := stepsIn_posEnd_tape ν (k + 1) cfin hrun
       have hstep' := hstep
       obtain ⟨τ, hτ, hsrc, hread, -, -, -, -⟩ := hstep'
       rcases trTag_guess_sEnd τ.1 (satTr_isTrTag hτ)
@@ -1727,7 +1957,7 @@ theorem sat_of_guess : ∀ (k : ℕ) (ν : A → Bool) (p : SatV A) (cfin : Conf
           unfold SatTr at h
           rw [hτ₁] at h
           exact h.2
-        exact ⟨ν, fun e he => absurd he (hno e)⟩
+        exact ⟨ν, hν, fun e he => absurd he (hno e), htape⟩
       · -- start checking the lowest clause
         have htr : (∀ a : A, τ.2 1 ≤ a) ∧ SatMinCl (τ.2 0) := by
           have h : SatTr τ := hτ
@@ -1749,8 +1979,8 @@ theorem sat_of_guess : ∀ (k : ℕ) (ν : A → Bool) (p : SatV A) (cfin : Conf
           step_functional_off_guess
             (fun hcon => SatTag.noConfusion (congrArg Prod.fst hcon.2.choose_spec)) hstep hint
         rw [hc₁] at hrest
-        exact ⟨ν, fun e he => (sat_of_chk k).1 ν (τ.2 0) (posCell topA) cfin htr.2.1
-          (satPosn_posCell _) hrest hacc e he (htr.2.2 e he)⟩
+        exact ⟨ν, hν, fun e he => (sat_of_chk k).1 ν (τ.2 0) (posCell topA) cfin htr.2.1
+          (satPosn_posCell _) hrest hacc e he (htr.2.2 e he), htape⟩
 
 end Reverse
 
@@ -1783,10 +2013,18 @@ theorem satMachine_accepts_iff_satisfiable : (satMachine A).Accepts ↔ Satisfia
   constructor
   · rintro ⟨c₀, cfin, n, hinit, -, hrun, hacc⟩
     rw [isInit_eq_confGuess hinit (fun _ => false)] at hrun
-    exact sat_of_guess n (fun _ => false) posStart cfin satPosn_posStart
-      posStart_le_posEnd hrun hacc
+    obtain ⟨ν', -, hν', -⟩ := sat_of_guess n (fun _ => false) posStart cfin
+      (fun _ h => Bool.noConfusion h) satPosn_posStart posStart_le_posEnd hrun hacc
+    exact ⟨ν', hν'⟩
   · rintro ⟨ν, hν⟩
-    exact satMachine_accepts_of_sat ν hν
+    classical
+    refine satMachine_accepts_of_sat (fun x => ν x && decide (SatVar x))
+      (fun x hx => of_decide_eq_true (Bool.and_eq_true_iff.mp hx).2) fun e he => ?_
+    obtain ⟨y, hy⟩ := hν e he
+    refine ⟨y, ?_⟩
+    rcases hy with ⟨hp, hT⟩ | ⟨hn, hF⟩
+    · exact Or.inl ⟨hp, Bool.and_eq_true_iff.mpr ⟨hT, decide_eq_true ⟨e, he, Or.inl hp⟩⟩⟩
+    · exact Or.inr ⟨hn, by rw [hF, Bool.false_and]⟩
 
 end Machine
 

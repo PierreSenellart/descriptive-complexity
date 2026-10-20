@@ -619,7 +619,9 @@ theorem BitDef.bitDefinable {P : DecisionProblem L} {R : ArithRel L Empty}
 definition, proved directly rather than through the machine. Its bit atom is
 translated by `DescriptiveComplexity.powArithDef`, which is
 [Immerman 1999][immerman1999descriptive] Thm 1.17(2); every other atom is a
-formula of the two numeric predicates outright. -/
+formula of the two numeric predicates outright.
+Registered in the Lax archive as
+[`Lax895169.ACZeroIsBitLogic.bitDefinable_ac0Definable`](https://laxarchive.org/lax-895169/Lax895169.ACZeroIsBitLogic.html#s-Lax895169.ACZeroIsBitLogic.bitDefinable_ac0Definable). -/
 theorem BitDefinable.ac0Definable {P : DecisionProblem L} (h : BitDefinable P) :
     AC0Definable P := by
   obtain ⟨φ, hφ⟩ := h

@@ -231,7 +231,9 @@ section RelOrdered
 
 variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 
-/-- **PTIME is closed under relativized ordered reductions.** -/
+/-- **PTIME is closed under relativized ordered reductions.**
+Registered in the Lax archive as
+[`Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction`](https://laxarchive.org/lax-535992/Lax535992.PTIMEClosure.html#s-Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction). -/
 theorem mem_PTIME_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
   (ifpDefinable_iff_mem_PTIME P).mp
     (((ifpDefinable_iff_mem_PTIME Q).mpr h).of_relOrderedReduction f)

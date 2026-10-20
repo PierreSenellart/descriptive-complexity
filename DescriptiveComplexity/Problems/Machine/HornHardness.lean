@@ -1887,9 +1887,9 @@ theorem steps_hVerClauseAccR (M : A → Bool) {c : A} (hc : SatCl c)
     (hmax : SatMaxCl c) (hhorn : AtMostOnePositive A) (hsat : ∃ y : A, MLit c y (M y)) :
     ∃ k ≤ bitRank tagTupleLe HPosn (posHEnd : HV A), ∃ cfin : Config (HV A),
       (hornMachine A).StepsIn k (confHVerR M c (posHCell botA)) cfin ∧
-        HAcc cfin.state := by
+        HAcc cfin.state ∧ cfin.tape = hTape M := by
   refine ⟨_, ?_, _, (steps_hVerRAll M hc).trans_step
-    (step_hVerAccR M hmax hhorn ((verFlagR_posHEnd M c).mpr hsat)), rfl⟩
+    (step_hVerAccR M hmax hhorn ((verFlagR_posHEnd M c).mpr hsat)), rfl, rfl⟩
   have e2 := bitRank_posHEnd_eq (A := A)
   have e3 := bitRank_posHCell_botA (A := A)
   omega
@@ -1899,9 +1899,9 @@ theorem steps_hVerClauseAccL (M : A → Bool) {c : A} (hc : SatCl c)
     (hmax : SatMaxCl c) (hhorn : AtMostOnePositive A) (hsat : ∃ y : A, MLit c y (M y)) :
     ∃ k ≤ bitRank tagTupleLe HPosn (posHEnd : HV A), ∃ cfin : Config (HV A),
       (hornMachine A).StepsIn k (confHVerL M c (posHCell topA)) cfin ∧
-        HAcc cfin.state := by
+        HAcc cfin.state ∧ cfin.tape = hTape M := by
   refine ⟨_, ?_, _, (steps_hVerLAll M hc).trans_step
-    (step_hVerAccL M hmax hhorn ((verFlagL_posHStart M c).mpr hsat)), rfl⟩
+    (step_hVerAccL M hmax hhorn ((verFlagL_posHStart M c).mpr hsat)), rfl, rfl⟩
   have e1 := bitRank_posHStart (A := A)
   have e2 := bitRank_posHEnd_eq (A := A)
   omega
@@ -1916,11 +1916,11 @@ theorem hVer_accepts (M : A → Bool) (hhorn : AtMostOnePositive A)
       (∃ (n : ℕ) (cfin : Config (HV A)),
           n ≤ {e : A | SatCl e ∧ c ≤ e}.ncard * bitRank tagTupleLe HPosn (posHEnd : HV A) ∧
           (hornMachine A).StepsIn n (confHVerR M c (posHCell botA)) cfin ∧
-            HAcc cfin.state) ∧
+            HAcc cfin.state ∧ cfin.tape = hTape M) ∧
         ∃ (n : ℕ) (cfin : Config (HV A)),
           n ≤ {e : A | SatCl e ∧ c ≤ e}.ncard * bitRank tagTupleLe HPosn (posHEnd : HV A) ∧
           (hornMachine A).StepsIn n (confHVerL M c (posHCell topA)) cfin ∧
-            HAcc cfin.state := by
+            HAcc cfin.state ∧ cfin.tape = hTape M := by
   intro c
   induction c using WellFoundedGT.induction with
   | ind c IH =>
@@ -1967,11 +1967,16 @@ theorem roundFold_marks_eq_forced {c₀ : A} (hmin : SatMinCl c₀) {M' : A → 
     rw [Nat.zero_add, hcard]
     exact forced_forcedIn_card hx
 
-/-- **The machine accepts every yes-instance of HORN-SAT**, within the
-budget: dispatch, `n` rounds of propagation, and a verification pass that the
-closure – which satisfiability makes a model – lets run to acceptance. -/
-theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable A) :
-    (hornMachine A).Accepts := by
+/-- **The run of the machine on a yes-instance of HORN-SAT**: within the
+budget it reaches an accepting configuration – dispatch, `n` rounds of
+propagation, and a verification pass that the closure, which satisfiability
+makes a model, lets run to acceptance – and the tape then holds the marks of
+the propagation closure. -/
+theorem hornMachine_final (hhorn : AtMostOnePositive A) (hsat : Satisfiable A) :
+    ∃ (cfin : Config (HV A)) (n : ℕ) (M' : A → Bool),
+      n < Nat.card {p : HV A // (hornMachine A).Posn p} ∧
+        (hornMachine A).StepsIn n confHInit cfin ∧ HAcc cfin.state ∧
+          cfin.tape = hTape M' ∧ ∀ x : A, M' x = true ↔ Forced x := by
   classical
   have hn : 1 ≤ Nat.card A := Nat.card_pos
   have hbudget := card_le_card_hPosn A
@@ -1996,7 +2001,7 @@ theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable
     have hchain := ((TMData.StepsIn.trans_step
       (show (hornMachine A).StepsIn 0 confHInit confHInit from rfl)
       (step_hInitChk hmin)).trans hs₁).trans hs₂
-    refine ⟨confHInit, cfin, 0 + 1 + k₁ + n₂, isInit_confHInit, ?_, hchain, hacc⟩
+    refine ⟨cfin, 0 + 1 + k₁ + n₂, M', ?_, hchain, hacc.1, hacc.2, hMf⟩
     -- the budget
     have hR : bitRank tagTupleLe HPosn (posHEnd : HV A) ≤ Nat.card A + 1 :=
       bitRank_posHEnd_le
@@ -2024,8 +2029,15 @@ theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable
       nlinarith [h1, h2, hn]
     exact lt_of_lt_of_le (lt_of_lt_of_le hlt (le_of_lt hb)) hbudget
   · have hno : ∀ e : A, ¬ SatCl e := fun e he => hcl ⟨e, he⟩
-    refine ⟨confHInit, _, 1, isInit_confHInit, ?_,
-      ⟨_, step_hInitAcc hno, rfl⟩, rfl⟩
+    refine ⟨_, 1, fun _ => false, ?_, ⟨_, step_hInitAcc hno, rfl⟩, rfl, rfl,
+      fun x => ⟨fun h => absurd h (by simp), ?_⟩⟩
+    swap
+    · rintro ⟨n, hn⟩
+      cases n with
+      | zero => exact hn.elim
+      | succ n =>
+        obtain ⟨c, hc, -⟩ := hn
+        exact absurd hc (hno c)
     have h16 : 16 ≤ 16 * Nat.card A * Nat.card A * Nat.card A := by
       calc (16 : ℕ) = 16 * 1 * 1 * 1 := by norm_num
         _ ≤ 16 * Nat.card A * Nat.card A * Nat.card A :=
@@ -2033,6 +2045,13 @@ theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable
     have hbudget' : 16 * Nat.card A * Nat.card A * Nat.card A ≤
         Nat.card {p : HV A // (hornMachine A).Posn p} := hbudget
     omega
+
+/-- **The machine accepts every yes-instance of HORN-SAT**, within the
+budget. -/
+theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable A) :
+    (hornMachine A).Accepts := by
+  obtain ⟨cfin, n, -, hn, hs, hacc, -⟩ := hornMachine_final hhorn hsat
+  exact ⟨confHInit, cfin, n, isInit_confHInit, hn, hs, hacc⟩
 
 /-! ### The machine accepts only Horn-satisfiable instances
 

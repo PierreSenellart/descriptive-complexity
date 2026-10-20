@@ -1,0 +1,104 @@
+specVersion: "1"
+id: "lax-564036"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Descriptive complexity: coNP, DP and the polynomial hierarchy"
+authors:
+  - name: "Pierre Senellart"
+    orcid: "0000-0002-7909-5369"
+    github: "PierreSenellart"
+  - name: "Claude (Anthropic)"
+bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @incollection{fagin1974generalized,
+      author       = {Ronald Fagin},
+      editor       = {Richard M. Karp},
+      title        = {Generalized first-order spectra and polynomial-time recognizable sets},
+      booktitle    = {Complexity of Computation},
+      series       = {SIAM-AMS Proceedings},
+      volume       = {7},
+      pages        = {43--73},
+      publisher    = {American Mathematical Society},
+      year         = {1974}
+    }
+  - |
+    @article{stockmeyer1976polynomial,
+      author       = {Larry J. Stockmeyer},
+      title        = {The Polynomial-Time Hierarchy},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {3},
+      number       = {1},
+      pages        = {1--22},
+      year         = {1976},
+      doi          = {10.1016/0304-3975(76)90061-X},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{wrathall1976complete,
+      author       = {Celia Wrathall},
+      title        = {Complete Sets and the Polynomial-Time Hierarchy},
+      journal      = {Theor. Comput. Sci.},
+      volume       = {3},
+      number       = {1},
+      pages        = {23--33},
+      year         = {1976},
+      doi          = {10.1016/0304-3975(76)90062-1},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{papadimitriou1984complexity,
+      author       = {Christos H. Papadimitriou and Mihalis Yannakakis},
+      title        = {The Complexity of Facets (and Some Facets of Complexity)},
+      journal      = {J. Comput. Syst. Sci.},
+      volume       = {28},
+      number       = {2},
+      pages        = {244--259},
+      year         = {1984},
+      doi          = {10.1016/0022-0000(84)90068-0},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{chandra1981alternation,
+      author       = {Ashok K. Chandra and
+                      Dexter Kozen and
+                      Larry J. Stockmeyer},
+      title        = {Alternation},
+      journal      = {J. {ACM}},
+      volume       = {28},
+      number       = {1},
+      pages        = {114--133},
+      year         = {1981},
+      doi          = {10.1145/322234.322243},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @book{immerman1999descriptive,
+      author       = {Neil Immerman},
+      title        = {Descriptive Complexity},
+      series       = {Graduate Texts in Computer Science},
+      publisher    = {Springer},
+      year         = {1999},
+      isbn         = {978-1-4612-6809-3},
+      doi          = {10.1007/978-1-4612-0539-5},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+issue:
+  repositoryId: 1320232165
+  number: 173

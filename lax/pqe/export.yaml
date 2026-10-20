@@ -1,0 +1,145 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: backport-lean-4.33
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.card_isWorld
+- DescriptiveComplexity.possibleWorlds_mem_sharpP
+- DescriptiveComplexity.weightedWorlds_mem_sharpP
+- DescriptiveComplexity.funcProb_holdsEvent_eq_ratio
+- DescriptiveComplexity.worldProb_eq_ratio
+- DescriptiveComplexity.weightedWorlds_of_not_isLinOrd
+- DescriptiveComplexity.possibleWorlds_h0_sharpP_oneCallComplete
+- DescriptiveComplexity.weightedWorlds_h0_sharpP_oneCallComplete
+- DescriptiveComplexity.sharpPP2DNF_parsimonious_possibleWorlds_h0
+- DescriptiveComplexity.possibleWorlds_ordered_parsimonious_weightedWorlds
+- DescriptiveComplexity.probDb_worldProb_eq
+- DescriptiveComplexity.weightedWorlds_rs_mem_FP
+- DescriptiveComplexity.possibleWorlds_apply
+- DescriptiveComplexity.weightedWorlds_apply
+- DescriptiveComplexity.OneCallReduction.congrSource
+- DescriptiveComplexity.CountingClass.oneCallHard_congr_finite
+- DescriptiveComplexity.sharpThreeSat_sharpP_parsimoniousComplete
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Probabilistic query evaluation is #P-hard'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+  - |
+    @article{dalvi2012dichotomy,
+      author       = {Nilesh Dalvi and Dan Suciu},
+      title        = {The dichotomy of probabilistic inference for unions of
+                      conjunctive queries},
+      journal      = {J. {ACM}},
+      volume       = {59},
+      number       = {6},
+      pages        = {1--87},
+      year         = {2012},
+      doi          = {10.1145/2395116.2395119}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax799700
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5f34068ba7707478cd268f2316c295d7ea51a711
+  folder: lax/np-catalog
+  restated_from: ../np-catalog/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+- package: Lax895169
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
+  folder: lax/ac0
+  restated_from: ../ac0/export.yaml
+- package: Lax366625
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 2c6d7c607a315c0a412dae550b8b4988e6fa9a60
+  folder: lax/counting
+  restated_from: ../counting/export.yaml
+- package: Lax280166
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 76872696ea1fbcfd245e4ddffa32a4ed8b882140
+  folder: lax/sharpp-catalog
+  restated_from: ../sharpp-catalog/export.yaml
+- package: Lax859101
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 2c61a96189639b8f90b12d458153bdb62d05ea70
+  folder: lax/counting-reductions
+  restated_from: ../counting-reductions/export.yaml
+restated:
+  DescriptiveComplexity.worldBlock: PossibleWorlds.worldBlock
+  DescriptiveComplexity.worldStructure: PossibleWorlds.worldStructure
+  DescriptiveComplexity.IsWorld: PossibleWorlds.IsWorld
+  DescriptiveComplexity.IsOpenFact: PossibleWorlds.IsOpenFact
+  DescriptiveComplexity.weightedLang: WeightedWorlds.weightedLang
+  DescriptiveComplexity.weightBlock: WeightedWorlds.weightBlock
+  DescriptiveComplexity.WLe: WeightedWorlds.WLe
+  DescriptiveComplexity.WeightCond: WeightedWorlds.WeightCond
+  DescriptiveComplexity.worldOf: WeightedWorlds.worldOf
+  DescriptiveComplexity.Fact: WeightedWorlds.Fact
+  DescriptiveComplexity.IsOpen: WeightedWorlds.IsOpen
+  DescriptiveComplexity.presWeight: WeightedWorlds.presWeight
+  DescriptiveComplexity.absWeight: WeightedWorlds.absWeight
+  DescriptiveComplexity.holdsEvent: WeightedWorlds.holdsEvent
+  DescriptiveComplexity.ProbAssignment: WeightedWorlds.ProbAssignment
+  DescriptiveComplexity.ProbAssignment.funcProb: WeightedWorlds.ProbAssignment.funcProb
+  DescriptiveComplexity.ProbAssignment.ofWeights: WeightedWorlds.ProbAssignment.ofWeights
+  DescriptiveComplexity.worldProb: WeightedWorlds.worldProb
+  DescriptiveComplexity.h0: Queries.h0
+  DescriptiveComplexity.rs: Queries.rs
+  DescriptiveComplexity.ProbDb: ExampleDatabase.ProbDb
+  DescriptiveComplexity.ProbDb.count: ExampleDatabase.ProbDb.count
+  DescriptiveComplexity.ProbDb.total: ExampleDatabase.ProbDb.total
+  DescriptiveComplexity.WeightedRel: WeightedWorlds.WeightedRel
+  DescriptiveComplexity.BitLt: WeightedWorlds.BitLt
+  DescriptiveComplexity.bitsOf: WeightedWorlds.bitsOf
+  DescriptiveComplexity.numOf: WeightedWorlds.numOf
+  DescriptiveComplexity.worldOfVal: WeightedWorlds.worldOfVal
+  DescriptiveComplexity.FactStatus: ExampleDatabase.FactStatus
+  DescriptiveComplexity.FactStatus.isCert: ExampleDatabase.FactStatus.isCert
+  DescriptiveComplexity.FactStatus.isUnc: ExampleDatabase.FactStatus.isUnc
+  DescriptiveComplexity.FactStatus.presW: ExampleDatabase.FactStatus.presW
+  DescriptiveComplexity.FactStatus.absW: ExampleDatabase.FactStatus.absW
+  DescriptiveComplexity.FactStatus.admits: ExampleDatabase.FactStatus.admits
+  DescriptiveComplexity.FactStatus.weight: ExampleDatabase.FactStatus.weight
+  DescriptiveComplexity.World: ExampleDatabase.World
+  DescriptiveComplexity.ProbDb.Valid: ExampleDatabase.ProbDb.Valid
+  DescriptiveComplexity.ProbDb.weight: ExampleDatabase.ProbDb.weight
+  DescriptiveComplexity.HoldsH0: ExampleDatabase.HoldsH0
+  DescriptiveComplexity.ProbDb.instDecidableValid: ExampleDatabase.ProbDb.instDecidableValid
+  DescriptiveComplexity.instDecidableHoldsH0: ExampleDatabase.instDecidableHoldsH0
+  DescriptiveComplexity.instDecidableEqFactStatus: ExampleDatabase.instDecidableEqFactStatus
+  FirstOrder.Language.rst: Queries.rst
+  FirstOrder.Language.rstRel: Queries.rstRel
+  FirstOrder.Language.instIsRelationalRst: Queries.instIsRelationalRst
+  FirstOrder.Language.rstR: Queries.rstR
+  FirstOrder.Language.rstS: Queries.rstS
+  FirstOrder.Language.rstT: Queries.rstT
+  FirstOrder.Language.instDecidableEqRstRel: Queries.instDecidableEqRstRel
+  DescriptiveComplexity.instIsRelationalWeightedLang: WeightedWorlds.instIsRelationalWeightedLang
+  DescriptiveComplexity.instFiniteSigmaNatRelationsRst: Queries.instFiniteSigmaNatRelationsRst
+  DescriptiveComplexity.ProbAssignment.valProb: WeightedWorlds.ProbAssignment.valProb
+  DescriptiveComplexity.openFactFintype: WeightedWorlds.openFactFintype

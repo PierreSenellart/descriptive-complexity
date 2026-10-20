@@ -250,48 +250,82 @@ theorem ipRhsVal_eq {r : A} (hr : IsBot r) : IPRhsVal (ipPt r) = BWTarget A :=
 
 end Numbers
 
-/-! ### Correctness -/
+/-! ### Correctness
+
+Stated for an explicit set of items and an explicit `0-1` vector, so that the
+same lemmas give the equivalence of the two decision problems and the
+bijection between their solutions
+(`DescriptiveComplexity.Problems.ZeroOneIP.CountingHardness`). -/
 
 section Correctness
 
-variable (A : Type) [Language.binWeights.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
+variable {A : Type} [Language.binWeights.Structure A] [LinearOrder A] [Finite A]
 
+/-- The columns of a set of items. -/
+def colsOf (S : A → Prop) (q : ipInterp.Map A) : Prop := S (q.2 0)
+
+/-- The items of a set of columns. -/
+def itemsOfCols (x : ipInterp.Map A → Prop) (a : A) : Prop := x (ipPt a)
+
+omit [Finite A] in
+/-- The order of the interpreted program is linear exactly when the input's
+is. -/
+theorem isLinOrd_bwLe_of_ipLe (hlin : IsLinOrd (IPLe (A := ipInterp.Map A))) :
+    IsLinOrd (BWLe (A := A)) :=
+  IsLinOrd.of_equiv ipEquiv.symm (fun q q' => by
+    rw [ipPt_surj q, ipPt_surj q', ipLe_iff]
+    exact Iff.rfl) hlin
+
+omit [Finite A] in
+/-- **A set of items summing to the target solves the one-equation program.** -/
+theorem zeroOneSol_colsOf {S : A → Prop} (hSi : ∀ i, S i → BWItem i)
+    (hsum : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget A) :
+    (∀ q, colsOf S q → IPCol q) ∧
+      ∀ r : ipInterp.Map A, IPRow r → (∑ᶠ j ∈ {j | colsOf S j}, IPCoefVal r j) = IPRhsVal r := by
+  refine ⟨fun q hq => ?_, fun r hr => ?_⟩
+  · rw [ipPt_surj q, ipCol_iff]
+    exact hSi _ hq
+  · obtain ⟨a, rfl⟩ : ∃ a, r = ipPt a := ⟨r.2 0, ipPt_surj r⟩
+    have ha : IsBot a := (ipRow_iff a).mp hr
+    have hbij : Set.BijOn ipPt {i : A | S i} {q : ipInterp.Map A | colsOf S q} :=
+      ⟨fun i hi => hi, ipPt_injective.injOn, fun q hq => ⟨q.2 0, hq, (ipPt_surj q).symm⟩⟩
+    rw [← finsum_mem_eq_of_bijOn ipPt hbij fun i hi => (ipCoefVal_eq ha (hSi i hi)).symm,
+      hsum, ipRhsVal_eq ha]
+
+omit [Finite A] in
+/-- **A solution of the one-equation program is a set of items summing to the
+target.** -/
+theorem subsetSum_itemsOfCols {a₀ : A} (ha₀ : IsBot a₀) {x : ipInterp.Map A → Prop}
+    (hxc : ∀ j, x j → IPCol j)
+    (heq : ∀ r : ipInterp.Map A, IPRow r → (∑ᶠ j ∈ {j | x j}, IPCoefVal r j) = IPRhsVal r) :
+    (∀ a, itemsOfCols x a → BWItem a) ∧
+      (∑ᶠ i ∈ {i | itemsOfCols x i}, BWWeight i) = BWTarget A := by
+  refine ⟨fun a ha => (ipCol_iff a).mp (hxc _ ha), ?_⟩
+  have hrow : IPRow (ipPt a₀) := (ipRow_iff a₀).mpr ha₀
+  have hbij : Set.BijOn ipPt {i : A | itemsOfCols x i} {q : ipInterp.Map A | x q} := by
+    refine ⟨fun i hi => hi, ipPt_injective.injOn, fun q hq => ⟨q.2 0, ?_, (ipPt_surj q).symm⟩⟩
+    change x (ipPt (q.2 0))
+    rw [← ipPt_surj q]
+    exact hq
+  have hstep : ∀ i : A, itemsOfCols x i → BWWeight i = IPCoefVal (ipPt a₀) (ipPt i) :=
+    fun i hi => (ipCoefVal_eq ha₀ ((ipCol_iff i).mp (hxc _ hi))).symm
+  rw [finsum_mem_eq_of_bijOn ipPt hbij fun i hi => hstep i hi, heq _ hrow, ipRhsVal_eq ha₀]
+
+variable (A) in
 /-- **Correctness of the reduction**: a binary-weighted instance has a set of
 items summing to the target iff the one-equation program interpreted in it has
 a `0-1` solution. -/
-theorem hasSubsetSum_iff_hasZeroOneSolution :
+theorem hasSubsetSum_iff_hasZeroOneSolution [Nonempty A] :
     HasSubsetSum A ↔ HasZeroOneSolution (ipInterp.Map A) := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   have : Finite (ipInterp.Map A) := ipInterp.map_finite A
   constructor
   · rintro ⟨-, hlin, S, hSi, hsum⟩
-    refine ⟨inferInstance, isLinOrd_ipLe hlin, fun q => S (q.2 0), fun q hq => ?_, ?_⟩
-    · rw [ipPt_surj q, ipCol_iff]
-      exact hSi _ hq
-    · intro r hr
-      obtain ⟨a, rfl⟩ : ∃ a, r = ipPt a := ⟨r.2 0, ipPt_surj r⟩
-      have ha : IsBot a := (ipRow_iff a).mp hr
-      have hbij : Set.BijOn ipPt {i : A | S i} {q : ipInterp.Map A | S (q.2 0)} :=
-        ⟨fun i hi => hi, ipPt_injective.injOn, fun q hq => ⟨q.2 0, hq, (ipPt_surj q).symm⟩⟩
-      rw [← finsum_mem_eq_of_bijOn ipPt hbij fun i hi => (ipCoefVal_eq ha (hSi i hi)).symm,
-        hsum, ipRhsVal_eq ha]
+    obtain ⟨h1, h2⟩ := zeroOneSol_colsOf hSi hsum
+    exact ⟨inferInstance, isLinOrd_ipLe hlin, colsOf S, h1, h2⟩
   · rintro ⟨-, hlin, x, hxc, heq⟩
-    have hlin' : IsLinOrd (BWLe (A := A)) :=
-      IsLinOrd.of_equiv ipEquiv.symm (fun q q' => by
-        rw [ipPt_surj q, ipPt_surj q', ipLe_iff]
-        exact Iff.rfl) hlin
-    refine ⟨inferInstance, hlin', fun a => x (ipPt a), fun a ha => ?_, ?_⟩
-    · exact (ipCol_iff a).mp (hxc _ ha)
-    · have hrow : IPRow (ipPt a₀) := (ipRow_iff a₀).mpr ha₀
-      have hbij : Set.BijOn ipPt {i : A | x (ipPt i)} {q : ipInterp.Map A | x q} := by
-        refine ⟨fun i hi => hi, ipPt_injective.injOn, fun q hq => ⟨q.2 0, ?_, (ipPt_surj q).symm⟩⟩
-        change x (ipPt (q.2 0))
-        rw [← ipPt_surj q]
-        exact hq
-      have hstep : ∀ i : A, x (ipPt i) → BWWeight i = IPCoefVal (ipPt a₀) (ipPt i) :=
-        fun i hi => (ipCoefVal_eq ha₀ ((ipCol_iff i).mp (hxc _ hi))).symm
-      rw [finsum_mem_eq_of_bijOn ipPt hbij fun i hi => hstep i hi, heq _ hrow,
-        ipRhsVal_eq ha₀]
+    obtain ⟨h1, h2⟩ := subsetSum_itemsOfCols ha₀ hxc heq
+    exact ⟨inferInstance, isLinOrd_bwLe_of_ipLe hlin, itemsOfCols x, h1, h2⟩
 
 end Correctness
 

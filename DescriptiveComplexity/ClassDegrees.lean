@@ -39,28 +39,38 @@ open FirstOrder
 open Language
 
 /-- **NP is the degree of SAT**: a problem is in NP exactly when it reduces to
-SAT (Cook–Levin, read as an equality of classes). -/
+SAT (Cook–Levin, read as an equality of classes).
+Registered in the Lax archive as
+[`Lax604544.ClassesAsDegrees.NP_eq_below_sat`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.NP_eq_below_sat). -/
 theorem NP_eq_below_sat : NP = .below SAT :=
   ComplexityClass.eq_below_of_complete SAT sat_mem_NP
     (fun Q hQ => sat_hard_of_sigmaSODefinable Q hQ) fun _ => Iff.rfl
 
-/-- **coNP is the degree of TAUT**. -/
+/-- **coNP is the degree of TAUT**.
+Registered in the Lax archive as
+[`Lax604544.ClassesAsDegrees.coNP_eq_below_taut`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.coNP_eq_below_taut). -/
 theorem coNP_eq_below_taut : coNP = .below TAUT :=
   ComplexityClass.eq_below_of_complete TAUT taut_mem_coNP
     (fun Q hQ => taut_hard_of_piSODefinable Q hQ) fun _ => Iff.rfl
 
-/-- **PTIME is the degree of HORN-SAT**. -/
+/-- **PTIME is the degree of HORN-SAT**.
+Registered in the Lax archive as
+[`Lax604544.ClassesAsDegrees.PTIME_eq_below_hornSat`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.PTIME_eq_below_hornSat). -/
 theorem PTIME_eq_below_hornSat : PTIME = .below HORNSAT :=
   ComplexityClass.eq_below_of_complete HORNSAT hornSat_mem_PTIME
     (fun Q hQ => hornSat_hard_of_sigmaSOHornDefinable Q hQ) fun _ => Iff.rfl
 
-/-- **NL is the degree of 2SAT**. -/
+/-- **NL is the degree of 2SAT**.
+Registered in the Lax archive as
+[`Lax604544.ClassesAsDegrees.NL_eq_below_twoSat`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.NL_eq_below_twoSat). -/
 theorem NL_eq_below_twoSat : NL = .below TwoSAT :=
   ComplexityClass.eq_below_of_complete TwoSAT twoSat_mem_NL
     (fun Q hQ => twoSat_hard_of_sigmaSOKromDefinable Q hQ) fun _ => Iff.rfl
 
 /-- **RE is the degree of FINSAT**: Trakhtenbrot's theorem, read as an equality
-of classes. -/
+of classes.
+Registered in the Lax archive as
+[`Lax604544.ClassesAsDegrees.RE_eq_below_finsat`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.RE_eq_below_finsat). -/
 theorem RE_eq_below_finsat : RE = .below FINSAT :=
   ComplexityClass.eq_below_of_complete FINSAT finsat_mem_RE
     (fun Q hQ => FinSat.finsat_hard_of_sigmaSONewDefinable Q hQ) fun _ => Iff.rfl

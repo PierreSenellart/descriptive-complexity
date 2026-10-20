@@ -74,7 +74,9 @@ theorem TwoSAT_NL_complete : NL.Complete TwoSAT :=
 PTIME by the Horn program for its implication graph. The inclusion has no
 syntactic route – a Krom kernel is not a Horn kernel – so it goes through the
 complete problem, exactly as `DescriptiveComplexity.PTIME_subset_NP` goes through
-HORN-SAT. -/
+HORN-SAT.
+Registered in the Lax archive as
+[`Lax535992.NLSubsetPTIME.NL_subset_PTIME`](https://laxarchive.org/lax-535992/Lax535992.NLSubsetPTIME.html#s-Lax535992.NLSubsetPTIME.NL_subset_PTIME). -/
 theorem NL_subset_PTIME : NL ⊆ PTIME := by
   intro L _ P hP
   obtain ⟨f⟩ := twoSat_hard_of_sigmaSOKromDefinable P hP
@@ -90,7 +92,9 @@ theorem NL_subset_NP : NL ⊆ NP := by
 
 /-- **L ⊆ PTIME**, by composing `DescriptiveComplexity.LOGSPACE_subset_NL` with
 `DescriptiveComplexity.NL_subset_PTIME`: a deterministic walk is a walk, and NL is
-inside polynomial time through 2SAT. -/
+inside polynomial time through 2SAT.
+Registered in the Lax archive as
+[`Lax535992.NLSubsetPTIME.LOGSPACE_subset_PTIME`](https://laxarchive.org/lax-535992/Lax535992.NLSubsetPTIME.html#s-Lax535992.NLSubsetPTIME.LOGSPACE_subset_PTIME). -/
 theorem LOGSPACE_subset_PTIME : LOGSPACE ⊆ PTIME := by
   intro L _ P hP
   exact NL_subset_PTIME (LOGSPACE_subset_NL hP)

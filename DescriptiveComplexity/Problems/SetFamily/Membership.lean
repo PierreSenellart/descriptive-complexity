@@ -103,6 +103,17 @@ disjoint – and, exactness replacing the threshold, no injection clause. -/
 noncomputable def exactCoverKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfCoverClause ⊓ sfDisjClause)
 
+/-- Kernel clause: the binary relation variable of the block is empty. Exact
+Cover does not use it, and a definition that *counts* the witnesses has to say
+so, or each exact cover would be counted once per binary relation. -/
+noncomputable def sfNoInjClause : setFamilySOLang.Sentence :=
+  fo% ∀ x y, ¬ sfInjSym(x, y)
+
+/-- The kernel of the witness-counting definition of Exact Cover: the kernel of
+its `Σ₁` definition, with the unused relation variable pinned. -/
+noncomputable def sharpExactCoverKernel : setFamilySOLang.Sentence :=
+  exactCoverKernel ⊓ sfNoInjClause
+
 /-- Kernel clause (Set Splitting): every set of the family contains a
 colored ground element. -/
 noncomputable def sfSplitInClause : setFamilySOLang.Sentence :=
@@ -118,6 +129,16 @@ guessed relation is read as one color class, and every set of the family
 meets it and its complement. -/
 noncomputable def setSplittingKernel : setFamilySOLang.Sentence :=
   sfSplitInClause ⊓ sfSplitOutClause
+
+/-- Kernel clause: the guessed relation holds only of ground elements. -/
+noncomputable def sfGuessElemClause : setFamilySOLang.Sentence :=
+  fo% ∀ x, sfGuessSym(x) → sfElemSym(x)
+
+/-- The kernel of the witness-counting definition of Set Splitting: a color
+class of ground elements splitting every set, the unused relation variable
+pinned. -/
+noncomputable def sharpSetSplittingKernel : setFamilySOLang.Sentence :=
+  setSplittingKernel ⊓ (sfGuessElemClause ⊓ sfNoInjClause)
 
 /-- The kernel of the `Σ₁` definition of Set Packing. -/
 noncomputable def setPackingKernel : setFamilySOLang.Sentence :=
@@ -271,6 +292,31 @@ private theorem realize_exactCoverKernel :
   exact and_congr (realize_sfFamClause ρ)
     (and_congr (realize_sfCoverClause ρ) (realize_sfDisjClause ρ))
 
+private theorem realize_sfNoInjClause :
+    SFRealize ρ sfNoInjClause ↔ ∀ x y : A, ¬ρ .inj ![x, y] := by
+  let := familyGuessBlock.structure ρ
+  have hsubI : ∀ (w : Fin 2 → A),
+      RelMap (L := setFamilySOLang) (M := A) sfInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [sfNoInjClause]
+  simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hsubI]
+  exact ⟨fun h x y => h ![x, y], fun h i => h (i 0) (i 1)⟩
+
+/-- Realization of the counting kernel of Exact Cover: the guessed subfamily is
+an exact cover, and the unused relation variable is empty. -/
+theorem realize_sharpExactCoverKernel :
+    (@Sentence.Realize setFamilySOLang A
+        (@sumStructure _ _ A _ (familyGuessBlock.structure ρ)) sharpExactCoverKernel) ↔
+      ExactCoverBy (SSElem (A := A)) SSFam SSMem (fun s => ρ .guess ![s]) ∧
+        ∀ x y : A, ¬ρ .inj ![x, y] := by
+  have h1 := realize_exactCoverKernel ρ
+  have h2 := realize_sfNoInjClause ρ
+  let := familyGuessBlock.structure ρ
+  rw [sharpExactCoverKernel, Sentence.Realize, Formula.realize_inf]
+  refine and_congr (h1.trans ?_) h2
+  exact ⟨fun ⟨hf, hc, hd⟩ => ⟨hf, hc, fun s s' hs hs' hne x hx => hd s s' x hs hs' hne hx⟩,
+    fun ⟨hf, hc, hd⟩ => ⟨hf, hc, fun s s' x hs hs' hne hx => hd s s' hs hs' hne x hx⟩⟩
+
 private theorem realize_sfSplitInClause :
     SFRealize ρ sfSplitInClause ↔
       ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ .guess ![x] := by
@@ -316,6 +362,36 @@ private theorem realize_setSplittingKernel :
   rw [setSplittingKernel]
   simp only [SFRealize, Sentence.Realize, Formula.realize_inf]
   exact and_congr (realize_sfSplitInClause ρ) (realize_sfSplitOutClause ρ)
+
+private theorem realize_sfGuessElemClause :
+    SFRealize ρ sfGuessElemClause ↔ ∀ x : A, ρ .guess ![x] → SSElem x := by
+  let := familyGuessBlock.structure ρ
+  have hsub : ∀ (w : Fin 1 → A),
+      RelMap (L := setFamilySOLang) (M := A) sfGuessSym w ↔ ρ .guess w := fun _ => Iff.rfl
+  rw [sfGuessElemClause]
+  simp only [SFRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_rel₁, Term.realize_var, Sum.elim_inr, Language.relMap_sumInl, hsub]
+  constructor
+  · intro h x hx
+    exact h (fun _ => x) hx
+  · intro h i hi
+    have hi' : ρ .guess ![i 0] := by
+      convert hi using 2
+    exact h (i 0) hi'
+
+/-- Realization of the counting kernel of Set Splitting. -/
+theorem realize_sharpSetSplittingKernel :
+    (@Sentence.Realize setFamilySOLang A
+        (@sumStructure _ _ A _ (familyGuessBlock.structure ρ)) sharpSetSplittingKernel) ↔
+      ((∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ρ .guess ![x]) ∧
+        ∀ f : A, SSFam f → ∃ x : A, SSElem x ∧ SSMem x f ∧ ¬ρ .guess ![x]) ∧
+      (∀ x : A, ρ .guess ![x] → SSElem x) ∧ ∀ x y : A, ¬ρ .inj ![x, y] := by
+  have h1 := realize_setSplittingKernel ρ
+  have h2 := realize_sfGuessElemClause ρ
+  have h3 := realize_sfNoInjClause ρ
+  let := familyGuessBlock.structure ρ
+  rw [sharpSetSplittingKernel, Sentence.Realize, Formula.realize_inf, Formula.realize_inf]
+  exact and_congr h1 (and_congr h2 h3)
 
 end Realize
 

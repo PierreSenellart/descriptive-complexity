@@ -310,7 +310,9 @@ def SOTCDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
     ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       P A ↔ spec.Accepts A
 
-/-- SO(TC) definability only depends on the finite instances of a problem. -/
+/-- SO(TC) definability only depends on the finite instances of a problem.
+Registered in the Lax archive as
+[`Lax134656.PSPACEClosure.PSPACE_mem_congr_finite`](https://laxarchive.org/lax-134656/Lax134656.PSPACEClosure.html#s-Lax134656.PSPACEClosure.PSPACE_mem_congr_finite). -/
 theorem sotcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     SOTCDefinable P ↔ SOTCDefinable Q := by

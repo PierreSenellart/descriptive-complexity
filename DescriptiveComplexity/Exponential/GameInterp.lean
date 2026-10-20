@@ -913,7 +913,9 @@ theorem atmAcceptSpace_EXPTIME_hard : EXPTIME.Hard ATMAcceptSpace := by
 /-- **Alternating acceptance in bounded space is EXPTIME-complete**, which is
 Chandra, Kozen and Stockmeyer's `APSPACE = EXPTIME`: an alternating machine that
 may use as much space as its input has positions decides exactly the problems
-of deterministic exponential time. -/
+of deterministic exponential time.
+Registered in the Lax archive as
+[`Lax480241.APSPACEIsEXPTIME.atmAcceptSpace_EXPTIME_complete`](https://laxarchive.org/lax-480241/Lax480241.APSPACEIsEXPTIME.html#s-Lax480241.APSPACEIsEXPTIME.atmAcceptSpace_EXPTIME_complete). -/
 theorem atmAcceptSpace_EXPTIME_complete : EXPTIME.Complete ATMAcceptSpace :=
   ⟨atmAcceptSpace_mem_EXPTIME, atmAcceptSpace_EXPTIME_hard⟩
 

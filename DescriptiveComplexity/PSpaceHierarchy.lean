@@ -400,17 +400,23 @@ theorem SOTCDefinable.of_sigmaSODefinable_any {k : ℕ} [L.IsRelational] {P : De
   obtain ⟨spec, hspec⟩ := sotcDefinable_soProblem Bs L φ true
   exact ⟨spec, fun A _ _ _ _ => (hφ A).trans (hspec A)⟩
 
-/-- **Every level of the polynomial hierarchy is inside PSPACE.** -/
+/-- **Every level of the polynomial hierarchy is inside PSPACE.**
+Registered in the Lax archive as
+[`Lax134656.HierarchyInPSPACE.sigmaP_subset_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.HierarchyInPSPACE.html#s-Lax134656.HierarchyInPSPACE.sigmaP_subset_PSPACE). -/
 theorem sigmaP_subset_PSPACE (k : ℕ) : SigmaP k ⊆ PSPACE := by
   cases k with
   | zero => exact fun _ _ _ h => NP_subset_PSPACE (PTIME_subset_NP h)
   | succ k => exact fun _ _ _ h => SOTCDefinable.of_sigmaSODefinable_any h
 
-/-- **`PH ⊆ PSPACE`**: the polynomial hierarchy is inside polynomial space. -/
+/-- **`PH ⊆ PSPACE`**: the polynomial hierarchy is inside polynomial space.
+Registered in the Lax archive as
+[`Lax134656.HierarchyInPSPACE.PH_subset_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.HierarchyInPSPACE.html#s-Lax134656.HierarchyInPSPACE.PH_subset_PSPACE). -/
 theorem PH_subset_PSPACE : PH ⊆ PSPACE :=
   fun _ _ _ h => h.elim fun k hk => sigmaP_subset_PSPACE k hk
 
-/-- **`Πₖᵖ ⊆ PSPACE`** as well, since PSPACE is closed under complement. -/
+/-- **`Πₖᵖ ⊆ PSPACE`** as well, since PSPACE is closed under complement.
+Registered in the Lax archive as
+[`Lax134656.HierarchyInPSPACE.piP_subset_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.HierarchyInPSPACE.html#s-Lax134656.HierarchyInPSPACE.piP_subset_PSPACE). -/
 theorem piP_subset_PSPACE (k : ℕ) : PiP k ⊆ PSPACE := by
   intro L _ P h
   rw [mem_piP_iff] at h

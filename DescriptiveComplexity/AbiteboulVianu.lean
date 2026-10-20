@@ -162,7 +162,9 @@ theorem ifpDefinableFree_of_pfpDefinableFree_of_ptime_eq_pspace
 
 /-- **The Abiteboul–Vianu theorem.** The inflationary and partial fixed-point
 logics have the same expressive power on unordered finite structures exactly
-when polynomial time and polynomial space coincide. -/
+when polynomial time and polynomial space coincide.
+Registered in the Lax archive as
+[`Lax134656.AbiteboulVianu.ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace`](https://laxarchive.org/lax-134656/Lax134656.AbiteboulVianu.html#s-Lax134656.AbiteboulVianu.ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace). -/
 theorem ifpDefinableFree_eq_pfpDefinableFree_iff_ptime_eq_pspace :
     (∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
         IFPDefinableFree P ↔ PFPDefinableFree P) ↔ PTIME = PSPACE := by

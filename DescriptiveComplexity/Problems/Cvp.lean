@@ -53,7 +53,9 @@ namespace DescriptiveComplexity
 /-- **CVP is `PTIME`-complete** ([Ladner 1975][ladner1975circuit]): membership
 is the FO(LFP) definition read back into the class by Immerman–Vardi, hardness
 is the unit-propagation circuit drawn inside a HORN-SAT instance. Both halves
-are machine-free, as everywhere in this library. -/
+are machine-free, as everywhere in this library.
+Registered in the Lax archive as
+[`Lax535992.CircuitValuePTIMEComplete.cvp_PTIME_complete`](https://laxarchive.org/lax-535992/Lax535992.CircuitValuePTIMEComplete.html#s-Lax535992.CircuitValuePTIMEComplete.cvp_PTIME_complete). -/
 theorem CVP_PTIME_complete : PTIME.Complete CVP :=
   ⟨cvp_mem_PTIME, cvp_PTIME_hard⟩
 

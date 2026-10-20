@@ -9,6 +9,7 @@ import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Ordered
 import DescriptiveComplexity.Composition
 import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedReorder
 import DescriptiveComplexity.Complexity
 import DescriptiveComplexity.Encoding
 import DescriptiveComplexity.Encoding.BinarySubsetSum
@@ -78,6 +79,58 @@ import DescriptiveComplexity.FixedPointInflationary
 import DescriptiveComplexity.FixedPointInflationaryLFP
 import DescriptiveComplexity.FixedPointPartial
 import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Counting
+import DescriptiveComplexity.Counting.SharpP
+import DescriptiveComplexity.Counting.Relativized
+import DescriptiveComplexity.Counting.Class
+import DescriptiveComplexity.Counting.Sized
+import DescriptiveComplexity.Counting.SizedPairs
+import DescriptiveComplexity.Counting.Post
+import DescriptiveComplexity.Counting.Encoding
+import DescriptiveComplexity.Counting.PossibleWorlds
+import DescriptiveComplexity.Counting.Probability
+import DescriptiveComplexity.Counting.FP
+import DescriptiveComplexity.Counting.DigitDefinable
+import DescriptiveComplexity.Counting.Digits.SetArith
+import DescriptiveComplexity.Counting.Digits.Tower
+import DescriptiveComplexity.Counting.Digits.Formulas
+import DescriptiveComplexity.Counting.Digits.Closure
+import DescriptiveComplexity.Counting.Digits.SumSweep
+import DescriptiveComplexity.Counting.Digits.ProdSem
+import DescriptiveComplexity.Counting.Digits.ProdSweep
+import DescriptiveComplexity.Counting.Digits.Bounds
+import DescriptiveComplexity.Counting.Digits.Term
+import DescriptiveComplexity.Counting.Digits.NormalForm
+import DescriptiveComplexity.Counting.Independence
+import DescriptiveComplexity.Counting.WeightedFacts
+import DescriptiveComplexity.Counting.QuantitativeBinders
+import DescriptiveComplexity.Counting.WeightedTerms
+import DescriptiveComplexity.Problems.HornSat.Number
+import DescriptiveComplexity.Problems.HornSat.NumberHardness
+import DescriptiveComplexity.Problems.MachineNumber
+import DescriptiveComplexity.Counting.Quantitative
+import DescriptiveComplexity.Counting.QuantitativePull
+import DescriptiveComplexity.Counting.Reduction
+import DescriptiveComplexity.Counting.Restrict
+import DescriptiveComplexity.Counting.QSO
+import DescriptiveComplexity.Counting.QSOWitness
+import DescriptiveComplexity.Counting.QSOQuantifiers
+import DescriptiveComplexity.Counting.QSOSharpP
+import DescriptiveComplexity.Counting.RelClosure
+import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.KernelPair
+import DescriptiveComplexity.Counting.DecisionClasses
+import DescriptiveComplexity.Counting.UnitWeights
+import DescriptiveComplexity.Counting.WeightedWorlds
+import DescriptiveComplexity.Permanent.Basic
+import DescriptiveComplexity.Permanent.Minor
+import DescriptiveComplexity.Permanent.Attach
+import DescriptiveComplexity.Permanent.Xor
+import DescriptiveComplexity.Permanent.AttachAll
+import DescriptiveComplexity.Permanent.Flat
+import DescriptiveComplexity.Permanent.CycNext
+import DescriptiveComplexity.Permanent.Ladder
+import DescriptiveComplexity.Permanent.Widths
 import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 import DescriptiveComplexity.PSpace
@@ -141,6 +194,7 @@ import DescriptiveComplexity.Difference
 import DescriptiveComplexity.Padding
 import DescriptiveComplexity.EqPattern
 import DescriptiveComplexity.OccurrenceOrder
+import DescriptiveComplexity.OccurrencePrefix
 import DescriptiveComplexity.OccurrenceFormulas
 import DescriptiveComplexity.OccurrenceSlack
 import DescriptiveComplexity.OccurrenceVar
@@ -207,7 +261,9 @@ the main results; the worked examples in
 `DescriptiveComplexity.Examples.ConjunctiveQueries` (conjunctive-query
 evaluation and containment) and `DescriptiveComplexity.Examples.GraphCrawling`
 (Web data acquisition, with a cardinality threshold, a reachability
-certificate and an ordered reduction) are the hands-on tutorials;
+certificate and an ordered reduction) are the hands-on tutorials, with
+`DescriptiveComplexity.Examples.ProbabilisticQueries` (query evaluation over
+probabilistic databases, a hard query and an easy one) for the counting side;
 individual declarations are documented on their own pages.
 
 ## The framework: problems, interpretations, reductions
@@ -234,6 +290,11 @@ individual declarations are documented on their own pages.
   (notation `P ≤ᶠᵒ[≤] Q`): order-invariant FO(≤) reductions, correct on every
   finite linearly ordered input. This is the standard notion of the field and
   the home of gadget constructions that genuinely need an order.
+  `DescriptiveComplexity.OrderedReorder` lets such a reduction replace the
+  order of its input by any linear order it can define
+  (`DescriptiveComplexity.FOInterpretation.reorder`), which is how a problem
+  reading its output in the order of the universe is reached from one that
+  carries the order of significance as a relation.
 * Logarithmic-space and polynomial-time reductions are *stronger* notions, and
   need a logic capturing those classes to state: they appear below, as
   `DescriptiveComplexity.TCReduction` (notation `P ≤ᵗᶜ Q`) and
@@ -2029,6 +2090,602 @@ The bottom of the ordered world, and the only vocabulary here that is a
   (`DescriptiveComplexity.Problems.FinSat`), and Post's correspondence problem
   is a member of it (`DescriptiveComplexity.pcp_mem_RE`).
 
+## Counting problems, and the class `#P`
+
+Everything above measures *decision* problems. A **counting problem**
+(`DescriptiveComplexity.CountingProblem`, in `DescriptiveComplexity.Counting`) attaches an
+isomorphism-invariant natural number to every structure, and its reductions are
+the **parsimonious** ones, `C ≤ᵖ D` and `C ≤ᵖ[≤] D`: a first-order
+interpretation under which the two counts are equal. They compose like the
+decision reductions, for the same reason. As on the decision side there is a
+relativized form `C ≤ʳᵖ[≤] D`, with a definable target universe
+(`DescriptiveComplexity.Counting.Relativized`), for the problems whose solutions span
+the universe; parsimonious hardness for a counting class is hardness under
+those (`DescriptiveComplexity.parsimoniousHard_sharpP_iff`), every ordinary reduction
+being one. Membership in `#P` travels backward along them too
+(`DescriptiveComplexity.SharpPDefinable.of_relOrderedParsimonious`, in
+`DescriptiveComplexity.Counting.RelClosure`). Pulling a kernel back through a
+definable domain is only a retraction on assignments, a pulled relation being
+free to hold of tuples that are not points of the target, which would count
+every witness several times; one more conjunct in the kernel, saying that the
+pulled relations hold only of points of the domain
+(`DescriptiveComplexity.supportSentence`), makes it a bijection
+(`DescriptiveComplexity.witnessCount_mapRel`).
+
+* **The class** `DescriptiveComplexity.SharpP` is *defined* by witness counting
+  ([Saluja, Subrahmanyam, Thakur 1995][saluja1995descriptive]): a counting
+  problem is `#P`-definable (`DescriptiveComplexity.SharpPDefinable`) when it is the
+  number of assignments of a second-order block satisfying a first-order kernel
+  over the ordered expansion, whatever the linear order. This is the prenex
+  form of the logic ΣQSO(FO) of
+  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive], and the two readings
+  coincide (`DescriptiveComplexity.mem_sharpP_iff_sqDefinable`): every term of
+  the logic (`DescriptiveComplexity.SQTerm`) – sums, products, first-order sums
+  and products, second-order sums – is a witness count, each construction
+  being a closure property of witness counts with free variables
+  (`DescriptiveComplexity.WCount`); the first-order product is the one that
+  rewrites the kernel, every relation variable taking the tuple as more
+  arguments (`DescriptiveComplexity.extendRel`). The order is a
+  parameter and not a guessed relation: guessing it, as the definition of NP
+  may, would multiply every count by the number of linear orders. Closure under
+  parsimonious reductions (`DescriptiveComplexity.SharpPDefinable.of_orderedParsimonious`)
+  rests on the pullback of a block being a *bijection* on assignments
+  (`DescriptiveComplexity.witnessCount_map`).
+* **#SAT is parsimoniously `#P`-complete**
+  (`DescriptiveComplexity.sharpSat_sharpP_parsimoniousComplete`,
+  [Valiant 1979][valiant1979complexity]): it is in `#P`, and every problem of
+  `#P` reduces to it by an ordered parsimonious reduction. A model is a set of
+  *variables of the formula*, i.e., of elements
+  occurring in a clause (`DescriptiveComplexity.SatModel`). Hardness is the Tseitin
+  reduction of the Cook–Levin theorem, which preserves the number of solutions
+  because gates determine the position variables
+  (`DescriptiveComplexity.Tseitin.gates_unique`) and every variable of the encoding
+  sits at a canonically padded tuple
+  (`DescriptiveComplexity.Tseitin.litSem_varCanon`); one tautological clause per block
+  variable is added so that each of them is a variable of the formula.
+* **A parsimonious catalog.** #3SAT
+  (`DescriptiveComplexity.sharpThreeSat_sharpP_parsimoniousComplete`), #1-in-SAT
+  (`DescriptiveComplexity.sharpOneInSat_sharpP_parsimoniousComplete`) and #Exact Cover
+  (`DescriptiveComplexity.sharpExactCover_sharpP_parsimoniousComplete`). The decision
+  reductions into the first two thread fresh variables along the occurrences of
+  a clause and leave them free once the clause is satisfied; the counting ones
+  force them, each being the truth of a prefix disjunction
+  (`DescriptiveComplexity.OccurrencePrefix`), in clauses of width three for #3SAT and
+  in exactly-one clauses for #1-in-SAT. The reduction of 1-in-SAT to Exact Cover
+  is parsimonious as it stands, its ground elements being the *variables* of
+  the formula and not every element of the instance.
+* **#Knapsack** (`DescriptiveComplexity.sharpKnapsack_sharpP_parsimoniousComplete`),
+  with binary weights. Karp's reduction from Exact Cover has one item per set of
+  the family and is parsimonious as it stands
+  (`DescriptiveComplexity.KnapRed.solEquiv`). Membership is where counting asks for
+  more than a `Σ₁` definition: the certificate carries the running totals and
+  the carries of an addition walk, and a count of certificates is a count of
+  solutions only if a solution has one. Totals and carries are forced where
+  the walk reads them (`DescriptiveComplexity.isChain_agree`), and the counting kernel
+  forbids them elsewhere (`DescriptiveComplexity.sharpKnapsackKernel`).
+* **#0-1 integer programming**
+  (`DescriptiveComplexity.sharpZeroOneIP_sharpP_parsimoniousComplete`), from #Knapsack
+  by the one-equation reading, whose interpreted universe is a copy of the
+  input; its membership is Knapsack's argument once per row.
+* **#Clique** (`DescriptiveComplexity.sharpClique_sharpP_parsimoniousComplete`), counting
+  the cliques with *exactly* as many vertices as the marked set. Its kernel is
+  the first of the catalog to read the order: a size is certified by a
+  bijection with the marked set, one among many, and the kernel asks for the
+  monotone one, unique on a linear order (`DescriptiveComplexity.MonoBij.ext`). That
+  argument is made once, for any solution of the threshold size with a
+  first-order property (`DescriptiveComplexity.sharpPDefinable_of_sized_set`, in
+  `DescriptiveComplexity.Counting.Sized`). The
+  reduction is from #1-in-SAT and is not that of
+  `DescriptiveComplexity.sat_ordered_fo_reduction_clique`, in which a clique picks one
+  true literal per clause among several: an occurrence vertex here stands for
+  “this literal is the true one of its clause and the others are false”,
+  adjacency is agreement of the values so forced
+  (`DescriptiveComplexity.OneInToClique.Clash`), and one clause vertex per clause keeps
+  the threshold away from `1`, where every vertex is a clique
+  (`DescriptiveComplexity.OneInToClique.solEquiv`).
+* **#Independent Set and #Vertex Cover**
+  (`DescriptiveComplexity.sharpIndependentSet_sharpP_parsimoniousComplete`,
+  `DescriptiveComplexity.sharpVertexCover_sharpP_parsimoniousComplete`), again at exactly
+  the threshold size, by the two complementing interpretations of the decision
+  problems unchanged: the covers of a size are the complements of the
+  independent sets of the complementary size
+  (`DescriptiveComplexity.coverComplEquiv`).
+* **#Set Packing** (`DescriptiveComplexity.sharpSetPacking_sharpP_parsimoniousComplete`),
+  from #Independent Set by the edge-incidence interpretation unchanged, whose
+  sets are the vertices, one each (`DescriptiveComplexity.packEquiv`).
+* **#Set Cover and #Hitting Set**
+  (`DescriptiveComplexity.sharpSetCover_sharpP_parsimoniousComplete`,
+  `DescriptiveComplexity.sharpHittingSet_sharpP_parsimoniousComplete`), the first from
+  #Vertex Cover by the same interpretation (`DescriptiveComplexity.coverEquiv`), the
+  second its transpose. Here the support of the exact-size count is *not* the
+  decision problem: a cover smaller than the threshold extends to one of
+  exactly that size only while unused sets remain, so the support is “some
+  cover has exactly the threshold size”
+  (`DescriptiveComplexity.sharpSetCover_support_iff`), which implies Set Cover and is
+  not implied by it.
+* **#Dominating Set**
+  (`DescriptiveComplexity.sharpDominatingSet_sharpP_parsimoniousComplete`), from #SAT and
+  order-free. The reduction from Set Cover is not parsimonious – a dominating
+  set may hold element vertices, and a smaller cover can be padded with one –
+  so the graph is built to leave the threshold no slack: two adjacent literal
+  vertices per variable and two private vertices seen only from them force a
+  dominating set of as many vertices as there are variables to hold exactly
+  one literal vertex per variable and nothing else
+  (`DescriptiveComplexity.SatToDom.dom_structure`), and dominating the clause vertices
+  is satisfying the clauses.
+* **#Feedback Vertex Set**
+  (`DescriptiveComplexity.sharpFeedbackVertexSet_sharpP_parsimoniousComplete`), at exactly
+  the threshold size, from #Vertex Cover by the symmetrizing interpretation of
+  the decision problem unchanged: the feedback vertex sets of the output are
+  the vertex covers of the input, the same sets
+  (`DescriptiveComplexity.cover_iff_acyclic_symmetrized`). Membership is where the work
+  is. The `Σ₁` definition certifies acyclicity by *a* strict order containing
+  the surviving arcs, and there are many; the counting kernel asks for the
+  least one, the transitive closure, which is not first-order definable but is
+  first-order *checkable*: a transitive irreflexive relation containing the
+  arcs, each pair of which starts with an arc
+  (`DescriptiveComplexity.IsAcyclicClosure.eq_transGen`).
+* **#Feedback Arc Set**
+  (`DescriptiveComplexity.sharpFeedbackArcSet_sharpP_parsimoniousComplete`), counting the
+  sets of *arcs* of exactly the threshold size – the size of a marked binary
+  relation, certified by the monotone bijection between two sets of pairs
+  (`DescriptiveComplexity.sharpPDefinable_of_sizedPairs`). The vertex-splitting
+  reduction from Feedback Vertex Set is not parsimonious and cannot be made
+  so: a superset of a solution is a solution on both sides, and the paddings
+  do not correspond. The reduction is from #1-in-SAT, through instances with
+  no slack: the clique instance of the formula has no clique above its
+  threshold (`DescriptiveComplexity.OneInToClique.ncard_clique_le`), and on such a
+  graph the feedback arc sets of the threshold size of its *conflict split
+  graph* – two parallel paths per conflict, so that a crossing arc alone cuts
+  nothing – are the complements of the cliques, by a count
+  (`DescriptiveComplexity.SplitBundle.internal_of_fas`). The second interpretation is
+  wrong on other graphs, so the two are composed under a promise
+  (`DescriptiveComplexity.OrderedParsimoniousReduction.transPromise`). As for Set
+  Cover, the support is “some feedback arc set has exactly the threshold
+  size” (`DescriptiveComplexity.sharpFeedbackArcSet_support_iff`), not the decision
+  problem.
+* **#Steiner Tree**
+  (`DescriptiveComplexity.sharpSteinerTree_sharpP_parsimoniousComplete`), the
+  node-weighted problem: the connected sets containing every terminal and
+  using exactly the threshold number of non-terminals. The reduction from
+  Vertex Cover of the decision problem is parsimonious as it stands – a
+  Steiner set of the incidence structure is the terminals and a vertex cover,
+  and the two paddings are the same vertices
+  (`DescriptiveComplexity.sharpSteinerTree_map`). Membership needs a unique certificate
+  of connectivity, which the root-and-order of the `Σ₁` definition is not. The
+  kernel uses the order of the instance as a clock: “reached from the least
+  chosen vertex within as many steps as the tick has predecessors”, determined
+  tick by tick (`DescriptiveComplexity.IsReachClock.eq_clockOf`), the set being
+  connected iff the last tick reaches all of it
+  (`DescriptiveComplexity.clockOf_top_iff_connectedOn`). It is the first kernel of the
+  catalog whose *property* reads the order, not only its size certificate
+  (`DescriptiveComplexity.sharpPDefinable_of_sized_ordered`).
+* **#Directed Hamilton Circuit**
+  (`DescriptiveComplexity.sharpDirHamCircuit_sharpP_parsimoniousComplete`). What is
+  counted is the circuit, as its “comes next” relation
+  (`DescriptiveComplexity.IsCircuit`), not the linear orders the decision problem
+  guesses, of which a circuit through `n` vertices has `n`; the counting kernel
+  guesses the one that starts at the least element of the instance
+  (`DescriptiveComplexity.card_rootedTour_eq`). Hardness is a *relativized* reduction
+  from #1-in-SAT
+  (`DescriptiveComplexity.sharpOneInSat_rel_ordered_parsimonious_sharpDirHamCircuit`),
+  a circuit spanning the universe, and not the one of the decision problem,
+  which goes through Vertex Cover and is not parsimonious. Each variable has a
+  two-way row through its occurrences, traversed from the left when it is true
+  and from the right when it is false; inside an occurrence the row is one-way
+  in the direction that makes the literal true, *through the clause vertex*, so
+  a clause is visited once per true literal
+  (`DescriptiveComplexity.Problems.Hamilton.CountingGadget`). A circuit is read
+  locally – every vertex is left once and reached once
+  (`DescriptiveComplexity.IsCircuit.local`) – which forces each row to be swept in one
+  direction (`DescriptiveComplexity.HamGadget.Circ.rowT`); and the relation of a model
+  is a circuit because a potential increases along it
+  (`DescriptiveComplexity.isCircuit_of_potential`), no enumeration being written.
+  The circuits are the models, bijectively
+  (`DescriptiveComplexity.HamGadget.modelEquiv`).
+* **#Hamilton Circuit**
+  (`DescriptiveComplexity.sharpHamCircuit_sharpP_parsimoniousComplete`), for undirected
+  graphs, a circuit being its **set of edges**
+  (`DescriptiveComplexity.IsUCircuit`) and not one of its two orientations. The
+  counting kernel fixes the orientation as well as the cut: from the least
+  element the guessed order goes first to the smaller of its two neighbours
+  (`DescriptiveComplexity.Oriented`, `DescriptiveComplexity.card_orientedTour_eq`). Hardness is
+  from the directed problem, order-free: each vertex is split into a path of
+  three, an arc joining the exit of one to the entry of the next, and the
+  middle vertex forces an undirected circuit to traverse every path the same
+  way round (`DescriptiveComplexity.Split.forward_all`), by induction along the
+  circuit (`DescriptiveComplexity.IsCircuit.induction`). So a directed circuit becomes
+  one edge set (`DescriptiveComplexity.Split.splitEquiv`); doubling each edge, the
+  reduction of the library in the other direction, would give two.
+* **The machine bridge**: counting accepting runs
+  (`DescriptiveComplexity.SharpNTMAccept`, in
+  `DescriptiveComplexity.Problems.Machine.Counting`) is the number of runs of the
+  machine of `DescriptiveComplexity.NTMAccept` reaching an accepting state within the
+  budget, each counted up to its first accepting configuration. It is
+  parsimoniously `#P`-complete
+  (`DescriptiveComplexity.sharpNtmAccept_sharpP_parsimoniousComplete`), and a counting
+  problem is in `#P` exactly when it reduces parsimoniously to it
+  (`DescriptiveComplexity.mem_sharpP_iff_le_sharpNtmAccept`) – the definition of `#P`
+  by accepting paths. Membership is the tableau of a run, which the run
+  determines; hardness is the machine `M_φ` of the Cook–Levin bridge, which
+  guesses only at the variables of the formula, so that its accepting runs are
+  the models (`DescriptiveComplexity.card_haltWalk_satMachine`).
+* **Relation to NP**, through the *support* of a counting problem, “is the count
+  positive?”: NP is exactly the class of supports of `#P`
+  (`DescriptiveComplexity.mem_NP_iff_exists_sharpP_support`), the support of a
+  parsimoniously `#P`-hard problem is NP-hard
+  (`DescriptiveComplexity.NP_hard_support_of_sharpP_parsimoniousHard`), and a
+  parsimoniously `#P`-hard problem whose support is in PTIME gives `NP ⊆ PTIME`
+  (`DescriptiveComplexity.NP_subset_PTIME_of_sharpP_parsimoniousHard`).
+* **Parsimonious hardness is not the hardness of the literature.** “`#P`-hard”
+  usually means hard under polynomial-time Turing reductions, and counting the
+  models of a DNF formula is `#P`-complete in that sense while its decision
+  version is trivial. By the last statement above it is *not* parsimoniously
+  `#P`-hard unless `NP ⊆ PTIME`. This is why the library says
+  `ParsimoniousHard` and `ParsimoniousComplete`; the bare words are kept for
+  the subtractive reductions below, and the one-call notion is qualified too.
+* **One-call reductions**, `C ≤ᶜ[≤] D` (`DescriptiveComplexity.OneCallReduction`,
+  in `DescriptiveComplexity.Counting.Reduction`): a relativized ordered
+  interpretation and a *post-processing term*, the count of the source being
+  the value of the term at the count of the interpreted instance. The terms
+  (`DescriptiveComplexity.PostTerm`, in `DescriptiveComplexity.Counting.Post`)
+  are built from the oracle's answer, first-order definable cardinalities of
+  the instance and powers of two of those, by `+`, `*`, truncated `-`, `/` and
+  `%`: arithmetic on numbers of polynomially many bits, with no counting of its
+  own. A definable cardinality is stored as the universe of a relativized
+  interpretation, so terms pull back along interpretations by the existing
+  composition, and one-call reductions compose
+  (`DescriptiveComplexity.OneCallReduction.trans`) – still with one call. A
+  parsimonious reduction is the case where the term is the oracle's answer.
+  `#P` is not expected to be closed under these reductions, so the plain words
+  are not used for them. What they are the reductions of is the
+  **one-call closure** of a class, `DescriptiveComplexity.CountingClass.OneCallMem`:
+  the problems reducing with one call to a problem of the class. It is closed
+  under one-call reductions, `DescriptiveComplexity.CountingClass.OneCallHard` is
+  hardness for it (`DescriptiveComplexity.CountingClass.oneCallHard_iff`), and
+  `DescriptiveComplexity.CountingClass.OneCallComplete` conjoins the two;
+  parsimonious hardness implies one-call hardness
+  (`DescriptiveComplexity.oneCallHard_sharpP_of_parsimoniousHard`). The one-call
+  closure of `#P` is a logical counterpart of `FP^#P`, not given that name
+  since the equivalence is not proved. A one-call reduction is a restricted
+  polynomial-time 1-Turing reduction, so one-call hardness is at least the
+  `#P`-hardness of the literature; a problem `#P`-hard under 1-Turing
+  reductions is hard for the higher counting classes too
+  ([Toda and Watanabe 1992][toda1992polynomial]).
+* **Subtractive reductions**, `C ≤ˢ D` (`DescriptiveComplexity.SubtractiveReducible`,
+  in `DescriptiveComplexity.Counting.Subtractive`), are the notion of
+  [Durand, Hermann, Kolaitis 2005][durand2005subtractive] under which `#P` *is*
+  closed (`DescriptiveComplexity.SharpPDefinable.of_subtractive`, their
+  Theorem 3.3). A strong subtractive reduction
+  (`DescriptiveComplexity.StrongSubtractiveReduction`) draws two instances of the
+  target, with the same tags and dimension and hence the same universe, such
+  that every solution of the first is a solution of the second and the count
+  of the source is the difference of the two counts. Since the condition is
+  about solutions, the target comes presented as the witness count of a
+  kernel. The closure is then one line of logic: the solutions of the second
+  instance that are not solutions of the first are the witnesses of the
+  conjunction of one pulled kernel with the negation of the other. Strong
+  reductions do not compose, so a subtractive reduction is a chain of steps,
+  each a strong subtractive or a (relativized) parsimonious reduction.
+  This is the widest notion of the library under which `#P` is closed, so the
+  plain words go to it, as on the decision side:
+  `DescriptiveComplexity.CountingClass.Hard` and
+  `DescriptiveComplexity.CountingClass.Complete` are hardness and completeness
+  under subtractive reductions. Parsimonious completeness implies it
+  (`DescriptiveComplexity.complete_sharpP_of_parsimoniousComplete`), so every
+  problem of the parsimonious catalog above is `#P`-complete in the plain
+  sense, each with its theorem (`DescriptiveComplexity.sharpSat_sharpP_complete`,
+  `DescriptiveComplexity.sharpHamCircuit_sharpP_complete`…), and
+  **#DNF is `#P`-complete**
+  (`DescriptiveComplexity.sharpDnf_sharpP_complete`, in
+  `DescriptiveComplexity.Problems.Sat.CountingDnfSubtractive`; their
+  Proposition 3.4), the two instances being the negated formula and a
+  tautology over the same variables. Whether the two digit-reading reductions
+  below can be replaced by subtractive ones is not known here.
+* **#DNF is one-call `#P`-complete** (`DescriptiveComplexity.sharpDnf_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.Sat.CountingDnf`), and is the first problem
+  complete under one-call reductions only. By De Morgan's law the sets of variables that
+  are not models of a CNF formula are the models of its sign swap read
+  disjunctively (`DescriptiveComplexity.dnfModel_swap_iff`), so
+  `#SAT(φ) = 2 ^ n - #DNF(¬φ)` for `n` the number of variables of `φ`
+  (`DescriptiveComplexity.sharpSat_oneCall_sharpDnf`); this is the one-call form
+  of the subtractive reduction above, the count at the tautology being known.
+* **Counting all the independent sets of a graph is one-call `#P`-complete**
+  (`DescriptiveComplexity.sharpAllIndependentSets_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.CliqueFamily.CountingAll`), from the count of the
+  independent sets of exactly the threshold size, which is parsimoniously
+  complete. The reduction attaches `n` pendant leaves to each of the `n`
+  vertices: an independent set of the result is an independent set `S` of the
+  graph with any leaves of the vertices outside it, so the oracle answers
+  `∑ S, (2 ^ n) ^ (n - |S|)`, a number whose digit of rank `n - k` in base
+  `2 ^ n` counts the independent sets of size `k`
+  (`DescriptiveComplexity.card_indepSet_pend_digit`). The post-processing term is
+  that digit, a quotient and a remainder; the arithmetic behind it is
+  `DescriptiveComplexity.sum_pow_div_mod`, in
+  `DescriptiveComplexity.Numbers.DigitExtract`.
+* **#BIS is one-call `#P`-complete** (`DescriptiveComplexity.sharpBIS_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite`): counting the
+  independent sets of a bipartite graph given with its bipartition
+  (`FirstOrder.Language.bipGraph`). The reduction, from the previous problem,
+  stretches every edge into `2n` paths of length two, whose middle vertices
+  form one side: an independent set of the result is any set `S` of vertices
+  with any middles of the edges having no endpoint in `S`, so the oracle
+  answers `∑ S, (2 ^ (2n)) ^ e(S)`, and its remainder modulo `2 ^ (2n)` counts
+  the sets with `e(S) = 0`, the complements of the independent sets
+  (`DescriptiveComplexity.card_stretchIndep_mod`). The two gadgets compose into
+  one call (`DescriptiveComplexity.OneCallReduction.trans`), so every problem of
+  `#P` is one question about the independent sets of a bipartite graph. This
+  is the problem #PP2CNF of [Provan and Ball 1983][provan1983complexity], an
+  independent set being the complement of a vertex cover; its dual **#PP2DNF**
+  (`DescriptiveComplexity.SharpPP2DNF`), the models of `⋁ (x ∧ y)` over the
+  edges, is one-call `#P`-complete too
+  (`DescriptiveComplexity.sharpPP2DNF_sharpP_oneCallComplete`), by
+  `#BIS + #PP2DNF = 2 ^ n`. It is the source of the `#P`-hardness of the query
+  `R(x), S(x, y), T(y)` over probabilistic databases
+  ([Dalvi and Suciu 2012][dalvi2012dichotomy]).
+* **The rest of the one-call catalog.** #2SAT, #HORN-SAT and #Monotone-2SAT
+  (`DescriptiveComplexity.sharpTwoSat_sharpP_oneCallComplete`,
+  `DescriptiveComplexity.sharpHornSat_sharpP_oneCallComplete`,
+  `DescriptiveComplexity.sharpMonotoneTwoSat_sharpP_oneCallComplete`), the
+  model counts of formulas of a definable shape, i.e., #SAT restricted to a
+  sentence (`DescriptiveComplexity.CountingProblem.restrict`), all reached
+  from counting all the independent sets by one clause per edge, of either
+  sign, each isolated vertex doubling the count
+  (`DescriptiveComplexity.sharpAllIndependentSets_oneCall_sharpSat`); counting
+  all the vertex covers (`DescriptiveComplexity.sharpAllVertexCovers_sharpP_oneCallComplete`),
+  the complements of the independent sets. #NAE-SAT
+  (`DescriptiveComplexity.sharpNaeSat_sharpP_oneCallComplete`) and #Set
+  Splitting (`DescriptiveComplexity.sharpSetSplitting_sharpP_oneCallComplete`),
+  whose solutions come in complementary pairs, by the reductions of the
+  decision problems unchanged, halving the count or dividing it by `2` to the
+  number of elements that are no variables. #3-Colorability
+  (`DescriptiveComplexity.sharpThreeCol_sharpP_oneCallComplete`) needs a new
+  reduction: the OR gate of the decision reduction leaves its output free when
+  one input is true, while three triangles attached to `z`, `¬p`, `¬ℓ` and
+  `F` force `z = p ∨ ℓ` with exactly `8` colorings
+  (`DescriptiveComplexity.SatToColCount.gate_iff`), so that the count is
+  `6 · 8 ^ g` times the number of models
+  (`DescriptiveComplexity.SatToColCount.card_proper`).
+* **The permanent is one-call `#P`-complete**
+  (`DescriptiveComplexity.sharpCycleCover_sharpP_oneCallComplete`, in
+  `DescriptiveComplexity.Problems.CycleCover.Completeness`): Valiant's theorem
+  ([Valiant 1979][valiant1979complexity]), for the number of cycle covers of a
+  digraph (`DescriptiveComplexity.SharpCycleCover`), which is the permanent of
+  its 0-1 adjacency matrix (`DescriptiveComplexity.sharpCycleCover_eq_bperm`)
+  and the number of perfect matchings of its bipartite double cover. The
+  permanent of a rectangular matrix and its Laplace expansion along a set of
+  rows (`DescriptiveComplexity.bperm_laplace`), stated on minors indexed by
+  sets of deleted rows and columns (`DescriptiveComplexity.pdel`), are what a
+  gadget argument computes with (`DescriptiveComplexity.Permanent`). Valiant's
+  XOR gadget (`DescriptiveComplexity.xorGadget`, six local values by `decide`)
+  is attached at every **site**, a pair of edges of which a cover uses exactly
+  one, and the expansion along the gadget rows leaves `4` per site times the
+  **XOR sum** over the choices of one edge per site of the corresponding
+  minor of the base graph (`DescriptiveComplexity.Site.pdel_attachAll`). The
+  base graph of a #1-in-SAT instance pairs, at each occurrence of a literal,
+  the self-loop of a track node with that of a spoke: the tracks of a literal
+  form a cycle through its occurrences in the order of the clauses, used
+  entirely or not at all (`DescriptiveComplexity.eq_empty_or_eq_of_cycNext_closed`),
+  and a hub per clause closes a cycle with exactly one free spoke; a minor is
+  `1` when the choice is consistent and `0` otherwise
+  (`DescriptiveComplexity.SatCover.pdel_base`), and the consistent choices are
+  the exactly-one models (`DescriptiveComplexity.SatCover.consistentEquiv`).
+  The gadget has entries `-1`, `2` and `3`; the **ladder expansion**
+  (`DescriptiveComplexity.ladder`, `DescriptiveComplexity.bperm_ladder`) turns
+  a matrix of natural numbers into a 0-1 matrix of the same permanent, an
+  edge of weight `k` becoming a level of `k` rungs and `2 ^ L` a ladder of `L`
+  levels of two rungs, so that `-1` is `2 ^ L` modulo `2 ^ L + 1`
+  (`DescriptiveComplexity.bperm_ladder_widths_modEq`). The one call asks for
+  the permanent of the drawn digraph; the count is its remainder modulo
+  `2 ^ L + 1` divided by `4` to the number of occurrences, both definable
+  cardinalities (`DescriptiveComplexity.sharpOneInSat_oneCall_sharpCycleCover`).
+* **FP, by quantitative logic** (`DescriptiveComplexity.Counting.Quantitative`,
+  `DescriptiveComplexity.Counting.QuantitativePull`,
+  `DescriptiveComplexity.Counting.FP`). The logic is that of
+  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive], whose idea it is to
+  put a *quantitative* level above a Boolean one: a formula counts `1` or `0`,
+  and above formulas come constants, `+`, `·`, and the sum `Σx` and the product
+  `Πx` over the elements (`DescriptiveComplexity.QTerm`, their grammar (3.1)
+  restricted to first-order quantifiers; `DescriptiveComplexity.QTerm.eval`,
+  their Table 1). Their Theorem 4.4 is that this logic over least fixed
+  points, QFO(LFP), captures FP over ordered structures, and the library
+  *defines* `DescriptiveComplexity.FP` that way
+  (`DescriptiveComplexity.FPDefinable`), the theorem being cited as the capture
+  theorems behind the other logically defined classes are. A term with no
+  fixed point is enough for most concrete functions
+  (`DescriptiveComplexity.fpDefinable_of_qfo`). The class is closed under
+  parsimonious reductions
+  (`DescriptiveComplexity.FPDefinable.of_orderedParsimonious`): the fixed point
+  pulls back as for PTIME, and a term through an interpretation by
+  `DescriptiveComplexity.QTerm.pull`, a sum over the interpreted universe
+  becoming a finite sum over tags of a sum over tuples. Positivity of a term
+  is a first-order formula (`DescriptiveComplexity.QTerm.pos`), so the support
+  of a problem of FP is in PTIME
+  (`DescriptiveComplexity.support_mem_PTIME_of_mem_FP`) and no problem of FP is
+  parsimoniously `#P`-hard unless `NP ⊆ PTIME`
+  (`DescriptiveComplexity.NP_subset_PTIME_of_mem_FP_of_parsimoniousHard`).
+  Not formalized: the second-order sums and products of their full logic QSO,
+  the capture theorem itself, and a machine characterization.
+* **The number written by a circuit, complete for FP**
+  (`DescriptiveComplexity.Problems.CircuitNumber`,
+  `DescriptiveComplexity.Counting.DigitDefinable`): the function counterpart of
+  the circuit value problem. An instance is a circuit with several output
+  gates and a comparison of them, and `DescriptiveComplexity.CircuitNumber` is
+  the number whose binary digits are the values of the outputs. It is complete
+  for FP under parsimonious reductions
+  (`DescriptiveComplexity.circuitNumber_FP_parsimoniousComplete`). Membership
+  is the gate rules of CVP and one term writing the number digit by digit.
+  Hardness has two halves. A function whose binary digits are relations of a
+  least fixed point (`DescriptiveComplexity.DigitDefinable`) reduces to the
+  problem by drawing the rules as a monotone circuit, one disjunction gate per
+  atom and one conjunction chain per rule instance, with no stratification by
+  stages (`DescriptiveComplexity.DigitDefinable.nonempty_orderedParsimonious`).
+  And every problem of FP is digit-definable, the next item. The problem
+  ignores isolated elements
+  (`DescriptiveComplexity.circuitNumber_of_embedding`), which closes FP under
+  relativized parsimonious reductions too
+  (`DescriptiveComplexity.mem_FP_of_relOrderedParsimonious`). The statement was
+  not found in the literature; under polynomial-time reductions it would be
+  empty, every function of FP being complete.
+* **The normal form of FP** (`DescriptiveComplexity.Counting.Digits.NormalForm`
+  and the files beside it): every problem defined in QFO(LFP) has its binary
+  digits defined by a least fixed point
+  (`DescriptiveComplexity.FPDefinable.digitDefinable`), so that the
+  digit-definable problems are exactly those of FP
+  (`DescriptiveComplexity.digitDefinable_iff_mem_FP`). This is the normal form
+  in the proof of the capture theorem of
+  [Arenas, Muñoz, Riveros 2020][arenas2020descriptive], obtained there through
+  machines and here inside the logic. The digits are computed by a tower of
+  inflationary inductions, one induction by stratification
+  (`DescriptiveComplexity.StepDef.stratify`), each stratum free to negate the
+  ones below: a sum of two numbers is first-order, by carry lookahead
+  (`DescriptiveComplexity.Digits.addF`); a sum over the tuples is a sweep
+  along the lexicographic order
+  (`DescriptiveComplexity.Digits.Dig.sum`), a row being written once, in full,
+  when the row before it is marked done
+  (`DescriptiveComplexity.Digits.sweep_stage`); a product is one sweep running
+  Horner's scheme (`DescriptiveComplexity.Digits.Dig.prod`). Arithmetic is
+  exact modulo `2 ^ (n ^ ℓ)`, so no intermediate value has to be bounded, and
+  the one-element structures, which have too few tuples, are treated apart
+  (`DescriptiveComplexity.QTerm.exists_formulas`). The limit of the tower is a
+  least fixed point of rules by the translation of FO(≤, IFP) into FO(LFP)
+  (`DescriptiveComplexity.IFPLfp.homAssign_lfpAssign_trRules`).
+* **The machine bridge for FP** (`DescriptiveComplexity.Problems.MachineNumber`,
+  `DescriptiveComplexity.Problems.HornSat.Number`): the function counterparts
+  of deterministic machine acceptance and of HORN-SAT.
+  `DescriptiveComplexity.DTMNumber` is the number a deterministic machine,
+  carried by the instance, leaves on its marked output cells, read in tape
+  order, when it halts and accepts within its clock;
+  `DescriptiveComplexity.HornNumber` is the number whose digits say which
+  marked variables of a Horn formula unit propagation forces, the variables
+  compared by a relation of the instance. Both are complete for FP under
+  parsimonious reductions
+  (`DescriptiveComplexity.dtmNumber_FP_parsimoniousComplete`,
+  `DescriptiveComplexity.hornNumber_FP_parsimoniousComplete`), and a function is
+  in FP exactly when it reduces to the first
+  (`DescriptiveComplexity.mem_FP_iff_le_dtmNumber`): the library's FP, defined
+  by a logic, is the machine one. Membership reads the number off the least
+  fixed point of the run, the halting time being a first-order condition on it
+  (`DescriptiveComplexity.MachNum.halted_iff`). Hardness chains the normal
+  form of the previous item, the Horn discharge – the least fixed point of
+  rules is the least model of a Horn formula
+  (`DescriptiveComplexity.HornNum.forced_var_iff`) – and the unit-propagation
+  machine of the PTIME bridge, which accepts with that model on its tape
+  (`DescriptiveComplexity.hornMachine_final`). The last step reads the digits
+  in tape order while the Horn formula compares its output variables by a
+  relation: the reduction first reorders its input so that the output
+  variables come first, in that order
+  (`DescriptiveComplexity.FOInterpretation.reorder`), and the machine lays its
+  cells out accordingly.
+* **Decision classes defined by counting**
+  (`DescriptiveComplexity.Counting.DecisionClasses`): `⊕P`, `Mod_k P`, `PP`,
+  `C₌P` and `UP`, each the class `DescriptiveComplexity.countClass S R` of the
+  problems whose answer is the relation `R` between two witness counts of
+  `∃SO` sentences, under the side condition `S` – the characterization of
+  these classes by differences of two `#P` functions
+  ([Fenner, Fortnow, Kurtz 1994][fenner1994gap]), which needs no
+  integer-valued problem. Closure under reductions is the pullback of the two
+  kernels (`DescriptiveComplexity.CountDefinable.of_orderedReduction`), a
+  member is given by two problems of `#P`
+  (`DescriptiveComplexity.mem_countClass_of_sharpP`), and the arithmetic on
+  kernels the inclusions need is the **pair kernel** of
+  `DescriptiveComplexity.Counting.KernelPair`: a selector variable of arity
+  zero choosing between two kernels, whose witness count is the sum of the two
+  (`DescriptiveComplexity.witnessCount_pairKernel`) and whose selector reads
+  the summands back (`DescriptiveComplexity.card_pairWitness_sel`). Hence
+  `UP ⊆ NP`, `UP ⊆ ⊕P`, `NP ⊆ PP`, `coNP ⊆ PP`, and the closure of `⊕P` and
+  `PP` under complement (`DescriptiveComplexity.compl_mem_parityP`,
+  `DescriptiveComplexity.compl_mem_PP`). The complete problems
+  (`DescriptiveComplexity.Problems.Sat.CountingDecision`,
+  `DescriptiveComplexity.Problems.Sat.CountingCompare`): the decision version
+  of `#SAT` by any property of one count is complete for the class of that
+  property (`DescriptiveComplexity.decide_sharpSat_countClass₁_complete`), by
+  the parsimonious Tseitin interpretation, so `⊕SAT` is `⊕P`-complete and
+  `Mod_k-SAT` is `Mod_k P`-complete; completeness transfers to the decision
+  version of every parsimoniously `#P`-complete problem
+  (`DescriptiveComplexity.countClass₁_complete_of_sharpP_parsimoniousComplete`),
+  in particular to the parity of the number of accepting runs of a machine,
+  which gives the machine characterization of `⊕P`
+  (`DescriptiveComplexity.mem_parityP_iff_le_parity_sharpNtmAccept`). For the
+  two-count classes, a CNF formula with a *selected variable*
+  (`FirstOrder.Language.satSel`) carries two counts, the models in which the
+  variable is true and those in which it is false
+  (`DescriptiveComplexity.SharpSelSAT`); `SelMajSAT` compares them and is
+  `PP`-complete (`DescriptiveComplexity.selMajSat_PP_complete`), `SelEqSAT`
+  equates them and is `C₌P`-complete
+  (`DescriptiveComplexity.selEqSat_CeqP_complete`), the hardness being the
+  Tseitin formula of a pair kernel with the selector's variable selected
+  (`DescriptiveComplexity.PairSel.pairTseitinInterp`). `UP` has no known
+  complete problem, and the question does not relativize
+  ([Hartmanis, Hemachandra 1988][hartmanis1988complexity]); it is here for its
+  inclusions.
+* **Possible worlds** (`DescriptiveComplexity.Counting.PossibleWorlds`): for a
+  finite relational schema, an instance holds certain facts and uncertain ones,
+  a possible world keeps the first and some of the second, and
+  `DescriptiveComplexity.PossibleWorlds φ` counts the worlds in which the
+  sentence `φ` holds. It is in `#P` for every first-order `φ`
+  (`DescriptiveComplexity.possibleWorlds_mem_sharpP`), and an instance with `k`
+  open facts has `2 ^ k` worlds (`DescriptiveComplexity.card_isWorld`), so the
+  count is the probability of `φ` over a tuple-independent database with
+  probabilities `1` and `1/2`, up to the factor `2 ^ k`. For the query above
+  it is one-call `#P`-complete
+  (`DescriptiveComplexity.possibleWorlds_h0_sharpP_oneCallComplete`, in the
+  tutorial `DescriptiveComplexity.Examples.ProbabilisticQueries`).
+* **A safe query** (`DescriptiveComplexity.Examples.ProbabilisticQueries`,
+  steps 10 to 15): on the same
+  weighted instances, the count of the weighted worlds of `R(x), S(x, y)` is in
+  FP (`DescriptiveComplexity.weightedWorlds_rs_mem_FP`), by a term of
+  quantitative first-order logic with no fixed point. The library helpers
+  behind it are generic: every fact as a Boolean variable with two weights
+  (`DescriptiveComplexity.weightedWorlds_eq_weightedCount_facts`), weighted
+  counts of independent events and the first-success identity that removes a
+  subtraction (`DescriptiveComplexity.weightedCount_forall`,
+  `DescriptiveComplexity.prod_add_eq_prod_add_sum`), named binders for terms
+  (`DescriptiveComplexity.QTerm.sumOver`), and the weights of an instance as
+  terms (`DescriptiveComplexity.fullPresT`).
+* **Probabilities as weighted counts**
+  (`DescriptiveComplexity.Counting.Probability`): finitely many independent
+  Boolean variables with rational probabilities, the distribution on
+  valuations and the probability of an event, taken from the
+  provenance-lean library; and, with a probability `a / (a + c)` given by two
+  natural weights, the fact that the probability of an event is the ratio of
+  its weighted count to that of the sure event
+  (`DescriptiveComplexity.ProbAssignment.funcProb_ofWeights`). This is the
+  concrete side of query evaluation over a tuple-independent database.
+* **Weighted worlds** (`DescriptiveComplexity.Counting.WeightedWorlds`): the
+  same with a probability per uncertain fact, given by two weights written in
+  binary in the instance (`DescriptiveComplexity.weightedLang`).
+  `DescriptiveComplexity.WeightedWorlds φ` is in `#P` for every first-order
+  `φ` (`DescriptiveComplexity.weightedWorlds_mem_sharpP`), and on a linearly
+  ordered instance it is the sum, over the worlds satisfying `φ`, of the
+  product of the weights of the facts
+  (`DescriptiveComplexity.weightedWorlds_eq_weightSum`); on an instance whose
+  position order is not linear it is zero
+  (`DescriptiveComplexity.weightedWorlds_of_not_isLinOrd`). A weight cannot
+  multiply a count directly, so the witness carries one number per open fact
+  below the weight that fact takes: “below” is first-order
+  (`DescriptiveComplexity.numLtFormula`), and the numbers below a weight are
+  as many as the weight (`DescriptiveComplexity.card_binNum_lt`). The worlds
+  being the valuations of the open facts, the probability of `φ` is
+  `WeightedWorlds φ / WeightedWorlds ⊤`
+  (`DescriptiveComplexity.funcProb_holdsEvent_eq_ratio`): **the probability of
+  any first-order query over a tuple-independent database is a ratio of two
+  `#P` numbers**. The uniform problem is the case of weight one
+  (`DescriptiveComplexity.possibleWorlds_ordered_parsimonious_weightedWorlds`,
+  in `DescriptiveComplexity.Counting.UnitWeights`), so for the query
+  `R(x), S(x, y), T(y)` the numerator is one-call `#P`-complete
+  (`DescriptiveComplexity.weightedWorlds_h0_sharpP_oneCallComplete`). The
+  tutorial ends with a concrete database type, its faithful encoding
+  (`DescriptiveComplexity.probDbEncoding_countFaithful`) and a computable
+  decoder (`DescriptiveComplexity.probDbDecoding`), on two pieces of
+  shared machinery: `DescriptiveComplexity.Numbers.BinEnum`, the decoding of
+  the binary digits an encoder writes, which
+  `DescriptiveComplexity.Encoding.BinarySubsetSum` uses too, and
+  `DescriptiveComplexity.Encoding.CountFaithful` and
+  `DescriptiveComplexity.CountDecoding`
+  (`DescriptiveComplexity.Counting.Encoding`), the counting forms of a faithful
+  encoding and of a computable decoding.
+
 ## Shared encodings
 
 * `DescriptiveComplexity.SecondOrderMerge` – merging a second-order quantifier
@@ -2150,11 +2807,18 @@ reduction and certificate in full.
 | `Σₖᵖ` (`k ≥ 1`) | `Σₖ¹`: `k` alternating second-order quantifier blocks, existential first | alternating polynomial-time Turing machine, `k` blocks, existential first | `QBF k` – at `k = 1`, NP · `ATMAccept k true` |
 | `Πₖᵖ` (`k ≥ 1`) | `Πₖ¹`: `k` alternating second-order quantifier blocks, universal first | the same machine, universal first | `QBF∀ k` – at `k = 1`, coNP · `ATMAccept k false` |
 | `PH` | full second-order logic | — | — |
+| `⊕P` | the number of witnesses of an ∃SO sentence is odd (`DescriptiveComplexity.ParityP`) | nondeterministic polynomial-time Turing machine, the parity of its accepting runs | ⊕SAT · the parity of every parsimoniously `#P`-complete problem (`DescriptiveComplexity.parityP_complete_of_sharpP_parsimoniousComplete`) |
+| `Mod_k P` | the number of witnesses is not a multiple of `k` (`DescriptiveComplexity.ModP`) | the same machine, the residue of its accepting runs | Mod_k-SAT · likewise for every parsimoniously `#P`-complete problem |
+| `PP` | one witness count exceeds another (`DescriptiveComplexity.PP`) | — | SelMajSAT: the selected variable is true in more models than it is false |
+| `C₌P` | two witness counts are equal (`DescriptiveComplexity.CeqP`) | — | SelEqSAT: in exactly as many |
+| `UP` | at most one witness, and the answer is whether there is one (`DescriptiveComplexity.UP`) | — | — (none is known) |
 | `PSPACE` | SO(TC): second-order logic with a transitive closure over assignments of a block of relation variables | polynomial-space Turing machine, deterministic or not | SUCCINCT-REACH · QSAT · space-bounded machine acceptance (deterministic & not) |
 | `EXPTIME` | SO(LFP): PTIME read over an exponential expansion; equivalently SO-GAME, a second-order alternating game | alternating polynomial-space Turing machine | acceptance by such a machine (`APSPACE = EXPTIME`) |
 | `NEXPTIME` | ∃SO over an exponential expansion, i.e., NP read there; equivalently ∃SO[new, exp], value invention bounded exponentially | wide machine, clocked | acceptance by such a machine within its clock · tiling a wide square (the `2ⁿ × 2ⁿ` tiling) |
 | `EXPSPACE` | SO(PFP): PSPACE read over an exponential expansion | wide machine, space-bounded | acceptance by such a machine in bounded space (deterministic & not) · tiling a wide corridor (width `2ⁿ`, unbounded height) |
 | `RE` | ∃SO[new]: ∃SO with value invention, the relation variables ranging over the universe extended by finitely many invented values | Turing machine, no step or space bound | FINSAT (Trakhtenbrot's theorem) · CODEHALT · HALT · PCP (Post's correspondence problem) |
+| `FP` (polynomial-time functions with natural-number values, `DescriptiveComplexity.FP`) | QFO(LFP), the quantitative first-order logic of [Arenas, Muñoz, Riveros 2020][arenas2020descriptive] over least fixed points: sums and products, over the elements, of polynomial-time conditions | – | – |
+| `#P` (a counting class, `DescriptiveComplexity.SharpP`) | the number of witnesses of an ∃SO sentence, over a linearly ordered universe: #FO, equivalently ΣQSO(FO) | nondeterministic polynomial-time Turing machine, counting its accepting runs | #SAT · #3SAT · #1-in-SAT · #Exact Cover · #Knapsack · #0-1 Integer Programming (both with binary numbers) · #Clique · #Independent Set · #Vertex Cover · #Set Packing · #Set Cover · #Hitting Set · #Dominating Set · #Feedback Vertex Set · #Feedback Arc Set · #Steiner Tree (all ten counting the solutions of exactly the threshold size) · #Directed Hamilton Circuit · #Hamilton Circuit (circuits as sets of edges) · counting the accepting runs of such a machine – all *parsimoniously* complete, a stronger notion than the `#P`-completeness of the literature · #DNF, complete under subtractive reductions (plain `#P`-complete here) · #2SAT · #HORN-SAT · #Monotone-2SAT · #NAE-SAT · #Set Splitting · #3-Colorability · counting all the independent sets or all the vertex covers of a graph · #BIS (the independent sets of a bipartite graph) · #PP2DNF · the permanent (#Cycle Cover), complete under one-call reductions only |
 | the degree of a problem: `DescriptiveComplexity.ComplexityClass.below Q₀`, e.g., `GI` | none – a downward closure under `≤ᶠᵒ[≤]` rather than a logic, which is the point of the construction | — | for `GI`: Graph Isomorphism · Digraph Isomorphism · DAG Isomorphism |
 
 Two of the models are named rather than described: both head automata walk a

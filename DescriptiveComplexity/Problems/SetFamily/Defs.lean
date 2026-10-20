@@ -126,12 +126,23 @@ def ExactlyCoversOn (Ep Fp : A → Prop) (Mp : A → A → Prop) : Prop :=
   ∃ G : A → Prop, (∀ s, G s → Fp s) ∧ (∀ x, Ep x → ∃ s, G s ∧ Mp x s) ∧
     ∀ s s', G s → G s' → s ≠ s' → ∀ x, Ep x → ¬(Mp x s ∧ Mp x s')
 
-/-- Exactness in the “exactly one” form: covering plus disjointness is one
-covering set per element. -/
-theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
-    ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, (∀ s, G s → Fp s) ∧
-      ∀ x, Ep x → ∃! s, G s ∧ Mp x s := by
-  refine exists_congr fun G => and_congr_right fun _ => ?_
+/-- The subfamily `G` is an exact cover: it consists of `Fp`-sets, covers every
+`Ep`-element, and no element belongs to two distinct members. This is the body
+of `DescriptiveComplexity.ExactlyCoversOn`, named for the statements that are about a
+particular cover and not only about the existence of one. -/
+def ExactCoverBy (Ep Fp : A → Prop) (Mp : A → A → Prop) (G : A → Prop) : Prop :=
+  (∀ s, G s → Fp s) ∧ (∀ x, Ep x → ∃ s, G s ∧ Mp x s) ∧
+    ∀ s s', G s → G s' → s ≠ s' → ∀ x, Ep x → ¬(Mp x s ∧ Mp x s')
+
+theorem exactlyCoversOn_iff_exists (Ep Fp : A → Prop) (Mp : A → A → Prop) :
+    ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, ExactCoverBy Ep Fp Mp G :=
+  Iff.rfl
+
+/-- Exactness of a given subfamily in the “exactly one” form: covering plus
+disjointness is one covering set per element. -/
+theorem exactCoverBy_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) (G : A → Prop) :
+    ExactCoverBy Ep Fp Mp G ↔ (∀ s, G s → Fp s) ∧ ∀ x, Ep x → ∃! s, G s ∧ Mp x s := by
+  refine and_congr_right fun _ => ?_
   constructor
   · rintro ⟨hcov, hdisj⟩ x hx
     obtain ⟨s, hs, hms⟩ := hcov x hx
@@ -145,6 +156,13 @@ theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) 
     · rintro ⟨h1, h2⟩
       obtain ⟨s₀, -, huniq⟩ := h x hx
       exact hne ((huniq s ⟨hs, h1⟩).trans (huniq s' ⟨hs', h2⟩).symm)
+
+/-- Exactness in the “exactly one” form: covering plus disjointness is one
+covering set per element. -/
+theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
+    ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, (∀ s, G s → Fp s) ∧
+      ∀ x, Ep x → ∃! s, G s ∧ Mp x s :=
+  exists_congr fun G => exactCoverBy_iff_unique Ep Fp Mp G
 
 /-- Some two-coloring of the ground elements *splits* every set of the
 family: no set is monochromatic. Like `DescriptiveComplexity.ExactlyCoversOn` this

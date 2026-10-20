@@ -1288,7 +1288,9 @@ theorem succinctReach_hard_of_sotcDefinable :
 `DescriptiveComplexity.succinctReach_mem_PSPACE`, the SO(TC) specification whose
 states are the states of the transition system; hardness is
 `DescriptiveComplexity.succinctReach_hard_of_sotcDefinable`, the three-group Tseitin
-discharge. -/
+discharge.
+Registered in the Lax archive as
+[`Lax134656.SuccinctReachPSPACEComplete.succinctReach_PSPACE_complete`](https://laxarchive.org/lax-134656/Lax134656.SuccinctReachPSPACEComplete.html#s-Lax134656.SuccinctReachPSPACEComplete.succinctReach_PSPACE_complete). -/
 theorem SUCCINCTREACH_PSPACE_complete : PSPACE.Complete SUCCINCTREACH :=
   ⟨succinctReach_mem_PSPACE,
     PSPACE_hard_of_sotcDefinable SUCCINCTREACH fun Q hQ =>

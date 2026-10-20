@@ -2295,7 +2295,9 @@ variable {L : Language.{0, 0}}
 /-- **Every FO(LFP) definable problem is SO-Horn definable** – the hard
 direction of Grädel's equivalence, by the staged translation above. Together
 with `DescriptiveComplexity.SigmaSOHornDefinable.lfpDefinable` this makes the two
-formalisms interchangeable. -/
+formalisms interchangeable.
+Registered in the Lax archive as
+[`Lax535992.HornIsLeastFixedPoint.lfpDefinable_sigmaSOHornDefinable`](https://laxarchive.org/lax-535992/Lax535992.HornIsLeastFixedPoint.html#s-Lax535992.HornIsLeastFixedPoint.lfpDefinable_sigmaSOHornDefinable). -/
 theorem LFPDefinable.sigmaSOHornDefinable [L.IsRelational] {P : DecisionProblem L}
     (h : LFPDefinable P) : SigmaSOHornDefinable P := by
   obtain ⟨d, hd⟩ := h
@@ -2323,14 +2325,18 @@ condition of the classical statement, is built into
 order. Against machines the reading is
 `DescriptiveComplexity.mem_PTIME_iff_le_dtmAccept`, deterministic polynomial-time
 acceptance being complete for the class; the residual gap there is the string-encoding
-one documented in `DescriptiveComplexity.Problems.Machine`, not this equivalence. -/
+one documented in `DescriptiveComplexity.Problems.Machine`, not this equivalence.
+Registered in the Lax archive as
+[`Lax535992.ImmermanVardi.lfpDefinable_iff_mem_PTIME`](https://laxarchive.org/lax-535992/Lax535992.ImmermanVardi.html#s-Lax535992.ImmermanVardi.lfpDefinable_iff_mem_PTIME). -/
 theorem lfpDefinable_iff_mem_PTIME [L.IsRelational] (P : DecisionProblem L) :
     LFPDefinable P ↔ P ∈ PTIME :=
   lfpDefinable_iff_sigmaSOHornDefinable P
 
 /-- **SO-Horn definability is closed under complement**: through the logic
 FO(LFP), where complementation is negating the output formula. This is the
-statement that was out of reach of the fragment alone. -/
+statement that was out of reach of the fragment alone.
+Registered in the Lax archive as
+[`Lax535992.PTIMEEqCoPTIME.sigmaSOHornDefinable_compl`](https://laxarchive.org/lax-535992/Lax535992.PTIMEEqCoPTIME.html#s-Lax535992.PTIMEEqCoPTIME.sigmaSOHornDefinable_compl). -/
 theorem SigmaSOHornDefinable.compl [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSOHornDefinable P) : SigmaSOHornDefinable Pᶜ :=
   LFPDefinable.sigmaSOHornDefinable (LFPDefinable.compl h.lfpDefinable)
@@ -2350,7 +2356,9 @@ theorem sigmaSOHornDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) 
 capture theorem at level 0 of the hierarchy, the identity that was open while
 the fragment stood alone: it needs the least model of a Horn program computed
 *inside* the fragment, which is what the translation through FO(LFP)
-provides. -/
+provides.
+Registered in the Lax archive as
+[`Lax564036.PolynomialTimeInHierarchy.piP_zero_eq`](https://laxarchive.org/lax-564036/Lax564036.PolynomialTimeInHierarchy.html#s-Lax564036.PolynomialTimeInHierarchy.piP_zero_eq). -/
 theorem piP_zero_eq : PiP 0 = SigmaP 0 := by
   change PTIME.compl = PTIME
   refine ComplexityClass.ext (fun P => sigmaSOHornDefinable_compl_iff P) fun P => ?_

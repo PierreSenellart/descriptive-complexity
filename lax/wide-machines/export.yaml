@@ -1,0 +1,172 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: v1.2.2
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.wideAccept_mem_NEXPTIME
+- DescriptiveComplexity.wideAcceptSpace_EXPSPACE_complete
+- DescriptiveComplexity.dwideAcceptSpace_EXPSPACE_complete
+- DescriptiveComplexity.wideRegAccept_NEXPTIME_complete
+- DescriptiveComplexity.wideTiling_NEXPTIME_complete
+- DescriptiveComplexity.wideCorridor_EXPSPACE_complete
+- DescriptiveComplexity.wideAccept_nonvacuous
+- DescriptiveComplexity.wideAcceptSpace_nonvacuous
+- DescriptiveComplexity.dwideAcceptSpace_nonvacuous
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'Descriptive complexity: wide machines and tilings'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @software{senellart2026descriptivecomplexity,
+      author = {Pierre Senellart},
+      title = {{DescriptiveComplexity}: Completeness by First-Order Reductions in {Lean}},
+      version = {1.2.2},
+      year = {2026},
+      doi = {10.5281/zenodo.21678423},
+      url = {https://github.com/PierreSenellart/descriptive-complexity}
+    }
+requires:
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax799700
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5f34068ba7707478cd268f2316c295d7ea51a711
+  folder: lax/np-catalog
+  restated_from: ../np-catalog/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+- package: Lax564036
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 646a3b4286aec6f78457067508d69471f8822db6
+  folder: lax/polynomial-hierarchy
+  restated_from: ../polynomial-hierarchy/export.yaml
+- package: Lax134656
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 154fe206220472baa3b470bc99c69234b7fbb2ee
+  folder: lax/pspace
+  restated_from: ../pspace/export.yaml
+- package: Lax480241
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 114790e6b0f3e2a935fe610f45b739fe6134d4f7
+  folder: lax/exponential
+  restated_from: ../exponential/export.yaml
+restated:
+  FirstOrder.Language.wide: WideMachines.wide
+  DescriptiveComplexity.wideData: WideMachines.wideData
+  FirstOrder.Language.wtile: WideTilings.wtile
+  DescriptiveComplexity.wideTileData: WideTilings.wideTileData
+  DescriptiveComplexity.wideRegData: WideRegChannel.wideRegData
+  DescriptiveComplexity.WMAcc: WideMachines.WMAcc
+  DescriptiveComplexity.WMBlank: WideMachines.WMBlank
+  DescriptiveComplexity.WMDst: WideMachines.WMDst
+  DescriptiveComplexity.WMRead: WideMachines.WMRead
+  DescriptiveComplexity.WMRight: WideMachines.WMRight
+  DescriptiveComplexity.WMSrc: WideMachines.WMSrc
+  DescriptiveComplexity.WMStart: WideMachines.WMStart
+  DescriptiveComplexity.WMTr: WideMachines.WMTr
+  DescriptiveComplexity.WMWrite: WideMachines.WMWrite
+  DescriptiveComplexity.WPoint: WideMachines.WPoint
+  DescriptiveComplexity.wpAttr: WideMachines.wpAttr
+  DescriptiveComplexity.wpInp: WideMachines.wpInp
+  DescriptiveComplexity.wpLe: WideMachines.wpLe
+  DescriptiveComplexity.wpMark: WideMachines.wpMark
+  DescriptiveComplexity.wpPosn: WideMachines.wpPosn
+  DescriptiveComplexity.WPoint: WideMachines.WPoint
+  DescriptiveComplexity.wpInpReg: WideRegChannel.wpInpReg
+  DescriptiveComplexity.TileData: WideTilings.TileData
+  DescriptiveComplexity.TileData.Acc: WideTilings.TileData.Acc
+  DescriptiveComplexity.TileData.Base: WideTilings.TileData.Base
+  DescriptiveComplexity.TileData.EdgeL: WideTilings.TileData.EdgeL
+  DescriptiveComplexity.TileData.EdgeR: WideTilings.TileData.EdgeR
+  DescriptiveComplexity.TileData.First: WideTilings.TileData.First
+  DescriptiveComplexity.TileData.Horiz: WideTilings.TileData.Horiz
+  DescriptiveComplexity.TileData.Le: WideTilings.TileData.Le
+  DescriptiveComplexity.TileData.Posn: WideTilings.TileData.Posn
+  DescriptiveComplexity.TileData.Start: WideTilings.TileData.Start
+  DescriptiveComplexity.TileData.Tile: WideTilings.TileData.Tile
+  DescriptiveComplexity.TileData.Vert: WideTilings.TileData.Vert
+  DescriptiveComplexity.WPoint: WideMachines.WPoint
+  DescriptiveComplexity.wpAttr: WideMachines.wpAttr
+  DescriptiveComplexity.wpMark: WideMachines.wpMark
+  DescriptiveComplexity.WTAcc: WideTilings.WTAcc
+  DescriptiveComplexity.WTBase: WideTilings.WTBase
+  DescriptiveComplexity.WTEdgeL: WideTilings.WTEdgeL
+  DescriptiveComplexity.WTEdgeR: WideTilings.WTEdgeR
+  DescriptiveComplexity.WTHoriz: WideTilings.WTHoriz
+  DescriptiveComplexity.WTStart: WideTilings.WTStart
+  DescriptiveComplexity.WTTile: WideTilings.WTTile
+  DescriptiveComplexity.WTVert: WideTilings.WTVert
+  DescriptiveComplexity.wtpFirst: WideTilings.wtpFirst
+  DescriptiveComplexity.wtpLe: WideTilings.wtpLe
+  DescriptiveComplexity.wtpPosn: WideTilings.wtpPosn
+  DescriptiveComplexity.WMSetLe: WideMachines.WMSetLe
+  DescriptiveComplexity.WMLe: WideMachines.WMLe
+  DescriptiveComplexity.WMDown: WideMachines.WMDown
+  DescriptiveComplexity.WMInp: WideMachines.WMInp
+  DescriptiveComplexity.WMInp: WideMachines.WMInp
+  DescriptiveComplexity.WMRegSeg: WideMachines.WMRegSeg
+  DescriptiveComplexity.WTDig: WideTilings.WTDig
+  DescriptiveComplexity.WMSetLe: WideMachines.WMSetLe
+  DescriptiveComplexity.WTLe: WideTilings.WTLe
+  DescriptiveComplexity.WMFileSeg: WideMachines.WMFileSeg
+  DescriptiveComplexity.WTFirst: WideTilings.WTFirst
+  DescriptiveComplexity.WTHasFirst: WideTilings.WTHasFirst
+  DescriptiveComplexity.WMHasInp: WideMachines.WMHasInp
+  FirstOrder.Language.instIsRelationalWide: WideMachines.instIsRelationalWide
+  FirstOrder.Language.instIsRelationalWtile: WideTilings.instIsRelationalWtile
+  DescriptiveComplexity.TileData.WellFormed: WideTilings.TileData.WellFormed
+  DescriptiveComplexity.TileData.Tileable: WideTilings.TileData.Tileable
+  DescriptiveComplexity.TileData.CorridorTileable: WideTilings.TileData.CorridorTileable
+  FirstOrder.Language.wideRel: WideMachines.wideRel
+  FirstOrder.Language.instDecidableEqWideRel: WideMachines.instDecidableEqWideRel
+  FirstOrder.Language.wmLe: WideMachines.wmLe
+  FirstOrder.Language.wmTr: WideMachines.wmTr
+  FirstOrder.Language.wmStart: WideMachines.wmStart
+  FirstOrder.Language.wmAcc: WideMachines.wmAcc
+  FirstOrder.Language.wmBlank: WideMachines.wmBlank
+  FirstOrder.Language.wmRight: WideMachines.wmRight
+  FirstOrder.Language.wmSrc: WideMachines.wmSrc
+  FirstOrder.Language.wmRead: WideMachines.wmRead
+  FirstOrder.Language.wmDst: WideMachines.wmDst
+  FirstOrder.Language.wmWrite: WideMachines.wmWrite
+  FirstOrder.Language.wmInp: WideMachines.wmInp
+  FirstOrder.Language.wtileRel: WideTilings.wtileRel
+  FirstOrder.Language.instDecidableEqWtileRel: WideTilings.instDecidableEqWtileRel
+  FirstOrder.Language.wtLe: WideTilings.wtLe
+  FirstOrder.Language.wtDig: WideTilings.wtDig
+  FirstOrder.Language.wtTile: WideTilings.wtTile
+  FirstOrder.Language.wtAcc: WideTilings.wtAcc
+  FirstOrder.Language.wtHoriz: WideTilings.wtHoriz
+  FirstOrder.Language.wtVert: WideTilings.wtVert
+  FirstOrder.Language.wtFirst: WideTilings.wtFirst
+  FirstOrder.Language.wtBase: WideTilings.wtBase
+  FirstOrder.Language.wtStart: WideTilings.wtStart
+  FirstOrder.Language.wtEdgeL: WideTilings.wtEdgeL
+  FirstOrder.Language.wtEdgeR: WideTilings.wtEdgeR
+  DescriptiveComplexity.TileData.IsTiling: WideTilings.TileData.IsTiling
+  DescriptiveComplexity.TileData.IsCorridor: WideTilings.TileData.IsCorridor
+  DescriptiveComplexity.MaxPos: WideTilings.MaxPos
+  DescriptiveComplexity.TileData.FirstTile: WideTilings.TileData.FirstTile
