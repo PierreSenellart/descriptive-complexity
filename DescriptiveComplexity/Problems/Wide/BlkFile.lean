@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.LowFile
-public import DescriptiveComplexity.Problems.Wide.Key
+import DescriptiveComplexity.Problems.Wide.Key
 public import DescriptiveComplexity.Problems.Wide.DrawTable
-public import DescriptiveComplexity.Problems.Wide.IxAddr
+import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # The file a clocked program lays out

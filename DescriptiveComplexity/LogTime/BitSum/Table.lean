@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitSum.Ones
+import DescriptiveComplexity.LogTime.Fields
 
 /-!
 # Level 3: counting the ones of a short word, by a table indexed by its value

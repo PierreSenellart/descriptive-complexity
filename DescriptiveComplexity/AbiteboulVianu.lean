@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.FixedPointOrderTransfer
-public import DescriptiveComplexity.FixedPointInflationaryLFP
+import DescriptiveComplexity.FixedPointOrderTransfer
+import DescriptiveComplexity.FixedPointInflationaryLFP
 public import DescriptiveComplexity.FixedPointPartialMachine
-public import DescriptiveComplexity.FixedPointStratify
-public import DescriptiveComplexity.Invariant.Backward
+import DescriptiveComplexity.FixedPointStratify
+import DescriptiveComplexity.Invariant.Backward
 
 /-!
 # The Abiteboul–Vianu theorem

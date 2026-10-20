@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.NexOuter
+import DescriptiveComplexity.Problems.Wide.NexOuter
 public import DescriptiveComplexity.Problems.Wide.NexSpec
 
 /-!

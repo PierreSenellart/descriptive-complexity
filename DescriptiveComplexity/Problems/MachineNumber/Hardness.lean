@@ -9,7 +9,7 @@ public import DescriptiveComplexity.Problems.MachineNumber.Defs
 public import DescriptiveComplexity.Problems.HornSat.Number
 public import DescriptiveComplexity.Problems.Machine.HornInterp
 public import DescriptiveComplexity.OrderedReorder
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 
 /-!
 # The number written by unit propagation reduces to the number written by a machine

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.ModelTheory.Semantics
-public import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.Pi
 
 /-!
 # Deciding first-order satisfaction on a finite structure

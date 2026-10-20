@@ -6,12 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.HornSat.Defs
-public import DescriptiveComplexity.Problems.HornSat.Membership
-public import DescriptiveComplexity.Problems.HornSat.Unsat
-public import DescriptiveComplexity.Problems.HornSat.Definability
+import DescriptiveComplexity.Problems.HornSat.Membership
+import DescriptiveComplexity.Problems.HornSat.Unsat
+import DescriptiveComplexity.Problems.HornSat.Definability
 public import DescriptiveComplexity.FixedPoint
-public import DescriptiveComplexity.FixedPointHorn
-public import DescriptiveComplexity.Problems.HornSat.Hardness
+import DescriptiveComplexity.FixedPointHorn
+import DescriptiveComplexity.Problems.HornSat.Hardness
 
 /-!
 # HORN-SAT

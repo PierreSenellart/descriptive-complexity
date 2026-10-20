@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FixedPointStepRel
-public import DescriptiveComplexity.Problems.Machine.SpaceHard
+import DescriptiveComplexity.Problems.Machine.SpaceHard
+public import DescriptiveComplexity.Problems.Machine.Space
 
 /-!
 # PSPACE is contained in FO(≤, PFP)

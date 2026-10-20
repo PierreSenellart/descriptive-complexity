@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxGate
-public import DescriptiveComplexity.Problems.Wide.DrawInstIGate
+import DescriptiveComplexity.Problems.Wide.DrawInstIGate
 
 /-!
 # The inner gates at an arbitrary file

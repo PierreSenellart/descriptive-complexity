@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannelLaid
 public import DescriptiveComplexity.Problems.Wide.NexSpine
-public import DescriptiveComplexity.Problems.Wide.DrawIxPack
-public import DescriptiveComplexity.Problems.Wide.BlkLayout
+import DescriptiveComplexity.Problems.Wide.DrawIxPack
+import DescriptiveComplexity.Problems.Wide.BlkLayout
 public import DescriptiveComplexity.Problems.Wide.DrawIxWidth
 public import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
 public import Mathlib.Data.Nat.Log

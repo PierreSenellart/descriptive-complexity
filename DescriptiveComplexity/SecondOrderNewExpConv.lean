@@ -5,10 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.SecondOrderNewExpBuild
+import DescriptiveComplexity.SecondOrderNewExpBuild
 public import DescriptiveComplexity.SecondOrderNewBdd
-public import DescriptiveComplexity.Exponential.Class
+import DescriptiveComplexity.Exponential.Class
 public import DescriptiveComplexity.Exponential.Classes
+import DescriptiveComplexity.SecondOrderNewExp
 
 /-!
 # From a problem over an expansion to one with value invention

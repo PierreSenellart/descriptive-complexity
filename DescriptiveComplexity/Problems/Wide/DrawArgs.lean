@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawAccCtl
-public import DescriptiveComplexity.Problems.Wide.DrawKindRule
+import DescriptiveComplexity.Problems.Wide.DrawKindRule
 public import DescriptiveComplexity.Problems.Wide.DrawProg
 public import DescriptiveComplexity.Problems.Wide.DrawName
 public import DescriptiveComplexity.Problems.Wide.DrawExp

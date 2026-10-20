@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.HaltHard.Tags
+public import Mathlib.Basic.Finite.Sum
+public import Mathlib.Basic.Finite.Prod
 
 /-!
 # The transition table of the simulating machine

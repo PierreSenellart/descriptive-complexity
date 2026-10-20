@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.DominatingSet.Defs
-public import DescriptiveComplexity.Problems.DominatingSet.Membership
+import DescriptiveComplexity.Problems.DominatingSet.Defs
+import DescriptiveComplexity.Problems.DominatingSet.Membership
 public import DescriptiveComplexity.Problems.DominatingSet.Reduction
-public import DescriptiveComplexity.Problems.SetFamily
+import DescriptiveComplexity.Problems.SetFamily
 
 /-!
 # Dominating Set is NP-complete

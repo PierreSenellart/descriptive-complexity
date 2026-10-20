@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.FinSat.Interp
-public import DescriptiveComplexity.Problems.FinSat.Fixpoint
+import DescriptiveComplexity.Problems.FinSat.Fixpoint
+import Mathlib.Tactic.FinCases
 
 /-!
 # Reading the encoded sentence off the image

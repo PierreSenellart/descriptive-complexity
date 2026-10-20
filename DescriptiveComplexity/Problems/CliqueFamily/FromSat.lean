@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 public import DescriptiveComplexity.OccurrenceFormulas
+import Mathlib.Tactic.FinCases
 
 /-!
 # SAT reduces to Clique by an ordered FO reduction

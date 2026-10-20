@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.RegChannelProg
+import DescriptiveComplexity.Problems.Wide.RegChannelProg
 public import DescriptiveComplexity.Problems.Wide.PadRules
 public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
 

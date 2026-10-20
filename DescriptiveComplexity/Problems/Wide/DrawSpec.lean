@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRel
 public import DescriptiveComplexity.Problems.Wide.DrawEnc
-public import DescriptiveComplexity.FixedPointPartial
+import DescriptiveComplexity.FixedPointPartial
 
 /-!
 # What one step of the iteration is, on the machine's side of the encoding

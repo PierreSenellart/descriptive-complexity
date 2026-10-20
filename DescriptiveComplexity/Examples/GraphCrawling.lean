@@ -5,21 +5,21 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Fintype.Lattice
 meta import Mathlib.Data.Fintype.Lattice
-public import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.FinCases
 meta import Mathlib.Tactic.FinCases
-public import DescriptiveComplexity.Block
+import DescriptiveComplexity.Block
 meta import DescriptiveComplexity.Block
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 meta import DescriptiveComplexity.Syntax
-public import DescriptiveComplexity.Encoding
+import DescriptiveComplexity.Encoding
 meta import DescriptiveComplexity.Encoding
 public import DescriptiveComplexity.Decoding
 meta import DescriptiveComplexity.Decoding
-public import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.SecondOrder
 meta import DescriptiveComplexity.SecondOrder
-public import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Ordered
 meta import DescriptiveComplexity.Ordered
 public import DescriptiveComplexity.OrderWalk
 meta import DescriptiveComplexity.OrderWalk

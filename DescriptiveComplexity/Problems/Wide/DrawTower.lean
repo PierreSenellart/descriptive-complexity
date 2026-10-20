@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
 public import DescriptiveComplexity.Problems.Wide.DrawTagged
 public import DescriptiveComplexity.Problems.Wide.DrawSeq
-public import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
+import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
 public import DescriptiveComplexity.Problems.Wide.DrawVar
 public import DescriptiveComplexity.Problems.Wide.DrawRound
 

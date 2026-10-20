@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Partition.Defs
 public import DescriptiveComplexity.Problems.Knapsack.Chain
 public import DescriptiveComplexity.Numbers.Wide

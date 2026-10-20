@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.FinSat.Hardness
-public import DescriptiveComplexity.RecursivelyEnumerable
+import DescriptiveComplexity.RecursivelyEnumerable
+import DescriptiveComplexity.Problems.FinSat.Fixpoint
 
 /-!
 # The reduction to FINSAT, and its correctness

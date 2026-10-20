@@ -5,10 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Coloring.Defs
 public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
 public import DescriptiveComplexity.OrderWalk
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Reductions of the coloring family

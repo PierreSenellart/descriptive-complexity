@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Tiles
 public import DescriptiveComplexity.OrderedComposition
+import Mathlib.Tactic.FinCases
 
 /-!
 # The tile system a machine is drawn as, and its grid

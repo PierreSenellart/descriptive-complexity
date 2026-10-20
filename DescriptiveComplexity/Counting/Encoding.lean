@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Encoding
+import DescriptiveComplexity.Encoding
 public import DescriptiveComplexity.Decoding
 public import DescriptiveComplexity.Counting
 

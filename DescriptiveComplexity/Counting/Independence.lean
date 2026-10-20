@@ -6,9 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Probability
-public import Mathlib.Data.Finset.Max
+import Mathlib.Data.Finset.Max
 public import Mathlib.Data.Fintype.BigOperators
-public import Mathlib.Logic.Equiv.Prod
+import Mathlib.Logic.Equiv.Prod
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # Weighted counts of independent events

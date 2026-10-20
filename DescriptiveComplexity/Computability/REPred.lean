@@ -8,6 +8,7 @@ module
 public import Mathlib.Computability.RE
 public import DescriptiveComplexity.Computability.Eval
 public import DescriptiveComplexity.RecursivelyEnumerable
+public import Mathlib.Data.List.GetD
 
 /-!
 # RE is recursively enumerable

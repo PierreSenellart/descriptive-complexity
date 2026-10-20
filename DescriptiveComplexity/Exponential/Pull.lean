@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Expansion
+import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 
 /-!
 # Pulling an exponential expansion back through an interpretation

@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Wide.WellFormed
 public import DescriptiveComplexity.Problems.Machine.Space
+import Mathlib.Tactic.FinCases
 
 /-!
 # Determinism is a promise a reduction can enforce: `DWideAcceptSpace ≤ᶠᵒ WideAcceptSpace`

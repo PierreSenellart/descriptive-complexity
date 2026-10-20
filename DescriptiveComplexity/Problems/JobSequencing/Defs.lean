@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Numbers.BinRel
 public import DescriptiveComplexity.Interpretation
-public import Mathlib.Algebra.BigOperators.Finprod
+import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Job sequencing: definition

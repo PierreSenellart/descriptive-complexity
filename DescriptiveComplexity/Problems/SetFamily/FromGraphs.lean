@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.SetFamily.Defs
 public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+import Mathlib.Tactic.FinCases
 
 /-!
 # Hardness of the set family: graphs as incidence systems

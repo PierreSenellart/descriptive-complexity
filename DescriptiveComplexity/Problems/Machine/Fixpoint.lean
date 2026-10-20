@@ -5,12 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.Defs
-public import DescriptiveComplexity.Problems.Machine.Walk
-public import DescriptiveComplexity.Problems.Machine.Program
-public import DescriptiveComplexity.FixedPoint
+import DescriptiveComplexity.Problems.Machine.Walk
+import DescriptiveComplexity.Problems.Machine.Program
+import DescriptiveComplexity.FixedPoint
 public import DescriptiveComplexity.FixedPointHorn
+import Mathlib.Tactic.FinCases
 
 /-!
 # Deterministic machine acceptance is in PTIME

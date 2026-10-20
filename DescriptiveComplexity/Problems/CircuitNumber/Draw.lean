@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.CircuitNumber.Defs
 public import DescriptiveComplexity.Problems.HornSat.Hardness
-public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedComposition
 
 /-!
 # The circuit of a system of rules

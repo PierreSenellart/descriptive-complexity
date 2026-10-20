@@ -6,11 +6,15 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Degree
-public import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.Taut
-public import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.Problems.HornSat
 public import DescriptiveComplexity.Problems.TwoSat
 public import DescriptiveComplexity.Problems.FinSat
+import DescriptiveComplexity.Problems.FinSat.Reduction
+import DescriptiveComplexity.Problems.HornSat.Definability
+import DescriptiveComplexity.Problems.TwoSat.Hardness
+import DescriptiveComplexity.Problems.TwoSat.Membership
 
 /-!
 # The logically defined classes are the degrees of their complete problems

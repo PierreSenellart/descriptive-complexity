@@ -5,8 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.OrderedComposition
 
 /-!
 # TAUT: propositional tautology

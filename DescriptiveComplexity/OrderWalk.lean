@@ -6,10 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Order.PiLex
-public import Mathlib.Order.Prod.Lex.Basic
+import Mathlib.Order.Prod.Lex.Basic
 public import Mathlib.Data.Set.Card
 public import DescriptiveComplexity.Padding
-public import Mathlib.Data.Finset.Max
+import Mathlib.Data.Finset.Max
 
 /-!
 # Walking a finite linear order, first-order

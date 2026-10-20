@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Taut
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 public import DescriptiveComplexity.Problems.ThreeSat.FromSat
+import DescriptiveComplexity.OrderedComposition
 
 /-!
 # 3-DNF-TAUT is coNP-complete

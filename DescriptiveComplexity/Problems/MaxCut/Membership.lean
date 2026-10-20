@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Block
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.MaxCut.Defs
 public import DescriptiveComplexity.Problems.Feedback.Membership
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # Max Cut is in NP

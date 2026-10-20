@@ -7,9 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Reduce
 public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
-public import DescriptiveComplexity.Problems.Wide.RegChannelNo
-public import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
-public import DescriptiveComplexity.Exponential.KernelArity
+import DescriptiveComplexity.Problems.Wide.RegChannelNo
+import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
+import DescriptiveComplexity.Exponential.KernelArity
 
 /-!
 # The reduction into the register channel

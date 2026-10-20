@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Digits.Closure
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Closure under sums over the tuples of the structure

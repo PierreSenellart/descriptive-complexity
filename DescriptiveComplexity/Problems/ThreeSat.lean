@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
-public import DescriptiveComplexity.Problems.ThreeSat.FromSat
+import DescriptiveComplexity.Problems.ThreeSat.FromSat
 
 /-!
 # 3SAT is NP-complete

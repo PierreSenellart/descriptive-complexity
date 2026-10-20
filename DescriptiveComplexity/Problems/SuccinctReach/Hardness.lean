@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.SuccinctReach.Membership
 public import DescriptiveComplexity.Problems.SuccinctReach.Double
 public import DescriptiveComplexity.Problems.Sat.TseitinFormulas
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # SUCCINCT-REACH is PSPACE-hard

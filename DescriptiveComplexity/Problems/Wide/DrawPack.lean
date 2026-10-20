@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.DrawSpec
+import DescriptiveComplexity.Problems.Wide.DrawSpec
 public import DescriptiveComplexity.Problems.Wide.DrawData
 
 /-!

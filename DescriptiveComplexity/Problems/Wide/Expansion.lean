@@ -7,9 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Defs
 public import DescriptiveComplexity.Problems.Machine.Defs
-public import DescriptiveComplexity.Exponential.Copies
-public import DescriptiveComplexity.Exponential.Expansion
-public import DescriptiveComplexity.Exponential.AddrExp
+import DescriptiveComplexity.Exponential.Copies
+import DescriptiveComplexity.Exponential.Expansion
+import DescriptiveComplexity.Exponential.AddrExp
+import Batteries.Tactic.OpenPrivate
 
 /-!
 # The wide machine as an exponential expansion

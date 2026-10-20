@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSpec
-public import DescriptiveComplexity.Problems.Wide.DrawMatrix
+import DescriptiveComplexity.Problems.Wide.DrawMatrix
 
 /-!
 # The atoms of a step matrix, classified

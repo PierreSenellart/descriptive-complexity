@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Cvp.Hardness.Wiring
+public import DescriptiveComplexity.Problems.HornSat.Unsat
 
 /-!
 # What the drawn circuit computes

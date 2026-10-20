@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Logic.Relation
+import Mathlib.Logic.Relation
 
 /-!
 # Savitch's recursive doubling

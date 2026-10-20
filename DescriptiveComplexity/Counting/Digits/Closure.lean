@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Digits.Formulas
+public import DescriptiveComplexity.Counting.Digits.Tower
+import DescriptiveComplexity.FixedPointStep
+import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.SecondOrderTransitiveClosure
 
 /-!
 # Numbers computed by a tower

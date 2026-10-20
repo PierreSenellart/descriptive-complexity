@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Permanent.Ladder
-public import Mathlib.Data.Int.GCD
-public import Mathlib.Tactic.Ring
-public import Mathlib.Tactic.Positivity
+import Mathlib.Data.Int.GCD
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Positivity
 
 /-!
 # From an integer matrix to a 0-1 matrix, modulo `2 ^ L + 1`

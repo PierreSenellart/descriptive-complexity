@@ -9,6 +9,7 @@ public import DescriptiveComplexity.SecondOrderNewPoint
 public import DescriptiveComplexity.SecondOrderNewMeansB
 public import DescriptiveComplexity.SecondOrderNewOrdered
 public import DescriptiveComplexity.SubstFormula
+import Mathlib.Tactic.FinCases
 
 /-!
 # The block a problem over an expansion is guessed in

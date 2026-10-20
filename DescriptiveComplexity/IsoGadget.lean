@@ -5,8 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Interpretation
+import DescriptiveComplexity.Interpretation
 public import Mathlib.ModelTheory.Graph
+import Mathlib.Tactic.FinCases
 
 /-!
 # The two marked sides of an isomorphism problem, as structures

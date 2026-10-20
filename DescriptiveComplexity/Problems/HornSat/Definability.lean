@@ -5,10 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
-public import DescriptiveComplexity.SecondOrderHorn
+import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.Problems.HornSat.Unsat
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # HORN-SAT is SO-Horn definable

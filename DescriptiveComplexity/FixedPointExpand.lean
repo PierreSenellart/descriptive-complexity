@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FixedPointInflationaryLFP
-public import DescriptiveComplexity.FixedPointOrderTransfer
-public import DescriptiveComplexity.SecondOrderMerge
-public import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.FixedPointOrderTransfer
+import DescriptiveComplexity.SecondOrderMerge
+import DescriptiveComplexity.Problems.HornSat
 
 /-!
 # Eliminating an induction from a second-order definition

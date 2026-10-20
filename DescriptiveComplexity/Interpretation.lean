@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.ModelTheory.Semantics
+import Mathlib.ModelTheory.Semantics
 public import Mathlib.ModelTheory.Complexity
-public import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.FinCases
 
 /-!
 # First-order interpretations and FO reductions

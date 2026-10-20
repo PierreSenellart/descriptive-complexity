@@ -5,8 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.LogTime.BitSum.Sizes
+import DescriptiveComplexity.LogTime.BitSum.Sizes
 public import DescriptiveComplexity.LogTime.BitLogic
+import DescriptiveComplexity.LogTime.Fields
 
 /-!
 # Co-location: the one device the Bit Sum Lemma is built out of

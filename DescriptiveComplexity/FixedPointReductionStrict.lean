@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.FixedPointReductionClosure
 public import DescriptiveComplexity.Problems.Even
 public import DescriptiveComplexity.Problems.Parity
+public import DescriptiveComplexity.FixedPointInflationaryLFP
 
 /-!
 # FO(LFP) reductions are strictly stronger than first-order ones

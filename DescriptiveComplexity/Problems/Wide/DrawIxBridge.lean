@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawGateFacts
-public import DescriptiveComplexity.Problems.Wide.IxAddr
+import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # What a coarse file's gate test is, elementwise

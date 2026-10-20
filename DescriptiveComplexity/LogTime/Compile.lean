@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.LogTime.Arith
 public import DescriptiveComplexity.LogTime.BitLogic
-public import DescriptiveComplexity.LogTime.Simulate
+import DescriptiveComplexity.LogTime.Simulate
 
 /-!
 # The lower fence: a bit-level prenex logic, compiled into machines

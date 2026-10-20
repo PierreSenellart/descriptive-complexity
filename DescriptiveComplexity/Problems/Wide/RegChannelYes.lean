@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
-public import DescriptiveComplexity.Problems.Wide.RegChannelWalk
-public import DescriptiveComplexity.Problems.Wide.SpineSav
-public import DescriptiveComplexity.Problems.Wide.DrawYes
+import DescriptiveComplexity.Problems.Wide.RegChannelWalk
+import DescriptiveComplexity.Problems.Wide.SpineSav
+import DescriptiveComplexity.Problems.Wide.DrawYes
 
 /-!
 # The handed program accepts, from the sentence alone

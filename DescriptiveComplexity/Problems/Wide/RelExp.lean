@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Double
-public import DescriptiveComplexity.SecondOrderTransitiveClosure
+import DescriptiveComplexity.SecondOrderTransitiveClosure
 
 /-!
 # Reading the instance inside the doubled universe

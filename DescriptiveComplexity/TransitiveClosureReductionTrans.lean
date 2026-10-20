@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.TransitiveClosureReductionClosure
+import DescriptiveComplexity.TransitiveClosureDecide
+import DescriptiveComplexity.TransitiveClosureDecideReach
+import DescriptiveComplexity.TransitiveClosureDecideReachDet
+import DescriptiveComplexity.TransitiveClosureFlatten
+public import DescriptiveComplexity.TransitiveClosureSentenceDecide
 
 /-!
 # Transitivity of FO(TC) and FO(DTC) reductions

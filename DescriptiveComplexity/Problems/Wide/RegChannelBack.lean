@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.TrackWrites
+import DescriptiveComplexity.Problems.Wide.TrackWrites
 public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
 
 /-!

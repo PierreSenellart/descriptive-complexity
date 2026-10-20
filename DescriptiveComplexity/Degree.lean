@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Hierarchy
+public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.RelComposition
 
 /-!
 # Completeness without a class: the degree of a problem

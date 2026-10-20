@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Data.Set.Card
-public import Mathlib.Data.Fintype.Pigeonhole
-public import Mathlib.Dynamics.FixedPoints.Basic
+import Mathlib.Data.Fintype.Pigeonhole
+import Mathlib.Dynamics.FixedPoints.Basic
 public import Mathlib.Order.Lattice.Nat
 
 /-!

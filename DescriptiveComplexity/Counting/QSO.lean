@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.KernelPair
-public import DescriptiveComplexity.SecondOrderMerge
+import DescriptiveComplexity.SecondOrderMerge
 public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!

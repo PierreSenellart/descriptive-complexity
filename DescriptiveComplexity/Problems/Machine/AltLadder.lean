@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltRound
+import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # The round game as an implication ladder

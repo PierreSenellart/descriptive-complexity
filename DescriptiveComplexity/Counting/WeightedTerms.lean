@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting.WeightedFacts
 public import DescriptiveComplexity.Counting.QuantitativeBinders
-public import DescriptiveComplexity.Problems.CircuitNumber.Membership
+import DescriptiveComplexity.Problems.CircuitNumber.Membership
 
 /-!
 # The weights of a weighted instance, as quantitative terms

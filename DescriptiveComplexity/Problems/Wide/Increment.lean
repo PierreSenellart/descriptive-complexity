@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.WellFormed
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # The address primitives of a wide machine

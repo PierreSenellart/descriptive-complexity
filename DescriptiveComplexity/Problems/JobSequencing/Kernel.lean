@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.JobSequencing.Schedule
-public import DescriptiveComplexity.Problems.Knapsack.Chain
+import DescriptiveComplexity.Problems.Knapsack.Chain
 public import DescriptiveComplexity.Numbers.Wide
 public import DescriptiveComplexity.SecondOrder
 

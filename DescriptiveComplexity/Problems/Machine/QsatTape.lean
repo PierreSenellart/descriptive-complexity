@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.Tape
 public import DescriptiveComplexity.Problems.Qsat.Defs
+import Mathlib.Tactic.FinCases
 
 /-!
 # The tape of the QBF machine

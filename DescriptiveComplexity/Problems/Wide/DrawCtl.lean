@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawData
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The control's dictionary: which slot plays which role

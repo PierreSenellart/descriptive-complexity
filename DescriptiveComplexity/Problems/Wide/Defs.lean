@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Machines
-public import DescriptiveComplexity.Interpretation
+import DescriptiveComplexity.Interpretation
 public import DescriptiveComplexity.Exponential.AddrExp
 
 /-!

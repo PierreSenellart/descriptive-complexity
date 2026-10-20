@@ -5,7 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.IsoGadget
+import DescriptiveComplexity.IsoGadget
+public import DescriptiveComplexity.Interpretation
 
 /-!
 # Two marked copies of a vocabulary, and the isomorphism problem they carry

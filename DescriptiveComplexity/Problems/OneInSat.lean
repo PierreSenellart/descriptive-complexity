@@ -6,10 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.OneInSat.Defs
-public import DescriptiveComplexity.Problems.OneInSat.Slots
-public import DescriptiveComplexity.Problems.OneInSat.Reduction
-public import DescriptiveComplexity.Problems.ThreeSat
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Problems.OneInSat.Slots
+import DescriptiveComplexity.Problems.OneInSat.Reduction
+import DescriptiveComplexity.Problems.ThreeSat
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # 1-in-SAT is NP-complete

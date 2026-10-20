@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Run
-public import DescriptiveComplexity.Problems.Machine.Program
+import DescriptiveComplexity.Problems.Machine.Program
+public import DescriptiveComplexity.Problems.Wide.RegChannel
 
 /-!
 # An accepting run tiles the emitted square

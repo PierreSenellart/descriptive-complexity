@@ -6,10 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
-public import DescriptiveComplexity.Problems.Sat
+import DescriptiveComplexity.Problems.Sat
 public import DescriptiveComplexity.OccurrenceVar
-public import DescriptiveComplexity.OccurrenceSlack
+import DescriptiveComplexity.OccurrenceSlack
 public import DescriptiveComplexity.Padding
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # 3-dimensional matching is NP-hard

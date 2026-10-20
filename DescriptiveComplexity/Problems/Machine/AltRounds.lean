@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltPrefix
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # The rounds, one block at a time

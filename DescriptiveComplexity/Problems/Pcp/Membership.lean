@@ -5,10 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Pcp.Cert
-public import DescriptiveComplexity.RecursivelyEnumerable
+import DescriptiveComplexity.RecursivelyEnumerable
 public import DescriptiveComplexity.Problems.FinSat
+import Mathlib.Tactic.FinCases
 
 /-!
 # `PCP` is in RE

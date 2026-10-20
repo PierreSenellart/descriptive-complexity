@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawAdv
-public import DescriptiveComplexity.Problems.Wide.DrawTrip
+import DescriptiveComplexity.Problems.Wide.DrawTrip
 public import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!

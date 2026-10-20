@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.Key
+import DescriptiveComplexity.Problems.Wide.Key
 public import DescriptiveComplexity.Problems.Wide.DrawRules
 
 /-!

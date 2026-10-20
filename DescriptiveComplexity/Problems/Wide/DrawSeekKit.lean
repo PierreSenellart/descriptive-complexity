@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSeek
-public import DescriptiveComplexity.Problems.Wide.DrawKit
+import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # The seek kit: random access

@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.OccurrenceFormulas
-public import DescriptiveComplexity.Problems.Sat
+import DescriptiveComplexity.Problems.Sat
+import Mathlib.Tactic.FinCases
 
 /-!
 # 2SAT: definition

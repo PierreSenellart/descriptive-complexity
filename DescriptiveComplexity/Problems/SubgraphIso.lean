@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.CliqueFamily
-public import DescriptiveComplexity.SecondOrder
-public import DescriptiveComplexity.Block
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 
 /-!
 # Subgraph Isomorphism is NP-complete

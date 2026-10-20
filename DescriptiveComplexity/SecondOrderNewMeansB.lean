@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrderNewMeans
 public import DescriptiveComplexity.SecondOrderMerge
+public import DescriptiveComplexity.SecondOrderNewCount
 
 /-!
 # Meanings for a whole block

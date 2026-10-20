@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Emit
 public import DescriptiveComplexity.Problems.Wide.Increment
+import Mathlib.Tactic.FinCases
 
 /-!
 # The grid of the emitted tiling is the machine's tape

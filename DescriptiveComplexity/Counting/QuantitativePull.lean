@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Quantitative
-public import DescriptiveComplexity.SecondOrderPull
+import DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Pulling a quantitative term back through an interpretation

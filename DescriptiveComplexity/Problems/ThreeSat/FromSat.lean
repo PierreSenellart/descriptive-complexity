@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.OccurrenceFormulas
 public import DescriptiveComplexity.Problems.ThreeSat.Defs
+import Mathlib.Tactic.FinCases
 
 /-!
 # SAT reduces to 3SAT by an ordered FO reduction

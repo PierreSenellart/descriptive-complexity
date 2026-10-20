@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Digits.Formulas
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The rows of a product sweep

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRun
-public import DescriptiveComplexity.Problems.Wide.DrawInstEval
+import DescriptiveComplexity.Problems.Wide.DrawInstEval
 
 /-!
 # The outer composition: the sweep's rounds

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefTags
-public import DescriptiveComplexity.Problems.Wide.DrawName
+import DescriptiveComplexity.Problems.Wide.DrawName
 
 /-!
 # The names a trip walks to are definable

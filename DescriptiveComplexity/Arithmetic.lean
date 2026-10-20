@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Ordered
 public import DescriptiveComplexity.OrderWalk
 
 /-!

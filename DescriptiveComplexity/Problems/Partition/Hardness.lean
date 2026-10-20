@@ -9,7 +9,9 @@ public import DescriptiveComplexity.Problems.Partition.Defs
 public import DescriptiveComplexity.Problems.NaeSat
 public import DescriptiveComplexity.OccurrenceSlack
 public import DescriptiveComplexity.Numbers.Digits
-public import DescriptiveComplexity.Padding
+import DescriptiveComplexity.Padding
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Partition is NP-hard

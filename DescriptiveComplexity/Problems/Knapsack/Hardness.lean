@@ -5,11 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Knapsack.Defs
 public import DescriptiveComplexity.Problems.SetFamily
 public import DescriptiveComplexity.Numbers.Digits
 public import DescriptiveComplexity.Padding
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Knapsack is NP-hard

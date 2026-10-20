@@ -5,12 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.SetFamily.Defs
+import DescriptiveComplexity.Problems.SetFamily.Defs
 public import DescriptiveComplexity.Problems.SetFamily.Reductions
 public import DescriptiveComplexity.Problems.SetFamily.FromGraphs
-public import DescriptiveComplexity.Problems.SetFamily.Membership
+import DescriptiveComplexity.Problems.SetFamily.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily
-public import DescriptiveComplexity.Composition
+import DescriptiveComplexity.Composition
 
 /-!
 # The set family is NP-complete

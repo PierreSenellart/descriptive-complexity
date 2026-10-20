@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Expansion
 public import DescriptiveComplexity.Exponential.Classes
-public import DescriptiveComplexity.Problems.Machine
-public import DescriptiveComplexity.Problems.Machine.Space
+import DescriptiveComplexity.Problems.Machine
+import DescriptiveComplexity.Problems.Machine.Space
 
 /-!
 # The wide machines are members of the exponential classes

@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.MachineNumber.Membership
 public import DescriptiveComplexity.Problems.MachineNumber.Hardness
-public import DescriptiveComplexity.Problems.HornSat.NumberHardness
-public import DescriptiveComplexity.Counting.Digits.NormalForm
+import DescriptiveComplexity.Problems.HornSat.NumberHardness
+import DescriptiveComplexity.Counting.Digits.NormalForm
 
 /-!
 # The number written by a machine is complete for FP

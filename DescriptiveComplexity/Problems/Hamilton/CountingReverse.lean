@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Hamilton.CountingForward
+public import DescriptiveComplexity.Problems.OneInSat.Counting
 
 /-!
 # Every circuit of the row graph is the circuit of a model

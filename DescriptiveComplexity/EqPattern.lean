@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Padding
-public import Mathlib.Data.Finset.Max
+import Mathlib.Data.Finset.Max
 
 /-!
 # Data read only through its equality pattern is first-order definable

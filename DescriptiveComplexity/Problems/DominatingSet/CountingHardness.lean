@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.DominatingSet.Counting
 public import DescriptiveComplexity.Problems.ExactCover
 public import DescriptiveComplexity.Problems.Sat.CountingHardness
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Dominating Set is parsimoniously `#P`-complete

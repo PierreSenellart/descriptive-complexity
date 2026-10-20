@@ -5,12 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+import DescriptiveComplexity.Problems.CliqueFamily.Defs
 public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
-public import DescriptiveComplexity.Problems.CliqueFamily.Membership
+import DescriptiveComplexity.Problems.CliqueFamily.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily.FromSat
-public import DescriptiveComplexity.Problems.Sat.Hardness
-public import DescriptiveComplexity.Composition
+import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Composition
 
 /-!
 # The clique family is NP-complete

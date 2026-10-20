@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.Fintype.EquivFin
+import Mathlib.Data.Fintype.EquivFin
 public import Mathlib.Data.Set.Card
-public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Logic.Equiv.Prod
+import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Logic.Equiv.Prod
 
 /-!
 # Unary representation of numbers in finite structures

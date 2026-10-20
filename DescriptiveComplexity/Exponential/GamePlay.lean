@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameAsk
-public import DescriptiveComplexity.Exponential.GameSweep
+import DescriptiveComplexity.Exponential.GameSweep
 
 /-!
 # The machine plays the game

@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.ThreeColorability.ToSat
-public import DescriptiveComplexity.Problems.ThreeColorability.FromSat
+import DescriptiveComplexity.Problems.ThreeColorability.FromSat
 
 /-!
 # 3-colorability is NP-complete

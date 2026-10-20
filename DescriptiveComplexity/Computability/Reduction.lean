@@ -10,6 +10,7 @@ public import Mathlib.Computability.RE
 public import Mathlib.Logic.Equiv.Fin.Basic
 public import DescriptiveComplexity.Relativized
 public import DescriptiveComplexity.OrderedComposition
+public import Mathlib.Data.List.GetD
 
 /-!
 # First-order reductions are computable

@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Cvp.Defs
+import DescriptiveComplexity.Problems.Cvp.Defs
 public import DescriptiveComplexity.Problems.Cvp.Membership
-public import DescriptiveComplexity.Problems.Cvp.Hardness
+import DescriptiveComplexity.Problems.Cvp.Hardness
 
 /-!
 # CVP

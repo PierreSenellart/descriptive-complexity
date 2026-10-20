@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.NexOuter
+import DescriptiveComplexity.Problems.Wide.NexOuter
 public import DescriptiveComplexity.Problems.Wide.NexSpec
-public import DescriptiveComplexity.Problems.Wide.DrawBuild
+import DescriptiveComplexity.Problems.Wide.DrawBuild
 
 /-!
 # Guessing the certificate onto the region

@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.QSO
-public import DescriptiveComplexity.Counting.SharpP
-public import Mathlib.SetTheory.Cardinal.Finite
+import DescriptiveComplexity.Counting.SharpP
+import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Witness counts with free variables, and their closure properties

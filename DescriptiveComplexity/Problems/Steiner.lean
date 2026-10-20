@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Steiner.Defs
-public import DescriptiveComplexity.Problems.Steiner.Reductions
-public import DescriptiveComplexity.Problems.Steiner.Membership
+import DescriptiveComplexity.Problems.Steiner.Reductions
+import DescriptiveComplexity.Problems.Steiner.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily
 
 /-!

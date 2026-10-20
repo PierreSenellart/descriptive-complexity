@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Qsat.Interp
 public import DescriptiveComplexity.Problems.Qsat.Blocks
+import Mathlib.Tactic.FinCases
 
 /-!
 # The quantifier prefix of the constructed instance

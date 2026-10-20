@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Counting.Restrict
 public import DescriptiveComplexity.Problems.TwoSat.Defs
 public import DescriptiveComplexity.Problems.HornSat.Defs
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
+public import DescriptiveComplexity.Syntax
+public import Mathlib.Tactic.FinCases
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # #2SAT, #HORN-SAT, #Monotone-2SAT, and all the vertex covers of a graph

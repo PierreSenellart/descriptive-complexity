@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Defs
-public import DescriptiveComplexity.Exponential.Order
+import DescriptiveComplexity.Exponential.Order
 
 /-!
 # What the promises of a wide machine come to

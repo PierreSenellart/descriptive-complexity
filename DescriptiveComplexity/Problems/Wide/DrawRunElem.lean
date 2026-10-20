@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawElem
-public import DescriptiveComplexity.Problems.Wide.DrawLoop
+import DescriptiveComplexity.Problems.Wide.DrawLoop
 
 /-!
 # The element loop's run

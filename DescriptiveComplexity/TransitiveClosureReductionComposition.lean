@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.TransitiveClosureReductionDet
-public import DescriptiveComplexity.FixedPointReductionComposition
+import DescriptiveComplexity.FixedPointReductionComposition
 
 /-!
 # Composing an FO(TC) reduction with a first-order one

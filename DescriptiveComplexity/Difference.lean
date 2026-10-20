@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.SecondOrderOrdered
 public import DescriptiveComplexity.Hierarchy
+public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.SecondOrderLift
 
 /-!
 # DP, the class of differences of NP problems

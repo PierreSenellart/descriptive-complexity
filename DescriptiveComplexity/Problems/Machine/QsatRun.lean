@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.QsatStep
 public import DescriptiveComplexity.Problems.Machine.DetRun
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # The run of the QBF machine

@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.ZeroOneIP.Counting
 public import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
 public import DescriptiveComplexity.Problems.Knapsack.CountingHardness
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #0-1 integer programming is parsimoniously `#P`-complete

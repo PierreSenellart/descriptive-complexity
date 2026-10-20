@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrderNewPull
 public import DescriptiveComplexity.SecondOrderOrdered
+import Mathlib.Tactic.FinCases
 
 /-!
 # Closure of `∃SO[new]` definability under ordered FO reductions

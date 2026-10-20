@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.Tape
 public import DescriptiveComplexity.Problems.Sat
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The machine of a CNF formula

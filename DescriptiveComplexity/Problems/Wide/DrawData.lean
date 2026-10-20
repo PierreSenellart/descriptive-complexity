@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.DrawAtoms
+import DescriptiveComplexity.Problems.Wide.DrawAtoms
 public import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
 public import DescriptiveComplexity.Problems.Wide.DrawSlots
 

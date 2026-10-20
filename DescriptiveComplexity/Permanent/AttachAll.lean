@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Permanent.Xor
+import Mathlib.Tactic.NormNum.Basic
+import Mathlib.Tactic.NormNum.Result
+public import Mathlib.Tactic.Ring.Basic
+import Mathlib.Tactic.Ring.Common
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # Attaching Valiant's gadget at every site of a list

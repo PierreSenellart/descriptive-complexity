@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Exponential.GameAskBack
+import DescriptiveComplexity.Exponential.GameAskBack
 public import DescriptiveComplexity.Exponential.GameSweep
-public import DescriptiveComplexity.Exponential.GamePlay
+import DescriptiveComplexity.Exponential.GamePlay
 
 /-!
 # The game, read back

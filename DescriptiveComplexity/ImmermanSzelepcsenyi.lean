@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.TransitiveClosureCompl
-public import DescriptiveComplexity.KromTransitiveClosure
+import DescriptiveComplexity.TransitiveClosureCompl
+import DescriptiveComplexity.KromTransitiveClosure
 public import DescriptiveComplexity.Problems.Reachability
+public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
 # Immerman–Szelepcsényi: `NL = coNL`

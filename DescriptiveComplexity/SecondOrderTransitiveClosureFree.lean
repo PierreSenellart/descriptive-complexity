@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.PSpace
-public import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.SecondOrderOrdered
+import Mathlib.Tactic.FinCases
 
 /-!
 # SO(TC) needs no order: the order is a guessed state component

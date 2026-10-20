@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.Wide.TilingHard
 public import DescriptiveComplexity.Problems.Wide.Corridor
 public import DescriptiveComplexity.Problems.Wide.Membership
 public import DescriptiveComplexity.Problems.Wide.Reduce
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Grid
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Run
+public import DescriptiveComplexity.Problems.Wide.TilingHard.Yes
+public import DescriptiveComplexity.Problems.Wide.TilingHard.No
 
 /-!
 # Tiling a wide corridor is EXPSPACE-complete

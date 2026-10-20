@@ -6,11 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Digits.Term
-public import DescriptiveComplexity.Counting.Digits.Bounds
+import DescriptiveComplexity.Counting.Digits.Bounds
 public import DescriptiveComplexity.Counting.DigitDefinable
-public import DescriptiveComplexity.FixedPointInflationaryLFP
-public import Mathlib.Order.Interval.Finset.Fin
-public import Mathlib.SetTheory.Cardinal.NatCard
+import DescriptiveComplexity.FixedPointInflationaryLFP
+import Mathlib.Order.Interval.Finset.Fin
+import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
 # The normal form of FP: every problem of FP is digit-definable

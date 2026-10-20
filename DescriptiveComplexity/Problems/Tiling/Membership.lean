@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Tiling.Defs
-public import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.SecondOrder
 public import DescriptiveComplexity.Hierarchy
 
 /-!

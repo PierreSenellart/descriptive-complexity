@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Free
+import Mathlib.Tactic.FinCases
 
 /-!
 # The copies of an order-guessing expansion, and the problem read in one of them

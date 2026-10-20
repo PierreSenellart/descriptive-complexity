@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.HeadEval
-public import DescriptiveComplexity.Arithmetic
+import DescriptiveComplexity.Arithmetic
 
 /-!
 # Arithmetic with heads: addition of ranks

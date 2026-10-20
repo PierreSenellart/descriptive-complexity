@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.Fields
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The doubling chain: `i ↦ 2 ^ i` is first-order in `≤`, `+` and `×`

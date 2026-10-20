@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Game.Membership
-public import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.Problems.HornSat
 public import DescriptiveComplexity.Problems.HornSat.Unsat
-public import DescriptiveComplexity.OccurrenceOrder
+import DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # HORN-SAT to GAME: unit propagation is a game

@@ -7,7 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.SetFamily.FromGraphs
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Counting.Sized
 
 /-!
 # #Set Packing

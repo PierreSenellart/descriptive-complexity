@@ -7,7 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.FinSat.Kernel
 public import DescriptiveComplexity.Problems.FinSat.Defs
-public import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Ordered
+public import DescriptiveComplexity.OrderWalk
+import Mathlib.Order.PiLex
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The sentence a reduction into FINSAT produces

@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.ImmermanSzelepcsenyi
+import DescriptiveComplexity.TransitiveClosureCompl
 
 /-!
 # REACH is NL-complete

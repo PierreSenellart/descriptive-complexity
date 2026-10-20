@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.SecondOrderNewExpPull
-public import DescriptiveComplexity.SecondOrderNewExp
+import DescriptiveComplexity.SecondOrderNewExp
 
 /-!
 # The guess the forward direction makes

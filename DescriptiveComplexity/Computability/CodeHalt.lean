@@ -5,9 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Computability.Halting
+import Mathlib.Computability.Halting
 public import DescriptiveComplexity.Computability.Catalog
 public import DescriptiveComplexity.Problems.CodeHalt.Membership
+import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.Computability.Reduction
 
 /-!
 # Drawing a partial recursive code as a concrete instance

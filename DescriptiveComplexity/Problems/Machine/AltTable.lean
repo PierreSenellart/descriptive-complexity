@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltProg
+import Mathlib.Tactic.FinCases
 
 /-!
 # The transition table of the QBF machine is a table

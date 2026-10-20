@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.TransitiveClosureSentenceDecide
+import DescriptiveComplexity.TransitiveClosureSentenceDecide
 public import DescriptiveComplexity.TransitiveClosureParamPull
 public import DescriptiveComplexity.TransitiveClosureReductionComposition
 public import DescriptiveComplexity.DetLogSpace

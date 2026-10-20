@@ -10,6 +10,7 @@ public import DescriptiveComplexity.FixedPoint
 public import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.Hierarchy
 public import Mathlib.Algebra.Group.Action.Defs
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # FO(LFP) = SO-Horn: the translation into the fragment

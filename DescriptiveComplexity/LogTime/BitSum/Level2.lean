@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitSum.Sum
+public import DescriptiveComplexity.LogTime.BitSum.Sizes
 
 /-!
 # Level 2: counting a middling word by its sub-blocks

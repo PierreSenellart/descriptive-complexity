@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Sat
 public import DescriptiveComplexity.Problems.Sat.TseitinFormulas
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The Cook–Levin theorem: hardness of SAT

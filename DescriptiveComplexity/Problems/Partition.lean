@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Partition.Defs
-public import DescriptiveComplexity.Problems.Partition.Membership
+import DescriptiveComplexity.Problems.Partition.Defs
+import DescriptiveComplexity.Problems.Partition.Membership
 public import DescriptiveComplexity.Problems.Partition.Hardness
-public import DescriptiveComplexity.Problems.NaeSat
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Problems.NaeSat
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # Partition

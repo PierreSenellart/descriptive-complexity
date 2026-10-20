@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Counting.SharpP
 public import DescriptiveComplexity.Counting.Relativized
 public import DescriptiveComplexity.Hierarchy
-public import DescriptiveComplexity.FixedPointReductionClosure
+import DescriptiveComplexity.FixedPointReductionClosure
 
 /-!
 # Counting classes, the class `#P`, and its relation to NP

@@ -6,8 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.SharpP
-public import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.SecondOrderOrdered
 public import DescriptiveComplexity.Numbers.MonotoneBijection
+import Mathlib.Tactic.FinCases
 
 /-!
 # Counting the solutions of exactly the threshold size

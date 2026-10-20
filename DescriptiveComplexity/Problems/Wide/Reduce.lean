@@ -13,6 +13,7 @@ public import DescriptiveComplexity.Problems.Wide.DrawPack
 public import DescriptiveComplexity.Problems.Wide.Membership
 public import DescriptiveComplexity.Problems.Wide.Det
 public import DescriptiveComplexity.Relativized
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The EXPSPACE reduction, assembled

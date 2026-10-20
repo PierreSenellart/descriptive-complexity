@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Analysis.SpecificLimits.Normed
+import Mathlib.Analysis.SpecificLimits.Normed
 public import DescriptiveComplexity.Encoding.BinarySubsetSum
 
 /-!

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Computability.PartrecCode
-public import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Ring
 
 /-!
 # The arithmetic a certificate for `CODEHALT` has to speak

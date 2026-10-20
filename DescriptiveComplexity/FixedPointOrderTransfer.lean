@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FixedPointPartial
+import Mathlib.Tactic.FinCases
 
 /-!
 # Order relativization: moving the order between the instance and the vocabulary

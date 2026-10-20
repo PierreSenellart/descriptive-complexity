@@ -5,13 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Hamilton.Defs
-public import DescriptiveComplexity.Problems.Hamilton.Cycle
+import DescriptiveComplexity.Problems.Hamilton.Defs
+import DescriptiveComplexity.Problems.Hamilton.Cycle
 public import DescriptiveComplexity.Problems.Hamilton.Membership
-public import DescriptiveComplexity.Problems.Hamilton.Reductions
-public import DescriptiveComplexity.Problems.Hamilton.Hardness
+import DescriptiveComplexity.Problems.Hamilton.Reductions
+import DescriptiveComplexity.Problems.Hamilton.Hardness
 public import DescriptiveComplexity.Problems.CliqueFamily
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # Hamilton circuits are NP-complete

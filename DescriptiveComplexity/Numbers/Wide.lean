@@ -6,7 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Numbers.BinRel
-public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Tactic.NormNum.Core
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # Wide numbers: sums that no longer fit in the instance's own positions

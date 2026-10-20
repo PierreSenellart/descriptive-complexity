@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawOuter
-public import DescriptiveComplexity.Problems.Wide.DrawBuild
+import DescriptiveComplexity.Problems.Wide.DrawBuild
 
 /-!
 # The clocked program's outer layer

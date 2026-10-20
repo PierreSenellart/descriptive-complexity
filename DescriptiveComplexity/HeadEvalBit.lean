@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.HeadBit
 public import DescriptiveComplexity.HeadEvalArith
 public import DescriptiveComplexity.LogTime.Simulate
+public import DescriptiveComplexity.HeadCaptureDet
 
 /-!
 # The bit-level logic is inside LOGSPACE

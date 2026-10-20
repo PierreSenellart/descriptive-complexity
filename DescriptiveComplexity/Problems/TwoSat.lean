@@ -6,10 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.TwoSat.Defs
-public import DescriptiveComplexity.Problems.TwoSat.Membership
-public import DescriptiveComplexity.Problems.TwoSat.Hardness
-public import DescriptiveComplexity.Problems.TwoSat.Ptime
-public import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.Problems.TwoSat.Membership
+import DescriptiveComplexity.Problems.TwoSat.Hardness
+import DescriptiveComplexity.Problems.TwoSat.Ptime
+import DescriptiveComplexity.Problems.HornSat
 public import DescriptiveComplexity.DetLogSpace
 
 /-!

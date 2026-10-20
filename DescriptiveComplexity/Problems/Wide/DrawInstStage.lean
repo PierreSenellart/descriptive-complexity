@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstCmp
 import all DescriptiveComplexity.Problems.Wide.DrawRunStage
+public import DescriptiveComplexity.Problems.Wide.DrawRunStage
+import DescriptiveComplexity.Problems.Wide.DrawAddr
 
 /-!
 # The stage atoms, instantiated: the copy loops

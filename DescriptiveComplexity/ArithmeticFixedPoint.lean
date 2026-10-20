@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.ArithmeticDefinable
 public import DescriptiveComplexity.FixedPointInflationaryLFP
-public import DescriptiveComplexity.FixedPointHorn
+import DescriptiveComplexity.FixedPointHorn
+import Mathlib.Tactic.FinCases
 
 /-!
 # AC⁰ ⊆ PTIME: the numeric predicates are an induction

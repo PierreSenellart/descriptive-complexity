@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import DescriptiveComplexity.Problems.Wide.DrawRunElem
 public import DescriptiveComplexity.Problems.Wide.DrawRunTagged
 public import DescriptiveComplexity.Problems.Wide.DrawRunTuple
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # Generated control families: the runs, iterated

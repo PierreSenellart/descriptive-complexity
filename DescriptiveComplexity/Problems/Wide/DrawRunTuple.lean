@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTuple
 public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+public import DescriptiveComplexity.Problems.Wide.DrawLoop
 
 /-!
 # The tuple loop's run

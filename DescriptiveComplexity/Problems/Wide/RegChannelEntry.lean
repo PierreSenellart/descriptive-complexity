@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Wide.RegChannelEval
 public import DescriptiveComplexity.Problems.Wide.TrackWrites
 public import DescriptiveComplexity.Problems.Wide.RegChannelProg
+public import DescriptiveComplexity.Problems.Wide.NexRun
 
 /-!
 # The tape the register channel hands over is the state the run reads

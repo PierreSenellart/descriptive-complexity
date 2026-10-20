@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
+import DescriptiveComplexity.Syntax
 
 /-!
 # #Hamilton Circuit: counting the circuits of an undirected graph

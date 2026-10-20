@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Game.Defs
 public import DescriptiveComplexity.FixedPointHorn
-public import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.OrderWalk
+import Mathlib.Tactic.FinCases
 
 /-!
 # GAME is in PTIME

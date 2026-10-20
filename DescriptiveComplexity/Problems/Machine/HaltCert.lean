@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.MachinesUnbounded
 public import DescriptiveComplexity.OrderWalk
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # An accepting run, read off as a finite certificate

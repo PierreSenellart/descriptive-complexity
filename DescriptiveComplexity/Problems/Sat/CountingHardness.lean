@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.Sat.Counting
 public import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.Sat.TseitinUnique
 public import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Tactic.FinCases
 
 /-!
 # #SAT is parsimoniously `#P`-complete

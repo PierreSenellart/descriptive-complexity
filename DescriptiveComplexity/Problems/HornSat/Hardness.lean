@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.SecondOrderHorn
+import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.ClauseDischarge
 public import DescriptiveComplexity.Problems.HornSat.Defs
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Hardness of HORN-SAT: the Horn discharge

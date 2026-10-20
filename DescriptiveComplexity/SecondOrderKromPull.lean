@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.SecondOrderPull
-public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Pulling SO-Krom definability back through an interpretation

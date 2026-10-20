@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.MaxCut.Defs
 public import DescriptiveComplexity.Problems.NaeThreeSat
+import Mathlib.Tactic.FinCases
 
 /-!
 # The gadget graph of the reduction from NAE-3SAT to Max Cut

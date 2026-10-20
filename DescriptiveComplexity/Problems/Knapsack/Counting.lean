@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Knapsack.Membership
 public import DescriptiveComplexity.Counting.Class
+import Mathlib.Tactic.FinCases
 
 /-!
 # #Knapsack: counting the solutions of a subset-sum instance

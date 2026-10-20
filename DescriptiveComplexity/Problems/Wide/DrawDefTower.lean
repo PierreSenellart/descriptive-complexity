@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefKit
-public import DescriptiveComplexity.Problems.Wide.DrawTuple
+import DescriptiveComplexity.Problems.Wide.DrawTuple
 public import DescriptiveComplexity.Problems.Wide.DrawTagged
 public import DescriptiveComplexity.Problems.Wide.DrawSeq
 

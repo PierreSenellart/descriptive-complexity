@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.MachinesAltPlay
-public import DescriptiveComplexity.Problems.Machine.Program
+import DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The `k`-round game: what a `Σₖ` definition of alternating acceptance guesses

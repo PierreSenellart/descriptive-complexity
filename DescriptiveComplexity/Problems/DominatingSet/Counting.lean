@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Block
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.DominatingSet.Defs
-public import DescriptiveComplexity.Counting.Sized
+import DescriptiveComplexity.Counting.Sized
 public import DescriptiveComplexity.Counting.Class
 
 /-!

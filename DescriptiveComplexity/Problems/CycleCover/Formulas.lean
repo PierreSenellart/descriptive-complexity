@@ -8,9 +8,10 @@ module
 public import DescriptiveComplexity.Problems.CycleCover.Models
 public import DescriptiveComplexity.Permanent.Widths
 public import DescriptiveComplexity.OccurrenceFormulas
-public import DescriptiveComplexity.OrderedComposition
-public import DescriptiveComplexity.RelComposition
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.RelComposition
+import DescriptiveComplexity.Syntax
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The formulas of the reduction of #1-in-SAT to #Cycle Cover

@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Prefix
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The levels of the Savitch recursion, and what a valuation reads

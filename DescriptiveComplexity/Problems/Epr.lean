@@ -5,8 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Epr.Defs
-public import DescriptiveComplexity.Problems.Epr.Small
+import DescriptiveComplexity.Problems.Epr.Defs
+import DescriptiveComplexity.Problems.Epr.Small
 public import DescriptiveComplexity.Problems.Epr.Membership
 
 /-!

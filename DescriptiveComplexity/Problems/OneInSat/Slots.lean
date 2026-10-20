@@ -5,8 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.OneInSat.Defs
+import DescriptiveComplexity.Problems.OneInSat.Defs
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
+import Mathlib.Tactic.FinCases
 
 /-!
 # The three slots of a clause

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Tiling
-public import DescriptiveComplexity.Problems.Tiling.Membership
+import DescriptiveComplexity.Problems.Tiling.Membership
 public import DescriptiveComplexity.Exponential.Classes
 
 /-!

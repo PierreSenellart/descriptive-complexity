@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Qsat
 public import DescriptiveComplexity.Problems.SuccinctReach
+public import DescriptiveComplexity.Problems.SuccinctReach.Hardness
+import DescriptiveComplexity.Problems.Qsat.Complement
+import DescriptiveComplexity.Problems.Qsat.Hardness
 
 /-!
 # `PSPACE = coPSPACE`

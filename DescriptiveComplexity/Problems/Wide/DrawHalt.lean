@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawProg
-public import DescriptiveComplexity.Problems.Machine.DetRun
+import DescriptiveComplexity.Problems.Machine.DetRun
 
 /-!
 # The accepting phase is a dead end

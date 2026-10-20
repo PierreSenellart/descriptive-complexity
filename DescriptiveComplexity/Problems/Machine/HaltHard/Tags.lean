@@ -7,7 +7,7 @@ module
 
 public import Mathlib.Computability.TuringMachine.Config
 public import Mathlib.Basic.Finite.Sum
-public import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
+import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
 
 /-!
 # The alphabet of the machine simulating a `ToPartrec` code

@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Numbers.BinRel
+public import Mathlib.Tactic.Ring.RingNF
+public import Mathlib.Algebra.BigOperators.Ring.Finset
 
 /-!
 # Numbers written in base `B` on a relation-ordered index set

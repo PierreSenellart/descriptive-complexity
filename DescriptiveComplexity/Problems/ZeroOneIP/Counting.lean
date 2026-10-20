@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.ZeroOneIP.Membership
 public import DescriptiveComplexity.Counting.Class
+import Mathlib.Tactic.FinCases
 
 /-!
 # #0-1 integer programming: counting the `0-1` solutions

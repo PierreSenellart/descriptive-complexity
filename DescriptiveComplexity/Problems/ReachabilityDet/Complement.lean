@@ -5,10 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.ReachabilityDet
-public import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.WalkBudget
+import Mathlib.Tactic.FinCases
 
 /-!
 # UNREACHd, and `L = coL`

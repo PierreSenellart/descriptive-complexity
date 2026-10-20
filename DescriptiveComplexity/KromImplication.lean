@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.TwoCnf
-public import Mathlib.Basic.Finite.Sigma
+import Mathlib.Basic.Finite.Sigma
 
 /-!
 # The implication graph of a Krom program

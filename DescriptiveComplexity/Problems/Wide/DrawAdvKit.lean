@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawAdv
-public import DescriptiveComplexity.Problems.Wide.DrawKit
+import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # The advance kit: one round of a sweep

@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Reachability
+import DescriptiveComplexity.Problems.Reachability
 public import DescriptiveComplexity.TransitiveClosureReach
 public import DescriptiveComplexity.DetLogSpace
+public import DescriptiveComplexity.TransitiveClosureCompl
 
 /-!
 # REACHd: deterministic reachability, complete for LOGSPACE

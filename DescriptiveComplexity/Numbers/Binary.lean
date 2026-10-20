@@ -7,8 +7,8 @@ module
 
 public import Mathlib.Algebra.BigOperators.Fin
 public import Mathlib.Data.Fintype.Sort
-public import Mathlib.Data.Nat.Bitwise
-public import Mathlib.Order.Hom.Set
+import Mathlib.Data.Nat.Bitwise
+import Mathlib.Order.Hom.Set
 
 /-!
 # Binary representation of numbers in finite structures

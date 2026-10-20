@@ -9,7 +9,7 @@ public import DescriptiveComplexity.Exponential.Matrix
 public import DescriptiveComplexity.Exponential.Increment
 public import DescriptiveComplexity.Exponential.Copies
 public import DescriptiveComplexity.HeadAutomaton
-public import DescriptiveComplexity.PSpace
+import DescriptiveComplexity.PSpace
 
 /-!
 # Simulating a machine that walks an expanded universe

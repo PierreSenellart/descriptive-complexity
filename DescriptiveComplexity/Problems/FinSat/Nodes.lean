@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Sat.Tseitin
-public import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.OrderWalk
 
 /-!
 # Positions and tags of the FINSAT reduction

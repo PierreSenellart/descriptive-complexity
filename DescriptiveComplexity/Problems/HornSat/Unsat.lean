@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Order.Lattice.Nat
-public import Mathlib.Data.Fintype.Card
-public import Mathlib.Data.Fintype.Lattice
-public import DescriptiveComplexity.Syntax
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Lattice
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.HornSat.Membership
 public import Mathlib.Data.Set.Card
 

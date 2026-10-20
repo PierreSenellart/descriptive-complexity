@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.MaxCut.Interp
+import Mathlib.Tactic.FinCases
 
 /-!
 # NAE-3SAT ordered-FO-reduces to Max Cut

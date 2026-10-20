@@ -6,11 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Hamilton.Gadget
-public import DescriptiveComplexity.Problems.Hamilton.Cycle
-public import DescriptiveComplexity.Problems.Hamilton.Forward
-public import DescriptiveComplexity.Problems.Hamilton.Reverse
-public import DescriptiveComplexity.Problems.CliqueFamily
-public import Mathlib.Data.Fintype.Lattice
+import DescriptiveComplexity.Problems.Hamilton.Cycle
+import DescriptiveComplexity.Problems.Hamilton.Forward
+import DescriptiveComplexity.Problems.Hamilton.Reverse
+import DescriptiveComplexity.Problems.CliqueFamily
+import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Vertex Cover reduces to Hamilton Circuit

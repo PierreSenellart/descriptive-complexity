@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Iterate
+import DescriptiveComplexity.Iterate
 public import DescriptiveComplexity.FixedPoint
 public import DescriptiveComplexity.SecondOrderTransitiveClosure
-public import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 
 /-!
 # Simultaneous first-order inductions: one skeleton for IFP and PFP

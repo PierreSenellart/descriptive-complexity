@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstRound
 public import DescriptiveComplexity.Problems.Wide.DrawRunVar
-public import DescriptiveComplexity.Problems.Wide.DrawInner
+import DescriptiveComplexity.Problems.Wide.DrawInner
 public import DescriptiveComplexity.Problems.Wide.DrawAddr
 
 /-!

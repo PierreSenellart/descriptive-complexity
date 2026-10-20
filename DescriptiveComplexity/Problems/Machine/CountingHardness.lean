@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.Counting
 public import DescriptiveComplexity.Problems.Machine.Interp
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # Counting accepting runs is parsimoniously `#P`-complete

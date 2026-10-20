@@ -6,10 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Data.Fintype.Perm
-public import Mathlib.Algebra.BigOperators.Ring.Finset
-public import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
-public import Mathlib.Data.Finset.Powerset
-public import Mathlib.Algebra.BigOperators.Group.Finset.Sigma
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
+import Mathlib.Data.Finset.Powerset
+import Mathlib.Algebra.BigOperators.Group.Finset.Sigma
 public import Mathlib.Algebra.BigOperators.ModEq
 
 /-!

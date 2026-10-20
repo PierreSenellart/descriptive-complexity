@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Order
+public import DescriptiveComplexity.OrderWalk
 
 /-!
 # The defining sentence of the order on an expanded universe

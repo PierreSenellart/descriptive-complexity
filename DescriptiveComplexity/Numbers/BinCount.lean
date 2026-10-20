@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Numbers.BinRel
-public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # Counting the binary numbers below a bound

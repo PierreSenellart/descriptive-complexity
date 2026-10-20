@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxEval
 public import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
-public import DescriptiveComplexity.Problems.Wide.DrawIxBridge
+import DescriptiveComplexity.Problems.Wide.DrawIxBridge
 
 /-!
 # A gated position's semantic pack, at an arbitrary file and phase

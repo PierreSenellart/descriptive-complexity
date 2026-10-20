@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.QuantitativePull
-public import DescriptiveComplexity.FixedPoint
+import DescriptiveComplexity.FixedPoint
 
 /-!
 # The class FP

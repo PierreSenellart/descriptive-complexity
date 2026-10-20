@@ -5,8 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.GadgetDouble
+public import Mathlib.ModelTheory.Graph
+import Mathlib.Tactic.FinCases
 
 /-!
 # The digraph-to-graph gadget

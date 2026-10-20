@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameSO
-public import DescriptiveComplexity.Exponential.Peel
-public import DescriptiveComplexity.Problems.Game
+import DescriptiveComplexity.Exponential.Peel
+import DescriptiveComplexity.Problems.Game
 
 /-!
 # The nodes of an interpreted AND/OR graph, as states of a game

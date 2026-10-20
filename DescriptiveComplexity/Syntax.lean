@@ -5,8 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.ModelTheory.Syntax
-public import Mathlib.ModelTheory.Semantics
+import Mathlib.ModelTheory.Syntax
+import Mathlib.ModelTheory.Semantics
 
 /-!
 # A surface syntax for first-order formulas

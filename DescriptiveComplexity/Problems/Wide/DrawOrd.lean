@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawEnc
-public import DescriptiveComplexity.Problems.Wide.Increment
+import DescriptiveComplexity.Problems.Wide.Increment
 public import DescriptiveComplexity.Exponential.Order
-public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedComposition
 public import DescriptiveComplexity.OrderWalk
 
 /-!

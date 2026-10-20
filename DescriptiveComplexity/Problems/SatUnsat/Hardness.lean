@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.SatUnsat
 public import DescriptiveComplexity.Problems.Sat.Hardness
+import Mathlib.Tactic.FinCases
 
 /-!
 # DP-hardness of SAT-UNSAT

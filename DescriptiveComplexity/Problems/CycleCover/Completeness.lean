@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.CycleCover.Drawing
 public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 public import DescriptiveComplexity.Counting.Reduction
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # #Cycle Cover is one-call `#P`-complete

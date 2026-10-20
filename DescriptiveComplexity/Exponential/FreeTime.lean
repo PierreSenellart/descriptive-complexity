@@ -8,7 +8,8 @@ module
 public import DescriptiveComplexity.Exponential.FreeCopy
 public import DescriptiveComplexity.Exponential.Classes
 public import DescriptiveComplexity.FixedPointParam
-public import DescriptiveComplexity.FixedPointStepRel
+import DescriptiveComplexity.FixedPointStepRel
+import Mathlib.Tactic.FinCases
 
 /-!
 # The copy a point names, and EXPTIME without the order

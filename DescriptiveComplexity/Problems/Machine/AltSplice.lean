@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltRank
+import DescriptiveComplexity.Problems.Machine.Program
+import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Splicing a play into a walk

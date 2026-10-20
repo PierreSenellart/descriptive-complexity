@@ -6,11 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.Defs
-public import DescriptiveComplexity.Problems.Machine.DetRun
-public import DescriptiveComplexity.FixedPointOrderTransfer
+import DescriptiveComplexity.Problems.Machine.DetRun
+import DescriptiveComplexity.FixedPointOrderTransfer
 public import DescriptiveComplexity.Counting
-public import DescriptiveComplexity.Vocabulary
-public import Mathlib.Algebra.BigOperators.Finprod
+import DescriptiveComplexity.Vocabulary
+import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # The number written by a machine: definition

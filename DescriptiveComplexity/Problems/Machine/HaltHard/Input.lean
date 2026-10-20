@@ -9,6 +9,8 @@ public import Mathlib.Computability.RE
 public import Mathlib.Computability.PartrecBasis
 public import DescriptiveComplexity.Problems.Machine.HaltHard.Bridge
 public import DescriptiveComplexity.Computability.Eval
+public import Mathlib.Tactic.Ring.RingNF
+public import Mathlib.Data.List.GetD
 
 /-!
 # The input chain: getting the instance into the machine

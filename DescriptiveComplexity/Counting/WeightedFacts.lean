@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.WeightedWorlds
-public import DescriptiveComplexity.Counting.Independence
+import DescriptiveComplexity.Counting.Independence
 
 /-!
 # Weighted worlds, with every fact as a variable

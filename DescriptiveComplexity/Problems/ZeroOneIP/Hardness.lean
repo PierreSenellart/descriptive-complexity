@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.ZeroOneIP.Defs
 public import DescriptiveComplexity.Problems.Knapsack.Defs
 public import DescriptiveComplexity.Padding
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Fintype.Lattice
 
 /-!
 # 0-1 integer programming is NP-hard

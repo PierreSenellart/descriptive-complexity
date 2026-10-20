@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FirstOrderDefinable
-public import DescriptiveComplexity.SecondOrderPull
-public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.SecondOrderPull
+import DescriptiveComplexity.OrderedComposition
 
 /-!
 # First-order definability travels backward along reductions

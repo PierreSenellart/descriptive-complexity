@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.GraphIso.Defs
 public import DescriptiveComplexity.Problems.GraphIso.Gadget
 public import DescriptiveComplexity.Problems.DigraphIso.Bridge
+import Mathlib.Tactic.FinCases
 
 /-!
 # Graph Isomorphism is GI-complete

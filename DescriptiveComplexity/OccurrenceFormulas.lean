@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.OccurrenceOrder
-public import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Ordered
 
 /-!
 # First-order formulas for literal occurrences, over the ordered expansion

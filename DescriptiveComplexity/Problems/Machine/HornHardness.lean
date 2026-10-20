@@ -7,7 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.HornTape
 public import DescriptiveComplexity.Problems.Machine.Hardness
-public import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.Problems.HornSat
+public import DescriptiveComplexity.Problems.HornSat.Unsat
+import Mathlib.Tactic.FinCases
 
 /-!
 # The unit-propagation machine of a Horn formula

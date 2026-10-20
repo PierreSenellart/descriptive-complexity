@@ -5,8 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Logic.Relation
-public import Mathlib.Data.Finset.Basic
+import Mathlib.Logic.Relation
+import Mathlib.Data.Finset.Basic
 public import Mathlib.Data.Fintype.EquivFin
 
 /-!

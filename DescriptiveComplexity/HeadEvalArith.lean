@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.HeadArith
 public import DescriptiveComplexity.ArithmeticDefinable
-public import DescriptiveComplexity.HeadCaptureDet
+import DescriptiveComplexity.HeadCaptureDet
 
 /-!
 # Evaluating an arithmetic formula with heads, and `AC⁰ ⊆ LOGSPACE`

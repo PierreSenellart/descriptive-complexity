@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawScan
+public import DescriptiveComplexity.Problems.Wide.Mirror
+public import DescriptiveComplexity.Problems.Wide.Test
 
 /-!
 # One-cell writes, and tests the tracks can decide

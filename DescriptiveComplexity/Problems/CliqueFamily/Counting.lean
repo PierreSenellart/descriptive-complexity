@@ -6,8 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.CliqueFamily.Membership
-public import DescriptiveComplexity.Counting.Sized
+import DescriptiveComplexity.Counting.Sized
 public import DescriptiveComplexity.Counting.Class
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 
 /-!
 # #Clique: counting the cliques of the threshold size

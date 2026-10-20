@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.Machine
-public import DescriptiveComplexity.LogTime.Pow
+import DescriptiveComplexity.LogTime.Pow
 
 /-!
 # The bit-level logic, and definability in it

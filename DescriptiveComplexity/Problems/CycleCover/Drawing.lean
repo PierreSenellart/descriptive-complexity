@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.CycleCover.Formulas
 public import DescriptiveComplexity.Problems.CycleCover.Defs
-public import DescriptiveComplexity.Counting.Post
-public import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Counting.Post
+import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # The drawing of the reduction of #1-in-SAT to #Cycle Cover

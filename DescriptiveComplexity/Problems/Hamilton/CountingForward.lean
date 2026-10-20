@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Hamilton.CountingGadget
+public import DescriptiveComplexity.Problems.OneInSat.Defs
 
 /-!
 # The circuit of an exactly-one model

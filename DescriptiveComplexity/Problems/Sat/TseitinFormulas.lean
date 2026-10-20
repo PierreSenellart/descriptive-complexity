@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Sat.Tseitin
-public import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Ordered
 
 /-!
 # The Tseitin encoding of a first-order kernel: defining formulas

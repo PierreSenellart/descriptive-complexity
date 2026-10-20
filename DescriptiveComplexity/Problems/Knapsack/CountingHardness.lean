@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Knapsack.Counting
 public import DescriptiveComplexity.Problems.Knapsack.Hardness
 public import DescriptiveComplexity.Problems.ExactCoverCounting
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Knapsack is parsimoniously `#P`-complete

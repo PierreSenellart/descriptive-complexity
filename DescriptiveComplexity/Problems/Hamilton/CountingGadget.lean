@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
 public import DescriptiveComplexity.OccurrenceVar
-public import DescriptiveComplexity.Problems.OneInSat.Counting
+import DescriptiveComplexity.Problems.OneInSat.Counting
 
 /-!
 # The row graph of a CNF formula

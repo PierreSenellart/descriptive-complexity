@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.DrawDefAsm
+import DescriptiveComplexity.Problems.Wide.DrawDefAsm
 public import DescriptiveComplexity.Problems.Wide.DrawDefLoop
-public import DescriptiveComplexity.Problems.Wide.DrawCtl
-public import DescriptiveComplexity.Problems.Wide.DrawOrd
+import DescriptiveComplexity.Problems.Wide.DrawCtl
+import DescriptiveComplexity.Problems.Wide.DrawOrd
 public import DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
-public import DescriptiveComplexity.Problems.Wide.DrawVerdict
+import DescriptiveComplexity.Problems.Wide.DrawVerdict
 
 /-!
 # One variable's verdict at an arbitrary file

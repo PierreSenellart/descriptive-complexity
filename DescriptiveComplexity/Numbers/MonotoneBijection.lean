@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.Fintype.Sort
+import Mathlib.Data.Fintype.Sort
 public import Mathlib.Data.Set.Card
-public import Mathlib.Order.Hom.Set
-public import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Order.Hom.Set
+import Mathlib.SetTheory.Cardinal.Finite
 
 /-!
 # The monotone bijection between two sets of the same size

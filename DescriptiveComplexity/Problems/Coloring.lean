@@ -6,10 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Coloring.Defs
-public import DescriptiveComplexity.Problems.Coloring.Reductions
-public import DescriptiveComplexity.Problems.Coloring.Membership
-public import DescriptiveComplexity.Problems.ThreeColorability
-public import DescriptiveComplexity.Composition
+import DescriptiveComplexity.Problems.Coloring.Reductions
+import DescriptiveComplexity.Problems.Coloring.Membership
+import DescriptiveComplexity.Problems.ThreeColorability
+import DescriptiveComplexity.Composition
 
 /-!
 # The coloring family is NP-complete

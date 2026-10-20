@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Steiner.Counting
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Tactic.FinCases
 
 /-!
 # #Steiner Tree is parsimoniously `#P`-complete

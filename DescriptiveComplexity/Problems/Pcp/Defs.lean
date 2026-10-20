@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.List.Forall2
+import Mathlib.Data.List.Forall2
 public import DescriptiveComplexity.Interpretation
 
 /-!

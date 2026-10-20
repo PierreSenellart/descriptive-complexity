@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Invariant.Structure
+public import DescriptiveComplexity.OrderedComposition
+import Mathlib.Order.PiLex
+import Mathlib.Tactic.DefEqTransformations
 
 /-!
 # The canonical order is inflationary-definable

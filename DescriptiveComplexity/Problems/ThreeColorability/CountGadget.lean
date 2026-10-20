@@ -11,6 +11,8 @@ public import Mathlib.Data.Fintype.Perm
 public import Mathlib.SetTheory.Cardinal.Finite
 public import Mathlib.Tactic.Ring
 public import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
+public import Mathlib.Tactic.FinCases
+public import Mathlib.Algebra.Group.Action.Defs
 
 /-!
 # A count-preserving 3-coloring gadget graph of a CNF formula

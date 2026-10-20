@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
 public import DescriptiveComplexity.Problems.Hamilton.CountingHardness
 public import DescriptiveComplexity.Counting.Subtractive
+public import DescriptiveComplexity.Syntax
 
 /-!
 # #Hamilton Circuit is parsimoniously `#P`-complete

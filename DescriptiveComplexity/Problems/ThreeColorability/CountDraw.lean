@@ -7,10 +7,12 @@ module
 
 public import DescriptiveComplexity.Problems.ThreeColorability.CountGadget
 public import DescriptiveComplexity.Problems.ThreeColorability.Counting
-public import DescriptiveComplexity.Problems.Sat.CountingHardness
+import DescriptiveComplexity.Problems.Sat.CountingHardness
 public import DescriptiveComplexity.OccurrenceFormulas
-public import DescriptiveComplexity.OccurrencePrefix
+import DescriptiveComplexity.OccurrencePrefix
 public import DescriptiveComplexity.Counting.Reduction
+public import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.Syntax
 
 /-!
 # #3-Colorability is one-call `#P`-complete

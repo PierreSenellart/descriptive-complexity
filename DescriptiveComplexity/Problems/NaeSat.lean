@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
-public import DescriptiveComplexity.Problems.Sat
-public import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Problems.Sat
+import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.OccurrenceOrder
 

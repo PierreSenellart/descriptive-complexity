@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstExp
+public import DescriptiveComplexity.Problems.Wide.DrawGate
 
 /-!
 # The gates, instantiated: the domain evaluation of one block

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstVar
-public import DescriptiveComplexity.Problems.Wide.DrawRunEval
+import DescriptiveComplexity.Problems.Wide.DrawRunEval
 
 /-!
 # The spine, instantiated: one variable's machinery per position

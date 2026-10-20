@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltSplice
+import DescriptiveComplexity.Problems.Machine.Program
+import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # One round of the game, and what it leaves behind

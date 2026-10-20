@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
 public import DescriptiveComplexity.Problems.CliqueFamily.Pendant
 public import DescriptiveComplexity.Counting.Reduction
 public import Mathlib.ModelTheory.Graph
+import DescriptiveComplexity.Syntax
+import Mathlib.Tactic.FinCases
 
 /-!
 # Counting all the independent sets of a graph

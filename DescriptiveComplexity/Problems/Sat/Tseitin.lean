@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.SecondOrder
 public import DescriptiveComplexity.Padding
-public import Mathlib.Data.Fintype.Lattice
-public import Mathlib.Tactic.FinCases
+import Mathlib.Data.Fintype.Lattice
+import Mathlib.Tactic.FinCases
 
 /-!
 # The Tseitin encoding of a first-order kernel: semantic layer

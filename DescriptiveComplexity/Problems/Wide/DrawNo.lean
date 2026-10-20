@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawYes
 public import DescriptiveComplexity.Problems.Wide.DrawHalt
+public import DescriptiveComplexity.Problems.Machine.DetRun
 
 /-!
 # A partial fixed point that fails makes the machine reject

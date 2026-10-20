@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.HaltHard.Sim
+import DescriptiveComplexity.Machines
+public import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
+import DescriptiveComplexity.Problems.Pcp.Hardness.History
 
 /-!
 # The simulating machine as rewriting, and the transport to a drawn machine

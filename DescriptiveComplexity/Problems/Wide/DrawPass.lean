@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRules
-public import DescriptiveComplexity.Problems.Wide.Mirror
-public import DescriptiveComplexity.Problems.Wide.Test
+import DescriptiveComplexity.Problems.Wide.Mirror
+import DescriptiveComplexity.Problems.Wide.Test
 
 /-!
 # A program's rules run its register passes

@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.List.NodupEquivFin
-public import Mathlib.Logic.Equiv.Sum
-public import Mathlib.Logic.Equiv.Fin.Basic
+import Mathlib.Data.List.NodupEquivFin
+import Mathlib.Logic.Equiv.Sum
+import Mathlib.Logic.Equiv.Fin.Basic
 public import DescriptiveComplexity.Computability.FinStruct
 
 /-!

@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawBack
 public import DescriptiveComplexity.Problems.Wide.DrawVar
 public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+public import DescriptiveComplexity.Problems.Wide.DrawLoop
 
 /-!
 # One variable's machinery: the run

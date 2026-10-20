@@ -11,6 +11,7 @@ public import DescriptiveComplexity.Iterate
 public import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.SecondOrderHornPull
 public import DescriptiveComplexity.Padding
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # FO(LFP): first-order logic with a least fixed point

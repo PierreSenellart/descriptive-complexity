@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Invariant.Stages
+import Mathlib.Tactic.FinCases
 
 /-!
 # `≡ᵏ` on a bare set, and the order an induction cannot define

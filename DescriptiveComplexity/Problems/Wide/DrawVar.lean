@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawEval
+public import DescriptiveComplexity.Problems.Wide.DrawIncrKit
 
 /-!
 # One variable's machinery: gates, the VAL loop, the stage write

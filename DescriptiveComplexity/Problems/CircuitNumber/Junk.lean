@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.CircuitNumber.Defs
 public import DescriptiveComplexity.Counting.Relativized
+import Mathlib.Tactic.FinCases
 
 /-!
 # The number written by a circuit ignores isolated elements

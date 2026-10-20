@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Blocks
-public import DescriptiveComplexity.Problems.Qsat.Complement
-public import DescriptiveComplexity.Problems.Qsat.Hardness
+import DescriptiveComplexity.Problems.Qsat.Complement
+import DescriptiveComplexity.Problems.Qsat.Hardness
 
 /-!
 # QSAT: quantified Boolean formulas with an unbounded prefix

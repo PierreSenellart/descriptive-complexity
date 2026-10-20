@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Ordered
-public import DescriptiveComplexity.Complexity
+import DescriptiveComplexity.Complexity
 
 /-!
 # FO(TC): first-order logic with transitive closure

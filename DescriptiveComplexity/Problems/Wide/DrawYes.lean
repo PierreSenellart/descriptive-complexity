@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRunSpine
 public import DescriptiveComplexity.Problems.Wide.DrawValEnum
+public import DescriptiveComplexity.FixedPointPartial
+public import DescriptiveComplexity.Problems.Wide.DrawRunOuter
 
 /-!
 # A partial fixed point that holds makes the machine accept

@@ -8,7 +8,8 @@ module
 public import DescriptiveComplexity.Problems.CliqueFamily.Counting
 public import DescriptiveComplexity.Problems.CliqueFamily.FromSat
 public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Tactic.FinCases
 
 /-!
 # #Clique is parsimoniously `#P`-complete

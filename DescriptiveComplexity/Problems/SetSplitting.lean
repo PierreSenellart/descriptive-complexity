@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.SetFamily
 public import DescriptiveComplexity.Problems.NaeThreeSat
-public import DescriptiveComplexity.Problems.ThreeSat.ToSat
+import DescriptiveComplexity.Problems.ThreeSat.ToSat
+import DescriptiveComplexity.Problems.SetFamily.Membership
 
 /-!
 # Set Splitting is NP-complete

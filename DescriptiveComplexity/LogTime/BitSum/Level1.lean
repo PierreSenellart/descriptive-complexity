@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitSum.Level2
+import DescriptiveComplexity.LogTime.Fields
 
 /-!
 # Level 1: counting all the ones of an element

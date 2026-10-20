@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Cvp.Hardness.Value
 public import DescriptiveComplexity.OrderedComposition
+public import DescriptiveComplexity.Problems.HornSat.Hardness
+public import Mathlib.Data.Fintype.Lattice
+import DescriptiveComplexity.FixedPointHorn
 
 /-!
 # CVP is `PTIME`-hard

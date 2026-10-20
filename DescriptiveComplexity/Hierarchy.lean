@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.SecondOrderLift
-public import DescriptiveComplexity.SecondOrderPull
+import DescriptiveComplexity.SecondOrderLift
+import DescriptiveComplexity.SecondOrderPull
 public import DescriptiveComplexity.SecondOrderOrdered
 public import DescriptiveComplexity.SecondOrderHornPull
-public import DescriptiveComplexity.RelComposition
+import DescriptiveComplexity.RelComposition
 
 /-!
 # The polynomial hierarchy, defined by second-order alternation

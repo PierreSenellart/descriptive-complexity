@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTable
-public import DescriptiveComplexity.Problems.Wide.Roam
+import DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The region a clocked program works in, and its size

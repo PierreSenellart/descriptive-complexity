@@ -8,8 +8,8 @@ module
 public import DescriptiveComplexity.Composition
 public import DescriptiveComplexity.Ordered
 public import Mathlib.Order.PiLex
-public import Mathlib.Order.Prod.Lex.Basic
-public import Mathlib.Data.Fintype.EquivFin
+import Mathlib.Order.Prod.Lex.Basic
+import Mathlib.Data.Fintype.EquivFin
 
 /-!
 # Composition of ordered first-order reductions

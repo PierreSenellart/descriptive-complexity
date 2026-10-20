@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.MaxCut.Defs
-public import DescriptiveComplexity.Problems.MaxCut.Membership
+import DescriptiveComplexity.Problems.MaxCut.Defs
+import DescriptiveComplexity.Problems.MaxCut.Membership
 public import DescriptiveComplexity.Problems.MaxCut.Reduction
-public import DescriptiveComplexity.Problems.NaeThreeSat
+import DescriptiveComplexity.Problems.NaeThreeSat
 
 /-!
 # Max Cut is NP-complete

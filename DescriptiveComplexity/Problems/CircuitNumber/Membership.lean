@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.CircuitNumber.Defs
 public import DescriptiveComplexity.Problems.Cvp.Membership
 public import DescriptiveComplexity.Counting.FP
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 
 /-!
 # The number written by a circuit is in FP

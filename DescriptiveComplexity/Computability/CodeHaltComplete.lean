@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Computability.CodeHalt
-public import DescriptiveComplexity.Problems.CodeHalt.Hardness
+import DescriptiveComplexity.Problems.CodeHalt.Hardness
 
 /-!
 # RE is exactly recursive enumerability

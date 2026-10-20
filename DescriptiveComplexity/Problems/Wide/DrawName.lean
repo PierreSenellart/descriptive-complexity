@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawBack
-public import DescriptiveComplexity.Problems.Wide.DrawGate
+import DescriptiveComplexity.Problems.Wide.DrawGate
 
 /-!
 # The cell of an encoded tuple: what one leaf read reads

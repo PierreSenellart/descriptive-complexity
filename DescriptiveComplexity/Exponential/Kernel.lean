@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Class
-public import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # What a NEXPTIME source problem looks like

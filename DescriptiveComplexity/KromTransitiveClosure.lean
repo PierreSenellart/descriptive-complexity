@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.KromImplication
 public import DescriptiveComplexity.ClauseDischarge
 public import DescriptiveComplexity.TransitiveClosureKrom
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # From the Krom fragment to FO(TC), through the complement

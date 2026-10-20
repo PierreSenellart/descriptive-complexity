@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.FinSat.Membership
-public import DescriptiveComplexity.Problems.FinSat.Reduction
+import DescriptiveComplexity.Problems.FinSat.Reduction
 
 /-!
 # Trakhtenbrot's theorem: finite satisfiability is RE-complete

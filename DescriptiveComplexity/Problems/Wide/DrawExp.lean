@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
+import DescriptiveComplexity.Problems.Wide.DrawRepAtoms
 public import DescriptiveComplexity.Problems.Wide.DrawData
-public import DescriptiveComplexity.Problems.Wide.DrawPad
+import DescriptiveComplexity.Problems.Wide.DrawPad
 
 /-!
 # What an expansion atom's element loop computes

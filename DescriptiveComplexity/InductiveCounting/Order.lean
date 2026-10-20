@@ -5,8 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.SetTheory.Cardinal.NatCard
+import Mathlib.SetTheory.Cardinal.NatCard
 public import DescriptiveComplexity.InductiveCounting.Machine
+public import Mathlib.Data.Finset.Max
 
 /-!
 # Registers as counters and as loop positions

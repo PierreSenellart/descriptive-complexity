@@ -6,8 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstStage
-public import DescriptiveComplexity.Problems.Wide.IxAddr
+import DescriptiveComplexity.Problems.Wide.IxAddr
 import all DescriptiveComplexity.Problems.Wide.DrawRunStage
+import DescriptiveComplexity.Problems.Wide.DrawAddr
 
 /-!
 # The address a stage atom builds, at an arbitrary file

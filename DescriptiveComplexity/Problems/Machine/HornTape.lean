@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.Program
 public import DescriptiveComplexity.OrderedComposition
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Fintype.Lattice
+import Mathlib.Tactic.FinCases
 
 /-!
 # The tape of the unit-propagation machine

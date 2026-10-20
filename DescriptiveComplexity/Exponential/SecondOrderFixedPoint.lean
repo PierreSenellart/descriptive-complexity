@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Class
-public import DescriptiveComplexity.FixedPointHorn
+import DescriptiveComplexity.FixedPointHorn
 public import DescriptiveComplexity.FixedPointPartialMachine
 
 /-!

@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Hamilton.Gadget
 public import DescriptiveComplexity.Problems.Hamilton.Cycle
 public import Mathlib.Logic.Equiv.Fin.Rotate
+public import Mathlib.Data.Finset.Max
+import Mathlib.Tactic.FinCases
+import Mathlib.Tactic.Recover
 
 /-!
 # Vertex Cover from a Hamilton circuit

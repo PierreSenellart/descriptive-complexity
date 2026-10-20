@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Tactic.FinCases
-public import DescriptiveComplexity.Vocabulary
-public import DescriptiveComplexity.Syntax
+import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Hierarchy
 
 /-!

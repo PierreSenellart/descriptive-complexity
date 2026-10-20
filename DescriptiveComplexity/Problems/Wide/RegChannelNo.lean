@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Wide.RegChannelYes
 public import DescriptiveComplexity.Problems.Wide.RegChannelBack
 public import Mathlib.Data.Nat.Log
+public import DescriptiveComplexity.Problems.Wide.RegChannelEnum
+import DescriptiveComplexity.Problems.Wide.SpineSav
 
 /-!
 # The handed program on a no-instance

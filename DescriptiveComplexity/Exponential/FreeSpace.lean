@@ -6,10 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.FreeCopy
-public import DescriptiveComplexity.FixedPointPartialMachine
-public import DescriptiveComplexity.FixedPointStepRel
-public import DescriptiveComplexity.PSpaceHierarchy
+import DescriptiveComplexity.FixedPointPartialMachine
+import DescriptiveComplexity.FixedPointStepRel
+import DescriptiveComplexity.PSpaceHierarchy
 public import DescriptiveComplexity.Exponential.Classes
+import Mathlib.Tactic.FinCases
 
 /-!
 # “Some copy answers yes” stays in polynomial space

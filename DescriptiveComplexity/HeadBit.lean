@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.HeadArith
+import DescriptiveComplexity.Arithmetic
 
 /-!
 # The bit of a rank, as a head program

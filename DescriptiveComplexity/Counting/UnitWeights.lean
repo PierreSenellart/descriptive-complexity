@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.WeightedWorlds
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Possible worlds are weighted worlds of weight one

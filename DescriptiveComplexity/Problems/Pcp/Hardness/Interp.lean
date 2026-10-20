@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Pcp.Hardness.Match
 public import DescriptiveComplexity.Ordered
+import Mathlib.Tactic.FinCases
 
 /-!
 # The interpretation: drawing the domino system first-order

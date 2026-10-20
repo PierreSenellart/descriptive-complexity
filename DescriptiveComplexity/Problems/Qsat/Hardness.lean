@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Induction
-public import DescriptiveComplexity.Problems.SuccinctReach
+import DescriptiveComplexity.Problems.SuccinctReach
 
 /-!
 # QSAT is PSPACE-hard

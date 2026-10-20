@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstSeq
 public import DescriptiveComplexity.Problems.Wide.DrawInstIGate
+public import DescriptiveComplexity.Problems.Wide.DrawRunSeq
 
 /-!
 # One round of the VAL loop, assembled

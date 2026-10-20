@@ -5,10 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Steiner.Defs
 public import DescriptiveComplexity.OrderWalk
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Fintype.Lattice
+import Mathlib.Tactic.FinCases
 
 /-!
 # Vertex Cover reduces to Steiner Tree

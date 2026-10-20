@@ -6,8 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Coloring.Membership
-public import DescriptiveComplexity.Problems.ThreeColorability.Defs
+import DescriptiveComplexity.Problems.ThreeColorability.Defs
 public import DescriptiveComplexity.Counting.Class
+import DescriptiveComplexity.Syntax
 
 /-!
 # #3-Colorability: counting the proper 3-colorings

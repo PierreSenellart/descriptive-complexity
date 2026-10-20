@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.CliqueFamily.Pendant
+public import Mathlib.Tactic.NormNum.Core
+public import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # Stretched edges: the independent sets of a graph, read off a bipartite one

@@ -7,9 +7,10 @@ module
 
 public import DescriptiveComplexity.Exponential.Classes
 public import DescriptiveComplexity.Exponential.Reach
-public import DescriptiveComplexity.PSpaceCompl
-public import DescriptiveComplexity.PSpaceHierarchy
-public import DescriptiveComplexity.Problems.TwoSat
+import DescriptiveComplexity.PSpaceCompl
+import DescriptiveComplexity.PSpaceHierarchy
+import DescriptiveComplexity.Problems.TwoSat
+import DescriptiveComplexity.FixedPointHorn
 
 /-!
 # The exponential classes: complements and inclusions

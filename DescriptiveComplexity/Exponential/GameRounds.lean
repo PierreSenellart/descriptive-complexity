@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameMove
-public import DescriptiveComplexity.Exponential.Translate
+import DescriptiveComplexity.Exponential.Translate
 
 /-!
 # Moving whole rounds

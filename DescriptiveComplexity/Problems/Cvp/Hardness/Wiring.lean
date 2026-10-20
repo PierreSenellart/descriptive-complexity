@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Cvp.Hardness.Interp
+import Mathlib.Tactic.FinCases
 
 /-!
 # The drawn circuit, gate by gate

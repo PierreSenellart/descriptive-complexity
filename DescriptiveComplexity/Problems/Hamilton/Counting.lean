@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Hamilton.Cycle
 public import DescriptiveComplexity.Problems.Hamilton.Membership
 public import DescriptiveComplexity.Counting.Class
+import DescriptiveComplexity.Syntax
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # #Directed Hamilton Circuit: counting the circuits

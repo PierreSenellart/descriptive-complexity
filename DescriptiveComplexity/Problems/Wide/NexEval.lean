@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.NexSpec
 public import DescriptiveComplexity.Problems.Wide.DrawProg
-public import DescriptiveComplexity.Problems.Wide.NexOuter
-public import DescriptiveComplexity.Problems.Wide.DrawRunEval
+import DescriptiveComplexity.Problems.Wide.NexOuter
+import DescriptiveComplexity.Problems.Wide.DrawRunEval
 
 /-!
 # The clocked evaluation's spine

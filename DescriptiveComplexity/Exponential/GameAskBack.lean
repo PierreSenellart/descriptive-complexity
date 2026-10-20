@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Exponential.GameAsk
+import DescriptiveComplexity.Exponential.GameAsk
 public import DescriptiveComplexity.Exponential.GameBack
 
 /-!

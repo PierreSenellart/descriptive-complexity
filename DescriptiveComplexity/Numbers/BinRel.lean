@@ -7,9 +7,9 @@ module
 
 public import DescriptiveComplexity.Numbers.Unary
 public import Mathlib.Algebra.BigOperators.Finprod
-public import Mathlib.Data.Set.Finite.Lemmas
-public import Mathlib.Algebra.BigOperators.Ring.Finset
-public import Mathlib.Tactic.Ring
+import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Tactic.Ring
 
 /-!
 # Binary numbers carried by a relation

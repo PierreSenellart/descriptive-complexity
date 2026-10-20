@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Step
+public import DescriptiveComplexity.Problems.Machine.Program
+public import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Roaming: what a wide machine may do between its phases

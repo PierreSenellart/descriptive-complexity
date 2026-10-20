@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.SecondOrderHorn
+import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.Problems.TwoSat.Implication
 public import DescriptiveComplexity.Problems.TwoSat.Membership
+import Mathlib.Tactic.FinCases
 
 /-!
 # 2SAT is in PTIME, by a Horn program for the implication graph

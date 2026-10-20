@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.OneInSat.Counting
 public import DescriptiveComplexity.Permanent.CycNext
 public import DescriptiveComplexity.Permanent.Flat
-public import DescriptiveComplexity.Permanent.Minor
+import DescriptiveComplexity.Permanent.Minor
 
 /-!
 # The base graph of a #1-in-SAT instance

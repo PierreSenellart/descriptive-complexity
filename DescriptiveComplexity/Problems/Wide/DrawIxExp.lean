@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstExp
-public import DescriptiveComplexity.Problems.Wide.IxAddr
+import DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # The expansion atoms at an arbitrary file

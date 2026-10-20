@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawArgs
 public import DescriptiveComplexity.Problems.Wide.DrawRunIter
-public import DescriptiveComplexity.Problems.Wide.DrawRunStage
+import DescriptiveComplexity.Problems.Wide.DrawRunStage
 
 /-!
 # The comparison atoms, instantiated

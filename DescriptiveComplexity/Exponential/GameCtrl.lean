@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameProgram
-public import DescriptiveComplexity.Exponential.GameTape
+import DescriptiveComplexity.Exponential.GameTape
 
 /-!
 # The control of a machine playing a second-order game

@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FixedPointExpand
+public import DescriptiveComplexity.SecondOrderMerge
+public import DescriptiveComplexity.Problems.HornSat
+import DescriptiveComplexity.FixedPointOrderTransfer
 
 /-!
 # Eliminating an induction under a quantifier prefix

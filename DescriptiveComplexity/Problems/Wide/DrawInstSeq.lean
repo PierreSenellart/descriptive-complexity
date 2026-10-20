@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstMat
-public import DescriptiveComplexity.Problems.Wide.DrawRunSeq
+import DescriptiveComplexity.Problems.Wide.DrawRunSeq
 public import DescriptiveComplexity.Problems.Wide.DrawCmp
 
 /-!

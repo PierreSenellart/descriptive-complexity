@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.TransitiveClosureReduction
-public import DescriptiveComplexity.TransitiveClosureDet
+import DescriptiveComplexity.TransitiveClosureDet
 
 /-!
 # FO(DTC) reductions: the logarithmic-space reduction of the textbooks

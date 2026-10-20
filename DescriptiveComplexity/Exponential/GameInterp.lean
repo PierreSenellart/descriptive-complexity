@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Exponential.GameExp
+import DescriptiveComplexity.Exponential.GameExp
 public import DescriptiveComplexity.Exponential.GamePlayBack
 public import DescriptiveComplexity.Problems.MachineAltSpace.Membership
+import Mathlib.Tactic.FinCases
 
 /-!
 # The machine, written in first-order logic

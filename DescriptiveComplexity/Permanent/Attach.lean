@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Permanent.Minor
 public import Mathlib.Data.Fintype.Sum
 public import Mathlib.Tactic.Ring
+public import Mathlib.Algebra.BigOperators.Ring.Finset
 
 /-!
 # Attaching a gadget to a matrix

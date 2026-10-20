@@ -5,12 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Problems.HornSat.Hardness
 public import DescriptiveComplexity.FixedPoint
-public import DescriptiveComplexity.FixedPointHorn
+import DescriptiveComplexity.FixedPointHorn
 public import DescriptiveComplexity.LogSpace
 public import DescriptiveComplexity.TransitiveClosure
+import Mathlib.Tactic.FinCases
 
 /-!
 # Reachability, and the Horn fragment at work

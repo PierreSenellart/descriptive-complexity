@@ -5,8 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.FixedPointExpandLevels
+import DescriptiveComplexity.FixedPointExpandLevels
 public import DescriptiveComplexity.TransitiveClosureReductionDet
+import DescriptiveComplexity.SecondOrderRelPull
 
 /-!
 # The whole polynomial hierarchy is closed under FO(LFP) reductions

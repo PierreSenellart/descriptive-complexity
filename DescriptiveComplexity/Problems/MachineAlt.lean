@@ -13,6 +13,7 @@ public import DescriptiveComplexity.Problems.Machine.AltInterp
 public import DescriptiveComplexity.Problems.Qbf
 public import DescriptiveComplexity.SecondOrderReplicate
 public import DescriptiveComplexity.MachinesAltPlay
+public import DescriptiveComplexity.Problems.Qbf.Hardness
 
 /-!
 # Alternating machine acceptance, and the machine bridge for the hierarchy

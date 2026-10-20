@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Feedback.Counting
 public import DescriptiveComplexity.Counting.SizedPairs
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
+import Mathlib.Tactic.FinCases
 
 /-!
 # #Feedback Arc Set: counting the feedback arc sets of the threshold size

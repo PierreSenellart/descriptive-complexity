@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.Membership
 public import DescriptiveComplexity.Problems.Sat.CountingHardness
+import DescriptiveComplexity.Syntax
+import Mathlib.Tactic.FinCases
 
 /-!
 # Counting the accepting runs of a machine

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Sat
 public import DescriptiveComplexity.Counting.Class
+import DescriptiveComplexity.Syntax
 
 /-!
 # #SAT: counting the models of a CNF formula

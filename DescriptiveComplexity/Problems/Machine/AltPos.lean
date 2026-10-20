@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltTable
+import Mathlib.Tactic.FinCases
 
 /-!
 # The positions of the QBF machine's tape, concretely

@@ -7,8 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Hamilton.CountingReverse
 public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-public import DescriptiveComplexity.Counting.Relativized
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Relativized
+import DescriptiveComplexity.Counting.Subtractive
+public import DescriptiveComplexity.OrderWalk
+import Mathlib.Tactic.FinCases
 
 /-!
 # #Directed Hamilton Circuit is parsimoniously `#P`-complete

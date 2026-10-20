@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.SecondOrder
-public import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Ordered
 public import DescriptiveComplexity.Encoding
 
 /-!

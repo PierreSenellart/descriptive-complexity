@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Epr.Expansion
-public import DescriptiveComplexity.PSpaceHierarchy
+import DescriptiveComplexity.PSpaceHierarchy
 public import DescriptiveComplexity.Exponential.Classes
 
 /-!

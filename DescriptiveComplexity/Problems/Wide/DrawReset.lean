@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTrip
-public import DescriptiveComplexity.Problems.Wide.DrawKit
+import DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # Resetting the working cell to the bottom

@@ -12,6 +12,8 @@ public import DescriptiveComplexity.Arithmetic
 public import DescriptiveComplexity.Counting.Sized
 public import DescriptiveComplexity.Counting.Class
 public import Mathlib.Data.Set.Finite.Lemmas
+public import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # #Steiner Tree: counting the Steiner sets of the threshold size

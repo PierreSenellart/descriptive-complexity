@@ -5,10 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Exponential.Expansion
 public import DescriptiveComplexity.Exponential.Copies
 public import DescriptiveComplexity.Problems.Epr.Small
+import Mathlib.Tactic.FinCases
 
 /-!
 # The expansion whose points are the relations on the instance

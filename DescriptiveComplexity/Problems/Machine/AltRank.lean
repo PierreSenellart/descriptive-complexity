@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltGame
+import DescriptiveComplexity.Problems.Machine.Program
+import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Walking the positions, and reading a play off a walk

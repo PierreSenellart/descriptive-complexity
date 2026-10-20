@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.FinSat.Invented
 public import DescriptiveComplexity.RecursivelyEnumerable
+import Mathlib.Tactic.FinCases
 
 /-!
 # FINSAT is in RE

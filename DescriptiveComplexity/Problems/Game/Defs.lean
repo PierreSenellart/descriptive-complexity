@@ -5,8 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Vocabulary
-public import DescriptiveComplexity.Interpretation
+import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Interpretation
 public import DescriptiveComplexity.Problems.Reachability
 
 /-!

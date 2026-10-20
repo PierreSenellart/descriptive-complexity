@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawGeom
-public import DescriptiveComplexity.Exponential.Expansion
+import DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # Encoding the points of an expansion as block values

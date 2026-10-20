@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
 public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #Independent Set and #Vertex Cover

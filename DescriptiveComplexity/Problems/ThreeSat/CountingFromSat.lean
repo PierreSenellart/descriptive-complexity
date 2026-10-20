@@ -5,12 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.OccurrenceFormulas
+import DescriptiveComplexity.OccurrenceFormulas
 public import DescriptiveComplexity.OccurrencePrefix
 public import DescriptiveComplexity.Problems.ThreeSat.Counting
 public import DescriptiveComplexity.Problems.Sat.CountingHardness
-public import Mathlib.Data.Fintype.Pigeonhole
-public import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Data.Fintype.Pigeonhole
+import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Tactic.FinCases
 
 /-!
 # #SAT reduces parsimoniously to #3SAT

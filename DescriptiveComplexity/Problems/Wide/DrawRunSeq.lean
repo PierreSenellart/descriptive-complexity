@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSeq
-public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The sequencer's run

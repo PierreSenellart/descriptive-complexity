@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Block
-public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedComposition
 
 /-!
 # Exponential expansions: reading a structure over its second-order objects

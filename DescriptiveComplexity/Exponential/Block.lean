@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.SecondOrderBlockHom
-public import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+import DescriptiveComplexity.SecondOrderTransitiveClosurePull
 
 /-!
 # Independent copies of a second-order block

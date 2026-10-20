@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
-public import DescriptiveComplexity.Problems.ThreeDimMatching.Membership
+import DescriptiveComplexity.Problems.ThreeDimMatching.Defs
+import DescriptiveComplexity.Problems.ThreeDimMatching.Membership
 public import DescriptiveComplexity.Problems.ThreeDimMatching.Hardness
-public import DescriptiveComplexity.Problems.Sat.Hardness
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Problems.Sat.Hardness
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # 3-dimensional matching

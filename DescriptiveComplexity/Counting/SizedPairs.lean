@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Sized
+import Mathlib.Tactic.FinCases
 
 /-!
 # Counting the solutions of exactly the threshold size, for sets of pairs

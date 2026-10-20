@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRunVar
-public import DescriptiveComplexity.Problems.Wide.Roam
+import DescriptiveComplexity.Problems.Wide.Roam
+public import DescriptiveComplexity.Problems.Wide.DrawAddr
 
 /-!
 # The VAL loop's enumeration

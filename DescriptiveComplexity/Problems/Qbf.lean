@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qbf.Defs
-public import DescriptiveComplexity.Problems.Qbf.Membership
-public import DescriptiveComplexity.Problems.Qbf.Transfer
-public import DescriptiveComplexity.Problems.Qbf.Hardness
+import DescriptiveComplexity.Problems.Qbf.Membership
+import DescriptiveComplexity.Problems.Qbf.Transfer
+import DescriptiveComplexity.Problems.Qbf.Hardness
 
 /-!
 # QBF: quantified Boolean formulas with bounded alternation

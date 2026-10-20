@@ -7,7 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.SetFamily.CountingPacking
 public import DescriptiveComplexity.Problems.SetFamily.Reductions
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Counting.Sized
 
 /-!
 # #Set Cover and #Hitting Set

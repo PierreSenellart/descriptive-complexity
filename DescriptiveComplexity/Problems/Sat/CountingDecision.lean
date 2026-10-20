@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Sat.CountingHardness
+import DescriptiveComplexity.Problems.Sat.CountingHardness
 public import DescriptiveComplexity.Problems.Machine.CountingHardness
 public import DescriptiveComplexity.Counting.DecisionClasses
 

@@ -6,8 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Feedback.SplitBundle
-public import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
+import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Tactic.FinCases
 
 /-!
 # #Feedback Arc Set is parsimoniously `#P`-complete

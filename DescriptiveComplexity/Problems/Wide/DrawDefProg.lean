@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefVar
-public import DescriptiveComplexity.Problems.Wide.DrawVar
-public import DescriptiveComplexity.Problems.Wide.DrawRound
+import DescriptiveComplexity.Problems.Wide.DrawVar
+import DescriptiveComplexity.Problems.Wide.DrawRound
 
 /-!
 # The last four layers, and the program's own kits

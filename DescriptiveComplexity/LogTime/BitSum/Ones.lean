@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitSum.Counter
+public import Mathlib.Data.Nat.Bitwise
 
 /-!
 # Counting ones, and the two atoms level 3 counts with

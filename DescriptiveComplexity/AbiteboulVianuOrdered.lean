@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.FixedPointInflationaryLFP
+import DescriptiveComplexity.FixedPointInflationaryLFP
 public import DescriptiveComplexity.FixedPointPartialMachine
 
 /-!

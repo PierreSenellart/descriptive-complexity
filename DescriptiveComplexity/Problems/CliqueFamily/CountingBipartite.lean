@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
 public import DescriptiveComplexity.Problems.CliqueFamily.Stretch
+import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Vocabulary
+import Mathlib.Tactic.FinCases
 
 /-!
 # #BIS and #PP2DNF: counting the independent sets of a bipartite graph

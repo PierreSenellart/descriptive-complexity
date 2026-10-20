@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Feedback.Defs
+import DescriptiveComplexity.Problems.Feedback.Defs
 public import DescriptiveComplexity.Problems.Feedback.Reductions
-public import DescriptiveComplexity.Problems.Feedback.Membership
+import DescriptiveComplexity.Problems.Feedback.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily
-public import DescriptiveComplexity.Composition
+import DescriptiveComplexity.Composition
 
 /-!
 # The feedback problems are NP-complete

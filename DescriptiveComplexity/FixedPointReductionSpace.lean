@@ -5,8 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.FixedPointStratifyPartial
-public import DescriptiveComplexity.FixedPointPartialMachine
+import DescriptiveComplexity.FixedPointStratifyPartial
+import DescriptiveComplexity.FixedPointPartialMachine
 public import DescriptiveComplexity.FixedPointReductionHierarchy
 
 /-!

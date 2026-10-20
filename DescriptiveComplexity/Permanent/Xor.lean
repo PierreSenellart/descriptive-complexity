@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Permanent.Attach
 public import Mathlib.Data.Fin.VecNotation
+import Mathlib.Tactic.Ring.RingNF
 
 /-!
 # Valiant's XOR gadget

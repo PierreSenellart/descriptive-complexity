@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Simulate
-public import DescriptiveComplexity.Exponential.Trivialize
+import DescriptiveComplexity.Exponential.Trivialize
 public import DescriptiveComplexity.Exponential.Reach
-public import DescriptiveComplexity.HeadCapture
+import DescriptiveComplexity.HeadCapture
 
 /-!
 # The operator pinned: `PSPACE = NL.exp`

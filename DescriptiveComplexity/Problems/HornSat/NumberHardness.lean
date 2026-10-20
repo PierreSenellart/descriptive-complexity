@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.HornSat.Number
-public import DescriptiveComplexity.Problems.HornSat.Hardness
+import DescriptiveComplexity.Problems.HornSat.Hardness
 public import DescriptiveComplexity.Problems.CircuitNumber.Hardness
 
 /-!

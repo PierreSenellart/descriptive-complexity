@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.Cvp.Defs
 public import DescriptiveComplexity.Counting
 public import Mathlib.Algebra.BigOperators.Finprod
 public import Mathlib.SetTheory.Cardinal.Finite
+import DescriptiveComplexity.Vocabulary
 
 /-!
 # The number written by a circuit: definition

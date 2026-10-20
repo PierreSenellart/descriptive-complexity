@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Interpretation
-public import Mathlib.Logic.Equiv.Fin.Basic
+import Mathlib.Logic.Equiv.Fin.Basic
 
 /-!
 # Composition of first-order reductions (transitivity)

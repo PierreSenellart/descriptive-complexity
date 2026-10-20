@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.CircuitNumber.Membership
 public import DescriptiveComplexity.Problems.CircuitNumber.Hardness
-public import DescriptiveComplexity.Problems.CircuitNumber.Junk
-public import DescriptiveComplexity.Counting.Digits.NormalForm
+import DescriptiveComplexity.Problems.CircuitNumber.Junk
+import DescriptiveComplexity.Counting.Digits.NormalForm
 
 /-!
 # The number written by a circuit is complete for FP

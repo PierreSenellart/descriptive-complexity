@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannel
 public import DescriptiveComplexity.Problems.Wide.Membership
+import DescriptiveComplexity.Problems.Machine.Membership
 
 /-!
 # The register channel, as an expansion

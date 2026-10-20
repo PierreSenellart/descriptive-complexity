@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.SecondOrderNewCount
+import DescriptiveComplexity.SecondOrderNewCount
 public import DescriptiveComplexity.SecondOrderNew
 
 /-!

@@ -6,10 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Computability.REPred
-public import DescriptiveComplexity.Computability.Reduction
-public import DescriptiveComplexity.Problems.Machine
+import DescriptiveComplexity.Computability.Reduction
+import DescriptiveComplexity.Problems.Machine
 public import DescriptiveComplexity.Problems.Machine.HaltMem
-public import DescriptiveComplexity.Problems.FinSat
+import DescriptiveComplexity.Problems.FinSat
 
 /-!
 # The catalog's vocabularies, presented

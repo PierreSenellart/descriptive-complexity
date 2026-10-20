@@ -8,7 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Taut
 public import DescriptiveComplexity.Problems.Sat.CountingHardness
 public import DescriptiveComplexity.Counting.Reduction
-public import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Syntax
 
 /-!
 # #DNF: counting the models of a DNF formula

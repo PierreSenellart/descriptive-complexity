@@ -5,9 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.AltMatrix
 public import DescriptiveComplexity.Problems.Machine.AltDefs
+import Mathlib.Tactic.FinCases
 
 /-!
 # The `Σₖ` kernel of alternating acceptance

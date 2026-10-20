@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Invariant.Structure
 public import DescriptiveComplexity.FixedPointPartial
-public import DescriptiveComplexity.Composition
+import DescriptiveComplexity.Composition
 
 /-!
 # Simulating a `k`-variable induction on the invariant structure

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Sat
-public import Mathlib.Data.Set.Finite.Lemmas
+import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # Literal occurrences of a CNF structure, ordered

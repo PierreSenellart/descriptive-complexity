@@ -14,6 +14,7 @@ public import DescriptiveComplexity.Problems.TwoSat
 public import DescriptiveComplexity.FirstOrderPull
 public import DescriptiveComplexity.ArithmeticDefinable
 public import DescriptiveComplexity.LogTime
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # EVEN: the parity of a bare set

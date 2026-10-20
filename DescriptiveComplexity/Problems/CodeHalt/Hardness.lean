@@ -7,7 +7,7 @@ module
 
 public import Mathlib.Computability.RE
 public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Draw
-public import DescriptiveComplexity.RecursivelyEnumerable
+import DescriptiveComplexity.RecursivelyEnumerable
 
 /-!
 # Every semi-decidable problem reduces to CODEHALT

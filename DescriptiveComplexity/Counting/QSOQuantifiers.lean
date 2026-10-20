@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.QSOWitness
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
+import Mathlib.Tactic.FinCases
 
 /-!
 # First-order sums and products of witness counts

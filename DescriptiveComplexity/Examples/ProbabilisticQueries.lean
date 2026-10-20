@@ -23,6 +23,8 @@ public import DescriptiveComplexity.Counting.WeightedTerms
 meta import DescriptiveComplexity.Counting.WeightedTerms
 public import DescriptiveComplexity.Counting.FP
 meta import DescriptiveComplexity.Counting.FP
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Counting.Independence
 
 /-!
 # Worked example: query evaluation over probabilistic databases

@@ -5,11 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Hamilton.Defs
 public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 public import DescriptiveComplexity.Relativized
 public import DescriptiveComplexity.OrderWalk
+import Mathlib.Tactic.FinCases
 
 /-!
 # The Vertex Cover → Hamilton Circuit gadget interpretation

@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
 public import DescriptiveComplexity.Problems.Wide.DrawIxPack
 public import DescriptiveComplexity.Problems.Wide.DrawSpineSem
-public import DescriptiveComplexity.Problems.Wide.DrawIxEval
+import DescriptiveComplexity.Problems.Wide.DrawIxEval
 
 /-!
 # What the spine does to the tape, at an arbitrary file

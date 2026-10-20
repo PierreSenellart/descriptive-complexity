@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Data.Set.Card
-public import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Numbers.DigitExtract
+import Mathlib.Tactic.NormNum.Core
 
 /-!
 # Pendant leaves: the independent sets of one size, read off a digit

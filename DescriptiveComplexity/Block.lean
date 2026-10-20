@@ -6,8 +6,11 @@ Authors: Pierre Senellart
 module
 
 public meta import Lean.Elab.Command
-public import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.SecondOrder
 public meta import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Vocabulary
+import Lean.Exception
+import Lean.ResolveName
 
 /-!
 # Declaring a second-order block

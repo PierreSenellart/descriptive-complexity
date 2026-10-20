@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.SecondOrderPull
-public import DescriptiveComplexity.SecondOrderLift
-public import DescriptiveComplexity.OrderedComposition
-public import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.SecondOrderLift
+import DescriptiveComplexity.OrderedComposition
+import Mathlib.Tactic.FinCases
 
 /-!
 # Closure of second-order definability under ordered FO reductions

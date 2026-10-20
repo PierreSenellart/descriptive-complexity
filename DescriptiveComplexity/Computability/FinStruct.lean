@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Computability.Primrec.List
-public import DescriptiveComplexity.Computability.Realize
+import DescriptiveComplexity.Computability.Realize
 public import DescriptiveComplexity.Interpretation
-public import Mathlib.Data.List.GetD
+import Mathlib.Data.List.GetD
 
 /-!
 # Finite structures as concrete data

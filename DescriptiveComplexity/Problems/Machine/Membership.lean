@@ -5,11 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.Walk
 public import DescriptiveComplexity.Problems.Machine.Defs
-public import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.SecondOrder
 public import DescriptiveComplexity.Hierarchy
+import Mathlib.Tactic.FinCases
 
 /-!
 # Machine acceptance is existential second-order definable

@@ -5,8 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Block
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Knapsack.Chain
 public import DescriptiveComplexity.SecondOrder
 

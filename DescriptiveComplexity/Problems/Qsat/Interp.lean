@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Qsat.Tags
 public import DescriptiveComplexity.Problems.Qsat.Defs
 public import DescriptiveComplexity.Padding

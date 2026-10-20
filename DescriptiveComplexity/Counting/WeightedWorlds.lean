@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Counting.PossibleWorlds
 public import DescriptiveComplexity.Numbers.BinCount
 public import DescriptiveComplexity.Counting.Probability
-public import Mathlib.Algebra.BigOperators.Finprod
+import Mathlib.Algebra.BigOperators.Finprod
 
 /-!
 # Counting weighted possible worlds

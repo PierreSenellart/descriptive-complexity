@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.FixedPointExpand
+import DescriptiveComplexity.FixedPointExpand
 public import DescriptiveComplexity.FixedPointReductionComposition
-public import DescriptiveComplexity.SecondOrderRelPull
+import DescriptiveComplexity.SecondOrderRelPull
 
 /-!
 # The classes are closed under FO(LFP) reductions

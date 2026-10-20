@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawScan
-public import DescriptiveComplexity.Problems.Wide.DrawSub
+import DescriptiveComplexity.Problems.Wide.DrawSub
 
 /-!
 # Reading one named register bit

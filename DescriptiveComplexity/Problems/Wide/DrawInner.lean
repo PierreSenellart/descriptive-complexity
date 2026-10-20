@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Bridge
-public import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.OrderWalk
+import Mathlib.Tactic.Monotonicity.Basic
 
 /-!
 # The fold on a final segment of the blocks

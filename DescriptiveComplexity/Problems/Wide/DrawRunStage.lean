@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
 public import DescriptiveComplexity.Problems.Wide.DrawBack
-public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The stage atom's run

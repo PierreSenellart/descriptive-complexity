@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.LogTime.BitSum.Columns
 public import DescriptiveComplexity.LogTime.BitSum.Level1
-public import DescriptiveComplexity.LogTime.Small
+import DescriptiveComplexity.LogTime.Small
+import DescriptiveComplexity.LogTime.Fields
 
 /-!
 # `TIMES` from `BSUM`: multiplication of ranks, in the bit logic

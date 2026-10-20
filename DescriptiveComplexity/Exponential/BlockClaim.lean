@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Copies
-public import DescriptiveComplexity.Composition
+import DescriptiveComplexity.Composition
 
 /-!
 # Claiming the block atoms of a quantifier-free matrix

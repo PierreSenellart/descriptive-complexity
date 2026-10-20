@@ -8,9 +8,11 @@ module
 public import DescriptiveComplexity.Problems.JobSequencing.Schedule
 public import DescriptiveComplexity.Problems.NaeThreeSat
 public import DescriptiveComplexity.OccurrenceSlack
-public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedComposition
 public import DescriptiveComplexity.Numbers.Digits
-public import DescriptiveComplexity.Padding
+import DescriptiveComplexity.Padding
+import Mathlib.Tactic.FinCases
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Job sequencing is NP-hard

@@ -7,8 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Grid
 public import DescriptiveComplexity.Problems.Wide.TrackWrites
-public import DescriptiveComplexity.Problems.Wide.Roam
-public import DescriptiveComplexity.Problems.Wide.LowFile
+import DescriptiveComplexity.Problems.Wide.Roam
+import DescriptiveComplexity.Problems.Wide.LowFile
 
 /-!
 # A run, read as a table of tiles

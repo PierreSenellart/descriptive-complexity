@@ -7,13 +7,13 @@ module
 
 public import DescriptiveComplexity.Decoding
 meta import DescriptiveComplexity.Decoding
-public import DescriptiveComplexity.Numbers.Binary
+import DescriptiveComplexity.Numbers.Binary
 meta import DescriptiveComplexity.Numbers.Binary
 public import DescriptiveComplexity.Numbers.BinEnum
 meta import DescriptiveComplexity.Numbers.BinEnum
 public import DescriptiveComplexity.Problems.Knapsack.Defs
 meta import DescriptiveComplexity.Problems.Knapsack.Defs
-public import Mathlib.Algebra.Order.BigOperators.Group.List
+import Mathlib.Algebra.Order.BigOperators.Group.List
 meta import Mathlib.Algebra.Order.BigOperators.Group.List
 
 /-!

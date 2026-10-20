@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.HeadEval
+public import Mathlib.SetTheory.Cardinal.NatCard
 
 /-!
 # The capture theorem for NL: FO(TC) is what a multi-head automaton recognizes

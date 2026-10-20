@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTuple
-public import DescriptiveComplexity.Problems.Wide.DrawSites
-public import DescriptiveComplexity.Problems.Wide.DrawReset
+import DescriptiveComplexity.Problems.Wide.DrawSites
+import DescriptiveComplexity.Problems.Wide.DrawReset
 
 /-!
 # The stage atom's machinery: a random access

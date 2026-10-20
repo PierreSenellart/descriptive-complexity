@@ -8,7 +8,7 @@ module
 public import DescriptiveComplexity.Problems.ExactCover
 public import DescriptiveComplexity.Problems.SetFamily.Counting
 public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
 
 /-!
 # #ExactCover is parsimoniously `#P`-complete

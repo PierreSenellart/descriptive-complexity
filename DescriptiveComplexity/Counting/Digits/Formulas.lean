@@ -5,7 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Counting.Digits.Tower
+import DescriptiveComplexity.Counting.Digits.Tower
+public import DescriptiveComplexity.Counting.Digits.SetArith
+import DescriptiveComplexity.OrderWalk
+import Mathlib.Order.PiLex
 
 /-!
 # Arithmetic on numbers given by formulas

@@ -5,8 +5,8 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.Finset.Sort
-public import Mathlib.Data.List.Forall2
+import Mathlib.Data.Finset.Sort
+import Mathlib.Data.List.Forall2
 public import DescriptiveComplexity.Numbers.BinRel
 
 /-!

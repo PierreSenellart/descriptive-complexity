@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawData
 public import DescriptiveComplexity.Problems.Wide.DrawTripKits
-public import DescriptiveComplexity.Problems.Wide.DrawIncrKit
+import DescriptiveComplexity.Problems.Wide.DrawIncrKit
 public import DescriptiveComplexity.Problems.Wide.DrawSweepKit
 public import DescriptiveComplexity.Problems.Wide.DrawAdvKit
 public import DescriptiveComplexity.Problems.Wide.DrawSeekKit

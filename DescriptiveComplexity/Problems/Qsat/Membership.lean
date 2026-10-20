@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Data.Set.Card
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Qsat.Defs
 
 /-!

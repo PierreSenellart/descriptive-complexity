@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.DetLogSpace
 public import DescriptiveComplexity.OrderWalk
-public import DescriptiveComplexity.Padding
+import DescriptiveComplexity.Padding
 
 /-!
 # Two-way multi-head automata over a structure

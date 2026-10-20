@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Card
 
 /-!
 # Surjectivity from a flip

@@ -8,6 +8,7 @@ module
 public import Mathlib.Data.Fintype.Lattice
 public import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
 public import DescriptiveComplexity.Problems.Machine.Defs
+public import Mathlib.Tactic.FinCases
 
 /-!
 # Drawing the domino system of a machine

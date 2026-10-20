@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Block
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Coloring.Defs
-public import DescriptiveComplexity.SecondOrder
+import DescriptiveComplexity.SecondOrder
 
 /-!
 # The coloring family is existential second-order definable

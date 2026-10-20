@@ -6,9 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.QsatInterp
-public import DescriptiveComplexity.Problems.Machine.SpaceDet
-public import DescriptiveComplexity.Problems.Machine.Space
-public import DescriptiveComplexity.Problems.Qsat
+import DescriptiveComplexity.Problems.Machine.SpaceDet
+import DescriptiveComplexity.Problems.Machine.Space
+import DescriptiveComplexity.Problems.Qsat
+import DescriptiveComplexity.Problems.Qsat.Hardness
 
 /-!
 # The space-bounded machine problems are PSPACE-complete

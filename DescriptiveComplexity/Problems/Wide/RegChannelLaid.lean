@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannel
-public import DescriptiveComplexity.Problems.Wide.DrawBack
-public import DescriptiveComplexity.Problems.Wide.LowFile
+import DescriptiveComplexity.Problems.Wide.DrawBack
+import DescriptiveComplexity.Problems.Wide.LowFile
 public import DescriptiveComplexity.Problems.Wide.DrawName
 
 /-!

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Quantitative
-public import DescriptiveComplexity.Padding
+import DescriptiveComplexity.Padding
 
 /-!
 # The size of the value of a quantitative term

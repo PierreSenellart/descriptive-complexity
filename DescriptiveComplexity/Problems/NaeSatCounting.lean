@@ -5,11 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.NaeSat
+import DescriptiveComplexity.Problems.NaeSat
 public import DescriptiveComplexity.Problems.SetSplitting
 public import DescriptiveComplexity.Problems.SetFamily.Counting
 public import DescriptiveComplexity.Problems.Sat.CountingDnf
-public import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Numbers.DigitExtract
+import Mathlib.Tactic.FinCases
 
 /-!
 # #NAE-SAT and #Set Splitting

@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
-public import DescriptiveComplexity.Problems.Wide.DrawValEnum
-public import Mathlib.Data.Nat.Log
+import DescriptiveComplexity.Problems.Wide.DrawValEnum
+import Mathlib.Data.Nat.Log
 
 /-!
 # The rounds of the evaluation, counted over the handed file

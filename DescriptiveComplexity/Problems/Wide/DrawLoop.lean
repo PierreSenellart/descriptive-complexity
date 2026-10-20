@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Machines
 public import DescriptiveComplexity.OrderWalk
-public import Mathlib.Logic.Relation
+import Mathlib.Logic.Relation
 
 /-!
 # Loops in the control: runs indexed by a finite linear order

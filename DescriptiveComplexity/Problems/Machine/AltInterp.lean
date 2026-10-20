@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.AltRounds
 public import DescriptiveComplexity.Problems.Machine.AltDefs
-public import DescriptiveComplexity.OrderedComposition
+import DescriptiveComplexity.OrderedComposition
 
 /-!
 # The machine of a formula, written in first-order logic

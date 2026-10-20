@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Sat.CountingDnf
 public import DescriptiveComplexity.Counting.Subtractive
+public import DescriptiveComplexity.Syntax
 
 /-!
 # #DNF is `#P`-complete

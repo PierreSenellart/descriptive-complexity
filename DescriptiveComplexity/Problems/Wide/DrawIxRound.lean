@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxSeq
-public import DescriptiveComplexity.Problems.Wide.DrawIxIGate
+import DescriptiveComplexity.Problems.Wide.DrawIxIGate
 public import DescriptiveComplexity.Problems.Wide.DrawInstRound
 
 /-!

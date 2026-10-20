@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.OneInSat.Slots
-public import DescriptiveComplexity.Problems.ThreeSat.Defs
+import DescriptiveComplexity.Problems.ThreeSat.Defs
+public import DescriptiveComplexity.Problems.OneInSat.Defs
 
 /-!
 # 3SAT ordered-FO-reduces to 1-in-SAT

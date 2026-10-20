@@ -5,8 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.MachineAltSpace.Guards
+import Mathlib.Tactic.FinCases
 
 /-!
 # The configuration block, and the four sentences of the machine

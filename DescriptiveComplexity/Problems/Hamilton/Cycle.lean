@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Hamilton.Defs
-public import Mathlib.Order.Fin.Basic
-public import Mathlib.Data.Fintype.Sort
+import Mathlib.Order.Fin.Basic
+import Mathlib.Data.Fintype.Sort
 
 /-!
 # A tour is a cyclic enumeration

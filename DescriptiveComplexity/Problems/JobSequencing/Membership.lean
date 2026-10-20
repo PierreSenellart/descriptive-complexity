@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.JobSequencing.Kernel
+public import DescriptiveComplexity.Problems.Knapsack.Chain
 
 /-!
 # Job sequencing is in NP

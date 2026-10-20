@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.DrawIxExp
+import DescriptiveComplexity.Problems.Wide.DrawIxExp
 public import DescriptiveComplexity.Problems.Wide.DrawInstGate
 
 /-!

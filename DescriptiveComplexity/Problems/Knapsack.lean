@@ -5,12 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Knapsack.Defs
-public import DescriptiveComplexity.Problems.Knapsack.Chain
-public import DescriptiveComplexity.Problems.Knapsack.Membership
+import DescriptiveComplexity.Problems.Knapsack.Defs
+import DescriptiveComplexity.Problems.Knapsack.Chain
+import DescriptiveComplexity.Problems.Knapsack.Membership
 public import DescriptiveComplexity.Problems.Knapsack.Hardness
-public import DescriptiveComplexity.Problems.ExactCover
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Problems.ExactCover
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # Knapsack

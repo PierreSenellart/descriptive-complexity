@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Problems.Even
-public import DescriptiveComplexity.DetLogSpace
-public import DescriptiveComplexity.TransitiveClosurePull
+import DescriptiveComplexity.DetLogSpace
+import DescriptiveComplexity.TransitiveClosurePull
 
 /-!
 # PARITY: the parity of a marked subset

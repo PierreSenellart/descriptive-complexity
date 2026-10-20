@@ -5,12 +5,12 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Ring.Finset
-public import Mathlib.Algebra.Order.BigOperators.Group.Finset
-public import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Data.Fintype.BigOperators
 public import Mathlib.SetTheory.Cardinal.Finite
-public import Mathlib.Algebra.Group.Action.Defs
-public import Mathlib.Tactic.Ring
+import Mathlib.Algebra.Group.Action.Defs
+import Mathlib.Tactic.Ring
 
 /-!
 # Reading a count off a digit

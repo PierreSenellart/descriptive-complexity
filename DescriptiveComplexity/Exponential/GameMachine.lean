@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Exponential.GameCtrl
 public import DescriptiveComplexity.MachinesAltSpace
 public import DescriptiveComplexity.Problems.Machine.Walk
+public import DescriptiveComplexity.Exponential.GameTape
+public import DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The machine of a second-order game

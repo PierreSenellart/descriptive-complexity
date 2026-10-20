@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.HornSat.Unsat
-public import DescriptiveComplexity.FixedPointOrderTransfer
+import DescriptiveComplexity.FixedPointOrderTransfer
 public import DescriptiveComplexity.Counting
-public import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Vocabulary
 public import Mathlib.Algebra.BigOperators.Finprod
 
 /-!

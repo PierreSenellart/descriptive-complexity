@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Iterate
-public import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.Pi
 
 /-!
 # The `k`-pebble refinement, over an abstract initial relation

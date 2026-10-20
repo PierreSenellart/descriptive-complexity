@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.SetFamily.Membership
 public import DescriptiveComplexity.Counting.Class
+import Mathlib.Tactic.FinCases
 
 /-!
 # #ExactCover: counting exact covers

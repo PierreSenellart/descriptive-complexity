@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.HaltHard
 public import DescriptiveComplexity.Problems.Pcp.Hardness
-public import DescriptiveComplexity.Problems.Pcp.Membership
+import DescriptiveComplexity.Problems.Pcp.Membership
+import DescriptiveComplexity.Computability.CodeHalt
 
 /-!
 # Post's correspondence problem is RE-complete

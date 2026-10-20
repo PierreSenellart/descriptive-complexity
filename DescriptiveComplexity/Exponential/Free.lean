@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.Exponential.Class
 public import DescriptiveComplexity.PSpace
-public import DescriptiveComplexity.SecondOrderTransitiveClosureFree
+import DescriptiveComplexity.SecondOrderTransitiveClosureFree
+import Mathlib.Tactic.FinCases
 
 /-!
 # Exponential expansions that see no order

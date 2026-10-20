@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.Nat.Bitwise
+import Mathlib.Data.Nat.Bitwise
 public import Mathlib.Data.Nat.Log
-public import Mathlib.Data.Nat.Prime.Basic
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Nat.Prime.Basic
+import Mathlib.Data.Fintype.Lattice
 public import DescriptiveComplexity.LogTime.Definable
 
 /-!

@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
+public import Mathlib.Data.Fintype.Sort
 
 /-!
 # The drawn instance draws the intended code

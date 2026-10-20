@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.TransitiveClosure
-public import DescriptiveComplexity.SecondOrderKrom
+import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.LogSpace
 
 /-!

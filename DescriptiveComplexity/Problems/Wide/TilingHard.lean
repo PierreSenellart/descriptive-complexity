@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Draw
-public import DescriptiveComplexity.Problems.Wide.TilingHard.No
-public import DescriptiveComplexity.Problems.Wide.TilingExp
+import DescriptiveComplexity.Problems.Wide.TilingHard.No
+import DescriptiveComplexity.Problems.Wide.TilingExp
 public import DescriptiveComplexity.Problems.Wide.RegChannelReduce
 
 /-!

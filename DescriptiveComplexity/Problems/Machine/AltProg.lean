@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Machine.AltTape
 public import DescriptiveComplexity.Problems.Qbf.Defs
 public import DescriptiveComplexity.MachinesAlt
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The machine of a quantified Boolean formula

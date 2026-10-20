@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.QsatProgram
+import Mathlib.Tactic.FinCases
 
 /-!
 # The geometry of the QBF machine's tape

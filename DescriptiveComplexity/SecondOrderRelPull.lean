@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FixedPointStepRel
-public import DescriptiveComplexity.SecondOrderOrdered
+import DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # Second-order definability pulls back through a relativized interpretation

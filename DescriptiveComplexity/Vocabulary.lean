@@ -7,7 +7,16 @@ module
 
 public meta import Lean.Elab.Command
 public import Mathlib.ModelTheory.Syntax
-public import Mathlib.ModelTheory.Semantics
+import Mathlib.ModelTheory.Semantics
+public import Lean.CoreM
+public import Lean.Data.Name
+public import Lean.Data.OpenDecl
+public import Lean.Declaration
+public import Lean.Elab.Util
+public import Lean.Environment
+public import Lean.Exception
+public import Lean.Expr
+public import Lean.ResolveName
 
 /-!
 # Declaring a vocabulary

@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Qbf.Defs
 public import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.Padding

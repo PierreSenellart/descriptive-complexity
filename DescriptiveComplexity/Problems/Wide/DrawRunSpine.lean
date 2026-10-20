@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.DrawRunOuter
+import DescriptiveComplexity.Problems.Wide.DrawRunOuter
 public import DescriptiveComplexity.Problems.Wide.DrawSpineSem
 
 /-!

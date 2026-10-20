@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Fintype.Lattice
 public import DescriptiveComplexity.Complexity
 
 /-!

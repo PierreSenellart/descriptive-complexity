@@ -5,12 +5,14 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.NexBuild
-public import DescriptiveComplexity.Problems.Wide.NexGuess
+import DescriptiveComplexity.Problems.Wide.NexBuild
+import DescriptiveComplexity.Problems.Wide.NexGuess
 public import DescriptiveComplexity.Problems.Wide.NexDet
 public import DescriptiveComplexity.Problems.Wide.DrawInit
 public import DescriptiveComplexity.Problems.Wide.NexEval
-public import DescriptiveComplexity.Problems.Wide.DrawRegion
+import DescriptiveComplexity.Problems.Wide.DrawRegion
+public import DescriptiveComplexity.Problems.Wide.DrawAddr
+import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The clocked program's whole run, and its clock

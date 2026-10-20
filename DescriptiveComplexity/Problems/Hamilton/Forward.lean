@@ -5,12 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Hamilton.Cycle
+import DescriptiveComplexity.Problems.Hamilton.Cycle
 public import DescriptiveComplexity.Problems.Hamilton.Gadget
-public import Mathlib.Data.List.NodupEquivFin
-public import Mathlib.Data.List.Chain
+import Mathlib.Data.List.NodupEquivFin
+import Mathlib.Data.List.Chain
 public import Mathlib.Data.Finset.Sort
-public import Mathlib.Data.Fintype.Lattice
+import Mathlib.Data.Fintype.Lattice
+import Mathlib.Tactic.FinCases
 
 /-!
 # A Hamilton circuit presented as a cyclic list

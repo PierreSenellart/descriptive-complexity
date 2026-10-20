@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameKernel
-public import DescriptiveComplexity.Exponential.GameNode
+import DescriptiveComplexity.Exponential.GameNode
+import Mathlib.Tactic.FinCases
 
 /-!
 # The six questions an interpreted AND/OR graph asks, and their kernels

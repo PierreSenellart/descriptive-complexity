@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.ParamFormula
 public import DescriptiveComplexity.Exponential.Block
-public import DescriptiveComplexity.Ordered
+import DescriptiveComplexity.Ordered
 
 /-!
 # Reading an expansion's defining sentences through the meanings

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Marks
-public import DescriptiveComplexity.Problems.Wide.Blocks
+import DescriptiveComplexity.Problems.Wide.Blocks
 
 /-!
 # The universe the EXPSPACE reduction draws

@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Bridge
 public import DescriptiveComplexity.OrderedComposition
-public import DescriptiveComplexity.Numbers.BinRel
+import DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # The order key a reduction writes is the block-major one

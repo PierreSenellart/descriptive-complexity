@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.ClauseDischarge
 public import DescriptiveComplexity.Problems.TwoSat.Defs
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # Hardness of 2SAT: the Krom discharge

@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.BigOperators.Ring.Finset
 public import DescriptiveComplexity.LogTime.BitSum.Sum
-public import Mathlib.Algebra.Group.Action.Defs
+import Mathlib.Algebra.Group.Action.Defs
 
 /-!
 # The columns of a product, and the carry chain that adds one block of them

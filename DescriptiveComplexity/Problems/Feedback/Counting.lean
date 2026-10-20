@@ -5,12 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Block
-public import DescriptiveComplexity.Syntax
+import DescriptiveComplexity.Block
+import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Feedback.Reductions
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
-public import DescriptiveComplexity.Counting.Sized
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Sized
+import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Tactic.FinCases
 
 /-!
 # #Feedback Vertex Set

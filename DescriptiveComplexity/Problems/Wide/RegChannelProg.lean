@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.RegChannelLaid
+import DescriptiveComplexity.Problems.Wide.RegChannelLaid
 public import DescriptiveComplexity.Problems.Wide.NexInterp
 public import DescriptiveComplexity.Problems.Wide.RegChannelInit
-public import DescriptiveComplexity.Problems.Wide.NexRun
+import DescriptiveComplexity.Problems.Wide.NexRun
 
 /-!
 # The clocked program of a reduction into the register channel

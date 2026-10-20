@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Hamilton.Counting
-public import Mathlib.GroupTheory.Perm.Cycle.Basic
-public import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.GroupTheory.Perm.Cycle.Basic
+import Mathlib.GroupTheory.OrderOfElement
 
 /-!
 # Circuits, locally and from a potential

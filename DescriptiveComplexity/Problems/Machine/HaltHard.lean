@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Machine.HaltHard.Correct
-public import DescriptiveComplexity.Problems.Machine.HaltMem
-public import DescriptiveComplexity.Problems.FinSat
+import DescriptiveComplexity.Problems.Machine.HaltHard.Correct
+import DescriptiveComplexity.Problems.Machine.HaltMem
+import DescriptiveComplexity.Problems.FinSat
 public import DescriptiveComplexity.Computability.Catalog
-public import DescriptiveComplexity.Computability.CodeHalt
+import DescriptiveComplexity.Computability.CodeHalt
 
 /-!
 # The halting problem is RE-complete

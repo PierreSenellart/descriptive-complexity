@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Data.Finset.Max
-public import Mathlib.Order.Interval.Finset.Defs
+import Mathlib.Order.Interval.Finset.Defs
+import Mathlib.Tactic.WLOG
 
 /-!
 # The cyclic successor on a finite set

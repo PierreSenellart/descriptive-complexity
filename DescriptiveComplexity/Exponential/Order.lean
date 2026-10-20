@@ -6,7 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Expansion
-public import DescriptiveComplexity.OrderWalk
+import DescriptiveComplexity.OrderWalk
+public import DescriptiveComplexity.OrderedComposition
 
 /-!
 # The order on an expanded universe

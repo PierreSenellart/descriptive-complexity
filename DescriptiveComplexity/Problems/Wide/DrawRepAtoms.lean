@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawAtoms
-public import DescriptiveComplexity.Exponential.Block
+import DescriptiveComplexity.Exponential.Block
 
 /-!
 # The atoms of a defining sentence, classified

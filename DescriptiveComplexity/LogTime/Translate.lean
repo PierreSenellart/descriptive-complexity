@@ -6,8 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.Small
-public import DescriptiveComplexity.LogTime.BitSum.Times
-public import DescriptiveComplexity.LogTime.Compile
+import DescriptiveComplexity.LogTime.BitSum.Times
+import DescriptiveComplexity.LogTime.Compile
+import DescriptiveComplexity.LogTime.Simulate
 
 /-!
 # `FO(≤, +, ×)` into the bit logic: the machine model is AC⁰

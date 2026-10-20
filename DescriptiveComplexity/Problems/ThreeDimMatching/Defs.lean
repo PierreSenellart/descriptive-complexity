@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Interpretation
 
 /-!

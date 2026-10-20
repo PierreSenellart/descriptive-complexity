@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting.QSOQuantifiers
 public import DescriptiveComplexity.Counting.Class
-public import Mathlib.Algebra.BigOperators.Ring.Finset
+import Mathlib.Algebra.BigOperators.Ring.Finset
 
 /-!
 # ΣQSO(FO) is the logic of `#P`

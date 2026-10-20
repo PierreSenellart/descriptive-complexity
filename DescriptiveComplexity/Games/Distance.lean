@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import Mathlib.Data.Fintype.EquivFin
-public import Mathlib.Data.Finset.Max
-public import Mathlib.Algebra.Order.GroupWithZero.Basic
+import Mathlib.Data.Fintype.EquivFin
+import Mathlib.Data.Finset.Max
+import Mathlib.Algebra.Order.GroupWithZero.Basic
 public import Mathlib.Tactic.Positivity
 
 /-!

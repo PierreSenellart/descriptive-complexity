@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import Mathlib.Computability.PartrecCode
-public import Mathlib.Data.Fintype.Sort
+import Mathlib.Data.Fintype.Sort
 public import DescriptiveComplexity.Computability.Eval
 
 /-!

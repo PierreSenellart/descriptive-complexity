@@ -5,9 +5,9 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Vocabulary
-public import DescriptiveComplexity.Interpretation
-public import DescriptiveComplexity.Numbers.Unary
+import DescriptiveComplexity.Vocabulary
+import DescriptiveComplexity.Interpretation
+import DescriptiveComplexity.Numbers.Unary
 public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!

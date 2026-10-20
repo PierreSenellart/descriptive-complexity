@@ -6,9 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.OneInSat.Counting
-public import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
+import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
 public import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
-public import DescriptiveComplexity.Counting.Subtractive
+import DescriptiveComplexity.Counting.Subtractive
+import Mathlib.Tactic.FinCases
 
 /-!
 # #SAT reduces parsimoniously to #1-in-SAT

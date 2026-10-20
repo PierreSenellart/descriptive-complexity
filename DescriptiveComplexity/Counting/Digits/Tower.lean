@@ -5,7 +5,7 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Counting.Digits.SetArith
+import DescriptiveComplexity.Counting.Digits.SetArith
 public import DescriptiveComplexity.FixedPointStratify
 
 /-!

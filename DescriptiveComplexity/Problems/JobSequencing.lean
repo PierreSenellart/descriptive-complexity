@@ -5,13 +5,13 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.JobSequencing.Defs
-public import DescriptiveComplexity.Problems.JobSequencing.Schedule
-public import DescriptiveComplexity.Problems.JobSequencing.Kernel
-public import DescriptiveComplexity.Problems.JobSequencing.Membership
+import DescriptiveComplexity.Problems.JobSequencing.Defs
+import DescriptiveComplexity.Problems.JobSequencing.Schedule
+import DescriptiveComplexity.Problems.JobSequencing.Kernel
+import DescriptiveComplexity.Problems.JobSequencing.Membership
 public import DescriptiveComplexity.Problems.JobSequencing.Hardness
-public import DescriptiveComplexity.Problems.NaeThreeSat
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Problems.NaeThreeSat
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # Job sequencing

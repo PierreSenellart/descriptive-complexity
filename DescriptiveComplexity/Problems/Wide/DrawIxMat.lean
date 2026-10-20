@@ -7,7 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxIGate
 public import DescriptiveComplexity.Problems.Wide.DrawIxStage
-public import DescriptiveComplexity.Problems.Wide.DrawInstMat
+import DescriptiveComplexity.Problems.Wide.DrawInstMat
+public import DescriptiveComplexity.Problems.Wide.DrawIxExp
 
 /-!
 # The matrix's stages at an arbitrary file

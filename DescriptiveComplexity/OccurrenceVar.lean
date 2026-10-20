@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.OccurrenceFormulas
+public import Mathlib.Data.Set.Finite.Lemmas
 
 /-!
 # The occurrences of a variable, cyclically ordered

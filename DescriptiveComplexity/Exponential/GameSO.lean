@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Game
-public import DescriptiveComplexity.Exponential.TagBits
-public import DescriptiveComplexity.SecondOrderMerge
+import DescriptiveComplexity.Exponential.TagBits
+import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.Exponential.PSpaceOn
 
 /-!

@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTagged
-public import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import DescriptiveComplexity.Problems.Wide.DrawRunElem
 
 /-!
 # The tag-branched machinery's run

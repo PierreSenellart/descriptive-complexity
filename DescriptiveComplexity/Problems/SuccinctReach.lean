@@ -6,9 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.SuccinctReach.Defs
-public import DescriptiveComplexity.Problems.SuccinctReach.Membership
-public import DescriptiveComplexity.Problems.SuccinctReach.Double
-public import DescriptiveComplexity.Problems.SuccinctReach.Hardness
+import DescriptiveComplexity.Problems.SuccinctReach.Membership
+import DescriptiveComplexity.Problems.SuccinctReach.Double
+import DescriptiveComplexity.Problems.SuccinctReach.Hardness
 
 /-!
 # SUCCINCT-REACH: reachability in a propositionally described transition system

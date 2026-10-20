@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.MachineNumber.Defs
 public import DescriptiveComplexity.Problems.Machine.Fixpoint
 public import DescriptiveComplexity.Problems.CircuitNumber.Membership
+import Mathlib.Tactic.FinCases
+import DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # The number written by a machine is in FP

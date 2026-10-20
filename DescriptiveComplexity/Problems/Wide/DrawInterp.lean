@@ -6,8 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefExp
-public import DescriptiveComplexity.Problems.Wide.DrawShape
-public import DescriptiveComplexity.Problems.Wide.DrawTable
+import DescriptiveComplexity.Problems.Wide.DrawShape
+import DescriptiveComplexity.Problems.Wide.DrawTable
+import Mathlib.Tactic.FinCases
 
 /-!
 # Writing the emitted machine down

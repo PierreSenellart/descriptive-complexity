@@ -6,7 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawData
-public import DescriptiveComplexity.Problems.Wide.DrawPad
+import DescriptiveComplexity.Problems.Wide.DrawPad
+public import DescriptiveComplexity.Problems.Wide.DrawAddr
+import DescriptiveComplexity.Problems.Wide.DrawInner
 
 /-!
 # What the inner loop computes

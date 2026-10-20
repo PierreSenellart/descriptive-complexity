@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Sat.CountingDecision
+public import DescriptiveComplexity.Vocabulary
+public import DescriptiveComplexity.Syntax
 
 /-!
 # SelMajSAT and SelEqSAT: complete problems for PP and C₌P

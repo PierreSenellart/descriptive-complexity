@@ -6,8 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Tiling
-public import DescriptiveComplexity.Problems.Wide.RegChannel
-public import DescriptiveComplexity.Problems.Wide.WellFormed
+import DescriptiveComplexity.Problems.Wide.RegChannel
+import DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # The tiles a computation table is drawn with

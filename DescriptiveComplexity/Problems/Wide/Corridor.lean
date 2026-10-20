@@ -7,7 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.TilingExp
 public import DescriptiveComplexity.Problems.Tiling.CorridorMem
-public import DescriptiveComplexity.Exponential.Classes
+import DescriptiveComplexity.Exponential.Classes
 
 /-!
 # The wide corridor: a strip as wide as the addresses

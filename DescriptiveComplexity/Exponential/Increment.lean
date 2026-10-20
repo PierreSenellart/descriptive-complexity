@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.OrdFormula
+public import Mathlib.Basic.Finite.Sigma
+public import Mathlib.Data.Fintype.Lattice
 
 /-!
 # The binary increment on a block's atoms

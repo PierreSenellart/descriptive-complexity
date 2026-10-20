@@ -5,10 +5,10 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.Wide.Defs
+import DescriptiveComplexity.Problems.Wide.Defs
 public import DescriptiveComplexity.Problems.Wide.Marks
-public import DescriptiveComplexity.Problems.Wide.Roam
-public import DescriptiveComplexity.Problems.Wide.RegFile
+import DescriptiveComplexity.Problems.Wide.Roam
+import DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The wide machine with a register channel

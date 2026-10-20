@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.DagIso.ToDigraphIso
-public import DescriptiveComplexity.Problems.DagIso.FromDigraphIso
+import DescriptiveComplexity.Problems.DagIso.FromDigraphIso
 
 /-!
 # DAG Isomorphism is GI-complete

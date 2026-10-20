@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxMat
 public import DescriptiveComplexity.Problems.Wide.DrawInstSeq
+public import DescriptiveComplexity.Problems.Wide.DrawRunSeq
 
 /-!
 # The matrix's sequencer at an arbitrary file

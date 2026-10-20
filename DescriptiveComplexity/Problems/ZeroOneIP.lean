@@ -5,11 +5,11 @@ Authors: Pierre Senellart
 -/
 module
 
-public import DescriptiveComplexity.Problems.ZeroOneIP.Defs
+import DescriptiveComplexity.Problems.ZeroOneIP.Defs
 public import DescriptiveComplexity.Problems.ZeroOneIP.Membership
-public import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
+import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
 public import DescriptiveComplexity.Problems.Knapsack
-public import DescriptiveComplexity.Hierarchy
+import DescriptiveComplexity.Hierarchy
 
 /-!
 # 0-1 integer programming

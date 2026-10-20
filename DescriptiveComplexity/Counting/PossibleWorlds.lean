@@ -6,7 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.Class
-public import DescriptiveComplexity.Numbers.DigitExtract
+import DescriptiveComplexity.Numbers.DigitExtract
 
 /-!
 # Counting possible worlds
