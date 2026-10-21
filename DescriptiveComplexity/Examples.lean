@@ -31,7 +31,10 @@ to be read top to bottom as a template for new formalizations.
   ([Gauquier–Manolescu–Senellart 2026][gauquier2026efficient2]), by the
   paper's reduction from Set Cover. Read second: it exercises what the CQ
   tutorial does not – a cardinality threshold, a reachability certificate,
-  an *ordered* FO reduction, and a single-sorted concrete encoding.
+  an *ordered* FO reduction, and a single-sorted concrete encoding. It closes
+  with the restriction to depth-2 websites and with a quota variant (a crawl
+  of at most `B` pages containing at least `K` targets), NP-complete by an
+  order-free reduction from the base problem.
 * `DescriptiveComplexity.Examples.ProbabilisticQueries`: query evaluation over
   probabilistic databases, the first tutorial about a *counting* problem. The
   count of the possible worlds of the query `R(x), S(x, y), T(y)` is one-call

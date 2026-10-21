@@ -86,7 +86,13 @@ Main results:
   encoding and its semantic faithfulness;
 * `DescriptiveComplexity.crawlDecoding` and
   **`DescriptiveComplexity.crawlWF_NP_complete`**: the computable decoding of
-  well-formed (single-root) websites, and completeness restricted to them.
+  well-formed (single-root) websites, and completeness restricted to them;
+* **`DescriptiveComplexity.crawlShallow_NP_complete`**: completeness already
+  on websites of depth 2 whose targets have no out-links, the shape of the
+  paper's hard instances;
+* **`DescriptiveComplexity.quotaCrawling_NP_complete`**: the variant asking
+  for a crawl of at most `B` pages containing at least `K` targets, the quota
+  `K` carried by a second marked set (step 10).
 -/
 
 @[expose] public section
@@ -1523,5 +1529,655 @@ theorem crawlWF_NP_complete :
   ⟨graphCrawling_sigmaSODefinable.inf_ofSentence crawlWFSentence,
     NP.hard_of_orderedReduction (setCover_ordered_fo_reduction_graphCrawling.withInvariant _
       fun A _ _ _ _ => crawlInterp_wf A) setCover_NP_hard⟩
+
+/-!
+The paper's hard instances are more special than the statement above records:
+the website produced from a set system has depth 2, and its targets are its
+leaves. The restriction is again one sentence, invariant on the image of the
+reduction, so the same two upgrades give NP-completeness on that class.
+-/
+
+/-- Shallowness of a website graph: target pages have no out-links, and no
+path follows three links (every page lies within two links of wherever a path
+starts). The shape of the instances produced from set systems. -/
+noncomputable def crawlShallowSentence : Language.siteGraph.Sentence :=
+  fo% (∀ x y, wsTarget(x) → ¬ wsEdge(x, y)) ∧
+    ∀ w x y z, ¬ ((wsEdge(w, x) ∧ wsEdge(x, y)) ∧ wsEdge(y, z))
+
+private theorem realize_crawlShallowSentence {A : Type} [Language.siteGraph.Structure A] :
+    A ⊨ crawlShallowSentence ↔ (∀ x y : A, WSTarget x → ¬WSEdge x y) ∧
+      ∀ w x y z : A, WSEdge w x → WSEdge x y → ¬WSEdge y z := by
+  simp only [crawlShallowSentence, Sentence.Realize, Formula.realize_inf,
+    Formula.realize_iAlls, Formula.realize_imp, Formula.realize_not, Formula.realize_rel₁,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, WSTarget, WSEdge]
+  constructor
+  · rintro ⟨h₁, h₂⟩
+    exact ⟨fun x y hx => h₁ ![x, y] hx,
+      fun w x y z hwx hxy hyz => h₂ ![w, x, y, z] ⟨⟨hwx, hxy⟩, hyz⟩⟩
+  · rintro ⟨h₁, h₂⟩
+    exact ⟨fun i hi => h₁ (i 0) (i 1) hi,
+      fun i hi => h₂ (i 0) (i 1) (i 2) (i 3) hi.1.1 hi.1.2 hi.2⟩
+
+/-- The image of the hardness reduction is shallow: links go from the root to
+set pages and from set pages to element pages, which are the targets. -/
+private theorem crawlInterp_shallow (A : Type) [Language.setSystem.Structure A]
+    [LinearOrder A] :
+    DecisionProblem.ofSentence crawlShallowSentence (crawlInterp.Map A) := by
+  refine realize_crawlShallowSentence.mpr ⟨?_, ?_⟩
+  · rintro ⟨t, w⟩ ⟨t', w'⟩ hT hE
+    obtain ⟨rfl, -⟩ := (crawl_target_iff t w).mp hT
+    rcases (crawl_edge_iff _ t' w w').mp hE with ⟨h, -⟩ | ⟨h, -⟩ <;> exact CrawlTag.noConfusion h
+  · rintro ⟨t₀, w₀⟩ ⟨t₁, w₁⟩ ⟨t₂, w₂⟩ ⟨t₃, w₃⟩ h₀₁ h₁₂ h₂₃
+    rcases (crawl_edge_iff t₀ t₁ w₀ w₁).mp h₀₁ with ⟨-, rfl, -⟩ | ⟨-, rfl, -⟩ <;>
+    rcases (crawl_edge_iff _ t₂ w₁ w₂).mp h₁₂ with ⟨h, -⟩ | ⟨-, rfl, -⟩ <;>
+    first
+    | exact CrawlTag.noConfusion h
+    | rcases (crawl_edge_iff _ t₃ w₂ w₃).mp h₂₃ with ⟨h, -⟩ | ⟨h, -⟩ <;>
+        exact CrawlTag.noConfusion h
+
+/-- **Graph crawling is NP-complete already on shallow websites**: depth 2, targets
+without out-links, a single root – the shape of the hard instances of
+[Gauquier–Manolescu–Senellart 2026][gauquier2026efficient2], Prop. 4. -/
+theorem crawlShallow_NP_complete :
+    NP.Complete (DecisionProblem.ofSentence crawlShallowSentence ⊓
+      (DecisionProblem.ofSentence crawlWFSentence ⊓ GraphCrawling)) :=
+  ⟨(graphCrawling_sigmaSODefinable.inf_ofSentence crawlWFSentence).inf_ofSentence
+      crawlShallowSentence,
+    NP.hard_of_orderedReduction
+      ((setCover_ordered_fo_reduction_graphCrawling.withInvariant _
+        fun A _ _ _ _ => crawlInterp_wf A).withInvariant _
+          fun A _ _ _ _ => crawlInterp_shallow A) setCover_NP_hard⟩
+
+end DescriptiveComplexity
+
+/-!
+### Step 10: a variant – reaching a quota of targets
+
+Crawling every target is the problem the reduction of step 8 is about; a
+focused crawler is more often judged by how many targets a crawl of a given
+size reaches. The decision variant asks for a crawl of at most `B` pages
+containing at least `K` targets, the quota `K` being the cardinality of a
+second marked set: the vocabulary grows by one unary symbol, and the arc of
+steps 5–9 runs again, compressed. Membership guesses one more injection, from
+the quota into the crawled targets. Hardness needs no new gadget: marking the
+targets themselves as the quota turns Graph Crawling into the variant, since a
+crawl contains as many targets as there are exactly when it contains them all
+– an order-free reduction, the identity on everything else.
+-/
+
+namespace FirstOrder
+
+namespace Language
+
+/-- The relational language of website graphs with a quota: the symbols of
+`Language.siteGraph`, and a second marked set whose cardinality is the number
+of targets to reach. -/
+fo_language quotaSiteGraph with qw where
+  /-- `edge a b`: a hyperlink from page `a` to page `b`. -/
+  edge : 2
+  /-- `root a`: the page `a` is the crawl's starting point. -/
+  root : 1
+  /-- `target a`: the page `a` is a target. -/
+  target : 1
+  /-- `marked a`: the page `a` belongs to the marked set carrying the
+  budget. -/
+  marked : 1
+  /-- `quota a`: the page `a` belongs to the marked set carrying the number of
+  targets to reach. -/
+  quota : 1
+
+end Language
+
+end FirstOrder
+
+namespace DescriptiveComplexity
+
+open FirstOrder
+
+open Language Structure
+
+/-! ### The quota semantics and its certificate -/
+
+section QuotaGeneric
+
+variable {A : Type}
+
+/-- Some marked root admits a crawl reaching the quota: a set of pages
+containing the root, entirely reachable from it inside itself, of at most as
+many pages as `Kp` has elements, and containing at least as many targets as
+`Qp` has elements. -/
+def QuotaCrawlOn (Adjp : A → A → Prop) (Rp Tp Kp Qp : A → Prop) : Prop :=
+  ∃ r, Rp r ∧ ∃ S : A → Prop, S r ∧ ReachesAllOn Adjp r S ∧
+    {x | S x}.ncard ≤ {x | Kp x}.ncard ∧ {x | Qp x}.ncard ≤ {x | S x ∧ Tp x}.ncard
+
+/-- The certified form: the certificate of `crawlOn_iff_certificate`, with the
+targets no longer required to be crawled, and a second injection, of the quota
+into the crawled targets. -/
+theorem quotaCrawlOn_iff_certificate [Finite A] (Adjp : A → A → Prop)
+    (Rp Tp Kp Qp : A → Prop) :
+    QuotaCrawlOn Adjp Rp Tp Kp Qp ↔ ∃ S : A → Prop,
+      (∃ Rt : A → Prop, (∃ x, Rt x) ∧ (∀ x, Rt x → Rp x ∧ S x) ∧
+        (∀ x y, Rt x → Rt y → x = y) ∧
+        ∃ Lt : A → A → Prop, (∀ x y z, Lt x y → Lt y z → Lt x z) ∧ (∀ x, ¬Lt x x) ∧
+          ∀ x, S x → ¬Rt x → ∃ y, S y ∧ Adjp y x ∧ Lt y x) ∧
+      Nonempty ({x // S x} ↪ {x // Kp x}) ∧
+      Nonempty ({x // Qp x} ↪ {x // S x ∧ Tp x}) := by
+  constructor
+  · rintro ⟨r, hRp, S, hSr, hreach, hcard, hquota⟩
+    obtain ⟨Lt, htrans, hirr, hstep⟩ := (reachesAllOn_iff_exists_order Adjp r S).mp hreach
+    exact ⟨S, ⟨(· = r), ⟨r, rfl⟩, fun x hx => hx ▸ ⟨hRp, hSr⟩,
+      fun x y hx hy => hx.trans hy.symm, Lt, htrans, hirr,
+      fun x hx hne => hstep x hx hne⟩,
+      (nonempty_embedding_iff_ncard_le _ _).mpr hcard,
+      (nonempty_embedding_iff_ncard_le Qp fun x => S x ∧ Tp x).mpr hquota⟩
+  · rintro ⟨S, ⟨Rt, ⟨r, hr⟩, hRtP, huniq, Lt, htrans, hirr, hstep⟩, he, hq⟩
+    obtain ⟨hRp, hSr⟩ := hRtP r hr
+    refine ⟨r, hRp, S, hSr,
+      (reachesAllOn_iff_exists_order Adjp r S).mpr ⟨Lt, htrans, hirr, ?_⟩,
+      (nonempty_embedding_iff_ncard_le _ _).mp he,
+      (nonempty_embedding_iff_ncard_le Qp fun x => S x ∧ Tp x).mp hq⟩
+    intro x hx hne
+    exact hstep x hx fun hRtx => hne (huniq x r hRtx hr)
+
+/-- With the targets as quota, reaching the quota is crawling every target. -/
+private theorem crawlOn_iff_quotaCrawlOn [Finite A] (Adjp : A → A → Prop)
+    (Rp Tp Kp : A → Prop) :
+    CrawlOn Adjp Rp Tp Kp ↔ QuotaCrawlOn Adjp Rp Tp Kp Tp := by
+  constructor
+  · rintro ⟨r, hRr, S, hSr, hT, hreach, hcard⟩
+    exact ⟨r, hRr, S, hSr, hreach, hcard,
+      Set.ncard_le_ncard (fun x hx => ⟨hT x hx, hx⟩) (Set.toFinite _)⟩
+  · rintro ⟨r, hRr, S, hSr, hreach, hcard, hquota⟩
+    have heq : {x | S x ∧ Tp x} = {x | Tp x} :=
+      Set.eq_of_subset_of_ncard_le (fun _ hx => hx.2) hquota (Set.toFinite _)
+    refine ⟨r, hRr, S, hSr, fun x hx => ?_, hreach, hcard⟩
+    have hmem : x ∈ {x | S x ∧ Tp x} := by
+      rw [heq]
+      exact hx
+    exact hmem.1
+
+variable {B : Type}
+
+/-- `QuotaCrawlOn` transports along an equivalence commuting with the five
+predicates. -/
+theorem QuotaCrawlOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB QB : B → Prop}
+    {AdjA : A → A → Prop} {RA TA KA QA : A → Prop}
+    (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hR : ∀ b, RB b ↔ RA (u b))
+    (hT : ∀ b, TB b ↔ TA (u b)) (hK : ∀ b, KB b ↔ KA (u b)) (hQ : ∀ b, QB b ↔ QA (u b))
+    (h : QuotaCrawlOn AdjB RB TB KB QB) : QuotaCrawlOn AdjA RA TA KA QA := by
+  obtain ⟨r, hRr, S, hSr, hreach, hcard, hquota⟩ := h
+  refine ⟨u r, (hR r).mp hRr, fun a => S (u.symm a), by simpa using hSr,
+    fun a ha => ?_, ?_, ?_⟩
+  · have hpath := reflTransGen_diLink_map (SA := fun a => S (u.symm a)) u hadj
+      (fun b => by simp) (hreach (u.symm a) ha)
+    simpa using hpath
+  · rw [← ncard_setOf_equiv u hK, ← ncard_setOf_symm u S]
+    exact hcard
+  · have hST : {b | S b ∧ TB b}.ncard = {a | S (u.symm a) ∧ TA a}.ncard :=
+      ncard_setOf_equiv u fun b => by simp [hT]
+    rw [← ncard_setOf_equiv u hQ, ← hST]
+    exact hquota
+
+/-- `QuotaCrawlOn` transports along an equivalence, iff version. -/
+theorem QuotaCrawlOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB QB : B → Prop}
+    {AdjA : A → A → Prop} {RA TA KA QA : A → Prop}
+    (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hR : ∀ b, RB b ↔ RA (u b))
+    (hT : ∀ b, TB b ↔ TA (u b)) (hK : ∀ b, KB b ↔ KA (u b)) (hQ : ∀ b, QB b ↔ QA (u b)) :
+    QuotaCrawlOn AdjB RB TB KB QB ↔ QuotaCrawlOn AdjA RA TA KA QA :=
+  ⟨QuotaCrawlOn.of_equiv u hadj hR hT hK hQ,
+    QuotaCrawlOn.of_equiv u.symm (fun a a' => by rw [hadj]; simp) (fun a => by rw [hR]; simp)
+      (fun a => by rw [hT]; simp) (fun a => by rw [hK]; simp) fun a => by rw [hQ]; simp⟩
+
+end QuotaGeneric
+
+/-! ### The bundled problem -/
+
+section QuotaShorthands
+
+variable {A : Type} [Language.quotaSiteGraph.Structure A]
+
+fo_predicates Language.quotaSiteGraph qw
+
+end QuotaShorthands
+
+/-- A website graph with a quota admits a crawl within budget reaching the
+quota. -/
+def HasQuotaCrawl (A : Type) [Language.quotaSiteGraph.Structure A] : Prop :=
+  Finite A ∧ QuotaCrawlOn (A := A) QWEdge QWRoot QWTarget QWMarked QWQuota
+
+/-- The quota-crawling property is isomorphism-invariant. -/
+theorem hasQuotaCrawl_iso {A B : Type} [Language.quotaSiteGraph.Structure A]
+    [Language.quotaSiteGraph.Structure B] (e : A ≃[Language.quotaSiteGraph] B) :
+    HasQuotaCrawl A ↔ HasQuotaCrawl B :=
+  and_congr e.toEquiv.finite_iff
+    (QuotaCrawlOn.equiv_iff e.toEquiv (fun a b => relMap_equiv₂ e qwEdge a b)
+      (fun a => relMap_equiv₁ e qwRoot a) (fun a => relMap_equiv₁ e qwTarget a)
+      (fun a => relMap_equiv₁ e qwMarked a) fun a => relMap_equiv₁ e qwQuota a)
+
+/-- GRAPH CRAWLING WITH A QUOTA (unit page costs): is there a crawl – a set of
+pages containing the marked root, reachable from it inside itself – of at most
+as many pages as the marked set has elements, containing at least as many
+targets as the quota set has elements? -/
+def QuotaCrawling : DecisionProblem Language.quotaSiteGraph where
+  Holds := fun A inst => @HasQuotaCrawl A inst
+  iso_invariant := fun e => hasQuotaCrawl_iso e
+
+/-! ### Membership in NP -/
+
+open SOBlock
+
+section QuotaSigmaOne
+
+/-- The existential block of the `Σ₁` definition of quota crawling: the four
+relation variables of `crawlGuessBlock`, and the injection of the quota into
+the crawled targets. -/
+fo_block quotaGuessBlock over Language.quotaSiteGraph qw into quotaSOLang with kQc where
+  /-- The crawled set of pages. -/
+  set : 1
+  /-- The start page of the crawl. -/
+  start : 1
+  /-- The order certifying reachability from the start page. -/
+  order : 2
+  /-- The injection witnessing the budget. -/
+  inj : 2
+  /-- The injection witnessing the quota. -/
+  pick : 2
+
+/-- Kernel clause: some root is guessed. -/
+private noncomputable def qcRootExistsClause : quotaSOLang.Sentence :=
+  fo% ∃ x, kQcStartSym(x)
+
+/-- Kernel clause: the guessed root carries the vocabulary's root mark and is
+crawled. -/
+private noncomputable def qcRootClause : quotaSOLang.Sentence :=
+  fo% ∀ x, kQcStartSym(x) → kQcRootSym(x) ∧ kQcSetSym(x)
+
+/-- Kernel clause: there is at most one guessed root. -/
+private noncomputable def qcRootUniqueClause : quotaSOLang.Sentence :=
+  fo% ∀ x y, kQcStartSym(x) ∧ kQcStartSym(y) → x ≐ y
+
+/-- Kernel clause: the guessed order is transitive. -/
+private noncomputable def qcTransClause : quotaSOLang.Sentence :=
+  fo% ∀ x y z, kQcOrderSym(x, y) ∧ kQcOrderSym(y, z) → kQcOrderSym(x, z)
+
+/-- Kernel clause: the guessed order is irreflexive. -/
+private noncomputable def qcIrreflClause : quotaSOLang.Sentence :=
+  fo% ∀ x, ¬ kQcOrderSym(x, x)
+
+/-- Kernel clause: every crawled non-root page is linked from a crawled page
+strictly below it. -/
+private noncomputable def qcStepClause : quotaSOLang.Sentence :=
+  fo% ∀ x, kQcSetSym(x) ∧ ¬ kQcStartSym(x) →
+    ∃ y, (kQcSetSym(y) ∧ kQcEdgeSym(y, x)) ∧ kQcOrderSym(y, x)
+
+/-- Kernel clause: the budget injection maps every crawled page to a marked
+element. -/
+private noncomputable def qcTotalClause : quotaSOLang.Sentence :=
+  fo% ∀ x, kQcSetSym(x) → ∃ y, kQcInjSym(x, y) ∧ kQcMarkedSym(y)
+
+/-- Kernel clause: the budget injection is injective. -/
+private noncomputable def qcInjClause : quotaSOLang.Sentence :=
+  fo% ∀ x y z, kQcInjSym(x, z) ∧ kQcInjSym(y, z) → x ≐ y
+
+/-- Kernel clause: the quota injection maps every element of the quota to a
+crawled target. -/
+private noncomputable def qcPickTotalClause : quotaSOLang.Sentence :=
+  fo% ∀ x, kQcQuotaSym(x) → ∃ y, kQcPickSym(x, y) ∧ (kQcSetSym(y) ∧ kQcTargetSym(y))
+
+/-- Kernel clause: the quota injection is injective. -/
+private noncomputable def qcPickInjClause : quotaSOLang.Sentence :=
+  fo% ∀ x y z, kQcPickSym(x, z) ∧ kQcPickSym(y, z) → x ≐ y
+
+/-- The first-order kernel of the `Σ₁` definition of quota crawling. -/
+private noncomputable def quotaKernel : quotaSOLang.Sentence :=
+  qcRootExistsClause ⊓ (qcRootClause ⊓ (qcRootUniqueClause ⊓ (qcTransClause ⊓
+    (qcIrreflClause ⊓ (qcStepClause ⊓ (qcTotalClause ⊓ (qcInjClause ⊓
+      (qcPickTotalClause ⊓ qcPickInjClause))))))))
+
+section QuotaRealize
+
+variable {A : Type} [Language.quotaSiteGraph.Structure A]
+  (ρ : quotaGuessBlock.Assignment A)
+
+/-- Realization at a structure expanded by an assignment of the block. -/
+abbrev QRealize (φ : quotaSOLang.Sentence) : Prop :=
+  @Sentence.Realize quotaSOLang A
+    (@sumStructure _ _ A _ (quotaGuessBlock.structure ρ)) φ
+
+private theorem realize_qcRootExistsClause :
+    QRealize ρ qcRootExistsClause ↔ ∃ x : A, ρ .start ![x] := by
+  let := quotaGuessBlock.structure ρ
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcStartSym w ↔ ρ .start w := fun _ => Iff.rfl
+  rw [qcRootExistsClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iExs, Formula.realize_rel₁,
+    Term.realize_var, Sum.elim_inr, hR]
+  exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨x, hx⟩ => ⟨fun _ => x, hx⟩⟩
+
+private theorem realize_qcRootClause :
+    QRealize ρ qcRootClause ↔ ∀ x : A, ρ .start ![x] → QWRoot x ∧ ρ .set ![x] := by
+  let := quotaGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcStartSym w ↔ ρ .start w := fun _ => Iff.rfl
+  rw [qcRootClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₁, Term.realize_var, Sum.elim_inr,
+    Language.relMap_sumInl, hS, hR]
+  exact ⟨fun h x hx => h (fun _ => x) hx, fun h i hi => h (i 0) hi⟩
+
+private theorem realize_qcRootUniqueClause :
+    QRealize ρ qcRootUniqueClause ↔ ∀ x y : A, ρ .start ![x] → ρ .start ![y] → x = y := by
+  let := quotaGuessBlock.structure ρ
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcStartSym w ↔ ρ .start w := fun _ => Iff.rfl
+  rw [qcRootUniqueClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₁, Formula.realize_equal, Term.realize_var,
+    Sum.elim_inr, hR]
+  exact ⟨fun h x y hx hy => h ![x, y] ⟨hx, hy⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
+
+private theorem realize_qcTransClause :
+    QRealize ρ qcTransClause ↔
+      ∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z] := by
+  let := quotaGuessBlock.structure ρ
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
+  rw [qcTransClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
+  exact ⟨fun h x y z h₁ h₂ => h ![x, y, z] ⟨h₁, h₂⟩,
+    fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
+
+private theorem realize_qcIrreflClause :
+    QRealize ρ qcIrreflClause ↔ ∀ x : A, ¬ρ .order ![x, x] := by
+  let := quotaGuessBlock.structure ρ
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
+  rw [qcIrreflClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_not,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, hL]
+  exact ⟨fun h x => h fun _ => x, fun h i => h (i 0)⟩
+
+private theorem realize_qcStepClause :
+    QRealize ρ qcStepClause ↔ ∀ x : A, ρ .set ![x] → ¬ρ .start ![x] →
+      ∃ y : A, (ρ .set ![y] ∧ QWEdge y x) ∧ ρ .order ![y, x] := by
+  let := quotaGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hR : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcStartSym w ↔ ρ .start w := fun _ => Iff.rfl
+  have hL : ∀ (w : Fin 2 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcOrderSym w ↔ ρ .order w := fun _ => Iff.rfl
+  rw [qcStepClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_inf, Formula.realize_not, Formula.realize_rel₁,
+    Formula.realize_rel₂, Term.realize_var, Sum.elim_inr, Sum.elim_inl,
+    Language.relMap_sumInl, hS, hR, hL]
+  constructor
+  · intro h x hx hnr
+    obtain ⟨y, hy⟩ := h (fun _ => x) ⟨hx, hnr⟩
+    exact ⟨y 0, ⟨hy.1.1, hy.1.2⟩, hy.2⟩
+  · intro h i hi
+    obtain ⟨y, hy⟩ := h (i 0) hi.1 hi.2
+    exact ⟨fun _ => y, ⟨hy.1.1, hy.1.2⟩, hy.2⟩
+
+private theorem realize_qcTotalClause :
+    QRealize ρ qcTotalClause ↔ ∀ x : A, ρ .set ![x] →
+      ∃ y : A, ρ .inj ![x, y] ∧ QWMarked y := by
+  let := quotaGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hI : ∀ (w : Fin 2 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [qcTotalClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
+    Term.realize_var, Sum.elim_inr, Sum.elim_inl, Language.relMap_sumInl, hS, hI]
+  constructor
+  · intro h x hx
+    obtain ⟨y, hy⟩ := h (fun _ => x) hx
+    exact ⟨y 0, hy⟩
+  · intro h i hi
+    obtain ⟨y, hy⟩ := h (i 0) hi
+    exact ⟨fun _ => y, hy⟩
+
+private theorem realize_qcInjClause :
+    QRealize ρ qcInjClause ↔ ∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x' := by
+  let := quotaGuessBlock.structure ρ
+  have hI : ∀ (w : Fin 2 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcInjSym w ↔ ρ .inj w := fun _ => Iff.rfl
+  rw [qcInjClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
+    Sum.elim_inr, hI]
+  exact ⟨fun h x x' y h₁ h₂ => h ![x, x', y] ⟨h₁, h₂⟩,
+    fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
+
+private theorem realize_qcPickTotalClause :
+    QRealize ρ qcPickTotalClause ↔ ∀ x : A, QWQuota x →
+      ∃ y : A, ρ .pick ![x, y] ∧ (ρ .set ![y] ∧ QWTarget y) := by
+  let := quotaGuessBlock.structure ρ
+  have hS : ∀ (w : Fin 1 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcSetSym w ↔ ρ .set w := fun _ => Iff.rfl
+  have hP : ∀ (w : Fin 2 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcPickSym w ↔ ρ .pick w := fun _ => Iff.rfl
+  rw [qcPickTotalClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_iExs, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₂,
+    Term.realize_var, Sum.elim_inr, Sum.elim_inl, Language.relMap_sumInl, hS, hP]
+  constructor
+  · intro h x hx
+    obtain ⟨y, hy⟩ := h (fun _ => x) hx
+    exact ⟨y 0, hy⟩
+  · intro h i hi
+    obtain ⟨y, hy⟩ := h (i 0) hi
+    exact ⟨fun _ => y, hy⟩
+
+private theorem realize_qcPickInjClause :
+    QRealize ρ qcPickInjClause ↔
+      ∀ x x' y : A, ρ .pick ![x, y] → ρ .pick ![x', y] → x = x' := by
+  let := quotaGuessBlock.structure ρ
+  have hP : ∀ (w : Fin 2 → A),
+      RelMap (L := quotaSOLang) (M := A) kQcPickSym w ↔ ρ .pick w := fun _ => Iff.rfl
+  rw [qcPickInjClause]
+  simp only [QRealize, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
+    Formula.realize_inf, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
+    Sum.elim_inr, hP]
+  exact ⟨fun h x x' y h₁ h₂ => h ![x, x', y] ⟨h₁, h₂⟩,
+    fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
+
+private theorem realize_quotaKernel :
+    QRealize ρ quotaKernel ↔
+      (∃ x : A, ρ .start ![x]) ∧
+      (∀ x : A, ρ .start ![x] → QWRoot x ∧ ρ .set ![x]) ∧
+      (∀ x y : A, ρ .start ![x] → ρ .start ![y] → x = y) ∧
+      (∀ x y z : A, ρ .order ![x, y] → ρ .order ![y, z] → ρ .order ![x, z]) ∧
+      (∀ x : A, ¬ρ .order ![x, x]) ∧
+      (∀ x : A, ρ .set ![x] → ¬ρ .start ![x] →
+        ∃ y : A, (ρ .set ![y] ∧ QWEdge y x) ∧ ρ .order ![y, x]) ∧
+      (∀ x : A, ρ .set ![x] → ∃ y : A, ρ .inj ![x, y] ∧ QWMarked y) ∧
+      (∀ x x' y : A, ρ .inj ![x, y] → ρ .inj ![x', y] → x = x') ∧
+      (∀ x : A, QWQuota x → ∃ y : A, ρ .pick ![x, y] ∧ (ρ .set ![y] ∧ QWTarget y)) ∧
+      ∀ x x' y : A, ρ .pick ![x, y] → ρ .pick ![x', y] → x = x' := by
+  rw [quotaKernel]
+  simp only [QRealize, Sentence.Realize, Formula.realize_inf]
+  exact and_congr (realize_qcRootExistsClause ρ)
+    (and_congr (realize_qcRootClause ρ)
+      (and_congr (realize_qcRootUniqueClause ρ)
+        (and_congr (realize_qcTransClause ρ)
+          (and_congr (realize_qcIrreflClause ρ)
+            (and_congr (realize_qcStepClause ρ)
+              (and_congr (realize_qcTotalClause ρ)
+                (and_congr (realize_qcInjClause ρ)
+                  (and_congr (realize_qcPickTotalClause ρ) (realize_qcPickInjClause ρ)))))))))
+
+end QuotaRealize
+
+/-- **Quota crawling is `Σ₁`-definable**: the certificate of Graph Crawling,
+without the requirement that every target be crawled, and with a second
+injection, of the quota into the crawled targets. -/
+theorem quotaCrawling_sigmaSODefinable : SigmaSODefinable 1 QuotaCrawling := by
+  refine ⟨[quotaGuessBlock], rfl, quotaKernel, ?_⟩
+  intro A _ _ _
+  constructor
+  · rintro ⟨-, hcr⟩
+    obtain ⟨S, ⟨Rt, ⟨r, hr⟩, hRtP, huniq, Lt, htrans, hirr, hstep⟩, ⟨e⟩, ⟨q⟩⟩ :=
+      (quotaCrawlOn_iff_certificate _ _ _ _ _).mp hcr
+    refine ⟨fun i => match i with
+      | .set => fun w : Fin 1 → A => S (w 0)
+      | .start => fun w : Fin 1 → A => Rt (w 0)
+      | .order => fun w : Fin 2 → A => Lt (w 0) (w 1)
+      | .inj => fun w : Fin 2 → A =>
+          ∃ h : S (w 0), (e ⟨w 0, h⟩ : {x // QWMarked x}).1 = w 1
+      | .pick => fun w : Fin 2 → A =>
+          ∃ h : QWQuota (w 0), (q ⟨w 0, h⟩ : {x // S x ∧ QWTarget x}).1 = w 1, ?_⟩
+    refine (realize_quotaKernel _).mpr ⟨⟨r, hr⟩,
+      fun x hx => ⟨(hRtP x hx).1, (hRtP x hx).2⟩, huniq, htrans, hirr, ?_,
+      fun x hx => ⟨(e ⟨x, hx⟩).1, ⟨hx, rfl⟩, (e ⟨x, hx⟩).2⟩, ?_,
+      fun x hx => ⟨(q ⟨x, hx⟩).1, ⟨hx, rfl⟩, (q ⟨x, hx⟩).2.1, (q ⟨x, hx⟩).2.2⟩, ?_⟩
+    · intro x hx hnr
+      obtain ⟨y, hy, hadj, hlt⟩ := hstep x hx hnr
+      exact ⟨y, ⟨hy, hadj⟩, hlt⟩
+    · rintro x x' y ⟨h, hy⟩ ⟨h', hy'⟩
+      exact congrArg Subtype.val (e.injective (Subtype.ext (hy.trans hy'.symm)))
+    · rintro x x' y ⟨h, hy⟩ ⟨h', hy'⟩
+      exact congrArg Subtype.val (q.injective (Subtype.ext (hy.trans hy'.symm)))
+  · rintro ⟨ρ, hρ⟩
+    obtain ⟨hex, hRtP, huniq, htrans, hirr, hstep, htot, hinj, hptot, hpinj⟩ :=
+      (realize_quotaKernel ρ).mp hρ
+    have hch : ∀ x : {x : A // ρ .set ![x]}, ∃ y : A, ρ .inj ![x.1, y] ∧ QWMarked y :=
+      fun x => htot x.1 x.2
+    choose f hf1 hf2 using hch
+    have hpch : ∀ x : {x : A // QWQuota x},
+        ∃ y : A, ρ .pick ![x.1, y] ∧ (ρ .set ![y] ∧ QWTarget y) :=
+      fun x => hptot x.1 x.2
+    choose g hg1 hg2 using hpch
+    refine ⟨‹Finite A›, (quotaCrawlOn_iff_certificate _ _ _ _ _).mpr
+      ⟨fun x => ρ .set ![x],
+        ⟨fun x => ρ .start ![x], hex, fun x hx => hRtP x hx, huniq,
+          fun x y => ρ .order ![x, y], htrans, hirr, ?_⟩,
+        ⟨⟨fun x => ⟨f x, hf2 x⟩, fun x x' hxx' => ?_⟩⟩,
+        ⟨⟨fun x => ⟨g x, hg2 x⟩, fun x x' hxx' => ?_⟩⟩⟩⟩
+    · intro x hx hnr
+      obtain ⟨y, ⟨hy, hadj⟩, hlt⟩ := hstep x hx hnr
+      exact ⟨y, hy, hadj, hlt⟩
+    · have hval : f x = f x' := congrArg Subtype.val hxx'
+      refine Subtype.ext (hinj x.1 x'.1 (f x) (hf1 x) ?_)
+      rw [hval]
+      exact hf1 x'
+    · have hval : g x = g x' := congrArg Subtype.val hxx'
+      refine Subtype.ext (hpinj x.1 x'.1 (g x) (hg1 x) ?_)
+      rw [hval]
+      exact hg1 x'
+
+end QuotaSigmaOne
+
+/-! ### NP-hardness, by reduction from Graph Crawling -/
+
+/-- The interpretation marking the targets as the quota, and copying
+everything else. -/
+def quotaInterp :
+    FOInterpretation Language.siteGraph Language.quotaSiteGraph Unit 1 where
+  relFormula {n} R :=
+    match n, R with
+    | _, .edge => fun _ => fo%⟨u, v⟩ wsEdge(u, v)
+    | _, .root => fun _ => fo%⟨u⟩ wsRoot(u)
+    | _, .target => fun _ => fo%⟨u⟩ wsTarget(u)
+    | _, .marked => fun _ => fo%⟨u⟩ wsMarked(u)
+    | _, .quota => fun _ => fo%⟨u⟩ wsTarget(u)
+
+section QuotaCorrectness
+
+variable (A : Type) [Language.siteGraph.Structure A]
+
+private theorem quota_edge (w w' : Fin 1 → A) :
+    RelMap (M := quotaInterp.Map A) qwEdge ![((), w), ((), w')] ↔ WSEdge (w 0) (w' 0) := by
+  rw [FOInterpretation.relMap_map]
+  simp [quotaInterp, WSEdge, Formula.realize_rel₂]
+
+private theorem quota_root (w : Fin 1 → A) :
+    RelMap (M := quotaInterp.Map A) qwRoot ![((), w)] ↔ WSRoot (w 0) := by
+  rw [FOInterpretation.relMap_map]
+  simp [quotaInterp, WSRoot, Formula.realize_rel₁]
+
+private theorem quota_target (w : Fin 1 → A) :
+    RelMap (M := quotaInterp.Map A) qwTarget ![((), w)] ↔ WSTarget (w 0) := by
+  rw [FOInterpretation.relMap_map]
+  simp [quotaInterp, WSTarget, Formula.realize_rel₁]
+
+private theorem quota_marked (w : Fin 1 → A) :
+    RelMap (M := quotaInterp.Map A) qwMarked ![((), w)] ↔ WSMarked (w 0) := by
+  rw [FOInterpretation.relMap_map]
+  simp [quotaInterp, WSMarked, Formula.realize_rel₁]
+
+private theorem quota_quota (w : Fin 1 → A) :
+    RelMap (M := quotaInterp.Map A) qwQuota ![((), w)] ↔ WSTarget (w 0) := by
+  rw [FOInterpretation.relMap_map]
+  simp [quotaInterp, WSTarget, Formula.realize_rel₁]
+
+private theorem quota_hEdge (b b' : quotaInterp.Map A) :
+    QWEdge b b' ↔
+      WSEdge (quotaInterp.mapEquivSelf A b) (quotaInterp.mapEquivSelf A b') := by
+  obtain ⟨⟨⟩, w⟩ := b
+  obtain ⟨⟨⟩, w'⟩ := b'
+  exact quota_edge A w w'
+
+private theorem quota_hRoot (b : quotaInterp.Map A) :
+    QWRoot b ↔ WSRoot (quotaInterp.mapEquivSelf A b) := by
+  obtain ⟨⟨⟩, w⟩ := b
+  exact quota_root A w
+
+private theorem quota_hTarget (b : quotaInterp.Map A) :
+    QWTarget b ↔ WSTarget (quotaInterp.mapEquivSelf A b) := by
+  obtain ⟨⟨⟩, w⟩ := b
+  exact quota_target A w
+
+private theorem quota_hMarked (b : quotaInterp.Map A) :
+    QWMarked b ↔ WSMarked (quotaInterp.mapEquivSelf A b) := by
+  obtain ⟨⟨⟩, w⟩ := b
+  exact quota_marked A w
+
+private theorem quota_hQuota (b : quotaInterp.Map A) :
+    QWQuota b ↔ WSTarget (quotaInterp.mapEquivSelf A b) := by
+  obtain ⟨⟨⟩, w⟩ := b
+  exact quota_quota A w
+
+/-- Correctness of the interpretation: a website has a cheap crawl iff the
+copy with its targets as quota has a crawl within budget reaching the quota. -/
+private theorem hasCheapCrawl_iff_quota_map :
+    HasCheapCrawl A ↔ HasQuotaCrawl (quotaInterp.Map A) := by
+  have htr := QuotaCrawlOn.equiv_iff (quotaInterp.mapEquivSelf A) (quota_hEdge A)
+    (quota_hRoot A) (quota_hTarget A) (quota_hMarked A) (quota_hQuota A)
+  constructor
+  · rintro ⟨hfin, hc⟩
+    exact ⟨(quotaInterp.mapEquivSelf A).finite_iff.mpr hfin,
+      htr.mpr ((crawlOn_iff_quotaCrawlOn _ _ _ _).mp hc)⟩
+  · rintro ⟨hfin, hc⟩
+    have := (quotaInterp.mapEquivSelf A).finite_iff.mp hfin
+    exact ⟨this, (crawlOn_iff_quotaCrawlOn _ _ _ _).mpr (htr.mp hc)⟩
+
+end QuotaCorrectness
+
+/-- **Graph Crawling FO-reduces to quota crawling**, by marking the targets as
+the quota. -/
+private def graphCrawling_fo_reduction_quotaCrawling : GraphCrawling ≤ᶠᵒ QuotaCrawling where
+  Tag := Unit
+  dim := 1
+  toInterpretation := quotaInterp
+  correct A _ _ _ := hasCheapCrawl_iff_quota_map A
+
+/-- Quota crawling is in NP. -/
+theorem quotaCrawling_mem_NP : QuotaCrawling ∈ NP := quotaCrawling_sigmaSODefinable
+
+/-- Quota crawling is NP-hard: Graph Crawling reduces to it. -/
+theorem quotaCrawling_NP_hard : NP.Hard QuotaCrawling :=
+  NP.hard_of_foReduction graphCrawling_fo_reduction_quotaCrawling graphCrawling_NP_hard
+
+/-- **Graph crawling with a quota is NP-complete**: deciding whether some crawl
+of at most `B` pages contains at least `K` targets. -/
+theorem quotaCrawling_NP_complete : NP.Complete QuotaCrawling :=
+  ⟨quotaCrawling_mem_NP, quotaCrawling_NP_hard⟩
 
 end DescriptiveComplexity
