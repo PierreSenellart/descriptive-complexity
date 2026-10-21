@@ -1871,7 +1871,7 @@ The bottom of the ordered world, and the only vocabulary here that is a
   instance (`DescriptiveComplexity.Epr.eprExp`), an assignment of the universal
   variables being one of those points. Its hardness is not formalized yet.
 
-* `DescriptiveComplexity.AddrExp` – the **address expansion**, written once for
+* `DescriptiveComplexity.Exponential.AddrExp` – the **address expansion**, written once for
   an arbitrary relational vocabulary with a designated order symbol: the block is
   one unary relation variable, so an assignment *is* a subset of the instance and
   the expanded universe is its power set; two tags keep the base universe visible
