@@ -118,7 +118,7 @@ theorem RelIsoOn.of_equiv (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → 
     simpa using h
 
 /-- `RelIsoOn` transports along an equivalence, iff version. -/
-private theorem RelIsoOn.equiv_iff (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
+theorem RelIsoOn.equiv_iff (u : B ≃ A) {PVB HVB : B → Prop} {PEB HEB : B → B → Prop}
     {PVA HVA : A → Prop} {PEA HEA : A → A → Prop}
     (hPV : ∀ b, PVB b ↔ PVA (u b)) (hHV : ∀ b, HVB b ↔ HVA (u b))
     (hPE : ∀ b b', PEB b b' ↔ PEA (u b) (u b'))

@@ -108,12 +108,12 @@ private theorem dummy_true_mem_iff {U : Finset (Occ A)} (hU : Consistent U) (x :
 
 /-- **The assignment read off a choice**: a variable is true when the track
 loop of its positive dummy occurrence is chosen. -/
-private def toModel (U : Finset (Occ A)) (x : A) : Prop :=
+def toModel (U : Finset (Occ A)) (x : A) : Prop :=
   ∃ hx : SatOccurs A x, Occ.dummy x hx true ∈ U
 
 /-- A literal is true under the assignment read off a consistent choice iff
 its occurrences are chosen. -/
-private theorem litTrue_toModel_iff {U : Finset (Occ A)} (hU : Consistent U) (o : Occ A) :
+theorem litTrue_toModel_iff {U : Finset (Occ A)} (hU : Consistent U) (o : Occ A) :
     LitTrue (toModel U) o.x o.s ↔ o ∈ U := by
   rw [mem_iff_dummy_mem hU o]
   cases hs : o.s
@@ -124,7 +124,7 @@ private theorem litTrue_toModel_iff {U : Finset (Occ A)} (hU : Consistent U) (o 
     exact ⟨fun ⟨_, h⟩ => h, fun h => ⟨_, h⟩⟩
 
 /-- **The assignment read off a consistent choice is an exactly-one model.** -/
-private theorem oneInModel_toModel
+theorem oneInModel_toModel
     {U : Finset (Occ A)} (hU : Consistent U) : OneInModel A (toModel U) := by
   refine ⟨fun c hc => ?_, fun x ⟨hx, _⟩ => hx⟩
   obtain ⟨o, ⟨hoh, ho⟩, huniq⟩ := hU.2.2 (Sum.inl ⟨c, hc⟩)
@@ -149,7 +149,7 @@ theorem mem_ofModel {ν : A → Prop} {o : Occ A} : o ∈ ofModel ν ↔ LitTrue
 
 open Classical in
 /-- **The choice read off an exactly-one model is consistent.** -/
-private theorem consistent_ofModel
+theorem consistent_ofModel
     {ν : A → Prop} (hν : OneInModel A ν) : Consistent (ofModel ν) := by
   refine ⟨fun o ho => ?_, fun o ho => ?_, fun h => ?_⟩
   · rw [mem_ofModel] at ho ⊢
@@ -182,7 +182,7 @@ private theorem consistent_ofModel
         simp [Occ.dummy, Occ.s, hlit]
 
 /-- **The consistent choices are the exactly-one models.** -/
-private noncomputable def consistentEquiv :
+noncomputable def consistentEquiv :
     {U : Finset (Occ A) // Consistent U} ≃ {ν : A → Prop // OneInModel A ν} where
   toFun U := ⟨toModel U.1, oneInModel_toModel U.2⟩
   invFun ν := ⟨ofModel ν.1, consistent_ofModel ν.2⟩

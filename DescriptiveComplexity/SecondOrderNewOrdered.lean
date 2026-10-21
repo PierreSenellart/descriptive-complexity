@@ -152,28 +152,28 @@ def oldEF {α : Type} (x : α) : ((newLang L).sum C.withOrder.lang).Formula α :
   Relations.formula₁ (extOldSym L C) (Term.var x)
 
 /-- The order variable relates original elements only. -/
-private noncomputable def oldOnlyS : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def oldOnlyS : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⟹ (oldEF L C (Sum.inr 0) ⊓ oldEF L C (Sum.inr 1)))
 
 /-- The order variable is reflexive on the original elements. -/
-private noncomputable def reflES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def reflES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 1) (oldEF L C (Sum.inr 0) ⟹ leEF L C (Sum.inr 0) (Sum.inr 0))
 
 /-- The order variable is transitive. -/
-private noncomputable def transES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def transES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 3)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⊓ leEF L C (Sum.inr 1) (Sum.inr 2) ⟹
       leEF L C (Sum.inr 0) (Sum.inr 2))
 
 /-- The order variable is antisymmetric. -/
-private noncomputable def antisymmES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def antisymmES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⊓ leEF L C (Sum.inr 1) (Sum.inr 0) ⟹
       Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))
 
 /-- The order variable is total on the original elements. -/
-private noncomputable def totalES : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def totalES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (oldEF L C (Sum.inr 0) ⊓ oldEF L C (Sum.inr 1) ⟹
       (leEF L C (Sum.inr 0) (Sum.inr 1) ⊔ leEF L C (Sum.inr 1) (Sum.inr 0)))
@@ -183,7 +183,7 @@ only, and is a linear order on them. Relativization is forced by value
 invention: the order symbol of an extended structure relates original elements
 only, so an unrelativized guard would be unsatisfiable as soon as something is
 invented. -/
-private noncomputable def extLinearGuard : ((newLang L).sum C.withOrder.lang).Sentence :=
+noncomputable def extLinearGuard : ((newLang L).sum C.withOrder.lang).Sentence :=
   oldOnlyS L C ⊓ (reflES L C ⊓ (transES L C ⊓ (antisymmES L C ⊓ totalES L C)))
 
 variable {L C} [L.IsRelational] (A : Type) [L.Structure A] (n : ℕ)

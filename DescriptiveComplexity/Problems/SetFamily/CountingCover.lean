@@ -277,7 +277,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 
 /-- The vertex-sets of a vertex cover of the threshold size are a cover of the
 threshold size. -/
-private theorem setCoverOfSize_vertexFamily {C : A → Prop} (h : CoverOfSize A C) :
+theorem setCoverOfSize_vertexFamily {C : A → Prop} (h : CoverOfSize A C) :
     SetCoverOfSize (edgeIncidenceInterp.Map A) (vertexFamily C) := by
   obtain ⟨hfin, hcov, hcard⟩ := h
   have := hfin
@@ -294,7 +294,7 @@ private theorem setCoverOfSize_vertexFamily {C : A → Prop} (h : CoverOfSize A 
         (edgeIncidence_mem w ![w 1, w 1]).mpr ⟨by simp, Or.inr (by simp)⟩⟩
 
 /-- A cover of the interpreted system consists of vertex-sets. -/
-private theorem setCover_diag {G : edgeIncidenceInterp.Map A → Prop}
+theorem setCover_diag {G : edgeIncidenceInterp.Map A → Prop}
     (h : SetCoverOfSize (edgeIncidenceInterp.Map A) G) :
     ∀ p : edgeIncidenceInterp.Map A, G p → ∃ v, p = diagPt v := by
   rintro ⟨⟨⟩, w⟩ hw
@@ -303,7 +303,7 @@ private theorem setCover_diag {G : edgeIncidenceInterp.Map A → Prop}
 
 /-- The vertices of a cover of the threshold size are a vertex cover of the
 threshold size. -/
-private theorem coverOfSize_of_setCover {G : edgeIncidenceInterp.Map A → Prop}
+theorem coverOfSize_of_setCover {G : edgeIncidenceInterp.Map A → Prop}
     (h : SetCoverOfSize (edgeIncidenceInterp.Map A) G) :
     CoverOfSize A fun v => G (diagPt v) := by
   have hdiag := setCover_diag h
@@ -321,7 +321,7 @@ private theorem coverOfSize_of_setCover {G : edgeIncidenceInterp.Map A → Prop}
 variable (A) in
 /-- **The covers of the threshold size of the edge-incidence system are the
 vertex covers of the threshold size**, bijectively. -/
-private def coverEquiv :
+def coverEquiv :
     {C : A → Prop // CoverOfSize A C} ≃
       {G : edgeIncidenceInterp.Map A → Prop //
         SetCoverOfSize (edgeIncidenceInterp.Map A) G} where

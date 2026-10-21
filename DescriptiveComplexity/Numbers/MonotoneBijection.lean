@@ -64,7 +64,7 @@ theorem MonoBij.functional (h : MonoBij K S F) {x y y' : A} (hy : F x y) (hy' : 
   le_antisymm ((h.2.2.2 x x y y' hy hy').mp le_rfl) ((h.2.2.2 x x y' y hy' hy).mp le_rfl)
 
 /-- A monotone bijection is injective. -/
-private theorem MonoBij.injective (h : MonoBij K S F) {x x' y : A} (hx : F x y) (hx' : F x' y) :
+theorem MonoBij.injective (h : MonoBij K S F) {x x' y : A} (hx : F x y) (hx' : F x' y) :
     x = x' :=
   le_antisymm ((h.2.2.2 x x' y y hx hx').mpr le_rfl) ((h.2.2.2 x' x y y hx' hx).mpr le_rfl)
 

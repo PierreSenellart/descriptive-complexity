@@ -72,7 +72,7 @@ private theorem rInLe_succ {n : ℕ} {a b : V} :
 
 theorem RInLe.step {n : ℕ} {a b : V} (h : RInLe E n a b) : RInLe E (n + 1) a b := Or.inl h
 
-private theorem RInLe.mono
+theorem RInLe.mono
     {n m : ℕ} {a b : V} (hnm : n ≤ m) (h : RInLe E n a b) : RInLe E m a b := by
   induction m with
   | zero => exact (Nat.le_zero.mp hnm) ▸ h

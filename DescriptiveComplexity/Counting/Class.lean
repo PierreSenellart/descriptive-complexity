@@ -216,7 +216,7 @@ private theorem ofKernel_mem_sharpP (B : SOBlock) (φ : (L.sum B.lang).Sentence)
 count of witnesses is positive exactly when there is a witness, and the order
 the kernel reads is re-quantified by the order elimination of
 `DescriptiveComplexity.sigmaSODefinable_of_orderPull`. -/
-private theorem SharpPDefinable.support_sigmaSODefinable {C : CountingProblem L}
+theorem SharpPDefinable.support_sigmaSODefinable {C : CountingProblem L}
     (h : SharpPDefinable C) : SigmaSODefinable 1 C.support := by
   obtain ⟨B, φ, hφ⟩ := h
   refine sigmaSODefinable_of_orderPull (k := 0) [B] rfl φ ?_

@@ -259,7 +259,7 @@ variable (A) in
 /-- Correctness of the reduction: a finite ordered CNF structure is
 satisfiable iff its interpreted marked graph has a clique at least as large
 as the marked set. -/
-private theorem satisfiable_iff_hasLargeClique [Finite A] [Nonempty A] :
+theorem satisfiable_iff_hasLargeClique [Finite A] [Nonempty A] :
     Satisfiable A ↔ HasLargeClique (satToClique.Map A) := by
   classical
   have hfin : Finite (satToClique.Map A) := satToClique.map_finite A
@@ -447,7 +447,7 @@ CNF structure to a yes-instance of Clique iff it is satisfiable. (The order
 is never mentioned by the formulas; the ordered packaging only serves to
 restrict correctness to finite structures, as required by the finiteness
 conjunct of `DescriptiveComplexity.Clique`.) -/
-private noncomputable def sat_ordered_fo_reduction_clique : SAT ≤ᶠᵒ[≤] Clique where
+noncomputable def sat_ordered_fo_reduction_clique : SAT ≤ᶠᵒ[≤] Clique where
   Tag := SatCliqueTag
   dim := 2
   toInterpretation := satToClique

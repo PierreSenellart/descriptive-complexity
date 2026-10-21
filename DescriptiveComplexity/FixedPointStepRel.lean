@@ -126,7 +126,7 @@ theorem SOBlock.pullAssignRel_iff (B : SOBlock) (I : RelFOInterpretation L₁ L�
 
 omit [L₂.IsRelational] in
 /-- Transferring the empty assignment gives the empty assignment. -/
-private theorem SOBlock.pullAssignRel_botAssign (B : SOBlock)
+theorem SOBlock.pullAssignRel_botAssign (B : SOBlock)
     (I : RelFOInterpretation L₁ L₂ Tag dm) {A : Type} [L₁.Structure A] :
     B.pullAssignRel I (B.botAssign (I.MapRel A)) = (B.pull Tag dm).botAssign A := by
   funext p x

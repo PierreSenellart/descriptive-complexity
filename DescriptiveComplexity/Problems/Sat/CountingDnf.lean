@@ -206,7 +206,7 @@ theorem dnfModel_swap_iff (e : A ≃ B)
 /-- **Models and non-models share out the assignments**: a CNF formula with
 `n` variables and its sign swap, read as a DNF formula, have `2 ^ n` models
 between them. -/
-private theorem sharpSat_add_sharpDnf [Finite A] (e : A ≃ B)
+theorem sharpSat_add_sharpDnf [Finite A] (e : A ≃ B)
     (hcl : ∀ c : A, RelMap satIsClause ![c] ↔ RelMap satIsClause ![e c])
     (hpos : ∀ c x : A, RelMap satPosIn ![c, x] ↔ RelMap satNegIn ![e c, e x])
     (hneg : ∀ c x : A, RelMap satNegIn ![c, x] ↔ RelMap satPosIn ![e c, e x]) :
@@ -257,7 +257,7 @@ private theorem realize_satOccursAt {α : Type} (A : Type) [Language.sat.Structu
 noncomputable def satOccursFormula : (Language.sat.sum Language.order).Formula (Fin 1) :=
   LHom.sumInl.onFormula (satOccursAt (0 : Fin 1))
 
-private theorem realize_satOccursFormula (A : Type) [Language.sat.Structure A] [LinearOrder A]
+theorem realize_satOccursFormula (A : Type) [Language.sat.Structure A] [LinearOrder A]
     (a : A) : satOccursFormula.Realize (fun _ => a) ↔ SatOccurs A a := by
   rw [satOccursFormula, LHom.realize_onFormula, satOccursAt]
   simp only [SatOccurs, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
@@ -270,7 +270,7 @@ private theorem realize_satOccursFormula (A : Type) [Language.sat.Structure A] [
 
 /-- **#SAT reduces to #DNF with one call**: `#SAT(φ) = 2 ^ n - #DNF(¬φ)`, for
 `n` the number of variables of `φ`. -/
-private noncomputable def sharpSat_oneCall_sharpDnf : SharpSAT ≤ᶜ[≤] SharpDNF :=
+noncomputable def sharpSat_oneCall_sharpDnf : SharpSAT ≤ᶜ[≤] SharpDNF :=
   (SharpDNF.pullbackReduction swapSignInterp).toOneCall.ofPost
     (.sub (.pow2 (.count satOccursFormula)) .oracle) fun A _ _ _ _ => by
       have h := sharpSat_add_sharpDnf (swapSignInterp.mapEquivSelf A).symm

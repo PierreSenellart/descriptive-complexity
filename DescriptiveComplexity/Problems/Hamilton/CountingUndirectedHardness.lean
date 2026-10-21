@@ -82,7 +82,7 @@ def SArc (R : A → A → Prop) : T3 × A → T3 × A → Prop
 /-- The edges of the split graph. -/
 def SEdge (R : A → A → Prop) (p q : T3 × A) : Prop := SArc R p q ∨ SArc R q p
 
-private theorem sedge_symm {R : A → A → Prop} {p q : T3 × A} (h : SEdge R p q) : SEdge R q p :=
+theorem sedge_symm {R : A → A → Prop} {p q : T3 × A} (h : SEdge R p q) : SEdge R q p :=
   h.symm
 
 private theorem sedge_m {R : A → A → Prop} {x : A} {q : T3 × A} (h : SEdge R (.m, x) q) :
@@ -111,7 +111,7 @@ variable [Finite A]
 /-! ### From a directed circuit to a circuit of the split graph -/
 
 /-- **A directed circuit, split, is a circuit of the split graph.** -/
-private theorem isCircuit_sarc [Nonempty A] {R Nxt : A → A → Prop} (h : IsCircuit R Nxt) :
+theorem isCircuit_sarc [Nonempty A] {R Nxt : A → A → Prop} (h : IsCircuit R Nxt) :
     IsCircuit (SEdge R) (SArc Nxt) := by
   classical
   obtain ⟨htot, hfun, hsurj, -, hR, -⟩ := h.local
@@ -181,7 +181,7 @@ private theorem no2 (hN : IsCircuit (SEdge R) N) (a : A) {u v : T3 × A} (h : N 
 
 /-- The circuit passes through the middle copy of a vertex, one way or the
 other. -/
-private theorem through_m (hN : IsCircuit (SEdge R) N) (x : A) :
+theorem through_m (hN : IsCircuit (SEdge R) N) (x : A) :
     (N (.i, x) (.m, x) ∧ N (.m, x) (.o, x)) ∨ (N (.o, x) (.m, x) ∧ N (.m, x) (.i, x)) := by
   obtain ⟨htot, -, hsurj, -, hR, -⟩ := hN.local
   obtain ⟨v, hv⟩ := htot (.m, x)
@@ -224,7 +224,7 @@ theorem forward_all (hN : IsCircuit (SEdge R) N) {x₀ : A} (h₀ : N (.i, x₀)
   exact fun x => key (.i, x)
 
 /-- **A forward circuit of the split graph is a split directed circuit.** -/
-private theorem exists_circuit_of_forward [Nonempty A] (hN : IsCircuit (SEdge R) N)
+theorem exists_circuit_of_forward [Nonempty A] (hN : IsCircuit (SEdge R) N)
     (hfwd : ∀ x, N (.i, x) (.m, x)) :
     IsCircuit R (fun x y => N (.o, x) (.i, y)) ∧
       ∀ p q, N p q ↔ SArc (fun x y => N (.o, x) (.i, y)) p q := by
@@ -282,13 +282,13 @@ end Reverse
 
 omit [Finite A] in
 /-- A split relation is read back on its exit-to-entry arcs. -/
-private theorem sarc_sym_iff {Nxt : A → A → Prop} (x y : A) :
+theorem sarc_sym_iff {Nxt : A → A → Prop} (x y : A) :
     (SArc Nxt (.o, x) (.i, y) ∨ SArc Nxt (.i, y) (.o, x)) ↔ Nxt x y :=
   ⟨fun h => h.elim id fun h => (h : False).elim, Or.inl⟩
 
 /-- **The undirected circuits of the split graph are the directed circuits of
 the graph**, bijectively. -/
-private noncomputable def splitEquiv [Nonempty A] (R : A → A → Prop) :
+noncomputable def splitEquiv [Nonempty A] (R : A → A → Prop) :
     {Nxt : A → A → Prop // IsCircuit R Nxt} ≃
       {E : T3 × A → T3 × A → Prop // IsUCircuit (SEdge R) E} :=
   Equiv.ofBijective

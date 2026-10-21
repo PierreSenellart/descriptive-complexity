@@ -397,7 +397,7 @@ private theorem ex {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
       exact ⟨fun _ => a, ha⟩
 
 /-- **Universal quantification** of one variable, in the same layout. -/
-private theorem all {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
+theorem all {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∀ a, R A (Sum.elim v fun _ => a) :=
   h.alls.congr fun _ _ _ _ _ _ => by
     refine ⟨fun hw a => hw _, fun ha w => ?_⟩

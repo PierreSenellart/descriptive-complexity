@@ -216,7 +216,7 @@ theorem EquivK.update {a b : Fin k → A} (h : EquivK E₀ a b) (i : Fin k) (c :
   (((equivK_iff E₀ a b).mp h).2 i).1 c
 
 /-- The game move, from the right. -/
-private theorem EquivK.update_right {a b : Fin k → A} (h : EquivK E₀ a b) (i : Fin k) (d : A) :
+theorem EquivK.update_right {a b : Fin k → A} (h : EquivK E₀ a b) (i : Fin k) (d : A) :
     ∃ c : A, EquivK E₀ (Function.update a i c) (Function.update b i d) :=
   (((equivK_iff E₀ a b).mp h).2 i).2 d
 

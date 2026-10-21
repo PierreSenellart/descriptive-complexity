@@ -81,7 +81,7 @@ private theorem maxCut_symm (u : B ≃ A) {RB : B → B → Prop} {RA : A → A 
   simp
 
 /-- `MaxCutOn` transports along an equivalence, iff version. -/
-private theorem MaxCutOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop} {AdjA KA : A → A → Prop}
+theorem MaxCutOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop} {AdjA KA : A → A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b'))
     (hK : ∀ b b', KB b b' ↔ KA (u b) (u b')) :
     MaxCutOn AdjB KB ↔ MaxCutOn AdjA KA :=

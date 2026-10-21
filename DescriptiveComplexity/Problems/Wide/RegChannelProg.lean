@@ -70,7 +70,7 @@ layer at the sweep that lays nothing and the region-guessing one, over the
 shared tower's evaluation, with the input written on the argument elements'
 file. Its pointer starts clear – there is no file-laying pointer to set – and
 its channel writes for the argument elements alone. -/
-private noncomputable def nexProgHanded (hzo : zero ≠ one)
+noncomputable def nexProgHanded (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G)
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v)

@@ -237,7 +237,7 @@ private theorem symm_hBin {MB : B → B → Prop} {MA : A → A → Prop} (u : B
   simp
 
 /-- `CoversOn` transports along an equivalence, iff version. -/
-private theorem CoversOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
+theorem CoversOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
     {EA FA KA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
@@ -315,7 +315,7 @@ theorem SplitsOn.of_equiv (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → P
     simpa using this
 
 /-- `SplitsOn` transports along an equivalence, iff version. -/
-private theorem SplitsOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+theorem SplitsOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
     {EA FA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) :
@@ -324,7 +324,7 @@ private theorem SplitsOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B �
     SplitsOn.of_equiv u.symm (symm_hUn u hE) (symm_hUn u hF) (symm_hBin u hM)⟩
 
 /-- `ExactlyCoversOn` transports along an equivalence, iff version. -/
-private theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
     {EA FA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) :
@@ -333,7 +333,7 @@ private theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB
     ExactlyCoversOn.of_equiv u.symm (symm_hUn u hE) (symm_hUn u hF) (symm_hBin u hM)⟩
 
 /-- `PacksOn` transports along an equivalence, iff version. -/
-private theorem PacksOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
+theorem PacksOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
     {EA FA KA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :

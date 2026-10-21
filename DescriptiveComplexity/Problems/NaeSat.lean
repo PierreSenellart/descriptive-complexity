@@ -109,7 +109,7 @@ private theorem naeProper_occ {ν : A → Prop} (h : NAEProper ν) (c : A)
     · exact ⟨y, false, ⟨hc, hn⟩, not_not_intro hT⟩
 
 /-- Not-all-equal properness from the occurrence form. -/
-private theorem naeProper_of_occ {ν : A → Prop}
+theorem naeProper_of_occ {ν : A → Prop}
     (h : ∀ c : A, RelMap satIsClause ![c] →
       (∃ x s, OccIn c x s ∧ LitTrue ν x s) ∧ ∃ x s, OccIn c x s ∧ ¬LitTrue ν x s) :
     NAEProper ν := by

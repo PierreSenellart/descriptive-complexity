@@ -162,7 +162,7 @@ def DecisionProblem.comapExOrd [L.IsRelational] : DecisionProblem L where
 /-- The pullback of `Q` along an *ordered* interpretation, with the order
 quantified universally: every linear order on the instance sends it to a
 yes-instance of `Q`. -/
-private def DecisionProblem.comapAllOrd [L.IsRelational] : DecisionProblem L where
+def DecisionProblem.comapAllOrd [L.IsRelational] : DecisionProblem L where
   Holds A _ := ∀ lo : LinearOrder A,
     letI := lo
     Q (I.Map A)
@@ -321,7 +321,7 @@ theorem DPDefinable.sigmaSODefinable_two (h : DPDefinable P) : SigmaSODefinable 
 /-- **DP ⊆ Π₂ᵖ**, the same merge with the blocks in the other order:
 `∀Y ∃X. (φ ∧ ψ)`. Recovering the `Σ` half from it uses that a block always has
 *some* assignment – the constantly true one will do. -/
-private theorem DPDefinable.piSODefinable_two (h : DPDefinable P) : PiSODefinable 2 P := by
+theorem DPDefinable.piSODefinable_two (h : DPDefinable P) : PiSODefinable 2 P := by
   obtain ⟨S, T, hS, hT, hST⟩ := h
   obtain ⟨Bs₁, hk1, φ, hφ⟩ := hS
   obtain ⟨Bs₂, hk2, ψ, hψ⟩ := hT

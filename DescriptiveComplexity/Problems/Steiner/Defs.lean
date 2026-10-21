@@ -390,7 +390,7 @@ theorem SteinerOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B
   exact hcard
 
 /-- `SteinerOn` transports along an equivalence, iff version. -/
-private theorem SteinerOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B → Prop}
+theorem SteinerOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B → Prop}
     {AdjA : A → A → Prop} {TermA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hterm : ∀ b, TermB b ↔ TermA (u b))
     (hK : ∀ b, KB b ↔ KA (u b)) : SteinerOn AdjB TermB KB ↔ SteinerOn AdjA TermA KA :=
@@ -420,7 +420,7 @@ theorem SteinerEdgeOn.of_equiv {A B : Type} (u : B ≃ A) {AdjB : B → B → Pr
     exact hcard
 
 /-- `SteinerEdgeOn` transports along an equivalence, iff version. -/
-private theorem SteinerEdgeOn.equiv_iff {A B : Type} (u : B ≃ A) {AdjB : B → B → Prop}
+theorem SteinerEdgeOn.equiv_iff {A B : Type} (u : B ≃ A) {AdjB : B → B → Prop}
     {TermB KB : B → Prop}
     {AdjA : A → A → Prop} {TermA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hterm : ∀ b, TermB b ↔ TermA (u b))

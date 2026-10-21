@@ -770,7 +770,7 @@ theorem ProbDb.Matches.finprod_factWeight (hm : i.Matches)
 open Classical in
 /-- The possible worlds of the instance are the possible worlds of the
 database. -/
-private theorem ProbDb.Matches.isWeightedWorld_iff (hm : i.Matches)
+theorem ProbDb.Matches.isWeightedWorld_iff (hm : i.Matches)
     (ρ : (worldBlock Language.rst).Assignment (Fin i.n)) :
     IsWeightedWorld ρ ↔ i.Valid (worldTables ρ) := by
   constructor
@@ -817,7 +817,7 @@ theorem ProbDb.Matches.count_eq (hm : i.Matches) : i.count = WeightedWorlds h0 (
 
 /-- On an instance matching a database, the abstract count of all the weighted
 worlds is the total weight computed from the database. -/
-private theorem ProbDb.Matches.total_eq (hm : i.Matches) :
+theorem ProbDb.Matches.total_eq (hm : i.Matches) :
     i.total = WeightedWorlds (⊤ : Language.rst.Sentence) (Fin i.n) := by
   let := Fintype.ofFinite {ρ : (worldBlock Language.rst).Assignment (Fin i.n) //
     IsWeightedWorld ρ ∧ @Sentence.Realize Language.rst (Fin i.n) (worldStructure ρ) ⊤}

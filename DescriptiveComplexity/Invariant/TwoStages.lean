@@ -84,7 +84,7 @@ variable [L.IsRelational] [Finite M] [Finite N]
 /-- **One application of the step formulas preserves joint invariance**: the
 two-structure `k`-variable invariance lemma, over the structures expanded by
 the (jointly invariant) current stages. -/
-private theorem StepDef.next_invariant₂ (d : StepDef L) (hd : d.VarBound k) (hrels : d.UsesRels S)
+theorem StepDef.next_invariant₂ (d : StepDef L) (hd : d.VarBound k) (hrels : d.UsesRels S)
     {ρ : d.B.Assignment M} {σ : d.B.Assignment N} (hρσ : AssignInvariant₂ S M N k ρ σ) :
     AssignInvariant₂ S M N k (d.next ρ) (d.next σ) := by
   intro i g v w hvw

@@ -85,7 +85,7 @@ abbrev x : A := o.1.2.1
 /-- The sign of an occurrence. -/
 abbrev s : Bool := o.1.2.2
 
-private theorem ext {o o' : Occ A} (hc : o.c = o'.c) (hx : o.x = o'.x) (hs : o.s = o'.s) : o = o' :=
+theorem ext {o o' : Occ A} (hc : o.c = o'.c) (hx : o.x = o'.x) (hs : o.s = o'.s) : o = o' :=
   Subtype.ext (Prod.ext hc (Prod.ext hx hs))
 
 /-- The variable of an occurrence is a variable of the formula. -/
@@ -103,7 +103,7 @@ theorem occIn_of_coe {c : A} (h : o.c = c) : OccIn c o.x o.s := by
   · exact WithBot.coe_injective (hc'.symm.trans h) ▸ h'
 
 /-- The dummy occurrence of a variable. -/
-private def dummy (x : A) (hx : SatOccurs A x) (s : Bool) : Occ A :=
+def dummy (x : A) (hx : SatOccurs A x) (s : Bool) : Occ A :=
   ⟨(⊥, x, s), Or.inl ⟨rfl, hx⟩⟩
 
 /-- A real occurrence. -/

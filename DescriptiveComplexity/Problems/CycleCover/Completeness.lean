@@ -58,7 +58,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Fintype A]
 
 /-- The permanent of the attached matrix is `4 ^ t` times the number of
 exactly-one models. -/
-private theorem bperm_attachedM :
+theorem bperm_attachedM :
     bperm (attachedM (A := A)) = 4 ^ Nat.card (Occ A) * (SharpOneInSAT A : ℤ) := by
   rw [attachedM, Site.bperm_flatAttach, Nat.card_eq_fintype_card]
   exact bperm_attachAll_sites_eq
@@ -72,7 +72,7 @@ private theorem card_satOccurs_le
 
 omit [LinearOrder A] [Fintype A] in
 /-- The number of exactly-one models is at most `2 ^ t`. -/
-private theorem sharpOneInSat_le [Finite A] : SharpOneInSAT A ≤ 2 ^ Nat.card (Occ A) := by
+theorem sharpOneInSat_le [Finite A] : SharpOneInSAT A ≤ 2 ^ Nat.card (Occ A) := by
   rw [sharpOneInSat_apply]
   refine le_trans (Nat.card_le_card_of_injective
     (fun ν : {ν : A → Prop // OneInModel A ν} => (⟨ν.1, ν.2.2⟩ :
@@ -86,7 +86,7 @@ variable [Nonempty A]
 
 /-- **The number of cycle covers of the drawing** is the permanent of the
 ladder expansion of the attached matrix. -/
-private theorem sharpCycleCover_drawInterp :
+theorem sharpCycleCover_drawInterp :
     SharpCycleCover (drawInterp.MapRel A) =
       bperm (ladder 3 (widths (Λ := Level A) (attachedM (A := A)))) := by
   classical
@@ -112,7 +112,7 @@ end SatCover
 exactly-one models is the permanent of the drawn digraph, modulo `2 ^ L + 1`
 for `L` the number of levels, divided by `4 ^ t` for `t` the number of
 occurrences. -/
-private noncomputable def sharpOneInSat_oneCall_sharpCycleCover
+noncomputable def sharpOneInSat_oneCall_sharpCycleCover
     : SharpOneInSAT ≤ᶜ[≤] SharpCycleCover where
   Tag := SatCover.FullTag
   dim := 6

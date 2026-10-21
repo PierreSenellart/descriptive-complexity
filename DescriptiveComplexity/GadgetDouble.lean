@@ -230,7 +230,7 @@ variable (F : FOInterpretation L₀ L₁ Tag d) {A : Type} [(Language.twoCopies 
 omit [L₁.IsRelational] in
 /-- **A point of the doubled construction is on the pattern side exactly when
 all its coordinates are.** -/
-private theorem tcPatMark_double (p : F.double.Map A) :
+theorem tcPatMark_double (p : F.double.Map A) :
     TCPatMark (L₁ := L₁) p ↔ ∀ j, TCPatMark (L₁ := L₀) (p.2 j) := by
   rw [TCPatMark, FOInterpretation.relMap_map]
   simp only [FOInterpretation.double, Formula.realize_iInf, Formula.realize_rel₁,
@@ -253,7 +253,7 @@ side.** This is what makes a reduction between isomorphism problems a statement
 about a construction on *single* structures: the two sides of the constructed
 instance are `F` applied to the two sides of the input, so an isomorphism of
 the former is one of the latter's images. -/
-private noncomputable def patSideDoubleEquiv :
+noncomputable def patSideDoubleEquiv :
     {p : F.double.Map A // TCPatMark (L₁ := L₁) p} ≃[L₁]
       F.Map {x : A // TCPatMark (L₁ := L₀) x} where
   toFun p := (p.1.1, fun j => ⟨p.1.2 j, (tcPatMark_double F p.1).mp p.2 j⟩)
@@ -312,13 +312,13 @@ isomorphic arguments. The converse holds for free, an interpretation being
 functorial (`DescriptiveComplexity.FOInterpretation.mapLEquiv`), so this is the
 whole content a client has to supply – and it speaks about single structures,
 with no pattern/host distinction anywhere. -/
-private def IsoReflecting (F : FOInterpretation L₀ L₁ Tag d) : Prop :=
+def IsoReflecting (F : FOInterpretation L₀ L₁ Tag d) : Prop :=
   ∀ (G H : Type) [L₀.Structure G] [L₀.Structure H] [Finite G] [Finite H],
     Nonempty (F.Map G ≃[L₁] F.Map H) → Nonempty (G ≃[L₀] H)
 
 /-- **Correctness of a doubled gadget**: the two sides of the input are
 isomorphic exactly when the two sides of its image are. -/
-private theorem twoCopiesIso_double_iff [Finite Tag] (hrefl : IsoReflecting F) (hA : Finite A) :
+theorem twoCopiesIso_double_iff [Finite Tag] (hrefl : IsoReflecting F) (hA : Finite A) :
     (TwoCopiesIso L₀).Holds A ↔ (TwoCopiesIso L₁).Holds (F.double.Map A) := by
   have := hA
   have : Finite {x : A // TCPatMark (L₁ := L₀) x} := Subtype.finite
@@ -331,7 +331,7 @@ private theorem twoCopiesIso_double_iff [Finite Tag] (hrefl : IsoReflecting F) (
 
 /-- **A gadget that reflects isomorphism is a reduction**: run it on both
 sides. Order-free, as a reduction between isomorphism problems must be. -/
-private noncomputable def isoReflecting_fo_reduction [Finite Tag] [Nonempty Tag]
+noncomputable def isoReflecting_fo_reduction [Finite Tag] [Nonempty Tag]
     (hrefl : IsoReflecting F) : TwoCopiesIso L₀ ≤ᶠᵒ TwoCopiesIso L₁ where
   Tag := Tag
   dim := d

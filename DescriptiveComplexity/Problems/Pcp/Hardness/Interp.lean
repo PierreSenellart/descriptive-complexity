@@ -785,7 +785,7 @@ private theorem reads_haltPcp :
     exact realize_vAtF (fun j => rfl) (fun j => rfl) (fun j => rfl)
 
 /-- **The image is a yes-instance exactly when the machine halts.** -/
-private theorem pcp_map_iff :
+theorem pcp_map_iff :
     PCP (haltPcpInterp.Map A) ↔ (tmData A).WellFormed ∧ (tmData A).AcceptsU :=
   pcpOn_iff_of_reads (reads_haltPcp A)
 

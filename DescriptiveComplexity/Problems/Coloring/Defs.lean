@@ -114,7 +114,7 @@ theorem ColorableOn.of_equiv (u : B ≃ A) {CflB : B → B → Prop} {CflA : A �
   exact hc (u.symm x) (u.symm y) ((hcfl (u.symm x) (u.symm y)).mpr (by simpa using hxy))
 
 /-- `ColorableOn` transports along an equivalence, iff version. -/
-private theorem ColorableOn.equiv_iff (u : B ≃ A) {CflB : B → B → Prop} {CflA : A → A → Prop}
+theorem ColorableOn.equiv_iff (u : B ≃ A) {CflB : B → B → Prop} {CflA : A → A → Prop}
     {k : ℕ} (hcfl : ∀ b b', CflB b b' ↔ CflA (u b) (u b')) :
     ColorableOn CflB k ↔ ColorableOn CflA k :=
   ⟨ColorableOn.of_equiv u hcfl,

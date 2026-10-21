@@ -102,13 +102,13 @@ theorem efStage.partialIso : ∀ {n : ℕ}, efStage L n a b → PartialIso L a b
 
 /-- **The spoiler moves on the left**: from a position surviving `n + 1`
 rounds, an element appended on the left is answered on the right. -/
-private theorem efStage.forth (h : efStage L (n + 1) a b) (c : M) :
+theorem efStage.forth (h : efStage L (n + 1) a b) (c : M) :
     ∃ d : N, efStage L n (Fin.snoc a c) (Fin.snoc b d) :=
   h.2.1 c
 
 /-- **The spoiler moves on the right**: from a position surviving `n + 1`
 rounds, an element appended on the right is answered on the left. -/
-private theorem efStage.back (h : efStage L (n + 1) a b) (d : N) :
+theorem efStage.back (h : efStage L (n + 1) a b) (d : N) :
     ∃ c : M, efStage L n (Fin.snoc a c) (Fin.snoc b d) :=
   h.2.2 d
 
@@ -153,7 +153,7 @@ theorem EFEquiv.symm (h : EFEquiv L M N n) : EFEquiv L N M n :=
   efStage.symm h
 
 /-- `n`-round equivalence is antitone in the number of rounds. -/
-private theorem EFEquiv.mono {m : ℕ} (hmn : m ≤ n) (h : EFEquiv L M N n) : EFEquiv L M N m :=
+theorem EFEquiv.mono {m : ℕ} (hmn : m ≤ n) (h : EFEquiv L M N n) : EFEquiv L M N m :=
   efStage_le hmn h
 
 /-! ### The methodology lemma -/

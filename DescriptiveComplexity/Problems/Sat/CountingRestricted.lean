@@ -332,7 +332,7 @@ private theorem edge_dom_true (w : Fin 2 → A) :
     ((edgeInterp s).domFormula true).Realize w ↔ GEdge (w 0) (w 1) :=
   realize_edgeDomF w
 
-private theorem edge_dom_false (w : Fin 2 → A) :
+theorem edge_dom_false (w : Fin 2 → A) :
     ((edgeInterp s).domFormula false).Realize w ↔ w 0 = w 1 := by
   simp [edgeInterp]
 
@@ -483,7 +483,7 @@ theorem eval_isoCount [LinearOrder A] : isoCount.eval A = Nat.card {x : A // ¬N
 
 /-- The count of the graph is the model count of the formula of its edges,
 doubled for each isolated vertex. -/
-private theorem sharpAllIndependentSets_eq_edge [Finite A] :
+theorem sharpAllIndependentSets_eq_edge [Finite A] :
     SharpAllIndependentSets A = SharpSAT ((edgeInterp s).MapRel A) *
       2 ^ Nat.card {x : A // ¬NonIso x} := by
   rw [sharpAllIndependentSets_apply, sharpSat_apply, Nat.card_congr edgeModelEquiv,
@@ -494,7 +494,7 @@ private theorem sharpAllIndependentSets_eq_edge [Finite A] :
 
 /-- **Counting all the independent sets reduces to #SAT with one call**, the
 formula being one clause of sign `s` per edge. -/
-private noncomputable def sharpAllIndependentSets_oneCall_sharpSat (s : Bool) :
+noncomputable def sharpAllIndependentSets_oneCall_sharpSat (s : Bool) :
     SharpAllIndependentSets ≤ᶜ[≤] SharpSAT where
   Tag := Bool
   dim := 2

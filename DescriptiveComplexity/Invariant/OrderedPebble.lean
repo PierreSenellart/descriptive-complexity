@@ -159,7 +159,7 @@ theorem IncompRel.congr_left {u v w : Fin k → A} (h : O u v)
 
 include htrans hinc in
 /-- Comparability is a congruence for incomparability, on the left. -/
-private theorem IncompRel.congr_right {u v w : Fin k → A} (huv : IncompRel O u v)
+theorem IncompRel.congr_right {u v w : Fin k → A} (huv : IncompRel O u v)
     (h : O v w) : O u w := by
   by_contra huw
   rcases Classical.em (O w u) with hwu | hwu
@@ -221,7 +221,7 @@ theorem SetLess.congr_right {O : PebbleRel A k} {j : Fin k} {u v w : Fin k → A
   exact fun hiff => hy (hiff.trans (hvw y))
 
 /-- Set comparison is invariant under move-set equality on the left. -/
-private theorem SetLess.congr_left {O : PebbleRel A k} {j : Fin k} {u v w : Fin k → A}
+theorem SetLess.congr_left {O : PebbleRel A k} {j : Fin k} {u v w : Fin k → A}
     (huv : MovesEq O j u v) (h : SetLess O j v w) : SetLess O j u w := by
   obtain ⟨x, hxv, hxw, hxmin⟩ := h
   refine ⟨x, (huv x).mpr hxv, hxw, fun y hy => hxmin y ?_⟩
@@ -499,7 +499,7 @@ theorem OrdK.congr_left {u v w : Fin k → A} (h : OrdK c₀ u v)
     (fun a b c h1 h2 => incompRel_ordK_trans c₀ h1 h2) h hvw'
 
 /-- The canonical order is a congruence for `≡ᵏ` on the left. -/
-private theorem OrdK.congr_right {u v w : Fin k → A} (huv : EquivK (colorAgree c₀) u v)
+theorem OrdK.congr_right {u v w : Fin k → A} (huv : EquivK (colorAgree c₀) u v)
     (h : OrdK c₀ v w) : OrdK c₀ u w := by
   have huv' : IncompRel (OrdK c₀) u v := by
     rw [incompRel_ordK_eq]

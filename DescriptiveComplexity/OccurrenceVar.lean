@@ -68,7 +68,7 @@ theorem VarNext.occIn_left {x c c' : A} {s t : Bool} (h : VarNext x c s c' t) :
   rcases h with h | ⟨h, -⟩
   exacts [h.1, h.1]
 
-private theorem VarNext.occIn_right {x c c' : A} {s t : Bool} (h : VarNext x c s c' t) :
+theorem VarNext.occIn_right {x c c' : A} {s t : Bool} (h : VarNext x c s c' t) :
     OccIn c' x t := by
   rcases h with h | ⟨-, h⟩
   exacts [h.2.1, h.1]

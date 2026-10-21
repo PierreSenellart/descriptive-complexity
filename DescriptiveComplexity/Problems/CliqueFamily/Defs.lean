@@ -174,7 +174,7 @@ private theorem symm_hK {KB : B → Prop} {KA : A → Prop} (u : B ≃ A)
   simp
 
 /-- `CliqueOn` transports along an equivalence, iff version. -/
-private theorem CliqueOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+theorem CliqueOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     CliqueOn AdjB KB ↔ CliqueOn AdjA KA :=
@@ -182,7 +182,7 @@ private theorem CliqueOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB :
     CliqueOn.of_equiv u.symm (symm_hadj u hadj) (symm_hK u hK)⟩
 
 /-- `IndepOn` transports along an equivalence, iff version. -/
-private theorem IndepOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+theorem IndepOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     IndepOn AdjB KB ↔ IndepOn AdjA KA :=
@@ -190,7 +190,7 @@ private theorem IndepOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : 
     IndepOn.of_equiv u.symm (symm_hadj u hadj) (symm_hK u hK)⟩
 
 /-- `CoverOn` transports along an equivalence, iff version. -/
-private theorem CoverOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+theorem CoverOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     CoverOn AdjB KB ↔ CoverOn AdjA KA :=

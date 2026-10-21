@@ -333,7 +333,7 @@ def refl (e : StepDef (K.sum Language.order)) : e.Ext e where
   limit := fun _ _ _ _ => rfl
 
 /-- Extensions compose. -/
-private def trans (x : e.Ext e') (y : e'.Ext e'') : e.Ext e'' where
+def trans (x : e.Ext e') (y : e'.Ext e'') : e.Ext e'' where
   emb := y.emb ∘ x.emb
   arity_emb := fun i => (y.arity_emb (x.emb i)).trans (x.arity_emb i)
   limit := fun A _ _ _ => by
@@ -371,7 +371,7 @@ theorem StepDef.Computes.ext {e e' : StepDef (K.sum Language.order)} {r : ℕ}
 /-- **The relations of a new stratum**, in the stratified induction: their
 limits are those of the stratum, over the structure expanded by the limit of
 the induction below. -/
-private theorem StepDef.inflLimit_stratify_inr (e : StepDef (K.sum Language.order))
+theorem StepDef.inflLimit_stratify_inr (e : StepDef (K.sum Language.order))
     (d : StepDef ((K.sum Language.order).sum e.B.lang)) (A : Type) [K.Structure A]
     [LinearOrder A] [Finite A] (i : d.B.ι) (x : Fin (d.B.arity i) → A) :
     (e.stratify d).inflLimit A (.inr i) x ↔

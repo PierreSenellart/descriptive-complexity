@@ -250,12 +250,12 @@ variable {A : Type} [Language.sat.Structure A]
 
 /-- The dominating set of an assignment: the vertices of its true literals – or
 everything, when there is no clause. -/
-private def domOf (ν : A → Prop) (p : sdInterp.Map A) : Prop :=
+def domOf (ν : A → Prop) (p : sdInterp.Map A) : Prop :=
   NoCl A ∨ ∃ s x, p = sdPt (.lit s) x ∧ SatOccurs A x ∧ LitTrue ν x s
 
 /-- The assignment of a dominating set: the variables whose positive literal
 vertex it holds. -/
-private def modelOf (D : sdInterp.Map A → Prop) (x : A) : Prop :=
+def modelOf (D : sdInterp.Map A → Prop) (x : A) : Prop :=
   D (sdPt (.lit true) x) ∧ SatOccurs A x
 
 /-- The marked vertices, one per variable. -/
@@ -313,7 +313,7 @@ private theorem ncard_domOf (hne : ¬NoCl A) (ν : A → Prop) :
 /-! ### Correctness -/
 
 /-- The dominating set of a model is one, of the threshold size. -/
-private theorem domSetOfSize_domOf [Finite A] {ν : A → Prop} (hν : SatModel A ν) :
+theorem domSetOfSize_domOf [Finite A] {ν : A → Prop} (hν : SatModel A ν) :
     DomSetOfSize (sdInterp.Map A) (domOf ν) := by
   by_cases hne : NoCl A
   · refine ⟨sdInterp.map_finite A, fun v => Or.inl (Or.inl hne), ?_⟩
@@ -419,7 +419,7 @@ theorem dom_structure [Finite A] (hne : ¬NoCl A) {D : sdInterp.Map A → Prop}
   exact ⟨s, (huniq _ _ x h hs).1, hocc⟩
 
 /-- The assignment of a dominating set of the threshold size is a model. -/
-private theorem satModel_modelOf [Finite A] {D : sdInterp.Map A → Prop}
+theorem satModel_modelOf [Finite A] {D : sdInterp.Map A → Prop}
     (hD : DomSetOfSize (sdInterp.Map A) D) : SatModel A (modelOf D) := by
   refine ⟨fun c hc => ?_, fun x hx => hx.2⟩
   have hne : ¬NoCl A := fun h => h ⟨c, hc⟩
@@ -440,7 +440,7 @@ private theorem satModel_modelOf [Finite A] {D : sdInterp.Map A → Prop}
 
 /-- A dominating set of the threshold size is the dominating set of its
 assignment. -/
-private theorem domOf_modelOf [Finite A] {D : sdInterp.Map A → Prop}
+theorem domOf_modelOf [Finite A] {D : sdInterp.Map A → Prop}
     (hD : DomSetOfSize (sdInterp.Map A) D) : domOf (modelOf D) = D := by
   funext p
   apply propext
@@ -471,7 +471,7 @@ private theorem domOf_modelOf [Finite A] {D : sdInterp.Map A → Prop}
       · exact ⟨h, hx⟩
 
 /-- A model is the assignment of its dominating set. -/
-private theorem modelOf_domOf {ν : A → Prop} (hν : SatModel A ν) : modelOf (domOf ν) = ν := by
+theorem modelOf_domOf {ν : A → Prop} (hν : SatModel A ν) : modelOf (domOf ν) = ν := by
   funext x
   apply propext
   constructor
@@ -492,7 +492,7 @@ variable (A) [Finite A]
 
 /-- **The dominating sets of the threshold size of the interpreted graph are
 the models of the CNF formula**, bijectively. -/
-private def solEquiv :
+def solEquiv :
     {ν : A → Prop // SatModel A ν} ≃
       {D : sdInterp.Map A → Prop // DomSetOfSize (sdInterp.Map A) D} where
   toFun ν := ⟨domOf ν.1, domSetOfSize_domOf ν.2⟩

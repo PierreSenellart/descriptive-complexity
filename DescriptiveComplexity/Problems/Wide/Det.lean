@@ -232,7 +232,7 @@ a first-order condition, so the promise folded into the yes-instances of
 `DescriptiveComplexity.DWideAcceptSpace` is enforced by the reduction itself.
 This is what lets the EXPSPACE-hardness of the deterministic problem be proved
 once and inherited by `DescriptiveComplexity.WideAcceptSpace`. -/
-private noncomputable def dwideAcceptSpace_fo_reduction_wideAcceptSpace :
+noncomputable def dwideAcceptSpace_fo_reduction_wideAcceptSpace :
     DWideAcceptSpace ≤ᶠᵒ WideAcceptSpace where
   Tag := Unit
   dim := 1

@@ -93,7 +93,7 @@ def EVEN : DecisionProblem Language.empty where
   iso_invariant := fun e => by rw [Nat.card_congr e.toEquiv]
 
 /-- The value of EVEN at a bare set, unfolded. -/
-private theorem even_holds_iff (A : Type) [Language.empty.Structure A] :
+theorem even_holds_iff (A : Type) [Language.empty.Structure A] :
     EVEN A ↔ Even (Nat.card A) :=
   Iff.rfl
 

@@ -361,7 +361,7 @@ noncomputable def DigitLFPDef.orderedParsimoniousHorn (d : DigitLFPDef L)
 
 /-- **Every digit-definable problem parsimoniously reduces to the number
 written by unit propagation.** -/
-private theorem DigitDefinable.nonempty_orderedParsimoniousHorn (h : DigitDefinable C) :
+theorem DigitDefinable.nonempty_orderedParsimoniousHorn (h : DigitDefinable C) :
     Nonempty (C ≤ᵖ[≤] HornNumber) := by
   obtain ⟨d, hd⟩ := h
   exact ⟨d.orderedParsimoniousHorn hd⟩

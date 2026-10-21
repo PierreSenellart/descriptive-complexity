@@ -101,7 +101,7 @@ private theorem mk_eq_mk {u v : Fin k → A} :
     mk S u = mk S v ↔ EquivK (atomicAgreeOn S A k) u v :=
   Quotient.eq
 
-private theorem exists_rep (c : InvMap S k A) : ∃ u : Fin k → A, mk S u = c :=
+theorem exists_rep (c : InvMap S k A) : ∃ u : Fin k → A, mk S u = c :=
   Quotient.exists_rep c
 
 instance [Finite A] : Finite (InvMap S k A) :=
@@ -223,7 +223,7 @@ variable {β : Type*} [LinearOrder β] {c₀ : (Fin k → A) → β}
 canonical order on tuples (`DescriptiveComplexity.OrdK`), a linear order on
 the `≡ᵏ`-classes (decidability by choice). -/
 @[instance_reducible]
-private noncomputable def invLinearOrder [Finite A]
+noncomputable def invLinearOrder [Finite A]
     (hc : colorAgree c₀ = atomicAgreeOn S A k) : LinearOrder (InvMap S k A) := by
   have hE : ∀ {u v : Fin k → A}, EquivK (atomicAgreeOn S A k) u v ↔
       EquivK (colorAgree c₀) u v := by

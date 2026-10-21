@@ -208,7 +208,7 @@ theorem Dig.congr {a : ℕ} {F G : Fam K a}
   exact this ▸ hF
 
 /-- A family defined by a formula of the ordered vocabulary alone. -/
-private theorem Dig.of_base {a : ℕ} (F : Fam K a)
+theorem Dig.of_base {a : ℕ} (F : Fam K a)
     (ψ : (K.sum Language.order).Formula (Fin a ⊕ Fin ℓ))
     (h : ∀ (A : Type) [K.Structure A] [LinearOrder A] [Finite A] [Nonempty A] (w : Fin a → A)
       (p : Fin ℓ → A), ψ.Realize (Sum.elim w p) ↔ tupBits (F A w) p) : Dig e₀ ℓ F := by

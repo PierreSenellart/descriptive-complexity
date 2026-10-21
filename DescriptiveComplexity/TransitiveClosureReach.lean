@@ -135,7 +135,7 @@ section Correctness
 
 variable {A : Type} [L.Structure A] [LinearOrder A]
 
-private theorem realize_edgeF (m m' : spec.Mode) (v : Fin 2 × Fin spec.k → A) :
+theorem realize_edgeF (m m' : spec.Mode) (v : Fin 2 × Fin spec.k → A) :
     (edgeF spec m m').Realize v ↔
       spec.Step ((m, fun i => v (0, i)) : spec.Node A) (m', fun i => v (1, i)) := by
   rw [edgeF, Formula.realize_relabel]

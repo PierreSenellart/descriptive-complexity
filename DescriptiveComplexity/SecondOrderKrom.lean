@@ -145,7 +145,7 @@ section Iso
 variable {L : Language.{0, 0}} {B : SOBlock} {k : ℕ} {M N : Type}
 variable [L.Structure M] [L.Structure N]
 
-private theorem KromLit.holds_equiv (e : M ≃[L] N) (l : KromLit B k) (ρ : B.Assignment M)
+theorem KromLit.holds_equiv (e : M ≃[L] N) (l : KromLit B k) (ρ : B.Assignment M)
     (v : Fin k → M) :
     l.Holds (B.mapAssign e.toEquiv ρ) (fun j => e (v j)) ↔ l.Holds ρ v := by
   rw [KromLit.Holds, KromLit.Holds]
@@ -181,7 +181,7 @@ theorem KromProgram.holds_equiv (e : M ≃[L] N) (prog : KromProgram L B k)
 /-- **Krom satisfiability is isomorphism-invariant**: a program has a
 satisfying assignment on one structure iff it has one on any isomorphic
 structure. -/
-private theorem KromProgram.exists_holds_equiv (e : M ≃[L] N) (prog : KromProgram L B k) :
+theorem KromProgram.exists_holds_equiv (e : M ≃[L] N) (prog : KromProgram L B k) :
     (∃ ρ : B.Assignment M, prog.Holds ρ) ↔ ∃ ρ : B.Assignment N, prog.Holds ρ := by
   constructor
   · rintro ⟨ρ, hρ⟩

@@ -95,7 +95,7 @@ private theorem eval_count (A : Type) [L.Structure A] [LinearOrder A] {k : ℕ}
 
 /-- The number of elements satisfying a first-order formula over the ordered
 expansion, as a cardinality of a set of elements. -/
-private theorem eval_count_one (A : Type) [L.Structure A] [LinearOrder A]
+theorem eval_count_one (A : Type) [L.Structure A] [LinearOrder A]
     (φ : (L.sum Language.order).Formula (Fin 1)) :
     (count φ).eval A = Nat.card {a : A // φ.Realize fun _ => a} := by
   rw [eval_count]
@@ -133,7 +133,7 @@ noncomputable def pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T
 
 /-- A pulled-back polynomial term has, at the instance, the value of the
 original term at the interpreted structure. -/
-private theorem eval_pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T d)
+theorem eval_pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T d)
     (A : Type) [L₁.Structure A] [LinearOrder A] (p : PolyTerm L₂) :
     (p.pull I).eval A =
       (letI := I.mapRelLinearOrder A; p.eval (I.MapRel A)) := by

@@ -167,7 +167,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 
 /-- The vertex-sets of an independent set of the threshold size are a packing
 of the threshold size. -/
-private theorem packingOfSize_vertexFamily {S : A → Prop} (h : IndepOfSize A S) :
+theorem packingOfSize_vertexFamily {S : A → Prop} (h : IndepOfSize A S) :
     PackingOfSize (edgeIncidenceInterp.Map A) (vertexFamily S) := by
   obtain ⟨hfin, hS, hcard⟩ := h
   have := hfin
@@ -182,7 +182,7 @@ private theorem packingOfSize_vertexFamily {S : A → Prop} (h : IndepOfSize A S
     · exact hS v u hv hu huv.symm h
 
 /-- A packing of the interpreted system consists of vertex-sets. -/
-private theorem packing_diag {G : edgeIncidenceInterp.Map A → Prop}
+theorem packing_diag {G : edgeIncidenceInterp.Map A → Prop}
     (h : PackingOfSize (edgeIncidenceInterp.Map A) G) :
     ∀ p : edgeIncidenceInterp.Map A, G p → ∃ v, p = diagPt v := by
   rintro ⟨⟨⟩, w⟩ hw
@@ -191,7 +191,7 @@ private theorem packing_diag {G : edgeIncidenceInterp.Map A → Prop}
 
 /-- The vertices of a packing of the threshold size are an independent set of
 the threshold size. -/
-private theorem indepOfSize_of_packing {G : edgeIncidenceInterp.Map A → Prop}
+theorem indepOfSize_of_packing {G : edgeIncidenceInterp.Map A → Prop}
     (h : PackingOfSize (edgeIncidenceInterp.Map A) G) :
     IndepOfSize A fun v => G (diagPt v) := by
   have hdiag := packing_diag h
@@ -204,7 +204,7 @@ private theorem indepOfSize_of_packing {G : edgeIncidenceInterp.Map A → Prop}
 variable (A) in
 /-- **The packings of the threshold size of the edge-incidence system are the
 independent sets of the threshold size**, bijectively. -/
-private def packEquiv :
+def packEquiv :
     {S : A → Prop // IndepOfSize A S} ≃
       {G : edgeIncidenceInterp.Map A → Prop //
         PackingOfSize (edgeIncidenceInterp.Map A) G} where

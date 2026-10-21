@@ -70,7 +70,7 @@ def CTag.code : CTag → Pal ⊕ Bool ⊕ (Bool × Bool) ⊕ Unit ⊕ (Bool × F
   | .spoil => Sum.inr (Sum.inr (Sum.inr (Sum.inl ())))
   | .tri s j r => Sum.inr (Sum.inr (Sum.inr (Sum.inr (s, j, r))))
 
-private theorem CTag.code_injective : Function.Injective CTag.code := by
+theorem CTag.code_injective : Function.Injective CTag.code := by
   intro t t' h
   cases t <;> cases t' <;> simp_all [CTag.code]
 

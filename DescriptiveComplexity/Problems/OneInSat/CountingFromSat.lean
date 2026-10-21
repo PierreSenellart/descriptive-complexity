@@ -234,10 +234,10 @@ private theorem occIn_map_iff (t te : OTag) (w we : Fin 2 → A) (sg : Bool) :
 def varP (x : A) : interp.Map A := (OTag.var, fun _ => x)
 
 /-- The prefix variable of the occurrence `(x, s)` of `c`. -/
-private def preP (s : Bool) (c x : A) : interp.Map A := (OTag.pre s, ![c, x])
+def preP (s : Bool) (c x : A) : interp.Map A := (OTag.pre s, ![c, x])
 
 /-- A case variable of the gate of the occurrence `(x, s)` of `c`. -/
-private def gP (i : GI) (s : Bool) (c x : A) : interp.Map A := (OTag.g i s, ![c, x])
+def gP (i : GI) (s : Bool) (c x : A) : interp.Map A := (OTag.g i s, ![c, x])
 
 omit instS instO in
 theorem pair_eq {t : OTag} {we : Fin 2 → A} {c x : A} (h0 : we 0 = c) (h1 : we 1 = x) :
@@ -456,13 +456,13 @@ private theorem gate_prop (a b z g₁₁ g₁₀ g₀₁ : Prop) :
 variable (μ : interp.Map A → Prop)
 
 /-- The assignment read on the variable copies. -/
-private def varVal (x : A) : Prop := μ (varP x)
+def varVal (x : A) : Prop := μ (varP x)
 
 /-- The assignment read on the prefix variables. -/
-private def preVal (c x : A) (s : Bool) : Prop := μ (preP s c x)
+def preVal (c x : A) (s : Bool) : Prop := μ (preP s c x)
 
 /-- The assignment read on the case variables. -/
-private def gVal (i : GI) (c x : A) (s : Bool) : Prop := μ (gP i s c x)
+def gVal (i : GI) (c x : A) (s : Bool) : Prop := μ (gP i s c x)
 
 variable {μ}
 
@@ -473,7 +473,7 @@ theorem ne_of_tag {t t' : OTag} {w w' : Fin 2 → A} (h : t ≠ t') :
 /-- **Every clause of the interpreted instance has exactly one true literal
 exactly when the assignment is a gate valuation**, read on the variable copies,
 the prefix variables and the case variables. -/
-private theorem oneInProper_iff_gateVal [Finite A] :
+theorem oneInProper_iff_gateVal [Finite A] :
     OneInProper μ ↔ GateVal (varVal μ) (preVal μ) (gVal μ) := by
   have hpre : ∀ c x s, (LitTrue μ (preP s c x) false ↔ ¬preVal μ c x s) ∧
       (LitTrue μ (preP s c x) true ↔ preVal μ c x s) := fun c x s => ⟨Iff.rfl, Iff.rfl⟩
@@ -643,7 +643,7 @@ variable {A : Type} [instS : Language.sat.Structure A] [instO : LinearOrder A] [
 
 /-- The assignment of the interpreted instance determined by an assignment of
 the input, before its restriction to the variables of the instance. -/
-private def canon (ν : A → Prop) : OTag × (Fin 2 → A) → Prop
+def canon (ν : A → Prop) : OTag × (Fin 2 → A) → Prop
   | (.var, w) => ν (w 0)
   | (.pre s, w) => PrefixOr ν (w 0) (w 1) s
   | (.g .tt s, w) => PrefixOrStrict ν (w 0) (w 1) s ∧ LitTrue ν (w 1) s
@@ -658,7 +658,7 @@ theorem val_congr {μ : interp.Map A → Prop} (t : OTag) {u u' : Fin 2 → A} (
   rfl
 
 /-- **A satisfying assignment has a gate valuation.** -/
-private theorem gateVal_canon {ν : A → Prop}
+theorem gateVal_canon {ν : A → Prop}
     (hν : ∀ c, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s) :
     GateVal (varVal (canon ν)) (preVal (canon ν)) (gVal (canon ν)) := by
   have hpv := prefixVal_prefixOr hν
@@ -674,7 +674,7 @@ private theorem gateVal_canon {ν : A → Prop}
 variable (A) in
 /-- **The exactly-one models of the interpreted instance are the models of the
 input**, bijectively. -/
-private noncomputable def modelEquiv :
+noncomputable def modelEquiv :
     {ν : A → Prop // SatModel A ν} ≃
       {μ : interp.Map A → Prop // OneInModel (interp.Map A) μ} where
   toFun ν := ⟨fun e => canon ν.1 e ∧ SatOccurs (interp.Map A) e,

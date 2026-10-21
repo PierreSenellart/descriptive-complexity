@@ -318,7 +318,7 @@ theorem AltAgree.isUniv (h : AltAgree u N M) (start : Bool) (b : B) :
   exists_congr fun j => and_congr_left' (h.blk j b)
 
 /-- Being stuck transports along an equivalence. -/
-private theorem AltAgree.stuck (h : AltAgree u N M) (c : Config B) :
+theorem AltAgree.stuck (h : AltAgree u N M) (c : Config B) :
     N.Stuck c ↔ M.Stuck (c.map u) := by
   constructor
   · intro hs d hd

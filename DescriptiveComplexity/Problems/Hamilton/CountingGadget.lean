@@ -110,7 +110,7 @@ theorem NextVar.occ_left {x y : A} (h : NextVar x y) : SatOccurs A x := by
   rcases h with h | ⟨h, -⟩
   exacts [h.1, h.1]
 
-private theorem NextVar.occ_right {x y : A} (h : NextVar x y) : SatOccurs A y := by
+theorem NextVar.occ_right {x y : A} (h : NextVar x y) : SatOccurs A y := by
   rcases h with h | ⟨-, h⟩
   exacts [h.2.1, h.1]
 

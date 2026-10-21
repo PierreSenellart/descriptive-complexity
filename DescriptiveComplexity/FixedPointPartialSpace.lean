@@ -75,7 +75,7 @@ noncomputable def SOBlock.idxList (B : SOBlock) : List B.ι :=
   (Finset.univ : Finset B.ι).toList
 
 open Classical in
-private theorem SOBlock.mem_idxList (B : SOBlock) (i : B.ι) : i ∈ B.idxList := by
+theorem SOBlock.mem_idxList (B : SOBlock) (i : B.ι) : i ∈ B.idxList := by
   let : Fintype B.ι := Fintype.ofFinite B.ι
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
@@ -215,7 +215,7 @@ theorem StepDef.toSOTCSpec_step_iff (ρ σ : d.B.Assignment A) :
     d.toSOTCSpec.Step ρ σ ↔ σ = d.next ρ :=
   d.realize_nextSentence ρ σ
 
-private theorem StepDef.toSOTCSpec_isSrc_iff (ρ : d.B.Assignment A) :
+theorem StepDef.toSOTCSpec_isSrc_iff (ρ : d.B.Assignment A) :
     d.toSOTCSpec.IsSrc ρ ↔ ρ = d.B.botAssign A :=
   d.realize_botSentence ρ
 

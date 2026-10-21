@@ -50,7 +50,7 @@ variable {A M : Type} [Language.finsat.Structure A]
 /-- The rank of a node: how many nodes precede it in the order of the syntax.
 It bounds the depth of the parse DAG below the node, and so the fuel its
 evaluation needs. -/
-private noncomputable def orank (g : A) : ℕ := ({x : A | OrdLt x g} : Set A).ncard
+noncomputable def orank (g : A) : ℕ := ({x : A | OrdLt x g} : Set A).ncard
 
 private theorem orank_lt
     [Finite A] (hwf : IsWF A) {c g : A} (h : OrdLt c g) : orank c < orank g := by

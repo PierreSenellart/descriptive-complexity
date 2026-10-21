@@ -116,7 +116,7 @@ theorem SOTCSpec.comap_isSrc_iff (ρ : spec.B.Assignment (I.Map A)) :
       (realize_sentence_of_equiv (spec.B.extendEquiv (I.ordExtendLEquiv A) ρ) spec.src)))
 
 /-- **Accepting states correspond.** -/
-private theorem SOTCSpec.comap_isTgt_iff (ρ : spec.B.Assignment (I.Map A)) :
+theorem SOTCSpec.comap_isTgt_iff (ρ : spec.B.Assignment (I.Map A)) :
     letI := I.mapLinearOrder A
     spec.IsTgt ρ ↔ (spec.comap I).IsTgt (spec.B.pullAssign ρ) := by
   let := I.mapLinearOrder A

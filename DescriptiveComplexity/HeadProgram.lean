@@ -102,7 +102,7 @@ theorem refl (x : Fin K → A) : HeadAgree m x x := fun _ _ => rfl
 
 private theorem symm (h : HeadAgree m x y) : HeadAgree m y x := fun j hj => (h j hj).symm
 
-private theorem trans (h : HeadAgree m x y) (h' : HeadAgree m y z) : HeadAgree m x z :=
+theorem trans (h : HeadAgree m x y) (h' : HeadAgree m y z) : HeadAgree m x z :=
   fun j hj => (h j hj).trans (h' j hj)
 
 /-- Agreement on more heads is agreement on fewer. -/
@@ -311,7 +311,7 @@ theorem Embeds.step (h : Embeds F P e xt) {c d : F.Conf A} (hcd : F.Step c d) :
   · rw [HeadTrans.retarget_target, htar]
 
 /-- A run of the fragment is a run of the program. -/
-private theorem Embeds.reach (h : Embeds F P e xt) {c d : F.Conf A} (hcd : F.Reach c d) :
+theorem Embeds.reach (h : Embeds F P e xt) {c d : F.Conf A} (hcd : F.Reach c d) :
     P.Reach (esite e xt c.1, c.2) (esite e xt d.1, d.2) := by
   induction hcd with
   | refl => exact Relation.ReflTransGen.refl
@@ -413,7 +413,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] {m : ℕ}
 
 /-- Weakening what a fragment is known to run: any relation implied by `R` and
 whose outcomes `R` already realizes up to the scratch heads. -/
-private theorem Runs.mono {F : HeadProgram L K} {R R' : (Fin K → A) → Bool → (Fin K → A) → Prop}
+theorem Runs.mono {F : HeadProgram L K} {R R' : (Fin K → A) → Bool → (Fin K → A) → Prop}
     (h : F.Runs A m R) (hsound : ∀ x b y, R x b y → R' x b y)
     (hcomplete : ∀ x b y, R' x b y → ∃ y', HeadAgree m y y' ∧ R x b y') : F.Runs A m R' where
   sound hr := hsound _ _ _ (h.sound hr)

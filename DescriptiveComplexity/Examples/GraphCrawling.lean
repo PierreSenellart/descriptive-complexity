@@ -405,7 +405,7 @@ theorem CrawlOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB : B �
     exact hcard
 
 /-- `CrawlOn` transports along an equivalence, iff version. -/
-private theorem CrawlOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB : B → Prop}
+theorem CrawlOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB : B → Prop}
     {AdjA : A → A → Prop} {RA TA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hR : ∀ b, RB b ↔ RA (u b))
     (hT : ∀ b, TB b ↔ TA (u b)) (hK : ∀ b, KB b ↔ KA (u b)) :

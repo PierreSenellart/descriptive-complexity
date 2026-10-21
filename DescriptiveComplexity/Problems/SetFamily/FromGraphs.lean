@@ -134,7 +134,7 @@ theorem eq_diagPt_iff (t : Unit) (w : Fin 2 → A) (v : A) :
     fin_cases i <;> simp [diagPt, h0, h1]
 
 /-- Distinct vertices give distinct vertex-sets. -/
-private theorem diagPt_injective : Function.Injective (diagPt (A := A)) := by
+theorem diagPt_injective : Function.Injective (diagPt (A := A)) := by
   intro v v' h
   simpa using ((eq_diagPt_iff () ![v, v] v').mp h).1
 
@@ -157,7 +157,7 @@ theorem ncard_diag_eq (P : A → Prop) (Q : edgeIncidenceInterp.Map A → Prop)
 pairs of its members. Shared by the reductions of Vertex Cover to Set Cover
 and of Independent Set to Set Packing, which both send a set of vertices to
 the family of its vertex-sets. -/
-private def vertexFamily (C : A → Prop) : edgeIncidenceInterp.Map A → Prop :=
+def vertexFamily (C : A → Prop) : edgeIncidenceInterp.Map A → Prop :=
   fun p => ∃ v, C v ∧ p = diagPt v
 
 /-- The family of vertex-sets of a set of vertices encodes the same number as

@@ -209,7 +209,7 @@ private theorem RevLexLt.asymm
   · rw [htl' j hlt] at hj
     exact absurd hj (lt_irrefl _)
 
-private theorem RevLexLt.trans {u w x : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w x) :
+theorem RevLexLt.trans {u w x : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w x) :
     RevLexLt u x := by
   obtain ⟨j, hj, htl⟩ := h
   obtain ⟨j', hj', htl'⟩ := h'

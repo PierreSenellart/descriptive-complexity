@@ -571,7 +571,7 @@ end Circ
 /-! ### The correspondence -/
 
 /-- A Hamilton circuit of the row graph, read locally. -/
-private theorem circ_of_isCircuit {Nxt : {v : Vtx A // Valid v} → {v : Vtx A // Valid v} → Prop}
+theorem circ_of_isCircuit {Nxt : {v : Vtx A // Valid v} → {v : Vtx A // Valid v} → Prop}
     (h : IsCircuit (fun u v : {v : Vtx A // Valid v} => Arc u.1 v.1) Nxt) :
     Circ fun u v => ∃ (hu : Valid u) (hv : Valid v), Nxt ⟨u, hu⟩ ⟨v, hv⟩ := by
   obtain ⟨htot, hfun, hsurj, hinj, hR, htwo⟩ := h.local
@@ -594,7 +594,7 @@ variable (A) [Nonempty A]
 
 /-- **The Hamilton circuits of the row graph are the exactly-one models of the
 formula**, bijectively. -/
-private noncomputable def modelEquiv :
+noncomputable def modelEquiv :
     {ν : A → Prop // OneInModel A ν} ≃
       {Nxt : {v : Vtx A // Valid v} → {v : Vtx A // Valid v} → Prop //
         IsCircuit (fun u v : {v : Vtx A // Valid v} => Arc u.1 v.1) Nxt} :=

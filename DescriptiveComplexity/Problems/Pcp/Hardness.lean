@@ -50,7 +50,7 @@ open scoped DescriptiveComplexity
 
 /-- **`HALT ≤ᶠᵒ[≤] PCP`**: the computation-history dominoes of the machine
 described by the instance. -/
-private noncomputable def halt_ordered_fo_reduction_pcp : HALT ≤ᶠᵒ[≤] PCP where
+noncomputable def halt_ordered_fo_reduction_pcp : HALT ≤ᶠᵒ[≤] PCP where
   Tag := HaltPcp.PTag
   dim := 5
   toInterpretation := HaltPcp.haltPcpInterp

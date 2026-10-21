@@ -159,7 +159,7 @@ theorem CtrlCfg.read (h₀ : IsBot a₀) {p : MachPh V M} {vv : Fin (gameDim B V
   rw [h.2.2.1, h.2.2.2 (leftPt a₀ p.par) (machPosn_leftPt a₀ p.par) (fun _ _ => h₀),
     tapeOfAssign_leftPt]
 
-private theorem CtrlCfg.posn {p : MachPh V M} {vv : Fin (gameDim B V) → A}
+theorem CtrlCfg.posn {p : MachPh V M} {vv : Fin (gameDim B V) → A}
     {c : Config (GamePt B V M A)} (h₀ : IsBot a₀) (h : CtrlCfg a₀ hdim vars ρ σ p vv c) :
     (𝕄).Posn c.head := by
   rw [h.2.2.1]; exact ⟨trivial, fun _ _ => h₀⟩

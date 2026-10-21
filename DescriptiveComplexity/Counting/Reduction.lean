@@ -150,7 +150,7 @@ theorem OneCallReduction.mapRel_nonempty (f : C ≤ᶜ[≤] D) (A : Type)
 
 /-- A relativized parsimonious reduction is a one-call reduction that returns
 the answer of the oracle unchanged. -/
-private def RelOrderedParsimoniousReduction.toOneCall (f : C ≤ʳᵖ[≤] D) : C ≤ᶜ[≤] D :=
+def RelOrderedParsimoniousReduction.toOneCall (f : C ≤ʳᵖ[≤] D) : C ≤ᶜ[≤] D :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -160,11 +160,11 @@ private def RelOrderedParsimoniousReduction.toOneCall (f : C ≤ʳᵖ[≤] D) : 
     correct := f.correct }
 
 /-- An ordered parsimonious reduction is a one-call reduction. -/
-private def OrderedParsimoniousReduction.toOneCall (f : C ≤ᵖ[≤] D) : C ≤ᶜ[≤] D :=
+def OrderedParsimoniousReduction.toOneCall (f : C ≤ᵖ[≤] D) : C ≤ᶜ[≤] D :=
   f.toRel.toOneCall
 
 /-- A parsimonious reduction is a one-call reduction. -/
-private noncomputable def ParsimoniousReduction.toOneCall (f : C ≤ᵖ D) : C ≤ᶜ[≤] D :=
+noncomputable def ParsimoniousReduction.toOneCall (f : C ≤ᵖ D) : C ≤ᶜ[≤] D :=
   f.toOrdered.toOneCall
 
 /-- Replacing the source of a one-call reduction by a counting problem with the
@@ -239,7 +239,7 @@ variable {C : CountingProblem L₁} {D : CountingProblem L₂} {E : CountingProb
 for relativized reductions; the post-processing of the second reduction is
 pulled back to the instance and substituted for the oracle's answer in the
 post-processing of the first. There is still one call. -/
-private noncomputable def OneCallReduction.trans (g : C ≤ᶜ[≤] D) (f : D ≤ᶜ[≤] E) : C ≤ᶜ[≤] E :=
+noncomputable def OneCallReduction.trans (g : C ≤ᶜ[≤] D) (f : D ≤ᶜ[≤] E) : C ≤ᶜ[≤] E :=
   letI := g.tagFinite
   letI := f.tagFinite
   letI : LinearOrder g.Tag := finiteLinearOrder g.Tag
@@ -338,12 +338,12 @@ theorem OneCallHard.of_relOrderedParsimonious {C : CountingProblem L}
   hC.of_oneCall f.toOneCall
 
 /-- One-call hardness travels forward along ordered parsimonious reductions. -/
-private theorem OneCallHard.of_orderedParsimonious {C : CountingProblem L} {D : CountingProblem L'}
+theorem OneCallHard.of_orderedParsimonious {C : CountingProblem L} {D : CountingProblem L'}
     (f : C ≤ᵖ[≤] D) (hC : K.OneCallHard C) : K.OneCallHard D :=
   hC.of_oneCall f.toOneCall
 
 /-- One-call hardness travels forward along parsimonious reductions. -/
-private theorem OneCallHard.of_parsimonious {C : CountingProblem L} {D : CountingProblem L'}
+theorem OneCallHard.of_parsimonious {C : CountingProblem L} {D : CountingProblem L'}
     (f : C ≤ᵖ D) (hC : K.OneCallHard C) : K.OneCallHard D :=
   hC.of_oneCall f.toOneCall
 
@@ -357,7 +357,7 @@ private theorem oneCallHard_congr_finite {C D : CountingProblem L}
 
 /-- A problem of the class that is one-call hard for it is one-call
 complete. -/
-private theorem OneCallComplete.of_mem {C : CountingProblem L} (hC : C ∈ K) (h : K.OneCallHard C) :
+theorem OneCallComplete.of_mem {C : CountingProblem L} (hC : C ∈ K) (h : K.OneCallHard C) :
     K.OneCallComplete C :=
   ⟨OneCallMem.of_mem hC, h⟩
 

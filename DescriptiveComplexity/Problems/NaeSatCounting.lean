@@ -450,7 +450,7 @@ private theorem split_litTrue
 
 /-- **The splittings of the literal set system are the not-all-equal
 assignments of every element.** -/
-private noncomputable def splitEquiv :
+noncomputable def splitEquiv :
     {S : splInterp.Map A → Prop // SplitColoring _ S} ≃ {ν : A → Prop // NAEProper ν} where
   toFun S := ⟨fun x => S.1 (splPt (.lit true) x), naeProper_of_occ fun c hc => by
       obtain ⟨⟨p, hpe, hpm, hp⟩, ⟨q, hqe, hqm, hq⟩⟩ :=

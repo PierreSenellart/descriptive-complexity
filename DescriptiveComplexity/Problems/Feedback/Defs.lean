@@ -234,7 +234,7 @@ private theorem feedback_symm_hBin {RB : B → B → Prop} {RA : A → A → Pro
   simp
 
 /-- `FeedbackOn` transports along an equivalence, iff version. -/
-private theorem FeedbackOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+theorem FeedbackOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     FeedbackOn AdjB KB ↔ FeedbackOn AdjA KA :=
@@ -242,7 +242,7 @@ private theorem FeedbackOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB
     FeedbackOn.of_equiv u.symm (feedback_symm_hBin u hadj) (feedback_symm_hUn u hK)⟩
 
 /-- `FeedbackArcOn` transports along an equivalence, iff version. -/
-private theorem FeedbackArcOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop}
+theorem FeedbackArcOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop}
     {AdjA KA : A → A → Prop} (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b'))
     (hK : ∀ b b', KB b b' ↔ KA (u b) (u b')) :
     FeedbackArcOn AdjB KB ↔ FeedbackArcOn AdjA KA :=

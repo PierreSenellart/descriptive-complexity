@@ -408,7 +408,7 @@ theorem inflStage_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrd
 
 /-- The value of the induced inflationary iteration is the least fixed point
 of the rules. -/
-private theorem inflLimit_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrder A] :
+theorem inflLimit_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrder A] :
     d.toStepDef.inflLimit A = lfpAssign d.rules := by
   funext i x
   refine propext ?_

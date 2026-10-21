@@ -174,7 +174,7 @@ theorem EquivK₂.update {a : Fin k → M} {b : Fin k → N} (h : EquivK₂ E₀
   (((equivK₂_iff E₀ a b).mp h).2 i).1 c
 
 /-- **The game move**, from the right. -/
-private theorem EquivK₂.update_right
+theorem EquivK₂.update_right
     {a : Fin k → M} {b : Fin k → N} (h : EquivK₂ E₀ a b) (i : Fin k)
     (d : N) : ∃ c : M, EquivK₂ E₀ (Function.update a i c) (Function.update b i d) :=
   (((equivK₂_iff E₀ a b).mp h).2 i).2 d

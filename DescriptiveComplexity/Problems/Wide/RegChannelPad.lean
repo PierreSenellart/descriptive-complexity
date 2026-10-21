@@ -417,7 +417,7 @@ omit [Nonempty dt.KIx] [Finite dt.KIx] [Finite R']
   [Language.wide.Structure (Univ A R'
     (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)] in
 /-- **An accepting control is in the accepting phase.** -/
-private theorem NexEmitted.acceptPh {bot : Option dt.KIx} (hE : NexEmitted PR bot)
+theorem NexEmitted.acceptPh {bot : Option dt.KIx} (hE : NexEmitted PR bot)
     (p : NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) (f : dt.CtlIx → A)
     (h : PR.accept p f) : p = NexPh.acceptP := ((hE.accept_iff p f).mp h).1
 

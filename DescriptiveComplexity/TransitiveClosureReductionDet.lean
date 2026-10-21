@@ -285,7 +285,7 @@ noncomputable def DTCReduction.toTC (f : P ≤ᵈᵗᶜ Q) : P ≤ᵗᶜ Q :=
 
 /-- **A relativized ordered FO reduction is an FO(DTC) reduction**, consulting
 no walk. -/
-private noncomputable def RelOrderedFOReduction.toDTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
+noncomputable def RelOrderedFOReduction.toDTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -299,11 +299,11 @@ private noncomputable def RelOrderedFOReduction.toDTC (f : P ≤ʳᶠᵒ[≤] Q)
         (f.toRelInterpretation.toTCFamLEquiv (TCFamily.empty _).det A)).symm }
 
 /-- **An ordered FO reduction is an FO(DTC) reduction.** -/
-private noncomputable def OrderedFOReduction.toDTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
+noncomputable def OrderedFOReduction.toDTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
   f.toRel.toDTC
 
 /-- **An FO reduction is an FO(DTC) reduction.** -/
-private noncomputable def FOReduction.toDTC (f : P ≤ᶠᵒ Q) : P ≤ᵈᵗᶜ Q :=
+noncomputable def FOReduction.toDTC (f : P ≤ᶠᵒ Q) : P ≤ᵈᵗᶜ Q :=
   f.toOrdered.toRel.toDTC
 
 /-- **PTIME is closed under FO(DTC) reductions.** -/

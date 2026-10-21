@@ -213,7 +213,7 @@ theorem ipLe_iff (a b : A) : IPLe (ipPt a) (ipPt b) ↔ BWLe a b := by
 
 /-- The interpreted order is the input's own place-value order, read on the
 copy. -/
-private theorem isLinOrd_ipLe (h : IsLinOrd (BWLe (A := A))) :
+theorem isLinOrd_ipLe (h : IsLinOrd (BWLe (A := A))) :
     IsLinOrd (IPLe (A := ipInterp.Map A)) :=
   IsLinOrd.of_equiv ipEquiv (fun a a' => (ipLe_iff a a').symm) h
 
@@ -267,15 +267,15 @@ section Correctness
 variable {A : Type} [Language.binWeights.Structure A] [LinearOrder A] [Finite A]
 
 /-- The columns of a set of items. -/
-private def colsOf (S : A → Prop) (q : ipInterp.Map A) : Prop := S (q.2 0)
+def colsOf (S : A → Prop) (q : ipInterp.Map A) : Prop := S (q.2 0)
 
 /-- The items of a set of columns. -/
-private def itemsOfCols (x : ipInterp.Map A → Prop) (a : A) : Prop := x (ipPt a)
+def itemsOfCols (x : ipInterp.Map A → Prop) (a : A) : Prop := x (ipPt a)
 
 omit [Finite A] in
 /-- The order of the interpreted program is linear exactly when the input's
 is. -/
-private theorem isLinOrd_bwLe_of_ipLe (hlin : IsLinOrd (IPLe (A := ipInterp.Map A))) :
+theorem isLinOrd_bwLe_of_ipLe (hlin : IsLinOrd (IPLe (A := ipInterp.Map A))) :
     IsLinOrd (BWLe (A := A)) :=
   IsLinOrd.of_equiv ipEquiv.symm (fun q q' => by
     rw [ipPt_surj q, ipPt_surj q', ipLe_iff]
@@ -283,7 +283,7 @@ private theorem isLinOrd_bwLe_of_ipLe (hlin : IsLinOrd (IPLe (A := ipInterp.Map 
 
 omit [Finite A] in
 /-- **A set of items summing to the target solves the one-equation program.** -/
-private theorem zeroOneSol_colsOf {S : A → Prop} (hSi : ∀ i, S i → BWItem i)
+theorem zeroOneSol_colsOf {S : A → Prop} (hSi : ∀ i, S i → BWItem i)
     (hsum : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget A) :
     (∀ q, colsOf S q → IPCol q) ∧
       ∀ r : ipInterp.Map A, IPRow r → (∑ᶠ j ∈ {j | colsOf S j}, IPCoefVal r j) = IPRhsVal r := by
@@ -300,7 +300,7 @@ private theorem zeroOneSol_colsOf {S : A → Prop} (hSi : ∀ i, S i → BWItem 
 omit [Finite A] in
 /-- **A solution of the one-equation program is a set of items summing to the
 target.** -/
-private theorem subsetSum_itemsOfCols {a₀ : A} (ha₀ : IsBot a₀) {x : ipInterp.Map A → Prop}
+theorem subsetSum_itemsOfCols {a₀ : A} (ha₀ : IsBot a₀) {x : ipInterp.Map A → Prop}
     (hxc : ∀ j, x j → IPCol j)
     (heq : ∀ r : ipInterp.Map A, IPRow r → (∑ᶠ j ∈ {j | x j}, IPCoefVal r j) = IPRhsVal r) :
     (∀ a, itemsOfCols x a → BWItem a) ∧

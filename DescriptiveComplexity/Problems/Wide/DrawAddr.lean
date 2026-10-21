@@ -288,7 +288,7 @@ variable (ly zero one) in
 the address that names it is marked. This is the inverse the forward direction
 never needs – it *writes* `trackOf` of an assignment – and the one a backward
 reading is built on. -/
-private def assignOfTrack (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
+def assignOfTrack (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
     (T : d.B.ι → (Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop) → Prop) :
     d.B.Assignment (X.Map A) :=
   fun i x => T i (tupAddr (R := R) (P := P) (ki := ki) ly zero one (ha i) x)

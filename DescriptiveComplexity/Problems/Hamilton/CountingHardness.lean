@@ -330,7 +330,7 @@ theorem dgArc_iff (p q : hamInterp.MapRel A) : DGArc p q ↔ Arc (vtxOf p).1 (vt
 variable (A) [Finite A] [Nonempty A]
 
 /-- **Correctness of the interpretation, for counting.** -/
-private theorem sharpDirHamCircuit_mapRel :
+theorem sharpDirHamCircuit_mapRel :
     SharpDirHamCircuit (hamInterp.MapRel A) = SharpOneInSAT A := by
   have := hamInterp.mapRel_finite A
   have hW : Finite {v : Vtx A // Valid v} := Finite.of_equiv _ (vtxEquiv A)
@@ -348,7 +348,7 @@ open HamGadget in
 /-- **#1-in-SAT reduces parsimoniously to #Directed Hamilton Circuit**, by a
 relativized interpretation: the tagged pairs that are no vertex of the row
 graph are left out of the universe. -/
-private noncomputable def sharpOneInSat_rel_ordered_parsimonious_sharpDirHamCircuit :
+noncomputable def sharpOneInSat_rel_ordered_parsimonious_sharpDirHamCircuit :
     SharpOneInSAT ≤ʳᵖ[≤] SharpDirHamCircuit where
   Tag := HTag
   dim := 2

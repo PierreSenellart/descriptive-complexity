@@ -523,7 +523,7 @@ logic over the instance itself. The invented values are taken to be `d`-tuples,
 guessed as one more relation variable, and the kernel is pulled back through the
 two-tag interpretation. With
 `DescriptiveComplexity.SigmaSODefinable.toNewBdd` this is `∃SO[new, d] = NP`. -/
-private theorem SigmaSONewBddDefinable.toSigmaSO (h : SigmaSONewBddDefinable d P) :
+theorem SigmaSONewBddDefinable.toSigmaSO (h : SigmaSONewBddDefinable d P) :
     SigmaSODefinable 1 P := by
   obtain ⟨B, φ, hφ⟩ := h
   refine ⟨[bddBlock d B], rfl, (bddInterp L d B).pullRelSentence φ, ?_⟩

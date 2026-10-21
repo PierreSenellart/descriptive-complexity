@@ -606,7 +606,7 @@ theorem reachesIn_regStep (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc
   F.toIx.reachesIn_regStep h h hs hwrite hagree hscan
 
 /-- **One move of a register walk**, the budget forgotten. -/
-private theorem reaches_regStep (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
+theorem reaches_regStep (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
     {q q' b : A} {f f' : (A → Prop) → A}
     (hwrite : ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell u)) ∧ WMDst τ q' ∧
       WMWrite τ (f' (F.cell u)) ∧ WMRight τ)
@@ -642,7 +642,7 @@ theorem reachesIn_regWalk (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
 
 /-- **A register walk**, the budget forgotten: each move is a run of any length
 whatever. -/
-private theorem reaches_regWalk (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
+theorem reaches_regWalk (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
     {tp : A → (A → Prop) → A} {u₀ : A}
     (hmove : ∀ u u' : A, WMSucc A u u' → WMLe u₀ u →
       Relation.ReflTransGen (wideData A).Step
@@ -682,7 +682,7 @@ theorem reachesIn_toReg (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Pro
   F.toIx.reachesIn_toReg h hle hother hskip
 
 /-- **Walking up to a distinguished register**, the budget forgotten. -/
-private theorem reaches_toReg (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
+theorem reaches_toReg (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
     {s : A → Prop} (hle : WMSetLe WMLe s (F.cell u))
     (hother : ∀ x : A, x ≠ u → ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell x)) ∧
       WMDst τ q ∧ WMWrite τ (f (F.cell x)) ∧ WMRight τ)

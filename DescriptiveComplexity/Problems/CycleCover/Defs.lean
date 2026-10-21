@@ -51,7 +51,7 @@ noncomputable def IsCycleCover.toFun
     {R F : A → A → Prop} (h : IsCycleCover R F) (x : A) : A :=
   Classical.choose (h.1 x).exists
 
-private theorem IsCycleCover.rel_toFun {R F : A → A → Prop} (h : IsCycleCover R F) (x : A) :
+theorem IsCycleCover.rel_toFun {R F : A → A → Prop} (h : IsCycleCover R F) (x : A) :
     F x (h.toFun x) :=
   Classical.choose_spec (h.1 x).exists
 

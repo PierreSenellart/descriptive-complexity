@@ -43,7 +43,7 @@ private theorem pow_add_pow_le {n : ℕ} (hn : 2 ≤ n) (M : ℕ) : n ^ M + n ^ 
   rw [pow_succ, ← mul_two]
   exact Nat.mul_le_mul_left _ hn
 
-private theorem exp_mono {n : ℕ} (hn : 2 ≤ n) {a b : ℕ} (h : a ≤ b) :
+theorem exp_mono {n : ℕ} (hn : 2 ≤ n) {a b : ℕ} (h : a ≤ b) :
     2 ^ (n ^ a) ≤ 2 ^ (n ^ b) :=
   Nat.pow_le_pow_right (by norm_num) (Nat.pow_le_pow_right (by omega) h)
 

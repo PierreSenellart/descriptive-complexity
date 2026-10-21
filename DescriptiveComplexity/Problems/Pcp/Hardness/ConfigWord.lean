@@ -159,10 +159,10 @@ outside of it. -/
 
 variable (M) in
 /-- The strict lexicographic order on cells. -/
-private def CellLt (x y : ℤ × A) : Prop :=
+def CellLt (x y : ℤ × A) : Prop :=
   x.1 < y.1 ∨ (x.1 = y.1 ∧ M.Le x.2 y.2 ∧ x.2 ≠ y.2)
 
-private theorem CellLt.trans (hlin : IsLinOrd M.Le) {x y z : ℤ × A}
+theorem CellLt.trans (hlin : IsLinOrd M.Le) {x y z : ℤ × A}
     (hxy : CellLt M x y) (hyz : CellLt M y z) : CellLt M x z := by
   rcases hxy with h1 | ⟨h1, h2, h3⟩ <;> rcases hyz with h4 | ⟨h4, h5, h6⟩
   · exact Or.inl (h1.trans h4)
@@ -171,7 +171,7 @@ private theorem CellLt.trans (hlin : IsLinOrd M.Le) {x y z : ℤ × A}
   · refine Or.inr ⟨h1.trans h4, hlin.2.1 _ _ _ h2 h5, fun hcon => ?_⟩
     exact h3 (hlin.2.2.1 _ _ h2 (hcon ▸ h5))
 
-private theorem CellLt.ne {x y : ℤ × A} (h : CellLt M x y) : x ≠ y := by
+theorem CellLt.ne {x y : ℤ × A} (h : CellLt M x y) : x ≠ y := by
   rintro rfl
   rcases h with h | ⟨-, -, h⟩
   · exact absurd h (lt_irrefl _)
@@ -1107,7 +1107,7 @@ theorem IsPosEnum.ne_nil (hwf : M.WellFormed) {ps : List A} (hps : IsPosEnum M p
   exact absurd ((hps.2 p).mpr hp) (by simp)
 
 /-- Consecutive entries of an enumeration are consecutive positions. -/
-private theorem IsPosEnum.isChain (hlin : IsLinOrd M.Le) {ps : List A} (hps : IsPosEnum M ps) :
+theorem IsPosEnum.isChain (hlin : IsLinOrd M.Le) {ps : List A} (hps : IsPosEnum M ps) :
     ps.IsChain (SuccPos M.Le M.Posn) := by
   rw [List.isChain_iff_forall_rel_of_append_cons_cons]
   intro p q l₁ l₂ heq

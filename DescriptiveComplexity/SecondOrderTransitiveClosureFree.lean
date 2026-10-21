@@ -465,7 +465,7 @@ theorem SOTCSpec.orderFree_isSrc_iff :
   · intro h
     exact ⟨realize_linearGuard_of_hord hord, (realize_orderElim_one ρ hord spec.src).mpr h⟩
 
-private theorem SOTCSpec.orderFree_isTgt_iff :
+theorem SOTCSpec.orderFree_isTgt_iff :
     spec.orderFree.IsTgt ρ ↔ spec.IsTgt (spec.B.restPart ρ) :=
   realize_orderElim_one ρ hord spec.tgt
 

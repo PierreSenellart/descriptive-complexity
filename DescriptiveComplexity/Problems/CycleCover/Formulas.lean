@@ -78,7 +78,7 @@ noncomputable instance : LinearOrder LevelTag := finiteLinearOrder LevelTag
 def LevelTag.extra : LevelTag := (none : Option (OccTag × Fin 3))
 
 /-- The level of an occurrence tag and an index. -/
-private def LevelTag.pos
+def LevelTag.pos
     (o : OccTag) (k : Fin 3) : LevelTag := (some (o, k) : Option (OccTag × Fin 3))
 
 /-- The tags of the drawing: the nodes of the attached graph, and the rungs,
@@ -698,7 +698,7 @@ private theorem xorGadget_bounds (j j' : Fin 4) : -1 ≤ xorGadget j j' ∧ xorG
   decide
 
 /-- The entries of the attached matrix are between `-1` and `3`. -/
-private theorem attachedM_bounds (a b : V A) : -1 ≤ attachedM a b ∧ attachedM a b ≤ 3 := by
+theorem attachedM_bounds (a b : V A) : -1 ≤ attachedM a b ∧ attachedM a b ≤ 3 := by
   rcases a with n | ⟨o, j⟩ <;> rcases b with n' | ⟨o', j'⟩
   · simp only [attachedM, Site.flatAttach, baseM]
     split_ifs <;> omega

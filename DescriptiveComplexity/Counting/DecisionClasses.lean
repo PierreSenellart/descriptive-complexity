@@ -149,7 +149,7 @@ noncomputable def CeqP : ComplexityClass :=
 No complete problem is known for it, and the question does not relativize
 ([Hartmanis, Hemachandra 1988][hartmanis1988complexity]); the class is here
 for its inclusions. -/
-private noncomputable def UP : ComplexityClass :=
+noncomputable def UP : ComplexityClass :=
   countClass (fun c _ => c ≤ 1) fun c _ => c = 1
 
 section Mem

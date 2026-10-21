@@ -106,7 +106,7 @@ variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q :
 /-- **FO(≤, IFP) definability is closed under FO(LFP) reductions**: the
 reduction's induction and the definition's induction stratify into one, the
 latter pulled back through the (order-extended) interpretation. -/
-private theorem IFPDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : IFPDefinable Q) :
+theorem IFPDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : IFPDefinable Q) :
     IFPDefinable P := by
   obtain ⟨d, hd⟩ := h
   let := f.tagFinite

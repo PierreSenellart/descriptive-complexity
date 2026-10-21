@@ -70,7 +70,7 @@ def ForceAt (c x : A) (s : Bool) (y : A) (t b : Bool) : Prop :=
 
 /-- The choices `(c, x, s)` and `(c', x', s')` disagree: some variable is made
 true by the first and false by the second. -/
-private def Clash (c x : A) (s : Bool) (c' x' : A) (s' : Bool) : Prop :=
+def Clash (c x : A) (s : Bool) (c' x' : A) (s' : Bool) : Prop :=
   ∃ y, (∃ t, ForceAt c x s y t true) ∧ ∃ t, ForceAt c' x' s' y t false
 
 /-- The choice `(c, x, s)` is a literal occurrence whose demands are
@@ -378,13 +378,13 @@ variable {A : Type} [Language.sat.Structure A]
 
 /-- The clique of an assignment: every clause vertex, and the occurrence
 vertices of its true literals. -/
-private def cliqueOf (ν : A → Prop) (p : oneInToClique.Map A) : Prop :=
+def cliqueOf (ν : A → Prop) (p : oneInToClique.Map A) : Prop :=
   (p.1 = .cl ∧ p.2 0 = p.2 1 ∧ IsCl (p.2 0)) ∨
     ∃ s, p.1 = .ofSign s ∧ OccIn (p.2 0) (p.2 1) s ∧ LitTrue ν (p.2 1) s
 
 /-- The assignment of a clique: the variables some occurrence vertex of the
 clique makes true. -/
-private def modelOf (S : oneInToClique.Map A → Prop) (y : A) : Prop :=
+def modelOf (S : oneInToClique.Map A → Prop) (y : A) : Prop :=
   ∃ c x s t, S (mkPt (.ofSign s) c x) ∧ ForceAt c x s y t true
 
 /-- The slots of a clique of the threshold size: two per clause. -/
@@ -501,7 +501,7 @@ private theorem adj_cliqueOf {ν : A → Prop} (hν : OneInProper ν) {p q : one
       exact (eq_mkPt p).trans (Eq.trans (by rw [ht, ht', hc, hx, hs]) (eq_mkPt q).symm)
 
 /-- The clique of an exactly-one assignment has the threshold size. -/
-private theorem cliqueOfSize_cliqueOf [Finite A] {ν : A → Prop} (hν : OneInProper ν) :
+theorem cliqueOfSize_cliqueOf [Finite A] {ν : A → Prop} (hν : OneInProper ν) :
     CliqueOfSize (oneInToClique.Map A) (cliqueOf ν) :=
   ⟨oneInToClique.map_finite A, fun _ _ hp hq hpq => adj_cliqueOf hν hp hq hpq,
     (ncard_cliqueOf hν).trans ncard_marked.symm⟩
@@ -605,7 +605,7 @@ private theorem litTrue_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) {s :
 
 /-- The assignment of a clique of the threshold size is an exactly-one
 model. -/
-private theorem oneInModel_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
+theorem oneInModel_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
     OneInModel A (modelOf S) := by
   refine ⟨fun c hc => ?_, ?_⟩
   · obtain ⟨-, x, s, h⟩ := clique_slots hS c hc
@@ -616,7 +616,7 @@ private theorem oneInModel_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
     exact occIn_satOccurs hf.1
 
 /-- A clique of the threshold size is the clique of its assignment. -/
-private theorem cliqueOf_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
+theorem cliqueOf_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
     cliqueOf (modelOf S) = S := by
   have hmod := oneInModel_modelOf hS
   have := hS.1
@@ -640,7 +640,7 @@ end Clique
 
 omit [LinearOrder A] in
 /-- An exactly-one model is the assignment of its clique. -/
-private theorem modelOf_cliqueOf {ν : A → Prop} (hν : OneInModel A ν) :
+theorem modelOf_cliqueOf {ν : A → Prop} (hν : OneInModel A ν) :
     modelOf (cliqueOf ν) = ν := by
   funext y
   refine propext ⟨?_, fun hy => ?_⟩
@@ -665,7 +665,7 @@ variable (A) [Finite A]
 
 /-- **The cliques of the threshold size of the interpreted graph are the
 exactly-one models of the CNF formula**, bijectively. -/
-private noncomputable def solEquiv :
+noncomputable def solEquiv :
     {ν : A → Prop // OneInModel A ν} ≃
       {S : oneInToClique.Map A → Prop // CliqueOfSize (oneInToClique.Map A) S} where
   toFun ν := ⟨cliqueOf ν.1, cliqueOfSize_cliqueOf ν.2.1⟩

@@ -70,7 +70,7 @@ noncomputable def occInterpEquiv : occInterp.MapRel A ≃ Occ A where
     change occOf (occTag o).1 (occTag o).2 _ _ _ = o
     exact occOf_occTag o
 
-private theorem card_occInterp : Nat.card (occInterp.MapRel A) = Nat.card (Occ A) :=
+theorem card_occInterp : Nat.card (occInterp.MapRel A) = Nat.card (Occ A) :=
   Nat.card_congr occInterpEquiv
 
 /-- The level of an occurrence and an index. -/
@@ -90,7 +90,7 @@ private theorem levelOfPos_injective : Function.Injective (levelOfPos (A := A)) 
   exact Prod.ext (by simp only [ht, hp]) hk
 
 /-- There are at least three levels per occurrence. -/
-private theorem three_mul_card_occ_le [Finite A] :
+theorem three_mul_card_occ_le [Finite A] :
     3 * Nat.card (Occ A) ≤ Nat.card (Level A) := by
   have := Nat.card_le_card_of_injective _ (levelOfPos_injective (A := A))
   rwa [Nat.card_prod, Nat.card_eq_fintype_card (α := Fin 3), Fintype.card_fin, mul_comm] at this

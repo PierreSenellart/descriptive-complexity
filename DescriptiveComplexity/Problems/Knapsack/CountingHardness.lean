@@ -41,7 +41,7 @@ variable (A : Type) [Language.setSystem.Structure A] [LinearOrder A] [Finite A] 
 
 /-- **The solutions of the interpreted subset-sum instance are the exact covers
 of the set system**, bijectively. -/
-private def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
+def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
     {G : A → Prop // ExactCoverBy (SSElem (A := A)) SSFam SSMem G} ≃
       {S : kInterp.Map A → Prop // KnapsackSol (kInterp.Map A) S} where
   toFun G := ⟨itemsOf a₀ G.1, kInterp.map_finite A, isLinOrd_bwLe,

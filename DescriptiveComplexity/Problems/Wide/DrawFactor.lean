@@ -296,7 +296,7 @@ theorem UGDefinable.congr (h : UGDefinable N) (he : ∀ e f g, N' e f g ↔ N e 
     UGDefinable N' :=
   h.imp fun _ hφ e w => (he _ _ _).trans (hφ e w)
 
-private theorem UGDefinable.and (h : UGDefinable N) (h' : UGDefinable N') :
+theorem UGDefinable.and (h : UGDefinable N) (h' : UGDefinable N') :
     UGDefinable fun e f g => N e f g ∧ N' e f g := by
   obtain ⟨φ, hφ⟩ := h
   obtain ⟨φ', hφ'⟩ := h'
@@ -304,7 +304,7 @@ private theorem UGDefinable.and (h : UGDefinable N) (h' : UGDefinable N') :
     rw [Formula.realize_inf]
     exact and_congr (hφ e w) (hφ' e w)⟩
 
-private theorem UGDefinable.or (h : UGDefinable N) (h' : UGDefinable N') :
+theorem UGDefinable.or (h : UGDefinable N) (h' : UGDefinable N') :
     UGDefinable fun e f g => N e f g ∨ N' e f g := by
   obtain ⟨φ, hφ⟩ := h
   obtain ⟨φ', hφ'⟩ := h'
@@ -461,7 +461,7 @@ private theorem uSlotDefinable_bitVal (h : UGDefinable N) :
 
 /-- **A value chosen by a condition of the kit** – not of the data – is
 definable when both branches are. -/
-private theorem USlotDefinable.ite {p : Prop} [Decidable p] (h : USlotDefinable V)
+theorem USlotDefinable.ite {p : Prop} [Decidable p] (h : USlotDefinable V)
     (h' : USlotDefinable V') :
     USlotDefinable fun e f g => if p then V e f g else V' e f g := by
   by_cases hp : p
@@ -517,11 +517,11 @@ theorem uSlotDefinable_cases {ι : Type*} [Finite ι]
 
 /-- **A readable value**: one a slot may be compared with. Every written value
 is one, the comparison being the graph formula read at that slot. -/
-private def UReadable (V : ∀ e : Env L, (Q → e.α) → (W → e.α) → e.α) : Prop :=
+def UReadable (V : ∀ e : Env L, (Q → e.α) → (W → e.α) → e.α) : Prop :=
   ∀ s : W, UGDefinable fun e f g => g s = V e f g
 
 /-- **Every written value is readable.** -/
-private theorem USlotDefinable.readable (h : USlotDefinable V) : UReadable V := by
+theorem USlotDefinable.readable (h : USlotDefinable V) : UReadable V := by
   obtain ⟨ψ, hψ⟩ := h
   intro s
   refine ⟨ψ.relabel (Sum.elim id fun _ => slotIx (Sum.inr s)), fun e w => ?_⟩
@@ -541,7 +541,7 @@ private theorem uReadable_ctl (q : Q) :
     UReadable (L := L) (W := W) fun _ f _ => f q :=
   fun s => (uGDefinable_mixEq (L := L) q s).congr fun _ _ _ => eq_comm
 
-private theorem UReadable.congr (h : UReadable V) (he : ∀ e f g, V' e f g = V e f g) :
+theorem UReadable.congr (h : UReadable V) (he : ∀ e f g, V' e f g = V e f g) :
     UReadable V' :=
   fun s => (h s).congr fun e f g => by rw [he]
 

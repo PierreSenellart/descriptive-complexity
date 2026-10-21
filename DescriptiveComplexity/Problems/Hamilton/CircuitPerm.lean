@@ -70,7 +70,7 @@ theorem cycSucc_reverse {Le : V → V → Prop} {x y : V} :
     · exact Or.inr ⟨h₂, h₁⟩
 
 /-- A circuit of a symmetric relation, traversed backwards, is a circuit. -/
-private theorem IsCircuit.reverse {R Nxt : V → V → Prop} (hsym : ∀ x y, R x y → R y x)
+theorem IsCircuit.reverse {R Nxt : V → V → Prop} (hsym : ∀ x y, R x y → R y x)
     (h : IsCircuit R Nxt) : IsCircuit R fun x y => Nxt y x := by
   obtain ⟨Le, hlin, hiff, hR⟩ := h
   exact ⟨fun a b => Le b a, hlin.reverse, fun x y => (hiff y x).trans cycSucc_reverse.symm,

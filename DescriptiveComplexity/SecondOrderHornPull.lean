@@ -102,7 +102,7 @@ theorem HornProgram.pull_mem (I : FOInterpretation L₁ L₂ Tag d)
   rw [HornProgram.pull, List.mem_flatMap]
   exact ⟨c, hc, List.mem_map.mpr ⟨t, mem_allTagAssign t, rfl⟩⟩
 
-private theorem HornProgram.pull_cases (I : FOInterpretation L₁ L₂ Tag d)
+theorem HornProgram.pull_cases (I : FOInterpretation L₁ L₂ Tag d)
     {prog : HornProgram L₂ B k} {c' : HornClause L₁ (B.pull Tag d) (k * d)}
     (hc' : c' ∈ prog.pull I) : ∃ c ∈ prog, ∃ t : Fin k → Tag, c' = c.pull I t := by
   rw [HornProgram.pull, List.mem_flatMap] at hc'

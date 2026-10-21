@@ -399,7 +399,7 @@ private theorem succPos_left_unique (hlin : IsLinOrd Le) {p p' q : A}
 
 omit [Finite A] in
 /-- The reverse of a linear order is a linear order. -/
-private theorem IsLinOrd.reverse (hlin : IsLinOrd Le) : IsLinOrd (fun a b => Le b a) :=
+theorem IsLinOrd.reverse (hlin : IsLinOrd Le) : IsLinOrd (fun a b => Le b a) :=
   ⟨hlin.1, fun a b c hab hbc => hlin.2.1 c b a hbc hab,
     fun a b hab hba => hlin.2.2.1 a b hba hab, fun a b => hlin.2.2.2 b a⟩
 

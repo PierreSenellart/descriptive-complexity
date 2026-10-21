@@ -102,7 +102,7 @@ theorem FPDefinable.of_orderedParsimonious (f : C ≤ᵖ[≤] D) (h : FPDefinabl
   exact h1.trans (hout.trans (hpull.symm.trans (congrArg _ (Subsingleton.elim _ _))))
 
 /-- FP is closed under parsimonious reductions. -/
-private theorem FPDefinable.of_parsimonious (f : C ≤ᵖ D) (h : FPDefinable D) : FPDefinable C :=
+theorem FPDefinable.of_parsimonious (f : C ≤ᵖ D) (h : FPDefinable D) : FPDefinable C :=
   h.of_orderedParsimonious f.toOrdered
 
 end Closure

@@ -59,7 +59,7 @@ open Language
 /-- Cofinal hardness is congruent in its membership predicate: two collections
 with the same problems have the same hard problems. This is what makes the
 degree construction below independent of the *presentation* of a class. -/
-private theorem CofinalHard.congr_mem
+theorem CofinalHard.congr_mem
     {Mem₁ Mem₂ : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     (h : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational] (Q : DecisionProblem L₀), Mem₁ Q ↔ Mem₂ Q)
     {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :

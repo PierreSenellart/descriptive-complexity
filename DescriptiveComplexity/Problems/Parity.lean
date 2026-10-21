@@ -118,7 +118,7 @@ def PARITY : DecisionProblem Language.markedSet where
     rw [hcard]
 
 /-- The value of PARITY, unfolded. -/
-private theorem parity_holds_iff (A : Type) [Language.markedSet.Structure A] :
+theorem parity_holds_iff (A : Type) [Language.markedSet.Structure A] :
     PARITY A ↔ Even (Marked A).ncard :=
   Iff.rfl
 
@@ -432,7 +432,7 @@ noncomputable def evenParityInterp :
   relFormula {_} _ _ := ⊤
 
 /-- Every point of the interpreted structure is marked. -/
-private theorem marked_evenParityInterp (A : Type) [Language.empty.Structure A] :
+theorem marked_evenParityInterp (A : Type) [Language.empty.Structure A] :
     Marked (evenParityInterp.Map A) = Set.univ := by
   ext p
   rw [mem_marked_iff]
@@ -441,7 +441,7 @@ private theorem marked_evenParityInterp (A : Type) [Language.empty.Structure A] 
   exact Formula.realize_top.mpr trivial
 
 /-- **EVEN reduces to PARITY**: mark everything. -/
-private noncomputable def even_fo_reduction_parity : EVEN ≤ᶠᵒ PARITY where
+noncomputable def even_fo_reduction_parity : EVEN ≤ᶠᵒ PARITY where
   Tag := Unit
   dim := 1
   toInterpretation := evenParityInterp

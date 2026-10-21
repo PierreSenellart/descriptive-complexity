@@ -53,7 +53,7 @@ theorem SOBlock.pad_arity_inl (B : SOBlock) (n a : ℕ) (i : B.ι) :
 /-- **The variables of a padded block**, counted: the original's and the new
 ones. This is what a clock's counting hypothesis is discharged by – the guessing
 site's rule names are indexed by assignments of the block. -/
-private theorem SOBlock.card_pad_ι (B : SOBlock) (n a : ℕ) :
+theorem SOBlock.card_pad_ι (B : SOBlock) (n a : ℕ) :
     Nat.card (B.pad n a).ι = Nat.card B.ι + n := by
   classical
   have : Fintype B.ι := Fintype.ofFinite _

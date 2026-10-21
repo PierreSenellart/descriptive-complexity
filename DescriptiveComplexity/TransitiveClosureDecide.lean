@@ -178,7 +178,7 @@ theorem Decides.congr {v : β → A} {P Q : Prop} (h : D.Decides v P) (hPQ : P �
     D.Decides v Q :=
   fun t => ⟨((h t).1).trans hPQ, ((h t).2).trans (not_congr hPQ)⟩
 
-private theorem Decides.congr_val {v w : β → A} {P : Prop} (h : D.Decides v P) (hvw : v = w) :
+theorem Decides.congr_val {v w : β → A} {P : Prop} (h : D.Decides v P) (hvw : v = w) :
     D.Decides w P :=
   hvw ▸ h
 
@@ -186,7 +186,7 @@ theorem Functional.step_unique (h : D.Functional A) {v : β → A} {a b c : D.No
     (hb : D.StepAt v a b) (hc : D.StepAt v a c) : b = c :=
   Sum.inl_injective (h v a (Sum.inl b) (Sum.inl c) hb hc)
 
-private theorem Functional.not_exit_of_step (h : D.Functional A) {v : β → A} {a b : D.Node A}
+theorem Functional.not_exit_of_step (h : D.Functional A) {v : β → A} {a b : D.Node A}
     (hb : D.StepAt v a b) {o : Bool} (ho : D.ExitAt v a o) : False :=
   Sum.inl_ne_inr (h v a (Sum.inl b) (Sum.inr o) hb ho)
 

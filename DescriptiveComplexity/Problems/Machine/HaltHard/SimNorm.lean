@@ -188,7 +188,7 @@ private theorem pass_suKill (h : σ = .one ∨ σ = .com ∨ σ = .bk) :
 end Pass
 
 /-- Reachability transported along equalities of the two configurations. -/
-private theorem Reach.cast {x x' y y' : LCfg c} (hx : x = x') (hy : y = y') (h : Reach x' y') :
+theorem Reach.cast {x x' y y' : LCfg c} (hx : x = x') (hy : y = y') (h : Reach x' y') :
     Reach x y := hx ▸ hy ▸ h
 
 /-- Gluing the letter behind the head back onto a run of its own kind – the

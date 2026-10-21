@@ -46,7 +46,7 @@ def SOBlock.restPart₂ (ρ : B.withBij₂.Assignment A) : B.Assignment A :=
 
 /-- The assignment of the extended block determined by a quaternary relation
 and an assignment of the original block. -/
-private def SOBlock.joinBij₂ (R : (Fin 4 → A) → Prop) (ρ : B.Assignment A) :
+def SOBlock.joinBij₂ (R : (Fin 4 → A) → Prop) (ρ : B.Assignment A) :
     B.withBij₂.Assignment A :=
   fun p => match p with
     | Sum.inl _ => R

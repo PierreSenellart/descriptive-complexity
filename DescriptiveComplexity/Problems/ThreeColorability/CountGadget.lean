@@ -418,7 +418,7 @@ private theorem bc_eq_zero (b : Bool) : bc b = 0 ↔ b = true := by cases b <;> 
 private theorem bc_ne_two (b : Bool) : bc b ≠ 2 := by cases b <;> decide
 
 /-- **A core coloring gives a model.** -/
-private theorem satModel_modelOf {κ : Core A → Fin 3} (hκ : CoreProper κ) (hn : NormC κ)
+theorem satModel_modelOf {κ : Core A → Fin 3} (hκ : CoreProper κ) (hn : NormC κ)
     (hall : AllNAE κ) : SatModel A (modelOf κ) := by
   refine ⟨fun c hc => ?_, fun x hx => hx.1⟩
   by_cases hex : ∃ x s, OccIn c x s
@@ -559,7 +559,7 @@ theorem allNAE_colOf : AllNAE (colOf ν) := by
 end OfModel
 
 /-- **The core colorings are the models.** -/
-private noncomputable def modelEquiv :
+noncomputable def modelEquiv :
     {κ : Core A → Fin 3 // (CoreProper κ ∧ NormC κ) ∧ AllNAE κ} ≃
       {ν : A → Prop // SatModel A ν} where
   toFun κ := ⟨modelOf κ.1, satModel_modelOf κ.2.1.1 κ.2.1.2 κ.2.2⟩

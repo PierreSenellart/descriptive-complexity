@@ -238,7 +238,7 @@ private theorem stepsIn_split : ∀ {m k : ℕ} {c e : Config A},
 /-- **Runs compose.** Phases of a constructed machine are proved one at a time
 and chained with this; the step counts add, which is the form the budget
 obligation of a reduction takes. -/
-private theorem StepsIn.trans : ∀ {n m : ℕ} {c d e : Config A},
+theorem StepsIn.trans : ∀ {n m : ℕ} {c d e : Config A},
     M.StepsIn n c d → M.StepsIn m d e → M.StepsIn (n + m) c e := by
   intro n
   induction n with
@@ -307,7 +307,7 @@ private theorem reachesIn_of_step {c d : Config A} (h : M.Step c d) : M.ReachesI
 /-- **Budgeted runs compose, and their budgets add.** This is the whole reason
 for the notion: a program's cost is read off its phases as a sum, and compared
 with the clock once. -/
-private theorem ReachesIn.trans {n m : ℕ} {c d e : Config A}
+theorem ReachesIn.trans {n m : ℕ} {c d e : Config A}
     (hcd : M.ReachesIn n c d) (hde : M.ReachesIn m d e) : M.ReachesIn (n + m) c e := by
   obtain ⟨k, hk, hrun⟩ := hcd
   obtain ⟨l, hl, hrun'⟩ := hde
@@ -490,7 +490,7 @@ theorem _root_.DescriptiveComplexity.Config.map_surjective (u : B ≃ A) :
   exact ⟨⟨u.symm c.state, u.symm c.head, fun b => u.symm (c.tape (u b))⟩, by
     simp [Config.map, Equiv.apply_symm_apply]⟩
 
-private theorem _root_.DescriptiveComplexity.Config.map_injective (u : B ≃ A) :
+theorem _root_.DescriptiveComplexity.Config.map_injective (u : B ≃ A) :
     Function.Injective (Config.map u) := by
   rintro ⟨s, hd, t⟩ ⟨s', hd', t'⟩ hc
   simp only [Config.map, Config.mk.injEq] at hc
@@ -505,7 +505,7 @@ theorem Agree.minPos (h : Agree u N M) {b : B} :
     rwa [(h.le _ _), Equiv.apply_symm_apply] at this
   · exact (h.le _ _).mpr (hm (u a) ((h.posn a).mp ha))
 
-private theorem Agree.succPos (h : Agree u N M) {b b' : B} :
+theorem Agree.succPos (h : Agree u N M) {b b' : B} :
     SuccPos N.Le N.Posn b b' ↔ SuccPos M.Le M.Posn (u b) (u b') := by
   refine and_congr (h.posn b) (and_congr (h.posn b') (and_congr (h.le _ _)
     (and_congr u.injective.ne_iff.symm ⟨fun hs a ha h₁ h₂ => ?_, fun hs a ha h₁ h₂ => ?_⟩)))

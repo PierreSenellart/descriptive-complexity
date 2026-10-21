@@ -95,7 +95,7 @@ def SOBlock.botAssign (B : SOBlock) (A : Type) : B.Assignment A :=
 
 /-- Transport along an equivalence maps the empty assignment to the empty
 assignment. -/
-private theorem SOBlock.mapAssign_botAssign (B : SOBlock) {A A' : Type} (e : A ≃ A') :
+theorem SOBlock.mapAssign_botAssign (B : SOBlock) {A A' : Type} (e : A ≃ A') :
     B.mapAssign e (B.botAssign A) = B.botAssign A' :=
   rfl
 

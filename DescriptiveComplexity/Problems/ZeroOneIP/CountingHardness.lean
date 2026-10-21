@@ -39,7 +39,7 @@ variable (A : Type) [Language.binWeights.Structure A] [LinearOrder A] [Finite A]
 
 /-- **The solutions of the one-equation program are the solutions of the
 subset-sum instance**, bijectively. -/
-private def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
+def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
     {S : A → Prop // KnapsackSol A S} ≃
       {x : ipInterp.Map A → Prop // ZeroOneSol (ipInterp.Map A) x} where
   toFun S := ⟨colsOf S.1, ipInterp.map_finite A, isLinOrd_ipLe S.2.2.1,

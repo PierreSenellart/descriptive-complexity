@@ -96,13 +96,13 @@ private theorem mem_EXPSPACE_compl_iff (P : DecisionProblem L) : Pᶜ ∈ EXPSPA
 /-- **SO(≤, LFP) is closed under complement** – the second-order shadow of
 `DescriptiveComplexity.piP_zero_eq`, and the reading of
 `DescriptiveComplexity.EXPTIME_eq_coEXPTIME` on the definition. -/
-private theorem SOLFPDefinable.compl {P : DecisionProblem L} (h : SOLFPDefinable P) :
+theorem SOLFPDefinable.compl {P : DecisionProblem L} (h : SOLFPDefinable P) :
     SOLFPDefinable Pᶜ :=
   (mem_EXPTIME_compl_iff P).mpr h
 
 /-- **SO(≤, PFP) is closed under complement** – the second-order shadow of
 Savitch. -/
-private theorem SOPFPDefinable.compl {P : DecisionProblem L} (h : SOPFPDefinable P) :
+theorem SOPFPDefinable.compl {P : DecisionProblem L} (h : SOPFPDefinable P) :
     SOPFPDefinable Pᶜ :=
   (mem_EXPSPACE_compl_iff P).mpr h
 

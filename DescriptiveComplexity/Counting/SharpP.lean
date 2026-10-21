@@ -196,7 +196,7 @@ theorem CountingProblem.ofKernel_apply (B : SOBlock) (φ : (L.sum B.lang).Senten
 
 /-- The support of a witness-counting problem is the problem its sentence
 defines. -/
-private theorem CountingProblem.ofKernel_support_iff (B : SOBlock) (φ : (L.sum B.lang).Sentence)
+theorem CountingProblem.ofKernel_support_iff (B : SOBlock) (φ : (L.sum B.lang).Sentence)
     (A : Type) [L.Structure A] [Finite A] :
     (CountingProblem.ofKernel B φ).support A ↔ SORealize L A [B] φ true :=
   witnessCount_pos_iff B φ A

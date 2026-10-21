@@ -119,7 +119,7 @@ theorem TopoOn.of_equiv (u : B ≃ A) {VB : B → Prop} {LtB ArcB : B → B → 
     simpa using (hLt (u.symm x) (u.symm y)).mp this
 
 /-- `TopoOn` transports along an equivalence, iff version. -/
-private theorem TopoOn.equiv_iff (u : B ≃ A) {VB : B → Prop} {LtB ArcB : B → B → Prop}
+theorem TopoOn.equiv_iff (u : B ≃ A) {VB : B → Prop} {LtB ArcB : B → B → Prop}
     {VA : A → Prop} {LtA ArcA : A → A → Prop}
     (hV : ∀ b, VB b ↔ VA (u b)) (hLt : ∀ b b', LtB b b' ↔ LtA (u b) (u b'))
     (hArc : ∀ b b', ArcB b b' ↔ ArcA (u b) (u b')) :

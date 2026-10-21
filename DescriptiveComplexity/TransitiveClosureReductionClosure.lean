@@ -73,7 +73,7 @@ variable {L'' : Language.{0, 0}} {M N : Type} {instM : L''.Structure M} {instN :
   (e : @Language.Equiv L'' M N instM instN)
 
 /-- A step of a parameterized walk transports along an isomorphism. -/
-private theorem ParamTCSpec.stepAt_of_equiv
+theorem ParamTCSpec.stepAt_of_equiv
     (s : ParamTCSpec L'') (z : Fin s.par → M) (a b : s.Node M) :
     @ParamTCSpec.StepAt L'' s N instN (e ∘ z) (a.1, e ∘ a.2) (b.1, e ∘ b.2) ↔
       @ParamTCSpec.StepAt L'' s M instM z a b := by
@@ -435,7 +435,7 @@ theorem mem_LOGSPACE_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ LOGSPACE)
 
 /-- An FO(TC) reduction complements: the same interpretation reduces the
 complements. -/
-private noncomputable def TCReduction.compl (f : P ≤ᵗᶜ Q) : Pᶜ ≤ᵗᶜ Qᶜ :=
+noncomputable def TCReduction.compl (f : P ≤ᵗᶜ Q) : Pᶜ ≤ᵗᶜ Qᶜ :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -444,7 +444,7 @@ private noncomputable def TCReduction.compl (f : P ≤ᵗᶜ Q) : Pᶜ ≤ᵗᶜ
     correct := fun A _ _ _ _ => not_congr (f.correct A) }
 
 /-- An FO(DTC) reduction complements. -/
-private noncomputable def DTCReduction.compl (f : P ≤ᵈᵗᶜ Q) : Pᶜ ≤ᵈᵗᶜ Qᶜ :=
+noncomputable def DTCReduction.compl (f : P ≤ᵈᵗᶜ Q) : Pᶜ ≤ᵈᵗᶜ Qᶜ :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim

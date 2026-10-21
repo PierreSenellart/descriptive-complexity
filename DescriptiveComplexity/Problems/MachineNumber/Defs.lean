@@ -132,7 +132,7 @@ private theorem Agree.halts {B : Type} {u : B ≃ A} {N : TMData B} (h : Agree u
       fun e he => hstuck (e.map u) (h.step.mp he)⟩
 
 /-- Agreements compose. -/
-private theorem Agree.trans {B C : Type} {u : B ≃ A} {v : C ≃ B} {N : TMData B} {K : TMData C}
+theorem Agree.trans {B C : Type} {u : B ≃ A} {v : C ≃ B} {N : TMData B} {K : TMData C}
     (h₁ : Agree v K N) (h₂ : Agree u N M) : Agree (v.trans u) K M where
   posn b := (h₁.posn b).trans (h₂.posn _)
   le b b' := (h₁.le b b').trans (h₂.le _ _)

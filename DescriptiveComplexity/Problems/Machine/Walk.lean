@@ -293,7 +293,7 @@ theorem RelWalk.isWalk (h : M.RelWalk Q H T) : M.IsWalk h.conf := by
     exact h.acc t ht _ (h.qex t).choose_spec
 
 /-- A walk is a relational walk, through the graphs of its configurations. -/
-private theorem IsWalk.relWalk {conf : A → Config A} (h : M.IsWalk conf) :
+theorem IsWalk.relWalk {conf : A → Config A} (h : M.IsWalk conf) :
     M.RelWalk (fun t q => q = (conf t).state) (fun t p => p = (conf t).head)
       (fun t p a => a = (conf t).tape p) := by
   obtain ⟨hinit, hstep, hacc⟩ := h

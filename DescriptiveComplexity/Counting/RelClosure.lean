@@ -63,7 +63,7 @@ def SOBlock.Supported (B : SOBlock) (J : RelFOInterpretation L₁ L₂ Tag dm)
     ∀ k : Fin (B.arity p.1), (J.domFormula (p.2 k)).Realize fun j => x (finProdFinEquiv (k, j))
 
 /-- A transferred assignment is supported. -/
-private theorem SOBlock.supported_pullAssignRel (B : SOBlock) (J : RelFOInterpretation L₁ L₂ Tag dm)
+theorem SOBlock.supported_pullAssignRel (B : SOBlock) (J : RelFOInterpretation L₁ L₂ Tag dm)
     (ρ : B.Assignment (J.MapRel A)) : B.Supported J (B.pullAssignRel J ρ) :=
   fun _ _ h k => h.1 k
 

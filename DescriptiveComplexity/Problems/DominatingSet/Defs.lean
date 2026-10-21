@@ -83,7 +83,7 @@ private theorem dom_symm_hBin {MB : B → B → Prop} {MA : A → A → Prop} (u
   simp
 
 /-- `DominatesOn` transports along an equivalence, iff version. -/
-private theorem DominatesOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+theorem DominatesOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     DominatesOn AdjB KB ↔ DominatesOn AdjA KA :=

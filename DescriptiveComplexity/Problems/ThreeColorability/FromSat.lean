@@ -88,7 +88,7 @@ section Characterization
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-private theorem realize_edgeF {t₁ t₂ : SatTag} {v : Fin 2 × Fin 2 → A} :
+theorem realize_edgeF {t₁ t₂ : SatTag} {v : Fin 2 × Fin 2 → A} :
     (edgeF t₁ t₂).Realize v ↔
       Core t₁ (v (0, 0)) (v (0, 1)) t₂ (v (1, 0)) (v (1, 1)) := by
   cases t₁ <;> cases t₂

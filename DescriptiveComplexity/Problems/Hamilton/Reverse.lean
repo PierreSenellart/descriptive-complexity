@@ -754,7 +754,7 @@ private noncomputable def selOf {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v 
   if isSel (tourSucc f v) then tourSucc f v else (tourSucc f).symm v
 
 /-- Which tour-slot direction of the selector `s` points back at the vertex. -/
-private noncomputable def bit
+noncomputable def bit
     {N : ℕ} (f : Fin N ≃ hamInterp.MapRel A) (v : hamInterp.MapRel A) : Bool :=
   decide (isSel (tourSucc f v))
 

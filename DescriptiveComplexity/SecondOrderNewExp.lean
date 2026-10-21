@@ -273,12 +273,12 @@ theorem valOf_valAssign (S : Fin c → (Fin d → A) → Prop) (i : Fin c) (w : 
     valOf (valAssign S) i w ↔ S i w :=
   Iff.rfl
 
-private theorem domHolds_eltAssign (x : A) :
+theorem domHolds_eltAssign (x : A) :
     ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, eltAssign x) :=
   (domHolds_false _).mpr ⟨⟨x, (eltOf_eltAssign x x).mpr rfl,
     fun y hy => (eltOf_eltAssign x y).mp hy⟩, fun i w => valOf_eltAssign x i w⟩
 
-private theorem domHolds_valAssign (S : Fin c → (Fin d → A) → Prop) :
+theorem domHolds_valAssign (S : Fin c → (Fin d → A) → Prop) :
     ExpExpansionFree.DomHolds (X := powExpFree L c d) (true, valAssign S) :=
   (domHolds_true _).mpr fun y => eltOf_valAssign S y
 
@@ -346,11 +346,11 @@ private theorem assign_eq_valAssign {ρ : (powBlock c d).Assignment A}
 
 /-- The point of the expansion carried by an element or by a tuple of `d`-ary
 relations. -/
-private def powPoint : A ⊕ (Fin c → (Fin d → A) → Prop) → (powExpFree L c d).Map A
+def powPoint : A ⊕ (Fin c → (Fin d → A) → Prop) → (powExpFree L c d).Map A
   | Sum.inl x => ⟨(false, eltAssign x), domHolds_eltAssign x⟩
   | Sum.inr S => ⟨(true, valAssign S), domHolds_valAssign S⟩
 
-private theorem powPoint_injective :
+theorem powPoint_injective :
     Function.Injective (powPoint (L := L) (c := c) (d := d) (A := A)) := by
   rintro (x | S) (y | T) h
   · refine congrArg Sum.inl ?_
@@ -364,7 +364,7 @@ private theorem powPoint_injective :
   · refine congrArg Sum.inr (funext fun i => ?_)
     exact (congrArg (fun p => p.1.2 (some i)) h : S i = T i)
 
-private theorem powPoint_surjective :
+theorem powPoint_surjective :
     Function.Surjective (powPoint (L := L) (c := c) (d := d) (A := A)) := by
   rintro ⟨⟨t, ρ⟩, h⟩
   cases t with
@@ -378,7 +378,7 @@ private theorem powPoint_surjective :
 /-- **The points of the expansion are the instance's elements and its `d`-ary
 relations**, so there are `n + 2 ^ nᵈ` of them: enough to hold any extension the
 bound of `DescriptiveComplexity.SigmaSONewExpDefinable` allows. -/
-private noncomputable def powPointEquiv :
+noncomputable def powPointEquiv :
     A ⊕ (Fin c → (Fin d → A) → Prop) ≃ (powExpFree L c d).Map A :=
   Equiv.ofBijective _ ⟨powPoint_injective, powPoint_surjective⟩
 
@@ -403,7 +403,7 @@ omit [L.IsRelational] in
 open Classical in
 /-- **A relation of the instance, at original points**: it holds exactly when it
 holds of the elements they name. -/
-private theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → Bool)
+theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → Bool)
     (hτ : ∀ i, τ i = false) :
     letI := ((powBlock c d).replicate n).structure₁ (L := L)
       ((powBlock c d).replicateAssign ρs)
@@ -419,14 +419,14 @@ private theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → 
 omit [L.IsRelational] in
 open Classical in
 /-- **A relation of the instance never holds of an invented point.** -/
-private theorem powRelSentence_base_eq_bot (R : L.Relations n) (τ : Fin n → Bool)
+theorem powRelSentence_base_eq_bot (R : L.Relations n) (τ : Fin n → Bool)
     (hτ : ¬∀ i, τ i = false) : powRelSentence L c d (Sum.inl R) τ = ⊥ := by
   rw [powRelSentence, ite_eq_right hτ]
 
 omit [L.IsRelational] in
 open Classical in
 /-- **The marker `old` holds exactly of the original points.** -/
-private theorem realize_powRelSentence_old (σs : Fin 1 → (powBlock c d).Assignment A)
+theorem realize_powRelSentence_old (σs : Fin 1 → (powBlock c d).Assignment A)
     (τ : Fin 1 → Bool) :
     letI := ((powBlock c d).replicate 1).structure₁ (L := L)
       ((powBlock c d).replicateAssign σs)
@@ -456,13 +456,13 @@ def extOn (L : Language.{0, 0}) [L.IsRelational] (A N : Type) [L.Structure A] :
       RelMap := fun {_k} r x => ∃ y, (∀ i, x i = Sum.inl (y i)) ∧ RelMap r y }
     { RelMap := fun | .old => fun x => IsOld (x 0) }
 
-private theorem relMap_extOn_base {N : Type} {k : ℕ} (R : L.Relations k) (x : Fin k → A ⊕ N) :
+theorem relMap_extOn_base {N : Type} {k : ℕ} (R : L.Relations k) (x : Fin k → A ⊕ N) :
     letI := extOn L A N
     RelMap (L := newLang L) (Sum.inl R) x ↔
       ∃ y, (∀ i, x i = Sum.inl (y i)) ∧ RelMap R y :=
   Iff.rfl
 
-private theorem relMap_extOn_old {N : Type} (x : Fin 1 → A ⊕ N) :
+theorem relMap_extOn_old {N : Type} (x : Fin 1 → A ⊕ N) :
     letI := extOn L A N
     RelMap (L := newLang L) (Sum.inr Language.oldSym) x ↔ IsOld (x 0) :=
   Iff.rfl
@@ -470,7 +470,7 @@ private theorem relMap_extOn_old {N : Type} (x : Fin 1 → A ⊕ N) :
 /-- **The expanded structure is the extended one**: the map sending an element
 to its original point and a `d`-ary relation to its new point is an isomorphism
 over `DescriptiveComplexity.newLang`. -/
-private noncomputable def powExtEquiv :
+noncomputable def powExtEquiv :
     letI := extOn L A (Fin c → (Fin d → A) → Prop)
     letI := ExpExpansionFree.mapStructure (X := powExpFree L c d) A
     @Language.Equiv (newLang L) (A ⊕ (Fin c → (Fin d → A) → Prop))
@@ -537,7 +537,7 @@ variable {L : Language.{0, 0}} [L.IsRelational] {A N : Type} [L.Structure A]
 /-- **The original elements together with the marked invented values**: a
 substructure, there being nothing to be closed under in a relational
 vocabulary. -/
-private def usedSub (U : N → Prop) :
+def usedSub (U : N → Prop) :
     letI := extOn L A N
     (newLang L).Substructure (A ⊕ N) :=
   letI := extOn L A N
@@ -548,18 +548,18 @@ private def usedSub (U : N → Prop) :
 def usedPoint (U : N → Prop) : A ⊕ {y : N // U y} → A ⊕ N :=
   Sum.map id Subtype.val
 
-private theorem usedPoint_mem (U : N → Prop) (x : A ⊕ {y : N // U y}) :
+theorem usedPoint_mem (U : N → Prop) (x : A ⊕ {y : N // U y}) :
     letI := extOn L A N
     usedPoint U x ∈ usedSub (L := L) (A := A) U := by
   cases x with
   | inl a => exact trivial
   | inr y => exact y.2
 
-private theorem usedPoint_isOld (U : N → Prop) (x : A ⊕ {y : N // U y}) :
+theorem usedPoint_isOld (U : N → Prop) (x : A ⊕ {y : N // U y}) :
     IsOld (usedPoint U x) ↔ IsOld x := by
   cases x <;> exact Iff.rfl
 
-private theorem usedPoint_eq_inl (U : N → Prop) (x : A ⊕ {y : N // U y}) (a : A) :
+theorem usedPoint_eq_inl (U : N → Prop) (x : A ⊕ {y : N // U y}) (a : A) :
     usedPoint U x = Sum.inl a ↔ x = Sum.inl a := by
   cases x with
   | inl b => exact ⟨fun h => congrArg Sum.inl (Sum.inl_injective h), fun h => congrArg _ h⟩
@@ -571,7 +571,7 @@ private theorem usedPoint_eq_inl (U : N → Prop) (x : A ⊕ {y : N // U y}) (a 
 /-- **The marked part is the extended universe over the marked values**: the
 invented values a sentence uses are the ones it marks, and what it says of them
 it says of the extension by those alone. -/
-private def usedSubEquiv (U : N → Prop) :
+def usedSubEquiv (U : N → Prop) :
     letI := extOn L A {y : N // U y}
     letI := extOn L A N
     @Language.Equiv (newLang L) (A ⊕ {y : N // U y}) (usedSub (L := L) (A := A) U) _

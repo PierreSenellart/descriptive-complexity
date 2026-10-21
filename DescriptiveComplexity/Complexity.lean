@@ -95,7 +95,7 @@ namespace ComplexityClass
 
 /-- Two complexity classes with the same members and the same hard problems
 are equal: the remaining fields are proofs. -/
-private theorem ext {C₁ C₂ : ComplexityClass}
+theorem ext {C₁ C₂ : ComplexityClass}
     (hMem : ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
       C₁.Mem P ↔ C₂.Mem P)
     (hHard : ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
@@ -141,7 +141,7 @@ def Complete (P : DecisionProblem L) : Prop :=
 
 theorem Complete.mem {P : DecisionProblem L} (h : C.Complete P) : P ∈ C := h.1
 
-private theorem Complete.hard {P : DecisionProblem L} (h : C.Complete P) : C.Hard P := h.2
+theorem Complete.hard {P : DecisionProblem L} (h : C.Complete P) : C.Hard P := h.2
 
 end ComplexityClass
 

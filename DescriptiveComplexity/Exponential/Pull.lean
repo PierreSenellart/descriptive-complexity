@@ -106,7 +106,7 @@ sentence is pulled back through the order-extended, block-extended
 interpretation – the defining sentences also being read through the renaming of
 relation variables that identifies the pullback of a replicated block with the
 replication of the pulled block. -/
-private noncomputable def pullOrdered : ExpExpansion L where
+noncomputable def pullOrdered : ExpExpansion L where
   Tag := X.Tag
   B := X.B.pull T d
   E := X.E

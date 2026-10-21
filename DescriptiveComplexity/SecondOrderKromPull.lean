@@ -110,7 +110,7 @@ noncomputable def KromProgram.pull (I : FOInterpretation L₁ L₂ Tag d)
     (prog : KromProgram L₂ B k) : KromProgram L₁ (B.pull Tag d) (k * d) :=
   prog.flatMap fun c => (allTagAssign Tag k).map fun t => c.pull I t
 
-private theorem KromProgram.pull_mem (I : FOInterpretation L₁ L₂ Tag d)
+theorem KromProgram.pull_mem (I : FOInterpretation L₁ L₂ Tag d)
     {prog : KromProgram L₂ B k} {c : KromClause L₂ B k} (hc : c ∈ prog)
     (t : Fin k → Tag) : c.pull I t ∈ prog.pull I := by
   rw [KromProgram.pull, List.mem_flatMap]

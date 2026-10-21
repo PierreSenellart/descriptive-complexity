@@ -275,7 +275,7 @@ theorem TCSpec.comap_isSrc_iff (a : (spec.comap I).Node A) :
   exact h1.trans (realize_ordExtend_iff I (spec.src a.1.1) _)
 
 /-- **Accepting nodes correspond.** -/
-private theorem TCSpec.comap_isTgt_iff (a : (spec.comap I).Node A) :
+theorem TCSpec.comap_isTgt_iff (a : (spec.comap I).Node A) :
     letI := I.mapLinearOrder A
     (spec.comap I).IsTgt a ↔ spec.IsTgt (comapNodeEquiv spec I a) := by
   let := I.mapLinearOrder A

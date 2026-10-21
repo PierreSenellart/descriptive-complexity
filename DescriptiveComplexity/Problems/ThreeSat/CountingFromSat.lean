@@ -225,13 +225,13 @@ private theorem pred_eq {t s : Bool} {w₁ w₂ : Fin 2 → A} (h : Pred t s w�
 variable (ν' : interp.Map A → Prop)
 
 /-- The assignment read on the variable copies. -/
-private def varVal (x : A) : Prop := ν' (PTag.var, fun _ => x)
+def varVal (x : A) : Prop := ν' (PTag.var, fun _ => x)
 
 /-- The assignment read on the prefix variables. -/
-private def preVal (c x : A) (s : Bool) : Prop := ν' (PTag.pre s, ![c, x])
+def preVal (c x : A) (s : Bool) : Prop := ν' (PTag.pre s, ![c, x])
 
 /-- The clause `K` contains a literal made true by `ν'`. -/
-private def HasTrue (K : interp.Map A) : Prop :=
+def HasTrue (K : interp.Map A) : Prop :=
   ∃ e : interp.Map A, (RelMap satPosIn ![K, e] ∧ ν' e) ∨ (RelMap satNegIn ![K, e] ∧ ¬ν' e)
 
 variable {ν'}
@@ -357,7 +357,7 @@ variable [Finite A]
 /-- **Every clause of the split has a true literal exactly when the assignment
 is a prefix valuation**, read on the variable copies and the prefix
 variables. -/
-private theorem allTrue_iff :
+theorem allTrue_iff :
     (∀ K : interp.Map A, RelMap satIsClause ![K] → HasTrue ν' K) ↔
       PrefixVal (varVal ν') (preVal ν') := by
   constructor
@@ -512,7 +512,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A]
 /-- The assignment of the split determined by an assignment of the input,
 before its restriction to the variables of the split: variable copies follow
 it, and a prefix variable is the truth of its prefix disjunction. -/
-private def canon (ν : A → Prop) : PTag × (Fin 2 → A) → Prop
+def canon (ν : A → Prop) : PTag × (Fin 2 → A) → Prop
   | (.var, w) => ν (w 0)
   | (.pre s, w) => PrefixOr ν (w 0) (w 1) s
   | _ => False
@@ -527,7 +527,7 @@ variable (A) in
 model of the input extends by the truth of its prefix disjunctions, and a
 model of the split is recovered from its variable copies because the prefix
 variables are determined. -/
-private noncomputable def modelEquiv :
+noncomputable def modelEquiv :
     {ν : A → Prop // SatModel A ν} ≃
       {ν' : interp.Map A → Prop // SatModel (interp.Map A) ν'} where
   toFun ν := ⟨fun e => canon ν.1 e ∧ SatOccurs (interp.Map A) e,

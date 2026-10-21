@@ -303,7 +303,7 @@ variable {L : Language.{0, 0}}
 /-- The inflationary reading of a simultaneous induction, as a partial one:
 disjoin each variable's own atom onto its step formula, so that one partial
 step of the result is one *inflationary* step of the original. -/
-private noncomputable def StepDef.inflate (d : StepDef L) : StepDef L where
+noncomputable def StepDef.inflate (d : StepDef L) : StepDef L where
   B := d.B
   step := fun i =>
     Relations.formula (varInSym L d.B i) (fun j => Term.var j) ⊔ d.step i
@@ -320,7 +320,7 @@ private theorem realize_inflate_step (d : StepDef L) {A : Type} [L.Structure A]
 
 /-- One partial step of the inflated induction is one inflationary step of
 the original. -/
-private theorem StepDef.next_inflate (d : StepDef L) {A : Type} [L.Structure A]
+theorem StepDef.next_inflate (d : StepDef L) {A : Type} [L.Structure A]
     (ρ : d.B.Assignment A) : d.inflate.next ρ = d.inflStep ρ := by
   funext i x
   exact propext (realize_inflate_step d ρ i x)

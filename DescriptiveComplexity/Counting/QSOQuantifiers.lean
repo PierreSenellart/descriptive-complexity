@@ -194,7 +194,7 @@ def castTerm {B' : SOBlock} {γ : Type} : (M.sum B.lang).Term γ → (M.sum B'.l
 
 /-- **Substituting `X'(w̄, ȳ)` for every atom `X(ȳ)`** of a relation variable
 of the block, `w̄` free variables. -/
-private def extendRel (w : Fin n → α) :
+def extendRel (w : Fin n → α) :
     ∀ {k : ℕ}, (M.sum B.lang).BoundedFormula α k → (M.sum (B.extend n).lang).BoundedFormula α k
   | _, .falsum => .falsum
   | _, .equal t₁ t₂ => .equal (castTerm t₁) (castTerm t₂)

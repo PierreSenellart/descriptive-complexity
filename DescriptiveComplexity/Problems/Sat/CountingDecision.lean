@@ -101,7 +101,7 @@ def RelOrderedParsimoniousReduction.decide (R : ℕ → Prop) {C : CountingProbl
 
 /-- An ordered parsimonious reduction is an ordered first-order reduction
 between the decision versions by any property. -/
-private def OrderedParsimoniousReduction.decide (R : ℕ → Prop) {C : CountingProblem L}
+def OrderedParsimoniousReduction.decide (R : ℕ → Prop) {C : CountingProblem L}
     {D : CountingProblem L'} (f : C ≤ᵖ[≤] D) : C.decide R ≤ᶠᵒ[≤] D.decide R :=
   letI := f.tagFinite
   letI := f.tagNonempty

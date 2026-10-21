@@ -139,7 +139,7 @@ private theorem single {x y : LCfg c} (h : lstep x = some y) : Reach x y :=
 private theorem head {x y z : LCfg c} (h : lstep x = some y) (hr : Reach y z) : Reach x z :=
   Relation.ReflTransGen.head h hr
 
-private theorem trans {x y z : LCfg c} (h : Reach x y) (h' : Reach y z) : Reach x z :=
+theorem trans {x y z : LCfg c} (h : Reach x y) (h' : Reach y z) : Reach x z :=
   Relation.ReflTransGen.trans h h'
 
 end Reach
@@ -157,7 +157,7 @@ theorem stepsTo.trans_step : ∀ {n : ℕ} {x y z : LCfg c},
     exact ⟨d, hstep, ih hrest hyz⟩
 
 /-- Counted runs compose. -/
-private theorem stepsTo.trans : ∀ {n m : ℕ} {x y z : LCfg c},
+theorem stepsTo.trans : ∀ {n m : ℕ} {x y z : LCfg c},
     stepsTo n x y → stepsTo m y z → stepsTo (n + m) x z := by
   intro n
   induction n with

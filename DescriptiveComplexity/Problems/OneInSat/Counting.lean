@@ -77,7 +77,7 @@ private theorem sharpOneInSat_apply (A : Type) [Language.sat.Structure A] :
 
 /-- An exactly-one proper assignment restricts to an exactly-one model: only
 its values at the variables of the formula matter. -/
-private theorem oneInModel_restrict {A : Type} [Language.sat.Structure A] {ν : A → Prop}
+theorem oneInModel_restrict {A : Type} [Language.sat.Structure A] {ν : A → Prop}
     (h : OneInProper ν) : OneInModel A fun x => ν x ∧ SatOccurs A x := by
   have hlit : ∀ c y t, OccIn c y t →
       (LitTrue (fun x => ν x ∧ SatOccurs A x) y t ↔ LitTrue ν y t) := by

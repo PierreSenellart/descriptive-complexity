@@ -239,7 +239,7 @@ variable [L.IsRelational] [L'.IsRelational] {P : DecisionProblem L} {Q : Decisio
 
 /-- **A relativized ordered FO reduction is an FO(TC) reduction**, consulting
 no walk. -/
-private def RelOrderedFOReduction.toTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
+def RelOrderedFOReduction.toTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -250,11 +250,11 @@ private def RelOrderedFOReduction.toTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵗᶜ 
       (f.correct A).trans (Q.iso_invariant (f.toRelInterpretation.toTCLEquiv A)).symm }
 
 /-- **An ordered FO reduction is an FO(TC) reduction.** -/
-private def OrderedFOReduction.toTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
+def OrderedFOReduction.toTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
   f.toRel.toTC
 
 /-- **An FO reduction is an FO(TC) reduction.** -/
-private noncomputable def FOReduction.toTC (f : P ≤ᶠᵒ Q) : P ≤ᵗᶜ Q :=
+noncomputable def FOReduction.toTC (f : P ≤ᶠᵒ Q) : P ≤ᵗᶜ Q :=
   f.toOrdered.toRel.toTC
 
 end Embed

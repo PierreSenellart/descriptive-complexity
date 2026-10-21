@@ -137,7 +137,7 @@ theorem BlockPlay.cons {i : ℕ} {c d : Config A} {ℓ : ℕ} {f : ℕ → Confi
     | succ j => exact hfb j (by omega)
 
 /-- The play `f` with its first configuration dropped. -/
-private theorem BlockPlay.tail {i : ℕ} {c : Config A} {ℓ : ℕ} {f : ℕ → Config A}
+theorem BlockPlay.tail {i : ℕ} {c : Config A} {ℓ : ℕ} {f : ℕ → Config A}
     (h : M.BlockPlay i c (ℓ + 1) f) : M.BlockPlay i (f 1) ℓ (fun j => f (j + 1)) :=
   ⟨rfl, fun j hj => h.2.1 (j + 1) (by omega), fun j hj => h.2.2 (j + 1) (by omega)⟩
 

@@ -602,7 +602,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 variable {dt} in
 /-- `ScratchEq` is transitive. -/
-private theorem ScratchEq.trans {I : Type} {st st' st'' : TapeSt dt A R' P' I}
+theorem ScratchEq.trans {I : Type} {st st' st'' : TapeSt dt A R' P' I}
     (h : dt.ScratchEq st st') (h' : dt.ScratchEq st' st'') :
     dt.ScratchEq st st'' :=
   ⟨h.1.trans h'.1, h.2.1.trans h'.2.1, h.2.2.1.trans h'.2.2.1,

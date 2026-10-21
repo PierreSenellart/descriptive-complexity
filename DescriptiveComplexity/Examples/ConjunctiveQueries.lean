@@ -387,7 +387,7 @@ theorem CQHom.of_equiv (u : A ≃ B) {VarA : A → Prop} {AtomA FactA : A → A 
 
 /-- The homomorphism condition transports along an equivalence, iff
 version. -/
-private theorem CQHom.equiv_iff (u : A ≃ B) {VarA : A → Prop} {AtomA FactA : A → A → Prop}
+theorem CQHom.equiv_iff (u : A ≃ B) {VarA : A → Prop} {AtomA FactA : A → A → Prop}
     {VarB : B → Prop} {AtomB FactB : B → B → Prop}
     (hVar : ∀ a, VarA a ↔ VarB (u a))
     (hAtom : ∀ a a', AtomA a a' ↔ AtomB (u a) (u a'))

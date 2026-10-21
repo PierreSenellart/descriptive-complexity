@@ -129,7 +129,7 @@ theorem StepsInU.trans_step : ∀ {n : ℕ} {c d e : ConfigU A},
     exact ⟨m, hstep, ih hrest hde⟩
 
 /-- Runs compose; the step counts add. -/
-private theorem StepsInU.trans : ∀ {n m : ℕ} {c d e : ConfigU A},
+theorem StepsInU.trans : ∀ {n m : ℕ} {c d e : ConfigU A},
     M.StepsInU n c d → M.StepsInU m d e → M.StepsInU (n + m) c e := by
   intro n
   induction n with
@@ -215,7 +215,7 @@ theorem _root_.DescriptiveComplexity.ConfigU.map_surjective (u : B ≃ A) :
   · funext x
     simp [ConfigU.map]
 
-private theorem _root_.DescriptiveComplexity.ConfigU.map_injective (u : B ≃ A) :
+theorem _root_.DescriptiveComplexity.ConfigU.map_injective (u : B ≃ A) :
     Function.Injective (ConfigU.map u) := by
   rintro ⟨s, hd, t⟩ ⟨s', hd', t'⟩ hc
   simp only [ConfigU.map, ConfigU.mk.injEq, Prod.mk.injEq] at hc

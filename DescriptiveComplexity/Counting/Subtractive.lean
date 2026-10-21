@@ -110,7 +110,7 @@ theorem FOInterpretation.witAt_iff_pull (ρ : B.Assignment (Tag × (Fin dim → 
 omit [Finite Tag] in
 /-- The witness count of the kernel at the interpreted instance, ordered
 lexicographically, is the number of witnesses there. -/
-private theorem FOInterpretation.witnessCount_map_eq_card :
+theorem FOInterpretation.witnessCount_map_eq_card :
     @witnessCount (L'.sum Language.order) B φ (I.Map A)
         (letI := I.mapLinearOrder A; sumOrderStructure L' (I.Map A)) =
       Nat.card {ρ : B.Assignment (Tag × (Fin dim → A)) // I.WitAt B φ A ρ} := by
@@ -215,7 +215,7 @@ private theorem card_diff_add_card {α : Type} [Finite α] {P Q : α → Prop} (
 /-- **The source of a strong subtractive reduction is in `#P`**: it counts the
 witnesses at the minuend that are not witnesses at the subtrahend, and those
 are the witnesses of one kernel. -/
-private theorem SharpPDefinable.of_strongSubtractive (f : StrongSubtractiveReduction C D) :
+theorem SharpPDefinable.of_strongSubtractive (f : StrongSubtractiveReduction C D) :
     SharpPDefinable C := by
   let := f.tagFinite
   let := f.tagNonempty
@@ -331,7 +331,7 @@ variable {K}
 
 theorem Complete.mem {C : CountingProblem L} (h : K.Complete C) : C ∈ K := h.1
 
-private theorem Complete.hard {C : CountingProblem L} (h : K.Complete C) : K.Hard C := h.2
+theorem Complete.hard {C : CountingProblem L} (h : K.Complete C) : K.Hard C := h.2
 
 /-- Hardness travels forward along subtractive reductions. -/
 theorem Hard.of_subtractive {C : CountingProblem L} {D : CountingProblem L'}

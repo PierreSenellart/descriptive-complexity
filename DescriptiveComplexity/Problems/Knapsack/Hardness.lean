@@ -288,7 +288,7 @@ theorem kLow_fst (a₀ e : A) : (kLow a₀ e).2 0 = e := rfl
 @[simp]
 theorem kLow_snd (a₀ e : A) : (kLow a₀ e).2 1 = a₀ := rfl
 
-private theorem kItem_injective (a₀ : A) : Function.Injective (kItem a₀) := fun _ _ h =>
+theorem kItem_injective (a₀ : A) : Function.Injective (kItem a₀) := fun _ _ h =>
   congrArg (fun q : kInterp.Map A => q.2 0) h
 
 private theorem kLow_injective (a₀ : A) : Function.Injective (kLow a₀) := fun _ _ h =>
@@ -383,7 +383,7 @@ theorem bwLe_pos_itm (w w' : Fin 2 → A) : ¬BWLe (kPt .pos w) (kPt .itm w') :=
 
 /-- The interpreted order is a linear order: the two tags in order, each
 carrying the lexicographic order on pairs. -/
-private theorem isLinOrd_bwLe : IsLinOrd (BWLe (A := kInterp.Map A)) := by
+theorem isLinOrd_bwLe : IsLinOrd (BWLe (A := kInterp.Map A)) := by
   refine ⟨fun q => ?_, fun q₁ q₂ q₃ h₁ h₂ => ?_, fun q₁ q₂ h₁ h₂ => ?_, fun q₁ q₂ => ?_⟩
   · obtain ⟨t, w, rfl⟩ := kPt_surj q
     cases t
@@ -430,7 +430,7 @@ variable {A : Type} [Language.setSystem.Structure A] [LinearOrder A] [Finite A]
 
 omit [Finite A] in
 /-- An item is the padded item of the set it carries. -/
-private theorem eq_kItem {a₀ : A} (ha₀ : IsBot a₀) {i : kInterp.Map A} (h : BWItem i) :
+theorem eq_kItem {a₀ : A} (ha₀ : IsBot a₀) {i : kInterp.Map A} (h : BWItem i) :
     i = kItem a₀ (i.2 0) ∧ SSFam (i.2 0) := by
   obtain ⟨t, w, rfl⟩ := kPt_surj i
   cases t
@@ -628,14 +628,14 @@ section Correctness
 variable {A : Type} [Language.setSystem.Structure A] [LinearOrder A] [Finite A]
 
 /-- The items of a subfamily: the padded items of its sets. -/
-private def itemsOf (a₀ : A) (G : A → Prop) (i : kInterp.Map A) : Prop := ∃ s, G s ∧ i = kItem a₀ s
+def itemsOf (a₀ : A) (G : A → Prop) (i : kInterp.Map A) : Prop := ∃ s, G s ∧ i = kItem a₀ s
 
 /-- The subfamily of a set of items: the sets whose padded item is chosen. -/
-private def coverOfItems (a₀ : A) (S : kInterp.Map A → Prop) (s : A) : Prop := S (kItem a₀ s)
+def coverOfItems (a₀ : A) (S : kInterp.Map A → Prop) (s : A) : Prop := S (kItem a₀ s)
 
 open Classical in
 /-- **The items of an exact cover sum to the target.** -/
-private theorem subsetSum_itemsOf [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀) {G : A → Prop}
+theorem subsetSum_itemsOf [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀) {G : A → Prop}
     (hG : ExactCoverBy (SSElem (A := A)) SSFam SSMem G) :
     (∀ i, itemsOf a₀ G i → BWItem i) ∧
       (∑ᶠ i ∈ {i | itemsOf a₀ G i}, BWWeight i) = BWTarget (kInterp.Map A) := by
@@ -664,7 +664,7 @@ private theorem subsetSum_itemsOf [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀) {
 
 open Classical in
 /-- **A set of items summing to the target is an exact cover.** -/
-private theorem exactCoverBy_coverOfItems [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀)
+theorem exactCoverBy_coverOfItems [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀)
     {S : kInterp.Map A → Prop} (hSi : ∀ i, S i → BWItem i)
     (hsum : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget (kInterp.Map A)) :
     ExactCoverBy (SSElem (A := A)) SSFam SSMem (coverOfItems a₀ S) := by

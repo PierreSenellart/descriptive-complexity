@@ -381,7 +381,7 @@ inductive SlotVal (c : ℕ) : Type
 variable [LinearOrder A]
 
 /-- What a source names, at a tuple. -/
-private noncomputable def SlotVal.eval (bot top : A) (w : Fin c → A) : SlotVal c → A
+noncomputable def SlotVal.eval (bot top : A) (w : Fin c → A) : SlotVal c → A
   | .copy k => w k
   | .bot => bot
   | .top => top
