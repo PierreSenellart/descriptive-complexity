@@ -407,7 +407,9 @@ theorem weightedWorlds_apply (φ : L.Sentence) (A : Type) [(weightedLang L).Stru
   Nat.card_congr (Equiv.subtypeEquivRight fun σ => realize_weightKernel σ φ)
 
 /-- On an instance whose positions are not linearly ordered, the count is
-zero: such an instance carries no number. -/
+zero: such an instance carries no number.
+Registered in the Lax archive as
+[`Lax794877.ProbabilityRatio.weightedWorlds_of_not_isLinOrd`](https://laxarchive.org/lax-794877/Lax794877.ProbabilityRatio.html#s-Lax794877.ProbabilityRatio.weightedWorlds_of_not_isLinOrd). -/
 theorem weightedWorlds_of_not_isLinOrd (φ : L.Sentence) (A : Type)
     [(weightedLang L).Structure A] (h : ¬IsLinOrd (WLe L A)) : WeightedWorlds φ A = 0 := by
   rw [weightedWorlds_apply]
@@ -418,7 +420,9 @@ theorem weightedWorlds_of_not_isLinOrd (φ : L.Sentence) (A : Type)
   exact Nat.card_of_isEmpty
 
 /-- **Counting the weighted worlds of a first-order sentence is in `#P`**,
-whatever the sentence. -/
+whatever the sentence.
+Registered in the Lax archive as
+[`Lax794877.WorldsInSharpP.weightedWorlds_mem_sharpP`](https://laxarchive.org/lax-794877/Lax794877.WorldsInSharpP.html#s-Lax794877.WorldsInSharpP.weightedWorlds_mem_sharpP). -/
 theorem weightedWorlds_mem_sharpP (φ : L.Sentence) : WeightedWorlds φ ∈ SharpP :=
   sharpPDefinable_ofKernel (weightBlock L) (weightKernel φ)
 
@@ -708,7 +712,9 @@ noncomputable def worldProb [Finite A] (φ : L.Sentence)
 
 /-- The probability of a first-order sentence is a ratio of two `#P` numbers:
 `DescriptiveComplexity.funcProb_holdsEvent_eq_ratio`, for the packaged
-probability. -/
+probability.
+Registered in the Lax archive as
+[`Lax794877.ProbabilityRatio.worldProb_eq_ratio`](https://laxarchive.org/lax-794877/Lax794877.ProbabilityRatio.html#s-Lax794877.ProbabilityRatio.worldProb_eq_ratio). -/
 theorem worldProb_eq_ratio [Finite A] (hlin : IsLinOrd (WLe L A)) (φ : L.Sentence)
     (hpos : ∀ x : {q : Fact L A // IsOpen q}, 0 < presWeight x + absWeight x) :
     worldProb φ hpos = (WeightedWorlds φ A : ℚ) / (WeightedWorlds (⊤ : L.Sentence) A : ℚ) :=

@@ -242,7 +242,9 @@ private theorem dwideAcceptSpace_iff_expansion
 
 /-- **The wide machine is in NEXPTIME**, which is `NP.exp`: the expansion turns
 it into `DescriptiveComplexity.NTMAccept`, and that problem is in NP. This is
-the first natural member the class has. -/
+the first natural member the class has.
+Registered in the Lax archive as
+[`Lax822549.WideMachinesComplete.wideAccept_mem_NEXPTIME`](https://laxarchive.org/lax-822549/Lax822549.WideMachinesComplete.html#s-Lax822549.WideMachinesComplete.wideAccept_mem_NEXPTIME). -/
 theorem wideAccept_mem_NEXPTIME : WideAccept ∈ NEXPTIME := by
   let hinst : ∀ (A : Type) [Language.wide.Structure A] [LinearOrder A],
       Language.turing.Structure (wideExp.Map A) := fun A => wideStructure A

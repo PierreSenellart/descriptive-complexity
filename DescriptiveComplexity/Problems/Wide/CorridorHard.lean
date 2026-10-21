@@ -448,7 +448,9 @@ theorem wideCorridor_EXPSPACE_hard : EXPSPACE.Hard WideCorridor :=
 /-- **Tiling a wide corridor is EXPSPACE-complete.** The membership half is
 `DescriptiveComplexity.wideCorridor_mem_EXPSPACE`: a wide corridor is an
 ordinary corridor of an exponential expansion, and that problem is a walk on
-rows, hence in PSPACE. -/
+rows, hence in PSPACE.
+Registered in the Lax archive as
+[`Lax822549.TilingsComplete.wideCorridor_EXPSPACE_complete`](https://laxarchive.org/lax-822549/Lax822549.TilingsComplete.html#s-Lax822549.TilingsComplete.wideCorridor_EXPSPACE_complete). -/
 theorem wideCorridor_EXPSPACE_complete : EXPSPACE.Complete WideCorridor :=
   ⟨wideCorridor_mem_EXPSPACE, wideCorridor_EXPSPACE_hard⟩
 

@@ -121,16 +121,22 @@ end WideSmoke
 /-! ### The three problems are not vacuous -/
 
 /-- **`DescriptiveComplexity.WideAccept` has a yes-instance**, so the membership
-`DescriptiveComplexity.wideAccept_mem_NEXPTIME` is not about an empty problem. -/
+`DescriptiveComplexity.wideAccept_mem_NEXPTIME` is not about an empty problem.
+Registered in the Lax archive as
+[`Lax822549.WideMachinesComplete.wideAccept_nonvacuous`](https://laxarchive.org/lax-822549/Lax822549.WideMachinesComplete.html#s-Lax822549.WideMachinesComplete.wideAccept_nonvacuous). -/
 theorem wideAccept_nonvacuous : WideAccept (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.accepts⟩
 
-/-- **`DescriptiveComplexity.WideAcceptSpace` has a yes-instance.** -/
+/-- **`DescriptiveComplexity.WideAcceptSpace` has a yes-instance.**
+Registered in the Lax archive as
+[`Lax822549.WideMachinesComplete.wideAcceptSpace_nonvacuous`](https://laxarchive.org/lax-822549/Lax822549.WideMachinesComplete.html#s-Lax822549.WideMachinesComplete.wideAcceptSpace_nonvacuous). -/
 theorem wideAcceptSpace_nonvacuous : WideAcceptSpace (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.acceptsSpace⟩
 
 /-- **`DescriptiveComplexity.DWideAcceptSpace` has a yes-instance**: the instance
-has no transitions, so it is deterministic. -/
+has no transitions, so it is deterministic.
+Registered in the Lax archive as
+[`Lax822549.WideMachinesComplete.dwideAcceptSpace_nonvacuous`](https://laxarchive.org/lax-822549/Lax822549.WideMachinesComplete.html#s-Lax822549.WideMachinesComplete.dwideAcceptSpace_nonvacuous). -/
 theorem dwideAcceptSpace_nonvacuous : DWideAcceptSpace (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.deterministic, WideSmoke.acceptsSpace⟩
 
