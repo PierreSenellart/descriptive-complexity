@@ -134,6 +134,25 @@ it is added both to the table in [README.md](README.md) and to the catalog in
 the `DescriptiveComplexity` module docstring. A completeness result that
 appears in neither is invisible.
 
+**Visibility.** Every file is a `module` that opens an `@[expose] public
+section` after its docstring, so a declaration is public and exposed unless
+marked `private`. Public is the interface: vocabularies, semantics, classes,
+interpretations and reduction terms, the theorems named by the conventions
+above, and whatever a public statement or an exposed body mentions, including
+the instances it needs. Private is the implementation: helper lemmas, gadget
+formulas, auxiliary definitions. Three rules the module system enforces and the
+old `private` did not: a public declaration may mention only public names, in
+its statement and, for a definition, in its body; a declaration governed by
+`include … in` or `omit … in` has to stay public; and a type-level definition
+(a vocabulary, a symbol, an `abbrev`) that computable code goes through has to
+be public too. A proof in another file that needs a private declaration gets it
+with `import all` of that module, never by promoting the declaration. Imports
+are `public import` only where a statement or body of the file uses the imported
+names, and plain `import` where only proofs do. Files that evaluate code at
+compile time (`#guard`) import their dependencies twice, as `import` and as
+`meta import`; the three files that define elaborators are a `public meta
+section` instead.
+
 ## Submitting a pull request
 
 1. Fork the repository and create a branch from `master`.

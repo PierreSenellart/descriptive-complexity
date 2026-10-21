@@ -111,6 +111,20 @@ machine bridges.
 
 ## 3. Logics and framework extensions
 
+- **Exposure, and the `import all` inventory** [M, after the module system has
+  settled]: public definitions are all exposed, so clients and the library's
+  own files can unfold them. Opacity is the remaining knob of the module system,
+  and it is sharper than it looks: a public definition without `@[expose]` is
+  opaque even to the public theorems of its own file, so hiding the body of an
+  interpretation or a gadget formula requires that every theorem stating a
+  definitional fact about it be private too. Pick the definitions whose bodies
+  are genuinely implementation (the formulas of a reduction, the encodings)
+  and give them `@[no_expose]` together with that discipline, in one pass per
+  layer with a full build each. Alongside, the two thousand `import all` edges
+  record every cross-file use of a private declaration; where a cluster of
+  files shares the same helpers, the helpers are an internal API and should
+  become public in a module of their own, which also shrinks the private
+  oleans a module loads.
 - **FO(LFP) ⊆ NP, directly** [M]: by guessing the fixed point and the derivation
   order and checking both first-order against the certificate interface
   (`derives_eq_of_closed_of_wf`). No new mathematics – the inclusion already

@@ -290,6 +290,18 @@ builds. Then `import DescriptiveComplexity` brings in the whole library; import
 individual modules (for instance `DescriptiveComplexity.Problems.Sat`) to keep
 build times down.
 
+The library is written for Lean's module system. Importing a module gives its
+public interface: the vocabularies, the problem semantics, the classes, the
+reductions and interpretations, and the completeness, membership and hardness
+theorems, which is also exactly what the API documentation shows. Its public
+definitions are exposed, so a client can unfold them. The lemmas and gadget
+formulas behind the theorems are private to their files, and nothing outside the
+library can name them; the library's own modules reach them with `import all`,
+which Lake permits within one package only. A module re-exports (with
+`public import`) only what its own statements need, so importing a single
+problem module brings what that module's theorems are about and not the rest of
+the library.
+
 ## Documentation
 
 * **Paper**: P. Senellart and A. Gnatenko, *Descriptive Complexity in Lean:
